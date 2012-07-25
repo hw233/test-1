@@ -67,6 +67,10 @@ public:
 	std::string arenaHost;
 	UInt16      arenaPort;
 
+    //yij
+    std::string msgCenterHost;
+    UInt16      msgCenterPort;
+
     bool enableLoginLimit;
     UInt16 loginLimit;
     UInt16 onlineLimit;
@@ -106,7 +110,8 @@ public:
 	inline void setSupportCompress(bool c) { supportCompress = c; }
 	inline void setGMCheck(bool c) { GMCheck = c; }
 	inline void setArenaServer(const char * h, UInt16 p) { arenaHost = h; arenaPort = p; }
-	inline void setChannelInfo(const char * sn, int num) { slugName = sn; channelNum = num; }
+	inline void setMsgCenter(const char * h, UInt16 p) { msgCenterHost = h; msgCenterPort = p; }  //yij
+    inline void setChannelInfo(const char * sn, int num) { slugName = sn; channelNum = num; }
 	inline void setLoginLimit(bool limit) { enableLoginLimit = limit; }
 	inline void setLoginMax(UInt16 max) { loginLimit = max; }
 	inline void setOnlineLimit(UInt16 limit) { onlineLimit = limit; }
@@ -115,6 +120,7 @@ public:
     inline void setServerNum(UInt32 no) { serverNum = no; }
     inline void setServerNo(UInt32 no) { serverNo = no; }
     inline void setMergeList(const char* list) { mergeList = list?list:"";}
+
 
 	inline void setVerifyTokenServer(const char* server, UInt16 port)
     {

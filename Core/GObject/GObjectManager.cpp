@@ -2004,6 +2004,8 @@ namespace GObject
             data->pageNum = dbd.pageNum;
             data->eChallengeTime = dbd.eChallengeTime;
             data->ePhysical = dbd.ePhysical;
+            if(data->ePhysical > gAthleticsRank.GetMaxPhysical(pl->getVipLevel()))
+                data->ePhysical = gAthleticsRank.GetMaxPhysical(pl->getVipLevel());
             data->eSelectIndex = dbd.eSelectIndex;
             for(UInt8 index = 0; index < 5; index++)
             {

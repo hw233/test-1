@@ -284,6 +284,7 @@ void BattleSimulator::start(UInt8 prevWin)
                 if (_player[i]->getBuffData(PLAYER_BUFF_ATHL9, now) > 0)
                     flag2 |= BattleFighter::AthlEnh9;
             }
+            flag2 |= _player[i]->getAthlRivalBuff();
 		}
 		for(int j = 0; j < 25; ++ j)
 		{
@@ -2141,7 +2142,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
     }
 
     // 雪球-137 小蜘蛛-434
-    if(SKILL_ID(skill->getId()) == 137 || SKILL_ID(skill->getId()) == 434)
+    if(SKILL_ID(skill->getId()) == 137 || SKILL_ID(skill->getId()) == 434 || SKILL_ID(skill->getId()) == 479)
     {
         static UInt8 skill_prob_137[10][3] = {
             {0, 0, 0},
@@ -2200,8 +2201,10 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             GObject::Fighter * fgt = NULL;
             if(SKILL_ID(skill->getId()) == 137)
                 fgt = globalFighters[5679];
-            else
+            else if(SKILL_ID(skill->getId()) == 434)
                 fgt = globalFighters[6011];
+            else
+                fgt = globalFighters[7006];
             if(fgt == NULL)
                 break;
 			BattleFighter * newf = new(std::nothrow) Battle::BattleFighter(_formula, fgt, side, pos);

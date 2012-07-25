@@ -99,7 +99,7 @@ CREATE TABLE `athletics_rank` (
   `extrachallenge` int(10) unsigned NOT NULL DEFAULT '0',
   `pageNum` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `eChallengeTime` int(10) NOT NULL DEFAULT '0',
-  `ePhysical` tinyint(3) NOT NULL DEFAULT '20',
+  `ePhysical` tinyint(3) NOT NULL DEFAULT '30',
   `eSelectIndex` tinyint(3) NOT NULL DEFAULT '0',
   `eCombine1` int(10) NOT NULL DEFAULT '0',
   `eCombine2` int(10) NOT NULL DEFAULT '0',

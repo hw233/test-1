@@ -351,8 +351,16 @@ void WBoss::reward(Player* player)
     if (!sz) return;
 
     UInt8 tlvl = 0;
-    if (m_id >= 5509 && m_id <= 5514)
-        tlvl = m_id-5509;
+    if (World::getOpenTest())
+    {
+        if (m_id >= 7000 && m_id <= 7005)
+            tlvl = m_id-7000;
+    }
+    else
+    {
+        if (m_id >= 5509 && m_id <= 5514)
+            tlvl = m_id-5509;
+    }
 
     UInt32 lucky1 = uRand(sz);
     UInt32 lucky2 = uRand(sz);
@@ -464,7 +472,7 @@ void WBoss::reward(Player* player)
             }
         }
 
-        if (World::getOpenTest())
+        if (World::getOpenTest() && World::_wday != 7)
         {
             MailPackage::MailItem item[] = {{1526,1},{MailPackage::Tael,1000},{9091,1}};
             (*i).player->sendMailItem(568, 569, item, 3);

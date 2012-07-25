@@ -274,6 +274,18 @@ function doAty(player, id, param1 ,  param2)
     --print("checkTimeOver");
     --print(needflag);
     mgr:CheckTimeOver();
+    if id == 13 then
+        local VipLvl = player:getVipLevel()
+        local count
+        if VipLvl < 6 then
+            count = 15
+        else
+            count = 20
+        end
+        if mgr:GetFlag(id) >= count then
+            return
+        end
+    end
     --判断标志位
     if needflag ~= nil then
         local curflag = mgr:GetFlag(id);
@@ -365,7 +377,7 @@ local exchangeProps = {
             --id,所需积分,数量,概率下限,概率上限(1~10000)
     [29]  = { 29,  10,  10,  1,    819   },
     [400] = { 400, 30,  3,   819,  1599  },
-    [55]  = { 55,  30,  1,   1599, 2389  },
+    [9094]= { 9094,30,  1,   1599, 2389  },
     [510] = { 51,  30,  1,   2389, 3179  },
     [504] = { 504, 40,  1,   3179, 3919  },
     [503] = { 503, 30,  1,   3919, 4709  },

@@ -25,8 +25,8 @@
 #define LSL_ID          8000
 #define RSL_ID          8999
 #define LNORMAL1_ID     9000
-#define RNORMAL1_ID     9999
-#define LOTHER_ID       10000
+#define RNORMAL1_ID     11999
+#define LOTHER_ID       12000
 #define ROTHER_ID       65535
 
 enum ItemClass
