@@ -3094,7 +3094,7 @@ void OnChatReq( GameMsgHdr& hdr, ChatReq& cr )
 		NETWORK()->Broadcast(st);
 		break;
 	}
-	if (cr._type != 0xFF && cfg.msgCenterPort > 0) 
+	if (cr._type == 0 && cfg.msgCenterPort > 0) //只监听世界
 	{
 		ToMsgCenter(st);
 	}
