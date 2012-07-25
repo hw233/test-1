@@ -1606,7 +1606,7 @@ void MailVIPFromBs(LoginMsgHdr &hdr,const void * data)
                 continue;
 
 			GObject::MailItemsInfo itemsInfo(item, BackStage, nums);
-			GObject::Mail *pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFD0000, true, &itemsInfo);
+            GObject::Mail *pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFD0000, true, &itemsInfo);
 			if(pmail != NULL)
 			{
 				GObject::mailPackageManager.push(pmail->id, item, nums, bindType == 1);

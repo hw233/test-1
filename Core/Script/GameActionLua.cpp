@@ -1219,6 +1219,11 @@ namespace Script
         return Call<UInt32>("GetExchangePropsID");
     }
 
+    lua_tinker::table GameActionLua::GetdayExtraAward(UInt32 month, UInt32 day)
+    {
+        return Call<lua_tinker::table>("GetdayExtraAward", month, day);
+    }
+
     void GameActionLua::sendConsumeMails(Player* player, UInt32 ototal, UInt32 ntotal)
     {
 		return Call<void>("sendConsumeMails", player, ototal, ntotal);

@@ -299,6 +299,7 @@ namespace Script
         UInt32 GetMaxActivity(UInt32 vip);
         lua_tinker::table GetExchangeProps(UInt32 id);
         UInt32 GetExchangePropsID();
+        lua_tinker::table GetdayExtraAward(UInt32 month, UInt32 day);
 
 	private:
 		Player* _player1;	//?ű???????Ϊ????1

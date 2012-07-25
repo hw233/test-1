@@ -108,6 +108,7 @@ enum MailItemType
     AutoFrontMap,
     ClanBattleAward,
     RealItemAwardActive,
+    NewDrawingGameAward,
 };
 enum ItemFrom
 {

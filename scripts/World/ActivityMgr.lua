@@ -14,7 +14,7 @@ local checkFlag = {
     [11] = 1,-- AtyCountryWar,//阵营战
     [12] = 5, -- AtyClanWar,   //帮派战
     [13] = 24,-- AtyAthletics, //斗剑
-    [14]=  1, --AtySign_in,   //每日签到,做标记是否签到,不加活跃度点数
+    [14]=  1, --AtySignIn,   //每日签到,做标记是否签到,不加活跃度点数
 
     --[110] = 1, --AtyShuoShuo, //领取发表说说奖励
     --[111] = 1, --AtyInvited, //领取好友邀请奖励
@@ -408,4 +408,49 @@ function GetExchangePropsID()
     return 29 
 end
 
+local dayExtraAward = {
+    [1] = {         --1月份
+    },
+    [2] = {         --2月份
+    },
+    [3] = {
+    },
+    [4] = {
+    },
+    [5] = {
+    },
+    [6] = {
+    },
+    [7] = {         --7月份
+        [25] = { {500,1},{29,5},   },
+    },
+    [8] = {
+    },
+    [9] = {
+    },
+    [10] = {
+    },
+    [11] = {
+    },
+    [12] = {
+    },
+}
+
+function GetdayExtraAward(month, day)
+    if nil == month or nil == day
+    then
+        return {}
+    end
+    local mon_tbl = dayExtraAward[tonumber(month)]
+    if nil == mon_tbl or nil == next(mon_tbl)
+    then
+        return {}
+    end
+    local award = mon_tbl[tonumber(day)]
+    if nil == award or nil == next(award) 
+    then 
+        return {}
+    end
+    return award
+end
 

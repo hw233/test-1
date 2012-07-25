@@ -616,7 +616,7 @@ void World::World_Midnight_Check( World * world )
 
     UInt32 nextday = curtime + 30;
 	globalPlayers.enumerate(enum_midnight, static_cast<void *>(&nextday));
-
+    leaderboard.newDrawingGame(nextday);
     //给筷子使用称号
     if(bSingleDayEnd)
     {

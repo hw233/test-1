@@ -127,7 +127,7 @@ public:
 	static inline UInt32 SharpDay(int c = 0, UInt32 cur = Now())
 	{
 		UInt32 tmptm = (cur + timezone) / 86400 * 86400 + timezone;
-		if(tmptm > cur)
+        if(tmptm > cur)
 			tmptm -= 86400;
 		else if(tmptm + 86400 <= cur)
 			tmptm += 86400;
