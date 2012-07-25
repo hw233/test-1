@@ -1,9 +1,9 @@
-cfg:setTcpPort(8833);
+cfg:setTcpPort(8888);
 cfg:setScriptPath("scripts/");
 cfg:setReportPath("reports/");
-cfg:setDataDatabase("localhost", 3306, "kingxin", "kingxin", "data_8833");
-cfg:setObjectDatabase("localhost", 3306, "kingxin", "kingxin", "asss_8833");
-cfg:setLogDatabase("localhost", 3306, "kingxin", "kingxin", "log_8833");
+cfg:setDataDatabase("localhost", 3306, "kingxin", "kingxin", "data_8888");
+cfg:setObjectDatabase("localhost", 3306, "kingxin", "kingxin", "asss_8888");
+cfg:setLogDatabase("localhost", 3306, "kingxin", "kingxin", "log_8888");
 cfg:setCryptKeys("huDqrvKLuk69Ajdl", "lsnMS3SYrnQNkndf");
 cfg:setGMCryptKeys("9uQdrvCLua69vKdl", "BsnMs9SY4nnMkcda");
 cfg:setFBRechargeKeys("1AkdraCLuainvjdA", "lBnnA9SY4yn8k0d0");
