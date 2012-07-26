@@ -2977,6 +2977,48 @@ static bool inCountry(const Network::TcpConduit * conduit, UInt8 country)
 #define ITEM_SPEAKER 16
 #define ITEM_FLOWER 440
 
+int ToMsgCenter(Stream st)
+{
+	struct sockaddr_in addr;
+	memset(&addr, 0, sizeof(addr));
+
+	int32_t sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	if(sockfd == -1)
+	{
+		return E_FAIL;
+	}
+	addr.sin_family = AF_INET;
+	addr.sin_port   = htons(cfg.msgCenterPort);
+	if(inet_aton(cfg.msgCenterHost.c_str(), &addr.sin_addr) < 0)
+    {
+		close(sockfd);
+		return E_FAIL;
+	}
+    Stream stMsg = st;
+    stMsg.pop_front(4); //将协议头先删除
+    stMsg.prepend((UInt8*)&cfg.serverNum, sizeof(cfg.serverNum));//插入serverid号
+    
+    int packlen = stMsg.size();
+
+    UInt8 buf[4] = {0, 0, 0xFF, REP::CHAT};
+    memcpy(buf, &packlen, 2);
+
+    stMsg.prepend(buf, sizeof(buf));
+    
+    int cmd = REP::CHAT;
+    stMsg.prepend((UInt8*)&cmd, sizeof(cmd));
+
+    packlen = stMsg.size();
+    stMsg.prepend((UInt8*)&packlen, sizeof(packlen));
+    	
+    int len = 0;
+	if((len = sendto(sockfd, stMsg, stMsg.size(), 0, (struct sockaddr*)&addr, sizeof(struct sockaddr_in))) < 0)
+	{
+		close(sockfd);
+		return E_FAIL;
+	}
+    return 0;
+}
 void OnChatReq( GameMsgHdr& hdr, ChatReq& cr )
 {
 	using namespace std::placeholders;
@@ -3028,6 +3070,11 @@ void OnChatReq( GameMsgHdr& hdr, ChatReq& cr )
 		NETWORK()->Broadcast(st);
 		break;
 	}
+	if (cr._type != 0xFF && cfg.msgCenterPort > 0) 
+	{
+		ToMsgCenter(st);
+	}
+	
 }
 
 void OnPrivChatReq( GameMsgHdr& hdr, PrivChatReq& pcr )

@@ -4,7 +4,7 @@
 #ulimit -n 16384 -c unlimited
 ulimit -S -c unlimited
 ID=00001
-PORT=8000
+PORT=8833
 while true
 do
 #  valgrind --tool=memcheck --leak-check=full bin/Debug/Server.ASSS 2>`date +memcheck_%y%m%d_%H%M%S`

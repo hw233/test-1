@@ -30,6 +30,7 @@ ConfigScript::ConfigScript( Cfg * cfg )
 	class_def<Cfg>("setSupportCompress", &Cfg::setSupportCompress);
 	class_def<Cfg>("setGMCheck", &Cfg::setGMCheck);
 	class_def<Cfg>("setArenaServer", &Cfg::setArenaServer);
+    class_def<Cfg>("setMsgCenter", &Cfg::setMsgCenter);   //yij
 	class_def<Cfg>("setChannelInfo", &Cfg::setChannelInfo);
 	class_def<Cfg>("setLoginLimit", &Cfg::setLoginLimit);
 	class_def<Cfg>("setLoginMax", &Cfg::setLoginMax);
