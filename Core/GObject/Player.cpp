@@ -2720,9 +2720,9 @@ namespace GObject
 			ret = 0x0101;
 			_lastNg = ng;
 
-            UInt32 exp = 0;
+            UInt32 exp = expfactor * ng->getExp();
             if(getBuffData(PLAYER_BUFF_TRAINP3, now))
-                exp = expfactor * ng->getExp() * 18 / 10;
+                exp *= (18.f/10.f);
             pendExp(exp);
 
 			ng->getLoots(this, _lastLoot, lootlvl, &atoCnt);
