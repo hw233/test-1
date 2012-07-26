@@ -2301,40 +2301,105 @@ void AthleticsRank::updateAthleticsMartial(Player* pl)
         level += 3;
     else
     {
-        if(level == 30)
-            ;
-        else
+        //if(level == 30)
+        //    ;
+        //else
             level -= 1;
     }
 
+    UInt32 size = 0;
+    std::map<UInt16, UInt64> mapList;
+    UInt32 mapCnt = 0;
+    UInt32 j;
     GObject::GlobalLevelsPlayersIterator it = GObject::globalLevelsPlayers.find(level);
-    if(it == GObject::globalLevelsPlayers.end())
-        it = GObject::globalLevelsPlayers.find(level - 1);
-    if(it == GObject::globalLevelsPlayers.end())
-        it = GObject::globalLevelsPlayers.find(level - 2);
-    if(it == GObject::globalLevelsPlayers.end())
-        it = GObject::globalLevelsPlayers.find(level - 3);
-    if(it == GObject::globalLevelsPlayers.end())
-        it = GObject::globalLevelsPlayers.find(level + 1);
-    if(it == GObject::globalLevelsPlayers.end())
-        return;
-
-    GObject::LevelPlayers* lvPlayer = it->second;
-
-    UInt32 size = lvPlayer->size();
-    UInt32 size2 = size;
-    UInt8 cnt = 1;
-    while(size < 100 && (level - cnt) > 29)
+    if(it != GObject::globalLevelsPlayers.end())
     {
-        GObject::GlobalLevelsPlayersIterator it = GObject::globalLevelsPlayers.find(level - cnt);
-        ++ cnt;
+        GObject::LevelPlayers* lvPlayer = it->second;
+        size = lvPlayer->size();
+        for(j = 0; j < size; j++)
+            mapList[mapCnt++] = (*lvPlayer)[j];
+    }
+    UInt8 cnt = 1;
+    UInt16 k;
+    URandom rnd(time(NULL));
+    Int32 rollId;
+    Int32 rollId2;
+    bool repeat;
+    while(size < 100 && (level - cnt) >= 29)
+    {
+        it = GObject::globalLevelsPlayers.find(level - cnt);
+        ++cnt;
         if(it == GObject::globalLevelsPlayers.end())
             continue;
         GObject::LevelPlayers* lvPlayer2 = it->second;
-
         size += lvPlayer2->size();
+        for(j = 0; j < lvPlayer2->size(); j++)
+            mapList[mapCnt++] = (*lvPlayer2)[j];
     }
 
+    UInt32 showCnt = size;
+    if(showCnt > 5)
+        showCnt = 5;
+    for(k = 0; k < showCnt; k++)
+    {
+        rollId = rnd(size);
+        rollId2 = rollId;
+        while(rollId < static_cast<Int32>(size))
+        {
+            if(mapList[rollId] == pl->getId())
+            {
+                rollId += 1;
+                continue;
+            }
+            repeat = false;
+            for(j = 0; j < k; j++)
+            {
+                if(mapList[rollId] == idIdx[j])
+                {
+                    repeat = true;
+                    break;
+                }
+            }
+            if(repeat)
+            {
+                rollId += 1;
+                continue;
+            }
+            break;
+        }
+        if(rollId == static_cast<Int32>(size))
+        {
+            rollId = rollId2 - 1;
+            while(rollId >= 0)
+            {
+                if(mapList[rollId] == pl->getId())
+                {
+                    rollId -= 1;
+                    continue;
+                }
+                repeat = false;
+                for(j = 0; j < k; j++)
+                {
+                    if(mapList[rollId] == idIdx[j])
+                    {
+                        repeat = true;
+                        break;
+                    }
+                }
+                if(repeat)
+                {
+                    rollId -= 1;
+                    continue;
+                }
+                break;
+            }
+        }
+        if(rollId == -1)
+            break;
+        idIdx[k] = mapList[rollId];
+    }
+
+#if 0
     if(size < 5)
     {
         int k = 0;
@@ -2452,7 +2517,7 @@ void AthleticsRank::updateAthleticsMartial(Player* pl)
 
         }
     }
-
+#endif
     AthleticsRankData* curData = getAthleticsRankData(pl);
     if(!curData)
         return;

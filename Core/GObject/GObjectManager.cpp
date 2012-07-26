@@ -1307,7 +1307,7 @@ namespace GObject
 			Fighter * fgt2 = fgt->clone(pl);
 			if(fgt2 == NULL)
 				continue;
-            if(pl->isMainFighter(specfgtobj.id) && specfgtobj.level > 29)
+            if(pl->isMainFighter(specfgtobj.id) && specfgtobj.level > 28)
             {
                 GObject::LevelPlayers* lvPlayer = NULL;
                 GObject::GlobalLevelsPlayersIterator it = GObject::globalLevelsPlayers.find(specfgtobj.level);
