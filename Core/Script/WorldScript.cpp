@@ -127,6 +127,11 @@ void WorldScript::init()
 	def("getICAct", GObject::World::getICAct);
 	def("setPExpItems", GObject::World::setPExpItems);
 	def("getPExpItems", GObject::World::getPExpItems);
+	def("setSoSoMapBegin", GObject::World::setSoSoMapBegin);
+	def("setOpenTest", GObject::World::setOpenTest);
+	def("getOpenTest", GObject::World::getOpenTest);
+	def("setConsumeActive", GObject::World::setConsumeActive);
+	def("getConsumeActive", GObject::World::getConsumeActive);
 	def("Broadcast", SysBroadcast);
 	def("GetStore", GetStore);
 	def("GetTitleList", GetTitleList);

@@ -1681,8 +1681,87 @@ function sendRechargeMails1(player, ototal, ntotal)
     end
 end
 
+function sendRechargeMails2(player, ototal, ntotal)
+    local lvls = {
+        99,199,399,699,1099,1599,2199,2899,3699,4599,5599,8999,15999,
+    }
+    local items = {
+        {503,2,1, 514,1,1},
+        {500,3,1, 56,6,1, 57,2,1},
+        {508,2,1, 56,6,1, 57,5,1},
+        {511,6,1, 466,6,1},
+        {516,3,1, 512,2,1},
+        {5065,1,1, 56,5,1},
+        {503,5,1, 56,6,1, 57,2,1},
+        {515,2,1, 56,6,1, 57,2,1},
+        {515,2,1, 56,6,1, 57,5,1},
+        {515,2,1, 56,6,1, 57,6,1},
+        {549,2,1, 56,6,1, 57,6,1},
+        {515,5,1, 30,10,1, 56,5,1, 57,5,1},
+        {507,5,1, 509,5,1, 515,5,1, 547,5,1},
+    }
+
+    local olvl = calcRechargeLevel(lvls, ototal)
+    local nlvl = calcRechargeLevel(lvls, ntotal)
+
+    if nlvl == 0 or olvl == nlvl then
+        return
+    end
+
+    for k = olvl+1, nlvl do
+        local title = string.format(msg_100, lvls[k])
+        local ctx = string.format(msg_101, lvls[k])
+        sendItemPackageMail(player, title, ctx, items[k]);
+    end
+end
+
+function sendRechargeMails3(player, ototal, ntotal)
+    local lvls = {
+        99,199,399,699,1099,1599,2199,2899,3699,4599,5599,8999,15999,26999,42999,64999,99999,
+    }
+    local items = {
+        {503,2,1, 516,2,1},
+        {514,1,1, 56,2,1},
+        {500,3,1, 57,3,1},
+        {505,2,1, 15,6,1},
+        {512,1,1, 501,1,1},
+        {508,2,1, 506,3,1},
+        {33,2,1, 515,3,1, 507,2,1},
+        {503,2,1, 514,3,1},
+        {509,1,1, 507,1,1},
+        {8000,3,1, 549,3,1, 509,2,1},
+        {1528,1,1},
+        {509,1,1, 507,1,1},
+        {509,2,1, 507,1,1, 515,1,1},
+        {509,2,1, 507,2,1, 515,1,1},
+        {509,2,1, 507,2,1, 515,2,1},
+        {509,3,1, 507,3,1, 515,2,1},
+        {509,3,1, 507,3,1, 515,3,1},
+    }
+
+    local olvl = calcRechargeLevel(lvls, ototal)
+    local nlvl = calcRechargeLevel(lvls, ntotal)
+
+    if nlvl == 0 or olvl == nlvl then
+        return
+    end
+
+    for k = olvl+1, nlvl do
+        local title = string.format(msg_100, lvls[k])
+        local ctx = string.format(msg_101, lvls[k])
+        sendItemPackageMail(player, title, ctx, items[k]);
+    end
+end
+
 function sendRechargeMails(player, ototal, ntotal)
-    sendRechargeMails1(player, ototal, ntotal)
+    --sendRechargeMails1(player, ototal, ntotal)
+    local start = { ['year'] = 2012, ['month'] = 7, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local s = os.time(start)
+    if os.time() >= s then
+        sendRechargeMails3(player, ototal, ntotal)
+    else
+        sendRechargeMails2(player, ototal, ntotal)
+    end
 end
 
 function onEquipForge(player, id, onums)
@@ -1708,4 +1787,78 @@ function onEquipForge(player, id, onums)
 
     sendItemPackageMail(player, msg_103, msg_103, item);
 end
+
+function onSoSoMapAward(player, off)
+    if off >= 7 then
+        return 0
+    end
+
+    local items = {
+        {503, 1},
+        {514, 1},
+        {56, 1},
+        {57, 1},
+        {11, 2},
+        {518, 5},
+        {509, 1},
+    }
+
+    local item = items[off+1]
+    if item == nil then
+        return 0 
+    end
+
+    print("item[1]" .. item[1])
+    local package = player:GetPackage()
+    package:Add(item[1], item[2], true)
+    return 1
+end
+
+
+function sendConsumeMails1(player, ototal, ntotal)
+    local lvls = {
+        100,200,400,600,800,1000,1200,1400,1600,1800,2000,6800,14000,22000,32000,44000,70000,
+    }
+
+    local items = {
+        {500,2,1, 514,2,1, 57,2,1, 56,2,1, 15,2,1},
+        {514,1,1, 57,1,1},
+        {500,1,1, 56,1,1},
+        {512,1,1, 501,1,1, 503,1,1, 516,1,1, 515,1,1},
+        {508,2,1, 506,2,1},
+        {8000,2,1, 33,3,3, 515,1,1, 509,2,1},
+        {505,2,1, 15,3,1},
+        {503,2,1, 514,3,1},
+        {509,1,1, 507,1,1},
+        {9076,1,1, 509,1,1, 507,1,1, 515,1,1},
+        {9076,2,1, 509,1,1, 507,1,1, 515,1,1},
+        {9076,3,1, 509,1,1, 507,1,1, 515,1,1},
+        {9076,5,1, 509,1,1, 507,1,1, 515,1,1},
+        {9076,6,1, 509,2,1, 507,2,1, 515,2,1},
+        {9076,8,1, 509,2,1, 507,2,1, 515,2,1},
+        {9076,9,1, 509,2,1, 507,2,1, 515,2,1},
+        {9076,10,1, 509,2,1, 507,2,1, 515,2,1},
+    }
+
+    local olvl = calcRechargeLevel(lvls, ototal)
+    local nlvl = calcRechargeLevel(lvls, ntotal)
+
+    if nlvl == 0 or olvl == nlvl then
+        return
+    end
+
+    for k = olvl+1, nlvl do
+        if lvls[k] == nil or items[k] == nil then
+            return
+        end
+        local title = string.format(msg_105, lvls[k])
+        local ctx = string.format(msg_106, lvls[k])
+        sendItemPackageMail(player, title, ctx, items[k]);
+    end
+end
+
+function sendConsumeMails(player, ototal, ntotal)
+    sendConsumeMails1(player, ototal, ntotal);
+end
+
 

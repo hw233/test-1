@@ -125,6 +125,8 @@ namespace Script
         lua_tinker::def(_L, "setFourCopAct", GObject::World::setFourCopAct);
         lua_tinker::def(_L, "getFourCopAct", GObject::World::getFourCopAct);
         lua_tinker::def(_L, "getPExpItems", GObject::World::getPExpItems);
+        lua_tinker::def(_L, "getOpenTest", GObject::World::getOpenTest);
+        lua_tinker::def(_L, "getConsumeActive", GObject::World::getConsumeActive);
 
         CLASS_DEF(GameActionLua, Print);
         lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);
@@ -1200,5 +1202,14 @@ namespace Script
     {
 		return Call<void>("sendRechargeMails", player, ototal, ntotal);
     }
+    void GameActionLua::sendConsumeMails(Player* player, UInt32 ototal, UInt32 ntotal)
+    {
+		return Call<void>("sendConsumeMails", player, ototal, ntotal);
+    }
+
+	bool GameActionLua::onSoSoMapAward( Player* player, UInt8 off)
+	{
+		Call<bool>("onSoSoMapAward", player, off);
+	}
 }
 

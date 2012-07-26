@@ -100,6 +100,8 @@ namespace GObject
 #define PLAYER_BUFF_YBUF            0x41
 #define PLAYER_BUFF_BBUF            0x42
 
+#define PLAYER_BUFF_N_ATHLETICS     0x44    //邀请斗剑冷却
+
 #define PLAYER_BUFF_DISPLAY_MAX		0x50
 #define PLAYER_BUFF_COUNT			0x50
 
@@ -934,6 +936,7 @@ namespace GObject
 		void makeFighterInfo(Stream&, Fighter *, bool = true);
 		bool makeFighterInfo(Stream&, UInt32);
         void sendRechargeInfo();
+        void sendConsumeInfo();
         void getMDItem();
         void sendMDSoul(UInt8 type, UInt32 id = 0);
         void sendJuneRechargeMails(UInt32 value);
@@ -955,6 +958,8 @@ namespace GObject
         void checkQQAward();
         void RollYDGem();
         void openLevelBox(UInt8 lvl, UInt8 cls);
+
+        void consumeGold(UInt32 c);
 
 	public:
 		Map* GetMap();
@@ -1164,6 +1169,7 @@ namespace GObject
 		void sendFriendActList();
 
 		std::string& fixName(std::string& name);
+        void patchDeleteDotS(std::string& name);
 		inline void patchMergedName() { patchMergedName(_id, _playerData.name); }
 		static void patchMergedName(UInt64 id, std::string& name);
         const char *patchShowName(const char* name, const UInt64 playerId = 0);
@@ -1567,6 +1573,10 @@ namespace GObject
     private:
         std::vector<RNR> rechargs;
         UInt32 m_arenaCommitCD;
+
+    public:
+        void getSoSoMapAward();
+        void sendSoSoMapInfo();
 
 #ifdef _FB
     public:

@@ -538,7 +538,7 @@ namespace GObject
         m_HeroMemo = new HeroMemo(this);
         m_ShuoShuo = new ShuoShuo(this);
         m_CFriend = new CFriend(this);
-        m_relation = new NewRelation();
+        m_relation = new NewRelation(this);
         m_pVars = new VarSystem(id);
         memset(&m_ctp, 0, sizeof(m_ctp));
         m_teamData = NULL;
@@ -3660,7 +3660,7 @@ namespace GObject
             moneyArena -= a;
             if(ci!=NULL)
             {
-                DBLOG1().PushUpdateData("insert into consume_achievement (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+                DBLOG1().PushUpdateData("insert into consume_arena (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
                 cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, a, TimeUtil::Now());
             }
         }
@@ -6309,6 +6309,17 @@ namespace GObject
 		send((st));
     }
 
+    void Player::sendConsumeInfo()
+    {
+        if (!World::getConsumeActive())
+            return;
+
+        UInt32 total = GetVar(VAR_CONSUME);
+		Stream st(REP::DAILY_DATA);
+		st << static_cast<UInt8>(15) << total << Stream::eos;
+		send((st));
+    }
+
 	void Player::sendTopupMail(const char* title, const char* content, UInt32 gold, UInt8 num)
 	{
 		m_MailBox->newMail(NULL, 0x01, title, content);
@@ -7139,7 +7150,7 @@ namespace GObject
 
 	std::string& Player::fixName( std::string& name )
 	{
-		if(cfg.merged && !name.empty())if(static_cast<UInt8>(*(name.end() - 1)) >= 32 && !_playerData.name.empty())
+        if(cfg.merged && !name.empty())if(static_cast<UInt8>(*(name.end() - 1)) >= 32 && !_playerData.name.empty())
 		{
 			const std::string& pn = _playerData.name;
 			size_t idx = pn.size() - 1;
@@ -7150,10 +7161,33 @@ namespace GObject
 			}
 			name.insert(name.end(), pn.begin() + idx + 1, pn.end());
 		}
-		return name;
+        return name;
 	}
 
-	void Player::patchMergedName( UInt64 id, std::string& name )
+    void Player::patchDeleteDotS(std::string& name)
+    {
+        if(cfg.merged && !name.empty())
+        {
+            UInt16 serverNo;
+            std::string nameTmp = name;
+            size_t pos = nameTmp.find(".S");
+            if(pos == std::string::npos)
+                pos = nameTmp.find(".s");
+            if(pos == std::string::npos)
+                return;
+            if(pos + 2 >= nameTmp.size())
+                return;
+            std::string tmp(nameTmp.begin()+pos+2, nameTmp.end());
+            serverNo = atoi(tmp.c_str());
+            if(serverNo == (this->getId() >> 48))
+            {
+                nameTmp.erase(nameTmp.begin()+pos, nameTmp.end());
+                name = nameTmp;
+            }
+        }
+    }
+
+    void Player::patchMergedName( UInt64 id, std::string& name )
 	{
 		if(cfg.merged && id >= 0x1000000000000ull)
 		{
@@ -8691,6 +8725,8 @@ namespace GObject
     {
         checkPIcCount();
         int nVipLevel = getVipLevel();
+        if (PracticePlace::_picCnt[nVipLevel] < _playerData.picCount)
+            _playerData.picCount = 0;
         return PracticePlace::_picCnt[nVipLevel] - _playerData.picCount;
     }
 
@@ -9057,6 +9093,10 @@ namespace GObject
             // 回流今日目标
         case 4:
             getTargetAwardRF(opt);
+            break;
+
+        case 5:
+            getSoSoMapAward();
             break;
         }
     }
@@ -10726,6 +10766,73 @@ namespace GObject
         }
     }
 #endif
+
+    void Player::getSoSoMapAward()
+    {
+        UInt32 now = TimeUtil::Now();
+        if (!World::_sosomapbegin || now < World::_sosomapbegin)
+            return;
+
+        UInt32 now_sharp = TimeUtil::SharpDay(0, now);
+        UInt32 soso_sharp = TimeUtil::SharpDay(0, World::_sosomapbegin);
+
+        if (now_sharp - soso_sharp > 7 * DAY_SECS)
+            return;
+
+        UInt32 off = CREATE_OFFSET(soso_sharp, now_sharp);
+        if (off >= 7)
+            return;
+
+        UInt32 soso = GetVar(VAR_SOSOMAPAWARD);
+        bool got = (soso>>off)&0x1;
+        if (got)
+            return;
+
+        GameAction()->onSoSoMapAward(this, off);
+
+        soso |= (1<<off);
+        SetVar(VAR_SOSOMAPAWARD, soso);
+
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(5) << static_cast<UInt8>(0) << Stream::eos;
+        send(st);
+    }
+
+    void Player::sendSoSoMapInfo()
+    {
+        UInt32 now = TimeUtil::Now();
+
+        if (!World::_sosomapbegin || now < World::_sosomapbegin)
+            return;
+
+        UInt32 now_sharp = TimeUtil::SharpDay(0, now);
+        UInt32 soso_sharp = TimeUtil::SharpDay(0, World::_sosomapbegin);
+
+        if (now_sharp - soso_sharp > 7 * DAY_SECS)
+            return;
+
+        UInt32 off = CREATE_OFFSET(soso_sharp, now_sharp);
+        if (off >= 7)
+            return;
+
+        UInt32 soso = GetVar(VAR_SOSOMAPAWARD);
+        bool got = (soso>>off)&0x1;
+
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(5) << static_cast<UInt8>(got?0:1) << Stream::eos;
+        send(st);
+    }
+
+    void Player::consumeGold(UInt32 c)
+    {
+        if (World::getConsumeActive())
+        {
+            UInt32 total = GetVar(VAR_CONSUME);
+            GameAction()->sendConsumeMails(this, total, total+c);
+            SetVar(VAR_CONSUME, total+c);
+            sendConsumeInfo();
+        }
+    }
 
 } // namespace GObject
 
