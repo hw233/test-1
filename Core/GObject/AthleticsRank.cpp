@@ -2446,22 +2446,22 @@ void AthleticsRank::updateAthleticsMartial(Player* pl)
             roll0 = (roll0 + 1) % size;
         }
         UInt32 roll1 = rnd(size);
-        while(size2 > roll1 && (pl->getId() == (*lvPlayer)[roll1] || roll1 == roll0))
+        while((size2 > roll1 && pl->getId() == (*lvPlayer)[roll1]) || roll1 == roll0)
         {
             roll1 = (roll1 + 1) % size;
         }
         UInt32 roll2 = rnd(size);
-        while(size2 > roll2 && (pl->getId() == (*lvPlayer)[roll2] || roll2 == roll0 || roll2 == roll1))
+        while((size2 > roll2 && pl->getId() == (*lvPlayer)[roll2]) || roll2 == roll0 || roll2 == roll1)
         {
             roll2 = (roll2 + 1) % size;
         }
         UInt32 roll3 = rnd(size);
-        while(size2 > roll3 && (pl->getId() == (*lvPlayer)[roll3] || roll3 == roll0 || roll3 == roll1 || roll3 == roll2))
+        while((size2 > roll3 && pl->getId() == (*lvPlayer)[roll3]) || roll3 == roll0 || roll3 == roll1 || roll3 == roll2)
         {
             roll3 = (roll3 + 1) % size;
         }
         UInt32 roll4 = rnd(size);
-        while(size2 > roll4 && (pl->getId() == (*lvPlayer)[roll4] || roll4 == roll0 || roll4 == roll1 || roll4 == roll2 || roll4 == roll3))
+        while((size2 > roll4 && pl->getId() == (*lvPlayer)[roll4]) || roll4 == roll0 || roll4 == roll1 || roll4 == roll2 || roll4 == roll3)
         {
             roll4 = (roll4 + 1) % size;
         }
@@ -2653,7 +2653,7 @@ void AthleticsRank::updateAthleticsP(Player* pl, UInt8 type)
                 AthleticsRankData* rankData = *found->second;
                 if(rankData->ePhysical >= MaxPhysical[pl->getVipLevel()])
                     return;
-                if(pl->GetVar(VAR_PHYSICAL_BUY) > MaxPhysicalBuy[pl->getVipLevel()])
+                if(pl->GetVar(VAR_PHYSICAL_BUY) >= MaxPhysicalBuy[pl->getVipLevel()])
                 {
                     pl->sendMsgCode(0, 1496);
                     return;
