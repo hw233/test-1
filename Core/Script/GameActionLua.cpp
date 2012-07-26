@@ -1228,5 +1228,19 @@ namespace Script
 	{
 		return Call<bool>("onSoSoMapAward", player, off);
 	}
+
+    UInt8 GameActionLua::onGetAthlRandomMaxValue(UInt8 diffculty)
+	{
+		return Call<UInt8>("onGetAthlRandomMaxValue", diffculty);
+	}
+	UInt32 GameActionLua::onGetAthlRandomAward(UInt8 diffculty, UInt8 opt)
+	{
+		return Call<UInt32>("onGetAthlRandomAward", diffculty, opt);
+	}
+	UInt8 GameActionLua::onGetAthlRandomDiffculty()
+	{
+		return Call<UInt8>("onGetAthlRandomDiffculty");
+	}
+
 }
 

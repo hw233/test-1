@@ -544,7 +544,7 @@ void OnLevelChange( GameMsgHdr& hdr, const void* data)
 	const GObject::LevelChange* lvc = reinterpret_cast<const GObject::LevelChange*>(data);
     if(lvc->oldLv == lvc->newLv)
         return;
-    if(lvc->oldLv > 29)
+    if(lvc->oldLv > 28)
     {
         GObject::GlobalLevelsPlayersIterator it = GObject::globalLevelsPlayers.find(lvc->oldLv);
         if(it != GObject::globalLevelsPlayers.end())
@@ -563,7 +563,7 @@ void OnLevelChange( GameMsgHdr& hdr, const void* data)
             }
         }
     }
-    if(lvc->newLv > 29)
+    if(lvc->newLv > 28)
     {
         GObject::LevelPlayers* lvPlayer = NULL;
         GObject::GlobalLevelsPlayersIterator it = GObject::globalLevelsPlayers.find(lvc->newLv);
