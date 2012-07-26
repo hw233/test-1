@@ -128,6 +128,7 @@ namespace GObject
     float GObjectManager::_tough_max;
     float GObjectManager::_counter_max;
     float GObjectManager::_mres_max;
+    float GObjectManager::_cridmg_max;
 
     std::vector<std::vector<UInt32>> GObjectManager::_color_chance_gold;
     std::vector<std::vector<UInt32>> GObjectManager::_color_chance_free;
@@ -213,6 +214,7 @@ namespace GObject
         LoadLuckyLog();
         loadRNR();
         loadNewRelation();
+        loadSkillStrengthen();
 		DB::gDataDBConnectionMgr->UnInit();
 	}
 
@@ -401,6 +403,7 @@ namespace GObject
             _tough_max = lua_tinker::call<float>(L, "getToughMax");
             _counter_max = lua_tinker::call<float>(L, "getCounterMax");
             _mres_max = lua_tinker::call<float>(L, "getMagResMax");
+            _cridmg_max = lua_tinker::call<float>(L, "getCriticalDmgMax");
         }
         lua_close(L);
 
@@ -1884,7 +1887,7 @@ namespace GObject
     	last_id = 0xFFFFFFFFFFFFFFFFull;
 		pl = NULL;
 		DBActivityData atydata;
-		if(execu->Prepare("SELECT `playerId`, `overTime`, `awardId`, `point`, `award`, `flags` FROM `activityData` ORDER BY  `playerId`", atydata) != DB::DB_OK)
+		if(execu->Prepare("SELECT `playerId`, `overTime`, `awardId`, `point`, `award`, `flags`, `scores`, `propsID` FROM `activityData` ORDER BY  `playerId`", atydata) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -1957,7 +1960,7 @@ namespace GObject
 		LoadingCounter lc("Loading athletics_rank:");
 		DBAthleticsData dbd;
         UInt32 rank[2] = {0,0};
-		if(execu->Prepare("SELECT `row`, `rank`, `ranker`, `maxRank`, `challengeNum`, `challengeTime`, `prestige`, `tael`, `winStreak`, `beWinStreak`, `failStreak`, `beFailStreak`, `oldRank`, `first4Rank`, `extrachallenge`, `pageNum` FROM `athletics_rank` ORDER BY `rank`, `maxRank`", dbd) != DB::DB_OK)
+		if(execu->Prepare("SELECT `row`, `rank`, `ranker`, `maxRank`, `challengeNum`, `challengeTime`, `prestige`, `tael`, `winStreak`, `beWinStreak`, `failStreak`, `beFailStreak`, `oldRank`, `first4Rank`, `extrachallenge`, `pageNum`, `eChallengeTime`, `ePhysical`, `eSelectIndex`, `eCombine1`, `eCombine2`, `eCombine3`, `eCombine4`, `eCombine5`, `eRival1`, `eRival2`, `eRival3`, `eRival4`, `eRival5`, `eCanAttack1`, `eCanAttack2`, `eCanAttack3`, `eCanAttack4`, `eCanAttack5`, `eRivalType1`, `eRivalType2`, `eRivalType3`, `eRivalType4`, `eRivalType5` FROM `athletics_rank` ORDER BY `rank`, `maxRank`", dbd) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -1999,6 +2002,18 @@ namespace GObject
             data->first4rank = dbd.first4rank;
             data->extrachallenge = dbd.extrachallenge;
             data->pageNum = dbd.pageNum;
+            data->eChallengeTime = dbd.eChallengeTime;
+            data->ePhysical = dbd.ePhysical;
+            if(data->ePhysical > gAthleticsRank.GetMaxPhysical(pl->getVipLevel()))
+                data->ePhysical = gAthleticsRank.GetMaxPhysical(pl->getVipLevel());
+            data->eSelectIndex = dbd.eSelectIndex;
+            for(UInt8 index = 0; index < 5; index++)
+            {
+                data->eCombine[index] = dbd.eCombine[index];
+                data->eRival[index] = dbd.eRival[index];
+                data->eCanAttack[index] = dbd.eCanAttack[index];
+                data->eRivalType[index] = dbd.eRivalType[index];
+            }
 			gAthleticsRank.addAthleticsFromDB(dbd.row, data);
 		}
 		lc.finalize();
@@ -3724,6 +3739,7 @@ namespace GObject
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
+			lc.advance();
 			pl = globalPlayers[hm.playerId];
             if (!pl)
                 continue;
@@ -3748,6 +3764,7 @@ namespace GObject
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
+			lc.advance();
 			pl = globalPlayers[ss.playerId];
             if (!pl)
                 continue;
@@ -3772,6 +3789,7 @@ namespace GObject
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
+			lc.advance();
 			pl = globalPlayers[cfa.playerId];
             if (!pl)
                 continue;
@@ -3889,6 +3907,7 @@ namespace GObject
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
+			lc.advance();
             TripodData td;
             td.soul = t.soul;
             td.fire = t.fire;
@@ -3934,6 +3953,7 @@ namespace GObject
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
+			lc.advance();
             GObject::PracticeData* ppd = new (std::nothrow) GObject::PracticeData(pd.id);
             if (!ppd)
                 return false;
@@ -3990,6 +4010,7 @@ namespace GObject
         bool found = false;
 		while(execu->Next() == DB::DB_OK)
 		{
+			lc.advance();
             if (rrdb.id == id && rrdb.num == num)
             {
                 found = true;
@@ -4309,7 +4330,7 @@ namespace GObject
             Player* pl = globalPlayers[t.playerId];
             if(!pl)
                 continue;
-            pl->GetNewRelation()->LoadFromDB(t.playerId, t.mood, t.sign);
+            pl->GetNewRelation()->LoadFromDB(t.mood, t.sign);
         }
         lc.finalize();
         return true;
@@ -4354,4 +4375,42 @@ namespace GObject
         return true;
     }
 
+    bool GObjectManager::loadSkillStrengthen()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading skill strengthen");
+        DBSS ss;
+        if(execu->Prepare("SELECT `id`, `playerId`, `skillid`, `father`, `maxVal`, `curVal`, `lvl`, `maxLvl` FROM `skill_strengthen` ORDER BY `playerId`", ss) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+        Player* pl = NULL;
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		while(execu->Next() == DB::DB_OK)
+        {
+			lc.advance();
+			if(ss.playerId != last_id)
+			{
+				last_id = ss.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+			Fighter * fgt = pl->findFighter(ss.id);
+			if(fgt == NULL)
+				continue;
+
+            SStrengthen s;
+            s.father = ss.father;
+            s.maxVal = ss.maxVal;
+            s.curVal = ss.curVal;
+            s.lvl = ss.lvl;
+            s.maxLvl = ss.maxLvl;
+            fgt->SSFromDB(ss.skillid, s);
+        }
+        lc.finalize();
+        return true;
+    }
+
 }
+

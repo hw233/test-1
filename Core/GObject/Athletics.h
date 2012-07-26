@@ -73,6 +73,7 @@ public:
 
     void listAthleticsReport();
     void listAthleticsMartial();
+    void listAthleticsMartial2(UInt8 type, bool update = false);
 
 public:
 	void defendergainsource(Player *, UInt32, UInt8, UInt32);
@@ -92,13 +93,14 @@ public:
 	bool addAthleticsExtraAward(UInt32 EquipId, UInt8 rank);
     void PayForPaging(UInt8 type);
     void PayForKillCD(UInt8 type);
+
 private:
 	Player * _owner;
 	bool _hasEnterAthletics;
 	std::deque<AthleticsData *> _athleticses;
-    Player* _martial[3];
+    //Player* _martial[5];
     //Battle::BattleSimulator* _martial_battle[3];
-    UInt8 _canAttack[3];
+    //UInt8 _canAttack[5];
 };
 
 }

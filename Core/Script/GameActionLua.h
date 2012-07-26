@@ -216,7 +216,7 @@ namespace Script
         void onFrontMapFloorWin( Player* player, UInt8 id, UInt8 spot, UInt8 lootlvl);
         void onFrontMapWin( Player* player, UInt8 id, UInt8 spot, UInt8 lootlvl);
 		void onEnchant(Player* player, UInt8 level);
-		void onEnchantAct(Player* player, UInt8 level, UInt8 type = 0);
+		void onEnchantAct(Player* player, UInt8 level, UInt8 quality = 0, UInt8 type = 0);
 		void onEnchantGt11(Player* player, UInt16 id, UInt8 level, UInt8 type);
         void onSoulEnchantMaxSoul(Player* player, UInt32 oms, UInt32 yams);
 		void onTrainFighterAct(Player* player, Fighter* fgt);
@@ -248,7 +248,9 @@ namespace Script
         UInt16 RunTargetAwardRF(Player* player);
         void sendRNR(Player* player, UInt32 now, UInt32 date, UInt32 total);
         void sendRechargeMails(Player* player, UInt32 ototal, UInt32 ntotal);
-        void onEquipForge( Player* player, UInt32 itemId, UInt32 onums);
+        void sendConsumeMails(Player* player, UInt32 ototal, UInt32 ntotal);
+        void onEquipForge(Player* player, UInt32 itemId, UInt32 onums);
+        bool onSoSoMapAward(Player* player, UInt8 off);
 	public:
 
 		template <typename R>
@@ -292,8 +294,12 @@ namespace Script
 
     public:
         void doAty( Player* pl, UInt32 id,  UInt32 param1, UInt32 param2);
-        UInt32  GetAtyCheckFlag(UInt32 idx);
-        UInt32  GetMaxActivity(UInt32 vip);
+        void doAtySignIn(Player* pl, UInt32 id, UInt32 month, UInt32 day);
+        UInt32 GetAtyCheckFlag(UInt32 idx);
+        UInt32 GetMaxActivity(UInt32 vip);
+        lua_tinker::table GetExchangeProps(UInt32 id);
+        UInt32 GetExchangePropsID();
+
 	private:
 		Player* _player1;	//?ű???????Ϊ????1
 		Player* _player2;	//?ű???????Ϊ????2

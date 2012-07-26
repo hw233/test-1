@@ -47,6 +47,17 @@ namespace GObject
 
 #define PEERLESS_UPMAX 1
 
+struct SStrengthen
+{
+    SStrengthen() : father(0), maxVal(0), curVal(0), lvl(0) {}
+
+    UInt16 father; // 带出此技能的心法或法宝ID
+    UInt32 maxVal; // 熔炼最大值
+    UInt32 curVal; // 熔炼当前值
+    UInt8 lvl; // 熔炼等级
+    UInt8 maxLvl; // 解封等级
+};
+
 struct SoulItemExp
 {
     UInt16 itemId;
@@ -705,6 +716,22 @@ private:
     bool _iswboss;
     Int32 _wbextatk;
     Int32 _wbextmagatk;
+
+    // 内丹系统
+public:
+    UInt8 SSGetLvl(UInt16 skillid);
+    SStrengthen* SSGetInfo(UInt16 skillid);
+    void SSOpen(UInt16 id);
+    UInt8 SSUpgrade(UInt16 id, UInt32 itemId, bool bind = false);
+    void SSErase(UInt16 id);
+    void SSUpdate2DB(UInt16 id, SStrengthen& ss);
+    void SSDeleteDB(UInt16 id);
+    void SSFromDB(UInt16 id, SStrengthen& ss);
+    void makeFighterSSInfo(Stream& st);
+    bool appendFighterSSInfo(Stream& st, UInt16 skillid);
+    bool appendFighterSSInfo(Stream& st, UInt16 skillid, SStrengthen* ss);
+private:
+    std::map<UInt16, SStrengthen> m_ss;
 
 public:
 	UInt32 favor;

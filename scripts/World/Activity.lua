@@ -72,9 +72,19 @@ function is7_10_15()
     return is_7_10_15
 end
 
-is_7_11_12 = false
-function is7_11_12()
-    return is_7_11_12
+is_7_13_16= false
+function is7_13_16()
+    return is_7_13_16
+end
+
+is_7_14_15 = false
+function is7_14_15()
+    return is_7_14_15
+end
+
+is_7_16_8_15 = false
+function is7_16_8_15()
+    return is_7_16_8_15 
 end
 
 is_7_13 = false
@@ -399,6 +409,8 @@ function onActivityCheck(tm)
           setRechargeActive(true, 16)
       elseif tm >= actTime73 and tm < actTime74 then
           setRechargeActive(true, 16)
+      elseif tm >= actTime83 and tm < actTime84 then
+          setRechargeActive(true, 16)
       else
           setRechargeActive(false, 16)
       end
@@ -425,6 +437,43 @@ function onActivityCheck(tm)
           is_7_10_15 = true
       else
           is_7_10_15 = false 
+      end
+
+      if tm >= actTime77 and tm < actTime78 then
+          setTrumpEnchRet(true)
+          is_7_13_16 = true
+          setPExpItems(true)
+      else
+          setTrumpEnchRet(false)
+          is_7_13_16 = false
+          setPExpItems(false)
+      end
+
+      if tm >= actTime79 and tm < actTime80 then
+          is_7_14_15 = true
+      else
+          is_7_14_15 = false
+      end
+
+      if tm >= actTime81 and tm < actTime82 then
+          is_7_16_8_15 = true
+      else
+          is_7_16_8_15 = false 
+      end
+
+      if tm >= actTime83 and tm < actTime84 then
+          setSoSoMapBegin(actTime83)
+      end
+
+      if tm >= actTime85 and tm < actTime86 then
+          setOpenTest(true)
+          setRechargeActive(true, 16)
+          setConsumeActive(true)
+          setSoSoMapBegin(actTime85)
+      else
+          setOpenTest(false)
+          setRechargeActive(false, 16)
+          setConsumeActive(false)
       end
 
       setShuoShuo(true);
@@ -489,6 +538,11 @@ function initActTime(y, m, d)
   local  SerStartTm30= { ['year'] = 2012, ['month'] = 7, ['day'] = 7, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm31= { ['year'] = 2012, ['month'] = 7, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm32= { ['year'] = 2012, ['month'] = 7, ['day'] = 10, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm33= { ['year'] = 2012, ['month'] = 7, ['day'] = 13, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm34= { ['year'] = 2012, ['month'] = 7, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm35= { ['year'] = 2012, ['month'] = 7, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm36= { ['year'] = 2012, ['month'] = 7, ['day'] = 17, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm37= { ['year'] = 2012, ['month'] = 7, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm102 = { ['year'] = 2012, ['month'] = 6, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -620,6 +674,21 @@ function initActTime(y, m, d)
 
   actTime75 = os.time(SerStartTm32);
   actTime76 = os.time(SerStartTm32) + 6 * 86400;
+
+  actTime77 = os.time(SerStartTm33);
+  actTime78 = os.time(SerStartTm33) + 4 * 86400;
+
+  actTime79 = os.time(SerStartTm34);
+  actTime80 = os.time(SerStartTm34) + 2 * 86400;
+
+  actTime81 = os.time(SerStartTm35);
+  actTime82 = os.time(SerStartTm35) + 31 * 86400;
+
+  actTime83 = os.time(SerStartTm36);
+  actTime84 = os.time(SerStartTm36) + 7 * 86400;
+
+  actTime85 = os.time(SerStartTm37);
+  actTime86 = os.time(SerStartTm37) + 7 * 86400;
 
   actTime101 = os.time(SerStartTm101);
   actTime102 = os.time(SerStartTm101) + 8 * 86400;

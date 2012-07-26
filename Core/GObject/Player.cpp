@@ -81,6 +81,9 @@
 #define DAY_SECS (24*60*60)
 #define CREATE_OFFSET(c, n) (((n) - (c)) / (DAY_SECS))
 
+#define ATHL_BUFF_SECS        (10*60)
+#define ATHL_BUFF_SECS_MAX    (30*60)
+
 namespace GObject
 {
     UInt32 Player::_recruit_cost = 20;
@@ -538,7 +541,7 @@ namespace GObject
         m_HeroMemo = new HeroMemo(this);
         m_ShuoShuo = new ShuoShuo(this);
         m_CFriend = new CFriend(this);
-        m_relation = new NewRelation();
+        m_relation = new NewRelation(this);
         m_pVars = new VarSystem(id);
         memset(&m_ctp, 0, sizeof(m_ctp));
         m_teamData = NULL;
@@ -1251,7 +1254,7 @@ namespace GObject
                     for (UInt8 j = 0; j < 6; ++j)
                     {
                         ied.gems[j] = gemId[cls-1][i][j];
-                        DB4().PushUpdateData("UPDATE `equipment` SET `enchant` = %u, `sockets` = %u, `socket1` = %u, `socket2` = %u, `socket3` = %u, `socket4` = %u, `socket5` = %u, `socket6` = %u, `attrType1` = %u, `attrValue1` = %d, `attrType2` = %u, `attrValue2` = %d, `attrType3` = %u, `attrValue3` = %d WHERE `id` = %u", ied.enchant, ied.sockets, ied.gems[0], ied.gems[1], ied.gems[2], ied.gems[3], ied.gems[4], ied.gems[5], ied.extraAttr2.type1, ied.extraAttr2.value1, ied.extraAttr2.type2, ied.extraAttr2.value2, ied.extraAttr2.type3, ied.extraAttr2.value3, ie->getId());
+                        DB4().PushUpdateData("UPDATE `equipment` SET `enchant` = %u, `sockets` = %u, `socket1` = %u, `socket2` = %u, `socket3` = %u, `socket4` = %u, `socket5` = %u, `socket6` = %u, `attrType1` = %u, `attrValue1` = %d, `attrType2` = %u, `attrValue2` = %d, `attrType3` = %u, `attrValue3` = %d WHERE `id` = %"I64_FMT"u", ied.enchant, ied.sockets, ied.gems[0], ied.gems[1], ied.gems[2], ied.gems[3], ied.gems[4], ied.gems[5], ied.extraAttr2.type1, ied.extraAttr2.value1, ied.extraAttr2.type2, ied.extraAttr2.value2, ied.extraAttr2.type3, ied.extraAttr2.value3, ie->getId());
                     }
                     GetPackage()->SendSingleEquipData(ie);
                 }
@@ -1641,13 +1644,6 @@ namespace GObject
             }
             _lastAthAward.clear();
         }
-
-        TeamCopyPlayerInfo* tcpInfo = getTeamCopyPlayerInfo();
-        if(tcpInfo)
-        {
-            tcpInfo->sendAwardInfo();
-        }
-
         sendDeamonAwardsInfo();
 
 		if(update)
@@ -2254,7 +2250,7 @@ namespace GObject
 		if(_playerData.formation == f)
 			return true;
 		_playerData.formation = f;
-		DB1().PushUpdateData("UPDATE `player` SET `formation` = %u WHERE id = %" I64_FMT "u", f, _id);
+		DB1().PushUpdateData("UPDATE `player` SET `formation` = %u WHERE id = %"I64_FMT"u", f, _id);
 
         return true;
 	}
@@ -2322,6 +2318,21 @@ namespace GObject
             teamCopyManager->updateTeamInfo(this);
         }
 	}
+
+	void Player::makeFighterSSList( Stream& st )
+	{
+		size_t c = _fighters.size();
+		st.init(REP::SKILLSTRENGTHEN);
+        st << static_cast<UInt8>(0);
+		st << static_cast<UInt8>(c);
+		for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
+        {
+            if (it->second)
+                it->second->makeFighterSSInfo(st);
+        }
+		st << Stream::eos;
+	}
+
 
 	void Player::makeFighterList( Stream& st )
 	{
@@ -3356,7 +3367,7 @@ namespace GObject
 				return;
 			if(v > 0)
 				DB7().PushUpdateData("REPLACE INTO `player_buff`(`id`, `buffId`, `data`) VALUES(%"I64_FMT"u, %u, %u)", _id, t - 0x40, v);
-			else
+            else
 				DB7().PushUpdateData("DELETE FROM `player_buff` WHERE `id` = %"I64_FMT"u AND `buffId` = %u", _id, t - 0x40);
 			return;
 		}
@@ -3377,7 +3388,7 @@ namespace GObject
 		}
 		if(field != NULL)
 			DB1().PushUpdateData("UPDATE `player` SET `%s` = %u WHERE `id` = %"I64_FMT"u", field, v, _id);
-	}
+    }
 
 	UInt32 Player::getGold( UInt32 c, IncommingInfo* ii)
 	{
@@ -3645,7 +3656,7 @@ namespace GObject
             moneyArena -= a;
             if(ci!=NULL)
             {
-                DBLOG1().PushUpdateData("insert into consume_achievement (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+                DBLOG1().PushUpdateData("insert into consume_arena (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
                 cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, a, TimeUtil::Now());
             }
         }
@@ -6294,6 +6305,17 @@ namespace GObject
 		send((st));
     }
 
+    void Player::sendConsumeInfo()
+    {
+        if (!World::getConsumeActive())
+            return;
+
+        UInt32 total = GetVar(VAR_CONSUME);
+		Stream st(REP::DAILY_DATA);
+		st << static_cast<UInt8>(15) << total << Stream::eos;
+		send((st));
+    }
+
 	void Player::sendTopupMail(const char* title, const char* content, UInt32 gold, UInt8 num)
 	{
 		m_MailBox->newMail(NULL, 0x01, title, content);
@@ -7124,7 +7146,7 @@ namespace GObject
 
 	std::string& Player::fixName( std::string& name )
 	{
-		if(cfg.merged && !name.empty())if(static_cast<UInt8>(*(name.end() - 1)) >= 32 && !_playerData.name.empty())
+        if(cfg.merged && !name.empty())if(static_cast<UInt8>(*(name.end() - 1)) >= 32 && !_playerData.name.empty())
 		{
 			const std::string& pn = _playerData.name;
 			size_t idx = pn.size() - 1;
@@ -7135,10 +7157,33 @@ namespace GObject
 			}
 			name.insert(name.end(), pn.begin() + idx + 1, pn.end());
 		}
-		return name;
+        return name;
 	}
 
-	void Player::patchMergedName( UInt64 id, std::string& name )
+    void Player::patchDeleteDotS(std::string& name)
+    {
+        if(cfg.merged && !name.empty())
+        {
+            UInt16 serverNo;
+            std::string nameTmp = name;
+            size_t pos = nameTmp.find(".S");
+            if(pos == std::string::npos)
+                pos = nameTmp.find(".s");
+            if(pos == std::string::npos)
+                return;
+            if(pos + 2 >= nameTmp.size())
+                return;
+            std::string tmp(nameTmp.begin()+pos+2, nameTmp.end());
+            serverNo = atoi(tmp.c_str());
+            if(serverNo == (this->getId() >> 48))
+            {
+                nameTmp.erase(nameTmp.begin()+pos, nameTmp.end());
+                name = nameTmp;
+            }
+        }
+    }
+
+    void Player::patchMergedName( UInt64 id, std::string& name )
 	{
 		if(cfg.merged && id >= 0x1000000000000ull)
 		{
@@ -8676,6 +8721,8 @@ namespace GObject
     {
         checkPIcCount();
         int nVipLevel = getVipLevel();
+        if (PracticePlace::_picCnt[nVipLevel] < _playerData.picCount)
+            _playerData.picCount = 0;
         return PracticePlace::_picCnt[nVipLevel] - _playerData.picCount;
     }
 
@@ -9042,6 +9089,10 @@ namespace GObject
             // 回流今日目标
         case 4:
             getTargetAwardRF(opt);
+            break;
+
+        case 5:
+            getSoSoMapAward();
             break;
         }
     }
@@ -9576,6 +9627,17 @@ namespace GObject
             {9030, 1},
         };
         sendMailItem(2356, 2357, &item[pos-1], 1, false);
+    }
+
+    void Player::sendPExpCard(int pos)
+    {
+        if (!pos || pos > 1)
+            return;
+        MailPackage::MailItem item[1] =
+        {
+            {9089, 1},
+        };
+        sendMailItem(3002, 3002, &item[pos-1], 1, false);
     }
 
     void Player::sendCreateMail()
@@ -10559,6 +10621,163 @@ namespace GObject
         send(st);
     }
 
+    void Player::adjustAthlBuffData(UInt32 type)
+    {
+        UInt32 now = TimeUtil::Now();
+        UInt32 leftTime;
+        UInt32 flag = 0;
+        UInt8 count = 0;
+        UInt8 index;
+        if(type & Battle::BattleFighter::AthlEnh1)
+        {
+            leftTime = ATHL_BUFF_SECS;
+            if(getBuffData(PLAYER_BUFF_ATHL1))
+            {
+                leftTime = getBuffData(PLAYER_BUFF_ATHL1) - now + ATHL_BUFF_SECS;
+                if(leftTime > ATHL_BUFF_SECS_MAX)
+                    leftTime = ATHL_BUFF_SECS_MAX;
+            }
+            setBuffData(PLAYER_BUFF_ATHL1, now + leftTime);
+            flag = PLAYER_BUFF_ATHL1;
+        }
+        else if(type & Battle::BattleFighter::AthlEnh2)
+        {
+            leftTime = ATHL_BUFF_SECS;
+            if(getBuffData(PLAYER_BUFF_ATHL2))
+            {
+                leftTime = getBuffData(PLAYER_BUFF_ATHL2) - now + ATHL_BUFF_SECS;
+                if(leftTime > ATHL_BUFF_SECS_MAX)
+                    leftTime = ATHL_BUFF_SECS_MAX;
+            }
+            setBuffData(PLAYER_BUFF_ATHL2, now + leftTime);
+            flag = PLAYER_BUFF_ATHL2;
+        }
+        else if(type & Battle::BattleFighter::AthlEnh3)
+        {
+            leftTime = ATHL_BUFF_SECS;
+            if(getBuffData(PLAYER_BUFF_ATHL3))
+            {
+                leftTime = getBuffData(PLAYER_BUFF_ATHL3) - now + ATHL_BUFF_SECS;
+                if(leftTime > ATHL_BUFF_SECS_MAX)
+                    leftTime = ATHL_BUFF_SECS_MAX;
+            }
+            setBuffData(PLAYER_BUFF_ATHL3, now + leftTime);
+            flag = PLAYER_BUFF_ATHL3;
+        }
+        else if(type & Battle::BattleFighter::AthlEnh4)
+        {
+            leftTime = ATHL_BUFF_SECS;
+            if(getBuffData(PLAYER_BUFF_ATHL4))
+            {
+                leftTime = getBuffData(PLAYER_BUFF_ATHL4) - now + ATHL_BUFF_SECS;
+                if(leftTime > ATHL_BUFF_SECS_MAX)
+                    leftTime = ATHL_BUFF_SECS_MAX;
+            }
+            setBuffData(PLAYER_BUFF_ATHL4, now + leftTime);
+            flag = PLAYER_BUFF_ATHL4;
+        }
+        else if(type & Battle::BattleFighter::AthlEnh5)
+        {
+            leftTime = ATHL_BUFF_SECS;
+            if(getBuffData(PLAYER_BUFF_ATHL5))
+            {
+                leftTime = getBuffData(PLAYER_BUFF_ATHL5) - now + ATHL_BUFF_SECS;
+                if(leftTime > ATHL_BUFF_SECS_MAX)
+                    leftTime = ATHL_BUFF_SECS_MAX;
+            }
+            setBuffData(PLAYER_BUFF_ATHL5, now + leftTime);
+            flag = PLAYER_BUFF_ATHL5;
+        }
+        else if(type & Battle::BattleFighter::AthlEnh6)
+        {
+            leftTime = ATHL_BUFF_SECS;
+            if(getBuffData(PLAYER_BUFF_ATHL6))
+            {
+                leftTime = getBuffData(PLAYER_BUFF_ATHL6) - now + ATHL_BUFF_SECS;
+                if(leftTime > ATHL_BUFF_SECS_MAX)
+                    leftTime = ATHL_BUFF_SECS_MAX;
+            }
+            setBuffData(PLAYER_BUFF_ATHL6, now + leftTime);
+            flag = PLAYER_BUFF_ATHL6;
+        }
+        else if(type & Battle::BattleFighter::AthlEnh7)
+        {
+            leftTime = ATHL_BUFF_SECS;
+            if(getBuffData(PLAYER_BUFF_ATHL7))
+            {
+                leftTime = getBuffData(PLAYER_BUFF_ATHL7) - now + ATHL_BUFF_SECS;
+                if(leftTime > ATHL_BUFF_SECS_MAX)
+                    leftTime = ATHL_BUFF_SECS_MAX;
+            }
+            setBuffData(PLAYER_BUFF_ATHL7, now + leftTime);
+            flag = PLAYER_BUFF_ATHL7;
+        }
+        else if(type & Battle::BattleFighter::AthlEnh8)
+        {
+            leftTime = ATHL_BUFF_SECS;
+            if(getBuffData(PLAYER_BUFF_ATHL8))
+            {
+                leftTime = getBuffData(PLAYER_BUFF_ATHL8) - now + ATHL_BUFF_SECS;
+                if(leftTime > ATHL_BUFF_SECS_MAX)
+                    leftTime = ATHL_BUFF_SECS_MAX;
+            }
+            setBuffData(PLAYER_BUFF_ATHL8, now + leftTime);
+            flag = PLAYER_BUFF_ATHL8;
+        }
+        else if(type & Battle::BattleFighter::AthlEnh9)
+        {
+            leftTime = ATHL_BUFF_SECS;
+            if(getBuffData(PLAYER_BUFF_ATHL9))
+            {
+                leftTime = getBuffData(PLAYER_BUFF_ATHL9) - now + ATHL_BUFF_SECS;
+                if(leftTime > ATHL_BUFF_SECS_MAX)
+                    leftTime = ATHL_BUFF_SECS_MAX;
+            }
+            setBuffData(PLAYER_BUFF_ATHL9, now + leftTime);
+            flag = PLAYER_BUFF_ATHL9;
+        }
+
+        //sendAthlBufInfo();
+        if(flag == 0)
+            return;
+        count = 1;
+        Stream st(REP::ATHLETICS_REFRESH_MARTIAL);
+        st << static_cast<UInt8>(5);
+        st << count;
+        index = flag - PLAYER_BUFF_ATHL1;
+        st << index;
+        leftTime = getBuffData(flag) - now;
+        st << leftTime;
+        st << Stream::eos;
+        send(st);
+    }
+
+    void Player::sendAthlBufInfo()
+    {
+        UInt32 leftTime;
+        Stream st(REP::ATHLETICS_REFRESH_MARTIAL);
+        st << static_cast<UInt8>(5);
+        UInt8 count = 0;
+        UInt8 index;
+        for(index = PLAYER_BUFF_ATHL1; index <= PLAYER_BUFF_ATHL9; index++)
+        {
+            if(getBuffData(index) > 0)
+                count++;
+        }
+        st << count;
+        for(index = PLAYER_BUFF_ATHL1; index <= PLAYER_BUFF_ATHL9; index++)
+        {
+            if(getBuffData(index) > 0)
+            {
+                st << static_cast<UInt8>(index - PLAYER_BUFF_ATHL1);
+                leftTime = getBuffData(index) - TimeUtil::Now();
+                st << leftTime;
+            }
+        }
+        st << Stream::eos;
+        send(st);
+    }
+
     bool Player::isCopyPassed(UInt8 copyid)
     {
         TeamCopyPlayerInfo* tcpInfo = getTeamCopyPlayerInfo();
@@ -10654,6 +10873,30 @@ namespace GObject
         }
         st.data<UInt8>(offset) = c;
     }
+    
+    //玩家每日签到接口
+    void Player::ActivitySignIn()
+    {
+        UInt32 day = 1;
+        UInt32 mon = 1;
+        UInt32 year = 2012;
+        TimeUtil::GetDMY(&day, &mon, &year);
+        GameAction()->doAtySignIn(this, AtySignIn, mon, day);
+    }
+
+    void Player::SendNextdayTime(UInt32 nextDay)
+    {
+        Stream st(REP::SVRST);
+        st << static_cast<UInt8>(1);
+        st << nextDay << Stream::eos;
+        send(st);
+        Stream st1(REP::ACTIVITY_SIGNIN);
+        ActivityMgr* mgr = this->GetActivityMgr();
+        mgr->CheckTimeOver();
+        st1 << static_cast<UInt8> (0);
+        st1 << static_cast<UInt32>(mgr->GetScores()) << static_cast<UInt8>(mgr->GetFlag(AtySignIn)) << Stream::eos;
+        send(st1);
+    }
 
 #ifdef _FB
     void Player::sendLevelAward()
@@ -10700,6 +10943,73 @@ namespace GObject
         }
     }
 #endif
+
+    void Player::getSoSoMapAward()
+    {
+        UInt32 now = TimeUtil::Now();
+        if (!World::_sosomapbegin || now < World::_sosomapbegin)
+            return;
+
+        UInt32 now_sharp = TimeUtil::SharpDay(0, now);
+        UInt32 soso_sharp = TimeUtil::SharpDay(0, World::_sosomapbegin);
+
+        if (now_sharp - soso_sharp > 7 * DAY_SECS)
+            return;
+
+        UInt32 off = CREATE_OFFSET(soso_sharp, now_sharp);
+        if (off >= 7)
+            return;
+
+        UInt32 soso = GetVar(VAR_SOSOMAPAWARD);
+        bool got = (soso>>off)&0x1;
+        if (got)
+            return;
+
+        GameAction()->onSoSoMapAward(this, off);
+
+        soso |= (1<<off);
+        SetVar(VAR_SOSOMAPAWARD, soso);
+
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(5) << static_cast<UInt8>(0) << Stream::eos;
+        send(st);
+    }
+
+    void Player::sendSoSoMapInfo()
+    {
+        UInt32 now = TimeUtil::Now();
+
+        if (!World::_sosomapbegin || now < World::_sosomapbegin)
+            return;
+
+        UInt32 now_sharp = TimeUtil::SharpDay(0, now);
+        UInt32 soso_sharp = TimeUtil::SharpDay(0, World::_sosomapbegin);
+
+        if (now_sharp - soso_sharp > 7 * DAY_SECS)
+            return;
+
+        UInt32 off = CREATE_OFFSET(soso_sharp, now_sharp);
+        if (off >= 7)
+            return;
+
+        UInt32 soso = GetVar(VAR_SOSOMAPAWARD);
+        bool got = (soso>>off)&0x1;
+
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(5) << static_cast<UInt8>(got?0:1) << Stream::eos;
+        send(st);
+    }
+
+    void Player::consumeGold(UInt32 c)
+    {
+        if (World::getConsumeActive())
+        {
+            UInt32 total = GetVar(VAR_CONSUME);
+            GameAction()->sendConsumeMails(this, total, total+c);
+            SetVar(VAR_CONSUME, total+c);
+            sendConsumeInfo();
+        }
+    }
 
 } // namespace GObject
 

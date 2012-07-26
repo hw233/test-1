@@ -133,7 +133,7 @@ public:
 	template<class T>
 	inline void * AddTimer(UInt32 interval, void (*cb)(T *), T * data = NULL, UInt32 fisrtInterval = 0)
 	{
-		typedef void (*_common_cb)(void *);
+        typedef void (*_common_cb)(void *);
 		_common_cb common_cb = reinterpret_cast<_common_cb>(cb);
 		TimerEvent * te = new(std::nothrow) TimerEvent(data, common_cb);
 		if(te == NULL)
@@ -200,9 +200,9 @@ protected:
 	inline void Run()
 	{
 		AddTimer(25, _event_msg_process, this);
-		if(m_Timerinterval > 0)
+        if(m_Timerinterval > 0)
 		{
-			AddTimer(m_Timerinterval, _event_timer_process, this);
+            AddTimer(m_Timerinterval, _event_timer_process, this);
 		}
 
 		m_IsActive = true;

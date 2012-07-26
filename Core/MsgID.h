@@ -241,6 +241,8 @@ namespace REQ
     const UInt8 ACTIVITY_LIST       = 0x4A; 
     /**活跃度领取奖励*/
     const UInt8 ACTIVITY_REWARD     = 0x4B;
+    /**活跃度签到积分*/
+    const UInt8 ACTIVITY_SIGNIN     = 0x4C;
     /**关系列表请求*/
     const UInt8 FRIEND_LIST         = 0xD8;// 0xA8
     /**关系列表操作*/
@@ -370,6 +372,8 @@ namespace REQ
     const UInt8 FOURCOP             = 0x1F;
     /** 新关系 **/
     const UInt8 NEWRELATION         = 0x17;
+    /** 符文 (内丹) **/
+    const UInt8 SKILLSTRENGTHEN     = 0x18;
 }
 
 namespace REP
@@ -418,6 +422,8 @@ namespace REP
     const UInt8 PACK_INFO           = 0xC0;// 0x30
     const UInt8 PACK_USE            = 0xC3;// 0x33
     const UInt8 PACK_EXTEND         = 0xC4;// 0x34
+    /**刷新历练*/
+    const UInt8 ATHLETICS_REFRESH_MARTIAL = 0xC7;
     const UInt8 REWARD_DRAW         = 0xCF;// 0x38
     const UInt8 TRIPOD_INFO         = 0xCE;// 0x39
     const UInt8 LUCKYDRAW_INFO      = 0x3D;
@@ -524,6 +530,7 @@ namespace REP
     const UInt8 ACTIVITY_LIST       = 0x4A; 
     /**活跃度领取奖励*/
     const UInt8 ACTIVITY_REWARD     = 0x4B;
+    const UInt8 ACTIVITY_SIGNIN     = 0x4C;
  
     const UInt8 FRIEND_LIST         = 0xD8;// 0xA8
     const UInt8 FRIEND_ACTION       = 0xD9;// 0xA9
@@ -604,7 +611,8 @@ namespace REP
     const UInt8 FOURCOP             = 0x1F;
     /** 新关系 **/
     const UInt8 NEWRELATION         = 0x17;
-
+    /** 符文 (内丹) **/
+    const UInt8 SKILLSTRENGTHEN     = 0x18;
 }
 
 namespace SPEQ

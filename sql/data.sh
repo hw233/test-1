@@ -17,6 +17,7 @@ function update_data()
     mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20120301_1.sql
     mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20120317_1.sql
     mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20120411_1.sql
+    mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20120717_1.sql
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from loot; source loot;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from map_object; source mapobject;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from item_template; source itemtemplate;";
@@ -50,6 +51,8 @@ function update_data()
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from soul_item_exp; source soulitemexp;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from soul_lvl_exp; source soullvlexp;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from soul_skill_template; source soulskilltemplate;";
+    mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from skillstrengthen; source skillstrengthen;";
+    mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from skillstrengthenprob; source skillstrengthenprob;";
 }
 
 update_data

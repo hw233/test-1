@@ -238,6 +238,7 @@ void BattleSimulator::start(UInt8 prevWin)
 	for(int i = 0; i < 2; ++ i)
 	{
 		UInt32 flag = 0;
+        UInt32 flag2 = 0;
 		if(_player[i] != NULL)
 		{
 			if(checkEnh)
@@ -257,6 +258,32 @@ void BattleSimulator::start(UInt8 prevWin)
                 flag |= BattleFighter::Enh4;
             if (_player[i]->getBuffData(PLAYER_BUFF_BBUF, now) > 0)
                 flag |= BattleFighter::Enh5;
+            /*if(_player[i]->hasFlag(GObject::Player::Copy)
+             || _player[i]->hasFlag(GObject::Player::AutoCopy)
+             || _player[i]->hasFlag(GObject::Player::InCopyTeam)
+             || _player[i]->hasFlag(GObject::Player::AutoDungeon)
+             || _player[i]->hasFlag(GObject::Player::AutoFrontMap))*/
+            if(_player[i]->hasFlag(GObject::Player::AthleticsBuff))
+            {
+                if (_player[i]->getBuffData(PLAYER_BUFF_ATHL1, now) > 0)
+                    flag2 |= BattleFighter::AthlEnh1;
+                if (_player[i]->getBuffData(PLAYER_BUFF_ATHL2, now) > 0)
+                    flag2 |= BattleFighter::AthlEnh2;
+                if (_player[i]->getBuffData(PLAYER_BUFF_ATHL3, now) > 0)
+                    flag2 |= BattleFighter::AthlEnh3;
+                if (_player[i]->getBuffData(PLAYER_BUFF_ATHL4, now) > 0)
+                    flag2 |= BattleFighter::AthlEnh4;
+                if (_player[i]->getBuffData(PLAYER_BUFF_ATHL5, now) > 0)
+                    flag2 |= BattleFighter::AthlEnh5;
+                if (_player[i]->getBuffData(PLAYER_BUFF_ATHL6, now) > 0)
+                    flag2 |= BattleFighter::AthlEnh6;
+                if (_player[i]->getBuffData(PLAYER_BUFF_ATHL7, now) > 0)
+                    flag2 |= BattleFighter::AthlEnh7;
+                if (_player[i]->getBuffData(PLAYER_BUFF_ATHL8, now) > 0)
+                    flag2 |= BattleFighter::AthlEnh8;
+                if (_player[i]->getBuffData(PLAYER_BUFF_ATHL9, now) > 0)
+                    flag2 |= BattleFighter::AthlEnh9;
+            }
 		}
 		for(int j = 0; j < 25; ++ j)
 		{
@@ -280,7 +307,8 @@ void BattleSimulator::start(UInt8 prevWin)
 								loaded[i] = true;
 							}
 						}
-
+                        if(flag2 > 0)
+                            bf->addFlag2(flag2);
                         if((prevWin-1) != i)
                             bf->initStats(checkEnh);
                         UInt8 justice_roar = (_player[i] != NULL ? _player[i]->getJusticeRoar() : 0);
@@ -304,6 +332,10 @@ void BattleSimulator::start(UInt8 prevWin)
                         portrait = 1063;
                     else if (bf->getFighter()->getFashionTypeId() == 1703)
                         portrait = 1064;
+                    else if (bf->getFighter()->getFashionTypeId() == 1704)
+                        portrait = 1076;
+                    else if (bf->getFighter()->getFashionTypeId() == 1705)
+                        portrait = 1077;
 
                     if(bf->getBuffData(FIGHTER_BUFF_CRMASGIRL, now))
                         portrait = 1058;
@@ -825,10 +857,8 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
                 if(magatk)
                 {
                     magdef = area_target->getMagDefend();
-                    magdmg = _formula->calcDamage(factor * magatk, magdef, bf->getLevel(), toughFactor);
                     float magatkreduce = area_target->getMagAtkReduce();
-                    if(magatkreduce && magdmg > 0)
-                        magdmg -= factor * magatk * magatkreduce / 100;
+                    magdmg = _formula->calcDamage(factor * magatk, magdef, bf->getLevel(), toughFactor, magatkreduce);
 
                     magdmg *= static_cast<float>(950 + _rnd(100)) / 1000;
 
@@ -838,11 +868,8 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
                 if(atk)
                 {
                     def = area_target->getDefend();
-                    dmg = _formula->calcDamage(factor * atk, def, bf->getLevel(), toughFactor);
-
                     float atkreduce = area_target->getAtkReduce();
-                    if(atkreduce && dmg > 0)
-                        dmg -= factor * atk * atkreduce / 100;
+                    dmg = _formula->calcDamage(factor * atk, def, bf->getLevel(), toughFactor, atkreduce);
 
                     dmg *= static_cast<float>(950 + _rnd(100)) / 1000;
 
@@ -1006,11 +1033,8 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 					float def = bf->getDefend();
 					bool pr = target_fighter->calcPierce(bf);
                     float toughFactor = pr ? bf->getTough(target_fighter) : 1.0f;
-					UInt32 dmg2 = _formula->calcDamage(atk, def, target_fighter->getLevel(), toughFactor);
-
                     float atkreduce = bf->getAtkReduce();
-                    if(atkreduce && dmg2 > 0)
-                        dmg2 -= factor * atk * atkreduce / 100;
+					UInt32 dmg2 = _formula->calcDamage(atk, def, target_fighter->getLevel(), toughFactor, atkreduce);
 
                     dmg2 *= static_cast<float>(950 + _rnd(100)) / 1000;
 
@@ -2117,7 +2141,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
     }
 
     // 雪球-137 小蜘蛛-434
-    if(SKILL_ID(skill->getId()) == 137 || SKILL_ID(skill->getId()) == 434)
+    if(SKILL_ID(skill->getId()) == 137 || SKILL_ID(skill->getId()) == 434 || SKILL_ID(skill->getId()) == 479)
     {
         static UInt8 skill_prob_137[10][3] = {
             {0, 0, 0},
@@ -2176,8 +2200,10 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             GObject::Fighter * fgt = NULL;
             if(SKILL_ID(skill->getId()) == 137)
                 fgt = globalFighters[5679];
-            else
+            else if(SKILL_ID(skill->getId()) == 434)
                 fgt = globalFighters[6011];
+            else
+                fgt = globalFighters[7006];
             if(fgt == NULL)
                 break;
 			BattleFighter * newf = new(std::nothrow) Battle::BattleFighter(_formula, fgt, side, pos);

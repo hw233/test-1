@@ -149,9 +149,11 @@ MSG_REG(GameMsgHdr, OnGetAward);
 MSG_REG_2(GameMsgHdr, REQ::FOURCOP, OnFourCopReq);
 MSG_REG_2(GameMsgHdr, REQ::TEAM_COPY_REQ, OnTeamCopyReq);
 MSG_REG_2(GameMsgHdr, REQ::NEWRELATION, OnNewRelationReq);
+MSG_REG_2(GameMsgHdr, REQ::SKILLSTRENGTHEN, OnSkillStrengthen);
 
 MSG_REG_2(GameMsgHdr, REQ::ACTIVITY_LIST, OnActivityList);
 MSG_REG_2(GameMsgHdr, REQ::ACTIVITY_REWARD,OnActivityReward);
+MSG_REG_2(GameMsgHdr, REQ::ACTIVITY_SIGNIN, OnActivitySignIn);
 
 MSG_REG_2(GameMsgHdr, REQ::TOWN_DEAMON, OnTownDeamonReq);
 
@@ -187,6 +189,9 @@ MSG_REG_2(GameMsgHdr, 0x219, OnOnAthleticsEnterNotify);
 MSG_REG_2(GameMsgHdr, 0x220, OnAthleticsResNotify);
 MSG_REG_2(GameMsgHdr, 0x221, OnAthleticsReportList);
 MSG_REG_2(GameMsgHdr, 0x222, OnAthlectisPayPaging);
+
+MSG_REG_2(GameMsgHdr, 0x223, OnNewRelationAttack);
+MSG_REG_2(GameMsgHdr, 0x224, OnNewRelationCountryReq);
 
 MSG_REG_2(GameMsgHdr, 0x230, OnArenaBet);
 MSG_REG_2(GameMsgHdr, 0x231, OnArenaBetResult);
@@ -253,6 +258,9 @@ MSG_REG_2(GameMsgHdr, 0x325, OnClearTaskReq);
 
 MSG_REG_2(GameMsgHdr, 0x330, OnMartialUpdateHdr);
 MSG_REG_2(GameMsgHdr, 0x331, OnMartialUpdate);
+
+MSG_REG_2(GameMsgHdr, 0x351, OnMartialUpdate2);
+
 MSG_REG_2(GameMsgHdr, 0x232, OnAthleticsMartialReq);
 MSG_REG_2(GameMsgHdr, 0x233, OnAthleticsMartialAttack);
 MSG_REG_2(GameMsgHdr, 0x234, OnAthleticsMartialBeAttack);
@@ -279,5 +287,6 @@ MSG_REG_2(GameMsgHdr, 0x250, OnRemoveClanRank);
 
 MSG_REG_2(GameMsgHdr, 0x251, OnGetArenaMoney);
 MSG_REG_2(GameMsgHdr, 0x252, OnArenaEnterCommit);
+MSG_REG_2(GameMsgHdr, 0x253, OnSendPExpCard);
 
 MSG_HANDLER_END()

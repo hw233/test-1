@@ -124,6 +124,9 @@ namespace Script
         lua_tinker::def(_L, "getMergeAthAct", GObject::World::getMergeAthAct);
         lua_tinker::def(_L, "setFourCopAct", GObject::World::setFourCopAct);
         lua_tinker::def(_L, "getFourCopAct", GObject::World::getFourCopAct);
+        lua_tinker::def(_L, "getPExpItems", GObject::World::getPExpItems);
+        lua_tinker::def(_L, "getOpenTest", GObject::World::getOpenTest);
+        lua_tinker::def(_L, "getConsumeActive", GObject::World::getConsumeActive);
 
         CLASS_DEF(GameActionLua, Print);
         lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);
@@ -335,7 +338,8 @@ namespace Script
         CLASS_DEF(ActivityMgr, UpdateToDB);
         CLASS_DEF(ActivityMgr, GetPoint);
         CLASS_DEF(ActivityMgr, AddRewardFlag);
-		
+        CLASS_DEF(ActivityMgr, AddScores);
+	    	
         //????
 		CLASS_ADD(Package);
 		CLASS_DEF(Package, Add);
@@ -952,9 +956,9 @@ namespace Script
 		Call<void>("onEnchant", player, level);
 	}
 
-	void GameActionLua::onEnchantAct( Player* player, UInt8 level, UInt8 type )
+	void GameActionLua::onEnchantAct( Player* player, UInt8 level, UInt8 quality, UInt8 type )
 	{
-		Call<void>("onEnchantAct", player, level, type);
+		Call<void>("onEnchantAct", player, level, quality, type);
 	}
 
 	void GameActionLua::onEnchantGt11( Player* player, UInt16 id, UInt8 level, UInt8 type)
@@ -1199,5 +1203,30 @@ namespace Script
     {
 		return Call<void>("sendRechargeMails", player, ototal, ntotal);
     }
+    
+    void GameActionLua::doAtySignIn(Player* pl, UInt32 id, UInt32 month, UInt32 day)
+    {
+        return Call<void>("doAtySignIn", pl, id, month, day);
+    }
+    
+    lua_tinker::table GameActionLua::GetExchangeProps(UInt32 id)
+    {
+        return Call<lua_tinker::table>("GetExchangeProps", id);
+    }
+
+    UInt32 GameActionLua::GetExchangePropsID()
+    {
+        return Call<UInt32>("GetExchangePropsID");
+    }
+
+    void GameActionLua::sendConsumeMails(Player* player, UInt32 ototal, UInt32 ntotal)
+    {
+		return Call<void>("sendConsumeMails", player, ototal, ntotal);
+    }
+
+	bool GameActionLua::onSoSoMapAward( Player* player, UInt8 off)
+	{
+		return Call<bool>("onSoSoMapAward", player, off);
+	}
 }
 

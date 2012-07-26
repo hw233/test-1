@@ -245,6 +245,32 @@ void OnAthleticsBeReq( GameMsgHdr& hdr, const void * data )
 	player->GetAthletics()->beAttack(abd->attacker, abd->formation, abd->portrait, abd->lineup);
 }
 
+void OnNewRelationAttack(GameMsgHdr& hdr, const void *data)
+{
+	MSG_QUERY_PLAYER(player);
+	struct NewRelationBeData
+	{
+		Player * attacker;
+		UInt16 formation;
+		UInt16 portrait;
+		Lineup lineup[5];
+	};
+	NewRelationBeData *abd = reinterpret_cast<NewRelationBeData *>(const_cast<void *>(data));
+    player->GetNewRelation()->beAttack(abd->attacker, abd->formation, abd->portrait, abd->lineup, player);
+}
+
+void OnNewRelationCountryReq(GameMsgHdr& hdr, const void *data)
+{
+    MSG_QUERY_PLAYER(player);
+    struct stNewRelationReq
+    {
+        UInt8 type;
+        std::string atkName;
+    };
+    stNewRelationReq *nrw = reinterpret_cast<stNewRelationReq *>(const_cast<void *>(data));
+    player->GetNewRelation()->countrySend(player, nrw->type, nrw->atkName);
+}
+
 void OnAthleticsEnterResp( GameMsgHdr& hdr, const void * )
 {
 	MSG_QUERY_PLAYER(player);
@@ -281,7 +307,10 @@ void OnAthleticsAwardReq(GameMsgHdr& hdr, const void * data)
 	struct GObject::AthleticsAward *awd = reinterpret_cast<struct GObject::AthleticsAward *>(const_cast<void *>(data));
     if(awd->itemId && awd->itemCount)
     {
-        player->GetPackage()->AddItem(awd->itemId, awd->itemCount, 1, false, FromAthletAward);
+        if(awd->itemId == 499)
+            player->getCoupon(awd->itemCount);
+        else
+            player->GetPackage()->AddItem(awd->itemId, awd->itemCount, 1, false, FromAthletAward);
     }
     if(awd->prestige)
     {
@@ -606,7 +635,7 @@ void OnSaleItemSearchReq( GameMsgHdr& hdr, const void * data )
 	player->GetSale()->searchMySale(*saleSearchReq);
 }
 
-void OnDailyCheck( GameMsgHdr& hdr, const void * )
+void OnDailyCheck( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
 
@@ -625,6 +654,7 @@ void OnDailyCheck( GameMsgHdr& hdr, const void * )
     player->SetVar(VAR_JUNE_HAPPY, 0);
     player->SetVar(VAR_JUNE_ITEM, 0);
     player->sendHappyInfo();
+    player->SendNextdayTime( *(UInt32*)data );
 }
 
 void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
@@ -1187,6 +1217,13 @@ void OnMartialUpdate( GameMsgHdr& hdr, const void* data )
     player->GetAthletics()->updateMartial(md);
 }
 
+void OnMartialUpdate2( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    UInt8 type = *(UInt8*)(data);
+    player->GetAthletics()->listAthleticsMartial2(type);
+}
+
 void OnAthleticsMartialAttack( GameMsgHdr& hdr, const void* data )
 {
 	MSG_QUERY_PLAYER(player);
@@ -1419,7 +1456,14 @@ void OnArenaEnterCommit( GameMsgHdr& hdr, const void* data )
     MSG_QUERY_PLAYER(player);
 	const UInt8 type = *reinterpret_cast<const UInt8 *>(data);
 
-    if(player->GetLev() < 70)
+#ifdef _FB
+#define LIMIT_LEVEL  60
+#else
+#define LIMIT_LEVEL  70
+#endif
+
+
+    if(player->GetLev() < LIMIT_LEVEL)
         return;
     if(type == 0)
     {
@@ -1437,6 +1481,12 @@ void OnArenaEnterCommit( GameMsgHdr& hdr, const void* data )
         st << Stream::eos;
         NETWORK()->SendToArena(st);
     }
+}
+void OnSendPExpCard( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    int pos = *(int*)(data);
+    player->sendPExpCard(pos);
 }
 
 #endif // _COUNTRYINNERMSGHANDLER_H_

@@ -57,7 +57,14 @@ struct AthleticsRankData
     UInt32  first4rank;
     UInt32  extrachallenge;
     UInt32  pageNum; //???
-        //UInt32  first4rank;
+    UInt32  eChallengeTime;
+    UInt8   ePhysical;
+    UInt8 eSelectIndex;
+    UInt32 eCombine[5];
+    UInt64 eRival[5];
+    UInt8 eCanAttack[5];
+    UInt8 eRivalType[5];
+    //UInt32  first4rank;
         //// 0x1 第一次成为竞技场第一
         //// 0x2 第一次杀入竞技场二强
         //// 0x4 第一次杀入竞技场三强
@@ -160,7 +167,7 @@ public:
     void requestAthleticsEvent(Stream&, Player * player);
 
 	void challenge(Player *, UInt8 type);
-	void challenge2(Player *, std::string&, UInt8 type);
+	void challenge2(Player *, std::string&, UInt8 type, UInt8 rivalDifficulty);
 
 protected:
 	void getRandomEquip(UInt8 level, UInt16 rank, UInt16& EquipId, UInt16& cnt);
@@ -193,9 +200,12 @@ public:
     UInt32 getAthleticsFirst4Rank(Player*, UInt32 first4rank);
     UInt32 setAthleticsFirst4Rank(Player*, UInt32 first4rank);
 
+    UInt32 getAthlRandomAward(UInt8 diffculty, UInt8 opt);
+    UInt8 getAthlRandomMaxValue(UInt8 diffculty);
     void updateAthleticsMartial(Player* pl);
+    void updateAthleticsP(Player* pl, UInt8 type);
 
-    void giveAward(Player* pl);
+    void giveAward(Player* pl, UInt8 type = 0);
 
     void notifyAthMartialOver(Player * atker, Player * defer, UInt32 id, UInt8 res);
 
@@ -266,6 +276,20 @@ public:
 	}
 
     static UInt8 GetMaxchallengenum(UInt32 vip);
+    static UInt8 GetMaxPhysical(UInt32 vip);
+public:
+    void updateOrginal_martial(Player* owner, UInt8 index, UInt64 arivalId);
+    Player* getOrginal_martial(Player* owner, UInt8 index);
+    void setOrginal_martial(Player* owner, UInt8 index, Player* pl);
+    void updateOrginal_canAttack(Player* owner, UInt8 index, UInt8 canAttack);
+    UInt8 getOrginal_canAttack(Player* owner, UInt8 index);
+    void setOrginal_canAttack(Player* owner, UInt8 index, UInt8 canAttack);
+    void updateOrginal_eCategory(Player* owner, UInt8 index, UInt32 combineValue);
+    void setOrginal_eCategory(Player* owner, UInt8 index, UInt32 combineValue);
+    void RequestSubDir(Player *player, UInt8 athlDiffculty, UInt8 athlCategory);
+    AthleticsRankData* getAthleticsRankData(Player* player);
+    void process();
+
 private:	
 	RankList		_ranks[2];
 	AthleticsList	_athleticses[2];

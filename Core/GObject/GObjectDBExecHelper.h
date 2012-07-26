@@ -206,6 +206,18 @@ struct DBGVar
     UInt32 overTime;
 };
 
+struct DBSS
+{
+    UInt32 id;
+    UInt64 playerId;
+    UInt16 skillid;
+    UInt16 father;
+    UInt32 maxVal;
+    UInt32 curVal;
+    UInt8 lvl;
+    UInt8 maxLvl;
+};
+
 struct DBFighterBuffData
 {
 	UInt64 playerId;
@@ -772,6 +784,13 @@ struct DBAthleticsData
     UInt32  first4rank;
     UInt32  extrachallenge;
     UInt8   pageNum;
+    UInt32 eChallengeTime;
+    UInt8 ePhysical;
+    UInt8 eSelectIndex;
+    UInt32 eCombine[5];
+    UInt64 eRival[5];
+    UInt8 eCanAttack[5];
+    UInt8 eRivalType[5];
 };
 
 struct DBAthleticsEventData
@@ -951,6 +970,8 @@ struct DBActivityData
     UInt32 point;
     UInt32 award;
     std::string flags;
+    UInt32 scores;
+    UInt32 propsID;
 };
 struct DBHeroMemo
 {
@@ -1147,6 +1168,20 @@ SPECIALDEF(3)
     UInt32, id,
     UInt32, data,
     UInt32, overTime
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBSS)
+SPECIALDEF(8)
+    (
+    UInt32, id,
+    UInt64, playerId,
+    UInt16, skillid,
+    UInt16, father,
+    UInt32, maxVal,
+    UInt32, curVal,
+    UInt8, lvl,
+    UInt8, maxLvl
     )
 SPECIALEND()
 
@@ -1870,7 +1905,7 @@ SPECIALDEF(2)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBAthleticsData)
-SPECIALDEF(16)
+SPECIALDEF(39)
 (
 	UInt8,  row,
 	UInt32, rank,
@@ -1891,7 +1926,30 @@ SPECIALDEF(16)
     UInt32, oldrank,
     UInt32, first4rank,
     UInt32, extrachallenge,
-    UInt8,  pageNum
+    UInt8,  pageNum,
+    UInt32, eChallengeTime,
+    UInt8, ePhysical,
+    UInt8, eSelectIndex,
+    UInt32, eCombine[0],
+    UInt32, eCombine[1],
+    UInt32, eCombine[2],
+    UInt32, eCombine[3],
+    UInt32, eCombine[4],
+    UInt64, eRival[0],
+    UInt64, eRival[1],
+    UInt64, eRival[2],
+    UInt64, eRival[3],
+    UInt64, eRival[4],
+    UInt8, eCanAttack[0],
+    UInt8, eCanAttack[1],
+    UInt8, eCanAttack[2],
+    UInt8, eCanAttack[3],
+    UInt8, eCanAttack[4],
+    UInt8, eRivalType[0],
+    UInt8, eRivalType[1],
+    UInt8, eRivalType[2],
+    UInt8, eRivalType[3],
+    UInt8, eRivalType[4]
 )
 SPECIALEND()
 
@@ -2081,14 +2139,16 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBActivityData)
-SPECIALDEF(6)
+SPECIALDEF(8)
 (
-    UInt64,playerId,
+    UInt64, playerId,
     UInt32, overTime,
     UInt32, awardID,
     UInt32, point,
     UInt32, award,
-    std::string, flags    
+    std::string, flags,   
+    UInt32, scores,
+    UInt32, propsID
 )
 SPECIALEND()
 

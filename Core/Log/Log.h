@@ -166,6 +166,8 @@ enum ItemTo
     ToForgeFighter,
     ToSecondSoul,
     ToArenaBet,
+    ToSkillStrengthenOpen,
+	ToSkillStrengthenUpgrade,
 };
 
 struct IncommingInfo

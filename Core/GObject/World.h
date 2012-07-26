@@ -229,6 +229,24 @@ public:
     inline static void setLevelAwardEnd(UInt32 end)
     { _levelawardend = end; }
 
+    inline static void setPExpItems(bool v)
+    { _pexpitems = v; }
+    inline static bool getPExpItems()
+    { return _pexpitems; }
+
+    inline static void setSoSoMapBegin(UInt32 v)
+    { _sosomapbegin = v; }
+
+    inline static void setOpenTest(bool v)
+    { _opentest = v; }
+    inline static bool getOpenTest()
+    { return _opentest; }
+
+    inline static void setConsumeActive(bool v)
+    { _consumeactive = v; }
+    inline static bool getConsumeActive()
+    { return _consumeactive; }
+
 	inline Script::WorldScript * getWorldScript() { return _worldScript; }
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
     static void commitArenaForceOnce();
@@ -300,6 +318,10 @@ public:
     static bool _duanwu;
     static bool _icact;
     static UInt32 _levelawardend;
+    static bool _pexpitems;
+    static UInt32 _sosomapbegin;
+    static bool _opentest;
+    static bool _consumeactive;
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }
@@ -325,6 +347,7 @@ private:
     static void Team_Copy_Process(void*);
 	static void ReCalcWeekDay( World * );
 	static void World_One_Min( World * );
+    static void AthleticsPhysicalCheck(void *);
 
 private:
 	void testUpdate();
