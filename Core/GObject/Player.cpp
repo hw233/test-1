@@ -8710,6 +8710,8 @@ namespace GObject
     {
         checkPIcCount();
         int nVipLevel = getVipLevel();
+        if (PracticePlace::_picCnt[nVipLevel] < _playerData.picCount)
+            _playerData.picCount = 0;
         return PracticePlace::_picCnt[nVipLevel] - _playerData.picCount;
     }
 
