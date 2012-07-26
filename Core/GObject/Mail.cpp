@@ -212,6 +212,8 @@ MailPackage * MailPackageManager::add( UInt32 id )
 Mail * MailBox::newMail( Player * sender, UInt8 type, const std::string& title, const std::string& content, UInt32 additional, bool writedb, MailItemsInfo * itemsInfo)
 {
 	Mutex::ScopedLock lk(_owner->getMutex());
+    //printf("id,sender,recvTime,type,title,additional:%u  %s  %u  %u  %s\n",IDGenerator::gMailOidGenerator.ID(),(sender==NULL ? "" : sender->getName()),TimeUtil::Now(),type,title,additional);
+    //printf("content:%s\n",content);
 
 	Mail * mail = newMail(IDGenerator::gMailOidGenerator.ID(), (sender == NULL ? "" : sender->getName()), TimeUtil::Now(), type, title, content, additional);
 	if(mail == NULL)
@@ -263,7 +265,6 @@ Mail * MailBox::newMail( UInt32 id, const std::string& sender, UInt32 recvTime, 
 	mail->title = title;
 	mail->content = content;
 	mail->additional = additional;
-
 	if(!(type & 0x80))
 		++ _newMails;
 	_mailBox.push_front(mail);

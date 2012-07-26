@@ -2,6 +2,7 @@
 #include "Leaderboard.h"
 #include "Country.h"
 #include "Server/WorldServer.h"
+#include "Server/SysMsg.h"
 #include "Server/Cfg.h"
 #include "Player.h"
 #include "Clan.h"
@@ -11,6 +12,7 @@
 #include "DB/DBExecutor.h"
 #include "MsgID.h"
 #include "ClanRankBattle.h"
+#include "Common/Itoa.h"
 
 namespace GObject
 {
@@ -123,7 +125,7 @@ void Leaderboard::doUpdate()
 {
     UInt8 count;
     UInt8 index;
-	std::unique_ptr<DB::DBExecutor> execu;
+    std::unique_ptr<DB::DBExecutor> execu;
 	execu.reset(DB::gObjectDBConnectionMgr->GetExecutor());
 	if (execu.get() == NULL || !execu->isConnected()) return;
 
@@ -236,6 +238,7 @@ void Leaderboard::doUpdate()
 	size_t cnt;
 
 	_levelRankWorld.clear();
+	_levelRankWorld10.clear();
 	_levelRankCountry[0].clear();
 	_levelRankCountry[1].clear();
 	_moneyRankWorld.clear();
@@ -257,10 +260,12 @@ void Leaderboard::doUpdate()
 		" LIMIT 0, 999", ilist);
 
 	cnt = ilist.size();
-	for(size_t i = 0; i < cnt; ++ i)
+    for(size_t i = 0; i < cnt; ++ i)
 	{
 		_levelRankWorld[ilist[i]] = static_cast<UInt16>(i + 1);
-	}
+        if(i < 10)
+            _levelRankWorld10.push_back(ilist[i]);
+    }
 
 	ilist.clear();
 	execu->ExtractData("SELECT `player`.`id` FROM"
@@ -485,7 +490,7 @@ void Leaderboard::sendOwnRank( Player * player, UInt32 id )
 
         if(country > 1)
             return;
-
+        
 		_searchInside(st, _levelRankWorld, pid);
 		_searchInside(st, _levelRankCountry[country], pid);
 		_searchInside(st, _moneyRankWorld, pid);
@@ -505,5 +510,37 @@ void Leaderboard::sendOwnRank( Player * player, UInt32 id )
 	player->send(st);
 }
 
+void Leaderboard::newDrawingGame(UInt32 nextday)
+{
+    if(cfg.openYear <= 2011)
+        return;
+    UInt32 opTime = TimeUtil::MkTime(cfg.openYear, cfg.openMonth, cfg.openDay);
+
+    if(TimeUtil::SharpDay(0, nextday) == opTime + 7 * 86400 )
+    {
+        UInt16 newAward[] = { 1000,800,600,400,200,100,100,100,100,100 }; 
+        //新人冲级赛 等级前十 送礼券
+        for(UInt16 rank = 0; rank < _levelRankWorld10.size(); ++rank){
+            Player * pl = GObject::globalPlayers[_levelRankWorld10[rank]];
+            if(NULL == pl)
+                continue;
+            SYSMSGV(title, 4018);
+            SYSMSGV(content, 4019, rank + 1, newAward[rank]);
+            Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            if(NULL == mail)
+                continue;
+            MailPackage::MailItem mitem[1] = { {GObject::MailPackage::Coupon, newAward[rank]} };
+            mailPackageManager.push(mail->id, mitem, 1, true);
+            std::string strItems;
+            for(int i = 0; i < 1; ++i){
+                strItems += Itoa(mitem[i].id);
+                strItems += ",";
+                strItems += Itoa(mitem[i].count);
+                strItems += "|";
+            }
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, _levelRankWorld10[rank], mail->id, NewDrawingGameAward, title, content, strItems.c_str(), mail->recvTime);
+        }
+    }
 }
 
+}

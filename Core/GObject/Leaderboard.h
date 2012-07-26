@@ -17,6 +17,7 @@ public:
 	bool hasUpdate(UInt32);
 	bool getPacket(UInt8, Stream*&);
 	void sendOwnRank(Player *, UInt32);
+    void newDrawingGame(UInt32 nextday); //新人冲级赛
 	inline UInt8 getMaxLevel() { return _maxLevel; }
 
     void begin() { m_sorting = true; }
@@ -40,6 +41,7 @@ private:
 	std::map<UInt64, UInt16> _achievementRankCountry[2];
 	std::map<UInt32, UInt16> _clanRankWorld;
 	std::map<UInt32, UInt16> _clanRankCountry[2];
+    std::vector<UInt64> _levelRankWorld10;  //世界等级前十名
 
     AtomicVal<bool> m_sorting;
 };

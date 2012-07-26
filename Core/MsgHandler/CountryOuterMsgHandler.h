@@ -3094,7 +3094,7 @@ void OnChatReq( GameMsgHdr& hdr, ChatReq& cr )
 		NETWORK()->Broadcast(st);
 		break;
 	}
-	if (cr._type != 0xFF && cfg.msgCenterPort > 0) 
+	if (cr._type == 0 && cfg.msgCenterPort > 0) //只监听世界
 	{
 		ToMsgCenter(st);
 	}
@@ -4786,6 +4786,8 @@ void OnActivitySignIn( GameMsgHdr& hdr, const void * data )
         case 1:
             {
                 //刷新待兑换的道具
+                if(!player->hasChecked())
+                    return;
                 if(player->getTael() < 100){
                     player->sendMsgCode(0, 1100);
                     return;
@@ -4803,15 +4805,19 @@ void OnActivitySignIn( GameMsgHdr& hdr, const void * data )
         case 2:
             {
                 //积分兑换道具
-                if (!player->hasChecked()){
+                if(!player->hasChecked())
                     return;
-                }
                 lua_tinker::table props = GameAction()->GetExchangeProps( mgr->GetPropsID() );
                 if(5 != props.size())
                     return;
                 UInt32 score = props.get<UInt32>(2);
                 if(mgr->GetScores() < score)
                     return;
+                if(player->GetPackage()->GetRestPackageSize() <= 0)
+                {
+                    player->sendMsgCode(0, 1011);
+                    return;
+                }
                 mgr->SubScores(score);
                 player->GetPackage()->Add(mgr->GetPropsID(), props.get<UInt8>(3), true, false, FromDailyActivity);
                 //兑换后重新刷新一次
