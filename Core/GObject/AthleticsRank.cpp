@@ -949,8 +949,8 @@ void AthleticsRank::challenge2(Player * atker, std::string& name, UInt8 type, UI
         return ;
     }
     data->challengenum = updateChallengeNum(data->challengenum, data->eChallengeTime);
-    if (data->challengenum >= Maxchallengenum[Viplvl] && cfg.GMCheck)
-        return ;
+    //if (data->challengenum >= Maxchallengenum[Viplvl] && cfg.GMCheck)
+    //    return ;
     data->challengenum ++;
     data->eChallengeTime = TimeUtil::Now();
 
@@ -2374,15 +2374,15 @@ void AthleticsRank::updateAthleticsMartial(Player* pl)
         index = 1;
     UInt8 diffculty = (data->eCombine[index - 1] >> 24) & 0xFF;
     if(diffculty == 2)
-        level += 1;
-    else if(diffculty == 3)
-        level += 2;
-    else if(diffculty == 4)
-        level += 3;
-    else if(diffculty == 5)
-        level += 5;
-    else
         ;
+    else if(diffculty == 3)
+        level += 1;
+    else if(diffculty == 4)
+        level += 2;
+    else if(diffculty == 5)
+        level += 3;
+    else
+        level -= 1;
 
     GObject::GlobalLevelsPlayersIterator it = GObject::globalLevelsPlayers.find(level);
     if(it == GObject::globalLevelsPlayers.end())
@@ -2392,9 +2392,7 @@ void AthleticsRank::updateAthleticsMartial(Player* pl)
     if(it == GObject::globalLevelsPlayers.end())
         it = GObject::globalLevelsPlayers.find(level - 3);
     if(it == GObject::globalLevelsPlayers.end())
-        it = GObject::globalLevelsPlayers.find(level - 4);
-    if(it == GObject::globalLevelsPlayers.end())
-        it = GObject::globalLevelsPlayers.find(level - 5);
+        it = GObject::globalLevelsPlayers.find(level + 1);
     if(it == GObject::globalLevelsPlayers.end())
         return;
 
@@ -2655,7 +2653,7 @@ void AthleticsRank::updateAthleticsP(Player* pl, UInt8 type)
                 AthleticsRankData* rankData = *found->second;
                 if(rankData->ePhysical >= MaxPhysical[pl->getVipLevel()])
                     return;
-                if(pl->GetVar(VAR_PHYSICAL_BUY) > MaxPhysicalBuy[pl->getVipLevel()])
+                if(pl->GetVar(VAR_PHYSICAL_BUY) >= MaxPhysicalBuy[pl->getVipLevel()])
                 {
                     pl->sendMsgCode(0, 1496);
                     return;
@@ -2711,6 +2709,7 @@ void AthleticsRank::giveAward( Player* pl, UInt8 type)
             count = awardId & 0xFFFF;
             //_owner->GetPackage()->AddItem(itemId, count, 1, true, FromAthletAward);
             AthleticsAward atkerAthleticsAward = { 0, 0, 0, 0, 0, 0, 0, 0, itemId, count};
+            atkerAthleticsAward.prestige = 50 * (World::_wday == 3 ? 2 : 1);
             GameMsgHdr hdr2(0x217, pl->getThreadId(), pl, sizeof(AthleticsAward));
             GLOBAL().PushMsg(hdr2, &atkerAthleticsAward);
             wins = 0;
