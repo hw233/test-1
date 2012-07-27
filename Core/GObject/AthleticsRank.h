@@ -200,8 +200,6 @@ public:
     UInt32 getAthleticsFirst4Rank(Player*, UInt32 first4rank);
     UInt32 setAthleticsFirst4Rank(Player*, UInt32 first4rank);
 
-    UInt32 getAthlRandomAward(UInt8 diffculty, UInt8 opt);
-    UInt8 getAthlRandomMaxValue(UInt8 diffculty);
     void updateAthleticsMartial(Player* pl);
     void updateAthleticsP(Player* pl, UInt8 type);
 

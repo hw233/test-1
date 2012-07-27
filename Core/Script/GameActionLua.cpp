@@ -1219,6 +1219,11 @@ namespace Script
         return Call<UInt32>("GetExchangePropsID");
     }
 
+    lua_tinker::table GameActionLua::GetdayExtraAward(UInt32 month, UInt32 day)
+    {
+        return Call<lua_tinker::table>("GetdayExtraAward", month, day);
+    }
+
     void GameActionLua::sendConsumeMails(Player* player, UInt32 ototal, UInt32 ntotal)
     {
 		return Call<void>("sendConsumeMails", player, ototal, ntotal);
@@ -1228,5 +1233,19 @@ namespace Script
 	{
 		return Call<bool>("onSoSoMapAward", player, off);
 	}
+
+    UInt8 GameActionLua::onGetAthlRandomMaxValue(UInt8 diffculty)
+	{
+		return Call<UInt8>("onGetAthlRandomMaxValue", diffculty);
+	}
+	UInt32 GameActionLua::onGetAthlRandomAward(UInt8 diffculty, UInt8 opt)
+	{
+		return Call<UInt32>("onGetAthlRandomAward", diffculty, opt);
+	}
+	UInt8 GameActionLua::onGetAthlRandomDiffculty()
+	{
+		return Call<UInt8>("onGetAthlRandomDiffculty");
+	}
+
 }
 

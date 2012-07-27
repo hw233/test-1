@@ -559,10 +559,8 @@ void Athletics::attackMartial(Player* defer)
             break;
 
         UInt8 tid = defer->getThreadId();
-        printf("atk(%"I64_FMT"u), defer(%"I64_FMT"u), (%u, %u)\n", _owner->getId(), defer->getId(), _owner->getThreadId(), defer->getThreadId());
         if(_owner->getThreadId() != tid)
         {
-            printf("It is different thread\n");
             struct AthleticsBeData
             {
                 Player * attacker;
@@ -620,7 +618,6 @@ void Athletics::attackMartial(Player* defer)
 
 void Athletics::beAttackMartial(Player * atker, UInt16 formation, UInt16 portrait, Lineup * lineup)
 {
-    printf("be: atk(%"I64_FMT"u), defer(%"I64_FMT"u), (%u, %u)\n", atker->getId(), _owner->getId(), atker->getThreadId(), _owner->getThreadId());
     atker->addFlag(GObject::Player::AthleticsBuff);
     adjustAthlDeferBuffData(atker, _owner, false);
 	Battle::BattleSimulator bsim(Battle::BS_ATHLETICS1, atker, _owner);
@@ -743,8 +740,8 @@ void Athletics::awardMartial(Player* defer, bool win)
     }
     else
     {
-        la.prestige = 5 * (World::_wday == 3 ? 2 : 1);
-        _owner->getPrestige(la.prestige, false);
+        //la.prestige = 5 * (World::_wday == 3 ? 2 : 1);
+        //_owner->getPrestige(la.prestige, false);
     }
 
     _owner->delayNotifyAthleticsAward(&la);
@@ -791,23 +788,6 @@ void Athletics::updateMartialHdr(const MartialHeader* mh)
 #endif
 }
 
-UInt8 getAthlRandomDiffculty()
-{
-    UInt16 rate;
-    UInt8 athlDiffculty;
-    rate = uRand(10000);
-    if(rate >= 9980)
-        athlDiffculty = 5;
-    else if(rate >= 9910)
-        athlDiffculty = 4;
-    else if(rate >= 9800)
-        athlDiffculty = 3;
-     else if(rate >= 8600)
-        athlDiffculty = 2;
-     else
-        athlDiffculty = 1;
-    return athlDiffculty;
-}
 #define COUNT_PER        5
 #define COUNT_MAX        9
 void getAthlRandomCategory(UInt8 *arr, UInt8 count)
@@ -843,6 +823,10 @@ void Athletics::listAthleticsMartial()
     st << curData->ePhysical;
     st << gAthleticsRank.GetMaxPhysical(_owner->getVipLevel());
 
+    if(_owner->getBuffData(PLAYER_BUFF_AMARTIAL_WIN) > 5)
+    {
+        _owner->setBuffData(PLAYER_BUFF_AMARTIAL_WIN, 0);
+    }
     UInt8 wins =  5 - _owner->getBuffData(PLAYER_BUFF_AMARTIAL_WIN);
     st << wins;
     /** 选择过 **/
@@ -861,7 +845,7 @@ void Athletics::listAthleticsMartial()
         UInt32 tmp;
         char a[64];
         std::string curAward;
-        tmp = gAthleticsRank.getAthlRandomAward(athlDiffculty, tmp4);
+        tmp = GameAction()->onGetAthlRandomAward(athlDiffculty, tmp4);
         sprintf(a, "%u:%u", (tmp >> 16), (tmp & 0xFFFF));
         curAward.assign(a);
         st << curAward;
@@ -873,11 +857,13 @@ void Athletics::listAthleticsMartial()
                 count++;
         }
         st << count;
-        for(i = 0; i < count; i++)
+        for(i = 0; i < 5/*count*/; i++)
         {
             Player* pl = gAthleticsRank.getOrginal_martial(_owner, i);
             if(pl)
                 st << pl->getName() << pl->getCountry() << pl->GetClass() << static_cast<UInt8>(pl->GetClassAndSex() & 0x0F) << pl->GetLev() << gAthleticsRank.getOrginal_canAttack(_owner, i) << curData->eRivalType[i];
+            //else
+            //    st << "" << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0);
         }
         st << Stream::eos;
         _owner->send(st);
@@ -900,18 +886,18 @@ void Athletics::listAthleticsMartial()
             {
                 UInt8 tmp1, tmp2, tmp3, tmp4;
                 UInt32 dbValue;
-                tmp1 = getAthlRandomDiffculty();
+                tmp1 = GameAction()->onGetAthlRandomDiffculty();
                 st << tmp1;
                 tmp2 = a[i];
                 st << tmp2;
                 tmp3 = 0;
                 st << tmp3;
-                UInt8 totalChoice = gAthleticsRank.getAthlRandomMaxValue(tmp1);
+                UInt8 totalChoice = GameAction()->onGetAthlRandomMaxValue(tmp1);
                 tmp4 = uRand(totalChoice);
                 UInt32 tmp;
                 char a[64];
                 std::string curAward;
-                tmp = gAthleticsRank.getAthlRandomAward(tmp1, tmp4);
+                tmp = GameAction()->onGetAthlRandomAward(tmp1, tmp4);
                 sprintf(a, "%u:%u", (tmp >> 16), (tmp & 0xFFFF));
                 curAward.assign(a);
                 st << curAward;
@@ -939,7 +925,7 @@ void Athletics::listAthleticsMartial()
                 UInt32 tmp;
                 char a[64];
                 std::string curAward;
-                tmp = gAthleticsRank.getAthlRandomAward(tmp1, tmp4);
+                tmp = GameAction()->onGetAthlRandomAward(tmp1, tmp4);
                 sprintf(a, "%u:%u", (tmp >> 16), (tmp & 0xFFFF));
                 curAward.assign(a);
                 st << curAward;
@@ -990,18 +976,18 @@ void Athletics::listAthleticsMartial2(UInt8 type, bool update)
             {
                 UInt8 tmp1, tmp2, tmp3, tmp4;
                 UInt32 dbValue;
-                tmp1 = getAthlRandomDiffculty();
+                tmp1 = GameAction()->onGetAthlRandomDiffculty();
                 st << tmp1;
                 tmp2 = a[i];
                 st << tmp2;
                 tmp3 = 0;
                 st << tmp3;
-                UInt8 totalChoice = gAthleticsRank.getAthlRandomMaxValue(tmp1);
+                UInt8 totalChoice = GameAction()->onGetAthlRandomMaxValue(tmp1);
                 tmp4 = uRand(totalChoice);
                 UInt32 tmp;
                 char a[64];
                 std::string curAward;
-                tmp = gAthleticsRank.getAthlRandomAward(tmp1, tmp4);
+                tmp = GameAction()->onGetAthlRandomAward(tmp1, tmp4);
                 sprintf(a, "%u:%u", (tmp >> 16), (tmp & 0xFFFF));
                 curAward.assign(a);
                 st << curAward;
@@ -1027,7 +1013,7 @@ void Athletics::listAthleticsMartial2(UInt8 type, bool update)
                 UInt32 tmp;
                 char a[64];
                 std::string curAward;
-                tmp = gAthleticsRank.getAthlRandomAward(tmp1, tmp4);
+                tmp = GameAction()->onGetAthlRandomAward(tmp1, tmp4);
                 sprintf(a, "%u:%u", (tmp >> 16), (tmp & 0xFFFF));
                 curAward.assign(a);
                 st << curAward;

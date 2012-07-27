@@ -333,6 +333,26 @@ void OnAthleticsAwardReq(GameMsgHdr& hdr, const void * data)
 	}
 }
 
+void OnAthleticsAwardReq2(GameMsgHdr& hdr, const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+    struct AthleticsAward2{
+        UInt8 diffculty;
+        UInt8 opt;
+    };
+	struct AthleticsAward2 *awd = reinterpret_cast<struct AthleticsAward2 *>(const_cast<void *>(data));
+    UInt32 awardId = GameAction()->onGetAthlRandomAward(awd->diffculty, awd->opt);
+    UInt16 itemId = awardId >> 16;
+    UInt16 count = awardId & 0xFFFF;
+    if(itemId && count)
+    {
+        if(itemId == 499)
+            player->getCoupon(count);
+        else
+            player->GetPackage()->AddItem(itemId, count, 1, false, FromAthletAward);
+    }
+}
+
 void OnGetBoxAddSource(GameMsgHdr& hdr, const void * data)
 {
 	MSG_QUERY_PLAYER(player);

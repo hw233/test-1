@@ -251,7 +251,10 @@ namespace Script
         void sendConsumeMails(Player* player, UInt32 ototal, UInt32 ntotal);
         void onEquipForge(Player* player, UInt32 itemId, UInt32 onums);
         bool onSoSoMapAward(Player* player, UInt8 off);
-	public:
+        UInt8 onGetAthlRandomMaxValue(UInt8 diffculty);
+        UInt32 onGetAthlRandomAward(UInt8 diffculty, UInt8 opt);
+        UInt8 onGetAthlRandomDiffculty();
+    public:
 
 		template <typename R>
 		inline R Run(Player* player, const std::string& script);
@@ -299,6 +302,7 @@ namespace Script
         UInt32 GetMaxActivity(UInt32 vip);
         lua_tinker::table GetExchangeProps(UInt32 id);
         UInt32 GetExchangePropsID();
+        lua_tinker::table GetdayExtraAward(UInt32 month, UInt32 day);
 
 	private:
 		Player* _player1;	//?ű???????Ϊ????1

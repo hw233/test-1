@@ -71,6 +71,8 @@ enum PurchaseType
     Discount8,
     LuckyDraw,
     ArenaBet,
+    AthleticKillCD2,
+    AthleticPhysical,
 };
 
 enum IncomingType
@@ -108,6 +110,7 @@ enum MailItemType
     AutoFrontMap,
     ClanBattleAward,
     RealItemAwardActive,
+    NewDrawingGameAward,
 };
 enum ItemFrom
 {

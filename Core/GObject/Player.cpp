@@ -10898,6 +10898,19 @@ namespace GObject
         UInt32 mon = 1;
         UInt32 year = 2012;
         TimeUtil::GetDMY(&day, &mon, &year);
+         
+        lua_tinker::table award = GameAction()->GetdayExtraAward(mon, day);
+        UInt32 cnt = award.size();
+        if(0 != cnt){
+            if(GetPackage()->GetRestPackageSize() < cnt){    //背包预留足够的位子,否则不能签到
+                sendMsgCode(0, 1011);
+                return;
+            }
+            for(UInt32 i = 0; i < cnt; ++i){
+                lua_tinker::table a = award.get<lua_tinker::table>(i + 1); 
+                GetPackage()->Add(a.get<UInt32>(1), a.get<UInt32>(2), true, false, FromDailyActivity);
+            }
+        }
         GameAction()->doAtySignIn(this, AtySignIn, mon, day);
     }
 

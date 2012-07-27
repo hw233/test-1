@@ -2270,88 +2270,6 @@ UInt8 getRivalRandomDiffculty()
     return rivalDiffculty;
 }
 
-typedef struct _stAward
-{
-    UInt16 itemId;
-    UInt16 count;
-}stAward;
-const stAward awardPool[] =
-{
-    {29, 1}, {29, 2}, {29, 3}, {55, 1}, {502, 1}, {510, 1},
-    {56, 1}, {57, 1}, {499, 5},
-    {511, 1}, {500, 1}, {499, 10},
-    {503, 1}, {514, 1},
-    {515, 1}, {509, 1}, {507, 1}
-};
-
-UInt32 AthleticsRank::getAthlRandomAward(UInt8 diffculty, UInt8 opt)
-{
-    UInt32 tmp = 0;
-    stAward award;
-    if(diffculty == 0 || diffculty > 5)
-        return tmp;
-    switch(diffculty)
-    {
-        case 1:
-            {
-                award = awardPool[opt];
-            }
-            break;
-        case 2:
-            {
-                award = awardPool[6 + opt];
-            }
-            break;
-        case 3:
-            {
-                award = awardPool[9 + opt];
-            }
-            break;
-        case 4:
-            {
-                award = awardPool[12 + opt];
-            }
-            break;
-        case 5:
-            {
-                award = awardPool[14 + opt];
-            }
-            break;
-        default:
-            break;
-    }
-    tmp = (award.itemId << 16) + award.count;
-    return tmp;
-}
-
-UInt8 AthleticsRank::getAthlRandomMaxValue(UInt8 diffculty)
-{
-    UInt8 tmp = 0;
-    if(diffculty == 0 || diffculty > 5)
-        return tmp;
-    switch(diffculty)
-    {
-        case 1:
-            tmp = 6;
-            break;
-        case 2:
-            tmp = 3;
-            break;
-        case 3:
-            tmp = 3;
-            break;
-        case 4:
-            tmp = 2;
-            break;
-        case 5:
-            tmp = 3;
-            break;
-        default:
-            break;
-    }
-    return tmp;
-}
-
 void AthleticsRank::updateAthleticsMartial(Player* pl)
 {
     if(pl == NULL)
@@ -2382,36 +2300,106 @@ void AthleticsRank::updateAthleticsMartial(Player* pl)
     else if(diffculty == 5)
         level += 3;
     else
-        level -= 1;
-
-    GObject::GlobalLevelsPlayersIterator it = GObject::globalLevelsPlayers.find(level);
-    if(it == GObject::globalLevelsPlayers.end())
-        it = GObject::globalLevelsPlayers.find(level - 1);
-    if(it == GObject::globalLevelsPlayers.end())
-        it = GObject::globalLevelsPlayers.find(level - 2);
-    if(it == GObject::globalLevelsPlayers.end())
-        it = GObject::globalLevelsPlayers.find(level - 3);
-    if(it == GObject::globalLevelsPlayers.end())
-        it = GObject::globalLevelsPlayers.find(level + 1);
-    if(it == GObject::globalLevelsPlayers.end())
-        return;
-
-    GObject::LevelPlayers* lvPlayer = it->second;
-
-    UInt32 size = lvPlayer->size();
-    UInt32 size2 = size;
-    UInt8 cnt = 1;
-    while(size < 100 && (level - cnt) > 29)
     {
-        GObject::GlobalLevelsPlayersIterator it = GObject::globalLevelsPlayers.find(level - cnt);
-        ++ cnt;
+        //if(level == 30)
+        //    ;
+        //else
+            level -= 1;
+    }
+
+    UInt32 size = 0;
+    std::map<UInt16, UInt64> mapList;
+    UInt32 mapCnt = 0;
+    UInt32 j;
+    GObject::GlobalLevelsPlayersIterator it = GObject::globalLevelsPlayers.find(level);
+    if(it != GObject::globalLevelsPlayers.end())
+    {
+        GObject::LevelPlayers* lvPlayer = it->second;
+        size = lvPlayer->size();
+        for(j = 0; j < size; j++)
+            mapList[mapCnt++] = (*lvPlayer)[j];
+    }
+    UInt8 cnt = 1;
+    UInt16 k;
+    URandom rnd(time(NULL));
+    Int32 rollId;
+    Int32 rollId2;
+    bool repeat;
+    while(size < 100 && (level - cnt) >= 29)
+    {
+        it = GObject::globalLevelsPlayers.find(level - cnt);
+        ++cnt;
         if(it == GObject::globalLevelsPlayers.end())
             continue;
         GObject::LevelPlayers* lvPlayer2 = it->second;
-
         size += lvPlayer2->size();
+        for(j = 0; j < lvPlayer2->size(); j++)
+            mapList[mapCnt++] = (*lvPlayer2)[j];
     }
 
+    UInt32 showCnt = size;
+    if(showCnt > 5)
+        showCnt = 5;
+    for(k = 0; k < showCnt; k++)
+    {
+        rollId = rnd(size);
+        rollId2 = rollId;
+        while(rollId < static_cast<Int32>(size))
+        {
+            if(mapList[rollId] == pl->getId())
+            {
+                rollId += 1;
+                continue;
+            }
+            repeat = false;
+            for(j = 0; j < k; j++)
+            {
+                if(mapList[rollId] == idIdx[j])
+                {
+                    repeat = true;
+                    break;
+                }
+            }
+            if(repeat)
+            {
+                rollId += 1;
+                continue;
+            }
+            break;
+        }
+        if(rollId == static_cast<Int32>(size))
+        {
+            rollId = rollId2 - 1;
+            while(rollId >= 0)
+            {
+                if(mapList[rollId] == pl->getId())
+                {
+                    rollId -= 1;
+                    continue;
+                }
+                repeat = false;
+                for(j = 0; j < k; j++)
+                {
+                    if(mapList[rollId] == idIdx[j])
+                    {
+                        repeat = true;
+                        break;
+                    }
+                }
+                if(repeat)
+                {
+                    rollId -= 1;
+                    continue;
+                }
+                break;
+            }
+        }
+        if(rollId == -1)
+            break;
+        idIdx[k] = mapList[rollId];
+    }
+
+#if 0
     if(size < 5)
     {
         int k = 0;
@@ -2529,7 +2517,7 @@ void AthleticsRank::updateAthleticsMartial(Player* pl)
 
         }
     }
-
+#endif
     AthleticsRankData* curData = getAthleticsRankData(pl);
     if(!curData)
         return;
@@ -2635,7 +2623,8 @@ void AthleticsRank::updateAthleticsP(Player* pl, UInt8 type)
                     pl->sendMsgCode(0, 1104);
                     return;
                 }
-                pl->useGold(1);
+                ConsumeInfo ci(AthleticKillCD2,0,0);
+                pl->useGold(1, &ci);
                 pl->setBuffData(PLAYER_BUFF_ATHLETICS_P, 0);
                 Stream st(REP::ATHLETICS_REFRESH_MARTIAL);
                 st << type << Stream::eos;
@@ -2664,7 +2653,8 @@ void AthleticsRank::updateAthleticsP(Player* pl, UInt8 type)
                     pl->sendMsgCode(0, 1104);
                     return;
                 }
-                pl->useGold(1);
+                ConsumeInfo ci(AthleticPhysical,0,0);
+                pl->useGold(1, &ci);
                 rankData->ePhysical += 1;
                 DB6().PushUpdateData("UPDATE `athletics_rank` SET `ePhysical` = %u WHERE `ranker` = %"I64_FMT"u", rankData->ePhysical, pl->getId());
                 Stream st(REP::ATHLETICS_REFRESH_MARTIAL);
@@ -2700,8 +2690,8 @@ void AthleticsRank::giveAward( Player* pl, UInt8 type)
             UInt8 index;
             UInt8 diffculty;
             UInt8 tmp4;
-            UInt32 itemId;
-            UInt8 count;
+            //UInt32 itemId;
+            //UInt8 count;
             if(!rankData)
                 return;
             index = rankData->eSelectIndex;
@@ -2709,11 +2699,20 @@ void AthleticsRank::giveAward( Player* pl, UInt8 type)
                 index = 1;
             diffculty = rankData->eCombine[index - 1] >> 24;
             tmp4 = rankData->eCombine[index - 1] & 0xFF;
-            UInt32 awardId = getAthlRandomAward(diffculty, tmp4);
+#if 0
+            UInt32 awardId = GameAction()->onGetAthlRandomAward(diffculty, tmp4);
             itemId = awardId >> 16;
             count = awardId & 0xFFFF;
             //_owner->GetPackage()->AddItem(itemId, count, 1, true, FromAthletAward);
-            AthleticsAward atkerAthleticsAward = { 0, 0, 0, 0, 0, 0, 0, 0, itemId, count};
+#else
+            struct AthleticsAward2{
+                UInt8 diffculty;
+                UInt8 opt;
+            }curOpt = {diffculty, tmp4};
+            GameMsgHdr hdr3(0x225, pl->getThreadId(), pl, sizeof(AthleticsAward2));
+            GLOBAL().PushMsg(hdr3, &curOpt);
+#endif
+            AthleticsAward atkerAthleticsAward = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
             atkerAthleticsAward.prestige = 50 * (World::_wday == 3 ? 2 : 1);
             GameMsgHdr hdr2(0x217, pl->getThreadId(), pl, sizeof(AthleticsAward));
             GLOBAL().PushMsg(hdr2, &atkerAthleticsAward);

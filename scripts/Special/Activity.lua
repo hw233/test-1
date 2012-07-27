@@ -1861,4 +1861,44 @@ function sendConsumeMails(player, ototal, ntotal)
     sendConsumeMails1(player, ototal, ntotal);
 end
 
+local awardPool = {
+    {{29, 1}, {29, 2}, {29, 3}, {55, 1}, {502, 1}, {510, 1}, {499, 5}},
+    {{56, 1}, {500, 1}, {499, 10}},
+    {{511, 3}, {505, 1}},
+    {{503, 1}, {514, 2}},
+    {{515, 1}, {509, 1}, {507, 1}}
+};
+
+function onGetAthlRandomMaxValue(diffculty)
+    if diffculty == 0 or diffculty > 5 then
+        return 0
+    end
+    return #awardPool[diffculty]
+end
+
+function onGetAthlRandomAward(diffculty, opt)
+    if diffculty == 0 or diffculty > 5 then
+        return 0
+    end
+    opt = opt + 1
+    if opt > #awardPool[diffculty] then
+        return 0
+    end
+    local award = awardPool[diffculty][opt][1] * 65536 + awardPool[diffculty][opt][2]
+    return award
+end
+
+function onGetAthlRandomDiffculty()
+    local prob = {8580, 9580, 9880, 9980, 10000}
+    local p
+    p = math.random(1, 10000)
+    local i = 1
+    for n = 1, #prob do
+        if p <= prob[n] then
+            i = n
+            break
+        end
+    end
+    return i
+end
 
