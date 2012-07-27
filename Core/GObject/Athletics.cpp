@@ -209,6 +209,35 @@ void Athletics::notifyDropAthleticsData(UInt32 id)
 	DB6().PushUpdateData("DELETE FROM `athletics_record` WHERE `id` = %u", id);
 }
 
+void Athletics::adjustAthlDeferBuffData(Player *atker, Player *defer, bool reset)
+{
+    return;
+    if(!atker || !defer)
+        return;
+    AthleticsRankData* curData = gAthleticsRank.getAthleticsRankData(atker);
+    if(!curData)
+        return;
+
+    UInt8 index;
+    UInt8 rivalType;
+    UInt32 bufFlag = Battle::BattleFighter::AthlEnh31;
+    index = curData->eSelectIndex;
+    if(index== 0 || index > 5)
+        index = 1;
+    rivalType = curData->eRivalType[index];
+    if(rivalType == 0 || rivalType > 7)
+        return;
+    if(reset)
+    {
+        defer->setAthlRivalBuff(bufFlag);
+    }
+    else
+    {
+        bufFlag = bufFlag << (rivalType - 1);
+        defer->setAthlRivalBuff(bufFlag);
+    }
+}
+
 void Athletics::attack(Player * defer)
 {
 	UInt8 tid = defer->getThreadId();
@@ -547,11 +576,13 @@ void Athletics::attackMartial(Player* defer)
 
         UInt32 reptid;
         _owner->addFlag(GObject::Player::AthleticsBuff);
+        adjustAthlDeferBuffData(_owner, defer, false);
         Battle::BattleSimulator bsim = Battle::BattleSimulator(Battle::BS_ATHLETICS1, _owner, defer);
         defer->PutFighters( bsim, 1, true );
         _owner->PutFighters( bsim, 0, true );
         bsim.start();
         res = bsim.getWinner() == 1;
+        adjustAthlDeferBuffData(_owner, defer, true);
         _owner->delFlag(GObject::Player::AthleticsBuff);
         reptid = bsim.getId();
 
@@ -584,7 +615,8 @@ void Athletics::attackMartial(Player* defer)
 
 void Athletics::beAttackMartial(Player * atker, UInt16 formation, UInt16 portrait, Lineup * lineup)
 {
-    _owner->addFlag(GObject::Player::AthleticsBuff);
+    atker->addFlag(GObject::Player::AthleticsBuff);
+    adjustAthlDeferBuffData(atker, _owner, false);
 	Battle::BattleSimulator bsim(Battle::BS_ATHLETICS1, atker, _owner);
 	bsim.setFormation( 0, formation );
 	bsim.setPortrait( 0, portrait );
@@ -599,7 +631,8 @@ void Athletics::beAttackMartial(Player * atker, UInt16 formation, UInt16 portrai
 	_owner->PutFighters( bsim, 1, true );
 	bsim.start();
 	bool res = bsim.getWinner() == 1;
-    _owner->delFlag(GObject::Player::AthleticsBuff);
+    adjustAthlDeferBuffData(atker, _owner, true);
+    atker->delFlag(GObject::Player::AthleticsBuff);
 
 	Stream st(REP::ATTACK_NPC);
 	st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;

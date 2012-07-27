@@ -2427,7 +2427,7 @@ void AthleticsRank::updateAthleticsMartial(Player* pl)
             UInt32 size1 = lvPlayer2->size();
             for(UInt32 j = 0; j < size1; ++j)
             {
-                if(i == 0 && pl->getId() == (*lvPlayer2)[j])
+                if(/*i == 0 && */pl->getId() == (*lvPlayer2)[j])
                     continue;
                 idIdx[k] = (*lvPlayer2)[j];
                 ++k;
@@ -2655,7 +2655,7 @@ void AthleticsRank::updateAthleticsP(Player* pl, UInt8 type)
                 AthleticsRankData* rankData = *found->second;
                 if(rankData->ePhysical >= MaxPhysical[pl->getVipLevel()])
                     return;
-                if(pl->GetVar(VAR_PHYSICAL_BUY) > MaxPhysicalBuy[pl->getVipLevel()])
+                if(pl->GetVar(VAR_PHYSICAL_BUY) >= MaxPhysicalBuy[pl->getVipLevel()])
                 {
                     pl->sendMsgCode(0, 1496);
                     return;
@@ -2691,8 +2691,13 @@ void AthleticsRank::giveAward( Player* pl, UInt8 type)
     if(type == 1)
     {
         UInt8 wins = pl->getBuffData(PLAYER_BUFF_AMARTIAL_WIN);
-        if(wins >= 5 && pl->GetPackage()->GetRestPackageSize() >= 1)
+        if(wins >= 5)
         {
+            if(pl->GetPackage()->GetRestPackageSize() < 1)
+            {
+                pl->sendMsgCode(0, 1011);
+                return;
+            }
             AthleticsRankData* rankData = *found->second;
             UInt8 index;
             UInt8 diffculty;

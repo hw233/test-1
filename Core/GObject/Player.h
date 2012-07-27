@@ -1346,6 +1346,7 @@ namespace GObject
         UInt8 _justice_roar;
         float _spirit_factor;
         bool _diamond_privilege;
+        UInt32 _athlRivalBuf;
     public:
         static UInt8 _yaMenActiveCount;
         static UInt8 _shiMenActiveCount;
@@ -1371,6 +1372,9 @@ namespace GObject
 
         inline void setDiamondPrivilege(UInt8 v) { _diamond_privilege = v; }
         inline UInt8 getDiamondPrivilege() { return _diamond_privilege; }
+
+        inline void setAthlRivalBuff(UInt8 v) { _athlRivalBuf = v; }
+        inline UInt32 getAthlRivalBuff() { return _athlRivalBuf; }
 
     protected:
 		inline void setBlockBossByLevel();
