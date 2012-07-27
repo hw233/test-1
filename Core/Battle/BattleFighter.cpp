@@ -113,7 +113,7 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         skillItem.rateExtent = 0;
         _passiveSkillAftAtk100.insert(_passiveSkillAftAtk100.end(), skillItem);
 
-        updateSkillStrengthen(passiveSkillPrvAtk100Id[idx]);
+        updateSkillStrengthen(passiveSkillAftAtk100Id[idx]);
     }
 
     cnt = passiveSkillBeAtk100Id.size();

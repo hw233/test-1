@@ -53,6 +53,8 @@ function update_data()
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from soul_skill_template; source soulskilltemplate;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from skillstrengthen; source skillstrengthen;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from skillstrengthenprob; source skillstrengthenprob;";
+    mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from skillstrengthen_skill; source skillstrengthen_skill;";
+    mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from skillstrengthen_effect; source skillstrengthen_effect;";
 }
 
 update_data

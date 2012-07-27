@@ -4176,7 +4176,7 @@ void Fighter::getAllSSAndLevel(Stream& st)
         if (_skill[i])
         {
             SStrengthen* ss = SSGetInfo(_skill[i]);
-            if (!ss)
+            if (ss)
             {
                 ++c;
                 UInt16 skill_id = SKILL_ID(_skill[i]);

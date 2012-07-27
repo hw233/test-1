@@ -125,9 +125,9 @@ private:
 		UInt8 damType2;
 		UInt32 damage;
 		UInt32 leftHP;
-        UInt16 rhp;
+        UInt32 rhp;
         UInt32 rLeftHP;
-		UInt16 counterDmg;
+		UInt32 counterDmg;
 		UInt32 counterLeft;
 	};
 	struct StatusChange

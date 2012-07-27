@@ -250,6 +250,16 @@ namespace GData
 			fprintf(stderr, "Load Skill Strengthen Prob Table Error !\n");
 			return false;
         }
+        if(!LoadSkillStrengthenEffect())
+        {
+			fprintf(stderr, "Load Skill Strengthen effect Table Error !\n");
+			return false;
+        }
+        if(!LoadSkillStrengthens())
+        {
+			fprintf(stderr, "Load Skill Strengthen Table Error !\n");
+			return false;
+        }
 
 		return true;
 	}
