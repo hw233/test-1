@@ -4268,8 +4268,8 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, bool bind)
 
     const GData::ItemBaseType& ibt = item->GetItemType();
     UInt32 exp = ibt.trumpExp;
-    //if (!exp)
-    //    return 0;
+    if (!exp)
+        return 0;
 
     if (item->getClass() != Item_Trump)
     {
