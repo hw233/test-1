@@ -4166,12 +4166,12 @@ void Fighter::makeFighterSSInfo(Stream& st)
     st.data<UInt8>(offset) = c;
 }
 
-#define SS_MAXLVL 9
 void Fighter::SSOpen(UInt16 id)
 {
     if (!_owner)
         return;
-    if (isSkillUp(id) < 0)
+    int idx = isSkillUp(id);
+    if (idx < 0)
         return;
 
     UInt16 sid = SKILL_ID(id);
@@ -4184,8 +4184,12 @@ void Fighter::SSOpen(UInt16 id)
     std::map<UInt16, SStrengthen>::iterator i = m_ss.find(sid);
     if (i != m_ss.end())
     {
-        if (i->second.maxLvl >= SS_MAXLVL)
+        UInt8 mlvl = getUpSkillLevel(idx);
+        if (i->second.maxLvl >= mlvl)
+        {
+            _owner->sendMsgCode(0, 1021);
             return;
+        }
     }
 
     Package* pkg = _owner->GetPackage();
@@ -4194,6 +4198,7 @@ void Fighter::SSOpen(UInt16 id)
         item = pkg->FindItem(itemId, false);
     if (!item)
         return;
+
     // 
     if (item->getClass() != Item_Trump)
     {
@@ -4219,7 +4224,10 @@ void Fighter::SSOpen(UInt16 id)
             ss.maxLvl = 1;
             m_ss[sid] = ss;
             SSUpdate2DB(id, ss);
+            _owner->sendMsgCode(0, 1023);
         }
+        else
+            _owner->sendMsgCode(0, 1024);
     }
     else
     {
@@ -4229,7 +4237,10 @@ void Fighter::SSOpen(UInt16 id)
             ++i->second.maxLvl;
             i->second.maxVal = GData::GDataManager::getMaxStrengthenVal(sid, i->second.lvl);
             SSUpdate2DB(id, i->second);
+            _owner->sendMsgCode(0, 1023);
         }
+        else
+            _owner->sendMsgCode(0, 1024);
     }
 }
 
@@ -4241,24 +4252,33 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, bool bind)
     UInt32 sid = SKILL_ID(id);
     std::map<UInt16, SStrengthen>::iterator i = m_ss.find(sid);
     if (i == m_ss.end())
+    {
+        _owner->sendMsgCode(0, 1022);
         return 0;
+    }
 
     SStrengthen& ss = m_ss[sid];
     if (!ss.maxVal) // full
+    {
+        _owner->sendMsgCode(0, 1021);
         return 0;
+    }
     if (GetItemSubClass(itemId) != Item_Citta)
         return 0;
-    //if (ss.father != itemId)
-    //    return 0;
 
     int idx = isSkillUp(id);
     if (idx < 0)
         return 0;
 
+    UInt8 mlvl = getUpSkillLevel(idx);
+    if (ss.lvl >= mlvl)
+    {
+        _owner->sendMsgCode(0, 1021);
+        return 0;
+    }
+
     if (GData::skill2item.find(sid) == GData::skill2item.end())
         return 0;
-    //if (GData::skill2item[sid] != itemId)
-    //    return 0;
 
     Package* pkg = _owner->GetPackage();
 
@@ -4285,7 +4305,6 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, bool bind)
     ss.curVal += exp;
 
     UInt8 ret = 1;
-    UInt8 mlvl = getUpSkillLevel(idx);
     mlvl = mlvl>ss.maxLvl?mlvl:ss.maxLvl;
     while (ss.curVal >= ss.maxVal)
     {
@@ -4305,6 +4324,7 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, bool bind)
     }
 
     SSUpdate2DB(id, ss);
+    _owner->sendMsgCode(0, 1025);
     return ret;
 }
 
