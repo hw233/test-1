@@ -36,6 +36,7 @@ namespace GData
 	ObjectMapT<GObject::ItemWeapon> npcWeapons;
 	std::vector<ItemGemType *> gemTypes(1000);
 	ItemEquipSetTypeManager	itemEquipSetTypeManager;
+    std::map<UInt16, UInt16> skill2item;
 
 	TaskTypeList			GDataManager::m_TaskTypeList;
 	TaskTypeRelationList	GDataManager::m_TaskTypeRelationList;
@@ -62,6 +63,8 @@ namespace GData
     std::vector<std::vector<UInt16> > GDataManager::m_OnlineAward[3];
     std::map<UInt32, UInt32>  GDataManager::m_soulItemExp;
     std::vector<UInt32> GDataManager::m_udpLogItems;
+    std::map<UInt16, std::vector<UInt32> > GDataManager::m_skillstrengthexp;
+    std::map<UInt16, std::vector<UInt32> > GDataManager::m_skillstrengthprob;
 
 	bool GDataManager::LoadAllData()
 	{
@@ -234,6 +237,16 @@ namespace GData
         if(!LoadSoulItemExp())
         {
 			fprintf(stderr, "Load Soul Item Exp Table Error !\n");
+			return false;
+        }
+        if(!LoadSkillStrengthenExp())
+        {
+			fprintf(stderr, "Load Skill Strengthen Exp Table Error !\n");
+			return false;
+        }
+        if(!LoadSkillStrengthenProb())
+        {
+			fprintf(stderr, "Load Skill Strengthen Prob Table Error !\n");
 			return false;
         }
 
@@ -469,6 +482,22 @@ namespace GData
 		return true;
 	}
 
+    void makeSkill2Item(const std::vector<const SkillBase*>& sks, UInt16 itemid)
+    {
+        if (!sks.size())
+            return;
+
+        UInt16 skillid = 0;
+        for (UInt32 i = 0; i < sks.size(); ++i)
+        {
+            if (sks[i])
+            {
+                skillid = sks[i]->getId();
+                skill2item[skillid/100] = itemid;
+            }
+        }
+    }
+
 	bool GDataManager::LoadItemTypeData()
 	{
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
@@ -509,6 +538,8 @@ namespace GData
 			case Item_Trump:
 				{
 					wt = new ItemTrumpType(idt.typeId, idt.name, idt.attrExtra);
+                    if (((ItemTrumpType*)wt)->attrExtra)
+                        makeSkill2Item(((ItemTrumpType*)wt)->attrExtra->skills, idt.typeId);
 				}
                 break;
             case Item_Gem:
@@ -616,11 +647,16 @@ namespace GData
 		}
 		{
 			lua_State* L = lua_open();
-			luaopen_base(L);
-			luaopen_string(L);
-			luaopen_table(L);
+            luaL_openlibs(L);
+			//luaopen_base(L);
+			//luaopen_string(L);
+			//luaopen_table(L);
 			{
+#ifdef _VT
+				std::string path = cfg.scriptPath + "ServerTaskConfVt.lua";
+#else
 				std::string path = cfg.scriptPath + "ServerTaskConf.lua";
+#endif
 				lua_tinker::dofile(L, path.c_str());
 				lua_tinker::table conf = lua_tinker::call<lua_tinker::table>(L, "GetTaskConfTable");
 				UInt32 size = conf.size();
@@ -754,7 +790,7 @@ namespace GData
 			{
 				lua_tinker::table tael_train_elem = tael_train.get<lua_tinker::table>(i+1);
 				UInt32 elem_sz = tael_train_elem.size();
-				m_TaelTrainList.resize(101);
+				m_TaelTrainList.resize(121);
 				for (UInt32 j = 0; j < elem_sz; ++ j)
 				{
 					UInt8 lowLev, highLev;
@@ -770,7 +806,7 @@ namespace GData
 			//GoldTrain
 			lua_tinker::table gold_train = lua_tinker::call<lua_tinker::table>(L, "GetGoldTrain");
 			UInt32 sz2 = gold_train.size();
-			m_GoldTrainList.resize(101);
+			m_GoldTrainList.resize(121);
 			for (UInt32 i = 0; i < sz2; ++ i)
 			{
 				lua_tinker::table gold_train_elem = gold_train.get<lua_tinker::table>(i+1);
@@ -1172,6 +1208,8 @@ namespace GData
             citta->needsoul = ct.needsoul;
             citta->effect = cittaEffectManager[ct.effectid];
             cittaManager.add(citta);
+            if (citta->effect)
+                makeSkill2Item(citta->effect->skill, ct.id/100+1200-1);
         }
         return true;
     }
@@ -1787,6 +1825,59 @@ namespace GData
                 return true;
         }
         return false;
+    }
+
+    bool GDataManager::LoadSkillStrengthenExp()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+        DBSSExp ssexp;
+		if(execu->Prepare("SELECT `id`, `exp1`, `exp2`, `exp3`, `exp4`, `exp5`, `exp6`, `exp7`, `exp8`, `exp9` FROM `skillstrengthen`", ssexp) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+		{
+            m_skillstrengthexp[ssexp.id].resize(9);
+            UInt32* pv = &ssexp.exp1;
+            for (UInt8 i = 0; i < 9; ++i)
+                m_skillstrengthexp[ssexp.id][i] = *pv++;;
+        }
+        return true;
+    }
+    bool GDataManager::LoadSkillStrengthenProb()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+        DBSSProb ssprob;
+		if(execu->Prepare("SELECT `id`, `prob1`, `prob2`, `prob3`, `prob4`, `prob5`, `prob6`, `prob7`, `prob8`, `prob9` FROM `skillstrengthenprob`", ssprob) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+		{
+            m_skillstrengthprob[ssprob.id].resize(9);
+            UInt32* pv = &ssprob.prob1;
+            for (UInt8 i = 0; i < 9; ++i)
+                m_skillstrengthprob[ssprob.id][i] = *pv++;;
+        }
+        return true;
+    }
+    UInt32 GDataManager::getMaxStrengthenVal(UInt16 id, UInt8 clvl)
+    {
+        std::map<UInt16, std::vector<UInt32> >::iterator i = m_skillstrengthexp.find(id);
+        if (i != m_skillstrengthexp.end())
+        {
+            if (i->second.size() > clvl)
+                return i->second[clvl];
+        }
+        return 0;
+    }
+    UInt32 GDataManager::getSkillStrengthenProb(UInt16 id, UInt8 clvl)
+    {
+        std::map<UInt16, std::vector<UInt32> >::iterator i = m_skillstrengthprob.find(id);
+        if (i != m_skillstrengthprob.end())
+        {
+            if (i->second.size() > clvl)
+                return i->second[clvl];
+        }
+        return 0;
     }
 }
 

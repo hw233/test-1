@@ -2,6 +2,7 @@
 -- 消耗一个物品所得到的积分
 local item2point = 10
 local item2point2 = 6
+local copylvl = {45,60,70,80,90,100}
 
 -- { 物品概率(累积值), 物品ID, 积分}，对应5个副本
 local items = {
@@ -1641,12 +1642,20 @@ function luckyDraw(player, id, num, bind)
         return got 
     end 
 
+    local lvl = player:GetLev()
+    local item2gold = 0;
+    if lvl >= copylvl[id] then
+        item2gold = 10;
+    else
+        item2gold = copylvl[id] - lvl + 10
+    end
+
     local package = player:GetPackage()
     local bnum = package:GetItemNum(needitem, true)
     local ubnum = package:GetItemNum(needitem, false)
-    local gold = player:getGold()
+    local gold = player:getGold4LuckDraw()
 
-    if (bnum + ubnum + gold/10) < num then
+    if (bnum + ubnum + gold/item2gold) < num then
         player:sendMsgCode(2, 1076, 0)
         return got 
     end
@@ -1695,7 +1704,7 @@ function luckyDraw(player, id, num, bind)
                 break
             end
         elseif use == 3 then
-            player:useGold4LuckDraw(item2point)
+            player:useGold4LuckDraw(item2gold)
         end
 
         local x = math.random(1,1000000)

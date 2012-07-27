@@ -50,20 +50,20 @@ function Task_00000113(npcId)
 		action.m_ActionID = 113
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = task_msg_544;
+		action.m_ActionMsg = task_msg_000544;
 	elseif task:GetTaskSubmitNpc(113) == npcId then
 		if Task_Submit_00000113() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 113
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = task_msg_545;
+			action.m_ActionMsg = task_msg_000545;
 		elseif task:HasAcceptedTask(113) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 113
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = task_msg_546;
+			action.m_ActionMsg = task_msg_000546;
 		end
 	end
 	return action;
@@ -77,8 +77,8 @@ function Task_00000113_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = task_msg_547..GetPlayerName(GetPlayer())..task_msg_548;
-	action.m_ActionMsg = task_msg_549;
+	action.m_NpcMsg = task_msg_000547..GetPlayerName(GetPlayer())..task_msg_000548;
+	action.m_ActionMsg = task_msg_000549;
 	return action;
 end
 
@@ -87,7 +87,7 @@ function Task_00000113_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = task_msg_550;
+	action.m_NpcMsg = task_msg_000550;
 	action.m_ActionMsg = "";
 	return action;
 end

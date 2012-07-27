@@ -50,13 +50,18 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120508_2.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120509_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120608_1.sql
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120515_1.sql # must be once for delete recharge total
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120515_1.sql # must be once for delete recharge total
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/towndeamon_player_fix.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120613_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120619_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120622_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120629_1.sql  # must be once for update arena_bet that recieved
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120703_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120706_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120709_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120629_2.sql  #must be once for update new_relation
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120713_1.sql
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120720_2.sql
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120722_1.sql
     #. clearshiyamen.sh
 }

@@ -109,17 +109,16 @@ int main(int argc, char* argv[])
         long long rid = random();
         long long rrid = rid << 32 | (random() | 0x12345);
         size_t vlen = snprintf(id, sizeof(id), "%llu", rrid);
-        memcached_return_t rc = memcached_set(memc, key, len, id, vlen, -1, 0);
+        memcached_return_t rc = memcached_set(memc, key, len, id, vlen, (time_t)(10*60), 0);
         int retry = 2;
         while (rc != MEMCACHED_SUCCESS && retry)
         {
-            rc = memcached_set(memc, key, len, id, vlen, -1, 0);
+            rc = memcached_set(memc, key, len, id, vlen, (time_t)(10*60), 0);
             --retry;
         }
-        printf("%s\n", id);
+        printf("%s - %u - try: %u\n", id, rc, 2-retry);
         sleep(5*60);
     }
     return 0;
 }
-
 

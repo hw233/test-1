@@ -245,6 +245,32 @@ void OnAthleticsBeReq( GameMsgHdr& hdr, const void * data )
 	player->GetAthletics()->beAttack(abd->attacker, abd->formation, abd->portrait, abd->lineup);
 }
 
+void OnNewRelationAttack(GameMsgHdr& hdr, const void *data)
+{
+	MSG_QUERY_PLAYER(player);
+	struct NewRelationBeData
+	{
+		Player * attacker;
+		UInt16 formation;
+		UInt16 portrait;
+		Lineup lineup[5];
+	};
+	NewRelationBeData *abd = reinterpret_cast<NewRelationBeData *>(const_cast<void *>(data));
+    player->GetNewRelation()->beAttack(abd->attacker, abd->formation, abd->portrait, abd->lineup, player);
+}
+
+void OnNewRelationCountryReq(GameMsgHdr& hdr, const void *data)
+{
+    MSG_QUERY_PLAYER(player);
+    struct stNewRelationReq
+    {
+        UInt8 type;
+        std::string atkName;
+    };
+    stNewRelationReq *nrw = reinterpret_cast<stNewRelationReq *>(const_cast<void *>(data));
+    player->GetNewRelation()->countrySend(player, nrw->type, nrw->atkName);
+}
+
 void OnAthleticsEnterResp( GameMsgHdr& hdr, const void * )
 {
 	MSG_QUERY_PLAYER(player);
@@ -585,9 +611,11 @@ void OnSaleSellRespNotify( GameMsgHdr& hdr, const void * data )
 	{
 		UInt32 saleId;
 		Player *buyer;
+        UInt32 id;
+        UInt16 num;
 	};
 	BuyInfo binfo = *reinterpret_cast<BuyInfo *>(const_cast<void *>(data));
-	player->GetSale()->sellSaleResp(binfo.saleId, binfo.buyer);
+	player->GetSale()->sellSaleResp(binfo.saleId, binfo.buyer, binfo.id, binfo.num);
 }
 
 void OnSaleItemCancel( GameMsgHdr& hdr, const void * data )
@@ -997,6 +1025,7 @@ void OnCreateAward(GameMsgHdr& hdr, const void * data)
 {
     MSG_QUERY_PLAYER(player);
     player->GetPackage()->AddItem(18, 1, true);
+    player->GetPackage()->AddItem(449, 1, true); // XXX: 首充礼包
     player->getCoupon(888);
 #if defined(_FB) && defined(_FB_TEST)
     player->getGold(20000);
@@ -1423,7 +1452,14 @@ void OnArenaEnterCommit( GameMsgHdr& hdr, const void* data )
     MSG_QUERY_PLAYER(player);
 	const UInt8 type = *reinterpret_cast<const UInt8 *>(data);
 
-    if(player->GetLev() < 70)
+#ifdef _FB
+#define LIMIT_LEVEL  60
+#else
+#define LIMIT_LEVEL  70
+#endif
+
+
+    if(player->GetLev() < LIMIT_LEVEL)
         return;
     if(type == 0)
     {
@@ -1441,6 +1477,12 @@ void OnArenaEnterCommit( GameMsgHdr& hdr, const void* data )
         st << Stream::eos;
         NETWORK()->SendToArena(st);
     }
+}
+void OnSendPExpCard( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    int pos = *(int*)(data);
+    player->sendPExpCard(pos);
 }
 
 #endif // _COUNTRYINNERMSGHANDLER_H_

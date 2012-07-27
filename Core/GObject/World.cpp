@@ -114,6 +114,12 @@ UInt32 World::_rechargenextretend;
 bool World::_mergeathact = false;
 bool World::_fourcopact = false;
 bool World::_duanwu;
+bool World::_icact;
+UInt32 World::_levelawardend;
+bool World::_pexpitems;
+UInt32 World::_sosomapbegin = 0;
+bool World::_opentest;
+bool World::_consumeactive;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
@@ -168,10 +174,14 @@ MayDaySortMap mayDaySortMap3;
 typedef std::multimap<UInt32, Player*> JuneSortMap;
 JuneSortMap juneSortMap;
 
+typedef std::multimap<UInt32, Player*> PExpItemsMap;
+PExpItemsMap pexpItemsMap;
+
 bool bSingleDayEnd = false;
 bool bValentineDayEnd = false;
 bool bMayDayEnd = false;
 bool bJuneEnd = false;
+bool bPExpItemsEnd = false;
 
 bool enum_midnight(void * ptr, void* next)
 {
@@ -230,6 +240,14 @@ bool enum_midnight(void * ptr, void* next)
             juneSortMap.insert(std::make_pair(num, pl));
     }
 
+    if(bPExpItemsEnd)
+    {
+        UInt32 num = pl->GetVar(VAR_PEXPITEMS);
+        if (num > 0)
+            pexpItemsMap.insert(std::make_pair(num, pl));
+    }
+
+
     if (World::_halloween && pl->isOnline())
         pl->sendHalloweenOnlineAward(TimeUtil::Now(), true);
 
@@ -249,7 +267,9 @@ bool enum_midnight(void * ptr, void* next)
     if (pl->GetVar(VAR_RECHARGE_TOTAL) &&
             (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 7, 1) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 7, 4) ||
-            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 7, 9)))
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 7, 9) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 7, 17) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 7, 25)))
     {
         if (pl->isOnline())
         {
@@ -261,6 +281,10 @@ bool enum_midnight(void * ptr, void* next)
             pl->SetVar(VAR_RECHARGE_TOTAL, 0);
         }
     }
+#ifdef _FB
+    if (TimeUtil::SharpDay(0, nextday) == TimeUtil::SharpDay(0, World::_levelawardend))
+        pl->sendLevelAward();
+#endif
 
 	return true;
 }
@@ -297,7 +321,7 @@ void World::makeActivityInfo(Stream &st)
     UInt32 active = _newyear?1:0;
     active |= _rechargeactiveno&1?2:0;
     active |= _girlday?4:0;
-    active |= _trumpenchret?8:0;
+    //active |= _trumpenchret?8:0;
     active |= _rechargeactiveno&2?16:0;
     active |= _foolsday?32:0;
     active |= _chingming?64:0;
@@ -524,6 +548,39 @@ void SendHappyItemCnt()
 
 }
 
+void SendPExpCard()
+{
+    if(bPExpItemsEnd)
+    {
+        int pos = 0;
+        UInt32 happyItemNum = 0xFFFFFFFF;
+        for(PExpItemsMap::reverse_iterator iter = pexpItemsMap.rbegin();
+                iter != pexpItemsMap.rend(); ++iter)
+        {
+            if(iter->first != happyItemNum)
+            {
+                ++pos;
+                happyItemNum = iter->first;
+            }
+            if(pos > 1) break;
+
+            Player* player = iter->second;
+            if (!player)
+                continue;
+            if (player->isOnline())
+            {
+                GameMsgHdr hdr(0x253, player->getThreadId(), player, sizeof(pos));
+                GLOBAL().PushMsg(hdr, &pos);
+            }
+            else
+            {
+                player->sendPExpCard(pos);
+            }
+        }
+    }
+
+}
+
 void World::World_Midnight_Check( World * world )
 {
 	UInt32 curtime = TimeUtil::Now();
@@ -535,6 +592,7 @@ void World::World_Midnight_Check( World * world )
     bool bValentineDay = getValentineDay();
     bool bMayDay = getMayDay();
     bool bJune = getJune();
+    bool bPExpItems = getPExpItems();
 	world->_worldScript->onActivityCheck(curtime+30);
 
 	world->_today = TimeUtil::SharpDay(0, curtime+30);	
@@ -554,6 +612,7 @@ void World::World_Midnight_Check( World * world )
     bMayDayEnd = bMayDay && !getMayDay();
     // 六一活动是否结束
     bJuneEnd = bJune && !getJune();
+    bPExpItemsEnd = bPExpItems && !getPExpItems();
 
     UInt32 nextday = curtime + 30;
 	globalPlayers.enumerate(enum_midnight, static_cast<void *>(&nextday));
@@ -585,6 +644,7 @@ void World::World_Midnight_Check( World * world )
     SendShusanLoveTitleCard();
     SendMDSoulCnt();
     SendHappyItemCnt();
+    SendPExpCard();
 #ifdef _FB
     if(bJuneEnd)
         world->SendLuckyDrawAward();

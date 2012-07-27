@@ -1,5 +1,6 @@
 
 #ifdef _FB
+#elif defined(_VT)
 #else
 
 #include "Config.h"

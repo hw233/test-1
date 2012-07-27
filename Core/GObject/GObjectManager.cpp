@@ -60,6 +60,8 @@
 #include "LuckyDraw.h"
 #include <fcntl.h>
 #include "RealItemAward.h"
+#include "NewRelation.h"
+#include "GVar.h"
 
 namespace GObject
 {
@@ -126,6 +128,7 @@ namespace GObject
     float GObjectManager::_tough_max;
     float GObjectManager::_counter_max;
     float GObjectManager::_mres_max;
+    float GObjectManager::_cridmg_max;
 
     std::vector<std::vector<UInt32>> GObjectManager::_color_chance_gold;
     std::vector<std::vector<UInt32>> GObjectManager::_color_chance_free;
@@ -173,6 +176,7 @@ namespace GObject
 
 	void GObjectManager::loadAllData()
 	{
+        loadGVar();
         loadRealItemAward();
         loadEquipForge();
 		loadMapData();
@@ -209,6 +213,8 @@ namespace GObject
         LoadSoulItemChance();
         LoadLuckyLog();
         loadRNR();
+        loadNewRelation();
+        loadSkillStrengthen();
 		DB::gDataDBConnectionMgr->UnInit();
 	}
 
@@ -397,6 +403,7 @@ namespace GObject
             _tough_max = lua_tinker::call<float>(L, "getToughMax");
             _counter_max = lua_tinker::call<float>(L, "getCounterMax");
             _mres_max = lua_tinker::call<float>(L, "getMagResMax");
+            _cridmg_max = lua_tinker::call<float>(L, "getCriticalDmgMax");
         }
         lua_close(L);
 
@@ -3730,6 +3737,7 @@ namespace GObject
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
+			lc.advance();
 			pl = globalPlayers[hm.playerId];
             if (!pl)
                 continue;
@@ -3754,6 +3762,7 @@ namespace GObject
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
+			lc.advance();
 			pl = globalPlayers[ss.playerId];
             if (!pl)
                 continue;
@@ -3778,6 +3787,7 @@ namespace GObject
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
+			lc.advance();
 			pl = globalPlayers[cfa.playerId];
             if (!pl)
                 continue;
@@ -3895,6 +3905,7 @@ namespace GObject
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
+			lc.advance();
             TripodData td;
             td.soul = t.soul;
             td.fire = t.fire;
@@ -3940,6 +3951,7 @@ namespace GObject
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
+			lc.advance();
             GObject::PracticeData* ppd = new (std::nothrow) GObject::PracticeData(pd.id);
             if (!ppd)
                 return false;
@@ -3996,6 +4008,7 @@ namespace GObject
         bool found = false;
 		while(execu->Next() == DB::DB_OK)
 		{
+			lc.advance();
             if (rrdb.id == id && rrdb.num == num)
             {
                 found = true;
@@ -4300,6 +4313,27 @@ namespace GObject
         return true;
     }
 
+    bool GObjectManager::loadNewRelation()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading New Relation");
+		DBNewRelation t;
+		if(execu->Prepare("SELECT `playerId`, `mood`, `sign` FROM `new_relation` ORDER BY `playerId`", t)!= DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+            Player* pl = globalPlayers[t.playerId];
+            if(!pl)
+                continue;
+            pl->GetNewRelation()->LoadFromDB(t.mood, t.sign);
+        }
+        lc.finalize();
+        return true;
+    }
+
     bool GObjectManager::loadRNR()
     {
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
@@ -4321,4 +4355,60 @@ namespace GObject
         return true;
     }
 
+    bool GObjectManager::loadGVar()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading RNR");
+        DBGVar gvar;
+        if(execu->Prepare("SELECT `id`, `data`, `over` FROM `gvar` ORDER BY `id`", gvar) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+        {
+			lc.advance();
+            GVarSystem::Instance().LoadVar(gvar.id, gvar.data, gvar.overTime);
+        }
+        lc.finalize();
+        return true;
+    }
+
+    bool GObjectManager::loadSkillStrengthen()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading skill strengthen");
+        DBSS ss;
+        if(execu->Prepare("SELECT `id`, `playerId`, `skillid`, `father`, `maxVal`, `curVal`, `lvl`, `maxLvl` FROM `skill_strengthen` ORDER BY `playerId`", ss) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+        Player* pl = NULL;
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		while(execu->Next() == DB::DB_OK)
+        {
+			lc.advance();
+			if(ss.playerId != last_id)
+			{
+				last_id = ss.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+			Fighter * fgt = pl->findFighter(ss.id);
+			if(fgt == NULL)
+				continue;
+
+            SStrengthen s;
+            s.father = ss.father;
+            s.maxVal = ss.maxVal;
+            s.curVal = ss.curVal;
+            s.lvl = ss.lvl;
+            s.maxLvl = ss.maxLvl;
+            fgt->SSFromDB(ss.skillid, s);
+        }
+        lc.finalize();
+        return true;
+    }
+
 }
+

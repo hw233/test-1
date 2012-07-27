@@ -428,10 +428,9 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
 
             TeamCopyPlayerInfo* tcpInfo = pl->getTeamCopyPlayerInfo();
             if(tcpInfo && tcpInfo->getPass(id, 0) == false)
-            {
                 tcpInfo->setPass(id, 0, true, true);
-                luckyDraw.notifyPass(pl, id);
-            }
+
+            luckyDraw.notifyPass(id);
 
             tcd.floor = 0;
             tcd.spot = 0;
@@ -716,7 +715,7 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool 
                     return;
                 }
 
-                if (!World::getNewYear() && !pl->isYD() && !pl->isBD())
+                if (!World::getNewYear() && !pl->isYD() && !pl->isBD() && !pl->isQQVIP())
                 {
                     if (pl->getVipLevel() < 6)
                         return;

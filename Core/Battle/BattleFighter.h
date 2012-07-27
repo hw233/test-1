@@ -132,7 +132,7 @@ public:
 	float getHitrate(BattleFighter* defgt);
 	float getEvade(BattleFighter* defgt);
 	float getCritical(BattleFighter* defgt);
-	inline float getCriticalDmg() {float ret = _criticaldmg + _criticalDmgAdd + _criticalDmgAdd2; return (ret > 0 ? ret : 0);}
+	float getCriticalDmg();
     float calcCriticalDmg(BattleFighter* defender);
 	float getPierce(BattleFighter* defgt);
 	float getCounter(BattleFighter* defgt);

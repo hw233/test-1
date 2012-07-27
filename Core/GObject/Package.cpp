@@ -2027,13 +2027,18 @@ namespace GObject
     {
         if (quality == 0) // 防具
         {
-            for (UInt8 l = level; l >= 8 && l > slevel; --l)
-                GameAction()->onEnchantAct(player, l, 1);
+            for (UInt8 l = level; l >= 6 && l > slevel; --l)
+                GameAction()->onEnchantAct(player, l, quality, 1);
         }
         else if (quality == 1) // 武器
         {
-            for (UInt8 l = level; l >= 8 && l > slevel; --l)
-                GameAction()->onEnchantAct(player, l, 0);
+            for (UInt8 l = level; l >= 6 && l > slevel; --l)
+                GameAction()->onEnchantAct(player, l, quality, 0);
+        }
+        else
+        {
+            for (UInt8 l = level; l >= 6 && l > slevel; --l)
+                GameAction()->onEnchantAct(player, l, quality);
         }
     }
 #endif
@@ -2321,7 +2326,10 @@ namespace GObject
 			}
 
             if (World::getTrumpEnchRet())
-                enchantToken(m_Owner, quality, oldEnchant, ied.enchant, autoEnch?0:1);
+            {
+                enchantAct(m_Owner, quality, oldEnchant, ied.enchant, autoEnch?0:1);
+                // enchantToken(m_Owner, quality, oldEnchant, ied.enchant, autoEnch?0:1);
+            }
 #ifdef _FB
             if (World::getEnchantAct() && (equip->getClass() == Item_Weapon || equip->getClass() == Item_Armor1 || equip->getClass() == Item_Armor2 || equip->getClass() == Item_Armor4 || equip->getClass() == Item_Armor5))
                 enchantAct(m_Owner, quality, oldEnchant, ied.enchant, autoEnch?0:1);
@@ -3825,6 +3833,7 @@ namespace GObject
 
 		getRandomAttr2(lv, crr, q, ied.extraAttr2.getCount(), protect, types, values, equip_t);
 
+        UInt8 num = 0;
         float v0 = 0;
         if(equip_t == EQUIPTYPE_EQUIP)
             v0 = GObjectManager::getAttrMax(lv, types[0]-1, q, crr)*90;
@@ -3834,6 +3843,8 @@ namespace GObject
         {
             SYSMSG_BROADCASTV(2203, m_Owner->getCountry(), m_Owner->getName().c_str(), equip->GetItemType().getId());
         }
+        if ((float)values[0] > v0)
+            ++num;
 
         float v1 = 0;
         if(equip_t == EQUIPTYPE_EQUIP)
@@ -3844,6 +3855,9 @@ namespace GObject
         {
             SYSMSG_BROADCASTV(2203, m_Owner->getCountry(), m_Owner->getName().c_str(), equip->GetItemType().getId());
         }
+        if ((float)values[1] > v1)
+            ++num;
+
 
         float v2 = 0;
         if(equip_t == EQUIPTYPE_EQUIP)
@@ -3854,6 +3868,15 @@ namespace GObject
         {
             SYSMSG_BROADCASTV(2203, m_Owner->getCountry(), m_Owner->getName().c_str(), equip->GetItemType().getId());
         }
+        if ((float)values[2] > v2)
+            ++num;
+
+#ifdef _FB
+        if (num)
+        {
+            m_Owner->equipForge(fighterId, itemId, num);
+        }
+#endif
 
 
         {
