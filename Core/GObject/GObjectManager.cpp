@@ -1953,7 +1953,7 @@ namespace GObject
 		LoadingCounter lc("Loading athletics_rank:");
 		DBAthleticsData dbd;
         UInt32 rank[2] = {0,0};
-		if(execu->Prepare("SELECT `row`, `rank`, `ranker`, `maxRank`, `challengeNum`, `challengeTime`, `prestige`, `tael`, `winStreak`, `beWinStreak`, `failStreak`, `beFailStreak`, `oldRank`, `first4Rank`, `extrachallenge`, `pageNum` FROM `athletics_rank` ORDER BY `rank`, `maxRank`", dbd) != DB::DB_OK)
+		if(execu->Prepare("SELECT `row`, `rank`, `ranker`, `maxRank`, `challengeNum`, `challengeTime`, `prestige`, `tael`, `winStreak`, `beWinStreak`, `failStreak`, `beFailStreak`, `oldRank`, `first4Rank`, `extrachallenge`, `pageNum`, `eChallengeTime`, `ePhysical`, `eSelectIndex`, `eCombine1`, `eCombine2`, `eCombine3`, `eCombine4`, `eCombine5`, `eRival1`, `eRival2`, `eRival3`, `eRival4`, `eRival5`, `eCanAttack1`, `eCanAttack2`, `eCanAttack3`, `eCanAttack4`, `eCanAttack5`, `eRivalType1`, `eRivalType2`, `eRivalType3`, `eRivalType4`, `eRivalType5` FROM `athletics_rank` ORDER BY `rank`, `maxRank`", dbd) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -1995,6 +1995,16 @@ namespace GObject
             data->first4rank = dbd.first4rank;
             data->extrachallenge = dbd.extrachallenge;
             data->pageNum = dbd.pageNum;
+            data->eChallengeTime = dbd.eChallengeTime;
+            data->ePhysical = dbd.ePhysical;
+            data->eSelectIndex = dbd.eSelectIndex;
+            for(UInt8 index = 0; index < 5; index++)
+            {
+                data->eCombine[index] = dbd.eCombine[index];
+                data->eRival[index] = dbd.eRival[index];
+                data->eCanAttack[index] = dbd.eCanAttack[index];
+                data->eRivalType[index] = dbd.eRivalType[index];
+            }
 			gAthleticsRank.addAthleticsFromDB(dbd.row, data);
 		}
 		lc.finalize();

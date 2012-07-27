@@ -253,6 +253,9 @@ MSG_REG_2(GameMsgHdr, 0x325, OnClearTaskReq);
 
 MSG_REG_2(GameMsgHdr, 0x330, OnMartialUpdateHdr);
 MSG_REG_2(GameMsgHdr, 0x331, OnMartialUpdate);
+
+MSG_REG_2(GameMsgHdr, 0x351, OnMartialUpdate2);
+
 MSG_REG_2(GameMsgHdr, 0x232, OnAthleticsMartialReq);
 MSG_REG_2(GameMsgHdr, 0x233, OnAthleticsMartialAttack);
 MSG_REG_2(GameMsgHdr, 0x234, OnAthleticsMartialBeAttack);

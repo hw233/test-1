@@ -416,6 +416,8 @@ namespace REP
     const UInt8 PACK_INFO           = 0xC0;// 0x30
     const UInt8 PACK_USE            = 0xC3;// 0x33
     const UInt8 PACK_EXTEND         = 0xC4;// 0x34
+    /**刷新历练*/
+    const UInt8 ATHLETICS_REFRESH_MARTIAL = 0xC7;
     const UInt8 REWARD_DRAW         = 0xCF;// 0x38
     const UInt8 TRIPOD_INFO         = 0xCE;// 0x39
     const UInt8 LUCKYDRAW_INFO      = 0x3D;

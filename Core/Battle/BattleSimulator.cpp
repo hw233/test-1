@@ -238,6 +238,7 @@ void BattleSimulator::start(UInt8 prevWin)
 	for(int i = 0; i < 2; ++ i)
 	{
 		UInt32 flag = 0;
+        UInt32 flag2 = 0;
 		if(_player[i] != NULL)
 		{
 			if(checkEnh)
@@ -257,6 +258,31 @@ void BattleSimulator::start(UInt8 prevWin)
                 flag |= BattleFighter::Enh4;
             if (_player[i]->getBuffData(PLAYER_BUFF_BBUF, now) > 0)
                 flag |= BattleFighter::Enh5;
+            /*if(_player[i]->hasFlag(GObject::Player::Copy)
+             || _player[i]->hasFlag(GObject::Player::AutoCopy)
+             || _player[i]->hasFlag(GObject::Player::InCopyTeam)
+             || _player[i]->hasFlag(GObject::Player::AutoDungeon)
+             || _player[i]->hasFlag(GObject::Player::AutoFrontMap))*/
+            {
+                if (_player[i]->getBuffData(PLAYER_BUFF_ATHL1, now) > 0)
+                    flag2 |= BattleFighter::AthlEnh1;
+                if (_player[i]->getBuffData(PLAYER_BUFF_ATHL2, now) > 0)
+                    flag2 |= BattleFighter::AthlEnh2;
+                if (_player[i]->getBuffData(PLAYER_BUFF_ATHL3, now) > 0)
+                    flag2 |= BattleFighter::AthlEnh3;
+                if (_player[i]->getBuffData(PLAYER_BUFF_ATHL4, now) > 0)
+                    flag2 |= BattleFighter::AthlEnh4;
+                if (_player[i]->getBuffData(PLAYER_BUFF_ATHL5, now) > 0)
+                    flag2 |= BattleFighter::AthlEnh5;
+                if (_player[i]->getBuffData(PLAYER_BUFF_ATHL6, now) > 0)
+                    flag2 |= BattleFighter::AthlEnh6;
+                if (_player[i]->getBuffData(PLAYER_BUFF_ATHL7, now) > 0)
+                    flag2 |= BattleFighter::AthlEnh7;
+                if (_player[i]->getBuffData(PLAYER_BUFF_ATHL8, now) > 0)
+                    flag2 |= BattleFighter::AthlEnh8;
+                if (_player[i]->getBuffData(PLAYER_BUFF_ATHL9, now) > 0)
+                    flag2 |= BattleFighter::AthlEnh9;
+            }
 		}
 		for(int j = 0; j < 25; ++ j)
 		{
@@ -280,7 +306,8 @@ void BattleSimulator::start(UInt8 prevWin)
 								loaded[i] = true;
 							}
 						}
-
+                        if(flag2 > 0)
+                            bf->addFlag2(flag2);
                         if((prevWin-1) != i)
                             bf->initStats(checkEnh);
                         UInt8 justice_roar = (_player[i] != NULL ? _player[i]->getJusticeRoar() : 0);

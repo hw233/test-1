@@ -609,7 +609,8 @@ struct PracticeHookAddReq
 
 struct AthleticsRefreshMartialReq
 {
-	MESSAGE_DEF(REQ::ATHLETICS_REFRESH_MARTIAL);
+    UInt8 _type;
+	MESSAGE_DEF1(REQ::ATHLETICS_REFRESH_MARTIAL, UInt8, _type);
 };
 
 struct TrumpLOrderReq
@@ -1049,6 +1050,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendSSDTInfo();
     pl->sendHappyInfo();
     pl->sendYBBufInfo(pl->GetVar(VAR_YBBUF));
+    pl->sendAthlBufInfo();
     luckyDraw.notifyDisplay(pl);
 
     if (World::getTrumpEnchRet())
@@ -3829,6 +3831,7 @@ void OnRefreshMartialReq( GameMsgHdr& hdr, AthleticsRefreshMartialReq& req )
     MSG_QUERY_PLAYER(player);
     if (!player->hasChecked())
         return;
+#if 0
     if(player->getTael() < 100)
         return;
 
@@ -3837,6 +3840,9 @@ void OnRefreshMartialReq( GameMsgHdr& hdr, AthleticsRefreshMartialReq& req )
 
     GameMsgHdr hdr2(0x1F1, WORKER_THREAD_WORLD, player, 0);
     GLOBAL().PushMsg(hdr2, NULL);
+#endif
+    GameMsgHdr hdr2(0x1F8, WORKER_THREAD_WORLD, player, 1);
+    GLOBAL().PushMsg(hdr2, &(req._type));
 }
 
 void OnTrumpUpgrade( GameMsgHdr& hdr, const void* data)

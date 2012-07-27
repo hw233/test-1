@@ -25,7 +25,7 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _atkAdd_last(0), _magAtkAdd_last(0), _defAdd_last(0), _magDefAdd_last(0), _hitrateAdd_last(0), _evadeAdd_last(0),
     _criticalAdd_last(0), _criticalDmgAdd_last(0), _pierceAdd_last(0), _counterAdd_last(0), _magResAdd_last(0), _toughAdd_last(0),
     _maxhpAdd_last(0), _maxActionAdd_last(0), _atkreduce_last(0), _magatkreduce_last(0), _formEffect(NULL), _formula(bf),
-    _forgetLevel(0), _forgetRound(0), _flag(0), _poisonRound(0), _poisonLevel(0), _stunRound(0), _stunLevel(0),
+    _forgetLevel(0), _forgetRound(0), _flag(0),_flag2(0),  _poisonRound(0), _poisonLevel(0), _stunRound(0), _stunLevel(0),
      _confuseRound(0), _confuseLevel(0), _weakRound(0), _weakLevel(0), _immune(0),
     _evade100(0), _evade100_cd(0), _evade100_last(0), _evade100_base_cd(0), _evade100_base_last(0),
     _defend100(0), _defend100_cd(0), _defend100_last(0), _defend100_base_cd(0), _defend100_base_last(0),
@@ -404,6 +404,45 @@ void BattleFighter::updateBuffExtras()
         _attrExtra.magatk += 50;
         _attrExtra.defend += 100;
         _attrExtra.magdef += 100;
+    }
+
+    if (_flag2 & AthlEnh1)
+    {
+        _attrExtra.attack *= 1.05f;
+        _attrExtra.magatk *= 1.05f;
+    }
+    if (_flag2 & AthlEnh2)
+    {
+        _attrExtra.defend *= 1.05f;
+        _attrExtra.magdef += 1.05f;
+    }
+    if (_flag2 & AthlEnh3)
+    {
+        _attrExtra.pierce *= 1.05f;
+    }
+    if (_flag2 & AthlEnh4)
+    {
+        _attrExtra.critical *= 1.05f;
+    }
+    if (_flag2 & AthlEnh5)
+    {
+        _attrExtra.evade *= 1.05f;
+    }
+    if (_flag2 & AthlEnh6)
+    {
+        _attrExtra.counter *= 1.05f;
+    }
+    if (_flag2 & AthlEnh7)
+    {
+        _attrExtra.physique *= 1.05f;
+    }
+    if (_flag2 & AthlEnh8)
+    {
+        _attrExtra.magres *= 1.05f;
+    }
+    if (_flag2 & AthlEnh9)
+    {
+        _attrExtra.hitrate *= 1.05f;
     }
 }
 

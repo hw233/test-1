@@ -174,6 +174,8 @@ namespace GObject
         VAR_JULY = 136, // 七月礼包
         VAR_2NDSOUL = 137, // 元神吞噬奖励是否发放
 
+        VAR_PHYSICAL_BUY = 143, //购买体力限制
+
         VAR_MAX,
     };
 
@@ -339,6 +341,7 @@ namespace GObject
             REGISTER_VAR(VAR_DUANWU, CYCLE_NONE);
             REGISTER_VAR(VAR_JULY, CYCLE_NONE);
             REGISTER_VAR(VAR_2NDSOUL, CYCLE_NONE);
+            REGISTER_VAR(VAR_PHYSICAL_BUY, CYCLE_DAY);
         }
         
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

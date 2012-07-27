@@ -765,6 +765,13 @@ struct DBAthleticsData
     UInt32  first4rank;
     UInt32  extrachallenge;
     UInt8   pageNum;
+    UInt32 eChallengeTime;
+    UInt8 ePhysical;
+    UInt8 eSelectIndex;
+    UInt32 eCombine[5];
+    UInt64 eRival[5];
+    UInt8 eCanAttack[5];
+    UInt8 eRivalType[5];
 };
 
 struct DBAthleticsEventData
@@ -1847,7 +1854,7 @@ SPECIALDEF(2)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBAthleticsData)
-SPECIALDEF(16)
+SPECIALDEF(39)
 (
 	UInt8,  row,
 	UInt32, rank,
@@ -1868,7 +1875,30 @@ SPECIALDEF(16)
     UInt32, oldrank,
     UInt32, first4rank,
     UInt32, extrachallenge,
-    UInt8,  pageNum
+    UInt8,  pageNum,
+    UInt32, eChallengeTime,
+    UInt8, ePhysical,
+    UInt8, eSelectIndex,
+    UInt32, eCombine[0],
+    UInt32, eCombine[1],
+    UInt32, eCombine[2],
+    UInt32, eCombine[3],
+    UInt32, eCombine[4],
+    UInt64, eRival[0],
+    UInt64, eRival[1],
+    UInt64, eRival[2],
+    UInt64, eRival[3],
+    UInt64, eRival[4],
+    UInt8, eCanAttack[0],
+    UInt8, eCanAttack[1],
+    UInt8, eCanAttack[2],
+    UInt8, eCanAttack[3],
+    UInt8, eCanAttack[4],
+    UInt8, eRivalType[0],
+    UInt8, eRivalType[1],
+    UInt8, eRivalType[2],
+    UInt8, eRivalType[3],
+    UInt8, eRivalType[4]
 )
 SPECIALEND()
 

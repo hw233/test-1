@@ -81,6 +81,9 @@
 #define DAY_SECS (24*60*60)
 #define CREATE_OFFSET(c, n) (((n) - (c)) / (DAY_SECS))
 
+#define ATHL_BUFF_SECS        (10*60)
+#define ATHL_BUFF_SECS_MAX    (30*60)
+
 namespace GObject
 {
     UInt32 Player::_recruit_cost = 20;
@@ -10502,6 +10505,163 @@ namespace GObject
     {
         Stream st(REP::YBBUF);
         st << static_cast<UInt8>((ybbuf >> 16) & 0xFFFF) << static_cast<UInt8>(ybbuf & 0xFFFF) << Stream::eos;
+        send(st);
+    }
+
+    void Player::adjustAthlBuffData(UInt32 type)
+    {
+        UInt32 now = TimeUtil::Now();
+        UInt32 leftTime;
+        UInt32 flag = 0;
+        UInt8 count = 0;
+        UInt8 index;
+        if(type & Battle::BattleFighter::AthlEnh1)
+        {
+            leftTime = ATHL_BUFF_SECS;
+            if(getBuffData(PLAYER_BUFF_ATHL1))
+            {
+                leftTime = getBuffData(PLAYER_BUFF_ATHL1) - now + ATHL_BUFF_SECS;
+                if(leftTime > ATHL_BUFF_SECS_MAX)
+                    leftTime = ATHL_BUFF_SECS_MAX;
+            }
+            setBuffData(PLAYER_BUFF_ATHL1, now + leftTime);
+            flag = PLAYER_BUFF_ATHL1;
+        }
+        else if(type & Battle::BattleFighter::AthlEnh2)
+        {
+            leftTime = ATHL_BUFF_SECS;
+            if(getBuffData(PLAYER_BUFF_ATHL2))
+            {
+                leftTime = getBuffData(PLAYER_BUFF_ATHL2) - now + ATHL_BUFF_SECS;
+                if(leftTime > ATHL_BUFF_SECS_MAX)
+                    leftTime = ATHL_BUFF_SECS_MAX;
+            }
+            setBuffData(PLAYER_BUFF_ATHL2, now + leftTime);
+            flag = PLAYER_BUFF_ATHL2;
+        }
+        else if(type & Battle::BattleFighter::AthlEnh3)
+        {
+            leftTime = ATHL_BUFF_SECS;
+            if(getBuffData(PLAYER_BUFF_ATHL3))
+            {
+                leftTime = getBuffData(PLAYER_BUFF_ATHL3) - now + ATHL_BUFF_SECS;
+                if(leftTime > ATHL_BUFF_SECS_MAX)
+                    leftTime = ATHL_BUFF_SECS_MAX;
+            }
+            setBuffData(PLAYER_BUFF_ATHL3, now + leftTime);
+            flag = PLAYER_BUFF_ATHL3;
+        }
+        else if(type & Battle::BattleFighter::AthlEnh4)
+        {
+            leftTime = ATHL_BUFF_SECS;
+            if(getBuffData(PLAYER_BUFF_ATHL4))
+            {
+                leftTime = getBuffData(PLAYER_BUFF_ATHL4) - now + ATHL_BUFF_SECS;
+                if(leftTime > ATHL_BUFF_SECS_MAX)
+                    leftTime = ATHL_BUFF_SECS_MAX;
+            }
+            setBuffData(PLAYER_BUFF_ATHL4, now + leftTime);
+            flag = PLAYER_BUFF_ATHL4;
+        }
+        else if(type & Battle::BattleFighter::AthlEnh5)
+        {
+            leftTime = ATHL_BUFF_SECS;
+            if(getBuffData(PLAYER_BUFF_ATHL5))
+            {
+                leftTime = getBuffData(PLAYER_BUFF_ATHL5) - now + ATHL_BUFF_SECS;
+                if(leftTime > ATHL_BUFF_SECS_MAX)
+                    leftTime = ATHL_BUFF_SECS_MAX;
+            }
+            setBuffData(PLAYER_BUFF_ATHL5, now + leftTime);
+            flag = PLAYER_BUFF_ATHL5;
+        }
+        else if(type & Battle::BattleFighter::AthlEnh6)
+        {
+            leftTime = ATHL_BUFF_SECS;
+            if(getBuffData(PLAYER_BUFF_ATHL6))
+            {
+                leftTime = getBuffData(PLAYER_BUFF_ATHL6) - now + ATHL_BUFF_SECS;
+                if(leftTime > ATHL_BUFF_SECS_MAX)
+                    leftTime = ATHL_BUFF_SECS_MAX;
+            }
+            setBuffData(PLAYER_BUFF_ATHL6, now + leftTime);
+            flag = PLAYER_BUFF_ATHL6;
+        }
+        else if(type & Battle::BattleFighter::AthlEnh7)
+        {
+            leftTime = ATHL_BUFF_SECS;
+            if(getBuffData(PLAYER_BUFF_ATHL7))
+            {
+                leftTime = getBuffData(PLAYER_BUFF_ATHL7) - now + ATHL_BUFF_SECS;
+                if(leftTime > ATHL_BUFF_SECS_MAX)
+                    leftTime = ATHL_BUFF_SECS_MAX;
+            }
+            setBuffData(PLAYER_BUFF_ATHL7, now + leftTime);
+            flag = PLAYER_BUFF_ATHL7;
+        }
+        else if(type & Battle::BattleFighter::AthlEnh8)
+        {
+            leftTime = ATHL_BUFF_SECS;
+            if(getBuffData(PLAYER_BUFF_ATHL8))
+            {
+                leftTime = getBuffData(PLAYER_BUFF_ATHL8) - now + ATHL_BUFF_SECS;
+                if(leftTime > ATHL_BUFF_SECS_MAX)
+                    leftTime = ATHL_BUFF_SECS_MAX;
+            }
+            setBuffData(PLAYER_BUFF_ATHL8, now + leftTime);
+            flag = PLAYER_BUFF_ATHL8;
+        }
+        else if(type & Battle::BattleFighter::AthlEnh9)
+        {
+            leftTime = ATHL_BUFF_SECS;
+            if(getBuffData(PLAYER_BUFF_ATHL9))
+            {
+                leftTime = getBuffData(PLAYER_BUFF_ATHL9) - now + ATHL_BUFF_SECS;
+                if(leftTime > ATHL_BUFF_SECS_MAX)
+                    leftTime = ATHL_BUFF_SECS_MAX;
+            }
+            setBuffData(PLAYER_BUFF_ATHL9, now + leftTime);
+            flag = PLAYER_BUFF_ATHL9;
+        }
+
+        //sendAthlBufInfo();
+        if(flag == 0)
+            return;
+        count = 1;
+        Stream st(REP::ATHLETICS_REFRESH_MARTIAL);
+        st << static_cast<UInt8>(5);
+        st << count;
+        index = flag - PLAYER_BUFF_ATHL1;
+        st << index;
+        leftTime = getBuffData(flag) - now;
+        st << leftTime;
+        st << Stream::eos;
+        send(st);
+    }
+
+    void Player::sendAthlBufInfo()
+    {
+        UInt32 leftTime;
+        Stream st(REP::ATHLETICS_REFRESH_MARTIAL);
+        st << static_cast<UInt8>(5);
+        UInt8 count = 0;
+        UInt8 index;
+        for(index = PLAYER_BUFF_ATHL1; index <= PLAYER_BUFF_ATHL9; index++)
+        {
+            if(getBuffData(index) > 0)
+                count++;
+        }
+        st << count;
+        for(index = PLAYER_BUFF_ATHL1; index <= PLAYER_BUFF_ATHL9; index++)
+        {
+            if(getBuffData(index) > 0)
+            {
+                st << static_cast<UInt8>(index - PLAYER_BUFF_ATHL1);
+                leftTime = getBuffData(index) - TimeUtil::Now();
+                st << leftTime;
+            }
+        }
+        st << Stream::eos;
         send(st);
     }
 
