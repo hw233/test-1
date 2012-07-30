@@ -2670,8 +2670,13 @@ void AthleticsRank::updateAthleticsP(Player* pl, UInt8 type)
 
 void AthleticsRank::giveAward( Player* pl, UInt8 type)
 {
-	RankList::iterator found = _ranks[1].find(pl);
-	if (found == _ranks[1].end())
+    if(!pl)
+        return;
+    UInt8 row = getRankRow(pl->GetLev());
+	if (row == 0xFF)
+		return;
+	RankList::iterator found = _ranks[row].find(pl);
+	if (found == _ranks[row].end())
 		return;
 
     AthleticsRankData* rankData = *found->second;
