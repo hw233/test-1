@@ -1641,13 +1641,6 @@ namespace GObject
             }
             _lastAthAward.clear();
         }
-
-        TeamCopyPlayerInfo* tcpInfo = getTeamCopyPlayerInfo();
-        if(tcpInfo)
-        {
-            tcpInfo->sendAwardInfo();
-        }
-
         sendDeamonAwardsInfo();
 
 		if(update)
