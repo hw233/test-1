@@ -679,12 +679,12 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
 		UInt32 left = p - now;
 		if(left >= duration)
 		{
-			exp *= 1.7f;
+			exp *= 1.8f;
 			player->setBuffData(PLAYER_BUFF_TRAINP3, p - duration);
 		}
 		else
 		{
-			exp = exp + exp * left * 7 / duration / 10;
+			exp = exp + exp * left * 8 / duration / 10;
 			player->setBuffData(PLAYER_BUFF_TRAINP3, 0);
 		}
 	}
