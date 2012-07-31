@@ -285,7 +285,6 @@ void BattleSimulator::start(UInt8 prevWin)
                     flag2 |= BattleFighter::AthlEnh9;
             }
             flag2 |= _player[i]->getAthlRivalBuff();
-            printf("flag2 = 0x%x\n", flag2);
 		}
 		for(int j = 0; j < 25; ++ j)
 		{
