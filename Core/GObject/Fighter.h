@@ -728,8 +728,8 @@ public:
     void SSDeleteDB(UInt16 id);
     void SSFromDB(UInt16 id, SStrengthen& ss);
     void makeFighterSSInfo(Stream& st);
-    void appendFighterSSInfo(Stream& st, UInt16 skillid);
-    void appendFighterSSInfo(Stream& st, UInt16 skillid, SStrengthen* ss);
+    bool appendFighterSSInfo(Stream& st, UInt16 skillid);
+    bool appendFighterSSInfo(Stream& st, UInt16 skillid, SStrengthen* ss);
 private:
     std::map<UInt16, SStrengthen> m_ss;
 

@@ -4131,31 +4131,36 @@ SStrengthen* Fighter::SSGetInfo(UInt16 skillid)
     return &i->second;
 }
 
-void Fighter::appendFighterSSInfo(Stream& st, UInt16 skillid)
+bool Fighter::appendFighterSSInfo(Stream& st, UInt16 skillid)
 {
     SStrengthen* ss = SSGetInfo(skillid);
-    appendFighterSSInfo(st, skillid, ss);
+    if (!ss)
+        return false;
+    return appendFighterSSInfo(st, skillid, ss);
 }
 
-void Fighter::appendFighterSSInfo(Stream& st, UInt16 skillid, SStrengthen* ss)
+bool Fighter::appendFighterSSInfo(Stream& st, UInt16 skillid, SStrengthen* ss)
 {
     if (ss)
     {
         st << skillid << ss->maxVal << ss->curVal << ss->lvl << ss->maxLvl;
+        return true;
     }
+    return false;
 }
 
 void Fighter::makeFighterSSInfo(Stream& st)
 {
     st << getId();
     size_t offset = st.size();
+    st << static_cast<UInt8>(0);
     UInt8 c = 0;
     for (int i = 0; i < getUpSkillsMax(); ++i)
     {
         if (_skill[i])
         {
-            appendFighterSSInfo(st, _skill[i]);
-            ++c;
+            if (appendFighterSSInfo(st, _skill[i]))
+                ++c;
         }
     }
     st.data<UInt8>(offset) = c;
