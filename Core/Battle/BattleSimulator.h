@@ -230,7 +230,7 @@ private:
     void reQueueFighterStatus(BattleFighter* bf);
 	void insertFighterStatus(BattleFighter* bf);
 	void removeFighterStatus(BattleFighter* bf);
-	UInt32 attackOnce(BattleFighter * bf, bool& cs, bool& pr, const GData::SkillBase* skill, BattleObject * bo, float factor, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, int counter_deny = -1, AttackPoint * counter_deny_list = NULL, std::vector<AttackAct>* atkAct = NULL);
+	UInt32 attackOnce(BattleFighter * bf, bool& first, bool& cs, bool& pr, const GData::SkillBase* skill, BattleObject * bo, float factor, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, int counter_deny = -1, AttackPoint * counter_deny_list = NULL, std::vector<AttackAct>* atkAct = NULL);
 
     UInt32 doXinmoAttack(BattleFighter * bf, BattleObject* bo, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
 

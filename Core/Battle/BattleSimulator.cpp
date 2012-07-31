@@ -936,13 +936,15 @@ UInt32 BattleSimulator::doXinmoAttack(BattleFighter * bf, BattleObject* bo, DefS
     return dmg;
 }
 
-UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const GData::SkillBase* skill, BattleObject * area_target_obj, float factor, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, int counter_deny, AttackPoint * counter_deny_list, std::vector<AttackAct>* atkAct)
+UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bool& pr, const GData::SkillBase* skill, BattleObject * area_target_obj, float factor, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, int counter_deny, AttackPoint * counter_deny_list, std::vector<AttackAct>* atkAct)
 {
 	if(area_target_obj == NULL || area_target_obj->getHP() == 0 || bf == NULL)
 		return 0;
 	// if a fighter was attacked
 	UInt32 dmg = 0;
     UInt32 magdmg = 0;
+    bool cs2 = false;
+    bool pr2 = false;
 	if(area_target_obj->isChar())
 	{
         bool counter100 = false;
@@ -1002,14 +1004,14 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 
 		if(!defend100 && (target_stun > 0 || (!enterEvade && bf->calcHit(area_target))))
 		{
-            pr = bf->calcPierce(area_target);
+            pr2 = bf->calcPierce(area_target);
             float atk = 0;
             float magatk = 0;
             if(NULL != skill && skill->effect != NULL)
             {
                 float  cf;
-                bf->calcSkillAttack(cs, area_target, atk, magatk , & cf);
-                if(cs )
+                bf->calcSkillAttack(cs2, area_target, atk, magatk , & cf);
+                if(cs2)
                 {
                      UInt8 s = bf->getSide();
                     if(s < 2)
@@ -1017,23 +1019,23 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 
  
                 }
-                //atk = bf->calcAttack(cs, area_target);
-                //magatk = bf->calcMagAttack(cs, area_target);
+                //atk = bf->calcAttack(cs2, area_target);
+                //magatk = bf->calcMagAttack(cs2, area_target);
                 float crratk = 0;
                 float crrmagatk = 0;
                 if(bf->getClass() == 3)
-                    crratk = aura_factor * (atk * skill->effect->crrdamP + skill->effect->addcrr * (cs ? bf->calcCriticalDmg(area_target) : 1));
+                    crratk = aura_factor * (atk * skill->effect->crrdamP + skill->effect->addcrr * (cs2 ? bf->calcCriticalDmg(area_target) : 1));
                 else
-                    crrmagatk = aura_factor * (magatk * skill->effect->crrdamP + skill->effect->addcrr * (cs ? bf->calcCriticalDmg(area_target) : 1));
+                    crrmagatk = aura_factor * (magatk * skill->effect->crrdamP + skill->effect->addcrr * (cs2 ? bf->calcCriticalDmg(area_target) : 1));
 
-                atk = aura_factor * (atk * skill->effect->damageP + skill->effect->adddam * (cs ? bf->calcCriticalDmg(area_target) : 1)) + crratk;
-                magatk = aura_factor * (magatk * skill->effect->magdamP + skill->effect->addmag * (cs ? bf->calcCriticalDmg(area_target) : 1)) + crrmagatk;
+                atk = aura_factor * (atk * skill->effect->damageP + skill->effect->adddam * (cs2 ? bf->calcCriticalDmg(area_target) : 1)) + crratk;
+                magatk = aura_factor * (magatk * skill->effect->magdamP + skill->effect->addmag * (cs2 ? bf->calcCriticalDmg(area_target) : 1)) + crrmagatk;
             }
             else
             {
                 float cf = 0.0f;
-                atk = bf->calcAttack(cs, area_target, &cf);
-                if(cs )
+                atk = bf->calcAttack(cs2, area_target, &cf);
+                if(cs2)
                 {
                     UInt8 s = bf->getSide();
                     if(s < 2)
@@ -1061,7 +1063,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 			{
 				float def;
                 float magdef;
-                float toughFactor = pr ? area_target->getTough(bf) : 1.0f;
+                float toughFactor = pr2 ? area_target->getTough(bf) : 1.0f;
                 if(magatk)
                 {
                     magdef = area_target->getMagDefend();
@@ -1095,7 +1097,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 			defList[defCount].leftHP = area_target->getHP();
             defList[defCount].pos = pos + (bf->getSide() == side ? 25 : 0);
             ++ defCount;
-//			printf("%u:%u %s %u:%u, made %u damage, hp left: %u\n", 1-side, from_pos, cs ? "CRITICALs" : "hits", side, pos, dmg, area_target->getHP());
+//			printf("%u:%u %s %u:%u, made %u damage, hp left: %u\n", 1-side, from_pos, cs2 ? "CRITICALs" : "hits", side, pos, dmg, area_target->getHP());
 			// killed the target fighter
 
             if(bf->getSide() != area_target->getSide() && counter_deny >= 0 && (!skill || skill->cond == GData::SKILL_ACTIVE))
@@ -1111,9 +1113,9 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 			else if(_winner == 0)
             {
                 const GData::SkillStrengthenEffect* ef = NULL;
-                if(cs && ss)
+                if(cs2 && ss)
                     ef = ss->getEffect(GData::ON_CRITICAL, GData::TYPE_BLEED);
-                if(!ef && pr && ss)
+                if(!ef && pr2 && ss)
                     ef = ss->getEffect(GData::ON_PIERCE, GData::TYPE_BLEED);
                 if (ef)
                 {
@@ -1247,7 +1249,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
         // 中毒
         if(poison)
         {
-            doPoisonAttack(bf, cs, skill, area_target, factor, defList, defCount, scList, scCount, atkAct);
+            doPoisonAttack(bf, cs2, skill, area_target, factor, defList, defCount, scList, scCount, atkAct);
         }
 
         std::vector<AttackAct> atkAct2;
@@ -1265,10 +1267,10 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 				if(counter100 || target_fighter->calcHit(bf))
 				{
                     defList[0].damType2 |= 0x80;
-					bool cs = false;
+					bool cs2 = false;
                     float cf = 0.0f;
-                    float atk = target_fighter->calcAttack(cs, bf, &cf);
-                    if(cs )
+                    float atk = target_fighter->calcAttack(cs2, bf, &cf);
+                    if(cs2)
                     {
                         UInt8 s = target_fighter->getSide();
                         if(s < 2)
@@ -1291,8 +1293,8 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
                     }
 					//float atk = target_fighter->getAttack();
 					float def = bf->getDefend();
-					bool pr = target_fighter->calcPierce(bf);
-                    float toughFactor = pr ? bf->getTough(target_fighter) : 1.0f;
+					bool pr2 = target_fighter->calcPierce(bf);
+                    float toughFactor = pr2 ? bf->getTough(target_fighter) : 1.0f;
                     float atkreduce = bf->getAtkReduce();
 					UInt32 dmg2 = _formula->calcDamage(atk, def, target_fighter->getLevel(), toughFactor, atkreduce);
 
@@ -1303,14 +1305,14 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 					bf->makeDamage(dmg2);
                     bf->setAtkReduce3(0, 0);
 
-					if(cs)
+					if(cs2)
 						defList[0].damType2 |= 0x40;
-					if(pr)
+					if(pr2)
 						defList[0].damType2 |= 0x20;
 					defList[0].counterDmg = dmg2;
 					defList[0].counterLeft = bf->getHP();
 
-//					if(cs)
+//					if(cs2)
 //						printf("  [Counter] %u:%u CRITICAL-STRIKEs %u:%u, made %u damage, hp left: %u\n", side, pos, 1-side, from_pos, dmg2, bf->getHP());
 //					else
 //						printf("  [Counter] %u:%u attacks %u:%u, made %u damage, hp left: %u\n", side, pos, 1-side, from_pos, dmg2, bf->getHP());
@@ -1340,17 +1342,23 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 	}
 	else // if attacked a barrier
 	{
-        float atk = bf->calcAttack(cs, 0, NULL);
+        float atk = bf->calcAttack(cs2, 0, NULL);
 		dmg = static_cast<int>(factor * atk) * (950 + _rnd(100)) / 1000;
 		area_target_obj->makeDamage(dmg);
 		defList[defCount].pos = area_target_obj->getPos() + (bf->getSide() == area_target_obj->getSide() ? 25 : 0);
 		defList[defCount].damType = e_damNormal;
 		defList[defCount].damage = dmg;
 		defList[defCount].leftHP = area_target_obj->getHP();
-//		printf("%u:%u %s ground object, made %u damage, hp left: %u\n", 1-side, from_pos, cs ? "CRITICALs" : "hits", dmg, area_target_obj->getHP());
+//		printf("%u:%u %s ground object, made %u damage, hp left: %u\n", 1-side, from_pos, cs2 ? "CRITICALs" : "hits", dmg, area_target_obj->getHP());
 		++ defCount;
 	}
 
+    if(first)
+    {
+        cs = cs2;
+        pr = pr2;
+        first = false;
+    }
 //to get attainment
     UInt8 s = bf->getSide();
     if(skill && s < 2 &&  _player[s] != NULL)
@@ -2359,10 +2367,11 @@ bool BattleSimulator::doNormalAttack(BattleFighter* bf, int otherside, int targe
 		// calculate damage
 		bool cs = false;
 		bool pr = false;
+        bool first = true;
 
 		UInt32 dmg = 0;
         // attack only one target
-        dmg += attackOnce(bf, cs, pr, NULL, target_object, 1, defList, defCount, scList, scCount, 0, NULL, atkAct);
+        dmg += attackOnce(bf, first, cs, pr, NULL, target_object, 1, defList, defCount, scList, scCount, 0, NULL, atkAct);
 
         int self_side = bf->getSide() == otherside ? 25 : 0;
         appendToPacket(bf->getSide(), bf->getPos(), target_pos + self_side, static_cast<UInt8>(0), static_cast<UInt16>(0), cs, pr, defList, defCount, scList, scCount);
@@ -2608,6 +2617,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
     StatusChange scList[250];
     bool cs = false;
     bool pr = false;
+    bool first = true;
 
     memset(defList, 0, sizeof(defList));
 
@@ -3070,9 +3080,9 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 cnt = 3;
             for(int i = 0; i < cnt; ++ i)
             {
-                dmg += attackOnce(bf, cs, pr, skill, _objs[target_side][target_pos], 1, defList, defCount, scList, scCount);
+                dmg += attackOnce(bf, first, cs, pr, skill, _objs[target_side][target_pos], 1, defList, defCount, scList, scCount);
             }
-            dmg += attackOnce(bf, cs, pr, skill, _objs[target_side][target_pos], 1, defList, defCount, scList, scCount, 0, NULL, atkAct);
+            dmg += attackOnce(bf, first, cs, pr, skill, _objs[target_side][target_pos], 1, defList, defCount, scList, scCount, 0, NULL, atkAct);
  
         }
         //道、万剑诀
@@ -3083,11 +3093,11 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             for(int i = 0; i < cnt; ++ i)
             {
                 BattleFighter* rnd_bf = getRandomFighter(target_side, NULL, 0);
-                dmg += attackOnce(bf, cs, pr, skill, rnd_bf, 1, defList, defCount, scList, scCount);
+                dmg += attackOnce(bf, first, cs, pr, skill, rnd_bf, 1, defList, defCount, scList, scCount);
                 if(rnd_bf)
                     ++ dmgCount[rnd_bf->getPos()];
             }
-            dmg += attackOnce(bf, cs, pr, skill, _objs[target_side][target_pos], 1, defList, defCount, scList, scCount, 0, NULL, atkAct);
+            dmg += attackOnce(bf, first, cs, pr, skill, _objs[target_side][target_pos], 1, defList, defCount, scList, scCount, 0, NULL, atkAct);
             ++ dmgCount[target_pos];
             const GData::SkillStrengthenEffect* ef = NULL;
             if(ss)
@@ -3129,16 +3139,16 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             if(fsize > idx)
                 factor = skill->factor[idx];
 
-            dmg += attackOnce(bf, cs, pr, skill, _objs[target_side][target_pos], factor, defList, defCount, scList, scCount, apcnt, ap, atkAct);
+            dmg += attackOnce(bf, first, cs, pr, skill, _objs[target_side][target_pos], factor, defList, defCount, scList, scCount, apcnt, ap, atkAct);
             for(int j = 0; j < apcnt; ++ j)
-                dmg += attackOnce(bf, cs, pr, skill, _objs[target_side][ap[j].pos], factor, defList, defCount, scList, scCount);
+                dmg += attackOnce(bf, first, cs, pr, skill, _objs[target_side][ap[j].pos], factor, defList, defCount, scList, scCount);
             for(int k = apcnt; k < apcnt2; ++ k)
-                dmg += attackOnce(bf, cs, pr, skill, _objs[target_side][ap[k].pos], factor*ap[k].factor, defList, defCount, scList, scCount);
+                dmg += attackOnce(bf, first, cs, pr, skill, _objs[target_side][ap[k].pos], factor*ap[k].factor, defList, defCount, scList, scCount);
 
         }
         else if(0 == skill->area)
         {
-            dmg += attackOnce(bf, cs, pr, skill, _objs[target_side][target_pos], 1, defList, defCount, scList, scCount, 0, NULL, atkAct);
+            dmg += attackOnce(bf, first, cs, pr, skill, _objs[target_side][target_pos], 1, defList, defCount, scList, scCount, 0, NULL, atkAct);
 
             const GData::SkillStrengthenEffect* ef = NULL;
             if(ss)
@@ -3155,7 +3165,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                     if(_objs[target_side][pos] != NULL)
                         break;
 
-                dmg += attackOnce(bf, cs, pr, skill, _objs[target_side][pos], 1, defList, defCount, scList, scCount);
+                dmg += attackOnce(bf, first, cs, pr, skill, _objs[target_side][pos], 1, defList, defCount, scList, scCount);
             }
             else
             {
@@ -3173,7 +3183,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 int idx = std::min(abs(fsize-1), i);
                 if(fsize > 0)
                     factor = skill->factor[idx];
-                dmg += attackOnce(bf, cs, pr, skill, _objs[target_side][pos], factor, defList, defCount, scList, scCount);
+                dmg += attackOnce(bf, first, cs, pr, skill, _objs[target_side][pos], factor, defList, defCount, scList, scCount);
                 ++i;
             }
         }
@@ -3187,10 +3197,10 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             float factor = 1;
             if(fsize > 0)
                 factor = skill->factor[0];
-            dmg += attackOnce(bf, cs, pr, skill, _objs[target_side][target_pos], skill->factor[0], defList, defCount, scList, scCount, apcnt, ap, atkAct);
+            dmg += attackOnce(bf, first, cs, pr, skill, _objs[target_side][target_pos], skill->factor[0], defList, defCount, scList, scCount, apcnt, ap, atkAct);
             for(int i = 0; i < apcnt; ++ i)
             {
-                dmg += attackOnce(bf, cs, pr, skill, _objs[target_side][ap[i].pos], ap[i].factor, defList, defCount, scList, scCount);
+                dmg += attackOnce(bf, first, cs, pr, skill, _objs[target_side][ap[i].pos], ap[i].factor, defList, defCount, scList, scCount);
             }
             if(ef)
             {
