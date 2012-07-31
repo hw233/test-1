@@ -1878,7 +1878,7 @@ namespace GObject
 
 	UInt8 Player::GetLev() const
 	{
-		return (!_fighters.empty()) ? _fighters.begin()->second->getLevel() : LEVEL_MAX;
+		return (!_fighters.empty()) ? _fighters.begin()->second->getLevel() : 1;
 	}
 
     UInt8 Player::GetColor() const

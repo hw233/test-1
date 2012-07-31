@@ -4214,6 +4214,12 @@ void Fighter::SSOpen(UInt16 id)
         }
     }
 
+    if (!GData::GDataManager::getMaxStrengthenVal(sid, 0))
+    {
+        _owner->sendMsgCode(0, 1024);
+        return;
+    }
+
     Package* pkg = _owner->GetPackage();
     ItemBase* item = pkg->FindItem(itemId, true);
     if (!item)

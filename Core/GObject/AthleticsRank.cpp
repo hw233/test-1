@@ -2670,14 +2670,19 @@ void AthleticsRank::updateAthleticsP(Player* pl, UInt8 type)
 
 void AthleticsRank::giveAward( Player* pl, UInt8 type)
 {
-	RankList::iterator found = _ranks[1].find(pl);
-	if (found == _ranks[1].end())
-		return;
 
-    AthleticsRankData* rankData = *found->second;
 
     if(type == 1)
     {
+        UInt8 row = getRankRow(pl->GetLev());
+        if (row == 0xFF)
+            return;
+        RankList::iterator found = _ranks[row].find(pl);
+        if (found == _ranks[row].end())
+            return;
+
+        AthleticsRankData* rankData = *found->second;
+
         UInt8 wins = pl->getBuffData(PLAYER_BUFF_AMARTIAL_WIN);
         if(wins >= 5)
         {
@@ -2738,6 +2743,11 @@ void AthleticsRank::giveAward( Player* pl, UInt8 type)
         }
         return;
     }
+
+	RankList::iterator found = _ranks[1].find(pl);
+	if (found == _ranks[1].end())
+		return;
+    AthleticsRankData* rankData = *found->second;
 
     if(rankData->prestige == 0 && rankData->tael == 0)
         return;
