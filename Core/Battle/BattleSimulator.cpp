@@ -989,17 +989,25 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
         }
 
         UInt8& defdeclast = area_target->getDefDecLast();
-        if( defdeclast > 0)
+        if(defdeclast > 0 && bf->getSide() != area_target->getSide())
         {
             UInt8 deflast = area_target->getDefendAddLast();
             UInt8 magdeflast = area_target->getMagDefendAddLast();
-            float defadd = area_target->getDefendAdd();
-            float magdefadd = area_target->getMagDefendAdd();
-            defadd += area_target->getDefDec();
-            magdefadd += area_target->getDefDec();
-            area_target->setDefendAdd(defadd, deflast);
-            area_target->setMagDefendAdd(magdefadd, magdeflast);
-            -- defdeclast;
+            float atkReduce = area_target->getAtkReduce();
+            float magReduce = area_target->getMagAtkReduce();
+            if(deflast > 0)
+            {
+                atkReduce += area_target->getDefDec();
+                magReduce += area_target->getDefDec();
+                area_target->setAtkReduce(atkReduce, deflast);
+                area_target->setMagAtkReduce(magReduce, magdeflast);
+                -- defdeclast;
+            }
+            else
+                defdeclast = 0;
+
+            if(defdeclast == 0)
+                area_target->setDefDec(0, 0);
         }
 
 		if(!defend100 && (target_stun > 0 || (!enterEvade && bf->calcHit(area_target))))
@@ -1073,7 +1081,6 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                     magdmg *= static_cast<float>(950 + _rnd(100)) / 1000;
 
                     magdmg = magdmg > 0 ? magdmg : 1;
-                    area_target->setMagAtkReduce3(0, 0);
                 }
 
                 if(atk)
@@ -1085,10 +1092,29 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                     dmg *= static_cast<float>(950 + _rnd(100)) / 1000;
 
                     dmg = dmg > 0 ? dmg : 1;
-                    area_target->setAtkReduce3(0, 0);
                 }
 
 			}
+            if(area_target->getMagAtkReduce3Last() > 0)
+            {
+                StatusChange& sc = scList[scCount];
+                sc.pos = pos + (bf->getSide() == side ? 25 : 0);
+                sc.statusId = 0;
+                area_target->setMagAtkReduce3(0, 0);
+                sc.type = e_stMagAtkReduce;
+                sc.data = static_cast<UInt32>(area_target->getMagAtkReduce());
+                ++scCount;
+            }
+            if(area_target->getAtkReduce3Last() > 0)
+            {
+                StatusChange& sc = scList[scCount];
+                sc.pos = pos + (bf->getSide() == side ? 25 : 0);
+                sc.statusId = 0;
+                area_target->setAtkReduce3(0, 0);
+                sc.type = e_stAtkReduce;
+                sc.data = static_cast<UInt32>(area_target->getAtkReduce());
+                ++scCount;
+            }
 
             defList[defCount].damType = e_damNormal;
             area_target->makeDamage(dmg + magdmg);
@@ -1277,20 +1303,6 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                             _maxCSFactor[s] = std::max( cf, _maxCSFactor[s] ) ;
 
                     }
-
-                    UInt8& defdeclast = bf->getDefDecLast();
-                    if( defdeclast > 0)
-                    {
-                        UInt8 deflast = bf->getDefendAddLast();
-                        UInt8 magdeflast = bf->getMagDefendAddLast();
-                        float defadd = bf->getDefendAdd();
-                        float magdefadd = bf->getMagDefendAdd();
-                        defadd += bf->getDefDec();
-                        magdefadd += bf->getDefDec();
-                        bf->setDefendAdd(defadd, deflast);
-                        bf->setMagDefendAdd(magdefadd, magdeflast);
-                        -- defdeclast;
-                    }
 					//float atk = target_fighter->getAttack();
 					float def = bf->getDefend();
 					bool pr2 = target_fighter->calcPierce(bf);
@@ -1303,7 +1315,27 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                     dmg2 = dmg2 > 0 ? dmg2 : 1;
 
 					bf->makeDamage(dmg2);
-                    bf->setAtkReduce3(0, 0);
+                    if(bf->getMagAtkReduce3Last() > 0)
+                    {
+                        StatusChange& sc = scList[scCount];
+                        sc.pos = bf->getPos() + 25;
+                        sc.statusId = 0;
+                        bf->setMagAtkReduce3(0, 0);
+                        sc.type = e_stMagAtkReduce;
+                        sc.data = static_cast<UInt32>(bf->getMagAtkReduce());
+                        ++scCount;
+                    }
+
+                    if(bf->getAtkReduce3Last() > 0)
+                    {
+                        StatusChange& sc = scList[scCount];
+                        sc.pos = bf->getPos() + 25;
+                        sc.statusId = 0;
+                        bf->setAtkReduce3(0, 0);
+                        sc.type = e_stAtkReduce;
+                        sc.data = static_cast<UInt32>(bf->getAtkReduce());
+                        ++scCount;
+                    }
 
 					if(cs2)
 						defList[0].damType2 |= 0x40;
@@ -2602,7 +2634,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                     ap[apcnt2].pos = x + y * 5;
                     int idx = std::min(abs(fsize-1), std::max(abs(ad.y), abs(ad.x)));
                     if(fsize != 0)
-                        ap[apcnt2 ++].factor = efs[j]->factor[idx];
+                        ap[apcnt2 ++].factor = efs[j]->value/100;
                     else
                         ap[apcnt2 ++].factor = 1;
                 }
@@ -3160,15 +3192,18 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             }
             if(ef)
             {
-                int pos = target_pos + 5;
-                for(; pos < 25; pos += 5)
-                    if(_objs[target_side][pos] != NULL)
+                int pos2 = -1;
+                for(int pos = target_pos + 5; pos < 25; pos += 5)
+                {
+                    if(_objs[target_side][pos] != NULL && _objs[target_side][pos]->getHP() != 0)
+                    {
+                        pos2 = pos;
                         break;
+                    }
+                }
 
-                dmg += attackOnce(bf, first, cs, pr, skill, _objs[target_side][pos], 1, defList, defCount, scList, scCount);
-            }
-            else
-            {
+                if(pos2 != -1)
+                    dmg += attackOnce(bf, first, cs, pr, skill, _objs[target_side][pos2], ef->value/100, defList, defCount, scList, scCount);
             }
         }
         else if(1 == skill->area)
@@ -3210,7 +3245,10 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                     if(!bf || bf->getHP() == 0)
                         continue;
                     if(_rnd(10000) < ef->value * 100)
+                    {
                         doXinmoAttack(bf, _objs[target_side][target_pos], defList, defCount, scList, scCount);
+                        break;
+                    }
                 }
             }
         }
@@ -5720,7 +5758,10 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
     {
         -- defAdd_last;
        if(0 == defAdd_last)
+       {
             setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stDef, 0, 0, scList, scCount, false);
+            bf->setDefDec(0, 0);
+       }
     }
 
     UInt8& magDefAdd_last = bf->getMagDefendAddLast();
@@ -5728,7 +5769,10 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
     {
         -- magDefAdd_last;
        if(0 == magDefAdd_last)
+       {
             setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stMagDef, 0, 0, scList, scCount, false);
+            bf->setDefDec(0, 0);
+       }
     }
 
     UInt8& hitrateAdd_last = bf->getHitrateAddLast();
@@ -6306,7 +6350,7 @@ void BattleSimulator::setStatusChange_Aura(BattleFighter * bf, UInt8 side, UInt8
 {
     GData::SkillStrengthenBase* ss = NULL;
     if(skill != NULL)
-        bf->getSkillStrengthen(SKILL_ID(skill->getId()));
+        ss = bf->getSkillStrengthen(SKILL_ID(skill->getId()));
     BattleObject * bo = _objs[side][pos];
     BattleFighter * bfgt = static_cast<BattleFighter *>(bo);
     StatusChange& sc = scList[scCount];
@@ -6323,7 +6367,7 @@ void BattleSimulator::setStatusChange_Aura(BattleFighter * bf, UInt8 side, UInt8
         ef = ss->getEffect(GData::ON_AURA, GData::TYPE_CRITICAL);
     if(ef)
     {
-        if(_rnd(10000) < bf->getCritical(NULL)*ef->value*100)
+        if(_rnd(10000) < bf->getCritical(NULL)*ef->value)
             factor = 2;
     }
 
@@ -6578,7 +6622,7 @@ bool BattleSimulator::doSkillStrengthen_reduce(BattleFighter* bf, const GData::S
             sc.statusId = 0;
 
         sc.type = e_stAtkReduce;
-        bo->setAtkReduce3(ef->value/100, ef->last);
+        bo->setAtkReduce3(ef->value, ef->last);
         sc.data = static_cast<UInt32>(bo->getAtkReduce());
         ++scCount;
     }
@@ -6591,7 +6635,7 @@ bool BattleSimulator::doSkillStrengthen_reduce(BattleFighter* bf, const GData::S
             sc.statusId = 0;
 
         sc.type = e_stMagAtkReduce;
-        bo->setMagAtkReduce3(ef->value/100, ef->last);
+        bo->setMagAtkReduce3(ef->value, ef->last);
         sc.data = static_cast<UInt32>(bo->getMagAtkReduce());
         ++scCount;
     }
@@ -6635,7 +6679,7 @@ bool BattleSimulator::doSkillStrengthen_debuf_defend(BattleFighter* bf, const GD
     else if(!active && bf->getSide() != target_side)
         pos0 = 25;
     {
-        bo->setDefDec(ef->value/100, ef->last);
+        bo->setDefDec(ef->value, ef->last);
         defList[defCount].pos = bo->getPos() + pos0;
         defList[defCount].damType = e_defDec;
         defList[defCount].damage = 0;

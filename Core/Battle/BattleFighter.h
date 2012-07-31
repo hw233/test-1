@@ -157,8 +157,8 @@ public:
 	inline Int32 getMaxHPAdd() {return _maxhpAdd;}
 	inline Int32 getActionAdd() {return _maxActionAdd;}
     inline float getToughAdd() { return _toughAdd;}
-    inline float getAtkReduce() { float ret = _atkreduce + _atkreduce2; return (ret > 0 ? ret : 0); }
-    inline float getMagAtkReduce() { float ret = _magatkreduce + _magatkreduce2; return (ret > 0 ? ret : 0); }
+    inline float getAtkReduce() { float ret = _atkreduce + _atkreduce2 + _atkreduce3; return (ret > 0 ? ret : 0); }
+    inline float getMagAtkReduce() { float ret = _magatkreduce + _magatkreduce2 + _magatkreduce3; return (ret > 0 ? ret : 0); }
 
 	inline void setAttackAdd(float v, UInt16 last = 0) {_attackAdd = v; _atkAdd_last = last;}
 	inline void setMagAttackAdd(float v, UInt16 last = 0) {_magAtkAdd = v; _magAtkAdd_last = last;}
@@ -195,6 +195,8 @@ public:
     inline UInt8& getToughAddLast() { return _toughAdd_last;}
     inline UInt8& getAtkReduceLast() { return _atkreduce_last;}
     inline UInt8& getMagAtkReduceLast() { return _magatkreduce_last;}
+    inline UInt8& getAtkReduce3Last() { return _atkreduce3_last;}
+    inline UInt8& getMagAtkReduce3Last() { return _magatkreduce3_last;}
 
     inline void setAtkReduce3(float v, UInt16 last) { _atkreduce3 = v; _atkreduce3_last = last; }
     inline void setMagAtkReduce3(float v, UInt16 last) { _magatkreduce3 = v; _magatkreduce3_last = last; }
