@@ -4062,6 +4062,53 @@ function ItemNormal_00009093(iid, num, bind, param)
     end
 end
 
+function ItemNormal_00009095(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    local items = {
+        {{511,10}, {1528,1},},
+        {{57,2}, {507,1},},
+        {{16,2}, {509,1},},
+        {{514,5}, {440,1},},
+        {{517,5}, {500,5},},
+        {{512,4}, {503,2},},
+        {{515,1}, {56,2},},
+        {{511,10}, {500,5},},
+        {{57,4}, {503,3},},
+        {{56,5}, {1528,1},},
+        {{512,4}, {16,4},},
+    }
+
+    local isz = #items
+    local used = 0
+    for n = 1,num do
+        if package:GetRestPackageSize() < 2 then
+            if used ~= 0 then
+                package:DelItemSendMsg(iid, player);
+            end
+            player:sendMsgCode(2, 1011, 0);
+            return used
+        end
+
+        local r = math.random(1,isz)
+        local item = items[r]
+        for k,v in pairs(item) do
+            package:Add(v[1], v[2], true, 0, 2);
+        end
+
+        local nr = math.random(1,100)
+        if nr <= 10 then
+            package:Add(1646, 1, false, 0, 2);
+        end
+
+        used = used + 1
+    end
+
+    package:DelItemSendMsg(iid, player);
+    return used;
+end
+
 function ItemNormal_00010000(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -5532,6 +5579,7 @@ local ItemNormal_Table = {
     [9089] = ItemNormal_00009089,
     [9092] = ItemNormal_00009092,
     [9093] = ItemNormal_00009093,
+    [9095] = ItemNormal_00009095,
 
     [10000] = ItemNormal_00010000,
     [10001] = ItemNormal_00010001,
