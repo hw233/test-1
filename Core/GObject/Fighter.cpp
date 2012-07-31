@@ -2139,6 +2139,8 @@ int Fighter::hasSkill( UInt16 skill )
 
 int Fighter::isSkillUp(UInt16 skill)
 {
+    if (!SKILL_ID(skill))
+        return -1;
     for (int i = 0; i < getUpSkillsMax(); ++i)
     {
         if (SKILL_ID(skill) == SKILL_ID(_skill[i]))

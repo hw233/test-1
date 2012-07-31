@@ -469,6 +469,7 @@ function onActivityCheck(tm)
           setOpenTest(true)
           setRechargeActive(true, 16)
           setConsumeActive(true)
+          setSoSoMapBegin(actTime85)
       else
           setOpenTest(false)
           setRechargeActive(false, 16)
