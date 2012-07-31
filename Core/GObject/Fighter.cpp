@@ -4367,7 +4367,7 @@ void Fighter::SSFromDB(UInt16 id, SStrengthen& ss)
 {
     if (!_owner)
         return;
-    if (isSkillUp(id*100) < 0)
+    if (hasSkill(id*100) < 0)
         return;
     // XXX: DO Delete
     m_ss[id] = ss;
