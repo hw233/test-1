@@ -983,6 +983,11 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 		pl->makeFighterList(st);
 		conn->send(&st[0], st.size());
 	}
+    {
+        Stream st;
+        pl->makeFighterSSList(st);
+		conn->send(&st[0], st.size());
+    }
 	{
 		Stream st;
 		pl->makeFormationInfo(st);
@@ -4691,6 +4696,60 @@ void OnGuideUdp( GameMsgHdr& hdr, GuideUdp& req )
 {
     MSG_QUERY_PLAYER(player);
     player->guideUdp(req._type, req.p1, req.p2);
+}
+
+void OnSkillStrengthen( GameMsgHdr& hdr, const void* data)
+{
+    MSG_QUERY_PLAYER(pl);
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    UInt32 fighterid = 0;
+    br >> type;
+    br >> fighterid;
+
+    Fighter* fgt = pl->findFighter(fighterid);
+    if (!fgt)
+        return;
+    if (type == 1)
+    {
+        UInt16 skillid = 0;
+        UInt32 itemid = 0;
+        UInt8 bind = 0;
+        br >> skillid;
+        br >> itemid;
+        br >> bind;
+        fgt->SSOpen(skillid, itemid, bind);
+    }
+    else if (type == 2)
+    {
+        UInt16 skillid = 0;
+        UInt16 num = 0;
+        br >> skillid;
+        br >> num;
+
+        bool brk = false;
+        for (UInt16 i = 0; i < num; ++i)
+        {
+            UInt32 itemid = 0;
+            UInt16 itemnum = 0;
+            UInt8 bind = 0;
+            br >> itemid;
+            br >> itemnum;
+            br >> bind;
+
+            for (UInt16 j = 0; j < itemnum; ++j)
+            {
+                if (!fgt->SSUpgrade(skillid, itemid, bind))
+                {
+                    brk = true;
+                    break;
+                }
+            }
+
+            if (brk)
+                break;
+        }
+    }
 }
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_

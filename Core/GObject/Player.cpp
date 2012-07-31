@@ -2323,6 +2323,21 @@ namespace GObject
         }
 	}
 
+	void Player::makeFighterSSList( Stream& st )
+	{
+		size_t c = _fighters.size();
+		st.init(REP::SKILLSTRENGTHEN);
+        st << static_cast<UInt8>(0);
+		st << static_cast<UInt8>(c);
+		for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
+        {
+            if (it->second)
+                it->second->makeFighterSSInfo(st);
+        }
+		st << Stream::eos;
+	}
+
+
 	void Player::makeFighterList( Stream& st )
 	{
 		size_t c = _fighters.size();

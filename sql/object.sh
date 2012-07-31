@@ -60,6 +60,8 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120706_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120709_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120629_2.sql  #must be once for update new_relation
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120713_1.sql
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120720_2.sql
     #. clearshiyamen.sh
 }
 

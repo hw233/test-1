@@ -206,6 +206,18 @@ struct DBGVar
     UInt32 overTime;
 };
 
+struct DBSS
+{
+    UInt32 id;
+    UInt64 playerId;
+    UInt16 skillid;
+    UInt16 father;
+    UInt32 maxVal;
+    UInt32 curVal;
+    UInt8 lvl;
+    UInt8 maxLvl;
+};
+
 struct DBFighterBuffData
 {
 	UInt64 playerId;
@@ -1147,6 +1159,20 @@ SPECIALDEF(3)
     UInt32, id,
     UInt32, data,
     UInt32, overTime
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBSS)
+SPECIALDEF(8)
+    (
+    UInt32, id,
+    UInt64, playerId,
+    UInt16, skillid,
+    UInt16, father,
+    UInt32, maxVal,
+    UInt32, curVal,
+    UInt8, lvl,
+    UInt8, maxLvl
     )
 SPECIALEND()
 
