@@ -1,5 +1,5 @@
 alter table `athletics_rank` add column `eChallengeTime` int(10) unsigned NOT NULL DEFAULT '0'after `pageNum`;
-alter table `athletics_rank` add column `ePhysical` tinyint(3) unsigned NOT NULL DEFAULT '20' after `eChallengeTime`;
+alter table `athletics_rank` add column `ePhysical` tinyint(3) unsigned NOT NULL DEFAULT '30' after `eChallengeTime`;
 
 alter table `athletics_rank` add column `eSelectIndex` tinyint(3) unsigned NOT NULL DEFAULT '0' after `ePhysical`;
 
