@@ -1129,9 +1129,9 @@ void Arena::pushPriliminary(BinaryReader& br)
         type = 2;
     }
 
-    UInt64 ppid = pid | (static_cast<UInt64>(sid) << 48) | (static_cast<UInt64>(cid) << 40);
-    if(cid == cfg.channelNum && sid == cfg.serverNo)
-        ppid = pid;
+    UInt64 ppid = pid;
+    if((cid != cfg.channelNum || sid != cfg.serverNo) && (ppid >> 48) == 0)
+        ppid = pid | (static_cast<UInt64>(sid) << 48) | (static_cast<UInt64>(cid) << 40);
 
 	GObject::Player * player = GObject::globalPlayers[ppid];
 
@@ -1313,9 +1313,9 @@ void Arena::readPrePlayers(BinaryReader& brd, UInt8 sIdx)
             UInt32 support = 0;
             std::string name;
             brd >> cid >> sid >> pid >> heroId >> level >> battlePoint >> support >> name;
-            UInt64 ppid = pid | (static_cast<UInt64>(sid) << 48) | (static_cast<UInt64>(cid) << 40);
-            if(cid == cfg.channelNum && sid == cfg.serverNo)
-                ppid = pid;
+            UInt64 ppid = pid;
+            if((cid != cfg.channelNum || sid != cfg.serverNo) && (ppid >> 48) == 0)
+                ppid = pid | (static_cast<UInt64>(sid) << 48) | (static_cast<UInt64>(cid) << 40);
             PreliminaryPlayer pp;
             pp.id = ppid;
             pp.support = support;
@@ -1390,9 +1390,9 @@ void Arena::readPlayers(BinaryReader& brd, UInt8 sIdx)
         UInt32 support = 0;
         std::string name;
         brd >> cid >> sid >> pid >> heroId >> level >> battlePoint >> support >> name;
-        UInt64 ppid = pid | (static_cast<UInt64>(sid) << 48) | (static_cast<UInt64>(cid) << 40);
-        if(cid == cfg.channelNum && sid == cfg.serverNo)
-            ppid = pid;
+        UInt64 ppid = pid;
+        if((cid != cfg.channelNum || sid != cfg.serverNo) && (ppid >> 48) == 0)
+            ppid = pid | (static_cast<UInt64>(sid) << 48) | (static_cast<UInt64>(cid) << 40);
         PreliminaryPlayer pp;
         pp.id = ppid;
         pp.support = support;
@@ -1465,9 +1465,9 @@ void Arena::readElimination(BinaryReader& brd)
             UInt32 battlePoint = 0;
             UInt32 support = 0;
             brd >> cid >> sid >> _finals[i][j].id >> _finals[i][j].level>> _finals[i][j].heroId >> battlePoint >> support >> _finals[i][j].name;
-            UInt64 ppid = _finals[i][j].id | (static_cast<UInt64>(sid) << 48) | (static_cast<UInt64>(cid) << 40);
-            if(cfg.channelNum != cid || cfg.serverNo != sid)
-                _finals[i][j].id = ppid;
+            UInt64 ppid = _finals[i][j].id;
+            if((cfg.channelNum != cid || cfg.serverNo != sid) && (ppid >> 48) == 0)
+                _finals[i][j].id = ppid | (static_cast<UInt64>(sid) << 48) | (static_cast<UInt64>(cid) << 40);
             _finalIdx[i][0][j] = j;
             _finals[i][j].battlePoint = battlePoint;
             _finals[i][j].support = support;
@@ -2169,9 +2169,9 @@ void Arena::updateBattlePoint(BinaryReader& brd)
     UInt64 pid = 0;
     UInt32 battlePoint = 0;
     brd >> cid >> sid >> pid >> battlePoint;
-    UInt64 ppid = pid | (static_cast<UInt64>(sid) << 48) | (static_cast<UInt64>(cid) << 40);
-    if(cid == cfg.channelNum && sid == cfg.serverNo)
-        ppid = pid;
+    UInt64 ppid = pid;
+    if((cid != cfg.channelNum || sid != cfg.serverNo) && (ppid >> 48) == 0)
+        ppid = pid | (static_cast<UInt64>(sid) << 48) | (static_cast<UInt64>(cid) << 40);
 
     PreliminaryPlayerListMap::iterator pit0 = _preliminaryPlayers[0].find(ppid);
     if(pit0 != _preliminaryPlayers[0].end())
