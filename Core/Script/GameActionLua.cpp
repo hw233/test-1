@@ -796,7 +796,7 @@ namespace Script
 	UInt16 GameActionLua::RunItemNormalUse(Player* player, UInt32 itemId, UInt32 param, UInt16 num, bool bind)
 	{
 		assert(player != NULL);
-		return Run<UInt32>(player, "RunItemNormalUse", itemId, num, bind, param);
+        return Run<UInt32>(player, "RunItemNormalUse", itemId, num, bind, param);
 	}
 
     UInt16 GameActionLua::getRandTrump(UInt8 lvl)

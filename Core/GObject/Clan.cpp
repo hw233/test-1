@@ -2712,7 +2712,7 @@ bool clanEnum(Clan * clan, EnumStruct * es)
 void ClanCache::listAll( Player * player, UInt16 idx, UInt8 cnt, UInt8 cny )
 {
 	//UInt8 cny = player->getCountry();
-	Stream st(REP::CLAN_REQ_LIST);
+    Stream st(REP::CLAN_REQ_LIST);
     UInt16 sz = 0;
     if(cny > 1)
     {
@@ -2735,7 +2735,6 @@ void ClanCache::listAll( Player * player, UInt16 idx, UInt8 cnt, UInt8 cny )
 	}
 
 	st << sz << idx << cnt;
-
 	EnumStruct es = {st, 0, idx, static_cast<UInt16>(idx + cnt)};
     if(cny > 1)
         globalClans.enumerate(clanEnum, &es);

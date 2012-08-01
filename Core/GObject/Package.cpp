@@ -531,7 +531,7 @@ namespace GObject
 				DB4().PushUpdateData("UPDATE `item` SET `itemNum` = %u WHERE `id` = %u AND `bindType` = %u AND `ownerId` = %"I64_FMT"u", item->Count(), typeId, bind, m_Owner->getId());
 				SendItemData(item);
 				if(notify)
-					ItemNotify(item->GetItemType().getId(), num);
+                    ItemNotify(item->GetItemType().getId(), num);
 				if((fromWhere != 0  && item->getQuality() >= 3) || (fromWhere == FromMerge && item->getQuality() >= 2))
                 {
                     AddItemCoursesLog(typeId, num, fromWhere);
@@ -1331,7 +1331,7 @@ namespace GObject
 
 	bool Package::UseItem(UInt32 id, UInt16 num, UInt8 type, UInt32 param, UInt8 bind)
 	{
-		if(!m_Owner->hasChecked())
+        if(!m_Owner->hasChecked())
 			return false;
 		bool ret = false;
 
@@ -1344,7 +1344,7 @@ namespace GObject
                 ItemBase* item = GetItem(id, bind > 0);
                 if (item && item->getClass() == Item_Formula5)
                 {
-                    ret = FormulaMerge(id, bind > 0);
+                    ret = FormulaMerge(id, bind > 0, num);
                     if (ret)
                         m_Owner->sendMsgCode(0, 1800);
                     else
@@ -1357,7 +1357,7 @@ namespace GObject
                 ItemBase* item = GetItem(id, bind > 0);
                 if (item && item->getClass() == Item_Citta5)
                 {
-                    ret = CittaMerge(id, bind > 0);
+                    ret = CittaMerge(id, bind > 0, num);
                     if (ret)
                         m_Owner->sendMsgCode(0, 1800);
                     else
@@ -1376,7 +1376,7 @@ namespace GObject
                             item->getClass() == Item_SL1 ||
                             item->getClass() == Item_SL2))
                 {
-                    ret = TrumpMerge(id, bind > 0);
+                    ret = TrumpMerge(id, bind > 0, num);
                     if (ret)
                         m_Owner->sendMsgCode(0, 1800);
                     else
@@ -1392,8 +1392,8 @@ namespace GObject
                  GetItemSubClass(id) != Item_Formula && 
                  GetItemSubClass(id) != Item_Enhance && 
                 GetItemSubClass(id) != Item_Citta &&
-                GetItemSubClass(id) != Item_Soul))
-			ret = false;
+                GetItemSubClass(id) != Item_Soul)){
+            ret = false;}
 		else
 		{
             if (GetItemSubClass(id) == Item_Formula || GetItemSubClass(id) == Item_Citta)
@@ -1402,7 +1402,7 @@ namespace GObject
 			if (bind != 0xFF)
 			{
 				ItemBase* item = GetItem(id, bind > 0);
-				if (item == NULL || item->Count() < num)
+                if (item == NULL || item->Count() < num)
 					ret = false;
 				else if (UInt16 n = GameAction()->RunItemNormalUse(m_Owner, id, param, num, bind > 0))
 				{
@@ -1432,7 +1432,6 @@ namespace GObject
 		Stream st(REP::PACK_USE);
 		st << id << static_cast<UInt8>(1) << static_cast<UInt8>(ret ? 1 : 0) << Stream::eos;
 		m_Owner->send(st);
-
 		return ret;
 	}
 
@@ -1544,7 +1543,7 @@ namespace GObject
 		return ret;
 	}
 
-    bool Package::FCMerge(UInt32 id, bool bind)
+    bool Package::FCMerge(UInt32 id, bool bind, UInt32 Mnum)
     {
         /*
         static struct {
@@ -1590,9 +1589,13 @@ namespace GObject
             {70,    71,     "1,1",                  1751},
             {0, 0, NULL, 0},
         };*/
-
+        /*
+        if(Mnum <= 0 || Mnum > 10)
+            return false;
+        */
+        Mnum = 1;
         bool b = false; //绑定
-        if (IsFull())
+        if (GetRestPackageSize() < Mnum)
         {
             m_Owner->sendMsgCode(0, 1011);
             return false;
@@ -1608,7 +1611,7 @@ namespace GObject
             UInt32 id = stfs[0].m_stfs[i].id;
             UInt32 num = stfs[0].m_stfs[i].num;
 
-            if( GetItemAnyNum(id) < num)
+            if( GetItemAnyNum(id) < num * Mnum)
                 return false;
         }
          
@@ -1617,11 +1620,11 @@ namespace GObject
             UInt32 id = stfs[0].m_stfs[i].id;
             UInt32 num = stfs[0].m_stfs[i].num;
             
-            DelItemAny(id, num, &bind);
+            DelItemAny(id, num * Mnum, &bind);
             if( bind )
                 b = true;
         }
-        Add( stfs[0].m_to, 1, b, false, FromFCMerge);
+        Add( stfs[0].m_to, 1 * Mnum, b, false, FromFCMerge);
         return true;
     }
 
@@ -4051,14 +4054,14 @@ namespace GObject
 
 	void Package::ItemNotify( UInt32 id, UInt16 num )
 	{
-		if(IsEquipId(id))
+        if(IsEquipId(id))
 		{
 			SYSMSG_SENDV(103, m_Owner, id);
 			SYSMSG_SENDV(1003, m_Owner, id);
 		}
 		else
 		{
-			SYSMSG_SENDV(102, m_Owner, id, num);
+            SYSMSG_SENDV(102, m_Owner, id, num);
 			SYSMSG_SENDV(1002, m_Owner, id, num);
 		}
 	}

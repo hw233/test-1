@@ -10908,7 +10908,10 @@ namespace GObject
             }
             for(UInt32 i = 0; i < cnt; ++i){
                 lua_tinker::table a = award.get<lua_tinker::table>(i + 1); 
-                GetPackage()->Add(a.get<UInt32>(1), a.get<UInt32>(2), true, false, FromDailyActivity);
+                if(499 == a.get<UInt32>(1))  //礼券
+                    getCoupon(a.get<UInt32>(2)); 
+                else
+                    GetPackage()->Add(a.get<UInt32>(1), a.get<UInt32>(2), true, false, FromDailyActivity);
             }
         }
         GameAction()->doAtySignIn(this, AtySignIn, mon, day);
