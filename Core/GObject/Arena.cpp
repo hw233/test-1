@@ -1645,7 +1645,7 @@ void Arena::calcFinalBet(int i)
                         int idx = 0;
                         const int aIndex[6] = {0, 16, 24, 28, 30, 31};
                         UInt8 nidx = 0;
-                        UInt8 nidx2 = 0;
+                        UInt8 nidx2 = 0xFF;
                         for(int j = 1; j < 6; ++ j)
                         {
                             SYSMSGV(g, 710 + i);
@@ -1689,7 +1689,7 @@ void Arena::calcFinalBet(int i)
                                         DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
                                     }
                                 }
-                                if(nidx2 != 0)
+                                if(nidx2 != (UInt8)(0xFF))
                                 {
                                     EliminationPlayer& ep = _finals[i][nidx2];
                                     Player * pl = globalPlayers[ep.id];
