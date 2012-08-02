@@ -4237,8 +4237,7 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, bool bind)
     if (idx < 0)
         return 0;
 
-    UInt8 mlvl = getUpSkillLevel(idx);
-    if (ss.lvl >= mlvl)
+    if (ss.lvl >= ss.maxLvl)
     {
         _owner->sendMsgCode(0, 1021);
         return 0;
@@ -4272,6 +4271,7 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, bool bind)
     ss.curVal += exp;
 
     UInt8 ret = 1;
+    UInt8 mlvl = getUpSkillLevel(idx);
     while (ss.curVal >= ss.maxVal)
     {
         ss.curVal -= ss.maxVal;

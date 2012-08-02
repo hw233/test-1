@@ -27,3 +27,4 @@ select selected in $OPTIONS;do
 done
 }
 
+IFS=' '
