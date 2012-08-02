@@ -2261,8 +2261,8 @@ bool Fighter::offSkill( UInt16 skill, bool writedb )
 #else
     _skill[idx] = 0;
     sendModification(0x60, 0, idx, writedb);
-    return true;
 #endif
+    return true;
 }
 
 bool Fighter::updateSkill( UInt16 skill, UInt16 nskill, bool sync, bool writedb )
