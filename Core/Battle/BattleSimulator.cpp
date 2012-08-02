@@ -3170,6 +3170,8 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             float factor = 1;
             if(fsize > idx)
                 factor = skill->factor[idx];
+            else
+                factor = skill->factor[fsize-1];
 
             dmg += attackOnce(bf, first, cs, pr, skill, _objs[target_side][target_pos], factor, defList, defCount, scList, scCount, apcnt, ap, atkAct);
             for(int j = 0; j < apcnt; ++ j)
