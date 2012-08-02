@@ -10880,6 +10880,7 @@ namespace GObject
                 st << fgt->getMaxSoul() << fgt->getPeerlessAndLevel();
                 fgt->getAllUpSkillAndLevel(st);
                 fgt->getAllPSkillAndLevel4Arena(st);
+                fgt->getAllSSAndLevel(st);
 
                 fgt->getAttrExtraEquip(st);
 
