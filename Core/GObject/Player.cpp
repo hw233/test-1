@@ -9926,21 +9926,104 @@ namespace GObject
 
     void Player::sendDiscountLimit()
     {
-        static UInt8 discount[] = {3,5,8,};
+        // 发送给客户端的有关限购的相关数据
         Stream st(REP::STORE_DISLIMIT);
-        for (UInt8 i = 0; i < 3; ++i)
+        for (UInt8 i = 4; i < 7; ++i)
         {
-            UInt8 max = GData::store.getDiscountLimit(discount[i]);
-            UInt8 used = GetVar(GObject::VAR_DISCOUNT_1+i);
-            if (used > max)
+            // 发送活动限购三栏的种类，时间和剩余数量
+            UInt8 type = i;
+            UInt32 max = 0;
+            UInt32 used = 0;
+
+            // 如果活动限购已经结束或已经购买完毕，则发送时间和数量为0的
+            max = GData::store.getDiscountLimit(type);
+            UInt8 offset = GData::store.getDisTypeVarOffset(type);
+            used = GetVar(GObject::VAR_DISCOUNT_1+offset);
+            if (offset == 0xfe)
+            {
+                // TODO: 全服限购的数量获取
+            }
+            if (offset == 0xff)
+            {
+                st << static_cast<UInt8>(0) 
+                    << static_cast<UInt32>(0)
+                    << static_cast<UInt32>(0);
+                break;
+            }
+
+            if (used >= max)
             {
                 used = max;
-                SetVar(GObject::VAR_DISCOUNT_1+i, used);
+                SetVar(GObject::VAR_DISCOUNT_1+offset, used);
             }
-            st << static_cast<UInt8>(max - used);
+
+            UInt32 count = max - used;
+
+            UInt32 time = GData::store.getEndTimeByDiscountType(type);
+            UInt32 now = (UInt32)std::time(NULL);
+            if (time < now)
+            {
+                // 活动限购已经结束
+                time = 0;
+                count = 0;
+            }
+            else
+                time -= now;
+
+            time = GData::store.getBeginTimeByDiscountType(type);
+            if (time > now)
+            {
+                // 活动限购还未开始
+                time = 0;
+                count = 0;
+            }
+
+            st << static_cast<UInt8>(type) 
+                << static_cast<UInt32>(time)
+                << static_cast<UInt32>(count);
         }
         st << Stream::eos;
         send(st);
+
+        // 再发送一个完整的三五八折协议
+        Stream st2(REP::STORE_DISLIMIT);
+        for (UInt8 i = 7; i < 10; ++i)
+        {
+            UInt8 type = i;
+            UInt8 offset = GData::store.getDisTypeVarOffset(type);
+            UInt32 max = GData::store.getDiscountLimit(type);
+            if (offset == 0xfe)
+            {
+                // TODO: 全服限购的数量获取
+            }
+            if (offset == 0xff)
+            {
+                st2 << static_cast<UInt8>(0) 
+                    << static_cast<UInt32>(0)
+                    << static_cast<UInt32>(0);
+                break;
+            }
+            UInt32 used = GetVar(GObject::VAR_DISCOUNT_1+offset);
+            if (used >= max)
+            {
+                used = max;
+                SetVar(GObject::VAR_DISCOUNT_1+offset, used);
+            }
+            UInt32 count = max - used;
+
+            UInt32 time = GData::store.getEndTimeByDiscountType(type);
+            UInt32 now = (UInt32)std::time(NULL);
+            if (time < now)
+                time = 0;
+            else
+                time -= now;
+
+            st2 << static_cast<UInt8>(type) 
+                << static_cast<UInt32>(time)
+                << static_cast<UInt32>(count);
+        }
+        st2 << Stream::eos;
+        send(st2);
     }
 
     void Player::continuousLogin(UInt32 now)

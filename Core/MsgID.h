@@ -651,6 +651,9 @@ namespace SPEQ
     const UInt16 MAILVIP            = 0x11C;
     const UInt16 JASON              = 0x11D;//PHP过来的JASON请求
     const UInt16 CFRIEND            = 0x11E;//设置成密友
+
+    const UInt16 DISCOUNTADD        = 0X120;
+    const UInt16 DISCOUNTQUERY      = 0X120;
 }
 
 namespace SPEP

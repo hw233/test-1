@@ -162,12 +162,17 @@ void WorldScript::init()
 
 	class_add<GData::Store>("Store");
 	class_def<GData::Store>("clear", &GData::Store::clear);
+    class_def<GData::Store>("clearNormalDiscount", &GData::Store::clearNormalDiscount);
+    class_def<GData::Store>("clearSpecialDiscount", &GData::Store::clearSpecialDiscount);
 	class_def<GData::Store>("add", &GData::Store::add);
 	class_def<GData::Store>("addExchange", &GData::Store::addExchange);
 	class_def<GData::Store>("needResetDiscount", &GData::Store::needResetDiscount);
 	class_def<GData::Store>("storeDiscount", &GData::Store::storeDiscount);
 	class_def<GData::Store>("discountLimit", &GData::Store::discountLimit);
+    class_def<GData::Store>("addSpecialDiscount", &GData::Store::addSpecialDiscount);
+    class_def<GData::Store>("addNormalDiscount", &GData::Store::addNormalDiscount);
 	class_def<GData::Store>("update", &GData::Store::makePacket);
+    class_add<GData::Discount>("Discount");
 	class_add<GData::TitleList>("TitleList");
 	class_def<GData::TitleList>("set", &GData::TitleList::set);
 }

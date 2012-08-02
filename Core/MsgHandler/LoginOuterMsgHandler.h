@@ -2173,5 +2173,21 @@ void SetCFriend(LoginMsgHdr& hdr, const void* data)
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
+void AddDiscount(LoginMsgHdr& hdr, const void* data)
+{
+    // TODO: 增加限时活动
+}
+
+void QueryDiscount(LoginMsgHdr& hdr, const void* data)
+{
+    // TODO: GM查询限时活动
+}
+
+void ClearDiscount(LoginMsgHdr& hdr, const void* data)
+{
+    // TODO: GM清空限时活动
+}
+
+
 #endif // _LOGINOUTERMSGHANDLER_H_
 
