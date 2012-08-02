@@ -157,8 +157,8 @@ public:
 	inline Int32 getMaxHPAdd() {return _maxhpAdd;}
 	inline Int32 getActionAdd() {return _maxActionAdd;}
     inline float getToughAdd() { return _toughAdd;}
-    inline float getAtkReduce() { float ret = _atkreduce + _atkreduce2 + _atkreduce3; return (ret > 0 ? ret : 0); }
-    inline float getMagAtkReduce() { float ret = _magatkreduce + _magatkreduce2 + _magatkreduce3; return (ret > 0 ? ret : 0); }
+    inline float getAtkReduce() { return _atkreduce + _atkreduce2 + _atkreduce3; }
+    inline float getMagAtkReduce() { return _magatkreduce + _magatkreduce2 + _magatkreduce3; }
 
 	inline void setAttackAdd(float v, UInt16 last = 0) {_attackAdd = v; _atkAdd_last = last;}
 	inline void setMagAttackAdd(float v, UInt16 last = 0) {_magAtkAdd = v; _magAtkAdd_last = last;}

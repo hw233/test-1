@@ -3133,7 +3133,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             ++ dmgCount[target_pos];
             const GData::SkillStrengthenEffect* ef = NULL;
             if(ss)
-                ef = ss->getEffect(GData::ON_BEDAMAGE, GData::TYPE_DEBUF_THERAPY);
+                ef = ss->getEffect(GData::ON_DAMAGE, GData::TYPE_DEBUF_THERAPY);
             if(ef)
             {
                 for(int i = 0; i < 25; ++ i)
@@ -6654,7 +6654,7 @@ bool BattleSimulator::doSkillStrengthen_week(BattleFighter* bf, const GData::Ski
         pos0 = 25;
     else if(!active && bf->getSide() != target_side)
         pos0 = 25;
-    if(bo->getHP() < (bo->getMaxHP() >> 1))
+    if( ((float)bo->getHP())/(bo->getMaxHP() < ef->value/100))
     {
         bo->setImmune2(0xE);
         defList[defCount].pos = bo->getPos() + pos0;

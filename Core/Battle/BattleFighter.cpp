@@ -612,8 +612,14 @@ float BattleFighter::calcTherapy(const GData::SkillBase* skill)
         ef = ss->getEffect(GData::ON_THERAPY, GData::TYPE_CRITICAL);
     if(ef)
     {
-        if(uRand(10000) < getCritical(NULL)*ef->value*100)
-            aura_factor *= 2;
+        if(uRand(10000) < getCritical(NULL)* 100)
+        {
+            float f = getCriticalDmg();
+            if(f > ef->value/100)
+                aura_factor *= ef->value/100;
+            else
+                aura_factor *= f;
+        }
     }
 
     return aura_factor * ((_magatk + _magAtkAdd + _magAtkAdd2) * skill->effect->hpP + skill->effect->addhp + skill->effect->hp);
