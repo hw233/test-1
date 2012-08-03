@@ -8526,14 +8526,19 @@ namespace GObject
             UInt8 qqvipl = 0;
             UInt8 flag = 0;
 
-            if (blue || qplus)
+            if (blue)
             {
                 flag = 8*(_playerData.qqvipl1 / 10);
                 qqvipl = _playerData.qqvipl1 % 10;
             }
             else
             {
-                if (_playerData.qqvipl >= 40)
+                if(qplus && World::getQQVipAct() && _playerData.qqvipl1 >= 40 && _playerData.qqvipl1 <= 49)
+                {
+                    flag = 8*((_playerData.qqvipl1-20) / 10);
+                    qqvipl = _playerData.qqvipl1 % 10;
+                }
+                else if (_playerData.qqvipl >= 40)
                 {
                     flag = 8*((_playerData.qqvipl-20) / 10);
                     qqvipl = _playerData.qqvipl % 10;
@@ -8659,14 +8664,23 @@ namespace GObject
                 }
             }
         }
-        else if (_playerData.qqvipl < 20 || _playerData.qqvipl >= 40 || ((domain == 11 || domain == 4) && d3d6 == 0 && _playerData.qqvipl1 > 0))
+        else if (_playerData.qqvipl < 20 || _playerData.qqvipl >= 40 || (domain == 4 && _playerData.qqvipl1 >= 40) ||
+                ((domain == 11 || domain == 4) && d3d6 == 0 && _playerData.qqvipl1 > 0))
         {
             UInt8 qqvipl = 0;
             UInt8 flag = 0;
             if ((domain == 11 || domain == 4) && d3d6 == 0 && _playerData.qqvipl1 > 0)
             {
-                qqvipl = _playerData.qqvipl1;
-                flag = 8*(_playerData.qqvipl1 / 10);
+                if (World::getQQVipAct() && _playerData.qqvipl1 >= 40 && _playerData.qqvipl1 <= 49)
+                {
+                    qqvipl = _playerData.qqvipl1;
+                    flag = 8*((_playerData.qqvipl1-20) / 10);
+                }
+                else
+                {
+                    qqvipl = _playerData.qqvipl1;
+                    flag = 8*(_playerData.qqvipl1 / 10);
+                }
             }
             else
             {
