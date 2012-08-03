@@ -742,7 +742,7 @@ namespace GObject
         }
         inline bool isQQVIP() const 
         {
-            return (_playerData.qqvipl > 40 && _playerData.qqvipl <= 49) || ((_playerData.qqvipl > 30 && _playerData.qqvipl <= 39) && (_playerData.qqvipl1 > 40 && _playerData.qqvipl1 <= 49));
+            return (_playerData.qqvipl > 40 && _playerData.qqvipl <= 49) || (_playerData.qqvipl1 > 40 && _playerData.qqvipl1 <= 49);
         }
 
 		UInt32 getTotalRecharge()			{ return _playerData.totalRecharge; }

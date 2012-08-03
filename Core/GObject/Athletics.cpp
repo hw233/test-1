@@ -232,7 +232,7 @@ void Athletics::adjustAthlDeferBuffData(Player *atker, Player *defer, bool reset
         return;
     if(reset)
     {
-        defer->setAthlRivalBuff(bufFlag);
+        defer->setAthlRivalBuff(0);
     }
     else
     {
