@@ -84,6 +84,8 @@ function discount(store)
     local tm3 = { ['year'] = 2012, ['month'] = 7, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local tm4 = { ['year'] = 2012, ['month'] = 7, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local tm5 = { ['year'] = 2012, ['month'] = 7, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local tm6 = { ['year'] = 2012, ['month'] = 7, ['day'] = 31, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local tm7 = { ['year'] = 2012, ['month'] = 8, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
     local now = os.time() + 30
     local t1 = os.time(tm1)
@@ -91,6 +93,8 @@ function discount(store)
     local t3 = os.time(tm3)
     local t4 = os.time(tm4)
     local t5 = os.time(tm5)
+    local t6 = os.time(tm6)
+    local t7 = os.time(tm7)
 
     local day = 86400
     local week = 604800
@@ -130,6 +134,14 @@ function discount(store)
     if now >= t5 and now < t5 + 2*day then
         store:add(2,5107,1850)
         store:add(2,5117,1850)
+    end
+
+    if now >= t6 and now < t6 + day then
+        store:add(2,9095,100)
+    end
+
+    if now >= t7 and now < t7 + 7*day then
+        store:add(2,9099,400)
     end
 end
 

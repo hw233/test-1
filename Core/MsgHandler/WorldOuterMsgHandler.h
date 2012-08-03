@@ -281,7 +281,7 @@ void OnClanListReq( GameMsgHdr& hdr, ClanListReq& clr )
 {
 	MSG_QUERY_PLAYER(player);
 	GObject::Clan * clan = NULL;
-	switch(clr._type)
+    switch(clr._type)
 	{
 	case 0:
 		GObject::clanCache.listAll(player, clr._startidx, clr._count, clr._flag);

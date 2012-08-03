@@ -258,6 +258,8 @@ void BattleSimulator::start(UInt8 prevWin)
                 flag |= BattleFighter::Enh4;
             if (_player[i]->getBuffData(PLAYER_BUFF_BBUF, now) > 0)
                 flag |= BattleFighter::Enh5;
+            if (_player[i]->getBuffData(PLAYER_BUFF_QQVIPBUF, now) > 0)
+                flag |= BattleFighter::Enh6;
             /*if(_player[i]->hasFlag(GObject::Player::Copy)
              || _player[i]->hasFlag(GObject::Player::AutoCopy)
              || _player[i]->hasFlag(GObject::Player::InCopyTeam)
@@ -1325,7 +1327,7 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
             UInt8 idx = 0;
 
             UInt8 effect_state = boSkill->effect->state;
-            if(SKILL_ID(boSkill->getId()) == 136) // 光棍
+            if(SKILL_ID(boSkill->getId()) == 136 || SKILL_ID(boSkill->getId()) == 146) // 光棍, 冰火双剪
             {
                 switch(bo->getClass())
                 {
@@ -1891,7 +1893,7 @@ void BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
     UInt8 cnt = 0;
     UInt8 state_idx = 0;
     UInt8 effect_state = skill->effect->state;
-    if(SKILL_ID(skill->getId()) == 136) // 光棍
+    if(SKILL_ID(skill->getId()) == 136 || SKILL_ID(skill->getId()) == 146) // 光棍, 冰火双剪
     {
         switch(bf->getClass())
         {
@@ -3037,7 +3039,7 @@ void BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GD
     bool tmpself = self;
     if(skill->effect->auraP || skill->effect->aura)
     {
-        if(SKILL_ID(skill->getId()) == 136 && bf->getClass() != 2) // 光棍
+        if((SKILL_ID(skill->getId()) == 136 || SKILL_ID(skill->getId()) == 146) && bf->getClass() != 2) // 光棍, 冰火双剪
             return;
 
         float rate = skill->prob * 100;

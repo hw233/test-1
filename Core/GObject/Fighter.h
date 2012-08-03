@@ -567,6 +567,7 @@ public:
     Int32 getAcuPraAdd() { return _praadd; }
     float getPracticeBufFactor();
     float getPracticeIncByDiamond();
+    float getPracticeIncByQQVip();
     float getClanTechAddon(int place);
     float getPracticeInc();
     // TODO:
@@ -727,6 +728,8 @@ public:
     void SSUpdate2DB(UInt16 id, SStrengthen& ss);
     void SSDeleteDB(UInt16 id);
     void SSFromDB(UInt16 id, SStrengthen& ss);
+    void SSSendSSInfo(UInt16 skill);
+    void SSNotify(UInt16 id, SStrengthen& ss);
     void makeFighterSSInfo(Stream& st);
     bool appendFighterSSInfo(Stream& st, UInt16 skillid);
     bool appendFighterSSInfo(Stream& st, UInt16 skillid, SStrengthen* ss);

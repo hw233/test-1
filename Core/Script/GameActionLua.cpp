@@ -117,6 +117,7 @@ namespace Script
 		lua_tinker::def(_L, "getEnchantGt11", GObject::World::getEnchantGt11);
         lua_tinker::def(_L, "getBlueDiamondAct", GObject::World::getBlueDiamondAct);
         lua_tinker::def(_L, "getYellowDiamondAct", GObject::World::getYellowDiamondAct);
+        lua_tinker::def(_L, "getQQVipAct", GObject::World::getQQVipAct);
         lua_tinker::def(_L, "getQQGameAct", GObject::World::getQQGameAct);
         lua_tinker::def(_L, "getRechargeNextRet", GObject::World::getRechargeNextRet);
         lua_tinker::def(_L, "setRechargeNextRetStart", GObject::World::setRechargeNextRetStart);
@@ -796,7 +797,7 @@ namespace Script
 	UInt16 GameActionLua::RunItemNormalUse(Player* player, UInt32 itemId, UInt32 param, UInt16 num, bool bind)
 	{
 		assert(player != NULL);
-		return Run<UInt32>(player, "RunItemNormalUse", itemId, num, bind, param);
+        return Run<UInt32>(player, "RunItemNormalUse", itemId, num, bind, param);
 	}
 
     UInt16 GameActionLua::getRandTrump(UInt8 lvl)

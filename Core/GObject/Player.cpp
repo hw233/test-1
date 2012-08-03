@@ -1254,7 +1254,7 @@ namespace GObject
                     for (UInt8 j = 0; j < 6; ++j)
                     {
                         ied.gems[j] = gemId[cls-1][i][j];
-                        DB4().PushUpdateData("UPDATE `equipment` SET `enchant` = %u, `sockets` = %u, `socket1` = %u, `socket2` = %u, `socket3` = %u, `socket4` = %u, `socket5` = %u, `socket6` = %u, `attrType1` = %u, `attrValue1` = %d, `attrType2` = %u, `attrValue2` = %d, `attrType3` = %u, `attrValue3` = %d WHERE `id` = %"I64_FMT"u", ied.enchant, ied.sockets, ied.gems[0], ied.gems[1], ied.gems[2], ied.gems[3], ied.gems[4], ied.gems[5], ied.extraAttr2.type1, ied.extraAttr2.value1, ied.extraAttr2.type2, ied.extraAttr2.value2, ied.extraAttr2.type3, ied.extraAttr2.value3, ie->getId());
+                        DB4().PushUpdateData("UPDATE `equipment` SET `enchant` = %u, `sockets` = %u, `socket1` = %u, `socket2` = %u, `socket3` = %u, `socket4` = %u, `socket5` = %u, `socket6` = %u, `attrType1` = %u, `attrValue1` = %d, `attrType2` = %u, `attrValue2` = %d, `attrType3` = %u, `attrValue3` = %d WHERE `id` = %u", ied.enchant, ied.sockets, ied.gems[0], ied.gems[1], ied.gems[2], ied.gems[3], ied.gems[4], ied.gems[5], ied.extraAttr2.type1, ied.extraAttr2.value1, ied.extraAttr2.type2, ied.extraAttr2.value2, ied.extraAttr2.type3, ied.extraAttr2.value3, ie->getId());
                     }
                     GetPackage()->SendSingleEquipData(ie);
                 }
@@ -1878,7 +1878,7 @@ namespace GObject
 
 	UInt8 Player::GetLev() const
 	{
-		return (!_fighters.empty()) ? _fighters.begin()->second->getLevel() : LEVEL_MAX;
+		return (!_fighters.empty()) ? _fighters.begin()->second->getLevel() : 1;
 	}
 
     UInt8 Player::GetColor() const
@@ -6514,8 +6514,16 @@ namespace GObject
             totalCnt = 0;
         }
 
-        copy = freeCnt + goldCnt + currentCnt;
-        copyMax = GObject::PlayerCopy::getFreeCount() + GObject::PlayerCopy::getGoldCount(vipLevel) + totalCnt;
+        UInt8 currentCnt2 = 0;
+        UInt8 totalCnt2 = 0;
+        if(this->isQQVIP() && World::getQQVipAct()){
+            currentCnt2 = this->GetVar(VAR_QQVIP_CNT);
+            totalCnt2 = 1;
+            if(currentCnt2 > totalCnt2)
+                currentCnt2 = 0;
+        }
+        copy = freeCnt + goldCnt + currentCnt + currentCnt2;
+        copyMax = GObject::PlayerCopy::getFreeCount() + GObject::PlayerCopy::getGoldCount(vipLevel) + totalCnt + totalCnt2;
 
         UInt32 now = TimeUtil::Now();
         if(now >= _playerData.dungeonEnd)
@@ -6583,7 +6591,16 @@ namespace GObject
             totalDiamondCnt = 0;
         }
 
-        st << cnt << static_cast<UInt8>(freeCnt + goldCnt + currentDiamondCnt) << static_cast<UInt8>(GObject::PlayerCopy::getFreeCount()) << static_cast<UInt8>(GObject::PlayerCopy::getGoldCount(vipLevel)) << static_cast<UInt8>(totalDiamondCnt);
+        UInt8 currentCnt2 = 0;
+        UInt8 totalCnt2 = 0;
+        if(this->isQQVIP() && World::getQQVipAct()){
+            currentCnt2 = this->GetVar(VAR_QQVIP_CNT);
+            totalCnt2 = 1;
+            if(currentCnt2 > totalCnt2)
+                currentCnt2 = 0;
+        }
+
+        st << cnt << static_cast<UInt8>(freeCnt + goldCnt + currentDiamondCnt + currentCnt2) << static_cast<UInt8>(GObject::PlayerCopy::getFreeCount()) << static_cast<UInt8>(GObject::PlayerCopy::getGoldCount(vipLevel)) << static_cast<UInt8>(totalDiamondCnt) << static_cast<UInt8>(totalCnt2);
         if(cnt)
         {
             playerCopy.buildInfo(this, st);
@@ -7295,12 +7312,6 @@ namespace GObject
 			h = 15;
 		for(UInt32 j = l; j <= h; ++j)
 		{
-			SYSMSG(title, 256);
-			SYSMSGV(content, 257, j);
-			Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
-			if(mail == NULL)
-				continue;
-
 			const UInt32 vipTable[16][12] =
             {
                 {450,1,0,0,0,0,0,0,0,0,0,0},
@@ -7320,6 +7331,12 @@ namespace GObject
                 {464,1,0,0,0,0,0,0,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0,0,0},
             };
+
+			SYSMSG(title, 256);
+			SYSMSGV(content, 257, vipTable[j-1][0]);
+			Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+			if(mail == NULL)
+				continue;
 
 			MailPackage::MailItem mitem[6];
 			UInt32 mcount = 0;
@@ -8177,6 +8194,18 @@ namespace GObject
             return 0.1;
         }
         else if(this->isYD() && World::getYellowDiamondAct())
+        {
+            return 0.1;
+        }
+        else
+        {
+            return 0.0;
+        }
+    }
+
+    float Player::getPracticeIncByQQVip()
+    {
+        if(isQQVIP() && World::getQQVipAct())
         {
             return 0.1;
         }
@@ -10680,6 +10709,19 @@ namespace GObject
 
     void Player::recvYBBuf(UInt8 type)
     {
+        if(this->isQQVIP() && World::getQQVipAct() && type == 2)
+        {
+            UInt32 qqbuf = GetVar(VAR_QQVIP_BUF);
+            if(!qqbuf)
+            {
+                UInt32 now = TimeUtil::Now();
+                setBuffData(PLAYER_BUFF_YBUF, now + 60 * 60);
+                SetVar(PLAYER_BUFF_QQVIPBUF, 1);
+                sendYBBufInfo(0, 1);
+            }
+            return;
+        }
+
         if((this->isBD() && World::getBlueDiamondAct()) || (this->isYD() && World::getYellowDiamondAct()))
         {
             UInt32 ybbuf = GetVar(VAR_YBBUF);
@@ -10710,14 +10752,15 @@ namespace GObject
                 SetVar(VAR_YBBUF, ybbuf);
             }
 
-            sendYBBufInfo(ybbuf);
+            sendYBBufInfo(ybbuf, 0);
         }
     }
 
-    void Player::sendYBBufInfo(UInt32 ybbuf)
+    void Player::sendYBBufInfo(UInt32 ybbuf, UInt32 qqvipbuf)
     {
         Stream st(REP::YBBUF);
-        st << static_cast<UInt8>((ybbuf >> 16) & 0xFFFF) << static_cast<UInt8>(ybbuf & 0xFFFF) << Stream::eos;
+        UInt8 qqbuf = qqvipbuf ? true : false;
+        st << static_cast<UInt8>((ybbuf >> 16) & 0xFFFF) << static_cast<UInt8>(ybbuf & 0xFFFF) << qqbuf << Stream::eos;
         send(st);
     }
 
@@ -10991,7 +11034,10 @@ namespace GObject
             }
             for(UInt32 i = 0; i < cnt; ++i){
                 lua_tinker::table a = award.get<lua_tinker::table>(i + 1); 
-                GetPackage()->Add(a.get<UInt32>(1), a.get<UInt32>(2), true, false, FromDailyActivity);
+                if(499 == a.get<UInt32>(1))  //礼券
+                    getCoupon(a.get<UInt32>(2)); 
+                else
+                    GetPackage()->Add(a.get<UInt32>(1), a.get<UInt32>(2), true, false, FromDailyActivity);
             }
         }
         GameAction()->doAtySignIn(this, AtySignIn, mon, day);

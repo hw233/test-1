@@ -107,9 +107,11 @@ void WorldScript::init()
 	def("setEnchantGt11", GObject::World::setEnchantGt11);
     def("setBlueDiamondAct", GObject::World::setBlueDiamondAct);
     def("setYellowDiamondAct", GObject::World::setYellowDiamondAct);
+    def("setQQVipAct", GObject::World::setQQVipAct);
     def("setQQGameAct", GObject::World::setQQGameAct);
     def("getBlueDiamondAct", GObject::World::getBlueDiamondAct);
     def("getYellowDiamondAct", GObject::World::getYellowDiamondAct);
+    def("getQQVipAct", GObject::World::getQQVipAct);
     def("getQQGameAct", GObject::World::getQQGameAct);
 	def("setJune", GObject::World::setJune);
 	def("getJune", GObject::World::getJune);
