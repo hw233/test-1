@@ -7295,12 +7295,6 @@ namespace GObject
 			h = 15;
 		for(UInt32 j = l; j <= h; ++j)
 		{
-			SYSMSG(title, 256);
-			SYSMSGV(content, 257, j);
-			Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
-			if(mail == NULL)
-				continue;
-
 			const UInt32 vipTable[16][12] =
             {
                 {450,1,0,0,0,0,0,0,0,0,0,0},
@@ -7320,6 +7314,12 @@ namespace GObject
                 {464,1,0,0,0,0,0,0,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0,0,0},
             };
+
+			SYSMSG(title, 256);
+			SYSMSGV(content, 257, vipTable[j-1][0]);
+			Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+			if(mail == NULL)
+				continue;
 
 			MailPackage::MailItem mitem[6];
 			UInt32 mcount = 0;
