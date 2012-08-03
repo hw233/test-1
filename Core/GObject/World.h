@@ -169,6 +169,10 @@ public:
     { _yellowdiamondact = v; }
     inline static bool getYellowDiamondAct()
     { return _yellowdiamondact; }
+    inline static void setQQVipAct(bool v)
+    { _qqvipact = v; }
+    inline static bool getQQVipAct()
+    { return _qqvipact; }
     inline static void setQQGameAct(bool v)
     { _qqgameact = v; }
     inline static bool getQQGameAct()
@@ -304,6 +308,7 @@ public:
     static bool _gemmergeact;
     static bool _bluediamondact;
     static bool _yellowdiamondact;
+    static bool _qqvipact;
     static bool _qqgameact;
     static void* _recalcwd;
     static bool _june;

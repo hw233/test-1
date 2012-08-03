@@ -180,6 +180,8 @@ namespace GObject
         VAR_CONSUME = 142, // 消耗累积
 
         VAR_PHYSICAL_BUY = 143, //购买体力限制
+        VAR_QQVIP_BUF = 144,    //QQ会员之力是否领取
+        VAR_QQVIP_CNT = 145,    //QQ会员特权
 
         VAR_MAX,
     };
@@ -352,6 +354,8 @@ namespace GObject
             REGISTER_VAR(VAR_SOSOMAPAWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_CONSUME, CYCLE_NONE);
             REGISTER_VAR(VAR_PHYSICAL_BUY, CYCLE_DAY);
+            REGISTER_VAR(VAR_QQVIP_BUF, CYCLE_DAY);
+            REGISTER_VAR(VAR_QQVIP_CNT, CYCLE_DAY);
         }
         
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

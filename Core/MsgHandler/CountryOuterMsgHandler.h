@@ -1056,7 +1056,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendMDSoul(0);
     pl->sendSSDTInfo();
     pl->sendHappyInfo();
-    pl->sendYBBufInfo(pl->GetVar(VAR_YBBUF));
+    pl->sendYBBufInfo(pl->GetVar(VAR_YBBUF), pl->GetVar(PLAYER_BUFF_QQVIPBUF));
     pl->sendAthlBufInfo();
     luckyDraw.notifyDisplay(pl);
 

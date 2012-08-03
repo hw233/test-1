@@ -6514,8 +6514,16 @@ namespace GObject
             totalCnt = 0;
         }
 
-        copy = freeCnt + goldCnt + currentCnt;
-        copyMax = GObject::PlayerCopy::getFreeCount() + GObject::PlayerCopy::getGoldCount(vipLevel) + totalCnt;
+        UInt8 currentCnt2 = 0;
+        UInt8 totalCnt2 = 0;
+        if(this->isQQVIP() && World::getQQVipAct()){
+            currentCnt2 = this->GetVar(VAR_QQVIP_CNT);
+            totalCnt2 = 1;
+            if(currentCnt2 > totalCnt2)
+                currentCnt2 = 0;
+        }
+        copy = freeCnt + goldCnt + currentCnt + currentCnt2;
+        copyMax = GObject::PlayerCopy::getFreeCount() + GObject::PlayerCopy::getGoldCount(vipLevel) + totalCnt + totalCnt2;
 
         UInt32 now = TimeUtil::Now();
         if(now >= _playerData.dungeonEnd)
@@ -6583,7 +6591,16 @@ namespace GObject
             totalDiamondCnt = 0;
         }
 
-        st << cnt << static_cast<UInt8>(freeCnt + goldCnt + currentDiamondCnt) << static_cast<UInt8>(GObject::PlayerCopy::getFreeCount()) << static_cast<UInt8>(GObject::PlayerCopy::getGoldCount(vipLevel)) << static_cast<UInt8>(totalDiamondCnt);
+        UInt8 currentCnt2 = 0;
+        UInt8 totalCnt2 = 0;
+        if(this->isQQVIP() && World::getQQVipAct()){
+            currentCnt2 = this->GetVar(VAR_QQVIP_CNT);
+            totalCnt2 = 1;
+            if(currentCnt2 > totalCnt2)
+                currentCnt2 = 0;
+        }
+
+        st << cnt << static_cast<UInt8>(freeCnt + goldCnt + currentDiamondCnt + currentCnt2) << static_cast<UInt8>(GObject::PlayerCopy::getFreeCount()) << static_cast<UInt8>(GObject::PlayerCopy::getGoldCount(vipLevel)) << static_cast<UInt8>(totalDiamondCnt) << static_cast<UInt8>(totalCnt2);
         if(cnt)
         {
             playerCopy.buildInfo(this, st);
@@ -8177,6 +8194,18 @@ namespace GObject
             return 0.1;
         }
         else if(this->isYD() && World::getYellowDiamondAct())
+        {
+            return 0.1;
+        }
+        else
+        {
+            return 0.0;
+        }
+    }
+
+    float Player::getPracticeIncByQQVip()
+    {
+        if(isQQVIP() && World::getQQVipAct())
         {
             return 0.1;
         }
@@ -10597,6 +10626,19 @@ namespace GObject
 
     void Player::recvYBBuf(UInt8 type)
     {
+        if(this->isQQVIP() && World::getQQVipAct() && type == 2)
+        {
+            UInt32 qqbuf = GetVar(VAR_QQVIP_BUF);
+            if(!qqbuf)
+            {
+                UInt32 now = TimeUtil::Now();
+                setBuffData(PLAYER_BUFF_YBUF, now + 60 * 60);
+                SetVar(PLAYER_BUFF_QQVIPBUF, 1);
+                sendYBBufInfo(0, 1);
+            }
+            return;
+        }
+
         if((this->isBD() && World::getBlueDiamondAct()) || (this->isYD() && World::getYellowDiamondAct()))
         {
             UInt32 ybbuf = GetVar(VAR_YBBUF);
@@ -10627,14 +10669,15 @@ namespace GObject
                 SetVar(VAR_YBBUF, ybbuf);
             }
 
-            sendYBBufInfo(ybbuf);
+            sendYBBufInfo(ybbuf, 0);
         }
     }
 
-    void Player::sendYBBufInfo(UInt32 ybbuf)
+    void Player::sendYBBufInfo(UInt32 ybbuf, UInt32 qqvipbuf)
     {
         Stream st(REP::YBBUF);
-        st << static_cast<UInt8>((ybbuf >> 16) & 0xFFFF) << static_cast<UInt8>(ybbuf & 0xFFFF) << Stream::eos;
+        UInt8 qqbuf = qqvipbuf ? true : false;
+        st << static_cast<UInt8>((ybbuf >> 16) & 0xFFFF) << static_cast<UInt8>(ybbuf & 0xFFFF) << qqbuf << Stream::eos;
         send(st);
     }
 
