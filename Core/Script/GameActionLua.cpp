@@ -117,6 +117,7 @@ namespace Script
 		lua_tinker::def(_L, "getEnchantGt11", GObject::World::getEnchantGt11);
         lua_tinker::def(_L, "getBlueDiamondAct", GObject::World::getBlueDiamondAct);
         lua_tinker::def(_L, "getYellowDiamondAct", GObject::World::getYellowDiamondAct);
+        lua_tinker::def(_L, "getQQVipAct", GObject::World::getQQVipAct);
         lua_tinker::def(_L, "getQQGameAct", GObject::World::getQQGameAct);
         lua_tinker::def(_L, "getRechargeNextRet", GObject::World::getRechargeNextRet);
         lua_tinker::def(_L, "setRechargeNextRetStart", GObject::World::setRechargeNextRetStart);

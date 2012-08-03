@@ -100,6 +100,7 @@ void BattleFormula::init()
 	class_def<GObject::Fighter>("getAcuPraAdd", &GObject::Fighter::getAcuPraAdd);
 	class_def<GObject::Fighter>("getPracticeBufFactor", &GObject::Fighter::getPracticeBufFactor);
 	class_def<GObject::Fighter>("getPracticeIncByDiamond", &GObject::Fighter::getPracticeIncByDiamond);
+	class_def<GObject::Fighter>("getPracticeIncByQQVip", &GObject::Fighter::getPracticeIncByQQVip);
 	class_def<GObject::Fighter>("getExtraHitrateLevel", &GObject::Fighter::getExtraHitrateLevel);
 	class_def<GObject::Fighter>("getExtraEvadeLevel", &GObject::Fighter::getExtraEvadeLevel);
 	class_def<GObject::Fighter>("getExtraCriticalLevel", &GObject::Fighter::getExtraCriticalLevel);
