@@ -2487,7 +2487,7 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
                     return false;
 
                 // XXX: do not send message to client
-                offCitta(_citta[idx], false, false, writedb); // delete skills was taken out by old citta first
+                offCitta(_citta[idx], false, true, writedb); // delete skills was taken out by old citta first
                 _citta[idx] = citta;
                 ret = true;
                 op = 1;
