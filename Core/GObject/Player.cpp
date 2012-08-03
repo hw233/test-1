@@ -9988,23 +9988,26 @@ namespace GObject
 
             UInt32 count = max - used;
 
-            UInt32 time = GData::store.getEndTimeByDiscountType(type);
             UInt32 now = (UInt32)std::time(NULL);
-            if (time < now)
-            {
-                // 活动限购已经结束
-                time = 0;
-                count = 0;
-            }
-            else
-                time -= now;
 
-            time = GData::store.getBeginTimeByDiscountType(type);
+            UInt32 time = GData::store.getBeginTimeByDiscountType(type);
             if (time > now)
             {
                 // 活动限购还未开始
                 time = 0;
                 count = 0;
+            }
+            else
+            {
+                time = GData::store.getEndTimeByDiscountType(type);
+                if (time < now)
+                {
+                    // 活动限购已经结束
+                    time = 0;
+                    count = 0;
+                }
+                else
+                    time -= now;
             }
 
             st << static_cast<UInt8>(type) 

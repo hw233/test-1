@@ -123,9 +123,22 @@ void Store::addSpecialDiscount()
     return;
 }
 
-void Store::addSpecialDiscountFromBS(UInt16 itemID, UInt8 discountType, UInt32 limitCount, UInt32 beginTime, UInt32 endTime, UInt16 priceOriginal, UInt16 priceDiscount)
+UInt8 Store::addSpecialDiscountFromBS(Discount discount)
 {
-    // TODO: GM通过后台发送新增限购活动
+    // GM通过后台发送新增限购活动
+    UInt32 now = (UInt32)std::time(NULL);
+    if (discount.itemID == 0 ||
+            discount.beginTime < now)
+    {
+        return 1;
+    }
+    if (discount.discountType > 6 || discount.discountType < 4)
+    {
+        return 1;
+    }
+    _itemsDiscount[DISCOUNTEND - DISCOUNT].push_back(discount);
+    ++ (_itemTypeCountDiscount[DISCOUNTEND - DISCOUNT][discount.discountType]);
+    return 0;
 }
 
 void Store::querySpecialDiscountFromBS()
@@ -135,7 +148,23 @@ void Store::querySpecialDiscountFromBS()
 
 void Store::clearSpecialDiscountFromBS()
 {
-    // TODO: GM通过后台发送清空限购活动
+    // GM通过后台发送清空限购活动
+    std::vector<Discount>& items = _itemsDiscount[DISCOUNTEND - DISCOUNT];
+    for(std::vector<Discount>::iterator it = items.begin(); it != items.end(); )
+    {
+#if 1
+        if ( ((*it).discountType) <= 6 && ((*it).discountType >= 4))
+        {
+            it = items.erase(it);
+        }
+        else
+        {
+            ++ it;
+        }
+#else
+        ++ it;
+#endif
+    }
 }
 
 bool Store::needResetDiscount()

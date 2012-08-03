@@ -52,7 +52,7 @@ public:
 	void addExchange(UInt8 type, UInt32 itemId, UInt32 priceID, UInt32 priceNum);
     void addNormalDiscount(UInt32 itemId, UInt32 discount);
     void addSpecialDiscount();
-    void addSpecialDiscountFromBS(UInt16 itemID, UInt8 discountType, UInt32 limitCount, UInt32 beginTime, UInt32 endTime, UInt16 priceOriginal, UInt16 priceDiscount);
+    UInt8 addSpecialDiscountFromBS(Discount discount);
     void querySpecialDiscountFromBS();
     void clearSpecialDiscountFromBS();
     bool needResetDiscount();
