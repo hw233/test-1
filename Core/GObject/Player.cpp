@@ -10646,9 +10646,10 @@ namespace GObject
             if(!qqbuf)
             {
                 UInt32 now = TimeUtil::Now();
-                setBuffData(PLAYER_BUFF_YBUF, now + 60 * 60);
-                SetVar(PLAYER_BUFF_QQVIPBUF, 1);
-                sendYBBufInfo(0, 1);
+                setBuffData(PLAYER_BUFF_QQVIPBUF, now + 60 * 60);
+                SetVar(VAR_QQVIP_BUF, 1);
+                //sendYBBufInfo(0, 1);
+                sendYBBufInfo(GetVar(VAR_YBBUF), GetVar(VAR_QQVIP_BUF));
             }
             return;
         }
@@ -10683,7 +10684,8 @@ namespace GObject
                 SetVar(VAR_YBBUF, ybbuf);
             }
 
-            sendYBBufInfo(ybbuf, 0);
+            //sendYBBufInfo(ybbuf, 0);
+            sendYBBufInfo(GetVar(VAR_YBBUF), GetVar(VAR_QQVIP_BUF));
         }
     }
 
