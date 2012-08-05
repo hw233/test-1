@@ -2413,7 +2413,7 @@ int Fighter::isCittaUp( UInt16 citta )
     return -1;
 }
 
-bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
+bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool lvlup )
 {
     if (!citta)
         return false;
@@ -2422,7 +2422,10 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
     if (!cb)
         return false;
 
-    if (hasCitta(citta) < 0)
+    int cidx = hasCitta(citta);
+    if (cidx < 0)
+        return false;
+    if (!lvlup && _cittas[cidx] != citta)
         return false;
 
     if (!(idx >= 0 && idx < getUpCittasMax())) // dst
@@ -2540,6 +2543,8 @@ bool Fighter::lvlUpCitta(UInt16 citta, bool writedb)
     {
         int i = hasCitta(citta);
         if (i < 0)
+            return false;
+        if (_cittas[i] != citta)
             return false;
         bool re =  addNewCitta(citta+1, writedb, false);
 
@@ -2846,7 +2851,7 @@ bool Fighter::addNewCitta( UInt16 citta, bool writedb, bool init )
 
             int i = isCittaUp(citta);
             if (i >= 0)
-                upCitta(citta, i, writedb);
+                upCitta(citta, i, writedb, true);
             _cittas[idx] = citta;
             op = 3;
         }
