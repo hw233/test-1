@@ -4126,14 +4126,21 @@ void Fighter::SSOpen(UInt16 id)
     UInt16 sid = SKILL_ID(id);
     if (GData::skill2item.find(sid) == GData::skill2item.end())
         return;
+#if 0 // XXX: 使用固定物品
     UInt16 itemId = GData::skill2item[sid];
     if (!itemId)
         return;
+#endif
 
     std::map<UInt16, SStrengthen>::iterator i = m_ss.find(sid);
     if (i != m_ss.end())
     {
         UInt8 mlvl = getUpSkillLevel(idx);
+        if (i->second.maxLvl >= mlvl && mlvl == 9)
+        {
+            _owner->sendMsgCode(0, 1027);
+            return;
+        }
         if (i->second.maxLvl >= mlvl)
         {
             _owner->sendMsgCode(0, 1021);
@@ -4147,6 +4154,9 @@ void Fighter::SSOpen(UInt16 id)
         return;
     }
 
+    UInt16 itemId = 550;
+    if (i->second.lvl >= 4)
+        itemId = 551;
     Package* pkg = _owner->GetPackage();
     ItemBase* item = pkg->FindItem(itemId, true);
     if (!item)
@@ -4227,7 +4237,7 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, bool bind)
 
     if (ss.lvl >= ss.maxLvl)
     {
-        _owner->sendMsgCode(0, 1021);
+        _owner->sendMsgCode(0, 1028);
         return 0;
     }
 
