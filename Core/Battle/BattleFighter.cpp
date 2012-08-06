@@ -447,6 +447,14 @@ void BattleFighter::updateBuffExtras()
         _attrExtra.magdef += 100;
     }
 
+    if (_flag & Enh6)
+    {
+        _attrExtra.attack += 50;
+        _attrExtra.magatk += 50;
+        _attrExtra.defend += 100;
+        _attrExtra.magdef += 100;
+    }
+
     if (_flag2 & AthlEnh1)
     {
         _attrExtra.attack *= 1.05f;

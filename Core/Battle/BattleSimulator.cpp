@@ -348,6 +348,8 @@ void BattleSimulator::start(UInt8 prevWin)
                 flag |= BattleFighter::Enh4;
             if (_player[i]->getBuffData(PLAYER_BUFF_BBUF, now) > 0)
                 flag |= BattleFighter::Enh5;
+            if (_player[i]->getBuffData(PLAYER_BUFF_QQVIPBUF, now) > 0)
+                flag |= BattleFighter::Enh6;
             /*if(_player[i]->hasFlag(GObject::Player::Copy)
              || _player[i]->hasFlag(GObject::Player::AutoCopy)
              || _player[i]->hasFlag(GObject::Player::InCopyTeam)
@@ -427,6 +429,8 @@ void BattleSimulator::start(UInt8 prevWin)
                         portrait = 1076;
                     else if (bf->getFighter()->getFashionTypeId() == 1705)
                         portrait = 1077;
+                    else if (bf->getFighter()->getFashionTypeId() == 1706)
+                        portrait = 1088;
 
                     if(bf->getBuffData(FIGHTER_BUFF_CRMASGIRL, now))
                         portrait = 1058;

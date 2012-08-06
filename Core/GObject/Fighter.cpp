@@ -2413,7 +2413,7 @@ int Fighter::isCittaUp( UInt16 citta )
     return -1;
 }
 
-bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
+bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool lvlup )
 {
     if (!citta)
         return false;
@@ -2422,7 +2422,10 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
     if (!cb)
         return false;
 
-    if (hasCitta(citta) < 0)
+    int cidx = hasCitta(citta);
+    if (cidx < 0)
+        return false;
+    if (!lvlup && _cittas[cidx] != citta)
         return false;
 
     if (!(idx >= 0 && idx < getUpCittasMax())) // dst
@@ -2487,7 +2490,7 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
                     return false;
 
                 // XXX: do not send message to client
-                offCitta(_citta[idx], false, false, writedb); // delete skills was taken out by old citta first
+                offCitta(_citta[idx], false, true, writedb); // delete skills was taken out by old citta first
                 _citta[idx] = citta;
                 ret = true;
                 op = 1;
@@ -2540,6 +2543,8 @@ bool Fighter::lvlUpCitta(UInt16 citta, bool writedb)
     {
         int i = hasCitta(citta);
         if (i < 0)
+            return false;
+        if (_cittas[i] != citta)
             return false;
         bool re =  addNewCitta(citta+1, writedb, false);
 
@@ -2846,7 +2851,7 @@ bool Fighter::addNewCitta( UInt16 citta, bool writedb, bool init )
 
             int i = isCittaUp(citta);
             if (i >= 0)
-                upCitta(citta, i, writedb);
+                upCitta(citta, i, writedb, true);
             _cittas[idx] = citta;
             op = 3;
         }
@@ -3026,6 +3031,11 @@ float Fighter::getPracticeBufFactor()
 float Fighter::getPracticeIncByDiamond()
 {
     return _owner->getPracticeIncByDiamond();
+}
+
+float Fighter::getPracticeIncByQQVip()
+{
+    return _owner->getPracticeIncByQQVip();
 }
 
 float Fighter::getClanTechAddon( int place )
@@ -4138,14 +4148,21 @@ void Fighter::SSOpen(UInt16 id)
     UInt16 sid = SKILL_ID(id);
     if (GData::skill2item.find(sid) == GData::skill2item.end())
         return;
+#if 0 // XXX: 使用固定物品
     UInt16 itemId = GData::skill2item[sid];
     if (!itemId)
         return;
+#endif
 
     std::map<UInt16, SStrengthen>::iterator i = m_ss.find(sid);
     if (i != m_ss.end())
     {
         UInt8 mlvl = getUpSkillLevel(idx);
+        if (i->second.maxLvl >= mlvl && mlvl == 9)
+        {
+            _owner->sendMsgCode(0, 1027);
+            return;
+        }
         if (i->second.maxLvl >= mlvl)
         {
             _owner->sendMsgCode(0, 1021);
@@ -4159,6 +4176,9 @@ void Fighter::SSOpen(UInt16 id)
         return;
     }
 
+    UInt16 itemId = 550;
+    if (i->second.lvl >= 4)
+        itemId = 551;
     Package* pkg = _owner->GetPackage();
     ItemBase* item = pkg->FindItem(itemId, true);
     if (!item)
@@ -4239,7 +4259,7 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, bool bind)
 
     if (ss.lvl >= ss.maxLvl)
     {
-        _owner->sendMsgCode(0, 1021);
+        _owner->sendMsgCode(0, 1028);
         return 0;
     }
 

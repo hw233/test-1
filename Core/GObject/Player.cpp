@@ -1013,8 +1013,8 @@ namespace GObject
         {
             char buf[1024] = {0};
             char* pbuf = &buf[0];
-            pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u||||||%u||%u||%u|",
-                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId().c_str(), GetLev(), _playerData.gold, _playerData.qqvipl, cfg.serverNum, platform);
+            pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u|||%u|||%u||%u||%u|",
+                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId().c_str(), GetLev(), _playerData.gold, getVipLevel(), _playerData.qqvipl, cfg.serverNum, platform);
 
             m_ulog->SetUserMsg(buf);
             if (platform != WEBDOWNLOAD)
@@ -1254,7 +1254,7 @@ namespace GObject
                     for (UInt8 j = 0; j < 6; ++j)
                     {
                         ied.gems[j] = gemId[cls-1][i][j];
-                        DB4().PushUpdateData("UPDATE `equipment` SET `enchant` = %u, `sockets` = %u, `socket1` = %u, `socket2` = %u, `socket3` = %u, `socket4` = %u, `socket5` = %u, `socket6` = %u, `attrType1` = %u, `attrValue1` = %d, `attrType2` = %u, `attrValue2` = %d, `attrType3` = %u, `attrValue3` = %d WHERE `id` = %"I64_FMT"u", ied.enchant, ied.sockets, ied.gems[0], ied.gems[1], ied.gems[2], ied.gems[3], ied.gems[4], ied.gems[5], ied.extraAttr2.type1, ied.extraAttr2.value1, ied.extraAttr2.type2, ied.extraAttr2.value2, ied.extraAttr2.type3, ied.extraAttr2.value3, ie->getId());
+                        DB4().PushUpdateData("UPDATE `equipment` SET `enchant` = %u, `sockets` = %u, `socket1` = %u, `socket2` = %u, `socket3` = %u, `socket4` = %u, `socket5` = %u, `socket6` = %u, `attrType1` = %u, `attrValue1` = %d, `attrType2` = %u, `attrValue2` = %d, `attrType3` = %u, `attrValue3` = %d WHERE `id` = %u", ied.enchant, ied.sockets, ied.gems[0], ied.gems[1], ied.gems[2], ied.gems[3], ied.gems[4], ied.gems[5], ied.extraAttr2.type1, ied.extraAttr2.value1, ied.extraAttr2.type2, ied.extraAttr2.value2, ied.extraAttr2.type3, ied.extraAttr2.value3, ie->getId());
                     }
                     GetPackage()->SendSingleEquipData(ie);
                 }
@@ -6514,8 +6514,16 @@ namespace GObject
             totalCnt = 0;
         }
 
-        copy = freeCnt + goldCnt + currentCnt;
-        copyMax = GObject::PlayerCopy::getFreeCount() + GObject::PlayerCopy::getGoldCount(vipLevel) + totalCnt;
+        UInt8 currentCnt2 = 0;
+        UInt8 totalCnt2 = 0;
+        if(this->isQQVIP() && World::getQQVipAct()){
+            currentCnt2 = this->GetVar(VAR_QQVIP_CNT);
+            totalCnt2 = 1;
+            if(currentCnt2 > totalCnt2)
+                currentCnt2 = 0;
+        }
+        copy = freeCnt + goldCnt + currentCnt + currentCnt2;
+        copyMax = GObject::PlayerCopy::getFreeCount() + GObject::PlayerCopy::getGoldCount(vipLevel) + totalCnt + totalCnt2;
 
         UInt32 now = TimeUtil::Now();
         if(now >= _playerData.dungeonEnd)
@@ -6583,7 +6591,16 @@ namespace GObject
             totalDiamondCnt = 0;
         }
 
-        st << cnt << static_cast<UInt8>(freeCnt + goldCnt + currentDiamondCnt) << static_cast<UInt8>(GObject::PlayerCopy::getFreeCount()) << static_cast<UInt8>(GObject::PlayerCopy::getGoldCount(vipLevel)) << static_cast<UInt8>(totalDiamondCnt);
+        UInt8 currentCnt2 = 0;
+        UInt8 totalCnt2 = 0;
+        if(this->isQQVIP() && World::getQQVipAct()){
+            currentCnt2 = this->GetVar(VAR_QQVIP_CNT);
+            totalCnt2 = 1;
+            if(currentCnt2 > totalCnt2)
+                currentCnt2 = 0;
+        }
+
+        st << cnt << static_cast<UInt8>(freeCnt + goldCnt + currentDiamondCnt + currentCnt2) << static_cast<UInt8>(GObject::PlayerCopy::getFreeCount()) << static_cast<UInt8>(GObject::PlayerCopy::getGoldCount(vipLevel)) << static_cast<UInt8>(totalDiamondCnt) << static_cast<UInt8>(totalCnt2);
         if(cnt)
         {
             playerCopy.buildInfo(this, st);
@@ -7295,12 +7312,6 @@ namespace GObject
 			h = 15;
 		for(UInt32 j = l; j <= h; ++j)
 		{
-			SYSMSG(title, 256);
-			SYSMSGV(content, 257, j);
-			Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
-			if(mail == NULL)
-				continue;
-
 			const UInt32 vipTable[16][12] =
             {
                 {450,1,0,0,0,0,0,0,0,0,0,0},
@@ -7320,6 +7331,12 @@ namespace GObject
                 {464,1,0,0,0,0,0,0,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0,0,0},
             };
+
+			SYSMSG(title, 256);
+			SYSMSGV(content, 257, vipTable[j-1][0]);
+			Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+			if(mail == NULL)
+				continue;
 
 			MailPackage::MailItem mitem[6];
 			UInt32 mcount = 0;
@@ -8186,6 +8203,18 @@ namespace GObject
         }
     }
 
+    float Player::getPracticeIncByQQVip()
+    {
+        if(isQQVIP() && World::getQQVipAct())
+        {
+            return 0.1;
+        }
+        else
+        {
+            return 0.0;
+        }
+    }
+
     bool Player::accPractice()
     {
         UInt32 goldUse = GData::moneyNeed[GData::INSTANTPRACTICE].gold;
@@ -8497,14 +8526,19 @@ namespace GObject
             UInt8 qqvipl = 0;
             UInt8 flag = 0;
 
-            if (blue || qplus)
+            if (blue)
             {
                 flag = 8*(_playerData.qqvipl1 / 10);
                 qqvipl = _playerData.qqvipl1 % 10;
             }
             else
             {
-                if (_playerData.qqvipl >= 40)
+                if(qplus && World::getQQVipAct() && _playerData.qqvipl1 >= 40 && _playerData.qqvipl1 <= 49)
+                {
+                    flag = 8*((_playerData.qqvipl1-20) / 10);
+                    qqvipl = _playerData.qqvipl1 % 10;
+                }
+                else if (_playerData.qqvipl >= 40)
                 {
                     flag = 8*((_playerData.qqvipl-20) / 10);
                     qqvipl = _playerData.qqvipl % 10;
@@ -8630,14 +8664,23 @@ namespace GObject
                 }
             }
         }
-        else if (_playerData.qqvipl < 20 || _playerData.qqvipl >= 40 || ((domain == 11 || domain == 4) && d3d6 == 0 && _playerData.qqvipl1 > 0))
+        else if (_playerData.qqvipl < 20 || _playerData.qqvipl >= 40 || (domain == 4 && _playerData.qqvipl1 >= 40) ||
+                ((domain == 11 || domain == 4) && d3d6 == 0 && _playerData.qqvipl1 > 0))
         {
             UInt8 qqvipl = 0;
             UInt8 flag = 0;
             if ((domain == 11 || domain == 4) && d3d6 == 0 && _playerData.qqvipl1 > 0)
             {
-                qqvipl = _playerData.qqvipl1;
-                flag = 8*(_playerData.qqvipl1 / 10);
+                if (World::getQQVipAct() && _playerData.qqvipl1 >= 40 && _playerData.qqvipl1 <= 49)
+                {
+                    qqvipl = _playerData.qqvipl1;
+                    flag = 8*((_playerData.qqvipl1-20) / 10);
+                }
+                else
+                {
+                    qqvipl = _playerData.qqvipl1;
+                    flag = 8*(_playerData.qqvipl1 / 10);
+                }
             }
             else
             {
@@ -10597,6 +10640,20 @@ namespace GObject
 
     void Player::recvYBBuf(UInt8 type)
     {
+        if(this->isQQVIP() && World::getQQVipAct() && type == 2)
+        {
+            UInt32 qqbuf = GetVar(VAR_QQVIP_BUF);
+            if(!qqbuf)
+            {
+                UInt32 now = TimeUtil::Now();
+                setBuffData(PLAYER_BUFF_QQVIPBUF, now + 60 * 60);
+                SetVar(VAR_QQVIP_BUF, 1);
+                //sendYBBufInfo(0, 1);
+                sendYBBufInfo(GetVar(VAR_YBBUF), GetVar(VAR_QQVIP_BUF));
+            }
+            return;
+        }
+
         if((this->isBD() && World::getBlueDiamondAct()) || (this->isYD() && World::getYellowDiamondAct()))
         {
             UInt32 ybbuf = GetVar(VAR_YBBUF);
@@ -10627,14 +10684,16 @@ namespace GObject
                 SetVar(VAR_YBBUF, ybbuf);
             }
 
-            sendYBBufInfo(ybbuf);
+            //sendYBBufInfo(ybbuf, 0);
+            sendYBBufInfo(GetVar(VAR_YBBUF), GetVar(VAR_QQVIP_BUF));
         }
     }
 
-    void Player::sendYBBufInfo(UInt32 ybbuf)
+    void Player::sendYBBufInfo(UInt32 ybbuf, UInt32 qqvipbuf)
     {
         Stream st(REP::YBBUF);
-        st << static_cast<UInt8>((ybbuf >> 16) & 0xFFFF) << static_cast<UInt8>(ybbuf & 0xFFFF) << Stream::eos;
+        UInt8 qqbuf = qqvipbuf ? true : false;
+        st << static_cast<UInt8>((ybbuf >> 16) & 0xFFFF) << static_cast<UInt8>(ybbuf & 0xFFFF) << qqbuf << Stream::eos;
         send(st);
     }
 

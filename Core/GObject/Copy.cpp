@@ -123,8 +123,16 @@ void PlayerCopy::sendInfo(Player* pl, UInt8 id)
         count = 0;
         st << count;
     }
+    //st << count;
+    count = 0;
+    if(pl->isQQVIP() && World::getQQVipAct()){
+        count = pl->GetVar(VAR_QQVIP_CNT);
+        if(count > PRIVILEGE_COUNT)
+            count = 0;
+    }
     st << count;
-
+    count = 1;
+    st << count;
     st << Stream::eos;
     pl->send(st);
 }
@@ -152,7 +160,7 @@ bool copyCheckLevel(Player* pl, UInt8 id)
     if (!pl)
         return false;
 
-    if(id == 0xff)
+    if(id == 0xff || id == 0xfe)
     {
         UInt8 realCopyId = GetCopyIdBySpots(PLAYER_DATA(pl, location));
         id = realCopyId;
@@ -200,6 +208,17 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
         } else if(pl->isYD() && World::getYellowDiamondAct()) {
             if(pl->GetVar(VAR_DIAMOND_YELLOW) < PRIVILEGE_COUNT) {
                 pl->AddVar(VAR_DIAMOND_YELLOW, 1);
+                return 0;
+            }
+        }
+        SYSMSG_SENDV(2000, pl);
+        return 1;
+    }
+    if(id == 0xfe)
+    {
+        if(pl->isQQVIP() && World::getQQVipAct()){
+            if(pl->GetVar(VAR_QQVIP_CNT) < PRIVILEGE_COUNT){
+                pl->AddVar(VAR_QQVIP_CNT, 1);
                 return 0;
             }
         }
@@ -267,6 +286,15 @@ void PlayerCopy::enter(Player* pl, UInt8 id)
             }
         }
     }
+    if(id == 0xfe)
+    {
+        if(pl->isQQVIP() && World::getQQVipAct()){
+            if(pl->GetVar(VAR_QQVIP_CNT) >= PRIVILEGE_COUNT) {
+                pl->sendMsgCode(0, 2000);
+                return;
+            }
+        }
+    }
 
     CopyData& tcd = getCopyData(pl, id, true);
     if (tcd.floor && tcd.spot)
@@ -274,7 +302,7 @@ void PlayerCopy::enter(Player* pl, UInt8 id)
 
     UInt8 lootlvl = 0;
     UInt8 ret = checkCopy(pl, id, lootlvl);
-    if(id == 0xff)
+    if(id == 0xff || id == 0xfe)
     {
         UInt8 realCopyId = GetCopyIdBySpots(PLAYER_DATA(pl, location));
         pl->setDiamondPrivilege(true);
@@ -583,7 +611,7 @@ CopyData& PlayerCopy::getCopyData(Player* pl, UInt64 playerId, UInt8 id, bool up
 {
     static CopyData nulldata;
     UInt8 idTmp = id;
-    if(id == 0xff)
+    if(id == 0xff || id == 0xfe)
     {
         UInt8 realCopyId = GetCopyIdBySpots(PLAYER_DATA(pl, location));
         id = realCopyId;
@@ -594,7 +622,7 @@ CopyData& PlayerCopy::getCopyData(Player* pl, UInt64 playerId, UInt8 id, bool up
                 playerId, id, cd.floor, cd.spot);
     }
 
-    if(idTmp != 0xff)
+    if(idTmp != 0xff && idTmp != 0xfe)
         getCount(pl, NULL, NULL);
     return cd;
 }
