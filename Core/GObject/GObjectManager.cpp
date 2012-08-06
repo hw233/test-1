@@ -75,7 +75,7 @@ namespace GObject
     UInt32 GObjectManager::_split_cost;
     UInt32 GObjectManager::_forge_cost;
     UInt32 GObjectManager::_split_chance[4][2];
-    UInt32 GObjectManager::_merge_chance[9];
+    UInt32 GObjectManager::_merge_chance[11];
     UInt32 GObjectManager::_enchant_chance[2][6][12];
     UInt8  GObjectManager::_enchant_max[11];
 
