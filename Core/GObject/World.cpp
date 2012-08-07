@@ -103,6 +103,7 @@ bool World::_gemmergeact = false;
 bool World::_bluediamondact = false;
 bool World::_yellowdiamondact = false;
 bool World::_qqvipact = false;
+bool World::_fallact = false;
 bool World::_qqgameact = false;
 void* World::_recalcwd = NULL;
 bool World::_june = false;

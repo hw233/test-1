@@ -118,6 +118,7 @@ namespace Script
         lua_tinker::def(_L, "getBlueDiamondAct", GObject::World::getBlueDiamondAct);
         lua_tinker::def(_L, "getYellowDiamondAct", GObject::World::getYellowDiamondAct);
         lua_tinker::def(_L, "getQQVipAct", GObject::World::getQQVipAct);
+        lua_tinker::def(_L, "getFallAct", GObject::World::getFallAct);
         lua_tinker::def(_L, "getQQGameAct", GObject::World::getQQGameAct);
         lua_tinker::def(_L, "getRechargeNextRet", GObject::World::getRechargeNextRet);
         lua_tinker::def(_L, "setRechargeNextRetStart", GObject::World::setRechargeNextRetStart);
@@ -253,6 +254,8 @@ namespace Script
         CLASS_DEF(Player, hasRealItemAward);
         CLASS_DEF(Player, getRealItemAward);
         CLASS_DEF(Player, getMoneyArena);
+		CLASS_DEF(Player, getQQVipPrivilege);
+		CLASS_DEF(Player, setQQVipPrivilege);
 
         CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);

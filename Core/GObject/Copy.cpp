@@ -302,10 +302,16 @@ void PlayerCopy::enter(Player* pl, UInt8 id)
 
     UInt8 lootlvl = 0;
     UInt8 ret = checkCopy(pl, id, lootlvl);
-    if(id == 0xff || id == 0xfe)
+    if(id == 0xff)
     {
         UInt8 realCopyId = GetCopyIdBySpots(PLAYER_DATA(pl, location));
         pl->setDiamondPrivilege(true);
+        id = realCopyId;
+    }
+    else if(id == 0xfe)
+    {
+        UInt8 realCopyId = GetCopyIdBySpots(PLAYER_DATA(pl, location));
+        pl->setQQVipPrivilege(true);
         id = realCopyId;
     }
     if (!ret) {
