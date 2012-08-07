@@ -10953,6 +10953,8 @@ namespace GObject
     //玩家每日签到接口
     void Player::ActivitySignIn()
     {
+        if(GetActivityMgr()->GetFlag(AtySignIn) != 0)
+            return;
         UInt32 day = 1;
         UInt32 mon = 1;
         UInt32 year = 2012;
