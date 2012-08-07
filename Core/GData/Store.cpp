@@ -67,7 +67,7 @@ void Store::addExchange(UInt8 type, UInt32 itemId, UInt32 priceID, UInt32 priceN
     return;
 }
 
-void Store::addNormalDiscount(UInt32 itemId, UInt32 discountNum)
+void Store::addNormalDiscount(UInt32 itemId, UInt32 discountNum, UInt32 num)
 {
     // lua脚本自动生成三五八折的限购商品表 
     UInt8 type = 0;
@@ -89,7 +89,7 @@ void Store::addNormalDiscount(UInt32 itemId, UInt32 discountNum)
     Discount discount;
     discount.itemID = itemId;
     discount.discountType = type;
-    discount.limitCount = discountNum + 4 / (_itemTypeCountDiscount[DISCOUNTEND - DISCOUNT][type] + 1);
+    discount.limitCount = discountNum + 4 / num;
     discount.beginTime = now;
     discount.endTime = TimeUtil::SharpWeek(1, now);
     discount.priceOriginal = getPrice(itemId);
@@ -139,7 +139,7 @@ UInt8 Store::addSpecialDiscountFromBS(Discount discount)
     // GM通过后台发送新增限购活动
     UInt32 now = TimeUtil::Now();
     if (discount.itemID == 0 ||
-            discount.beginTime < now)
+            discount.endTime < now)
     {
         return 1;
     }
@@ -149,7 +149,6 @@ UInt8 Store::addSpecialDiscountFromBS(Discount discount)
     }
     _itemsDiscount[DISCOUNTEND - DISCOUNT].push_back(discount);
     ++ (_itemTypeCountDiscount[DISCOUNTEND - DISCOUNT][discount.discountType]);
-    storeDiscount();
     return 0;
 }
 
@@ -158,26 +157,42 @@ void Store::querySpecialDiscountFromBS()
     // TODO: GM通过后台查询现有的限购活动
 }
 
-void Store::clearSpecialDiscountFromBS()
+UInt8 Store::clearSpecialDiscountFromBS(UInt8 type /* = 0 */)
 {
     // GM通过后台发送清空限购活动
-    std::vector<Discount>& items = _itemsDiscount[DISCOUNTEND - DISCOUNT];
-    for(std::vector<Discount>::iterator it = items.begin(); it != items.end(); )
+    UInt8 result = 1;
+    if (type)
     {
-#if 1
-        if ( ((*it).discountType) <= 6 && ((*it).discountType >= 4))
+        std::vector<Discount>& items = _itemsDiscount[DISCOUNTEND - DISCOUNT];
+        for(std::vector<Discount>::iterator it = items.begin(); it != items.end(); )
         {
-            it = items.erase(it);
+            if ( (*it).discountType == type)
+            {
+                it = items.erase(it);
+            }
+            else
+            {
+                ++ it;
+            }
         }
-        else
+    }
+    else
+    {
+        std::vector<Discount>& items = _itemsDiscount[DISCOUNTEND - DISCOUNT];
+        for(std::vector<Discount>::iterator it = items.begin(); it != items.end(); )
         {
-            ++ it;
+            if ( ((*it).discountType) <= 6 && ((*it).discountType >= 4))
+            {
+                it = items.erase(it);
+            }
+            else
+            {
+                ++ it;
+            }
         }
-#else
-        ++ it;
-#endif
     }
     storeDiscount();
+    return result;
 }
 
 bool Store::needResetDiscount()
@@ -383,7 +398,7 @@ void Store::clearSpecialDiscount()
     UInt32 now = TimeUtil::Now();
     for(std::vector<Discount>::iterator it = items.begin(); it != items.end(); )
     {
-        if ((*it).endTime <= (now + 30))
+        if ((*it).endTime <= (now + 60))
         {
             if ((*it).discountType < 7)
             {

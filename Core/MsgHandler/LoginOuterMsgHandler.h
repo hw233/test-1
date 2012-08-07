@@ -2183,7 +2183,7 @@ void AddDiscountFromBs(LoginMsgHdr& hdr, const void* data)
     br >> discount.discountType;
     br >> discount.beginTime;
     br >> discount.endTime;
-    UInt8 count;
+    UInt16 count;
     br >> count;
     UInt8 result = 0;
     for (UInt8 i = 0; i < count; ++i)
@@ -2198,6 +2198,7 @@ void AddDiscountFromBs(LoginMsgHdr& hdr, const void* data)
             break;
         }
     }
+    GData::store.storeDiscount();
 
     Stream st(SPEP::ADDDISCOUNT);
     st << result << Stream::eos;

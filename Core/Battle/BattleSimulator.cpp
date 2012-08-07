@@ -339,6 +339,8 @@ void BattleSimulator::start(UInt8 prevWin)
                         portrait = 1076;
                     else if (bf->getFighter()->getFashionTypeId() == 1705)
                         portrait = 1077;
+                    else if (bf->getFighter()->getFashionTypeId() == 1706)
+                        portrait = 1088;
 
                     if(bf->getBuffData(FIGHTER_BUFF_CRMASGIRL, now))
                         portrait = 1058;

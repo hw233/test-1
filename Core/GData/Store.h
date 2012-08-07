@@ -51,11 +51,11 @@ public:
 	void add(UInt8 type, UInt32 itemId, UInt32 price);
     void addDiscountFromDB( UInt16 itemID, UInt8 discountType, UInt32 limitCount, UInt32 beginTime, UInt32 endTime, UInt16 priceOriginal, UInt16 priceDiscount);
 	void addExchange(UInt8 type, UInt32 itemId, UInt32 priceID, UInt32 priceNum);
-    void addNormalDiscount(UInt32 itemId, UInt32 discount);
+    void addNormalDiscount(UInt32 itemId, UInt32 discount, UInt32 num);
     void addSpecialDiscount();
     UInt8 addSpecialDiscountFromBS(Discount discount);
     void querySpecialDiscountFromBS();
-    void clearSpecialDiscountFromBS();
+    UInt8 clearSpecialDiscountFromBS(UInt8 type = 0);
     bool needResetDiscount();
     void storeDiscount();
 	void sendList(UInt8 type, GObject::Player *);

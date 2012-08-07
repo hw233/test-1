@@ -1,6 +1,6 @@
 
 -- 限时折扣
-testTm = { ['year'] = 2012, ['month'] = 8, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+testTm = { ['year'] = 2012, ['month'] = 8, ['day'] = 1, ['hour'] = 21, ['min'] = 0, ['sec'] = 0 };
 
 local discount_items = {
     465,466,516,547,57,56,500,15,501,503,505,506,508,511,512,513,514,515,517,
@@ -71,10 +71,11 @@ function resetDiscount()
         for i = 1, num do
             local n = math.random(1, #discount_items)
             print("id: " .. discount_items[n] .. " discount: " .. discounts[d])
-            store:addNormalDiscount(discount_items[n], discounts[d])
+            store:addNormalDiscount(discount_items[n], discounts[d], num)
             table.remove(discount_items, n);
         end
     end
+    store:addSpecialDiscount()
 end
 
 function discount(store)
@@ -83,6 +84,8 @@ function discount(store)
     local tm3 = { ['year'] = 2012, ['month'] = 7, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local tm4 = { ['year'] = 2012, ['month'] = 7, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local tm5 = { ['year'] = 2012, ['month'] = 7, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local tm6 = { ['year'] = 2012, ['month'] = 7, ['day'] = 31, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local tm7 = { ['year'] = 2012, ['month'] = 8, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
     local now = os.time() + 30
     local t1 = os.time(tm1)
@@ -90,6 +93,8 @@ function discount(store)
     local t3 = os.time(tm3)
     local t4 = os.time(tm4)
     local t5 = os.time(tm5)
+    local t6 = os.time(tm6)
+    local t7 = os.time(tm7)
 
     local day = 86400
     local week = 604800
@@ -130,6 +135,14 @@ function discount(store)
         store:add(2,5107,1850)
         store:add(2,5117,1850)
     end
+
+    if now >= t6 and now < t6 + day then
+        store:add(2,9095,100)
+    end
+
+    if now >= t7 and now < t7 + 7*day then
+        store:add(2,9099,400)
+    end
 end
 
 
@@ -138,6 +151,7 @@ function loadStore()
     store:clear()
     store:clearSpecialDiscount()
 
+    --store:discountLimit()
 
     discount(store)
 
@@ -397,18 +411,14 @@ function loadStore()
     store:add(13,1304,6000)
     store:add(14,507,2000)
     store:add(14,509,2000)
-
     if store:needResetDiscount() then
         print ("needResetDiscount")
         resetDiscount()
     else
         print ("Don't needResetDiscount")
     end
-
-    store:addSpecialDiscount()
-    print ("add SpecialDisocunt")
-
     store:storeDiscount()
+
     store:update()
 end
 

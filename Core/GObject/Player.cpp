@@ -1013,8 +1013,8 @@ namespace GObject
         {
             char buf[1024] = {0};
             char* pbuf = &buf[0];
-            pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u||||||%u||%u||%u|",
-                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId().c_str(), GetLev(), _playerData.gold, _playerData.qqvipl, cfg.serverNum, platform);
+            pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u|||%u|||%u||%u||%u|",
+                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId().c_str(), GetLev(), _playerData.gold, getVipLevel(), _playerData.qqvipl, cfg.serverNum, platform);
 
             m_ulog->SetUserMsg(buf);
             if (platform != WEBDOWNLOAD)
@@ -8526,14 +8526,19 @@ namespace GObject
             UInt8 qqvipl = 0;
             UInt8 flag = 0;
 
-            if (blue || qplus)
+            if (blue)
             {
                 flag = 8*(_playerData.qqvipl1 / 10);
                 qqvipl = _playerData.qqvipl1 % 10;
             }
             else
             {
-                if (_playerData.qqvipl >= 40)
+                if(qplus && World::getQQVipAct() && _playerData.qqvipl1 >= 40 && _playerData.qqvipl1 <= 49)
+                {
+                    flag = 8*((_playerData.qqvipl1-20) / 10);
+                    qqvipl = _playerData.qqvipl1 % 10;
+                }
+                else if (_playerData.qqvipl >= 40)
                 {
                     flag = 8*((_playerData.qqvipl-20) / 10);
                     qqvipl = _playerData.qqvipl % 10;
@@ -8659,14 +8664,23 @@ namespace GObject
                 }
             }
         }
-        else if (_playerData.qqvipl < 20 || _playerData.qqvipl >= 40 || ((domain == 11 || domain == 4) && d3d6 == 0 && _playerData.qqvipl1 > 0))
+        else if (_playerData.qqvipl < 20 || _playerData.qqvipl >= 40 || (domain == 4 && _playerData.qqvipl1 >= 40) ||
+                ((domain == 11 || domain == 4) && d3d6 == 0 && _playerData.qqvipl1 > 0))
         {
             UInt8 qqvipl = 0;
             UInt8 flag = 0;
             if ((domain == 11 || domain == 4) && d3d6 == 0 && _playerData.qqvipl1 > 0)
             {
-                qqvipl = _playerData.qqvipl1;
-                flag = 8*(_playerData.qqvipl1 / 10);
+                if (World::getQQVipAct() && _playerData.qqvipl1 >= 40 && _playerData.qqvipl1 <= 49)
+                {
+                    qqvipl = _playerData.qqvipl1;
+                    flag = 8*((_playerData.qqvipl1-20) / 10);
+                }
+                else
+                {
+                    qqvipl = _playerData.qqvipl1;
+                    flag = 8*(_playerData.qqvipl1 / 10);
+                }
             }
             else
             {
@@ -10718,9 +10732,10 @@ namespace GObject
             if(!qqbuf)
             {
                 UInt32 now = TimeUtil::Now();
-                setBuffData(PLAYER_BUFF_YBUF, now + 60 * 60);
-                SetVar(PLAYER_BUFF_QQVIPBUF, 1);
-                sendYBBufInfo(0, 1);
+                setBuffData(PLAYER_BUFF_QQVIPBUF, now + 60 * 60);
+                SetVar(VAR_QQVIP_BUF, 1);
+                //sendYBBufInfo(0, 1);
+                sendYBBufInfo(GetVar(VAR_YBBUF), GetVar(VAR_QQVIP_BUF));
             }
             return;
         }
@@ -10755,7 +10770,8 @@ namespace GObject
                 SetVar(VAR_YBBUF, ybbuf);
             }
 
-            sendYBBufInfo(ybbuf, 0);
+            //sendYBBufInfo(ybbuf, 0);
+            sendYBBufInfo(GetVar(VAR_YBBUF), GetVar(VAR_QQVIP_BUF));
         }
     }
 
@@ -11023,6 +11039,8 @@ namespace GObject
     //玩家每日签到接口
     void Player::ActivitySignIn()
     {
+        if(GetActivityMgr()->GetFlag(AtySignIn) != 0)
+            return;
         UInt32 day = 1;
         UInt32 mon = 1;
         UInt32 year = 2012;

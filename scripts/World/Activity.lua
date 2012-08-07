@@ -97,6 +97,11 @@ function is6_29()
     return is_6_29
 end
 
+is_0810_0901 = false
+function is0810_0901()
+    return is_0810_0901
+end
+
 function onActivityCheck(tm)
   local osmax = oldServersMax[serverName]
   if osmax ~= nil and serverNum <= osmax then
@@ -476,6 +481,24 @@ function onActivityCheck(tm)
           setConsumeActive(false)
       end
 
+      if tm >= actTime87 and tm < actTime88 then
+          setConsumeActive(true)
+      else
+          setConsumeActive(false)
+      end
+
+      if tm >= actTime89 and tm < actTime90 then
+          setQQVipAct(true)
+      else
+          setQQVipAct(false)
+      end
+
+      if tm >= actTime91 and tm < actTime92 then
+          is_0810_0901 = true
+      else
+          is_0810_0901 = false
+      end
+
       setShuoShuo(true);
   end
 
@@ -543,6 +566,11 @@ function initActTime(y, m, d)
   local  SerStartTm35= { ['year'] = 2012, ['month'] = 7, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm36= { ['year'] = 2012, ['month'] = 7, ['day'] = 17, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm37= { ['year'] = 2012, ['month'] = 7, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm38= { ['year'] = 2012, ['month'] = 8, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- vip会员
+  local  SerStartTm39= { ['year'] = 2012, ['month'] = 8, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 坐骑6销售时间
+  local  SerStartTm40= { ['year'] = 2012, ['month'] = 8, ['day'] = 10, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm102 = { ['year'] = 2012, ['month'] = 6, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -689,6 +717,15 @@ function initActTime(y, m, d)
 
   actTime85 = os.time(SerStartTm37);
   actTime86 = os.time(SerStartTm37) + 7 * 86400;
+
+  actTime87 = os.time(SerStartTm38);
+  actTime88 = os.time(SerStartTm38) + 7 * 86400;
+
+  actTime89 = os.time(SerStartTm39);
+  actTime90 = os.time(SerStartTm39) + 3 * 86400;
+
+  actTime91= os.time(SerStartTm40);
+  actTime92= os.time(SerStartTm40) + 23 * 86400;
 
   actTime101 = os.time(SerStartTm101);
   actTime102 = os.time(SerStartTm101) + 8 * 86400;
