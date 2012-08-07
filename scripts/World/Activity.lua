@@ -102,6 +102,11 @@ function is0810_0901()
     return is_0810_0901
 end
 
+is_0808_0814 = false
+function is0808_0814()
+    return is_0808_0814
+end
+
 function onActivityCheck(tm)
   local osmax = oldServersMax[serverName]
   if osmax ~= nil and serverNum <= osmax then
@@ -499,6 +504,14 @@ function onActivityCheck(tm)
           is_0810_0901 = false
       end
 
+      if tm >= actTime93 and tm < actTime94 then
+          setFallAct(true)
+          is_0808_0814 = true
+      else
+          setFallAct(false)
+          is_0808_0814 = false
+      end
+
       setShuoShuo(true);
   end
 
@@ -571,6 +584,8 @@ function initActTime(y, m, d)
   local  SerStartTm39= { ['year'] = 2012, ['month'] = 8, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 坐骑6销售时间
   local  SerStartTm40= { ['year'] = 2012, ['month'] = 8, ['day'] = 10, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 掉落活动
+  local  SerStartTm41= { ['year'] = 2012, ['month'] = 8, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm102 = { ['year'] = 2012, ['month'] = 6, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -726,6 +741,9 @@ function initActTime(y, m, d)
 
   actTime91= os.time(SerStartTm40);
   actTime92= os.time(SerStartTm40) + 23 * 86400;
+
+  actTime93= os.time(SerStartTm41);
+  actTime94= os.time(SerStartTm41) + 7 * 86400;
 
   actTime101 = os.time(SerStartTm101);
   actTime102 = os.time(SerStartTm101) + 8 * 86400;

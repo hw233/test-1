@@ -736,7 +736,7 @@ namespace GObject
             //if (_playerData.qqvipl >= 10 && _playerData.qqvipl <= 19)
             if (_playerData.qqvipl >= 11 && _playerData.qqvipl <= 19) //qqvipl为10代表蓝钻0级，不是蓝钻用户
                 return true;
-            if (_playerData.qqvipl >= 20 && _playerData.qqvipl <= 29 && _playerData.qqvipl1 >= 11 && _playerData.qqvipl1 <= 19) //qqvipli1为10代表蓝钻0级，不是蓝钻用户
+            if (_playerData.qqvipl >= 21 && _playerData.qqvipl <= 29 && _playerData.qqvipl1 >= 11 && _playerData.qqvipl1 <= 19) //qqvipli1为10代表蓝钻0级，不是蓝钻用户
                     return true;
             return false;
         }
@@ -1351,6 +1351,7 @@ namespace GObject
         UInt8 _justice_roar;
         float _spirit_factor;
         bool _diamond_privilege;
+        bool _qqvip_privilege;
         UInt32 _athlRivalBuf;
     public:
         static UInt8 _yaMenActiveCount;
@@ -1378,6 +1379,9 @@ namespace GObject
 
         inline void setDiamondPrivilege(UInt8 v) { _diamond_privilege = v; }
         inline UInt8 getDiamondPrivilege() { return _diamond_privilege; }
+
+        inline void setQQVipPrivilege(UInt8 v) { _qqvip_privilege = v; }
+        inline UInt8 getQQVipPrivilege() { return _qqvip_privilege; }
 
         inline void setAthlRivalBuff(UInt32 v) { _athlRivalBuf = v; }
         inline UInt32 getAthlRivalBuff() { return _athlRivalBuf; }

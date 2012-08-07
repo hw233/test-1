@@ -173,6 +173,9 @@ end
 
 function onDungeonWin(player, id, count)
     June(player, 0);
+    if count > 0 then
+        FallActivity(player, count)
+    end
 end
 
 function onClanBattleAttend(player)
@@ -805,6 +808,16 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     MayDay(player, lootlvl)
     June(player, lootlvl);
     LuckyDrawBox(player, id)
+    if player:getQQVipPrivilege() == true then
+        player:setQQVipPrivilege(false)
+        FallActivity(player, 1)
+    else
+        if lootlvl == 0 then
+            FallActivity(player, 1)
+        else
+            FallActivity(player, lootlvl)
+        end
+    end
 end
 
 
@@ -821,6 +834,11 @@ function onFrontMapWin(player, id, spot, lootlvl)
     ChingMingDay(player, lootlvl)
     MayDay(player, lootlvl)
     June(player, lootlvl);
+    if lootlvl == 0 then
+        FallActivity(player, 1)
+    else
+        FallActivity(player, lootlvl)
+    end
 end
 
 local vippack = {
@@ -1070,6 +1088,19 @@ function ChingMingDay(player, lootlvl)
         };
     local package = player:GetPackage();
     package:AddItem(481, itemNum[lootlvl], true);
+end
+
+function FallActivity(player, count)
+    if not getFallAct() then
+        return
+    end
+
+    if count > 3 then
+        count = 3
+    end
+
+    local package = player:GetPackage();
+    package:AddItem(9119, count, true);
 end
 
 function onLoginPF(player)

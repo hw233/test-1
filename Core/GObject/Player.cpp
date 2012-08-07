@@ -519,7 +519,7 @@ namespace GObject
 		_availInit(false), _vipLevel(0), _clan(NULL), _clanBattle(NULL), _flag(0), _gflag(0), _onlineDuration(0), _offlineTime(0),
 		_nextTavernUpdate(0), _nextBookStoreUpdate(0), _bossLevel(21), _ng(NULL), _lastNg(NULL),
 		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), m_autoCopyFailed(false),
-        _justice_roar(0), _spirit_factor(1.0f), _diamond_privilege(false), _athlRivalBuf(0), _worldBossHp(0), m_autoCopyComplete(0), hispot(0xFF), hitype(0), m_ulog(NULL),
+        _justice_roar(0), _spirit_factor(1.0f), _diamond_privilege(false), _qqvip_privilege(false), _athlRivalBuf(0), _worldBossHp(0), m_autoCopyComplete(0), hispot(0xFF), hitype(0), m_ulog(NULL),
         m_isOffical(false), m_sysDailog(false), m_hasTripod(false)
 	{
         m_ClanBattleStatus = 1;
@@ -7796,6 +7796,9 @@ namespace GObject
         }
 #else
 		char numstr[16];
+        char separator[2] = {32, 0};
+
+        std::string sepStr(separator);
 		sprintf(numstr, "%u", _playerData.title);
 		_battleName.clear();
 		_battleName = getClanName();
@@ -7807,7 +7810,8 @@ namespace GObject
 			_battleName += numstr;
 		}
         */
-		_battleName = _battleName + "\n" + numstr + "\n" + _playerData.name;
+		//_battleName = _battleName + "\n" + numstr + "\n" + _playerData.name;
+		_battleName = _battleName + sepStr + numstr + sepStr + _playerData.name;
 #endif
 	}
 
@@ -8533,7 +8537,7 @@ namespace GObject
             }
             else
             {
-                if(qplus && World::getQQVipAct() && _playerData.qqvipl1 >= 40 && _playerData.qqvipl1 <= 49)
+                if(qplus /*&& World::getQQVipAct()*/ && _playerData.qqvipl1 >= 40 && _playerData.qqvipl1 <= 49)
                 {
                     flag = 8*((_playerData.qqvipl1-20) / 10);
                     qqvipl = _playerData.qqvipl1 % 10;
