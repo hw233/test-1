@@ -12,6 +12,12 @@ namespace GData
 
 Store store;
 
+void Store::process (UInt32 now)
+{
+    // 每隔五分钟的定时器检测，检查限购状态
+    clearSpecialDiscount();
+}
+
 void Store::add( UInt8 type, UInt32 itemId, UInt32 price )
 {
     if(cfg.arenaPort == 0 && (itemId == ARENA_BET_ITEM1 || itemId == ARENA_BET_ITEM2))
@@ -79,13 +85,13 @@ void Store::addNormalDiscount(UInt32 itemId, UInt32 discountNum)
         default:
             break;
     }
-    UInt32 now = (UInt32)std::time(NULL);
+    UInt32 now = TimeUtil::Now() + 30;
     Discount discount;
     discount.itemID = itemId;
     discount.discountType = type;
     discount.limitCount = discountNum + 4 / (_itemTypeCountDiscount[DISCOUNTEND - DISCOUNT][type] + 1);
     discount.beginTime = now;
-    discount.endTime = TimeUtil::SharpWeek(1, now) - 3600 * 24;
+    discount.endTime = TimeUtil::SharpWeek(1, now);
     discount.priceOriginal = getPrice(itemId);
     discount.priceDiscount = getPrice(itemId) * discountNum / 10;
     _itemsDiscount[DISCOUNTEND - DISCOUNT].push_back(discount);
@@ -95,6 +101,7 @@ void Store::addNormalDiscount(UInt32 itemId, UInt32 discountNum)
 void Store::addSpecialDiscount()
 {
     // FIXME: 优化lua动态载入特殊限购活动
+    UInt32 now = TimeUtil::Now();
     lua_State* L = lua_open();
     luaL_openlibs(L); 
     {
@@ -114,6 +121,10 @@ void Store::addSpecialDiscount()
             discount.endTime = specialDiscount.get<UInt32>(5);
             discount.priceDiscount = specialDiscount.get<UInt16>(6);
             discount.priceOriginal = specialDiscount.get<UInt16>(7);
+            if (discount.endTime <= (now + 30))
+            {
+                continue;
+            }
             _itemsDiscount[DISCOUNTEND - DISCOUNT].push_back(discount);
             ++ (_itemTypeCountDiscount[DISCOUNTEND - DISCOUNT][discount.discountType]);
         }
@@ -126,7 +137,7 @@ void Store::addSpecialDiscount()
 UInt8 Store::addSpecialDiscountFromBS(Discount discount)
 {
     // GM通过后台发送新增限购活动
-    UInt32 now = (UInt32)std::time(NULL);
+    UInt32 now = TimeUtil::Now();
     if (discount.itemID == 0 ||
             discount.beginTime < now)
     {
@@ -138,6 +149,7 @@ UInt8 Store::addSpecialDiscountFromBS(Discount discount)
     }
     _itemsDiscount[DISCOUNTEND - DISCOUNT].push_back(discount);
     ++ (_itemTypeCountDiscount[DISCOUNTEND - DISCOUNT][discount.discountType]);
+    storeDiscount();
     return 0;
 }
 
@@ -165,6 +177,7 @@ void Store::clearSpecialDiscountFromBS()
         ++ it;
 #endif
     }
+    storeDiscount();
 }
 
 bool Store::needResetDiscount()
@@ -181,7 +194,7 @@ bool Store::needResetDiscount()
             if ((*it).discountType >= 7 && (*it).discountType <= 9)
             {
                 // 限购商品的过期时间检查
-                if ((*it).endTime > (UInt32)std::time(NULL))
+                if ((*it).endTime > TimeUtil::Now() + 30)
                 {
                     // 本周限购未过期
                     return false;
@@ -367,11 +380,20 @@ void Store::clearSpecialDiscount()
 {
     // 清除过期的限购打折信息
     std::vector<Discount>& items = _itemsDiscount[DISCOUNTEND - DISCOUNT];
+    UInt32 now = TimeUtil::Now();
     for(std::vector<Discount>::iterator it = items.begin(); it != items.end(); )
     {
-        if ((*it).endTime <= (UInt32)std::time(NULL))
+        if ((*it).endTime <= (now + 30))
         {
-            it = items.erase(it);
+            if ((*it).discountType < 7)
+            {
+                DB3().PushUpdateData("DELETE FROM `discount` \
+                        where `itemid` = %u and `type` = %u", \
+                        (*it).itemID, (*it).discountType);
+                it = items.erase(it);
+            }
+            else 
+                ++ it;
         }
         else
         {
@@ -397,20 +419,6 @@ void Store::storeDiscount()
     }
 }
 
-void Store::discountLimit()
-{
-    static UInt8 baseLimit[] = {3,5,8};
-    for (UInt8 n = 0; n < 3; ++n)
-    {
-        UInt8 c = 0;
-        for (UInt8 i = 0; i < _items[0].size() && c < 4; ++i)
-        {
-            if (((_items[0][i]>>16)&0xFFFF) == baseLimit[n])
-                ++c;
-        }
-        _discountLimit.push_back(baseLimit[n] + 4 / c);
-    }
-}
 
 UInt8 Store::getDiscountType(UInt8 columnIndex)
 {

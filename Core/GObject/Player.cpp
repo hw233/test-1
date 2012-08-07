@@ -9988,7 +9988,7 @@ namespace GObject
 
             UInt32 count = max - used;
 
-            UInt32 now = (UInt32)std::time(NULL);
+            UInt32 now = TimeUtil::Now();
 
             UInt32 time = GData::store.getBeginTimeByDiscountType(type);
             if (time > now)
@@ -10044,7 +10044,7 @@ namespace GObject
             UInt32 count = max - used;
 
             UInt32 time = GData::store.getEndTimeByDiscountType(type);
-            UInt32 now = (UInt32)std::time(NULL);
+            UInt32 now = TimeUtil::Now();
             if (time < now)
                 time = 0;
             else

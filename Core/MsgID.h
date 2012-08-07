@@ -652,11 +652,10 @@ namespace SPEQ
     const UInt16 JASON              = 0x11D;//PHP过来的JASON请求
     const UInt16 CFRIEND            = 0x11E;//设置成密友
         
+    // FIXME: GameClient.cpp:145(cmdTypes[]) expand.
     const UInt16 ADDDISCOUNT         = 0x121; // 增加限时活动
     const UInt16 QUERYDISCOUNT       = 0x122; // 查询限时活动
     const UInt16 CLEARDISCOUNT       = 0x123; // 清空限时活动
-
-
 }
 
 namespace SPEP

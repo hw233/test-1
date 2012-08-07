@@ -1857,59 +1857,8 @@ function sendConsumeMails1(player, ototal, ntotal)
     end
 end
 
-function sendConsumeMails2(player, ototal, ntotal)
-    local lvls = {
-        100,300,700,1300,2100,3100,4300,5700,7300,9100,11100,17900,31900,53900,85900,129900,
-    }
-
-    local items = {
-        {516,2,1, 514,2,1, 9093,2,1},
-        {500,1,1, 57,1,1},
-        {9093,1,1},
-        {512,1,1, 513,1,1, 503,1,1, 547,2,1, 515,1,1},
-        {517,2,1, 512,2,1},
-        {8000,2,1, 9092,1,1, 515,1,1, 509,2,1},
-        {9092,1,1, 9082,6,1},
-        {503,2,1, 8000,2,1},
-        {509,1,1, 507,1,1},
-        {9076,1,1, 1528,2,1, 515,2,1},
-        {9076,3,1, 9093,1,1, 515,1,1},
-        {9076,3,1, 549,2,1, 515,2,1, 9092,2,1},
-        {9076,3,1, 515,3,1, 9092,2,1, 9093,5,1},
-        {9076,6,1, 515,2,1},
-        {9076,6,1, 8000,10,1, 515,2,1},
-        {515,4,1, 549,1,1, 509,3,1, 507,3,1},
-    }
-
-    local olvl = calcRechargeLevel(lvls, ototal)
-    local nlvl = calcRechargeLevel(lvls, ntotal)
-
-    if nlvl == 0 or olvl == nlvl then
-        return
-    end
-
-    for k = olvl+1, nlvl do
-        if lvls[k] == nil or items[k] == nil then
-            return
-        end
-        local title = string.format(msg_105, lvls[k])
-        local ctx = string.format(msg_106, lvls[k])
-        sendItemPackageMail(player, title, ctx, items[k]);
-    end
-end
-
 function sendConsumeMails(player, ototal, ntotal)
-    local t1 = { ['year'] = 2012, ['month'] = 8, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-
-    local s1 = os.time(t1)
-
-    local now = os.time()
-
-    if now >= s1 then
-        sendConsumeMails2(player, ototal, ntotal);
-    else
-        sendConsumeMails1(player, ototal, ntotal);
-    end
+    sendConsumeMails1(player, ototal, ntotal);
 end
 
 local awardPool = {

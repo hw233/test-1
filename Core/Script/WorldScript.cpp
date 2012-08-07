@@ -170,7 +170,6 @@ void WorldScript::init()
 	class_def<GData::Store>("addExchange", &GData::Store::addExchange);
 	class_def<GData::Store>("needResetDiscount", &GData::Store::needResetDiscount);
 	class_def<GData::Store>("storeDiscount", &GData::Store::storeDiscount);
-	class_def<GData::Store>("discountLimit", &GData::Store::discountLimit);
     class_def<GData::Store>("addSpecialDiscount", &GData::Store::addSpecialDiscount);
     class_def<GData::Store>("addNormalDiscount", &GData::Store::addNormalDiscount);
 	class_def<GData::Store>("update", &GData::Store::makePacket);

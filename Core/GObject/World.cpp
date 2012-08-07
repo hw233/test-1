@@ -695,6 +695,11 @@ void World::World_Online_Log( void * )
 #endif
 }
 
+void World::World_Store_Check(void *)
+{
+    GData::store.process(TimeUtil::Now());
+}
+
 void World::World_Athletics_Check( void * )
 {
 	gAthleticsRank.TmExtraAward();
@@ -739,6 +744,7 @@ bool World::Init()
 	AddTimer(3600 * 4 * 1000, World_ChatItem_Purge);
 	AddTimer(5000, World_Multi_Check, this);
 	AddTimer(60 * 1000, World_One_Min, this);
+    AddTimer(60 * 1000 * 5, World_Store_Check);
 
 #ifdef _FB
     if(getJune())

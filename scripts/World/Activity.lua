@@ -476,19 +476,6 @@ function onActivityCheck(tm)
           setConsumeActive(false)
       end
 
-      if tm >= actTime87 and tm < actTime88 then
-          setConsumeActive(true)
-      else
-          setConsumeActive(false)
-      end
-
-      if tm >= actTime89 and tm < actTime90 then
-          print("setQQVipAct")
-          setQQVipAct(true)
-      else
-          setQQVipAct(false)
-      end
-
       setShuoShuo(true);
   end
 
@@ -556,9 +543,6 @@ function initActTime(y, m, d)
   local  SerStartTm35= { ['year'] = 2012, ['month'] = 7, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm36= { ['year'] = 2012, ['month'] = 7, ['day'] = 17, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm37= { ['year'] = 2012, ['month'] = 7, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTm38= { ['year'] = 2012, ['month'] = 8, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  -- vip会员
-  local  SerStartTm39= { ['year'] = 2012, ['month'] = 8, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm102 = { ['year'] = 2012, ['month'] = 6, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -705,12 +689,6 @@ function initActTime(y, m, d)
 
   actTime85 = os.time(SerStartTm37);
   actTime86 = os.time(SerStartTm37) + 7 * 86400;
-
-  actTime87 = os.time(SerStartTm38);
-  actTime88 = os.time(SerStartTm38) + 7 * 86400;
-
-  actTime89 = os.time(SerStartTm39);
-  actTime90 = os.time(SerStartTm39) + 300 * 86400;
 
   actTime101 = os.time(SerStartTm101);
   actTime102 = os.time(SerStartTm101) + 8 * 86400;

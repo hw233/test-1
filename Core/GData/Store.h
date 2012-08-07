@@ -47,6 +47,7 @@ struct Discount
 class Store
 {
 public:
+    void process(UInt32 now);
 	void add(UInt8 type, UInt32 itemId, UInt32 price);
     void addDiscountFromDB( UInt16 itemID, UInt8 discountType, UInt32 limitCount, UInt32 beginTime, UInt32 endTime, UInt16 priceOriginal, UInt16 priceDiscount);
 	void addExchange(UInt8 type, UInt32 itemId, UInt32 priceID, UInt32 priceNum);
@@ -66,7 +67,6 @@ public:
     void clearNormalDiscount();
     void clearSpecialDiscount();
     void resetDistcount() { _items[0].clear(); _discountLimit.clear(); }
-    void discountLimit();
     UInt8 getDiscountType(UInt8 columnIndex);
     UInt16 getDiscountLimit(UInt8 type);
     UInt8 getItemsByDiscount(UInt8 type, UInt16 items[4]);
