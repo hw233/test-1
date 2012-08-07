@@ -192,6 +192,7 @@ UInt8 Store::clearSpecialDiscountFromBS(UInt8 type /* = 0 */)
         }
     }
     storeDiscount();
+    makePacket();
     return result;
 }
 
@@ -301,6 +302,7 @@ void Store::makePacket()
 {
 	for(int i = 0; i <= PURCHASE2 - PURCHASE1; ++ i)
 	{
+        _storePacket[i].clear();
 		std::vector<UInt32>& items = _items[i];
 		_storePacket[i].init(REP::STORE_LIST);
 		_storePacket[i] << static_cast<UInt8>(PURCHASE1 + i) << static_cast<UInt8>(items.size());
@@ -313,6 +315,7 @@ void Store::makePacket()
 
     for(int i = 0; i <= PURCHASE4 - PURCHASE3; ++ i)
 	{
+        _storePacket2[i].clear();
 		std::vector<UInt32>& items = _items2[i];
 		_storePacket2[i].init(REP::STORE_LIST);
 		_storePacket2[i] << static_cast<UInt8>(PURCHASE3 + i) << static_cast<UInt8>(items.size());
@@ -325,18 +328,20 @@ void Store::makePacket()
 
     for (int i = 0; i <= EXCHANGEEND - EXCHANGE; ++i)
     {
-		std::vector<Exchange>& items = _itemsExchange[i];
-		_storePacketExchange[i].init(REP::STORE_LIST_EXCHANGE);
-		_storePacketExchange[i] << static_cast<UInt8>(i + EXCHANGE) << static_cast<UInt8>(items.size());
-		for(std::vector<Exchange>::iterator it = items.begin(); it != items.end(); ++ it)
+        _storePacketExchange[i].clear();
+        std::vector<Exchange>& items = _itemsExchange[i];
+        _storePacketExchange[i].init(REP::STORE_LIST_EXCHANGE);
+        _storePacketExchange[i] << static_cast<UInt8>(i + EXCHANGE) << static_cast<UInt8>(items.size());
+        for(std::vector<Exchange>::iterator it = items.begin(); it != items.end(); ++ it)
         {
             _storePacketExchange[i] << (*it).itemID << (*it).priceID << (*it).priceNum;
         }
-		_storePacketExchange[i] << Stream::eos;
+        _storePacketExchange[i] << Stream::eos;
     }
 
     for (int i = 0; i<= DISCOUNTEND - DISCOUNTEND; ++ i)
     {
+        _storePacketDiscount[i].clear();
         std::vector<Discount>& items = _itemsDiscount[i];
         _storePacketDiscount[i].init(REP::STORE_LIST);
 		_storePacketDiscount[i] << static_cast<UInt8>(DISCOUNT + i) << static_cast<UInt8>(items.size());
@@ -370,6 +375,12 @@ void Store::clear()
 		_itemsExchange[i].clear();
 		_itemPricesExchange[i].clear();
     }
+    for (int i = 0; i <= DISCOUNTEND - DISCOUNT; ++i)
+    {
+        _storePacketDiscount[i].clear();
+        _itemsDiscount[i].clear();
+    }
+
 }
 
 void Store::clearNormalDiscount()

@@ -2199,6 +2199,7 @@ void AddDiscountFromBs(LoginMsgHdr& hdr, const void* data)
         }
     }
     GData::store.storeDiscount();
+    GData::store.makePacket();
 
     Stream st(SPEP::ADDDISCOUNT);
     st << result << Stream::eos;

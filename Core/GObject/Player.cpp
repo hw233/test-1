@@ -9977,11 +9977,14 @@ namespace GObject
             UInt8 type = i;
             UInt32 max = 0;
             UInt32 used = 0;
+            UInt32 time = 0;
+            UInt32 now = TimeUtil::Now();
 
             // 如果活动限购已经结束或已经购买完毕，则发送时间和数量为0的
             max = GData::store.getDiscountLimit(type);
             UInt8 offset = GData::store.getDisTypeVarOffset(type);
             used = GetVar(GObject::VAR_DISCOUNT_1+offset);
+
             if (offset == 0xfe)
             {
                 // TODO: 全服限购的数量获取
@@ -10000,11 +10003,20 @@ namespace GObject
                 SetVar(GObject::VAR_DISCOUNT_1+offset, used);
             }
 
+            time = GetVar(GObject::VAR_DISCOUNT_SP_1_TIME + type - 4);
+            if (time < now)
+            {
+                SetVar(GObject::VAR_DISCOUNT_1+offset, 0);
+                time = GData::store.getEndTimeByDiscountType(type);
+                SetVar(GObject::VAR_DISCOUNT_SP_1_TIME + type - 4, time);
+                used = 0;
+            }
+
+
             UInt32 count = max - used;
 
-            UInt32 now = TimeUtil::Now();
 
-            UInt32 time = GData::store.getBeginTimeByDiscountType(type);
+            time = GData::store.getBeginTimeByDiscountType(type);
             if (time > now)
             {
                 // 活动限购还未开始
