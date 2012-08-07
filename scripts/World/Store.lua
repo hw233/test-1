@@ -148,6 +148,10 @@ if is0810_0901() then
 store:add(2,1706,599)
 end
 
+if is0808_0814() then
+store:add(2,9120,400)
+end
+
 store:add(2,1528,50)
 store:add(2,9082,5)
 store:add(2,549,80)
