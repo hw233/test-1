@@ -932,8 +932,13 @@ struct DBWBoss
 };
 struct DBDiscount
 {
-    UInt32 itemid;
-    UInt8 discount;
+    UInt16 itemID;
+    UInt32 beginTime;
+    UInt32 endTime;
+    UInt16 priceOriginal;
+    UInt16 priceDiscount;
+    UInt8 type;
+    UInt32 count;
 };
 struct DBLuckyLog
 {
@@ -2174,10 +2179,15 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBDiscount)
-SPECIALDEF(2)
+SPECIALDEF(7)
 (
-    UInt32, itemid,
-    UInt8, discount
+    UInt16, itemID,
+    UInt32, beginTime,
+    UInt32, endTime,
+    UInt16, priceOriginal,
+    UInt16, priceDiscount,
+    UInt8, type,
+    UInt32, count
 )
 SPECIALEND()
 

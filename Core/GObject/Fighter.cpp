@@ -2111,20 +2111,16 @@ bool Fighter::testMutual( UInt16 skill )
 {
     UInt16 mutualSkills[] = {
         1,5,
-        1,9,
         2,6,
         3,7,
-        5,9,
         10,28,
         11,15,
         11,18,
         12,16,
         15,18,
         19,23,
-        19,27,
         20,24,
         21,25,
-        23,27,
     };
 
     UInt16 j = 0;
@@ -4177,7 +4173,7 @@ void Fighter::SSOpen(UInt16 id)
     }
 
     UInt16 itemId = 550;
-    if (i->second.lvl >= 4)
+    if (i->second.maxLvl >= 4)
         itemId = 551;
     Package* pkg = _owner->GetPackage();
     ItemBase* item = pkg->FindItem(itemId, true);

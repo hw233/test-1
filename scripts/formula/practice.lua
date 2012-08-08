@@ -45,11 +45,10 @@ function calcPracticeInc( fgt )
     soulPracticeFactor = fgt:getSoulPracticeFactor()
 
     diamondFactor = fgt:getPracticeIncByDiamond()
-    qqVipFactor = fgt:getPracticeIncByQQVip()
 
     -- (基础 + 穴道加成) * (1 + ((资质 - 5) * 0.16 + 山头加成 + 帮派加成 + BUFF加成 + ... + 蓝黄砖加成))
     --return ((prabase+fgt:getAcuPraAdd()+soulPracticeAdd) * (1 + (capacity - 5) * capfactor + placeadd + clantechaddon + buffactor + soulPracticeFactor))
-    return ((prabase+fgt:getAcuPraAdd()+soulPracticeAdd) * (1 + (capacity - 5) * capfactor + placeadd + clantechaddon + buffactor + soulPracticeFactor + diamondFactor + qqVipFactor))
+    return ((prabase+fgt:getAcuPraAdd()+soulPracticeAdd) * (1 + (capacity - 5) * capfactor + placeadd + clantechaddon + buffactor + soulPracticeFactor + diamondFactor))
 end
 
 function GetPlaceAddons()

@@ -4147,6 +4147,62 @@ function ItemNormal_00009118(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00009119(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (1+num/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    local items = {508, 514, 515, 500, 49, 503, 511, 517, 15, 509}
+    local counts = {1, 1, 1, 1, 1, 1, 1, 1, 2, 1}
+    local prob = {1700,3200,3300,4800,5200,5500,7100,8500,9900,10000}
+    local broad = {0,1,1,0,0,1,0,1,0,1}
+    local item = 0
+    local count = 0
+
+    for count =1,num do
+        local k = 1
+        local rand = math.random(10000)
+        for n = 1,#prob do
+            if rand <= prob[n] then
+                item = items[n]
+                count = counts[n]
+                k = n
+                break;
+            end
+        end
+
+        if item == 0 then
+            return false
+        end
+
+        package:AddItem(item, count, 1, 0, 2)
+        if broad[k] == 1 then
+            Broadcast(0x27, msg_68.."[p:"..player:getCountry()..":"..player:getPName().."]"..msg_60.."[4:9119]，"..msg_61.."[4:"..item.."]x"..count)
+        end
+        package:DelItemSendMsg(iid, player)
+    end
+    return num
+end
+
+function ItemNormal_00009120(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (1+num/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    package:AddItem(33, 50, 1, 0, 2)
+    package:DelItemSendMsg(iid, player)
+
+    return num
+end
+
 function ItemNormal_00010000(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -5658,6 +5714,8 @@ local ItemNormal_Table = {
     [9095] = ItemNormal_00009095,
     [9099] = ItemNormal_00009099,
     [9118] = ItemNormal_00009118,
+    [9119] = ItemNormal_00009119,
+    [9120] = ItemNormal_00009120,
 
     [10000] = ItemNormal_00010000,
     [10001] = ItemNormal_00010001,

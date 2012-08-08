@@ -85,6 +85,9 @@ public:
 
     std::string mergeList;
 
+    bool udplog;
+    bool dclog;
+
 public:
 	inline void setTcpPort(UInt16 p) {tcpPort = p;}
 	void setIfName(const char* iname);
@@ -120,6 +123,8 @@ public:
     inline void setServerNum(UInt32 no) { serverNum = no; }
     inline void setServerNo(UInt32 no) { serverNo = no; }
     inline void setMergeList(const char* list) { mergeList = list?list:"";}
+    inline void setUdpLog(bool v) { udplog = v; }
+    inline void setDCLog(bool v) { dclog = v; }
 
 
 	inline void setVerifyTokenServer(const char* server, UInt16 port)

@@ -21,7 +21,11 @@ namespace GData
 /** 兑换索引: 8 **/
 #define EXCHANGE 8
 #define EXCHANGEEND 8
+/** 限购索引：1 **/
+#define DISCOUNT 1
+#define DISCOUNTEND 1
 #endif
+
 struct Exchange
 {
     UInt16 itemID;
@@ -29,24 +33,47 @@ struct Exchange
     UInt16 priceNum;
 };
 
+struct Discount
+{
+    UInt16 itemID;
+    UInt8 discountType;
+    UInt32 limitCount;
+    UInt32 beginTime;
+    UInt32 endTime;
+    UInt16 priceOriginal;
+    UInt16 priceDiscount;
+};
+
 class Store
 {
 public:
+    void process(UInt32 now);
 	void add(UInt8 type, UInt32 itemId, UInt32 price);
+    void addDiscountFromDB( UInt16 itemID, UInt8 discountType, UInt32 limitCount, UInt32 beginTime, UInt32 endTime, UInt16 priceOriginal, UInt16 priceDiscount);
 	void addExchange(UInt8 type, UInt32 itemId, UInt32 priceID, UInt32 priceNum);
-    bool needResetDiscount() { return !_items[0].size(); }
+    void addNormalDiscount(UInt32 itemId, UInt32 discount, UInt32 num);
+    void addSpecialDiscount();
+    UInt8 addSpecialDiscountFromBS(Discount discount);
+    void querySpecialDiscountFromBS();
+    UInt8 clearSpecialDiscountFromBS(UInt8 type = 0);
+    bool needResetDiscount();
     void storeDiscount();
 	void sendList(UInt8 type, GObject::Player *);
+    UInt32 getPrice( UInt8 type, UInt16 itemId, UInt16 flag);
 	UInt32 getPrice(UInt8 type, UInt16 itemId);
 	UInt32 getPrice(UInt16 itemId);
 	void makePacket();
 	void clear();
+    void clearNormalDiscount();
+    void clearSpecialDiscount();
     void resetDistcount() { _items[0].clear(); _discountLimit.clear(); }
-    void discountLimit();
+    UInt8 getDiscountType(UInt8 columnIndex);
     UInt16 getDiscountLimit(UInt8 type);
     UInt8 getItemsByDiscount(UInt8 type, UInt16 items[4]);
-    float getDiscount(UInt8 type);
-    UInt8 getDisVarOffset(UInt8 type);
+    UInt8 getDisTypeVarOffset(UInt8 type);
+    UInt8 getNewDisVarOffset(UInt8 type);
+    UInt32 getEndTimeByDiscountType(UInt8 type);
+    UInt32 getBeginTimeByDiscountType(UInt8 type);
 private:
 	std::vector<UInt32> _items[PURCHASE2-PURCHASE1+1];
 	std::map<UInt32, UInt32> _itemPrices[PURCHASE2-PURCHASE1+1];
@@ -60,8 +87,12 @@ private:
 	std::map<UInt32, UInt32> _itemPricesExchange[EXCHANGEEND-EXCHANGE+1];
 	Stream _storePacketExchange[EXCHANGEEND-EXCHANGE+1];
 
-    std::vector<UInt16> _discountLimit;
-};
+    // 限购栏的商品信息
+	std::vector<Discount> _itemsDiscount[DISCOUNTEND-DISCOUNT+1];
+	std::map<UInt8, UInt8> _itemTypeCountDiscount[DISCOUNTEND-DISCOUNT+1];
+	Stream _storePacketDiscount[DISCOUNTEND-DISCOUNT+1];
+
+    std::vector<UInt16> _discountLimit; };
 
 extern Store store;
 

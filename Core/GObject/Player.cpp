@@ -519,7 +519,7 @@ namespace GObject
 		_availInit(false), _vipLevel(0), _clan(NULL), _clanBattle(NULL), _flag(0), _gflag(0), _onlineDuration(0), _offlineTime(0),
 		_nextTavernUpdate(0), _nextBookStoreUpdate(0), _bossLevel(21), _ng(NULL), _lastNg(NULL),
 		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), m_autoCopyFailed(false),
-        _justice_roar(0), _spirit_factor(1.0f), _diamond_privilege(false), _athlRivalBuf(0), _worldBossHp(0), m_autoCopyComplete(0), hispot(0xFF), hitype(0), m_ulog(NULL),
+        _justice_roar(0), _spirit_factor(1.0f), _diamond_privilege(false), _qqvip_privilege(false), _athlRivalBuf(0), _worldBossHp(0), m_autoCopyComplete(0), hispot(0xFF), hitype(0), m_ulog(NULL),
         m_isOffical(false), m_sysDailog(false), m_hasTripod(false)
 	{
         m_ClanBattleStatus = 1;
@@ -1009,7 +1009,7 @@ namespace GObject
     void Player::udpLog(UInt8 platform, const char* str1, const char* str2, const char* str3, const char* str4,
                 const char* str5, const char* str6, const char* type, UInt32 count)
     {
-        if (m_ulog)
+        if (m_ulog && cfg.udplog)
         {
             char buf[1024] = {0};
             char* pbuf = &buf[0];
@@ -7798,6 +7798,9 @@ namespace GObject
         }
 #else
 		char numstr[16];
+        char separator[2] = {32, 0};
+
+        std::string sepStr(separator);
 		sprintf(numstr, "%u", _playerData.title);
 		_battleName.clear();
 		_battleName = getClanName();
@@ -7809,7 +7812,8 @@ namespace GObject
 			_battleName += numstr;
 		}
         */
-		_battleName = _battleName + "\n" + numstr + "\n" + _playerData.name;
+		//_battleName = _battleName + "\n" + numstr + "\n" + _playerData.name;
+		_battleName = _battleName + sepStr + numstr + sepStr + _playerData.name;
 #endif
 	}
 
@@ -8535,7 +8539,7 @@ namespace GObject
             }
             else
             {
-                if(qplus && World::getQQVipAct() && _playerData.qqvipl1 >= 40 && _playerData.qqvipl1 <= 49)
+                if(qplus /*&& World::getQQVipAct()*/ && _playerData.qqvipl1 >= 40 && _playerData.qqvipl1 <= 49)
                 {
                     flag = 8*((_playerData.qqvipl1-20) / 10);
                     qqvipl = _playerData.qqvipl1 % 10;
@@ -9971,21 +9975,119 @@ namespace GObject
 
     void Player::sendDiscountLimit()
     {
-        static UInt8 discount[] = {3,5,8,};
+        // 发送给客户端的有关限购的相关数据
         Stream st(REP::STORE_DISLIMIT);
-        for (UInt8 i = 0; i < 3; ++i)
+        for (UInt8 i = 4; i < 7; ++i)
         {
-            UInt8 max = GData::store.getDiscountLimit(discount[i]);
-            UInt8 used = GetVar(GObject::VAR_DISCOUNT_1+i);
-            if (used > max)
+            // 发送活动限购三栏的种类，时间和剩余数量
+            UInt8 type = i;
+            UInt32 max = 0;
+            UInt32 used = 0;
+            UInt32 time = 0;
+            UInt32 now = TimeUtil::Now();
+
+            // 如果活动限购已经结束或已经购买完毕，则发送时间和数量为0的
+            max = GData::store.getDiscountLimit(type);
+            UInt8 offset = GData::store.getDisTypeVarOffset(type);
+            used = GetVar(GObject::VAR_DISCOUNT_1+offset);
+
+            if (offset == 0xfe)
+            {
+                // TODO: 全服限购的数量获取
+            }
+            if (offset == 0xff)
+            {
+                st << static_cast<UInt8>(0) 
+                    << static_cast<UInt32>(0)
+                    << static_cast<UInt32>(0);
+                break;
+            }
+
+            if (used >= max)
             {
                 used = max;
-                SetVar(GObject::VAR_DISCOUNT_1+i, used);
+                SetVar(GObject::VAR_DISCOUNT_1+offset, used);
             }
-            st << static_cast<UInt8>(max - used);
+
+            time = GetVar(GObject::VAR_DISCOUNT_SP_1_TIME + type - 4);
+            if (time < now)
+            {
+                SetVar(GObject::VAR_DISCOUNT_1+offset, 0);
+                time = GData::store.getEndTimeByDiscountType(type);
+                SetVar(GObject::VAR_DISCOUNT_SP_1_TIME + type - 4, time);
+                used = 0;
+            }
+
+
+            UInt32 count = max - used;
+
+
+            time = GData::store.getBeginTimeByDiscountType(type);
+            if (time > now)
+            {
+                // 活动限购还未开始
+                time = 0;
+                count = 0;
+            }
+            else
+            {
+                time = GData::store.getEndTimeByDiscountType(type);
+                if (time < now)
+                {
+                    // 活动限购已经结束
+                    time = 0;
+                    count = 0;
+                }
+                else
+                    time -= now;
+            }
+
+            st << static_cast<UInt8>(type) 
+                << static_cast<UInt32>(time)
+                << static_cast<UInt32>(count);
         }
         st << Stream::eos;
         send(st);
+
+        // 再发送一个完整的三五八折协议
+        Stream st2(REP::STORE_DISLIMIT);
+        for (UInt8 i = 7; i < 10; ++i)
+        {
+            UInt8 type = i;
+            UInt8 offset = GData::store.getDisTypeVarOffset(type);
+            UInt32 max = GData::store.getDiscountLimit(type);
+            if (offset == 0xfe)
+            {
+                // TODO: 全服限购的数量获取
+            }
+            if (offset == 0xff)
+            {
+                st2 << static_cast<UInt8>(0) 
+                    << static_cast<UInt32>(0)
+                    << static_cast<UInt32>(0);
+                break;
+            }
+            UInt32 used = GetVar(GObject::VAR_DISCOUNT_1+offset);
+            if (used >= max)
+            {
+                used = max;
+                SetVar(GObject::VAR_DISCOUNT_1+offset, used);
+            }
+            UInt32 count = max - used;
+
+            UInt32 time = GData::store.getEndTimeByDiscountType(type);
+            UInt32 now = TimeUtil::Now();
+            if (time < now)
+                time = 0;
+            else
+                time -= now;
+
+            st2 << static_cast<UInt8>(type) 
+                << static_cast<UInt32>(time)
+                << static_cast<UInt32>(count);
+        }
+        st2 << Stream::eos;
+        send(st2);
     }
 
     void Player::continuousLogin(UInt32 now)
@@ -10956,6 +11058,8 @@ namespace GObject
     //玩家每日签到接口
     void Player::ActivitySignIn()
     {
+        if(GetActivityMgr()->GetFlag(AtySignIn) != 0)
+            return;
         UInt32 day = 1;
         UInt32 mon = 1;
         UInt32 year = 2012;

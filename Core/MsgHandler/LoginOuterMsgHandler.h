@@ -28,6 +28,7 @@
 #include "Common/StringTokenizer.h"
 #include "GData/Formation.h"
 #include "GData/ExpTable.h"
+#include "GData/Store.h"
 #include "GObject/Player.h"
 #include <libmemcached/memcached.h>
 #include "GObject/SaleMgr.h"
@@ -2172,6 +2173,59 @@ void SetCFriend(LoginMsgHdr& hdr, const void* data)
     st << ret << Stream::eos;
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
+
+void AddDiscountFromBs(LoginMsgHdr& hdr, const void* data)
+{
+    // GM增加限时限购活动
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+    GData::Discount discount;
+    br >> discount.discountType;
+    br >> discount.beginTime;
+    br >> discount.endTime;
+    UInt16 count;
+    br >> count;
+    UInt8 result = 0;
+    for (UInt8 i = 0; i < count; ++i)
+    {
+        br >> discount.itemID;            // UInt16
+        br >> discount.limitCount;        // UInt32
+        br >> discount.priceOriginal;     // UInt16
+        br >> discount.priceDiscount;     // UInt16
+        result = GData::store.addSpecialDiscountFromBS(discount);
+        if (result)
+        {
+            break;
+        }
+    }
+    GData::store.storeDiscount();
+    GData::store.makePacket();
+
+    Stream st(SPEP::ADDDISCOUNT);
+    st << result << Stream::eos;
+	NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
+void QueryDiscountFromBs(LoginMsgHdr& hdr, const void* data)
+{
+    // TODO: GM查询限时限购活动
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+    for (UInt8 type = 4; type < 7; ++type)
+    {
+        Stream st (SPEP::QUERYDISCOUNT);
+        st << type;
+    }
+}
+
+void ClearDiscountFromBs(LoginMsgHdr& hdr, const void* data)
+{
+    // GM清空限时限购活动
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+    GData::store.clearSpecialDiscountFromBS();
+}
+
 
 #endif // _LOGINOUTERMSGHANDLER_H_
 

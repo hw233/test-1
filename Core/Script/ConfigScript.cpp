@@ -40,6 +40,8 @@ ConfigScript::ConfigScript( Cfg * cfg )
 	class_def<Cfg>("setWarZone", &Cfg::setWarZone);
 	class_def<Cfg>("setServerNum", &Cfg::setServerNum);
 	class_def<Cfg>("setServerNo", &Cfg::setServerNo);
+	class_def<Cfg>("setUdpLog", &Cfg::setUdpLog);
+	class_def<Cfg>("setDCLog", &Cfg::setDCLog);
 	set("cfg", cfg);
 }
 

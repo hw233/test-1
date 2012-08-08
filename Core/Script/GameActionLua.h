@@ -184,7 +184,7 @@ namespace Script
 		void RunAutoRegen(Player* player, Fighter* fighter);
 
 		void onLogin(Player* player);
-		void onDungeonWin(Player* player, UInt8 id, UInt8 count);
+		void onDungeonWin(Player* player, UInt8 id, UInt8 count, bool free);
 		void onClanBattleAttend(Player* player);
 		void onCountryBattleAttend(Player* player);
 		void onCountryBattleWinStreak(Player* player, UInt32 count);
