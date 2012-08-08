@@ -1385,12 +1385,12 @@ CREATE TABLE `wboss` (
 DROP TABLE IF EXISTS `discount`;
 CREATE TABLE `discount` (
       `itemid` int(10) unsigned NOT NULL,
-      `discount` tinyint(3) unsigned NOT NULL
-      `timeBegin` int(10) unsigned NOT NULL
-      `timeEnd` int(10) unsigned NOT NULL
-      `priceOriginal` int(10) unsigned NOT NULL
-      `priceDiscount` int(10) unsigned NOT NULL
-      `type` tinyint(3) unsigned NOT NULL
+      `discount` tinyint(3) unsigned NOT NULL,
+      `timeBegin` int(10) unsigned NOT NULL,
+      `timeEnd` int(10) unsigned NOT NULL,
+      `priceOriginal` int(10) unsigned NOT NULL,
+      `priceDiscount` int(10) unsigned NOT NULL,
+      `type` tinyint(3) unsigned NOT NULL,
       `count` int(10) unsigned NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
