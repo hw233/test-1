@@ -253,7 +253,7 @@ namespace Script
         CLASS_DEF(Player, lastLootPush);
         CLASS_DEF(Player, hasRealItemAward);
         CLASS_DEF(Player, getRealItemAward);
-        CLASS_DEF(Player, getMoneyArena);
+        CLASS_DEF(Player, getMoneyArenaLua);
 		CLASS_DEF(Player, getQQVipPrivilege);
 		CLASS_DEF(Player, setQQVipPrivilege);
 
