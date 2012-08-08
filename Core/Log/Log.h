@@ -69,13 +69,15 @@ enum PurchaseType
     Discount3,
     Discount5,
     Discount8,
-    DiscountSp1,
-    DiscountSp2,
-    DiscountSp3,
     LuckyDraw,
     ArenaBet,
     AthleticKillCD2,
     AthleticPhysical,
+    DiscountSp1,
+    DiscountSp2,
+    DiscountSp3,
+    ArenaFromCard,
+    ArenaFromMail,
 };
 
 enum IncomingType

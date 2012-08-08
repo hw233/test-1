@@ -3973,7 +3973,7 @@ function ItemNormal_00009080(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
     package:DelItemSendMsg(iid, player);
-    player:getMoneyArena(100*num);
+    player:getMoneyArenaLua(100*num);
     return num;
 end
 

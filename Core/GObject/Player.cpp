@@ -3634,7 +3634,13 @@ namespace GObject
 		sendModification(3, _playerData.tael);
 	}
 
-	UInt32 Player::getMoneyArena( UInt32 c )
+    UInt32 Player::getMoneyArenaLua(UInt32 c)
+    {
+        IncommingInfo ii(ArenaFromCard,0,0);
+        return getMoneyArena(c, &ii);
+    }
+
+	UInt32 Player::getMoneyArena( UInt32 c, IncommingInfo* ii)
 	{
         UInt32 moneyArena = GetVar(VAR_MONEY_ARENA);
 		if(c == 0)
@@ -3647,6 +3653,12 @@ namespace GObject
         Stream st(REP::USER_INFO_CHANGE);
         st << static_cast<UInt8>(0x56) << moneyArena << Stream::eos;
         send(st);
+
+        if(ii && ii->incommingType != 0)
+        {
+            DBLOG1().PushUpdateData("insert into consume_arena (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+                cfg.serverLogId, getId(), ii->incommingType, ii->itemId, ii->itemNum, c, TimeUtil::Now());
+        }
 
         return moneyArena;
 	}
