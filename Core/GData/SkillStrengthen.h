@@ -42,6 +42,7 @@ enum
     TYPE_ABSORB,        // 吸血效果
     TYPE_IMMUNE,        // 免疫所有控制状态
     TYPE_DEBUF_THERAPY, // 减治疗效果
+    TYPE_ATKADD,        // 增加攻击效果
     TYPE_MAX,
 };
 

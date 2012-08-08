@@ -35,11 +35,11 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
 	_maxhpAdd2(0), _maxActionAdd2(0), _fakeDeadTimes(0),
     _atkreduce3(0), _magatkreduce3(0), _pudu_debuf(0),
     _atkreduce3_last(0), _magatkreduce3_last(0), _pudu_debuf_last(0),
-    _deep_forget_dmg_extra(0), _deep_stun_dmg_extra(0),
+    _deep_forget_dmg_extra(0), _deep_forget_last(0), _deep_stun_dmg_extra(0), _deep_stun_last(0),
     _therapy_dec(0), _therapy_dec_last(0),
     _bleed1(0), _bleed2(0), _bleed3(0),
     _bleed1_last(0), _bleed2_last(0), _bleed3_last(0),
-    _immune2(0), _def_dec(0), _def_dec_last(0)
+    _immune2(0), _def_dec(0), _def_dec_last(0), _def_dec_times(0)
 {
     memset(_immuneLevel, 0, sizeof(_immuneLevel));
     memset(_immuneRound, 0, sizeof(_immuneRound));
@@ -599,7 +599,7 @@ void BattleFighter::calcSkillAttack(bool& isCritical, BattleFighter* defender, f
         *pCf = factor;
 }
 
-float BattleFighter::calcTherapy(const GData::SkillBase* skill)
+float BattleFighter::calcTherapy(bool& isCritical, bool& first, const GData::SkillBase* skill)
 {
     if(!skill)
         return 0;
@@ -622,11 +622,13 @@ float BattleFighter::calcTherapy(const GData::SkillBase* skill)
     {
         if(uRand(10000) < getCritical(NULL)* 100)
         {
-            float f = getCriticalDmg();
-            if(f > ef->value/100)
-                aura_factor *= ef->value/100;
-            else
-                aura_factor *= f;
+            float f = (getCriticalDmg()-1)*ef->value/100 + 1;
+            aura_factor *= f;
+            if(first)
+            {
+                isCritical = true;
+                first = false;
+            }
         }
     }
 

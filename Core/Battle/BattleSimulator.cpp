@@ -99,6 +99,7 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, cons
         skillStrengthenTable[GData::TYPE_DISPERSE] = &BattleSimulator::doSkillStrengthen_disperse;
         skillStrengthenTable[GData::TYPE_DAMAG_REDUCE] = &BattleSimulator::doSkillStrengthen_reduce;
         skillStrengthenTable[GData::TYPE_DEBUF_DEFEND] = &BattleSimulator::doSkillStrengthen_debuf_defend;
+        skillStrengthenTable[GData::TYPE_ATKADD] = &BattleSimulator::doSkillStrengthen_atkadd;
     }
 }
 
@@ -163,6 +164,7 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, GObj
         skillStrengthenTable[GData::TYPE_DISPERSE] = &BattleSimulator::doSkillStrengthen_disperse;
         skillStrengthenTable[GData::TYPE_DAMAG_REDUCE] = &BattleSimulator::doSkillStrengthen_reduce;
         skillStrengthenTable[GData::TYPE_DEBUF_DEFEND] = &BattleSimulator::doSkillStrengthen_debuf_defend;
+        skillStrengthenTable[GData::TYPE_ATKADD] = &BattleSimulator::doSkillStrengthen_atkadd;
     }
 }
 
@@ -979,43 +981,79 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
             aura_factor = 1 + static_cast<float>(bf->getAura()-100) * 0.0025;
         }
 
-        UInt8& deepforgetlast = area_target->getDeepForgetLast();
-        if(deepforgetlast > 0)
-        {
-            -- deepforgetlast;
-            factor += area_target->getDeepForgetDmgExtra();
-        }
-        UInt8& deepstunlast = area_target->getDeepStunLast();
-        if(deepstunlast > 0)
-        {
-            -- deepstunlast;
-            factor += area_target->getDeepStunDmgExtra();
-        }
-
-        UInt8& defdeclast = area_target->getDefDecLast();
-        if(defdeclast > 0 && bf->getSide() != area_target->getSide())
-        {
-            UInt8 deflast = area_target->getDefendAddLast();
-            UInt8 magdeflast = area_target->getMagDefendAddLast();
-            float atkReduce = area_target->getAtkReduce();
-            float magReduce = area_target->getMagAtkReduce();
-            if(deflast > 0)
-            {
-                atkReduce += area_target->getDefDec();
-                magReduce += area_target->getDefDec();
-                area_target->setAtkReduce(atkReduce, deflast);
-                area_target->setMagAtkReduce(magReduce, magdeflast);
-                -- defdeclast;
-            }
-            else
-                defdeclast = 0;
-
-            if(defdeclast == 0)
-                area_target->setDefDec(0, 0);
-        }
-
 		if(!defend100 && (target_stun > 0 || (!enterEvade && bf->calcHit(area_target))))
 		{
+            UInt8& deepforgetlast = area_target->getDeepForgetLast();
+            if(deepforgetlast > 0 && bf->getSide() != area_target->getSide())
+            {
+                -- deepforgetlast;
+                factor += area_target->getDeepForgetDmgExtra();
+                if(deepforgetlast == 0)
+                {
+                    area_target->setDeepForgetDmgExtra(0, 0);
+                    defList[defCount].damType = e_unDeepForget;
+                    defList[defCount].damage = 0;
+                    defList[defCount].pos = area_target->getPos();
+                    defList[defCount].leftHP = area_target->getHP();
+                    defCount++;
+
+                    defList[defCount].damType = e_Forget;
+                    defList[defCount].damage = 0;
+                    defList[defCount].pos = area_target->getPos();
+                    defList[defCount].leftHP = area_target->getHP();
+                    defCount++;
+                }
+            }
+            UInt8& deepstunlast = area_target->getDeepStunLast();
+            if(deepstunlast > 0 && bf->getSide() != area_target->getSide())
+            {
+                -- deepstunlast;
+                factor += area_target->getDeepStunDmgExtra();
+                if(deepstunlast == 0)
+                {
+                    area_target->setDeepStunDmgExtra(0, 0);
+                    defList[defCount].damType = e_unDeepStun;
+                    defList[defCount].damage = 0;
+                    defList[defCount].pos = area_target->getPos();
+                    defList[defCount].leftHP = area_target->getHP();
+                    defCount++;
+
+                    defList[defCount].damType = e_Stun;
+                    defList[defCount].damage = 0;
+                    defList[defCount].pos = area_target->getPos();
+                    defList[defCount].leftHP = area_target->getHP();
+                    defCount++;
+                }
+            }
+
+            UInt8& defdeclast = area_target->getDefDecLast();
+            if(defdeclast > 0 && bf->getSide() != area_target->getSide())
+            {
+                UInt8 deflast = area_target->getDefendAddLast();
+                UInt8 magdeflast = area_target->getMagDefendAddLast();
+                float defAdd = area_target->getDefendAdd();
+                float magdefAdd = area_target->getMagDefendAdd();
+                if(deflast > 0)
+                {
+                    defAdd += area_target->_defend * area_target->getDefDec()/100;
+                    magdefAdd += area_target->_magdef * area_target->getDefDec()/100;
+                    area_target->setDefendAdd(defAdd, deflast);
+                    area_target->setMagDefendAdd(magdefAdd, magdeflast);
+                    -- defdeclast;
+
+                    UInt8 defdecTimes = area_target->getDefDecTimes();
+                    ++ defdecTimes;
+                    defList[defCount].pos = area_target->getPos();
+                    defList[defCount].damType = e_defDec;
+                    defList[defCount].damage = defdecTimes;
+                    defList[defCount].leftHP = area_target->getHP();
+                    ++ defCount;
+                    area_target->setDefDecTimes(defdecTimes);
+                }
+                else
+                    defdeclast = 0;
+            }
+
             pr2 = bf->calcPierce(area_target);
             float atk = 0;
             float magatk = 0;
@@ -1890,7 +1928,9 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
         // therapy skill
         if(skill->effect->hp > 0 || skill->effect->addhp > 0 || skill->effect->hpP > 0.001)
         {
-            UInt32 rhp = bf->calcTherapy(skill);
+            bool cs = false;
+            bool first = true;
+            UInt32 rhp = bf->calcTherapy(cs, first, skill);
             if(bf->getSide() != target_side)
             {
                 UInt32 hpr = bf->regenHP(rhp);
@@ -2245,7 +2285,7 @@ void BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
     if((state[state_idx] & immune2))
     {
         target_bo->setImmune2(0);
-        defList[defCount].damType = e_Immune;
+        defList[defCount].damType = e_unImmune2;
         return;
     }
     if((state[state_idx] & immune) && SKILL_LEVEL(skill->getId()) <= target_bo->getImmuneLevel(state[state_idx]))
@@ -2625,7 +2665,6 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 GData::Area* area = NULL;
                 area = &(GData::areaList[efs[j]->area]);
                 int cnt = area->getCount();
-                int fsize = efs[j]->factor.size();
                 for(int i = 1; i < cnt; ++ i)
                 {
                     GData::Area::Data& ad = (*area)[i];
@@ -2636,11 +2675,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                         continue;
                     }
                     ap[apcnt2].pos = x + y * 5;
-                    int idx = std::min(abs(fsize-1), std::max(abs(ad.y), abs(ad.x)));
-                    if(fsize != 0)
-                        ap[apcnt2 ++].factor = efs[j]->value/100;
-                    else
-                        ap[apcnt2 ++].factor = 1;
+                    ap[apcnt2 ++].factor = efs[j]->value/100;
                 }
                 break;
             }
@@ -2703,7 +2738,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
     // therapy skill
     if(skill->effect->hp > 0 || skill->effect->addhp > 0 || skill->effect->hpP > 0.001)
     {
-        UInt32 rhp = bf->calcTherapy(skill);
+        UInt32 rhp = bf->calcTherapy(cs, first, skill);
         // 释、普渡慈航
         if(SKILL_ID(skill->getId()) == 18)
         {
@@ -2947,99 +2982,6 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
         }
     }
 
-    // 混乱晕眩封印状态
-    if(skill->effect->state & 0x2e)
-    {
-        float rate = skill->prob * 100;
-	    if(bf->getSide() != target_side)
-        {
-            if(1 == skill->area)
-            {
-                int i = 0;
-                int fsize = skill->factor.size();
-                for(UInt8 pos = 0; pos < 25; ++ pos)
-                {
-                    BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][pos]);
-                    if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
-                        continue;
-
-                    float factor = 1;
-                    int idx = std::min(abs(fsize-1), i);
-                    if(fsize > 0)
-                        factor = skill->factor[idx];
-                    if(((skill->cond != GData::SKILL_ACTIVE && skill->cond != GData::SKILL_PEERLESS) || (rate * factor) > _rnd(10000)))
-                    {
-                        defList[defCount].damage = 0;
-                        defList[defCount].pos = pos;
-                        defList[defCount].leftHP = bo->getHP();
-                        doSkillState(bf, skill, bo, defList, defCount, NULL, NULL);
-                        defCount ++;
-                    }
-                    ++ i;
-                }
-            }
-            else if(0 == skill->area)
-            {
-                BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][target_pos]);
-                if(bo != NULL && bo->getHP() != 0 && bo->isChar())
-                {
-                    if(((skill->cond != GData::SKILL_ACTIVE && skill->cond != GData::SKILL_PEERLESS) || rate > _rnd(10000)))
-                    {
-                        std::vector<AttackAct> atkAct2;
-                        atkAct2.clear();
-                        defList[defCount].damage = 0;
-                        defList[defCount].pos = target_pos;
-                        defList[defCount].leftHP = bo->getHP();
-                        doSkillState(bf, skill, bo, defList, defCount, &atkAct2, atkAct);
-                        defCount ++;
-                        doSkillAtk2(false, &atkAct2, defList, defCount, scList, scCount);
-                    }
-                }
-            }
-            else
-            {
-                BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][target_pos]);
-                if(bo != NULL && bo->getHP() != 0 && bo->isChar())
-                {
-                    int fsize = skill->factor.size();
-                    float factor = 1;
-                    if(fsize > 0)
-                        factor = skill->factor[0];
-                    if(((skill->cond != GData::SKILL_ACTIVE && skill->cond != GData::SKILL_PEERLESS) || (rate * factor) > _rnd(10000)))
-                    {
-                        std::vector<AttackAct> atkAct2;
-                        atkAct2.clear();
-                        defList[defCount].damage = 0;
-                        defList[defCount].pos = target_pos;
-                        defList[defCount].leftHP = bo->getHP();
-                        doSkillState(bf, skill, bo, defList, defCount, &atkAct2, atkAct);
-                        defCount ++;
-                        doSkillAtk2(false, &atkAct2, defList, defCount, scList, scCount);
-                    }
-                }
-
-                for(int i = 0; i < apcnt; ++ i)
-                {
-                    BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][ap[i].pos]);
-                    if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
-                        continue;
-
-                    if(((skill->cond != GData::SKILL_ACTIVE && skill->cond != GData::SKILL_PEERLESS) || (rate * ap[i].factor) > _rnd(10000)))
-                    {
-                        std::vector<AttackAct> atkAct2;
-                        atkAct2.clear();
-                        defList[defCount].damage = 0;
-                        defList[defCount].pos = ap[i].pos;
-                        defList[defCount].leftHP = bo->getHP();
-                        doSkillState(bf, skill, bo, defList, defCount, &atkAct2, atkAct);
-                        defCount ++;
-                        doSkillAtk2(false, &atkAct2, defList, defCount, scList, scCount);
-                    }
-                }
-            }
-        }
-    }
-
     // 驱散
     if(skill->effect->disperse > 0)
     {
@@ -3254,6 +3196,99 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                     {
                         doXinmoAttack(bf, _objs[target_side][target_pos], defList, defCount, scList, scCount);
                         break;
+                    }
+                }
+            }
+        }
+    }
+
+    // 混乱晕眩封印状态
+    if(skill->effect->state & 0x2e)
+    {
+        float rate = skill->prob * 100;
+	    if(bf->getSide() != target_side)
+        {
+            if(1 == skill->area)
+            {
+                int i = 0;
+                int fsize = skill->factor.size();
+                for(UInt8 pos = 0; pos < 25; ++ pos)
+                {
+                    BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][pos]);
+                    if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
+                        continue;
+
+                    float factor = 1;
+                    int idx = std::min(abs(fsize-1), i);
+                    if(fsize > 0)
+                        factor = skill->factor[idx];
+                    if(((skill->cond != GData::SKILL_ACTIVE && skill->cond != GData::SKILL_PEERLESS) || (rate * factor) > _rnd(10000)))
+                    {
+                        defList[defCount].damage = 0;
+                        defList[defCount].pos = pos;
+                        defList[defCount].leftHP = bo->getHP();
+                        doSkillState(bf, skill, bo, defList, defCount, NULL, NULL);
+                        defCount ++;
+                    }
+                    ++ i;
+                }
+            }
+            else if(0 == skill->area)
+            {
+                BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][target_pos]);
+                if(bo != NULL && bo->getHP() != 0 && bo->isChar())
+                {
+                    if(((skill->cond != GData::SKILL_ACTIVE && skill->cond != GData::SKILL_PEERLESS) || rate > _rnd(10000)))
+                    {
+                        std::vector<AttackAct> atkAct2;
+                        atkAct2.clear();
+                        defList[defCount].damage = 0;
+                        defList[defCount].pos = target_pos;
+                        defList[defCount].leftHP = bo->getHP();
+                        doSkillState(bf, skill, bo, defList, defCount, &atkAct2, atkAct);
+                        defCount ++;
+                        doSkillAtk2(false, &atkAct2, defList, defCount, scList, scCount);
+                    }
+                }
+            }
+            else
+            {
+                BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][target_pos]);
+                if(bo != NULL && bo->getHP() != 0 && bo->isChar())
+                {
+                    int fsize = skill->factor.size();
+                    float factor = 1;
+                    if(fsize > 0)
+                        factor = skill->factor[0];
+                    if(((skill->cond != GData::SKILL_ACTIVE && skill->cond != GData::SKILL_PEERLESS) || (rate * factor) > _rnd(10000)))
+                    {
+                        std::vector<AttackAct> atkAct2;
+                        atkAct2.clear();
+                        defList[defCount].damage = 0;
+                        defList[defCount].pos = target_pos;
+                        defList[defCount].leftHP = bo->getHP();
+                        doSkillState(bf, skill, bo, defList, defCount, &atkAct2, atkAct);
+                        defCount ++;
+                        doSkillAtk2(false, &atkAct2, defList, defCount, scList, scCount);
+                    }
+                }
+
+                for(int i = 0; i < apcnt; ++ i)
+                {
+                    BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][ap[i].pos]);
+                    if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
+                        continue;
+
+                    if(((skill->cond != GData::SKILL_ACTIVE && skill->cond != GData::SKILL_PEERLESS) || (rate * ap[i].factor) > _rnd(10000)))
+                    {
+                        std::vector<AttackAct> atkAct2;
+                        atkAct2.clear();
+                        defList[defCount].damage = 0;
+                        defList[defCount].pos = ap[i].pos;
+                        defList[defCount].leftHP = bo->getHP();
+                        doSkillState(bf, skill, bo, defList, defCount, &atkAct2, atkAct);
+                        defCount ++;
+                        doSkillAtk2(false, &atkAct2, defList, defCount, scList, scCount);
                     }
                 }
             }
@@ -5715,12 +5750,17 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
         -- forget;
         if(forget == 0)
         {
-            defList[defCount].damType = e_UnForget;
+            if(0 != bf->getDeepForgetLast())
+            {
+                bf->setDeepForgetDmgExtra(0, 0);
+                defList[defCount].damType = e_unDeepForget;
+            }
+            else
+                defList[defCount].damType = e_UnForget;
             defList[defCount].damage = 0;
             defList[defCount].pos = bf->getPos() + 25;
             defList[defCount].leftHP = bf->getHP();
             defCount++;
-            bf->setDeepForgetDmgExtra(0, 0);
         }
 
         bf->setForgetRound(forget);
@@ -5732,12 +5772,17 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
 		-- stun;
 	    if(stun == 0)
         {
-            defList[defCount].damType = e_UnStun;
+            if(0 != bf->getDeepStunLast())
+            {
+                bf->setDeepStunDmgExtra(0, 0);
+                defList[defCount].damType = e_unDeepStun;
+            }
+            else
+                defList[defCount].damType = e_UnStun;
             defList[defCount].damage = 0;
             defList[defCount].pos = bf->getPos() + 25;
             defList[defCount].leftHP = bf->getHP();
             defCount++;
-            bf->setDeepStunDmgExtra(0, 0);
         }
 
 	    bf->setStunRound(stun);
@@ -5759,6 +5804,7 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
             setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stMagAtk, 0, 0, scList, scCount, false);
     }
 
+    bool clearDefDec = false;
     UInt8& defAdd_last = bf->getDefendAddLast();
     if(defAdd_last > 0)
     {
@@ -5766,7 +5812,13 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
        if(0 == defAdd_last)
        {
             setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stDef, 0, 0, scList, scCount, false);
-            bf->setDefDec(0, 0);
+            float defdec = abs(bf->getDefDec());
+            if(defdec > 0.001f)
+            {
+                bf->setDefDec(0, 0);
+                bf->setDefDecTimes(0);
+                clearDefDec = true;
+            }
        }
     }
 
@@ -5777,8 +5829,24 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
        if(0 == magDefAdd_last)
        {
             setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stMagDef, 0, 0, scList, scCount, false);
-            bf->setDefDec(0, 0);
+            float defdec = abs(bf->getDefDec());
+            if(defdec > 0.001f)
+            {
+                bf->setDefDec(0, 0);
+                bf->setDefDecTimes(0);
+                clearDefDec = true;
+            }
        }
+    }
+
+    if(clearDefDec)
+    {
+        defList[defCount].pos = bf->getPos() + 25;
+        defList[defCount].damType = e_undefDec;
+        defList[defCount].damage = bf->getDefDecTimes();
+        defList[defCount].leftHP = bf->getHP();
+        ++ defCount;
+        bf->setDefDecTimes(0);
     }
 
     UInt8& hitrateAdd_last = bf->getHitrateAddLast();
@@ -6354,9 +6422,6 @@ void BattleSimulator::setStatusChange_Counter(BattleFighter * bf, UInt8 side, UI
 
 void BattleSimulator::setStatusChange_Aura(BattleFighter * bf, UInt8 side, UInt8 pos, const GData::SkillBase* skill, float value, UInt16 last, StatusChange * scList, size_t& scCount, bool active )
 {
-    GData::SkillStrengthenBase* ss = NULL;
-    if(skill != NULL)
-        ss = bf->getSkillStrengthen(SKILL_ID(skill->getId()));
     BattleObject * bo = _objs[side][pos];
     BattleFighter * bfgt = static_cast<BattleFighter *>(bo);
     StatusChange& sc = scList[scCount];
@@ -6367,20 +6432,10 @@ void BattleSimulator::setStatusChange_Aura(BattleFighter * bf, UInt8 side, UInt8
         sc.statusId = skill->getId();
     else
         sc.statusId = 0;
-    const GData::SkillStrengthenEffect* ef = NULL;
-    float factor = 1;
-    if(ss)
-        ef = ss->getEffect(GData::ON_AURA, GData::TYPE_CRITICAL);
-    if(ef)
-    {
-        if(_rnd(10000) < bf->getCritical(NULL)*ef->value)
-            factor = 2;
-    }
-
     sc.type = e_stAura;
     if(skill && skill->cond == GData::SKILL_BEATKED && bf->getPos() + 25 != sc.pos)
         ++last;
-    bfgt->AddAura(value * factor);
+    bfgt->AddAura(value);
     sc.data = static_cast<UInt32>(bfgt->getAura());
 
     ++ scCount;
@@ -6591,18 +6646,55 @@ bool BattleSimulator::doSkillStrengthen_disperse(BattleFighter* bf, const GData:
         pos0 = 25;
     if(_rnd(10000) < ef->value*100)
     {
-        bo->setConfuseLevel(0);
-        bo->setConfuseRound(0);
-        bo->setStunLevel(0);
-        bo->setStunRound(0);
-        bo->setForgetLevel(0);
-        bo->setForgetRound(0);
+        if(bo->getConfuseRound() != 0)
+        {
+            bo->setConfuseLevel(0);
+            bo->setConfuseRound(0);
 
-        defList[defCount].pos = bo->getPos() + pos0;
-        defList[defCount].damType = e_Disperse;
-        defList[defCount].damage = 0;
-        defList[defCount].leftHP = bo->getHP();
-        ++ defCount;
+            defList[defCount].pos = bo->getPos() + pos0;
+            defList[defCount].damType = e_UnConfuse;
+            defList[defCount].damage = 0;
+            defList[defCount].leftHP = bo->getHP();
+            ++ defCount;
+        }
+
+        if(bo->getStunRound() != 0)
+        {
+            bo->setStunLevel(0);
+            bo->setStunRound(0);
+
+            if(bo->getDeepForgetLast() != 0)
+            {
+                bo->setDeepStunDmgExtra(0, 0);
+                defList[defCount].damType = e_unDeepForget;
+            }
+            else
+                defList[defCount].damType = e_UnForget;
+
+            defList[defCount].pos = bo->getPos() + pos0;
+            defList[defCount].damage = 0;
+            defList[defCount].leftHP = bo->getHP();
+            ++ defCount;
+        }
+
+        if(bo->getForgetRound() != 0)
+        {
+            bo->setForgetLevel(0);
+            bo->setForgetRound(0);
+
+            if(bo->getDeepForgetLast() != 0)
+            {
+                bo->setDeepForgetDmgExtra(0, 0);
+                defList[defCount].damType = e_unDeepStun;
+            }
+            else
+                defList[defCount].damType = e_UnStun;
+
+            defList[defCount].pos = bo->getPos() + pos0;
+            defList[defCount].damage = 0;
+            defList[defCount].leftHP = bo->getHP();
+            ++ defCount;
+        }
     }
 
     return true;
@@ -6686,6 +6778,7 @@ bool BattleSimulator::doSkillStrengthen_debuf_defend(BattleFighter* bf, const GD
         pos0 = 25;
     {
         bo->setDefDec(ef->value, ef->last);
+        bf->setDefDecTimes(0);
         defList[defCount].pos = bo->getPos() + pos0;
         defList[defCount].damType = e_defDec;
         defList[defCount].damage = 0;
@@ -6695,6 +6788,23 @@ bool BattleSimulator::doSkillStrengthen_debuf_defend(BattleFighter* bf, const GD
 
     return true;
 }
+
+bool BattleSimulator::doSkillStrengthen_atkadd(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active)
+{
+    BattleFighter* bo = static_cast<BattleFighter *>(_objs[target_side][target_pos]);
+    if(!bo || !bf || !ef || !skill)
+        return false;
+
+    bool flag = bf->getSide() == target_side ? !active : active;
+    UInt16 last = ef->last + (bf == bo ? 1 : 0);
+    float atkadd = bo->_attack * ef->value/100;
+    setStatusChange_Atk(bf, target_side, target_pos, skill, atkadd, last, scList, scCount, flag );
+    float magatkadd = bo->_magatk * ef->value/100;
+    setStatusChange_MagAtk(bf, target_side, target_pos, skill, magatkadd, last, scList, scCount, flag );
+
+    return true;
+}
+
 
 
 bool BattleSimulator::doSkillStrengthenAttack(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active)

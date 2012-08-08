@@ -214,7 +214,7 @@ public:
 	bool calcCounter(BattleFighter* attacker, bool ranged = false);
 	bool canBeCounter();
 	bool calcPierce(BattleFighter* defender);
-    float calcTherapy(const GData::SkillBase* skill);
+    float calcTherapy(bool& isCritical, bool& first, const GData::SkillBase* skill);
     float calcMagAttack(bool& isCritical, BattleFighter* defender, float* pCf);
     float calcPoison(const GData::SkillBase* skill, BattleFighter* defender, bool cs);
     void calcSkillAttack(bool& isCritical, BattleFighter* defender, float& atk, float& magatk, float* pCf);
@@ -486,6 +486,7 @@ private:
 
     float _def_dec;
     UInt8 _def_dec_last;
+    UInt8 _def_dec_times;
 
 public:
     void fakeDead();
@@ -518,6 +519,8 @@ public:
     inline UInt8& getDefDecLast() { return _def_dec_last; }
     inline float getDefDec() { return _def_dec; }
     inline void setDefDec(float value, UInt8 last) { _def_dec = value; _def_dec_last = last; }
+    inline UInt8 getDefDecTimes() { return _def_dec_times; }
+    inline void setDefDecTimes(UInt8 v) { _def_dec_times = v; }
 public:
 	enum StatusFlag
 	{
