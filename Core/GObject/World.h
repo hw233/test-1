@@ -346,6 +346,7 @@ private:
 	static void World_testUpdate(World *);
 	static void World_Leaderboard_Update( void * );
 	static void World_ChatItem_Purge( void * );
+    static void World_Store_Check(void *);
 	static void World_Multi_Check( World * );
 	static void World_Midnight_Check( World * );
     static void World_CreateNewDB_Check();

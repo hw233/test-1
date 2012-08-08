@@ -874,9 +874,9 @@ namespace Script
 		Call<void>("onLogin", player);
 	}
 
-	void GameActionLua::onDungeonWin( Player* player, UInt8 id, UInt8 count )
+	void GameActionLua::onDungeonWin( Player* player, UInt8 id, UInt8 count, bool free )
 	{
-		Call<void>("onDungeonWin", player, id, count);
+		Call<void>("onDungeonWin", player, id, count, free);
 	}
 
 	void GameActionLua::onClanBattleAttend( Player* player )
