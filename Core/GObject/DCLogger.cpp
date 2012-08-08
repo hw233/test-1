@@ -27,6 +27,8 @@ bool DCLogger::init()
 
 void DCLogger::incDomainOnlineNum(UInt8 domain)
 {
+    if (!cfg.dclog)
+        return;
     for(int i = 0; i < MAX_DOMAIN; ++i)
     {
         if(domain == m_domain[i])
@@ -36,6 +38,8 @@ void DCLogger::incDomainOnlineNum(UInt8 domain)
 
 void DCLogger::decDomainOnlineNum(UInt8 domain)
 {
+    if (!cfg.dclog)
+        return;
     for(int i = 0; i < MAX_DOMAIN; ++i)
     {
         if(domain == m_domain[i] && m_onlineNum_domain[i] > 0)
@@ -45,6 +49,8 @@ void DCLogger::decDomainOnlineNum(UInt8 domain)
 
 bool DCLogger::reg(Player* player)
 {
+    if (!cfg.dclog)
+        return true;
     std::ostringstream msg;
 
     msg << "version=";
@@ -78,6 +84,8 @@ bool DCLogger::reg(Player* player)
 
 bool DCLogger::login(Player* player)
 {
+    if (!cfg.dclog)
+        return true;
     std::ostringstream msg;
 
     msg << "version=";
@@ -111,6 +119,8 @@ bool DCLogger::login(Player* player)
 
 bool DCLogger::logout(Player* player)
 {
+    if (!cfg.dclog)
+        return true;
     std::ostringstream msg;
 
     msg << "version=";
@@ -146,6 +156,8 @@ bool DCLogger::logout(Player* player)
 
 void DCLogger::online()
 {
+    if (!cfg.dclog)
+        return;
     for(int i = 0; i < MAX_DOMAIN; ++ i)
     {
         if(m_onlineNum_domain[i])
@@ -155,6 +167,8 @@ void DCLogger::online()
 
 bool DCLogger::online(UInt32 num, UInt8 domain)
 {
+    if (!cfg.dclog)
+        return true;
     std::ostringstream msg;
 
     msg << "version=";
@@ -180,6 +194,8 @@ bool DCLogger::online(UInt32 num, UInt8 domain)
 
 bool DCLogger::consume(Player* player, UInt32 total, UInt32 c)
 {
+    if (!cfg.dclog)
+        return true;
     stringstream msg;
     msg << "version=";
     msg << version;
@@ -217,6 +233,8 @@ bool DCLogger::consume(Player* player, UInt32 total, UInt32 c)
 
 bool DCLogger::fee(Player* player, UInt32 total, Int32 c)
 {
+    if (!cfg.dclog)
+        return true;
     std::ostringstream msg;
 
     msg << "version=";
@@ -261,6 +279,8 @@ bool DCLogger::fee(Player* player, UInt32 total, Int32 c)
 
 bool DCLogger::blue(Player* player)
 {
+    if (!cfg.dclog)
+        return true;
     std::ostringstream msg;
 
     msg << "version=";
@@ -292,6 +312,8 @@ bool DCLogger::blue(Player* player)
 
 bool DCLogger::d3d6(Player* player)
 {
+    if (!cfg.dclog)
+        return true;
     std::ostringstream msg;
 
     msg << "version=";

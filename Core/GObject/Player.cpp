@@ -1009,7 +1009,7 @@ namespace GObject
     void Player::udpLog(UInt8 platform, const char* str1, const char* str2, const char* str3, const char* str4,
                 const char* str5, const char* str6, const char* type, UInt32 count)
     {
-        if (m_ulog)
+        if (m_ulog && cfg.udplog)
         {
             char buf[1024] = {0};
             char* pbuf = &buf[0];
