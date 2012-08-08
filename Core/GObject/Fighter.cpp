@@ -2511,9 +2511,11 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool lvlup )
 
     if (ret && !swap)
     {
-        bool up = _owner?(_owner->getMainFighter()?_owner->getMainFighter()->getLevel()>=10:true):false;
+        bool up = true;//_owner?(_owner->getMainFighter()?_owner->getMainFighter()->getLevel()>=10:true):false;
+        /*
         if (!writedb)
             up = false;
+            */
         addSkillsFromCT(skillFromCitta(citta), writedb, up);
 
         {

@@ -6636,7 +6636,7 @@ void BattleSimulator::setStatusChange_MagAtkReduce(BattleFighter * bf, UInt8 sid
 bool BattleSimulator::doSkillStrengthen_disperse(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active)
 {
     BattleFighter* bo = static_cast<BattleFighter *>(_objs[target_side][target_pos]);
-    if(!bo || !bf || !ef || !skill)
+    if(!bo || !bf || !ef || !skill || bo->getHP() == 0)
         return false;
 
     int pos0 = 0;
@@ -6703,7 +6703,7 @@ bool BattleSimulator::doSkillStrengthen_disperse(BattleFighter* bf, const GData:
 bool BattleSimulator::doSkillStrengthen_reduce(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active)
 {
     BattleFighter* bo = static_cast<BattleFighter *>(_objs[target_side][target_pos]);
-    if(!bo || !bf || !ef || !skill)
+    if(!bo || !bf || !ef || !skill || bo->getHP() == 0)
         return false;
 
     int pos0 = 0;
@@ -6744,7 +6744,7 @@ bool BattleSimulator::doSkillStrengthen_reduce(BattleFighter* bf, const GData::S
 bool BattleSimulator::doSkillStrengthen_week(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active)
 {
     BattleFighter* bo = static_cast<BattleFighter *>(_objs[target_side][target_pos]);
-    if(!bo || !bf || !ef || !skill)
+    if(!bo || !bf || !ef || !skill || bo->getHP() == 0)
         return false;
 
     int pos0 = 0;
@@ -6768,7 +6768,7 @@ bool BattleSimulator::doSkillStrengthen_week(BattleFighter* bf, const GData::Ski
 bool BattleSimulator::doSkillStrengthen_debuf_defend(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active)
 {
     BattleFighter* bo = static_cast<BattleFighter *>(_objs[target_side][target_pos]);
-    if(!bo || !bf || !ef || !skill)
+    if(!bo || !bf || !ef || !skill || bo->getHP() == 0)
         return false;
 
     int pos0 = 0;
@@ -6792,7 +6792,7 @@ bool BattleSimulator::doSkillStrengthen_debuf_defend(BattleFighter* bf, const GD
 bool BattleSimulator::doSkillStrengthen_atkadd(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active)
 {
     BattleFighter* bo = static_cast<BattleFighter *>(_objs[target_side][target_pos]);
-    if(!bo || !bf || !ef || !skill)
+    if(!bo || !bf || !ef || !skill || bo->getHP() == 0)
         return false;
 
     bool flag = bf->getSide() == target_side ? !active : active;
@@ -6809,8 +6809,7 @@ bool BattleSimulator::doSkillStrengthen_atkadd(BattleFighter* bf, const GData::S
 
 bool BattleSimulator::doSkillStrengthenAttack(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active)
 {
-    BattleObject * bo = static_cast<BattleFighter *>(_objs[target_side][target_pos]);
-    if(!bo || !bf || !ef || !skill || bo->getHP() == 0)
+    if(!bf || !ef || !skill)
         return false;
     if((this->skillStrengthenTable[ef->type]) == NULL)
         return false;
