@@ -4134,12 +4134,12 @@ void Fighter::SSOpen(UInt16 id)
         UInt8 mlvl = getUpSkillLevel(idx);
         if (i->second.maxLvl >= mlvl && mlvl == 9)
         {
-            _owner->sendMsgCode(0, 1028);
+            _owner->sendMsgCode(0, 1021);
             return;
         }
         if (i->second.maxLvl >= mlvl)
         {
-            _owner->sendMsgCode(0, 1021);
+            _owner->sendMsgCode(0, 1027);
             return;
         }
     }
@@ -4233,7 +4233,7 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, bool bind)
 
     if (ss.lvl >= ss.maxLvl)
     {
-        _owner->sendMsgCode(0, 1027);
+        _owner->sendMsgCode(0, 1028);
         return 0;
     }
 
