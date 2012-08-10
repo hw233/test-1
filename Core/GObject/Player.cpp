@@ -10038,6 +10038,7 @@ namespace GObject
                 // 活动限购还未开始
                 time = 0;
                 count = 0;
+                SetVar(GObject::VAR_DISCOUNT_SP_1_TIME + type - 4, 0);
             }
             else
             {
@@ -10047,6 +10048,7 @@ namespace GObject
                     // 活动限购已经结束
                     time = 0;
                     count = 0;
+                    SetVar(GObject::VAR_DISCOUNT_SP_1_TIME + type - 4, 0);
                 }
                 else
                     time -= now;
