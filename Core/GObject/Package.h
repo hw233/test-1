@@ -111,10 +111,10 @@ namespace GObject
 		UInt16 Size() const  { return m_Size; }
 		ItemBase*  GetItem(UInt32 id, bool bind = false);
 		ItemEquip*  GetEquip(UInt32 id);
-        inline bool FormulaMerge(UInt32 id, bool bind, UInt32 Mnum) { return FCMerge(id, bind, Mnum); }
-        inline bool CittaMerge(UInt32 id, bool bind, UInt32 Mnum) { return FCMerge(id, bind, Mnum); }
-        inline bool TrumpMerge(UInt32 id, bool bind, UInt32 Mnum) { return FCMerge(id, bind, Mnum); } 
-        bool FCMerge(UInt32 id, bool bind, UInt32 Mnum);
+        inline UInt8 FormulaMerge(UInt32 id, UInt8 bind, UInt32 Mnum) { return FCMerge(id, bind, Mnum); }
+        inline UInt8 CittaMerge(UInt32 id, UInt8 bind, UInt32 Mnum) { return FCMerge(id, bind, Mnum); }
+        inline UInt8 TrumpMerge(UInt32 id, UInt8 bind, UInt32 Mnum) { return FCMerge(id, bind, Mnum); } 
+        UInt8 FCMerge(UInt32 id, UInt8 bind, UInt32 Mnum);
 
 		UInt16 GetItemNum(UInt32 id, bool bind = false);
 		UInt16 GetItemAnyNum(UInt32 id);

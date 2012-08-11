@@ -1334,54 +1334,81 @@ namespace GObject
         if(!m_Owner->hasChecked())
 			return false;
 		bool ret = false;
-
+        UInt8 ret2 = 0;
         // XXX: 0-使用 1-合成 2-分解
         // XXX: 0,2同时走使用流程
         if (type == 1)
         {
+            ItemBase* item = GetItem(id, bind > 0);
+            if(2 == bind){ //2:优先使用绑定材料合成
+                if( !item )
+                    item = GetItem(id, false);
+            }
+            if( !item ){
+                m_Owner->sendMsgCode(0, 1802);
+                return false;
+            }
             if (GetItemSubClass(id) == Item_Formula)
             {
-                ItemBase* item = GetItem(id, bind > 0);
                 if (item && item->getClass() == Item_Formula5)
                 {
-                    ret = FormulaMerge(id, bind > 0, num);
-                    if (ret)
+                    ret2 = FormulaMerge(id, bind, num);
+                    if (1 == ret2){
                         m_Owner->sendMsgCode(0, 1800);
-                    else
+                        return true;
+                    }
+                    else if(0 == ret2){
                         m_Owner->sendMsgCode(0, 1802);
-                    return ret;
+                        return false;
+                    }
+                    else{
+                        m_Owner->sendMsgCode(0, 1011);
+                        return false;
+                    }
                 }
             }
             else if (GetItemSubClass(id) == Item_Citta)
             {
-                ItemBase* item = GetItem(id, bind > 0);
                 if (item && item->getClass() == Item_Citta5)
                 {
-                    ret = CittaMerge(id, bind > 0, num);
-                    if (ret)
+                    ret2 = CittaMerge(id, bind, num);
+                    if (1 == ret2){
                         m_Owner->sendMsgCode(0, 1800);
-                    else
+                        return true;
+                    }
+                    else if(0 == ret2){
                         m_Owner->sendMsgCode(0, 1802);
-                    return ret;
+                        return false;
+                    }
+                    else{
+                        m_Owner->sendMsgCode(0, 1011);
+                        return false;
+                    }
                 }
             }
             else if (GetItemSubClass(id) == Item_Normal ||
                     GetItemSubClass(id) == Item_Soul ||
                     GetItemSubClass(id) == Item_SL)
             {
-                ItemBase* item = GetItem(id, bind > 0);
                 if (item && (item->getClass() == Item_Normal29 ||
                             item->getClass() == Item_Normal28 ||
                             (item->getClass() >= Item_Soul && item->getClass() <= Item_Soul9) ||
                             item->getClass() == Item_SL1 ||
                             item->getClass() == Item_SL2))
                 {
-                    ret = TrumpMerge(id, bind > 0, num);
-                    if (ret)
+                    ret2 = TrumpMerge(id, bind, num);
+                    if (1 == ret2){
                         m_Owner->sendMsgCode(0, 1800);
-                    else
+                        return true;
+                    }
+                    else if(0 == ret2){
                         m_Owner->sendMsgCode(0, 1802);
-                    return ret;
+                        return false;
+                    }
+                    else{
+                        m_Owner->sendMsgCode(0, 1011);
+                        return false;
+                    }
                 }
             }
             return false;
@@ -1543,7 +1570,7 @@ namespace GObject
 		return ret;
 	}
 
-    bool Package::FCMerge(UInt32 id, bool bind, UInt32 Mnum)
+    UInt8 Package::FCMerge(UInt32 id, UInt8 bind, UInt32 Mnum)
     {
         /*
         static struct {
@@ -1589,43 +1616,75 @@ namespace GObject
             {70,    71,     "1,1",                  1751},
             {0, 0, NULL, 0},
         };*/
-        /*
-        if(Mnum <= 0 || Mnum > 10)
-            return false;
-        */
-        Mnum = 1;
-        bool b = false; //绑定
-        if (GetRestPackageSize() < Mnum)
-        {
-            m_Owner->sendMsgCode(0, 1011);
-            return false;
-        }
-
+        if(Mnum <= 0)
+            return 0;
         std::vector<stMergeStf> stfs = GObjectManager::getMergeStfs(id);
-
+        ItemBase * item = FindItem(stfs[0].m_to, true);
+        if( !item )
+            item = FindItem(stfs[0].m_to, false); 
+        if( !item ){
+            const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[stfs[0].m_to];
+            if(itemType == NULL) return 0;
+            item = new(std::nothrow) ItemBase(stfs[0].m_to, itemType);
+            if(item == NULL) return 0; 
+        }
+        if( IsEquip(item->getClass()) ){ //合成的是法宝，叠加数为1
+            if(Mnum > GetRestPackageSize())
+                return 2;
+        }
+        else{
+            if(item->Size(item->Count() + Mnum) - item->Size() + 1 > GetRestPackageSize())
+                return 2;
+        }
         if(stfs.size()  == 0 )
-            return false;
+            return 0;
 
         for(UInt32 i = 0 ; i < stfs[0].m_stfs.size() ; i ++)
         {
             UInt32 id = stfs[0].m_stfs[i].id;
             UInt32 num = stfs[0].m_stfs[i].num;
-
-            if( GetItemAnyNum(id) < num * Mnum)
-                return false;
+            if(2 == bind){ //优先使用绑定材料
+                if( GetItemAnyNum(id) < num * Mnum)
+                    return 0;
+            }
+            else if(1 == bind){ //只使用绑定材料
+                if( GetItemNum(id, true) < num * Mnum)
+                   return 0; 
+            }
+            else if(0 == bind){ //只使用不绑定材料
+                if( GetItemNum(id, false) < num * Mnum)
+                   return 0; 
+            }
+            else
+                return 0;
         }
-         
-        for(UInt32 i = 0 ; i < stfs[0].m_stfs.size() ; i ++)
-        {
-            UInt32 id = stfs[0].m_stfs[i].id;
-            UInt32 num = stfs[0].m_stfs[i].num;
-            
-            DelItemAny(id, num * Mnum, &bind);
-            if( bind )
-                b = true;
-        }
-        Add( stfs[0].m_to, 1 * Mnum, b, false, FromFCMerge);
-        return true;
+        for(UInt32 j = 0; j < Mnum; j ++){ 
+            bool b = false;
+            for(UInt32 i = 0 ; i < stfs[0].m_stfs.size() ; i ++)
+            {
+                UInt32 id = stfs[0].m_stfs[i].id;
+                UInt32 num = stfs[0].m_stfs[i].num;
+                if(2 == bind){ //优先使用绑定材料
+                    bool hasBind = true; 
+                    DelItemAny(id, num, &hasBind);
+                    if (hasBind)
+                        b = true;
+                }
+                else if(1 == bind){ //只使用绑定材料
+                    DelItem(id, num, true);
+                    b = true;
+                }
+                else if(0 == bind){ //只使用不绑定材料
+                    DelItem(id, num, false);
+                    b = false;
+                }
+            }
+            Add( stfs[0].m_to, 1, b, false, FromFCMerge);
+	    }	
+        Stream st(REP::PACK_USE);  //合成成功，供客户端更新数据
+		st << id << static_cast<UInt8>(4) << static_cast<UInt8>(1) << Stream::eos;
+		m_Owner->send(st);
+        return 1;
     }
 
 	UInt16 Package::GetItemNum(UInt32 id, bool bind)
