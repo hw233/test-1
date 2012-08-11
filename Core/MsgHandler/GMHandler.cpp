@@ -88,6 +88,7 @@ GMHandler::GMHandler()
 	Reg(3, "reloadLua", &GMHandler::OnReLoadLua);
 	Reg(3, "reload", &GMHandler::OnReLoadLua);
 	Reg(3, "limitluckydraw", &GMHandler::OnLimitLuckyDraw);
+    UInt8 getDisVarOffset(UInt8 type);
 	Reg(3, "run", &GMHandler::OnRunScript);
 	Reg(3, "reconn", &GMHandler::OnReconn);
 	Reg(3, "settitle", &GMHandler::OnSetTitle);

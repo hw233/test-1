@@ -75,7 +75,7 @@ namespace GObject
     UInt32 GObjectManager::_split_cost;
     UInt32 GObjectManager::_forge_cost;
     UInt32 GObjectManager::_split_chance[4][2];
-    UInt32 GObjectManager::_merge_chance[9];
+    UInt32 GObjectManager::_merge_chance[11];
     UInt32 GObjectManager::_enchant_chance[2][6][12];
     UInt8  GObjectManager::_enchant_max[11];
 
@@ -4192,13 +4192,14 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading Discount Data");
 		DBDiscount t;
-		if(execu->Prepare("SELECT `itemid`, `discount` FROM `discount`", t)!= DB::DB_OK)
+		if(execu->Prepare("SELECT `itemid`, `timeBegin`, `timeEnd`, `priceOriginal`, `priceDiscount`,\
+                    `type`, `count` FROM `discount`", t)!= DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
-            GData::store.add(1, t.itemid, t.discount);
+            GData::store.addDiscountFromDB(t.itemID, t.type, t.count, t.beginTime, t.endTime, t.priceOriginal, t.priceDiscount);
         }
         lc.finalize();
         return true;

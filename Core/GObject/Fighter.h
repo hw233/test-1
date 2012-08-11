@@ -288,7 +288,7 @@ public:
     // 初始化可装备的心法
     void setCittas(std::string& cittas, bool = true);
     // 装备心法
-    bool upCitta(UInt16 citta, int idx, bool = true);
+    bool upCitta(UInt16 citta, int idx, bool = true, bool = false);
     // 卸下心法
     bool offCitta(UInt16 citta, bool = false, bool = false, bool = true);
     // 增加一个心法
@@ -567,6 +567,7 @@ public:
     Int32 getAcuPraAdd() { return _praadd; }
     float getPracticeBufFactor();
     float getPracticeIncByDiamond();
+    float getPracticeIncByQQVip();
     float getClanTechAddon(int place);
     float getPracticeInc();
     // TODO:
@@ -727,6 +728,8 @@ public:
     void SSUpdate2DB(UInt16 id, SStrengthen& ss);
     void SSDeleteDB(UInt16 id);
     void SSFromDB(UInt16 id, SStrengthen& ss);
+    void SSSendSSInfo(UInt16 skill);
+    void SSNotify(UInt16 id, SStrengthen& ss);
     void makeFighterSSInfo(Stream& st);
     bool appendFighterSSInfo(Stream& st, UInt16 skillid);
     bool appendFighterSSInfo(Stream& st, UInt16 skillid, SStrengthen* ss);

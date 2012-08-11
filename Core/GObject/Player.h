@@ -102,6 +102,7 @@ namespace GObject
 #define PLAYER_BUFF_N_ATHLETICS     0x44    //邀请斗剑冷却
 
 #define PLAYER_BUFF_ATHLETICS_P     0x45    //历练冷却时间
+#define PLAYER_BUFF_QQVIPBUF        0x46
 #define PLAYER_BUFF_ATHL1           0x51
 #define PLAYER_BUFF_ATHL2           0x52
 #define PLAYER_BUFF_ATHL3           0x53
@@ -698,7 +699,7 @@ namespace GObject
             _playerData.qqvipl1 = lvl;
             if (lvl > 7 && lvl < 10)
                 _playerData.qqvipl1 = 7;
-            if (lvl >= 20)
+            else if (lvl >= 20 && lvl < 40)
                  _playerData.qqvipl1 = 16;
         }
         inline UInt8 getQQVipl() { return _playerData.qqvipl; }
@@ -724,7 +725,7 @@ namespace GObject
         // XXX: 1-9 黄钻等级
         //      10-19 蓝钻等级
         //      20-29 3366等级,另qqvipl1 为蓝钻等级
-        //      30-39 Q+等级,另qqvipl1 为黄钻等级
+        //      30-39 Q+等级,另qqvipl1为会员等级
         //      40-49 QQ会员等级
         inline bool isYD() const
         {
@@ -735,13 +736,13 @@ namespace GObject
             //if (_playerData.qqvipl >= 10 && _playerData.qqvipl <= 19)
             if (_playerData.qqvipl >= 11 && _playerData.qqvipl <= 19) //qqvipl为10代表蓝钻0级，不是蓝钻用户
                 return true;
-            if (_playerData.qqvipl >= 20 && _playerData.qqvipl <= 29 && _playerData.qqvipl1 >= 11 && _playerData.qqvipl1 <= 19) //qqvipli1为10代表蓝钻0级，不是蓝钻用户
+            if (_playerData.qqvipl >= 21 && _playerData.qqvipl <= 29 && _playerData.qqvipl1 >= 11 && _playerData.qqvipl1 <= 19) //qqvipli1为10代表蓝钻0级，不是蓝钻用户
                     return true;
             return false;
         }
         inline bool isQQVIP() const 
         {
-            return (_playerData.qqvipl > 40 && _playerData.qqvipl <= 49);
+            return (_playerData.qqvipl > 40 && _playerData.qqvipl <= 49) || (_playerData.qqvipl1 > 40 && _playerData.qqvipl1 <= 49);
         }
 
 		UInt32 getTotalRecharge()			{ return _playerData.totalRecharge; }
@@ -845,7 +846,8 @@ namespace GObject
 		UInt32 useTael(UInt32 c,ConsumeInfo * ci=NULL);
 		void useTael2(UInt32 c, Player *attacker, ConsumeInfo * ci = NULL);
         UInt32 useMoneyArena( UInt32 a,ConsumeInfo * ci = NULL);
-        UInt32 getMoneyArena( UInt32 c );
+        UInt32 getMoneyArenaLua(UInt32 c);
+        UInt32 getMoneyArena( UInt32 c, IncommingInfo *ii = NULL);
 
 		UInt32 getCoin(UInt32 c = 0);
 		UInt32 useCoin(UInt32 c, ConsumeInfo * ci=NULL, bool notify = true);
@@ -1350,6 +1352,7 @@ namespace GObject
         UInt8 _justice_roar;
         float _spirit_factor;
         bool _diamond_privilege;
+        bool _qqvip_privilege;
         UInt32 _athlRivalBuf;
     public:
         static UInt8 _yaMenActiveCount;
@@ -1365,6 +1368,7 @@ namespace GObject
         inline UInt32 getPracticeSlot() { return _praplace&0xffff; }
         float getPracticeBufFactor();
         float getPracticeIncByDiamond();
+        float getPracticeIncByQQVip();
         bool accPractice();
         void AddPracticeExp(const PracticeFighterExp* pfexp);
 
@@ -1376,6 +1380,9 @@ namespace GObject
 
         inline void setDiamondPrivilege(UInt8 v) { _diamond_privilege = v; }
         inline UInt8 getDiamondPrivilege() { return _diamond_privilege; }
+
+        inline void setQQVipPrivilege(UInt8 v) { _qqvip_privilege = v; }
+        inline UInt8 getQQVipPrivilege() { return _qqvip_privilege; }
 
         inline void setAthlRivalBuff(UInt32 v) { _athlRivalBuf = v; }
         inline UInt32 getAthlRivalBuff() { return _athlRivalBuf; }
@@ -1570,7 +1577,7 @@ namespace GObject
         void onBlueactiveday();
         void sendSecondInfo();
         void recvYBBuf(UInt8 type);
-        void sendYBBufInfo(UInt32 ybbuf);
+        void sendYBBufInfo(UInt32 ybbuf, UInt32 qqvipbuf);
         void adjustAthlBuffData(UInt32 type);
         void sendAthlBufInfo();
 

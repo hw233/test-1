@@ -110,6 +110,7 @@ namespace GObject
         VAR_DISCOUNT_1 = 80, // 3折区购买次数
         VAR_DISCOUNT_2 = 81, // 5折区购买次数
         VAR_DISCOUNT_3 = 82, // 8折区购买次数
+
         VAR_CTSLANDING = 83, // 创建角色前七天连续登陆记录
         VAR_CTSAWARD = 84, // 七天登陆奖励
         VAR_CLAWARD = 85, // 七天连续登陆奖励
@@ -180,6 +181,20 @@ namespace GObject
         VAR_CONSUME = 142, // 消耗累积
 
         VAR_PHYSICAL_BUY = 143, //购买体力限制
+        VAR_QQVIP_BUF = 144,    //QQ会员之力是否领取
+        VAR_QQVIP_CNT = 145,    //QQ会员特权
+
+        VAR_DISCOUNT_SP_1 = 144, // 原3折区域，增加活动限购后的购买次数
+        VAR_DISCOUNT_SP_2 = 145, // 原5折区域，增加活动限购后的购买次数
+        VAR_DISCOUNT_SP_3 = 146, // 原8折区域，增加活动限购后的购买次数
+
+        VAR_DISCOUNT_1_TIME = 147,
+        VAR_DISCOUNT_2_TIME = 148,
+        VAR_DISCOUNT_3_TIME = 149,
+
+        VAR_DISCOUNT_SP_1_TIME = 150,
+        VAR_DISCOUNT_SP_2_TIME = 151,
+        VAR_DISCOUNT_SP_3_TIME = 152,
 
         VAR_MAX,
     };
@@ -287,6 +302,17 @@ namespace GObject
             REGISTER_VAR(VAR_DISCOUNT_1, CYCLE_WEEK);
             REGISTER_VAR(VAR_DISCOUNT_2, CYCLE_WEEK);
             REGISTER_VAR(VAR_DISCOUNT_3, CYCLE_WEEK);
+            REGISTER_VAR(VAR_DISCOUNT_SP_1, CYCLE_NONE);
+            REGISTER_VAR(VAR_DISCOUNT_SP_2, CYCLE_NONE);
+            REGISTER_VAR(VAR_DISCOUNT_SP_3, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_DISCOUNT_1_TIME, CYCLE_NONE);
+            REGISTER_VAR(VAR_DISCOUNT_2_TIME, CYCLE_NONE);
+            REGISTER_VAR(VAR_DISCOUNT_3_TIME, CYCLE_NONE);
+            REGISTER_VAR(VAR_DISCOUNT_SP_1_TIME, CYCLE_NONE);
+            REGISTER_VAR(VAR_DISCOUNT_SP_2_TIME, CYCLE_NONE);
+            REGISTER_VAR(VAR_DISCOUNT_SP_3_TIME, CYCLE_NONE);
+
             REGISTER_VAR(VAR_CTSLANDING, CYCLE_NONE);
             REGISTER_VAR(VAR_CTSAWARD, CYCLE_DAY);
             REGISTER_VAR(VAR_CLAWARD, CYCLE_DAY);
@@ -352,6 +378,8 @@ namespace GObject
             REGISTER_VAR(VAR_SOSOMAPAWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_CONSUME, CYCLE_NONE);
             REGISTER_VAR(VAR_PHYSICAL_BUY, CYCLE_DAY);
+            REGISTER_VAR(VAR_QQVIP_BUF, CYCLE_DAY);
+            REGISTER_VAR(VAR_QQVIP_CNT, CYCLE_DAY);
         }
         
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

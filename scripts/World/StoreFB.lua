@@ -36,6 +36,8 @@ end
 
 store:discountLimit()
 
+addSpecialDiscount()
+
 store:add(2,549,80)
 store:add(2,9083,50)
 

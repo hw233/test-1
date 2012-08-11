@@ -130,6 +130,8 @@ int query_rolelist_req(JsonHead* head, json_t* body, json_t* retbody, std::strin
         areaid = atoi(val->child->text);
 
     playerid = atoll(playerId);
+    //if (cfg.merged)
+    //    playerid |= (areaid << 48);
     GObject::Player* player = GObject::globalPlayers[playerid];
     if (!player)
     {
@@ -138,7 +140,18 @@ int query_rolelist_req(JsonHead* head, json_t* body, json_t* retbody, std::strin
     }
 
     json_insert_pair_into_object(retbody, "ullRoleId", json_new_string(playerId));
-    json_insert_pair_into_object(retbody, "szRoleName", json_new_string(player->getName().c_str()));
+    std::string name = player->getName();
+    if (cfg.merged && name.length())
+    {
+        int len = name.size() - 1;
+        for (; len > 0; --len)
+        {
+            if (name[len] >= 32)
+                break;
+        }
+        name.resize(len+1);
+    }
+    json_insert_pair_into_object(retbody, "szRoleName", json_new_string(name.c_str()));
 
     head->cmd = 2;
     return 0;

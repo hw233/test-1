@@ -73,6 +73,11 @@ enum PurchaseType
     ArenaBet,
     AthleticKillCD2,
     AthleticPhysical,
+    DiscountSp1,
+    DiscountSp2,
+    DiscountSp3,
+    ArenaFromCard,
+    ArenaFromMail,
 };
 
 enum IncomingType
