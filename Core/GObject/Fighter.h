@@ -325,6 +325,7 @@ public:
     void getAllCittaAndLevel(Stream& st);
     // 取得所有学会的无双技能
     void getAllPeerlessAndLevel(Stream& st);
+    const std::vector<UInt16>& getCittas() const { return _cittas; }
 
     // 取得可装备的无双技能
     void getAllPeerless(Stream& st);

@@ -25,7 +25,7 @@ namespace GObject
     {
         GVAR_INVALID = 0,
         GVAR_TCPASS = 1, // 组队副本最高通过等级
-        GVAR_CITTASPLIT = 2; // 心法拆分成两个处理
+        GVAR_CITTASPLIT = 2, // 心法拆分成两个处理
         GVAR_MAX,
     };
 
