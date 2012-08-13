@@ -2777,8 +2777,8 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                     if (logVarOffset != 0xff)
                     {
                         ConsumeInfo ci(Discount3+logVarOffset, 0, 0);
+                        player->useGold(price, &ci);
                     }
-                    player->useGold(price, &ci);
                     st << static_cast<UInt8>(0);
 
                     GameAction()->doAty(player, AtyBuy, 0, 0);
