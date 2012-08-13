@@ -375,12 +375,6 @@ void Store::clear()
 		_itemsExchange[i].clear();
 		_itemPricesExchange[i].clear();
     }
-    for (int i = 0; i <= DISCOUNTEND - DISCOUNT; ++i)
-    {
-        _storePacketDiscount[i].clear();
-        _itemsDiscount[i].clear();
-    }
-
 }
 
 void Store::clearNormalDiscount()
