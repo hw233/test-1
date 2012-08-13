@@ -25,6 +25,10 @@ namespace GObject
     {
         GVAR_INVALID = 0,
         GVAR_TCPASS = 1, // 组队副本最高通过等级
+
+        GVAR_DISCOUNT_SP_1 = 0x11,  // 第一类全服限购的剩余数量
+        GVAR_DISCOUNT_SP_2 = 0x12,  // 第二类全服限购的剩余数量 
+        GVAR_DISCOUNT_SP_3 = 0x13,  // 第三类全服限购的剩余数量
         GVAR_MAX,
     };
 
