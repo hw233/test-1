@@ -39,8 +39,8 @@ namespace GObject
 
 #define SKILL_UPMAX 3 // 技能最初就能装备3个
 #define CITTA_LEVEL_MAX 100
-#define CITTA_UPMAX 6
-#define CITTA_INIT 2 // 心法最初只能装2个,由穴道控制装备个数
+#define CITTA_UPMAX 9
+#define CITTA_INIT 5 // 心法最初只能装2个,由穴道控制装备个数
 #define TRUMP_UPMAX 3
 #define TRUMP_INIT 1 // 法宝最初只能装1个,由VIP等级控制装备个数
 #define ACUPOINTS_MAX 15

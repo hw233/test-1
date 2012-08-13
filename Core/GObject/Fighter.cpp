@@ -2418,6 +2418,10 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool lvlup )
     if (!cb)
         return false;
 
+    // XXX: 只能装备3个主动技能
+    if (cb->effect && cb->effect->skill.size() && getUpSkillsNum() >= 3)
+        return false;
+
     int cidx = hasCitta(citta);
     if (cidx < 0)
         return false;
