@@ -1905,8 +1905,10 @@ namespace GObject
         UInt16 citta = cittas[fgt->getClass()-1];
         if (fgt->hasCitta(citta) < 0) {
             if (fgt->addNewCitta(citta, writedb, true)) {
+#if 0
                 if (fgt->upCitta(citta, 0, writedb)) {
                 }
+#endif
             }
         }
     }
