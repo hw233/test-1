@@ -1369,8 +1369,8 @@ void AthleticsRank::TmExtraAward()
 			MailItemsInfo itemsInfo(mitem, AthliticisTimeAward, count);
 
             SYSMSG(title, 318);
-			SYSMSGV(awardStr, 326, item1->getName().c_str());
-			SYSMSGV(content, 325, rank, awardStr);
+			//SYSMSGV(awardStr, 326, item1->getName().c_str());
+			SYSMSGV(content, 325, rank, itemId, itemCount);
 			pmail = ranker->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
 
             if(pmail != NULL)

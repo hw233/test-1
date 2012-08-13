@@ -4289,7 +4289,6 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, bool bind)
     ss.curVal += exp;
 
     UInt8 ret = 1;
-    UInt8 mlvl = getUpSkillLevel(idx);
     while (ss.curVal >= ss.maxVal)
     {
         ss.curVal -= ss.maxVal;
@@ -4298,12 +4297,11 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, bool bind)
         if (ss.lvl >= ss.maxLvl)
         {
             ss.curVal = 0;
-            if (ss.lvl == mlvl) // XXX: max level
+            if (ss.lvl == 9) // XXX: max level
                 ss.maxVal = 0;
             ret = 0;
             break;
         }
-
         ss.maxVal = GData::GDataManager::getMaxStrengthenVal(sid, ss.lvl);
     }
 
