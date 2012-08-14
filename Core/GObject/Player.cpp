@@ -7811,6 +7811,7 @@ namespace GObject
 #else
 		char numstr[16];
         char separator[2] = {32, 0};
+        //char separator[] = {"\n "}; //分隔符是回车加空格
 
         std::string sepStr(separator);
 		sprintf(numstr, "%u", _playerData.title);
@@ -10040,6 +10041,7 @@ namespace GObject
                 // 活动限购还未开始
                 time = 0;
                 count = 0;
+                SetVar(GObject::VAR_DISCOUNT_SP_1_TIME + type - 4, 0);
             }
             else
             {
@@ -10049,6 +10051,7 @@ namespace GObject
                     // 活动限购已经结束
                     time = 0;
                     count = 0;
+                    SetVar(GObject::VAR_DISCOUNT_SP_1_TIME + type - 4, 0);
                 }
                 else
                     time -= now;
