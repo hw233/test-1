@@ -196,6 +196,8 @@ namespace GObject
         VAR_DISCOUNT_SP_2_TIME = 153,
         VAR_DISCOUNT_SP_3_TIME = 154,
 
+        VAR_RECHARGE_TOTAL3366 = 169, //3366合作充值活动
+
         VAR_MAX,
     };
 

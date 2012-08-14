@@ -62,6 +62,7 @@
 #include "RealItemAward.h"
 #include "NewRelation.h"
 #include "GVar.h"
+#include "Server/SysMsg.h"
 
 namespace GObject
 {
@@ -739,6 +740,11 @@ namespace GObject
 	{
 		p->Load();
 		gBlockbossmgr.addPlayerRank(p, p->getBlockBossLevel(), p->GetLev());
+
+        void cittaSplit(Player* pl);
+        // XXX: 拆分心法处理
+        if (!GVAR.GetVar(GVAR_CITTASPLIT))
+            cittaSplit(p);
 		return true;
 	}
 
@@ -853,6 +859,107 @@ namespace GObject
 
         return true;
 
+    }
+
+    UInt16 getCittaItemId(UInt16 citta)
+    {
+        UInt16 c2item[] = {
+            27, 1306,
+            39, 1311,
+            47, 1315,
+            53, 1318,
+            57, 1319,
+            63, 1322,
+            32, 1308,
+            41, 1313,
+            33, 1309,
+            40, 1312,
+            59, 1321,
+            80, 1324,
+            36, 1310,
+            31, 1307,
+            52, 1317,
+            45, 1314,
+            58, 1320,
+            66, 1323,
+        };
+
+        for (UInt16 i = 0; i < sizeof(c2item)/sizeof(UInt16); i += 2)
+        {
+            if (c2item[i] == citta)
+                return c2item[i+1];
+        }
+        return 0;
+    }
+
+    bool cittaSplit2(std::pair<const unsigned int, GObject::Fighter*>& f)
+    {
+        Fighter* fgt = f.second;
+        if (!fgt)
+            return true;
+        Player* pl = fgt->getOwner();
+        if (!pl)
+            return true;
+
+        const std::vector<UInt16>& cittas = fgt->getCittas();
+        if (!cittas.size())
+            return true;
+
+        size_t size = cittas.size();
+        for (size_t i = 0; i < size; ++i)
+        {
+            UInt16 citta = cittas[i];
+            if (citta)
+            {
+                UInt8 lvl = CITTA_LEVEL(citta);
+                UInt16 id = CITTA_ID(citta);
+
+                UInt16 itemid = getCittaItemId(id);
+                if (!itemid)
+                    continue;
+
+                if (fgt->getCittasNum() < 40)
+                {
+                    UInt16 ncitta = CITTAANDLEVEL(itemid - 1200 + 1, lvl);
+                    if (fgt->addNewCitta(ncitta, true, true))
+                        continue;
+                }
+
+                UInt32 exp = 0;
+                for (UInt8 l = 1; l <= lvl; ++l)
+                {
+                    const GData::CittaBase* cb = GData::cittaManager[CITTAANDLEVEL(id,l)];
+                    if (!cb)
+                        continue;
+                    exp += cb->pexp;
+                }
+
+                if (exp) {
+                    UInt16 rCount1 = static_cast<UInt16>(exp / 1000000);
+                    exp = exp % 1000000;
+                    UInt16 rCount2 = static_cast<UInt16>(exp / 10000);
+                    exp = exp % 10000;
+                    UInt16 rCount3 = static_cast<UInt16>(exp / 100);
+
+                    SYSMSG(title, 3003);
+                    SYSMSGV(content, 3004, fgt->getName().c_str());
+                    MailPackage::MailItem mitem[4] = {{31, rCount1}, {30, rCount2}, {29, rCount3}, {itemid, 1}};
+                    MailItemsInfo itemsInfo(mitem, SplitCitta, 4);
+                    GObject::Mail * pmail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+                    if (pmail != NULL)
+                    {
+                        GObject::mailPackageManager.push(pmail->id, mitem, 4, true);
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    void cittaSplit(Player* pl)
+    {
+        pl->foreachFighter(cittaSplit2);
     }
 
 	bool GObjectManager::loadAllPlayers()
@@ -1392,10 +1499,10 @@ namespace GObject
 			fgt2->setAmulet(fetchEquipment(specfgtobj.amulet), false);
             fgt2->setTrump(specfgtobj.trump, false);
             fgt2->setPeerless(specfgtobj.peerless, false); // XXX: must after setTrump
-            fgt2->setSkills(specfgtobj.skills, false);
-            fgt2->setUpSkills(specfgtobj.skill, false);
             fgt2->setCittas(specfgtobj.cittas, false);
             fgt2->setUpCittas(specfgtobj.citta, false);
+            fgt2->setSkills(specfgtobj.skills, false);
+            fgt2->setUpSkills(specfgtobj.skill, false);
             fgt2->setAttrType1(specfgtobj.attrType1);
             fgt2->setAttrValue1(specfgtobj.attrValue1);
             fgt2->setAttrType2(specfgtobj.attrType2);
@@ -1948,6 +2055,7 @@ namespace GObject
 		/////////////////////////////////
 
 		globalPlayers.enumerate(player_load, 0);
+        GVAR.SetVar(GVAR_CITTASPLIT, 1);
 
 		return true;
 	}

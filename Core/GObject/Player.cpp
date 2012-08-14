@@ -6172,6 +6172,14 @@ namespace GObject
 #endif
         }
 
+        if (World::getRechargeActive3366() && atoi(m_domain.c_str()) == 11)
+        {
+            UInt32 total = GetVar(VAR_RECHARGE_TOTAL3366);
+            GameAction()->sendRechargeMails(this, total, total+r);
+            SetVar(VAR_RECHARGE_TOTAL3366, total+r);
+            sendRechargeInfo();
+        }
+
         if(World::getJune())
         {
             UInt32 total = GetVar(VAR_JUNE_RECHARGE_TOTAL);
@@ -6324,10 +6332,14 @@ namespace GObject
 
     void Player::sendRechargeInfo()
     {
-        if (!World::getRechargeActive())
+        if (!World::getRechargeActive() || !World::getRechargeActive3366())
             return;
 
-        UInt32 total = GetVar(VAR_RECHARGE_TOTAL);
+        UInt32 total;
+        if(World::getRechargeActive())
+             total = GetVar(VAR_RECHARGE_TOTAL);
+        else
+            total = GetVar(VAR_RECHARGE_TOTAL3366);
 		Stream st(REP::DAILY_DATA);
 		st << static_cast<UInt8>(12) << total << Stream::eos;
 		send((st));
@@ -7819,8 +7831,8 @@ namespace GObject
         }
 #else
 		char numstr[16];
-        char separator[2] = {32, 0};
-        //char separator[] = {"\n "}; //分隔符是回车加空格
+        //char separator[2] = {32, 0};
+        char separator[] = {"\n "}; //分隔符是回车加空格
 
         std::string sepStr(separator);
 		sprintf(numstr, "%u", _playerData.title);

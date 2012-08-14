@@ -87,6 +87,7 @@ namespace Script
 		lua_tinker::def(_L, "getNewYear",	GObject::World::getNewYear);
 		lua_tinker::def(_L, "getBlueactiveday",	GObject::World::getBlueactiveday);
 		lua_tinker::def(_L, "getRechargeActive", GObject::World::getRechargeActive);
+		lua_tinker::def(_L, "getRechargeActive3366", GObject::World::getRechargeActive3366);
 		lua_tinker::def(_L, "getValentineDay", GObject::World::getValentineDay);
 		lua_tinker::def(_L, "getNetValentineDay", GObject::World::getNetValentineDay);
 		lua_tinker::def(_L, "getGirlDay", GObject::World::getGirlDay);
