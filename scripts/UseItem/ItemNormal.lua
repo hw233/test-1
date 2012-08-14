@@ -4164,7 +4164,6 @@ function ItemNormal_00009119(iid, num, bind, param)
     local count = 0
 
     for count =1,num do
-        print(count)
         local k = 1
         local rand = math.random(10000)
         for n = 1,#prob do
