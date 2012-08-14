@@ -293,6 +293,8 @@ void jsonParser2(void * buf, int len, Stream& st)
     json_t* rethead = NULL;
     json_t* retbody = NULL;
 
+    setlocale(LC_ALL, "");
+
     retobj = json_new_object();
     if (!retobj)
         goto _error1;
