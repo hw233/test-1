@@ -171,10 +171,12 @@ function onLevelup(player, olev, nlev)
     end
 end
 
-function onDungeonWin(player, id, count)
+function onDungeonWin(player, id, count, free)
     June(player, 0);
-    if count > 0 then
-        FallActivity(player, count)
+    if free == true then
+        FallActivity(player, 1)
+    else
+        FallActivity(player, 2)
     end
 end
 
