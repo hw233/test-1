@@ -2682,6 +2682,24 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
         }
     }
 
+    bool specialEf = true;  // 鹊桥技能需要特殊处理
+    bool isQueqiao = false;
+    if(SKILL_ID(skill->getId()) == 147 || SKILL_ID(skill->getId()) == 148 || SKILL_ID(skill->getId()) == 149)
+    {
+        isQueqiao = true;
+        specialEf = false;
+        int bfCnt = 1;
+        for(int i = 0; i < apcnt; ++ i)
+        {
+            BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][ap[i].pos]);
+            if(!bo || bo->getHP() == 0)
+                continue;
+            ++ bfCnt;
+        }
+        if(bfCnt == 2)
+            specialEf = true;
+    }
+
     size_t defCount = 0;
     DefStatus defList[250];
     size_t scCount = 0;
@@ -2701,6 +2719,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
     // 免疫降灵气
     //bool dostatus = true;
     //if(dostatus)
+    if(specialEf)
     {
         bool self = false;
         bool flag = ((target_side == bf->getSide()) ? false : true);
@@ -3170,6 +3189,18 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 ++i;
             }
         }
+        else if(specialEf && isQueqiao)
+        {
+            int fsize = skill->factor.size();
+            float factor = 1;
+            if(fsize > 0)
+                factor = skill->factor[fsize-1];
+            dmg += attackOnce(bf, first, cs, pr, skill, _objs[target_side][target_pos], factor, defList, defCount, scList, scCount, apcnt, ap, atkAct);
+            for(int i = 0; i < apcnt; ++ i)
+            {
+                dmg += attackOnce(bf, first, cs, pr, skill, _objs[target_side][ap[i].pos], factor, defList, defCount, scList, scCount);
+            }
+        }
         else
         {
             const GData::SkillStrengthenEffect* ef = NULL;
@@ -3203,7 +3234,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
     }
 
     // 混乱晕眩封印状态
-    if(skill->effect->state & 0x2e)
+    if((skill->effect->state & 0x2e) && specialEf)
     {
         float rate = skill->prob * 100;
 	    if(bf->getSide() != target_side)
