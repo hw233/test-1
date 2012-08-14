@@ -1100,11 +1100,6 @@ namespace GObject
         udpLog("discount", type, "", "", "", "", "act"); 
     }
 
-    void Player::actUdp(UInt8 type, std::string& p1, std::string& p2)
-    {
-            udpLog(p1.c_str(), p2.c_str(), "", "", "", "", "act");
-    }
-
     void Player::sendHalloweenOnlineAward(UInt32 now, bool _online)
     {
         _online = false; // XXX: fuck
@@ -3447,7 +3442,9 @@ namespace GObject
 		sendModification(1, _playerData.gold);
 
         if (ci)
+        {
             udpLog(ci->purchaseType, ci->itemId, ci->itemNum, c, "add");
+        }
 #ifdef _FB
 #else
         dclogger.consume(this, _playerData.gold, c);

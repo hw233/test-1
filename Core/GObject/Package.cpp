@@ -537,7 +537,10 @@ namespace GObject
                     AddItemCoursesLog(typeId, num, fromWhere);
                 }
                 if (fromWhere != FromNpcBuy && (GData::store.getPrice(typeId) || GData::GDataManager::isInUdpItem(typeId)))
+                {
                     udpLog(item->getClass(), typeId, num, 0, "add");
+                    cittaUdpLog(1, typeId, num);
+                }
                 if (typeId == 1209)
                     m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
                 if (typeId == 1223)
@@ -562,7 +565,10 @@ namespace GObject
 				m_Items[ItemKey(typeId, bind)] = item;
 				DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, %u, %"I64_FMT"u, %u)", typeId, num, m_Owner->getId(), bind ? 1 : 0);
                 if (fromWhere != FromNpcBuy && (GData::store.getPrice(typeId) || GData::GDataManager::isInUdpItem(typeId)))
+                {
                     udpLog(item->getClass(), typeId, num, 0, "add");
+                    cittaUdpLog(1, typeId, num);
+                }
                 //增加获取物品的荣誉
                 GameAction()->doAttainment(m_Owner, Script::ON_ADD_ITEM, typeId);
                 if (typeId == 1209)
@@ -606,7 +612,10 @@ namespace GObject
                 AddItemCoursesLog(typeId, static_cast<UInt32>(count), fromWhere);
             }
             if (fromWhere != FromNpcBuy && (GData::store.getPrice(typeId) || GData::GDataManager::isInUdpItem(typeId)))
+            {
                 udpLog(item->getClass(), typeId, count, 0, "add");
+                cittaUdpLog(1, typeId, count);
+            }
             if (typeId == 1209)
                 m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
             if (typeId == 1223)
@@ -626,7 +635,10 @@ namespace GObject
 			m_Items[ItemKey(typeId, bind)] = item;
 			DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, %u, %"I64_FMT"u, %u)", typeId, count, m_Owner->getId(), bind ? 1 : 0);
             if (fromWhere != FromNpcBuy && (GData::store.getPrice(typeId) || GData::GDataManager::isInUdpItem(typeId)))
+            {
                 udpLog(item->getClass(), typeId, count, 0, "add");
+                cittaUdpLog(1, typeId, count);
+            }
 			SendItemData(item);
 			ItemNotify(item->GetItemType().getId(), count);
             //获得物品
@@ -1011,7 +1023,12 @@ namespace GObject
 
             UInt32 price = GData::store.getPrice(id);
             if (price || GData::GDataManager::isInUdpItem(id))
+            {
                 udpLog(item->getClass(), id, num, price, "sub");
+                cittaUdpLog(2, id, num);
+                if (toWhere == ToSkillStrengthenOpen || toWhere == ToSkillStrengthenUpgrade)
+                    cittaUdpLog(3, id, num);
+            }
 
 			SendItemData(item);
 			if (cnt == 0)
@@ -1044,7 +1061,12 @@ namespace GObject
 
             UInt32 price = GData::store.getPrice(item->getId());
             if (price || GData::GDataManager::isInUdpItem(item->getId()))
+            {
                 udpLog(item->getClass(), item->getId(), num, price, "sub");
+                cittaUdpLog(2, item->getId(), num);
+                if (toWhere == ToSkillStrengthenOpen || toWhere == ToSkillStrengthenUpgrade)
+                    cittaUdpLog(3, item->getId(), num);
+            }
 
 			SendItemData(item);
 			UInt32 id = item->getId();
@@ -1535,6 +1557,22 @@ namespace GObject
         snprintf(_type, 32, "%u", t);
         snprintf(_id, 32, "%u", id);
         m_Owner->udpLog(op, _type, _id, _price, "", "", "props", num);
+    }
+
+    void Package::cittaUdpLog(UInt8 type, UInt32 id, UInt32 num)
+    {
+        if (! ((id >= LCITTA_ID && id <=RCITTA_ID) || (id >= LCITTA1_ID && id <= RCITTA1_ID)))
+            return;
+
+        if (type < 1 || type > 3)
+            return;
+
+        char itemAct[32] = "";
+        snprintf (itemAct, 32, "%d_%d", id, type);
+        for (UInt32 i = 0; i < num; ++i)
+        {
+            m_Owner->udpLog("citta", itemAct, "", "", "", "", "act");
+        }
     }
 
     UInt8 Package::GetItemCareer(UInt32 itemid, UInt8 bind)
