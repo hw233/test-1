@@ -116,7 +116,7 @@ std::string fixPlayerName(std::string name)
         int len = name.size() - 1;
         for (; len > 0; --len)
         {
-            if (name[len] >= 32)
+            if (static_cast<UInt8>(name[len]) >= 32)
                 break;
         }
         name.resize(len+1);
@@ -292,6 +292,8 @@ void jsonParser2(void * buf, int len, Stream& st)
     json_t* retobj = NULL;
     json_t* rethead = NULL;
     json_t* retbody = NULL;
+
+    setlocale(LC_ALL, "");
 
     retobj = json_new_object();
     if (!retobj)

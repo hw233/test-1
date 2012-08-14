@@ -158,4 +158,19 @@ LOCK TABLES `spirit_attr` WRITE;
 source spiritattr
 UNLOCK TABLES;
 
+LOCK TABLES `skillstrengthen` WRITE;
+source skillstrengthen
+UNLOCK TABLES;
+
+LOCK TABLES `skillstrengthenprob` WRITE;
+source skillstrengthenprob
+UNLOCK TABLES;
+
+LOCK TABLES `skillstrengthen_skill` WRITE;
+source skillstrengthen_skill
+UNLOCK TABLES;
+
+LOCK TABLES `skillstrengthen_effect` WRITE;
+source skillstrengthen_effect
+UNLOCK TABLES;
 

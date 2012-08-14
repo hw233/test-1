@@ -6,6 +6,7 @@
 #include "GData/AttrExtra.h"
 #include "BattleObject.h"
 #include "GData/SkillTable.h"
+#include "GData/SkillStrengthen.h"
 
 namespace Script
 {
@@ -156,8 +157,8 @@ public:
 	inline Int32 getMaxHPAdd() {return _maxhpAdd;}
 	inline Int32 getActionAdd() {return _maxActionAdd;}
     inline float getToughAdd() { return _toughAdd;}
-    inline float getAtkReduce() { float ret = _atkreduce + _atkreduce2; return (ret > 0 ? ret : 0); }
-    inline float getMagAtkReduce() { float ret = _magatkreduce + _magatkreduce2; return (ret > 0 ? ret : 0); }
+    inline float getAtkReduce() { return _atkreduce + _atkreduce2 + _atkreduce3; }
+    inline float getMagAtkReduce() { return _magatkreduce + _magatkreduce2 + _magatkreduce3; }
 
 	inline void setAttackAdd(float v, UInt16 last = 0) {_attackAdd = v; _atkAdd_last = last;}
 	inline void setMagAttackAdd(float v, UInt16 last = 0) {_magAtkAdd = v; _magAtkAdd_last = last;}
@@ -194,6 +195,12 @@ public:
     inline UInt8& getToughAddLast() { return _toughAdd_last;}
     inline UInt8& getAtkReduceLast() { return _atkreduce_last;}
     inline UInt8& getMagAtkReduceLast() { return _magatkreduce_last;}
+    inline UInt8& getAtkReduce3Last() { return _atkreduce3_last;}
+    inline UInt8& getMagAtkReduce3Last() { return _magatkreduce3_last;}
+
+    inline void setAtkReduce3(float v, UInt16 last) { _atkreduce3 = v; _atkreduce3_last = last; }
+    inline void setMagAtkReduce3(float v, UInt16 last) { _magatkreduce3 = v; _magatkreduce3_last = last; }
+    inline void setPuduDebuf(float v, UInt16 last) { _pudu_debuf= v; _pudu_debuf_last = last; }
 
 	inline UInt32 getLostHP() { Int64 tmp = _maxhp + _maxhpAdd + _maxhpAdd2; UInt32 mhp = (tmp > 0 ? tmp : 0); if(mhp > _hp) return mhp - _hp; return 0; }
 
@@ -207,7 +214,7 @@ public:
 	bool calcCounter(BattleFighter* attacker, bool ranged = false);
 	bool canBeCounter();
 	bool calcPierce(BattleFighter* defender);
-    float calcTherapy(const GData::SkillBase* skill);
+    float calcTherapy(bool& isCritical, bool& first, const GData::SkillBase* skill);
     float calcMagAttack(bool& isCritical, BattleFighter* defender, float* pCf);
     float calcPoison(const GData::SkillBase* skill, BattleFighter* defender, bool cs);
     void calcSkillAttack(bool& isCritical, BattleFighter* defender, float& atk, float& magatk, float* pCf);
@@ -280,6 +287,9 @@ public:
 
     const GData::SkillBase* getPassiveSkill(std::vector<GData::SkillItem>& passiveSkill);
     const GData::SkillBase* getPassiveSkill100(std::vector<GData::SkillItem>& passiveSkill100, size_t& idx);
+
+    GData::SkillStrengthenBase* getSkillStrengthen(UInt16 skillId);
+    void updateSkillStrengthen(UInt16 skillId);
 
     inline bool isRevival() { return _revival; }
     inline void setRevival()
@@ -434,6 +444,8 @@ private:
     std::vector<GData::SkillItem> _passiveSkillDead;
     std::vector<GData::SkillItem> _passiveSkillAftNAtk;
 
+    std::map<UInt16, GData::SkillStrengthenBase*> _skillStrengthen;
+
     bool _revival;
     UInt8 _activeSkillIdx;
     // 入场时技能效果
@@ -456,10 +468,59 @@ private:
 	Int32 _maxhpAdd2, _maxActionAdd2;
 
     UInt16 _fakeDeadTimes;
+
+    float _atkreduce3, _magatkreduce3, _pudu_debuf;
+    UInt8 _atkreduce3_last, _magatkreduce3_last, _pudu_debuf_last;
+
+    float _deep_forget_dmg_extra;
+    UInt8 _deep_forget_last;
+    float _deep_stun_dmg_extra;
+    UInt8 _deep_stun_last;
+
+    float _therapy_dec;
+    UInt8 _therapy_dec_last;
+
+    float _bleed1, _bleed2, _bleed3;
+    UInt8 _bleed1_last, _bleed2_last, _bleed3_last;
+    UInt8 _immune2;
+
+    float _def_dec;
+    UInt8 _def_dec_last;
+    UInt8 _def_dec_times;
+
 public:
     void fakeDead();
     inline UInt16 getFakeDeadTimes() { return _fakeDeadTimes; }
 
+    inline UInt8& getDeepForgetLast() { return _deep_forget_last; }
+    inline float getDeepForgetDmgExtra() { return _deep_forget_dmg_extra; }
+    inline void setDeepForgetDmgExtra(float v, UInt8 l) { _deep_forget_dmg_extra = v; _deep_forget_last = l; }
+    inline UInt8& getDeepStunLast() { return _deep_stun_last; }
+    inline float getDeepStunDmgExtra() { return _deep_stun_dmg_extra; }
+    inline void setDeepStunDmgExtra(float v, UInt8 l) { _deep_stun_dmg_extra = v; _deep_stun_last = l; }
+
+    inline UInt8& getTherapyDecLast() { return _therapy_dec_last; }
+    inline float getTherapyDec() { return _therapy_dec; }
+    inline void setTherapyDec(float value, UInt8 last) { _therapy_dec = value; _therapy_dec_last = last; }
+
+    inline UInt8& getBleed1Last() { return _bleed1_last; }
+    inline float getBleed1() { return _bleed1; }
+    inline void setBleed1(float value, UInt8 last) { _bleed1 = value; _bleed1_last = last; }
+    inline UInt8& getBleed2Last() { return _bleed2_last; }
+    inline float getBleed2() { return _bleed2; }
+    inline void setBleed2(float value, UInt8 last) { _bleed2 = value; _bleed2_last = last; }
+    inline UInt8& getBleed3Last() { return _bleed3_last; }
+    inline float getBleed3() { return _bleed3; }
+    inline void setBleed3(float value, UInt8 last) { _bleed3 = value; _bleed3_last = last; }
+
+    inline UInt8 getImmune2() { return _immune2; }
+    inline void setImmune2(UInt8 v) { _immune2 = v; }
+
+    inline UInt8& getDefDecLast() { return _def_dec_last; }
+    inline float getDefDec() { return _def_dec; }
+    inline void setDefDec(float value, UInt8 last) { _def_dec = value; _def_dec_last = last; }
+    inline UInt8 getDefDecTimes() { return _def_dec_times; }
+    inline void setDefDecTimes(UInt8 v) { _def_dec_times = v; }
 public:
 	enum StatusFlag
 	{

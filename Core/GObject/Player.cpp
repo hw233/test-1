@@ -1905,10 +1905,10 @@ namespace GObject
         UInt16 citta = cittas[fgt->getClass()-1];
         if (fgt->hasCitta(citta) < 0) {
             if (fgt->addNewCitta(citta, writedb, true)) {
-#if 0
+                /*
                 if (fgt->upCitta(citta, 0, writedb)) {
                 }
-#endif
+                */
             }
         }
     }
@@ -3924,7 +3924,7 @@ namespace GObject
 		if (priceType == 0)
 		{
 			const std::vector<UInt32>& golds = GData::GDataManager::GetGoldTrainList();
-            if (fgt->getLevel() >= golds.size())
+            if(fgt->getLevel() >= golds.size())
                 return false;
 			price = time * golds[fgt->getLevel()]; 
 			if (getGold() < price)
@@ -3937,7 +3937,7 @@ namespace GObject
 		else
 		{
 			const std::vector<UInt32>& taels = GData::GDataManager::GetTaelTrainList();
-            if (fgt->getLevel() >= taels.size())
+            if(fgt->getLevel() >= taels.size())
                 return false;
 			price = time * taels[fgt->getLevel()];
 			if (getTael() < price)
@@ -7811,6 +7811,7 @@ namespace GObject
 #else
 		char numstr[16];
         char separator[2] = {32, 0};
+        //char separator[] = {"\n "}; //分隔符是回车加空格
 
         std::string sepStr(separator);
 		sprintf(numstr, "%u", _playerData.title);
@@ -10040,6 +10041,7 @@ namespace GObject
                 // 活动限购还未开始
                 time = 0;
                 count = 0;
+                SetVar(GObject::VAR_DISCOUNT_SP_1_TIME + type - 4, 0);
             }
             else
             {
@@ -10049,6 +10051,7 @@ namespace GObject
                     // 活动限购已经结束
                     time = 0;
                     count = 0;
+                    SetVar(GObject::VAR_DISCOUNT_SP_1_TIME + type - 4, 0);
                 }
                 else
                     time -= now;
@@ -11055,6 +11058,7 @@ namespace GObject
                 st << fgt->getMaxSoul() << fgt->getPeerlessAndLevel();
                 fgt->getAllUpSkillAndLevel(st);
                 fgt->getAllPSkillAndLevel4Arena(st);
+                fgt->getAllSSAndLevel(st);
 
                 fgt->getAttrExtraEquip(st);
 

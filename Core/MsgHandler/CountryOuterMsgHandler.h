@@ -2749,8 +2749,36 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                             item = player->GetPackage()->AddItem(items[i], 1, true, false, FromNpcBuy);
                     }
 
-                    ConsumeInfo ci(Discount3+3, 0, 0);
-                    player->useGold(price, &ci);
+                    UInt8 logVarOffset = 0;
+                    switch (discountType)
+                    {
+                        case 4:
+                            logVarOffset = DiscountSp1 - Discount3;
+                            break;
+                        case 5:
+                            logVarOffset = DiscountSp2 - Discount3;
+                            break;
+                        case 6:
+                            logVarOffset = DiscountSp3 - Discount3;
+                            break;
+                        case 7:
+                            logVarOffset = Discount3 - Discount3;
+                            break;
+                        case 8:
+                            logVarOffset = Discount5 - Discount3;
+                            break;
+                        case 9:
+                            logVarOffset = Discount8 - Discount3;
+                            break;
+                        default:
+                            logVarOffset = 0xff;
+                    }
+                    
+                    if (logVarOffset != 0xff)
+                    {
+                        ConsumeInfo ci(Discount3+logVarOffset, 0, 0);
+                        player->useGold(price, &ci);
+                    }
                     st << static_cast<UInt8>(0);
 
                     GameAction()->doAty(player, AtyBuy, 0, 0);
@@ -3323,6 +3351,9 @@ void OnSaleSellReq( GameMsgHdr& hdr, SaleSellReq& req )
 
 	if(!player->hasChecked())
 		return;
+
+    if (player->GetLev() < 45)
+        return;
 
 	player->GetSale()->sellSaleReq(req._data);
 }

@@ -1737,7 +1737,7 @@ function ItemNormal_VIP(iid, num, bind, param)
 
     if lvl >= 6 then
         local equip = getRandOEquip(player:GetLev())
-        package:AddEquip(equip, 1, false, 0, 2);
+        package:AddEquip(equip, 1, false, 2);
     end
 
     package:DelItemSendMsg(iid, player);

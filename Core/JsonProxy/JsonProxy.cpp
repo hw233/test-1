@@ -175,6 +175,7 @@ int main()
                 new_fd = -1;
                 break;
             }
+            g_log->OutError("RECV: %s\n", buf);
 
             int sd = 0;
             if( (sd = send( asss_conn, buf, len, 0 )) < 0)
@@ -204,6 +205,7 @@ int main()
                 g_log->OutError("write_jason_rep connection close %s\n", inet_ntoa(their_addr.sin_addr));
                 break;
             }
+            g_log->OutError("SEND: %s\n", buf);
         }
         while(false);
 

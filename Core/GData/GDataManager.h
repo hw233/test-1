@@ -54,6 +54,8 @@ namespace GData
         static bool LoadHeroMemoMaxSoul();
         static bool LoadSpiritAttrTable();
         static bool LoadSoulItemExp();
+		static bool LoadSkillStrengthenEffect();
+		static bool LoadSkillStrengthens();
         static bool LoadSkillStrengthenExp();
         static bool LoadSkillStrengthenProb();
 

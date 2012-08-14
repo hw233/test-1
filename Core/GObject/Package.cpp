@@ -1619,6 +1619,9 @@ namespace GObject
         if(Mnum <= 0)
             return 0;
         std::vector<stMergeStf> stfs = GObjectManager::getMergeStfs(id);
+        if(stfs.size()  == 0 )
+            return 0;
+
         ItemBase * item = FindItem(stfs[0].m_to, true);
         if( !item )
             item = FindItem(stfs[0].m_to, false); 
@@ -1636,9 +1639,7 @@ namespace GObject
             if(item->Size(item->Count() + Mnum) - item->Size() + 1 > GetRestPackageSize())
                 return 2;
         }
-        if(stfs.size()  == 0 )
-            return 0;
-
+        
         for(UInt32 i = 0 ; i < stfs[0].m_stfs.size() ; i ++)
         {
             UInt32 id = stfs[0].m_stfs[i].id;

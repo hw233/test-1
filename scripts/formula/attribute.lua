@@ -16,13 +16,13 @@ counterlvl_addon_factor = 800
 deflvl_factor = 250
 deflvl_addon_factor = 1500
 
-hitrate_max = 150
-evade_max = 55
-critical_max = 75
-pierce_max = 70
-tough_max = 75
-counter_max = 55
-magres_max = 70
+hitrate_max = 160
+evade_max = 65
+critical_max = 80
+pierce_max = 80
+tough_max = 80
+counter_max = 65
+magres_max = 75
 critical_damage_max = 300
 
 

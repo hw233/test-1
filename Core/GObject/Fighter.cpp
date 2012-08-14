@@ -1262,14 +1262,18 @@ void Fighter::addTrumpAttr( ItemEquip* trump )
 
     UInt8 q = trump->getQuality();
     UInt8 l = ied.tRank;
-    AttrFactor af = GObjectManager::getTrumpTRankFactor(q-2, l-1);
-    if(trump->GetItemType().getId() < 1600)
-        af.aura = 0;
-    else
-        af.auraMax = 0;
 
     if(l > 0 && q > 1)
+    {
+        AttrFactor af = GObjectManager::getTrumpTRankFactor(q-2, l-1);
+        if(trump->GetItemType().getId() < 1600)
+            af.aura = 0;
+        else
+            af.auraMax = 0;
+
         ae *= af;
+
+    }
 
 	addAttrExtra(_attrExtraEquip, &ae);
 
@@ -2515,9 +2519,11 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool lvlup )
 
     if (ret && !swap)
     {
-        bool up = _owner?(_owner->getMainFighter()?_owner->getMainFighter()->getLevel()>=10:true):false;
+        bool up = true;//_owner?(_owner->getMainFighter()?_owner->getMainFighter()->getLevel()>=10:true):false;
+        /*
         if (!writedb)
             up = false;
+            */
         addSkillsFromCT(skillFromCitta(citta), writedb, up);
 
         {
@@ -4115,6 +4121,28 @@ void Fighter::makeFighterSSInfo(Stream& st)
     st.data<UInt8>(offset) = c;
 }
 
+void Fighter::getAllSSAndLevel(Stream& st)
+{
+    size_t offset = st.size();
+    st << static_cast<UInt8>(0);
+    UInt8 c = 0;
+    for (int i = 0; i < getUpSkillsMax(); ++i)
+    {
+        if (_skill[i])
+        {
+            SStrengthen* ss = SSGetInfo(_skill[i]);
+            if (ss)
+            {
+                ++c;
+                UInt16 skill_id = SKILL_ID(_skill[i]);
+                st << static_cast<UInt16>(SKILLANDLEVEL(skill_id, ss->lvl));
+            }
+        }
+    }
+    st.data<UInt8>(offset) = c;
+}
+
+#define SS_MAXLVL 9
 void Fighter::SSOpen(UInt16 id)
 {
     if (!_owner)
