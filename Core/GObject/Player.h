@@ -1453,7 +1453,9 @@ namespace GObject
         void tradeUdpLog(UInt32 price);
         void skillStrengthenLog(UInt8 type, UInt32 val);
         void townDeamonUdpLog(UInt16 level);
-        void dungeonUdpLog();
+        void dungeonUdpLog(UInt8 levelReq, UInt8 type);
+        void frontMapUdpLog(UInt8 id, UInt8 type);
+        void copyUdpLog(UInt8 levelReq, UInt8 type);
         void guideUdp(UInt8 type, std::string& p1, std::string& p2);
         void moneyLog(int type, int gold, int coupon = 0, int tael = 0, int achievement = 0, int prestige = 0);
         void actUdp(UInt8 type, std::string& p1, std::string& p2);
