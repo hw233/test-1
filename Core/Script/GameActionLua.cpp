@@ -124,6 +124,7 @@ namespace Script
         lua_tinker::def(_L, "getMergeAthAct", GObject::World::getMergeAthAct);
         lua_tinker::def(_L, "setFourCopAct", GObject::World::setFourCopAct);
         lua_tinker::def(_L, "getFourCopAct", GObject::World::getFourCopAct);
+        lua_tinker::def(_L, "getPExpItems", GObject::World::getPExpItems);
 
         CLASS_DEF(GameActionLua, Print);
         lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);
@@ -952,9 +953,9 @@ namespace Script
 		Call<void>("onEnchant", player, level);
 	}
 
-	void GameActionLua::onEnchantAct( Player* player, UInt8 level, UInt8 type )
+	void GameActionLua::onEnchantAct( Player* player, UInt8 level, UInt8 quality, UInt8 type )
 	{
-		Call<void>("onEnchantAct", player, level, type);
+		Call<void>("onEnchantAct", player, level, quality, type);
 	}
 
 	void GameActionLua::onEnchantGt11( Player* player, UInt16 id, UInt8 level, UInt8 type)

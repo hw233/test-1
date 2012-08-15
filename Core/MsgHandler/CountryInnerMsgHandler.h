@@ -1438,6 +1438,12 @@ void OnArenaEnterCommit( GameMsgHdr& hdr, const void* data )
         NETWORK()->SendToArena(st);
     }
 }
+void OnSendPExpCard( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    int pos = *(int*)(data);
+    player->sendPExpCard(pos);
+}
 
 #endif // _COUNTRYINNERMSGHANDLER_H_
 
