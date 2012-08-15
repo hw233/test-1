@@ -539,8 +539,9 @@ namespace GObject
                 if (fromWhere != FromNpcBuy && (GData::store.getPrice(typeId) || GData::GDataManager::isInUdpItem(typeId)))
                 {
                     udpLog(item->getClass(), typeId, num, 0, "add");
-                    cittaUdpLog(1, typeId, num);
                 }
+                cittaUdpLog(1, typeId, num);
+
                 if (typeId == 1209)
                     m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
                 if (typeId == 1223)
@@ -567,8 +568,8 @@ namespace GObject
                 if (fromWhere != FromNpcBuy && (GData::store.getPrice(typeId) || GData::GDataManager::isInUdpItem(typeId)))
                 {
                     udpLog(item->getClass(), typeId, num, 0, "add");
-                    cittaUdpLog(1, typeId, num);
                 }
+                cittaUdpLog(1, typeId, num);
                 //增加获取物品的荣誉
                 GameAction()->doAttainment(m_Owner, Script::ON_ADD_ITEM, typeId);
                 if (typeId == 1209)
@@ -614,8 +615,8 @@ namespace GObject
             if (fromWhere != FromNpcBuy && (GData::store.getPrice(typeId) || GData::GDataManager::isInUdpItem(typeId)))
             {
                 udpLog(item->getClass(), typeId, count, 0, "add");
-                cittaUdpLog(1, typeId, count);
             }
+            cittaUdpLog(1, typeId, count);
             if (typeId == 1209)
                 m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
             if (typeId == 1223)
@@ -637,8 +638,8 @@ namespace GObject
             if (fromWhere != FromNpcBuy && (GData::store.getPrice(typeId) || GData::GDataManager::isInUdpItem(typeId)))
             {
                 udpLog(item->getClass(), typeId, count, 0, "add");
-                cittaUdpLog(1, typeId, count);
             }
+            cittaUdpLog(1, typeId, count);
 			SendItemData(item);
 			ItemNotify(item->GetItemType().getId(), count);
             //获得物品
@@ -1025,11 +1026,11 @@ namespace GObject
             if (price || GData::GDataManager::isInUdpItem(id))
             {
                 udpLog(item->getClass(), id, num, price, "sub");
-                cittaUdpLog(2, id, num);
-                if (toWhere == ToSkillStrengthenOpen || toWhere == ToSkillStrengthenUpgrade)
-                    cittaUdpLog(3, id, num);
             }
 
+            cittaUdpLog(2, id, num);
+            if (toWhere == ToSkillStrengthenOpen || toWhere == ToSkillStrengthenUpgrade)
+                cittaUdpLog(3, id, num);
 			SendItemData(item);
 			if (cnt == 0)
 			{
@@ -1063,10 +1064,10 @@ namespace GObject
             if (price || GData::GDataManager::isInUdpItem(item->getId()))
             {
                 udpLog(item->getClass(), item->getId(), num, price, "sub");
-                cittaUdpLog(2, item->getId(), num);
-                if (toWhere == ToSkillStrengthenOpen || toWhere == ToSkillStrengthenUpgrade)
-                    cittaUdpLog(3, item->getId(), num);
             }
+            cittaUdpLog(2, item->getId(), num);
+            if (toWhere == ToSkillStrengthenOpen || toWhere == ToSkillStrengthenUpgrade)
+                cittaUdpLog(3, item->getId(), num);
 
 			SendItemData(item);
 			UInt32 id = item->getId();

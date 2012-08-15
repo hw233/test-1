@@ -1095,9 +1095,9 @@ namespace GObject
 
     void Player::discountLog(UInt8 discountType)
     {
-        char type[8] = "";
-        snprintf (type, 8, "%d", discountType);
-        udpLog("discount", type, "", "", "", "", "act"); 
+        char action[16] = "";
+        snprintf (action, 16, "F1703_%d", discountType);
+        udpLog("discount", action, "", "", "", "", "act"); 
     }
 
     void Player::tradeUdpLog(UInt32 price)
@@ -1127,6 +1127,20 @@ namespace GObject
                 break;
         }
         udpLog("skillStrengthen", action, "", "", "", "", "act", num);
+    }
+
+    void Player::townDeamonUdpLog(UInt16 level)
+    {
+        char action[16] = "";
+        snprintf (action, 16, "F_1074_%d", level);
+        udpLog("townDeamon", action, "", "", "", "", "act");
+    }
+
+    void Player::dungeonUdpLog()
+    {
+        // TODO: 决战之地日志
+        char action[16] = "";
+        udpLog("dungeon", action, "", "", "", "", "act");
     }
 
     void Player::sendHalloweenOnlineAward(UInt32 now, bool _online)
