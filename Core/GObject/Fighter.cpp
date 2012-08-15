@@ -25,6 +25,7 @@
 #include "AttainMgr.h"
 #include "GData/SpiritAttrTable.h"
 #include "SecondSoul.h"
+#include "GVar.h"
 
 namespace GObject
 {
@@ -2065,7 +2066,7 @@ void Fighter::setUpSkills( std::string& skill, bool writedb )
     StringTokenizer tk(skill, ",");
     for (size_t i = 0; i < tk.count() && i < getUpSkillsMax(); ++i)
     {
-        upSkill(::atoi(tk[i].c_str()), i, writedb);
+        upSkill(::atoi(tk[i].c_str()), i, writedb, false);
     }
 }
 
@@ -2150,7 +2151,7 @@ bool Fighter::testMutual( UInt16 skill )
     return false;
 }
 
-bool Fighter::upSkill( UInt16 skill, int idx, bool writedb )
+bool Fighter::upSkill( UInt16 skill, int idx, bool writedb, bool online )
 {
     if (!skill)
         return false;
@@ -2225,7 +2226,7 @@ bool Fighter::upSkill( UInt16 skill, int idx, bool writedb )
     {
         sendModification(0x60, skill, idx, writedb);
 
-        if (writedb)
+        if (online)
         {
             if (_owner && getUpSkillsNum() == 1)
                 _owner->OnHeroMemo(MC_SKILL, MD_STARTED, 0, 0);
@@ -2339,7 +2340,7 @@ void Fighter::setSkills( std::string& skills, bool writedb )
         addSkillsFromCT(vt_skills, writedb, up);
 }
 
-bool Fighter::addNewSkill( UInt16 skill, bool writedb, bool up )
+bool Fighter::addNewSkill( UInt16 skill, bool writedb, bool up, bool online )
 {
     if (!skill)
         return false;
@@ -2357,7 +2358,7 @@ bool Fighter::addNewSkill( UInt16 skill, bool writedb, bool up )
             int i = isSkillUp(skill);
             if (i >= 0 || up)
             {
-                upSkill(skill, i, writedb);
+                upSkill(skill, i, writedb, online);
                 if (up)
                     op = 1;
                 else
@@ -2376,7 +2377,7 @@ bool Fighter::addNewSkill( UInt16 skill, bool writedb, bool up )
             UInt8  max = getUpSkillsMax();
             UInt16 i = getUpSkillsNum();
             if(i < max)
-                upSkill(skill, i, writedb);
+                upSkill(skill, i, writedb, online);
         }
         op = 1;
     }
@@ -2399,7 +2400,10 @@ void Fighter::setUpCittas( std::string& citta, bool writedb )
     StringTokenizer tk(citta, ",");
     for (size_t i = 0; i < tk.count(); ++i)
     {
-        upCitta(::atoi(tk[i].c_str()), i, writedb);
+        if (GVAR.GetVar(GVAR_CITTASPLIT))
+            upCitta(::atoi(tk[i].c_str()), i, true, false, false);
+        else
+            upCitta(::atoi(tk[i].c_str()), i, writedb, false, false);
     }
 }
 
@@ -2413,7 +2417,7 @@ int Fighter::isCittaUp( UInt16 citta )
     return -1;
 }
 
-bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool lvlup )
+bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool lvlup, bool online )
 {
     if (!citta)
         return false;
@@ -2520,11 +2524,11 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool lvlup )
         //sendModification(0x62, citta, idx, writedb);
         sendModification(0x62, citta, op/*1add,2del,3mod*/, writedb);
 
-        if(writedb && CURRENT_THREAD_ID() <= WORKER_THREAD_NEUTRAL)
+        if(online && writedb && CURRENT_THREAD_ID() <= WORKER_THREAD_NEUTRAL)
             //装备上心法成就
             GameAction()->doAttainment(_owner, 10084,getUpCittasNum());
 
-        if (_owner && writedb)
+        if (online && _owner && writedb)
             _owner->OnHeroMemo(MC_CITTA, MD_ADVANCED, 0, 1);
     }
 
@@ -2535,7 +2539,7 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool lvlup )
         if (!writedb)
             up = false;
             */
-        addSkillsFromCT(skillFromCitta(citta), writedb, up);
+        addSkillsFromCT(skillFromCitta(citta), writedb, up, online);
 
         {
             soul += cb->needsoul;
@@ -2648,7 +2652,7 @@ void Fighter::delSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
     }
 }
 
-void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills, bool writedb, bool up)
+void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills, bool writedb, bool up, bool online)
 {
     if (skills.size())
     {
@@ -2661,7 +2665,7 @@ void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                 if (s->cond == GData::SKILL_PEERLESS)
                     addNewPeerless(s->getId(), writedb, up);
                 else if (s->cond == GData::SKILL_ACTIVE)
-                    addNewSkill(s->getId(), writedb, up);
+                    addNewSkill(s->getId(), writedb, up, online);
                 else if (s->cond == GData::SKILL_PREATK ||
                         s->cond == GData::SKILL_AFTATK ||
                         s->cond == GData::SKILL_AFTNATK ||
@@ -2843,7 +2847,7 @@ int Fighter::hasCitta( UInt16 citta )
     return -1;
 }
 
-bool Fighter::addNewCitta( UInt16 citta, bool writedb, bool init )
+bool Fighter::addNewCitta( UInt16 citta, bool writedb, bool init, bool split )
 {
     if (!citta)
         return false;
@@ -2868,7 +2872,7 @@ bool Fighter::addNewCitta( UInt16 citta, bool writedb, bool init )
 
             int i = isCittaUp(citta);
             if (i >= 0)
-                upCitta(citta, i, writedb, true);
+                upCitta(citta, i, writedb, true, init?false:true);
             _cittas[idx] = citta;
             op = 3;
         }
@@ -2888,6 +2892,13 @@ bool Fighter::addNewCitta( UInt16 citta, bool writedb, bool init )
     _attrDirty = true;
     _bPDirty = true;
     sendModification(0x63, citta, op/*1add,2del,3mod*/, writedb);
+
+    // XXX: 拆分出来的都是增益心法
+    if (!GVAR.GetVar(GVAR_CITTASPLIT) && split)
+    {
+        UInt8 idx = getUpCittasNum();
+        upCitta(citta, idx, true, false, false);
+    }
 
     if (!init && _owner && writedb)
         _owner->OnHeroMemo(MC_CITTA, MD_ADVANCED, 0, 0);
@@ -2911,7 +2922,7 @@ bool Fighter::offCitta( UInt16 citta, bool flip, bool offskill, bool writedb )
         citta = _citta[idx];
 
     const std::vector<const GData::SkillBase*>& skills = skillFromCitta(citta);
-    if (skills.size())
+    if (skills.size() && offskill)
     {
         for (size_t i = 0; i < skills.size(); ++i)
         {
