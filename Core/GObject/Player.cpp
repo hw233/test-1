@@ -1100,6 +1100,35 @@ namespace GObject
         udpLog("discount", type, "", "", "", "", "act"); 
     }
 
+    void Player::tradeUdpLog(UInt32 price)
+    {
+        udpLog("trade", "F_1081", "", "", "", "", "act", price);
+    }
+
+    void Player::skillStrengthenLog(UInt8 type, UInt32 val)
+    {
+        char action[16] = "";
+        UInt32 num = 1;
+        switch (type)
+        {
+            case 1:
+                snprintf (action, 16, "%s", "F_1075");
+                if (val)
+                    strcat (action, "_1");
+                else
+                    strcat (action, "_2");
+                break;
+            case 2:
+                snprintf (action, 8, "%s", "F_1076");
+                num = val;
+                break;
+            default:
+                snprintf (action, 8, "%s", "Error");
+                break;
+        }
+        udpLog("skillStrengthen", action, "", "", "", "", "act", num);
+    }
+
     void Player::sendHalloweenOnlineAward(UInt32 now, bool _online)
     {
         _online = false; // XXX: fuck

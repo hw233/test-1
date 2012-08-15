@@ -4232,9 +4232,11 @@ void Fighter::SSOpen(UInt16 id)
             ss.maxLvl = 1;
             m_ss[sid] = ss;
             SSUpdate2DB(id, ss);
+            _owner->skillStrengthenLog(1, 1);
             _owner->sendMsgCode(0, 1023);
         }
         else
+            _owner->skillStrengthenLog(1, 0);
             _owner->sendMsgCode(0, 1024);
     }
     else
@@ -4245,9 +4247,11 @@ void Fighter::SSOpen(UInt16 id)
             ++i->second.maxLvl;
             i->second.maxVal = GData::GDataManager::getMaxStrengthenVal(sid, i->second.lvl);
             SSUpdate2DB(id, i->second);
+            _owner->skillStrengthenLog(1, 1);
             _owner->sendMsgCode(0, 1023);
         }
         else
+            _owner->skillStrengthenLog(1, 0);
             _owner->sendMsgCode(0, 1024);
     }
 }
@@ -4310,6 +4314,7 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, bool bind)
     }
 
     ss.curVal += exp;
+    _owner->skillStrengthenLog(2, exp);
 
     UInt8 ret = 1;
     while (ss.curVal >= ss.maxVal)

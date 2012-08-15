@@ -1376,6 +1376,7 @@ namespace GObject
                 {
                     ret2 = FormulaMerge(id, bind, num);
                     if (1 == ret2){
+                        multiMergeUdpLog(num);
                         m_Owner->sendMsgCode(0, 1800);
                         return true;
                     }
@@ -1396,6 +1397,7 @@ namespace GObject
                     ret2 = CittaMerge(id, bind, num);
                     if (1 == ret2){
                         m_Owner->sendMsgCode(0, 1800);
+                        multiMergeUdpLog(num);
                         return true;
                     }
                     else if(0 == ret2){
@@ -1421,6 +1423,7 @@ namespace GObject
                     ret2 = TrumpMerge(id, bind, num);
                     if (1 == ret2){
                         m_Owner->sendMsgCode(0, 1800);
+                        multiMergeUdpLog(num);
                         return true;
                     }
                     else if(0 == ret2){
@@ -1561,18 +1564,31 @@ namespace GObject
 
     void Package::cittaUdpLog(UInt8 type, UInt32 id, UInt32 num)
     {
-        if (! ((id >= LCITTA_ID && id <=RCITTA_ID) || (id >= LCITTA1_ID && id <= RCITTA1_ID)))
-            return;
+        char itemAct[32] = "";
+
+        // 是否是解封石
+        if (id != 550 && id != 551)
+        {
+            // 是否属于心法书/残卷范围
+            if (! ((id >= LCITTA_ID && id <=RCITTA_ID) || (id >= LCITTA1_ID && id <= RCITTA1_ID)))
+                return;
+        }
 
         if (type < 1 || type > 3)
             return;
 
-        char itemAct[32] = "";
         snprintf (itemAct, 32, "%d_%d", id, type);
-        for (UInt32 i = 0; i < num; ++i)
-        {
-            m_Owner->udpLog("citta", itemAct, "", "", "", "", "act");
-        }
+        m_Owner->udpLog("citta", itemAct, "", "", "", "", "act", num);
+    }
+
+    void Package::gemMergeUdpLog(UInt32 num)
+    {
+        m_Owner->udpLog("gemMerge", "F_1078", "", "", "", "", "act", num);
+    }
+
+    void Package::multiMergeUdpLog(UInt32 num)
+    {
+        m_Owner->udpLog("multiMerge", "F_1080", "", "", "", "", "act", num);
     }
 
     UInt8 Package::GetItemCareer(UInt32 itemid, UInt8 bind)
@@ -3386,12 +3402,14 @@ namespace GObject
         if(bindGemsOut > 0)
         {
             AddItem(gemIdOut, bindGemsOut, true, false, FromMerge);
+            gemMergeUdpLog(bindGemsOut);
             if(World::getGemMergeAct())
                 GameAction()->onMergeGem(m_Owner, lvl + 2, bindGemsOut);
         }
         if(unbindGemsOut > 0)
         {
             AddItem(gemIdOut, unbindGemsOut, false, false, FromMerge);
+            gemMergeUdpLog(unbindGemsOut);
             if(World::getGemMergeAct())
                 GameAction()->onMergeGem(m_Owner, lvl + 2, unbindGemsOut);
         }
