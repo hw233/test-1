@@ -339,10 +339,10 @@ bool Trade::replyTrade(UInt32 id, UInt32 coin, UInt32 gold, std::vector<TradeIte
 		}
 	}
 	DB1().PushUpdateData("UPDATE `trade` SET `tradeStatus` = %d, `coin` = %u, `gold` = %u, `items` = '%s' WHERE `tradeId` = %u AND `ownerId` = %"I64_FMT"u", trade->_tradeStatus, coin, gold, trade->_strItems.c_str(), trade->_id, _owner->getId());
-/*
+    /*
 	TRACE_LOG("LaunchTrade : id[%d] owner[%"I64_FMT"u : %s] tradeSide[%d] trader[%"I64_FMT"u : %s] tradeTitle[%s] tradeTime[%u] coin[%d] gold[%d] items[%s]", \
 		trade->_id, _owner->getId(), _owner->getName().c_str(), trade->_tradeSide, trade->_tradePlayer->getId(), trade->_tradePlayer->getName().c_str(),  trade->_tradeTitle.c_str(), trade->_tradeTime, coin, gold, trade->_strItems.c_str());
-*/
+        */
 	operateTradeNotify(trade->_id, trade->_tradeStatus);
 
 	//禄脴赂麓脥篓脰陋

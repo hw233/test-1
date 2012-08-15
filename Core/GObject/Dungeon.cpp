@@ -530,6 +530,7 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
         }
         bool free = (PLAYER_DATA(player, dungeonCnt) <= getMaxCount());
 		GameAction()->onDungeonWin(player, _id, dpi.totalCount, free);
+        player->dungeonUdpLog();
 
 	}
 
