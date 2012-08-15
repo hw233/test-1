@@ -1616,8 +1616,11 @@ namespace GObject
             {70,    71,     "1,1",                  1751},
             {0, 0, NULL, 0},
         };*/
-        if(Mnum <= 0)
-            return 0;
+        if(Mnum <= 0){ //兼容老的合成协议
+            Mnum = 1;
+            bind = 2;
+        }
+        
         std::vector<stMergeStf> stfs = GObjectManager::getMergeStfs(id);
         if(stfs.size()  == 0 )
             return 0;
