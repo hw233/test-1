@@ -4236,8 +4236,10 @@ void Fighter::SSOpen(UInt16 id)
             _owner->sendMsgCode(0, 1023);
         }
         else
+        {
             _owner->skillStrengthenLog(1, 0);
             _owner->sendMsgCode(0, 1024);
+        }
     }
     else
     {
@@ -4251,8 +4253,10 @@ void Fighter::SSOpen(UInt16 id)
             _owner->sendMsgCode(0, 1023);
         }
         else
+        {
             _owner->skillStrengthenLog(1, 0);
             _owner->sendMsgCode(0, 1024);
+        }
     }
 }
 
