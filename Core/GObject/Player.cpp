@@ -1136,11 +1136,52 @@ namespace GObject
         udpLog("townDeamon", action, "", "", "", "", "act");
     }
 
-    void Player::dungeonUdpLog()
+    void Player::dungeonUdpLog(UInt8 levelReq, UInt8 type)
     {
-        // TODO: 决战之地日志
+        // 决战之地日志(又叫通天塔又叫地牢)
         char action[16] = "";
+        switch(levelReq)
+        {
+            case 30:
+                snprintf (action, 16, "F1068_%d", type);
+                break;
+            case 45:
+                snprintf (action, 16, "F1069_%d", type);
+                break;
+            case 60:
+                snprintf (action, 16, "F1070_%d", type);
+                break;
+            case 75:
+                snprintf (action, 16, "F1071_%d", type);
+                break;
+            case 90:
+                snprintf (action, 16, "F1072_%d", type);
+                break;
+            default:
+                snprintf (action, 16, "ERROR");
+                break;
+        }
         udpLog("dungeon", action, "", "", "", "", "act");
+    }
+
+    void Player::frontMapUdpLog(UInt8 id, UInt8 type)
+    {
+        // 阵图日志
+        char action[16] = "";
+
+        snprintf (action, 16, "F%d_%d", id + 1055, type);
+        
+        udpLog("frontMap", action, "", "", "", "", "act");
+    }
+
+    void Player::copyUdpLog(UInt8 id, UInt8 type)
+    {
+        // 副本日志
+        char action[16] = "";
+
+        snprintf (action, 16, "F%d_%d", id + 1049, type);
+        
+        udpLog("copy", action, "", "", "", "", "act");
     }
 
     void Player::sendHalloweenOnlineAward(UInt32 now, bool _online)

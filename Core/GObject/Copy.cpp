@@ -230,6 +230,7 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
         ++PLAYER_DATA(pl, copyFreeCnt);
         DB1().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = %u, `copyGoldCnt` = %u WHERE `id` = %"I64_FMT"u",
                 PLAYER_DATA(pl, copyFreeCnt), PLAYER_DATA(pl, copyGoldCnt), pl->getId());
+        pl->copyUdpLog(id, 1);
         return 0;
     } else if (PLAYER_DATA(pl, copyGoldCnt) < getGoldCount(pl->getVipLevel())) {
         if (pl->getGold() < GData::moneyNeed[GData::COPY_ENTER1+PLAYER_DATA(pl, copyGoldCnt)].gold) {
@@ -244,6 +245,7 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
         DB1().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = %u, `copyGoldCnt` = %u WHERE `id` = %"I64_FMT"u",
                 PLAYER_DATA(pl, copyFreeCnt), PLAYER_DATA(pl, copyGoldCnt), pl->getId());
         lootlvl = PLAYER_DATA(pl, copyGoldCnt);
+        pl->copyUdpLog(id, 3);
         return 0;
     } else {
         SYSMSG_SENDV(2000, pl);
@@ -422,6 +424,11 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                 st << Stream::eos;
                 pl->send(st);
             }
+
+            if (PLAYER_DATA(pl, copyFreeCnt) < getFreeCount()) 
+                pl->copyUdpLog(id, 2);
+            else
+                pl->copyUdpLog(id, 4);
 
             UInt32 thisDay = TimeUtil::SharpDay();
             UInt32 fourthDay = TimeUtil::SharpDay(3, PLAYER_DATA(pl, created));

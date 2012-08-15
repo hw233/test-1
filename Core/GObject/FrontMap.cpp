@@ -196,6 +196,7 @@ void FrontMap::enter(Player* pl, UInt8 id)
             DB3().PushUpdateData("REPLACE INTO `player_frontmap`(`playerId`, `id`, `spot`, `count`, `status`) VALUES(%"I64_FMT"u, %u, 0, 0, 0)",
                     pl->getId(), id);
             ret = 0;
+            pl->frontMapUdpLog(id, 1);
         } else if (PLAYER_DATA(pl, frontGoldCnt) < getGoldCount(pl->getVipLevel())) {
             if (pl->getGold() < GData::moneyNeed[GData::FRONTMAP_ENTER1+PLAYER_DATA(pl, frontGoldCnt)].gold) {
                 Stream st(REP::FORMATTON_INFO);
@@ -214,6 +215,7 @@ void FrontMap::enter(Player* pl, UInt8 id)
 
             ConsumeInfo ci(EnterFrontMap,0,0);
             pl->useGold(20*PLAYER_DATA(pl, frontGoldCnt), &ci);
+            pl->frontMapUdpLog(id, 3);
         } else {
             // XXX:
             return;
@@ -355,6 +357,10 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
                 pl->send(st);
             }
             tmp.resize(0);
+            if (PLAYER_DATA(pl, frontFreeCnt) < getFreeCount())
+                pl->frontMapUdpLog(id,2);
+            else
+                pl->frontMapUdpLog(id,4);
 
             UInt32 thisDay = TimeUtil::SharpDay();
             UInt32 fifthDay = TimeUtil::SharpDay(4, PLAYER_DATA(pl, created));
