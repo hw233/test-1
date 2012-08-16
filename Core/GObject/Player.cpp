@@ -6375,7 +6375,7 @@ namespace GObject
 
     void Player::sendRechargeInfo()
     {
-        if (!World::getRechargeActive() || !World::getRechargeActive3366())
+        if (!World::getRechargeActive() && !World::getRechargeActive3366())
             return;
 
         UInt32 total;
