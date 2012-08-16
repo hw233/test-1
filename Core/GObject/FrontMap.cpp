@@ -357,7 +357,7 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
                 pl->send(st);
             }
             tmp.resize(0);
-            if (PLAYER_DATA(pl, frontFreeCnt) < getFreeCount())
+            if (!PLAYER_DATA(pl, frontGoldCnt))
                 pl->frontMapUdpLog(id,2);
             else
                 pl->frontMapUdpLog(id,4);
