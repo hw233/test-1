@@ -116,7 +116,7 @@ std::string fixPlayerName(std::string name)
         int len = name.size() - 1;
         for (; len > 0; --len)
         {
-            if (name[len] >= 32)
+            if (static_cast<UInt8>(name[len]) >= 32)
                 break;
         }
         name.resize(len+1);
