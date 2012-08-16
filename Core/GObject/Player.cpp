@@ -1184,6 +1184,60 @@ namespace GObject
         udpLog("copy", action, "", "", "", "", "act");
     }
 
+    void Player::athleticsUdpLog(UInt8 id, UInt8 type /* = 0 */)
+    {
+        // 斗剑功能相关日志
+        char action[16] = "";
+        if (type)
+        {
+            snprintf (action, 16, "F%d_%d", id, type);
+        }
+        else
+        {
+            snprintf (action, 16, "F%d", id);
+        }
+        udpLog("athletics", action, "", "", "", "", "act");
+    }
+
+    void Player::activityUdpLog(UInt8 id, UInt8 type /* = 0 */)
+    {
+        // 活跃度功能相关日志
+        // FIXME: 只能记录兑换积分小于255
+        char action[16] = "";
+        if (type)
+        {
+            snprintf (action, 16, "F%d_%d", id, type);
+        }
+        else
+        {
+            snprintf (action, 16, "F%d", id);
+        }
+        udpLog("activity", action, "", "", "", "", "act");
+    }
+
+    void Player::practiceUdplog()
+    {
+        // 修为相关日志（暂时只有加速）
+        char action[16] = "";
+        snprintf (action, 16, "F%d", _vipLevel + 1003);
+        udpLog("activity", action, "", "", "", "", "act");
+    }
+
+    void Player::arenaUdplog(UInt8 id, UInt8 type /* = 0 */)
+    {
+        // 跨服战操作相关日志
+        char action[16] = "";
+        if (type)
+        {
+            snprintf (action, 16, "F%d_%d", id, type);
+        }
+        else
+        {
+            snprintf (action, 16, "F%d", id);
+        }
+        udpLog("arena", action, "", "", "", "", "act");
+    }
+
     void Player::sendHalloweenOnlineAward(UInt32 now, bool _online)
     {
         _online = false; // XXX: fuck
@@ -11201,6 +11255,8 @@ namespace GObject
             }
         }
         GameAction()->doAtySignIn(this, AtySignIn, mon, day);
+        activityUdpLog(1025);
+
     }
 
     void Player::SendNextdayTime(UInt32 nextDay)

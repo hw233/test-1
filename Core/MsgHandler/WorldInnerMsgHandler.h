@@ -534,6 +534,7 @@ void OnDoInstantPracticeAccReq( GameMsgHdr& hdr, const void* data)
 		return;
 	GObject::EventPlayerPractice* event = static_cast<GObject::EventPlayerPractice*>(it->second);
 	event->instantComplete();
+    player->practiceUdplog();
 }
 
 void OnLevelChange( GameMsgHdr& hdr, const void* data)

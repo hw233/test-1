@@ -2567,6 +2567,8 @@ void AthleticsRank::updateAthleticsP(Player* pl, UInt8 type)
                 UInt8 para = type;
                 GameMsgHdr hdr(0x351, pl->getThreadId(), pl, sizeof(para));
                 GLOBAL().PushMsg(hdr, &para);
+                pl->athleticsUdpLog(1030);
+                pl->athleticsUdpLog(1030, 1);
             }
             break;
         case 1:
@@ -2582,6 +2584,8 @@ void AthleticsRank::updateAthleticsP(Player* pl, UInt8 type)
                 UInt8 para = type;
                 GameMsgHdr hdr(0x351, pl->getThreadId(), pl, sizeof(para));
                 GLOBAL().PushMsg(hdr, &para);
+                pl->athleticsUdpLog(1030);
+                pl->athleticsUdpLog(1030, 2);
             }
             break;
         case 2:
@@ -2626,6 +2630,7 @@ void AthleticsRank::updateAthleticsP(Player* pl, UInt8 type)
                 ConsumeInfo ci(AthleticKillCD2,0,0);
                 pl->useGold(1, &ci);
                 pl->setBuffData(PLAYER_BUFF_ATHLETICS_P, 0);
+                pl->athleticsUdpLog(1031);
                 Stream st(REP::ATHLETICS_REFRESH_MARTIAL);
                 st << type << Stream::eos;
                 pl->send(st);
@@ -2656,6 +2661,7 @@ void AthleticsRank::updateAthleticsP(Player* pl, UInt8 type)
                 ConsumeInfo ci(AthleticPhysical,0,0);
                 pl->useGold(1, &ci);
                 rankData->ePhysical += 1;
+                pl->athleticsUdpLog(1029);
                 DB6().PushUpdateData("UPDATE `athletics_rank` SET `ePhysical` = %u WHERE `ranker` = %"I64_FMT"u", rankData->ePhysical, pl->getId());
                 Stream st(REP::ATHLETICS_REFRESH_MARTIAL);
                 st << type << rankData->ePhysical << Stream::eos;
@@ -2670,8 +2676,6 @@ void AthleticsRank::updateAthleticsP(Player* pl, UInt8 type)
 
 void AthleticsRank::giveAward( Player* pl, UInt8 type)
 {
-
-
     if(type == 1)
     {
         UInt8 row = getRankRow(pl->GetLev());
@@ -2761,6 +2765,8 @@ void AthleticsRank::giveAward( Player* pl, UInt8 type)
     rankData->tael = 0;
 
     DB6().PushUpdateData("UPDATE `athletics_rank` SET `prestige` = %u, `tael` = %u WHERE `ranker` = %"I64_FMT"u", rankData->prestige, rankData->tael, rankData->ranker->getId());
+
+    pl->athleticsUdpLog(1049, 3);
 
     {
         Stream st(REP::FIGHT_INFO_CHANGE);

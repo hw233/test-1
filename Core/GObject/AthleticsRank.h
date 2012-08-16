@@ -138,11 +138,14 @@ public:
 
 	static const UInt32 ATHLETICS_BUFF_TIME = 15 * 60;
 
-    public:
+public:
     enum
     {
         AthleticsPayForPaging,
         AthleticsPayForKillCD,
+    };
+    enum
+    {
     };
 public:
 	AthleticsRank();
