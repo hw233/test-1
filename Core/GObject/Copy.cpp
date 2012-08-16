@@ -425,7 +425,7 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                 pl->send(st);
             }
 
-            if (PLAYER_DATA(pl, copyFreeCnt) < getFreeCount()) 
+            if (!PLAYER_DATA(pl, copyGoldCnt)) 
                 pl->copyUdpLog(id, 2);
             else
                 pl->copyUdpLog(id, 4);

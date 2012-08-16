@@ -1406,7 +1406,7 @@ void OnPlayerEntered( ArenaMsgHdr& hdr, const void * data )
 	player->send(st);
     if (!r)
     {
-        player->arenaUdplog(1001);
+        player->arenaUdpLog(1001);
     }
 }
 
@@ -1548,7 +1548,7 @@ void OnArenaOpReq( GameMsgHdr& hdr, const void * data )
                 if(r == 0xFF)
                     break;
                 if (r <= 1)
-                    player->arenaUdplog(1002, r);
+                    player->arenaUdpLog(1002, r);
 				Stream st(REP::SERVER_ARENA_OP);
 				st << type << r << state;
                 if(state < 2)

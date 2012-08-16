@@ -1184,7 +1184,7 @@ namespace GObject
         udpLog("copy", action, "", "", "", "", "act");
     }
 
-    void Player::athleticsUdpLog(UInt8 id, UInt8 type /* = 0 */)
+    void Player::athleticsUdpLog(UInt32 id, UInt8 type /* = 0 */)
     {
         // 斗剑功能相关日志
         char action[16] = "";
@@ -1199,7 +1199,7 @@ namespace GObject
         udpLog("athletics", action, "", "", "", "", "act");
     }
 
-    void Player::activityUdpLog(UInt8 id, UInt8 type /* = 0 */)
+    void Player::activityUdpLog(UInt32 id, UInt8 type /* = 0 */)
     {
         // 活跃度功能相关日志
         // FIXME: 只能记录兑换积分小于255
@@ -1215,7 +1215,7 @@ namespace GObject
         udpLog("activity", action, "", "", "", "", "act");
     }
 
-    void Player::practiceUdplog()
+    void Player::practiceUdpLog()
     {
         // 修为相关日志（暂时只有加速）
         char action[16] = "";
@@ -1223,7 +1223,7 @@ namespace GObject
         udpLog("activity", action, "", "", "", "", "act");
     }
 
-    void Player::arenaUdplog(UInt8 id, UInt8 type /* = 0 */)
+    void Player::arenaUdpLog(UInt32 id, UInt8 type /* = 0 */)
     {
         // 跨服战操作相关日志
         char action[16] = "";
@@ -1236,6 +1236,14 @@ namespace GObject
             snprintf (action, 16, "F%d", id);
         }
         udpLog("arena", action, "", "", "", "", "act");
+    }
+
+    void Player::luckyDrawUdpLog(UInt32 id, UInt8 type, UInt32 num /* = 1 */)
+    {
+        // 秘境寻宝相关日志
+        char action[16] = "";
+        snprintf (action, 16, "F%d_%d", id + 1018, type);
+        udpLog("luckyDraw", action, "", "", "", "", "act", num);
     }
 
     void Player::sendHalloweenOnlineAward(UInt32 now, bool _online)
