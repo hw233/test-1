@@ -187,7 +187,7 @@ public:
 #endif
     bool testMutual(UInt16 skill);
     // 装备技能
-    bool upSkill(UInt16 skill, int idx, bool = true);
+    bool upSkill(UInt16 skill, int idx, bool = true, bool = true);
     // 卸下技能
     bool offSkill(UInt16 skill, bool = true);
     // 更新技能
@@ -209,7 +209,7 @@ public:
     // 取得概率被动技能的个数
     UInt16 getPnSkillsNum();
     // 增加一个新技能,包括技能升级
-    bool addNewSkill(UInt16 skill, bool = true, bool = false);
+    bool addNewSkill(UInt16 skill, bool = true, bool = false, bool = false);
     // 删除一个可装备的技能
     bool delSkill(UInt16 skill, bool = true, bool = true, bool = true);
     // 取得装备技能的最大数
@@ -288,11 +288,11 @@ public:
     // 初始化可装备的心法
     void setCittas(std::string& cittas, bool = true);
     // 装备心法
-    bool upCitta(UInt16 citta, int idx, bool = true, bool = false);
+    bool upCitta(UInt16 citta, int idx, bool = true, bool = false, bool = true);
     // 卸下心法
     bool offCitta(UInt16 citta, bool = false, bool = false, bool = true);
     // 增加一个心法
-    bool addNewCitta(UInt16 citta, bool = true, bool = false);
+    bool addNewCitta(UInt16 citta, bool = true, bool = false, bool = false);
     // 删除所有心法
     void delAllCitta( bool = true);
     // 删除一个心法
@@ -332,7 +332,7 @@ public:
     // 取得可装备的无双技能的个数
     inline UInt8 getPeerlessNum() { return _peerless.size(); }
 
-    void addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills, bool = true, bool = false);
+    void addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills, bool = true, bool = false, bool = true);
     void delSkillsFromCT(const std::vector<const GData::SkillBase*>& skills, bool = true);
 
 	inline ItemFashion* getFashion() { return _fashion; }
