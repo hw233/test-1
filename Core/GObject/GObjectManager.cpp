@@ -921,7 +921,8 @@ namespace GObject
                 if (fgt->getCittasNum() < 40)
                 {
                     UInt16 ncitta = CITTAANDLEVEL(itemid - 1200 + 1, lvl);
-                    if (fgt->addNewCitta(ncitta, true, true))
+                    int idx = fgt->isCittaUp(citta);
+                    if (fgt->addNewCitta(ncitta, true, true, idx>=0?true:false))
                         continue;
                 }
 
@@ -1501,8 +1502,11 @@ namespace GObject
             fgt2->setPeerless(specfgtobj.peerless, false); // XXX: must after setTrump
             fgt2->setCittas(specfgtobj.cittas, false);
             fgt2->setUpCittas(specfgtobj.citta, false);
-            fgt2->setSkills(specfgtobj.skills, false);
-            fgt2->setUpSkills(specfgtobj.skill, false);
+            if (GVAR.GetVar(GVAR_CITTASPLIT))
+            {
+                fgt2->setSkills(specfgtobj.skills, false);
+                fgt2->setUpSkills(specfgtobj.skill, false);
+            }
             fgt2->setAttrType1(specfgtobj.attrType1);
             fgt2->setAttrValue1(specfgtobj.attrValue1);
             fgt2->setAttrType2(specfgtobj.attrType2);
