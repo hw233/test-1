@@ -4337,6 +4337,7 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, bool bind)
         ss.curVal -= ss.maxVal;
         ++ss.lvl;
 
+        ss.maxVal = GData::GDataManager::getMaxStrengthenVal(sid, ss.lvl);
         if (ss.lvl >= ss.maxLvl)
         {
             ss.curVal = 0;
@@ -4345,7 +4346,6 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, bool bind)
             ret = 0;
             break;
         }
-        ss.maxVal = GData::GDataManager::getMaxStrengthenVal(sid, ss.lvl);
     }
 
     SSUpdate2DB(id, ss);

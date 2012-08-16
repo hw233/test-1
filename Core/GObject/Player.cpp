@@ -6380,7 +6380,7 @@ namespace GObject
 
         UInt32 total;
         if(World::getRechargeActive())
-             total = GetVar(VAR_RECHARGE_TOTAL);
+            total = GetVar(VAR_RECHARGE_TOTAL);
         else
             total = GetVar(VAR_RECHARGE_TOTAL3366);
 		Stream st(REP::DAILY_DATA);
