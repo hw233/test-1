@@ -6478,12 +6478,12 @@ namespace GObject
 
     void Player::sendRechargeInfo()
     {
-        if (!World::getRechargeActive() || !World::getRechargeActive3366())
+        if (!World::getRechargeActive() && !World::getRechargeActive3366())
             return;
 
         UInt32 total;
         if(World::getRechargeActive())
-             total = GetVar(VAR_RECHARGE_TOTAL);
+            total = GetVar(VAR_RECHARGE_TOTAL);
         else
             total = GetVar(VAR_RECHARGE_TOTAL3366);
 		Stream st(REP::DAILY_DATA);
