@@ -65,6 +65,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120722_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120731_1.sql # must be once for consume (var 142)
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120730_1.sql
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120813_1.sql
     #. clearshiyamen.sh
 }
 

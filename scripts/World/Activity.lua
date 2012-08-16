@@ -512,6 +512,12 @@ function onActivityCheck(tm)
           is_0808_0814 = false
       end
 
+      if tm >= actTime95 and tm < actTime96 then
+          setRechargeActive(true, 16)
+      else
+          setRechargeActive(false, 16)
+      end
+
       setShuoShuo(true);
   end
 
@@ -586,6 +592,8 @@ function initActTime(y, m, d)
   local  SerStartTm40= { ['year'] = 2012, ['month'] = 8, ['day'] = 10, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 掉落活动
   local  SerStartTm41= { ['year'] = 2012, ['month'] = 8, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 充值返利（8/14-8/16）
+  local  SerStartTm42= { ['year'] = 2012, ['month'] = 8, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm102 = { ['year'] = 2012, ['month'] = 6, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -744,6 +752,9 @@ function initActTime(y, m, d)
 
   actTime93= os.time(SerStartTm41);
   actTime94= os.time(SerStartTm41) + 7 * 86400;
+
+  actTime95 = os.time(SerStartTm42);
+  actTime96 = os.time(SerStartTm42) + 3 * 86400;
 
   actTime101 = os.time(SerStartTm101);
   actTime102 = os.time(SerStartTm101) + 8 * 86400;

@@ -7809,6 +7809,7 @@ namespace GObject
 #else
 		char numstr[16];
         char separator[2] = {32, 0};
+        //char separator[] = {"\n "}; //分隔符是回车加空格
 
         std::string sepStr(separator);
 		sprintf(numstr, "%u", _playerData.title);
