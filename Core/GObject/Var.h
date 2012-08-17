@@ -184,17 +184,17 @@ namespace GObject
         VAR_QQVIP_BUF = 144,    //QQ会员之力是否领取
         VAR_QQVIP_CNT = 145,    //QQ会员特权
 
-        VAR_DISCOUNT_SP_1 = 144, // 原3折区域，增加活动限购后的购买次数
-        VAR_DISCOUNT_SP_2 = 145, // 原5折区域，增加活动限购后的购买次数
-        VAR_DISCOUNT_SP_3 = 146, // 原8折区域，增加活动限购后的购买次数
+        VAR_DISCOUNT_SP_1 = 146, // 原3折区域，增加活动限购后的购买次数
+        VAR_DISCOUNT_SP_2 = 147, // 原5折区域，增加活动限购后的购买次数
+        VAR_DISCOUNT_SP_3 = 148, // 原8折区域，增加活动限购后的购买次数
 
-        VAR_DISCOUNT_1_TIME = 147,
-        VAR_DISCOUNT_2_TIME = 148,
-        VAR_DISCOUNT_3_TIME = 149,
+        VAR_DISCOUNT_1_TIME = 149,
+        VAR_DISCOUNT_2_TIME = 150,
+        VAR_DISCOUNT_3_TIME = 151,
 
-        VAR_DISCOUNT_SP_1_TIME = 150,
-        VAR_DISCOUNT_SP_2_TIME = 151,
-        VAR_DISCOUNT_SP_3_TIME = 152,
+        VAR_DISCOUNT_SP_1_TIME = 152,
+        VAR_DISCOUNT_SP_2_TIME = 153,
+        VAR_DISCOUNT_SP_3_TIME = 154,
 
         VAR_MAX,
     };
