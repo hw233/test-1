@@ -4059,6 +4059,9 @@ UInt16 Fighter::getBattlePortrait()
     case 1705:
         portrait = 1077;
         break;
+    case 1706:
+        portrait = 1088;
+        break;
     }
 
     return portrait;
