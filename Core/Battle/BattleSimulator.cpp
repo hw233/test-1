@@ -2606,7 +2606,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
 			setObject(side, pos, newf);
             
             defList[i].pos = pos + 25;
-            defList[i].damType = e_Summon;
+            defList[i].damType = e_Summon; 
             defList[i].damage = fgt->getId();
             defList[i].leftHP = newf->getHP();
             ++defCount;
@@ -2684,20 +2684,39 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
 
     bool specialEf = true;  // 鹊桥技能需要特殊处理
     bool isQueqiao = false;
+    bool bQueqiaoState = false;  // 鹊桥技能，是否主目标上buf
     if(SKILL_ID(skill->getId()) == 147 || SKILL_ID(skill->getId()) == 148 || SKILL_ID(skill->getId()) == 149)
     {
         isQueqiao = true;
         specialEf = false;
         int bfCnt = 1;
+        assert(apcnt < 6 && skill->factor.size() == 7); // 必须有足够多的技能伤害因子，否则会出错
         for(int i = 0; i < apcnt; ++ i)
         {
             BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][ap[i].pos]);
             if(!bo || bo->getHP() == 0)
                 continue;
+            // 鹊桥技能按照主次目标的顺序确定技能伤害因子
+            ap[i].factor = skill->factor[i+1];
             ++ bfCnt;
         }
         if(bfCnt == 2)
             specialEf = true;
+
+        if(specialEf)  // 如果目标两人，伤害因子统一用factor[6]
+        {
+            for(int i = 0; i < apcnt; ++i)
+            {
+                BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][ap[i].pos]);
+                if(!bo || bo->getHP() == 0)
+                    continue;
+                ap[i].factor = skill->factor[6];
+            }
+            bQueqiaoState = (uRand(10000) > 5000) ? true : false;
+        }
+//#ifdef _DEBUG
+//        fprintf(stderr, "specialEf = %d, isQueqiao = %d, bmainstate = %d\n", specialEf, isQueqiao, bQueqiaoState);
+//#endif
     }
 
     size_t defCount = 0;
@@ -2735,6 +2754,28 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
         {
             bool ifDecAura = isImmuneDecAura(skill, target_side, target_pos, defList, defCount);
             doSkillStatus(flag, bf, skill, target_side, target_pos, 1, scList, scCount, self, ifDecAura);
+        }
+        else if(isQueqiao)  // 伤害两个人的鹊桥技能，随机一个人中状态
+        {
+            bool bDecAura = false;
+            if(bQueqiaoState)  // 主目标
+            {
+                BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][target_pos]);
+                if(bo != NULL && bo->getHP() != 0 && bo->isChar())
+                {
+                     bDecAura = isImmuneDecAura(skill, target_side, target_pos, defList, defCount);
+                     doSkillStatus(flag, bf, skill, target_side, target_pos, 1, scList, scCount, self, bDecAura);
+                }
+            }
+            else // 分目标
+            {
+                // 这里虽然写了for循环，但是肯定只有一个活人。。。
+                for(int i = 0; i < apcnt; ++i)
+                {
+                    bDecAura = isImmuneDecAura(skill, target_side, ap[i].pos, defList, defCount);
+                    doSkillStatus(flag, bf, skill, target_side, ap[i].pos, 1, scList, scCount, self, bDecAura);
+                }
+            }
         }
         else
         {
@@ -3281,6 +3322,46 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                         doSkillAtk2(false, &atkAct2, defList, defCount, scList, scCount);
                     }
                 }
+            }
+            else if(isQueqiao) // 两个目标的鹊桥，随机一个上状态
+            {
+                int ntarpos = target_pos;
+                BattleFighter* bo = NULL;
+                if(bQueqiaoState) // 主目标上buf
+                {
+                    bo = static_cast<BattleFighter*>(_objs[target_side][target_pos]);
+                    if(bo == NULL || bo->getHP() == 0 || !bo->isChar()) // 无效的目标
+                        bo = NULL;
+                }
+                else
+                {
+                    for(int i = 0; i < apcnt; ++ i)
+                    {
+                        bo = static_cast<BattleFighter*>(_objs[target_side][ap[i].pos]);
+                        if(bo != NULL && bo->getHP() != 0 && bo->isChar())
+                        {
+                            ntarpos = ap[i].pos;
+                            break; // 找到目标了
+                        }
+                    }
+                }
+               if(bo != NULL)
+               {
+                   if(((skill->cond != GData::SKILL_ACTIVE && skill->cond != GData::SKILL_PEERLESS) || rate > _rnd(10000)))
+                   {
+//#ifdef _DEBUG
+//                       fprintf(stderr, "i beat you to dizz!! rate = %f\n", rate);
+//#endif
+                       std::vector<AttackAct> atkAct2;
+                       atkAct2.clear();
+                       defList[defCount].damage = 0;
+                       defList[defCount].pos = ntarpos;
+                       defList[defCount].leftHP = bo->getHP();
+                       doSkillState(bf, skill, bo, defList, defCount, &atkAct2, atkAct);
+                       defCount ++;
+                       doSkillAtk2(false, &atkAct2, defList, defCount, scList, scCount);
+                   }
+               }
             }
             else
             {
