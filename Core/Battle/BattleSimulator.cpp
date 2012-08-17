@@ -6864,7 +6864,7 @@ bool BattleSimulator::doSkillStrengthen_week(BattleFighter* bf, const GData::Ski
         pos0 = 25;
     else if(!active && bf->getSide() != target_side)
         pos0 = 25;
-    if( ((float)bo->getHP())/(bo->getMaxHP() < ef->value/100))
+    if( ((float)bo->getHP()/bo->getMaxHP()) < ef->value/100)
     {
         bo->setImmune2(0xE);
         defList[defCount].pos = bo->getPos() + pos0;

@@ -1008,6 +1008,8 @@ namespace GObject
 	{
 		if (num == 0 || IsEquipId(id))
 			return false;
+        if (!toWhere)
+            toWhere = ToDelete;
 		ItemBase * item = FindItem(id, bind);
 		if (item == NULL) return false;
 		bool ret = TryDelItem(item, num);
@@ -1048,6 +1050,8 @@ namespace GObject
 	{
 		if (num == 0 || item == NULL || IsEquipId(item->getId()))
 			return false;
+        if (!toWhere)
+            toWhere = ToDelete;
 		bool ret = TryDelItem(item, num);
 		if (ret)
 		{

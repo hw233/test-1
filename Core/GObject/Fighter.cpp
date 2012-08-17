@@ -2337,7 +2337,7 @@ void Fighter::setSkills( std::string& skills, bool writedb )
     }
 
     if (vt_skills.size())
-        addSkillsFromCT(vt_skills, writedb, up);
+        addSkillsFromCT(vt_skills, writedb, up, false);
 }
 
 bool Fighter::addNewSkill( UInt16 skill, bool writedb, bool up, bool online )
@@ -2400,10 +2400,7 @@ void Fighter::setUpCittas( std::string& citta, bool writedb )
     StringTokenizer tk(citta, ",");
     for (size_t i = 0; i < tk.count(); ++i)
     {
-        if (GVAR.GetVar(GVAR_CITTASPLIT))
-            upCitta(::atoi(tk[i].c_str()), i, true, false, false);
-        else
-            upCitta(::atoi(tk[i].c_str()), i, writedb, false, false);
+        upCitta(::atoi(tk[i].c_str()), i, writedb, false, false);
     }
 }
 
@@ -2892,13 +2889,6 @@ bool Fighter::addNewCitta( UInt16 citta, bool writedb, bool init, bool split )
     _attrDirty = true;
     _bPDirty = true;
     sendModification(0x63, citta, op/*1add,2del,3mod*/, writedb);
-
-    // XXX: 拆分出来的都是增益心法
-    if (!GVAR.GetVar(GVAR_CITTASPLIT) && split)
-    {
-        UInt8 idx = getUpCittasNum();
-        upCitta(citta, idx, true, false, false);
-    }
 
     if (!init && _owner && writedb)
         _owner->OnHeroMemo(MC_CITTA, MD_ADVANCED, 0, 0);
@@ -4337,6 +4327,7 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, bool bind)
         ss.curVal -= ss.maxVal;
         ++ss.lvl;
 
+        ss.maxVal = GData::GDataManager::getMaxStrengthenVal(sid, ss.lvl);
         if (ss.lvl >= ss.maxLvl)
         {
             ss.curVal = 0;
@@ -4345,7 +4336,6 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, bool bind)
             ret = 0;
             break;
         }
-        ss.maxVal = GData::GDataManager::getMaxStrengthenVal(sid, ss.lvl);
     }
 
     SSUpdate2DB(id, ss);
