@@ -20,13 +20,13 @@ namespace GObject
 
 
 class CountryBattle;
-//??Ϊ???????????ݳ???
+//作为基础配置数据出现
 struct MapData
 {
 	MapData(): m_ID(0), m_Level(0), m_Acquirable(0), m_Country(0) { }
 	UInt8		m_ID;
 	std::string	m_Name;
-	UInt8		m_Level;			//??????ͼ?????ȼ?
+	UInt8		m_Level;			//进入地图需求等级
 	UInt8		m_Acquirable;
 	UInt8		m_Country;
 };
@@ -128,9 +128,9 @@ public:
 private:
 	std::string m_Name;
 
-	MapData		m_MapData;		//??ʼ??ʱ
+	MapData		m_MapData;		//初始化时
 
-	MOMap		m_MOMap;		//??ͼ?ݵ????ж????ļ???
+	MOMap		m_MOMap;		//地图据点所有对象的集合
 
 	std::map<UInt16, SpotData>	m_Spots;
 	MapPlayer _playerList[COUNTRY_MAX][2];//country pk_status
