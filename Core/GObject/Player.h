@@ -288,6 +288,20 @@ namespace GObject
         UInt8 type;
     };
 
+    class EventTlzAuto : public EventBase
+    {
+    public:
+	    EventTlzAuto(Player * player, UInt32 interval);
+
+    public:
+	    virtual UInt32 GetID() const { return EVENT_TLZAUTO; }
+	    void process();
+	    void cancel() const;
+	    void complete() const;
+
+    };
+
+
 	struct Lineup
 	{
 		Lineup(): fid(0), pos(0), fighter(NULL) {}
@@ -372,7 +386,7 @@ namespace GObject
             smFinishCount(0), smFreeCount(0), smAcceptCount(0), ymFinishCount(0), ymFreeCount(0), ymAcceptCount(0),
             clanTaskId(0), ctFinishCount(0),
 			created(0), lockExpireTime(0), wallow(1), battlecdtm(0), dungeonCnt(0), dungeonEnd(0),
-            copyFreeCnt(0), copyGoldCnt(0), copyUpdate(0), frontFreeCnt(0), frontGoldCnt(0), frontUpdate(0)
+            copyFreeCnt(0), copyGoldCnt(0), copyUpdate(0), frontFreeCnt(0), frontGoldCnt(0), frontUpdate(0),m_isTlzAuto(0)
 #ifdef _ARENA_SERVER
             , entered(0)
 #endif
@@ -470,7 +484,9 @@ namespace GObject
 #ifdef _ARENA_SERVER
         UInt8 entered;
 #endif
-	};
+        UInt8 tjEvent1[3];          //天劫事件1的3个据点
+
+    };
 
 	class Player:
 		public GObjectBaseT<Player, UInt64>
@@ -1048,6 +1064,20 @@ namespace GObject
 		//????ϵͳ
 		inline bool IsInTeam() const { return false; }	//TODO
 
+        //天劫每日任务
+        void OnDoTianjieTask(UInt8 eventId, UInt8 cmd, UInt8 id);
+        UInt8 freshTjEvent1Id();
+        UInt8 attackTjEvent1(UInt8 id, UInt8 cmd);
+        UInt8 attackTjEvent3(UInt8 id);
+        void getTjTask1Data(Stream& st);
+        void getTjTask2Data(Stream& st);
+        void getTjTask3Data(Stream& st);
+
+        void processAutoTlz();
+        void cancelAutoTlz();
+        void completeAutoTlz();
+        bool m_isTlzAuto;
+        /////
 	public:
 		UInt16   GetFreePackageSize();
 		bool     ExtendPackageSize();

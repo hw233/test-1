@@ -374,6 +374,8 @@ namespace REQ
     const UInt8 NEWRELATION         = 0x17;
     /** 符文 (内丹) **/
     const UInt8 SKILLSTRENGTHEN     = 0x18;
+    /** 天劫 **/
+    const UInt8 TIANJIE             = 0x19;
 }
 
 namespace REP
@@ -613,6 +615,8 @@ namespace REP
     const UInt8 NEWRELATION         = 0x17;
     /** 符文 (内丹) **/
     const UInt8 SKILLSTRENGTHEN     = 0x18;
+    /** 天劫 **/
+    const UInt8 TIANJIE             = 0x19;
 }
 
 namespace SPEQ

@@ -40,6 +40,7 @@
 #include "Common/Itoa.h"
 #include "Server/SysMsg.h"
 #include "Arena.h"
+#include "Tianjie.h"
 
 namespace GObject
 {
@@ -703,7 +704,10 @@ void World::World_Boss_Refresh(void*)
 {
     worldBoss.process(TimeUtil::Now());
 }
-
+void World::Tianjie_Refresh(void*)
+{
+	GObject::Tianjie::instance().process(TimeUtil::Now());
+}
 void World::Team_Copy_Process(void*)
 {
     teamCopyManager->process(TimeUtil::Now());
@@ -716,6 +720,9 @@ void World::AthleticsPhysicalCheck(void *)
 
 bool World::Init()
 {
+	GObject::Tianjie::instance().Init();
+	AddTimer(5 * 1000, Tianjie_Refresh, static_cast<void*>(NULL));
+	
 	GObjectManager::delayLoad();
 	GObjectManager::LoadPracticeData();
 	GObjectManager::LoadTripodData();

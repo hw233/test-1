@@ -58,6 +58,8 @@
 #include "GObject/TownDeamon.h"
 #include "GObject/Arena.h"
 
+#include "GObject/Tianjie.h"
+
 struct NullReq
 {
 	UInt32 ticket;
@@ -2511,6 +2513,12 @@ void OnAttackNpcReq( GameMsgHdr& hdr, AttackNpcReq& anr )
 		return;
 	}
 
+	if (GObject::Tianjie::instance().isTjNpc(anr._npcId, loc))
+	{
+	    GObject::Tianjie::instance().attack(player, loc, anr._npcId);
+	    return;
+	}
+
     if (WBossMgr::isWorldBoss(anr._npcId))
         worldBoss.attack(player, loc, anr._npcId);
     else
@@ -4164,6 +4172,10 @@ void OnFourCopReq( GameMsgHdr& hdr, const void* data)
         st << opt << tmpCnt << Stream::eos;
         pl->send(st);
     }
+}
+void OnTianjieReq( GameMsgHdr& hdr, const void* data)
+{
+    GObject::Tianjie::instance().OnTianjieReq(hdr, data);
 }
 
 void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)

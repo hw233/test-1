@@ -59,7 +59,7 @@
 #endif
 #include "GData/Store.h"
 #include "RealItemAward.h"
-
+#include "GObject/Tianjie.h"
 #include <cmath>
 
 #define NTD_ONLINE_TIME (4*60*60)
@@ -11040,6 +11040,354 @@ namespace GObject
             sendConsumeInfo();
         }
     }
+
+    static const UInt32 s_tjEvent1NpcId[16] = {};//天劫事件1,16个据点的怪物npc
+    static const UInt32 s_tjEvent1Exp[16] = {};  //天劫事件1,16个据点的经验
+
+    void Player::OnDoTianjieTask(UInt8 eventId, UInt8 cmd, UInt8 id)
+    {
+        Stream st(REQ::TIANJIE);
+        UInt8 type = 0;
+        UInt8 rcmd = 0;
+        if (1 == eventId)
+        {
+            type = 1;
+            switch (cmd)
+            {
+                //查询列表
+            case 0:
+                {
+                    st << type << rcmd;
+                    //获取数据列表
+                    getTjTask1Data(st);
+                    st << Stream::eos;
+
+                    send(st);
+                }
+                break;
+                //攻击据点 默认攻击
+            case 1:
+            case 2:
+                {
+                    UInt8 res = attackTjEvent1(id, rcmd);
+                    if (res > 0)
+                    {
+                        UInt8 rcmd = res;
+                        st << type << rcmd << Stream::eos;
+                        send(st);
+                    }
+                }
+                break;
+                //刷新任务
+            case 3:
+                {
+                    if (GetVar(VAR_TJ_TASK1_NUMBER) == 5)
+                    {
+                        rcmd = 1;
+                    }
+                    else if (getTael() < 500)
+                    {
+                        rcmd = 3;
+                    }
+                    if (rcmd > 0)
+                    {
+                        st << type << rcmd << Stream::eos;
+                        send(st);
+                        return;
+                    }
+                    ConsumeInfo ci(TianjieTask, 0, 0);
+                    useTael(500, &ci);
+
+                    for (size_t i = 0; i < sizeof(_playerData.tjEvent1)/sizeof(_playerData.tjEvent1[0]); ++i)
+                    {
+                        _playerData.tjEvent1[i] = freshTjEvent1Id();
+                    }
+                    UInt8 num1 = 5-GetVar(VAR_TJ_TASK1_NUMBER);
+                    st << type << rcmd <<num1 << _playerData.tjEvent1[0] << _playerData.tjEvent1[1] << _playerData.tjEvent1[2];
+                    st << Stream::eos;
+                    send(st);
+                }
+                break;
+           default:
+                break;
+            }
+        }
+        else if (2 == eventId)
+        {
+            type = 2;
+            switch (cmd)
+            {
+                    //查询列表
+                case 0:
+                    {
+                        st << type << rcmd;
+                        getTjTask2Data(st);
+                        st << Stream::eos;
+                        send(st);
+                    }
+                    break;
+                    //捐款
+                case 1:
+                    {
+                        int count = GetVar(VAR_TJ_TASK2_TAEL) + GetVar(VAR_TJ_TASK2_GOLD) + GetVar(VAR_TJ_TASK2_COUPON) + GetVar(VAR_TJ_TASK2_TJYJ);
+                        if (count >= 100) //达到上限
+                        {
+                            rcmd = 5;
+                            st << type << rcmd << Stream::eos;
+                            send(st);
+                            return;
+                        }
+                        if (0 == id) //白银
+                        {
+                            if (getTael() < 1000)
+                            {
+                                rcmd = 1; //银币不足
+                                st << type << rcmd << Stream::eos;
+                                send(st);
+                                return;
+                            }
+                            ConsumeInfo ci(TianjieTask, 0, 0);
+                            useTael(1000, &ci);
+                            AddVar(VAR_TJ_TASK2_TAEL, 1);
+                        }
+                        else if (1 == id) //仙石
+                        {
+                            if (getGold() < 10)
+                            {
+                                rcmd = 2; //仙石不足
+                                st << type << rcmd << Stream::eos;
+                                send(st);
+                                return;
+                            }
+                            ConsumeInfo ci(TianjieTask, 0, 0);
+                            useGold(10, &ci);
+                            AddVar(VAR_TJ_TASK2_GOLD, 1);
+                        }
+                        else if (2 == id) //礼券
+                        {
+                            if (getCoupon() < 10)
+                            {
+                                rcmd = 3; //不足
+                                st << type << rcmd << Stream::eos;
+                                send(st);
+                                return;
+                            }
+                            ConsumeInfo ci(TianjieTask, 0, 0);
+                            useCoupon(10, &ci);
+                            AddVar(VAR_TJ_TASK2_COUPON, 1);
+                        }
+                        else if (3 == id) //天劫印记
+                        {
+                            if (!GetPackage()->DelItemAny(9999, 1))
+                            {
+                                rcmd = 4; //印记不足
+                                st << type << rcmd << Stream::eos;
+                                send(st);
+                                return;
+                            }
+                            AddVar(VAR_TJ_TASK2_TJYJ, 1);
+                        }
+                        st << type << rcmd;
+                        getTjTask2Data(st);
+                        st << Stream::eos;
+                        send(st);
+                    }
+                    break;
+                    //领取奖励
+                case 2:
+                    {
+                        if (GetVar(VAR_TJ_TASK2_RECV) == 1)//已领取
+                        {
+                            rcmd = 6;
+                            st << type << rcmd << Stream::eos;
+                            send(st);
+                            return;
+                        }
+
+                        int count = GetVar(VAR_TJ_TASK2_TAEL) + GetVar(VAR_TJ_TASK2_GOLD) + GetVar(VAR_TJ_TASK2_COUPON) + GetVar(VAR_TJ_TASK2_TJYJ);
+                        int exp2 = count * 1000000 / 100;
+                        //达到天劫等级的玩家,一天只能领一次奖励
+                        AddExp(exp2);
+                        if (GObject::Tianjie::instance().isPlayerInTj(GetLev()))
+                        {
+                            AddVar(VAR_TJ_TASK2_RECV, 1);
+                        }
+                        SetVar(VAR_TJ_TASK2_TAEL, 0 );
+                        SetVar(VAR_TJ_TASK2_GOLD, 0 );
+                        SetVar(VAR_TJ_TASK2_COUPON, 0 );
+                        SetVar(VAR_TJ_TASK2_TJYJ, 0 );
+            
+                        st << type << rcmd;
+                        getTjTask2Data(st);
+                        st << Stream::eos;
+                        send(st);
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+        else if (3 == eventId)
+        {
+            type = 3;
+            switch (cmd)
+            {
+            case 0: //列表
+                break;
+            case 1: //前往破阵
+                {
+                    UInt8 res =  attackTjEvent3(id);
+                    if (res > 0)
+                    {
+                        st << type << res << Stream::eos;
+                        send(st);
+                        return;
+                    }
+                }
+                break;
+            case 2: //自动破阵
+                {
+                    if (getTael() < 1000)
+                    {
+                        rcmd = 3;
+                        st << type << rcmd << Stream::eos;
+                        send(st);
+                        return;
+                    }
+                }
+                break;
+            case 3: //自动完成
+                {
+                    if (getGold() < 10)
+                    {
+                        rcmd = 2;
+                        st << type << rcmd << Stream::eos;
+                        send(st);
+                        return;
+                    }
+                }
+                break;
+            default:
+                break;
+            }
+        }
+    }
+    UInt8 Player::freshTjEvent1Id()
+    {
+        UInt8 id = 0;
+
+        return id;
+    }
+    UInt8 Player::attackTjEvent1(UInt8 id, UInt8 cmd)
+    {
+        if (id > 15) 
+            return 4;
+        
+        if (GetVar(VAR_TJ_TASK1_NUMBER) == 5)
+            return 1;
+
+        if (cmd == 2 && getGold() < 5) //双倍奖励
+            return 2; //仙石不足
+       
+        bool res = attackNpc(s_tjEvent1NpcId[id]);
+        if (res)
+        {
+            if (2 == cmd)
+            {
+                ConsumeInfo ci(TianjieTask, 0, 0);
+                useGold(5, &ci);
+            }
+            _playerData.tjEvent1[id] = 0;
+
+            AddExp(s_tjEvent1Exp[id] * cmd);
+
+            AddVar(VAR_TJ_TASK1_NUMBER, 1);
+        }
+        return 0;
+    }
+    UInt8 Player::attackTjEvent3(UInt8 id)
+    {
+        UInt8 copyid = GetVar(VAR_TJ_TASK3_COPYID);
+        if (51 == copyid)
+        {
+            return 1;
+        }
+        if (0 == copyid) copyid = 1;
+        bool res = GObject::Tianjie::instance().attackTlz(this, id, copyid);
+        if (res)
+        {
+            AddVar(VAR_TJ_TASK3_COPYID, 1);
+        }
+        return 0;
+    }
+    void Player::getTjTask1Data(Stream& st)
+    {
+        if (GetVar(VAR_TJ_TASK1_NUMBER) == 0) //今日还没做任务
+        {
+            for (int i = 0; i < sizeof(_playerData.tjEvent1)/sizeof(_playerData.tjEvent1[0]); ++i)
+            {
+                if (_playerData.tjEvent1[i] == 0)
+                {
+                    _playerData.tjEvent1[i] = freshTjEvent1Id();
+                }
+            }
+        }
+        UInt8 num1 = 5-GetVar(VAR_TJ_TASK1_NUMBER);
+        st << num1 << _playerData.tjEvent1[0] << _playerData.tjEvent1[1] << _playerData.tjEvent1[2];
+    }
+    void Player::getTjTask2Data(Stream& st)
+    {
+        short n1 = GetVar(VAR_TJ_TASK2_TAEL);
+        short n2 = GetVar(VAR_TJ_TASK2_GOLD);
+        short n3 = GetVar(VAR_TJ_TASK2_COUPON);
+        short n4 = GetVar(VAR_TJ_TASK2_TJYJ);
+        UInt8 percent = (n1+n2+n3+n4);      //捐献百分比,100上限
+        int exp2 = percent * 1000000 / 100; //经验
+        st << n1 << n2 << n3 << n4 << percent << exp2;
+    }
+    void Player::getTjTask3Data(Stream& st)
+    {
+        short copyid = GetVar(VAR_TJ_TASK3_COPYID);
+        UInt8 percent = copyid * 100/ 50;
+        int exp3 = percent * 10000000 / 100;
+        st << copyid << percent << exp3;
+    }
+    void Player::processAutoTlz()
+    {
+        m_isTlzAuto = true;
+        if (GetVar(VAR_TJ_TASK3_COPYID) == 51)
+        {
+        }
+    }
+    void Player::cancelAutoTlz()
+    {
+    }
+    void Player::completeAutoTlz()
+    {
+
+    }
+
+EventTlzAuto::EventTlzAuto( Player * player, UInt32 interval)
+	: EventBase(player, interval)
+{
+}
+
+void EventTlzAuto::process()
+{
+	m_player->processAutoTlz();
+}
+
+void EventTlzAuto::cancel() const
+{
+	m_player->cancelAutoTlz();
+}
+
+void EventTlzAuto::complete() const
+{
+	m_player->completeAutoTlz();
+}
+
+
 
 } // namespace GObject
 

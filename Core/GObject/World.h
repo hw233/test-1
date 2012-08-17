@@ -348,6 +348,7 @@ private:
 	static void ReCalcWeekDay( World * );
 	static void World_One_Min( World * );
     static void AthleticsPhysicalCheck(void *);
+	static void Tianjie_Refresh(void*);
 
 private:
 	void testUpdate();

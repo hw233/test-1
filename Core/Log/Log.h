@@ -73,6 +73,8 @@ enum PurchaseType
     ArenaBet,
     AthleticKillCD2,
     AthleticPhysical,
+    TianjieDonate,
+    TianjieTask,
 };
 
 enum IncomingType

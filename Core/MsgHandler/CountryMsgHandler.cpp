@@ -161,6 +161,8 @@ MSG_REG_2(GameMsgHdr, REQ::SECOND_SOUL, OnSecondSoulReq);
 MSG_REG_2(GameMsgHdr, REQ::RC7DAY, OnRC7Day);
 MSG_REG_2(GameMsgHdr, REQ::RF7DAY, OnRF7Day);
 
+MSG_REG_2(GameMsgHdr, REQ::TIANJIE, OnTianjieReq);
+
 MSG_REG_2(GameMsgHdr, 0x1D0, OnDailyReq2);
 
 MSG_REG_2(GameMsgHdr, 0x1EE, OnReLoadLuaReq);

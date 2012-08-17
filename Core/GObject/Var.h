@@ -181,6 +181,16 @@ namespace GObject
 
         VAR_PHYSICAL_BUY = 143, //购买体力限制
 
+        VAR_TJ_EVENT_PRESTIGE=150,  //天劫事件中的声望
+        VAR_TJ_TASK_PRESTIGE=151,   //天劫活动中的声望
+        VAR_TJ_TASK1_NUMBER=152,    //天劫每日任务1的已完成次数
+        VAR_TJ_TASK2_TAEL=153,     //天劫任务2捐献的银币积分
+        VAR_TJ_TASK2_GOLD=154,     //天劫任务2捐献的仙石积分
+        VAR_TJ_TASK2_COUPON=155,    //天劫任务2捐献的礼券积分
+        VAR_TJ_TASK2_TJYJ=156,      //天劫任务2捐献的天劫印记
+        VAR_TJ_TASK2_RECV=157,      //天劫任务2是否已领取任务
+        VAR_TJ_TASK3_COPYID=158,    //天劫任务3当前破阵层数
+
         VAR_MAX,
     };
 
@@ -352,6 +362,16 @@ namespace GObject
             REGISTER_VAR(VAR_SOSOMAPAWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_CONSUME, CYCLE_NONE);
             REGISTER_VAR(VAR_PHYSICAL_BUY, CYCLE_DAY);
+
+            REGISTER_VAR(VAR_TJ_EVENT_PRESTIGE, CYCLE_DAY);
+            REGISTER_VAR(VAR_TJ_TASK_PRESTIGE,  CYCLE_NONE);
+            REGISTER_VAR(VAR_TJ_TASK1_NUMBER, CYCLE_DAY);
+            REGISTER_VAR(VAR_TJ_TASK2_TAEL, CYCLE_NONE);
+            REGISTER_VAR(VAR_TJ_TASK2_GOLD, CYCLE_NONE);
+            REGISTER_VAR(VAR_TJ_TASK2_COUPON, CYCLE_NONE);
+            REGISTER_VAR(VAR_TJ_TASK2_TJYJ, CYCLE_NONE);
+            REGISTER_VAR(VAR_TJ_TASK2_RECV, CYCLE_DAY);
+            REGISTER_VAR(VAR_TJ_TASK3_COPYID, CYCLE_NONE);
         }
         
         UInt32 GetVar(UInt32 id, UInt32 now = 0);
