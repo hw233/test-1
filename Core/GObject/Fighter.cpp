@@ -2423,7 +2423,7 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool lvlup )
         return false;
 
     // XXX: 只能装备3个主动技能
-    if (cb->effect && cb->effect->skill.size() && getUpSkillsNum() >= 3)
+    if (!lvlup && cb->effect && cb->effect->skill.size() && getUpSkillsNum() >= 3)
         return false;
 
     int cidx = hasCitta(citta);
@@ -2432,8 +2432,10 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool lvlup )
     if (!lvlup && _cittas[cidx] != citta)
         return false;
 
+#if 0
     if (!(idx >= 0 && idx < getUpCittasMax())) // dst
         return false;
+#endif
 
     int op = 0;
     bool swap = false;
@@ -2447,6 +2449,7 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool lvlup )
             return false;
         }
 
+#if 0
         if (idx < getUpCittasNum()) // XXX: no we all append
         {
             if (getUpCittasNum() < getUpCittasMax()) {
@@ -2459,7 +2462,11 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool lvlup )
                 }
             }
         } else
+#else
             idx = getUpCittasNum();
+            if (!(idx >= 0 && idx < getUpCittasMax())) // dst
+                return false;
+#endif
 
         if (_citta[idx])
             offCitta(_citta[idx], false, true, writedb);
@@ -2470,6 +2477,7 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool lvlup )
     }
     else
     {
+#if 0
         if (src != idx)
         {
             if (_citta[idx])
@@ -2484,6 +2492,9 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool lvlup )
             }
         }
         else
+#else
+        idx = src;
+#endif
         { // upgrade
             if (_citta[idx] != citta)
             {
@@ -2494,10 +2505,10 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool lvlup )
                     return false;
 
                 // XXX: do not send message to client
-                offCitta(_citta[idx], false, true, writedb); // delete skills was taken out by old citta first
+                offCitta(_citta[idx], false, false, writedb); // delete skills was taken out by old citta first
                 _citta[idx] = citta;
                 ret = true;
-                op = 1;
+                op = 3;
             }
         }
     }
@@ -2938,7 +2949,8 @@ bool Fighter::offCitta( UInt16 citta, bool flip, bool offskill, bool writedb )
         }
     }
     //sendModification(0x62, 0, i, writedb);
-    sendModification(0x62, citta, 2/*1add,2del,3mod*/, writedb);
+    if (flip)
+        sendModification(0x62, citta, 2/*1add,2del,3mod*/, writedb);
     return true;
 }
 

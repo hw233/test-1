@@ -1499,10 +1499,10 @@ namespace GObject
 			fgt2->setAmulet(fetchEquipment(specfgtobj.amulet), false);
             fgt2->setTrump(specfgtobj.trump, false);
             fgt2->setPeerless(specfgtobj.peerless, false); // XXX: must after setTrump
-            fgt2->setSkills(specfgtobj.skills, false);
-            fgt2->setUpSkills(specfgtobj.skill, false);
             fgt2->setCittas(specfgtobj.cittas, false);
             fgt2->setUpCittas(specfgtobj.citta, false);
+            fgt2->setSkills(specfgtobj.skills, false);
+            fgt2->setUpSkills(specfgtobj.skill, false);
             fgt2->setAttrType1(specfgtobj.attrType1);
             fgt2->setAttrValue1(specfgtobj.attrValue1);
             fgt2->setAttrType2(specfgtobj.attrType2);
