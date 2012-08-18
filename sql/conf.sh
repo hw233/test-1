@@ -5,8 +5,8 @@ U=kingxin
 P=kingxin
 PT=3306
 
-DBD=data_3322
-DBO=asss_3322
+DBD=data_jlt
+DBO=asss_jlt
 
 OPTIONS="Yes/No/Exit"
 IFS=/
