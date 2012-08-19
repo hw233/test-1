@@ -1827,6 +1827,37 @@ function sendRechargeMails4(player, ototal, ntotal)
     end
 end
 
+function sendRechargeMails5(player, ototal, ntotal)
+    local lvls = {
+        99,199,399,699,1099,1599,2199,2899,3699,4599,5599,8999,15999,26999,42999,64999,99999,
+    }
+    local items = {
+        {500,2,1},
+        {514,2,1},
+        {503,2,1},
+        {516,2,1},
+        {515,1,1},
+        {515,2,1},
+        {515,3,1},
+    }
+
+    local olvl = calcRechargeLevel(lvls, ototal)
+    if ntotal > 2199 then
+        ntotal = 2199
+    end
+    local nlvl = calcRechargeLevel(lvls, ntotal)
+
+    if nlvl == 0 or olvl == nlvl then
+        return
+    end
+
+    for k = olvl+1, nlvl do
+        local title = string.format(msg_109, lvls[k])
+        local ctx = string.format(msg_110, lvls[k])
+        sendItemPackageMail(player, title, ctx, items[k]);
+    end
+end
+
 function sendRechargeMails(player, ototal, ntotal)
     --sendRechargeMails1(player, ototal, ntotal)
     --[[local start = { ['year'] = 2012, ['month'] = 7, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1836,7 +1867,12 @@ function sendRechargeMails(player, ototal, ntotal)
     else
         sendRechargeMails2(player, ototal, ntotal)
     end--]]
-    sendRechargeMails4(player, ototal, ntotal)
+    if getRechargeActive() then
+        sendRechargeMails4(player, ototal, ntotal)
+    end
+    if getRechargeActive3366() then
+        sendRechargeMails5(player, ototal, ntotal)
+    end
 end
 
 function onEquipForge(player, id, onums)
