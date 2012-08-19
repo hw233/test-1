@@ -39,8 +39,8 @@ namespace GObject
 
 #define SKILL_UPMAX 3 // 技能最初就能装备3个
 #define CITTA_LEVEL_MAX 100
-#define CITTA_UPMAX 6
-#define CITTA_INIT 2 // 心法最初只能装2个,由穴道控制装备个数
+#define CITTA_UPMAX 9
+#define CITTA_INIT 5 // 心法最初只能装2个,由穴道控制装备个数
 #define TRUMP_UPMAX 3
 #define TRUMP_INIT 1 // 法宝最初只能装1个,由VIP等级控制装备个数
 #define ACUPOINTS_MAX 15
@@ -325,6 +325,7 @@ public:
     void getAllCittaAndLevel(Stream& st);
     // 取得所有学会的无双技能
     void getAllPeerlessAndLevel(Stream& st);
+    const std::vector<UInt16>& getCittas() const { return _cittas; }
 
     // 取得可装备的无双技能
     void getAllPeerless(Stream& st);

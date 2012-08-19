@@ -3353,6 +3353,9 @@ void OnSaleSellReq( GameMsgHdr& hdr, SaleSellReq& req )
 	if(!player->hasChecked())
 		return;
 
+    if (player->GetLev() < 45)
+        return;
+
 	player->GetSale()->sellSaleReq(req._data);
 }
 

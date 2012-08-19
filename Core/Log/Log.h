@@ -116,6 +116,7 @@ enum MailItemType
     ClanBattleAward,
     RealItemAwardActive,
     NewDrawingGameAward,
+    SplitCitta,
 };
 enum ItemFrom
 {
