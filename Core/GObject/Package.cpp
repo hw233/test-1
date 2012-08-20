@@ -546,6 +546,14 @@ namespace GObject
                     qixiUdpLog(typeId, num);
                 }
 
+                // 太乙精金的特殊记录
+                if (typeId == 503 && bind!= true)
+                {
+                    udpLog("item", "I_503_1_2", "", "", "", "", "act", num);
+                }
+
+
+
                 if (typeId == 1209)
                     m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
                 if (typeId == 1223)
@@ -578,6 +586,12 @@ namespace GObject
                 if (fromWhere == FromQixi)
                 {
                     qixiUdpLog(typeId, num);
+                }
+
+                // 太乙精金的特殊记录
+                if (typeId == 503 && bind!= true)
+                {
+                    udpLog("item", "I_503_1_2", "", "", "", "", "act", num);
                 }
 
                 //增加获取物品的荣誉
@@ -631,6 +645,12 @@ namespace GObject
             {
                 qixiUdpLog(typeId, count);
             }
+            // 太乙精金的特殊记录
+            if (typeId == 503 && bind!= true)
+            {
+                udpLog("item", "I_503_1_2", "", "", "", "", "act", count);
+            }
+
             if (typeId == 1209)
                 m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
             if (typeId == 1223)
@@ -658,6 +678,12 @@ namespace GObject
             {
                 qixiUdpLog(typeId, count);
             }
+            // 太乙精金的特殊记录
+            if (typeId == 503 && bind!= true)
+            {
+                udpLog("item", "I_503_1_2", "", "", "", "", "act", count);
+            }
+
 			SendItemData(item);
 			ItemNotify(item->GetItemType().getId(), count);
             //获得物品
@@ -1051,6 +1077,13 @@ namespace GObject
             cittaUdpLog(2, id, num);
             if (toWhere == ToSkillStrengthenOpen || toWhere == ToSkillStrengthenUpgrade)
                 cittaUdpLog(3, id, num);
+
+            // 太乙精金的特殊记录
+            if (typeId == 503 && bind!= true)
+            {
+                udpLog("item", "I_503_2_2", "", "", "", "", "act", count);
+            }
+
 			SendItemData(item);
 			if (cnt == 0)
 			{
@@ -1090,6 +1123,12 @@ namespace GObject
             cittaUdpLog(2, item->getId(), num);
             if (toWhere == ToSkillStrengthenOpen || toWhere == ToSkillStrengthenUpgrade)
                 cittaUdpLog(3, item->getId(), num);
+
+            // 太乙精金的特殊记录
+            if (typeId == 503 && bind!= true)
+            {
+                udpLog("item", "I_503_2_2", "", "", "", "", "act", count);
+            }
 
 			SendItemData(item);
 			UInt32 id = item->getId();
