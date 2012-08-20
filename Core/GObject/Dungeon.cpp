@@ -104,8 +104,13 @@ UInt8 Dungeon::playerEnter( Player * player )
 						return 3;
 					ConsumeInfo ci(VipEnterDungeon,0,0);
 					player->useGold(price, &ci);
+                    player->dungeonUdpLog(_dungeon->levelReq, 3);
 				}
 			}
+            else
+            {
+                    player->dungeonUdpLog(_dungeon->levelReq, 1);
+            }
 
 		}
 
@@ -530,6 +535,14 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
         }
         bool free = (PLAYER_DATA(player, dungeonCnt) <= getMaxCount());
 		GameAction()->onDungeonWin(player, _id, dpi.totalCount, free);
+        if(PLAYER_DATA(player, dungeonCnt) > getMaxCount())
+        {
+            player->dungeonUdpLog(_dungeon->levelReq, 4);
+        }
+        else
+        {
+            player->dungeonUdpLog(_dungeon->levelReq, 2);
+        }
 
 	}
 

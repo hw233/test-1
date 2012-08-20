@@ -532,12 +532,16 @@ namespace GObject
 				SendItemData(item);
 				if(notify)
                     ItemNotify(item->GetItemType().getId(), num);
-				if((fromWhere != 0  && item->getQuality() >= 3) || (fromWhere == FromMerge && item->getQuality() >= 2))
-                {
+				//if((fromWhere != 0  && item->getQuality() >= 3) || (fromWhere == FromMerge && item->getQuality() >= 2))
+                //{
                     AddItemCoursesLog(typeId, num, fromWhere);
-                }
+                //}
                 if (fromWhere != FromNpcBuy && (GData::store.getPrice(typeId) || GData::GDataManager::isInUdpItem(typeId)))
+                {
                     udpLog(item->getClass(), typeId, num, 0, "add");
+                }
+                cittaUdpLog(1, typeId, num);
+
                 if (typeId == 1209)
                     m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
                 if (typeId == 1223)
@@ -562,7 +566,10 @@ namespace GObject
 				m_Items[ItemKey(typeId, bind)] = item;
 				DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, %u, %"I64_FMT"u, %u)", typeId, num, m_Owner->getId(), bind ? 1 : 0);
                 if (fromWhere != FromNpcBuy && (GData::store.getPrice(typeId) || GData::GDataManager::isInUdpItem(typeId)))
+                {
                     udpLog(item->getClass(), typeId, num, 0, "add");
+                }
+                cittaUdpLog(1, typeId, num);
                 //增加获取物品的荣誉
                 GameAction()->doAttainment(m_Owner, Script::ON_ADD_ITEM, typeId);
                 if (typeId == 1209)
@@ -576,7 +583,7 @@ namespace GObject
 				SendItemData(item);
 				if(notify)
 					ItemNotify(item->GetItemType().getId(), num);
-				if((fromWhere != 0  && item->getQuality() >= 3) || (fromWhere == FromMerge && item->getQuality() >= 2))
+				//if((fromWhere != 0  && item->getQuality() >= 3) || (fromWhere == FromMerge && item->getQuality() >= 2))
                      AddItemCoursesLog(typeId, num, fromWhere);
 				return item;
 			}
@@ -601,12 +608,15 @@ namespace GObject
 				SendItemData(exist);
 				ItemNotify(item->GetItemType().getId(), count);
 			}
-            if((fromWhere != 0  && item->getQuality() >= 3) || (fromWhere == FromMerge && item->getQuality() >= 2))
-            {
+            //if((fromWhere != 0  && item->getQuality() >= 3) || (fromWhere == FromMerge && item->getQuality() >= 2))
+            //{
                 AddItemCoursesLog(typeId, static_cast<UInt32>(count), fromWhere);
-            }
+            //}
             if (fromWhere != FromNpcBuy && (GData::store.getPrice(typeId) || GData::GDataManager::isInUdpItem(typeId)))
+            {
                 udpLog(item->getClass(), typeId, count, 0, "add");
+            }
+            cittaUdpLog(1, typeId, count);
             if (typeId == 1209)
                 m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
             if (typeId == 1223)
@@ -626,15 +636,18 @@ namespace GObject
 			m_Items[ItemKey(typeId, bind)] = item;
 			DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, %u, %"I64_FMT"u, %u)", typeId, count, m_Owner->getId(), bind ? 1 : 0);
             if (fromWhere != FromNpcBuy && (GData::store.getPrice(typeId) || GData::GDataManager::isInUdpItem(typeId)))
+            {
                 udpLog(item->getClass(), typeId, count, 0, "add");
+            }
+            cittaUdpLog(1, typeId, count);
 			SendItemData(item);
 			ItemNotify(item->GetItemType().getId(), count);
             //获得物品
             GameAction()->doAttainment(m_Owner, Script::ON_ADD_ITEM, typeId);
-            if((fromWhere != 0  && item->getQuality() >= 3) || (fromWhere == FromMerge && item->getQuality() >= 2))
-            {
+            //if((fromWhere != 0  && item->getQuality() >= 3) || (fromWhere == FromMerge && item->getQuality() >= 2))
+            //{
                  AddItemCoursesLog(typeId, static_cast<UInt32>(count), fromWhere);
-            }
+            //}
             if (typeId == 1209)
                 m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
             if (typeId == 1223)
@@ -995,6 +1008,8 @@ namespace GObject
 	{
 		if (num == 0 || IsEquipId(id))
 			return false;
+        if (!toWhere)
+            toWhere = ToDelete;
 		ItemBase * item = FindItem(id, bind);
 		if (item == NULL) return false;
 		bool ret = TryDelItem(item, num);
@@ -1002,17 +1017,22 @@ namespace GObject
 		{
 			UInt16 cnt = item->Count();
 
-            if((toWhere!= 0  && item->getQuality() >= 3) || (toWhere == ToGemMgerge && item->getQuality() >= 2))
-            {
+            //if((toWhere!= 0  && item->getQuality() >= 3) || (toWhere == ToGemMgerge && item->getQuality() >= 2))
+            //{
 				std::string tbn("item_courses");
 				DBLOG().GetMultiDBName(tbn); 
 				DBLOG().PushUpdateData("insert into  `%s`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)",tbn.c_str(), cfg.serverLogId, m_Owner->getId(), item->GetItemType().getId(), num, toWhere, TimeUtil::Now());
-            }
+            //}
 
             UInt32 price = GData::store.getPrice(id);
             if (price || GData::GDataManager::isInUdpItem(id))
+            {
                 udpLog(item->getClass(), id, num, price, "sub");
+            }
 
+            cittaUdpLog(2, id, num);
+            if (toWhere == ToSkillStrengthenOpen || toWhere == ToSkillStrengthenUpgrade)
+                cittaUdpLog(3, id, num);
 			SendItemData(item);
 			if (cnt == 0)
 			{
@@ -1030,21 +1050,28 @@ namespace GObject
 	{
 		if (num == 0 || item == NULL || IsEquipId(item->getId()))
 			return false;
+        if (!toWhere)
+            toWhere = ToDelete;
 		bool ret = TryDelItem(item, num);
 		if (ret)
 		{
 			UInt16 cnt = item->Count();
 
-            if((toWhere!= 0  && item->getQuality() >= 3) || (toWhere == ToGemMgerge && item->getQuality() >= 2))
-            {
+            //if((toWhere!= 0  && item->getQuality() >= 3) || (toWhere == ToGemMgerge && item->getQuality() >= 2))
+            //{
 				std::string tbn("item_courses");
 				DBLOG().GetMultiDBName(tbn); 
 				DBLOG().PushUpdateData("insert into `%s`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)",tbn.c_str() ,cfg.serverLogId, m_Owner->getId(), item->GetItemType().getId(), num, toWhere, TimeUtil::Now());
-            }
+            //}
 
             UInt32 price = GData::store.getPrice(item->getId());
             if (price || GData::GDataManager::isInUdpItem(item->getId()))
+            {
                 udpLog(item->getClass(), item->getId(), num, price, "sub");
+            }
+            cittaUdpLog(2, item->getId(), num);
+            if (toWhere == ToSkillStrengthenOpen || toWhere == ToSkillStrengthenUpgrade)
+                cittaUdpLog(3, item->getId(), num);
 
 			SendItemData(item);
 			UInt32 id = item->getId();
@@ -1354,6 +1381,7 @@ namespace GObject
                 {
                     ret2 = FormulaMerge(id, bind, num);
                     if (1 == ret2){
+                        multiMergeUdpLog(num);
                         m_Owner->sendMsgCode(0, 1800);
                         return true;
                     }
@@ -1374,6 +1402,7 @@ namespace GObject
                     ret2 = CittaMerge(id, bind, num);
                     if (1 == ret2){
                         m_Owner->sendMsgCode(0, 1800);
+                        multiMergeUdpLog(num);
                         return true;
                     }
                     else if(0 == ret2){
@@ -1399,6 +1428,7 @@ namespace GObject
                     ret2 = TrumpMerge(id, bind, num);
                     if (1 == ret2){
                         m_Owner->sendMsgCode(0, 1800);
+                        multiMergeUdpLog(num);
                         return true;
                     }
                     else if(0 == ret2){
@@ -1537,6 +1567,35 @@ namespace GObject
         m_Owner->udpLog(op, _type, _id, _price, "", "", "props", num);
     }
 
+    void Package::cittaUdpLog(UInt8 type, UInt32 id, UInt32 num)
+    {
+        char itemAct[32] = "";
+
+        // 是否是解封石
+        if (id != 550 && id != 551)
+        {
+            // 是否属于心法书/残卷范围
+            if (! ((id >= LCITTA_ID && id <=RCITTA_ID) || (id >= LCITTA1_ID && id <= RCITTA1_ID)))
+                return;
+        }
+
+        if (type < 1 || type > 3)
+            return;
+
+        snprintf (itemAct, 32, "%d_%d", id, type);
+        m_Owner->udpLog("citta", itemAct, "", "", "", "", "act", num);
+    }
+
+    void Package::gemMergeUdpLog(UInt32 num)
+    {
+        m_Owner->udpLog("gemMerge", "F_1078", "", "", "", "", "act", num);
+    }
+
+    void Package::multiMergeUdpLog(UInt32 num)
+    {
+        m_Owner->udpLog("multiMerge", "F_1080", "", "", "", "", "act", num);
+    }
+
     UInt8 Package::GetItemCareer(UInt32 itemid, UInt8 bind)
     {
 		ItemBase * item = FindItem(itemid, bind);
@@ -1616,8 +1675,11 @@ namespace GObject
             {70,    71,     "1,1",                  1751},
             {0, 0, NULL, 0},
         };*/
-        if(Mnum <= 0)
-            return 0;
+        if(Mnum <= 0){ //兼容老的合成协议
+            Mnum = 1;
+            bind = 2;
+        }
+        
         std::vector<stMergeStf> stfs = GObjectManager::getMergeStfs(id);
         if(stfs.size()  == 0 )
             return 0;
@@ -3348,12 +3410,14 @@ namespace GObject
         if(bindGemsOut > 0)
         {
             AddItem(gemIdOut, bindGemsOut, true, false, FromMerge);
+            gemMergeUdpLog(bindGemsOut);
             if(World::getGemMergeAct())
                 GameAction()->onMergeGem(m_Owner, lvl + 2, bindGemsOut);
         }
         if(unbindGemsOut > 0)
         {
             AddItem(gemIdOut, unbindGemsOut, false, false, FromMerge);
+            gemMergeUdpLog(unbindGemsOut);
             if(World::getGemMergeAct())
                 GameAction()->onMergeGem(m_Owner, lvl + 2, unbindGemsOut);
         }

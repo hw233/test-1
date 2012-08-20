@@ -163,6 +163,7 @@ function loadStore()
 
         discount(store)
 
+        store:add(2,1325,50)
         if is7_16_8_15() then
             store:add(2,1704,999)
             store:add(2,1705,999)

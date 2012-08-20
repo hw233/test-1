@@ -521,6 +521,8 @@ void TownDeamon::challenge(Player* pl, UInt16 level, UInt8 type)
                         m_maxLevel = level;
                     }
 
+                    pl->townDeamonUdpLog(level); // 上报挑战成功的udp日志
+
                     res = 0;
                     ++ dpd->curLevel;
                     if(dpd->startTime == 0)
@@ -683,6 +685,7 @@ void TownDeamon::autoCompleteQuite(Player* pl, UInt16 levels)
             GData::NpcGroup * ng = it->second;
             pl->pendExp(ng->getExp());
             ng->getLoots(pl, pl->_lastLoot, 0, NULL);
+            pl->townDeamonUdpLog(dpd->curLevel + idx);
         }
     }
 
