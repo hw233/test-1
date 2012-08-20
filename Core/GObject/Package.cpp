@@ -549,7 +549,7 @@ namespace GObject
                 // 太乙精金的特殊记录
                 if (typeId == 503 && bind!= true)
                 {
-                    udpLog("item", "I_503_1_2", "", "", "", "", "act", num);
+                    m_Owner->udpLog("item", "I_503_1_2", "", "", "", "", "act", num);
                 }
 
 
@@ -591,7 +591,7 @@ namespace GObject
                 // 太乙精金的特殊记录
                 if (typeId == 503 && bind!= true)
                 {
-                    udpLog("item", "I_503_1_2", "", "", "", "", "act", num);
+                    m_Owner->udpLog("item", "I_503_1_2", "", "", "", "", "act", num);
                 }
 
                 //增加获取物品的荣誉
@@ -648,7 +648,7 @@ namespace GObject
             // 太乙精金的特殊记录
             if (typeId == 503 && bind!= true)
             {
-                udpLog("item", "I_503_1_2", "", "", "", "", "act", count);
+                m_Owner->udpLog("item", "I_503_1_2", "", "", "", "", "act", count);
             }
 
             if (typeId == 1209)
@@ -681,7 +681,7 @@ namespace GObject
             // 太乙精金的特殊记录
             if (typeId == 503 && bind!= true)
             {
-                udpLog("item", "I_503_1_2", "", "", "", "", "act", count);
+                m_Owner->udpLog("item", "I_503_1_2", "", "", "", "", "act", count);
             }
 
 			SendItemData(item);
@@ -1079,9 +1079,9 @@ namespace GObject
                 cittaUdpLog(3, id, num);
 
             // 太乙精金的特殊记录
-            if (typeId == 503 && bind!= true)
+            if (id == 503 && bind!= true)
             {
-                udpLog("item", "I_503_2_2", "", "", "", "", "act", count);
+                m_Owner->udpLog("item", "I_503_2_2", "", "", "", "", "act", num);
             }
 
 			SendItemData(item);
@@ -1125,9 +1125,9 @@ namespace GObject
                 cittaUdpLog(3, item->getId(), num);
 
             // 太乙精金的特殊记录
-            if (typeId == 503 && bind!= true)
+            if (item->getId() == 503 && item->GetBindStatus()!= true)
             {
-                udpLog("item", "I_503_2_2", "", "", "", "", "act", count);
+                m_Owner->udpLog("item", "I_503_2_2", "", "", "", "", "act", num);
             }
 
 			SendItemData(item);
