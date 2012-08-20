@@ -128,6 +128,8 @@ namespace GObject
 #define MAX_FRIENDS 30
 #define MAX_CFRIENDS 50
 
+#define QIXI_MAX_STEPS  24
+
 	class Map;
 	class Player;
 	class ItemBase;
@@ -358,6 +360,16 @@ namespace GObject
     {
         UInt8 id;
         UInt8 level;	//???? = 0?? ??ʾ?˼?????δ??????
+    };
+
+    struct QixiInfo 
+    {
+        Player* lover;
+        UInt8 bind;
+        UInt8 pos;
+        UInt8 event;
+        UInt32 score;
+        QixiInfo() : lover(NULL), bind(0), pos(0), event(0), score(0) {}
     };
 
 	struct PlayerData
@@ -1237,9 +1249,36 @@ namespace GObject
 
     private:
         bool _isJumpingMap;
+
+        QixiInfo m_qixi;
+        bool _qixiBinding;
     public:
         inline bool isJumpingMap() { return _isJumpingMap; }
         inline void setJumpingMap(bool v) { _isJumpingMap = v; }
+
+        void loadQixiInfoFromDB(Player* pl, UInt8 bind, UInt8 pos, UInt8 event, UInt32 score)
+        {
+            m_qixi.lover = pl;
+            m_qixi.bind = bind;
+            m_qixi.pos = pos;
+            m_qixi.event = event;
+            m_qixi.score = score;
+        }
+        void sendQixiInfo();
+        void divorceQixi();
+        void postQixiEyes(Player* pl);
+        void roamingQueqiao(UInt8 pos);
+        void qixiStepAdvance(UInt8 pos, UInt8 event, UInt8 score);
+
+        void beDivorceQixi(Player* pl);
+        UInt8 beQixiEyes(Player* pl);
+        void onQixiEyesResp(UInt8 bind);
+        void postRoamResult(UInt8 pos, UInt8 event, UInt8 score);
+
+        inline bool queQiaoCheck() { return m_qixi.bind; }
+        inline UInt8 getQueqiaoPos() { return m_qixi.pos; }
+        inline Player* getLover() { return m_qixi.lover; }
+        inline UInt32 getScore() { return m_qixi.score; }
 
 	private:
 		Mutex _mutex;
@@ -1334,6 +1373,7 @@ namespace GObject
 		std::vector<GData::LootResult> _lastLoot;
         std::vector<LastAthAward> _lastAthAward;
         std::vector<GData::LootResult> _equipAward;
+		std::vector<GData::LootResult> _RegisterAward;
 
     private:
 		UInt16 _lastDungeon;
@@ -1525,6 +1565,7 @@ namespace GObject
         void sendHappyInfo(UInt16 itemId = 0);
         void getTargetAward(UInt8 opt);
         void getTargetAwardRF(UInt8 opt);
+        void getNewRegisterAward(UInt8 opt);
 
         inline TripodData& getTripodData() { return m_td; }
         TripodData& newTripodData();
@@ -1565,6 +1606,8 @@ namespace GObject
         void sendDeamonAwardsInfo();
         void getDeamonAwards();
         void lastLootPush(UInt16 itemId, UInt16 num);
+        void RegisterAward(UInt16 itemId, UInt16 num);
+        void sendNewRegisterAward(UInt8 idx);
         void IDIPAddItem(UInt16 itemId, UInt16 num, bool bind = true);
 
     private:

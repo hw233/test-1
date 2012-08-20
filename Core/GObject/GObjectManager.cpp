@@ -216,6 +216,7 @@ namespace GObject
         loadRNR();
         loadNewRelation();
         loadSkillStrengthen();
+        loadQixi();
 		DB::gDataDBConnectionMgr->UnInit();
 	}
 
@@ -4611,5 +4612,36 @@ namespace GObject
         return true;
     }
 
+    bool GObjectManager::loadQixi()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading Qixi");
+        DBQixi qixi;
+        if(execu->Prepare("SELECT `playerId`, `lover`, `bind`, `pos`, `event`, `score` FROM `qixi` ORDER BY `playerId`", qixi) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+        Player* pl = NULL;
+        Player* lover = NULL;
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		while(execu->Next() == DB::DB_OK)
+        {
+			lc.advance();
+            lover = NULL;
+			if(qixi.playerId != last_id)
+			{
+				last_id = qixi.playerId;
+				pl = globalPlayers[last_id];
+				lover = globalPlayers[qixi.lover];
+			}
+			if(pl == NULL)
+				continue;
+
+            pl->loadQixiInfoFromDB(lover, qixi.bind, qixi.pos, qixi.event, qixi.score);
+        }
+        lc.finalize();
+        return true;
+
+    }
 }
 

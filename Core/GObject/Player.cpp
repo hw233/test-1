@@ -84,6 +84,8 @@
 #define ATHL_BUFF_SECS        (10*60)
 #define ATHL_BUFF_SECS_MAX    (30*60)
 
+#define QIXI_XIQUE 9122
+
 namespace GObject
 {
     UInt32 Player::_recruit_cost = 20;
@@ -550,6 +552,7 @@ namespace GObject
         m_dpData = new DeamonPlayerData();
         m_csFlag = 0;
         _mditem = 0;
+        _qixiBinding = false;
 	}
 
 
@@ -9344,13 +9347,16 @@ namespace GObject
             // 今日目标
             getTargetAward(opt);
             break;
-            // 回流今日目标
         case 4:
+            // 回流今日目标
             getTargetAwardRF(opt);
             break;
 
         case 5:
             getSoSoMapAward();
+            break;
+        case 6:
+            getNewRegisterAward(opt);
             break;
         }
     }
@@ -9401,6 +9407,44 @@ namespace GObject
         if(GetVar(VAR_AWARD_SSDT_1))
             status |= (1 << 4);
         st << status << Stream::eos;
+        send(st);
+    }
+
+    void Player::getNewRegisterAward(UInt8 opt)
+    {
+        if(opt != 0 && opt != 1)
+            return;
+        if(GetLev() > 1)
+            return;
+        if(opt == 1)
+        {
+            if(2 == GetVar(VAR_AWARD_NEWREGISTER))
+                return;
+			std::vector<GData::LootResult>::iterator it;
+			for(it = _RegisterAward.begin(); it != _RegisterAward.end(); ++ it)
+			{
+				m_Package->ItemNotify(it->id, it->count);
+			}
+			_RegisterAward.clear();
+            SetVar(VAR_AWARD_NEWREGISTER, 2);
+        }
+        else{
+            if(GetVar(VAR_AWARD_NEWREGISTER))
+                return;
+            UInt8 idx = 0;
+            if( 0 == (idx = GameAction()->RunNewRegisterAward(this)) )
+                return;
+            sendNewRegisterAward(idx);
+            SetVar(VAR_AWARD_NEWREGISTER, 1);
+        }
+    }
+            
+    void Player::sendNewRegisterAward(UInt8 idx)
+    {
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(6);
+        st << idx;
+        st << Stream::eos;
         send(st);
     }
 
@@ -9502,6 +9546,12 @@ namespace GObject
     {
         GData::LootResult lt = {itemId, num};
         _lastLoot.push_back(lt);
+    }
+
+    void Player::RegisterAward(UInt16 itemId, UInt16 num)
+    {
+        GData::LootResult lt = {itemId, num};
+        _RegisterAward.push_back(lt);
     }
 
     void Player::sendHappyInfo(UInt16 itemId)
@@ -11404,6 +11454,153 @@ namespace GObject
             SetVar(VAR_CONSUME, total+c);
             sendConsumeInfo();
         }
+    }
+
+    void Player::sendQixiInfo()
+    {
+        {
+			std::vector<GData::LootResult>::iterator it;
+			for(it = _lastLoot.begin(); it != _lastLoot.end(); ++ it)
+			{
+				m_Package->ItemNotify(it->id, it->count);
+			}
+			_lastLoot.clear();
+        }
+
+        Stream st(REP::ACTIVE);
+        st << static_cast<UInt8>(0x01) << static_cast<UInt8>(0x01) << static_cast<UInt8>(0x01);
+        if(m_qixi.lover)
+            st << m_qixi.lover->getName();
+        else
+            st << "";
+
+        st << m_qixi.bind << m_qixi.pos << m_qixi.event;
+        st << Stream::eos;
+        send(st);
+    }
+
+    void Player::divorceQixi()
+    {
+        if(!m_qixi.bind)
+            return;
+        Player* pl = m_qixi.lover;
+        m_qixi.lover = NULL;
+        m_qixi.bind = 0;
+
+        pl->beDivorceQixi(this);
+
+		DB().PushUpdateData("UPDATE `qixi` SET `lover`=0, `bind`=0 WHERE `playerId` = %"I64_FMT"u", getId());
+        WORLD().DivorceQixiPair(this);
+        sendQixiInfo();
+    }
+
+    void Player::postQixiEyes(Player* pl)
+    {
+        if(m_qixi.bind)
+            return;
+
+        if(!_hasFriend(0, pl))
+            return;
+        m_qixi.lover = pl;
+        UInt8 bind = pl->beQixiEyes(this);
+        onQixiEyesResp(bind);
+        if(m_qixi.bind)
+            WORLD().UpdateQixiScore(this, m_qixi.lover);
+
+		DB().PushUpdateData("REPLACE INTO `qixi` (`pos`, `event`, `score`, `bind`, `lover`, `playerId`) VALUES(%u, %u, %u, %u, %"I64_FMT"u, %"I64_FMT"u)", m_qixi.pos, m_qixi.event, m_qixi.score, m_qixi.bind, pl->getId(), getId());
+    }
+
+    void Player::roamingQueqiao(UInt8 pos)
+    {
+        if (GetPackage()->GetRestPackageSize() < 1)
+        {
+            sendMsgCode(0, 1011);
+            return;
+        }
+        if(false == GetPackage()->DelItemAny(QIXI_XIQUE, 1, NULL, ToQixi))
+            return;
+
+        UInt8 pos2 = GameAction()->onRoamingQueqiao(this, pos);
+
+        Stream st(REP::ACTIVE);
+        st << static_cast<UInt8>(0x01) << static_cast<UInt8>(0x03) << pos2;
+        st << Stream::eos;
+        send(st);
+    }
+
+    void Player::beDivorceQixi(Player* pl)
+    {
+        if(m_qixi.lover != pl)
+            return;
+
+        m_qixi.bind = 0;
+
+        sendMsgCode(0, 1029);
+		DB().PushUpdateData("UPDATE `qixi` SET `bind`=0 WHERE `playerId` = %"I64_FMT"u", getId());
+        sendQixiInfo();
+    }
+
+    UInt8 Player::beQixiEyes(Player* pl)
+    {
+        UInt8 bind = 0;
+        if(m_qixi.bind || m_qixi.lover != pl)
+        {
+            bind = 0;
+        }
+        else
+        {
+            m_qixi.bind = 1;
+            bind = 1;
+
+            DB().PushUpdateData("UPDATE `qixi` SET `bind`=%u WHERE `playerId` = %"I64_FMT"u", bind, getId());
+            sendQixiInfo();
+        }
+
+        return bind;
+    }
+
+    void Player::onQixiEyesResp(UInt8 bind)
+    {
+        m_qixi.bind = bind;
+
+        Stream st(REP::ACTIVE);
+        st << static_cast<UInt8>(0x01) << static_cast<UInt8>(0x02) << bind;
+        st << Stream::eos;
+        send(st);
+
+        //sendQixiInfo();
+    }
+
+    void Player::postRoamResult(UInt8 pos, UInt8 event, UInt8 score)
+    {
+        struct Roam
+        {
+            UInt8 pos;
+            UInt8 event;
+            UInt8 score;
+        };
+
+        Roam roam;
+        roam.pos = pos;
+        roam.event = event;
+        roam.score = score;
+
+		GameMsgHdr hdr(0x1F9, WORKER_THREAD_WORLD, this, sizeof(Roam));
+		GLOBAL().PushMsg(hdr, &roam);
+    }
+
+    void Player::qixiStepAdvance(UInt8 pos, UInt8 event, UInt8 score)
+    {
+        m_qixi.pos = pos;
+        m_qixi.event = event;
+        m_qixi.score += score;
+
+        if(m_qixi.lover == NULL and m_qixi.score == score)
+            DB().PushUpdateData("REPLACE INTO `qixi` (`pos`, `event`, `score`, `bind`, `lover`, `playerId`) VALUES(%u, %u, %u, %u, 0, %"I64_FMT"u)", m_qixi.pos, m_qixi.event, m_qixi.score, m_qixi.bind, getId());
+        else
+            DB().PushUpdateData("UPDATE `qixi` SET `pos`=%u, `event`=%u, `score`=%u WHERE `playerId` = %"I64_FMT"u", pos, event, m_qixi.score, getId());
+        if(m_qixi.bind)
+            WORLD().UpdateQixiScore(this, m_qixi.lover);
     }
 
 } // namespace GObject

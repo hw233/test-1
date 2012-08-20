@@ -146,9 +146,9 @@ function discount(store)
         store:add(2,9099,400)
     end
 
-    if now >= t8 and now < t8 + 7*day then
-        store:add(2,1706,599)
-    end
+    --if now >= t8 and now < t8 + 7*day then
+    --    store:add(2,1706,599)
+    --end
 end
 
 
@@ -158,11 +158,12 @@ function loadStore()
 
     store:clearSpecialDiscount()
 
-    if ((now % 86400) > 30) then
+    --if ((now % 86400) > 30) then
         store:clear()
 
         discount(store)
 
+        store:add(2,1706,599)
         store:add(2,1325,50)
         if is7_16_8_15() then
             store:add(2,1704,999)
@@ -223,6 +224,7 @@ function loadStore()
         store:add(2,9015,10)
         store:add(2,9016,10)
         store:add(2,9035,10)
+        store:add(2,9122,10)
         store:add(2,548,1)
         store:add(2,465,20)
         store:add(2,466,10)
@@ -433,7 +435,7 @@ function loadStore()
         store:add(14,507,2000)
         store:add(14,509,2000)
 
-    end
+    --end
 
     if store:needResetDiscount() then
         print ("needResetDiscount")

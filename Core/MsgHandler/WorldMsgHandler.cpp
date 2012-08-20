@@ -52,8 +52,11 @@ MSG_REG_2(GameMsgHdr, REQ::CLAN_SKILL, OnClanTechOpReq);
 MSG_REG_2(GameMsgHdr, REQ::CLAN_BATTLE, OnClanCityBattleReq);
 MSG_REG_2(GameMsgHdr, REQ::CLANCITYBATTLELIST, OnClanCityBattleListReq);
 MSG_REG(GameMsgHdr, OnArenaInfoReq);
-MSG_REG(GameMsgHdr, OnArenaEliminationReq);
+MSG_REG(GameMsgHdr, OnArenaLeaderBoardReq);
 MSG_REG_2(GameMsgHdr, REQ::SERVER_ARENA_OP, OnArenaOpReq);
+
+
+MSG_REG_2(GameMsgHdr, REQ::ACTIVE, OnQixiReq);
 
 MSG_REG_2(ArenaMsgHdr, 0x101, OnArenaConnected);
 MSG_REG_2(ArenaMsgHdr, 0x102, OnPlayerEntered);
@@ -63,6 +66,7 @@ MSG_REG_2(ArenaMsgHdr, 0x105, OnPriliminaryInfo);
 MSG_REG_2(ArenaMsgHdr, 0x106, OnArenaBattleReport);
 MSG_REG_2(ArenaMsgHdr, 0x107, OnArenaSupport);
 MSG_REG_2(ArenaMsgHdr, 0x108, OnArenaBattlePoint);
+MSG_REG_2(ArenaMsgHdr, 0x109, OnArenaLeaderBoard);
 
 MSG_REG_2(GameMsgHdr, 0x160, OnClanChatReq);
 
@@ -131,6 +135,8 @@ MSG_REG_2(GameMsgHdr, 0x1F6, OnPracticeAddExp);
 MSG_REG_2(GameMsgHdr, 0x1F7, OnPracticeStop);
 
 MSG_REG_2(GameMsgHdr, 0x1F8, OnAthleticsFlush);
+
+MSG_REG_2(GameMsgHdr, 0x1F9, OnRoamResult);
 
 #ifdef _ARENA_SERVER
 MSG_REG_2(LoginMsgHdr, 0x01, onServerReg);

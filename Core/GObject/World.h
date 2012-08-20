@@ -47,6 +47,30 @@ struct lt_rcsort
 
 typedef std::set<RCSort, lt_rcsort> RCSortType;
 
+struct QixiScore
+{
+    Player* lover;
+    UInt32 score;
+};
+
+struct QixiPair
+{
+    QixiScore p1;
+    QixiScore p2;
+};
+
+struct ScoreGreater
+{
+     bool operator()(const QixiPair* qp1, const QixiPair* qp2) const
+     {
+         return ((qp1->p1.score + qp1->p2.score) > (qp2->p1.score + qp2->p2.score));
+     }
+};
+
+typedef std::multiset<QixiPair*, ScoreGreater> QixiPlayerSet;
+typedef QixiPlayerSet::iterator QixiPlayersIt;
+typedef std::map<Player*, QixiPlayersIt> QixiScoreMap;
+
 class World:
 	public WorkerRunner<WorldMsgHandler>
 {
@@ -226,6 +250,11 @@ public:
     inline static bool getJuly()
     { return _july; }
 
+    inline static void setQixi(bool v)
+    { _qixi = v; }
+    inline static bool getQixi()
+    { return _qixi; }
+
     inline static void setRechargeNextRet(bool v)
     { _rechargenextret = v; }
     inline static bool getRechargeNextRet()
@@ -337,6 +366,7 @@ public:
     static bool _june;
     static bool _june1;
     static bool _july;
+    static bool _qixi;
     static bool _enchant_gt11;
     static bool _rechargenextret;
     static UInt32 _rechargenextretstart;
@@ -382,6 +412,14 @@ private:
 	static void World_One_Min( World * );
     static void AthleticsPhysicalCheck(void *);
 
+public:
+    void UpdateQixiScore(Player* pl, Player* lover);
+    void sendQixiPlayers(Player* pl);
+    void DivorceQixiPair(Player* pl);
+    void LoadQixiScore(Player* pl, Player* lover);
+    void SendQixiAward();
+    void sendQixiScoreAward(Player* pl);
+
 private:
 	void testUpdate();
 	Script::WorldScript * _worldScript;
@@ -392,6 +430,9 @@ private:
     std::vector<UInt32> _domain_nums;
     LuckyDrawList _luckyDrawList;
     LuckyDrawRankList _luckyDrawRankList;
+
+    QixiScoreMap _qixiScoreMap;
+    QixiPlayerSet _qixiPlayerSet;
 };
 
     void CreateNewDB(UInt32 mon = 0, UInt32 year = 2011);

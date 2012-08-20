@@ -124,6 +124,8 @@ public:
     void updateBattlePoint(BinaryReader& brd);
     void commitArenaForceOnce();
 
+    void updateLeaderBoard(BinaryReader& brd);
+    void sendLeaderBoard(Player* pl);
 private:
 	static void appendLineup( Stream& st, Player * player);
 	static void appendEquipInfo( Stream& st, ItemEquip * equip );
@@ -157,6 +159,7 @@ private:
     PreliminaryPlayerListMap _preliminaryPlayers[2];
     PreliminaryPlayerList _preliminaryPlayers_list[2];
     PreliminaryPlayersSet _preliminaryPlayers_list_set[2];
+    std::map<UInt16, std::string> _leaderBoard;
 };
 
 extern Arena arena;

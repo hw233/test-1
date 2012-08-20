@@ -2179,6 +2179,7 @@ void AddDiscountFromBs(LoginMsgHdr& hdr, const void* data)
     // GM增加限时限购活动
 	BinaryReader br(data,hdr.msgHdr.bodyLen);
     CHKKEY();
+    GData::store.clearSpecialDiscountFromBS();
     GData::Discount discount;
     br >> discount.discountType;
     br >> discount.beginTime;

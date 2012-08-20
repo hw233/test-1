@@ -892,6 +892,7 @@ void initRCRank()
     GObject::globalPlayers.enumerate(player_enum_rc, 0);
     init = true;
 }
+
 void OnSendRechargeRank ( GameMsgHdr& hdr,  const void* data )
 {
     MSG_QUERY_PLAYER(player);
@@ -906,6 +907,21 @@ void OnSendConsumeRank ( GameMsgHdr& hdr,  const void* data )
     // TODO:
     if (!init)
         initRCRank();
+}
+
+void OnRoamResult( GameMsgHdr& hdr,  const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+
+    struct Roam
+    {
+        UInt8 pos;
+        UInt8 event;
+        UInt8 score;
+    };
+
+    Roam* roam = (Roam*)data;
+    player->qixiStepAdvance(roam->pos, roam->event, roam->score);
 }
 
 #endif // _WORLDINNERMSGHANDLER_H_

@@ -980,6 +980,10 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 		pl->makePlayerInfo(st);
 		conn->send(&st[0], st.size());
 	}
+    {
+        if( !pl->GetVar(VAR_AWARD_NEWREGISTER) && pl->GetLev() == 1)
+            pl->sendNewRegisterAward(0);  //0:表示新用户注册还可以邀请好友进行抽奖
+    }
 	{
 		Stream st;
 		pl->makeFighterList(st);
@@ -3046,6 +3050,7 @@ static bool inCountry(const Network::TcpConduit * conduit, UInt8 country)
 
 #define ITEM_SPEAKER 16
 #define ITEM_FLOWER 440
+#define ITEM_QIXI_TALK 9123
 
 int ToMsgCenter(Stream st)
 {
@@ -3134,6 +3139,15 @@ void OnChatReq( GameMsgHdr& hdr, ChatReq& cr )
             if (!player->hasChecked())
                 return;
             if(!player->GetPackage()->DelItemAny(ITEM_FLOWER, 1))
+                break;
+            NETWORK()->Broadcast(st);
+            break;
+        }
+    case 9:
+        {
+            if (!player->hasChecked())
+                return;
+            if(!player->GetPackage()->DelItemAny(ITEM_QIXI_TALK, 1))
                 break;
             NETWORK()->Broadcast(st);
             break;
