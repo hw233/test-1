@@ -1223,7 +1223,7 @@ namespace GObject
         // 修为相关日志（暂时只有加速）
         char action[16] = "";
         snprintf (action, 16, "F%d", _vipLevel + 1003);
-        udpLog("activity", action, "", "", "", "", "act");
+        udpLog("practice", action, "", "", "", "", "act");
     }
 
     void Player::arenaUdpLog(UInt32 id, UInt8 type /* = 0 */)
