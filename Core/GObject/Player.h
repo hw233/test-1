@@ -952,8 +952,8 @@ namespace GObject
 		void makeFighterList(Stream&);
 		void makeFighterInfo(Stream&, Fighter *, bool = true);
 		bool makeFighterInfo(Stream&, UInt32);
-        void sendRechargeInfo();
-        void sendConsumeInfo();
+        void sendRechargeInfo(bool rank = false);
+        void sendConsumeInfo(bool rank = false);
         void getMDItem();
         void sendMDSoul(UInt8 type, UInt32 id = 0);
         void sendJuneRechargeMails(UInt32 value);

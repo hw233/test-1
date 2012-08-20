@@ -736,10 +736,104 @@ namespace GObject
 		return buff.fighterId == id;
 	}
 
+    void mergeCittaPages(Player* p)
+    {
+        if (!p)
+            return;
+        struct MergeFromToInfo
+        {
+            UInt16 from;
+            UInt16 to;
+        };
+
+        static MergeFromToInfo mfti[] = {
+            {6054, 6053},
+            {6055, 6053},
+            {6057, 6056},
+            {6058, 6056},
+            {6059, 6056},
+            {6060, 6056},
+            {6062, 6061},
+            {6063, 6061},
+            {6064, 6061},
+            {6065, 6061},
+            {6066, 6061},
+            {6068, 6067},
+            {6069, 6067},
+            {6070, 6067},
+            {6071, 6067},
+            {6072, 6067},
+            {6074, 6073},
+            {6075, 6073},
+            {6076, 6073},
+            {6077, 6073},
+            {6078, 6073},
+            {6079, 6073},
+            {6081, 6080},
+            {6082, 6080},
+            {6083, 6080},
+            {6084, 6080},
+            {6085, 6080},
+            {6086, 6080},
+            {6088, 6087},
+            {6089, 6087},
+            {6090, 6087},
+            {6091, 6087},
+            {6092, 6087},
+            {6093, 6087},
+            {6095, 6094},
+            {6096, 6094},
+            {6097, 6094},
+            {6098, 6094},
+            {6099, 6094},
+            {6100, 6094},
+            {6101, 6094},
+            {6102, 6094},
+            {6104, 6103},
+            {6105, 6103},
+            {6106, 6103},
+            {6107, 6103},
+            {6108, 6103},
+            {6109, 6103},
+            {6110, 6103},
+            {6111, 6103},
+            {6113, 6112},
+            {6114, 6112},
+            {6115, 6112},
+            {6116, 6112},
+            {6117, 6112},
+            {6118, 6112},
+            {6119, 6112},
+            {6120, 6112},
+        };
+
+        Package* pkg = p->GetPackage();
+        for (size_t i = 0; i < sizeof(mfti)/sizeof(MergeFromToInfo); ++i)
+        {
+            UInt16 num = pkg->GetItemNum(mfti[i].from, true);
+            if (num)
+            {
+                pkg->DelItem(mfti[i].from, num, true);
+                pkg->AddItem(mfti[i].to, num, true);
+                num = 0;
+            }
+
+            num = pkg->GetItemNum(mfti[i].from, false);
+            if (num)
+            {
+                pkg->DelItem(mfti[i].from, num, false);
+                pkg->AddItem(mfti[i].to, num, false);
+                num = 0;
+            }
+        }
+    }
+
 	inline bool player_load(Player * p, int)
 	{
 		p->Load();
 		gBlockbossmgr.addPlayerRank(p, p->getBlockBossLevel(), p->GetLev());
+        if (!GVAR.GetVar(GVAR_CITTASMERGE))
+            mergeCittaPages(p);
 		return true;
 	}
 
@@ -1497,7 +1591,7 @@ namespace GObject
             fgt2->setPeerless(specfgtobj.peerless, false); // XXX: must after setTrump
             fgt2->setCittas(specfgtobj.cittas, false);
             fgt2->setUpCittas(specfgtobj.citta, false);
-            fgt2->setSkills(specfgtobj.skills, false);
+            //fgt2->setSkills(specfgtobj.skills, false);
             fgt2->setUpSkills(specfgtobj.skill, false);
             fgt2->setAttrType1(specfgtobj.attrType1);
             fgt2->setAttrValue1(specfgtobj.attrValue1);
@@ -2051,6 +2145,7 @@ namespace GObject
 		/////////////////////////////////
 
 		globalPlayers.enumerate(player_load, 0);
+        GVAR.SetVar(GVAR_CITTASMERGE, 1);
 
 		return true;
 	}
