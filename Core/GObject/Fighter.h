@@ -39,8 +39,8 @@ namespace GObject
 
 #define SKILL_UPMAX 3 // 技能最初就能装备3个
 #define CITTA_LEVEL_MAX 100
-#define CITTA_UPMAX 6
-#define CITTA_INIT 2 // 心法最初只能装2个,由穴道控制装备个数
+#define CITTA_UPMAX 9
+#define CITTA_INIT 5 // 心法最初只能装2个,由穴道控制装备个数
 #define TRUMP_UPMAX 3
 #define TRUMP_INIT 1 // 法宝最初只能装1个,由VIP等级控制装备个数
 #define ACUPOINTS_MAX 15
@@ -288,7 +288,7 @@ public:
     // 初始化可装备的心法
     void setCittas(std::string& cittas, bool = true);
     // 装备心法
-    bool upCitta(UInt16 citta, int idx, bool = true);
+    bool upCitta(UInt16 citta, int idx, bool = true, bool = false);
     // 卸下心法
     bool offCitta(UInt16 citta, bool = false, bool = false, bool = true);
     // 增加一个心法
@@ -325,6 +325,7 @@ public:
     void getAllCittaAndLevel(Stream& st);
     // 取得所有学会的无双技能
     void getAllPeerlessAndLevel(Stream& st);
+    const std::vector<UInt16>& getCittas() const { return _cittas; }
 
     // 取得可装备的无双技能
     void getAllPeerless(Stream& st);
@@ -422,6 +423,8 @@ public:
 
     static inline bool isMainFighter(UInt32 id) { return id > 0 && id < 10; }
     inline bool isMainFighter() { return isMainFighter(_id); }
+
+    void getAllSSAndLevel(Stream& st);
 
 public:
 	inline const GData::AttrExtra * getAttrExtraEquip() { checkDirty(); return &_attrExtraEquip; }
@@ -567,6 +570,7 @@ public:
     Int32 getAcuPraAdd() { return _praadd; }
     float getPracticeBufFactor();
     float getPracticeIncByDiamond();
+    float getPracticeIncByQQVip();
     float getClanTechAddon(int place);
     float getPracticeInc();
     // TODO:
@@ -727,6 +731,8 @@ public:
     void SSUpdate2DB(UInt16 id, SStrengthen& ss);
     void SSDeleteDB(UInt16 id);
     void SSFromDB(UInt16 id, SStrengthen& ss);
+    void SSSendSSInfo(UInt16 skill);
+    void SSNotify(UInt16 id, SStrengthen& ss);
     void makeFighterSSInfo(Stream& st);
     bool appendFighterSSInfo(Stream& st, UInt16 skillid);
     bool appendFighterSSInfo(Stream& st, UInt16 skillid, SStrengthen* ss);

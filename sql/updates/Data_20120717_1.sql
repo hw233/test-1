@@ -28,4 +28,3 @@ CREATE TABLE `skillstrengthen` (
     PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-

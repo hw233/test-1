@@ -419,7 +419,7 @@ namespace GObject
         static UInt32 _split_cost;
         static UInt32 _forge_cost;
         static UInt32 _split_chance[4][2];
-        static UInt32 _merge_chance[9];
+        static UInt32 _merge_chance[11];
 		static UInt32 _enchant_chance[2][6][12];
 		static UInt8  _enchant_max[11];
 		static UInt32 _trump_lorder_chance[6][12];

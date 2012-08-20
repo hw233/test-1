@@ -528,8 +528,8 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
                 randNum = randNum + 1;
             player->GetPackage()->AddItem2(9057, randNum, true, true);
         }
-
-		GameAction()->onDungeonWin(player, _id, dpi.totalCount);
+        bool free = (PLAYER_DATA(player, dungeonCnt) <= getMaxCount());
+		GameAction()->onDungeonWin(player, _id, dpi.totalCount, free);
 
 	}
 

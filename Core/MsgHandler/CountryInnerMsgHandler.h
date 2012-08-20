@@ -1468,7 +1468,8 @@ void OnGetArenaMoney( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);
 	const UInt32 arenaMoney = *reinterpret_cast<const UInt32 *>(data);
-    player->getMoneyArena(arenaMoney);
+    IncommingInfo ii(ArenaFromMail,0,0);
+    player->getMoneyArena(arenaMoney, &ii);
 }
 
 void OnArenaEnterCommit( GameMsgHdr& hdr, const void* data )

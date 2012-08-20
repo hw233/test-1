@@ -171,8 +171,13 @@ function onLevelup(player, olev, nlev)
     end
 end
 
-function onDungeonWin(player, id, count)
+function onDungeonWin(player, id, count, free)
     June(player, 0);
+    if free == true then
+        FallActivity(player, 1)
+    else
+        FallActivity(player, 2)
+    end
 end
 
 function onClanBattleAttend(player)
@@ -805,6 +810,16 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     MayDay(player, lootlvl)
     June(player, lootlvl);
     LuckyDrawBox(player, id)
+    if player:getQQVipPrivilege() == true then
+        player:setQQVipPrivilege(false)
+        FallActivity(player, 1)
+    else
+        if lootlvl == 0 then
+            FallActivity(player, 1)
+        else
+            FallActivity(player, lootlvl)
+        end
+    end
 end
 
 
@@ -821,6 +836,11 @@ function onFrontMapWin(player, id, spot, lootlvl)
     ChingMingDay(player, lootlvl)
     MayDay(player, lootlvl)
     June(player, lootlvl);
+    if lootlvl == 0 then
+        FallActivity(player, 1)
+    else
+        FallActivity(player, lootlvl)
+    end
 end
 
 local vippack = {
@@ -1070,6 +1090,19 @@ function ChingMingDay(player, lootlvl)
         };
     local package = player:GetPackage();
     package:AddItem(481, itemNum[lootlvl], true);
+end
+
+function FallActivity(player, count)
+    if not getFallAct() then
+        return
+    end
+
+    if count > 3 then
+        count = 3
+    end
+
+    local package = player:GetPackage();
+    package:AddItem(9119, count, true);
 end
 
 function onLoginPF(player)
@@ -1753,15 +1786,57 @@ function sendRechargeMails3(player, ototal, ntotal)
     end
 end
 
+function sendRechargeMails4(player, ototal, ntotal)
+    local lvls = {
+        99,199,399,699,1099,1599,2199,2899,3699,4599,5599,8999,15999,26999,42999,64999,99999,
+    }
+    local items = {
+        {503,2,1, 514,1,1},
+        {500,3,1, 56,6,1, 57,2,1},
+        {503,2,1, 56,4,1, 57,5,1},
+        {512,6,1, 8000,4,1},
+        {516,3,1, 512,2,1},
+        {5025,1,1, 56,5,1},
+        {503,5,1, 56,6,1, 57,2,1},
+        {515,2,1, 56,6,1, 57,2,1},
+        {515,2,1, 56,6,1, 57,5,1},
+        {515,2,1, 56,6,1, 57,6,1},
+        {549,2,1, 56,6,1, 57,6,1},
+        {515,5,1, 30,10,1, 1528,2,1},
+        {507,5,1, 509,5,1, 515,5,1, 547,5,1},
+        --{509,2,1, 507,2,1, 515,1,1},
+        --{509,2,1, 507,2,1, 515,2,1},
+        --{509,3,1, 507,3,1, 515,2,1},
+        --{509,3,1, 507,3,1, 515,3,1},
+    }
+
+    local olvl = calcRechargeLevel(lvls, ototal)
+    if ntotal > 15999 then
+        ntotal = 15999
+    end
+    local nlvl = calcRechargeLevel(lvls, ntotal)
+
+    if nlvl == 0 or olvl == nlvl then
+        return
+    end
+
+    for k = olvl+1, nlvl do
+        local title = string.format(msg_107, lvls[k])
+        local ctx = string.format(msg_108, lvls[k])
+        sendItemPackageMail(player, title, ctx, items[k]);
+    end
+end
+
 function sendRechargeMails(player, ototal, ntotal)
     --sendRechargeMails1(player, ototal, ntotal)
-    local start = { ['year'] = 2012, ['month'] = 7, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    --[[local start = { ['year'] = 2012, ['month'] = 7, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local s = os.time(start)
     if os.time() >= s then
         sendRechargeMails3(player, ototal, ntotal)
     else
         sendRechargeMails2(player, ototal, ntotal)
-    end
+    end--]]
+    sendRechargeMails4(player, ototal, ntotal)
 end
 
 function onEquipForge(player, id, onums)

@@ -97,6 +97,16 @@ function is6_29()
     return is_6_29
 end
 
+is_0810_0901 = false
+function is0810_0901()
+    return is_0810_0901
+end
+
+is_0808_0814 = false
+function is0808_0814()
+    return is_0808_0814
+end
+
 function onActivityCheck(tm)
   local osmax = oldServersMax[serverName]
   if osmax ~= nil and serverNum <= osmax then
@@ -476,6 +486,38 @@ function onActivityCheck(tm)
           setConsumeActive(false)
       end
 
+      if tm >= actTime87 and tm < actTime88 then
+          setConsumeActive(true)
+      else
+          setConsumeActive(false)
+      end
+
+      if tm >= actTime89 and tm < actTime90 then
+          setQQVipAct(true)
+      else
+          setQQVipAct(false)
+      end
+
+      if tm >= actTime91 and tm < actTime92 then
+          is_0810_0901 = true
+      else
+          is_0810_0901 = false
+      end
+
+      if tm >= actTime93 and tm < actTime94 then
+          setFallAct(true)
+          is_0808_0814 = true
+      else
+          setFallAct(false)
+          is_0808_0814 = false
+      end
+
+      if tm >= actTime95 and tm < actTime96 then
+          setRechargeActive(true, 16)
+      else
+          setRechargeActive(false, 16)
+      end
+
       setShuoShuo(true);
   end
 
@@ -515,7 +557,7 @@ function initActTime(y, m, d)
   local  SerStartTm18= { ['year'] = 2011, ['month'] = 5, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   -- 蓝钻特权
-  local  SerStartTm19= { ['year'] = 2012, ['month'] = 6, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm19= { ['year'] = 2012, ['month'] = 8, ['day'] = 10, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 黄钻特权
   local  SerStartTm20= { ['year'] = 2012, ['month'] = 6, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 游戏大厅特权
@@ -543,6 +585,15 @@ function initActTime(y, m, d)
   local  SerStartTm35= { ['year'] = 2012, ['month'] = 7, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm36= { ['year'] = 2012, ['month'] = 7, ['day'] = 17, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm37= { ['year'] = 2012, ['month'] = 7, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm38= { ['year'] = 2012, ['month'] = 8, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- vip会员
+  local  SerStartTm39= { ['year'] = 2012, ['month'] = 8, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 坐骑6销售时间
+  local  SerStartTm40= { ['year'] = 2012, ['month'] = 8, ['day'] = 10, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 掉落活动
+  local  SerStartTm41= { ['year'] = 2012, ['month'] = 8, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 充值返利（8/14-8/16）
+  local  SerStartTm42= { ['year'] = 2012, ['month'] = 8, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm102 = { ['year'] = 2012, ['month'] = 6, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -621,7 +672,7 @@ function initActTime(y, m, d)
   actTime40 = os.time(SerStartTm18) + 7 * 86400;
 
   actTime41 = os.time(SerStartTm19);
-  actTime42 = os.time(SerStartTm19) + 19 * 86400;
+  actTime42 = os.time(SerStartTm19) + 14 * 86400;
 
   actTime43 = os.time(SerStartTm20);
   actTime44 = os.time(SerStartTm20) + 19 * 86400;
@@ -689,6 +740,21 @@ function initActTime(y, m, d)
 
   actTime85 = os.time(SerStartTm37);
   actTime86 = os.time(SerStartTm37) + 7 * 86400;
+
+  actTime87 = os.time(SerStartTm38);
+  actTime88 = os.time(SerStartTm38) + 7 * 86400;
+
+  actTime89 = os.time(SerStartTm39);
+  actTime90 = os.time(SerStartTm39) + 3 * 86400;
+
+  actTime91= os.time(SerStartTm40);
+  actTime92= os.time(SerStartTm40) + 23 * 86400;
+
+  actTime93= os.time(SerStartTm41);
+  actTime94= os.time(SerStartTm41) + 7 * 86400;
+
+  actTime95 = os.time(SerStartTm42);
+  actTime96 = os.time(SerStartTm42) + 3 * 86400;
 
   actTime101 = os.time(SerStartTm101);
   actTime102 = os.time(SerStartTm101) + 8 * 86400;

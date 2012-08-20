@@ -110,6 +110,7 @@ namespace GObject
         VAR_DISCOUNT_1 = 80, // 3折区购买次数
         VAR_DISCOUNT_2 = 81, // 5折区购买次数
         VAR_DISCOUNT_3 = 82, // 8折区购买次数
+
         VAR_CTSLANDING = 83, // 创建角色前七天连续登陆记录
         VAR_CTSAWARD = 84, // 七天登陆奖励
         VAR_CLAWARD = 85, // 七天连续登陆奖励
@@ -180,16 +181,30 @@ namespace GObject
         VAR_CONSUME = 142, // 消耗累积
 
         VAR_PHYSICAL_BUY = 143, //购买体力限制
+        VAR_QQVIP_BUF = 144,    //QQ会员之力是否领取
+        VAR_QQVIP_CNT = 145,    //QQ会员特权
 
-        VAR_TJ_EVENT_PRESTIGE=150,  //天劫事件中的声望
-        VAR_TJ_TASK_PRESTIGE=151,   //天劫活动中的声望
-        VAR_TJ_TASK1_NUMBER=152,    //天劫每日任务1的已完成次数
-        VAR_TJ_TASK2_TAEL=153,     //天劫任务2捐献的银币积分
-        VAR_TJ_TASK2_GOLD=154,     //天劫任务2捐献的仙石积分
-        VAR_TJ_TASK2_COUPON=155,    //天劫任务2捐献的礼券积分
-        VAR_TJ_TASK2_TJYJ=156,      //天劫任务2捐献的天劫印记
-        VAR_TJ_TASK2_RECV=157,      //天劫任务2是否已领取任务
-        VAR_TJ_TASK3_COPYID=158,    //天劫任务3当前破阵层数
+        VAR_DISCOUNT_SP_1 = 146, // 原3折区域，增加活动限购后的购买次数
+        VAR_DISCOUNT_SP_2 = 147, // 原5折区域，增加活动限购后的购买次数
+        VAR_DISCOUNT_SP_3 = 148, // 原8折区域，增加活动限购后的购买次数
+
+        VAR_DISCOUNT_1_TIME = 149,
+        VAR_DISCOUNT_2_TIME = 150,
+        VAR_DISCOUNT_3_TIME = 151,
+
+        VAR_DISCOUNT_SP_1_TIME = 152,
+        VAR_DISCOUNT_SP_2_TIME = 153,
+        VAR_DISCOUNT_SP_3_TIME = 154,
+
+        VAR_TJ_EVENT_PRESTIGE=155,  //天劫事件中的声望
+        VAR_TJ_TASK_PRESTIGE=156,   //天劫活动中的声望
+        VAR_TJ_TASK1_NUMBER=157,    //天劫每日任务1的已完成次数
+        VAR_TJ_TASK2_TAEL=158,     //天劫任务2捐献的银币积分
+        VAR_TJ_TASK2_GOLD=159,     //天劫任务2捐献的仙石积分
+        VAR_TJ_TASK2_COUPON=160,    //天劫任务2捐献的礼券积分
+        VAR_TJ_TASK2_TJYJ=161,      //天劫任务2捐献的天劫印记
+        VAR_TJ_TASK2_RECV=162,      //天劫任务2是否已领取任务
+        VAR_TJ_TASK3_COPYID=163,    //天劫任务3当前破阵层数
 
         VAR_MAX,
     };
@@ -297,6 +312,17 @@ namespace GObject
             REGISTER_VAR(VAR_DISCOUNT_1, CYCLE_WEEK);
             REGISTER_VAR(VAR_DISCOUNT_2, CYCLE_WEEK);
             REGISTER_VAR(VAR_DISCOUNT_3, CYCLE_WEEK);
+            REGISTER_VAR(VAR_DISCOUNT_SP_1, CYCLE_NONE);
+            REGISTER_VAR(VAR_DISCOUNT_SP_2, CYCLE_NONE);
+            REGISTER_VAR(VAR_DISCOUNT_SP_3, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_DISCOUNT_1_TIME, CYCLE_NONE);
+            REGISTER_VAR(VAR_DISCOUNT_2_TIME, CYCLE_NONE);
+            REGISTER_VAR(VAR_DISCOUNT_3_TIME, CYCLE_NONE);
+            REGISTER_VAR(VAR_DISCOUNT_SP_1_TIME, CYCLE_NONE);
+            REGISTER_VAR(VAR_DISCOUNT_SP_2_TIME, CYCLE_NONE);
+            REGISTER_VAR(VAR_DISCOUNT_SP_3_TIME, CYCLE_NONE);
+
             REGISTER_VAR(VAR_CTSLANDING, CYCLE_NONE);
             REGISTER_VAR(VAR_CTSAWARD, CYCLE_DAY);
             REGISTER_VAR(VAR_CLAWARD, CYCLE_DAY);
@@ -362,6 +388,7 @@ namespace GObject
             REGISTER_VAR(VAR_SOSOMAPAWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_CONSUME, CYCLE_NONE);
             REGISTER_VAR(VAR_PHYSICAL_BUY, CYCLE_DAY);
+<<<<<<< HEAD
 
             REGISTER_VAR(VAR_TJ_EVENT_PRESTIGE, CYCLE_DAY);
             REGISTER_VAR(VAR_TJ_TASK_PRESTIGE,  CYCLE_NONE);
@@ -372,6 +399,10 @@ namespace GObject
             REGISTER_VAR(VAR_TJ_TASK2_TJYJ, CYCLE_NONE);
             REGISTER_VAR(VAR_TJ_TASK2_RECV, CYCLE_DAY);
             REGISTER_VAR(VAR_TJ_TASK3_COPYID, CYCLE_NONE);
+=======
+            REGISTER_VAR(VAR_QQVIP_BUF, CYCLE_DAY);
+            REGISTER_VAR(VAR_QQVIP_CNT, CYCLE_DAY);
+>>>>>>> 8494b54eaf34e239940c9b74e5fbd8f5d611aa25
         }
         
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

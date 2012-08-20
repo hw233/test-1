@@ -109,6 +109,21 @@ void fillHead(json_t* head, JsonHead* hdr)
     json_insert_pair_into_object(head, "szRetErrMsg", json_new_string(hdr->errmsg));
 }
 
+std::string fixPlayerName(std::string name)
+{
+    if (cfg.merged && name.length())
+    {
+        int len = name.size() - 1;
+        for (; len > 0; --len)
+        {
+            if (static_cast<UInt8>(name[len]) >= 32)
+                break;
+        }
+        name.resize(len+1);
+    }
+    return name;
+}
+
 int query_rolelist_req(JsonHead* head, json_t* body, json_t* retbody, std::string& err)
 {
     if (!head || !body || !retbody)
@@ -130,6 +145,8 @@ int query_rolelist_req(JsonHead* head, json_t* body, json_t* retbody, std::strin
         areaid = atoi(val->child->text);
 
     playerid = atoll(playerId);
+    //if (cfg.merged)
+    //    playerid |= (areaid << 48);
     GObject::Player* player = GObject::globalPlayers[playerid];
     if (!player)
     {
@@ -138,7 +155,7 @@ int query_rolelist_req(JsonHead* head, json_t* body, json_t* retbody, std::strin
     }
 
     json_insert_pair_into_object(retbody, "ullRoleId", json_new_string(playerId));
-    json_insert_pair_into_object(retbody, "szRoleName", json_new_string(player->getName().c_str()));
+    json_insert_pair_into_object(retbody, "szRoleName", json_new_string(fixPlayerName(player->getName()).c_str()));
 
     head->cmd = 2;
     return 0;
@@ -172,7 +189,7 @@ int query_rolebaseinfo_req(JsonHead* head, json_t* body, json_t* retbody, std::s
         return EPLAYER_NOT_EXIST;
     }
 
-    json_insert_pair_into_object(retbody, "szRoleName", json_new_string(player->getName().c_str()));
+    json_insert_pair_into_object(retbody, "szRoleName", json_new_string(fixPlayerName(player->getName()).c_str()));
     json_insert_pair_into_object(retbody, "ucGender", my_json_new_number(player->IsMale()?1:2));
     char title[32] = {0};
     snprintf(title, sizeof(title), "%u", player->getTitle());
@@ -275,6 +292,8 @@ void jsonParser2(void * buf, int len, Stream& st)
     json_t* retobj = NULL;
     json_t* rethead = NULL;
     json_t* retbody = NULL;
+
+    setlocale(LC_ALL, "");
 
     retobj = json_new_object();
     if (!retobj)

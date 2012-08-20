@@ -22,7 +22,7 @@ enum
 	WORKER_THREAD_DB,				//5  DB
 	WORKER_THREAD_DB1,				//6  DB1 player,trade
 	WORKER_THREAD_DB2,				//7  DB2 fighter
-    WORKER_THREAD_DB3,              //8  DB3 dungeon_player,player_copy,player_front,auto_battle
+    WORKER_THREAD_DB3,              //8  DB3 dungeon_player,player_copy,player_front,auto_battle,discount
 	WORKER_THREAD_DB4,				//9  DB4 item,equipment,sale
 	WORKER_THREAD_DB5,				//10 DB5 task_instance, clan
 	WORKER_THREAD_DB6,				//11 athletics,tripod

@@ -169,7 +169,15 @@ public:
     { _yellowdiamondact = v; }
     inline static bool getYellowDiamondAct()
     { return _yellowdiamondact; }
-    inline static void setQQGameAct(bool v)
+    inline static void setQQVipAct(bool v)
+    { _qqvipact = v; }
+    inline static bool getQQVipAct()
+    { return _qqvipact; }
+    inline static void setFallAct(bool v)
+    { _fallact = v; }
+    inline static bool getFallAct()
+    { return _fallact; }
+     inline static void setQQGameAct(bool v)
     { _qqgameact = v; }
     inline static bool getQQGameAct()
     { return _qqgameact; }
@@ -304,6 +312,8 @@ public:
     static bool _gemmergeact;
     static bool _bluediamondact;
     static bool _yellowdiamondact;
+    static bool _qqvipact;
+    static bool _fallact;
     static bool _qqgameact;
     static void* _recalcwd;
     static bool _june;
@@ -336,6 +346,7 @@ private:
 	static void World_testUpdate(World *);
 	static void World_Leaderboard_Update( void * );
 	static void World_ChatItem_Purge( void * );
+    static void World_Store_Check(void *);
 	static void World_Multi_Check( World * );
 	static void World_Midnight_Check( World * );
     static void World_CreateNewDB_Check();

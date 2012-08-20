@@ -1058,7 +1058,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendMDSoul(0);
     pl->sendSSDTInfo();
     pl->sendHappyInfo();
-    pl->sendYBBufInfo(pl->GetVar(VAR_YBBUF));
+    pl->sendYBBufInfo(pl->GetVar(VAR_YBBUF), pl->GetVar(VAR_QQVIP_BUF));
     pl->sendAthlBufInfo();
     luckyDraw.notifyDisplay(pl);
 
@@ -2689,12 +2689,13 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
         lr._count = 1;
 	UInt32 price = 0;
     if (lr._type == 1)
-        price = GData::store.getPrice(2, lr._itemId); // XXX: when discount need one item id
+        price = GData::store.getPrice(lr._type, lr._itemId, lr._count); // XXX: when discount need one item id
     else
         price = GData::store.getPrice(lr._type, lr._itemId);
 	Stream st(REP::STORE_BUY);
 	if(price == 0 || price == 0xFFFFFFFF)
 	{
+        // 客户端商城界面有错误，重新更新界面
 		st << static_cast<UInt8>(3);
         GData::store.sendList(lr._type, player);
 	}
@@ -2708,36 +2709,45 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 		{
         case 1:
             {
-                UInt8 discount = lr._count;
-                UInt8 varoff = GData::store.getDisVarOffset(discount);
+                // TODO(JLT): 折扣商品的购买
+                UInt8 discountType = lr._count;
+                UInt8 varoff = GData::store.getDisTypeVarOffset(discountType);
+                if (varoff == 0xfe)
+                {
+                    //TODO: 全服限购，只需要检查全服是否还有库存
+                }
                 if (varoff == 0xff)
                     return;
-                if (player->GetVar(VAR_DISCOUNT_1+varoff) >= GData::store.getDiscountLimit(discount))
+
+                if (player->GetVar(VAR_DISCOUNT_1+varoff) >= GData::store.getDiscountLimit(discountType))
                 {
                     player->sendMsgCode(0, 1020);
                     return;
                 }
 
                 UInt16 items[4] = {0};
-                UInt8 c = GData::store.getItemsByDiscount(discount, items);
+                UInt8 c = GData::store.getItemsByDiscount(discountType, items);
                 if (!c) return;
                 if (player->GetPackage()->GetRestPackageSize() < c)
                 {
+                    // 背包空间不足
                     player->sendMsgCode(0, 1011);
                     return;
                 }
 
+                // 获取价格
                 price = 0;
                 for (UInt8 i = 0; i < c; ++i)
-                    price += GData::store.getPrice(2, items[i]);
+                    price += GData::store.getPrice(1, items[i], discountType);
 
-                price *= GData::store.getDiscount(discount);
                 if(PLAYER_DATA(player, gold) < price)
                 {
+                    // 玩家货币不足
                     st << static_cast<UInt8>(1);
                 }
                 else
                 {
+                    // 检查完毕，购买道具
                     for (UInt8 i = 0; i < c; ++i)
                     {
                         GObject::ItemBase * item;
@@ -2747,13 +2757,42 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                             item = player->GetPackage()->AddItem(items[i], 1, true, false, FromNpcBuy);
                     }
 
-                    ConsumeInfo ci(Discount3+varoff, 0, 0);
-                    player->useGold(price, &ci);
+                    UInt8 logVarOffset = 0;
+                    switch (discountType)
+                    {
+                        case 4:
+                            logVarOffset = DiscountSp1 - Discount3;
+                            break;
+                        case 5:
+                            logVarOffset = DiscountSp2 - Discount3;
+                            break;
+                        case 6:
+                            logVarOffset = DiscountSp3 - Discount3;
+                            break;
+                        case 7:
+                            logVarOffset = Discount3 - Discount3;
+                            break;
+                        case 8:
+                            logVarOffset = Discount5 - Discount3;
+                            break;
+                        case 9:
+                            logVarOffset = Discount8 - Discount3;
+                            break;
+                        default:
+                            logVarOffset = 0xff;
+                    }
+                    
+                    if (logVarOffset != 0xff)
+                    {
+                        ConsumeInfo ci(Discount3+logVarOffset, 0, 0);
+                        player->useGold(price, &ci);
+                        player->discountLog(discountType);
+                    }
                     st << static_cast<UInt8>(0);
 
                     GameAction()->doAty(player, AtyBuy, 0, 0);
 
-                    player->AddVar(VAR_DISCOUNT_1+varoff, 1);
+                    player->AddVar(VAR_DISCOUNT_1+varoff, 1);   // 更新购买次数（限购商品）
                     player->sendDiscountLimit();
                 }
             }
@@ -3321,6 +3360,9 @@ void OnSaleSellReq( GameMsgHdr& hdr, SaleSellReq& req )
 
 	if(!player->hasChecked())
 		return;
+
+    if (player->GetLev() < 45)
+        return;
 
 	player->GetSale()->sellSaleReq(req._data);
 }

@@ -519,7 +519,7 @@ namespace GObject
 		_availInit(false), _vipLevel(0), _clan(NULL), _clanBattle(NULL), _flag(0), _gflag(0), _onlineDuration(0), _offlineTime(0),
 		_nextTavernUpdate(0), _nextBookStoreUpdate(0), _bossLevel(21), _ng(NULL), _lastNg(NULL),
 		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), m_autoCopyFailed(false),
-        _justice_roar(0), _spirit_factor(1.0f), _diamond_privilege(false), _athlRivalBuf(0), _worldBossHp(0), m_autoCopyComplete(0), hispot(0xFF), hitype(0), m_ulog(NULL),
+        _justice_roar(0), _spirit_factor(1.0f), _diamond_privilege(false), _qqvip_privilege(false), _athlRivalBuf(0), _worldBossHp(0), m_autoCopyComplete(0), hispot(0xFF), hitype(0), m_ulog(NULL),
         m_isOffical(false), m_sysDailog(false), m_hasTripod(false)
 	{
         m_ClanBattleStatus = 1;
@@ -1009,12 +1009,12 @@ namespace GObject
     void Player::udpLog(UInt8 platform, const char* str1, const char* str2, const char* str3, const char* str4,
                 const char* str5, const char* str6, const char* type, UInt32 count)
     {
-        if (m_ulog)
+        if (m_ulog && cfg.udplog)
         {
             char buf[1024] = {0};
             char* pbuf = &buf[0];
-            pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u||||||%u||%u||%u|",
-                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId().c_str(), GetLev(), _playerData.gold, _playerData.qqvipl, cfg.serverNum, platform);
+            pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u|||%u|||%u||%u||%u|",
+                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId().c_str(), GetLev(), _playerData.gold, getVipLevel(), _playerData.qqvipl, cfg.serverNum, platform);
 
             m_ulog->SetUserMsg(buf);
             if (platform != WEBDOWNLOAD)
@@ -1091,6 +1091,18 @@ namespace GObject
         World::_moneyLogged = now;
         // TODO:
         World::_moneyIn[6][type-1].gold += gold;
+    }
+
+    void Player::discountLog(UInt8 discountType)
+    {
+        char type[8] = "";
+        snprintf (type, 8, "%d", discountType);
+        udpLog("discount", type, "", "", "", "", "act"); 
+    }
+
+    void Player::actUdp(UInt8 type, std::string& p1, std::string& p2)
+    {
+            udpLog(p1.c_str(), p2.c_str(), "", "", "", "", "act");
     }
 
     void Player::sendHalloweenOnlineAward(UInt32 now, bool _online)
@@ -1254,7 +1266,7 @@ namespace GObject
                     for (UInt8 j = 0; j < 6; ++j)
                     {
                         ied.gems[j] = gemId[cls-1][i][j];
-                        DB4().PushUpdateData("UPDATE `equipment` SET `enchant` = %u, `sockets` = %u, `socket1` = %u, `socket2` = %u, `socket3` = %u, `socket4` = %u, `socket5` = %u, `socket6` = %u, `attrType1` = %u, `attrValue1` = %d, `attrType2` = %u, `attrValue2` = %d, `attrType3` = %u, `attrValue3` = %d WHERE `id` = %"I64_FMT"u", ied.enchant, ied.sockets, ied.gems[0], ied.gems[1], ied.gems[2], ied.gems[3], ied.gems[4], ied.gems[5], ied.extraAttr2.type1, ied.extraAttr2.value1, ied.extraAttr2.type2, ied.extraAttr2.value2, ied.extraAttr2.type3, ied.extraAttr2.value3, ie->getId());
+                        DB4().PushUpdateData("UPDATE `equipment` SET `enchant` = %u, `sockets` = %u, `socket1` = %u, `socket2` = %u, `socket3` = %u, `socket4` = %u, `socket5` = %u, `socket6` = %u, `attrType1` = %u, `attrValue1` = %d, `attrType2` = %u, `attrValue2` = %d, `attrType3` = %u, `attrValue3` = %d WHERE `id` = %u", ied.enchant, ied.sockets, ied.gems[0], ied.gems[1], ied.gems[2], ied.gems[3], ied.gems[4], ied.gems[5], ied.extraAttr2.type1, ied.extraAttr2.value1, ied.extraAttr2.type2, ied.extraAttr2.value2, ied.extraAttr2.type3, ied.extraAttr2.value3, ie->getId());
                     }
                     GetPackage()->SendSingleEquipData(ie);
                 }
@@ -1905,8 +1917,10 @@ namespace GObject
         UInt16 citta = cittas[fgt->getClass()-1];
         if (fgt->hasCitta(citta) < 0) {
             if (fgt->addNewCitta(citta, writedb, true)) {
+                /*
                 if (fgt->upCitta(citta, 0, writedb)) {
                 }
+                */
             }
         }
     }
@@ -3632,7 +3646,13 @@ namespace GObject
 		sendModification(3, _playerData.tael);
 	}
 
-	UInt32 Player::getMoneyArena( UInt32 c )
+    UInt32 Player::getMoneyArenaLua(UInt32 c)
+    {
+        IncommingInfo ii(ArenaFromCard,0,0);
+        return getMoneyArena(c, &ii);
+    }
+
+	UInt32 Player::getMoneyArena( UInt32 c, IncommingInfo* ii)
 	{
         UInt32 moneyArena = GetVar(VAR_MONEY_ARENA);
 		if(c == 0)
@@ -3645,6 +3665,12 @@ namespace GObject
         Stream st(REP::USER_INFO_CHANGE);
         st << static_cast<UInt8>(0x56) << moneyArena << Stream::eos;
         send(st);
+
+        if(ii && ii->incommingType != 0)
+        {
+            DBLOG1().PushUpdateData("insert into consume_arena (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+                cfg.serverLogId, getId(), ii->incommingType, ii->itemId, ii->itemNum, c, TimeUtil::Now());
+        }
 
         return moneyArena;
 	}
@@ -3910,7 +3936,7 @@ namespace GObject
 		if (priceType == 0)
 		{
 			const std::vector<UInt32>& golds = GData::GDataManager::GetGoldTrainList();
-            if (fgt->getLevel() >= golds.size())
+            if(fgt->getLevel() >= golds.size())
                 return false;
 			price = time * golds[fgt->getLevel()]; 
 			if (getGold() < price)
@@ -3923,7 +3949,7 @@ namespace GObject
 		else
 		{
 			const std::vector<UInt32>& taels = GData::GDataManager::GetTaelTrainList();
-            if (fgt->getLevel() >= taels.size())
+            if(fgt->getLevel() >= taels.size())
                 return false;
 			price = time * taels[fgt->getLevel()];
 			if (getTael() < price)
@@ -6514,8 +6540,16 @@ namespace GObject
             totalCnt = 0;
         }
 
-        copy = freeCnt + goldCnt + currentCnt;
-        copyMax = GObject::PlayerCopy::getFreeCount() + GObject::PlayerCopy::getGoldCount(vipLevel) + totalCnt;
+        UInt8 currentCnt2 = 0;
+        UInt8 totalCnt2 = 0;
+        if(this->isQQVIP() && World::getQQVipAct()){
+            currentCnt2 = this->GetVar(VAR_QQVIP_CNT);
+            totalCnt2 = 1;
+            if(currentCnt2 > totalCnt2)
+                currentCnt2 = 0;
+        }
+        copy = freeCnt + goldCnt + currentCnt + currentCnt2;
+        copyMax = GObject::PlayerCopy::getFreeCount() + GObject::PlayerCopy::getGoldCount(vipLevel) + totalCnt + totalCnt2;
 
         UInt32 now = TimeUtil::Now();
         if(now >= _playerData.dungeonEnd)
@@ -6583,7 +6617,16 @@ namespace GObject
             totalDiamondCnt = 0;
         }
 
-        st << cnt << static_cast<UInt8>(freeCnt + goldCnt + currentDiamondCnt) << static_cast<UInt8>(GObject::PlayerCopy::getFreeCount()) << static_cast<UInt8>(GObject::PlayerCopy::getGoldCount(vipLevel)) << static_cast<UInt8>(totalDiamondCnt);
+        UInt8 currentCnt2 = 0;
+        UInt8 totalCnt2 = 0;
+        if(this->isQQVIP() && World::getQQVipAct()){
+            currentCnt2 = this->GetVar(VAR_QQVIP_CNT);
+            totalCnt2 = 1;
+            if(currentCnt2 > totalCnt2)
+                currentCnt2 = 0;
+        }
+
+        st << cnt << static_cast<UInt8>(freeCnt + goldCnt + currentDiamondCnt + currentCnt2) << static_cast<UInt8>(GObject::PlayerCopy::getFreeCount()) << static_cast<UInt8>(GObject::PlayerCopy::getGoldCount(vipLevel)) << static_cast<UInt8>(totalDiamondCnt) << static_cast<UInt8>(totalCnt2);
         if(cnt)
         {
             playerCopy.buildInfo(this, st);
@@ -7295,12 +7338,6 @@ namespace GObject
 			h = 15;
 		for(UInt32 j = l; j <= h; ++j)
 		{
-			SYSMSG(title, 256);
-			SYSMSGV(content, 257, j);
-			Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
-			if(mail == NULL)
-				continue;
-
 			const UInt32 vipTable[16][12] =
             {
                 {450,1,0,0,0,0,0,0,0,0,0,0},
@@ -7320,6 +7357,12 @@ namespace GObject
                 {464,1,0,0,0,0,0,0,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0,0,0},
             };
+
+			SYSMSG(title, 256);
+			SYSMSGV(content, 257, vipTable[j-1][0]);
+			Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+			if(mail == NULL)
+				continue;
 
 			MailPackage::MailItem mitem[6];
 			UInt32 mcount = 0;
@@ -7779,6 +7822,10 @@ namespace GObject
         }
 #else
 		char numstr[16];
+        char separator[2] = {32, 0};
+        //char separator[] = {"\n "}; //分隔符是回车加空格
+
+        std::string sepStr(separator);
 		sprintf(numstr, "%u", _playerData.title);
 		_battleName.clear();
 		_battleName = getClanName();
@@ -7790,7 +7837,8 @@ namespace GObject
 			_battleName += numstr;
 		}
         */
-		_battleName = _battleName + "\n" + numstr + "\n" + _playerData.name;
+		//_battleName = _battleName + "\n" + numstr + "\n" + _playerData.name;
+		_battleName = _battleName + sepStr + numstr + sepStr + _playerData.name;
 #endif
 	}
 
@@ -8186,6 +8234,18 @@ namespace GObject
         }
     }
 
+    float Player::getPracticeIncByQQVip()
+    {
+        if(isQQVIP() && World::getQQVipAct())
+        {
+            return 0.1;
+        }
+        else
+        {
+            return 0.0;
+        }
+    }
+
     bool Player::accPractice()
     {
         UInt32 goldUse = GData::moneyNeed[GData::INSTANTPRACTICE].gold;
@@ -8497,14 +8557,19 @@ namespace GObject
             UInt8 qqvipl = 0;
             UInt8 flag = 0;
 
-            if (blue || qplus)
+            if (blue)
             {
                 flag = 8*(_playerData.qqvipl1 / 10);
                 qqvipl = _playerData.qqvipl1 % 10;
             }
             else
             {
-                if (_playerData.qqvipl >= 40)
+                if(qplus /*&& World::getQQVipAct()*/ && _playerData.qqvipl1 >= 40 && _playerData.qqvipl1 <= 49)
+                {
+                    flag = 8*((_playerData.qqvipl1-20) / 10);
+                    qqvipl = _playerData.qqvipl1 % 10;
+                }
+                else if (_playerData.qqvipl >= 40)
                 {
                     flag = 8*((_playerData.qqvipl-20) / 10);
                     qqvipl = _playerData.qqvipl % 10;
@@ -8630,14 +8695,23 @@ namespace GObject
                 }
             }
         }
-        else if (_playerData.qqvipl < 20 || _playerData.qqvipl >= 40 || ((domain == 11 || domain == 4) && d3d6 == 0 && _playerData.qqvipl1 > 0))
+        else if (_playerData.qqvipl < 20 || _playerData.qqvipl >= 40 || (domain == 4 && _playerData.qqvipl1 >= 40) ||
+                ((domain == 11 || domain == 4) && d3d6 == 0 && _playerData.qqvipl1 > 0))
         {
             UInt8 qqvipl = 0;
             UInt8 flag = 0;
             if ((domain == 11 || domain == 4) && d3d6 == 0 && _playerData.qqvipl1 > 0)
             {
-                qqvipl = _playerData.qqvipl1;
-                flag = 8*(_playerData.qqvipl1 / 10);
+                if (World::getQQVipAct() && _playerData.qqvipl1 >= 40 && _playerData.qqvipl1 <= 49)
+                {
+                    qqvipl = _playerData.qqvipl1;
+                    flag = 8*((_playerData.qqvipl1-20) / 10);
+                }
+                else
+                {
+                    qqvipl = _playerData.qqvipl1;
+                    flag = 8*(_playerData.qqvipl1 / 10);
+                }
             }
             else
             {
@@ -9926,21 +10000,121 @@ namespace GObject
 
     void Player::sendDiscountLimit()
     {
-        static UInt8 discount[] = {3,5,8,};
+        // 发送给客户端的有关限购的相关数据
         Stream st(REP::STORE_DISLIMIT);
-        for (UInt8 i = 0; i < 3; ++i)
+        for (UInt8 i = 4; i < 7; ++i)
         {
-            UInt8 max = GData::store.getDiscountLimit(discount[i]);
-            UInt8 used = GetVar(GObject::VAR_DISCOUNT_1+i);
-            if (used > max)
+            // 发送活动限购三栏的种类，时间和剩余数量
+            UInt8 type = i;
+            UInt32 max = 0;
+            UInt32 used = 0;
+            UInt32 time = 0;
+            UInt32 now = TimeUtil::Now();
+
+            // 如果活动限购已经结束或已经购买完毕，则发送时间和数量为0的
+            max = GData::store.getDiscountLimit(type);
+            UInt8 offset = GData::store.getDisTypeVarOffset(type);
+            used = GetVar(GObject::VAR_DISCOUNT_1+offset);
+
+            if (offset == 0xfe)
+            {
+                // TODO: 全服限购的数量获取
+            }
+            if (offset == 0xff)
+            {
+                st << static_cast<UInt8>(0) 
+                    << static_cast<UInt32>(0)
+                    << static_cast<UInt32>(0);
+                break;
+            }
+
+            if (used >= max)
             {
                 used = max;
-                SetVar(GObject::VAR_DISCOUNT_1+i, used);
+                SetVar(GObject::VAR_DISCOUNT_1+offset, used);
             }
-            st << static_cast<UInt8>(max - used);
+
+            time = GetVar(GObject::VAR_DISCOUNT_SP_1_TIME + type - 4);
+            if (time < now)
+            {
+                SetVar(GObject::VAR_DISCOUNT_1+offset, 0);
+                time = GData::store.getEndTimeByDiscountType(type);
+                SetVar(GObject::VAR_DISCOUNT_SP_1_TIME + type - 4, time);
+                used = 0;
+            }
+
+
+            UInt32 count = max - used;
+
+
+            time = GData::store.getBeginTimeByDiscountType(type);
+            if (time > now)
+            {
+                // 活动限购还未开始
+                time = 0;
+                count = 0;
+                SetVar(GObject::VAR_DISCOUNT_SP_1_TIME + type - 4, 0);
+            }
+            else
+            {
+                time = GData::store.getEndTimeByDiscountType(type);
+                if (time < now)
+                {
+                    // 活动限购已经结束
+                    time = 0;
+                    count = 0;
+                    SetVar(GObject::VAR_DISCOUNT_SP_1_TIME + type - 4, 0);
+                }
+                else
+                    time -= now;
+            }
+
+            st << static_cast<UInt8>(type) 
+                << static_cast<UInt32>(time)
+                << static_cast<UInt32>(count);
         }
         st << Stream::eos;
         send(st);
+
+        // 再发送一个完整的三五八折协议
+        Stream st2(REP::STORE_DISLIMIT);
+        for (UInt8 i = 7; i < 10; ++i)
+        {
+            UInt8 type = i;
+            UInt8 offset = GData::store.getDisTypeVarOffset(type);
+            UInt32 max = GData::store.getDiscountLimit(type);
+            if (offset == 0xfe)
+            {
+                // TODO: 全服限购的数量获取
+            }
+            if (offset == 0xff)
+            {
+                st2 << static_cast<UInt8>(0) 
+                    << static_cast<UInt32>(0)
+                    << static_cast<UInt32>(0);
+                break;
+            }
+            UInt32 used = GetVar(GObject::VAR_DISCOUNT_1+offset);
+            if (used >= max)
+            {
+                used = max;
+                SetVar(GObject::VAR_DISCOUNT_1+offset, used);
+            }
+            UInt32 count = max - used;
+
+            UInt32 time = GData::store.getEndTimeByDiscountType(type);
+            UInt32 now = TimeUtil::Now();
+            if (time < now)
+                time = 0;
+            else
+                time -= now;
+
+            st2 << static_cast<UInt8>(type) 
+                << static_cast<UInt32>(time)
+                << static_cast<UInt32>(count);
+        }
+        st2 << Stream::eos;
+        send(st2);
     }
 
     void Player::continuousLogin(UInt32 now)
@@ -10597,6 +10771,20 @@ namespace GObject
 
     void Player::recvYBBuf(UInt8 type)
     {
+        if(this->isQQVIP() && World::getQQVipAct() && type == 2)
+        {
+            UInt32 qqbuf = GetVar(VAR_QQVIP_BUF);
+            if(!qqbuf)
+            {
+                UInt32 now = TimeUtil::Now();
+                setBuffData(PLAYER_BUFF_QQVIPBUF, now + 60 * 60);
+                SetVar(VAR_QQVIP_BUF, 1);
+                //sendYBBufInfo(0, 1);
+                sendYBBufInfo(GetVar(VAR_YBBUF), GetVar(VAR_QQVIP_BUF));
+            }
+            return;
+        }
+
         if((this->isBD() && World::getBlueDiamondAct()) || (this->isYD() && World::getYellowDiamondAct()))
         {
             UInt32 ybbuf = GetVar(VAR_YBBUF);
@@ -10627,14 +10815,16 @@ namespace GObject
                 SetVar(VAR_YBBUF, ybbuf);
             }
 
-            sendYBBufInfo(ybbuf);
+            //sendYBBufInfo(ybbuf, 0);
+            sendYBBufInfo(GetVar(VAR_YBBUF), GetVar(VAR_QQVIP_BUF));
         }
     }
 
-    void Player::sendYBBufInfo(UInt32 ybbuf)
+    void Player::sendYBBufInfo(UInt32 ybbuf, UInt32 qqvipbuf)
     {
         Stream st(REP::YBBUF);
-        st << static_cast<UInt8>((ybbuf >> 16) & 0xFFFF) << static_cast<UInt8>(ybbuf & 0xFFFF) << Stream::eos;
+        UInt8 qqbuf = qqvipbuf ? true : false;
+        st << static_cast<UInt8>((ybbuf >> 16) & 0xFFFF) << static_cast<UInt8>(ybbuf & 0xFFFF) << qqbuf << Stream::eos;
         send(st);
     }
 
@@ -10880,6 +11070,7 @@ namespace GObject
                 st << fgt->getMaxSoul() << fgt->getPeerlessAndLevel();
                 fgt->getAllUpSkillAndLevel(st);
                 fgt->getAllPSkillAndLevel4Arena(st);
+                fgt->getAllSSAndLevel(st);
 
                 fgt->getAttrExtraEquip(st);
 
@@ -10894,6 +11085,8 @@ namespace GObject
     //玩家每日签到接口
     void Player::ActivitySignIn()
     {
+        if(GetActivityMgr()->GetFlag(AtySignIn) != 0)
+            return;
         UInt32 day = 1;
         UInt32 mon = 1;
         UInt32 year = 2012;
@@ -10908,7 +11101,10 @@ namespace GObject
             }
             for(UInt32 i = 0; i < cnt; ++i){
                 lua_tinker::table a = award.get<lua_tinker::table>(i + 1); 
-                GetPackage()->Add(a.get<UInt32>(1), a.get<UInt32>(2), true, false, FromDailyActivity);
+                if(499 == a.get<UInt32>(1))  //礼券
+                    getCoupon(a.get<UInt32>(2)); 
+                else
+                    GetPackage()->Add(a.get<UInt32>(1), a.get<UInt32>(2), true, false, FromDailyActivity);
             }
         }
         GameAction()->doAtySignIn(this, AtySignIn, mon, day);
@@ -11236,35 +11432,24 @@ namespace GObject
                 break;
             case 1: //前往破阵
                 {
-                    UInt8 res =  attackTjEvent3(id);
-                    if (res > 0)
+                    if (GetVar(VAR_TJ_TASK3_COPYID) == 51)
                     {
+                        rcmd = 1;
                         st << type << res << Stream::eos;
                         send(st);
                         return;
                     }
+                    attackTjEvent3(id);
                 }
                 break;
             case 2: //自动破阵
                 {
-                    if (getTael() < 1000)
-                    {
-                        rcmd = 3;
-                        st << type << rcmd << Stream::eos;
-                        send(st);
-                        return;
-                    }
+                    processAutoTlz();
                 }
                 break;
             case 3: //自动完成
                 {
-                    if (getGold() < 10)
-                    {
-                        rcmd = 2;
-                        st << type << rcmd << Stream::eos;
-                        send(st);
-                        return;
-                    }
+                    completeAutoTlz():
                 }
                 break;
             default:
@@ -11308,16 +11493,24 @@ namespace GObject
     UInt8 Player::attackTjEvent3(UInt8 id)
     {
         UInt8 copyid = GetVar(VAR_TJ_TASK3_COPYID);
-        if (51 == copyid)
-        {
-            return 1;
-        }
+        if (copyid > 50) return;
+
         if (0 == copyid) copyid = 1;
         bool res = GObject::Tianjie::instance().attackTlz(this, id, copyid);
         if (res)
         {
+            copyid++;
             AddVar(VAR_TJ_TASK3_COPYID, 1);
-        }
+        
+            Stream st(REQ::TIANJIE);
+
+            UInt8 percent3 = (copyid-1) * 100 / 50;
+            int exp3 = 1000000;
+            int time3 = 0; //剩余时间 秒
+         
+            st << static_cast<UInt8>(3) << static_cast<UInt8>(0) <<copyid << percent3 << exp3 << time3 << Stream::eos;
+            m_player->send(st); 
+        } 
         return 0;
     }
     void Player::getTjTask1Data(Stream& st)
@@ -11347,46 +11540,121 @@ namespace GObject
     }
     void Player::getTjTask3Data(Stream& st)
     {
-        short copyid = GetVar(VAR_TJ_TASK3_COPYID);
-        UInt8 percent = copyid * 100/ 50;
+        UInt8 finish = 0;
+        byte copyid = GetVar(VAR_TJ_TASK3_COPYID);
+        if (copyid == 51) //已完成
+        {
+            finish = 1;
+        }
+        if (copyid == 0) copyid = 1;
+        UInt8 percent = (copyid-1) * 100/ 50;
         int exp3 = percent * 10000000 / 100;
-        st << copyid << percent << exp3;
+        int time3 = 0;
+        if (hasFlag(Player::AutoTlz)) 
+            time3 = (51 - copyid) * 30;
+        st << finish << copyid << percent << exp3 << time3;
     }
     void Player::processAutoTlz()
     {
-        m_isTlzAuto = true;
+        Stream st(REQ::TIANJIE);
+        UInt8 type = 3;
+        UInt8 rcmd = 0;
         if (GetVar(VAR_TJ_TASK3_COPYID) == 51)
         {
+            rcmd = 1;
+            st << type << cmd << Stream::eos;
+            send(st);
+            return;
         }
-    }
-    void Player::cancelAutoTlz()
-    {
+        if (getGold() < 5)
+        {
+            rcmd = 2;
+            st << type << rcmd << Stream::eos;
+            send(st);
+            return;
+        }
+        ConsumeInfo ci(TianjieTask, 0, 0);
+        useGold(5, &ci);
+        
+        int count = 51 - GetVar(VAR_TJ_TASK3_COPYID);
+        EventTlzAuto* event = new(std::nothrow) EventTlzAuto(this, 30, count);
+        if (event == NULL) return;
+        PushTimerEvent(event);
+        event->notify();
+        
+        addFlag(Player::AutoTlz);
     }
     void Player::completeAutoTlz()
     {
+        Stream st(REQ::TIANJIE);
+        UInt8 type = 3;
+        UInt8 rcmd = 0;
+        if (GetVar(VAR_TJ_TASK3_COPYID) == 51)
+        {
+            rcmd = 1;
+        }
+        if (getGold() < 10)
+        {
+            rcmd = 2; //xs不足
+        }
+        if (rcmd > 0 )
+        {
+            st << type << rcmd << Stream::eos;
+            send(st);
+            return;
+        }
+        ConsumeInfo ci(TianjieTask, 0, 0);
+        useGold(10, &ci);
+            
+        SetVar(VAR_TJ_TASK3_COPYID, 51);
+        AddExp(1000000);
+        
+        st << type << rcmd;
+        getTjTask3Data(st);
+        m_player->send(st); 
+        //删除定时事件
+        PopTimerEvent(this, EVENT_TLZAUTO, getId());
+        delFlag(Player::AutoTlz);
+       }
 
+EventTlzAuto::EventTlzAuto( Player * player, UInt32 interval, UInt32 count)
+	: EventBase(player, interval, count)
+{
+}
+
+void EventTlzAuto::Process(UInt32 leftCount)
+{
+    m_player->AddVar(VAR_TJ_TASK3_COPYID, 1);
+
+    notify();
+    if (leftCount == 0)
+    {
+        PopTimerEvent(this, EVENT_TLZAUTO, getId());
     }
-
-EventTlzAuto::EventTlzAuto( Player * player, UInt32 interval)
-	: EventBase(player, interval)
-{
-}
-
-void EventTlzAuto::process()
-{
-	m_player->processAutoTlz();
-}
-
-void EventTlzAuto::cancel() const
-{
-	m_player->cancelAutoTlz();
 }
 
 void EventTlzAuto::complete() const
 {
-	m_player->completeAutoTlz();
 }
+void EventTlzAuto::notify()
+{
+    if(m_player == NULL || !m_player->isOnline())
+        return;
+    Stream st(REQ::TIANJIE);
+    UInt8 type = 3;
+    UInt8 cmd = 0;
+    if (m_player->GetVar(VAR_TJ_TASK3_COPYID) >= 51)
+    {
+        AddExp(1000000);
 
+        m_player->delFlag(Player::AutoTlz);
+    }
+    st << type << cmd;
+    m_player->getTjTask3Data(st);
+    st << Stream::eos;
+         
+    m_player->send(st); 
+}
 
 
 } // namespace GObject
