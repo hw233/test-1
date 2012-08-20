@@ -472,6 +472,11 @@ bool Clan::kick(Player * player, UInt64 pid)
         player->sendMsgCode(0, 1317);
         return false;
     }
+    if(ClanRankBattleMgr::Instance().IsInBattle(this))
+    {
+        SYSMSG_SEND(2235, player);          
+        return false;
+    }
 
 	Mutex::ScopedLock lk(_mutex);
 	Members::iterator found = find(pid);
