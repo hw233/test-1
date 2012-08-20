@@ -3037,6 +3037,7 @@ static bool inCountry(const Network::TcpConduit * conduit, UInt8 country)
 
 #define ITEM_SPEAKER 16
 #define ITEM_FLOWER 440
+#define ITEM_QIXI_TALK 9123
 
 int ToMsgCenter(Stream st)
 {
@@ -3125,6 +3126,15 @@ void OnChatReq( GameMsgHdr& hdr, ChatReq& cr )
             if (!player->hasChecked())
                 return;
             if(!player->GetPackage()->DelItemAny(ITEM_FLOWER, 1))
+                break;
+            NETWORK()->Broadcast(st);
+            break;
+        }
+    case 9:
+        {
+            if (!player->hasChecked())
+                return;
+            if(!player->GetPackage()->DelItemAny(ITEM_QIXI_TALK, 1))
                 break;
             NETWORK()->Broadcast(st);
             break;

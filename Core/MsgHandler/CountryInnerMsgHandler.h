@@ -1510,5 +1510,13 @@ void OnSendPExpCard( GameMsgHdr& hdr, const void* data )
     player->sendPExpCard(pos);
 }
 
+void OnRoamintQueqiao( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    UInt8 pos = *(UInt8*)(data);
+    player->roamingQueqiao(pos);
+}
+
+
 #endif // _COUNTRYINNERMSGHANDLER_H_
 

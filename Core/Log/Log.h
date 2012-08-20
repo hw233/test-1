@@ -151,6 +151,7 @@ enum ItemFrom
 	FromSSDTAward,
 	FromHappyAward,
     FromIDIP,
+    FromQixi,
 };
 
 enum ItemTo
@@ -177,6 +178,7 @@ enum ItemTo
     ToArenaBet,
     ToSkillStrengthenOpen,
 	ToSkillStrengthenUpgrade,
+    ToQixi,
 };
 
 struct IncommingInfo

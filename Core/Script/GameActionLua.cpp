@@ -107,6 +107,7 @@ namespace Script
 		lua_tinker::def(_L, "getJune", GObject::World::getJune);
 		lua_tinker::def(_L, "getJune1", GObject::World::getJune1);
 		lua_tinker::def(_L, "getJuly", GObject::World::getJuly);
+		lua_tinker::def(_L, "getQixi", GObject::World::getQixi);
 		lua_tinker::def(_L, "getYDMDAct", GObject::World::getYDMDAct);
 		lua_tinker::def(_L, "getWeekDay",	GObject::World::getWeekDay);
 		lua_tinker::def(_L, "getThanksgiving",	GObject::World::getThanksgiving);
@@ -257,6 +258,7 @@ namespace Script
         CLASS_DEF(Player, getMoneyArenaLua);
 		CLASS_DEF(Player, getQQVipPrivilege);
 		CLASS_DEF(Player, setQQVipPrivilege);
+		CLASS_DEF(Player, postRoamResult);
 
         CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);
@@ -1252,5 +1254,9 @@ namespace Script
 		return Call<UInt8>("onGetAthlRandomDiffculty");
 	}
 
+    UInt8 GameActionLua::onRoamingQueqiao(Player* pl, UInt8 pos)
+    {
+		return Call<UInt8 >("onRoamingQueqiao", pl, pos);
+    }
 }
 
