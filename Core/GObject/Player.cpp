@@ -9229,13 +9229,16 @@ namespace GObject
             // 今日目标
             getTargetAward(opt);
             break;
-            // 回流今日目标
         case 4:
+            // 回流今日目标
             getTargetAwardRF(opt);
             break;
 
         case 5:
             getSoSoMapAward();
+            break;
+        case 6:
+            getNewRegisterAward(opt);
             break;
         }
     }
@@ -9286,6 +9289,44 @@ namespace GObject
         if(GetVar(VAR_AWARD_SSDT_1))
             status |= (1 << 4);
         st << status << Stream::eos;
+        send(st);
+    }
+
+    void Player::getNewRegisterAward(UInt8 opt)
+    {
+        if(opt != 0 && opt != 1)
+            return;
+        if(GetLev() > 1)
+            return;
+        if(opt == 1)
+        {
+            if(2 == GetVar(VAR_AWARD_NEWREGISTER))
+                return;
+			std::vector<GData::LootResult>::iterator it;
+			for(it = _RegisterAward.begin(); it != _RegisterAward.end(); ++ it)
+			{
+				m_Package->ItemNotify(it->id, it->count);
+			}
+			_RegisterAward.clear();
+            SetVar(VAR_AWARD_NEWREGISTER, 2);
+        }
+        else{
+            if(GetVar(VAR_AWARD_NEWREGISTER))
+                return;
+            UInt8 idx = 0;
+            if( 0 == (idx = GameAction()->RunNewRegisterAward(this)) )
+                return;
+            sendNewRegisterAward(idx);
+            SetVar(VAR_AWARD_NEWREGISTER, 1);
+        }
+    }
+            
+    void Player::sendNewRegisterAward(UInt8 idx)
+    {
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(6);
+        st << idx;
+        st << Stream::eos;
         send(st);
     }
 
@@ -9387,6 +9428,12 @@ namespace GObject
     {
         GData::LootResult lt = {itemId, num};
         _lastLoot.push_back(lt);
+    }
+
+    void Player::RegisterAward(UInt16 itemId, UInt16 num)
+    {
+        GData::LootResult lt = {itemId, num};
+        _RegisterAward.push_back(lt);
     }
 
     void Player::sendHappyInfo(UInt16 itemId)

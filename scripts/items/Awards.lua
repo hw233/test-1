@@ -152,5 +152,42 @@ function RunTargetAwardRF(player)
     return j;
 end
 
+function RunNewRegisterAward(player)
+    if player == nil then
+        return 0;
+    end
+
+    local package = player:GetPackage();
+
+	if package:GetRestPackageSize() < 1 then
+		player:sendMsgCode(2, 1011, 0);
+		return 0;
+	end
+    if not isFBVersion() then
+        for i = 3, 32 do
+            if player:hasRealItemAward(i) then
+                player:getRealItemAward(i)
+                Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]在新手注册邀请好友抽奖活动中获得10QB大奖，让我们一起来祝贺他。玩蜀山传奇，下一个幸运儿就是你！！！！！！！")
+                return 8;
+            end
+        end
+    end
+    local chance = {379,1895,2400,5768,9558,9991,10000}
+    local item = {515,503,507,56,57,509,500,--[["10QB"]] }
+    local j = 0;
+    local g = math.random(1, 10000)
+    for i = 1, #chance do
+        if g <= chance[i] then
+            player:RegisterAward(item[i], 1);
+            package:AddItem(item[i], 1, true, true, 31);
+            j = i;
+            break
+        end
+    end
+    
+    return j;
+
+end
+
 
 
