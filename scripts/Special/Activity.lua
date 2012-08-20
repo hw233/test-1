@@ -173,6 +173,7 @@ end
 
 function onDungeonWin(player, id, count, free)
     June(player, 0);
+    Qixi(player, 0);
     if free == true then
         FallActivity(player, 1)
     else
@@ -809,6 +810,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     ChingMingDay(player, lootlvl)
     MayDay(player, lootlvl)
     June(player, lootlvl);
+    Qixi(player, lootlvl);
     LuckyDrawBox(player, id)
     if player:getQQVipPrivilege() == true then
         player:setQQVipPrivilege(false)
@@ -836,6 +838,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
     ChingMingDay(player, lootlvl)
     MayDay(player, lootlvl)
     June(player, lootlvl);
+    Qixi(player, lootlvl);
     if lootlvl == 0 then
         FallActivity(player, 1)
     else
@@ -2012,4 +2015,50 @@ function onGetAthlRandomDiffculty()
     end
     return i
 end
+
+
+-- 1:聊天 2:牵手 3:险境 4:喜鹊 5:名胜 6:心动 7:神坛
+function onRoamingQueqiao(player, pos)
+    local roamPlace = {
+     -- 1  2  3  4  5  6  7  8
+        2, 3, 5, 1, 3, 2, 2, 6,
+        5, 1, 4, 2, 6, 3, 5, 2,
+        3, 2, 5, 6, 3, 2, 1, 7
+    }
+
+    local eventItem = {
+        {{502, 2, 10}, {510, 1, 10}, {29, 10, 10}},
+        {{56, 1, 20}, {500, 1, 20}, {57, 1, 20}},
+        {{511, 2, 20}, {512, 1, 30}, {517, 1, 30}},
+        {{9122, 1, 10}, {9122, 1, 10}, {9122, 1, 10}},
+        {{503, 1, 30}, {514, 1, 30}, {501, 1, 30}},
+        {{509, 1, 40}, {1528, 1, 40}, {1325, 1, 40}},
+        {{1647, 1, 50}, {1648, 1, 50}, {1649, 1, 50}},
+    }
+
+    step = math.random(1, 3)
+    pos2 = pos + step
+    if pos2 > 24 then
+        pos2 = pos2 - 24
+    end
+
+    local package = player:GetPackage()
+    i = roamPlace[pos2]
+    j = math.random(1, 3)
+
+    package:Add(eventItem[i][j][1], eventItem[i][j][2], true, true, 32)
+    player:lastLootPush(eventItem[i][j][1], eventItem[i][j][2]);
+    player:postRoamResult(pos2, j, eventItem[i][j][3]);
+
+    return pos2;
+end
+
+function Qixi(player, lootlvl)
+    if getQixi() then
+        -- 喜鹊
+        local package = player:GetPackage();
+        package:AddItem(9122, 1, true, 0, 10);
+    end
+end
+
 

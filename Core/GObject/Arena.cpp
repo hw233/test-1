@@ -2203,4 +2203,31 @@ void Arena::updateBattlePoint(BinaryReader& brd)
     }
 }
 
+void Arena::updateLeaderBoard(BinaryReader& brd)
+{
+    UInt16 cnt;
+    brd >> cnt;
+    for(int i = 0; i < cnt; ++ i)
+    {
+        UInt16 session = 0;
+        std::string name;
+        brd >> session >> name;
+        _leaderBoard[session] = name;
+    }
+}
+
+void Arena::sendLeaderBoard(Player* pl)
+{
+	Stream st(REP::SERVER_ARENA_LB);
+    UInt16 cnt = _leaderBoard.size();
+    st << cnt;
+    for(std::map<UInt16, std::string>::iterator it = _leaderBoard.begin(); it != _leaderBoard.end(); ++ it)
+    {
+        st << it->first << it->second;
+    }
+    st << Stream::eos;
+
+    pl->send(st);
+}
+
 }

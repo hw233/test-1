@@ -262,6 +262,13 @@ function onActivityCheck(tm)
       setJune(false)
   end
 
+  if tm >= actTime203 and tm < actTime204 then
+      setQixi(true)
+  else
+      setQixi(false)
+  end
+
+
   if tm >= actTime59 and tm < actTime60 then
       is_6_22 = true
       setDuanWu(true)
@@ -616,6 +623,9 @@ function initActTime(y, m, d)
   local  SerStartTm200= { ['year'] = 2012, ['month'] = 6, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm201= { ['year'] = 2012, ['month'] = 7, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
+  -- 七夕
+  local  SerStartTm202= { ['year'] = 2012, ['month'] = 8, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
 
@@ -794,6 +804,9 @@ function initActTime(y, m, d)
 
   actTime202= os.time(SerStartTm201);
   setLevelAwardEnd(actTime202)
+
+  actTime203= os.time(SerStartTm202);
+  actTime204= os.time(SerStartTm202) + 7 * 86400;
 
   onActivityCheck(os.time() + 30);
 

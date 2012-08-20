@@ -304,6 +304,7 @@ namespace Script
         lua_tinker::table GetExchangeProps(UInt32 id);
         UInt32 GetExchangePropsID();
         lua_tinker::table GetdayExtraAward(UInt32 month, UInt32 day);
+        UInt8 onRoamingQueqiao(Player* pl, UInt8 pos);
 
 	private:
 		Player* _player1;	//?ű???????Ϊ????1

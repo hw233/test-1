@@ -759,4 +759,20 @@ void OnLuckyDraw( GameMsgHdr& hdr,  const void* data )
     WORLD().RankLuckyDraw(player);
 }
 
+void OnRoamResult( GameMsgHdr& hdr,  const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+
+    struct Roam
+    {
+        UInt8 pos;
+        UInt8 event;
+        UInt8 score;
+    };
+
+    Roam* roam = (Roam*)data;
+    player->qixiStepAdvance(roam->pos, roam->event, roam->score);
+}
+
+
 #endif // _WORLDINNERMSGHANDLER_H_

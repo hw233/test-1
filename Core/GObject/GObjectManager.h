@@ -104,6 +104,7 @@ namespace GObject
         static bool loadNewRelation();
         static bool loadRNR();
         static bool loadSkillStrengthen();
+        static bool loadQixi();
 
         static bool addGM(UInt64 id, UInt8 lvl);
         static bool delGM(UInt64 id);
