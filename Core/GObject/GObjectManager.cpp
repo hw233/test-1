@@ -740,11 +740,6 @@ namespace GObject
 	{
 		p->Load();
 		gBlockbossmgr.addPlayerRank(p, p->getBlockBossLevel(), p->GetLev());
-
-        void cittaSplit(Player* pl);
-        // XXX: 拆分心法处理
-        if (!GVAR.GetVar(GVAR_CITTASPLIT))
-            cittaSplit(p);
 		return true;
 	}
 
@@ -921,7 +916,8 @@ namespace GObject
                 if (fgt->getCittasNum() < 40)
                 {
                     UInt16 ncitta = CITTAANDLEVEL(itemid - 1200 + 1, lvl);
-                    if (fgt->addNewCitta(ncitta, true, true))
+                    int idx = fgt->isCittaUp(citta);
+                    if (fgt->addNewCitta(ncitta, true, true, idx>=0?true:false))
                         continue;
                 }
 
@@ -2055,7 +2051,6 @@ namespace GObject
 		/////////////////////////////////
 
 		globalPlayers.enumerate(player_load, 0);
-        GVAR.SetVar(GVAR_CITTASPLIT, 1);
 
 		return true;
 	}

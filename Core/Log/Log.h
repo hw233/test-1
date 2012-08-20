@@ -162,7 +162,7 @@ enum ItemTo
 	ToSellNpc,
 	ToExchange,
 	ToExchangeSet,
-	ToDesdroy,
+	ToDesdroy, // ToTripod
 	ToDetachGemDesdroy,	
 	ToUse,
 	ToClanDonate,

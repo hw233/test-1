@@ -4845,6 +4845,7 @@ void OnActivitySignIn( GameMsgHdr& hdr, const void * data )
                 mgr->UpdateToDB();
                 
                 lua_tinker::table p = GameAction()->GetExchangeProps(id);
+                player->activityUdpLog(1026);
                 st << static_cast<UInt16>(id) << p.get<UInt8>(3) << p.get<UInt16>(2) << Stream::eos;
             }
             break;
@@ -4866,6 +4867,8 @@ void OnActivitySignIn( GameMsgHdr& hdr, const void * data )
                 }
                 mgr->SubScores(score);
                 player->GetPackage()->Add(mgr->GetPropsID(), props.get<UInt8>(3), true, false, FromDailyActivity);
+                player->activityUdpLog(1027, score); 
+                player->activityUdpLog(1028, score); 
                 //兑换后重新刷新一次
                 id = GameAction()->GetExchangePropsID();
                 mgr->SetPropsID(id);

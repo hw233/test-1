@@ -532,10 +532,10 @@ namespace GObject
 				SendItemData(item);
 				if(notify)
                     ItemNotify(item->GetItemType().getId(), num);
-				if((fromWhere != 0  && item->getQuality() >= 3) || (fromWhere == FromMerge && item->getQuality() >= 2))
-                {
+				//if((fromWhere != 0  && item->getQuality() >= 3) || (fromWhere == FromMerge && item->getQuality() >= 2))
+                //{
                     AddItemCoursesLog(typeId, num, fromWhere);
-                }
+                //}
                 if (fromWhere != FromNpcBuy && (GData::store.getPrice(typeId) || GData::GDataManager::isInUdpItem(typeId)))
                 {
                     udpLog(item->getClass(), typeId, num, 0, "add");
@@ -583,7 +583,7 @@ namespace GObject
 				SendItemData(item);
 				if(notify)
 					ItemNotify(item->GetItemType().getId(), num);
-				if((fromWhere != 0  && item->getQuality() >= 3) || (fromWhere == FromMerge && item->getQuality() >= 2))
+				//if((fromWhere != 0  && item->getQuality() >= 3) || (fromWhere == FromMerge && item->getQuality() >= 2))
                      AddItemCoursesLog(typeId, num, fromWhere);
 				return item;
 			}
@@ -608,10 +608,10 @@ namespace GObject
 				SendItemData(exist);
 				ItemNotify(item->GetItemType().getId(), count);
 			}
-            if((fromWhere != 0  && item->getQuality() >= 3) || (fromWhere == FromMerge && item->getQuality() >= 2))
-            {
+            //if((fromWhere != 0  && item->getQuality() >= 3) || (fromWhere == FromMerge && item->getQuality() >= 2))
+            //{
                 AddItemCoursesLog(typeId, static_cast<UInt32>(count), fromWhere);
-            }
+            //}
             if (fromWhere != FromNpcBuy && (GData::store.getPrice(typeId) || GData::GDataManager::isInUdpItem(typeId)))
             {
                 udpLog(item->getClass(), typeId, count, 0, "add");
@@ -644,10 +644,10 @@ namespace GObject
 			ItemNotify(item->GetItemType().getId(), count);
             //获得物品
             GameAction()->doAttainment(m_Owner, Script::ON_ADD_ITEM, typeId);
-            if((fromWhere != 0  && item->getQuality() >= 3) || (fromWhere == FromMerge && item->getQuality() >= 2))
-            {
+            //if((fromWhere != 0  && item->getQuality() >= 3) || (fromWhere == FromMerge && item->getQuality() >= 2))
+            //{
                  AddItemCoursesLog(typeId, static_cast<UInt32>(count), fromWhere);
-            }
+            //}
             if (typeId == 1209)
                 m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
             if (typeId == 1223)
@@ -1008,6 +1008,8 @@ namespace GObject
 	{
 		if (num == 0 || IsEquipId(id))
 			return false;
+        if (!toWhere)
+            toWhere = ToDelete;
 		ItemBase * item = FindItem(id, bind);
 		if (item == NULL) return false;
 		bool ret = TryDelItem(item, num);
@@ -1015,12 +1017,12 @@ namespace GObject
 		{
 			UInt16 cnt = item->Count();
 
-            if((toWhere!= 0  && item->getQuality() >= 3) || (toWhere == ToGemMgerge && item->getQuality() >= 2))
-            {
+            //if((toWhere!= 0  && item->getQuality() >= 3) || (toWhere == ToGemMgerge && item->getQuality() >= 2))
+            //{
 				std::string tbn("item_courses");
 				DBLOG().GetMultiDBName(tbn); 
 				DBLOG().PushUpdateData("insert into  `%s`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)",tbn.c_str(), cfg.serverLogId, m_Owner->getId(), item->GetItemType().getId(), num, toWhere, TimeUtil::Now());
-            }
+            //}
 
             UInt32 price = GData::store.getPrice(id);
             if (price || GData::GDataManager::isInUdpItem(id))
@@ -1048,17 +1050,19 @@ namespace GObject
 	{
 		if (num == 0 || item == NULL || IsEquipId(item->getId()))
 			return false;
+        if (!toWhere)
+            toWhere = ToDelete;
 		bool ret = TryDelItem(item, num);
 		if (ret)
 		{
 			UInt16 cnt = item->Count();
 
-            if((toWhere!= 0  && item->getQuality() >= 3) || (toWhere == ToGemMgerge && item->getQuality() >= 2))
-            {
+            //if((toWhere!= 0  && item->getQuality() >= 3) || (toWhere == ToGemMgerge && item->getQuality() >= 2))
+            //{
 				std::string tbn("item_courses");
 				DBLOG().GetMultiDBName(tbn); 
 				DBLOG().PushUpdateData("insert into `%s`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)",tbn.c_str() ,cfg.serverLogId, m_Owner->getId(), item->GetItemType().getId(), num, toWhere, TimeUtil::Now());
-            }
+            //}
 
             UInt32 price = GData::store.getPrice(item->getId());
             if (price || GData::GDataManager::isInUdpItem(item->getId()))

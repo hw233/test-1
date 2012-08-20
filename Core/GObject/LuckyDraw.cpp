@@ -134,6 +134,7 @@ void LuckyDraw::draw(Player* player, UInt8 id, UInt8 num, bool bind)
 
         if (logits.size())
             pushLog(player->getName(), logits);
+        player->luckyDrawUdpLog(id, static_cast<UInt8> (bind ? 1:2), num);
     }
     else
         st << static_cast<UInt8>(0);
