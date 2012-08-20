@@ -1095,14 +1095,52 @@ namespace GObject
 
     void Player::discountLog(UInt8 discountType)
     {
-        char type[8] = "";
-        snprintf (type, 8, "%d", discountType);
-        udpLog("discount", type, "", "", "", "", "act"); 
+        char action[16] = "";
+        snprintf (action, 16, "F1703_%d", discountType);
+        udpLog("discount", action, "", "", "", "", "act"); 
     }
 
-    void Player::actUdp(UInt8 type, std::string& p1, std::string& p2)
+    void Player::tradeUdpLog(UInt32 price)
     {
-            udpLog(p1.c_str(), p2.c_str(), "", "", "", "", "act");
+        udpLog("trade", "F_1081", "", "", "", "", "act", price);
+    }
+
+    void Player::skillStrengthenLog(UInt8 type, UInt32 val)
+    {
+        char action[16] = "";
+        UInt32 num = 1;
+        switch (type)
+        {
+            case 1:
+                snprintf (action, 16, "%s", "F_1075");
+                if (val)
+                    strcat (action, "_1");
+                else
+                    strcat (action, "_2");
+                break;
+            case 2:
+                snprintf (action, 8, "%s", "F_1076");
+                num = val;
+                break;
+            default:
+                snprintf (action, 8, "%s", "Error");
+                break;
+        }
+        udpLog("skillStrengthen", action, "", "", "", "", "act", num);
+    }
+
+    void Player::townDeamonUdpLog(UInt16 level)
+    {
+        char action[16] = "";
+        snprintf (action, 16, "F_1074_%d", level);
+        udpLog("townDeamon", action, "", "", "", "", "act");
+    }
+
+    void Player::dungeonUdpLog()
+    {
+        // TODO: 决战之地日志
+        char action[16] = "";
+        udpLog("dungeon", action, "", "", "", "", "act");
     }
 
     void Player::sendHalloweenOnlineAward(UInt32 now, bool _online)
@@ -3447,7 +3485,9 @@ namespace GObject
 		sendModification(1, _playerData.gold);
 
         if (ci)
+        {
             udpLog(ci->purchaseType, ci->itemId, ci->itemNum, c, "add");
+        }
 #ifdef _FB
 #else
         dclogger.consume(this, _playerData.gold, c);
@@ -6175,6 +6215,14 @@ namespace GObject
 #endif
         }
 
+        if (World::getRechargeActive3366() && atoi(m_domain.c_str()) == 11)
+        {
+            UInt32 total = GetVar(VAR_RECHARGE_TOTAL3366);
+            GameAction()->sendRechargeMails(this, total, total+r);
+            SetVar(VAR_RECHARGE_TOTAL3366, total+r);
+            sendRechargeInfo();
+        }
+
         if(World::getJune())
         {
             UInt32 total = GetVar(VAR_JUNE_RECHARGE_TOTAL);
@@ -6327,10 +6375,14 @@ namespace GObject
 
     void Player::sendRechargeInfo()
     {
-        if (!World::getRechargeActive())
+        if (!World::getRechargeActive() || !World::getRechargeActive3366())
             return;
 
-        UInt32 total = GetVar(VAR_RECHARGE_TOTAL);
+        UInt32 total;
+        if(World::getRechargeActive())
+             total = GetVar(VAR_RECHARGE_TOTAL);
+        else
+            total = GetVar(VAR_RECHARGE_TOTAL3366);
 		Stream st(REP::DAILY_DATA);
 		st << static_cast<UInt8>(12) << total << Stream::eos;
 		send((st));
@@ -7822,8 +7874,8 @@ namespace GObject
         }
 #else
 		char numstr[16];
-        char separator[2] = {32, 0};
-        //char separator[] = {"\n "}; //分隔符是回车加空格
+        //char separator[2] = {32, 0};
+        char separator[] = {"\n "}; //分隔符是回车加空格
 
         std::string sepStr(separator);
 		sprintf(numstr, "%u", _playerData.title);

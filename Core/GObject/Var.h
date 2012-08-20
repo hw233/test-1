@@ -206,6 +206,8 @@ namespace GObject
         VAR_TJ_TASK2_RECV=162,      //天劫任务2是否已领取任务
         VAR_TJ_TASK3_COPYID=163,    //天劫任务3当前破阵层数
 
+        VAR_RECHARGE_TOTAL3366 = 169, //3366合作充值活动
+
         VAR_MAX,
     };
 

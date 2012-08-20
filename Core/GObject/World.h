@@ -93,6 +93,10 @@ public:
     { _rechargeactive = v; if (v) _rechargeactiveno |= no; else _rechargeactiveno &= ~no; }
     inline static bool getRechargeActive()
     { return _rechargeactive; }
+    inline static void setRechargeActive3366(bool v, UInt8 no)
+    { _rechargeactive3366 = v; if (v) _rechargeactiveno |= no; else _rechargeactiveno &= ~no; }
+    inline static bool getRechargeActive3366()
+    { return _rechargeactive3366; }
     inline static void setValentineDay(bool v)
     { _valentineday = v; }
     inline static bool getValentineDay()
@@ -290,6 +294,7 @@ public:
     static bool _newyear;
     static bool _blueactiveday;
     static bool _rechargeactive;
+    static bool _rechargeactive3366;
     static UInt8 _rechargeactiveno;
     static bool _valentineday;
     static bool _netvalentineday;

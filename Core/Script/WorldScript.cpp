@@ -65,6 +65,8 @@ void WorldScript::init()
 	def("setBlueactiveday", GObject::World::setBlueactiveday);
 	def("getRechargeActive", GObject::World::getRechargeActive);
 	def("setRechargeActive", GObject::World::setRechargeActive);
+	def("getRechargeActive3366", GObject::World::getRechargeActive3366);
+	def("setRechargeActive3366", GObject::World::setRechargeActive3366);
 	def("getValentineDay", GObject::World::getValentineDay);
 	def("setValentineDay", GObject::World::setValentineDay);
 	def("getNetValentineDay", GObject::World::getNetValentineDay);
