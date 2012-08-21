@@ -1249,6 +1249,22 @@ namespace GObject
         udpLog("luckyDraw", action, "", "", "", "", "act", num);
     }
 
+    void Player::qixiUdpLog(UInt32 id)
+    {
+        // 七夕活动相关日志
+        char action[16] = "";
+        snprintf (action, 16, "F_%d", id);
+        udpLog("qixi", action, "", "", "", "", "act");
+    }
+
+    void Player::clanUdpLog(UInt32 id)
+    {
+        // 帮派相关日志
+        char action[16] = "";
+        snprintf (action, 16, "F_%d", id);
+        udpLog("clan", action, "", "", "", "", "act");
+    }
+
     void Player::sendHalloweenOnlineAward(UInt32 now, bool _online)
     {
         _online = false; // XXX: fuck
@@ -3593,6 +3609,12 @@ namespace GObject
         if (ci)
         {
             udpLog(ci->purchaseType, ci->itemId, ci->itemNum, c, "add");
+        }
+
+        // 统计鹊桥道具购买的日志
+        if (ci->itemId == 9122)
+        {
+            udpLog("qixi", "I_9122_1", "", "", "", "", "act", ci->itemNum);
         }
 #ifdef _FB
 #else
@@ -11488,6 +11510,7 @@ namespace GObject
         m_qixi.bind = 0;
 
         pl->beDivorceQixi(this);
+        qixiUdpLog(1085);
 
 		DB().PushUpdateData("UPDATE `qixi` SET `lover`=0, `bind`=0 WHERE `playerId` = %"I64_FMT"u", getId());
         WORLD().DivorceQixiPair(this);
@@ -11505,7 +11528,10 @@ namespace GObject
         UInt8 bind = pl->beQixiEyes(this);
         onQixiEyesResp(bind);
         if(m_qixi.bind)
+        {
             WORLD().UpdateQixiScore(this, m_qixi.lover);
+        }
+        qixiUdpLog(1084);
 
 		DB().PushUpdateData("REPLACE INTO `qixi` (`pos`, `event`, `score`, `bind`, `lover`, `playerId`) VALUES(%u, %u, %u, %u, %"I64_FMT"u, %"I64_FMT"u)", m_qixi.pos, m_qixi.event, m_qixi.score, m_qixi.bind, pl->getId(), getId());
     }
@@ -11518,10 +11544,14 @@ namespace GObject
             return;
         }
         if(false == GetPackage()->DelItemAny(QIXI_XIQUE, 1, NULL, ToQixi))
+        {
             return;
+        }
+        udpLog("qixi", "I_9122_2", "", "", "", "", "act");
 
         UInt8 pos2 = GameAction()->onRoamingQueqiao(this, pos);
 
+        qixiUdpLog(1083);
         Stream st(REP::ACTIVE);
         st << static_cast<UInt8>(0x01) << static_cast<UInt8>(0x03) << pos2;
         st << Stream::eos;
