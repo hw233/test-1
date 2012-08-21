@@ -541,6 +541,10 @@ namespace GObject
                     udpLog(item->getClass(), typeId, num, 0, "add");
                 }
                 cittaUdpLog(1, typeId, num);
+                if (fromWhere == FromQixi)
+                {
+                    qixiUdpLog(typeId, num);
+                }
 
                 if (typeId == 1209)
                     m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
@@ -570,6 +574,12 @@ namespace GObject
                     udpLog(item->getClass(), typeId, num, 0, "add");
                 }
                 cittaUdpLog(1, typeId, num);
+
+                if (fromWhere == FromQixi)
+                {
+                    qixiUdpLog(typeId, num);
+                }
+
                 //增加获取物品的荣誉
                 //GameAction()->doAttainment(m_Owner, Script::ON_ADD_ITEM, typeId);
                 if (typeId == 1209)
@@ -617,6 +627,10 @@ namespace GObject
                 udpLog(item->getClass(), typeId, count, 0, "add");
             }
             cittaUdpLog(1, typeId, count);
+            if (fromWhere == FromQixi)
+            {
+                qixiUdpLog(typeId, count);
+            }
             if (typeId == 1209)
                 m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
             if (typeId == 1223)
@@ -640,6 +654,10 @@ namespace GObject
                 udpLog(item->getClass(), typeId, count, 0, "add");
             }
             cittaUdpLog(1, typeId, count);
+            if (fromWhere == FromQixi)
+            {
+                qixiUdpLog(typeId, count);
+            }
 			SendItemData(item);
 			ItemNotify(item->GetItemType().getId(), count);
             //获得物品
@@ -1584,6 +1602,14 @@ namespace GObject
 
         snprintf (itemAct, 32, "%d_%d", id, type);
         m_Owner->udpLog("citta", itemAct, "", "", "", "", "act", num);
+    }
+
+    void Package::qixiUdpLog(UInt32 id, UInt32 num)
+    {
+        char itemAct[32] = "";
+
+        snprintf (itemAct, 32, "F_1087_%d", id);
+        m_Owner->udpLog("qixi", itemAct, "", "", "", "", "act", num);
     }
 
     void Package::gemMergeUdpLog(UInt32 num)

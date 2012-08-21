@@ -207,6 +207,10 @@ function loadStore()
             store:add(2,9120,400)
         end
 
+        if getQixi() then
+            store:add(2,9122,10)
+        end
+
         store:add(2,551,10)
         store:add(2,1528,50)
         store:add(2,9082,5)
@@ -224,7 +228,6 @@ function loadStore()
         store:add(2,9015,10)
         store:add(2,9016,10)
         store:add(2,9035,10)
-        store:add(2,9122,10)
         store:add(2,9123,50)
         store:add(2,548,1)
         store:add(2,465,20)

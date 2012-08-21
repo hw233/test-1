@@ -2202,7 +2202,7 @@ function ItemNormal_00000021(iid, num, bind, param)
 	   local package = player:GetPackage();
 	   local reqGrids = 21;
 	   if reqGrids <= 	package:GetRestPackageSize() then
-	       package:DelItemSendMsg(20, player);
+	       package:DelItemSendMsg(iid, player);
            local fgt = player:getMainFighter();
            if fgt == nil then
                return false
