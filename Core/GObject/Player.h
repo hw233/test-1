@@ -1501,6 +1501,8 @@ namespace GObject
         void practiceUdpLog();
         void arenaUdpLog(UInt32 id, UInt8 type = 0);
         void luckyDrawUdpLog(UInt32 id, UInt8 type, UInt32 num = 1);
+        void qixiUdpLog(UInt32 id);
+        void clanUdpLog(UInt32 id);
         void guideUdp(UInt8 type, std::string& p1, std::string& p2);
         void moneyLog(int type, int gold, int coupon = 0, int tael = 0, int achievement = 0, int prestige = 0);
         void actUdp(UInt8 type, std::string& p1, std::string& p2);

@@ -3393,6 +3393,7 @@ void Clan::GetWeal(Player* player)
 
     addMemberProffer(player, tael);
     player->AddVar(VAR_CLAN_WEAL, tael);
+    player->clanUdpLog(1089);
     SYSMSG_SENDV(2242, player, tael);
 
     SendPackageInfo(player);
