@@ -11530,7 +11530,7 @@ namespace GObject
         pl->beDivorceQixi(this);
         qixiUdpLog(1085);
 
-		DB().PushUpdateData("UPDATE `qixi` SET `lover`=0, `bind`=0 WHERE `playerId` = %"I64_FMT"u", getId());
+		DB1().PushUpdateData("UPDATE `qixi` SET `lover`=0, `bind`=0 WHERE `playerId` = %"I64_FMT"u", getId());
         WORLD().DivorceQixiPair(this);
         sendQixiInfo();
     }
@@ -11551,7 +11551,7 @@ namespace GObject
         }
         qixiUdpLog(1084);
 
-		DB().PushUpdateData("REPLACE INTO `qixi` (`pos`, `event`, `score`, `bind`, `lover`, `playerId`) VALUES(%u, %u, %u, %u, %"I64_FMT"u, %"I64_FMT"u)", m_qixi.pos, m_qixi.event, m_qixi.score, m_qixi.bind, pl->getId(), getId());
+		DB1().PushUpdateData("REPLACE INTO `qixi` (`pos`, `event`, `score`, `bind`, `lover`, `playerId`) VALUES(%u, %u, %u, %u, %"I64_FMT"u, %"I64_FMT"u)", m_qixi.pos, m_qixi.event, m_qixi.score, m_qixi.bind, pl->getId(), getId());
     }
 
     void Player::roamingQueqiao(UInt8 pos)
@@ -11584,7 +11584,7 @@ namespace GObject
         m_qixi.bind = 0;
 
         sendMsgCode(0, 1029);
-		DB().PushUpdateData("UPDATE `qixi` SET `bind`=0 WHERE `playerId` = %"I64_FMT"u", getId());
+		DB1().PushUpdateData("UPDATE `qixi` SET `bind`=0 WHERE `playerId` = %"I64_FMT"u", getId());
         sendQixiInfo();
     }
 
@@ -11600,7 +11600,7 @@ namespace GObject
             m_qixi.bind = 1;
             bind = 1;
 
-            DB().PushUpdateData("UPDATE `qixi` SET `bind`=%u WHERE `playerId` = %"I64_FMT"u", bind, getId());
+            DB1().PushUpdateData("UPDATE `qixi` SET `bind`=%u WHERE `playerId` = %"I64_FMT"u", bind, getId());
             sendQixiInfo();
         }
 
@@ -11644,11 +11644,18 @@ namespace GObject
         m_qixi.score += score;
 
         if(m_qixi.lover == NULL and m_qixi.score == score)
-            DB().PushUpdateData("REPLACE INTO `qixi` (`pos`, `event`, `score`, `bind`, `lover`, `playerId`) VALUES(%u, %u, %u, %u, 0, %"I64_FMT"u)", m_qixi.pos, m_qixi.event, m_qixi.score, m_qixi.bind, getId());
+            DB1().PushUpdateData("REPLACE INTO `qixi` (`pos`, `event`, `score`, `bind`, `lover`, `playerId`) VALUES(%u, %u, %u, %u, 0, %"I64_FMT"u)", m_qixi.pos, m_qixi.event, m_qixi.score, m_qixi.bind, getId());
         else
-            DB().PushUpdateData("UPDATE `qixi` SET `pos`=%u, `event`=%u, `score`=%u WHERE `playerId` = %"I64_FMT"u", pos, event, m_qixi.score, getId());
+            DB1().PushUpdateData("UPDATE `qixi` SET `pos`=%u, `event`=%u, `score`=%u WHERE `playerId` = %"I64_FMT"u", pos, event, m_qixi.score, getId());
         if(m_qixi.bind)
             WORLD().UpdateQixiScore(this, m_qixi.lover);
+    }
+
+    void Player::resetQixi()
+    {
+        m_qixi.bind = 0;
+        m_qixi.lover = NULL;
+        DB1().PushUpdateData("UPDATE `qixi` SET `bind`=0, `lover`=0 WHERE `playerId` = %"I64_FMT"u", getId());
     }
 
 } // namespace GObject
