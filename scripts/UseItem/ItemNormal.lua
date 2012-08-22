@@ -2202,7 +2202,7 @@ function ItemNormal_00000021(iid, num, bind, param)
 	   local package = player:GetPackage();
 	   local reqGrids = 21;
 	   if reqGrids <= 	package:GetRestPackageSize() then
-	       package:DelItemSendMsg(20, player);
+	       package:DelItemSendMsg(iid, player);
            local fgt = player:getMainFighter();
            if fgt == nil then
                return false
@@ -3072,6 +3072,9 @@ function ItemNormal_citta(iid, num, bind, param)
 	if fgt == nil then
 		return false;
 	end
+    if num ~= 1 then
+        return false
+    end
     local cls = fgt:getClass()
     local car = package:GetItemCareer(iid, bind)
     if car ~= 0 then
@@ -3086,12 +3089,92 @@ function ItemNormal_citta(iid, num, bind, param)
     return num
 end
 
+function cittamerge(iid, num, bind, param)
+	local player = GetPlayer();
+	local package = player:GetPackage();
+
+    local citta2citta = {
+        [6054] = 6053,
+        [6055] = 6053,
+        [6057] = 6056,
+        [6058] = 6056,
+        [6059] = 6056,
+        [6060] = 6056,
+        [6062] = 6061,
+        [6063] = 6061,
+        [6064] = 6061,
+        [6065] = 6061,
+        [6066] = 6061,
+        [6068] = 6067,
+        [6069] = 6067,
+        [6070] = 6067,
+        [6071] = 6067,
+        [6072] = 6067,
+        [6074] = 6073,
+        [6075] = 6073,
+        [6076] = 6073,
+        [6077] = 6073,
+        [6078] = 6073,
+        [6079] = 6073,
+        [6081] = 6080,
+        [6082] = 6080,
+        [6083] = 6080,
+        [6084] = 6080,
+        [6085] = 6080,
+        [6086] = 6080,
+        [6088] = 6087,
+        [6089] = 6087,
+        [6090] = 6087,
+        [6091] = 6087,
+        [6092] = 6087,
+        [6093] = 6087,
+        [6095] = 6094,
+        [6096] = 6094,
+        [6097] = 6094,
+        [6098] = 6094,
+        [6099] = 6094,
+        [6100] = 6094,
+        [6101] = 6094,
+        [6102] = 6094,
+        [6104] = 6103,
+        [6105] = 6103,
+        [6106] = 6103,
+        [6107] = 6103,
+        [6108] = 6103,
+        [6109] = 6103,
+        [6110] = 6103,
+        [6111] = 6103,
+        [6113] = 6112,
+        [6114] = 6112,
+        [6115] = 6112,
+        [6116] = 6112,
+        [6117] = 6112,
+        [6118] = 6112,
+        [6119] = 6112,
+        [6120] = 6112,
+    }
+
+	if package:GetRestPackageSize() < num then		
+		player:sendMsgCode(2, 1011, 0);
+		return false;
+	end
+
+    package:Add(citta2citta[iid], num, bind);
+
+	package:DelItemSendMsg(iid, player);
+    return num
+end
+
 function ItemNormal_formation(iid, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
 
     if package:GetItemNum(iid, true) == 0 and package:GetItemNum(iid, false) ==0 then
         return false;
+    end
+
+    if num ~= 1 then
+        return false
     end
 
     local formation = iid - FormationBookBase + 1
@@ -4450,6 +4533,149 @@ function ItemNormal_00010010(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00010011(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (3+(3*num*5)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    package:Add(440, num*5, true, 0, 2);
+    package:Add(51, num*5, true, 0, 2);
+    package:Add(48, num*5, true, 0, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010012(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (6+(6*num*5)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    package:Add(440, num*5, true, 0, 2);
+    package:Add(51, num*5, true, 0, 2);
+    package:Add(48, num*5, true, 0, 2);
+    package:Add(49, num*5, true, 0, 2);
+    package:Add(50, num*5, true, 0, 2);
+    package:Add(56, num*5, true, 0, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010013(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (6+(6*num*5)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    package:Add(440, num*5, true, 0, 2);
+    package:Add(51, num*5, true, 0, 2);
+    package:Add(48, num*5, true, 0, 2);
+    package:Add(49, num*5, true, 0, 2);
+    package:Add(50, num*5, true, 0, 2);
+    package:Add(57, num*5, true, 0, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010014(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (6+(6*num*5)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    package:Add(440, num*5, true, 0, 2);
+    package:Add(51, num*5, true, 0, 2);
+    package:Add(48, num*5, true, 0, 2);
+    package:Add(49, num*5, true, 0, 2);
+    package:Add(50, num*5, true, 0, 2);
+    package:Add(15, num*5, true, 0, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010015(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (12+(12*num*7)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    package:Add(56, num*10, true, 0, 2);
+    package:Add(57, num*10, true, 0, 2);
+    package:Add(508, num*10, true, 0, 2);
+    package:Add(506, num*10, true, 0, 2);
+    package:Add(15, num*10, true, 0, 2);
+    package:Add(49, num*5, true, 0, 2);
+    package:Add(50, num*5, true, 0, 2);
+    package:Add(503, num*10, true, 0, 2);
+    package:Add(509, num*5, true, 0, 2);
+    package:Add(507, num*5, true, 0, 2);
+    package:Add(549, num*2, true, 0, 2);
+    package:Add(440, num*2, true, 0, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010016(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (7+(7*num*5)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    package:Add(56, num*5, true, 0, 2);
+    package:Add(57, num*5, true, 0, 2);
+    package:Add(508, num*5, true, 0, 2);
+    package:Add(506, num*5, true, 0, 2);
+    package:Add(15, num*5, true, 0, 2);
+    package:Add(48, num*5, true, 0, 2);
+    package:Add(440, num*2, true, 0, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010017(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (6+(6*num*3)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    package:Add(56, num*5, true, 0, 2);
+    package:Add(57, num*5, true, 0, 2);
+    package:Add(549, num*1, true, 0, 2);
+    package:Add(51, num*1, true, 0, 2);
+    package:Add(440, num*1, true, 0, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
 function ItemNormal_QixiLoveCard(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -4760,6 +4986,65 @@ local ItemNormal_Table = {
     [23] = ItemNormal_athletics_23,
     [24] = ItemNormal_athletics_24,
     [25] = ItemNormal_athletics_25,
+
+    [6054] = cittamerge,
+    [6055] = cittamerge,
+    [6057] = cittamerge,
+    [6058] = cittamerge,
+    [6059] = cittamerge,
+    [6060] = cittamerge,
+    [6062] = cittamerge,
+    [6063] = cittamerge,
+    [6064] = cittamerge,
+    [6065] = cittamerge,
+    [6066] = cittamerge,
+    [6068] = cittamerge,
+    [6069] = cittamerge,
+    [6070] = cittamerge,
+    [6071] = cittamerge,
+    [6072] = cittamerge,
+    [6074] = cittamerge,
+    [6075] = cittamerge,
+    [6076] = cittamerge,
+    [6077] = cittamerge,
+    [6078] = cittamerge,
+    [6079] = cittamerge,
+    [6081] = cittamerge,
+    [6082] = cittamerge,
+    [6083] = cittamerge,
+    [6084] = cittamerge,
+    [6085] = cittamerge,
+    [6086] = cittamerge,
+    [6088] = cittamerge,
+    [6089] = cittamerge,
+    [6090] = cittamerge,
+    [6091] = cittamerge,
+    [6092] = cittamerge,
+    [6093] = cittamerge,
+    [6095] = cittamerge,
+    [6096] = cittamerge,
+    [6097] = cittamerge,
+    [6098] = cittamerge,
+    [6099] = cittamerge,
+    [6100] = cittamerge,
+    [6101] = cittamerge,
+    [6102] = cittamerge,
+    [6104] = cittamerge,
+    [6105] = cittamerge,
+    [6106] = cittamerge,
+    [6107] = cittamerge,
+    [6108] = cittamerge,
+    [6109] = cittamerge,
+    [6110] = cittamerge,
+    [6111] = cittamerge,
+    [6113] = cittamerge,
+    [6114] = cittamerge,
+    [6115] = cittamerge,
+    [6116] = cittamerge,
+    [6117] = cittamerge,
+    [6118] = cittamerge,
+    [6119] = cittamerge,
+    [6120] = cittamerge,
 
     [7000] = ItemNormal_00007000,
     [7001] = ItemNormal_00007000,
@@ -5893,6 +6178,13 @@ local ItemNormal_Table = {
     [10008] = ItemNormal_00010008,
     [10009] = ItemNormal_00010009,
     [10010] = ItemNormal_00010010,
+    [10011] = ItemNormal_00010011,
+    [10012] = ItemNormal_00010012,
+    [10013] = ItemNormal_00010013,
+    [10014] = ItemNormal_00010014,
+    [10015] = ItemNormal_00010015,
+    [10016] = ItemNormal_00010016,
+    [10017] = ItemNormal_00010017,
 };
 
 function ItemNormalOther_00000441(iid, num, bind, other)

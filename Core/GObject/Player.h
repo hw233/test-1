@@ -967,8 +967,8 @@ namespace GObject
 		void makeFighterList(Stream&);
 		void makeFighterInfo(Stream&, Fighter *, bool = true);
 		bool makeFighterInfo(Stream&, UInt32);
-        void sendRechargeInfo();
-        void sendConsumeInfo();
+        void sendRechargeInfo(bool rank = false);
+        void sendConsumeInfo(bool rank = false);
         void getMDItem();
         void sendMDSoul(UInt8 type, UInt32 id = 0);
         void sendJuneRechargeMails(UInt32 value);
@@ -1377,6 +1377,7 @@ namespace GObject
         std::vector<LastAthAward> _lastAthAward;
         std::vector<GData::LootResult> _equipAward;
 		std::vector<GData::LootResult> _RegisterAward;
+		std::vector<GData::LootResult> _lastQueqiaoAward;
 
     private:
 		UInt16 _lastDungeon;
@@ -1504,6 +1505,9 @@ namespace GObject
         void practiceUdpLog();
         void arenaUdpLog(UInt32 id, UInt8 type = 0);
         void luckyDrawUdpLog(UInt32 id, UInt8 type, UInt32 num = 1);
+        void qixiUdpLog(UInt32 id);
+        void clanUdpLog(UInt32 id);
+        void countryBattleUdpLog(UInt32 id, UInt8 country);
         void guideUdp(UInt8 type, std::string& p1, std::string& p2);
         void moneyLog(int type, int gold, int coupon = 0, int tael = 0, int achievement = 0, int prestige = 0);
         void actUdp(UInt8 type, std::string& p1, std::string& p2);
@@ -1612,6 +1616,8 @@ namespace GObject
         void RegisterAward(UInt16 itemId, UInt16 num);
         void sendNewRegisterAward(UInt8 idx);
         void IDIPAddItem(UInt16 itemId, UInt16 num, bool bind = true);
+        void lastQueqiaoAwardPush(UInt16 itemId, UInt16 num);
+        void checkLastQueqiaoAward();
 
     private:
         bool m_hasTripod;

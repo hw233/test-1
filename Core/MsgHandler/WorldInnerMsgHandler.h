@@ -25,7 +25,9 @@
 #include "GObject/SpecialAward.h"
 #include "GObject/PracticePlace.h"
 #include "GObject/ArenaBattle.h"
+#include "GObject/World.h"
 #include "Common/Itoa.h"
+#include <set>
 
 void OnPushTimerEvent( GameMsgHdr& hdr, const void * data )
 {
@@ -759,6 +761,154 @@ void OnLuckyDraw( GameMsgHdr& hdr,  const void* data )
     WORLD().RankLuckyDraw(player);
 }
 
+void OnRechargeRank ( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    UInt32 total = *((UInt32*)data);
+    if (!total)
+        return;
+
+    bool inrank = false;
+    UInt32 oldrank = 0;
+    for (RCSortType::iterator i = World::rechargeSort.begin(), e = World::rechargeSort.end(); i != e; ++i)
+    {
+        if (i->player == player)
+        {
+            inrank = true;
+            World::rechargeSort.erase(i);
+            break;
+        }
+        ++oldrank;
+    }
+
+    RCSort s;
+    s.player = player;
+    s.total = total;
+    World::rechargeSort.insert(s);
+
+    UInt32 rank = 0;
+    for (RCSortType::iterator i = World::rechargeSort.begin(), e = World::rechargeSort.end(); i != e; ++i)
+    {
+        if (i->player == player)
+            break;
+        ++rank;
+    }
+
+#if 0
+    // TODO: broadcast
+    if ((oldrank < 20 && rank != oldrank) || (!inrank && rank < 20))
+    {
+        ++rank;
+        Stream st(0);
+        st << player->getName() << rank << Stream::eos;
+        NETWORK()->Broadcast(st);
+    }
+#endif
+}
+
+void OnConsumeRank ( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    UInt32 total = *((UInt32*)data);
+    if (!total)
+        return;
+
+    bool inrank = false;
+    UInt32 oldrank = 0;
+    for (RCSortType::iterator i = World::consumeSort.begin(), e = World::consumeSort.end(); i != e; ++i)
+    {
+        ++oldrank;
+        if (i->player == player)
+        {
+            inrank = true;
+            World::consumeSort.erase(i);
+            break;
+        }
+    }
+
+    RCSort s;
+    s.player = player;
+    s.total = total;
+    World::consumeSort.insert(s);
+
+    UInt32 rank = 0;
+    for (RCSortType::iterator i = World::consumeSort.begin(), e = World::consumeSort.end(); i != e; ++i)
+    {
+        ++rank;
+        if (i->player == player)
+            break;
+    }
+#if 0
+    // TODO: broadcast
+    if ((oldrank < 20 && rank != oldrank) || (!inrank && rank < 20))
+    {
+        ++rank;
+        Stream st(0);
+        st << player->getName() << rank << Stream::eos;
+        NETWORK()->Broadcast(st);
+    }
+#endif
+}
+
+inline bool player_enum_rc(GObject::Player * p, int)
+{
+    using namespace GObject;
+    if (World::getRechargeActive() || World::getRechargeActive3366())
+    {
+        UInt32 total;
+        if(World::getRechargeActive())
+            total = p->GetVar(VAR_RECHARGE_TOTAL);
+        else
+            total = p->GetVar(VAR_RECHARGE_TOTAL3366);
+        if (total)
+        {
+            RCSort s;
+            s.player = p;
+            s.total = total;
+            World::rechargeSort.insert(s);
+        }
+    }
+    if (World::getConsumeActive())
+    {
+        UInt32 total = p->GetVar(VAR_CONSUME);
+        if (total)
+        {
+            RCSort s;
+            s.player = p;
+            s.total = total;
+            World::consumeSort.insert(s);
+        }
+    }
+    return true;
+}
+
+static bool init = false;
+void initRCRank()
+{
+    GObject::globalPlayers.enumerate(player_enum_rc, 0);
+    init = true;
+}
+
+void OnSendRechargeRank ( GameMsgHdr& hdr,  const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    // TODO:
+    if (!init)
+        initRCRank();
+}
+
+void OnSendConsumeRank ( GameMsgHdr& hdr,  const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    // TODO:
+    if (!init)
+        initRCRank();
+}
+
 void OnRoamResult( GameMsgHdr& hdr,  const void* data )
 {
     MSG_QUERY_PLAYER(player);
@@ -774,5 +924,16 @@ void OnRoamResult( GameMsgHdr& hdr,  const void* data )
     player->qixiStepAdvance(roam->pos, roam->event, roam->score);
 }
 
+
+void OnReCalcWeekDayAddTimer( GameMsgHdr& hdr,  const void* data )
+{
+    WORLD()._recalcwd = WORLD().AddTimer(10000, WORLD().ReCalcWeekDay, &(WORLD()), 10000);
+}
+
+void OnReCalcWeekDayRemoveTimer( GameMsgHdr& hdr,  const void* data )
+{
+    WORLD().RemoveTimer(WORLD()._recalcwd);
+    WORLD()._recalcwd = NULL;
+}
 
 #endif // _WORLDINNERMSGHANDLER_H_

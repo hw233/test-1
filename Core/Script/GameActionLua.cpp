@@ -260,6 +260,7 @@ namespace Script
 		CLASS_DEF(Player, getQQVipPrivilege);
 		CLASS_DEF(Player, setQQVipPrivilege);
 		CLASS_DEF(Player, postRoamResult);
+        CLASS_DEF(Player, lastQueqiaoAwardPush);
 
         CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);

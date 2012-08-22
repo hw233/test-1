@@ -1384,6 +1384,7 @@ namespace GObject
         
         Stream stream(REP::CLAN_RANKBATTLE_REPINIT);
         stream << UInt8(1) << UInt8(0) << Stream::eos;
+        player->clanUdpLog(1088);
         player->send(stream);
     }
 

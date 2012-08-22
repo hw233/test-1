@@ -2418,7 +2418,6 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool lvlup, bool onl
 {
     if (!citta)
         return false;
-    // XXX: need this???
     const GData::CittaBase* cb = GData::cittaManager[citta];
     if (!cb)
         return false;
@@ -2433,13 +2432,7 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool lvlup, bool onl
     if (!lvlup && _cittas[cidx] != citta)
         return false;
 
-#if 0
-    if (!(idx >= 0 && idx < getUpCittasMax())) // dst
-        return false;
-#endif
-
     int op = 0;
-    bool swap = false;
     bool ret = false;
     int src = isCittaUp(citta);
     if (src < 0)
@@ -2450,24 +2443,9 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool lvlup, bool onl
             return false;
         }
 
-#if 0
-        if (idx < getUpCittasNum()) // XXX: no we all append
-        {
-            if (getUpCittasNum() < getUpCittasMax()) {
-                for (int j = getUpCittasMax() - 1; j >= idx+1; --j)
-                {
-                    _citta[j] = _citta[j-1];
-                    _citta[j-1] = 0;
-                    //if (_citta[j])
-                    //    sendModification(0x62, _citta[j], j, writedb);
-                }
-            }
-        } else
-#else
-            idx = getUpCittasNum();
-            if (!(idx >= 0 && idx < getUpCittasMax())) // dst
-                return false;
-#endif
+        idx = getUpCittasNum();
+        if (!(idx >= 0 && idx < getUpCittasMax())) // dst
+            return false;
 
         if (_citta[idx])
             offCitta(_citta[idx], false, true, writedb);
@@ -2478,39 +2456,20 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool lvlup, bool onl
     }
     else
     {
-#if 0
-        if (src != idx)
-        {
-            if (_citta[idx])
-            { // swap
-                // sendModification(0x62, _citta[idx], src, writedb);
-
-                _citta[src] ^= _citta[idx];
-                _citta[idx] ^= _citta[src];
-                _citta[src] ^= _citta[idx];
-                ret = true;
-                swap = true;
-            }
-        }
-        else
-#else
         idx = src;
-#endif
-        { // upgrade
-            if (_citta[idx] != citta)
-            {
-                const GData::CittaBase* yacb = GData::cittaManager[_citta[idx]];
-                if (!yacb)
-                    return false;
-                if (cb->needsoul > getMaxSoul() - (getSoul() - yacb->needsoul))
-                    return false;
+        if (_citta[idx] != citta) // upgrade
+        {
+            const GData::CittaBase* yacb = GData::cittaManager[_citta[idx]];
+            if (!yacb)
+                return false;
+            if (cb->needsoul > getMaxSoul() - (getSoul() - yacb->needsoul))
+                return false;
 
-                // XXX: do not send message to client
-                offCitta(_citta[idx], false, false, writedb); // delete skills was taken out by old citta first
-                _citta[idx] = citta;
-                ret = true;
-                op = 3;
-            }
+            // XXX: do not send message to client
+            offCitta(_citta[idx], false, false, writedb); // delete skills was taken out by old citta first
+            _citta[idx] = citta;
+            ret = true;
+            op = 3;
         }
     }
 
@@ -2518,7 +2477,6 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool lvlup, bool onl
     {
         _attrDirty = true;
         _bPDirty = true;
-        //sendModification(0x62, citta, idx, writedb);
         sendModification(0x62, citta, op/*1add,2del,3mod*/, writedb);
 
         if(online && writedb && CURRENT_THREAD_ID() <= WORKER_THREAD_NEUTRAL)
@@ -2529,7 +2487,7 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool lvlup, bool onl
             _owner->OnHeroMemo(MC_CITTA, MD_ADVANCED, 0, 1);
     }
 
-    if (ret && !swap)
+    if (ret)
     {
         bool up = true;//_owner?(_owner->getMainFighter()?_owner->getMainFighter()->getLevel()>=10:true):false;
         /*

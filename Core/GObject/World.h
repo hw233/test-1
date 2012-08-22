@@ -34,6 +34,19 @@ typedef LuckyDrawList::iterator LuckyDrawRank;
 typedef LuckyDrawList::reverse_iterator RLuckyDrawRank;
 typedef std::map<Player *, LuckyDrawRank> LuckyDrawRankList;
 
+struct RCSort
+{
+    GObject::Player* player;
+    UInt32 total;
+};
+
+struct lt_rcsort
+{
+    bool operator()(const RCSort& a, const RCSort& b) const { return a.total >= b.total; }
+};
+
+typedef std::set<RCSort, lt_rcsort> RCSortType;
+
 struct QixiScore
 {
     Player* lover;
@@ -368,6 +381,10 @@ public:
     static bool _opentest;
     static bool _consumeactive;
 
+public:
+    static RCSortType rechargeSort;
+    static RCSortType consumeSort;
+
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }
 	void OnTimer();
@@ -391,9 +408,11 @@ private:
     static void World_Boss_Prepare(void*);
     static void Hero_Island_Process(void*);
     static void Team_Copy_Process(void*);
-	static void ReCalcWeekDay( World * );
 	static void World_One_Min( World * );
     static void AthleticsPhysicalCheck(void *);
+
+public:
+	static void ReCalcWeekDay( World * );
 
 public:
     void UpdateQixiScore(Player* pl, Player* lover);

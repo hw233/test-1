@@ -541,6 +541,18 @@ namespace GObject
                     udpLog(item->getClass(), typeId, num, 0, "add");
                 }
                 cittaUdpLog(1, typeId, num);
+                if (fromWhere == FromQixi)
+                {
+                    qixiUdpLog(typeId, num);
+                }
+
+                // 太乙精金的特殊记录
+                if (typeId == 503 && bind!= true)
+                {
+                    m_Owner->udpLog("item", "I_503_1_2", "", "", "", "", "act", num);
+                }
+
+
 
                 if (typeId == 1209)
                     m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
@@ -570,8 +582,20 @@ namespace GObject
                     udpLog(item->getClass(), typeId, num, 0, "add");
                 }
                 cittaUdpLog(1, typeId, num);
+
+                if (fromWhere == FromQixi)
+                {
+                    qixiUdpLog(typeId, num);
+                }
+
+                // 太乙精金的特殊记录
+                if (typeId == 503 && bind!= true)
+                {
+                    m_Owner->udpLog("item", "I_503_1_2", "", "", "", "", "act", num);
+                }
+
                 //增加获取物品的荣誉
-                GameAction()->doAttainment(m_Owner, Script::ON_ADD_ITEM, typeId);
+                //GameAction()->doAttainment(m_Owner, Script::ON_ADD_ITEM, typeId);
                 if (typeId == 1209)
                     m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
                 if (typeId == 1223)
@@ -617,6 +641,16 @@ namespace GObject
                 udpLog(item->getClass(), typeId, count, 0, "add");
             }
             cittaUdpLog(1, typeId, count);
+            if (fromWhere == FromQixi)
+            {
+                qixiUdpLog(typeId, count);
+            }
+            // 太乙精金的特殊记录
+            if (typeId == 503 && bind!= true)
+            {
+                m_Owner->udpLog("item", "I_503_1_2", "", "", "", "", "act", count);
+            }
+
             if (typeId == 1209)
                 m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
             if (typeId == 1223)
@@ -640,10 +674,20 @@ namespace GObject
                 udpLog(item->getClass(), typeId, count, 0, "add");
             }
             cittaUdpLog(1, typeId, count);
+            if (fromWhere == FromQixi)
+            {
+                qixiUdpLog(typeId, count);
+            }
+            // 太乙精金的特殊记录
+            if (typeId == 503 && bind!= true)
+            {
+                m_Owner->udpLog("item", "I_503_1_2", "", "", "", "", "act", count);
+            }
+
 			SendItemData(item);
 			ItemNotify(item->GetItemType().getId(), count);
             //获得物品
-            GameAction()->doAttainment(m_Owner, Script::ON_ADD_ITEM, typeId);
+            //GameAction()->doAttainment(m_Owner, Script::ON_ADD_ITEM, typeId);
             //if((fromWhere != 0  && item->getQuality() >= 3) || (fromWhere == FromMerge && item->getQuality() >= 2))
             //{
                  AddItemCoursesLog(typeId, static_cast<UInt32>(count), fromWhere);
@@ -1033,6 +1077,13 @@ namespace GObject
             cittaUdpLog(2, id, num);
             if (toWhere == ToSkillStrengthenOpen || toWhere == ToSkillStrengthenUpgrade)
                 cittaUdpLog(3, id, num);
+
+            // 太乙精金的特殊记录
+            if (id == 503 && bind!= true)
+            {
+                m_Owner->udpLog("item", "I_503_2_2", "", "", "", "", "act", num);
+            }
+
 			SendItemData(item);
 			if (cnt == 0)
 			{
@@ -1072,6 +1123,12 @@ namespace GObject
             cittaUdpLog(2, item->getId(), num);
             if (toWhere == ToSkillStrengthenOpen || toWhere == ToSkillStrengthenUpgrade)
                 cittaUdpLog(3, item->getId(), num);
+
+            // 太乙精金的特殊记录
+            if (item->getId() == 503 && item->GetBindStatus()!= true)
+            {
+                m_Owner->udpLog("item", "I_503_2_2", "", "", "", "", "act", num);
+            }
 
 			SendItemData(item);
 			UInt32 id = item->getId();
@@ -1453,8 +1510,8 @@ namespace GObject
             ret = false;}
 		else
 		{
-            if (GetItemSubClass(id) == Item_Formula || GetItemSubClass(id) == Item_Citta)
-                num = 1;
+            //if (GetItemSubClass(id) == Item_Formula || GetItemSubClass(id) == Item_Citta) // XXX: confirm in lua
+            //    num = 1;
 
 			if (bind != 0xFF)
 			{
@@ -1584,6 +1641,14 @@ namespace GObject
 
         snprintf (itemAct, 32, "%d_%d", id, type);
         m_Owner->udpLog("citta", itemAct, "", "", "", "", "act", num);
+    }
+
+    void Package::qixiUdpLog(UInt32 id, UInt32 num)
+    {
+        char itemAct[32] = "";
+
+        snprintf (itemAct, 32, "F_1087_%d", id);
+        m_Owner->udpLog("qixi", itemAct, "", "", "", "", "act", num);
     }
 
     void Package::gemMergeUdpLog(UInt32 num)

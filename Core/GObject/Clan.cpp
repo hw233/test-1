@@ -472,6 +472,11 @@ bool Clan::kick(Player * player, UInt64 pid)
         player->sendMsgCode(0, 1317);
         return false;
     }
+    if(ClanRankBattleMgr::Instance().IsInBattle(this))
+    {
+        SYSMSG_SEND(2235, player);          
+        return false;
+    }
 
 	Mutex::ScopedLock lk(_mutex);
 	Members::iterator found = find(pid);
@@ -3388,6 +3393,7 @@ void Clan::GetWeal(Player* player)
 
     addMemberProffer(player, tael);
     player->AddVar(VAR_CLAN_WEAL, tael);
+    player->clanUdpLog(1089);
     SYSMSG_SENDV(2242, player, tael);
 
     SendPackageInfo(player);

@@ -1861,6 +1861,44 @@ function sendRechargeMails5(player, ototal, ntotal)
     end
 end
 
+function sendRechargeMails6(player, ototal, ntotal)
+    local lvls = {
+        10,99,199,399,699,1099,1599,2199,2899,3699,4599,5599,8999,15999,26999,42999,64999,
+    }
+    local items = {
+        {1325,1,1, 551,2,1},
+        {503,2,1, 516,2,1},
+        {8000,1,1, 551,2,1},
+        {517,2,1, 1325,1,1},
+        {505,2,1, 15,6,1},
+        {512,1,1, 513,1,1},
+        {1528,1,1, 1325,1,1},
+        {515,3,1, 509,2,1},
+        {503,2,1, 516,2,1},
+        {1325,2,1, 515,1,1},
+        {517,3,1, 549,2,1, 509,2,1},
+        {1528,2,1},
+        {1325,5,1, 516,3,1},
+        {1528,2,1, 549,2,1, 515,2,1},
+        {509,2,1, 507,2,1, 515,3,1, 1325,2,1},
+        {509,2,1, 507,2,1, 515,3,1, 1528,5,1},
+        {509,3,1, 507,3,1, 515,5,1, 503,10,1},
+    }
+
+    local olvl = calcRechargeLevel(lvls, ototal)
+    local nlvl = calcRechargeLevel(lvls, ntotal)
+
+    if nlvl == 0 or olvl == nlvl then
+        return
+    end
+
+    for k = olvl+1, nlvl do
+        local title = string.format(msg_100, lvls[k])
+        local ctx = string.format(msg_101, lvls[k])
+        sendItemPackageMail(player, title, ctx, items[k]);
+    end
+end
+
 function sendRechargeMails(player, ototal, ntotal)
     --sendRechargeMails1(player, ototal, ntotal)
     --[[local start = { ['year'] = 2012, ['month'] = 7, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1870,12 +1908,13 @@ function sendRechargeMails(player, ototal, ntotal)
     else
         sendRechargeMails2(player, ototal, ntotal)
     end--]]
-    if getRechargeActive() then
-        sendRechargeMails4(player, ototal, ntotal)
-    end
-    if getRechargeActive3366() then
-        sendRechargeMails5(player, ototal, ntotal)
-    end
+    --if getRechargeActive() then
+    --    sendRechargeMails4(player, ototal, ntotal)
+    --end
+    --if getRechargeActive3366() then
+    --    sendRechargeMails5(player, ototal, ntotal)
+    --end
+    sendRechargeMails6(player, ototal, ntotal)
 end
 
 function onEquipForge(player, id, onums)
@@ -2032,7 +2071,7 @@ function onRoamingQueqiao(player, pos)
         {{511, 2, 20}, {512, 1, 30}, {517, 1, 30}},
         {{9122, 1, 10}, {9122, 1, 10}, {9122, 1, 10}},
         {{503, 1, 30}, {514, 1, 30}, {501, 1, 30}},
-        {{509, 1, 40}, {507, 1, 40}, {515, 1, 40}},
+        {{509, 1, 40}, {1528, 1, 40}, {1325, 1, 40}},
         {{1647, 1, 50}, {1648, 1, 50}, {1649, 1, 50}},
     }
 
@@ -2047,7 +2086,7 @@ function onRoamingQueqiao(player, pos)
     j = math.random(1, 3)
 
     package:Add(eventItem[i][j][1], eventItem[i][j][2], true, true, 32)
-    player:lastLootPush(eventItem[i][j][1], eventItem[i][j][2]);
+    player:lastQueqiaoAwardPush(eventItem[i][j][1], eventItem[i][j][2]);
     player:postRoamResult(pos2, j, eventItem[i][j][3]);
 
     return pos2;

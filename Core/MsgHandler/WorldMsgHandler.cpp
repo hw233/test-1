@@ -113,6 +113,10 @@ MSG_REG_2(GameMsgHdr, 0x1B2, OnPutSaleNotify);
 MSG_REG_2(GameMsgHdr, 0x1B3, OnBuySaleCheckOKNotify);
 
 MSG_REG_2(GameMsgHdr, 0x1C0, OnLuckyDraw);
+MSG_REG_2(GameMsgHdr, 0x1C1, OnRechargeRank);
+MSG_REG_2(GameMsgHdr, 0x1C2, OnConsumeRank);
+MSG_REG_2(GameMsgHdr, 0x1C3, OnSendRechargeRank);
+MSG_REG_2(GameMsgHdr, 0x1C4, OnSendConsumeRank);
 
 MSG_REG_2(GameMsgHdr, 0x1EE, OnReloadLuaReq);
 MSG_REG_2(GameMsgHdr, 0x1ED, OnRunscriptReq);
@@ -133,6 +137,9 @@ MSG_REG_2(GameMsgHdr, 0x1F7, OnPracticeStop);
 MSG_REG_2(GameMsgHdr, 0x1F8, OnAthleticsFlush);
 
 MSG_REG_2(GameMsgHdr, 0x1F9, OnRoamResult);
+
+MSG_REG_2(GameMsgHdr, 0x1FA, OnReCalcWeekDayAddTimer);
+MSG_REG_2(GameMsgHdr, 0x1FB, OnReCalcWeekDayRemoveTimer);
 
 #ifdef _ARENA_SERVER
 MSG_REG_2(LoginMsgHdr, 0x01, onServerReg);

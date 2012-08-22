@@ -1223,7 +1223,7 @@ namespace GObject
         // 修为相关日志（暂时只有加速）
         char action[16] = "";
         snprintf (action, 16, "F%d", _vipLevel + 1003);
-        udpLog("activity", action, "", "", "", "", "act");
+        udpLog("practice", action, "", "", "", "", "act");
     }
 
     void Player::arenaUdpLog(UInt32 id, UInt8 type /* = 0 */)
@@ -1247,6 +1247,30 @@ namespace GObject
         char action[16] = "";
         snprintf (action, 16, "F%d_%d", id + 1018, type);
         udpLog("luckyDraw", action, "", "", "", "", "act", num);
+    }
+
+    void Player::qixiUdpLog(UInt32 id)
+    {
+        // 七夕活动相关日志
+        char action[16] = "";
+        snprintf (action, 16, "F_%d", id);
+        udpLog("qixi", action, "", "", "", "", "act");
+    }
+
+    void Player::clanUdpLog(UInt32 id)
+    {
+        // 帮派相关日志
+        char action[16] = "";
+        snprintf (action, 16, "F_%d", id);
+        udpLog("clan", action, "", "", "", "", "act");
+    }
+
+    void Player::countryBattleUdpLog(UInt32 id, UInt8 country)
+    {
+        // 国战相关日志
+        char action[16] = "";
+        snprintf (action, 16, "F_%d_%d", id, country);
+        udpLog("countryBattle", action, "", "", "", "", "act");
     }
 
     void Player::sendHalloweenOnlineAward(UInt32 now, bool _online)
@@ -3593,6 +3617,12 @@ namespace GObject
         if (ci)
         {
             udpLog(ci->purchaseType, ci->itemId, ci->itemNum, c, "add");
+        }
+
+        // 统计鹊桥道具购买的日志
+        if (ci->itemId == 9122)
+        {
+            udpLog("qixi", "I_9122_1", "", "", "", "", "act", ci->itemNum);
         }
 #ifdef _FB
 #else
@@ -6371,7 +6401,7 @@ namespace GObject
             UInt32 total = GetVar(VAR_RECHARGE_TOTAL);
             GameAction()->sendRechargeMails(this, total, total+r);
             SetVar(VAR_RECHARGE_TOTAL, total+r);
-            sendRechargeInfo();
+            sendRechargeInfo(true);
 #endif
         }
 
@@ -6380,7 +6410,7 @@ namespace GObject
             UInt32 total = GetVar(VAR_RECHARGE_TOTAL3366);
             GameAction()->sendRechargeMails(this, total, total+r);
             SetVar(VAR_RECHARGE_TOTAL3366, total+r);
-            sendRechargeInfo();
+            sendRechargeInfo(true);
         }
 
         if(World::getJune())
@@ -6533,7 +6563,7 @@ namespace GObject
         }
     }
 
-    void Player::sendRechargeInfo()
+    void Player::sendRechargeInfo(bool rank)
     {
         if (!World::getRechargeActive() && !World::getRechargeActive3366())
             return;
@@ -6546,9 +6576,15 @@ namespace GObject
 		Stream st(REP::DAILY_DATA);
 		st << static_cast<UInt8>(12) << total << Stream::eos;
 		send((st));
+
+        if (rank)
+        {
+            GameMsgHdr hdr(0x1C1, WORKER_THREAD_WORLD, this, sizeof(total));
+            GLOBAL().PushMsg(hdr, &total);
+        }
     }
 
-    void Player::sendConsumeInfo()
+    void Player::sendConsumeInfo(bool rank)
     {
         if (!World::getConsumeActive())
             return;
@@ -6557,6 +6593,12 @@ namespace GObject
 		Stream st(REP::DAILY_DATA);
 		st << static_cast<UInt8>(15) << total << Stream::eos;
 		send((st));
+
+        if (rank)
+        {
+            GameMsgHdr hdr(0x1C2, WORKER_THREAD_WORLD, this, sizeof(total));
+            GLOBAL().PushMsg(hdr, &total);
+        }
     }
 
 	void Player::sendTopupMail(const char* title, const char* content, UInt32 gold, UInt8 num)
@@ -9596,6 +9638,22 @@ namespace GObject
         _RegisterAward.push_back(lt);
     }
 
+    void Player::lastQueqiaoAwardPush(UInt16 itemId, UInt16 num)
+    {
+        GData::LootResult lt = {itemId, num};
+        _lastQueqiaoAward.push_back(lt);
+    }
+
+    void Player::checkLastQueqiaoAward()
+    {
+        std::vector<GData::LootResult>::iterator it;
+        for(it = _lastQueqiaoAward.begin(); it != _lastQueqiaoAward.end(); ++ it)
+        {
+            m_Package->ItemNotify(it->id, it->count);
+        }
+        _lastQueqiaoAward.clear();
+    }
+
     void Player::sendHappyInfo(UInt16 itemId)
     {
 
@@ -11500,15 +11558,6 @@ namespace GObject
 
     void Player::sendQixiInfo()
     {
-        {
-			std::vector<GData::LootResult>::iterator it;
-			for(it = _lastLoot.begin(); it != _lastLoot.end(); ++ it)
-			{
-				m_Package->ItemNotify(it->id, it->count);
-			}
-			_lastLoot.clear();
-        }
-
         Stream st(REP::ACTIVE);
         st << static_cast<UInt8>(0x01) << static_cast<UInt8>(0x01) << static_cast<UInt8>(0x01);
         if(m_qixi.lover)
@@ -11519,6 +11568,9 @@ namespace GObject
         st << m_qixi.bind << m_qixi.pos << m_qixi.event;
         st << Stream::eos;
         send(st);
+
+        GameMsgHdr hdr1(0x255, getThreadId(), this, 0);
+        GLOBAL().PushMsg(hdr1, NULL);
     }
 
     void Player::divorceQixi()
@@ -11530,6 +11582,7 @@ namespace GObject
         m_qixi.bind = 0;
 
         pl->beDivorceQixi(this);
+        qixiUdpLog(1085);
 
 		DB().PushUpdateData("UPDATE `qixi` SET `lover`=0, `bind`=0 WHERE `playerId` = %"I64_FMT"u", getId());
         WORLD().DivorceQixiPair(this);
@@ -11547,7 +11600,10 @@ namespace GObject
         UInt8 bind = pl->beQixiEyes(this);
         onQixiEyesResp(bind);
         if(m_qixi.bind)
+        {
             WORLD().UpdateQixiScore(this, m_qixi.lover);
+        }
+        qixiUdpLog(1084);
 
 		DB().PushUpdateData("REPLACE INTO `qixi` (`pos`, `event`, `score`, `bind`, `lover`, `playerId`) VALUES(%u, %u, %u, %u, %"I64_FMT"u, %"I64_FMT"u)", m_qixi.pos, m_qixi.event, m_qixi.score, m_qixi.bind, pl->getId(), getId());
     }
@@ -11560,10 +11616,14 @@ namespace GObject
             return;
         }
         if(false == GetPackage()->DelItemAny(QIXI_XIQUE, 1, NULL, ToQixi))
+        {
             return;
+        }
+        udpLog("qixi", "I_9122_2", "", "", "", "", "act");
 
         UInt8 pos2 = GameAction()->onRoamingQueqiao(this, pos);
 
+        qixiUdpLog(1083);
         Stream st(REP::ACTIVE);
         st << static_cast<UInt8>(0x01) << static_cast<UInt8>(0x03) << pos2;
         st << Stream::eos;
