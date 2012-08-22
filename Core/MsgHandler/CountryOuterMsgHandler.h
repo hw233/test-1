@@ -980,6 +980,10 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 		pl->makePlayerInfo(st);
 		conn->send(&st[0], st.size());
 	}
+    {
+        if( !pl->GetVar(VAR_AWARD_NEWREGISTER) && pl->GetLev() == 1)
+            pl->sendNewRegisterAward(0);  //0:表示新用户注册还可以邀请好友进行抽奖
+    }
 	{
 		Stream st;
 		pl->makeFighterList(st);

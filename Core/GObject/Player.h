@@ -1373,6 +1373,7 @@ namespace GObject
 		std::vector<GData::LootResult> _lastLoot;
         std::vector<LastAthAward> _lastAthAward;
         std::vector<GData::LootResult> _equipAward;
+		std::vector<GData::LootResult> _RegisterAward;
 
     private:
 		UInt16 _lastDungeon;
@@ -1564,6 +1565,7 @@ namespace GObject
         void sendHappyInfo(UInt16 itemId = 0);
         void getTargetAward(UInt8 opt);
         void getTargetAwardRF(UInt8 opt);
+        void getNewRegisterAward(UInt8 opt);
 
         inline TripodData& getTripodData() { return m_td; }
         TripodData& newTripodData();
@@ -1604,6 +1606,8 @@ namespace GObject
         void sendDeamonAwardsInfo();
         void getDeamonAwards();
         void lastLootPush(UInt16 itemId, UInt16 num);
+        void RegisterAward(UInt16 itemId, UInt16 num);
+        void sendNewRegisterAward(UInt8 idx);
         void IDIPAddItem(UInt16 itemId, UInt16 num, bool bind = true);
 
     private:

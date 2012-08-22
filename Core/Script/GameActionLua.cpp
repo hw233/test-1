@@ -253,6 +253,7 @@ namespace Script
         CLASS_DEF(Player, sendMDSoul);
         CLASS_DEF(Player, sendHappyInfo);
         CLASS_DEF(Player, lastLootPush);
+        CLASS_DEF(Player, RegisterAward);
         CLASS_DEF(Player, hasRealItemAward);
         CLASS_DEF(Player, getRealItemAward);
         CLASS_DEF(Player, getMoneyArenaLua);
@@ -1200,6 +1201,12 @@ namespace Script
     {
 		assert(player != NULL);
 		return Call<UInt16>("RunTargetAwardRF", player);
+    }
+
+    UInt16 GameActionLua::RunNewRegisterAward(Player* player)
+    {
+		assert(player != NULL);
+		return Call<UInt16>("RunNewRegisterAward", player);
     }
 
     void GameActionLua::sendRNR(Player* player, UInt32 now, UInt32 date, UInt32 total)
