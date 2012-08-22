@@ -4450,6 +4450,15 @@ function ItemNormal_00010010(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_QixiLoveCard(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    player:setTitle(iid-9124+18)
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+
 local ItemNormal_Table = {
   [1] = ItemNormal_00000001,
 	[8] = ItemNormal_00000008,
@@ -5868,6 +5877,10 @@ local ItemNormal_Table = {
     [9118] = ItemNormal_00009118,
     [9119] = ItemNormal_00009119,
     [9120] = ItemNormal_00009120,
+
+    -- 七夕称号卡
+    [9124] = ItemNormal_QixiLoveCard,
+    [9125] = ItemNormal_QixiLoveCard,
 
     [10000] = ItemNormal_00010000,
     [10001] = ItemNormal_00010001,

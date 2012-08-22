@@ -11445,6 +11445,8 @@ namespace GObject
         m_qixi.lover = pl;
         UInt8 bind = pl->beQixiEyes(this);
         onQixiEyesResp(bind);
+        if(m_qixi.bind)
+            WORLD().UpdateQixiScore(this, m_qixi.lover);
 
 		DB().PushUpdateData("REPLACE INTO `qixi` (`pos`, `event`, `score`, `bind`, `lover`, `playerId`) VALUES(%u, %u, %u, %u, %"I64_FMT"u, %"I64_FMT"u)", m_qixi.pos, m_qixi.event, m_qixi.score, m_qixi.bind, pl->getId(), getId());
     }
