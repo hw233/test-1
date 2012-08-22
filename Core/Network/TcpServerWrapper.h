@@ -1,6 +1,8 @@
 #ifndef _TCPSERVERWRAPPER_INC_
 #define _TCPSERVERWRAPPER_INC_
 
+#include <memory>
+
 #ifdef _ARENA_SERVER
 #include "ArenaClient.h"
 #else

@@ -2685,7 +2685,7 @@ void AthleticsRank::giveAward( Player* pl, UInt8 type)
         if (found == _ranks[row].end())
             return;
 
-        AthleticsRankData* rankData = *found->second;
+        //AthleticsRankData* rankData = *found->second;
 
         UInt8 wins = pl->getBuffData(PLAYER_BUFF_AMARTIAL_WIN);
         if(wins >= 5)

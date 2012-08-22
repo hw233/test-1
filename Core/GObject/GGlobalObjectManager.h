@@ -4,6 +4,7 @@
 #include "GObjectBase.h"
 #include "Common/Compat.h"
 
+#include <set>
 #include <unordered_map>
 #include "Common/Mutex.h"
 

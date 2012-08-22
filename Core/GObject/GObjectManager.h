@@ -1,6 +1,7 @@
 #ifndef _GOBJECTMANAGER_H_
 #define _GOBJECTMANAGER_H_
 
+#include <map>
 #include "GLocalObjectManager.h"
 #include "GGlobalObjectManager.h"
 #include "ItemData.h"

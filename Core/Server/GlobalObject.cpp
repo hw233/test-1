@@ -16,7 +16,7 @@ bool GlobalObject::Init()
 
 void GlobalObject::UnInit()
 {
-	//?ͷ???Ϣ???????е???Ϣ
+	//释放消息池中所有的消息
 	for (int i = 0; i < MAX_THREAD_NUM; i++)
 	{
 		FastMutex::ScopedLock lock(m_MsgQueueCs[i]);

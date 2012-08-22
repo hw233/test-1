@@ -1,0 +1,12 @@
+*~
+*.o
+*.a
+cscope.*
+tags
+TAGS
+gmon.out
+bin
+build
+log
+obj
+reports
