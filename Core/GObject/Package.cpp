@@ -127,8 +127,8 @@ namespace GObject
 #endif
 	static UInt32 exchange_cost[2][10] = {{2000, 2000, 5000, 20000, 30000}, {3000, 3000, 10000, 25000, 35000, 40000, 50000, 80000, 100000}};
 	static UInt32 exchange_set_cost = 100000;
-	static UInt32 merge_chance[9] = {100, 85, 85, 75, 75, 65, 65, 55, 55};
-	static UInt32 activate_cost[11][3] = {
+	//static UInt32 merge_chance[9] = {100, 85, 85, 75, 75, 65, 65, 55, 55};
+	/*static UInt32 activate_cost[11][3] = {
 		{2000, 5000, 10000},
 		{2000, 5000, 10000},
 		{2000, 5000, 10000},
@@ -140,6 +140,7 @@ namespace GObject
 		{10000, 20000, 50000},
 		{10000, 20000, 50000},
 		{10000, 20000, 50000}};
+        */
 #if 0
 	static void getRandomAttr2(UInt8 lv, UInt8 q, int c, UInt8 mask, UInt8 * t, Int16 * v)
 	{

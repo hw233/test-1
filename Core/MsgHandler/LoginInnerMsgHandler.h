@@ -6,7 +6,7 @@
 #include "Server/WorldServer.h"
 #include "GObject/Player.h"
 
-static unsigned long long failed_cnt = 0;
+//static unsigned long long failed_cnt = 0;
 
 void OnCheckPackKey( LoginMsgHdr& hdr, const void * data )
 {

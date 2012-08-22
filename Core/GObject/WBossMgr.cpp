@@ -646,7 +646,7 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
     Int32 matk = 0;
     if (m_final && nflist[0].fighter && !m_extra && m_last)
     {
-        UInt32 exthp = 0;
+        //UInt32 exthp = 0;
 
         atk = _mgr->getLastAtk(bossidx[World::_wday-1][m_idx]);
         matk = _mgr->getLastMAtk(bossidx[World::_wday-1][m_idx]);
