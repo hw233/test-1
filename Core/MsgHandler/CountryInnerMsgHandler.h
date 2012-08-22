@@ -1517,6 +1517,11 @@ void OnRoamintQueqiao( GameMsgHdr& hdr, const void* data )
     player->roamingQueqiao(pos);
 }
 
+void OnRoamintQueqiaoLastLoot( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    player->checkLastBattled();
+}
 
 #endif // _COUNTRYINNERMSGHANDLER_H_
 

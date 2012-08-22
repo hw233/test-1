@@ -11480,15 +11480,6 @@ namespace GObject
 
     void Player::sendQixiInfo()
     {
-        {
-			std::vector<GData::LootResult>::iterator it;
-			for(it = _lastLoot.begin(); it != _lastLoot.end(); ++ it)
-			{
-				m_Package->ItemNotify(it->id, it->count);
-			}
-			_lastLoot.clear();
-        }
-
         Stream st(REP::ACTIVE);
         st << static_cast<UInt8>(0x01) << static_cast<UInt8>(0x01) << static_cast<UInt8>(0x01);
         if(m_qixi.lover)
@@ -11499,6 +11490,9 @@ namespace GObject
         st << m_qixi.bind << m_qixi.pos << m_qixi.event;
         st << Stream::eos;
         send(st);
+
+        GameMsgHdr hdr1(0x255, getThreadId(), this, 0);
+        GLOBAL().PushMsg(hdr1, NULL);
     }
 
     void Player::divorceQixi()
