@@ -2962,7 +2962,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
         case PURCHASE3:
         case PURCHASE3+1:
         case PURCHASE3+2:
-        case PURCHASE4:
+        case PURCHASE3+3:
             {
                 UInt32 arena = player->GetVar(VAR_MONEY_ARENA);
                 if (arena < price)
@@ -2985,6 +2985,33 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 					    player->useMoneyArena(price,&ci);
                         st << static_cast<UInt8>(0);
                         GameAction()->doAty( player,AtyBuy, 0,0);
+                    }
+                }
+            }
+            break;
+        case PURCHASE4:
+            {
+                UInt32 proffer = player->getClanProffer();
+                if (proffer < price)
+                {
+                    st << static_cast<UInt8>(1);
+                }
+                else
+                {
+                    GObject::ItemBase * item = NULL;
+                    if(IsEquipTypeId(lr._itemId))
+                        item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    else
+                        item = player->GetPackage()->AddItem(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    if(item == NULL)
+                        st << static_cast<UInt8>(2);
+                    else
+                    {
+                        ConsumeInfo ci(Item,lr._itemId, lr._count);
+                        player->useClanProffer(price,&ci);
+                        st << static_cast<UInt8>(0);
+
+                        GameAction()->doAty(player, AtyBuy, 0,0);
                     }
                 }
             }

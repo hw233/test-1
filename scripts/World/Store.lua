@@ -434,6 +434,8 @@ function loadStore()
         store:add(13,1304,6000)
         store:add(14,507,2000)
         store:add(14,509,2000)
+        store:add(15,5041,300)
+        store:add(15,5051,300)
 
     --end
 
