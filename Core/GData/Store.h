@@ -17,7 +17,7 @@ namespace GData
 #define PURCHASE1 1
 #define PURCHASE2 7
 #define PURCHASE3 11
-#define PURCHASE4 14
+#define PURCHASE4 15 /** 15代表帮派贡献，但放在商场 **/
 /** 兑换索引: 8 **/
 #define EXCHANGE 8
 #define EXCHANGEEND 8

@@ -861,6 +861,9 @@ namespace GObject
         UInt32 getMoneyArenaLua(UInt32 c);
         UInt32 getMoneyArena( UInt32 c, IncommingInfo *ii = NULL);
 
+        UInt32 useClanProffer(UInt32 c, ConsumeInfo *ci = NULL);
+        UInt32 getClanProffer(UInt32 c = 0, IncommingInfo *ii = NULL);
+
 		UInt32 getCoin(UInt32 c = 0);
 		UInt32 useCoin(UInt32 c, ConsumeInfo * ci=NULL, bool notify = true);
 		bool holdCoin(UInt32 c, UInt8);
