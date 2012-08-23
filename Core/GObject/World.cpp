@@ -1075,6 +1075,12 @@ void World::LoadQixiScore(Player* pl, Player* lover)
 {
     if(!pl->queQiaoCheck())
         return;
+    if(lover->getLover() != pl)
+    {
+        pl->resetQixi();
+        return;
+    }
+
     QixiScoreMap::iterator it = _qixiScoreMap.find(pl);
     if(it == _qixiScoreMap.end())
     {
@@ -1138,7 +1144,6 @@ void World::UpdateQixiScore(Player* pl, Player* lover)
 
 void World::sendQixiPlayers(Player* pl)
 {
-    int max = 3;
     UInt8 i = 0;
     UInt32 myPlace = 0;
     UInt32 myScore = 0;
@@ -1161,7 +1166,7 @@ void World::sendQixiPlayers(Player* pl)
     size_t offset = st.size();
 
     st << i;
-    for(QixiPlayersIt qpIt = _qixiPlayerSet.begin(); i < max && qpIt != _qixiPlayerSet.end(); ++ qpIt, ++ i)
+    for(QixiPlayersIt qpIt = _qixiPlayerSet.begin(); i < 3 && qpIt != _qixiPlayerSet.end(); ++ qpIt, ++ i)
     {
         QixiPair* qp = *qpIt;
         st << qp->p1.lover->getName() << qp->p2.lover->getName() << static_cast<UInt32>(qp->p1.score + qp->p2.score);

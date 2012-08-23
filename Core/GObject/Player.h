@@ -1272,6 +1272,7 @@ namespace GObject
         void postQixiEyes(Player* pl);
         void roamingQueqiao(UInt8 pos);
         void qixiStepAdvance(UInt8 pos, UInt8 event, UInt8 score);
+        void resetQixi();
 
         void beDivorceQixi(Player* pl);
         UInt8 beQixiEyes(Player* pl);
