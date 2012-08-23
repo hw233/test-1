@@ -2475,6 +2475,7 @@ namespace GObject
 			st << buffid[i] << buffleft[i];
 		}
         st << GetVar(VAR_MONEY_ARENA);
+        st << getClanProffer();
 		st << Stream::eos;
 	}
 
@@ -3876,6 +3877,66 @@ namespace GObject
         send(st);
 
         return moneyArena;
+    }
+
+	UInt32 Player::getClanProffer( UInt32 c, IncommingInfo* ii)
+	{
+        Clan* clan = getClan();
+        if(!clan)
+            return 0;
+        ClanMember* member = clan->getClanMember(this);
+        if(!member)
+            return 0;
+        if(c == 0)
+			return member->proffer;
+		member->proffer += c;
+		SYSMSG_SENDV(166, this, c);
+		SYSMSG_SENDV(1066, this, c);
+        {
+            Stream st(REP::CLAN_INFO_UPDATE);
+            st << static_cast<UInt8>(5) << member->proffer << Stream::eos;
+            send(st);
+        }
+        DB5().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %"I64_FMT"u", member->proffer, this->getId());
+
+        if(ii && ii->incommingType != 0)
+        {
+            DBLOG1().PushUpdateData("insert into consume_clan_proffer (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+                cfg.serverLogId, getId(), ii->incommingType, ii->itemId, ii->itemNum, c, TimeUtil::Now());
+        }
+
+		return member->proffer;
+	}
+
+	UInt32 Player::useClanProffer( UInt32 a,ConsumeInfo * ci )
+	{
+        Clan* clan = getClan();
+        if(!clan)
+            return 0;
+        ClanMember* member = clan->getClanMember(this);
+        if(!member)
+            return 0;
+        if(member->proffer < a)
+            member->proffer = 0;
+        else
+        {
+            member->proffer -= a;
+            if(ci!=NULL)
+            {
+                DBLOG1().PushUpdateData("insert into consume_clan_proffer (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+                cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, a, TimeUtil::Now());
+            }
+        }
+        SYSMSG_SENDV(165, this, a);
+        SYSMSG_SENDV(1065, this, a);
+        {
+            Stream st(REP::CLAN_INFO_UPDATE);
+            st << static_cast<UInt8>(5) << member->proffer << Stream::eos;
+            send(st);
+        }
+        DB5().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %"I64_FMT"u", member->proffer, this->getId());
+
+        return member->proffer;
     }
 
     UInt32 Player::getCoin( UInt32 c )
@@ -11530,7 +11591,7 @@ namespace GObject
         pl->beDivorceQixi(this);
         qixiUdpLog(1085);
 
-		DB().PushUpdateData("UPDATE `qixi` SET `lover`=0, `bind`=0 WHERE `playerId` = %"I64_FMT"u", getId());
+		DB1().PushUpdateData("UPDATE `qixi` SET `lover`=0, `bind`=0 WHERE `playerId` = %"I64_FMT"u", getId());
         WORLD().DivorceQixiPair(this);
         sendQixiInfo();
     }
@@ -11551,7 +11612,7 @@ namespace GObject
         }
         qixiUdpLog(1084);
 
-		DB().PushUpdateData("REPLACE INTO `qixi` (`pos`, `event`, `score`, `bind`, `lover`, `playerId`) VALUES(%u, %u, %u, %u, %"I64_FMT"u, %"I64_FMT"u)", m_qixi.pos, m_qixi.event, m_qixi.score, m_qixi.bind, pl->getId(), getId());
+		DB1().PushUpdateData("REPLACE INTO `qixi` (`pos`, `event`, `score`, `bind`, `lover`, `playerId`) VALUES(%u, %u, %u, %u, %"I64_FMT"u, %"I64_FMT"u)", m_qixi.pos, m_qixi.event, m_qixi.score, m_qixi.bind, pl->getId(), getId());
     }
 
     void Player::roamingQueqiao(UInt8 pos)
@@ -11584,7 +11645,7 @@ namespace GObject
         m_qixi.bind = 0;
 
         sendMsgCode(0, 1029);
-		DB().PushUpdateData("UPDATE `qixi` SET `bind`=0 WHERE `playerId` = %"I64_FMT"u", getId());
+		DB1().PushUpdateData("UPDATE `qixi` SET `bind`=0 WHERE `playerId` = %"I64_FMT"u", getId());
         sendQixiInfo();
     }
 
@@ -11600,7 +11661,7 @@ namespace GObject
             m_qixi.bind = 1;
             bind = 1;
 
-            DB().PushUpdateData("UPDATE `qixi` SET `bind`=%u WHERE `playerId` = %"I64_FMT"u", bind, getId());
+            DB1().PushUpdateData("UPDATE `qixi` SET `bind`=%u WHERE `playerId` = %"I64_FMT"u", bind, getId());
             sendQixiInfo();
         }
 
@@ -11644,11 +11705,18 @@ namespace GObject
         m_qixi.score += score;
 
         if(m_qixi.lover == NULL and m_qixi.score == score)
-            DB().PushUpdateData("REPLACE INTO `qixi` (`pos`, `event`, `score`, `bind`, `lover`, `playerId`) VALUES(%u, %u, %u, %u, 0, %"I64_FMT"u)", m_qixi.pos, m_qixi.event, m_qixi.score, m_qixi.bind, getId());
+            DB1().PushUpdateData("REPLACE INTO `qixi` (`pos`, `event`, `score`, `bind`, `lover`, `playerId`) VALUES(%u, %u, %u, %u, 0, %"I64_FMT"u)", m_qixi.pos, m_qixi.event, m_qixi.score, m_qixi.bind, getId());
         else
-            DB().PushUpdateData("UPDATE `qixi` SET `pos`=%u, `event`=%u, `score`=%u WHERE `playerId` = %"I64_FMT"u", pos, event, m_qixi.score, getId());
+            DB1().PushUpdateData("UPDATE `qixi` SET `pos`=%u, `event`=%u, `score`=%u WHERE `playerId` = %"I64_FMT"u", pos, event, m_qixi.score, getId());
         if(m_qixi.bind)
             WORLD().UpdateQixiScore(this, m_qixi.lover);
+    }
+
+    void Player::resetQixi()
+    {
+        m_qixi.bind = 0;
+        m_qixi.lover = NULL;
+        DB1().PushUpdateData("UPDATE `qixi` SET `bind`=0, `lover`=0 WHERE `playerId` = %"I64_FMT"u", getId());
     }
 
 } // namespace GObject

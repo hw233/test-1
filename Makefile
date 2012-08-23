@@ -54,3 +54,9 @@ clean:
 	cd tools/udplog_cpp/ && make clean
 	cd build && make -f Makefile clean
 
+touch:
+	touch .now
+	find . -cnewer .now -exec touch {} \;
+	rm -f .now
+
+

@@ -2658,7 +2658,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
         {
             apcnt2 = apcnt;
             const std::vector<const GData::SkillStrengthenEffect*>& efs = ss->effect;
-            for(int j = 0; j < efs.size(); ++ j)
+            for(size_t j = 0; j < efs.size(); ++ j)
             {
                 if(efs[j]->type != GData::TYPE_AREA)
                     continue;
@@ -3410,7 +3410,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
     if(ss && bf->getHP() != 0)
     {
         const std::vector<const GData::SkillStrengthenEffect*>& efs = ss->effect;
-        for(int i = 0; i < efs.size(); ++ i)
+        for(size_t i = 0; i < efs.size(); ++ i)
         {
             const GData::SkillStrengthenEffect* ef = efs[i];
             if(ef->target == 3)

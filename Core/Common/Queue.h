@@ -1,6 +1,8 @@
 #ifndef _QUEUE_H_
 #define _QUEUE_H_
 
+#include <queue>
+
 //////////////////////////////////////////////////////////////////////////
 template <typename Type>
 class Queue

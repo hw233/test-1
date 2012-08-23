@@ -861,6 +861,9 @@ namespace GObject
         UInt32 getMoneyArenaLua(UInt32 c);
         UInt32 getMoneyArena( UInt32 c, IncommingInfo *ii = NULL);
 
+        UInt32 useClanProffer(UInt32 c, ConsumeInfo *ci = NULL);
+        UInt32 getClanProffer(UInt32 c = 0, IncommingInfo *ii = NULL);
+
 		UInt32 getCoin(UInt32 c = 0);
 		UInt32 useCoin(UInt32 c, ConsumeInfo * ci=NULL, bool notify = true);
 		bool holdCoin(UInt32 c, UInt8);
@@ -1269,6 +1272,7 @@ namespace GObject
         void postQixiEyes(Player* pl);
         void roamingQueqiao(UInt8 pos);
         void qixiStepAdvance(UInt8 pos, UInt8 event, UInt8 score);
+        void resetQixi();
 
         void beDivorceQixi(Player* pl);
         UInt8 beQixiEyes(Player* pl);

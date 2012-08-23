@@ -294,7 +294,7 @@ public:
 private:	
 	RankList		_ranks[2];
 	AthleticsList	_athleticses[2];
-	UInt32			_maxRank[2];	//???ڼ?¼????λ??????
+	UInt32			_maxRank[2];	//用于纪录最大位置序号
 
 	std::deque<AthleticsEventData *> _athleticsesEvent[2];
 };

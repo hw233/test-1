@@ -335,7 +335,7 @@ public:
     void sendPracticePlaceInfo(Player* pl);
     void broadcastPracticePlaceInfo();
 
-    // ????ְλ
+    // 帮派职位
     bool setClanRank(Player* pl, UInt64 inviteeId, UInt8 cls);
     UInt8 getClanRank(Player* pl);
     UInt8 getClanRankCount(UInt8 cls);
@@ -459,7 +459,7 @@ public:
 	void addClanDonateRecordFromDB(const std::string&, UInt8, UInt16, UInt32);
 	void addClanDonateRecord(const std::string&, UInt8, UInt16, UInt32);
 
-    // ?????ʽ?
+    // 帮派资金
     void setClanFunds(UInt32 funds) { _funds = funds; }
     void addClanFunds(UInt32 funds);
     void useClanFunds(UInt32 funds);
@@ -519,7 +519,7 @@ private:
 	std::string _name;
 	Members _members;
     UInt8 _maxMemberCount;
-	std::set<UInt32> _membersJoinTime;	// ??֤ÿ????Ա??????ʱ?䲻һ??
+	std::set<UInt32> _membersJoinTime;	// 保证每个成员加入的时间不一样
 	std::vector<ClanPendingMember *> _pending;
 	UInt8 _rank;
 	UInt8 _level;
@@ -531,7 +531,7 @@ private:
 	UInt64 _founder;
 	std::string _founderName;
 	UInt64 _leader;
-	UInt64 _construction;            // ???ɽ?????
+	UInt64 _construction;            // 帮派建设度
 	UInt32 _nextPurgeTime;
 	std::string _contact;
 	std::string _announce;
@@ -562,8 +562,8 @@ private:
 	ClanDynamicMsg * _clanDynamicMsg;
 	ClanBattle * _clanBattle;
 
-    UInt32 _funds;          // ?????ʽ?
-	UInt64 _watchman;       // ??????��?ػ???
+    UInt32 _funds;          // 帮派资金
+	UInt64 _watchman;       // 帮派修炼地护法
 
 	Mutex _mutex;
 };
