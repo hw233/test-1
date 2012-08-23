@@ -390,6 +390,7 @@ void WBoss::reward(Player* player)
     UInt32 j = 0;
     for (AtkInfoType::reverse_iterator i = m_atkinfo.rbegin(); i != m_atkinfo.rend(); ++i, ++j)
     {
+        (*i).player->wBossUdpLog(1096 + m_idx);
         if (j < AWARD_AREA1)
         {
             MailPackage::MailItem item1[] = {{trumpFrag[tlvl],4},};

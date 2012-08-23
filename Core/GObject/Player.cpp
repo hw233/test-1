@@ -1273,6 +1273,31 @@ namespace GObject
         udpLog("countryBattle", action, "", "", "", "", "act");
     }
 
+    void Player::secondSoulUdpLog(UInt32 id, UInt32 val /* = 0 */, UInt32 num /* = 1 */)
+    {
+        // 元神相关日志
+        char action[16] = "";
+        if (val)
+        {
+            snprintf(action, 16, "F_%d_%d", id, val);
+        }
+        else
+        {
+            snprintf (action, 16, "F_%d", id);
+        }
+        if (!num)
+            return;
+        udpLog("secondSoul", action, "", "", "", "", "act", num);
+    }
+
+    void Player::wBossUdpLog(UInt32 id)
+    {
+        // 世界boss相关日志
+        char action[16] = "";
+        snprintf (action, 16, "F_%d", id);
+        udpLog("worldBoss", action, "", "", "", "", "act");
+    }
+
     void Player::sendHalloweenOnlineAward(UInt32 now, bool _online)
     {
         _online = false; // XXX: fuck

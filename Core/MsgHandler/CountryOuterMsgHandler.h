@@ -2287,7 +2287,8 @@ void CountryBattleJoinReq( GameMsgHdr& hdr, CountryBattleJoinStruct& req )
 		cb->playerLeave(player);
 		rep.result = 1;
 	}
-    player->countryBattleUdpLog(1090, player->getCountry());
+    if(rep.result == 0)
+        player->countryBattleUdpLog(1090, player->getCountry());
 	player->send(rep);
 }
 
@@ -4699,6 +4700,7 @@ void OnSecondSoulReq( GameMsgHdr& hdr, const void* data)
             for( int j = 0; j < infoNum; ++ j)
             {
                 st << soulItemExpOut[j].itemId << soulItemExpOut[j].res << soulItemExpOut[j].exp;
+                player->GetPackage()->secondSoulItemUdpLog(soulItemExpOut[j].res + 1, soulItemExpOut[j].itemId, 1);
             }
             st << Stream::eos;
             player->send(st);
