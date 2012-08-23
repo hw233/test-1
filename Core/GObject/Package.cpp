@@ -542,6 +542,7 @@ namespace GObject
                     udpLog(item->getClass(), typeId, num, 0, "add");
                 }
                 cittaUdpLog(1, typeId, num);
+                secondSoulItemUdpLog(1, typeId, num);
                 if (fromWhere == FromQixi)
                 {
                     qixiUdpLog(typeId, num);
@@ -583,6 +584,7 @@ namespace GObject
                     udpLog(item->getClass(), typeId, num, 0, "add");
                 }
                 cittaUdpLog(1, typeId, num);
+                secondSoulItemUdpLog(1, typeId, num);
 
                 if (fromWhere == FromQixi)
                 {
@@ -642,6 +644,7 @@ namespace GObject
                 udpLog(item->getClass(), typeId, count, 0, "add");
             }
             cittaUdpLog(1, typeId, count);
+            secondSoulItemUdpLog(1, typeId, count);
             if (fromWhere == FromQixi)
             {
                 qixiUdpLog(typeId, count);
@@ -675,6 +678,7 @@ namespace GObject
                 udpLog(item->getClass(), typeId, count, 0, "add");
             }
             cittaUdpLog(1, typeId, count);
+            secondSoulItemUdpLog(1, typeId, count);
             if (fromWhere == FromQixi)
             {
                 qixiUdpLog(typeId, count);
@@ -1642,6 +1646,20 @@ namespace GObject
 
         snprintf (itemAct, 32, "%d_%d", id, type);
         m_Owner->udpLog("citta", itemAct, "", "", "", "", "act", num);
+    }
+
+    void Package::secondSoulItemUdpLog(UInt8 type, UInt32 id, UInt32 num)
+    {
+        char itemAct[32] = "";
+
+        if (id < LSL_ID || id > RSL_ID) 
+            return;
+
+        if (type < 1 || type > 3)
+            return;
+
+        snprintf (itemAct, 32, "I_%d_%d", id, type);
+        m_Owner->udpLog("secondSoul", itemAct, "", "", "", "", "act", num);
     }
 
     void Package::qixiUdpLog(UInt32 id, UInt32 num)
