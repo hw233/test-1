@@ -1392,6 +1392,7 @@ void OnTownDeamonlBeAttack( GameMsgHdr& hdr, const void* data )
 	struct TDBeAttackData
 	{
 		Player * attacker;
+        UInt32 spirit;
 		UInt16 formation;
 		UInt16 portrait;
 		Lineup lineup[5];
@@ -1399,20 +1400,7 @@ void OnTownDeamonlBeAttack( GameMsgHdr& hdr, const void* data )
 
 	TDBeAttackData* tdabd = reinterpret_cast<TDBeAttackData*>(const_cast<void *>(data));
 
-    townDeamonManager->beAttackByPlayer(player, tdabd->attacker, tdabd->formation, tdabd->portrait, tdabd->lineup);
-}
-
-void OnTownDeamonResNotify( GameMsgHdr& hdr, const void* data )
-{
-    MSG_QUERY_PLAYER(player);
-    struct TDResNotify
-    {
-        GObject::Player * peer;
-        bool win;
-    };
-    TDResNotify* notify = reinterpret_cast<TDResNotify*>(const_cast<void *>(data));
-
-    townDeamonManager->notifyChallengeResult(player, notify->peer, notify->win);
+    townDeamonManager->beAttackByPlayer(player, tdabd->attacker, tdabd->spirit, tdabd->formation, tdabd->portrait, tdabd->lineup);
 }
 
 void OnCFriendLvlUp( GameMsgHdr& hdr, const void* data )
@@ -1530,6 +1518,73 @@ void OnRoamintQueqiaoLastLoot( GameMsgHdr& hdr, const void* data )
     MSG_QUERY_PLAYER(player);
     player->checkLastQueqiaoAward();
 }
+
+void OnDelItemAny( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+    struct DelItemInfo
+    {
+        UInt32 id;
+        UInt16 num;
+        UInt8 toWhere;
+    };
+
+	const DelItemInfo* item = reinterpret_cast<const DelItemInfo*>(data);
+    if(item)
+        player->GetPackage()->DelItemAny(item->id, item->num, NULL, item->toWhere);
+}
+
+void OnAddItem( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+    struct AddItemInfo
+    {
+        UInt32 id;
+        UInt16 num;
+        UInt8 bind;
+        UInt8 fromWhere;
+    };
+
+	const AddItemInfo* item = reinterpret_cast<const AddItemInfo*>(data);
+    if(item)
+        player->GetPackage()->AddItem2(item->id, item->num, true, item->bind, item->fromWhere);
+}
+
+void OnTownDeamonChallenge( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+    struct TownDeamonChallenge
+    {
+        Player * defer;
+        UInt32   spirit;
+    };
+
+	const TownDeamonChallenge* tdc = reinterpret_cast<const TownDeamonChallenge*>(data);
+    if(tdc)
+        townDeamonManager->attackPlayer(player, tdc->defer, tdc->spirit);
+}
+
+void OnTownDeamonAutoCompleteQuite( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+    struct TownLevels
+    {
+        UInt16 curLevel;
+        UInt16 levels;
+    };
+
+	const TownLevels* tls = reinterpret_cast<const TownLevels*>(data);
+    if(tls)
+        townDeamonManager->autoCompleteQuite(player, tls->curLevel, tls->levels);
+}
+
+void OnTownDeamonAttackNpc( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	const UInt16 level = *reinterpret_cast<const UInt16*>(data);
+    townDeamonManager->attackNpc(player, level);
+}
+
 
 #endif // _COUNTRYINNERMSGHANDLER_H_
 

@@ -155,8 +155,6 @@ MSG_REG_2(GameMsgHdr, REQ::ACTIVITY_LIST, OnActivityList);
 MSG_REG_2(GameMsgHdr, REQ::ACTIVITY_REWARD,OnActivityReward);
 MSG_REG_2(GameMsgHdr, REQ::ACTIVITY_SIGNIN, OnActivitySignIn);
 
-MSG_REG_2(GameMsgHdr, REQ::TOWN_DEAMON, OnTownDeamonReq);
-
 MSG_REG_2(GameMsgHdr, REQ::SECOND_SOUL, OnSecondSoulReq);
 MSG_REG_2(GameMsgHdr, REQ::RC7DAY, OnRC7Day);
 MSG_REG_2(GameMsgHdr, REQ::RF7DAY, OnRF7Day);
@@ -268,7 +266,6 @@ MSG_REG_2(GameMsgHdr, 0x234, OnAthleticsMartialBeAttack);
 MSG_REG_2(GameMsgHdr, 0x235, OnAwardAthleticsMartial);
 
 MSG_REG_2(GameMsgHdr, 0x340, OnTownDeamonlBeAttack);
-MSG_REG_2(GameMsgHdr, 0x341, OnTownDeamonResNotify);
 
 MSG_REG_2(GameMsgHdr, 0x236, OnAwardHIPrestige);
 MSG_REG_2(GameMsgHdr, 0x237, OnSendShusanLoveTitleCard);
@@ -292,5 +289,11 @@ MSG_REG_2(GameMsgHdr, 0x253, OnSendPExpCard);
 
 MSG_REG_2(GameMsgHdr, 0x254, OnRoamintQueqiao);
 MSG_REG_2(GameMsgHdr, 0x255, OnRoamintQueqiaoLastLoot);
+
+MSG_REG_2(GameMsgHdr, 0x256, OnDelItemAny);
+MSG_REG_2(GameMsgHdr, 0x257, OnAddItem);
+MSG_REG_2(GameMsgHdr, 0x258, OnTownDeamonChallenge);
+MSG_REG_2(GameMsgHdr, 0x259, OnTownDeamonAutoCompleteQuite);
+MSG_REG_2(GameMsgHdr, 0x260, OnTownDeamonAttackNpc);
 
 MSG_HANDLER_END()
