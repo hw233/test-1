@@ -1323,13 +1323,13 @@ namespace GObject
 					return false;
 				old = fgt->setRing(static_cast<GObject::ItemEquip *>(item));
 				break;
-            case 0x50:
-            case 0x51:
-            case 0x52:
+            case 0x0a:
+            case 0x0b:
+            case 0x0c:
                 if(item->getClass() != Item_Trump)
                     return false;
-                if (fgt->canSetTrump(part-0x50, item->getId()))
-                    old = fgt->setTrump(static_cast<GObject::ItemTrump*>(item), part-0x50);
+                if (fgt->canSetTrump(part-0x0a, item->getId()))
+                    old = fgt->setTrump(static_cast<GObject::ItemTrump*>(item), part-0x0a);
                 else
                     return false;
                 break;
@@ -1373,10 +1373,10 @@ namespace GObject
 			case 0x28:
 				old = fgt->setRing(NULL);
 				break;
-            case 0x50:
-            case 0x51:
-            case 0x52:
-                old = fgt->setTrump(static_cast<GObject::ItemTrump*>(NULL), part-0x50);
+            case 0x0a:
+            case 0x0b:
+            case 0x0c:
+                old = fgt->setTrump(static_cast<GObject::ItemTrump*>(NULL), part-0x0a);
                 break;
             default:
                 return false;
@@ -2502,7 +2502,7 @@ namespace GObject
 				fgt->setDirty();
 
                 if(equip->getClass() == Item_Trump)
-                    fgt->sendModification(0x50 + pos, equip, false);
+                    fgt->sendModification(0x0a+ pos, equip, false);
                 else
                     fgt->sendModification(0x20 + pos, equip, false);
 			}
@@ -2579,7 +2579,7 @@ namespace GObject
 			{
 				fgt->setDirty();
                 if(equip->getClass() == Item_Trump)
-                    fgt->sendModification(0x50 + pos, equip, false);
+                    fgt->sendModification(0x0a+ pos, equip, false);
                 else
                     fgt->sendModification(0x20 + pos, equip, false);
 			}
@@ -3827,7 +3827,7 @@ namespace GObject
 			{
 				fgt->setDirty();
                 if(equip->getClass() == Item_Trump)
-                    fgt->sendModification(0x50 + pos, equip, false);
+                    fgt->sendModification(0x0a+ pos, equip, false);
                 else
                     fgt->sendModification(0x20 + pos, equip, false);
 			}
@@ -4126,7 +4126,7 @@ namespace GObject
 		{
 			fgt->setDirty();
             if(equip->GetItemType().subClass == Item_Trump)
-                fgt->sendModification(0x50 + pos, equip, false);
+                fgt->sendModification(0x0a+ pos, equip, false);
             else
                 fgt->sendModification(0x20 + pos, equip, false);
 		}
@@ -4416,7 +4416,7 @@ namespace GObject
             if (trump->getClass() == Item_Fashion)
                 fgt->sendModification(0x20, trump, false);
             else
-                fgt->sendModification(0x50 + pos, trump, false);
+                fgt->sendModification(0x0a+ pos, trump, false);
         }
 		else
 			SendSingleEquipData(trump);
@@ -4468,7 +4468,7 @@ namespace GObject
             if (trump->getClass() == Item_Fashion)
                 fgt->sendModification(0x20, trump, false);
             else
-                fgt->sendModification(0x50 + pos, trump, false);
+                fgt->sendModification(0x0a + pos, trump, false);
         }
 		else
 			SendSingleEquipData(trump);
