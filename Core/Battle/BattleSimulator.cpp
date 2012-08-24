@@ -6890,7 +6890,7 @@ bool BattleSimulator::doSkillStrengthen_debuf_defend(BattleFighter* bf, const GD
         pos0 = 25;
     {
         bo->setDefDec(ef->value, ef->last);
-        bf->setDefDecTimes(0);
+        bo->setDefDecTimes(0);
         defList[defCount].pos = bo->getPos() + pos0;
         defList[defCount].damType = e_defDec;
         defList[defCount].damage = 0;

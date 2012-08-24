@@ -25,6 +25,7 @@
 #include "GObject/Clan.h"
 #include "GObject/DCLogger.h"
 #include "GObject/ShuoShuo.h"
+#include "Common/StringTokenizer.h"
 
 //Login thread -> Country thread
 void PlayerEnter( GameMsgHdr& hdr, const void * data )
@@ -1073,6 +1074,13 @@ void OnCreateAward(GameMsgHdr& hdr, const void * data)
     player->setVipL(6);
 #endif
     player->udpLog("create", "", "", "", "", "", "guide");
+    StringTokenizer via(player->getVia(), "_");
+    if (via.count() == 2)
+        player->udpLog(via[0].c_str(), via[1].c_str(), "", "", "", "", "refer");
+    else if (via.count() == 1)
+        player->udpLog(via[0].c_str(), "", "", "", "", "", "refer");
+    else
+        player->udpLog("", "", "", "", "", "", "refer");
     player->sendCreateMail();
 #ifdef _FB
 #else

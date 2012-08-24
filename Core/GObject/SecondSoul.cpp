@@ -98,8 +98,15 @@ bool SecondSoul::practiceLevelUp(UInt32& pexp)
     float factor = 1 - getPracticeLevUpFactor();
     if(factor < 0)
         factor = 1;
+    UInt32 formalPexp = pexp;
     if(GData::soulExpTable.testPracticeLevelUp(m_practiceLevel, pexp, factor))
     {
+        if (pexp < formalPexp)
+        {
+            m_fgt->getOwner()->secondSoulUdpLog(1093);
+            m_fgt->getOwner()->secondSoulUdpLog(1095, 0, formalPexp - pexp);
+            m_fgt->getOwner()->secondSoulUdpLog(1094, m_practiceLevel);
+        }
         m_strength = Script::BattleFormula::getCurrent()->calcSoulStrenght(this);
         m_agility = Script::BattleFormula::getCurrent()->calcSoulAgility(this);
         m_physique = Script::BattleFormula::getCurrent()->calcSoulPhysique(this);

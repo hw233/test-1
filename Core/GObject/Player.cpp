@@ -1275,6 +1275,31 @@ namespace GObject
         udpLog("countryBattle", action, "", "", "", "", "act");
     }
 
+    void Player::secondSoulUdpLog(UInt32 id, UInt32 val /* = 0 */, UInt32 num /* = 1 */)
+    {
+        // 元神相关日志
+        char action[16] = "";
+        if (val)
+        {
+            snprintf(action, 16, "F_%d_%d", id, val);
+        }
+        else
+        {
+            snprintf (action, 16, "F_%d", id);
+        }
+        if (!num)
+            return;
+        udpLog("secondSoul", action, "", "", "", "", "act", num);
+    }
+
+    void Player::wBossUdpLog(UInt32 id)
+    {
+        // 世界boss相关日志
+        char action[16] = "";
+        snprintf (action, 16, "F_%d", id);
+        udpLog("worldBoss", action, "", "", "", "", "act");
+    }
+
     void Player::sendHalloweenOnlineAward(UInt32 now, bool _online)
     {
         _online = false; // XXX: fuck
@@ -2298,7 +2323,7 @@ namespace GObject
 			for(UInt8 z = 0; z < 9; ++ z)
 				m_Package->EquipTo(0, fgt, z+0x20, equip, true);
             for(UInt8 t = 0; t < 3; ++ t)
-				m_Package->EquipTo(0, fgt, t+0x50, equip, true);
+				m_Package->EquipTo(0, fgt, t+0x0a, equip, true);
 
 			_fighters.erase(it);
 			DB2().PushUpdateData("DELETE FROM `fighter` WHERE `id` = %u AND `playerId` = %"I64_FMT"u", id, getId());
@@ -10220,6 +10245,7 @@ namespace GObject
             return;
 
         UInt8 lvl = GetLev();
+        lvl = lvl > 99 ? 99 : lvl;
         UInt64 exp = (offline/60)*((lvl-10)*(lvl/10)*5+25)*0.8f;
         AddVar(VAR_OFFLINE_EXP, exp);
         AddVar(VAR_OFFLINE_PEXP, offline/60);

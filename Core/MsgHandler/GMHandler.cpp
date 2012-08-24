@@ -1170,7 +1170,7 @@ void makeSuper( GObject::Fighter * fgt, UInt8 equipLvl = 100, UInt8 enchant = 8,
         if(equip)
         { 
             makeItemSuper(package, equip, 0, 9, 0, flushAttr);
-            package->EquipTo(equip->getId(), fgt, 0x50, o);
+            package->EquipTo(equip->getId(), fgt, 0x0a, o);
         }
 		break;
 	case 2:
@@ -1226,7 +1226,7 @@ void makeSuper( GObject::Fighter * fgt, UInt8 equipLvl = 100, UInt8 enchant = 8,
         if(equip)
         { 
             makeItemSuper(package, equip, 0, 9, 0, flushAttr);
-            package->EquipTo(equip->getId(), fgt, 0x50, o);
+            package->EquipTo(equip->getId(), fgt, 0x0a, o);
         }
 		break;
 	case 3:
@@ -1282,7 +1282,7 @@ void makeSuper( GObject::Fighter * fgt, UInt8 equipLvl = 100, UInt8 enchant = 8,
         if(equip)
         { 
             makeItemSuper(package, equip, 0, 9, 0, flushAttr);
-            package->EquipTo(equip->getId(), fgt, 0x50, o);
+            package->EquipTo(equip->getId(), fgt, 0x0a, o);
         }
 		break;
 	default:

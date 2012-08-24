@@ -1406,7 +1406,7 @@ void OnFighterEquipReq( GameMsgHdr& hdr, FighterEquipReq& fer )
 		return;
 	if(fer._part == 0)
 	{
-		static UInt8 p[12] = {0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x50, 0x51, 0x52};
+		static UInt8 p[12] = {0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x0a, 0x0b, 0x0c};
 		ItemEquip * e[12] = {fgt->getFashion(), fgt->getWeapon(), fgt->getArmor(0), fgt->getArmor(1),
             fgt->getArmor(2), fgt->getArmor(3), fgt->getArmor(4), fgt->getAmulet(),
             fgt->getRing(), fgt->getTrump(0), fgt->getTrump(1), fgt->getTrump(2)};
@@ -1430,14 +1430,14 @@ void OnFighterEquipReq( GameMsgHdr& hdr, FighterEquipReq& fer )
     case 0x30:
         fgt->setPeerless(static_cast<UInt16>(fer._equipId), true);
         break;
-    case 0x60:
+    case 0x2a:
         {
             UInt16 skill = (fer._equipId >> 16) & 0xFFFF;
             idx = fer._equipId & 0xFFFF;
             fgt->upSkill(skill, idx, true);
         }
         break;
-    case 0x61:
+    case 0x2b:
         {
             return; // XXX: 取消卸载技能功能
             UInt16 skill = (fer._equipId >> 16) & 0xFFFF;
@@ -1445,21 +1445,21 @@ void OnFighterEquipReq( GameMsgHdr& hdr, FighterEquipReq& fer )
             fgt->offSkill(skill, true);
         }
         break;
-    case 0x62:
+    case 0x2c:
         {
             UInt16 citta = (fer._equipId >> 16) & 0xFFFF;
             idx = fer._equipId & 0xFFFF;
             fgt->upCitta(citta, idx, true);
         }
         break;
-    case 0x63:
+    case 0x2d:
         {
             UInt16 citta = (fer._equipId >> 16) & 0xFFFF;
             idx = fer._equipId & 0xFFFF;
             fgt->offCitta(citta, true, true);
         }
         break;
-    case 0x64:
+    case 0x2e:
         {
             UInt16 citta = (fer._equipId >> 16) & 0xFFFF;
             idx = fer._equipId & 0xFFFF;
@@ -2287,7 +2287,8 @@ void CountryBattleJoinReq( GameMsgHdr& hdr, CountryBattleJoinStruct& req )
 		cb->playerLeave(player);
 		rep.result = 1;
 	}
-    player->countryBattleUdpLog(1090, player->getCountry());
+    if(rep.result == 0)
+        player->countryBattleUdpLog(1090, player->getCountry());
 	player->send(rep);
 }
 
@@ -4699,6 +4700,7 @@ void OnSecondSoulReq( GameMsgHdr& hdr, const void* data)
             for( int j = 0; j < infoNum; ++ j)
             {
                 st << soulItemExpOut[j].itemId << soulItemExpOut[j].res << soulItemExpOut[j].exp;
+                player->GetPackage()->secondSoulItemUdpLog(soulItemExpOut[j].res + 1, soulItemExpOut[j].itemId, 1);
             }
             st << Stream::eos;
             player->send(st);
