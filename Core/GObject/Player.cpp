@@ -123,14 +123,16 @@ namespace GObject
 	{
 		UInt32 now = TimeUtil::Now();
 		float exp = calcExpEach(now);
-		if(m_Player->getBuffData(PLAYER_BUFF_TRAINP3, now))
-			exp *= 1.8f;
-		else if(m_Player->getBuffData(PLAYER_BUFF_TRAINP4, now))
-			exp *= 1.5f;
-		else if(m_Player->getBuffData(PLAYER_BUFF_TRAINP2, now))
-			exp *= 1.5f;
-		else if(m_Player->getBuffData(PLAYER_BUFF_TRAINP1, now))
-			exp *= 1.2f;
+        if(m_Player->getBuffData(PLAYER_BUFF_ADVANCED_HOOK, now))
+            exp = 0;
+        else if(m_Player->getBuffData(PLAYER_BUFF_TRAINP3, now))
+            exp *= 1.8f;
+        else if(m_Player->getBuffData(PLAYER_BUFF_TRAINP4, now))
+            exp *= 1.5f;
+        else if(m_Player->getBuffData(PLAYER_BUFF_TRAINP2, now))
+            exp *= 1.5f;
+        else if(m_Player->getBuffData(PLAYER_BUFF_TRAINP1, now))
+            exp *= 1.2f;
 		_npcGroup->monsterKilled(m_Player);
 		if(m_Player->isOnline())
 			m_Player->AddExp(static_cast<UInt32>(exp));
@@ -2994,6 +2996,21 @@ namespace GObject
 
         OnHeroMemo(MC_FIGHTER, MD_STARTED, 0, 0);
 		return true;
+	}
+
+    /** 随身加速服功能 **/
+    void Player::advancedHookExp()
+	{
+        printf("getBuffData(PLAYER_BUFF_ADVANCED_HOOK, TimeUtil::Now()) = %u\n", getBuffData(PLAYER_BUFF_ADVANCED_HOOK, TimeUtil::Now()));
+        if(getBuffData(PLAYER_BUFF_ADVANCED_HOOK, TimeUtil::Now()) == 0)
+            return;
+        UInt8 lvl = GetLev();
+        lvl = lvl > 99 ? 99 : lvl;
+        UInt32 extraExp = (lvl - 10) * (lvl / 10) * 5 + 25;
+        extraExp = extraExp * 3 / 2;
+        SYSMSG_SENDV(191, this, extraExp);
+        SYSMSG_SENDV(1068, this, extraExp);
+		return;
 	}
 
 	void Player::pushAutoBattle(UInt32 npcId, UInt16 count, UInt16 interval)

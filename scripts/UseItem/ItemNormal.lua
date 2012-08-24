@@ -4315,6 +4315,20 @@ function ItemNormal_00009120(iid, num, bind, param)
     return num
 end
 
+function ItemNormal_00009126(iid, num, bind, param)
+  local player = GetPlayer()
+  local package = player:GetPackage();
+  player:setBuffData(5, 0, true)
+  player:setBuffData(10, 0, true)
+  player:setBuffData(11, 0, true)
+  if ItemNormal_AddBuff(player, 22, 86400*7, num, 31449600) then
+  	package:DelItemSendMsg(iid, player);
+	return num;
+  else
+	return false;
+  end
+end
+
 function ItemNormal_00010000(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -6166,6 +6180,8 @@ local ItemNormal_Table = {
     -- 七夕称号卡
     [9124] = ItemNormal_QixiLoveCard,
     [9125] = ItemNormal_QixiLoveCard,
+
+    [9126] = ItemNormal_00009126,
 
     [10000] = ItemNormal_00010000,
     [10001] = ItemNormal_00010001,
