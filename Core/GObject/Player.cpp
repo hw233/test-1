@@ -11355,8 +11355,8 @@ namespace GObject
 
     void Player::IDIPAddItem(UInt16 itemId, UInt16 num, bool bind)
     {
-        SYSMSG(title, 4004);
-        SYSMSG(content, 4005);
+        SYSMSGV(title, 4004, itemId);
+        SYSMSGV(content, 4005, itemId, num);
         Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFD0000/*free*/);
         if(mail)
         {
