@@ -3001,14 +3001,13 @@ namespace GObject
     /** 随身加速服功能 **/
     void Player::advancedHookExp()
 	{
-        printf("getBuffData(PLAYER_BUFF_ADVANCED_HOOK, TimeUtil::Now()) = %u\n", getBuffData(PLAYER_BUFF_ADVANCED_HOOK, TimeUtil::Now()));
-        if(getBuffData(PLAYER_BUFF_ADVANCED_HOOK, TimeUtil::Now()) == 0)
+       if(getBuffData(PLAYER_BUFF_ADVANCED_HOOK, TimeUtil::Now()) == 0)
             return;
         UInt8 lvl = GetLev();
         lvl = lvl > 99 ? 99 : lvl;
         UInt32 extraExp = (lvl - 10) * (lvl / 10) * 5 + 25;
         extraExp = extraExp * 3 / 2;
-        SYSMSG_SENDV(191, this, extraExp);
+        SYSMSG_SENDV(100, this, extraExp);
         SYSMSG_SENDV(1068, this, extraExp);
 		return;
 	}
@@ -3857,7 +3856,7 @@ namespace GObject
         SetVar(VAR_MONEY_ARENA, moneyArena);
 
         Stream st(REP::USER_INFO_CHANGE);
-        st << static_cast<UInt8>(0x56) << moneyArena << Stream::eos;
+        st << static_cast<UInt8>(0x16) << moneyArena << Stream::eos;
         send(st);
 
         if(ii && ii->incommingType != 0)
@@ -3890,7 +3889,7 @@ namespace GObject
         SetVar(VAR_MONEY_ARENA, moneyArena);
 
         Stream st(REP::USER_INFO_CHANGE);
-        st << static_cast<UInt8>(0x56) << moneyArena << Stream::eos;
+        st << static_cast<UInt8>(0x16) << moneyArena << Stream::eos;
         send(st);
 
         return moneyArena;
@@ -4489,7 +4488,7 @@ namespace GObject
         DB6().PushUpdateData("UPDATE `player` SET `prestige` = %u WHERE `id` = %"I64_FMT"u", _playerData.prestige, getId());
 
         Stream st(REP::USER_INFO_CHANGE);
-        st << static_cast<UInt8>(0x55) << _playerData.prestige << Stream::eos;
+        st << static_cast<UInt8>(0x15) << _playerData.prestige << Stream::eos;
         send(st);
 
 		return _playerData.prestige;
@@ -4516,7 +4515,7 @@ namespace GObject
         DB6().PushUpdateData("UPDATE `player` SET `prestige` = %u WHERE `id` = %"I64_FMT"u", _playerData.prestige, getId());
 
         Stream st(REP::USER_INFO_CHANGE);
-        st << static_cast<UInt8>(0x55) << _playerData.prestige << Stream::eos;
+        st << static_cast<UInt8>(0x15) << _playerData.prestige << Stream::eos;
         send(st);
 
 		return _playerData.prestige;

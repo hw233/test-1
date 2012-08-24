@@ -770,10 +770,6 @@ bool advancedHookEnumerate(Player * pl, UInt8 para)
 {
     if(!pl)
         return false;
-    if(pl->getId() == 82301)
-    {
-	    printf("pl->getThreadId() = %d\n", pl->getThreadId());
-    }
     GameMsgHdr hdr1(0x256, pl->getThreadId(), pl, 0);
     GLOBAL().PushMsg(hdr1, NULL);
     return true;

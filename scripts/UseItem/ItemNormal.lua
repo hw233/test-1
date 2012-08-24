@@ -4321,7 +4321,7 @@ function ItemNormal_00009126(iid, num, bind, param)
   player:setBuffData(5, 0, true)
   player:setBuffData(10, 0, true)
   player:setBuffData(11, 0, true)
-  if ItemNormal_AddBuff(player, 22, 86400*7, num, 31449600) then
+  if ItemNormal_AddBuff(player, 24, 86400*7, num, 31449600) then
   	package:DelItemSendMsg(iid, player);
 	return num;
   else
