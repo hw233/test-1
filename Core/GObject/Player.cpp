@@ -10229,8 +10229,10 @@ namespace GObject
             return;
 
         UInt8 lvl = GetLev();
-        lvl = lvl > 99 ? 99 : lvl;
-        UInt64 exp = (offline/60)*((lvl-10)*(lvl/10)*5+25)*0.8f;
+        UInt8 yalvl = lvl;
+        if (lvl > 99)
+            yalvl = 99;
+        UInt64 exp = (offline/60)*((lvl-10)*(yalvl/10)*5+25)*0.8f;
         AddVar(VAR_OFFLINE_EXP, exp);
         AddVar(VAR_OFFLINE_PEXP, offline/60);
         AddVar(VAR_OFFLINE_EQUIP, offline);
