@@ -32,33 +32,68 @@ void DungeonLevel::getLoot( GObject::Player * player, UInt32 specialItem, UInt8 
 	{
         if (!(*it))
             continue;
-		LootResult lr = (*it)->roll();
-		const ItemBaseType * ibt = itemBaseTypeManager[lr.id];
-		if(replace)
-		{
-			if(ibt != NULL && ibt->quality < 5)
-			{
-				lr.id = specialItem;
-				lr.count = 1;
-				replace = false;
-				specialItem = 0;
-				player->GetPackage()->Add(lr.id, lr.count, true, true, FromDungeon);//only use for weekday Saturday activity
-				player->_lastLoot.push_back(lr);
-				lr.id = 0;
-			}
-		}
-		if(lr.id == 0)
-			continue;
-		else if(gemDecrease > 0 && IsGemId(lr.id))
-		{
-			if(uRand(100) < gemDecrease)
-			{
-				lr.id = 0;
-				continue;
-			}
-		}
-		player->GetPackage()->Add(lr.id, lr.count, lr.id > 5000 && ibt->bindType > 0, true, FromDungeon);
-		player->_lastLoot.push_back(lr);
+
+#if 0
+        LootResult lr = (*it)->roll();
+        const ItemBaseType * ibt = itemBaseTypeManager[lr.id];
+        if(replace)
+        {
+            if(ibt != NULL && ibt->quality < 5)
+            {
+                lr.id = specialItem;
+                lr.count = 1;
+                replace = false;
+                specialItem = 0;
+                player->GetPackage()->Add(lr.id, lr.count, true, true, FromDungeon);//only use for weekday Saturday activity
+                player->_lastLoot.push_back(lr);
+                lr.id = 0;
+            }
+        }
+        if(lr.id == 0)
+            continue;
+        else if(gemDecrease > 0 && IsGemId(lr.id))
+        {
+            if(uRand(100) < gemDecrease)
+            {
+                lr.id = 0;
+                continue;
+            }
+        }
+        player->GetPackage()->Add(lr.id, lr.count, lr.id > 5000 && ibt->bindType > 0, true, FromDungeon);
+        player->_lastLoot.push_back(lr);
+#else
+        std::vector<LootResult> lr;
+        (*it)->roll(lr);
+        for (size_t j = 0; j < lr.size(); ++j)
+        {
+            const ItemBaseType * ibt = itemBaseTypeManager[lr[j].id];
+            if(replace)
+            {
+                if(ibt != NULL && ibt->quality < 5)
+                {
+                    lr[j].id = specialItem;
+                    lr[j].count = 1;
+                    replace = false;
+                    specialItem = 0;
+                    player->GetPackage()->Add(lr[j].id, lr[j].count, true, true, FromDungeon);//only use for weekday Saturday activity
+                    player->_lastLoot.push_back(lr[j]);
+                    lr[j].id = 0;
+                }
+            }
+            if(lr[j].id == 0)
+                continue;
+            else if(gemDecrease > 0 && IsGemId(lr[j].id))
+            {
+                if(uRand(100) < gemDecrease)
+                {
+                    lr[j].id = 0;
+                    continue;
+                }
+            }
+            player->GetPackage()->Add(lr[j].id, lr[j].count, lr[j].id > 5000 && ibt->bindType > 0, true, FromDungeon);
+            player->_lastLoot.push_back(lr[j]);
+        }
+#endif
 	}
 }
 

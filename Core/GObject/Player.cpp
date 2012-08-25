@@ -9189,11 +9189,12 @@ namespace GObject
             const GData::LootItem* li = GData::lootTable[loot];
             if (li)
             {
-                GData::LootResult lr = li->roll();
-                if (lr.id)
+                std::vector<GData::LootResult> lr;
+                li->roll(lr);
+                if (lr.size())
                 {
-                    m_td.itemId = lr.id;
-                    m_td.num = lr.count;
+                    m_td.itemId = lr[0].id;
+                    m_td.num = lr[0].count;
                     m_td.needgen = 0;
                     return true;
                 }
@@ -10204,6 +10205,7 @@ namespace GObject
             return;
 
         UInt8 lvl = GetLev();
+        lvl = lvl > 99 ? 99 : lvl;
         UInt64 exp = (offline/60)*((lvl-10)*(lvl/10)*5+25)*0.8f;
         AddVar(VAR_OFFLINE_EXP, exp);
         AddVar(VAR_OFFLINE_PEXP, offline/60);

@@ -32,9 +32,9 @@ struct LootItem
 		std::vector<LootCount> counts;
 	};
 	std::vector<LootData> items;
-	bool isPack;
+	UInt8 isPack;
 
-	LootResult roll(URandom * = NULL) const;
+	void roll(std::vector<LootResult>& lt, URandom * = NULL) const;
 	void roll(GObject::Player *) const;
 };
 

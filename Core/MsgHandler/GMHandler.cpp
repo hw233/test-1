@@ -182,6 +182,8 @@ GMHandler::GMHandler()
     Reg(3, "ssup", &GMHandler::OnSSUp);
     Reg(3, "sserase", &GMHandler::OnSSErase);
     Reg(3, "sosog", &GMHandler::OnSoSoGet);
+    Reg(2, "clear", &GMHandler::OnClearTask);
+    Reg(2, "reset", &GMHandler::OnClearCFT);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2870,4 +2872,27 @@ void GMHandler::OnHandleSignIn(GObject::Player* player, std::vector<std::string>
     }
 }
 
+void GMHandler::OnClearTask(GObject::Player* player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return;
+    UInt8 type = atoi(args[0].c_str());
+    GameMsgHdr msg(0x325, player->getThreadId(), player, sizeof(type));
+    GLOBAL().PushMsg(msg, &type);
+}
+
+void GMHandler::OnClearCFT(GObject::Player* player, std::vector<std::string>& args)
+{
+    PLAYER_DATA(player, frontUpdate) = TimeUtil::Now();
+    PLAYER_DATA(player, copyUpdate) = TimeUtil::Now();
+    PLAYER_DATA(player, copyFreeCnt) = 0;
+    PLAYER_DATA(player, copyGoldCnt) = 0;
+    PLAYER_DATA(player, frontFreeCnt) = 0;
+    PLAYER_DATA(player, frontGoldCnt) = 0;
+    PLAYER_DATA(player, dungeonCnt) = 0;
+    DB1().PushUpdateData("UPDATE `player` SET `frontFreeCnt` = 0, `frontGoldCnt` = 0, `frontUpdate` = %u WHERE `id` = %"I64_FMT"u", TimeUtil::Now(), player->getId());
+    DB1().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = 0, `copyGoldCnt` = 0, `copyUpdate` = %u WHERE `id` = %"I64_FMT"u", TimeUtil::Now(), player->getId());
+	DB1().PushUpdateData("UPDATE `player` SET `dungeonCnt` = 0 where `id` = %"I64_FMT"u", player->getId());
+    player->sendDailyInfo();
+}
 

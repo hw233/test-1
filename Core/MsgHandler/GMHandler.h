@@ -142,6 +142,8 @@ private:
     void OnSSUp(GObject::Player* player, std::vector<std::string>& args);
     void OnSSErase(GObject::Player* player, std::vector<std::string>& args);
     void OnSoSoGet(GObject::Player* player, std::vector<std::string>& args);
+    void OnClearTask(GObject::Player* player, std::vector<std::string>& args);
+    void OnClearCFT(GObject::Player* player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;
