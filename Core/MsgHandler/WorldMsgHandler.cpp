@@ -113,6 +113,10 @@ MSG_REG_2(GameMsgHdr, 0x1B2, OnPutSaleNotify);
 MSG_REG_2(GameMsgHdr, 0x1B3, OnBuySaleCheckOKNotify);
 
 MSG_REG_2(GameMsgHdr, 0x1C0, OnLuckyDraw);
+MSG_REG_2(GameMsgHdr, 0x1C1, OnRechargeRank);
+MSG_REG_2(GameMsgHdr, 0x1C2, OnConsumeRank);
+MSG_REG_2(GameMsgHdr, 0x1C3, OnSendRechargeRank);
+MSG_REG_2(GameMsgHdr, 0x1C4, OnSendConsumeRank);
 
 MSG_REG_2(GameMsgHdr, 0x1EE, OnReloadLuaReq);
 MSG_REG_2(GameMsgHdr, 0x1ED, OnRunscriptReq);

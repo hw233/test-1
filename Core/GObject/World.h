@@ -34,6 +34,19 @@ typedef LuckyDrawList::iterator LuckyDrawRank;
 typedef LuckyDrawList::reverse_iterator RLuckyDrawRank;
 typedef std::map<Player *, LuckyDrawRank> LuckyDrawRankList;
 
+struct RCSort
+{
+    GObject::Player* player;
+    UInt32 total;
+};
+
+struct lt_rcsort
+{
+    bool operator()(const RCSort& a, const RCSort& b) const { return a.total >= b.total; }
+};
+
+typedef std::set<RCSort, lt_rcsort> RCSortType;
+
 struct QixiScore
 {
     Player* lover;
@@ -367,6 +380,10 @@ public:
     static UInt32 _sosomapbegin;
     static bool _opentest;
     static bool _consumeactive;
+
+public:
+    static RCSortType rechargeSort;
+    static RCSortType consumeSort;
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }
