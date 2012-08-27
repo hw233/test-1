@@ -333,6 +333,9 @@ void jsonParser2(void * buf, int len, Stream& st)
         case 5:
             ret = add_playeritem_req(&head, body, retbody, err);
             break;
+        case 55:
+            ret = query_pagoda_rsp(&head, body, retbody, err);
+            break;
         default:
             break;
     }
@@ -366,6 +369,29 @@ _error1:
         json_free_value(&retobj);
 
     return;
+}
+
+int query_pagoda_rsp(JsonHead* head, json_t* body, json_t* retbody, std::string& err)
+{
+    if (!head || !body || !retbody)
+        return EUNKNOW;
+
+    char openid[36] = {0};
+    char playerId[32] = {0};
+    UInt32 areaid = 0;
+
+    body = body->child;
+    if (!body)
+        return EUNKNOW;
+
+    json_t* val = json_find_first_label(body, "uiAreaId");
+    if (val && val->child && val->child->text)
+        areaid = atoi(val->child->text);
+
+    head->cmd = 56;
+    json_insert_pair_into_object(retbody, "iResult", my_json_new_number(0));
+    json_insert_pair_into_object(retbody, "szRetMsg", json_new_string("success"));
+    return 0;
 }
 
 #endif

@@ -768,6 +768,23 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
 			player->setBuffData(PLAYER_BUFF_TRAINP1, 0);
 		}
 	}
+	p = player->getBuffData(PLAYER_BUFF_ADVANCED_HOOK, now);
+	if(p > 0)
+	{
+        exp = ecs->exp; /** 重置 **/
+		UInt32 left = p - now;
+        /** 随身经验加速符还有效 **/
+		if(left > duration)
+		{
+            exp *= 1.6f;
+			player->setBuffData(PLAYER_BUFF_ADVANCED_HOOK, p - duration);
+		}
+		else
+		{
+		    exp = exp + exp * left * 3/ duration / 5;
+			player->setBuffData(PLAYER_BUFF_ADVANCED_HOOK, 0);
+		}
+	}
 	player->AddExp(static_cast<UInt32>(exp));
 	ecs->ng->monsterKilled(player, ecs->count);
 }
@@ -1530,6 +1547,12 @@ void OnRoamintQueqiaoLastLoot( GameMsgHdr& hdr, const void* data )
     MSG_QUERY_PLAYER(player);
     player->checkLastQueqiaoAward();
 }
-
+#if 0
+void OnAdvancedHookExp( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    player->advancedHookExp();
+}
+#endif
 #endif // _COUNTRYINNERMSGHANDLER_H_
 
