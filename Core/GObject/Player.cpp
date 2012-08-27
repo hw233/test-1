@@ -6317,7 +6317,7 @@ namespace GObject
             UInt32 total = GetVar(VAR_RECHARGE_TOTAL);
             GameAction()->sendRechargeMails(this, total, total+r);
             SetVar(VAR_RECHARGE_TOTAL, total+r);
-            sendRechargeInfo();
+            sendRechargeInfo(true);
 #endif
         }
 
@@ -6326,7 +6326,7 @@ namespace GObject
             UInt32 total = GetVar(VAR_RECHARGE_TOTAL3366);
             GameAction()->sendRechargeMails(this, total, total+r);
             SetVar(VAR_RECHARGE_TOTAL3366, total+r);
-            sendRechargeInfo();
+            sendRechargeInfo(true);
         }
 
         if(World::getJune())
@@ -6479,7 +6479,7 @@ namespace GObject
         }
     }
 
-    void Player::sendRechargeInfo()
+    void Player::sendRechargeInfo(bool rank)
     {
         if (!World::getRechargeActive() && !World::getRechargeActive3366())
             return;
@@ -6492,9 +6492,15 @@ namespace GObject
 		Stream st(REP::DAILY_DATA);
 		st << static_cast<UInt8>(12) << total << Stream::eos;
 		send((st));
+
+        if (rank)
+        {
+            GameMsgHdr hdr(0x1C1, WORKER_THREAD_WORLD, this, sizeof(total));
+            GLOBAL().PushMsg(hdr, &total);
+        }
     }
 
-    void Player::sendConsumeInfo()
+    void Player::sendConsumeInfo(bool rank)
     {
         if (!World::getConsumeActive())
             return;
@@ -6503,6 +6509,12 @@ namespace GObject
 		Stream st(REP::DAILY_DATA);
 		st << static_cast<UInt8>(15) << total << Stream::eos;
 		send((st));
+
+        if (rank)
+        {
+            GameMsgHdr hdr(0x1C2, WORKER_THREAD_WORLD, this, sizeof(total));
+            GLOBAL().PushMsg(hdr, &total);
+        }
     }
 
 	void Player::sendTopupMail(const char* title, const char* content, UInt32 gold, UInt8 num)

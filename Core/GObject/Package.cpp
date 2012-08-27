@@ -571,7 +571,7 @@ namespace GObject
                 }
                 cittaUdpLog(1, typeId, num);
                 //增加获取物品的荣誉
-                GameAction()->doAttainment(m_Owner, Script::ON_ADD_ITEM, typeId);
+                //GameAction()->doAttainment(m_Owner, Script::ON_ADD_ITEM, typeId);
                 if (typeId == 1209)
                     m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
                 if (typeId == 1223)
@@ -643,7 +643,7 @@ namespace GObject
 			SendItemData(item);
 			ItemNotify(item->GetItemType().getId(), count);
             //获得物品
-            GameAction()->doAttainment(m_Owner, Script::ON_ADD_ITEM, typeId);
+            //GameAction()->doAttainment(m_Owner, Script::ON_ADD_ITEM, typeId);
             //if((fromWhere != 0  && item->getQuality() >= 3) || (fromWhere == FromMerge && item->getQuality() >= 2))
             //{
                  AddItemCoursesLog(typeId, static_cast<UInt32>(count), fromWhere);

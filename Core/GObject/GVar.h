@@ -26,6 +26,7 @@ namespace GObject
         GVAR_INVALID = 0,
         GVAR_TCPASS = 1, // 组队副本最高通过等级
         GVAR_CITTASPLIT = 2, // 心法拆分成两个处理
+        GVAR_CITTASMERGE = 3, // 心法残页合并
         GVAR_MAX,
     };
 
@@ -49,6 +50,7 @@ namespace GObject
             //注册变量
             GREGISTER_VAR(GVAR_TCPASS, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_CITTASPLIT, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_CITTASMERGE, GCYCLE_NONE);
         }
         
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

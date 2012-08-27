@@ -124,6 +124,8 @@ bool World::_pexpitems;
 UInt32 World::_sosomapbegin = 0;
 bool World::_opentest;
 bool World::_consumeactive;
+RCSortType World::rechargeSort;
+RCSortType World::consumeSort;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {

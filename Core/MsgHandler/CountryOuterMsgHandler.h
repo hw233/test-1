@@ -1154,6 +1154,14 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     {
         pl->sendSoSoMapInfo();
     }
+    {
+        GameMsgHdr hdr(0x1C3, WORKER_THREAD_WORLD, pl, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+    }
+    {
+        GameMsgHdr hdr(0x1C4, WORKER_THREAD_WORLD, pl, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+    }
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -1431,6 +1439,7 @@ void OnFighterEquipReq( GameMsgHdr& hdr, FighterEquipReq& fer )
         break;
     case 0x61:
         {
+            return; // XXX: 取消卸载技能功能
             UInt16 skill = (fer._equipId >> 16) & 0xFFFF;
             idx = fer._equipId & 0xFFFF;
             fgt->offSkill(skill, true);
