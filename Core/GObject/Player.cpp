@@ -1018,7 +1018,11 @@ namespace GObject
         {
             char buf[1024] = {0};
             char* pbuf = &buf[0];
-            pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u|||%u|||%u||%u||%u|",
+            if (cfg.isTestPlatform)
+                pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u|||%u|||%u||%u||%u|1|",
+                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId().c_str(), GetLev(), _playerData.gold, getVipLevel(), _playerData.qqvipl, cfg.serverNum, platform);
+            else
+                pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u|||%u|||%u||%u||%u|",
                     cfg.serverNum, cfg.tcpPort, getId(), getOpenId().c_str(), GetLev(), _playerData.gold, getVipLevel(), _playerData.qqvipl, cfg.serverNum, platform);
 
             m_ulog->SetUserMsg(buf);
@@ -10264,8 +10268,10 @@ namespace GObject
             return;
 
         UInt8 lvl = GetLev();
-        lvl = lvl > 99 ? 99 : lvl;
-        UInt64 exp = (offline/60)*((lvl-10)*(lvl/10)*5+25)*0.8f;
+        UInt8 yalvl = lvl;
+        if (lvl > 99)
+            yalvl = 99;
+        UInt64 exp = (offline/60)*((lvl-10)*(yalvl/10)*5+25)*0.8f;
         AddVar(VAR_OFFLINE_EXP, exp);
         AddVar(VAR_OFFLINE_PEXP, offline/60);
         AddVar(VAR_OFFLINE_EQUIP, offline);
@@ -11390,8 +11396,8 @@ namespace GObject
 
     void Player::IDIPAddItem(UInt16 itemId, UInt16 num, bool bind)
     {
-        SYSMSG(title, 4004);
-        SYSMSG(content, 4005);
+        SYSMSGV(title, 4004, itemId);
+        SYSMSGV(content, 4005, itemId, num);
         Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFD0000/*free*/);
         if(mail)
         {

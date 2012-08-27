@@ -29,6 +29,7 @@ ConfigScript::ConfigScript( Cfg * cfg )
 	class_def<Cfg>("setMerged", &Cfg::setMerged);
 	class_def<Cfg>("setSupportCompress", &Cfg::setSupportCompress);
 	class_def<Cfg>("setGMCheck", &Cfg::setGMCheck);
+    class_def<Cfg>("setTestPlatform", &Cfg::setTestPlatform);
 	class_def<Cfg>("setArenaServer", &Cfg::setArenaServer);
     class_def<Cfg>("setMsgCenter", &Cfg::setMsgCenter);   //yij
 	class_def<Cfg>("setChannelInfo", &Cfg::setChannelInfo);

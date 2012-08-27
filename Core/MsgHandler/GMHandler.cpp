@@ -182,6 +182,7 @@ GMHandler::GMHandler()
     Reg(3, "ssup", &GMHandler::OnSSUp);
     Reg(3, "sserase", &GMHandler::OnSSErase);
     Reg(3, "sosog", &GMHandler::OnSoSoGet);
+    Reg(2, "idip", &GMHandler::OnAddIdip);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2870,4 +2871,8 @@ void GMHandler::OnHandleSignIn(GObject::Player* player, std::vector<std::string>
     }
 }
 
+void GMHandler::OnAddIdip(GObject::Player * player, std::vector<std::string>& args)
+{
+    player->IDIPAddItem(503, 1, true);
+}
 

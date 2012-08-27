@@ -10,7 +10,6 @@ local flushtaskfactor = {
     }
 }
 
-local lvlfactor = {5,10,15,20,25,30,35,40,45,50}
 local base = 25
 
 local taskawardfactor = {
@@ -33,7 +32,12 @@ function GetTaskAwardFactor(ttype, color, lvl)
         if lvl < 30 then
             return taskawardfactor[1][color] * lvl + base
         end
-        return taskawardfactor[1][color] * (lvlfactor[math.floor(lvl/10)] * (lvl - 10) + base)
+        -- (等级-10)*INT(IF(等级>99,99,等级)/10)*5+25
+        yalvl = lvl
+        if lvl > 99 then
+            yalvl = 99
+        end
+        return taskawardfactor[1][color] * ((lvl-10)*math.floor(yalvl/10)*5 + base)
     end
     return taskawardfactor[ttype][color]
 end

@@ -203,11 +203,13 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
         if(pl->isBD() && World::getBlueDiamondAct()) {
             if(pl->GetVar(VAR_DIAMOND_BLUE) < PRIVILEGE_COUNT) {
                 pl->AddVar(VAR_DIAMOND_BLUE, 1);
+                pl->copyUdpLog(id, 5);
                 return 0;
             }
         } else if(pl->isYD() && World::getYellowDiamondAct()) {
             if(pl->GetVar(VAR_DIAMOND_YELLOW) < PRIVILEGE_COUNT) {
                 pl->AddVar(VAR_DIAMOND_YELLOW, 1);
+                pl->copyUdpLog(id, 6);
                 return 0;
             }
         }
