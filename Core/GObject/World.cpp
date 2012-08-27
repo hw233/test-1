@@ -1266,12 +1266,16 @@ void World::SendQixiAward()
                     for(int i = 0; i < mitemNum; ++ i)
                     {
                         MailPackage::MailItem mitem;
+                        bool bind = true;
                         if(mitems[i].id == 9124)
+                        {
                             mitem.id = mitems[i].id + (pl->GetClassAndSex() & 0x0F);
+                            bind = false;
+                        }
                         else
                             mitem.id = mitems[i].id;
                         mitem.count = mitems[i].count;
-                        mailPackageManager.push(mail->id, &mitem, 1, true);
+                        mailPackageManager.push(mail->id, &mitem, 1, bind);
 
                         strItems += Itoa(mitem.id);
                         strItems += ",";

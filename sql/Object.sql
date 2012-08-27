@@ -1338,6 +1338,7 @@ CREATE TABLE `towndeamon_player` (
   `itemNum` int(10) unsigned NOT NULL DEFAULT 0,
   `quitLevel` smallint(3) unsigned NOT NULL DEFAULT 0,
   `attacker` bigint(20) unsigned NOT NULL DEFAULT 0,
+  `time2MaxLvl` int(10) unsigned NOT NULL,
   PRIMARY KEY (`playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
