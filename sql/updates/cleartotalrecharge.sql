@@ -1,1 +1,1 @@
-update var set data=0 where id=46;
+delete from var where id = 46;

@@ -33,7 +33,7 @@ function GetTaskAwardFactor(ttype, color, lvl)
             return taskawardfactor[1][color] * lvl + base
         end
         -- (等级-10)*INT(IF(等级>99,99,等级)/10)*5+25
-        yalvl = lvl
+        local yalvl = lvl
         if lvl > 99 then
             yalvl = 99
         end
