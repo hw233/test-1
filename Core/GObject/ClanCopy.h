@@ -22,19 +22,6 @@ namespace GObject
 class Player;
 class Clan;
 
-struct ClanCopyCheckData
-{
-    ClanCopyCheckData(UInt8 t = 0, UInt32 id = 0, UInt16 minF = 0, UInt16 maxF = 0)
-        : type(t), objectId(id), minFloor(minF), maxFloor(maxF)
-    {
-    }
-
-    UInt8 type;    // 格子类型：普通怪，精英怪，机关，Boss
-    UInt32 objectId; // 格子的id（机关种类或者怪物id）
-    UInt16 minFloor; // 最低出现层数
-    UInt16 maxFloor; // 最高出现层数
-};
-
 struct ClanCopyPlayer
 {
 	ClanCopyPlayer(Player * player_ = NULL, UInt16 hold_ = 0, UInt8 status_ = 1)
@@ -65,16 +52,23 @@ struct ClanCopyMonster
 
 class ClanCopy
 {
-    typedef std::map<UInt8, ClanCopyMonster> spotMonster;
+    typedef std::map<UInt8, ClanCopyMonster> SpotMonster; // 该据点的怪物
+    typedef std::map<UInt8, ClanCopyPlayer> SpotPlayer;   // 该据点的玩家
+
     public:
         ClanCopy(Clan *c); 
         ~ClanCopy();
 
         void createEnemy(UInt32 round);
+        void enemyMove(UInt32 round);
+        void spotCombat(UInt8 spot, UInt32 round);
 
     private:
         Clan    * _clan;
         UInt16 _copyLevel;
+        SpotMonster _spotMonster;
+        SpotPlayer _spotPlayer;
+        
 };
 
 }

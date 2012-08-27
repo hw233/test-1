@@ -30,4 +30,14 @@ void ClanCopy::createEnemy(UInt32 round)
     // TODO: 敌人老巢产生敌人
 }
 
+void ClanCopy::enemyMove(UInt32 round)
+{
+    // TODO: 敌人移动
+}
+
+void ClanCopy::spotCombat(UInt8 spot, UInt32 round)
+{
+    // TODO: 该据点战斗
+}
+
 }
