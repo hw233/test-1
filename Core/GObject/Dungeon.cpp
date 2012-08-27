@@ -78,6 +78,7 @@ UInt8 Dungeon::playerEnter( Player * player )
 		PLAYER_DATA(player, dungeonEnd) = TimeUtil::SharpDay(1);
         ++ PLAYER_DATA(player, dungeonCnt);
 		sendDungeonInfo(player, *dpi);
+        player->dungeonUdpLog(_dungeon->levelReq, 1);
 	}
 	else
 	{

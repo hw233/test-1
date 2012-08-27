@@ -39,8 +39,6 @@ struct LeaderboardItem2
 	std::string clan;
 };
 
-
-
 }
 
 namespace DB {
@@ -69,6 +67,15 @@ SPECIALDEF(6)
 )
 SPECIALEND()
 
+SPECIALBEGIN(GObject::LeaderboardTowndown)
+SPECIALDEF(4)
+(
+    UInt64, id,
+	std::string, name,
+    UInt16, level,
+    UInt32, time
+)
+SPECIALEND()
 
 }
 
@@ -233,6 +240,14 @@ void Leaderboard::doUpdate()
     }
 	buildPacket(_clanStream, 3, _id, blist);
 #endif
+
+	std::vector<LeaderboardTowndown> blist3;
+	execu->ExtractData("select a.id, a.name, b.maxLevel, b.time2MaxLvl from player a, towndeamon_player b where a.id=b.playerId order by b.maxLevel desc, b.time2MaxLvl asc limit 100;", blist3);
+    {
+        FastMutex::ScopedLock lk(_tmutex);
+        _towndown.clear();
+        _towndown.insert(_towndown.end(), blist3.begin(), blist3.end());
+    }
 
 	std::vector<UInt64> ilist;
 	size_t cnt;
