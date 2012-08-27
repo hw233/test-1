@@ -1547,12 +1547,12 @@ void OnRoamintQueqiaoLastLoot( GameMsgHdr& hdr, const void* data )
     MSG_QUERY_PLAYER(player);
     player->checkLastQueqiaoAward();
 }
-
+#if 0
 void OnAdvancedHookExp( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);
     player->advancedHookExp();
 }
-
+#endif
 #endif // _COUNTRYINNERMSGHANDLER_H_
 

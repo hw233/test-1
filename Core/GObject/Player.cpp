@@ -124,7 +124,7 @@ namespace GObject
 		UInt32 now = TimeUtil::Now();
 		float exp = calcExpEach(now);
         if(m_Player->getBuffData(PLAYER_BUFF_ADVANCED_HOOK, now))
-            exp = 0;
+            exp *= 1.5f;
         else if(m_Player->getBuffData(PLAYER_BUFF_TRAINP3, now))
             exp *= 1.8f;
         else if(m_Player->getBuffData(PLAYER_BUFF_TRAINP4, now))
@@ -3022,21 +3022,23 @@ namespace GObject
         OnHeroMemo(MC_FIGHTER, MD_STARTED, 0, 0);
 		return true;
 	}
-
+#if 0
     /** 随身加速服功能 **/
     void Player::advancedHookExp()
 	{
-       if(getBuffData(PLAYER_BUFF_ADVANCED_HOOK, TimeUtil::Now()) == 0)
+        if(getBuffData(PLAYER_BUFF_ADVANCED_HOOK, TimeUtil::Now()) == 0)
+            return;
+        if(!isOnline())
             return;
         UInt8 lvl = GetLev();
+        UInt8 lvl2 = lvl;
         lvl = lvl > 99 ? 99 : lvl;
-        UInt32 extraExp = (lvl - 10) * (lvl / 10) * 5 + 25;
+        UInt32 extraExp = (lvl2 - 10) * (lvl / 10) * 5 + 25;
         extraExp = extraExp * 3 / 2;
-        SYSMSG_SENDV(100, this, extraExp);
-        SYSMSG_SENDV(1068, this, extraExp);
+        AddExp(extraExp);
 		return;
 	}
-
+#endif
 	void Player::pushAutoBattle(UInt32 npcId, UInt16 count, UInt16 interval)
 	{
 		if(npcId == 0 || count == 0 || interval == 0)
@@ -8502,6 +8504,11 @@ namespace GObject
 
     float Player::getPracticeBufFactor()
     {
+        if(getBuffData(PLAYER_BUFF_ADVANCED_P_HOOK, TimeUtil::Now()))
+        {
+            return 0.2;
+        }
+
         if(getBuffData(PLAYER_BUFF_PRACTICE1, TimeUtil::Now()))
         {
             return 0.5;
@@ -8667,7 +8674,9 @@ namespace GObject
             UInt32 now = TimeUtil::Now();
             UInt32 duration = 60*60;
             UInt8 type = 0;
-            UInt32 p = getBuffData(PLAYER_BUFF_PROTECT, now);
+            UInt32 p = getBuffData(PLAYER_BUFF_ADVANCED_P_HOOK, now);
+            if(!p)
+                p = getBuffData(PLAYER_BUFF_PROTECT, now);
             if (!p)
             {
                 p = getBuffData(PLAYER_BUFF_PRACTICE1, now);
@@ -8681,14 +8690,24 @@ namespace GObject
             {
                 left -= duration;
                 if (type == 0)
-                    setBuffData(PLAYER_BUFF_PROTECT, left+now);
+                {
+                    if(getBuffData(PLAYER_BUFF_ADVANCED_P_HOOK, now))
+                        setBuffData(PLAYER_BUFF_ADVANCED_P_HOOK, left+now);
+                    else
+                        setBuffData(PLAYER_BUFF_PROTECT, left+now);
+                }
                 else
                     setBuffData(PLAYER_BUFF_PRACTICE1, left+now);
             }
             else if (left)
             {
                 if (type == 0)
-                    setBuffData(PLAYER_BUFF_PROTECT, 0);
+                {
+                    if(getBuffData(PLAYER_BUFF_ADVANCED_P_HOOK, now))
+                        setBuffData(PLAYER_BUFF_ADVANCED_P_HOOK, 0);
+                    else
+                        setBuffData(PLAYER_BUFF_PROTECT, 0);
+                }
                 else
                     setBuffData(PLAYER_BUFF_PRACTICE1, 0);
             }

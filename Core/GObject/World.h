@@ -410,7 +410,7 @@ private:
     static void Team_Copy_Process(void*);
 	static void World_One_Min( World * );
     static void AthleticsPhysicalCheck(void *);
-    static void advancedHookTimer(void *para);
+    //static void advancedHookTimer(void *para);
 
 public:
 	static void ReCalcWeekDay( World * );

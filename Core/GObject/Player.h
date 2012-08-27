@@ -57,10 +57,11 @@ namespace GObject
 #define PLAYER_BUFF_REENTERCLAN		0x13
 #define PLAYER_BUFF_CLANRCENHANCE	0x14    
 #define PLAYER_BUFF_PWDLOCK			0x15	//5?????????? ????10????
+#define PLAYER_BUFF_ADVANCED_P_HOOK	0x16    //随身修为加速符: 20%
 #define PLAYER_BUFF_PRACTICE1       0x17	//修为加速: 50%
 //#define PLAYER_BUFF_PRACTICE2       0x17	//??��?ӳ?50% XXX: ??ʱ????
 //#define PLAYER_BUFF_XTHTYT          0x18	//??ʹ????????????Ԫ̥
-#define PLAYER_BUFF_ADVANCED_HOOK	0x18    //随身挂机加速符
+#define PLAYER_BUFF_ADVANCED_HOOK	0x18    //随身挂机加速符: 50%
 #define PLAYER_BUFF_WBOSS           0x19	//?Ѷ??????��?BOSS????
 #define PLAYER_BUFF_YDOTR           0x20    //??????????ֵ?ܶ?
 #define PLAYER_BUFF_AUTOCOPY        0x21	//?Զ?????
@@ -1024,7 +1025,7 @@ namespace GObject
         inline void setCopyFailed() { m_autoCopyFailed = true; }
 		bool autoBattle(UInt32);
 		void pushAutoBattle(UInt32, UInt16, UInt16);
-        void advancedHookExp();
+        //void advancedHookExp();
 		void pushAutoDungeon(UInt32, UInt32, UInt8);
 		void cancelAutoBattle();
 		void cancelAutoBattleNotify();
