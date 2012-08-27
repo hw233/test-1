@@ -924,4 +924,16 @@ void OnRoamResult( GameMsgHdr& hdr,  const void* data )
     player->qixiStepAdvance(roam->pos, roam->event, roam->score);
 }
 
+
+void OnReCalcWeekDayAddTimer( GameMsgHdr& hdr,  const void* data )
+{
+    WORLD()._recalcwd = WORLD().AddTimer(10000, WORLD().ReCalcWeekDay, &(WORLD()), 10000);
+}
+
+void OnReCalcWeekDayRemoveTimer( GameMsgHdr& hdr,  const void* data )
+{
+    WORLD().RemoveTimer(WORLD()._recalcwd);
+    WORLD()._recalcwd = NULL;
+}
+
 #endif // _WORLDINNERMSGHANDLER_H_

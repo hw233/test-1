@@ -1520,7 +1520,7 @@ void OnRoamintQueqiao( GameMsgHdr& hdr, const void* data )
 void OnRoamintQueqiaoLastLoot( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);
-    player->checkLastBattled();
+    player->checkLastQueqiaoAward();
 }
 
 #endif // _COUNTRYINNERMSGHANDLER_H_

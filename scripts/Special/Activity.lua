@@ -2086,7 +2086,7 @@ function onRoamingQueqiao(player, pos)
     j = math.random(1, 3)
 
     package:Add(eventItem[i][j][1], eventItem[i][j][2], true, true, 32)
-    player:lastLootPush(eventItem[i][j][1], eventItem[i][j][2]);
+    player:lastQueqiaoAwardPush(eventItem[i][j][1], eventItem[i][j][2]);
     player:postRoamResult(pos2, j, eventItem[i][j][3]);
 
     return pos2;

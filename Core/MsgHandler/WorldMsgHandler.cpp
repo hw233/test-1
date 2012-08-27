@@ -138,6 +138,9 @@ MSG_REG_2(GameMsgHdr, 0x1F8, OnAthleticsFlush);
 
 MSG_REG_2(GameMsgHdr, 0x1F9, OnRoamResult);
 
+MSG_REG_2(GameMsgHdr, 0x1FA, OnReCalcWeekDayAddTimer);
+MSG_REG_2(GameMsgHdr, 0x1FB, OnReCalcWeekDayRemoveTimer);
+
 #ifdef _ARENA_SERVER
 MSG_REG_2(LoginMsgHdr, 0x01, onServerReg);
 MSG_REG_2(GameMsgHdr, 0x02, onPlayerEnter);

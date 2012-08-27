@@ -408,9 +408,11 @@ private:
     static void World_Boss_Prepare(void*);
     static void Hero_Island_Process(void*);
     static void Team_Copy_Process(void*);
-	static void ReCalcWeekDay( World * );
 	static void World_One_Min( World * );
     static void AthleticsPhysicalCheck(void *);
+
+public:
+	static void ReCalcWeekDay( World * );
 
 public:
     void UpdateQixiScore(Player* pl, Player* lover);

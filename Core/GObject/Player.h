@@ -1374,6 +1374,7 @@ namespace GObject
         std::vector<LastAthAward> _lastAthAward;
         std::vector<GData::LootResult> _equipAward;
 		std::vector<GData::LootResult> _RegisterAward;
+		std::vector<GData::LootResult> _lastQueqiaoAward;
 
     private:
 		UInt16 _lastDungeon;
@@ -1611,6 +1612,8 @@ namespace GObject
         void RegisterAward(UInt16 itemId, UInt16 num);
         void sendNewRegisterAward(UInt8 idx);
         void IDIPAddItem(UInt16 itemId, UInt16 num, bool bind = true);
+        void lastQueqiaoAwardPush(UInt16 itemId, UInt16 num);
+        void checkLastQueqiaoAward();
 
     private:
         bool m_hasTripod;

@@ -379,15 +379,18 @@ void World::calWeekDay( World * world )
     if(_wday == wday)
     {
         if(!_recalcwd)
-            _recalcwd = world->AddTimer(10000, ReCalcWeekDay, world, 10000);
+        {
+            GameMsgHdr hdr(0x1FA, WORKER_THREAD_WORLD, NULL, 0);
+            GLOBAL().PushMsg(hdr, NULL);
+        }
         return;
     }
     else
     {
         if(_recalcwd)
         {
-            world->RemoveTimer(_recalcwd);
-            _recalcwd = NULL;
+            GameMsgHdr hdr(0x1FB, WORKER_THREAD_WORLD, NULL, 0);
+            GLOBAL().PushMsg(hdr, NULL);
         }
         _wday = wday;
     }

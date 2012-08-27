@@ -9576,6 +9576,22 @@ namespace GObject
         _RegisterAward.push_back(lt);
     }
 
+    void Player::lastQueqiaoAwardPush(UInt16 itemId, UInt16 num)
+    {
+        GData::LootResult lt = {itemId, num};
+        _lastQueqiaoAward.push_back(lt);
+    }
+
+    void Player::checkLastQueqiaoAward()
+    {
+        std::vector<GData::LootResult>::iterator it;
+        for(it = _lastQueqiaoAward.begin(); it != _lastQueqiaoAward.end(); ++ it)
+        {
+            m_Package->ItemNotify(it->id, it->count);
+        }
+        _lastQueqiaoAward.clear();
+    }
+
     void Player::sendHappyInfo(UInt16 itemId)
     {
 
