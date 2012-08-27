@@ -8,6 +8,7 @@
 #include "GObject/Player.h"
 #include "MsgID.h"
 #include "Common/BinaryReader.h"
+#include "GObject/Leaderboard.h"
 
 extern "C" {
 //#include "bits.h"
@@ -267,6 +268,37 @@ int add_playeritem_req(JsonHead* head, json_t* body, json_t* retbody, std::strin
     return 0;
 }
 
+int query_pagoda_rsp(JsonHead* head, json_t* body, json_t* retbody, std::string& err)
+{
+    if (!head || !body || !retbody)
+        return EUNKNOW;
+
+    body = body->child;
+    if (!body)
+        return EUNKNOW;
+
+    UInt32 areaid = 0;
+    json_t* val = json_find_first_label(body, "uiAreaId");
+    if (val && val->child && val->child->text)
+        areaid = atoi(val->child->text);
+
+    UInt32 count = 0;
+    const std::vector<GObject::LeaderboardTowndown>& towndown = GObject::leaderboard.getTowndown();
+    json_insert_pair_into_object(retbody, "uiCount", my_json_new_number(count));
+    for (UInt32 i = 0; i < count; ++i)
+    {
+        char playerId[32] = {0};
+        snprintf(playerId, sizeof(playerId), "%"I64_FMT"u", towndown[i].id);
+        json_insert_pair_into_object(retbody, "uiRoleId", json_new_string(playerId));
+        json_insert_pair_into_object(retbody, "szRoleName", json_new_string(towndown[i].name.c_str()));
+        json_insert_pair_into_object(retbody, "uiLayers", my_json_new_number(towndown[i].level));
+        json_insert_pair_into_object(retbody, "uiReachedTime", my_json_new_number(towndown[i].time));
+    }
+
+    head->cmd = 56;
+    return 0;
+}
+
 void jsonParser2(void * buf, int len, Stream& st)
 {
 	BinaryReader br(buf, len);
@@ -369,29 +401,6 @@ _error1:
         json_free_value(&retobj);
 
     return;
-}
-
-int query_pagoda_rsp(JsonHead* head, json_t* body, json_t* retbody, std::string& err)
-{
-    if (!head || !body || !retbody)
-        return EUNKNOW;
-
-    char openid[36] = {0};
-    char playerId[32] = {0};
-    UInt32 areaid = 0;
-
-    body = body->child;
-    if (!body)
-        return EUNKNOW;
-
-    json_t* val = json_find_first_label(body, "uiAreaId");
-    if (val && val->child && val->child->text)
-        areaid = atoi(val->child->text);
-
-    head->cmd = 56;
-    json_insert_pair_into_object(retbody, "iResult", my_json_new_number(0));
-    json_insert_pair_into_object(retbody, "szRetMsg", json_new_string("success"));
-    return 0;
 }
 
 #endif
