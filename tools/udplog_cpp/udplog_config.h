@@ -29,9 +29,11 @@ public:
 public:
 	int32_t Init(const char* szFileName = DEFAULT_CONFIGFILENAME);
 	
+	//随机取一个host返回，返回值 < 0 表示获取失败
 	int32_t GetHostRandomly(stHost& host);
     int32_t GetHostRandomlyDomain(stHost& host, int domain);
 	
+	//根据文件名字获取对应的ID，返回值 < 0 表示获取失败
 	int32_t GetLogFileID(const char* typeinfo);
 
 private:

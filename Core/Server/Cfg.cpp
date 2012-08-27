@@ -11,7 +11,7 @@
 Cfg::Cfg( ): tcpPort(8888), serverIp(0), serverLogId(0), dbDataPort(3306), dbObjectPort(3306),
     fbVersion(false), vtVersion(false), debug(false),
     openYear(2011), openMonth(9), openDay(23), enableWallow(false), limitLuckyDraw(0),
-	merged(false), supportCompress(true), GMCheck(true), channelNum(0), serverNum(0), serverNo(0), arenaPort(0),
+	merged(false), supportCompress(true), GMCheck(true), channelNum(0), serverNum(0), serverNo(0), isTestPlatform(false), arenaPort(0),
 	enableLoginLimit(false), loginLimit(10000), onlineLimit(0), udplog(true), dclog(true), _filename("conf/config.lua")
 {
 }

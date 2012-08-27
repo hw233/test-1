@@ -190,7 +190,7 @@ int32_t CUdpLogConfig::Init(const char* szFileName/* = DEFAULT_CONFIGFILENAME*/)
 	{
 		return ret;
 	}
-
+    
     ret = InitDomainServerInfo(pRoot);
     if (ret < 0)
     {
