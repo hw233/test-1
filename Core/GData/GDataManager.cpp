@@ -391,6 +391,10 @@ namespace GData
 		return true;
 	}
 
+    bool GDataManager::LoadClanCopyData()
+    {
+    }
+
 	void SetValOrPercent(UInt16& val, float& perc, const std::string& str)
 	{
 		if(str[str.length() - 1] == '%')
