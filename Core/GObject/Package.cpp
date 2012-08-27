@@ -554,6 +554,15 @@ namespace GObject
                     m_Owner->udpLog("item", "I_503_1_2", "", "", "", "", "act", num);
                 }
 
+                // 这是什么道具要统计？文档里没找到。。。
+                if (typeId == 550)
+                {
+                    char strBuf[32] = "";
+                    m_Owner->udpLog("item", "I_550_1", "", "", "", "", "act", num);
+                    snprintf(strBuf, 32, "I_550_1_%d", fromWhere);
+                    m_Owner->udpLog("item", strBuf, "", "", "", "", "act", num);
+                }
+
 
 
                 if (typeId == 1209)
@@ -595,6 +604,15 @@ namespace GObject
                 if (typeId == 503 && bind!= true)
                 {
                     m_Owner->udpLog("item", "I_503_1_2", "", "", "", "", "act", num);
+                }
+
+                // 这是什么道具要统计？文档里没找到。。。
+                if (typeId == 550)
+                {
+                    char strBuf[32] = "";
+                    m_Owner->udpLog("item", "I_550_1", "", "", "", "", "act", num);
+                    snprintf(strBuf, 32, "I_550_1_%d", fromWhere);
+                    m_Owner->udpLog("item", strBuf, "", "", "", "", "act", num);
                 }
 
                 //增加获取物品的荣誉
@@ -655,6 +673,15 @@ namespace GObject
                 m_Owner->udpLog("item", "I_503_1_2", "", "", "", "", "act", count);
             }
 
+            // 这是什么道具要统计？文档里没找到。。。
+            if (typeId == 550)
+            {
+                char strBuf[32] = "";
+                m_Owner->udpLog("item", "I_550_1", "", "", "", "", "act", count);
+                snprintf(strBuf, 32, "I_550_1_%d", fromWhere);
+                m_Owner->udpLog("item", strBuf, "", "", "", "", "act", count);
+            }
+
             if (typeId == 1209)
                 m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
             if (typeId == 1223)
@@ -689,8 +716,17 @@ namespace GObject
                 m_Owner->udpLog("item", "I_503_1_2", "", "", "", "", "act", count);
             }
 
-			SendItemData(item);
-			ItemNotify(item->GetItemType().getId(), count);
+            // 这是什么道具要统计？文档里没找到。。。
+            if (typeId == 550)
+            {
+                char strBuf[32] = "";
+                m_Owner->udpLog("item", "I_550_1", "", "", "", "", "act", count);
+                snprintf(strBuf, 32, "I_550_1_%d", fromWhere);
+                m_Owner->udpLog("item", strBuf, "", "", "", "", "act", count);
+            }
+
+            SendItemData(item);
+            ItemNotify(item->GetItemType().getId(), count);
             //获得物品
             //GameAction()->doAttainment(m_Owner, Script::ON_ADD_ITEM, typeId);
             //if((fromWhere != 0  && item->getQuality() >= 3) || (fromWhere == FromMerge && item->getQuality() >= 2))
@@ -1089,7 +1125,16 @@ namespace GObject
                 m_Owner->udpLog("item", "I_503_2_2", "", "", "", "", "act", num);
             }
 
-			SendItemData(item);
+            // 这是什么道具要统计？文档里没找到。。。
+            if (id == 550)
+            {
+                char strBuf[32] = "";
+                m_Owner->udpLog("item", "I_550_2", "", "", "", "", "act", num);
+                snprintf(strBuf, 32, "I_550_2_%d", toWhere);
+                m_Owner->udpLog("item", strBuf, "", "", "", "", "act", num);
+            }
+
+            SendItemData(item);
 			if (cnt == 0)
 			{
 				SAFE_DELETE(item);
@@ -1133,6 +1178,15 @@ namespace GObject
             if (item->getId() == 503 && item->GetBindStatus()!= true)
             {
                 m_Owner->udpLog("item", "I_503_2_2", "", "", "", "", "act", num);
+            }
+
+            // 这是什么道具要统计？文档里没找到。。。
+            if (item->getId() == 550)
+            {
+                char strBuf[32] = "";
+                m_Owner->udpLog("item", "I_550_2", "", "", "", "", "act", num);
+                snprintf(strBuf, 32, "I_550_2_%d", toWhere);
+                m_Owner->udpLog("item", strBuf, "", "", "", "", "act", num);
             }
 
 			SendItemData(item);
