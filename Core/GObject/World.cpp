@@ -1223,27 +1223,27 @@ void World::SendQixiAward()
         }
         else if(pos == 1)
         {
-            MailPackage::MailItem mitem = {1325, 30};
+            MailPackage::MailItem mitem = {1325, 25};
             mitems.push_back(mitem);
         }
         else if(pos == 2)
         {
-            MailPackage::MailItem mitem = {1325, 25};
+            MailPackage::MailItem mitem = {1325, 20};
             mitems.push_back(mitem);
         }
         else if(pos < 10)
         {
-            MailPackage::MailItem mitem = {1325, 20};
+            MailPackage::MailItem mitem = {1325, 15};
             mitems.push_back(mitem);
         }
         else if(pos < 50)
         {
-            MailPackage::MailItem mitem = {1325, 15};
+            MailPackage::MailItem mitem = {1325, 10};
             mitems.push_back(mitem);
         }
         else if(pos < 100)
         {
-            MailPackage::MailItem mitem = {1325, 10};
+            MailPackage::MailItem mitem = {1325, 5};
             mitems.push_back(mitem);
         }
 
@@ -1262,21 +1262,23 @@ void World::SendQixiAward()
                 Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
                 if(mail)
                 {
-                    for(int j = 0; j < mitemNum; ++ j)
-                    {
-                        if(mitems[j].id == 9124)
-                            mitems[j].id += (pl->GetClassAndSex() & 0x0F);
-                        mailPackageManager.push(mail->id, &(mitems[j]), 1, true);
-                    }
-
                     std::string strItems;
                     for(int i = 0; i < mitemNum; ++ i)
                     {
-                        strItems += Itoa(mitems[i].id);
+                        MailPackage::MailItem mitem;
+                        if(mitems[i].id == 9124)
+                            mitem.id = mitems[i].id + (pl->GetClassAndSex() & 0x0F);
+                        else
+                            mitem.id = mitems[i].id;
+                        mitem.count = mitems[i].count;
+                        mailPackageManager.push(mail->id, &mitem, 1, true);
+
+                        strItems += Itoa(mitem.id);
                         strItems += ",";
-                        strItems += Itoa(mitems[i].count);
+                        strItems += Itoa(mitem.count);
                         strItems += "|";
                     }
+
                     DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
                 }
             }
@@ -1329,7 +1331,7 @@ void World::sendQixiScoreAward(Player* pl)
     }
     else if(score > 799)
     {
-        MailPackage::MailItem mitem[3] = {{503, 7}, {514, 7}, {511, 7}};
+        MailPackage::MailItem mitem[3] = {{503, 7}, {514, 7}, {512, 7}};
         mailPackageManager.push(mail->id, mitem, 3, true);
 
         for(int i = 0; i < 3; ++ i)
@@ -1368,7 +1370,7 @@ void World::sendQixiScoreAward(Player* pl)
     }
     else if(score > 49)
     {
-        MailPackage::MailItem mitem[3] = {{503, 7}, {510, 7}, {504, 7}};
+        MailPackage::MailItem mitem[3] = {{502, 7}, {510, 7}, {504, 7}};
         mailPackageManager.push(mail->id, mitem, 3, true);
 
         for(int i = 0; i < 3; ++ i)
