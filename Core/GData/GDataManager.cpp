@@ -8,6 +8,8 @@
 #include "LootTable.h"
 #include "ClanTechTable.h"
 #include "ClanSkillTable.h"
+#include "ClanCopyTable.h"
+#include "ClanStatueTable.h"
 #include "GObject/Item.h"
 #include "DB/DBConnectionMgr.h"
 #include "GDataDBExecHelper.h"
@@ -260,6 +262,18 @@ namespace GData
 			fprintf(stderr, "Load Skill Strengthen Table Error !\n");
 			return false;
         }
+        /*
+        if (!LoadClanCopy())
+        {
+            fprintf (stderr, "Load Clan Copy Table Error !\n");
+            return false;
+        }
+        if (!LoadClanStatue())
+        {
+            fprintf (stderr, "Load Clan Statue Error !\n");
+            return false;
+        }
+        */
 
 		return true;
 	}
@@ -390,10 +404,6 @@ namespace GData
 
 		return true;
 	}
-
-    bool GDataManager::LoadClanCopyData()
-    {
-    }
 
 	void SetValOrPercent(UInt16& val, float& perc, const std::string& str)
 	{
@@ -1358,6 +1368,57 @@ namespace GData
 
 		return true;
 	}
+
+    bool GDataManager::LoadClanCopy()
+    {
+        // TODO: 读取和帮派副本有关的配置参数
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+        /*
+		DBClanSkillType cst;
+		if (execu->Prepare("SELECT `id`, `name`, `level`, `needs`, `value` FROM `clan_skill_template` ORDER BY `id` ASC, `level` ASC", cst) != DB::DB_OK)
+			return false;
+		while (execu->Next() == DB::DB_OK)
+		{
+			if (cst.id >= clanSkillTable.size())
+			{
+				clanSkillTable.resize(cst.id + 1);
+			}
+			SingleClanSkillTable & single = clanSkillTable[cst.id];
+			if (cst.level >= single.size())
+				single.resize(cst.level + 1);
+			single[cst.level] = ClanSkillTableData(cst.id, cst.name, cst.level, cst.needs, cst.value);
+		}
+        */
+
+		return true;
+    }
+
+    bool GDataManager::LoadClanStatue()
+    {
+        // 读取帮派神像数据
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+        DBClanStatue cs;
+		if (execu->Prepare("SELECT `level`, `needExp`, `consumeExp`, \
+                    `exHp`, `exAttack`, `exDefend`, `exMagAtk`, `exMagDef`, `exAction`, `exHitRate`\
+                    FROM `clan_copy_template` ORDER BY `level` ASC", cs) != DB::DB_OK)
+			return false;
+		while (execu->Next() == DB::DB_OK)
+		{
+			if (cs.level >= clanStatueTable.size())
+			{
+				clanStatueTable.resize(cs.level + 1);
+			}
+            clanStatueTable[cs.level] = ClanStatueTableData(
+                                     cs.level, cs.needExp, cs.consumeExp, 
+                                     cs.exHp, cs.exAttack, cs.exDefend, 
+                                     cs.exMagAtk, cs.exMagDef, cs.exAction, cs.exHitRate);
+
+		}
+        return true;
+    }
+
 	bool GDataManager::LoadFighterProb()
 	{
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());

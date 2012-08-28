@@ -231,6 +231,21 @@ struct DBClanSkillType
     float value;        // 技能效果值
 };
 
+struct DBClanStatue
+{
+    // 帮派神像模板参数
+    UInt16 level;       // 神像等级
+    UInt32 needExp;     // 升级所需经验值
+    UInt32 consumeExp;  // 每小时减少的经验值
+    UInt32 exHp;        // 神像增加的hp
+    UInt32 exAttack;    // 神像增加的物攻值
+    UInt32 exDefend;    // 神像增加的物防值
+    UInt32 exMagAtk;    // 神像增加的法攻值
+    UInt32 exMagDef;    // 神像增加的法防值
+    UInt32 exAction;    // 神像增加的身法值
+    UInt32 exHitRate;   // 神像增加的命中值
+};
+
 struct DBSoulSkillType
 {
 	UInt16 id;          // 技能ID
@@ -574,6 +589,22 @@ SPECIALDEF(5)
 	UInt32, needs,
     float, value
 	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBClanStatue)
+SPECIALDEF(10)
+    (
+    UInt16, level,       
+    UInt32, needExp,         
+    UInt32, consumeExp,   
+    UInt32, exHp,        
+    UInt32, exAttack,    
+    UInt32, exDefend,    
+    UInt32, exMagAtk,    
+    UInt32, exMagDef,    
+    UInt32, exAction,    
+    UInt32, exHitRate
+    )
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBSoulSkillType)

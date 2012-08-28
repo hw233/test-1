@@ -43,11 +43,12 @@ struct ClanCopyPlayer
 	UInt8  hasAttack;
 };
 
+// 帮派副本怪物信息结构
 struct ClanCopyMonster
 {
     UInt32 npcId;
-    UInt32 currentSpot;
-    UInt32 nextSpot;
+    UInt8 currentSpot;
+    UInt8 nextSpot;
 };
 
 class ClanCopy

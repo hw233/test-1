@@ -11787,5 +11787,24 @@ namespace GObject
         DB1().PushUpdateData("UPDATE `qixi` SET `bind`=0, `lover`=0 WHERE `playerId` = %"I64_FMT"u", getId());
     }
 
+    ///////////////////////////////////////////////
+    // 帮派副本相关
+
+    void Player::sendClanCopyInfo()
+    {
+        // TODO: 发送帮派副本标签页的有关数据信息
+        if (_clan == NULL)
+            return;
+        Stream st(REP::CLAN_COPY);
+        st << static_cast<UInt8>(CLAN_COPY_TAB_INFO);
+        st << static_cast<UInt8>(_clan->getOnlineMembersCount());
+        st << Stream::eos;
+        send(st);
+    }
+    
+    
+    // 帮派副本相关
+    ///////////////////////////////////////////////
+
 } // namespace GObject
 

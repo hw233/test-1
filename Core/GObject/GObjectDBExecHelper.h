@@ -661,6 +661,13 @@ struct DBClanRewardRecord
 	std::string items;
 };
 
+struct DBClanStatue
+{
+    UInt32 clanId;
+    UInt16 level;
+    UInt32 exp;
+};
+
 struct DBTaskData
 {
 	UInt64 m_ownerId;
@@ -1738,6 +1745,15 @@ SPECIALDEF(5)
 	UInt32, timeAlloc,
 	std::string, playerName,
 	std::string, items
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBClanStatue)
+SPECIALDEF(3)
+(
+    UInt32, clanId,
+    UInt16, level,
+    UInt32, exp
 )
 SPECIALEND()
 

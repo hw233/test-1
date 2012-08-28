@@ -2837,6 +2837,28 @@ namespace GObject
 		lc.finalize();
 		globalClans.enumerate(cacheClan, 0);
 
+        // 读取帮派神像
+        lc.prepare("Loading clan statue:");
+        DBClanStatue cs;
+        if (execu->Prepare("SELECT `clanid`, `level`, `exp` FROM `clan_statue` ORDER BY `clanid`", cs) != DB::DB_OK)
+            return false;
+        clan = NULL;
+        lastId = 0xFFFFFFFF;
+        lc.reset(1000);
+        while(execu->Next() == DB::DB_OK)
+        {
+            lc.advance();
+            if (cs.clanId != lastId)
+            {
+                lastId = cs.clanId;
+                clan = globalClans[cs.clanId];
+            }
+            if(clan == NULL) continue;
+            clan->LoadStatue(cs.level, cs.exp);
+        }
+        lc.finalize();
+
+
 
         lc.prepare("Loading clan item:");
         DBClanItem ci;

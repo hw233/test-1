@@ -23,6 +23,7 @@
 #include "MsgHandler/CountryMsgStruct.h"
 #include "ClanRankBattle.h"
 #include "HeroMemo.h"
+#include "ClanStatue.h"
 
 #include "GObject/AthleticsRank.h"
 #include <mysql.h>
@@ -256,6 +257,7 @@ Clan::Clan( UInt32 id, const std::string& name, UInt32 ft, UInt8 lvl ) :
     _itemPkg.Init(_id, 0, GData::clanLvlTable.getPkgSize(_level));
 
 	_techs = new ClanTech(this);
+    _statue = new ClanStatue(this);
     _maxMemberCount = BASE_MEMBER_COUNT + _techs->getMemberCount();
 	memset(_favorId, 0, sizeof(_favorId));
 	_clanDynamicMsg = new ClanDynamicMsg();
@@ -270,6 +272,7 @@ Clan::Clan( UInt32 id, const std::string& name, UInt32 ft, UInt8 lvl ) :
 Clan::~Clan()
 {
 	delete _techs;
+    delete _statue;
 	delete _clanDynamicMsg;
 	delete _clanBattle;
 }
@@ -1197,6 +1200,25 @@ void Clan::VisitMembers(ClanMemberVisitor& visitor)
         if(mem == NULL || mem->player == NULL) continue;
         if(!visitor(mem)) break;
     }
+}
+
+UInt8 Clan::getOnlineMembersCount()
+{
+	Mutex::ScopedLock lk(_mutex);
+    UInt8 c = 0;
+    Members::iterator offset = _members.begin();
+    for (; offset != _members.end(); ++ offset)
+    {
+		ClanMember * mem = *offset;
+        if (!mem || !mem->player)
+            continue;
+        if (mem->player->isOnline())
+            ++ c;
+        else
+            continue;
+    }
+    return c;
+    
 }
 
 void Clan::listMembers( Player * player )
@@ -3519,6 +3541,13 @@ void Clan::sendClanList(Player *player, UInt8 type, UInt8 start, UInt8 cnt)
     }
     st << Stream::eos;
     player->send(st);
+}
+
+void Clan::LoadStatue(UInt16 level, UInt32 exp)
+{
+    // 读取帮派神像数据
+    Mutex::ScopedLock lk(_mutex);
+    _statue->updateLevel(exp);
 }
 
 }
