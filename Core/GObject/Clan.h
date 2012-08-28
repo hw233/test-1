@@ -16,6 +16,7 @@ class Player;
 class ClanTech;
 class ClanBattle;
 class Clan;
+class ClanStatue;
 
 #define BASE_MEMBER_COUNT 30
 struct AllocItem
@@ -415,6 +416,11 @@ public:
     void GetWeal(Player* player);
     void GetItems(Player* player);
 
+    /**
+     *@brief 加载帮派神像
+     */
+    void LoadStatue(UInt16 level, UInt32 exp);
+
 public:
 	inline bool alive() { return !_deleted; }
 
@@ -479,6 +485,7 @@ public:
 		return NULL;
 	}
 
+    UInt8 getOnlineMembersCount();
     void VisitMembers(ClanMemberVisitor& visitor);
 	void listMembers(Player *);
 	void listPending(Player *);
@@ -556,6 +563,7 @@ private:
 	std::map<UInt32, UInt8> _repoNum;
 	std::multimap<UInt32, AllocRecord> _allocRecords;
 	ClanTech * _techs;
+    ClanStatue * _statue;
 	bool _deleted;
 	std::vector<std::string> _keywords;
 

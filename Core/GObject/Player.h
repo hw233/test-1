@@ -1211,6 +1211,14 @@ namespace GObject
         void AddClanBuilding(UInt32);
         void AddClanContrib(UInt32);
 
+        ////////////////////////////////////////////
+        // 帮派副本
+
+        void sendClanCopyInfo();
+        
+        // 帮派副本
+        ////////////////////////////////////////////
+
 		void listRecruit(UInt8 type, UInt8, UInt16);
 		void flushTaskColor(UInt8 tasktype, UInt8 type, UInt8, UInt16, bool = false);
         void sendColorTask(UInt8 ttype, UInt16 ncount);

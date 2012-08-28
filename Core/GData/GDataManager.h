@@ -42,6 +42,8 @@ namespace GData
 		static bool LoadCittaEffect();
 		static bool LoadCittas();
         static bool LoadClanLvlData();
+        static bool LoadClanCopy();
+        static bool LoadClanStatue();
 		static bool LoadClanTechTable();
 		static bool LoadClanSkillTable();
         static bool LoadSoulSkillTable();

@@ -1131,6 +1131,26 @@ void OnClanCityBattleListReq( GameMsgHdr& hdr, const void * data )
 	}
 }
 
+void OnClanCopyReq (GameMsgHdr& hdr, const void * data )
+{
+    // TODO: 帮派副本系统的请求协议
+    MSG_QUERY_PLAYER(player);
+    if (!player->hasChecked())
+        return;
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    brd >> type;
+    switch(type)
+    {
+        case CLAN_COPY_TAB_INFO:
+            // 请求帮派副本信息
+            player->sendClanCopyInfo();
+            break;
+        default:
+                break;
+    }
+}
+
 struct PlayerIdRep
 {
 	UInt64 id;
@@ -2023,7 +2043,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
     brd >> type;
     switch(type)
     {
-    case 0x01:
+        case 0x01:
         {
             if(!WORLD().getQixi())
                 break;

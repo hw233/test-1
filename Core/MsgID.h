@@ -229,7 +229,9 @@ namespace REQ
     const UInt8 ALLOCATECLANREWARD  = 0x9E;
     /**宗族分配记录请求 */
     const UInt8 CLANALLOCRECORD     = 0x9F;
-    /**邮件ID列表 */
+    /**帮派副本 */
+    const UInt8 CLAN_COPY           = 0x5C;
+    /**邮件ID列表*/
     const UInt8 MAIL_ID_LIST        = 0x40;// 0xA6
     /**邮件信息列表 */
     const UInt8 MAIL_LIST           = 0x41;// 0xA0
@@ -527,6 +529,8 @@ namespace REP
     const UInt8 ALLOCATECLANREWARD  = 0x9E;
     const UInt8 CLANALLOCRECORD     = 0x9F;
 
+    const UInt8 CLAN_COPY           = 0x5C;
+
     const UInt8 MAIL_ID_LIST        = 0x40;// 0xA6
     const UInt8 MAIL_LIST           = 0x41;// 0xA0
     const UInt8 MAIL_CONTENTS       = 0x42;// 0xA1
@@ -723,4 +727,9 @@ namespace ARENAREQ
 }
 
 #endif // __ASSS_MSGID_H_
+enum CLAN_COPY
+{
+    CLAN_COPY_TAB_INFO = 0x01,
+};
+
 

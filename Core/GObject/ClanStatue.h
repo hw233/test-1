@@ -14,10 +14,11 @@ class ClanStatue
         ~ClanStatue();
 
     public:
-        void addClanStatueFromDB();
+        void updateLevel(UInt32 exp);
 
     private:
         UInt8 _level;
+        UInt32 _exp;
         Clan * _clan;
 };
 
