@@ -1238,7 +1238,7 @@ void Clan::listPending( Player * player )
 		}
         else
         {
-            st << cmem->player->getId() << cmem->player->getName() << cmem->player->GetLev() << cmem->opTime;
+            st << cmem->player->getId() << cmem->player->getName() << cmem->player->GetLev() << cmem->opTime << cmem->player->getPF();
             ++ c;
             ++ it;
         }
@@ -1391,7 +1391,7 @@ void Clan::broadcastMemberInfo( ClanMember& cmem, UInt8 t )
 	Stream st(REP::CLAN_INFO_UPDATE);
 	st << t << cmem.player->getId();
 	if(t == 0)
-		st << cmem.cls << cmem.player->getName() << cmem.player->GetLev() << static_cast<UInt8>(cmem.player->isOnline() ? 1 : 0) << cmem.player->getLastOnline() << Stream::eos;
+		st << cmem.cls << cmem.player->getName() << cmem.player->GetLev() << static_cast<UInt8>(cmem.player->isOnline() ? 1 : 0) << cmem.player->getLastOnline() << cmem.player->getPF() << Stream::eos;
 	else
 		st << cmem.cls << cmem.player->GetLev() << static_cast<UInt8>(cmem.player->isOnline() ? 1 : 0) << cmem.proffer << cmem.player->getLastOnline() << Stream::eos;
 	broadcast(st);
@@ -1402,7 +1402,7 @@ void Clan::broadcastPendingMemberInfo( ClanPendingMember& cpmem )
     if (!cpmem.player)
         return;
 	Stream st(REP::CLAN_INFO_UPDATE);
-	st << static_cast<UInt8>(0) << cpmem.player->getId() << static_cast<UInt8>(100) << cpmem.player->getName() << cpmem.player->GetLev() << static_cast<UInt8>(cpmem.player->isOnline() ? 1 : 0) << cpmem.player->getLastOnline() << Stream::eos;
+	st << static_cast<UInt8>(0) << cpmem.player->getId() << static_cast<UInt8>(100) << cpmem.player->getName() << cpmem.player->GetLev() << static_cast<UInt8>(cpmem.player->isOnline() ? 1 : 0) << cpmem.player->getLastOnline() << cpmem.player->getPF() << Stream::eos;
 	broadcast(st);
 }
 
