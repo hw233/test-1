@@ -117,6 +117,7 @@ enum MailItemType
     RealItemAwardActive,
     NewDrawingGameAward,
     SplitCitta,
+    BlueDiamondCmd,
 };
 enum ItemFrom
 {

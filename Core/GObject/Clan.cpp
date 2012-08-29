@@ -137,6 +137,7 @@ UInt32 ClanItemPkg::AddItem(UInt16 id, UInt32 num)
 
     if(num == 0) return 0;
 
+
     ItemMap::iterator iter = m_Items.find(id);
     if(iter != m_Items.end())
     {
@@ -1212,7 +1213,7 @@ void Clan::listMembers( Player * player )
 		ClanMember * mem = *offset;
         if (!mem || !mem->player)
             continue;
-		st << mem->player->getId() << mem->player->getName() << mem->cls << mem->player->GetLev() << static_cast<UInt8>(mem->player->isOnline() ? 1 : 0) << mem->proffer << mem->player->getLastOnline();
+		st << mem->player->getId() << mem->player->getName() << mem->cls << mem->player->GetLev() << static_cast<UInt8>(mem->player->isOnline() ? 1 : 0) << mem->proffer << mem->player->getLastOnline() << mem->player->getPF();
 	}
 	st << Stream::eos;
 	player->send(st);

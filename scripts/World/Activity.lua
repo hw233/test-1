@@ -543,6 +543,12 @@ function onActivityCheck(tm)
           setConsumeActive(false)
       end
 
+      if tm >= actTime501 and tm < actTime501_1 then
+          setRechargeActive3366(true, 16)
+      else
+          setRechargeActive3366(false, 16)
+      end
+
       setShuoShuo(true);
   end
 
@@ -625,7 +631,8 @@ function initActTime(y, m, d)
   local  SerStartTm44= { ['year'] = 2012, ['month'] = 8, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 消耗活动
   local SerStartTm500 = { ['year'] = 2012, ['month'] = 8, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-
+  -- 3366合作充值活动（8/30-8/31）
+  local  SerStartTm501= { ['year'] = 2012, ['month'] = 8, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   -- 繁体版
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -803,6 +810,8 @@ function initActTime(y, m, d)
   actTime500    = os.time(SerStartTm500);
   actTime500_1  = os.time(SerStartTm500) + 7 * 86400;
 
+  actTime501 = os.time(SerStartTm501);
+  actTime501_1 = os.time(SerStartTm501) + 2 * 86400;
 
   -- 繁体版
   actTime101 = os.time(SerStartTm101);

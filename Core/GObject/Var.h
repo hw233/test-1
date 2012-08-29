@@ -199,6 +199,7 @@ namespace GObject
         VAR_AWARD_NEWREGISTER  = 155, //新用户注册抽奖
 
         VAR_RECHARGE_TOTAL3366 = 169, //3366合作充值活动
+        VAR_BDIAMOND_CMD = 170, //蓝钻用户每日可领取当前等级寻宝令
 
         VAR_MAX,
     };
@@ -385,6 +386,7 @@ namespace GObject
             REGISTER_VAR(VAR_PHYSICAL_BUY, CYCLE_DAY);
             REGISTER_VAR(VAR_QQVIP_BUF, CYCLE_DAY);
             REGISTER_VAR(VAR_QQVIP_CNT, CYCLE_DAY);
+            REGISTER_VAR(VAR_BDIAMOND_CMD, CYCLE_DAY);
         }
         
         UInt32 GetVar(UInt32 id, UInt32 now = 0);
