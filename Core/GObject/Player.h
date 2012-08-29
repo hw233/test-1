@@ -1579,6 +1579,8 @@ namespace GObject
         void getTargetAward(UInt8 opt);
         void getTargetAwardRF(UInt8 opt);
         void getNewRegisterAward(UInt8 opt);
+        void getAwardFromAD();
+        void getAwardFromRF();
 
         inline TripodData& getTripodData() { return m_td; }
         TripodData& newTripodData();
