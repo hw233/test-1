@@ -6700,7 +6700,7 @@ namespace GObject
 		st << static_cast<UInt8>(12) << total << Stream::eos;
 		send((st));
 
-        if (rank)
+        if (rank && World::getNeedRechargeRank())
         {
             GameMsgHdr hdr(0x1C1, WORKER_THREAD_WORLD, this, sizeof(total));
             GLOBAL().PushMsg(hdr, &total);
@@ -6717,7 +6717,7 @@ namespace GObject
 		st << static_cast<UInt8>(15) << total << Stream::eos;
 		send((st));
 
-        if (rank)
+        if (rank && World::getNeedConsumeRank())
         {
             GameMsgHdr hdr(0x1C2, WORKER_THREAD_WORLD, this, sizeof(total));
             GLOBAL().PushMsg(hdr, &total);
@@ -9583,6 +9583,14 @@ namespace GObject
         case 6:
             getNewRegisterAward(opt);
             break;
+        case 7:
+            //推广用注册玩家登录奖励领取 
+            getAwardFromAD();
+            break;
+        case 8:
+            //回流用户新区道具奖
+            getAwardFromRF();
+            break;
         }
     }
 
@@ -9643,7 +9651,7 @@ namespace GObject
             return;
         if(opt == 1)
         {
-            if(2 == GetVar(VAR_AWARD_NEWREGISTER))
+            if(1 != GetVar(VAR_AWARD_NEWREGISTER))
                 return;
 			std::vector<GData::LootResult>::iterator it;
 			for(it = _RegisterAward.begin(); it != _RegisterAward.end(); ++ it)
@@ -9671,6 +9679,28 @@ namespace GObject
         st << idx;
         st << Stream::eos;
         send(st);
+    }
+
+    void Player::getAwardFromAD()
+    {
+        if(GetVar(VAR_AWARD_NEWREGISTER))
+            return;
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(7);
+        st << GameAction()->RunNewRegisterAwardAD_RF(this, 1) << Stream::eos;
+        send(st);
+        SetVar(VAR_AWARD_NEWREGISTER, 3);
+    }
+
+    void Player::getAwardFromRF()
+    {
+        if(GetVar(VAR_AWARD_NEWREGISTER))
+            return;
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(8);
+        st << GameAction()->RunNewRegisterAwardAD_RF(this, 2) << Stream::eos;
+        send(st);
+        SetVar(VAR_AWARD_NEWREGISTER, 4);
     }
 
     void Player::getHappyAward(UInt8 opt)
@@ -11696,7 +11726,7 @@ namespace GObject
             UInt32 total = GetVar(VAR_CONSUME);
             GameAction()->sendConsumeMails(this, total, total+c);
             SetVar(VAR_CONSUME, total+c);
-            sendConsumeInfo();
+            sendConsumeInfo(true);
         }
     }
 
