@@ -6631,7 +6631,7 @@ namespace GObject
 		st << static_cast<UInt8>(12) << total << Stream::eos;
 		send((st));
 
-        if (rank)
+        if (rank && World::getNeedRechargeRank())
         {
             GameMsgHdr hdr(0x1C1, WORKER_THREAD_WORLD, this, sizeof(total));
             GLOBAL().PushMsg(hdr, &total);
@@ -6648,7 +6648,7 @@ namespace GObject
 		st << static_cast<UInt8>(15) << total << Stream::eos;
 		send((st));
 
-        if (rank)
+        if (rank && World::getNeedConsumeRank())
         {
             GameMsgHdr hdr(0x1C2, WORKER_THREAD_WORLD, this, sizeof(total));
             GLOBAL().PushMsg(hdr, &total);
@@ -11627,7 +11627,7 @@ namespace GObject
             UInt32 total = GetVar(VAR_CONSUME);
             GameAction()->sendConsumeMails(this, total, total+c);
             SetVar(VAR_CONSUME, total+c);
-            sendConsumeInfo();
+            sendConsumeInfo(true);
         }
     }
 

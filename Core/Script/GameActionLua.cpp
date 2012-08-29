@@ -131,6 +131,8 @@ namespace Script
         lua_tinker::def(_L, "getPExpItems", GObject::World::getPExpItems);
         lua_tinker::def(_L, "getOpenTest", GObject::World::getOpenTest);
         lua_tinker::def(_L, "getConsumeActive", GObject::World::getConsumeActive);
+        lua_tinker::def(_L, "getNeedRechargeRank", GObject::World::getNeedRechargeRank);
+        lua_tinker::def(_L, "getNeedConsumeRank", GObject::World::getNeedConsumeRank);
 
         CLASS_DEF(GameActionLua, Print);
         lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);
