@@ -224,6 +224,7 @@ function ItemNormal_00000401(iid, num, bind, param)
 
     fgt:setBuffData(8, 0, true)
     fgt:setBuffData(7, 0, true)
+    fgt:setBuffData(0xf, 0, true)
     if ItemNormal_AddBuff(fgt, 5, 3600, num, 356400) then
         package:DelItemSendMsg(401, player);
         return num;
@@ -246,6 +247,7 @@ function ItemNormal_00000438(iid, num, bind, param)
 
     fgt:setBuffData(8, 0, true)
     fgt:setBuffData(5, 0, true)
+    fgt:setBuffData(0xf, 0, true)
     if ItemNormal_AddBuff(fgt, 7, 7200, num, 356400) then
         package:DelItemSendMsg(438, player);
         return num;
@@ -258,6 +260,9 @@ function ItemNormal_00000439(iid, num, bind, param)
     local fgt = player:findFighter(param);
     local package = player:GetPackage();
 
+    print("xxxxxx")
+    print(fgt)
+    print(param)
     if fgt == nil then
         return false
     end
@@ -268,8 +273,36 @@ function ItemNormal_00000439(iid, num, bind, param)
 
     fgt:setBuffData(7, 0, true)
     fgt:setBuffData(5, 0, true)
+    fgt:setBuffData(0xf, 0, true)
     if ItemNormal_AddBuff(fgt, 8, 7200, num, 356400) then
         package:DelItemSendMsg(439, player);
+        return num;
+    end
+    return false
+end
+
+function ItemNormal_00009139(iid, num, bind, param)
+    local player = GetPlayer()
+    local fgt = player:findFighter(param);
+    local package = player:GetPackage();
+
+    print("sssssssssss")
+    print(fgt)
+    print(param)
+    if fgt == nil then
+        return false
+    end
+
+    for i=0,5 do
+        fgt:setBuffData(i+9, 0, true)
+    end
+
+    fgt:setBuffData(7, 0, true)
+    fgt:setBuffData(5, 0, true)
+    fgt:setBuffData(8, 0, true)
+    print("***************")
+    if ItemNormal_AddBuff(fgt, 0xf, 7200, num, 356400) then
+        package:DelItemSendMsg(9139, player);
         return num;
     end
     return false
@@ -6201,6 +6234,8 @@ local ItemNormal_Table = {
 
     [9126] = ItemNormal_00009126,
     [9133] = ItemNormal_00009133,
+
+    [9139] = ItemNormal_00009139,
 
     [10000] = ItemNormal_00010000,
     [10001] = ItemNormal_00010001,

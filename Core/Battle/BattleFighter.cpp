@@ -718,7 +718,8 @@ void BattleFighter::initStats(bool checkEnh)
                     _fighter->getBuffData(FIGHTER_BUFF_DMAN, now) ||
                     _fighter->getBuffData(FIGHTER_BUFF_DWMAN, now) ||
                     _fighter->getBuffData(FIGHTER_BUFF_SMAN, now) ||
-                    _fighter->getBuffData(FIGHTER_BUFF_SWMAN, now))
+                    _fighter->getBuffData(FIGHTER_BUFF_SWMAN, now) ||
+                    _fighter->getBuffData(FIGHTER_BUFF_RDIAMOND, now))
 				_flag |= 1;
 			_flag |= (_fighter->getOwner()->getBuffData(PLAYER_BUFF_HOLY, 0)) << 28;
 		}
