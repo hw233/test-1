@@ -731,7 +731,7 @@ namespace GObject
             if (_playerData.qqvipl >= 20 && _playerData.qqvipl <= 29)
                 return (3<<4)|(_playerData.qqvipl-20);
             if (_playerData.qqvipl >= 30 && _playerData.qqvipl <= 39)
-                return (4<<4)|(_playerData.qqvipl-30);
+                return (4<<4)|(_playerData.qqvipl1>40?_playerData.qqvipl1-40:0);
             if (_playerData.qqvipl >= 40 && _playerData.qqvipl <= 49)
                 return (4<<4)|(_playerData.qqvipl-40);
             return 0;
