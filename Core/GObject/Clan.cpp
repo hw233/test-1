@@ -3550,4 +3550,9 @@ void Clan::LoadStatue(UInt16 level, UInt32 exp)
     _statue->updateLevel(exp);
 }
 
+UInt16 Clan::getClanStatueLevel()
+{
+    return _statue->getLevel();
+}
+
 }

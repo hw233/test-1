@@ -231,6 +231,12 @@ struct DBClanSkillType
     float value;        // 技能效果值
 };
 
+struct DBClanCopy
+{
+    UInt16 level;               // 帮派副本等级
+    UInt32 expOutput;           // 该等级每小时给予神像的经验值
+};
+
 struct DBClanStatue
 {
     // 帮派神像模板参数
@@ -590,6 +596,15 @@ SPECIALDEF(5)
     float, value
 	)
 SPECIALEND()
+
+SPECIALBEGIN(GData::DBClanCopy)
+SPECIALDEF(2)
+    (
+    UInt16, level,       
+    UInt32, expOutput
+    )
+SPECIALEND()
+
 
 SPECIALBEGIN(GData::DBClanStatue)
 SPECIALDEF(10)

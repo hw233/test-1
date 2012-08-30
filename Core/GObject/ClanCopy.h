@@ -22,53 +22,76 @@ namespace GObject
 class Player;
 class Clan;
 
-struct ClanCopyPlayer
+enum Copy_Spot
 {
-	ClanCopyPlayer(Player * player_ = NULL, UInt16 hold_ = 0, UInt8 status_ = 1)
-		: player(player_), hold(hold_), status(status_)
-	{
-		id = 0;
-		reliveNum = 0;
-		offTime = 0;
-		hasEnter = 0;
-		hasAttack = 0;
-	}
-	Player * player;
-	UInt32 id;
-	UInt16 hold;
-	UInt8  status;	
-	UInt16 reliveNum;
-	UInt32 offTime;		
-	UInt8  hasEnter;
-	UInt8  hasAttack;
+    Home = 0x01,
+    Route1_Spot1 = 0x11,
+    Route2_Spot1 = 0x21,
+    Route3_Spot1 = 0x31,
+    Enemy_Base = 0xff,
 };
 
-// 帮派副本怪物信息结构
+enum CLAN_COPY_STATUS
+{
+    CLAN_COPY_READY   = 0x01,
+    CLAN_COPY_PROCESS = 0x02,
+    CLAN_COPY_WIN     = 0x03,
+    CLAN_COPY_LOSE    = 0x04,
+};
+
+struct ClanCopyPlayer
+{
+	ClanCopyPlayer(Player * player, UInt8 spSkillType = 0)
+		: player(player), spSkillType(spSkillType)
+	{
+        formalBattleRound = 0;
+	}
+	Player * player;
+    UInt8 spSkillType;
+    UInt8 formalBattleRound;
+};
+
 struct ClanCopyMonster
 {
+    // 帮派副本怪物信息结构
     UInt32 npcId;
-    UInt8 currentSpot;
-    UInt8 nextSpot;
+    UInt16 waveCount;       // 第几波产生的怪物
+    UInt16 npcValue;
+    bool   hasMoved;        // 是否已经移动
+};
+
+struct ClanCopySpot
+{
+    // 帮派副本的据点信息结构
+    UInt8 spotId;
+    UInt8 nextSpotId;       // 该据点之后的据点
+
 };
 
 class ClanCopy
 {
-    typedef std::map<UInt8, ClanCopyMonster> SpotMonster; // 该据点的怪物
-    typedef std::map<UInt8, ClanCopyPlayer> SpotPlayer;   // 该据点的玩家
+    typedef std::map<UInt8, ClanCopySpot> SpotList;
+    typedef std::multimap<UInt8, ClanCopyMonster> CopyMonster; // 该据点的怪物
+    typedef std::multimap<UInt8, ClanCopyPlayer> SpotPlayer;   // 该据点的玩家
 
     public:
         ClanCopy(Clan *c); 
         ~ClanCopy();
 
         void createEnemy(UInt32 round);
-        void enemyMove(UInt32 round);
-        void spotCombat(UInt8 spot, UInt32 round);
+        void roundMove(UInt32 round);
+        void roundCombat(UInt8 round);
+        void lose();
+        void win();
 
     private:
         Clan    * _clan;
         UInt16 _copyLevel;
-        SpotMonster _spotMonster;
+        CopyMonster _copyMonster;
         SpotPlayer _spotPlayer;
+        SpotList _spotList;
+        UInt32 _copyProcessTime;
+        UInt32 _homeHp;
         
 };
 

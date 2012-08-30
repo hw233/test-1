@@ -51,6 +51,7 @@
 #include "GData/ClanTechTable.h"
 #include "GData/ClanLvlTable.h"
 #include "GData/ClanSkillTable.h"
+#include "GData/ClanStatueTable.h"
 #include "Common/StringTokenizer.h"
 #include "TownDeamon.h"
 #include "ArenaBattle.h"
@@ -10049,6 +10050,63 @@ namespace GObject
         ClanSkill& skill = it->second;
         return GData::clanSkillTable[skill.id][skill.level].value;
     }
+
+    float Player::getClanStatueHPEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        UInt16 level = _clan->getClanStatueLevel();
+        return GData::clanStatueTable[level].exHp;
+    }
+
+    float Player::getClanStatueAtkEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        UInt16 level = _clan->getClanStatueLevel();
+        return GData::clanStatueTable[level].exAttack;
+    }
+
+    float Player::getClanStatueDefendEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        UInt16 level = _clan->getClanStatueLevel();
+        return GData::clanStatueTable[level].exDefend;
+    }
+
+    float Player::getClanStatueMagAtkEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        UInt16 level = _clan->getClanStatueLevel();
+        return GData::clanStatueTable[level].exMagAtk;
+    }
+
+    float Player::getClanStatueMagDefentEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        UInt16 level = _clan->getClanStatueLevel();
+        return GData::clanStatueTable[level].exMagDef;
+    }
+
+    float Player::getClanStatueActionEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        UInt16 level = _clan->getClanStatueLevel();
+        return GData::clanStatueTable[level].exAction;
+    }
+
+    float Player::getClanStatueHitrLvlEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        UInt16 level = _clan->getClanStatueLevel();
+        return GData::clanStatueTable[level].exHitRate;
+    }
+
 
     void Player::onBlueactiveday()
     {

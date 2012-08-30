@@ -477,6 +477,7 @@ public:
 	ClanTech * getClanTech() { return _techs; }
 	ClanBattle * getClanBattle() { return _clanBattle; }
 	ClanDynamicMsg * getClanDynamicMsg() { return _clanDynamicMsg; }
+    UInt16 getClanStatueLevel();
 
 	inline Player * getOwner()
 	{

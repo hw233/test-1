@@ -64,5 +64,6 @@ typedef std::vector<ClanStatueTableData>  ClanStatueTable;
 
 extern ClanStatueTable clanStatueTable;
 }
+
 #endif
 

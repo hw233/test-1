@@ -1633,6 +1633,15 @@ namespace GObject
         void lastQueqiaoAwardPush(UInt16 itemId, UInt16 num);
         void checkLastQueqiaoAward();
 
+        // 帮派神像
+        float getClanStatueHPEffect();
+        float getClanStatueAtkEffect();
+        float getClanStatueDefendEffect();
+        float getClanStatueMagAtkEffect();
+        float getClanStatueMagDefentEffect();
+        float getClanStatueActionEffect();
+        float getClanStatueHitrLvlEffect();
+
     private:
         bool m_hasTripod;
         TripodData m_td;
