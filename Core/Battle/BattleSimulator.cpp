@@ -6778,10 +6778,10 @@ bool BattleSimulator::doSkillStrengthen_disperse(BattleFighter* bf, const GData:
             if(bo->getDeepForgetLast() != 0)
             {
                 bo->setDeepStunDmgExtra(0, 0);
-                defList[defCount].damType = e_unDeepForget;
+                defList[defCount].damType = e_unDeepStun;
             }
             else
-                defList[defCount].damType = e_UnForget;
+                defList[defCount].damType = e_UnStun;
 
             defList[defCount].pos = bo->getPos() + pos0;
             defList[defCount].damage = 0;
@@ -6797,10 +6797,10 @@ bool BattleSimulator::doSkillStrengthen_disperse(BattleFighter* bf, const GData:
             if(bo->getDeepForgetLast() != 0)
             {
                 bo->setDeepForgetDmgExtra(0, 0);
-                defList[defCount].damType = e_unDeepStun;
+                defList[defCount].damType = e_unDeepForget;
             }
             else
-                defList[defCount].damType = e_UnStun;
+                defList[defCount].damType = e_UnForget;
 
             defList[defCount].pos = bo->getPos() + pos0;
             defList[defCount].damage = 0;
