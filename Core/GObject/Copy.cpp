@@ -124,15 +124,14 @@ void PlayerCopy::sendInfo(Player* pl, UInt8 id)
         st << count;
     }
     //st << count;
-    count = 0;
-    if(pl->isQQVIP() && World::getQQVipAct()){
-        count = pl->GetVar(VAR_QQVIP_CNT);
-        if(count > PRIVILEGE_COUNT)
-            count = 0;
-    }
+    count = pl->GetVar(VAR_QQVIP_CNT);
+    UInt8 maxCount = 0;
+    if(pl->isQQVIP() && World::getQQVipAct())
+        maxCount = 1;
+    if(count > maxCount)
+        count = maxCount;
     st << count;
-    count = 1;
-    st << count;
+    st << maxCount;
     st << Stream::eos;
     pl->send(st);
 }
