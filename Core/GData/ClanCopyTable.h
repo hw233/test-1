@@ -62,6 +62,9 @@ struct ClanCopyData
     UInt16 minPlayer;           // 该等级副本参与最少人数
     UInt16 maxPlayer;           // 该等级副本参与最多人数
     UInt8  spotMaxPlayer;       // 该等级副本每个据点最大人数
+    UInt32 interval;            // 副本状态变化的间隔时间（默认为5s）
+    UInt32 startTick;           // 第一轮开始所需要的间隔数目
+    UInt32 monsterRefreshTick;  // 相邻两波怪的间隔时间
 };
 
 typedef std::vector<ClanCopyData> ClanCopyTable;

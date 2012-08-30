@@ -73,16 +73,22 @@ class ClanCopy
     typedef std::map<UInt8, ClanCopySpot> SpotList;
     typedef std::multimap<UInt8, ClanCopyMonster> CopyMonster; // 该据点的怪物
     typedef std::multimap<UInt8, ClanCopyPlayer> SpotPlayer;   // 该据点的玩家
+    typedef std::multimap<UInt8, ClanCopyPlayer> DeadPlayer;   // 该据点死亡的玩家（逃跑也算）
 
     public:
         ClanCopy(Clan *c); 
         ~ClanCopy();
 
+        void process();
+
         void createEnemy(UInt32 round);
         void roundMove(UInt32 round);
         void roundCombat(UInt8 round);
+        void attackHome(const ClanCopyMonster& clanCopyMonster);
         void lose();
         void win();
+        void setInterval(UInt32 interval);
+        void setStartTick(UInt32 tickCount);
 
     private:
         Clan    * _clan;
@@ -92,6 +98,7 @@ class ClanCopy
         SpotList _spotList;
         UInt32 _copyProcessTime;
         UInt32 _homeHp;
+        DeadPlayer _deadPlayer;
         
 };
 
