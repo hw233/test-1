@@ -131,6 +131,8 @@ namespace Script
         lua_tinker::def(_L, "getPExpItems", GObject::World::getPExpItems);
         lua_tinker::def(_L, "getOpenTest", GObject::World::getOpenTest);
         lua_tinker::def(_L, "getConsumeActive", GObject::World::getConsumeActive);
+        lua_tinker::def(_L, "getNeedRechargeRank", GObject::World::getNeedRechargeRank);
+        lua_tinker::def(_L, "getNeedConsumeRank", GObject::World::getNeedConsumeRank);
 
         CLASS_DEF(GameActionLua, Print);
         lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);
@@ -1208,6 +1210,12 @@ namespace Script
     {
 		assert(player != NULL);
 		return Call<UInt16>("RunNewRegisterAward", player);
+    }
+
+    UInt8 GameActionLua::RunNewRegisterAwardAD_RF(Player* player, UInt8 idx)
+    {
+		assert(player != NULL);
+		return Call<UInt8>("RunNewRegisterAwardAD_RF", player, idx);
     }
 
     void GameActionLua::sendRNR(Player* player, UInt32 now, UInt32 date, UInt32 total)

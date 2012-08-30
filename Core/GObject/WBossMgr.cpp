@@ -923,8 +923,8 @@ void WBossMgr::nextDay(UInt32 now)
         m_boss->disapper();
         m_boss->setIdx(0);
         m_idx = 0;
-        delete m_boss;
-        m_boss = NULL;
+        //delete m_boss;
+        //m_boss = NULL;
     }
     TRACE_LOG("out of time. next day: %u, %u", _prepareTime, _prepareStep);
     fprintf(stderr, "out of time. next day: %u\n", _prepareTime);

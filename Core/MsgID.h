@@ -187,6 +187,8 @@ namespace REQ
     const UInt8 COLLECTNPCACTION    = 0x89;
     /**循环任务刷新*/
     const UInt8 TASK_CYC_REFRESH    = 0x57;// 0x8B
+    /**活动指令*/
+    const UInt8 ACT                 = 0x8B;
     /**自动完成日常任务*/
     const UInt8 DAYTASKAUTOCOMPLETED= 0x8C;
     /**???*/
@@ -500,6 +502,7 @@ namespace REP
 
     const UInt8 TASK_CYC_FRESH      = 0x57;// 0x8B
 
+    const UInt8 ACT                 = 0x8B;
     const UInt8 AUTO_COMPLETED_TASK = 0x8D;
     const UInt8 QUERYDAYTASK        = 0x8F;
 

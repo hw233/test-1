@@ -731,7 +731,7 @@ namespace GObject
             if (_playerData.qqvipl >= 20 && _playerData.qqvipl <= 29)
                 return (3<<4)|(_playerData.qqvipl-20);
             if (_playerData.qqvipl >= 30 && _playerData.qqvipl <= 39)
-                return (4<<4)|(_playerData.qqvipl-30);
+                return (4<<4)|(_playerData.qqvipl1>40?_playerData.qqvipl1-40:0);
             if (_playerData.qqvipl >= 40 && _playerData.qqvipl <= 49)
                 return (4<<4)|(_playerData.qqvipl-40);
             return 0;
@@ -739,11 +739,12 @@ namespace GObject
         // XXX: 1-9 黄钻等级
         //      10-19 蓝钻等级
         //      20-29 3366等级,另qqvipl1 为蓝钻等级
-        //      30-39 Q+等级,另qqvipl1为会员等级
+        //      30-39 Q+等级,另qqvipl1为会员等级(现归属QQ会员)
         //      40-49 QQ会员等级
         inline bool isYD() const
         {
-            return (_playerData.qqvipl >= 1 && _playerData.qqvipl <= 9) || (_playerData.qqvipl >= 30 && _playerData.qqvipl <= 39);
+            //return (_playerData.qqvipl >= 1 && _playerData.qqvipl <= 9) || (_playerData.qqvipl >= 30 && _playerData.qqvipl <= 39);
+            return (_playerData.qqvipl >= 1 && _playerData.qqvipl <= 9);
         }
         inline bool isBD() const
         {
@@ -756,7 +757,7 @@ namespace GObject
         }
         inline bool isQQVIP() const 
         {
-            return (_playerData.qqvipl > 40 && _playerData.qqvipl <= 49) || (_playerData.qqvipl1 > 40 && _playerData.qqvipl1 <= 49);
+            return (_playerData.qqvipl > 40 && _playerData.qqvipl <= 49) || (_playerData.qqvipl1 > 40 && _playerData.qqvipl1 <= 49) || (_playerData.qqvipl >= 30 && _playerData.qqvipl <= 39 && _playerData.qqvipl1 > 40 && _playerData.qqvipl1 <= 49);
         }
 
 		UInt32 getTotalRecharge()			{ return _playerData.totalRecharge; }
@@ -1587,6 +1588,8 @@ namespace GObject
         void getTargetAward(UInt8 opt);
         void getTargetAwardRF(UInt8 opt);
         void getNewRegisterAward(UInt8 opt);
+        void getAwardFromAD();
+        void getAwardFromRF();
 
         inline TripodData& getTripodData() { return m_td; }
         TripodData& newTripodData();

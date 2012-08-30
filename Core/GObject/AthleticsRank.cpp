@@ -602,7 +602,7 @@ void AthleticsRank::requestAthleticsList(Player * player, UInt16 type)
         UInt8 i = 0;
         for(Rank it = getRankBegin(row); i < rank3num; ++i, ++it)
         {
-            st << i << (*it)->ranker->getName();
+            st << i << (*it)->ranker->getName() << (*it)->ranker->getPF();
         }
     }
 
@@ -612,7 +612,7 @@ void AthleticsRank::requestAthleticsList(Player * player, UInt16 type)
         UInt32 i = static_cast<UInt32>(getRankPos(row, start));
         for (Rank offset = start; offset != end; ++offset, ++i)
         {
-            st << i << (*offset)->ranker->getName() << (*offset)->ranker->getCountry() << (*offset)->ranker->GetLev() << (*offset)->winstreak;
+            st << i << (*offset)->ranker->getName() << (*offset)->ranker->getCountry() << (*offset)->ranker->GetLev() << (*offset)->winstreak << (*offset)->ranker->getPF();
 #if 0
             updateBoxTimeoutAward(offset, row, now);
             UInt16 tmout = GetOutTimebyColor((*offset)->boxcolor);

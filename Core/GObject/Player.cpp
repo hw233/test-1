@@ -929,6 +929,75 @@ namespace GObject
         if (World::_blueactiveday)
             onBlueactiveday();
 
+        /**
+         * 1：蓝钻
+         * 2：黄钻
+         * 4：会员
+         **/
+        UInt32 curStatus = GetVar(VAR_BDIAMOND_CMD);
+        UInt32 newStatus;
+        UInt16 titleId;
+        if(isBD() && (curStatus&1) == 0)
+        {
+            newStatus = 1;
+            titleId = 283;
+        }
+        else if(isYD() && (curStatus&2) == 0)
+        {
+            newStatus = 2;
+            titleId = 285;
+        }
+        else if(isQQVIP() && (curStatus&4) == 0)
+        {
+            newStatus = 4;
+            titleId = 287;
+        }
+        else
+        {
+            newStatus = 0;
+            titleId = 0;
+        }
+        if(newStatus > 0)
+        {
+            SetVar(VAR_BDIAMOND_CMD, curStatus | newStatus);
+
+			SYSMSG(title, titleId);
+			SYSMSG(content, titleId + 1);
+
+			Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            if(mail)
+            {
+                UInt8 level = GetLev();
+                UInt16 itemId;
+                if(level < 60)
+                    itemId = 9012;
+                else if(level < 70)
+                    itemId = 9013;
+                else if(level < 80)
+                    itemId = 9014;
+                else if(level < 90)
+                    itemId = 9015;
+                else if(level < 100)
+                    itemId = 9016;
+                else
+                    itemId = 9035;
+                MailPackage::MailItem mitem[1] = {{itemId, 1}};
+                MailItemsInfo itemsInfo(mitem, BlueDiamondCmd, 1);
+                mailPackageManager.push(mail->id, mitem, 1, true);
+
+                std::string strItems;
+                for (int i = 0; i < 1; ++i)
+                {
+                    strItems += Itoa(mitem[i].id);
+                    strItems += ",";
+                    strItems += Itoa(mitem[i].count);
+                    strItems += "|";
+                }
+
+                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+            }
+        }
+
         sendLevelPack(GetLev());
         offlineExp(curtime);
 
@@ -6632,7 +6701,7 @@ namespace GObject
 		st << static_cast<UInt8>(12) << total << Stream::eos;
 		send((st));
 
-        if (rank)
+        if (rank && World::getNeedRechargeRank())
         {
             GameMsgHdr hdr(0x1C1, WORKER_THREAD_WORLD, this, sizeof(total));
             GLOBAL().PushMsg(hdr, &total);
@@ -6649,7 +6718,7 @@ namespace GObject
 		st << static_cast<UInt8>(15) << total << Stream::eos;
 		send((st));
 
-        if (rank)
+        if (rank && World::getNeedConsumeRank())
         {
             GameMsgHdr hdr(0x1C2, WORKER_THREAD_WORLD, this, sizeof(total));
             GLOBAL().PushMsg(hdr, &total);
@@ -9515,6 +9584,14 @@ namespace GObject
         case 6:
             getNewRegisterAward(opt);
             break;
+        case 7:
+            //推广用注册玩家登录奖励领取 
+            getAwardFromAD();
+            break;
+        case 8:
+            //回流用户新区道具奖
+            getAwardFromRF();
+            break;
         }
     }
 
@@ -9575,7 +9652,7 @@ namespace GObject
             return;
         if(opt == 1)
         {
-            if(2 == GetVar(VAR_AWARD_NEWREGISTER))
+            if(1 != GetVar(VAR_AWARD_NEWREGISTER))
                 return;
 			std::vector<GData::LootResult>::iterator it;
 			for(it = _RegisterAward.begin(); it != _RegisterAward.end(); ++ it)
@@ -9603,6 +9680,28 @@ namespace GObject
         st << idx;
         st << Stream::eos;
         send(st);
+    }
+
+    void Player::getAwardFromAD()
+    {
+        if(GetVar(VAR_AWARD_NEWREGISTER))
+            return;
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(7);
+        st << GameAction()->RunNewRegisterAwardAD_RF(this, 1) << Stream::eos;
+        send(st);
+        SetVar(VAR_AWARD_NEWREGISTER, 3);
+    }
+
+    void Player::getAwardFromRF()
+    {
+        if(GetVar(VAR_AWARD_NEWREGISTER))
+            return;
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(8);
+        st << GameAction()->RunNewRegisterAwardAD_RF(this, 2) << Stream::eos;
+        send(st);
+        SetVar(VAR_AWARD_NEWREGISTER, 4);
     }
 
     void Player::getHappyAward(UInt8 opt)
@@ -11685,7 +11784,7 @@ namespace GObject
             UInt32 total = GetVar(VAR_CONSUME);
             GameAction()->sendConsumeMails(this, total, total+c);
             SetVar(VAR_CONSUME, total+c);
-            sendConsumeInfo();
+            sendConsumeInfo(true);
         }
     }
 

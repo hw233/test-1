@@ -282,17 +282,27 @@ int query_pagoda_rsp(JsonHead* head, json_t* body, json_t* retbody, std::string&
     if (val && val->child && val->child->text)
         areaid = atoi(val->child->text);
 
-    UInt32 count = 0;
     const std::vector<GObject::LeaderboardTowndown>& towndown = GObject::leaderboard.getTowndown();
+    UInt32 count = towndown.size();
     json_insert_pair_into_object(retbody, "uiCount", my_json_new_number(count));
-    for (UInt32 i = 0; i < count; ++i)
+    json_t* arr = json_new_array();
+    if (arr)
     {
-        char playerId[32] = {0};
-        snprintf(playerId, sizeof(playerId), "%"I64_FMT"u", towndown[i].id);
-        json_insert_pair_into_object(retbody, "uiRoleId", json_new_string(playerId));
-        json_insert_pair_into_object(retbody, "szRoleName", json_new_string(towndown[i].name.c_str()));
-        json_insert_pair_into_object(retbody, "uiLayers", my_json_new_number(towndown[i].level));
-        json_insert_pair_into_object(retbody, "uiReachedTime", my_json_new_number(towndown[i].time));
+        for (UInt32 i = 0; i < count; ++i)
+        {
+            char playerId[32] = {0};
+            json_t* obj = json_new_object();
+            if (obj)
+            {
+                snprintf(playerId, sizeof(playerId), "%"I64_FMT"u", towndown[i].id);
+                json_insert_pair_into_object(obj, "ullRoleId", json_new_string(playerId));
+                json_insert_pair_into_object(obj, "szRoleName", json_new_string(fixPlayerName(towndown[i].name).c_str()));
+                json_insert_pair_into_object(obj, "uiLayers", my_json_new_number(towndown[i].level));
+                json_insert_pair_into_object(obj, "uiReachedTime", my_json_new_number(towndown[i].time));
+                json_insert_child(arr, obj);
+            }
+        }
+        json_insert_pair_into_object(retbody, "pPagodaList", arr);
     }
 
     head->cmd = 56;
@@ -325,7 +335,7 @@ void jsonParser2(void * buf, int len, Stream& st)
     json_t* rethead = NULL;
     json_t* retbody = NULL;
 
-    setlocale(LC_ALL, "");
+    // setlocale(LC_ALL, "");
 
     retobj = json_new_object();
     if (!retobj)

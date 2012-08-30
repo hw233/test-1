@@ -5,7 +5,7 @@ U=kingxin
 P=kingxin
 PT=3306
 
-DBD=data_8888
+DBD=data_88888
 DBO=asss_8888
 
 OPTIONS="Yes/No/Exit"

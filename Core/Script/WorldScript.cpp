@@ -141,6 +141,10 @@ void WorldScript::init()
 	def("getOpenTest", GObject::World::getOpenTest);
 	def("setConsumeActive", GObject::World::setConsumeActive);
 	def("getConsumeActive", GObject::World::getConsumeActive);
+	def("setNeedRechargeRank", GObject::World::setNeedRechargeRank);
+	def("getNeedRechargeRank", GObject::World::getNeedRechargeRank);
+	def("setNeedConsumeRank", GObject::World::setNeedConsumeRank);
+	def("getNeedConsumeRank", GObject::World::getNeedConsumeRank);
 	def("Broadcast", SysBroadcast);
 	def("GetStore", GetStore);
 	def("GetTitleList", GetTitleList);

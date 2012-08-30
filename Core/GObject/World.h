@@ -300,6 +300,14 @@ public:
     { _consumeactive = v; }
     inline static bool getConsumeActive()
     { return _consumeactive; }
+    inline static void setNeedRechargeRank(bool v)
+    { _needrechargerank = v; }
+    inline static bool getNeedRechargeRank()
+    { return _needrechargerank; }
+    inline static void setNeedConsumeRank(bool v)
+    { _needconsumerank = v; }
+    inline static bool getNeedConsumeRank()
+    { return _needconsumerank; }
 
 	inline Script::WorldScript * getWorldScript() { return _worldScript; }
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
@@ -380,6 +388,8 @@ public:
     static UInt32 _sosomapbegin;
     static bool _opentest;
     static bool _consumeactive;
+    static bool _needrechargerank;
+    static bool _needconsumerank;
 
 public:
     static RCSortType rechargeSort;
