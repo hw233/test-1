@@ -1376,12 +1376,12 @@ namespace GData
         // TODO: 读取和帮派副本有关的配置参数
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
-        /*
-		DBClanSkillType cst;
-		if (execu->Prepare("SELECT `id`, `name`, `level`, `needs`, `value` FROM `clan_skill_template` ORDER BY `id` ASC, `level` ASC", cst) != DB::DB_OK)
+        DBClanCopy cc;
+		if (execu->Prepare("SELECT `level`, `expOutput` FROM `clan_copy_template` ORDER BY `level` ASC", cc) != DB::DB_OK)
 			return false;
 		while (execu->Next() == DB::DB_OK)
 		{
+        /*
 			if (cst.id >= clanSkillTable.size())
 			{
 				clanSkillTable.resize(cst.id + 1);
@@ -1390,8 +1390,8 @@ namespace GData
 			if (cst.level >= single.size())
 				single.resize(cst.level + 1);
 			single[cst.level] = ClanSkillTableData(cst.id, cst.name, cst.level, cst.needs, cst.value);
-		}
         */
+		}
 
 		return true;
     }
@@ -1404,7 +1404,7 @@ namespace GData
         DBClanStatue cs;
 		if (execu->Prepare("SELECT `level`, `needExp`, `consumeExp`, \
                     `exHp`, `exAttack`, `exDefend`, `exMagAtk`, `exMagDef`, `exAction`, `exHitRate`\
-                    FROM `clan_copy_template` ORDER BY `level` ASC", cs) != DB::DB_OK)
+                    FROM `clan_statue_template` ORDER BY `level` ASC", cs) != DB::DB_OK)
 			return false;
 		while (execu->Next() == DB::DB_OK)
 		{

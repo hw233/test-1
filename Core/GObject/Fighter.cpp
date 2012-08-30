@@ -1421,6 +1421,18 @@ void Fighter::rebuildEquipAttr()
 #endif
     }
 
+    if (_owner)
+    {
+        // 帮派神像对额外属性的加成
+        _attrExtraEquip.hp += _owner->getClanStatueHPEffect();
+        _attrExtraEquip.attack += _owner->getClanStatueAtkEffect();
+        _attrExtraEquip.defend += _owner->getClanStatueDefendEffect();
+        _attrExtraEquip.magatk += _owner->getClanStatueMagAtkEffect();
+        _attrExtraEquip.magdef += _owner->getClanStatueMagDefentEffect();
+        _attrExtraEquip.action += _owner->getClanStatueActionEffect();
+        _attrExtraEquip.hitrlvl += _owner->getClanStatueHitrLvlEffect();
+    }
+
     if(m_2ndSoul)
     {
         m_2ndSoul->addAttr(_attrExtraEquip);

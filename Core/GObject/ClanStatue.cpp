@@ -10,7 +10,7 @@
 namespace GObject
 {
 
-ClanStatue::ClanStatue(Clan *c) : _level(0), _clan(c)
+ClanStatue::ClanStatue(Clan *c) : _level(1), _clan(c)
 {
 }
 
@@ -35,6 +35,11 @@ void ClanStatue::updateLevel(UInt32 exp)
     }
     if (!_level)
         ++ _level;
+}
+
+UInt16 ClanStatue::getLevel()
+{
+    return _level;
 }
 
 }

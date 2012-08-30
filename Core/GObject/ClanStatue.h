@@ -15,9 +15,10 @@ class ClanStatue
 
     public:
         void updateLevel(UInt32 exp);
+        UInt16 getLevel();
 
     private:
-        UInt8 _level;
+        UInt16 _level;
         UInt32 _exp;
         Clan * _clan;
 };
