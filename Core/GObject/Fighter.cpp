@@ -2418,7 +2418,6 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool lvlup, bool onl
 {
     if (!citta)
         return false;
-    // XXX: need this???
     const GData::CittaBase* cb = GData::cittaManager[citta];
     if (!cb)
         return false;

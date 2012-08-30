@@ -1510,8 +1510,8 @@ namespace GObject
             ret = false;}
 		else
 		{
-            if (GetItemSubClass(id) == Item_Formula || GetItemSubClass(id) == Item_Citta)
-                num = 1;
+            //if (GetItemSubClass(id) == Item_Formula || GetItemSubClass(id) == Item_Citta) // XXX: confirm in lua
+            //    num = 1;
 
 			if (bind != 0xFF)
 			{
