@@ -1265,6 +1265,14 @@ namespace GObject
         udpLog("clan", action, "", "", "", "", "act");
     }
 
+    void Player::countryBattleUdpLog(UInt32 id, UInt8 country)
+    {
+        // 国战相关日志
+        char action[16] = "";
+        snprintf (action, 16, "F_%d_%d", id, country);
+        udpLog("countryBattle", action, "", "", "", "", "act");
+    }
+
     void Player::sendHalloweenOnlineAward(UInt32 now, bool _online)
     {
         _online = false; // XXX: fuck

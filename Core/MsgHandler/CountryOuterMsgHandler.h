@@ -2287,6 +2287,7 @@ void CountryBattleJoinReq( GameMsgHdr& hdr, CountryBattleJoinStruct& req )
 		cb->playerLeave(player);
 		rep.result = 1;
 	}
+    player->countryBattleUdpLog(1090, player->getCountry());
 	player->send(rep);
 }
 
