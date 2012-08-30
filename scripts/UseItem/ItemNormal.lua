@@ -1922,6 +1922,7 @@ function ItemNormal_00000055(iid, num, bind, param)
   player:setBuffData(6, 0, true)
   player:setBuffData(10, 0, true)
   player:setBuffData(11, 0, true)
+  player:setBuffData(24, 0, true)
   if ItemNormal_AddBuff(player, 5, 3600, num, 356400) then
   	package:DelItemSendMsg(55, player);
 	return num;
@@ -1936,6 +1937,7 @@ function ItemNormal_00000056(iid, num, bind, param)
   player:setBuffData(5, 0, true)
   player:setBuffData(10, 0, true)
   player:setBuffData(11, 0, true)
+  player:setBuffData(24, 0, true)
   if ItemNormal_AddBuff(player, 6, 3600, num, 356400) then
   	package:DelItemSendMsg(56, player);
 	return num;
@@ -1947,6 +1949,7 @@ end
 function ItemNormal_00000057(iid, num, bind, param)
   local player = GetPlayer()
   local package = player:GetPackage();
+  player:setBuffData(0x16, 0, true)
   player:setBuffData(0x17, 0, true)
   if ItemNormal_AddBuff(player, 4, 3600, num, 356400) then
   	package:DelItemSendMsg(57, player);
@@ -4125,6 +4128,7 @@ function ItemNormal_00009092(iid, num, bind, param)
     player:setBuffData(5, 0, true)
     player:setBuffData(6, 0, true)
     player:setBuffData(11, 0, true)
+    player:setBuffData(0x18, 0, true)
     if ItemNormal_AddBuff(player, 10, 3600, num, 356400) then
         package:DelItemSendMsg(iid, player);
         return num;
@@ -4136,7 +4140,8 @@ end
 function ItemNormal_00009093(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
-    player:setBuffData(4, 0, true)
+    player:setBuffData(0x4, 0, true)
+    player:setBuffData(0x16, 0, true)
     if ItemNormal_AddBuff(player, 0x17, 3600, num, 356400) then
         package:DelItemSendMsg(iid, player);
         return num;
@@ -4315,6 +4320,34 @@ function ItemNormal_00009120(iid, num, bind, param)
     return num
 end
 
+function ItemNormal_00009126(iid, num, bind, param)
+  local player = GetPlayer()
+  local package = player:GetPackage();
+  player:setBuffData(5, 0, true)
+  player:setBuffData(6, 0, true)
+  player:setBuffData(10, 0, true)
+  player:setBuffData(11, 0, true)
+  if ItemNormal_AddBuff(player, 0x18, 360000, num, 31536000) then
+  	package:DelItemSendMsg(iid, player);
+	return num;
+  else
+	return false;
+  end
+end
+
+function ItemNormal_00009133(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    player:setBuffData(0x4, 0, true)
+    player:setBuffData(0x17, 0, true)
+    if ItemNormal_AddBuff(player, 0x16, 360000, num, 31536000) then
+        package:DelItemSendMsg(iid, player);
+        return num;
+    else
+        return false;
+    end
+end
+
 function ItemNormal_00010000(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -4376,7 +4409,7 @@ function ItemNormal_00010002(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-    if package:GetRestPackageSize() < (6+(6*num*5)/99) then
+    if package:GetRestPackageSize() < (5+(5*num*5)/99) then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
@@ -4385,8 +4418,7 @@ function ItemNormal_00010002(iid, num, bind, param)
     package:Add(57, num*5, true, 0, 2);
     package:Add(514, num*4, true, 0, 2);
     package:Add(503, num*3, true, 0, 2);
-    package:Add(51, num*5, true, 0, 2);
-    package:Add(48, num*5, true, 0, 2);
+    package:Add(47, num, true, 0, 2);
 
     package:DelItemSendMsg(iid, player);
     return num;
@@ -6166,6 +6198,9 @@ local ItemNormal_Table = {
     -- 七夕称号卡
     [9124] = ItemNormal_QixiLoveCard,
     [9125] = ItemNormal_QixiLoveCard,
+
+    [9126] = ItemNormal_00009126,
+    [9133] = ItemNormal_00009133,
 
     [10000] = ItemNormal_00010000,
     [10001] = ItemNormal_00010001,

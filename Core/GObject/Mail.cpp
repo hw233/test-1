@@ -437,9 +437,13 @@ void MailBox::readMail( UInt32 id )
 						for(UInt32 i = 0; i < 3 && t[i] > 0; ++ i)
 						{
 							const GData::LootItem * li = GData::lootTable[t[i]];
-							GData::LootResult r = li->roll(&ur);
-							st<< r.id << r.count;
-							num ++;
+                            std::vector<GData::LootResult> lr;
+							li->roll(lr, &ur);
+                            for (size_t j = 0; j < lr.size(); ++j)
+                            {
+                                st << lr[j].id << lr[j].count;
+                                num ++;
+                            }
 						}
 						st.data<UInt16>(off) = num;
 					}
@@ -616,8 +620,10 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 					for(UInt32 i = 0; i < 3 && t[i] > 0; ++ i)
 					{
 						const GData::LootItem * li = GData::lootTable[t[i]];
-						GData::LootResult r = li->roll(&ur);
-						_owner->GetPackage()->Add(r.id, r.count, true, false, FromVipAward);
+                        std::vector<GData::LootResult> lr;
+						li->roll(lr, &ur);
+                        for (size_t j = 0; j < lr.size(); ++j)
+                            _owner->GetPackage()->Add(lr[j].id, lr[j].count, true, false, FromVipAward);
 					}
 				}
 				else if(pkgId > 0 && !GameAction()->onTakeMailPackage(_owner, pkgId))

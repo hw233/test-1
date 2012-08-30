@@ -295,5 +295,6 @@ MSG_REG_2(GameMsgHdr, 0x257, OnAddItem);
 MSG_REG_2(GameMsgHdr, 0x258, OnTownDeamonChallenge);
 MSG_REG_2(GameMsgHdr, 0x259, OnTownDeamonAutoCompleteQuite);
 MSG_REG_2(GameMsgHdr, 0x260, OnTownDeamonAttackNpc);
+//MSG_REG_2(GameMsgHdr, 0x256, OnAdvancedHookExp);
 
 MSG_HANDLER_END()

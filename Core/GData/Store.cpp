@@ -191,8 +191,6 @@ UInt8 Store::clearSpecialDiscountFromBS(UInt8 type /* = 0 */)
             }
         }
     }
-    storeDiscount();
-    makePacket();
     return result;
 }
 

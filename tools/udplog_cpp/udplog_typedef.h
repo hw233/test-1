@@ -37,6 +37,7 @@ typedef unsigned long				uint64_t;
 #define MAX_USERMSG_LENGTH 512
 
 #define DEFAULT_CONFIGFILENAME			"./conf/udplog.xml"
+//#define DEFAULT_CONFIGFILENAME			"D:\\udp_log\\udplog_cpp\\udplog_cpp\\udplog_cpp\\Debug\\config\\udplog.xml"
 
 //#if defined(WIN32) || defined(_WIN32)
 //#pragma warning(disable:4996)

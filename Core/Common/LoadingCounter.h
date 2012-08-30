@@ -35,6 +35,5 @@ private:
 	UInt32 _count;
 };
 
-UInt64 LoadingCounter::_firstClock = TimeUtil::GetTick();
 
 #endif // _LOADINGCOUNTER_H_

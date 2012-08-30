@@ -590,10 +590,10 @@ void AthleticsRank::requestAthleticsList(Player * player, UInt16 type)
 	//else if(player->getVipLevel() == 1)
 	//	endTime=(*rank)->challengetime+7 * 60;
 	
-	(*rank)->challengenum = updateChallengeNum((*rank)->challengenum, (*rank)->challengetime);
+	//(*rank)->challengenum = updateChallengeNum((*rank)->challengenum, (*rank)->challengetime);
     if(type & 0x01)
     {
-        st << static_cast<UInt32>(getRankPos(row, rank)) << (*rank)->maxrank << (*rank)->challengenum << (*rank)->winstreak << static_cast<UInt16>(player->getBuffLeft(PLAYER_BUFF_ATHLETICS)) << (*rank)->prestige << (*rank)->tael << static_cast<UInt16>(player->getBuffLeft(PLAYER_BUFF_ATHLETICS_P));
+        st << static_cast<UInt32>(getRankPos(row, rank)) << (*rank)->maxrank << /*(*rank)->challengenum*/static_cast<UInt8>(0) << (*rank)->winstreak << static_cast<UInt16>(player->getBuffLeft(PLAYER_BUFF_ATHLETICS)) << (*rank)->prestige << (*rank)->tael << static_cast<UInt16>(player->getBuffLeft(PLAYER_BUFF_ATHLETICS_P));
     }
 
     if(type & 0x02)
@@ -888,7 +888,7 @@ void AthleticsRank::challenge(Player * atker, std::string& name, UInt8 type)
 #endif
 
         //updateAthleticsRank(data);
-        data->challengenum = updateChallengeNum(data->challengenum, data->challengetime);
+        //data->challengenum = updateChallengeNum(data->challengenum, data->challengetime);
         data->challengetime = TimeUtil::Now();
 
         UInt32 challengeBuff=data->challengetime+ (cfg.GMCheck ? ATHLETICS_BUFF_TIME : 10);
@@ -903,8 +903,10 @@ void AthleticsRank::challenge(Player * atker, std::string& name, UInt8 type)
             challengeBuff=data->challengetime + 5 * 60;
 
         atker->setBuffData(PLAYER_BUFF_ATHLETICS, challengeBuff);
-        DB6().PushUpdateData("UPDATE `athletics_rank` SET `challengeNum` = %u, `challengeTime` = %u  WHERE `ranker` = %"I64_FMT"u",
-                data->challengenum, data->challengetime, data->ranker->getId());
+        //DB6().PushUpdateData("UPDATE `athletics_rank` SET `challengeNum` = %u, `challengeTime` = %u  WHERE `ranker` = %"I64_FMT"u",
+        //        data->challengenum, data->challengetime, data->ranker->getId());
+        DB6().PushUpdateData("UPDATE `athletics_rank` SET `challengeTime` = %u  WHERE `ranker` = %"I64_FMT"u",
+                data->challengetime, data->ranker->getId());
     }
 
 	atker->addGlobalFlag(Player::Challenging);
@@ -951,7 +953,8 @@ void AthleticsRank::challenge2(Player * atker, std::string& name, UInt8 type, UI
     data->challengenum = updateChallengeNum(data->challengenum, data->eChallengeTime);
     //if (data->challengenum >= Maxchallengenum[Viplvl] && cfg.GMCheck)
     //    return ;
-    data->challengenum ++;
+    if(data->challengenum <= 255)
+        data->challengenum ++;
     data->eChallengeTime = TimeUtil::Now();
 
     if(data->challengenum >= 5)
@@ -977,7 +980,7 @@ void AthleticsRank::challenge2(Player * atker, std::string& name, UInt8 type, UI
         challengeBuff=data->eChallengeTime + 5 * 60;
 
     atker->setBuffData(PLAYER_BUFF_ATHLETICS_P, challengeBuff);
-    DB6().PushUpdateData("UPDATE `athletics_rank` SET `challengeNum` = %u, `challengeTime` = %u WHERE `ranker` = %"I64_FMT"u", data->challengenum, data->eChallengeTime, data->ranker->getId());
+    DB6().PushUpdateData("UPDATE `athletics_rank` SET `challengeNum` = %u, `eChallengeTime` = %u WHERE `ranker` = %"I64_FMT"u", data->challengenum, data->eChallengeTime, data->ranker->getId());
 
 	atker->addGlobalFlag(Player::Challenging);
 	defer->addGlobalFlag(Player::BeChallenging);
@@ -1002,8 +1005,8 @@ void AthleticsRank::notifyAthMartialOver(Player * atker, Player * defer, UInt32 
 
     if(res == 2)
     {
-        -- data->challengenum;
-        DB6().PushUpdateData("UPDATE `athletics_rank` SET `challengeNum` = %u WHERE `ranker` = %"I64_FMT"u", data->challengenum, atker->getId());
+        //-- data->challengenum;
+        //DB6().PushUpdateData("UPDATE `athletics_rank` SET `challengeNum` = %u WHERE `ranker` = %"I64_FMT"u", data->challengenum, atker->getId());
     }
     else
     {

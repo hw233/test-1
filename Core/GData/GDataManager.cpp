@@ -1576,8 +1576,8 @@ namespace GData
 		while(execu->Next() == DB::DB_OK)
 		{
 			LootItem li;
-			li.isPack = dbli.isPack > 0;
-			if(li.isPack)
+			li.isPack = dbli.isPack;
+			if(li.isPack == 1)
 			{
 				StringTokenizer tk(dbli.table, "|");
 				size_t cnt = tk.count();
@@ -1615,6 +1615,34 @@ namespace GData
 					li.items.push_back(ld);
 				}
 			}
+            else if (li.isPack == 2)
+            {
+				StringTokenizer tk(dbli.table, "|");
+				size_t cnt = tk.count();
+				if(cnt == 0)
+					continue;
+				for(size_t j = 0; j < cnt; ++ j)
+                {
+					StringTokenizer tk2(tk[j], ",");
+					size_t tcnt = tk2.count();
+                    if (tcnt < 2)
+                        continue;
+                    LootItem::LootData ld; // ld.chance for chance, ld.counts.count for id
+                    for (size_t k = 0; k < tcnt; ++k)
+                    {
+                        if (k == tcnt - 1)
+                            ld.chance = atoi(tk2[k].c_str());
+                        else
+                        {
+                            LootItem::LootCount lcnt;
+                            lcnt.count = atoi(tk2[k].c_str());
+                            lcnt.chance = 0;
+                            ld.counts.push_back(lcnt);
+                        }
+                    }
+                    li.items.push_back(ld);
+                }
+            }
 			else
 			{
 				StringTokenizer tk(dbli.table, ",");

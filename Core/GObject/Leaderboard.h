@@ -3,11 +3,20 @@
 
 #include "Common/Stream.h"
 #include "Common/AtomicVal.h"
+#include "Common/Mutex.h"
 
 namespace GObject
 {
 
 class Player;
+
+struct LeaderboardTowndown
+{
+    UInt64 id;
+	std::string name;
+    UInt16 level;
+    UInt32 time;
+};
 
 class Leaderboard
 {
@@ -19,6 +28,12 @@ public:
 	void sendOwnRank(Player *, UInt32);
     void newDrawingGame(UInt32 nextday); //新人冲级赛
 	inline UInt8 getMaxLevel() { return _maxLevel; }
+
+    const std::vector<LeaderboardTowndown>& getTowndown()
+    {
+        FastMutex::ScopedLock lk(_tmutex);
+        return _towndown;
+    };
 
     void begin() { m_sorting = true; }
     void end() { m_sorting = false; }
@@ -42,6 +57,9 @@ private:
 	std::map<UInt32, UInt16> _clanRankWorld;
 	std::map<UInt32, UInt16> _clanRankCountry[2];
     std::vector<UInt64> _levelRankWorld10;  //世界等级前十名
+
+    FastMutex _tmutex;
+    std::vector<LeaderboardTowndown> _towndown;
 
     AtomicVal<bool> m_sorting;
 };

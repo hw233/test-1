@@ -123,14 +123,16 @@ namespace GObject
 	{
 		UInt32 now = TimeUtil::Now();
 		float exp = calcExpEach(now);
-		if(m_Player->getBuffData(PLAYER_BUFF_TRAINP3, now))
-			exp *= 1.8f;
-		else if(m_Player->getBuffData(PLAYER_BUFF_TRAINP4, now))
-			exp *= 1.5f;
-		else if(m_Player->getBuffData(PLAYER_BUFF_TRAINP2, now))
-			exp *= 1.5f;
-		else if(m_Player->getBuffData(PLAYER_BUFF_TRAINP1, now))
-			exp *= 1.2f;
+        if(m_Player->getBuffData(PLAYER_BUFF_ADVANCED_HOOK, now))
+            exp *= 1.5f;
+        else if(m_Player->getBuffData(PLAYER_BUFF_TRAINP3, now))
+            exp *= 1.8f;
+        else if(m_Player->getBuffData(PLAYER_BUFF_TRAINP4, now))
+            exp *= 1.5f;
+        else if(m_Player->getBuffData(PLAYER_BUFF_TRAINP2, now))
+            exp *= 1.5f;
+        else if(m_Player->getBuffData(PLAYER_BUFF_TRAINP1, now))
+            exp *= 1.2f;
 		_npcGroup->monsterKilled(m_Player);
 		if(m_Player->isOnline())
 			m_Player->AddExp(static_cast<UInt32>(exp));
@@ -1016,7 +1018,11 @@ namespace GObject
         {
             char buf[1024] = {0};
             char* pbuf = &buf[0];
-            pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u|||%u|||%u||%u||%u|",
+            if (cfg.isTestPlatform)
+                pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u|||%u|||%u||%u||%u|1|",
+                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId().c_str(), GetLev(), _playerData.gold, getVipLevel(), _playerData.qqvipl, cfg.serverNum, platform);
+            else
+                pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u|||%u|||%u||%u||%u|",
                     cfg.serverNum, cfg.tcpPort, getId(), getOpenId().c_str(), GetLev(), _playerData.gold, getVipLevel(), _playerData.qqvipl, cfg.serverNum, platform);
 
             m_ulog->SetUserMsg(buf);
@@ -2321,7 +2327,7 @@ namespace GObject
 			for(UInt8 z = 0; z < 9; ++ z)
 				m_Package->EquipTo(0, fgt, z+0x20, equip, true);
             for(UInt8 t = 0; t < 3; ++ t)
-				m_Package->EquipTo(0, fgt, t+0x50, equip, true);
+				m_Package->EquipTo(0, fgt, t+0x0a, equip, true);
 
 			_fighters.erase(it);
 			DB2().PushUpdateData("DELETE FROM `fighter` WHERE `id` = %u AND `playerId` = %"I64_FMT"u", id, getId());
@@ -3020,7 +3026,23 @@ namespace GObject
         OnHeroMemo(MC_FIGHTER, MD_STARTED, 0, 0);
 		return true;
 	}
-
+#if 0
+    /** 随身加速服功能 **/
+    void Player::advancedHookExp()
+	{
+        if(getBuffData(PLAYER_BUFF_ADVANCED_HOOK, TimeUtil::Now()) == 0)
+            return;
+        if(!isOnline())
+            return;
+        UInt8 lvl = GetLev();
+        UInt8 lvl2 = lvl;
+        lvl = lvl > 99 ? 99 : lvl;
+        UInt32 extraExp = (lvl2 - 10) * (lvl / 10) * 5 + 25;
+        extraExp = extraExp * 3 / 2;
+        AddExp(extraExp);
+		return;
+	}
+#endif
 	void Player::pushAutoBattle(UInt32 npcId, UInt16 count, UInt16 interval)
 	{
 		if(npcId == 0 || count == 0 || interval == 0)
@@ -3865,7 +3887,7 @@ namespace GObject
         SetVar(VAR_MONEY_ARENA, moneyArena);
 
         Stream st(REP::USER_INFO_CHANGE);
-        st << static_cast<UInt8>(0x56) << moneyArena << Stream::eos;
+        st << static_cast<UInt8>(0x16) << moneyArena << Stream::eos;
         send(st);
 
         if(ii && ii->incommingType != 0)
@@ -3898,7 +3920,7 @@ namespace GObject
         SetVar(VAR_MONEY_ARENA, moneyArena);
 
         Stream st(REP::USER_INFO_CHANGE);
-        st << static_cast<UInt8>(0x56) << moneyArena << Stream::eos;
+        st << static_cast<UInt8>(0x16) << moneyArena << Stream::eos;
         send(st);
 
         return moneyArena;
@@ -4497,7 +4519,7 @@ namespace GObject
         DB6().PushUpdateData("UPDATE `player` SET `prestige` = %u WHERE `id` = %"I64_FMT"u", _playerData.prestige, getId());
 
         Stream st(REP::USER_INFO_CHANGE);
-        st << static_cast<UInt8>(0x55) << _playerData.prestige << Stream::eos;
+        st << static_cast<UInt8>(0x15) << _playerData.prestige << Stream::eos;
         send(st);
 
 		return _playerData.prestige;
@@ -4524,7 +4546,7 @@ namespace GObject
         DB6().PushUpdateData("UPDATE `player` SET `prestige` = %u WHERE `id` = %"I64_FMT"u", _playerData.prestige, getId());
 
         Stream st(REP::USER_INFO_CHANGE);
-        st << static_cast<UInt8>(0x55) << _playerData.prestige << Stream::eos;
+        st << static_cast<UInt8>(0x15) << _playerData.prestige << Stream::eos;
         send(st);
 
 		return _playerData.prestige;
@@ -8486,6 +8508,11 @@ namespace GObject
 
     float Player::getPracticeBufFactor()
     {
+        if(getBuffData(PLAYER_BUFF_ADVANCED_P_HOOK, TimeUtil::Now()))
+        {
+            return 0.2;
+        }
+
         if(getBuffData(PLAYER_BUFF_PRACTICE1, TimeUtil::Now()))
         {
             return 0.5;
@@ -8651,7 +8678,9 @@ namespace GObject
             UInt32 now = TimeUtil::Now();
             UInt32 duration = 60*60;
             UInt8 type = 0;
-            UInt32 p = getBuffData(PLAYER_BUFF_PROTECT, now);
+            UInt32 p = getBuffData(PLAYER_BUFF_ADVANCED_P_HOOK, now);
+            if(!p)
+                p = getBuffData(PLAYER_BUFF_PROTECT, now);
             if (!p)
             {
                 p = getBuffData(PLAYER_BUFF_PRACTICE1, now);
@@ -8665,14 +8694,24 @@ namespace GObject
             {
                 left -= duration;
                 if (type == 0)
-                    setBuffData(PLAYER_BUFF_PROTECT, left+now);
+                {
+                    if(getBuffData(PLAYER_BUFF_ADVANCED_P_HOOK, now))
+                        setBuffData(PLAYER_BUFF_ADVANCED_P_HOOK, left+now);
+                    else
+                        setBuffData(PLAYER_BUFF_PROTECT, left+now);
+                }
                 else
                     setBuffData(PLAYER_BUFF_PRACTICE1, left+now);
             }
             else if (left)
             {
                 if (type == 0)
-                    setBuffData(PLAYER_BUFF_PROTECT, 0);
+                {
+                    if(getBuffData(PLAYER_BUFF_ADVANCED_P_HOOK, now))
+                        setBuffData(PLAYER_BUFF_ADVANCED_P_HOOK, 0);
+                    else
+                        setBuffData(PLAYER_BUFF_PROTECT, 0);
+                }
                 else
                     setBuffData(PLAYER_BUFF_PRACTICE1, 0);
             }
@@ -9214,11 +9253,12 @@ namespace GObject
             const GData::LootItem* li = GData::lootTable[loot];
             if (li)
             {
-                GData::LootResult lr = li->roll();
-                if (lr.id)
+                std::vector<GData::LootResult> lr;
+                li->roll(lr);
+                if (lr.size())
                 {
-                    m_td.itemId = lr.id;
-                    m_td.num = lr.count;
+                    m_td.itemId = lr[0].id;
+                    m_td.num = lr[0].count;
                     m_td.needgen = 0;
                     return true;
                 }
@@ -10247,7 +10287,10 @@ namespace GObject
             return;
 
         UInt8 lvl = GetLev();
-        UInt64 exp = (offline/60)*((lvl-10)*(lvl/10)*5+25)*0.8f;
+        UInt8 yalvl = lvl;
+        if (lvl > 99)
+            yalvl = 99;
+        UInt64 exp = (offline/60)*((lvl-10)*(yalvl/10)*5+25)*0.8f;
         AddVar(VAR_OFFLINE_EXP, exp);
         AddVar(VAR_OFFLINE_PEXP, offline/60);
         AddVar(VAR_OFFLINE_EQUIP, offline);
@@ -11372,8 +11415,8 @@ namespace GObject
 
     void Player::IDIPAddItem(UInt16 itemId, UInt16 num, bool bind)
     {
-        SYSMSG(title, 4004);
-        SYSMSG(content, 4005);
+        SYSMSGV(title, 4004, itemId);
+        SYSMSGV(content, 4005, itemId, num);
         Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFD0000/*free*/);
         if(mail)
         {

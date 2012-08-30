@@ -182,6 +182,9 @@ GMHandler::GMHandler()
     Reg(3, "ssup", &GMHandler::OnSSUp);
     Reg(3, "sserase", &GMHandler::OnSSErase);
     Reg(3, "sosog", &GMHandler::OnSoSoGet);
+    Reg(2, "idip", &GMHandler::OnAddIdip);
+    Reg(2, "clear", &GMHandler::OnClearTask);
+    Reg(2, "reset", &GMHandler::OnClearCFT);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -1170,7 +1173,7 @@ void makeSuper( GObject::Fighter * fgt, UInt8 equipLvl = 100, UInt8 enchant = 8,
         if(equip)
         { 
             makeItemSuper(package, equip, 0, 9, 0, flushAttr);
-            package->EquipTo(equip->getId(), fgt, 0x50, o);
+            package->EquipTo(equip->getId(), fgt, 0x0a, o);
         }
 		break;
 	case 2:
@@ -1226,7 +1229,7 @@ void makeSuper( GObject::Fighter * fgt, UInt8 equipLvl = 100, UInt8 enchant = 8,
         if(equip)
         { 
             makeItemSuper(package, equip, 0, 9, 0, flushAttr);
-            package->EquipTo(equip->getId(), fgt, 0x50, o);
+            package->EquipTo(equip->getId(), fgt, 0x0a, o);
         }
 		break;
 	case 3:
@@ -1282,7 +1285,7 @@ void makeSuper( GObject::Fighter * fgt, UInt8 equipLvl = 100, UInt8 enchant = 8,
         if(equip)
         { 
             makeItemSuper(package, equip, 0, 9, 0, flushAttr);
-            package->EquipTo(equip->getId(), fgt, 0x50, o);
+            package->EquipTo(equip->getId(), fgt, 0x0a, o);
         }
 		break;
 	default:
@@ -2870,4 +2873,32 @@ void GMHandler::OnHandleSignIn(GObject::Player* player, std::vector<std::string>
     }
 }
 
+void GMHandler::OnAddIdip(GObject::Player * player, std::vector<std::string>& args)
+{
+    player->IDIPAddItem(503, 1, true);
+}
+
+void GMHandler::OnClearTask(GObject::Player* player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return;
+    UInt8 type = atoi(args[0].c_str());
+    GameMsgHdr msg(0x325, player->getThreadId(), player, sizeof(type));
+    GLOBAL().PushMsg(msg, &type);
+}
+
+void GMHandler::OnClearCFT(GObject::Player* player, std::vector<std::string>& args)
+{
+    PLAYER_DATA(player, frontUpdate) = TimeUtil::Now();
+    PLAYER_DATA(player, copyUpdate) = TimeUtil::Now();
+    PLAYER_DATA(player, copyFreeCnt) = 0;
+    PLAYER_DATA(player, copyGoldCnt) = 0;
+    PLAYER_DATA(player, frontFreeCnt) = 0;
+    PLAYER_DATA(player, frontGoldCnt) = 0;
+    PLAYER_DATA(player, dungeonCnt) = 0;
+    DB1().PushUpdateData("UPDATE `player` SET `frontFreeCnt` = 0, `frontGoldCnt` = 0, `frontUpdate` = %u WHERE `id` = %"I64_FMT"u", TimeUtil::Now(), player->getId());
+    DB1().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = 0, `copyGoldCnt` = 0, `copyUpdate` = %u WHERE `id` = %"I64_FMT"u", TimeUtil::Now(), player->getId());
+	DB1().PushUpdateData("UPDATE `player` SET `dungeonCnt` = 0 where `id` = %"I64_FMT"u", player->getId());
+    player->sendDailyInfo();
+}
 
