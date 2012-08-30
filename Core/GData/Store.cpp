@@ -6,6 +6,7 @@
 #include "MsgID.h"
 #include "Server/Cfg.h"
 #include "GObject/Package.h"
+#include "GObject/Var.h"
 
 namespace GData
 {
@@ -487,17 +488,17 @@ UInt8 Store::getDisTypeVarOffset(UInt8 type)
         case 3:
             return 0xfe;
         case 4:
-            return 144-80;
+            return GObject::VAR_DISCOUNT_SP_1 - GObject::VAR_DISCOUNT_1;
         case 5:
-            return 145-80;
+            return GObject::VAR_DISCOUNT_SP_2 - GObject::VAR_DISCOUNT_1;
         case 6:
-            return 146-80;
+            return GObject::VAR_DISCOUNT_SP_3 - GObject::VAR_DISCOUNT_1;
         case 7:
-            return 82-80;
+            return GObject::VAR_DISCOUNT_1 - GObject::VAR_DISCOUNT_1;
         case 8:
-            return 81-80;
+            return GObject::VAR_DISCOUNT_2 - GObject::VAR_DISCOUNT_1;
         case 9:
-            return 80-80;
+            return GObject::VAR_DISCOUNT_3 - GObject::VAR_DISCOUNT_1;
         default:
             return 0xff;
     }
