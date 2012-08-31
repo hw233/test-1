@@ -83,6 +83,8 @@ static const UInt32 s_tjTotalRewardId = 9132;
 #define TJ_EVENT_WAIT_TIME 15*60      //天劫事件间隔时间
 #define TJ_EVENT_PROCESS_TIME 15*60   //天劫事件持续时间
 
+//#define TJ_EVENT_WAIT_TIME 2*60      //天劫事件间隔时间
+//#define TJ_EVENT_PROCESS_TIME 10*60   //天劫事件持续时间
 Tianjie::Tianjie()
 {
     m_tjTypeId = 0;
@@ -842,6 +844,9 @@ void Tianjie::goNext()
        memset(m_rate1KilledCount, 0, sizeof(m_rate1KilledCount));
        memset(m_rate2DonateCount, 0, sizeof(m_rate2DonateCount));
  
+       m_eventSortMap.clear();
+       m_scoreSortMap.clear();
+
        if (m_tjTypeId+1 < sizeof(s_tjRoleLevel)/sizeof(s_tjRoleLevel[0]))
        {
            m_currOpenedTjLevel = s_tjRoleLevel[++m_tjTypeId];
@@ -2027,7 +2032,6 @@ void Tianjie::rewardTask()
         p->SetVar(VAR_TJ_TASK2_SCORE, 0);
         p->SetVar(VAR_TJ_TASK3_COPYID, 0);
         p->SetVar(VAR_TJ_EVENT_PRESTIGE, 0);
-        p->SetVar(VAR_TJ_TASK_PRESTIGE, 0);
     }
     //发奖品
     reward(m_scoreSortMap, VAR_TJ_TASK_PRESTIGE, 1);

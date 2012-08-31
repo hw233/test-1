@@ -4325,7 +4325,7 @@ function ItemNormal_00009131(iid, num, bind, param)
     local items = {9017,9018,9019,9020,9021,9068,9069};
     local total = 0;
     for x=1,num do
-        package:AddItem(8555, 2, 1, 0, 2);
+        package:AddItem(8555, 1, 1, 0, 2);
         package:AddItem(509, 1, 1, 0, 2);
         local i = math.random(1, 7);
         package:AddItem(items[i], 1, 1, 0, 2);
@@ -4349,7 +4349,7 @@ function ItemNormal_00009132(iid, num, bind, param)
     local items = {9017,9018,9019,9020,9021,9068,9069};
     local total = 0;
     for x=1,num do
-        package:AddItem(8555, 1, 1, 0, 2);
+        package:AddItem(8555, 2, 1, 0, 2);
         package:AddItem(509, 1, 1, 0, 2);
         local i = math.random(1, 7);
         package:AddItem(items[i], 1, 1, 0, 2);
