@@ -1702,6 +1702,36 @@ namespace GObject
 		}
 	}
 
+    void Player::addLastTjScore()
+    {
+        if (!GObject::Tianjie::instance().isTjOpened())
+        {
+            _playerData.lastTjEventScore = 0;
+            _playerData.lastTjTotalScore = 0;
+            return;
+        }
+        
+        if (GObject::Tianjie::instance().isTjExecute() && _playerData.lastTjEventScore > 0)
+        {
+            AddVar(VAR_TJ_EVENT_PRESTIGE, _playerData.lastTjEventScore);
+            GObject::Tianjie::instance().insertToEventSortMap(this, GetVar(VAR_TJ_EVENT_PRESTIGE), GetVar(VAR_TJ_EVENT_PRESTIGE)-_playerData.lastTjEventScore);
+            GObject::Tianjie::instance().updateEventData(this);
+            GObject::Tianjie::instance().broadEventTop1(this);
+        
+            SYSMSG_SENDV(165, this, _playerData.lastTjEventScore);
+        }
+        if (_playerData.lastTjTotalScore > 0)
+        {
+            AddVar(VAR_TJ_TASK_PRESTIGE, _playerData.lastTjTotalScore);
+            GObject::Tianjie::instance().insertToScoreSortMap(this, GetVar(VAR_TJ_TASK_PRESTIGE),GetVar(VAR_TJ_TASK_PRESTIGE)-_playerData.lastTjTotalScore);
+        
+            SYSMSG_SENDV(166, this, _playerData.lastTjTotalScore);
+
+            GObject::Tianjie::instance().updateRankData(this);
+        }
+        _playerData.lastTjEventScore = 0;
+        _playerData.lastTjTotalScore = 0;
+    }
 	void Player::setBuffData(UInt8 id, UInt32 data, bool writedb)
 	{
 		UInt32 now = TimeUtil::Now();
@@ -2602,7 +2632,7 @@ namespace GObject
 		return res;
 	}
 
-	bool Player::attackNpc( UInt32 npcId, UInt32 turns, bool regen, bool needtype )
+	bool Player::attackNpc( UInt32 npcId, UInt32 turns, bool regen, bool needtype, UInt32 expMulti)
 	{
 		UInt32 now = TimeUtil::Now();
 		UInt32 buffLeft = getBuffData(PLAYER_BUFF_ATTACKING, now);
@@ -2618,7 +2648,7 @@ namespace GObject
 				return false;
 		}
 		GData::NpcGroups::iterator it = GData::npcGroups.find(npcId);
-		if(it == GData::npcGroups.end())
+        if(it == GData::npcGroups.end())
 			return false;
 
 		GData::NpcGroup * ng = it->second;
@@ -2660,7 +2690,12 @@ namespace GObject
 			st << static_cast<UInt16>(0x0101);
 			_lastNg = ng;
 
-            if (ng->getLevel() <= GetLev() || (ng->getLevel() > GetLev() && (ng->getLevel() - GetLev()) < 10))
+            if (ng->getType() == 8) //天劫怪
+            {
+                UInt32 exp = TIANJIE_EXP(GetLev()) * ng->getExp() * expMulti;
+                addExpOrTjScore(exp, 0, GObject::Tianjie::instance().isTjRateNpc(npcId), true);
+            }
+            else if (ng->getLevel() <= GetLev() || (ng->getLevel() > GetLev() && (ng->getLevel() - GetLev()) < 10))
             {
                 UInt32 exp = 0;
                 if(getBuffData(PLAYER_BUFF_TRAINP3, now))
@@ -2686,6 +2721,7 @@ namespace GObject
                 pendExp(exp);
                 ng->getLoots(this, _lastLoot);
             }
+            
             //战胜特定NPC之后 荣誉
             GameAction()->doAttainment(this, 10351, npcId);
 		}
@@ -4366,7 +4402,8 @@ namespace GObject
 			mlvl = 255;
 		else
 			mlvl += 10;
-		if(cfg.enableWallow && _playerData.wallow)
+
+        if(cfg.enableWallow && _playerData.wallow)
 		{
 			UInt32 onlineDuration = (_onlineDuration + TimeUtil::Now() - _playerData.lastOnline);
 			if(onlineDuration >= 5 * 60 * 60)
@@ -4389,6 +4426,8 @@ namespace GObject
 			if(fgt != NULL)
 				fgt->addExp(exp);
 		}
+        //是否开启天劫
+        GObject::Tianjie::instance().isOpenTj(this);
         sendLevelPack(GetLev()); // XXX: 
 	}
 
@@ -11289,9 +11328,15 @@ namespace GObject
         }
     }
 
-    static const UInt32 s_tjEvent1NpcId[16] = {};//天劫事件1,16个据点的怪物npc
-    static const UInt32 s_tjEvent1Exp[16] = {};  //天劫事件1,16个据点的经验
-
+    static const UInt32 s_task1ColorScore[] = {300, 600, 900, 1200}; //日常任务的积分
+    static const UInt32 s_tjTask1MaxCount = 5;       //天劫日常任务1的最大可完成数
+    static const UInt32 s_tjTask2MaxScore = 16000;    //天劫日常任务2的最大捐献积分
+    static const UInt8  s_tjTask2Score[4] = {200, 200, 200, 200};
+    static const UInt8  s_tjTask2ExpMulti[4] = {30, 30, 30, 30};
+    static const UInt8  s_tjTask3CopyCount = 50;
+    static const UInt8  s_tjTask3AutoTime  = 30;
+    static const UInt8  s_task3ExpMulti = 8;
+    static const UInt8  s_task3Score    = 60; 
     void Player::OnDoTianjieTask(UInt8 eventId, UInt8 cmd, UInt8 id)
     {
         Stream st(REQ::TIANJIE);
@@ -11317,7 +11362,7 @@ namespace GObject
             case 1:
             case 2:
                 {
-                    UInt8 res = attackTjEvent1(id, rcmd);
+                    UInt8 res = attackTjEvent1(id, cmd);
                     if (res > 0)
                     {
                         UInt8 rcmd = res;
@@ -11346,12 +11391,14 @@ namespace GObject
                     ConsumeInfo ci(TianjieTask, 0, 0);
                     useTael(500, &ci);
 
-                    for (size_t i = 0; i < sizeof(_playerData.tjEvent1)/sizeof(_playerData.tjEvent1[0]); ++i)
-                    {
-                        _playerData.tjEvent1[i] = freshTjEvent1Id();
-                    }
-                    UInt8 num1 = 5-GetVar(VAR_TJ_TASK1_NUMBER);
-                    st << type << rcmd <<num1 << _playerData.tjEvent1[0] << _playerData.tjEvent1[1] << _playerData.tjEvent1[2];
+                    memset(_playerData.tjEvent1, 0, sizeof(_playerData.tjEvent1));
+                    memset(_playerData.tjColor1, 0, sizeof(_playerData.tjColor1));
+                    memset(_playerData.tjExp1,   0, sizeof(_playerData.tjExp1));
+                    for (int i = 0; i < 3; ++i)
+                        GObject::Tianjie::instance().randomTask1Data(GetLev(),_playerData.tjEvent1[i], _playerData.tjColor1[i], _playerData.tjExp1[i]);
+                    
+                    st << type << rcmd;
+                    getTjTask1Data(st, true);
                     st << Stream::eos;
                     send(st);
                 }
@@ -11363,6 +11410,7 @@ namespace GObject
         else if (2 == eventId)
         {
             type = 2;
+            int score = GetVar(VAR_TJ_TASK2_SCORE);
             switch (cmd)
             {
                     //查询列表
@@ -11377,14 +11425,14 @@ namespace GObject
                     //捐款
                 case 1:
                     {
-                        int count = GetVar(VAR_TJ_TASK2_TAEL) + GetVar(VAR_TJ_TASK2_GOLD) + GetVar(VAR_TJ_TASK2_COUPON) + GetVar(VAR_TJ_TASK2_TJYJ);
-                        if (count >= 100) //达到上限
+                        if (score >= s_tjTask2MaxScore) //达到上限
                         {
                             rcmd = 5;
                             st << type << rcmd << Stream::eos;
                             send(st);
                             return;
                         }
+                        int tjScore = 0;
                         if (0 == id) //白银
                         {
                             if (getTael() < 1000)
@@ -11397,6 +11445,7 @@ namespace GObject
                             ConsumeInfo ci(TianjieTask, 0, 0);
                             useTael(1000, &ci);
                             AddVar(VAR_TJ_TASK2_TAEL, 1);
+                            tjScore = s_tjTask2Score[0];
                         }
                         else if (1 == id) //仙石
                         {
@@ -11410,6 +11459,7 @@ namespace GObject
                             ConsumeInfo ci(TianjieTask, 0, 0);
                             useGold(10, &ci);
                             AddVar(VAR_TJ_TASK2_GOLD, 1);
+                            tjScore = s_tjTask2Score[1];
                         }
                         else if (2 == id) //礼券
                         {
@@ -11423,10 +11473,11 @@ namespace GObject
                             ConsumeInfo ci(TianjieTask, 0, 0);
                             useCoupon(10, &ci);
                             AddVar(VAR_TJ_TASK2_COUPON, 1);
+                            tjScore = s_tjTask2Score[2];
                         }
                         else if (3 == id) //天劫印记
                         {
-                            if (!GetPackage()->DelItemAny(9999, 1))
+                            if (!GetPackage()->DelItemAny(9138, 1))
                             {
                                 rcmd = 4; //印记不足
                                 st << type << rcmd << Stream::eos;
@@ -11434,37 +11485,15 @@ namespace GObject
                                 return;
                             }
                             AddVar(VAR_TJ_TASK2_TJYJ, 1);
+                            tjScore = s_tjTask2Score[3];
                         }
-                        st << type << rcmd;
-                        getTjTask2Data(st);
-                        st << Stream::eos;
-                        send(st);
-                    }
-                    break;
-                    //领取奖励
-                case 2:
-                    {
-                        if (GetVar(VAR_TJ_TASK2_RECV) == 1)//已领取
+                        if (tjScore > 0)
                         {
-                            rcmd = 6;
-                            st << type << rcmd << Stream::eos;
-                            send(st);
-                            return;
-                        }
+                            int exp = TIANJIE_EXP(GetLev()) * s_tjTask2ExpMulti[id];
+                            addExpOrTjScore(exp, tjScore, false, false);
 
-                        int count = GetVar(VAR_TJ_TASK2_TAEL) + GetVar(VAR_TJ_TASK2_GOLD) + GetVar(VAR_TJ_TASK2_COUPON) + GetVar(VAR_TJ_TASK2_TJYJ);
-                        int exp2 = count * 1000000 / 100;
-                        //达到天劫等级的玩家,一天只能领一次奖励
-                        AddExp(exp2);
-                        if (GObject::Tianjie::instance().isPlayerInTj(GetLev()))
-                        {
-                            AddVar(VAR_TJ_TASK2_RECV, 1);
+                            AddVar(VAR_TJ_TASK2_SCORE, tjScore);
                         }
-                        SetVar(VAR_TJ_TASK2_TAEL, 0 );
-                        SetVar(VAR_TJ_TASK2_GOLD, 0 );
-                        SetVar(VAR_TJ_TASK2_COUPON, 0 );
-                        SetVar(VAR_TJ_TASK2_TJYJ, 0 );
-            
                         st << type << rcmd;
                         getTjTask2Data(st);
                         st << Stream::eos;
@@ -11487,7 +11516,7 @@ namespace GObject
                     if (GetVar(VAR_TJ_TASK3_COPYID) == 51)
                     {
                         rcmd = 1;
-                        st << type << res << Stream::eos;
+                        st << type << rcmd << Stream::eos;
                         send(st);
                         return;
                     }
@@ -11501,7 +11530,7 @@ namespace GObject
                 break;
             case 3: //自动完成
                 {
-                    completeAutoTlz():
+                    completeAutoTlz();
                 }
                 break;
             default:
@@ -11509,15 +11538,9 @@ namespace GObject
             }
         }
     }
-    UInt8 Player::freshTjEvent1Id()
-    {
-        UInt8 id = 0;
-
-        return id;
-    }
     UInt8 Player::attackTjEvent1(UInt8 id, UInt8 cmd)
     {
-        if (id > 15) 
+        if (id > 3) 
             return 4;
         
         if (GetVar(VAR_TJ_TASK1_NUMBER) == 5)
@@ -11526,7 +11549,7 @@ namespace GObject
         if (cmd == 2 && getGold() < 5) //双倍奖励
             return 2; //仙石不足
        
-        bool res = attackNpc(s_tjEvent1NpcId[id]);
+        bool res = attackNpc(_playerData.tjEvent1[id],0xFFFFFFFF,false,true,cmd);
         if (res)
         {
             if (2 == cmd)
@@ -11534,51 +11557,92 @@ namespace GObject
                 ConsumeInfo ci(TianjieTask, 0, 0);
                 useGold(5, &ci);
             }
-            _playerData.tjEvent1[id] = 0;
+            int taskScore = s_task1ColorScore[_playerData.tjColor1[id]] * cmd;
 
-            AddExp(s_tjEvent1Exp[id] * cmd);
+            int exp = _playerData.tjExp1[id] * cmd;
+            addExpOrTjScore(exp, taskScore, false, true);
 
             AddVar(VAR_TJ_TASK1_NUMBER, 1);
+
+            _playerData.tjEvent1[id] = 0;
+            _playerData.tjColor1[id] = 0;
+            _playerData.tjExp1[id] = 0;
         }
+        Stream st(REQ::TIANJIE);
+        st <<  static_cast<UInt8>(1) << static_cast<UInt8>(0);
+        //获取数据列表
+        getTjTask1Data(st);
+        st << Stream::eos;
+        send(st);
         return 0;
     }
-    UInt8 Player::attackTjEvent3(UInt8 id)
+    
+   
+   UInt8 Player::attackTjEvent3(UInt8 id)
     {
         UInt8 copyid = GetVar(VAR_TJ_TASK3_COPYID);
-        if (copyid > 50) return;
+        if (copyid > s_tjTask3CopyCount) return 1;
 
-        if (0 == copyid) copyid = 1;
-        bool res = GObject::Tianjie::instance().attackTlz(this, id, copyid);
+        if (0 == copyid) 
+        {
+            copyid = 1;
+            AddVar(VAR_TJ_TASK3_COPYID, 1);
+        }
+        bool res = GObject::Tianjie::instance().attackTlz(this, copyid);
         if (res)
         {
             copyid++;
             AddVar(VAR_TJ_TASK3_COPYID, 1);
-        
-            Stream st(REQ::TIANJIE);
+            int exp = TIANJIE_EXP(GetLev()) * s_task3ExpMulti;
+            addExpOrTjScore(exp, s_task3Score, false, true);
 
-            UInt8 percent3 = (copyid-1) * 100 / 50;
-            int exp3 = 1000000;
-            int time3 = 0; //剩余时间 秒
-         
-            st << static_cast<UInt8>(3) << static_cast<UInt8>(0) <<copyid << percent3 << exp3 << time3 << Stream::eos;
-            m_player->send(st); 
+            Stream st(REQ::TIANJIE);
+            st << static_cast<UInt8>(3) << static_cast<UInt8>(0);
+            getTjTask3Data(st);
+            st << Stream::eos;
+            send(st); 
         } 
         return 0;
     }
-    void Player::getTjTask1Data(Stream& st)
+    void Player::getTjTask1Data(Stream& st, bool isRefresh)
     {
-        if (GetVar(VAR_TJ_TASK1_NUMBER) == 0) //今日还没做任务
+        if (isRefresh || GetVar(VAR_TJ_TASK1_NUMBER) == 0) //今日还没做任务
         {
-            for (int i = 0; i < sizeof(_playerData.tjEvent1)/sizeof(_playerData.tjEvent1[0]); ++i)
+            for (int i = 0; i < 3; ++i)
             {
                 if (_playerData.tjEvent1[i] == 0)
                 {
-                    _playerData.tjEvent1[i] = freshTjEvent1Id();
+                    GObject::Tianjie::instance().randomTask1Data(GetLev(),_playerData.tjEvent1[i], _playerData.tjColor1[i], _playerData.tjExp1[i]);
                 }
             }
         }
+        UInt8 type = 0;
+        int value[3] = {0};
+        value[0] = _playerData.tjExp1[0];
+        value[1] = _playerData.tjExp1[1];
+        value[2] = _playerData.tjExp1[2];
+        for (int i = 0; i < 3; ++i)
+        {
+            GData::NpcGroups::iterator it = GData::npcGroups.find(_playerData.tjEvent1[i]);
+            if(it != GData::npcGroups.end())
+            {
+		        GData::NpcGroup * ng = it->second;
+                value[i] +=  TIANJIE_EXP(GetLev()) * ng->getExp();
+            }
+        }
+        if (GObject::Tianjie::instance().isPlayerInTj(GetLev()))
+        {
+            type = 1;
+            value[0] = value[0] * 2 / TIANJIE_EXP(GetLev()) + s_task1ColorScore[_playerData.tjColor1[0]];
+            value[1] = value[1] * 2 / TIANJIE_EXP(GetLev()) + s_task1ColorScore[_playerData.tjColor1[1]];
+            value[2] = value[2] * 2 / TIANJIE_EXP(GetLev()) + s_task1ColorScore[_playerData.tjColor1[2]];
+        }
         UInt8 num1 = 5-GetVar(VAR_TJ_TASK1_NUMBER);
-        st << num1 << _playerData.tjEvent1[0] << _playerData.tjEvent1[1] << _playerData.tjEvent1[2];
+        st << num1 << type;
+        st << _playerData.tjEvent1[0] << _playerData.tjColor1[0] << value[0];
+        st << _playerData.tjEvent1[1] << _playerData.tjColor1[1] << value[1];
+        st << _playerData.tjEvent1[2] << _playerData.tjColor1[2] << value[2];
+
     }
     void Player::getTjTask2Data(Stream& st)
     {
@@ -11586,62 +11650,133 @@ namespace GObject
         short n2 = GetVar(VAR_TJ_TASK2_GOLD);
         short n3 = GetVar(VAR_TJ_TASK2_COUPON);
         short n4 = GetVar(VAR_TJ_TASK2_TJYJ);
-        UInt8 percent = (n1+n2+n3+n4);      //捐献百分比,100上限
-        int exp2 = percent * 1000000 / 100; //经验
-        st << n1 << n2 << n3 << n4 << percent << exp2;
+        UInt8 percent = GetVar(VAR_TJ_TASK2_SCORE)*100/s_tjTask2MaxScore;      //捐献百分比
+        int exp2 = TIANJIE_EXP(GetLev()) * s_tjTask2ExpMulti[0] ; //经验
+        int score = s_tjTask2Score[0];
+        if (GObject::Tianjie::instance().isPlayerInTj(GetLev()))
+        {
+            score += exp2*2/TIANJIE_EXP(GetLev());
+            exp2 = 0;
+        }
+        st << n1 << n2 << n3 << n4 << percent << exp2 << score;
     }
     void Player::getTjTask3Data(Stream& st)
     {
         UInt8 finish = 0;
-        byte copyid = GetVar(VAR_TJ_TASK3_COPYID);
-        if (copyid == 51) //已完成
+        UInt8 copyid = GetVar(VAR_TJ_TASK3_COPYID);
+        if (copyid == (s_tjTask3CopyCount+1)) //已完成
         {
             finish = 1;
         }
         if (copyid == 0) copyid = 1;
-        UInt8 percent = (copyid-1) * 100/ 50;
-        int exp3 = percent * 10000000 / 100;
+        
+        UInt8 percent = (copyid-1) * 100/ s_tjTask3CopyCount;
+        int exp3 = TIANJIE_EXP(GetLev()) * s_task3ExpMulti;
+        int score = s_task3Score;
         int time3 = 0;
         if (hasFlag(Player::AutoTlz)) 
-            time3 = (51 - copyid) * 30;
-        st << finish << copyid << percent << exp3 << time3;
+            time3 = (s_tjTask3CopyCount-copyid+1) * s_tjTask3AutoTime;
+         if (GObject::Tianjie::instance().isPlayerInTj(GetLev()))
+        {
+            score += exp3*2/TIANJIE_EXP(GetLev());
+            exp3 = 0;
+        }
+        
+        st << finish << static_cast<UInt8>(copyid-1) << percent << time3 << exp3 << score;
+    }
+    void Player::addExpOrTjScore(int exp, int score, bool isEventScore, bool isEndScore)
+    {
+        int eventScore = 0;
+        //天劫事件的经验转换为天劫积分
+        if (isEventScore) eventScore = score;
+        if (GObject::Tianjie::instance().isPlayerInTj(GetLev()))
+        {
+            if (isEventScore)
+                eventScore += exp*2/TIANJIE_EXP(GetLev());
+            score += exp*2/TIANJIE_EXP(GetLev());;
+        }
+        else if (isEndScore) //战斗结束后再加经验
+        {
+            pendExp(exp);
+        }
+        else                 //立即加经验
+        {
+            AddExp(exp);
+        }
+        if (isEndScore)
+        {
+            if (isEventScore) 
+                _playerData.lastTjEventScore += eventScore;
+            _playerData.lastTjTotalScore += score;
+        }
+        else
+        {
+            if (eventScore > 0)
+            {
+                AddVar(VAR_TJ_EVENT_PRESTIGE, eventScore);
+                GObject::Tianjie::instance().insertToEventSortMap(this, GetVar(VAR_TJ_EVENT_PRESTIGE), GetVar(VAR_TJ_EVENT_PRESTIGE)-eventScore);
+                GObject::Tianjie::instance().updateEventData(this);
+                SYSMSG_SENDV(165, this, eventScore);
+
+                GObject::Tianjie::instance().broadEventTop1(this);
+            }
+            if (score > 0)
+            {
+                AddVar(VAR_TJ_TASK_PRESTIGE, score);
+                GObject::Tianjie::instance().insertToScoreSortMap(this, GetVar(VAR_TJ_TASK_PRESTIGE),GetVar(VAR_TJ_TASK_PRESTIGE)-score);
+                SYSMSG_SENDV(166, this, score);
+
+                GObject::Tianjie::instance().updateRankData(this);
+             }
+        }
     }
     void Player::processAutoTlz()
     {
         Stream st(REQ::TIANJIE);
         UInt8 type = 3;
         UInt8 rcmd = 0;
-        if (GetVar(VAR_TJ_TASK3_COPYID) == 51)
+        if (hasFlag(Player::AutoTlz))
+            return;
+
+        if (GetVar(VAR_TJ_TASK3_COPYID) == (s_tjTask3CopyCount+1))
         {
             rcmd = 1;
-            st << type << cmd << Stream::eos;
+            st << type << rcmd << Stream::eos;
             send(st);
             return;
         }
-        if (getGold() < 5)
+        else if (GetVar(VAR_TJ_TASK3_COPYID) == 0)
         {
-            rcmd = 2;
+            SetVar(VAR_TJ_TASK3_COPYID, 1);
+        }
+        if (getTael() < 1000)
+        {
+            rcmd = 2; //银币不足
             st << type << rcmd << Stream::eos;
             send(st);
             return;
         }
         ConsumeInfo ci(TianjieTask, 0, 0);
-        useGold(5, &ci);
-        
-        int count = 51 - GetVar(VAR_TJ_TASK3_COPYID);
-        EventTlzAuto* event = new(std::nothrow) EventTlzAuto(this, 30, count);
-        if (event == NULL) return;
-        PushTimerEvent(event);
-        event->notify();
+        useTael(1000, &ci);
         
         addFlag(Player::AutoTlz);
+        
+        int count = s_tjTask3CopyCount+1 - GetVar(VAR_TJ_TASK3_COPYID);
+        EventTlzAuto* event = new(std::nothrow) EventTlzAuto(this, s_tjTask3AutoTime, count);
+        if (event == NULL) return;
+        PushTimerEvent(event);
+    
+        event->notify(true);
     }
     void Player::completeAutoTlz()
     {
         Stream st(REQ::TIANJIE);
         UInt8 type = 3;
         UInt8 rcmd = 0;
-        if (GetVar(VAR_TJ_TASK3_COPYID) == 51)
+        if (!hasFlag(Player::AutoTlz))
+            return;
+
+        if (GetVar(VAR_TJ_TASK3_COPYID) == (s_tjTask3CopyCount+1))
         {
             rcmd = 1;
         }
@@ -11657,13 +11792,21 @@ namespace GObject
         }
         ConsumeInfo ci(TianjieTask, 0, 0);
         useGold(10, &ci);
-            
-        SetVar(VAR_TJ_TASK3_COPYID, 51);
-        AddExp(1000000);
-        
+   
+        int currCopyId = GetVar(VAR_TJ_TASK3_COPYID);
+        if (currCopyId == 0)
+            currCopyId = 1;
+        int copyCount = s_tjTask3CopyCount - currCopyId + 1;
+
+        SetVar(VAR_TJ_TASK3_COPYID, (s_tjTask3CopyCount+1));
+        //加积分和经验
+        int exp = TIANJIE_EXP(GetLev()) * s_task3ExpMulti * copyCount;
+        addExpOrTjScore(exp, s_task3Score*copyCount, false);
+
         st << type << rcmd;
         getTjTask3Data(st);
-        m_player->send(st); 
+        st << Stream::eos;
+        send(st); 
         //删除定时事件
         PopTimerEvent(this, EVENT_TLZAUTO, getId());
         delFlag(Player::AutoTlz);
@@ -11676,36 +11819,40 @@ EventTlzAuto::EventTlzAuto( Player * player, UInt32 interval, UInt32 count)
 
 void EventTlzAuto::Process(UInt32 leftCount)
 {
-    m_player->AddVar(VAR_TJ_TASK3_COPYID, 1);
+    m_Player->AddVar(VAR_TJ_TASK3_COPYID, 1);
 
     notify();
     if (leftCount == 0)
     {
-        PopTimerEvent(this, EVENT_TLZAUTO, getId());
+        PopTimerEvent(m_Player, EVENT_TLZAUTO,  m_Player->getId());
     }
 }
 
 void EventTlzAuto::complete() const
 {
 }
-void EventTlzAuto::notify()
+void EventTlzAuto::notify(bool isBeginAuto)
 {
-    if(m_player == NULL || !m_player->isOnline())
+    if(m_Player == NULL || !m_Player->isOnline())
         return;
+    int copyid = m_Player->GetVar(VAR_TJ_TASK3_COPYID);
+    if (!isBeginAuto)
+    {
+        int exp = TIANJIE_EXP(m_Player->GetLev()) * s_task3ExpMulti;
+        m_Player->addExpOrTjScore(exp, s_task3Score, false);
+    }
+    if (copyid  >= (s_tjTask3CopyCount+1))
+        m_Player->delFlag(Player::AutoTlz);
+
     Stream st(REQ::TIANJIE);
     UInt8 type = 3;
     UInt8 cmd = 0;
-    if (m_player->GetVar(VAR_TJ_TASK3_COPYID) >= 51)
-    {
-        AddExp(1000000);
 
-        m_player->delFlag(Player::AutoTlz);
-    }
     st << type << cmd;
-    m_player->getTjTask3Data(st);
+    m_Player->getTjTask3Data(st);
     st << Stream::eos;
          
-    m_player->send(st); 
+    m_Player->send(st); 
 }
 
 

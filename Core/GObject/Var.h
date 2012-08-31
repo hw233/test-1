@@ -199,11 +199,11 @@ namespace GObject
         VAR_TJ_EVENT_PRESTIGE=155,  //天劫事件中的声望
         VAR_TJ_TASK_PRESTIGE=156,   //天劫活动中的声望
         VAR_TJ_TASK1_NUMBER=157,    //天劫每日任务1的已完成次数
-        VAR_TJ_TASK2_TAEL=158,     //天劫任务2捐献的银币积分
-        VAR_TJ_TASK2_GOLD=159,     //天劫任务2捐献的仙石积分
+        VAR_TJ_TASK2_TAEL=158,      //天劫任务2捐献的银币积分
+        VAR_TJ_TASK2_GOLD=159,      //天劫任务2捐献的仙石积分
         VAR_TJ_TASK2_COUPON=160,    //天劫任务2捐献的礼券积分
         VAR_TJ_TASK2_TJYJ=161,      //天劫任务2捐献的天劫印记
-        VAR_TJ_TASK2_RECV=162,      //天劫任务2是否已领取任务
+        VAR_TJ_TASK2_SCORE=162,     //天劫任务2的积分
         VAR_TJ_TASK3_COPYID=163,    //天劫任务3当前破阵层数
 
         VAR_RECHARGE_TOTAL3366 = 169, //3366合作充值活动
@@ -391,15 +391,16 @@ namespace GObject
             REGISTER_VAR(VAR_CONSUME, CYCLE_NONE);
             REGISTER_VAR(VAR_PHYSICAL_BUY, CYCLE_DAY);
 
-            REGISTER_VAR(VAR_TJ_EVENT_PRESTIGE, CYCLE_DAY);
+            REGISTER_VAR(VAR_TJ_EVENT_PRESTIGE, CYCLE_NONE);
             REGISTER_VAR(VAR_TJ_TASK_PRESTIGE,  CYCLE_NONE);
             REGISTER_VAR(VAR_TJ_TASK1_NUMBER, CYCLE_DAY);
-            REGISTER_VAR(VAR_TJ_TASK2_TAEL, CYCLE_NONE);
-            REGISTER_VAR(VAR_TJ_TASK2_GOLD, CYCLE_NONE);
-            REGISTER_VAR(VAR_TJ_TASK2_COUPON, CYCLE_NONE);
-            REGISTER_VAR(VAR_TJ_TASK2_TJYJ, CYCLE_NONE);
-            REGISTER_VAR(VAR_TJ_TASK2_RECV, CYCLE_DAY);
-            REGISTER_VAR(VAR_TJ_TASK3_COPYID, CYCLE_NONE);
+            REGISTER_VAR(VAR_TJ_TASK2_TAEL, CYCLE_DAY);
+            REGISTER_VAR(VAR_TJ_TASK2_GOLD, CYCLE_DAY);
+            REGISTER_VAR(VAR_TJ_TASK2_COUPON, CYCLE_DAY);
+            REGISTER_VAR(VAR_TJ_TASK2_TJYJ, CYCLE_DAY);
+            REGISTER_VAR(VAR_TJ_TASK2_SCORE, CYCLE_DAY);
+            REGISTER_VAR(VAR_TJ_TASK3_COPYID, CYCLE_DAY);
+            
             REGISTER_VAR(VAR_QQVIP_BUF, CYCLE_DAY);
             REGISTER_VAR(VAR_QQVIP_CNT, CYCLE_DAY);
         }

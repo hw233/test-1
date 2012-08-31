@@ -298,7 +298,7 @@ namespace GObject
 	    virtual UInt32 GetID() const { return EVENT_TLZAUTO; }
 	    void Process(UInt32);
 	    void complete() const;
-        void notify();
+        void notify(bool isBeginAuto = false);
 
     };
 
@@ -387,7 +387,7 @@ namespace GObject
             smFinishCount(0), smFreeCount(0), smAcceptCount(0), ymFinishCount(0), ymFreeCount(0), ymAcceptCount(0),
             clanTaskId(0), ctFinishCount(0),
 			created(0), lockExpireTime(0), wallow(1), battlecdtm(0), dungeonCnt(0), dungeonEnd(0),
-            copyFreeCnt(0), copyGoldCnt(0), copyUpdate(0), frontFreeCnt(0), frontGoldCnt(0), frontUpdate(0),m_isTlzAuto(0)
+            copyFreeCnt(0), copyGoldCnt(0), copyUpdate(0), frontFreeCnt(0), frontGoldCnt(0), frontUpdate(0)
 #ifdef _ARENA_SERVER
             , entered(0)
 #endif
@@ -407,6 +407,11 @@ namespace GObject
             smcolor.reserve(32);
             yamen.reserve(32);
             ymcolor.reserve(32);
+            memset(tjEvent1, 0, sizeof(tjEvent1));
+            memset(tjColor1, 0, sizeof(tjColor1));
+            memset(tjExp1, 0, sizeof(tjExp1));
+            lastTjEventScore = 0;
+            lastTjTotalScore = 0;
         }
 
 
@@ -485,8 +490,11 @@ namespace GObject
 #ifdef _ARENA_SERVER
         UInt8 entered;
 #endif
-        UInt8 tjEvent1[3];          //天劫事件1的3个据点
-
+        short tjEvent1[3];       //天劫事件1的3个据点npc
+        UInt8 tjColor1[3];       //颜色
+        int   tjExp1[3];         //经验  
+        int   lastTjEventScore;      //天劫事件积分
+        int   lastTjTotalScore;      //天劫活动积分
     };
 
 	class Player:
@@ -640,7 +648,7 @@ namespace GObject
 		void makeWallow(Stream& st);
 
 		void checkLastBattled();
-
+        void addLastTjScore();
 		void checkHPLoss();
 		void checkDeath();
 
@@ -1014,7 +1022,7 @@ namespace GObject
 
 		//ս??????
 		bool challenge(Player *, UInt32 * = NULL, int * = NULL, bool = true, UInt32 = 0, bool = false, UInt32 = Battle::BS_ATHLETICS1, UInt8 = 0x03);
-		bool attackNpc(UInt32, UInt32 = 0xFFFFFFFF, bool = false, bool = true);
+		bool attackNpc(UInt32, UInt32 = 0xFFFFFFFF, bool = false, bool = true, UInt32 = 1);
         bool attackRareAnimal(UInt32 id);
         bool attackCopyNpc(UInt32, UInt8, UInt8, UInt8, UInt8 = 0, bool = false, std::vector<UInt16>* loot = NULL, bool = true);
         bool attackWorldBoss(UInt32, UInt8, UInt8, UInt8, bool = false);
@@ -1069,16 +1077,15 @@ namespace GObject
 
         //天劫每日任务
         void OnDoTianjieTask(UInt8 eventId, UInt8 cmd, UInt8 id);
-        UInt8 freshTjEvent1Id();
         UInt8 attackTjEvent1(UInt8 id, UInt8 cmd);
         UInt8 attackTjEvent3(UInt8 id);
-        void getTjTask1Data(Stream& st);
+        void getTjTask1Data(Stream& st, bool isRefresh = false);
         void getTjTask2Data(Stream& st);
         void getTjTask3Data(Stream& st);
+        void addExpOrTjScore(int exp, int score, bool isEventScore = true, bool isEndScore = false);
 
         void processAutoTlz();
         void completeAutoTlz();
-        bool m_isTlzAuto;
         /////
 	public:
 		UInt16   GetFreePackageSize();

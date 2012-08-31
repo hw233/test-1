@@ -73,16 +73,13 @@ enum PurchaseType
     ArenaBet,
     AthleticKillCD2,
     AthleticPhysical,
-<<<<<<< HEAD
     TianjieDonate,
     TianjieTask,
-=======
     DiscountSp1,
     DiscountSp2,
     DiscountSp3,
     ArenaFromCard,
     ArenaFromMail,
->>>>>>> 8494b54eaf34e239940c9b74e5fbd8f5d611aa25
 };
 
 enum IncomingType

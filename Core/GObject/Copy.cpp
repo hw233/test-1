@@ -17,7 +17,7 @@
 #include "ShuoShuo.h"
 #include "LuckyDraw.h"
 #include "Package.h"
-
+#include "GObject/Tianjie.h"
 namespace GObject
 {
 #define PRIVILEGE_COUNT 1
@@ -451,6 +451,10 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                 else
                     randNum = randNum + 1;
                 pl->GetPackage()->AddItem2(9057, randNum, true, true);
+            }
+            if (GObject::Tianjie::instance().isTjOpened())
+            {
+                pl->GetPackage()->AddItem(9138, 1, false, false);
             }
             GameAction()->onCopyWin(pl, id, tcd.floor, tcd.spot, tcd.lootlvl);
 

@@ -1152,6 +1152,9 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     {
         pl->sendSoSoMapInfo();
     }
+    {
+        GObject::Tianjie::instance().getTianjieData(pl, true);
+    }
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -2581,6 +2584,7 @@ void OnBattleEndReq( GameMsgHdr& hdr, BattleEndReq& req )
 		return ;
 
 	player->checkLastBattled();
+    player->addLastTjScore();
 }
 
 void OnCopyReq( GameMsgHdr& hdr, CopyReq& req )
@@ -4217,7 +4221,7 @@ void OnFourCopReq( GameMsgHdr& hdr, const void* data)
 }
 void OnTianjieReq( GameMsgHdr& hdr, const void* data)
 {
-    GObject::Tianjie::instance().OnTianjieReq(hdr, data);
+    GObject::Tianjie::instance().onTianjieReq(hdr, data);
 }
 
 void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)

@@ -477,7 +477,7 @@ public:
 public:
     inline void setExtraAttack(Int32 atk) { setDirty(true); _wbextatk = atk; }
 	inline void setExtraMagAttack(Int32 atk) { setDirty(true); _wbextmagatk = atk; }
-
+    inline void setAttrExtraEquip(const GData::AttrExtra& other){setDirty(true); _attrExtraEquip = other;}
 public:
 	inline Int16 getBaseStrength()
     {
