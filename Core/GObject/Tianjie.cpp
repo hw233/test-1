@@ -83,8 +83,8 @@ static const UInt32 s_tjTotalRewardId = 9132;
 #define TJ_EVENT_WAIT_TIME 15*60      //天劫事件间隔时间
 #define TJ_EVENT_PROCESS_TIME 15*60   //天劫事件持续时间
 
-//#define TJ_EVENT_WAIT_TIME 2*60      //天劫事件间隔时间
-//#define TJ_EVENT_PROCESS_TIME 10*60   //天劫事件持续时间
+//#define TJ_EVENT_WAIT_TIME 30      //天劫事件间隔时间
+//#define TJ_EVENT_PROCESS_TIME 2*60   //天劫事件持续时间
 Tianjie::Tianjie()
 {
     m_tjTypeId = 0;
