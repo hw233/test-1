@@ -80,10 +80,8 @@ static const UInt32 s_tjTotalRewardId = 9132;
 #define TIME_60 60 
 #define ONE_DAY_SECOND (24*3600)
 
-//#define TJ_EVENT_WAIT_TIME 5*60      //天劫事件间隔时间
-//#define TJ_EVENT_PROCESS_TIME 15*60   //天劫事件持续时间
-#define TJ_EVENT_WAIT_TIME 3*60      //天劫事件间隔时间
-#define TJ_EVENT_PROCESS_TIME 10*60   //天劫事件持续时间
+#define TJ_EVENT_WAIT_TIME 15*60      //天劫事件间隔时间
+#define TJ_EVENT_PROCESS_TIME 15*60   //天劫事件持续时间
 
 Tianjie::Tianjie()
 {
@@ -1958,6 +1956,7 @@ void Tianjie::reward(multimap<int, Player*>& m, UInt8 varId, UInt8 EventOrTotal)
             else if (EventOrTotal == 1)
             {
                 item.id = s_tjTotalRewardId;
+                if (i == 1)
                 SYSMSG_BROADCASTV(5041, iter->second->getCountry(), iter->second->getName().c_str(), iter->second->getCountry(), iter->second->getName().c_str());
             }
             item.count = 11-i;         //个数
