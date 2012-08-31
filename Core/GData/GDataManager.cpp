@@ -262,12 +262,20 @@ namespace GData
 			fprintf(stderr, "Load Skill Strengthen Table Error !\n");
 			return false;
         }
+        
         /*
         if (!LoadClanCopy())
         {
             fprintf (stderr, "Load Clan Copy Table Error !\n");
             return false;
         }
+
+        if (!LoadClanCopyMonster)
+        {
+            fprintf (stderr, "Load Clan Copy Monster Table Error !\n");
+            return false;
+        }
+
         if (!LoadClanStatue())
         {
             fprintf (stderr, "Load Clan Statue Error !\n");
@@ -1395,6 +1403,27 @@ namespace GData
 
 		return true;
     }
+
+    bool GDataManager::LoadClanCopyMonster()
+    {
+        // 读取和帮派副本怪物配置
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+        DBClanCopyMonster ccs;
+		if (execu->Prepare("SELECT `level`, `appearRound`, `npcId`, `npcCount`, `npcRouteCount`, `npcValue` FROM `clan_copy_monster_template` ORDER BY `level` ASC", ccs) != DB::DB_OK)
+			return false;
+		while (execu->Next() == DB::DB_OK)
+		{
+            
+            UInt32 key = (static_cast<UInt32>(ccs.level)) << 16 | ccs.appearRound;
+            clanCopyMonsterMap.insert(std::make_pair(key, 
+                        ClanCopyMonsterData(ccs.level, ccs.appearRound, ccs.npcId, 
+                            ccs.npcCount, ccs.npcRouteCount, ccs.npcValue)));
+		}
+
+		return true;
+    }
+
 
     bool GDataManager::LoadClanStatue()
     {

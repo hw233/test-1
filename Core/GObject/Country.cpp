@@ -13,6 +13,8 @@
 #include "Common/TimeUtil.h"
 #include "Common/Itoa.h"
 #include "ClanRankBattle.h"
+#include "ClanCopy.h"
+#include "TownDeamon.h"
 
 namespace GObject
 {
@@ -46,6 +48,11 @@ void Country::ClanRankBattleCheck(void *)
     ClanRankBattleMgr::Instance().Process(TimeUtil::Now());
 }
 
+void Country::ClanCopyCheck(void *)
+{
+    ClanCopyMgr::Instance().process(TimeUtil::Now());
+}
+
 bool Country::Init()
 {
 	//GameActionLua
@@ -63,6 +70,7 @@ bool Country::Init()
 		AddTimer(5000, Country_Battle_Check, static_cast<void *>(NULL), (5 - (now % 5)) * 1000);
 		AddTimer(5000, Hero_Island_Check, static_cast<void *>(NULL), (5 - (now % 5)) * 1000);
         AddTimer(1000, ClanRankBattleCheck);
+        AddTimer(1000, ClanCopyCheck);
         //townDeamonManager->process();
 	}
 
