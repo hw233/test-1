@@ -411,6 +411,7 @@ void CountryBattle::end(UInt32 curtime)
                 Mail * pmail = it->first->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
                 if(pmail != NULL)
                     mailPackageManager.push(pmail->id, mitem, 1, true);
+                it->first->countryBattleUdpLog(1091, it->first->getCountry());
             }
             else if (rewardid[side] == PLAYER_BUFF_TRAINP2 && count)
             {
@@ -421,6 +422,7 @@ void CountryBattle::end(UInt32 curtime)
                 Mail * pmail = it->first->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
                 if(pmail != NULL)
                     mailPackageManager.push(pmail->id, mitem, 1, true);
+                it->first->countryBattleUdpLog(1091, it->first->getCountry());
             }
 
 			/*for back stage*/

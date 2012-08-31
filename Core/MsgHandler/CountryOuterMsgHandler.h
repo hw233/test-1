@@ -982,6 +982,10 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 		pl->makePlayerInfo(st);
 		conn->send(&st[0], st.size());
 	}
+    {
+        if( !pl->GetVar(VAR_AWARD_NEWREGISTER) && pl->GetLev() == 1)
+            pl->sendNewRegisterAward(0);  //0:表示新用户注册还可以邀请好友进行抽奖
+    }
 	{
 		Stream st;
 		pl->makeFighterList(st);
@@ -1154,6 +1158,16 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     }
     {
         GObject::Tianjie::instance().getTianjieData(pl, true);
+    }
+    if (World::getNeedRechargeRank())
+    {
+        GameMsgHdr hdr(0x1C3, WORKER_THREAD_WORLD, pl, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+    }
+    if (World::getNeedConsumeRank())
+    {
+        GameMsgHdr hdr(0x1C4, WORKER_THREAD_WORLD, pl, 0);
+        GLOBAL().PushMsg(hdr, NULL);
     }
 }
 
@@ -1399,7 +1413,7 @@ void OnFighterEquipReq( GameMsgHdr& hdr, FighterEquipReq& fer )
 		return;
 	if(fer._part == 0)
 	{
-		static UInt8 p[12] = {0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x50, 0x51, 0x52};
+		static UInt8 p[12] = {0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x0a, 0x0b, 0x0c};
 		ItemEquip * e[12] = {fgt->getFashion(), fgt->getWeapon(), fgt->getArmor(0), fgt->getArmor(1),
             fgt->getArmor(2), fgt->getArmor(3), fgt->getArmor(4), fgt->getAmulet(),
             fgt->getRing(), fgt->getTrump(0), fgt->getTrump(1), fgt->getTrump(2)};
@@ -1423,35 +1437,36 @@ void OnFighterEquipReq( GameMsgHdr& hdr, FighterEquipReq& fer )
     case 0x30:
         fgt->setPeerless(static_cast<UInt16>(fer._equipId), true);
         break;
-    case 0x60:
+    case 0x2a:
         {
             UInt16 skill = (fer._equipId >> 16) & 0xFFFF;
             idx = fer._equipId & 0xFFFF;
             fgt->upSkill(skill, idx, true);
         }
         break;
-    case 0x61:
+    case 0x2b:
         {
+            return; // XXX: 取消卸载技能功能
             UInt16 skill = (fer._equipId >> 16) & 0xFFFF;
             idx = fer._equipId & 0xFFFF;
             fgt->offSkill(skill, true);
         }
         break;
-    case 0x62:
+    case 0x2c:
         {
             UInt16 citta = (fer._equipId >> 16) & 0xFFFF;
             idx = fer._equipId & 0xFFFF;
             fgt->upCitta(citta, idx, true);
         }
         break;
-    case 0x63:
+    case 0x2d:
         {
             UInt16 citta = (fer._equipId >> 16) & 0xFFFF;
             idx = fer._equipId & 0xFFFF;
             fgt->offCitta(citta, true, true);
         }
         break;
-    case 0x64:
+    case 0x2e:
         {
             UInt16 citta = (fer._equipId >> 16) & 0xFFFF;
             idx = fer._equipId & 0xFFFF;
@@ -2279,6 +2294,8 @@ void CountryBattleJoinReq( GameMsgHdr& hdr, CountryBattleJoinStruct& req )
 		cb->playerLeave(player);
 		rep.result = 1;
 	}
+    if(rep.result == 0)
+        player->countryBattleUdpLog(1090, player->getCountry());
 	player->send(rep);
 }
 
@@ -2970,7 +2987,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
         case PURCHASE3:
         case PURCHASE3+1:
         case PURCHASE3+2:
-        case PURCHASE4:
+        case PURCHASE3+3:
             {
                 UInt32 arena = player->GetVar(VAR_MONEY_ARENA);
                 if (arena < price)
@@ -2993,6 +3010,33 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 					    player->useMoneyArena(price,&ci);
                         st << static_cast<UInt8>(0);
                         GameAction()->doAty( player,AtyBuy, 0,0);
+                    }
+                }
+            }
+            break;
+        case PURCHASE4:
+            {
+                UInt32 proffer = player->getClanProffer();
+                if (proffer < price)
+                {
+                    st << static_cast<UInt8>(1);
+                }
+                else
+                {
+                    GObject::ItemBase * item = NULL;
+                    if(IsEquipTypeId(lr._itemId))
+                        item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    else
+                        item = player->GetPackage()->AddItem(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    if(item == NULL)
+                        st << static_cast<UInt8>(2);
+                    else
+                    {
+                        ConsumeInfo ci(Item,lr._itemId, lr._count);
+                        player->useClanProffer(price,&ci);
+                        st << static_cast<UInt8>(0);
+
+                        GameAction()->doAty(player, AtyBuy, 0,0);
                     }
                 }
             }
@@ -3049,6 +3093,7 @@ static bool inCountry(const Network::TcpConduit * conduit, UInt8 country)
 
 #define ITEM_SPEAKER 16
 #define ITEM_FLOWER 440
+#define ITEM_QIXI_TALK 9123
 
 int ToMsgCenter(Stream st)
 {
@@ -3137,6 +3182,15 @@ void OnChatReq( GameMsgHdr& hdr, ChatReq& cr )
             if (!player->hasChecked())
                 return;
             if(!player->GetPackage()->DelItemAny(ITEM_FLOWER, 1))
+                break;
+            NETWORK()->Broadcast(st);
+            break;
+        }
+    case 9:
+        {
+            if (!player->hasChecked())
+                return;
+            if(!player->GetPackage()->DelItemAny(ITEM_QIXI_TALK, 1))
                 break;
             NETWORK()->Broadcast(st);
             break;
@@ -4664,6 +4718,7 @@ void OnSecondSoulReq( GameMsgHdr& hdr, const void* data)
             for( int j = 0; j < infoNum; ++ j)
             {
                 st << soulItemExpOut[j].itemId << soulItemExpOut[j].res << soulItemExpOut[j].exp;
+                player->GetPackage()->secondSoulItemUdpLog(soulItemExpOut[j].res + 1, soulItemExpOut[j].itemId, 1);
             }
             st << Stream::eos;
             player->send(st);
@@ -4857,6 +4912,7 @@ void OnActivitySignIn( GameMsgHdr& hdr, const void * data )
                 mgr->UpdateToDB();
                 
                 lua_tinker::table p = GameAction()->GetExchangeProps(id);
+                player->activityUdpLog(1026);
                 st << static_cast<UInt16>(id) << p.get<UInt8>(3) << p.get<UInt16>(2) << Stream::eos;
             }
             break;
@@ -4878,6 +4934,8 @@ void OnActivitySignIn( GameMsgHdr& hdr, const void * data )
                 }
                 mgr->SubScores(score);
                 player->GetPackage()->Add(mgr->GetPropsID(), props.get<UInt8>(3), true, false, FromDailyActivity);
+                player->activityUdpLog(1027, score); 
+                player->activityUdpLog(1028, score); 
                 //兑换后重新刷新一次
                 id = GameAction()->GetExchangePropsID();
                 mgr->SetPropsID(id);

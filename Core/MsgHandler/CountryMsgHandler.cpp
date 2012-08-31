@@ -292,4 +292,9 @@ MSG_REG_2(GameMsgHdr, 0x251, OnGetArenaMoney);
 MSG_REG_2(GameMsgHdr, 0x252, OnArenaEnterCommit);
 MSG_REG_2(GameMsgHdr, 0x253, OnSendPExpCard);
 
+MSG_REG_2(GameMsgHdr, 0x254, OnRoamintQueqiao);
+MSG_REG_2(GameMsgHdr, 0x255, OnRoamintQueqiaoLastLoot);
+
+//MSG_REG_2(GameMsgHdr, 0x256, OnAdvancedHookExp);
+
 MSG_HANDLER_END()

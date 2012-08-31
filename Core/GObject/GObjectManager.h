@@ -1,6 +1,7 @@
 #ifndef _GOBJECTMANAGER_H_
 #define _GOBJECTMANAGER_H_
 
+#include <map>
 #include "GLocalObjectManager.h"
 #include "GGlobalObjectManager.h"
 #include "ItemData.h"
@@ -104,6 +105,7 @@ namespace GObject
         static bool loadNewRelation();
         static bool loadRNR();
         static bool loadSkillStrengthen();
+        static bool loadQixi();
 
         static bool addGM(UInt64 id, UInt8 lvl);
         static bool delGM(UInt64 id);

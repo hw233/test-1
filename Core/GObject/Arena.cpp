@@ -1130,7 +1130,7 @@ void Arena::pushPriliminary(BinaryReader& br)
     }
 
     UInt64 ppid = pid;
-    if((cid != cfg.channelNum || sid != cfg.serverNo) && (ppid >> 48) == 0)
+    if((cid != (UInt32)cfg.channelNum || sid != (UInt32)cfg.serverNo) && (ppid >> 48) == 0)
         ppid = pid | (static_cast<UInt64>(sid) << 48) | (static_cast<UInt64>(cid) << 40);
 
 	GObject::Player * player = GObject::globalPlayers[ppid];
@@ -1427,7 +1427,7 @@ void Arena::readHistories(BinaryReader& brd)
         UInt32 cnt = 0;
         brd >> cnt;
 
-        for(int j = 0; j < cnt; ++ j)
+        for(size_t j = 0; j < cnt; ++ j)
         {
             UInt64 pid = 0;
             brd >> pid;
@@ -1933,7 +1933,7 @@ void Arena::sendPreliminary(Player* player, UInt8 type, UInt8 flag, UInt16 start
         size_t offset = st.size();
         st << premNum;
         PreliminaryPlayersSet::iterator setIt = _preliminaryPlayers_list_set[type].begin();
-        int pos = start;
+        size_t pos = start;
         if(pos > _preliminaryPlayers_list_set[type].size())
             pos = _preliminaryPlayers_list_set[type].size();
         std::advance(setIt, pos);
@@ -2076,7 +2076,7 @@ void Arena::updateSuport(UInt8 type, UInt8 flag, UInt16 pos)
         if(type == 1)
         {
             PreliminaryPlayerListIterator it = _preliminaryPlayers_list[0].begin();
-            int pos2 = pos;
+            size_t pos2 = pos;
             if(pos2 > _preliminaryPlayers_list[0].size())
                 pos2 = _preliminaryPlayers_list[0].size();
             std::advance(it, pos2);
@@ -2089,7 +2089,7 @@ void Arena::updateSuport(UInt8 type, UInt8 flag, UInt16 pos)
         else
         {
             PreliminaryPlayerListIterator it = _preliminaryPlayers_list[1].begin();
-            int pos2 = pos;
+            size_t pos2 = pos;
             if(pos2 > _preliminaryPlayers_list[1].size())
                 pos2 = _preliminaryPlayers_list[1].size();
             std::advance(it, pos2);
@@ -2170,7 +2170,7 @@ void Arena::updateBattlePoint(BinaryReader& brd)
     UInt32 battlePoint = 0;
     brd >> cid >> sid >> pid >> battlePoint;
     UInt64 ppid = pid;
-    if((cid != cfg.channelNum || sid != cfg.serverNo) && (ppid >> 48) == 0)
+    if((cid != (UInt32)cfg.channelNum || sid != (UInt32)cfg.serverNo) && (ppid >> 48) == 0)
         ppid = pid | (static_cast<UInt64>(sid) << 48) | (static_cast<UInt64>(cid) << 40);
 
     PreliminaryPlayerListMap::iterator pit0 = _preliminaryPlayers[0].find(ppid);
@@ -2201,6 +2201,33 @@ void Arena::updateBattlePoint(BinaryReader& brd)
             }
         }
     }
+}
+
+void Arena::updateLeaderBoard(BinaryReader& brd)
+{
+    UInt16 cnt;
+    brd >> cnt;
+    for(int i = 0; i < cnt; ++ i)
+    {
+        UInt16 session = 0;
+        std::string name;
+        brd >> session >> name;
+        _leaderBoard[session] = name;
+    }
+}
+
+void Arena::sendLeaderBoard(Player* pl)
+{
+	Stream st(REP::SERVER_ARENA_LB);
+    UInt16 cnt = _leaderBoard.size();
+    st << cnt;
+    for(std::map<UInt16, std::string>::iterator it = _leaderBoard.begin(); it != _leaderBoard.end(); ++ it)
+    {
+        st << it->first << it->second;
+    }
+    st << Stream::eos;
+
+    pl->send(st);
 }
 
 }

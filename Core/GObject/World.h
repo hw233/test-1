@@ -34,6 +34,43 @@ typedef LuckyDrawList::iterator LuckyDrawRank;
 typedef LuckyDrawList::reverse_iterator RLuckyDrawRank;
 typedef std::map<Player *, LuckyDrawRank> LuckyDrawRankList;
 
+struct RCSort
+{
+    GObject::Player* player;
+    UInt32 total;
+};
+
+struct lt_rcsort
+{
+    bool operator()(const RCSort& a, const RCSort& b) const { return a.total >= b.total; }
+};
+
+typedef std::set<RCSort, lt_rcsort> RCSortType;
+
+struct QixiScore
+{
+    Player* lover;
+    UInt32 score;
+};
+
+struct QixiPair
+{
+    QixiScore p1;
+    QixiScore p2;
+};
+
+struct ScoreGreater
+{
+     bool operator()(const QixiPair* qp1, const QixiPair* qp2) const
+     {
+         return ((qp1->p1.score + qp1->p2.score) > (qp2->p1.score + qp2->p2.score));
+     }
+};
+
+typedef std::multiset<QixiPair*, ScoreGreater> QixiPlayerSet;
+typedef QixiPlayerSet::iterator QixiPlayersIt;
+typedef std::map<Player*, QixiPlayersIt> QixiScoreMap;
+
 class World:
 	public WorkerRunner<WorldMsgHandler>
 {
@@ -213,6 +250,11 @@ public:
     inline static bool getJuly()
     { return _july; }
 
+    inline static void setQixi(bool v)
+    { _qixi = v; }
+    inline static bool getQixi()
+    { return _qixi; }
+
     inline static void setRechargeNextRet(bool v)
     { _rechargenextret = v; }
     inline static bool getRechargeNextRet()
@@ -258,6 +300,14 @@ public:
     { _consumeactive = v; }
     inline static bool getConsumeActive()
     { return _consumeactive; }
+    inline static void setNeedRechargeRank(bool v)
+    { _needrechargerank = v; }
+    inline static bool getNeedRechargeRank()
+    { return _needrechargerank; }
+    inline static void setNeedConsumeRank(bool v)
+    { _needconsumerank = v; }
+    inline static bool getNeedConsumeRank()
+    { return _needconsumerank; }
 
 	inline Script::WorldScript * getWorldScript() { return _worldScript; }
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
@@ -324,6 +374,7 @@ public:
     static bool _june;
     static bool _june1;
     static bool _july;
+    static bool _qixi;
     static bool _enchant_gt11;
     static bool _rechargenextret;
     static UInt32 _rechargenextretstart;
@@ -337,6 +388,12 @@ public:
     static UInt32 _sosomapbegin;
     static bool _opentest;
     static bool _consumeactive;
+    static bool _needrechargerank;
+    static bool _needconsumerank;
+
+public:
+    static RCSortType rechargeSort;
+    static RCSortType consumeSort;
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }
@@ -361,10 +418,21 @@ private:
     static void World_Boss_Prepare(void*);
     static void Hero_Island_Process(void*);
     static void Team_Copy_Process(void*);
-	static void ReCalcWeekDay( World * );
 	static void World_One_Min( World * );
     static void AthleticsPhysicalCheck(void *);
 	static void Tianjie_Refresh(void*);
+    //static void advancedHookTimer(void *para);
+
+public:
+	static void ReCalcWeekDay( World * );
+
+public:
+    void UpdateQixiScore(Player* pl, Player* lover);
+    void sendQixiPlayers(Player* pl);
+    void DivorceQixiPair(Player* pl);
+    void LoadQixiScore(Player* pl, Player* lover);
+    void SendQixiAward();
+    void sendQixiScoreAward(Player* pl);
 
 private:
 	void testUpdate();
@@ -376,6 +444,9 @@ private:
     std::vector<UInt32> _domain_nums;
     LuckyDrawList _luckyDrawList;
     LuckyDrawRankList _luckyDrawRankList;
+
+    QixiScoreMap _qixiScoreMap;
+    QixiPlayerSet _qixiPlayerSet;
 };
 
     void CreateNewDB(UInt32 mon = 0, UInt32 year = 2011);

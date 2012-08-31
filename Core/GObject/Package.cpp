@@ -127,8 +127,8 @@ namespace GObject
 #endif
 	static UInt32 exchange_cost[2][10] = {{2000, 2000, 5000, 20000, 30000}, {3000, 3000, 10000, 25000, 35000, 40000, 50000, 80000, 100000}};
 	static UInt32 exchange_set_cost = 100000;
-	static UInt32 merge_chance[9] = {100, 85, 85, 75, 75, 65, 65, 55, 55};
-	static UInt32 activate_cost[11][3] = {
+	//static UInt32 merge_chance[9] = {100, 85, 85, 75, 75, 65, 65, 55, 55};
+	/*static UInt32 activate_cost[11][3] = {
 		{2000, 5000, 10000},
 		{2000, 5000, 10000},
 		{2000, 5000, 10000},
@@ -140,6 +140,7 @@ namespace GObject
 		{10000, 20000, 50000},
 		{10000, 20000, 50000},
 		{10000, 20000, 50000}};
+        */
 #if 0
 	static void getRandomAttr2(UInt8 lv, UInt8 q, int c, UInt8 mask, UInt8 * t, Int16 * v)
 	{
@@ -541,6 +542,28 @@ namespace GObject
                     udpLog(item->getClass(), typeId, num, 0, "add");
                 }
                 cittaUdpLog(1, typeId, num);
+                secondSoulItemUdpLog(1, typeId, num);
+                if (fromWhere == FromQixi)
+                {
+                    qixiUdpLog(typeId, num);
+                }
+
+                // 太乙精金的特殊记录
+                if (typeId == 503 && bind!= true)
+                {
+                    m_Owner->udpLog("item", "I_503_1_2", "", "", "", "", "act", num);
+                }
+
+                // 这是什么道具要统计？文档里没找到。。。
+                if (typeId == 550)
+                {
+                    char strBuf[32] = "";
+                    m_Owner->udpLog("item", "I_550_1", "", "", "", "", "act", num);
+                    snprintf(strBuf, 32, "I_550_1_%d", fromWhere);
+                    m_Owner->udpLog("item", strBuf, "", "", "", "", "act", num);
+                }
+
+
 
                 if (typeId == 1209)
                     m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
@@ -570,8 +593,30 @@ namespace GObject
                     udpLog(item->getClass(), typeId, num, 0, "add");
                 }
                 cittaUdpLog(1, typeId, num);
+                secondSoulItemUdpLog(1, typeId, num);
+
+                if (fromWhere == FromQixi)
+                {
+                    qixiUdpLog(typeId, num);
+                }
+
+                // 太乙精金的特殊记录
+                if (typeId == 503 && bind!= true)
+                {
+                    m_Owner->udpLog("item", "I_503_1_2", "", "", "", "", "act", num);
+                }
+
+                // 这是什么道具要统计？文档里没找到。。。
+                if (typeId == 550)
+                {
+                    char strBuf[32] = "";
+                    m_Owner->udpLog("item", "I_550_1", "", "", "", "", "act", num);
+                    snprintf(strBuf, 32, "I_550_1_%d", fromWhere);
+                    m_Owner->udpLog("item", strBuf, "", "", "", "", "act", num);
+                }
+
                 //增加获取物品的荣誉
-                GameAction()->doAttainment(m_Owner, Script::ON_ADD_ITEM, typeId);
+                //GameAction()->doAttainment(m_Owner, Script::ON_ADD_ITEM, typeId);
                 if (typeId == 1209)
                     m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
                 if (typeId == 1223)
@@ -617,6 +662,26 @@ namespace GObject
                 udpLog(item->getClass(), typeId, count, 0, "add");
             }
             cittaUdpLog(1, typeId, count);
+            secondSoulItemUdpLog(1, typeId, count);
+            if (fromWhere == FromQixi)
+            {
+                qixiUdpLog(typeId, count);
+            }
+            // 太乙精金的特殊记录
+            if (typeId == 503 && bind!= true)
+            {
+                m_Owner->udpLog("item", "I_503_1_2", "", "", "", "", "act", count);
+            }
+
+            // 这是什么道具要统计？文档里没找到。。。
+            if (typeId == 550)
+            {
+                char strBuf[32] = "";
+                m_Owner->udpLog("item", "I_550_1", "", "", "", "", "act", count);
+                snprintf(strBuf, 32, "I_550_1_%d", fromWhere);
+                m_Owner->udpLog("item", strBuf, "", "", "", "", "act", count);
+            }
+
             if (typeId == 1209)
                 m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
             if (typeId == 1223)
@@ -640,10 +705,30 @@ namespace GObject
                 udpLog(item->getClass(), typeId, count, 0, "add");
             }
             cittaUdpLog(1, typeId, count);
-			SendItemData(item);
-			ItemNotify(item->GetItemType().getId(), count);
+            secondSoulItemUdpLog(1, typeId, count);
+            if (fromWhere == FromQixi)
+            {
+                qixiUdpLog(typeId, count);
+            }
+            // 太乙精金的特殊记录
+            if (typeId == 503 && bind!= true)
+            {
+                m_Owner->udpLog("item", "I_503_1_2", "", "", "", "", "act", count);
+            }
+
+            // 这是什么道具要统计？文档里没找到。。。
+            if (typeId == 550)
+            {
+                char strBuf[32] = "";
+                m_Owner->udpLog("item", "I_550_1", "", "", "", "", "act", count);
+                snprintf(strBuf, 32, "I_550_1_%d", fromWhere);
+                m_Owner->udpLog("item", strBuf, "", "", "", "", "act", count);
+            }
+
+            SendItemData(item);
+            ItemNotify(item->GetItemType().getId(), count);
             //获得物品
-            GameAction()->doAttainment(m_Owner, Script::ON_ADD_ITEM, typeId);
+            //GameAction()->doAttainment(m_Owner, Script::ON_ADD_ITEM, typeId);
             //if((fromWhere != 0  && item->getQuality() >= 3) || (fromWhere == FromMerge && item->getQuality() >= 2))
             //{
                  AddItemCoursesLog(typeId, static_cast<UInt32>(count), fromWhere);
@@ -1008,6 +1093,8 @@ namespace GObject
 	{
 		if (num == 0 || IsEquipId(id))
 			return false;
+        if (!toWhere)
+            toWhere = ToDelete;
 		ItemBase * item = FindItem(id, bind);
 		if (item == NULL) return false;
 		bool ret = TryDelItem(item, num);
@@ -1031,7 +1118,23 @@ namespace GObject
             cittaUdpLog(2, id, num);
             if (toWhere == ToSkillStrengthenOpen || toWhere == ToSkillStrengthenUpgrade)
                 cittaUdpLog(3, id, num);
-			SendItemData(item);
+
+            // 太乙精金的特殊记录
+            if (id == 503 && bind!= true)
+            {
+                m_Owner->udpLog("item", "I_503_2_2", "", "", "", "", "act", num);
+            }
+
+            // 这是什么道具要统计？文档里没找到。。。
+            if (id == 550)
+            {
+                char strBuf[32] = "";
+                m_Owner->udpLog("item", "I_550_2", "", "", "", "", "act", num);
+                snprintf(strBuf, 32, "I_550_2_%d", toWhere);
+                m_Owner->udpLog("item", strBuf, "", "", "", "", "act", num);
+            }
+
+            SendItemData(item);
 			if (cnt == 0)
 			{
 				SAFE_DELETE(item);
@@ -1048,6 +1151,8 @@ namespace GObject
 	{
 		if (num == 0 || item == NULL || IsEquipId(item->getId()))
 			return false;
+        if (!toWhere)
+            toWhere = ToDelete;
 		bool ret = TryDelItem(item, num);
 		if (ret)
 		{
@@ -1068,6 +1173,21 @@ namespace GObject
             cittaUdpLog(2, item->getId(), num);
             if (toWhere == ToSkillStrengthenOpen || toWhere == ToSkillStrengthenUpgrade)
                 cittaUdpLog(3, item->getId(), num);
+
+            // 太乙精金的特殊记录
+            if (item->getId() == 503 && item->GetBindStatus()!= true)
+            {
+                m_Owner->udpLog("item", "I_503_2_2", "", "", "", "", "act", num);
+            }
+
+            // 这是什么道具要统计？文档里没找到。。。
+            if (item->getId() == 550)
+            {
+                char strBuf[32] = "";
+                m_Owner->udpLog("item", "I_550_2", "", "", "", "", "act", num);
+                snprintf(strBuf, 32, "I_550_2_%d", toWhere);
+                m_Owner->udpLog("item", strBuf, "", "", "", "", "act", num);
+            }
 
 			SendItemData(item);
 			UInt32 id = item->getId();
@@ -1257,13 +1377,13 @@ namespace GObject
 					return false;
 				old = fgt->setRing(static_cast<GObject::ItemEquip *>(item));
 				break;
-            case 0x50:
-            case 0x51:
-            case 0x52:
+            case 0x0a:
+            case 0x0b:
+            case 0x0c:
                 if(item->getClass() != Item_Trump)
                     return false;
-                if (fgt->canSetTrump(part-0x50, item->getId()))
-                    old = fgt->setTrump(static_cast<GObject::ItemTrump*>(item), part-0x50);
+                if (fgt->canSetTrump(part-0x0a, item->getId()))
+                    old = fgt->setTrump(static_cast<GObject::ItemTrump*>(item), part-0x0a);
                 else
                     return false;
                 break;
@@ -1307,10 +1427,10 @@ namespace GObject
 			case 0x28:
 				old = fgt->setRing(NULL);
 				break;
-            case 0x50:
-            case 0x51:
-            case 0x52:
-                old = fgt->setTrump(static_cast<GObject::ItemTrump*>(NULL), part-0x50);
+            case 0x0a:
+            case 0x0b:
+            case 0x0c:
+                old = fgt->setTrump(static_cast<GObject::ItemTrump*>(NULL), part-0x0a);
                 break;
             default:
                 return false;
@@ -1449,8 +1569,8 @@ namespace GObject
             ret = false;}
 		else
 		{
-            if (GetItemSubClass(id) == Item_Formula || GetItemSubClass(id) == Item_Citta)
-                num = 1;
+            //if (GetItemSubClass(id) == Item_Formula || GetItemSubClass(id) == Item_Citta) // XXX: confirm in lua
+            //    num = 1;
 
 			if (bind != 0xFF)
 			{
@@ -1580,6 +1700,28 @@ namespace GObject
 
         snprintf (itemAct, 32, "%d_%d", id, type);
         m_Owner->udpLog("citta", itemAct, "", "", "", "", "act", num);
+    }
+
+    void Package::secondSoulItemUdpLog(UInt8 type, UInt32 id, UInt32 num)
+    {
+        char itemAct[32] = "";
+
+        if (id < LSL_ID || id > RSL_ID) 
+            return;
+
+        if (type < 1 || type > 3)
+            return;
+
+        snprintf (itemAct, 32, "I_%d_%d", id, type);
+        m_Owner->udpLog("secondSoul", itemAct, "", "", "", "", "act", num);
+    }
+
+    void Package::qixiUdpLog(UInt32 id, UInt32 num)
+    {
+        char itemAct[32] = "";
+
+        snprintf (itemAct, 32, "F_1087_%d", id);
+        m_Owner->udpLog("qixi", itemAct, "", "", "", "", "act", num);
     }
 
     void Package::gemMergeUdpLog(UInt32 num)
@@ -2414,7 +2556,7 @@ namespace GObject
 				fgt->setDirty();
 
                 if(equip->getClass() == Item_Trump)
-                    fgt->sendModification(0x50 + pos, equip, false);
+                    fgt->sendModification(0x0a+ pos, equip, false);
                 else
                     fgt->sendModification(0x20 + pos, equip, false);
 			}
@@ -2491,7 +2633,7 @@ namespace GObject
 			{
 				fgt->setDirty();
                 if(equip->getClass() == Item_Trump)
-                    fgt->sendModification(0x50 + pos, equip, false);
+                    fgt->sendModification(0x0a+ pos, equip, false);
                 else
                     fgt->sendModification(0x20 + pos, equip, false);
 			}
@@ -3739,7 +3881,7 @@ namespace GObject
 			{
 				fgt->setDirty();
                 if(equip->getClass() == Item_Trump)
-                    fgt->sendModification(0x50 + pos, equip, false);
+                    fgt->sendModification(0x0a+ pos, equip, false);
                 else
                     fgt->sendModification(0x20 + pos, equip, false);
 			}
@@ -4038,7 +4180,7 @@ namespace GObject
 		{
 			fgt->setDirty();
             if(equip->GetItemType().subClass == Item_Trump)
-                fgt->sendModification(0x50 + pos, equip, false);
+                fgt->sendModification(0x0a+ pos, equip, false);
             else
                 fgt->sendModification(0x20 + pos, equip, false);
 		}
@@ -4328,7 +4470,7 @@ namespace GObject
             if (trump->getClass() == Item_Fashion)
                 fgt->sendModification(0x20, trump, false);
             else
-                fgt->sendModification(0x50 + pos, trump, false);
+                fgt->sendModification(0x0a+ pos, trump, false);
         }
 		else
 			SendSingleEquipData(trump);
@@ -4380,7 +4522,7 @@ namespace GObject
             if (trump->getClass() == Item_Fashion)
                 fgt->sendModification(0x20, trump, false);
             else
-                fgt->sendModification(0x50 + pos, trump, false);
+                fgt->sendModification(0x0a + pos, trump, false);
         }
 		else
 			SendSingleEquipData(trump);

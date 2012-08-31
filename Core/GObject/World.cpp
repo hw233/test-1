@@ -111,6 +111,7 @@ void* World::_recalcwd = NULL;
 bool World::_june = false;
 bool World::_june1 = false;
 bool World::_july = false;
+bool World::_qixi= false;
 bool World::_enchant_gt11 = false;
 bool World::_rechargenextret;
 UInt32 World::_rechargenextretstart;
@@ -124,6 +125,10 @@ bool World::_pexpitems;
 UInt32 World::_sosomapbegin = 0;
 bool World::_opentest;
 bool World::_consumeactive;
+RCSortType World::rechargeSort;
+RCSortType World::consumeSort;
+bool World::_needrechargerank = false;
+bool World::_needconsumerank = false;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
@@ -186,6 +191,7 @@ bool bValentineDayEnd = false;
 bool bMayDayEnd = false;
 bool bJuneEnd = false;
 bool bPExpItemsEnd = false;
+bool bQixiEnd = false;
 
 bool enum_midnight(void * ptr, void* next)
 {
@@ -293,6 +299,28 @@ bool enum_midnight(void * ptr, void* next)
 	return true;
 }
 
+bool enum_qixi(void * ptr, void * data)
+{
+	Player * pl = static_cast<Player *>(ptr);
+	if(pl == NULL)
+		return true;
+
+    WORLD().sendQixiPlayers(pl);
+
+    return true;
+}
+
+bool enum_qixi_score(void * ptr, void * data)
+{
+	Player * pl = static_cast<Player *>(ptr);
+	if(pl == NULL)
+		return true;
+
+    WORLD().sendQixiScoreAward(pl);
+
+    return true;
+}
+
 bool enum_clan_midnight(void * ptr, void * data)
 {
 	Clan * clan = static_cast<Clan *>(ptr);
@@ -314,6 +342,17 @@ bool enum_lucky_draw_rank_list(void * ptr, void * data )
         return true;
 
     WORLD().RankLuckyDraw(player, false);
+    return true;
+}
+
+bool enum_qixi_rank_list(void * ptr, void * data )
+{
+    Player* player = static_cast<Player*>(ptr);
+    if(player == NULL || !player->queQiaoCheck())
+        return true;
+
+    Player* lover = player->getLover();
+    WORLD().LoadQixiScore(player, lover);
     return true;
 }
 
@@ -343,15 +382,18 @@ void World::calWeekDay( World * world )
     if(_wday == wday)
     {
         if(!_recalcwd)
-            _recalcwd = world->AddTimer(10000, ReCalcWeekDay, world, 10000);
+        {
+            GameMsgHdr hdr(0x1FA, WORKER_THREAD_WORLD, NULL, 0);
+            GLOBAL().PushMsg(hdr, NULL);
+        }
         return;
     }
     else
     {
         if(_recalcwd)
         {
-            world->RemoveTimer(_recalcwd);
-            _recalcwd = NULL;
+            GameMsgHdr hdr(0x1FB, WORKER_THREAD_WORLD, NULL, 0);
+            GLOBAL().PushMsg(hdr, NULL);
         }
         _wday = wday;
     }
@@ -596,6 +638,7 @@ void World::World_Midnight_Check( World * world )
     bool bValentineDay = getValentineDay();
     bool bMayDay = getMayDay();
     bool bJune = getJune();
+    bool bQixi = getQixi();
     bool bPExpItems = getPExpItems();
 	world->_worldScript->onActivityCheck(curtime+30);
 
@@ -617,6 +660,7 @@ void World::World_Midnight_Check( World * world )
     // 六一活动是否结束
     bJuneEnd = bJune && !getJune();
     bPExpItemsEnd = bPExpItems && !getPExpItems();
+    bQixiEnd = bQixi && !getQixi();
 
     UInt32 nextday = curtime + 30;
 	globalPlayers.enumerate(enum_midnight, static_cast<void *>(&nextday));
@@ -653,6 +697,8 @@ void World::World_Midnight_Check( World * world )
     if(bJuneEnd)
         world->SendLuckyDrawAward();
 #endif
+    if(bQixiEnd)
+        world->SendQixiAward();
 	
 	dungeonManager.enumerate(enum_dungeon_midnight, &curtime);
 	globalClans.enumerate(enum_clan_midnight, &curtime);
@@ -725,7 +771,21 @@ void World::AthleticsPhysicalCheck(void *)
 {
     gAthleticsRank.process();
 }
+#if 0
+bool advancedHookEnumerate(Player * pl, UInt8 para)
+{
+    if(!pl)
+        return false;
+    GameMsgHdr hdr1(0x256, pl->getThreadId(), pl, 0);
+    GLOBAL().PushMsg(hdr1, NULL);
+    return true;
+}
 
+void World::advancedHookTimer(void *para)
+{
+	globalPlayers.enumerate(advancedHookEnumerate, static_cast<UInt8>(0));
+}
+#endif
 bool World::Init()
 {
 	GObject::Tianjie::instance().Init();
@@ -759,6 +819,8 @@ bool World::Init()
     if(getJune())
         globalPlayers.enumerate(enum_lucky_draw_rank_list, static_cast<void *>(NULL));
 #endif
+    if(getQixi())
+        globalPlayers.enumerate(enum_qixi_rank_list, static_cast<void *>(NULL));
 
 	UInt32 now = TimeUtil::Now(), sday = TimeUtil::SharpDay(1) - 10;
 	if(sday < now) sday += 86400;
@@ -771,7 +833,10 @@ bool World::Init()
 
     AddTimer(5 * 1000, Team_Copy_Process, static_cast<void*>(NULL));
     AddTimer(3600 * 1000, AthleticsPhysicalCheck, static_cast<void *>(NULL), (3600 - now % 3600) * 1000);
-	return true;
+
+    //AddTimer(60 * 1000, advancedHookTimer, static_cast<void *>(NULL), (60 - now % 60) * 1000);
+
+    return true;
 }
 
 void World::UnInit()
@@ -1030,6 +1095,334 @@ void World::World_One_Min( World * world )
 void World::commitArenaForceOnce()
 {
     GObject::arena.commitArenaForceOnce();
+}
+
+void World::LoadQixiScore(Player* pl, Player* lover)
+{
+    if(!pl->queQiaoCheck())
+        return;
+    if(lover->getLover() != pl)
+    {
+        pl->resetQixi();
+        return;
+    }
+
+    QixiScoreMap::iterator it = _qixiScoreMap.find(pl);
+    if(it == _qixiScoreMap.end())
+    {
+        QixiPair* qp = new QixiPair();
+        qp->p1.lover = lover;
+        qp->p1.score = pl->getScore();
+        qp->p2.lover = pl;
+        qp->p2.score = lover->getScore();
+        QixiPlayersIt qpIt = _qixiPlayerSet.insert(qp);
+        _qixiScoreMap[pl] = qpIt;
+        _qixiScoreMap[lover] = qpIt;
+    }
+}
+
+
+void World::UpdateQixiScore(Player* pl, Player* lover)
+{
+    if(!pl->queQiaoCheck())
+        return;
+    QixiScoreMap::iterator it = _qixiScoreMap.find(pl);
+    UInt32 myPlace = 0;
+    if(it == _qixiScoreMap.end())
+    {
+        QixiPair* qp = new QixiPair();
+        qp->p1.lover = lover;
+        qp->p1.score = pl->getScore();
+        qp->p2.lover = pl;
+        qp->p2.score = lover->getScore();
+        QixiPlayersIt qpIt = _qixiPlayerSet.insert(qp);
+        _qixiScoreMap[pl] = qpIt;
+        _qixiScoreMap[lover] = qpIt;
+        myPlace = std::distance(_qixiPlayerSet.begin(), qpIt) + 1;
+    }
+    else
+    {
+        QixiPlayersIt qpIt = it->second;
+        QixiPair* qp = *(qpIt);
+
+        _qixiPlayerSet.erase(qpIt);
+        if(qp->p1.lover == lover)
+            qp->p1.score = pl->getScore();
+        else if(qp->p2.lover == lover)
+            qp->p2.score = pl->getScore();
+
+        QixiPlayersIt qpIt2 = _qixiPlayerSet.insert(qp);
+        _qixiScoreMap[pl] = qpIt2;
+        _qixiScoreMap[lover] = qpIt2;
+        myPlace = std::distance(_qixiPlayerSet.begin(), qpIt2) + 1;
+    }
+
+    if(0 != myPlace && myPlace < 4)
+    {
+        globalPlayers.enumerate(enum_qixi, static_cast<void *>(NULL));
+    }
+    else
+    {
+        sendQixiPlayers(pl);
+        sendQixiPlayers(lover);
+    }
+}
+
+void World::sendQixiPlayers(Player* pl)
+{
+    UInt8 i = 0;
+    UInt32 myPlace = 0;
+    UInt32 myScore = 0;
+    QixiScoreMap::iterator it = _qixiScoreMap.find(pl);
+    if(it != _qixiScoreMap.end())
+    {
+        QixiPlayersIt qpIt = it->second;
+        myPlace = std::distance(_qixiPlayerSet.begin(), qpIt) + 1;
+        QixiPair* qp = *qpIt;
+        myScore = qp->p1.score + qp->p2.score;
+    }
+    else
+    {
+        myScore = pl->getScore();
+    }
+
+    Stream st(REP::ACTIVE);
+    st << static_cast<UInt8>(0x01) << static_cast<UInt8>(0x01) << static_cast<UInt8>(0x02);
+    st << myPlace << myScore;
+    size_t offset = st.size();
+
+    st << i;
+    for(QixiPlayersIt qpIt = _qixiPlayerSet.begin(); i < 3 && qpIt != _qixiPlayerSet.end(); ++ qpIt, ++ i)
+    {
+        QixiPair* qp = *qpIt;
+        st << qp->p1.lover->getName() << qp->p2.lover->getName() << static_cast<UInt32>(qp->p1.score + qp->p2.score);
+    }
+    st.data<UInt8>(offset) = i;
+    st << Stream::eos;
+
+    pl->send(st);
+}
+
+void World::DivorceQixiPair(Player* pl)
+{
+    QixiScoreMap::iterator it = _qixiScoreMap.find(pl);
+    Player* lover1 = NULL;
+    Player* lover2 = NULL;
+    UInt32 myPlace = 0;
+    if(it == _qixiScoreMap.end())
+    {
+        return;
+    }
+    else
+    {
+        QixiPlayersIt qpIt = it->second;
+        QixiPair* qp = *(qpIt);
+        myPlace = std::distance(_qixiPlayerSet.begin(), qpIt) + 1;
+
+        _qixiPlayerSet.erase(qpIt);
+        _qixiScoreMap.erase(qp->p1.lover);
+        _qixiScoreMap.erase(qp->p2.lover);
+        lover1 = qp->p1.lover;
+        lover2 = qp->p2.lover;
+        delete qp;
+    }
+
+    if(0 != myPlace && myPlace < 4)
+    {
+        globalPlayers.enumerate(enum_qixi, static_cast<void *>(NULL));
+    }
+    else
+    {
+        sendQixiPlayers(lover1);
+        sendQixiPlayers(lover2);
+    }
+
+}
+
+void World::SendQixiAward()
+{
+    int pos = 0;
+ 
+    globalPlayers.enumerate(enum_qixi_score, static_cast<void *>(NULL));
+    std::vector<MailPackage::MailItem> mitems;
+    SYSMSG(title, 4020);
+    for(QixiPlayersIt qpIt = _qixiPlayerSet.begin(); qpIt != _qixiPlayerSet.end() && pos < 99; ++ qpIt, ++ pos)
+    {
+        mitems.clear();
+        if(pos == 0)
+        {
+            // 9124:牛郎 9125:织女
+            MailPackage::MailItem mitem1 = {9124, 1};
+            MailPackage::MailItem mitem2 = {1325, 30};
+            mitems.push_back(mitem1);
+            mitems.push_back(mitem2);
+        }
+        else if(pos == 1)
+        {
+            MailPackage::MailItem mitem = {1325, 25};
+            mitems.push_back(mitem);
+        }
+        else if(pos == 2)
+        {
+            MailPackage::MailItem mitem = {1325, 20};
+            mitems.push_back(mitem);
+        }
+        else if(pos < 10)
+        {
+            MailPackage::MailItem mitem = {1325, 15};
+            mitems.push_back(mitem);
+        }
+        else if(pos < 50)
+        {
+            MailPackage::MailItem mitem = {1325, 10};
+            mitems.push_back(mitem);
+        }
+        else if(pos < 100)
+        {
+            MailPackage::MailItem mitem = {1325, 5};
+            mitems.push_back(mitem);
+        }
+
+        UInt16 mitemNum = mitems.size();
+        if(mitemNum > 0)
+        {
+            QixiPair* qp = *(qpIt);
+            Player* player[2];
+            player[0] = qp->p1.lover;
+            player[1] = qp->p2.lover;
+            for(int idx = 0; idx < 2; ++ idx)
+            {
+                Player* pl = player[idx];
+                Player* lover = pl->getLover();
+                SYSMSGV(content, 4021, lover->getName().c_str(), pos+1, pos+1);
+                Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+                if(mail)
+                {
+                    std::string strItems;
+                    for(int i = 0; i < mitemNum; ++ i)
+                    {
+                        MailPackage::MailItem mitem;
+                        bool bind = true;
+                        if(mitems[i].id == 9124)
+                        {
+                            mitem.id = mitems[i].id + (pl->GetClassAndSex() & 0x0F);
+                            bind = false;
+                        }
+                        else
+                            mitem.id = mitems[i].id;
+                        mitem.count = mitems[i].count;
+                        mailPackageManager.push(mail->id, &mitem, 1, bind);
+
+                        strItems += Itoa(mitem.id);
+                        strItems += ",";
+                        strItems += Itoa(mitem.count);
+                        strItems += "|";
+                    }
+
+                    DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+                }
+            }
+        }
+    }
+}
+
+void World::sendQixiScoreAward(Player* pl)
+{
+    if(pl->queQiaoCheck())
+    {
+        SYSMSG(title, 4022);
+        Player* lover = pl->getLover();
+        SYSMSGV(content, 4023, lover->getName().c_str());
+
+        Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        MailPackage::MailItem mitem = {1325, 7};
+        mailPackageManager.push(mail->id, &mitem, 1, true);
+
+        std::string strItems;
+        strItems += Itoa(mitem.id);
+        strItems += ",";
+        strItems += Itoa(mitem.count);
+        strItems += "|";
+        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+    }
+
+    UInt32 score = pl->getScore();
+    if(score < 50)
+        return;
+
+    SYSMSG(title, 4024);
+    SYSMSGV(content, 4025, score);
+
+    std::string strItems;
+    Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+
+    if(score > 999)
+    {
+        MailPackage::MailItem mitem[3] = {{515, 7}, {509, 7}, {507, 7}};
+        mailPackageManager.push(mail->id, mitem, 3, true);
+
+        for(int i = 0; i < 3; ++ i)
+        {
+            strItems += Itoa(mitem[i].id);
+            strItems += ",";
+            strItems += Itoa(mitem[i].count);
+            strItems += "|";
+        }
+    }
+    else if(score > 799)
+    {
+        MailPackage::MailItem mitem[3] = {{503, 7}, {514, 7}, {512, 7}};
+        mailPackageManager.push(mail->id, mitem, 3, true);
+
+        for(int i = 0; i < 3; ++ i)
+        {
+            strItems += Itoa(mitem[i].id);
+            strItems += ",";
+            strItems += Itoa(mitem[i].count);
+            strItems += "|";
+        }
+    }
+    else if(score > 599)
+    {
+        MailPackage::MailItem mitem[3] = {{500, 7}, {511, 7}, {1526, 7}};
+        mailPackageManager.push(mail->id, mitem, 3, true);
+
+        for(int i = 0; i < 3; ++ i)
+        {
+            strItems += Itoa(mitem[i].id);
+            strItems += ",";
+            strItems += Itoa(mitem[i].count);
+            strItems += "|";
+        }
+    }
+    else if(score > 199)
+    {
+        MailPackage::MailItem mitem[3] = {{56, 7}, {57, 7}, {15, 7}};
+        mailPackageManager.push(mail->id, mitem, 3, true);
+
+        for(int i = 0; i < 3; ++ i)
+        {
+            strItems += Itoa(mitem[i].id);
+            strItems += ",";
+            strItems += Itoa(mitem[i].count);
+            strItems += "|";
+        }
+    }
+    else if(score > 49)
+    {
+        MailPackage::MailItem mitem[3] = {{502, 7}, {510, 7}, {504, 7}};
+        mailPackageManager.push(mail->id, mitem, 3, true);
+
+        for(int i = 0; i < 3; ++ i)
+        {
+            strItems += Itoa(mitem[i].id);
+            strItems += ",";
+            strItems += Itoa(mitem[i].count);
+            strItems += "|";
+        }
+    }
+
+    DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
 }
 
 }

@@ -531,14 +531,14 @@ void TownDeamon::challenge(Player* pl, UInt16 level, UInt8 type)
                     if(dpd->maxLevel == 0)
                     {
                         ++ dpd->maxLevel;
-                        DB3().PushUpdateData("INSERT INTO `towndeamon_player` ( `deamonLevel`, `curLevel`, `maxLevel`, `playerId`, `startTime`, `accTime`, `accLen`, `accAwards`, `vitalityTime`, `vitality`, `spirit`, `challengeTime`, `itemId`, `itemNum`, `quitLevel`, `attacker`) VALUES (%u, %u, %u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %"I64_FMT"u) ", dpd->deamonLevel, dpd->curLevel, dpd->maxLevel, pl->getId(), dpd->startTime, dpd->accTime, dpd->accLen, dpd->accAwards, dpd->vitalityTime, dpd->vitality, dpd->spirit, dpd->challengeTime, dpd->itemId, dpd->itemNum, dpd->quitLevel, dpd->attacker);
+                        DB3().PushUpdateData("INSERT INTO `towndeamon_player` ( `deamonLevel`, `curLevel`, `maxLevel`, `time2MaxLvl`, `playerId`, `startTime`, `accTime`, `accLen`, `accAwards`, `vitalityTime`, `vitality`, `spirit`, `challengeTime`, `itemId`, `itemNum`, `quitLevel`, `attacker`) VALUES (%u, %u, %u, %u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %"I64_FMT"u) ", dpd->deamonLevel, dpd->curLevel, dpd->maxLevel, TimeUtil::Now(), pl->getId(), dpd->startTime, dpd->accTime, dpd->accLen, dpd->accAwards, dpd->vitalityTime, dpd->vitality, dpd->spirit, dpd->challengeTime, dpd->itemId, dpd->itemNum, dpd->quitLevel, dpd->attacker);
                     }
                     else
                     {
                         if(dpd->curLevel > dpd->maxLevel)
                         {
                             dpd->maxLevel = dpd->curLevel;
-                            DB3().PushUpdateData("UPDATE `towndeamon_player` SET `curLevel`=%u, `maxLevel`=%u, `startTime`=%u WHERE `playerId` = %"I64_FMT"u", dpd->curLevel, dpd->maxLevel, dpd->startTime, pl->getId());
+                            DB3().PushUpdateData("UPDATE `towndeamon_player` SET `curLevel`=%u, `maxLevel`=%u, `time2MaxLvl`=%u, `startTime`=%u WHERE `playerId` = %"I64_FMT"u", dpd->curLevel, dpd->maxLevel, TimeUtil::Now(), dpd->startTime, pl->getId());
                         }
                         else
                             DB3().PushUpdateData("UPDATE `towndeamon_player` SET `curLevel`=%u, `startTime`=%u  WHERE `playerId` = %"I64_FMT"u", dpd->curLevel, dpd->startTime, pl->getId());

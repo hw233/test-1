@@ -390,6 +390,7 @@ void WBoss::reward(Player* player)
     UInt32 j = 0;
     for (AtkInfoType::reverse_iterator i = m_atkinfo.rbegin(); i != m_atkinfo.rend(); ++i, ++j)
     {
+        (*i).player->wBossUdpLog(1096 + m_idx);
         if (j < AWARD_AREA1)
         {
             MailPackage::MailItem item1[] = {{trumpFrag[tlvl],4},};
@@ -646,7 +647,7 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
     Int32 matk = 0;
     if (m_final && nflist[0].fighter && !m_extra && m_last)
     {
-        UInt32 exthp = 0;
+        //UInt32 exthp = 0;
 
         atk = _mgr->getLastAtk(bossidx[World::_wday-1][m_idx]);
         matk = _mgr->getLastMAtk(bossidx[World::_wday-1][m_idx]);
@@ -922,8 +923,8 @@ void WBossMgr::nextDay(UInt32 now)
         m_boss->disapper();
         m_boss->setIdx(0);
         m_idx = 0;
-        delete m_boss;
-        m_boss = NULL;
+        //delete m_boss;
+        //m_boss = NULL;
     }
     TRACE_LOG("out of time. next day: %u, %u", _prepareTime, _prepareStep);
     fprintf(stderr, "out of time. next day: %u\n", _prepareTime);

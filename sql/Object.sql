@@ -1338,6 +1338,7 @@ CREATE TABLE `towndeamon_player` (
   `itemNum` int(10) unsigned NOT NULL DEFAULT 0,
   `quitLevel` smallint(3) unsigned NOT NULL DEFAULT 0,
   `attacker` bigint(20) unsigned NOT NULL DEFAULT 0,
+  `time2MaxLvl` int(10) unsigned NOT NULL,
   PRIMARY KEY (`playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -1477,6 +1478,7 @@ CREATE TABLE IF NOT EXISTS `skill_strengthen` (
     KEY `id` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `tianjie`;
 CREATE TABLE IF NOT EXISTS `tianjie` (                                                                             
     `id` int(10) unsigned NOT NULL AUTO_INCREMENT,                                                       
     `is_opened` tinyint(1) DEFAULT '0' COMMENT '是否已开启',                                             
@@ -1493,4 +1495,15 @@ CREATE TABLE IF NOT EXISTS `tianjie` (
     PRIMARY KEY (`id`),                                                                                  
     UNIQUE KEY `level_only` (`level`)                                                                    
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 CHECKSUM=1 DELAY_KEY_WRITE=1 ROW_FORMAT=DYNAMIC;
+
+DROP TABLE IF EXISTS `qixi`;
+CREATE TABLE IF NOT EXISTS `qixi` (
+    `playerId` bigint(20) unsigned NOT NULL,
+    `lover` bigint(20) unsigned NOT NULL,
+    `bind` tinyint(3) unsigned NOT NULL,
+    `pos` tinyint(3) unsigned NOT NULL,
+    `event` tinyint(3) unsigned NOT NULL,
+    `score` int(10) unsigned NOT NULL,
+    PRIMARY KEY(`playerId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

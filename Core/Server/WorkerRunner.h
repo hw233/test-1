@@ -1,6 +1,7 @@
 #ifndef _WORKERRUNNER_H_
 #define _WORKERRUNNER_H_
 
+#include "Config.h"
 #include "MsgHandler/MsgHandler.h"
 
 #include <event2/event.h>

@@ -107,6 +107,7 @@ namespace Script
 		lua_tinker::def(_L, "getJune", GObject::World::getJune);
 		lua_tinker::def(_L, "getJune1", GObject::World::getJune1);
 		lua_tinker::def(_L, "getJuly", GObject::World::getJuly);
+		lua_tinker::def(_L, "getQixi", GObject::World::getQixi);
 		lua_tinker::def(_L, "getYDMDAct", GObject::World::getYDMDAct);
 		lua_tinker::def(_L, "getWeekDay",	GObject::World::getWeekDay);
 		lua_tinker::def(_L, "getThanksgiving",	GObject::World::getThanksgiving);
@@ -130,6 +131,8 @@ namespace Script
         lua_tinker::def(_L, "getPExpItems", GObject::World::getPExpItems);
         lua_tinker::def(_L, "getOpenTest", GObject::World::getOpenTest);
         lua_tinker::def(_L, "getConsumeActive", GObject::World::getConsumeActive);
+        lua_tinker::def(_L, "getNeedRechargeRank", GObject::World::getNeedRechargeRank);
+        lua_tinker::def(_L, "getNeedConsumeRank", GObject::World::getNeedConsumeRank);
 
         CLASS_DEF(GameActionLua, Print);
         lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);
@@ -252,11 +255,14 @@ namespace Script
         CLASS_DEF(Player, sendMDSoul);
         CLASS_DEF(Player, sendHappyInfo);
         CLASS_DEF(Player, lastLootPush);
+        CLASS_DEF(Player, RegisterAward);
         CLASS_DEF(Player, hasRealItemAward);
         CLASS_DEF(Player, getRealItemAward);
         CLASS_DEF(Player, getMoneyArenaLua);
 		CLASS_DEF(Player, getQQVipPrivilege);
 		CLASS_DEF(Player, setQQVipPrivilege);
+		CLASS_DEF(Player, postRoamResult);
+        CLASS_DEF(Player, lastQueqiaoAwardPush);
 
         CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);
@@ -1200,6 +1206,18 @@ namespace Script
 		return Call<UInt16>("RunTargetAwardRF", player);
     }
 
+    UInt16 GameActionLua::RunNewRegisterAward(Player* player)
+    {
+		assert(player != NULL);
+		return Call<UInt16>("RunNewRegisterAward", player);
+    }
+
+    UInt8 GameActionLua::RunNewRegisterAwardAD_RF(Player* player, UInt8 idx)
+    {
+		assert(player != NULL);
+		return Call<UInt8>("RunNewRegisterAwardAD_RF", player, idx);
+    }
+
     void GameActionLua::sendRNR(Player* player, UInt32 now, UInt32 date, UInt32 total)
     {
 		return Call<void>("sendRNR", player, now, date, total);
@@ -1252,5 +1270,9 @@ namespace Script
 		return Call<UInt8>("onGetAthlRandomDiffculty");
 	}
 
+    UInt8 GameActionLua::onRoamingQueqiao(Player* pl, UInt8 pos)
+    {
+		return Call<UInt8 >("onRoamingQueqiao", pl, pos);
+    }
 }
 

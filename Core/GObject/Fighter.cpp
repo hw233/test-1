@@ -359,7 +359,7 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
 			DB1().PushUpdateData("DELETE FROM `fighter_buff` WHERE `playerId` = %"I64_FMT"u AND `id` = %u AND `buffId` = %u", _owner->getId(), _id, t - 0x40);
 		return;
 	}
-    if (t >= 0x50 && t < 0x50 + getMaxTrumps())
+    if (t >= 0x0a && t < 0x0a+ getMaxTrumps())
     {
         UInt32 trumps[TRUMP_UPMAX] = {0};
         if (getAllTrumpId(trumps)) {
@@ -439,7 +439,7 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
     case 0x32: // cittaslot
         // DB2().PushUpdateData("UPDATE `fighter` SET `cittaslot` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", _cittaslot, _id, _owner->getId());
         break;
-    case 0x60:
+    case 0x2a:
         { // skill
             std::string str;
             if (value2string(_skill, getUpSkillsMax(), str)) {
@@ -447,7 +447,7 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
             }
         }
         break;
-    case 0x61:
+    case 0x2b:
         { // skills
             if (_skills.size()) {
                 std::string str;
@@ -461,7 +461,7 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
             }
         }
         break;
-    case 0x62:
+    case 0x2c:
         { // citta
             std::string str;
             if (value2string(_citta, getUpCittasNum(), str)) {
@@ -469,7 +469,7 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
             }
         }
         break;
-    case 0x63:
+    case 0x2d:
         { // cittas 
             if (_cittas.size()) {
                 std::string str;
@@ -483,7 +483,7 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
             }
         }
         break;
-    case 0x64: // passive
+    case 0x2e: // passive
         break;
 
 	case 0x20: field = "fashion"; break;
@@ -844,7 +844,7 @@ ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
                 GameAction()->doAttainment(_owner, 10211, 0);
             }
 
-            sendModification(0x50+idx, _trump[idx], writedb);
+            sendModification(0x0a+idx, _trump[idx], writedb);
 
             if (trump && writedb && _owner && trump->GetItemType().getId() >= 1600 && trump->GetItemType().getId() <= 1699)
                 _owner->OnHeroMemo(MC_SKILL, MD_ADVANCED, 0, 0);
@@ -2182,7 +2182,7 @@ bool Fighter::upSkill( UInt16 skill, int idx, bool writedb, bool online )
             {
                 _skill[j] = _skill[j-1];;
                 _skill[j-1] = 0;
-                sendModification(0x60, _skill[j], j, false);
+                sendModification(0x2a, _skill[j], j, false);
             }
 
             _skill[idx] = skill;
@@ -2204,7 +2204,7 @@ bool Fighter::upSkill( UInt16 skill, int idx, bool writedb, bool online )
         {
             //if (_skill[idx])
             { // swap
-                sendModification(0x60, _skill[idx], src, false);
+                sendModification(0x2a, _skill[idx], src, false);
 
                 _skill[src] ^= _skill[idx];
                 _skill[idx] ^= _skill[src];
@@ -2224,7 +2224,7 @@ bool Fighter::upSkill( UInt16 skill, int idx, bool writedb, bool online )
 
     if (ret)
     {
-        sendModification(0x60, skill, idx, writedb);
+        sendModification(0x2a, skill, idx, writedb);
 
         if (online)
         {
@@ -2255,13 +2255,13 @@ bool Fighter::offSkill( UInt16 skill, bool writedb )
     {
         _skill[i] = _skill[i+1];
         _skill[i+1] = 0;
-        sendModification(0x60, _skill[i], i, false);
+        sendModification(0x2a, _skill[i], i, false);
     }
     _skill[i] = 0;
-    sendModification(0x60, 0, i, writedb);
+    sendModification(0x2a, 0, i, writedb);
 #else
     _skill[idx] = 0;
-    sendModification(0x60, 0, idx, writedb);
+    sendModification(0x2a, 0, idx, writedb);
 #endif
     return true;
 }
@@ -2279,13 +2279,13 @@ bool Fighter::updateSkill( UInt16 skill, UInt16 nskill, bool sync, bool writedb 
     idx = isSkillUp(skill);
     if (idx >= 0) {
         _skill[idx] = nskill;
-        sendModification(0x60, nskill, idx, writedb);
+        sendModification(0x2a, nskill, idx, writedb);
     }
 
     _attrDirty = true;
     _bPDirty = true;
     if (sync)
-        sendModification(0x61, skill, 3/*1add,2del,3mod*/, writedb);
+        sendModification(0x2b, skill, 3/*1add,2del,3mod*/, writedb);
     return true;
 }
 
@@ -2306,7 +2306,7 @@ bool Fighter::delSkill( UInt16 skill, bool writedb, bool sync, bool offskill )
     _attrDirty = true;
     _bPDirty = true;
     if (sync)
-        sendModification(0x61, skill, 2/*1add,2del,3mod*/, writedb);
+        sendModification(0x2b, skill, 2/*1add,2del,3mod*/, writedb);
     return true;
 }
 
@@ -2337,7 +2337,7 @@ void Fighter::setSkills( std::string& skills, bool writedb )
     }
 
     if (vt_skills.size())
-        addSkillsFromCT(vt_skills, writedb, up);
+        addSkillsFromCT(vt_skills, writedb, up, false);
 }
 
 bool Fighter::addNewSkill( UInt16 skill, bool writedb, bool up, bool online )
@@ -2385,10 +2385,10 @@ bool Fighter::addNewSkill( UInt16 skill, bool writedb, bool up, bool online )
     idx = isSkillUp(skill); // XXX: hack
     if (idx >= 0) {
         _skill[idx] = skill;
-        sendModification(0x60, skill, idx, writedb);
+        sendModification(0x2a, skill, idx, writedb);
     }
 
-    sendModification(0x61, skill, op, writedb);
+    sendModification(0x2b, skill, op, writedb);
     return true;
 }
 
@@ -2400,10 +2400,7 @@ void Fighter::setUpCittas( std::string& citta, bool writedb )
     StringTokenizer tk(citta, ",");
     for (size_t i = 0; i < tk.count(); ++i)
     {
-        if (GVAR.GetVar(GVAR_CITTASPLIT))
-            upCitta(::atoi(tk[i].c_str()), i, true, false, false);
-        else
-            upCitta(::atoi(tk[i].c_str()), i, writedb, false, false);
+        upCitta(::atoi(tk[i].c_str()), i, writedb, false, false);
     }
 }
 
@@ -2421,7 +2418,6 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool lvlup, bool onl
 {
     if (!citta)
         return false;
-    // XXX: need this???
     const GData::CittaBase* cb = GData::cittaManager[citta];
     if (!cb)
         return false;
@@ -2436,13 +2432,7 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool lvlup, bool onl
     if (!lvlup && _cittas[cidx] != citta)
         return false;
 
-#if 0
-    if (!(idx >= 0 && idx < getUpCittasMax())) // dst
-        return false;
-#endif
-
     int op = 0;
-    bool swap = false;
     bool ret = false;
     int src = isCittaUp(citta);
     if (src < 0)
@@ -2453,24 +2443,9 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool lvlup, bool onl
             return false;
         }
 
-#if 0
-        if (idx < getUpCittasNum()) // XXX: no we all append
-        {
-            if (getUpCittasNum() < getUpCittasMax()) {
-                for (int j = getUpCittasMax() - 1; j >= idx+1; --j)
-                {
-                    _citta[j] = _citta[j-1];
-                    _citta[j-1] = 0;
-                    //if (_citta[j])
-                    //    sendModification(0x62, _citta[j], j, writedb);
-                }
-            }
-        } else
-#else
-            idx = getUpCittasNum();
-            if (!(idx >= 0 && idx < getUpCittasMax())) // dst
-                return false;
-#endif
+        idx = getUpCittasNum();
+        if (!(idx >= 0 && idx < getUpCittasMax())) // dst
+            return false;
 
         if (_citta[idx])
             offCitta(_citta[idx], false, true, writedb);
@@ -2481,39 +2456,20 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool lvlup, bool onl
     }
     else
     {
-#if 0
-        if (src != idx)
-        {
-            if (_citta[idx])
-            { // swap
-                // sendModification(0x62, _citta[idx], src, writedb);
-
-                _citta[src] ^= _citta[idx];
-                _citta[idx] ^= _citta[src];
-                _citta[src] ^= _citta[idx];
-                ret = true;
-                swap = true;
-            }
-        }
-        else
-#else
         idx = src;
-#endif
-        { // upgrade
-            if (_citta[idx] != citta)
-            {
-                const GData::CittaBase* yacb = GData::cittaManager[_citta[idx]];
-                if (!yacb)
-                    return false;
-                if (cb->needsoul > getMaxSoul() - (getSoul() - yacb->needsoul))
-                    return false;
+        if (_citta[idx] != citta) // upgrade
+        {
+            const GData::CittaBase* yacb = GData::cittaManager[_citta[idx]];
+            if (!yacb)
+                return false;
+            if (cb->needsoul > getMaxSoul() - (getSoul() - yacb->needsoul))
+                return false;
 
-                // XXX: do not send message to client
-                offCitta(_citta[idx], false, false, writedb); // delete skills was taken out by old citta first
-                _citta[idx] = citta;
-                ret = true;
-                op = 3;
-            }
+            // XXX: do not send message to client
+            offCitta(_citta[idx], false, false, writedb); // delete skills was taken out by old citta first
+            _citta[idx] = citta;
+            ret = true;
+            op = 3;
         }
     }
 
@@ -2521,8 +2477,7 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool lvlup, bool onl
     {
         _attrDirty = true;
         _bPDirty = true;
-        //sendModification(0x62, citta, idx, writedb);
-        sendModification(0x62, citta, op/*1add,2del,3mod*/, writedb);
+        sendModification(0x2c, citta, op/*1add,2del,3mod*/, writedb);
 
         if(online && writedb && CURRENT_THREAD_ID() <= WORKER_THREAD_NEUTRAL)
             //装备上心法成就
@@ -2532,7 +2487,7 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool lvlup, bool onl
             _owner->OnHeroMemo(MC_CITTA, MD_ADVANCED, 0, 1);
     }
 
-    if (ret && !swap)
+    if (ret)
     {
         bool up = true;//_owner?(_owner->getMainFighter()?_owner->getMainFighter()->getLevel()>=10:true):false;
         /*
@@ -2705,7 +2660,7 @@ bool Fighter::upPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb)
                 if (skill != _passkl[idx][j])
                 { // upgrade
                     _passkl[idx][j] = skill;
-                    sendModification(0x64, skill, 3/*1add,2del,3mod*/, writedb);
+                    sendModification(0x2e, skill, 3/*1add,2del,3mod*/, writedb);
                 }
                 break;
             }
@@ -2715,7 +2670,7 @@ bool Fighter::upPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb)
         {  // up
             ret = true;
             _passkl[idx].push_back(skill);
-            sendModification(0x64, skill, 1/*1add,2del,3mod*/, writedb);
+            sendModification(0x2e, skill, 1/*1add,2del,3mod*/, writedb);
         }
     }
     else
@@ -2728,7 +2683,7 @@ bool Fighter::upPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb)
                 if (skill != _rpasskl[idx][j])
                 { // upgrade
                     _rpasskl[idx][j] = skill;
-                    sendModification(0x64, skill, 3/*1add,2del,3mod*/, writedb);
+                    sendModification(0x2e, skill, 3/*1add,2del,3mod*/, writedb);
                     break;
                 }
             }
@@ -2738,7 +2693,7 @@ bool Fighter::upPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb)
         { // up
             ret = true;
             _rpasskl[idx].push_back(skill);
-            sendModification(0x64, skill, 1/*1add,2del,3mod*/, writedb);
+            sendModification(0x2e, skill, 1/*1add,2del,3mod*/, writedb);
         }
     }
 
@@ -2808,7 +2763,7 @@ bool Fighter::offPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb
     }
 
     if (ret) // off
-        sendModification(0x64, skill, 2/*1add,2del,3mod*/, writedb);
+        sendModification(0x2e, skill, 2/*1add,2del,3mod*/, writedb);
 
     return true;
 }
@@ -2891,14 +2846,7 @@ bool Fighter::addNewCitta( UInt16 citta, bool writedb, bool init, bool split )
 
     _attrDirty = true;
     _bPDirty = true;
-    sendModification(0x63, citta, op/*1add,2del,3mod*/, writedb);
-
-    // XXX: 拆分出来的都是增益心法
-    if (!GVAR.GetVar(GVAR_CITTASPLIT) && split)
-    {
-        UInt8 idx = getUpCittasNum();
-        upCitta(citta, idx, true, false, false);
-    }
+    sendModification(0x2d, citta, op/*1add,2del,3mod*/, writedb);
 
     if (!init && _owner && writedb)
         _owner->OnHeroMemo(MC_CITTA, MD_ADVANCED, 0, 0);
@@ -2956,12 +2904,12 @@ bool Fighter::offCitta( UInt16 citta, bool flip, bool offskill, bool writedb )
             _citta[i] = _citta[i+1];
             _citta[i+1] = 0;
             //if (_citta[i])
-            //    sendModification(0x62, _citta[i], i, writedb);
+            //    sendModification(0x2c, _citta[i], i, writedb);
         }
     }
-    //sendModification(0x62, 0, i, writedb);
+    //sendModification(0x2c, 0, i, writedb);
     if (flip)
-        sendModification(0x62, citta, 2/*1add,2del,3mod*/, writedb);
+        sendModification(0x2c, citta, 2/*1add,2del,3mod*/, writedb);
     return true;
 }
 
@@ -3028,7 +2976,7 @@ bool Fighter::delCitta( UInt16 citta, bool writedb )
 
     _attrDirty = true;
     _bPDirty = true;
-    sendModification(0x63, citta, 2/*1add,2del,3mod*/, writedb);
+    sendModification(0x2d, citta, 2/*1add,2del,3mod*/, writedb);
 
     //散功成就
     GameAction()->doAttainment(_owner, 10081, 0);
@@ -3587,7 +3535,7 @@ void Fighter::updateForgeAttr(bool notify)
     if (notify)
     {
         Stream st(REP::CHANGE_EQUIPMENT);
-        st << getId() << static_cast<UInt8>(1) << static_cast<UInt8>(0x46);
+        st << getId() << static_cast<UInt8>(1) << static_cast<UInt8>(0x0d);
         st << _attrType1 << _attrValue1 << _attrType2 << _attrValue2 << _attrType3 << _attrValue3 << Stream::eos;
         _owner->send(st);
     }
@@ -3864,7 +3812,7 @@ UInt8 Fighter::getSoulSkillIdx(UInt16 itemId)
 bool Fighter::addElixirAttrByOffset(UInt8 off, Int32 v)
 {
     static UInt8 off2type[] = {
-        0x80, 0x84, 0x81, 0x82, 0x83, 0x85, 0x86, 0x87, 0x88, 0x89, 0x90, 0x91, 0x92, 0x93,
+        0x10, 0x14, 0x11, 0x12, 0x13, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d,
     };
 
 #define MAXVAL(x,y) { if (x > y) x = y; }
@@ -4084,6 +4032,9 @@ UInt16 Fighter::getBattlePortrait()
         break;
     case 1706:
         portrait = 1088;
+        break;
+    case 1707:
+        portrait = 1090;
         break;
     }
 
@@ -4337,6 +4288,7 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, bool bind)
         ss.curVal -= ss.maxVal;
         ++ss.lvl;
 
+        ss.maxVal = GData::GDataManager::getMaxStrengthenVal(sid, ss.lvl);
         if (ss.lvl >= ss.maxLvl)
         {
             ss.curVal = 0;
@@ -4345,7 +4297,6 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, bool bind)
             ret = 0;
             break;
         }
-        ss.maxVal = GData::GDataManager::getMaxStrengthenVal(sid, ss.lvl);
     }
 
     SSUpdate2DB(id, ss);

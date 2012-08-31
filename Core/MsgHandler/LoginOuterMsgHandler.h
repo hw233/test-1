@@ -2183,6 +2183,7 @@ void AddDiscountFromBs(LoginMsgHdr& hdr, const void* data)
     br >> discount.discountType;
     br >> discount.beginTime;
     br >> discount.endTime;
+    GData::store.clearSpecialDiscountFromBS(discount.discountType);
     UInt16 count;
     br >> count;
     UInt8 result = 0;
@@ -2224,6 +2225,8 @@ void ClearDiscountFromBs(LoginMsgHdr& hdr, const void* data)
 	BinaryReader br(data,hdr.msgHdr.bodyLen);
     CHKKEY();
     GData::store.clearSpecialDiscountFromBS();
+    GData::store.storeDiscount();
+    GData::store.makePacket();
 }
 
 

@@ -218,6 +218,16 @@ struct DBSS
     UInt8 maxLvl;
 };
 
+struct DBQixi
+{
+    UInt64 playerId;
+    UInt64 lover;
+    UInt8 bind;
+    UInt8 pos;
+    UInt8 event;
+    UInt32 score;
+};
+
 struct DBFighterBuffData
 {
 	UInt64 playerId;
@@ -1189,6 +1199,19 @@ SPECIALDEF(8)
     UInt8, maxLvl
     )
 SPECIALEND()
+
+SPECIALBEGIN(GObject::DBQixi)
+SPECIALDEF(6)
+    (
+    UInt64, playerId,
+    UInt64, lover,
+    UInt8, bind,
+    UInt8, pos,
+    UInt8, event,
+    UInt32, score
+    )
+SPECIALEND()
+
 
 SPECIALBEGIN(GObject::DBFighterBuffData)
 SPECIALDEF(4)

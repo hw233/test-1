@@ -271,10 +271,9 @@ struct ArenaInfoReq
 	MESSAGE_DEF4(REQ::SERVER_ARENA_INFO, UInt8, type, UInt8, flag, UInt16, start, UInt8, len);
 };
 
-struct ArenaEliminationReq
+struct ArenaLeaderBoardReq
 {
-	UInt8 group;
-	MESSAGE_DEF1(REQ::SERVER_ARENA_ELIM, UInt8, group);
+	MESSAGE_DEF(REQ::SERVER_ARENA_LB);
 };
 
 void OnClanListReq( GameMsgHdr& hdr, ClanListReq& clr )
@@ -1404,6 +1403,10 @@ void OnPlayerEntered( ArenaMsgHdr& hdr, const void * data )
 	Stream st(REP::SERVER_ARENA_OP);
 	st << static_cast<UInt8>(1) << r << static_cast<UInt8>(entered + 1) << rname << Stream::eos;
 	player->send(st);
+    if (!r)
+    {
+        player->arenaUdpLog(1001);
+    }
 }
 
 void OnLineupCommited( ArenaMsgHdr& hdr, const void * data )
@@ -1468,6 +1471,12 @@ void OnArenaBattlePoint( ArenaMsgHdr& hdr, const void * data )
     GObject::arena.updateBattlePoint(br);
 }
 
+void OnArenaLeaderBoard( ArenaMsgHdr& hdr, const void * data )
+{
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    GObject::arena.updateLeaderBoard(br);
+}
+
 void OnArenaInfoReq( GameMsgHdr& hdr, ArenaInfoReq& air )
 {
 	MSG_QUERY_PLAYER(player);
@@ -1493,10 +1502,10 @@ void OnArenaInfoReq( GameMsgHdr& hdr, ArenaInfoReq& air )
 	//GObject::arena.sendInfo(player);
 }
 
-void OnArenaEliminationReq( GameMsgHdr&hdr, ArenaEliminationReq& aer )
+void OnArenaLeaderBoardReq( GameMsgHdr&hdr, ArenaLeaderBoardReq& aer )
 {
 	MSG_QUERY_PLAYER(player);
-	//GObject::arena.sendElimination(player, aer.group);
+	GObject::arena.sendLeaderBoard(player);
 }
 
 void OnArenaOpReq( GameMsgHdr& hdr, const void * data )
@@ -1543,6 +1552,8 @@ void OnArenaOpReq( GameMsgHdr& hdr, const void * data )
                     r = GObject::arena.bet2(player, state, group, pos, tael);
                 if(r == 0xFF)
                     break;
+                if (r <= 1)
+                    player->arenaUdpLog(1002, r);
 				Stream st(REP::SERVER_ARENA_OP);
 				st << type << r << state;
                 if(state < 2)
@@ -1997,5 +2008,67 @@ void GmHandlerFromBs(LoginMsgHdr &hdr,const void * data)
 	NETWORK()->SendMsgToClient(hdr.sessionId,st);
 }
 #endif
+
+void OnQixiReq(GameMsgHdr& hdr, const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+	if(!player->hasChecked())
+		return;
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+	UInt8 op;
+    UInt8 type;
+
+    brd >> type;
+    switch(type)
+    {
+    case 0x01:
+        {
+            if(!WORLD().getQixi())
+                break;
+            brd >> op;
+            switch(op)
+            {
+            case 0x01:
+                {
+                    UInt8 type = 0;
+                    brd >> type;
+                    if(type == 1)
+                        player->sendQixiInfo();
+                    else if(type == 2)
+                        WORLD().sendQixiPlayers(player);
+                }
+                break;
+            case 0x02:
+                {
+                    UInt8 type = 0;
+                    brd >> type;
+                    if(type == 0)
+                    {
+                        UInt64 pid = 0;
+                        brd >> pid;
+
+                        GObject::Player * pl = GObject::globalPlayers[pid];
+                        if(!pl)
+                            break;
+                        player->postQixiEyes(pl);
+                    }
+                    else if(type == 1)
+                    {
+                        player->divorceQixi();
+                    }
+                }
+                break;
+            case 0x03:
+                {
+                    UInt8 pos = player->getQueqiaoPos();
+                    GameMsgHdr hdr1(0x254, player->getThreadId(), player, sizeof(pos));
+                    GLOBAL().PushMsg(hdr1, &pos);
+                }
+                break;
+            }
+            break;
+        }
+    }
+}
 
 #endif // _WORLDOUTERMSGHANDLER_H_

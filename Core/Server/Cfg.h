@@ -63,6 +63,7 @@ public:
 	int channelNum;
 	int serverNum;
     int serverNo;
+    bool isTestPlatform;
 
 	std::string arenaHost;
 	UInt16      arenaPort;
@@ -112,6 +113,7 @@ public:
 	inline void setMerged(bool m) { merged = m; }
 	inline void setSupportCompress(bool c) { supportCompress = c; }
 	inline void setGMCheck(bool c) { GMCheck = c; }
+    inline void setTestPlatform(bool c) { isTestPlatform = c; }
 	inline void setArenaServer(const char * h, UInt16 p) { arenaHost = h; arenaPort = p; }
 	inline void setMsgCenter(const char * h, UInt16 p) { msgCenterHost = h; msgCenterPort = p; }  //yij
     inline void setChannelInfo(const char * sn, int num) { slugName = sn; channelNum = num; }

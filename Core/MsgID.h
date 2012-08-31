@@ -187,6 +187,8 @@ namespace REQ
     const UInt8 COLLECTNPCACTION    = 0x89;
     /**循环任务刷新*/
     const UInt8 TASK_CYC_REFRESH    = 0x57;// 0x8B
+    /**活动指令*/
+    const UInt8 ACT                 = 0x8B;
     /**自动完成日常任务*/
     const UInt8 DAYTASKAUTOCOMPLETED= 0x8C;
     /**???*/
@@ -313,7 +315,7 @@ namespace REQ
     /**跨服战信息请求*/
     const UInt8 SERVER_ARENA_INFO   = 0xEA;
     /**请求对阵表*/
-    const UInt8 SERVER_ARENA_ELIM   = 0xEB;
+    const UInt8 SERVER_ARENA_LB     = 0xEB;
     /**跨服战操作*/
     const UInt8 SERVER_ARENA_OP     = 0xE8;
     /**聊天*/
@@ -376,6 +378,8 @@ namespace REQ
     const UInt8 SKILLSTRENGTHEN     = 0x18;
     /** 天劫 **/
     const UInt8 TIANJIE             = 0x19;
+    /** 活动 **/
+    const UInt8 ACTIVE              = 0X8B;
 }
 
 namespace REP
@@ -497,6 +501,7 @@ namespace REP
 
     const UInt8 TASK_CYC_FRESH      = 0x57;// 0x8B
 
+    const UInt8 ACT                 = 0x8B;
     const UInt8 AUTO_COMPLETED_TASK = 0x8D;
     const UInt8 QUERYDAYTASK        = 0x8F;
 
@@ -574,7 +579,7 @@ namespace REP
     const UInt8 SORT_LIST           = 0xDA;// 0xE8
     const UInt8 SORT_PERSONAL       = 0xDB;// 0xE9
     const UInt8 SERVER_ARENA_INFO   = 0xEA;
-    const UInt8 SERVER_ARENA_ELIM   = 0xEB;
+    const UInt8 SERVER_ARENA_LB     = 0xEB;
 
     const UInt8 CHAT                = 0x20;// 0xF0
     const UInt8 CHAT_PRIVATE        = 0x21;// 0xF1
@@ -617,6 +622,8 @@ namespace REP
     const UInt8 SKILLSTRENGTHEN     = 0x18;
     /** 天劫 **/
     const UInt8 TIANJIE             = 0x19;
+    /** 活动 **/
+    const UInt8 ACTIVE              = 0X8B;
 }
 
 namespace SPEQ

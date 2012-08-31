@@ -119,6 +119,7 @@ enum MailItemType
     RealItemAwardActive,
     NewDrawingGameAward,
     SplitCitta,
+    BlueDiamondCmd,
 };
 enum ItemFrom
 {
@@ -153,6 +154,7 @@ enum ItemFrom
 	FromSSDTAward,
 	FromHappyAward,
     FromIDIP,
+    FromQixi,
 };
 
 enum ItemTo
@@ -164,7 +166,7 @@ enum ItemTo
 	ToSellNpc,
 	ToExchange,
 	ToExchangeSet,
-	ToDesdroy,
+	ToDesdroy, // ToTripod
 	ToDetachGemDesdroy,	
 	ToUse,
 	ToClanDonate,
@@ -179,6 +181,7 @@ enum ItemTo
     ToArenaBet,
     ToSkillStrengthenOpen,
 	ToSkillStrengthenUpgrade,
+    ToQixi,
 };
 
 struct IncommingInfo

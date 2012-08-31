@@ -861,7 +861,7 @@ void Athletics::listAthleticsMartial()
         {
             Player* pl = gAthleticsRank.getOrginal_martial(_owner, i);
             if(pl)
-                st << pl->getName() << pl->getCountry() << pl->GetClass() << static_cast<UInt8>(pl->GetClassAndSex() & 0x0F) << pl->GetLev() << gAthleticsRank.getOrginal_canAttack(_owner, i) << curData->eRivalType[i];
+                st << pl->getName() << pl->getCountry() << pl->GetClass() << static_cast<UInt8>(pl->GetClassAndSex() & 0x0F) << pl->GetLev() << gAthleticsRank.getOrginal_canAttack(_owner, i) << curData->eRivalType[i] << pl->getPF();
             //else
             //    st << "" << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0);
         }
@@ -962,7 +962,7 @@ void Athletics::listAthleticsMartial2(UInt8 type, bool update)
         {
             Player* player = gAthleticsRank.getOrginal_martial(_owner, i);
             if(player)
-                st << player->getName() << player->getCountry() << player->GetClass() << static_cast<UInt8>(player->GetClassAndSex() & 0x0F) << player->GetLev() << gAthleticsRank.getOrginal_canAttack(_owner, i) << curData->eRivalType[i];
+                st << player->getName() << player->getCountry() << player->GetClass() << static_cast<UInt8>(player->GetClassAndSex() & 0x0F) << player->GetLev() << gAthleticsRank.getOrginal_canAttack(_owner, i) << curData->eRivalType[i] <<  player->getPF();
         }
     }
     else

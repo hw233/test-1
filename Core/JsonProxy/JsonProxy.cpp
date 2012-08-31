@@ -166,7 +166,7 @@ int main()
         }
 
         do {
-            char buf[4096] = {0};
+            char buf[160000] = {0}; // XXX: 16K
             int len = 0;
             if((len = read_jason_req(new_fd, buf)) == 0)
             {
@@ -198,14 +198,15 @@ int main()
                 break;
             }
 
-            if( -1 == send( new_fd, buf, len, 0 ))
+            int cnt = send( new_fd, buf, len, 0 );
+            if( -1 == cnt )
             {
                 close(new_fd);
                 new_fd = -1;
                 g_log->OutError("write_jason_rep connection close %s\n", inet_ntoa(their_addr.sin_addr));
                 break;
             }
-            g_log->OutError("SEND: %s\n", buf);
+            g_log->OutError("[len recved: %d][len send: %d] SEND: %s\n", len, cnt, buf);
         }
         while(false);
 

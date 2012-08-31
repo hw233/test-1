@@ -173,6 +173,7 @@ end
 
 function onDungeonWin(player, id, count, free)
     June(player, 0);
+    Qixi(player, 0);
     if free == true then
         FallActivity(player, 1)
     else
@@ -809,6 +810,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     ChingMingDay(player, lootlvl)
     MayDay(player, lootlvl)
     June(player, lootlvl);
+    Qixi(player, lootlvl);
     LuckyDrawBox(player, id)
     if player:getQQVipPrivilege() == true then
         player:setQQVipPrivilege(false)
@@ -836,6 +838,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
     ChingMingDay(player, lootlvl)
     MayDay(player, lootlvl)
     June(player, lootlvl);
+    Qixi(player, lootlvl);
     if lootlvl == 0 then
         FallActivity(player, 1)
     else
@@ -1112,8 +1115,8 @@ function onLoginPF(player)
             [2] = "朋友网",
             [4] = "Q+",
             [10] = "QQ游戏大厅",
-            -- [11] = "3366",
-            -- [12] = "官网",
+            --[11] = "3366",
+            --[12] = "官网",
         }
         local titles = {
             [1] = pfnames[1].."登陆奖励",
@@ -1121,17 +1124,16 @@ function onLoginPF(player)
             [4] = pfnames[4].."登陆奖励",
             [10] = pfnames[10].."登陆奖励",
             --[11] = pfnames[11].."登陆奖励",
-            -- [12] = pfnames[12].."登陆奖励",
+            --[12] = pfnames[12].."登陆奖励",
         }
         local ctxs = {
-            [1] = "每日通过"..pfnames[1].."登陆《蜀山传奇》都可以获得【"..pfnames[1].."登陆礼包】 \n登陆礼包每日只能领取一次",
-            [2] = "每日通过"..pfnames[2].."登陆《蜀山传奇》都可以获得【"..pfnames[2].."登陆礼包】 \n登陆礼包每日只能领取一次",
-            [4] = "每日通过"..pfnames[4].."登陆《蜀山传奇》都可以获得【"..pfnames[4].."登陆礼包】 登陆礼包每日只能领取一次",
-            [10] = "每日通过"..pfnames[10].."登陆《蜀山传奇》都可以获得【"..pfnames[10].."登陆礼包】 \n登陆礼包每日只能领取一次",
-            --[11] = "每日通过"..pfnames[11].."登陆《蜀山传奇》都可以获得【"..pfnames[11].."登陆礼包】 登陆礼包每日只能领取一次",
-            -- [12] = "每日通过"..pfnames[12].."登陆《蜀山传奇》都可以获得【"..pfnames[12].."登陆礼包】 登陆礼包每日只能领取一次",
+            [1] = "每日通过"..pfnames[1].."登陆《蜀山传奇》都可以获得【"..pfnames[1].."登陆礼包】 \n登陆礼包每日只能领取一次\n<font color=\"#FF0000\">黄钻贵族通过"..pfnames[1].."登陆，可以领取黄钻每日礼包，内容包括：太乙真金、高级挂机加速符、银票、一级宝石、七星元木等。请在游戏主界面领取。</font><font color=\"#3399FF\"><u><a href=\"event:openYellow\">开通黄钻</a></u></font>",
+            [2] = "每日通过"..pfnames[2].."登陆《蜀山传奇》都可以获得【"..pfnames[2].."登陆礼包】 \n登陆礼包每日只能领取一次\n<font color=\"#FF0000\">黄钻贵族通过"..pfnames[2].."登陆，可以领取黄钻每日礼包，内容包括：太乙真金、高级挂机加速符、银票、一级宝石、七星元木等。请在游戏主界面领取。</font><font color=\"#3399FF\"><u><a href=\"event:openYellow\">开通黄钻</a></u></font>",
+            [4] = "每日通过"..pfnames[4].."登陆《蜀山传奇》都可以获得【"..pfnames[4].."登陆礼包】 登陆礼包每日只能领取一次\n<font color=\"#FF0000\">QQ会员贵族通过"..pfnames[4].."登陆，可以领取QQ会员每日礼包，内容包括：太乙真金、高级挂机加速符、银票、一级宝石、七星元木等。请在游戏主界面领取。</font><font color=\"#3399ff\"><u><a href=\"event:openQQVip\">开通QQ会员</a></u></font>",
+            [10] = "每日通过"..pfnames[10].."登陆《蜀山传奇》都可以获得【"..pfnames[10].."登陆礼包】 \n登陆礼包每日只能领取一次\n<font color=\"#FF0000\">蓝钻贵族通过"..pfnames[10].."登陆，可以领取蓝钻每日礼包，内容包括：太乙真金、高级挂机加速符、银票、一级宝石、七星元木等。请在游戏主界面领取。</font><font color=\"#3399ff\"><u><a href=\"event:openBlue\">开通蓝钻</a></u></font>",
+            --[11] = "每日通过"..pfnames[11].."登陆《蜀山传奇》都可以获得【"..pfnames[11].."登陆礼包】 登陆礼包每日只能领取一次\n<font color=\"#FF0000\">蓝钻贵族通过"..pfnames[11].."登陆，可以领取蓝钻每日礼包，内容包括：太乙真金、高级挂机加速符、银票、一级宝石、七星元木等。请在游戏主界面领取。</font><font color=\"#00FFFF\"><u><a href=\"event:openYellow\">开通蓝钻</a></u></font>",
+            --[12] = "每日通过"..pfnames[12].."登陆《蜀山传奇》都可以获得【"..pfnames[12].."登陆礼包】 登陆礼包每日只能领取一次\n<font color=\"#FF0000\">QQ会员贵族通过"..pfnames[12].."登陆，可以领取QQ会员每日礼包，内容包括：太乙真金、高级挂机加速符、银票、一级宝石、七星元木等。请在游戏主界面领取。</font><font color=\"#FF0000\"><u><a href=\"event:openQQVip\">开通QQ会员</a></u></font>",
         }
-
         local pkgs = {
             [1] = {469,1,1},
             [2] = {470,1,1},
@@ -1858,6 +1860,44 @@ function sendRechargeMails5(player, ototal, ntotal)
     end
 end
 
+function sendRechargeMails6(player, ototal, ntotal)
+    local lvls = {
+        10,99,199,399,699,1099,1599,2199,2899,3699,4599,5599,8999,15999,26999,42999,64999,
+    }
+    local items = {
+        {1325,1,1, 551,2,1},
+        {503,2,1, 516,2,1},
+        {8000,1,1, 551,2,1},
+        {517,2,1, 1325,1,1},
+        {505,2,1, 15,6,1},
+        {512,1,1, 513,1,1},
+        {1528,1,1, 1325,1,1},
+        {515,3,1, 509,2,1},
+        {503,2,1, 516,2,1},
+        {1325,2,1, 515,1,1},
+        {517,3,1, 549,2,1, 509,2,1},
+        {1528,2,1},
+        {1325,5,1, 516,3,1},
+        {1528,2,1, 549,2,1, 515,2,1},
+        {509,2,1, 507,2,1, 515,3,1, 1325,2,1},
+        {509,2,1, 507,2,1, 515,3,1, 1528,5,1},
+        {509,3,1, 507,3,1, 515,5,1, 503,10,1},
+    }
+
+    local olvl = calcRechargeLevel(lvls, ototal)
+    local nlvl = calcRechargeLevel(lvls, ntotal)
+
+    if nlvl == 0 or olvl == nlvl then
+        return
+    end
+
+    for k = olvl+1, nlvl do
+        local title = string.format(msg_100, lvls[k])
+        local ctx = string.format(msg_101, lvls[k])
+        sendItemPackageMail(player, title, ctx, items[k]);
+    end
+end
+
 function sendRechargeMails(player, ototal, ntotal)
     --sendRechargeMails1(player, ototal, ntotal)
     --[[local start = { ['year'] = 2012, ['month'] = 7, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1867,12 +1907,13 @@ function sendRechargeMails(player, ototal, ntotal)
     else
         sendRechargeMails2(player, ototal, ntotal)
     end--]]
-    if getRechargeActive() then
-        sendRechargeMails4(player, ototal, ntotal)
-    end
-    if getRechargeActive3366() then
-        sendRechargeMails5(player, ototal, ntotal)
-    end
+    --if getRechargeActive() then
+    --    sendRechargeMails4(player, ototal, ntotal)
+    --end
+    --if getRechargeActive3366() then
+    --    sendRechargeMails5(player, ototal, ntotal)
+    --end
+    sendRechargeMails6(player, ototal, ntotal)
 end
 
 function onEquipForge(player, id, onums)
@@ -1968,8 +2009,49 @@ function sendConsumeMails1(player, ototal, ntotal)
     end
 end
 
+function sendConsumeMails2(player, ototal, ntotal)
+    local lvls = {
+        100,300,700,1300,2100,3100,4300,5700,7300,9100,11100,17900,25900,35900,55900,
+    }
+
+    local items = {
+        {516,2,1, 503,2,1},
+        {500,1,1, 517,1,1},
+        {15,2,1},
+        {547,2,1, 515,1,1, 1325,2,1},
+        {505,2,1, 512,2,1, 1528,1,1},
+        {8000,2,1, 516,1,1, 515,1,1, 509,2,1},
+        {513,2,1, 9082,6,1},
+        {503,2,1, 1325,1,1},
+        {509,1,1, 507,1,1},
+        {1325,2,1, 1528,2,1, 515,2,1},
+        {9076,3,1, 515,1,1},
+        {9022,5,1, 549,2,1, 515,2,1},
+        {9022,5,1, 515,3,1, 1325,2,1, 1528,2,1},
+        {9076,5,1, 515,5,1, 1325,1,1, 1528,1,1},
+        {9076,15,1},
+    }
+
+    local olvl = calcRechargeLevel(lvls, ototal)
+    local nlvl = calcRechargeLevel(lvls, ntotal)
+
+    if nlvl == 0 or olvl == nlvl then
+        return
+    end
+
+    for k = olvl+1, nlvl do
+        if lvls[k] == nil or items[k] == nil then
+            return
+        end
+        local title = string.format(msg_105, lvls[k])
+        local ctx = string.format(msg_106, lvls[k])
+        sendItemPackageMail(player, title, ctx, items[k]);
+    end
+end
+
 function sendConsumeMails(player, ototal, ntotal)
-    sendConsumeMails1(player, ototal, ntotal);
+    --sendConsumeMails1(player, ototal, ntotal);
+    sendConsumeMails2(player, ototal, ntotal);
 end
 
 local awardPool = {
@@ -2012,4 +2094,50 @@ function onGetAthlRandomDiffculty()
     end
     return i
 end
+
+
+-- 1:聊天 2:牵手 3:险境 4:喜鹊 5:名胜 6:心动 7:神坛
+function onRoamingQueqiao(player, pos)
+    local roamPlace = {
+     -- 1  2  3  4  5  6  7  8
+        2, 3, 5, 1, 3, 2, 2, 6,
+        5, 1, 4, 2, 6, 3, 5, 2,
+        3, 2, 5, 6, 3, 2, 1, 7
+    }
+
+    local eventItem = {
+        {{502, 2, 10}, {510, 1, 10}, {29, 10, 10}},
+        {{56, 1, 20}, {500, 1, 20}, {57, 1, 20}},
+        {{511, 2, 20}, {512, 1, 30}, {517, 1, 30}},
+        {{9122, 1, 10}, {9122, 1, 10}, {9122, 1, 10}},
+        {{503, 1, 30}, {514, 1, 30}, {501, 1, 30}},
+        {{509, 1, 40}, {1528, 1, 40}, {1325, 1, 40}},
+        {{1647, 1, 50}, {1648, 1, 50}, {1649, 1, 50}},
+    }
+
+    step = math.random(1, 3)
+    pos2 = pos + step
+    if pos2 > 24 then
+        pos2 = pos2 - 24
+    end
+
+    local package = player:GetPackage()
+    i = roamPlace[pos2]
+    j = math.random(1, 3)
+
+    package:Add(eventItem[i][j][1], eventItem[i][j][2], true, true, 32)
+    player:lastQueqiaoAwardPush(eventItem[i][j][1], eventItem[i][j][2]);
+    player:postRoamResult(pos2, j, eventItem[i][j][3]);
+
+    return pos2;
+end
+
+function Qixi(player, lootlvl)
+    if getQixi() then
+        -- 喜鹊
+        local package = player:GetPackage();
+        package:AddItem(9122, 1, true, 0, 10);
+    end
+end
+
 

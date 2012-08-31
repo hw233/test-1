@@ -25,6 +25,7 @@
 #include "GObject/Clan.h"
 #include "GObject/DCLogger.h"
 #include "GObject/ShuoShuo.h"
+#include "Common/StringTokenizer.h"
 
 //Login thread -> Country thread
 void PlayerEnter( GameMsgHdr& hdr, const void * data )
@@ -767,6 +768,23 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
 			player->setBuffData(PLAYER_BUFF_TRAINP1, 0);
 		}
 	}
+	p = player->getBuffData(PLAYER_BUFF_ADVANCED_HOOK, now);
+	if(p > 0)
+	{
+        exp = ecs->exp; /** 重置 **/
+		UInt32 left = p - now;
+        /** 随身经验加速符还有效 **/
+		if(left > duration)
+		{
+            exp *= 1.6f;
+			player->setBuffData(PLAYER_BUFF_ADVANCED_HOOK, p - duration);
+		}
+		else
+		{
+		    exp = exp + exp * left * 3/ duration / 5;
+			player->setBuffData(PLAYER_BUFF_ADVANCED_HOOK, 0);
+		}
+	}
 	player->AddExp(static_cast<UInt32>(exp));
 	ecs->ng->monsterKilled(player, ecs->count);
 }
@@ -1056,6 +1074,13 @@ void OnCreateAward(GameMsgHdr& hdr, const void * data)
     player->setVipL(6);
 #endif
     player->udpLog("create", "", "", "", "", "", "guide");
+    StringTokenizer via(player->getVia(), "_");
+    if (via.count() == 2)
+        player->udpLog(via[0].c_str(), via[1].c_str(), "", "", "", "", "refer");
+    else if (via.count() == 1)
+        player->udpLog(via[0].c_str(), "", "", "", "", "", "refer");
+    else
+        player->udpLog("", "", "", "", "", "", "refer");
     player->sendCreateMail();
 #ifdef _FB
 #else
@@ -1510,5 +1535,24 @@ void OnSendPExpCard( GameMsgHdr& hdr, const void* data )
     player->sendPExpCard(pos);
 }
 
+void OnRoamintQueqiao( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    UInt8 pos = *(UInt8*)(data);
+    player->roamingQueqiao(pos);
+}
+
+void OnRoamintQueqiaoLastLoot( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    player->checkLastQueqiaoAward();
+}
+#if 0
+void OnAdvancedHookExp( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    player->advancedHookExp();
+}
+#endif
 #endif // _COUNTRYINNERMSGHANDLER_H_
 

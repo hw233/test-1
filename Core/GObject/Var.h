@@ -196,7 +196,8 @@ namespace GObject
         VAR_DISCOUNT_SP_2_TIME = 153,
         VAR_DISCOUNT_SP_3_TIME = 154,
 
-        VAR_TJ_EVENT_PRESTIGE=155,  //天劫事件中的声望
+        VAR_AWARD_NEWREGISTER  = 155, //新用户注册抽奖
+
         VAR_TJ_TASK_PRESTIGE=156,   //天劫活动中的声望
         VAR_TJ_TASK1_NUMBER=157,    //天劫每日任务1的已完成次数
         VAR_TJ_TASK2_TAEL=158,      //天劫任务2捐献的银币积分
@@ -205,8 +206,10 @@ namespace GObject
         VAR_TJ_TASK2_TJYJ=161,      //天劫任务2捐献的天劫印记
         VAR_TJ_TASK2_SCORE=162,     //天劫任务2的积分
         VAR_TJ_TASK3_COPYID=163,    //天劫任务3当前破阵层数
+        VAR_TJ_EVENT_PRESTIGE=164,  //天劫事件中的声望
 
         VAR_RECHARGE_TOTAL3366 = 169, //3366合作充值活动
+        VAR_BDIAMOND_CMD = 170, //蓝钻用户每日可领取当前等级寻宝令
 
         VAR_MAX,
     };
@@ -274,6 +277,7 @@ namespace GObject
             REGISTER_VAR(VAR_AWARD_QPLUS, CYCLE_DAY);
             REGISTER_VAR(VAR_AWARD_SSDT_1, CYCLE_DAY);
             REGISTER_VAR(VAR_AWARD_SSDT_2, CYCLE_NONE);
+            REGISTER_VAR(VAR_AWARD_NEWREGISTER, CYCLE_NONE);
 
             REGISTER_VAR(VAR_CLANBATTLE_HONOUR, CYCLE_DAY);
             REGISTER_VAR(VAR_CLAN_WEAL, CYCLE_DAY);
@@ -391,7 +395,6 @@ namespace GObject
             REGISTER_VAR(VAR_CONSUME, CYCLE_NONE);
             REGISTER_VAR(VAR_PHYSICAL_BUY, CYCLE_DAY);
 
-            REGISTER_VAR(VAR_TJ_EVENT_PRESTIGE, CYCLE_NONE);
             REGISTER_VAR(VAR_TJ_TASK_PRESTIGE,  CYCLE_NONE);
             REGISTER_VAR(VAR_TJ_TASK1_NUMBER, CYCLE_DAY);
             REGISTER_VAR(VAR_TJ_TASK2_TAEL, CYCLE_DAY);
@@ -400,9 +403,11 @@ namespace GObject
             REGISTER_VAR(VAR_TJ_TASK2_TJYJ, CYCLE_DAY);
             REGISTER_VAR(VAR_TJ_TASK2_SCORE, CYCLE_DAY);
             REGISTER_VAR(VAR_TJ_TASK3_COPYID, CYCLE_DAY);
+            REGISTER_VAR(VAR_TJ_EVENT_PRESTIGE, CYCLE_NONE);
             
             REGISTER_VAR(VAR_QQVIP_BUF, CYCLE_DAY);
             REGISTER_VAR(VAR_QQVIP_CNT, CYCLE_DAY);
+            REGISTER_VAR(VAR_BDIAMOND_CMD, CYCLE_DAY);
         }
         
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

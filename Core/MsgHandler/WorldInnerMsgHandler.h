@@ -25,7 +25,9 @@
 #include "GObject/SpecialAward.h"
 #include "GObject/PracticePlace.h"
 #include "GObject/ArenaBattle.h"
+#include "GObject/World.h"
 #include "Common/Itoa.h"
+#include <set>
 
 void OnPushTimerEvent( GameMsgHdr& hdr, const void * data )
 {
@@ -534,6 +536,7 @@ void OnDoInstantPracticeAccReq( GameMsgHdr& hdr, const void* data)
 		return;
 	GObject::EventPlayerPractice* event = static_cast<GObject::EventPlayerPractice*>(it->second);
 	event->instantComplete();
+    player->practiceUdpLog();
 }
 
 void OnLevelChange( GameMsgHdr& hdr, const void* data)
@@ -756,6 +759,271 @@ void OnLuckyDraw( GameMsgHdr& hdr,  const void* data )
     }
 
     WORLD().RankLuckyDraw(player);
+}
+
+#define CNT 7
+void SendRechargeRank(Stream& st)
+{
+    using namespace GObject;
+    st.init(REP::ACT);
+    UInt8 cnt = World::rechargeSort.size();
+    if (cnt > CNT)
+        cnt = CNT;
+    st << static_cast<UInt8>(2) << static_cast<UInt8>(1) << static_cast<UInt8>(0) << cnt;
+    UInt32 c = 0;
+    for (RCSortType::iterator i = World::rechargeSort.begin(), e = World::rechargeSort.end(); i != e; ++i)
+    {
+        st << i->player->getName();
+        st << i->total;
+        st << static_cast<UInt8>(i->player->getCountry()<<4|(i->player->IsMale()?0:1));
+        ++c;
+        if (c >= CNT)
+            break;
+    }
+    st << Stream::eos;
+}
+
+void OnRechargeRank ( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    UInt32 total = *((UInt32*)data);
+    if (!total)
+        return;
+
+    bool inrank = false;
+    UInt32 oldrank = 0;
+    for (RCSortType::iterator i = World::rechargeSort.begin(), e = World::rechargeSort.end(); i != e; ++i)
+    {
+        ++oldrank;
+        if (i->player == player)
+        {
+            if (oldrank <= CNT)
+                inrank = true;
+            World::rechargeSort.erase(i);
+            break;
+        }
+    }
+
+    RCSort s;
+    s.player = player;
+    s.total = total;
+    World::rechargeSort.insert(s);
+
+    UInt32 rank = 0;
+    UInt32 myrank = 0;
+    bool stop = false;
+    for (RCSortType::iterator i = World::rechargeSort.begin(), e = World::rechargeSort.end(); i != e; ++i)
+    {
+        if (!stop)
+            ++myrank;
+
+        if (i->player == player)
+            stop = true;
+
+        ++rank;
+
+        Stream st(REP::ACT);
+        st << static_cast<UInt8>(2) << static_cast<UInt8>(1) << static_cast<UInt8>(2) << i->total << static_cast<UInt8>(rank) << Stream::eos;
+        i->player->send(st);
+    }
+
+    if (oldrank <= CNT || (!inrank && myrank <= CNT))
+    {
+        Stream st;
+        SendRechargeRank(st);
+        NETWORK()->Broadcast(st);
+    }
+}
+
+void SendConsumeRank(Stream& st)
+{
+    using namespace GObject;
+    st.init(REP::ACT);
+    UInt8 cnt = World::consumeSort.size();
+    if (cnt > CNT)
+        cnt = CNT;
+    st << static_cast<UInt8>(2) << static_cast<UInt8>(2) << static_cast<UInt8>(0) << cnt;
+    UInt32 c = 0;
+    for (RCSortType::iterator i = World::consumeSort.begin(), e = World::consumeSort.end(); i != e; ++i)
+    {
+        st << i->player->getName();
+        st << i->total;
+        st << static_cast<UInt8>(i->player->getCountry()<<4|(i->player->IsMale()?0:1));
+        ++c;
+        if (c >= CNT)
+            break;
+    }
+    st << Stream::eos;
+}
+
+void OnConsumeRank ( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    UInt32 total = *((UInt32*)data);
+    if (!total)
+        return;
+
+    bool inrank = false;
+    UInt32 oldrank = 0;
+    for (RCSortType::iterator i = World::consumeSort.begin(), e = World::consumeSort.end(); i != e; ++i)
+    {
+        ++oldrank;
+        if (i->player == player)
+        {
+            if (oldrank <= CNT)
+                inrank = true;
+            World::consumeSort.erase(i);
+            break;
+        }
+    }
+
+    RCSort s;
+    s.player = player;
+    s.total = total;
+    World::consumeSort.insert(s);
+
+    UInt32 rank = 0;
+    UInt32 myrank = 0;
+    bool stop = false;
+    for (RCSortType::iterator i = World::consumeSort.begin(), e = World::consumeSort.end(); i != e; ++i)
+    {
+        if (!stop)
+            ++myrank;
+
+        if (i->player == player)
+            stop = true;
+
+        ++rank;
+
+        Stream st(REP::ACT);
+        st << static_cast<UInt8>(2) << static_cast<UInt8>(2) << static_cast<UInt8>(2) << i->total << static_cast<UInt8>(rank) << Stream::eos;
+        i->player->send(st);
+    }
+
+    if (oldrank <= CNT || (!inrank && myrank <= CNT))
+    {
+        Stream st;
+        SendConsumeRank(st);
+        NETWORK()->Broadcast(st);
+    }
+}
+
+inline bool player_enum_rc(GObject::Player * p, int)
+{
+    using namespace GObject;
+    if (World::getRechargeActive() || World::getRechargeActive3366())
+    {
+        UInt32 total;
+        if(World::getRechargeActive())
+            total = p->GetVar(VAR_RECHARGE_TOTAL);
+        else
+            total = p->GetVar(VAR_RECHARGE_TOTAL3366);
+        if (total)
+        {
+            RCSort s;
+            s.player = p;
+            s.total = total;
+            World::rechargeSort.insert(s);
+        }
+    }
+    if (World::getConsumeActive())
+    {
+        UInt32 total = p->GetVar(VAR_CONSUME);
+        if (total)
+        {
+            RCSort s;
+            s.player = p;
+            s.total = total;
+            World::consumeSort.insert(s);
+        }
+    }
+    return true;
+}
+
+static bool init = false;
+void initRCRank()
+{
+    GObject::globalPlayers.enumerate(player_enum_rc, 0);
+    init = true;
+}
+
+void OnSendRechargeRank ( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+    if (!init)
+        initRCRank();
+    Stream st;
+    SendRechargeRank(st);
+    player->send(st);
+
+    UInt32 rank = 0;
+    for (RCSortType::iterator i = World::rechargeSort.begin(), e = World::rechargeSort.end(); i != e; ++i)
+    {
+        ++rank;
+        if (i->player == player)
+        {
+            Stream st(REP::ACT);
+            st << static_cast<UInt8>(2) << static_cast<UInt8>(1) << static_cast<UInt8>(2) << i->total << static_cast<UInt8>(rank) << Stream::eos;
+            player->send(st);
+            break;
+        }
+    }
+}
+
+void OnSendConsumeRank ( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+    if (!init)
+        initRCRank();
+    Stream st;
+    SendConsumeRank(st);
+    player->send(st);
+
+    UInt32 rank = 0;
+    for (RCSortType::iterator i = World::consumeSort.begin(), e = World::consumeSort.end(); i != e; ++i)
+    {
+        ++rank;
+        if (i->player == player)
+        {
+            Stream st(REP::ACT);
+            st << static_cast<UInt8>(2) << static_cast<UInt8>(2) << static_cast<UInt8>(2) << i->total << static_cast<UInt8>(rank) << Stream::eos;
+            player->send(st);
+            break;
+        }
+    }
+}
+
+void OnRoamResult( GameMsgHdr& hdr,  const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+
+    struct Roam
+    {
+        UInt8 pos;
+        UInt8 event;
+        UInt8 score;
+    };
+
+    Roam* roam = (Roam*)data;
+    player->qixiStepAdvance(roam->pos, roam->event, roam->score);
+}
+
+
+void OnReCalcWeekDayAddTimer( GameMsgHdr& hdr,  const void* data )
+{
+    WORLD()._recalcwd = WORLD().AddTimer(10000, WORLD().ReCalcWeekDay, &(WORLD()), 10000);
+}
+
+void OnReCalcWeekDayRemoveTimer( GameMsgHdr& hdr,  const void* data )
+{
+    WORLD().RemoveTimer(WORLD()._recalcwd);
+    WORLD()._recalcwd = NULL;
 }
 
 #endif // _WORLDINNERMSGHANDLER_H_

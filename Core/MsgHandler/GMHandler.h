@@ -147,6 +147,9 @@ private:
     void OnTj2(GObject::Player* player, std::vector<std::string>& args);
     void OnTj3(GObject::Player* player, std::vector<std::string>& args);
     void OnTj4(GObject::Player* player, std::vector<std::string>& args);
+    void OnAddIdip(GObject::Player* player, std::vector<std::string>& args);
+    void OnClearTask(GObject::Player* player, std::vector<std::string>& args);
+    void OnClearCFT(GObject::Player* player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;

@@ -57,9 +57,11 @@ namespace GObject
 #define PLAYER_BUFF_REENTERCLAN		0x13
 #define PLAYER_BUFF_CLANRCENHANCE	0x14    
 #define PLAYER_BUFF_PWDLOCK			0x15	//5?????????? ????10????
+#define PLAYER_BUFF_ADVANCED_P_HOOK	0x16    //随身修为加速符: 20%
 #define PLAYER_BUFF_PRACTICE1       0x17	//修为加速: 50%
 //#define PLAYER_BUFF_PRACTICE2       0x17	//??��?ӳ?50% XXX: ??ʱ????
-#define PLAYER_BUFF_XTHTYT          0x18	//??ʹ????????????Ԫ̥
+//#define PLAYER_BUFF_XTHTYT          0x18	//??ʹ????????????Ԫ̥
+#define PLAYER_BUFF_ADVANCED_HOOK	0x18    //随身挂机加速符: 50%
 #define PLAYER_BUFF_WBOSS           0x19	//?Ѷ??????��?BOSS????
 #define PLAYER_BUFF_YDOTR           0x20    //??????????ֵ?ܶ?
 #define PLAYER_BUFF_AUTOCOPY        0x21	//?Զ?????
@@ -127,6 +129,8 @@ namespace GObject
 
 #define MAX_FRIENDS 30
 #define MAX_CFRIENDS 50
+
+#define QIXI_MAX_STEPS  24
 
 	class Map;
 	class Player;
@@ -372,6 +376,16 @@ namespace GObject
     {
         UInt8 id;
         UInt8 level;	//???? = 0?? ??ʾ?˼?????δ??????
+    };
+
+    struct QixiInfo 
+    {
+        Player* lover;
+        UInt8 bind;
+        UInt8 pos;
+        UInt8 event;
+        UInt32 score;
+        QixiInfo() : lover(NULL), bind(0), pos(0), event(0), score(0) {}
     };
 
 	struct PlayerData
@@ -742,7 +756,7 @@ namespace GObject
             if (_playerData.qqvipl >= 20 && _playerData.qqvipl <= 29)
                 return (3<<4)|(_playerData.qqvipl-20);
             if (_playerData.qqvipl >= 30 && _playerData.qqvipl <= 39)
-                return (4<<4)|(_playerData.qqvipl-30);
+                return (4<<4)|(_playerData.qqvipl1>40?_playerData.qqvipl1-40:0);
             if (_playerData.qqvipl >= 40 && _playerData.qqvipl <= 49)
                 return (4<<4)|(_playerData.qqvipl-40);
             return 0;
@@ -750,11 +764,12 @@ namespace GObject
         // XXX: 1-9 黄钻等级
         //      10-19 蓝钻等级
         //      20-29 3366等级,另qqvipl1 为蓝钻等级
-        //      30-39 Q+等级,另qqvipl1为会员等级
+        //      30-39 Q+等级,另qqvipl1为会员等级(现归属QQ会员)
         //      40-49 QQ会员等级
         inline bool isYD() const
         {
-            return (_playerData.qqvipl >= 1 && _playerData.qqvipl <= 9) || (_playerData.qqvipl >= 30 && _playerData.qqvipl <= 39);
+            //return (_playerData.qqvipl >= 1 && _playerData.qqvipl <= 9) || (_playerData.qqvipl >= 30 && _playerData.qqvipl <= 39);
+            return (_playerData.qqvipl >= 1 && _playerData.qqvipl <= 9);
         }
         inline bool isBD() const
         {
@@ -767,7 +782,7 @@ namespace GObject
         }
         inline bool isQQVIP() const 
         {
-            return (_playerData.qqvipl > 40 && _playerData.qqvipl <= 49) || (_playerData.qqvipl1 > 40 && _playerData.qqvipl1 <= 49);
+            return (_playerData.qqvipl > 40 && _playerData.qqvipl <= 49) || (_playerData.qqvipl1 > 40 && _playerData.qqvipl1 <= 49) || (_playerData.qqvipl >= 30 && _playerData.qqvipl <= 39 && _playerData.qqvipl1 > 40 && _playerData.qqvipl1 <= 49);
         }
 
 		UInt32 getTotalRecharge()			{ return _playerData.totalRecharge; }
@@ -874,6 +889,9 @@ namespace GObject
         UInt32 getMoneyArenaLua(UInt32 c);
         UInt32 getMoneyArena( UInt32 c, IncommingInfo *ii = NULL);
 
+        UInt32 useClanProffer(UInt32 c, ConsumeInfo *ci = NULL);
+        UInt32 getClanProffer(UInt32 c = 0, IncommingInfo *ii = NULL);
+
 		UInt32 getCoin(UInt32 c = 0);
 		UInt32 useCoin(UInt32 c, ConsumeInfo * ci=NULL, bool notify = true);
 		bool holdCoin(UInt32 c, UInt8);
@@ -977,8 +995,8 @@ namespace GObject
 		void makeFighterList(Stream&);
 		void makeFighterInfo(Stream&, Fighter *, bool = true);
 		bool makeFighterInfo(Stream&, UInt32);
-        void sendRechargeInfo();
-        void sendConsumeInfo();
+        void sendRechargeInfo(bool rank = false);
+        void sendConsumeInfo(bool rank = false);
         void getMDItem();
         void sendMDSoul(UInt8 type, UInt32 id = 0);
         void sendJuneRechargeMails(UInt32 value);
@@ -1033,6 +1051,7 @@ namespace GObject
         inline void setCopyFailed() { m_autoCopyFailed = true; }
 		bool autoBattle(UInt32);
 		void pushAutoBattle(UInt32, UInt16, UInt16);
+        //void advancedHookExp();
 		void pushAutoDungeon(UInt32, UInt32, UInt8);
 		void cancelAutoBattle();
 		void cancelAutoBattleNotify();
@@ -1274,9 +1293,37 @@ namespace GObject
 
     private:
         bool _isJumpingMap;
+
+        QixiInfo m_qixi;
+        bool _qixiBinding;
     public:
         inline bool isJumpingMap() { return _isJumpingMap; }
         inline void setJumpingMap(bool v) { _isJumpingMap = v; }
+
+        void loadQixiInfoFromDB(Player* pl, UInt8 bind, UInt8 pos, UInt8 event, UInt32 score)
+        {
+            m_qixi.lover = pl;
+            m_qixi.bind = bind;
+            m_qixi.pos = pos;
+            m_qixi.event = event;
+            m_qixi.score = score;
+        }
+        void sendQixiInfo();
+        void divorceQixi();
+        void postQixiEyes(Player* pl);
+        void roamingQueqiao(UInt8 pos);
+        void qixiStepAdvance(UInt8 pos, UInt8 event, UInt8 score);
+        void resetQixi();
+
+        void beDivorceQixi(Player* pl);
+        UInt8 beQixiEyes(Player* pl);
+        void onQixiEyesResp(UInt8 bind);
+        void postRoamResult(UInt8 pos, UInt8 event, UInt8 score);
+
+        inline bool queQiaoCheck() { return m_qixi.bind; }
+        inline UInt8 getQueqiaoPos() { return m_qixi.pos; }
+        inline Player* getLover() { return m_qixi.lover; }
+        inline UInt32 getScore() { return m_qixi.score; }
 
 	private:
 		Mutex _mutex;
@@ -1371,6 +1418,8 @@ namespace GObject
 		std::vector<GData::LootResult> _lastLoot;
         std::vector<LastAthAward> _lastAthAward;
         std::vector<GData::LootResult> _equipAward;
+		std::vector<GData::LootResult> _RegisterAward;
+		std::vector<GData::LootResult> _lastQueqiaoAward;
 
     private:
 		UInt16 _lastDungeon;
@@ -1490,7 +1539,19 @@ namespace GObject
         void tradeUdpLog(UInt32 price);
         void skillStrengthenLog(UInt8 type, UInt32 val);
         void townDeamonUdpLog(UInt16 level);
-        void dungeonUdpLog();
+        void dungeonUdpLog(UInt8 levelReq, UInt8 type);
+        void frontMapUdpLog(UInt8 id, UInt8 type);
+        void copyUdpLog(UInt8 levelReq, UInt8 type);
+        void athleticsUdpLog(UInt32 id, UInt8 type = 0);
+        void activityUdpLog(UInt32 id, UInt8 type = 0);
+        void practiceUdpLog();
+        void arenaUdpLog(UInt32 id, UInt8 type = 0);
+        void luckyDrawUdpLog(UInt32 id, UInt8 type, UInt32 num = 1);
+        void qixiUdpLog(UInt32 id);
+        void clanUdpLog(UInt32 id);
+        void countryBattleUdpLog(UInt32 id, UInt8 country);
+        void secondSoulUdpLog(UInt32 id, UInt32 val = 0, UInt32 num = 1);
+        void wBossUdpLog(UInt32 id);
         void guideUdp(UInt8 type, std::string& p1, std::string& p2);
         void moneyLog(int type, int gold, int coupon = 0, int tael = 0, int achievement = 0, int prestige = 0);
         void actUdp(UInt8 type, std::string& p1, std::string& p2);
@@ -1555,6 +1616,9 @@ namespace GObject
         void sendHappyInfo(UInt16 itemId = 0);
         void getTargetAward(UInt8 opt);
         void getTargetAwardRF(UInt8 opt);
+        void getNewRegisterAward(UInt8 opt);
+        void getAwardFromAD();
+        void getAwardFromRF();
 
         inline TripodData& getTripodData() { return m_td; }
         TripodData& newTripodData();
@@ -1595,7 +1659,11 @@ namespace GObject
         void sendDeamonAwardsInfo();
         void getDeamonAwards();
         void lastLootPush(UInt16 itemId, UInt16 num);
+        void RegisterAward(UInt16 itemId, UInt16 num);
+        void sendNewRegisterAward(UInt8 idx);
         void IDIPAddItem(UInt16 itemId, UInt16 num, bool bind = true);
+        void lastQueqiaoAwardPush(UInt16 itemId, UInt16 num);
+        void checkLastQueqiaoAward();
 
     private:
         bool m_hasTripod;

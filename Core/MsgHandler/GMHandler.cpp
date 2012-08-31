@@ -56,13 +56,13 @@ GMHandler::GMHandler()
 	Reg(3, "donate", &GMHandler::OnClanDonate);
 	Reg(3, "banchat", &GMHandler::OnBanChat);
 	Reg(3, "addexp", &GMHandler::OnAddExp);
-	Reg(3, "exp", &GMHandler::OnAddExp);
-	Reg(3, "pexp", &GMHandler::OnAddPExp);
+	Reg(2, "exp", &GMHandler::OnAddExp);
+	Reg(2, "pexp", &GMHandler::OnAddPExp);
 	Reg(3, "addpexp", &GMHandler::OnAddPExp);
 	Reg(3, "additem", &GMHandler::OnAddItem);
 	Reg(3, "addclanbox", &GMHandler::OnClanBox);
 	Reg(3, "item", &GMHandler::OnAddItem);
-	Reg(3, "itemb", &GMHandler::OnAddItemB);
+	Reg(2, "itemb", &GMHandler::OnAddItemB);
 	Reg(3, "itemset", &GMHandler::OnAddItemSet);
 	Reg(3, "equipall", &GMHandler::OnEquipAll);
 	Reg(3, "addmoney", &GMHandler::OnAddMoney);
@@ -77,7 +77,7 @@ GMHandler::GMHandler()
 	Reg(3, "rename", &GMHandler::OnRename);
 	Reg(3, "testlua", &GMHandler::OnTestLua);
 	Reg(3, "setdl", &GMHandler::OnSetDL);
-	Reg(3, "setvip", &GMHandler::OnSetVip);
+	Reg(2, "setvip", &GMHandler::OnSetVip);
 	Reg(3, "super", &GMHandler::OnSuper);
 	Reg(3, "spawn", &GMHandler::OnSpawn);
 	Reg(3, "unspawn", &GMHandler::OnUnspawn);
@@ -132,7 +132,7 @@ GMHandler::GMHandler()
     Reg(3, "m2a", &GMHandler::OnMoney2All);
     Reg(3, "kick", &GMHandler::OnKick);
     Reg(3, "count", &GMHandler::OnCount);
-    Reg(3, "wc", &GMHandler::OnCount);
+    Reg(2, "wc", &GMHandler::OnCount);
     Reg(3, "tid", &GMHandler::OnThreadId);
     Reg(3, "ac", &GMHandler::OnAutoCopy);
     Reg(3, "lock", &GMHandler::OnLock);
@@ -163,12 +163,12 @@ GMHandler::GMHandler()
     Reg(3, "ghmaward", &GMHandler::OnGetHeroMemoAward);
     Reg(3, "sysdlg", &GMHandler::OnSysDailog);
     Reg(3, "regenall", &GMHandler::OnRegenAll);
-    Reg(3, "bosshp", &GMHandler::OnSetBossHp);
+    Reg(2, "bosshp", &GMHandler::OnSetBossHp);
     Reg(3, "systm", &GMHandler::OnTime);
-    Reg(3, "tm", &GMHandler::OnTime);
+    Reg(2, "tm", &GMHandler::OnTime);
     Reg(3, "token", &GMHandler::OnToken);
 	Reg(3, "recharge", &GMHandler::OnRecharge);
-	Reg(3, "boss", &GMHandler::OnBossHP);
+	Reg(2, "boss", &GMHandler::OnBossHP);
 	Reg(3, "json", &GMHandler::OnJson);
 	Reg(3, "rc7awd", &GMHandler::OnRC7Awd);
 	Reg(3, "rc7ton", &GMHandler::OnRC7TurnOn);
@@ -187,6 +187,9 @@ GMHandler::GMHandler()
     Reg(3, "tj2", &GMHandler::OnTj2);
     Reg(3, "tj3", &GMHandler::OnTj3);
     Reg(3, "tj4", &GMHandler::OnTj4);
+    Reg(2, "idip", &GMHandler::OnAddIdip);
+    Reg(2, "clear", &GMHandler::OnClearTask);
+    Reg(2, "reset", &GMHandler::OnClearCFT);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -1175,7 +1178,7 @@ void makeSuper( GObject::Fighter * fgt, UInt8 equipLvl = 100, UInt8 enchant = 8,
         if(equip)
         { 
             makeItemSuper(package, equip, 0, 9, 0, flushAttr);
-            package->EquipTo(equip->getId(), fgt, 0x50, o);
+            package->EquipTo(equip->getId(), fgt, 0x0a, o);
         }
 		break;
 	case 2:
@@ -1231,7 +1234,7 @@ void makeSuper( GObject::Fighter * fgt, UInt8 equipLvl = 100, UInt8 enchant = 8,
         if(equip)
         { 
             makeItemSuper(package, equip, 0, 9, 0, flushAttr);
-            package->EquipTo(equip->getId(), fgt, 0x50, o);
+            package->EquipTo(equip->getId(), fgt, 0x0a, o);
         }
 		break;
 	case 3:
@@ -1287,7 +1290,7 @@ void makeSuper( GObject::Fighter * fgt, UInt8 equipLvl = 100, UInt8 enchant = 8,
         if(equip)
         { 
             makeItemSuper(package, equip, 0, 9, 0, flushAttr);
-            package->EquipTo(equip->getId(), fgt, 0x50, o);
+            package->EquipTo(equip->getId(), fgt, 0x0a, o);
         }
 		break;
 	default:
@@ -2888,6 +2891,34 @@ void GMHandler::OnTj2(GObject::Player* player, std::vector<std::string>& args)
 		return;
     int scoreCount = atoi(args[0].c_str());
     GObject::Tianjie::instance().setTj2Count(scoreCount);
+}
+void GMHandler::OnAddIdip(GObject::Player * player, std::vector<std::string>& args)
+{
+    player->IDIPAddItem(503, 1, true);
+}
+
+void GMHandler::OnClearTask(GObject::Player* player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return;
+    UInt8 type = atoi(args[0].c_str());
+    GameMsgHdr msg(0x325, player->getThreadId(), player, sizeof(type));
+    GLOBAL().PushMsg(msg, &type);
+}
+
+void GMHandler::OnClearCFT(GObject::Player* player, std::vector<std::string>& args)
+{
+    PLAYER_DATA(player, frontUpdate) = TimeUtil::Now();
+    PLAYER_DATA(player, copyUpdate) = TimeUtil::Now();
+    PLAYER_DATA(player, copyFreeCnt) = 0;
+    PLAYER_DATA(player, copyGoldCnt) = 0;
+    PLAYER_DATA(player, frontFreeCnt) = 0;
+    PLAYER_DATA(player, frontGoldCnt) = 0;
+    PLAYER_DATA(player, dungeonCnt) = 0;
+    DB1().PushUpdateData("UPDATE `player` SET `frontFreeCnt` = 0, `frontGoldCnt` = 0, `frontUpdate` = %u WHERE `id` = %"I64_FMT"u", TimeUtil::Now(), player->getId());
+    DB1().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = 0, `copyGoldCnt` = 0, `copyUpdate` = %u WHERE `id` = %"I64_FMT"u", TimeUtil::Now(), player->getId());
+	DB1().PushUpdateData("UPDATE `player` SET `dungeonCnt` = 0 where `id` = %"I64_FMT"u", player->getId());
+    player->sendDailyInfo();
 }
 
 void GMHandler::OnTj3(GObject::Player* player, std::vector<std::string>& args)

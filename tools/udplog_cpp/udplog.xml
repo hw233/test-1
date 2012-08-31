@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <config>
 	<udplog_server>
+		<!--服务器设置-->
 		<item ip="192.168.1.2" port="8080" />
 		<item ip="192.168.1.2" port="8080" />
 	</updlog_server>
 	<log_file_type>
+		<!--udp日志tableid-->
 		<item typeinfo="login"	id="8" /> 
 		<item typeinfo="pay"	id="9" /> 
 		<item typeinfo="props"	id="10" /> 

@@ -199,6 +199,8 @@ namespace GObject
 
         void udpLog(UInt32 type, UInt32 id, UInt32 num, UInt32 price, const char* op);
         void cittaUdpLog(UInt8 type, UInt32 id, UInt32 num);
+        void secondSoulItemUdpLog(UInt8 type, UInt32 id, UInt32 num);
+        void qixiUdpLog(UInt32 id, UInt32 num);
         void gemMergeUdpLog(UInt32 num);
         void multiMergeUdpLog(UInt32 num);
 

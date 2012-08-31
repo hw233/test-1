@@ -25,24 +25,28 @@ const LootItem * LootTable::operator[]( UInt32 id )
 
 void LootItem::roll( GObject::Player * player ) const
 {
-	LootResult lr = roll();
-	if(lr.id == 0)
-		return;
-	player->GetPackage()->Add(lr.id, lr.count, false, false, FromNpc);
+    std::vector<LootResult> lr;
+	roll(lr);
+    for (size_t n = 0; n < lr.size(); ++n)
+    {
+        if (!lr[n].id)
+            continue;
+        player->GetPackage()->Add(lr[n].id, lr[n].count, false, false, FromNpc);
+    }
 }
 
-LootResult LootItem::roll(URandom * ur) const
+void LootItem::roll(std::vector<LootResult>& lr, URandom * ur) const
 {
 	if(ur == NULL)
 	{
 		ur = &static_cast<BaseThread *>(Thread::current())->uRandom;
 	}
 	LootResult r = {0, 0};
-	if(isPack)
+	if(isPack == 1)
 	{
 		size_t cnt = items.size();
 		UInt32 rollNum = (*ur)(10000);
-		for(size_t i = 0; i < cnt; ++ i)
+		for(size_t i = 0; i < cnt; ++i)
 		{
 			const LootData& ld = items[i];
 			if(rollNum < ld.chance)
@@ -50,8 +54,9 @@ LootResult LootItem::roll(URandom * ur) const
 				const LootItem * li = lootTable[ld.id];
 				if(li != NULL)
 				{
-					r = li->roll(ur);
-					if(!ld.counts.empty())
+                    std::vector<LootResult> lr1;
+					li->roll(lr1, ur);
+					if(!ld.counts.empty() && lr1.size())
 					{
 						UInt32 countR = (*ur)(10000);
 						size_t ccnt = ld.counts.size();
@@ -59,22 +64,48 @@ LootResult LootItem::roll(URandom * ur) const
 						{
 							if(ld.counts[j].chance > countR)
 							{
-								r.count = ld.counts[j].count;
+                                for (size_t k = 0; k < lr1.size(); ++k)
+                                    lr1[k].count = ld.counts[j].count;
 								break;
 							}
 							countR -= ld.counts[j].chance;
 						}
 					}
+                    if (lr1.size())
+                        lr.insert(lr.end(), lr1.begin(), lr1.end());
 				}
-				return r;
+				return;
 			}
 			rollNum -= items[i].chance;
 		}
-		return r;
+		return;
 	}
+    else if (isPack == 2)
+    {
+		size_t cnt = items.size();
+		UInt32 rollNum = (*ur)(10000);
+		for(size_t i = 0; i < cnt; ++ i)
+		{
+			const LootData& ld = items[i];
+			if(rollNum < ld.chance)
+            {
+                size_t lcnt = ld.counts.size();
+                for (size_t l = 0; l < lcnt; ++l)
+                {
+                    r.id = ld.counts[l].count;
+                    r.count = 1;
+                    lr.push_back(r);
+                }
+                return;
+            }
+			rollNum -= items[i].chance;
+        }
+        return;
+    }
 	r.id = items[(*ur)(items.size())].id;
 	r.count = 1;
-	return r;
+    lr.push_back(r);
+	return;
 }
 
 }

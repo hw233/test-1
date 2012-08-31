@@ -78,6 +78,7 @@ UInt8 Dungeon::playerEnter( Player * player )
 		PLAYER_DATA(player, dungeonEnd) = TimeUtil::SharpDay(1);
         ++ PLAYER_DATA(player, dungeonCnt);
 		sendDungeonInfo(player, *dpi);
+        player->dungeonUdpLog(_dungeon->levelReq, 1);
 	}
 	else
 	{
@@ -104,8 +105,13 @@ UInt8 Dungeon::playerEnter( Player * player )
 						return 3;
 					ConsumeInfo ci(VipEnterDungeon,0,0);
 					player->useGold(price, &ci);
+                    player->dungeonUdpLog(_dungeon->levelReq, 3);
 				}
 			}
+            else
+            {
+                    player->dungeonUdpLog(_dungeon->levelReq, 1);
+            }
 
 		}
 
@@ -534,7 +540,14 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
         }
         bool free = (PLAYER_DATA(player, dungeonCnt) <= getMaxCount());
 		GameAction()->onDungeonWin(player, _id, dpi.totalCount, free);
-        player->dungeonUdpLog();
+        if(PLAYER_DATA(player, dungeonCnt) > getMaxCount())
+        {
+            player->dungeonUdpLog(_dungeon->levelReq, 4);
+        }
+        else
+        {
+            player->dungeonUdpLog(_dungeon->levelReq, 2);
+        }
 
 	}
 
