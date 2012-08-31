@@ -237,6 +237,16 @@ struct DBClanCopy
     UInt32 expOutput;           // 该等级每小时给予神像的经验值
 };
 
+struct DBClanCopyMonster
+{
+    UInt16 level;              // 副本等级
+    UInt16 appearRound;        // 生产该怪的波数
+    UInt32 npcId;              // 怪物npcGroupId
+    UInt8  npcCount;           // 每一路怪物的数量
+    UInt8  npcRouteCount;      // 出现的路数 
+    UInt16 npcValue;           // 怪物对主基地的破坏值
+};
+
 struct DBClanStatue
 {
     // 帮派神像模板参数
@@ -602,6 +612,18 @@ SPECIALDEF(2)
     (
     UInt16, level,       
     UInt32, expOutput
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBClanCopyMonster)
+SPECIALDEF(6)
+    (
+    UInt16, level,
+    UInt16, appearRound,
+    UInt32, npcId,
+    UInt8,  npcCount,
+    UInt8,  npcRouteCount,
+    UInt16, npcValue
     )
 SPECIALEND()
 

@@ -12,134 +12,294 @@ const static UInt32 COPY_ROUTE_COUNT = 3;  // 帮派副本的路径数目
 
 ClanCopy::ClanCopy(Clan *c) : _clan(c), _copyLevel(0)
 {
-    _copyMonster.clear();
+    _spotMap.clear();
+    _spotMonster.clear();
     _spotPlayer.clear();
-    _spotList.clear();
-    _copyProcessTime = 0;
-    _deadPlayer.clear();
+    _spotDeadPlayer.clear();
+    _spotDeadPlayer.clear();
+
+    _readyTime = 0;
+    _startTime = 0;
+    _endTime = 0;
+    _tickTime = 0;
+
+    _tickTimeInterval = 5;
+    _startTick = 1;
+    _monsterRefreshTick = 9;
+    _tickCount = 0;
+
+    _maxMonsterWave = 20;
+    _curMonsterWave = 0;
 }
 
 
 ClanCopy::~ClanCopy()
 {
-    _copyMonster.clear();
+    _spotMap.clear();
+    _spotMonster.clear();
     _spotPlayer.clear();
-    _spotList.clear();
-    _copyProcessTime = 0;
-    _deadPlayer.clear();
+    _spotDeadPlayer.clear();
+}
+
+void ClanCopy::initCopyData()
+{
+    // TODO: 读取副本配置数据，初始化副本状态
+}
+
+
+void ClanCopy::process(UInt32 now)
+{
+    // TODO: 游戏状态进行
+    if (_startTime == 0)
+        return;  // 还在准备状态，游戏未开始
+
+    if ((now - _tickTime) < _tickTimeInterval)
+        return;    // 未到达触发下一状态的时间
+    _tickTime = now;
+
+    for (SpotMap::iterator it = _spotMap.begin(); it != _spotMap.end(); ++it)
+    {
+        if (it->first == Enemy_Base)
+            enemyBaseAct();
+        else
+            monsterAssault(it->first);
+    }
+    ++_tickCount;
+}
+
+void ClanCopy::monsterAssault(const UInt8& spotId)
+{
+    // TODO: 怪物对据点发起冲锋
+    SpotMap::iterator spotIt = _spotMap.find(spotId);
+    if (spotIt == _spotMap.end())
+    {
+        return; // 正常情况下不会进入这里
+    }
+    ClanCopySpot &spot = spotIt->second;
+
+    SpotPlayer::iterator playerIt = _spotPlayer.find(spotId);
+    if (playerIt == _spotPlayer.end())
+    {
+        return; // 正常情况下不会进入这里
+    }
+    SpotPlayerList& playerList = playerIt->second;
+
+    SpotMonster::iterator monsterIt = _spotMonster.find(spotId);
+    if (monsterIt == _spotMonster.end())
+    {
+        return; // 正常情况下不会进入这里
+    }
+    SpotMonsterList& monsterList = monsterIt->second;
+
+    if (spot.lastBattleTick + _monsterRefreshTick > _tickCount )
+    {
+        // 仍然在战斗阶段
+        spotCombat(monsterList, playerList, spotId);
+    }
+    else
+    {
+        // 怪物冲锋阶段
+        monsterMove(spotId);
+        spot.lastBattleTick = _tickCount;
+    }
+}
+
+void ClanCopy::spotCombat(SpotMonsterList& monsterList, SpotPlayerList& playerList, UInt8 spotId)
+{
+    // 开始一轮战斗（FIXME: 战斗状态更新通知客户端）
+    SpotPlayerList::iterator playerIt = playerList.begin();
+    SpotMonsterList::iterator monsterIt = monsterList.begin(); 
+    while (monsterIt != monsterList.end())
+    {
+        if (playerIt == playerList.end())
+        {
+            // 没有玩家与怪物匹配
+            break;
+        }
+        else
+        {
+            // 找到可以匹配的玩家与怪物战斗
+            GData::NpcGroups::iterator npcGroupsIt = GData::npcGroups.find(monsterIt->npcId);
+            if(npcGroupsIt == GData::npcGroups.end())
+                return;
+
+            GData::NpcGroup * ng = npcGroupsIt->second;
+            Battle::BattleSimulator bsim(Battle::BS_COPY5, playerIt->player, ng->getName(), ng->getLevel(), false);
+            playerIt->player->PutFighters( bsim, 0 );
+            ng->putFighters( bsim );
+            bsim.start();
+            Stream& packet = bsim.getPacket();
+            if (packet.size() <= 8)
+                return;
+
+            bool res = bsim.getWinner() == 1;
+            if (res)
+            {
+                // 玩家防守成功
+                monsterIt->isDead = true;
+            }
+            else
+            {
+                // 玩家防守失败
+                playerIt->isDead = true;
+                _spotDeadPlayer.insert (std::make_pair(spotId, *playerIt)); // 加入死亡名单
+                playerIt->player->regenAll();    // 生命值回满
+            }
+            Stream st(REP::ATTACK_NPC);
+            st << static_cast<UInt8>(res) << static_cast<UInt8>(1) << static_cast<UInt8> (32) << static_cast<UInt8>(0) << static_cast<UInt8>(0);
+            st.append(&packet[8], packet.size() - 8);
+            st << Stream::eos;
+            playerIt->player->send(st);
+            bsim.applyFighterHP(0, playerIt->player, false);
+        }
+        ++ playerIt;
+        ++ monsterIt;
+    }
+    playerList.remove_if(isPlayerDead());
+    monsterList.remove_if(isMonsterDead());
 }
 
 void ClanCopy::setInterval(UInt32 interval)
 {
-    // TODO: 设置游戏节奏时间
+    // 设置游戏节奏时间
+    if (!interval)
+        return;
+    _tickTimeInterval = interval;
 }
 
 void ClanCopy::setStartTick(UInt32 tickCount)
 {
-    //  TODO: 设置游戏第一轮刷怪时间
+    //  设置副本第一轮刷怪时间 （节奏数目）
+    _startTick = tickCount;
 }
 
-void ClanCopy::process()
+void ClanCopy::setStartTimeInterval(UInt32 startTimeInterval)
 {
-    // 定时器触发，每隔一秒更新一次状态
-    ++_copyProcessTime;
+    // 设置副本第一轮刷怪的时间（秒数）
+    _startTick = startTimeInterval / _tickTimeInterval;
 }
 
-void ClanCopy::createEnemy(UInt32 round)
+void ClanCopy::enemyBaseAct()
 {
-    // TODO: 敌人老巢产生敌人
-}
-
-void ClanCopy::roundMove(UInt32 round)
-{
-    // 副本移动
-    for (CopyMonster::iterator it = _copyMonster.begin(); it != _copyMonster.end(); ++it)
+    // 敌人老巢的行动
+    monsterMove(Enemy_Base); // 上一轮产生的怪物先行移动
+    if (_curMonsterWave * _monsterRefreshTick + _startTick < _tickCount)
+        return;   // 未到达刷怪时间
+    if (_curMonsterWave < _maxMonsterWave)
     {
-        if ((it->second).hasMoved)
-            continue;
-        UInt8 curSpotId = it->first;
-
-        if (curSpotId == Copy_Spot::Home)
-        {
-            // 敌人在主基地，不移动
-            continue;
-        }
-        SpotList::iterator spotListIt = _spotList.find(curSpotId);
-        if (spotListIt == _spotList.end())
-            return;
-        ClanCopyMonster clanCopyMonster = it->second;
-        _copyMonster.erase(it);
-        _copyMonster.insert(std::make_pair((spotListIt->second).nextSpotId, clanCopyMonster));
+        // 刷新一轮怪
+        ++ _curMonsterWave;
+        createEnemy();
     }
 }
 
-void ClanCopy::roundCombat(UInt8 round)
+void ClanCopy::createEnemy()
 {
-    // 开始一轮战斗（FIXME: 战斗状态更新通知客户端）
-    for (CopyMonster::iterator it = _copyMonster.begin(); it != _copyMonster.end(); ++it)
+    // 敌人老巢产生敌人
+
+    UInt32 key = ((static_cast<UInt32>(_copyLevel)) << 16) | _curMonsterWave;
+    GData::ClanCopyMonsterMap::iterator it = GData::clanCopyMonsterMap.find(key);
+    if (it == GData::clanCopyMonsterMap.end())
     {
-        if (it->first == Copy_Spot::Enemy_Base) // 怪物老巢的怪物，不需要战斗
-            continue;
+        // 该轮没有怪物（暂时不会配置出该情况）
+        return;
+    }
+    const GData::ClanCopyMonsterData &clanCopyMonsterData = it->second;
 
-        // 寻找该据点是否有玩家与之战斗
-        SpotPlayer::iterator beg = _spotPlayer.lower_bound(it->first);
-        SpotPlayer::iterator end = _spotPlayer.upper_bound(it->first);
-        while (beg != end)
+    {
+        // 没有老巢据点或者老巢据点道路数小于怪物配置数目
+        SpotMap::iterator it = _spotMap.find(Enemy_Base);
+        if (it == _spotMap.end() || (it->second).nextSpotId.size() < clanCopyMonsterData.npcRouteCount)
+            return;  
+    }
+
+    // 设置该轮怪物参数
+    ClanCopyMonster clanCopyMonster (clanCopyMonsterData.npcId, _curMonsterWave, clanCopyMonsterData.npcValue, 0, _tickCount + 1);
+    SpotMonster::iterator spotMonsterIt = _spotMonster.find(Enemy_Base);
+    if (spotMonsterIt == _spotMonster.end())
+        return; // 正常情况不会进入这里
+
+    // 老巢中放入怪物
+    SpotMonsterList &spotMonsterList = spotMonsterIt->second;
+    for (UInt8 i = 0; i < clanCopyMonsterData.npcRouteCount; ++ i)
+    {
+        // 设置一路的怪
+        clanCopyMonster.nextSpotId = _spotMap[Enemy_Base].nextSpotId[i];
+        for (UInt16 count = 0; count < clanCopyMonsterData.npcCount; ++ count)
         {
-            // 寻找是否有可以匹配的玩家与怪物战斗
-            if ((beg->second).formalBattleRound < round)
-            {
-                // 找到可以匹配的玩家与怪物战斗
-                GData::NpcGroups::iterator npcGroupsIt = GData::npcGroups.find((it->second).npcId);
-                if(npcGroupsIt == GData::npcGroups.end())
-                    return;
-
-                GData::NpcGroup * ng = npcGroupsIt->second;
-                Battle::BattleSimulator bsim(Battle::BS_COPY5, (beg->second).player, ng->getName(), ng->getLevel(), false);
-                (beg->second).player->PutFighters( bsim, 0 );
-                ng->putFighters( bsim );
-                bsim.start();
-                Stream& packet = bsim.getPacket();
-                if (packet.size() <= 8)
-                    return;
-
-                bool res = bsim.getWinner() == 1;
-                if (res)
-                {
-                    // 玩家防守成功
-                    (beg->second).formalBattleRound = round; // 更新玩家战斗状态
-                    _copyMonster.erase(it); // 怪物消失
-                }
-                else
-                {
-                    // 玩家防守失败，怪物可以走向下一个据点
-                    (beg->second).player->regenAll();    // 生命值回满
-                    _deadPlayer.insert (std::make_pair(beg->first, beg->second)); // 加入死亡名单
-                    _spotPlayer.erase (beg); // 从据点玩家中剔除
-                }
-                Stream st(REP::ATTACK_NPC);
-                st << static_cast<UInt8>(res) << static_cast<UInt8>(1) << static_cast<UInt8> (32) << static_cast<UInt8>(0) << static_cast<UInt8>(0);
-                st.append(&packet[8], packet.size() - 8);
-                st << Stream::eos;
-                (beg->second).player->send(st);
-                bsim.applyFighterHP(0, (beg->second).player, false);
-                break;
-            }
-            ++beg;
+            spotMonsterList.push_back(clanCopyMonster);
         }
+    }
+}
 
-        // 怪物轮空
-        if (beg == end && it->first == Home)
+void ClanCopy::monsterMove(UInt8 spotId)
+{
+    // 该据点的怪物向下一个据点移动
+    SpotMonster::iterator it = _spotMonster.find(spotId);
+    if (it == _spotMonster.end())
+        return;
+    SpotMonsterList &monsterList = it->second;
+    if (spotId == Enemy_Base)
+    {
+        // 老巢怪物直接移动
+        for (SpotMonsterList::iterator monsterIt = monsterList.begin(); monsterIt != monsterList.end(); ++ monsterIt)
         {
-            // 怪物在主基地轮空，攻击主基地
-            attackHome(it->second);
-            if (!_homeHp)
-            {
-                // 主基地被摧毁，副本挑战失败
-                lose();
+            UInt8 nextSpotId = monsterIt->nextSpotId; // 获取目标据点Id
+            SpotMonster::iterator spotMonsterIt = _spotMonster.find(nextSpotId); // 目标据点的怪物列表
+            if (spotMonsterIt == _spotMonster.end())
                 return;
-            }
+            monsterIt->justMoved = true;
+            (spotMonsterIt->second).push_back(*monsterIt);
         }
+        monsterList.clear(); // 怪物老巢怪物列表
+    }
+    else
+    {
+        // 存在玩家防守的据点
+        SpotPlayer::iterator spotPlayerIt = _spotPlayer.find(spotId);
+        if (spotPlayerIt == _spotPlayer.end())
+            return;
+        SpotPlayerList &playerList = spotPlayerIt->second; // 获取该据点的玩家列表
+
+        SpotPlayerList::iterator playerIt = playerList.begin();
+        SpotMonsterList::iterator monsterIt = monsterList.begin();
+
+        while (monsterIt != monsterList.end())
+        {
+            // 怪物与玩家一一匹配
+            if (playerIt != playerList.end())
+                continue;
+            ++ monsterIt;
+            ++ playerIt;
+        }
+
+        // 怪物比玩家多的人向下一据点移动
+        for (; monsterIt != monsterList.end(); ++ monsterIt)
+        {
+            if (spotId == Home)
+            {
+                // 已经在主基地，直接攻击主基地
+                attackHome(*monsterIt);
+                if (!_homeHp)
+                {
+                    // TODO: 主基地被摧毁，游戏结束
+                    ClanCopyMgr::Instance().clanLose(this);
+                    return;
+                }
+            }
+            else
+            {
+                UInt8 nextSpotId = monsterIt->nextSpotId; // 获取目标据点Id
+                SpotMonster::iterator spotMonsterIt = _spotMonster.find(nextSpotId); // 目标据点的怪物列表
+                if (spotMonsterIt == _spotMonster.end())
+                    return;
+
+                monsterIt->justMoved = true;
+                (spotMonsterIt->second).push_back(*monsterIt);
+            }
+            monsterIt->isDead = true;
+        }
+        monsterList.remove_if(isMonsterDead());
     }
 }
 
@@ -162,20 +322,51 @@ void ClanCopy::lose()
 {
     // TODO: 帮派副本挑战失败
 
-    for (SpotPlayer::iterator it = _spotPlayer.begin(); it != _spotPlayer.end(); ++ it)
-    {
-        (it->second).player->regenAll();
-    }
 }
 
 void ClanCopy::win()
 {
     // TODO: 帮派副本挑战成功
-    for (SpotPlayer::iterator it = _spotPlayer.begin(); it != _spotPlayer.end(); ++ it)
+}
+
+
+/////////////////////////////////////////////////////////////
+// ClanCopyMgr
+
+ClanCopyMgr::ClanCopyMgr()
+{
+}
+
+ClanCopyMgr::~ClanCopyMgr()
+{
+}
+
+void ClanCopyMgr::process(UInt32 now)
+{
+    // TODO; 定时器处理所有帮派副本
+    for (ClanCopyMap::iterator it = _clanCopyMap.begin(); it != _clanCopyMap.end(); ++ it)
     {
-        (it->second).player->regenAll();
+        (it->second).process(now);
     }
 }
 
+bool ClanCopyMgr::createClanCopy(Clan *c)
+{
+    // TODO: 创建一个新帮派副本
+    return false;
+}
+
+void ClanCopyMgr::deleteClanCopy(Clan *c)
+{
+    // TODO: 清除已经结束的帮派副本
+}
+
+void ClanCopyMgr::clanLose(ClanCopy* clanCopy)
+{
+    // TODO: 该副本已经失败
+}
+
+// ClanCopyMgr
+/////////////////////////////////////////////////////////////
 
 }

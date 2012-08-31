@@ -28,14 +28,6 @@ static UInt8 spotMapType[] =
 };
 
 
-struct ClanCopyMonsterData
-{
-    UInt32 npcId;              // 怪物npcGroupId
-    UInt16 minCopyLevel;       // 出现该怪物的最低副本等级
-    UInt16 maxCopyLevel;       // 出现该怪物的最高副本等级
-    UInt16 minRound;           // 出现该怪物的最低波数
-    UInt16 maxRound;           // 出现该怪物的最高波数
-};
 
 struct ClanCopySpotData
 {
@@ -47,13 +39,30 @@ struct ClanCopySpotData
     UInt8  side1BufferType;     // 防守方的据点增益效果种类
     UInt8  side2BufferType;     // 进攻方的据点增益效果种类
 };
-typedef std::vector<ClanCopyMonsterData> ClanCopyMonsterTable;
 typedef std::vector<ClanCopySpotData> ClanCopySpotTable;
 
 extern ClanCopySpotTable clanCopySpotTable;
-extern ClanCopyMonsterTable clanCopyMonsterTable;
 
 #endif
+
+struct ClanCopyMonsterData
+{
+    ClanCopyMonsterData(UInt16 level, UInt16 appearRound, UInt32 npcId,
+            UInt8 npcCount, UInt8 npcRouteCount, UInt16 npcValue)
+        : level(level), appearRound(appearRound), npcId(npcId),
+        npcCount(npcCount), npcRouteCount(npcRouteCount), npcValue(npcValue)
+    {
+    }
+    UInt16 level;              // 副本等级
+    UInt16 appearRound;        // 生产该怪的波数
+    UInt32 npcId;              // 怪物npcGroupId
+    UInt8  npcCount;           // 每一路怪物的数量
+    UInt8  npcRouteCount;      // 出现的路数 
+    UInt16 npcValue;           // 怪物对主基地的破坏值
+};
+
+// key值为 (level << 16 | appearRound)
+typedef std::map<UInt32, ClanCopyMonsterData> ClanCopyMonsterMap;
 
 struct ClanCopyData
 {
@@ -62,14 +71,12 @@ struct ClanCopyData
     UInt16 minPlayer;           // 该等级副本参与最少人数
     UInt16 maxPlayer;           // 该等级副本参与最多人数
     UInt8  spotMaxPlayer;       // 该等级副本每个据点最大人数
-    UInt32 interval;            // 副本状态变化的间隔时间（默认为5s）
-    UInt32 startTick;           // 第一轮开始所需要的间隔数目
-    UInt32 monsterRefreshTick;  // 相邻两波怪的间隔时间
 };
 
 typedef std::vector<ClanCopyData> ClanCopyTable;
 
 extern ClanCopyTable clanCopyTable;
+extern ClanCopyMonsterMap clanCopyMonsterMap;
 
 }
 

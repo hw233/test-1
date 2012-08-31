@@ -7,6 +7,7 @@ namespace GData
 //ClanCopyMonsterTable clanCopyMonsterTable;
 //ClanCopySpotTable clanCopySpotTable;
 ClanCopyTable clanCopyTable;
+ClanCopyMonsterMap clanCopyMonsterMap;
 
 }
 
