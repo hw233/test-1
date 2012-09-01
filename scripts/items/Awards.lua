@@ -172,7 +172,8 @@ function RunNewRegisterAward(player)
             end
         end
     end
-    local chance = {379,1895,2400,5768,9558,9991,10000}
+    --local chance = {379,1895,2400,5768,9558,9991,10000}
+    local chance = {379,1895,5000,5000,5000,9991,10000}
     local item = {515,503,507,56,57,509,500,--[["10QB"]] }
     local j = 0;
     local g = math.random(1, 10000)
