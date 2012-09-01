@@ -1,4 +1,5 @@
 #include "ClanCopy.h"
+#include "Clan.h"
 #include "MsgID.h"
 #include "GData/ClanCopyTable.h"
 #include "Player.h"
@@ -10,13 +11,15 @@ namespace GObject
 const static UInt32 COPY_ROUTE_COUNT = 3;  // 帮派副本的路径数目
 
 
-ClanCopy::ClanCopy(Clan *c) : _clan(c), _copyLevel(0)
+ClanCopy::ClanCopy(Clan *c) : _clan(c)
 {
+    _copyLevel = c->getCopyLevel();
     _spotMap.clear();
     _spotMonster.clear();
     _spotPlayer.clear();
     _spotDeadPlayer.clear();
     _spotDeadPlayer.clear();
+    _status = CLAN_COPY_READY;
 
     _readyTime = 0;
     _startTime = 0;
@@ -41,6 +44,12 @@ ClanCopy::~ClanCopy()
     _spotDeadPlayer.clear();
 }
 
+UInt8 ClanCopy::getStatus()
+{
+    // 返回副本状态
+    return _status;
+}
+
 void ClanCopy::initCopyData()
 {
     // TODO: 读取副本配置数据，初始化副本状态
@@ -49,7 +58,7 @@ void ClanCopy::initCopyData()
 
 void ClanCopy::process(UInt32 now)
 {
-    // TODO: 游戏状态进行
+    // 游戏状态进行
     if (_startTime == 0)
         return;  // 还在准备状态，游戏未开始
 
@@ -69,7 +78,6 @@ void ClanCopy::process(UInt32 now)
 
 void ClanCopy::monsterAssault(const UInt8& spotId)
 {
-    // TODO: 怪物对据点发起冲锋
     SpotMap::iterator spotIt = _spotMap.find(spotId);
     if (spotIt == _spotMap.end())
     {
@@ -343,17 +351,45 @@ ClanCopyMgr::~ClanCopyMgr()
 
 void ClanCopyMgr::process(UInt32 now)
 {
-    // TODO; 定时器处理所有帮派副本
-    for (ClanCopyMap::iterator it = _clanCopyMap.begin(); it != _clanCopyMap.end(); ++ it)
+    // 定时器处理所有帮派副本
+    for (ClanCopyMap::iterator it = _clanCopyMap.begin(); it != _clanCopyMap.end();)
     {
-        (it->second).process(now);
+        if ((it->second).getStatus() == CLAN_COPY_OVER)
+        {
+            // 该帮派副本数据已经无效
+            _clanCopyMap.erase(it ++);
+        }
+        else
+        {
+            (it->second).process(now);
+            ++ it;
+        }
+    }
+}
+
+UInt8 ClanCopyMgr::getCopyStatus(UInt32 clanId)
+{
+    // 查询某一帮派的副本状态
+    ClanCopyMap::iterator it = _clanCopyMap.find(clanId);
+    if (it == _clanCopyMap.end())
+    {
+        return CLAN_COPY_NONE;
+    }
+    else
+    {
+        return (it->second).getStatus();
     }
 }
 
 bool ClanCopyMgr::createClanCopy(Clan *c)
 {
-    // TODO: 创建一个新帮派副本
-    return false;
+    // 创建一个新帮派副本
+    if (c == NULL)
+        return false;
+    if (_clanCopyMap.find(c->getId()) != _clanCopyMap.end())
+        return false;
+    _clanCopyMap.insert(std::make_pair(c->getId(), ClanCopy(c)));
+    return true;
 }
 
 void ClanCopyMgr::deleteClanCopy(Clan *c)

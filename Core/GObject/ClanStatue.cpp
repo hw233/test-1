@@ -42,4 +42,9 @@ UInt16 ClanStatue::getLevel()
     return _level;
 }
 
+UInt32 ClanStatue::getExp()
+{
+    return _exp;
+}
+
 }

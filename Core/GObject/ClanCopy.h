@@ -34,10 +34,12 @@ enum Copy_Spot
 
 enum CLAN_COPY_STATUS
 {
+    CLAN_COPY_NONE    = 0x00,
     CLAN_COPY_READY   = 0x01,
     CLAN_COPY_PROCESS = 0x02,
     CLAN_COPY_WIN     = 0x03,
     CLAN_COPY_LOSE    = 0x04,
+    CLAN_COPY_OVER    = 0xFF,
 };
 
 struct ClanCopyPlayer
@@ -99,16 +101,18 @@ struct ClanCopySpot
 class ClanCopy
 {
     public:
-    typedef std::map<UInt8, ClanCopySpot> SpotMap;
-    typedef std::list<ClanCopyMonster> SpotMonsterList;
-    typedef std::list<ClanCopyPlayer> SpotPlayerList;
-    typedef std::map<UInt8, SpotMonsterList> SpotMonster; // 该据点的怪物
-    typedef std::map<UInt8, SpotPlayerList> SpotPlayer;   // 该据点的玩家
-    typedef std::map<UInt8, ClanCopyPlayer> SpotDeadPlayer;   // 该据点死亡的玩家（逃跑也算）
+        typedef std::map<UInt8, ClanCopySpot> SpotMap;
+        typedef std::list<ClanCopyMonster> SpotMonsterList;
+        typedef std::list<ClanCopyPlayer> SpotPlayerList;
+        typedef std::map<UInt8, SpotMonsterList> SpotMonster; // 该据点的怪物
+        typedef std::map<UInt8, SpotPlayerList> SpotPlayer;   // 该据点的玩家
+        typedef std::map<UInt8, ClanCopyPlayer> SpotDeadPlayer;   // 该据点死亡的玩家（逃跑也算）
 
     public:
         ClanCopy(Clan *c); 
         ~ClanCopy();
+
+        UInt8 getStatus();
 
         void initCopyData();
         void process(UInt32 now);
@@ -126,8 +130,11 @@ class ClanCopy
         void setStartTimeInterval(UInt32 startTimeInterval);
 
     private:
-        Clan    * _clan;
+        Clan   *_clan;
         UInt16 _copyLevel;
+        UInt8  _status;
+
+
         SpotMap _spotMap;
         SpotMonster _spotMonster;
         SpotPlayer _spotPlayer;
@@ -138,7 +145,7 @@ class ClanCopy
         UInt32 _startTime;         // 副本开始的时间戳
         UInt32 _endTime;           // 副本结束的时间戳
         UInt32 _tickTime;
-        
+
         UInt32 _tickTimeInterval;      // 状态改变的最小时间间隔（秒）
         UInt32 _startTick;             // 开始第一轮刷怪的tick
         UInt32 _monsterRefreshTick;    // 刷新怪物的间隔tick
@@ -154,23 +161,24 @@ class ClanCopyMgr : public Singleton <ClanCopyMgr>
     typedef std::map<UInt32, ClanCopy> ClanCopyMap;
 
     public:
-        ClanCopyMgr();
-        ~ClanCopyMgr();
+    ClanCopyMgr();
+    ~ClanCopyMgr();
 
-        void process(UInt32 now);
+    void process(UInt32 now);
 
+    UInt8 getCopyStatus(UInt32 clanId);
 
-        // 创建一个新帮派副本
-        bool createClanCopy(Clan *c);
+    // 创建一个新帮派副本
+    bool createClanCopy(Clan *c);
 
-        // 清除已经结束的副本
-        void deleteClanCopy(Clan *c);
+    // 清除已经结束的副本
+    void deleteClanCopy(Clan *c);
 
-        void clanLose(ClanCopy* clanCopy);
+    void clanLose(ClanCopy* clanCopy);
 
     private:
-        UInt16 _maxCopyLevel;  // 全服最高通关的副本等级
-        ClanCopyMap _clanCopyMap;
+    UInt16 _maxCopyLevel;  // 全服最高通关的副本等级
+    ClanCopyMap _clanCopyMap;
 
 };
 

@@ -1381,7 +1381,7 @@ namespace GData
 
     bool GDataManager::LoadClanCopy()
     {
-        // TODO: 读取和帮派副本有关的配置参数
+        // 读取和帮派副本有关的配置参数
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
         DBClanCopy cc;
@@ -1389,16 +1389,12 @@ namespace GData
 			return false;
 		while (execu->Next() == DB::DB_OK)
 		{
-        /*
-			if (cst.id >= clanSkillTable.size())
-			{
-				clanSkillTable.resize(cst.id + 1);
-			}
-			SingleClanSkillTable & single = clanSkillTable[cst.id];
-			if (cst.level >= single.size())
-				single.resize(cst.level + 1);
-			single[cst.level] = ClanSkillTableData(cst.id, cst.name, cst.level, cst.needs, cst.value);
-        */
+            if (cc.level >= clanCopyTable.size())
+            {
+                clanCopyTable.resize(static_cast<size_t>(cc.level + 1));
+            }
+            clanCopyTable[cc.level] = ClanCopyData(cc.level, cc.expOutput, cc.monsterWaveCount,
+                    cc.minPlayer, cc.maxPlayer, cc.spotMaxPlayer, cc.homeHp);
 		}
 
 		return true;
