@@ -982,6 +982,7 @@ void Tianjie::attack1(Player* pl, UInt16 loc, UInt32 npcid)
 	    if (iter->second == (int)npcid)
 	    {
 	        res = pl->attackNpc(npcid);
+            m_locNpcMap.erase(iter);
             break;
 	    }
         ++iter;
@@ -1803,7 +1804,6 @@ void Tianjie::deleteNpc(int npcid, UInt16 loc)
     if (!p_map) return;
     p_map->Hide(npcid, true);
 	p_map->DelObject(npcid);
-
 }
 
 void Tianjie::sendDmg(UInt32 damage)
@@ -1815,6 +1815,7 @@ void Tianjie::sendDmg(UInt32 damage)
     st << Stream::eos;
     NETWORK()->Broadcast(st);
 }
+
 
 void Tianjie::sendHp(Player* player)
 {
