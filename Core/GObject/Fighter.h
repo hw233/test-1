@@ -35,6 +35,8 @@ namespace GObject
 #define FIGHTER_BUFF_DMAN       0x0D //道男
 #define FIGHTER_BUFF_DWMAN      0x0E //道女
 
+#define FIGHTER_BUFF_RDIAMOND   0x0F //红钻变身卡
+
 #define FIGHTER_BUFF_COUNT 0x10 
 
 #define SKILL_UPMAX 3 // 技能最初就能装备3个
