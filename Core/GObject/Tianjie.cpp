@@ -71,8 +71,8 @@ static const UInt32 s_tjBoss[][2] = {
 static const UInt32 s_tj4Score = 1000;
 static const UInt32 s_tjBossScore = 2800;
 //天劫宝箱 [绿色,蓝色,紫色,橙色]
-static const UInt32 s_tjEventBoxId[] = {9127, 9128, 9129, 9130};
-static const UInt32 s_tjTotalBoxId[] = {9134, 9135, 9136, 9137};
+static const UInt32 s_tjEventBoxId[] = {9134, 9135, 9136, 9137};
+static const UInt32 s_tjTotalBoxId[] = {9127, 9128, 9129, 9130};
 static const UInt32 s_tjEventRewardId = 9131;
 static const UInt32 s_tjTotalRewardId = 9132;
 
@@ -80,7 +80,7 @@ static const UInt32 s_tjTotalRewardId = 9132;
 #define TIME_60 60 
 #define ONE_DAY_SECOND (24*3600)
 
-#define TJ_EVENT_WAIT_TIME 15*60      //天劫事件间隔时间
+#define TJ_EVENT_WAIT_TIME 10*60      //天劫事件间隔时间
 #define TJ_EVENT_PROCESS_TIME 15*60   //天劫事件持续时间
 
 //#define TJ_EVENT_WAIT_TIME 30      //天劫事件间隔时间
@@ -650,7 +650,7 @@ void Tianjie::updateRankData(Player* pl)
 }
 void Tianjie::setRatePercent()
 {
-    UInt8 percent = m_eventCurrNumber * 100 / m_eventMaxNumber;
+    UInt32 percent = m_eventCurrNumber * 100 / m_eventMaxNumber;
     if (percent > 100)
         percent = 100;
     if (percent - m_oldBroadPercent >= 25)
@@ -908,7 +908,7 @@ void Tianjie::start1()
     	_ng = it->second;
     	if (!_ng) continue;
 
-        for (size_t j = 0; j < 20; ++j) //一次刷20只怪
+        for (size_t j = 0; j < 100; ++j) //一次刷20只怪
         {
             addNpc(npcid);
         }
@@ -1097,6 +1097,7 @@ void Tianjie::start2()
 }
 void Tianjie::donate2(Player* pl, UInt8 id)
 {
+    static UInt32 s_count = 0;
     if (m_currTjRate != 2 || !m_isTjExecute)
         return;
 
@@ -1185,7 +1186,9 @@ void Tianjie::donate2(Player* pl, UInt8 id)
         isFinish();
         
         setRatePercent(); 
-        broadEvent2();
+        s_count++;
+        if (s_count % 5 == 0)
+            broadEvent2();
         broadEvent2(pl);
         
         char r2_donated[32] = {0};
