@@ -10154,7 +10154,7 @@ namespace GObject
     {
         if (_clan == NULL)
             return 0;
-        UInt16 level = _clan->getClanStatueLevel();
+        UInt16 level = _clan->getStatueLevel();
         return GData::clanStatueTable[level].exHp;
     }
 
@@ -10162,7 +10162,7 @@ namespace GObject
     {
         if (_clan == NULL)
             return 0;
-        UInt16 level = _clan->getClanStatueLevel();
+        UInt16 level = _clan->getStatueLevel();
         return GData::clanStatueTable[level].exAttack;
     }
 
@@ -10170,7 +10170,7 @@ namespace GObject
     {
         if (_clan == NULL)
             return 0;
-        UInt16 level = _clan->getClanStatueLevel();
+        UInt16 level = _clan->getStatueLevel();
         return GData::clanStatueTable[level].exDefend;
     }
 
@@ -10178,7 +10178,7 @@ namespace GObject
     {
         if (_clan == NULL)
             return 0;
-        UInt16 level = _clan->getClanStatueLevel();
+        UInt16 level = _clan->getStatueLevel();
         return GData::clanStatueTable[level].exMagAtk;
     }
 
@@ -10186,7 +10186,7 @@ namespace GObject
     {
         if (_clan == NULL)
             return 0;
-        UInt16 level = _clan->getClanStatueLevel();
+        UInt16 level = _clan->getStatueLevel();
         return GData::clanStatueTable[level].exMagDef;
     }
 
@@ -10194,7 +10194,7 @@ namespace GObject
     {
         if (_clan == NULL)
             return 0;
-        UInt16 level = _clan->getClanStatueLevel();
+        UInt16 level = _clan->getStatueLevel();
         return GData::clanStatueTable[level].exAction;
     }
 
@@ -10202,7 +10202,7 @@ namespace GObject
     {
         if (_clan == NULL)
             return 0;
-        UInt16 level = _clan->getClanStatueLevel();
+        UInt16 level = _clan->getStatueLevel();
         return GData::clanStatueTable[level].exHitRate;
     }
 
@@ -11955,6 +11955,24 @@ namespace GObject
         Stream st(REP::CLAN_COPY);
         st << static_cast<UInt8>(CLAN_COPY_TAB_INFO);
         st << static_cast<UInt8>(_clan->getOnlineMembersCount());
+
+        st << static_cast<UInt16>(_clan->getStatueLevel());
+        st << static_cast<UInt32>(_clan->getStatueExp());
+        st << static_cast<UInt32>(_clan->getStatueNextExp());
+        st << static_cast<UInt32>(_clan->getStatueConsumeExp());
+        st << static_cast<UInt32>(_clan->getStatueExHp());
+        st << static_cast<UInt32>(_clan->getStatueExAttack());
+        st << static_cast<UInt32>(_clan->getStatueExDefend());
+        st << static_cast<UInt32>(_clan->getStatueExMagAtk());
+        st << static_cast<UInt32>(_clan->getStatueExMagDef());
+        st << static_cast<UInt32>(_clan->getStatueExAction());
+        st << static_cast<UInt32>(_clan->getStatueExHitRate());
+
+        st << static_cast<UInt16>(_clan->getCopyLevel());
+        st << static_cast<UInt32>(_clan->getOutputExp());
+        st << static_cast<UInt32>(_clan->getNextOutputExp());
+        st << static_cast<UInt8> (_clan->getCopyStatus());
+        st << static_cast<UInt8> (_clan->getCopyMeberCount());
         st << Stream::eos;
         send(st);
     }

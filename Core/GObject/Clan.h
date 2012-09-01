@@ -17,6 +17,7 @@ class ClanTech;
 class ClanBattle;
 class Clan;
 class ClanStatue;
+class ClanCopy;
 
 #define BASE_MEMBER_COUNT 30
 struct AllocItem
@@ -477,14 +478,33 @@ public:
 	ClanTech * getClanTech() { return _techs; }
 	ClanBattle * getClanBattle() { return _clanBattle; }
 	ClanDynamicMsg * getClanDynamicMsg() { return _clanDynamicMsg; }
-    UInt16 getClanStatueLevel();
 
-	inline Player * getOwner()
-	{
-		if (_members.size() > 0)
-			return (*_members.begin())->player;
-		return NULL;
-	}
+public:
+    // 帮派副本，帮派神像
+    UInt16 getStatueLevel();
+    UInt32 getStatueExp();
+    UInt32 getStatueNextExp();
+    UInt32 getStatueConsumeExp();
+    UInt32 getStatueExHp();
+    UInt32 getStatueExAttack();
+    UInt32 getStatueExDefend();
+    UInt32 getStatueExMagAtk();
+    UInt32 getStatueExMagDef();
+    UInt32 getStatueExAction();
+    UInt32 getStatueExHitRate();
+
+    UInt16 getCopyLevel();
+    UInt32 getOutputExp();
+    UInt32 getNextOutputExp();
+    UInt8  getCopyStatus();
+    UInt8  getCopyMeberCount();
+
+    inline Player * getOwner()
+    {
+        if (_members.size() > 0)
+            return (*_members.begin())->player;
+        return NULL;
+    }
 
     UInt8 getOnlineMembersCount();
     void VisitMembers(ClanMemberVisitor& visitor);
@@ -563,8 +583,13 @@ private:
 
 	std::map<UInt32, UInt8> _repoNum;
 	std::multimap<UInt32, AllocRecord> _allocRecords;
+
 	ClanTech * _techs;
     ClanStatue * _statue;
+    UInt16 _copyLevel;
+
+    ClanCopy * _clanCopy;
+
 	bool _deleted;
 	std::vector<std::string> _keywords;
 

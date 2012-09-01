@@ -21,7 +21,7 @@ struct ClanStatueTableData
     ClanStatueTableData(const ClanStatueTableData& cstd)
     {
         level      = cstd.level;
-        needExp        = cstd.needExp;
+        needExp    = cstd.needExp;
         consumeExp = cstd.consumeExp;
         exHp       = cstd.exHp;      
         exAttack   = cstd.exAttack;  

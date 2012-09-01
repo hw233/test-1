@@ -45,6 +45,31 @@ extern ClanCopySpotTable clanCopySpotTable;
 
 #endif
 
+struct ClanCopyData
+{
+    UInt16 level;               // 帮派副本等级
+    UInt32 expOutput;           // 该等级给予神像每小时的经验值
+    UInt16 maxWaveCount;        // 该等级刷怪的最大波数（包括不出怪的轮空波数）
+    UInt16 minPlayer;           // 该等级副本参与最少人数
+    UInt16 maxPlayer;           // 该等级副本参与最多人数
+    UInt8  spotMaxPlayer;       // 该等级副本每个据点最大人数
+    UInt32 homeHp;              // 该等级主基地的的生命值
+
+    ClanCopyData(UInt16 level, UInt32 expOutput, UInt16 maxWaveCount,
+            UInt16 minPlayer, UInt16 maxPlayer, UInt8 spotMaxPlayer, UInt32 homeHp)
+        : level(level), expOutput(expOutput), maxWaveCount(maxWaveCount), 
+        minPlayer(minPlayer), maxPlayer(maxPlayer), spotMaxPlayer(spotMaxPlayer),
+        homeHp(homeHp)
+    {
+    }
+    ClanCopyData():level(0), expOutput(0), maxWaveCount(0), minPlayer(0), maxPlayer(0), spotMaxPlayer(0), homeHp(0)
+    {
+    }
+    
+};
+
+typedef std::vector<ClanCopyData> ClanCopyTable;
+
 struct ClanCopyMonsterData
 {
     ClanCopyMonsterData(UInt16 level, UInt16 appearRound, UInt32 npcId,
@@ -63,17 +88,6 @@ struct ClanCopyMonsterData
 
 // key值为 (level << 16 | appearRound)
 typedef std::map<UInt32, ClanCopyMonsterData> ClanCopyMonsterMap;
-
-struct ClanCopyData
-{
-    UInt16 level;               // 帮派副本等级
-    UInt32 expOutput;           // 该等级给予神像每小时的经验值
-    UInt16 minPlayer;           // 该等级副本参与最少人数
-    UInt16 maxPlayer;           // 该等级副本参与最多人数
-    UInt8  spotMaxPlayer;       // 该等级副本每个据点最大人数
-};
-
-typedef std::vector<ClanCopyData> ClanCopyTable;
 
 extern ClanCopyTable clanCopyTable;
 extern ClanCopyMonsterMap clanCopyMonsterMap;

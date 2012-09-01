@@ -11,6 +11,8 @@
 #include "GData/ClanTechTable.h"
 #include "GData/ClanLvlTable.h"
 #include "GData/ClanSkillTable.h"
+#include "GData/ClanStatueTable.h"
+#include "GData/ClanCopyTable.h"
 #include "Player.h"
 #include "Package.h"
 #include "Mail.h"
@@ -24,6 +26,7 @@
 #include "ClanRankBattle.h"
 #include "HeroMemo.h"
 #include "ClanStatue.h"
+#include "ClanCopy.h"
 
 #include "GObject/AthleticsRank.h"
 #include <mysql.h>
@@ -3551,9 +3554,88 @@ void Clan::LoadStatue(UInt16 level, UInt32 exp)
     _statue->updateLevel(exp);
 }
 
-UInt16 Clan::getClanStatueLevel()
+UInt16 Clan::getStatueLevel()
 {
     return _statue->getLevel();
 }
+
+UInt32 Clan::getStatueExp()
+{
+    return _statue->getExp();
+}
+
+UInt32 Clan::getStatueNextExp()
+{
+    return GData::clanStatueTable[_statue->getLevel()].needExp;
+}
+
+UInt32 Clan::getStatueConsumeExp()
+{
+    return GData::clanStatueTable[_statue->getLevel()].consumeExp;
+}
+
+UInt32 Clan::getStatueExHp()
+{
+    return GData::clanStatueTable[_statue->getLevel()].exHp;
+}
+
+UInt32 Clan::getStatueExAttack()
+{
+    return GData::clanStatueTable[_statue->getLevel()].exAttack;
+}
+
+UInt32 Clan::getStatueExDefend()
+{
+    return GData::clanStatueTable[_statue->getLevel()].exDefend;
+}
+
+UInt32 Clan::getStatueExMagAtk()
+{
+    return GData::clanStatueTable[_statue->getLevel()].exMagAtk;
+}
+
+UInt32 Clan::getStatueExMagDef()
+{
+    return GData::clanStatueTable[_statue->getLevel()].exMagDef;
+}
+
+UInt32 Clan::getStatueExAction()
+{
+    return GData::clanStatueTable[_statue->getLevel()].exAction;
+}
+
+UInt32 Clan::getStatueExHitRate()
+{
+    return GData::clanStatueTable[_statue->getLevel()].exHitRate;
+}
+
+
+UInt16 Clan::getCopyLevel()
+{
+    return _copyLevel;
+}
+
+UInt32 Clan::getOutputExp()
+{
+    return GData::clanCopyTable[_statue->getLevel()].expOutput;
+}
+
+UInt32 Clan::getNextOutputExp()
+{
+    return GData::clanCopyTable[_statue->getLevel() + 1].expOutput;
+}
+
+UInt8  Clan::getCopyStatus()
+{
+    // TODO: 返回帮派副本状态
+    return GObject::ClanCopyMgr::Instance().getCopyStatus(_id);
+}
+
+UInt8  Clan::getCopyMeberCount()
+{
+    // TODO: 返回帮派副本的参与人数
+    return 0;
+}
+
 
 }
