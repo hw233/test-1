@@ -53,9 +53,9 @@ static const int s_tlzNpcId[][2] = {
 //物攻  法攻  物防  法防  生命  身法  命中   闪避   反击   法术抵抗
 //   1     1  0.5    0.5     1     1  0.05%  0.05%  0.05%  0.10%
 //                                    200%   100%   100%   200%
-static const float  s_rate3NpcBaseModulus[] = {1, 1, 0.5, 0.5, 1, 1};
-static const float  s_rate3NpcAdvanceModulus[] = {0.0005, 0.0005, 0.0005, 0.001};
-static const float  s_rate3NpcAdvanceModMax[] =  {2, 1, 1, 2};
+static const float  s_rate3NpcBaseModulus[] = {0.05, 0.05, 0.01, 0.01, 0.05, 0.001};
+static const float  s_rate3NpcAdvanceModulus[] = {0.001, 0.01, 0.01, 0.02};
+static const float  s_rate3NpcAdvanceModMax[] =  {200, 100, 100, 200};
 static const UInt8  s_rate3NpcScore = 100;    //天劫事件3每层积分  
 static const UInt8  s_rate3ExpMulti = 10;     //天雷阵的经验倍数
 //天劫事件4的分身和真身BOSS
@@ -123,6 +123,10 @@ Tianjie::Tianjie()
     m_tj4BossHp = 0;
 
     m_nextTjTime = 0;    
+
+    pthread_mutex_init(&m_eventMutex, NULL);
+    pthread_mutex_init(&m_totalMutex, NULL);
+    pthread_mutex_init(&m_locMutex, NULL);
 }
 
 bool Tianjie::isPlayerInTj(int playerLevel)
@@ -144,6 +148,7 @@ bool Tianjie::isOpenTj(Player* pl)
  {
  	if (!m_isTjExecute) return false;
 	
+    pthread_mutex_lock(&m_locMutex);
  	multimap<int, int>::iterator iter = m_locNpcMap.find(loc);
 	//验证怪物和玩家是否在同一个据点
 	while (iter != m_locNpcMap.end())
@@ -152,10 +157,12 @@ bool Tianjie::isOpenTj(Player* pl)
             break;
 	    if (iter->second == npcid)
 	    {
+            pthread_mutex_unlock(&m_locMutex);
 	        return true;
 	    }
         ++iter;
 	}
+    pthread_mutex_unlock(&m_locMutex);
  	return false;
  }
 bool  Tianjie::isTjRateNpc(int npcid)
@@ -965,6 +972,7 @@ void Tianjie::attack1(Player* pl, UInt16 loc, UInt32 npcid)
 	if (index == -1) return;
 	
     bool res = false;
+    pthread_mutex_lock(&m_locMutex);
     multimap<int, int>::iterator iter = m_locNpcMap.find(loc);
 	//验证怪物和玩家是否在同一个据点
 	while (iter != m_locNpcMap.end())
@@ -978,6 +986,7 @@ void Tianjie::attack1(Player* pl, UInt16 loc, UInt32 npcid)
 	    }
         ++iter;
 	}
+    pthread_mutex_unlock(&m_locMutex);
 	//玩家赢了
 	if (res)
 	{
@@ -1239,6 +1248,30 @@ void Tianjie::start3()
         m_tlzNpcName[i] = _ng->getName(); 
     }
     printf("----------------------start3()\n");
+    for(int i = 0; i < 2; ++i)
+    {
+        int npcId = s_tlzNpcId[m_tjTypeId][i];
+        GData::NpcGroups::iterator it = GData::npcGroups.find(npcId);
+        if(it == GData::npcGroups.end())
+           break;
+        GData::NpcGroup* _ng = it->second;
+        std::vector<GData::NpcFData>& _npcList = _ng->getList();
+        if (_npcList.size() == 0)
+            break;
+        GObject::Fighter* fighter = _npcList[0].fighter;
+        m_fighter[i] = fighter;
+
+        m_tlzNpcBaseAttra[i].attack = fighter->getBaseAttack(); 
+        m_tlzNpcBaseAttra[i].magatk = fighter->getBaseMagAttack();
+        m_tlzNpcBaseAttra[i].defend = fighter->getBaseDefend();
+        m_tlzNpcBaseAttra[i].magdef = fighter->getBaseMagDefend();
+        m_tlzNpcBaseAttra[i].hp     = fighter->getBaseHP();
+        m_tlzNpcBaseAttra[i].action = fighter->getBaseAction();
+        m_tlzNpcBaseAttra[i].hitrate =fighter->getBaseHitrate();
+        m_tlzNpcBaseAttra[i].evade = fighter->getBaseEvade();
+        m_tlzNpcBaseAttra[i].counter = fighter->getBaseCounter();
+        m_tlzNpcBaseAttra[i].magres = fighter->getBaseMagRes();
+    }
 }
 bool getAllFormation(const unsigned int& k, const GData::Formation* f, void* idVec)
 {
@@ -1264,37 +1297,24 @@ void Tianjie::putTlzFighters(BattleSimulator& bsim, int tlzLevel)
     {
         int idx = uRand(2);
 
-        int npcId = s_tlzNpcId[m_tjTypeId][idx];
-   
-        GData::NpcGroups::iterator it = GData::npcGroups.find(npcId);
-        if(it == GData::npcGroups.end())
-           break;
-        GData::NpcGroup* _ng = it->second;
-        std::vector<GData::NpcFData>& _npcList = _ng->getList();
-        if (_npcList.size() == 0)
-            break;
-        GObject::Fighter* fighter = _npcList[0].fighter;
-        GData::AttrExtra baseAttrExtra = *(fighter->getAttrExtraEquip());
-        
-        int j = tlzLevel;
-        GData::AttrExtra attrExtra = baseAttrExtra;
-        attrExtra.attack *= (1 + s_rate3NpcBaseModulus[0]*j);
-        attrExtra.magatk *= (1 + s_rate3NpcBaseModulus[1]*j);
-        attrExtra.defend *= (1 + s_rate3NpcBaseModulus[2]*j);
-        attrExtra.magdef *= (1 + s_rate3NpcBaseModulus[3]*j);
-        attrExtra.hp     *= (1 + s_rate3NpcBaseModulus[4]*j);
-        attrExtra.action *= (1 +s_rate3NpcBaseModulus[5]*j);
-        attrExtra.hitrate = min(s_rate3NpcAdvanceModMax[0], attrExtra.hitrate*(1+s_rate3NpcAdvanceModulus[0]*j));
-        attrExtra.evade = min(s_rate3NpcAdvanceModMax[1], attrExtra.evade*(1+s_rate3NpcAdvanceModulus[1]*j));
-        attrExtra.counter = min(s_rate3NpcAdvanceModMax[2], attrExtra.counter*(1+s_rate3NpcAdvanceModulus[2]*j));
-        attrExtra.magres = min(s_rate3NpcAdvanceModMax[3], attrExtra.magres*(1+s_rate3NpcAdvanceModulus[3]*j));
+        GObject::Fighter* fighter = m_fighter[idx];
+        fighter->attack = m_tlzNpcBaseAttra[idx].attack * (1 + s_rate3NpcBaseModulus[0]*tlzLevel);
+        fighter->magatk = m_tlzNpcBaseAttra[idx].magatk * (1 + s_rate3NpcBaseModulus[1]*tlzLevel);
+        fighter->defend = m_tlzNpcBaseAttra[idx].defend * (1 + s_rate3NpcBaseModulus[2]*tlzLevel);
+        fighter->magdef = m_tlzNpcBaseAttra[idx].magdef * (1 + s_rate3NpcBaseModulus[3]*tlzLevel);
+        fighter->maxhp = m_tlzNpcBaseAttra[idx].hp * (1 + s_rate3NpcBaseModulus[4]*tlzLevel);
+        fighter->action = m_tlzNpcBaseAttra[idx].action * (1 + s_rate3NpcBaseModulus[5]*tlzLevel);
+        fighter->hitrate = m_tlzNpcBaseAttra[idx].hitrate * (1 + s_rate3NpcAdvanceModulus[0]*tlzLevel);
+        fighter->evade = m_tlzNpcBaseAttra[idx].evade * (1 + s_rate3NpcAdvanceModulus[1]*tlzLevel);
+        fighter->counter = m_tlzNpcBaseAttra[idx].counter * (1 + s_rate3NpcAdvanceModulus[2]*tlzLevel);
+        fighter->magres = m_tlzNpcBaseAttra[idx].magres * (1 + s_rate3NpcAdvanceModulus[3]*tlzLevel);
+  
+        fighter->hitrate = MIN(fighter->hitrate, s_rate3NpcAdvanceModMax[0]);
+        fighter->evade = MIN(fighter->evade, s_rate3NpcAdvanceModMax[1]);
+        fighter->counter = MIN(fighter->counter, s_rate3NpcAdvanceModMax[2]);
+        fighter->magres = MIN(fighter->magres, s_rate3NpcAdvanceModMax[3]);
         //增强NPC的属性
-        fighter->setAttrExtraEquip(attrExtra);
-
         bsim.newFighter(1, form->getPos(i), fighter);
-
-        //重置回基础属性
-        fighter->setAttrExtraEquip(baseAttrExtra);
     }
 }
 void Tianjie::attack3(Player* pl)
@@ -1765,9 +1785,12 @@ bool Tianjie::addNpc(int npcid)
     p_map->AddObject(mo);
     p_map->Show(npcid, true, mo.m_Type);
 
+
+    pthread_mutex_lock(&m_locMutex);
 	//保存据点上的怪物
 	m_locNpcMap.insert(make_pair(spot, npcid));
-
+    pthread_mutex_unlock(&m_locMutex);
+    
     m_loc = spot;
 
     printf("-------------------------------------------addnpc, id:%d, loc:%d\n", npcid, spot);
@@ -1810,7 +1833,8 @@ void Tianjie::insertToEventSortMap(Player* pl, int newScore, int oldScore)
 {
     if (!m_isTjExecute || m_currTjRate >= 4)
         return;
-    
+   
+    pthread_mutex_lock(&m_eventMutex);
     multimap<int, Player*>::iterator iter = m_eventSortMap.find(oldScore);
 
     while (iter != m_eventSortMap.end())
@@ -1825,12 +1849,15 @@ void Tianjie::insertToEventSortMap(Player* pl, int newScore, int oldScore)
         ++iter;
     }
     m_eventSortMap.insert(make_pair(newScore, pl));
+    
+    pthread_mutex_unlock(&m_eventMutex);
 }
 void Tianjie::insertToScoreSortMap(Player* pl, int newScore, int oldScore)
 {
     if (!m_isTjOpened)
         return;
 
+    pthread_mutex_lock(&m_totalMutex);
     multimap<int, Player*>::iterator iter = m_scoreSortMap.find(oldScore);
 
     while (iter != m_scoreSortMap.end())
@@ -1845,33 +1872,42 @@ void Tianjie::insertToScoreSortMap(Player* pl, int newScore, int oldScore)
         ++iter;
     }
     m_scoreSortMap.insert(make_pair(newScore, pl));
+    pthread_mutex_unlock(&m_totalMutex);
 }
 short Tianjie::getEventRank(Player* pl)
 {
     short rank = 0;
+
+    pthread_mutex_lock(&m_eventMutex);
     multimap<int, Player*>::reverse_iterator iter;
     for (iter=m_eventSortMap.rbegin(); iter!=m_eventSortMap.rend(); ++iter)
     {
         rank++;
         if (iter->second == pl)
         {
+            pthread_mutex_unlock(&m_eventMutex);
             return rank;
         }
     }
+    pthread_mutex_unlock(&m_eventMutex);
     return 0;
 }
 short Tianjie::getScoreRank(Player* pl)
 {
     short rank = 0;
+
+    pthread_mutex_lock(&m_totalMutex);
     multimap<int, Player*>::reverse_iterator iter;
     for (iter=m_scoreSortMap.rbegin(); iter!=m_scoreSortMap.rend(); ++iter)
     {
         rank++;
         if (iter->second == pl)
         {
+            pthread_mutex_unlock(&m_totalMutex);
             return rank;
         }
     }
+    pthread_mutex_unlock(&m_totalMutex);  
     return 0;
 }
 void Tianjie::rewardEventBox(Player*pl, int score)

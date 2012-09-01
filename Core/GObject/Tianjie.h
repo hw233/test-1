@@ -19,6 +19,19 @@ using namespace std;
 typedef Battle::BattleSimulator BattleSimulator;
 namespace GObject
 {
+    struct TlzNpcAttra
+    {
+        float attack;                                                                                                                                                 
+        float magatk;                                                                                                                                                 
+        float defend;                                                                                                                                                 
+        float magdef;                                                                                                                                                 
+        float hp;                                                                                                                                                     
+        float action;                                                                                                                                                 
+        float hitrate;                                                                                                                                                
+        float evade; 
+        float counter;
+        float magres;
+    };
     class Player;
 
     struct Tianleizhen
@@ -172,6 +185,8 @@ namespace GObject
         //事件3
         static const int s_maxTlzLevel = 500;    //天雷阵最高层
         string m_tlzNpcName[2];
+        TlzNpcAttra m_tlzNpcBaseAttra[2];
+        GObject::Fighter* m_fighter[2];
         //事件4
         int m_bossIndex;
         string m_bossName;
@@ -182,6 +197,9 @@ namespace GObject
         AtkInfoType m_atkinfo;
         UInt8 _percent;
 
+        pthread_mutex_t m_eventMutex;
+        pthread_mutex_t m_totalMutex;
+        pthread_mutex_t m_locMutex;
     };
 }
 #endif
