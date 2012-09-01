@@ -53,7 +53,7 @@ static const int s_tlzNpcId[][2] = {
 //物攻  法攻  物防  法防  生命  身法  命中   闪避   反击   法术抵抗
 //   1     1  0.5    0.5     1     1  0.05%  0.05%  0.05%  0.10%
 //                                    200%   100%   100%   200%
-static const float  s_rate3NpcBaseModulus[] = {0.05, 0.05, 0.01, 0.01, 0.05, 0.001};
+static const float  s_rate3NpcBaseModulus[] = {0.02, 0.02, 0.01, 0.01, 0.05, 0.001};
 static const float  s_rate3NpcAdvanceModulus[] = {0.001, 0.01, 0.01, 0.02};
 static const float  s_rate3NpcAdvanceModMax[] =  {200, 100, 100, 200};
 static const UInt8  s_rate3NpcScore = 100;    //天劫事件3每层积分  
