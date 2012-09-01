@@ -88,7 +88,7 @@ static const UInt32 s_tjTotalRewardId = 9132;
 Tianjie::Tianjie()
 {
     m_tjTypeId = 0;
-    m_isNotRestart = true;
+    m_isNetOk = false;
 
 	m_isTjOpened = 0;        
 	m_isTjExecute = 0;      
@@ -198,7 +198,8 @@ void Tianjie::OpenTj()
     DB1().PushUpdateData("REPLACE INTO `tianjie`(`is_opened`,`level`,`opentime`,`rate`) VALUES(%d, %d, from_unixtime(%d), %d)", 
 		                 m_isTjOpened, m_currOpenedTjLevel, m_openTime, m_currTjRate);
 
-    SYSMSG_BROADCASTV(5001);
+    if (m_isNetOk)
+        SYSMSG_BROADCASTV(5001);
 
     Stream st(REQ::TIANJIE);
     UInt8 type = 5; //通知
@@ -207,7 +208,8 @@ void Tianjie::OpenTj()
 
     st << type << status << id << Stream::eos;
     
-    NETWORK()->Broadcast(st);
+    if (m_isNetOk)
+        NETWORK()->Broadcast(st);
 }
 	
 bool Tianjie::Init()
@@ -290,7 +292,6 @@ bool Tianjie::LoadFromDB()
          
             if (TimeUtil::Now() - m_openTime < TJ_EVENT_PROCESS_TIME)
             {
-                m_isNotRestart = false;
                 startTianjie(true);
             }
             else
@@ -702,7 +703,7 @@ void Tianjie::process(UInt32 now)
     	switch (m_notifyRate)
     	{
 	        case 1:
-	          if (m_isNotRestart)
+	          if (m_isNetOk)
                   SYSMSG_BROADCASTV(5002, 15); 
 	            m_notifyRate = 2;
 	            break;
@@ -711,7 +712,7 @@ void Tianjie::process(UInt32 now)
 				if (tm > 10*TIME_60)
 					return;
 				
-	            if (m_isNotRestart)
+	            if (m_isNetOk)
 			        SYSMSG_BROADCASTV(5002, 10);
 	            m_notifyRate = 3; 
 	            break;
@@ -719,7 +720,7 @@ void Tianjie::process(UInt32 now)
 	        case 3:
 				if (tm > 5*TIME_60)
 					return;
-	            if (m_isNotRestart)
+	            if (m_isNetOk)
 				    SYSMSG_BROADCASTV(5002, 5);
 	            m_notifyRate = 4;
 	            break;
@@ -728,12 +729,12 @@ void Tianjie::process(UInt32 now)
 				if (tm > 5)
 					return;
 	            m_notifyRate = 5;
+                m_isNetOk = true;
 	            startTianjie();
 	            break;
 				
 			case 5:
 				if (tm > (-1*TJ_EVENT_PROCESS_TIME)) //事件持续时间
-//                if (tm > (-1*720))
                     return;
 				closeTianjie();
 				m_notifyRate = 0;
@@ -778,7 +779,7 @@ void Tianjie::startTianjie(bool isRestart)
         start4(isRestart);
     }
 	DB1().PushUpdateData("update tianjie set is_execute=%d, is_finish=%d, rate=%d, r4_day=%d  where level = %d", 1, 0, m_currTjRate, m_bossDay, m_currOpenedTjLevel);	
-    m_isNotRestart = true;
+    m_isNetOk = true;
 }
 void Tianjie::closeTianjie()
 {
@@ -821,7 +822,7 @@ void Tianjie::closeTianjie()
     //下一步
     goNext();
 
-    m_isNotRestart = true;
+    m_isNetOk = true;
 }
 void Tianjie::goNext()
 {
@@ -885,7 +886,7 @@ void Tianjie::goNext()
 void Tianjie::start1()
 {	
     m_eventMaxNumber = 0;
-    if (m_isNotRestart)
+    if (m_isNetOk)
     {
         m_eventCurrNumber = 0;
         m_eventOldPercent = 0;
@@ -917,7 +918,7 @@ void Tianjie::start1()
 	}
 	printf("----------------------start1()\n");
 
-    if (m_isNotRestart)
+    if (m_isNetOk)
     {
         SYSMSG_BROADCASTV(5010);
         broadEvent1();
@@ -1051,7 +1052,8 @@ void Tianjie::close1()
     m_locNpcMap.clear();
     memset(m_rate1KilledCount, 0, sizeof(m_rate1KilledCount));
 
-    SYSMSG_BROADCASTV(5014);
+    if (m_isNetOk)
+        SYSMSG_BROADCASTV(5014);
 }
 void Tianjie::randomTask1Data(int roleLev,short& npcId, UInt8& color, int& exp)
 {
@@ -1074,7 +1076,7 @@ void Tianjie::randomTask1Data(int roleLev,short& npcId, UInt8& color, int& exp)
 void Tianjie::start2()
 {
     m_eventMaxNumber = 0;
-    if (m_isNotRestart)
+    if (m_isNetOk)
     {
         m_eventCurrNumber = 0;
         m_eventOldPercent = 0;
@@ -1087,7 +1089,7 @@ void Tianjie::start2()
    
     printf("----------------------start2()\n");
 
-    if (m_isNotRestart)
+    if (m_isNetOk)
     {
         SYSMSG_BROADCASTV(5020);
         broadEvent2();
@@ -1203,12 +1205,13 @@ void Tianjie::close2()
     printf("----------------------close2()\n");
     
     memset(m_rate2DonateCount, 0, sizeof(m_rate2DonateCount));
-    SYSMSG_BROADCASTV(5023, m_tjTypeId, m_currTjRate);
+    if (m_isNetOk)
+        SYSMSG_BROADCASTV(5023, m_tjTypeId, m_currTjRate);
 }
 void Tianjie::start3()
 {
     m_eventMaxNumber = 0;
-    if (m_isNotRestart)
+    if (m_isNetOk)
     {
         m_eventCurrNumber = 0;
         m_eventOldPercent = 0;
@@ -1219,7 +1222,7 @@ void Tianjie::start3()
 
     m_eventMaxNumber = s_maxTlzLevel;
 
-    if (m_isNotRestart)
+    if (m_isNetOk)
     {
         SYSMSG_BROADCASTV(5030);
         broadEvent3();
@@ -1332,7 +1335,8 @@ void Tianjie::close3()
 {
     printf("----------------------close3()\n");
 
-    SYSMSG_BROADCASTV(5033, m_tjTypeId, m_currTjRate);
+    if (m_isNetOk)
+        SYSMSG_BROADCASTV(5033, m_tjTypeId, m_currTjRate);
 }
 
 bool Tianjie::attackTlz(Player* pl, UInt16 level)
@@ -1439,7 +1443,7 @@ void Tianjie::start4(bool isRestart)
     {
         addNpc(s_tjBoss[m_bossIndex][0]);
  
-        if (m_isNotRestart)
+        if (m_isNetOk)
         {
             broadBossAppear(s_tjBoss[m_bossIndex][0], m_loc);
             broadBossCount(m_eventCurrNumber);

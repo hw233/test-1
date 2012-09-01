@@ -38,7 +38,7 @@ namespace GObject
         void setTj1Count(int count) {m_tj1Count = count;};
         void setTj2Count(int count) {m_tj2Count = count;};
         void setTj3Count(int count) {m_tj3Count = count;};
-        void setTj4BossHp(int maxHp) {m_tj4BossHp = maxHp;printf("----------------------------setbosshp:%d\n", m_tj4BossHp);};
+        void setTj4BossHp(int maxHp) {m_tj4BossHp = maxHp;};
     private:
         int m_tj1Count;
         int m_tj2Count;
@@ -49,7 +49,8 @@ namespace GObject
 		bool Init();
 		bool LoadFromDB();
         UInt8 getTjTypeId() {return m_tjTypeId;};
-
+        void setNetOk() {m_isNetOk = true;};
+       
         void onTianjieReq(GameMsgHdr&, const void*);
         void getTianjieData(Player* pl, bool isLogin=false);
         void getRate1DailyData(Player* pl, Stream& st);
@@ -141,7 +142,7 @@ namespace GObject
 		GData::NpcGroup* _ng;
 		multimap<int, int> m_locNpcMap; //据点上的怪物
 	    UInt8 m_tjTypeId;
-        bool m_isNotRestart;
+        bool m_isNetOk;
 
 		bool m_isTjOpened;         //天劫开启状态
 		bool m_isTjExecute;        //天劫事件是否正在运行

@@ -2887,7 +2887,7 @@ namespace GObject
         if (!ng)
             return false;
 
-        if (cfg.GMCheck && needtype && ng->getType()) // XXX: 必须是野外怪
+        if (cfg.GMCheck && needtype && ng->getType() &&  ng->getType() != 8) // XXX: 必须是野外怪,天劫怪除外
             return false;
 
 		if(GameAction()->RunExploreTask(this, npcId))

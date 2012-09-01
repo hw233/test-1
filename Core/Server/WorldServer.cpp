@@ -19,7 +19,7 @@
 #include "GObject/DCLogger.h"
 #include "GObject/SortWorker.h"
 #include "Common/StringTokenizer.h"
-
+#include "GObject/Tianjie.h"
 const char* s_HelpInfo = "";
 //////////////////////////////////////////////////////////////////////////
 WorldServer::WorldServer() : m_IsActive(false), curl(NULL)
@@ -349,6 +349,7 @@ void WorldServer::Up()
                 State("open", atoi(st[i].c_str()));
         }
     }
+    GObject::Tianjie::instance().setNetOk();
 }
 
 void WorldServer::Down()
