@@ -2,6 +2,7 @@
 *.o
 *.a
 *.swp
+*.obj
 cscope.*
 tags
 TAGS
@@ -11,3 +12,6 @@ build
 log
 obj
 reports
+Debug
+Release
+lib3rd

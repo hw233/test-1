@@ -14,7 +14,9 @@
 
 #include "Server/WorldServer.h"
 #include "Battle/BattleSimulator.h"
+#ifndef _WIN32
 #include "kingnet_analyzer.h"
+#endif
 #include "Script/lua_tinker.h"
 #include "Mail.h"
 #include "GObject/NewRelation.h"
@@ -39,7 +41,7 @@ namespace GObject
 #define PLAYER_BUFF_ATTR1			0x01
 #define PLAYER_BUFF_ATTR2			0x02
 #define PLAYER_BUFF_ATTR3			0x03
-#define PLAYER_BUFF_PROTECT			0x04    //??��?ӳ?
+#define PLAYER_BUFF_PROTECT			0x04    //??v?ӳ?
 #define PLAYER_BUFF_TRAINP1			0x05
 #define PLAYER_BUFF_TRAINP2			0x06
 #define PLAYER_BUFF_CLANMOVE		0x07	//??????ս????BUFF
@@ -47,7 +49,7 @@ namespace GObject
 #define PLAYER_BUFF_BOSSWEAK		0x09
 #define PLAYER_BUFF_TRAINP3			0x0A	//??Բ????????+80%
 #define PLAYER_BUFF_TRAINP4			0x0B	//??Բ????????+50%
-#define PLAYER_BUFF_ATHLETICS		0x0C	//???ھ???buffer, ?��??̴߳???
+#define PLAYER_BUFF_ATHLETICS		0x0C	//???ھ???buffer, ?=??̴߳???
 #define PLAYER_BUFF_PKLOCK			0x0D
 #define PLAYER_BUFF_WEAK			0x0E
 #define PLAYER_BUFF_HOLY			0x0F
@@ -59,10 +61,10 @@ namespace GObject
 #define PLAYER_BUFF_PWDLOCK			0x15	//5?????????? ????10????
 #define PLAYER_BUFF_ADVANCED_P_HOOK	0x16    //随身修为加速符: 20%
 #define PLAYER_BUFF_PRACTICE1       0x17	//修为加速: 50%
-//#define PLAYER_BUFF_PRACTICE2       0x17	//??��?ӳ?50% XXX: ??ʱ????
+//#define PLAYER_BUFF_PRACTICE2       0x17	//??v?ӳ?50% XXX: ??ʱ????
 //#define PLAYER_BUFF_XTHTYT          0x18	//??ʹ????????????Ԫ̥
 #define PLAYER_BUFF_ADVANCED_HOOK	0x18    //随身挂机加速符: 50%
-#define PLAYER_BUFF_WBOSS           0x19	//?Ѷ??????��?BOSS????
+#define PLAYER_BUFF_WBOSS           0x19	//?Ѷ??????=?BOSS????
 #define PLAYER_BUFF_YDOTR           0x20    //??????????ֵ?ܶ?
 #define PLAYER_BUFF_AUTOCOPY        0x21	//?Զ?????
 #define PLAYER_BUFF_ONLINE          0x22	//?ۻ?????ʱ??
@@ -92,13 +94,13 @@ namespace GObject
 #define PLAYER_BUFF_HIRA19          0x39    //  5507
 #define PLAYER_BUFF_HIRA20          0x3A    //  5508
 
-#define PLAYER_BUFF_HIPG            0x3B    // ?̹?֮��
-#define PLAYER_BUFF_HIBT            0x3C    // ???籦??
+#define PLAYER_BUFF_HIPG            0x3B    // ?̹?֮f
+#define PLAYER_BUFF_HIBT            0x3C    // ???篿?
 #define PLAYER_BUFF_HILN            0x3D    // ??Ԫ??ŭ
 #define PLAYER_BUFF_HIJZ            0x3E    // ???н???
 #define PLAYER_BUFF_HIESCAPE        0x3F    // Ӣ?۵?????
 
-#define PLAYER_BUFF_AMARTIAL_WIN    0x40    // ??????��ʤ??????
+#define PLAYER_BUFF_AMARTIAL_WIN    0x40    // ??????wʤ??????
 #define PLAYER_BUFF_YBUF            0x41
 #define PLAYER_BUFF_BBUF            0x42
 #define PLAYER_BUFF_N_ATHLETICS     0x44    //邀请斗剑冷却
@@ -122,7 +124,7 @@ namespace GObject
 #define SHIMEN_TASK_MAXCOUNT        5       // ʦ??ÿ????????????
 #define YAMEN_TASK_MAXCOUNT         5       // ʦ??ÿ????????????
 
-#define MAX_PRACTICE_FIGHTRES       10      // ??????��ɢ????
+#define MAX_PRACTICE_FIGHTRES       10      // ??????vɢ????
 
 #define MAX_TRIPOD_SOUL 100000
 #define POINT_PERMIN (60*10)
@@ -167,9 +169,9 @@ namespace GObject
         }
 
         UInt32 soul;    // Ԫ??ֵ
-        UInt8 fire;     // ????: 0-??ͨ?Ļ? 1-??Ŀ?λ? 2-???????? 3-??ľ???? 4-��??ڤ?? 5-???????? 6-???????? 
-        UInt8 quality;  // ????Ʒ?? 1-?? 2-?? 3-�� 4-?? 5-??
-        UInt8 awdst;    // ????״̬ 0-??��?? 1-δ??ȡ
+        UInt8 fire;     // ????: 0-??ͨ?Ļ? 1-??Ŀ?λ? 2-???????? 3-??ľ???? 4-v??ڤ?? 5-???????? 6-???????? 
+        UInt8 quality;  // ????Ʒ?? 1-?? 2-?? 3-6 4-?? 5-??
+        UInt8 awdst;    // ????״̬ 0-??v?? 1-δ??ȡ
         UInt8 needgen;  // ??Ҫ???????ɽ???
         UInt32 itemId;
         UInt8 num;
@@ -413,10 +415,10 @@ namespace GObject
 		std::string name;           // ????
 		UInt32 gold;	            // Ԫ??
 		UInt32 coupon;	            // ??ȯ
-		UInt32 tael;	            // ??��
+		UInt32 tael;	            // ??}
 		UInt32 coin;	            // ͭǮ
         UInt32 prestige;            // ????
-		UInt32 status;              // ״̬:0x01 - pk???? 0x02 - ?д迪 0x04 - С?????? 0x80 - ??ֹ̽??
+		UInt32 status;              // ״̬:0x01 - pk???? 0x02 - ?д轿0x04 - С?????? 0x80 - ??ֹ̽??
 		UInt8 country;              // ????
 		UInt8 title;                // ͷ??
 		UInt32 achievement;         // ս??
@@ -431,7 +433,7 @@ namespace GObject
 		UInt8 inCity;               // ????
 		UInt32 lastOnline;          // ?ϴ?????ʱ??
 		UInt64 newGuild;            // ????????????
-		UInt16 packSize;            // ???ұ?????��
+		UInt16 packSize;            // ???ұ?????
 		UInt8 mounts;               // ????
 		UInt8 gmLevel;              //
 		UInt8 icCount;              // ?һ????ٴ???
@@ -497,7 +499,7 @@ namespace GObject
 		{
 			ClanBattleFlag = 0x00000001,
 			CanTaskInit	= 0x00000002,
-			Challenging = 0x00000010,		//????״̬, ?��??̴߳???
+			Challenging = 0x00000010,		//????״̬, ?=??̴߳???
 			BeChallenging = 0x00000020,		//?Ǿ???״̬
 			SGPunish	= 0x00000040,		//???ٳͷ?
             AthPayForPage = 0x00000080,     //in athletics range for paging
@@ -1519,8 +1521,9 @@ namespace GObject
         void moneyLog(int type, int gold, int coupon = 0, int tael = 0, int achievement = 0, int prestige = 0);
         void actUdp(UInt8 type, std::string& p1, std::string& p2);
     private:
+#ifndef _WIN32
         CUserLogger* m_ulog;
-
+#endif
     public:
         void sendMailPack(UInt16 title, UInt16 content, lua_tinker::table items);
         void sendMailItem(UInt16 title, UInt16 content, MailPackage::MailItem* mitem, UInt16 size, bool bind = true);

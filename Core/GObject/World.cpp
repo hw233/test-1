@@ -29,7 +29,9 @@
 #include "WBossMgr.h"
 #include "HeroIsland.h"
 #include "MsgID.h"
+#ifndef _WIN32
 #include "DCLogger.h"
+#endif
 #include "TeamCopy.h"
 #include "ArenaBattle.h"
 #include "GData/Store.h"
@@ -737,10 +739,12 @@ void World::World_Online_Log( void * )
 {
 	UInt32 onlineNums=NETWORK()->getOnlineNum();
 	DBLOG1().PushUpdateData("insert into online_situations (server_id,divtime,num) values(%u,%u,%u)", cfg.serverLogId, TimeUtil::Now(), onlineNums);
+#ifndef _WIN32
 #ifdef _FB
 #else
     dclogger.online();
 #endif
+#endif // _WIN32
 }
 
 void World::World_Store_Check(void *)

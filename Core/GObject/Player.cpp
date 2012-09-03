@@ -44,7 +44,9 @@
 #include "FrontMap.h"
 #include "HeroIsland.h"
 #include "GObject/AthleticsRank.h"
+#ifndef _WIN32
 #include "DCLogger.h"
+#endif
 #include "ClanRankBattle.h"
 #include "TeamCopy.h"
 #include "HoneyFall.h"
@@ -523,8 +525,11 @@ namespace GObject
 		_availInit(false), _vipLevel(0), _clan(NULL), _clanBattle(NULL), _flag(0), _gflag(0), _onlineDuration(0), _offlineTime(0),
 		_nextTavernUpdate(0), _nextBookStoreUpdate(0), _bossLevel(21), _ng(NULL), _lastNg(NULL),
 		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), m_autoCopyFailed(false),
-        _justice_roar(0), _spirit_factor(1.0f), _diamond_privilege(false), _qqvip_privilege(false), _athlRivalBuf(0), _worldBossHp(0), m_autoCopyComplete(0), hispot(0xFF), hitype(0), m_ulog(NULL),
-        m_isOffical(false), m_sysDailog(false), m_hasTripod(false)
+        _justice_roar(0), _spirit_factor(1.0f), _diamond_privilege(false), _qqvip_privilege(false), _athlRivalBuf(0), _worldBossHp(0), m_autoCopyComplete(0), hispot(0xFF), hitype(0),
+#ifndef _WIN32
+		m_ulog(NULL),
+#endif
+		m_isOffical(false), m_sysDailog(false), m_hasTripod(false)
 	{
         m_ClanBattleStatus = 1;
         m_ClanBattleScore = 0;
@@ -1002,6 +1007,7 @@ namespace GObject
 
         char buf[64] = {0};
         snprintf(buf, sizeof(buf), "%"I64_FMT"u", _id);
+#ifndef _WIN32
         m_ulog = _analyzer.GetInstance(buf);
         if (m_ulog)
         {
@@ -1013,7 +1019,7 @@ namespace GObject
                 m_ulog->SetUserIP(inet_ntoa(inaddr));
             }
         }
-
+#endif
         if (!m_via.empty())
         {
             StringTokenizer via(m_via, "_");
@@ -1071,10 +1077,12 @@ namespace GObject
             }
 		}
 
+#ifndef _WIN32
 #ifdef _FB
 #else
         dclogger.login(this);
 #endif
+#endif // _WIN32
 	}
 
 #define WEBDOWNLOAD 255
@@ -1083,6 +1091,7 @@ namespace GObject
     void Player::udpLog(UInt8 platform, const char* str1, const char* str2, const char* str3, const char* str4,
                 const char* str5, const char* str6, const char* type, UInt32 count)
     {
+#ifndef _WIN32
         if (m_ulog && cfg.udplog)
         {
             char buf[1024] = {0};
@@ -1102,11 +1111,13 @@ namespace GObject
 
             TRACE_LOG("%s - (%s,%s,%s,%s,%s,%s,%s,%u)", buf, str1, str2, str3, str4, str5, str6, type, count);
         }
-    }
+#endif
+	}
 
     void Player::udpLog(const char* str1, const char* str2, const char* str3, const char* str4,
                 const char* str5, const char* str6, const char* type, UInt32 count)
     {
+#ifndef _WIN32
         if (m_ulog)
         {
             UInt8 platform = atoi(getDomain().c_str());
@@ -1115,6 +1126,7 @@ namespace GObject
 
             udpLog(platform, str1, str2, str3, str4, str5, str6, type, count);
         }
+#endif // _WIN32
     }
 
     void Player::udpLog(UInt32 type, UInt32 id, UInt32 num, UInt32 price, const char* op)
@@ -1159,7 +1171,8 @@ namespace GObject
         {
             for (int i = 0; i < 6; ++i)
                 memcpy(&World::_moneyIn[i], &World::_moneyIn[i+1], sizeof(World::_moneyIn[i]));
-            World::_moneyIn[6] = {{0,},};
+            //World::_moneyIn[6] = {{0,},};
+            memset(&World::_moneyIn, 0, sizeof(World::_moneyIn));
 
             DB8().PushUpdateData("INSERT INTO `money` (`time`, `type`, `gold`, `coupon`, `tael`, `achievement`, `prestige`) VALUES (%d,1,0,0,0,0,0)", today);
             DB8().PushUpdateData("INSERT INTO `money` (`time`, `type`, `gold`, `coupon`, `tael`, `achievement`, `prestige`) VALUES (%d,2,0,0,0,0,0)", today);
@@ -1810,10 +1823,12 @@ namespace GObject
             PopTimerEvent(this, EVENT_TIMETICK, getId());
 
         LogoutSaveOnlineTimeToday();
+#ifndef _WIN32
 #ifdef _FB
 #else
         dclogger.logout(this);
 #endif
+#endif // _WIN32
         heroIsland.playerOffline(this);
 		removeStatus(SGPunish);
         udpLog("", "", "", "", "", "2", "login");
@@ -2224,7 +2239,7 @@ namespace GObject
                  while(it != _fighters.end())
                  {
                       if(it->second->getId() >=  10 )
-                         minCol = min(minCol, it->second->getColor());
+                         minCol = std::min(minCol, it->second->getColor());
                        it ++ ;
                  }
 
@@ -3741,10 +3756,12 @@ namespace GObject
         {
             udpLog("qixi", "I_9122_1", "", "", "", "", "act", ci->itemNum);
         }
+#ifndef _WIN32
 #ifdef _FB
 #else
         dclogger.consume(this, _playerData.gold, c);
 #endif
+#endif // _WIN32
 		return _playerData.gold;
 	}
 
@@ -9050,10 +9067,12 @@ namespace GObject
                         GetPackage()->AddItem2(itemId, ydItem[j].itemNum, true, true);
                     }
 
+#ifndef _WIN32
 #ifdef _FB
 #else
                     dclogger.d3d6(this);
 #endif
+#endif // _WIN32
                 }
                 else
                 {
@@ -9154,10 +9173,12 @@ namespace GObject
                         GetPackage()->AddItem2(itemId, factor*ydItem[j].itemNum, true, true);
                     }
 
+#ifndef _WIN32
 #ifdef _FB
 #else
                     dclogger.blue(this);
 #endif
+#endif // _WIN32
                 }
                 else
                 {
@@ -10302,7 +10323,7 @@ namespace GObject
         {
             Stream st(REP::TOWN_DEAMON);
             st << static_cast<UInt8>(0x08);
-            string name = "";
+            std::string name = "";
             if(m_dpData->attacker)
                 name = m_dpData->attacker->getName();
 
@@ -11871,7 +11892,7 @@ namespace GObject
         m_qixi.event = event;
         m_qixi.score += score;
 
-        if(m_qixi.lover == NULL and m_qixi.score == score)
+        if(m_qixi.lover == NULL && m_qixi.score == score)
             DB1().PushUpdateData("REPLACE INTO `qixi` (`pos`, `event`, `score`, `bind`, `lover`, `playerId`) VALUES(%u, %u, %u, %u, 0, %"I64_FMT"u)", m_qixi.pos, m_qixi.event, m_qixi.score, m_qixi.bind, getId());
         else
             DB1().PushUpdateData("UPDATE `qixi` SET `pos`=%u, `event`=%u, `score`=%u WHERE `playerId` = %"I64_FMT"u", pos, event, m_qixi.score, getId());

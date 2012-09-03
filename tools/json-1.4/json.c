@@ -26,6 +26,9 @@
 #include <memory.h>
 #include <sys/types.h>
 
+#ifdef _WIN32
+#define snprintf _snprintf
+#endif
 
 enum LEX_VALUE
 { LEX_MORE = 0,

@@ -4,6 +4,10 @@
 #include "Platform.h"
 #ifndef _WIN32
 #include <sys/time.h>
+#else
+#include <Winbase.h>
+#include <time.h>
+#define localtime_r(t, tm) localtime_s(tm, t)
 #endif
 
 class TimeUtil

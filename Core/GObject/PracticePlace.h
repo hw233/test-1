@@ -74,7 +74,7 @@ struct PlaceData
 {
     PlaceData() : used(0)
     {
-        bzero(&place, sizeof(place));
+        memset(&place, 0, sizeof(place));
     }
     ~PlaceData() { }
 

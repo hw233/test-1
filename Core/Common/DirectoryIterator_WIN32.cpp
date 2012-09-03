@@ -1,7 +1,7 @@
 #include "DirectoryIterator_WIN32.h"
 #include "File_WIN32.h"
 #include "Path.h"
-
+#include "File.h"
 
 
 
