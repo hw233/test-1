@@ -14,19 +14,26 @@
 #include "Cfg.h"
 #include "SysMsg.h"
 #include "Common/TimeUtil.h"
-#include "kingnet_analyzer.h"
+#ifndef _WIN32
 #include "GObject/DCWorker.h"
 #include "GObject/DCLogger.h"
+#include "kingnet_analyzer.h"
+#endif
 #include "GObject/SortWorker.h"
 #include "Common/StringTokenizer.h"
 
 const char* s_HelpInfo = "";
 //////////////////////////////////////////////////////////////////////////
-WorldServer::WorldServer() : m_IsActive(false), curl(NULL)
+WorldServer::WorldServer() : m_IsActive(false)
+#ifndef _WIN32
+	, curl(NULL)
+#endif
 {
 	memset(m_AllWorker, 0x00, sizeof(m_AllWorker));
 	m_TcpService = NULL;
+#ifndef _WIN32
     curl = curl_easy_init();
+#endif
 }
 
 WorldServer::~WorldServer()
@@ -36,7 +43,9 @@ WorldServer::~WorldServer()
 		delete m_AllWorker[i];
 	}
 	//delete m_TcpService;
+#ifndef _WIN32
     if (curl) curl_easy_cleanup(curl);
+#endif
 }
 
 bool WorldServer::ParseCommandInfor(Int32 argc, char * argv[])
@@ -79,6 +88,8 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 	cfg.load(scriptStr);
 	globalSysMsg.load();
 	Battle::battleReport.init();
+
+#ifndef _WIN32
 #ifdef _FB
     _analyzer.Init("./conf/udplogfb.xml");
 #else
@@ -87,6 +98,7 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 #ifdef _FB
 #else
     GObject::dclogger.init();
+#endif
 #endif
 
     if (!num)
@@ -135,10 +147,10 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 
 	worker = WORKER_THREAD_SORT;
 	m_AllWorker[worker] = new WorkerThread<GObject::SortWorker>(new GObject::SortWorker(0, WORKER_THREAD_SORT));
-
+#ifndef _WIN32
 	worker = WORKER_THREAD_DC;
 	m_AllWorker[worker] = new WorkerThread<GObject::DCWorker>(new GObject::DCWorker(0, WORKER_THREAD_DC));
-
+#endif
 	worker = WORKER_THREAD_DB;
 	m_AllWorker[worker] = new WorkerThread<DB::DBWorker>(new DB::DBWorker(0, WORKER_THREAD_DB));
 	worker = WORKER_THREAD_DB1;
@@ -163,8 +175,10 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 	worker = WORKER_THREAD_DB_LOG1;
 	m_AllWorker[worker] = new WorkerThread<DB::DBWorker>(new DB::DBWorker(1, WORKER_THREAD_DB_LOG1));
 
+#ifndef _WIN32
 	worker = WORKER_THREAD_DC;
 	m_AllWorker[worker]->Run();
+#endif
 
 	//启动数据库线程处理
 	worker = WORKER_THREAD_DB;
@@ -278,7 +292,7 @@ void WorldServer::Shutdown()
 	//关闭所有工作线程
 	for (worker = 0; worker < MAX_THREAD_NUM; worker++)
 	{
-		if(worker <= WORKER_THREAD_DC)
+		if(worker < WORKER_THREAD_DB)
 			m_AllWorker[worker]->Shutdown();
 	}
 
@@ -302,16 +316,19 @@ static int recvret(char* data, size_t size, size_t nmemb, char* buf)
 {
     size_t nsize = size * nmemb;
     if (nsize > MAX_RET_LEN) {
-        bcopy(data, buf, MAX_RET_LEN);
+        //bcopy(data, buf, MAX_RET_LEN);
+		memcpy(buf, data, MAX_RET_LEN);
         return MAX_RET_LEN;
     }   
 
-    bcopy(data, buf, nsize);
+	memcpy(buf, data, nsize);
+    //bcopy(data, buf, nsize);
     return nsize;
 }
 
 void WorldServer::State(const char* action, int serverNum)
 {
+#ifndef _WIN32
     if (!curl || !action || !serverNum)
         return;
     char url[4096] = {0};
@@ -335,6 +352,7 @@ void WorldServer::State(const char* action, int serverNum)
     {
         fprintf(stderr, "URL: %s [ERROR]\n", url);
     }
+#endif
 }
 
 void WorldServer::Up()
@@ -367,15 +385,17 @@ GObject::World& WorldServer::GetWorld()
 	return Worker<GObject::World>(WORKER_THREAD_WORLD);
 }
 
-GObject::DCWorker& WorldServer::GetSort()
+GObject::SortWorker& WorldServer::GetSort()
 {
-	return Worker<GObject::DCWorker>(WORKER_THREAD_SORT);
+	return Worker<GObject::SortWorker>(WORKER_THREAD_SORT);
 }
 
+#ifndef _WIN32
 GObject::DCWorker& WorldServer::GetDC()
 {
 	return Worker<GObject::DCWorker>(WORKER_THREAD_DC);
 }
+#endif
 
 DB::DBWorker& WorldServer::GetDB()
 {

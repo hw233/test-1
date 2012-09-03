@@ -20,6 +20,7 @@ void OnCheckPackKey( LoginMsgHdr& hdr, const void * data )
     UInt8 ret = 0;
     UInt8 type = 0xFF;
     size_t len = strlen(key->key);
+#ifndef _WIN32
     if (cfg.GMCheck)
     {
         memcached_return rc;
@@ -98,6 +99,7 @@ void OnCheckPackKey( LoginMsgHdr& hdr, const void * data )
         }
     }
     else
+#endif // _WIN32
     {
         UInt8 type = 0xFF;
         if (isdigit(key->key[0]) && key->key[1] == '-')

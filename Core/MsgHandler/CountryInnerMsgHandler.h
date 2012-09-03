@@ -23,7 +23,9 @@
 #include "Common/Itoa.h"
 #include "Script/BattleFormula.h"
 #include "GObject/Clan.h"
+#ifndef _WIN32
 #include "GObject/DCLogger.h"
+#endif
 #include "GObject/ShuoShuo.h"
 #include "Common/StringTokenizer.h"
 
@@ -876,11 +878,13 @@ void OnGoldRecharge( GameMsgHdr& hdr, const void * data )
         snprintf(nno, 256, "%s#%s", recharge->uint, recharge->no);
         player->udpLog(nno, recharge->money, gold, id, "", "pay", "pay");
 
+#ifndef _WIN32
 #ifdef _FB
 #else
         UInt32 mny = atoi(recharge->money);
         dclogger.fee(player, 0, mny);
 #endif
+#endif //_WIN32
     }
     else
     {
@@ -1082,10 +1086,12 @@ void OnCreateAward(GameMsgHdr& hdr, const void * data)
     else
         player->udpLog("", "", "", "", "", "", "refer");
     player->sendCreateMail();
+#ifndef _WIN32
 #ifdef _FB
 #else
     dclogger.reg(player);
 #endif
+#endif //_WIN32
 }
 
 void OnRunScriptReq( GameMsgHdr&, const void * data )

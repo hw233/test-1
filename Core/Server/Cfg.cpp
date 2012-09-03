@@ -5,8 +5,10 @@
 #include "Script/DepartDBScript.h"
 #include "Common/StringTokenizer.h"
 
+#ifndef _WIN32
 #include <sys/ioctl.h> // for ioctl
 #include <net/if.h> // for struct ifreq, IF_NAMESIZE
+#endif
 
 Cfg::Cfg( ): tcpPort(8888), serverIp(0), serverLogId(0), dbDataPort(3306), dbObjectPort(3306),
     fbVersion(false), vtVersion(false), debug(false),
@@ -44,6 +46,7 @@ void Cfg::setIfName(const char* iname)
     if (fd < 0)
         return;
 
+#ifndef _WIN32
     struct ifreq ifr;
     size_t ilen = strlen(ifName.c_str());
     ilen = ilen > IF_NAMESIZE ? IF_NAMESIZE - 1: ilen;
@@ -53,6 +56,7 @@ void Cfg::setIfName(const char* iname)
         return;
 
     serverIp = ((struct sockaddr_in*)&ifr.ifr_addr)->sin_addr.s_addr;
+#endif
 }
 
 Cfg::IPMask Cfg::parseAddress(const std::string& addr)

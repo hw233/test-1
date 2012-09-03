@@ -3118,7 +3118,7 @@ int ToMsgCenter(Stream st)
     stMsg.prepend((UInt8*)&packlen, sizeof(packlen));
     	
     int len = 0;
-	if((len = sendto(sockfd, stMsg, stMsg.size(), 0, (struct sockaddr*)&addr, sizeof(struct sockaddr_in))) < 0)
+	if((len = sendto(sockfd, (const char*)(UInt8*)stMsg, stMsg.size(), 0, (struct sockaddr*)&addr, sizeof(struct sockaddr_in))) < 0)
 	{
 		close(sockfd);
 		return E_FAIL;
