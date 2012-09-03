@@ -1,4 +1,4 @@
-#ifndef _GOBJECTDBEXECHELPER_H_
+﻿#ifndef _GOBJECTDBEXECHELPER_H_
 #define _GOBJECTDBEXECHELPER_H_
 
 #include "DB/DBExecHelper.h"
@@ -1572,7 +1572,7 @@ SPECIALDEF(4)
 	(
 	UInt8, id,
 	UInt8, type,
-	UInt16, location, 
+	UInt16, location,
 	std::string, npcgroups
 	)
 SPECIALEND()
@@ -2152,7 +2152,7 @@ SPECIALDEF(6)
     UInt8, spot,
     UInt8, count,
     UInt8, status,
-    UInt8, lootlvl 
+    UInt8, lootlvl
 )
 SPECIALEND()
 
@@ -2174,7 +2174,7 @@ SPECIALDEF(8)
     UInt32, awardID,
     UInt32, point,
     UInt32, award,
-    std::string, flags,   
+    std::string, flags,
     UInt32, scores,
     UInt32, propsID
 )
@@ -2245,7 +2245,7 @@ SPECIALBEGIN(GObject::DBRNR)
 SPECIALDEF(2)
 (
     UInt64, id,
-    std::string, record 
+    std::string, record
 )
 SPECIALEND()
 

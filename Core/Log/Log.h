@@ -1,4 +1,4 @@
-#ifndef LOG_INC
+﻿#ifndef LOG_INC
 #define LOG_INC
 
 #define APP_ERROR		1
@@ -165,14 +165,14 @@ enum ItemTo
 	ToExchange,
 	ToExchangeSet,
 	ToDesdroy, // ToTripod
-	ToDetachGemDesdroy,	
+	ToDetachGemDesdroy,
 	ToUse,
 	ToClanDonate,
 	ToGemMgerge,
 	ToActivateAttr,
-	ToGemAttach,	
-	ToTrainFighter,	
-	ToTrumpUpgrade,	
+	ToGemAttach,
+	ToTrainFighter,
+	ToTrumpUpgrade,
     ToEquipUpgrade,
     ToForgeFighter,
     ToSecondSoul,
@@ -270,11 +270,11 @@ private:
 #define LOG()			WorkerThread<WorkerRunner<> >::LocalWorker().GetLog()
 #else
 
-#define ERROR_LOG(fmt, ...) 
-#define WARN_LOG(fmt, ...)	
-#define DEBUG_LOG(fmt, ...)	
-#define INFO_LOG(fmt, ...)	
-#define TRACE_LOG(fmt, ...)	
+#define ERROR_LOG(fmt, ...)
+#define WARN_LOG(fmt, ...)
+#define DEBUG_LOG(fmt, ...)
+#define INFO_LOG(fmt, ...)
+#define TRACE_LOG(fmt, ...)
 
 #endif
 

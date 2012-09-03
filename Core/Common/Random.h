@@ -43,16 +43,16 @@ public:
 
 	UInt32 next(UInt32 n);
 		/// Returns the next 31-bit pseudo random number modulo n.
-	
+
 	char nextChar();
 		/// Returns the next pseudo random character.
-	
+
 	bool nextBool();
 		/// Returns the next boolean pseudo random value.
-		
+
 	float nextFloat();
 		/// Returns the next float pseudo random number between 0.0 and 1.0.
-		
+
 	double nextDouble();
 		/// Returns the next double pseudo random number between 0.0 and 1.0.
 
@@ -97,13 +97,13 @@ inline bool Random::nextBool()
 	return (next() & 0x1000) != 0;
 }
 
-	
+
 inline float Random::nextFloat()
 {
 	return float(next()) / 0x7FFFFFFF;
 }
 
-	
+
 inline double Random::nextDouble()
 {
 	return double(next()) / 0x7FFFFFFF;

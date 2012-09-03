@@ -1,4 +1,4 @@
-
+﻿
 #ifndef _GVAR_H_
 #define _GVAR_H_
 
@@ -17,7 +17,7 @@ namespace GObject
         GCYCLE_WEEK =    4,  //周
         GCYCLE_MONTH =   5,  //月
         GCYCLE_YEAR =    6,  //年
-        
+
         GCYCLE_MAX,
     };
 
@@ -34,7 +34,7 @@ namespace GObject
 #define GREGISTER_VAR(Var, Type) \
     m_VarTypes[Var] = Type;
 
-    /** 
+    /**
      *@brief 变量系统
      */
     class GVarSystem : public Singleton<GVarSystem>
@@ -52,7 +52,7 @@ namespace GObject
             GREGISTER_VAR(GVAR_CITTASPLIT, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_CITTASMERGE, GCYCLE_NONE);
         }
-        
+
         UInt32 GetVar(UInt32 id, UInt32 now = 0);
         void SetVar(UInt32 id, UInt32 data, UInt32 now = 0);
         void AddVar(UInt32 id, UInt32 data, UInt32 now = 0);

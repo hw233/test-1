@@ -80,7 +80,7 @@ typedef std::map<UInt64, PreliminaryPlayerListIterator> PreliminaryPlayerListMap
 struct PlayerLess
 {
      bool operator()(const PreliminaryPlayerListIterator p1, const PreliminaryPlayerListIterator p2) const
-     {       
+     {
          return p1->battlePoint > p2->battlePoint;
      }
 };

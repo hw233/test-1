@@ -1,4 +1,4 @@
-#include "GVar.h"
+﻿#include "GVar.h"
 #include "Config.h"
 #include "Server/WorldServer.h"
 
@@ -33,7 +33,7 @@ namespace GObject
         if(id >= GVAR_MAX || m_Vars[id] == 0) return 0;
 
         if(CheckReset(id , now)) UpdateDB(id);
-        
+
         return m_Vars[id];
     }
 
@@ -79,7 +79,7 @@ namespace GObject
             now += m_Offset;
 
         if(now < m_OverTime[id]) return false;
-        
+
         UInt32 oldtime = m_OverTime[id];
 
         switch(m_VarTypes[id])

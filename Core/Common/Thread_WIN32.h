@@ -9,7 +9,7 @@
 
 class  ThreadImpl
 {
-public:	
+public:
     typedef DWORD TIDImpl;
 	typedef void (*Callable)(void*);
 
@@ -26,7 +26,7 @@ public:
 		}
 
 		Callable  callback;
-		void*     pData; 
+		void*     pData;
 	};
 
 	enum Priority
@@ -38,7 +38,7 @@ public:
 		PRIO_HIGHEST_IMPL = THREAD_PRIORITY_HIGHEST
 	};
 
-	ThreadImpl();				
+	ThreadImpl();
 	~ThreadImpl();
 
 	TIDImpl tidImpl() const;
@@ -60,7 +60,7 @@ public:
 	static void yieldImpl();
 	static ThreadImpl* currentImpl();
 	static TIDImpl currentTidImpl();
-    
+
 protected:
 #if defined(_DLL)
 	static DWORD WINAPI runnableEntry(LPVOID pThread);
@@ -98,7 +98,7 @@ private:
 		{
 			TlsSetValue(_slot, pThread);
 		}
-	
+
 	private:
 		DWORD _slot;
 	};

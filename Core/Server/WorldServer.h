@@ -42,7 +42,7 @@ public:
 	void UnInit();
 	void SetActive(bool active);
 	bool IsActive() const;
-	
+
 public:
 	GObject::Country& GetCountry(UInt8 worker);
 	GObject::World& GetWorld();

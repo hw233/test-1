@@ -54,7 +54,7 @@ Zip::size_type Zip::zip(std::vector<data_type>& dst,
 
         ret = deflate(&m_stream, Z_FINISH);
         if (ret == Z_STREAM_END || ret == Z_MEM_ERROR)
-            break; 
+            break;
 
         if (ret == Z_BUF_ERROR || !m_stream.avail_out) {
             dst.resize(dst.size() << 1);
@@ -101,7 +101,7 @@ Zip::size_type Zip::unzip(
 
         ret = inflate(&m_stream, Z_NO_FLUSH);
         if (ret == Z_STREAM_END || ret == Z_MEM_ERROR)
-            break; 
+            break;
 
         if (ret == Z_BUF_ERROR || !m_stream.avail_out) {
 #ifndef NDEBUG
@@ -174,7 +174,7 @@ Zip::size_type Zip::zip(pointer* dst, const_pointer src, size_type srclen, level
 
         ret = deflate(&m_stream, Z_FINISH);
         if (ret == Z_STREAM_END || ret == Z_MEM_ERROR)
-            break; 
+            break;
 
         if (ret == Z_BUF_ERROR || !m_stream.avail_out) {
 #ifndef NDEBUG
@@ -241,7 +241,7 @@ Zip::size_type Zip::unzip(pointer* dst, const_pointer src, size_type srclen)
 
         ret = inflate(&m_stream, Z_NO_FLUSH);
         if (ret == Z_STREAM_END || ret == Z_MEM_ERROR)
-            break; 
+            break;
 
         if (ret == Z_BUF_ERROR || !m_stream.avail_out) {
 #ifndef NDEBUG

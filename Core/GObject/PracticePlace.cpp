@@ -1,4 +1,4 @@
-
+﻿
 #include "Config.h"
 #include "Player.h"
 #include "Package.h"
@@ -402,7 +402,7 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
         msg.id = AtyPractice;
         GameMsgHdr hdr(0x245, pl->getThreadId(), pl, sizeof(stActivityMsg));
         GLOBAL().PushMsg(hdr, &msg);
- 
+
         //pl->send(st);
         return true;
     }
@@ -727,9 +727,9 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
     {
         if (!pl || !place)
             return false;
-        if (place == PPLACE_MAX) // XXX: 
+        if (place == PPLACE_MAX) // XXX:
             return false;
-        
+
         if (idx > m_places[place-1].data.size())
             return false;
 
@@ -746,7 +746,7 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
             return false;
         }
 #endif
-        
+
         Stream st(REP::PRACTICE_ROB);
         Player* def = 0;
         bool sumfalg = false;
@@ -823,7 +823,7 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
         pl->PutFighters(bsim, 0, true);
         def->PutFighters(bsim, 1, true);
         bsim.start();
-        
+
         Stream st(REP::PRACTICE_ROB);
         Stream& packet = bsim.getPacket();
         if(packet.size() <= 8) {
@@ -869,7 +869,7 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
                     owner->send(st);
                 }
             }
-        } 
+        }
         else
         {
             st << static_cast<UInt8>(1);
@@ -929,7 +929,7 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
         const std::vector<UInt32>& golds = GData::GDataManager::GetGoldOpenSlot();
         if (!golds.size() || pd.place.openslot >= golds.size())
             return false;
-        UInt32 price = golds[pd.place.openslot]; 
+        UInt32 price = golds[pd.place.openslot];
         if (pl->getGold() < price)
         {
             pl->sendMsgCode(0, 1101);

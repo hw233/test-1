@@ -10,7 +10,7 @@ struct ClanSkillTableData
 {
 	ClanSkillTableData(UInt16 id = 0, const std::string& name = std::string(),
             UInt8 level = 0, UInt32 needs = 0, UInt32 value = 0)
-        : id(id), name(name), level(level), needs(needs), value(value) {} 
+        : id(id), name(name), level(level), needs(needs), value(value) {}
 
     ClanSkillTableData(const ClanSkillTableData& cstd)
     {

@@ -69,7 +69,7 @@ namespace Network
 			}
 			if(len <= 0)
 				return;
-			
+
 			char * data = new(std::nothrow) char[len];
 			if(data == NULL)
 				evbuffer_drain(buffer, len);

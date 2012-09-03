@@ -205,8 +205,8 @@ void HeroMemo::updateToDB()
     std::string memos;
 
     UInt32 size = m_awards.size();
-    for (UInt32 i = 0; i < size; ++i) 
-    {   
+    for (UInt32 i = 0; i < size; ++i)
+    {
         awards += Itoa(m_awards[i]);
         if(i != size - 1)
             awards += ",";

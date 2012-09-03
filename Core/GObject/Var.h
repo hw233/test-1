@@ -1,4 +1,4 @@
-
+﻿
 #ifndef _VAR_H_
 #define _VAR_H_
 
@@ -16,19 +16,19 @@ namespace GObject
         CYCLE_WEEK =    4,  //周
         CYCLE_MONTH =   5,  //月
         CYCLE_YEAR =    6,  //年
-        
+
         CYCLE_MAX,
     };
 
 
     enum VarID
     {
-        VAR_INVALID = 0,    //??Ч??��
+        VAR_INVALID = 0,    //??Ч??
         VAR_SINGLE_CHOPSTICKS = 1, //???????Ϳ???
         VAR_SENGYI = 2,     // ɮ??
         VAR_APRON = 3,      // ?Ƕ?
         VAR_TGDT = 4,       // ?ж???????ʱ??
-        VAR_TGDCNT = 5,     // ?ж???��??????3Сʱ????
+        VAR_TGDCNT = 5,     // ?ж???l??????3Сʱ????
         VAR_ATOFM = 6,     // ?Զ???ͼid
         VAR_ICEMAN = 7,     // ѩ??
         VAR_BOOT = 8,     // ʥ??ѥ
@@ -41,7 +41,7 @@ namespace GObject
         VAR_KEYPACK6 = 15,
         VAR_KEYPACK7 = 16,
         VAR_KEYPACK8 = 17,
-       
+
         VAR_FAIL_ENCH = 20,  // fail to enchat equip
         VAR_SPLIT_EQUIP = 21 , //split equip times
         VAR_SPLIT_THRUMP = 22,//split thrump times
@@ -51,7 +51,7 @@ namespace GObject
         VAR_BATTLE_FJ = 26,  //???????
         VAR_BATTLE_SKILL_DMG = 27, //???????
         VAR_BATTLE_PEERLESS_DMG = 28,//????????
-        
+
         VAR_COUNTRY_BATTLE_WIN =29,
         VAR_ATHLETICS_WIN = 30 ,
 
@@ -66,7 +66,7 @@ namespace GObject
         VAR_YELLOW_THRUMP_NUM= 38,
 
         VAR_AWARD_3366 = 39,
-        
+
         VAR_CLANBATTLE_HONOUR = 40, //帮派战今日贡献
         VAR_CLAN_WEAL = 41,         //今日领取的福利数
 
@@ -209,7 +209,7 @@ namespace GObject
     m_VarTypes[Var] = Type;
 
 
-    /** 
+    /**
      *@brief 变量系统
      */
     class VarSystem
@@ -262,7 +262,7 @@ namespace GObject
             REGISTER_VAR(VAR_PURPLE_EQUIP_NUM, CYCLE_NONE);
             REGISTER_VAR(VAR_YELLOW_EQUIP_NUM, CYCLE_NONE);
             REGISTER_VAR(VAR_YELLOW_THRUMP_NUM, CYCLE_NONE);
-            
+
             REGISTER_VAR(VAR_AWARD_3366, CYCLE_DAY);
             REGISTER_VAR(VAR_AWARD_QPLUS, CYCLE_DAY);
             REGISTER_VAR(VAR_AWARD_SSDT_1, CYCLE_DAY);
@@ -388,7 +388,7 @@ namespace GObject
             REGISTER_VAR(VAR_QQVIP_CNT, CYCLE_DAY);
             REGISTER_VAR(VAR_BDIAMOND_CMD, CYCLE_DAY);
         }
-        
+
         UInt32 GetVar(UInt32 id, UInt32 now = 0);
         void SetVar(UInt32 id, UInt32 data, UInt32 now = 0);
         void AddVar(UInt32 id, UInt32 data, UInt32 now = 0);

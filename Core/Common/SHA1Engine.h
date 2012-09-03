@@ -19,7 +19,7 @@ public:
 
 	SHA1Engine();
 	~SHA1Engine();
-		
+
 	unsigned digestLength() const;
 	void reset();
 	const DigestEngine::Digest& digest();

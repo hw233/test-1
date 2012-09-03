@@ -13,7 +13,7 @@ struct TradeCheckData
 	Player * _trader;
 
 	TradeCheckData(UInt32 id = 0) : _id(id), _time(0), _trader(NULL){}
-	TradeCheckData(UInt32 id, UInt32 time, Player* trader) : _id(id), _time(time), _trader(trader) {} 
+	TradeCheckData(UInt32 id, UInt32 time, Player* trader) : _id(id), _time(time), _trader(trader) {}
 };
 
 class TradeCheck

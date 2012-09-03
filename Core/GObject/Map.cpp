@@ -1,4 +1,4 @@
-#include "Config.h"
+﻿#include "Config.h"
 #include "Map.h"
 #include "Fighter.h"
 #include "GObjectManager.h"
@@ -54,7 +54,7 @@ void Map::changebyStatus(Player *pl)
 	UInt8 status = getIndexbyPK(pl);
 	MapPlayer::iterator it = find(country, status, pl);
 	if(it != _playerList[country][status].end())
-		_playerList[country][status].erase(it);	
+		_playerList[country][status].erase(it);
 	_playerList[country][1-status].insert(pl);
 #endif
 }
@@ -284,7 +284,7 @@ void Map::SendAtCity(Player * pl, bool inCity, bool notify)
 	{
 		UInt8 c = 0;
 		Stream st(REP::MAP_SAMPLEUSER);
-		
+
 		st << static_cast<UInt8>(0);
 		for(UInt32 i = 0; i < COUNTRY_MAX && c <= MAX_NUM; i ++)
 		{
@@ -299,7 +299,7 @@ void Map::SendAtCity(Player * pl, bool inCity, bool notify)
 						if(player != pl && (player)->isOnline())
 						{
 							st << player->getName() << player->getPF() << player->GetClassAndSex() << player->getCountry() << player->GetLev() << static_cast<UInt8>(PLAYER_DATA(player, status));
-							++ c;							
+							++ c;
 						}
 					}
 				}
@@ -351,7 +351,7 @@ void Map::SendAtCity(Player * pl, bool inCity, bool notify)
 		st << Stream::eos;
 		pl->send(st);
 	}
-	
+
 	SpotData * sd = GetSpot(PLAYER_DATA(pl, location));
 	if(sd == NULL)
 		return;
@@ -361,7 +361,7 @@ void Map::SendAtCity(Player * pl, bool inCity, bool notify)
 	}
 }
 
-MapPlayer::iterator Map::find(UInt8 country, UInt8 status, Player *player) 
+MapPlayer::iterator Map::find(UInt8 country, UInt8 status, Player *player)
 {
 	using namespace std::placeholders;
 	MapPlayer::iterator it = std::find_if(_playerList[country][status].begin(), _playerList[country][status].end(), std::bind(find_player, _1, player));
@@ -380,7 +380,7 @@ UInt32 Map::getCityPlayerNum()
 	}
 
 	return count;
-	
+
 }
 
 void Map::Broadcast( SpotData * sd, Stream& st, Player * pl )
@@ -445,7 +445,7 @@ void Map::Broadcast2( const void * buf, int size, UInt8 cny, Player * pl )
 }
 
 void Map::Broadcast( const void * buf, int size, Player * pl )
-{ 
+{
 	if(pl == NULL)
 	{
         // XXX: Only broadcast to current thread

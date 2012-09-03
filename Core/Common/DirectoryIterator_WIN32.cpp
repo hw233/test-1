@@ -22,7 +22,7 @@ DirectoryIteratorImpl::DirectoryIteratorImpl(const std::string& path): _fh(INVAL
 	else
 	{
 		_current = _fd.cFileName;
-		if (_current == "." || _current == "..")	
+		if (_current == "." || _current == "..")
 			next();
 	}
 }

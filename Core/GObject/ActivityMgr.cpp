@@ -1,4 +1,4 @@
-#include "Config.h"
+﻿#include "Config.h"
 #include "ActivityMgr.h"
 #include "Player.h"
 #include "Common/StringTokenizer.h"
@@ -78,7 +78,7 @@ UInt8 ActivityMgr::GetFlag(UInt32 idx )
     else
         return _item.flag[idx];
 }
-/** 
+/**
  *  更新标志位
  */
 void ActivityMgr::UpdateFlag(UInt32 idx,  UInt8 v)
@@ -121,7 +121,7 @@ void ActivityMgr::SubScores(UInt32 v)
 {
     if(v <= 0) return;
     _item.scores -= v;
-    if(_item.scores < 0) 
+    if(_item.scores < 0)
         _item.scores = 0;
 }
 
@@ -157,7 +157,7 @@ UInt8 ActivityMgr::GetOnlineRewardGetNum()
 void ActivityMgr::GetOnlineReward(UInt8 cnt)
 {
     lua_tinker::table t = GameAction()->GetOnlineReward(cnt);
-    
+
     UInt32 size = t.size();
     for(UInt32 i = 0; i < size; i++)
     {
@@ -238,12 +238,12 @@ void ActivityMgr::ChangeOnlineReward()
      _owner->send(st);
 }
 /**
- *  获取奖励 
+ *  获取奖励
  */
 void ActivityMgr::GetReward(UInt32 flag)
 {
     CheckTimeOver();
-    
+
     if(flag != AtyOnlineReward && _item.award & flag)
         return;
 
@@ -320,7 +320,7 @@ inline UInt8 GetAtyIDInClient(UInt32 item_enum)
     return  static_cast<UInt8>(item_enum + 1);
 }
 void ActivityMgr::SendActivityInfo(Stream& s)
-{ 
+{
     UInt8 c1, m1 = 0;
     UInt8 c2,  m2 = 0;
     UInt8 c3,  m3 = 0;
@@ -329,7 +329,7 @@ void ActivityMgr::SendActivityInfo(Stream& s)
     //刷新活跃度
     c1 =static_cast<UInt8>( GameAction()->GetMaxActivity(vipLevel));
     s<< static_cast<UInt8>(_item.point) << c1;
-    //刷新活跃度签到积分、待兑换道具id 
+    //刷新活跃度签到积分、待兑换道具id
     s<< static_cast<UInt32>(_item.scores) << static_cast<UInt8>(_item.flag[AtySignIn]);
     lua_tinker::table props = GameAction()->GetExchangeProps(_item.propsID);
     s<< static_cast<UInt16>(_item.propsID) << props.get<UInt8>(3) << props.get<UInt16>(2);
@@ -404,7 +404,7 @@ void ActivityMgr::SendActivityInfo(Stream& s)
     s << GetAtyIDInClient(AtyTownDeamon) << static_cast<UInt8>(_owner->GetVar(VAR_TOWNDEAMON)) << static_cast<UInt8>(1);
     s << GetAtyIDInClient(AtyShuoShuo) << static_cast<UInt8>(_owner->GetVar(VAR_SHUOSHUO)) << static_cast<UInt8>(1);
     s << GetAtyIDInClient(AtyInvited) << static_cast<UInt8>(_owner->GetVar(VAR_INVITED)) << static_cast<UInt8>(1);
-    
+
     for(UInt32 i = 0 ; i <  AtyMaxFlag; i ++  )
     {
         c1 = static_cast<UInt8>(_item.flag[i]);
@@ -443,7 +443,7 @@ void ActivityMgr::ActivityList(UInt8 type)
 {
     //自我刷新一下
     CheckTimeOver();
-    
+
     UInt32 time = 0;
     //上线时间检查
     if(_item.flag[AtyLongTime]  == 0)

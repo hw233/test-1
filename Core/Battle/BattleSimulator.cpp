@@ -1,4 +1,4 @@
-#include "Config.h"
+﻿#include "Config.h"
 #include "BattleSimulator.h"
 #include "GObject/Country.h"
 #include "Server/WorldServer.h"
@@ -206,7 +206,7 @@ UInt32 BattleSimulator::clearLastBattle(UInt8 side, bool isLast)
         _packet.data<UInt32>(4) = _id;
     }
 
-    UInt32 oldID = _id; 
+    UInt32 oldID = _id;
     if(!isLast)
     {
         _id = IDGenerator::gBattleOidGenerator.ID();
@@ -501,7 +501,7 @@ void BattleSimulator::start(UInt8 prevWin)
                     bf->getFighter()->getAllUpSkillAndLevel(_packet);
                     bf->getFighter()->getAllPSkillAndLevel(_packet);
                     bf->getFighter()->getAllSSAndLevel(_packet);
-                    
+
 					if(ismain && (prevWin-1) != i)
 					{
                         bf->postInit();
@@ -594,7 +594,7 @@ void  BattleSimulator::SendAttainMsgToPlayer( GObject::Player* player, UInt32 id
 #ifdef NO_ATTAINMENT
      return;
 #endif
-                 stAttainMsg  msg; 
+                 stAttainMsg  msg;
                  msg.attainID = id;
                  msg.param = param;
                  GameMsgHdr h(0x244,  player->getThreadId(), player, sizeof(msg));
@@ -644,7 +644,7 @@ void BattleSimulator::CheckAttain()
             {
                 SendAttainMsgToPlayer(_player[0] ,  Script::BATTLE_MAX_AURA, max);
             }
-            
+
             float fMax = _maxCSFactor[0];
             if(fMax >= 3.0)
             {
@@ -833,7 +833,7 @@ float BattleSimulator::testLink( BattleFighter *& bf, UInt16& skillId )
 			}
 		}
 	}
-    // TODO: 
+    // TODO:
 #if 0
 	UInt32 sid = bf->getFighter()->getSkill();
 	switch(sid)
@@ -935,7 +935,7 @@ UInt32 BattleSimulator::doXinmoAttack(BattleFighter * bf, BattleObject* bo, DefS
             defList[defCount].damType = e_damOut;
             area_target->setDefend100(false);
         }
-        
+
         defList[defCount].damage = 0;
         defList[defCount].leftHP = area_target->getHP();
 //			printf("%u:%u hits %u:%u, but missed!\n", 1-side, from_pos, side, pos);
@@ -1071,7 +1071,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                     if(s < 2)
                         _maxCSFactor[s] = std::max( cf, _maxCSFactor[s] ) ;
 
- 
+
                 }
                 //atk = bf->calcAttack(cs2, area_target);
                 //magatk = bf->calcMagAttack(cs2, area_target);
@@ -1249,7 +1249,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                     *****************************/
                     counter100 = true;
                     break;
-                } 
+                }
                 if(counter100 != true)
                 {
                     target_skill = area_target->getPassiveSkillAftEvd();
@@ -1287,7 +1287,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                     setStatusChange(bf, area_target->getSide(), area_target->getPos(), 1, 0, e_stAura, 25 + area_target->getSoulExtraAura(), 0, scList, scCount, true);
                 }
             }
-            
+
 			defList[defCount].damage = 0;
 			defList[defCount].leftHP = area_target->getHP();
 //			printf("%u:%u hits %u:%u, but missed!\n", 1-side, from_pos, side, pos);
@@ -1307,7 +1307,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
         {
             rhp += (dmg + magdmg) * ef->value/100;
         }
- 
+
         if(rhp > 0)
         {
             bf->regenHP(rhp);
@@ -2608,9 +2608,9 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
 			newf->setSideAndPos(side, pos);
 			newf->addFlag(BattleFighter::IsMirror);
 			setObject(side, pos, newf);
-            
+
             defList[i].pos = pos + 25;
-            defList[i].damType = e_Summon; 
+            defList[i].damType = e_Summon;
             defList[i].damage = fgt->getId();
             defList[i].leftHP = newf->getHP();
             ++defCount;
@@ -3125,7 +3125,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 dmg += attackOnce(bf, first, cs, pr, skill, _objs[target_side][target_pos], 1, defList, defCount, scList, scCount);
             }
             dmg += attackOnce(bf, first, cs, pr, skill, _objs[target_side][target_pos], 1, defList, defCount, scList, scCount, 0, NULL, atkAct);
- 
+
         }
         //道、万剑诀
         else if(SKILL_ID(skill->getId()) == 27)
@@ -4099,7 +4099,7 @@ UInt32 BattleSimulator::doSkillAttackAftEnter(BattleFighter* bf, const GData::Sk
             defList[defCount].damage = 0;
             defList[defCount].leftHP = bo->getHP();
             ++defCount;
- 
+
             rcnt = 1;
             break;
         }
@@ -4138,7 +4138,7 @@ UInt32 BattleSimulator::doSkillAttackAftEnter(BattleFighter* bf, const GData::Sk
             defList[defCount].damage = 0;
             defList[defCount].leftHP = bo->getHP();
             ++defCount;
- 
+
         }
 
         rcnt = 1;
@@ -4198,7 +4198,7 @@ UInt32 BattleSimulator::doAttack( int pos )
             //	insertFighterStatus(fs);
             //}
             // killed
- 
+
             std::vector<AttackAct> atkAct;
             atkAct.clear();
             if(bf->getHP() == 0)
@@ -4210,7 +4210,7 @@ UInt32 BattleSimulator::doAttack( int pos )
                 onDamage(bf, scList, scCount, false);
             appendToPacket(bf->getSide(), bf->getPos(), bf->getPos() + 25, 0, 0, false, false, defList, defCount, NULL, 0);
             rcnt++;
- 
+
             size_t actCnt = atkAct.size();
             for(size_t idx = 0; idx < actCnt; idx++)
             {
@@ -4244,7 +4244,7 @@ UInt32 BattleSimulator::doAttack( int pos )
         int otherside = 1 - bf->getSide();
         if(confuse > 0)
         {
-            BattleFighter* rnd_bf = NULL; 
+            BattleFighter* rnd_bf = NULL;
             if(_rnd(2) == bf->getSide())
             {
                 UInt8 myPos = bf->getPos();
@@ -4620,7 +4620,7 @@ UInt32 BattleSimulator::doAttack( int pos )
             {
                 if(dmg > 0 && target_object->isChar())
                 {
-                    // TODO: 
+                    // TODO:
                     BattleFighter * target_fighter = static_cast<BattleFighter *>(target_object);
                     UInt16 myskillid = bf->getFighter()->getSkill();
                     if(target_fighter->getHP() > 0)

@@ -21,14 +21,14 @@ public:
 		/// Creates the SingletonHolder.
 	{
 	}
-	
+
 	~SingletonHolder()
 		/// Destroys the SingletonHolder and the singleton
 		/// object that it holds.
 	{
 		delete _pS;
 	}
-	
+
 	S* get()
 		/// Returns a pointer to the singleton object
 		/// hold by the SingletonHolder. The first call
@@ -38,7 +38,7 @@ public:
 		if (!_pS) _pS = new S;
 		return _pS;
 	}
-	
+
 private:
 	S* _pS;
 	FastMutex _m;

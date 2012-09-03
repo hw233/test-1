@@ -174,9 +174,9 @@ GMHandler::GMHandler()
 	Reg(3, "rc7ton", &GMHandler::OnRC7TurnOn);
 	Reg(3, "vars", &GMHandler::OnAddVarS);
 	Reg(3, "ld", &GMHandler::OnLuckyDraw);
-	
+
     Reg(3, "sign", &GMHandler::OnHandleSignIn);
-	
+
     Reg(3, "newr", &GMHandler::OnNewRelation);
     Reg(3, "ssopen", &GMHandler::OnSSOpen);
     Reg(3, "ssup", &GMHandler::OnSSUp);
@@ -288,7 +288,7 @@ void GMHandler::OnClanBox(GObject::Player * player, std::vector<std::string>& ar
 		return;
 	clb.cl = globalGlobalNamedClans[player->fixName(args[0])];
 	clb.count = atoi(args[1].c_str());
-	if(clb.cl == NULL || clb.count == 0) 
+	if(clb.cl == NULL || clb.count == 0)
 		return;
 	GameMsgHdr hdr(0x17B, WORKER_THREAD_WORLD, player, sizeof(AddClanBox));
 	GLOBAL().PushMsg(hdr, &clb);
@@ -311,7 +311,7 @@ void GMHandler::OnClanDonate(GObject::Player * player, std::vector<std::string>&
 	GObject::Clan *pclan = player->getClan();
 	if(pclan == NULL)
 		return;
-	
+
 	DonateItem items = {1, 1, count};
 	GameMsgHdr hdr(0x17A, WORKER_THREAD_WORLD, player, sizeof(DonateItem));
 	GLOBAL().PushMsg(hdr, &items);
@@ -545,8 +545,8 @@ void GMHandler::OnAddMoney( GObject::Player * player, std::vector<std::string>& 
                 player->getGold(val);
 
                 {
-                    char gold[32] = {0}; 
-                    snprintf(gold, 32, "%u", val); 
+                    char gold[32] = {0};
+                    snprintf(gold, 32, "%u", val);
                     player->udpLog("free", gold, "", "", "", "", "currency");
                 }
 			}
@@ -680,8 +680,8 @@ void GMHandler::OnTopup( GObject::Player * player, std::vector<std::string>& arg
 	UInt32 val = atoi(args[0].c_str());
 	player->getGold(val);
     {
-        char gold[32] = {0}; 
-        snprintf(gold, 32, "%u", val); 
+        char gold[32] = {0};
+        snprintf(gold, 32, "%u", val);
         player->udpLog("free", gold, "", "", "", "", "currency");
     }
 	player->addTotalRecharge(val);
@@ -1123,55 +1123,55 @@ void makeSuper( GObject::Fighter * fgt, UInt8 equipLvl = 100, UInt8 enchant = 8,
 	case 1:
 		weapon = static_cast<GObject::ItemWeapon *>(package->AddEquip(itemIdStart[0][idx], false, true));
         if(weapon)
-        { 
+        {
             makeItemSuper(package, weapon, 0, enchant, gemlevel, flushAttr);
             package->EquipTo(weapon->getId(), fgt, 0x21, o);
         }
         armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[0][idx] + 1, false, true));
         if(armor)
-        { 
+        {
             makeItemSuper(package, armor, 0, enchant, gemlevel, flushAttr);
             package->EquipTo(armor->getId(), fgt, 0x22, o);
         }
         armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[0][idx] + 3, false, true));
         if(armor)
-        { 
+        {
             makeItemSuper(package, armor, 0, enchant, gemlevel, flushAttr);
             package->EquipTo(armor->getId(), fgt, 0x23, o);
         }
         armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[0][idx] + 2, false, true));
         if(armor)
-        { 
+        {
             makeItemSuper(package, armor, 0, enchant, gemlevel, flushAttr);
             package->EquipTo(armor->getId(), fgt, 0x24, o);
         }
         armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[0][idx] + 4, false, true));
         if(armor)
-        { 
+        {
             makeItemSuper(package, armor, 0, enchant, gemlevel, flushAttr);
             package->EquipTo(armor->getId(), fgt, 0x25, o);
         }
         armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[0][idx] + 5, false, true));
         if(armor)
-        { 
+        {
             makeItemSuper(package, armor, 0, enchant, gemlevel, flushAttr);
             package->EquipTo(armor->getId(), fgt, 0x26, o);
         }
         equip = static_cast<GObject::ItemEquip *>(package->AddEquip(itemIdStart[0][idx] + 6, false, true));
         if(equip)
-        { 
+        {
             makeItemSuper(package, equip, 0, enchant, gemlevel, flushAttr);
             package->EquipTo(equip->getId(), fgt, 0x27, o);
         }
         equip = static_cast<GObject::ItemEquip *>(package->AddEquip(itemIdStart[0][idx] + 7, false, true));
         if(equip)
-        { 
+        {
             makeItemSuper(package, equip, 0, enchant, gemlevel, flushAttr);
             package->EquipTo(equip->getId(), fgt, 0x28, o);
         }
         equip = static_cast<GObject::ItemEquip *>(package->AddEquip(trump[0], false, true));
         if(equip)
-        { 
+        {
             makeItemSuper(package, equip, 0, 9, 0, flushAttr);
             package->EquipTo(equip->getId(), fgt, 0x0a, o);
         }
@@ -1179,55 +1179,55 @@ void makeSuper( GObject::Fighter * fgt, UInt8 equipLvl = 100, UInt8 enchant = 8,
 	case 2:
 		weapon = static_cast<GObject::ItemWeapon *>(package->AddEquip(itemIdStart[1][idx], false, true));
         if(weapon)
-        { 
+        {
             makeItemSuper(package, weapon, 1, enchant, gemlevel, flushAttr);
             package->EquipTo(weapon->getId(), fgt, 0x21, o);
         }
 		armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[1][idx] + 1, false, true));
         if(armor)
-        { 
+        {
             makeItemSuper(package, armor, 1, enchant, gemlevel, flushAttr);
             package->EquipTo(armor->getId(), fgt, 0x22, o);
         }
 		armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[1][idx] + 3, false, true));
         if(armor)
-        { 
+        {
             makeItemSuper(package, armor, 1, enchant, gemlevel, flushAttr);
             package->EquipTo(armor->getId(), fgt, 0x23, o);
         }
 		armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[1][idx] + 2, false, true));
         if(armor)
-        { 
+        {
             makeItemSuper(package, armor, 1, enchant, gemlevel, flushAttr);
             package->EquipTo(armor->getId(), fgt, 0x24, o);
         }
 		armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[1][idx] + 4, false, true));
         if(armor)
-        { 
+        {
             makeItemSuper(package, armor, 1, enchant, gemlevel, flushAttr);
             package->EquipTo(armor->getId(), fgt, 0x25, o);
         }
 		armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[1][idx] + 5, false, true));
         if(armor)
-        { 
+        {
             makeItemSuper(package, armor, 1, enchant, gemlevel, flushAttr);
             package->EquipTo(armor->getId(), fgt, 0x26, o);
         }
 		equip = static_cast<GObject::ItemEquip *>(package->AddEquip(itemIdStart[1][idx] + 6, false, true));
         if(equip)
-        { 
+        {
             makeItemSuper(package, equip, 1, enchant, gemlevel, flushAttr);
             package->EquipTo(equip->getId(), fgt, 0x27, o);
         }
 		equip = static_cast<GObject::ItemEquip *>(package->AddEquip(itemIdStart[1][idx] + 7, false, true));
         if(equip)
-        { 
+        {
             makeItemSuper(package, equip, 1, enchant, gemlevel, flushAttr);
             package->EquipTo(equip->getId(), fgt, 0x28, o);
         }
         equip = static_cast<GObject::ItemEquip *>(package->AddEquip(trump[1], false, true));
         if(equip)
-        { 
+        {
             makeItemSuper(package, equip, 0, 9, 0, flushAttr);
             package->EquipTo(equip->getId(), fgt, 0x0a, o);
         }
@@ -1235,55 +1235,55 @@ void makeSuper( GObject::Fighter * fgt, UInt8 equipLvl = 100, UInt8 enchant = 8,
 	case 3:
 		weapon = static_cast<GObject::ItemWeapon *>(package->AddEquip(itemIdStart[2][idx], false, true));
 	    if(weapon)
-        { 
+        {
             makeItemSuper(package, weapon, 1, enchant, gemlevel, flushAttr);
             package->EquipTo(weapon->getId(), fgt, 0x21, o);
         }
 		armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[2][idx] + 1, false, true));
         if(armor)
-        { 
+        {
             makeItemSuper(package, armor, 1, enchant, gemlevel, flushAttr);
             package->EquipTo(armor->getId(), fgt, 0x22, o);
         }
 		armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[2][idx] + 3, false, true));
         if(armor)
-        { 
+        {
             makeItemSuper(package, armor, 1, enchant, gemlevel, flushAttr);
             package->EquipTo(armor->getId(), fgt, 0x23, o);
         }
 		armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[2][idx] + 2, false, true));
         if(armor)
-        { 
+        {
             makeItemSuper(package, armor, 1, enchant, gemlevel, flushAttr);
             package->EquipTo(armor->getId(), fgt, 0x24, o);
         }
 		armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[2][idx] + 4, false, true));
         if(armor)
-        { 
+        {
             makeItemSuper(package, armor, 1, enchant, gemlevel, flushAttr);
             package->EquipTo(armor->getId(), fgt, 0x25, o);
         }
 		armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[2][idx] + 5, false, true));
         if(armor)
-        { 
+        {
             makeItemSuper(package, armor, 1, enchant, gemlevel, flushAttr);
             package->EquipTo(armor->getId(), fgt, 0x26, o);
         }
 		equip = static_cast<GObject::ItemEquip *>(package->AddEquip(itemIdStart[2][idx] + 6, false, true));
         if(equip)
-        { 
+        {
             makeItemSuper(package, equip, 1, enchant, gemlevel, flushAttr);
             package->EquipTo(equip->getId(), fgt, 0x27, o);
         }
 		equip = static_cast<GObject::ItemEquip *>(package->AddEquip(itemIdStart[2][idx] + 7, false, true));
         if(equip)
-        { 
+        {
             makeItemSuper(package, equip, 1, enchant, gemlevel, flushAttr);
             package->EquipTo(equip->getId(), fgt, 0x28, o);
         }
         equip = static_cast<GObject::ItemEquip *>(package->AddEquip(trump[2], false, true));
         if(equip)
-        { 
+        {
             makeItemSuper(package, equip, 0, 9, 0, flushAttr);
             package->EquipTo(equip->getId(), fgt, 0x0a, o);
         }
@@ -1352,8 +1352,8 @@ void GMHandler::OnSuper( GObject::Player * player, std::vector<std::string>& arg
     player->AddPExp(100000);
     player->getGold(10000000);
     {
-        char gold[32] = {0}; 
-        snprintf(gold, 32, "%u", 10000000); 
+        char gold[32] = {0};
+        snprintf(gold, 32, "%u", 10000000);
         player->udpLog("free", gold, "", "", "", "", "currency");
     }
     player->getTael(10000000);
@@ -2282,8 +2282,8 @@ inline bool give_money(Player * p, UInt32* money)
         {
             p->getGold(moneys[0]);
             {
-                char gold[32] = {0}; 
-                snprintf(gold, 32, "%u", moneys[0]); 
+                char gold[32] = {0};
+                snprintf(gold, 32, "%u", moneys[0]);
                 p->udpLog("free", gold, "", "", "", "", "currency");
             }
         }
@@ -2329,7 +2329,7 @@ void GMHandler::OnKick(GObject::Player *player, std::vector<std::string>& args)
 
     UInt64 playerId = atol(args[0].c_str());
 	GObject::Player * pl= GObject::globalPlayers[playerId];
-    if (pl) 
+    if (pl)
     {
         TcpConnection conn = NETWORK()->GetConn(pl->GetSessionID());
         if (conn)
@@ -2492,7 +2492,7 @@ void GMHandler::OnClanItem(GObject::Player *player, std::vector<std::string>& ar
 
     UInt16 itemId = 0;
     UInt32 itemNum = 0;
-    
+
     itemId = (UInt16)atoi(args[0].c_str());
     if(args.size() > 1)
     {
@@ -2652,7 +2652,7 @@ void GMHandler::OnGetHeroMemoAward(GObject::Player* player, std::vector<std::str
     player->GetHeroMemo()->getAward(idx);
 }
 
-inline bool player_enum(GObject::Player* p, int) 
+inline bool player_enum(GObject::Player* p, int)
 {
     if (!p->isOnline())
         p->setSysDailog(true);
@@ -2674,7 +2674,7 @@ void GMHandler::OnSetBossHp(GObject::Player* player, std::vector<std::string>& a
 }
 void GMHandler::OnTime(GObject::Player* player, std::vector<std::string>& args)
 {
-    time_t curtime1 = time(NULL) + 30; 
+    time_t curtime1 = time(NULL) + 30;
     struct tm *local = localtime(&curtime1);
     SYSMSG_SENDV(2350, player, 1900+local->tm_year, 1+local->tm_mon, local->tm_mday, local->tm_hour, local->tm_min, local->tm_sec, World::_wday);
 }

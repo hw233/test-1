@@ -29,7 +29,7 @@ public:
 		/// the specified width.
 
 	static std::string format0(int value, int width);
-		/// Formats an integer value in decimal notation, 
+		/// Formats an integer value in decimal notation,
 		/// right justified and zero-padded in a field
 		/// having at least the specified width.
 
@@ -52,8 +52,8 @@ public:
 		/// specified width.
 
 	static std::string format0(unsigned int value, int width);
-		/// Formats an unsigned int value in decimal notation, 
-		/// right justified and zero-padded in a field having at 
+		/// Formats an unsigned int value in decimal notation,
+		/// right justified and zero-padded in a field having at
 		/// least the specified width.
 
 	static std::string formatHex(unsigned value);
@@ -69,11 +69,11 @@ public:
 
 	static std::string format(long value, int width);
 		/// Formats a long value in decimal notation,
-		/// right justified in a field having at least the 
+		/// right justified in a field having at least the
 		/// specified width.
 
 	static std::string format0(long value, int width);
-		/// Formats a long value in decimal notation, 
+		/// Formats a long value in decimal notation,
 		/// right justified and zero-padded in a field
 		/// having at least the specified width.
 
@@ -83,7 +83,7 @@ public:
 
 	static std::string formatHex(long value, int width);
 		/// Formats an unsigned long value in hexadecimal notation,
-		/// right justified and zero-padded in a field having at least the 
+		/// right justified and zero-padded in a field having at least the
 		/// specified width.
 		/// The value is treated as unsigned.
 
@@ -92,11 +92,11 @@ public:
 
 	static std::string format(unsigned long value, int width);
 		/// Formats an unsigned long value in decimal notation,
-		/// right justified in a field having at least the specified 
+		/// right justified in a field having at least the specified
 		/// width.
 
 	static std::string format0(unsigned long value, int width);
-		/// Formats an unsigned long value in decimal notation, 
+		/// Formats an unsigned long value in decimal notation,
 		/// right justified and zero-padded
 		/// in a field having at least the specified width.
 
@@ -105,7 +105,7 @@ public:
 
 	static std::string formatHex(unsigned long value, int width);
 		/// Formats an unsigned long value in hexadecimal notation,
-		/// right justified and zero-padded in a field having at least the 
+		/// right justified and zero-padded in a field having at least the
 		/// specified width.
 
 #if defined(_HAVE_INT64) && !defined(_LONG_IS_64_BIT)
@@ -118,8 +118,8 @@ public:
 		/// right justified in a field having at least the specified width.
 
 	static std::string format0(Int64 value, int width);
-		/// Formats a 64-bit integer value in decimal notation, 
-		/// right justified and zero-padded in a field having at least 
+		/// Formats a 64-bit integer value in decimal notation,
+		/// right justified and zero-padded in a field having at least
 		/// the specified width.
 
 	static std::string formatHex(Int64 value);
@@ -128,7 +128,7 @@ public:
 
 	static std::string formatHex(Int64 value, int width);
 		/// Formats a 64-bit integer value in hexadecimal notation,
-		/// right justified and zero-padded in a field having at least 
+		/// right justified and zero-padded in a field having at least
 		/// the specified width.
 		/// The value is treated as unsigned.
 
@@ -140,8 +140,8 @@ public:
 		/// right justified in a field having at least the specified width.
 
 	static std::string format0(UInt64 value, int width);
-		/// Formats an unsigned 64-bit integer value in decimal notation, 
-		/// right justified and zero-padded in a field having at least the 
+		/// Formats an unsigned 64-bit integer value in decimal notation,
+		/// right justified and zero-padded in a field having at least the
 		/// specified width.
 
 	static std::string formatHex(UInt64 value);
@@ -149,7 +149,7 @@ public:
 
 	static std::string formatHex(UInt64 value, int width);
 		/// Formats a 64-bit integer value in hexadecimal notation,
-		/// right justified and zero-padded in a field having at least 
+		/// right justified and zero-padded in a field having at least
 		/// the specified width.
 
 #endif // defined(_HAVE_INT64) && !defined(_LONG_IS_64_BIT)
@@ -185,7 +185,7 @@ public:
 		/// the specified width.
 
 	static void append0(std::string& str, int value, int width);
-		/// Formats an integer value in decimal notation, 
+		/// Formats an integer value in decimal notation,
 		/// right justified and zero-padded in a field
 		/// having at least the specified width.
 
@@ -208,8 +208,8 @@ public:
 		/// specified width.
 
 	static void append0(std::string& str, unsigned int value, int width);
-		/// Formats an unsigned int value in decimal notation, 
-		/// right justified and zero-padded in a field having at 
+		/// Formats an unsigned int value in decimal notation,
+		/// right justified and zero-padded in a field having at
 		/// least the specified width.
 
 	static void appendHex(std::string& str, unsigned value);
@@ -225,11 +225,11 @@ public:
 
 	static void append(std::string& str, long value, int width);
 		/// Formats a long value in decimal notation,
-		/// right justified in a field having at least the 
+		/// right justified in a field having at least the
 		/// specified width.
 
 	static void append0(std::string& str, long value, int width);
-		/// Formats a long value in decimal notation, 
+		/// Formats a long value in decimal notation,
 		/// right justified and zero-padded in a field
 		/// having at least the specified width.
 
@@ -239,7 +239,7 @@ public:
 
 	static void appendHex(std::string& str, long value, int width);
 		/// Formats an unsigned long value in hexadecimal notation,
-		/// right justified and zero-padded in a field having at least the 
+		/// right justified and zero-padded in a field having at least the
 		/// specified width.
 		/// The value is treated as unsigned.
 
@@ -248,11 +248,11 @@ public:
 
 	static void append(std::string& str, unsigned long value, int width);
 		/// Formats an unsigned long value in decimal notation,
-		/// right justified in a field having at least the specified 
+		/// right justified in a field having at least the specified
 		/// width.
 
 	static void append0(std::string& str, unsigned long value, int width);
-		/// Formats an unsigned long value in decimal notation, 
+		/// Formats an unsigned long value in decimal notation,
 		/// right justified and zero-padded
 		/// in a field having at least the specified width.
 
@@ -261,7 +261,7 @@ public:
 
 	static void appendHex(std::string& str, unsigned long value, int width);
 		/// Formats an unsigned long value in hexadecimal notation,
-		/// right justified and zero-padded in a field having at least the 
+		/// right justified and zero-padded in a field having at least the
 		/// specified width.
 
 #if defined(_HAVE_INT64) && !defined(_LONG_IS_64_BIT)
@@ -274,8 +274,8 @@ public:
 		/// right justified in a field having at least the specified width.
 
 	static void append0(std::string& str, Int64 value, int width);
-		/// Formats a 64-bit integer value in decimal notation, 
-		/// right justified and zero-padded in a field having at least 
+		/// Formats a 64-bit integer value in decimal notation,
+		/// right justified and zero-padded in a field having at least
 		/// the specified width.
 
 	static void appendHex(std::string& str, Int64 value);
@@ -284,7 +284,7 @@ public:
 
 	static void appendHex(std::string& str, Int64 value, int width);
 		/// Formats a 64-bit integer value in hexadecimal notation,
-		/// right justified and zero-padded in a field having at least 
+		/// right justified and zero-padded in a field having at least
 		/// the specified width.
 		/// The value is treated as unsigned.
 
@@ -296,8 +296,8 @@ public:
 		/// right justified in a field having at least the specified width.
 
 	static void append0(std::string& str, UInt64 value, int width);
-		/// Formats an unsigned 64-bit integer value in decimal notation, 
-		/// right justified and zero-padded in a field having at least the 
+		/// Formats an unsigned 64-bit integer value in decimal notation,
+		/// right justified and zero-padded in a field having at least the
 		/// specified width.
 
 	static void appendHex(std::string& str, UInt64 value);
@@ -305,7 +305,7 @@ public:
 
 	static void appendHex(std::string& str, UInt64 value, int width);
 		/// Formats a 64-bit integer value in hexadecimal notation,
-		/// right justified and zero-padded in a field having at least 
+		/// right justified and zero-padded in a field having at least
 		/// the specified width.
 
 #endif // defined(_HAVE_INT64) && !defined(_LONG_IS_64_BIT)

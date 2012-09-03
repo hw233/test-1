@@ -1,4 +1,4 @@
-#ifndef _STORE_H_
+﻿#ifndef _STORE_H_
 #define _STORE_H_
 
 #include "Common/Stream.h"

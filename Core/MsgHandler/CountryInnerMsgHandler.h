@@ -1,4 +1,4 @@
-#ifndef _COUNTRYINNERMSGHANDLER_H_
+﻿#ifndef _COUNTRYINNERMSGHANDLER_H_
 #define _COUNTRYINNERMSGHANDLER_H_
 
 #include "Server/GlobalObject.h"
@@ -40,7 +40,7 @@ void PlayerEnter( GameMsgHdr& hdr, const void * data )
 		{
 			delete player;
 			return;
-		} 
+		}
 		//player->GetPackage()->AddItemFromDB(8942, 1, true);
 		//DB3().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(8942, 1, %"I64_FMT"u, 1)", player->getId());
 	}
@@ -107,9 +107,9 @@ void OnBroadcast( GameMsgHdr& hdr, const void * data )
 {
 #define MSG_MAX 4096
     struct BroadcastMsg
-    {   
+    {
         Map* map;
-        Player* pl; 
+        Player* pl;
         int size;
         char msg[MSG_MAX];
     };
@@ -856,7 +856,7 @@ void OnGoldRecharge( GameMsgHdr& hdr, const void * data )
     if (type == 0)
     {
         struct Recharge
-        {   
+        {
             UInt8 type;
             UInt32 gold;
             char no[256];
@@ -889,7 +889,7 @@ void OnGoldRecharge( GameMsgHdr& hdr, const void * data )
     else
     {
         struct Recharge
-        {   
+        {
             UInt8 type;
             UInt32 gold;
         };
@@ -1142,7 +1142,7 @@ void OnSetPropsReq( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);
     struct Props
-    {    
+    {
         UInt32 pexp;
         UInt32 prestige;
         UInt32 honor;
@@ -1440,7 +1440,7 @@ void OnTownDeamonResNotify( GameMsgHdr& hdr, const void* data )
 
 void OnCFriendLvlUp( GameMsgHdr& hdr, const void* data )
 {
-    struct PlayerLvlUp 
+    struct PlayerLvlUp
     {
         Player* player;
         UInt8 lvl;
@@ -1485,7 +1485,7 @@ void OnSendRNR( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);
     struct SendRNR
-    {     
+    {
         Player* player;
         UInt32 off;
         UInt32 date;

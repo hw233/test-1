@@ -363,7 +363,7 @@ void BattleFighter::updateAllAttr()
 void BattleFighter::setAttrExtra(UInt8 klass, UInt8 career, UInt8 level)
 {
 	//float strength = 2.5f;
-	//float physique = 6.5f; 
+	//float physique = 6.5f;
 	//float agility = 2.5f;
 	//float intelligence = 1.5f;
 	//UInt32 attack = 25;
@@ -375,7 +375,7 @@ void BattleFighter::setAttrExtra(UInt8 klass, UInt8 career, UInt8 level)
 	//float critical = 0.15;
 	//float pierce = 0.1;
 	//float counter = 0.3;
-	
+
 	UInt8 i = 1;
 	lua_tinker::table factors = _formula->getFactor(klass, career, level);
 	_attrbylevel.strength = static_cast<UInt16>(factors.get<float>(i++));
@@ -952,7 +952,7 @@ const GData::SkillBase* BattleFighter::getPassiveSkill(std::vector<GData::SkillI
             break;
         }
     }
- 
+
     return resSkillBase;
 }
 

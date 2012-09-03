@@ -8,7 +8,6 @@
 #include <winsock2.h>
 #define atoll(STR) _atoi64(STR)
 #define strtoll(STR, END, BASE) _strtoi64(STR, END, BASE)
-#define inet_aton(STR) inet_addr(STR)
 
 typedef _int32 int32_t;
 

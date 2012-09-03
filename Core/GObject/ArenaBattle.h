@@ -1,4 +1,4 @@
-
+﻿
 #ifndef ARENABATTLE_H_
 #define ARENABATTLE_H_
 

@@ -120,7 +120,7 @@ namespace GObject
 		m_TaskSubmitedList.clear();
 	}
 
-	
+
 	void TaskMgr::ConvertOldGuildTask()
 	{
 #if 0
@@ -355,7 +355,7 @@ namespace GObject
             GameAction()->doAttainment(m_PlayerOwner,  Script:: SUBMIT_CLAN_TASKS,   1);
             GameAction()->doAty(m_PlayerOwner, AtyClanTask, 0, 0);
         }
-	
+
     }
 	bool TaskMgr::SubmitTask(UInt32 taskId)
 	{
@@ -379,7 +379,7 @@ namespace GObject
         {
             m_TaskSubmitedList[taskId] = TimeUtil::Now();
             DB5().PushUpdateData("UPDATE `task_instance`  SET `submit` = 1,`timeEnd` = %u WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", m_TaskSubmitedList[taskId], it->second->m_TaskId, it->second->m_OwnerId);
-        
+
         }
         CheckTaskAttainment(taskId,& taskType);
     	SAFE_DELETE(it->second);
@@ -701,7 +701,7 @@ namespace GObject
 				m_TaskCompletedList[it->first] = it->second;
 				m_TaskAcceptedList.erase(it);
                 //GameAction()->doAttainment(this->m_PlayerOwner, 10305 , taskType.m_TypeId);
-                
+
 			}
 			if (notify)
 			{
@@ -1018,7 +1018,7 @@ namespace GObject
 	}
 
 	bool TaskMgr::FlushTaskColor(UInt32 dayTaskId, UInt8 &color, UInt32 &nextFlushTime)
-	{	
+	{
 		UInt32 viplvl = m_PlayerOwner->getVipLevel();
 
 		color = nextFlushTime = 0;
@@ -1041,7 +1041,7 @@ namespace GObject
 				useGold = true;
 				ConsumeInfo ci(DayTaskFlushColor,0,0);
 				m_PlayerOwner->useGold(price,&ci);
-			}	
+			}
 			nextFlushTime = TimeUtil::SharpFourtyMin(1, now) - now;
 		}
 		else
@@ -1106,7 +1106,7 @@ namespace GObject
 				{
 					++ dayTaskData->m_FlushCount;
 				}
-			}		
+			}
 		}
 		else
 		{
@@ -1142,7 +1142,7 @@ namespace GObject
 		dayTaskData->m_PreFlushTime = now;
 		dayTaskData->m_PreTaskQuality = color;
 		DB().PushUpdateData("UPDATE `day_task_instance` SET `preTaskQuality` = %u, `flushCount` = %u WHERE `loopTask` = %u AND `ownerId` = %"I64_FMT"u", dayTaskData->m_PreTaskQuality, dayTaskData->m_FlushCount, dayTaskId, m_PlayerOwner->getId());
-	
+
 		return true;
 	}
 
@@ -1181,9 +1181,9 @@ namespace GObject
 		{
 			//Add AutoTask completed check
 			UInt32 expire = (dayTask->m_MaxFlushQualityCount - dayTask->m_Count) * 60;
-			
+
 			UInt32 viplvl = m_PlayerOwner->getVipLevel();
-            if(viplvl >= 5) 
+            if(viplvl >= 5)
 				expire=0;
 			else if(viplvl == 4)
                 expire=(dayTask->m_MaxFlushQualityCount - dayTask->m_Count) * 30;
@@ -1323,7 +1323,7 @@ namespace GObject
 			if (dayTaskData->m_AutoCompletedTaskId != taskId) return 0;
 			if (dayTaskData->m_Count >= dayTaskData->m_MaxFlushQualityCount) return 0;
 			UInt32 completedTime = (dayTaskData->m_MaxFlushQualityCount - dayTaskData->m_Count) * 60 + dayTaskData->m_AutoCompletedTaskAcceptTime;
-			
+
 			UInt32 viplvl = m_PlayerOwner->getVipLevel();
 			if(viplvl >= 5)
 				completedTime = dayTaskData->m_AutoCompletedTaskAcceptTime;

@@ -1,4 +1,4 @@
-#ifndef _FIGHTER_H_
+﻿#ifndef _FIGHTER_H_
 #define _FIGHTER_H_
 
 #include "GObjectManager.h"
@@ -37,7 +37,7 @@ namespace GObject
 
 #define FIGHTER_BUFF_RDIAMOND   0x0F //红钻变身卡
 
-#define FIGHTER_BUFF_COUNT 0x10 
+#define FIGHTER_BUFF_COUNT 0x10
 
 #define SKILL_UPMAX 3 // 技能最初就能装备3个
 #define CITTA_LEVEL_MAX 100
@@ -162,7 +162,7 @@ public:
     // 卸下无双技能
     void offPeerless(bool = true);
     // 增加一个可装备的无双技能
-    bool addNewPeerless(UInt16 pl, bool = true, bool = false); 
+    bool addNewPeerless(UInt16 pl, bool = true, bool = false);
     // 删除一个可装备的无双技能
     bool delPeerless(UInt16 pl, bool = true);
     inline UInt16 getPeerless() { return peerless / SKILL_LEVEL_MAX; }
@@ -639,7 +639,7 @@ protected:
 	UInt8 _level;
 	UInt64 _exp;        // 经验
     UInt32 _pexp;       // 修炼经验
-    UInt32 _pexpAddTmp; // for Attainment  
+    UInt32 _pexpAddTmp; // for Attainment
     UInt32 _pexpMax;    // 修炼最大经验
 	float _potential;   // 潜力
 	float _capacity;    // 资质
@@ -648,7 +648,7 @@ protected:
 
     UInt8 _acupoints[ACUPOINTS_MAX];    // 穴道
 
-    UInt16 _skill[SKILL_UPMAX];     // 装备的技能 _skill[i] % SKILL_LEVEL_MAX => skilllevel, _skill[i]/SKILL_LEVEL_MAX=> skillid 
+    UInt16 _skill[SKILL_UPMAX];     // 装备的技能 _skill[i] % SKILL_LEVEL_MAX => skilllevel, _skill[i]/SKILL_LEVEL_MAX=> skillid
     std::vector<UInt16> _skills;    // 可装备的技能 TODO: 如果所有技能都将是由心法带出,则数据表里不需要存这个字段
 
     UInt8 _cittaslot;               // 可装备心法最大数
