@@ -1210,6 +1210,12 @@ namespace Script
 		return Call<UInt16>("RunNewRegisterAward", player);
     }
 
+    UInt8 GameActionLua::RunNewRegisterAwardAD_RF(Player* player, UInt8 idx)
+    {
+		assert(player != NULL);
+		return Call<UInt8>("RunNewRegisterAwardAD_RF", player, idx);
+    }
+
     void GameActionLua::sendRNR(Player* player, UInt32 now, UInt32 date, UInt32 total)
     {
 		return Call<void>("sendRNR", player, now, date, total);

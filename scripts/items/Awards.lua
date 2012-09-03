@@ -186,8 +186,77 @@ function RunNewRegisterAward(player)
     end
     
     return j;
-
 end
 
+local PlatformAward =  
+{ --平台id
+    [1]  = {    -- "QQ空间"
+        --1:推广用注册玩家登录奖励领取
+        --2:回流用户新区道具奖
+        [1] = {}, --id,num
+        [2] = {},
+    },
+    [2]  = {    -- "朋友网"
+        [1] = {},
+        [2] = {},
+    },
+    [3]  = {    -- "qq微博"
+        [1] = {},
+        [2] = {},
+    },
+    [4]  = {    -- "Q+"
+        [1] = {},
+        [2] = {},
+    },
+    [5]  = {    -- "财付通"
+        [1] = {},
+        [2] = {},
+    },
+    [10] = {    -- "QQ游戏大厅"
+        [1] = {},
+        [2] = {},
+    },
+    [11] = {    -- "3366"
+        [1] = {},
+        [2] = {},
+    },
+    [12] = {    -- "官网"
+        [1] = {},
+        [2] = {},
+    },
+    [16] = {    -- gamelife
+        [1] = {},
+        [2] = {},
+    },
+    [17] = {    -- qqunion
+        [1] = {},
+        [2] = {},
+    },
+}
+
+function RunNewRegisterAwardAD_RF(player, idx)
+    if nil == player or nil == idx then
+        return 0
+    end
+    if 1 ~= idx and 2 ~= idx then
+        return 0
+    end
+    local pf = player:getPlatform()
+    local aw = PlatformAward[pf]
+    print("平台id:"..pf)
+    if nil == aw or nil == next(aw) then
+        return 0
+    end
+    local award = aw[idx]
+    local package = player:GetPackage()
+	if package:GetRestPackageSize() < #award then
+		player:sendMsgCode(2, 1011, 0)
+		return 0
+	end
+    for _, val in pairs(award) do 
+        package:Add(val[1], val[2], true, false, 31)
+    end
+    return 1
+end
 
 

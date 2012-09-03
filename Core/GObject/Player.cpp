@@ -9514,6 +9514,14 @@ namespace GObject
         case 6:
             getNewRegisterAward(opt);
             break;
+        case 7:
+            //推广用注册玩家登录奖励领取 
+            getAwardFromAD();
+            break;
+        case 8:
+            //回流用户新区道具奖
+            getAwardFromRF();
+            break;
         }
     }
 
@@ -9574,7 +9582,7 @@ namespace GObject
             return;
         if(opt == 1)
         {
-            if(2 == GetVar(VAR_AWARD_NEWREGISTER))
+            if(1 != GetVar(VAR_AWARD_NEWREGISTER))
                 return;
 			std::vector<GData::LootResult>::iterator it;
 			for(it = _RegisterAward.begin(); it != _RegisterAward.end(); ++ it)
@@ -9602,6 +9610,28 @@ namespace GObject
         st << idx;
         st << Stream::eos;
         send(st);
+    }
+
+    void Player::getAwardFromAD()
+    {
+        if(GetVar(VAR_AWARD_NEWREGISTER))
+            return;
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(7);
+        st << GameAction()->RunNewRegisterAwardAD_RF(this, 1) << Stream::eos;
+        send(st);
+        SetVar(VAR_AWARD_NEWREGISTER, 3);
+    }
+
+    void Player::getAwardFromRF()
+    {
+        if(GetVar(VAR_AWARD_NEWREGISTER))
+            return;
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(8);
+        st << GameAction()->RunNewRegisterAwardAD_RF(this, 2) << Stream::eos;
+        send(st);
+        SetVar(VAR_AWARD_NEWREGISTER, 4);
     }
 
     void Player::getHappyAward(UInt8 opt)
