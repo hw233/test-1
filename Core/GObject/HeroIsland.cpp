@@ -160,17 +160,17 @@ void HeroIsland::setRareAnimals(UInt8 spot, UInt32 npcid, Table attr, UInt32 las
             break;
     }
 
-    std::vector<RareAnimals>::iterator
-        i = _animals[spot].begin(), e = _animals[spot].end();
-    for ( ; i != e; ++i)
+	bool inserted = false;
+    for (auto i=_animals[spot].begin(), e=_animals[spot].end(); i != e; ++i)
     {
         if ((*i).id > ra.id)
         {
             _animals[spot].insert(i, ra);
+            inserted = true;
             break;
         }
     }
-    if (i == e)
+    if (!inserted)
         _animals[spot].push_back(ra);
 }
 
