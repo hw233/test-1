@@ -32,7 +32,7 @@ namespace GObject
 
 GlobalFighters globalFighters;
 
-static float enc_factor[] = {0, 0.05, 0.10, 0.16, 0.23, 0.31, 0.40, 0.51, 0.64, 0.80, 1.00, 1.25, 1.51};
+static float enc_factor[] = {0, 0.05f, 0.10f, 0.16f, 0.23f, 0.31f, 0.40f, 0.51f, 0.64f, 0.80f, 1.00f, 1.25f, 1.51f};
 #define SOUL_EXP_ITEM 8000
 #define SOUL_SKILL_DEFAULT_ITEM 8565
 

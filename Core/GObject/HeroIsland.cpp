@@ -42,10 +42,10 @@ HeroIsland::~HeroIsland()
 
 bool HeroIsland::initSkillAttr()
 {
-    _skillattr[1].magatkP = 0.1;
-    _skillattr[1].attackP = 0.1;
-    _skillattr[2].defendP = 0.1;
-    _skillattr[2].magdefP = 0.1;
+    _skillattr[1].magatkP = 0.1f;
+    _skillattr[1].attackP = 0.1f;
+    _skillattr[2].defendP = 0.1f;
+    _skillattr[2].magdefP = 0.1f;
     _skillattr[3].aura = 25;
     return false;
 }

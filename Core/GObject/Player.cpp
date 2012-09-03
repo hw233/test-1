@@ -8596,40 +8596,40 @@ namespace GObject
     {
         if(getBuffData(PLAYER_BUFF_ADVANCED_P_HOOK, TimeUtil::Now()))
         {
-            return 0.2;
+            return 0.2f;
         }
 
         if(getBuffData(PLAYER_BUFF_PRACTICE1, TimeUtil::Now()))
         {
-            return 0.5;
+            return 0.5f;
         }
 #if 0
         if(getBuffData(PLAYER_BUFF_PRACTICE2, TimeUtil::Now()))
         {
-            return 0.5;
+            return 0.5f;
         }
 #else
         if(getBuffData(PLAYER_BUFF_PROTECT, TimeUtil::Now()))
         {
-            return 0.2;
+            return 0.2f;
         }
 #endif
-        return 0.0;
+        return 0.0f;
     }
 
     float Player::getPracticeIncByDiamond()
     {
         if(this->isBD() && World::getBlueDiamondAct())
         {
-            return 0.1;
+            return 0.1f;
         }
         else if(this->isYD() && World::getYellowDiamondAct())
         {
-            return 0.1;
+            return 0.1f;
         }
         else
         {
-            return 0.0;
+            return 0.0f;
         }
     }
 
@@ -8637,11 +8637,11 @@ namespace GObject
     {
         if(isQQVIP() && World::getQQVipAct())
         {
-            return 0.1;
+            return 0.1f;
         }
         else
         {
-            return 0.0;
+            return 0.0f;
         }
     }
 
