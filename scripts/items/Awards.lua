@@ -243,7 +243,7 @@ function RunNewRegisterAwardAD_RF(player, idx)
     end
     local pf = player:getPlatform()
     local aw = PlatformAward[pf]
-    print("平台id:"..pf)
+    --print("平台id:"..pf)
     if nil == aw or nil == next(aw) then
         return 0
     end
