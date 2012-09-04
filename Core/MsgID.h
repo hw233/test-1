@@ -1,4 +1,4 @@
-﻿#ifndef _ASSS_MSGID_H_
+#ifndef _ASSS_MSGID_H_
 #define _ASSS_MSGID_H_
 
 #include "Config.h"
@@ -720,6 +720,5 @@ enum CLAN_COPY
     CLAN_COPY_MEMBER_LIST_OP = 0x02,
 };
 
-#endif // _MSGID_H_
 #endif // __ASSS_MSGID_H_
 

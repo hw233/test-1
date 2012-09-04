@@ -1,4 +1,4 @@
-﻿#include "Config.h"
+#include "Config.h"
 #include "Clan.h"
 #include "GObject/Country.h"
 #include "GObject/TaskMgr.h"
@@ -35,13 +35,14 @@
 namespace GObject
 {
 
+#define MAX_COPY_LOG 20
+
 GlobalClans globalClans, globalClansByCountry[COUNTRY_MAX];
 GlobalNamedClans globalGlobalNamedClans, globalNamedClans[COUNTRY_MAX];
 GlobalNamedClans globalOwnedClans[COUNTRY_MAX];
 
 #define CLAN_AUTHORITY_COPY 7
 UInt8 ClanAuthority[5][8] = 
-UInt8 ClanAuthority[5][7] =
 {
 	{ 0, 1, 0, 0, 0, 0, 0, 0 },
 	{ 0, 1, 0, 0, 0, 0, 0, 0 },
@@ -3660,6 +3661,12 @@ void   Clan::LoadCopy(UInt16 level, UInt32 levelUpdateTime)
     _copyLevelUpdateTime = now;
 }
 
+void   Clan::LoadCopyLog(UInt32 logTime, UInt8 logType, std::string playerName, UInt32 logVal)
+{
+    // 数据库读取帮派副本历史日志
+    _copyLog.push_back(ClanCopyLog(_id, logTime, logType, logVal, playerName));
+}
+
 UInt16 Clan::getCopyLevel()
 {
     return 5;
@@ -3734,7 +3741,7 @@ void   Clan::clanCopyOperate(Player * player, UInt8 type, UInt8 command, UInt8 v
                         // "开启副本"
                         if (hasClanAuthority(player, CLAN_AUTHORITY_COPY))
                         {
-                            GObject::ClanCopyMgr::Instance().createClanCopy(this);
+                            GObject::ClanCopyMgr::Instance().createClanCopy(player, this);
                         }
                         else
                         {
@@ -3757,7 +3764,7 @@ void   Clan::clanCopyMemberOperate(Player * player, UInt8 command, UInt8 val)
     // TODO: 帮派副本成员相关操作
 }
 
-void Clan::sendClanCopyInfo(Player * player)
+void   Clan::sendClanCopyInfo(Player * player)
 {
     Mutex::ScopedLock lk(_mutex);
 	Members::iterator found = find(player);
@@ -3819,28 +3826,27 @@ void Clan::sendClanCopyInfo(Player * player)
     st << static_cast<UInt8> (0);  // 掠夺按钮状态
 
     UInt8 logNum = _copyLog.size();
-    st << static_cast<UInt8>(logNum);  // TODO: 副本日志数量
-    for (UInt8 i = 0; i < logNum; ++ i)
+    st << static_cast<UInt8>(logNum);  
+    for (std::list<ClanCopyLog>::iterator it = _copyLog.begin(); it != _copyLog.end(); ++ it)
     {
-        const ClanCopyLog& copyLog = _copyLog[i];
         struct tm t_tm;
-        time_t logTime = copyLog.logTime;
+        time_t logTime = it->logTime;
         localtime_r(&logTime, &t_tm);
-        st << static_cast<UInt16>(t_tm.tm_year + 1900);
-        st << static_cast<UInt8>(t_tm.tm_mon + 1);
-        st << static_cast<UInt8>(t_tm.tm_mday);
-        switch (copyLog.logType)
+        st << static_cast<UInt16>(t_tm.tm_year + 1900); // 年
+        st << static_cast<UInt8>(t_tm.tm_mon + 1);      // 月
+        st << static_cast<UInt8>(t_tm.tm_mday);         // 日
+        switch (it->logType)
         {
             case 1:
                 // 通关副本日志
                 st << static_cast<UInt8> (1);
-                st << copyLog.playerName;
-                st << static_cast<UInt8>(copyLog.logVal);
+                st << it->playerName;
+                st << static_cast<UInt8>(it->logVal);
                 break;
             case 2:
                 // 副本等级重置
                 st << static_cast<UInt8> (2);
-                st << static_cast<UInt8>(copyLog.logVal);
+                st << static_cast<UInt8>(it->logVal);
                 break;
             default:
                 return;
@@ -3848,6 +3854,33 @@ void Clan::sendClanCopyInfo(Player * player)
     }
     st << Stream::eos;
     player->send(st);
+}
+
+void   Clan::addCopyLevel()
+{
+    // 更新并保存新帮派副本的等级
+    if (_copyLevel < GData::clanCopyTable.size())
+    {
+        ++_copyLevel;
+        DB5().PushUpdateData("REPLACE INTO `clan_copy` (`level`, `levelUpdateTime`) VALUES (%u, %u) where `clanId = %u", _copyLevel, TimeUtil::Now(), _id);
+    }
+}
+
+void   Clan::addCopyWinLog(Player* player)
+{
+    if (!player)
+        return;
+    ClanCopyLog clanCopyLog(_id, TimeUtil::Now(), 2, _copyLevel, player->getName());
+    _copyLog.push_back(clanCopyLog);
+    if (_copyLog.size() > MAX_COPY_LOG)
+    {
+        _copyLog.pop_front();
+        DB5().PushUpdateData("REPLACE INTO `clan_copy_log` (`logTime`, `logType`, `playerName`, `logVal`) VALUES (%u, %u, '%s', %u) where `clanid` = %u ORDER `logTime` ASC limit 1", clanCopyLog.logTime, clanCopyLog.logType, clanCopyLog.playerName.c_str(), clanCopyLog.logVal);
+    }
+    else
+    {
+        DB5().PushUpdateData("INSERTE INTO  `clan_copy_log` (`clanId`, `logTime`, `logType`, `playerName`, `logVal`) VALUES (%u, %u, %u, %s, %u)", _id, clanCopyLog.logTime, clanCopyLog.logType, clanCopyLog.playerName.c_str(), clanCopyLog.logVal);
+    }
 }
 
 // 帮派副本

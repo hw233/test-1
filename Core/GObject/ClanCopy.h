@@ -118,7 +118,7 @@ class ClanCopy
         typedef std::map<UInt8, ClanCopyPlayer> SpotDeadPlayer;   // 该据点死亡的玩家（逃跑也算）
 
     public:
-        ClanCopy(Clan *c); 
+        ClanCopy(Clan *c, Player *player); 
         ~ClanCopy();
 
         UInt8 getStatus();
@@ -146,6 +146,7 @@ class ClanCopy
         void notifySpotPlayerInfo(UInt8 spotId);
         void notifyCopyLose();
         void notifyCopyWin();
+        void notifyLauncherEscape();
 
     private:
         Clan   *_clan;
@@ -179,6 +180,8 @@ class ClanCopy
         std::set<Player *> _observerPlayer; // 围观人员
         std::map<Player *, UInt8> _playerIndex; //快速查找玩家对应据点的索引
 
+        Player* _launchPlayer;
+
 #ifdef DEBUG_CLAN_COPY
         std::fstream fileSt;
 #endif
@@ -198,7 +201,7 @@ class ClanCopyMgr : public Singleton <ClanCopyMgr>
     UInt8 getCopyStatus(UInt32 clanId);
 
     // 创建一个新帮派副本
-    bool createClanCopy(Clan *c);
+    bool createClanCopy(Player* player, Clan *c);
 
     // 清除已经结束的副本
     void deleteClanCopy(ClanCopy *clanCopy);

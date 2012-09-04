@@ -1,4 +1,4 @@
-﻿#include "Config.h"
+#include "Config.h"
 #include "Server/WorldServer.h"
 #include "MsgID.h"
 #include "Player.h"

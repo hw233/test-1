@@ -676,6 +676,15 @@ struct DBClanCopy
     UInt32 levelUpdateTime;
 };
 
+struct DBClanCopyLog
+{
+    UInt32 clanId;
+    UInt32 logTime;
+    UInt8  logType;
+    std::string playerName;
+    UInt32 logVal;
+};
+
 struct DBTaskData
 {
 	UInt64 m_ownerId;
@@ -1772,6 +1781,17 @@ SPECIALDEF(3)
     UInt32, clanId,
     UInt16, level,
     UInt32, levelUpdateTime
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBClanCopyLog)
+SPECIALDEF(5)
+(
+    UInt32, clanId,
+    UInt32, logTime,
+    UInt8,  logType,
+    std::string, playerName,
+    UInt32, logVal
 )
 SPECIALEND()
 
