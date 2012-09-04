@@ -100,8 +100,8 @@ static const UInt32 s_tjTotalRewardId = 9132;
 //#define TJ_EVENT_WAIT_TIME 10*60      //天劫事件间隔时间
 //#define TJ_EVENT_PROCESS_TIME 15*60   //天劫事件持续时间
 
-#define TJ_EVENT_WAIT_TIME 2*60      //天劫事件间隔时间
-#define TJ_EVENT_PROCESS_TIME 5*60   //天劫事件持续时间
+#define TJ_EVENT_WAIT_TIME 10*60      //天劫事件间隔时间
+#define TJ_EVENT_PROCESS_TIME 15*60   //天劫事件持续时间
 Tianjie::Tianjie()
 {
     m_tjTypeId = 0;
@@ -966,22 +966,18 @@ void Tianjie::start1()
                 count--;
         }
         //同一种怪,不同的id号 
-        for (int k = 0; k < 4; k++)
+        int minNpcId = s_rate1MinNpcIds[m_tjTypeId][i];
+        int maxNpcId = s_rate1MaxNpcIds[m_tjTypeId][i];
+        while (minNpcId <= maxNpcId)
         {
-            int minNpcId = s_rate1MinNpcIds[m_tjTypeId][k];
-            int maxNpcId = s_rate1MaxNpcIds[m_tjTypeId][k];
-            while (minNpcId <= maxNpcId)
+            for (size_t j = 0; j < 4; ++j) //一次刷20只怪
             {
-                for (size_t j = 0; j < 4; ++j) //一次刷20只怪
-                {
-                    int count = 5;
-		            while (addNpc(minNpcId) == false && count > 0) 
-                        count--;
-                }
-                minNpcId++;
+                int count = 5;
+		        while (addNpc(minNpcId) == false && count > 0) 
+                    count--;
             }
+            minNpcId++;
         }
-        
         //需要消灭的小怪总数
         m_eventMaxNumber += s_rate1NpcCount[i];
 	}
