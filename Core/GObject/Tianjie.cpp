@@ -868,12 +868,14 @@ void Tianjie::closeTianjie()
     }
     else if (m_currTjRate ==4 && !m_isFinish)
     {
+        clearEventScore();
         rewardTask();
     }
     else if (m_currTjRate == 5)
     {
         if (m_isOk)
             rewardBoss();
+        clearEventScore();
         rewardTask();
     }
     clearEventData();
@@ -2061,7 +2063,17 @@ void Tianjie::rewardTotalBox(Player*pl, int score)
     delete [] pItems;
     pItems = NULL;
 }
-
+void Tianjie::clearEventScore()
+{
+    multimap<int, Player*>::iterator iter;
+    for (iter = m_eventSortMap.begin(); iter != m_eventSortMap.end(); ++iter)
+    {
+        if (iter->second->GetVar(VAR_TJ_EVENT_PRESTIGE) > 0)
+        {
+            iter->second->SetVar(VAR_TJ_EVENT_PRESTIGE, 0);
+        }
+    }
+}
 void Tianjie::reward(multimap<int, Player*>& m, UInt8 varId, UInt8 EventOrTotal)
 {
     multimap<int, Player*>::reverse_iterator iter;
@@ -2095,7 +2107,8 @@ void Tianjie::reward(multimap<int, Player*>& m, UInt8 varId, UInt8 EventOrTotal)
         {
             rewardTotalBox(iter->second,score);
         }
-        iter->second->SetVar(varId, 0);
+        if (iter->second->GetVar(varId) > 0)
+            iter->second->SetVar(varId, 0);
     }
     m.clear();
 }
@@ -2140,14 +2153,22 @@ void Tianjie::rewardTask()
             item.count = 3;         //
             iter->second->sendMailItem(5058, 5059, &item, 1, true);
         }
-        p->SetVar(VAR_TJ_TASK1_NUMBER, 0);
-        p->SetVar(VAR_TJ_TASK2_TAEL, 0);
-        p->SetVar(VAR_TJ_TASK2_GOLD, 0);
-        p->SetVar(VAR_TJ_TASK2_COUPON, 0);
-        p->SetVar(VAR_TJ_TASK2_TJYJ, 0);
-        p->SetVar(VAR_TJ_TASK2_SCORE, 0);
-        p->SetVar(VAR_TJ_TASK3_COPYID, 0);
-        p->SetVar(VAR_TJ_EVENT_PRESTIGE, 0);
+        if (p->GetVar(VAR_TJ_TASK1_NUMBER) >0)
+            p->SetVar(VAR_TJ_TASK1_NUMBER, 0);
+        if (p->GetVar(VAR_TJ_TASK2_TAEL) > 0)
+            p->SetVar(VAR_TJ_TASK2_TAEL, 0);
+        if (p->GetVar(VAR_TJ_TASK2_GOLD) > 0)
+            p->SetVar(VAR_TJ_TASK2_GOLD, 0);
+        if (p->GetVar(VAR_TJ_TASK2_COUPON) > 0)
+            p->SetVar(VAR_TJ_TASK2_COUPON, 0);
+        if (p->GetVar(VAR_TJ_TASK2_TJYJ) > 0)
+            p->SetVar(VAR_TJ_TASK2_TJYJ, 0);
+        if (p->GetVar(VAR_TJ_TASK2_SCORE) > 0)
+            p->SetVar(VAR_TJ_TASK2_SCORE, 0);
+        if (p->GetVar(VAR_TJ_TASK3_COPYID) > 0)
+            p->SetVar(VAR_TJ_TASK3_COPYID, 0);
+        if (p->GetVar(VAR_TJ_EVENT_PRESTIGE) > 0)
+            p->SetVar(VAR_TJ_EVENT_PRESTIGE, 0);
 
         p->clearTjTaskData();
     }

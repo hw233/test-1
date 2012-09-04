@@ -150,6 +150,7 @@ namespace GObject
         void reward(multimap<int, Player*>& m, UInt8 varId, UInt8 EventOrTotal);
         void rewardBoss();
         void rewardTask();  //关闭天劫前,根据玩家的天劫声望发奖品
+        void clearEventScore();
 
         std::string GetNextSection(std::string& strString , char cSeperator);
 		
