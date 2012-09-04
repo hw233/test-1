@@ -20,7 +20,7 @@ struct CDMsg
 {
 	UInt8 type;			//宗族动态信息类型
 	std::vector<CDMValType> value;
-	
+
 	CDMsg(UInt8 t = 0xFF) : type(t) {}
 };
 
@@ -47,7 +47,7 @@ struct CDMKey
 {
 	UInt32 key1;
 	UInt32 key2;
-	
+
 	CDMKey(UInt32 k1 = 0, UInt32 k2 = 0) : key1(k1), key2(k2) {}
 };
 struct CDMKeyLess
@@ -82,7 +82,7 @@ public:
 	bool addCDMsg(UInt8, const std::string&, UInt32, UInt32, Stream * = NULL);
 	bool addCDMsg(UInt8, const std::string&, const std::string&, UInt32, Stream * = NULL);
 	bool addCDMsg(UInt8, const std::string&, const std::string&, const std::string&, UInt32, Stream * = NULL);
-	bool addCDMsg(UInt8, const std::string&, UInt32, UInt32, UInt32, Stream * = NULL);	
+	bool addCDMsg(UInt8, const std::string&, UInt32, UInt32, UInt32, Stream * = NULL);
 	bool addCDMsg(UInt8, const std::string&, const std::string&, const std::string&, UInt32, UInt32, Stream * = NULL);
 	bool addCDMsg(UInt8, const std::string&, const std::string&, UInt32, UInt32, Stream * = NULL);
 	bool addCDMsg(UInt8, const std::string&, const std::string&, const std::string&, const std::string&, UInt32, Stream * = NULL);

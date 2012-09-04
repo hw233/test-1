@@ -1,4 +1,4 @@
-#ifndef LOG_INC
+﻿#ifndef LOG_INC
 #define LOG_INC
 
 #define APP_ERROR		1
@@ -167,14 +167,14 @@ enum ItemTo
 	ToExchange,
 	ToExchangeSet,
 	ToDesdroy, // ToTripod
-	ToDetachGemDesdroy,	
+	ToDetachGemDesdroy,
 	ToUse,
 	ToClanDonate,
 	ToGemMgerge,
 	ToActivateAttr,
-	ToGemAttach,	
-	ToTrainFighter,	
-	ToTrumpUpgrade,	
+	ToGemAttach,
+	ToTrainFighter,
+	ToTrumpUpgrade,
     ToEquipUpgrade,
     ToForgeFighter,
     ToSecondSoul,
@@ -218,7 +218,7 @@ public:
 	void OutInfo(const char * fmt, ...);
 	void OutTrace(const char * fmt, ...);
 	void OutLog(UInt8 lev, const char * fmt, ...);
-	//ֻ?ǰ?Ҫ????????־?????????ַ???
+	//只是把要输出的日志，打包成字符串
 
 	void FlushLog(UInt8 lev, tm& aTm, const char* buffer);
 
@@ -226,7 +226,7 @@ protected:
 	FILE* GetFileHandler(UInt8 lev, tm& aTm);	//fail : NULL
 private:
 	UInt8		m_LogLev;
-	std::string m_LogDir;		//??־Ŀ¼
+	std::string m_LogDir;		//日志目录
 
 	FILE*		m_ErrorFile;
 	FILE*		m_WarnFile;
@@ -272,11 +272,11 @@ private:
 #define LOG()			WorkerThread<WorkerRunner<> >::LocalWorker().GetLog()
 #else
 
-#define ERROR_LOG(fmt, ...) 
-#define WARN_LOG(fmt, ...)	
-#define DEBUG_LOG(fmt, ...)	
-#define INFO_LOG(fmt, ...)	
-#define TRACE_LOG(fmt, ...)	
+#define ERROR_LOG(fmt, ...)
+#define WARN_LOG(fmt, ...)
+#define DEBUG_LOG(fmt, ...)
+#define INFO_LOG(fmt, ...)
+#define TRACE_LOG(fmt, ...)
 
 #endif
 

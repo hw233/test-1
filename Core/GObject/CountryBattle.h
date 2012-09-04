@@ -26,7 +26,7 @@ struct CountryBattleData
 
 struct CBStatusData
 {
-	CBStatusData(): type(0xFF), lvlside(0), player(NULL), streak(0), score(0), playerOther(NULL), streakOther(0) {}	
+	CBStatusData(): type(0xFF), lvlside(0), player(NULL), streak(0), score(0), playerOther(NULL), streakOther(0) {}
 	UInt8 type;
 	UInt8 lvlside;
 	Player * player;

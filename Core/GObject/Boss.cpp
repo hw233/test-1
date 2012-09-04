@@ -214,7 +214,7 @@ void Boss::firstBloodReward(Player *player)
 	else
 	{
 		SYSMSGV(content, 280, _ng->getName().c_str(), _ng->getName().c_str());
-		pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);	
+		pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
 	}
 	if(pmail != NULL)
 		mailPackageManager.push(pmail->id, Items[rand].id, Items[rand].count, true);
@@ -259,7 +259,7 @@ void Boss::onReward()
 
 	Player *player_arr[3] = {NULL, NULL, NULL};
 	UInt32 exp[3] = {0, 0, 0};
-	double damage_percert[3] = {0, 0, 0};	
+	double damage_percert[3] = {0, 0, 0};
 	std::string playerName[] = {"", "", ""};
 	for(UInt16 i = 0; i < 3 && iter != expList.end(); i ++, iter ++)
 	{
@@ -268,10 +268,10 @@ void Boss::onReward()
 		damage_percert[i] = static_cast<double>(exp[i]) / static_cast<double>(maxHp) * 100;
 		playerName[i] = player_arr[i]->getName();
 	}
-	
-	Mail *pmail = NULL;	
+
+	Mail *pmail = NULL;
 	do
-	{		
+	{
 		iter = expList.begin();
 		Player * player = iter->second.player;
 		UInt32 rank = iter->second.rank;
@@ -780,7 +780,7 @@ void BossManager::getNextBoss()
 		_nextBossLevel = 0;
 		return;
 	}
-	
+
 	if(cur->second.spawnTime <= TimeUtil::Now())
 	{
 		++ cur;

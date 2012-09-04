@@ -37,7 +37,7 @@ Exception::Exception(const Exception& exc):
 	_pNested = exc._pNested ? exc._pNested->clone() : 0;
 }
 
-	
+
 Exception::~Exception() throw()
 {
 	delete _pNested;
@@ -68,13 +68,13 @@ const char* Exception::className() const throw()
 	return typeid(*this).name();
 }
 
-	
+
 const char* Exception::what() const throw()
 {
 	return name();
 }
 
-	
+
 std::string Exception::displayText() const
 {
 	std::string txt = name();

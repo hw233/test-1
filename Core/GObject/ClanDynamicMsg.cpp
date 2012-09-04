@@ -5,12 +5,12 @@
 
 namespace GObject
 {
-//人事0 城战1 技艺2 其他3 
+//人事0 城战1 技艺2 其他3
 //人事0x0001 城战0x0010 技艺0x0100 其他0x1000
 static const UInt8 CDMTypeCvt[] = { 0, 0, 1, 1, 1, 1, 1, 1, 2, 0, 3, 3, 3, 0, 1, 1, 1, 1, 1, 1, 1, 1, 3 };
 static const UInt8 CDMTCvt[] = { 0x01, 0x02, 0x04, 0x08 };
 
-ClanDynamicMsg::ClanDynamicMsg() : _key(0) 
+ClanDynamicMsg::ClanDynamicMsg() : _key(0)
 {
 }
 
@@ -27,7 +27,7 @@ ClanDynamicMsg::~ClanDynamicMsg()
 
 UInt16 ClanDynamicMsg::getCDMsgSize(UInt8 type)
 {
-	
+
 	UInt16 sz = 0;
 	for (UInt8 i = 0; i < 4; ++ i)
 	{
@@ -335,7 +335,7 @@ bool ClanDynamicMsg::addCDMsg(UInt8 type, const std::string& val1, const std::st
 			st.init(REP::CLAN_DINFO_UPDATE);
 			st << type << static_cast<UInt32>(0) << val1 << val2 << val3 << val4 << val5 << Stream::eos;
 		}
-		return true;	
+		return true;
 	}
 	return false;
 }
@@ -380,7 +380,7 @@ bool ClanDynamicMsg::addCDMsg(UInt8 type, const std::string& val1, const std::st
 			st.init(REP::CLAN_DINFO_UPDATE);
 			st << type << static_cast<UInt32>(0) << val1 << val2 << val3 << val4 << val5 << Stream::eos;
 		}
-		return true;		
+		return true;
 	}
 	return false;
 }
@@ -425,6 +425,6 @@ void ClanDynamicMsg::cleanClanDynamicMsg()
 	_cbrElem.erase(deletedStart, _cbrElem.end());
 	DB5().PushUpdateData("DELETE FROM `clan_battle_result` WHERE `battleTime` < %u", deletedDay);
 }
-	
+
 
 }

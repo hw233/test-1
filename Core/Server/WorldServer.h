@@ -8,14 +8,20 @@
 #include "DB/DBWorker.h"
 #include "Login/LoginWorker.h"
 #include "WorkerThread.h"
+
+#ifndef _WIN32
 #include <curl/curl.h>
+#endif
 
 extern const char* s_HelpInfo;
 
 namespace GObject
 {
 	class Country;
+	class SortWorker;
+#ifndef _WIN32
     class DCWorker;
+#endif
 }
 
 class BaseThread;
@@ -36,12 +42,14 @@ public:
 	void UnInit();
 	void SetActive(bool active);
 	bool IsActive() const;
-	
+
 public:
 	GObject::Country& GetCountry(UInt8 worker);
 	GObject::World& GetWorld();
-	GObject::DCWorker& GetSort();
+	GObject::SortWorker& GetSort();
+#ifndef _WIN32
 	GObject::DCWorker& GetDC();
+#endif
 	DB::DBWorker& GetDB();
 	DB::DBWorker& GetDB1();
 	DB::DBWorker& GetDB2();
@@ -79,7 +87,9 @@ public:
     void State(const char* action, int serverNum);
 
 private:
+#ifndef _WIN32
     CURL* curl;
+#endif
 };
 
 #define SERVER()		WorldServer::Instance()

@@ -1,4 +1,4 @@
-#ifndef _COUNTRYOUTERMSGHANDLER_H_
+﻿#ifndef _COUNTRYOUTERMSGHANDLER_H_
 #define _COUNTRYOUTERMSGHANDLER_H_
 
 #include "MsgTypes.h"
@@ -361,7 +361,7 @@ struct CopyReq
 {
     UInt8 type;
     UInt8 id;
-    MESSAGE_DEF2(REQ::COPY_DATA, UInt8, type, UInt8, id); 
+    MESSAGE_DEF2(REQ::COPY_DATA, UInt8, type, UInt8, id);
 };
 
 struct NpcTriggerReq
@@ -937,9 +937,9 @@ void OnAttainReq( GameMsgHdr& hdr, const void* data )
 
 void OnSelectCountry( GameMsgHdr& hdr, SelectCountry& req )
 {
-	MSG_QUERY_PLAYER(player);	
+	MSG_QUERY_PLAYER(player);
     UInt8 country = req._country;
-    if (country > 2) 
+    if (country > 2)
         return;
     if (player->getCountry() != country)
     {   //before leave thread
@@ -954,7 +954,7 @@ void OnSelectCountry( GameMsgHdr& hdr, SelectCountry& req )
         CountryEnterStruct ces(true, pd.inCity ? 1 : 0, pd.location);
         GameMsgHdr hdr(0x1F0, player->getThreadId(), player, sizeof(CountryEnterStruct));
         GLOBAL().PushMsg( hdr, &ces );
-    }    
+    }
 }
 
 void OnNewGuildReq( GameMsgHdr& hdr, NewGuildReq& req)
@@ -1173,7 +1173,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
 {
-	MSG_QUERY_PLAYER(player);	
+	MSG_QUERY_PLAYER(player);
 	BinaryReader br(data, hdr.msgHdr.bodyLen);
 	UInt8 field = 0;
 	br >> field;
@@ -1424,7 +1424,7 @@ void OnFighterEquipReq( GameMsgHdr& hdr, FighterEquipReq& fer )
     if(!player->hasChecked())
         return;
 
-    int idx; 
+    int idx;
     switch(fer._part)
     {
     case 0x29:
@@ -2326,8 +2326,8 @@ void OnLanchChallengeReq( GameMsgHdr& hdr, LanchChallengeReq& lcr)
 		st1 << static_cast<UInt8>(1) << lcr.target << Stream::eos;
 		player->send(st1);
 		return;
-	}	
-	
+	}
+
 	Stream st(REP::LANCHCHALLENGE);
 	st << player->getCountry() << player->getName() << Stream::eos;
 	target->send(st);
@@ -2368,11 +2368,11 @@ void OnRequestChallengeReq( GameMsgHdr& hdr, RequestChallengeReq& rcr)
 	UInt8 tid = player->getThreadId();
 	if( attacker->getThreadId() != tid || !attacker->hasStatus(0x02) || !player->hasStatus(0x02) )
 		return;
-	
+
 	st << static_cast<UInt8>(0) << player->getName() << Stream::eos;
 	attacker->send(st);
 
-	
+
 	Battle::BattleSimulator bsim(player->getLocation(), player, attacker);
 	player->PutFighters( bsim, 0, true );
 	attacker->PutFighters( bsim, 1, true );
@@ -2474,7 +2474,7 @@ void OnChallengePlayerReq( GameMsgHdr& hdr, ChallengePlayerReq& cpr )
 		}
 	}
 	else
-	{	
+	{
 		if(lev <= 5 && !GObject::challengeCheck.hasPair(target, player))
 		{
 #if 0
@@ -2570,10 +2570,10 @@ void kick(Player* pl)
 {
     TcpConnection conn = NETWORK()->GetConn(pl->GetSessionID());
     if (conn)
-    {    
+    {
         Network::GameClient * cl = static_cast<Network::GameClient *>(conn.get());
-        if (cl) 
-        {    
+        if (cl)
+        {
             pl->SetSessionID(-1);
             pl->testBattlePunish();
             pl->setOnline(false);
@@ -2581,8 +2581,8 @@ void kick(Player* pl)
             cl->send(kick_pkt, 4);
             cl->SetPlayer(NULL);
             cl->pendClose();
-        }    
-    }    
+        }
+    }
 }
 
 void OnBattleEndReq( GameMsgHdr& hdr, BattleEndReq& req )
@@ -2665,9 +2665,9 @@ void OnFrontMapReq( GameMsgHdr& hdr, const void* data)
 	}
 
     BinaryReader brd(data, hdr.msgHdr.bodyLen);
-    UInt8 type = 0; 
-    UInt8 id = 0; 
-    UInt8 param = 0; 
+    UInt8 type = 0;
+    UInt8 id = 0;
+    UInt8 param = 0;
     brd >> type;
     brd >> id;
 
@@ -2678,11 +2678,11 @@ void OnFrontMapReq( GameMsgHdr& hdr, const void* data)
             break;
 
         case 1:
-            GObject::frontMap.enter(player, id); 
+            GObject::frontMap.enter(player, id);
             break;
 
         case 2:
-            GObject::frontMap.reset(player, id); 
+            GObject::frontMap.reset(player, id);
             break;
 
         case 3:
@@ -2802,7 +2802,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                         default:
                             logVarOffset = 0xff;
                     }
-                    
+
                     if (logVarOffset != 0xff)
                     {
                         ConsumeInfo ci(Discount3+logVarOffset, 0, 0);
@@ -3095,6 +3095,17 @@ static bool inCountry(const Network::TcpConduit * conduit, UInt8 country)
 #define ITEM_FLOWER 440
 #define ITEM_QIXI_TALK 9123
 
+#ifdef _WIN32
+int inet_aton(const char *cp, struct in_addr *inp)
+{
+    unsigned long addr = inet_addr(cp);
+    if(addr == INADDR_NONE)
+        return -1;
+    inp->s_addr = addr;
+    return 0;
+}
+#endif
+
 int ToMsgCenter(Stream st)
 {
 	struct sockaddr_in addr;
@@ -3115,22 +3126,22 @@ int ToMsgCenter(Stream st)
     Stream stMsg = st;
     stMsg.pop_front(4); //将协议头先删除
     stMsg.prepend((UInt8*)&cfg.serverNum, sizeof(cfg.serverNum));//插入serverid号
-    
+
     int packlen = stMsg.size();
 
     UInt8 buf[4] = {0, 0, 0xFF, REP::CHAT};
     memcpy(buf, &packlen, 2);
 
     stMsg.prepend(buf, sizeof(buf));
-    
+
     int cmd = REP::CHAT;
     stMsg.prepend((UInt8*)&cmd, sizeof(cmd));
 
     packlen = stMsg.size();
     stMsg.prepend((UInt8*)&packlen, sizeof(packlen));
-    	
+
     int len = 0;
-	if((len = sendto(sockfd, stMsg, stMsg.size(), 0, (struct sockaddr*)&addr, sizeof(struct sockaddr_in))) < 0)
+	if((len = sendto(sockfd, (const char*)(UInt8*)stMsg, stMsg.size(), 0, (struct sockaddr*)&addr, sizeof(struct sockaddr_in))) < 0)
 	{
 		close(sockfd);
 		return E_FAIL;
@@ -3203,7 +3214,7 @@ void OnChatReq( GameMsgHdr& hdr, ChatReq& cr )
 	{
 		ToMsgCenter(st);
 	}
-	
+
 }
 
 void OnPrivChatReq( GameMsgHdr& hdr, PrivChatReq& pcr )
@@ -3919,7 +3930,7 @@ void OnClanRankBattleReq(GameMsgHdr& hdr, const void* data)
 
 	if(player->getThreadId() != WORKER_THREAD_NEUTRAL) return;
     if(player->getLocation() != RANK_BATTLE_LOCATION) return;
-    
+
     BinaryReader brd(data, hdr.msgHdr.bodyLen);
     UInt8 type = 0;
     brd >> type;
@@ -3960,7 +3971,7 @@ void OnClanRankBattleReq(GameMsgHdr& hdr, const void* data)
                 brd >> skillId;
                 ClanRankBattleMgr::Instance().UseSkill(player, skillId);
             }
-            break; 
+            break;
         case 5: //请求战况信息
             {
                 ClanRankBattleMgr::Instance().SendBattleInfo(player);
@@ -4529,7 +4540,7 @@ void OnTownDeamonReq( GameMsgHdr& hdr, const void* data)
 
     if(op != 0x08)
     {
-       townDeamonManager->checkStartTime(player); 
+       townDeamonManager->checkStartTime(player);
     }
 
     switch(op)
@@ -4910,7 +4921,7 @@ void OnActivitySignIn( GameMsgHdr& hdr, const void * data )
                 id = GameAction()->GetExchangePropsID();
                 mgr->SetPropsID(id);
                 mgr->UpdateToDB();
-                
+
                 lua_tinker::table p = GameAction()->GetExchangeProps(id);
                 player->activityUdpLog(1026);
                 st << static_cast<UInt16>(id) << p.get<UInt8>(3) << p.get<UInt16>(2) << Stream::eos;
@@ -4934,8 +4945,8 @@ void OnActivitySignIn( GameMsgHdr& hdr, const void * data )
                 }
                 mgr->SubScores(score);
                 player->GetPackage()->Add(mgr->GetPropsID(), props.get<UInt8>(3), true, false, FromDailyActivity);
-                player->activityUdpLog(1027, score); 
-                player->activityUdpLog(1028, score); 
+                player->activityUdpLog(1027, score);
+                player->activityUdpLog(1028, score);
                 //兑换后重新刷新一次
                 id = GameAction()->GetExchangePropsID();
                 mgr->SetPropsID(id);
@@ -4944,11 +4955,11 @@ void OnActivitySignIn( GameMsgHdr& hdr, const void * data )
                 st << mgr->GetScores() << static_cast<UInt16>(id) << p.get<UInt8>(3) << p.get<UInt16>(2) << Stream::eos;
             }
             break;
-  
+
         default:
-            return; 
+            return;
             break;
-  
+
     }
     player->send(st);
 }

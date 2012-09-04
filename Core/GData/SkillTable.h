@@ -125,7 +125,7 @@ typedef ObjectMapT<SkillEffect, UInt16> SkillEffectManager;
 
 } // namespace GData
 
-#endif // CITTA_H 
+#endif // CITTA_H
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */
 

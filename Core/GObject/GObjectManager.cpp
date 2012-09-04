@@ -1,4 +1,4 @@
-#include "Config.h"
+﻿#include "Config.h"
 #include "GObjectManager.h"
 #include "DB/DBConnectionMgr.h"
 #include "GObjectDBExecHelper.h"
@@ -279,12 +279,12 @@ namespace GObject
 	{
 		UInt32 thisDay = TimeUtil::SharpDay(0, now);
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
-		
+
 		execu->Execute2("UPDATE `clan` SET `grabAchieve` = 0 WHERE `battleThisDay` <> %u", thisDay);
 		execu->Execute2("UPDATE `clan` AS `update_clan` SET `battleStatus` = IF(%u < `battleThisDay` + `battleTime` * 1800, 0, IF(%u < `battleThisDay`+ `battleTime` * 1800 + 3600, 1, 2)) WHERE `battleThisDay` = %u AND `update_clan`.`id` = `id` AND (`battleStatus` = 0 OR `battleStatus` = 1)", now, now, thisDay);
 		execu->Execute2("UPDATE `clan` AS `update_clan` SET `battleThisDay` = %u, `battleTime` = `update_clan`.`nextBattleTime`, `battleStatus` = IF(%u < %u + `nextBattleTime` * 1800, 0, IF(%u < %u + `nextBattleTime` * 1800 + 3600, 1, 2)) WHERE `battleThisDay` <> %u AND `update_clan`.`id` = `id` AND `battleStatus` <> 256", thisDay, now, thisDay, now, thisDay, thisDay);
 		execu->Execute2("UPDATE `clan_player` AS `update_clan_player` SET `enterCount` = 0 WHERE `playerId` = `update_clan_player`.`playerId` AND `thisDay` <> %u", thisDay);
-		
+
 		return true;
 	}
 
@@ -1634,7 +1634,7 @@ namespace GObject
 		lc.finalize();
 
 		lc.prepare("Loading password:");
-		last_id = 0xFFFFFFFFFFFFFFFFull; 
+		last_id = 0xFFFFFFFFFFFFFFFFull;
 		pl = NULL;
 		DBSecondPWD spd;
 		if(execu->Prepare("SELECT `playerId`, `password`, `questionForPWD`, `answerForPWD` FROM `pass_word`", spd) != DB::DB_OK)
@@ -1656,7 +1656,7 @@ namespace GObject
 
 		//load all items
 		lc.prepare("Loading items:");
-		last_id = 0xFFFFFFFFFFFFFFFFull; 
+		last_id = 0xFFFFFFFFFFFFFFFFull;
 		pl = NULL;
 		ItemData idata;
 #if 1
@@ -1753,13 +1753,13 @@ namespace GObject
 					if (count == 1)
 					{
 						item = Package::BuildEquipFromDB(atoi(tokenizer2[0].c_str()), false);
-						if (item != NULL) 
+						if (item != NULL)
 							trade->_items.push_back(static_cast<ItemEquip *>(item));
 					}
 					else if(count == 2)
 					{
 						item = Package::BuildItem(atoi(tokenizer2[0].c_str()), atoi(tokenizer2[1].c_str()), false);
-						if (item != NULL) 
+						if (item != NULL)
 							trade->_items.push_back(item);
 					}
 				}
@@ -2036,7 +2036,7 @@ namespace GObject
 			}
 		}
 		lc.finalize();
-		
+
 		//use for new year activity fix???????????????????
 		lc.prepare("Loading exchange plane ticket:");
 		DBExchangeTicket det;
@@ -2101,7 +2101,7 @@ namespace GObject
 			pl->GetActivityMgr()->LoadFromDB(atydata);
 		}
 
-        
+
         lc.finalize();
 		lc.prepare("Loading mail package:");
 		last_id = 0xFFFFFFFFFFFFFFFFull;
@@ -2419,7 +2419,7 @@ namespace GObject
 	{
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
-		
+
         // ͨ??????????
 		LoadingCounter lc("Loading dungeon monster templates:");
 		GData::DBDungeonMonster dmon;
@@ -2522,7 +2522,7 @@ namespace GObject
             ddl[dlvl.level] = dl;
 		}
 		lc.finalize();
-		
+
 		GData::dungeons.enumerate(dungeon_enum, NULL);
 
         // ͨ?????û?????
@@ -2557,7 +2557,7 @@ namespace GObject
     {
         std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
-		
+
         // ???Ӹ???????
 		LoadingCounter lc("Loading team copy templates:");
 		GData::DBTeamCopy dbtc;
@@ -2684,7 +2684,7 @@ namespace GObject
 
 
 		execu.reset(DB::gObjectDBConnectionMgr->GetExecutor());
-		if (execu.get() == NULL || !execu->isConnected()) 
+		if (execu.get() == NULL || !execu->isConnected())
 			return false;
 
         // ??????Ϣ
@@ -2994,7 +2994,7 @@ namespace GObject
 			if (cb.battlerClanId == 0)
 			{
 				clan = NULL;
-				clanBattle = clanManager.getRobBattleClan();				
+				clanBattle = clanManager.getRobBattleClan();
 			}
 			else if (cb.battlerClanId != lastId)
 			{
@@ -3041,7 +3041,7 @@ namespace GObject
 			{
 				delete cbp;
 				DB5().PushUpdateData("DELETE FROM `clan_battler` WHERE `id` = %u", cb.id);
-				continue;	
+				continue;
 			}
 		}
 		lc.finalize();
@@ -3246,9 +3246,9 @@ namespace GObject
                                     }
                                 }
                             }
-                         
+
                         }
-                      _vMergeStfs.push_back(s); 
+                      _vMergeStfs.push_back(s);
                  }
             }
 
@@ -3263,7 +3263,7 @@ namespace GObject
                         lua_tinker::table  t_from = t_idmap.get< lua_tinker::table >(1);
 
                         lua_tinker::table  t_to = t_idmap.get< lua_tinker::table >(2);
-                        
+
                         UInt32 sFrom = t_from.size();
                         UInt32 sTo = t_to.size();
                         if(sFrom  == sTo)
@@ -3290,7 +3290,7 @@ namespace GObject
                     }
                 }*/
             }
-			for(UInt8 t = 0; t < 2; ++t) 
+			for(UInt8 t = 0; t < 2; ++t)
             {
                 for(q = 0; q < 6; q ++)
                 {
@@ -3639,7 +3639,7 @@ namespace GObject
 
         return true;
     }
-        
+
         bool GObjectManager::loadEquipments()
         {
             std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
@@ -3815,7 +3815,7 @@ namespace GObject
 		}
 		lc.finalize();
 
-		return true;	
+		return true;
 	}
 
 	bool GObjectManager::LoadArena()
@@ -3843,7 +3843,7 @@ namespace GObject
 		}
 		lc.finalize();
 
-		return true;	
+		return true;
 	}
 
     bool GObjectManager::LoadPracticePlace()
@@ -4296,7 +4296,7 @@ namespace GObject
 		return static_cast<ItemArmor *>(equip);
 	}
 
-    bool GObjectManager::LoadTownDeamon() // 
+    bool GObjectManager::LoadTownDeamon() //
     {
         if(!townDeamonManager)
             return false;

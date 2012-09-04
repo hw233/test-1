@@ -64,7 +64,7 @@ int jason_listen( int port )
     my_addr.sin_family = AF_INET;
     my_addr.sin_port = htons(port);
     my_addr.sin_addr.s_addr = INADDR_ANY;
-    bzero(&(my_addr.sin_zero),8);
+    memset(&(my_addr.sin_zero), 0, 8);
     //绑定套接口
     if(bind(sockfd,(struct sockaddr *)&my_addr,sizeof(struct sockaddr))==-1)
     {

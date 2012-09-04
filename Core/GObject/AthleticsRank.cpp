@@ -1,4 +1,4 @@
-#include "Config.h"
+﻿#include "Config.h"
 #include "Player.h"
 #include "AthleticsRank.h"
 #include "Server/WorldServer.h"
@@ -357,12 +357,12 @@ void AthleticsRank::BuildNewBox(Rank &it_rank)// UInt8 row, UInt16 rank, UInt8 l
 	const UInt16 boxcount[2][2][4][6] =
 	{
 		{
-			{{35}, {70}, {140}, {210}}, 
+			{{35}, {70}, {140}, {210}},
 			{{15}, {30}, {60},  {90}}
 		},
 
 		{
-			{{40, 45, 50, 60, 80, 100}, {80, 90, 100, 120, 160, 200}, {160, 180, 200, 240, 320, 400}, {240, 270, 300, 360, 480, 600}}, 
+			{{40, 45, 50, 60, 80, 100}, {80, 90, 100, 120, 160, 200}, {160, 180, 200, 240, 320, 400}, {240, 270, 300, 360, 480, 600}},
 			{{17, 20, 22, 25, 27, 30},  {35, 40, 45, 50, 55, 60},     {70, 80, 90,100, 110, 120},     {110, 120, 135, 150, 165, 180}}
 		}
 	};
@@ -384,12 +384,12 @@ void AthleticsRank::BuildNewBox(Rank &it_rank)// UInt8 row, UInt16 rank, UInt8 l
 	UInt32 preBoxTime = (*it_rank)->boxflushtime;
 	UInt32 now = TimeUtil::Now();
 	UInt32 time_stay = now - preBoxTime;
-	
+
 	UInt32 coupon_rate = 10;	//10:礼券宝箱 50:经验宝箱 15: 铜币宝箱 15:银币宝箱 10:战功
 	UInt32 exp_rate = 60;
 	UInt32 coin_rate = 75;
 	UInt32 tael_rate = 90;
-	
+
 	if(time_stay < 3600)
 		coupon_rate -= coupon_rate * (3600 - time_stay) / 3600 ;
 	UInt32 r_type = uRand(100);
@@ -412,13 +412,13 @@ void AthleticsRank::BuildNewBox(Rank &it_rank)// UInt8 row, UInt16 rank, UInt8 l
 		if(rank == 1)// 0:绿色 0:蓝色 75:紫色 25:橙色
 		{
 			gre_rate = 0;
-			blu_rate = 0;			
+			blu_rate = 0;
 			pur_rate = 75;
 		}
 		else if(rank < 11)// 0:绿色 65:蓝色 25:紫色 10:橙色
 		{
 			gre_rate = 0;
-			blu_rate = 65;	
+			blu_rate = 65;
 			pur_rate = 90;
 		}
 	}
@@ -461,7 +461,7 @@ void AthleticsRank::BuildNewBox(Rank &it_rank)// UInt8 row, UInt16 rank, UInt8 l
 					}
 				}
 			}
-			break;		
+			break;
 		case 2:
 		case 3:
 			{
@@ -480,10 +480,10 @@ void AthleticsRank::BuildNewBox(Rank &it_rank)// UInt8 row, UInt16 rank, UInt8 l
 			}
 			break;
 	}
-	
+
 	(*it_rank)->awardType = type;
 	(*it_rank)->boxcolor = color;
-	(*it_rank)->boxflushtime = now;	
+	(*it_rank)->boxflushtime = now;
 	if(type == 2 || type == 3)
 	{
 		if(row == 0)
@@ -498,7 +498,7 @@ void AthleticsRank::BuildNewBox(Rank &it_rank)// UInt8 row, UInt16 rank, UInt8 l
 	else
 	{
 		(*it_rank)->awardCount = static_cast<UInt32>(count_base[2][lvl_sep]) * static_cast<UInt32>(color_rate[color]) * static_cast<UInt32>(rank_rate[rank_sep]) / 100;
-	}	
+	}
 #endif
 }
 
@@ -520,7 +520,7 @@ void AthleticsRank::requestAthleticsList(Player * player, UInt16 type)
 	RankList::iterator found = _ranks[row].find(player);
 	if (found == _ranks[row].end())
 	{
-		ERROR_LOG("Cannot find the athletics player[%"I64_FMT"u][%s]", player->getId(), player->getName().c_str());
+		//ERROR_LOG("Cannot find the athletics player[%"I64_FMT"u][%s]", player->getId(), player->getName().c_str());
 		enterAthleticsReq(player, player->GetLev());
 		return ;
 	}
@@ -589,7 +589,7 @@ void AthleticsRank::requestAthleticsList(Player * player, UInt16 type)
 	//	endTime=(*rank)->challengetime+5 * 60;
 	//else if(player->getVipLevel() == 1)
 	//	endTime=(*rank)->challengetime+7 * 60;
-	
+
 	//(*rank)->challengenum = updateChallengeNum((*rank)->challengenum, (*rank)->challengetime);
     if(type & 0x01)
     {
@@ -710,7 +710,7 @@ void AthleticsRank::RequestPageNum(Player* player)
     if(rankpos <=500)
         return;
 
-    if(( (*rank)->pageNum *10 + 11) >= rankpos) 
+    if(( (*rank)->pageNum *10 + 11) >= rankpos)
         return;
     /*
     if((*rank)->pageNum >= 10)
@@ -739,7 +739,7 @@ void AthleticsRank::AddPageNum(Player* player, bool bMoneyEnough)
 
     if(player->hasGlobalFlag(Player::AthPayForPage) == false)
         return;
-    
+
     player->delGlobalFlag(Player::AthPayForPage);
 
      UInt8 row = getRankRow(player->GetLev());
@@ -827,7 +827,7 @@ void AthleticsRank::challenge(Player * atker, std::string& name, UInt8 type)
 		Stream st(REP::ATHLETICS_CHALLENGE);
 		st << Stream::eos;
 		atker->send(st);
-		ERROR_LOG("Cannot find the athletics player[%"I64_FMT"u][%s][%d]", atker->getId(), atker->getName().c_str(), row);
+		//ERROR_LOG("Cannot find the athletics player[%"I64_FMT"u][%s][%d]", atker->getId(), atker->getName().c_str(), row);
 		enterAthleticsReq(atker, atker->GetLev());
 		return ;
 	}
@@ -848,7 +848,7 @@ void AthleticsRank::challenge(Player * atker, std::string& name, UInt8 type)
                 setAthleticsExtraChallenge(atker, 0);
 			return;
         }
-        
+
 		if ((atkerRankPos - deferRankPos > 10 * (pageNum + 1))  && !type)
 		{
 			//Stream st(REP::ATHLETICS_CHALLENGE);
@@ -857,9 +857,9 @@ void AthleticsRank::challenge(Player * atker, std::string& name, UInt8 type)
 			atker->sendMsgCode(0, 1405);
 			return ;
 		}
-        
+
 	}
-	else 
+	else
     {
         if(deferRankPos > 10)
 		    return;
@@ -1041,7 +1041,7 @@ void AthleticsRank::notifyAthletcisOver(Player * atker, Player * defer, UInt32 i
 		if (atkerRankPos <= deferRankPos || (atkerRankPos - deferRankPos > 10*(data->pageNum + 1)))// && !(getAthleticsExtraChallenge(atker) & static_cast<UInt32>(0x80000000))))
 			return;
 	}
-	else 
+	else
     {
         if(deferRankPos >10)
 		     return;
@@ -1114,7 +1114,7 @@ void AthleticsRank::notifyAthletcisOver(Player * atker, Player * defer, UInt32 i
             {
                 flag |= 0x02;
             }
-			
+
             if(atkerRankPos < 500 )
             {
                 deferdata->rank = atkDataRank;
@@ -1148,7 +1148,7 @@ void AthleticsRank::notifyAthletcisOver(Player * atker, Player * defer, UInt32 i
         data->failstreak = 0;
 
 		//DB6().PushUpdateData("UPDATE `athletics_rank` SET `winStreak` = 0, `befailstreak` = %u WHERE `ranker` = %"I64_FMT"u", deferdata->befailstreak, deferdata->ranker->getId());
-		
+
 //		if(atkerRankPos != 1)
         if(bNeedChangePos)
         {
@@ -1211,7 +1211,7 @@ void AthleticsRank::notifyAthletcisBoxFlushTime(Player * player)
 	Stream st(REP::GETBOX);
 
 	st << static_cast<UInt8>(255) << (*playerRank->second)->awardType << (*playerRank->second)->awardCount <<static_cast<UInt16>(now >= endTime ? 0 : endTime - now) << Stream::eos;
-	player->send(st); 
+	player->send(st);
 #endif
 }
 
@@ -1478,7 +1478,7 @@ void AthleticsRank::TmExtraAward()
 		getRandomEquip(level, rank, equipid, cnt);
 
 		if(equipid == 0)
-			continue;//error; 
+			continue;//error;
 		const GData::ItemBaseType *item1 = Package::GetItemBaseType(equipid);
         if (!item1)
             return;
@@ -1613,8 +1613,8 @@ void AthleticsRank::getRandomEquip(UInt8 level, UInt16 rank, UInt16& EquipId, UI
 			UInt32 rand = uRand(56);
 			EquipId = PurpleEquip60[rand];
 		}
-		else 
-		{		
+		else
+		{
 			UInt32 rand = uRand(56);
 			EquipId = PurpleEquip50[rand];
 		}

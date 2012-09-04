@@ -592,7 +592,7 @@ function initActTime(y, m, d)
   -- 黄钻特权
   local  SerStartTm20= { ['year'] = 2012, ['month'] = 8, ['day'] = 24, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 游戏大厅特权
-  local  SerStartTm21= { ['year'] = 2012, ['month'] = 6, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm21= { ['year'] = 2012, ['month'] = 9, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   -- 充值返利（5/16-5/27）
   local  SerStartTm22= { ['year'] = 2012, ['month'] = 5, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -723,7 +723,7 @@ function initActTime(y, m, d)
   actTime44 = os.time(SerStartTm20) + 17 * 86400;
 
   actTime45 = os.time(SerStartTm21);
-  actTime46 = os.time(SerStartTm21) + 14 * 86400;
+  actTime46 = os.time(SerStartTm21) + 30 * 86400;
 
   actTime47 = os.time(SerStartTm22);
   actTime48 = os.time(SerStartTm22) + 12 * 86400;

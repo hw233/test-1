@@ -154,7 +154,7 @@ void Sale::sellSaleReq(std::vector<SaleSellData>& sales)
 			salePuts[j].price = sales[j].price > 99999 ? 99999 : sales[j].price;
 		}
 		GameMsgHdr hdr(0x1B2, WORKER_THREAD_WORLD, _owner, sizeof(salePuts));
-		GLOBAL().PushMsg(hdr, &salePuts);		
+		GLOBAL().PushMsg(hdr, &salePuts);
 	}
 	else
 	{
@@ -310,7 +310,7 @@ void Sale::sellSaleResp(UInt32 id, Player *buyer, UInt32 itemId, UInt16 itemNum)
 		{
 			//_owner->getCoin(saleSellRespData->price);
 			//SYSMSGV(content, 313, saleSellRespData->itemName, buyer->getName().c_str(), saleSellRespData->price);
-			//_owner->GetMailBox()->newMail(_owner, 0x07, title, content);	
+			//_owner->GetMailBox()->newMail(_owner, 0x07, title, content);
 		}
 		else
 		{

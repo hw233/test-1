@@ -1,0 +1,868 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{CE786243-5425-421E-98B3-190801F704BF}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>ServerASSS</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(ProjectDir)..\Core;$(ProjectDir)..\lib3rd\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)..\lib3rd\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(ProjectDir)..\Core;$(ProjectDir)..\lib3rd\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)..\lib3rd\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_CONSOLE;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>Config.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>Config.h</ForcedIncludeFiles>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>Ws2_32.lib;zlibd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy $(ProjectDir)..\lib3rd\bin\libmysql.dll $(TargetDir)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;_CONSOLE;_CRT_SECURE_NO_WARNINGS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>Config.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>Config.h</ForcedIncludeFiles>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>Ws2_32.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy $(ProjectDir)..\lib3rd\bin\libmysql.dll $(TargetDir)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Core\Battle\BattleField.cpp" />
+    <ClCompile Include="..\Core\Battle\BattleFighter.cpp" />
+    <ClCompile Include="..\Core\Battle\BattleReport.cpp" />
+    <ClCompile Include="..\Core\Battle\BattleSimulator.cpp" />
+    <ClCompile Include="..\Core\Common\Ascii.cpp" />
+    <ClCompile Include="..\Core\Common\AtomicCounter.cpp" />
+    <ClCompile Include="..\Core\Common\Bugcheck.cpp" />
+    <ClCompile Include="..\Core\Common\Debugger.cpp" />
+    <ClCompile Include="..\Core\Common\DigestEngine.cpp" />
+    <ClCompile Include="..\Core\Common\DirectoryIterator.cpp" />
+    <ClCompile Include="..\Core\Common\DirectoryIterator_UNIX.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\DirectoryIterator_WIN32.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\Environment.cpp" />
+    <ClCompile Include="..\Core\Common\Environment_UNIX.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\Environment_WIN32.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\ErrorHandler.cpp" />
+    <ClCompile Include="..\Core\Common\Event.cpp" />
+    <ClCompile Include="..\Core\Common\Event_POSIX.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\Event_WIN32.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\Exception.cpp" />
+    <ClCompile Include="..\Core\Common\File.cpp" />
+    <ClCompile Include="..\Core\Common\File_UNIX.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\File_WIN32.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\LoadingCounter.cpp" />
+    <ClCompile Include="..\Core\Common\MemBlockPool.cpp" />
+    <ClCompile Include="..\Core\Common\Mutex.cpp" />
+    <ClCompile Include="..\Core\Common\Mutex_POSIX.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\Mutex_WIN32.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\NumberFormatter.cpp" />
+    <ClCompile Include="..\Core\Common\Path.cpp" />
+    <ClCompile Include="..\Core\Common\Path_UNIX.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\Path_WIN32.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\Random.cpp" />
+    <ClCompile Include="..\Core\Common\RandomStream.cpp" />
+    <ClCompile Include="..\Core\Common\RefCountedObject.cpp" />
+    <ClCompile Include="..\Core\Common\Runnable.cpp" />
+    <ClCompile Include="..\Core\Common\SHA1Engine.cpp" />
+    <ClCompile Include="..\Core\Common\SignalHandler.cpp" />
+    <ClCompile Include="..\Core\Common\StringTokenizer.cpp" />
+    <ClCompile Include="..\Core\Common\Thread.cpp" />
+    <ClCompile Include="..\Core\Common\ThreadLocal.cpp" />
+    <ClCompile Include="..\Core\Common\Thread_POSIX.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\Thread_WIN32.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\Timespan.cpp" />
+    <ClCompile Include="..\Core\Common\Timestamp.cpp" />
+    <ClCompile Include="..\Core\Common\TInf.cpp" />
+    <ClCompile Include="..\Core\Common\URandom.cpp" />
+    <ClCompile Include="..\Core\Common\Zip.cpp" />
+    <ClCompile Include="..\Core\Config.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\Core\DB\DBConn.cpp" />
+    <ClCompile Include="..\Core\DB\DBConnectionMgr.cpp" />
+    <ClCompile Include="..\Core\DB\DBExecutor.cpp" />
+    <ClCompile Include="..\Core\DB\DBWorker.cpp" />
+    <ClCompile Include="..\Core\GData\Area.cpp" />
+    <ClCompile Include="..\Core\GData\CittaTable.cpp" />
+    <ClCompile Include="..\Core\GData\ClanAssistantData.cpp" />
+    <ClCompile Include="..\Core\GData\ClanLvlTable.cpp" />
+    <ClCompile Include="..\Core\GData\ClanSkillTable.cpp" />
+    <ClCompile Include="..\Core\GData\ClanTechTable.cpp" />
+    <ClCompile Include="..\Core\GData\CopyTable.cpp" />
+    <ClCompile Include="..\Core\GData\DungeonData.cpp" />
+    <ClCompile Include="..\Core\GData\EUpgradeTable.cpp" />
+    <ClCompile Include="..\Core\GData\ExpTable.cpp" />
+    <ClCompile Include="..\Core\GData\FighterProb.cpp" />
+    <ClCompile Include="..\Core\GData\Formation.cpp" />
+    <ClCompile Include="..\Core\GData\FrontMapTable.cpp" />
+    <ClCompile Include="..\Core\GData\GDataManager.cpp" />
+    <ClCompile Include="..\Core\GData\LootTable.cpp" />
+    <ClCompile Include="..\Core\GData\Money.cpp" />
+    <ClCompile Include="..\Core\GData\NpcGroup.cpp" />
+    <ClCompile Include="..\Core\GData\SkillStrengthen.cpp" />
+    <ClCompile Include="..\Core\GData\SkillTable.cpp" />
+    <ClCompile Include="..\Core\GData\SoulExpTable.cpp" />
+    <ClCompile Include="..\Core\GData\SoulSkillTable.cpp" />
+    <ClCompile Include="..\Core\GData\SpiritAttrTable.cpp" />
+    <ClCompile Include="..\Core\GData\Store.cpp" />
+    <ClCompile Include="..\Core\GData\TalentTable.cpp" />
+    <ClCompile Include="..\Core\GData\Title.cpp" />
+    <ClCompile Include="..\Core\GObject\ActivityMgr.cpp" />
+    <ClCompile Include="..\Core\GObject\Announce.cpp" />
+    <ClCompile Include="..\Core\GObject\Arena.cpp" />
+    <ClCompile Include="..\Core\GObject\ArenaBattle.cpp" />
+    <ClCompile Include="..\Core\GObject\Athletics.cpp" />
+    <ClCompile Include="..\Core\GObject\AthleticsRank.cpp" />
+    <ClCompile Include="..\Core\GObject\AttainMgr.cpp" />
+    <ClCompile Include="..\Core\GObject\BlockBossMgr.cpp" />
+    <ClCompile Include="..\Core\GObject\Boss.cpp" />
+    <ClCompile Include="..\Core\GObject\CFriend.cpp" />
+    <ClCompile Include="..\Core\GObject\ChatItem.cpp" />
+    <ClCompile Include="..\Core\GObject\Clan.cpp" />
+    <ClCompile Include="..\Core\GObject\ClanBattle.cpp" />
+    <ClCompile Include="..\Core\GObject\ClanDynamicMsg.cpp" />
+    <ClCompile Include="..\Core\GObject\ClanManager.cpp" />
+    <ClCompile Include="..\Core\GObject\ClanRankBattle.cpp" />
+    <ClCompile Include="..\Core\GObject\ClanTech.cpp" />
+    <ClCompile Include="..\Core\GObject\Copy.cpp" />
+    <ClCompile Include="..\Core\GObject\Country.cpp" />
+    <ClCompile Include="..\Core\GObject\CountryBattle.cpp" />
+    <ClCompile Include="..\Core\GObject\DCLogger.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\DCWorker.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\Dungeon.cpp" />
+    <ClCompile Include="..\Core\GObject\EventBase.cpp" />
+    <ClCompile Include="..\Core\GObject\Fighter.cpp" />
+    <ClCompile Include="..\Core\GObject\FrontMap.cpp" />
+    <ClCompile Include="..\Core\GObject\GObjectManager.cpp" />
+    <ClCompile Include="..\Core\GObject\GVar.cpp" />
+    <ClCompile Include="..\Core\GObject\HeroIsland.cpp" />
+    <ClCompile Include="..\Core\GObject\HeroMemo.cpp" />
+    <ClCompile Include="..\Core\GObject\HoneyFall.cpp" />
+    <ClCompile Include="..\Core\GObject\Item.cpp" />
+    <ClCompile Include="..\Core\GObject\Leaderboard.cpp" />
+    <ClCompile Include="..\Core\GObject\LuckyDraw.cpp" />
+    <ClCompile Include="..\Core\GObject\Mail.cpp" />
+    <ClCompile Include="..\Core\GObject\Map.cpp" />
+    <ClCompile Include="..\Core\GObject\MapCollection.cpp" />
+    <ClCompile Include="..\Core\GObject\MapObject.cpp" />
+    <ClCompile Include="..\Core\GObject\MOAction.cpp" />
+    <ClCompile Include="..\Core\GObject\NewRelation.cpp" />
+    <ClCompile Include="..\Core\GObject\Package.cpp" />
+    <ClCompile Include="..\Core\GObject\Player.cpp" />
+    <ClCompile Include="..\Core\GObject\PracticePlace.cpp" />
+    <ClCompile Include="..\Core\GObject\Prepaid.cpp" />
+    <ClCompile Include="..\Core\GObject\RealItemAward.cpp" />
+    <ClCompile Include="..\Core\GObject\Sale.cpp" />
+    <ClCompile Include="..\Core\GObject\SaleMgr.cpp" />
+    <ClCompile Include="..\Core\GObject\SecondSoul.cpp" />
+    <ClCompile Include="..\Core\GObject\ShuoShuo.cpp" />
+    <ClCompile Include="..\Core\GObject\SortWorker.cpp" />
+    <ClCompile Include="..\Core\GObject\SpecialAward.cpp" />
+    <ClCompile Include="..\Core\GObject\TaskMgr.cpp" />
+    <ClCompile Include="..\Core\GObject\TeamCopy.cpp" />
+    <ClCompile Include="..\Core\GObject\TownDeamon.cpp" />
+    <ClCompile Include="..\Core\GObject\Trade.cpp" />
+    <ClCompile Include="..\Core\GObject\TradeCheck.cpp" />
+    <ClCompile Include="..\Core\GObject\Var.cpp" />
+    <ClCompile Include="..\Core\GObject\WBossMgr.cpp" />
+    <ClCompile Include="..\Core\GObject\World.cpp" />
+    <ClCompile Include="..\Core\Login\LoginWorker.cpp" />
+    <ClCompile Include="..\Core\Log\Log.cpp" />
+    <ClCompile Include="..\Core\lua\lapi.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\lauxlib.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\lbaselib.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\lcode.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\ldblib.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\ldebug.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\ldo.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\ldump.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\lfunc.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\lgc.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\linit.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\liolib.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\llex.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\lmathlib.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\lmem.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\loadlib.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\lobject.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\lopcodes.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\loslib.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\lparser.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\lstate.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\lstring.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\lstrlib.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\ltable.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\ltablib.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\ltm.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\lundump.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\lvm.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\lxmllib.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\lzio.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\Core\MsgHandler\CountryMsgHandler.cpp" />
+    <ClCompile Include="..\Core\MsgHandler\GMHandler.cpp" />
+    <ClCompile Include="..\Core\MsgHandler\JsonParser.cpp" />
+    <ClCompile Include="..\Core\MsgHandler\LoginMsgHandler.cpp" />
+    <ClCompile Include="..\Core\MsgHandler\MsgHandler.cpp" />
+    <ClCompile Include="..\Core\MsgHandler\WorldMsgHandler.cpp" />
+    <ClCompile Include="..\Core\Network\ArenaConn.cpp" />
+    <ClCompile Include="..\Core\Network\GameClient.cpp" />
+    <ClCompile Include="..\Core\Network\Network.cpp" />
+    <ClCompile Include="..\Core\Network\TcpConduit.cpp" />
+    <ClCompile Include="..\Core\Network\TcpServer.cpp" />
+    <ClCompile Include="..\Core\Script\BattleFormula.cpp" />
+    <ClCompile Include="..\Core\Script\ConfigScript.cpp" />
+    <ClCompile Include="..\Core\Script\DepartDBScript.cpp" />
+    <ClCompile Include="..\Core\Script\GameActionLua.cpp" />
+    <ClCompile Include="..\Core\Script\lua_tinker.cpp" />
+    <ClCompile Include="..\Core\Script\Script.cpp" />
+    <ClCompile Include="..\Core\Script\WorldScript.cpp" />
+    <ClCompile Include="..\Core\Server\Cfg.cpp" />
+    <ClCompile Include="..\Core\Server\GlobalObject.cpp" />
+    <ClCompile Include="..\Core\Server\Main.cpp" />
+    <ClCompile Include="..\Core\Server\OidGenerator.cpp" />
+    <ClCompile Include="..\Core\Server\SysMsg.cpp" />
+    <ClCompile Include="..\Core\Server\WorldServer.cpp" />
+    <ClCompile Include="..\tools\json-1.4\json.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\tools\json-1.4\json_helper.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Core\Battle\BattleField.h" />
+    <ClInclude Include="..\Core\Battle\BattleFighter.h" />
+    <ClInclude Include="..\Core\Battle\BattleObject.h" />
+    <ClInclude Include="..\Core\Battle\BattleReport.h" />
+    <ClInclude Include="..\Core\Battle\BattleSimulator.h" />
+    <ClInclude Include="..\Core\Common\Ascii.h" />
+    <ClInclude Include="..\Core\Common\AtomicCounter.h" />
+    <ClInclude Include="..\Core\Common\AtomicVal.h" />
+    <ClInclude Include="..\Core\Common\AutoPtr.h" />
+    <ClInclude Include="..\Core\Common\BaseThread.h" />
+    <ClInclude Include="..\Core\Common\BinaryReader.h" />
+    <ClInclude Include="..\Core\Common\Buffer.h" />
+    <ClInclude Include="..\Core\Common\BufferAllocator.h" />
+    <ClInclude Include="..\Core\Common\BufferedStreamBuf.h" />
+    <ClInclude Include="..\Core\Common\Bugcheck.h" />
+    <ClInclude Include="..\Core\Common\Compat.h" />
+    <ClInclude Include="..\Core\Common\Debugger.h" />
+    <ClInclude Include="..\Core\Common\DigestEngine.h" />
+    <ClInclude Include="..\Core\Common\DirectoryIterator.h" />
+    <ClInclude Include="..\Core\Common\DirectoryIterator_UNIX.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\DirectoryIterator_WIN32.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Environment.h" />
+    <ClInclude Include="..\Core\Common\Environment_UNIX.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Environment_WIN32.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\ErrorHandler.h" />
+    <ClInclude Include="..\Core\Common\Event.h" />
+    <ClInclude Include="..\Core\Common\Event_POSIX.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Event_WIN32.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Exception.h" />
+    <ClInclude Include="..\Core\Common\File.h" />
+    <ClInclude Include="..\Core\Common\File_UNIX.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\File_WIN32.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\HashList.h" />
+    <ClInclude Include="..\Core\Common\HashTable.h" />
+    <ClInclude Include="..\Core\Common\Itoa.h" />
+    <ClInclude Include="..\Core\Common\LoadingCounter.h" />
+    <ClInclude Include="..\Core\Common\MemBlockPool.h" />
+    <ClInclude Include="..\Core\Common\Mutex.h" />
+    <ClInclude Include="..\Core\Common\Mutex_POSIX.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Mutex_WIN32.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Node.h" />
+    <ClInclude Include="..\Core\Common\Noncopyable.h" />
+    <ClInclude Include="..\Core\Common\NumberFormatter.h" />
+    <ClInclude Include="..\Core\Common\Path.h" />
+    <ClInclude Include="..\Core\Common\Path_UNIX.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Path_WIN32.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Platform.h" />
+    <ClInclude Include="..\Core\Common\Queue.h" />
+    <ClInclude Include="..\Core\Common\Random.h" />
+    <ClInclude Include="..\Core\Common\RandomStream.h" />
+    <ClInclude Include="..\Core\Common\RefCountedObject.h" />
+    <ClInclude Include="..\Core\Common\Runnable.h" />
+    <ClInclude Include="..\Core\Common\ScopedLock.h" />
+    <ClInclude Include="..\Core\Common\Serialize.h" />
+    <ClInclude Include="..\Core\Common\SHA1Engine.h" />
+    <ClInclude Include="..\Core\Common\SignalHandler.h" />
+    <ClInclude Include="..\Core\Common\Singleton.h" />
+    <ClInclude Include="..\Core\Common\SingletonHolder.h" />
+    <ClInclude Include="..\Core\Common\Stream.h" />
+    <ClInclude Include="..\Core\Common\StreamUtil.h" />
+    <ClInclude Include="..\Core\Common\String.h" />
+    <ClInclude Include="..\Core\Common\StringTokenizer.h" />
+    <ClInclude Include="..\Core\Common\Thread.h" />
+    <ClInclude Include="..\Core\Common\ThreadLocal.h" />
+    <ClInclude Include="..\Core\Common\Thread_POSIX.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Thread_WIN32.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Timespan.h" />
+    <ClInclude Include="..\Core\Common\Timestamp.h" />
+    <ClInclude Include="..\Core\Common\TimeUtil.h" />
+    <ClInclude Include="..\Core\Common\TInf.h" />
+    <ClInclude Include="..\Core\Common\Unzipper.h" />
+    <ClInclude Include="..\Core\Common\URandom.h" />
+    <ClInclude Include="..\Core\Common\Zip.h" />
+    <ClInclude Include="..\Core\Common\Zipper.h" />
+    <ClInclude Include="..\Core\Config.h" />
+    <ClInclude Include="..\Core\DB\DBConn.h" />
+    <ClInclude Include="..\Core\DB\DBConnectionMgr.h" />
+    <ClInclude Include="..\Core\DB\DBExecHelper.h" />
+    <ClInclude Include="..\Core\DB\DBExecutor.h" />
+    <ClInclude Include="..\Core\DB\DBExecutorMgr.h" />
+    <ClInclude Include="..\Core\DB\DBWorker.h" />
+    <ClInclude Include="..\Core\GData\AcuPraTable.h" />
+    <ClInclude Include="..\Core\GData\Area.h" />
+    <ClInclude Include="..\Core\GData\AttrExtra.h" />
+    <ClInclude Include="..\Core\GData\CittaTable.h" />
+    <ClInclude Include="..\Core\GData\ClanAssistantData.h" />
+    <ClInclude Include="..\Core\GData\ClanLvlTable.h" />
+    <ClInclude Include="..\Core\GData\ClanSkillTable.h" />
+    <ClInclude Include="..\Core\GData\ClanTechTable.h" />
+    <ClInclude Include="..\Core\GData\CopyTable.h" />
+    <ClInclude Include="..\Core\GData\DungeonData.h" />
+    <ClInclude Include="..\Core\GData\EUpgradeTable.h" />
+    <ClInclude Include="..\Core\GData\ExpTable.h" />
+    <ClInclude Include="..\Core\GData\FighterProb.h" />
+    <ClInclude Include="..\Core\GData\Formation.h" />
+    <ClInclude Include="..\Core\GData\FrontMapTable.h" />
+    <ClInclude Include="..\Core\GData\GDataDBExecHelper.h" />
+    <ClInclude Include="..\Core\GData\GDataManager.h" />
+    <ClInclude Include="..\Core\GData\ItemType.h" />
+    <ClInclude Include="..\Core\GData\LootTable.h" />
+    <ClInclude Include="..\Core\GData\Money.h" />
+    <ClInclude Include="..\Core\GData\NpcGroup.h" />
+    <ClInclude Include="..\Core\GData\ObjectBase.h" />
+    <ClInclude Include="..\Core\GData\ObjectManager.h" />
+    <ClInclude Include="..\Core\GData\SkillStrengthen.h" />
+    <ClInclude Include="..\Core\GData\SkillTable.h" />
+    <ClInclude Include="..\Core\GData\SoulExpTable.h" />
+    <ClInclude Include="..\Core\GData\SoulSkillTable.h" />
+    <ClInclude Include="..\Core\GData\SpiritAttrTable.h" />
+    <ClInclude Include="..\Core\GData\Store.h" />
+    <ClInclude Include="..\Core\GData\TalentTable.h" />
+    <ClInclude Include="..\Core\GData\TaskNpcRelation.h" />
+    <ClInclude Include="..\Core\GData\TaskType.h" />
+    <ClInclude Include="..\Core\GData\Title.h" />
+    <ClInclude Include="..\Core\GData\WeaponDef.h" />
+    <ClInclude Include="..\Core\GObject\ActivityMgr.h" />
+    <ClInclude Include="..\Core\GObject\Announce.h" />
+    <ClInclude Include="..\Core\GObject\Arena.h" />
+    <ClInclude Include="..\Core\GObject\ArenaBattle.h" />
+    <ClInclude Include="..\Core\GObject\Athletics.h" />
+    <ClInclude Include="..\Core\GObject\AthleticsRank.h" />
+    <ClInclude Include="..\Core\GObject\AttainMgr.h" />
+    <ClInclude Include="..\Core\GObject\AttrFactor.h" />
+    <ClInclude Include="..\Core\GObject\BlockBossMgr.h" />
+    <ClInclude Include="..\Core\GObject\Boss.h" />
+    <ClInclude Include="..\Core\GObject\CFriend.h" />
+    <ClInclude Include="..\Core\GObject\ChatItem.h" />
+    <ClInclude Include="..\Core\GObject\Clan.h" />
+    <ClInclude Include="..\Core\GObject\ClanBattle.h" />
+    <ClInclude Include="..\Core\GObject\ClanDynamicMsg.h" />
+    <ClInclude Include="..\Core\GObject\ClanManager.h" />
+    <ClInclude Include="..\Core\GObject\ClanRankBattle.h" />
+    <ClInclude Include="..\Core\GObject\ClanTech.h" />
+    <ClInclude Include="..\Core\GObject\Copy.h" />
+    <ClInclude Include="..\Core\GObject\Country.h" />
+    <ClInclude Include="..\Core\GObject\CountryBattle.h" />
+    <ClInclude Include="..\Core\GObject\DCLogger.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\DCWorker.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\Dungeon.h" />
+    <ClInclude Include="..\Core\GObject\EventBase.h" />
+    <ClInclude Include="..\Core\GObject\EventTimer.h" />
+    <ClInclude Include="..\Core\GObject\Fighter.h" />
+    <ClInclude Include="..\Core\GObject\FrontMap.h" />
+    <ClInclude Include="..\Core\GObject\GGlobalObjectManager.h" />
+    <ClInclude Include="..\Core\GObject\GLocalObjectManager.h" />
+    <ClInclude Include="..\Core\GObject\GObjectBase.h" />
+    <ClInclude Include="..\Core\GObject\GObjectDBExecHelper.h" />
+    <ClInclude Include="..\Core\GObject\GObjectManager.h" />
+    <ClInclude Include="..\Core\GObject\GVar.h" />
+    <ClInclude Include="..\Core\GObject\HeroIsland.h" />
+    <ClInclude Include="..\Core\GObject\HeroMemo.h" />
+    <ClInclude Include="..\Core\GObject\HoneyFall.h" />
+    <ClInclude Include="..\Core\GObject\Item.h" />
+    <ClInclude Include="..\Core\GObject\ItemData.h" />
+    <ClInclude Include="..\Core\GObject\Leaderboard.h" />
+    <ClInclude Include="..\Core\GObject\LuckyDraw.h" />
+    <ClInclude Include="..\Core\GObject\Mail.h" />
+    <ClInclude Include="..\Core\GObject\Map.h" />
+    <ClInclude Include="..\Core\GObject\MapCollection.h" />
+    <ClInclude Include="..\Core\GObject\MapObject.h" />
+    <ClInclude Include="..\Core\GObject\MOAction.h" />
+    <ClInclude Include="..\Core\GObject\NewRelation.h" />
+    <ClInclude Include="..\Core\GObject\Package.h" />
+    <ClInclude Include="..\Core\GObject\Player.h" />
+    <ClInclude Include="..\Core\GObject\PracticePlace.h" />
+    <ClInclude Include="..\Core\GObject\Prepaid.h" />
+    <ClInclude Include="..\Core\GObject\RealItemAward.h" />
+    <ClInclude Include="..\Core\GObject\Sale.h" />
+    <ClInclude Include="..\Core\GObject\SaleMgr.h" />
+    <ClInclude Include="..\Core\GObject\SecondSoul.h" />
+    <ClInclude Include="..\Core\GObject\ShuoShuo.h" />
+    <ClInclude Include="..\Core\GObject\SortWorker.h" />
+    <ClInclude Include="..\Core\GObject\SpecialAward.h" />
+    <ClInclude Include="..\Core\GObject\TaskData.h" />
+    <ClInclude Include="..\Core\GObject\TaskMgr.h" />
+    <ClInclude Include="..\Core\GObject\TeamCopy.h" />
+    <ClInclude Include="..\Core\GObject\TownDeamon.h" />
+    <ClInclude Include="..\Core\GObject\Trade.h" />
+    <ClInclude Include="..\Core\GObject\TradeCheck.h" />
+    <ClInclude Include="..\Core\GObject\Var.h" />
+    <ClInclude Include="..\Core\GObject\WBossMgr.h" />
+    <ClInclude Include="..\Core\GObject\World.h" />
+    <ClInclude Include="..\Core\Login\LoginWorker.h" />
+    <ClInclude Include="..\Core\Log\Log.h" />
+    <ClInclude Include="..\Core\lua\lapi.h" />
+    <ClInclude Include="..\Core\lua\lauxlib.h" />
+    <ClInclude Include="..\Core\lua\lcode.h" />
+    <ClInclude Include="..\Core\lua\ldebug.h" />
+    <ClInclude Include="..\Core\lua\ldo.h" />
+    <ClInclude Include="..\Core\lua\lfunc.h" />
+    <ClInclude Include="..\Core\lua\lgc.h" />
+    <ClInclude Include="..\Core\lua\llex.h" />
+    <ClInclude Include="..\Core\lua\llimits.h" />
+    <ClInclude Include="..\Core\lua\lmem.h" />
+    <ClInclude Include="..\Core\lua\lobject.h" />
+    <ClInclude Include="..\Core\lua\lopcodes.h" />
+    <ClInclude Include="..\Core\lua\lparser.h" />
+    <ClInclude Include="..\Core\lua\lstate.h" />
+    <ClInclude Include="..\Core\lua\lstring.h" />
+    <ClInclude Include="..\Core\lua\ltable.h" />
+    <ClInclude Include="..\Core\lua\ltm.h" />
+    <ClInclude Include="..\Core\lua\lua.h" />
+    <ClInclude Include="..\Core\lua\luaconf.h" />
+    <ClInclude Include="..\Core\lua\lualib.h" />
+    <ClInclude Include="..\Core\lua\lundump.h" />
+    <ClInclude Include="..\Core\lua\lvm.h" />
+    <ClInclude Include="..\Core\lua\lzio.h" />
+    <ClInclude Include="..\Core\MsgHandler\CountryInnerMsgHandler.h" />
+    <ClInclude Include="..\Core\MsgHandler\CountryMsgHandler.h" />
+    <ClInclude Include="..\Core\MsgHandler\CountryMsgStruct.h" />
+    <ClInclude Include="..\Core\MsgHandler\CountryOuterMsgHandler.h" />
+    <ClInclude Include="..\Core\MsgHandler\GMHandler.h" />
+    <ClInclude Include="..\Core\MsgHandler\JsonParser.h" />
+    <ClInclude Include="..\Core\MsgHandler\LoginInnerMsgHandler.h" />
+    <ClInclude Include="..\Core\MsgHandler\LoginMsgHandler.h" />
+    <ClInclude Include="..\Core\MsgHandler\LoginOuterMsgHandler.h" />
+    <ClInclude Include="..\Core\MsgHandler\MsgFunc.h" />
+    <ClInclude Include="..\Core\MsgHandler\MsgHandler.h" />
+    <ClInclude Include="..\Core\MsgHandler\MsgTypes.h" />
+    <ClInclude Include="..\Core\MsgHandler\WorldInnerMsgHandler.h" />
+    <ClInclude Include="..\Core\MsgHandler\WorldMsgHandler.h" />
+    <ClInclude Include="..\Core\MsgHandler\WorldOuterMsgHandler.h" />
+    <ClInclude Include="..\Core\MsgID.h" />
+    <ClInclude Include="..\Core\Network\ArenaConn.h" />
+    <ClInclude Include="..\Core\Network\GameClient.h" />
+    <ClInclude Include="..\Core\Network\Network.h" />
+    <ClInclude Include="..\Core\Network\TcpConduit.h" />
+    <ClInclude Include="..\Core\Network\TcpServer.h" />
+    <ClInclude Include="..\Core\Network\TcpServerWrapper.h" />
+    <ClInclude Include="..\Core\Script\BattleFormula.h" />
+    <ClInclude Include="..\Core\Script\ConfigScript.h" />
+    <ClInclude Include="..\Core\Script\DepartDBScript.h" />
+    <ClInclude Include="..\Core\Script\GameActionLua.h" />
+    <ClInclude Include="..\Core\Script\lua_tinker.h" />
+    <ClInclude Include="..\Core\Script\Script.h" />
+    <ClInclude Include="..\Core\Script\WorldScript.h" />
+    <ClInclude Include="..\Core\Server\Cfg.h" />
+    <ClInclude Include="..\Core\Server\GlobalObject.h" />
+    <ClInclude Include="..\Core\Server\OidGenerator.h" />
+    <ClInclude Include="..\Core\Server\ServerTypes.h" />
+    <ClInclude Include="..\Core\Server\SysMsg.h" />
+    <ClInclude Include="..\Core\Server\WorkerRunner.h" />
+    <ClInclude Include="..\Core\Server\WorkerThread.h" />
+    <ClInclude Include="..\Core\Server\WorldServer.h" />
+    <ClInclude Include="..\tools\json-1.4\json.h" />
+    <ClInclude Include="..\tools\json-1.4\json_helper.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Core\Script\GameActionLuaImpl.inl" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

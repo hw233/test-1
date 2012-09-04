@@ -1,4 +1,4 @@
-#ifndef _SECOND_SOUL_H_
+﻿#ifndef _SECOND_SOUL_H_
 #define _SECOND_SOUL_H_
 
 #include "Config.h"

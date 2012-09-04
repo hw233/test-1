@@ -18,7 +18,7 @@ struct AssistantFData
 {
 	AssistantFData(GObject::Fighter * f = NULL, UInt8 fn = 0, UInt8 pb = 0, UInt8 pe = 4)
 		: fighter(f), fighterNum(fn) { }
-	
+
 	GObject::Fighter * fighter;
 	UInt8 fighterNum;
 	std::vector<UInt8> pos;

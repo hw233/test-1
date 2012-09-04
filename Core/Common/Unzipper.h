@@ -28,7 +28,7 @@ public:
     }
 
     inline const UInt8* operator & () const { return &m_data[0]; }
-    inline size_type size() const { return m_size; } 
+    inline size_type size() const { return m_size; }
 
 private:
     container m_data;

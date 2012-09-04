@@ -1,4 +1,4 @@
-#ifndef _GDATADBEXECHELPER_H_
+﻿#ifndef _GDATADBEXECHELPER_H_
 #define _GDATADBEXECHELPER_H_
 
 #include "DB/DBExecHelper.h"
@@ -27,7 +27,7 @@ struct DBItemType
 {
 	UInt32		typeId;         // 物品编号
 	std::string	name;           // 名字
-	UInt8		subClass;       // 物品类型 - 
+	UInt8		subClass;       // 物品类型 -
     UInt8       career;         // 职业
 	UInt16		reqLev;         // 物品(可装备)等级
 	UInt16		vLev;           // 物品(价值)等级
@@ -296,7 +296,7 @@ struct DBExp
 	UInt64 exp;
 };
 
-struct DBSoulExp 
+struct DBSoulExp
 {
 	UInt8 lvl;
 	UInt32 exp;
@@ -850,7 +850,7 @@ SPECIALDEF(4)
     (
         UInt8, id,
         UInt8, floor,
-        UInt8, spot, 
+        UInt8, spot,
         UInt32, fighterId
     )
 SPECIALEND()
@@ -859,8 +859,8 @@ SPECIALBEGIN(GData::DBFrontMap)
 SPECIALDEF(4)
     (
         UInt8, id,
-        UInt8, spot, 
-        UInt8, count, 
+        UInt8, spot,
+        UInt8, count,
         UInt32, fighterId
     )
 SPECIALEND()

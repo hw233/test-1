@@ -50,9 +50,9 @@ void TradeCheck::update(UInt32 curr)
 	iterator itUp = _tradeDatas.upper_bound(curr-TRADE_TIME_OUT);
 	for (iterator it = _tradeDatas.begin(); it != itUp;)
 	{
-		UInt32 id = it->second->_id; 
+		UInt32 id = it->second->_id;
 		GameMsgHdr hdr(0x295, it->second->_trader->getThreadId(), it->second->_trader, sizeof(UInt32));
-		GLOBAL().PushMsg(hdr, &id);	
+		GLOBAL().PushMsg(hdr, &id);
 		SAFE_DELETE(it->second);
 		_tradeDatas.erase(it++);
 	}

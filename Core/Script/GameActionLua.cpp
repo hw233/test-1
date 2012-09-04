@@ -1,4 +1,4 @@
-#include "Config.h"
+ï»¿#include "Config.h"
 #include "GameActionLua.h"
 #include "Server/WorldServer.h"
 #include "GObject/Player.h"
@@ -28,7 +28,7 @@ namespace Script
 
 	GameActionLua::~GameActionLua()
 	{
-		
+
 	}
 
 	void GameActionLua::init()
@@ -314,7 +314,7 @@ namespace Script
 		CLASS_DEF(TaskMgr, AddDummyTaskStep);
 		CLASS_DEF(TaskMgr, AddDummyTaskStep2);
 		CLASS_DEF(TaskMgr, AcceptTask);
-		CLASS_DEF(TaskMgr, SubmitTask);	
+		CLASS_DEF(TaskMgr, SubmitTask);
 		CLASS_DEF(TaskMgr, AbandonTask);
 		CLASS_DEF(TaskMgr, ResetTaskStep);
 		CLASS_DEF(TaskMgr, CheckPreTaskStep);
@@ -350,7 +350,7 @@ namespace Script
         CLASS_DEF(ActivityMgr, GetPoint);
         CLASS_DEF(ActivityMgr, AddRewardFlag);
         CLASS_DEF(ActivityMgr, AddScores);
-	    	
+
         //????
 		CLASS_ADD(Package);
 		CLASS_DEF(Package, Add);
@@ -379,7 +379,7 @@ namespace Script
 		CLASS_DEF(Package, IsFull);
 		CLASS_DEF(Package, DelItemSendMsg);
 		CLASS_DEF(Package, GetItemCareer);
-		
+
 		//??Æ·
 		CLASS_ADD(ItemBase);
 		CLASS_DEF(ItemBase, Count);
@@ -423,27 +423,27 @@ namespace Script
 
 	UInt32 GameActionLua::GetRandLoopTask(Player * player, UInt32 dayTaskId)
 	{
-		return Run<UInt32>(player, "GetRandLoopTask", dayTaskId);	
+		return Run<UInt32>(player, "GetRandLoopTask", dayTaskId);
 	}
 
 	UInt8 GameActionLua::GetRandLoopTaskQuality()
 	{
-		return Run<UInt8>(NULL, "GetRandLoopTaskQuality");	
+		return Run<UInt8>(NULL, "GetRandLoopTaskQuality");
 	}
 
 	UInt16 GameActionLua::GetLoopTaskMaxCount(UInt32 dayTaskId)
 	{
-		return Run<UInt16>(NULL, "GetLoopTaskMaxCount", dayTaskId);	
+		return Run<UInt16>(NULL, "GetLoopTaskMaxCount", dayTaskId);
 	}
 
 	UInt16 GameActionLua::GetLoopTaskMaxQualityCount(UInt32 dayTaskId)
 	{
-		return Run<UInt16>(NULL, "GetLoopTaskMaxQualityCount", dayTaskId);	
+		return Run<UInt16>(NULL, "GetLoopTaskMaxQualityCount", dayTaskId);
 	}
 
 	Table GameActionLua::GetLoopTaskTasks(Player * player, UInt32 dayTaskId)
 	{
-		return Run<Table>(player, "GetLoopTaskTasks", dayTaskId);		
+		return Run<Table>(player, "GetLoopTaskTasks", dayTaskId);
 	}
 
 	UInt32 GameActionLua::GetLoopTaskIdByNpc(Player * player, UInt32 npcId)
@@ -527,7 +527,7 @@ namespace Script
 		MOAction::ItemTaskAction(player, taskId, dummyNpcId);
 	}
 
-	UInt32 GameActionLua::GetSharpDay(UInt32 now) 
+	UInt32 GameActionLua::GetSharpDay(UInt32 now)
 	{
 		return TimeUtil::SharpDay(0, now);
 	}
@@ -854,10 +854,10 @@ namespace Script
 		}
 		if (player->getCountry() == 1)
 		{
-			return "À¥??";
+			return "%??";
         }
 		else{
-			return "??Á¢";
+			return "??b";
 		}
 	}
 
@@ -1098,7 +1098,7 @@ namespace Script
 	}
 	lua_tinker::table GameActionLua::onGetMailItems(UInt32 pkgId)
 	{
-		return Call<lua_tinker::table>("onGetMailItems", pkgId);	
+		return Call<lua_tinker::table>("onGetMailItems", pkgId);
 	}
 
     lua_tinker::table GameActionLua::GetOnlineReward(UInt8 cnt)
@@ -1226,12 +1226,12 @@ namespace Script
     {
 		return Call<void>("sendRechargeMails", player, ototal, ntotal);
     }
-    
+
     void GameActionLua::doAtySignIn(Player* pl, UInt32 id, UInt32 month, UInt32 day)
     {
         return Call<void>("doAtySignIn", pl, id, month, day);
     }
-    
+
     lua_tinker::table GameActionLua::GetExchangeProps(UInt32 id)
     {
         return Call<lua_tinker::table>("GetExchangeProps", id);

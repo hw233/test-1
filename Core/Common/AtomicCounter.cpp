@@ -12,7 +12,7 @@ AtomicCounter::AtomicCounter():
 {
 }
 
-	
+
 AtomicCounter::AtomicCounter(AtomicCounter::ValueType initialValue):
 	_counter(initialValue)
 {
@@ -36,7 +36,7 @@ AtomicCounter& AtomicCounter::operator = (const AtomicCounter& counter)
 	return *this;
 }
 
-	
+
 AtomicCounter& AtomicCounter::operator = (AtomicCounter::ValueType value)
 {
 	InterlockedExchange(&_counter, value);
@@ -53,7 +53,7 @@ AtomicCounter::AtomicCounter():
 {
 }
 
-	
+
 AtomicCounter::AtomicCounter(AtomicCounter::ValueType initialValue):
 	_counter(initialValue)
 {
@@ -77,7 +77,7 @@ AtomicCounter& AtomicCounter::operator = (const AtomicCounter& counter)
 	return *this;
 }
 
-	
+
 AtomicCounter& AtomicCounter::operator = (AtomicCounter::ValueType value)
 {
 	_counter = value;
@@ -94,7 +94,7 @@ AtomicCounter::AtomicCounter()
 	_counter.value = 0;
 }
 
-	
+
 AtomicCounter::AtomicCounter(AtomicCounter::ValueType initialValue)
 {
 	_counter.value = initialValue;
@@ -119,7 +119,7 @@ AtomicCounter& AtomicCounter::operator = (const AtomicCounter& counter)
 	return *this;
 }
 
-	
+
 AtomicCounter& AtomicCounter::operator = (AtomicCounter::ValueType value)
 {
 	FastMutex::ScopedLock lock(_counter.mutex);
