@@ -33,12 +33,12 @@ public:
 	inline UInt8 GetType() const		{ return m_MOData.m_Type;	}
 	inline UInt32 GetActionType() const	{ return m_MOData.m_ActionType; }
 	inline bool IsHide() const			{ return m_MOData.m_Hide; }
-	
+
 	inline MOData& GetMOData()	{ return m_MOData;	}
 
 public:
 	void Action(Player* player);
-	
+
 private:
 	MOData m_MOData;
 };

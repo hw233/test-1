@@ -1,4 +1,4 @@
-
+﻿
 #ifndef PRACTICEPLACE_H_
 #define PRACTICEPLACE_H_
 
@@ -74,7 +74,7 @@ struct PlaceData
 {
     PlaceData() : used(0)
     {
-        bzero(&place, sizeof(place));
+        memset(&place, 0, sizeof(place));
     }
     ~PlaceData() { }
 
@@ -109,7 +109,7 @@ public:
     // 更新修炼将
     void updateFighters(std::list<UInt32>& fgts, UInt64 id);
 
-    // 取得所有修练点信息 
+    // 取得所有修练点信息
     void getAllPlaceInfo(Player* pl);
     // 取得修炼点信息
     void getPlaceInfo(Player* pl, UInt8 place);

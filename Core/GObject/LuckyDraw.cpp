@@ -24,7 +24,7 @@ void LuckyDraw::sendInfo(Player* player)
     if (!player)
         return;
     FastMutex::ScopedLock lock(_lock);
-    
+
     Stream st(REP::LUCKYDRAW);
 
     st << static_cast<UInt8>(1);

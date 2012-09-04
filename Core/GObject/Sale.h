@@ -100,7 +100,7 @@ struct SaleSearchResp
 	UInt16 count;
 	Player * founder;
 
-	SaleSearchResp() 
+	SaleSearchResp()
 	{
 		memset(this, 0x00, sizeof(SaleSearchResp));
 	}
@@ -130,7 +130,7 @@ public:
 public:
 	bool addSaleFromDB(SaleSellRespData *);
 	bool addSaleMailFromDB(UInt32, ItemBase *, bool = false);
-	
+
 public:
 	void sellSaleReq(std::vector<SaleSellData>&);
 	void sellSaleReqNotify(SaleSellRespData *, UInt8);
@@ -152,7 +152,7 @@ public:
 	}
 	inline void addAccessSaleItem(UInt32 id)
 	{
-		_accessItems.insert(id); 
+		_accessItems.insert(id);
 	}
 
 private:

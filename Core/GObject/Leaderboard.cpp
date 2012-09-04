@@ -1,4 +1,4 @@
-#include "Config.h"
+﻿#include "Config.h"
 #include "Leaderboard.h"
 #include "Country.h"
 #include "Server/WorldServer.h"
@@ -427,7 +427,7 @@ void Leaderboard::doUpdate()
 		"WHERE `clan_skill`.`clanId` = `clan`.`id` AND `clan_skill`.`skillId` = 1 AND `clan`.`id` = `clan_player`.`id`"
 		"AND `clan`.`leader` = `player`.`id` AND `player`.`country` = 0 GROUP BY `clan_player`.`id`"
 		"ORDER BY `clan_skill`.`level` DESC, `clan`.`proffer` DESC, COUNT(`clan_player`.`id`) DESC LIMIT 0, 100", clist);
-	
+
 	cnt = clist.size();
 	for(size_t i = 0; i < cnt; ++ i)
 	{
@@ -505,7 +505,7 @@ void Leaderboard::sendOwnRank( Player * player, UInt32 id )
 
         if(country > 1)
             return;
-        
+
 		_searchInside(st, _levelRankWorld, pid);
 		_searchInside(st, _levelRankCountry[country], pid);
 		_searchInside(st, _moneyRankWorld, pid);
@@ -533,7 +533,7 @@ void Leaderboard::newDrawingGame(UInt32 nextday)
 
     if(TimeUtil::SharpDay(0, nextday) == opTime + 7 * 86400 )
     {
-        UInt16 newAward[] = { 1000,800,600,400,200,100,100,100,100,100 }; 
+        UInt16 newAward[] = { 1000,800,600,400,200,100,100,100,100,100 };
         //新人冲级赛 等级前十 送礼券
         for(UInt16 rank = 0; rank < _levelRankWorld10.size(); ++rank){
             Player * pl = GObject::globalPlayers[_levelRankWorld10[rank]];

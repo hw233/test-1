@@ -1,4 +1,4 @@
-#ifndef _GDATAMANAGER_H_
+﻿#ifndef _GDATAMANAGER_H_
 #define _GDATAMANAGER_H_
 
 #include "GData/ItemType.h"

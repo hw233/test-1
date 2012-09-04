@@ -15,7 +15,7 @@ protected:
 	bool tryLockImpl();
 	bool tryLockImpl(long milliseconds);
 	void unlockImpl();
-	
+
 private:
 	CRITICAL_SECTION _cs;
 };

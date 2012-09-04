@@ -7,7 +7,7 @@ std::string Itoa(Type n, int dec = 10)
 	char buffer[256];
 	char* p = buffer;
 
-	do 
+	do
 	{
 		*p++ = "0123456789"[n % dec];
 		n /= dec;

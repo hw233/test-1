@@ -16,7 +16,7 @@ static UInt8 clanTechDonateType[] = { 0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }
 
 ClanTech::ClanTech(Clan * c) : _clanLev(0), _clan(c)
 {
-	
+
 }
 
 ClanTech::~ClanTech()
@@ -85,7 +85,7 @@ bool ClanTech::donate(Player * player, UInt8 id, UInt16 type, UInt32 count)
 		}
 		break;
 	default:
-		{	
+		{
 			//捐献喜好品
 			//const UInt8 index[] = {0, 0, 0, 0, 0, 0, 0, 7, 7, 7, 7};
 			//if(id > 10  || id < 7)
@@ -192,7 +192,7 @@ UInt32 ClanTech::getExtra(UInt8 id)
 {
 	Techs::iterator found = _techs.find(id);
 	if (found == _techs.end())
-		return 0; 
+		return 0;
 	return found->second.extra;
 }
 
@@ -230,7 +230,7 @@ UInt16 ClanTech::getClanAchieve()
 	return static_cast<UInt16>(achieve <= 0 ? 0 : achieve);
 }
 
-UInt32 ClanTech::getAtuobattleSpeed() //挂机加速 
+UInt32 ClanTech::getAtuobattleSpeed() //挂机加速
 {
 	Mutex::ScopedLock lk(_mutex);
 	Techs::iterator found = _techs.find(2);
@@ -246,8 +246,8 @@ bool ClanTech::getHoldAssist(UInt16& cnt, UInt32& mt)
 
 	Techs::iterator found = _techs.find(5);
 	if (found != _techs.end())
-		mt = GData::clanTechTable[5][found->second.level].effect1; 
-	
+		mt = GData::clanTechTable[5][found->second.level].effect1;
+
 	found = _techs.find(6);
 	if (found != _techs.end())
 		cnt = GData::clanTechTable[6][found->second.level].effect1;

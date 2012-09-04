@@ -1,9 +1,8 @@
 #include "File_WIN32.h"
 #include "Exception.h"
-#include "String.h"
+#include "StringUtil.h"
 
-
-
+#include "Path.h"
 
 
 
@@ -18,17 +17,17 @@ public:
 			FileImpl::handleLastErrorImpl(path);
 		}
 	}
-	
+
 	~FileHandle()
 	{
 		if (_h != INVALID_HANDLE_VALUE) CloseHandle(_h);
 	}
-	
+
 	HANDLE get() const
 	{
 		return _h;
 	}
-	
+
 private:
 	HANDLE _h;
 };
@@ -96,7 +95,7 @@ bool FileImpl::existsImpl() const
 bool FileImpl::canReadImpl() const
 {
 	common_assert (!_path.empty());
-	
+
 	DWORD attr = GetFileAttributes(_path.c_str());
 	if (attr == 0xFFFFFFFF)
 	{
@@ -115,7 +114,7 @@ bool FileImpl::canReadImpl() const
 bool FileImpl::canWriteImpl() const
 {
 	common_assert (!_path.empty());
-	
+
 	DWORD attr = GetFileAttributes(_path.c_str());
 	if (attr == 0xFFFFFFFF)
 		handleLastErrorImpl(_path);
@@ -183,7 +182,7 @@ Timestamp FileImpl::createdImpl() const
 	common_assert (!_path.empty());
 
 	WIN32_FILE_ATTRIBUTE_DATA fad;
-	if (GetFileAttributesEx(_path.c_str(), GetFileExInfoStandard, &fad) == 0) 
+	if (GetFileAttributesEx(_path.c_str(), GetFileExInfoStandard, &fad) == 0)
 		handleLastErrorImpl(_path);
 	return Timestamp::fromFileTimeNP(fad.ftCreationTime.dwLowDateTime, fad.ftCreationTime.dwHighDateTime);
 }
@@ -194,7 +193,7 @@ Timestamp FileImpl::getLastModifiedImpl() const
 	common_assert (!_path.empty());
 
 	WIN32_FILE_ATTRIBUTE_DATA fad;
-	if (GetFileAttributesEx(_path.c_str(), GetFileExInfoStandard, &fad) == 0) 
+	if (GetFileAttributesEx(_path.c_str(), GetFileExInfoStandard, &fad) == 0)
 		handleLastErrorImpl(_path);
 	return Timestamp::fromFileTimeNP(fad.ftLastWriteTime.dwLowDateTime, fad.ftLastWriteTime.dwHighDateTime);
 }
@@ -221,7 +220,7 @@ FileImpl::FileSizeImpl FileImpl::getSizeImpl() const
 	common_assert (!_path.empty());
 
 	WIN32_FILE_ATTRIBUTE_DATA fad;
-	if (GetFileAttributesEx(_path.c_str(), GetFileExInfoStandard, &fad) == 0) 
+	if (GetFileAttributesEx(_path.c_str(), GetFileExInfoStandard, &fad) == 0)
 		handleLastErrorImpl(_path);
 	LARGE_INTEGER li;
 	li.LowPart  = fad.nFileSizeLow;
@@ -239,7 +238,7 @@ void FileImpl::setSizeImpl(FileSizeImpl size)
 	li.QuadPart = size;
 	if (SetFilePointer(fh.get(), li.LowPart, &li.HighPart, FILE_BEGIN) == -1)
 		handleLastErrorImpl(_path);
-	if (SetEndOfFile(fh.get()) == 0) 
+	if (SetEndOfFile(fh.get()) == 0)
 		handleLastErrorImpl(_path);
 }
 
@@ -270,7 +269,7 @@ void FileImpl::copyToImpl(const std::string& path) const
 {
 	common_assert (!_path.empty());
 
-	if (CopyFileA(_path.c_str(), path.c_str(), FALSE) != 0) 
+	if (CopyFileA(_path.c_str(), path.c_str(), FALSE) != 0)
 	{
 		FileImpl copy(path);
 		copy.setWriteableImpl(true);
@@ -283,7 +282,7 @@ void FileImpl::renameToImpl(const std::string& path)
 {
 	common_assert (!_path.empty());
 
-	if (MoveFileA(_path.c_str(), path.c_str()) == 0) 
+	if (MoveFileA(_path.c_str(), path.c_str()) == 0)
 		handleLastErrorImpl(_path);
 }
 
@@ -294,7 +293,7 @@ void FileImpl::removeImpl()
 
 	if (isDirectoryImpl())
 	{
-		if (RemoveDirectoryA(_path.c_str()) == 0) 
+		if (RemoveDirectoryA(_path.c_str()) == 0)
 			handleLastErrorImpl(_path);
 	}
 	else
@@ -326,7 +325,7 @@ bool FileImpl::createFileImpl()
 bool FileImpl::createDirectoryImpl()
 {
 	common_assert (!_path.empty());
-	
+
 	if (existsImpl() && isDirectoryImpl())
 		return false;
 	if (CreateDirectoryA(_path.c_str(), 0) == 0)

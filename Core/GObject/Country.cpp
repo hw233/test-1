@@ -1,4 +1,4 @@
-#include "Config.h"
+﻿#include "Config.h"
 #include "Country.h"
 #include "GData/GDataManager.h"
 #include "Script/GameActionLua.h"

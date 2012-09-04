@@ -1,4 +1,4 @@
-#ifndef _BATTLESIMULATOR_H_
+﻿#ifndef _BATTLESIMULATOR_H_
 #define _BATTLESIMULATOR_H_
 
 #include "BattleField.h"
@@ -30,7 +30,7 @@ namespace Battle
 
         // 斗剑场
         BS_ATHLETICS1 = 0xFD01,
-        // 世界BOSS 
+        // 世界BOSS
         BS_WBOSS = 0xFC01
     };
 
@@ -366,8 +366,8 @@ private:
     /*
     bool    _evade3OK[2]; //达成次数
     bool    _evade9ok[2]; //达成次数
-    bool    _cs3ok[2]; 
-    bool    _cs9ok[2]; 
+    bool    _cs3ok[2];
+    bool    _cs9ok[2];
     bool    _pr3ok[2];
     bool    _pr9ok[2];
     bool    _fj3ok[2];

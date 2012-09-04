@@ -6,6 +6,14 @@
 #ifdef _WIN32
 #include <windows.h>
 #include <winsock2.h>
+#define atoll(STR) _atoi64(STR)
+#define strtoll(STR, END, BASE) _strtoi64(STR, END, BASE)
+
+typedef _int32 int32_t;
+
+#define __PRETTY_FUNCTION__ __FUNCSIG__
+#define __func__ __FUNCTION__
+
 #endif
 
 #include <cstdio>

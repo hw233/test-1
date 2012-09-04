@@ -1,7 +1,7 @@
 #include "DirectoryIterator_WIN32.h"
 #include "File_WIN32.h"
 #include "Path.h"
-
+#include "File.h"
 
 
 
@@ -22,7 +22,7 @@ DirectoryIteratorImpl::DirectoryIteratorImpl(const std::string& path): _fh(INVAL
 	else
 	{
 		_current = _fd.cFileName;
-		if (_current == "." || _current == "..")	
+		if (_current == "." || _current == "..")
 			next();
 	}
 }

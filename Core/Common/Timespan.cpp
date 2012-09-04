@@ -16,7 +16,7 @@ Timespan::Timespan():
 {
 }
 
-	
+
 Timespan::Timespan(TimeDiff microseconds):
 	_span(microseconds)
 {
@@ -28,7 +28,7 @@ Timespan::Timespan(long seconds, long microseconds):
 {
 }
 
-	
+
 Timespan::Timespan(int days, int hours, int minutes, int seconds, int microseconds):
 	_span(TimeDiff(microseconds) + TimeDiff(seconds)*SECONDS + TimeDiff(minutes)*MINUTES + TimeDiff(hours)*HOURS + TimeDiff(days)*DAYS)
 {

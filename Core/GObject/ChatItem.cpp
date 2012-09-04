@@ -40,7 +40,7 @@ UInt32 ChatItem::addFighter( Player * player, UInt32 id )
 	FIndex fi = {player->getId(), id};
 	ChatItemData& cid = _fighterData[fi];
 	cid.st.init(REP::FLAUNT_GOOD);
-    // XXX: 
+    // XXX:
 	cid.st << static_cast<UInt8>(0x02) << static_cast<UInt8>(player->IsMale() ? 0 : 1) << player->getCountry()
 		<< player->getName() << static_cast<UInt16>(fgt->getId()) << fgt->getLevel() << fgt->getPotential() << fgt->getPeerlessAndLevel();
 

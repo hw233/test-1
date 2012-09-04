@@ -1,4 +1,4 @@
-#ifndef _COUNTRYINNERMSGHANDLER_H_
+﻿#ifndef _COUNTRYINNERMSGHANDLER_H_
 #define _COUNTRYINNERMSGHANDLER_H_
 
 #include "Server/GlobalObject.h"
@@ -23,7 +23,9 @@
 #include "Common/Itoa.h"
 #include "Script/BattleFormula.h"
 #include "GObject/Clan.h"
+#ifndef _WIN32
 #include "GObject/DCLogger.h"
+#endif
 #include "GObject/ShuoShuo.h"
 #include "Common/StringTokenizer.h"
 
@@ -38,7 +40,7 @@ void PlayerEnter( GameMsgHdr& hdr, const void * data )
 		{
 			delete player;
 			return;
-		} 
+		}
 		//player->GetPackage()->AddItemFromDB(8942, 1, true);
 		//DB3().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(8942, 1, %"I64_FMT"u, 1)", player->getId());
 	}
@@ -105,9 +107,9 @@ void OnBroadcast( GameMsgHdr& hdr, const void * data )
 {
 #define MSG_MAX 4096
     struct BroadcastMsg
-    {   
+    {
         Map* map;
-        Player* pl; 
+        Player* pl;
         int size;
         char msg[MSG_MAX];
     };
@@ -854,7 +856,7 @@ void OnGoldRecharge( GameMsgHdr& hdr, const void * data )
     if (type == 0)
     {
         struct Recharge
-        {   
+        {
             UInt8 type;
             UInt32 gold;
             char no[256];
@@ -876,16 +878,18 @@ void OnGoldRecharge( GameMsgHdr& hdr, const void * data )
         snprintf(nno, 256, "%s#%s", recharge->uint, recharge->no);
         player->udpLog(nno, recharge->money, gold, id, "", "pay", "pay");
 
+#ifndef _WIN32
 #ifdef _FB
 #else
         UInt32 mny = atoi(recharge->money);
         dclogger.fee(player, 0, mny);
 #endif
+#endif //_WIN32
     }
     else
     {
         struct Recharge
-        {   
+        {
             UInt8 type;
             UInt32 gold;
         };
@@ -1082,10 +1086,12 @@ void OnCreateAward(GameMsgHdr& hdr, const void * data)
     else
         player->udpLog("", "", "", "", "", "", "refer");
     player->sendCreateMail();
+#ifndef _WIN32
 #ifdef _FB
 #else
     dclogger.reg(player);
 #endif
+#endif //_WIN32
 }
 
 void OnRunScriptReq( GameMsgHdr&, const void * data )
@@ -1136,7 +1142,7 @@ void OnSetPropsReq( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);
     struct Props
-    {    
+    {
         UInt32 pexp;
         UInt32 prestige;
         UInt32 honor;
@@ -1434,7 +1440,7 @@ void OnTownDeamonResNotify( GameMsgHdr& hdr, const void* data )
 
 void OnCFriendLvlUp( GameMsgHdr& hdr, const void* data )
 {
-    struct PlayerLvlUp 
+    struct PlayerLvlUp
     {
         Player* player;
         UInt8 lvl;
@@ -1479,7 +1485,7 @@ void OnSendRNR( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);
     struct SendRNR
-    {     
+    {
         Player* player;
         UInt32 off;
         UInt32 date;

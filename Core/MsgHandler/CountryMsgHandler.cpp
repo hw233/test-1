@@ -1,4 +1,4 @@
-#include "Config.h"
+﻿#include "Config.h"
 #include "MsgID.h"
 #include "CountryMsgHandler.h"
 #include "CountryOuterMsgHandler.h"

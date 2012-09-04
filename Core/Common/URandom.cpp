@@ -2,6 +2,15 @@
 #include "URandom.h"
 #include "BaseThread.h"
 
+#ifdef _WIN32
+
+inline int rand_r(unsigned int* seed)
+{
+	return rand();
+}
+
+#endif
+
 URandom::URandom()
 {
 	seed();

@@ -1,4 +1,4 @@
-#ifndef _CLAN_H_
+﻿#ifndef _CLAN_H_
 #define _CLAN_H_
 
 #include <set>
@@ -91,11 +91,11 @@ public:
      */
     bool CheckAddItem(UInt16 id, UInt32 num);
     UInt32 AddItem(UInt16 id, UInt32 num);
- 
+
     /**
      *@brief 获取道具数和移除道具
      */
-    UInt32 GetItemNum(UInt16 id) const; 
+    UInt32 GetItemNum(UInt16 id) const;
     void RemoveItem(UInt16 id, UInt32 num);
 
     /**
@@ -304,7 +304,7 @@ public:
 	UInt8 apply(Player *, UInt32 = 0, bool = true);
 	bool declineInvite(Player *);
 	void updateRank(ClanMember * = NULL, std::string = "");
-	static UInt8 buildRank(UInt16); 
+	static UInt8 buildRank(UInt16);
 	bool donate(Player *, UInt8, UInt16, UInt32);
 	bool checkDonate(Player *, UInt8, UInt16, UInt32);
 	bool GMDonate(Player * player, UInt8 skillId, UInt16 type, UInt32 count);
@@ -433,7 +433,7 @@ public:
 	UInt32 getAllyClanFromDB() { return _allyClanId; }
 	void addAllyClanFromDB(UInt32 ci) { _allyClanId = ci; }
 	void addAllyClanFromDB(Clan * c) { _allyClan = c; }
-	bool addAllyClan(Player *, Player *, Clan *); 
+	bool addAllyClan(Player *, Player *, Clan *);
 	bool delAllyClan(Player *, Clan *);
 	bool hasAllyClan() { return _allyClan != NULL; }
 	bool hasAllyClan(Clan * c) { return c == _allyClan; }
@@ -557,10 +557,10 @@ private:
 	std::vector<ClanPendingMember *> _pending;
 	UInt8 _rank;
 	UInt8 _level;
-    
+
     ClanItemPkg _itemPkg;
-    ItemHistoryList _itemHistories;	
-    
+    ItemHistoryList _itemHistories;
+
     UInt32 _foundTime;
 	UInt64 _founder;
 	std::string _founderName;

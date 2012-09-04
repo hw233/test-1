@@ -1,4 +1,4 @@
-#ifndef _WORLDOUTERMSGHANDLER_H_
+﻿#ifndef _WORLDOUTERMSGHANDLER_H_
 #define _WORLDOUTERMSGHANDLER_H_
 
 #include "MsgTypes.h"
@@ -46,7 +46,7 @@ struct ClanListReq
 	UInt8 _type;
 	UInt16 _startidx;
 	UInt8 _count;
-    UInt8 _flag;      // 0-???? 1-��?? 2-ȫ??
+    UInt8 _flag;      // 0-???? 1-%?? 2-ȫ??
 	std::string _name;
 	MESSAGE_DEF5(REQ::CLAN_LIST, UInt8, _type, UInt16, _startidx, UInt8, _count, UInt8, _flag, std::string, _name);
 };
@@ -736,7 +736,7 @@ void OnClanTechOpReq(GameMsgHdr& hdr, const void * data)
                 clan->skillLevelUp(player, skillId);
             }
             break;
-		}	
+		}
 	}
 
     switch (op)
@@ -770,12 +770,12 @@ void OnClanPackageReq( GameMsgHdr& hdr, const void * data )
 	BinaryReader brd(data, hdr.msgHdr.bodyLen);
     UInt8 op = 0;
     brd >> op;
-    
+
     switch(op)
     {
     case 0: //帮派仓库基础信息请求
         {
-            clan->SendPackageInfo(player); 
+            clan->SendPackageInfo(player);
         }
         break;
     case 1: //帮派仓库列表请求
@@ -978,7 +978,7 @@ void OnClanCityBattleReq( GameMsgHdr& hdr, const void * data )
 					break;
 				case 3:
 					{
-						//??��????
+						//??b????
 						if (clan->hasEnemyClan(allyClan))
 						{
 							r = false;
@@ -1395,7 +1395,7 @@ void OnAthleticsKillCD( GameMsgHdr& hdr, const void * data)
          return;
      GObject::gAthleticsRank.RequestKillCD(player);
 }
-void OnAthleticsGetAwardReq( GameMsgHdr& hdr, AthleticsGetAwardReq& req ) 
+void OnAthleticsGetAwardReq( GameMsgHdr& hdr, AthleticsGetAwardReq& req )
 {
     MSG_QUERY_PLAYER(player);
     GObject::gAthleticsRank.giveAward(player, req._type);

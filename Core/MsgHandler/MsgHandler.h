@@ -15,7 +15,7 @@ namespace GObject
 class MsgHandler
 {
 public:
-	MsgHandler(UInt8 worker = 0xFF) : m_Worker(worker) 
+	MsgHandler(UInt8 worker = 0xFF) : m_Worker(worker)
 	 {
 		 for (int i = 0; i < MAX_MSG_NUM; i++)
 		 {

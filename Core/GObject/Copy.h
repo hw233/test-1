@@ -59,7 +59,7 @@ public:
     UInt8 getCopyFloors(UInt8 id);
     UInt8 checkCopy(Player* pl, UInt8 id, UInt8& lootlvl);
     void sendAutoCopy(Player* pl);
-    
+
 private:
     std::map<UInt64, std::map<UInt8, CopyData> > m_copys;
 	FastMutex _mutex;

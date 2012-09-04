@@ -14,7 +14,7 @@ struct Talent : public ObjectBaseT<UInt16>
         : ObjectBaseT<UInt16>(id, name), cls(0), quality(0), prob(0), potential(0), capacity(0),
         strength(0), strengthP(0), physique(0), physiqueP(0), agility(0), agilityP(0),
         intelligence(0), intelligenceP(0), will(0), willP(0), soul(0), soulP(0), aura(0), auraP(0),
-        auraMax(0), auraMaxP(0), attack(0), attackP(0), magatk(0), magatkP(0), defend(0), defendP(0), 
+        auraMax(0), auraMaxP(0), attack(0), attackP(0), magatk(0), magatkP(0), defend(0), defendP(0),
         magdef(0), magdefP(0), hp(0), hpP(0), tough(0), action(0), hitrate(0), evade(0), critical(0),
         criticaldmg(0), pierce(0), counter(0), magres(0) {}
     ~Talent() {}

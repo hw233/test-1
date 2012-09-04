@@ -1,4 +1,4 @@
-#ifndef COUNTRY_INC
+﻿#ifndef COUNTRY_INC
 #define COUNTRY_INC
 
 #include "Server/WorkerRunner.h"
@@ -47,7 +47,7 @@ public:
 	void MergePendingPlayerList();
 	void PlayerEnter(Player * pl, bool = true);
 	void PlayerLeave(Player * pl);
-		
+
 	Player * FindPlayer(UInt32 slot);
 
 	void Broadcast(UInt16, Stream&);
@@ -70,7 +70,7 @@ private:
 	UInt8		m_ThreadID;					//?????߳?
 
 	std::vector<Map *>	m_MapManager;
-	
+
 	Script::GameActionLua*	m_GameActionLua;
 	Script::BattleFormula*	m_BattleFormula;
 
