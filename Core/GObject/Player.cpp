@@ -1941,23 +1941,15 @@ namespace GObject
             return;
         }
         
-        if (GObject::Tianjie::instance().isTjExecute() && _playerData.lastTjEventScore > 0)
+        if (_playerData.lastTjEventScore > 0)
         {
-            AddVar(VAR_TJ_EVENT_PRESTIGE, _playerData.lastTjEventScore);
-            GObject::Tianjie::instance().insertToEventSortMap(this, GetVar(VAR_TJ_EVENT_PRESTIGE), GetVar(VAR_TJ_EVENT_PRESTIGE)-_playerData.lastTjEventScore);
-            GObject::Tianjie::instance().updateEventData(this);
-            GObject::Tianjie::instance().broadEventTop1(this);
-        
             SYSMSG_SENDV(167, this, _playerData.lastTjEventScore);
+            SYSMSG_SENDV(169, this, _playerData.lastTjEventScore);
         }
         if (_playerData.lastTjTotalScore > 0)
         {
-            AddVar(VAR_TJ_TASK_PRESTIGE, _playerData.lastTjTotalScore);
-            GObject::Tianjie::instance().insertToScoreSortMap(this, GetVar(VAR_TJ_TASK_PRESTIGE),GetVar(VAR_TJ_TASK_PRESTIGE)-_playerData.lastTjTotalScore);
-        
             SYSMSG_SENDV(168, this, _playerData.lastTjTotalScore);
-
-            GObject::Tianjie::instance().updateRankData(this);
+            SYSMSG_SENDV(170, this, _playerData.lastTjTotalScore);
         }
         _playerData.lastTjEventScore = 0;
         _playerData.lastTjTotalScore = 0;
@@ -2863,7 +2855,7 @@ namespace GObject
 		return res;
 	}
 
-	bool Player::attackNpc( UInt32 npcId, UInt32 turns, bool regen, bool needtype, UInt32 expMulti)
+	bool Player::attackNpc( UInt32 npcId, UInt32 turns, bool regen, bool needtype)
 	{
 		UInt32 now = TimeUtil::Now();
 		UInt32 buffLeft = getBuffData(PLAYER_BUFF_ATTACKING, now);
@@ -2887,7 +2879,7 @@ namespace GObject
         if (!ng)
             return false;
 
-        if (cfg.GMCheck && needtype && ng->getType() &&  ng->getType() != 8) // XXX: 必须是野外怪,天劫怪除外
+        if (cfg.GMCheck && needtype && ng->getType()) // XXX: 必须是野外怪,天劫怪除外
             return false;
 
 		if(GameAction()->RunExploreTask(this, npcId))
@@ -2921,12 +2913,7 @@ namespace GObject
 			st << static_cast<UInt16>(0x0101);
 			_lastNg = ng;
 
-            if (ng->getType() == 8) //天劫怪
-            {
-                UInt32 exp = TIANJIE_EXP(GetLev()) * ng->getExp() * expMulti;
-                addExpOrTjScore(exp, 0, GObject::Tianjie::instance().isTjRateNpc(npcId), true);
-            }
-            else if (ng->getLevel() <= GetLev() || (ng->getLevel() > GetLev() && (ng->getLevel() - GetLev()) < 10))
+            if (ng->getLevel() <= GetLev() || (ng->getLevel() > GetLev() && (ng->getLevel() - GetLev()) < 10))
             {
                 UInt32 exp = 0;
                 if(getBuffData(PLAYER_BUFF_TRAINP3, now))
@@ -2983,6 +2970,73 @@ namespace GObject
 
 		return res;
 	}
+
+    bool Player::attackTianjieNpc(UInt32 npcId, UInt32 expMulti, bool isEvent,bool isBoss)
+	{
+        int turns = 100;
+		UInt32 now = TimeUtil::Now();
+		UInt32 buffLeft = getBuffData(PLAYER_BUFF_ATTACKING, now);
+		if(buffLeft > now)
+		{
+			sendMsgCode(0, 1407, buffLeft - now);
+			return false;
+		}
+		checkLastBattled();
+		
+        GData::NpcGroups::iterator it = GData::npcGroups.find(npcId);
+        if(it == GData::npcGroups.end())
+			return false;
+
+		GData::NpcGroup * ng = it->second;
+
+        if (!ng)
+            return false;
+
+        if (cfg.GMCheck && (ng->getType() != 8 || GObject::Tianjie::instance().isTjOpened() == false)) //只能在天劫期间 
+            return false;
+
+		if(GameAction()->RunExploreTask(this, npcId))
+			turns = 0;
+        UInt16 location = _playerData.location;
+        if (isBoss) 
+            location = Battle::BS_WBOSS;
+		Battle::BattleSimulator bsim(location, this, ng->getName(), ng->getLevel(), false, turns);
+		PutFighters( bsim, 0 );
+        ng->putFighters( bsim );
+		bsim.start();
+	
+        Stream& packet = bsim.getPacket();
+		if(packet.size() <= 8)
+			return false;
+
+		bool res = bsim.getWinner() == 1;
+		if(res)
+		{
+			_lastNg = ng;
+            UInt32 exp = TIANJIE_EXP(GetLev()) * ng->getExp() * expMulti;
+            addExpOrTjScore(exp, 0, isEvent, true);
+		}
+        
+        UInt16 ret = 0x0100;
+        if (res) ret = 0x0101;
+
+        Stream st(REP::ATTACK_NPC);                                                                                                      
+        st << ret << PLAYER_DATA(this, lastExp) << static_cast<UInt8>(0); 
+        UInt8 size = _lastLoot.size();    
+        st << size;   
+        for (UInt8 i = 0; i < size; ++i)
+        {
+            st << _lastLoot[i].id << _lastLoot[i].count;                                                                                  
+        }
+        st.append(&packet[8], packet.size() - 8);    
+        st << Stream::eos;                                                                                                                                    
+        send(st);
+       
+        turns = bsim.getTurns() > 15 ? 15 : bsim.getTurns();
+		setBuffData(PLAYER_BUFF_ATTACKING, now + turns);
+		return res;
+	}
+
 
     void Player::autoFrontMapFailed()
     {
@@ -11990,7 +12044,7 @@ namespace GObject
         if (cmd == 2 && getGold() < 5) //双倍奖励
             return 2; //仙石不足
        
-        bool res = attackNpc(_playerData.tjEvent1[id],0xFFFFFFFF,false,true,cmd);
+        bool res = attackTianjieNpc(_playerData.tjEvent1[id], cmd, false);
         if (res)
         {
             if (2 == cmd)
@@ -12130,6 +12184,7 @@ namespace GObject
         int eventScore = 0;
         //天劫事件的经验转换为天劫积分
         if (isEventScore) eventScore = score;
+
         if (GObject::Tianjie::instance().isPlayerInTj(GetLev()))
         {
             if (isEventScore)
@@ -12150,26 +12205,39 @@ namespace GObject
                 _playerData.lastTjEventScore += eventScore;
             _playerData.lastTjTotalScore += score;
         }
-        else
+        if (eventScore > 0)
         {
-            if (eventScore > 0)
+            AddVar(VAR_TJ_EVENT_PRESTIGE, eventScore);
+            GObject::Tianjie::instance().insertToEventSortMap(this, GetVar(VAR_TJ_EVENT_PRESTIGE), GetVar(VAR_TJ_EVENT_PRESTIGE)-eventScore);
+            GObject::Tianjie::instance().updateEventData(this);
+            GObject::Tianjie::instance().broadEventTop1(this);
+        
+            if (!isEndScore) 
             {
-                AddVar(VAR_TJ_EVENT_PRESTIGE, eventScore);
-                GObject::Tianjie::instance().insertToEventSortMap(this, GetVar(VAR_TJ_EVENT_PRESTIGE), GetVar(VAR_TJ_EVENT_PRESTIGE)-eventScore);
-                GObject::Tianjie::instance().updateEventData(this);
                 SYSMSG_SENDV(167, this, eventScore);
-
-                GObject::Tianjie::instance().broadEventTop1(this);
+                SYSMSG_SENDV(169, this, eventScore);
             }
-            if (score > 0)
-            {
-                AddVar(VAR_TJ_TASK_PRESTIGE, score);
-                GObject::Tianjie::instance().insertToScoreSortMap(this, GetVar(VAR_TJ_TASK_PRESTIGE),GetVar(VAR_TJ_TASK_PRESTIGE)-score);
-                SYSMSG_SENDV(168, this, score);
-
-                GObject::Tianjie::instance().updateRankData(this);
-             }
         }
+        if (score > 0)
+        {
+            AddVar(VAR_TJ_TASK_PRESTIGE, score);
+            GObject::Tianjie::instance().insertToScoreSortMap(this, GetVar(VAR_TJ_TASK_PRESTIGE),GetVar(VAR_TJ_TASK_PRESTIGE)-score);
+            GObject::Tianjie::instance().updateRankData(this);
+         
+            if (!isEndScore)
+            {
+                SYSMSG_SENDV(168, this, score);
+                SYSMSG_SENDV(170, this, score);
+            }
+         }
+    }
+    void Player::clearTjTaskData()
+    {
+        memset(_playerData.tjEvent1, 0, sizeof(_playerData.tjEvent1));
+        memset(_playerData.tjColor1, 0, sizeof(_playerData.tjColor1));
+        memset(_playerData.tjExp1, 0, sizeof(_playerData.tjExp1));
+
+        cancleAutoTlz();
     }
     void Player::processAutoTlz()
     {
@@ -12208,6 +12276,15 @@ namespace GObject
         PushTimerEvent(event);
     
         event->notify(true);
+    }
+    void Player::cancleAutoTlz()
+    {
+        if (hasFlag(Player::AutoTlz))
+        {
+            //删除定时事件
+            PopTimerEvent(this, EVENT_TLZAUTO, getId());
+            delFlag(Player::AutoTlz);
+        }
     }
     void Player::completeAutoTlz()
     {

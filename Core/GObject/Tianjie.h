@@ -84,6 +84,7 @@ namespace GObject
         void broadEvent1(Player* pl = NULL);
         void broadEvent2(Player* pl = NULL);
         void broadEvent3(Player* pl = NULL);
+        void broadEvent4(Player* pl = NULL, int t=0);
         void updateEventData(Player* pl);
         void updateRankData(Player* pl);
         void setRatePercent();
@@ -141,6 +142,7 @@ namespace GObject
         short getScoreRank(Player* pl);
 
 	private:
+        void clearEventData();
 	    bool addNpc(int npcid);
 		void deleteNpc(int npcid, UInt16 loc);
         void rewardEventBox(Player*pl, int score);
@@ -168,7 +170,8 @@ namespace GObject
         int m_nextTjTime;
 
         int m_Top1Record;          //第一名玩家的积分
-        int m_Top1PlayerId;        //第一名玩家的ID号
+        string m_Top1PlayerName;        //第一名玩家的ID号
+        Player* m_Top1Pl;
 
         int m_eventMaxNumber;      //该事件达成条件
         int m_eventCurrNumber;     //该事件已达成数

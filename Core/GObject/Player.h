@@ -541,8 +541,8 @@ namespace GObject
             AutoFrontMap    = 0x00000080,
             InCopyTeam      = 0x00000100,
             ClanRankBattle  = 0x00000200,
+            AutoTlz         = 0x00000400,
             AthleticsBuff   = 0x80000000,
-            AutoTlz         = 0x00000300,
 			AllFlags		= 0xFFFFFFFF
 		};
 
@@ -1040,7 +1040,8 @@ namespace GObject
 
 		//ս??????
 		bool challenge(Player *, UInt32 * = NULL, int * = NULL, bool = true, UInt32 = 0, bool = false, UInt32 = Battle::BS_ATHLETICS1, UInt8 = 0x03);
-		bool attackNpc(UInt32, UInt32 = 0xFFFFFFFF, bool = false, bool = true, UInt32 = 1);
+		bool attackNpc(UInt32, UInt32 = 0xFFFFFFFF, bool = false, bool = true);
+        bool attackTianjieNpc(UInt32 npcId, UInt32 expMulti = 1, bool isEvent = false, bool isBoss = false);
         bool attackRareAnimal(UInt32 id);
         bool attackCopyNpc(UInt32, UInt8, UInt8, UInt8, UInt8 = 0, bool = false, std::vector<UInt16>* loot = NULL, bool = true);
         bool attackWorldBoss(UInt32, UInt8, UInt8, UInt8, bool = false);
@@ -1103,7 +1104,10 @@ namespace GObject
         void getTjTask3Data(Stream& st);
         void addExpOrTjScore(int exp, int score, bool isEventScore = true, bool isEndScore = false);
 
+        void clearTjTaskData();
+
         void processAutoTlz();
+        void cancleAutoTlz();
         void completeAutoTlz();
         /////
 	public:

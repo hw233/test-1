@@ -2596,12 +2596,12 @@ void OnBattleEndReq( GameMsgHdr& hdr, BattleEndReq& req )
         tcpInfo->sendAwardInfo();
     }
 
+    player->addLastTjScore();
 
-	if(now <= PLAYER_DATA(player, battlecdtm))
+    if(now <= PLAYER_DATA(player, battlecdtm))
 		return ;
 
 	player->checkLastBattled();
-    player->addLastTjScore();
 }
 
 void OnCopyReq( GameMsgHdr& hdr, CopyReq& req )
