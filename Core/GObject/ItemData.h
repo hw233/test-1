@@ -1,4 +1,4 @@
-#ifndef _ITEMDATA_H_
+﻿#ifndef _ITEMDATA_H_
 #define _ITEMDATA_H_
 
 #include "Common/Stream.h"

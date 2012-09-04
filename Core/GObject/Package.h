@@ -113,7 +113,7 @@ namespace GObject
 		ItemEquip*  GetEquip(UInt32 id);
         inline UInt8 FormulaMerge(UInt32 id, UInt8 bind, UInt32 Mnum) { return FCMerge(id, bind, Mnum); }
         inline UInt8 CittaMerge(UInt32 id, UInt8 bind, UInt32 Mnum) { return FCMerge(id, bind, Mnum); }
-        inline UInt8 TrumpMerge(UInt32 id, UInt8 bind, UInt32 Mnum) { return FCMerge(id, bind, Mnum); } 
+        inline UInt8 TrumpMerge(UInt32 id, UInt8 bind, UInt32 Mnum) { return FCMerge(id, bind, Mnum); }
         UInt8 FCMerge(UInt32 id, UInt8 bind, UInt32 Mnum);
 
 		UInt16 GetItemNum(UInt32 id, bool bind = false);

@@ -23,7 +23,7 @@ void ErrorHandler::exception(const Exception& exc)
 	common_debugger_msg(exc.what());
 }
 
-	
+
 void ErrorHandler::exception(const std::exception& exc)
 {
 	common_debugger_msg(exc.what());
@@ -48,7 +48,7 @@ void ErrorHandler::handle(const Exception& exc)
 	}
 }
 
-	
+
 void ErrorHandler::handle(const std::exception& exc)
 {
 	FastMutex::ScopedLock lock(_mutex);

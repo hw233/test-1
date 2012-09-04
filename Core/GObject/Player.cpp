@@ -1,4 +1,4 @@
-#include "Config.h"
+﻿#include "Config.h"
 #include "Server/WorldServer.h"
 #include "MsgID.h"
 #include "Player.h"
@@ -249,7 +249,7 @@ namespace GObject
 		DB().PushUpdateData("UPDATE `fighter_train` SET `checkTime` = %u, `accExp` = %u WHERE `fgtId` = %u AND `ownerId` = %"I64_FMT"u", data->checktime, data->accExp, fgtId, m_Player->getId());
 		if(leftCount == 0)
 		{
-			m_Player->delTrainFighter(fgtId, true);		
+			m_Player->delTrainFighter(fgtId, true);
 			return;
 		}
 		if (_fighter->getLevel() >= m_Player->GetLev())
@@ -585,7 +585,7 @@ namespace GObject
 		if(!hasStatus(TopupRewarded))
 		{
 			addStatus(TopupRewarded);
-			if(_vipLevel > 8)				
+			if(_vipLevel > 8)
 				sendVIPMails(9, _vipLevel);
 			sendBlockBossMail(24, _bossLevel);
 		}
@@ -594,7 +594,7 @@ namespace GObject
 		{
 			globalCountryBattle.addAutoCB(this);
 		}
-        
+
         ClanRankBattleMgr::Instance().PlayerEnter(this);
 
 		setBlockBossByLevel();
@@ -687,7 +687,7 @@ namespace GObject
 
 	UInt32 Player::calcYDVipLevel(UInt32 total)
 	{
-#define YDVIP_OPEN_MAX 6 
+#define YDVIP_OPEN_MAX 6
 		UInt32 totalRecharge = total;
 		UInt32 vipl;
 		if(totalRecharge < 100)
@@ -1130,7 +1130,7 @@ namespace GObject
     }
 
     void Player::udpLog(UInt32 type, UInt32 id, UInt32 num, UInt32 price, const char* op)
-    {    
+    {
         if (!op || !price)
             return;
         char _price[32] = {0};
@@ -1188,7 +1188,7 @@ namespace GObject
     {
         char action[16] = "";
         snprintf (action, 16, "F1703_%d", discountType);
-        udpLog("discount", action, "", "", "", "", "act"); 
+        udpLog("discount", action, "", "", "", "", "act");
     }
 
     void Player::tradeUdpLog(UInt32 price)
@@ -1261,7 +1261,7 @@ namespace GObject
         char action[16] = "";
 
         snprintf (action, 16, "F%d_%d", id + 1055, type);
-        
+
         udpLog("frontMap", action, "", "", "", "", "act");
     }
 
@@ -1271,7 +1271,7 @@ namespace GObject
         char action[16] = "";
 
         snprintf (action, 16, "F%d_%d", id + 1049, type);
-        
+
         udpLog("copy", action, "", "", "", "", "act");
     }
 
@@ -1717,7 +1717,7 @@ namespace GObject
         UInt32 now = TimeUtil::Now();
 
        // UInt32 onlineToday = GetVar(VAR_TODAY_ONLINE, now);
-    
+
         UInt32 t = GetOnlineTimeTodaySinceLastLogin(now);
         AddVarNow(VAR_TODAY_ONLINE,  t , now);
 
@@ -1770,7 +1770,7 @@ namespace GObject
 		{
 			_onlineDuration = _onlineDuration + curtime - _playerData.lastOnline;
 		}
-		
+
 		DBLOG1().PushUpdateData("update login_states set logout_time=%u where server_id=%u and player_id=%"I64_FMT"u and login_time=%u", curtime, cfg.serverLogId, _id, _playerData.lastOnline);
 		DB1().PushUpdateData("UPDATE `player` SET `lastOnline` = %u, `nextReward` = '%u|%u|%u|%u' WHERE `id` = %"I64_FMT"u", curtime, _playerData.rewardStep, _playerData.nextRewardItem, _playerData.nextRewardCount, _playerData.nextRewardTime, _id);
         _isOnline = false;
@@ -1989,8 +1989,8 @@ namespace GObject
 		if(idx > PLAYER_BUFF_COUNT)
 			return 0;
 		if(idx != PLAYER_BUFF_AUTOHEAL &&
-                idx != PLAYER_BUFF_HOLY && 
-                idx != PLAYER_BUFF_AUTOCOPY && 
+                idx != PLAYER_BUFF_HOLY &&
+                idx != PLAYER_BUFF_AUTOCOPY &&
                 idx != PLAYER_BUFF_WBOSS &&
                 idx != PLAYER_BUFF_YDOTR &&
                 idx != PLAYER_BUFF_ONLINE &&
@@ -2228,7 +2228,7 @@ namespace GObject
            if(!load && CURRENT_THREAD_ID() <= WORKER_THREAD_NEUTRAL)
            {
                  UInt8 col  = fgt->getColor();
-           
+
                  if(_fighters.size())
                      GameAction()->doAttainment(this, 10101, static_cast<UInt32>(col));
 
@@ -2243,7 +2243,7 @@ namespace GObject
                        it ++ ;
                  }
 
-           
+
                  if(_fighters.size() == 5)
                      GameAction()->doAttainment(this, 10102, minCol);
                  if(_fighters.size() == 10)
@@ -2374,7 +2374,7 @@ namespace GObject
 		}
 		return fighter;
 	}
-	
+
 	Fighter * Player::removeFighter( UInt32 id )
 	{
 		if(_fighters.empty())
@@ -2733,7 +2733,7 @@ namespace GObject
 			default:
 				break;
 			}
-		} 
+		}
 		Stream st(REP::USER_INFO_CHANGE);
 		st << static_cast<UInt8>(0x10) << step << Stream::eos;
 		send(st);
@@ -2772,7 +2772,7 @@ namespace GObject
 		bsim.start();
 		bool res = bsim.getWinner() == 1;
 
-            
+
 		Stream st(REP::ATTACK_NPC);
 		st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
         if (report & 0x01)
@@ -4096,7 +4096,7 @@ namespace GObject
 			return _playerData.coin;
 		}
 
-	
+
 		if(cfg.enableWallow && _playerData.wallow)
 		{
 			UInt32 onlineDuration = (_onlineDuration + TimeUtil::Now() - _playerData.lastOnline);
@@ -4259,14 +4259,14 @@ namespace GObject
 				{
 					SYSMSGV(title, 406);
 					SYSMSGV(content, 409, fgt->getName().c_str(), data->price - money, data->accExp, money);
-					GetMailBox()->newMail(NULL, 0x12, title, content);	
+					GetMailBox()->newMail(NULL, 0x12, title, content);
 					getGold(money);
 				}
 				else
 				{
 					SYSMSGV(title, 406);
 					SYSMSGV(content, 407, fgt->getName().c_str(), data->price - money, data->accExp);
-					GetMailBox()->newMail(NULL, 0x12, title, content);	
+					GetMailBox()->newMail(NULL, 0x12, title, content);
 				}
 			}
 			else
@@ -4321,7 +4321,7 @@ namespace GObject
 			const std::vector<UInt32>& golds = GData::GDataManager::GetGoldTrainList();
             if(fgt->getLevel() >= golds.size())
                 return false;
-			price = time * golds[fgt->getLevel()]; 
+			price = time * golds[fgt->getLevel()];
 			if (getGold() < price)
 			{
 				sendMsgCode(0, 1101);
@@ -4428,7 +4428,7 @@ namespace GObject
 			}
 			return true;
 		}
-		
+
 		return false;
 	}
 
@@ -4582,11 +4582,11 @@ namespace GObject
             return _playerData.attainment;
 
         _playerData.attainment += a;
-        
+
         sendModification(0x0B, _playerData.attainment);
         return _playerData.attainment;
     }
-    
+
     UInt32 Player::useAttainment(UInt32 a, ConsumeInfo* ci)
     {
         if(a == 0 || _playerData.attainment == 0)
@@ -4732,7 +4732,7 @@ namespace GObject
 			if(fgt != NULL)
 				fgt->addExp(exp);
 		}
-        sendLevelPack(GetLev()); // XXX: 
+        sendLevelPack(GetLev()); // XXX:
 	}
 
     void Player::addHIAttr(const GData::AttrExtra& attr)
@@ -5101,7 +5101,7 @@ namespace GObject
                         sendMsgCode(0, 1101);
                         return false;
                     }
-                    
+
                     ConsumeInfo ci(YamenTask, 0, 0);
                     useGold(GData::moneyNeed[GData::YAMEN_IM].gold, &ci);
 
@@ -5768,7 +5768,7 @@ namespace GObject
 						UInt8 tmpcolor = fgt->getColor();
                         if(tmpcolor)
                         {
-                            if( (1 << tmpcolor) & hasGet ) 
+                            if( (1 << tmpcolor) & hasGet )
                             {
                                 -- i;
                                 continue;
@@ -6211,11 +6211,11 @@ namespace GObject
 
     void Player::OnAddOneFriend()
     {
-        GameAction()->doAttainment(this, Script::ADD_FRIEND,       _friends[0].size()); 
+        GameAction()->doAttainment(this, Script::ADD_FRIEND,       _friends[0].size());
     }
     void Player::OnFriendLevUp(UInt8 nLev)
     {
-    
+
         //一个好友的等级上升
         GameAction()->doAttainment(this, Script::ONE_FRIEND_LEV_UP, nLev);
 
@@ -6366,7 +6366,7 @@ namespace GObject
             std::set<Player *> :: iterator it = _friends[0].begin();
             while(it != _friends[0].end())
             {
-                
+
                 GameMsgHdr hdr(0x244, (*it)->getThreadId(), *it, sizeof(msg));
                 GLOBAL().PushMsg(hdr, &msg);
                 it ++ ;
@@ -6507,7 +6507,7 @@ namespace GObject
         DB1().PushUpdateData("UPDATE `player` SET `formations` = '%s' WHERE id = %" I64_FMT "u", formations.c_str(), _id);
 
         //学习阵法的成就
-        GameAction()->doAttainment(this,Script:: LEARNED_FORMATION, cnt); 
+        GameAction()->doAttainment(this,Script:: LEARNED_FORMATION, cnt);
         GameAction()->doAttainment(this,Script:: LEARNED_SFORMATION , scnt);
         Stream st(REP::RANK_DATA);
         st << static_cast<UInt8>(2) << newformationId << Stream::eos;
@@ -6831,7 +6831,7 @@ namespace GObject
             _playerData.rewardStep = 0;
 			genOnlineRewardItems();
 		}
-        else 
+        else
         {
             if (_playerData.rewardStep >= GData::GDataManager::GetOnlineAwardCount())
             {
@@ -6868,7 +6868,7 @@ namespace GObject
         {
             for (; n < size; n+=2)
             {
-                st << ids[n]; 
+                st << ids[n];
                 if (n+1 >= size)
                 {
                     st << static_cast<UInt8>(1);
@@ -7100,7 +7100,7 @@ namespace GObject
     }
     UInt8 Player::GetFullPotFighterNum()
     {
-        UInt8 num = 0 ; 
+        UInt8 num = 0 ;
         std::map<UInt32, Fighter *> ::iterator it = _fighters.begin();
         while(it != _fighters.end())
         {
@@ -7113,12 +7113,12 @@ namespace GObject
 
     UInt8 Player::GetFullCapFighterNum()
     {
-        UInt8 num = 0 ; 
+        UInt8 num = 0 ;
         std::map<UInt32, Fighter *> ::iterator it = _fighters.begin();
         while(it != _fighters.end())
         {
             if(it->second->getCapacity() >= GObjectManager::getMaxCapacity()/100 )
-                num ++; 
+                num ++;
             it ++ ;
         }
         return num;
@@ -7144,7 +7144,7 @@ namespace GObject
         }
 
         bool isPotential = false;
-        float p = 0; 
+        float p = 0;
 		UInt32 rate = 0;
         UInt32 itemId = ITEM_TRAIN_TYPE1 + type - 1;
 
@@ -7197,14 +7197,14 @@ namespace GObject
         else
             OnHeroMemo(MC_FIGHTER, MD_MASTER, 0, 1);
 
-        bool bMainFighter = isMainFighter( fgt->getId()) ; 
+        bool bMainFighter = isMainFighter( fgt->getId()) ;
 		if(uRand(1000) < rate)
 		{
             if(isPotential)
             {
                 p += 0.01f;
                 p = floorf(p * 100.0f + 0.5f) / 100.0f;
-                
+
                 bool bFull = false;
                 if(p >=  GObjectManager::getMaxPotential()/100)
                 {
@@ -7218,7 +7218,7 @@ namespace GObject
                 {
                     //触发潜力满 成就
                     UInt8 num = GetFullPotFighterNum();
-                   
+
                     GameAction()->doAttainment(this, Script::FIGHTER_POT_FULL , num);
                     if(num == 10 && GetFullCapFighterNum() == 10)
                     {
@@ -7259,7 +7259,7 @@ namespace GObject
             {
                 p += 0.1f;
                 p = floorf(p * 10.0f + 0.5f) / 10.0f;
-                
+
                 bool bFull = false;
                 if(p >= GObjectManager::getMaxCapacity()/100)
                 {
@@ -7277,7 +7277,7 @@ namespace GObject
                     if(num == 10 && GetFullPotFighterNum() == 10)
                     {
                         //十个人全满
-                        
+
                         GameAction()->doAttainment(this,Script::TEN_FIGHTER_PC_FULL  , 10);
                     }
 
@@ -7786,7 +7786,7 @@ namespace GObject
 				strItems += "|";
 			}
 
-            // XXX: 改成发礼包，在礼包使用里给装备 yangyoufa@ 23/02/12 10:21:47 
+            // XXX: 改成发礼包，在礼包使用里给装备 yangyoufa@ 23/02/12 10:21:47
 #if 0
             if (j >= 5) // XXX: 玩家等级橙色装备x1
             {
@@ -8114,7 +8114,7 @@ namespace GObject
 				}
 				else
 				{
-					lt.id = dietyFavor[uRand(4)];		
+					lt.id = dietyFavor[uRand(4)];
 					if(_bossLevel < 144)
 						lt.count = 2;
 					else if(_bossLevel < 160)
@@ -8199,7 +8199,7 @@ namespace GObject
         if(IsMainThread() == false  &&  CURRENT_THREAD_ID() <= WORKER_THREAD_NEUTRAL)
             GameAction()->doAttainment(this,Script::JOIN_CLAN,0 );
 	}
-    
+
 	void Player::testBattlePunish()
 	{
 		UInt32 atktime = _buffData[PLAYER_BUFF_ATTACKING];
@@ -8609,40 +8609,40 @@ namespace GObject
     {
         if(getBuffData(PLAYER_BUFF_ADVANCED_P_HOOK, TimeUtil::Now()))
         {
-            return 0.2;
+            return 0.2f;
         }
 
         if(getBuffData(PLAYER_BUFF_PRACTICE1, TimeUtil::Now()))
         {
-            return 0.5;
+            return 0.5f;
         }
 #if 0
         if(getBuffData(PLAYER_BUFF_PRACTICE2, TimeUtil::Now()))
         {
-            return 0.5;
+            return 0.5f;
         }
 #else
         if(getBuffData(PLAYER_BUFF_PROTECT, TimeUtil::Now()))
         {
-            return 0.2;
+            return 0.2f;
         }
 #endif
-        return 0.0;
+        return 0.0f;
     }
 
     float Player::getPracticeIncByDiamond()
     {
         if(this->isBD() && World::getBlueDiamondAct())
         {
-            return 0.1;
+            return 0.1f;
         }
         else if(this->isYD() && World::getYellowDiamondAct())
         {
-            return 0.1;
+            return 0.1f;
         }
         else
         {
-            return 0.0;
+            return 0.0f;
         }
     }
 
@@ -8650,11 +8650,11 @@ namespace GObject
     {
         if(isQQVIP() && World::getQQVipAct())
         {
-            return 0.1;
+            return 0.1f;
         }
         else
         {
-            return 0.0;
+            return 0.0f;
         }
     }
 
@@ -8693,7 +8693,7 @@ namespace GObject
         GameAction()->doAttainment(this,  Script::SELECT_COUNTRY , 0);
     }
     void Player::setCountry(UInt8 cny)
-    { 
+    {
         _playerData.country = cny;
 		DB1().PushUpdateData("UPDATE `player` SET `country` = %u WHERE `id` = %"I64_FMT"u", cny, getId());
 
@@ -8770,7 +8770,7 @@ namespace GObject
                 Fighter* fgt = findFighter(pfexp->fids[i]);
                 if(fgt && pfexp->counts[i])
                 {
-                    fgt->addPExp(fgt->getPracticeInc() * pfexp->counts[i]); 
+                    fgt->addPExp(fgt->getPracticeInc() * pfexp->counts[i]);
                 }
             }
 
@@ -8822,7 +8822,7 @@ namespace GObject
                 Fighter* fgt = findFighter(pfexp->fids[i]);
                 if(fgt && pfexp->counts[i])
                 {
-                    fgt->addPExp(fgt->getPracticeInc() * pfexp->counts[i]); 
+                    fgt->addPExp(fgt->getPracticeInc() * pfexp->counts[i]);
                 }
             }
         }
@@ -9287,7 +9287,7 @@ namespace GObject
                     return true;
             }
         }
-        
+
        return false;
 
     }
@@ -9477,7 +9477,7 @@ namespace GObject
     static UInt16 fire_end = 51;
     static UInt8 fire_id2bit[] = {16/*47*/, 8/*48*/, 4/*49*/, 2/*50*/, 1/*51*/};
     static UInt8 fire_com[] = {24,20,18,17,12,10,9,6,5,3};
-    static UInt8 fire_factor[][6] = 
+    static UInt8 fire_factor[][6] =
     {
         {0,     0,      100,    0,      0,      0},
         {0,     0,      0,      0,      100,    0},
@@ -9618,7 +9618,7 @@ namespace GObject
             getNewRegisterAward(opt);
             break;
         case 7:
-            //推广用注册玩家登录奖励领取 
+            //推广用注册玩家登录奖励领取
             getAwardFromAD();
             break;
         case 8:
@@ -9705,7 +9705,7 @@ namespace GObject
             SetVar(VAR_AWARD_NEWREGISTER, 1);
         }
     }
-            
+
     void Player::sendNewRegisterAward(UInt8 idx)
     {
         Stream st(REP::GETAWARD);
@@ -10593,7 +10593,7 @@ namespace GObject
             }
             if (offset == 0xff)
             {
-                st << static_cast<UInt8>(0) 
+                st << static_cast<UInt8>(0)
                     << static_cast<UInt32>(0)
                     << static_cast<UInt32>(0);
                 break;
@@ -10640,7 +10640,7 @@ namespace GObject
                     time -= now;
             }
 
-            st << static_cast<UInt8>(type) 
+            st << static_cast<UInt8>(type)
                 << static_cast<UInt32>(time)
                 << static_cast<UInt32>(count);
         }
@@ -10660,7 +10660,7 @@ namespace GObject
             }
             if (offset == 0xff)
             {
-                st2 << static_cast<UInt8>(0) 
+                st2 << static_cast<UInt8>(0)
                     << static_cast<UInt32>(0)
                     << static_cast<UInt32>(0);
                 break;
@@ -10680,7 +10680,7 @@ namespace GObject
             else
                 time -= now;
 
-            st2 << static_cast<UInt8>(type) 
+            st2 << static_cast<UInt8>(type)
                 << static_cast<UInt32>(time)
                 << static_cast<UInt32>(count);
         }
@@ -11652,7 +11652,7 @@ namespace GObject
         }
         st.data<UInt8>(offset) = c;
     }
-    
+
     //玩家每日签到接口
     void Player::ActivitySignIn()
     {
@@ -11662,7 +11662,7 @@ namespace GObject
         UInt32 mon = 1;
         UInt32 year = 2012;
         TimeUtil::GetDMY(&day, &mon, &year);
-         
+
         lua_tinker::table award = GameAction()->GetdayExtraAward(mon, day);
         UInt32 cnt = award.size();
         if(0 != cnt){
@@ -11671,9 +11671,9 @@ namespace GObject
                 return;
             }
             for(UInt32 i = 0; i < cnt; ++i){
-                lua_tinker::table a = award.get<lua_tinker::table>(i + 1); 
+                lua_tinker::table a = award.get<lua_tinker::table>(i + 1);
                 if(499 == a.get<UInt32>(1))  //礼券
-                    getCoupon(a.get<UInt32>(2)); 
+                    getCoupon(a.get<UInt32>(2));
                 else
                     GetPackage()->Add(a.get<UInt32>(1), a.get<UInt32>(2), true, false, FromDailyActivity);
             }

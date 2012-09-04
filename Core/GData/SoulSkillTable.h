@@ -10,7 +10,7 @@ struct SoulSkillTableData
 {
 	SoulSkillTableData(UInt16 id = 0, const std::string& name = std::string(),
             UInt8 level = 0, UInt32 itemId = 0, float value = 0)
-        : id(id), name(name), level(level), itemId(itemId), value(value) {} 
+        : id(id), name(name), level(level), itemId(itemId), value(value) {}
 
     SoulSkillTableData(const SoulSkillTableData& sstd)
     {

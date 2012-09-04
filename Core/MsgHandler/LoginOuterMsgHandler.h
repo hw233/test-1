@@ -1,4 +1,4 @@
-#ifndef _LOGINOUTERMSGHANDLER_H_
+﻿#ifndef _LOGINOUTERMSGHANDLER_H_
 #define _LOGINOUTERMSGHANDLER_H_
 
 #include <string>
@@ -1324,7 +1324,7 @@ void AddItemFromBs(LoginMsgHdr &hdr,const void * data)
 			}
 			else
 			{
-				result +="2 ";				
+				result +="2 ";
 			}
 		}
 	}
@@ -1332,7 +1332,7 @@ void AddItemFromBs(LoginMsgHdr &hdr,const void * data)
 	st<<result;
 	st<<Stream::eos;
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
-	
+
 	SAFE_DELETE(item);
 
 }
@@ -1369,7 +1369,7 @@ void AddItemFromBsById(LoginMsgHdr &hdr,const void * data)
     UInt16 serverNo = 0;
     if(cfg.merged)
     {
-        br>>serverNo;        
+        br>>serverNo;
     }
     for(UInt32 i = 0; i < 4; i ++)
 	{
@@ -1402,7 +1402,7 @@ void AddItemFromBsById(LoginMsgHdr &hdr,const void * data)
 			}
 			else
 			{
-				result +="2 ";				
+				result +="2 ";
 			}
 		}
 	}
@@ -1410,7 +1410,7 @@ void AddItemFromBsById(LoginMsgHdr &hdr,const void * data)
 	st<<result;
 	st<<Stream::eos;
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
-	
+
 	SAFE_DELETE(item);
 
 }
@@ -1573,7 +1573,7 @@ void AddItemToAllFromBs(LoginMsgHdr &hdr,const void * data)
 	st<<result;
 	st<<Stream::eos;
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
-	
+
 	SAFE_DELETE(item);
 }
 
@@ -1695,7 +1695,7 @@ void SetPropsFromBs(LoginMsgHdr &hdr,const void * data)
 
 void SetMoneyFromBs(LoginMsgHdr &hdr,const void * data)
 {
-    return; // XXX: 取消这个功能 yangyoufa@ 19/12/11 21:04:59 
+    return; // XXX: 取消这个功能 yangyoufa@ 19/12/11 21:04:59
 	BinaryReader br(data,hdr.msgHdr.bodyLen);
     Stream st;
 	st.init(SPEP::SETMONEY,0x01);
@@ -2060,7 +2060,7 @@ void GetMoneyFromBs(LoginMsgHdr &hdr, const void * data)
         TimeUtil::GetYYMMDD(TimeUtil::SharpDay(-2, now)),
         TimeUtil::GetYYMMDD(TimeUtil::SharpDay(-1, now)),
         TimeUtil::GetYYMMDD(now),
-    };  
+    };
 
     bool found = false;
     for (int i = 0; i < 7; ++i)

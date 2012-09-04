@@ -1,4 +1,4 @@
-#include "Config.h"
+﻿#include "Config.h"
 #include "GDataManager.h"
 #include "Area.h"
 #include "WeaponDef.h"
@@ -793,7 +793,7 @@ namespace GData
 		{
 			std::string path = cfg.scriptPath + "Other/FighterTrain.lua";
 			lua_tinker::dofile(L, path.c_str());
-			
+
 			//TaelTrain
 			lua_tinker::table tael_train = lua_tinker::call<lua_tinker::table>(L, "GetTaelTrain");
 			UInt32 sz1 = tael_train.size();
@@ -1548,7 +1548,7 @@ namespace GData
             if(cnt == 0)
                 continue;
 
-           stEUpgradeItem& item = eUpgradeTable[dbeu.id]; 
+           stEUpgradeItem& item = eUpgradeTable[dbeu.id];
            item.toId = dbeu.toId;
 
             for(size_t j = 0; j < cnt; ++ j)
@@ -1711,7 +1711,7 @@ namespace GData
 	const TaskType& GDataManager::GetTaskTypeData(UInt32 typeId)
 	{
 		static TaskType null;
-		
+
 		TaskTypeList::const_iterator cit = m_TaskTypeList.find(typeId);
 		return cit != m_TaskTypeList.end() ? cit->second : null;
 	}
@@ -1719,7 +1719,7 @@ namespace GData
 	const TaskTypeRelation& GDataManager::GetTaskTypeRelationData(UInt32 typeId)
 	{
 		static TaskTypeRelation null;
-		
+
 		TaskTypeRelationList::const_iterator cit = m_TaskTypeRelationList.find(typeId);
 		return cit != m_TaskTypeRelationList.end() ? cit->second : null;
 	}
@@ -1751,7 +1751,7 @@ namespace GData
 
 	const ItemBaseType* GDataManager::GetItemTypeData(UInt32 itemId)
 	{
-		return itemBaseTypeManager[itemId];	
+		return itemBaseTypeManager[itemId];
 	}
 
 	GObject::ItemWeapon* GDataManager::GetNpcWeapon( UInt32 wpId )

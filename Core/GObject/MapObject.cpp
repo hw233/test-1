@@ -18,5 +18,5 @@ namespace GObject
 	{
 		MOAction::Action(player, GetID(), GetActionType());
 	}
-	
+
 }

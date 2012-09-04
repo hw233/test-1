@@ -22,25 +22,25 @@ public:
 		/// Creates and allocates the Buffer.
 	{
 	}
-	
+
 	~Buffer()
 		/// Destroys the Buffer.
 	{
 		delete [] _ptr;
 	}
-	
+
 	std::size_t size() const
 		/// Returns the size of the buffer.
 	{
 		return _size;
 	}
-	
+
 	T* begin()
 		/// Returns a pointer to the beginning of the buffer.
 	{
 		return _ptr;
 	}
-	
+
 	const T* begin() const
 		/// Returns a pointer to the beginning of the buffer.
 	{
@@ -52,24 +52,24 @@ public:
 	{
 		return _ptr + _size;
 	}
-	
+
 	const T* end() const
 		/// Returns a pointer to the end of the buffer.
 	{
 		return _ptr + _size;
 	}
-	
+
 	T& operator [] (std::size_t index)
 	{
 		common_assert (index < _size);
-		
+
 		return _ptr[index];
 	}
 
 	const T& operator [] (std::size_t index) const
 	{
 		common_assert (index < _size);
-		
+
 		return _ptr[index];
 	}
 

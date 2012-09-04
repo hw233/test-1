@@ -59,7 +59,7 @@ namespace GObject
 		UInt8  GetTaskSubType(UInt32 taskId);
 		UInt32 GetTaskAcceptNpc(UInt32 taskId);
 		UInt32 GetTaskSubmitNpc(UInt32 taskId);
-		
+
 
 		bool   HasAcceptedTask(UInt32 taskId);
 		bool   HasCompletedTask(UInt32 taskId);
@@ -72,7 +72,7 @@ namespace GObject
 		bool TaskExist(UInt32 taskId);
 
 	public:
-		UInt32 AcceptTask(UInt32 taskId);	
+		UInt32 AcceptTask(UInt32 taskId);
 		bool   AbandonTask(UInt32 taskId);
 		bool   SubmitTask(UInt32 taskId);
         void CheckTaskAttainment(UInt32 taskId,  const GData::TaskType* taskType);
@@ -158,16 +158,16 @@ namespace GObject
 
 		Player* m_PlayerOwner;
 
-		TaskList m_TaskAcceptedList;		
+		TaskList m_TaskAcceptedList;
 		TaskList m_TaskCompletedList;
         std::map<UInt32, UInt32> m_TaskSubmitedList; //FIXME
 
 		typedef std::set<UInt32> CanAcceptTaskList;
-		CanAcceptTaskList m_CanAcceptTaskList;	
+		CanAcceptTaskList m_CanAcceptTaskList;
 
-		DayTaskList m_DayTaskList;			
+		DayTaskList m_DayTaskList;
 
-		bool m_IsConvey;	
+		bool m_IsConvey;
 		UInt32 m_ConveyTask;
 		UInt32 m_ConveyNpc;
 	};

@@ -1,4 +1,4 @@
-#ifndef MOACTION_INC
+﻿#ifndef MOACTION_INC
 #define MOACTION_INC
 
 #include <memory>
@@ -29,7 +29,7 @@ namespace GObject
 	public:
 		static void TaskAction(Player* player, UInt32 npcId);
 		static void TaskActionStep(Player* player, UInt32 npcId, UInt32 taskId, UInt8 step);
-		
+
 		static void CollectAction(Player* player, UInt32 npcId);
 		static void CollectActionStep(Player* player, UInt32 npcId);
 		static void LoopTaskAction(Player* player, UInt32 npcId);

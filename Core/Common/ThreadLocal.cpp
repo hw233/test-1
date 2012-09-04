@@ -25,7 +25,7 @@ ThreadLocalStorage::~ThreadLocalStorage()
 {
 	for (TLSMap::iterator it = _map.begin(); it != _map.end(); ++it)
 	{
-		delete it->second;	
+		delete it->second;
 	}
 }
 

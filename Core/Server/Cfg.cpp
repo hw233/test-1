@@ -28,7 +28,7 @@ void Cfg::load(const char * scriptStr)
 	}
 	script.doFile(_filename.c_str());
 
-    // load departDB name 
+    // load departDB name
     Script::DepartDBScript s(this);
     std::string dbNamePath = scriptPath + "DepartDB.lua";
     s.doFile(dbNamePath.c_str());
@@ -41,8 +41,8 @@ void Cfg::setIfName(const char* iname)
     else
         ifName = iname;
 
-    int fd; 
-    fd = socket(AF_INET , SOCK_DGRAM , 0); 
+    int fd;
+    fd = socket(AF_INET , SOCK_DGRAM , 0);
     if (fd < 0)
         return;
 

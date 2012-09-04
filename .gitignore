@@ -3,6 +3,9 @@
 *.a
 *.swp
 *.obj
+*.opensdf
+*.sdf
+*.suo
 cscope.*
 tags
 TAGS
@@ -15,3 +18,4 @@ reports
 Debug
 Release
 lib3rd
+conf/config.lua

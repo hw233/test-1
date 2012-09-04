@@ -23,7 +23,7 @@ class Player;
 
 struct ClanTechData
 {
-	ClanTechData(UInt8 s = 0, UInt16 t = 0 , UInt8 l = 0, UInt32 e = 0) 
+	ClanTechData(UInt8 s = 0, UInt16 t = 0 , UInt8 l = 0, UInt32 e = 0)
 		: techId(s), type(t), level(l), extra(e)
 	{
 	}

@@ -1,4 +1,4 @@
-#include "TownDeamon.h"
+﻿#include "TownDeamon.h"
 #include "Player.h"
 #include "Common/Stream.h"
 #include "MsgID.h"
@@ -16,7 +16,7 @@ namespace GObject
 
 #define ACC_ITEM        465
 #define VITALITY_ITEM   466
-#define TD_AUTO_TAEL    50 
+#define TD_AUTO_TAEL    50
 
 TownDeamon* townDeamonManager = new TownDeamon();
 
@@ -441,7 +441,7 @@ void TownDeamon::attackPlayer(Player* pl, Player* defer)
 		Stream st(REP::ATTACK_NPC);
 		st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
 		pl->send(st);
-		
+
         notifyChallengeResult(pl, defer, res);
 
 		return;

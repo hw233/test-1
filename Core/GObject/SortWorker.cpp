@@ -1,4 +1,4 @@
- 
+
 #include "Config.h"
 #include "SortWorker.h"
 #include "GObject/Leaderboard.h"

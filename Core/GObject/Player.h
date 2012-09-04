@@ -1,4 +1,4 @@
-#ifndef _PLAYER_H_
+﻿#ifndef _PLAYER_H_
 #define _PLAYER_H_
 
 #include "GObjectManager.h"
@@ -57,7 +57,7 @@ namespace GObject
 #define PLAYER_BUFF_CLANBATTING		0x11	//??????????ս
 #define PLAYER_BUFF_CLANRECOVE		0x12	//
 #define PLAYER_BUFF_REENTERCLAN		0x13
-#define PLAYER_BUFF_CLANRCENHANCE	0x14    
+#define PLAYER_BUFF_CLANRCENHANCE	0x14
 #define PLAYER_BUFF_PWDLOCK			0x15	//5?????????? ????10????
 #define PLAYER_BUFF_ADVANCED_P_HOOK	0x16    //随身修为加速符: 20%
 #define PLAYER_BUFF_PRACTICE1       0x17	//修为加速: 50%
@@ -151,7 +151,7 @@ namespace GObject
     struct PracticeData;
     class AttainMgr;
     struct TeamData;
-    struct TeamCopyPlayerInfo;
+    class TeamCopyPlayerInfo;
     class ActivityMgr;
     class HeroMemo;
     class ShuoShuo;
@@ -169,7 +169,7 @@ namespace GObject
         }
 
         UInt32 soul;    // Ԫ??ֵ
-        UInt8 fire;     // ????: 0-??ͨ?Ļ? 1-??Ŀ?λ? 2-???????? 3-??ľ???? 4-v??ڤ?? 5-???????? 6-???????? 
+        UInt8 fire;     // ????: 0-??ͨ?Ļ? 1-??Ŀ?λ? 2-???????? 3-??ľ???? 4-v??ڤ?? 5-???????? 6-????????
         UInt8 quality;  // ????Ʒ?? 1-?? 2-?? 3-6 4-?? 5-??
         UInt8 awdst;    // ????״̬ 0-??v?? 1-δ??ȡ
         UInt8 needgen;  // ??Ҫ???????ɽ???
@@ -319,7 +319,7 @@ namespace GObject
 		UInt32 trainend;
 		UInt32 accExp;
 		float  factor;
-	}; 
+	};
 
     struct PracticeFighterExp
     {
@@ -366,7 +366,7 @@ namespace GObject
         UInt8 level;	//???? = 0?? ??ʾ?˼?????δ??????
     };
 
-    struct QixiInfo 
+    struct QixiInfo
     {
         Player* lover;
         UInt8 bind;
@@ -422,7 +422,7 @@ namespace GObject
 		UInt8 country;              // ????
 		UInt8 title;                // ͷ??
 		UInt32 achievement;         // ս??
-        UInt32 attainment;          //  
+        UInt32 attainment;          //
         UInt8 qqvipl;               // QQ VIP?ȼ?
         UInt8 qqvipl1;              // 3366ʱ??QQ VIP?ȼ?
         UInt8 qqvipyear;            // QQ VIP?Ƿ?????
@@ -437,23 +437,23 @@ namespace GObject
 		UInt8 mounts;               // ????
 		UInt8 gmLevel;              //
 		UInt8 icCount;              // ?һ????ٴ???
-		UInt32 nextIcReset;         // 
+		UInt32 nextIcReset;         //
         UInt8  picCount;            // ???ٴ???
         UInt32 nextPIcReset;        // ???ٴ???????ʱ??
-		UInt16 formation;           // 
-		Lineup lineup[5];           // 
-		UInt32 totalRecharge;       // 
-		UInt32 lastExp;             // 
-		UInt64 lastResource;        // 
-		UInt8 rewardStep;           // 
-		UInt16 nextRewardItem;      // 
-		UInt8 nextRewardCount;      // 
-		UInt32 nextRewardTime;      // 
-		UInt32 nextExtraReward;     // 
-		UInt16 tavernId[6];         // 
-		UInt8 tavernBlueCount;      // 
-		UInt8 tavernPurpleCount;    // 
-		UInt16 tavernOrangeCount;    // 
+		UInt16 formation;           //
+		Lineup lineup[5];           //
+		UInt32 totalRecharge;       //
+		UInt32 lastExp;             //
+		UInt64 lastResource;        //
+		UInt8 rewardStep;           //
+		UInt16 nextRewardItem;      //
+		UInt8 nextRewardCount;      //
+		UInt32 nextRewardTime;      //
+		UInt32 nextExtraReward;     //
+		UInt16 tavernId[6];         //
+		UInt8 tavernBlueCount;      //
+		UInt8 tavernPurpleCount;    //
+		UInt16 tavernOrangeCount;    //
         UInt32 fshimen[6];          // ˢ????ʦ??????
 		UInt8 fsmcolor[6];          // ˢ????ʦ??????????ɫ
         std::vector<UInt32> shimen; // ʦ??????
@@ -470,11 +470,11 @@ namespace GObject
         UInt8 ymAcceptCount;        // ???????????ս??ܴ???
         UInt32 clanTaskId;          // ????????
         UInt8 ctFinishCount;        // ???????????????ɸ???
-		UInt16 bookStore[6];        // 
-		UInt32 created;             // 
-		UInt32 lockExpireTime;      // 
-		UInt8 wallow;               // 
-		UInt32 battlecdtm;          // 
+		UInt16 bookStore[6];        //
+		UInt32 created;             //
+		UInt32 lockExpireTime;      //
+		UInt8 wallow;               //
+		UInt32 battlecdtm;          //
         UInt8 dungeonCnt;           // ͨ??????ǰ????
         UInt32 dungeonEnd;          // ͨ????????????ʱ??
         UInt8 copyFreeCnt;          // ???????Ѵ???
@@ -503,7 +503,7 @@ namespace GObject
 			BeChallenging = 0x00000020,		//?Ǿ???״̬
 			SGPunish	= 0x00000040,		//???ٳͷ?
             AthPayForPage = 0x00000080,     //in athletics range for paging
-            AthPayForKillCD=0x00000100,     
+            AthPayForKillCD=0x00000100,
 			AllGlobalFlags	= 0xFFFFFFFF
 		};
 
@@ -607,7 +607,7 @@ namespace GObject
 
         //玩家每日签到接口
         void ActivitySignIn();
-        void SendNextdayTime(UInt32 nextDay); 
+        void SendNextdayTime(UInt32 nextDay);
 
 		void Login();
         void sendCreateMail();
@@ -759,7 +759,7 @@ namespace GObject
                     return true;
             return false;
         }
-        inline bool isQQVIP() const 
+        inline bool isQQVIP() const
         {
             return (_playerData.qqvipl > 40 && _playerData.qqvipl <= 49) || (_playerData.qqvipl1 > 40 && _playerData.qqvipl1 <= 49) || (_playerData.qqvipl >= 30 && _playerData.qqvipl <= 39 && _playerData.qqvipl1 > 40 && _playerData.qqvipl1 <= 49);
         }
@@ -1099,7 +1099,7 @@ namespace GObject
         void SetClanBattleScore(UInt32 score) { m_ClanBattleScore = score; }
         void AddClanBattleScore(UInt32 score) { m_ClanBattleScore += score; }
         UInt32 GetClanBattleScore() const { return m_ClanBattleScore; }
-       
+
         void SetClanBattleWinTimes(UInt32 times) { m_ClanBattleWinTimes = times; }
         void IncClanBattleWinTimes() { ++m_ClanBattleWinTimes; }
         UInt32 GetClanBattleWinTimes() const { return m_ClanBattleWinTimes; }
@@ -1542,7 +1542,7 @@ namespace GObject
     public:
         inline void setDomain(const std::string& domain)
         {
-            m_domain = domain; 
+            m_domain = domain;
             m_isOffical = false;
             if (atoi(domain.c_str()) == 12)
                 m_isOffical = true;

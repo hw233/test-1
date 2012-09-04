@@ -1,4 +1,4 @@
-#include "Config.h"
+﻿#include "Config.h"
 #include "WorldServer.h"
 #include "GData/GDataManager.h"
 #include "GObject/GObjectManager.h"
@@ -319,7 +319,7 @@ static int recvret(char* data, size_t size, size_t nmemb, char* buf)
         //bcopy(data, buf, MAX_RET_LEN);
 		memcpy(buf, data, MAX_RET_LEN);
         return MAX_RET_LEN;
-    }   
+    }
 
 	memcpy(buf, data, nsize);
     //bcopy(data, buf, nsize);

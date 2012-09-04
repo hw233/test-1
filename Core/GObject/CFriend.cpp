@@ -174,7 +174,7 @@ void CFriend::reset(bool online)
     bool w = false;
     if (m_cf.size() < MIN_ITEM)
     {
-        m_cf.resize(MIN_ITEM, 0); 
+        m_cf.resize(MIN_ITEM, 0);
         w = true;
     }
     if (m_cf[1])

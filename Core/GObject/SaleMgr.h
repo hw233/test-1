@@ -1,4 +1,4 @@
-#ifndef _SALEMGR_H_
+﻿#ifndef _SALEMGR_H_
 #define _SALEMGR_H_
 
 #include "Sale.h"
@@ -31,7 +31,7 @@ static const UInt32 SALE_TIME_OUT = 24 * 60 * 60;
 public:
 	SaleMgr();
 	~SaleMgr();
-	
+
 public:
 	bool addSaleFromDB(SaleData *);
 
@@ -42,7 +42,7 @@ public:
 	void cancelSale(Player *, UInt32);
 
 	void requestSaleList(Player *, UInt16, UInt16, std::string&, UInt8, UInt8, UInt8, UInt8);
-	
+
 	void searchPlayerSale(Player *, Player *, UInt16, UInt16);
 	void searchPlayerSaleResp(Player *, Player *, UInt16, UInt16, UInt32 *, UInt16);
 	void searchSaleByItemName(Player *, std::string&, UInt16, UInt16);
@@ -81,7 +81,7 @@ protected:
 			std::set<UInt32>::iterator it = _saleIndex.begin();
 			index = *it;
 			_saleIndex.erase(it);
-		}	
+		}
 		return index;
 	}
 
@@ -111,7 +111,7 @@ private:
     UInt8 _on_off;
 	std::vector<SaleData *> _sales;
 	std::set<UInt32> _saleIndex;
-	
+
 	SalePosType _salePos;
 	SaleCheckType _saleCheck[3];
 	SaleRowType _saleRow[62];	//普通1 强化2 (0 : reversed)

@@ -14,7 +14,7 @@ R GameActionLua::Run(Player* player, const std::string& script)
 	_player1 = player;
 
 	R ret = lua_tinker::call<R>(_L, script.c_str());
-	
+
 
 	_player1 = savePlayer1;
 

@@ -1,4 +1,4 @@
-
+﻿
 #ifndef HEROISLAND_H_
 #define HEROISLAND_H_
 
@@ -135,7 +135,7 @@ struct RareAnimals
     UInt32 last; // 效果持续时间
     UInt32 cdlong; // 攻击后冷却时间，全局
     UInt32 cd; // 冷却结束时间
-    UInt8 bufid; // 
+    UInt8 bufid; //
 };
 
 struct lt_score

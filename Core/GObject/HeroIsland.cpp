@@ -1,4 +1,4 @@
-
+﻿
 #include "HeroIsland.h"
 #include "Server/SysMsg.h"
 #include "Common/Random.h"
@@ -42,10 +42,10 @@ HeroIsland::~HeroIsland()
 
 bool HeroIsland::initSkillAttr()
 {
-    _skillattr[1].magatkP = 0.1;
-    _skillattr[1].attackP = 0.1;
-    _skillattr[2].defendP = 0.1;
-    _skillattr[2].magdefP = 0.1;
+    _skillattr[1].magatkP = 0.1f;
+    _skillattr[1].attackP = 0.1f;
+    _skillattr[2].defendP = 0.1f;
+    _skillattr[2].magdefP = 0.1f;
     _skillattr[3].aura = 25;
     return false;
 }
@@ -174,14 +174,14 @@ void HeroIsland::setRareAnimals(UInt8 spot, UInt32 npcid, Table attr, UInt32 las
         _animals[spot].push_back(ra);
 }
 
-class Sort 
-{    
+class Sort
+{
     public:
         bool operator()(Awards a, Awards b)
-        {    
+        {
             return a.prob < b.prob;
-        }    
-};   
+        }
+};
 
 void HeroIsland::addHIAwardsCfg(UInt8 quality, UInt32 id, UInt32 num, UInt32 prob)
 {
@@ -419,7 +419,7 @@ void HeroIsland::process(UInt32 now)
     {
         Stream st(REP::HERO_ISLAND);
         st << static_cast<UInt8>(15);
-        st << now; 
+        st << now;
         st << _startTime;
         st << _endTime;
         st << Stream::eos;
@@ -933,7 +933,7 @@ void HeroIsland::sendPlayers(HIPlayerData* pd, UInt8 spot, UInt16 start, UInt8 p
 {
     if (!pd || !pd->player || spot > HERO_ISLAND_SPOTS)
         return;
-    
+
     Stream st(REP::HERO_ISLAND);
     st << static_cast<UInt8>(6);
     size_t sz = _players[spot].size();
@@ -1580,7 +1580,7 @@ bool HeroIsland::useSkill(Player* player, UInt8 skillid, UInt8 type)
                     --_nplayers[pd->spot];
             }
             break;
-            
+
         default:
             return false;
             break;
@@ -1691,7 +1691,7 @@ void HeroIsland::playerEnter(Player* player)
     if (enter(player, player->getHIType(), player->getHISpot(), false))
     {
         st << static_cast<UInt8>(0);
-        st << now; 
+        st << now;
         st << _startTime;
         st << _endTime;
         player->addFlag(Player::InHeroIsland);

@@ -1,4 +1,4 @@
- 
+
 #include "Config.h"
 #include "DCWorker.h"
 
@@ -23,7 +23,7 @@ namespace GObject
 
         std::string appname = "appoperlog";
         if (m_logger->init(appname))
-        {   
+        {
             ERROR_LOG("Init DCLogger FAILED");
             return true;
         }
@@ -44,7 +44,7 @@ namespace GObject
     void DCWorker::OnTimer()
     {
         std::vector<const char *> l;
-        {   
+        {
             FastMutex::ScopedLock lk(m_Mutex);
             if(m_DCLog.empty())
                 return;
@@ -52,7 +52,7 @@ namespace GObject
             l = m_DCLog;
             m_DCLog.clear();
             m_Limit = 0;
-        }   
+        }
 
         if (!l.empty())
         {

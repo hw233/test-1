@@ -84,13 +84,13 @@ bool File::exists() const
 	return existsImpl();
 }
 
-	
+
 bool File::canRead() const
 {
 	return canReadImpl();
 }
 
-	
+
 bool File::canWrite() const
 {
 	return canWriteImpl();
@@ -108,7 +108,7 @@ bool File::isFile() const
 	return isFileImpl();
 }
 
-	
+
 bool File::isDirectory() const
 {
 	return isDirectoryImpl();
@@ -138,31 +138,31 @@ Timestamp File::created() const
 	return createdImpl();
 }
 
-	
+
 Timestamp File::getLastModified() const
 {
 	return getLastModifiedImpl();
 }
 
-	
+
 void File::setLastModified(const Timestamp& ts)
 {
 	setLastModifiedImpl(ts);
 }
 
-	
+
 File::FileSize File::getSize() const
 {
 	return getSizeImpl();
 }
 
-	
+
 void File::setSize(FileSizeImpl size)
 {
 	setSizeImpl(size);
 }
 
-	
+
 void File::setWriteable(bool flag)
 {
 	setWriteableImpl(flag);
@@ -180,7 +180,7 @@ void File::setExecutable(bool flag)
 	setExecutableImpl(flag);
 }
 
-	
+
 void File::copyTo(const std::string& path) const
 {
 	Path src(getPathImpl());
@@ -221,14 +221,14 @@ void File::moveTo(const std::string& path)
 	setPathImpl(path);
 }
 
-	
+
 void File::renameTo(const std::string& path)
 {
 	renameToImpl(path);
 	setPathImpl(path);
 }
 
-	
+
 void File::remove(bool recursive)
 {
 	if (recursive && !isLink() && isDirectory())

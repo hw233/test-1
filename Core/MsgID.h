@@ -1,4 +1,4 @@
-#ifndef _ASSS_MSGID_H_
+﻿#ifndef _ASSS_MSGID_H_
 #define _ASSS_MSGID_H_
 
 #include "Config.h"
@@ -37,39 +37,39 @@ namespace REQ
     const UInt8 CAMPS_CHOICE        = 0xF1;// 0x0D
     /**登陆 */
     const UInt8 LOGIN               = 0xE0;// 0x10
-    /**创建角色 */                              
+    /**创建角色 */
     const UInt8 CREATE_ROLE         = 0xE1;// 0x11
-    /**新手引导步骤 */                           
+    /**新手引导步骤 */
     const UInt8 NEW_HAND_STEP       = 0xE3;// 0x13
-    /**请求玩家信息 */                          
+    /**请求玩家信息 */
     const UInt8 USER_INFO           = 0xE4;// 0x14
-    /**BUFFER信息改变 */                        
+    /**BUFFER信息改变 */
     const UInt8 STATE               = 0xE5;// 0x15
     /**回流用户7日活动指令 */
     const UInt8 RF7DAY              = 0x15;
-    /** ??? */                                  
+    /** ??? */
     const UInt8 STATE_CHANGE        = 0x16;
-    /**查询书商 */                               
+    /**查询书商 */
     const UInt8 BOOK_LIST           = 0xEC;// 0x1A
-    /**买书 */                                 
+    /**买书 */
     const UInt8 BOOK_BUY            = 0xED;// 0x1B
-    /**读阵型 */                               
+    /**读阵型 */
     const UInt8 READ_BATTLE         = 0xEE;// 0x1D
-    /**改变阵型 */                             
+    /**改变阵型 */
     const UInt8 BATTLE_CHECK        = 0xEF;// 0x1E
     /**装备改变 */
     const UInt8 CHANGE_EQ           = 0xD0;// 0x21
-    /**雇用散仙 */                             
+    /**雇用散仙 */
     const UInt8 HIRE_HERO           = 0xD1;// 0x22
-    /**散仙信息 */                             
+    /**散仙信息 */
     const UInt8 HERO_INFO           = 0xD2;// 0x23
-    /**酒馆列表 */                             
+    /**酒馆列表 */
     const UInt8 HOTEL_LIST          = 0xD3;// 0x26
-    /**解雇散仙 */                             
+    /**解雇散仙 */
     const UInt8 FIRE_HERO           = 0xD4;// 0x27
-    /**接收散仙 */                             
+    /**接收散仙 */
     const UInt8 ACCEPT_FIGHTER      = 0xD5;// 0x28
-    /**对某人使用物品 */                             
+    /**对某人使用物品 */
     const UInt8 PACK_USE_OTHER      = 0xD7;//
     /**加血 */
     const UInt8 ADD_HP              = 0xDE;// 0x29
@@ -81,13 +81,13 @@ namespace REQ
     const UInt8 TRAIN_FIGHTER_OP    = 0x37;
     /**背包列表信息 */
     const UInt8 PACK_INFO           = 0xC0;// 0x30
-    /**背包添加到九疑鼎 */                      
+    /**背包添加到九疑鼎 */
     const UInt8 PACK_TRIPOD         = 0xC1;// 0x31
-    /**背包卖出 */                              
+    /**背包卖出 */
     const UInt8 PACK_SELL           = 0xC2;// 0x32
-    /**背包使用 */                              
+    /**背包使用 */
     const UInt8 PACK_USE            = 0xC3;// 0x33
-    /**背包扩展 */                              
+    /**背包扩展 */
     const UInt8 PACK_EXTEND         = 0xC4;// 0x34
     /**在线奖励 */
     const UInt8 REWARD              = 0xCF;// 0x38
@@ -99,19 +99,19 @@ namespace REQ
     const UInt8 LUCKYDRAW           = 0x3E;
     /**装备强化 */
     const UInt8 EQ_ENHANCE          = 0xB0;// 0x40
-    /**装备打孔 */                               
+    /**装备打孔 */
     const UInt8 EQ_PUNCH            = 0xB1;// 0x41
-    /**宝石镶嵌 */                               
+    /**宝石镶嵌 */
     const UInt8 EQ_EMBED            = 0xB2;// 0x43
-    /**宝石拆卸 */                               
+    /**宝石拆卸 */
     const UInt8 EQ_UN_EMBED         = 0xB3;// 0x44
-    /**单个分解 */                               
+    /**单个分解 */
     const UInt8 EQ_UN_SINGLE        = 0x45;
-    /**转换装备 */                               
+    /**转换装备 */
     const UInt8 EQ_EXCHANGE         = 0x46;
-    /**装备洗炼 */                               
+    /**装备洗炼 */
     const UInt8 EQ_PURIFY           = 0xB4;// 0x47
-    /**批量分解 */                               
+    /**批量分解 */
     const UInt8 EQ_DECOMPOSE        = 0xB5;// 0x49
     /**置换部位 */
     const UInt8 EQ_EXCHANGE_POS     = 0x4A;
@@ -125,15 +125,15 @@ namespace REQ
     const UInt8 MAP_TRANSPORT       = 0xA1;// 0x52
     /**进入离开通天塔 */
     const UInt8 BABEL_JOIN          = 0xAA;// 0x58
-    /**请求通天塔信息 */                       
+    /**请求通天塔信息 */
     const UInt8 BABEL_UPDATE        = 0xAB;// 0x59
-    /**开始通天塔战斗 */                       
+    /**开始通天塔战斗 */
     const UInt8 BABEL_START         = 0xAC;// 0x5A
-    /**开始自动通天塔战斗 */                   
+    /**开始自动通天塔战斗 */
     const UInt8 BABEL_AUTO_START    = 0xAD;// 0x5B
-    /**立即完成通天塔战斗 */                   
+    /**立即完成通天塔战斗 */
     const UInt8 BABEL_END           = 0xAE;// 0x5C
-    /**日常 */                                 
+    /**日常 */
     const UInt8 DAILY               = 0xAF;// 0x5F
     /**换名字 */
     //const UInt8 CHANGE_NAME         = 0x60;
@@ -149,13 +149,13 @@ namespace REQ
     const UInt8 AUTO_FRONTMAP       = 0x98;// ??
     /**请求战报 */
     const UInt8 FIGHT_REPORT        = 0x9A;// 0x6C
-    /**打怪 */                                 
+    /**打怪 */
     const UInt8 ATTACK_NPC          = 0x9B;// 0x61
-    /**挂机 */                                 
+    /**挂机 */
     const UInt8 TASK_HOOK           = 0x9D;// 0x6D
-    /**挂机停止 */                             
+    /**挂机停止 */
     const UInt8 TASK_HOOK_STOP      = 0x9E;// 0x6E
-    /**挂机加速 */                             
+    /**挂机加速 */
     const UInt8 TASK_HOOK_ADD       = 0x9F;// 0x6F
     /**发起切磋请求 */
     const UInt8 LANCHCHALLENGE      = 0x72;
@@ -197,19 +197,19 @@ namespace REQ
     const UInt8 QUERYDAYTASK        = 0x8F;
     /**请求帮派列表信息 */
     const UInt8 CLAN_LIST           = 0x60;// 0x90
-    /**请求自己帮派信息 */                      
+    /**请求自己帮派信息 */
     const UInt8 CLAN_SELF           = 0x61;// 0x91
-    /**帮派创建 */                              
+    /**帮派创建 */
     const UInt8 CLAN_CREATE         = 0x62;// 0x92
-    /**申请加入帮派 */                          
+    /**申请加入帮派 */
     const UInt8 CLAN_APPLY          = 0x63;// 0x93
-    /**帮派成员操作 */                          
+    /**帮派成员操作 */
     const UInt8 CLAN_OPERATE        = 0x64;// 0x94
-    /**帮派信息改变 */                          
+    /**帮派信息改变 */
     const UInt8 CLAN_INFO_CHANGE    = 0x65;// 0x95
-    /**请求某个帮派信息 */                      
+    /**请求某个帮派信息 */
     const UInt8 CLAN_REQ_OTHER      = 0x66;// 0x96
-    /**请求帮派成员列表信息 */                  
+    /**请求帮派成员列表信息 */
     const UInt8 CLAN_PLAYER_LIST    = 0x67;// 0x97
     /**请求帮派科技信息 */
     const UInt8 CLAN_SKILL          = 0x69;// 0x99
@@ -240,7 +240,7 @@ namespace REQ
     /**邮件信息改变 */
     const UInt8 MAIL_CHANGE         = 0x46;// 0xA5
     /**活跃度请求 */
-    const UInt8 ACTIVITY_LIST       = 0x4A; 
+    const UInt8 ACTIVITY_LIST       = 0x4A;
     /**活跃度领取奖励 */
     const UInt8 ACTIVITY_REWARD     = 0x4B;
     /**活跃度签到积分 */
@@ -255,19 +255,19 @@ namespace REQ
     const UInt8 STORE_BUY           = 0xDD;// 0xB1
     /**请求交易列表信息 */
     const UInt8 TRADE_LIST          = 0x80;// 0xC0
-    /**根据交易ID请求交易内容 */                
+    /**根据交易ID请求交易内容 */
     const UInt8 TRADE_DATA          = 0x81;// 0xC1
-    /**发起交易 */                              
+    /**发起交易 */
     const UInt8 TRADE_LAUNCH        = 0x82;// 0xC2
-    /**回复交易 */                              
+    /**回复交易 */
     const UInt8 TRADE_REPLY         = 0x83;// 0xC3
-    /**确认取消和删除交易状态操作 */            
+    /**确认取消和删除交易状态操作 */
     const UInt8 TRADE_OPERATE       = 0x84;// 0xC4
-    /**请求寄售列表 */                          
+    /**请求寄售列表 */
     const UInt8 SALE_LIST           = 0x85;// 0xC5
-    /**发起寄售 */                              
+    /**发起寄售 */
     const UInt8 SALE_SELL           = 0x86;// 0xC6
-    /**购买或下架指定物品 */                    
+    /**购买或下架指定物品 */
     const UInt8 SALE_OP             = 0x87;// 0xC7
     /**英雄岛 */
     const UInt8 HERO_ISLAND         = 0x97;
@@ -341,19 +341,19 @@ namespace REQ
     const UInt8 CLAN_RANKBATTLE_REQ     = 0x5A;
     /**帮会战排名列表 */
     const UInt8 CLAN_RANKBATTLE_SORTLIST = 0x5B;
-    
+
     /** 法宝精炼 */
     const UInt8 EQ_TRUMP_UPGRADE    = 0xB7;
     /** 法宝升阶 */
     const UInt8 EQ_TRUMP_L_ORDER    = 0xB8;
-    
+
     /***装备升级 */
     const UInt8 EQ_UPGRADE          = 0xB9;
     const UInt8 EQ_SPIRIT           = 0xBA;
 
     /**装备洗练属性解封 */
     const UInt8 EQ_ACTIVATE         = 0xBB;
-    
+
     // const UInt8 GETBOX              = 0xD4;
     // const UInt8 BLOCKBOSS           = 0xD5;
 
@@ -533,11 +533,11 @@ namespace REP
     const UInt8 MAIL_CHANGE         = 0x46;// 0xA5
 
     /** 活跃度请求 */
-    const UInt8 ACTIVITY_LIST       = 0x4A; 
+    const UInt8 ACTIVITY_LIST       = 0x4A;
     /** 活跃度领取奖励 */
     const UInt8 ACTIVITY_REWARD     = 0x4B;
     const UInt8 ACTIVITY_SIGNIN     = 0x4C;
- 
+
     const UInt8 FRIEND_LIST         = 0xD8;// 0xA8
     const UInt8 FRIEND_ACTION       = 0xD9;// 0xA9
 
@@ -600,7 +600,7 @@ namespace REP
     const UInt8 CLAN_RANKBATTLE_REPINIT = 0x59;  //非战斗时信息返回
     const UInt8 CLAN_RANKBATTLE_REP     = 0x5A;  //战斗时信息返回
     const UInt8 CLAN_RANKBATTLE_SORTLIST = 0x5B; //帮会战排名列表
-    
+
     const UInt8 TEAM_COPY_REQ       = 0x99;
 
     /** 战报数据 */
@@ -659,7 +659,7 @@ namespace SPEQ
     const UInt16 MAILVIP            = 0x11C;
     const UInt16 JASON              = 0x11D;//PHP过来的JASON请求
     const UInt16 CFRIEND            = 0x11E;//设置成密友
-        
+
     const UInt16 ADDDISCOUNT         = 0x121; // 增加限时活动
     const UInt16 QUERYDISCOUNT       = 0x122; // 查询限时活动
     const UInt16 CLEARDISCOUNT       = 0x123; // 清空限时活动

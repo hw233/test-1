@@ -40,7 +40,7 @@ public:
 public:
 	void listClans(Player *, UInt16, UInt8);
 	bool addOnBattleClan(ClanBattle *);
-	bool addOffBattleClan(ClanBattle *);	
+	bool addOffBattleClan(ClanBattle *);
 	bool delBattleClan(ClanBattle *);
 	ClanBattle * getRobBattleClan();
 	ClanBattle * getBattleClan(Player *, std::string&);
@@ -62,7 +62,7 @@ private:
 		{
 			if (_cbt == other._cbt)
 				return _lev > other._lev;
-			return _cbt < other._cbt; 
+			return _cbt < other._cbt;
 		}
 	};
 	typedef std::multimap<OnBCTKey, ClanBattle *> OnBattleClanT;

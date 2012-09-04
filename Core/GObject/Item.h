@@ -19,7 +19,7 @@ namespace GObject
 		{
 		}
 		virtual ~ItemBase() {};
-	
+
 	public:
 		const GData::ItemBaseType& GetItemType() const { return *_itemBaseType; }
 
@@ -80,7 +80,7 @@ namespace GObject
 	class ItemEquip : public ItemBase
 	{
 	public:
-		ItemEquip(UInt32 id, const GData::ItemBaseType* itemEquipType, ItemEquipData& itemEquipData) 
+		ItemEquip(UInt32 id, const GData::ItemBaseType* itemEquipType, ItemEquipData& itemEquipData)
 			: ItemBase(id, itemEquipType), _itemEquipData(itemEquipData)
 		{
 		}
@@ -112,7 +112,7 @@ namespace GObject
             if (attrExtra)
                 return attrExtra->attack;
             return 0;
-        } 
+        }
 		inline UInt16 getImgAttack()
         {
             const GData::AttrExtra* attrExtra = getAttrExtra();
@@ -145,7 +145,7 @@ namespace GObject
 	{
 	public:
 		ItemWeapon(UInt32 id, const GData::ItemBaseType* itemArmorType, ItemEquipData& itemEquipData)
-			: ItemEquip(id, itemArmorType, itemEquipData) 
+			: ItemEquip(id, itemArmorType, itemEquipData)
 		{ }
 	};
 
@@ -153,7 +153,7 @@ namespace GObject
 	{
 	public:
 		ItemArmor(UInt32 id, const GData::ItemBaseType* itemEquipType, ItemEquipData& itemEquipData)
-		    : ItemEquip(id, itemEquipType, itemEquipData) 
+		    : ItemEquip(id, itemEquipType, itemEquipData)
 		{ }
 	};
 
@@ -161,7 +161,7 @@ namespace GObject
     {
 	public:
 		ItemFashion(UInt32 id, const GData::ItemBaseType* itemEquipType, ItemEquipData& itemEquipData)
-		    : ItemEquip(id, itemEquipType, itemEquipData) 
+		    : ItemEquip(id, itemEquipType, itemEquipData)
 		{ }
     };
 

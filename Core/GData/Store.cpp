@@ -1,4 +1,4 @@
-#include "Config.h"
+﻿#include "Config.h"
 #include "Store.h"
 #include "GObject/Country.h"
 #include "Server/WorldServer.h"
@@ -70,7 +70,7 @@ void Store::addExchange(UInt8 type, UInt32 itemId, UInt32 priceID, UInt32 priceN
 
 void Store::addNormalDiscount(UInt32 itemId, UInt32 discountNum, UInt32 num)
 {
-    // lua脚本自动生成三五八折的限购商品表 
+    // lua脚本自动生成三五八折的限购商品表
     UInt8 type = 0;
     switch (discountNum)
     {
@@ -104,7 +104,7 @@ void Store::addSpecialDiscount()
     // FIXME: 优化lua动态载入特殊限购活动
     UInt32 now = TimeUtil::Now();
     lua_State* L = lua_open();
-    luaL_openlibs(L); 
+    luaL_openlibs(L);
     {
         std::string path = cfg.scriptPath + "World/Store.lua";
         lua_tinker::dofile(L, path.c_str());
@@ -196,7 +196,7 @@ UInt8 Store::clearSpecialDiscountFromBS(UInt8 type /* = 0 */)
 }
 
 bool Store::needResetDiscount()
-{ 
+{
     // 判断是否需要更新限购商品
     if(!_itemsDiscount[0].size())
         return true;
@@ -263,7 +263,7 @@ UInt32 Store::getPrice( UInt8 type, UInt16 itemId, UInt16 flag)
             if ((*it).itemID == itemId && (*it).discountType == flag)
                 return (*it).priceDiscount;
         }
-       
+
     }
     return 0xFFFFFFFF;
 }
@@ -411,7 +411,7 @@ void Store::clearSpecialDiscount()
                         (*it).itemID, (*it).discountType);
                 it = items.erase(it);
             }
-            else 
+            else
                 ++ it;
         }
         else

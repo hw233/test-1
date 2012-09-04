@@ -89,7 +89,7 @@ struct TaskInfor
 S11N_TRAITS_9(TaskInfor, UInt32, m_Id, UInt8, m_Class, UInt32, m_TaskId, UInt32, m_AcceptTime, std::vector<UInt16>, m_Step, UInt32, m_TimeBegin, UInt32, m_TimeEnd, UInt8, m_Completed, UInt8, m_Submit);
 
 struct CurrTaskResp
-{	
+{
 	std::vector<TaskInfor> m_TaskInforVec;
 
 	MESSAGE_DEF1(REP::GET_TASK_LIST, std::vector<TaskInfor>, m_TaskInforVec);

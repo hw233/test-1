@@ -26,14 +26,14 @@ namespace
 		{
 			sigset_t sset;
 			sigemptyset(&sset);
-			sigaddset(&sset, SIGPIPE); 
+			sigaddset(&sset, SIGPIPE);
 			pthread_sigmask(SIG_BLOCK, &sset, 0);
 		}
 		~SignalBlocker()
 		{
 		}
 	};
-	
+
 	static SignalBlocker signalBlocker;
 }
 #endif
@@ -48,7 +48,7 @@ ThreadImpl::ThreadImpl():
 {
 }
 
-			
+
 ThreadImpl::~ThreadImpl()
 {
 	if (isRunningImpl())
@@ -206,7 +206,7 @@ void ThreadImpl::joinImpl()
 	_pData->done.wait();
 	void* result;
 	if (pthread_join(_pData->thread, &result))
-		throw SystemException("cannot join thread"); 
+		throw SystemException("cannot join thread");
 }
 
 
@@ -241,7 +241,7 @@ void ThreadImpl::sleepImpl(long milliseconds)
 		// This is specific to DECThreads
 		struct timespec interval;
 		interval.tv_sec  = milliseconds / 1000;
-		interval.tv_nsec = (milliseconds % 1000)*1000000; 
+		interval.tv_nsec = (milliseconds % 1000)*1000000;
 		pthread_delay_np(&interval);
 #elif _OS == _OS_LINUX || _OS == _OS_MAC_OS_X || _OS == _OS_QNX || _OS == _OS_VXWORKS
 	Timespan remainingTime(1000*Timespan::TimeDiff(milliseconds));
@@ -265,7 +265,7 @@ void ThreadImpl::sleepImpl(long milliseconds)
 	}
 	while (remainingTime > 0 && rc < 0 && errno == EINTR);
 	if (rc < 0 && remainingTime > 0) throw SystemException("Thread::sleep(): nanosleep() failed");
-#else 
+#else
 	Timespan remainingTime(1000*Timespan::TimeDiff(milliseconds));
 	int rc;
 	do
@@ -300,7 +300,7 @@ void* ThreadImpl::runnableEntry(void* pThread)
 	sigemptyset(&sset);
 	sigaddset(&sset, SIGQUIT);
 	sigaddset(&sset, SIGTERM);
-	sigaddset(&sset, SIGPIPE); 
+	sigaddset(&sset, SIGPIPE);
 	pthread_sigmask(SIG_BLOCK, &sset, 0);
 #endif
 
@@ -338,7 +338,7 @@ void* ThreadImpl::callableEntry(void* pThread)
 	sigemptyset(&sset);
 	sigaddset(&sset, SIGQUIT);
 	sigaddset(&sset, SIGTERM);
-	sigaddset(&sset, SIGPIPE); 
+	sigaddset(&sset, SIGPIPE);
 	pthread_sigmask(SIG_BLOCK, &sset, 0);
 #endif
 

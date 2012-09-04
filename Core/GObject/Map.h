@@ -1,4 +1,4 @@
-#ifndef MAP_INC
+﻿#ifndef MAP_INC
 #define MAP_INC
 
 #include "Common/Stream.h"
@@ -89,7 +89,7 @@ public:
 	bool AddObject(MOData& mo);
 	void DelObject(UInt32 id);
 	void DelObjects();	//all objects
-	MapObject* GetObject(UInt32 id); 
+	MapObject* GetObject(UInt32 id);
 
 	static void AddSpot(UInt16 id, const std::string&, UInt8 type, UInt8 countryBattle, UInt32 x, UInt32 y);
 	static Map * FromSpot(UInt16 spotID);
