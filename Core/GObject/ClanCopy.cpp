@@ -18,7 +18,7 @@ const static UInt32 COPY_ROUTE_COUNT = 3;  // 帮派副本的路径数目
 UInt32 clanCopyFileIndex = 1;
 #endif
 
-ClanCopy::ClanCopy(Clan *c) : _clan(c)
+ClanCopy::ClanCopy(Clan *c, Player * player) : _clan(c), _launchPlayer(player)
 {
 #ifdef DEBUG_CLAN_COPY
     char fileBuf[32];
@@ -54,6 +54,7 @@ ClanCopy::ClanCopy(Clan *c) : _clan(c)
     fileSt << "clan_copy_log:" << std::endl;
 #endif
     
+    _launchPlayer = NULL;
 }
 
 
@@ -126,6 +127,13 @@ void ClanCopy::playerEscape(Player *player)
         // 围观群众散去
         _observerPlayer.erase(obIt);
         return;
+    }
+
+    if (player == _launchPlayer)
+    {
+        // 发起者逃跑，副本作废
+        _status = CLAN_COPY_OVER;
+        notifyLauncherEscape();
     }
 
     std::map<Player *, UInt8>::iterator playerIndexIt = _playerIndex.find(player);
@@ -445,22 +453,59 @@ bool ClanCopy::checkWin()
         }
     }
     _status = CLAN_COPY_WIN;
+    _clan->addCopyLevel();
+    _clan->addCopyWinLog(_launchPlayer);
     notifyCopyWin();
     return win;
 }
 
 void ClanCopy::notifySpotPlayerInfo(UInt8 spotId)
 {
-    // TODO: 通知玩家该据点状态
+    // 通知玩家该据点状态
+
+    Stream st(REP::CLAN_COPY);
+    st << static_cast<UInt8> (CLAN_COPY_MEMBER_LIST_OP);
+    st << static_cast<UInt16> (_copyLevel);
+    UInt8 count = _spotMap.size();
+    st << static_cast<UInt8> (count);
+    for (SpotMap::iterator mapIt = _spotMap.begin(); mapIt != _spotMap.end(); ++ mapIt)
+    {
+        // 每个据点的信息
+        st << static_cast<UInt8> (mapIt->first);
+        ClanCopySpot &clanCopySpot = mapIt->second;
+        st << static_cast<UInt8> (clanCopySpot.maxPlayerCount);
+        st << static_cast<UInt8> (clanCopySpot.spotBufferType);
+        st << static_cast<UInt16> (clanCopySpot.spotBufferValue);
+
+        SpotPlayer::iterator spotPlayerIt = _spotPlayer.find(mapIt->first);
+        if (spotPlayerIt == _spotPlayer.end())
+            return;
+
+        st << static_cast<UInt8> ((spotPlayerIt->second).size());
+        UInt8 i = 0;
+        for (SpotPlayerList::iterator playerListIt =  (spotPlayerIt->second).begin(); 
+                playerListIt != spotPlayerIt->second.end();++ i, ++ playerListIt)
+        {
+            // 据点内每个玩家的信息
+            st << static_cast<UInt8> (i + 1);
+            st << static_cast<UInt64> (playerListIt->player->getId());
+            st << playerListIt->player->getName();
+            st << static_cast<UInt8> (playerListIt->player->GetLev());
+        }
+    }
+    st << Stream::eos;
+ 
     for (std::map<Player *, UInt8>::iterator playerIt = _playerIndex.begin();
             playerIt != _playerIndex.end(); ++ playerIt)
     {
         // 通知副本战斗玩家
+        playerIt->first->send(st);
     }
     for (std::set<Player *>::iterator obIt = _observerPlayer.begin();
             obIt != _observerPlayer.end(); ++ obIt)
     {
         // 通知围观群众
+        (*obIt)->send(st);
     }
 }
 
@@ -472,6 +517,11 @@ void ClanCopy::notifyCopyLose()
 void ClanCopy::notifyCopyWin()
 {
     // TODO: 通知玩家副本成功
+}
+
+void ClanCopy::notifyLauncherEscape()
+{
+    // TODO: 通知玩家发起者逃跑，副本作废
 }
 
 /////////////////////////////////////////////////////////////
@@ -492,7 +542,7 @@ void ClanCopyMgr::process(UInt32 now)
     {
         if ((it->second).getStatus() == CLAN_COPY_OVER)
         {
-            // 该帮派副本数据已经无效
+            // 该帮派副本数据已经无效，清除有关数据
             deleteClanCopy(&(it->second));
             _clanCopyMap.erase(it ++);
         }
@@ -519,14 +569,14 @@ UInt8 ClanCopyMgr::getCopyStatus(UInt32 clanId)
     }
 }
 
-bool ClanCopyMgr::createClanCopy(Clan *c)
+bool ClanCopyMgr::createClanCopy(Player* player, Clan *c)
 {
     // 创建一个新帮派副本
     if (c == NULL)
         return false;
     if (_clanCopyMap.find(c->getId()) != _clanCopyMap.end())
         return false;
-    _clanCopyMap.insert(std::make_pair(c->getId(), ClanCopy(c)));
+    _clanCopyMap.insert(std::make_pair(c->getId(), ClanCopy(c, player)));
     return true;
 }
 
@@ -580,10 +630,10 @@ void ClanCopyMgr::playerEnter(Player * player)
     for (SpotMap::iterator mapIt = _spotMap.begin(); mapIt != _spotMap.end(); ++ mapIt)
     {
         st << static_cast<UInt8> (mapIt->first);
-        ClanSpot &clanSpot = mapIt->second;
-        st << static_cast<UInt8> (clanSpot.maxPlayerCount);
-        st << static_cast<UInt8> (clanSpot.spotBufferType);
-        st << static_cast<UInt16> (clanSpot.spotBufferValue);
+        ClanCopySpot &clanCopySpot = mapIt->second;
+        st << static_cast<UInt8> (clanCopySpot.maxPlayerCount);
+        st << static_cast<UInt8> (clanCopySpot.spotBufferType);
+        st << static_cast<UInt16> (clanCopySpot.spotBufferValue);
 
         SpotPlayer::iterator spotPlayerIt = _spotPlayer.find(mapIt->first);
         if (spotPlayerIt == _spotPlayer.end())

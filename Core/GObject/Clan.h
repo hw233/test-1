@@ -1,4 +1,4 @@
-﻿#ifndef _CLAN_H_
+#ifndef _CLAN_H_
 #define _CLAN_H_
 
 #include <set>
@@ -481,6 +481,7 @@ public:
 
     void LoadStatue(UInt16 level, UInt32 exp, UInt32 expUpdateTime);
     void LoadCopy(UInt16 level, UInt32 levelUpdateTime);
+    void LoadCopyLog(UInt32 logTime, UInt8 logType, std::string playerName, UInt32 logVal);
 
     void sendClanCopyInfo(Player * player);
 
@@ -504,6 +505,9 @@ public:
 
     void   clanCopyOperate(Player * player, UInt8 type, UInt8 command, UInt8 val = 0);
     void   clanCopyMemberOperate(Player * player, UInt8 command, UInt8 val);
+
+    void   addCopyLevel();
+    void   addCopyWinLog(Player* player);
 
     inline Player * getOwner()
     {
@@ -595,7 +599,7 @@ private:
     UInt16 _copyLevel;
     UInt32 _copyLevelUpdateTime;
 
-    std::vector<ClanCopyLog> _copyLog;
+    std::list<ClanCopyLog> _copyLog;
 
 	bool _deleted;
 	std::vector<std::string> _keywords;

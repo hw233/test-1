@@ -1,4 +1,4 @@
-﻿#ifndef _ASSS_MSGID_H_
+#ifndef _ASSS_MSGID_H_
 #define _ASSS_MSGID_H_
 
 #include "Config.h"
@@ -726,11 +726,11 @@ namespace ARENAREQ
     const UInt8 BATTLE_REPORT       = 0x08;
 }
 
-#endif // __ASSS_MSGID_H_
 enum CLAN_COPY
 {
     CLAN_COPY_TAB_INFO = 0x01,
     CLAN_COPY_MEMBER_LIST_OP = 0x02,
 };
 
+#endif // __ASSS_MSGID_H_
 
