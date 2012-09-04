@@ -209,6 +209,15 @@ function ItemNormal_00000026(iid, num, bind, param)
   end
 end
 
+function fixModelConflict(fgt, bufid)
+    local buffers = {5,7,8,9,0xa,0xb,0xc,0xe,0xf,0x10,}
+    for n=1,#buffers do
+        if bufid ~= buffers[n] then
+            fgt:setBuffData(buffers[n], 0, true)
+        end
+    end
+end
+
 function ItemNormal_00000401(iid, num, bind, param)
     local player = GetPlayer()
     local fgt = player:findFighter(param);
@@ -218,13 +227,8 @@ function ItemNormal_00000401(iid, num, bind, param)
         return false
     end
 
-    for i=0,5 do
-        fgt:setBuffData(i+9, 0, true)
-    end
+    fixModelConflict(fgt, 5)
 
-    fgt:setBuffData(8, 0, true)
-    fgt:setBuffData(7, 0, true)
-    fgt:setBuffData(0xf, 0, true)
     if ItemNormal_AddBuff(fgt, 5, 3600, num, 356400) then
         package:DelItemSendMsg(401, player);
         return num;
@@ -241,13 +245,8 @@ function ItemNormal_00000438(iid, num, bind, param)
         return false
     end
 
-    for i=0,5 do
-        fgt:setBuffData(i+9, 0, true)
-    end
+    fixModelConflict(fgt, 7)
 
-    fgt:setBuffData(8, 0, true)
-    fgt:setBuffData(5, 0, true)
-    fgt:setBuffData(0xf, 0, true)
     if ItemNormal_AddBuff(fgt, 7, 7200, num, 356400) then
         package:DelItemSendMsg(438, player);
         return num;
@@ -264,13 +263,8 @@ function ItemNormal_00000439(iid, num, bind, param)
         return false
     end
 
-    for i=0,5 do
-        fgt:setBuffData(i+9, 0, true)
-    end
+    fixModelConflict(fgt, 8)
 
-    fgt:setBuffData(7, 0, true)
-    fgt:setBuffData(5, 0, true)
-    fgt:setBuffData(0xf, 0, true)
     if ItemNormal_AddBuff(fgt, 8, 7200, num, 356400) then
         package:DelItemSendMsg(439, player);
         return num;
@@ -287,19 +281,33 @@ function ItemNormal_00009139(iid, num, bind, param)
         return false
     end
 
-    for i=0,5 do
-        fgt:setBuffData(i+9, 0, true)
-    end
+    fixModelConflict(fgt, 0xf)
 
-    fgt:setBuffData(7, 0, true)
-    fgt:setBuffData(5, 0, true)
-    fgt:setBuffData(8, 0, true)
     if ItemNormal_AddBuff(fgt, 0xf, 3600*24, num, 356400) then
         package:DelItemSendMsg(9139, player);
         return num;
     end
     return false
 end
+
+function ItemNormal_00009140(iid, num, bind, param)
+    local player = GetPlayer()
+    local fgt = player:findFighter(param);
+    local package = player:GetPackage();
+
+    if fgt == nil then
+        return false
+    end
+
+    fixModelConflict(fgt, 0x10)
+
+    if ItemNormal_AddBuff(fgt, 0x10, 3600*24, num, 356400) then
+        package:DelItemSendMsg(iid, player);
+        return num;
+    end
+    return false
+end
+
 
 function ItemNormal_00000027(iid, num, bind, param)
     local player = GetPlayer();
@@ -1435,14 +1443,6 @@ function ItemNormal_00000480(iid, num, bind, param)
 		return false;
 	end
 
-    fgt:setBuffData(5, 0, true)
-    fgt:setBuffData(7, 0, true)
-    fgt:setBuffData(8, 0, true)
-
-    for i=0,5 do
-        fgt:setBuffData(i+9, 0, true)
-    end
-
     local cls = fgt:getClass()
     if cls == 0 then
         return false
@@ -1456,6 +1456,12 @@ function ItemNormal_00000480(iid, num, bind, param)
         b = math.random(0, 5)
     end
     buf = b
+
+    for i=0,5 do
+        fgt:setBuffData(i+9, 0, true)
+    end
+
+    fixModelConflict(fgt, 0) -- clear all
 
     fgt:setBuffData(buf+9, os.time()+24*60*60, true)
     package:DelItemSendMsg(480, player);
@@ -6362,6 +6368,7 @@ local ItemNormal_Table = {
     [9133] = ItemNormal_00009133,
 
     [9139] = ItemNormal_00009139,
+    [9140] = ItemNormal_00009140,
 
     [10000] = ItemNormal_00010000,
     [10001] = ItemNormal_00010001,

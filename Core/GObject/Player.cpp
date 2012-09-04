@@ -3724,6 +3724,12 @@ namespace GObject
                 cfg.serverLogId, getId(), ii->incommingType, ii->itemId, ii->itemNum, c, TimeUtil::Now());
         }
 
+        if (ii && ii->incommingType == InFromSale)
+        {
+            char gold[32] = {0};
+            snprintf(gold, sizeof(gold), "%u", c);
+            udpLog("sale", gold, "", "", "", "", "currency");
+        }
 		return _playerData.gold;
 	}
 
@@ -3799,6 +3805,13 @@ namespace GObject
                 {
                     DBLOG1().PushUpdateData("insert into consume_gold (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
                         cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, c, TimeUtil::Now());
+                }
+
+                if (ci && ci->purchaseType == PurchaseSale)
+                {
+                    char gold[32] = {0};
+                    snprintf(gold, sizeof(gold), "-%u", _holdGold);
+                    udpLog("sale", gold, "", "", "", "", "currency");
                 }
 
 				SYSMSG_SENDV(150, this, c);
@@ -10238,6 +10251,52 @@ namespace GObject
             {9089, 1},
         };
         sendMailItem(3002, 3002, &item[pos-1], 1, false);
+    }
+
+    void Player::sendRechargeRankAward(int pos)
+    {
+        if (!pos || pos > 7)
+            return;
+        MailPackage::MailItem item[7][1] =
+        {
+            {{9076, 80},},
+            {{9076, 60},},
+            {{9076, 50},},
+            {{9076, 10},},
+            {{9076, 10},},
+            {{9076, 10},},
+            {{9076, 10},},
+        };
+
+        SYSMSGV(_title, 4026, pos);
+        SYSMSGV(_content, 4027, pos);
+        Mail * mail = m_MailBox->newMail(NULL, 0x21, _title, _content, 0xFFFE0000);
+        if(mail)
+        {
+            MailPackage::MailItem* mitem = &item[pos-1][0];
+            UInt32 size = 1;
+            std::string strItems;
+            for (UInt32 i = 0; i < size; ++i)
+            {
+                strItems += Itoa(mitem[i].id);
+                strItems += ",";
+                strItems += Itoa(mitem[i].count);
+                strItems += "|";
+            }
+            mailPackageManager.push(mail->id, mitem, size, true);
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, _title, _content, strItems.c_str(), mail->recvTime);
+        }
+    }
+
+    void Player::sendConsumeRankAward(int pos)
+    {
+        if (!pos || pos > 3)
+            return;
+        MailPackage::MailItem item[1][1] =
+        {
+            {{444, 1},},
+        };
+        sendMailItem(2331, 2332, &item[pos-1][0], 1, false);
     }
 
     void Player::sendCreateMail()

@@ -19,7 +19,7 @@ function itemtemplate()
     sed -i /^$/d $f
     sed -i s/\"//g $f
     export lines=`wc -l $f | awk '{print $1}'`
-    echo "Generating file $d, total lines $l"
+    echo "Generating file $d, total lines $lines"
     awk '
         BEGIN {
             print "INSERT INTO `item_template` VALUES";

@@ -193,6 +193,8 @@ bool bMayDayEnd = false;
 bool bJuneEnd = false;
 bool bPExpItemsEnd = false;
 bool bQixiEnd = false;
+bool bRechargeEnd = false;
+bool bConsumeEnd = false;
 
 bool enum_midnight(void * ptr, void* next)
 {
@@ -628,6 +630,60 @@ void SendPExpCard()
 
 }
 
+void SendRechargeRankAward()
+{
+    if(bRechargeEnd)
+    {
+        int pos = 0;
+        for (RCSortType::iterator i = World::rechargeSort.begin(), e = World::rechargeSort.end(); i != e; ++i)
+        {
+            ++pos;
+
+            if(pos > 7) break;
+
+            Player* player = i->player;
+            if (!player)
+                continue;
+            if (player->isOnline())
+            {
+                GameMsgHdr hdr(0x257, player->getThreadId(), player, sizeof(pos));
+                GLOBAL().PushMsg(hdr, &pos);
+            }
+            else
+            {
+                player->sendRechargeRankAward(pos);
+            }
+        }
+    }
+}
+
+void SendConsumeRankAward()
+{
+    if(bConsumeEnd)
+    {
+        int pos = 0;
+        for (RCSortType::iterator i = World::consumeSort.begin(), e = World::consumeSort.end(); i != e; ++i)
+        {
+            ++pos;
+
+            if(pos > 1) break;
+
+            Player* player = i->player;
+            if (!player)
+                continue;
+            if (player->isOnline())
+            {
+                GameMsgHdr hdr(0x258, player->getThreadId(), player, sizeof(pos));
+                GLOBAL().PushMsg(hdr, &pos);
+            }
+            else
+            {
+                player->sendConsumeRankAward(pos);
+            }
+        }
+    }
+}
+
 void World::World_Midnight_Check( World * world )
 {
 	UInt32 curtime = TimeUtil::Now();
@@ -640,6 +696,8 @@ void World::World_Midnight_Check( World * world )
     bool bMayDay = getMayDay();
     bool bJune = getJune();
     bool bQixi = getQixi();
+    bool bRecharge = (getRechargeActive() || getRechargeActive3366()) && getNeedRechargeRank();
+    bool bConsume = getConsumeActive() && getNeedConsumeRank();
     bool bPExpItems = getPExpItems();
 	world->_worldScript->onActivityCheck(curtime+30);
 
@@ -662,6 +720,8 @@ void World::World_Midnight_Check( World * world )
     bJuneEnd = bJune && !getJune();
     bPExpItemsEnd = bPExpItems && !getPExpItems();
     bQixiEnd = bQixi && !getQixi();
+    bRechargeEnd = bRecharge && !(getRechargeActive()||getRechargeActive3366());
+    bConsumeEnd = bConsume && !getConsumeActive();
 
     UInt32 nextday = curtime + 30;
 	globalPlayers.enumerate(enum_midnight, static_cast<void *>(&nextday));
@@ -700,6 +760,10 @@ void World::World_Midnight_Check( World * world )
 #endif
     if(bQixiEnd)
         world->SendQixiAward();
+    if (bRechargeEnd)
+        SendRechargeRankAward();
+    if (bConsumeEnd)
+        SendConsumeRankAward();
 	
 	dungeonManager.enumerate(enum_dungeon_midnight, &curtime);
 	globalClans.enumerate(enum_clan_midnight, &curtime);
