@@ -263,14 +263,13 @@ namespace GData
 			return false;
         }
         
-        /*
         if (!LoadClanCopy())
         {
             fprintf (stderr, "Load Clan Copy Table Error !\n");
             return false;
         }
 
-        if (!LoadClanCopyMonster)
+        if (!LoadClanCopyMonster())
         {
             fprintf (stderr, "Load Clan Copy Monster Table Error !\n");
             return false;
@@ -281,7 +280,6 @@ namespace GData
             fprintf (stderr, "Load Clan Statue Error !\n");
             return false;
         }
-        */
 
 		return true;
 	}
@@ -1385,7 +1383,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
         DBClanCopy cc;
-		if (execu->Prepare("SELECT `level`, `expOutput` FROM `clan_copy_template` ORDER BY `level` ASC", cc) != DB::DB_OK)
+		if (execu->Prepare("SELECT `level`, `expOutput`, `monsterWaveCount`, `minPlayer`, `maxPlayer`, `spotMaxPlayer`, `homeHp` FROM `clan_copy_template` ORDER BY `level` ASC", cc) != DB::DB_OK)
 			return false;
 		while (execu->Next() == DB::DB_OK)
 		{
@@ -1406,7 +1404,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
         DBClanCopyMonster ccs;
-		if (execu->Prepare("SELECT `level`, `appearRound`, `npcId`, `npcCount`, `npcRouteCount`, `npcValue` FROM `clan_copy_monster_template` ORDER BY `level` ASC", ccs) != DB::DB_OK)
+		if (execu->Prepare("SELECT `level`, `appearRound`, `npcId`, `npcCount`, `npcRouteCount`, `npcValue` FROM `clan_copy_monster_template` ORDER BY `level` ASC, `appearRound` ASC", ccs) != DB::DB_OK)
 			return false;
 		while (execu->Next() == DB::DB_OK)
 		{

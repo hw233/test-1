@@ -18,6 +18,7 @@ class ClanBattle;
 class Clan;
 class ClanStatue;
 class ClanCopy;
+struct ClanCopyLog;
 
 #define BASE_MEMBER_COUNT 30
 struct AllocItem
@@ -417,10 +418,6 @@ public:
     void GetWeal(Player* player);
     void GetItems(Player* player);
 
-    /**
-     *@brief 加载帮派神像
-     */
-    void LoadStatue(UInt16 level, UInt32 exp);
 
 public:
 	inline bool alive() { return !_deleted; }
@@ -481,6 +478,12 @@ public:
 
 public:
     // 帮派副本，帮派神像
+
+    void LoadStatue(UInt16 level, UInt32 exp, UInt32 expUpdateTime);
+    void LoadCopy(UInt16 level, UInt32 levelUpdateTime);
+
+    void sendClanCopyInfo(Player * player);
+
     UInt16 getStatueLevel();
     UInt32 getStatueExp();
     UInt32 getStatueNextExp();
@@ -497,7 +500,10 @@ public:
     UInt32 getOutputExp();
     UInt32 getNextOutputExp();
     UInt8  getCopyStatus();
-    UInt8  getCopyMeberCount();
+    UInt16 getCopyMeberCount();
+
+    void   clanCopyOperate(Player * player, UInt8 type, UInt8 command, UInt8 val = 0);
+    void   clanCopyMemberOperate(Player * player, UInt8 command, UInt8 val);
 
     inline Player * getOwner()
     {
@@ -587,8 +593,9 @@ private:
 	ClanTech * _techs;
     ClanStatue * _statue;
     UInt16 _copyLevel;
+    UInt32 _copyLevelUpdateTime;
 
-    ClanCopy * _clanCopy;
+    std::vector<ClanCopyLog> _copyLog;
 
 	bool _deleted;
 	std::vector<std::string> _keywords;

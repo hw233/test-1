@@ -1137,14 +1137,39 @@ void OnClanCopyReq (GameMsgHdr& hdr, const void * data )
     MSG_QUERY_PLAYER(player);
     if (!player->hasChecked())
         return;
+
+	GObject::Clan * clan = player->getClan();
+	if(clan == NULL)
+	{
+		Stream st(REP::CLAN_COPY);
+		st << static_cast<UInt8>(0);
+		st << Stream::eos;
+		player->send(st);
+		return;
+	}
+
     BinaryReader brd(data, hdr.msgHdr.bodyLen);
     UInt8 type = 0;
     brd >> type;
+    UInt8 command = 0;
+    brd >> command;
+    UInt8 val = 0;
     switch(type)
     {
         case CLAN_COPY_TAB_INFO:
             // 请求帮派副本信息
-            player->sendClanCopyInfo();
+            if (command == 0)
+                clan->sendClanCopyInfo(player);
+            else
+            {
+                brd >> val;
+                clan->clanCopyOperate(player, type, command, val);
+            }
+            break;
+        case CLAN_COPY_MEMBER_LIST_OP:
+            // 帮派副本成员操作
+            brd >> val;
+            clan->clanCopyOperate(player, type, command, val);
             break;
         default:
                 break;

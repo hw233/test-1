@@ -5,14 +5,26 @@
 #include "Player.h"
 #include "Common/Stream.h"
 
+
 namespace GObject
 {
 
+
+
+
 const static UInt32 COPY_ROUTE_COUNT = 3;  // 帮派副本的路径数目
 
+#ifdef DEBUG_CLAN_COPY
+UInt32 clanCopyFileIndex = 1;
+#endif
 
 ClanCopy::ClanCopy(Clan *c) : _clan(c)
 {
+#ifdef DEBUG_CLAN_COPY
+    char fileBuf[32];
+    snprintf (fileBuf, 32, "clan_copy_%d.txt", clanCopyFileIndex++);
+    fileSt.open(fileBuf, std::fstream::in);
+#endif
     _copyLevel = c->getCopyLevel();
     _spotMap.clear();
     _spotMonster.clear();
@@ -33,21 +45,94 @@ ClanCopy::ClanCopy(Clan *c) : _clan(c)
 
     _maxMonsterWave = 20;
     _curMonsterWave = 0;
+
+    _totalPlayer = 0;  
+    _deadPlayer = 0;   
+    _escapePlayer = 0; 
+    _observerPlayer.clear();
+#ifdef DEBUG_CLAN_COPY
+    fileSt << "clan_copy_log:" << std::endl;
+#endif
+    
 }
 
 
 ClanCopy::~ClanCopy()
 {
+#ifdef DEBUG_CLAN_COPY
+    fileSt.close();
+#endif
     _spotMap.clear();
     _spotMonster.clear();
     _spotPlayer.clear();
     _spotDeadPlayer.clear();
+    _observerPlayer.clear();
 }
 
 UInt8 ClanCopy::getStatus()
 {
     // 返回副本状态
     return _status;
+}
+
+UInt16 ClanCopy::getTotalPlayer()
+{
+    return _totalPlayer;
+}
+
+void ClanCopy::addPlayer(Player * player)
+{
+    // 增加帮派副本玩家人数 （仅在准备状态有效）
+    if (_status != CLAN_COPY_READY)
+        return;
+    std::set<Player*>::iterator obIt = _observerPlayer.find(player);
+    if (obIt!= _observerPlayer.end())
+        _observerPlayer.erase(obIt);
+    for (SpotMap::iterator mapIt = _spotMap.begin(); mapIt != _spotMap.end(); ++mapIt)
+    {
+        if (mapIt->first == Home)
+            continue;
+        SpotPlayer::iterator playerIt = _spotPlayer.find(mapIt->first);
+        if (playerIt == _spotPlayer.end())
+            return;
+        if ((playerIt->second).size() >= (mapIt->second).maxPlayerCount)
+            continue;
+        else
+        {
+            (playerIt->second).push_back(ClanCopyPlayer(player));
+            notifySpotPlayerInfo(mapIt->first);
+            return;
+        }
+    }
+    player->sendMsgCode(0, 1351);
+}
+
+void ClanCopy::addObserver(Player * player)
+{
+    // 增加帮派副本围观人员（不明真相的围观群众）
+    if (_observerPlayer.find(player) != _observerPlayer.end())
+        return;    // 已经是围观人员，不需要再次加入（这里也是异常流程）
+    if (_playerIndex.find(player) != _playerIndex.end())
+        return;    // 已经是副本战斗人员（这里也是异常流程）
+    _observerPlayer.insert(player);
+}
+
+void ClanCopy::playerEscape(Player *player)
+{
+    // TODO: 玩家逃跑
+    std::set<Player *>::iterator obIt = _observerPlayer.find(player);
+    if (obIt != _observerPlayer.end())
+    {
+        // 围观群众散去
+        _observerPlayer.erase(obIt);
+        return;
+    }
+
+    std::map<Player *, UInt8>::iterator playerIndexIt = _playerIndex.find(player);
+    if (playerIndexIt != _playerIndex.end())
+    {
+        // TODO: 游戏中玩家逃跑
+    }
 }
 
 void ClanCopy::initCopyData()
@@ -59,8 +144,13 @@ void ClanCopy::initCopyData()
 void ClanCopy::process(UInt32 now)
 {
     // 游戏状态进行
-    if (_startTime == 0)
+    if (_status == CLAN_COPY_READY)
         return;  // 还在准备状态，游戏未开始
+
+    if (_status == CLAN_COPY_WIN)
+        return;
+    if (_status == CLAN_COPY_LOSE)
+        return;
 
     if ((now - _tickTime) < _tickTimeInterval)
         return;    // 未到达触发下一状态的时间
@@ -73,23 +163,25 @@ void ClanCopy::process(UInt32 now)
         else
             monsterAssault(it->first);
     }
+
+    if (_tickCount >= _maxMonsterWave * _monsterRefreshTick + _startTick)
+    {
+        checkWin();
+    }
     ++_tickCount;
 }
 
 void ClanCopy::monsterAssault(const UInt8& spotId)
 {
+    // 据点战斗或者怪物移动
     SpotMap::iterator spotIt = _spotMap.find(spotId);
     if (spotIt == _spotMap.end())
-    {
         return; // 正常情况下不会进入这里
-    }
     ClanCopySpot &spot = spotIt->second;
 
     SpotPlayer::iterator playerIt = _spotPlayer.find(spotId);
     if (playerIt == _spotPlayer.end())
-    {
         return; // 正常情况下不会进入这里
-    }
     SpotPlayerList& playerList = playerIt->second;
 
     SpotMonster::iterator monsterIt = _spotMonster.find(spotId);
@@ -114,11 +206,12 @@ void ClanCopy::monsterAssault(const UInt8& spotId)
 
 void ClanCopy::spotCombat(SpotMonsterList& monsterList, SpotPlayerList& playerList, UInt8 spotId)
 {
-    // 开始一轮战斗（FIXME: 战斗状态更新通知客户端）
+    // 开始一轮战斗
     SpotPlayerList::iterator playerIt = playerList.begin();
     SpotMonsterList::iterator monsterIt = monsterList.begin(); 
     while (monsterIt != monsterList.end())
     {
+        // 怪物一一与玩家匹配直到没有怪物
         if (playerIt == playerList.end())
         {
             // 没有玩家与怪物匹配
@@ -163,6 +256,8 @@ void ClanCopy::spotCombat(SpotMonsterList& monsterList, SpotPlayerList& playerLi
         ++ playerIt;
         ++ monsterIt;
     }
+
+    // 移除已经死亡的怪物或者玩家
     playerList.remove_if(isPlayerDead());
     monsterList.remove_if(isMonsterDead());
 }
@@ -257,6 +352,7 @@ void ClanCopy::monsterMove(UInt8 spotId)
             if (spotMonsterIt == _spotMonster.end())
                 return;
             monsterIt->justMoved = true;
+            monsterIt->nextMoveTick = _tickCount + _monsterRefreshTick;
             (spotMonsterIt->second).push_back(*monsterIt);
         }
         monsterList.clear(); // 怪物老巢怪物列表
@@ -290,19 +386,22 @@ void ClanCopy::monsterMove(UInt8 spotId)
                 attackHome(*monsterIt);
                 if (!_homeHp)
                 {
-                    // TODO: 主基地被摧毁，游戏结束
-                    ClanCopyMgr::Instance().clanLose(this);
+                    // 主基地被摧毁，游戏结束
+                    _status = CLAN_COPY_LOSE;
+                    notifyCopyLose();
                     return;
                 }
             }
             else
             {
+                //  移动至下一据点
                 UInt8 nextSpotId = monsterIt->nextSpotId; // 获取目标据点Id
                 SpotMonster::iterator spotMonsterIt = _spotMonster.find(nextSpotId); // 目标据点的怪物列表
                 if (spotMonsterIt == _spotMonster.end())
                     return;
 
                 monsterIt->justMoved = true;
+                monsterIt->nextMoveTick = _tickCount + _monsterRefreshTick;
                 (spotMonsterIt->second).push_back(*monsterIt);
             }
             monsterIt->isDead = true;
@@ -311,9 +410,10 @@ void ClanCopy::monsterMove(UInt8 spotId)
     }
 }
 
-void ClanCopy::attackHome(const ClanCopyMonster& clanCopyMonster)
+void ClanCopy::attackHome(ClanCopyMonster& clanCopyMonster)
 {
     // 怪物攻击主基地
+    clanCopyMonster.isDead = true;
     if (_homeHp <= clanCopyMonster.npcValue)
     {
         // 主基地被摧毁
@@ -332,11 +432,47 @@ void ClanCopy::lose()
 
 }
 
-void ClanCopy::win()
+bool ClanCopy::checkWin()
 {
-    // TODO: 帮派副本挑战成功
+    // 检查是否帮派副本挑战成功
+    bool win = true;
+    for (SpotMonster::iterator it = _spotMonster.begin(); it != _spotMonster.end(); ++ it)
+    {
+        if (!(it->second).empty())
+        {
+            win = false;
+            return win;
+        }
+    }
+    _status = CLAN_COPY_WIN;
+    notifyCopyWin();
+    return win;
 }
 
+void ClanCopy::notifySpotPlayerInfo(UInt8 spotId)
+{
+    // TODO: 通知玩家该据点状态
+    for (std::map<Player *, UInt8>::iterator playerIt = _playerIndex.begin();
+            playerIt != _playerIndex.end(); ++ playerIt)
+    {
+        // 通知副本战斗玩家
+    }
+    for (std::set<Player *>::iterator obIt = _observerPlayer.begin();
+            obIt != _observerPlayer.end(); ++ obIt)
+    {
+        // 通知围观群众
+    }
+}
+
+void ClanCopy::notifyCopyLose()
+{
+    // TODO: 通知玩家副本失败
+}
+
+void ClanCopy::notifyCopyWin()
+{
+    // TODO: 通知玩家副本成功
+}
 
 /////////////////////////////////////////////////////////////
 // ClanCopyMgr
@@ -357,10 +493,12 @@ void ClanCopyMgr::process(UInt32 now)
         if ((it->second).getStatus() == CLAN_COPY_OVER)
         {
             // 该帮派副本数据已经无效
+            deleteClanCopy(&(it->second));
             _clanCopyMap.erase(it ++);
         }
         else
         {
+            // 处理帮派副本游戏进程
             (it->second).process(now);
             ++ it;
         }
@@ -392,14 +530,130 @@ bool ClanCopyMgr::createClanCopy(Clan *c)
     return true;
 }
 
-void ClanCopyMgr::deleteClanCopy(Clan *c)
+void ClanCopyMgr::deleteClanCopy(ClanCopy *clanCopy)
 {
-    // TODO: 清除已经结束的帮派副本
+    // 清除已经结束的帮派副本(Nothing done)
 }
 
 void ClanCopyMgr::clanLose(ClanCopy* clanCopy)
 {
     // TODO: 该副本已经失败
+}
+
+void ClanCopyMgr::playerEnter(Player * player)
+{
+    // TODO: 有玩家进入帮派副本据点
+    if(player->getLocation() != CLAN_COPY_LOCATION) return;
+
+    Clan* clan = player->getClan();
+    if(clan == NULL) return;  // 没有帮派
+
+    ClanCopyMap::iterator it = _clanCopyMap.find(clan->getId());
+    if (it == _clanCopyMap.end())
+        return;  // 没有开启副本
+
+    if (player->GetVar(VAR_CLAN_LEAVE_TIME) + 24 * 60 * 60 > TimeUtil::Now())
+    {
+        player->sendMsgCode(1, 1343);
+        (it->second).addObserver(player);
+    }
+    else
+    {
+
+        if ((it->second).getStatus() == CLAN_COPY_READY)
+        {
+            (it->second).addPlayer(player);
+        }
+        else
+        {
+            (it->second).addObserver(player);
+        }
+    }
+
+    /*
+    //通知状态变化
+    Stream st(REP::CLAN_COPY);
+    st << static_cast<UInt8> (CLAN_COPY_MEMBER_LIST_OP);
+    st << static_cast<UInt16> (_copyLevel);
+    UInt8 count = _spotMap.size();
+    st << static_cast<UInt8> (count);
+    for (SpotMap::iterator mapIt = _spotMap.begin(); mapIt != _spotMap.end(); ++ mapIt)
+    {
+        st << static_cast<UInt8> (mapIt->first);
+        ClanSpot &clanSpot = mapIt->second;
+        st << static_cast<UInt8> (clanSpot.maxPlayerCount);
+        st << static_cast<UInt8> (clanSpot.spotBufferType);
+        st << static_cast<UInt16> (clanSpot.spotBufferValue);
+
+        SpotPlayer::iterator spotPlayerIt = _spotPlayer.find(mapIt->first);
+        if (spotPlayerIt == _spotPlayer.end())
+            return;
+
+        st << static_cast<UInt8> ((spotPlayerIt->second).size());
+        for (SpotPlayerList::iterator playerListIt =  (spotPlayerIt->second).begin(); 
+                playerListIt != spotPlayerIt->second.end(); ++ playerListIt)
+        {
+            st << static_cast<UInt8> (playerListIt - (spotPlayerIt->second).begin() + 1);
+            st << static_cast<UInt64> playerListIt->player->getId();
+            st << playerListIt->player->getName();
+            st << static_cast<UInt8> playerListIt->player->getLevel();
+        }
+    }
+    st << Stream::eos;
+    */
+}
+
+void ClanCopyMgr::playerLeave(Player * player)
+{
+    // TODO: 有玩家离开帮派副本据点
+    if(player->getLocation() != CLAN_COPY_LOCATION) return;
+
+    Clan* clan = player->getClan();
+    if(clan == NULL) return;  // 没有帮派
+
+    ClanCopyMap::iterator it = _clanCopyMap.find(clan->getId());
+    if (it == _clanCopyMap.end())
+        return;  // 没有开启副本
+
+    (it->second).playerEscape(player);
+
+    //通知状态变化
+    /*
+       Stream stream(REP::CLAN_RANKBATTLE_REP);
+       stream << UInt8(9);
+       stream << player->getId();
+       stream << UInt8(1);
+       stream << Stream::eos;
+       info->Broadcast(stream);
+       */
+
+    // 如果是围观群众，先清除围观群众
+    /*
+    std::set<Player*>::iterator it = _observerPlayer.find(player);
+    if (it != _observerPlayer.end())
+        _observerPlayer.erase(it);
+
+    // 如果是正在进行的玩家
+    std::map<Player *, UInt8>::iterator indexIt = _playerIndex.find(player);
+    if (indexIt != _playerIndex.end())
+    {
+        // TODO: 战斗玩家离开副本
+    }
+    */
+}
+
+UInt16 ClanCopyMgr::getTotalPlayer(Clan* c)
+{
+    // 查询某一帮派副本的参与人数
+    ClanCopyMap::iterator it = _clanCopyMap.find(c->getId());
+    if (it == _clanCopyMap.end())
+    {
+        return 0;
+    }
+    else
+    {
+        return (it->second).getTotalPlayer();
+    }
 }
 
 // ClanCopyMgr

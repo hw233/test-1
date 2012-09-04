@@ -666,6 +666,14 @@ struct DBClanStatue
     UInt32 clanId;
     UInt16 level;
     UInt32 exp;
+    UInt32 expUpdateTime;
+};
+
+struct DBClanCopy
+{
+    UInt32 clanId;
+    UInt16 level;
+    UInt32 levelUpdateTime;
 };
 
 struct DBTaskData
@@ -1749,11 +1757,21 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBClanStatue)
+SPECIALDEF(4)
+(
+    UInt32, clanId,
+    UInt16, level,
+    UInt32, exp,
+    UInt32, expUpdateTime
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBClanCopy)
 SPECIALDEF(3)
 (
     UInt32, clanId,
     UInt16, level,
-    UInt32, exp
+    UInt32, levelUpdateTime
 )
 SPECIALEND()
 

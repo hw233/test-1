@@ -20,6 +20,9 @@ class Player;
 #define CLAN_TECH_MEMBER_COUNT      3
 #define CLAN_TECH_SKILL_EXTEND      4
 #define CLAN_TECH_SKILL_EXTEND2     5
+#define CLAN_TECH_STATUE            6
+#define CLAN_TECH_COPY_LEVEL        7
+#define CLAN_TECH_COPY_ROB          8
 
 struct ClanTechData
 {
@@ -72,6 +75,9 @@ public:
     UInt32 getPracticeSpeed();
     UInt32 getPracticeSlot();
     UInt32 getMemberCount();
+    UInt32 getMaxCopyLevel();
+    UInt32 getMaxStatueLevel();
+    UInt32 getMaxCopyRobLevel();
     UInt32 getSkillExtend(UInt8 skillId);
 
 private:

@@ -23,6 +23,7 @@
 #include "GData/NpcGroup.h"
 #include "GData/Title.h"
 #include "Clan.h"
+#include "ClanCopy.h"
 #include "Mail.h"
 #include "Boss.h"
 #include "Athletics.h"
@@ -4903,6 +4904,11 @@ namespace GObject
         }
         ClanRankBattleMgr::Instance().PlayerLeave(this);
 
+        if (_playerData.location == CLAN_COPY_LOCATION)
+        {
+            ClanCopyMgr::Instance().playerLeave(this);
+        }
+
         if(hasFlag(InCopyTeam))
             teamCopyManager->leaveTeamCopy(this);
 
@@ -4961,6 +4967,12 @@ namespace GObject
 		}
 		map->SendAtCity(this, inCity, !sameMap);
         setJumpingMap(false);
+
+        if (spot == CLAN_COPY_LOCATION)
+        {
+            ClanCopyMgr::Instance().playerEnter(this);
+        }
+
 	}
 
 	bool Player::regenHP( UInt32 hp )
@@ -13290,37 +13302,6 @@ void EventTlzAuto::notify(bool isBeginAuto)
     ///////////////////////////////////////////////
     // 帮派副本相关
 
-    void Player::sendClanCopyInfo()
-    {
-        // TODO: 发送帮派副本标签页的有关数据信息
-        if (_clan == NULL)
-            return;
-        Stream st(REP::CLAN_COPY);
-        st << static_cast<UInt8>(CLAN_COPY_TAB_INFO);
-        st << static_cast<UInt8>(_clan->getOnlineMembersCount());
-
-        st << static_cast<UInt16>(_clan->getStatueLevel());
-        st << static_cast<UInt32>(_clan->getStatueExp());
-        st << static_cast<UInt32>(_clan->getStatueNextExp());
-        st << static_cast<UInt32>(_clan->getStatueConsumeExp());
-        st << static_cast<UInt32>(_clan->getStatueExHp());
-        st << static_cast<UInt32>(_clan->getStatueExAttack());
-        st << static_cast<UInt32>(_clan->getStatueExDefend());
-        st << static_cast<UInt32>(_clan->getStatueExMagAtk());
-        st << static_cast<UInt32>(_clan->getStatueExMagDef());
-        st << static_cast<UInt32>(_clan->getStatueExAction());
-        st << static_cast<UInt32>(_clan->getStatueExHitRate());
-
-        st << static_cast<UInt16>(_clan->getCopyLevel());
-        st << static_cast<UInt32>(_clan->getOutputExp());
-        st << static_cast<UInt32>(_clan->getNextOutputExp());
-        st << static_cast<UInt8> (_clan->getCopyStatus());
-        st << static_cast<UInt8> (_clan->getCopyMeberCount());
-        st << Stream::eos;
-        send(st);
-    }
-    
-    
     // 帮派副本相关
     ///////////////////////////////////////////////
 
