@@ -4482,7 +4482,19 @@ function ItemNormal_00009126(iid, num, bind, param)
   player:setBuffData(6, 0, true)
   player:setBuffData(10, 0, true)
   player:setBuffData(11, 0, true)
-  if ItemNormal_AddBuff(player, 0x18, 360000, num, 31536000) then
+  local duringTime
+  if iid == 9126 then
+      duringTime = 3600 * 100
+  elseif iid == 9141 then
+      duringTime = 3600 * 8
+  elseif iid == 9142 then
+      duringTime = 3600 * 16
+  elseif iid == 9143 then
+      duringTime = 3600 * 24
+  else
+      duringTime = 0
+  end
+  if ItemNormal_AddBuff(player, 0x18, duringTime, num, 31536000) then
   	package:DelItemSendMsg(iid, player);
 	return num;
   else
@@ -4495,7 +4507,19 @@ function ItemNormal_00009133(iid, num, bind, param)
     local package = player:GetPackage();
     player:setBuffData(0x4, 0, true)
     player:setBuffData(0x17, 0, true)
-    if ItemNormal_AddBuff(player, 0x16, 360000, num, 31536000) then
+    local duringTime
+    if iid == 9133 then
+      duringTime = 3600 * 100
+    elseif iid == 9144 then
+      duringTime = 3600 * 8
+    elseif iid == 9145 then
+      duringTime = 3600 * 16
+    elseif iid == 9146 then
+      duringTime = 3600 * 24
+    else
+      duringTime = 0
+    end
+    if ItemNormal_AddBuff(player, 0x16, duringTime, num, 31536000) then
         package:DelItemSendMsg(iid, player);
         return num;
     else
@@ -6504,6 +6528,13 @@ local ItemNormal_Table = {
     [9133] = ItemNormal_00009133,
 
     [9139] = ItemNormal_00009139,
+
+    [9141] = ItemNormal_00009126,
+    [9142] = ItemNormal_00009126,
+    [9143] = ItemNormal_00009126,
+    [9144] = ItemNormal_00009133,
+    [9145] = ItemNormal_00009133,
+    [9146] = ItemNormal_00009133,
 
     [10000] = ItemNormal_00010000,
     [10001] = ItemNormal_00010001,
