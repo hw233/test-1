@@ -344,6 +344,36 @@ UInt32 ClanTech::getMemberCount()
 	return GData::clanTechTable[CLAN_TECH_MEMBER_COUNT][found->second.level].effect1;
 }
 
+UInt32 ClanTech::getMaxCopyLevel()
+{
+	Mutex::ScopedLock lk(_mutex);
+    Techs::iterator found = _techs.find(CLAN_TECH_COPY_LEVEL);
+    if(found == _techs.end())
+        return 0;
+
+	return GData::clanTechTable[CLAN_TECH_COPY_LEVEL][found->second.level].effect1;
+}
+
+UInt32 ClanTech::getMaxStatueLevel()
+{
+	Mutex::ScopedLock lk(_mutex);
+    Techs::iterator found = _techs.find(CLAN_TECH_STATUE);
+    if(found == _techs.end())
+        return 0;
+
+	return GData::clanTechTable[CLAN_TECH_STATUE][found->second.level].effect1;
+}
+
+UInt32 ClanTech::getMaxCopyRobLevel()
+{
+	Mutex::ScopedLock lk(_mutex);
+    Techs::iterator found = _techs.find(CLAN_TECH_COPY_ROB);
+    if(found == _techs.end())
+        return 0;
+
+	return GData::clanTechTable[CLAN_TECH_COPY_ROB][found->second.level].effect1;
+}
+
 UInt32 ClanTech::getSkillExtend(UInt8 skillId)
 {
     static UInt8 tech_skill_extend[] = {

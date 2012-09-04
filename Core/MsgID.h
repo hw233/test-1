@@ -717,6 +717,7 @@ namespace ARENAREQ
 enum CLAN_COPY
 {
     CLAN_COPY_TAB_INFO = 0x01,
+    CLAN_COPY_MEMBER_LIST_OP = 0x02,
 };
 
 #endif // _MSGID_H_

@@ -2854,9 +2854,30 @@ namespace GObject
                 clan = globalClans[cs.clanId];
             }
             if(clan == NULL) continue;
-            clan->LoadStatue(cs.level, cs.exp);
+            clan->LoadStatue(cs.level, cs.exp, cs.expUpdateTime);
         }
         lc.finalize();
+
+        lc.prepare("Loading clan copy:");
+        DBClanCopy cc;
+        if (execu->Prepare("SELECT `clanid`, `level`, `levelUpdateTime` FROM `clan_copy` ORDER BY `clanid`", cc) != DB::DB_OK)
+            return false;
+        clan = NULL;
+        lastId = 0xFFFFFFFF;
+        lc.reset(1000);
+        while(execu->Next() == DB::DB_OK)
+        {
+            lc.advance();
+            if (cc.clanId != lastId)
+            {
+                lastId = cc.clanId;
+                clan = globalClans[cc.clanId];
+            }
+            if(clan == NULL) continue;
+            clan->LoadCopy(cc.level, cc.levelUpdateTime);
+        }
+        lc.finalize();
+
 
 
 

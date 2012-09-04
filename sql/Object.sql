@@ -1489,3 +1489,11 @@ CREATE TABLE IF NOT EXISTS `qixi` (
     PRIMARY KEY(`playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `clan_statue`;
+CREATE TABLE IF NOT EXISTS `clan_copy` (
+    `clanId` bigint(20) unsigned NOT NULL,
+    `level` int(10) unsigned NOT NULL,
+    `exp` bigint(20) unsigned NOT NULL,
+    PRIMARY KEY(`clanId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+

@@ -4,6 +4,11 @@
 #include "Config.h"
 #include "Common/Singleton.h"
 
+//#define DEBUG_CLAN_COPY   // 这条件宏编译搞不定啊
+
+#ifdef DEBUG_CLAN_COPY
+#include <fstream>
+#endif
 
 namespace Battle
 {
@@ -17,6 +22,7 @@ namespace GData
 
 namespace GObject
 {
+
 
 #define  CLAN_COPY_LOCATION  0x3202
 
@@ -93,7 +99,10 @@ struct ClanCopySpot
 {
     // 帮派副本的据点信息结构
     UInt8 spotId;
+    UInt8 spotBufferType;          // 该据点加成类型
+    UInt16 spotBufferValue;        // 该据点加成数据
     std::vector<UInt8> nextSpotId; // 通往下一个据点的id
+    UInt16 maxPlayerCount;         // 该据点最大的玩家数
     UInt32 lastBattleTick;         // 上一场战斗发生的tick时间
 
 };
@@ -113,6 +122,11 @@ class ClanCopy
         ~ClanCopy();
 
         UInt8 getStatus();
+        UInt16 getTotalPlayer();
+
+        void addPlayer(Player* player);
+        void addObserver(Player* player);
+        void playerEscape(Player* player);
 
         void initCopyData();
         void process(UInt32 now);
@@ -122,12 +136,16 @@ class ClanCopy
         void createEnemy();
         void monsterMove(UInt8 spotId);
         void spotCombat(SpotMonsterList& monsterList, SpotPlayerList& playerList, UInt8 spotId);
-        void attackHome(const ClanCopyMonster& clanCopyMonster);
+        void attackHome(ClanCopyMonster& clanCopyMonster);
         void lose();
-        void win();
+        bool checkWin();
         void setInterval(UInt32 interval);
         void setStartTick(UInt32 tickCount);
         void setStartTimeInterval(UInt32 startTimeInterval);
+
+        void notifySpotPlayerInfo(UInt8 spotId);
+        void notifyCopyLose();
+        void notifyCopyWin();
 
     private:
         Clan   *_clan;
@@ -153,6 +171,17 @@ class ClanCopy
 
         UInt32 _maxMonsterWave;        // 该等级副本刷怪的波数（包括轮空的）
         UInt32 _curMonsterWave;        // 当前已经刷新的怪的波数（包括轮空的）
+
+        UInt32 _totalPlayer;           // 总共参与人数（报名结束阶段截止）
+        UInt32 _deadPlayer;            // 已经死亡人数
+        UInt32 _escapePlayer;          // 中途逃跑人数
+
+        std::set<Player *> _observerPlayer; // 围观人员
+        std::map<Player *, UInt8> _playerIndex; //快速查找玩家对应据点的索引
+
+#ifdef DEBUG_CLAN_COPY
+        std::fstream fileSt;
+#endif
 };
 
 
@@ -172,14 +201,33 @@ class ClanCopyMgr : public Singleton <ClanCopyMgr>
     bool createClanCopy(Clan *c);
 
     // 清除已经结束的副本
-    void deleteClanCopy(Clan *c);
+    void deleteClanCopy(ClanCopy *clanCopy);
 
     void clanLose(ClanCopy* clanCopy);
+
+    void playerEnter(Player * player);
+    void playerLeave(Player * player);
+
+    UInt16 getTotalPlayer(Clan *c);
 
     private:
     UInt16 _maxCopyLevel;  // 全服最高通关的副本等级
     ClanCopyMap _clanCopyMap;
 
+};
+
+struct ClanCopyLog
+{
+    UInt32 clanId;
+    UInt32 logTime;
+    UInt8  logType;
+    UInt32 logVal;
+    std::string playerName;
+    ClanCopyLog (UInt32 clanId, UInt32 logTime, 
+       UInt8 logType, UInt32 logVal, std::string playerName)
+        : clanId(clanId), logTime(logTime), logType(logType), logVal(logVal), playerName(playerName)
+    {
+    }
 };
 
 }

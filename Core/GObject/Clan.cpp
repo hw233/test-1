@@ -39,13 +39,14 @@ GlobalClans globalClans, globalClansByCountry[COUNTRY_MAX];
 GlobalNamedClans globalGlobalNamedClans, globalNamedClans[COUNTRY_MAX];
 GlobalNamedClans globalOwnedClans[COUNTRY_MAX];
 
-UInt8 ClanAuthority[5][7] = 
+#define CLAN_AUTHORITY_COPY 7
+UInt8 ClanAuthority[5][8] = 
 {
-	{ 0, 1, 0, 0, 0, 0, 0 },
-	{ 0, 1, 0, 0, 0, 0, 0 },
-	{ 1, 1, 0, 0, 0, 0, 0 },
-	{ 1, 1, 1, 1, 0, 0, 0 },
-	{ 1, 1, 1, 1, 1, 1, 1 }
+	{ 0, 1, 0, 0, 0, 0, 0, 0 },
+	{ 0, 1, 0, 0, 0, 0, 0, 0 },
+	{ 1, 1, 0, 0, 0, 0, 0, 1 },
+	{ 1, 1, 1, 1, 0, 0, 0, 1 },
+	{ 1, 1, 1, 1, 1, 1, 1, 1 }
 };
 
 
@@ -271,6 +272,9 @@ Clan::Clan( UInt32 id, const std::string& name, UInt32 ft, UInt8 lvl ) :
     m_DailyBattleScore = 0;
     m_BattleRanking = 0;
     m_LastBattleRanking = 0;
+
+    _copyLevel = 0;
+    _copyLevelUpdateTime = 0;
 }
 
 Clan::~Clan()
@@ -3547,95 +3551,306 @@ void Clan::sendClanList(Player *player, UInt8 type, UInt8 start, UInt8 cnt)
     player->send(st);
 }
 
-void Clan::LoadStatue(UInt16 level, UInt32 exp)
+void Clan::LoadStatue(UInt16 level, UInt32 exp, UInt32 expUpdateTime)
 {
     // 读取帮派神像数据
     Mutex::ScopedLock lk(_mutex);
-    _statue->updateLevel(exp);
+    _statue->updateLevel(exp, expUpdateTime);
 }
+
+//////////////////////////////////////////
+// 帮派神像
 
 UInt16 Clan::getStatueLevel()
 {
+    return 1;
     return _statue->getLevel();
 }
 
 UInt32 Clan::getStatueExp()
 {
+    return 100;
     return _statue->getExp();
 }
 
 UInt32 Clan::getStatueNextExp()
 {
+    return 500;
     return GData::clanStatueTable[_statue->getLevel()].needExp;
 }
 
 UInt32 Clan::getStatueConsumeExp()
 {
+    return 50;
     return GData::clanStatueTable[_statue->getLevel()].consumeExp;
 }
 
 UInt32 Clan::getStatueExHp()
 {
+    return 101;
     return GData::clanStatueTable[_statue->getLevel()].exHp;
 }
 
 UInt32 Clan::getStatueExAttack()
 {
+    return 102;
     return GData::clanStatueTable[_statue->getLevel()].exAttack;
 }
 
 UInt32 Clan::getStatueExDefend()
 {
+    return 103;
     return GData::clanStatueTable[_statue->getLevel()].exDefend;
 }
 
 UInt32 Clan::getStatueExMagAtk()
 {
+    return 104;
     return GData::clanStatueTable[_statue->getLevel()].exMagAtk;
 }
 
 UInt32 Clan::getStatueExMagDef()
 {
+    return 105;
     return GData::clanStatueTable[_statue->getLevel()].exMagDef;
 }
 
 UInt32 Clan::getStatueExAction()
 {
+    return 106;
     return GData::clanStatueTable[_statue->getLevel()].exAction;
 }
 
 UInt32 Clan::getStatueExHitRate()
 {
+    return 107;
     return GData::clanStatueTable[_statue->getLevel()].exHitRate;
 }
 
+// 帮派神像
+//////////////////////////////////////////
+
+//////////////////////////////////////////
+// 帮派副本
+
+void   Clan::LoadCopy(UInt16 level, UInt32 levelUpdateTime)
+{
+    // 副本重置
+    UInt32 now = TimeUtil::Now();
+    UInt32 count = 0;
+    if (now < levelUpdateTime)
+    {
+        // 又穿越了？
+        count = (TimeUtil::SharpWeek(1, levelUpdateTime) - TimeUtil::SharpWeek(1, now)) / (3600 * 24 * 7) * 5;
+        if (level < count * 5)
+            level = 1;
+        else
+            level -= count * 5;
+    }
+    else
+    {
+        count = (TimeUtil::SharpWeek(1, now) - TimeUtil::SharpWeek(1, levelUpdateTime)) / (3600 * 24 * 7) * 5;
+        if (level < count * 5)
+            level = 1;
+        else
+            level -= count * 5;
+    }
+    _copyLevel = level;
+    _copyLevelUpdateTime = now;
+}
 
 UInt16 Clan::getCopyLevel()
 {
+    return 5;
     return _copyLevel;
 }
 
 UInt32 Clan::getOutputExp()
 {
+    return 100;
     return GData::clanCopyTable[_statue->getLevel()].expOutput;
 }
 
 UInt32 Clan::getNextOutputExp()
 {
+    return 150;
     return GData::clanCopyTable[_statue->getLevel() + 1].expOutput;
 }
 
 UInt8  Clan::getCopyStatus()
 {
-    // TODO: 返回帮派副本状态
+    // 返回帮派副本状态
     return GObject::ClanCopyMgr::Instance().getCopyStatus(_id);
 }
 
-UInt8  Clan::getCopyMeberCount()
+UInt16  Clan::getCopyMeberCount()
 {
-    // TODO: 返回帮派副本的参与人数
-    return 0;
+    // 返回帮派副本的参与人数
+    return ClanCopyMgr::Instance().getTotalPlayer(this);
 }
+
+void   Clan::clanCopyOperate(Player * player, UInt8 type, UInt8 command, UInt8 val /* = 0 */)
+{
+    // TODO: 处理有关帮派副本的操作
+    switch (type)
+    {
+        case 0x01:
+            // 帮派副本信息标签页相关操作
+            if (command == 1)
+            {
+                // 按下帮派副本标签页的按钮
+                switch (val)
+                {
+                    case 0x04:
+                        // TODO:  通知帮派其他成员
+                        // "召集帮众并前往"
+                        if (hasClanAuthority(player, CLAN_AUTHORITY_COPY))
+                        {
+                        }
+                        else
+                        {
+                            player->sendMsgCode(0, 1342);
+                        }
+                        break;
+                    case 0x00:
+                        // "前往观战"
+                    case 0x02:
+                        // "前往副本"
+                        if(player->getLocation() == CLAN_COPY_LOCATION
+                                && player->getThreadId() == WORKER_THREAD_NEUTRAL)
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            player->moveTo(CLAN_COPY_LOCATION, true);
+                        }
+                        break;
+                    case 0x01:
+                        // "只有长老级以上才可开启副本"
+                        return;
+                    case 0x03:
+                        // "开启副本"
+                        if (hasClanAuthority(player, CLAN_AUTHORITY_COPY))
+                        {
+                            GObject::ClanCopyMgr::Instance().createClanCopy(this);
+                        }
+                        else
+                        {
+                            player->sendMsgCode(0, 1341);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            }
+        case 0x02:
+            clanCopyMemberOperate(player, command, val);
+            break;
+    }
+}
+
+void   Clan::clanCopyMemberOperate(Player * player, UInt8 command, UInt8 val)
+{
+    // TODO: 帮派副本成员相关操作
+}
+
+void Clan::sendClanCopyInfo(Player * player)
+{
+    Mutex::ScopedLock lk(_mutex);
+	Members::iterator found = find(player);
+	if (found == _members.end())
+		return;
+    Stream st(REP::CLAN_COPY);
+    st << static_cast<UInt8>(CLAN_COPY_TAB_INFO);
+    st << _name;
+    st << static_cast<UInt8>(getOnlineMembersCount());
+
+    st << static_cast<UInt16>(_techs->getLev(CLAN_TECH_STATUE));     // 神像科技等级
+    st << static_cast<UInt16>(_techs->getLev(CLAN_TECH_COPY_LEVEL)); // 副本科技等级
+    st << static_cast<UInt16>(_techs->getLev(CLAN_TECH_COPY_ROB));    // 掠夺科技等级
+
+    st << static_cast<UInt16>(getStatueLevel());
+    st << static_cast<UInt32>(getStatueExp());
+    st << static_cast<UInt32>(getStatueNextExp());
+    st << static_cast<UInt32>(getOutputExp());
+    st << static_cast<UInt32>(getStatueConsumeExp());
+    st << static_cast<UInt32>(getStatueExHp());
+    st << static_cast<UInt32>(getStatueExAttack());
+    st << static_cast<UInt32>(getStatueExDefend());
+    //st << static_cast<UInt32>(getStatueExMagAtk());
+    //st << static_cast<UInt32>(getStatueExMagDef());
+    //st << static_cast<UInt32>(getStatueExAction());
+    //st << static_cast<UInt32>(getStatueExHitRate());
+
+    st << static_cast<UInt16>(getCopyLevel());
+    st << static_cast<UInt32>(getOutputExp());
+    st << static_cast<UInt32>(getNextOutputExp());
+    
+    // 副本按钮状态
+    UInt8 status = getCopyStatus();
+    if (status == CLAN_COPY_READY)
+    {
+        // 副本开启报名阶段
+        if (hasClanAuthority(player, CLAN_AUTHORITY_COPY))
+            st << static_cast<UInt8>(4);
+        else
+            st << static_cast<UInt8>(2);
+    }
+    else if (status == CLAN_COPY_NONE)
+    {
+        // 副本还未开启
+        if (hasClanAuthority(player, CLAN_AUTHORITY_COPY))
+            st << static_cast<UInt8>(3);
+        else
+            st << static_cast<UInt8>(1);
+    }
+    else
+    {
+        // 副本已经开始，只能观战
+        st << static_cast<UInt8>(0);
+    }
+
+    st << static_cast<UInt8> (getCopyMeberCount());
+
+    st << static_cast<UInt8> (0);  // 掠夺疲劳
+    st << static_cast<UInt8> (0);  // 掠夺按钮状态
+
+    UInt8 logNum = _copyLog.size();
+    st << static_cast<UInt8>(logNum);  // TODO: 副本日志数量
+    for (UInt8 i = 0; i < logNum; ++ i)
+    {
+        const ClanCopyLog& copyLog = _copyLog[i];
+        struct tm t_tm;
+        time_t logTime = copyLog.logTime;
+        localtime_r(&logTime, &t_tm);
+        st << static_cast<UInt16>(t_tm.tm_year + 1900);
+        st << static_cast<UInt8>(t_tm.tm_mon + 1);
+        st << static_cast<UInt8>(t_tm.tm_mday);
+        switch (copyLog.logType)
+        {
+            case 1:
+                // 通关副本日志
+                st << static_cast<UInt8> (1);
+                st << copyLog.playerName;
+                st << static_cast<UInt8>(copyLog.logVal);
+                break;
+            case 2:
+                // 副本等级重置
+                st << static_cast<UInt8> (2);
+                st << static_cast<UInt8>(copyLog.logVal);
+                break;
+            default:
+                return;
+        }
+    }
+    st << Stream::eos;
+    player->send(st);
+}
+
+// 帮派副本
+//////////////////////////////////////////
 
 
 }
