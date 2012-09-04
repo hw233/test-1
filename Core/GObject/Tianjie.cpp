@@ -97,11 +97,11 @@ static const UInt32 s_tjTotalRewardId = 9132;
 #define TIME_60 60 
 #define ONE_DAY_SECOND (24*3600)
 
-//#define TJ_EVENT_WAIT_TIME 10*60      //天劫事件间隔时间
-//#define TJ_EVENT_PROCESS_TIME 15*60   //天劫事件持续时间
-
 #define TJ_EVENT_WAIT_TIME 10*60      //天劫事件间隔时间
 #define TJ_EVENT_PROCESS_TIME 15*60   //天劫事件持续时间
+
+//#define TJ_EVENT_WAIT_TIME 2*60      //天劫事件间隔时间
+//#define TJ_EVENT_PROCESS_TIME 5*60   //天劫事件持续时间
 Tianjie::Tianjie()
 {
     m_tjTypeId = 0;
@@ -1041,7 +1041,8 @@ void Tianjie::attack1(Player* pl, UInt16 loc, UInt32 npcid)
 	    if (iter->second == (int)npcid)
 	    {
 	        res = pl->attackTianjieNpc(npcid, 1, true);
-            m_locNpcMap.erase(iter);
+            if (res)
+                m_locNpcMap.erase(iter);
             break;
 	    }
         ++iter;
@@ -1407,6 +1408,15 @@ void Tianjie::close3()
 
 bool Tianjie::attackTlz(Player* pl, UInt16 level)
 {
+    UInt32 now = TimeUtil::Now();
+    UInt32 buffLeft = pl->getBuffData(PLAYER_BUFF_ATTACKING, now);
+    if(buffLeft > now)
+    {
+        pl->sendMsgCode(0, 1407, buffLeft - now);
+        return false;
+    }
+    pl->checkLastBattled();
+
     int r = uRand(2);
     Battle::BattleSimulator bsim(Battle::BS_WBOSS, pl, m_tlzNpcName[r], s_tjRoleLevel[m_tjTypeId], false);
     pl->PutFighters(bsim, 0);
@@ -1433,8 +1443,7 @@ bool Tianjie::attackTlz(Player* pl, UInt16 level)
     st << Stream::eos;
     pl->send(st);
 
-    int turns = bsim.getTurns() > 15 ? 15 : bsim.getTurns();;
-    pl->setBuffData(PLAYER_BUFF_ATTACKING, TimeUtil::Now() + turns);
+    pl->setBuffData(PLAYER_BUFF_ATTACKING, TimeUtil::Now() + 15);
 
     return res;
 }
@@ -1487,7 +1496,7 @@ void Tianjie::broadBossCount(int count, Player* pl)
     st << static_cast<UInt8>(3);
     st << static_cast<UInt32>(count);
     st << Stream::eos;
-    if (NULL != pl)                                                                                                                                          
+    if (NULL != pl)
         pl->send(st);
     else 
         NETWORK()->Broadcast(st);
