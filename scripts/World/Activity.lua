@@ -641,7 +641,7 @@ function initActTime(y, m, d)
   local SerStartTm500 = { ['year'] = 2012, ['month'] = 8, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 3366合作充值活动（8/30-8/31）
   local  SerStartTm501= { ['year'] = 2012, ['month'] = 8, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTm502= { ['year'] = 2012, ['month'] = 9, ['day'] = 7, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm502= { ['year'] = 2012, ['month'] = 9, ['day'] = 6, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   -- 繁体版
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -823,7 +823,7 @@ function initActTime(y, m, d)
   actTime501_1 = os.time(SerStartTm501) + 2 * 86400;
 
   actTime502 = os.time(SerStartTm502);
-  actTime502_1 = os.time(SerStartTm502) + 3 * 86400;
+  actTime502_1 = os.time(SerStartTm502) + 4 * 86400;
 
   -- 繁体版
   actTime101 = os.time(SerStartTm101);

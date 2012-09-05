@@ -476,6 +476,8 @@ void BattleSimulator::start(UInt8 prevWin)
                         portrait = 1089;
                     else if (bf->getBuffData(FIGHTER_BUFF_BLUE, now))
                         portrait = 1090;
+                    else if (bf->getBuffData(FIGHTER_BUFF_QQVIP, now))
+                        portrait = 1091;
                     else
                     {
                         if (!portrait)
