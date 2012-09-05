@@ -4138,9 +4138,15 @@ void Fighter::SSOpen(UInt16 id)
 {
     if (!_owner)
         return;
-    int idx = isSkillUp(id);
-    if (idx < 0)
-        return;
+
+    bool bIsPeerLess = (SKILL_ID(peerless) == SKILL_ID(id));
+    int idx = -1;
+    if(!bIsPeerLess)
+    {
+        idx = isSkillUp(id);
+        if (idx < 0)
+            return;
+    }
 
     UInt16 sid = SKILL_ID(id);
     if (GData::skill2item.find(sid) == GData::skill2item.end())
@@ -4154,7 +4160,11 @@ void Fighter::SSOpen(UInt16 id)
     std::map<UInt16, SStrengthen>::iterator i = m_ss.find(sid);
     if (i != m_ss.end())
     {
-        UInt8 mlvl = getUpSkillLevel(idx);
+        UInt8 mlvl = 0;
+        if(bIsPeerLess)
+            mlvl = getPeerlessLevel();
+        else
+            mlvl = getUpSkillLevel(idx);
         if (i->second.maxLvl >= mlvl && mlvl == 9)
         {
             _owner->sendMsgCode(0, 1021);
@@ -4258,9 +4268,14 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, bool bind)
     if (GetItemSubClass(itemId) != Item_Citta)
         return 0;
 
-    int idx = isSkillUp(id);
-    if (idx < 0)
-        return 0;
+    int idx = -1;
+    bool bIsPeerLess = (SKILL_ID(id) == SKILL_ID(peerless));
+    if(!bIsPeerLess)
+    {
+        idx = isSkillUp(id);
+        if (idx < 0)
+            return 0;
+    }
 
     if (ss.lvl >= ss.maxLvl)
     {

@@ -126,8 +126,8 @@ public:
 	inline float getSoul() { return _soul; }
 	inline float getAura() { return (_aura > 0 ? _aura : 0); }
 	inline float getAuraMax() { return (_auraMax > 0 ? _auraMax : 0); }
-	inline float getAttack() {float ret = _attack + _attackAdd + _attackAdd2; return (ret > 0 ? ret : 0);}
-	inline float getMagAttack() {float ret = _magatk + _magAtkAdd + _magAtkAdd2; return (ret > 0 ? ret : 0);}
+	inline float getAttack() {float ret = _attack + _attackAdd + _attackAdd2 + _atkAddSpecial; return (ret > 0 ? ret : 0);}
+	inline float getMagAttack() {float ret = _magatk + _magAtkAdd + _magAtkAdd2 + _magAtkAddSpecial; return (ret > 0 ? ret : 0);}
 	inline float getDefend() {float ret = _defend + _defAdd + _defAdd2; return (ret > 0 ? ret : 0);}
 	inline float getMagDefend() {float ret = _magdef + _magDefAdd + _magDefAdd2; return (ret > 0 ? ret : 0);}
 	float getHitrate(BattleFighter* defgt);
@@ -498,6 +498,7 @@ private:
     UInt8 _def_dec_last;
     UInt8 _def_dec_times;
 
+
     UInt32 _aura_bleed;
     UInt8 _aura_dec_cd, _aura_bleed_last;
     UInt32 _stun_bleed;
@@ -506,6 +507,49 @@ private:
     UInt8 _confuse_cd, _confuse_bleed_last;
 
     UInt8 _colorStock, _colorStockTimes, _colorStockLast;
+
+    // cotton add for skillstrengthen
+public:
+    inline float getAtkAddSpecial(){ return _atkAddSpecial; }
+    inline Int16 getAtkSpecialLast(){return _atkSpecialLast;}
+    inline void setAtkSpecialLast(Int16 nLast) { _atkSpecialLast = nLast; }
+    inline void setAtkAddSpecial(float v, Int16 nlast){ _atkAddSpecial = v; _atkSpecialLast = nlast; }
+
+    inline float getMagAtkAddSpecial(){ return _magAtkAddSpecial; }
+    inline Int16 getMagAtkSpecialLast(){return _magAtkSpecialLast;}
+    inline void setMagAtkSpecialLast(Int16 nLast) { _magAtkSpecialLast = nLast; }
+    inline void setMagAtkAddSpecial(float v, Int16 nlast){ _magAtkAddSpecial = v; _magAtkSpecialLast = nlast; }
+
+    inline bool getSingleAttackFlag(){ return _bSingleAttackFlag; }
+    inline void setSingleAttackFlag(bool b){ _bSingleAttackFlag =  b; }
+
+    inline float getHitChangeByPeerless(){ return _hitChangeByPeerless; }
+    inline void setHitChangeByPeerless(float v){ _hitChangeByPeerless = v; }
+    inline float getCounterChangeByPeerless(){ return _counterChangeByPeerless; }
+    inline void setCounterChangeByPeerless(float v){ _counterChangeByPeerless = v; }
+
+    inline float getBleedRandom(){ return _bleedRandom; }
+    inline void setBleedRandom(float v, Int16 last){ _bleedRandom = v; _bleedRandomLast = last; }
+    inline Int16& getBleedRandomLast(){ return _bleedRandomLast; }
+    inline void setBleedRandomLast(Int16 v){ _bleedRandomLast = v; }
+    inline UInt8 getBleedAttackClass(){ return _bleedAttackClass; }
+    inline void setBleedAttackClass(UInt8 v){ _bleedAttackClass = v; }
+
+private:
+    float _atkAddSpecial;  // 技能符文吸收对方伤害额外增加的物攻
+    Int16 _atkSpecialLast;
+    float _magAtkAddSpecial;
+    Int16 _magAtkSpecialLast;
+
+    float _bleedRandom;
+    Int16 _bleedRandomLast;
+    UInt8 _bleedAttackClass;  // 流血的时候，前端要根据攻击者的类型表现特效
+
+    // 由于无双技能导致的额外命中增加、反击减少，只能作用在本次，所以每次攻击完毕，直接清除，也不用通知前端
+    float _hitChangeByPeerless;
+    float _counterChangeByPeerless;
+    
+    bool  _bSingleAttackFlag;  // 群体攻击时候，只攻击到一人的标记
 
 public:
     void fakeDead();

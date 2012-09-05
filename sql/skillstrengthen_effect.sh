@@ -22,7 +22,7 @@ function skillstrengthen_effect()
         BEGIN {
             print "INSERT INTO `skillstrengthen_effect` VALUES";
         } {
-            printf("(%d,%d,%d,%f,%d,\x27%s\x27,%d,%d,%f)",$1,$2,$3,$4,$5,$6,$7,$8,$9);
+            printf("(%d,%d,%d,%f,%d,\x27%s\x27,%d,%d,%f,%f,%f)",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11);
             if (NR <= ENVIRON["lines"]-1)
                 printf(",");
             else if (NR >= ENVIRON["lines"])
