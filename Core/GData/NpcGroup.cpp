@@ -92,16 +92,16 @@ void NpcGroup::getLoots( GObject::Player * player, std::vector<LootResult>& il, 
 	std::vector<const LootItem *>::iterator it;
 	for(it = _loots[lootlvl].begin(); it != _loots[lootlvl].end(); ++ it)
 	{
-		LootResult lr = (*it)->roll();
-		if(lr.id == 0)
-			continue;
-		if (player->GetPackage()->Add(lr.id, lr.count, false, true, FromNpc))
+        std::vector<LootResult> lr;
+        (*it)->roll(lr);
+        for (size_t j = 0; j < lr.size(); ++j)
         {
-            ++cnt;
-            il.push_back(lr);
+            if (player->GetPackage()->Add(lr[j].id, lr[j].count, false, true, FromNpc))
+            {
+                ++cnt;
+                il.push_back(lr[j]);
+            }
         }
-        else
-            continue;
 	}
     if (atoCnt)
         *atoCnt = cnt;

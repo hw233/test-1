@@ -9253,11 +9253,12 @@ namespace GObject
             const GData::LootItem* li = GData::lootTable[loot];
             if (li)
             {
-                GData::LootResult lr = li->roll();
-                if (lr.id)
+                std::vector<GData::LootResult> lr;
+                li->roll(lr);
+                if (lr.size())
                 {
-                    m_td.itemId = lr.id;
-                    m_td.num = lr.count;
+                    m_td.itemId = lr[0].id;
+                    m_td.num = lr[0].count;
                     m_td.needgen = 0;
                     return true;
                 }
