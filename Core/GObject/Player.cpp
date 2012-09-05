@@ -10306,6 +10306,10 @@ namespace GObject
         SYSMSG(title, 2335);
         SYSMSG(content, 2336);
         GetMailBox()->newMail(NULL, 0x12, title, content);
+
+
+        MailPackage::MailItem item[2] = {{9161, 1}, {9162, 1}};
+        sendMailItem(4028, 4028, item, 2);
 #endif
     }
 

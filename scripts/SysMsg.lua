@@ -749,6 +749,7 @@ sysMsg:set(4025, 0, "恭喜您在七夕活动中达到了%u积分，获得了相
 
 sysMsg:set(4026, 0, "充值排行第%u名奖励")
 sysMsg:set(4027, 0, "充值排行第%u名奖励")
+sysMsg:set(4028, 0, "宝典")
 
 sysMsg:set(9999, 0, "var: %d")
 
