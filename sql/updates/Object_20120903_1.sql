@@ -18,7 +18,6 @@ CREATE TABLE `clan_copy_log` (
     `logTime` bigint(20) unsigned NOT NULL,
     `logType` smallint(6) NOT NULL,
     `playerName` varchar(255) NOT NULL,
-    `logVal` bigint(20) unsigned NOT NULL,
-    PRIMARY KEY (`clanId`)
+    `logVal` bigint(20) unsigned NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 

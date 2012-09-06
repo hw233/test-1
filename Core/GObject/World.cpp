@@ -1,4 +1,4 @@
-﻿#include "Config.h"
+#include "Config.h"
 #include "World.h"
 #include "Leaderboard.h"
 #include "ClanManager.h"
@@ -37,6 +37,7 @@
 #include "GData/Store.h"
 #include "CountryBattle.h"
 #include "ClanRankBattle.h"
+#include "ClanCopy.h"
 #include "ShuoShuo.h"
 #include "CFriend.h"
 #include "Common/Itoa.h"
@@ -771,6 +772,38 @@ void World::AthleticsPhysicalCheck(void *)
 {
     gAthleticsRank.process();
 }
+
+void World::ClanCopyCheck(void *)
+{
+    ClanCopyMgr::Instance().process(TimeUtil::Now());
+}
+
+void World::ClanStatueCheck(void *)
+{
+    class UpdateStatueVisitor : public Visitor<Clan>
+    {
+        public:
+            UpdateStatueVisitor()
+            {
+            }
+
+            bool operator()(Clan* clan)
+            {
+                clan->updateStatueExp();
+                return true;
+            }
+            
+    };
+    UpdateStatueVisitor visitor;
+    for (UInt8 i = 0; i <=2; ++i)
+    {
+        if(i > 1)
+            globalClans.enumerate(visitor);
+        else
+            globalClansByCountry[i].enumerate(visitor);
+    }
+}
+
 #if 0
 bool advancedHookEnumerate(Player * pl, UInt8 para)
 {
@@ -830,6 +863,8 @@ bool World::Init()
 
     AddTimer(5 * 1000, Team_Copy_Process, static_cast<void*>(NULL));
     AddTimer(3600 * 1000, AthleticsPhysicalCheck, static_cast<void *>(NULL), (3600 - now % 3600) * 1000);
+    AddTimer(1000, ClanCopyCheck);
+    AddTimer(3600 * 1000, ClanStatueCheck, static_cast<void *>(NULL), (3600 - now % 3600) * 1000);
 
     //AddTimer(60 * 1000, advancedHookTimer, static_cast<void *>(NULL), (60 - now % 60) * 1000);
 

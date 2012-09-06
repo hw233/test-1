@@ -2882,7 +2882,7 @@ namespace GObject
         // 读取帮派副本历史日志
         lc.prepare("Loading clan copy log:");
         DBClanCopyLog ccl;
-        if (execu->Prepare("SELECT `clanid`, `logTime`, `logType`, `playerName`, `logVal` FROM `clan_copy_log` ORDER BY `clanid` ASC, `logTime` ASC`", ccl) != DB::DB_OK)
+        if (execu->Prepare("SELECT `clanid`, `logTime`, `logType`, `playerName`, `logVal` FROM `clan_copy_log` ORDER BY `clanid` ASC, `logTime` ASC", ccl) != DB::DB_OK)
             return false;
         clan = NULL;
         lastId = 0xFFFFFFFF;
