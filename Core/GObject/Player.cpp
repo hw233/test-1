@@ -9625,6 +9625,10 @@ namespace GObject
             //回流用户新区道具奖
             getAwardFromRF();
             break;
+        case 9:
+            //领取礼物卡
+            getAwardGiftCard();
+            break;
         }
     }
 
@@ -9735,6 +9739,17 @@ namespace GObject
         st << GameAction()->RunNewRegisterAwardAD_RF(this, 2) << Stream::eos;
         send(st);
         SetVar(VAR_AWARD_NEWREGISTER, 4);
+    }
+
+    void Player::getAwardGiftCard()
+    {
+        if(GetVar(VAR_AWARD_NEWREGISTER))
+            return;
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(9);
+        st << GameAction()->RunNewRegisterAwardAD_RF(this, 3) << Stream::eos;
+        send(st);
+        SetVar(VAR_AWARD_NEWREGISTER, 5);
     }
 
     void Player::getHappyAward(UInt8 opt)
