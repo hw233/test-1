@@ -467,6 +467,8 @@ private:
     static void AthleticsPhysicalCheck(void *);
 	static void Tianjie_Refresh(void*);
     static void TownDeamonTmAward(void *);
+    static void ClanCopyCheck(void *);
+    static void ClanStatueCheck(void *);
     //static void advancedHookTimer(void *para);
 
 public:

@@ -483,7 +483,10 @@ public:
     void LoadCopy(UInt16 level, UInt32 levelUpdateTime);
     void LoadCopyLog(UInt32 logTime, UInt8 logType, std::string playerName, UInt32 logVal);
 
-    void sendClanCopyInfo(Player * player);
+    void updateStatueExp();
+
+    void sendClanCopyInfo(Player * player, UInt8 val = 0);
+    void notifyCopyCreated(Player * player);
 
     UInt16 getStatueLevel();
     UInt32 getStatueExp();
@@ -508,6 +511,8 @@ public:
 
     void   addCopyLevel();
     void   addCopyWinLog(Player* player);
+
+public:
 
     inline Player * getOwner()
     {

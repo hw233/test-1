@@ -4968,10 +4968,7 @@ namespace GObject
 		map->SendAtCity(this, inCity, !sameMap);
         setJumpingMap(false);
 
-        if (spot == CLAN_COPY_LOCATION)
-        {
-            ClanCopyMgr::Instance().playerEnter(this);
-        }
+        ClanCopyMgr::Instance().playerEnter(this);
 
 	}
 

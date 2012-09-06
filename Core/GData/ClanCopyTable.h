@@ -73,9 +73,9 @@ typedef std::vector<ClanCopyData> ClanCopyTable;
 struct ClanCopyMonsterData
 {
     ClanCopyMonsterData(UInt16 level, UInt16 appearRound, UInt32 npcId,
-            UInt8 npcCount, UInt8 npcRouteCount, UInt16 npcValue)
+            UInt8 npcCount, UInt8 npcRouteCount, UInt16 npcValue, UInt8 monsterType)
         : level(level), appearRound(appearRound), npcId(npcId),
-        npcCount(npcCount), npcRouteCount(npcRouteCount), npcValue(npcValue)
+        npcCount(npcCount), npcRouteCount(npcRouteCount), npcValue(npcValue), monsterType(monsterType)
     {
     }
     UInt16 level;              // 副本等级
@@ -84,6 +84,7 @@ struct ClanCopyMonsterData
     UInt8  npcCount;           // 每一路怪物的数量
     UInt8  npcRouteCount;      // 出现的路数 
     UInt16 npcValue;           // 怪物对主基地的破坏值
+    UInt8  monsterType;        // 怪物类型（普通怪 ，精英怪，boss）
 };
 
 // key值为 (level << 16 | appearRound)

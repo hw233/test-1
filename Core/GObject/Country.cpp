@@ -48,11 +48,6 @@ void Country::ClanRankBattleCheck(void *)
     ClanRankBattleMgr::Instance().Process(TimeUtil::Now());
 }
 
-void Country::ClanCopyCheck(void *)
-{
-    ClanCopyMgr::Instance().process(TimeUtil::Now());
-}
-
 bool Country::Init()
 {
 	//GameActionLua
@@ -70,7 +65,6 @@ bool Country::Init()
 		AddTimer(5000, Country_Battle_Check, static_cast<void *>(NULL), (5 - (now % 5)) * 1000);
 		AddTimer(5000, Hero_Island_Check, static_cast<void *>(NULL), (5 - (now % 5)) * 1000);
         AddTimer(1000, ClanRankBattleCheck);
-        AddTimer(1000, ClanCopyCheck);
         //townDeamonManager->process();
 	}
 
@@ -121,6 +115,7 @@ void Country::PlayerEnter(Player * pl, bool notify)
             {
 				map->PlayerEnter(pl, true);
                 ClanRankBattleMgr::Instance().PlayerEnter(pl);
+                ClanCopyMgr::Instance().playerEnter(pl);
             }
 		}
 	}

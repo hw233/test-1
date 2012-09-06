@@ -27,28 +27,29 @@ void ClanStatue::updateLevel(UInt32 exp, UInt32 expUpdateTime)
     UInt32 expOutput = GData::clanCopyTable[copyLevel].expOutput;
     UInt32 expConsume = GData::clanStatueTable[_level].consumeExp;
     UInt32 now = TimeUtil::Now();
-    if (now < expUpdateTime)
+    Int64  bigExp = 0;
+
+    if (expUpdateTime)
     {
-        if (expConsume > expOutput)
+        // 从数据库读取时更新神像经验值
+        if (now < expUpdateTime)
         {
-            _exp = exp + (expConsume - expOutput) * (expUpdateTime / 3600 - now / 3600);
+            // 被穿越了?
+            bigExp = exp - (expOutput - expConsume ) * (expUpdateTime / 3600 - now / 3600);
         }
         else
         {
-            _exp = exp - (expOutput - expConsume ) * (expUpdateTime / 3600 - now / 3600);
+            bigExp = exp + (expOutput - expConsume ) * (now / 3600 - expUpdateTime / 3600);
         }
     }
     else
     {
-        if (expConsume > expOutput)
-        {
-            _exp = exp - (expConsume - expOutput) * (now / 3600 - expUpdateTime / 3600);
-        }
-        else
-        {
-            _exp = exp + (expOutput - expConsume ) * (now / 3600 - expUpdateTime / 3600);
-        }
+        bigExp = _exp + expOutput - expConsume;
     }
+    if (bigExp < 0)
+        _exp = 0;
+    else
+        _exp = static_cast<UInt32>(bigExp);
     _level = 0;
     for (std::vector<GData::ClanStatueTableData>::iterator it = GData::clanStatueTable.begin(); 
             it != GData::clanStatueTable.end(); ++it)
