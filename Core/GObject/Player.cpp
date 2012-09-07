@@ -5525,15 +5525,7 @@ namespace GObject
     {
         if (rcnt > 100)
             return false;
-
-        int cnt = tasks.size();
-        UInt32* t = &tasks[0];
-        for (int i = 0; i < cnt; ++i)
-        {
-            if (*t++ == task)
-                return true;
-        }
-        return false;
+        return find(tasks.begin(), tasks.end(), task) != tasks.end();
     }
 
 	void Player::flushTaskColor(UInt8 tasktype, UInt8 type, UInt8 color, UInt16 count, bool force)
