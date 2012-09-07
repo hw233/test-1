@@ -2578,7 +2578,7 @@ bool Fighter::lvlUpCitta(UInt16 citta, bool writedb)
     }
     else
     {
-		if(_owner != NULL) ;
+		if(_owner != NULL)
             SYSMSG_SENDV(2008, _owner);
     }
     return false;

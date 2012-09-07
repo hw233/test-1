@@ -36,8 +36,10 @@ namespace GObject
 #define FIGHTER_BUFF_DWMAN      0x0E //道女
 
 #define FIGHTER_BUFF_RDIAMOND   0x0F //红钻变身卡
+#define FIGHTER_BUFF_BLUE       0x10 //蓝钻变身卡
+#define FIGHTER_BUFF_QQVIP      0x11 //QQ会员变身卡
 
-#define FIGHTER_BUFF_COUNT 0x10
+#define FIGHTER_BUFF_COUNT 0x20
 
 #define SKILL_UPMAX 3 // 技能最初就能装备3个
 #define CITTA_LEVEL_MAX 100

@@ -662,6 +662,8 @@ namespace GObject
         void sendMayDayTitleCard(int);
         void sendJuneHappyTitleCard(int pos);
         void sendPExpCard(int pos);
+        void sendRechargeRankAward(int pos);
+        void sendConsumeRankAward(int pos);
 
 	public:
 		void sendTopupMail(const char* title, const char* content, UInt32 gold, UInt8 num);
@@ -1591,6 +1593,7 @@ namespace GObject
         void getNewRegisterAward(UInt8 opt);
         void getAwardFromAD();
         void getAwardFromRF();
+        void getAwardGiftCard();
 
         inline TripodData& getTripodData() { return m_td; }
         TripodData& newTripodData();
