@@ -20,7 +20,7 @@
 
 class  ThreadImpl
 {
-public:	
+public:
     typedef pthread_t TIDImpl;
 	typedef void (*Callable)(void*);
 
@@ -40,12 +40,12 @@ public:
 		}
 
 		Callable  callback;
-		void*     pData; 
+		void*     pData;
 	};
 
-	ThreadImpl();				
+	ThreadImpl();
 	~ThreadImpl();
-    
+
 	TIDImpl tidImpl() const;
 	void setPriorityImpl(int prio);
 	int getPriorityImpl() const;
@@ -93,7 +93,7 @@ private:
 		{
 			pthread_setspecific(_key, pThread);
 		}
-	
+
 	private:
 		pthread_key_t _key;
 	};
@@ -123,7 +123,7 @@ private:
 	AutoPtr<ThreadData> _pData;
 
 	static CurrentThreadHolder _currentThreadHolder;
-	
+
 #if defined(_OS_FAMILY_UNIX) && !defined(_VXWORKS)
 	SignalHandler::JumpBufferVec _jumpBufferVec;
 	friend class SignalHandler;

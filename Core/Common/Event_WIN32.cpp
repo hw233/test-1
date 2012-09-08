@@ -37,6 +37,6 @@ bool EventImpl::waitImpl(long milliseconds)
 	case WAIT_OBJECT_0:
 		return true;
 	default:
-		throw SystemException("wait for event failed");		
+		throw SystemException("wait for event failed");
 	}
 }

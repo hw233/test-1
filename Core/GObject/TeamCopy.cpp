@@ -411,7 +411,7 @@ UInt32 TeamCopy::joinTeam(Player* pl, UInt32 teamId, std::string pwd)
 
     if(copyId != teamCopyId || t != teamCopyType)
         return 0;
-    
+
     AllCopyTeamsIterator it = m_allCopyTeams[copyIdx].find(teamId);
     if(it == m_allCopyTeams[copyIdx].end() || it->second == NULL)
     {

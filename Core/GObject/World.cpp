@@ -1,4 +1,4 @@
-#include "Config.h"
+﻿#include "Config.h"
 #include "World.h"
 #include "Leaderboard.h"
 #include "ClanManager.h"
@@ -29,7 +29,9 @@
 #include "WBossMgr.h"
 #include "HeroIsland.h"
 #include "MsgID.h"
+#ifndef _WIN32
 #include "DCLogger.h"
+#endif
 #include "TeamCopy.h"
 #include "ArenaBattle.h"
 #include "GData/Store.h"
@@ -191,6 +193,8 @@ bool bMayDayEnd = false;
 bool bJuneEnd = false;
 bool bPExpItemsEnd = false;
 bool bQixiEnd = false;
+bool bRechargeEnd = false;
+bool bConsumeEnd = false;
 
 bool enum_midnight(void * ptr, void* next)
 {
@@ -419,7 +423,7 @@ void World::setWeekDay(UInt8 wday)
 		_worldScript->onActivityCheck(TimeUtil::SharpDay(1) - 10);
 		UInt16 * prices = Dungeon::getPrice(sz);
 		for(size_t i = 0; i < sz; ++ i)
-			prices[i] /= 2;	
+			prices[i] /= 2;
 	}
     if (!cfg.GMCheck)
         _worldScript->onActivityCheck(TimeUtil::Now()+30);
@@ -432,7 +436,7 @@ void World::setWeekDay(UInt8 wday)
 
 bool enum_dungeon_midnight(void * ptr, void * data)
 {
-	Dungeon *dg = static_cast<Dungeon *>(ptr); 
+	Dungeon *dg = static_cast<Dungeon *>(ptr);
 	if(dg == NULL)
 		return false;
 	UInt32 now = *reinterpret_cast<UInt32 *>(data);
@@ -626,6 +630,60 @@ void SendPExpCard()
 
 }
 
+void SendRechargeRankAward()
+{
+    if(bRechargeEnd)
+    {
+        int pos = 0;
+        for (RCSortType::iterator i = World::rechargeSort.begin(), e = World::rechargeSort.end(); i != e; ++i)
+        {
+            ++pos;
+
+            if(pos > 7) break;
+
+            Player* player = i->player;
+            if (!player)
+                continue;
+            if (player->isOnline())
+            {
+                GameMsgHdr hdr(0x257, player->getThreadId(), player, sizeof(pos));
+                GLOBAL().PushMsg(hdr, &pos);
+            }
+            else
+            {
+                player->sendRechargeRankAward(pos);
+            }
+        }
+    }
+}
+
+void SendConsumeRankAward()
+{
+    if(bConsumeEnd)
+    {
+        int pos = 0;
+        for (RCSortType::iterator i = World::consumeSort.begin(), e = World::consumeSort.end(); i != e; ++i)
+        {
+            ++pos;
+
+            if(pos > 1) break;
+
+            Player* player = i->player;
+            if (!player)
+                continue;
+            if (player->isOnline())
+            {
+                GameMsgHdr hdr(0x258, player->getThreadId(), player, sizeof(pos));
+                GLOBAL().PushMsg(hdr, &pos);
+            }
+            else
+            {
+                player->sendConsumeRankAward(pos);
+            }
+        }
+    }
+}
+
 void World::World_Midnight_Check( World * world )
 {
 	UInt32 curtime = TimeUtil::Now();
@@ -638,10 +696,12 @@ void World::World_Midnight_Check( World * world )
     bool bMayDay = getMayDay();
     bool bJune = getJune();
     bool bQixi = getQixi();
+    bool bRecharge = (getRechargeActive() || getRechargeActive3366()) && getNeedRechargeRank();
+    bool bConsume = getConsumeActive() && getNeedConsumeRank();
     bool bPExpItems = getPExpItems();
 	world->_worldScript->onActivityCheck(curtime+30);
 
-	world->_today = TimeUtil::SharpDay(0, curtime+30);	
+	world->_today = TimeUtil::SharpDay(0, curtime+30);
 	DB1().PushUpdateData("UPDATE `player` SET `icCount` = 0;");
 
     chopStickSortMap.clear();
@@ -660,6 +720,8 @@ void World::World_Midnight_Check( World * world )
     bJuneEnd = bJune && !getJune();
     bPExpItemsEnd = bPExpItems && !getPExpItems();
     bQixiEnd = bQixi && !getQixi();
+    bRechargeEnd = bRecharge && !(getRechargeActive()||getRechargeActive3366());
+    bConsumeEnd = bConsume && !getConsumeActive();
 
     UInt32 nextday = curtime + 30;
 	globalPlayers.enumerate(enum_midnight, static_cast<void *>(&nextday));
@@ -680,10 +742,10 @@ void World::World_Midnight_Check( World * world )
             if(pos > 3) break;
 
             UInt32 titles[] = {0, 1, 2, 3};
-           
+
             Player* player = iter->second;
             player->setTitle(titles[pos]);
-            SYSMSG_BROADCASTV(2142, player->getCountry(), player->getPName(), titles[pos]); 
+            SYSMSG_BROADCASTV(2142, player->getCountry(), player->getPName(), titles[pos]);
         }
     }
 
@@ -698,12 +760,16 @@ void World::World_Midnight_Check( World * world )
 #endif
     if(bQixiEnd)
         world->SendQixiAward();
+    if (bRechargeEnd)
+        SendRechargeRankAward();
+    if (bConsumeEnd)
+        SendConsumeRankAward();
 	
 	dungeonManager.enumerate(enum_dungeon_midnight, &curtime);
 	globalClans.enumerate(enum_clan_midnight, &curtime);
 	clanManager.reConfigClanBattle();
 	challengeCheck.clear();
-	
+
 	calWeekDay(world);
 	Stream st(REP::DAILY_DATA);
 	makeActivityInfo(st);
@@ -737,10 +803,12 @@ void World::World_Online_Log( void * )
 {
 	UInt32 onlineNums=NETWORK()->getOnlineNum();
 	DBLOG1().PushUpdateData("insert into online_situations (server_id,divtime,num) values(%u,%u,%u)", cfg.serverLogId, TimeUtil::Now(), onlineNums);
+#ifndef _WIN32
 #ifdef _FB
 #else
     dclogger.online();
 #endif
+#endif // _WIN32
 }
 
 void World::World_Store_Check(void *)
@@ -787,7 +855,7 @@ bool World::Init()
 	GObjectManager::delayLoad();
 	GObjectManager::LoadPracticeData();
 	GObjectManager::LoadTripodData();
-	
+
 	std::string path = cfg.scriptPath + "World/main.lua";
 	_worldScript = new Script::WorldScript(path.c_str());
 	path = cfg.scriptPath + "formula/main.lua";
@@ -957,7 +1025,7 @@ void World::SendLuckyDrawList(Player* player)
 void World::SendLuckyDrawAward()
 {
     int pos = 0;
- 
+
     SYSMSG(title, 2360);
     for(LuckyDrawRank rank = _luckyDrawList.begin(); rank != _luckyDrawList.end() && pos < 10; ++ rank, ++ pos)
     {
@@ -1235,7 +1303,7 @@ void World::DivorceQixiPair(Player* pl)
 void World::SendQixiAward()
 {
     int pos = 0;
- 
+
     globalPlayers.enumerate(enum_qixi_score, static_cast<void *>(NULL));
     std::vector<MailPackage::MailItem> mitems;
     SYSMSG(title, 4020);

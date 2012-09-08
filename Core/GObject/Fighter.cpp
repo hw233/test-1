@@ -1,4 +1,4 @@
-#include "Config.h"
+﻿#include "Config.h"
 #include "Fighter.h"
 #include "Country.h"
 #include "TaskMgr.h"
@@ -32,7 +32,7 @@ namespace GObject
 
 GlobalFighters globalFighters;
 
-static float enc_factor[] = {0, 0.05, 0.10, 0.16, 0.23, 0.31, 0.40, 0.51, 0.64, 0.80, 1.00, 1.25, 1.51};
+static float enc_factor[] = {0, 0.05f, 0.10f, 0.16f, 0.23f, 0.31f, 0.40f, 0.51f, 0.64f, 0.80f, 1.00f, 1.25f, 1.51f};
 #define SOUL_EXP_ITEM 8000
 #define SOUL_SKILL_DEFAULT_ITEM 8565
 
@@ -374,7 +374,7 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
 	{
 	case 1: field = "hp"; break;
 	case 2: field = "level"; break;
-	case 3: 
+	case 3:
         {
 #if 0
             UInt32 now = time(NULL);
@@ -470,7 +470,7 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
         }
         break;
     case 0x2d:
-        { // cittas 
+        { // cittas
             if (_cittas.size()) {
                 std::string str;
                 if (value2string(&_cittas[0], _cittas.size(), str)) {
@@ -1690,7 +1690,7 @@ UInt16 Fighter::getP100SkillsNum()
     UInt16 size = 0;
     for (size_t i = 0; i < GData::SKILL_PASSIVES-GData::SKILL_PASSSTART; ++i)
     {
-        size += _passkl[i].size(); 
+        size += _passkl[i].size();
     }
     return size;
 }
@@ -1700,7 +1700,7 @@ UInt16 Fighter::getPnSkillsNum()
     UInt16 size = 0;
     for (size_t i = 0; i < GData::SKILL_PASSIVES-GData::SKILL_PASSSTART; ++i)
     {
-        size += _rpasskl[i].size(); 
+        size += _rpasskl[i].size();
     }
     return size;
 }
@@ -1977,7 +1977,7 @@ void Fighter::setAcupoints( std::string& acupoints, bool writedb )
     {
         setAcupoints(i, ::atoi(tk[i].c_str()), writedb, true); // XXX: must be less then 255
     }
-    
+
     for (UInt8 i = 0; i < ACUPOINTS_MAX; ++i)
     {
         if (_acupoints[i] && _acupoints[i] < 3)
@@ -2545,7 +2545,7 @@ bool Fighter::lvlUpCitta(UInt16 citta, bool writedb)
                         const GData::CittaBase* cb = GData::cittaManager[_cittas[i]];
                         if(cb)
                         {
-                            num9 ++; 
+                            num9 ++;
                             if(cb->type >= 8)
                                 num9Type8 ++;
                         }
@@ -2560,13 +2560,13 @@ bool Fighter::lvlUpCitta(UInt16 citta, bool writedb)
                      GameAction()->doAttainment(_owner,  10086, num9Type8);
                 }
             }
-            
+
         }
         return re;
     }
     else
     {
-		if(_owner != NULL) ;
+		if(_owner != NULL)
             SYSMSG_SENDV(2008, _owner);
     }
     return false;
@@ -2731,7 +2731,7 @@ bool Fighter::offPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb
     if (!p100)
     {
         for (UInt16 i = 0; i < type-GData::SKILL_PASSSTART; ++i)
-            lastsize += _passkl[i].size(); 
+            lastsize += _passkl[i].size();
     }
 
     UInt16 idx = type - GData::SKILL_PASSSTART;
@@ -2967,9 +2967,9 @@ bool Fighter::delCitta( UInt16 citta, bool writedb )
                 MailItemsInfo itemsInfo(mitem, DismissCitta, 3);
                 GObject::Mail * pmail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
                 if(pmail != NULL)
-                {    
+                {
                     GObject::mailPackageManager.push(pmail->id, mitem, 3, true);
-                }   
+                }
             }
         }
     }
@@ -4169,7 +4169,7 @@ void Fighter::SSOpen(UInt16 id)
     if (!item)
         return;
 
-    // 
+    //
     if (item->getClass() != Item_Trump)
     {
         if(!pkg->DelItem2(item, 1, ToSkillStrengthenOpen))

@@ -1,4 +1,4 @@
-#include "Config.h"
+﻿#include "Config.h"
 #include "CountryBattle.h"
 #include "GObject/Country.h"
 #include "Server/WorldServer.h"
@@ -102,7 +102,7 @@ void CountryBattle::LeaveGetAttainment(Player* p, CBPlayerData& data)
     }
     if(data.maxKillStreak)
      GameAction()->doAttainment(p, Script:: COUNTRY_BATTLE_KILL_STREAK, data.maxKillStreak);
-    
+
 }
 void CountryBattle::process(UInt32 curtime)
 {
@@ -135,7 +135,7 @@ void CountryBattle::process(UInt32 curtime)
 
 			int turns = 0;
 			bool res = cbd1->player->challenge(cbd2->player, NULL, &turns, false, 50);
-           
+
 			GameAction()->RunOperationTaskAction1(cbd1->player, 2, res);
 			GameAction()->RunOperationTaskAction1(cbd2->player, 2, !res);
 			cbd1->player->setBuffData(PLAYER_BUFF_ATTACKING, curtime + 2 * turns);
@@ -181,9 +181,9 @@ void CountryBattle::process(UInt32 curtime)
 					cbd2->player->pendAchievement(loserAchieve);
 				else
 					cbd2->player->getAchievement(loserAchieve);
-				
+
 				rotate(curtime + turns * 2, lvl, 0, pos1, achieve, 2);
-			
+
 				UInt32 viplvl = cbd2->player->getVipLevel();
 				if(viplvl >= 4)
 				{
@@ -228,7 +228,7 @@ void CountryBattle::process(UInt32 curtime)
 					_topStreak = cbd2->killStreak;
 				}
 				_score[1] += gotScore;
-				
+
 				data.setSideLevel(1, lvl);
 				data.player = cbd2->player;
 				data.streak = cbd2->killStreak;
@@ -250,7 +250,7 @@ void CountryBattle::process(UInt32 curtime)
 
 				UInt32 viplvl = cbd1->player->getVipLevel();
 				if(viplvl >= 4)
-				{	
+				{
 					rotate(curtime + turns * 2, lvl, 0, pos1, loserAchieve, 1);
 					cbd1->killStreak = 0;
 
@@ -264,7 +264,7 @@ void CountryBattle::process(UInt32 curtime)
 				{
 					doLeave(curtime, lvl, 0, pos1, loserAchieve, 1);
 				}
-			
+
 				if(cbd2->killStreak >= 10 && World::_actAvailable && gSpecialAward.getAwardSize(0) < 3)
 					gSpecialAward.AddSpecialAwardList(0, cbd2->player);
 
@@ -472,7 +472,7 @@ void CountryBattle::rotate( UInt32 curtime, UInt8 lvl, UInt8 side, int pos, UInt
 
 	CountryBattleData * cbd = blist[pos];
 	cbd->restCountTime = 0;
-	
+
 	CBPlayerData& cbpdata = _battleDuration[cbd->player->getCountry()][cbd->player];
 	cbpdata.totalAchievement += achievement;
 	cbd->sendAchieveUpdate(cbpdata.totalAchievement);
@@ -509,7 +509,7 @@ bool CountryBattle::playerEnter( Player * player )
 		player->sendMsgCode(0, 1401);
 		return false;
 	}
-    // XXX: yangyoufa@ 08/01/12 21:15:02 
+    // XXX: yangyoufa@ 08/01/12 21:15:02
 #if 0
 	if(player->getBuffData(PLAYER_BUFF_ATTACKING, curtime))
 	{
@@ -597,7 +597,7 @@ void CountryBattle::doLeave( UInt32 curtime, UInt8 lvl, UInt8 side, int pos, UIn
 	CountryBattleData * cbd = blist[pos];
 	UInt32 dur = cbd->getReward(lvl, curtime, _rewardTime);
 	Player * player = cbd->player;
-	
+
 	CBPlayerData& cbpdata = _battleDuration[player->getCountry()][player];
 	if(loseFlag != 0)
 	{
@@ -607,7 +607,7 @@ void CountryBattle::doLeave( UInt32 curtime, UInt8 lvl, UInt8 side, int pos, UIn
 	}
 	if(dur > 0)
 		cbpdata.awardTime += (dur << 1);
-	
+
 	player->delFlag(Player::CountryBattle);
 
    // printf("离开阵营战 ： killall %u , streak : %u\n",  cbpdata.totalWin, cbpdata.maxKillStreak);
@@ -666,7 +666,7 @@ void CountryBattle::restCount( UInt32 curtime, UInt8 lvl, UInt8 side )
 			cbd->restCountTime = curtime + 60;
 			_score[side] += gotScore;
 			cbd->player->getAchievement(achievement);
-		
+
 			CBPlayerData& cbpdata = _battleDuration[player->getCountry()][player];
 			cbpdata.totalAchievement += achievement;
 			cbd->sendAchieveUpdate(cbpdata.totalAchievement);

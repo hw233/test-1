@@ -1,4 +1,4 @@
-#include "Config.h"
+﻿#include "Config.h"
 #include "Common/Itoa.h"
 #include "Player.h"
 #include "Package.h"
@@ -262,7 +262,7 @@ bool Trade::launchTrade(std::string& name, const std::string& title, UInt32 coin
 
 	_tradeDatas[trade->_id] = trade;
 
-	char escstrTitle[256]; 
+	char escstrTitle[256];
 	mysql_escape_string(escstrTitle, trade->_tradeTitle.c_str(), trade->_tradeTitle.length()>255?255:trade->_tradeTitle.length());
 
 	DB1().PushUpdateData("INSERT INTO `trade` VALUES (%d, %"I64_FMT"u, %d, %d, %"I64_FMT"u, '%s', %d, %d, %d, '%s')", trade->_id, _owner->getId(), trade->_tradeSide, \
@@ -455,7 +455,7 @@ void Trade::deleteTrade(UInt32 id)
 	TradeData* trade = found->second;
 
 	if(trade->_tradeStatus >= TRADE_SELFOK && trade->_tradeStatus <= TRADE_TIMEOUT)
-	{		
+	{
 		if(trade->_items.size()!= 0)
 		{
 			UInt16 itemNum = trade->_items.size();
@@ -491,8 +491,8 @@ bool Trade::recvLaunchTrade(UInt32 id, const std::string& title, UInt32 time, Pl
 	trade->_tradeStatus = static_cast<UInt8>(TRADE_RECEIVE);
 	trade->_tradePlayer = launcher;
 	_tradeDatas[trade->_id] = trade;
-	
-	char escstrTitle[1024]; 
+
+	char escstrTitle[1024];
 	mysql_escape_string(escstrTitle, trade->_tradeTitle.c_str(), trade->_tradeTitle.length()>1022?1022:trade->_tradeTitle.length());
 
 
@@ -717,7 +717,7 @@ void Trade::makeMailInfo(UInt32 id, Stream& st, UInt16& num)
 			st << static_cast<UInt16>(item->GetItemType().getId()) << item->Count();
 		}
 	}
-	
+
 }
 bool Trade::needBuildTradeItems(UInt8 status)
 {

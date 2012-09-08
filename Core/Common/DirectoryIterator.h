@@ -21,19 +21,19 @@ class  DirectoryIterator
 	///     even is the original iterator has been advanced
 	///     (all copies of an iterator share their state with
 	///     the original iterator)
-	///   * because of this you should only use the prefix 
+	///   * because of this you should only use the prefix
 	///     increment operator
 {
 public:
 	DirectoryIterator();
 		/// Creates the end iterator.
-		
+
 	DirectoryIterator(const std::string& path);
 		/// Creates a directory iterator for the given path.
 
 	DirectoryIterator(const DirectoryIterator& iterator);
 		/// Creates a directory iterator for the given path.
-		
+
 	DirectoryIterator(const File& file);
 		/// Creates a directory iterator for the given file.
 
@@ -45,7 +45,7 @@ public:
 
 	const std::string& name() const;
 		/// Returns the current filename.
-		
+
 	const Path& path() const;
 		/// Returns the current path.
 
@@ -53,18 +53,18 @@ public:
 	DirectoryIterator& operator = (const File& file);
 	DirectoryIterator& operator = (const Path& path);
 	DirectoryIterator& operator = (const std::string& path);
-	
+
 	DirectoryIterator& operator ++ ();   // prefix
-	
+
 	//@ deprecated
 	DirectoryIterator operator ++ (int); // postfix
 		/// Please use the prefix increment operator instead.
-	
+
 	const File& operator * () const;
 	File& operator * ();
 	const File* operator -> () const;
 	File* operator -> ();
-	
+
 	bool operator == (const DirectoryIterator& iterator) const;
 	bool operator != (const DirectoryIterator& iterator) const;
 
@@ -83,7 +83,7 @@ inline const std::string& DirectoryIterator::name() const
 	return _path.getFileName();
 }
 
-	
+
 inline const Path& DirectoryIterator::path() const
 {
 	return _path;

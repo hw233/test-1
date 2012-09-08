@@ -21,7 +21,7 @@ FastMutex EnvironmentImpl::_mutex;
 std::string EnvironmentImpl::getImpl(const std::string& name)
 {
 	FastMutex::ScopedLock lock(_mutex);
-	
+
 	const char* val = getenv(name.c_str());
 	if (val)
 		return std::string(val);
@@ -41,7 +41,7 @@ bool EnvironmentImpl::hasImpl(const std::string& name)
 void EnvironmentImpl::setImpl(const std::string& name, const std::string& value)
 {
 	FastMutex::ScopedLock lock(_mutex);
-	
+
 	std::string var = name;
 	var.append("=");
 	var.append(value);
@@ -130,14 +130,14 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 	int rc = getifaddrs(&ifaphead);
 	if (rc) return;
 
-	for (struct ifaddrs* ifap = ifaphead; ifap; ifap = ifap->ifa_next) 
+	for (struct ifaddrs* ifap = ifaphead; ifap; ifap = ifap->ifa_next)
 	{
-		if (ifap->ifa_addr && ifap->ifa_addr->sa_family == AF_LINK) 
+		if (ifap->ifa_addr && ifap->ifa_addr->sa_family == AF_LINK)
 		{
 			struct sockaddr_dl* sdl = reinterpret_cast<struct sockaddr_dl*>(ifap->ifa_addr);
 			caddr_t ap = (caddr_t) (sdl->sdl_data + sdl->sdl_nlen);
 			int alen = sdl->sdl_alen;
-			if (ap && alen > 0) 
+			if (ap && alen > 0)
 			{
 				std::memcpy(&id, ap, sizeof(id));
 				break;
@@ -159,9 +159,9 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 #include <net/if.h>
 #ifndef __CYGWIN__
 #include <net/if_arp.h>
-#else // workaround for Cygwin, which does not have if_arp.h 
+#else // workaround for Cygwin, which does not have if_arp.h
 #define ARPHRD_ETHER 1 /* Ethernet 10Mbps */
-#endif 
+#endif
 #include <arpa/inet.h>
 #include <unistd.h>
 
@@ -204,7 +204,7 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 	}
 	for (const char* ptr = buf; ptr < buf + ifc.ifc_len;)
 	{
-		const struct ifreq* ifr = reinterpret_cast<const struct ifreq*>(ptr);		
+		const struct ifreq* ifr = reinterpret_cast<const struct ifreq*>(ptr);
 		int rc = ioctl(sock, SIOCGIFHWADDR, ifr);
 		if (rc != -1)
 		{

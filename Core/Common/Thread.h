@@ -27,7 +27,7 @@ class  Thread: private ThreadImpl
 	/// Furthermore, a thread can be assigned a name.
 	/// The name of a thread can be changed at any time.
 {
-public:	
+public:
 	typedef ThreadImpl::TIDImpl TID;
 
 	using ThreadImpl::Callable;
@@ -44,10 +44,10 @@ public:
 
 	Thread();
 		/// Creates a thread. Call start() to start it.
-		
+
 	Thread(const std::string& name);
 		/// Creates a named thread. Call start() to start it.
-		
+
 	~Thread();
 		/// Destroys the thread.
 
@@ -79,17 +79,17 @@ public:
 		/// Sets the thread's priority, using an operating system specific
 		/// priority value. Use getMinOSPriority() and getMaxOSPriority() to
 		/// obtain mininum and maximum priority values.
-		
+
 	int getOSPriority() const;
 		/// Returns the thread's priority, expressed as an operating system
 		/// specific priority value.
 		///
 		/// May return 0 if the priority has not been explicitly set.
-		
+
 	static int getMinOSPriority();
 		/// Returns the mininum operating system-specific priority value,
 		/// which can be passed to setOSPriority().
-		
+
 	static int getMaxOSPriority();
 		/// Returns the maximum operating system-specific priority value,
 		/// which can be passed to setOSPriority().
@@ -111,15 +111,15 @@ public:
 		/// Starts the thread with the given target and parameter.
 
 	void join();
-		/// Waits until the thread completes execution.	
+		/// Waits until the thread completes execution.
 		/// If multiple threads try to join the same
 		/// thread, the result is undefined.
-		
+
 	void join(long milliseconds);
 		/// Waits for at most the given interval for the thread
 		/// to complete. Throws a TimeoutException if the thread
 		/// does not complete within the specified time interval.
-		
+
 	bool tryJoin(long milliseconds);
 		/// Waits for at most the given interval for the thread
 		/// to complete. Returns true if the thread has finished,
@@ -140,7 +140,7 @@ public:
 		/// If the current thread is the main thread, 0 is returned.
 
  	static TID currentTid();
- 		/// Returns the native thread ID for the current thread.    
+ 		/// Returns the native thread ID for the current thread.
 
 protected:
 	ThreadLocalStorage& tls();
@@ -151,10 +151,10 @@ protected:
 
 	std::string makeName();
 		/// Creates a unique name for a thread.
-		
+
 	static int uniqueId();
 		/// Creates and returns a unique id for a thread.
-		
+
 private:
 	Thread(const Thread&);
 	Thread& operator = (const Thread&);
@@ -187,7 +187,7 @@ inline int Thread::id() const
 inline std::string Thread::name() const
 {
 	FastMutex::ScopedLock lock(_mutex);
-	
+
 	return _name;
 }
 
@@ -195,7 +195,7 @@ inline std::string Thread::name() const
 inline std::string Thread::getName() const
 {
 	FastMutex::ScopedLock lock(_mutex);
-	
+
 	return _name;
 }
 
@@ -226,22 +226,22 @@ inline Thread* Thread::current()
 
 inline void Thread::setOSPriority(int prio)
 {
-	setOSPriorityImpl(prio);	
+	setOSPriorityImpl(prio);
 }
 
-	
+
 inline int Thread::getOSPriority() const
 {
 	return getOSPriorityImpl();
 }
 
-	
+
 inline int Thread::getMinOSPriority()
 {
 	return ThreadImpl::getMinOSPriorityImpl();
 }
 
-	
+
 inline int Thread::getMaxOSPriority()
 {
 	return ThreadImpl::getMaxOSPriorityImpl();

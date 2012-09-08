@@ -1,4 +1,4 @@
-#include "Config.h"
+﻿#include "Config.h"
 #include "MsgID.h"
 #include "CountryMsgHandler.h"
 #include "CountryOuterMsgHandler.h"
@@ -296,5 +296,8 @@ MSG_REG_2(GameMsgHdr, 0x258, OnTownDeamonChallenge);
 MSG_REG_2(GameMsgHdr, 0x259, OnTownDeamonAutoCompleteQuite);
 MSG_REG_2(GameMsgHdr, 0x260, OnTownDeamonAttackNpc);
 //MSG_REG_2(GameMsgHdr, 0x256, OnAdvancedHookExp);
+
+MSG_REG_2(GameMsgHdr, 0x257, OnSendRechargeRankAward);
+MSG_REG_2(GameMsgHdr, 0x258, OnSendConsumeRankAward);
 
 MSG_HANDLER_END()

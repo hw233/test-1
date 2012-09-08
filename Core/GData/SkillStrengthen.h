@@ -1,4 +1,4 @@
-
+﻿
 #ifndef SKILLSTRENGTHEN_H_
 #define SKILLSTRENGTHEN_H_
 

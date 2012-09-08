@@ -120,7 +120,7 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 	// Make an initial call to GetAdaptersInfo to get
 	// the necessary size into len
 	DWORD rc = GetAdaptersInfo(pAdapterInfo, &len);
-	if (rc == ERROR_BUFFER_OVERFLOW) 
+	if (rc == ERROR_BUFFER_OVERFLOW)
 	{
 		delete [] reinterpret_cast<char*>(pAdapterInfo);
 		pAdapterInfo = reinterpret_cast<IP_ADAPTER_INFO*>(new char[len]);
@@ -129,11 +129,11 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 	{
 		return;
 	}
-	if (GetAdaptersInfo(pAdapterInfo, &len) == NO_ERROR) 
+	if (GetAdaptersInfo(pAdapterInfo, &len) == NO_ERROR)
 	{
 		pAdapter = pAdapterInfo;
 		bool found = false;
-		while (pAdapter && !found) 
+		while (pAdapter && !found)
 		{
 			if (pAdapter->Type == MIB_IF_TYPE_ETHERNET && pAdapter->AddressLength == sizeof(id))
 			{

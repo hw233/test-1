@@ -71,7 +71,7 @@ struct AttrExtra
 		criticalP += other.criticalP;
 		pierceP += other.pierceP;
 #endif
-    
+
         hitrlvl += other.hitrlvl;
         evdlvl += other.evdlvl;
         crilvl += other.crilvl;
@@ -124,7 +124,7 @@ struct AttrExtra
 		criticaldmgP *= af.criticaldmg;
 		counterP *= af.counter;
         magresP *= af.magres;
-    
+
         hitrlvl *= af.hitrate;
         evdlvl *= af.evade;
         crilvl *= af.critical;
@@ -187,7 +187,7 @@ struct AttrExtra
 		criticalP += other.criticalP;
 		pierceP += other.pierceP;
 #endif
-    
+
         hitrlvl += other.hitrlvl;
         evdlvl += other.evdlvl;
         crilvl += other.crilvl;

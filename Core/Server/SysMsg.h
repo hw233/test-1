@@ -14,7 +14,7 @@ public:
 	SysMsgItem(UInt8, const std::string&);
 	void send(GObject::Player *);
 	void sendva(GObject::Player *, ...);
-	
+
 	void get(char *);
 	void getva(char *, ...);
     void getva(std::string& str, ...);

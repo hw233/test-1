@@ -1,4 +1,4 @@
-#include "Config.h"
+﻿#include "Config.h"
 #include "ClanManager.h"
 #include "GObject/Country.h"
 #include "Server/WorldServer.h"
@@ -12,7 +12,7 @@
 #include "Common/TimeUtil.h"
 #include "MsgID.h"
 
-namespace GObject 
+namespace GObject
 {
 
 ClanManager clanManager;
@@ -44,7 +44,7 @@ bool ClanManager::validClanBattleTime(UInt8 cbt)
 void ClanManager::resumeRobClanBattleData()
 {
 	ClanRobBattle * crb = static_cast<ClanRobBattle *>(clanManager.getRobBattleClan());
-	crb->resumeClanBattleData(TimeUtil::Now());	
+	crb->resumeClanBattleData(TimeUtil::Now());
 }
 
 void ClanManager::resumeRobClanBattleScore()
@@ -68,7 +68,7 @@ void ClanManager::process(UInt32 now, UInt32 today)
 		case 2:
 			_clanRobBattle->initClanBattle();
 			_clanBattle->startClanBattle();
-			_clanBattle->setClanBattlerStartData();	
+			_clanBattle->setClanBattlerStartData();
 			++ onBcIter;
 			break;
 		case 3:
@@ -97,7 +97,7 @@ void ClanManager::makeBattleClanInfo(Player * player, Stream& st, ClanBattle * c
 	{
 		if (clanBattle->isInBattling() || clanBattle->getOwnerClan() == player->getClan()) attack = 0x10;
 		if (clanBattle->isInAttacking()) attack |= 0x01;
-		st << clanBattle->getOwnerClanId() << clanBattle->getOwnerClanName() << clanBattle->getOwnerClanLev() << attack << clanBattle->getBattleTime() << clanBattle->getTotalAtkerNum() << clanBattle->getTotalDeferNum() << clanBattle->getWillGainBattlerAward(player->getClan());	
+		st << clanBattle->getOwnerClanId() << clanBattle->getOwnerClanName() << clanBattle->getOwnerClanLev() << attack << clanBattle->getBattleTime() << clanBattle->getTotalAtkerNum() << clanBattle->getTotalDeferNum() << clanBattle->getWillGainBattlerAward(player->getClan());
 	}
 	else
 	{
@@ -130,7 +130,7 @@ void ClanManager::listClans(Player * player, UInt16 start, UInt8 count)
 	{
 		if (count > 0 && start < 1)
 		{
-			makeBattleClanInfo(player, st, _clanRobBattle);	
+			makeBattleClanInfo(player, st, _clanRobBattle);
 		}
 	}
 
@@ -174,7 +174,7 @@ void ClanManager::listClans(Player * player, UInt16 start, UInt8 count)
 				makeBattleClanInfo(player, st, offset->second);
 		}
 	}
- 
+
 	if (start >= onlineClansSize)
 		start -= onlineClansSize;
 	else if (count > 0)
@@ -274,8 +274,8 @@ void ClanManager::reConfigClanBattle()
 // 	mat.insert(std::make_pair(clan->getClanBattle()->getGrabAchieve(), clan));
 // 	clan->retEnterPlsyersCount(cbs->count);
 // 	return true;
-// }	
-// 
+// }
+//
 //void ClanManager::allocRepo()
 //{
 //	UInt16 count[3] = {0};
@@ -318,7 +318,7 @@ void ClanManager::reConfigClanBattle()
 //	{
 //		SYSMSG_BROADCASTV(450, maxAchiveName[0]);
 //	}
-//	
+//
 //	DBLOG().PushUpdateData("insert into `clanbattle_players_count`(`server_id`, `enter_players1`, `enter_players2`, `enter_players3`, `max_achievement`, `created_at`) values(%u, %u, %u, %u, %u, %u)", cfg.serverLogId, cbs.count[0], cbs.count[1], cbs.count[2], maxAchieveTable.empty() ? 0 : maxAchieveTable.begin()->first, TimeUtil::Now());
 //}
 

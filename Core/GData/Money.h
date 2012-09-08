@@ -1,4 +1,4 @@
-
+﻿
 #ifndef MONEY_H_
 #define MONEY_H_
 
@@ -97,7 +97,7 @@ enum
 // 自动英雄岛
     AUTOHI,
 // 组队副本通关抽奖
-   TEAMCOPYAWARD_ROLL, 
+   TEAMCOPYAWARD_ROLL,
 // 装备洗练属性解封
    ATTR_ACTIVATE,
 

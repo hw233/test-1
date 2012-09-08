@@ -549,6 +549,14 @@ function onActivityCheck(tm)
           setRechargeActive3366(false, 16)
       end
 
+      if tm >= actTime502 and tm < actTime502_1 then
+          setRechargeActive(true, 16)
+          setNeedRechargeRank(true)
+      else
+          setRechargeActive(false, 16)
+          setNeedRechargeRank(false)
+      end
+
       setShuoShuo(true);
   end
 
@@ -592,7 +600,7 @@ function initActTime(y, m, d)
   -- 黄钻特权
   local  SerStartTm20= { ['year'] = 2012, ['month'] = 8, ['day'] = 24, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 游戏大厅特权
-  local  SerStartTm21= { ['year'] = 2012, ['month'] = 6, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm21= { ['year'] = 2012, ['month'] = 9, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   -- 充值返利（5/16-5/27）
   local  SerStartTm22= { ['year'] = 2012, ['month'] = 5, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -633,6 +641,7 @@ function initActTime(y, m, d)
   local SerStartTm500 = { ['year'] = 2012, ['month'] = 8, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 3366合作充值活动（8/30-8/31）
   local  SerStartTm501= { ['year'] = 2012, ['month'] = 8, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm502= { ['year'] = 2012, ['month'] = 9, ['day'] = 6, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   -- 繁体版
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -723,7 +732,7 @@ function initActTime(y, m, d)
   actTime44 = os.time(SerStartTm20) + 17 * 86400;
 
   actTime45 = os.time(SerStartTm21);
-  actTime46 = os.time(SerStartTm21) + 14 * 86400;
+  actTime46 = os.time(SerStartTm21) + 30 * 86400;
 
   actTime47 = os.time(SerStartTm22);
   actTime48 = os.time(SerStartTm22) + 12 * 86400;
@@ -812,6 +821,9 @@ function initActTime(y, m, d)
 
   actTime501 = os.time(SerStartTm501);
   actTime501_1 = os.time(SerStartTm501) + 2 * 86400;
+
+  actTime502 = os.time(SerStartTm502);
+  actTime502_1 = os.time(SerStartTm502) + 4 * 86400;
 
   -- 繁体版
   actTime101 = os.time(SerStartTm101);

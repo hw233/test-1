@@ -99,7 +99,7 @@ bool ClanBattleHold::delBattler(Player * player)
 	using namespace std::placeholders;
 	cbp_iter found = std::find_if(battlers.begin(), battlers.end(), std::bind(find_clan_battle_member, _1, player));
 	if (found != battlers.end())
-		return delBattler(*found);		
+		return delBattler(*found);
 	return false;
 }
 
@@ -276,7 +276,7 @@ void ClanBattle::overClanBattle(UInt8 succ)
 		SYSMSG_BROADCASTV(451, getOwnerClanName().c_str());
 		if (ownerClan != NULL && clanDynamicMsg != NULL)
 		{
-			Stream st;			
+			Stream st;
 			clanDynamicMsg->addCDMsg(3, getOwnerClanId(), thisDay, &st);
 			ownerClan->broadcast(st);
 		}
@@ -332,7 +332,7 @@ void ClanBattle::configClanBattleData(bool writedb)
 	{
 		guarderId = techs->getHoldCityGuarder();
 		if (guarderId == 0) guarderId = 4540;
-		//配置南门图腾 
+		//配置南门图腾
 		{
 			const GData::ClanAssistant * cat = GData::clanAssistants[guarderId];
 			if (cat == NULL)
@@ -407,7 +407,7 @@ bool ClanBattle::isClanHoldDestroy(UInt16 pos)
 }
 
 UInt8 ClanBattle::getClanEndurance(UInt16 pos)
-{	
+{
 	UInt16 hold = (pos & 0x00FF) - 1;
 	return hold >= 4 ? 0 : _holds[hold].endurance;
 }
@@ -477,7 +477,7 @@ void ClanBattle::listClanHoldPlayerInfo(Player * player, UInt16 pos)
 	for (; iter != _holds[hold].battlers.end() && usedCnt <= 0xFF; ++ iter)
 	{
 		cbPlayer = *iter;
-		st << cbPlayer->player->getName() << cbPlayer->player->GetClass() << getClanRelation(player, cbPlayer->player) << static_cast<UInt8>(cbPlayer->status == 1 ? 0 : 3) << cbPlayer->player->GetLev(); 
+		st << cbPlayer->player->getName() << cbPlayer->player->GetClass() << getClanRelation(player, cbPlayer->player) << static_cast<UInt8>(cbPlayer->status == 1 ? 0 : 3) << cbPlayer->player->GetLev();
 		++ usedCnt;
 	}
 	st.data<UInt8>(4+1) = usedCnt;
@@ -539,7 +539,7 @@ void ClanBattle::notifyClanBattleOverTime(Player * player)
 	if (player == NULL)
 		broadcastHold(st);
 	else
-		player->send(st);	
+		player->send(st);
 }
 
 void ClanBattle::notifyClanBattleWinData(Player * player)
@@ -1292,7 +1292,7 @@ void ClanBattle::recoveBattlePlayer(Player * player, UInt8 recoveT)
 bool ClanBattle::incAwardClanBattleVictor(Player * player)
 {
 	Clan * clan = player->getClan();
-	if (clan == NULL) 
+	if (clan == NULL)
 		return false;
 	Mutex::ScopedLock lk(clan->_mutex);
 	ClanMember * clanMember = clan->getClanMember(player);
@@ -1324,7 +1324,7 @@ bool ClanBattle::setAwardClanBattleVictor(ClanBattlePlayer * cbp, bool rand)
 		if (rnd(100) <= 30)
 		{
 			if (!incAwardClanBattleVictor(cbp->player))
-				return false;	
+				return false;
 			cbp->hasEnter |= 0x10;
 			DB5().PushUpdateData("UPDATE `clan_battler` SET `hasEnter` = %u WHERE `id` = %u", cbp->hasEnter, cbp->id);
 			SYSMSG(title, 444);
@@ -1338,7 +1338,7 @@ bool ClanBattle::setAwardClanBattleVictor(ClanBattlePlayer * cbp, bool rand)
 	{
 		if (!incAwardClanBattleVictor(cbp->player))
 			return false;
-		cbp->hasEnter |= 0x10;		
+		cbp->hasEnter |= 0x10;
 		DB5().PushUpdateData("UPDATE `clan_battler` SET `hasEnter` = %u WHERE `id` = %u", cbp->hasEnter, cbp->id);
 		SYSMSG(title, 444);
 		SYSMSG(content, 445);
@@ -1512,7 +1512,7 @@ UInt8 ClanCityBattle::getNextBattleTime()
 	case 2:
 		return _battleTime;
 	}
-	return 0; 
+	return 0;
 }
 
 bool ClanCityBattle::canClanBattleOpen()
@@ -1745,7 +1745,7 @@ bool ClanCityBattle::enterClanCity(Player * player)
 	notifyClanBattlePlayerCount();
 	notifyClanBattleWinData(player);
 	notifyClanHoldEndurance(player);
-	notifyClanHoldPlayerInfo(player, clanBattlePlayerEx->hold, clanBattlePlayerEx->status, 1);	
+	notifyClanHoldPlayerInfo(player, clanBattlePlayerEx->hold, clanBattlePlayerEx->status, 1);
 	DEBUG_LOG("Player [%s] enter clan [%u], side[%u]", player->getName().c_str(), _clan->getId(), clanBattlePlayerEx->side);
 
 	return true;
@@ -1805,7 +1805,7 @@ void ClanCityBattle::notifyBattleOverMailNotify(UInt8 succ)
 bool ClanCityBattle::setNextBattleTime(Player * player, UInt8 r)
 {
 	if (!_clan->existClanMember(player))
-		return false;	
+		return false;
 	if (getNextBattleTime() == r)
 		return false;
 	if (_clan->hasClanAuthority(player, 4) == 0)
@@ -1847,17 +1847,17 @@ UInt8 ClanCityBattle::getClanBattleStatus(UInt8 cbt, UInt32 now)
 }
 
 UInt32 ClanCityBattle::getOwnerClanId()
-{ 
-	return _clan->getId(); 
+{
+	return _clan->getId();
 }
 
 UInt8 ClanCityBattle::getOwnerClanLev()
 {
 	return _clan->getLev();
 }
-std::string ClanCityBattle::getOwnerClanName() 
+std::string ClanCityBattle::getOwnerClanName()
 {
-	return _clan->getName(); 
+	return _clan->getName();
 }
 
 ClanDynamicMsg * ClanCityBattle::getClanDynamicMsg()
@@ -1865,19 +1865,19 @@ ClanDynamicMsg * ClanCityBattle::getClanDynamicMsg()
 	return _clan->getClanDynamicMsg();
 }
 
-Clan * ClanCityBattle::getAllyClan() 
+Clan * ClanCityBattle::getAllyClan()
 {
-	return _clan->getAllyClan(); 
+	return _clan->getAllyClan();
 }
 
-UInt16 ClanCityBattle::getBattleAchieve() 
-{ 
-	return _clan->getClanTech()->getBattleAchieve(); 
+UInt16 ClanCityBattle::getBattleAchieve()
+{
+	return _clan->getClanTech()->getBattleAchieve();
 }
 
-UInt8 ClanCityBattle::getLev() 
+UInt8 ClanCityBattle::getLev()
 {
-	return _clan->getLev(); 
+	return _clan->getLev();
 }
 
 /* returns:
@@ -1906,7 +1906,7 @@ int ClanCityBattle::testClanBattleStatus(UInt32 now, UInt32 today)
 }
 
 void ClanCityBattle::configClanBattleCheck()
-{	
+{
 	_isInbattling = 0;
 	_nextBattleTime = _battleTime;
 	_grabAchieve = 0;
@@ -1969,7 +1969,7 @@ bool ClanCityBattle::attackPlayer2(ClanBattlePlayer * cbAtker, ClanBattlePlayer 
 		Stream st(REP::ATTACK_NPC);
 		st << static_cast<UInt8>(res ? 0 : 1) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
 		cbDefer->player->send(st);
-	}	
+	}
 
 	return true;
 }
@@ -2077,7 +2077,7 @@ bool ClanCityBattle::attackPlayer(Player * atker, std::string deferName)
 		atker->setBuffData(PLAYER_BUFF_ATTACKING, TimeUtil::Now() + bsim.getTurns() * 2);
 		cbDefer->player->regenAll();
 		cbAtker->wins ++;
-		cbAtker->serailWins ++;	
+		cbAtker->serailWins ++;
 		if (cbAtker->serailWins >= 3)
 		{
 			UInt8 tipsPos = (cbAtker->serailWins < 10 ? cbAtker->serailWins - 3 : 7);
@@ -2085,7 +2085,7 @@ bool ClanCityBattle::attackPlayer(Player * atker, std::string deferName)
 			SYSMSGV(tipsContent, Tips[tipsPos], cbAtker->player->getName().c_str(), getOwnerClanName().c_str());
 			Stream st(REP::CLAN_BATTLE);
 			st << static_cast<UInt8>(15) << static_cast<UInt8>(2) << tipsContent << Stream::eos;
-			broadcastHold(st);	
+			broadcastHold(st);
 		}
 		if (cbDefer->serailWins >= 3)
 		{
@@ -2145,7 +2145,7 @@ bool ClanCityBattle::attackPlayer(Player * atker, std::string deferName)
 			SYSMSGV(tipsContent, Tips[tipsPos], cbDefer->player->getName().c_str(), getOwnerClanName().c_str());
 			Stream st(REP::CLAN_BATTLE);
 			st << static_cast<UInt8>(15) << static_cast<UInt8>(2) << tipsContent << Stream::eos;
-			broadcastHold(st);	
+			broadcastHold(st);
 		}
 		if (cbAtker->serailWins >= 3)
 		{
@@ -2294,7 +2294,7 @@ bool ClanCityBattle::attackNpc(Player * atker, std::string npcName)
 			_holds[hold].endurance -= endurance;
 			switch (hold)
 			{
-			case 0:				
+			case 0:
 				cbAtker->grabAchieve ++;	//记录杀死宗族守卫者次数，最后结算
 				DB5().PushUpdateData("UPDATE `clan` SET `hallEdurance` = %u WHERE `id` = %u", _holds[hold].endurance, getOwnerClanId());
 				DB5().PushUpdateData("UPDATE `clan_battler` SET `grabAchieve` = %u WHERE `id` = %u",cbAtker->grabAchieve, cbAtker->id);
@@ -2320,7 +2320,7 @@ bool ClanCityBattle::attackNpc(Player * atker, std::string npcName)
 					overClanBattle(0);
 					clearClanBattle();
 				}
-				else 
+				else
 				{
 					if (hold == 1)
 					{
@@ -2378,7 +2378,7 @@ bool ClanCityBattle::attackNpc(Player * atker, std::string npcName)
 }
 
 bool ClanCityBattle::resumeClanBattleData(UInt32 now)
-{	
+{
 	UInt32 thisDay = TimeUtil::SharpDay(0, now);
 	bool resume = false, sameDay = false;
 	bool start = false;
@@ -2424,7 +2424,7 @@ bool ClanCityBattle::resumeClanBattleData(UInt32 now)
 			else
 			{
 				startClanBattle(thisDay);
-				setClanBattlerStartData(false);	
+				setClanBattlerStartData(false);
 			}
 			start = true;
 			break;
@@ -2521,7 +2521,7 @@ UInt32 ClanCityBattle::getBattleOverTime(UInt32 now)
 
 void ClanCityBattle::closingBattlerAward(UInt8 succ)
 {
-	if (succ != 0) 
+	if (succ != 0)
 		return;
 	UInt32 clanId;
 	float gainScore = 0.0f;
@@ -2610,7 +2610,7 @@ void ClanCityBattle::closingBattlerAward(UInt8 succ)
 bool ClanCityBattle::incEnterClanCount(Player * player)
 {
 	Clan * clan = player->getClan();
-	if (clan == NULL) 
+	if (clan == NULL)
 		return false;
 	Mutex::ScopedLock lk(clan->_mutex);
 	Clan::Members::iterator found = clan->find(player);
@@ -2742,7 +2742,7 @@ int ClanRobBattle::testClanBattleStatus(UInt32 now, UInt32 today)
 
 //TODO
 void ClanRobBattle::configClanBattleCheck()
-{	
+{
 	_isInbattling = 0;
 	_battleTime = _nextBattleTime = 39;
 	_grabAchieve = 0;
@@ -2852,7 +2852,7 @@ void ClanRobBattle::configClanBattleData(bool writedb)
 }
 
 bool ClanRobBattle::resumeClanBattleData(UInt32 now)
-{	
+{
 	UInt32 thisDay = TimeUtil::SharpDay(0, now);
 	bool sameDay = false;
 	bool start = false;
@@ -2893,7 +2893,7 @@ bool ClanRobBattle::resumeClanBattleData(UInt32 now)
 		else
 		{
 			startClanBattle(thisDay);
-			setClanBattlerStartData(false);	
+			setClanBattlerStartData(false);
 		}
 		start = true;
 		break;
@@ -2924,7 +2924,7 @@ bool ClanRobBattle::enterTotem(Player * player)
 	Clan * playerClan = player->getClan();
 	if (playerClan == NULL || playerClan != _clan)
 		return false;
-	if (!_clan->existClanMember(player))	
+	if (!_clan->existClanMember(player))
 		return false;
 	if (player->getClanBattle() != NULL)
 	{
@@ -3095,7 +3095,7 @@ bool ClanRobBattle::enterClanCity(Player * player)
 	{
 		clanBattlePlayerEx->id = IDGenerator::gClanBatterRecordIDGenerator.ID();
 		DB5().PushUpdateData("REPLACE INTO `clan_battler`(`id`, `battler`, `battlerLev`, `battleClanId`, `battleClanTime`, `battleHold`, `hasEnter`) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u, %u)", clanBattlePlayerEx->id, player->getId(),
-			player->GetLev(), 0, thisDay, clanBattlePlayerEx->hold, clanBattlePlayerEx->hasEnter);	
+			player->GetLev(), 0, thisDay, clanBattlePlayerEx->hold, clanBattlePlayerEx->hasEnter);
 	}
 	DB5().PushUpdateData("UPDATE `clan_player` SET `enterCount` = %u  WHERE `playerId` = %"I64_FMT"u ", clanMember->enterCount, player->getId());
 	notifyBattleScore(player);
@@ -3238,7 +3238,7 @@ bool ClanRobBattle::attackPlayer(Player * atker,  std::string deferName)
 		atker->setBuffData(PLAYER_BUFF_ATTACKING, TimeUtil::Now() + bsim.getTurns() * 2);
 		cbDefer->player->regenAll();
 		cbAtker->wins ++;
-		cbAtker->serailWins ++;	
+		cbAtker->serailWins ++;
 		if (cbAtker->serailWins >= 3)
 		{
 			UInt8 tipsPos = (cbAtker->serailWins < 10 ? cbAtker->serailWins - 3 : 7);
@@ -3246,7 +3246,7 @@ bool ClanRobBattle::attackPlayer(Player * atker,  std::string deferName)
 			SYSMSGV(tipsContent, Tips[tipsPos], cbAtker->player->getName().c_str(), getOwnerClanName().c_str());
 			Stream st(REP::CLAN_BATTLE);
 			st << static_cast<UInt8>(15) << static_cast<UInt8>(2) << tipsContent << Stream::eos;
-			broadcastHold(st);	
+			broadcastHold(st);
 		}
 		if (cbDefer->serailWins >= 3)
 		{
@@ -3306,7 +3306,7 @@ bool ClanRobBattle::attackPlayer(Player * atker,  std::string deferName)
 			SYSMSGV(tipsContent, Tips[tipsPos], cbDefer->player->getName().c_str(), getOwnerClanName().c_str());
 			Stream st(REP::CLAN_BATTLE);
 			st << static_cast<UInt8>(15) << static_cast<UInt8>(2) << tipsContent << Stream::eos;
-			broadcastHold(st);	
+			broadcastHold(st);
 		}
 		if (cbAtker->serailWins >= 3)
 		{
@@ -3411,7 +3411,7 @@ bool ClanRobBattle::attackPlayer2(ClanBattlePlayer * cbAtker, ClanBattlePlayer *
 		Stream st(REP::ATTACK_NPC);
 		st << static_cast<UInt8>(res ? 0 : 1) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
 		cbDefer->player->send(st);
-	}	
+	}
 
 	return true;
 }
@@ -3501,7 +3501,7 @@ bool ClanRobBattle::attackNpc(Player * atker, std::string npcName)
 			_holds[hold].endurance -= endurance;
 			switch (hold)
 			{
-			case 0:				
+			case 0:
 				//cbAtker->grabAchieve ++;	//记录杀死宗族守卫者次数，最后结算
 				DB5().PushUpdateData("UPDATE `clan` SET `hallEdurance` = %u WHERE `id` = %u", _holds[hold].endurance, getOwnerClanId());
 				//DB5().PushUpdateData("UPDATE `clan_battler` SET `grabAchieve` = %u WHERE `id` = %u",cbAtker->grabAchieve, cbAtker->id);
@@ -3528,7 +3528,7 @@ bool ClanRobBattle::attackNpc(Player * atker, std::string npcName)
 					switchBattleClanOwner();
 					clearClanBattle();
 				}
-				else 
+				else
 				{
 					if (hold == 1)
 					{
@@ -3708,7 +3708,7 @@ UInt8 ClanRobBattle::getBattlerLev()
 }
 
 void ClanRobBattle::calcBattleScore(Player * player, UInt32 score)
-{	
+{
 	Clan * clan = player->getClan();
 	if (clan == NULL) return;
 	_sst[clan] += score;
@@ -3719,7 +3719,7 @@ void ClanRobBattle::calcBattleScore(Player * player, UInt32 score)
 		if (it->second == clan)
 		{
 			_rowSst.erase(it);
-			_rowSst.insert(std::make_pair(_sst[clan], clan));	
+			_rowSst.insert(std::make_pair(_sst[clan], clan));
 			change = true;
 			break;
 		}
@@ -3740,7 +3740,7 @@ void ClanRobBattle::calcBattleScore(Player * player, UInt32 score)
 		}
 	}
 	if (change)
-		notifyBattleScore();	
+		notifyBattleScore();
 	notifySelfBattleScore(clan, _sst[clan]);
 }
 
@@ -3784,7 +3784,7 @@ void ClanRobBattle::notifyBattleScore(Player * player)
 	for (; offset != _rowSst.end(); ++ offset)
 	{
 		st << offset->second->getName() << offset->first;
-	}	
+	}
 	st << Stream::eos;
 	player == NULL ? broadcastHold(st) : player->send(st);
 }
@@ -3840,7 +3840,7 @@ static bool find_assist(GData::NpcGroup * npc, UInt32 id)
 void ClanRobBattle::displayHiddenMonster(UInt16 hold, bool notify)
 {
 	//hold == 1: 南门 hold == 2 ： 北门
-	//klass == 1: 诸葛亮 klass == 2: 于谦	
+	//klass == 1: 诸葛亮 klass == 2: 于谦
 	static const UInt32 assistId[2] = { 4930, 4931 };
 	static const float bound[2] = { 50.0f, 30.0f };
 	using namespace std::placeholders;
@@ -4376,7 +4376,7 @@ void ClanRobBattle::switchBattleClanOwner()
 		st << static_cast<UInt8>(20) << clan->getId() << clan->getName() << Stream::eos;
 		broadcastHold(st);
 	}
-	_status = 0xFF;	//关闭城池	
+	_status = 0xFF;	//关闭城池
 }
 
 void ClanRobBattle::update(UInt32 now)

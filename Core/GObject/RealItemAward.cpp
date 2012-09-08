@@ -59,7 +59,7 @@ void RealItemAwardMgr::getAward(Player* pl, UInt32 id)
     }
     if(id >=3 && id <= 32)
     {
-        num = 10; 
+        num = 10;
         SYSMSG(title, 2368);
         SYSMSGV(content, 2369, num, award.card_no.c_str(), award.card_psw.c_str());
         Mail * mail = pl->GetMailBox()->newMail(NULL, 0x01, title, content);

@@ -29,7 +29,7 @@ public:
         try
         {
             m_Log = new Log(1, GetLogName());
-        } catch (Exception& e)
+        } catch (Exception&)
         {
         }
 

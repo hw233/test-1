@@ -20,8 +20,8 @@ namespace GObject
 
 namespace GData
 {
-    class SkillBase;
-    class SkillItem;
+    struct SkillBase;
+    struct SkillItem;
 }
 
 namespace Battle

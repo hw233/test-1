@@ -1,4 +1,4 @@
-#ifndef  _ACTIVITYMGR_H
+﻿#ifndef  _ACTIVITYMGR_H
 #define  _ACTIVITYMGR_H
 class Stream;
 namespace GObject
@@ -21,7 +21,7 @@ namespace GObject
         AtyCountryWar,//阵营战
         AtyClanWar,   //帮派战
         AtyAthletics, //斗剑
-        AtySignIn,    //每日签到 
+        AtySignIn,    //每日签到
         AtyMaxFlag,      //标志记录的个数
 
         AtyBegin      = 99,
@@ -40,7 +40,7 @@ namespace GObject
         AtyEnd,
     };
 
-          
+
     struct ActivityItem
     {
         UInt32  overTime;//结束时间
@@ -48,7 +48,7 @@ namespace GObject
         UInt32  point;   //活跃点数
         UInt32  award;   //领取的奖励
         UInt32  scores;  //玩家签到总积分
-        UInt32  propsID; //刷新出来的道具ID，待兑换 
+        UInt32  propsID; //刷新出来的道具ID，待兑换
         /*
         UInt8   practice;//修炼次数
         UInt8   tripodFire;//点火次数
@@ -71,11 +71,11 @@ namespace GObject
                 awardID = aid;
             if(ot)
                 overTime = ot;
-            if(s) 
+            if(s)
                 scores = s;
             point = 10;
             propsID = 29;
-            if(pid) 
+            if(pid)
                 propsID = pid;
         }
     };
@@ -122,7 +122,7 @@ namespace GObject
            // only in script func
            void AddPoint(UInt32 v);
            UInt32 GetPoint(){return _item.point;}
-           UInt8  GetFlag(UInt32 idx);  
+           UInt8  GetFlag(UInt32 idx);
 
            /**
             * @brief 领取奖励后置领取位
@@ -155,15 +155,15 @@ namespace GObject
             * @brief s->c  刷新列表
             */
            void ActivityList(UInt8 type);
-            
+
            /**
-            * @brief 增加签到积分 
+            * @brief 增加签到积分
             */
             void AddScores(UInt32 v);
             void SubScores(UInt32 v);
             UInt32 GetScores() { return _item.scores;}
             UInt32 GetPropsID() { return _item.propsID;}
-            void SetPropsID(UInt32 id = 0); 
+            void SetPropsID(UInt32 id = 0);
     };
 
 }

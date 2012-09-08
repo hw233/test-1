@@ -1,4 +1,4 @@
-
+﻿
 #ifndef _VAR_H_
 #define _VAR_H_
 
@@ -16,24 +16,24 @@ namespace GObject
         CYCLE_WEEK =    4,  //周
         CYCLE_MONTH =   5,  //月
         CYCLE_YEAR =    6,  //年
-        
+
         CYCLE_MAX,
     };
 
 
     enum VarID
     {
-        VAR_INVALID = 0,    //??Ч??��
-        VAR_SINGLE_CHOPSTICKS = 1, //???????Ϳ???
-        VAR_SENGYI = 2,     // ɮ??
-        VAR_APRON = 3,      // ?Ƕ?
-        VAR_TGDT = 4,       // ?ж???????ʱ??
-        VAR_TGDCNT = 5,     // ?ж???��??????3Сʱ????
-        VAR_ATOFM = 6,     // ?Զ???ͼid
-        VAR_ICEMAN = 7,     // ѩ??
-        VAR_BOOT = 8,     // ʥ??ѥ
+        VAR_INVALID = 0,    //无效变量
+        VAR_SINGLE_CHOPSTICKS = 1, //光棍节送筷子
+        VAR_SENGYI = 2,     //僧衣
+        VAR_APRON = 3,      //肚兜
+        VAR_TGDT = 4,       //感恩节在线时间
+        VAR_TGDCNT = 5,     //感恩节连续在线3小时次数
+        VAR_ATOFM = 6,     //自动阵图id
+        VAR_ICEMAN = 7,     //雪人
+        VAR_BOOT = 8,     //圣诞靴
         VAR_TODAY_ONLINE = 9,     // time -- online today
-        VAR_KEYPACK1 = 10,  // KEY????
+        VAR_KEYPACK1 = 10,  // KEY礼包
         VAR_KEYPACK2 = 11,
         VAR_KEYPACK3 = 12,
         VAR_KEYPACK4 = 13,
@@ -41,17 +41,17 @@ namespace GObject
         VAR_KEYPACK6 = 15,
         VAR_KEYPACK7 = 16,
         VAR_KEYPACK8 = 17,
-       
+
         VAR_FAIL_ENCH = 20,  // fail to enchat equip
         VAR_SPLIT_EQUIP = 21 , //split equip times
         VAR_SPLIT_THRUMP = 22,//split thrump times
-        VAR_BATTLE_MISS = 23, //???????
+        VAR_BATTLE_MISS = 23, //靠靠靠
         VAR_BATTLE_CS  = 24,  //
-        VAR_BATTLE_PR = 25,   //???????
-        VAR_BATTLE_FJ = 26,  //???????
-        VAR_BATTLE_SKILL_DMG = 27, //???????
-        VAR_BATTLE_PEERLESS_DMG = 28,//????????
-        
+        VAR_BATTLE_PR = 25,   //靠靠靠
+        VAR_BATTLE_FJ = 26,  //靠靠靠
+        VAR_BATTLE_SKILL_DMG = 27, //靠靠靠
+        VAR_BATTLE_PEERLESS_DMG = 28,//靠靠靠靠
+
         VAR_COUNTRY_BATTLE_WIN =29,
         VAR_ATHLETICS_WIN = 30 ,
 
@@ -66,7 +66,7 @@ namespace GObject
         VAR_YELLOW_THRUMP_NUM= 38,
 
         VAR_AWARD_3366 = 39,
-        
+
         VAR_CLANBATTLE_HONOUR = 40, //帮派战今日贡献
         VAR_CLAN_WEAL = 41,         //今日领取的福利数
 
@@ -209,7 +209,7 @@ namespace GObject
     m_VarTypes[Var] = Type;
 
 
-    /** 
+    /**
      *@brief 变量系统
      */
     class VarSystem
@@ -262,7 +262,7 @@ namespace GObject
             REGISTER_VAR(VAR_PURPLE_EQUIP_NUM, CYCLE_NONE);
             REGISTER_VAR(VAR_YELLOW_EQUIP_NUM, CYCLE_NONE);
             REGISTER_VAR(VAR_YELLOW_THRUMP_NUM, CYCLE_NONE);
-            
+
             REGISTER_VAR(VAR_AWARD_3366, CYCLE_DAY);
             REGISTER_VAR(VAR_AWARD_QPLUS, CYCLE_DAY);
             REGISTER_VAR(VAR_AWARD_SSDT_1, CYCLE_DAY);
@@ -388,7 +388,7 @@ namespace GObject
             REGISTER_VAR(VAR_QQVIP_CNT, CYCLE_DAY);
             REGISTER_VAR(VAR_BDIAMOND_CMD, CYCLE_DAY);
         }
-        
+
         UInt32 GetVar(UInt32 id, UInt32 now = 0);
         void SetVar(UInt32 id, UInt32 data, UInt32 now = 0);
         void AddVar(UInt32 id, UInt32 data, UInt32 now = 0);

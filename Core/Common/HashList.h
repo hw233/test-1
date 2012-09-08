@@ -221,7 +221,7 @@ protected:
 	{
 		if(_count + (_count >> 2) >= _capacity)
 		{
-			static int stepSize[] = 
+			static int stepSize[] =
 			{
 				17,				37,				79,				163,			331,
 				673,			1361,			2729,			5471,			10949,

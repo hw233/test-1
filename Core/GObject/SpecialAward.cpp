@@ -78,9 +78,9 @@ void SpecialAward::AddSpecialAwardList(UInt8 type, Player *player)
 			return;
 	}
 
-	UInt16 Award = 0;		
+	UInt16 Award = 0;
 	m_SpecialAward[type].push_back(player);
-	
+
 	switch(type)
 	{
 		case 0:
@@ -102,7 +102,7 @@ void SpecialAward::AddSpecialAwardList(UInt8 type, Player *player)
 }
 
 void SpecialAward::luckydrawAward(Player * player)
-{	
+{
 	if(!World::_actAvailable1)
 		return;
 	UInt8 size = m_SpecialAward[3].size();

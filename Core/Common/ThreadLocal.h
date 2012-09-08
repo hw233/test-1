@@ -28,16 +28,16 @@ public:
 		_value()
 	{
 	}
-	
+
 	~TLSSlot()
 	{
 	}
-	
+
 	C& value()
 	{
 		return _value;
 	}
-	
+
 private:
 	TLSSlot(const TLSSlot&);
 	TLSSlot& operator = (const TLSSlot&);
@@ -54,24 +54,24 @@ class  ThreadLocalStorage
 public:
 	ThreadLocalStorage();
 		/// Creates the TLS.
-		
+
 	~ThreadLocalStorage();
 		/// Deletes the TLS.
 
 	TLSAbstractSlot*& get(const void* key);
 		/// Returns the slot for the given key.
-		
+
 	static ThreadLocalStorage& current();
 		/// Returns the TLS object for the current thread
 		/// (which may also be the main thread).
-		
+
 	static void clear();
 		/// Clears the current thread's TLS object.
 		/// Does nothing in the main thread.
-	
+
 private:
 	typedef std::map<const void*, TLSAbstractSlot*> TLSMap;
-	
+
 	TLSMap _map;
 
 	friend class Thread;
@@ -99,16 +99,16 @@ public:
 	ThreadLocal()
 	{
 	}
-	
+
 	~ThreadLocal()
 	{
 	}
-	
+
 	C* operator -> ()
 	{
 		return &get();
 	}
-	
+
 	C& operator * ()
 		/// "Dereferences" the smart pointer and returns a reference
 		/// to the underlying data object. The reference can be used
@@ -125,7 +125,7 @@ public:
 		if (!p) p = new Slot;
 		return static_cast<Slot*>(p)->value();
 	}
-	
+
 private:
 	ThreadLocal(const ThreadLocal&);
 	ThreadLocal& operator = (const ThreadLocal&);

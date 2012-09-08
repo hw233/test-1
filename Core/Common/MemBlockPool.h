@@ -1,4 +1,4 @@
-#ifndef _MEMBLOCK_POOL_H_
+﻿#ifndef _MEMBLOCK_POOL_H_
 #define _MEMBLOCK_POOL_H_
 
 #include <memory.h>

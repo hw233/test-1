@@ -1,4 +1,4 @@
-#ifndef _CLAN_RANK_BATTLE_H_
+﻿#ifndef _CLAN_RANK_BATTLE_H_
 #define _CLAN_RANK_BATTLE_H_
 
 #include <set>
@@ -66,7 +66,7 @@ namespace GObject
      */
     typedef MailPackage::MailItem ClanBattleReward;
 
-    
+
     /**
      *@brief 帮会战技能
      */
@@ -142,7 +142,7 @@ namespace GObject
          */
         bool IsEnd() const { return m_bEnd; }
         /**
-         *@brief 结算 
+         *@brief 结算
          */
         void End(UInt32 extScore1, UInt32 extScore2);
         /**
@@ -165,7 +165,7 @@ namespace GObject
          *@brief 获取连胜玩家数
          */
         UInt32 GetWinStateNum() const;
-        
+
 
         void FillPlayers(Stream& stream, UInt32 clan);
         void FillPlayer(Stream& stream, Player* player);
@@ -240,7 +240,7 @@ namespace GObject
          *@brief 定时处理
          */
         void Process(UInt32 now);
-        
+
         /**
          *@brief 开始结束
          */
@@ -316,7 +316,7 @@ namespace GObject
         UInt32 m_Winner;
     };
 
-     
+
     /**
      *@brief 帮会排名战
      */
@@ -479,7 +479,7 @@ namespace GObject
 
         bool m_singupNotified;
         bool m_battleNotified;
-        
+
         //参加战斗的帮会列表
         ClanMap m_Clans;
         //当前帮会积分排名
@@ -487,7 +487,7 @@ namespace GObject
         //在据点上的玩家列表
         PlayerSet m_InplacePlayers;
 
-        
+
         //播报报名公告倒计时
         UInt32 m_SignupCountDown;
         //战斗场次

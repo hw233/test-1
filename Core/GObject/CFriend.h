@@ -1,4 +1,4 @@
-
+﻿
 #ifndef CFRIEND_H_
 #define CFRIEND_H_
 
