@@ -1,4 +1,4 @@
-﻿#include "TownDeamon.h"
+#include "TownDeamon.h"
 #include "Player.h"
 #include "Common/Stream.h"
 #include "MsgID.h"

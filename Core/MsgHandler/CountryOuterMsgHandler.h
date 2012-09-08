@@ -4511,6 +4511,7 @@ void OnNewRelationReq( GameMsgHdr& hdr, const void* data)
     pl->send(st);
 }
 
+#if 0
 void OnTownDeamonReq( GameMsgHdr& hdr, const void* data)
 {
 	MSG_QUERY_PLAYER(player);
@@ -4606,6 +4607,7 @@ void OnTownDeamonReq( GameMsgHdr& hdr, const void* data)
         return;
     }
 }
+#endif
 
 void OnGetHeroMemoAward( GameMsgHdr& hdr, GetHeroMemoAward& req)
 {
