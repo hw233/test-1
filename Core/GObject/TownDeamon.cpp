@@ -175,10 +175,12 @@ void TownDeamon::showTown(Player* pl)
 
 void TownDeamon::showLevelTown(Player* pl, UInt16 level)
 {
-    if(level > m_Monsters.size() || level == 0)
+    if(level == 0)
     {
         return;
     }
+    if(level > m_Monsters.size())
+        level = m_Monsters.size();
 
     Int16 idx = level - 1;
     Player* pl2 = m_Monsters[idx].player;
