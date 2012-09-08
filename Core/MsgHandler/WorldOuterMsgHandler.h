@@ -30,6 +30,7 @@
 #include "Common/BinaryReader.h"
 #include "GData/Money.h"
 #include "GObject/TownDeamon.h"
+#include "GObject/ClanRankBattle.h"
 
 #ifdef _ARENA_SERVER
 #include "GObject/GameServer.h"
@@ -2133,6 +2134,10 @@ void OnTownDeamonReq( GameMsgHdr& hdr, const void* data)
     case 0x05:
         {
             if(!player->hasChecked())
+                return;
+            if(player->hasFlag(GObject::Player::InHeroIsland))
+                return;
+            if(GObject::ClanRankBattleMgr::Instance().IsInBattle(player->getClan()))
                 return;
 
             UInt16 level = 0;
