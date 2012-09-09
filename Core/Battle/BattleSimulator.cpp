@@ -173,6 +173,7 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, GObj
         skillStrengthenTable[GData::TYPE_ABSORB_ATTACK] = &BattleSimulator::doSkillStrengthen_absorbAtk;
         skillStrengthenTable[GData::TYPE_ADDMAGICATK] = &BattleSimulator::doSkillStrengthen_addMagicAtk;
         skillStrengthenTable[GData::TYPE_ABSORB_MAGATK] = &BattleSimulator::doSkillStrengthen_absorbMagAtk;
+        skillStrengthenTable[GData::TYPE_BUF_THERAPY] = &BattleSimulator::doSkillStrengthen_absorbMagAtk;
     }
 }
 
@@ -3319,12 +3320,13 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 ef = ss->getEffect(GData::ON_DAMAGE, GData::TYPE_DEBUF_THERAPY);
             if(ef)
             {
+                BattleObject** this_side = _objs[target_side];
                 for(int i = 0; i < 25; ++ i)
                 {
                     if(dmgCount[i] < 3)
                         continue;
 
-                    BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][i]);
+                    BattleFighter* bo = static_cast<BattleFighter*>(this_side[i]);
                     if(bo->getHP() == 0 && bo->getTherapyDecLast() != 0)
                         continue;
 
@@ -7564,6 +7566,15 @@ bool BattleSimulator::doSkillStrengthen_absorbAtk(BattleFighter* bf, const GData
     // bf出手的人，bo被攻击者
     float fAddAttack = bo->_attack*ef->value/100;
     SetSpecialAttrChange(bf, skill, e_stAtk, ef->last, fAddAttack, active, scList, scCount);
+    return true;
+}
+
+bool BattleSimulator::doSkillStrengthen_bufTherapy( BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active )
+{
+    if(!bf || !ef || bf->getHP() <= 0)
+        return false;
+
+    bf->setTherapyDec(ef->value, ef->last);
     return true;
 }
 

@@ -326,7 +326,7 @@ private:
     bool doSkillStrengthen_absorbAtk(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active);
     bool doSkillStrengthen_addMagicAtk(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active);
     bool doSkillStrengthen_absorbMagAtk(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active);
-
+    bool doSkillStrengthen_bufTherapy(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active);
 
     void SetSpecialAttrChange(BattleFighter* bf, const GData::SkillBase* skill, StatusType eType, Int16 nLast, float value, bool bOffset, StatusChange* scList, size_t& scCount);
     void ReduceSpecialAttrLast(BattleFighter* bf, StatusType eType, Int16 nReduce, StatusChange* scList, size_t& scCount);
