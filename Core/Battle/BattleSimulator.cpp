@@ -4021,6 +4021,31 @@ bool BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GD
                 if(value < 0)
                     ModifySingleAttackValue_SkillStrengthen(bf, skill, value, false);
                 setStatusChange(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill, e_stAura, value, skill->last, scList, scCount, activeFlag);
+                if(value < 0)
+                {
+                    GData::SkillStrengthenBase* ss = bf->getSkillStrengthen(SKILL_ID(skill->getId()));
+                    if(ss)
+                    {
+                        const GData::SkillStrengthenEffect* ef = ss->getEffect(GData::ON_ATTACKSINGLE, GData::TYPE_AURA_RETURN);
+                        if(ef)
+                        {
+                            BattleObject** this_side_obj = _objs[bf->getSide()];
+                            std::vector<UInt8> bf_company;
+                            bf_company.reserve(25);
+                            for(UInt8 i=0; i<25; ++i)
+                            {
+                                if(i == bf->getPos())
+                                    continue;
+                                BattleFighter* fighter = static_cast<BattleFighter*>(this_side_obj[i]);
+                                if(fighter && fighter->getHP()>0)
+                                    bf_company.push_back(i);
+                            }
+                            value = -value*ef->value/100/bf_company.size();
+                            for(auto p=bf_company.begin(),e=bf_company.end(); p!=e; ++p)
+                                setStatusChange(bf, bf->getSide(), *p, cnt, skill, e_stAura, value, skill->last, scList, scCount, activeFlag);
+                        }
+                    }
+                }
             }
         }
     }
@@ -4059,6 +4084,8 @@ bool BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GD
         }
         else
         {
+            if(value < 0)
+                ModifySingleAttackValue_SkillStrengthen(bf, skill, value, true);
             setStatusChange(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill, e_stDef, value, skill->last, scList, scCount, activeFlag);
         }
     }
@@ -4097,6 +4124,8 @@ bool BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GD
         }
         else
         {
+            if(value < 0)
+                ModifySingleAttackValue_SkillStrengthen(bf, skill, value, true);
             setStatusChange(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill, e_stMagDef, value, skill->last, scList, scCount, activeFlag);
         }
     }
