@@ -490,6 +490,9 @@ private:
     float _therapy_dec;
     UInt8 _therapy_dec_last;
 
+    float _aura_dec;
+    UInt8 _aura_dec_last;
+
     float _bleed1, _bleed2, _bleed3;
     UInt8 _bleed1_last, _bleed2_last, _bleed3_last;
     UInt8 _immune2;
@@ -565,6 +568,10 @@ public:
     inline UInt8& getTherapyDecLast() { return _therapy_dec_last; }
     inline float getTherapyDec() { return _therapy_dec; }
     inline void setTherapyDec(float value, UInt8 last) { _therapy_dec = value; _therapy_dec_last = last; }
+
+    inline UInt8& getAuraDecLast() { return _aura_dec_last; }
+    inline float getAuraDec() { return _aura_dec; }
+    inline void setAuraDec(float value, UInt8 last) { _aura_dec = value; _aura_dec_last = last; }
 
     inline UInt8& getBleed1Last() { return _bleed1_last; }
     inline float getBleed1() { return _bleed1; }

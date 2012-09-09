@@ -104,7 +104,8 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, cons
         skillStrengthenTable[GData::TYPE_ABSORB_ATTACK] = &BattleSimulator::doSkillStrengthen_absorbAtk;
         skillStrengthenTable[GData::TYPE_ADDMAGICATK] = &BattleSimulator::doSkillStrengthen_addMagicAtk;
         skillStrengthenTable[GData::TYPE_ABSORB_MAGATK] = &BattleSimulator::doSkillStrengthen_absorbMagAtk;
-        skillStrengthenTable[GData::TYPE_BUF_THERAPY] = &BattleSimulator::doSkillStrengthen_absorbMagAtk;
+        skillStrengthenTable[GData::TYPE_BUF_THERAPY] = &BattleSimulator::doSkillStrengthen_bufTherapy;
+        skillStrengthenTable[GData::TYPE_DEBUF_AURA] = &BattleSimulator::doSkillStrengthen_DebufAura;
     }
 }
 
@@ -174,7 +175,8 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, GObj
         skillStrengthenTable[GData::TYPE_ABSORB_ATTACK] = &BattleSimulator::doSkillStrengthen_absorbAtk;
         skillStrengthenTable[GData::TYPE_ADDMAGICATK] = &BattleSimulator::doSkillStrengthen_addMagicAtk;
         skillStrengthenTable[GData::TYPE_ABSORB_MAGATK] = &BattleSimulator::doSkillStrengthen_absorbMagAtk;
-        skillStrengthenTable[GData::TYPE_BUF_THERAPY] = &BattleSimulator::doSkillStrengthen_absorbMagAtk;
+        skillStrengthenTable[GData::TYPE_BUF_THERAPY] = &BattleSimulator::doSkillStrengthen_bufTherapy;
+        skillStrengthenTable[GData::TYPE_DEBUF_AURA] = &BattleSimulator::doSkillStrengthen_DebufAura;
     }
 }
 
@@ -1197,8 +1199,10 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
 
             if(bf->getSide() != area_target->getSide() && counter_deny >= 0 && (!skill || skill->cond == GData::SKILL_ACTIVE))
             {
-                setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAura, 25 + bf->getSoulExtraAura(), 0, scList, scCount, false);
-                setStatusChange(bf, area_target->getSide(), area_target->getPos(), 1, 0, e_stAura, 25 + area_target->getSoulExtraAura(), 0, scList, scCount, true);
+                float aura_add = 25+bf->getSoulExtraAura()-calcAuraDebuf(bf, defList, defCount);
+                setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAura, aura_add, 0, scList, scCount, false);
+                aura_add = 25+area_target->getSoulExtraAura()-calcAuraDebuf(area_target, defList, defCount);
+                setStatusChange(bf, area_target->getSide(), area_target->getPos(), 1, 0, e_stAura, aura_add, 0, scList, scCount, true);
             }
 
 			if(area_target->getHP() == 0)
@@ -7570,6 +7574,17 @@ bool BattleSimulator::doSkillStrengthen_absorbAtk(BattleFighter* bf, const GData
     return true;
 }
 
+
+bool BattleSimulator::doSkillStrengthen_DebufAura( BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active )
+{
+    BattleFighter* bo = static_cast<BattleFighter *>(_objs[target_side][target_pos]);
+    if(!bo || !bf || !ef || !skill || bf->getHP() == 0)
+        return false;
+
+    bo->setAuraDec(ef->value, ef->last);
+    return true;
+}
+
 bool BattleSimulator::doSkillStrengthen_bufTherapy( BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active )
 {
     if(!bf || !ef || bf->getHP() <= 0)
@@ -8238,5 +8253,23 @@ float BattleSimulator::calcTherapyDebuf(BattleFighter* bo, DefStatus* defList, s
     return factor;
 }
 
+float BattleSimulator::calcAuraDebuf( BattleFighter* bo, DefStatus* defList, size_t& defCount )
+{
+    float factor = bo->getAuraDec();
+    UInt8& last = bo->getAuraDecLast();
+    if(last > 0)
+    {
+        -- last;
+        if(last == 0)
+            bo->setAuraDec(0, 0);
+        defList[defCount].damType = e_unneishan;
+        defList[defCount].damage = 0;
+        defList[defCount].pos = bo->getPos() + 25;
+        defList[defCount].leftHP = bo->getHP();
+        defCount ++;
+    }
+
+    return factor;
+}
 
 }

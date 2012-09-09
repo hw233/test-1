@@ -327,7 +327,7 @@ private:
     bool doSkillStrengthen_addMagicAtk(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active);
     bool doSkillStrengthen_absorbMagAtk(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active);
     bool doSkillStrengthen_bufTherapy(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active);
-
+    bool doSkillStrengthen_DebufAura( BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active );
     void SetSpecialAttrChange(BattleFighter* bf, const GData::SkillBase* skill, StatusType eType, Int16 nLast, float value, bool bOffset, StatusChange* scList, size_t& scCount);
     void ReduceSpecialAttrLast(BattleFighter* bf, StatusType eType, Int16 nReduce, StatusChange* scList, size_t& scCount);
     // 元磁神雷使用后调用的接口
@@ -344,6 +344,7 @@ private:
 
     bool doDeBufAttack(BattleFighter* bf);
     float calcTherapyDebuf(BattleFighter* bo, DefStatus* defList, size_t& defCount);
+    float calcAuraDebuf(BattleFighter* bo, DefStatus* defList, size_t& defCount);
 private:
 	int _id, _winner, _turns;
 	UInt8 _position;
