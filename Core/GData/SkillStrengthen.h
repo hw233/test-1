@@ -56,6 +56,7 @@ enum
     TYPE_HAOTIANJING,  // 借用一下昊天镜的名字，这个状态其实就是升自己命中，降对方反击
     TYPE_RANDOM_BLEED, // 随机一人流血
     TYPE_AURA_RETURN, //减少的灵气X%平均附加给同伴（除了自己）
+    TYPE_ATK_RETURN, //减少的攻击，转换X%给己方攻击最高的同伴，持续一次（last）攻击（主动出手的攻击）
     TYPE_MAX,
 };
 

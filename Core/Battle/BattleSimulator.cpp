@@ -4026,7 +4026,7 @@ bool BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GD
                     GData::SkillStrengthenBase* ss = bf->getSkillStrengthen(SKILL_ID(skill->getId()));
                     if(ss)
                     {
-                        const GData::SkillStrengthenEffect* ef = ss->getEffect(GData::ON_ATTACKSINGLE, GData::TYPE_AURA_RETURN);
+                        const GData::SkillStrengthenEffect* ef = ss->getEffect(GData::ON_SKILLUSED, GData::TYPE_AURA_RETURN);
                         if(ef)
                         {
                             BattleObject** this_side_obj = _objs[bf->getSide()];
@@ -4067,6 +4067,31 @@ bool BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GD
         else
         {
             setStatusChange(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill, e_stAtk, value, skill->last, scList, scCount, activeFlag);
+            if(value < 0)
+            {
+                GData::SkillStrengthenBase* ss = bf->getSkillStrengthen(SKILL_ID(skill->getId()));
+                if(ss)
+                {
+                    const GData::SkillStrengthenEffect* ef = ss->getEffect(GData::ON_SKILLUSED, GData::TYPE_ATK_RETURN);
+                    if(ef)
+                    {
+                        BattleObject** this_side_obj = _objs[bf->getSide()];
+                        float maxatk = 0;
+                        UInt8 maxatk_pos = 0;
+                        for(UInt8 i=0; i<25; ++i)
+                        {
+                            BattleFighter* fighter = static_cast<BattleFighter*>(this_side_obj[i]);
+                            if(fighter && fighter->getAttack()>maxatk)
+                            {
+                                maxatk = fighter->getAttack();
+                                maxatk_pos = i;
+                            }
+                        }
+                        value = -value*ef->value/100;
+                        setStatusChange(bf, bf->getSide(), maxatk_pos, cnt, skill, e_stAtk, value, 1, scList, scCount, activeFlag);
+                    }
+                }
+            }
         }
     }
 
