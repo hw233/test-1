@@ -190,6 +190,8 @@ GMHandler::GMHandler()
     Reg(2, "idip", &GMHandler::OnAddIdip);
     Reg(2, "clear", &GMHandler::OnClearTask);
     Reg(2, "reset", &GMHandler::OnClearCFT);
+
+    Reg(3, "statue", &GMHandler::OnStatueExp);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2936,3 +2938,17 @@ void GMHandler::OnTj4(GObject::Player* player, std::vector<std::string>& args)
     int bossMaxHp = atoi(args[0].c_str());
     GObject::Tianjie::instance().setTj4BossHp(bossMaxHp);
 }
+
+void GMHandler::OnStatueExp(GObject::Player* player, std::vector<std::string>& args)
+{
+    if(args.empty())
+        return;
+    if(args.size() == 1)
+    {
+        UInt32 exp = atoi(args[0].c_str());
+        if(exp == 0)
+            return;
+        player->AddStatueExp(exp);
+    }
+}
+

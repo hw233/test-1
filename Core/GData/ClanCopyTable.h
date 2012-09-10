@@ -27,23 +27,28 @@ static UInt8 spotMapType[] =
 			/*0123456789ABCDEF */
 };
 
+#endif
 
 
 struct ClanCopySpotData
 {
-    UInt8  spotId;              // 该据点的id（使用enum Copy_Spot的值）
-    UInt8  copyType;            // 帮派副本类型(现默认只有防守怪物类型)
-    UInt16 copyLevel;           // 帮派副本等级
-    UInt8  side1MaxCount;       // 防守方的最大人数
-    UInt8  side2MaxCount;       // 进攻方的最大人数
-    UInt8  side1BufferType;     // 防守方的据点增益效果种类
-    UInt8  side2BufferType;     // 进攻方的据点增益效果种类
+    UInt8  bufferType;     // 防守方的据点增益效果种类
+    UInt8  maxCount;       // 防守方的最大人数
+    std::vector<float> bufferValue; // 防守方增益效果值（和人数相关）
+    ClanCopySpotData(UInt8 bufferType)
+        : bufferType(bufferType), maxCount(20)
+    {
+        bufferValue.clear();
+    }
+    ClanCopySpotData()
+        : bufferType(0), maxCount(20)
+    {
+    }
 };
-typedef std::vector<ClanCopySpotData> ClanCopySpotTable;
+typedef std::map<UInt8, ClanCopySpotData> ClanCopySpotMap;
 
-extern ClanCopySpotTable clanCopySpotTable;
+extern ClanCopySpotMap clanCopySpotMap;
 
-#endif
 
 struct ClanCopyData
 {

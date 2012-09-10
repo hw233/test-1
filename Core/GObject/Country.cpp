@@ -48,6 +48,27 @@ void Country::ClanRankBattleCheck(void *)
     ClanRankBattleMgr::Instance().Process(TimeUtil::Now());
 }
 
+void Country::ClanCopyCheck(void *)
+{
+    ClanCopyMgr::Instance().process(TimeUtil::Now());
+}
+
+void Country::ClanCopyResetBegin(void *)
+{
+    ClanCopyMgr::Instance().ResetBegin();
+}
+
+void Country::ClanCopyReset(void *)
+{
+    ClanCopyMgr::Instance().Reset();
+}
+
+void Country::ClanCopyResetEnd(void *)
+{
+    ClanCopyMgr::Instance().ResetEnd();
+}
+
+
 bool Country::Init()
 {
 	//GameActionLua
@@ -57,7 +78,7 @@ bool Country::Init()
 	m_BattleFormula = new Script::BattleFormula(path.c_str());
 	if(TID() == WORKER_THREAD_NEUTRAL)
 	{
-		UInt32 now = TimeUtil::Now();
+		UInt32 now = TimeUtil::Now(), sweek = TimeUtil::SharpWeek(1) - 10;
 		bossManager.getNextBoss();
 		bossManager.process(now);
         ClanRankBattleMgr::Instance().Init();
@@ -66,6 +87,17 @@ bool Country::Init()
 		AddTimer(5000, Hero_Island_Check, static_cast<void *>(NULL), (5 - (now % 5)) * 1000);
         AddTimer(1000, ClanRankBattleCheck);
         //townDeamonManager->process();
+        UInt32 tdChkPoint = TimeUtil::SharpDayT(0, now) + TOWNDEAMONENDTM;
+
+        AddTimer(1000, ClanCopyCheck);
+
+        AddTimer(3600 * 24 * 7, ClanCopyResetBegin, static_cast<void * >(NULL), (sweek - now) > 1800 ? (sweek - now - 1800) * 1000 : ((sweek - now) + 3600 * 24 * 7 - 1800) * 1000 );
+        AddTimer(3600 * 24 * 7, ClanCopyReset, static_cast<void * >(NULL), (sweek - now) * 1000);
+        AddTimer(3600 * 24 * 7, ClanCopyResetEnd, static_cast<void * >(NULL), (sweek - now + 1800) * 1000);
+
+
+
+        AddTimer(86400 * 1000, TownDeamonTmAward, static_cast<void *>(NULL), (tdChkPoint >= now ? tdChkPoint - now : 86400 + tdChkPoint - now) * 1000);
 	}
 
 	return true;

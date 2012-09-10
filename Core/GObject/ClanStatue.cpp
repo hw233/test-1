@@ -13,6 +13,7 @@ namespace GObject
 
 ClanStatue::ClanStatue(Clan *c) : _level(1), _clan(c)
 {
+    _exp = 0;
 }
 
 ClanStatue::~ClanStatue()
@@ -62,6 +63,25 @@ void ClanStatue::updateLevel(UInt32 exp, UInt32 expUpdateTime)
     }
     if (!_level)
         ++ _level;
+    DB5().PushUpdateData("REPLACE INTO `clan_statue` (`exp`, `level`, `expUpdateTime`) VALUES (%u,%u,%u) where `clanId = %u", _exp, _level, now, _clan->getId());
+}
+
+void ClanStatue::addExp(UInt32 exp)
+{
+    _exp += exp;
+    _level = 0;
+    for (std::vector<GData::ClanStatueTableData>::iterator it = GData::clanStatueTable.begin(); 
+            it != GData::clanStatueTable.end(); ++it)
+    {
+        if (_exp < it->needExp)
+        {
+            _level = it->level;
+            return;
+        }
+    }
+    if (!_level)
+        ++ _level;
+    DB5().PushUpdateData("REPLACE INTO `clan_statue` (`exp`, `level`, `expUpdateTime`) VALUES (%u,%u,%u) where `clanId = %u", _exp, _level, TimeUtil::Now(), _clan->getId());
 }
 
 UInt16 ClanStatue::getLevel()
@@ -72,6 +92,29 @@ UInt16 ClanStatue::getLevel()
 UInt32 ClanStatue::getExp()
 {
     return _exp;
+}
+
+UInt32 ClanStatue::getShownExp()
+{
+    // 返回客户端实际显示的exp
+    if (_level <= 1)
+        return _exp;
+    else
+    {
+        return _exp - GData::clanStatueTable[_level - 1].needExp;
+    }
+}
+
+UInt32 ClanStatue::getShownNextExp()
+{
+    // TODO: 返回客户端实际显示需要的下一级的exp
+    
+    if (_level <= 1)
+        return GData::clanStatueTable[_level].needExp;
+    else
+    {
+        return GData::clanStatueTable[_level].needExp - GData::clanStatueTable[_level - 1].needExp;
+    }
 }
 
 }
