@@ -406,6 +406,7 @@ struct DBTianjie
     std::string r2_donated;
     int r3_copyid;
     UInt8 r4_day;
+    UInt8 open_next;
 };
 struct DBPlayerMaxLevel
 {
@@ -866,7 +867,7 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBTianjie)
-SPECIALDEF(12)
+SPECIALDEF(13)
     (
     int,id,
     bool,is_opened,
@@ -879,7 +880,8 @@ SPECIALDEF(12)
     std::string, r1_killed,
     std::string, r2_donated,
     int, r3_copyid,
-    UInt8, r4_day
+    UInt8, r4_day,
+    UInt8, open_next
     )
 SPECIALEND()
 

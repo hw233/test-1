@@ -268,6 +268,11 @@ function onActivityCheck(tm)
       setQixi(false)
   end
 
+  if tm >= actTime230 and tm < actTime231 then
+      setYearRP(true)
+  else
+      setYearRP(false)
+  end
 
   if tm >= actTime59 and tm < actTime60 then
       is_6_22 = true
@@ -651,7 +656,8 @@ function initActTime(y, m, d)
   -- 七夕
   local  SerStartTm202= { ['year'] = 2012, ['month'] = 8, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
-  -- 越南版
+  -- 周年庆回流用户
+  local  SerStartTm230= { ['year'] = 2012, ['month'] = 9, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
@@ -844,6 +850,9 @@ function initActTime(y, m, d)
 
   actTime203= os.time(SerStartTm202);
   actTime204= os.time(SerStartTm202) + 7 * 86400;
+
+  actTime230= os.time(SerStartTm230);
+  actTime231= os.time(SerStartTm230) + 15*86400;
 
   onActivityCheck(os.time() + 30);
 

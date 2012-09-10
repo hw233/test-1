@@ -308,6 +308,11 @@ public:
     { _needconsumerank = v; }
     inline static bool getNeedConsumeRank()
     { return _needconsumerank; }
+    inline static void setYearRP(bool v)
+    { _yearRP = v; }
+    inline static bool getYearRP()
+    { return _yearRP; }
+
 
 	inline Script::WorldScript * getWorldScript() { return _worldScript; }
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
@@ -390,7 +395,7 @@ public:
     static bool _consumeactive;
     static bool _needrechargerank;
     static bool _needconsumerank;
-
+    static bool _yearRP;
 public:
     static RCSortType rechargeSort;
     static RCSortType consumeSort;

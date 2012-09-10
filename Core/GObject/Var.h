@@ -208,6 +208,9 @@ namespace GObject
         VAR_TJ_TASK3_COPYID=163,    //天劫任务3当前破阵层数
         VAR_TJ_EVENT_PRESTIGE=164,  //天劫事件中的声望
 
+        VAR_RP_VALUE=165,           //周年庆回流用户礼包
+        VAR_RP_REWARD_GOT=166,      //回流用户奖励,是否已领取
+
         VAR_RECHARGE_TOTAL3366 = 169, //3366合作充值活动
         VAR_BDIAMOND_CMD = 170, //蓝钻用户每日可领取当前等级寻宝令
 
@@ -404,7 +407,10 @@ namespace GObject
             REGISTER_VAR(VAR_TJ_TASK2_SCORE, CYCLE_DAY);
             REGISTER_VAR(VAR_TJ_TASK3_COPYID, CYCLE_DAY);
             REGISTER_VAR(VAR_TJ_EVENT_PRESTIGE, CYCLE_NONE);
-            
+           
+            REGISTER_VAR(VAR_RP_VALUE, CYCLE_NONE);
+            REGISTER_VAR(VAR_RP_REWARD_GOT, CYCLE_DAY);
+
             REGISTER_VAR(VAR_QQVIP_BUF, CYCLE_DAY);
             REGISTER_VAR(VAR_QQVIP_CNT, CYCLE_DAY);
             REGISTER_VAR(VAR_BDIAMOND_CMD, CYCLE_DAY);

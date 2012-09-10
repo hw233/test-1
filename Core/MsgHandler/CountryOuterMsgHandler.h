@@ -4829,6 +4829,13 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
             player->turnOnRC7Day();
             break;
 
+        case 6:
+            player->getYearRPPackage();
+            break;
+        case 7:
+            player->getYearRPReward();
+            break;
+
         default:
             break;
     }

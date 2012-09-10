@@ -10798,7 +10798,60 @@ namespace GObject
         ctslanding |= (1<<off);
         SetVar(VAR_CTSLANDINGRF, ctslanding);
     }
+    UInt8 Player::getRPLoginDay()
+    {
+        UInt32 now = TimeUtil::Now();
+        UInt32 now_sharp = TimeUtil::SharpDay(0, now);
+        UInt32 created_sharp = TimeUtil::SharpDay(0, getCreated());
+        if (created_sharp > now_sharp)
+            return 0;
 
+        if (now_sharp - created_sharp > 7 * DAY_SECS)
+            return 0;
+
+        UInt32 ctslanding = GetVar(VAR_CTSLANDING);
+        UInt32 off = CREATE_OFFSET(created_sharp, now_sharp);
+        if (off >= 7)
+            return 0;
+
+        UInt32 t = 0;
+        UInt32 cts3 = 0;
+        for (int i = off; i >= 0; --i)
+        {
+            if (ctslanding & (1<<i))
+                ++t;
+            else
+            {
+                if (cts3 < t)
+                    cts3 = t;
+                t = 0;
+            }
+        }
+        if (cts3 < t)
+            cts3 = t;
+        cts3 = cts3 < 3 ? cts3 : 3;
+        return cts3;
+    }
+    void Player::sendYearRPInfo()
+    {
+        UInt8 cts = getRPLoginDay();
+        if (cts == 0)
+            return;
+
+        UInt32 rpValue = GetVar(VAR_RP_VALUE); 
+        UInt8 packageType = rpValue;
+        if (packageType > 0)
+        {
+            UInt8 packageGot = rpValue >> 8;
+            UInt8 rewardGot = GetVar(VAR_RP_REWARD_GOT);
+
+            Stream st(REP::RC7DAY);
+            st << static_cast<UInt8>(8); 
+            st << packageType << packageGot << cts << rewardGot;
+            st << Stream::eos;
+            send(st);
+        }
+    }
     void Player::sendRC7DayInfo(UInt32 now)
     {
         if (!World::getRC7Day())
@@ -10915,6 +10968,86 @@ namespace GObject
         st << static_cast<UInt8>(GetVar(VAR_CTSAWARDRF)); // 抽奖
         st << Stream::eos;
         send(st);
+    }
+    const int g_rpCoupon = 365;
+    const int g_rp1Items[][2] = {
+    {15, 20}, {510, 10}, {56, 10}, {57, 10}, {502, 100},
+    {514, 10}, {508, 10}, {506, 10},{1700, 1} };
+    const int g_rp2Items[][2] = {
+    {15, 30}, {56, 20}, {57, 20}, {502, 100}, {203,20},
+    {515, 10}, {508, 10}, {506, 10},{1700, 1} };
+    const int g_rp3Items[][2] = {
+    {15, 50}, {515, 20}, {509, 20}, {507, 20},
+    {1700, 1}, {1701, 1}, {1704, 1}, {1705,1} };
+    const int g_rpRewardItems[][2] = {{15,1},{502,2},{509,1}};
+
+    void Player::getYearRPPackage()
+    {
+        if (!World::getYearRP())
+            return;
+
+        UInt32 rpValue = GetVar(VAR_RP_VALUE); 
+        UInt8 packageType = rpValue;
+        if (packageType > 0)
+        {
+            UInt8 packageGot = rpValue >> 8;
+            if (packageGot == 1)
+            {
+                Stream st(REP::RF7DAY);
+                st << static_cast<UInt8>(8);
+                st << static_cast<UInt8>(1);
+                st << Stream::eos;
+                send(st);
+                return;
+            }
+            getCoupon(g_rpCoupon);
+            if (1 == packageType)
+            {
+                for (int i = 0; i < 9; ++i)
+                    GetPackage()->AddItem(g_rp1Items[i][0], g_rp1Items[i][1], true);
+            }
+            else if (2 == packageType)
+            {
+                for (int i = 0; i < 9; ++i)
+                    GetPackage()->AddItem(g_rp2Items[i][0], g_rp2Items[i][1], true);
+            }
+            else if (3 == packageType)
+            {
+                for (int i = 0; i < 8; ++i)
+                    GetPackage()->AddItem(g_rp3Items[i][0], g_rp3Items[i][1], true);
+            }
+            rpValue = rpValue & (0xFF+1);
+            SetVar(VAR_RP_VALUE, rpValue);
+
+            sendYearRPInfo();
+        }
+    }
+    void Player::getYearRPReward()
+    {
+        if (!World::getYearRP())
+            return;
+        UInt8 cts = getRPLoginDay();
+        if (cts == 0)
+            return;
+
+        UInt8 isGot = GetVar(VAR_RP_REWARD_GOT);
+        if (isGot == 1)
+        {
+            Stream st(REP::RF7DAY);
+            st << static_cast<UInt8>(8);
+            st << static_cast<UInt8>(2);
+            st << Stream::eos;
+            send(st);
+            return;
+        }
+        getCoupon(10*cts);
+        for (int i = 0; i < 3; ++i)
+        {
+           GetPackage()->AddItem(g_rpRewardItems[i][0], g_rpRewardItems[i][1]*cts, true);
+        }
+        SetVar(VAR_RP_REWARD_GOT, 1);
+
+        sendYearRPInfo();
     }
 
     void Player::getContinuousReward(UInt8 type, UInt8 idx)
@@ -11844,7 +11977,7 @@ namespace GObject
         }
     }
 
-    static const UInt32 s_task1ColorScore[] = {300, 600, 900, 1200}; //日常任务的积分
+    static const UInt32 s_task1ColorScore[] = {100, 200, 300, 400}; //日常任务的积分
     static const UInt32 s_tjTask1MaxCount = 5;       //天劫日常任务1的最大可完成数
     static const UInt32 s_tjTask2MaxScore = 16000;    //天劫日常任务2的最大捐献积分
     static const UInt8  s_tjTask2Score[4] = {200, 200, 200, 200};
@@ -11852,7 +11985,7 @@ namespace GObject
     static const UInt8  s_tjTask3CopyCount = 50;
     static const UInt8  s_tjTask3AutoTime  = 30;
     static const UInt8  s_task3ExpMulti = 8;
-    static const UInt8  s_task3Score    = 60; 
+    static const UInt8  s_task3Score    = 50; 
     void Player::OnDoTianjieTask(UInt8 eventId, UInt8 cmd, UInt8 id)
     {
         Stream st(REQ::TIANJIE);
@@ -12228,8 +12361,11 @@ namespace GObject
         }
         if (eventScore > 0)
         {
+            int oldScore = GetVar(VAR_TJ_EVENT_PRESTIGE);
             AddVar(VAR_TJ_EVENT_PRESTIGE, eventScore);
-            GObject::Tianjie::instance().insertToEventSortMap(this, GetVar(VAR_TJ_EVENT_PRESTIGE), GetVar(VAR_TJ_EVENT_PRESTIGE)-eventScore);
+            //捐款不会超过40000积分
+            GObject::Tianjie::instance().setEvent2MaxScore(this);
+            GObject::Tianjie::instance().insertToEventSortMap(this, GetVar(VAR_TJ_EVENT_PRESTIGE), oldScore);
             GObject::Tianjie::instance().updateEventData(this);
             GObject::Tianjie::instance().broadEventTop1(this);
         

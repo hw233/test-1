@@ -1111,6 +1111,12 @@ namespace GObject
         void processAutoTlz();
         void cancleAutoTlz();
         void completeAutoTlz();
+        
+        //周年庆回流用户
+        UInt8 getRPLoginDay();
+        void sendYearRPInfo();
+        void getYearRPPackage();
+        void getYearRPReward();
         /////
 	public:
 		UInt16   GetFreePackageSize();

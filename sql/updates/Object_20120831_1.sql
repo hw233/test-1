@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS `tianjie` (
     `r2_donated` char(32) DEFAULT NULL COMMENT '事件2捐款数',                                            
     `r3_copyid` int(11) DEFAULT '0' COMMENT '事件3天雷阵层数',                                           
     `r4_day` int(11) DEFAULT '0' COMMENT '打BOSS的天数',                                                 
+    `open_next` tinyint(4) DEFAULT '0',
     PRIMARY KEY (`id`),                                                                                  
     UNIQUE KEY `level_only` (`level`)                                                                    
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 CHECKSUM=1 DELAY_KEY_WRITE=1 ROW_FORMAT=DYNAMIC;

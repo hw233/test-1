@@ -41,6 +41,7 @@ namespace GObject
     };
     class Tianjie
     {
+        typedef multimap<int, Player*, std::greater<int> > TSortMap;
     public:
 		static Tianjie& instance()
 		{
@@ -101,6 +102,7 @@ namespace GObject
         void start2();
         void donate2(Player* pl, UInt8 id); //捐献资源
         void close2();
+        void setEvent2MaxScore(Player* pl);
 
         //天雷阵
         void start3();
@@ -108,8 +110,8 @@ namespace GObject
         void attack3(Player* pl);
         void close3();
         int  makeTlzKey(UInt8 type, UInt16 level);
-
         bool attackTlz(Player* pl, UInt16 level);
+        void getTlzFights();
 
         //末日天雷
         void broadBossAppear(UInt32 bossId, UInt16 loc, Player* pl=NULL);
@@ -126,6 +128,7 @@ namespace GObject
         void sendDmg(UInt32 damage);
 
         void broadTianjiePassed();
+        void clearPlayerTaskScore();
     public:
 		bool isPlayerInTj(int playerLevel);
 		bool isOpenTj(Player* pl);
@@ -147,7 +150,7 @@ namespace GObject
 		void deleteNpc(int npcid, UInt16 loc);
         void rewardEventBox(Player*pl, int score);
         void rewardTotalBox(Player*pl, int score);
-        void reward(multimap<int, Player*>& m, UInt8 varId, UInt8 EventOrTotal);
+        void reward(TSortMap& m, UInt8 varId, UInt8 EventOrTotal);
         void rewardBoss();
         void rewardTask();  //关闭天劫前,根据玩家的天劫声望发奖品
         void clearEventScore();
@@ -178,8 +181,8 @@ namespace GObject
         int m_eventCurrNumber;     //该事件已达成数
         int m_eventOldPercent;     //上一次广播的事件达成百分比
         UInt8 m_oldBroadPercent; 
-        multimap<int, Player*> m_eventSortMap;
-        multimap<int, Player*> m_scoreSortMap;
+        TSortMap m_eventSortMap;
+        TSortMap m_scoreSortMap;
         //事件1
         short m_rate1KilledCount[4]; //怪物已击杀数
 
@@ -200,6 +203,13 @@ namespace GObject
         UInt32 m_bossMaxHp;
         AtkInfoType m_atkinfo;
         UInt8 _percent;
+
+        //天劫后排行榜保留5个小时
+        int m_rankKeepTime;
+        bool m_isRankKeep;
+
+        bool m_isOpenNextTianjie;
+        int m_nextTjLevel;
 
         pthread_mutex_t m_eventMutex;
         pthread_mutex_t m_totalMutex;
