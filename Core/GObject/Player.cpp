@@ -10264,6 +10264,13 @@ namespace GObject
         return GData::clanStatueTable[level].exHitRate;
     }
 
+    void  Player::AddStatueExp(UInt32 exp)
+    {
+        if (_clan == NULL)
+            return;
+        _clan->addStatueExp(exp);
+    }
+
 
     void Player::onBlueactiveday()
     {

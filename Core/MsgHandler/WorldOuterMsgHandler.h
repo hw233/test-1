@@ -1148,10 +1148,10 @@ void OnClanCopyReq (GameMsgHdr& hdr, const void * data )
 
     BinaryReader brd(data, hdr.msgHdr.bodyLen);
     UInt8 type = 0;
-    brd >> type;
     UInt8 command = 0;
-    brd >> command;
     UInt8 val = 0;
+    brd >> type;
+    brd >> command;
     switch(type)
     {
         case CLAN_COPY_TAB_INFO:
@@ -1161,13 +1161,16 @@ void OnClanCopyReq (GameMsgHdr& hdr, const void * data )
             else
             {
                 brd >> val;
-                clan->clanCopyOperate(player, type, command, val);
+                clan->clanCopyTabOperate(player, command, val);
             }
             break;
         case CLAN_COPY_MEMBER_LIST_OP:
             // 帮派副本成员操作
-            brd >> val;
-            clan->clanCopyOperate(player, type, command, val);
+            clan->clanCopyMemberOperate(player, command, brd);
+            break;
+        case CLAN_COPY_BATTLE:
+            // 帮派副本的战斗操作
+            clan->clanCopyBattleOperate(player, command, brd);
             break;
         default:
                 break;

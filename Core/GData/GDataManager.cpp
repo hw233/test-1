@@ -1393,6 +1393,30 @@ namespace GData
                     cc.minPlayer, cc.maxPlayer, cc.spotMaxPlayer, cc.homeHp);
 		}
 
+        lua_State* L = lua_open();
+        luaopen_base(L);
+        luaopen_string(L);
+        luaopen_table(L);
+        {
+            std::string path = cfg.scriptPath + "formula/clancopy.lua";
+            lua_tinker::dofile(L, path.c_str());
+            lua_tinker::table bufferTypes = lua_tinker::call<lua_tinker::table>(L, "LoadClanCopySpotBufferType");
+            UInt32 size = bufferTypes.size();
+            for (UInt32 i = 1; i <= size; i++)
+            {
+                UInt8 bufferType = bufferTypes.get<UInt8>(i);
+                lua_tinker::table bufferValues = lua_tinker::call<lua_tinker::table>(L, "LoadClanCopySpotBufferValue", bufferType);
+                UInt32 bufferValueSize = bufferValues.size();
+                ClanCopySpotData clanCopySpotData(bufferType);
+                for (UInt32 j = 1; j <= bufferValueSize; j++)
+                {
+                    clanCopySpotData.bufferValue.push_back(bufferValues.get<float>(j));
+                }
+                clanCopySpotMap.insert(std::make_pair(bufferType, clanCopySpotData));
+            }
+        }
+        lua_close(L);
+
 		return true;
     }
 

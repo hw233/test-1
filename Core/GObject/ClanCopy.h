@@ -15,6 +15,7 @@
 #include <iostream>
 #endif
 
+
 namespace Battle
 {
     class BattleSimulator;
@@ -43,17 +44,27 @@ static const float  s_rate3NpcAdvanceModulus[][4] = {
 {0.0002, 0.005, 0.004, 0.01},
 };
 
+static const float  s_rate3NpcAdvanceModMax[] =  {200, 100, 100, 200};
+
+
 #define  CLAN_COPY_LOCATION  0x3202
 
 class Player;
 class Clan;
 class BattleSimulator;
 
+static const UInt8 BATTLER_COUNT = 5;
 static const UInt8 SPOT_COUNT = 5;
 static const UInt8 SpotId[SPOT_COUNT] =
 {
     0x01, 0x11, 0x21, 0x31, 0xff
 };
+
+static const UInt8 SpotBufferId[SPOT_COUNT] = 
+{
+    0x01, 0x01, 0x01, 0x01, 0x01
+};
+
 static const UInt8 NextSpotNum[SPOT_COUNT] = 
 {
     1, 1, 1, 1, 3
@@ -87,12 +98,19 @@ enum Copy_Spot_Buffer
 enum CLAN_COPY_STATUS
 {
     // 帮派副本状态列表
-    CLAN_COPY_NONE    = 0x00,
+    CLAN_COPY_NONE    = 0x00, 
     CLAN_COPY_READY   = 0x01,
     CLAN_COPY_PROCESS = 0x02,
     CLAN_COPY_WIN     = 0x03,
     CLAN_COPY_LOSE    = 0x04,
-    CLAN_COPY_OVER    = 0xFF,
+    CLAN_COPY_OVER    = 0xFF,  // 帮派副本数据待清除状态
+};
+
+enum CLAN_COPY_FORCE_END_TYPE
+{
+    FORCE_END_BY_RESET = 0x01,
+    FORCE_END_BY_GM = 0x02,
+    FORCE_END_BY_ERROR = 0xff
 };
 
 struct ClanCopyPlayer
@@ -107,6 +125,7 @@ struct ClanCopyPlayer
     UInt8 deadType;
 };
 
+
 struct isPlayerDead
 {
     bool operator() (const ClanCopyPlayer& clanCopyPlayer) const
@@ -118,7 +137,8 @@ struct isPlayerDead
 struct ClanCopyMonster
 {
     // 帮派副本怪物信息结构
-    UInt32 npcId;
+    UInt32 npcIndex;        // 该副本中怪物的序号(即副本中的身份证号码)
+    UInt32 npcId;           // 怪物类型Id
     UInt8  monsterType;     // 怪物种类（普通怪，精英怪，boss）
     UInt16 waveCount;       // 第几波产生的怪物
     UInt16 npcValue;        // 怪物对主基地的破坏值
@@ -133,8 +153,8 @@ struct ClanCopyMonster
     UInt8 level;
     
 
-    ClanCopyMonster(UInt32 npcId, UInt8 monsterType, UInt16 waveCount, UInt16 npcValue, UInt8 nextSpotId, UInt32 nextMoveTick, UInt16 copyLevel)
-        : npcId(npcId), monsterType(monsterType), waveCount(waveCount), npcValue(npcValue), nextSpotId(nextSpotId), nextMoveTick(nextMoveTick)
+    ClanCopyMonster(UInt32 npcIndex, UInt32 npcId, UInt8 monsterType, UInt16 waveCount, UInt16 npcValue, UInt8 nextSpotId, UInt32 nextMoveTick, UInt16 copyLevel)
+        : npcIndex(npcIndex), npcId(npcId), monsterType(monsterType), waveCount(waveCount), npcValue(npcValue), nextSpotId(nextSpotId), nextMoveTick(nextMoveTick)
     {
         isDead = false;
         justMoved = false;
@@ -166,6 +186,12 @@ struct ClanCopyMonster
             fighter->evade   = fighter->getBaseEvade()     * (1 + s_rate3NpcAdvanceModulus[monsterType][1]*copyLevel);
             fighter->counter = fighter->getBaseCounter()   * (1 + s_rate3NpcAdvanceModulus[monsterType][2]*copyLevel);
             fighter->magres  = fighter->getBaseMagRes()    * (1 + s_rate3NpcAdvanceModulus[monsterType][3]*copyLevel);
+
+            fighter->hitrate = fighter->hitrate < s_rate3NpcAdvanceModMax[0] ? fighter->hitrate : s_rate3NpcAdvanceModMax[0];
+            fighter->evade = fighter->evade < s_rate3NpcAdvanceModMax[0] ? fighter->evade : s_rate3NpcAdvanceModMax[1];
+            fighter->counter = fighter->counter < s_rate3NpcAdvanceModMax[0] ? fighter->counter : s_rate3NpcAdvanceModMax[2];
+            fighter->magres = fighter->magres < s_rate3NpcAdvanceModMax[0] ? fighter->magres : s_rate3NpcAdvanceModMax[3];
+
         }
     }
 };
@@ -183,12 +209,12 @@ struct ClanCopySpot
     // 帮派副本的据点信息结构
     UInt8 spotId;
     UInt8 spotBufferType;          // 该据点加成类型
-    UInt16 spotBufferValue;        // 该据点加成数据
+    float spotBufferValue;        // 该据点加成数据
     UInt16 maxPlayerCount;         // 该据点最大的玩家数
     UInt32 lastBattleTick;         // 上一场战斗发生的tick时间
     std::vector<UInt8> nextSpotId; // 通往下一个据点的id
 
-    ClanCopySpot(UInt8 spotId, UInt8 spotBufferType, UInt16 spotBufferValue,
+    ClanCopySpot(UInt8 spotId, UInt8 spotBufferType, float spotBufferValue,
             UInt16 maxPlayerCount = 20, UInt32 lastBattleTick = 0)
         :spotId(spotId), spotBufferType(spotBufferType), spotBufferValue(spotBufferValue),
         maxPlayerCount(maxPlayerCount), lastBattleTick(lastBattleTick)
@@ -198,8 +224,6 @@ struct ClanCopySpot
     ClanCopySpot(): spotId(0), spotBufferType(0), spotBufferValue(0), maxPlayerCount(20), lastBattleTick(0)
     {
     }
-
-
 };
 
 class ClanCopy
@@ -225,10 +249,15 @@ class ClanCopy
         void playerEscape(Player* player);
 
         void initCopyData();
+        void updateBufferAttr(UInt8 spotId);
         void process(UInt32 now);
         void requestStart(Player* player);
 
+        void forceEnd(UInt8 type);
+
         void adjustPlayerPosition(Player * opPlayer, Player* player, UInt8 oldSpotId, UInt8 oldPosition, UInt8 newSpotId, UInt8 newPositon);
+
+        void updateSpotBufferValue(UInt8 spotId);
 
         void monsterAssault(const UInt8& spotId);
         void enemyBaseAct();
@@ -245,6 +274,7 @@ class ClanCopy
 
         void notifyAll(Stream st);
         void notifySpotPlayerInfo(Player * player = NULL);
+        void notifySpotBattleInfo(Player * player = NULL);
         void notifyCopyLose();
         void notifyCopyWin();
         void notifyLauncherEscape();
@@ -281,10 +311,12 @@ class ClanCopy
 
         Player* _launchPlayer;
         URandom _rnd;
+        std::map<UInt8, GData::AttrExtra>  _spotAttrs;
 
 #ifdef DEBUG_CLAN_COPY
         // 谁能告诉我为什么一定需要通过指针new一个才能编译通过
-        std::fstream* fileSt;           
+        // 测试不用指针，居然又好了，真的是人品驱动编程啊
+        std::fstream * fileSt;           
 #endif
 };
 
@@ -297,6 +329,10 @@ class ClanCopyMgr : public Singleton <ClanCopyMgr>
     ClanCopyMgr();
     ~ClanCopyMgr();
 
+    void ResetBegin();
+    void Reset();
+    void ResetEnd();
+
     void process(UInt32 now);
 
     UInt8 getCopyStatus(UInt32 clanId);
@@ -304,6 +340,7 @@ class ClanCopyMgr : public Singleton <ClanCopyMgr>
     // 创建一个新帮派副本
     bool createClanCopy(Player* player, Clan *c);
 
+    void forceEndClanCopy(ClanCopy *clanCopy);
     // 清除已经结束的副本
     void deleteClanCopy(ClanCopy *clanCopy);
 
@@ -312,10 +349,12 @@ class ClanCopyMgr : public Singleton <ClanCopyMgr>
     void playerRequestStart(Player * player);
 
     UInt16 getTotalPlayer(Clan *c);
+    ClanCopy * getClanCopyByClan(Clan *c);
 
     private:
     UInt16 _maxCopyLevel;  // 全服最高通关的副本等级
     ClanCopyMap _clanCopyMap;
+    bool _reset;           // 是否在副本重置时间段 （每周日23:30~周一00:30）
 
 };
 

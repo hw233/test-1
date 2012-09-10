@@ -4,8 +4,9 @@
 namespace GData
 {
 
-ClanCopyTable clanCopyTable;
-ClanCopyMonsterMap clanCopyMonsterMap;
+    ClanCopySpotMap clanCopySpotMap;
+    ClanCopyTable clanCopyTable;
+    ClanCopyMonsterMap clanCopyMonsterMap;
 
 }
 

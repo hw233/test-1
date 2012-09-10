@@ -420,7 +420,6 @@ private:
     static void Team_Copy_Process(void*);
 	static void World_One_Min( World * );
     static void AthleticsPhysicalCheck(void *);
-    static void ClanCopyCheck(void *);
     static void ClanStatueCheck(void *);
     //static void advancedHookTimer(void *para);
 

@@ -7,10 +7,13 @@
 #include "GObjectManager.h"
 #include "ClanDynamicMsg.h"
 #include "Server/ServerTypes.h"
+#include "Common/BinaryReader.h"
 
 class SysMsgItem;
 namespace GObject
 {
+
+static const UInt16 COPY_RESET_LEVEL = 5;
 
 class Player;
 class ClanTech;
@@ -484,9 +487,12 @@ public:
     void LoadCopyLog(UInt32 logTime, UInt8 logType, std::string playerName, UInt32 logVal);
 
     void updateStatueExp();
+    void resetCopyLevel();
 
     void sendClanCopyInfo(Player * player, UInt8 val = 0);
     void notifyCopyCreated(Player * player);
+
+    void   addStatueExp(UInt32 exp);
 
     UInt16 getStatueLevel();
     UInt32 getStatueExp();
@@ -506,8 +512,9 @@ public:
     UInt8  getCopyStatus();
     UInt16 getCopyMeberCount();
 
-    void   clanCopyOperate(Player * player, UInt8 type, UInt8 command, UInt8 val = 0);
-    void   clanCopyMemberOperate(Player * player, UInt8 command, UInt8 val);
+    void   clanCopyTabOperate(Player * player, UInt8 command, UInt8 val = 0);
+    void   clanCopyMemberOperate(Player * player, UInt8 command, BinaryReader& brd);
+    void   clanCopyBattleOperate(Player * player, UInt8 command, BinaryReader & brd);
 
     void   addCopyLevel();
     void   addCopyWinLog(Player* player);
@@ -539,6 +546,7 @@ public:
 	void broadcast(Stream&);
 	void broadcast(const void *, size_t);
 	void broadcast(SysMsgItem *);
+    void broadcastCopyInfo();
 
 public:
 	ClanMember * getClanMember(Player *);

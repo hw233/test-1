@@ -1426,6 +1426,24 @@ void Clan::broadcastMemberInfo( ClanMember& cmem, UInt8 t )
 	else
 		st << cmem.cls << cmem.player->GetLev() << static_cast<UInt8>(cmem.player->isOnline() ? 1 : 0) << cmem.proffer << cmem.player->getLastOnline() << Stream::eos;
 	broadcast(st);
+    broadcastCopyInfo();
+
+}
+
+void Clan::broadcastCopyInfo()
+{
+	Mutex::ScopedLock lk(_mutex);
+	ClanMember * mem = NULL;
+	Members::iterator offset;
+	for(offset = _members.begin(); offset != _members.end(); ++ offset)
+	{
+		mem = *offset;
+        if (!mem)
+            continue;
+        if (!mem->player)
+            continue;
+        sendClanCopyInfo(mem->player);
+	}
 }
 
 void Clan::broadcastPendingMemberInfo( ClanPendingMember& cpmem )
@@ -2947,7 +2965,7 @@ bool Clan::setClanRank(Player* pl, UInt64 inviteeId, UInt8 cls)
 		DB5().PushUpdateData("UPDATE `clan_player` SET `cls` = %u WHERE `playerId` = %"I64_FMT"u", cls, inviteeId);
     }
 
-
+    sendClanCopyInfo(clan_pl);
     return true;
 }
 
@@ -3563,10 +3581,34 @@ void Clan::LoadStatue(UInt16 level, UInt32 exp, UInt32 expUpdateTime)
     _statue->updateLevel(exp, expUpdateTime);
 }
 
+void Clan::addStatueExp(UInt32 exp)
+{
+    Mutex::ScopedLock lk(_mutex);
+    _statue->addExp(exp);
+    broadcastCopyInfo();
+
+}
+
 void Clan::updateStatueExp()
 {
     Mutex::ScopedLock lk(_mutex);
     _statue->updateLevel(0, 0);
+    broadcastCopyInfo();
+}
+
+void Clan::resetCopyLevel()
+{
+    // 帮派副本等级下降五级
+    ClanCopy * clanCopy = ClanCopyMgr::Instance().getClanCopyByClan(this);
+    if (!clanCopy)
+    {
+        // 不应该出现还未结束的副本信息，强制结束后重置
+        clanCopy->forceEnd(FORCE_END_BY_ERROR);
+    }
+    if (_copyLevel <= COPY_RESET_LEVEL)
+        _copyLevel = 1;
+    else
+        _copyLevel -= COPY_RESET_LEVEL;
 }
 
 UInt16 Clan::getStatueLevel()
@@ -3576,12 +3618,12 @@ UInt16 Clan::getStatueLevel()
 
 UInt32 Clan::getStatueExp()
 {
-    return _statue->getExp();
+    return _statue->getShownExp();
 }
 
 UInt32 Clan::getStatueNextExp()
 {
-    return GData::clanStatueTable[_statue->getLevel()].needExp;
+    return _statue->getShownNextExp();
 }
 
 UInt32 Clan::getStatueConsumeExp()
@@ -3669,7 +3711,7 @@ UInt16 Clan::getCopyLevel()
 
 UInt32 Clan::getOutputExp()
 {
-    return GData::clanCopyTable[_statue->getLevel()].expOutput;
+    return GData::clanCopyTable[_copyLevel].expOutput;
 }
 
 UInt32 Clan::getNextOutputExp()
@@ -3689,83 +3731,81 @@ UInt16  Clan::getCopyMeberCount()
     return ClanCopyMgr::Instance().getTotalPlayer(this);
 }
 
-void   Clan::clanCopyOperate(Player * player, UInt8 type, UInt8 command, UInt8 val /* = 0 */)
+void   Clan::clanCopyTabOperate(Player * player, UInt8 command, UInt8 val /* = 0 */)
 {
-    // TODO: 处理有关帮派副本的操作
-    switch (type)
+    // 帮派副本信息标签页相关操作
+    if (command == 1)
     {
-        case 0x01:
-            // 帮派副本信息标签页相关操作
-            if (command == 1)
-            {
-                // 按下帮派副本标签页的按钮
-                switch (val)
+        // 按下帮派副本标签页的按钮
+        switch (val)
+        {
+            case 0x04:
+                // "召集帮众并前往"
+                if (hasClanAuthority(player, CLAN_AUTHORITY_COPY))
                 {
-                    case 0x04:
-                        // "召集帮众并前往"
-                        if (hasClanAuthority(player, CLAN_AUTHORITY_COPY))
-                        {
-                            notifyCopyCreated(player);
-                        }
-                        else
-                        {
-                            player->sendMsgCode(0, 1342);
-                        }
-                        break;
-                    case 0x00:
-                        // "前往观战"
-                    case 0x02:
-                        // "前往副本"
-                        if(player->getLocation() == CLAN_COPY_LOCATION
-                                && player->getThreadId() == WORKER_THREAD_NEUTRAL)
-                        {
-                            return;
-                        }
-                        else
-                        {
-                        }
-                        break;
-                    case 0x01:
-                        // "只有长老级以上才可开启副本"
-                        return;
-                    case 0x03:
-                        // "开启副本"
-                        if (hasClanAuthority(player, CLAN_AUTHORITY_COPY))
-                        {
-                            if (_techs->getMaxCopyLevel() <= _copyLevel)
-                            {
-                                //player->sendMsgCode(0, 1340);  // 帮派科技不够开启更高等级
-                                //sendClanCopyInfo(player, 3);
-                                //return;
-                            }
-                            GObject::ClanCopyMgr::Instance().createClanCopy(player, this);
-                            sendClanCopyInfo(player);
-                        }
-                        else
-                        {
-                            player->sendMsgCode(0, 1341);
-                        }
-                        break;
-                    default:
-                        break;
+                    broadcastCopyInfo();
+                    notifyCopyCreated(player);
+                }
+                else
+                {
+                    player->sendMsgCode(0, 1342);
                 }
                 break;
-            }
-        case 0x02:
-            clanCopyMemberOperate(player, command, val);
-            break;
+            case 0x00:
+                // "前往观战"
+            case 0x02:
+                // "前往副本"
+                if(player->getLocation() == CLAN_COPY_LOCATION
+                        && player->getThreadId() == WORKER_THREAD_NEUTRAL)
+                {
+                    return;
+                }
+                break;
+            case 0x01:
+                // "只有长老级以上才可开启副本"
+                return;
+            case 0x03:
+                // "开启副本"
+                if (hasClanAuthority(player, CLAN_AUTHORITY_COPY))
+                {
+                    if (_techs->getMaxCopyLevel() <= _copyLevel)
+                    {
+                        player->sendMsgCode(0, 1340);  // 帮派科技不够开启更高等级
+                        return;
+                    }
+                    GObject::ClanCopyMgr::Instance().createClanCopy(player, this);
+                    sendClanCopyInfo(player);
+                }
+                else
+                {
+                    player->sendMsgCode(0, 1341); // 不是长老以上职位，权限不够开启副本
+                }
+                break;
+            default:
+                break;
+        }
     }
 }
 
-void   Clan::clanCopyMemberOperate(Player * player, UInt8 command, UInt8 val)
+void   Clan::clanCopyMemberOperate(Player * player, UInt8 command, BinaryReader & brd)
 {
-    // TODO: 帮派副本成员相关操作
+    // 帮派副本成员相关操作
     switch (command)
     {
-        case 1:
+        case 0:
+            // 强制刷新准备页面
+            {
+                ClanCopy * clanCopy = GObject::ClanCopyMgr::Instance().getClanCopyByClan(this);
+                if (!clanCopy)
+                {
+                    player->sendMsgCode(0, 1352);
+                    return;
+                }
+                clanCopy->notifySpotPlayerInfo(player);
+            }
             break;
-        case 2:
-            // 请求开始副本(暂定)
+        case 1:
+            // 请求开始副本
             if (hasClanAuthority(player, CLAN_AUTHORITY_COPY))
             {
                 GObject::ClanCopyMgr::Instance().playerRequestStart(player);
@@ -3775,6 +3815,53 @@ void   Clan::clanCopyMemberOperate(Player * player, UInt8 command, UInt8 val)
                 player->sendMsgCode(0, 1344);
             }
             break;
+        case 2:
+            // 帮派成员操作调整
+            {
+                UInt64 playerId;
+                brd >> playerId;
+                Player * targetPlayer = globalPlayers[playerId];
+                if (!targetPlayer)
+                    return;
+                UInt8 oldSpotId;
+                UInt8 oldPosition;
+                UInt8 newSpotId;
+                UInt8 newPosition;
+                brd >> oldSpotId;
+                brd >> oldPosition;
+                brd >> newSpotId;
+                brd >> newPosition;
+                ClanCopy * clanCopy = GObject::ClanCopyMgr::Instance().getClanCopyByClan(this);
+                if (!clanCopy)
+                {
+                    player->sendMsgCode(0, 1352);
+                    return;
+                }
+                clanCopy->adjustPlayerPosition(player, targetPlayer, oldSpotId, oldPosition, newSpotId, newPosition);
+            }
+            break;
+        default:
+            break;
+    }
+}
+
+void   Clan::clanCopyBattleOperate(Player * player, UInt8 command, BinaryReader & brd)
+{
+    // TODO: 帮派副本战斗操作
+    switch (command)
+    {
+        case 0:
+            // 强制刷新准备页面
+            {
+                ClanCopy * clanCopy = GObject::ClanCopyMgr::Instance().getClanCopyByClan(this);
+                if (!clanCopy)
+                {
+                    player->sendMsgCode(0, 1352);
+                    return;
+                }
+                clanCopy->notifySpotPlayerInfo(player);
+            }
+            break;
         default:
             break;
     }
@@ -3782,6 +3869,7 @@ void   Clan::clanCopyMemberOperate(Player * player, UInt8 command, UInt8 val)
 
 void   Clan::sendClanCopyInfo(Player * player, UInt8 val)
 {
+    // 发送帮派副本标签页的所有有关信息
     Mutex::ScopedLock lk(_mutex);
     Members::iterator found = find(player);
     if (found == _members.end())
@@ -3795,7 +3883,7 @@ void   Clan::sendClanCopyInfo(Player * player, UInt8 val)
     st << static_cast<UInt16>(_techs->getLev(CLAN_TECH_COPY_LEVEL)); // 副本科技等级
     st << static_cast<UInt16>(_techs->getLev(CLAN_TECH_COPY_ROB));    // 掠夺科技等级
 
-    st << static_cast<UInt16> (20); // (getStatueLevel());
+    st << static_cast<UInt16>(getStatueLevel());
     st << static_cast<UInt32>(getStatueExp());
     st << static_cast<UInt32>(getStatueNextExp());
     st << static_cast<UInt32>(getOutputExp());
@@ -3828,7 +3916,7 @@ void   Clan::sendClanCopyInfo(Player * player, UInt8 val)
             else
                 st << static_cast<UInt8>(2);
         }
-        else if (status == CLAN_COPY_NONE)
+        else if (status == CLAN_COPY_NONE || status == CLAN_COPY_OVER)
         {
             // 副本还未开启
             if (hasClanAuthority(player, CLAN_AUTHORITY_COPY))
@@ -3924,6 +4012,7 @@ void   Clan::notifyCopyCreated(Player * player)
                 if (member->player == player) return true;
                 Stream st (REP::CLAN_COPY);
                 st << static_cast<UInt8>(0x02);
+                st << static_cast<UInt8>(0x01);
                 st << Stream::eos;
                 member->player->send(st);
                 return true;
