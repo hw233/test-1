@@ -18,8 +18,8 @@ function itemtemplate()
     sed -i /等级/d $f
     sed -i /^$/d $f
     sed -i s/\"//g $f
-    export lines=`wc -l $f | awk '{print $1}'`
-    echo "Generating file $d, total lines $l"
+    export lines=`awk 'END {print NR}' $f`
+    echo "Generating file $d, total lines $lines"
     awk '
         BEGIN {
             print "INSERT INTO `item_template` VALUES";

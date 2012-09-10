@@ -1560,5 +1560,15 @@ void OnAdvancedHookExp( GameMsgHdr& hdr, const void* data )
     player->advancedHookExp();
 }
 #endif
+void OnSendRechargeRankAward( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    player->sendRechargeRankAward(*(int*)data);
+}
+void OnSendConsumeRankAward( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    player->sendConsumeRankAward(*(int*)data);
+}
 #endif // _COUNTRYINNERMSGHANDLER_H_
 

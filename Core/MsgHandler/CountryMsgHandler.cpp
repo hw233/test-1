@@ -297,4 +297,7 @@ MSG_REG_2(GameMsgHdr, 0x255, OnRoamintQueqiaoLastLoot);
 
 //MSG_REG_2(GameMsgHdr, 0x256, OnAdvancedHookExp);
 
+MSG_REG_2(GameMsgHdr, 0x257, OnSendRechargeRankAward);
+MSG_REG_2(GameMsgHdr, 0x258, OnSendConsumeRankAward);
+
 MSG_HANDLER_END()
