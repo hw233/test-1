@@ -1508,3 +1508,10 @@ CREATE TABLE IF NOT EXISTS `qixi` (
     PRIMARY KEY(`playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `reportid`;
+CREATE TABLE `reportid` (                
+    `maxid` int(11) NOT NULL DEFAULT '0',  
+    PRIMARY KEY (`maxid`)                  
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+

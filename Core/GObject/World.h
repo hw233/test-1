@@ -307,6 +307,20 @@ public:
     { _needrechargerank = v; }
     inline static bool getNeedRechargeRank()
     { return _needrechargerank; }
+    inline static void setRechargeTime(UInt32 begin, UInt32 end)
+    {
+        _rechargebegin = begin;
+        _rechargeend = end;
+    }
+    inline static UInt32 getRechargeBegin() { return _rechargebegin; }
+    inline static UInt32 getRechargeEnd() { return _rechargeend; }
+    inline static void setConsumeTime(UInt32 begin, UInt32 end)
+    {
+        _consumebegin = begin;
+        _consumeend = end;
+    }
+    inline static UInt32 getConsumeBegin() { return _consumebegin; }
+    inline static UInt32 getConsumeEnd() { return _consumeend; }
     inline static void setNeedConsumeRank(bool v)
     { _needconsumerank = v; }
     inline static bool getNeedConsumeRank()
@@ -394,9 +408,15 @@ public:
     static bool _consumeactive;
     static bool _needrechargerank;
     static bool _needconsumerank;
+    static UInt32 _rechargebegin;
+    static UInt32 _rechargeend;
+    static UInt32 _consumebegin;
+    static UInt32 _consumeend;
+
 public:
     static RCSortType rechargeSort;
     static RCSortType consumeSort;
+    static void initRCRank();
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }

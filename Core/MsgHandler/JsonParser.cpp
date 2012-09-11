@@ -9,6 +9,7 @@
 #include "MsgID.h"
 #include "Common/BinaryReader.h"
 #include "GObject/Leaderboard.h"
+#include "GObject/ActivityMgr.h"
 
 extern "C" {
 //#include "bits.h"
@@ -268,7 +269,7 @@ int add_playeritem_req(JsonHead* head, json_t* body, json_t* retbody, std::strin
     return 0;
 }
 
-int query_pagoda_rsp(JsonHead* head, json_t* body, json_t* retbody, std::string& err)
+int query_pagoda_rsq(JsonHead* head, json_t* body, json_t* retbody, std::string& err)
 {
     if (!head || !body || !retbody)
         return EUNKNOW;
@@ -309,6 +310,79 @@ int query_pagoda_rsp(JsonHead* head, json_t* body, json_t* retbody, std::string&
     return 0;
 }
 
+int query_gangcopy_complete_layer_req(JsonHead* head, json_t* body, json_t* retbody, std::string& err)
+{
+    if (!head || !body || !retbody)
+        return EUNKNOW;
+
+    body = body->child;
+    if (!body)
+        return EUNKNOW;
+
+    UInt32 areaid = 0;
+    json_t* val = json_find_first_label(body, "uiAreaId");
+    if (val && val->child && val->child->text)
+        areaid = atoi(val->child->text);
+
+    // TODO: 
+    UInt32 count = 1;
+    json_insert_pair_into_object(retbody, "uiCount", my_json_new_number(count));
+    json_t* arr = json_new_array();
+    if (arr)
+    {
+        for (UInt32 i = 0; i < count; ++i)
+        {
+            json_t* obj = json_new_object();
+            if (obj)
+            {
+                json_insert_pair_into_object(obj, "uiFactionID", json_new_string("1"));
+                json_insert_pair_into_object(obj, "szFactionName", json_new_string(fixPlayerName("YYF").c_str()));
+                json_insert_pair_into_object(obj, "uiFactionMaxLevel", my_json_new_number(100));
+                json_insert_pair_into_object(obj, "uiFactiontime2MaxLvl", my_json_new_number(time(NULL)));
+                json_insert_child(arr, obj);
+            }
+        }
+        json_insert_pair_into_object(retbody, "pGangCopyOverList", arr);
+    }
+
+    head->cmd = 58;
+    return 0;
+}
+int query_activity_req(JsonHead* head, json_t* body, json_t* retbody, std::string& err)
+{
+    if (!head || !body || !retbody)
+        return EUNKNOW;
+
+    body = body->child;
+    if (!body)
+        return EUNKNOW;
+
+    char openid[36] = {0};
+    char playerId[32] = {0};
+    UInt64 playerid = 0;
+    UInt32 areaid = 0;
+
+    GET_STRING(body, "szOpenId", openid, 36);
+    GET_STRING(body, "playerId", playerId, 32);
+    json_t* val = json_find_first_label(body, "uiAreaId");
+    if (val && val->child && val->child->text)
+        areaid = atoi(val->child->text);
+
+    GObject::Player* player = GObject::globalPlayers[playerid];
+    if (!player)
+    {
+        err += "player not exist!";
+        return EPLAYER_NOT_EXIST;
+    }
+
+    json_insert_pair_into_object(retbody, "szOpenId", json_new_string(openid));
+    json_insert_pair_into_object(retbody, "szRoleName", json_new_string(fixPlayerName(player->getName()).c_str()));
+    json_insert_pair_into_object(retbody, "ucGender", my_json_new_number(player->IsMale()?1:2));
+    json_insert_pair_into_object(retbody, "uiActval", my_json_new_number(player->GetActivityMgr()?player->GetActivityMgr()->GetPoint():0));
+
+    head->cmd = 60;
+    return 0;
+}
 void jsonParser2(void * buf, int len, Stream& st)
 {
 	BinaryReader br(buf, len);
@@ -376,7 +450,13 @@ void jsonParser2(void * buf, int len, Stream& st)
             ret = add_playeritem_req(&head, body, retbody, err);
             break;
         case 55:
-            ret = query_pagoda_rsp(&head, body, retbody, err);
+            ret = query_pagoda_rsq(&head, body, retbody, err);
+            break;
+        case 57:
+            ret = query_gangcopy_complete_layer_req(&head, body, retbody, err);
+            break;
+        case 59:
+            ret = query_activity_req(&head, body, retbody, err);
             break;
         default:
             break;

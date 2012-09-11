@@ -134,6 +134,10 @@ bool World::_needconsumerank = false;
 #ifndef _WIN32
 CUserLogger* World::ulog = NULL;
 #endif
+UInt32 World::_rechargebegin = 0;
+UInt32 World::_rechargeend = 0;
+UInt32 World::_consumebegin = 0;
+UInt32 World::_consumeend = 0;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
@@ -302,6 +306,8 @@ bool enum_midnight(void * ptr, void* next)
     if (TimeUtil::SharpDay(0, nextday) == TimeUtil::SharpDay(0, World::_levelawardend))
         pl->sendLevelAward();
 #endif
+
+    World::initRCRank();
 
 	return true;
 }
@@ -1526,6 +1532,47 @@ void World::udpLog(const char* str1, const char* str2, const char* str3, const c
     }
 }
 #endif
+
+inline bool player_enum_rc(GObject::Player * p, int)
+{
+    //using namespace GObject;
+    if (World::getRechargeActive() || World::getRechargeActive3366())
+    {
+        UInt32 total;
+        if(World::getRechargeActive())
+            total = p->GetVar(VAR_RECHARGE_TOTAL);
+        else
+            total = p->GetVar(VAR_RECHARGE_TOTAL3366);
+        if (total)
+        {
+            RCSort s;
+            s.player = p;
+            s.total = total;
+            World::rechargeSort.insert(s);
+        }
+    }
+    if (World::getConsumeActive())
+    {
+        UInt32 total = p->GetVar(VAR_CONSUME);
+        if (total)
+        {
+            RCSort s;
+            s.player = p;
+            s.total = total;
+            World::consumeSort.insert(s);
+        }
+    }
+    return true;
+}
+
+static bool init = false;
+void World::initRCRank()
+{
+    if (init)
+        return;
+    GObject::globalPlayers.enumerate(player_enum_rc, 0);
+    init = true;
+}
 
 }
 
