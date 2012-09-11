@@ -30,6 +30,9 @@ enum
     /*7*/ SKILL_ENTER,
     /*8*/ SKILL_DEAD,
     /*9*/ SKILL_AFTNATK,
+    /*10*/ SKILL_ONTHERAPY,
+    /*11*/ SKILL_ONSKILLDMG,
+    /*12*/ SKILL_ONOTHERDEAD,
     SKILL_PASSIVES
 };
 

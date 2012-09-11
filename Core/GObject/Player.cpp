@@ -10513,14 +10513,32 @@ namespace GObject
         }
         if(m_dpData->itemNum != 0)
         {
-            if(NULL != GetPackage()->AddItem2(m_dpData->itemId, m_dpData->itemNum, true, true, FromTownDeamon))
+            if(GetFreePackageSize() > m_dpData->itemNum/99)
             {
+                struct AddItemInfo
+                {
+                    UInt32 id;
+                    UInt16 num;
+                    UInt8 bind;
+                    UInt8 fromWhere;
+                };
+
+                AddItemInfo item;
+                item.id = m_dpData->itemId;
+                item.num = m_dpData->itemNum;
+                item.bind = true;
+                item.fromWhere = FromTownDeamon;
+                GameMsgHdr hdr1(0x259, getThreadId(), this, sizeof(AddItemInfo));
+                GLOBAL().PushMsg(hdr1, &item);
+
                 m_dpData->itemId = 0;
                 m_dpData->itemNum = 0;
                 m_dpData->quitLevel = 0;
                 m_dpData->attacker = NULL;
                 DB3().PushUpdateData("UPDATE `towndeamon_player` SET `itemId`=0, `itemNum`=0, `quitLevel`=0, `attacker`=0 WHERE `playerId` = %"I64_FMT"u", getId());
             }
+            else
+                sendMsgCode(2, 1011);
         }
         else
         {

@@ -985,4 +985,28 @@ void OnReCalcWeekDayRemoveTimer( GameMsgHdr& hdr,  const void* data )
     WORLD()._recalcwd = NULL;
 }
 
+void OnTownDeamonResNotify( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    struct TDResNotify
+    {
+        GObject::Player * peer;
+        bool win;
+    };
+    TDResNotify* notify = reinterpret_cast<TDResNotify*>(const_cast<void *>(data));
+
+    GObject::townDeamonManager->notifyChallengeResult(player, notify->peer, notify->win);
+}
+
+void OnTownDeamonAttackNpcNotify( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    bool win = *reinterpret_cast<bool*>(const_cast<void *>(data));
+
+    GObject::townDeamonManager->notifyAttackNpcResult(player, win);
+}
+
+
+
+
 #endif // _WORLDINNERMSGHANDLER_H_
