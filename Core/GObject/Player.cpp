@@ -849,6 +849,7 @@ namespace GObject
 
         continuousLogin(curtime);
         continuousLoginRF(curtime);
+        sendYearRPInfo();
 
         if (World::_halloween)
             sendHalloweenOnlineAward(curtime);
@@ -10925,6 +10926,7 @@ namespace GObject
 
             Stream st(REP::RC7DAY);
             st << static_cast<UInt8>(8); 
+            st << static_cast<UInt8>(0); 
             st << packageType << packageGot << cts << rewardGot;
             st << Stream::eos;
             send(st);
@@ -11061,9 +11063,6 @@ namespace GObject
 
     void Player::getYearRPPackage()
     {
-        if (!World::getYearRP())
-            return;
-
         UInt32 rpValue = GetVar(VAR_RP_VALUE); 
         UInt8 packageType = rpValue;
         if (packageType > 0)
@@ -11102,8 +11101,6 @@ namespace GObject
     }
     void Player::getYearRPReward()
     {
-        if (!World::getYearRP())
-            return;
         UInt8 cts = getRPLoginDay();
         if (cts == 0)
             return;

@@ -163,8 +163,9 @@ struct NewUserStruct
     std::string _openkey;
     std::string _via;
     std::string _invited;
-	MESSAGE_DEF10(REQ::CREATE_ROLE, std::string, _name, UInt8, _class, UInt8, _level, UInt8, _level1, UInt8, _isYear,
-            std::string, _platform, std::string, _openid, std::string, _openkey, std::string, _via, std::string, _invited);
+    UInt8 _rp;
+	MESSAGE_DEF11(REQ::CREATE_ROLE, std::string, _name, UInt8, _class, UInt8, _level, UInt8, _level1, UInt8, _isYear,
+            std::string, _platform, std::string, _openid, std::string, _openkey, std::string, _via, std::string, _invited , UInt8, _rp);
 
 };
 
@@ -618,6 +619,8 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->setSysDailog(true);
             GameMsgHdr hdr(0x297, country, pl, 0);
             GLOBAL().PushMsg(hdr, NULL);
+
+            pl->SetVar(GObject::VAR_RP_VALUE, nu._rp);
 		}
 	}
 

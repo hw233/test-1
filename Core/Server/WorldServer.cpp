@@ -87,7 +87,7 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
     GObject::VarSystem::Init();
 	cfg.load(scriptStr);
 	globalSysMsg.load();
-	Battle::battleReport.init();
+//	Battle::battleReport.init();
 
 #ifndef _WIN32
 #ifdef _FB
@@ -210,6 +210,7 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 	GObject::GObjectManager::InitIDGen();	    //将各表的最大ID值存入缓存
 	GObject::GObjectManager::loadAllData();
 
+	Battle::battleReport.init();
 	return true;
 }
 

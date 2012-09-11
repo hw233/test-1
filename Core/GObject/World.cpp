@@ -131,7 +131,6 @@ RCSortType World::rechargeSort;
 RCSortType World::consumeSort;
 bool World::_needrechargerank = false;
 bool World::_needconsumerank = false;
-bool World::_yearRP = false;
 #ifndef _WIN32
 CUserLogger* World::ulog = NULL;
 #endif

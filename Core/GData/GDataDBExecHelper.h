@@ -419,6 +419,10 @@ struct DBTianleizhen
     int npcid;
     int score;
 };
+struct DBReportId
+{
+    int id;
+};
 }
 
 
@@ -900,6 +904,13 @@ SPECIALDEF(4)
     int,npcid,
     int,score
     )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBReportId)
+SPECIALDEF(1)
+	(
+	int,id
+	)
 SPECIALEND()
 
 
