@@ -41,12 +41,13 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _bleed1(0), _bleed2(0), _bleed3(0),
     _bleed1_last(0), _bleed2_last(0), _bleed3_last(0),
     _immune2(0), _def_dec(0), _def_dec_last(0), _def_dec_times(0),
+
     _aura_bleed(0), _aura_dec_cd(0), _aura_bleed_last(0),
     _stun_bleed(0), _stun_cd(0), _stun_bleed_last(0),
     _confuse_bleed(0), _confuse_cd(0), _confuse_bleed_last(0),
-    _colorStock(0), _colorStockTimes(0), _colorStockLast(0)
-    _atkAddSpecial(0), _atkSpecialLast(0), _magAtkAddSpecial(0), _magAtkSpecialLast(0), _hitChangeByPeerless(0), _counterChangeByPeerless(0),
-    _bleedRandom(0), _bleedRandomLast(0), _bleedAttackClass(1)
+    _colorStock(0), _colorStockTimes(0), _colorStockLast(0),
+    _atkAddSpecial(0), _atkSpecialLast(0), _magAtkAddSpecial(0), _magAtkSpecialLast(0), _hitChangeByPeerless(0),
+    _bleedRandom(0), _bleedRandomLast(0), _bleedAttackClass(1), _counterChangeByPeerless(0),_bSingleAttackFlag(false)
 {
     memset(_immuneLevel, 0, sizeof(_immuneLevel));
     memset(_immuneRound, 0, sizeof(_immuneRound));
