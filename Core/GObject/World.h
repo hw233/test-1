@@ -5,6 +5,9 @@
 #include "Server/WorkerThread.h"
 #include "Common/Stream.h"
 #include "Server/Cfg.h"
+#ifndef _WIN32
+#include "kingnet_analyzer.h"
+#endif
 
 namespace Network
 {
@@ -304,6 +307,20 @@ public:
     { _needrechargerank = v; }
     inline static bool getNeedRechargeRank()
     { return _needrechargerank; }
+    inline static void setRechargeTime(UInt32 begin, UInt32 end)
+    {
+        _rechargebegin = begin;
+        _rechargeend = end;
+    }
+    inline static UInt32 getRechargeBegin() { return _rechargebegin; }
+    inline static UInt32 getRechargeEnd() { return _rechargeend; }
+    inline static void setConsumeTime(UInt32 begin, UInt32 end)
+    {
+        _consumebegin = begin;
+        _consumeend = end;
+    }
+    inline static UInt32 getConsumeBegin() { return _consumebegin; }
+    inline static UInt32 getConsumeEnd() { return _consumeend; }
     inline static void setNeedConsumeRank(bool v)
     { _needconsumerank = v; }
     inline static bool getNeedConsumeRank()
@@ -390,10 +407,15 @@ public:
     static bool _consumeactive;
     static bool _needrechargerank;
     static bool _needconsumerank;
+    static UInt32 _rechargebegin;
+    static UInt32 _rechargeend;
+    static UInt32 _consumebegin;
+    static UInt32 _consumeend;
 
 public:
     static RCSortType rechargeSort;
     static RCSortType consumeSort;
+    static void initRCRank();
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }
@@ -424,6 +446,13 @@ private:
 
 public:
 	static void ReCalcWeekDay( World * );
+
+#ifndef _WIN32
+public:
+    static CUserLogger* ulog;
+    static void udpLog(const char* str1, const char* str2, const char* str3, const char* str4,
+            const char* str5, const char* str6, const char* type);
+#endif
 
 public:
     void UpdateQixiScore(Player* pl, Player* lover);

@@ -3758,7 +3758,7 @@ namespace GObject
         }
 
         // 统计鹊桥道具购买的日志
-        if (ci->itemId == 9122)
+        if (ci && ci->itemId == 9122)
         {
             udpLog("qixi", "I_9122_1", "", "", "", "", "act", ci->itemNum);
         }
@@ -10272,15 +10272,15 @@ namespace GObject
     {
         if (!pos || pos > 7)
             return;
-        MailPackage::MailItem item[7][1] =
+        MailPackage::MailItem item[7][4] =
         {
-            {{9076, 80},},
-            {{9076, 60},},
-            {{9076, 50},},
-            {{9076, 10},},
-            {{9076, 10},},
-            {{9076, 10},},
-            {{9076, 10},},
+            {{9076,20},{509,20},{30,100},},
+            {{9076,10},{509,10},{30,50},},
+            {{9076,5},{509,10},{30,20},},
+            {{9076,5},{509,5},},
+            {{9076,5},{509,5},},
+            {{9076,5},{509,5},},
+            {{9076,5},{509,5},},
         };
 
         SYSMSGV(_title, 4026, pos);
@@ -10289,7 +10289,7 @@ namespace GObject
         if(mail)
         {
             MailPackage::MailItem* mitem = &item[pos-1][0];
-            UInt32 size = 1;
+            UInt32 size = 4;
             std::string strItems;
             for (UInt32 i = 0; i < size; ++i)
             {
