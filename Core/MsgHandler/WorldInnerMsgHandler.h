@@ -912,51 +912,11 @@ void OnConsumeRank ( GameMsgHdr& hdr,  const void* data )
     }
 }
 
-inline bool player_enum_rc(GObject::Player * p, int)
-{
-    using namespace GObject;
-    if (World::getRechargeActive() || World::getRechargeActive3366())
-    {
-        UInt32 total;
-        if(World::getRechargeActive())
-            total = p->GetVar(VAR_RECHARGE_TOTAL);
-        else
-            total = p->GetVar(VAR_RECHARGE_TOTAL3366);
-        if (total)
-        {
-            RCSort s;
-            s.player = p;
-            s.total = total;
-            World::rechargeSort.insert(s);
-        }
-    }
-    if (World::getConsumeActive())
-    {
-        UInt32 total = p->GetVar(VAR_CONSUME);
-        if (total)
-        {
-            RCSort s;
-            s.player = p;
-            s.total = total;
-            World::consumeSort.insert(s);
-        }
-    }
-    return true;
-}
-
-static bool init = false;
-void initRCRank()
-{
-    GObject::globalPlayers.enumerate(player_enum_rc, 0);
-    init = true;
-}
-
 void OnSendRechargeRank ( GameMsgHdr& hdr,  const void* data )
 {
     using namespace GObject;
     MSG_QUERY_PLAYER(player);
-    if (!init)
-        initRCRank();
+    World::initRCRank();
     Stream st;
     SendRechargeRank(st);
     player->send(st);
@@ -979,8 +939,7 @@ void OnSendConsumeRank ( GameMsgHdr& hdr,  const void* data )
 {
     using namespace GObject;
     MSG_QUERY_PLAYER(player);
-    if (!init)
-        initRCRank();
+    World::initRCRank();
     Stream st;
     SendConsumeRank(st);
     player->send(st);
