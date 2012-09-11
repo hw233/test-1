@@ -2019,7 +2019,7 @@ bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb, bool init )
 
             if (pap->pra > getPExp())
                 return false;
-            addPExp(-pap->pra, writedb);
+            addPExp(-static_cast<Int32>(pap->pra), writedb);
 
             _acupoints[idx] = v;
             if (_acupoints[idx] < 3)
@@ -2854,7 +2854,7 @@ bool Fighter::addNewCitta( UInt16 citta, bool writedb, bool init, bool split )
     }
 
     if (!init && cb->pexp)
-        addPExp(-cb->pexp, writedb);
+        addPExp(-static_cast<Int32>(cb->pexp), writedb);
 
     _attrDirty = true;
     _bPDirty = true;

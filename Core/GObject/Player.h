@@ -850,7 +850,7 @@ namespace GObject
 		void updateDB(UInt8, UInt32);
 
 		UInt32 getGold(UInt32 c = 0, IncommingInfo* ii = NULL);
-		UInt32 useGold(UInt32 c,ConsumeInfo * ci=NULL);
+		UInt32 useGold(UInt32 c, ConsumeInfo * ci=NULL);
         UInt32 useGold4LuckDraw(UInt32 c);
         UInt32 getGold4LuckDraw();
 		bool holdGold(UInt32 c, UInt8, ConsumeInfo * ci = NULL);

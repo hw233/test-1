@@ -3760,7 +3760,7 @@ namespace GObject
         }
 
         // 统计鹊桥道具购买的日志
-        if (ci->itemId == 9122)
+        if (ci && ci->itemId == 9122)
         {
             udpLog("qixi", "I_9122_1", "", "", "", "", "act", ci->itemNum);
         }
