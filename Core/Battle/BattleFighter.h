@@ -490,6 +490,9 @@ private:
     float _therapy_dec;
     UInt8 _therapy_dec_last;
 
+	float _therapy_add;
+	UInt8 _therapy_add_last;
+
     float _aura_dec;
     UInt8 _aura_dec_last;
 
@@ -568,6 +571,11 @@ public:
     inline UInt8& getTherapyDecLast() { return _therapy_dec_last; }
     inline float getTherapyDec() { return _therapy_dec; }
     inline void setTherapyDec(float value, UInt8 last) { _therapy_dec = value; _therapy_dec_last = last; }
+
+	// 加治疗效果
+	inline UInt8& getTherapyAddLast() { return _therapy_add_last; }
+	inline float getTherapyAdd() { return _therapy_add; }
+	inline void setTherapyAdd(float value, UInt8 last) { _therapy_add = value; _therapy_add_last = last; }
 
     inline UInt8& getAuraDecLast() { return _aura_dec_last; }
     inline float getAuraDec() { return _aura_dec; }

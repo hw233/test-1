@@ -221,10 +221,13 @@ private:
         e_unBleed2 = 41,  // 释
         e_Bleed3 = 42,    // 道,剑气
         e_unBleed3 = 43,  // 道
+        e_TherapyBuff = 44,   // 加治疗效果
+        e_unTherapyBuff = 45,
         e_Bleed4 = 46,    // 燃烧
         e_unBleed4 = 47,  // 
         e_Immune3 = 48,   // 五彩石
         e_unImmune3 = 49, // 
+		e_MAX_STATE,
     };
 
 
@@ -343,7 +346,10 @@ private:
     UInt32 GetBleedDmg(BattleFighter* bf, BattleFighter* bo, float nfactor);
 
     bool doDeBufAttack(BattleFighter* bf);
+
+	float calcTherapyFactor(BattleFighter* bo, DefStatus* defList, size_t& defCount);
     float calcTherapyDebuf(BattleFighter* bo, DefStatus* defList, size_t& defCount);
+	float calcTherapyAddBuff(BattleFighter* bo, DefStatus* defList, size_t& defCount);
     float calcAuraDebuf(BattleFighter* bo, DefStatus* defList, size_t& defCount);
 private:
 	int _id, _winner, _turns;

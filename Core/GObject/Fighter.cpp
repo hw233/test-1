@@ -4184,8 +4184,11 @@ void Fighter::SSOpen(UInt16 id)
     }
 
     UInt16 itemId = 550;
-    if (i->second.maxLvl >= 4)
-        itemId = 551;
+	if (i != m_ss.end())
+	{
+		if (i->second.maxLvl >= 4)
+			itemId = 551;
+	}
     Package* pkg = _owner->GetPackage();
     ItemBase* item = pkg->FindItem(itemId, true);
     if (!item)
