@@ -1953,6 +1953,10 @@ void Fighter::setPeerless( UInt16 pl, bool writedb )
     if (_owner && writedb)
         _owner->OnHeroMemo(MC_SKILL, MD_ADVANCED, 0, 1);
     sendModification(0x30, peerless, 0, writedb);
+
+    // 装备无双技能，通知前端符文相关内容
+    if(peerless)
+        PeerlessSSNotify(peerless);
 }
 
 UInt8 Fighter::getAcupointCnt()
@@ -4109,6 +4113,12 @@ void Fighter::makeFighterSSInfo(Stream& st)
                 ++c;
         }
     }
+    // append peerless skill
+    if (peerless)
+    {
+        if (appendFighterSSInfo(st, peerless))
+            ++c;
+    }
     st.data<UInt8>(offset) = c;
 }
 
@@ -4372,6 +4382,15 @@ void Fighter::SSNotify(UInt16 id, SStrengthen& ss)
     appendFighterSSInfo(st, id, &ss);
     st << Stream::eos;
     _owner->send(st);
+}
+
+void Fighter::PeerlessSSNotify(UInt16 id)
+{
+    UInt16 sid = SKILL_ID(id);
+    std::map<UInt16, SStrengthen>::iterator it = m_ss.find(sid);
+    if (it == m_ss.end())
+        return;
+    SSNotify(id, it->second);
 }
 
 void Fighter::SSDeleteDB(UInt16 id)

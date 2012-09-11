@@ -751,6 +751,7 @@ public:
     void makeFighterSSInfo(Stream& st);
     bool appendFighterSSInfo(Stream& st, UInt16 skillid);
     bool appendFighterSSInfo(Stream& st, UInt16 skillid, SStrengthen* ss);
+    void PeerlessSSNotify(UInt16 id);
 private:
     std::map<UInt16, SStrengthen> m_ss;
 
