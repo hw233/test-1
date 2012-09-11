@@ -541,6 +541,13 @@ public:
     inline UInt8 getBleedAttackClass(){ return _bleedAttackClass; }
     inline void setBleedAttackClass(UInt8 v){ _bleedAttackClass = v; }
 
+    inline float getBleedBySkill(){ return _bleedBySkill; }
+    inline void setBleedBySkill(float v, Int16 last){ _bleedBySkill = v; _bleedBySkillLast = last; }
+    inline Int16& getBleedBySkillLast(){ return _bleedBySkillLast; }
+    inline void setBleedBySkillLast(Int16 v){ _bleedBySkillLast = v; }
+    inline UInt8 getBleedBySkillClass(){ return _bleedBySkillClass; }
+    inline void setBleedBySkillClass(UInt8 v){ _bleedBySkillClass = v; }
+
 private:
     float _atkAddSpecial;  // 技能符文吸收对方伤害额外增加的物攻
     Int16 _atkSpecialLast;
@@ -550,6 +557,10 @@ private:
     float _bleedRandom;
     Int16 _bleedRandomLast;
     UInt8 _bleedAttackClass;  // 流血的时候，前端要根据攻击者的类型表现特效
+
+    float _bleedBySkill;      // 无量七色符文流血
+    Int16 _bleedBySkillLast;
+    UInt8 _bleedBySkillClass;  // 流血的时候，前端要根据攻击者的类型表现特效
 
     // 由于无双技能导致的额外命中增加、反击减少，只能作用在本次，所以每次攻击完毕，直接清除，也不用通知前端
     float _hitChangeByPeerless;

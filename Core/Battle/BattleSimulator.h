@@ -227,7 +227,7 @@ private:
         e_unBleed4 = 47,  // 
         e_Immune3 = 48,   // 五彩石
         e_unImmune3 = 49, // 
-		e_MAX_STATE,
+        e_MAX_STATE,
     };
 
 
@@ -331,6 +331,8 @@ private:
     bool doSkillStrengthen_absorbMagAtk(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active);
     bool doSkillStrengthen_bufTherapy(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active);
     bool doSkillStrengthen_DebufAura( BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active );
+    bool doSkillStrengthen_AttackFriend(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active);
+    bool doSkillStrengthen_BleedBySkill(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active);
     void SetSpecialAttrChange(BattleFighter* bf, const GData::SkillBase* skill, StatusType eType, Int16 nLast, float value, bool bOffset, StatusChange* scList, size_t& scCount);
     void ReduceSpecialAttrLast(BattleFighter* bf, StatusType eType, Int16 nReduce, StatusChange* scList, size_t& scCount);
     // 元磁神雷使用后调用的接口
@@ -344,9 +346,14 @@ private:
     bool BleedRandom_SkillStrengthen(BattleFighter* bf, BattleFighter* bo, const GData::SkillStrengthenEffect* ef, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
     // 获取流血值
     UInt32 GetBleedDmg(BattleFighter* bf, BattleFighter* bo, float nfactor);
+    // 上状态被抵抗也流血
+    bool AddExtraDamageAfterResist_SkillStrengthen(BattleFighter* pFighter, BattleFighter* pTarget, const GData::SkillBase* skill, int nDamage, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
 
     bool doDeBufAttack(BattleFighter* bf);
 
+    // 计算普通攻击产生的伤害值
+    UInt32 CalcNormalAttackDamage(BattleFighter * bf, BattleObject* bo, StateType& eStateType);
+    // 计算治疗因子
 	float calcTherapyFactor(BattleFighter* bo, DefStatus* defList, size_t& defCount);
     float calcTherapyDebuf(BattleFighter* bo, DefStatus* defList, size_t& defCount);
 	float calcTherapyAddBuff(BattleFighter* bo, DefStatus* defList, size_t& defCount);

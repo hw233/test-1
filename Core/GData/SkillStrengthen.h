@@ -59,6 +59,9 @@ enum
     TYPE_ATK_RETURN, //减少的攻击，转换X%给己方攻击最高的同伴，持续一次（last）攻击（主动出手的攻击）
     TYPE_BUF_THERAPY, // 增治疗效果
     TYPE_DEBUF_AURA, //被攻击的目标下2（last）次获得的灵气时，每次减少X点
+    TYPE_DAMAGE_EXTRA, // 被抵抗也流血
+    TYPE_ATTACK_FRIEND,// 攻击本方血最少的人
+    TYPE_BLEED_BYSKILL, // 技能导致流血，取技能的攻击力，hp改变和hp改变附加
     TYPE_MAX,
 };
 

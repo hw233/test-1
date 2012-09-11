@@ -106,6 +106,8 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, cons
         skillStrengthenTable[GData::TYPE_ABSORB_MAGATK] = &BattleSimulator::doSkillStrengthen_absorbMagAtk;
         skillStrengthenTable[GData::TYPE_BUF_THERAPY] = &BattleSimulator::doSkillStrengthen_bufTherapy;
         skillStrengthenTable[GData::TYPE_DEBUF_AURA] = &BattleSimulator::doSkillStrengthen_DebufAura;
+        skillStrengthenTable[GData::TYPE_ATTACK_FRIEND] = &BattleSimulator::doSkillStrengthen_AttackFriend;
+        skillStrengthenTable[GData::TYPE_BLEED_BYSKILL] = &BattleSimulator::doSkillStrengthen_BleedBySkill;
     }
 }
 
@@ -177,6 +179,8 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, GObj
         skillStrengthenTable[GData::TYPE_ABSORB_MAGATK] = &BattleSimulator::doSkillStrengthen_absorbMagAtk;
         skillStrengthenTable[GData::TYPE_BUF_THERAPY] = &BattleSimulator::doSkillStrengthen_bufTherapy;
         skillStrengthenTable[GData::TYPE_DEBUF_AURA] = &BattleSimulator::doSkillStrengthen_DebufAura;
+        skillStrengthenTable[GData::TYPE_ATTACK_FRIEND] = &BattleSimulator::doSkillStrengthen_AttackFriend;
+        skillStrengthenTable[GData::TYPE_BLEED_BYSKILL] = &BattleSimulator::doSkillStrengthen_BleedBySkill;
     }
 }
 
@@ -1656,6 +1660,8 @@ UInt32 BattleSimulator::doPoisonAttack(BattleFighter* bf, bool cs, const GData::
             } // 第三波毒
             else
             {
+                AddExtraDamageAfterResist_SkillStrengthen(bf, area_target, skill, dmg2*1.5, defList, defCount, scList, scCount);
+
                 defList[defCount].leftHP = area_target->getHP();
                 ++defCount;
                 doSkillAtk2(false, &atkAct2, defList, defCount, scList, scCount);
@@ -1663,6 +1669,8 @@ UInt32 BattleSimulator::doPoisonAttack(BattleFighter* bf, bool cs, const GData::
         } // 第二波毒
         else
         {
+            AddExtraDamageAfterResist_SkillStrengthen(bf, area_target, skill, dmg2*2.5, defList, defCount, scList, scCount);
+
             defList[defCount].leftHP = area_target->getHP();
             ++defCount;
             doSkillAtk2(false, &atkAct2, defList, defCount, scList, scCount);
@@ -1670,6 +1678,9 @@ UInt32 BattleSimulator::doPoisonAttack(BattleFighter* bf, bool cs, const GData::
     } // 第一波毒
     else
     {
+        // 如果是抵抗，查找是否有符文强化
+        AddExtraDamageAfterResist_SkillStrengthen(bf, area_target, skill, dmg2*3, defList, defCount, scList, scCount);
+
         defList[defCount].leftHP = area_target->getHP();
         ++defCount;
         doSkillAtk2(false, &atkAct2, defList, defCount, scList, scCount);
@@ -7611,6 +7622,149 @@ bool BattleSimulator::doSkillStrengthen_absorbAtk(BattleFighter* bf, const GData
     return true;
 }
 
+bool BattleSimulator::doSkillStrengthen_BleedBySkill(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active)
+{
+    BattleFighter* bo = static_cast<BattleFighter *>(_objs[target_side][target_pos]);
+    if(!bo || !bf || !ef || !skill || bf->getHP() == 0 || bo->getHP() <= 0)
+        return false;
+
+   // UInt32 nBleed = (bf, bo, ef->value/100);
+    UInt32 nBleed = abs(bf->calcPoison(skill, bo, false)) * ef->value/100;
+    UInt8 nClass = bf->getClass();
+    if(nBleed > 0)
+    {
+        bo->setBleedBySkill(nBleed, ef->last);
+        bo->setBleedBySkillClass(nClass);
+        if(nClass == 1)
+            defList[defCount].damType = e_Bleed1;
+        else if(nClass == 2)
+            defList[defCount].damType = e_Bleed2;
+        else
+            defList[defCount].damType = e_Bleed3;
+
+        defList[defCount].damage = 0;
+        defList[defCount].pos = bo->getPos();
+        defList[defCount].leftHP = bo->getHP();
+        ++ defCount;
+    }
+    return true;
+}
+
+bool BattleSimulator::doSkillStrengthen_AttackFriend(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active)
+{
+    BattleFighter* bo = static_cast<BattleFighter *>(_objs[target_side][target_pos]);
+    if(!bo || !bf || !ef || !skill || bf->getHP() == 0 || bo->getHP() <= 0)
+        return false;
+
+    // 找出本方血最少的人，对他进行攻击
+    BattleObject** this_side_obj = _objs[target_side];
+    UInt32 minHP = 0xffffffff;
+    UInt8 minHP_pos = 0;
+    BattleFighter* fighter = NULL;
+    for(UInt8 i=0; i<25; ++i)
+    {
+        if( i == bo->getPos())  // 除目标以外的人
+            continue;
+
+        fighter = static_cast<BattleFighter*>(this_side_obj[i]);
+        if(fighter && fighter->getHP() > 0 &&  fighter->getHP() < minHP)
+        {
+            minHP = fighter->getHP();
+            minHP_pos = i;
+        }
+    }
+    fighter = static_cast<BattleFighter*>(this_side_obj[minHP_pos]);
+    if(fighter && fighter->getHP() > 0)  // 攻击血最少的人
+    {
+        StateType eType = e_MAX_STATE;
+        float dmg = CalcNormalAttackDamage(bo, fighter, eType);  // bo 打 fighter
+        if (eType == e_MAX_STATE)
+            return false;
+
+        dmg *= ef->value/100;
+        defList[defCount].damType = eType;
+        defList[defCount].damage = dmg;
+        defList[defCount].leftHP = fighter->getHP();
+        defList[defCount].pos = fighter->getPos();
+        ++ defCount;
+        if (eType == e_damNormal)
+        {
+            // 这个加进去，可以看到人跑到友人那边攻击一次？
+            {
+                defList[defCount].damType = e_xinmo;
+                defList[defCount].damage = 0;
+                defList[defCount].leftHP = bf->getHP();
+                defList[defCount].pos = bf->getPos();
+                ++ defCount;
+            }
+
+            fighter->makeDamage(dmg);
+            if(fighter->getHP() == 0)
+            {
+                onDead(false, fighter, defList, defCount);
+            }
+            else if(_winner == 0)
+            {
+                onDamage(fighter, scList, scCount, true, NULL);
+            }
+        }
+    }
+    return true;
+}
+
+UInt32 BattleSimulator::CalcNormalAttackDamage(BattleFighter * bf, BattleObject* bo, StateType& eStateType)
+{
+    if(!bf || !bo || bf->getHP() == 0 || bo->getHP() == 0)
+        return 0;
+    UInt32 dmg = 0;
+
+    BattleFighter * area_target = static_cast<BattleFighter *>(bo);
+    UInt8 target_stun = area_target->getStunRound();
+    bool enterEvade = area_target->getEvad100();
+    bool defend100 = area_target->getDefend100();
+
+    bool pr = false;
+    bool cs = false;
+    if(!defend100 && (target_stun > 0 || (!enterEvade && bf->calcHit(area_target))))
+    {
+        pr = bf->calcPierce(area_target);
+        float atk = 0;
+        float cf = 0.0f;
+        atk = bf->calcAttack(cs, area_target, &cf);
+        if(cs )
+        {
+            UInt8 s = bf->getSide();
+            if(s < 2)
+                _maxCSFactor[s] = std::max( cf, _maxCSFactor[s] ) ;
+
+        }
+
+        float def;
+        float toughFactor = pr ? area_target->getTough(bf) : 1.0f;
+        def = area_target->getDefend();
+        float atkreduce = area_target->getAtkReduce();
+        dmg = _formula->calcDamage(atk, def, bf->getLevel(), toughFactor, atkreduce);
+        dmg *= static_cast<float>(950 + _rnd(100)) / 1000;
+        dmg = dmg > 0 ? dmg : 1;
+        eStateType = e_damNormal;
+    }
+    else
+    {
+        if(enterEvade)
+        {
+            eStateType = e_damEvade;
+            area_target->setEvad100(false);
+        }
+
+        if(defend100)
+        {
+            eStateType = e_damOut;
+            area_target->setDefend100(false);
+        }
+    }
+
+    return dmg;
+}
 
 bool BattleSimulator::doSkillStrengthen_DebufAura( BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active )
 {
@@ -7789,6 +7943,32 @@ bool BattleSimulator::AddYuanCiState_SkillStrengthen(BattleFighter* pFighter, Ba
     float fRate = ef->value*100;  // value%的机会上状态
     if (fRate > _rnd(10000))
         AddSkillStrengthenState(pFighter, pTarget, skill->getId(), nState, ef->last, defList, defCount, scList, scCount);
+    return true;
+}
+
+bool BattleSimulator::AddExtraDamageAfterResist_SkillStrengthen(BattleFighter* pFighter, BattleFighter* pTarget, const GData::SkillBase* skill, int nDamage, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount)
+{
+    if(!pFighter || !pTarget || !skill)
+        return false;
+    GData::SkillStrengthenBase* ss = pFighter->getSkillStrengthen(SKILL_ID(skill->getId()));
+    if(!ss)
+        return false;
+    const GData::SkillStrengthenEffect* ef = ss->getEffect(GData::ON_RESIST, GData::TYPE_DAMAGE_EXTRA);
+    if(!ef)
+        return false;
+
+    float nRealDamage = ef->value/100 * nDamage;  // 伤害值
+    defList[defCount].damType = e_damNormal;
+    pTarget->makeDamage(nRealDamage);
+    defList[defCount].damage = nRealDamage;
+    defList[defCount].leftHP = pTarget->getHP();
+    ++defCount;
+
+    if(pTarget->getHP() == 0)
+    {
+        onDead(true, pTarget, defList, defCount);
+    }
+
     return true;
 }
 
@@ -8022,7 +8202,7 @@ bool BattleSimulator::doSkillStrengthenAttack(BattleFighter* bf, const GData::Sk
 
     if (ef->cond == GData::ON_SKILLUSED)  // 技能使用后对自己使用的符文加强
     {
-        (this->*skillStrengthenTable[ef->type])(bf, skill, ef, target_side, target_pos, defList, defCount, scList, scCount, active);        
+        (this->*skillStrengthenTable[ef->type])(bf, skill, ef, target_side, target_pos, defList, defCount, scList, scCount, active);
     }
     else if(1 == skill->area)
     {
@@ -8261,6 +8441,44 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
         if(nrandomlast == 0)
         {
             bf->setBleedRandom(0, 0);
+            defList[defCount].damType = eUnType;
+        }
+        else
+            defList[defCount].damType = eType;
+        ++defCount;
+        if(bf->getHP() == 0)
+        {
+            onDead(true, bf, defList, defCount);
+        }
+    }
+
+    // 取中毒伤害来流血的debuf。。。
+    Int16& nbySkilllast = bf->getBleedBySkillLast();
+    if(nbySkilllast != 0)
+    {
+        float dmg = bf->getBleedBySkill();
+        dmg *= static_cast<float>(950 + _rnd(100))/1000;
+        bf->makeDamage(dmg);
+        defList[defCount].damage = dmg;
+        defList[defCount].pos = bf->getPos() + 25;
+        defList[defCount].leftHP = bf->getHP();
+        -- nbySkilllast;
+        UInt8 nClass = bf->getBleedBySkillClass();
+        StateType eType = e_Bleed1;
+        StateType eUnType = e_unBleed1;
+        if(nClass == 2)
+        {
+            eType = e_Bleed2;
+            eUnType = e_unBleed2;
+        }
+        else if(nClass == 3)
+        {
+            eType = e_Bleed3;
+            eUnType = e_unBleed3;
+        }
+        if(nbySkilllast == 0)
+        {
+            bf->setBleedBySkill(0, 0);
             defList[defCount].damType = eUnType;
         }
         else
