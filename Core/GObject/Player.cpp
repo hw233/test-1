@@ -10434,7 +10434,7 @@ namespace GObject
                 item.num = m_dpData->itemNum;
                 item.bind = true;
                 item.fromWhere = FromTownDeamon;
-                GameMsgHdr hdr1(0x257, getThreadId(), this, sizeof(AddItemInfo));
+                GameMsgHdr hdr1(0x259, getThreadId(), this, sizeof(AddItemInfo));
                 GLOBAL().PushMsg(hdr1, &item);
 
                 m_dpData->itemId = 0;

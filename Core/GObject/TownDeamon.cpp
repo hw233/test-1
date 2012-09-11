@@ -566,7 +566,7 @@ void TownDeamon::challenge(Player* pl, UInt16 level, UInt8 type)
                 break;
             else
             {
-                GameMsgHdr hdr(0x260, pl->getThreadId(), pl, sizeof(UInt16));
+                GameMsgHdr hdr(0x262, pl->getThreadId(), pl, sizeof(UInt16));
                 GLOBAL().PushMsg(hdr, &(level));
             }
 
@@ -594,7 +594,7 @@ void TownDeamon::challenge(Player* pl, UInt16 level, UInt8 type)
                         UInt32   spirit;
                     };
                     TownDeamonChallenge tdc = { def, deferDpd->calcSpirit() };
-                    GameMsgHdr hdr(0x258, pl->getThreadId(), pl, sizeof(TownDeamonChallenge));
+                    GameMsgHdr hdr(0x260, pl->getThreadId(), pl, sizeof(TownDeamonChallenge));
                     GLOBAL().PushMsg(hdr, &tdc);
                 }
                     //attackPlayer(pl, def);
@@ -738,7 +738,7 @@ void TownDeamon::autoCompleteQuiteCheck(Player* pl, UInt16 levels)
             UInt16 levels;
         };
         TownLevels tls = { dpd->curLevel, maxCnt };
-        GameMsgHdr hdr2(0x259, pl->getThreadId(), pl, sizeof(TownLevels));
+        GameMsgHdr hdr2(0x261, pl->getThreadId(), pl, sizeof(TownLevels));
         GLOBAL().PushMsg(hdr2, &tls);
 
         if(dpd->startTime == 0)

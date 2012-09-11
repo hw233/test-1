@@ -291,10 +291,10 @@ MSG_REG_2(GameMsgHdr, 0x254, OnRoamintQueqiao);
 MSG_REG_2(GameMsgHdr, 0x255, OnRoamintQueqiaoLastLoot);
 
 MSG_REG_2(GameMsgHdr, 0x256, OnDelItemAny);
-MSG_REG_2(GameMsgHdr, 0x257, OnAddItem);
-MSG_REG_2(GameMsgHdr, 0x258, OnTownDeamonChallenge);
-MSG_REG_2(GameMsgHdr, 0x259, OnTownDeamonAutoCompleteQuite);
-MSG_REG_2(GameMsgHdr, 0x260, OnTownDeamonAttackNpc);
+MSG_REG_2(GameMsgHdr, 0x259, OnAddItem);
+MSG_REG_2(GameMsgHdr, 0x260, OnTownDeamonChallenge);
+MSG_REG_2(GameMsgHdr, 0x261, OnTownDeamonAutoCompleteQuite);
+MSG_REG_2(GameMsgHdr, 0x262, OnTownDeamonAttackNpc);
 //MSG_REG_2(GameMsgHdr, 0x256, OnAdvancedHookExp);
 
 MSG_REG_2(GameMsgHdr, 0x257, OnSendRechargeRankAward);
