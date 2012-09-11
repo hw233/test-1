@@ -849,7 +849,7 @@ namespace GObject
 
         continuousLogin(curtime);
         continuousLoginRF(curtime);
-    //    sendYearRPInfo();
+        //sendYearRPInfo();
 
         if (World::_halloween)
             sendHalloweenOnlineAward(curtime);
@@ -11093,7 +11093,7 @@ namespace GObject
                 for (int i = 0; i < 8; ++i)
                     GetPackage()->AddItem(g_rp3Items[i][0], g_rp3Items[i][1], true);
             }
-            rpValue = rpValue & (0xFF+1);
+            rpValue += (0xFF+1);
             SetVar(VAR_RP_VALUE, rpValue);
 
             sendYearRPInfo();
