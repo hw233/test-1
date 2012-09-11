@@ -43,7 +43,7 @@ public:
 	BattleSimulator(UInt32, GObject::Player *, GObject::Player *, bool report = true, UInt32 fake_turns = 500);
 	inline int getId() {return _id;}
 	inline int getTurns() {return _turns;}
-	void start(UInt8 prevWin = 0xFF);
+	void start(UInt8 prevWin = 0xFF, bool checkEnh = true);
 	inline Stream& getPacket() {return _packet;}
 	inline Script::BattleFormula * getFormula() { return _formula; }
 	inline int getWinner() { return _winner; } // returns 1 for attacker winning, 2 for defender winning, or 0 for that game's still in progress

@@ -284,7 +284,7 @@ void  BattleSimulator::InitAttainRecord()
 // #############################
 // change the battle queue but not pass client check
 // prevWin for 组队
-void BattleSimulator::start(UInt8 prevWin)
+void BattleSimulator::start(UInt8 prevWin, bool checkEnh)
 {
     if(prevWin != 0xFF && (prevWin == 0 || prevWin > 2))
         return;
@@ -325,7 +325,7 @@ void BattleSimulator::start(UInt8 prevWin)
 	UInt8 cnt[2] = {0, 0};
 	bool loaded[2] = {false, false};
 	//bool checkEnh = _player[1] == NULL;
-	bool checkEnh = true; // XXX: 对怪对人都有用
+	//bool checkEnh = true; // XXX: 对怪对人都有用
 	UInt32 now = TimeUtil::Now();
 	for(int i = 0; i < 2; ++ i)
 	{
@@ -341,44 +341,44 @@ void BattleSimulator::start(UInt8 prevWin)
 					flag = 0x08;
 				else if(_player[i]->getBuffData(PLAYER_BUFF_ATTR1, now) > 0)
 					flag = 0x04;
+                if(_player[i]->getBuffData(PLAYER_BUFF_CLANRCENHANCE, now) > 0)
+                {
+                    flag |= BattleFighter::Enh3;
+                }
+                if (_player[i]->getBuffData(PLAYER_BUFF_YBUF, now) > 0)
+                    flag |= BattleFighter::Enh4;
+                if (_player[i]->getBuffData(PLAYER_BUFF_BBUF, now) > 0)
+                    flag |= BattleFighter::Enh5;
+                if (_player[i]->getBuffData(PLAYER_BUFF_QQVIPBUF, now) > 0)
+                    flag |= BattleFighter::Enh6;
+                /*if(_player[i]->hasFlag(GObject::Player::Copy)
+                 || _player[i]->hasFlag(GObject::Player::AutoCopy)
+                 || _player[i]->hasFlag(GObject::Player::InCopyTeam)
+                 || _player[i]->hasFlag(GObject::Player::AutoDungeon)
+                 || _player[i]->hasFlag(GObject::Player::AutoFrontMap))*/
+                if(_player[i]->hasFlag(GObject::Player::AthleticsBuff))
+                {
+                    if (_player[i]->getBuffData(PLAYER_BUFF_ATHL1, now) > 0)
+                        flag2 |= BattleFighter::AthlEnh1;
+                    if (_player[i]->getBuffData(PLAYER_BUFF_ATHL2, now) > 0)
+                        flag2 |= BattleFighter::AthlEnh2;
+                    if (_player[i]->getBuffData(PLAYER_BUFF_ATHL3, now) > 0)
+                        flag2 |= BattleFighter::AthlEnh3;
+                    if (_player[i]->getBuffData(PLAYER_BUFF_ATHL4, now) > 0)
+                        flag2 |= BattleFighter::AthlEnh4;
+                    if (_player[i]->getBuffData(PLAYER_BUFF_ATHL5, now) > 0)
+                        flag2 |= BattleFighter::AthlEnh5;
+                    if (_player[i]->getBuffData(PLAYER_BUFF_ATHL6, now) > 0)
+                        flag2 |= BattleFighter::AthlEnh6;
+                    if (_player[i]->getBuffData(PLAYER_BUFF_ATHL7, now) > 0)
+                        flag2 |= BattleFighter::AthlEnh7;
+                    if (_player[i]->getBuffData(PLAYER_BUFF_ATHL8, now) > 0)
+                        flag2 |= BattleFighter::AthlEnh8;
+                    if (_player[i]->getBuffData(PLAYER_BUFF_ATHL9, now) > 0)
+                        flag2 |= BattleFighter::AthlEnh9;
+                }
+                flag2 |= _player[i]->getAthlRivalBuff();
 			}
-			if(_player[i]->getBuffData(PLAYER_BUFF_CLANRCENHANCE, now) > 0)
-			{
-				flag |= BattleFighter::Enh3;
-			}
-            if (_player[i]->getBuffData(PLAYER_BUFF_YBUF, now) > 0)
-                flag |= BattleFighter::Enh4;
-            if (_player[i]->getBuffData(PLAYER_BUFF_BBUF, now) > 0)
-                flag |= BattleFighter::Enh5;
-            if (_player[i]->getBuffData(PLAYER_BUFF_QQVIPBUF, now) > 0)
-                flag |= BattleFighter::Enh6;
-            /*if(_player[i]->hasFlag(GObject::Player::Copy)
-             || _player[i]->hasFlag(GObject::Player::AutoCopy)
-             || _player[i]->hasFlag(GObject::Player::InCopyTeam)
-             || _player[i]->hasFlag(GObject::Player::AutoDungeon)
-             || _player[i]->hasFlag(GObject::Player::AutoFrontMap))*/
-            if(_player[i]->hasFlag(GObject::Player::AthleticsBuff))
-            {
-                if (_player[i]->getBuffData(PLAYER_BUFF_ATHL1, now) > 0)
-                    flag2 |= BattleFighter::AthlEnh1;
-                if (_player[i]->getBuffData(PLAYER_BUFF_ATHL2, now) > 0)
-                    flag2 |= BattleFighter::AthlEnh2;
-                if (_player[i]->getBuffData(PLAYER_BUFF_ATHL3, now) > 0)
-                    flag2 |= BattleFighter::AthlEnh3;
-                if (_player[i]->getBuffData(PLAYER_BUFF_ATHL4, now) > 0)
-                    flag2 |= BattleFighter::AthlEnh4;
-                if (_player[i]->getBuffData(PLAYER_BUFF_ATHL5, now) > 0)
-                    flag2 |= BattleFighter::AthlEnh5;
-                if (_player[i]->getBuffData(PLAYER_BUFF_ATHL6, now) > 0)
-                    flag2 |= BattleFighter::AthlEnh6;
-                if (_player[i]->getBuffData(PLAYER_BUFF_ATHL7, now) > 0)
-                    flag2 |= BattleFighter::AthlEnh7;
-                if (_player[i]->getBuffData(PLAYER_BUFF_ATHL8, now) > 0)
-                    flag2 |= BattleFighter::AthlEnh8;
-                if (_player[i]->getBuffData(PLAYER_BUFF_ATHL9, now) > 0)
-                    flag2 |= BattleFighter::AthlEnh9;
-            }
-            flag2 |= _player[i]->getAthlRivalBuff();
 		}
 		for(int j = 0; j < 25; ++ j)
 		{
