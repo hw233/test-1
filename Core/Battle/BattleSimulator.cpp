@@ -3486,6 +3486,13 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                     if(!bf || bf->getHP() == 0)
                         continue;
 
+                    UInt32 stun = bf->getStunRound();
+                    UInt32 confuse = bf->getConfuseRound();
+                    UInt32 forget = bf->getForgetRound();
+
+                    if(stun > 0 || confuse > 0 || forget > 0)
+                        continue;
+
                     if(bf->getSide() == bo->getSide())
                     {
                         continue;
@@ -7205,7 +7212,7 @@ bool BattleSimulator::doSkillStrengthen_disperse(BattleFighter* bf, const GData:
             bo->setStunLevel(0);
             bo->setStunRound(0);
 
-            if(bo->getDeepForgetLast() != 0)
+            if(bo->getDeepStunLast() != 0)
             {
                 bo->setDeepStunDmgExtra(0, 0);
                 defList[defCount].damType = e_unDeepStun;
