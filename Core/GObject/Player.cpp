@@ -8185,7 +8185,15 @@ namespace GObject
             GLOBAL().PushMsg(h, &idx);
         }
         else
+        {
             GetShuoShuo()->setShuoSafe(idx);
+            if (idx == SS_PUBTST_PKG)
+            {
+                char action[16] = "";
+                snprintf (action, 16, "F_%d", 1101);
+                udpLog("916", action, "", "", "", "", "act");
+            }
+        }
     }
 
 	void Player::setClan(Clan * c)
@@ -9912,6 +9920,9 @@ namespace GObject
                 st << Stream::eos;
                 send(st);
                 OnShuoShuo(SS_PUBTST_PKG);
+                char action[16] = "";
+                snprintf (action, 16, "F_%d_%d", 1098, 1);
+                udpLog("916", action, "", "", "", "", "act");
             }
         }
         else if(type == 2)
@@ -9921,7 +9932,12 @@ namespace GObject
             if(atoi(m_domain.c_str()) == 11)
             {
                 if(is3366AndLevel4() && (status & 0x08) == 0)
+                {
+                    char action[16] = "";
+                    snprintf (action, 16, "F_%d_%d", 1098, 5);
+                    udpLog("916", action, "", "", "", "", "act");
                     newStatus = status | 0x08;
+                }
                 else
                     return;
             }
@@ -9930,21 +9946,36 @@ namespace GObject
                 if((status & 0x01) == 0)
                     newStatus = status | 0x01;
                 else
+                {
+                    char action[16] = "";
+                    snprintf (action, 16, "F_%d_%d", 1098, 2);
+                    udpLog("916", action, "", "", "", "", "act");
                     return;
+                }
             }
             else if(isYD())
             {
                 if((status & 0x02) == 0)
                     newStatus = status | 0x02;
                 else
+                {
+                    char action[16] = "";
+                    snprintf (action, 16, "F_%d_%d", 1098, 3);
+                    udpLog("916", action, "", "", "", "", "act");
                     return;
+                }
             }
             else if(isQQVIP())
             {
                 if((status & 0x04) == 0)
                     newStatus = status | 0x04;
                 else
+                {
+                    char action[16] = "";
+                    snprintf (action, 16, "F_%d_%d", 1098, 4);
+                    udpLog("916", action, "", "", "", "", "act");
                     return;
+                }
             }
             else
                 return;
