@@ -708,6 +708,7 @@ public:
     bool openSecondSoul(UInt8 cls);
     void setSecondSoul(SecondSoul* sedondSoul);
     UInt8 getSoulExtraAura();
+    UInt8 getSoulAuraLeft();
     bool practiceLevelUp();
     bool changeSecondSoulClass(UInt8 cls);
     bool changeSecondSoulXinxiu(UInt8 xinxiu);

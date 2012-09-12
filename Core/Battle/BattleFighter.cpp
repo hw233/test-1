@@ -658,7 +658,7 @@ float BattleFighter::calcTherapy(bool& isCritical, bool& first, const GData::Ski
     if(skill->cond == GData::SKILL_PEERLESS)
     {
         aura_factor = _aura / 100;
-        _aura = 0;
+       // _aura = 0;  //  set函数统一处理，不在这里修改灵气了 
     }
 
     GData::SkillStrengthenBase* ss = getSkillStrengthen(SKILL_ID(skill->getId()));
