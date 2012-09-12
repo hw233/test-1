@@ -177,6 +177,7 @@ struct ClanCopyMonster
         {
             Fighter * fighter = it->fighter->clone(NULL);
             GData::NpcFData fdata = {fighter, it->pos};
+
             npcList.push_back(fdata);
 
             fighter->attack  = fighter->getBaseAttack()    * (1 + s_rate3NpcBaseModulus[monsterType][0]*copyLevel);
@@ -194,6 +195,7 @@ struct ClanCopyMonster
             fighter->evade = fighter->evade < s_rate3NpcAdvanceModMax[0] ? fighter->evade : s_rate3NpcAdvanceModMax[1];
             fighter->counter = fighter->counter < s_rate3NpcAdvanceModMax[0] ? fighter->counter : s_rate3NpcAdvanceModMax[2];
             fighter->magres = fighter->magres < s_rate3NpcAdvanceModMax[0] ? fighter->magres : s_rate3NpcAdvanceModMax[3];
+            fighter->setDirty(false);
 
         }
     }
@@ -371,7 +373,8 @@ class ClanCopyMgr : public Singleton <ClanCopyMgr>
     // 创建一个新帮派副本
     bool createClanCopy(Player* player, Clan *c);
 
-    void forceEndClanCopy(ClanCopy *clanCopy);
+    void forceEndClanCopy(ClanCopy *clanCopy, UInt8 type = FORCE_END_BY_RESET);
+    void forceEndAllClanCopy();
     // 清除已经结束的副本
     void deleteClanCopy(ClanCopy *clanCopy);
 

@@ -3589,6 +3589,13 @@ void Clan::addStatueExp(UInt32 exp)
 
 }
 
+void Clan::subStatueExp(UInt32 exp)
+{
+    Mutex::ScopedLock lk(_mutex);
+    _statue->subExp(exp);
+    broadcastCopyInfo();
+}
+
 void Clan::updateStatueExp()
 {
     Mutex::ScopedLock lk(_mutex);
@@ -3605,12 +3612,23 @@ void Clan::resetCopyLevel()
         // 不应该出现还未结束的副本信息，强制结束后重置
         clanCopy->forceEnd(FORCE_END_BY_ERROR);
     }
+    ClanCopyLog clanCopyLog(_id, TimeUtil::Now(), 2, COPY_RESET_LEVEL > _copyLevel ? _copyLevel : COPY_RESET_LEVEL, getName());
     if (_copyLevel <= COPY_RESET_LEVEL)
         _copyLevel = 1;
     else
         _copyLevel -= COPY_RESET_LEVEL;
 
-    DB5().PushUpdateData("REPLACE INTO `clan_copy` (`clanId`, `level`, `levelUpdateTime`, `maxCopyLevel`, `maxCopyTime`) VALUES (%u, %u, %u, %u)", _id, _copyLevel, TimeUtil::Now(), _copyMaxLevel, _copyMaxTime);
+    _copyLog.push_back(clanCopyLog);
+    if (_copyLog.size() > MAX_COPY_LOG)
+    {
+        _copyLog.pop_front();
+        DB5().PushUpdateData("DELETE FROM `clan_copy_log` where `clanid` = %u ORDER BY `logTime` ASC limit 1", _id);
+        DB5().PushUpdateData("Insert INTO `clan_copy_log` (`clanid`, `logTime`, `logType`, `playerName`, `logVal`) VALUES (%u, %u, %u, '%s', %u)", _id, clanCopyLog.logTime, clanCopyLog.logType, clanCopyLog.playerName.c_str(), clanCopyLog.logVal);
+    }
+    else
+    {
+        DB5().PushUpdateData("INSERT INTO  `clan_copy_log` (`clanId`, `logTime`, `logType`, `playerName`, `logVal`) VALUES (%u, %u, %u, '%s', %u)", _id, clanCopyLog.logTime, clanCopyLog.logType, clanCopyLog.playerName.c_str(), clanCopyLog.logVal);
+    }
 }
 
 UInt16 Clan::getStatueLevel()
@@ -3871,6 +3889,15 @@ void   Clan::clanCopyBattleOperate(Player * player, UInt8 command, BinaryReader 
     }
 }
 
+bool   Clan::copyLevelAvailable()
+{
+    // 判断科技等级是否支持开启更高级的副本
+    if (_techs->getMaxCopyLevel() > _copyLevel)
+        return true;
+    else
+        return false;
+}
+
 void   Clan::sendClanCopyInfo(Player * player, UInt8 val)
 {
     // 发送帮派副本标签页的所有有关信息
@@ -3979,7 +4006,7 @@ void   Clan::addCopyLevel()
         ++_copyLevel;
         _copyMaxLevel = _copyLevel >= _copyMaxLevel ? _copyLevel : _copyMaxLevel;
         _copyMaxTime = _copyLevel >= _copyMaxLevel ? TimeUtil::Now() : _copyMaxTime;
-        DB5().PushUpdateData("REPLACE INTO `clan_copy` (`clanId`, `level`, `levelUpdateTime`, `maxCopyLevel`, `maxCopyTime`) VALUES (%u, %u, %u, %u)", _id, _copyLevel, TimeUtil::Now(), _copyMaxLevel, _copyMaxTime);
+        DB5().PushUpdateData("REPLACE INTO `clan_copy` (`clanId`, `level`, `levelUpdateTime`, `maxCopyLevel`, `maxCopyTime`) VALUES (%u, %u, %u, %u, %u)", _id, _copyLevel, TimeUtil::Now(), _copyMaxLevel, _copyMaxTime);
     }
 }
 
@@ -3987,14 +4014,13 @@ void   Clan::addCopyWinLog(Player* player)
 {
     if (!player)
         return;
-    ClanCopyLog clanCopyLog(_id, TimeUtil::Now(), 2, _copyLevel, player->getName());
+    ClanCopyLog clanCopyLog(_id, TimeUtil::Now(), 1, _copyLevel, player->getName());
     _copyLog.push_back(clanCopyLog);
     if (_copyLog.size() > MAX_COPY_LOG)
     {
         _copyLog.pop_front();
         DB5().PushUpdateData("DELETE FROM `clan_copy_log` where `clanid` = %u ORDER BY `logTime` ASC limit 1", _id);
         DB5().PushUpdateData("Insert INTO `clan_copy_log` (`clanid`, `logTime`, `logType`, `playerName`, `logVal`) VALUES (%u, %u, %u, '%s', %u)", _id, clanCopyLog.logTime, clanCopyLog.logType, clanCopyLog.playerName.c_str(), clanCopyLog.logVal);
-        //DB5().PushUpdateData("REPLACE INTO `clan_copy_log` (`logTime`, `logType`, `playerName`, `logVal`) VALUES (%u, %u, '%s', %u) where `clanid` = %u ORDER `logTime` ASC limit 1", clanCopyLog.logTime, clanCopyLog.logType, clanCopyLog.playerName.c_str(), clanCopyLog.logVal);
     }
     else
     {

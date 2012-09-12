@@ -489,10 +489,12 @@ public:
     void updateStatueExp();
     void resetCopyLevel();
 
+    bool copyLevelAvailable();
     void sendClanCopyInfo(Player * player, UInt8 val = 0);
     void notifyCopyCreated(Player * player);
 
     void   addStatueExp(UInt32 exp);
+    void   subStatueExp(UInt32 exp);
 
     UInt16 getStatueLevel();
     UInt32 getStatueExp();

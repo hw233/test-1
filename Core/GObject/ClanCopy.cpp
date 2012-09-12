@@ -40,7 +40,7 @@ ClanCopy::ClanCopy(Clan *c, Player * player) : _clan(c), _launchPlayer(player)
     _endTime = 0;
     _tickTime = 0;
 
-    _tickTimeInterval = 1;
+    _tickTimeInterval = 5;
     _startTick = 1;
     _monsterRefreshTick = 6;
     _tickCount = 0;
@@ -335,7 +335,17 @@ void ClanCopy::updateBufferAttr(UInt8 spotId)
 void ClanCopy::updateSpotBufferValue(UInt8 spotId)
 {
     // 根据人数更新据点buffer加成
-    UInt8 count = _spotPlayer[spotId].size();
+    UInt8 count = 0;
+    if (_status != CLAN_COPY_PROCESS)
+        count = _spotPlayer[spotId].size();
+    else
+    {
+        for (ClanCopyPlayer::iterator it = _spotPlayer[spotId],begin(); it != _spotPlayer[spotId].end(); ++ it)
+        {
+            if (!it->deadType)
+                ++ count;
+        }
+    }
     _spotMap[spotId].spotBufferValue = GData::clanCopySpotMap[spotId].bufferValue[count];
 }
 
@@ -403,6 +413,8 @@ void ClanCopy::adjustPlayerPosition(Player * opPlayer, Player* player, UInt8 old
                     _spotPlayer[newSpotId].push_back(*spotPlayerListIt);
                     _spotPlayer[oldSpotId].erase(spotPlayerListIt);
                     _playerIndex[player] = newSpotId;
+                    updateSpotBufferValue(oldSpotId);
+                    updateSpotBufferValue(newSpotId);
                     notifySpotPlayerInfo();
                     return;
                 }
@@ -1001,7 +1013,7 @@ void ClanCopy::notifySpotBattleInfo(Player * player /* = NULL */)
         ClanCopySpot &clanCopySpot = mapIt->second;
         st << static_cast<UInt8> (clanCopySpot.maxPlayerCount);
         st << static_cast<UInt8> (clanCopySpot.spotBufferType);
-        st << static_cast<UInt16> (clanCopySpot.spotBufferValue);
+        st << static_cast<UInt16> (clanCopySpot.spotBufferValue * 1000);
 
         UInt8 i = 0;
         st << static_cast<UInt8> (_spotPlayer[spotId].size() + _spotDeadPlayer[spotId].size());
@@ -1030,6 +1042,7 @@ void ClanCopy::notifySpotBattleInfo(Player * player /* = NULL */)
             st << static_cast<UInt8> ((*monsterListIt)->monsterType);
             st << static_cast<UInt16> ((*monsterListIt)->npcValue);
             st << static_cast<UInt8> ((*monsterListIt)->justMoved ? spotId : (*monsterListIt)->nextSpotId);
+            st << static_cast<UInt8> ((*monsterListIt)->isDead ? 1 : 0);
         }
         st << static_cast<UInt8> (_spotBattleInfo[spotId].size());
         for (BattleInfo::iterator battleInfoIt = _spotBattleInfo[spotId].begin(); battleInfoIt != _spotBattleInfo[spotId].end(); ++ battleInfoIt)
@@ -1286,6 +1299,18 @@ void ClanCopyMgr::process(UInt32 now)
     }
 }
 
+void ClanCopyMgr::forceEndAllClanCopy()
+{ 
+    for (ClanCopyMap::iterator it = _clanCopyMap.begin(); it != _clanCopyMap.end();)
+    {
+        forceEndClanCopy(it->second);
+        delete (it->second);
+        _clanCopyMap.erase(it ++);
+    }
+    _reset = true;
+
+}
+
 UInt8 ClanCopyMgr::getCopyStatus(UInt32 clanId)
 {
     // 查询某一帮派的副本状态
@@ -1324,6 +1349,12 @@ bool ClanCopyMgr::createClanCopy(Player* player, Clan *c)
         return false;
     }
 
+    if (!c->copyLevelAvailable())
+    {
+        player->sendMsgCode(0, 1355);
+        return false;
+    }
+
     if (_reset)
     {
         player->sendMsgCode(0, 1354);
@@ -1343,10 +1374,10 @@ bool ClanCopyMgr::createClanCopy(Player* player, Clan *c)
     return true;
 }
 
-void ClanCopyMgr::forceEndClanCopy(ClanCopy* clanCopy)
+void ClanCopyMgr::forceEndClanCopy(ClanCopy* clanCopy, UInt8 type /* = FORCE_END_BY_RESET */)
 {
     // 强制结束副本
-    clanCopy->forceEnd(FORCE_END_BY_RESET);
+    clanCopy->forceEnd(type);
 }
 
 void ClanCopyMgr::deleteClanCopy(ClanCopy *clanCopy)
