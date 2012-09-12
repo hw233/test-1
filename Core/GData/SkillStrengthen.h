@@ -30,6 +30,7 @@ enum
     ON_SKILLUSED,   // 技能使用之后
     ON_RESIST,    // 状态被抵抗时
     ON_USEHAOTIAN,  // 使用昊天镜的时候。。。
+    ON_TARGET_DEAD, // 目标受攻击死亡
 };
 
 enum
@@ -62,6 +63,7 @@ enum
     TYPE_DAMAGE_EXTRA, // 被抵抗也流血
     TYPE_ATTACK_FRIEND,// 攻击本方血最少的人
     TYPE_BLEED_BYSKILL, // 技能导致流血，取技能的攻击力，hp改变和hp改变附加
+    TYPE_AURA_GET,   // 获取灵气
     TYPE_MAX,
 };
 

@@ -3411,6 +3411,12 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 if(pos2 != -1)
                     dmg += attackOnce(bf, first, cs, pr, skill, _objs[target_side][pos2], ef->value/100, defList, defCount, scList, scCount);
             }
+
+            BattleFighter* ptarget = static_cast<BattleFighter*>(_objs[target_side][target_pos]);
+            if(ptarget && ptarget->getHP() <= 0)  // beat to death!!!
+            {
+                bf->setMainTargetDeadFlag(true);
+            }
         }
         else if(1 == skill->area)
         {
@@ -3729,22 +3735,26 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
         }
     }
 
+    if (skill && skill->cond == GData::SKILL_PEERLESS)
+    {
+        int nChangeAuraNum = -1*bf->getAura() + bf->getAuraLeft(); // 因为天赋术，hero无双之后会留一点灵力
+        setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAura, nChangeAuraNum, 0, scList, scCount, false);
+    }
+
     if(ss && bf->getHP() != 0)
     {
         const std::vector<const GData::SkillStrengthenEffect*>& efs = ss->effect;
+        const GData::SkillStrengthenEffect* ef = NULL;
         for(size_t i = 0; i < efs.size(); ++ i)
         {
-            const GData::SkillStrengthenEffect* ef = efs[i];
+            ef = efs[i];
             if(ef->target == 3)
                 doSkillStrengthenAttack(bf, skill, ef, bf->getSide(), bf->getPos(), defList, defCount, scList, scCount, true);
             else
                 doSkillStrengthenAttack(bf, skill, ef, target_side, target_pos, defList, defCount, scList, scCount, true);
         }
-    }
 
-    if(ss)
-    {
-        const GData::SkillStrengthenEffect* ef = ss->getEffect(GData::ON_SKILLUSED, GData::TYPE_RANDOM_BLEED);
+        ef = ss->getEffect(GData::ON_SKILLUSED, GData::TYPE_RANDOM_BLEED);
         if(ef) // 有随机流血的符文
         {
             // 找出所有有效目标，然后随机一个
@@ -3770,15 +3780,20 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 BleedRandom_SkillStrengthen(bf, bo, ef, defList, defCount, scList, scCount);
             }
         }
+
+        // 主目标死亡，有符文要返还灵气
+        if(bf->getMainTargetDeadFlag())
+        {
+            ef = ss->getEffect(GData::ON_TARGET_DEAD, GData::TYPE_AURA_GET);
+            if(ef)
+            {
+                setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAura, ef->value, 0, scList, scCount, false);
+            }
+        }
     }
 
     bf->setSingleAttackFlag(false);  // 攻击完毕，取消此次造成的增加概率的效果
-
-    if (skill && skill->cond == GData::SKILL_PEERLESS)
-    {
-        int nChangeAuraNum = -1*bf->getAura() + bf->getAuraLeft(); // 因为天赋术，hero无双之后会留一点灵力
-        setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAura, nChangeAuraNum, 0, scList, scCount, false);
-    }
+    bf->setMainTargetDeadFlag(false);
 
     int self_side = bf->getSide() == target_side ? 25 : 0;
     appendToPacket( bf->getSide(), bf->getPos(), target_pos + self_side, 2, skill->getId(), cs, pr, defList, defCount, scList, scCount);

@@ -529,6 +529,9 @@ public:
     inline bool getSingleAttackFlag(){ return _bSingleAttackFlag; }
     inline void setSingleAttackFlag(bool b){ _bSingleAttackFlag =  b; }
 
+    inline bool getMainTargetDeadFlag(){ return _bMainTargetDead; }
+    inline void setMainTargetDeadFlag(bool b){ _bMainTargetDead = b; }
+
     inline float getHitChangeByPeerless(){ return _hitChangeByPeerless; }
     inline void setHitChangeByPeerless(float v){ _hitChangeByPeerless = v; }
     inline float getCounterChangeByPeerless(){ return _counterChangeByPeerless; }
@@ -567,6 +570,7 @@ private:
     float _counterChangeByPeerless;
     
     bool  _bSingleAttackFlag;  // 群体攻击时候，只攻击到一人的标记
+    bool  _bMainTargetDead;    // 主目标被打死（目前只在area为0的时候做了标记，以后需要就慢慢加好了）
 
 public:
     void fakeDead();
