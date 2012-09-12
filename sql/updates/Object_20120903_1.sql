@@ -10,6 +10,8 @@ CREATE TABLE IF NOT EXISTS `clan_copy` (
     `clanId` bigint(20) unsigned NOT NULL,
     `level` int(10) unsigned NOT NULL,
     `levelUpdateTime` bigint(20) unsigned NOT NULL,
+    `maxCopyLevel` int(10) unsigned NOT NULL DEFAULT '0',
+    `maxCopyTime` bigint(20) unsigned NOT NULL DEFAULT '0',
     PRIMARY KEY(`clanId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

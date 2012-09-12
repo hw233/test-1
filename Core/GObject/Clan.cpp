@@ -3609,6 +3609,8 @@ void Clan::resetCopyLevel()
         _copyLevel = 1;
     else
         _copyLevel -= COPY_RESET_LEVEL;
+
+    DB5().PushUpdateData("REPLACE INTO `clan_copy` (`clanId`, `level`, `levelUpdateTime`, `maxCopyLevel`, `maxCopyTime`) VALUES (%u, %u, %u, %u)", _id, _copyLevel, TimeUtil::Now(), _copyMaxLevel, _copyMaxTime);
 }
 
 UInt16 Clan::getStatueLevel()
@@ -3672,7 +3674,7 @@ UInt32 Clan::getStatueExHitRate()
 //////////////////////////////////////////
 // 帮派副本
 
-void   Clan::LoadCopy(UInt16 level, UInt32 levelUpdateTime)
+void   Clan::LoadCopy(UInt16 level, UInt32 levelUpdateTime, UInt16 maxLevel, UInt32 maxTime)
 {
     // 副本重置
     UInt32 now = TimeUtil::Now();
@@ -3696,6 +3698,8 @@ void   Clan::LoadCopy(UInt16 level, UInt32 levelUpdateTime)
     }
     _copyLevel = level;
     _copyLevelUpdateTime = now;
+    _copyMaxLevel = maxLevel;
+    _copyMaxTime = maxTime;
 }
 
 void   Clan::LoadCopyLog(UInt32 logTime, UInt8 logType, std::string playerName, UInt32 logVal)
@@ -3716,7 +3720,7 @@ UInt32 Clan::getOutputExp()
 
 UInt32 Clan::getNextOutputExp()
 {
-    return GData::clanCopyTable[_statue->getLevel() + 1].expOutput;
+    return GData::clanCopyTable[_copyLevel + 1].expOutput;
 }
 
 UInt8  Clan::getCopyStatus()
@@ -3890,10 +3894,10 @@ void   Clan::sendClanCopyInfo(Player * player, UInt8 val)
     st << static_cast<UInt32>(getStatueConsumeExp());
     st << static_cast<UInt32>(getStatueExHp());
     st << static_cast<UInt32>(getStatueExAttack());
-    st << static_cast<UInt32>(getStatueExDefend());
+    //st << static_cast<UInt32>(getStatueExDefend());
     //st << static_cast<UInt32>(getStatueExMagAtk());
     //st << static_cast<UInt32>(getStatueExMagDef());
-    //st << static_cast<UInt32>(getStatueExAction());
+    st << static_cast<UInt32>(getStatueExAction());
     //st << static_cast<UInt32>(getStatueExHitRate());
 
     st << static_cast<UInt16>(getCopyLevel());
@@ -3973,7 +3977,9 @@ void   Clan::addCopyLevel()
     if (_copyLevel < GData::clanCopyTable.size())
     {
         ++_copyLevel;
-        DB5().PushUpdateData("REPLACE INTO `clan_copy` (`level`, `levelUpdateTime`) VALUES (%u, %u) where `clanId = %u", _copyLevel, TimeUtil::Now(), _id);
+        _copyMaxLevel = _copyLevel >= _copyMaxLevel ? _copyLevel : _copyMaxLevel;
+        _copyMaxTime = _copyLevel >= _copyMaxLevel ? TimeUtil::Now() : _copyMaxTime;
+        DB5().PushUpdateData("REPLACE INTO `clan_copy` (`clanId`, `level`, `levelUpdateTime`, `maxCopyLevel`, `maxCopyTime`) VALUES (%u, %u, %u, %u)", _id, _copyLevel, TimeUtil::Now(), _copyMaxLevel, _copyMaxTime);
     }
 }
 
@@ -3986,11 +3992,13 @@ void   Clan::addCopyWinLog(Player* player)
     if (_copyLog.size() > MAX_COPY_LOG)
     {
         _copyLog.pop_front();
-        DB5().PushUpdateData("REPLACE INTO `clan_copy_log` (`logTime`, `logType`, `playerName`, `logVal`) VALUES (%u, %u, '%s', %u) where `clanid` = %u ORDER `logTime` ASC limit 1", clanCopyLog.logTime, clanCopyLog.logType, clanCopyLog.playerName.c_str(), clanCopyLog.logVal);
+        DB5().PushUpdateData("DELETE FROM `clan_copy_log` where `clanid` = %u ORDER BY `logTime` ASC limit 1", _id);
+        DB5().PushUpdateData("Insert INTO `clan_copy_log` (`clanid`, `logTime`, `logType`, `playerName`, `logVal`) VALUES (%u, %u, %u, '%s', %u)", _id, clanCopyLog.logTime, clanCopyLog.logType, clanCopyLog.playerName.c_str(), clanCopyLog.logVal);
+        //DB5().PushUpdateData("REPLACE INTO `clan_copy_log` (`logTime`, `logType`, `playerName`, `logVal`) VALUES (%u, %u, '%s', %u) where `clanid` = %u ORDER `logTime` ASC limit 1", clanCopyLog.logTime, clanCopyLog.logType, clanCopyLog.playerName.c_str(), clanCopyLog.logVal);
     }
     else
     {
-        DB5().PushUpdateData("INSERTE INTO  `clan_copy_log` (`clanId`, `logTime`, `logType`, `playerName`, `logVal`) VALUES (%u, %u, %u, %s, %u)", _id, clanCopyLog.logTime, clanCopyLog.logType, clanCopyLog.playerName.c_str(), clanCopyLog.logVal);
+        DB5().PushUpdateData("INSERT INTO  `clan_copy_log` (`clanId`, `logTime`, `logType`, `playerName`, `logVal`) VALUES (%u, %u, %u, '%s', %u)", _id, clanCopyLog.logTime, clanCopyLog.logType, clanCopyLog.playerName.c_str(), clanCopyLog.logVal);
     }
 }
 

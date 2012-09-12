@@ -1392,6 +1392,7 @@ namespace GData
             clanCopyTable[cc.level] = ClanCopyData(cc.level, cc.expOutput, cc.monsterWaveCount,
                     cc.minPlayer, cc.maxPlayer, cc.spotMaxPlayer, cc.homeHp);
 		}
+        clanCopyTable.push_back(ClanCopyData());
 
         lua_State* L = lua_open();
         luaopen_base(L);
@@ -1463,6 +1464,7 @@ namespace GData
                                      cs.exMagAtk, cs.exMagDef, cs.exAction, cs.exHitRate);
 
 		}
+        clanStatueTable.push_back(ClanStatueTableData());
         return true;
     }
 

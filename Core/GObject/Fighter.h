@@ -114,6 +114,7 @@ class Fighter
 {
 public:
 	Fighter(UInt32, Player *);
+    //Fighter(const Fighter& fighter);
 	~Fighter();
 
 	Fighter * clone(Player * owner);
@@ -226,6 +227,8 @@ public:
 	inline UInt16 getUpSkillAndLevel(int idx = 0) { return (idx >= 0 && idx < SKILL_UPMAX) ? _skill[idx] : 0; }
     // 取得默认技能
     inline UInt16 getDefaultSkillAndLevel() { return _skills.size()?_skills[0]:0; }
+    // 取得技能的容器
+    inline const std::vector<UInt16>& getSkillsVec() { return _skills;}
     // 取得可装备的技能数
     UInt8 getSkillsNum();
     // 取得所有装备的技能和等级
@@ -250,6 +253,8 @@ public:
 
     // 取得所有主动技能
     void getUpSkillAndLevel(std::vector<UInt16>& skills);
+    // 根据索引返回被动技能容器
+    inline const std::vector<UInt16>& getPassiveSkillByIndex(UInt16 index) { return _passkl[index];}
     // 取得攻击前被动100%触发技能
     inline std::vector<UInt16>& getPassiveSkillPreAtk100() { return _passkl[GData::SKILL_PREATK-GData::SKILL_PASSSTART]; }
     // 取得攻击后被动100%触发技能
@@ -267,6 +272,8 @@ public:
     // 取得死亡后概率100%触发技能
     inline std::vector<UInt16>& getPassiveSkillDead100() { return _passkl[GData::SKILL_DEAD-GData::SKILL_PASSSTART]; }
 
+    // 根据索引返回被动技能容器(为什么要拆成两部分？跪了……）
+    inline const std::vector<UInt16>& getPassiveSkillByIndex2(UInt16 index) { return _rpasskl[index];}
     // 取得攻击前被动概率触发技能
     inline std::vector<UInt16>& getPassiveSkillPreAtk() { return _rpasskl[GData::SKILL_PREATK-GData::SKILL_PASSSTART]; }
     // 取得攻击后被动概率触发技能
@@ -342,10 +349,12 @@ public:
 	inline ItemFashion* getFashion() { return _fashion; }
 	inline ItemWeapon * getWeapon() { return _weapon; }
 	inline ItemArmor * getArmor(int idx) { return (idx >= 0 && idx < 5) ? _armor[idx] : NULL; }
+    inline void * getArmorAddr() { return _armor;}
 	inline ItemEquip * getAmulet() { return _amulet; }
 	inline ItemEquip * getRing() { return _ring; }
 
 	inline ItemEquip * getTrump(int idx) { return (idx >= 0 && idx < getMaxTrumps()) ? _trump[idx] : 0; }
+    inline void * getTrumpAddr() { return _trump;}
     inline UInt8 getMaxTrumps () { return TRUMP_UPMAX; }
     UInt32 getTrumpId(int idx);
     int getAllTrumpId(UInt32* trumps, int size = TRUMP_UPMAX);

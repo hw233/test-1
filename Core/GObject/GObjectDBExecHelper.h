@@ -674,6 +674,8 @@ struct DBClanCopy
     UInt32 clanId;
     UInt16 level;
     UInt32 levelUpdateTime;
+    UInt16 maxLevel;
+    UInt32 maxLevelTime;
 };
 
 struct DBClanCopyLog
@@ -1776,11 +1778,13 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBClanCopy)
-SPECIALDEF(3)
+SPECIALDEF(5)
 (
     UInt32, clanId,
     UInt16, level,
-    UInt32, levelUpdateTime
+    UInt32, levelUpdateTime,
+    UInt16, maxLevel,
+    UInt32, maxLevelTime
 )
 SPECIALEND()
 
