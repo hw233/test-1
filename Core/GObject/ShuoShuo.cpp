@@ -80,6 +80,9 @@ void ShuoShuo::setShuoShuo(UInt8 idx, UInt8 status)
     if (idx >= SS_MAX)
         return;
 
+    if (m_ss.size() < SS_MAX)
+        m_ss.resize(SS_MAX, 0);
+
     UInt8 o = m_ss[idx];
     m_ss[idx] = status;
 
@@ -94,6 +97,8 @@ UInt8 ShuoShuo::getShuoShuo(UInt8 idx)
 {
     if (idx >= SS_MAX)
         return 0;
+    if (m_ss.size() < SS_MAX)
+        m_ss.resize(SS_MAX, 0);
     return m_ss[idx];
 }
 
