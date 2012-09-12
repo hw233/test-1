@@ -1940,6 +1940,34 @@ function sendRechargeMails7(player, ototal, ntotal)
     end
 end
 
+function sendRechargeMails_2012_09_13(player, ototal, ntotal)
+    local lvls = {
+        10,50,99,199,399,699,999,
+    }
+    local items = {
+        {516,1,1},
+        {503,1,1, 15,2,1},
+        {514,2,1, 512,2,1},
+        {516,1,1, 547,2,1},
+        {549,1,1},
+        {509,1,1, 500,1,1},
+        {9017,1,1, 9019,1,1},
+    }
+
+    local olvl = calcRechargeLevel(lvls, ototal)
+    local nlvl = calcRechargeLevel(lvls, ntotal)
+
+    if nlvl == 0 or olvl == nlvl then
+        return
+    end
+
+    for k = olvl+1, nlvl do
+        local title = string.format(msg_100, lvls[k])
+        local ctx = string.format(msg_101, lvls[k])
+        sendItemPackageMail(player, title, ctx, items[k]);
+    end
+end
+
 function sendRechargeMails(player, ototal, ntotal)
     --sendRechargeMails1(player, ototal, ntotal)
     --[[local start = { ['year'] = 2012, ['month'] = 7, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1956,7 +1984,8 @@ function sendRechargeMails(player, ototal, ntotal)
     --    sendRechargeMails5(player, ototal, ntotal)
     --end
     -- sendRechargeMails6(player, ototal, ntotal)
-    sendRechargeMails7(player, ototal, ntotal)
+    --sendRechargeMails7(player, ototal, ntotal)
+    sendRechargeMails_2012_09_13(player, ototal, ntotal)
 end
 
 function onEquipForge(player, id, onums)
@@ -2218,37 +2247,39 @@ function onGetYearActAward(player, type)
     end
 end
 
-function onGetKillMonsterReward(player)
+function onGetKillMonsterReward(player, pos)
     local roamPlace = {
      -- 1  2  3  4  5  6  7  8
-        2, 3, 5, 1, 3, 2, 2, 6,
-        5, 1, 4, 2, 6, 3, 5, 2,
-        3, 2, 5, 6, 3, 2, 1, 7
+        1, 2, 3, 4, 5, 6, 7, 8,
+        9, 10, 1, 3, 11, 12, 8, 2,
+        6, 13, 1, 14, 8, 3, 13, 15,
+        1, 3, 8, 16,
     }
 
     local eventItem = {
-        {{502,  1, 1, 1}, {55,  1, 1, 1}, {510,  1, 1, 1}},
-        {{56,   1, 1, 1}, {57,  1, 1, 1}, {1525, 1, 1, 1}},
-        {{502,  1, 1, 1}, {55,  1, 1, 1}, {510,  1, 1, 1}},
-        {{1326, 1, 1, 1}, {466, 1, 1, 1}, {8000, 1, 1, 1}},
-        {{56,   1, 1, 1}, {57,  1, 1, 1}, {1525, 1, 1, 1}},
-        {{502,  1, 1, 1}, {55,  1, 1, 1}, {510,  1, 1, 1}},
-        {{1326, 1, 1, 1}, {466, 1, 1, 1}, {8000, 1, 1, 1}},
-        {{502,  1, 1, 1}, {55,  1, 1, 1}, {510,  1, 1, 1}},
-        {{503,  1, 1, 1}, {33,  1, 1, 1}, {508,  1, 1, 1}},
-        {{1326, 1, 1, 1}, {466, 1, 1, 1}, {8000, 1, 1, 1}},
-        {{1326, 1, 1, 1}, {466, 1, 1, 1}, {8000, 1, 1, 1}},
-        {{503,  1, 1, 1}, {33,  1, 1, 1}, {508,  1, 1, 1}},
-        {{503,  1, 1, 1}, {33,  1, 1, 1}, {508,  1, 1, 1}},
-        {{1326, 1, 1, 1}, {466, 1, 1, 1}, {8000, 1, 1, 1}},
-        {{1326, 1, 1, 1}, {466, 1, 1, 1}, {8000, 1, 1, 1}},
-        {{9076, 1, 1, 1}, {9076,1, 1, 1}, {9076, 1, 1, 1}},
+        --{物品ID，物品数，剑侠（或柔情、或财富、或传奇），剑侠个数}
+        {{502,  1, 1, 1}, {55,  1, 0, 0}, {510,  1, 0, 0}},
+        {{56,   1, 0, 0}, {57,  1, 0, 0}, {1525, 1, 1, 1}},
+        {{502,  1, 1, 1}, {55,  1, 0, 0}, {510,  1, 0, 0}},
+        {{1326, 1, 0, 0}, {466, 1, 0, 0}, {8000, 1, 3, 1}},
+        {{56,   1, 0, 0}, {57,  1, 0, 0}, {1525, 1, 3, 1}},
+        {{502,  1, 2, 1}, {55,  1, 0, 0}, {510,  1, 0, 0}},
+        {{1326, 1, 0, 0}, {466, 1, 0, 0}, {8000, 1, 2, 1}},
+        {{502,  1, 3, 1}, {55,  1, 0, 0}, {510,  1, 0, 0}},
+        {{503,  1, 4, 1}, {33,  1, 0, 0}, {508,  1, 0, 0}},
+        {{1326, 1, 0, 0}, {466, 1, 0, 0}, {8000, 1, 3, 1}},
+        {{1326, 1, 0, 0}, {466, 1, 0, 0}, {8000, 1, 2, 1}},
+        {{503,  1, 4, 1}, {33,  1, 0, 0}, {508,  1, 0, 0}},
+        {{503,  1, 3, 1}, {33,  1, 0, 0}, {508,  1, 0, 0}},
+        {{1326, 1, 0, 0}, {466, 1, 0, 0}, {8000, 1, 2, 1}},
+        {{1326, 1, 0, 0}, {466, 1, 0, 0}, {8000, 1, 2, 1}},
+        {{9076, 1, 4, 1}, {9076,1, 4, 1}, {9076, 1, 4, 1}},
     }
 
-    step = math.random(1, 3)
-    pos2 = pos + step
-    if pos2 > 24 then
-        pos2 = pos2 - 24
+    local step = math.random(1, 3)
+    local pos2 = pos + step
+    if pos2 > 28 then
+        pos2 = pos2 - 28
     end
 
     local package = player:GetPackage()
@@ -2256,8 +2287,8 @@ function onGetKillMonsterReward(player)
     j = math.random(1, 3)
 
     package:Add(eventItem[i][j][1], eventItem[i][j][2], true, true, 32)
-    player:lastQueqiaoAwardPush(eventItem[i][j][1], eventItem[i][j][2]);
-    player:postRoamResult(pos2, j, eventItem[i][j][3]);
+    player:lastKillMonsterAwardPush(eventItem[i][j][1], eventItem[i][j][2]);
+    player:posttKillMonsterRoamResult(pos2, j, eventItem[i][j][3]);
 
     return pos2;
 end

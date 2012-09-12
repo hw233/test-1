@@ -981,7 +981,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 		conn->send(&st[0], st.size());
 	}
     {
-        if( !pl->GetVar(VAR_AWARD_NEWREGISTER) && pl->GetLev() == 1)
+        if(!pl->GetVar(VAR_AWARD_NEWREGISTER) && pl->GetLev() == 1)
             pl->sendNewRegisterAward(0);  //0:表示新用户注册还可以邀请好友进行抽奖
     }
 	{
@@ -1154,12 +1154,12 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     {
         pl->sendSoSoMapInfo();
     }
-    if (World::getNeedRechargeRank())
+    if (World::getNeedRechargeRank() || time(NULL) <= World::getRechargeEnd() + 24*60*60)
     {
         GameMsgHdr hdr(0x1C3, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr, NULL);
     }
-    if (World::getNeedConsumeRank())
+    if (World::getNeedConsumeRank() || time(NULL) <= World::getConsumeEnd() + 24*60*60)
     {
         GameMsgHdr hdr(0x1C4, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr, NULL);
@@ -4551,6 +4551,7 @@ void OnNewRelationReq( GameMsgHdr& hdr, const void* data)
     pl->send(st);
 }
 
+#if 0
 void OnTownDeamonReq( GameMsgHdr& hdr, const void* data)
 {
 	MSG_QUERY_PLAYER(player);
@@ -4646,6 +4647,7 @@ void OnTownDeamonReq( GameMsgHdr& hdr, const void* data)
         return;
     }
 }
+#endif
 
 void OnGetHeroMemoAward( GameMsgHdr& hdr, GetHeroMemoAward& req)
 {

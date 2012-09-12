@@ -855,7 +855,7 @@ namespace GObject
 		void updateDB(UInt8, UInt32);
 
 		UInt32 getGold(UInt32 c = 0, IncommingInfo* ii = NULL);
-		UInt32 useGold(UInt32 c,ConsumeInfo * ci=NULL);
+		UInt32 useGold(UInt32 c, ConsumeInfo * ci=NULL);
         UInt32 useGold4LuckDraw(UInt32 c);
         UInt32 getGold4LuckDraw();
 		bool holdGold(UInt32 c, UInt8, ConsumeInfo * ci = NULL);
@@ -1291,6 +1291,7 @@ namespace GObject
         UInt8 beQixiEyes(Player* pl);
         void onQixiEyesResp(UInt8 bind);
         void postRoamResult(UInt8 pos, UInt8 event, UInt8 score);
+        void postKillMonsterRoamResult(UInt8 pos, UInt8 event, UInt8 score);
 
         inline bool queQiaoCheck() { return m_qixi.bind; }
         inline UInt8 getQueqiaoPos() { return m_qixi.pos; }
@@ -1595,6 +1596,7 @@ namespace GObject
         void getNewRegisterAward(UInt8 opt);
         void getAwardFromAD();
         void getAwardFromRF();
+        void getAwardGiftCard();
 
         inline TripodData& getTripodData() { return m_td; }
         TripodData& newTripodData();

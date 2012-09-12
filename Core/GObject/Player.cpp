@@ -3758,7 +3758,7 @@ namespace GObject
         }
 
         // 统计鹊桥道具购买的日志
-        if (ci->itemId == 9122)
+        if (ci && ci->itemId == 9122)
         {
             udpLog("qixi", "I_9122_1", "", "", "", "", "act", ci->itemNum);
         }
@@ -9625,6 +9625,10 @@ namespace GObject
             //回流用户新区道具奖
             getAwardFromRF();
             break;
+        case 9:
+            //领取礼物卡
+            getAwardGiftCard();
+            break;
         }
     }
 
@@ -9735,6 +9739,17 @@ namespace GObject
         st << GameAction()->RunNewRegisterAwardAD_RF(this, 2) << Stream::eos;
         send(st);
         SetVar(VAR_AWARD_NEWREGISTER, 4);
+    }
+
+    void Player::getAwardGiftCard()
+    {
+        if(GetVar(VAR_AWARD_NEWREGISTER))
+            return;
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(9);
+        st << GameAction()->RunNewRegisterAwardAD_RF(this, 3) << Stream::eos;
+        send(st);
+        SetVar(VAR_AWARD_NEWREGISTER, 5);
     }
 
     void Player::getHappyAward(UInt8 opt)
@@ -9882,6 +9897,8 @@ namespace GObject
             return;
         }
         Stream st(REP::COUNTRY_ACT);
+        UInt8 subType = 1;
+        st << subType;
         st << type;
         if(type == 1)
         {
@@ -9894,6 +9911,7 @@ namespace GObject
                 st << static_cast<UInt8>(1);
                 st << Stream::eos;
                 send(st);
+                //OnShuoShuo(SS_PUBTST_PKG);
             }
         }
         else if(type == 2)
@@ -10348,15 +10366,15 @@ namespace GObject
     {
         if (!pos || pos > 7)
             return;
-        MailPackage::MailItem item[7][1] =
+        MailPackage::MailItem item[7][4] =
         {
-            {{9076, 80},},
-            {{9076, 60},},
-            {{9076, 50},},
-            {{9076, 10},},
-            {{9076, 10},},
-            {{9076, 10},},
-            {{9076, 10},},
+            {{9076,20},{509,20},{30,100},},
+            {{9076,10},{509,10},{30,50},},
+            {{9076,5},{509,10},{30,20},},
+            {{9076,5},{509,5},},
+            {{9076,5},{509,5},},
+            {{9076,5},{509,5},},
+            {{9076,5},{509,5},},
         };
 
         SYSMSGV(_title, 4026, pos);
@@ -10365,7 +10383,7 @@ namespace GObject
         if(mail)
         {
             MailPackage::MailItem* mitem = &item[pos-1][0];
-            UInt32 size = 1;
+            UInt32 size = 4;
             std::string strItems;
             for (UInt32 i = 0; i < size; ++i)
             {
@@ -10495,14 +10513,32 @@ namespace GObject
         }
         if(m_dpData->itemNum != 0)
         {
-            if(NULL != GetPackage()->AddItem2(m_dpData->itemId, m_dpData->itemNum, true, true, FromTownDeamon))
+            if(GetFreePackageSize() > m_dpData->itemNum/99)
             {
+                struct AddItemInfo
+                {
+                    UInt32 id;
+                    UInt16 num;
+                    UInt8 bind;
+                    UInt8 fromWhere;
+                };
+
+                AddItemInfo item;
+                item.id = m_dpData->itemId;
+                item.num = m_dpData->itemNum;
+                item.bind = true;
+                item.fromWhere = FromTownDeamon;
+                GameMsgHdr hdr1(0x259, getThreadId(), this, sizeof(AddItemInfo));
+                GLOBAL().PushMsg(hdr1, &item);
+
                 m_dpData->itemId = 0;
                 m_dpData->itemNum = 0;
                 m_dpData->quitLevel = 0;
                 m_dpData->attacker = NULL;
                 DB3().PushUpdateData("UPDATE `towndeamon_player` SET `itemId`=0, `itemNum`=0, `quitLevel`=0, `attacker`=0 WHERE `playerId` = %"I64_FMT"u", getId());
             }
+            else
+                sendMsgCode(2, 1011);
         }
         else
         {
@@ -12075,6 +12111,26 @@ namespace GObject
         m_qixi.bind = 0;
         m_qixi.lover = NULL;
         DB1().PushUpdateData("UPDATE `qixi` SET `bind`=0, `lover`=0 WHERE `playerId` = %"I64_FMT"u", getId());
+    }
+
+    void Player::postKillMonsterRoamResult(UInt8 pos, UInt8 event, UInt8 score)
+    {
+        /*
+        struct Roam
+        {
+            UInt8 pos;
+            UInt8 event;
+            UInt8 score;
+        };
+
+        Roam roam;
+        roam.pos = pos;
+        roam.event = event;
+        roam.score = score;
+
+		GameMsgHdr hdr(0x1F9, WORKER_THREAD_WORLD, this, sizeof(Roam));
+		GLOBAL().PushMsg(hdr, &roam);
+        */
     }
 
 } // namespace GObject

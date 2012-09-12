@@ -284,6 +284,14 @@ public:
     // 取得死亡后概率触发技能
     inline std::vector<UInt16>& getPassiveSkillDead() { return _rpasskl[GData::SKILL_DEAD-GData::SKILL_PASSSTART]; }
 
+
+    // 神农宝鼎
+    inline std::vector<UInt16>& getPassiveSkillOnTherapy() { return _passkl[GData::SKILL_ONTHERAPY-GData::SKILL_PASSSTART]; }
+    // 轩辕神剑
+    inline std::vector<UInt16>& getPassiveSkillOnSkillDmg() { return _passkl[GData::SKILL_ONSKILLDMG-GData::SKILL_PASSSTART]; }
+    // 五彩元石
+    inline std::vector<UInt16>& getPassiveSkillOnOtherDead() { return _passkl[GData::SKILL_ONOTHERDEAD-GData::SKILL_PASSSTART]; }
+
     // 取得心法带出技能的ID表
     const std::vector<const GData::SkillBase*>& skillFromCitta(UInt16 citta);
 

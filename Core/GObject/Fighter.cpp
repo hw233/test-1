@@ -2007,7 +2007,7 @@ bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb, bool init )
 
             if (pap->pra > getPExp())
                 return false;
-            addPExp(-pap->pra, writedb);
+            addPExp(-static_cast<Int32>(pap->pra), writedb);
 
             _acupoints[idx] = v;
             if (_acupoints[idx] < 3)
@@ -2594,7 +2594,10 @@ void Fighter::delSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_AFTRES ||
                         s->cond == GData::SKILL_DEAD ||
                         s->cond == GData::SKILL_ENTER ||
-                        s->cond == GData::SKILL_DEAD)
+                        s->cond == GData::SKILL_ONTHERAPY ||
+                        s->cond == GData::SKILL_ONSKILLDMG ||
+                        s->cond == GData::SKILL_ONOTHERDEAD
+                        )
                 {
                     offPassiveSkill(s->getId(), s->cond, s->prob>=100.0f, writedb);
                 }
@@ -2629,7 +2632,10 @@ void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_AFTRES ||
                         s->cond == GData::SKILL_DEAD ||
                         s->cond == GData::SKILL_ENTER ||
-                        s->cond == GData::SKILL_DEAD)
+                        s->cond == GData::SKILL_ONTHERAPY ||
+                        s->cond == GData::SKILL_ONSKILLDMG ||
+                        s->cond == GData::SKILL_ONOTHERDEAD
+                        )
                 {
                     upPassiveSkill(s->getId(), s->cond, (s->prob >= 100.0f), writedb);
                 }
@@ -2842,7 +2848,7 @@ bool Fighter::addNewCitta( UInt16 citta, bool writedb, bool init, bool split )
     }
 
     if (!init && cb->pexp)
-        addPExp(-cb->pexp, writedb);
+        addPExp(-static_cast<Int32>(cb->pexp), writedb);
 
     _attrDirty = true;
     _bPDirty = true;
