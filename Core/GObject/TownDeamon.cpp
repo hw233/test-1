@@ -674,7 +674,7 @@ void TownDeamon::notifyChallengeResult(Player* pl, Player* defer, bool win)
 void TownDeamon::notifyAttackNpcResult(Player* pl, bool win)
 {
     DeamonPlayerData* dpd = pl->getDeamonPlayerData();
-    UInt32 level = dpd->curLevel + 1;
+    UInt16 level = dpd->curLevel + 1;
     if(win)
     {
         if (level > m_maxLevel)
