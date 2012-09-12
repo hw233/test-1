@@ -1392,6 +1392,7 @@ namespace GObject
         std::vector<GData::LootResult> _equipAward;
 		std::vector<GData::LootResult> _RegisterAward;
 		std::vector<GData::LootResult> _lastQueqiaoAward;
+        std::vector<GData::LootResult> _lastKillMonsterAward;
 
     private:
 		UInt16 _lastDungeon;
@@ -1639,6 +1640,8 @@ namespace GObject
         void IDIPAddItem(UInt16 itemId, UInt16 num, bool bind = true);
         void lastQueqiaoAwardPush(UInt16 itemId, UInt16 num);
         void checkLastQueqiaoAward();
+        void lastKillMonsterAwardPush(UInt16 itemId, UInt16 num);
+        void checkLastKillMonsterAward();
 
     private:
         bool m_hasTripod;
@@ -1693,6 +1696,7 @@ namespace GObject
     public:
         void getSoSoMapAward();
         void sendSoSoMapInfo();
+        void getKillMonsterAward();
 
 #ifdef _FB
     public:

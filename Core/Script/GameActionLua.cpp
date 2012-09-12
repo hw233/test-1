@@ -1,4 +1,4 @@
-﻿#include "Config.h"
+#include "Config.h"
 #include "GameActionLua.h"
 #include "Server/WorldServer.h"
 #include "GObject/Player.h"
@@ -134,6 +134,7 @@ namespace Script
         lua_tinker::def(_L, "getConsumeActive", GObject::World::getConsumeActive);
         lua_tinker::def(_L, "getNeedRechargeRank", GObject::World::getNeedRechargeRank);
         lua_tinker::def(_L, "getNeedConsumeRank", GObject::World::getNeedConsumeRank);
+        lua_tinker::def(_L, "getKillMonsterAct", GObject::World::getKillMonsterAct);
 
         CLASS_DEF(GameActionLua, Print);
         lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);
@@ -264,6 +265,7 @@ namespace Script
 		CLASS_DEF(Player, setQQVipPrivilege);
 		CLASS_DEF(Player, postRoamResult);
         CLASS_DEF(Player, lastQueqiaoAwardPush);
+        CLASS_DEF(Player, lastKillMonsterAwardPush);
 
         CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);
@@ -1105,6 +1107,11 @@ namespace Script
     lua_tinker::table GameActionLua::GetOnlineReward(UInt8 cnt)
     {
         return Call<lua_tinker::table>("GetOnlineReward", cnt);
+    }
+
+    UInt8 GameActionLua::onGetKillMonsterReward(Player* player)
+    {
+        return Call<UInt8>("onGetKillMonsterReward", player);
     }
 
     void   GameActionLua::GetAtyReward(Player* p, UInt32 flag)

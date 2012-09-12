@@ -1164,6 +1164,8 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         GameMsgHdr hdr(0x1C4, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr, NULL);
     }
+    //if(World::getYearActive())
+    //    pl->sendYearActInfo();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -1636,10 +1638,23 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
         {
 	        if(!World::getYearActive())
 		        return;
-            UInt8 type = 0;
-            br >> type;
-            if(type == 1 || type == 2)
-                player->getYearActAward(type);
+            UInt8 opt2 = 0;
+            br >> opt2;
+            if(opt2 == 1)
+            {
+                UInt8 type = 0;
+                br >> type;
+                if(type == 1 || type == 2)
+                    player->getYearActAward(type);
+            }else if(opt2 == 2)
+                player->sendYearActInfo();
+        }
+        break;
+        case 2:
+        {
+            if(!World::getKillMonsterAct())
+                return;
+            player->getKillMonsterAward();
         }
         break;
         default:

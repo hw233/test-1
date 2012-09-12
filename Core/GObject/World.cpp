@@ -131,6 +131,7 @@ RCSortType World::rechargeSort;
 RCSortType World::consumeSort;
 bool World::_needrechargerank = false;
 bool World::_needconsumerank = false;
+bool World::_killMonsteract = 0;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {

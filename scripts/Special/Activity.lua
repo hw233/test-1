@@ -179,6 +179,10 @@ function onDungeonWin(player, id, count, free)
     else
         FallActivity(player, 2)
     end
+    if getKillMonsterAct() then
+        local package = player:GetPackage();
+        package:Add(9163, 1, true)
+    end
 end
 
 function onClanBattleAttend(player)
@@ -822,6 +826,10 @@ function onCopyWin(player, id, floor, spot, lootlvl)
             FallActivity(player, lootlvl)
         end
     end
+    if getKillMonsterAct() then
+        local package = player:GetPackage();
+        package:Add(9163, 1, true)
+    end
 end
 
 
@@ -843,6 +851,10 @@ function onFrontMapWin(player, id, spot, lootlvl)
         FallActivity(player, 1)
     else
         FallActivity(player, lootlvl)
+    end
+    if getKillMonsterAct() then
+        local package = player:GetPackage();
+        package:Add(9163, 1, true)
     end
 end
 
@@ -2174,14 +2186,17 @@ end
 function onGetYearActAward(player, type)
     if type ==1 then
         local package = player:GetPackage()
-        if package:GetRestPackageSize() < 6 then
+        if package:GetRestPackageSize() < 9 then
             return false
         end
         player:getCoupon(50)
         package:Add(56, 5, true)
         package:Add(57, 5, true)
-        player:getTael(5000)
+        package:Add(15, 5, true)
         package:Add(49, 1, true)
+        package:Add(503, 1, true)
+        package:Add(510, 1, true)
+        package:Add(5031, 5, true)
         package:Add(9163, 1, true)
         return true
     end
@@ -2194,7 +2209,7 @@ function onGetYearActAward(player, type)
         package:Add(503, 1, true)
         package:Add(514, 1, true)
         package:Add(1325, 1, true)
-        player:getTael(5000)
+        package:Add(15, 5, true)
         package:Add(51, 1, true)
         package:Add(48, 1, true)
         package:Add(49, 2, true)
@@ -2203,4 +2218,47 @@ function onGetYearActAward(player, type)
     end
 end
 
+function onGetKillMonsterReward(player)
+    local roamPlace = {
+     -- 1  2  3  4  5  6  7  8
+        2, 3, 5, 1, 3, 2, 2, 6,
+        5, 1, 4, 2, 6, 3, 5, 2,
+        3, 2, 5, 6, 3, 2, 1, 7
+    }
+
+    local eventItem = {
+        {{502,  1, 1, 1}, {55,  1, 1, 1}, {510,  1, 1, 1}},
+        {{56,   1, 1, 1}, {57,  1, 1, 1}, {1525, 1, 1, 1}},
+        {{502,  1, 1, 1}, {55,  1, 1, 1}, {510,  1, 1, 1}},
+        {{1326, 1, 1, 1}, {466, 1, 1, 1}, {8000, 1, 1, 1}},
+        {{56,   1, 1, 1}, {57,  1, 1, 1}, {1525, 1, 1, 1}},
+        {{502,  1, 1, 1}, {55,  1, 1, 1}, {510,  1, 1, 1}},
+        {{1326, 1, 1, 1}, {466, 1, 1, 1}, {8000, 1, 1, 1}},
+        {{502,  1, 1, 1}, {55,  1, 1, 1}, {510,  1, 1, 1}},
+        {{503,  1, 1, 1}, {33,  1, 1, 1}, {508,  1, 1, 1}},
+        {{1326, 1, 1, 1}, {466, 1, 1, 1}, {8000, 1, 1, 1}},
+        {{1326, 1, 1, 1}, {466, 1, 1, 1}, {8000, 1, 1, 1}},
+        {{503,  1, 1, 1}, {33,  1, 1, 1}, {508,  1, 1, 1}},
+        {{503,  1, 1, 1}, {33,  1, 1, 1}, {508,  1, 1, 1}},
+        {{1326, 1, 1, 1}, {466, 1, 1, 1}, {8000, 1, 1, 1}},
+        {{1326, 1, 1, 1}, {466, 1, 1, 1}, {8000, 1, 1, 1}},
+        {{9076, 1, 1, 1}, {9076,1, 1, 1}, {9076, 1, 1, 1}},
+    }
+
+    step = math.random(1, 3)
+    pos2 = pos + step
+    if pos2 > 24 then
+        pos2 = pos2 - 24
+    end
+
+    local package = player:GetPackage()
+    i = roamPlace[pos2]
+    j = math.random(1, 3)
+
+    package:Add(eventItem[i][j][1], eventItem[i][j][2], true, true, 32)
+    player:lastQueqiaoAwardPush(eventItem[i][j][1], eventItem[i][j][2]);
+    player:postRoamResult(pos2, j, eventItem[i][j][3]);
+
+    return pos2;
+end
 

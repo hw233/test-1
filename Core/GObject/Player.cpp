@@ -1002,9 +1002,6 @@ namespace GObject
             }
         }
 
-        if(World::getYearActive)
-            sendYearActInfo();
-
         sendLevelPack(GetLev());
         offlineExp(curtime);
 
@@ -9921,6 +9918,10 @@ namespace GObject
         UInt8 type;
         UInt8 result;
 
+        UInt8 opt = 1;
+        st << opt;
+        st2 << opt;
+
         type = 1;
         st << type;
         if(GetVar(VAR_YEAR_SWORDSMAN) > 0)
@@ -9945,6 +9946,22 @@ namespace GObject
         st2 << result;
         st2 << Stream::eos;
         send(st2);
+    }
+
+    void Player::lastKillMonsterAwardPush(UInt16 itemId, UInt16 num)
+    {
+        GData::LootResult lt = {itemId, num};
+        _lastKillMonsterAward.push_back(lt);
+    }
+
+    void Player::checkLastKillMonsterAward()
+    {
+        std::vector<GData::LootResult>::iterator it;
+        for(it = _lastKillMonsterAward.begin(); it != _lastKillMonsterAward.end(); ++ it)
+        {
+            m_Package->ItemNotify(it->id, it->count);
+        }
+        _lastKillMonsterAward.clear();
     }
 
     TripodData& Player::runTripodData(TripodData& data, bool init)
@@ -11874,6 +11891,22 @@ namespace GObject
 
         Stream st(REP::GETAWARD);
         st << static_cast<UInt8>(5) << static_cast<UInt8>(got?0:1) << Stream::eos;
+        send(st);
+    }
+
+    void Player::getKillMonsterAward()
+    {
+        if(GetPackage()->GetItemAnyNum(9163) < 1)
+        {
+            return;
+        }
+        UInt8 idx;
+        UInt8 subType = 2;
+        Stream st(REP::COUNTRY_ACT);
+        st << subType;
+        idx = GameAction()->onGetKillMonsterReward(this);
+        st << idx;
+        st << Stream::eos;
         send(st);
     }
 

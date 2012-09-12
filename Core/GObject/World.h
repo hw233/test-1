@@ -312,6 +312,10 @@ public:
     { _needconsumerank = v; }
     inline static bool getNeedConsumeRank()
     { return _needconsumerank; }
+    inline static void setKillMonsterAct(bool v)
+    { _killMonsteract = v; }
+    inline static bool getKillMonsterAct()
+    { return _killMonsteract; }
 
 	inline Script::WorldScript * getWorldScript() { return _worldScript; }
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
@@ -395,6 +399,7 @@ public:
     static bool _consumeactive;
     static bool _needrechargerank;
     static bool _needconsumerank;
+    static bool _killMonsteract;
 
 public:
     static RCSortType rechargeSort;
