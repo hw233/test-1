@@ -60,6 +60,9 @@ MSG_REG_2(GameMsgHdr, REQ::CLAN_COPY, OnClanCopyReq);
 
 MSG_REG_2(GameMsgHdr, REQ::ACTIVE, OnQixiReq);
 
+MSG_REG_2(GameMsgHdr, REQ::TOWN_DEAMON, OnTownDeamonReq);
+
+
 MSG_REG_2(ArenaMsgHdr, 0x101, OnArenaConnected);
 MSG_REG_2(ArenaMsgHdr, 0x102, OnPlayerEntered);
 MSG_REG_2(ArenaMsgHdr, 0x103, OnLineupCommited);
@@ -142,6 +145,10 @@ MSG_REG_2(GameMsgHdr, 0x1F9, OnRoamResult);
 
 MSG_REG_2(GameMsgHdr, 0x1FA, OnReCalcWeekDayAddTimer);
 MSG_REG_2(GameMsgHdr, 0x1FB, OnReCalcWeekDayRemoveTimer);
+
+MSG_REG_2(GameMsgHdr, 0x1FC, OnTownDeamonResNotify);
+MSG_REG_2(GameMsgHdr, 0x1FD, OnTownDeamonAttackNpcNotify);
+
 
 #ifdef _ARENA_SERVER
 MSG_REG_2(LoginMsgHdr, 0x01, onServerReg);

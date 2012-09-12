@@ -213,12 +213,16 @@ private:
         e_unImmune2 = 35,
         e_defDec = 36,
         e_undefDec = 37,
-        e_Bleed1 = 38,    // 儒
+        e_Bleed1 = 38,    // 儒,电击
         e_unBleed1 = 39,  // 儒
-        e_Bleed2 = 40,    // 释
+        e_Bleed2 = 40,    // 释,心剑
         e_unBleed2 = 41,  // 释
-        e_Bleed3 = 42,    // 道
+        e_Bleed3 = 42,    // 道,剑气
         e_unBleed3 = 43,  // 道
+        e_Bleed4 = 46,    // 燃烧
+        e_unBleed4 = 47,  // 
+        e_Immune3 = 48,   // 五彩石
+        e_unImmune3 = 49, // 
     };
 
 
@@ -236,7 +240,7 @@ private:
 
 	float testRescue(BattleFighter *& bf, int counter_deny, AttackPoint * counter_deny_list);
 	float testLink(BattleFighter *& bf, UInt16& skillId);
-    bool onDead(bool activeFlag, BattleObject * bo, DefStatus* defList, size_t& defCount);
+    bool onDead(bool activeFlag, BattleObject * bo, DefStatus* defList, size_t& defCount, StatusChange * scList, size_t& scCount);
 	int testWinner();
 	int testWinner2();
 	void appendToPacket(UInt8 from_side, UInt8 from_pos, UInt8 target_pos, UInt8 atk_type, UInt16 add_id, bool cs, bool pr, DefStatus* defList, size_t defCount, StatusChange * scList, size_t scCount);
@@ -245,7 +249,7 @@ private:
 	void setStatusChange(UInt8 side, UInt8 pos, int cnt, UInt16 skillId, UInt8 type, UInt32 value, StatusChange * scList, size_t& scCount, bool active);
 	void setStatusChange(BattleFighter * bf, UInt8 side, UInt8 pos, int cnt, const GData::SkillBase* skill, UInt8 type, float value, UInt16 last, StatusChange * scList, size_t& scCount, bool active);
 	void setStatusChange2(BattleFighter* bf, UInt8 side, UInt8 pos, int cnt, UInt16 skillId, UInt8 type, float value, UInt16 last, StatusChange * scList, size_t& scCount, bool active);
-	void onDamage(BattleObject * bo, StatusChange * scList, size_t& scCount, bool active, std::vector<AttackAct>* atkAct = NULL);
+	void onDamage(BattleObject * bo, DefStatus* defList, size_t& defCount, StatusChange * scList, size_t& scCount, bool active, std::vector<AttackAct>* atkAct = NULL);
 	BattleFighter * getRandomFighter(UInt8 side, UInt8 * excepts, size_t exceptCount);
     bool doNormalAttack(BattleFighter* bf, int otherside, int target_pos, std::vector<AttackAct>* atkAct = NULL);
     bool doSkillAttack(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt, std::vector<AttackAct>* atkAct = NULL, UInt32 skillParam = 0);
@@ -334,6 +338,11 @@ private:
 	GObject::Player * _player[2];
 	std::string _other_name;
 	UInt8 _other_level;
+
+	BattleFighter* _activeFgt;
+	std::vector<BattleFighter*> _onTherapy;
+	std::vector<BattleFighter*> _onSkillDmg;
+	std::vector<BattleFighter*> _onOtherDead;
 
     UInt8 _teams[2];
     std::vector<std::string> _team_name[2];

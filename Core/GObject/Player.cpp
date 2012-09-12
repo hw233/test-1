@@ -10346,15 +10346,15 @@ namespace GObject
     {
         if (!pos || pos > 7)
             return;
-        MailPackage::MailItem item[7][1] =
+        MailPackage::MailItem item[7][4] =
         {
-            {{9076, 80},},
-            {{9076, 60},},
-            {{9076, 50},},
-            {{9076, 10},},
-            {{9076, 10},},
-            {{9076, 10},},
-            {{9076, 10},},
+            {{9076,20},{509,20},{30,100},},
+            {{9076,10},{509,10},{30,50},},
+            {{9076,5},{509,10},{30,20},},
+            {{9076,5},{509,5},},
+            {{9076,5},{509,5},},
+            {{9076,5},{509,5},},
+            {{9076,5},{509,5},},
         };
 
         SYSMSGV(_title, 4026, pos);
@@ -10363,7 +10363,7 @@ namespace GObject
         if(mail)
         {
             MailPackage::MailItem* mitem = &item[pos-1][0];
-            UInt32 size = 1;
+            UInt32 size = 4;
             std::string strItems;
             for (UInt32 i = 0; i < size; ++i)
             {
@@ -10493,14 +10493,32 @@ namespace GObject
         }
         if(m_dpData->itemNum != 0)
         {
-            if(NULL != GetPackage()->AddItem2(m_dpData->itemId, m_dpData->itemNum, true, true, FromTownDeamon))
+            if(GetFreePackageSize() > m_dpData->itemNum/99)
             {
+                struct AddItemInfo
+                {
+                    UInt32 id;
+                    UInt16 num;
+                    UInt8 bind;
+                    UInt8 fromWhere;
+                };
+
+                AddItemInfo item;
+                item.id = m_dpData->itemId;
+                item.num = m_dpData->itemNum;
+                item.bind = true;
+                item.fromWhere = FromTownDeamon;
+                GameMsgHdr hdr1(0x259, getThreadId(), this, sizeof(AddItemInfo));
+                GLOBAL().PushMsg(hdr1, &item);
+
                 m_dpData->itemId = 0;
                 m_dpData->itemNum = 0;
                 m_dpData->quitLevel = 0;
                 m_dpData->attacker = NULL;
                 DB3().PushUpdateData("UPDATE `towndeamon_player` SET `itemId`=0, `itemNum`=0, `quitLevel`=0, `attacker`=0 WHERE `playerId` = %"I64_FMT"u", getId());
             }
+            else
+                sendMsgCode(2, 1011);
         }
         else
         {
