@@ -16,6 +16,7 @@ class ClanStatue
     public:
         void updateLevel(UInt32 exp, UInt32 expUpdateTime);
         void addExp(UInt32 exp);
+        void subExp(UInt32 exp);
         UInt16 getLevel();
         UInt32 getExp();
         UInt32 getShownExp();

@@ -69,6 +69,11 @@ static const UInt8 NextSpotNum[SPOT_COUNT] =
 {
     1, 1, 1, 1, 3
 };
+static const UInt8 NextMoveTick[SPOT_COUNT] = 
+{
+    4, 3, 3, 3, 2
+};
+
 static const UInt8 NextSpotId[SPOT_COUNT][16] = 
 {
     {0x01},
@@ -115,6 +120,7 @@ enum CLAN_COPY_FORCE_END_TYPE
 
 struct ClanCopyPlayer
 {
+    // 据点玩家信息
 	ClanCopyPlayer(Player * player, UInt8 spSkillType = 0)
 		: player(player), spSkillType(spSkillType)
 	{
@@ -146,12 +152,12 @@ struct ClanCopyMonster
     UInt32 nextMoveTick;    // 下一次移动的tick时间
     bool   isDead;          // 该怪物是否已经死亡
     bool   justMoved;       // 是否新进来的
-    std::vector<GData::NpcFData> npcList;  // 具体怪物列表 
-    std::vector<Fighter> npcFighter;
     UInt16 formation;       // 怪物阵型
     std::string name;
     UInt8 level;
+    std::vector<GData::NpcFData> npcList;  // 具体怪物列表 
     
+
 
     ClanCopyMonster(UInt32 npcIndex, UInt32 npcId, UInt8 monsterType, UInt16 waveCount, UInt16 npcValue, UInt8 nextSpotId, UInt32 nextMoveTick, UInt16 copyLevel)
         : npcIndex(npcIndex), npcId(npcId), monsterType(monsterType), waveCount(waveCount), npcValue(npcValue), nextSpotId(nextSpotId), nextMoveTick(nextMoveTick)
@@ -159,7 +165,6 @@ struct ClanCopyMonster
         isDead = false;
         justMoved = false;
         npcList.clear();
-        npcFighter.clear();
         GData::NpcGroups::iterator ngIt = GData::npcGroups.find(npcId);
         if(ngIt == GData::npcGroups.end())
             return;
@@ -170,12 +175,11 @@ struct ClanCopyMonster
         std::vector<GData::NpcFData>& nl = ng->getList();
         for (std::vector<GData::NpcFData>::iterator it = nl.begin(); it != nl.end(); ++ it)
         {
-            npcFighter.push_back(*(it->fighter));
-            UInt8 index = npcFighter.size() - 1;
-            GData::NpcFData fdata = {&npcFighter[index], it->pos};
+            Fighter * fighter = it->fighter->clone(NULL);
+            GData::NpcFData fdata = {fighter, it->pos};
+
             npcList.push_back(fdata);
 
-            Fighter * fighter = &npcFighter[index];
             fighter->attack  = fighter->getBaseAttack()    * (1 + s_rate3NpcBaseModulus[monsterType][0]*copyLevel);
             fighter->magatk  = fighter->getBaseMagAttack() * (1 + s_rate3NpcBaseModulus[monsterType][1]*copyLevel);
             fighter->defend  = fighter->getBaseDefend()    * (1 + s_rate3NpcBaseModulus[monsterType][2]*copyLevel);
@@ -191,16 +195,26 @@ struct ClanCopyMonster
             fighter->evade = fighter->evade < s_rate3NpcAdvanceModMax[0] ? fighter->evade : s_rate3NpcAdvanceModMax[1];
             fighter->counter = fighter->counter < s_rate3NpcAdvanceModMax[0] ? fighter->counter : s_rate3NpcAdvanceModMax[2];
             fighter->magres = fighter->magres < s_rate3NpcAdvanceModMax[0] ? fighter->magres : s_rate3NpcAdvanceModMax[3];
+            fighter->setDirty(false);
 
         }
     }
+
+    ~ClanCopyMonster()
+    {
+        for (std::vector<GData::NpcFData>::iterator it = npcList.begin(); it != npcList.end(); ++ it)
+        {
+            delete it->fighter;
+        }
+    }
+
 };
 
 struct isMonsterDead
 {
-    bool operator() (const ClanCopyMonster& clanCopyMonster) const
+    bool operator() (const ClanCopyMonster* clanCopyMonster) const
     {
-        return clanCopyMonster.isDead;
+        return clanCopyMonster->isDead;
     }
 };
 
@@ -211,17 +225,29 @@ struct ClanCopySpot
     UInt8 spotBufferType;          // 该据点加成类型
     float spotBufferValue;        // 该据点加成数据
     UInt16 maxPlayerCount;         // 该据点最大的玩家数
-    UInt32 lastBattleTick;         // 上一场战斗发生的tick时间
+    UInt32 nextMoveTick;         // 上一场战斗发生的tick时间
     std::vector<UInt8> nextSpotId; // 通往下一个据点的id
 
     ClanCopySpot(UInt8 spotId, UInt8 spotBufferType, float spotBufferValue,
-            UInt16 maxPlayerCount = 20, UInt32 lastBattleTick = 0)
+            UInt16 maxPlayerCount = 20, UInt32 nextMoveTick = 0)
         :spotId(spotId), spotBufferType(spotBufferType), spotBufferValue(spotBufferValue),
-        maxPlayerCount(maxPlayerCount), lastBattleTick(lastBattleTick)
+        maxPlayerCount(maxPlayerCount), nextMoveTick(nextMoveTick)
     {
     }
 
-    ClanCopySpot(): spotId(0), spotBufferType(0), spotBufferValue(0), maxPlayerCount(20), lastBattleTick(0)
+    ClanCopySpot(): spotId(0), spotBufferType(0), spotBufferValue(0), maxPlayerCount(20), nextMoveTick(0)
+    {
+    }
+};
+
+struct ClanCopyBattleInfo
+{
+    // 帮派副本战斗信息
+    UInt32 playerId;        // 玩家Id
+    UInt32 monsterIndex;    // 怪物唯一索引
+    UInt8  battleResult;    // 战斗结果 1.玩家胜利 2.怪物胜利
+    ClanCopyBattleInfo (UInt32 playerId, UInt32 monsterIndex, UInt8 battleResult)
+        : playerId(playerId), monsterIndex(monsterIndex), battleResult(battleResult)
     {
     }
 };
@@ -229,12 +255,15 @@ struct ClanCopySpot
 class ClanCopy
 {
     public:
+        typedef std::vector<ClanCopyBattleInfo> BattleInfo;
         typedef std::map<UInt8, ClanCopySpot> SpotMap;
-        typedef std::list<ClanCopyMonster> SpotMonsterList;
+        typedef std::list<ClanCopyMonster* > SpotMonsterList;
         typedef std::list<ClanCopyPlayer> SpotPlayerList;
         typedef std::map<UInt8, SpotMonsterList> SpotMonster; // 该据点的怪物
         typedef std::map<UInt8, SpotPlayerList> SpotPlayer;   // 该据点的玩家
         typedef std::map<UInt8, SpotPlayerList> SpotDeadPlayer;   // 该据点死亡的玩家（逃跑也算）
+        typedef std::map<UInt8, BattleInfo> SpotBattleInfo;
+        typedef std::set<ClanCopyMonster* > DeadMonster;
 
     public:
         ClanCopy(Clan *c, Player *player); 
@@ -243,7 +272,7 @@ class ClanCopy
         UInt8 getStatus();
         UInt16 getTotalPlayer();
 
-        void addPlayer(Player* player);
+        void addPlayer(Player* player, bool needNotify = true);
         void addPlayerFromSpot(Clan* c);
         void addObserver(Player* player);
         void playerEscape(Player* player);
@@ -263,8 +292,8 @@ class ClanCopy
         void enemyBaseAct();
         void createEnemy();
         void monsterMove(UInt8 spotId);
-        void spotCombat(SpotMonsterList& monsterList, SpotPlayerList& playerList, UInt8 spotId);
-        void attackHome(ClanCopyMonster& clanCopyMonster);
+        void spotCombat(UInt8 spotId);
+        void attackHome(ClanCopyMonster* clanCopyMonster);
         bool checkWin();
         void setInterval(UInt32 interval);
         void setStartTick(UInt32 tickCount);
@@ -287,10 +316,14 @@ class ClanCopy
         UInt8  _status;
 
 
-        SpotMap _spotMap;
-        SpotMonster _spotMonster;
-        SpotPlayer _spotPlayer;
+        SpotMap        _spotMap;
+        SpotMonster    _spotMonster;
+        SpotPlayer     _spotPlayer;
         SpotDeadPlayer _spotDeadPlayer;
+        SpotBattleInfo _spotBattleInfo;
+        DeadMonster    _deadMonster;
+
+        UInt32 _homeMaxHp;
         UInt32 _homeHp;
 
         UInt32 _readyTime;         // 副本报名的时间戳
@@ -340,11 +373,12 @@ class ClanCopyMgr : public Singleton <ClanCopyMgr>
     // 创建一个新帮派副本
     bool createClanCopy(Player* player, Clan *c);
 
-    void forceEndClanCopy(ClanCopy *clanCopy);
+    void forceEndClanCopy(ClanCopy *clanCopy, UInt8 type = FORCE_END_BY_RESET);
+    void forceEndAllClanCopy();
     // 清除已经结束的副本
     void deleteClanCopy(ClanCopy *clanCopy);
 
-    void playerEnter(Player * player);
+    void playerEnter(Player * player, bool needNotify = true);
     void playerLeave(Player * player);
     void playerRequestStart(Player * player);
 

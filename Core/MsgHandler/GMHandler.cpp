@@ -36,6 +36,8 @@
 #include "MsgHandler/JsonParser.h"
 #include "GObject/LuckyDraw.h"
 #include "GObject/Tianjie.h"
+#include "GObject/ClanCopy.h"
+
 GMHandler gmHandler;
 
 GMHandler::GMHandler()
@@ -192,6 +194,7 @@ GMHandler::GMHandler()
     Reg(2, "reset", &GMHandler::OnClearCFT);
 
     Reg(3, "statue", &GMHandler::OnStatueExp);
+    Reg(3, "resetcopy", &GMHandler::OnResetClanCopy);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2945,10 +2948,17 @@ void GMHandler::OnStatueExp(GObject::Player* player, std::vector<std::string>& a
         return;
     if(args.size() == 1)
     {
-        UInt32 exp = atoi(args[0].c_str());
-        if(exp == 0)
-            return;
-        player->AddStatueExp(exp);
+        Int32 exp = atoi(args[0].c_str());
+        if(exp >= 0)
+            player->AddStatueExp(exp);
+        else
+            player->SubStatueExp(-exp);
+
     }
+}
+
+void GMHandler::OnResetClanCopy(GObject::Player* player, std::vector<std::string>& args)
+{
+    GObject::ClanCopyMgr::Instance().forceEndAllClanCopy();
 }
 

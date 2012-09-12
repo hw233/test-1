@@ -1715,6 +1715,7 @@ namespace GObject
         float getClanStatueActionEffect();
         float getClanStatueHitrLvlEffect();
         void  AddStatueExp(UInt32 exp);
+        void  SubStatueExp(UInt32 exp);
 
     private:
         bool m_hasTripod;

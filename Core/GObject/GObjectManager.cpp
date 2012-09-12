@@ -2860,7 +2860,7 @@ namespace GObject
         // 读取帮派副本
         lc.prepare("Loading clan copy:");
         DBClanCopy cc;
-        if (execu->Prepare("SELECT `clanid`, `level`, `levelUpdateTime` FROM `clan_copy` ORDER BY `clanid`", cc) != DB::DB_OK)
+        if (execu->Prepare("SELECT `clanid`, `level`, `levelUpdateTime`, `maxCopyLevel`, `maxCopyTime` FROM `clan_copy` ORDER BY `clanid`", cc) != DB::DB_OK)
             return false;
         clan = NULL;
         lastId = 0xFFFFFFFF;
@@ -2874,7 +2874,7 @@ namespace GObject
                 clan = globalClans[cc.clanId];
             }
             if(clan == NULL) continue;
-            clan->LoadCopy(cc.level, cc.levelUpdateTime);
+            clan->LoadCopy(cc.level, cc.levelUpdateTime, cc.maxLevel, cc.maxLevelTime);
         }
         lc.finalize();
         

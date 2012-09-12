@@ -483,16 +483,18 @@ public:
     // 帮派副本，帮派神像
 
     void LoadStatue(UInt16 level, UInt32 exp, UInt32 expUpdateTime);
-    void LoadCopy(UInt16 level, UInt32 levelUpdateTime);
+    void LoadCopy(UInt16 level, UInt32 levelUpdateTime, UInt16 maxLevel, UInt32 maxTime);
     void LoadCopyLog(UInt32 logTime, UInt8 logType, std::string playerName, UInt32 logVal);
 
     void updateStatueExp();
     void resetCopyLevel();
 
+    bool copyLevelAvailable();
     void sendClanCopyInfo(Player * player, UInt8 val = 0);
     void notifyCopyCreated(Player * player);
 
     void   addStatueExp(UInt32 exp);
+    void   subStatueExp(UInt32 exp);
 
     UInt16 getStatueLevel();
     UInt32 getStatueExp();
@@ -611,6 +613,8 @@ private:
     ClanStatue * _statue;
     UInt16 _copyLevel;
     UInt32 _copyLevelUpdateTime;
+    UInt16 _copyMaxLevel;
+    UInt32 _copyMaxTime;
 
     std::list<ClanCopyLog> _copyLog;
 

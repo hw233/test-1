@@ -10673,6 +10673,13 @@ namespace GObject
         _clan->addStatueExp(exp);
     }
 
+    void Player::SubStatueExp(UInt32 exp)
+    {
+        if (_clan == NULL)
+            return;
+        _clan->addStatueExp(exp);
+    }
+
 
     void Player::onBlueactiveday()
     {
