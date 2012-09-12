@@ -741,7 +741,7 @@ void SaleMgr::searchPlayerSaleResp(Player * founder, Player * beFounder, UInt16 
 	if (count != 0)
 	{
 		SaleData * sale = NULL;
-		UInt16 maxSaleSz = _sales.size();
+		UInt32 maxSaleSz = _sales.size();
 		SalePosType::iterator found;
 		std::vector<UInt32>::iterator offset, sentinel;
 		offset = sentinel = vec.begin();
