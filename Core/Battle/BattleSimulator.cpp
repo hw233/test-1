@@ -7692,7 +7692,7 @@ bool BattleSimulator::doSkillStrengthen_AttackFriend(BattleFighter* bf, const GD
     if(fighter && fighter->getHP() > 0)  // 攻击血最少的人
     {
         StateType eType = e_MAX_STATE;
-        float dmg = CalcNormalAttackDamage(bo, fighter, eType);  // bo 打 fighter
+        UInt32 dmg = CalcNormalAttackDamage(bo, fighter, eType);  // bo 打 fighter
         if (eType == e_MAX_STATE)
             return false;
 
@@ -7716,11 +7716,11 @@ bool BattleSimulator::doSkillStrengthen_AttackFriend(BattleFighter* bf, const GD
             fighter->makeDamage(dmg);
             if(fighter->getHP() == 0)
             {
-                onDead(false, fighter, defList, defCount);
+                onDead(false, fighter, defList, defCount, scList, scCount);
             }
             else if(_winner == 0)
             {
-                onDamage(fighter, scList, scCount, true, NULL);
+                onDamage(fighter, defList, defCount, scList, scCount, true, NULL);
             }
         }
     }
@@ -7972,7 +7972,7 @@ bool BattleSimulator::AddExtraDamageAfterResist_SkillStrengthen(BattleFighter* p
     if(!ef)
         return false;
 
-    float nRealDamage = ef->value/100 * nDamage;  // 伤害值
+    UInt32 nRealDamage = ef->value/100 * nDamage;  // 伤害值
     defList[defCount].damType = e_damNormal;
     pTarget->makeDamage(nRealDamage);
     defList[defCount].damage = nRealDamage;
@@ -7981,7 +7981,7 @@ bool BattleSimulator::AddExtraDamageAfterResist_SkillStrengthen(BattleFighter* p
 
     if(pTarget->getHP() == 0)
     {
-        onDead(true, pTarget, defList, defCount);
+        onDead(true, pTarget, defList, defCount, scList, scCount);
     }
 
     return true;
@@ -8433,7 +8433,7 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
     Int16& nrandomlast = bf->getBleedRandomLast();
     if(nrandomlast != 0)
     {
-        float dmg = bf->getBleedRandom();
+        UInt32 dmg = bf->getBleedRandom();
         dmg *= static_cast<float>(950 + _rnd(100))/1000;
         bf->makeDamage(dmg);
         defList[defCount].damage = dmg;
@@ -8463,7 +8463,7 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
         ++defCount;
         if(bf->getHP() == 0)
         {
-            onDead(true, bf, defList, defCount);
+            onDead(true, bf, defList, defCount, scList, scCount);
         }
     }
 
@@ -8471,7 +8471,7 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
     Int16& nbySkilllast = bf->getBleedBySkillLast();
     if(nbySkilllast != 0)
     {
-        float dmg = bf->getBleedBySkill();
+        UInt32 dmg = bf->getBleedBySkill();
         dmg *= static_cast<float>(950 + _rnd(100))/1000;
         bf->makeDamage(dmg);
         defList[defCount].damage = dmg;
@@ -8501,7 +8501,11 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
         ++defCount;
         if(bf->getHP() == 0)
         {
-            onDead(true, bf, defList, defCount);
+            onDead(true, bf, defList, defCount, scList, scCount);
+        }
+        else if(_winner == 0)
+        {
+            onDamage(bf, defList, defCount, scList, scCount, false);
         }
     }
 
