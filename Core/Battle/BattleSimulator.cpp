@@ -1661,6 +1661,7 @@ UInt32 BattleSimulator::doPoisonAttack(BattleFighter* bf, bool cs, const GData::
             else
             {
                 AddExtraDamageAfterResist_SkillStrengthen(bf, area_target, skill, dmg2*1.5, defList, defCount, scList, scCount);
+                AddStateAfterPoisonResist_SkillStrengthen(bf, area_target, skill, 1, defList, defCount, scList, scCount);
 
                 defList[defCount].leftHP = area_target->getHP();
                 ++defCount;
@@ -1670,6 +1671,7 @@ UInt32 BattleSimulator::doPoisonAttack(BattleFighter* bf, bool cs, const GData::
         else
         {
             AddExtraDamageAfterResist_SkillStrengthen(bf, area_target, skill, dmg2*2.5, defList, defCount, scList, scCount);
+            AddStateAfterPoisonResist_SkillStrengthen(bf, area_target, skill, 2, defList, defCount, scList, scCount);
 
             defList[defCount].leftHP = area_target->getHP();
             ++defCount;
@@ -1680,6 +1682,9 @@ UInt32 BattleSimulator::doPoisonAttack(BattleFighter* bf, bool cs, const GData::
     {
         // 如果是抵抗，查找是否有符文强化
         AddExtraDamageAfterResist_SkillStrengthen(bf, area_target, skill, dmg2*3, defList, defCount, scList, scCount);
+
+        // 如果被抵抗，上状态
+        AddStateAfterPoisonResist_SkillStrengthen(bf, area_target, skill, 3, defList, defCount, scList, scCount);
 
         defList[defCount].leftHP = area_target->getHP();
         ++defCount;
@@ -3456,9 +3461,17 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             float factor = 1;
             if(fsize > 0)
                 factor = skill->factor[0];
+
+            bf->setAttackIndex(1); // 标记是第一个目标，供后面使用，哭泣。。。
+
             dmg += attackOnce(bf, first, cs, pr, skill, _objs[target_side][target_pos], skill->factor[0], defList, defCount, scList, scCount, apcnt, ap, atkAct);
+            int nindex = 2;
             for(int i = 0; i < apcnt; ++ i)
             {
+                BattleFighter* ptarget = static_cast<BattleFighter*>(_objs[target_side][ap[i].pos]);
+                if(!ptarget || ptarget->getHP() == 0)  // 活人才需要打，死人略过
+                    continue;
+                bf->setAttackIndex(nindex++);  // 依次第二、第三记录下来
                 dmg += attackOnce(bf, first, cs, pr, skill, _objs[target_side][ap[i].pos], ap[i].factor, defList, defCount, scList, scCount);
             }
             if(ef)
@@ -7983,6 +7996,46 @@ bool BattleSimulator::AddExtraDamageAfterResist_SkillStrengthen(BattleFighter* p
     {
         onDead(true, pTarget, defList, defCount, scList, scCount);
     }
+    else if(_winner == 0)
+    {
+        onDamage(pTarget, defList, defCount, scList, scCount, true, NULL);
+    }
+
+    return true;
+}
+
+bool BattleSimulator::AddStateAfterPoisonResist_SkillStrengthen(BattleFighter* pFighter, BattleFighter* pTarget, const GData::SkillBase* skill, int nfactor, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount)
+{
+    if(!pFighter || !pTarget || !skill)
+        return false;
+    int nIndex = pFighter->getAttackIndex();
+    if (nIndex <= 0 || nIndex > 3)  // 只有第1-3的对象才上状态，囧一个
+        return false;
+
+    GData::SkillStrengthenBase* ss = pFighter->getSkillStrengthen(SKILL_ID(skill->getId()));
+    if(!ss)
+        return false;
+    const GData::SkillStrengthenEffect* ef = ss->getEffect(GData::ON_RESIST, GData::TYPE_RESIST_ADDSTATE);
+    if(!ef)
+        return false;
+
+    float fRate = 0;
+    if (nIndex == 1)
+    {
+        fRate = nfactor*ef->value*100;
+    }
+    else if(nIndex == 2)
+    {
+        fRate = nfactor*ef->valueExt1*100;
+    }
+    else if(nIndex == 3)
+    {
+        fRate = nfactor*ef->valueExt2*100;
+    }
+
+    UInt8 nState = 4;  // dizz
+    if (fRate > _rnd(10000))
+        AddSkillStrengthenState(pFighter, pTarget, skill->getId(), nState, ef->last, defList, defCount, scList, scCount);
 
     return true;
 }
@@ -8174,7 +8227,7 @@ void BattleSimulator::ModifySingleAttackValue_SkillStrengthen(BattleFighter* bf,
         if(isAdd)
             fvalue += ef->value;
         else
-            fvalue -= ef->value;
+            fvalue -= ef->valueExt1;  // 减掉的值取这个
     }
 }
 

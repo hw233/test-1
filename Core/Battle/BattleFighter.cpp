@@ -47,7 +47,7 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _colorStock(0), _colorStockTimes(0), _colorStockLast(0),
     _atkAddSpecial(0), _atkSpecialLast(0), _magAtkAddSpecial(0), _magAtkSpecialLast(0), 
     _bleedRandom(0), _bleedRandomLast(0), _bleedAttackClass(1),_bleedBySkill(0), _bleedBySkillLast(0), _bleedBySkillClass(1),
-    _hitChangeByPeerless(0),_counterChangeByPeerless(0),_bSingleAttackFlag(false),_bMainTargetDead(false)
+    _hitChangeByPeerless(0),_counterChangeByPeerless(0),_bSingleAttackFlag(false),_bMainTargetDead(false),_nCurrentAttackIndex(0)
 {
     memset(_immuneLevel, 0, sizeof(_immuneLevel));
     memset(_immuneRound, 0, sizeof(_immuneRound));

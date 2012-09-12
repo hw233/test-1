@@ -551,6 +551,9 @@ public:
     inline UInt8 getBleedBySkillClass(){ return _bleedBySkillClass; }
     inline void setBleedBySkillClass(UInt8 v){ _bleedBySkillClass = v; }
 
+    inline int getAttackIndex(){return _nCurrentAttackIndex; }
+    inline void setAttackIndex(int nindex){ _nCurrentAttackIndex = nindex; }
+
 private:
     float _atkAddSpecial;  // 技能符文吸收对方伤害额外增加的物攻
     Int16 _atkSpecialLast;
@@ -571,6 +574,7 @@ private:
     
     bool  _bSingleAttackFlag;  // 群体攻击时候，只攻击到一人的标记
     bool  _bMainTargetDead;    // 主目标被打死（目前只在area为0的时候做了标记，以后需要就慢慢加好了）
+    int   _nCurrentAttackIndex;  // 当前攻击对象索引，只在我自己需要的时候赋值过，后面的人要用的时候，请在攻击之前自己设置好
 
 public:
     void fakeDead();

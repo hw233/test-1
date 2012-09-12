@@ -348,6 +348,8 @@ private:
     UInt32 GetBleedDmg(BattleFighter* bf, BattleFighter* bo, float nfactor);
     // 上状态被抵抗也流血
     bool AddExtraDamageAfterResist_SkillStrengthen(BattleFighter* pFighter, BattleFighter* pTarget, const GData::SkillBase* skill, int nDamage, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
+    // 毒被抵抗时上状态
+    bool AddStateAfterPoisonResist_SkillStrengthen(BattleFighter* pFighter, BattleFighter* pTarget, const GData::SkillBase* skill, int nfactor, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
 
     bool doDeBufAttack(BattleFighter* bf);
 
