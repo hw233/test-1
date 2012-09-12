@@ -8465,6 +8465,10 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
         {
             onDead(true, bf, defList, defCount, scList, scCount);
         }
+        else if(_winner == 0)
+        {
+            onDamage(bf, defList, defCount, scList, scCount, false);
+        }
     }
 
     // 取中毒伤害来流血的debuf。。。
