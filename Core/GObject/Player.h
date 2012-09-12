@@ -764,6 +764,11 @@ namespace GObject
             return (_playerData.qqvipl > 40 && _playerData.qqvipl <= 49) || (_playerData.qqvipl1 > 40 && _playerData.qqvipl1 <= 49) || (_playerData.qqvipl >= 30 && _playerData.qqvipl <= 39 && _playerData.qqvipl1 > 40 && _playerData.qqvipl1 <= 49);
         }
 
+        inline bool is3366AndLevel4() const
+        {
+            return (_playerData.qqvipl >= 24 && _playerData.qqvipl <= 29);
+        }
+
 		UInt32 getTotalRecharge()			{ return _playerData.totalRecharge; }
 		void addTotalRecharge(UInt32);
 		void setTotalRecharge( UInt32 r );
@@ -1286,6 +1291,7 @@ namespace GObject
         UInt8 beQixiEyes(Player* pl);
         void onQixiEyesResp(UInt8 bind);
         void postRoamResult(UInt8 pos, UInt8 event, UInt8 score);
+        void postKillMonsterRoamResult(UInt8 pos, UInt8 curType, UInt8 curCount);
 
         inline bool queQiaoCheck() { return m_qixi.bind; }
         inline UInt8 getQueqiaoPos() { return m_qixi.pos; }
@@ -1387,6 +1393,7 @@ namespace GObject
         std::vector<GData::LootResult> _equipAward;
 		std::vector<GData::LootResult> _RegisterAward;
 		std::vector<GData::LootResult> _lastQueqiaoAward;
+        std::vector<GData::LootResult> _lastKillMonsterAward;
 
     private:
 		UInt16 _lastDungeon;
@@ -1582,6 +1589,8 @@ namespace GObject
         void sendSSDTInfo();
         void getHappyAward(UInt8 opt);
         void sendHappyInfo(UInt16 itemId = 0);
+        void getYearActAward(UInt8 type);
+        void sendYearActInfo();
         void getTargetAward(UInt8 opt);
         void getTargetAwardRF(UInt8 opt);
         void getNewRegisterAward(UInt8 opt);
@@ -1633,6 +1642,8 @@ namespace GObject
         void IDIPAddItem(UInt16 itemId, UInt16 num, bool bind = true);
         void lastQueqiaoAwardPush(UInt16 itemId, UInt16 num);
         void checkLastQueqiaoAward();
+        void lastKillMonsterAwardPush(UInt16 itemId, UInt16 num);
+        void checkLastKillMonsterAward();
 
     private:
         bool m_hasTripod;
@@ -1687,6 +1698,7 @@ namespace GObject
     public:
         void getSoSoMapAward();
         void sendSoSoMapInfo();
+        void getKillMonsterAward();
 
 #ifdef _FB
     public:
