@@ -2682,8 +2682,9 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
 			// insert fighter into queue by order
 			insertFighterStatus(newf);
         }
-
-        setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAura, -1 * bf->getAura(), 0, scList, scCount, false);
+        
+        int nChangeAuraNum = -1*bf->getAura() + bf->getAuraLeft(); // 因为天赋术，hero无双之后会留一点灵力
+        setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAura, nChangeAuraNum, 0, scList, scCount, false);
 
         appendToPacket(bf->getSide(), bf->getPos(), bf->getPos() + 25, 2, skill->getId(), false, false, defList, defCount, scList, scCount);
 
@@ -3486,6 +3487,13 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                     if(!bf || bf->getHP() == 0)
                         continue;
 
+                    UInt32 stun = bf->getStunRound();
+                    UInt32 confuse = bf->getConfuseRound();
+                    UInt32 forget = bf->getForgetRound();
+
+                    if(stun > 0 || confuse > 0 || forget > 0)
+                        continue;
+
                     if(bf->getSide() == bo->getSide())
                     {
                         continue;
@@ -3654,7 +3662,8 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
 
     if (skill && skill->cond == GData::SKILL_PEERLESS)
     {
-        setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAura, -1 * bf->getAura(), 0, scList, scCount, false);
+        int nChangeAuraNum = -1*bf->getAura() + bf->getAuraLeft(); // 因为天赋术，hero无双之后会留一点灵力
+        setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAura, nChangeAuraNum, 0, scList, scCount, false);
     }
 
     int self_side = bf->getSide() == target_side ? 25 : 0;
@@ -7205,7 +7214,7 @@ bool BattleSimulator::doSkillStrengthen_disperse(BattleFighter* bf, const GData:
             bo->setStunLevel(0);
             bo->setStunRound(0);
 
-            if(bo->getDeepForgetLast() != 0)
+            if(bo->getDeepStunLast() != 0)
             {
                 bo->setDeepStunDmgExtra(0, 0);
                 defList[defCount].damType = e_unDeepStun;
