@@ -3782,6 +3782,14 @@ UInt8 Fighter::getSoulExtraAura()
     return m_2ndSoul->getExtraAura();
 }
 
+UInt8 Fighter::getSoulAuraLeft()
+{
+    if(!m_2ndSoul)
+        return 0;
+
+    return m_2ndSoul->getAuraLeft();
+}
+
 bool Fighter::practiceLevelUp()
 {
     if(!m_2ndSoul)

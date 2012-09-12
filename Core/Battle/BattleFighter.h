@@ -386,7 +386,8 @@ public:
     inline void setMagAtkReduce2(float v) { _magatkreduce2 = v; }
 
     inline UInt8 getSoulExtraAura() { return _fighter->getSoulExtraAura(); }
-
+    // 通过天赋术额外保留部分灵力
+    inline UInt8 getAuraLeft(){ return _fighter->getSoulAuraLeft(); } 
 private:
 	void updateBuffExtras();
 
