@@ -211,6 +211,7 @@ namespace GObject
         VAR_CAIFU_CNT = 185, //财富个数
         VAR_CHUANQI_CNT = 186, //传奇个数
 
+        VAR_AWARD_BIRTHDAY     = 190, //周年庆活动(生日罗盘许愿星)
         VAR_MAX,
     };
 
@@ -278,6 +279,7 @@ namespace GObject
             REGISTER_VAR(VAR_AWARD_SSDT_1, CYCLE_DAY);
             REGISTER_VAR(VAR_AWARD_SSDT_2, CYCLE_NONE);
             REGISTER_VAR(VAR_AWARD_NEWREGISTER, CYCLE_NONE);
+            REGISTER_VAR(VAR_AWARD_BIRTHDAY, CYCLE_DAY);
 
             REGISTER_VAR(VAR_CLANBATTLE_HONOUR, CYCLE_DAY);
             REGISTER_VAR(VAR_CLAN_WEAL, CYCLE_DAY);

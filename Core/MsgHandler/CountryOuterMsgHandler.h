@@ -983,6 +983,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     {
         if(!pl->GetVar(VAR_AWARD_NEWREGISTER) && pl->GetLev() == 1)
             pl->sendNewRegisterAward(0);  //0:表示新用户注册还可以邀请好友进行抽奖
+        pl->CheckCanAwardBirthday(); //生日罗盘许愿星(周年庆活动)
     }
 	{
 		Stream st;
