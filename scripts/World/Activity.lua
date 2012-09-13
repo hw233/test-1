@@ -571,11 +571,11 @@ function onActivityCheck(tm)
       if tm >= actTime503 and tm < actTime503_1 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
-          setRechargeTime(actTime503, actTime503_1)
       else
           setRechargeActive(false, 16)
           setNeedRechargeRank(false)
       end
+      setRechargeTime(actTime503, actTime503_1)
 
       setShuoShuo(true);
   end
@@ -663,8 +663,8 @@ function initActTime(y, m, d)
   local  SerStartTm501= { ['year'] = 2012, ['month'] = 8, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm502= { ['year'] = 2012, ['month'] = 9, ['day'] = 6, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 斩妖
-  local  SerStartTm505= { ['year'] = 2012, ['month'] = 9, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  --local  SerStartTm505= { ['year'] = 2012, ['month'] = 9, ['day'] = 10, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --local  SerStartTm505= { ['year'] = 2012, ['month'] = 9, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm505= { ['year'] = 2012, ['month'] = 9, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 周岁红包送不停
   local  SerStartTm506= { ['year'] = 2012, ['month'] = 9, ['day'] = 13, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 

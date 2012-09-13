@@ -1341,9 +1341,17 @@ void  OnDoAttainment(  GameMsgHdr& hdr, const void* data)
 }
 void  OnDoActivity( GameMsgHdr& hdr, const void* data)
 {
-     MSG_QUERY_PLAYER(player);
-     const stActivityMsg* co = reinterpret_cast<const stActivityMsg*>(data);
-     GameAction()->doAty(player, co->id, co->param1, co->param2);
+    MSG_QUERY_PLAYER(player);
+    const stActivityMsg* co = reinterpret_cast<const stActivityMsg*>(data);
+    if(co->id == AtyTownDeamon)
+    {
+        if(player->GetVar(VAR_TOWNDEAMON))
+            return;
+        else
+            player->SetVar(VAR_TOWNDEAMON, 1);
+    }
+
+    GameAction()->doAty(player, co->id, co->param1, co->param2);
 }
 void OnAwardHIPrestige( GameMsgHdr& hdr, const void* data )
 {

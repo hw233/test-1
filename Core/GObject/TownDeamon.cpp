@@ -507,7 +507,7 @@ void TownDeamon::attackPlayer(Player* pl, Player* defer, UInt32 spirit)
 		UInt16 portrait;
 		Lineup lineup[5];
 	};
-	TDBeAttackData tdbad = { pl, pl->getFormation(), static_cast<UInt16>(pl->getMainFighter() != NULL ? pl->getMainFighter()->getId() : 0) };
+	TDBeAttackData tdbad = { pl, spirit, pl->getFormation(), static_cast<UInt16>(pl->getMainFighter() != NULL ? pl->getMainFighter()->getId() : 0) };
 	for(int i = 0; i < 5; ++ i)
 		tdbad.lineup[i] = pl->getLineup(i);
 	GameMsgHdr hdr(0x340, tid, defer, sizeof(TDBeAttackData));
@@ -674,7 +674,7 @@ void TownDeamon::notifyChallengeResult(Player* pl, Player* defer, bool win)
 void TownDeamon::notifyAttackNpcResult(Player* pl, bool win)
 {
     DeamonPlayerData* dpd = pl->getDeamonPlayerData();
-    UInt32 level = dpd->curLevel + 1;
+    UInt16 level = dpd->curLevel + 1;
     if(win)
     {
         if (level > m_maxLevel)
