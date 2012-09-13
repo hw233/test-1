@@ -194,7 +194,7 @@ GMHandler::GMHandler()
     Reg(2, "reset", &GMHandler::OnClearCFT);
 
     Reg(3, "statue", &GMHandler::OnStatueExp);
-    Reg(3, "resetcopy", &GMHandler::OnResetClanCopy);
+    Reg(3, "setcopy", &GMHandler::OnSetClanCopyLevel);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2957,8 +2957,16 @@ void GMHandler::OnStatueExp(GObject::Player* player, std::vector<std::string>& a
     }
 }
 
-void GMHandler::OnResetClanCopy(GObject::Player* player, std::vector<std::string>& args)
+void GMHandler::OnSetClanCopyLevel(GObject::Player* player, std::vector<std::string>& args)
 {
-    GObject::ClanCopyMgr::Instance().forceEndAllClanCopy();
+    if(args.empty())
+        return;
+    if(args.size() == 1)
+    {
+        UInt32 level = atoi(args[0].c_str());
+
+        player->setClanCopyLevel(level);
+
+    }
 }
 

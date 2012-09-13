@@ -52,18 +52,20 @@ void ClanStatue::updateLevel(UInt32 exp, UInt32 expUpdateTime)
     else
         _exp = static_cast<UInt32>(bigExp);
     _level = 0;
+
     for (std::vector<GData::ClanStatueTableData>::iterator it = GData::clanStatueTable.begin(); 
             it != GData::clanStatueTable.end(); ++it)
     {
         if (_exp < it->needExp)
         {
             _level = it->level - 1;
+            if (!_level)
+                ++ _level;
             DB5().PushUpdateData("REPLACE INTO `clan_statue` (`clanId`, `exp`, `level`, `expUpdateTime`) VALUES (%u,%u,%u,%u)", _clan->getId(), _exp, _level, now);
             return;
         }
     }
-    if (!_level)
-        ++ _level;
+    _level = GData::clanStatueTable.size() - 2;
     DB5().PushUpdateData("REPLACE INTO `clan_statue` (`clanId`, `exp`, `level`, `expUpdateTime`) VALUES (%u,%u,%u,%u)", _clan->getId(), _exp, _level, now);
 }
 
@@ -77,13 +79,14 @@ void ClanStatue::addExp(UInt32 exp)
         if (_exp < it->needExp)
         {
             _level = it->level - 1;
+            if (!_level)
+                ++ _level;
             DB5().PushUpdateData("REPLACE INTO `clan_statue` (`clanId`, `exp`, `level`, `expUpdateTime`) VALUES (%u,%u,%u,%u)", _clan->getId(), _exp, _level, TimeUtil::Now());
             return;
         }
     }
-    if (!_level)
-        ++ _level;
-    DB5().PushUpdateData("REPLACE INTO `clan_statue` (`clanId`, `exp`, `level`, `expUpdateTime`) VALUES (%u,%u,%u,%u)", _clan->getId(), _exp, _level, TimeUtil::Now(), _clan->getId());
+    _level = GData::clanStatueTable.size() - 2;
+    DB5().PushUpdateData("REPLACE INTO `clan_statue` (`clanId`, `exp`, `level`, `expUpdateTime`) VALUES (%u,%u,%u,%u)", _clan->getId(), _exp, _level, TimeUtil::Now());
 }
 
 void ClanStatue::subExp(UInt32 exp)
@@ -99,12 +102,13 @@ void ClanStatue::subExp(UInt32 exp)
         if (_exp < it->needExp)
         {
             _level = it->level - 1;
+            if (!_level)
+                ++ _level;
             DB5().PushUpdateData("REPLACE INTO `clan_statue` (`clanId`, `exp`, `level`, `expUpdateTime`) VALUES (%u,%u,%u,%u)", _clan->getId(), _exp, _level, TimeUtil::Now());
             return;
         }
     }
-    if (!_level)
-        ++ _level;
+    _level = GData::clanStatueTable.size() - 1;
     DB5().PushUpdateData("REPLACE INTO `clan_statue` (`clanId`, `exp`, `level`, `expUpdateTime`) VALUES (%u,%u,%u,%u)", _clan->getId(), _exp, _level, TimeUtil::Now(), _clan->getId());
 }
 
@@ -125,7 +129,7 @@ UInt32 ClanStatue::getShownExp()
         return _exp;
     else
     {
-        return _exp - GData::clanStatueTable[_level - 1].needExp;
+        return _exp - GData::clanStatueTable[_level].needExp;
     }
 }
 
@@ -133,11 +137,15 @@ UInt32 ClanStatue::getShownNextExp()
 {
     // 返回客户端实际显示需要的下一级的exp
     
-    if (_level < 1)
+    if (!_level)
         return GData::clanStatueTable[2].needExp;
     else
     {
-        return GData::clanStatueTable[_level + 1].needExp - GData::clanStatueTable[_level].needExp;
+        UInt32 maxLevel = GData::clanStatueTable.size() - 2;
+        if (_level < maxLevel)
+            return GData::clanStatueTable[_level + 1].needExp - GData::clanStatueTable[_level].needExp;
+        else 
+            return 0;
     }
 }
 

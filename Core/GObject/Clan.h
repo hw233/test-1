@@ -521,6 +521,8 @@ public:
     void   addCopyLevel();
     void   addCopyWinLog(Player* player);
 
+    void   setCopyLevel(UInt16 level);
+
 public:
 
     inline Player * getOwner()
