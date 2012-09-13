@@ -147,7 +147,7 @@ private:
     void OnClearCFT(GObject::Player* player, std::vector<std::string>& args);
 
     void OnStatueExp(GObject::Player* player, std::vector<std::string>& args);
-    void OnResetClanCopy(GObject::Player* player, std::vector<std::string>& args);
+    void OnSetClanCopyLevel(GObject::Player* player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;

@@ -3586,7 +3586,6 @@ void Clan::addStatueExp(UInt32 exp)
     Mutex::ScopedLock lk(_mutex);
     _statue->addExp(exp);
     broadcastCopyInfo();
-
 }
 
 void Clan::subStatueExp(UInt32 exp)
@@ -3607,7 +3606,7 @@ void Clan::resetCopyLevel()
 {
     // 帮派副本等级下降五级
     ClanCopy * clanCopy = ClanCopyMgr::Instance().getClanCopyByClan(this);
-    if (!clanCopy)
+    if (clanCopy)
     {
         // 不应该出现还未结束的副本信息，强制结束后重置
         clanCopy->forceEnd(FORCE_END_BY_ERROR);
@@ -3893,9 +3892,9 @@ bool   Clan::copyLevelAvailable()
 {
     // 判断科技等级是否支持开启更高级的副本
     if (_techs->getMaxCopyLevel() > _copyLevel)
+        if (_copyLevel < GData::clanCopyTable.size() - 1)
         return true;
-    else
-        return false;
+    return false;
 }
 
 void   Clan::sendClanCopyInfo(Player * player, UInt8 val)
@@ -3969,7 +3968,7 @@ void   Clan::sendClanCopyInfo(Player * player, UInt8 val)
 
     UInt8 logNum = _copyLog.size();
     st << static_cast<UInt8>(logNum);  
-    for (std::list<ClanCopyLog>::iterator it = _copyLog.begin(); it != _copyLog.end(); ++ it)
+    for (std::list<ClanCopyLog>::reverse_iterator it = _copyLog.rbegin(); it != _copyLog.rend(); ++ it)
     {
         struct tm t_tm;
         time_t logTime = it->logTime;
@@ -4001,7 +4000,7 @@ void   Clan::sendClanCopyInfo(Player * player, UInt8 val)
 void   Clan::addCopyLevel()
 {
     // 更新并保存新帮派副本的等级
-    if (_copyLevel < GData::clanCopyTable.size())
+    if (_copyLevel < GData::clanCopyTable.size() - 1)
     {
         ++_copyLevel;
         _copyMaxLevel = _copyLevel >= _copyMaxLevel ? _copyLevel : _copyMaxLevel;
@@ -4058,6 +4057,18 @@ void   Clan::notifyCopyCreated(Player * player)
 
     CopyCreateVisitor visitor(player);
     VisitMembers(visitor);
+}
+
+void    Clan::setCopyLevel(UInt16 level)
+{ 
+    ClanCopy * clanCopy = ClanCopyMgr::Instance().getClanCopyByClan(this);
+    if (clanCopy)
+    {
+        // 不应该出现还未结束的副本信息，强制结束后重置
+        clanCopy->forceEnd(FORCE_END_BY_GM);
+    }
+
+    _copyLevel = level;
 }
 
 

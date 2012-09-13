@@ -5399,6 +5399,23 @@ namespace GObject
         clan->addMemberProffer(this, contrib);
     }
 
+
+    ////////////////////////////////////////////
+    // 帮派副本
+
+    void Player::setClanCopyLevel(UInt16 level)
+    {
+        // GM命令设置帮派副本等级
+        if (_clan == NULL)
+            return;
+        _clan->setCopyLevel(level);
+    }
+
+
+    // 帮派副本
+    ////////////////////////////////////////////
+
+
 	inline UInt32 getTavernPriceByColor(UInt8 color)
 	{
         return 0;
@@ -10475,7 +10492,7 @@ namespace GObject
     {
         if (_clan == NULL)
             return;
-        _clan->addStatueExp(exp);
+        _clan->subStatueExp(exp);
     }
 
 

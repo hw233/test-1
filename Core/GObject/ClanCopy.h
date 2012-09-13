@@ -150,7 +150,7 @@ struct ClanCopyMonster
     UInt16 npcValue;        // 怪物对主基地的破坏值
     UInt8  nextSpotId;      // 怪物下一个目标据点
     UInt32 nextMoveTick;    // 下一次移动的tick时间
-    bool   isDead;          // 该怪物是否已经死亡
+    UInt8  deadType;        // 该怪物是否已经死亡
     bool   justMoved;       // 是否新进来的
     UInt16 formation;       // 怪物阵型
     std::string name;
@@ -162,7 +162,7 @@ struct ClanCopyMonster
     ClanCopyMonster(UInt32 npcIndex, UInt32 npcId, UInt8 monsterType, UInt16 waveCount, UInt16 npcValue, UInt8 nextSpotId, UInt32 nextMoveTick, UInt16 copyLevel)
         : npcIndex(npcIndex), npcId(npcId), monsterType(monsterType), waveCount(waveCount), npcValue(npcValue), nextSpotId(nextSpotId), nextMoveTick(nextMoveTick)
     {
-        isDead = false;
+        deadType = true;;
         justMoved = false;
         npcList.clear();
         GData::NpcGroups::iterator ngIt = GData::npcGroups.find(npcId);
@@ -214,7 +214,7 @@ struct isMonsterDead
 {
     bool operator() (const ClanCopyMonster* clanCopyMonster) const
     {
-        return clanCopyMonster->isDead;
+        return clanCopyMonster->deadType? true : false;
     }
 };
 
