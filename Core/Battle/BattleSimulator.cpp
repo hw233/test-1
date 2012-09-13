@@ -3773,15 +3773,17 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             // 找出所有有效目标，然后随机一个
             std::vector<UInt8> vPos;
             vPos.clear();
-            BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][target_pos]);
-            if(bo && bo->getHP() > 0)
-                vPos.push_back(target_pos);
-            for(int i = 0; i < apcnt; ++i)
+            BattleFighter* bo = NULL;
+//             BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][target_pos]);
+//             if(bo && bo->getHP() > 0)
+//                 vPos.push_back(target_pos);
+           // for(int i = 0; i < apcnt; ++i)
+             for(int pos = 0; pos < 25; ++ pos)
             {
-                bo = static_cast<BattleFighter*>(_objs[target_side][ap[i].pos]);
+                bo = static_cast<BattleFighter*>(_objs[target_side][pos]);
                 if(bo && bo->getHP() > 0)
                 {
-                    vPos.push_back(ap[i].pos);
+                    vPos.push_back(pos);
                 }
             }
             if(vPos.size() > 0)
