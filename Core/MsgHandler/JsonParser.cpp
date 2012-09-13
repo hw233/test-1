@@ -368,6 +368,7 @@ int query_activity_req(JsonHead* head, json_t* body, json_t* retbody, std::strin
     if (val && val->child && val->child->text)
         areaid = atoi(val->child->text);
 
+    playerid = atoll(playerId);
     GObject::Player* player = GObject::globalPlayers[playerid];
     if (!player)
     {
@@ -377,7 +378,7 @@ int query_activity_req(JsonHead* head, json_t* body, json_t* retbody, std::strin
 
     json_insert_pair_into_object(retbody, "szOpenId", json_new_string(openid));
     json_insert_pair_into_object(retbody, "szRoleName", json_new_string(fixPlayerName(player->getName()).c_str()));
-    json_insert_pair_into_object(retbody, "ucGender", my_json_new_number(player->IsMale()?1:2));
+    json_insert_pair_into_object(retbody, "ullRoleId", json_new_string(playerId));
     json_insert_pair_into_object(retbody, "uiActval", my_json_new_number(player->GetActivityMgr()?player->GetActivityMgr()->GetPoint():0));
 
     head->cmd = 60;

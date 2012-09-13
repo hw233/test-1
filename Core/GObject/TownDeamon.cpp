@@ -1,4 +1,4 @@
-﻿#include "TownDeamon.h"
+#include "TownDeamon.h"
 #include "Player.h"
 #include "Common/Stream.h"
 #include "MsgID.h"
@@ -175,10 +175,12 @@ void TownDeamon::showTown(Player* pl)
 
 void TownDeamon::showLevelTown(Player* pl, UInt16 level)
 {
-    if(level > m_Monsters.size() || level == 0)
+    if(level == 0)
     {
         return;
     }
+    if(level > m_Monsters.size())
+        level = m_Monsters.size();
 
     Int16 idx = level - 1;
     Player* pl2 = m_Monsters[idx].player;
@@ -244,7 +246,20 @@ void TownDeamon::useAccItem(Player* pl, UInt8 count)
             res = 1;
         else
         {
-            pl->GetPackage()->DelItemAny(ACC_ITEM, need);
+            struct DelItemInfo
+            {
+                UInt32 id;
+                UInt16 num;
+                UInt8 toWhere;
+            };
+            DelItemInfo item;
+            item.id = ACC_ITEM;
+            item.num = need;
+            item.toWhere = 0;
+            GameMsgHdr hdr1(0x256, pl->getThreadId(), pl, sizeof(DelItemInfo));
+            GLOBAL().PushMsg(hdr1, &item);
+
+            //pl->GetPackage()->DelItemAny(ACC_ITEM, need);
             if(dpd->accTime != 0 && accLeft == 0)
             {
                 dpd->accAwards += dpd->accLen/TD_AWARD_TIMEUNIT;
@@ -315,7 +330,20 @@ void TownDeamon::useVitalityItem(Player* pl, UInt8 count)
                 dpd->vitality = 0;
             }
 
-            pl->GetPackage()->DelItemAny(VITALITY_ITEM, need);
+            struct DelItemInfo
+            {
+                UInt32 id;
+                UInt16 num;
+                UInt8 toWhere;
+            };
+            DelItemInfo item;
+            item.id = VITALITY_ITEM;
+            item.num = need;
+            item.toWhere = 0;
+            GameMsgHdr hdr1(0x256, pl->getThreadId(), pl, sizeof(DelItemInfo));
+            GLOBAL().PushMsg(hdr1, &item);
+
+            //pl->GetPackage()->DelItemAny(VITALITY_ITEM, need);
             dpd->vitalityTime = TimeUtil::Now();
             if(dpd->vitality > TD_MAXVITALITY)
                 dpd->vitality = TD_MAXVITALITY;
@@ -369,8 +397,9 @@ void TownDeamon::cancelDeamon(Player* pl)
     pl->send(st);
 }
 
-bool TownDeamon::attackNpc(Player* pl, UInt32 npcId)
+bool TownDeamon::attackNpc(Player* pl, UInt16 level)
 {
+    UInt32 npcId = m_Monsters[level - 1].npcId;
     UInt32 now = TimeUtil::Now();
     UInt32 buffLeft = pl->getBuffData(PLAYER_BUFF_ATTACKING, now);
     if(cfg.GMCheck && buffLeft > now)
@@ -417,10 +446,26 @@ bool TownDeamon::attackNpc(Player* pl, UInt32 npcId)
     bsim.applyFighterHP(0, pl);
 
     pl->setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns());
+
+    pl->townDeamonUdpLog(level); // 上报挑战成功的udp日志
+
+    UInt32 thisDay = TimeUtil::SharpDay();
+    UInt32 seventhDay = TimeUtil::SharpDay(6, PLAYER_DATA(pl, created));
+    if(20 == level && thisDay == seventhDay && !pl->GetVar(VAR_CLAWARD2))
+    {
+        pl->SetVar(VAR_CLAWARD2, 1);
+        pl->sendRC7DayInfo(TimeUtil::Now());
+    }
+    if (20 == level )
+        pl->setContinuousRFAward(7);
+
+	GameMsgHdr hdr(0x1FD, WORKER_THREAD_WORLD, pl, sizeof(bool));
+	GLOBAL().PushMsg(hdr, &res);
+
     return res;
 }
 
-void TownDeamon::attackPlayer(Player* pl, Player* defer)
+void TownDeamon::attackPlayer(Player* pl, Player* defer, UInt32 spirit)
 {
 	UInt8 tid = defer->getThreadId();
 	if(tid == pl->getThreadId())
@@ -430,8 +475,8 @@ void TownDeamon::attackPlayer(Player* pl, Player* defer)
 		Battle::BattleSimulator bsim(/*pl->getLocation()*/Battle::BS_COPY5, pl, defer);
 		pl->PutFighters( bsim, 0, true );
 		defer->PutFighters( bsim, 1, true );
-        DeamonPlayerData* deferDpd = defer->getDeamonPlayerData();
-        UInt32 spirit = deferDpd->calcSpirit();
+        //DeamonPlayerData* deferDpd = defer->getDeamonPlayerData();
+        //UInt32 spirit = deferDpd->calcSpirit();
         float factor = static_cast<float>(spirit)/100.0f;
         defer->setSpiritFactor(factor);
 		bsim.start();
@@ -441,26 +486,35 @@ void TownDeamon::attackPlayer(Player* pl, Player* defer)
 		Stream st(REP::ATTACK_NPC);
 		st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
 		pl->send(st);
-
-        notifyChallengeResult(pl, defer, res);
+		
+        //notifyChallengeResult(pl, defer, res);
+        struct TDResNotify
+        {
+            Player * peer;
+            bool win;
+        };
+        TDResNotify notify = { defer, res };
+        GameMsgHdr hdr2(0x1FC, WORKER_THREAD_WORLD, pl, sizeof(TDResNotify));
+        GLOBAL().PushMsg(hdr2, &notify);
 
 		return;
 	}
 	struct TDBeAttackData
 	{
 		Player * attacker;
+        UInt32 spirit;
 		UInt16 formation;
 		UInt16 portrait;
 		Lineup lineup[5];
 	};
-	TDBeAttackData tdbad = { pl, pl->getFormation(), static_cast<UInt16>(pl->getMainFighter() != NULL ? pl->getMainFighter()->getId() : 0) };
+	TDBeAttackData tdbad = { pl, spirit, pl->getFormation(), static_cast<UInt16>(pl->getMainFighter() != NULL ? pl->getMainFighter()->getId() : 0) };
 	for(int i = 0; i < 5; ++ i)
 		tdbad.lineup[i] = pl->getLineup(i);
 	GameMsgHdr hdr(0x340, tid, defer, sizeof(TDBeAttackData));
 	GLOBAL().PushMsg(hdr, &tdbad);
 }
 
-void TownDeamon::beAttackByPlayer(Player* defer, Player * atker, UInt16 formation, UInt16 portrait, Lineup * lineup)
+void TownDeamon::beAttackByPlayer(Player* defer, Player * atker, UInt32 spirit, UInt16 formation, UInt16 portrait, Lineup * lineup)
 {
 	Battle::BattleSimulator bsim(/*atker->getLocation()*/Battle::BS_COPY5, atker, defer);
 	bsim.setFormation( 0, formation );
@@ -474,8 +528,8 @@ void TownDeamon::beAttackByPlayer(Player* defer, Player * atker, UInt16 formatio
 		}
 	}
 	defer->PutFighters( bsim, 1, true );
-    DeamonPlayerData* deferDpd = defer->getDeamonPlayerData();
-    UInt32 spirit = deferDpd->calcSpirit();
+    //DeamonPlayerData* deferDpd = defer->getDeamonPlayerData();
+    //UInt32 spirit = deferDpd->calcSpirit();
     float factor = static_cast<float>(spirit)/100.0f;
     defer->setSpiritFactor(factor);
 	bsim.start();
@@ -493,7 +547,7 @@ void TownDeamon::beAttackByPlayer(Player* defer, Player * atker, UInt16 formatio
 	};
 
 	TDResNotify notify = { defer, res };
-	GameMsgHdr hdr2(0x341, atker->getThreadId(), atker, sizeof(TDResNotify));
+	GameMsgHdr hdr2(0x1FC, WORKER_THREAD_WORLD, atker, sizeof(TDResNotify));
 	GLOBAL().PushMsg(hdr2, &notify);
 }
 
@@ -512,54 +566,8 @@ void TownDeamon::challenge(Player* pl, UInt16 level, UInt8 type)
                 break;
             else
             {
-                UInt8 res = 0;
-                if(attackNpc(pl, m_Monsters[idx].npcId))
-                {
-                    if (level > m_maxLevel)
-                    {
-                        SYSMSG_BROADCASTV(2337, pl->getCountry(), pl->getName().c_str(), level);
-                        m_maxLevel = level;
-                    }
-
-                    pl->townDeamonUdpLog(level); // 上报挑战成功的udp日志
-
-                    res = 0;
-                    ++ dpd->curLevel;
-                    if(dpd->startTime == 0)
-                        dpd->startTime = TimeUtil::Now();
-
-                    if(dpd->maxLevel == 0)
-                    {
-                        ++ dpd->maxLevel;
-                        DB3().PushUpdateData("INSERT INTO `towndeamon_player` ( `deamonLevel`, `curLevel`, `maxLevel`, `time2MaxLvl`, `playerId`, `startTime`, `accTime`, `accLen`, `accAwards`, `vitalityTime`, `vitality`, `spirit`, `challengeTime`, `itemId`, `itemNum`, `quitLevel`, `attacker`) VALUES (%u, %u, %u, %u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %"I64_FMT"u) ", dpd->deamonLevel, dpd->curLevel, dpd->maxLevel, TimeUtil::Now(), pl->getId(), dpd->startTime, dpd->accTime, dpd->accLen, dpd->accAwards, dpd->vitalityTime, dpd->vitality, dpd->spirit, dpd->challengeTime, dpd->itemId, dpd->itemNum, dpd->quitLevel, dpd->attacker);
-                    }
-                    else
-                    {
-                        if(dpd->curLevel > dpd->maxLevel)
-                        {
-                            dpd->maxLevel = dpd->curLevel;
-                            DB3().PushUpdateData("UPDATE `towndeamon_player` SET `curLevel`=%u, `maxLevel`=%u, `time2MaxLvl`=%u, `startTime`=%u WHERE `playerId` = %"I64_FMT"u", dpd->curLevel, dpd->maxLevel, TimeUtil::Now(), dpd->startTime, pl->getId());
-                        }
-                        else
-                            DB3().PushUpdateData("UPDATE `towndeamon_player` SET `curLevel`=%u, `startTime`=%u  WHERE `playerId` = %"I64_FMT"u", dpd->curLevel, dpd->startTime, pl->getId());
-                    }
-
-                    UInt32 thisDay = TimeUtil::SharpDay();
-                    UInt32 seventhDay = TimeUtil::SharpDay(6, PLAYER_DATA(pl, created));
-                    if(20 == dpd->curLevel && thisDay == seventhDay && !pl->GetVar(VAR_CLAWARD2))
-                    {
-                        pl->SetVar(VAR_CLAWARD2, 1);
-                        pl->sendRC7DayInfo(TimeUtil::Now());
-                    }
-                    if (20 == dpd->curLevel)
-                        pl->setContinuousRFAward(7);
-                }
-                else
-                    res = 1;
-                Stream st(REP::TOWN_DEAMON);
-                st << static_cast<UInt8>(0x05);
-                st << level << type << res << Stream::eos;
-                pl->send(st);
+                GameMsgHdr hdr(0x262, pl->getThreadId(), pl, sizeof(UInt16));
+                GLOBAL().PushMsg(hdr, &(level));
             }
 
         }
@@ -579,7 +587,17 @@ void TownDeamon::challenge(Player* pl, UInt16 level, UInt8 type)
                 dpd->inChallenge = true;
                 deferDpd->inChallenge = true;
                 if (def != pl && def->getDeamonPlayerData() && def->getDeamonPlayerData()->deamonLevel)
-                    attackPlayer(pl, def);
+                {
+                    struct TownDeamonChallenge
+                    {
+                        Player * defer;
+                        UInt32   spirit;
+                    };
+                    TownDeamonChallenge tdc = { def, deferDpd->calcSpirit() };
+                    GameMsgHdr hdr(0x260, pl->getThreadId(), pl, sizeof(TownDeamonChallenge));
+                    GLOBAL().PushMsg(hdr, &tdc);
+                }
+                    //attackPlayer(pl, def);
             }
             else
             {
@@ -600,7 +618,12 @@ void TownDeamon::challenge(Player* pl, UInt16 level, UInt8 type)
         break;
     }
 
-    addActivity(pl);
+    stActivityMsg msg;
+    msg.id = AtyTownDeamon;
+    GameMsgHdr hdr2(0x245, pl->getThreadId(), pl, sizeof(stActivityMsg));
+    GLOBAL().PushMsg(hdr2, &msg);
+
+    //addActivity(pl);
 }
 
 void TownDeamon::notifyChallengeResult(Player* pl, Player* defer, bool win)
@@ -648,15 +671,53 @@ void TownDeamon::notifyChallengeResult(Player* pl, Player* defer, bool win)
     pl->send(st);
 }
 
-void TownDeamon::autoCompleteQuite(Player* pl, UInt16 levels)
+void TownDeamon::notifyAttackNpcResult(Player* pl, bool win)
+{
+    DeamonPlayerData* dpd = pl->getDeamonPlayerData();
+    UInt16 level = dpd->curLevel + 1;
+    if(win)
+    {
+        if (level > m_maxLevel)
+        {
+            SYSMSG_BROADCASTV(2337, pl->getCountry(), pl->getName().c_str(), level);
+            m_maxLevel = level;
+        }
+
+        ++ dpd->curLevel;
+        if(dpd->startTime == 0)
+            dpd->startTime = TimeUtil::Now();
+
+        if(dpd->maxLevel == 0)
+        {
+            ++ dpd->maxLevel;
+            DB3().PushUpdateData("INSERT INTO `towndeamon_player` ( `deamonLevel`, `curLevel`, `maxLevel`, `time2MaxLvl`, `playerId`, `startTime`, `accTime`, `accLen`, `accAwards`, `vitalityTime`, `vitality`, `spirit`, `challengeTime`, `itemId`, `itemNum`, `quitLevel`, `attacker`) VALUES (%u, %u, %u, %u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %"I64_FMT"u) ", dpd->deamonLevel, dpd->curLevel, dpd->maxLevel, TimeUtil::Now(), pl->getId(), dpd->startTime, dpd->accTime, dpd->accLen, dpd->accAwards, dpd->vitalityTime, dpd->vitality, dpd->spirit, dpd->challengeTime, dpd->itemId, dpd->itemNum, dpd->quitLevel, dpd->attacker);
+        }
+        else
+        {
+            if(dpd->curLevel > dpd->maxLevel)
+            {
+                dpd->maxLevel = dpd->curLevel;
+                DB3().PushUpdateData("UPDATE `towndeamon_player` SET `curLevel`=%u, `maxLevel`=%u, `time2MaxLvl`=%u, `startTime`=%u WHERE `playerId` = %"I64_FMT"u", dpd->curLevel, dpd->maxLevel, TimeUtil::Now(), dpd->startTime, pl->getId());
+            }
+            else
+                DB3().PushUpdateData("UPDATE `towndeamon_player` SET `curLevel`=%u, `startTime`=%u  WHERE `playerId` = %"I64_FMT"u", dpd->curLevel, dpd->startTime, pl->getId());
+        }
+    }
+    Stream st(REP::TOWN_DEAMON);
+    st << static_cast<UInt8>(0x05);
+    st << level << static_cast<UInt8>(0) << static_cast<UInt8>(win ? 0 : 1) << Stream::eos;
+    pl->send(st);
+}
+
+
+void TownDeamon::autoCompleteQuiteCheck(Player* pl, UInt16 levels)
 {
     if(!checkTownDeamon(pl))
         return;
 
     DeamonPlayerData* dpd = pl->getDeamonPlayerData();
-    UInt16 curLevelTmp = dpd->curLevel;
 
-    UInt32 maxCnt = levels;
+    UInt16 maxCnt = levels;
     if(levels > dpd->maxLevel - dpd->curLevel)
         maxCnt = dpd->maxLevel - dpd->curLevel;
 
@@ -669,43 +730,66 @@ void TownDeamon::autoCompleteQuite(Player* pl, UInt16 levels)
     if(maxCnt == 0)
         res = 1;
 
+    if(maxCnt != 0)
+    {
+        struct TownLevels
+        {
+            UInt16 curLevel;
+            UInt16 levels;
+        };
+        TownLevels tls = { dpd->curLevel, maxCnt };
+        GameMsgHdr hdr2(0x261, pl->getThreadId(), pl, sizeof(TownLevels));
+        GLOBAL().PushMsg(hdr2, &tls);
+
+        if(dpd->startTime == 0)
+            dpd->startTime = TimeUtil::Now();
+        dpd->curLevel += maxCnt;
+        DB3().PushUpdateData("UPDATE `towndeamon_player` SET `curLevel`=%u, `startTime`=%u WHERE `playerId` = %"I64_FMT"u", dpd->curLevel, dpd->startTime, pl->getId());
+    }
+    else
+    {
+        Stream st(REP::TOWN_DEAMON);
+        st << static_cast<UInt8>(0x07) << res;
+        st << Stream::eos;
+        pl->send(st);
+    }
+}
+
+void TownDeamon::autoCompleteQuite(Player* pl, UInt16 curLevel, UInt16 levels)
+{
     Stream st(REP::TOWN_DEAMON);
-    st << static_cast<UInt8>(0x07) << res;
-    if(res == 0)
+    st << static_cast<UInt8>(0x07) << static_cast<UInt8>(0);
     {
 		ConsumeInfo ci(TownDeamonAuto,0,0);
-		pl->useTael(maxCnt * TD_AUTO_TAEL,&ci);
-        st << static_cast<UInt16>(dpd->curLevel + maxCnt);
-        for(UInt32 idx = 0; idx < maxCnt ; ++idx)
+		pl->useTael(levels * TD_AUTO_TAEL,&ci);
+        st << static_cast<UInt16>(curLevel + levels);
+        for(UInt32 idx = 0; idx < levels; ++idx)
         {
-            GData::NpcGroups::iterator it = GData::npcGroups.find(m_Monsters[idx + dpd->curLevel].npcId);
+            GData::NpcGroups::iterator it = GData::npcGroups.find(m_Monsters[idx + curLevel].npcId);
             if(it == GData::npcGroups.end())
                 continue;
 
             GData::NpcGroup * ng = it->second;
             pl->pendExp(ng->getExp());
             ng->getLoots(pl, pl->_lastLoot, 0, NULL);
-            pl->townDeamonUdpLog(dpd->curLevel + idx);
+            pl->townDeamonUdpLog(curLevel + idx);
         }
     }
 
-    if(maxCnt != 0)
     {
-        if(dpd->startTime == 0)
-            dpd->startTime = TimeUtil::Now();
-        dpd->curLevel += maxCnt;
-        DB3().PushUpdateData("UPDATE `towndeamon_player` SET `curLevel`=%u, `startTime`=%u WHERE `playerId` = %"I64_FMT"u", dpd->curLevel, dpd->startTime, pl->getId());
-
+        UInt16 curLevelTmp = curLevel;
+        curLevel += levels;
         UInt32 thisDay = TimeUtil::SharpDay();
         UInt32 seventhDay = TimeUtil::SharpDay(6, PLAYER_DATA(pl, created));
-        if(curLevelTmp < 20 && dpd->curLevel >= 20 && thisDay == seventhDay && !pl->GetVar(VAR_CLAWARD2))
+        if(curLevelTmp < 20 && curLevel >= 20 && thisDay == seventhDay && !pl->GetVar(VAR_CLAWARD2))
         {
             pl->SetVar(VAR_CLAWARD2, 1);
             pl->sendRC7DayInfo(TimeUtil::Now());
         }
-        if (curLevelTmp < 20 && dpd->curLevel >= 20)
+        if (curLevelTmp < 20 && curLevel >= 20)
             pl->setContinuousRFAward(7);
     }
+
     st << pl->getPendExp();
     UInt16 sz = pl->_lastLoot.size();
     st << sz;
@@ -838,17 +922,7 @@ void TownDeamon::addActivity(Player* pl)
 {
     if (!pl->GetVar(VAR_TOWNDEAMON))
     {
-        if(pl->getThreadId() != WORKER_THREAD_NEUTRAL)
-        {
-            stActivityMsg msg;
-            msg.id = AtyTownDeamon;
-            GameMsgHdr hdr2(0x245, pl->getThreadId(), pl, sizeof(stActivityMsg));
-            GLOBAL().PushMsg(hdr2, &msg);
-        }
-        else
-        {
-            GameAction()->doAty(pl, AtyTownDeamon, 0, 0);
-        }
+        GameAction()->doAty(pl, AtyTownDeamon, 0, 0);
         pl->SetVar(VAR_TOWNDEAMON, 1);
     }
 }

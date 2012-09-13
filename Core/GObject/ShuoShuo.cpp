@@ -13,12 +13,20 @@
 namespace GObject
 {
 
-ShuoShuo::ShuoShuo(Player* player) : m_owner(player), m_maxIdx(0)
+ShuoShuo::ShuoShuo(Player* player) : m_owner(player)
 {
     m_updateTime = TimeUtil::Now();
 }
 ShuoShuo::~ShuoShuo()
 {
+}
+
+void ShuoShuo::resetMin()
+{
+    for (UInt8 i = 0; i < MIN_ITEM; ++i)
+        m_ss[i] = 0;
+    m_ss[SS_PUBTST_PKG] = 0;
+    m_ss[SS_SLLP] = 0;
 }
 
 void ShuoShuo::loadFromDB(UInt32 update, const char* ss)
@@ -28,21 +36,16 @@ void ShuoShuo::loadFromDB(UInt32 update, const char* ss)
 
     StringTokenizer shuo(ss, ",");
     UInt32 count = shuo.count();
-    UInt32 c = count;
-    if (count < MIN_ITEM)
-        count = MIN_ITEM;
-
-    m_ss.resize(count);
-    for (UInt8 i = 0; i < c; ++i)
+    if (count > SS_MAX)
+        count = SS_MAX;
+    m_ss.resize(SS_MAX,0);
+    for (UInt8 i = 0; i < count; ++i)
         m_ss[i] = atoi(shuo[i].c_str());
 
-    m_maxIdx = count;
     m_updateTime = update;
-
     if (TimeUtil::SharpDay(0, TimeUtil::Now()) != TimeUtil::SharpDay(0, m_updateTime))
     {
-        for (UInt8 i = 0; i < MIN_ITEM; ++i)
-            m_ss[i] = 0;
+        resetMin();
         updateToDB();
     }
 }
@@ -73,27 +76,17 @@ void ShuoShuo::setShuoShuo(UInt8 idx, UInt8 status)
 {
     if (!World::getShuoShuo())
         return;
-    bool w = false;
-    if (m_ss.size() < MIN_ITEM)
-    {
-        m_ss.resize(MIN_ITEM, 0);
-        m_maxIdx = MIN_ITEM;
-        w = true;
-    }
 
-    if (idx >= m_maxIdx)
-    {
-        m_maxIdx = idx+1;
-        w = true;
-    }
+    if (idx >= SS_MAX)
+        return;
 
-    if (m_ss.size() < m_maxIdx)
-        m_ss.resize(m_maxIdx, 0);
+    if (m_ss.size() < SS_MAX)
+        m_ss.resize(SS_MAX, 0);
 
     UInt8 o = m_ss[idx];
     m_ss[idx] = status;
 
-    if (o != status || w)
+    if (o != status)
     {
         updateToDB();
         updateShuoShuo(idx);
@@ -102,8 +95,10 @@ void ShuoShuo::setShuoShuo(UInt8 idx, UInt8 status)
 
 UInt8 ShuoShuo::getShuoShuo(UInt8 idx)
 {
-    if (idx >= m_maxIdx)
+    if (idx >= SS_MAX)
         return 0;
+    if (m_ss.size() < SS_MAX)
+        m_ss.resize(SS_MAX, 0);
     return m_ss[idx];
 }
 
@@ -156,13 +151,21 @@ void ShuoShuo::sendShuoShuo()
 
 void ShuoShuo::reset(bool online)
 {
-    if (m_ss.size() < MIN_ITEM)
-        m_ss.resize(MIN_ITEM, 0);
+    if (m_ss.size() < SS_MAX)
+        m_ss.resize(SS_MAX, 0);
     for (UInt8 i = 0; i < MIN_ITEM; ++i)
     {
         m_ss[i] = 0;
         if (online)
             updateShuoShuo(i);
+    }
+
+    m_ss[SS_PUBTST_PKG] = 0;
+    m_ss[SS_SLLP] = 0;
+    if (online)
+    {
+        updateShuoShuo(SS_PUBTST_PKG);
+        updateShuoShuo(SS_SLLP);
     }
     updateToDB();
 }

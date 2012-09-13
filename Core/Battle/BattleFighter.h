@@ -160,24 +160,24 @@ public:
     inline float getAtkReduce() { return _atkreduce + _atkreduce2 + _atkreduce3; }
     inline float getMagAtkReduce() { return _magatkreduce + _magatkreduce2 + _magatkreduce3; }
 
-	inline void setAttackAdd(float v, UInt16 last = 0) {_attackAdd = v; _atkAdd_last = last;}
-	inline void setMagAttackAdd(float v, UInt16 last = 0) {_magAtkAdd = v; _magAtkAdd_last = last;}
-	inline void setDefendAdd(float v, UInt16 last = 0) {_defAdd = v; _defAdd_last = last;}
-	inline void setMagDefendAdd(float v, UInt16 last = 0) {_magDefAdd = v; _magDefAdd_last = last;}
-	inline void setHitrateAdd(float v, UInt16 last = 0) {_hitrateAdd = v; _hitrateAdd_last = last;}
-	inline void setEvadeAdd(float v, UInt16 last = 0) {_evadeAdd = v; _evadeAdd_last = last;}
-	inline void setCriticalAdd(float v, UInt16 last = 0) {_criticalAdd = v; _criticalAdd_last = last;}
-	inline void setCriticalDmgAdd(float v, UInt16 last = 0) {_criticalDmgAdd = v; _criticalDmgAdd_last = last;}
-	inline void setPierceAdd(float v, UInt16 last = 0) {_pierceAdd = v; _pierceAdd_last = last;}
-	inline void setCounterAdd(float v, UInt16 last = 0) {_counterAdd = v; _counterAdd_last = last;}
-	inline void setMagResAdd(float v, UInt16 last = 0) {_magResAdd = v; _magResAdd_last = last;}
-	inline void setMaxHPAdd(UInt32 v) {_maxhpAdd = v;}
-	inline void setActionAdd(UInt32 v, UInt16 last = 0) {_maxActionAdd = v; _maxActionAdd_last = last;}
+	void setAttackAdd(float v, UInt16 last = 0);
+	void setMagAttackAdd(float v, UInt16 last = 0);
+	void setDefendAdd(float v, UInt16 last = 0);
+	void setMagDefendAdd(float v, UInt16 last = 0);
+	void setHitrateAdd(float v, UInt16 last = 0);
+	void setEvadeAdd(float v, UInt16 last = 0);
+	void setCriticalAdd(float v, UInt16 last = 0);
+	void setCriticalDmgAdd(float v, UInt16 last = 0);
+	void setPierceAdd(float v, UInt16 last = 0);
+	void setCounterAdd(float v, UInt16 last = 0);
+	void setMagResAdd(float v, UInt16 last = 0);
+	void setMaxHPAdd(Int32 v, UInt16 last = 0);
+	void setActionAdd(Int32 v, UInt16 last = 0);
+    void setToughAdd(float v, UInt16 last = 0);
+    void setAtkReduce(float v, UInt16 last = 0);
+    void setMagAtkReduce(float v, UInt16 last = 0);
     inline void AddAura(Int32 v) {_aura += v; if(_aura > _auraMax) _aura = _auraMax; else if(_aura < 0) _aura = 0;}
     inline void setAura(Int32 v) {_aura = v > _auraMax ? _auraMax : v;}
-    inline void setToughAdd(float v, UInt16 last) {_toughAdd = v; _toughAdd_last = last;}
-    inline void setAtkReduce(float v, UInt16 last) { _atkreduce = v; _atkreduce_last = last; }
-    inline void setMagAtkReduce(float v, UInt16 last) { _magatkreduce = v; _magatkreduce_last = last; }
 
 	inline UInt8& getAttackAddLast() {return _atkAdd_last;}
     inline UInt8& getMagAttackAddLast() {return _magAtkAdd_last;}
@@ -198,9 +198,9 @@ public:
     inline UInt8& getAtkReduce3Last() { return _atkreduce3_last;}
     inline UInt8& getMagAtkReduce3Last() { return _magatkreduce3_last;}
 
-    inline void setAtkReduce3(float v, UInt16 last) { _atkreduce3 = v; _atkreduce3_last = last; }
-    inline void setMagAtkReduce3(float v, UInt16 last) { _magatkreduce3 = v; _magatkreduce3_last = last; }
-    inline void setPuduDebuf(float v, UInt16 last) { _pudu_debuf= v; _pudu_debuf_last = last; }
+    void setAtkReduce3(float v, UInt16 last);
+    void setMagAtkReduce3(float v, UInt16 last);
+    void setPuduDebuf(float v, UInt16 last);
 
 	inline UInt32 getLostHP() { Int64 tmp = _maxhp + _maxhpAdd + _maxhpAdd2; UInt32 mhp = (tmp > 0 ? tmp : 0); if(mhp > _hp) return mhp - _hp; return 0; }
 
@@ -284,6 +284,11 @@ public:
     const GData::SkillBase* getPassiveSkillAftNAtk();
     void releaseSkillCD(int cd);
     void releaseSkillCD(std::vector<GData::SkillItem>& skill, int cd);
+
+
+    const GData::SkillBase* getPassiveSkillOnTherapy();
+    const GData::SkillBase* getPassiveSkillOnSkillDmg();
+    const GData::SkillBase* getPassiveSkillOnOtherDead();
 
     const GData::SkillBase* getPassiveSkill(std::vector<GData::SkillItem>& passiveSkill);
     const GData::SkillBase* getPassiveSkill100(std::vector<GData::SkillItem>& passiveSkill100, size_t& idx);
@@ -374,14 +379,15 @@ public:
 	inline void setPierceAdd2(float v) {_pierceAdd2 = v;}
 	inline void setCounterAdd2(float v) {_counterAdd2 = v;}
 	inline void setMagResAdd2(float v) {_magResAdd2 = v;}
-	inline void setMaxHPAdd2(Int32 v) {_maxhpAdd = v;}
+	inline void setMaxHPAdd2(Int32 v) {_maxhpAdd2 = v;}
 	inline void setActionAdd2(Int32 v) {_maxActionAdd2 = v;}
     inline void setToughAdd2(float v) {_toughAdd2 = v;}
     inline void setAtkReduce2(float v) { _atkreduce2 = v; }
     inline void setMagAtkReduce2(float v) { _magatkreduce2 = v; }
 
     inline UInt8 getSoulExtraAura() { return _fighter->getSoulExtraAura(); }
-
+    // 通过天赋术额外保留部分灵力
+    inline UInt8 getAuraLeft(){ return _fighter->getSoulAuraLeft(); } 
 private:
 	void updateBuffExtras();
 
@@ -444,6 +450,10 @@ private:
     std::vector<GData::SkillItem> _passiveSkillDead;
     std::vector<GData::SkillItem> _passiveSkillAftNAtk;
 
+    std::vector<GData::SkillItem> _passiveSkillOnTherapy;
+    std::vector<GData::SkillItem> _passiveSkillOnSkillDmg;
+    std::vector<GData::SkillItem> _passiveSkillOnOtherDead;
+
     std::map<UInt16, GData::SkillStrengthenBase*> _skillStrengthen;
 
     bool _revival;
@@ -488,6 +498,15 @@ private:
     UInt8 _def_dec_last;
     UInt8 _def_dec_times;
 
+    UInt32 _aura_bleed;
+    UInt8 _aura_dec_cd, _aura_bleed_last;
+    UInt32 _stun_bleed;
+    UInt8 _stun_cd, _stun_bleed_last;
+    UInt32 _confuse_bleed;
+    UInt8 _confuse_cd, _confuse_bleed_last;
+
+    UInt8 _colorStock, _colorStockTimes, _colorStockLast;
+
 public:
     void fakeDead();
     inline UInt16 getFakeDeadTimes() { return _fakeDeadTimes; }
@@ -513,6 +532,23 @@ public:
     inline float getBleed3() { return _bleed3; }
     inline void setBleed3(float value, UInt8 last) { _bleed3 = value; _bleed3_last = last; }
 
+
+    inline UInt8& getAuraDecCD() { return _aura_dec_cd; }
+    inline UInt8& getAuraBleedLast() { return _aura_bleed_last; }
+    inline float getAuraBleed() { return _aura_bleed; }
+    inline void setAuraBleed(float value, UInt8 last, UInt8 cd) { _aura_bleed = value; _aura_bleed_last = last; _aura_dec_cd = cd; }
+
+    inline UInt8& getStunCD() { return _stun_cd; }
+    inline UInt8& getStunBleedLast() { return _stun_bleed_last; }
+    inline float getStunBleed() { return _stun_bleed; }
+    inline void setStunBleed(float value, UInt8 last, UInt8 cd) { _stun_bleed = value; _stun_bleed_last = last; _stun_cd = cd; }
+
+    inline UInt8& getConfuceCD() { return _confuse_cd; }
+    inline UInt8& getConfuceBleedLast() { return _confuse_bleed_last; }
+    inline float getConfuceBleed() { return _confuse_bleed; }
+    inline void setConfuceBleed(float value, UInt8 last, UInt8 cd) { _confuse_bleed = value; _confuse_bleed_last = last; _confuse_cd = cd; }
+
+
     inline UInt8 getImmune2() { return _immune2; }
     inline void setImmune2(UInt8 v) { _immune2 = v; }
 
@@ -521,6 +557,14 @@ public:
     inline void setDefDec(float value, UInt8 last) { _def_dec = value; _def_dec_last = last; }
     inline UInt8 getDefDecTimes() { return _def_dec_times; }
     inline void setDefDecTimes(UInt8 v) { _def_dec_times = v; }
+
+    inline UInt8 getColorStock() { return _colorStock; }
+    inline UInt8& getColorStockTimes() { return _colorStockTimes; }
+    inline UInt8& getColorStockLast() { return _colorStockLast; }
+    inline void setColorStock(UInt8 v, UInt8 ts, UInt8 ls) { _colorStock = v; _colorStockTimes = ts; _colorStockLast = ls; }
+
+
+	virtual void makeDamage(UInt32& u);
 public:
 	enum StatusFlag
 	{

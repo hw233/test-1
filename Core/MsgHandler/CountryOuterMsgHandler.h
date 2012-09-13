@@ -1165,6 +1165,8 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         GameMsgHdr hdr(0x1C4, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr, NULL);
     }
+    //if(World::getYearActive())
+    //    pl->sendYearActInfo();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -1620,6 +1622,44 @@ void OnLuckyDrawReq( GameMsgHdr& hdr, const void * data )
     else if (type == 1)
     {
         luckyDraw.sendInfo(player);
+    }
+}
+
+void OnCountryActReq( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 opt = 0;
+    br >> opt;
+
+    switch(opt)
+    {
+        /** 周岁红包送不停 **/
+        case 1:
+        {
+	        if(!World::getYearActive())
+		        return;
+            UInt8 opt2 = 0;
+            br >> opt2;
+            if(opt2 == 1)
+            {
+                UInt8 type = 0;
+                br >> type;
+                if(type == 1 || type == 2)
+                    player->getYearActAward(type);
+            }else if(opt2 == 2)
+                player->sendYearActInfo();
+        }
+        break;
+        case 2:
+        {
+            if(!World::getKillMonsterAct())
+                return;
+            player->getKillMonsterAward();
+        }
+        break;
+        default:
+        break;
     }
 }
 
@@ -4512,6 +4552,7 @@ void OnNewRelationReq( GameMsgHdr& hdr, const void* data)
     pl->send(st);
 }
 
+#if 0
 void OnTownDeamonReq( GameMsgHdr& hdr, const void* data)
 {
 	MSG_QUERY_PLAYER(player);
@@ -4607,6 +4648,7 @@ void OnTownDeamonReq( GameMsgHdr& hdr, const void* data)
         return;
     }
 }
+#endif
 
 void OnGetHeroMemoAward( GameMsgHdr& hdr, GetHeroMemoAward& req)
 {

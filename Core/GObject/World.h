@@ -137,6 +137,10 @@ public:
     { _rechargeactive3366 = v; if (v) _rechargeactiveno |= no; else _rechargeactiveno &= ~no; }
     inline static bool getRechargeActive3366()
     { return _rechargeactive3366; }
+    inline static void setYearActive(bool v)
+    { _yearact = v; }
+    inline static bool getYearActive()
+    { return _yearact; }
     inline static void setValentineDay(bool v)
     { _valentineday = v; }
     inline static bool getValentineDay()
@@ -325,6 +329,10 @@ public:
     { _needconsumerank = v; }
     inline static bool getNeedConsumeRank()
     { return _needconsumerank; }
+    inline static void setKillMonsterAct(bool v)
+    { _killMonsteract = v; }
+    inline static bool getKillMonsterAct()
+    { return _killMonsteract; }
 
 	inline Script::WorldScript * getWorldScript() { return _worldScript; }
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
@@ -362,6 +370,7 @@ public:
     static bool _blueactiveday;
     static bool _rechargeactive;
     static bool _rechargeactive3366;
+    static bool _yearact;
     static UInt8 _rechargeactiveno;
     static bool _valentineday;
     static bool _netvalentineday;
@@ -407,6 +416,7 @@ public:
     static bool _consumeactive;
     static bool _needrechargerank;
     static bool _needconsumerank;
+    static bool _killMonsteract;
     static UInt32 _rechargebegin;
     static UInt32 _rechargeend;
     static UInt32 _consumebegin;

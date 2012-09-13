@@ -2594,7 +2594,10 @@ void Fighter::delSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_AFTRES ||
                         s->cond == GData::SKILL_DEAD ||
                         s->cond == GData::SKILL_ENTER ||
-                        s->cond == GData::SKILL_DEAD)
+                        s->cond == GData::SKILL_ONTHERAPY ||
+                        s->cond == GData::SKILL_ONSKILLDMG ||
+                        s->cond == GData::SKILL_ONOTHERDEAD
+                        )
                 {
                     offPassiveSkill(s->getId(), s->cond, s->prob>=100.0f, writedb);
                 }
@@ -2629,7 +2632,10 @@ void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_AFTRES ||
                         s->cond == GData::SKILL_DEAD ||
                         s->cond == GData::SKILL_ENTER ||
-                        s->cond == GData::SKILL_DEAD)
+                        s->cond == GData::SKILL_ONTHERAPY ||
+                        s->cond == GData::SKILL_ONSKILLDMG ||
+                        s->cond == GData::SKILL_ONOTHERDEAD
+                        )
                 {
                     upPassiveSkill(s->getId(), s->cond, (s->prob >= 100.0f), writedb);
                 }
@@ -3607,6 +3613,14 @@ UInt8 Fighter::getSoulExtraAura()
         return 0;
 
     return m_2ndSoul->getExtraAura();
+}
+
+UInt8 Fighter::getSoulAuraLeft()
+{
+    if(!m_2ndSoul)
+        return 0;
+
+    return m_2ndSoul->getAuraLeft();
 }
 
 bool Fighter::practiceLevelUp()

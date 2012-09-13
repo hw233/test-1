@@ -55,6 +55,8 @@ public:
 		 UInt32 msgId = MsgId;
 		 assert( msgId < MAX_MSG_NUM );
 		 assert( !m_HandlerList[msgId] );
+         if(m_HandlerList[msgId])
+             printf("%d\n", msgId);
 		 m_HandlerList[msgId] = handler;
 	 }
 

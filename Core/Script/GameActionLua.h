@@ -229,6 +229,7 @@ namespace Script
         lua_tinker::table GetOnlineReward(UInt8 cnt);
         void   GetAtyReward(Player* p, UInt32 flag);
 		UInt32 onLuckyDrawItemRoll(UInt8 type);
+        UInt8 onGetKillMonsterReward(Player* player);
 		UInt32 onDungeonLootItemRoll(Player * player, UInt8 id, UInt8 level, bool isBoss);
 		void onMergeGem(Player * player, UInt8 lev, UInt8 num);
 		bool getActivateAttrResult(UInt8 lastActivateCount, UInt8 quality);
@@ -254,6 +255,7 @@ namespace Script
         void sendConsumeMails(Player* player, UInt32 ototal, UInt32 ntotal);
         void onEquipForge(Player* player, UInt32 itemId, UInt32 onums);
         bool onSoSoMapAward(Player* player, UInt8 off);
+        bool onGetYearActAward(Player* player, UInt8 type);
         UInt8 onGetAthlRandomMaxValue(UInt8 diffculty);
         UInt32 onGetAthlRandomAward(UInt8 diffculty, UInt8 opt);
         UInt8 onGetAthlRandomDiffculty();
