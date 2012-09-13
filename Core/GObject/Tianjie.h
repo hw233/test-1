@@ -205,7 +205,7 @@ namespace GObject
         UInt8 _percent;
 
         //天劫后排行榜保留5个小时
-        int m_rankKeepTime;
+        UInt32 m_rankKeepTime;
         bool m_isRankKeep;
 
         bool m_isOpenNextTianjie;

@@ -24,7 +24,7 @@ enum ENUM_ID_TJ2
 //天劫触发等级
 static const int s_tjRoleLevel[] = {59,69,79,89,99,109};
 //天劫事件1的小怪ID
-static const int s_rate1Npc[][4] = {
+static const UInt32 s_rate1Npc[][4] = {
 {7007, 7008, 7009, 7010},
 {7013, 7014, 7015, 7016},
 {7019, 7020, 7021, 7022},
@@ -109,8 +109,9 @@ static const UInt32 s_tjEventBoxId[] = {9134, 9135, 9136, 9137};
 static const UInt32 s_tjTotalBoxId[] = {9127, 9128, 9129, 9130};
 static const UInt32 s_tjEventRewardId = 9131;
 static const UInt32 s_tjTotalRewardId = 9132;
+static const UInt32 s_tjWeaponId[] = {1650,1651,1652,1529,1530,1531};
+static const UInt32 s_tjNameCardId[] = {9154,9155,9156,9157,9158,9159};
 static  MailPackage::MailItem s_eventItem[2]= {{30,10}, {509,1}};
-
 #define TJ_START_TIME_HOUR 19
 #define TIME_60 60 
 #define ONE_DAY_SECOND (24*3600)
@@ -119,8 +120,8 @@ static const int s_rankKeepTime = 5*3600;
 static const int TJ_EVENT_WAIT_TIME = 10*60;      //天劫事件间隔时间
 static const int TJ_EVENT_PROCESS_TIME = 15*60;   //天劫事件持续时间
 
-//static const int TJ_EVENT_WAIT_TIME  = 5*60;      //天劫事件间隔时间
-//static const int TJ_EVENT_PROCESS_TIME = 2*60;   //天劫事件持续时间
+//static const int TJ_EVENT_WAIT_TIME  = 2*60;      //天劫事件间隔时间
+//static const int TJ_EVENT_PROCESS_TIME = 5*60;   //天劫事件持续时间
 Tianjie::Tianjie()
 {
     m_tjTypeId = 0;
@@ -191,7 +192,7 @@ bool Tianjie::isOpenTj(Player* pl)
     if (m_isTjOpened && playerLevel == m_currOpenedTjLevel+10)
     {
         //达到了下个天劫等级
-        if (m_tjTypeId + 1 < sizeof(s_tjRoleLevel)/sizeof(s_tjRoleLevel[0]))
+        if ((UInt8)(m_tjTypeId + 1) < sizeof(s_tjRoleLevel)/sizeof(s_tjRoleLevel[0]))
         {
             m_isOpenNextTianjie = true;
             m_nextTjLevel = playerLevel;
@@ -247,7 +248,7 @@ void Tianjie::OpenTj()
 	m_currTjRate = 1;
     m_isRankKeep = true;
 
-    for (int i = 0; i < sizeof(s_tjRoleLevel)/sizeof(s_tjRoleLevel[0]); ++i)
+    for (size_t i = 0; i < sizeof(s_tjRoleLevel)/sizeof(s_tjRoleLevel[0]); ++i)
 	{
 		if (s_tjRoleLevel[i] == m_currOpenedTjLevel)
         {
@@ -1005,7 +1006,7 @@ void Tianjie::goNext()
  
        if (START_WITH_59)
        {
-           if (m_tjTypeId+1 < sizeof(s_tjRoleLevel)/sizeof(s_tjRoleLevel[0]))
+           if ((UInt8)(m_tjTypeId+1) < sizeof(s_tjRoleLevel)/sizeof(s_tjRoleLevel[0]))
            {
                m_currOpenedTjLevel = s_tjRoleLevel[++m_tjTypeId];
                m_nextTjTime = TimeUtil::Now() + TJ_EVENT_WAIT_TIME;
@@ -1014,7 +1015,7 @@ void Tianjie::goNext()
        }
 	   else
        {
-           if (m_tjTypeId+1 < sizeof(s_tjRoleLevel)/sizeof(s_tjRoleLevel[0]))
+           if ((UInt8)(m_tjTypeId+1) < sizeof(s_tjRoleLevel)/sizeof(s_tjRoleLevel[0]))
                m_currOpenedTjLevel = s_tjRoleLevel[++m_tjTypeId];
            else
            {
@@ -1217,7 +1218,7 @@ bool Tianjie::isFinish()
 
 void Tianjie::close1()
 {
-    printf("--------------------------------------------close1, npccount:%d\n", m_locNpcMap.size());
+    printf("--------------------------------------------close1\n");
 	multimap<int, int>::iterator iter;
 	for (iter = m_locNpcMap.begin(); iter != m_locNpcMap.end(); ++iter)
 	{
@@ -2261,13 +2262,28 @@ void Tianjie::reward(TSortMap& m, UInt8 varId, UInt8 EventOrTotal)
             {
                 item.id = s_tjTotalRewardId;
                 if (i == 1)
-                SYSMSG_BROADCASTV(5041, iter->second->getCountry(), iter->second->getName().c_str(), iter->second->getCountry(), iter->second->getName().c_str());
+                {
+                    SYSMSG_BROADCASTV(5041, iter->second->getCountry(), iter->second->getName().c_str(), iter->second->getCountry(), iter->second->getName().c_str());
+                    MailPackage::MailItem nameCardItem;
+                    nameCardItem.id = s_tjNameCardId[m_tjTypeId];
+                    nameCardItem.count = 1;
+                    iter->second->sendMailItem(5063, 5064, &nameCardItem, 1, true);
+                }
+                MailPackage::MailItem weaponItem;
+                weaponItem.id = s_tjWeaponId[m_tjTypeId];
+                weaponItem.count = 1;
+                iter->second->sendMailItem(5065, 5066, &weaponItem, 1, true);
             }
             item.count = 11-i;         //个数
             iter->second->sendMailItem(5052, 5053, &item, 1, true);
-            int msgId = 5050;
-            if (EventOrTotal == 1) msgId = 5051;
-            SYSMSG_BROADCASTV(msgId, i, iter->second->getCountry(), iter->second->getName().c_str(), item.id, item.count);
+            if (EventOrTotal == 0)
+            {
+                SYSMSG_BROADCASTV(5050, i, iter->second->getCountry(), iter->second->getName().c_str(), item.id, item.count);
+            }
+            else if (EventOrTotal == 1)
+            {
+            SYSMSG_BROADCASTV(5051, i, iter->second->getCountry(), iter->second->getName().c_str(), item.id, item.count, s_tjWeaponId[m_tjTypeId], 1);
+            }
         }
         int score = iter->second->GetVar(varId);
         if (EventOrTotal == 0)
