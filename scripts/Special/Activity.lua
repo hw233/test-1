@@ -2223,9 +2223,9 @@ function onGetYearActAward(player, type)
         package:Add(57, 5, true)
         package:Add(15, 5, true)
         package:Add(49, 1, true)
-        package:Add(503, 1, true)
+        package:Add(502, 1, true)
         package:Add(510, 1, true)
-        package:Add(5031, 5, true)
+        package:Add(5031, 1, true)
         package:Add(9163, 1, true)
         return true
     end
@@ -2288,7 +2288,7 @@ function onGetKillMonsterReward(player, pos)
 
     package:Add(eventItem[i][j][1], eventItem[i][j][2], true, true, 32)
     player:lastKillMonsterAwardPush(eventItem[i][j][1], eventItem[i][j][2]);
-    player:posttKillMonsterRoamResult(pos2, j, eventItem[i][j][3]);
+    player:postKillMonsterRoamResult(pos2, eventItem[i][j][3], eventItem[i][j][4]);
 
     return pos2;
 end

@@ -667,7 +667,6 @@ function initActTime(y, m, d)
   --local  SerStartTm505= { ['year'] = 2012, ['month'] = 9, ['day'] = 10, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 周岁红包送不停
   local  SerStartTm506= { ['year'] = 2012, ['month'] = 9, ['day'] = 13, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  --local  SerStartTm506= { ['year'] = 2012, ['month'] = 9, ['day'] = 10, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm503= { ['year'] = 2012, ['month'] = 9, ['day'] = 13, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 

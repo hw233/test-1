@@ -766,7 +766,7 @@ namespace GObject
 
         inline bool is3366AndLevel4() const
         {
-            return (_playerData.qqvipl >= 20 && _playerData.qqvipl <= 29 && _playerData.qqvipl1 >= 4);
+            return (_playerData.qqvipl >= 24 && _playerData.qqvipl <= 29);
         }
 
 		UInt32 getTotalRecharge()			{ return _playerData.totalRecharge; }
@@ -1291,7 +1291,7 @@ namespace GObject
         UInt8 beQixiEyes(Player* pl);
         void onQixiEyesResp(UInt8 bind);
         void postRoamResult(UInt8 pos, UInt8 event, UInt8 score);
-        void postKillMonsterRoamResult(UInt8 pos, UInt8 event, UInt8 score);
+        void postKillMonsterRoamResult(UInt8 pos, UInt8 curType, UInt8 curCount);
 
         inline bool queQiaoCheck() { return m_qixi.bind; }
         inline UInt8 getQueqiaoPos() { return m_qixi.pos; }

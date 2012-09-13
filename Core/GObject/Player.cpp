@@ -9911,17 +9911,47 @@ namespace GObject
                 st << static_cast<UInt8>(1);
                 st << Stream::eos;
                 send(st);
-                //OnShuoShuo(SS_PUBTST_PKG);
+                OnShuoShuo(SS_PUBTST_PKG);
             }
         }
         else if(type == 2)
         {
-            if(GetVar(VAR_YEAR_NOBLE))
+            UInt8 status = GetVar(VAR_YEAR_NOBLE);
+            UInt8 newStatus;
+            if(atoi(m_domain.c_str()) == 11)
+            {
+                if(is3366AndLevel4() && (status & 0x08) == 0)
+                    newStatus = status | 0x08;
+                else
+                    return;
+            }
+            else if(isBD())
+            {
+                if((status & 0x01) == 0)
+                    newStatus = status | 0x01;
+                else
+                    return;
+            }
+            else if(isYD())
+            {
+                if((status & 0x02) == 0)
+                    newStatus = status | 0x02;
+                else
+                    return;
+            }
+            else if(isQQVIP())
+            {
+                if((status & 0x04) == 0)
+                    newStatus = status | 0x04;
+                else
+                    return;
+            }
+            else
                 return;
             ret = GameAction()->onGetYearActAward(this, type);
             if(ret)
             {
-                SetVar(VAR_YEAR_NOBLE, 1);
+                SetVar(VAR_YEAR_NOBLE, newStatus);
                 st << static_cast<UInt8>(1);
                 st << Stream::eos;
                 send(st);
@@ -9952,6 +9982,7 @@ namespace GObject
 
         type = 2;
         st2 << type;
+#if 0
         if(GetVar(VAR_YEAR_NOBLE) > 0)
             result = 3;
         else
@@ -9961,6 +9992,50 @@ namespace GObject
             else
                 result = 4;
         }
+#else
+        /*
+         * 0x01:蓝钻(不考虑3366)
+         * 0x02:黄钻
+         * 0x04:QQ会员
+         * 0x08:3366且大于等于4级
+         */
+        UInt8 status = GetVar(VAR_YEAR_NOBLE);
+        if(atoi(m_domain.c_str()) == 11)
+        {
+            if(is3366AndLevel4())
+            {
+                if(status & 0x08)
+                    result = 3;
+                else
+                    result = 2;
+            }
+            else
+                result = 4;
+        }
+        else if(isBD())
+        {
+            if(status & 0x01)
+                result = 3;
+            else
+                result = 2;
+        }
+        else if(isYD())
+        {
+            if(status & 0x02)
+                result = 3;
+            else
+                result = 2;
+        }
+        else if(isQQVIP())
+        {
+            if(status & 0x04)
+                result = 3;
+            else
+                result = 2;
+        }
+        else
+            result = 4;
+#endif
         st2 << result;
         st2 << Stream::eos;
         send(st2);
@@ -12113,24 +12188,22 @@ namespace GObject
         DB1().PushUpdateData("UPDATE `qixi` SET `bind`=0, `lover`=0 WHERE `playerId` = %"I64_FMT"u", getId());
     }
 
-    void Player::postKillMonsterRoamResult(UInt8 pos, UInt8 event, UInt8 score)
+    void Player::postKillMonsterRoamResult(UInt8 pos, UInt8 curType, UInt8 curCount)
     {
-        /*
-        struct Roam
-        {
-            UInt8 pos;
-            UInt8 event;
-            UInt8 score;
-        };
-
-        Roam roam;
-        roam.pos = pos;
-        roam.event = event;
-        roam.score = score;
-
-		GameMsgHdr hdr(0x1F9, WORKER_THREAD_WORLD, this, sizeof(Roam));
-		GLOBAL().PushMsg(hdr, &roam);
-        */
+#if 0
+        if(pos != GetVar(VAR_ZYCM_POS))
+            SetVar(VAR_ZYCM_POS, pos);
+        if(curType == 1)
+            SetVar(VAR_XIAGU_CNT, curCount);
+        else if(curType == 2)
+            SetVar(VAR_ROUQING, curCount);
+        else if(curType == 3)
+            SetVar(VAR_CAIFU_CNT, curCount);
+        else if(curType == 4)
+            SetVar(VAR_CHUANQI_CNT, curCount);
+#endif
+		//GameMsgHdr hdr(0x1F9, WORKER_THREAD_WORLD, this, sizeof(Roam));
+		//GLOBAL().PushMsg(hdr, &roam);
     }
 
 } // namespace GObject

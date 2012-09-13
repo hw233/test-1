@@ -198,17 +198,18 @@ namespace GObject
 
         VAR_AWARD_NEWREGISTER  = 155, //新用户注册抽奖
 
-        VAR_YEAR_SWORDSMAN = 161, //周岁剑侠红包
-        VAR_YEAR_NOBLE = 162, //周岁贵族红包
-        /** 斩妖除魔剑侠路 **/
-        VAR_ZYCM_POS = 163, //偏移
-        VAR_XIAGU_CNT = 164, //侠骨个数
-        VAR_ROUQING = 165, //柔情个数
-        VAR_CAIFU_CNT = 166, //财富个数
-        VAR_CHUANQI_CNT = 167, //传奇个数
         /** 结束 **/
         VAR_RECHARGE_TOTAL3366 = 169, //3366合作充值活动
         VAR_BDIAMOND_CMD = 170, //蓝钻用户每日可领取当前等级寻宝令
+
+        VAR_YEAR_SWORDSMAN = 180, //周岁剑侠红包
+        VAR_YEAR_NOBLE = 181, //周岁贵族红包
+        /** 斩妖除魔剑侠路 **/
+        VAR_ZYCM_POS = 182, //偏移
+        VAR_XIAGU_CNT = 183, //侠骨个数
+        VAR_ROUQING = 184, //柔情个数
+        VAR_CAIFU_CNT = 185, //财富个数
+        VAR_CHUANQI_CNT = 186, //传奇个数
 
         VAR_MAX,
     };
