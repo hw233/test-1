@@ -884,7 +884,6 @@ void World::advancedHookTimer(void *para)
 #endif
 bool World::Init()
 {
-	GObject::Tianjie::instance().Init();
 	AddTimer(5 * 1000, Tianjie_Refresh, static_cast<void*>(NULL));
 	
 	GObjectManager::delayLoad();

@@ -198,7 +198,6 @@ namespace GObject
 
         VAR_AWARD_NEWREGISTER  = 155, //新用户注册抽奖
 
-<<<<<<< HEAD
         VAR_TJ_TASK_PRESTIGE=156,   //天劫活动中的声望
         VAR_TJ_TASK1_NUMBER=157,    //天劫每日任务1的已完成次数
         VAR_TJ_TASK2_TAEL=158,      //天劫任务2捐献的银币积分
@@ -212,9 +211,7 @@ namespace GObject
         VAR_RP_VALUE=165,           //周年庆回流用户礼包
         VAR_RP_REWARD_GOT=166,      //回流用户奖励,是否已领取
 
-=======
         /** 结束 **/
->>>>>>> 9044102899e756ffd67b3507be329d13149f2447
         VAR_RECHARGE_TOTAL3366 = 169, //3366合作充值活动
         VAR_BDIAMOND_CMD = 170, //蓝钻用户每日可领取当前等级寻宝令
 

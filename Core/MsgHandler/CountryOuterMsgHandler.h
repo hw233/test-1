@@ -1170,12 +1170,9 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         GameMsgHdr hdr(0x1C4, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr, NULL);
     }
-<<<<<<< HEAD
     pl->sendYearRPInfo();
-=======
     //if(World::getYearActive())
     //    pl->sendYearActInfo();
->>>>>>> 9044102899e756ffd67b3507be329d13149f2447
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )

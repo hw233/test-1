@@ -120,8 +120,8 @@ static const int s_rankKeepTime = 5*3600;
 static const int TJ_EVENT_WAIT_TIME = 10*60;      //天劫事件间隔时间
 static const int TJ_EVENT_PROCESS_TIME = 15*60;   //天劫事件持续时间
 
-//static const int TJ_EVENT_WAIT_TIME  = 2*60;      //天劫事件间隔时间
-//static const int TJ_EVENT_PROCESS_TIME = 5*60;   //天劫事件持续时间
+//static const int TJ_EVENT_WAIT_TIME  = 10*60;      //天劫事件间隔时间
+//static const int TJ_EVENT_PROCESS_TIME = 15*60;   //天劫事件持续时间
 Tianjie::Tianjie()
 {
     m_tjTypeId = 0;
@@ -296,7 +296,6 @@ bool Tianjie::Init()
 {
     LoadFromDB();
 
-    initSortMap();
 	return true;
 }
 bool Tianjie::LoadFromDB()
@@ -321,6 +320,9 @@ bool Tianjie::LoadFromDB()
 		m_openTime = dbexp.opentime;
         m_isOpenNextTianjie = dbexp.open_next;
        
+        //只有天劫打开了，才能插入数据到map
+        initSortMap();
+    
         if (m_isOpenNextTianjie)
             m_nextTjLevel = m_currOpenedTjLevel+10;
         if (m_isTjOpened)
@@ -400,6 +402,8 @@ bool Tianjie::LoadFromDB()
                 closeTianjie();
             }
         }
+        if (m_currTjRate >= 3)
+             getTlzFights();
 	}
 	if (isTjDBNull) //天劫表无数据,从玩家表中计算
 	{
@@ -1980,8 +1984,8 @@ void Tianjie::broadTianjiePassed()
     UInt8 keep = m_isRankKeep;
 
     st << type << status << id << keep << Stream::eos;
-
-    NETWORK()->Broadcast(st);
+    if (m_isNetOk)
+        NETWORK()->Broadcast(st);
 }
 int Tianjie::makeTlzKey(UInt8 type, UInt16 level)
 {
@@ -2263,7 +2267,8 @@ void Tianjie::reward(TSortMap& m, UInt8 varId, UInt8 EventOrTotal)
                 item.id = s_tjTotalRewardId;
                 if (i == 1)
                 {
-                    SYSMSG_BROADCASTV(5041, iter->second->getCountry(), iter->second->getName().c_str(), iter->second->getCountry(), iter->second->getName().c_str());
+                    if (m_isNetOk)
+                        SYSMSG_BROADCASTV(5041, iter->second->getCountry(), iter->second->getName().c_str(), iter->second->getCountry(), iter->second->getName().c_str());
                     MailPackage::MailItem nameCardItem;
                     nameCardItem.id = s_tjNameCardId[m_tjTypeId];
                     nameCardItem.count = 1;
@@ -2276,11 +2281,11 @@ void Tianjie::reward(TSortMap& m, UInt8 varId, UInt8 EventOrTotal)
             }
             item.count = 11-i;         //个数
             iter->second->sendMailItem(5052, 5053, &item, 1, true);
-            if (EventOrTotal == 0)
+            if (EventOrTotal == 0 && m_isNetOk)
             {
                 SYSMSG_BROADCASTV(5050, i, iter->second->getCountry(), iter->second->getName().c_str(), item.id, item.count);
             }
-            else if (EventOrTotal == 1)
+            else if (EventOrTotal == 1 && m_isNetOk)
             {
             SYSMSG_BROADCASTV(5051, i, iter->second->getCountry(), iter->second->getName().c_str(), item.id, item.count, s_tjWeaponId[m_tjTypeId], 1);
             }

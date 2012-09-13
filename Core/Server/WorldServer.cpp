@@ -211,6 +211,7 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 	GObject::GObjectManager::loadAllData();
 
 	Battle::battleReport.init();
+	GObject::Tianjie::instance().Init();
 	return true;
 }
 
