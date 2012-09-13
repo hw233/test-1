@@ -1,4 +1,4 @@
-﻿#include "Config.h"
+#include "Config.h"
 #include "GameActionLua.h"
 #include "Server/WorldServer.h"
 #include "GObject/Player.h"
@@ -88,6 +88,7 @@ namespace Script
 		lua_tinker::def(_L, "getBlueactiveday",	GObject::World::getBlueactiveday);
 		lua_tinker::def(_L, "getRechargeActive", GObject::World::getRechargeActive);
 		lua_tinker::def(_L, "getRechargeActive3366", GObject::World::getRechargeActive3366);
+		lua_tinker::def(_L, "getYearActive", GObject::World::getYearActive);
 		lua_tinker::def(_L, "getValentineDay", GObject::World::getValentineDay);
 		lua_tinker::def(_L, "getNetValentineDay", GObject::World::getNetValentineDay);
 		lua_tinker::def(_L, "getGirlDay", GObject::World::getGirlDay);
@@ -133,6 +134,7 @@ namespace Script
         lua_tinker::def(_L, "getConsumeActive", GObject::World::getConsumeActive);
         lua_tinker::def(_L, "getNeedRechargeRank", GObject::World::getNeedRechargeRank);
         lua_tinker::def(_L, "getNeedConsumeRank", GObject::World::getNeedConsumeRank);
+        lua_tinker::def(_L, "getKillMonsterAct", GObject::World::getKillMonsterAct);
 
         CLASS_DEF(GameActionLua, Print);
         lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);
@@ -256,13 +258,16 @@ namespace Script
         CLASS_DEF(Player, sendHappyInfo);
         CLASS_DEF(Player, lastLootPush);
         CLASS_DEF(Player, RegisterAward);
+        CLASS_DEF(Player, BirthdayAward);
         CLASS_DEF(Player, hasRealItemAward);
         CLASS_DEF(Player, getRealItemAward);
         CLASS_DEF(Player, getMoneyArenaLua);
 		CLASS_DEF(Player, getQQVipPrivilege);
 		CLASS_DEF(Player, setQQVipPrivilege);
 		CLASS_DEF(Player, postRoamResult);
+		CLASS_DEF(Player, postKillMonsterRoamResult);
         CLASS_DEF(Player, lastQueqiaoAwardPush);
+        CLASS_DEF(Player, lastKillMonsterAwardPush);
 
         CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);
@@ -1106,6 +1111,11 @@ namespace Script
         return Call<lua_tinker::table>("GetOnlineReward", cnt);
     }
 
+    UInt8 GameActionLua::onGetKillMonsterReward(Player* player)
+    {
+        return Call<UInt8>("onGetKillMonsterReward", player);
+    }
+
     void   GameActionLua::GetAtyReward(Player* p, UInt32 flag)
     {
         Call<void>("GetAtyReward", p , flag);
@@ -1206,7 +1216,7 @@ namespace Script
 		return Call<UInt16>("RunTargetAwardRF", player);
     }
 
-    UInt16 GameActionLua::RunNewRegisterAward(Player* player)
+    UInt8 GameActionLua::RunNewRegisterAward(Player* player)
     {
 		assert(player != NULL);
 		return Call<UInt16>("RunNewRegisterAward", player);
@@ -1216,6 +1226,12 @@ namespace Script
     {
 		assert(player != NULL);
 		return Call<UInt8>("RunNewRegisterAwardAD_RF", player, idx);
+    }
+
+    UInt8 GameActionLua::RunBirthdayAward(Player* player)
+    {
+		assert(player != NULL);
+		return Call<UInt16>("RunBirthdayAward", player);
     }
 
     void GameActionLua::sendRNR(Player* player, UInt32 now, UInt32 date, UInt32 total)
@@ -1255,6 +1271,11 @@ namespace Script
 	bool GameActionLua::onSoSoMapAward( Player* player, UInt8 off)
 	{
 		return Call<bool>("onSoSoMapAward", player, off);
+	}
+
+	bool GameActionLua::onGetYearActAward( Player* player, UInt8 type)
+	{
+		return Call<bool>("onGetYearActAward", player, type);
 	}
 
     UInt8 GameActionLua::onGetAthlRandomMaxValue(UInt8 diffculty)

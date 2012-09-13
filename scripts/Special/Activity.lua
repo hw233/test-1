@@ -179,6 +179,10 @@ function onDungeonWin(player, id, count, free)
     else
         FallActivity(player, 2)
     end
+    if getKillMonsterAct() then
+        local package = player:GetPackage();
+        package:Add(9163, 1, true)
+    end
 end
 
 function onClanBattleAttend(player)
@@ -822,6 +826,10 @@ function onCopyWin(player, id, floor, spot, lootlvl)
             FallActivity(player, lootlvl)
         end
     end
+    if getKillMonsterAct() then
+        local package = player:GetPackage();
+        package:Add(9163, 1, true)
+    end
 end
 
 
@@ -843,6 +851,10 @@ function onFrontMapWin(player, id, spot, lootlvl)
         FallActivity(player, 1)
     else
         FallActivity(player, lootlvl)
+    end
+    if getKillMonsterAct() then
+        local package = player:GetPackage();
+        package:Add(9163, 1, true)
     end
 end
 
@@ -2200,4 +2212,84 @@ function Qixi(player, lootlvl)
     end
 end
 
+function onGetYearActAward(player, type)
+    if type ==1 then
+        local package = player:GetPackage()
+        if package:GetRestPackageSize() < 9 then
+            return false
+        end
+        player:getCoupon(50)
+        package:Add(56, 5, true)
+        package:Add(57, 5, true)
+        package:Add(15, 5, true)
+        package:Add(49, 1, true)
+        package:Add(502, 1, true)
+        package:Add(510, 1, true)
+        package:Add(5031, 1, true)
+        package:Add(9163, 1, true)
+        return true
+    end
+    if type ==2 then
+        local package = player:GetPackage()
+        if package:GetRestPackageSize() < 9 then
+            return false
+        end
+        package:Add(509, 1, true)
+        package:Add(503, 1, true)
+        package:Add(514, 1, true)
+        package:Add(1325, 1, true)
+        package:Add(15, 5, true)
+        package:Add(51, 1, true)
+        package:Add(48, 1, true)
+        package:Add(49, 2, true)
+        package:Add(50, 2, true)
+        return true
+    end
+end
+
+function onGetKillMonsterReward(player, pos)
+    local roamPlace = {
+     -- 1  2  3  4  5  6  7  8
+        1, 2, 3, 4, 5, 6, 7, 8,
+        9, 10, 1, 3, 11, 12, 8, 2,
+        6, 13, 1, 14, 8, 3, 13, 15,
+        1, 3, 8, 16,
+    }
+
+    local eventItem = {
+        --{物品ID，物品数，剑侠（或柔情、或财富、或传奇），剑侠个数}
+        {{502,  1, 1, 1}, {55,  1, 0, 0}, {510,  1, 0, 0}},
+        {{56,   1, 0, 0}, {57,  1, 0, 0}, {1525, 1, 1, 1}},
+        {{502,  1, 1, 1}, {55,  1, 0, 0}, {510,  1, 0, 0}},
+        {{1326, 1, 0, 0}, {466, 1, 0, 0}, {8000, 1, 3, 1}},
+        {{56,   1, 0, 0}, {57,  1, 0, 0}, {1525, 1, 3, 1}},
+        {{502,  1, 2, 1}, {55,  1, 0, 0}, {510,  1, 0, 0}},
+        {{1326, 1, 0, 0}, {466, 1, 0, 0}, {8000, 1, 2, 1}},
+        {{502,  1, 3, 1}, {55,  1, 0, 0}, {510,  1, 0, 0}},
+        {{503,  1, 4, 1}, {33,  1, 0, 0}, {508,  1, 0, 0}},
+        {{1326, 1, 0, 0}, {466, 1, 0, 0}, {8000, 1, 3, 1}},
+        {{1326, 1, 0, 0}, {466, 1, 0, 0}, {8000, 1, 2, 1}},
+        {{503,  1, 4, 1}, {33,  1, 0, 0}, {508,  1, 0, 0}},
+        {{503,  1, 3, 1}, {33,  1, 0, 0}, {508,  1, 0, 0}},
+        {{1326, 1, 0, 0}, {466, 1, 0, 0}, {8000, 1, 2, 1}},
+        {{1326, 1, 0, 0}, {466, 1, 0, 0}, {8000, 1, 2, 1}},
+        {{9076, 1, 4, 1}, {9076,1, 4, 1}, {9076, 1, 4, 1}},
+    }
+
+    local step = math.random(1, 3)
+    local pos2 = pos + step
+    if pos2 > 28 then
+        pos2 = pos2 - 28
+    end
+
+    local package = player:GetPackage()
+    i = roamPlace[pos2]
+    j = math.random(1, 3)
+
+    package:Add(eventItem[i][j][1], eventItem[i][j][2], true, true, 32)
+    player:lastKillMonsterAwardPush(eventItem[i][j][1], eventItem[i][j][2]);
+    player:postKillMonsterRoamResult(pos2, eventItem[i][j][3], eventItem[i][j][4]);
+
+    return pos2;
+end
 

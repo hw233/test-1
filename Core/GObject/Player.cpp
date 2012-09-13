@@ -1098,11 +1098,11 @@ namespace GObject
             char buf[1024] = {0};
             char* pbuf = &buf[0];
             if (cfg.isTestPlatform)
-                pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u|%u||%u|||%u||%u||%u|1|",
-                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId().c_str(), GetLev(), _playerData.gold, _playerData.coupon, getVipLevel(), _playerData.qqvipl, cfg.serverNum, platform);
+                pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u|%u|%u|%u|||%u||%u||%u|1|",
+                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId().c_str(), GetLev(), _playerData.gold, _playerData.coupon, _playerData.tael, getVipLevel(), _playerData.qqvipl, cfg.serverNum, platform);
             else
-                pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u|%u||%u|||%u||%u||%u|",
-                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId().c_str(), GetLev(), _playerData.gold, _playerData.coupon, getVipLevel(), _playerData.qqvipl, cfg.serverNum, platform);
+                pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u|%u|%u|%u|||%u||%u||%u|",
+                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId().c_str(), GetLev(), _playerData.gold, _playerData.coupon, _playerData.tael, getVipLevel(), _playerData.qqvipl, cfg.serverNum, platform);
 
             m_ulog->SetUserMsg(buf);
             if (platform != WEBDOWNLOAD)
@@ -8279,7 +8279,15 @@ namespace GObject
             GLOBAL().PushMsg(h, &idx);
         }
         else
+        {
             GetShuoShuo()->setShuoSafe(idx);
+            if (idx == SS_PUBTST_PKG)
+            {
+                char action[16] = "";
+                snprintf (action, 16, "F_%d", 1101);
+                udpLog("916", action, "", "", "", "", "act");
+            }
+        }
     }
 
 	void Player::setClan(Clan * c)
@@ -9723,6 +9731,9 @@ namespace GObject
             //领取礼物卡
             getAwardGiftCard();
             break;
+        case 10:
+            getAwardBirthday(opt);
+            break;
         }
     }
 
@@ -9846,6 +9857,88 @@ namespace GObject
         SetVar(VAR_AWARD_NEWREGISTER, 5);
     }
 
+    void Player::getAwardBirthday(UInt8 opt)
+    {
+    #define NUM 3
+        if(opt != 0 && opt != 1 && opt != 2)
+            return;
+        UInt32 day = 1;
+        UInt32 mon = 1;
+        UInt32 year = 2012;
+        TimeUtil::GetDMY(&day, &mon, &year);
+        if(year != 2012 || mon != 9 || day < 16 || day > 30)
+            return;
+        UInt8 num = GetVar(VAR_AWARD_BIRTHDAY);
+        if(opt == 2){    //邀请好友成功
+            if(num >= NUM) return;
+            Stream st(REP::GETAWARD);
+            st << static_cast<UInt8>(10) << static_cast<UInt8>(0);
+            st << static_cast<UInt8>(2 - num) << static_cast<UInt8>(1)<< Stream::eos;
+            send(st);
+            SetVar(VAR_AWARD_BIRTHDAY, num + NUM);
+        }
+        else if(opt == 1){  //领奖
+			std::vector<GData::LootResult>::iterator it;
+			for(it = _BirthdayAward.begin(); it != _BirthdayAward.end(); ++ it)
+			{
+				m_Package->ItemNotify(it->id, it->count);
+			}
+			_BirthdayAward.clear();
+            OnShuoShuo(SS_SLLP);
+        }
+        else if(opt == 0){  //抽奖
+            UInt8 flag = 0;
+            if(num >= NUM){ //已邀请过好友
+                num -= NUM;
+                if(num < 0 || num >= NUM)
+                    num = 2;
+                flag = 1;
+                if(num >= 2) return;
+            }
+            else{
+                if(num >= 1) //未邀请过好友
+                    return;
+            }
+            UInt8 id = GameAction()->RunBirthdayAward(this);
+            if(!id) return;
+            {
+                Stream st(REP::GETAWARD);
+                st << static_cast<UInt8>(10) << id << Stream::eos;
+                send(st);
+            }
+            SetVar(VAR_AWARD_BIRTHDAY, flag ? (num + 1 + NUM) : (num + 1));
+            {
+                Stream st(REP::GETAWARD);
+                st << static_cast<UInt8>(10) << static_cast<UInt8>(0);
+                st << static_cast<UInt8>(flag ? (2 - num - 1) : 0) << flag << Stream::eos;
+                send(st);
+            }
+        }
+    #undef NUM
+    }
+    void Player::CheckCanAwardBirthday()
+    {
+        UInt32 day = 1;
+        UInt32 mon = 1;
+        UInt32 year = 2012;
+        TimeUtil::GetDMY(&day, &mon, &year);
+        if(year == 2012 && mon == 9 && day >= 16 && day <= 30){
+            //生日罗盘许愿星(周年庆活动) 
+            UInt8 num = GetVar(VAR_AWARD_BIRTHDAY);
+            UInt8 flag = 0;
+            if(num >= 3){
+                num -= 3;
+                if(num < 0 || num >= 3)
+                    num = 2;
+                flag = 1;
+            }
+            Stream st(REP::GETAWARD);
+            st << static_cast<UInt8>(10) << static_cast<UInt8>(0);
+            st << static_cast<UInt8>(flag ? (2 - num) : (1 - num)) << flag << Stream::eos;
+            send(st);
+        }
+    }
+
     void Player::getHappyAward(UInt8 opt)
     {
         if(opt == 6)
@@ -9952,6 +10045,12 @@ namespace GObject
         _RegisterAward.push_back(lt);
     }
 
+    void Player::BirthdayAward(UInt16 itemId, UInt16 num)
+    {
+        GData::LootResult lt = {itemId, num};
+        _BirthdayAward.push_back(lt);
+    }
+
     void Player::lastQueqiaoAwardPush(UInt16 itemId, UInt16 num)
     {
         GData::LootResult lt = {itemId, num};
@@ -9980,6 +10079,198 @@ namespace GObject
         UInt8 status = GetVar(VAR_JUNE_ITEM);
         st << happy << static_cast<UInt8>(happy >= 20 ? 1 : 0) << itemId << status << Stream::eos;
         send(st);
+    }
+
+    void Player::getYearActAward(UInt8 type)
+    {
+        bool ret = false;
+        if(GetPackage()->GetRestPackageSize() < 9)
+        {
+            sendMsgCode(0, 1011);
+            return;
+        }
+        Stream st(REP::COUNTRY_ACT);
+        UInt8 subType = 1;
+        st << subType;
+        st << type;
+        if(type == 1)
+        {
+            if(GetVar(VAR_YEAR_SWORDSMAN))
+                return;
+            ret = GameAction()->onGetYearActAward(this, type);
+            if(ret)
+            {
+                SetVar(VAR_YEAR_SWORDSMAN, 1);
+                st << static_cast<UInt8>(1);
+                st << Stream::eos;
+                send(st);
+                OnShuoShuo(SS_PUBTST_PKG);
+                char action[16] = "";
+                snprintf (action, 16, "F_%d_%d", 1098, 1);
+                udpLog("916", action, "", "", "", "", "act");
+            }
+        }
+        else if(type == 2)
+        {
+            UInt8 status = GetVar(VAR_YEAR_NOBLE);
+            UInt8 newStatus;
+            if(atoi(m_domain.c_str()) == 11)
+            {
+                if(is3366AndLevel4() && (status & 0x08) == 0)
+                {
+                    char action[16] = "";
+                    snprintf (action, 16, "F_%d_%d", 1098, 5);
+                    udpLog("916", action, "", "", "", "", "act");
+                    newStatus = status | 0x08;
+                }
+                else
+                    return;
+            }
+            else if(isBD())
+            {
+                if((status & 0x01) == 0)
+                    newStatus = status | 0x01;
+                else
+                {
+                    char action[16] = "";
+                    snprintf (action, 16, "F_%d_%d", 1098, 2);
+                    udpLog("916", action, "", "", "", "", "act");
+                    return;
+                }
+            }
+            else if(isYD())
+            {
+                if((status & 0x02) == 0)
+                    newStatus = status | 0x02;
+                else
+                {
+                    char action[16] = "";
+                    snprintf (action, 16, "F_%d_%d", 1098, 3);
+                    udpLog("916", action, "", "", "", "", "act");
+                    return;
+                }
+            }
+            else if(isQQVIP())
+            {
+                if((status & 0x04) == 0)
+                    newStatus = status | 0x04;
+                else
+                {
+                    char action[16] = "";
+                    snprintf (action, 16, "F_%d_%d", 1098, 4);
+                    udpLog("916", action, "", "", "", "", "act");
+                    return;
+                }
+            }
+            else
+                return;
+            ret = GameAction()->onGetYearActAward(this, type);
+            if(ret)
+            {
+                SetVar(VAR_YEAR_NOBLE, newStatus);
+                st << static_cast<UInt8>(1);
+                st << Stream::eos;
+                send(st);
+            }
+        }
+    }
+
+    void Player::sendYearActInfo()
+    {
+        Stream st(REP::COUNTRY_ACT);
+        Stream st2(REP::COUNTRY_ACT);
+        UInt8 type;
+        UInt8 result;
+
+        UInt8 opt = 1;
+        st << opt;
+        st2 << opt;
+
+        type = 1;
+        st << type;
+        if(GetVar(VAR_YEAR_SWORDSMAN) > 0)
+            result = 3;
+        else
+            result = 2;
+        st << result;
+        st << Stream::eos;
+        send(st);
+
+        type = 2;
+        st2 << type;
+#if 0
+        if(GetVar(VAR_YEAR_NOBLE) > 0)
+            result = 3;
+        else
+        {
+            if(isBD() || isYD() || isQQVIP() || is3366AndLevel4())
+                result = 2;
+            else
+                result = 4;
+        }
+#else
+        /*
+         * 0x01:蓝钻(不考虑3366)
+         * 0x02:黄钻
+         * 0x04:QQ会员
+         * 0x08:3366且大于等于4级
+         */
+        UInt8 status = GetVar(VAR_YEAR_NOBLE);
+        if(atoi(m_domain.c_str()) == 11)
+        {
+            if(is3366AndLevel4())
+            {
+                if(status & 0x08)
+                    result = 3;
+                else
+                    result = 2;
+            }
+            else
+                result = 4;
+        }
+        else if(isBD())
+        {
+            if(status & 0x01)
+                result = 3;
+            else
+                result = 2;
+        }
+        else if(isYD())
+        {
+            if(status & 0x02)
+                result = 3;
+            else
+                result = 2;
+        }
+        else if(isQQVIP())
+        {
+            if(status & 0x04)
+                result = 3;
+            else
+                result = 2;
+        }
+        else
+            result = 4;
+#endif
+        st2 << result;
+        st2 << Stream::eos;
+        send(st2);
+    }
+
+    void Player::lastKillMonsterAwardPush(UInt16 itemId, UInt16 num)
+    {
+        GData::LootResult lt = {itemId, num};
+        _lastKillMonsterAward.push_back(lt);
+    }
+
+    void Player::checkLastKillMonsterAward()
+    {
+        std::vector<GData::LootResult>::iterator it;
+        for(it = _lastKillMonsterAward.begin(); it != _lastKillMonsterAward.end(); ++ it)
+        {
+            m_Package->ItemNotify(it->id, it->count);
+        }
+        _lastKillMonsterAward.clear();
     }
 
     TripodData& Player::runTripodData(TripodData& data, bool init)
@@ -12059,6 +12350,22 @@ namespace GObject
         send(st);
     }
 
+    void Player::getKillMonsterAward()
+    {
+        if(GetPackage()->GetItemAnyNum(9163) < 1)
+        {
+            return;
+        }
+        UInt8 idx;
+        UInt8 subType = 2;
+        Stream st(REP::COUNTRY_ACT);
+        st << subType;
+        idx = GameAction()->onGetKillMonsterReward(this);
+        st << idx;
+        st << Stream::eos;
+        send(st);
+    }
+
     void Player::consumeGold(UInt32 c)
     {
         if (World::getConsumeActive())
@@ -12777,6 +13084,24 @@ void EventTlzAuto::notify(bool isBeginAuto)
         m_qixi.bind = 0;
         m_qixi.lover = NULL;
         DB1().PushUpdateData("UPDATE `qixi` SET `bind`=0, `lover`=0 WHERE `playerId` = %"I64_FMT"u", getId());
+    }
+
+    void Player::postKillMonsterRoamResult(UInt8 pos, UInt8 curType, UInt8 curCount)
+    {
+#if 0
+        if(pos != GetVar(VAR_ZYCM_POS))
+            SetVar(VAR_ZYCM_POS, pos);
+        if(curType == 1)
+            SetVar(VAR_XIAGU_CNT, curCount);
+        else if(curType == 2)
+            SetVar(VAR_ROUQING, curCount);
+        else if(curType == 3)
+            SetVar(VAR_CAIFU_CNT, curCount);
+        else if(curType == 4)
+            SetVar(VAR_CHUANQI_CNT, curCount);
+#endif
+		//GameMsgHdr hdr(0x1F9, WORKER_THREAD_WORLD, this, sizeof(Roam));
+		//GLOBAL().PushMsg(hdr, &roam);
     }
 
 } // namespace GObject

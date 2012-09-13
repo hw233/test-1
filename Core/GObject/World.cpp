@@ -84,6 +84,7 @@ bool World::_newyear = false;
 bool World::_blueactiveday = false;
 bool World::_rechargeactive = false;
 bool World::_rechargeactive3366 = false;
+bool World::_yearact = false;
 UInt8 World::_rechargeactiveno = 0;
 bool World::_valentineday = false;
 bool World::_netvalentineday = false;
@@ -131,6 +132,7 @@ RCSortType World::rechargeSort;
 RCSortType World::consumeSort;
 bool World::_needrechargerank = false;
 bool World::_needconsumerank = false;
+bool World::_killMonsteract = 0;
 #ifndef _WIN32
 CUserLogger* World::ulog = NULL;
 #endif

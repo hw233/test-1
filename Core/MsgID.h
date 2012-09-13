@@ -31,6 +31,8 @@ namespace REQ
     const UInt8 GETAWARD            = 0x13;
     /**寻宝排行榜 */
     const UInt8 LUCKY_RANK          = 0x14;
+    /** 各种活动 **/
+    const UInt8 COUNTRY_ACT         = 0x1B;
     /**成就 */
     const UInt8 ACHIEVEMENT         = 0xF0;// 0x0C
     /**阵营选择 */
@@ -553,6 +555,8 @@ namespace REP
     const UInt8 YBBUF               = 0x12;
     const UInt8 GETAWARD            = 0x13;
     const UInt8 LUCKY_RANK          = 0x14;
+    /** 各种活动 **/
+    const UInt8 COUNTRY_ACT         = 0x1B;
 
     const UInt8 TRADE_LIST          = 0x80;// 0xC0
     const UInt8 TRADE_DATA          = 0x81;// 0xC1
