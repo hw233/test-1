@@ -68,12 +68,18 @@ float SecondSoul::getPracticeFactor()
 
 float SecondSoul::getPracticeLevUpFactor()
 {
-    return getSoulSkillValue(SOUL_SKILL_PRACLVLUP);
+    return 0;  // 这个技能暂时废除了
+   // return getSoulSkillValue(SOUL_SKILL_PRACLVLUP);
 }
 
 UInt8 SecondSoul::getExtraAura()
 {
     return static_cast<UInt8>(getSoulSkillValue(SOUL_SKILL_AURAEXTRA));
+}
+
+UInt8 SecondSoul::getAuraLeft()
+{
+    return static_cast<UInt8>(getSoulSkillValue(SOUL_SKILL_TALENT));
 }
 
 float SecondSoul::getSoulSkillValue(UInt8 id)
