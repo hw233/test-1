@@ -562,6 +562,12 @@ function onActivityCheck(tm)
           setYearActive(false)
       end
 
+      if tm >= actTime507 and tm < actTime507_1 then
+          setQgameGiftAct(true)
+      else
+          setQgameGiftAct(false)
+      end
+
       if tm >= actTime505 and tm < actTime505_1 then
           setKillMonsterAct(true)
       else
@@ -666,6 +672,8 @@ function initActTime(y, m, d)
   local  SerStartTm505= { ['year'] = 2012, ['month'] = 9, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 周岁红包送不停
   local  SerStartTm506= { ['year'] = 2012, ['month'] = 9, ['day'] = 13, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- Qgame大厅礼包
+  local  SerStartTm507= { ['year'] = 2012, ['month'] = 9, ['day'] = 17, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm503= { ['year'] = 2012, ['month'] = 9, ['day'] = 13, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
@@ -854,6 +862,9 @@ function initActTime(y, m, d)
 
   actTime506 = os.time(SerStartTm506);
   actTime506_1 = os.time(SerStartTm506) + 18 * 86400;
+
+  actTime507 = os.time(SerStartTm507);
+  actTime507_1 = os.time(SerStartTm507) + 3 * 86400;
 
   actTime503 = os.time(SerStartTm503);
   actTime503_1 = os.time(SerStartTm503) + 4 * 86400;

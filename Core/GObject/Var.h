@@ -224,6 +224,7 @@ namespace GObject
         VAR_CAIFU_CNT = 185, //财富个数
         VAR_CHUANQI_CNT = 186, //传奇个数
 
+        VAR_QGAME_GIFT = 188, //Qgame大厅礼包
         VAR_AWARD_BIRTHDAY     = 190, //周年庆活动(生日罗盘许愿星)
         VAR_MAX,
     };
@@ -433,6 +434,7 @@ namespace GObject
             REGISTER_VAR(VAR_ROUQING, CYCLE_NONE);
             REGISTER_VAR(VAR_CAIFU_CNT, CYCLE_NONE);
             REGISTER_VAR(VAR_CHUANQI_CNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_QGAME_GIFT, CYCLE_DAY);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

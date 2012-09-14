@@ -10175,6 +10175,17 @@ namespace GObject
         }
     }
 
+    void Player::getQgameGiftAward()
+    {
+        if(atoi(m_domain.c_str()) != 10)
+            return;
+        if(GetVar(VAR_QGAME_GIFT) == 0)
+        {
+            MailPackage::MailItem item[2] = {{503, 1},{514, 1}};
+            sendMailItem(2380, 2381, item, 2);
+            SetVar(VAR_QGAME_GIFT, 1);
+        }
+    }
     void Player::sendYearActInfo()
     {
         Stream st(REP::COUNTRY_ACT);

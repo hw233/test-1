@@ -89,6 +89,7 @@ namespace Script
 		lua_tinker::def(_L, "getRechargeActive", GObject::World::getRechargeActive);
 		lua_tinker::def(_L, "getRechargeActive3366", GObject::World::getRechargeActive3366);
 		lua_tinker::def(_L, "getYearActive", GObject::World::getYearActive);
+		lua_tinker::def(_L, "getQgameGiftAct", GObject::World::getQgameGiftAct);
 		lua_tinker::def(_L, "getValentineDay", GObject::World::getValentineDay);
 		lua_tinker::def(_L, "getNetValentineDay", GObject::World::getNetValentineDay);
 		lua_tinker::def(_L, "getGirlDay", GObject::World::getGirlDay);

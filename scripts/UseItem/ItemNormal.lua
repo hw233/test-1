@@ -337,6 +337,17 @@ function ItemNormal_9147_9159(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_9170_9172(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    if iid < 9170 or iid > 9172 then
+        return 0
+    end
+    player:setTitle(iid-9170+33)
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
 function ItemNormal_00000027(iid, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
@@ -6846,6 +6857,10 @@ local ItemNormal_Table = {
 
     [9161] = ItemNormal_00009161,
     [9162] = ItemNormal_00009161,
+
+    [9170] = ItemNormal_9170_9172,
+    [9171] = ItemNormal_9170_9172,
+    [9172] = ItemNormal_9170_9172,
 
     [10000] = ItemNormal_00010000,
     [10001] = ItemNormal_00010001,
