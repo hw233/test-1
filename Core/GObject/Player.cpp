@@ -10129,38 +10129,38 @@ namespace GObject
             else if(isBD())
             {
                 if((status & 0x01) == 0)
-                    newStatus = status | 0x01;
-                else
                 {
+                    newStatus = status | 0x01;
                     char action[16] = "";
                     snprintf (action, 16, "F_%d_%d", 1098, 2);
                     udpLog("916", action, "", "", "", "", "act");
-                    return;
                 }
+                else
+                    return;
             }
             else if(isYD())
             {
                 if((status & 0x02) == 0)
-                    newStatus = status | 0x02;
-                else
                 {
                     char action[16] = "";
                     snprintf (action, 16, "F_%d_%d", 1098, 3);
                     udpLog("916", action, "", "", "", "", "act");
-                    return;
+                    newStatus = status | 0x02;
                 }
+                else
+                    return;
             }
             else if(isQQVIP())
             {
                 if((status & 0x04) == 0)
-                    newStatus = status | 0x04;
-                else
                 {
                     char action[16] = "";
                     snprintf (action, 16, "F_%d_%d", 1098, 4);
                     udpLog("916", action, "", "", "", "", "act");
-                    return;
+                    newStatus = status | 0x04;
                 }
+                else
+                    return;
             }
             else
                 return;
