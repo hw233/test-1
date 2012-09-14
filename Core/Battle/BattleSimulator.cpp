@@ -4398,8 +4398,8 @@ bool BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GD
             fighter = static_cast<BattleFighter*>(this_side_obj[maxatk_pos]);
             if(fighter && fighter->getHP() > 0)
             {
-                float fAtk = bo->_attack * skill->effect->atkP + skill->effect->atk;
-                float fmagicAtk = bo->_magatk * skill->effect->magatkP + skill->effect->magatk;
+                float fAtk = bo->getAttack() * skill->effect->atkP + skill->effect->atk;
+                float fmagicAtk = bo->getMagAttack() * skill->effect->magatkP + skill->effect->magatk;
                 if(fAtk < 0)
                 {
                     fAtk = -fAtk*ef->value/100;
