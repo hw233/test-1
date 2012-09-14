@@ -83,6 +83,7 @@ bool World::_newyear = false;
 bool World::_blueactiveday = false;
 bool World::_rechargeactive = false;
 bool World::_rechargeactive3366 = false;
+bool World::_yearact = false;
 UInt8 World::_rechargeactiveno = 0;
 bool World::_valentineday = false;
 bool World::_netvalentineday = false;

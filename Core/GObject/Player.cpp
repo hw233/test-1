@@ -1002,6 +1002,9 @@ namespace GObject
             }
         }
 
+        if(World::getYearActive)
+            sendYearActInfo();
+
         sendLevelPack(GetLev());
         offlineExp(curtime);
 
@@ -9871,6 +9874,77 @@ namespace GObject
         UInt8 status = GetVar(VAR_JUNE_ITEM);
         st << happy << static_cast<UInt8>(happy >= 20 ? 1 : 0) << itemId << status << Stream::eos;
         send(st);
+    }
+
+    void Player::getYearActAward(UInt8 type)
+    {
+        bool ret = false;
+        if(GetPackage()->GetRestPackageSize() < 9)
+        {
+            sendMsgCode(0, 1011);
+            return;
+        }
+        Stream st(REP::COUNTRY_ACT);
+        st << type;
+        if(type == 1)
+        {
+            if(GetVar(VAR_YEAR_SWORDSMAN))
+                return;
+            ret = GameAction()->onGetYearActAward(this, type);
+            if(ret)
+            {
+                SetVar(VAR_YEAR_SWORDSMAN, 1);
+                st << static_cast<UInt8>(1);
+                st << Stream::eos;
+                send(st);
+            }
+        }
+        else if(type == 2)
+        {
+            if(GetVar(VAR_YEAR_NOBLE))
+                return;
+            ret = GameAction()->onGetYearActAward(this, type);
+            if(ret)
+            {
+                SetVar(VAR_YEAR_NOBLE, 1);
+                st << static_cast<UInt8>(1);
+                st << Stream::eos;
+                send(st);
+            }
+        }
+    }
+
+    void Player::sendYearActInfo()
+    {
+        Stream st(REP::COUNTRY_ACT);
+        Stream st2(REP::COUNTRY_ACT);
+        UInt8 type;
+        UInt8 result;
+
+        type = 1;
+        st << type;
+        if(GetVar(VAR_YEAR_SWORDSMAN) > 0)
+            result = 3;
+        else
+            result = 2;
+        st << result;
+        st << Stream::eos;
+        send(st);
+
+        type = 2;
+        st2 << type;
+        if(GetVar(VAR_YEAR_NOBLE) > 0)
+            result = 3;
+        else
+        {
+            if(isBD() || isYD() || isQQVIP() || is3366AndLevel4())
+                result = 2;
+            else
+                result = 4;
+        }
+        st2 << result;
+        st2 << Stream::eos;
+        send(st2);
     }
 
     TripodData& Player::runTripodData(TripodData& data, bool init)

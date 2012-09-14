@@ -2171,4 +2171,36 @@ function Qixi(player, lootlvl)
     end
 end
 
+function onGetYearActAward(player, type)
+    if type ==1 then
+        local package = player:GetPackage()
+        if package:GetRestPackageSize() < 6 then
+            return false
+        end
+        player:getCoupon(50)
+        package:Add(56, 5, true)
+        package:Add(57, 5, true)
+        player:getTael(5000)
+        package:Add(49, 1, true)
+        package:Add(9163, 1, true)
+        return true
+    end
+    if type ==2 then
+        local package = player:GetPackage()
+        if package:GetRestPackageSize() < 9 then
+            return false
+        end
+        package:Add(509, 1, true)
+        package:Add(503, 1, true)
+        package:Add(514, 1, true)
+        package:Add(1325, 1, true)
+        player:getTael(5000)
+        package:Add(51, 1, true)
+        package:Add(48, 1, true)
+        package:Add(49, 2, true)
+        package:Add(50, 2, true)
+        return true
+    end
+end
+
 

@@ -253,6 +253,7 @@ namespace Script
         void sendConsumeMails(Player* player, UInt32 ototal, UInt32 ntotal);
         void onEquipForge(Player* player, UInt32 itemId, UInt32 onums);
         bool onSoSoMapAward(Player* player, UInt8 off);
+        bool onGetYearActAward(Player* player, UInt8 type);
         UInt8 onGetAthlRandomMaxValue(UInt8 diffculty);
         UInt32 onGetAthlRandomAward(UInt8 diffculty, UInt8 opt);
         UInt8 onGetAthlRandomDiffculty();

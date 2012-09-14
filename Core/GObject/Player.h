@@ -764,6 +764,11 @@ namespace GObject
             return (_playerData.qqvipl > 40 && _playerData.qqvipl <= 49) || (_playerData.qqvipl1 > 40 && _playerData.qqvipl1 <= 49) || (_playerData.qqvipl >= 30 && _playerData.qqvipl <= 39 && _playerData.qqvipl1 > 40 && _playerData.qqvipl1 <= 49);
         }
 
+        inline bool is3366AndLevel4() const
+        {
+            return (_playerData.qqvipl >= 20 && _playerData.qqvipl <= 29 && _playerData.qqvipl1 >= 4);
+        }
+
 		UInt32 getTotalRecharge()			{ return _playerData.totalRecharge; }
 		void addTotalRecharge(UInt32);
 		void setTotalRecharge( UInt32 r );
@@ -1582,6 +1587,8 @@ namespace GObject
         void sendSSDTInfo();
         void getHappyAward(UInt8 opt);
         void sendHappyInfo(UInt16 itemId = 0);
+        void getYearActAward(UInt8 type);
+        void sendYearActInfo();
         void getTargetAward(UInt8 opt);
         void getTargetAwardRF(UInt8 opt);
         void getNewRegisterAward(UInt8 opt);

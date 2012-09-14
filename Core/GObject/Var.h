@@ -198,6 +198,8 @@ namespace GObject
 
         VAR_AWARD_NEWREGISTER  = 155, //新用户注册抽奖
 
+        VAR_YEAR_SWORDSMAN = 161, //周岁剑侠红包
+        VAR_YEAR_NOBLE = 162, //周岁贵族红包
         VAR_RECHARGE_TOTAL3366 = 169, //3366合作充值活动
         VAR_BDIAMOND_CMD = 170, //蓝钻用户每日可领取当前等级寻宝令
 
@@ -387,6 +389,8 @@ namespace GObject
             REGISTER_VAR(VAR_QQVIP_BUF, CYCLE_DAY);
             REGISTER_VAR(VAR_QQVIP_CNT, CYCLE_DAY);
             REGISTER_VAR(VAR_BDIAMOND_CMD, CYCLE_DAY);
+            REGISTER_VAR(VAR_YEAR_SWORDSMAN, CYCLE_DAY);
+            REGISTER_VAR(VAR_YEAR_NOBLE, CYCLE_DAY);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

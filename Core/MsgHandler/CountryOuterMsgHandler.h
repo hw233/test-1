@@ -1622,6 +1622,31 @@ void OnLuckyDrawReq( GameMsgHdr& hdr, const void * data )
     }
 }
 
+void OnCountryActReq( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 opt = 0;
+    br >> opt;
+
+    switch(opt)
+    {
+        /** 周岁红包送不停 **/
+        case 1:
+        {
+	        if(!World::getYearActive())
+		        return;
+            UInt8 type = 0;
+            br >> type;
+            if(type == 1 || type == 2)
+                player->getYearActAward(type);
+        }
+        break;
+        default:
+        break;
+    }
+}
+
 void OnEnchantReq( GameMsgHdr& hdr, EnchantReq& er )
 {
 	MSG_QUERY_PLAYER(player);

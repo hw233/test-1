@@ -88,6 +88,7 @@ namespace Script
 		lua_tinker::def(_L, "getBlueactiveday",	GObject::World::getBlueactiveday);
 		lua_tinker::def(_L, "getRechargeActive", GObject::World::getRechargeActive);
 		lua_tinker::def(_L, "getRechargeActive3366", GObject::World::getRechargeActive3366);
+		lua_tinker::def(_L, "getYearActive", GObject::World::getYearActive);
 		lua_tinker::def(_L, "getValentineDay", GObject::World::getValentineDay);
 		lua_tinker::def(_L, "getNetValentineDay", GObject::World::getNetValentineDay);
 		lua_tinker::def(_L, "getGirlDay", GObject::World::getGirlDay);
@@ -1255,6 +1256,11 @@ namespace Script
 	bool GameActionLua::onSoSoMapAward( Player* player, UInt8 off)
 	{
 		return Call<bool>("onSoSoMapAward", player, off);
+	}
+
+	bool GameActionLua::onGetYearActAward( Player* player, UInt8 type)
+	{
+		return Call<bool>("onGetYearActAward", player, type);
 	}
 
     UInt8 GameActionLua::onGetAthlRandomMaxValue(UInt8 diffculty)
