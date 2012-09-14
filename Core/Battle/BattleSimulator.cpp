@@ -1660,34 +1660,35 @@ UInt32 BattleSimulator::doPoisonAttack(BattleFighter* bf, bool cs, const GData::
             } // 第三波毒
             else
             {
+                defList[defCount].leftHP = area_target->getHP();
+                ++defCount;
                 AddExtraDamageAfterResist_SkillStrengthen(bf, area_target, skill, dmg2*1.5, defList, defCount, scList, scCount);
                 AddStateAfterPoisonResist_SkillStrengthen(bf, area_target, skill, 1, defList, defCount, scList, scCount);
 
-                defList[defCount].leftHP = area_target->getHP();
-                ++defCount;
                 doSkillAtk2(false, &atkAct2, defList, defCount, scList, scCount);
             }
         } // 第二波毒
         else
         {
+            defList[defCount].leftHP = area_target->getHP();
+            ++defCount;
             AddExtraDamageAfterResist_SkillStrengthen(bf, area_target, skill, dmg2*2.5, defList, defCount, scList, scCount);
             AddStateAfterPoisonResist_SkillStrengthen(bf, area_target, skill, 2, defList, defCount, scList, scCount);
 
-            defList[defCount].leftHP = area_target->getHP();
-            ++defCount;
             doSkillAtk2(false, &atkAct2, defList, defCount, scList, scCount);
         }
     } // 第一波毒
     else
     {
+        defList[defCount].leftHP = area_target->getHP();
+        ++defCount;
+
         // 如果是抵抗，查找是否有符文强化
         AddExtraDamageAfterResist_SkillStrengthen(bf, area_target, skill, dmg2*3, defList, defCount, scList, scCount);
 
         // 如果被抵抗，上状态
         AddStateAfterPoisonResist_SkillStrengthen(bf, area_target, skill, 3, defList, defCount, scList, scCount);
 
-        defList[defCount].leftHP = area_target->getHP();
-        ++defCount;
         doSkillAtk2(false, &atkAct2, defList, defCount, scList, scCount);
     }
 
