@@ -11401,17 +11401,17 @@ namespace GObject
             if (1 == packageType)
             {
                 for (int i = 0; i < 9; ++i)
-                    GetPackage()->AddItem(g_rp1Items[i][0], g_rp1Items[i][1], true);
+                    GetPackage()->Add(g_rp1Items[i][0], g_rp1Items[i][1], true);
             }
             else if (2 == packageType)
             {
                 for (int i = 0; i < 9; ++i)
-                    GetPackage()->AddItem(g_rp2Items[i][0], g_rp2Items[i][1], true);
+                    GetPackage()->Add(g_rp2Items[i][0], g_rp2Items[i][1], true);
             }
             else if (3 == packageType)
             {
                 for (int i = 0; i < 8; ++i)
-                    GetPackage()->AddItem(g_rp3Items[i][0], g_rp3Items[i][1], true);
+                    GetPackage()->Add(g_rp3Items[i][0], g_rp3Items[i][1], true);
             }
             rpValue += (0xFF+1);
             SetVar(VAR_RP_VALUE, rpValue);
@@ -11438,7 +11438,7 @@ namespace GObject
         getCoupon(10*cts);
         for (int i = 0; i < 3; ++i)
         {
-           GetPackage()->AddItem(g_rpRewardItems[i][0], g_rpRewardItems[i][1]*cts, true);
+           GetPackage()->Add(g_rpRewardItems[i][0], g_rpRewardItems[i][1]*cts, true);
         }
         SetVar(VAR_RP_REWARD_GOT, 1);
 
