@@ -67,6 +67,8 @@ void WorldScript::init()
 	def("setRechargeActive", GObject::World::setRechargeActive);
 	def("getYearActive", GObject::World::getYearActive);
 	def("setYearActive", GObject::World::setYearActive);
+	def("getQgameGiftAct", GObject::World::getQgameGiftAct);
+	def("setQgameGiftAct", GObject::World::setQgameGiftAct);
 	def("getRechargeActive3366", GObject::World::getRechargeActive3366);
 	def("setRechargeActive3366", GObject::World::setRechargeActive3366);
 	def("getValentineDay", GObject::World::getValentineDay);

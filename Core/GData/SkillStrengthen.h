@@ -26,6 +26,11 @@ enum
     ON_DAMAGE,       // 伤害时
     ON_BEDAMAGE,     // 受伤害时
     ON_WEAK,         // 虚弱时
+    ON_ATTACKSINGLE, // 群攻只攻击到一个目标时
+    ON_SKILLUSED,   // 技能使用之后
+    ON_RESIST,    // 状态被抵抗时
+    ON_USEHAOTIAN,  // 使用昊天镜的时候。。。
+    ON_TARGET_DEAD, // 目标受攻击死亡
 };
 
 enum
@@ -43,13 +48,30 @@ enum
     TYPE_IMMUNE,        // 免疫所有控制状态
     TYPE_DEBUF_THERAPY, // 减治疗效果
     TYPE_ATKADD,        // 增加攻击效果
+    TYPE_ABSORB_ATTACK, // 吸收目标物理攻击，持续到一次有效攻击
+    TYPE_YUANCISHENLEI, // 元磁神雷攻击特殊效果
+    TYPE_INTENSIFYSTATE, // 强化技能效果
+    TYPE_ADDMAGICATK,   // 增加法伤(取自己的法伤当因子，楼下的是取对方的当因子)
+    TYPE_ABSORB_MAGATK,
+    TYPE_ADDSTATE,     // 上状态
+    TYPE_HAOTIANJING,  // 借用一下昊天镜的名字，这个状态其实就是升自己命中，降对方反击
+    TYPE_RANDOM_BLEED, // 随机一人流血
+    TYPE_AURA_RETURN, //减少的灵气X%平均附加给同伴（除了自己）
+    TYPE_ATK_RETURN, //减少的攻击，转换X%给己方攻击最高的同伴，持续一次（last）攻击（主动出手的攻击）
+    TYPE_BUF_THERAPY, // 增治疗效果
+    TYPE_DEBUF_AURA, //被攻击的目标下2（last）次获得的灵气时，每次减少X点
+    TYPE_DAMAGE_EXTRA, // 被抵抗也流血
+    TYPE_ATTACK_FRIEND,// 攻击本方血最少的人
+    TYPE_BLEED_BYSKILL, // 技能导致流血，取技能的攻击力，hp改变和hp改变附加
+    TYPE_AURA_GET,   // 获取灵气
+    TYPE_RESIST_ADDSTATE, // 被抵抗上状态
     TYPE_MAX,
 };
 
 struct SkillStrengthenEffect : public ObjectBaseNT<UInt16>
 {
     SkillStrengthenEffect(UInt16 id)
-        : ObjectBaseNT<UInt16>(id), cond(0), target(0), prob(0), area(0), last(0), type(0), value(0) {}
+        : ObjectBaseNT<UInt16>(id), cond(0), target(0), prob(0), area(0), last(0), type(0), value(0), valueExt1(0), valueExt2(0) {}
     ~SkillStrengthenEffect() {}
 
     UInt16 cond;
@@ -60,6 +82,8 @@ struct SkillStrengthenEffect : public ObjectBaseNT<UInt16>
     Int16 last;
     Int16 type;
     float value;
+    float valueExt1;
+    float valueExt2;
 };
 
 struct SkillStrengthenBase : public ObjectBaseT<UInt16>

@@ -85,6 +85,7 @@ bool World::_blueactiveday = false;
 bool World::_rechargeactive = false;
 bool World::_rechargeactive3366 = false;
 bool World::_yearact = false;
+bool World::_qgamegiftact = false;
 UInt8 World::_rechargeactiveno = 0;
 bool World::_valentineday = false;
 bool World::_netvalentineday = false;
@@ -1153,6 +1154,17 @@ bool enum_openact(void * ptr, void * v)
     return true;
 }
 
+bool enum_qgamegift(void * ptr, void * v)
+{
+	Player * pl = static_cast<Player *>(ptr);
+	if(pl == NULL)
+		return true;
+    if(!pl->isOnline())
+        return true;
+    pl->getQgameGiftAward();
+    return true;
+}
+
 void World::World_One_Min( World * world )
 {
 #ifdef _FB
@@ -1184,6 +1196,17 @@ void World::World_One_Min( World * world )
 
     if (day)
         globalPlayers.enumerate(enum_openact, (void*)&day);
+#else
+    if(!World::getQgameGiftAct())
+        return;
+	UInt32 now = world->_now;
+    struct tm t;
+    time_t tt = now;
+    localtime_r(&tt, &t);
+    if(t.tm_hour == 21 && t.tm_min == 0)
+    {
+        globalPlayers.enumerate(enum_qgamegift, static_cast<void *>(NULL));
+    }
 #endif
 }
 

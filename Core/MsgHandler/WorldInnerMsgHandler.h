@@ -958,6 +958,12 @@ void OnSendConsumeRank ( GameMsgHdr& hdr,  const void* data )
     }
 }
 
+void OnGetQgameGiftAward( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    player->getQgameGiftAward();
+}
+
 void OnRoamResult( GameMsgHdr& hdr,  const void* data )
 {
     MSG_QUERY_PLAYER(player);

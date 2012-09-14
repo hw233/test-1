@@ -5525,15 +5525,7 @@ namespace GObject
     {
         if (rcnt > 100)
             return false;
-
-        int cnt = tasks.size();
-        UInt32* t = &tasks[0];
-        for (int i = 0; i < cnt; ++i)
-        {
-            if (*t++ == task)
-                return true;
-        }
-        return false;
+        return find(tasks.begin(), tasks.end(), task) != tasks.end();
     }
 
 	void Player::flushTaskColor(UInt8 tasktype, UInt8 type, UInt8 color, UInt16 count, bool force)
@@ -10129,38 +10121,38 @@ namespace GObject
             else if(isBD())
             {
                 if((status & 0x01) == 0)
-                    newStatus = status | 0x01;
-                else
                 {
+                    newStatus = status | 0x01;
                     char action[16] = "";
                     snprintf (action, 16, "F_%d_%d", 1098, 2);
                     udpLog("916", action, "", "", "", "", "act");
-                    return;
                 }
+                else
+                    return;
             }
             else if(isYD())
             {
                 if((status & 0x02) == 0)
-                    newStatus = status | 0x02;
-                else
                 {
                     char action[16] = "";
                     snprintf (action, 16, "F_%d_%d", 1098, 3);
                     udpLog("916", action, "", "", "", "", "act");
-                    return;
+                    newStatus = status | 0x02;
                 }
+                else
+                    return;
             }
             else if(isQQVIP())
             {
                 if((status & 0x04) == 0)
-                    newStatus = status | 0x04;
-                else
                 {
                     char action[16] = "";
                     snprintf (action, 16, "F_%d_%d", 1098, 4);
                     udpLog("916", action, "", "", "", "", "act");
-                    return;
+                    newStatus = status | 0x04;
                 }
+                else
+                    return;
             }
             else
                 return;
@@ -10175,6 +10167,17 @@ namespace GObject
         }
     }
 
+    void Player::getQgameGiftAward()
+    {
+        if(atoi(m_domain.c_str()) != 10)
+            return;
+        if(GetVar(VAR_QGAME_GIFT) == 0)
+        {
+            MailPackage::MailItem item[2] = {{503, 1},{514, 1}};
+            sendMailItem(2380, 2381, item, 2);
+            SetVar(VAR_QGAME_GIFT, 1);
+        }
+    }
     void Player::sendYearActInfo()
     {
         Stream st(REP::COUNTRY_ACT);
@@ -10708,8 +10711,8 @@ namespace GObject
         GetMailBox()->newMail(NULL, 0x12, title, content);
 
 
-        MailPackage::MailItem item[2] = {{9161, 1}, {9162, 1}};
-        sendMailItem(4028, 4028, item, 2);
+        MailPackage::MailItem item[5] = {{9161, 1}, {9162, 1}, {9164, 1}, {9165, 1}, {9166, 1}};
+        sendMailItem(4028, 4028, item, 5);
 #endif
     }
 

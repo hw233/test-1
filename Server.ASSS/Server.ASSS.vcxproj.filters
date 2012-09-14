@@ -636,6 +636,9 @@
     <ClCompile Include="..\tools\json-1.4\json_helper.c">
       <Filter>json</Filter>
     </ClCompile>
+    <ClCompile Include="..\Core\GObject\Tianjie.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Core\Common\Ascii.h">
@@ -1371,6 +1374,9 @@
     </ClInclude>
     <ClInclude Include="..\Core\lua\lzio.h">
       <Filter>lua\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\Tianjie.h">
+      <Filter>GObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

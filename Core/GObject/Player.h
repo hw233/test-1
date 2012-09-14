@@ -1638,6 +1638,7 @@ namespace GObject
         void getHappyAward(UInt8 opt);
         void sendHappyInfo(UInt16 itemId = 0);
         void getYearActAward(UInt8 type);
+        void getQgameGiftAward();
         void sendYearActInfo();
         void getTargetAward(UInt8 opt);
         void getTargetAwardRF(UInt8 opt);
