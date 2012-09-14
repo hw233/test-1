@@ -250,7 +250,7 @@ struct DBClanCopyMonster
     UInt16 appearRound;        // 生产该怪的波数
     UInt32 npcId;              // 怪物npcGroupId
     UInt8  npcCount;           // 每一路怪物的数量
-    UInt8  npcRouteCount;      // 出现的路数 
+    UInt8  npcRouteIndex;      // 出现的路数 
     UInt16 npcValue;           // 怪物对主基地的破坏值
     UInt8  monsterType;        // 怪物类型（普通，精英，boss）
 };
@@ -667,7 +667,7 @@ SPECIALDEF(7)
     UInt16, appearRound,
     UInt32, npcId,
     UInt8,  npcCount,
-    UInt8,  npcRouteCount,
+    UInt8,  npcRouteIndex,
     UInt16, npcValue,
     UInt8,  monsterType
     )

@@ -1426,7 +1426,7 @@ void Clan::broadcastMemberInfo( ClanMember& cmem, UInt8 t )
 	else
 		st << cmem.cls << cmem.player->GetLev() << static_cast<UInt8>(cmem.player->isOnline() ? 1 : 0) << cmem.proffer << cmem.player->getLastOnline() << Stream::eos;
 	broadcast(st);
-    broadcastCopyInfo();
+    //broadcastCopyInfo();
 
 }
 
@@ -3613,7 +3613,7 @@ void Clan::resetCopyLevel()
     }
     ClanCopyLog clanCopyLog(_id, TimeUtil::Now(), 2, COPY_RESET_LEVEL > _copyLevel ? _copyLevel : COPY_RESET_LEVEL, getName());
     if (_copyLevel <= COPY_RESET_LEVEL)
-        _copyLevel = 1;
+        _copyLevel = 0;
     else
         _copyLevel -= COPY_RESET_LEVEL;
 
@@ -3789,7 +3789,7 @@ void   Clan::clanCopyTabOperate(Player * player, UInt8 command, UInt8 val /* = 0
                 // "开启副本"
                 if (hasClanAuthority(player, CLAN_AUTHORITY_COPY))
                 {
-                    if (_techs->getMaxCopyLevel() <= _copyLevel)
+                    if (_techs->getMaxCopyLevel() <= _copyLevel + 1)
                     {
                         player->sendMsgCode(0, 1340);  // 帮派科技不够开启更高等级
                         return;
@@ -3926,7 +3926,7 @@ void   Clan::sendClanCopyInfo(Player * player, UInt8 val)
     st << static_cast<UInt32>(getStatueExAction());
     //st << static_cast<UInt32>(getStatueExHitRate());
 
-    st << static_cast<UInt16>(getCopyLevel());
+    st << static_cast<UInt16>(getCopyLevel() + 1);
     st << static_cast<UInt32>(getOutputExp());
     st << static_cast<UInt32>(getNextOutputExp());
 

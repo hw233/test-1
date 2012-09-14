@@ -23,6 +23,7 @@
 #include "Common/Itoa.h"
 #include "Script/BattleFormula.h"
 #include "GObject/Clan.h"
+#include "GObject/ClanCopy.h"
 #ifndef _WIN32
 #include "GObject/DCLogger.h"
 #endif
@@ -997,6 +998,7 @@ void OnClanOption( GameMsgHdr& hdr, const void* data )
     case 1:    // 开除帮派
     case 2:    // 离开帮派
         {
+            GObject::ClanCopyMgr::Instance().playerLeave(player);
             player->delClanTask();
             player->setClan(co->clan);
         }

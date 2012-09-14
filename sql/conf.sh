@@ -5,8 +5,13 @@ U=kingxin
 P=kingxin
 PT=3306
 
+<<<<<<< HEAD
 DBD=data_jlt;
 DBO=asss_jlt;
+=======
+DBD=data_jlt
+DBO=asss_jlt
+>>>>>>> 9a2af98... clanCopy (Wait for testing.)
 
 OPTIONS="Yes/No/Exit"
 IFS=/
