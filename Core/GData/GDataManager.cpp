@@ -1427,15 +1427,14 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
         DBClanCopyMonster ccs;
-		if (execu->Prepare("SELECT `level`, `appearRound`, `npcId`, `npcCount`, `npcRouteCount`, `npcValue`, `monsterType` FROM `clan_copy_monster_template` ORDER BY `level` ASC, `appearRound` ASC", ccs) != DB::DB_OK)
-			return false;
+		if (execu->Prepare("SELECT `level`, `appearRound`, `npcId`, `npcCount`, `npcRouteIndex`, `npcValue`, `monsterType` FROM `clan_copy_monster_template` ORDER BY `level` ASC, `appearRound` ASC", ccs) != DB::DB_OK) return false;
 		while (execu->Next() == DB::DB_OK)
 		{
             
-            UInt32 key = (static_cast<UInt32>(ccs.level)) << 16 | ccs.appearRound;
+            UInt32 key = ((static_cast<UInt32>(ccs.level)) << 16 | ccs.appearRound) << 8 | ccs.npcRouteIndex;
             clanCopyMonsterMap.insert(std::make_pair(key, 
                         ClanCopyMonsterData(ccs.level, ccs.appearRound, ccs.npcId, 
-                            ccs.npcCount, ccs.npcRouteCount, ccs.npcValue, ccs.monsterType)));
+                            ccs.npcCount, ccs.npcRouteIndex, ccs.npcValue, ccs.monsterType)));
 		}
 
 		return true;

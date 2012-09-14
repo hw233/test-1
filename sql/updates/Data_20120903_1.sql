@@ -23,7 +23,7 @@ CREATE TABLE `clan_copy_monster_template` (
     `appearRound` int(10) unsigned NOT NULL DEFAULT 0,
     `npcId` bigint(20) unsigned NOT NULL DEFAULT 0,
     `npcCount` smallint(5) unsigned NOT NULL DEFAULT 0,
-    `npcRouteCount` smallint(5) unsigned NOT NULL DEFAULT 0,
+    `npcRouteIndex` smallint(5) unsigned NOT NULL DEFAULT 0,
     `npcValue` smallint(5) unsigned NOT NULL DEFAULT 0,
     `monsterType` smallint(5) unsigned NOT NULL DEFAULT 0
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

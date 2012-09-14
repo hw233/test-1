@@ -6,6 +6,7 @@
 #include "Common/Stream.h"
 #include "Common/URandom.h"
 #include "GData/NpcGroup.h"
+#include "GData/ClanCopyTable.h"
 #include "Fighter.h"
 
 #define DEBUG_CLAN_COPY
@@ -52,6 +53,7 @@ static const float  s_rate3NpcAdvanceModMax[] =  {200, 100, 100, 200};
 class Player;
 class Clan;
 class BattleSimulator;
+class ClanCopyMonsterData;
 
 static const UInt8 BATTLER_COUNT = 5;
 static const UInt8 SPOT_COUNT = 5;
@@ -288,9 +290,10 @@ class ClanCopy
 
         void updateSpotBufferValue(UInt8 spotId);
 
-        void monsterAssault(const UInt8& spotId);
+        void monsterAssault(UInt8 spotId);
         void enemyBaseAct();
         void createEnemy();
+        void createEnemyToSpotId(UInt8 spotId, const GData::ClanCopyMonsterData& clanCopyMonsterData);
         void monsterMove(UInt8 spotId);
         void spotCombat(UInt8 spotId);
         void attackHome(ClanCopyMonster* clanCopyMonster);
@@ -338,6 +341,8 @@ class ClanCopy
 
         UInt32 _maxMonsterWave;        // 该等级副本刷怪的波数（包括轮空的）
         UInt32 _curMonsterWave;        // 当前已经刷新的怪的波数（包括轮空的）
+
+        UInt32 _npcIndex;
 
         std::set<Player *> _observerPlayer; // 围观人员
         std::map<Player *, UInt8> _playerIndex; //快速查找玩家对应据点的索引
