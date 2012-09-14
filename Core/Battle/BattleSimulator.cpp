@@ -1355,14 +1355,19 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
             ++ defCount;
         }
 
-        if (dmg > 0 && bf->getAtkAddSpecial() > 0)  // 一次有效的物理攻击，减少上次吸收的物理伤害
+        if (dmg > 0)  // 一次有效的物理攻击，减少上次吸收的物理伤害和被减掉的伤害
         {
-            ReduceSpecialAttrLast(bf, e_stAtk, 1, scList, scCount);
-           // SetSpecialAttrChange(bf, NULL, 0, 0, scList, scCount);
+            if (bf->getAtkSpecialLast() > 0)
+                ReduceSpecialAttrLast(bf, e_ss_Atk, 1, scList, scCount);
+            if (bf->getAtkDecSpecialLast() > 0)
+                ReduceSpecialAttrLast(bf, e_ss_DecAtk, 1, scList, scCount);
         }
-        if (magdmg > 0 && bf->getMagAtkAddSpecial() > 0)  // 一次有效的法术攻击，减少法术特殊加成效果
+        if (magdmg > 0)  // 一次有效的法术攻击，减少法术特殊加成效果和被减掉的效果
         {
-            ReduceSpecialAttrLast(bf, e_stMagAtk, 1, scList, scCount);
+            if (bf->getMagAtkSpecialLast() > 0)
+                ReduceSpecialAttrLast(bf, e_ss_MagAtk, 1, scList, scCount);
+            if (bf->getMagAtkDecSpecialLast() > 0 )
+                ReduceSpecialAttrLast(bf, e_ss_DecMagAtk, 1, scList, scCount);
         }
 
         // 中毒
@@ -3123,9 +3128,12 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
         }
 
         // 一次有效的治疗
-        if(rhp > 0 && bf->getMagAtkAddSpecial() > 0)
+        if(rhp > 0)
         {
-            ReduceSpecialAttrLast(bf, e_stMagAtk, 1, scList, scCount);
+            if (bf->getMagAtkSpecialLast() > 0)
+                ReduceSpecialAttrLast(bf, e_ss_MagAtk, 1, scList, scCount);
+            if (bf->getMagAtkDecSpecialLast() > 0)
+                ReduceSpecialAttrLast(bf, e_ss_DecMagAtk, 1, scList, scCount);
         }
     }
     else if( (skill->effect->state != 1) && (skill->effect->hp < 0 || skill->effect->addhp < 0 || skill->effect->hpP < -0.001) )
@@ -4385,8 +4393,8 @@ bool BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GD
             BattleFighter* fighter = NULL;
             for(UInt8 i=0; i<25; ++i)
             {
-                if( i == bf->getPos())  // 除自己以外的人
-                    continue;
+                //if( i == bf->getPos())  // 除自己以外的人
+                    //continue;
 
                 fighter = static_cast<BattleFighter*>(this_side_obj[i]);
                 if(fighter && fighter->getHP() > 0 && fighter->getAttack()>maxatk)
@@ -4398,17 +4406,17 @@ bool BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GD
             fighter = static_cast<BattleFighter*>(this_side_obj[maxatk_pos]);
             if(fighter && fighter->getHP() > 0)
             {
-                float fAtk = bo->getAttack() * skill->effect->atkP + skill->effect->atk;
-                float fmagicAtk = bo->getMagAttack() * skill->effect->magatkP + skill->effect->magatk;
+                float fAtk = bo->_attack * skill->effect->atkP + skill->effect->atk;
+                float fmagicAtk = bo->_magatk * skill->effect->magatkP + skill->effect->magatk;
                 if(fAtk < 0)
                 {
                     fAtk = -fAtk*ef->value/100;
-                    SetSpecialAttrChange(fighter, skill, e_stAtk, ef->last, fAtk, true, scList, scCount);
+                    SetSpecialAttrChange(fighter, skill, e_ss_Atk, ef->last, fAtk, true, scList, scCount);
                 }
                 if(fmagicAtk< 0)
                 {
                     fmagicAtk = -fmagicAtk*ef->value/100;
-                    SetSpecialAttrChange(fighter, skill, e_stMagAtk, ef->last, fmagicAtk, true, scList, scCount);
+                    SetSpecialAttrChange(fighter, skill, e_ss_MagAtk, ef->last, fmagicAtk, true, scList, scCount);
                 }
             }				
             //setStatusChange(bf, bf->getSide(), maxatk_pos, 1, skill, e_stAtk, value, 1, scList, scCount, activeFlag);					
@@ -7626,7 +7634,7 @@ bool BattleSimulator::doSkillStrengthen_addMagicAtk(BattleFighter* bf, const GDa
         return false;
 
     float fAddMagAtk = bf->_magatk * ef->value/100;
-    SetSpecialAttrChange(bf, skill, e_stMagAtk, ef->last, fAddMagAtk, active, scList, scCount);
+    SetSpecialAttrChange(bf, skill, e_ss_MagAtk, ef->last, fAddMagAtk, active, scList, scCount);
 
     return true;
 }
@@ -7639,7 +7647,8 @@ bool BattleSimulator::doSkillStrengthen_absorbMagAtk(BattleFighter* bf, const GD
 
     // bf出手的人，bo被攻击者
     float fAddAttack = bo->_magatk*ef->value/100;
-    SetSpecialAttrChange(bf, skill, e_stMagAtk, ef->last, fAddAttack, active, scList, scCount);
+    SetSpecialAttrChange(bf, skill, e_ss_MagAtk, ef->last, fAddAttack, active, scList, scCount);
+    SetSpecialAttrChange(bo, skill, e_ss_DecMagAtk, ef->last, -fAddAttack, !active, scList, scCount);
     return true;
 }
 
@@ -7652,7 +7661,8 @@ bool BattleSimulator::doSkillStrengthen_absorbAtk(BattleFighter* bf, const GData
 
     // bf出手的人，bo被攻击者
     float fAddAttack = bo->_attack*ef->value/100;
-    SetSpecialAttrChange(bf, skill, e_stAtk, ef->last, fAddAttack, active, scList, scCount);
+    SetSpecialAttrChange(bf, skill, e_ss_Atk, ef->last, fAddAttack, active, scList, scCount);
+    SetSpecialAttrChange(bo, skill, e_ss_DecAtk, ef->last, -fAddAttack, !active, scList, scCount);
     return true;
 }
 
@@ -7832,9 +7842,9 @@ bool BattleSimulator::doSkillStrengthen_bufTherapy( BattleFighter* bf, const GDa
 
 // bOffset标记通知前端的时候要不要+25的偏移。对于本次的出手者来说，本方阵营id需要偏移25，敌方的不用
 // skill导致bf的属性etype产生value的改变，持续last次有效，新的覆盖旧的。
-void BattleSimulator::SetSpecialAttrChange(BattleFighter* bf, const GData::SkillBase* skill, StatusType eType, Int16 nLast, float value, bool bOffset, StatusChange* scList, size_t& scCount)
+void BattleSimulator::SetSpecialAttrChange(BattleFighter* bf, const GData::SkillBase* skill, SpecialStatus eType, Int16 nLast, float value, bool bOffset, StatusChange* scList, size_t& scCount)
 {
-    if(!bf || eType >= MAX_STATUS || eType < MIN_STATUS)
+    if(!bf || eType >= MAX_SPECIAL_STATUS || eType < MIN_SPECIAL_STATUS)
         return;
 
     if(nLast <= 0)
@@ -7843,42 +7853,62 @@ void BattleSimulator::SetSpecialAttrChange(BattleFighter* bf, const GData::Skill
     StatusChange& sc = scList[scCount];
     if(bOffset)
         sc.pos = bf->getPos() + 25;
+    else
+        sc.pos = bf->getPos();
     if(skill)
         sc.statusId = skill->getId();
     else
         sc.statusId = 0;
-    sc.type = eType;
+   // sc.type = eType;
+    StatusType estType = MIN_STATUS;
     switch(eType)
     {
-        case e_stAtk:
+        case e_ss_Atk:
             {
                 bf->setAtkAddSpecial(value, nLast);
                 sc.data = static_cast<UInt32>(bf->getAttack());
+                estType = e_stAtk;
             }
             break;
-        case e_stMagAtk:
+        case e_ss_DecAtk:
+            {
+                bf->setAtkDecSpecial(value, nLast);
+                sc.data = static_cast<UInt32>(bf->getAttack());
+                estType = e_stAtk;
+            }
+            break;
+        case e_ss_MagAtk:
             {
                 bf->setMagAtkAddSpecial(value, nLast);
                 sc.data = static_cast<UInt32>(bf->getMagAttack());
+                estType = e_stMagAtk;
+            }
+            break;
+        case e_ss_DecMagAtk:
+            {
+                bf->setMagAtkDecSpecial(value, nLast);
+                sc.data = static_cast<UInt32>(bf->getMagAttack());
+                estType = e_stMagAtk;
             }
             break;
         default:
             break;
     }
 
+    sc.type = estType;
     ++scCount;
     return;
 }
 
-void BattleSimulator::ReduceSpecialAttrLast(BattleFighter* bf, StatusType eType, Int16 nReduce, StatusChange* scList, size_t& scCount)
+void BattleSimulator::ReduceSpecialAttrLast(BattleFighter* bf, SpecialStatus eType, Int16 nReduce, StatusChange* scList, size_t& scCount)
 {
-    if(!bf || eType >= MAX_STATUS || eType < MIN_STATUS)
+    if(!bf || eType >= MAX_SPECIAL_STATUS || eType <= MIN_SPECIAL_STATUS)
         return;
 
     Int16 nLast = 0;
     switch(eType)
     {
-        case e_stAtk:
+        case e_ss_Atk:
             {
                 nLast = bf->getAtkSpecialLast();
                 nLast -= nReduce;
@@ -7886,12 +7916,28 @@ void BattleSimulator::ReduceSpecialAttrLast(BattleFighter* bf, StatusType eType,
                     bf->setAtkSpecialLast(nLast);
             }
             break;
-        case e_stMagAtk:
+        case e_ss_DecAtk:
+            {
+                nLast = bf->getAtkDecSpecialLast();
+                nLast -= nReduce;
+                if (nLast > 0)
+                    bf->setAtkDecSpecialLast(nLast);
+            }
+            break;
+        case e_ss_MagAtk:
             {
                 nLast = bf->getMagAtkSpecialLast();
                 nLast -= nReduce;
                 if (nLast > 0)
                     bf->setMagAtkSpecialLast(nLast);
+            }
+            break;
+        case e_ss_DecMagAtk:
+            {
+                nLast = bf->getMagAtkDecSpecialLast();
+                nLast -= nReduce;
+                if (nLast > 0)
+                    bf->setMagAtkDecSpecialLast(nLast);
             }
             break;
         default:
@@ -7993,6 +8039,7 @@ bool BattleSimulator::AddExtraDamageAfterResist_SkillStrengthen(BattleFighter* p
 
     UInt32 nRealDamage = ef->value/100 * nDamage;  // 伤害值
     defList[defCount].damType = e_damNormal;
+    defList[defCount].pos = pTarget->getPos();
     pTarget->makeDamage(nRealDamage);
     defList[defCount].damage = nRealDamage;
     defList[defCount].leftHP = pTarget->getHP();

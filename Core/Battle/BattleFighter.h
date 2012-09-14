@@ -126,8 +126,8 @@ public:
 	inline float getSoul() { return _soul; }
 	inline float getAura() { return (_aura > 0 ? _aura : 0); }
 	inline float getAuraMax() { return (_auraMax > 0 ? _auraMax : 0); }
-	inline float getAttack() {float ret = _attack + _attackAdd + _attackAdd2 + _atkAddSpecial; return (ret > 0 ? ret : 0);}
-	inline float getMagAttack() {float ret = _magatk + _magAtkAdd + _magAtkAdd2 + _magAtkAddSpecial; return (ret > 0 ? ret : 0);}
+	inline float getAttack() {float ret = _attack + _attackAdd + _attackAdd2 + _atkAddSpecial + _atkDecSpecial; return (ret > 0 ? ret : 0);}
+	inline float getMagAttack() {float ret = _magatk + _magAtkAdd + _magAtkAdd2 + _magAtkAddSpecial + _magAtkDecSpecial; return (ret > 0 ? ret : 0);}
 	inline float getDefend() {float ret = _defend + _defAdd + _defAdd2; return (ret > 0 ? ret : 0);}
 	inline float getMagDefend() {float ret = _magdef + _magDefAdd + _magDefAdd2; return (ret > 0 ? ret : 0);}
 	float getHitrate(BattleFighter* defgt);
@@ -526,6 +526,16 @@ public:
     inline void setMagAtkSpecialLast(Int16 nLast) { _magAtkSpecialLast = nLast; }
     inline void setMagAtkAddSpecial(float v, Int16 nlast){ _magAtkAddSpecial = v; _magAtkSpecialLast = nlast; }
 
+    inline float getAtkDecSpecial(){ return _atkDecSpecial; }
+    inline Int16 getAtkDecSpecialLast(){return _atkDecSpecialLast;}
+    inline void setAtkDecSpecialLast(Int16 nLast) { _atkDecSpecialLast = nLast; }
+    inline void setAtkDecSpecial(float v, Int16 nlast){ _atkDecSpecial = v; _atkDecSpecialLast = nlast; }
+
+    inline float getMagAtkDecSpecial(){ return _magAtkDecSpecial; }
+    inline Int16 getMagAtkDecSpecialLast(){return _magAtkDecSpecialLast;}
+    inline void setMagAtkDecSpecialLast(Int16 nLast) { _magAtkDecSpecialLast = nLast; }
+    inline void setMagAtkDecSpecial(float v, Int16 nlast){ _magAtkDecSpecial = v; _magAtkDecSpecialLast = nlast; }
+
     inline bool getSingleAttackFlag(){ return _bSingleAttackFlag; }
     inline void setSingleAttackFlag(bool b){ _bSingleAttackFlag =  b; }
 
@@ -559,6 +569,10 @@ private:
     Int16 _atkSpecialLast;
     float _magAtkAddSpecial;
     Int16 _magAtkSpecialLast;
+    float _atkDecSpecial;  // 技能符文:自己被对方吸收的攻击
+    Int16 _atkDecSpecialLast;
+    float _magAtkDecSpecial;
+    Int16 _magAtkDecSpecialLast;
 
     float _bleedRandom;
     Int16 _bleedRandomLast;

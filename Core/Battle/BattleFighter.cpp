@@ -46,6 +46,7 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _confuse_bleed(0), _confuse_cd(0), _confuse_bleed_last(0),
     _colorStock(0), _colorStockTimes(0), _colorStockLast(0),
     _atkAddSpecial(0), _atkSpecialLast(0), _magAtkAddSpecial(0), _magAtkSpecialLast(0), 
+    _atkDecSpecial(0), _atkDecSpecialLast(0), _magAtkDecSpecial(0), _magAtkDecSpecialLast(0),
     _bleedRandom(0), _bleedRandomLast(0), _bleedAttackClass(1),_bleedBySkill(0), _bleedBySkillLast(0), _bleedBySkillClass(1),
     _hitChangeByPeerless(0),_counterChangeByPeerless(0),_bSingleAttackFlag(false),_bMainTargetDead(false),_nCurrentAttackIndex(0)
 {
@@ -1111,6 +1112,12 @@ float BattleFighter::getHitrate(BattleFighter* defgt)
     else
         hiterate = _formula->calcHitrate(this, defgt) + _hitrateAdd + _hitrateAdd2 + _hitChangeByPeerless;
 
+// #ifdef _DEBUG
+//     if (_hitChangeByPeerless != 0)
+//     {
+//         fprintf(stderr, "old hitrate = %f, new hitrate = %f\n", hiterate - _hitChangeByPeerless, hiterate);
+//     }
+// #endif
     if(hiterate > GObject::GObjectManager::getHiterateMax() && !isNpc())
         hiterate = GObject::GObjectManager::getHiterateMax();
 
@@ -1178,6 +1185,13 @@ float BattleFighter::getCounter(BattleFighter* defgt)
         counter = _counter + _counterAdd + _counterAdd2 + _counterChangeByPeerless;
     else
         counter = _formula->calcCounter(this, defgt) + _counterAdd + _counterAdd2 + _counterChangeByPeerless;
+
+// #ifdef _DEBUG
+//     if (_counterChangeByPeerless != 0)
+//     {
+//         fprintf(stderr, "old counter = %f, new counter = %f\n", counter - _counterChangeByPeerless, counter);
+//     }
+// #endif
 
     if(counter > GObject::GObjectManager::getCounterMax() && !isNpc())
         counter = GObject::GObjectManager::getCounterMax();
