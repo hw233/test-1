@@ -4071,10 +4071,8 @@ bool BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GD
             else if(!ifDecAura)
             {
                 if(value < 0)
-                    ModifySingleAttackValue_SkillStrengthen(bf, skill, value, false);
-                setStatusChange(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill, e_stAura, value, skill->last, scList, scCount, activeFlag);
-                if(value < 0)
                 {
+                    ModifySingleAttackValue_SkillStrengthen(bf, skill, value, false);
                     GData::SkillStrengthenBase* ss = bf->getSkillStrengthen(SKILL_ID(skill->getId()));
                     if(ss)
                     {
@@ -4094,13 +4092,18 @@ bool BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GD
                             }
                             if(bf_company.size() > 0)
                             {
-                                float avevalue = -value*ef->value/100/bf_company.size();
+                                float targetvalue = bo->getAura();
+                                if(targetvalue+value >= 0)  // 扣除的灵气比拥有的少
+                                    targetvalue = -value;
+                                float avevalue = targetvalue*ef->value/100/bf_company.size();
                                 for(auto p=bf_company.begin(),e=bf_company.end(); p!=e; ++p)
                                     setStatusChange(bf, bf->getSide(), *p, 1, skill, e_stAura, avevalue, skill->last, scList, scCount, !activeFlag);
                             }                            
                         }
                     }
                 }
+
+                setStatusChange(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill, e_stAura, value, skill->last, scList, scCount, activeFlag);
             }
         }
     }
