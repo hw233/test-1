@@ -210,6 +210,7 @@ namespace GObject
 
         VAR_RP_VALUE=165,           //周年庆回流用户礼包
         VAR_RP_REWARD_GOT=166,      //回流用户奖励,是否已领取
+        VAR_CONSUME_918 = 167, // 9/18-9/24活动 消耗累积
 
         /** 结束 **/
         VAR_RECHARGE_TOTAL3366 = 169, //3366合作充值活动
@@ -228,7 +229,6 @@ namespace GObject
         VAR_QGAME_GIFT = 188, //Qgame大厅礼包
         VAR_AWARD_BIRTHDAY     = 190, //周年庆活动(生日罗盘许愿星)
         
-        VAR_CONSUME_918 = 191, // 9/18-9/24活动 消耗累积
         VAR_MAX,
     };
 
