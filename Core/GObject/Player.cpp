@@ -12377,6 +12377,7 @@ namespace GObject
         }
         GetPackage()->DelItemAny(9163, 1);
         GameAction()->onGetKillMonsterReward(this);
+        udpLog("916", "F_1099", "", "", "", "", "act");
     }
 
     void Player::consumeGold(UInt32 c)

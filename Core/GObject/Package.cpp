@@ -563,6 +563,13 @@ namespace GObject
                     m_Owner->udpLog("item", strBuf, "", "", "", "", "act", num);
                 }
 
+                if (fromWhere == FromKillMonster)
+                {
+                    char strBuf[32] = "";
+                    snprintf(strBuf, 32, "I_%u_1_%u", typeId, (UInt32)fromWhere);
+                    m_Owner->udpLog("item", strBuf, "", "", "", "", "act", num);
+                }
+
 
 
                 if (typeId == 1209)
@@ -612,6 +619,13 @@ namespace GObject
                     char strBuf[32] = "";
                     m_Owner->udpLog("item", "I_550_1", "", "", "", "", "act", num);
                     snprintf(strBuf, 32, "I_550_1_%d", fromWhere);
+                    m_Owner->udpLog("item", strBuf, "", "", "", "", "act", num);
+                }
+
+                if (fromWhere == FromKillMonster)
+                {
+                    char strBuf[32] = "";
+                    snprintf(strBuf, 32, "I_%u_1_%u", typeId, (UInt32)fromWhere);
                     m_Owner->udpLog("item", strBuf, "", "", "", "", "act", num);
                 }
 
@@ -681,6 +695,12 @@ namespace GObject
                 snprintf(strBuf, 32, "I_550_1_%d", fromWhere);
                 m_Owner->udpLog("item", strBuf, "", "", "", "", "act", count);
             }
+            if (fromWhere == FromKillMonster)
+            {
+                char strBuf[32] = "";
+                snprintf(strBuf, 32, "I_%u_1_%u", typeId, (UInt32)fromWhere);
+                m_Owner->udpLog("item", strBuf, "", "", "", "", "act", count);
+            }
 
             if (typeId == 1209)
                 m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
@@ -725,13 +745,20 @@ namespace GObject
                 m_Owner->udpLog("item", strBuf, "", "", "", "", "act", count);
             }
 
+            if (fromWhere == FromKillMonster)
+            {
+                char strBuf[32] = "";
+                snprintf(strBuf, 32, "I_%u_1_%u", typeId, (UInt32)fromWhere);
+                m_Owner->udpLog("item", strBuf, "", "", "", "", "act", count);
+            }
+
             SendItemData(item);
             ItemNotify(item->GetItemType().getId(), count);
             //获得物品
             //GameAction()->doAttainment(m_Owner, Script::ON_ADD_ITEM, typeId);
             //if((fromWhere != 0  && item->getQuality() >= 3) || (fromWhere == FromMerge && item->getQuality() >= 2))
             //{
-                 AddItemCoursesLog(typeId, static_cast<UInt32>(count), fromWhere);
+            AddItemCoursesLog(typeId, static_cast<UInt32>(count), fromWhere);
             //}
             if (typeId == 1209)
                 m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
