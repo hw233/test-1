@@ -392,6 +392,37 @@ struct DBFrontMap
     UInt32 fighterId;
 };
 
+struct DBTianjie
+{
+	int id;
+	bool is_opened;
+	bool is_execute;
+	bool is_finish;
+	bool is_ok;
+	int level;
+	int rate;
+	int opentime;
+    std::string r1_killed;
+    std::string r2_donated;
+    int r3_copyid;
+    UInt8 r4_day;
+    UInt8 open_next;
+};
+struct DBPlayerMaxLevel
+{
+    int level;
+};
+struct DBTianleizhen
+{
+    int type;
+    int level;
+    int npcid;
+    int score;
+};
+struct DBReportId
+{
+    int id;
+};
 }
 
 
@@ -838,6 +869,50 @@ SPECIALDEF(4)
         UInt32, fighterId
     )
 SPECIALEND()
+
+SPECIALBEGIN(GData::DBTianjie)
+SPECIALDEF(13)
+    (
+    int,id,
+    bool,is_opened,
+    bool,is_execute,
+    bool,is_finish,
+    bool,is_ok,
+    int,level,
+    int,rate,
+    int,opentime,
+    std::string, r1_killed,
+    std::string, r2_donated,
+    int, r3_copyid,
+    UInt8, r4_day,
+    UInt8, open_next
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBPlayerMaxLevel)
+SPECIALDEF(1)
+	(
+	int,level
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBTianleizhen)
+SPECIALDEF(4)
+    (
+    int,type,
+    int,level,
+    int,npcid,
+    int,score
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBReportId)
+SPECIALDEF(1)
+	(
+	int,id
+	)
+SPECIALEND()
+
 
 }
 

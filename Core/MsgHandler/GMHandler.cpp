@@ -35,7 +35,7 @@
 #include "GObject/HeroMemo.h"
 #include "MsgHandler/JsonParser.h"
 #include "GObject/LuckyDraw.h"
-
+#include "GObject/Tianjie.h"
 GMHandler gmHandler;
 
 GMHandler::GMHandler()
@@ -182,6 +182,11 @@ GMHandler::GMHandler()
     Reg(3, "ssup", &GMHandler::OnSSUp);
     Reg(3, "sserase", &GMHandler::OnSSErase);
     Reg(3, "sosog", &GMHandler::OnSoSoGet);
+
+    Reg(3, "tj1", &GMHandler::OnTj1);
+    Reg(3, "tj2", &GMHandler::OnTj2);
+    Reg(3, "tj3", &GMHandler::OnTj3);
+    Reg(3, "tj4", &GMHandler::OnTj4);
     Reg(2, "idip", &GMHandler::OnAddIdip);
     Reg(2, "clear", &GMHandler::OnClearTask);
     Reg(2, "reset", &GMHandler::OnClearCFT);
@@ -2873,6 +2878,20 @@ void GMHandler::OnHandleSignIn(GObject::Player* player, std::vector<std::string>
     }
 }
 
+void GMHandler::OnTj1(GObject::Player* player, std::vector<std::string>& args)
+{
+	if(args.size() < 1)
+		return;
+    int npcCount = atoi(args[0].c_str());
+    GObject::Tianjie::instance().setTj1Count(npcCount);
+}
+void GMHandler::OnTj2(GObject::Player* player, std::vector<std::string>& args)
+{
+	if(args.size() < 1)
+		return;
+    int scoreCount = atoi(args[0].c_str());
+    GObject::Tianjie::instance().setTj2Count(scoreCount);
+}
 void GMHandler::OnAddIdip(GObject::Player * player, std::vector<std::string>& args)
 {
     player->IDIPAddItem(503, 1, true);
@@ -2902,3 +2921,18 @@ void GMHandler::OnClearCFT(GObject::Player* player, std::vector<std::string>& ar
     player->sendDailyInfo();
 }
 
+void GMHandler::OnTj3(GObject::Player* player, std::vector<std::string>& args)
+{
+	if(args.size() < 1)
+		return;
+    int tlzLevelCount = atoi(args[0].c_str());
+    GObject::Tianjie::instance().setTj3Count(tlzLevelCount);
+}
+
+void GMHandler::OnTj4(GObject::Player* player, std::vector<std::string>& args)
+{
+	if(args.size() < 1)
+		return;
+    int bossMaxHp = atoi(args[0].c_str());
+    GObject::Tianjie::instance().setTj4BossHp(bossMaxHp);
+}

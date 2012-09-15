@@ -16,6 +16,7 @@ enum EventID
     EVENT_AUTOCOPY = 7,
     EVENT_TIMETICK = 8,
     EVENT_AUTOFRONTMAP = 9,
+    EVENT_TLZAUTO = 10,
 };
 
 namespace GObject

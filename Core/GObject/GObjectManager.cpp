@@ -2415,7 +2415,6 @@ namespace GObject
 		dungeonManager.add(new Dungeon(dd->getId(), dd));
 		return true;
 	}
-
 	bool GObjectManager::LoadDungeon()
 	{
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());

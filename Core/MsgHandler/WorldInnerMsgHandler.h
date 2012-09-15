@@ -958,6 +958,12 @@ void OnSendConsumeRank ( GameMsgHdr& hdr,  const void* data )
     }
 }
 
+void OnGetQgameGiftAward( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    player->getQgameGiftAward();
+}
+
 void OnRoamResult( GameMsgHdr& hdr,  const void* data )
 {
     MSG_QUERY_PLAYER(player);
@@ -979,7 +985,7 @@ void OnKillMonsterRoamResult( GameMsgHdr& hdr,  const void* data )
 
     struct _Roam
     {
-        UInt8 _pos;
+        UInt32 _pos;
         UInt8 _curType;
         UInt8 _curCount;
         UInt8 _tips;
@@ -1001,6 +1007,8 @@ void OnKillMonsterReqInfo( GameMsgHdr& hdr,  const void* data )
     st << subType;
     UInt8 subType2 = 0;
     st << subType2;
+    st << player->GetVar(VAR_ZYCM_POS);
+    st << static_cast<UInt8>(player->GetVar(VAR_ZYCM_TIPS));
     st << player->GetVar(VAR_XIAGU_CNT);
     st << player->GetVar(VAR_ROUQING_CNT);
     st << player->GetVar(VAR_CAIFU_CNT);

@@ -10,7 +10,7 @@
 #include "MsgID.h"
 #include "GData/Money.h"
 #include "HeroMemo.h"
-
+#include "GObject/Tianjie.h"
 namespace GObject
 {
 
@@ -533,6 +533,10 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
             else
                 randNum = randNum + 1;
             player->GetPackage()->AddItem2(9057, randNum, true, true);
+        }
+        if (GObject::Tianjie::instance().isTjOpened())
+        { 
+            player->GetPackage()->AddItem(9138, 1, false, false);
         }
         bool free = (PLAYER_DATA(player, dungeonCnt) <= getMaxCount());
 		GameAction()->onDungeonWin(player, _id, dpi.totalCount, free);

@@ -89,6 +89,7 @@ namespace Script
 		lua_tinker::def(_L, "getRechargeActive", GObject::World::getRechargeActive);
 		lua_tinker::def(_L, "getRechargeActive3366", GObject::World::getRechargeActive3366);
 		lua_tinker::def(_L, "getYearActive", GObject::World::getYearActive);
+		lua_tinker::def(_L, "getQgameGiftAct", GObject::World::getQgameGiftAct);
 		lua_tinker::def(_L, "getValentineDay", GObject::World::getValentineDay);
 		lua_tinker::def(_L, "getNetValentineDay", GObject::World::getNetValentineDay);
 		lua_tinker::def(_L, "getGirlDay", GObject::World::getGirlDay);
@@ -258,6 +259,7 @@ namespace Script
         CLASS_DEF(Player, sendHappyInfo);
         CLASS_DEF(Player, lastLootPush);
         CLASS_DEF(Player, RegisterAward);
+        CLASS_DEF(Player, BirthdayAward);
         CLASS_DEF(Player, hasRealItemAward);
         CLASS_DEF(Player, getRealItemAward);
         CLASS_DEF(Player, getMoneyArenaLua);
@@ -1215,7 +1217,7 @@ namespace Script
 		return Call<UInt16>("RunTargetAwardRF", player);
     }
 
-    UInt16 GameActionLua::RunNewRegisterAward(Player* player)
+    UInt8 GameActionLua::RunNewRegisterAward(Player* player)
     {
 		assert(player != NULL);
 		return Call<UInt16>("RunNewRegisterAward", player);
@@ -1225,6 +1227,12 @@ namespace Script
     {
 		assert(player != NULL);
 		return Call<UInt8>("RunNewRegisterAwardAD_RF", player, idx);
+    }
+
+    UInt8 GameActionLua::RunBirthdayAward(Player* player)
+    {
+		assert(player != NULL);
+		return Call<UInt16>("RunBirthdayAward", player);
     }
 
     void GameActionLua::sendRNR(Player* player, UInt32 now, UInt32 date, UInt32 total)

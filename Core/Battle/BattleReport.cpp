@@ -4,19 +4,46 @@
 #include "Server/Cfg.h"
 #include "Common/URandom.h"
 #include "Common/DirectoryIterator.h"
+#include "DB/DBConnectionMgr.h"
+#include "DB/DBExecutor.h"
+#include "GData/GDataDBExecHelper.h"
+#include "Server/WorldServer.h"
 
 namespace Battle
 {
 
 BattleReport battleReport;
 
+int lastMaxId = 0;
 void BattleReport::init()
 {
 	try
 	{
+		UInt32 maxid = 0;
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor()); 
+        if (execu.get() != NULL && execu->isConnected())     
+        {
+            GData::DBReportId dbexp;
+            if(execu->Prepare("SELECT maxid from reportid", dbexp) == DB::DB_OK)
+            {
+                if(execu->Next() == DB::DB_OK)
+                {
+                    maxid = dbexp.id;
+                }
+                else
+                {
+                    DB1().PushUpdateData("insert into reportid values(0)");
+                }
+            }
+            if (maxid > 0)
+            {
+                lastMaxId = maxid;
+	    	    IDGenerator::gBattleOidGenerator.Init(maxid);
+                return;
+            }
+        }
 		DirectoryIterator dirit(cfg.reportPath);
 		DirectoryIterator end;
-		UInt32 maxid = 0;
 		while (dirit != end)
 		{
 			DirectoryIterator dirit2(dirit.path().toString());
@@ -84,6 +111,8 @@ void BattleReport::addReport( UInt32 id, std::vector<UInt8>& v )
 		return;
 	fwrite(&v[0], 1, v.size(), f);
 	fclose(f);
+    DB1().PushUpdateData("update reportid set maxid = %d where maxid=%d", id, lastMaxId);
+    lastMaxId = id;
 }
 
 void BattleReport::loadReport( UInt32 id, std::vector<UInt8>& v )

@@ -42,6 +42,7 @@
 #include "Common/Itoa.h"
 #include "Server/SysMsg.h"
 #include "Arena.h"
+#include "Tianjie.h"
 
 namespace GObject
 {
@@ -84,6 +85,7 @@ bool World::_blueactiveday = false;
 bool World::_rechargeactive = false;
 bool World::_rechargeactive3366 = false;
 bool World::_yearact = false;
+bool World::_qgamegiftact = false;
 UInt8 World::_rechargeactiveno = 0;
 bool World::_valentineday = false;
 bool World::_netvalentineday = false;
@@ -806,7 +808,10 @@ void World::World_Midnight_Check( World * world )
     if (bConsumeEnd)
         SendConsumeRankAward();
     if(bMonsterActEnd)
+    {
+        world->killMonsterInit();
 	    SendKillMonsterRankAward();
+    }
 
 	dungeonManager.enumerate(enum_dungeon_midnight, &curtime);
 	globalClans.enumerate(enum_clan_midnight, &curtime);
@@ -885,7 +890,10 @@ void World::World_Boss_Refresh(void*)
 {
     worldBoss.process(TimeUtil::Now());
 }
-
+void World::Tianjie_Refresh(void*)
+{
+	GObject::Tianjie::instance().process(TimeUtil::Now());
+}
 void World::Team_Copy_Process(void*)
 {
     teamCopyManager->process(TimeUtil::Now());
@@ -912,6 +920,8 @@ void World::advancedHookTimer(void *para)
 #endif
 bool World::Init()
 {
+	AddTimer(5 * 1000, Tianjie_Refresh, static_cast<void*>(NULL));
+	
 	GObjectManager::delayLoad();
 	GObjectManager::LoadPracticeData();
 	GObjectManager::LoadTripodData();
@@ -1179,6 +1189,17 @@ bool enum_openact(void * ptr, void * v)
     return true;
 }
 
+bool enum_qgamegift(void * ptr, void * v)
+{
+	Player * pl = static_cast<Player *>(ptr);
+	if(pl == NULL)
+		return true;
+    if(!pl->isOnline())
+        return true;
+    pl->getQgameGiftAward();
+    return true;
+}
+
 void World::World_One_Min( World * world )
 {
 #ifdef _FB
@@ -1210,6 +1231,17 @@ void World::World_One_Min( World * world )
 
     if (day)
         globalPlayers.enumerate(enum_openact, (void*)&day);
+#else
+    if(!World::getQgameGiftAct())
+        return;
+	UInt32 now = world->_now;
+    struct tm t;
+    time_t tt = now;
+    localtime_r(&tt, &t);
+    if(t.tm_hour == 21 && t.tm_min == 0)
+    {
+        globalPlayers.enumerate(enum_qgamegift, static_cast<void *>(NULL));
+    }
 #endif
 }
 
@@ -1646,18 +1678,12 @@ void World::killMonsterAppend(Stream& st, UInt8 index)
     using namespace GObject;
     if(index > 3)
         return;
-    /*
-    st.init(REP::COUNTRY_ACT);
-    UInt8 subType = 0x02;
-    st << subType;
-    UInt8 subType2 = 2;
-    st << subType2;
-    */
-    UInt8 cnt = /*World::*/killMonsterSort[index].size();
+
+    UInt8 cnt = killMonsterSort[index].size();
     if (cnt > RANK_CNT)
         cnt = RANK_CNT;
     UInt32 c = 0;
-    for (RCSortType::iterator i = /*World::*/killMonsterSort[index].begin(), e = /*World::*/killMonsterSort[index].end(); i != e; ++i)
+    for (RCSortType::iterator i = killMonsterSort[index].begin(), e = killMonsterSort[index].end(); i != e; ++i)
     {
         st << i->player->getName();
         st << i->total;
@@ -1671,7 +1697,6 @@ void World::killMonsterAppend(Stream& st, UInt8 index)
         st << nullName;
         st << c;
     }
-    //st << Stream::eos;
 }
 
 void World::killMonsterInit()
@@ -1680,50 +1705,36 @@ void World::killMonsterInit()
     if(!sortInit)
     {
         sortInit = true;
-        printf("-------------------------------------------------------------------------------------------------------------");
         GObject::globalPlayers.enumerate(player_enum_killmonster, 0);
     }
 }
 
 void World::UpdateKillMonsterRank(Player* pl, UInt8 type, UInt8 count)
 {
-#if 0
-    static bool sortInit = false;
-    if(!sortInit)
-    {
-        sortInit = true;
-        print("-------------------------------------------------------------------------------------------------------------");
-        GObject::globalPlayers.enumerate(player_enum_killmonster, 0);
-    }
-#endif
-    Stream st(REP::ACT);
+    Stream st(REP::COUNTRY_ACT);
     UInt8 subType = 0x02;
     st << subType;
     UInt8 subType2 = 0x01;
-    st >> subType2;
-    st << static_cast<UInt8>(pl->GetVar(VAR_ZYCM_POS));
+    st << subType2;
+    st << pl->GetVar(VAR_ZYCM_POS);
     st << static_cast<UInt8>(pl->GetVar(VAR_ZYCM_TIPS));
     st << type;
     UInt32 curCnt;
     if(type == 1)
     {
-        curCnt = pl->GetVar(VAR_XIAGU_CNT) + count;
-        pl->SetVar(VAR_XIAGU_CNT, curCnt);
+        curCnt = pl->GetVar(VAR_XIAGU_CNT);
     }
     else if(type == 2)
     {
-        curCnt = pl->GetVar(VAR_ROUQING_CNT) + count;
-        pl->SetVar(VAR_ROUQING_CNT, curCnt);
+        curCnt = pl->GetVar(VAR_ROUQING_CNT);
     }
     else if(type == 3)
     {
-        curCnt = pl->GetVar(VAR_CAIFU_CNT) + count;
-        pl->SetVar(VAR_CAIFU_CNT, curCnt);
+        curCnt = pl->GetVar(VAR_CAIFU_CNT);
     }
     else if(type == 4)
     {
-        curCnt = pl->GetVar(VAR_CHUANQI_CNT) + count;
-        pl->SetVar(VAR_CHUANQI_CNT, curCnt);
+        curCnt = pl->GetVar(VAR_CHUANQI_CNT);
     }
     else
         curCnt = 0;
@@ -1735,10 +1746,8 @@ void World::UpdateKillMonsterRank(Player* pl, UInt8 type, UInt8 count)
         return;
 
     UInt8 index = type -1;
-    UInt32 oldrank = 0;
     for (RCSortType::iterator i = World::killMonsterSort[index].begin(), e = World::killMonsterSort[index].end(); i != e; ++i)
     {
-        ++oldrank;
         if (i->player == pl)
         {
             World::killMonsterSort[index].erase(i);
@@ -1758,14 +1767,14 @@ void World::UpdateKillMonsterRank(Player* pl, UInt8 type, UInt8 count)
             break;
     }
 
-    if (oldrank <= RANK_CNT || newrank <= RANK_CNT)
+    if (newrank <= RANK_CNT)
     {
         Stream st(REP::COUNTRY_ACT);
-        //st.init(REP::COUNTRY_ACT);
         UInt8 subType = 0x02;
         st << subType;
         UInt8 subType2 = 2;
         st << subType2;
+        st << static_cast<UInt8>(index + 1);
         killMonsterAppend(st, index);
         st << Stream::eos;
         NETWORK()->Broadcast(st);

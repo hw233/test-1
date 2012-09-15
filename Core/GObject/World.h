@@ -141,6 +141,10 @@ public:
     { _yearact = v; }
     inline static bool getYearActive()
     { return _yearact; }
+    inline static void setQgameGiftAct(bool v)
+    { _qgamegiftact = v; }
+    inline static bool getQgameGiftAct()
+    { return _qgamegiftact; }
     inline static void setValentineDay(bool v)
     { _valentineday = v; }
     inline static bool getValentineDay()
@@ -334,6 +338,7 @@ public:
     inline static bool getKillMonsterAct()
     { return _killMonsteract; }
 
+
 	inline Script::WorldScript * getWorldScript() { return _worldScript; }
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
     static void commitArenaForceOnce();
@@ -371,6 +376,7 @@ public:
     static bool _rechargeactive;
     static bool _rechargeactive3366;
     static bool _yearact;
+    static bool _qgamegiftact;
     static UInt8 _rechargeactiveno;
     static bool _valentineday;
     static bool _netvalentineday;
@@ -454,6 +460,7 @@ private:
     static void Team_Copy_Process(void*);
 	static void World_One_Min( World * );
     static void AthleticsPhysicalCheck(void *);
+	static void Tianjie_Refresh(void*);
     //static void advancedHookTimer(void *para);
 
 public:

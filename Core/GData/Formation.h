@@ -39,7 +39,7 @@ public:
     {
         return a.pos < b.pos;
     }
-
+    inline UInt8 getPos(int gridIdx) const {return _grids[gridIdx].pos;}
 private:
 	std::vector<GridEffect> _grids;
     std::vector<UInt32> _levUpItem;

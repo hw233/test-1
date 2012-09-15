@@ -21,7 +21,7 @@
 #endif
 #include "GObject/SortWorker.h"
 #include "Common/StringTokenizer.h"
-
+#include "GObject/Tianjie.h"
 const char* s_HelpInfo = "";
 //////////////////////////////////////////////////////////////////////////
 WorldServer::WorldServer() : m_IsActive(false)
@@ -87,7 +87,7 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
     GObject::VarSystem::Init();
 	cfg.load(scriptStr);
 	globalSysMsg.load();
-	Battle::battleReport.init();
+//	Battle::battleReport.init();
 
 #ifndef _WIN32
 #ifdef _FB
@@ -210,6 +210,8 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 	GObject::GObjectManager::InitIDGen();	    //将各表的最大ID值存入缓存
 	GObject::GObjectManager::loadAllData();
 
+	Battle::battleReport.init();
+	GObject::Tianjie::instance().Init();
 	return true;
 }
 
@@ -367,6 +369,7 @@ void WorldServer::Up()
                 State("open", atoi(st[i].c_str()));
         }
     }
+    GObject::Tianjie::instance().setNetOk();
 }
 
 void WorldServer::Down()

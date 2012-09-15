@@ -295,6 +295,20 @@ namespace GObject
         UInt8 type;
     };
 
+    class EventTlzAuto : public EventBase
+    {
+    public:
+	    EventTlzAuto(Player * player, UInt32 interval,UInt32 count);
+
+    public:
+	    virtual UInt32 GetID() const { return EVENT_TLZAUTO; }
+	    void Process(UInt32);
+	    void complete() const;
+        void notify(bool isBeginAuto = false);
+
+    };
+
+
 	struct Lineup
 	{
 		Lineup(): fid(0), pos(0), fighter(NULL) {}
@@ -409,6 +423,11 @@ namespace GObject
             smcolor.reserve(32);
             yamen.reserve(32);
             ymcolor.reserve(32);
+            memset(tjEvent1, 0, sizeof(tjEvent1));
+            memset(tjColor1, 0, sizeof(tjColor1));
+            memset(tjExp1, 0, sizeof(tjExp1));
+            lastTjEventScore = 0;
+            lastTjTotalScore = 0;
         }
 
 
@@ -487,7 +506,12 @@ namespace GObject
 #ifdef _ARENA_SERVER
         UInt8 entered;
 #endif
-	};
+        short tjEvent1[3];       //天劫事件1的3个据点npc
+        UInt8 tjColor1[3];       //颜色
+        int   tjExp1[3];         //经验  
+        int   lastTjEventScore;      //天劫事件积分
+        int   lastTjTotalScore;      //天劫活动积分
+    };
 
 	class Player:
 		public GObjectBaseT<Player, UInt64>
@@ -519,6 +543,7 @@ namespace GObject
             AutoFrontMap    = 0x00000080,
             InCopyTeam      = 0x00000100,
             ClanRankBattle  = 0x00000200,
+            AutoTlz         = 0x00000400,
             AthleticsBuff   = 0x80000000,
 			AllFlags		= 0xFFFFFFFF
 		};
@@ -639,7 +664,7 @@ namespace GObject
 		void makeWallow(Stream& st);
 
 		void checkLastBattled();
-
+        void addLastTjScore();
 		void checkHPLoss();
 		void checkDeath();
 
@@ -1026,6 +1051,7 @@ namespace GObject
 		//ս??????
 		bool challenge(Player *, UInt32 * = NULL, int * = NULL, bool = true, UInt32 = 0, bool = false, UInt32 = Battle::BS_ATHLETICS1, UInt8 = 0x03);
 		bool attackNpc(UInt32, UInt32 = 0xFFFFFFFF, bool = false, bool = true);
+        bool attackTianjieNpc(UInt32 npcId, UInt32 expMulti = 1, bool isEvent = false, bool isBoss = false);
         bool attackRareAnimal(UInt32 id);
         bool attackCopyNpc(UInt32, UInt8, UInt8, UInt8, UInt8 = 0, bool = false, std::vector<UInt16>* loot = NULL, bool = true);
         bool attackWorldBoss(UInt32, UInt8, UInt8, UInt8, bool = false);
@@ -1079,6 +1105,27 @@ namespace GObject
 		//????ϵͳ
 		inline bool IsInTeam() const { return false; }	//TODO
 
+        //天劫每日任务
+        void OnDoTianjieTask(UInt8 eventId, UInt8 cmd, UInt8 id);
+        UInt8 attackTjEvent1(UInt8 id, UInt8 cmd);
+        UInt8 attackTjEvent3(UInt8 id);
+        void getTjTask1Data(Stream& st, bool isRefresh = false);
+        void getTjTask2Data(Stream& st);
+        void getTjTask3Data(Stream& st);
+        void addExpOrTjScore(int exp, int score, bool isEventScore = true, bool isEndScore = false);
+
+        void clearTjTaskData();
+
+        void processAutoTlz();
+        void cancleAutoTlz();
+        void completeAutoTlz();
+        
+        //周年庆回流用户
+        UInt8 getRPLoginDay();
+        void sendYearRPInfo();
+        void getYearRPPackage();
+        void getYearRPReward();
+        /////
 	public:
 		UInt16   GetFreePackageSize();
 		bool     ExtendPackageSize();
@@ -1287,13 +1334,13 @@ namespace GObject
         void roamingQueqiao(UInt8 pos);
         void qixiStepAdvance(UInt8 pos, UInt8 event, UInt8 score);
         void resetQixi();
-        void killMonsterStepAdvance(UInt8 pos, UInt8 curType, UInt8 curCount, UInt8 tips);
+        void killMonsterStepAdvance(UInt32 pos, UInt8 curType, UInt8 curCount, UInt8 tips);
 
         void beDivorceQixi(Player* pl);
         UInt8 beQixiEyes(Player* pl);
         void onQixiEyesResp(UInt8 bind);
         void postRoamResult(UInt8 pos, UInt8 event, UInt8 score);
-        void postKillMonsterRoamResult(UInt8 pos, UInt8 curType, UInt8 curCount, UInt8 tips);
+        void postKillMonsterRoamResult(UInt32 pos, UInt8 curType, UInt8 curCount, UInt8 tips);
 
         inline bool queQiaoCheck() { return m_qixi.bind; }
         inline UInt8 getQueqiaoPos() { return m_qixi.pos; }
@@ -1394,6 +1441,7 @@ namespace GObject
         std::vector<LastAthAward> _lastAthAward;
         std::vector<GData::LootResult> _equipAward;
 		std::vector<GData::LootResult> _RegisterAward;
+		std::vector<GData::LootResult> _BirthdayAward;
 		std::vector<GData::LootResult> _lastQueqiaoAward;
         std::vector<GData::LootResult> _lastKillMonsterAward;
 
@@ -1592,6 +1640,7 @@ namespace GObject
         void getHappyAward(UInt8 opt);
         void sendHappyInfo(UInt16 itemId = 0);
         void getYearActAward(UInt8 type);
+        void getQgameGiftAward();
         void sendYearActInfo();
         void getTargetAward(UInt8 opt);
         void getTargetAwardRF(UInt8 opt);
@@ -1641,6 +1690,9 @@ namespace GObject
         void lastLootPush(UInt16 itemId, UInt16 num);
         void RegisterAward(UInt16 itemId, UInt16 num);
         void sendNewRegisterAward(UInt8 idx);
+        void BirthdayAward(UInt16 itemId, UInt16 num);
+        void getAwardBirthday(UInt8 opt);
+        void CheckCanAwardBirthday();
         void IDIPAddItem(UInt16 itemId, UInt16 num, bool bind = true);
         void lastQueqiaoAwardPush(UInt16 itemId, UInt16 num);
         void checkLastQueqiaoAward();

@@ -13,7 +13,7 @@
 #include "HeroMemo.h"
 #include "ShuoShuo.h"
 #include "Package.h"
-
+#include "GObject/Tianjie.h"
 namespace GObject
 {
 
@@ -385,6 +385,10 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
                 else
                     randNum = randNum + 1;
                 pl->GetPackage()->AddItem2(9057, randNum, true, true);
+            }
+            if (GObject::Tianjie::instance().isTjOpened())
+            { 
+                pl->GetPackage()->AddItem(9138, 1, false, false);
             }
 
             GameAction()->onFrontMapWin(pl, id, spot, tmp[spot].lootlvl);
