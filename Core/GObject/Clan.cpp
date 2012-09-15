@@ -3838,6 +3838,11 @@ void   Clan::clanCopyMemberOperate(Player * player, UInt8 command, BinaryReader 
             break;
         case 2:
             // 帮派成员操作调整
+            if (!hasClanAuthority(player, CLAN_AUTHORITY_COPY))
+            {
+                player->sendMsgCode(0, 1349);
+            }
+            else
             {
                 UInt64 playerId;
                 brd >> playerId;
