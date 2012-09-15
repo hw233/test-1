@@ -129,6 +129,7 @@ bool World::_pexpitems;
 UInt32 World::_sosomapbegin = 0;
 bool World::_opentest;
 bool World::_consumeactive;
+bool World::_consume918 = false;
 RCSortType World::rechargeSort;
 RCSortType World::consumeSort;
 bool World::_needrechargerank = false;
@@ -305,6 +306,30 @@ bool enum_midnight(void * ptr, void* next)
             pl->SetVar(VAR_RECHARGE_TOTAL, 0);
         }
     }
+    if (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 24) ||
+        TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 24))
+    {
+        int couponCount = 0;
+        int total = pl->GetVar(VAR_CONSUME_918);
+        if (total >= 1000 && total < 5000)
+            couponCount = 300;
+        else if (total >= 5000 && total < 10000)
+            couponCount = 800;
+        else if (total >= 10000 && total < 50000)
+            couponCount = 1500;
+        else if (total >= 50000)
+            couponCount = 5000;
+        if (couponCount > 0)
+        {
+            MailPackage::MailItem mitem[1] = {{0xA000, couponCount}};
+            MailItemsInfo itemsInfo(mitem, Activity, 1);
+            SYSMSGV(title, 5100);
+            SYSMSGV(content, 5102, total, couponCount);
+            Mail* mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content,0xFFFE0000, true, &itemsInfo);
+            GObject::mailPackageManager.push(mail->id, mitem, 1, true);
+        }
+    }
+
 #ifdef _FB
     if (TimeUtil::SharpDay(0, nextday) == TimeUtil::SharpDay(0, World::_levelawardend))
         pl->sendLevelAward();
@@ -885,6 +910,7 @@ void World::advancedHookTimer(void *para)
 #endif
 bool World::Init()
 {
+	GObject::Tianjie::instance().Init();
 	AddTimer(5 * 1000, Tianjie_Refresh, static_cast<void*>(NULL));
 	
 	GObjectManager::delayLoad();

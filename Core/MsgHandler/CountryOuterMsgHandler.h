@@ -1159,6 +1159,12 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     }
     {
         GObject::Tianjie::instance().getTianjieData(pl, true);
+        if (World::getConsume918())
+        {
+            Stream st(REP::DAILY_DATA);
+            st << static_cast<UInt8>(17) << pl->GetVar(VAR_CONSUME_918) << Stream::eos;
+            pl->send((st));
+        }
     }
     if (World::getNeedRechargeRank() || time(NULL) <= World::getRechargeEnd() + 24*60*60)
     {

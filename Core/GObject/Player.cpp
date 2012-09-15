@@ -11204,24 +11204,16 @@ namespace GObject
         UInt32 off = CREATE_OFFSET(created_sharp, now_sharp);
         if (off >= 7)
             return 0;
-
-        UInt32 t = 0;
-        UInt32 cts3 = 0;
+        UInt32 cts = 0;
         for (int i = off; i >= 0; --i)
         {
             if (ctslanding & (1<<i))
-                ++t;
+                ++cts;
             else
-            {
-                if (cts3 < t)
-                    cts3 = t;
-                t = 0;
-            }
+                break;
         }
-        if (cts3 < t)
-            cts3 = t;
-        cts3 = cts3 < 3 ? cts3 : 3;
-        return cts3;
+
+        return cts;
     }
     void Player::sendYearRPInfo()
     {
@@ -11366,7 +11358,7 @@ namespace GObject
     {15, 20}, {510, 10}, {56, 10}, {57, 10}, {502, 100},
     {514, 10}, {508, 10}, {506, 10},{1700, 1} };
     const int g_rp2Items[][2] = {
-    {15, 30}, {56, 20}, {57, 20}, {502, 100}, {203,20},
+    {15, 30}, {56, 20}, {57, 20}, {502, 100}, {503,20},
     {515, 10}, {508, 10}, {506, 10},{1700, 1} };
     const int g_rp3Items[][2] = {
     {15, 50}, {515, 20}, {509, 20}, {507, 20},
@@ -11394,16 +11386,20 @@ namespace GObject
             {
                 for (int i = 0; i < 9; ++i)
                     GetPackage()->Add(g_rp1Items[i][0], g_rp1Items[i][1], true);
+
+                udpLog("rpPacket", "F_1100_1", "", "", "", "", "act");
             }
             else if (2 == packageType)
             {
                 for (int i = 0; i < 9; ++i)
                     GetPackage()->Add(g_rp2Items[i][0], g_rp2Items[i][1], true);
+                udpLog("rpPacket", "F_1100_2", "", "", "", "", "act");
             }
             else if (3 == packageType)
             {
                 for (int i = 0; i < 8; ++i)
                     GetPackage()->Add(g_rp3Items[i][0], g_rp3Items[i][1], true);
+                udpLog("rpPacket", "F_1100_3", "", "", "", "", "act");
             }
             rpValue += (0xFF+1);
             SetVar(VAR_RP_VALUE, rpValue);
@@ -11427,6 +11423,7 @@ namespace GObject
             send(st);
             return;
         }
+        cts = cts > 3 ? 3 : cts;
         getCoupon(10*cts);
         for (int i = 0; i < 3; ++i)
         {
@@ -12378,6 +12375,61 @@ namespace GObject
             SetVar(VAR_CONSUME, total+c);
             sendConsumeInfo(true);
         }
+        if (World::getConsume918())
+        {
+            UInt32 total = GetVar(VAR_CONSUME_918);
+            if (total < 100)
+            {
+                if (total+c >= 100)
+                {
+                    MailPackage::MailItem item = {515,2};
+                    sendMailItem(5100, 5101, &item, 1, true);
+                }
+            }
+            int gold = 0;
+            int coupon = 0;
+            if (total < 1000 && total+c>=1000)
+            {
+                gold = 1000;
+                coupon = 300;
+                SYSMSGV(title, 5103);
+                SYSMSGV(content, 5104, gold, coupon, coupon);
+                GetMailBox()->newMail(NULL, 0x21, title, content);
+            }
+            if (total < 5000 && total+c>=5000)
+            {
+                gold = 5000;
+                coupon = 500;
+                SYSMSGV(title, 5103);
+                SYSMSGV(content, 5104, gold, coupon, coupon);
+                GetMailBox()->newMail(NULL, 0x21, title, content);
+            
+            }
+            if (total < 10000 && total+c>=10000)
+            {
+                gold = 10000;
+                coupon = 700;
+                SYSMSGV(title, 5103);
+                SYSMSGV(content, 5104, gold, coupon, coupon);
+                GetMailBox()->newMail(NULL, 0x21, title, content);
+            
+            }
+            if (total < 50000 && total+c>=50000)
+            {
+                gold = 50000;
+                coupon = 3500;
+                SYSMSGV(title, 5103);
+                SYSMSGV(content, 5104, gold, coupon, coupon);
+                GetMailBox()->newMail(NULL, 0x21, title, content);
+            }
+            AddVar(VAR_CONSUME_918, c);
+
+            Stream st(REP::DAILY_DATA);
+		    st << static_cast<UInt8>(17) << total+c << Stream::eos;
+		    send((st));
+
+            udpLog("consumeGold", "F_1103", "", "", "", "", "act", c);
+        }
     }
 
     static const UInt32 s_task1ColorScore[] = {100, 200, 300, 400}; //日常任务的积分
@@ -12498,6 +12550,8 @@ namespace GObject
                             useTael(1000, &ci);
                             AddVar(VAR_TJ_TASK2_TAEL, 1);
                             tjScore = s_tjTask2Score[0];
+
+                            udpLog("tianjie", "F_1109_3", "", "", "", "", "act");
                         }
                         else if (1 == id) //仙石
                         {
@@ -12512,6 +12566,7 @@ namespace GObject
                             useGold(10, &ci);
                             AddVar(VAR_TJ_TASK2_GOLD, 1);
                             tjScore = s_tjTask2Score[1];
+                            udpLog("tianjie", "F_1109_1", "", "", "", "", "act");
                         }
                         else if (2 == id) //礼券
                         {
@@ -12526,6 +12581,7 @@ namespace GObject
                             useCoupon(10, &ci);
                             AddVar(VAR_TJ_TASK2_COUPON, 1);
                             tjScore = s_tjTask2Score[2];
+                            udpLog("tianjie", "F_1109_2", "", "", "", "", "act");
                         }
                         else if (3 == id) //天劫印记
                         {
@@ -12538,6 +12594,7 @@ namespace GObject
                             }
                             AddVar(VAR_TJ_TASK2_TJYJ, 1);
                             tjScore = s_tjTask2Score[3];
+                            udpLog("tianjie", "F_1109_4", "", "", "", "", "act");
                         }
                         if (tjScore > 0)
                         {
@@ -12619,6 +12676,11 @@ namespace GObject
             _playerData.tjEvent1[id] = 0;
             _playerData.tjColor1[id] = 0;
             _playerData.tjExp1[id] = 0;
+
+            if (cmd == 1)
+                udpLog("tianjie", "F_1111", "", "", "", "", "act");
+            else if (cmd == 2)
+                udpLog("tianjie", "F_1112", "", "", "", "", "act");
         }
         Stream st(REQ::TIANJIE);
         st <<  static_cast<UInt8>(1) << static_cast<UInt8>(0);
@@ -12653,6 +12715,11 @@ namespace GObject
             getTjTask3Data(st);
             st << Stream::eos;
             send(st); 
+
+            if (copyid == 51)
+            {
+                udpLog("tianjie", "F_1114", "", "", "", "", "act");
+            }
         } 
         return 0;
     }
@@ -12771,6 +12838,8 @@ namespace GObject
             GObject::Tianjie::instance().insertToEventSortMap(this, GetVar(VAR_TJ_EVENT_PRESTIGE), oldScore);
             GObject::Tianjie::instance().updateEventData(this);
             GObject::Tianjie::instance().broadEventTop1(this);
+
+            GObject::Tianjie::instance().udplogScore(this, eventScore, 1);
         
             if (!isEndScore) 
             {
@@ -12783,6 +12852,8 @@ namespace GObject
             AddVar(VAR_TJ_TASK_PRESTIGE, score);
             GObject::Tianjie::instance().insertToScoreSortMap(this, GetVar(VAR_TJ_TASK_PRESTIGE),GetVar(VAR_TJ_TASK_PRESTIGE)-score);
             GObject::Tianjie::instance().updateRankData(this);
+
+            GObject::Tianjie::instance().udplogScore(this, score, 0);
          
             if (!isEndScore)
             {
@@ -12836,6 +12907,8 @@ namespace GObject
         PushTimerEvent(event);
     
         event->notify(true);
+        
+        udpLog("tianjie", "F_1116", "", "", "", "", "act");
     }
     void Player::cancleAutoTlz()
     {
@@ -12888,6 +12961,8 @@ namespace GObject
         //删除定时事件
         PopTimerEvent(this, EVENT_TLZAUTO, getId());
         delFlag(Player::AutoTlz);
+        
+        udpLog("tianjie", "F_1115", "", "", "", "", "act");
        }
 
 EventTlzAuto::EventTlzAuto( Player * player, UInt32 interval, UInt32 count)
@@ -12920,8 +12995,10 @@ void EventTlzAuto::notify(bool isBeginAuto)
         m_Player->addExpOrTjScore(exp, s_task3Score, false);
     }
     if (copyid  >= (s_tjTask3CopyCount+1))
+    {
         m_Player->delFlag(Player::AutoTlz);
-
+        m_Player->udpLog("tianjie", "F_1114", "", "", "", "", "act");
+    }
     Stream st(REQ::TIANJIE);
     UInt8 type = 3;
     UInt8 cmd = 0;

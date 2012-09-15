@@ -12,7 +12,7 @@
 #include "GObject/WBossMgr.h"
 namespace GObject
 {
-    extern URandom GRND;
+extern URandom GRND;
 #define START_WITH_59 0 
 //事件2捐赠的ID
 enum ENUM_ID_TJ2
@@ -117,12 +117,13 @@ static  MailPackage::MailItem s_eventItem[2]= {{30,10}, {509,1}};
 #define TIME_60 60 
 #define ONE_DAY_SECOND (24*3600)
 static const int s_rankKeepTime = 5*3600;
-//static const int s_rankKeepTime = 10*60;
 static const int TJ_EVENT_WAIT_TIME = 10*60;      //天劫事件间隔时间
 static const int TJ_EVENT_PROCESS_TIME = 15*60;   //天劫事件持续时间
 
-//static const int TJ_EVENT_WAIT_TIME  = 10*60;      //天劫事件间隔时间
-//static const int TJ_EVENT_PROCESS_TIME = 15*60;   //天劫事件持续时间
+//static const int s_rankKeepTime = 4*60;
+//static const int TJ_EVENT_WAIT_TIME  = 2*60;      //天劫事件间隔时间
+//static const int TJ_EVENT_PROCESS_TIME = 3*60;   //天劫事件持续时间
+
 Tianjie::Tianjie()
 {
     m_tjTypeId = 0;
@@ -287,6 +288,8 @@ void Tianjie::OpenTj()
     
     if (m_isNetOk)
         NETWORK()->Broadcast(st);
+
+    udplogTjStatus(true);
 }
 	
 bool Tianjie::Init()
@@ -985,6 +988,8 @@ void Tianjie::goNext()
     m_notifyRate = 0;
     if ((m_currTjRate == 4 && !m_isFinish) || m_currTjRate == 5)
     {
+       udplogTjStatus(false);
+
        if (!m_isRankKeep)
        {
            m_eventSortMap.clear();
@@ -1294,6 +1299,8 @@ void Tianjie::donate2(Player* pl, UInt8 id)
                  pl->useTael(1000, &ci);
                  index = 0;
                  score = s_rate2DonateScore[0];
+
+                 pl->udpLog("tianjie", "F_1108_3", "", "", "", "", "act");
              }
              else
                  cmd = 1;
@@ -1305,6 +1312,8 @@ void Tianjie::donate2(Player* pl, UInt8 id)
                  pl->useGold(10, &ci);
                  index = 1;
                  score = s_rate2DonateScore[1];
+                 
+                 pl->udpLog("tianjie", "F_1108_1", "", "", "", "", "act");
              }
              else
                  cmd = 2;
@@ -1316,6 +1325,8 @@ void Tianjie::donate2(Player* pl, UInt8 id)
                  pl->useCoupon(10, &ci);
                  index = 2;
                  score = s_rate2DonateScore[2];
+                 
+                 pl->udpLog("tianjie", "F_1108_2", "", "", "", "", "act");
              }
              else
                  cmd = 3;
@@ -1325,6 +1336,8 @@ void Tianjie::donate2(Player* pl, UInt8 id)
              {
                  index = 3;
                  score = s_rate2DonateScore[3];
+
+                 pl->udpLog("tianjie", "F_1108_4", "", "", "", "", "act");
              }
              else
                  cmd = 4;
@@ -2189,6 +2202,7 @@ void Tianjie::rewardEventBox(Player*pl, int score)
             score = 0;
         }
         pItems[j].count = 1;
+        udplogItem(pl, pItems[j].id, pItems[j].count);
         j++;
     }
     if (j > 0)
@@ -2270,14 +2284,18 @@ void Tianjie::reward(TSortMap& m, UInt8 varId, UInt8 EventOrTotal)
                     nameCardItem.id = s_tjNameCardId[m_tjTypeId];
                     nameCardItem.count = 1;
                     iter->second->sendMailItem(5063, 5064, &nameCardItem, 1, true);
+                    
+                    udplogItem(iter->second, nameCardItem.id, nameCardItem.count);
                 }
                 MailPackage::MailItem weaponItem;
                 weaponItem.id = s_tjWeaponId[m_tjTypeId];
                 weaponItem.count = 1;
                 iter->second->sendMailItem(5065, 5066, &weaponItem, 1, true);
+                udplogItem(iter->second, weaponItem.id, weaponItem.count);
             }
             item.count = 11-i;         //个数
             iter->second->sendMailItem(5052, 5053, &item, 1, true);
+            udplogItem(iter->second, item.id, item.count);
             if (EventOrTotal == 0 && m_isNetOk)
             {
                 SYSMSG_BROADCASTV(5050, i, iter->second->getCountry(), iter->second->getName().c_str(), item.id, item.count);
@@ -2324,12 +2342,12 @@ void Tianjie::rewardBoss()
             (*i).player->addExpOrTjScore(0, (s_tjBossScore-(j-1)*300), false, false);
             (*i).player->sendMailItem(5052, 5053, &item, 1, true);
             SYSMSG_BROADCASTV(5060, j, (*i).player->getCountry(), (*i).player->getName().c_str(), item.id, item.count, (s_tjBossScore-(j-1)*300));
+
+            udplogItem((*i).player, item.id, item.count);
         }
 
         if (m_isOk)
             (*i).player->sendMailItem(5061, 5062, s_eventItem, 2, true);
-        //if (j == 10)
-    //        break;
     }
 
     m_atkinfo.clear();
@@ -2412,6 +2430,34 @@ void Tianjie::clearPlayerTaskScore()
             p->SetVar(VAR_TJ_TASK_PRESTIGE, 0);
         }
     }
+}
+void Tianjie::udplogTjStatus(bool isOpen)
+{
+    std::unordered_map<UInt64, Player*>& pm = GObject::globalPlayers.getMap();
+    std::unordered_map<UInt64, Player*>::iterator iter =  pm.begin();
+    if (iter != pm.end())
+    {
+        Player* pl = iter->second;
+        if (isOpen)
+            pl->udpLog("tianjie", "F_1104_1", "", "", "", "", "act");
+        else
+            pl->udpLog("tianjie", "F_1104_0", "", "", "", "", "act");
+    }
+}
+void Tianjie::udplogItem(Player* pl, UInt32 itemId, int itemCount)
+{
+    char udpStr[32] = {0};
+    sprintf(udpStr, "F_1106_%d", itemId);
+    pl->udpLog("tianjie", udpStr, "", "", "", "", "act", itemCount);
+}
+void Tianjie::udplogScore(Player* pl, int score, bool isEvent)
+{
+    char udpStr[32] = {0};
+    if (isEvent)
+        sprintf(udpStr, "F_1106_%d", m_currTjRate);
+    else
+        strcpy(udpStr, "F_1106_6");
+    pl->udpLog("tianjie", udpStr, "", "", "", "", "act", score);
 }
 std::string Tianjie::GetNextSection(std::string& strString , char cSeperator)
 {
