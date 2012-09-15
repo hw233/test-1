@@ -7,6 +7,7 @@
 #include "GObject/WBossMgr.h"
 #include "GObject/Fighter.h"
 #include "Common/Stream.h"
+#include "Common/Mutex.h"
 #include "MsgHandler/MsgTypes.h"
 #include "MsgHandler/MsgFunc.h"
 #include "Common/BinaryReader.h"
@@ -211,9 +212,9 @@ namespace GObject
         bool m_isOpenNextTianjie;
         int m_nextTjLevel;
 
-        pthread_mutex_t m_eventMutex;
-        pthread_mutex_t m_totalMutex;
-        pthread_mutex_t m_locMutex;
+        Mutex m_eventMutex;
+        Mutex m_totalMutex;
+        Mutex m_locMutex;
     };
 }
 #endif

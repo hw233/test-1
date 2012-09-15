@@ -112,6 +112,8 @@ struct DBSkillStrengthenEffect
     Int16 last;
     Int16 type;
     float value;
+    float valueExt1;
+    float valueExt2;
 };
 
 struct DBSkill
@@ -629,7 +631,7 @@ SPECIALEND()
 
 
 SPECIALBEGIN(GData::DBSkillStrengthenEffect)
-SPECIALDEF(9)
+SPECIALDEF(11)
     (
     UInt16, id,
     UInt16, cond,
@@ -639,7 +641,9 @@ SPECIALDEF(9)
     std::string, factor,
     Int16, last,
     Int16, type,
-    float, value
+    float, value,
+    float, valueExt1,
+    float, valueExt2
     )
 SPECIALEND()
 

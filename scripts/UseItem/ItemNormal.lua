@@ -337,6 +337,17 @@ function ItemNormal_9147_9159(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_9170_9172(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    if iid < 9170 or iid > 9172 then
+        return 0
+    end
+    player:setTitle(iid-9170+33)
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
 function ItemNormal_00000027(iid, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
@@ -4569,6 +4580,22 @@ function ItemNormal_00009161(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_9164_9166(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    package:DelItemSendMsg(iid, player);
+    if iid == 9164 then
+        player:getTael(1000*num)
+    end
+    if iid == 9165 then
+        player:getTael(199*num)
+    end
+    if iid == 9166 then
+        player:getTael(500*num)
+    end
+    return num;
+end
+
 function ItemNormal_00010000(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -4987,7 +5014,7 @@ function ItemNormal_00010021(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-    if package:GetRestPackageSize() < (5+(5*num*4)/99) then
+    if package:GetRestPackageSize() < (6+(6*num*4)/99) then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
@@ -4996,7 +5023,8 @@ function ItemNormal_00010021(iid, num, bind, param)
     package:Add(57, num*5, true, 0, 2);
     package:Add(514, num*4, true, 0, 2);
     package:Add(503, num*3, true, 0, 2);
-    package:Add(47, num*1, true, 0, 2);
+    package:Add(1325, num*2, true, 0, 2);
+    package:Add(9140, num*2, true, 0, 2);
 
     package:DelItemSendMsg(iid, player);
     return num;
@@ -6846,6 +6874,14 @@ local ItemNormal_Table = {
 
     [9161] = ItemNormal_00009161,
     [9162] = ItemNormal_00009161,
+
+    [9164] = ItemNormal_9164_9166,
+    [9165] = ItemNormal_9164_9166,
+    [9166] = ItemNormal_9164_9166,
+
+    [9170] = ItemNormal_9170_9172,
+    [9171] = ItemNormal_9170_9172,
+    [9172] = ItemNormal_9170_9172,
 
     [10000] = ItemNormal_00010000,
     [10001] = ItemNormal_00010001,

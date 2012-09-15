@@ -12,6 +12,7 @@
 #include "GObject/WBossMgr.h"
 namespace GObject
 {
+    extern URandom GRND;
 #define START_WITH_59 0 
 //事件2捐赠的ID
 enum ENUM_ID_TJ2
@@ -165,10 +166,6 @@ Tianjie::Tianjie()
     m_rankKeepTime = 0;
     m_isRankKeep = false;
 
-    pthread_mutex_init(&m_eventMutex, NULL);
-    pthread_mutex_init(&m_totalMutex, NULL);
-    pthread_mutex_init(&m_locMutex, NULL);
-
     m_fighter[0] = NULL;
     m_fighter[1] = NULL;
 
@@ -207,7 +204,7 @@ bool Tianjie::isOpenTj(Player* pl)
  {
  	if (!m_isTjExecute) return false;
 	
-    pthread_mutex_lock(&m_locMutex);
+    m_locMutex.lock();
  	multimap<int, int>::iterator iter = m_locNpcMap.find(loc);
 	//验证怪物和玩家是否在同一个据点
 	while (iter != m_locNpcMap.end())
@@ -216,12 +213,12 @@ bool Tianjie::isOpenTj(Player* pl)
             break;
 	    if (iter->second == npcid)
 	    {
-            pthread_mutex_unlock(&m_locMutex);
+            m_locMutex.unlock();
 	        return true;
 	    }
         ++iter;
 	}
-    pthread_mutex_unlock(&m_locMutex);
+    m_locMutex.unlock();
  	return false;
  }
 bool  Tianjie::isTjRateNpc(int npcid)
@@ -1139,7 +1136,7 @@ void Tianjie::attack1(Player* pl, UInt16 loc, UInt32 npcid)
 	if (index == -1) return;
 	
     bool res = false;
-    pthread_mutex_lock(&m_locMutex);
+    m_locMutex.lock();
     multimap<int, int>::iterator iter = m_locNpcMap.find(loc);
 	//验证怪物和玩家是否在同一个据点
 	while (iter != m_locNpcMap.end())
@@ -1155,7 +1152,7 @@ void Tianjie::attack1(Player* pl, UInt16 loc, UInt32 npcid)
 	    }
         ++iter;
 	}
-    pthread_mutex_unlock(&m_locMutex);
+    m_locMutex.unlock();
 	//玩家赢了
 	if (res)
 	{
@@ -1236,11 +1233,11 @@ void Tianjie::close1()
 }
 void Tianjie::randomTask1Data(int roleLev,short& npcId, UInt8& color, int& exp)
 {
-    int idx = uRand(4);
+    int idx = GRND(4);
     npcId = s_rate1Npc[m_tjTypeId][idx];
 
     //绿色 50%，蓝色27%，紫色15%，橙色8%
-    int num = uRand(100);
+    int num = GRND(100);
     if (num < 50)
         color = 0;
     else if (num < 77)
@@ -1451,7 +1448,7 @@ void Tianjie::putTlzFighters(BattleSimulator& bsim, int tlzLevel)
     UInt16 fIdx = 0;
     int fCount = idVec.size();
     
-    fIdx = uRand(fCount);
+    fIdx = GRND(fCount);
     bsim.setFormation(1, idVec[fIdx]);
     
     const GData::Formation* form = GData::formationManager[idVec[fIdx]];
@@ -1460,7 +1457,7 @@ void Tianjie::putTlzFighters(BattleSimulator& bsim, int tlzLevel)
     int r[5] = {0};
     for (int i = 0; i < 5; i++)
     {
-        int idx = uRand(2);
+        int idx = GRND(2);
         //防止5个一样的怪,客户端怪物icon显示会不同的BUG
         r[i] = idx;
         if (i == 4 && ((r[0]+r[1]+r[2]+r[3]+r[4]==0) || (r[0]+r[1]+r[2]+r[3]+r[4]==5)))
@@ -1541,7 +1538,7 @@ bool Tianjie::attackTlz(Player* pl, UInt16 level)
     }
     pl->checkLastBattled();
 
-    int r = uRand(2);
+    int r = GRND(2);
     Battle::BattleSimulator bsim(Battle::BS_WBOSS, pl, m_tlzNpcName[r], s_tjRoleLevel[m_tjTypeId], false);
     pl->PutFighters(bsim, 0);
     putTlzFighters(bsim, level);
@@ -2013,7 +2010,7 @@ bool Tianjie::addNpc(int npcid)
     Map::GetAllSpot(spots);
     if (!spots.size()) return false;
     
-    UInt16 spot = spots[uRand(spots.size())];
+    UInt16 spot = spots[GRND(spots.size())];
     if (!spot) return false;
  
     if (m_currTjRate == 5)
@@ -2033,9 +2030,9 @@ bool Tianjie::addNpc(int npcid)
     {
         p_map->Show(npcid, true, mo.m_Type);
 
-        pthread_mutex_lock(&m_locMutex);
+        m_locMutex.lock();
         m_locNpcMap.insert(make_pair(spot, npcid));
-        pthread_mutex_unlock(&m_locMutex);
+        m_locMutex.unlock();
 
         m_loc = spot;
    
@@ -2085,7 +2082,7 @@ void Tianjie::insertToEventSortMap(Player* pl, int newScore, int oldScore)
     if (!m_isTjExecute || m_currTjRate >= 4)
         return;
    
-    pthread_mutex_lock(&m_eventMutex);
+    m_eventMutex.lock();
     TSortMap::iterator iter = m_eventSortMap.find(oldScore);
 
     while (iter != m_eventSortMap.end())
@@ -2101,14 +2098,14 @@ void Tianjie::insertToEventSortMap(Player* pl, int newScore, int oldScore)
     }
     m_eventSortMap.insert(make_pair(newScore, pl));
     
-    pthread_mutex_unlock(&m_eventMutex);
+    m_eventMutex.unlock();
 }
 void Tianjie::insertToScoreSortMap(Player* pl, int newScore, int oldScore)
 {
     if (!m_isTjOpened)
         return;
 
-    pthread_mutex_lock(&m_totalMutex);
+    m_totalMutex.lock();
     TSortMap::iterator iter = m_scoreSortMap.find(oldScore);
 
     while (iter != m_scoreSortMap.end())
@@ -2123,42 +2120,42 @@ void Tianjie::insertToScoreSortMap(Player* pl, int newScore, int oldScore)
         ++iter;
     }
     m_scoreSortMap.insert(make_pair(newScore, pl));
-    pthread_mutex_unlock(&m_totalMutex);
+    m_totalMutex.unlock();
 }
 short Tianjie::getEventRank(Player* pl)
 {
     short rank = 0;
 
-    pthread_mutex_lock(&m_eventMutex);
+    m_eventMutex.lock();
     TSortMap::iterator iter;
     for (iter=m_eventSortMap.begin(); iter!=m_eventSortMap.end(); ++iter)
     {
         rank++;
         if (iter->second == pl)
         {
-            pthread_mutex_unlock(&m_eventMutex);
+            m_eventMutex.unlock();
             return rank;
         }
     }
-    pthread_mutex_unlock(&m_eventMutex);
+    m_eventMutex.unlock();
     return 0;
 }
 short Tianjie::getScoreRank(Player* pl)
 {
     short rank = 0;
 
-    pthread_mutex_lock(&m_totalMutex);
+    m_totalMutex.lock();
     TSortMap::iterator iter;
     for (iter=m_scoreSortMap.begin(); iter!=m_scoreSortMap.end(); ++iter)
     {
         rank++;
         if (iter->second == pl)
         {
-            pthread_mutex_unlock(&m_totalMutex);
+            m_totalMutex.unlock();
             return rank;
         }
     }
-    pthread_mutex_unlock(&m_totalMutex);  
+    m_totalMutex.unlock();
     return 0;
 }
 void Tianjie::rewardEventBox(Player*pl, int score)

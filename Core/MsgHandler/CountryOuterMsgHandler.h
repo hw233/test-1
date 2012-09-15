@@ -1173,6 +1173,18 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendYearRPInfo();
     //if(World::getYearActive())
     //    pl->sendYearActInfo();
+    if (World::getQgameGiftAct())
+    {
+        UInt32 now = TimeUtil::Now();
+        struct tm t;
+        time_t tt = now;
+        localtime_r(&tt, &t);
+        if(t.tm_hour == 21 && t.tm_min <= 10)
+        {
+            GameMsgHdr hdr(0x1C5, WORKER_THREAD_WORLD, pl, 0);
+            GLOBAL().PushMsg(hdr, NULL);
+        }
+    }
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )

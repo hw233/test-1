@@ -739,6 +739,8 @@ CREATE TABLE `skillstrengthen_effect` (
   `last` tinyint(3) NOT NULL,
   `type` smallint(6) unsigned NOT NULL DEFAULT 0,
   `value` float(5,2) NOT NULL DEFAULT '1.00',
+  `valueExtend1` float(5,2) NOT NULL DEFAULT '1.00',
+  `valueExtend2` float(5,2) NOT NULL DEFAULT '1.00',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
