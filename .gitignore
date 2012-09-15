@@ -6,6 +6,7 @@
 *.opensdf
 *.sdf
 *.suo
+*.ipch
 cscope.*
 tags
 TAGS

@@ -5,6 +5,8 @@
 #include <vector>
 #include <map>
 
+class Stream;
+
 namespace GObject
 {
 
@@ -23,6 +25,9 @@ public:
     void load(UInt32 id, UInt32 cd, std::string& card_no, std::string& card_psw);
     bool hasAward(UInt32 id);
     void getAward(Player* pl, UInt32 id);
+    void getInfo(Stream& st);
+    bool addAward(UInt32 id, UInt32 cd, std::string& card_no, std::string& card_psw);
+    bool delAward(UInt32 id);
 private:
     FastMutex m_mutex;
     std::map<UInt32, RealItemAward> m_awards;

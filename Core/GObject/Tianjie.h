@@ -7,6 +7,7 @@
 #include "GObject/WBossMgr.h"
 #include "GObject/Fighter.h"
 #include "Common/Stream.h"
+#include "Common/Mutex.h"
 #include "MsgHandler/MsgTypes.h"
 #include "MsgHandler/MsgFunc.h"
 #include "Common/BinaryReader.h"
@@ -156,7 +157,10 @@ namespace GObject
         void clearEventScore();
 
         std::string GetNextSection(std::string& strString , char cSeperator);
-		
+        void udplogTjStatus(bool isOpen);		
+        void udplogItem(Player* pl, UInt32 itemId, int itemCount=1);
+    public:
+        void udplogScore(Player* pl, int score, bool isEvent);
     private:
 		GData::NpcGroup* _ng;
 		multimap<int, int> m_locNpcMap; //据点上的怪物
@@ -211,9 +215,9 @@ namespace GObject
         bool m_isOpenNextTianjie;
         int m_nextTjLevel;
 
-        pthread_mutex_t m_eventMutex;
-        pthread_mutex_t m_totalMutex;
-        pthread_mutex_t m_locMutex;
+        Mutex m_eventMutex;
+        Mutex m_totalMutex;
+        Mutex m_locMutex;
     };
 }
 #endif

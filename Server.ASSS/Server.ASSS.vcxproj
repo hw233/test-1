@@ -273,6 +273,7 @@
     <ClCompile Include="..\Core\GObject\SpecialAward.cpp" />
     <ClCompile Include="..\Core\GObject\TaskMgr.cpp" />
     <ClCompile Include="..\Core\GObject\TeamCopy.cpp" />
+    <ClCompile Include="..\Core\GObject\Tianjie.cpp" />
     <ClCompile Include="..\Core\GObject\TownDeamon.cpp" />
     <ClCompile Include="..\Core\GObject\Trade.cpp" />
     <ClCompile Include="..\Core\GObject\TradeCheck.cpp" />
@@ -787,6 +788,7 @@
     <ClInclude Include="..\Core\GObject\TaskData.h" />
     <ClInclude Include="..\Core\GObject\TaskMgr.h" />
     <ClInclude Include="..\Core\GObject\TeamCopy.h" />
+    <ClInclude Include="..\Core\GObject\Tianjie.h" />
     <ClInclude Include="..\Core\GObject\TownDeamon.h" />
     <ClInclude Include="..\Core\GObject\Trade.h" />
     <ClInclude Include="..\Core\GObject\TradeCheck.h" />

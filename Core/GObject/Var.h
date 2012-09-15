@@ -227,6 +227,8 @@ namespace GObject
 
         VAR_QGAME_GIFT = 188, //Qgame大厅礼包
         VAR_AWARD_BIRTHDAY     = 190, //周年庆活动(生日罗盘许愿星)
+        
+        VAR_CONSUME_918 = 191, // 9/18-9/24活动 消耗累积
         VAR_MAX,
     };
 

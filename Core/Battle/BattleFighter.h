@@ -126,8 +126,8 @@ public:
 	inline float getSoul() { return _soul; }
 	inline float getAura() { return (_aura > 0 ? _aura : 0); }
 	inline float getAuraMax() { return (_auraMax > 0 ? _auraMax : 0); }
-	inline float getAttack() {float ret = _attack + _attackAdd + _attackAdd2; return (ret > 0 ? ret : 0);}
-	inline float getMagAttack() {float ret = _magatk + _magAtkAdd + _magAtkAdd2; return (ret > 0 ? ret : 0);}
+	inline float getAttack() {float ret = _attack + _attackAdd + _attackAdd2 + _atkAddSpecial + _atkDecSpecial; return (ret > 0 ? ret : 0);}
+	inline float getMagAttack() {float ret = _magatk + _magAtkAdd + _magAtkAdd2 + _magAtkAddSpecial + _magAtkDecSpecial; return (ret > 0 ? ret : 0);}
 	inline float getDefend() {float ret = _defend + _defAdd + _defAdd2; return (ret > 0 ? ret : 0);}
 	inline float getMagDefend() {float ret = _magdef + _magDefAdd + _magDefAdd2; return (ret > 0 ? ret : 0);}
 	float getHitrate(BattleFighter* defgt);
@@ -490,6 +490,12 @@ private:
     float _therapy_dec;
     UInt8 _therapy_dec_last;
 
+	float _therapy_add;
+	UInt8 _therapy_add_last;
+
+    float _aura_dec;
+    UInt8 _aura_dec_last;
+
     float _bleed1, _bleed2, _bleed3;
     UInt8 _bleed1_last, _bleed2_last, _bleed3_last;
     UInt8 _immune2;
@@ -497,6 +503,7 @@ private:
     float _def_dec;
     UInt8 _def_dec_last;
     UInt8 _def_dec_times;
+
 
     UInt32 _aura_bleed;
     UInt8 _aura_dec_cd, _aura_bleed_last;
@@ -506,6 +513,82 @@ private:
     UInt8 _confuse_cd, _confuse_bleed_last;
 
     UInt8 _colorStock, _colorStockTimes, _colorStockLast;
+
+    // cotton add for skillstrengthen
+public:
+    inline float getAtkAddSpecial(){ return _atkAddSpecial; }
+    inline Int16 getAtkSpecialLast(){return _atkSpecialLast;}
+    inline void setAtkSpecialLast(Int16 nLast) { _atkSpecialLast = nLast; }
+    inline void setAtkAddSpecial(float v, Int16 nlast){ _atkAddSpecial = v; _atkSpecialLast = nlast; }
+
+    inline float getMagAtkAddSpecial(){ return _magAtkAddSpecial; }
+    inline Int16 getMagAtkSpecialLast(){return _magAtkSpecialLast;}
+    inline void setMagAtkSpecialLast(Int16 nLast) { _magAtkSpecialLast = nLast; }
+    inline void setMagAtkAddSpecial(float v, Int16 nlast){ _magAtkAddSpecial = v; _magAtkSpecialLast = nlast; }
+
+    inline float getAtkDecSpecial(){ return _atkDecSpecial; }
+    inline Int16 getAtkDecSpecialLast(){return _atkDecSpecialLast;}
+    inline void setAtkDecSpecialLast(Int16 nLast) { _atkDecSpecialLast = nLast; }
+    inline void setAtkDecSpecial(float v, Int16 nlast){ _atkDecSpecial = v; _atkDecSpecialLast = nlast; }
+
+    inline float getMagAtkDecSpecial(){ return _magAtkDecSpecial; }
+    inline Int16 getMagAtkDecSpecialLast(){return _magAtkDecSpecialLast;}
+    inline void setMagAtkDecSpecialLast(Int16 nLast) { _magAtkDecSpecialLast = nLast; }
+    inline void setMagAtkDecSpecial(float v, Int16 nlast){ _magAtkDecSpecial = v; _magAtkDecSpecialLast = nlast; }
+
+    inline bool getSingleAttackFlag(){ return _bSingleAttackFlag; }
+    inline void setSingleAttackFlag(bool b){ _bSingleAttackFlag =  b; }
+
+    inline bool getMainTargetDeadFlag(){ return _bMainTargetDead; }
+    inline void setMainTargetDeadFlag(bool b){ _bMainTargetDead = b; }
+
+    inline float getHitChangeByPeerless(){ return _hitChangeByPeerless; }
+    inline void setHitChangeByPeerless(float v){ _hitChangeByPeerless = v; }
+    inline float getCounterChangeByPeerless(){ return _counterChangeByPeerless; }
+    inline void setCounterChangeByPeerless(float v){ _counterChangeByPeerless = v; }
+
+    inline float getBleedRandom(){ return _bleedRandom; }
+    inline void setBleedRandom(float v, Int16 last){ _bleedRandom = v; _bleedRandomLast = last; }
+    inline Int16& getBleedRandomLast(){ return _bleedRandomLast; }
+    inline void setBleedRandomLast(Int16 v){ _bleedRandomLast = v; }
+    inline UInt8 getBleedAttackClass(){ return _bleedAttackClass; }
+    inline void setBleedAttackClass(UInt8 v){ _bleedAttackClass = v; }
+
+    inline float getBleedBySkill(){ return _bleedBySkill; }
+    inline void setBleedBySkill(float v, Int16 last){ _bleedBySkill = v; _bleedBySkillLast = last; }
+    inline Int16& getBleedBySkillLast(){ return _bleedBySkillLast; }
+    inline void setBleedBySkillLast(Int16 v){ _bleedBySkillLast = v; }
+    inline UInt8 getBleedBySkillClass(){ return _bleedBySkillClass; }
+    inline void setBleedBySkillClass(UInt8 v){ _bleedBySkillClass = v; }
+
+    inline int getAttackIndex(){return _nCurrentAttackIndex; }
+    inline void setAttackIndex(int nindex){ _nCurrentAttackIndex = nindex; }
+
+private:
+    float _atkAddSpecial;  // 技能符文吸收对方伤害额外增加的物攻
+    Int16 _atkSpecialLast;
+    float _magAtkAddSpecial;
+    Int16 _magAtkSpecialLast;
+    float _atkDecSpecial;  // 技能符文:自己被对方吸收的攻击
+    Int16 _atkDecSpecialLast;
+    float _magAtkDecSpecial;
+    Int16 _magAtkDecSpecialLast;
+
+    float _bleedRandom;
+    Int16 _bleedRandomLast;
+    UInt8 _bleedAttackClass;  // 流血的时候，前端要根据攻击者的类型表现特效
+
+    float _bleedBySkill;      // 无量七色符文流血
+    Int16 _bleedBySkillLast;
+    UInt8 _bleedBySkillClass;  // 流血的时候，前端要根据攻击者的类型表现特效
+
+    // 由于无双技能导致的额外命中增加、反击减少，只能作用在本次，所以每次攻击完毕，直接清除，也不用通知前端
+    float _hitChangeByPeerless;
+    float _counterChangeByPeerless;
+    
+    bool  _bSingleAttackFlag;  // 群体攻击时候，只攻击到一人的标记
+    bool  _bMainTargetDead;    // 主目标被打死（目前只在area为0的时候做了标记，以后需要就慢慢加好了）
+    int   _nCurrentAttackIndex;  // 当前攻击对象索引，只在我自己需要的时候赋值过，后面的人要用的时候，请在攻击之前自己设置好
 
 public:
     void fakeDead();
@@ -521,6 +604,15 @@ public:
     inline UInt8& getTherapyDecLast() { return _therapy_dec_last; }
     inline float getTherapyDec() { return _therapy_dec; }
     inline void setTherapyDec(float value, UInt8 last) { _therapy_dec = value; _therapy_dec_last = last; }
+
+	// 加治疗效果
+	inline UInt8& getTherapyAddLast() { return _therapy_add_last; }
+	inline float getTherapyAdd() { return _therapy_add; }
+	inline void setTherapyAdd(float value, UInt8 last) { _therapy_add = value; _therapy_add_last = last; }
+
+    inline UInt8& getAuraDecLast() { return _aura_dec_last; }
+    inline float getAuraDec() { return _aura_dec; }
+    inline void setAuraDec(float value, UInt8 last) { _aura_dec = value; _aura_dec_last = last; }
 
     inline UInt8& getBleed1Last() { return _bleed1_last; }
     inline float getBleed1() { return _bleed1; }

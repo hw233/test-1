@@ -5014,7 +5014,7 @@ function ItemNormal_00010021(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-    if package:GetRestPackageSize() < (5+(5*num*4)/99) then
+    if package:GetRestPackageSize() < (6+(6*num*4)/99) then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
@@ -5023,7 +5023,8 @@ function ItemNormal_00010021(iid, num, bind, param)
     package:Add(57, num*5, true, 0, 2);
     package:Add(514, num*4, true, 0, 2);
     package:Add(503, num*3, true, 0, 2);
-    package:Add(47, num*1, true, 0, 2);
+    package:Add(1325, num*2, true, 0, 2);
+    package:Add(9140, num*2, true, 0, 2);
 
     package:DelItemSendMsg(iid, player);
     return num;
@@ -5612,6 +5613,10 @@ local ItemNormal_Table = {
     [1322] = ItemNormal_citta,
     [1323] = ItemNormal_citta,
     [1324] = ItemNormal_citta,
+    [1329] = ItemNormal_citta,
+    [1330] = ItemNormal_citta,
+    [1331] = ItemNormal_citta,
+    [1332] = ItemNormal_citta,
 
     [1000] = ItemNormal_formation,
     [1001] = ItemNormal_formation,
