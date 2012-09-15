@@ -10,6 +10,7 @@
 #include "Common/BinaryReader.h"
 #include "GObject/Leaderboard.h"
 #include "GObject/ActivityMgr.h"
+#include "GObject/TownDeamon.h"
 
 extern "C" {
 //#include "bits.h"
@@ -416,7 +417,7 @@ int query_role_pagoda_req(JsonHead* head, json_t* body, json_t* retbody, std::st
 
     json_insert_pair_into_object(retbody, "ullRoleId", json_new_string(playerId));
     json_insert_pair_into_object(retbody, "szRoleName", json_new_string(fixPlayerName(player->getName()).c_str()));
-    json_insert_pair_into_object(retbody, "uiLayers", my_json_new_number(100)); // TODO:
+    json_insert_pair_into_object(retbody, "uiLayers", my_json_new_number(player->getDeamonPlayerData()?player->getDeamonPlayerData()->maxLevel:0));
 
     head->cmd = 62;
     return 0;
