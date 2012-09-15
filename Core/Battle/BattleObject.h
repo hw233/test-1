@@ -24,7 +24,15 @@ public:
 	inline Class getClass() {return _cls;}
 	inline UInt32 getHP() {return _hp;}
 
-	inline void makeDamage(UInt32 u);
+	virtual void makeDamage(UInt32& u)
+    {
+        if(_hp < u)
+            _hp = 0;
+        else
+            _hp -= u;
+    }
+
+
 
 	inline bool isChar() { return _cls == Char; }
 
@@ -36,14 +44,6 @@ protected:
 	UInt32 _hp;
 	UInt8 _side, _pos;
 };
-
-inline void BattleObject::makeDamage( UInt32 u )
-{
-	if(_hp < u)
-		_hp = 0;
-	else
-		_hp -= u;
-}
 
 }
 

@@ -1,4 +1,4 @@
-#ifndef _SECOND_SOUL_H_
+﻿#ifndef _SECOND_SOUL_H_
 #define _SECOND_SOUL_H_
 
 #include "Config.h"
@@ -32,7 +32,8 @@ struct SoulSkill
 #define SOUL_SKILL_ACUFACTOR     9          // 吐纳术, 修炼速度增加
 #define SOUL_SKILL_AURAEXTRA     10         // 聚灵术, 灵气获得额外增加
 #define SOUL_SKILL_AURAMAX       11         // 通灵术, 灵气上限增加
-#define SOUL_SKILL_PRACLVLUP     12         // 天赋术, 减少元神升级的修为消耗
+//#define SOUL_SKILL_PRACLVLUP     12         // 天赋术, 减少元神升级的修为消耗
+#define SOUL_SKILL_TALENT        12         // 新天赋术，使用无双技能后保留部分灵气（上面那个暂时废除了）
 //#define SOUL_SKILL_ALLATTR      11          // 通神术, 增加元神所有属性
 
 class SecondSoul
@@ -59,6 +60,7 @@ public:
     float getPracticeLevUpFactor();
 
     UInt8 getExtraAura();
+    UInt8 getAuraLeft();
     bool practiceLevelUp(UInt32& pexp);
     SoulSkill* getSoulSkill(UInt8 idx);
     UInt8 getSoulSkillIdx(SoulSkill ss);

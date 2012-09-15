@@ -2,6 +2,11 @@
 *.o
 *.a
 *.swp
+*.obj
+*.opensdf
+*.sdf
+*.suo
+*.ipch
 cscope.*
 tags
 TAGS
@@ -11,3 +16,7 @@ build
 log
 obj
 reports
+Debug
+Release
+lib3rd
+conf/config.lua

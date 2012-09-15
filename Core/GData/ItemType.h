@@ -1,4 +1,4 @@
-#ifndef _ITEMTYPE_H_
+﻿#ifndef _ITEMTYPE_H_
 #define _ITEMTYPE_H_
 
 #include "AttrExtra.h"

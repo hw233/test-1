@@ -1,4 +1,4 @@
-
+﻿
 #ifndef _VAR_H_
 #define _VAR_H_
 
@@ -16,24 +16,24 @@ namespace GObject
         CYCLE_WEEK =    4,  //周
         CYCLE_MONTH =   5,  //月
         CYCLE_YEAR =    6,  //年
-        
+
         CYCLE_MAX,
     };
 
 
     enum VarID
     {
-        VAR_INVALID = 0,    //??Ч??��
-        VAR_SINGLE_CHOPSTICKS = 1, //???????Ϳ???
-        VAR_SENGYI = 2,     // ɮ??
-        VAR_APRON = 3,      // ?Ƕ?
-        VAR_TGDT = 4,       // ?ж???????ʱ??
-        VAR_TGDCNT = 5,     // ?ж???��??????3Сʱ????
-        VAR_ATOFM = 6,     // ?Զ???ͼid
-        VAR_ICEMAN = 7,     // ѩ??
-        VAR_BOOT = 8,     // ʥ??ѥ
+        VAR_INVALID = 0,    //无效变量
+        VAR_SINGLE_CHOPSTICKS = 1, //光棍节送筷子
+        VAR_SENGYI = 2,     //僧衣
+        VAR_APRON = 3,      //肚兜
+        VAR_TGDT = 4,       //感恩节在线时间
+        VAR_TGDCNT = 5,     //感恩节连续在线3小时次数
+        VAR_ATOFM = 6,     //自动阵图id
+        VAR_ICEMAN = 7,     //雪人
+        VAR_BOOT = 8,     //圣诞靴
         VAR_TODAY_ONLINE = 9,     // time -- online today
-        VAR_KEYPACK1 = 10,  // KEY????
+        VAR_KEYPACK1 = 10,  // KEY礼包
         VAR_KEYPACK2 = 11,
         VAR_KEYPACK3 = 12,
         VAR_KEYPACK4 = 13,
@@ -41,17 +41,17 @@ namespace GObject
         VAR_KEYPACK6 = 15,
         VAR_KEYPACK7 = 16,
         VAR_KEYPACK8 = 17,
-       
+
         VAR_FAIL_ENCH = 20,  // fail to enchat equip
         VAR_SPLIT_EQUIP = 21 , //split equip times
         VAR_SPLIT_THRUMP = 22,//split thrump times
-        VAR_BATTLE_MISS = 23, //???????
+        VAR_BATTLE_MISS = 23, //靠靠靠
         VAR_BATTLE_CS  = 24,  //
-        VAR_BATTLE_PR = 25,   //???????
-        VAR_BATTLE_FJ = 26,  //???????
-        VAR_BATTLE_SKILL_DMG = 27, //???????
-        VAR_BATTLE_PEERLESS_DMG = 28,//????????
-        
+        VAR_BATTLE_PR = 25,   //靠靠靠
+        VAR_BATTLE_FJ = 26,  //靠靠靠
+        VAR_BATTLE_SKILL_DMG = 27, //靠靠靠
+        VAR_BATTLE_PEERLESS_DMG = 28,//靠靠靠靠
+
         VAR_COUNTRY_BATTLE_WIN =29,
         VAR_ATHLETICS_WIN = 30 ,
 
@@ -66,7 +66,7 @@ namespace GObject
         VAR_YELLOW_THRUMP_NUM= 38,
 
         VAR_AWARD_3366 = 39,
-        
+
         VAR_CLANBATTLE_HONOUR = 40, //帮派战今日贡献
         VAR_CLAN_WEAL = 41,         //今日领取的福利数
 
@@ -198,8 +198,37 @@ namespace GObject
 
         VAR_AWARD_NEWREGISTER  = 155, //新用户注册抽奖
 
-        VAR_RECHARGE_TOTAL3366 = 169, //3366合作充值活动
+        VAR_TJ_TASK_PRESTIGE=156,   //天劫活动中的声望
+        VAR_TJ_TASK1_NUMBER=157,    //天劫每日任务1的已完成次数
+        VAR_TJ_TASK2_TAEL=158,      //天劫任务2捐献的银币积分
+        VAR_TJ_TASK2_GOLD=159,      //天劫任务2捐献的仙石积分
+        VAR_TJ_TASK2_COUPON=160,    //天劫任务2捐献的礼券积分
+        VAR_TJ_TASK2_TJYJ=161,      //天劫任务2捐献的天劫印记
+        VAR_TJ_TASK2_SCORE=162,     //天劫任务2的积分
+        VAR_TJ_TASK3_COPYID=163,    //天劫任务3当前破阵层数
+        VAR_TJ_EVENT_PRESTIGE=164,  //天劫事件中的声望
 
+        VAR_RP_VALUE=165,           //周年庆回流用户礼包
+        VAR_RP_REWARD_GOT=166,      //回流用户奖励,是否已领取
+
+        /** 结束 **/
+        VAR_RECHARGE_TOTAL3366 = 169, //3366合作充值活动
+        VAR_BDIAMOND_CMD = 170, //蓝钻用户每日可领取当前等级寻宝令
+
+        VAR_YEAR_SWORDSMAN = 180, //周岁剑侠红包
+        VAR_YEAR_NOBLE = 181, //周岁贵族红包
+        /** 斩妖除魔剑侠路 **/
+        VAR_ZYCM_POS = 182, //偏移
+        VAR_XIAGU_CNT = 183, //侠骨个数
+        VAR_ROUQING_CNT = 184, //柔情个数
+        VAR_CAIFU_CNT = 185, //财富个数
+        VAR_CHUANQI_CNT = 186, //传奇个数
+        VAR_ZYCM_TIPS = 187, //随机数1～3，为TIPS
+
+        VAR_QGAME_GIFT = 188, //Qgame大厅礼包
+        VAR_AWARD_BIRTHDAY     = 190, //周年庆活动(生日罗盘许愿星)
+        
+        VAR_CONSUME_918 = 191, // 9/18-9/24活动 消耗累积
         VAR_MAX,
     };
 
@@ -208,7 +237,7 @@ namespace GObject
     m_VarTypes[Var] = Type;
 
 
-    /** 
+    /**
      *@brief 变量系统
      */
     class VarSystem
@@ -261,12 +290,13 @@ namespace GObject
             REGISTER_VAR(VAR_PURPLE_EQUIP_NUM, CYCLE_NONE);
             REGISTER_VAR(VAR_YELLOW_EQUIP_NUM, CYCLE_NONE);
             REGISTER_VAR(VAR_YELLOW_THRUMP_NUM, CYCLE_NONE);
-            
+
             REGISTER_VAR(VAR_AWARD_3366, CYCLE_DAY);
             REGISTER_VAR(VAR_AWARD_QPLUS, CYCLE_DAY);
             REGISTER_VAR(VAR_AWARD_SSDT_1, CYCLE_DAY);
             REGISTER_VAR(VAR_AWARD_SSDT_2, CYCLE_NONE);
             REGISTER_VAR(VAR_AWARD_NEWREGISTER, CYCLE_NONE);
+            REGISTER_VAR(VAR_AWARD_BIRTHDAY, CYCLE_DAY);
 
             REGISTER_VAR(VAR_CLANBATTLE_HONOUR, CYCLE_DAY);
             REGISTER_VAR(VAR_CLAN_WEAL, CYCLE_DAY);
@@ -383,10 +413,33 @@ namespace GObject
             REGISTER_VAR(VAR_SOSOMAPAWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_CONSUME, CYCLE_NONE);
             REGISTER_VAR(VAR_PHYSICAL_BUY, CYCLE_DAY);
+
+            REGISTER_VAR(VAR_TJ_TASK_PRESTIGE,  CYCLE_NONE);
+            REGISTER_VAR(VAR_TJ_TASK1_NUMBER, CYCLE_DAY);
+            REGISTER_VAR(VAR_TJ_TASK2_TAEL, CYCLE_DAY);
+            REGISTER_VAR(VAR_TJ_TASK2_GOLD, CYCLE_DAY);
+            REGISTER_VAR(VAR_TJ_TASK2_COUPON, CYCLE_DAY);
+            REGISTER_VAR(VAR_TJ_TASK2_TJYJ, CYCLE_DAY);
+            REGISTER_VAR(VAR_TJ_TASK2_SCORE, CYCLE_DAY);
+            REGISTER_VAR(VAR_TJ_TASK3_COPYID, CYCLE_DAY);
+            REGISTER_VAR(VAR_TJ_EVENT_PRESTIGE, CYCLE_NONE);
+           
+            REGISTER_VAR(VAR_RP_VALUE, CYCLE_NONE);
+            REGISTER_VAR(VAR_RP_REWARD_GOT, CYCLE_DAY);
+
             REGISTER_VAR(VAR_QQVIP_BUF, CYCLE_DAY);
             REGISTER_VAR(VAR_QQVIP_CNT, CYCLE_DAY);
+            REGISTER_VAR(VAR_BDIAMOND_CMD, CYCLE_DAY);
+            REGISTER_VAR(VAR_YEAR_SWORDSMAN, CYCLE_DAY);
+            REGISTER_VAR(VAR_YEAR_NOBLE, CYCLE_DAY);
+            REGISTER_VAR(VAR_ZYCM_POS, CYCLE_NONE);
+            REGISTER_VAR(VAR_XIAGU_CNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_ROUQING_CNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_CAIFU_CNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_CHUANQI_CNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_QGAME_GIFT, CYCLE_DAY);
         }
-        
+
         UInt32 GetVar(UInt32 id, UInt32 now = 0);
         void SetVar(UInt32 id, UInt32 data, UInt32 now = 0);
         void AddVar(UInt32 id, UInt32 data, UInt32 now = 0);

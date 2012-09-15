@@ -11,7 +11,7 @@ StringTokenizer::StringTokenizer(const std::string& str, const std::string& sepa
 	std::string::const_iterator it2;
 	std::string::const_iterator it3;
 	std::string::const_iterator end = str.end();
-	
+
 	while (it1 != end)
 	{
 		if (options & TOK_TRIM)

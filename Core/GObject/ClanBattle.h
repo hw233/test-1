@@ -13,7 +13,7 @@ namespace GData
 
 namespace GObject
 {
- 
+
 class Clan;
 class Player;
 class ClanDynamicMsg;
@@ -35,23 +35,23 @@ struct ClanBattlePlayer
 	Player * player;
 	UInt32 id;
 	UInt16 hold;
-	UInt8  status;	
+	UInt8  status;
 	UInt8  side;
 	UInt16 reliveNum;
 	UInt16 wins;
-	UInt16 serailWins;	
+	UInt16 serailWins;
 	UInt16 maxSerailWins;
 	UInt8  southEdurance;
-	UInt8  northEdurance;	
+	UInt8  northEdurance;
 	UInt32 grabAchieve;		//对于夺城战，采用积分制
-	UInt32 offTime;		
+	UInt32 offTime;
 	UInt8  hasEnter;
 	UInt8  hasAttack;
 };
 
 struct ClanHoldMonster
 {
-	ClanHoldMonster(std::string n = "", UInt8 l = 0, UInt8 k = 0, UInt16 h = 0, UInt32 b = 0) 
+	ClanHoldMonster(std::string n = "", UInt8 l = 0, UInt8 k = 0, UInt16 h = 0, UInt32 b = 0)
 		: name(n), level(l), klass(k), hold(h), buff(b), dirty(true)
 	{
 		hp.resize(25);
@@ -62,7 +62,7 @@ struct ClanHoldMonster
 	inline UInt32 getHP(UInt8 i) { return i >= hp.size() ? 0 : hp[i]; }
 	inline void setHp(UInt8 i, UInt32 h) { if (i < hp.size()) hp[i] = h; }
 	inline void setMaxHp(UInt8 i, UInt32 h) { if (i < maxHp.size()) maxHp[i] = h; }
-	
+
 	std::string name;
 	UInt8 level;
 	UInt8 klass;
@@ -165,7 +165,7 @@ public:
 	void overClanBattle(UInt8 = 1);
 	inline bool isInBattling()  { return false; /*_isInbattling == 1;*/ }
 	inline bool isInAttacking() { return _isInAttacking; }
-	virtual void configClanBattleCheck() {}		
+	virtual void configClanBattleCheck() {}
 	virtual void configClanBattleData(bool = true);
 	virtual bool resumeClanBattleData(UInt32) { return true; }
 	bool resumePlayerToClanBattle(ClanBattlePlayer *, UInt32 = TimeUtil::Now());
@@ -178,7 +178,7 @@ public:
 	virtual UInt8 getClanRelation(Clan *) { return 0; }
 	UInt8 getClanRelation(Player *, Player *);
 	UInt8 getClanMonsterRelation(Player *);
-	
+
 	virtual UInt32 getClanBattleOverTime() { return 0; }
 
 public:
@@ -286,7 +286,7 @@ protected:
 	ClanBattleHold _holds[4];	// 0xF001:宗祠 0xF002:南门 0xF003:北门 0xF004:复活点
 	bool _firstAttack[2];
 	std::map<Player *, ClanBattlePlayer *> _clanBattlePlayerLocs;
-	std::set<ClanBattlePlayer *> _recoverClanBattlers;	
+	std::set<ClanBattlePlayer *> _recoverClanBattlers;
 	std::set<ClanBattlePlayer *> _offClanBattlers;
 	std::map<std::string, ClanHoldMonster *> _recoverClanHoldAssistant;
 	Stream _attackClanBattlerStream;
@@ -342,7 +342,7 @@ public:
 	void notifyBattleOverMailNotify(UInt8);
 
 
-public: 
+public:
 	static void setMaxEnterCount(UInt8 count){_maxEnterCount = count;}
 	static UInt8 getMaxEnterCount(){return _maxEnterCount;}
 	static UInt8 getClanBattleStatus(UInt8, UInt32 = TimeUtil::Now());
@@ -350,7 +350,7 @@ public:
 public:
 	Clan * getOwnerClan() { return _clan; }
 	UInt32 getOwnerClanId();
-	void setOwnerClanId(UInt32) {} 
+	void setOwnerClanId(UInt32) {}
 	void setOwnerClanRank(UInt8, bool = false) {}
 	UInt8 getOwnerClanRank() { return 0; }
 	UInt8 getOwnerClanLev();

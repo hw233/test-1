@@ -15,8 +15,8 @@ namespace Common {
 	class  Bugcheck
 		/// This class provides some static methods that are
 		/// used by the
-		/// common_assert_dbg(), common_assert(), common_check_ptr() 
-		/// and common_bugcheck() macros. 
+		/// common_assert_dbg(), common_assert(), common_check_ptr()
+		/// and common_bugcheck() macros.
 		/// You should not invoke these methods
 		/// directly. Use the macros instead, as they
 		/// automatically provide useful context information.
@@ -103,7 +103,7 @@ namespace Common {
 
 //
 // common_static_assert
-// 
+//
 // The following was ported from <boost/static_assert.hpp>
 //
 
@@ -112,17 +112,17 @@ template <bool x>
 struct COMMON_STATIC_ASSERTION_FAILURE;
 
 
-template <> 
-struct COMMON_STATIC_ASSERTION_FAILURE<true> 
+template <>
+struct COMMON_STATIC_ASSERTION_FAILURE<true>
 {
-	enum 
-	{ 
-		value = 1 
-	}; 
+	enum
+	{
+		value = 1
+	};
 };
 
 
-template <int x> 
+template <int x>
 struct common_static_assert_test
 {
 };

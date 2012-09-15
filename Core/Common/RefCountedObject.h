@@ -20,12 +20,12 @@ public:
 
 	void duplicate() const;
 		/// Increments the object's reference count.
-		
+
 	void release() const;
 		/// Decrements the object's reference count
 		/// and deletes the object if the count
 		/// reaches zero.
-		
+
 	int referenceCount() const;
 		/// Returns the reference count.
 

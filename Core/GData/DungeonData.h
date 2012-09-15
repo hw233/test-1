@@ -32,7 +32,7 @@ struct DungeonLevel
 {
 	const DungeonMonster * monsterSet;
 	std::vector<const LootItem *> loots;
-	
+
 	void getLoot(GObject::Player *, UInt32, UInt8 = 0) const;
 };
 

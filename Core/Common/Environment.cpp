@@ -26,13 +26,13 @@ std::string Environment::get(const std::string& name, const std::string& default
 		return defaultValue;
 }
 
-	
+
 bool Environment::has(const std::string& name)
 {
 	return EnvironmentImpl::hasImpl(name);
 }
 
-	
+
 void Environment::set(const std::string& name, const std::string& value)
 {
 	EnvironmentImpl::setImpl(name, value);
@@ -44,18 +44,18 @@ std::string Environment::osName()
 	return EnvironmentImpl::osNameImpl();
 }
 
-	
+
 std::string Environment::osVersion()
 {
 	return EnvironmentImpl::osVersionImpl();
 }
 
-	
+
 std::string Environment::osArchitecture()
 {
 	return EnvironmentImpl::osArchitectureImpl();
 }
-	
+
 
 std::string Environment::nodeName()
 {

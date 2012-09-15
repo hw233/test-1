@@ -1,4 +1,4 @@
-#ifndef _TASKDATA_INC_
+﻿#ifndef _TASKDATA_INC_
 #define _TASKDATA_INC_
 
 #include <string>
@@ -15,7 +15,7 @@ namespace GObject
 		UInt32				m_AcceptNpc;
 		UInt32				m_SubmitNpc;
 		UInt16				m_LoopTask;			//valid if m_Class == 3
-		UInt16				m_AcceptMaxNum;	
+		UInt16				m_AcceptMaxNum;
 
 		UInt64				m_OwnerId;
 		UInt32				m_AcceptTime;
@@ -64,7 +64,7 @@ namespace GObject
 		bool operator<(const DayTaskData& other) const { return m_LoopTaskId < other.m_LoopTaskId; }
 		bool operator==(const DayTaskData& other) const { return m_LoopTaskId == other.m_LoopTaskId; }
 	};
-	
+
 }
 
 #endif

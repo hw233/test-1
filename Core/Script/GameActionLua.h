@@ -1,4 +1,4 @@
-#ifndef _GAMEACTIONLUA_INC_
+﻿#ifndef _GAMEACTIONLUA_INC_
 #define _GAMEACTIONLUA_INC_
 
 #include "Script.h"
@@ -38,7 +38,7 @@ namespace Script
         FAIL_ENCH = 10169,
         SPLIT_EQUIP = 10176,
         SPLIT_EQUIP_COLOR = 10178,
-        
+
         ADD_TRUMP  = 10200,
         ADD_NTRUMP = 10201,
         SPLIT_THRUMP = 10208,
@@ -64,7 +64,7 @@ namespace Script
         COUNTRY_BATTLE_WIN = 10552,
         COUNTRY_BATTLE_KILL_STREAK = 10555,
         ATHLETICS_WIN = 10558,
-    
+
         BATTLE_MISS = 10601,
         BATTLE_CS = 10602,
         BATTLE_PR = 10603,
@@ -136,9 +136,9 @@ namespace Script
 	public:
 		void Print() { std::cout << "Lua Test" << std::endl; }
 		void DoLuaTest(Player * player, const std::string& buffer);
- 
+
 	public:
-		template <typename R> 
+		template <typename R>
 		inline R RunMO(Player* player, UInt32 npcId);
 
 		Table RunCollectTask(Player* player, UInt32 npcId);
@@ -147,7 +147,7 @@ namespace Script
 		bool RunExploreTask(Player* player, UInt32 npcId);	//true:??̽???????? false:û??̽??????
 
 		bool  RunAutoBattleAction(Player* player, UInt32 npcId, UInt32 turns);
-		
+
 		bool  CheckTaskAcceptCondition(Player* player, UInt32 taskId);	//????????????????
 		Table RunTask(Player* player, UInt32 taskId, UInt32 npcId);
 		Table RunTaskStep(Player* player, UInt32 taskId, UInt8 step);
@@ -175,8 +175,8 @@ namespace Script
 		bool IsItemTaskItem(UInt32 itemId);
 		bool IsTaskItemItem(UInt32 itemId);
 
-		bool RunTaskItemUse(Player* player, UInt32 itemId);	
-		bool RunItemTaskUse(Player* player, UInt32 itemId);	
+		bool RunTaskItemUse(Player* player, UInt32 itemId);
+		bool RunItemTaskUse(Player* player, UInt32 itemId);
 		UInt16 RunItemNormalUse(Player* player, UInt32 itemId, UInt32 param, UInt16 num, bool bind);
 		UInt16 RunItemNormalUseOther(Player* player, UInt32 itemId, Player* other, UInt16 num, bool bind);
         UInt16 getRandTrump(UInt8 lvl);
@@ -229,6 +229,7 @@ namespace Script
         lua_tinker::table GetOnlineReward(UInt8 cnt);
         void   GetAtyReward(Player* p, UInt32 flag);
 		UInt32 onLuckyDrawItemRoll(UInt8 type);
+        UInt8 onGetKillMonsterReward(Player* player);
 		UInt32 onDungeonLootItemRoll(Player * player, UInt8 id, UInt8 level, bool isBoss);
 		void onMergeGem(Player * player, UInt8 lev, UInt8 num);
 		bool getActivateAttrResult(UInt8 lastActivateCount, UInt8 quality);
@@ -246,12 +247,15 @@ namespace Script
         UInt16 RunHappyAward(Player* player, UInt8 opt);
         UInt16 RunTargetAward(Player* player);
         UInt16 RunTargetAwardRF(Player* player);
-        UInt16 RunNewRegisterAward(Player* player);
+        UInt8 RunNewRegisterAward(Player* player);
+        UInt8 RunNewRegisterAwardAD_RF(Player* player, UInt8 idx);
+        UInt8 RunBirthdayAward(Player* player);
         void sendRNR(Player* player, UInt32 now, UInt32 date, UInt32 total);
         void sendRechargeMails(Player* player, UInt32 ototal, UInt32 ntotal);
         void sendConsumeMails(Player* player, UInt32 ototal, UInt32 ntotal);
         void onEquipForge(Player* player, UInt32 itemId, UInt32 onums);
         bool onSoSoMapAward(Player* player, UInt8 off);
+        bool onGetYearActAward(Player* player, UInt8 type);
         UInt8 onGetAthlRandomMaxValue(UInt8 diffculty);
         UInt32 onGetAthlRandomAward(UInt8 diffculty, UInt8 opt);
         UInt8 onGetAthlRandomDiffculty();
@@ -259,7 +263,7 @@ namespace Script
 
 		template <typename R>
 		inline R Run(Player* player, const std::string& script);
-		
+
 		template <typename R, typename T1>
 		inline R Run(Player* player, const std::string& script, const T1& t1);
 		template <typename R, typename T1, typename T2>

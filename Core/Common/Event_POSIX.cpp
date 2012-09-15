@@ -21,8 +21,8 @@ EventImpl::~EventImpl()
 void EventImpl::waitImpl()
 {
 	if (pthread_mutex_lock(&_mutex))
-		throw SystemException("wait for event failed (lock)"); 
-	while (!_state) 
+		throw SystemException("wait for event failed (lock)");
+	while (!_state)
 	{
 		if (pthread_cond_wait(&_cond, &_mutex))
 		{
@@ -59,8 +59,8 @@ bool EventImpl::waitImpl(long milliseconds)
 #endif
 
 	if (pthread_mutex_lock(&_mutex) != 0)
-		throw SystemException("wait for event failed (lock)"); 
-	while (!_state) 
+		throw SystemException("wait for event failed (lock)");
+	while (!_state)
 	{
 		if ((rc = pthread_cond_timedwait(&_cond, &_mutex, &abstime)))
 		{

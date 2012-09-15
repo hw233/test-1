@@ -18,7 +18,9 @@ enum
 	WORKER_THREAD_WORLD,			//世界线程
 	WORKER_THREAD_LOGIN,			//登录
 	WORKER_THREAD_SORT,				//排序
+#ifndef _WIN32
 	WORKER_THREAD_DC,				//
+#endif
 	WORKER_THREAD_DB,				//5  DB
 	WORKER_THREAD_DB1,				//6  DB1 player,trade
 	WORKER_THREAD_DB2,				//7  DB2 fighter

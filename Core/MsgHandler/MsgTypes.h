@@ -9,7 +9,7 @@ namespace GObject
 }
 
 struct MsgHdr
-{	
+{
 	MsgHdr(): desWorkerID(0), cmdID(0), bodyLen(0) {}
 	MsgHdr(UInt32 id, UInt8 did, UInt32 blen): desWorkerID(did), cmdID(id), bodyLen(blen) {}
 	UInt8	desWorkerID;
@@ -41,7 +41,7 @@ struct LoginMsgHdr
 		playerID(0), sessionID(0) { }
 #ifdef _ARENA_SERVER
     LoginMsgHdr(UInt32 id, UInt8 did, int sess, UInt32 blen):
-        msgHdr(id, did, blen), sessionID(sess) { } 
+        msgHdr(id, did, blen), sessionID(sess) { }
 #endif
 	LoginMsgHdr(UInt32 id, UInt8 did, UInt64 pid, int sess, UInt32 blen):
 		msgHdr(id, did, blen), playerID(pid), sessionID(sess) { }

@@ -17,7 +17,7 @@ public:
 	{
 		_mutex.lock();
 	}
-	
+
 	~ScopedLocker()
 	{
 		_mutex.unlock();
@@ -46,12 +46,12 @@ public:
 	{
 		_pMutex->lock();
 	}
-	
+
 	~ScopedLockerWithUnlock()
 	{
 		unlock();
 	}
-	
+
 	void unlock()
 	{
 		if (_pMutex)

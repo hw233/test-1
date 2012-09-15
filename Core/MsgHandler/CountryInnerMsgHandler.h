@@ -1,4 +1,4 @@
-#ifndef _COUNTRYINNERMSGHANDLER_H_
+﻿#ifndef _COUNTRYINNERMSGHANDLER_H_
 #define _COUNTRYINNERMSGHANDLER_H_
 
 #include "Server/GlobalObject.h"
@@ -23,7 +23,9 @@
 #include "Common/Itoa.h"
 #include "Script/BattleFormula.h"
 #include "GObject/Clan.h"
+#ifndef _WIN32
 #include "GObject/DCLogger.h"
+#endif
 #include "GObject/ShuoShuo.h"
 #include "Common/StringTokenizer.h"
 
@@ -38,7 +40,7 @@ void PlayerEnter( GameMsgHdr& hdr, const void * data )
 		{
 			delete player;
 			return;
-		} 
+		}
 		//player->GetPackage()->AddItemFromDB(8942, 1, true);
 		//DB3().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(8942, 1, %"I64_FMT"u, 1)", player->getId());
 	}
@@ -105,9 +107,9 @@ void OnBroadcast( GameMsgHdr& hdr, const void * data )
 {
 #define MSG_MAX 4096
     struct BroadcastMsg
-    {   
+    {
         Map* map;
-        Player* pl; 
+        Player* pl;
         int size;
         char msg[MSG_MAX];
     };
@@ -854,7 +856,7 @@ void OnGoldRecharge( GameMsgHdr& hdr, const void * data )
     if (type == 0)
     {
         struct Recharge
-        {   
+        {
             UInt8 type;
             UInt32 gold;
             char no[256];
@@ -876,16 +878,18 @@ void OnGoldRecharge( GameMsgHdr& hdr, const void * data )
         snprintf(nno, 256, "%s#%s", recharge->uint, recharge->no);
         player->udpLog(nno, recharge->money, gold, id, "", "pay", "pay");
 
+#ifndef _WIN32
 #ifdef _FB
 #else
         UInt32 mny = atoi(recharge->money);
         dclogger.fee(player, 0, mny);
 #endif
+#endif //_WIN32
     }
     else
     {
         struct Recharge
-        {   
+        {
             UInt8 type;
             UInt32 gold;
         };
@@ -1082,10 +1086,12 @@ void OnCreateAward(GameMsgHdr& hdr, const void * data)
     else
         player->udpLog("", "", "", "", "", "", "refer");
     player->sendCreateMail();
+#ifndef _WIN32
 #ifdef _FB
 #else
     dclogger.reg(player);
 #endif
+#endif //_WIN32
 }
 
 void OnRunScriptReq( GameMsgHdr&, const void * data )
@@ -1136,7 +1142,7 @@ void OnSetPropsReq( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);
     struct Props
-    {    
+    {
         UInt32 pexp;
         UInt32 prestige;
         UInt32 honor;
@@ -1335,9 +1341,17 @@ void  OnDoAttainment(  GameMsgHdr& hdr, const void* data)
 }
 void  OnDoActivity( GameMsgHdr& hdr, const void* data)
 {
-     MSG_QUERY_PLAYER(player);
-     const stActivityMsg* co = reinterpret_cast<const stActivityMsg*>(data);
-     GameAction()->doAty(player, co->id, co->param1, co->param2);
+    MSG_QUERY_PLAYER(player);
+    const stActivityMsg* co = reinterpret_cast<const stActivityMsg*>(data);
+    if(co->id == AtyTownDeamon)
+    {
+        if(player->GetVar(VAR_TOWNDEAMON))
+            return;
+        else
+            player->SetVar(VAR_TOWNDEAMON, 1);
+    }
+
+    GameAction()->doAty(player, co->id, co->param1, co->param2);
 }
 void OnAwardHIPrestige( GameMsgHdr& hdr, const void* data )
 {
@@ -1409,6 +1423,7 @@ void OnTownDeamonlBeAttack( GameMsgHdr& hdr, const void* data )
 	struct TDBeAttackData
 	{
 		Player * attacker;
+        UInt32 spirit;
 		UInt16 formation;
 		UInt16 portrait;
 		Lineup lineup[5];
@@ -1416,25 +1431,12 @@ void OnTownDeamonlBeAttack( GameMsgHdr& hdr, const void* data )
 
 	TDBeAttackData* tdabd = reinterpret_cast<TDBeAttackData*>(const_cast<void *>(data));
 
-    townDeamonManager->beAttackByPlayer(player, tdabd->attacker, tdabd->formation, tdabd->portrait, tdabd->lineup);
-}
-
-void OnTownDeamonResNotify( GameMsgHdr& hdr, const void* data )
-{
-    MSG_QUERY_PLAYER(player);
-    struct TDResNotify
-    {
-        GObject::Player * peer;
-        bool win;
-    };
-    TDResNotify* notify = reinterpret_cast<TDResNotify*>(const_cast<void *>(data));
-
-    townDeamonManager->notifyChallengeResult(player, notify->peer, notify->win);
+    townDeamonManager->beAttackByPlayer(player, tdabd->attacker, tdabd->spirit, tdabd->formation, tdabd->portrait, tdabd->lineup);
 }
 
 void OnCFriendLvlUp( GameMsgHdr& hdr, const void* data )
 {
-    struct PlayerLvlUp 
+    struct PlayerLvlUp
     {
         Player* player;
         UInt8 lvl;
@@ -1479,7 +1481,7 @@ void OnSendRNR( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);
     struct SendRNR
-    {     
+    {
         Player* player;
         UInt32 off;
         UInt32 date;
@@ -1547,6 +1549,74 @@ void OnRoamintQueqiaoLastLoot( GameMsgHdr& hdr, const void* data )
     MSG_QUERY_PLAYER(player);
     player->checkLastQueqiaoAward();
 }
+
+void OnDelItemAny( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+    struct DelItemInfo
+    {
+        UInt32 id;
+        UInt16 num;
+        UInt8 toWhere;
+    };
+
+	const DelItemInfo* item = reinterpret_cast<const DelItemInfo*>(data);
+    if(item)
+        player->GetPackage()->DelItemAny(item->id, item->num, NULL, item->toWhere);
+}
+
+void OnAddItem( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+    struct AddItemInfo
+    {
+        UInt32 id;
+        UInt16 num;
+        UInt8 bind;
+        UInt8 fromWhere;
+    };
+
+	const AddItemInfo* item = reinterpret_cast<const AddItemInfo*>(data);
+    if(item)
+        player->GetPackage()->AddItem2(item->id, item->num, true, item->bind, item->fromWhere);
+}
+
+void OnTownDeamonChallenge( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+    struct TownDeamonChallenge
+    {
+        Player * defer;
+        UInt32   spirit;
+    };
+
+	const TownDeamonChallenge* tdc = reinterpret_cast<const TownDeamonChallenge*>(data);
+    if(tdc)
+        townDeamonManager->attackPlayer(player, tdc->defer, tdc->spirit);
+}
+
+void OnTownDeamonAutoCompleteQuite( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+    struct TownLevels
+    {
+        UInt16 curLevel;
+        UInt16 levels;
+    };
+
+	const TownLevels* tls = reinterpret_cast<const TownLevels*>(data);
+    if(tls)
+        townDeamonManager->autoCompleteQuite(player, tls->curLevel, tls->levels);
+}
+
+void OnTownDeamonAttackNpc( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	const UInt16 level = *reinterpret_cast<const UInt16*>(data);
+    townDeamonManager->attackNpc(player, level);
+}
+
+
 #if 0
 void OnAdvancedHookExp( GameMsgHdr& hdr, const void* data )
 {
@@ -1554,5 +1624,15 @@ void OnAdvancedHookExp( GameMsgHdr& hdr, const void* data )
     player->advancedHookExp();
 }
 #endif
+void OnSendRechargeRankAward( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    player->sendRechargeRankAward(*(int*)data);
+}
+void OnSendConsumeRankAward( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    player->sendConsumeRankAward(*(int*)data);
+}
 #endif // _COUNTRYINNERMSGHANDLER_H_
 

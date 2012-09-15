@@ -1,4 +1,4 @@
-
+﻿
 #ifndef SKILLTABLE_H_
 #define SKILLTABLE_H_
 
@@ -30,6 +30,9 @@ enum
     /*7*/ SKILL_ENTER,
     /*8*/ SKILL_DEAD,
     /*9*/ SKILL_AFTNATK,
+    /*10*/ SKILL_ONTHERAPY,
+    /*11*/ SKILL_ONSKILLDMG,
+    /*12*/ SKILL_ONOTHERDEAD,
     SKILL_PASSIVES
 };
 
@@ -49,48 +52,48 @@ struct SkillEffect : public ObjectBaseNT<UInt16>
         critical(0), pierce(0), counter(0), magres(0), atkreduce(0), magatkreduce(0) {}
     ~SkillEffect() {}
 
-    UInt8 state;
-    UInt8 immune;
-    UInt8 disperse;
-    Int16 damage;
+    UInt8 state; // 状态: 0-无状态 1-中毒，2-混乱，4-晕眩(无法攻击)，8-无法使用技能, 16-反伤, 32-虚弱, 64-降灵气 有等级之分
+    UInt8 immune; // 对状态技能的免疫,只能免疫比自己技能低的技能
+    UInt8 disperse; // 驱散状态,只对友方使用,除自己外,是状态的值的和
+    Int16 damage; // 物理伤害 num/num% (目前物理伤害和法术伤害互斥)
     float damageP;
-    float adddam;
-    Int16 magdam;
+    float adddam; // 物理伤害附加(具体值)
+    Int16 magdam; // 法术伤害 num/num%
     float magdamP;
-    float addmag;
-    Int16 crrdam;
+    float addmag; // 法术伤害附加(具体值)
+    Int16 crrdam; // 职业伤害 num/num%
     float crrdamP;
-    float addcrr;
-    Int16 hp;
+    float addcrr; // 职业伤害附加(具体值)
+    Int16 hp; // HP改变 [+/-]num/num%
     float hpP;
-    float addhp;
-    Int16 absorb;
+    float addhp; // HP改变附加(具体值)[+/-]
+    Int16 absorb; // 伤害吸血 num/num%
     float absorbP;
-    Int16 thorn;
+    Int16 thorn; // 反弹 num/num%
     float thornP;
-    Int16 inj2hp;
+    Int16 inj2hp; // 受伤回扣 num/num%
     float inj2hpP;
-    Int16 aura;
+    Int16 aura; // 作用士气 [+/-]num/num%
     float auraP;
-    Int16 atk;
+    Int16 atk; // 物理攻击 [+/-]num/num%
     float atkP;
-    Int16 def;
+    Int16 def; // 物理防御 [+/-]num/num%
     float defP;
-    Int16 magatk;
+    Int16 magatk; // 法术攻击 [+/-]num/num%
     float magatkP;
-    Int16 magdef;
+    Int16 magdef; // 法术防御 [+/-]num/num%
     float magdefP;
-    float tough;
-    float action;
+    float tough; // 坚韧[+/-]
+    float action; // 身法[+/-]num/num%
     float actionP;
-    float hitrate;
-    float evade;
-    float critical;
-    float pierce;
-    float counter;
-    float magres;
-    float atkreduce;
-    float magatkreduce;
+    float hitrate; // 命中[+/-]
+    float evade; // 闪避[+/-]
+    float critical; // 暴击[+/-]
+    float pierce; // 击破/护甲穿透[+/-]
+    float counter; // 反击[+/-]
+    float magres; // 法术抵抗[+/-]
+    float atkreduce; // 物理伤害减免
+    float magatkreduce; // 法术伤害减免
 };
 
 struct SkillBase : public ObjectBaseT<UInt16>
@@ -100,13 +103,22 @@ struct SkillBase : public ObjectBaseT<UInt16>
         prob(0), area(0), last(0), cd(0), effect(0) {}
     ~SkillBase() { if (effect) delete effect; }
 
-    UInt8 target;
-    UInt16 cond;
-    float prob;
-    UInt8 area;
-    std::vector<float> factor;
-    Int16 last;
-    UInt16 cd;
+    UInt8 target;              // 作用对象: 0-友方,1-敌方,2-自己(对友方和自己加,对敌方减)
+                               // 触发条件: SKILL_ACTIVE   - 主动
+                               //           SKILL_PEERLESS - 无双技能,当灵气>=100释放
+                               //           SKILL_PREATK   - 攻击前被动触发(回血技能,无概率)
+                               //           SKILL_AFTATK   - 攻击后被动触发(有概率)
+                               //           SKILL_AFTNATK  - 普通攻击后被动触发(有概率)
+                               //           SKILL_BEATKED  - 被攻击后触发(有概率)
+                               //           SKILL_AFTEVD   - 闪避后触发
+                               //           SKILL_AFTRES   - 抵抗后触发
+                               //           SKILL_ENTER    - 入场时触发
+    UInt16 cond;               //           SKILL_DEAD     - 死亡后触发
+    float prob;                // 主动状态触发概率 或 被动触发概率
+    UInt8 area;                // 伤害范围: 0-单体,1-全体,2-横排,3-竖列,4-十字,5-V字,6-T字
+    std::vector<float> factor; // 伤害倍率: 如, 横排伤害 1,0.3,0.5,1,0 距离攻击目标为0的伤害系数是1,距离为2的伤害系数为0.5
+    Int16 last;                // 持续时间: -1-一直有效,0-非持续,N-持续次数
+    UInt16 cd;                 // 冷却回合
     const SkillEffect* effect;
 };
 
@@ -125,7 +137,7 @@ typedef ObjectMapT<SkillEffect, UInt16> SkillEffectManager;
 
 } // namespace GData
 
-#endif // CITTA_H 
+#endif // CITTA_H
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */
 

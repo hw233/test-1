@@ -1,4 +1,4 @@
-#ifndef _GDATADBEXECHELPER_H_
+﻿#ifndef _GDATADBEXECHELPER_H_
 #define _GDATADBEXECHELPER_H_
 
 #include "DB/DBExecHelper.h"
@@ -27,7 +27,7 @@ struct DBItemType
 {
 	UInt32		typeId;         // 物品编号
 	std::string	name;           // 名字
-	UInt8		subClass;       // 物品类型 - 
+	UInt8		subClass;       // 物品类型 -
     UInt8       career;         // 职业
 	UInt16		reqLev;         // 物品(可装备)等级
 	UInt16		vLev;           // 物品(价值)等级
@@ -112,6 +112,8 @@ struct DBSkillStrengthenEffect
     Int16 last;
     Int16 type;
     float value;
+    float valueExt1;
+    float valueExt2;
 };
 
 struct DBSkill
@@ -296,7 +298,7 @@ struct DBExp
 	UInt64 exp;
 };
 
-struct DBSoulExp 
+struct DBSoulExp
 {
 	UInt8 lvl;
 	UInt32 exp;
@@ -392,6 +394,37 @@ struct DBFrontMap
     UInt32 fighterId;
 };
 
+struct DBTianjie
+{
+	int id;
+	bool is_opened;
+	bool is_execute;
+	bool is_finish;
+	bool is_ok;
+	int level;
+	int rate;
+	int opentime;
+    std::string r1_killed;
+    std::string r2_donated;
+    int r3_copyid;
+    UInt8 r4_day;
+    UInt8 open_next;
+};
+struct DBPlayerMaxLevel
+{
+    int level;
+};
+struct DBTianleizhen
+{
+    int type;
+    int level;
+    int npcid;
+    int score;
+};
+struct DBReportId
+{
+    int id;
+};
 }
 
 
@@ -598,7 +631,7 @@ SPECIALEND()
 
 
 SPECIALBEGIN(GData::DBSkillStrengthenEffect)
-SPECIALDEF(9)
+SPECIALDEF(11)
     (
     UInt16, id,
     UInt16, cond,
@@ -608,7 +641,9 @@ SPECIALDEF(9)
     std::string, factor,
     Int16, last,
     Int16, type,
-    float, value
+    float, value,
+    float, valueExt1,
+    float, valueExt2
     )
 SPECIALEND()
 
@@ -824,7 +859,7 @@ SPECIALDEF(4)
     (
         UInt8, id,
         UInt8, floor,
-        UInt8, spot, 
+        UInt8, spot,
         UInt32, fighterId
     )
 SPECIALEND()
@@ -833,11 +868,55 @@ SPECIALBEGIN(GData::DBFrontMap)
 SPECIALDEF(4)
     (
         UInt8, id,
-        UInt8, spot, 
-        UInt8, count, 
+        UInt8, spot,
+        UInt8, count,
         UInt32, fighterId
     )
 SPECIALEND()
+
+SPECIALBEGIN(GData::DBTianjie)
+SPECIALDEF(13)
+    (
+    int,id,
+    bool,is_opened,
+    bool,is_execute,
+    bool,is_finish,
+    bool,is_ok,
+    int,level,
+    int,rate,
+    int,opentime,
+    std::string, r1_killed,
+    std::string, r2_donated,
+    int, r3_copyid,
+    UInt8, r4_day,
+    UInt8, open_next
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBPlayerMaxLevel)
+SPECIALDEF(1)
+	(
+	int,level
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBTianleizhen)
+SPECIALDEF(4)
+    (
+    int,type,
+    int,level,
+    int,npcid,
+    int,score
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBReportId)
+SPECIALDEF(1)
+	(
+	int,id
+	)
+SPECIALEND()
+
 
 }
 

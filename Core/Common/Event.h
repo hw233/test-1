@@ -27,13 +27,13 @@ public:
 		/// Creates the event. If autoReset is true,
 		/// the event is automatically reset after
 		/// a wait() successfully returns.
-		
+
 	~Event();
 		/// Destroys the event.
 
 	void set();
 		/// Signals the event. If autoReset is true,
-		/// only one thread waiting for the event 
+		/// only one thread waiting for the event
 		/// can resume execution.
 		/// If autoReset is false, all waiting threads
 		/// can resume execution.
@@ -55,7 +55,7 @@ public:
 
 	void reset();
 		/// Resets the event to unsignalled state.
-	
+
 private:
 	Event(const Event&);
 	Event& operator = (const Event&);

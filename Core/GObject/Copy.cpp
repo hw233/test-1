@@ -17,7 +17,7 @@
 #include "ShuoShuo.h"
 #include "LuckyDraw.h"
 #include "Package.h"
-
+#include "GObject/Tianjie.h"
 namespace GObject
 {
 #define PRIVILEGE_COUNT 1
@@ -124,15 +124,14 @@ void PlayerCopy::sendInfo(Player* pl, UInt8 id)
         st << count;
     }
     //st << count;
-    count = 0;
-    if(pl->isQQVIP() && World::getQQVipAct()){
-        count = pl->GetVar(VAR_QQVIP_CNT);
-        if(count > PRIVILEGE_COUNT)
-            count = 0;
-    }
+    count = pl->GetVar(VAR_QQVIP_CNT);
+    UInt8 maxCount = 0;
+    if(pl->isQQVIP() && World::getQQVipAct())
+        maxCount = 1;
+    if(count > maxCount)
+        count = maxCount;
     st << count;
-    count = 1;
-    st << count;
+    st << maxCount;
     st << Stream::eos;
     pl->send(st);
 }
@@ -427,7 +426,7 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                 pl->send(st);
             }
 
-            if (!PLAYER_DATA(pl, copyGoldCnt)) 
+            if (!PLAYER_DATA(pl, copyGoldCnt))
                 pl->copyUdpLog(id, 2);
             else
                 pl->copyUdpLog(id, 4);
@@ -460,6 +459,10 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                 else
                     randNum = randNum + 1;
                 pl->GetPackage()->AddItem2(9057, randNum, true, true);
+            }
+            if (GObject::Tianjie::instance().isTjOpened())
+            {
+                pl->GetPackage()->AddItem(9138, 1, false, false);
             }
             GameAction()->onCopyWin(pl, id, tcd.floor, tcd.spot, tcd.lootlvl);
 
@@ -731,7 +734,7 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool 
                 DB3().PushUpdateData("REPLACE INTO `autocopy` (`playerId`, `id`) VALUES (%"I64_FMT"u, %u)", pl->getId(), id);
 
                 Stream st(REP::AUTO_COPY);
-                st << static_cast<UInt8>(0) << id << tcd.floor << tcd.spot << Stream::eos; 
+                st << static_cast<UInt8>(0) << id << tcd.floor << tcd.spot << Stream::eos;
                 pl->send(st);
             }
             break;
@@ -806,12 +809,12 @@ void PlayerCopy::sendAutoCopy(Player* pl)
         return;
 
     FastMutex::ScopedLock lk(_mutex);
-    CopyData& tcd = getCopyData(pl, id); 
+    CopyData& tcd = getCopyData(pl, id);
     if (!tcd.floor)
         return;
 
     Stream st(REP::AUTO_COPY);
-    st << static_cast<UInt8>(0) << id << tcd.floor << tcd.spot << Stream::eos; 
+    st << static_cast<UInt8>(0) << id << tcd.floor << tcd.spot << Stream::eos;
     pl->send(st);
 }
 

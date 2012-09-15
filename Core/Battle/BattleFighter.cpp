@@ -36,10 +36,19 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _atkreduce3(0), _magatkreduce3(0), _pudu_debuf(0),
     _atkreduce3_last(0), _magatkreduce3_last(0), _pudu_debuf_last(0),
     _deep_forget_dmg_extra(0), _deep_forget_last(0), _deep_stun_dmg_extra(0), _deep_stun_last(0),
-    _therapy_dec(0), _therapy_dec_last(0),
+    _therapy_dec(0), _therapy_dec_last(0),_therapy_add(0),_therapy_add_last(0),
+    _aura_dec(0), _aura_dec_last(0),
     _bleed1(0), _bleed2(0), _bleed3(0),
     _bleed1_last(0), _bleed2_last(0), _bleed3_last(0),
-    _immune2(0), _def_dec(0), _def_dec_last(0), _def_dec_times(0)
+    _immune2(0), _def_dec(0), _def_dec_last(0), _def_dec_times(0),
+    _aura_bleed(0), _aura_dec_cd(0), _aura_bleed_last(0),
+    _stun_bleed(0), _stun_cd(0), _stun_bleed_last(0),
+    _confuse_bleed(0), _confuse_cd(0), _confuse_bleed_last(0),
+    _colorStock(0), _colorStockTimes(0), _colorStockLast(0),
+    _atkAddSpecial(0), _atkSpecialLast(0), _magAtkAddSpecial(0), _magAtkSpecialLast(0), 
+    _atkDecSpecial(0), _atkDecSpecialLast(0), _magAtkDecSpecial(0), _magAtkDecSpecialLast(0),
+    _bleedRandom(0), _bleedRandomLast(0), _bleedAttackClass(1),_bleedBySkill(0), _bleedBySkillLast(0), _bleedBySkillClass(1),
+    _hitChangeByPeerless(0),_counterChangeByPeerless(0),_bSingleAttackFlag(false),_bMainTargetDead(false),_nCurrentAttackIndex(0)
 {
     memset(_immuneLevel, 0, sizeof(_immuneLevel));
     memset(_immuneRound, 0, sizeof(_immuneRound));
@@ -51,6 +60,8 @@ void BattleFighter::setFighter( GObject::Fighter * f )
 	_fighter = f;
 
     _peerlessSkill.base = GData::skillManager[_fighter->getPeerlessAndLevel()];
+    // reg skillstrenghten
+    updateSkillStrengthen(_fighter->getPeerlessAndLevel());
 
     std::vector<UInt16> activeSkill;
     _fighter->getUpSkillAndLevel(activeSkill);
@@ -89,6 +100,9 @@ void BattleFighter::setFighter( GObject::Fighter * f )
     std::vector<UInt16>& passiveSkillDeadId = _fighter->getPassiveSkillDead();
     std::vector<UInt16>& passiveSkillAftNAtk = _fighter->getPassiveSkillAftNAtk();
 
+    std::vector<UInt16>& passiveSkillOnTherapy = _fighter->getPassiveSkillOnTherapy();
+    std::vector<UInt16>& passiveSkillOnSkillDmg = _fighter->getPassiveSkillOnSkillDmg();
+    std::vector<UInt16>& passiveSkillOnOtherDead = _fighter->getPassiveSkillOnOtherDead();
 
     cnt = passiveSkillPrvAtk100Id.size();
     _passiveSkillPrvAtk100.clear();
@@ -313,6 +327,45 @@ void BattleFighter::setFighter( GObject::Fighter * f )
 
         updateSkillStrengthen(passiveSkillAftNAtk[idx]);
     }
+
+    cnt = passiveSkillOnTherapy.size();
+    _passiveSkillOnTherapy.clear();
+    for(idx = 0; idx < cnt; idx++)
+    {
+        GData::SkillItem skillItem;
+        skillItem.base = GData::skillManager[passiveSkillOnTherapy[idx]];
+        skillItem.cd = 0;
+        skillItem.rateExtent = 0;
+        _passiveSkillOnTherapy.insert(_passiveSkillOnTherapy.end(), skillItem);
+
+        updateSkillStrengthen(passiveSkillOnTherapy[idx]);
+    }
+
+    cnt = passiveSkillOnSkillDmg.size();
+    _passiveSkillOnSkillDmg.clear();
+    for(idx = 0; idx < cnt; idx++)
+    {
+        GData::SkillItem skillItem;
+        skillItem.base = GData::skillManager[passiveSkillOnSkillDmg[idx]];
+        skillItem.cd = 0;
+        skillItem.rateExtent = 0;
+        _passiveSkillOnSkillDmg.insert(_passiveSkillOnSkillDmg.end(), skillItem);
+
+        updateSkillStrengthen(passiveSkillOnSkillDmg[idx]);
+    }
+
+    cnt = passiveSkillOnOtherDead.size();
+    _passiveSkillOnOtherDead.clear();
+    for(idx = 0; idx < cnt; idx++)
+    {
+        GData::SkillItem skillItem;
+        skillItem.base = GData::skillManager[passiveSkillOnOtherDead[idx]];
+        skillItem.cd = 0;
+        skillItem.rateExtent = 0;
+        _passiveSkillOnOtherDead.insert(_passiveSkillOnOtherDead.end(), skillItem);
+
+        updateSkillStrengthen(passiveSkillOnOtherDead[idx]);
+    }
 }
 
 void BattleFighter::updateAllAttr()
@@ -363,7 +416,7 @@ void BattleFighter::updateAllAttr()
 void BattleFighter::setAttrExtra(UInt8 klass, UInt8 career, UInt8 level)
 {
 	//float strength = 2.5f;
-	//float physique = 6.5f; 
+	//float physique = 6.5f;
 	//float agility = 2.5f;
 	//float intelligence = 1.5f;
 	//UInt32 attack = 25;
@@ -375,7 +428,7 @@ void BattleFighter::setAttrExtra(UInt8 klass, UInt8 career, UInt8 level)
 	//float critical = 0.15;
 	//float pierce = 0.1;
 	//float counter = 0.3;
-	
+
 	UInt8 i = 1;
 	lua_tinker::table factors = _formula->getFactor(klass, career, level);
 	_attrbylevel.strength = static_cast<UInt16>(factors.get<float>(i++));
@@ -611,7 +664,7 @@ float BattleFighter::calcTherapy(bool& isCritical, bool& first, const GData::Ski
     if(skill->cond == GData::SKILL_PEERLESS)
     {
         aura_factor = _aura / 100;
-        _aura = 0;
+       // _aura = 0;  //  set函数统一处理，不在这里修改灵气了 
     }
 
     GData::SkillStrengthenBase* ss = getSkillStrengthen(SKILL_ID(skill->getId()));
@@ -632,7 +685,7 @@ float BattleFighter::calcTherapy(bool& isCritical, bool& first, const GData::Ski
         }
     }
 
-    return aura_factor * ((_magatk + _magAtkAdd + _magAtkAdd2) * skill->effect->hpP + skill->effect->addhp + skill->effect->hp);
+    return aura_factor * (getMagAttack() * skill->effect->hpP + skill->effect->addhp + skill->effect->hp);
 }
 
 float BattleFighter::calcPoison(const GData::SkillBase* skill, BattleFighter* defender, bool cs)
@@ -718,7 +771,9 @@ void BattleFighter::initStats(bool checkEnh)
                     _fighter->getBuffData(FIGHTER_BUFF_DMAN, now) ||
                     _fighter->getBuffData(FIGHTER_BUFF_DWMAN, now) ||
                     _fighter->getBuffData(FIGHTER_BUFF_SMAN, now) ||
-                    _fighter->getBuffData(FIGHTER_BUFF_SWMAN, now))
+                    _fighter->getBuffData(FIGHTER_BUFF_SWMAN, now) ||
+                    _fighter->getBuffData(FIGHTER_BUFF_RDIAMOND, now) ||
+                    _fighter->getBuffData(FIGHTER_BUFF_QQVIP, now))
 				_flag |= 1;
 			_flag |= (_fighter->getOwner()->getBuffData(PLAYER_BUFF_HOLY, 0)) << 28;
 		}
@@ -951,7 +1006,7 @@ const GData::SkillBase* BattleFighter::getPassiveSkill(std::vector<GData::SkillI
             break;
         }
     }
- 
+
     return resSkillBase;
 }
 
@@ -1031,14 +1086,38 @@ void BattleFighter::releaseSkillCD(int cd)
     releaseSkillCD(_passiveSkillAftNAtk, cd);
 }
 
+const GData::SkillBase* BattleFighter::getPassiveSkillOnTherapy()
+{
+    size_t idx = 0;
+    return getPassiveSkill100(_passiveSkillOnTherapy, idx);
+}
+
+const GData::SkillBase* BattleFighter::getPassiveSkillOnSkillDmg()
+{
+    size_t idx = 0;
+    return getPassiveSkill100(_passiveSkillOnSkillDmg, idx);
+}
+
+const GData::SkillBase* BattleFighter::getPassiveSkillOnOtherDead()
+{
+    size_t idx = 0;
+    return getPassiveSkill100(_passiveSkillOnOtherDead, idx);
+}
+
 float BattleFighter::getHitrate(BattleFighter* defgt)
 {
     float hiterate = 0;
     if(defgt == NULL)
-        hiterate = _hitrate + _hitrateAdd + _hitrateAdd2;
+        hiterate = _hitrate + _hitrateAdd + _hitrateAdd2 + _hitChangeByPeerless;
     else
-        hiterate = _formula->calcHitrate(this, defgt) + _hitrateAdd + _hitrateAdd2;
+        hiterate = _formula->calcHitrate(this, defgt) + _hitrateAdd + _hitrateAdd2 + _hitChangeByPeerless;
 
+// #ifdef _DEBUG
+//     if (_hitChangeByPeerless != 0)
+//     {
+//         fprintf(stderr, "old hitrate = %f, new hitrate = %f\n", hiterate - _hitChangeByPeerless, hiterate);
+//     }
+// #endif
     if(hiterate > GObject::GObjectManager::getHiterateMax() && !isNpc())
         hiterate = GObject::GObjectManager::getHiterateMax();
 
@@ -1103,9 +1182,16 @@ float BattleFighter::getCounter(BattleFighter* defgt)
 {
     float counter = 0;
     if(defgt == NULL)
-        counter = _counter + _counterAdd + _counterAdd2;
+        counter = _counter + _counterAdd + _counterAdd2 + _counterChangeByPeerless;
     else
-        counter = _formula->calcCounter(this, defgt) + _counterAdd + _counterAdd2;
+        counter = _formula->calcCounter(this, defgt) + _counterAdd + _counterAdd2 + _counterChangeByPeerless;
+
+// #ifdef _DEBUG
+//     if (_counterChangeByPeerless != 0)
+//     {
+//         fprintf(stderr, "old counter = %f, new counter = %f\n", counter - _counterChangeByPeerless, counter);
+//     }
+// #endif
 
     if(counter > GObject::GObjectManager::getCounterMax() && !isNpc())
         counter = GObject::GObjectManager::getCounterMax();
@@ -1264,5 +1350,269 @@ void BattleFighter::updateSkillStrengthen(UInt16 skillId)
         _skillStrengthen[skill_id] = (GData::SkillStrengthenBase*)(GData::skillStrengthenManager[ssId]);
     }
 }
+
+void BattleFighter::setAttackAdd(float v, UInt16 last)
+{
+    if((v < 0.001f) || (_attackAdd < 0.001f)
+            || ( _attackAdd > 0 && v < 0)
+            || ( _attackAdd < 0 && v > 0)
+            || ((_attackAdd > 0) && (v > 0) && (_attackAdd < v))
+            || ((_attackAdd < 0) && (v < 0) && (_attackAdd > v)))
+    {
+        _attackAdd = v;
+        _atkAdd_last = last;
+    }
+}
+
+void BattleFighter::setMagAttackAdd(float v, UInt16 last)
+{
+    if((v < 0.001f) || (_magAtkAdd < 0.001f)
+            || ( _magAtkAdd > 0 && v < 0)
+            || ( _magAtkAdd < 0 && v > 0)
+            || ((_magAtkAdd > 0) && (v > 0) && (_magAtkAdd < v))
+            || ((_magAtkAdd < 0) && (v < 0) && (_magAtkAdd > v)))
+    {
+        _magAtkAdd = v;
+        _magAtkAdd_last = last;
+    }
+}
+
+void BattleFighter::setDefendAdd(float v, UInt16 last)
+{
+    if((v < 0.001f) || (_defAdd < 0.001f)
+            || ( _defAdd > 0 && v < 0)
+            || ( _defAdd < 0 && v > 0)
+            || ((_defAdd > 0) && (v > 0) && (_defAdd < v))
+            || ((_defAdd < 0) && (v < 0) && (_defAdd > v)))
+    {
+        _defAdd = v;
+        _defAdd_last = last;
+    }
+}
+
+void BattleFighter::setMagDefendAdd(float v, UInt16 last)
+{
+    if((v < 0.001f) || (_magDefAdd < 0.001f)
+            || ( _magDefAdd > 0 && v < 0)
+            || ( _magDefAdd < 0 && v > 0)
+            || ((_magDefAdd > 0) && (v > 0) && (_magDefAdd < v))
+            || ((_magDefAdd < 0) && (v < 0) && (_magDefAdd > v)))
+    {
+        _magDefAdd = v;
+        _magDefAdd_last = last;
+    }
+}
+
+void BattleFighter::setHitrateAdd(float v, UInt16 last)
+{
+    if((v < 0.001f) || (_hitrateAdd < 0.001f)
+            || ( _hitrateAdd > 0 && v < 0)
+            || ( _hitrateAdd < 0 && v > 0)
+            || ((_hitrateAdd > 0) && (v > 0) && (_hitrateAdd < v))
+            || ((_hitrateAdd < 0) && (v < 0) && (_hitrateAdd > v)))
+    {
+        _hitrateAdd = v;
+        _hitrateAdd_last = last;
+    }
+}
+
+void BattleFighter::setEvadeAdd(float v, UInt16 last)
+{
+    if((v < 0.001f) || (_evadeAdd < 0.001f)
+            || ( _evadeAdd > 0 && v < 0)
+            || ( _evadeAdd < 0 && v > 0)
+            || ((_evadeAdd > 0) && (v > 0) && (_evadeAdd < v))
+            || ((_evadeAdd < 0) && (v < 0) && (_evadeAdd > v)))
+    {
+        _evadeAdd = v;
+        _evadeAdd_last = last;
+    }
+}
+
+void BattleFighter::setCriticalAdd(float v, UInt16 last)
+{
+    if((v < 0.001f) || (_criticalAdd < 0.001f)
+            || ( _criticalAdd > 0 && v < 0)
+            || ( _criticalAdd < 0 && v > 0)
+            || ((_criticalAdd > 0) && (v > 0) && (_criticalAdd < v))
+            || ((_criticalAdd < 0) && (v < 0) && (_criticalAdd > v)))
+    {
+        _criticalAdd = v;
+        _criticalAdd_last = last;
+    }
+}
+
+void BattleFighter::setCriticalDmgAdd(float v, UInt16 last)
+{
+    if((v < 0.001f) || (_criticalDmgAdd < 0.001f)
+            || ( _criticalDmgAdd > 0 && v < 0)
+            || ( _criticalDmgAdd < 0 && v > 0)
+            || ((_criticalDmgAdd > 0) && (v > 0) && (_criticalDmgAdd < v))
+            || ((_criticalDmgAdd < 0) && (v < 0) && (_criticalDmgAdd > v)))
+    {
+        _criticalDmgAdd = v;
+        _criticalDmgAdd_last = last;
+    }
+}
+
+void BattleFighter::setPierceAdd(float v, UInt16 last)
+{
+    if((v < 0.001f) || (_pierceAdd < 0.001f)
+            || ( _pierceAdd > 0 && v < 0)
+            || ( _pierceAdd < 0 && v > 0)
+            || ((_pierceAdd > 0) && (v > 0) && (_pierceAdd < v))
+            || ((_pierceAdd < 0) && (v < 0) && (_pierceAdd > v)))
+    {
+        _pierceAdd = v;
+        _pierceAdd_last = last;
+    }
+}
+
+void BattleFighter::setCounterAdd(float v, UInt16 last)
+{
+    if((v < 0.001f) || (_counterAdd < 0.001f)
+            || ( _counterAdd > 0 && v < 0)
+            || ( _counterAdd < 0 && v > 0)
+            || ((_counterAdd > 0) && (v > 0) && (_counterAdd < v))
+            || ((_counterAdd < 0) && (v < 0) && (_counterAdd > v)))
+    {
+        _counterAdd = v;
+        _counterAdd_last = last;
+    }
+}
+
+void BattleFighter::setMagResAdd(float v, UInt16 last)
+{
+    if((v < 0.001f) || (_magResAdd < 0.001f)
+            || ( _magResAdd > 0 && v < 0)
+            || ( _magResAdd < 0 && v > 0)
+            || ((_magResAdd > 0) && (v > 0) && (_magResAdd < v))
+            || ((_magResAdd < 0) && (v < 0) && (_magResAdd > v)))
+    {
+        _magResAdd = v;
+        _magResAdd_last = last;
+    }
+}
+
+void BattleFighter::setMaxHPAdd(Int32 v, UInt16 last)
+{
+    if((v == 0) || (_maxhpAdd == 0)
+            || ( _maxhpAdd > 0 && v < 0)
+            || ( _maxhpAdd < 0 && v > 0)
+            || ((_maxhpAdd > 0) && (v > 0) && (_maxhpAdd < v))
+            || ((_maxhpAdd < 0) && (v < 0) && (_maxhpAdd > v)))
+    {
+        _maxhpAdd = v;
+        _maxhpAdd_last = last;
+    }
+}
+
+void BattleFighter::setActionAdd(Int32 v, UInt16 last)
+{
+    if((v == 0) || (_maxActionAdd == 0)
+            || ( _maxActionAdd > 0 && v < 0)
+            || ( _maxActionAdd < 0 && v > 0)
+            || ((_maxActionAdd > 0) && (v > 0) && (_maxActionAdd < v))
+            || ((_maxActionAdd < 0) && (v < 0) && (_maxActionAdd > v)))
+    {
+        _maxActionAdd = v;
+        _maxActionAdd_last = last;
+    }
+}
+
+void BattleFighter::setToughAdd(float v, UInt16 last)
+{
+    if((v < 0.001f) || (_toughAdd < 0.001f)
+            || ( _toughAdd > 0 && v < 0)
+            || ( _toughAdd < 0 && v > 0)
+            || ((_toughAdd > 0) && (v > 0) && (_toughAdd < v))
+            || ((_toughAdd < 0) && (v < 0) && (_toughAdd > v)))
+    {
+        _toughAdd = v;
+        _toughAdd_last = last;
+    }
+}
+
+void BattleFighter::setAtkReduce(float v, UInt16 last)
+{
+    if((v < 0.001f) || (_atkreduce < 0.001f)
+            || ( _atkreduce > 0 && v < 0)
+            || ( _atkreduce < 0 && v > 0)
+            || ((_atkreduce > 0) && (v > 0) && (_atkreduce < v))
+            || ((_atkreduce < 0) && (v < 0) && (_atkreduce > v)))
+    {
+        _atkreduce = v;
+        _atkreduce_last = last;
+    }
+}
+
+void BattleFighter::setMagAtkReduce(float v, UInt16 last)
+{
+    if((v < 0.001f) || (_magatkreduce < 0.001f)
+            || ( _magatkreduce > 0 && v < 0)
+            || ( _magatkreduce < 0 && v > 0)
+            || ((_magatkreduce > 0) && (v > 0) && (_magatkreduce < v))
+            || ((_magatkreduce < 0) && (v < 0) && (_magatkreduce > v)))
+    {
+        _magatkreduce = v;
+        _magatkreduce_last = last;
+    }
+}
+
+void BattleFighter::setAtkReduce3(float v, UInt16 last)
+{
+    if((v < 0.001f) || (_atkreduce3 < 0.001f)
+            || ( _atkreduce3 > 0 && v < 0)
+            || ( _atkreduce3 < 0 && v > 0)
+            || ((_atkreduce3 > 0) && (v > 0) && (_atkreduce3 < v))
+            || ((_atkreduce3 < 0) && (v < 0) && (_atkreduce3 > v)))
+    {
+        _atkreduce3 = v;
+        _atkreduce3_last = last;
+    }
+}
+
+void BattleFighter::setMagAtkReduce3(float v, UInt16 last)
+{
+    if((v < 0.001f) || (_magatkreduce3 < 0.001f)
+            || ( _magatkreduce3 > 0 && v < 0)
+            || ( _magatkreduce3 < 0 && v > 0)
+            || ((_magatkreduce3 > 0) && (v > 0) && (_magatkreduce3 < v))
+            || ((_magatkreduce3 < 0) && (v < 0) && (_magatkreduce3 > v)))
+    {
+        _magatkreduce3 = v;
+        _magatkreduce3_last = last;
+    }
+}
+
+void BattleFighter::setPuduDebuf(float v, UInt16 last)
+{
+    if((v < 0.001f) || (_pudu_debuf < 0.001f)
+            || ( _pudu_debuf > 0 && v < 0)
+            || ( _pudu_debuf < 0 && v > 0)
+            || ((_pudu_debuf > 0) && (v > 0) && (_pudu_debuf < v))
+            || ((_pudu_debuf < 0) && (v < 0) && (_pudu_debuf > v)))
+    {
+        _pudu_debuf = v;
+        _pudu_debuf_last = last;
+    }
+}
+ 
+
+void BattleFighter::makeDamage( UInt32& u )
+{
+    if(_colorStockTimes > 0)
+    {
+        u = 0;
+        -- _colorStockTimes;
+        return;
+    }
+
+	if(_hp < u)
+		_hp = 0;
+	else
+		_hp -= u;
+}
+
 
 }

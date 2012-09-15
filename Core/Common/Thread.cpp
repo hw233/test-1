@@ -15,17 +15,17 @@
 
 
 
-Thread::Thread(): 
-	_id(uniqueId()), 
-	_name(makeName()), 
+Thread::Thread():
+	_id(uniqueId()),
+	_name(makeName()),
 	_pTLS(0)
 {
 }
 
 
-Thread::Thread(const std::string& name): 
-	_id(uniqueId()), 
-	_name(name), 
+Thread::Thread(const std::string& name):
+	_id(uniqueId()),
+	_name(name),
 	_pTLS(0)
 {
 }

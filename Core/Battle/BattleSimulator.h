@@ -1,4 +1,4 @@
-#ifndef _BATTLESIMULATOR_H_
+﻿#ifndef _BATTLESIMULATOR_H_
 #define _BATTLESIMULATOR_H_
 
 #include "BattleField.h"
@@ -30,7 +30,7 @@ namespace Battle
 
         // 斗剑场
         BS_ATHLETICS1 = 0xFD01,
-        // 世界BOSS 
+        // 世界BOSS
         BS_WBOSS = 0xFC01
     };
 
@@ -152,10 +152,12 @@ private:
         UInt8 target_pos;
         const GData::SkillBase* skill;
         UInt32 param;
+        UInt32 param1; // 参数不够用，加一个
     };
 
     enum StatusType
     {
+        MIN_STATUS = 0,
         e_stAura = 0,
         e_stAtk,
         e_stDef,
@@ -213,14 +215,30 @@ private:
         e_unImmune2 = 35,
         e_defDec = 36,
         e_undefDec = 37,
-        e_Bleed1 = 38,    // 儒
+        e_Bleed1 = 38,    // 儒,电击
         e_unBleed1 = 39,  // 儒
-        e_Bleed2 = 40,    // 释
+        e_Bleed2 = 40,    // 释,心剑
         e_unBleed2 = 41,  // 释
-        e_Bleed3 = 42,    // 道
+        e_Bleed3 = 42,    // 道,剑气
         e_unBleed3 = 43,  // 道
+        e_TherapyBuff = 44,   // 加治疗效果
+        e_unTherapyBuff = 45,
+        e_Bleed4 = 46,    // 燃烧
+        e_unBleed4 = 47,  // 
+        e_Immune3 = 48,   // 五彩石
+        e_unImmune3 = 49, // 
+        e_MAX_STATE,
     };
 
+    enum SpecialStatus
+    {
+        MIN_SPECIAL_STATUS = 0,
+        e_ss_Atk,
+        e_ss_DecAtk,
+        e_ss_MagAtk,
+        e_ss_DecMagAtk,
+        MAX_SPECIAL_STATUS,
+    };
 
 private:
 	int findFirstAttacker();
@@ -236,7 +254,7 @@ private:
 
 	float testRescue(BattleFighter *& bf, int counter_deny, AttackPoint * counter_deny_list);
 	float testLink(BattleFighter *& bf, UInt16& skillId);
-    bool onDead(bool activeFlag, BattleObject * bo, DefStatus* defList, size_t& defCount);
+    bool onDead(bool activeFlag, BattleObject * bo, DefStatus* defList, size_t& defCount, StatusChange * scList, size_t& scCount);
 	int testWinner();
 	int testWinner2();
 	void appendToPacket(UInt8 from_side, UInt8 from_pos, UInt8 target_pos, UInt8 atk_type, UInt16 add_id, bool cs, bool pr, DefStatus* defList, size_t defCount, StatusChange * scList, size_t scCount);
@@ -245,7 +263,7 @@ private:
 	void setStatusChange(UInt8 side, UInt8 pos, int cnt, UInt16 skillId, UInt8 type, UInt32 value, StatusChange * scList, size_t& scCount, bool active);
 	void setStatusChange(BattleFighter * bf, UInt8 side, UInt8 pos, int cnt, const GData::SkillBase* skill, UInt8 type, float value, UInt16 last, StatusChange * scList, size_t& scCount, bool active);
 	void setStatusChange2(BattleFighter* bf, UInt8 side, UInt8 pos, int cnt, UInt16 skillId, UInt8 type, float value, UInt16 last, StatusChange * scList, size_t& scCount, bool active);
-	void onDamage(BattleObject * bo, StatusChange * scList, size_t& scCount, bool active, std::vector<AttackAct>* atkAct = NULL);
+	void onDamage(BattleObject * bo, DefStatus* defList, size_t& defCount, StatusChange * scList, size_t& scCount, bool active, std::vector<AttackAct>* atkAct = NULL);
 	BattleFighter * getRandomFighter(UInt8 side, UInt8 * excepts, size_t exceptCount);
     bool doNormalAttack(BattleFighter* bf, int otherside, int target_pos, std::vector<AttackAct>* atkAct = NULL);
     bool doSkillAttack(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt, std::vector<AttackAct>* atkAct = NULL, UInt32 skillParam = 0);
@@ -253,7 +271,7 @@ private:
     BattleFighter* getTherapyTarget2(BattleFighter* bf, UInt8 * excepts, size_t exceptCount);
     bool doSkillStatus(bool activeFlag, BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt, StatusChange* scList, size_t& scCount, bool& self, bool ifDecAura);
     bool doSkillStatus2(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt, StatusChange* scList, size_t& scCount);
-    void doSkillState(BattleFighter* bf, const GData::SkillBase* skill, BattleObject* bo, DefStatus* defList, size_t& defCount, std::vector<AttackAct>* atkAct2, std::vector<AttackAct>* atkAct = NULL);
+    void doSkillState(BattleFighter* bf, const GData::SkillBase* skill, BattleObject* bo, DefStatus* defList, size_t& defCount, std::vector<AttackAct>* atkAct2, std::vector<AttackAct>* atkAct, StatusChange* scList, size_t& scCount);
     void getSkillTarget(BattleFighter* bf, const GData::SkillBase* skill, int& target_side, int& target_pos, int& cnt);
 
     UInt32 doPoisonAttack(BattleFighter* bf, bool cs, const GData::SkillBase* skill, BattleFighter* area_target, float factor, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, std::vector<AttackAct>* atkAct);
@@ -317,9 +335,40 @@ private:
     bool doSkillStrengthen_week(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active);
     bool doSkillStrengthen_debuf_defend(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active);
     bool doSkillStrengthen_atkadd(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active);
+    bool doSkillStrengthen_absorbAtk(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active);
+    bool doSkillStrengthen_addMagicAtk(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active);
+    bool doSkillStrengthen_absorbMagAtk(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active);
+    bool doSkillStrengthen_bufTherapy(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active);
+    bool doSkillStrengthen_DebufAura( BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active );
+    bool doSkillStrengthen_AttackFriend(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active);
+    bool doSkillStrengthen_BleedBySkill(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active);
+    void SetSpecialAttrChange(BattleFighter* bf, const GData::SkillBase* skill, SpecialStatus eType, Int16 nLast, float value, bool bOffset, StatusChange* scList, size_t& scCount);
+    void ReduceSpecialAttrLast(BattleFighter* bf, SpecialStatus eType, Int16 nReduce, StatusChange* scList, size_t& scCount);
+    // 元磁神雷使用后调用的接口
+    bool AddYuanCiState_SkillStrengthen(BattleFighter* pFighter, BattleFighter* pTarget, const GData::SkillBase* skill, const int nAttackCount, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
+    // 群攻的时候只中一个目标产生加强
+    void ModifySingleAttackValue_SkillStrengthen(BattleFighter* bf,const GData::SkillBase* skill, float& fvalue, bool isAdd);
+    // 上状态，只跟作用双方和状态有关的函数接口，主要用在技能符文加强的上状态
+    bool AddSkillStrengthenState(BattleFighter* pFighter, BattleFighter* pTarget,const UInt16 nSkillId, const UInt8 nState, const Int16 nLast, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
+    bool AddStateAfterResist_SkillStrengthen(BattleFighter* pFighter, BattleFighter* pTarget, const GData::SkillBase* skill, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
+    // 技能符文随机流血
+    bool BleedRandom_SkillStrengthen(BattleFighter* bf, BattleFighter* bo, const GData::SkillStrengthenEffect* ef, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
+    // 获取流血值
+    UInt32 GetBleedDmg(BattleFighter* bf, BattleFighter* bo, float nfactor);
+    // 上状态被抵抗也流血
+    bool AddExtraDamageAfterResist_SkillStrengthen(BattleFighter* pFighter, BattleFighter* pTarget, const GData::SkillBase* skill, int nDamage, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
+    // 毒被抵抗时上状态
+    bool AddStateAfterPoisonResist_SkillStrengthen(BattleFighter* pFighter, BattleFighter* pTarget, const GData::SkillBase* skill, int nfactor, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
 
     bool doDeBufAttack(BattleFighter* bf);
+
+    // 计算普通攻击产生的伤害值
+    UInt32 CalcNormalAttackDamage(BattleFighter * bf, BattleObject* bo, StateType& eStateType);
+    // 计算治疗因子
+	float calcTherapyFactor(BattleFighter* bo, DefStatus* defList, size_t& defCount);
     float calcTherapyDebuf(BattleFighter* bo, DefStatus* defList, size_t& defCount);
+	float calcTherapyAddBuff(BattleFighter* bo, DefStatus* defList, size_t& defCount);
+    float calcAuraDebuf(BattleFighter* bo, DefStatus* defList, size_t& defCount);
 private:
 	int _id, _winner, _turns;
 	UInt8 _position;
@@ -334,6 +383,11 @@ private:
 	GObject::Player * _player[2];
 	std::string _other_name;
 	UInt8 _other_level;
+
+	BattleFighter* _activeFgt;
+	std::vector<BattleFighter*> _onTherapy;
+	std::vector<BattleFighter*> _onSkillDmg;
+	std::vector<BattleFighter*> _onOtherDead;
 
     UInt8 _teams[2];
     std::vector<std::string> _team_name[2];
@@ -366,8 +420,8 @@ private:
     /*
     bool    _evade3OK[2]; //达成次数
     bool    _evade9ok[2]; //达成次数
-    bool    _cs3ok[2]; 
-    bool    _cs9ok[2]; 
+    bool    _cs3ok[2];
+    bool    _cs9ok[2];
     bool    _pr3ok[2];
     bool    _pr9ok[2];
     bool    _fj3ok[2];

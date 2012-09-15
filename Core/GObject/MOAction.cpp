@@ -178,13 +178,13 @@ namespace GObject
 			st << Stream::eos;
 			player->send(st);
 			return ;
-		} 
+		}
 		UInt32 now = TimeUtil::Now();
 		UInt32 leftFlushTime = 0;
 		if(viplvl >= 4)
 		{
 			if (data->m_PreFlushTime != 0 && TimeUtil::SharpFourtyMin(0, data->m_PreFlushTime) == TimeUtil::SharpFourtyMin(0, now))
-				leftFlushTime = TimeUtil::SharpFourtyMin(1, now) - now;			
+				leftFlushTime = TimeUtil::SharpFourtyMin(1, now) - now;
 		}
 		else
 		{
@@ -238,7 +238,7 @@ namespace GObject
 	{
 		Table msg = GameAction()->RunDayCopyTask(player, npcId);
 		UInt16 sz = static_cast<UInt16>(msg.size());
-		
+
 		Stream st(REP::DIALOG_START);
 		st << npcId << static_cast<UInt16>(0) << sz;
 		for (UInt16 i = 1; i <= sz; ++i)
@@ -254,7 +254,7 @@ namespace GObject
 	{
 		Table msg = GameAction()->RunActiveTask(player, npcId);
 		UInt16 sz = static_cast<UInt16>(msg.size());
-		
+
 		Stream st(REP::DIALOG_START);
 		st << npcId << static_cast<UInt16>(0) << sz;
 		for (UInt16 i = 1; i <= sz; ++i)

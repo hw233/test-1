@@ -1,4 +1,4 @@
-#ifndef _WORLDOUTERMSGHANDLER_H_
+﻿#ifndef _WORLDOUTERMSGHANDLER_H_
 #define _WORLDOUTERMSGHANDLER_H_
 
 #include "MsgTypes.h"
@@ -29,6 +29,8 @@
 #include "Common/Stream.h"
 #include "Common/BinaryReader.h"
 #include "GData/Money.h"
+#include "GObject/TownDeamon.h"
+#include "GObject/ClanRankBattle.h"
 
 #ifdef _ARENA_SERVER
 #include "GObject/GameServer.h"
@@ -46,7 +48,7 @@ struct ClanListReq
 	UInt8 _type;
 	UInt16 _startidx;
 	UInt8 _count;
-    UInt8 _flag;      // 0-???? 1-��?? 2-ȫ??
+    UInt8 _flag;      // 0-???? 1-%?? 2-ȫ??
 	std::string _name;
 	MESSAGE_DEF5(REQ::CLAN_LIST, UInt8, _type, UInt16, _startidx, UInt8, _count, UInt8, _flag, std::string, _name);
 };
@@ -736,7 +738,7 @@ void OnClanTechOpReq(GameMsgHdr& hdr, const void * data)
                 clan->skillLevelUp(player, skillId);
             }
             break;
-		}	
+		}
 	}
 
     switch (op)
@@ -770,12 +772,12 @@ void OnClanPackageReq( GameMsgHdr& hdr, const void * data )
 	BinaryReader brd(data, hdr.msgHdr.bodyLen);
     UInt8 op = 0;
     brd >> op;
-    
+
     switch(op)
     {
     case 0: //帮派仓库基础信息请求
         {
-            clan->SendPackageInfo(player); 
+            clan->SendPackageInfo(player);
         }
         break;
     case 1: //帮派仓库列表请求
@@ -978,7 +980,7 @@ void OnClanCityBattleReq( GameMsgHdr& hdr, const void * data )
 					break;
 				case 3:
 					{
-						//??��????
+						//??b????
 						if (clan->hasEnemyClan(allyClan))
 						{
 							r = false;
@@ -1350,7 +1352,7 @@ void OnAthleticsKillCD( GameMsgHdr& hdr, const void * data)
          return;
      GObject::gAthleticsRank.RequestKillCD(player);
 }
-void OnAthleticsGetAwardReq( GameMsgHdr& hdr, AthleticsGetAwardReq& req ) 
+void OnAthleticsGetAwardReq( GameMsgHdr& hdr, AthleticsGetAwardReq& req )
 {
     MSG_QUERY_PLAYER(player);
     GObject::gAthleticsRank.giveAward(player, req._type);
@@ -2070,5 +2072,106 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         }
     }
 }
+
+void OnTownDeamonReq( GameMsgHdr& hdr, const void* data)
+{
+	MSG_QUERY_PLAYER(player);
+
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 op = 0;
+    br >> op;
+
+    if(op !=0x08 && player->GetLev() < 40)
+        return;
+
+    if(op != 0x08)
+    {
+        GObject::townDeamonManager->checkStartTime(player); 
+    }
+
+    switch(op)
+    {
+    case 0x00:
+        {
+            GObject::townDeamonManager->showTown(player);
+        }
+        break;
+    case 0x01:
+        {
+            UInt16 level = 0;
+            br >> level;
+            GObject::townDeamonManager->showLevelTown(player, level);
+        }
+        break;
+    case 0x02:
+        {
+            UInt16 start = 0;
+            UInt16 count = 0;
+            br >> start >> count;
+            GObject::townDeamonManager->listDeamons(player, start, count);
+        }
+        break;
+    case 0x03:
+        {
+            if(!player->hasChecked())
+                return;
+
+            UInt8 count = 0;
+            br >> count;
+            GObject::townDeamonManager->useAccItem(player, count);
+        }
+        break;
+    case 0x04:
+        {
+            if(!player->hasChecked())
+                return;
+
+            UInt8 count = 0;
+            br >> count;
+            GObject::townDeamonManager->useVitalityItem(player, count);
+        }
+        break;
+    case 0x05:
+        {
+            if(!player->hasChecked())
+                return;
+            if(player->hasFlag(GObject::Player::InHeroIsland))
+                return;
+            if(GObject::ClanRankBattleMgr::Instance().IsInBattle(player->getClan()))
+                return;
+
+            UInt16 level = 0;
+            UInt8 type = 0;
+            br >> level >> type;
+            GObject::townDeamonManager->challenge(player, level, type);
+        }
+        break;
+    case 0x06:
+        {
+            if(!player->hasChecked())
+                return;
+
+            GObject::townDeamonManager->cancelDeamon(player);
+        }
+        break;
+    case 0x07:
+        {
+            if(!player->hasChecked())
+                return;
+
+            UInt16 levels = 0;
+            br >> levels;
+            GObject::townDeamonManager->autoCompleteQuiteCheck(player, levels);
+        }
+        break;
+    case 0x08:
+        {
+            player->getDeamonAwards();
+        }
+    default:
+        return;
+    }
+}
+
 
 #endif // _WORLDOUTERMSGHANDLER_H_

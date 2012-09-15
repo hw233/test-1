@@ -179,6 +179,10 @@ function onDungeonWin(player, id, count, free)
     else
         FallActivity(player, 2)
     end
+    if getKillMonsterAct() then
+        local package = player:GetPackage();
+        package:Add(9163, 1, true)
+    end
 end
 
 function onClanBattleAttend(player)
@@ -822,6 +826,10 @@ function onCopyWin(player, id, floor, spot, lootlvl)
             FallActivity(player, lootlvl)
         end
     end
+    if getKillMonsterAct() then
+        local package = player:GetPackage();
+        package:Add(9163, 1, true)
+    end
 end
 
 
@@ -843,6 +851,10 @@ function onFrontMapWin(player, id, spot, lootlvl)
         FallActivity(player, 1)
     else
         FallActivity(player, lootlvl)
+    end
+    if getKillMonsterAct() then
+        local package = player:GetPackage();
+        package:Add(9163, 1, true)
     end
 end
 
@@ -1115,8 +1127,8 @@ function onLoginPF(player)
             [2] = "朋友网",
             [4] = "Q+",
             [10] = "QQ游戏大厅",
-            -- [11] = "3366",
-            -- [12] = "官网",
+            --[11] = "3366",
+            --[12] = "官网",
         }
         local titles = {
             [1] = pfnames[1].."登陆奖励",
@@ -1124,17 +1136,16 @@ function onLoginPF(player)
             [4] = pfnames[4].."登陆奖励",
             [10] = pfnames[10].."登陆奖励",
             --[11] = pfnames[11].."登陆奖励",
-            -- [12] = pfnames[12].."登陆奖励",
+            --[12] = pfnames[12].."登陆奖励",
         }
         local ctxs = {
-            [1] = "每日通过"..pfnames[1].."登陆《蜀山传奇》都可以获得【"..pfnames[1].."登陆礼包】 \n登陆礼包每日只能领取一次",
-            [2] = "每日通过"..pfnames[2].."登陆《蜀山传奇》都可以获得【"..pfnames[2].."登陆礼包】 \n登陆礼包每日只能领取一次",
-            [4] = "每日通过"..pfnames[4].."登陆《蜀山传奇》都可以获得【"..pfnames[4].."登陆礼包】 登陆礼包每日只能领取一次",
-            [10] = "每日通过"..pfnames[10].."登陆《蜀山传奇》都可以获得【"..pfnames[10].."登陆礼包】 \n登陆礼包每日只能领取一次",
-            --[11] = "每日通过"..pfnames[11].."登陆《蜀山传奇》都可以获得【"..pfnames[11].."登陆礼包】 登陆礼包每日只能领取一次",
-            -- [12] = "每日通过"..pfnames[12].."登陆《蜀山传奇》都可以获得【"..pfnames[12].."登陆礼包】 登陆礼包每日只能领取一次",
+            [1] = "每日通过"..pfnames[1].."登陆《蜀山传奇》都可以获得【"..pfnames[1].."登陆礼包】 \n登陆礼包每日只能领取一次\n<font color=\"#FF0000\">黄钻贵族通过"..pfnames[1].."登陆，可以领取黄钻每日礼包，内容包括：太乙真金、高级挂机加速符、银票、一级宝石、七星元木等。请在游戏主界面领取。</font><font color=\"#3399FF\"><u><a href=\"event:openYellow\">开通黄钻</a></u></font>",
+            [2] = "每日通过"..pfnames[2].."登陆《蜀山传奇》都可以获得【"..pfnames[2].."登陆礼包】 \n登陆礼包每日只能领取一次\n<font color=\"#FF0000\">黄钻贵族通过"..pfnames[2].."登陆，可以领取黄钻每日礼包，内容包括：太乙真金、高级挂机加速符、银票、一级宝石、七星元木等。请在游戏主界面领取。</font><font color=\"#3399FF\"><u><a href=\"event:openYellow\">开通黄钻</a></u></font>",
+            [4] = "每日通过"..pfnames[4].."登陆《蜀山传奇》都可以获得【"..pfnames[4].."登陆礼包】 登陆礼包每日只能领取一次\n<font color=\"#FF0000\">QQ会员贵族通过"..pfnames[4].."登陆，可以领取QQ会员每日礼包，内容包括：太乙真金、高级挂机加速符、银票、一级宝石、七星元木等。请在游戏主界面领取。</font><font color=\"#3399ff\"><u><a href=\"event:openQQVip\">开通QQ会员</a></u></font>",
+            [10] = "每日通过"..pfnames[10].."登陆《蜀山传奇》都可以获得【"..pfnames[10].."登陆礼包】 \n登陆礼包每日只能领取一次\n<font color=\"#FF0000\">蓝钻贵族通过"..pfnames[10].."登陆，可以领取蓝钻每日礼包，内容包括：太乙真金、高级挂机加速符、银票、一级宝石、七星元木等。请在游戏主界面领取。</font><font color=\"#3399ff\"><u><a href=\"event:openBlue\">开通蓝钻</a></u></font>",
+            --[11] = "每日通过"..pfnames[11].."登陆《蜀山传奇》都可以获得【"..pfnames[11].."登陆礼包】 登陆礼包每日只能领取一次\n<font color=\"#FF0000\">蓝钻贵族通过"..pfnames[11].."登陆，可以领取蓝钻每日礼包，内容包括：太乙真金、高级挂机加速符、银票、一级宝石、七星元木等。请在游戏主界面领取。</font><font color=\"#00FFFF\"><u><a href=\"event:openYellow\">开通蓝钻</a></u></font>",
+            --[12] = "每日通过"..pfnames[12].."登陆《蜀山传奇》都可以获得【"..pfnames[12].."登陆礼包】 登陆礼包每日只能领取一次\n<font color=\"#FF0000\">QQ会员贵族通过"..pfnames[12].."登陆，可以领取QQ会员每日礼包，内容包括：太乙真金、高级挂机加速符、银票、一级宝石、七星元木等。请在游戏主界面领取。</font><font color=\"#FF0000\"><u><a href=\"event:openQQVip\">开通QQ会员</a></u></font>",
         }
-
         local pkgs = {
             [1] = {469,1,1},
             [2] = {470,1,1},
@@ -1899,6 +1910,64 @@ function sendRechargeMails6(player, ototal, ntotal)
     end
 end
 
+function sendRechargeMails7(player, ototal, ntotal)
+    local lvls = {
+        10,1000,1999,3599,5599,7999,12999,20999,35999,
+    }
+    local items = {
+        {1325,1,1, 1528,1,1},
+        {503,5,1, 516,5,1},
+        {1325,2,1, 515,1,1},
+        {9088,10,1, 515,1,1},
+        {1528,5,1, 1325,5,1},
+        {1325,3,1, 503,5,1},
+        {515,5,1, 503,10,1},
+        {515,5,1, 1325,3,1, 1528,3,1},
+        {515,8,1, 1325,5,1, 1528,5,1},
+    }
+
+    local olvl = calcRechargeLevel(lvls, ototal)
+    local nlvl = calcRechargeLevel(lvls, ntotal)
+
+    if nlvl == 0 or olvl == nlvl then
+        return
+    end
+
+    for k = olvl+1, nlvl do
+        local title = string.format(msg_100, lvls[k])
+        local ctx = string.format(msg_101, lvls[k])
+        sendItemPackageMail(player, title, ctx, items[k]);
+    end
+end
+
+function sendRechargeMails_2012_09_13(player, ototal, ntotal)
+    local lvls = {
+        10,50,99,199,399,699,999,
+    }
+    local items = {
+        {516,1,1},
+        {503,1,1, 15,2,1},
+        {514,2,1, 512,2,1},
+        {516,1,1, 547,2,1},
+        {549,1,1},
+        {509,1,1, 500,1,1},
+        {9017,1,1, 9019,1,1},
+    }
+
+    local olvl = calcRechargeLevel(lvls, ototal)
+    local nlvl = calcRechargeLevel(lvls, ntotal)
+
+    if nlvl == 0 or olvl == nlvl then
+        return
+    end
+
+    for k = olvl+1, nlvl do
+        local title = string.format(msg_100, lvls[k])
+        local ctx = string.format(msg_101, lvls[k])
+        sendItemPackageMail(player, title, ctx, items[k]);
+    end
+end
+
 function sendRechargeMails(player, ototal, ntotal)
     --sendRechargeMails1(player, ototal, ntotal)
     --[[local start = { ['year'] = 2012, ['month'] = 7, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1914,7 +1983,9 @@ function sendRechargeMails(player, ototal, ntotal)
     --if getRechargeActive3366() then
     --    sendRechargeMails5(player, ototal, ntotal)
     --end
-    sendRechargeMails6(player, ototal, ntotal)
+    -- sendRechargeMails6(player, ototal, ntotal)
+    --sendRechargeMails7(player, ototal, ntotal)
+    sendRechargeMails_2012_09_13(player, ototal, ntotal)
 end
 
 function onEquipForge(player, id, onums)
@@ -2141,4 +2212,118 @@ function Qixi(player, lootlvl)
     end
 end
 
+function onGetYearActAward(player, type)
+    if type ==1 then
+        local package = player:GetPackage()
+        if package:GetRestPackageSize() < 9 then
+            return false
+        end
+        player:getCoupon(50)
+        package:Add(56, 5, true)
+        package:Add(57, 5, true)
+        package:Add(15, 5, true)
+        package:Add(49, 1, true)
+        package:Add(502, 1, true)
+        package:Add(510, 1, true)
+        package:Add(5031, 1, true)
+        package:Add(9163, 1, true)
+        return true
+    end
+    if type ==2 then
+        local package = player:GetPackage()
+        if package:GetRestPackageSize() < 9 then
+            return false
+        end
+        package:Add(509, 1, true)
+        package:Add(503, 1, true)
+        package:Add(514, 1, true)
+        package:Add(1325, 1, true)
+        package:Add(15, 5, true)
+        package:Add(51, 1, true)
+        package:Add(48, 1, true)
+        package:Add(49, 2, true)
+        package:Add(50, 2, true)
+        return true
+    end
+end
+
+function onGetKillMonsterReward(player)
+    local roamPlace = {
+     -- 1  2  3  4  5  6  7  8
+        1, 2, 3, 4, 5, 6, 7, 8,
+        9, 10, 1, 3, 11, 12, 8, 2,
+        6, 13, 1, 14, 8, 3, 13, 15,
+        1, 3, 8, 16,
+    }
+
+    local eventItem = {
+        --{物品ID，物品数，剑侠（或柔情、或财富、或传奇），剑侠个数}
+        {{502,  1, 1, 1}, {55,  1, 0, 0}, {510,  1, 0, 0}},
+        {{56,   1, 0, 0}, {57,  1, 0, 0}, {1526, 1, 1, 1}},
+        {{502,  1, 1, 1}, {55,  1, 0, 0}, {510,  1, 0, 0}},
+        {{1326, 1, 0, 0}, {466, 1, 0, 0}, {8000, 1, 3, 1}},
+        {{56,   1, 0, 0}, {57,  1, 0, 0}, {1526, 1, 3, 1}},
+        {{502,  1, 2, 1}, {55,  1, 0, 0}, {510,  1, 0, 0}},
+        {{1326, 1, 0, 0}, {466, 1, 0, 0}, {8000, 1, 2, 1}},
+        {{502,  1, 3, 1}, {55,  1, 0, 0}, {510,  1, 0, 0}},
+        {{503,  1, 4, 1}, {33,  1, 0, 0}, {508,  1, 0, 0}},
+        {{1326, 1, 0, 0}, {466, 1, 0, 0}, {8000, 1, 3, 1}},
+        {{1326, 1, 0, 0}, {466, 1, 0, 0}, {8000, 1, 2, 1}},
+        {{503,  1, 4, 1}, {33,  1, 0, 0}, {508,  1, 0, 0}},
+        {{503,  1, 3, 1}, {33,  1, 0, 0}, {508,  1, 0, 0}},
+        {{1326, 1, 0, 0}, {466, 1, 0, 0}, {8000, 1, 2, 1}},
+        {{1326, 1, 0, 0}, {466, 1, 0, 0}, {8000, 1, 2, 1}},
+        {{9076, 1, 4, 1}, {9076,1, 4, 1}, {9076, 1, 4, 1}},
+    }
+
+    local pos = player:GetVar(182)
+    local step = math.random(1, 3)
+    local pos2 = pos + step
+    --if pos2 > 28 then
+    --    pos2 = pos2 - 28
+    --end
+    --player:SetVar(182, pos2)
+
+    local posTmp = pos2 % 28
+    if posTmp == 0 then
+        posTmp  = 28
+    end
+
+    local package = player:GetPackage()
+    local i = roamPlace[posTmp]
+    local j = math.random(1, 3)
+
+    package:Add(eventItem[i][j][1], eventItem[i][j][2], true, true, 33)
+    player:lastKillMonsterAwardPush(eventItem[i][j][1], eventItem[i][j][2]);
+    if eventItem[i][j][3] >=1 and eventItem[i][j][3] <= 4 then
+        local curType = eventItem[i][j][3]
+        local extAward = 0
+        if curType == 1 and player:GetVar(183) == (1-1) then
+            extAward = 1757
+        elseif curType == 2 and player:GetVar(184) == (1-1) then
+            extAward = 1751
+        elseif curType == 3 and player:GetVar(185) == (1-1) then
+            extAward = 1750
+        elseif curType == 4 and player:GetVar(186) == (1-1) then
+            extAward = 1752
+        elseif curType == 1 and player:GetVar(183) == (5-1) then
+            extAward = 1753
+        elseif curType == 2 and player:GetVar(184) == (3-1) then
+            extAward = 1754
+        elseif curType == 3 and player:GetVar(185) == (4-1) then
+            extAward = 1755
+        elseif curType == 4 and player:GetVar(186) == (2-1) then
+            extAward = 1756
+        end
+
+        if extAward ~= 0 then
+            --package:Add(extAward, 1, true, true, 33)
+            --player:lastKillMonsterAwardPush(extAward, 1);
+            sendItemPackageMail(player, msg_120, msg_121, {extAward,1,1})
+        end
+    end
+    player:postKillMonsterRoamResult(pos2, eventItem[i][j][3], eventItem[i][j][4], j);
+
+    return pos2;
+end
 

@@ -25,7 +25,7 @@ struct RankCmp
 			return rd1._playerLevel > rd2._playerLevel;
 		else
 			return rd1._bossLevel > rd2._bossLevel;
-			
+
 	}
 
 };
@@ -41,7 +41,7 @@ public:
 	void resetPlayerRank(Player *pl, UInt16 bossLevel, UInt8 playerLevel, UInt16 couponCount, UInt16 itemId, UInt8 itemCount);
 	void addPlayerRank(Player *pl, UInt16 bossLevel, UInt8 playerLevel);
 	void reqBlockBossData(Player *pl, UInt16 bossLevel);
-	
+
 private:
 	Rank::iterator find(Player *pl);
 

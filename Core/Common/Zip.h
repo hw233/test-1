@@ -81,7 +81,7 @@ public:
      * <br>
      * The src.size() must be the actual length of data which <br>
      * will be uncompressed.
-     * 
+     *
      * @param dst - the destination std::vector
      * @param src - the source std::vector
      * @param level - the compress level

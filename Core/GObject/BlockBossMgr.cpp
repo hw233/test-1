@@ -73,7 +73,7 @@ void BlockBossMgr::reqBlockBossData(Player *pl, UInt16 bossLevel)
 	UInt32 rank = 999;
 	if(it != _playerRank.end())
 		rank = std::distance(_playerRank.begin(), it) + 1;
-		
+
 	Stream st(REP::BLOCKBOSS);
 	UInt8 count = static_cast<UInt8>(_playerRank.size() > 3 ? 3 : _playerRank.size());
 	st << bossLevel << rank << count;

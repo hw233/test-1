@@ -1,4 +1,4 @@
-#ifndef _LEADERBOARD_H_
+﻿#ifndef _LEADERBOARD_H_
 #define _LEADERBOARD_H_
 
 #include "Common/Stream.h"

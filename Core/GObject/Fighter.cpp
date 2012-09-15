@@ -1,4 +1,4 @@
-#include "Config.h"
+﻿#include "Config.h"
 #include "Fighter.h"
 #include "Country.h"
 #include "TaskMgr.h"
@@ -32,7 +32,7 @@ namespace GObject
 
 GlobalFighters globalFighters;
 
-static float enc_factor[] = {0, 0.05, 0.10, 0.16, 0.23, 0.31, 0.40, 0.51, 0.64, 0.80, 1.00, 1.25, 1.51};
+static float enc_factor[] = {0, 0.05f, 0.10f, 0.16f, 0.23f, 0.31f, 0.40f, 0.51f, 0.64f, 0.80f, 1.00f, 1.25f, 1.51f};
 #define SOUL_EXP_ITEM 8000
 #define SOUL_SKILL_DEFAULT_ITEM 8565
 
@@ -374,7 +374,7 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
 	{
 	case 1: field = "hp"; break;
 	case 2: field = "level"; break;
-	case 3: 
+	case 3:
         {
 #if 0
             UInt32 now = time(NULL);
@@ -470,7 +470,7 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
         }
         break;
     case 0x2d:
-        { // cittas 
+        { // cittas
             if (_cittas.size()) {
                 std::string str;
                 if (value2string(&_cittas[0], _cittas.size(), str)) {
@@ -1690,7 +1690,7 @@ UInt16 Fighter::getP100SkillsNum()
     UInt16 size = 0;
     for (size_t i = 0; i < GData::SKILL_PASSIVES-GData::SKILL_PASSSTART; ++i)
     {
-        size += _passkl[i].size(); 
+        size += _passkl[i].size();
     }
     return size;
 }
@@ -1700,7 +1700,7 @@ UInt16 Fighter::getPnSkillsNum()
     UInt16 size = 0;
     for (size_t i = 0; i < GData::SKILL_PASSIVES-GData::SKILL_PASSSTART; ++i)
     {
-        size += _rpasskl[i].size(); 
+        size += _rpasskl[i].size();
     }
     return size;
 }
@@ -1953,6 +1953,10 @@ void Fighter::setPeerless( UInt16 pl, bool writedb )
     if (_owner && writedb)
         _owner->OnHeroMemo(MC_SKILL, MD_ADVANCED, 0, 1);
     sendModification(0x30, peerless, 0, writedb);
+
+    // 装备无双技能，通知前端符文相关内容
+    if(peerless)
+        PeerlessSSNotify(peerless);
 }
 
 UInt8 Fighter::getAcupointCnt()
@@ -1977,7 +1981,7 @@ void Fighter::setAcupoints( std::string& acupoints, bool writedb )
     {
         setAcupoints(i, ::atoi(tk[i].c_str()), writedb, true); // XXX: must be less then 255
     }
-    
+
     for (UInt8 i = 0; i < ACUPOINTS_MAX; ++i)
     {
         if (_acupoints[i] && _acupoints[i] < 3)
@@ -2007,7 +2011,7 @@ bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb, bool init )
 
             if (pap->pra > getPExp())
                 return false;
-            addPExp(-pap->pra, writedb);
+            addPExp(-static_cast<Int32>(pap->pra), writedb);
 
             _acupoints[idx] = v;
             if (_acupoints[idx] < 3)
@@ -2545,7 +2549,7 @@ bool Fighter::lvlUpCitta(UInt16 citta, bool writedb)
                         const GData::CittaBase* cb = GData::cittaManager[_cittas[i]];
                         if(cb)
                         {
-                            num9 ++; 
+                            num9 ++;
                             if(cb->type >= 8)
                                 num9Type8 ++;
                         }
@@ -2560,13 +2564,13 @@ bool Fighter::lvlUpCitta(UInt16 citta, bool writedb)
                      GameAction()->doAttainment(_owner,  10086, num9Type8);
                 }
             }
-            
+
         }
         return re;
     }
     else
     {
-		if(_owner != NULL) ;
+		if(_owner != NULL)
             SYSMSG_SENDV(2008, _owner);
     }
     return false;
@@ -2594,7 +2598,10 @@ void Fighter::delSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_AFTRES ||
                         s->cond == GData::SKILL_DEAD ||
                         s->cond == GData::SKILL_ENTER ||
-                        s->cond == GData::SKILL_DEAD)
+                        s->cond == GData::SKILL_ONTHERAPY ||
+                        s->cond == GData::SKILL_ONSKILLDMG ||
+                        s->cond == GData::SKILL_ONOTHERDEAD
+                        )
                 {
                     offPassiveSkill(s->getId(), s->cond, s->prob>=100.0f, writedb);
                 }
@@ -2629,7 +2636,10 @@ void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_AFTRES ||
                         s->cond == GData::SKILL_DEAD ||
                         s->cond == GData::SKILL_ENTER ||
-                        s->cond == GData::SKILL_DEAD)
+                        s->cond == GData::SKILL_ONTHERAPY ||
+                        s->cond == GData::SKILL_ONSKILLDMG ||
+                        s->cond == GData::SKILL_ONOTHERDEAD
+                        )
                 {
                     upPassiveSkill(s->getId(), s->cond, (s->prob >= 100.0f), writedb);
                 }
@@ -2731,7 +2741,7 @@ bool Fighter::offPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb
     if (!p100)
     {
         for (UInt16 i = 0; i < type-GData::SKILL_PASSSTART; ++i)
-            lastsize += _passkl[i].size(); 
+            lastsize += _passkl[i].size();
     }
 
     UInt16 idx = type - GData::SKILL_PASSSTART;
@@ -2842,7 +2852,7 @@ bool Fighter::addNewCitta( UInt16 citta, bool writedb, bool init, bool split )
     }
 
     if (!init && cb->pexp)
-        addPExp(-cb->pexp, writedb);
+        addPExp(-static_cast<Int32>(cb->pexp), writedb);
 
     _attrDirty = true;
     _bPDirty = true;
@@ -2967,9 +2977,9 @@ bool Fighter::delCitta( UInt16 citta, bool writedb )
                 MailItemsInfo itemsInfo(mitem, DismissCitta, 3);
                 GObject::Mail * pmail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
                 if(pmail != NULL)
-                {    
+                {
                     GObject::mailPackageManager.push(pmail->id, mitem, 3, true);
-                }   
+                }
             }
         }
     }
@@ -3609,6 +3619,14 @@ UInt8 Fighter::getSoulExtraAura()
     return m_2ndSoul->getExtraAura();
 }
 
+UInt8 Fighter::getSoulAuraLeft()
+{
+    if(!m_2ndSoul)
+        return 0;
+
+    return m_2ndSoul->getAuraLeft();
+}
+
 bool Fighter::practiceLevelUp()
 {
     if(!m_2ndSoul)
@@ -4033,6 +4051,9 @@ UInt16 Fighter::getBattlePortrait()
     case 1706:
         portrait = 1088;
         break;
+    case 1707:
+        portrait = 1090;
+        break;
     }
 
     return portrait;
@@ -4092,6 +4113,12 @@ void Fighter::makeFighterSSInfo(Stream& st)
                 ++c;
         }
     }
+    // append peerless skill
+    if (peerless)
+    {
+        if (appendFighterSSInfo(st, peerless))
+            ++c;
+    }
     st.data<UInt8>(offset) = c;
 }
 
@@ -4121,9 +4148,15 @@ void Fighter::SSOpen(UInt16 id)
 {
     if (!_owner)
         return;
-    int idx = isSkillUp(id);
-    if (idx < 0)
-        return;
+
+    bool bIsPeerLess = (SKILL_ID(peerless) == SKILL_ID(id));
+    int idx = -1;
+    if(!bIsPeerLess)
+    {
+        idx = isSkillUp(id);
+        if (idx < 0)
+            return;
+    }
 
     UInt16 sid = SKILL_ID(id);
     if (GData::skill2item.find(sid) == GData::skill2item.end())
@@ -4137,7 +4170,11 @@ void Fighter::SSOpen(UInt16 id)
     std::map<UInt16, SStrengthen>::iterator i = m_ss.find(sid);
     if (i != m_ss.end())
     {
-        UInt8 mlvl = getUpSkillLevel(idx);
+        UInt8 mlvl = 0;
+        if(bIsPeerLess)
+            mlvl = getPeerlessLevel();
+        else
+            mlvl = getUpSkillLevel(idx);
         if (i->second.maxLvl >= mlvl && mlvl == 9)
         {
             _owner->sendMsgCode(0, 1021);
@@ -4157,8 +4194,11 @@ void Fighter::SSOpen(UInt16 id)
     }
 
     UInt16 itemId = 550;
-    if (i->second.maxLvl >= 4)
-        itemId = 551;
+	if (i != m_ss.end())
+	{
+		if (i->second.maxLvl >= 4)
+			itemId = 551;
+	}
     Package* pkg = _owner->GetPackage();
     ItemBase* item = pkg->FindItem(itemId, true);
     if (!item)
@@ -4166,7 +4206,7 @@ void Fighter::SSOpen(UInt16 id)
     if (!item)
         return;
 
-    // 
+    //
     if (item->getClass() != Item_Trump)
     {
         if(!pkg->DelItem2(item, 1, ToSkillStrengthenOpen))
@@ -4241,9 +4281,14 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, bool bind)
     if (GetItemSubClass(itemId) != Item_Citta)
         return 0;
 
-    int idx = isSkillUp(id);
-    if (idx < 0)
-        return 0;
+    int idx = -1;
+    bool bIsPeerLess = (SKILL_ID(id) == SKILL_ID(peerless));
+    if(!bIsPeerLess)
+    {
+        idx = isSkillUp(id);
+        if (idx < 0)
+            return 0;
+    }
 
     if (ss.lvl >= ss.maxLvl)
     {
@@ -4337,6 +4382,15 @@ void Fighter::SSNotify(UInt16 id, SStrengthen& ss)
     appendFighterSSInfo(st, id, &ss);
     st << Stream::eos;
     _owner->send(st);
+}
+
+void Fighter::PeerlessSSNotify(UInt16 id)
+{
+    UInt16 sid = SKILL_ID(id);
+    std::map<UInt16, SStrengthen>::iterator it = m_ss.find(sid);
+    if (it == m_ss.end())
+        return;
+    SSNotify(id, it->second);
 }
 
 void Fighter::SSDeleteDB(UInt16 id)

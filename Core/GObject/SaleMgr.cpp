@@ -1,4 +1,4 @@
-#include "Config.h"
+﻿#include "Config.h"
 #include "SaleMgr.h"
 #include "Item.h"
 #include "Player.h"
@@ -274,7 +274,7 @@ void SaleMgr::addSaleItem(Player * player, UInt32 id, UInt32 pos)
 		{
 			_sales[pos] = NULL;
 			setNextIndex(pos);
-			
+
 			delRowSale(sale);
 			delSaleCheck(sale);
 			_salePos.erase(sale->_id);
@@ -302,7 +302,7 @@ void SaleMgr::addSaleItem(Player * player, UInt32 id, UInt32 pos)
 			saleItemBuy.item = sale->_item;
 			saleItemBuy.priceType = sale->_priceType;
 			saleItemBuy.price = sale->_price;
-		
+
 			struct BuyInfo
 			{
 				UInt32 saleId;
@@ -502,7 +502,7 @@ bool SaleMgr::shiftSingleSaleList(UInt8 type, UInt8 quality, UInt8 career, UInt1
 	{
 		std::vector<SaleData *>& sales = it->second;
 		if (sales.empty())
-			continue; 
+			continue;
         if (quality != 0 && career != 0)
         {
 			// 指定颜色,职业
@@ -569,7 +569,7 @@ bool SaleMgr::shiftSingleSaleList2(UInt8 type, UInt8 quality, UInt8 career, UInt
 	{
 		std::vector<SaleData *>& sales = it->second;
 		if (sales.empty())
-			continue; 
+			continue;
         if(quality != 0 && career != 0)
         {
 			//指定颜色,职业
@@ -741,7 +741,7 @@ void SaleMgr::searchPlayerSaleResp(Player * founder, Player * beFounder, UInt16 
 	if (count != 0)
 	{
 		SaleData * sale = NULL;
-		UInt16 maxSaleSz = _sales.size();
+		UInt32 maxSaleSz = _sales.size();
 		SalePosType::iterator found;
 		std::vector<UInt32>::iterator offset, sentinel;
 		offset = sentinel = vec.begin();

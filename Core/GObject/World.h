@@ -5,6 +5,9 @@
 #include "Server/WorkerThread.h"
 #include "Common/Stream.h"
 #include "Server/Cfg.h"
+#ifndef _WIN32
+#include "kingnet_analyzer.h"
+#endif
 
 namespace Network
 {
@@ -134,6 +137,14 @@ public:
     { _rechargeactive3366 = v; if (v) _rechargeactiveno |= no; else _rechargeactiveno &= ~no; }
     inline static bool getRechargeActive3366()
     { return _rechargeactive3366; }
+    inline static void setYearActive(bool v)
+    { _yearact = v; }
+    inline static bool getYearActive()
+    { return _yearact; }
+    inline static void setQgameGiftAct(bool v)
+    { _qgamegiftact = v; }
+    inline static bool getQgameGiftAct()
+    { return _qgamegiftact; }
     inline static void setValentineDay(bool v)
     { _valentineday = v; }
     inline static bool getValentineDay()
@@ -300,6 +311,37 @@ public:
     { _consumeactive = v; }
     inline static bool getConsumeActive()
     { return _consumeactive; }
+    inline static void setConsume918(bool v)
+    { _consume918 = v; }
+    inline static bool getConsume918()
+    { return _consume918; }
+    inline static void setNeedRechargeRank(bool v)
+    { _needrechargerank = v; }
+    inline static bool getNeedRechargeRank()
+    { return _needrechargerank; }
+    inline static void setRechargeTime(UInt32 begin, UInt32 end)
+    {
+        _rechargebegin = begin;
+        _rechargeend = end;
+    }
+    inline static UInt32 getRechargeBegin() { return _rechargebegin; }
+    inline static UInt32 getRechargeEnd() { return _rechargeend; }
+    inline static void setConsumeTime(UInt32 begin, UInt32 end)
+    {
+        _consumebegin = begin;
+        _consumeend = end;
+    }
+    inline static UInt32 getConsumeBegin() { return _consumebegin; }
+    inline static UInt32 getConsumeEnd() { return _consumeend; }
+    inline static void setNeedConsumeRank(bool v)
+    { _needconsumerank = v; }
+    inline static bool getNeedConsumeRank()
+    { return _needconsumerank; }
+    inline static void setKillMonsterAct(bool v)
+    { _killMonsteract = v; }
+    inline static bool getKillMonsterAct()
+    { return _killMonsteract; }
+
 
 	inline Script::WorldScript * getWorldScript() { return _worldScript; }
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
@@ -337,6 +379,8 @@ public:
     static bool _blueactiveday;
     static bool _rechargeactive;
     static bool _rechargeactive3366;
+    static bool _yearact;
+    static bool _qgamegiftact;
     static UInt8 _rechargeactiveno;
     static bool _valentineday;
     static bool _netvalentineday;
@@ -380,10 +424,21 @@ public:
     static UInt32 _sosomapbegin;
     static bool _opentest;
     static bool _consumeactive;
+    static bool _consume918;
+    static bool _needrechargerank;
+    static bool _needconsumerank;
+    static bool _killMonsteract;
+    static UInt32 _rechargebegin;
+    static UInt32 _rechargeend;
+    static UInt32 _consumebegin;
+    static UInt32 _consumeend;
 
 public:
     static RCSortType rechargeSort;
     static RCSortType consumeSort;
+    static void initRCRank();
+
+    static RCSortType killMonsterSort[4];
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }
@@ -410,10 +465,18 @@ private:
     static void Team_Copy_Process(void*);
 	static void World_One_Min( World * );
     static void AthleticsPhysicalCheck(void *);
+	static void Tianjie_Refresh(void*);
     //static void advancedHookTimer(void *para);
 
 public:
 	static void ReCalcWeekDay( World * );
+
+#ifndef _WIN32
+public:
+    static CUserLogger* ulog;
+    static void udpLog(const char* str1, const char* str2, const char* str3, const char* str4,
+            const char* str5, const char* str6, const char* type);
+#endif
 
 public:
     void UpdateQixiScore(Player* pl, Player* lover);
@@ -422,6 +485,10 @@ public:
     void LoadQixiScore(Player* pl, Player* lover);
     void SendQixiAward();
     void sendQixiScoreAward(Player* pl);
+
+    void killMonsterAppend(Stream& st, UInt8 index);
+    void killMonsterInit();
+    void UpdateKillMonsterRank(Player* pl, UInt8 Type, UInt8 count);
 
 private:
 	void testUpdate();

@@ -1,4 +1,4 @@
-#ifndef _GAMECLIENT_H_
+﻿#ifndef _GAMECLIENT_H_
 #define _GAMECLIENT_H_
 
 #include "Common/AtomicVal.h"

@@ -1,4 +1,4 @@
-#include "Config.h"
+﻿#include "Config.h"
 #include "Country.h"
 #include "Server/WorldServer.h"
 #include "MsgID.h"
@@ -504,7 +504,7 @@ namespace GObject
     void  Package::AddItemCoursesLog(UInt32 typeId, UInt32 num, UInt8 fromWhere)
     {
          std::string tbn("item_courses");
-         DBLOG().GetMultiDBName(tbn); 
+         DBLOG().GetMultiDBName(tbn);
          DBLOG().PushUpdateData("insert into `%s`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", tbn.c_str(),cfg.serverLogId, m_Owner->getId(), typeId, num, fromWhere, TimeUtil::Now());
     }
 
@@ -514,7 +514,7 @@ namespace GObject
         std::string tbn("item_histories");
         DBLOG().GetMultiDBName(tbn);
         DBLOG().PushUpdateData("insert into %s (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)",tbn.c_str(), cfg.serverLogId, m_Owner->getId(), itemId, num, TimeUtil::Now());
-        
+
     }
 	ItemBase* Package::AddItem2(UInt32 typeId, UInt32 num, bool notify, bool bind, UInt8 fromWhere)
 	{
@@ -560,6 +560,13 @@ namespace GObject
                     char strBuf[32] = "";
                     m_Owner->udpLog("item", "I_550_1", "", "", "", "", "act", num);
                     snprintf(strBuf, 32, "I_550_1_%d", fromWhere);
+                    m_Owner->udpLog("item", strBuf, "", "", "", "", "act", num);
+                }
+
+                if (fromWhere == FromKillMonster)
+                {
+                    char strBuf[32] = "";
+                    snprintf(strBuf, 32, "I_%u_1_%u", typeId, (UInt32)fromWhere);
                     m_Owner->udpLog("item", strBuf, "", "", "", "", "act", num);
                 }
 
@@ -612,6 +619,13 @@ namespace GObject
                     char strBuf[32] = "";
                     m_Owner->udpLog("item", "I_550_1", "", "", "", "", "act", num);
                     snprintf(strBuf, 32, "I_550_1_%d", fromWhere);
+                    m_Owner->udpLog("item", strBuf, "", "", "", "", "act", num);
+                }
+
+                if (fromWhere == FromKillMonster)
+                {
+                    char strBuf[32] = "";
+                    snprintf(strBuf, 32, "I_%u_1_%u", typeId, (UInt32)fromWhere);
                     m_Owner->udpLog("item", strBuf, "", "", "", "", "act", num);
                 }
 
@@ -681,6 +695,12 @@ namespace GObject
                 snprintf(strBuf, 32, "I_550_1_%d", fromWhere);
                 m_Owner->udpLog("item", strBuf, "", "", "", "", "act", count);
             }
+            if (fromWhere == FromKillMonster)
+            {
+                char strBuf[32] = "";
+                snprintf(strBuf, 32, "I_%u_1_%u", typeId, (UInt32)fromWhere);
+                m_Owner->udpLog("item", strBuf, "", "", "", "", "act", count);
+            }
 
             if (typeId == 1209)
                 m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
@@ -725,13 +745,20 @@ namespace GObject
                 m_Owner->udpLog("item", strBuf, "", "", "", "", "act", count);
             }
 
+            if (fromWhere == FromKillMonster)
+            {
+                char strBuf[32] = "";
+                snprintf(strBuf, 32, "I_%u_1_%u", typeId, (UInt32)fromWhere);
+                m_Owner->udpLog("item", strBuf, "", "", "", "", "act", count);
+            }
+
             SendItemData(item);
             ItemNotify(item->GetItemType().getId(), count);
             //获得物品
             //GameAction()->doAttainment(m_Owner, Script::ON_ADD_ITEM, typeId);
             //if((fromWhere != 0  && item->getQuality() >= 3) || (fromWhere == FromMerge && item->getQuality() >= 2))
             //{
-                 AddItemCoursesLog(typeId, static_cast<UInt32>(count), fromWhere);
+            AddItemCoursesLog(typeId, static_cast<UInt32>(count), fromWhere);
             //}
             if (typeId == 1209)
                 m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
@@ -904,7 +931,7 @@ namespace GObject
 					ItemNotify(equip->GetItemType().getId());
 				if(FromWhere != 0 && itype->quality >= 4)
 					DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), typeId, id, FromWhere, TimeUtil::Now());
-                
+
                 OnAddEquipAndCheckAttainment(itype, FromWhere);
 				return equip;
 			}
@@ -987,7 +1014,7 @@ namespace GObject
             ItemNotify(equip->GetItemType().getId());
         if( itype->quality >= 4)
             DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), typeId, id, FromEquipUpgrade, TimeUtil::Now());
-                                                                                        
+
         // OnAddEquipAndCheckAttainment(itype, FromWhere);
          return equip;
     }
@@ -1000,10 +1027,10 @@ namespace GObject
             {
                 GameAction()->doAttainment(this->m_Owner, Script::ADD_TRUMP, itype->quality);
     //                if(itype->quality == 5)
-               //获得累计法宝 
+               //获得累计法宝
                 GameAction()->doAttainment(this->m_Owner, Script::ADD_NTRUMP,1 );
-                
-                    
+
+
             }
             else
             {
@@ -1105,7 +1132,7 @@ namespace GObject
             //if((toWhere!= 0  && item->getQuality() >= 3) || (toWhere == ToGemMgerge && item->getQuality() >= 2))
             //{
 				std::string tbn("item_courses");
-				DBLOG().GetMultiDBName(tbn); 
+				DBLOG().GetMultiDBName(tbn);
 				DBLOG().PushUpdateData("insert into  `%s`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)",tbn.c_str(), cfg.serverLogId, m_Owner->getId(), item->GetItemType().getId(), num, toWhere, TimeUtil::Now());
             //}
 
@@ -1161,7 +1188,7 @@ namespace GObject
             //if((toWhere!= 0  && item->getQuality() >= 3) || (toWhere == ToGemMgerge && item->getQuality() >= 2))
             //{
 				std::string tbn("item_courses");
-				DBLOG().GetMultiDBName(tbn); 
+				DBLOG().GetMultiDBName(tbn);
 				DBLOG().PushUpdateData("insert into `%s`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)",tbn.c_str() ,cfg.serverLogId, m_Owner->getId(), item->GetItemType().getId(), num, toWhere, TimeUtil::Now());
             //}
 
@@ -1262,7 +1289,7 @@ namespace GObject
         if(!eq)
             return 0;
         UInt8 c  = eq->getClass();
-        
+
         switch (c)
         {
             case Item_Fashion:
@@ -1270,10 +1297,10 @@ namespace GObject
 
             case Item_Weapon:
                 return  0x21;
-                
+
             case Item_Armor1:
                 return  0x22;
-               
+
             case Item_Armor2:
                 return  0x23;
                 break;
@@ -1282,13 +1309,13 @@ namespace GObject
                 break;
             case Item_Armor4:
                 return  0x25;
-                
+
             case Item_Armor5:
                 return  0x26;
-               
+
             case Item_Amulet:
                 return  0x27;
-                
+
             case  Item_Ring:
                 return 0x28;
         }
@@ -1562,8 +1589,8 @@ namespace GObject
 
         if (num == 0 || IsEquipId(id) ||
                 (GetItemSubClass(id) != Item_Normal &&
-                 GetItemSubClass(id) != Item_Formula && 
-                 GetItemSubClass(id) != Item_Enhance && 
+                 GetItemSubClass(id) != Item_Formula &&
+                 GetItemSubClass(id) != Item_Enhance &&
                 GetItemSubClass(id) != Item_Citta &&
                 GetItemSubClass(id) != Item_Soul)){
             ret = false;}
@@ -1583,7 +1610,7 @@ namespace GObject
 					DelItem2(item, rn);
 					AddItemHistoriesLog(id, rn);
                     ret = true;
-				}				
+				}
 			}
 			else
 			{
@@ -1666,7 +1693,7 @@ namespace GObject
 	void Package::DelItemSendMsg(UInt32 itemid, Player *player)
 	{
 		SYSMSG_SENDV(104, player, itemid);
-		SYSMSG_SENDV(1004, player, itemid);		
+		SYSMSG_SENDV(1004, player, itemid);
 	}
 
     void Package::udpLog(UInt32 type, UInt32 id, UInt32 num, UInt32 price, const char* op)
@@ -1706,7 +1733,7 @@ namespace GObject
     {
         char itemAct[32] = "";
 
-        if (id < LSL_ID || id > RSL_ID) 
+        if (id < LSL_ID || id > RSL_ID)
             return;
 
         if (type < 1 || type > 3)
@@ -1804,7 +1831,7 @@ namespace GObject
             {1413,  1415,   "1,1,1",                1252},
             {209,   216,    "1,1,1,1,1,1,1,1",      1621},
             {217,   224,    "1,1,1,1,1,1,1,1",      1620},
-            {225,   225,    "10",                   1628},    
+            {225,   225,    "10",                   1628},
             {90,    90,     "10",                   1524},
             {226,   226,    "10",                   1635},
             {227,   227,    "10",                   1619},
@@ -1817,19 +1844,19 @@ namespace GObject
             Mnum = 1;
             bind = 2;
         }
-        
+
         std::vector<stMergeStf> stfs = GObjectManager::getMergeStfs(id);
         if(stfs.size()  == 0 )
             return 0;
 
         ItemBase * item = FindItem(stfs[0].m_to, true);
         if( !item )
-            item = FindItem(stfs[0].m_to, false); 
+            item = FindItem(stfs[0].m_to, false);
         if( !item ){
             const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[stfs[0].m_to];
             if(itemType == NULL) return 0;
             item = new(std::nothrow) ItemBase(stfs[0].m_to, itemType);
-            if(item == NULL) return 0; 
+            if(item == NULL) return 0;
         }
         if( IsEquip(item->getClass()) ){ //合成的是法宝，叠加数为1
             if(Mnum > GetRestPackageSize())
@@ -1839,7 +1866,7 @@ namespace GObject
             if(item->Size(item->Count() + Mnum) - item->Size() + 1 > GetRestPackageSize())
                 return 2;
         }
-        
+
         for(UInt32 i = 0 ; i < stfs[0].m_stfs.size() ; i ++)
         {
             UInt32 id = stfs[0].m_stfs[i].id;
@@ -1850,23 +1877,23 @@ namespace GObject
             }
             else if(1 == bind){ //只使用绑定材料
                 if( GetItemNum(id, true) < num * Mnum)
-                   return 0; 
+                   return 0;
             }
             else if(0 == bind){ //只使用不绑定材料
                 if( GetItemNum(id, false) < num * Mnum)
-                   return 0; 
+                   return 0;
             }
             else
                 return 0;
         }
-        for(UInt32 j = 0; j < Mnum; j ++){ 
+        for(UInt32 j = 0; j < Mnum; j ++){
             bool b = false;
             for(UInt32 i = 0 ; i < stfs[0].m_stfs.size() ; i ++)
             {
                 UInt32 id = stfs[0].m_stfs[i].id;
                 UInt32 num = stfs[0].m_stfs[i].num;
                 if(2 == bind){ //优先使用绑定材料
-                    bool hasBind = true; 
+                    bool hasBind = true;
                     DelItemAny(id, num, &hasBind);
                     if (hasBind)
                         b = true;
@@ -1881,7 +1908,7 @@ namespace GObject
                 }
             }
             Add( stfs[0].m_to, 1, b, false, FromFCMerge);
-	    }	
+	    }
         Stream st(REP::PACK_USE);  //合成成功，供客户端更新数据
 		st << id << static_cast<UInt8>(4) << static_cast<UInt8>(1) << Stream::eos;
 		m_Owner->send(st);
@@ -2324,7 +2351,7 @@ namespace GObject
 		if (type > 1) return 2;
 		Fighter * fgt = NULL;
 		UInt8 pos = 0;
-        UInt32 failThisTime = 0; 
+        UInt32 failThisTime = 0;
 		ItemEquip * equip = FindEquip(fgt, pos, fighterId, itemId);
 		if(equip == NULL/* || equip->getClass() == Item_Ring || equip->getClass() == Item_Amulet*/)
 			return 2;
@@ -2613,7 +2640,7 @@ namespace GObject
         //if fail
         if(0 == failThisTime)
             failThisTime  =1;
-    
+
         OnFailEnchAttainment(failThisTime);
 		if(type == 0 && ied.enchant >= 4)
 		{
@@ -2646,7 +2673,7 @@ namespace GObject
 
     void  Package::OnFailEnchAttainment( UInt32 failThisTime)
     {
-    
+
         UInt32  ft = m_Owner->GetVar(GObject::VAR_FAIL_ENCH);
         ft += failThisTime;
 
@@ -2720,7 +2747,7 @@ namespace GObject
 	{
 		if (GetItemSubClass(gemId) != Item_Gem) return 2;
 		UInt32 lvl;
-        
+
         if(IsGemId2(gemId))
             lvl = (gemId - 1) % 10 + 10;
         else
@@ -2837,10 +2864,10 @@ namespace GObject
          * 反击宝石， 闪避宝石， 暴击宝石， 破击宝石,身法宝石， 坚韧宝石， 法抗宝石
          * {Item_Gem, Item_Gem1, Item_Gem2, Item_Gem3, Item_Gem4, ........., Item_Gem19}   ---- Item_Weapon
          * {Item_Gem, Item_Gem1, Item_Gem2, Item_Gem3, Item_Gem4, ........., Item_Gem19}   ---- Item_Armor1 头盔
-         * {Item_Gem, Item_Gem1, Item_Gem2, Item_Gem3, Item_Gem4, ........., Item_Gem19}   ---- Item_Armor2 胸甲 
-         * {Item_Gem, Item_Gem1, Item_Gem2, Item_Gem3, Item_Gem4, ........., Item_Gem19}   ---- Item_Armor3 肩甲 
-         * {Item_Gem, Item_Gem1, Item_Gem2, Item_Gem3, Item_Gem4, ........., Item_Gem19}   ---- Item_Armor4 腰带 
-         * {Item_Gem, Item_Gem1, Item_Gem2, Item_Gem3, Item_Gem4, ........., Item_Gem19}   ---- Item_Armor5 腿甲 
+         * {Item_Gem, Item_Gem1, Item_Gem2, Item_Gem3, Item_Gem4, ........., Item_Gem19}   ---- Item_Armor2 胸甲
+         * {Item_Gem, Item_Gem1, Item_Gem2, Item_Gem3, Item_Gem4, ........., Item_Gem19}   ---- Item_Armor3 肩甲
+         * {Item_Gem, Item_Gem1, Item_Gem2, Item_Gem3, Item_Gem4, ........., Item_Gem19}   ---- Item_Armor4 腰带
+         * {Item_Gem, Item_Gem1, Item_Gem2, Item_Gem3, Item_Gem4, ........., Item_Gem19}   ---- Item_Armor5 腿甲
          * {Item_Gem, Item_Gem1, Item_Gem2, Item_Gem3, Item_Gem4, ........., Item_Gem19}   ---- Item_Amulet 项链
          * {Item_Gem, Item_Gem1, Item_Gem2, Item_Gem3, Item_Gem4, ........., Item_Gem19}   ---- Item_Ring
          */
@@ -3056,7 +3083,7 @@ namespace GObject
         const GData::ItemBaseType& t = item->GetItemType();
         UInt32 itemOutId = 0;
         UInt32 count = 0;
-        GameAction()->doAty(this->m_Owner, AtySplit, 0,0);    
+        GameAction()->doAty(this->m_Owner, AtySplit, 0,0);
 		{
 
 			UInt32 r = uRand(100);
@@ -3168,7 +3195,7 @@ namespace GObject
 
         if(item != NULL)
             DelEquip2(static_cast<ItemEquip *>(item), ToSplit);
-        
+
         res &= (spirit?0:1);
 		return res;
 	}
@@ -3913,10 +3940,10 @@ namespace GObject
     {
         Fighter * fgt = NULL;
         UInt8 pos = 0;
-        
+
         ItemEquip * oldEquip = FindEquip(fgt, pos, fighterId, itemId);
         if (oldEquip == NULL) return 2;
-        
+
         if(this->IsFull()){
              m_Owner->sendMsgCode(0, 1011);
              return 2;
@@ -3949,7 +3976,7 @@ namespace GObject
 
         for(UInt32 i = 0 ;  i < it->second.stfs.size(); i++)
         {
-            GData::stUseItem&  itm = it->second.stfs[i]; 
+            GData::stUseItem&  itm = it->second.stfs[i];
             if(  GetItemAnyNum(itm.id) < itm.num)
                 return 2;
         }
@@ -3978,7 +4005,7 @@ namespace GObject
              {
                 if(t[i] - 1 >= 0)
                   maxv[i] = GObjectManager::getAttrMax(lv, t[i]-1, q, crr);
-             }             
+             }
         }
 
         //删除原有物品
@@ -4664,7 +4691,7 @@ namespace GObject
             DB4().PushUpdateData("UPDATE `equipment_spirit` SET `spform1` = %u, `spform2` = %u, `spform3` = %u WHERE `id` = %u", esa.spForm[0], esa.spForm[1], esa.spForm[2], equip->getId());
         }
     }
-    
+
     void Package::enumerate(Visitor<ItemBase>& visitor)
     {
 		item_elem_iter iter = m_Items.begin();

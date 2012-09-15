@@ -15,7 +15,7 @@ namespace GObject
 class MsgHandler
 {
 public:
-	MsgHandler(UInt8 worker = 0xFF) : m_Worker(worker) 
+	MsgHandler(UInt8 worker = 0xFF) : m_Worker(worker)
 	 {
 		 for (int i = 0; i < MAX_MSG_NUM; i++)
 		 {
@@ -55,6 +55,8 @@ public:
 		 UInt32 msgId = MsgId;
 		 assert( msgId < MAX_MSG_NUM );
 		 assert( !m_HandlerList[msgId] );
+         if(m_HandlerList[msgId])
+             printf("%d\n", msgId);
 		 m_HandlerList[msgId] = handler;
 	 }
 

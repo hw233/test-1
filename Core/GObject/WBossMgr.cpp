@@ -1,4 +1,4 @@
-
+﻿
 #include "WBossMgr.h"
 #include "Server/Cfg.h"
 #include "Common/TimeUtil.h"
@@ -139,11 +139,11 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
     if (!pl) return false;
     UInt32 now = TimeUtil::Now();
     UInt32 buffLeft = pl->getBuffData(PLAYER_BUFF_ATTACKING, now);
-    if(cfg.GMCheck && buffLeft > now) 
-    {    
+    if(cfg.GMCheck && buffLeft > now)
+    {
         pl->sendMsgCode(0, 1407, buffLeft - now);
         return false;
-    }    
+    }
     pl->checkLastBattled();
 
     GData::NpcGroups::iterator it = GData::npcGroups.find(npcId);
@@ -151,7 +151,7 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
         return false;
 
     Battle::BattleSimulator bsim(Battle::BS_WBOSS, pl, _ng->getName(), _ng->getLevel(), false);
-    pl->PutFighters(bsim, 0); 
+    pl->PutFighters(bsim, 0);
     _ng->putFighters(bsim);
 
     std::vector<GData::NpcFData>& nflist = _ng->getList();
@@ -233,7 +233,7 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
                 TRACE_LOG("WBOSS INSERT ret: %u (pid: %"I64_FMT"u, dmg: %u)", ret, pl->getId(), damage);
 
                 UInt8 newPercent = ((float)newHP / nflist[0].fighter->getMaxHP()) * 100;
-                
+
                 if (newPercent > 100)
                     newPercent = 100;
                 if (_percent < newPercent)
@@ -276,7 +276,7 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
     }
 
     if(res)
-    {    
+    {
         ret = 0x0101;
         if (!final)
         {
@@ -770,7 +770,7 @@ void WBoss::disapper()
     _percent = 100;
     _ng = NULL;
     _hp.clear();
-    
+
     TRACE_LOG("disapper: %u, idx: %u, loc: %u", m_id, m_idx, m_loc);
 }
 
@@ -923,8 +923,8 @@ void WBossMgr::nextDay(UInt32 now)
         m_boss->disapper();
         m_boss->setIdx(0);
         m_idx = 0;
-        delete m_boss;
-        m_boss = NULL;
+        //delete m_boss;
+        //m_boss = NULL;
     }
     TRACE_LOG("out of time. next day: %u, %u", _prepareTime, _prepareStep);
     fprintf(stderr, "out of time. next day: %u\n", _prepareTime);
@@ -999,22 +999,22 @@ void WBossMgr::process(UInt32 now)
 void WBossMgr::broadcastTV(UInt32 now)
 {
     if (now >= _prepareTime && !_prepareStep)
-        _prepareStep = 1; 
+        _prepareStep = 1;
 
     switch (_prepareStep)
     {
         case 1:
-            SYSMSG_BROADCASTV(547, 15); 
+            SYSMSG_BROADCASTV(547, 15);
             fprintf(stderr, "15 mins\n");
-            _prepareStep = 2; 
+            _prepareStep = 2;
             break;
 
         case 2:
             if (now < _appearTime - 10 * 60)
                 return;
             fprintf(stderr, "10 mins\n");
-            SYSMSG_BROADCASTV(547, 10); 
-            _prepareStep = 3; 
+            SYSMSG_BROADCASTV(547, 10);
+            _prepareStep = 3;
             break;
 
         case 3:
@@ -1022,7 +1022,7 @@ void WBossMgr::broadcastTV(UInt32 now)
                 return;
             fprintf(stderr, "5 mins\n");
             SYSMSG_BROADCASTV(547, 5);
-            _prepareStep = 4; 
+            _prepareStep = 4;
             break;
 
         case 4:

@@ -28,7 +28,7 @@ namespace Script
 
 	GameActionLua::~GameActionLua()
 	{
-		
+
 	}
 
 	void GameActionLua::init()
@@ -88,6 +88,8 @@ namespace Script
 		lua_tinker::def(_L, "getBlueactiveday",	GObject::World::getBlueactiveday);
 		lua_tinker::def(_L, "getRechargeActive", GObject::World::getRechargeActive);
 		lua_tinker::def(_L, "getRechargeActive3366", GObject::World::getRechargeActive3366);
+		lua_tinker::def(_L, "getYearActive", GObject::World::getYearActive);
+		lua_tinker::def(_L, "getQgameGiftAct", GObject::World::getQgameGiftAct);
 		lua_tinker::def(_L, "getValentineDay", GObject::World::getValentineDay);
 		lua_tinker::def(_L, "getNetValentineDay", GObject::World::getNetValentineDay);
 		lua_tinker::def(_L, "getGirlDay", GObject::World::getGirlDay);
@@ -131,6 +133,9 @@ namespace Script
         lua_tinker::def(_L, "getPExpItems", GObject::World::getPExpItems);
         lua_tinker::def(_L, "getOpenTest", GObject::World::getOpenTest);
         lua_tinker::def(_L, "getConsumeActive", GObject::World::getConsumeActive);
+        lua_tinker::def(_L, "getNeedRechargeRank", GObject::World::getNeedRechargeRank);
+        lua_tinker::def(_L, "getNeedConsumeRank", GObject::World::getNeedConsumeRank);
+        lua_tinker::def(_L, "getKillMonsterAct", GObject::World::getKillMonsterAct);
 
         CLASS_DEF(GameActionLua, Print);
         lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);
@@ -254,13 +259,16 @@ namespace Script
         CLASS_DEF(Player, sendHappyInfo);
         CLASS_DEF(Player, lastLootPush);
         CLASS_DEF(Player, RegisterAward);
+        CLASS_DEF(Player, BirthdayAward);
         CLASS_DEF(Player, hasRealItemAward);
         CLASS_DEF(Player, getRealItemAward);
         CLASS_DEF(Player, getMoneyArenaLua);
 		CLASS_DEF(Player, getQQVipPrivilege);
 		CLASS_DEF(Player, setQQVipPrivilege);
 		CLASS_DEF(Player, postRoamResult);
+		CLASS_DEF(Player, postKillMonsterRoamResult);
         CLASS_DEF(Player, lastQueqiaoAwardPush);
+        CLASS_DEF(Player, lastKillMonsterAwardPush);
 
         CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);
@@ -312,7 +320,7 @@ namespace Script
 		CLASS_DEF(TaskMgr, AddDummyTaskStep);
 		CLASS_DEF(TaskMgr, AddDummyTaskStep2);
 		CLASS_DEF(TaskMgr, AcceptTask);
-		CLASS_DEF(TaskMgr, SubmitTask);	
+		CLASS_DEF(TaskMgr, SubmitTask);
 		CLASS_DEF(TaskMgr, AbandonTask);
 		CLASS_DEF(TaskMgr, ResetTaskStep);
 		CLASS_DEF(TaskMgr, CheckPreTaskStep);
@@ -348,7 +356,7 @@ namespace Script
         CLASS_DEF(ActivityMgr, GetPoint);
         CLASS_DEF(ActivityMgr, AddRewardFlag);
         CLASS_DEF(ActivityMgr, AddScores);
-	    	
+
         //????
 		CLASS_ADD(Package);
 		CLASS_DEF(Package, Add);
@@ -377,7 +385,7 @@ namespace Script
 		CLASS_DEF(Package, IsFull);
 		CLASS_DEF(Package, DelItemSendMsg);
 		CLASS_DEF(Package, GetItemCareer);
-		
+
 		//??Æ·
 		CLASS_ADD(ItemBase);
 		CLASS_DEF(ItemBase, Count);
@@ -421,27 +429,27 @@ namespace Script
 
 	UInt32 GameActionLua::GetRandLoopTask(Player * player, UInt32 dayTaskId)
 	{
-		return Run<UInt32>(player, "GetRandLoopTask", dayTaskId);	
+		return Run<UInt32>(player, "GetRandLoopTask", dayTaskId);
 	}
 
 	UInt8 GameActionLua::GetRandLoopTaskQuality()
 	{
-		return Run<UInt8>(NULL, "GetRandLoopTaskQuality");	
+		return Run<UInt8>(NULL, "GetRandLoopTaskQuality");
 	}
 
 	UInt16 GameActionLua::GetLoopTaskMaxCount(UInt32 dayTaskId)
 	{
-		return Run<UInt16>(NULL, "GetLoopTaskMaxCount", dayTaskId);	
+		return Run<UInt16>(NULL, "GetLoopTaskMaxCount", dayTaskId);
 	}
 
 	UInt16 GameActionLua::GetLoopTaskMaxQualityCount(UInt32 dayTaskId)
 	{
-		return Run<UInt16>(NULL, "GetLoopTaskMaxQualityCount", dayTaskId);	
+		return Run<UInt16>(NULL, "GetLoopTaskMaxQualityCount", dayTaskId);
 	}
 
 	Table GameActionLua::GetLoopTaskTasks(Player * player, UInt32 dayTaskId)
 	{
-		return Run<Table>(player, "GetLoopTaskTasks", dayTaskId);		
+		return Run<Table>(player, "GetLoopTaskTasks", dayTaskId);
 	}
 
 	UInt32 GameActionLua::GetLoopTaskIdByNpc(Player * player, UInt32 npcId)
@@ -525,7 +533,7 @@ namespace Script
 		MOAction::ItemTaskAction(player, taskId, dummyNpcId);
 	}
 
-	UInt32 GameActionLua::GetSharpDay(UInt32 now) 
+	UInt32 GameActionLua::GetSharpDay(UInt32 now)
 	{
 		return TimeUtil::SharpDay(0, now);
 	}
@@ -852,10 +860,10 @@ namespace Script
 		}
 		if (player->getCountry() == 1)
 		{
-			return "À¥??";
+			return "%??";
         }
 		else{
-			return "??Á¢";
+			return "??b";
 		}
 	}
 
@@ -1096,12 +1104,17 @@ namespace Script
 	}
 	lua_tinker::table GameActionLua::onGetMailItems(UInt32 pkgId)
 	{
-		return Call<lua_tinker::table>("onGetMailItems", pkgId);	
+		return Call<lua_tinker::table>("onGetMailItems", pkgId);
 	}
 
     lua_tinker::table GameActionLua::GetOnlineReward(UInt8 cnt)
     {
         return Call<lua_tinker::table>("GetOnlineReward", cnt);
+    }
+
+    UInt8 GameActionLua::onGetKillMonsterReward(Player* player)
+    {
+        return Call<UInt8>("onGetKillMonsterReward", player);
     }
 
     void   GameActionLua::GetAtyReward(Player* p, UInt32 flag)
@@ -1204,10 +1217,22 @@ namespace Script
 		return Call<UInt16>("RunTargetAwardRF", player);
     }
 
-    UInt16 GameActionLua::RunNewRegisterAward(Player* player)
+    UInt8 GameActionLua::RunNewRegisterAward(Player* player)
     {
 		assert(player != NULL);
 		return Call<UInt16>("RunNewRegisterAward", player);
+    }
+
+    UInt8 GameActionLua::RunNewRegisterAwardAD_RF(Player* player, UInt8 idx)
+    {
+		assert(player != NULL);
+		return Call<UInt8>("RunNewRegisterAwardAD_RF", player, idx);
+    }
+
+    UInt8 GameActionLua::RunBirthdayAward(Player* player)
+    {
+		assert(player != NULL);
+		return Call<UInt16>("RunBirthdayAward", player);
     }
 
     void GameActionLua::sendRNR(Player* player, UInt32 now, UInt32 date, UInt32 total)
@@ -1218,12 +1243,12 @@ namespace Script
     {
 		return Call<void>("sendRechargeMails", player, ototal, ntotal);
     }
-    
+
     void GameActionLua::doAtySignIn(Player* pl, UInt32 id, UInt32 month, UInt32 day)
     {
         return Call<void>("doAtySignIn", pl, id, month, day);
     }
-    
+
     lua_tinker::table GameActionLua::GetExchangeProps(UInt32 id)
     {
         return Call<lua_tinker::table>("GetExchangeProps", id);
@@ -1247,6 +1272,11 @@ namespace Script
 	bool GameActionLua::onSoSoMapAward( Player* player, UInt8 off)
 	{
 		return Call<bool>("onSoSoMapAward", player, off);
+	}
+
+	bool GameActionLua::onGetYearActAward( Player* player, UInt8 type)
+	{
+		return Call<bool>("onGetYearActAward", player, type);
 	}
 
     UInt8 GameActionLua::onGetAthlRandomMaxValue(UInt8 diffculty)

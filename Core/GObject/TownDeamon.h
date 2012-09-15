@@ -41,6 +41,7 @@ struct DeamonPlayerData
 {
     UInt32 challengeTime;
     UInt32 startTime;
+    UInt32 time2MaxLvl;
     UInt16 deamonLevel;
     UInt16 curLevel;
     UInt16 maxLevel;
@@ -60,6 +61,7 @@ struct DeamonPlayerData
     {
         challengeTime = 0;
         startTime = 0;
+        time2MaxLvl = 0;
         deamonLevel = 0;
         curLevel = 0;
         maxLevel = 0;
@@ -102,14 +104,16 @@ class TownDeamon
         void cancelDeamon(Player*);
         void challenge(Player*, UInt16 level, UInt8 type);
         void notifyChallengeResult(Player*, Player* defer, bool win);
-        void autoCompleteQuite(Player*, UInt16 levels);
+        void notifyAttackNpcResult(Player* pl, bool win);
+        void autoCompleteQuiteCheck(Player* pl, UInt16 levels);
+        void autoCompleteQuite(Player* pl, UInt16 curLevel, UInt16 levels);
         void process();
 
         void checkStartTime(Player* pl);
         bool checkTownDeamon(Player* pl);
-        bool attackNpc(Player* pl, UInt32 npcId);
-        void attackPlayer(Player* pl, Player* defer);
-        void beAttackByPlayer(Player* defer, Player * atker, UInt16 formation, UInt16 portrait, Lineup * lineup);
+        bool attackNpc(Player* pl, UInt16 level);
+        void attackPlayer(Player* pl, Player* defer, UInt32 spirit);
+        void beAttackByPlayer(Player* defer, Player * atker, UInt32 spirit, UInt16 formation, UInt16 portrait, Lineup * lineup);
         void addActivity(Player* pl);
 
     private:

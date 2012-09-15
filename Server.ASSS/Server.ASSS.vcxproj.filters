@@ -1,0 +1,1387 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Common">
+      <UniqueIdentifier>{6808a67f-9d90-45da-8f13-883f8dd50f89}</UniqueIdentifier>
+      <Extensions>
+      </Extensions>
+    </Filter>
+    <Filter Include="Battle">
+      <UniqueIdentifier>{762e1d52-897c-4db2-ad8b-f2592ef0b921}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DB">
+      <UniqueIdentifier>{51c95247-0b47-49f5-b7ab-a201f777550e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GData">
+      <UniqueIdentifier>{0b2bd12c-3ac0-41d7-aea2-eb574d0dea8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GObject">
+      <UniqueIdentifier>{ac0f99f3-55f8-44a2-8710-b624cb284f1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Log">
+      <UniqueIdentifier>{cf00314d-699c-4b06-8c15-d977807d2d94}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Login">
+      <UniqueIdentifier>{418cf960-1ffe-49ec-a131-f40e6bb676ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MsgHandler">
+      <UniqueIdentifier>{8bbceaf4-9d22-488d-8445-dcbaf749ed7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network">
+      <UniqueIdentifier>{b9f92f7f-dea1-467e-8d1c-278d4d3ccb1a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Script">
+      <UniqueIdentifier>{5b8d530f-b38d-441f-b4c8-d07c646a026e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Server">
+      <UniqueIdentifier>{cc9ce52d-fb3a-46ff-8537-e8cd1a070d44}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common\Win32">
+      <UniqueIdentifier>{400d88cb-c92b-4cdc-8487-37e9c5a5c5d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common\Posix">
+      <UniqueIdentifier>{a486725d-95db-485d-8e54-9bc7aa647054}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lua">
+      <UniqueIdentifier>{16ccc2f5-7c02-4ac1-b1ad-d1a42c1f9bad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="json">
+      <UniqueIdentifier>{441219d8-a320-438a-98ca-744ef08b7891}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lua\header">
+      <UniqueIdentifier>{3b4a13ff-db66-4fbf-9453-5eba10e4fa1a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Core\Common\Ascii.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\AtomicCounter.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\Bugcheck.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\Debugger.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\DigestEngine.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\DirectoryIterator.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\Environment.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\ErrorHandler.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\Event.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\Exception.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\File.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\LoadingCounter.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\MemBlockPool.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\Mutex.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\NumberFormatter.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\Path.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\Random.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\RandomStream.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\RefCountedObject.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\Runnable.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\SHA1Engine.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\SignalHandler.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\StringTokenizer.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\Thread.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\ThreadLocal.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\Timespan.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\Timestamp.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\TInf.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\URandom.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\Zip.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\DirectoryIterator_UNIX.cpp">
+      <Filter>Common\Posix</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\DirectoryIterator_WIN32.cpp">
+      <Filter>Common\Win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\Environment_WIN32.cpp">
+      <Filter>Common\Win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\Event_WIN32.cpp">
+      <Filter>Common\Win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\File_WIN32.cpp">
+      <Filter>Common\Win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\Mutex_WIN32.cpp">
+      <Filter>Common\Win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\Path_WIN32.cpp">
+      <Filter>Common\Win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\Thread_WIN32.cpp">
+      <Filter>Common\Win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\Environment_UNIX.cpp">
+      <Filter>Common\Posix</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\Event_POSIX.cpp">
+      <Filter>Common\Posix</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\File_UNIX.cpp">
+      <Filter>Common\Posix</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\Mutex_POSIX.cpp">
+      <Filter>Common\Posix</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\Path_UNIX.cpp">
+      <Filter>Common\Posix</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Common\Thread_POSIX.cpp">
+      <Filter>Common\Posix</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Battle\BattleField.cpp">
+      <Filter>Battle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Battle\BattleFighter.cpp">
+      <Filter>Battle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Battle\BattleReport.cpp">
+      <Filter>Battle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Battle\BattleSimulator.cpp">
+      <Filter>Battle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\DB\DBConn.cpp">
+      <Filter>DB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\DB\DBConnectionMgr.cpp">
+      <Filter>DB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\DB\DBExecutor.cpp">
+      <Filter>DB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\DB\DBWorker.cpp">
+      <Filter>DB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GData\Area.cpp">
+      <Filter>GData</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GData\CittaTable.cpp">
+      <Filter>GData</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GData\ClanAssistantData.cpp">
+      <Filter>GData</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GData\ClanLvlTable.cpp">
+      <Filter>GData</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GData\ClanSkillTable.cpp">
+      <Filter>GData</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GData\ClanTechTable.cpp">
+      <Filter>GData</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GData\CopyTable.cpp">
+      <Filter>GData</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GData\DungeonData.cpp">
+      <Filter>GData</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GData\EUpgradeTable.cpp">
+      <Filter>GData</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GData\ExpTable.cpp">
+      <Filter>GData</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GData\FighterProb.cpp">
+      <Filter>GData</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GData\Formation.cpp">
+      <Filter>GData</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GData\FrontMapTable.cpp">
+      <Filter>GData</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GData\GDataManager.cpp">
+      <Filter>GData</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GData\LootTable.cpp">
+      <Filter>GData</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GData\Money.cpp">
+      <Filter>GData</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GData\NpcGroup.cpp">
+      <Filter>GData</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GData\SkillStrengthen.cpp">
+      <Filter>GData</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GData\SkillTable.cpp">
+      <Filter>GData</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GData\SoulExpTable.cpp">
+      <Filter>GData</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GData\SoulSkillTable.cpp">
+      <Filter>GData</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GData\SpiritAttrTable.cpp">
+      <Filter>GData</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GData\Store.cpp">
+      <Filter>GData</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GData\TalentTable.cpp">
+      <Filter>GData</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GData\Title.cpp">
+      <Filter>GData</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\ActivityMgr.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\Announce.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\Arena.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\ArenaBattle.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\Athletics.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\AthleticsRank.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\AttainMgr.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\BlockBossMgr.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\Boss.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\CFriend.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\ChatItem.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\Clan.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\ClanBattle.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\ClanDynamicMsg.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\ClanManager.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\ClanRankBattle.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\ClanTech.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\Copy.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\Country.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\CountryBattle.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\DCLogger.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\DCWorker.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\Dungeon.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\EventBase.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\Fighter.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\FrontMap.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\GObjectManager.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\GVar.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\HeroIsland.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\HeroMemo.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\HoneyFall.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\Item.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\Leaderboard.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\LuckyDraw.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\Mail.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\Map.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\MapCollection.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\MapObject.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\MOAction.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\NewRelation.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\Package.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\Player.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\PracticePlace.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\Prepaid.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\RealItemAward.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\Sale.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\SaleMgr.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\SecondSoul.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\ShuoShuo.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\SortWorker.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\SpecialAward.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\TaskMgr.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\TeamCopy.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\TownDeamon.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\Trade.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\TradeCheck.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\Var.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\WBossMgr.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\World.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Log\Log.cpp">
+      <Filter>Log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Login\LoginWorker.cpp">
+      <Filter>Login</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\MsgHandler\CountryMsgHandler.cpp">
+      <Filter>MsgHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\MsgHandler\GMHandler.cpp">
+      <Filter>MsgHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\MsgHandler\JsonParser.cpp">
+      <Filter>MsgHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\MsgHandler\LoginMsgHandler.cpp">
+      <Filter>MsgHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\MsgHandler\MsgHandler.cpp">
+      <Filter>MsgHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\MsgHandler\WorldMsgHandler.cpp">
+      <Filter>MsgHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Network\ArenaConn.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Network\GameClient.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Network\Network.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Network\TcpConduit.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Network\TcpServer.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Script\BattleFormula.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Script\ConfigScript.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Script\DepartDBScript.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Script\GameActionLua.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Script\lua_tinker.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Script\Script.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Script\WorldScript.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Server\Cfg.cpp">
+      <Filter>Server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Server\GlobalObject.cpp">
+      <Filter>Server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Server\Main.cpp">
+      <Filter>Server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Server\OidGenerator.cpp">
+      <Filter>Server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Server\SysMsg.cpp">
+      <Filter>Server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Server\WorldServer.cpp">
+      <Filter>Server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\lapi.c">
+      <Filter>lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\lauxlib.c">
+      <Filter>lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\lbaselib.c">
+      <Filter>lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\lcode.c">
+      <Filter>lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\ldblib.c">
+      <Filter>lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\ldebug.c">
+      <Filter>lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\ldo.c">
+      <Filter>lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\ldump.c">
+      <Filter>lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\lfunc.c">
+      <Filter>lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\lgc.c">
+      <Filter>lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\linit.c">
+      <Filter>lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\liolib.c">
+      <Filter>lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\llex.c">
+      <Filter>lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\lmathlib.c">
+      <Filter>lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\lmem.c">
+      <Filter>lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\loadlib.c">
+      <Filter>lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\lobject.c">
+      <Filter>lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\lopcodes.c">
+      <Filter>lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\loslib.c">
+      <Filter>lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\lparser.c">
+      <Filter>lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\lstate.c">
+      <Filter>lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\lstring.c">
+      <Filter>lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\lstrlib.c">
+      <Filter>lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\ltable.c">
+      <Filter>lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\ltablib.c">
+      <Filter>lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\ltm.c">
+      <Filter>lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\lundump.c">
+      <Filter>lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\lvm.c">
+      <Filter>lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\lxmllib.c">
+      <Filter>lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\lua\lzio.c">
+      <Filter>lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Config.cpp" />
+    <ClCompile Include="..\tools\json-1.4\json.c">
+      <Filter>json</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tools\json-1.4\json_helper.c">
+      <Filter>json</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\Tianjie.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Core\Common\Ascii.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\AtomicCounter.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\AtomicVal.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\AutoPtr.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\BaseThread.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\BinaryReader.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Buffer.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\BufferAllocator.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\BufferedStreamBuf.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Bugcheck.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Compat.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Debugger.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\DigestEngine.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\DirectoryIterator.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Environment.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\ErrorHandler.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Event.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Exception.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\File.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\HashList.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\HashTable.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Itoa.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\LoadingCounter.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\MemBlockPool.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Mutex.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Node.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Noncopyable.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\NumberFormatter.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Path.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Platform.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Queue.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Random.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\RandomStream.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\RefCountedObject.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Runnable.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\ScopedLock.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Serialize.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\SHA1Engine.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\SignalHandler.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Singleton.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\SingletonHolder.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Stream.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\StreamUtil.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\String.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\StringTokenizer.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Thread.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\ThreadLocal.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Timespan.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Timestamp.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\TimeUtil.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\TInf.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Unzipper.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\URandom.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Zip.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Zipper.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\DirectoryIterator_UNIX.h">
+      <Filter>Common\Posix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\DirectoryIterator_WIN32.h">
+      <Filter>Common\Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Environment_WIN32.h">
+      <Filter>Common\Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Event_WIN32.h">
+      <Filter>Common\Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\File_WIN32.h">
+      <Filter>Common\Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Mutex_WIN32.h">
+      <Filter>Common\Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Path_WIN32.h">
+      <Filter>Common\Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Thread_WIN32.h">
+      <Filter>Common\Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Environment_UNIX.h">
+      <Filter>Common\Posix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Event_POSIX.h">
+      <Filter>Common\Posix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\File_UNIX.h">
+      <Filter>Common\Posix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Mutex_POSIX.h">
+      <Filter>Common\Posix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Path_UNIX.h">
+      <Filter>Common\Posix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Common\Thread_POSIX.h">
+      <Filter>Common\Posix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Battle\BattleField.h">
+      <Filter>Battle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Battle\BattleFighter.h">
+      <Filter>Battle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Battle\BattleObject.h">
+      <Filter>Battle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Battle\BattleReport.h">
+      <Filter>Battle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Battle\BattleSimulator.h">
+      <Filter>Battle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\DB\DBConn.h">
+      <Filter>DB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\DB\DBConnectionMgr.h">
+      <Filter>DB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\DB\DBExecHelper.h">
+      <Filter>DB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\DB\DBExecutor.h">
+      <Filter>DB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\DB\DBExecutorMgr.h">
+      <Filter>DB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\DB\DBWorker.h">
+      <Filter>DB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GData\AcuPraTable.h">
+      <Filter>GData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GData\Area.h">
+      <Filter>GData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GData\AttrExtra.h">
+      <Filter>GData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GData\CittaTable.h">
+      <Filter>GData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GData\ClanAssistantData.h">
+      <Filter>GData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GData\ClanLvlTable.h">
+      <Filter>GData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GData\ClanSkillTable.h">
+      <Filter>GData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GData\ClanTechTable.h">
+      <Filter>GData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GData\CopyTable.h">
+      <Filter>GData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GData\DungeonData.h">
+      <Filter>GData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GData\EUpgradeTable.h">
+      <Filter>GData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GData\ExpTable.h">
+      <Filter>GData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GData\FighterProb.h">
+      <Filter>GData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GData\Formation.h">
+      <Filter>GData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GData\FrontMapTable.h">
+      <Filter>GData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GData\GDataDBExecHelper.h">
+      <Filter>GData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GData\GDataManager.h">
+      <Filter>GData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GData\ItemType.h">
+      <Filter>GData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GData\LootTable.h">
+      <Filter>GData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GData\Money.h">
+      <Filter>GData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GData\NpcGroup.h">
+      <Filter>GData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GData\ObjectBase.h">
+      <Filter>GData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GData\ObjectManager.h">
+      <Filter>GData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GData\SkillStrengthen.h">
+      <Filter>GData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GData\SkillTable.h">
+      <Filter>GData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GData\SoulExpTable.h">
+      <Filter>GData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GData\SoulSkillTable.h">
+      <Filter>GData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GData\SpiritAttrTable.h">
+      <Filter>GData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GData\Store.h">
+      <Filter>GData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GData\TalentTable.h">
+      <Filter>GData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GData\TaskNpcRelation.h">
+      <Filter>GData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GData\TaskType.h">
+      <Filter>GData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GData\Title.h">
+      <Filter>GData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GData\WeaponDef.h">
+      <Filter>GData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\ActivityMgr.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\Announce.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\Arena.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\ArenaBattle.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\Athletics.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\AthleticsRank.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\AttainMgr.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\AttrFactor.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\BlockBossMgr.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\Boss.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\CFriend.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\ChatItem.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\Clan.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\ClanBattle.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\ClanDynamicMsg.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\ClanManager.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\ClanRankBattle.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\ClanTech.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\Copy.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\Country.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\CountryBattle.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\DCLogger.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\DCWorker.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\Dungeon.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\EventBase.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\EventTimer.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\Fighter.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\FrontMap.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\GGlobalObjectManager.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\GLocalObjectManager.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\GObjectBase.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\GObjectDBExecHelper.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\GObjectManager.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\GVar.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\HeroIsland.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\HeroMemo.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\HoneyFall.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\Item.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\ItemData.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\Leaderboard.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\LuckyDraw.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\Mail.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\Map.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\MapCollection.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\MapObject.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\MOAction.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\NewRelation.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\Package.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\Player.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\PracticePlace.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\Prepaid.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\RealItemAward.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\Sale.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\SaleMgr.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\SecondSoul.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\ShuoShuo.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\SortWorker.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\SpecialAward.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\TaskData.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\TaskMgr.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\TeamCopy.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\TownDeamon.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\Trade.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\TradeCheck.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\Var.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\WBossMgr.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\World.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Log\Log.h">
+      <Filter>Log</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Login\LoginWorker.h">
+      <Filter>Login</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\MsgHandler\CountryInnerMsgHandler.h">
+      <Filter>MsgHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\MsgHandler\CountryMsgHandler.h">
+      <Filter>MsgHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\MsgHandler\CountryMsgStruct.h">
+      <Filter>MsgHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\MsgHandler\CountryOuterMsgHandler.h">
+      <Filter>MsgHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\MsgHandler\GMHandler.h">
+      <Filter>MsgHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\MsgHandler\JsonParser.h">
+      <Filter>MsgHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\MsgHandler\LoginInnerMsgHandler.h">
+      <Filter>MsgHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\MsgHandler\LoginMsgHandler.h">
+      <Filter>MsgHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\MsgHandler\LoginOuterMsgHandler.h">
+      <Filter>MsgHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\MsgHandler\MsgFunc.h">
+      <Filter>MsgHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\MsgHandler\MsgHandler.h">
+      <Filter>MsgHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\MsgHandler\MsgTypes.h">
+      <Filter>MsgHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\MsgHandler\WorldInnerMsgHandler.h">
+      <Filter>MsgHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\MsgHandler\WorldMsgHandler.h">
+      <Filter>MsgHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\MsgHandler\WorldOuterMsgHandler.h">
+      <Filter>MsgHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Network\ArenaConn.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Network\GameClient.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Network\Network.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Network\TcpConduit.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Network\TcpServer.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Network\TcpServerWrapper.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Script\WorldScript.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Script\BattleFormula.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Script\ConfigScript.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Script\DepartDBScript.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Script\GameActionLua.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Script\lua_tinker.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Script\Script.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Server\Cfg.h">
+      <Filter>Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Server\GlobalObject.h">
+      <Filter>Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Server\OidGenerator.h">
+      <Filter>Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Server\ServerTypes.h">
+      <Filter>Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Server\SysMsg.h">
+      <Filter>Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Server\WorkerRunner.h">
+      <Filter>Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Server\WorkerThread.h">
+      <Filter>Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Server\WorldServer.h">
+      <Filter>Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Config.h" />
+    <ClInclude Include="..\Core\MsgID.h" />
+    <ClInclude Include="..\tools\json-1.4\json.h">
+      <Filter>json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tools\json-1.4\json_helper.h">
+      <Filter>json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\lua\lapi.h">
+      <Filter>lua\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\lua\lauxlib.h">
+      <Filter>lua\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\lua\lcode.h">
+      <Filter>lua\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\lua\ldebug.h">
+      <Filter>lua\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\lua\ldo.h">
+      <Filter>lua\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\lua\lfunc.h">
+      <Filter>lua\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\lua\lgc.h">
+      <Filter>lua\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\lua\llex.h">
+      <Filter>lua\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\lua\llimits.h">
+      <Filter>lua\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\lua\lmem.h">
+      <Filter>lua\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\lua\lobject.h">
+      <Filter>lua\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\lua\lopcodes.h">
+      <Filter>lua\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\lua\lparser.h">
+      <Filter>lua\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\lua\lstate.h">
+      <Filter>lua\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\lua\lstring.h">
+      <Filter>lua\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\lua\ltable.h">
+      <Filter>lua\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\lua\ltm.h">
+      <Filter>lua\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\lua\lua.h">
+      <Filter>lua\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\lua\luaconf.h">
+      <Filter>lua\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\lua\lualib.h">
+      <Filter>lua\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\lua\lundump.h">
+      <Filter>lua\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\lua\lvm.h">
+      <Filter>lua\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\lua\lzio.h">
+      <Filter>lua\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\Tianjie.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Core\Script\GameActionLuaImpl.inl">
+      <Filter>Script</Filter>
+    </None>
+  </ItemGroup>
+</Project>

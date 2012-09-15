@@ -8,7 +8,7 @@
 namespace GObject
 {
 
-class SortWorker 
+class SortWorker
     : public WorkerRunner<>
 {
 public:

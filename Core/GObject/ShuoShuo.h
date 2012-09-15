@@ -1,4 +1,4 @@
-
+﻿
 #ifndef SHUOSHUO_H_
 #define SHUOSHUO_H_
 
@@ -8,49 +8,51 @@ namespace GObject
 {
 
 enum {
-    SS_WBOSS = 0,
-    SS_ACT100,
-    SS_ATHWIN,
-    SS_CTRYBATTLE,
-    SS_CLANRANK = 4,
-    SS_40,
-    SS_50,
-    SS_60,
-    SS_70,
-    SS_80,
-    SS_90,
-    SS_100 = 11,
-    SS_COPY1 = 12,
-    SS_COPY2,
-    SS_COPY3,
-    SS_COPY4,
-    SS_COPY5,
-    SS_COPY6,
-    SS_FM1 = 18,
-    SS_FM2,
-    SS_FM3,
-    SS_FM4,
-    SS_FM5,
-    SS_FM6,
-    SS_FM7,
-    SS_FM8,
-    SS_FM9,
-    SS_FM10,
-    SS_FM11,
-    SS_FM12 = 29,
-    SS_OE = 30,
-    SS_TRUMP,
-    SS_CITTA,
-    SS_SHIMEN,
-    SS_YAMEN,
-    SS_TEAMCP,
-    SS_FMTLVLUP,
-    SS_HM_30 = 37,
-    SS_HM_40,
-    SS_HM_50,
-    SS_HM_60,
-    SS_HM_70,
-    SS_HM_80,
+    SS_WBOSS            = 0,
+    SS_ACT100           = 1,
+    SS_ATHWIN           = 2,
+    SS_CTRYBATTLE       = 3,
+    SS_CLANRANK         = 4,
+    SS_40               = 5,
+    SS_50               = 6,
+    SS_60               = 7,
+    SS_70               = 8,
+    SS_80               = 9,
+    SS_90               = 10,
+    SS_100              = 11,
+    SS_COPY1            = 12,
+    SS_COPY2            = 13,
+    SS_COPY3            = 14,
+    SS_COPY4            = 15,
+    SS_COPY5            = 16,
+    SS_COPY6            = 17,
+    SS_FM1              = 18,
+    SS_FM2              = 19,
+    SS_FM3              = 20,
+    SS_FM4              = 21,
+    SS_FM5              = 22,
+    SS_FM6              = 23,
+    SS_FM7              = 24,
+    SS_FM8              = 25,
+    SS_FM9              = 26,
+    SS_FM10             = 27,
+    SS_FM11             = 28,
+    SS_FM12             = 29,
+    SS_OE               = 30,
+    SS_TRUMP            = 31,
+    SS_CITTA            = 32,
+    SS_SHIMEN           = 33,
+    SS_YAMEN            = 34,
+    SS_TEAMCP           = 35,
+    SS_FMTLVLUP         = 36,
+    SS_HM_30            = 37,
+    SS_HM_40            = 38,
+    SS_HM_50            = 39,
+    SS_HM_60            = 40,
+    SS_HM_70            = 41,
+    SS_HM_80            = 42,
+    SS_PUBTST_PKG       = 43, // 每天领取完公测剑侠红包分享
+    SS_SLLP             = 44, // 生日罗盘分享
     SS_MAX
 };
 
@@ -73,11 +75,11 @@ public:
     void updateShuoShuo(UInt8 idx);
     void sendShuoShuo();
     void reset(bool = true);
+    void resetMin();
 
 private:
     Player* m_owner;
     std::vector<UInt8> m_ss; // 0-未达 1-已达 2-已领取
-    UInt8 m_maxIdx;
     UInt32 m_updateTime;
 };
 

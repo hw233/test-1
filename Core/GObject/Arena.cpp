@@ -1,4 +1,4 @@
-#include "Config.h"
+﻿#include "Config.h"
 #include "Arena.h"
 #include "Player.h"
 #include "Fighter.h"
@@ -22,7 +22,7 @@ namespace GObject
 #endif
 
 const static UInt8 progress_accept[7][13] = {
-  // 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12 
+  // 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12
     {0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0},   // 0
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},   // 1
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},   // 2
@@ -227,7 +227,7 @@ UInt8 Arena::bet1( Player * player, UInt8 state, UInt8 group, UInt64 pid, UInt8 
     if(progress_accept[state][_progress] == 0)
         return 0xFF;
 
-    PreliminaryPlayerListMap::iterator pit = _preliminaryPlayers[state].find(pid); 
+    PreliminaryPlayerListMap::iterator pit = _preliminaryPlayers[state].find(pid);
     if(pit == _preliminaryPlayers[state].end())
         return 0xFF;
 

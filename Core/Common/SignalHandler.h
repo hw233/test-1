@@ -17,7 +17,7 @@ class SignalHandler
 	///
 	/// The class provides a signal handler (installed with
 	/// installHandlers()) that translates certain POSIX
-	/// signals (SIGILL, SIGBUS, SIGSEGV, SIGSYS) into 
+	/// signals (SIGILL, SIGBUS, SIGSEGV, SIGSYS) into
 	/// C++ exceptions.
 	///
 	/// Internally, a stack of sigjmp_buf structs is maintained for
@@ -62,9 +62,9 @@ public:
 		/// Returns the top-most sigjmp_buf for the current thread.
 
 	static void throwSignalException(int sig);
-		/// Throws a SignalException with a textual description  
-		/// of the given signal as argument. 
-	
+		/// Throws a SignalException with a textual description
+		/// of the given signal as argument.
+
 	static void install();
 		/// Installs signal handlers for SIGILL, SIGBUS, SIGSEGV
 		/// and SIGSYS.
@@ -86,7 +86,7 @@ protected:
 
 private:
 	static JumpBufferVec _jumpBufferVec;
-	
+
 	friend class ThreadImpl;
 };
 

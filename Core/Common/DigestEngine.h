@@ -22,19 +22,19 @@ public:
 
 	DigestEngine();
 	virtual ~DigestEngine();
-		
+
 	void update(const void* data, unsigned length);
 	void update(char data);
 	void update(const std::string& data);
 		/// Updates the digest with the given data.
-		
+
 	virtual unsigned digestLength() const = 0;
 		/// Returns the length of the digest in bytes.
 
 	virtual void reset() = 0;
 		/// Resets the engine so that a new
 		/// digest can be computed.
-		
+
 	virtual const Digest& digest() = 0;
 		/// Finishes the computation of the digest and
 		/// returns the message digest. Resets the engine
@@ -49,7 +49,7 @@ protected:
 	virtual void updateImpl(const void* data, unsigned length) = 0;
 		/// Updates the digest with the given data. Must be implemented
 		/// by subclasses.
-		
+
 private:
 	DigestEngine(const DigestEngine&);
 	DigestEngine& operator = (const DigestEngine&);
@@ -75,7 +75,7 @@ inline void DigestEngine::update(char data)
 
 inline void DigestEngine::update(const std::string& data)
 {
-	updateImpl(data.data(), (unsigned) data.size());	
+	updateImpl(data.data(), (unsigned) data.size());
 }
 
 

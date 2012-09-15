@@ -172,7 +172,8 @@ function RunNewRegisterAward(player)
             end
         end
     end
-    local chance = {379,1895,2400,5768,9558,9991,10000}
+    --local chance = {379,1895,2400,5768,9558,9991,10000}
+    local chance = {379,1895,5000,5000,5000,9991,10000}
     local item = {515,503,507,56,57,509,500,--[["10QB"]] }
     local j = 0;
     local g = math.random(1, 10000)
@@ -186,8 +187,111 @@ function RunNewRegisterAward(player)
     end
     
     return j;
-
 end
 
+function RunBirthdayAward(player)
+    if player == nil then
+        return 0;
+    end
+    local package = player:GetPackage();
+	if package:GetRestPackageSize() < 1 then
+		player:sendMsgCode(2, 1011, 0);
+		return 0;
+	end
+    local chance = {5000, 5300, 5500, 5500, 5500, 6000, 6000, 10000}
+    local item = {503, 509, 515, "QB", "Ipad", 507, "Iphone", 500 }
+    local j = 0; 
+    local g = math.random(1, 10000)
+    for i = 1, #chance do
+        if g <= chance[i] then
+            player:BirthdayAward(item[i], 1);
+            package:AddItem(item[i], 1, true, true, 31);
+            j = i;
+            break
+        end
+    end
+    return j;
+end
+
+local PlatformAward =  
+{ --平台id
+    [1]  = {    -- "QQ空间"
+        --1:推广用注册玩家登录奖励领取
+        --2:回流用户新区道具奖
+        [1] = {}, --id,num
+		[2] = {},
+		[3] = {{515, 5},{503, 5},{507,5},{509,5},{1528,5},{440,5},{1325,5}},
+    },
+    [2]  = {    -- "朋友网"
+        [1] = {}, --id,num
+		[2] = {},
+		[3] = {{515, 5},{503, 5},{507,5},{509,5},{1528,5},{440,5},{1325,5}},
+    },
+    [3]  = {    -- "qq微博"
+        [1] = {}, --id,num
+		[2] = {},
+		[3] = {{515, 5},{503, 5},{507,5},{509,5},{1528,5},{440,5},{1325,5}},
+    },
+    [4]  = {    -- "Q+"
+        [1] = {}, --id,num
+		[2] = {},
+		[3] = {{515, 5},{503, 5},{507,5},{509,5},{1528,5},{440,5},{1325,5}},
+    },
+    [5]  = {    -- "财付通"
+        [1] = {}, --id,num
+		[2] = {},
+		[3] = {{515, 5},{503, 5},{507,5},{509,5},{1528,5},{440,5},{1325,5}},
+    },
+    [10] = {    -- "QQ游戏大厅"
+        [1] = {}, --id,num
+		[2] = {},
+		[3] = {{515, 5},{503, 5},{507,5},{509,5},{1528,5},{440,5},{1325,5}},
+    },
+    [11] = {    -- "3366"
+        [1] = {}, --id,num
+		[2] = {},
+		[3] = {{515, 5},{503, 5},{507,5},{509,5},{1528,5},{440,5},{1325,5}},
+    },
+    [12] = {    -- "官网"
+        [1] = {}, --id,num
+        [2] = {},
+		[3] = {{515, 5},{503, 5},{507,5},{509,5},{1528,5},{440,5},{1325,5}},
+    },
+    [16] = {    -- gamelife
+        [1] = {}, --id,num
+		[2] = {},
+		[3] = {{515, 5},{503, 5},{507,5},{509,5},{1528,5},{440,5},{1325,5}},
+    },
+    [17] = {    -- qqunion
+        [1] = {}, --id,num
+		[2] = {},
+		[3] = {{515, 5},{503, 5},{507,5},{509,5},{1528,5},{440,5},{1325,5}},
+    },
+}
+
+function RunNewRegisterAwardAD_RF(player, idx)
+    if nil == player or nil == idx then
+        return 0
+    end
+    if 1 ~= idx and 2 ~= idx and 3 ~= idx then
+        return 0
+    end
+    local pf = player:getPlatform()
+    local aw = PlatformAward[pf]
+    --print("平台id:"..pf)
+    if nil == aw or nil == next(aw) then
+        return 0
+    end
+    local award = aw[idx]
+    local package = player:GetPackage()
+	if package:GetRestPackageSize() < #award then
+		player:sendMsgCode(2, 1011, 0)
+		return 0
+	end
+    for _, val in pairs(award) do 
+        package:Add(val[1], val[2], true, false, 31)
+    end
+    return 1
+end
 
 

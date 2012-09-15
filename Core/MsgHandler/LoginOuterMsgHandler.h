@@ -1,5 +1,7 @@
-#ifndef _LOGINOUTERMSGHANDLER_H_
+﻿#ifndef _LOGINOUTERMSGHANDLER_H_
 #define _LOGINOUTERMSGHANDLER_H_
+
+#include <string>
 
 #include "MsgTypes.h"
 #include "MsgFunc.h"
@@ -30,18 +32,22 @@
 #include "GData/ExpTable.h"
 #include "GData/Store.h"
 #include "GObject/Player.h"
-#include <libmemcached/memcached.h>
 #include "GObject/SaleMgr.h"
 #include "GObject/WBossMgr.h"
-#include "GObject/DCLogger.h"
 #include "GObject/FrontMap.h"
 #include "GObject/Copy.h"
 #include "GObject/Dungeon.h"
 #include "GObject/World.h"
 #include "GObject/Var.h"
+#include "GObject/RealItemAward.h"
 //#include "MsgHandler/JsonParser.h"
 
+#ifndef _WIN32
+#include <libmemcached/memcached.h>
+#include "GObject/DCLogger.h"
+
 static memcached_st* memc = NULL;
+#endif
 
 bool getId(char buf[64], UInt8 type = 0);
 bool checkKey(UInt8 type, const UInt8* _hashval, UInt64 _userid);
@@ -58,7 +64,7 @@ bool checkKey(UInt8 type, const UInt8* _hashval, UInt64 _userid);
         return;\
 }
 
-static void serverNameToGlobalName(string& name, UInt16 sid)
+static void serverNameToGlobalName(std::string& name, UInt16 sid)
 {
     if(cfg.merged && sid > 0)
     {
@@ -72,6 +78,7 @@ static void serverNameToGlobalName(string& name, UInt16 sid)
     }
 }
 
+#ifndef _WIN32
 static bool initMemcache()
 {
     bool hasServer = false;
@@ -114,6 +121,7 @@ __attribute__((destructor)) static void uninitMemcache()
         memc = NULL;
     }
 }
+#endif // _WIN32
 
 struct UserDisconnectStruct
 {
@@ -156,9 +164,12 @@ struct NewUserStruct
     std::string _openkey;
     std::string _via;
     std::string _invited;
-	MESSAGE_DEF10(REQ::CREATE_ROLE, std::string, _name, UInt8, _class, UInt8, _level, UInt8, _level1, UInt8, _isYear,
+    UInt8 _rp;
+	MESSAGE_DEF11(REQ::CREATE_ROLE, std::string, _name, UInt8, _class, UInt8, _level, UInt8, _level1, UInt8, _isYear,
+            std::string, _platform, std::string, _openid, std::string, _openkey, std::string, _via, std::string, _invited, UInt8, _rp);
+/*	MESSAGE_DEF10(REQ::CREATE_ROLE, std::string, _name, UInt8, _class, UInt8, _level, UInt8, _level1, UInt8, _isYear,
             std::string, _platform, std::string, _openid, std::string, _openkey, std::string, _via, std::string, _invited);
-
+*/
 };
 
 
@@ -168,10 +179,12 @@ void UserDisconnect( GameMsgHdr& hdr, UserDisconnectStruct& )
 	player->SetSessionID(-1);
 	GameMsgHdr imh(0x200, player->getThreadId(), player, 0);
 	GLOBAL().PushMsg(imh, NULL);
+#ifndef _WIN32
 #ifdef _FB
 #else
     GObject::dclogger.decDomainOnlineNum(atoi(player->getDomain().c_str()));
 #endif
+#endif // _WIN32
 }
 
 struct UserLogonRepStruct
@@ -336,10 +349,12 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 		if(res == 0)
 		{
             TRACE_LOG("登陆成功, %s, %"I64_FMT"u, %"I64_FMT"u, %u, %d", ul._openid.c_str(), ul._userid, pid, hdr.sessionID, player->getThreadId());
+#ifndef _WIN32
 #ifdef _FB
 #else
             GObject::dclogger.incDomainOnlineNum(atoi(ul._platform.c_str()));
 #endif
+#endif //_WIN32
             player->setQQVipl(ul._level);
             player->setQQVipl1(ul._level1);
             player->setQQVipYear(ul._isYear);
@@ -349,11 +364,13 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 		else if(res == 4)
 		{
             TRACE_LOG("重复登陆, %s, %"I64_FMT"u, %"I64_FMT"u, %u, %d", ul._openid.c_str(), ul._userid, pid, hdr.sessionID, player->getThreadId());
+#ifndef _WIN32
 #ifdef _FB
 #else
             GObject::dclogger.decDomainOnlineNum(atoi(domain.c_str()));
             GObject::dclogger.incDomainOnlineNum(atoi(ul._platform.c_str()));
 #endif
+#endif //_WIN32
             player->setQQVipl(ul._level);
             player->setQQVipl1(ul._level1);
             player->setQQVipYear(ul._isYear);
@@ -564,7 +581,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
                 UInt64 inviterId = (pl->getId() & 0xffff000000000000) + atoll(nu._invited.c_str());
                 char szTmp[128];
                 sprintf(szTmp, "%ld", inviterId);
-                string strTmp(szTmp);
+                std::string strTmp(szTmp);
                 nu._invited  = strTmp;
             }
             pl->setInvited(nu._invited);
@@ -572,10 +589,12 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 
 			DBLOG1().PushUpdateData("insert into register_states(server_id,player_id,player_name,platform,reg_time) values(%u,%"I64_FMT"u, '%s', %u, %u)", cfg.serverLogId, pl->getId(), pl->getName().c_str(), atoi(nu._platform.c_str()), TimeUtil::Now());
 
+#ifndef _WIN32
 #ifdef _FB
 #else
             GObject::dclogger.incDomainOnlineNum(atoi(pl->getDomain().c_str()));
 #endif
+#endif //_WIN32
 			CountryEnterStruct ces(false, 1, loc);
 			GameMsgHdr imh(0x1F0, country, pl, sizeof(CountryEnterStruct));
 			GLOBAL().PushMsg(imh, &ces);
@@ -603,7 +622,9 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->setSysDailog(true);
             GameMsgHdr hdr(0x297, country, pl, 0);
             GLOBAL().PushMsg(hdr, NULL);
-		}
+
+            pl->SetVar(GObject::VAR_RP_VALUE, nu._rp);
+        }
 	}
 
 	if(res == 0)
@@ -664,6 +685,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
         br>>serverNo;
         player_Id += (static_cast<UInt64>(serverNo) << 48);
     }
+#ifndef _WIN32
 #ifdef _FB
 #else
     initMemcache();
@@ -720,6 +742,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
     else
         err += "token server error.";
 #endif
+#endif //_WIN32
 
     if (no.length())
     {
@@ -837,6 +860,7 @@ void onUserReRecharge( LoginMsgHdr& hdr, const void * data )
 
 bool getId(char buf[64], UInt8 type)
 {
+#ifndef _WIN32
     if (cfg.GMCheck)
     {
         UInt8 ret = 1;
@@ -877,6 +901,7 @@ bool getId(char buf[64], UInt8 type)
             return false;
     }
     else
+#endif //_WIN32
     {
         const char* id = "20110503ll";
         memcpy(buf, id, strlen(id));
@@ -1305,7 +1330,7 @@ void AddItemFromBs(LoginMsgHdr &hdr,const void * data)
 			}
 			else
 			{
-				result +="2 ";				
+				result +="2 ";
 			}
 		}
 	}
@@ -1313,7 +1338,7 @@ void AddItemFromBs(LoginMsgHdr &hdr,const void * data)
 	st<<result;
 	st<<Stream::eos;
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
-	
+
 	SAFE_DELETE(item);
 
 }
@@ -1350,7 +1375,7 @@ void AddItemFromBsById(LoginMsgHdr &hdr,const void * data)
     UInt16 serverNo = 0;
     if(cfg.merged)
     {
-        br>>serverNo;        
+        br>>serverNo;
     }
     for(UInt32 i = 0; i < 4; i ++)
 	{
@@ -1383,7 +1408,7 @@ void AddItemFromBsById(LoginMsgHdr &hdr,const void * data)
 			}
 			else
 			{
-				result +="2 ";				
+				result +="2 ";
 			}
 		}
 	}
@@ -1391,7 +1416,7 @@ void AddItemFromBsById(LoginMsgHdr &hdr,const void * data)
 	st<<result;
 	st<<Stream::eos;
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
-	
+
 	SAFE_DELETE(item);
 
 }
@@ -1424,11 +1449,12 @@ void ServerOnlinePFNum(LoginMsgHdr& hdr, const void * data)
 	BinaryReader br(data,hdr.msgHdr.bodyLen);
 	Stream st;
 	st.init(SPEP::ONLINEPF,0x01);
-    CHKKEY();
-    UInt32 nums[MAX_DOMAIN] = {0,};
-    GObject::dclogger.getOnline(nums);
     size_t off = st.size();
     st << static_cast<UInt8>(0);
+#ifndef _WIN32
+	CHKKEY();
+    UInt32 nums[MAX_DOMAIN] = {0,};
+    GObject::dclogger.getOnline(nums);
 
     UInt8 count = 0;
     for (UInt8 i = 0; i < MAX_DOMAIN; ++i)
@@ -1440,8 +1466,8 @@ void ServerOnlinePFNum(LoginMsgHdr& hdr, const void * data)
             ++count;
         }
     }
-
     st.data<UInt8>(off) = count;
+#endif //_WIN32
 	st<<Stream::eos;
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
 #endif
@@ -1553,7 +1579,7 @@ void AddItemToAllFromBs(LoginMsgHdr &hdr,const void * data)
 	st<<result;
 	st<<Stream::eos;
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
-	
+
 	SAFE_DELETE(item);
 }
 
@@ -1675,7 +1701,7 @@ void SetPropsFromBs(LoginMsgHdr &hdr,const void * data)
 
 void SetMoneyFromBs(LoginMsgHdr &hdr,const void * data)
 {
-    return; // XXX: 取消这个功能 yangyoufa@ 19/12/11 21:04:59 
+    return; // XXX: 取消这个功能 yangyoufa@ 19/12/11 21:04:59
 	BinaryReader br(data,hdr.msgHdr.bodyLen);
     Stream st;
 	st.init(SPEP::SETMONEY,0x01);
@@ -1729,6 +1755,7 @@ void SetMoneyFromBs(LoginMsgHdr &hdr,const void * data)
         money.coupon = coupon;
         money.achievement = achievement;
 
+#ifndef _WIN32
         if (cfg.GMCheck)
         {
             initMemcache();
@@ -1779,6 +1806,7 @@ void SetMoneyFromBs(LoginMsgHdr &hdr,const void * data)
             }
         }
         else
+#endif //_WIN32
         {
             GameMsgHdr msg(0x323, pl->getThreadId(), pl, sizeof(money));
             GLOBAL().PushMsg(msg, &money);
@@ -2038,7 +2066,7 @@ void GetMoneyFromBs(LoginMsgHdr &hdr, const void * data)
         TimeUtil::GetYYMMDD(TimeUtil::SharpDay(-2, now)),
         TimeUtil::GetYYMMDD(TimeUtil::SharpDay(-1, now)),
         TimeUtil::GetYYMMDD(now),
-    };  
+    };
 
     bool found = false;
     for (int i = 0; i < 7; ++i)
@@ -2228,6 +2256,63 @@ void ClearDiscountFromBs(LoginMsgHdr& hdr, const void* data)
     GData::store.storeDiscount();
     GData::store.makePacket();
 }
+
+void QueryRealAwardInfo(LoginMsgHdr& hdr, const void* data)
+{
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+    Stream st(SPEP::REALAWARDINFO);
+    GObject::realItemAwardMgr.getInfo(st);
+    st << Stream::eos;
+	NETWORK()->SendMsgToClient(hdr.sessionID, st);
+}
+
+void AddRealAward(LoginMsgHdr& hdr, const void* data)
+{
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+
+    UInt8 type = 0;
+    UInt8 ret = 0;
+    br >> type;
+
+    Stream st(SPEP::ADDREALAWARD);
+    st << type;
+    switch(type)
+    {
+    case 1:
+        {
+            UInt32 id = 0;
+            UInt32 cd = 0;
+            std::string card_no;
+            std::string card_psw;
+            br >> id >> cd >> card_no >> card_psw;
+            if(id == 0 || cd == 0 || card_no.length() == 0 || card_psw.length() == 0)
+                ret = 0;
+            else if(GObject::realItemAwardMgr.addAward(id, cd, card_no, card_psw))
+                ret = 1;
+            else
+                ret = 2;
+        }
+        break;
+    case 2:
+        {
+            UInt32 id = 0;
+            br >> id;
+            if(id == 0)
+                ret = 0;
+            else if(GObject::realItemAwardMgr.delAward(id))
+                ret = 1;
+            else
+                ret = 2;
+        }
+        break;
+    }
+    st << ret << Stream::eos;
+
+	NETWORK()->SendMsgToClient(hdr.sessionID, st);
+}
+
 
 
 #endif // _LOGINOUTERMSGHANDLER_H_

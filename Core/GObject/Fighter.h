@@ -1,4 +1,4 @@
-#ifndef _FIGHTER_H_
+﻿#ifndef _FIGHTER_H_
 #define _FIGHTER_H_
 
 #include "GObjectManager.h"
@@ -35,7 +35,11 @@ namespace GObject
 #define FIGHTER_BUFF_DMAN       0x0D //道男
 #define FIGHTER_BUFF_DWMAN      0x0E //道女
 
-#define FIGHTER_BUFF_COUNT 0x10 
+#define FIGHTER_BUFF_RDIAMOND   0x0F //红钻变身卡
+#define FIGHTER_BUFF_BLUE       0x10 //蓝钻变身卡
+#define FIGHTER_BUFF_QQVIP      0x11 //QQ会员变身卡
+
+#define FIGHTER_BUFF_COUNT 0x20
 
 #define SKILL_UPMAX 3 // 技能最初就能装备3个
 #define CITTA_LEVEL_MAX 100
@@ -160,7 +164,7 @@ public:
     // 卸下无双技能
     void offPeerless(bool = true);
     // 增加一个可装备的无双技能
-    bool addNewPeerless(UInt16 pl, bool = true, bool = false); 
+    bool addNewPeerless(UInt16 pl, bool = true, bool = false);
     // 删除一个可装备的无双技能
     bool delPeerless(UInt16 pl, bool = true);
     inline UInt16 getPeerless() { return peerless / SKILL_LEVEL_MAX; }
@@ -279,6 +283,14 @@ public:
     inline std::vector<UInt16>& getPassiveSkillEnter() { return _rpasskl[GData::SKILL_ENTER-GData::SKILL_PASSSTART]; }
     // 取得死亡后概率触发技能
     inline std::vector<UInt16>& getPassiveSkillDead() { return _rpasskl[GData::SKILL_DEAD-GData::SKILL_PASSSTART]; }
+
+
+    // 神农宝鼎
+    inline std::vector<UInt16>& getPassiveSkillOnTherapy() { return _passkl[GData::SKILL_ONTHERAPY-GData::SKILL_PASSSTART]; }
+    // 轩辕神剑
+    inline std::vector<UInt16>& getPassiveSkillOnSkillDmg() { return _passkl[GData::SKILL_ONSKILLDMG-GData::SKILL_PASSSTART]; }
+    // 五彩元石
+    inline std::vector<UInt16>& getPassiveSkillOnOtherDead() { return _passkl[GData::SKILL_ONOTHERDEAD-GData::SKILL_PASSSTART]; }
 
     // 取得心法带出技能的ID表
     const std::vector<const GData::SkillBase*>& skillFromCitta(UInt16 citta);
@@ -477,6 +489,8 @@ public:
 public:
     inline void setExtraAttack(Int32 atk) { setDirty(true); _wbextatk = atk; }
 	inline void setExtraMagAttack(Int32 atk) { setDirty(true); _wbextmagatk = atk; }
+    inline void setAttrExtraEquip(const GData::AttrExtra& other){_attrExtraEquip += other;}
+    inline void resetAttrExtraEquip(){setDirty(true); _attrExtraEquip.reset();}
 
 public:
 	inline Int16 getBaseStrength()
@@ -637,7 +651,7 @@ protected:
 	UInt8 _level;
 	UInt64 _exp;        // 经验
     UInt32 _pexp;       // 修炼经验
-    UInt32 _pexpAddTmp; // for Attainment  
+    UInt32 _pexpAddTmp; // for Attainment
     UInt32 _pexpMax;    // 修炼最大经验
 	float _potential;   // 潜力
 	float _capacity;    // 资质
@@ -646,7 +660,7 @@ protected:
 
     UInt8 _acupoints[ACUPOINTS_MAX];    // 穴道
 
-    UInt16 _skill[SKILL_UPMAX];     // 装备的技能 _skill[i] % SKILL_LEVEL_MAX => skilllevel, _skill[i]/SKILL_LEVEL_MAX=> skillid 
+    UInt16 _skill[SKILL_UPMAX];     // 装备的技能 _skill[i] % SKILL_LEVEL_MAX => skilllevel, _skill[i]/SKILL_LEVEL_MAX=> skillid
     std::vector<UInt16> _skills;    // 可装备的技能 TODO: 如果所有技能都将是由心法带出,则数据表里不需要存这个字段
 
     UInt8 _cittaslot;               // 可装备心法最大数
@@ -696,6 +710,7 @@ public:
     bool openSecondSoul(UInt8 cls);
     void setSecondSoul(SecondSoul* sedondSoul);
     UInt8 getSoulExtraAura();
+    UInt8 getSoulAuraLeft();
     bool practiceLevelUp();
     bool changeSecondSoulClass(UInt8 cls);
     bool changeSecondSoulXinxiu(UInt8 xinxiu);
@@ -736,6 +751,7 @@ public:
     void makeFighterSSInfo(Stream& st);
     bool appendFighterSSInfo(Stream& st, UInt16 skillid);
     bool appendFighterSSInfo(Stream& st, UInt16 skillid, SStrengthen* ss);
+    void PeerlessSSNotify(UInt16 id);
 private:
     std::map<UInt16, SStrengthen> m_ss;
 

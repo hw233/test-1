@@ -16,7 +16,7 @@ DirectoryIterator::DirectoryIterator(): _pImpl(0)
 {
 }
 
-	
+
 DirectoryIterator::DirectoryIterator(const std::string& path): _path(path), _pImpl(new DirectoryIteratorImpl(path))
 {
 	_path.makeDirectory();
@@ -27,14 +27,14 @@ DirectoryIterator::DirectoryIterator(const std::string& path): _path(path), _pIm
 
 DirectoryIterator::DirectoryIterator(const DirectoryIterator& iterator): _path(iterator._path), _pImpl(iterator._pImpl)
 {
-	if (_pImpl) 
+	if (_pImpl)
 	{
 		_pImpl->duplicate();
 		_file = _path;
 	}
 }
 
-	
+
 DirectoryIterator::DirectoryIterator(const File& file): _path(file.path()), _pImpl(new DirectoryIteratorImpl(file.path()))
 {
 	_path.makeDirectory();
@@ -61,7 +61,7 @@ DirectoryIterator& DirectoryIterator::operator = (const DirectoryIterator& it)
 {
 	if (_pImpl) _pImpl->release();
 	_pImpl = it._pImpl;
-	if (_pImpl) 
+	if (_pImpl)
 	{
 		_pImpl->duplicate();
 		_path = it._path;

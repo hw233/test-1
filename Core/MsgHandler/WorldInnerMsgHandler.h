@@ -178,7 +178,7 @@ void OnClanMailInviteClick(GameMsgHdr& hdr, const void * data)
 	}
 	else
 	{
-		inviter->getClan()->declineInvite(player);	
+		inviter->getClan()->declineInvite(player);
 	}
 	Stream st(REQ::MAIL_DELETE);
 	st << static_cast<UInt8>(1) << cmcir->id << Stream::eos;
@@ -681,7 +681,7 @@ void OnLuckyDraw( GameMsgHdr& hdr,  const void* data )
     player->AddVar(VAR_LUCKYDRAW_CNT, times);
     SYSMSG(title, 2364);
     SYSMSG(content, 2365);
-    if((oldCnt < 20) && ((oldCnt + times) >=20)) 
+    if((oldCnt < 20) && ((oldCnt + times) >=20))
     {
         Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
         if(mail)
@@ -700,7 +700,7 @@ void OnLuckyDraw( GameMsgHdr& hdr,  const void* data )
             DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, player->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
         }
     }
-    if((oldCnt < 40) && ((oldCnt + times) >=40)) 
+    if((oldCnt < 40) && ((oldCnt + times) >=40))
     {
         Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
         if(mail)
@@ -719,7 +719,7 @@ void OnLuckyDraw( GameMsgHdr& hdr,  const void* data )
             DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, player->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
         }
     }
-    if((oldCnt < 60) && ((oldCnt + times) >=60)) 
+    if((oldCnt < 60) && ((oldCnt + times) >=60))
     {
         Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
         if(mail)
@@ -738,7 +738,7 @@ void OnLuckyDraw( GameMsgHdr& hdr,  const void* data )
             DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, player->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
         }
     }
-    if((oldCnt < 80) && ((oldCnt + times) >=80)) 
+    if((oldCnt < 80) && ((oldCnt + times) >=80))
     {
         Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
         if(mail)
@@ -761,6 +761,28 @@ void OnLuckyDraw( GameMsgHdr& hdr,  const void* data )
     WORLD().RankLuckyDraw(player);
 }
 
+#define CNT 7
+void SendRechargeRank(Stream& st)
+{
+    using namespace GObject;
+    st.init(REP::ACT);
+    UInt8 cnt = World::rechargeSort.size();
+    if (cnt > CNT)
+        cnt = CNT;
+    st << static_cast<UInt8>(2) << static_cast<UInt8>(1) << static_cast<UInt8>(0) << cnt;
+    UInt32 c = 0;
+    for (RCSortType::iterator i = World::rechargeSort.begin(), e = World::rechargeSort.end(); i != e; ++i)
+    {
+        st << i->player->getName();
+        st << i->total;
+        st << static_cast<UInt8>(i->player->getCountry()<<4|(i->player->IsMale()?0:1));
+        ++c;
+        if (c >= CNT)
+            break;
+    }
+    st << Stream::eos;
+}
+
 void OnRechargeRank ( GameMsgHdr& hdr,  const void* data )
 {
     using namespace GObject;
@@ -774,13 +796,14 @@ void OnRechargeRank ( GameMsgHdr& hdr,  const void* data )
     UInt32 oldrank = 0;
     for (RCSortType::iterator i = World::rechargeSort.begin(), e = World::rechargeSort.end(); i != e; ++i)
     {
+        ++oldrank;
         if (i->player == player)
         {
-            inrank = true;
+            if (oldrank <= CNT)
+                inrank = true;
             World::rechargeSort.erase(i);
             break;
         }
-        ++oldrank;
     }
 
     RCSort s;
@@ -789,23 +812,50 @@ void OnRechargeRank ( GameMsgHdr& hdr,  const void* data )
     World::rechargeSort.insert(s);
 
     UInt32 rank = 0;
+    UInt32 myrank = 0;
+    bool stop = false;
     for (RCSortType::iterator i = World::rechargeSort.begin(), e = World::rechargeSort.end(); i != e; ++i)
     {
+        if (!stop)
+            ++myrank;
+
         if (i->player == player)
-            break;
+            stop = true;
+
         ++rank;
+
+        Stream st(REP::ACT);
+        st << static_cast<UInt8>(2) << static_cast<UInt8>(1) << static_cast<UInt8>(2) << i->total << static_cast<UInt8>(rank) << Stream::eos;
+        i->player->send(st);
     }
 
-#if 0
-    // TODO: broadcast
-    if ((oldrank < 20 && rank != oldrank) || (!inrank && rank < 20))
+    if (oldrank <= CNT || (!inrank && myrank <= CNT))
     {
-        ++rank;
-        Stream st(0);
-        st << player->getName() << rank << Stream::eos;
+        Stream st;
+        SendRechargeRank(st);
         NETWORK()->Broadcast(st);
     }
-#endif
+}
+
+void SendConsumeRank(Stream& st)
+{
+    using namespace GObject;
+    st.init(REP::ACT);
+    UInt8 cnt = World::consumeSort.size();
+    if (cnt > CNT)
+        cnt = CNT;
+    st << static_cast<UInt8>(2) << static_cast<UInt8>(2) << static_cast<UInt8>(0) << cnt;
+    UInt32 c = 0;
+    for (RCSortType::iterator i = World::consumeSort.begin(), e = World::consumeSort.end(); i != e; ++i)
+    {
+        st << i->player->getName();
+        st << i->total;
+        st << static_cast<UInt8>(i->player->getCountry()<<4|(i->player->IsMale()?0:1));
+        ++c;
+        if (c >= CNT)
+            break;
+    }
+    st << Stream::eos;
 }
 
 void OnConsumeRank ( GameMsgHdr& hdr,  const void* data )
@@ -824,7 +874,8 @@ void OnConsumeRank ( GameMsgHdr& hdr,  const void* data )
         ++oldrank;
         if (i->player == player)
         {
-            inrank = true;
+            if (oldrank <= CNT)
+                inrank = true;
             World::consumeSort.erase(i);
             break;
         }
@@ -836,77 +887,81 @@ void OnConsumeRank ( GameMsgHdr& hdr,  const void* data )
     World::consumeSort.insert(s);
 
     UInt32 rank = 0;
+    UInt32 myrank = 0;
+    bool stop = false;
     for (RCSortType::iterator i = World::consumeSort.begin(), e = World::consumeSort.end(); i != e; ++i)
     {
-        ++rank;
+        if (!stop)
+            ++myrank;
+
         if (i->player == player)
-            break;
-    }
-#if 0
-    // TODO: broadcast
-    if ((oldrank < 20 && rank != oldrank) || (!inrank && rank < 20))
-    {
+            stop = true;
+
         ++rank;
-        Stream st(0);
-        st << player->getName() << rank << Stream::eos;
+
+        Stream st(REP::ACT);
+        st << static_cast<UInt8>(2) << static_cast<UInt8>(2) << static_cast<UInt8>(2) << i->total << static_cast<UInt8>(rank) << Stream::eos;
+        i->player->send(st);
+    }
+
+    if (oldrank <= CNT || (!inrank && myrank <= CNT))
+    {
+        Stream st;
+        SendConsumeRank(st);
         NETWORK()->Broadcast(st);
     }
-#endif
-}
-
-inline bool player_enum_rc(GObject::Player * p, int)
-{
-    using namespace GObject;
-    if (World::getRechargeActive() || World::getRechargeActive3366())
-    {
-        UInt32 total;
-        if(World::getRechargeActive())
-            total = p->GetVar(VAR_RECHARGE_TOTAL);
-        else
-            total = p->GetVar(VAR_RECHARGE_TOTAL3366);
-        if (total)
-        {
-            RCSort s;
-            s.player = p;
-            s.total = total;
-            World::rechargeSort.insert(s);
-        }
-    }
-    if (World::getConsumeActive())
-    {
-        UInt32 total = p->GetVar(VAR_CONSUME);
-        if (total)
-        {
-            RCSort s;
-            s.player = p;
-            s.total = total;
-            World::consumeSort.insert(s);
-        }
-    }
-    return true;
-}
-
-static bool init = false;
-void initRCRank()
-{
-    GObject::globalPlayers.enumerate(player_enum_rc, 0);
-    init = true;
 }
 
 void OnSendRechargeRank ( GameMsgHdr& hdr,  const void* data )
 {
+    using namespace GObject;
     MSG_QUERY_PLAYER(player);
-    // TODO:
-    if (!init)
-        initRCRank();
+    World::initRCRank();
+    Stream st;
+    SendRechargeRank(st);
+    player->send(st);
+
+    UInt32 rank = 0;
+    for (RCSortType::iterator i = World::rechargeSort.begin(), e = World::rechargeSort.end(); i != e; ++i)
+    {
+        ++rank;
+        if (i->player == player)
+        {
+            Stream st(REP::ACT);
+            st << static_cast<UInt8>(2) << static_cast<UInt8>(1) << static_cast<UInt8>(2) << i->total << static_cast<UInt8>(rank) << Stream::eos;
+            player->send(st);
+            break;
+        }
+    }
 }
 
 void OnSendConsumeRank ( GameMsgHdr& hdr,  const void* data )
 {
+    using namespace GObject;
     MSG_QUERY_PLAYER(player);
-    // TODO:
-    if (!init)
-        initRCRank();
+    World::initRCRank();
+    Stream st;
+    SendConsumeRank(st);
+    player->send(st);
+
+    UInt32 rank = 0;
+    for (RCSortType::iterator i = World::consumeSort.begin(), e = World::consumeSort.end(); i != e; ++i)
+    {
+        ++rank;
+        if (i->player == player)
+        {
+            Stream st(REP::ACT);
+            st << static_cast<UInt8>(2) << static_cast<UInt8>(2) << static_cast<UInt8>(2) << i->total << static_cast<UInt8>(rank) << Stream::eos;
+            player->send(st);
+            break;
+        }
+    }
+}
+
+void OnGetQgameGiftAward( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    player->getQgameGiftAward();
 }
 
 void OnRoamResult( GameMsgHdr& hdr,  const void* data )
@@ -924,6 +979,47 @@ void OnRoamResult( GameMsgHdr& hdr,  const void* data )
     player->qixiStepAdvance(roam->pos, roam->event, roam->score);
 }
 
+void OnKillMonsterRoamResult( GameMsgHdr& hdr,  const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+
+    struct _Roam
+    {
+        UInt32 _pos;
+        UInt8 _curType;
+        UInt8 _curCount;
+        UInt8 _tips;
+    };
+
+    const _Roam* roam = reinterpret_cast<const _Roam *>(data);
+    player->killMonsterStepAdvance(roam->_pos, roam->_curType, roam->_curCount, roam->_tips);
+}
+
+void OnKillMonsterReqInfo( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    WORLD().killMonsterInit();
+
+    Stream st(REP::COUNTRY_ACT);
+    UInt8 subType = 0x02;
+    st << subType;
+    UInt8 subType2 = 0;
+    st << subType2;
+    st << player->GetVar(VAR_ZYCM_POS);
+    st << static_cast<UInt8>(player->GetVar(VAR_ZYCM_TIPS));
+    st << player->GetVar(VAR_XIAGU_CNT);
+    st << player->GetVar(VAR_ROUQING_CNT);
+    st << player->GetVar(VAR_CAIFU_CNT);
+    st << player->GetVar(VAR_CHUANQI_CNT);
+    WORLD().killMonsterAppend(st, 0);
+    WORLD().killMonsterAppend(st, 1);
+    WORLD().killMonsterAppend(st, 2);
+    WORLD().killMonsterAppend(st, 3);
+    st << Stream::eos;
+    player->send(st);
+}
 
 void OnReCalcWeekDayAddTimer( GameMsgHdr& hdr,  const void* data )
 {
@@ -935,5 +1031,29 @@ void OnReCalcWeekDayRemoveTimer( GameMsgHdr& hdr,  const void* data )
     WORLD().RemoveTimer(WORLD()._recalcwd);
     WORLD()._recalcwd = NULL;
 }
+
+void OnTownDeamonResNotify( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    struct TDResNotify
+    {
+        GObject::Player * peer;
+        bool win;
+    };
+    TDResNotify* notify = reinterpret_cast<TDResNotify*>(const_cast<void *>(data));
+
+    GObject::townDeamonManager->notifyChallengeResult(player, notify->peer, notify->win);
+}
+
+void OnTownDeamonAttackNpcNotify( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    bool win = *reinterpret_cast<bool*>(const_cast<void *>(data));
+
+    GObject::townDeamonManager->notifyAttackNpcResult(player, win);
+}
+
+
+
 
 #endif // _WORLDINNERMSGHANDLER_H_

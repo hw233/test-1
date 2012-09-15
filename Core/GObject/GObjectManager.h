@@ -1,4 +1,4 @@
-#ifndef _GOBJECTMANAGER_H_
+﻿#ifndef _GOBJECTMANAGER_H_
 #define _GOBJECTMANAGER_H_
 
 #include <map>
@@ -230,7 +230,7 @@ namespace GObject
 
             return attr->attrMax[q][crr][t];
         }
-        
+
         static UInt32 getColorFighterChance(UInt16 idx, UInt8 f_g, UInt8 color )
         {
             if(!f_g)
@@ -378,7 +378,7 @@ namespace GObject
                 UInt8 lvl2 = lvl - lvl%10;
                 it = _ringHpBase.find(lvl2);
             }
-            
+
             stRingHpBase* ringHp = NULL;
             if(it == _ringHpBase.end())
                 ringHp = _ringHpBase[10];

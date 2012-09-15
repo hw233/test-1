@@ -1,4 +1,4 @@
-#include "Config.h"
+﻿#include "Config.h"
 #include "Player.h"
 #include "Country.h"
 #include "Athletics.h"
@@ -269,7 +269,7 @@ void Athletics::attack(Player * defer)
 		Stream st(REP::ATTACK_NPC);
 		st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
 		_owner->send(st);
-		
+
 		UInt32 id = addAthleticsData(0, defer, res ? 0 : 1, reptid, time);
 		notifyAthleticsDeferData(0, defer, id, res ? 0 : 1, reptid, time);
 		AthleticsResult ar = { id, 0, defer, res };
@@ -499,7 +499,7 @@ bool Athletics::addAthleticsExtraAward(UInt32 EquipId, UInt8 rank)
 	}
 	_owner->GetPackage()->AddEquip(EquipId, true, false, FromAthletAward);
 	_owner->GetPackage()->AddItem(8913, 1, true, false, FromAthletAward);
-	
+
 	if(rank == 1)
 	{
 		_owner->GetPackage()->AddItem(8999, 3, true, false, FromAthletAward);
@@ -509,7 +509,7 @@ bool Athletics::addAthleticsExtraAward(UInt32 EquipId, UInt8 rank)
 		_owner->GetPackage()->AddItem(8999, 2, true, false, FromAthletAward);
 	else  if(rank == 3)
 		_owner->GetPackage()->AddItem(8999, 1, true, false, FromAthletAward);
-	
+
 	return true;
 }
 
@@ -598,7 +598,7 @@ void Athletics::attackMartial(Player* defer)
         //UInt32 time = TimeUtil::Now();
 		id = 0;//addAthleticsData(0, defer, res ? 0 : 1, reptid, time);
 		//notifyAthleticsDeferData(0, defer, id, res ? 0 : 1, reptid, time);
-       
+
         Player* winner =  res ? _owner : defer;
 
         GameAction()->doAttainment(winner,  Script::ATHLETICS_WIN , 1);
@@ -861,7 +861,7 @@ void Athletics::listAthleticsMartial()
         {
             Player* pl = gAthleticsRank.getOrginal_martial(_owner, i);
             if(pl)
-                st << pl->getName() << pl->getCountry() << pl->GetClass() << static_cast<UInt8>(pl->GetClassAndSex() & 0x0F) << pl->GetLev() << gAthleticsRank.getOrginal_canAttack(_owner, i) << curData->eRivalType[i];
+                st << pl->getName() << pl->getCountry() << pl->GetClass() << static_cast<UInt8>(pl->GetClassAndSex() & 0x0F) << pl->GetLev() << gAthleticsRank.getOrginal_canAttack(_owner, i) << curData->eRivalType[i] << pl->getPF();
             //else
             //    st << "" << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0);
         }
@@ -962,7 +962,7 @@ void Athletics::listAthleticsMartial2(UInt8 type, bool update)
         {
             Player* player = gAthleticsRank.getOrginal_martial(_owner, i);
             if(player)
-                st << player->getName() << player->getCountry() << player->GetClass() << static_cast<UInt8>(player->GetClassAndSex() & 0x0F) << player->GetLev() << gAthleticsRank.getOrginal_canAttack(_owner, i) << curData->eRivalType[i];
+                st << player->getName() << player->getCountry() << player->GetClass() << static_cast<UInt8>(player->GetClassAndSex() & 0x0F) << player->GetLev() << gAthleticsRank.getOrginal_canAttack(_owner, i) << curData->eRivalType[i] <<  player->getPF();
         }
     }
     else
@@ -1052,7 +1052,7 @@ void Athletics:: PayForKillCD(UInt8 type)
     GObject::AthleticsPay msg;
     msg.type = AthleticsRank::AthleticsPayForKillCD;
     msg.moneyEnough = 0;
-   if(_owner->getGold() < cost) 
+   if(_owner->getGold() < cost)
        _owner->sendMsgCode(0, 1104);
    else
    {

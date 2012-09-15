@@ -1,4 +1,4 @@
-#include "Config.h"
+﻿#include "Config.h"
 #include "Mail.h"
 #include "Server/WorldServer.h"
 #include "MsgID.h"
@@ -76,7 +76,7 @@ bool MailPackage::takeIt( Player * player, bool gm )
 
                     if (gm)
                     {
-                        char gold[32] = {0}; 
+                        char gold[32] = {0};
                         snprintf(gold, 32, "%u", c);
                         player->udpLog("free", gold, "", "", "", "", "currency");
                     }
@@ -512,7 +512,7 @@ void MailBox::readMail( UInt32 id )
 				st << static_cast<UInt16>(0);
 				UInt16 EquipId = mail->additional & 0xFFFF;
 				UInt8 rank =  static_cast<UInt8>(mail->additional >> 16);
-				
+
 				st << EquipId << static_cast<UInt16>(1);
 				st << static_cast<UInt16>(8913) << static_cast<UInt16>(1);
 				UInt16 num = 2;
@@ -541,7 +541,7 @@ void MailBox::readMail( UInt32 id )
 				st << static_cast<UInt8>(1);
 				st << static_cast<UInt32>(0) << static_cast<UInt32>(0) << static_cast<UInt32>(0) << static_cast<UInt32>(0);
 				size_t off = st.size();
-				st << static_cast<UInt16>(0);	
+				st << static_cast<UInt16>(0);
 				UInt16 num = 0;
 				_owner->GetTrade()->makeMailInfo(mail->additional, st, num);
 				st.data<UInt16>(off) = num;
@@ -574,7 +574,7 @@ void MailBox::readMail( UInt32 id )
             break;
 		default://ÓÊ¼þÃ»ÓÐÎïÆ·
 			{
-				st << static_cast<UInt8>(0);	
+				st << static_cast<UInt8>(0);
 			}
 			break;
 	}
@@ -683,7 +683,7 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 		}
 		break;
 	case 0x31:
-		{	
+		{
 			UInt32 EquipId = mail->additional & 0xFFFF;
 			UInt8 rank =  static_cast<UInt8>(mail->additional >> 16);
 			if(_owner->GetAthletics()->addAthleticsExtraAward(EquipId, rank))
@@ -801,7 +801,7 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 				delIt = true;
 				break;
 			}
-			ClanAllyClickReq cacr = { mail->additional, action == 0 ? true : false, _owner };			
+			ClanAllyClickReq cacr = { mail->additional, action == 0 ? true : false, _owner };
 			GameMsgHdr hdr(0x176, WORKER_THREAD_WORLD, launcher, sizeof(ClanAllyClickReq));
 			GLOBAL().PushMsg(hdr, &cacr);
 			delIt = true;
@@ -832,7 +832,7 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 			if(_newMails > 0)
 			{
 				-- _newMails;
-                // XXX: 
+                // XXX:
 				//Stream st(REP::MAIL_NEW);
 				//st << _newMails << Stream::eos;
 				//_owner->send(st);

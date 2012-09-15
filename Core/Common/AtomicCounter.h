@@ -32,44 +32,44 @@ class AtomicCounter
 {
 public:
 	typedef int ValueType; /// The underlying integer type.
-	
+
 	AtomicCounter();
 		/// Creates a new AtomicCounter and initializes it to zero.
-		
+
 	explicit AtomicCounter(ValueType initialValue);
 		/// Creates a new AtomicCounter and initializes it with
 		/// the given value.
-	
+
 	AtomicCounter(const AtomicCounter& counter);
 		/// Creates the counter by copying another one.
-	
+
 	~AtomicCounter();
 		/// Destroys the AtomicCounter.
 
 	AtomicCounter& operator = (const AtomicCounter& counter);
 		/// Assigns the value of another AtomicCounter.
-		
+
 	AtomicCounter& operator = (ValueType value);
 		/// Assigns a value to the counter.
 
 	operator ValueType () const;
 		/// Returns the value of the counter.
-		
+
 	ValueType value() const;
 		/// Returns the value of the counter.
-		
+
 	ValueType operator ++ (); // prefix
 		/// Increments the counter and returns the result.
-		
+
 	ValueType operator ++ (int); // postfix
 		/// Increments the counter and returns the previous value.
-		
+
 	ValueType operator -- (); // prefix
 		/// Decrements the counter and returns the result.
-		
+
 	ValueType operator -- (int); // postfix
 		/// Decrements the counter and returns the previous value.
-		
+
 	bool operator ! () const;
 		/// Returns true if the counter is zero, false otherwise.
 
@@ -104,7 +104,7 @@ inline AtomicCounter::operator AtomicCounter::ValueType () const
 	return _counter;
 }
 
-	
+
 inline AtomicCounter::ValueType AtomicCounter::value() const
 {
 	return _counter;
@@ -116,7 +116,7 @@ inline AtomicCounter::ValueType AtomicCounter::operator ++ () // prefix
 	return InterlockedIncrement(&_counter);
 }
 
-	
+
 inline AtomicCounter::ValueType AtomicCounter::operator ++ (int) // postfix
 {
 	ValueType result(_counter);
@@ -130,7 +130,7 @@ inline AtomicCounter::ValueType AtomicCounter::operator -- () // prefix
 	return InterlockedDecrement(&_counter);
 }
 
-	
+
 inline AtomicCounter::ValueType AtomicCounter::operator -- (int) // postfix
 {
 	ValueType result(_counter);
@@ -138,7 +138,7 @@ inline AtomicCounter::ValueType AtomicCounter::operator -- (int) // postfix
 	return result;
 }
 
-	
+
 inline bool AtomicCounter::operator ! () const
 {
 	return _counter == 0;
@@ -154,7 +154,7 @@ inline AtomicCounter::operator AtomicCounter::ValueType () const
 	return _counter;
 }
 
-	
+
 inline AtomicCounter::ValueType AtomicCounter::value() const
 {
 	return _counter;
@@ -166,7 +166,7 @@ inline AtomicCounter::ValueType AtomicCounter::operator ++ () // prefix
 	return OSAtomicIncrement32(&_counter);
 }
 
-	
+
 inline AtomicCounter::ValueType AtomicCounter::operator ++ (int) // postfix
 {
 	ValueType result(_counter);
@@ -180,7 +180,7 @@ inline AtomicCounter::ValueType AtomicCounter::operator -- () // prefix
 	return OSAtomicDecrement32(&_counter);
 }
 
-	
+
 inline AtomicCounter::ValueType AtomicCounter::operator -- (int) // postfix
 {
 	ValueType result(_counter);
@@ -188,7 +188,7 @@ inline AtomicCounter::ValueType AtomicCounter::operator -- (int) // postfix
 	return result;
 }
 
-	
+
 inline bool AtomicCounter::operator ! () const
 {
 	return _counter == 0;
@@ -209,7 +209,7 @@ inline AtomicCounter::operator AtomicCounter::ValueType () const
 	return result;
 }
 
-	
+
 inline AtomicCounter::ValueType AtomicCounter::value() const
 {
 	ValueType result;
@@ -231,7 +231,7 @@ inline AtomicCounter::ValueType AtomicCounter::operator ++ () // prefix
 	return result;
 }
 
-	
+
 inline AtomicCounter::ValueType AtomicCounter::operator ++ (int) // postfix
 {
 	ValueType result;
@@ -253,7 +253,7 @@ inline AtomicCounter::ValueType AtomicCounter::operator -- () // prefix
 	return result;
 }
 
-	
+
 inline AtomicCounter::ValueType AtomicCounter::operator -- (int) // postfix
 {
 	ValueType result;
@@ -264,7 +264,7 @@ inline AtomicCounter::ValueType AtomicCounter::operator -- (int) // postfix
 	return result;
 }
 
-	
+
 inline bool AtomicCounter::operator ! () const
 {
 	bool result;

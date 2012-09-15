@@ -41,6 +41,7 @@ public:
 				break;
 		}
 	}
+    int size() {return _objs.size();}
 protected:
 	ObjMap _objs;
 };

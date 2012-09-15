@@ -1,4 +1,4 @@
-
+﻿
 #include "FrontMap.h"
 #include "Player.h"
 #include "GData/FrontMapTable.h"
@@ -13,7 +13,7 @@
 #include "HeroMemo.h"
 #include "ShuoShuo.h"
 #include "Package.h"
-
+#include "GObject/Tianjie.h"
 namespace GObject
 {
 
@@ -85,7 +85,7 @@ void FrontMap::sendInfo2(Player* pl, UInt8 id, bool succ)
 
     if (succ)
         sendFrontMap(st, pl, id, true);
-    else 
+    else
         st << static_cast<UInt8>(0);
 
     st << Stream::eos;
@@ -204,12 +204,12 @@ void FrontMap::enter(Player* pl, UInt8 id)
                 pl->send(st);
                 pl->sendMsgCode(0, 1104);
                 return;
-            }  
+            }
 
             ++PLAYER_DATA(pl, frontGoldCnt);
             tmp.resize(1);
             tmp[0].lootlvl = PLAYER_DATA(pl, frontGoldCnt);
-            DB3().PushUpdateData("REPLACE INTO `player_frontmap`(`playerId`, `id`, `spot`, `count`, `status`, `lootlvl`) VALUES(%"I64_FMT"u, %u, 0, 0, 0, %u)", 
+            DB3().PushUpdateData("REPLACE INTO `player_frontmap`(`playerId`, `id`, `spot`, `count`, `status`, `lootlvl`) VALUES(%"I64_FMT"u, %u, 0, 0, 0, %u)",
                     pl->getId(), id, PLAYER_DATA(pl, frontGoldCnt));
             ret = 0;
 
@@ -385,6 +385,10 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
                 else
                     randNum = randNum + 1;
                 pl->GetPackage()->AddItem2(9057, randNum, true, true);
+            }
+            if (GObject::Tianjie::instance().isTjOpened())
+            { 
+                pl->GetPackage()->AddItem(9138, 1, false, false);
             }
 
             GameAction()->onFrontMapWin(pl, id, spot, tmp[spot].lootlvl);
@@ -573,9 +577,9 @@ void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool in
 
                 UInt8 secs = 0;
                 if (cfg.GMCheck)
-                    secs = 60; 
+                    secs = 60;
                 else
-                    secs = 20; 
+                    secs = 20;
 
                 EventAutoFrontMap* event = new (std::nothrow) EventAutoFrontMap(pl, secs, count, id, nspot);
                 if (!event) return;
@@ -586,7 +590,7 @@ void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool in
                 DB3().PushUpdateData("REPLACE INTO `auto_frontmap` (`playerId`, `id`) VALUES (%"I64_FMT"u, %u)", pl->getId(), id);
 
                 Stream st(REP::AUTO_FRONTMAP);
-                st << static_cast<UInt8>(0) << id << nspot << Stream::eos; 
+                st << static_cast<UInt8>(0) << id << nspot << Stream::eos;
                 pl->send(st);
             }
             break;
@@ -601,7 +605,7 @@ void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool in
                 autoClear(pl);
 
                 Stream st(REP::AUTO_FRONTMAP);
-                st << static_cast<UInt8>(1) << id << Stream::eos; 
+                st << static_cast<UInt8>(1) << id << Stream::eos;
                 pl->send(st);
             }
             break;

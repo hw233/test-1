@@ -1,4 +1,5 @@
 #include "Path_WIN32.h"
+#include "Exception.h"
 #include "Environment_WIN32.h"
 
 
