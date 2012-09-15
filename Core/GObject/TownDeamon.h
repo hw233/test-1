@@ -41,6 +41,7 @@ struct DeamonPlayerData
 {
     UInt32 challengeTime;
     UInt32 startTime;
+    UInt32 time2MaxLvl;
     UInt16 deamonLevel;
     UInt16 curLevel;
     UInt16 maxLevel;
@@ -60,6 +61,7 @@ struct DeamonPlayerData
     {
         challengeTime = 0;
         startTime = 0;
+        time2MaxLvl = 0;
         deamonLevel = 0;
         curLevel = 0;
         maxLevel = 0;
