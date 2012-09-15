@@ -130,6 +130,9 @@ RCSortType World::rechargeSort;
 RCSortType World::consumeSort;
 bool World::_needrechargerank = false;
 bool World::_needconsumerank = false;
+#ifndef _WIN32
+CUserLogger* World::ulog = NULL;
+#endif
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
@@ -807,6 +810,23 @@ void World::World_Online_Log( void * )
 #ifdef _FB
 #else
     dclogger.online();
+
+    UInt32 onlines[MAX_DOMAIN] = {0};
+    dclogger.getOnline(onlines);
+
+    char sz_online[32] = {0};
+    char sz_time[32] = {0};
+    char sz_server[32] = {0};
+
+    snprintf(sz_online, sizeof(sz_online), "%u", onlineNums);
+    snprintf(sz_time, sizeof(sz_time), "%u", (UInt32)time(NULL));
+    snprintf(sz_server, sizeof(sz_server), "%d", cfg.serverNum);
+    udpLog("pcu", sz_server, sz_time, sz_online, "", "", "ser");
+
+    snprintf(sz_online, sizeof(sz_online), "%u", onlines[1]);
+    snprintf(sz_time, sizeof(sz_time), "%u", (UInt32)time(NULL));
+    snprintf(sz_server, sizeof(sz_server), "%d", cfg.serverNum);
+    udpLog("vippcu", sz_server, sz_time, sz_online, "", "", "ser");
 #endif
 #endif // _WIN32
 }
@@ -1486,4 +1506,19 @@ void World::sendQixiScoreAward(Player* pl)
     DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
 }
 
+#ifndef _WIN32
+void World::udpLog(const char* str1, const char* str2, const char* str3, const char* str4,
+    const char* str5, const char* str6, const char* type)
+{
+    if (!ulog && cfg.udplog)
+        ulog = _analyzer.GetInstance("world");
+    if (ulog && cfg.udplog)
+    {
+        ulog->LogMsg(str1, str2, str3, str4, str5, str6, type);
+        TRACE_LOG("(%s,%s,%s,%s,%s,%s,%s)", str1, str2, str3, str4, str5, str6, type);
+    }
 }
+#endif
+
+}
+
