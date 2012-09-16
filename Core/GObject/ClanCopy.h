@@ -268,7 +268,7 @@ class ClanCopy
         typedef std::set<ClanCopyMonster* > DeadMonster;
 
     public:
-        ClanCopy(Clan *c, Player *player); 
+        ClanCopy(Clan *c, UInt32 copyId, Player *player); 
         ~ClanCopy();
 
         UInt8 getStatus();
@@ -316,6 +316,7 @@ class ClanCopy
     private:
         Clan   *_clan;
         UInt16 _copyLevel;
+        UInt32 _copyId;
         UInt8  _status;
 
 
@@ -367,6 +368,8 @@ class ClanCopyMgr : public Singleton <ClanCopyMgr>
     ClanCopyMgr();
     ~ClanCopyMgr();
 
+    void setInterval(UInt32 time);
+
     void ResetBegin();
     void Reset();
     void ResetEnd();
@@ -394,6 +397,7 @@ class ClanCopyMgr : public Singleton <ClanCopyMgr>
     UInt16 _maxCopyLevel;  // 全服最高通关的副本等级
     ClanCopyMap _clanCopyMap;
     bool _reset;           // 是否在副本重置时间段 （每周日23:30~周一00:30）
+    UInt32 _interval;
 
 };
 

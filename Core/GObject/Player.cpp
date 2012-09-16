@@ -5519,6 +5519,13 @@ namespace GObject
         _clan->setCopyLevel(level);
     }
 
+    void Player::setClanCopyTime(UInt32 time)
+    {
+        // GM命令设置帮派副本每轮时间
+        ClanCopyMgr::Instance().setInterval(time);
+    }
+
+
 
     // 帮派副本
     ////////////////////////////////////////////
@@ -10632,7 +10639,7 @@ namespace GObject
         if (_clan == NULL)
             return 0;
         UInt16 level = _clan->getStatueLevel();
-        return GData::clanStatueTable[level].exHp;
+        return static_cast<float>(GData::clanStatueTable[level].exHp);
     }
 
     float Player::getClanStatueAtkEffect()
@@ -10640,7 +10647,7 @@ namespace GObject
         if (_clan == NULL)
             return 0;
         UInt16 level = _clan->getStatueLevel();
-        return GData::clanStatueTable[level].exAttack;
+        return static_cast<float>(GData::clanStatueTable[level].exAttack);
     }
 
     float Player::getClanStatueDefendEffect()
@@ -10648,7 +10655,7 @@ namespace GObject
         if (_clan == NULL)
             return 0;
         UInt16 level = _clan->getStatueLevel();
-        return GData::clanStatueTable[level].exDefend;
+        return static_cast<float>(GData::clanStatueTable[level].exDefend);
     }
 
     float Player::getClanStatueMagAtkEffect()
@@ -10656,7 +10663,7 @@ namespace GObject
         if (_clan == NULL)
             return 0;
         UInt16 level = _clan->getStatueLevel();
-        return GData::clanStatueTable[level].exMagAtk;
+        return static_cast<float>(GData::clanStatueTable[level].exMagAtk);
     }
 
     float Player::getClanStatueMagDefentEffect()
@@ -10664,7 +10671,7 @@ namespace GObject
         if (_clan == NULL)
             return 0;
         UInt16 level = _clan->getStatueLevel();
-        return GData::clanStatueTable[level].exMagDef;
+        return static_cast<float>(GData::clanStatueTable[level].exMagDef);
     }
 
     float Player::getClanStatueActionEffect()
@@ -10672,7 +10679,7 @@ namespace GObject
         if (_clan == NULL)
             return 0;
         UInt16 level = _clan->getStatueLevel();
-        return GData::clanStatueTable[level].exAction;
+        return static_cast<float>(GData::clanStatueTable[level].exAction);
     }
 
     float Player::getClanStatueHitrLvlEffect()
@@ -10680,7 +10687,7 @@ namespace GObject
         if (_clan == NULL)
             return 0;
         UInt16 level = _clan->getStatueLevel();
-        return GData::clanStatueTable[level].exHitRate;
+        return static_cast<float>(GData::clanStatueTable[level].exHitRate);
     }
 
     void  Player::AddStatueExp(UInt32 exp)

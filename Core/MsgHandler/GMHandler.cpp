@@ -38,6 +38,7 @@
 #include "GObject/Tianjie.h"
 #include "GObject/ClanCopy.h"
 
+#include "GObject/Tianjie.h"
 GMHandler gmHandler;
 
 GMHandler::GMHandler()
@@ -195,6 +196,7 @@ GMHandler::GMHandler()
 
     Reg(3, "statue", &GMHandler::OnStatueExp);
     Reg(3, "setcopy", &GMHandler::OnSetClanCopyLevel);
+    Reg(3, "setcopytime", &GMHandler::OnSetClanCopyTime);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2970,3 +2972,33 @@ void GMHandler::OnSetClanCopyLevel(GObject::Player* player, std::vector<std::str
     }
 }
 
+void GMHandler::OnSetClanCopyTime(GObject::Player* player, std::vector<std::string>& args)
+{
+    if(args.empty())
+        return;
+    if (args.size() == 1)
+    {
+        Int32 copyTime = atoi(args[0].c_str());
+        if(copyTime < 0)
+            return;
+        else
+            player->setClanCopyTime(static_cast<UInt32>(copyTime));
+    }
+}
+
+void GMHandler::OnTj3(GObject::Player* player, std::vector<std::string>& args)
+{
+	if(args.size() < 1)
+		return;
+    int tlzLevelCount = atoi(args[0].c_str());
+    GObject::Tianjie::instance().setTj3Count(tlzLevelCount);
+}
+
+void GMHandler::OnTj4(GObject::Player* player, std::vector<std::string>& args)
+{
+	if(args.size() < 1)
+		return;
+    int bossMaxHp = atoi(args[0].c_str());
+    GObject::Tianjie::instance().setTj4BossHp(bossMaxHp);
+}
+>>>>>>> db48d4f... clanCopy statueAttr fixed. GM setcopytime add.

@@ -508,6 +508,8 @@ public:
     UInt32 getStatueExAction();
     UInt32 getStatueExHitRate();
 
+    void   notifyUpdateStatueAttr();
+
     UInt16 getCopyLevel();
     UInt32 getOutputExp();
     UInt32 getNextOutputExp();
