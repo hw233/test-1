@@ -24,6 +24,7 @@ ClanStatue::~ClanStatue()
 void ClanStatue::updateLevel(UInt32 exp, UInt32 expUpdateTime)
 {
     // 根据现有exp更新等级（FIXME: 重置副本的时间段经验结算）
+    UInt16 formalLevel = _level;
     UInt16 copyLevel = _clan->getCopyLevel();
     UInt32 expOutput = GData::clanCopyTable[copyLevel].expOutput;
     UInt32 expConsume = GData::clanStatueTable[_level].consumeExp;
@@ -67,10 +68,15 @@ void ClanStatue::updateLevel(UInt32 exp, UInt32 expUpdateTime)
     }
     _level = GData::clanStatueTable.size() - 2;
     DB5().PushUpdateData("REPLACE INTO `clan_statue` (`clanId`, `exp`, `level`, `expUpdateTime`) VALUES (%u,%u,%u,%u)", _clan->getId(), _exp, _level, now);
+    if (formalLevel != _level)
+    {
+        _clan->notifyUpdateStatueAttr();
+    }
 }
 
 void ClanStatue::addExp(UInt32 exp)
 {
+    UInt16 formalLevel = _level;
     _exp += exp;
     _level = 0;
     for (std::vector<GData::ClanStatueTableData>::iterator it = GData::clanStatueTable.begin(); 
@@ -87,10 +93,15 @@ void ClanStatue::addExp(UInt32 exp)
     }
     _level = GData::clanStatueTable.size() - 2;
     DB5().PushUpdateData("REPLACE INTO `clan_statue` (`clanId`, `exp`, `level`, `expUpdateTime`) VALUES (%u,%u,%u,%u)", _clan->getId(), _exp, _level, TimeUtil::Now());
+    if (formalLevel != _level)
+    {
+        _clan->notifyUpdateStatueAttr();
+    }
 }
 
 void ClanStatue::subExp(UInt32 exp)
 {
+    UInt16 formalLevel = _level;
     if (_exp < exp)
         _exp = 0;
     else
@@ -110,6 +121,10 @@ void ClanStatue::subExp(UInt32 exp)
     }
     _level = GData::clanStatueTable.size() - 1;
     DB5().PushUpdateData("REPLACE INTO `clan_statue` (`clanId`, `exp`, `level`, `expUpdateTime`) VALUES (%u,%u,%u,%u)", _clan->getId(), _exp, _level, TimeUtil::Now(), _clan->getId());
+    if (formalLevel != _level)
+    {
+        _clan->notifyUpdateStatueAttr();
+    }
 }
 
 UInt16 ClanStatue::getLevel()

@@ -1465,7 +1465,7 @@ namespace GData
                                      cs.exMagAtk, cs.exMagDef, cs.exAction, cs.exHitRate);
 
 		}
-        clanStatueTable.push_back(ClanStatueTableData());
+        clanStatueTable[0] = (ClanStatueTableData());
         return true;
     }
 

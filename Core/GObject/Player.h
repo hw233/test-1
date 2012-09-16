@@ -1216,6 +1216,7 @@ namespace GObject
 
         // GM命令设置帮派副本等级
         void setClanCopyLevel(UInt16 level);
+        void setClanCopyTime(UInt32 time);
 
 
         // 帮派副本

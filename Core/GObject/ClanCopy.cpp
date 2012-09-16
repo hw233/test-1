@@ -19,7 +19,7 @@ const static UInt32 COPY_MIN_PLAYER = 2;
 UInt32 clanCopyFileIndex = 1;
 #endif
 
-ClanCopy::ClanCopy(Clan *c, Player * player) : _clan(c), _launchPlayer(player)
+ClanCopy::ClanCopy(Clan *c, UInt32 copyId, Player * player) : _clan(c), _copyId  (copyId), _launchPlayer(player)
 {
 #ifdef DEBUG_CLAN_COPY
     char fileBuf[32];
@@ -42,7 +42,7 @@ ClanCopy::ClanCopy(Clan *c, Player * player) : _clan(c), _launchPlayer(player)
 
     _npcIndex = 1;
 
-    _tickTimeInterval = 5;
+    _tickTimeInterval = 3;
     _startTick = 1;
     _monsterRefreshTick = 6;
     _tickCount = 0;
@@ -811,7 +811,6 @@ void ClanCopy::spotCombat(UInt8 spotId)
                 (*monsterIt)->nextSpotId = spotId;
                 Battle::BattleSimulator bsim(Battle::BS_COPY5, playerIt->player, (*monsterIt)->name, (*monsterIt)->level, false);
                 playerIt->player->PutFighters( bsim, 0 );
-                playerIt->player->addHIAttr(_spotAttrs[spotId]);
 
                 size_t c = (*monsterIt)->npcList.size();
                 if(c <= 0)
@@ -831,7 +830,9 @@ void ClanCopy::spotCombat(UInt8 spotId)
                     bsim.newFighter(1, (*monsterIt)->npcList[i].pos, (*monsterIt)->npcList[i].fighter);
                 }
 
+                playerIt->player->addHIAttr(_spotAttrs[spotId]);
                 bsim.start();
+                playerIt->player->clearHIAttr();
                 Stream& packet = bsim.getPacket();
                 if (packet.size() <= 8)
                 {
@@ -870,7 +871,6 @@ void ClanCopy::spotCombat(UInt8 spotId)
                 st << Stream::eos;
                 playerIt->player->send(st);
                 bsim.applyFighterHP(0, playerIt->player, false);
-                playerIt->player->clearHIAttr();
                 break;
             }
         }
@@ -1108,6 +1108,7 @@ void ClanCopy::notifySpotBattleInfo(Player * player /* = NULL */)
     }
     Stream st(REP::CLAN_COPY);
     st << static_cast<UInt8> (CLAN_COPY_BATTLE);
+    st << static_cast<UInt32> (_copyId);
     st << static_cast<UInt16> (_copyLevel);
     st << static_cast<UInt16> (_maxMonsterWave);
     st << static_cast<UInt16> (_curMonsterWave);
@@ -1321,6 +1322,7 @@ ClanCopyMgr::ClanCopyMgr()
 {
     UInt32 now = TimeUtil::Now();
     UInt32 sweek = TimeUtil::SharpWeek(1, now);
+    _interval = 3;
     if ((sweek - now) <= 1800 || (now + 3600 * 24 * 7 - sweek) <= 1800)
     {
         _reset = true;
@@ -1334,6 +1336,11 @@ ClanCopyMgr::ClanCopyMgr()
 ClanCopyMgr::~ClanCopyMgr()
 {   
 
+}
+
+void ClanCopyMgr::setInterval(UInt32 time)
+{
+    _interval = time;
 }
 
 void ClanCopyMgr::ResetBegin()
@@ -1382,18 +1389,6 @@ void ClanCopyMgr::ResetEnd()
 void ClanCopyMgr::process(UInt32 now)
 {
     // 定时器处理所有帮派副本
-#ifdef DEBUG_CLAN_COPY
-    /*
-       static UInt32 count = 0;
-       if (!count)
-       {
-       createClanCopy(GObject::globalPlayers.begin()->second,globalClans[1]);
-       std::cout << "ClanCopy create." << std::endl;
-       std::cout << "Launcher : " << GObject::globalPlayers.begin()->second->getName() << std::endl;
-       }
-       ++ count;
-       */
-#endif
     for (ClanCopyMap::iterator it = _clanCopyMap.begin(); it != _clanCopyMap.end();)
     {
         if (it->second->getStatus() == CLAN_COPY_OVER)
@@ -1453,6 +1448,7 @@ ClanCopy * ClanCopyMgr::getClanCopyByClan(Clan *c)
 bool ClanCopyMgr::createClanCopy(Player* player, Clan *c)
 {
     // 创建一个新帮派副本
+    static UInt32 clanId = 1;
     if (c == NULL)
         return false;
     if (_clanCopyMap.find(c->getId()) != _clanCopyMap.end())
@@ -1474,7 +1470,8 @@ bool ClanCopyMgr::createClanCopy(Player* player, Clan *c)
         return false;
     }
 
-    ClanCopy  * copy = new ClanCopy(c, player);
+    ClanCopy  * copy = new ClanCopy(c, clanId ++, player);
+    copy->setInterval(_interval);
     if (!copy)
     {
         // new都失败，那也差不多了

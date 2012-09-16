@@ -153,6 +153,7 @@ private:
 
     void OnStatueExp(GObject::Player* player, std::vector<std::string>& args);
     void OnSetClanCopyLevel(GObject::Player* player, std::vector<std::string>& args);
+    void OnSetClanCopyTime(GObject::Player* player, std::vector<std::string>& arge);
 };
 
 extern GMHandler gmHandler;
