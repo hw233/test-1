@@ -1154,6 +1154,11 @@ namespace GObject
         }
     }
 
+    void Player::luaUdpLog(const char* str1, const char* str2, const char* type)
+    {
+        udpLog(str1, str2, "", "", "", "", type);
+    }
+
     void Player::guideUdp(UInt8 type, std::string& p1, std::string& p2)
     {
         if (type == 0)
@@ -12211,6 +12216,7 @@ namespace GObject
                 fgt->getAttrExtraEquip(st);
 
                 st << fgt->getSoulExtraAura();
+                st << fgt->getSoulAuraLeft();
                 st << fgt->getBattlePortrait();
                 fgt->appendElixirAttr2(st);
             }

@@ -166,6 +166,7 @@ Tianjie::Tianjie()
     m_nextTjTime = 0;
     m_rankKeepTime = 0;
     m_isRankKeep = false;
+    m_isWait = false;
 
     m_fighter[0] = NULL;
     m_fighter[1] = NULL;
@@ -185,7 +186,17 @@ bool Tianjie::isOpenTj(Player* pl)
     if (!m_isTjOpened && playerLevel == m_currOpenedTjLevel)
     {
         SYSMSG_BROADCASTV(5000, pl->getCountry(), pl->getName().c_str(), playerLevel);
+        m_isWait =false;
+		DB1().PushUpdateData("update tianjie set is_wait=0 where level=%d", m_currOpenedTjLevel); 
+
         OpenTj();
+    }
+    else if (!m_isTjOpened && !m_isWait && playerLevel == m_currOpenedTjLevel-1)
+    {
+        m_isWait = true;
+		DB1().PushUpdateData("update tianjie set is_wait=1 where level=%d", m_currOpenedTjLevel); 
+        
+        notifyTianjieStatus();
     }
     if (m_isTjOpened && playerLevel == m_currOpenedTjLevel+10)
     {
@@ -278,16 +289,9 @@ void Tianjie::OpenTj()
         SYSMSG_BROADCASTV(5001);
 
     printf("-------------------------------------------------------opentj\n");
-    Stream st(REQ::TIANJIE);
-    UInt8 type = 5; //通知
-    UInt8 status = 1; //开启状态
-    UInt8 id = m_tjTypeId;
-    UInt8 keep = m_isRankKeep;
-
-    st << type << status << id << keep << Stream::eos;
-
+    
     if (m_isNetOk)
-        NETWORK()->Broadcast(st);
+        notifyTianjieStatus();
 
     udplogTjStatus(true);
 }
@@ -304,7 +308,7 @@ bool Tianjie::LoadFromDB()
 	if (execu.get() == NULL || !execu->isConnected()) return false;
 
 	GData::DBTianjie dbexp;
-    if(execu->Prepare("SELECT `id`, `is_opened`,`is_execute`,`is_finish`,`is_ok`,`level`,`rate`,UNIX_TIMESTAMP(opentime),`r1_killed`,`r2_donated`,`r3_copyid`,`r4_day`,`open_next` FROM `tianjie` order by level desc limit 1", dbexp) != DB::DB_OK)
+    if(execu->Prepare("SELECT `id`, `is_opened`,`is_execute`,`is_finish`,`is_ok`,`level`,`rate`,UNIX_TIMESTAMP(opentime),`r1_killed`,`r2_donated`,`r3_copyid`,`r4_day`,`open_next`, `is_wait` FROM `tianjie` order by level desc limit 1", dbexp) != DB::DB_OK)
 		return false;
 
 	bool isTjDBNull = true;
@@ -319,7 +323,8 @@ bool Tianjie::LoadFromDB()
 		m_currTjRate = dbexp.rate;
 		m_openTime = dbexp.opentime;
         m_isOpenNextTianjie = dbexp.open_next;
-
+        m_isWait = dbexp.is_wait;
+       
         //只有天劫打开了，才能插入数据到map
         initSortMap();
 
@@ -427,7 +432,12 @@ bool Tianjie::LoadFromDB()
 	    	}
             if (currMaxPlayerLevel < s_tjRoleLevel[0])
             {
-                m_currOpenedTjLevel = s_tjRoleLevel[0];
+               m_currOpenedTjLevel = s_tjRoleLevel[0];
+               if (currMaxPlayerLevel + 1 == m_currOpenedTjLevel)
+               {
+                   m_isWait = true;
+               }
+               DB1().PushUpdateData("REPLACE INTO `tianjie`(`level`,`is_wait`) VALUES(%d,%d)", m_currOpenedTjLevel, m_isWait);
             }
             else
             {
@@ -494,19 +504,25 @@ void Tianjie::onTianjieReq( GameMsgHdr& hdr, const void* data)
         pl->OnDoTianjieTask(type, cmd, id);
     }
 }
-
+void Tianjie::notifyTianjieStatus(Player* pl)
+{
+    Stream st1(REQ::TIANJIE);
+    UInt8 type1 = 5; //通知
+    UInt8 status1 =  m_isTjOpened;
+    UInt8 id1 = m_tjTypeId;
+    UInt8 keep = m_isRankKeep;
+    UInt8 wait = m_isWait;
+    st1 << type1 << status1 << id1 << keep << wait << Stream::eos;
+    if (pl != NULL)
+        pl->send(st1);
+    else
+        NETWORK()->Broadcast(st1);
+}
 void Tianjie::getTianjieData(Player* pl, bool isLogin)
 {
     if (isLogin)
     {
-        Stream st1(REQ::TIANJIE);
-        UInt8 type1 = 5; //通知
-        UInt8 status1 =  m_isTjOpened;
-        UInt8 id1 = m_tjTypeId;
-        UInt8 keep = m_isRankKeep;
-        st1 << type1 << status1 << id1 << keep << Stream::eos;
-        pl->send(st1);
-
+        notifyTianjieStatus(pl);
         return;
     }
     Stream st(REP::TIANJIE);
@@ -996,8 +1012,7 @@ void Tianjie::goNext()
            m_scoreSortMap.clear();
        }
        broadTianjiePassed();
-       DB1().PushUpdateData("update tianjie set is_opened=%d,is_execute=%d,is_finish=%d,is_ok=%d where level=%d",
-	   	                    0, 0, m_isFinish, m_isOk, m_currOpenedTjLevel);
+       DB1().PushUpdateData("update tianjie set is_opened=%d,is_execute=%d,is_finish=%d,is_ok=%d where level=%d", 0, 0, m_isFinish, m_isOk, m_currOpenedTjLevel);
 
        m_isTjOpened = false;
 	   m_isTjExecute = 0;
@@ -1006,6 +1021,9 @@ void Tianjie::goNext()
 	   m_currTjRate = 0;
 //	   m_openTime = 0;
        m_bossDay =  0;
+       m_isWait = false;
+       
+       broadTianjiePassed();
 
        memset(m_rate1KilledCount, 0, sizeof(m_rate1KilledCount));
        memset(m_rate2DonateCount, 0, sizeof(m_rate2DonateCount));
@@ -1987,15 +2005,8 @@ void Tianjie::broadTianjiePassed()
 {
     printf("---------------------------------------tianjie passed,keep:%d\n", m_isRankKeep);
 
-    Stream st(REQ::TIANJIE);
-    UInt8 type = 5; //通知
-    UInt8 status = 0; //关闭
-    UInt8 id  = m_tjTypeId;
-    UInt8 keep = m_isRankKeep;
-
-    st << type << status << id << keep << Stream::eos;
     if (m_isNetOk)
-        NETWORK()->Broadcast(st);
+        notifyTianjieStatus();
 }
 int Tianjie::makeTlzKey(UInt8 type, UInt16 level)
 {

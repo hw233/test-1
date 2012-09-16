@@ -1016,7 +1016,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
             aura_factor = 1 + static_cast<float>(bf->getAura()-100) * 0.0025;
         }
 
-       if(!colorStock && !defend100 && (target_stun > 0 || (!enterEvade && bf->calcHit(area_target))))
+        if(!colorStock && !defend100 && (target_stun > 0 || (!enterEvade && bf->calcHit(area_target))))
         {
             UInt8& deepforgetlast = area_target->getDeepForgetLast();
             if(deepforgetlast > 0 && bf->getSide() != area_target->getSide())
@@ -1323,8 +1323,14 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
 
                 if(bf->getSide() != area_target->getSide() && counter_deny >= 0 && (!skill || skill->cond == GData::SKILL_ACTIVE))
                 {
-                    setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAura, 25 + bf->getSoulExtraAura(), 0, scList, scCount, false);
-                    setStatusChange(bf, area_target->getSide(), area_target->getPos(), 1, 0, e_stAura, 25 + area_target->getSoulExtraAura(), 0, scList, scCount, true);
+                    float aura_add = 25+bf->getSoulExtraAura()-calcAuraDebuf(bf, defList, defCount);
+                    if(aura_add < 0)
+                        aura_add = 0;
+                    setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAura, aura_add, 0, scList, scCount, false);
+                    aura_add = 25+area_target->getSoulExtraAura()-calcAuraDebuf(area_target, defList, defCount);
+                    if(aura_add < 0)
+                        aura_add = 0;
+                    setStatusChange(bf, area_target->getSide(), area_target->getPos(), 1, 0, e_stAura, aura_add, 0, scList, scCount, true);
                 }
             }
 

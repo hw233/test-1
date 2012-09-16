@@ -2319,6 +2319,7 @@ function onGetKillMonsterReward(player)
         if extAward ~= 0 then
             --package:Add(extAward, 1, true, true, 33)
             --player:lastKillMonsterAwardPush(extAward, 1);
+            player:luaUdpLog("916", "F_1099_"..curType, "act")
             sendItemPackageMail(player, msg_120, msg_121, {extAward,1,1})
         end
     end

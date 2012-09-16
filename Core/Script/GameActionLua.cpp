@@ -269,6 +269,7 @@ namespace Script
 		CLASS_DEF(Player, postKillMonsterRoamResult);
         CLASS_DEF(Player, lastQueqiaoAwardPush);
         CLASS_DEF(Player, lastKillMonsterAwardPush);
+        CLASS_DEF(Player, luaUdpLog);
 
         CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);
