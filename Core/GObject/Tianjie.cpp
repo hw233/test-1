@@ -13,7 +13,7 @@
 namespace GObject
 {
 extern URandom GRND;
-#define START_WITH_59 0
+#define START_WITH_59 0 
 //事件2捐赠的ID
 enum ENUM_ID_TJ2
 {
@@ -216,7 +216,6 @@ bool Tianjie::isOpenTj(Player* pl)
  {
  	if (!m_isTjExecute) return false;
 
-    m_locMutex.lock();
  	multimap<int, int>::iterator iter = m_locNpcMap.find(loc);
 	//验证怪物和玩家是否在同一个据点
 	while (iter != m_locNpcMap.end())
@@ -225,12 +224,10 @@ bool Tianjie::isOpenTj(Player* pl)
             break;
 	    if (iter->second == npcid)
 	    {
-            m_locMutex.unlock();
 	        return true;
 	    }
         ++iter;
 	}
-    m_locMutex.unlock();
  	return false;
  }
 bool  Tianjie::isTjRateNpc(int npcid)
@@ -476,6 +473,8 @@ bool Tianjie::LoadFromDB()
 }
 void Tianjie::onTianjieReq( GameMsgHdr& hdr, const void* data)
 {
+	FastMutex::ScopedLock lk(_opMutex);
+
     MSG_QUERY_PLAYER(pl);
     BinaryReader br(data, hdr.msgHdr.bodyLen);
     UInt8 type = 0;
@@ -781,7 +780,6 @@ void Tianjie::updateRankData(Player* pl)
     st << type << rank << score;
 
     int i = 0;
-    m_totalMutex.lock();
     TSortMap::iterator iter;
     for (iter=m_scoreSortMap.begin(); iter!=m_scoreSortMap.end(); ++iter)
     {
@@ -793,7 +791,6 @@ void Tianjie::updateRankData(Player* pl)
         if (i == 10)
             break;
     }
-    m_totalMutex.unlock();
     while (i < 10) //少于10个,填空的string
     {
         string name;
@@ -1128,6 +1125,7 @@ void Tianjie::attack(Player* pl, UInt16 loc, UInt32 npcid)
 {
     if (!m_isTjExecute) return;
 
+	FastMutex::ScopedLock lk(_opMutex);
     if (1 == m_currTjRate)
     {
         attack1(pl, loc, npcid);
@@ -1166,7 +1164,6 @@ void Tianjie::attack1(Player* pl, UInt16 loc, UInt32 npcid)
 	if (index == -1) return;
 
     bool res = false;
-    m_locMutex.lock();
     multimap<int, int>::iterator iter = m_locNpcMap.find(loc);
 	//验证怪物和玩家是否在同一个据点
 	while (iter != m_locNpcMap.end())
@@ -1182,7 +1179,6 @@ void Tianjie::attack1(Player* pl, UInt16 loc, UInt32 npcid)
 	    }
         ++iter;
 	}
-    m_locMutex.unlock();
 	//玩家赢了
 	if (res)
 	{
@@ -2061,9 +2057,7 @@ bool Tianjie::addNpc(int npcid)
     {
         p_map->Show(npcid, true, mo.m_Type);
 
-        m_locMutex.lock();
         m_locNpcMap.insert(make_pair(spot, npcid));
-        m_locMutex.unlock();
 
         m_loc = spot;
 
@@ -2113,7 +2107,6 @@ void Tianjie::insertToEventSortMap(Player* pl, int newScore, int oldScore)
     if (!m_isTjExecute || m_currTjRate >= 4)
         return;
 
-    m_eventMutex.lock();
     TSortMap::iterator iter = m_eventSortMap.find(oldScore);
 
     while (iter != m_eventSortMap.end())
@@ -2128,15 +2121,12 @@ void Tianjie::insertToEventSortMap(Player* pl, int newScore, int oldScore)
         ++iter;
     }
     m_eventSortMap.insert(make_pair(newScore, pl));
-
-    m_eventMutex.unlock();
 }
 void Tianjie::insertToScoreSortMap(Player* pl, int newScore, int oldScore)
 {
     if (!m_isTjOpened)
         return;
 
-    m_totalMutex.lock();
     TSortMap::iterator iter = m_scoreSortMap.find(oldScore);
 
     while (iter != m_scoreSortMap.end())
@@ -2151,42 +2141,35 @@ void Tianjie::insertToScoreSortMap(Player* pl, int newScore, int oldScore)
         ++iter;
     }
     m_scoreSortMap.insert(make_pair(newScore, pl));
-    m_totalMutex.unlock();
 }
 short Tianjie::getEventRank(Player* pl)
 {
     short rank = 0;
 
-    m_eventMutex.lock();
     TSortMap::iterator iter;
     for (iter=m_eventSortMap.begin(); iter!=m_eventSortMap.end(); ++iter)
     {
         rank++;
         if (iter->second == pl)
         {
-            m_eventMutex.unlock();
             return rank;
         }
     }
-    m_eventMutex.unlock();
     return 0;
 }
 short Tianjie::getScoreRank(Player* pl)
 {
     short rank = 0;
 
-    m_totalMutex.lock();
     TSortMap::iterator iter;
     for (iter=m_scoreSortMap.begin(); iter!=m_scoreSortMap.end(); ++iter)
     {
         rank++;
         if (iter->second == pl)
         {
-            m_totalMutex.unlock();
             return rank;
         }
     }
-    m_totalMutex.unlock();
     return 0;
 }
 void Tianjie::rewardEventBox(Player*pl, int score)
