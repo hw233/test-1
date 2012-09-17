@@ -520,6 +520,7 @@ bool Clan::kick(Player * player, UInt64 pid)
     ClanRankBattleMgr::Instance().Signout(kicker);
     player->SetVar(VAR_CLANBATTLE_HONOUR, 0);
     kicker->SetVar(VAR_CLAN_LEAVE_TIME, now);
+    kicker->setFightersDirty(true);
 
 	getAllocBack(*member);
 
@@ -617,6 +618,7 @@ bool Clan::leave(Player * player)
     ClanRankBattleMgr::Instance().Signout(player);
     player->SetVar(VAR_CLANBATTLE_HONOUR, 0);
     player->SetVar(VAR_CLAN_LEAVE_TIME, now);
+    player->setFightersDirty(true);
 
 	_members.erase(found);
 	delete member;
@@ -829,6 +831,7 @@ UInt8 Clan::apply( Player * player, UInt32 optime, bool writedb )
 			leader->player->GetMailBox()->newMail(player, 0x23, title, content);
 		}
 	}
+    player->setFightersDirty(true);
 
 	return 0;
 }
@@ -3578,7 +3581,7 @@ void Clan::LoadStatue(UInt16 level, UInt32 exp, UInt32 expUpdateTime)
 {
     // 读取帮派神像数据
     Mutex::ScopedLock lk(_mutex);
-    _statue->updateLevel(exp, expUpdateTime);
+    _statue->updateLevel(exp, expUpdateTime, _techs->getMaxStatueLevel());
 }
 
 void Clan::addStatueExp(UInt32 exp)
@@ -3597,8 +3600,9 @@ void Clan::subStatueExp(UInt32 exp)
 
 void Clan::updateStatueExp()
 {
+    //每小时更新神像等级
     Mutex::ScopedLock lk(_mutex);
-    _statue->updateLevel(0, 0);
+    _statue->updateLevel(0, 0, _techs->getMaxStatueLevel());
     broadcastCopyInfo();
 }
 

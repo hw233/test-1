@@ -947,13 +947,7 @@ void World::ClanStatueCheck(void *)
             
     };
     UpdateStatueVisitor visitor;
-    for (UInt8 i = 0; i <=2; ++i)
-    {
-        if(i > 1)
-            globalClans.enumerate(visitor);
-        else
-            globalClansByCountry[i].enumerate(visitor);
-    }
+    globalClans.enumerate(visitor);
 }
 
 #if 0
@@ -1020,7 +1014,8 @@ bool World::Init()
     AddTimer(3600 * 1000, AthleticsPhysicalCheck, static_cast<void *>(NULL), (3600 - now % 3600) * 1000);
     //AddTimer(60 * 1000, advancedHookTimer, static_cast<void *>(NULL), (60 - now % 60) * 1000);
 
-    AddTimer(3600 * 1000, ClanStatueCheck, static_cast<void *>(NULL), (3600 - now % 3600) * 1000);
+    //AddTimer(3600 * 1000, ClanStatueCheck, static_cast<void *>(NULL), (3600 - now % 3600) * 1000);
+    AddTimer(5 * 60 * 1000, ClanStatueCheck, static_cast<void *>(NULL));
 
     return true;
 }

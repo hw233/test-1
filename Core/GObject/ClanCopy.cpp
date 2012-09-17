@@ -405,6 +405,7 @@ void ClanCopy::updateSpotBufferValue(UInt8 spotId)
         }
     }
     _spotMap[spotId].spotBufferValue = GData::clanCopySpotMap[spotId].bufferValue[count];
+    updateBufferAttr(spotId);
 }
 
 void ClanCopy::adjustPlayerPosition(Player * opPlayer, Player* player, UInt8 oldSpotId, UInt8 oldPosition, UInt8 newSpotId, UInt8 newPosition)

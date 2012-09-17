@@ -21,7 +21,7 @@ ClanStatue::~ClanStatue()
 }
 
 
-void ClanStatue::updateLevel(UInt32 exp, UInt32 expUpdateTime)
+void ClanStatue::updateLevel(UInt32 exp, UInt32 expUpdateTime, UInt16 maxLevel)
 {
     // 根据现有exp更新等级（FIXME: 重置副本的时间段经验结算）
     UInt16 formalLevel = _level;
@@ -62,11 +62,25 @@ void ClanStatue::updateLevel(UInt32 exp, UInt32 expUpdateTime)
             _level = it->level - 1;
             if (!_level)
                 ++ _level;
+            if (_level > maxLevel)
+            {
+                _level = maxLevel;
+                _exp = GData::clanStatueTable[_level + 1].needExp - 1;
+            }
             DB5().PushUpdateData("REPLACE INTO `clan_statue` (`clanId`, `exp`, `level`, `expUpdateTime`) VALUES (%u,%u,%u,%u)", _clan->getId(), _exp, _level, now);
+            if (formalLevel != _level)
+            {
+                _clan->notifyUpdateStatueAttr();
+            }
             return;
         }
     }
     _level = GData::clanStatueTable.size() - 2;
+    if (_level > maxLevel)
+    {
+        _level = maxLevel;
+        _exp = GData::clanStatueTable[_level + 1].needExp - 1;
+    }
     DB5().PushUpdateData("REPLACE INTO `clan_statue` (`clanId`, `exp`, `level`, `expUpdateTime`) VALUES (%u,%u,%u,%u)", _clan->getId(), _exp, _level, now);
     if (formalLevel != _level)
     {
@@ -88,6 +102,10 @@ void ClanStatue::addExp(UInt32 exp)
             if (!_level)
                 ++ _level;
             DB5().PushUpdateData("REPLACE INTO `clan_statue` (`clanId`, `exp`, `level`, `expUpdateTime`) VALUES (%u,%u,%u,%u)", _clan->getId(), _exp, _level, TimeUtil::Now());
+            if (formalLevel != _level)
+            {
+                _clan->notifyUpdateStatueAttr();
+            }
             return;
         }
     }
@@ -116,6 +134,10 @@ void ClanStatue::subExp(UInt32 exp)
             if (!_level)
                 ++ _level;
             DB5().PushUpdateData("REPLACE INTO `clan_statue` (`clanId`, `exp`, `level`, `expUpdateTime`) VALUES (%u,%u,%u,%u)", _clan->getId(), _exp, _level, TimeUtil::Now());
+            if (formalLevel != _level)
+            {
+                _clan->notifyUpdateStatueAttr();
+            }
             return;
         }
     }

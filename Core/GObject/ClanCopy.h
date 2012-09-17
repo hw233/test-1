@@ -64,7 +64,7 @@ static const UInt8 SpotId[SPOT_COUNT] =
 
 static const UInt8 SpotBufferId[SPOT_COUNT] = 
 {
-    0x01, 0x01, 0x01, 0x01, 0x01
+    0x01, 0x11, 0x21, 0x31, 0x01
 };
 
 static const UInt8 NextSpotNum[SPOT_COUNT] = 
