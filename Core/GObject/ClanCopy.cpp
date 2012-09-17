@@ -45,7 +45,7 @@ ClanCopy::ClanCopy(Clan *c, UInt32 copyId, Player * player) : _clan(c), _copyId 
 
     _tickTimeInterval = 3;
     _startTick = 1;
-    _monsterRefreshTick = 6;
+    _monsterRefreshTick = 3;
     _tickCount = 0;
 
     _maxMonsterWave = 20;
@@ -578,6 +578,7 @@ void ClanCopy::process(UInt32 now)
 
     for (SpotMap::reverse_iterator rit = _spotMap.rbegin(); rit != _spotMap.rend(); ++rit)
     {
+        _spotBattleInfo[rit->first].clear();
         if (rit->first == Enemy_Base)
             enemyBaseAct();
         else
@@ -738,7 +739,6 @@ void ClanCopy::spotCombat(UInt8 spotId)
 #ifdef DEBUG_CLAN_COPY
     *fileSt << "SpotCombat (" << (UInt32)spotId <<") ." << std::endl;
 #endif
-    _spotBattleInfo[spotId].clear();
     SpotPlayerList::iterator playerIt = _spotPlayer[spotId].begin();
     SpotMonsterList::iterator monsterIt = _spotMonster[spotId].begin(); 
     UInt8 count = 0;
@@ -983,6 +983,7 @@ void ClanCopy::attackHome(ClanCopyMonster* clanCopyMonster)
 {
     // 怪物攻击主基地
     _deadMonster.insert(clanCopyMonster);
+    _spotBattleInfo[Home].push_back(ClanCopyBattleInfo(0, clanCopyMonster->npcId, 0xFF, 0));
     clanCopyMonster->deadType = 0xff;
     if (_homeHp <= clanCopyMonster->npcValue)
     {
@@ -1404,13 +1405,7 @@ void ClanCopyMgr::Reset()
             }
     };
     ResetClanCopyVisitor visitor;
-    for (UInt8 i = 0; i <=2; ++i)
-    {
-        if(i > 1)
-            globalClans.enumerate(visitor);
-        else
-            globalClansByCountry[i].enumerate(visitor);
-    }
+    globalClans.enumerate(visitor);
     INFO_LOG("Reset clanCopy.");
 }
 
