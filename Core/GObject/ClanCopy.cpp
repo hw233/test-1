@@ -1357,6 +1357,7 @@ void ClanCopyMgr::ResetBegin()
         }
     }
     _reset = true;
+    INFO_LOG("Start reset clanCopy.");
 }
 
 void ClanCopyMgr::Reset()
@@ -1379,11 +1380,13 @@ void ClanCopyMgr::Reset()
         else
             globalClansByCountry[i].enumerate(visitor);
     }
+    INFO_LOG("Reset clanCopy.");
 }
 
 void ClanCopyMgr::ResetEnd()
 {
     _reset = false;
+    INFO_LOG("End reset clanCopy.");
 }
 
 void ClanCopyMgr::process(UInt32 now)
