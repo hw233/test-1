@@ -96,9 +96,13 @@ bool Country::Init()
 
         AddTimer(1000, ClanCopyCheck);
 
-        AddTimer(3600 * 24 * 7, ClanCopyResetBegin, static_cast<void * >(NULL), (sweek - now) > 1800 ? (sweek - now - 1800) * 1000 : ((sweek - now) + 3600 * 24 * 7 - 1800) * 1000 );
-        AddTimer(3600 * 24 * 7, ClanCopyReset, static_cast<void * >(NULL), (sweek - now) * 1000);
-        AddTimer(3600 * 24 * 7, ClanCopyResetEnd, static_cast<void * >(NULL), (sweek - now + 1800) * 1000);
+        AddTimer(3600 * 24 * 7 * 1000, ClanCopyResetBegin, static_cast<void * >(NULL), 
+                (sweek - now) > 1800 ? (sweek - now - 1800) * 1000 : ((sweek - now) + 3600 * 24 * 7 - 1800) * 1000 );
+        AddTimer(3600 * 24 * 7 * 1000, ClanCopyReset, static_cast<void * >(NULL), (sweek - now) * 1000);
+        AddTimer(3600 * 24 * 7 * 1000, ClanCopyResetEnd, static_cast<void * >(NULL), (sweek - now + 1800) * 1000);
+        //AddTimer(4 * 60 * 1000, ClanCopyResetBegin, static_cast<void * >(NULL), 60 * 1000);
+        //AddTimer(4 * 60 * 1000, ClanCopyReset, static_cast<void * >(NULL), 120 * 1000);
+        //AddTimer(4 * 60 * 1000, ClanCopyResetEnd, static_cast<void * >(NULL), 180 * 1000);
 
 
 
