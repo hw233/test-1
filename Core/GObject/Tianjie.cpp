@@ -2471,9 +2471,9 @@ void Tianjie::udplogScore(Player* pl, int score, bool isEvent)
 {
     char udpStr[32] = {0};
     if (isEvent)
-        sprintf(udpStr, "F_1117_%d", m_currTjRate);
+        sprintf(udpStr, "F_1106_%d", m_currTjRate);//正确应该是1117,将错就错
     else
-        strcpy(udpStr, "F_1117_6");
+        strcpy(udpStr, "F_1106_6");
     pl->udpLog("tianjie", udpStr, "", "", "", "", "act", score);
 }
 std::string Tianjie::GetNextSection(std::string& strString , char cSeperator)
