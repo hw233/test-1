@@ -781,6 +781,7 @@ void Tianjie::updateRankData(Player* pl)
     st << type << rank << score;
 
     int i = 0;
+    m_totalMutex.lock();
     TSortMap::iterator iter;
     for (iter=m_scoreSortMap.begin(); iter!=m_scoreSortMap.end(); ++iter)
     {
@@ -792,6 +793,7 @@ void Tianjie::updateRankData(Player* pl)
         if (i == 10)
             break;
     }
+    m_totalMutex.unlock();
     while (i < 10) //少于10个,填空的string
     {
         string name;
@@ -1017,8 +1019,7 @@ void Tianjie::goNext()
            m_eventSortMap.clear();
            m_scoreSortMap.clear();
        }
-       broadTianjiePassed();
-       DB1().PushUpdateData("update tianjie set is_opened=%d,is_execute=%d,is_finish=%d,is_ok=%d where level=%d", 0, 0, m_isFinish, m_isOk, m_currOpenedTjLevel);
+       DB1().PushUpdateData("update tianjie set is_opened=%d,is_execute=%d,is_finish=%d,is_ok=%d,is_wait=0 where level=%d", 0, 0, m_isFinish, m_isOk, m_currOpenedTjLevel);
 
        m_isTjOpened = false;
 	   m_isTjExecute = 0;
