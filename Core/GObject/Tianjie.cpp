@@ -399,7 +399,13 @@ bool Tianjie::LoadFromDB()
             {
                 clearPlayerTaskScore();
             }
-            else if (int(TimeUtil::Now() - m_openTime) > TJ_EVENT_PROCESS_TIME)
+            else if (TimeUtil::Now() < (m_openTime + TJ_EVENT_PROCESS_TIME))
+            {
+                if (m_currTjRate == 1)
+                    clearPlayerTaskScore();
+                startTianjie(true);
+            }
+            else if (TimeUtil::Now()  > (m_openTime + TJ_EVENT_PROCESS_TIME))
             {
                 if (m_currTjRate == 1)
                     clearPlayerTaskScore();
@@ -2465,9 +2471,9 @@ void Tianjie::udplogScore(Player* pl, int score, bool isEvent)
 {
     char udpStr[32] = {0};
     if (isEvent)
-        sprintf(udpStr, "F_1106_%d", m_currTjRate);
+        sprintf(udpStr, "F_1117_%d", m_currTjRate);
     else
-        strcpy(udpStr, "F_1106_6");
+        strcpy(udpStr, "F_1117_6");
     pl->udpLog("tianjie", udpStr, "", "", "", "", "act", score);
 }
 std::string Tianjie::GetNextSection(std::string& strString , char cSeperator)
