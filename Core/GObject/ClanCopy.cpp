@@ -33,6 +33,7 @@ ClanCopy::ClanCopy(Clan *c, UInt32 copyId, Player * player) : _clan(c), _copyId 
     _spotPlayer.clear();
     _spotDeadPlayer.clear();
     _deadMonster.clear();
+    _waitForWinPlayer.clear();
     _status = CLAN_COPY_READY;
 
     _readyTime = TimeUtil::Now();
@@ -259,9 +260,9 @@ void ClanCopy::playerEscape(Player *player)
             UInt8 spotId = playerIndexIt->second;
             for (SpotPlayerList::iterator spotPlayerListIt = _spotPlayer[spotId].begin(); spotPlayerListIt != _spotPlayer[spotId].end(); ++ spotPlayerListIt)
             {
+                // 该玩家在该据点（活的）
                 if (spotPlayerListIt->player == player)
                 {
-                    // 该玩家在该据点
                     spotPlayerListIt->deadType = 2;  // 该玩家已逃跑
                     _spotDeadPlayer[spotId].push_back (*spotPlayerListIt); // 加入死亡名单
                     spotPlayerListIt->player->regenAll();    // 生命值回满
@@ -284,11 +285,12 @@ void ClanCopy::playerEscape(Player *player)
 
             for (SpotPlayerList::iterator spotPlayerListIt = _spotDeadPlayer[spotId].begin(); spotPlayerListIt != _spotDeadPlayer[spotId].end(); ++ spotPlayerListIt)
             {
+                // 该玩家在该据点（战死）
                 if (spotPlayerListIt->player == player)
                 {
-                    // 该玩家在该据点
                     spotPlayerListIt->deadType = 2;  // 该玩家已逃跑
                     spotPlayerListIt->player->regenAll();    // 生命值回满
+                    _waitForWinPlayer.push_back(spotPlayerListIt->player);
                     _spotDeadPlayer[spotId].erase(spotPlayerListIt);
 #ifdef DEBUG_CLAN_COPY
                     *fileSt << "Dead player \"" << player->getName() << "\" escape from spot " << (UInt32)spotId << "." << std::endl;
@@ -316,6 +318,7 @@ void ClanCopy::initCopyData()
     *fileSt << "initCopyData..." << std::endl;
 #endif
     _homeMaxHp = _homeHp = GData::clanCopyTable[_copyLevel].homeHp;
+    _maxReward = GData::clanCopyTable[_copyLevel].maxReward;
 
     ClanCopySpot clanCopySpot;
     SpotPlayerList spotPlayerList;
@@ -405,6 +408,7 @@ void ClanCopy::updateSpotBufferValue(UInt8 spotId)
         }
     }
     _spotMap[spotId].spotBufferValue = GData::clanCopySpotMap[spotId].bufferValue[count];
+    updateBufferAttr(spotId);
 }
 
 void ClanCopy::adjustPlayerPosition(Player * opPlayer, Player* player, UInt8 oldSpotId, UInt8 oldPosition, UInt8 newSpotId, UInt8 newPosition)
@@ -1022,9 +1026,37 @@ bool ClanCopy::checkWin()
 #endif
     _clan->addCopyLevel();
     _clan->addCopyWinLog(_launchPlayer);
+    addWinReward();
     notifyCopyWin();
     return win;
 }
+
+void ClanCopy::addWinReward()
+{
+    // TODO: 发送胜利奖励
+    for (std::map<Player *, UInt8>::iterator playerIt = _playerIndex.begin();
+            playerIt != _playerIndex.end(); ++ playerIt)
+    {
+        // 通知副本战斗玩家
+        /*
+           MailPackage::MailItem mitem[1] = {{55, count}};
+           MailItemsInfo itemsInfo(mitem, CountryBattleAward, 1);
+
+           SYSMSGV(content, mailid[side], it->second.totalAchievement, count, it->second.totalWin, it->second.totallose, it->second.maxKillStreak);
+           Mail * pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+           if(pmail != NULL)
+           mailPackageManager.push(pmail->id, mitem, 1, true);
+           */
+    }
+    for (std::vector<Player* >::iterator playerIt = _waitForWinPlayer.begin();
+            playerIt != _waitForWinPlayer.end(); ++ playerIt)
+    {
+        // 通知战死后离开的玩家
+        //(*playerIt)->send(st);
+    }
+
+}
+
 
 void ClanCopy::notifyAll(Stream st)
 {

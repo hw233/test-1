@@ -59,15 +59,16 @@ struct ClanCopyData
     UInt16 maxPlayer;           // 该等级副本参与最多人数
     UInt8  spotMaxPlayer;       // 该等级副本每个据点最大人数
     UInt32 homeHp;              // 该等级主基地的的生命值
+    UInt32 maxReward;           // 该等级获胜给予奖励经验值的最大值
 
     ClanCopyData(UInt16 level, UInt32 expOutput, UInt16 maxWaveCount,
-            UInt16 minPlayer, UInt16 maxPlayer, UInt8 spotMaxPlayer, UInt32 homeHp)
+            UInt16 minPlayer, UInt16 maxPlayer, UInt8 spotMaxPlayer, UInt32 homeHp, UInt32 maxReward)
         : level(level), expOutput(expOutput), maxWaveCount(maxWaveCount), 
         minPlayer(minPlayer), maxPlayer(maxPlayer), spotMaxPlayer(spotMaxPlayer),
-        homeHp(homeHp)
+        homeHp(homeHp), maxReward(maxReward)
     {
     }
-    ClanCopyData():level(0), expOutput(0), maxWaveCount(0), minPlayer(0), maxPlayer(0), spotMaxPlayer(0), homeHp(0)
+    ClanCopyData():level(0), expOutput(0), maxWaveCount(0), minPlayer(0), maxPlayer(0), spotMaxPlayer(0), homeHp(0), maxReward(0)
     {
     }
     

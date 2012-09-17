@@ -21,7 +21,7 @@ function clancopytemplate()
         BEGIN {
             print "INSERT INTO `clan_copy_template` VALUES";
         } {
-            printf("(%d,%d,%d,%d,%d,%d,%d)",$1,$2,$3,$4,$5,$6,$7);
+            printf("(%d,%d,%d,%d,%d,%d,%d,%d)",$1,$2,$3,$4,$5,$6,$7,$8);
             if (NR <= ENVIRON["lines"]-1)
                 printf(",");
             else if (NR >= ENVIRON["lines"])

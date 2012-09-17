@@ -21,7 +21,7 @@ function clanstatuetemplate()
         BEGIN {
             print "INSERT INTO `clan_statue_template` VALUES";
         } {
-            printf("(%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10);
+            printf("(%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)",$1,$3,$4,$5,$6,0,$6,0,$7,0);
             if (NR <= ENVIRON["lines"]-1)
                 printf(",");
             else if (NR >= ENVIRON["lines"])

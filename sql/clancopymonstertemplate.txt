@@ -1,4 +1,5 @@
-锘縧evel	appearRound	npcId	npcCount	npcRouteCount	npcValue	npctype
+副本等级	生产该怪的波数	怪物id	每一路怪物的数量	出现路数	怪物到达玩家老家的破坏值	类型
+level	appearRound	npcId	npcCount	npcRouteCount	npcValue	npctype
 1	1	5711	1	0	5	1
 1	1	5711	1	0	5	1
 1	1	5713	1	0	5	1

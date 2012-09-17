@@ -64,7 +64,7 @@ static const UInt8 SpotId[SPOT_COUNT] =
 
 static const UInt8 SpotBufferId[SPOT_COUNT] = 
 {
-    0x01, 0x01, 0x01, 0x01, 0x01
+    0x01, 0x11, 0x21, 0x31, 0x01
 };
 
 static const UInt8 NextSpotNum[SPOT_COUNT] = 
@@ -298,6 +298,8 @@ class ClanCopy
         void spotCombat(UInt8 spotId);
         void attackHome(ClanCopyMonster* clanCopyMonster);
         bool checkWin();
+        void addWinReward();
+
         void setInterval(UInt32 interval);
         void setStartTick(UInt32 tickCount);
         void setStartTimeInterval(UInt32 startTimeInterval);
@@ -326,9 +328,11 @@ class ClanCopy
         SpotDeadPlayer _spotDeadPlayer;
         SpotBattleInfo _spotBattleInfo;
         DeadMonster    _deadMonster;
+        std::vector<Player *> _waitForWinPlayer; // 失败后逃跑的玩家列表（胜利后需要获得邮件）
 
         UInt32 _homeMaxHp;
         UInt32 _homeHp;
+        UInt32 _maxReward;
 
         UInt32 _readyTime;         // 副本报名的时间戳
         UInt32 _startTime;         // 副本开始的时间戳
