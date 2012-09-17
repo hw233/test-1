@@ -781,12 +781,6 @@ void ClanCopy::spotCombat(UInt8 spotId)
     {
 
         // 死怪，重新查找下一个怪物
-        if ((*monsterIt)->deadType == 3)
-        {
-            (*monsterIt)->deadType = 2;
-            ++ monsterIt;
-            continue;
-        }
         if ((*monsterIt)->deadType == 2)
         {
             (*monsterIt)->deadType = 1;
@@ -848,11 +842,10 @@ void ClanCopy::spotCombat(UInt8 spotId)
                 }
 
                 bool res = bsim.getWinner() == 1;
-                _spotBattleInfo[spotId].push_back(ClanCopyBattleInfo(playerIt->player->getId(), (*monsterIt)->npcIndex, res));
                 if (res)
                 {
                     // 玩家防守成功
-                    (*monsterIt)->deadType = 2 + (flag?1:0);
+                    (*monsterIt)->deadType = 1 + (flag?1:0);
 #ifdef DEBUG_CLAN_COPY
                     *fileSt << "Player win." << std::endl;
                     *fileSt << "Monster deadType = " << (UInt32) (*monsterIt)->deadType << "." << std::endl;
@@ -870,6 +863,9 @@ void ClanCopy::spotCombat(UInt8 spotId)
                     playerIt->player->regenAll();    // 生命值回满
                     updateSpotBufferValue(spotId);
                 }
+                _spotBattleInfo[spotId].push_back(
+                        ClanCopyBattleInfo(playerIt->player->getId(), (*monsterIt)->npcIndex, res, 
+                            res?playerIt->player->allHpP():(*monsterIt)->allHpP()));
                 Stream st(REP::ATTACK_NPC);
                 st << static_cast<UInt8>(res) << static_cast<UInt8>(1) << static_cast<UInt32> (0) << static_cast<UInt8>(0) << static_cast<UInt8>(0);
                 st.append(&packet[8], packet.size() - 8);
@@ -987,7 +983,7 @@ void ClanCopy::attackHome(ClanCopyMonster* clanCopyMonster)
 {
     // 怪物攻击主基地
     _deadMonster.insert(clanCopyMonster);
-    clanCopyMonster->deadType = 1;
+    clanCopyMonster->deadType = 0xff;
     if (_homeHp <= clanCopyMonster->npcValue)
     {
         // 主基地被摧毁
@@ -1147,6 +1143,7 @@ void ClanCopy::notifySpotBattleInfo(Player * player /* = NULL */)
     st << static_cast<UInt16> (_curMonsterWave);
     st << static_cast<UInt32> (_homeMaxHp);
     st << static_cast<UInt32> (_homeHp);
+    st << static_cast<UInt16> (_tickCount);
     UInt8 count = _spotMap.size();
     st << static_cast<UInt8> (count);
     for (SpotMap::iterator mapIt = _spotMap.begin(); mapIt != _spotMap.end(); ++ mapIt)
@@ -1186,7 +1183,7 @@ void ClanCopy::notifySpotBattleInfo(Player * player /* = NULL */)
             st << static_cast<UInt8> ((*monsterListIt)->monsterType);
             st << static_cast<UInt16> ((*monsterListIt)->npcValue);
             st << static_cast<UInt8> ((*monsterListIt)->justMoved ? spotId : (*monsterListIt)->nextSpotId);
-            st << static_cast<UInt8> ((*monsterListIt)->deadType ? 1:0);
+            st << static_cast<UInt8> ((*monsterListIt)->deadType);
         }
         st << static_cast<UInt8> (_spotBattleInfo[spotId].size());
         for (BattleInfo::iterator battleInfoIt = _spotBattleInfo[spotId].begin(); battleInfoIt != _spotBattleInfo[spotId].end(); ++ battleInfoIt)

@@ -210,6 +210,29 @@ struct ClanCopyMonster
         }
     }
 
+    UInt8 allHpP()
+    {
+        UInt32 total = 0;
+        UInt32 totalmax = 0;
+        for(UInt8 i = 0; i < npcList.size(); ++ i)
+        {
+            Fighter * fighter = npcList[i].fighter;
+            if (fighter->getCurrentHP())
+                total += fighter->getCurrentHP();
+            else
+                total += fighter->getMaxHP();
+            totalmax += fighter->getMaxHP();
+        }
+        if (!totalmax)
+            return 0;
+        if (!total)
+            return 100;
+        UInt8 p = (((float)total)/totalmax) * 100;
+        if (p > 100)
+            p = 100;
+        return p;
+    }
+
 };
 
 struct isMonsterDead
@@ -248,8 +271,9 @@ struct ClanCopyBattleInfo
     UInt32 playerId;        // 玩家Id
     UInt32 monsterIndex;    // 怪物唯一索引
     UInt8  battleResult;    // 战斗结果 1.玩家胜利 2.怪物胜利
-    ClanCopyBattleInfo (UInt32 playerId, UInt32 monsterIndex, UInt8 battleResult)
-        : playerId(playerId), monsterIndex(monsterIndex), battleResult(battleResult)
+    UInt8  remainHpP;       // 胜利方剩余的hp
+    ClanCopyBattleInfo (UInt32 playerId, UInt32 monsterIndex, UInt8 battleResult, UInt8 remainHpP)
+        : playerId(playerId), monsterIndex(monsterIndex), battleResult(battleResult), remainHpP(remainHpP)
     {
     }
 };
