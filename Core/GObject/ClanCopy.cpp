@@ -383,6 +383,7 @@ void ClanCopy::updateBufferAttr(UInt8 spotId)
             break;
         case 0x31:
             _spotAttrs[spotId].attackP = _spotMap[spotId].spotBufferValue;
+            _spotAttrs[spotId].magatkP = _spotMap[spotId].spotBufferValue;
             break;
         case 0xff:
             break;
