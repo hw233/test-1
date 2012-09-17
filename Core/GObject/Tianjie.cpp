@@ -399,7 +399,7 @@ bool Tianjie::LoadFromDB()
             {
                 clearPlayerTaskScore();
             }
-            else if (TimeUtil::Now() < (m_openTime + TJ_EVENT_PROCESS_TIME))
+            else if ( TimeUtil::Now() >= m_openTime &&  TimeUtil::Now() < (m_openTime + TJ_EVENT_PROCESS_TIME))
             {
                 if (m_currTjRate == 1)
                     clearPlayerTaskScore();
