@@ -571,11 +571,11 @@ function onActivityCheck(tm)
       if tm >= actTime503 and tm < actTime503_1 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
-          setRechargeTime(actTime503, actTime503_1)
       else
           setRechargeActive(false, 16)
           setNeedRechargeRank(false)
       end
+      setRechargeTime(actTime503, actTime503_1)
 
       setShuoShuo(true);
   end
