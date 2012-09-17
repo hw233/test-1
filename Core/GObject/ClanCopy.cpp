@@ -1191,6 +1191,7 @@ void ClanCopy::notifySpotBattleInfo(Player * player /* = NULL */)
             st << static_cast<UInt64> (battleInfoIt->playerId);
             st << static_cast<UInt32> (battleInfoIt->monsterIndex);
             st << static_cast<UInt8>  (battleInfoIt->battleResult);
+            st << static_cast<UInt8>  (battleInfoIt->remainHpP);
         }
     }
     st << Stream::eos;
