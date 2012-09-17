@@ -10483,6 +10483,20 @@ namespace GObject
         sendMailItem(2331, 2332, &item[pos-1][0], 1, false);
     }
 
+    void Player::sendKillMonsterRankAward(UInt8 index, Int32 pos)
+    {
+        if (index > 3 || !pos || pos > 1)
+            return;
+        MailPackage::MailItem item[5][1] =
+        {
+            {{1329, 1},},
+            {{1330, 1},},
+            {{1331, 1},},
+            {{1332, 1},},
+        };
+        sendMailItem(2370 + index * 2, 2371 + index * 2, &item[index][0], 1, false);
+    }
+
     void Player::sendCreateMail()
     {
 #ifdef _FB
@@ -12188,22 +12202,36 @@ namespace GObject
         DB1().PushUpdateData("UPDATE `qixi` SET `bind`=0, `lover`=0 WHERE `playerId` = %"I64_FMT"u", getId());
     }
 
-    void Player::postKillMonsterRoamResult(UInt8 pos, UInt8 curType, UInt8 curCount)
+    void Player::postKillMonsterRoamResult(UInt8 pos, UInt8 curType, UInt8 curCount, UInt8 tips)
     {
-#if 0
-        if(pos != GetVar(VAR_ZYCM_POS))
-            SetVar(VAR_ZYCM_POS, pos);
+        struct _Roam
+        {
+            UInt8 _pos;
+            UInt8 _curType;
+            UInt8 _curCount;
+            UInt8 _tips;
+        }curRoam = {pos, curType, curCount, tips};
+
+		GameMsgHdr hdr(0x1FE, WORKER_THREAD_WORLD, this, sizeof(curRoam));
+		GLOBAL().PushMsg(hdr, &curRoam);
+    }
+
+    void Player::killMonsterStepAdvance(UInt8 pos, UInt8 curType, UInt8 curCount, UInt8 tips)
+    {
+        SetVar(VAR_ZYCM_POS, pos);
         if(curType == 1)
-            SetVar(VAR_XIAGU_CNT, curCount);
+            AddVar(VAR_XIAGU_CNT, curCount);
         else if(curType == 2)
-            SetVar(VAR_ROUQING, curCount);
+            AddVar(VAR_ROUQING_CNT, curCount);
         else if(curType == 3)
-            SetVar(VAR_CAIFU_CNT, curCount);
+            AddVar(VAR_CAIFU_CNT, curCount);
         else if(curType == 4)
-            SetVar(VAR_CHUANQI_CNT, curCount);
-#endif
-		//GameMsgHdr hdr(0x1F9, WORKER_THREAD_WORLD, this, sizeof(Roam));
-		//GLOBAL().PushMsg(hdr, &roam);
+            AddVar(VAR_CHUANQI_CNT, curCount);
+
+        if(GetVar(VAR_ZYCM_TIPS) != tips)
+            SetVar(VAR_ZYCM_TIPS, tips);
+
+        WORLD().UpdateKillMonsterRank(this, curType, curCount);
     }
 
 } // namespace GObject

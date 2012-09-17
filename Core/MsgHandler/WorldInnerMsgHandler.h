@@ -973,6 +973,45 @@ void OnRoamResult( GameMsgHdr& hdr,  const void* data )
     player->qixiStepAdvance(roam->pos, roam->event, roam->score);
 }
 
+void OnKillMonsterRoamResult( GameMsgHdr& hdr,  const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+
+    struct _Roam
+    {
+        UInt8 _pos;
+        UInt8 _curType;
+        UInt8 _curCount;
+        UInt8 _tips;
+    };
+
+    const _Roam* roam = reinterpret_cast<const _Roam *>(data);
+    player->killMonsterStepAdvance(roam->_pos, roam->_curType, roam->_curCount, roam->_tips);
+}
+
+void OnKillMonsterReqInfo( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    WORLD().killMonsterInit();
+
+    Stream st(REP::COUNTRY_ACT);
+    UInt8 subType = 0x02;
+    st << subType;
+    UInt8 subType2 = 0;
+    st << subType2;
+    st << player->GetVar(VAR_XIAGU_CNT);
+    st << player->GetVar(VAR_ROUQING_CNT);
+    st << player->GetVar(VAR_CAIFU_CNT);
+    st << player->GetVar(VAR_CHUANQI_CNT);
+    WORLD().killMonsterAppend(st, 0);
+    WORLD().killMonsterAppend(st, 1);
+    WORLD().killMonsterAppend(st, 2);
+    WORLD().killMonsterAppend(st, 3);
+    st << Stream::eos;
+    player->send(st);
+}
 
 void OnReCalcWeekDayAddTimer( GameMsgHdr& hdr,  const void* data )
 {

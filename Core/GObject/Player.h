@@ -664,6 +664,7 @@ namespace GObject
         void sendPExpCard(int pos);
         void sendRechargeRankAward(int pos);
         void sendConsumeRankAward(int pos);
+        void sendKillMonsterRankAward(UInt8 index, Int32 pos);
 
 	public:
 		void sendTopupMail(const char* title, const char* content, UInt32 gold, UInt8 num);
@@ -1286,12 +1287,13 @@ namespace GObject
         void roamingQueqiao(UInt8 pos);
         void qixiStepAdvance(UInt8 pos, UInt8 event, UInt8 score);
         void resetQixi();
+        void killMonsterStepAdvance(UInt8 pos, UInt8 curType, UInt8 curCount, UInt8 tips);
 
         void beDivorceQixi(Player* pl);
         UInt8 beQixiEyes(Player* pl);
         void onQixiEyesResp(UInt8 bind);
         void postRoamResult(UInt8 pos, UInt8 event, UInt8 score);
-        void postKillMonsterRoamResult(UInt8 pos, UInt8 curType, UInt8 curCount);
+        void postKillMonsterRoamResult(UInt8 pos, UInt8 curType, UInt8 curCount, UInt8 tips);
 
         inline bool queQiaoCheck() { return m_qixi.bind; }
         inline UInt8 getQueqiaoPos() { return m_qixi.pos; }

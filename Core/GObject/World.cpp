@@ -139,6 +139,8 @@ UInt32 World::_rechargebegin = 0;
 UInt32 World::_rechargeend = 0;
 UInt32 World::_consumebegin = 0;
 UInt32 World::_consumeend = 0;
+/** 0：侠骨；1：柔情；2财富；3传奇 **/
+RCSortType World::killMonsterSort[4];
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
@@ -695,6 +697,32 @@ void SendConsumeRankAward()
     }
 }
 
+void SendKillMonsterRankAward()
+{
+    for(UInt8 index = 0; index < 4; index++)
+    {
+        Int32 pos = 0;
+        for (RCSortType::iterator i = World::killMonsterSort[index].begin(), e = World::killMonsterSort[index].end(); i != e; ++i)
+        {
+            ++pos;
+            if(pos > 1) break;
+
+            Player* player = i->player;
+            if (!player)
+                continue;
+            //if (player->isOnline())
+            //{
+            //    GameMsgHdr hdr(0x258, player->getThreadId(), player, sizeof(pos));
+            //    GLOBAL().PushMsg(hdr, &pos);
+            //}
+            //else
+            //{
+                player->sendKillMonsterRankAward(index, pos);
+            //}
+        }
+    }
+}
+
 void World::World_Midnight_Check( World * world )
 {
 	UInt32 curtime = TimeUtil::Now();
@@ -710,6 +738,7 @@ void World::World_Midnight_Check( World * world )
     bool bRecharge = (getRechargeActive() || getRechargeActive3366()) && getNeedRechargeRank();
     bool bConsume = getConsumeActive() && getNeedConsumeRank();
     bool bPExpItems = getPExpItems();
+    bool bMonsterAct = getKillMonsterAct();
 	world->_worldScript->onActivityCheck(curtime+30);
 
 	world->_today = TimeUtil::SharpDay(0, curtime+30);
@@ -733,6 +762,7 @@ void World::World_Midnight_Check( World * world )
     bQixiEnd = bQixi && !getQixi();
     bRechargeEnd = bRecharge && !(getRechargeActive()||getRechargeActive3366());
     bConsumeEnd = bConsume && !getConsumeActive();
+    bool bMonsterActEnd = bMonsterAct && !getKillMonsterAct();
 
     UInt32 nextday = curtime + 30;
 	globalPlayers.enumerate(enum_midnight, static_cast<void *>(&nextday));
@@ -775,7 +805,9 @@ void World::World_Midnight_Check( World * world )
         SendRechargeRankAward();
     if (bConsumeEnd)
         SendConsumeRankAward();
-	
+    if(bMonsterActEnd)
+	    SendKillMonsterRankAward();
+
 	dungeonManager.enumerate(enum_dungeon_midnight, &curtime);
 	globalClans.enumerate(enum_clan_midnight, &curtime);
 	clanManager.reConfigClanBattle();
@@ -1567,6 +1599,177 @@ void World::initRCRank()
         return;
     GObject::globalPlayers.enumerate(player_enum_rc, 0);
     init = true;
+}
+
+inline bool player_enum_killmonster(GObject::Player * p, int)
+{
+    using namespace GObject;
+    if (World::getKillMonsterAct())
+    {
+        UInt32 total;
+        RCSort s;
+        total = p->GetVar(VAR_XIAGU_CNT);
+        if (total)
+        {
+            s.player = p;
+            s.total = total;
+            World::killMonsterSort[0].insert(s);
+        }
+        total = p->GetVar(VAR_ROUQING_CNT);
+        if (total)
+        {
+            s.player = p;
+            s.total = total;
+            World::killMonsterSort[1].insert(s);
+        }
+        total = p->GetVar(VAR_CAIFU_CNT);
+        if (total)
+        {
+            s.player = p;
+            s.total = total;
+            World::killMonsterSort[2].insert(s);
+        }
+        total = p->GetVar(VAR_CHUANQI_CNT);
+        if (total)
+        {
+            s.player = p;
+            s.total = total;
+            World::killMonsterSort[3].insert(s);
+        }
+    }
+    return true;
+}
+
+#define RANK_CNT 1
+void World::killMonsterAppend(Stream& st, UInt8 index)
+{
+    using namespace GObject;
+    if(index > 3)
+        return;
+    /*
+    st.init(REP::COUNTRY_ACT);
+    UInt8 subType = 0x02;
+    st << subType;
+    UInt8 subType2 = 2;
+    st << subType2;
+    */
+    UInt8 cnt = /*World::*/killMonsterSort[index].size();
+    if (cnt > RANK_CNT)
+        cnt = RANK_CNT;
+    UInt32 c = 0;
+    for (RCSortType::iterator i = /*World::*/killMonsterSort[index].begin(), e = /*World::*/killMonsterSort[index].end(); i != e; ++i)
+    {
+        st << i->player->getName();
+        st << i->total;
+        ++c;
+        if (c >= RANK_CNT)
+            break;
+    }
+    if(c == 0)
+    {
+        std::string nullName;
+        st << nullName;
+        st << c;
+    }
+    //st << Stream::eos;
+}
+
+void World::killMonsterInit()
+{
+    static bool sortInit = false;
+    if(!sortInit)
+    {
+        sortInit = true;
+        printf("-------------------------------------------------------------------------------------------------------------");
+        GObject::globalPlayers.enumerate(player_enum_killmonster, 0);
+    }
+}
+
+void World::UpdateKillMonsterRank(Player* pl, UInt8 type, UInt8 count)
+{
+#if 0
+    static bool sortInit = false;
+    if(!sortInit)
+    {
+        sortInit = true;
+        print("-------------------------------------------------------------------------------------------------------------");
+        GObject::globalPlayers.enumerate(player_enum_killmonster, 0);
+    }
+#endif
+    Stream st(REP::ACT);
+    UInt8 subType = 0x02;
+    st << subType;
+    UInt8 subType2 = 0x01;
+    st >> subType2;
+    st << static_cast<UInt8>(pl->GetVar(VAR_ZYCM_POS));
+    st << static_cast<UInt8>(pl->GetVar(VAR_ZYCM_TIPS));
+    st << type;
+    UInt32 curCnt;
+    if(type == 1)
+    {
+        curCnt = pl->GetVar(VAR_XIAGU_CNT) + count;
+        pl->SetVar(VAR_XIAGU_CNT, curCnt);
+    }
+    else if(type == 2)
+    {
+        curCnt = pl->GetVar(VAR_ROUQING_CNT) + count;
+        pl->SetVar(VAR_ROUQING_CNT, curCnt);
+    }
+    else if(type == 3)
+    {
+        curCnt = pl->GetVar(VAR_CAIFU_CNT) + count;
+        pl->SetVar(VAR_CAIFU_CNT, curCnt);
+    }
+    else if(type == 4)
+    {
+        curCnt = pl->GetVar(VAR_CHUANQI_CNT) + count;
+        pl->SetVar(VAR_CHUANQI_CNT, curCnt);
+    }
+    else
+        curCnt = 0;
+    st << curCnt;
+    st << Stream::eos;
+    pl->send(st);
+
+    if(type < 1 || type > 4)
+        return;
+
+    UInt8 index = type -1;
+    UInt32 oldrank = 0;
+    for (RCSortType::iterator i = World::killMonsterSort[index].begin(), e = World::killMonsterSort[index].end(); i != e; ++i)
+    {
+        ++oldrank;
+        if (i->player == pl)
+        {
+            World::killMonsterSort[index].erase(i);
+            break;
+        }
+    }
+    RCSort s;
+    s.player = pl;
+    s.total = curCnt;
+    World::killMonsterSort[index].insert(s);
+
+    UInt32 newrank = 0;
+    for (RCSortType::iterator i = World::killMonsterSort[index].begin(), e = World::killMonsterSort[index].end(); i != e; ++i)
+    {
+        ++newrank;
+        if (i->player == pl)
+            break;
+    }
+
+    if (oldrank <= RANK_CNT || newrank <= RANK_CNT)
+    {
+        Stream st(REP::COUNTRY_ACT);
+        //st.init(REP::COUNTRY_ACT);
+        UInt8 subType = 0x02;
+        st << subType;
+        UInt8 subType2 = 2;
+        st << subType2;
+        killMonsterAppend(st, index);
+        st << Stream::eos;
+        NETWORK()->Broadcast(st);
+    }
 }
 
 }

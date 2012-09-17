@@ -147,6 +147,8 @@ MSG_REG_2(GameMsgHdr, 0x1FB, OnReCalcWeekDayRemoveTimer);
 MSG_REG_2(GameMsgHdr, 0x1FC, OnTownDeamonResNotify);
 MSG_REG_2(GameMsgHdr, 0x1FD, OnTownDeamonAttackNpcNotify);
 
+MSG_REG_2(GameMsgHdr, 0x1FE, OnKillMonsterRoamResult);
+MSG_REG_2(GameMsgHdr, 0x1FF, OnKillMonsterReqInfo);
 
 #ifdef _ARENA_SERVER
 MSG_REG_2(LoginMsgHdr, 0x01, onServerReg);

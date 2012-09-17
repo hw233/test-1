@@ -2247,7 +2247,7 @@ function onGetYearActAward(player, type)
     end
 end
 
-function onGetKillMonsterReward(player, pos)
+function onGetKillMonsterReward(player)
     local roamPlace = {
      -- 1  2  3  4  5  6  7  8
         1, 2, 3, 4, 5, 6, 7, 8,
@@ -2276,6 +2276,7 @@ function onGetKillMonsterReward(player, pos)
         {{9076, 1, 4, 1}, {9076,1, 4, 1}, {9076, 1, 4, 1}},
     }
 
+    local pos = player:GetVar(182)
     local step = math.random(1, 3)
     local pos2 = pos + step
     if pos2 > 28 then
@@ -2283,12 +2284,42 @@ function onGetKillMonsterReward(player, pos)
     end
 
     local package = player:GetPackage()
-    i = roamPlace[pos2]
-    j = math.random(1, 3)
+    local i = roamPlace[pos2]
+    local j = math.random(1, 3)
 
-    package:Add(eventItem[i][j][1], eventItem[i][j][2], true, true, 32)
+    package:Add(eventItem[i][j][1], eventItem[i][j][2], true, true, 33)
     player:lastKillMonsterAwardPush(eventItem[i][j][1], eventItem[i][j][2]);
-    player:postKillMonsterRoamResult(pos2, eventItem[i][j][3], eventItem[i][j][4]);
+    local extAward = 0
+    if player:GetVar(183) == 1 then
+        extAward = 1757
+    end
+    if player:GetVar(184) == 1 then
+        extAward = 1750
+    end
+    if player:GetVar(185) == 1 then
+        extAward = 1751
+    end
+    if player:GetVar(186) == 1 then
+        extAward = 1752
+    end
+
+    if player:GetVar(183) == 5 then
+        extAward = 1753
+    end
+    if player:GetVar(184) == 3 then
+        extAward = 1754
+    end
+    if player:GetVar(185) == 4 then
+        extAward = 1755
+    end
+    if player:GetVar(186) == 2 then
+        extAward = 1756
+    end
+    if extAward ~= 0 then
+        package:Add(extAward, 1, true, true, 33)
+        player:lastKillMonsterAwardPush(extAward, 1);
+    end
+    player:postKillMonsterRoamResult(pos2, eventItem[i][j][3], eventItem[i][j][4], j);
 
     return pos2;
 end

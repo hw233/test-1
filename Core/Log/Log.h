@@ -153,6 +153,7 @@ enum ItemFrom
 	FromHappyAward,
     FromIDIP,
     FromQixi,
+    FromKillMonster, //斩妖除魔
 };
 
 enum ItemTo
