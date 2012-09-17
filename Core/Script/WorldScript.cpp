@@ -143,7 +143,9 @@ void WorldScript::init()
 	def("setOpenTest", GObject::World::setOpenTest);
 	def("getOpenTest", GObject::World::getOpenTest);
 	def("setConsumeActive", GObject::World::setConsumeActive);
-	def("getConsumeActive", GObject::World::getConsumeActive);
+	def("setConsume918", GObject::World::setConsume918);
+	def("getConsume918", GObject::World::getConsume918);
+    def("getConsumeActive", GObject::World::getConsumeActive);
     def("setKillMonsterAct", GObject::World::setKillMonsterAct);
     def("getKillMonsterAct", GObject::World::getKillMonsterAct);
 	def("setNeedRechargeRank", GObject::World::setNeedRechargeRank);

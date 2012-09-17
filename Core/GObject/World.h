@@ -311,6 +311,10 @@ public:
     { _consumeactive = v; }
     inline static bool getConsumeActive()
     { return _consumeactive; }
+    inline static void setConsume918(bool v)
+    { _consume918 = v; }
+    inline static bool getConsume918()
+    { return _consume918; }
     inline static void setNeedRechargeRank(bool v)
     { _needrechargerank = v; }
     inline static bool getNeedRechargeRank()
@@ -420,6 +424,7 @@ public:
     static UInt32 _sosomapbegin;
     static bool _opentest;
     static bool _consumeactive;
+    static bool _consume918;
     static bool _needrechargerank;
     static bool _needconsumerank;
     static bool _killMonsteract;
@@ -432,6 +437,8 @@ public:
     static RCSortType rechargeSort;
     static RCSortType consumeSort;
     static void initRCRank();
+
+    static RCSortType killMonsterSort[4];
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }
@@ -478,6 +485,10 @@ public:
     void LoadQixiScore(Player* pl, Player* lover);
     void SendQixiAward();
     void sendQixiScoreAward(Player* pl);
+
+    void killMonsterAppend(Stream& st, UInt8 index);
+    void killMonsterInit();
+    void UpdateKillMonsterRank(Player* pl, UInt8 Type, UInt8 count);
 
 private:
 	void testUpdate();

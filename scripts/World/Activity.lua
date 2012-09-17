@@ -268,6 +268,13 @@ function onActivityCheck(tm)
       setQixi(false)
   end
 
+  if tm >= actTime210 and tm < actTime211 then
+      setConsume918(true)
+  else
+      setConsume918(false)
+  end
+
+
   if tm >= actTime59 and tm < actTime60 then
       is_6_22 = true
       setDuanWu(true)
@@ -668,8 +675,7 @@ function initActTime(y, m, d)
   local  SerStartTm501= { ['year'] = 2012, ['month'] = 8, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm502= { ['year'] = 2012, ['month'] = 9, ['day'] = 6, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 斩妖
-  --local  SerStartTm505= { ['year'] = 2012, ['month'] = 9, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTm505= { ['year'] = 2012, ['month'] = 9, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm505= { ['year'] = 2012, ['month'] = 9, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 周岁红包送不停
   local  SerStartTm506= { ['year'] = 2012, ['month'] = 9, ['day'] = 13, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- Qgame大厅礼包
@@ -693,6 +699,8 @@ function initActTime(y, m, d)
 
   -- 七夕
   local  SerStartTm202= { ['year'] = 2012, ['month'] = 8, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --商城消费大酬宾(9/18-9/24)
+  local  SerStartTm210= { ['year'] = 2012, ['month'] = 9, ['day'] = 13, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
@@ -858,7 +866,7 @@ function initActTime(y, m, d)
   actTime502_1 = os.time(SerStartTm502) + 4 * 86400;
 
   actTime505 = os.time(SerStartTm505);
-  actTime505_1 = os.time(SerStartTm505) + 15 * 86400;
+  actTime505_1 = os.time(SerStartTm505) + 8 * 86400;
 
   actTime506 = os.time(SerStartTm506);
   actTime506_1 = os.time(SerStartTm506) + 18 * 86400;
@@ -900,6 +908,10 @@ function initActTime(y, m, d)
 
   actTime203= os.time(SerStartTm202);
   actTime204= os.time(SerStartTm202) + 7 * 86400;
+
+  actTime210= os.time(SerStartTm210);
+  actTime211= os.time(SerStartTm210) + 7 * 86400;
+
 
   onActivityCheck(os.time() + 30);
 

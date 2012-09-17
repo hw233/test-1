@@ -1159,6 +1159,12 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     }
     {
         GObject::Tianjie::instance().getTianjieData(pl, true);
+        if (World::getConsume918())
+        {
+            Stream st(REP::DAILY_DATA);
+            st << static_cast<UInt8>(17) << pl->GetVar(VAR_CONSUME_918) << Stream::eos;
+            pl->send((st));
+        }
     }
     if (World::getNeedRechargeRank() || time(NULL) <= World::getRechargeEnd() + 24*60*60)
     {
@@ -1673,7 +1679,17 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
         {
             if(!World::getKillMonsterAct())
                 return;
-            player->getKillMonsterAward();
+            UInt8 type = 0;
+            br >> type;
+            if(type == 0)
+            {
+                GameMsgHdr hdr(0x1FF, WORKER_THREAD_WORLD, player, 0);
+                GLOBAL().PushMsg(hdr, NULL);
+            }
+            else if(type == 1)
+                player->getKillMonsterAward();
+            else if(type == 2)
+                player->checkLastKillMonsterAward();
         }
         break;
         default:

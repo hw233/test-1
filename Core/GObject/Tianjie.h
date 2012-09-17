@@ -157,7 +157,10 @@ namespace GObject
         void clearEventScore();
 
         std::string GetNextSection(std::string& strString , char cSeperator);
-		
+        void udplogTjStatus(bool isOpen);		
+        void udplogItem(Player* pl, UInt32 itemId, int itemCount=1);
+    public:
+        void udplogScore(Player* pl, int score, bool isEvent);
     private:
 		GData::NpcGroup* _ng;
 		multimap<int, int> m_locNpcMap; //据点上的怪物
