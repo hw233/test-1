@@ -39,6 +39,7 @@ CREATE TABLE `clan_copy_template` (
     `maxPlayer` int(10) unsigned NOT NULL DEFAULT 0,
     `spotMaxPlayer` int(10) unsigned NOT NULL DEFAULT 0,
     `homeHp` bigint(20) unsigned NOT NULL DEFAULT 0,
+    `maxReward` bigint(20) unsigned NOT NULL DEFAULT 0,
     PRIMARY KEY (`level`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;

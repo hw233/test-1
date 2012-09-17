@@ -3811,7 +3811,7 @@ void   Clan::clanCopyTabOperate(Player * player, UInt8 command, UInt8 val /* = 0
                 // "开启副本"
                 if (hasClanAuthority(player, CLAN_AUTHORITY_COPY))
                 {
-                    if (_techs->getMaxCopyLevel() <= static_cast<UInt32>(_copyLevel + 1))
+                    if (_techs->getMaxCopyLevel() < static_cast<UInt32>(_copyLevel + 1))
                     {
                         player->sendMsgCode(0, 1340);  // 帮派科技不够开启更高等级
                         return;

@@ -1383,7 +1383,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
         DBClanCopy cc;
-		if (execu->Prepare("SELECT `level`, `expOutput`, `monsterWaveCount`, `minPlayer`, `maxPlayer`, `spotMaxPlayer`, `homeHp` FROM `clan_copy_template` ORDER BY `level` ASC", cc) != DB::DB_OK)
+		if (execu->Prepare("SELECT `level`, `expOutput`, `monsterWaveCount`, `minPlayer`, `maxPlayer`, `spotMaxPlayer`, `homeHp`, `maxReward` FROM `clan_copy_template` ORDER BY `level` ASC", cc) != DB::DB_OK)
 			return false;
 		while (execu->Next() == DB::DB_OK)
 		{
@@ -1392,7 +1392,7 @@ namespace GData
                 clanCopyTable.resize(static_cast<size_t>(cc.level + 1));
             }
             clanCopyTable[cc.level] = ClanCopyData(cc.level, cc.expOutput, cc.monsterWaveCount,
-                    cc.minPlayer, cc.maxPlayer, cc.spotMaxPlayer, cc.homeHp);
+                    cc.minPlayer, cc.maxPlayer, cc.spotMaxPlayer, cc.homeHp, cc.maxReward);
 		}
         clanCopyTable.push_back(ClanCopyData());
 

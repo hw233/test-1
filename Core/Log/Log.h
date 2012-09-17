@@ -120,6 +120,7 @@ enum MailItemType
     NewDrawingGameAward,
     SplitCitta,
     BlueDiamondCmd,
+    ClanCopyAward,
 };
 enum ItemFrom
 {

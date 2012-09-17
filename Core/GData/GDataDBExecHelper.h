@@ -240,8 +240,9 @@ struct DBClanCopy
     UInt16 monsterWaveCount;    // 该等级刷怪的波数
     UInt16 minPlayer;           // 该等级副本最小参与人数
     UInt16 maxPlayer;           // 该等级副本最大参与人数
-    UInt8 spotMaxPlayer;       // 该等级据点最大的玩家数
+    UInt8  spotMaxPlayer;       // 该等级据点最大的玩家数
     UInt32 homeHp;              // 该等级基地的生命值
+    UInt32 maxReward;           // 该等级获胜给予奖励经验值的最大值
 };
 
 struct DBClanCopyMonster
@@ -647,7 +648,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBClanCopy)
-SPECIALDEF(7)
+SPECIALDEF(8)
     (
     UInt16, level,         
     UInt32, expOutput,     
@@ -655,7 +656,8 @@ SPECIALDEF(7)
     UInt16, minPlayer,     
     UInt16, maxPlayer,     
     UInt8,  spotMaxPlayer, 
-    UInt32, homeHp
+    UInt32, homeHp,
+    UInt32, maxReward
     )
 SPECIALEND()
 
