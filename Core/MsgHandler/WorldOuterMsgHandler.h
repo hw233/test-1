@@ -263,6 +263,8 @@ struct AthleticsChallengeReq
 
 struct ArenaInfoReq
 {
+	UInt8 type;
+	UInt8 flag;
 	MESSAGE_DEF(REQ::SERVER_ARENA_INFO);
 };
 
@@ -1422,10 +1424,29 @@ void OnPriliminaryInfo( ArenaMsgHdr& hdr, const void * data )
 	GObject::arena.pushPriliminaryCount(r);
 }
 
-void OnArenaInfoReq( GameMsgHdr& hdr, ArenaInfoReq& )
+void OnArenaInfoReq( GameMsgHdr& hdr, ArenaInfoReq& air )
 {
 	MSG_QUERY_PLAYER(player);
-	GObject::arena.sendInfo(player);
+    switch(air.type)
+    {
+    case 0:
+        GObject::arena.sendStatus(player);
+        break;
+    case 1:
+        GObject::arena.sendEnter(player);
+        break;
+    case 2:
+    case 3:
+        GObject::arena.sendPreliminary(player, air.flag);
+        break;
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+        GObject::arena.sendElimination(player, air.flag);
+        break;
+    }
+	//GObject::arena.sendInfo(player);
 }
 
 void OnArenaEliminationReq( GameMsgHdr&hdr, ArenaEliminationReq& aer )

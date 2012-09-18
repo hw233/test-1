@@ -618,7 +618,6 @@ void Arena::readFrom( BinaryReader& brd )
 void Arena::sendInfo( Player * player )
 {
 	Stream st(REP::SERVER_ARENA_INFO);
-#if 0
 	std::map<Player *, ArenaPlayer>::iterator it = _players.find(player);
 	if(it == _players.end())
 	{
@@ -633,7 +632,6 @@ void Arena::sendInfo( Player * player )
 		st << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt16>(0);
 	else
 		st << static_cast<UInt8>(iter->second.lastRank) << static_cast<UInt8>(iter->second.rank) << static_cast<UInt16>(iter->second.session);
-#endif
 	UInt32 leftTime;
 	UInt32 now = TimeUtil::Now();
 	if(_nextTime > now)
@@ -966,16 +964,17 @@ void Arena::readHistories(BinaryReader& brd)
         brd >> pid >> level >> name;
 
         Player * pl = pm[pid];
+        if(pl == NULL)
+            continue;
+        ArenaPlayer& ap = _players[pl];
         UInt16 bCount = 0;
         brd >> bCount;
+        ap.battles.resize(bCount);
         for(UInt16 p = 0; p < bCount; ++ p)
         {
             PriliminaryBattle pb;
-            brd >> pb.won >> pb.otherColor >> pb.otherName >> pb.battleTime >> pb.battleId;
-            if(pl == NULL)
-                continue;
-            ArenaPlayer& ap = _players[pl];
-            ap.battles.push_back(pb);
+            brd >> pb.won >> pb.otherName >> pb.battleTime >> pb.battleId;
+            ap.battles[p] = pb;
         }
     }
 }
@@ -1031,18 +1030,19 @@ void Arena::readElimination(BinaryReader& brd)
             _notified = 0;
         }
 
-        int idx = 0;
+        int idx = _round;
         const int aIndex[6] = {0, 16, 24, 28, 30, 31};
         for(int j = 0; j < aIndex[idx]; ++ j)
         {
             UInt8 cnt = 0;
             brd >> cnt;
             brd >> _finalBattles[i][j].wonFlag;
+            _finalBattles[i][j].battleId.resize(cnt);
             for(int k = 0; k < cnt; ++ k)
             {
                 UInt32 battleId;
                 brd >> battleId;
-                _finalBattles[i][j].battleId.push_back(battleId);;
+                _finalBattles[i][j].battleId[k] = battleId;
             }
         }
 
@@ -1306,10 +1306,11 @@ void Arena::sendPreliminary(Player* player, UInt8 flag)
 void Arena::sendElimination( Player * player, UInt8 group )
 {
 	bool resultOnly = (group & 0x80) > 0;
-	UInt8 g = (group & 0x7F) - 1;
-	if(g >= 3)
-		return;
-	if(_progress < 4)
+    if(group > 5)
+        return;
+    const UInt8 gp_mod[] = {0, 0, 1, 1, 0, 1};
+	UInt8 g = gp_mod[group];
+	if(_progress < 3)
 		return;
 	Stream st(REP::SERVER_ARENA_ELIM);
 	st << group;
@@ -1337,15 +1338,42 @@ void Arena::sendElimination( Player * player, UInt8 group )
 	}
 	if(!resultOnly)
 	{
-		for(int i = 0; i < 32; ++ i)
+        int istart = 0;
+        int iend = 8;
+        if(_progress == 3 || _progress == 4)
+        {
+            switch(group)
+            {
+            case 0:
+            case 2:
+                istart = 0;
+                iend = 16;
+                break;
+            case 1:
+            case 3:
+                istart = 16;
+                iend = 32;
+                break;
+            }
+        }
+		for(int i = istart; i < iend; ++ i)
 		{
 			st << _finals[g][i].level << _finals[g][i].name;
 		}
 	}
 	st << _round;
+
+    int istart = 0;
+    if(_progress > 4)
+    {
+        istart = aIndex[2];
+    }
 	for(int j = 0; j < aIndex[_round]; ++ j)
 	{
-		st << _finalBattles[g][j].wonFlag << _finalBattles[g][j].battleId[0] << _finalBattles[g][j].battleId[1] << _finalBattles[g][j].battleId[2];
+        UInt8 cnt = static_cast<UInt8>(_finalBattles[g][j].battleId.size());
+        st << cnt << _finalBattles[g][j].wonFlag;
+        for(int k = 0; k < cnt; ++ k)
+            st << _finalBattles[g][j].battleId[k];
 	}
 	st << Stream::eos;
 	player->send(st);
