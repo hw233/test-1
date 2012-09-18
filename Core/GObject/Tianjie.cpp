@@ -2177,10 +2177,10 @@ void Tianjie::rewardEventBox(Player*pl, int score)
     //积分奖励
     const UInt32* pBoxId = s_tjEventBoxId;
 
-    int itemCount = score/5000 + 3;
+    int itemCount = score/5000 + 4;
     MailPackage::MailItem* pItems = new MailPackage::MailItem[itemCount];
     int j = 0;
-    while (score >= 500)
+    while (score > 0)
     {
         if (score >= 5000)
         {
@@ -2196,6 +2196,11 @@ void Tianjie::rewardEventBox(Player*pl, int score)
         {
             pItems[j].id = pBoxId[1];
             score -= 1000;
+        }
+        else if (score >= 500)
+        {
+            pItems[j].id = pBoxId[0];
+            score -= 500;
         }
         else
         {
@@ -2217,10 +2222,10 @@ void Tianjie::rewardTotalBox(Player*pl, int score)
     //积分奖励
     const UInt32* pBoxId = s_tjTotalBoxId;
 
-    int itemCount = score/10000 + 3;
+    int itemCount = score/10000 + 4;
     MailPackage::MailItem* pItems = new MailPackage::MailItem[itemCount];
     int j = 0;
-    while (score >= 1000)
+    while (score > 0)
     {
         if (score >= 10000)
         {
@@ -2236,6 +2241,11 @@ void Tianjie::rewardTotalBox(Player*pl, int score)
         {
             pItems[j].id = pBoxId[1];
             score -= 2000;
+        }
+        else if (score >= 1000)
+        {
+            pItems[j].id = pBoxId[0];
+            score -= 1000;
         }
         else
         {
