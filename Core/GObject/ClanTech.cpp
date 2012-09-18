@@ -361,7 +361,10 @@ UInt32 ClanTech::getMaxStatueLevel()
     if(found == _techs.end())
         return 0;
 
-	return GData::clanTechTable[CLAN_TECH_STATUE][found->second.level].effect1;
+	UInt32 maxLevel = GData::clanTechTable[CLAN_TECH_STATUE][found->second.level].effect1;
+    if (!maxLevel)
+        ++ maxLevel;
+    return maxLevel;
 }
 
 UInt32 ClanTech::getMaxCopyRobLevel()

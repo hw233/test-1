@@ -2836,69 +2836,6 @@ namespace GObject
 		lc.finalize();
 		globalClans.enumerate(cacheClan, 0);
 
-        // 读取帮派神像
-        lc.prepare("Loading clan statue:");
-        DBClanStatue cs;
-        if (execu->Prepare("SELECT `clanid`, `level`, `exp` FROM `clan_statue` ORDER BY `clanid`", cs) != DB::DB_OK)
-            return false;
-        clan = NULL;
-        lastId = 0xFFFFFFFF;
-        lc.reset(1000);
-        while(execu->Next() == DB::DB_OK)
-        {
-            lc.advance();
-            if (cs.clanId != lastId)
-            {
-                lastId = cs.clanId;
-                clan = globalClans[cs.clanId];
-            }
-            if(clan == NULL) continue;
-            clan->LoadStatue(cs.level, cs.exp, cs.expUpdateTime);
-        }
-        lc.finalize();
-
-        // 读取帮派副本
-        lc.prepare("Loading clan copy:");
-        DBClanCopy cc;
-        if (execu->Prepare("SELECT `clanid`, `level`, `levelUpdateTime`, `maxCopyLevel`, `maxCopyTime` FROM `clan_copy` ORDER BY `clanid`", cc) != DB::DB_OK)
-            return false;
-        clan = NULL;
-        lastId = 0xFFFFFFFF;
-        lc.reset(1000);
-        while(execu->Next() == DB::DB_OK)
-        {
-            lc.advance();
-            if (cc.clanId != lastId)
-            {
-                lastId = cc.clanId;
-                clan = globalClans[cc.clanId];
-            }
-            if(clan == NULL) continue;
-            clan->LoadCopy(cc.level, cc.levelUpdateTime, cc.maxLevel, cc.maxLevelTime);
-        }
-        lc.finalize();
-        
-        // 读取帮派副本历史日志
-        lc.prepare("Loading clan copy log:");
-        DBClanCopyLog ccl;
-        if (execu->Prepare("SELECT `clanid`, `logTime`, `logType`, `playerName`, `logVal` FROM `clan_copy_log` ORDER BY `clanid` ASC, `logTime` ASC", ccl) != DB::DB_OK)
-            return false;
-        clan = NULL;
-        lastId = 0xFFFFFFFF;
-        while(execu->Next() == DB::DB_OK)
-        {
-            lc.advance();
-            if (ccl.clanId != lastId)
-            {
-                lastId = ccl.clanId;
-                clan = globalClans[ccl.clanId];
-            }
-            if (clan == NULL) continue;
-            clan->LoadCopyLog(ccl.logTime, ccl.logType, ccl.playerName, ccl.logVal);
-        }
-        lc.finalize();
-
-
         lc.prepare("Loading clan item:");
         DBClanItem ci;
         if(execu->Prepare("SELECT `clanid`, `playerid`, `itemid`, `itemnum` FROM `clan_item` ORDER BY `clanid`", ci) != DB::DB_OK)
@@ -3190,6 +3127,68 @@ namespace GObject
 			clan->addAllocRecord(crr.timeAlloc, ar, false);
 		}
 		lc.finalize();
+
+        // 读取帮派神像
+        lc.prepare("Loading clan statue:");
+        DBClanStatue cs;
+        if (execu->Prepare("SELECT `clanid`, `level`, `exp`, `expUpdateTime` FROM `clan_statue` ORDER BY `clanid`", cs) != DB::DB_OK)
+            return false;
+        clan = NULL;
+        lastId = 0xFFFFFFFF;
+        lc.reset(1000);
+        while(execu->Next() == DB::DB_OK)
+        {
+            lc.advance();
+            if (cs.clanId != lastId)
+            {
+                lastId = cs.clanId;
+                clan = globalClans[cs.clanId];
+            }
+            if(clan == NULL) continue;
+            clan->LoadStatue(cs.level, cs.exp, cs.expUpdateTime);
+        }
+        lc.finalize();
+
+        // 读取帮派副本
+        lc.prepare("Loading clan copy:");
+        DBClanCopy cc;
+        if (execu->Prepare("SELECT `clanid`, `level`, `levelUpdateTime`, `maxCopyLevel`, `maxCopyTime` FROM `clan_copy` ORDER BY `clanid`", cc) != DB::DB_OK)
+            return false;
+        clan = NULL;
+        lastId = 0xFFFFFFFF;
+        lc.reset(1000);
+        while(execu->Next() == DB::DB_OK)
+        {
+            lc.advance();
+            if (cc.clanId != lastId)
+            {
+                lastId = cc.clanId;
+                clan = globalClans[cc.clanId];
+            }
+            if(clan == NULL) continue;
+            clan->LoadCopy(cc.level, cc.levelUpdateTime, cc.maxLevel, cc.maxLevelTime);
+        }
+        lc.finalize();
+        
+        // 读取帮派副本历史日志
+        lc.prepare("Loading clan copy log:");
+        DBClanCopyLog ccl;
+        if (execu->Prepare("SELECT `clanid`, `logTime`, `logType`, `playerName`, `logVal` FROM `clan_copy_log` ORDER BY `clanid` ASC, `logTime` ASC", ccl) != DB::DB_OK)
+            return false;
+        clan = NULL;
+        lastId = 0xFFFFFFFF;
+        while(execu->Next() == DB::DB_OK)
+        {
+            lc.advance();
+            if (ccl.clanId != lastId)
+            {
+                lastId = ccl.clanId;
+                clan = globalClans[ccl.clanId];
+            }
+            if (clan == NULL) continue;
+            clan->LoadCopyLog(ccl.logTime, ccl.logType, ccl.playerName, ccl.logVal);
+        }
+        lc.finalize();
 
 		return true;
 	}

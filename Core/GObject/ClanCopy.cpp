@@ -50,6 +50,7 @@ ClanCopy::ClanCopy(Clan *c, UInt32 copyId, Player * player) : _clan(c), _copyId 
 
     _maxMonsterWave = 20;
     _curMonsterWave = 0;
+    _lastWave = 0;
 
     _observerPlayer.clear();
 #ifdef DEBUG_CLAN_COPY
@@ -319,6 +320,7 @@ void ClanCopy::initCopyData()
 #endif
     _homeMaxHp = _homeHp = GData::clanCopyTable[_copyLevel].homeHp;
     _maxReward = GData::clanCopyTable[_copyLevel].maxReward;
+    _maxMonsterWave = GData::clanCopyTable[_copyLevel].maxWaveCount;
 
     ClanCopySpot clanCopySpot;
     SpotPlayerList spotPlayerList;
@@ -620,6 +622,8 @@ void ClanCopy::process(UInt32 now)
 void ClanCopy::enemyBaseAct()
 {
     // 敌人老巢的行动
+    if (_lastWave)
+        --_lastWave;
     monsterMove(Enemy_Base); // 上一轮产生的怪物先行移动
     if (_curMonsterWave * _monsterRefreshTick + _startTick > _tickCount)
     {
@@ -637,6 +641,11 @@ void ClanCopy::enemyBaseAct()
         *fileSt << "enemyBase create " << (UInt32) _curMonsterWave << " wave monster." << std::endl;
 #endif
         createEnemy();
+    }
+    else
+    {
+        if (!_lastWave)
+            _lastWave = 2;
     }
 }
 
@@ -775,6 +784,9 @@ void ClanCopy::spotCombat(UInt8 spotId)
         ++ monsterIt;
     }
 
+    if (_lastWave == 1)
+        flag = true;
+
     if (flag)
     {
         // 需要重新冲阵
@@ -877,10 +889,24 @@ void ClanCopy::spotCombat(UInt8 spotId)
                     // 加入死亡名单
                     playerIt->player->regenAll();    // 生命值回满
                     updateSpotBufferValue(spotId);
+
+                    for(size_t i = 0; i < c; ++ i)
+                    {
+                        Battle::BattleObject * obj = bsim(1, (*monsterIt)->npcList[i].pos);
+                        if(obj == NULL || !obj->isChar())
+                            continue;
+                        Battle::BattleFighter * bfgt = static_cast<Battle::BattleFighter *>(obj);
+                        UInt32 nHP = bfgt->getHP();
+                        (*monsterIt)->npcList[i].fighter->setCurrentHP(nHP, false);
+                    }
                 }
                 _spotBattleInfo[spotId].push_back(
                         ClanCopyBattleInfo(playerIt->player->getId(), (*monsterIt)->npcIndex, res, 
                             res?playerIt->player->allHpP():(*monsterIt)->allHpP()));
+#ifdef DEBUG_CLAN_COPY
+                if (!res)
+                    *fileSt << "Monster remain hp = " << (UInt32) (*monsterIt)->allHpP() << "." << std::endl;
+#endif
                 Stream st(REP::ATTACK_NPC);
                 st << static_cast<UInt8>(res) << static_cast<UInt8>(1) << static_cast<UInt32> (0) << static_cast<UInt8>(0) << static_cast<UInt8>(0);
                 st.append(&packet[8], packet.size() - 8);
@@ -899,7 +925,10 @@ void ClanCopy::spotCombat(UInt8 spotId)
             break;
         }
         else
+        {
+            ++ monsterIt;
             ++playerIt;
+        }
     }
 
     if (flag)
@@ -1039,7 +1068,7 @@ bool ClanCopy::checkWin()
 
 void ClanCopy::addWinReward(UInt32 awardValue)
 {
-    // TODO: 发送胜利奖励
+    // 发送胜利奖励
     _clan->addStatueExp(awardValue);
     MailPackage::MailItem mitem[1] = {{1325, 1}};
     for (std::map<Player *, UInt8>::iterator playerIt = _playerIndex.begin();
@@ -1209,6 +1238,19 @@ void ClanCopy::notifySpotBattleInfo(Player * player /* = NULL */)
 void ClanCopy::notifyCopyLose()
 {
     // 通知玩家副本失败
+
+    Stream st (REP::CLAN_COPY);
+    st << static_cast<UInt8>(0x02);
+    st << static_cast<UInt8>(0x04);
+    st << Stream::eos;
+
+    for (std::map<Player *, UInt8>::iterator playerIt = _playerIndex.begin();
+            playerIt != _playerIndex.end(); ++ playerIt)
+    {
+        // 通知副本战斗玩家
+        playerIt->first->send(st);
+    }
+    /*
     class CopyLoseVisitor : public Visitor<ClanMember>
     {
         public:
@@ -1230,11 +1272,26 @@ void ClanCopy::notifyCopyLose()
 
     CopyLoseVisitor visitor;
     _clan->VisitMembers(visitor);
+    */
 }
 
 void ClanCopy::notifyCopyWin(UInt32 awardValue)
 {
     // 通知玩家副本成功
+
+    Stream st (REP::CLAN_COPY);
+    st << static_cast<UInt8>(0x02);
+    st << static_cast<UInt8>(0x03);
+    st << static_cast<UInt32>(awardValue);
+    st << Stream::eos;
+
+    for (std::map<Player *, UInt8>::iterator playerIt = _playerIndex.begin();
+            playerIt != _playerIndex.end(); ++ playerIt)
+    {
+        // 通知副本战斗玩家
+        playerIt->first->send(st);
+    }
+    /*
     class CopyWinVisitor : public Visitor<ClanMember>
     {
         public:
@@ -1260,6 +1317,7 @@ void ClanCopy::notifyCopyWin(UInt32 awardValue)
 
     CopyWinVisitor visitor(awardValue);
     _clan->VisitMembers(visitor);
+    */
 }
 
 void ClanCopy::notifyLauncherEscape()

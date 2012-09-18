@@ -60,8 +60,6 @@ void ClanStatue::updateLevel(UInt32 exp, UInt32 expUpdateTime, UInt16 maxLevel)
         if (_exp < it->needExp)
         {
             _level = it->level - 1;
-            if (!_level)
-                ++ _level;
             if (_level > maxLevel)
             {
                 _level = maxLevel;
@@ -69,6 +67,8 @@ void ClanStatue::updateLevel(UInt32 exp, UInt32 expUpdateTime, UInt16 maxLevel)
                 if (_exp)
                     --_exp;
             }
+            if (!_level)
+                ++ _level;
             DB5().PushUpdateData("REPLACE INTO `clan_statue` (`clanId`, `exp`, `level`, `expUpdateTime`) VALUES (%u,%u,%u,%u)", _clan->getId(), _exp, _level, now);
             if (formalLevel != _level)
             {
@@ -85,6 +85,8 @@ void ClanStatue::updateLevel(UInt32 exp, UInt32 expUpdateTime, UInt16 maxLevel)
         if (_exp)
             --_exp;
     }
+    if (!_level)
+        ++ _level;
     DB5().PushUpdateData("REPLACE INTO `clan_statue` (`clanId`, `exp`, `level`, `expUpdateTime`) VALUES (%u,%u,%u,%u)", _clan->getId(), _exp, _level, now);
     if (formalLevel != _level)
     {
@@ -103,8 +105,6 @@ void ClanStatue::addExp(UInt32 exp, UInt16 maxLevel)
         if (_exp < it->needExp)
         {
             _level = it->level - 1;
-            if (!_level)
-                ++ _level;
             if (_level > maxLevel)
             {
                 _level = maxLevel;
@@ -112,6 +112,8 @@ void ClanStatue::addExp(UInt32 exp, UInt16 maxLevel)
                 if (_exp)
                     --_exp;
             }
+            if (!_level)
+                ++ _level;
             DB5().PushUpdateData("REPLACE INTO `clan_statue` (`clanId`, `exp`, `level`, `expUpdateTime`) VALUES (%u,%u,%u,%u)", _clan->getId(), _exp, _level, TimeUtil::Now());
             if (formalLevel != _level)
             {
@@ -128,6 +130,8 @@ void ClanStatue::addExp(UInt32 exp, UInt16 maxLevel)
         if (_exp)
             --_exp;
     }
+    if (!_level)
+        ++ _level;
     DB5().PushUpdateData("REPLACE INTO `clan_statue` (`clanId`, `exp`, `level`, `expUpdateTime`) VALUES (%u,%u,%u,%u)", _clan->getId(), _exp, _level, TimeUtil::Now());
     if (formalLevel != _level)
     {
@@ -149,8 +153,6 @@ void ClanStatue::subExp(UInt32 exp, UInt16 maxLevel)
         if (_exp < it->needExp)
         {
             _level = it->level - 1;
-            if (!_level)
-                ++ _level;
             if (_level > maxLevel)
             {
                 _level = maxLevel;
@@ -158,6 +160,8 @@ void ClanStatue::subExp(UInt32 exp, UInt16 maxLevel)
                 if (_exp)
                     --exp;
             }
+            if (!_level)
+                ++ _level;
             DB5().PushUpdateData("REPLACE INTO `clan_statue` (`clanId`, `exp`, `level`, `expUpdateTime`) VALUES (%u,%u,%u,%u)", _clan->getId(), _exp, _level, TimeUtil::Now());
             if (formalLevel != _level)
             {
@@ -174,6 +178,8 @@ void ClanStatue::subExp(UInt32 exp, UInt16 maxLevel)
         if (_exp)
             --exp;
     }
+    if (!_level)
+        ++ _level;
     DB5().PushUpdateData("REPLACE INTO `clan_statue` (`clanId`, `exp`, `level`, `expUpdateTime`) VALUES (%u,%u,%u,%u)", _clan->getId(), _exp, _level, TimeUtil::Now(), _clan->getId());
     if (formalLevel != _level)
     {
