@@ -1,5 +1,3 @@
-神像等级	升级需要的exp	累计升级需要的EXP	每小时减少的exp	加成hp	加成attack	加成action
-level	needExp	needExps	consumeExp	exHp	exAttack	exAction
 1	0	0	0	60	6	3
 2	1300	1300	20	126	12	6
 3	2925	4225	40	212	21	10

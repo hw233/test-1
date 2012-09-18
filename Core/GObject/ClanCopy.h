@@ -182,6 +182,9 @@ struct ClanCopyMonster
 
             npcList.push_back(fdata);
 
+            fighter->maxhp = fighter->getBaseHP();
+            fighter->setCurrentHP(fighter->maxhp, false);
+            /*
             fighter->attack  = fighter->getBaseAttack()    * (1 + s_rate3NpcBaseModulus[monsterType][0]*copyLevel);
             fighter->magatk  = fighter->getBaseMagAttack() * (1 + s_rate3NpcBaseModulus[monsterType][1]*copyLevel);
             fighter->defend  = fighter->getBaseDefend()    * (1 + s_rate3NpcBaseModulus[monsterType][2]*copyLevel);
@@ -197,6 +200,7 @@ struct ClanCopyMonster
             fighter->evade = fighter->evade < s_rate3NpcAdvanceModMax[0] ? fighter->evade : s_rate3NpcAdvanceModMax[1];
             fighter->counter = fighter->counter < s_rate3NpcAdvanceModMax[0] ? fighter->counter : s_rate3NpcAdvanceModMax[2];
             fighter->magres = fighter->magres < s_rate3NpcAdvanceModMax[0] ? fighter->magres : s_rate3NpcAdvanceModMax[3];
+            */
             fighter->setDirty(false);
 
         }
@@ -221,7 +225,7 @@ struct ClanCopyMonster
                 total += fighter->getCurrentHP();
             else
                 total += fighter->getMaxHP();
-            totalmax += fighter->getMaxHP();
+            totalmax += fighter->getBaseHP();
         }
         if (!totalmax)
             return 0;
@@ -370,6 +374,7 @@ class ClanCopy
 
         UInt32 _maxMonsterWave;        // 该等级副本刷怪的波数（包括轮空的）
         UInt32 _curMonsterWave;        // 当前已经刷新的怪的波数（包括轮空的）
+        UInt8  _lastWave;              // 是否已经是最后一波结束了
 
         UInt32 _npcIndex;
 

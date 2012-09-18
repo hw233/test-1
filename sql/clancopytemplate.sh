@@ -11,8 +11,8 @@ function clancopytemplate()
 # 11,"302,2,3|303,1",0,40,"3,4"
     f=$1
     d=clancopytemplate
-    sed -i /ID/d $f
-    sed -i /REF/d $f
+    sed -i /副本等级/d $f
+    sed -i /level/d $f
     sed -i /^$/d $f
     sed -i s/\"//g $f
     export lines=`wc -l $f | awk '{print $1}'`
