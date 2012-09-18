@@ -290,6 +290,11 @@ Clan::~Clan()
 bool Clan::accept(Player * player, UInt64 pid )
 {
     bool ret = false;
+    if (ClanCopyMgr::Instance().getClanCopyByClan(this))
+    {
+        player->sendMsgCode(0, 1358);
+        return ret;
+    }
 	if (_clanBattle->isInBattling())
 	{
 		player->sendMsgCode(2, 1317);
@@ -480,6 +485,11 @@ bool Clan::join(ClanMember * cm)
 
 bool Clan::kick(Player * player, UInt64 pid)
 {
+    if (ClanCopyMgr::Instance().getClanCopyByClan(this))
+    {
+        player->sendMsgCode(0, 1358);
+        return false;
+    }
 	if (_clanBattle->isInBattling())
 	{
         player->sendMsgCode(0, 1317);
@@ -594,6 +604,11 @@ bool Clan::leave(Player * player)
 		player->sendMsgCode(0, 1317);
 		return false;
 	}
+    if (ClanCopyMgr::Instance().getClanCopyByClan(this))
+    {
+        player->sendMsgCode(0, 1358);
+        return false;
+    }
     if(ClanRankBattleMgr::Instance().IsInBattle(this))
     {
         SYSMSG_SEND(2235, player);
@@ -3587,14 +3602,14 @@ void Clan::LoadStatue(UInt16 level, UInt32 exp, UInt32 expUpdateTime)
 void Clan::addStatueExp(UInt32 exp)
 {
     Mutex::ScopedLock lk(_mutex);
-    _statue->addExp(exp);
+    _statue->addExp(exp, _techs->getMaxStatueLevel());
     broadcastCopyInfo();
 }
 
 void Clan::subStatueExp(UInt32 exp)
 {
     Mutex::ScopedLock lk(_mutex);
-    _statue->subExp(exp);
+    _statue->subExp(exp, _techs->getMaxStatueLevel());
     broadcastCopyInfo();
 }
 
