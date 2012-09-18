@@ -9,7 +9,7 @@
 #include "GData/ClanCopyTable.h"
 #include "Fighter.h"
 
-#define DEBUG_CLAN_COPY
+//#define DEBUG_CLAN_COPY
 
 #ifdef DEBUG_CLAN_COPY
 #include <fstream>
