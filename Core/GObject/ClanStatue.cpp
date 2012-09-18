@@ -41,7 +41,7 @@ void ClanStatue::updateLevel(UInt32 exp, UInt32 expUpdateTime, UInt16 maxLevel)
         }
         else
         {
-            bigExp = exp + (expOutput - expConsume ) * (now / 3600 - expUpdateTime / 3600);
+            bigExp = exp + (static_cast<Int64>(expOutput) - expConsume ) * (now / 3600 - expUpdateTime / 3600);
         }
     }
     else
@@ -88,7 +88,7 @@ void ClanStatue::updateLevel(UInt32 exp, UInt32 expUpdateTime, UInt16 maxLevel)
     }
 }
 
-void ClanStatue::addExp(UInt32 exp)
+void ClanStatue::addExp(UInt32 exp, UInt16 maxLevel)
 {
     UInt16 formalLevel = _level;
     _exp += exp;
@@ -101,6 +101,11 @@ void ClanStatue::addExp(UInt32 exp)
             _level = it->level - 1;
             if (!_level)
                 ++ _level;
+            if (_level > maxLevel)
+            {
+                _level = maxLevel;
+                _exp = GData::clanStatueTable[_level + 1].needExp - 1;
+            }
             DB5().PushUpdateData("REPLACE INTO `clan_statue` (`clanId`, `exp`, `level`, `expUpdateTime`) VALUES (%u,%u,%u,%u)", _clan->getId(), _exp, _level, TimeUtil::Now());
             if (formalLevel != _level)
             {
@@ -110,6 +115,11 @@ void ClanStatue::addExp(UInt32 exp)
         }
     }
     _level = GData::clanStatueTable.size() - 2;
+    if (_level > maxLevel)
+    {
+        _level = maxLevel;
+        _exp = GData::clanStatueTable[_level + 1].needExp - 1;
+    }
     DB5().PushUpdateData("REPLACE INTO `clan_statue` (`clanId`, `exp`, `level`, `expUpdateTime`) VALUES (%u,%u,%u,%u)", _clan->getId(), _exp, _level, TimeUtil::Now());
     if (formalLevel != _level)
     {
@@ -117,7 +127,7 @@ void ClanStatue::addExp(UInt32 exp)
     }
 }
 
-void ClanStatue::subExp(UInt32 exp)
+void ClanStatue::subExp(UInt32 exp, UInt16 maxLevel)
 {
     UInt16 formalLevel = _level;
     if (_exp < exp)
@@ -133,6 +143,11 @@ void ClanStatue::subExp(UInt32 exp)
             _level = it->level - 1;
             if (!_level)
                 ++ _level;
+            if (_level > maxLevel)
+            {
+                _level = maxLevel;
+                _exp = GData::clanStatueTable[_level + 1].needExp - 1;
+            }
             DB5().PushUpdateData("REPLACE INTO `clan_statue` (`clanId`, `exp`, `level`, `expUpdateTime`) VALUES (%u,%u,%u,%u)", _clan->getId(), _exp, _level, TimeUtil::Now());
             if (formalLevel != _level)
             {
@@ -142,6 +157,11 @@ void ClanStatue::subExp(UInt32 exp)
         }
     }
     _level = GData::clanStatueTable.size() - 1;
+    if (_level > maxLevel)
+    {
+        _level = maxLevel;
+        _exp = GData::clanStatueTable[_level + 1].needExp - 1;
+    }
     DB5().PushUpdateData("REPLACE INTO `clan_statue` (`clanId`, `exp`, `level`, `expUpdateTime`) VALUES (%u,%u,%u,%u)", _clan->getId(), _exp, _level, TimeUtil::Now(), _clan->getId());
     if (formalLevel != _level)
     {

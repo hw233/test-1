@@ -585,12 +585,27 @@ void ClanCopy::process(UInt32 now)
             monsterAssault(rit->first);
     }
 
+    if (_status == CLAN_COPY_LOSE)
+    {
+        notifySpotBattleInfo();
+        notifyCopyLose();
+        _status = CLAN_COPY_OVER;
+        return;
+    }
+
     //　检查是否已经胜利
     if (_tickCount >= _maxMonsterWave * _monsterRefreshTick + _startTick)
     {
         if (checkWin())
         {
+            _clan->addCopyLevel();
+            _clan->addCopyWinLog(_launchPlayer);
+            UInt32 awardValue = static_cast<UInt32> (static_cast<float>(_homeHp) / _homeMaxHp * _maxReward);
+            addWinReward(awardValue);
+            notifySpotBattleInfo();
+            notifyCopyWin(awardValue);
             _status = CLAN_COPY_OVER;
+            return;
         }
     }
     notifySpotBattleInfo();
@@ -955,8 +970,6 @@ void ClanCopy::monsterMove(UInt8 spotId)
                 {
                     // 主基地被摧毁，游戏结束
                     _status = CLAN_COPY_LOSE;
-                    notifyCopyLose();
-                    _status = CLAN_COPY_OVER;
                     return;
                 }
             }
@@ -1021,35 +1034,25 @@ bool ClanCopy::checkWin()
 #ifdef DEBUG_CLAN_COPY
         *fileSt << "Clan copy win in tick (" << _tickCount << ")." << std::endl;
 #endif
-    _clan->addCopyLevel();
-    _clan->addCopyWinLog(_launchPlayer);
-    addWinReward();
-    notifyCopyWin();
     return win;
 }
 
-void ClanCopy::addWinReward()
+void ClanCopy::addWinReward(UInt32 awardValue)
 {
     // TODO: 发送胜利奖励
+    _clan->addStatueExp(awardValue);
+    MailPackage::MailItem mitem[1] = {{1325, 1}};
     for (std::map<Player *, UInt8>::iterator playerIt = _playerIndex.begin();
             playerIt != _playerIndex.end(); ++ playerIt)
     {
         // 通知副本战斗玩家
-        /*
-           MailPackage::MailItem mitem[1] = {{55, count}};
-           MailItemsInfo itemsInfo(mitem, CountryBattleAward, 1);
-
-           SYSMSGV(content, mailid[side], it->second.totalAchievement, count, it->second.totalWin, it->second.totallose, it->second.maxKillStreak);
-           Mail * pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
-           if(pmail != NULL)
-           mailPackageManager.push(pmail->id, mitem, 1, true);
-           */
+        playerIt->first->sendMailItem(800, 801, mitem, 1, true);
     }
     for (std::vector<Player* >::iterator playerIt = _waitForWinPlayer.begin();
             playerIt != _waitForWinPlayer.end(); ++ playerIt)
     {
         // 通知战死后离开的玩家
-        //(*playerIt)->send(st);
+        (*playerIt)->sendMailItem(800, 801, mitem, 1, true);
     }
 
 }
@@ -1229,13 +1232,14 @@ void ClanCopy::notifyCopyLose()
     _clan->VisitMembers(visitor);
 }
 
-void ClanCopy::notifyCopyWin()
+void ClanCopy::notifyCopyWin(UInt32 awardValue)
 {
     // 通知玩家副本成功
     class CopyWinVisitor : public Visitor<ClanMember>
     {
         public:
-            CopyWinVisitor()
+            CopyWinVisitor(UInt32 awardValue)
+                : awardValue(awardValue)
             {
             }
 
@@ -1244,14 +1248,17 @@ void ClanCopy::notifyCopyWin()
                 Stream st (REP::CLAN_COPY);
                 st << static_cast<UInt8>(0x02);
                 st << static_cast<UInt8>(0x03);
+                st << static_cast<UInt32>(awardValue);
                 st << Stream::eos;
                 member->player->send(st);
                 return true;
             }
+        private:
+            UInt32 awardValue;
 
     };
 
-    CopyWinVisitor visitor;
+    CopyWinVisitor visitor(awardValue);
     _clan->VisitMembers(visitor);
 }
 

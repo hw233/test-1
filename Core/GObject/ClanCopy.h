@@ -322,7 +322,7 @@ class ClanCopy
         void spotCombat(UInt8 spotId);
         void attackHome(ClanCopyMonster* clanCopyMonster);
         bool checkWin();
-        void addWinReward();
+        void addWinReward(UInt32 awardValue);
 
         void setInterval(UInt32 interval);
         void setStartTick(UInt32 tickCount);
@@ -334,7 +334,7 @@ class ClanCopy
         void notifySpotPlayerInfo(Player * player = NULL);
         void notifySpotBattleInfo(Player * player = NULL);
         void notifyCopyLose();
-        void notifyCopyWin();
+        void notifyCopyWin(UInt32 awardValue);
         void notifyLauncherEscape();
 
         void notifyCopyCreate();
