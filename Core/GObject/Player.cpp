@@ -9629,6 +9629,9 @@ namespace GObject
             //领取礼物卡
             getAwardGiftCard();
             break;
+        case 10:
+            getAwardBirthday(opt);
+            break;
         }
     }
 
@@ -9752,6 +9755,88 @@ namespace GObject
         SetVar(VAR_AWARD_NEWREGISTER, 5);
     }
 
+    void Player::getAwardBirthday(UInt8 opt)
+    {
+    #define NUM 3
+        if(opt != 0 && opt != 1 && opt != 2)
+            return;
+        UInt32 day = 1;
+        UInt32 mon = 1;
+        UInt32 year = 2012;
+        TimeUtil::GetDMY(&day, &mon, &year);
+        if(year != 2012 || mon != 9 || day < 16 || day > 30)
+            return;
+        UInt8 num = GetVar(VAR_AWARD_BIRTHDAY);
+        if(opt == 2){    //邀请好友成功
+            if(num >= NUM) return;
+            Stream st(REP::GETAWARD);
+            st << static_cast<UInt8>(10) << static_cast<UInt8>(0);
+            st << static_cast<UInt8>(2 - num) << static_cast<UInt8>(1)<< Stream::eos;
+            send(st);
+            SetVar(VAR_AWARD_BIRTHDAY, num + NUM);
+        }
+        else if(opt == 1){  //领奖
+			std::vector<GData::LootResult>::iterator it;
+			for(it = _BirthdayAward.begin(); it != _BirthdayAward.end(); ++ it)
+			{
+				m_Package->ItemNotify(it->id, it->count);
+			}
+			_BirthdayAward.clear();
+            //OnShouShou(SS_SLLP);
+        }
+        else if(opt == 0){  //抽奖
+            UInt8 flag = 0;
+            if(num >= NUM){ //已邀请过好友
+                num -= NUM;
+                if(num < 0 || num >= NUM)
+                    num = 2;
+                flag = 1;
+                if(num >= 2) return;
+            }
+            else{
+                if(num >= 1) //未邀请过好友
+                    return;
+            }
+            UInt8 id = GameAction()->RunBirthdayAward(this);
+            if(!id) return;
+            {
+                Stream st(REP::GETAWARD);
+                st << static_cast<UInt8>(10) << id << Stream::eos;
+                send(st);
+            }
+            SetVar(VAR_AWARD_BIRTHDAY, flag ? (num + 1 + NUM) : (num + 1));
+            {
+                Stream st(REP::GETAWARD);
+                st << static_cast<UInt8>(10) << static_cast<UInt8>(0);
+                st << static_cast<UInt8>(flag ? (2 - num - 1) : 0) << flag << Stream::eos;
+                send(st);
+            }
+        }
+    #undef NUM
+    }
+    void Player::CheckCanAwardBirthday()
+    {
+        UInt32 day = 1;
+        UInt32 mon = 1;
+        UInt32 year = 2012;
+        TimeUtil::GetDMY(&day, &mon, &year);
+        if(year == 2012 && mon == 9 && day >= 16 && day <= 30){
+            //生日罗盘许愿星(周年庆活动) 
+            UInt8 num = GetVar(VAR_AWARD_BIRTHDAY);
+            UInt8 flag = 0;
+            if(num >= 3){
+                num -= 3;
+                if(num < 0 || num >= 3)
+                    num = 2;
+                flag = 1;
+            }
+            Stream st(REP::GETAWARD);
+            st << static_cast<UInt8>(10) << static_cast<UInt8>(0);
+            st << static_cast<UInt8>(flag ? (2 - num) : (1 - num)) << flag << Stream::eos;
+            send(st);
+        }
+    }
+
     void Player::getHappyAward(UInt8 opt)
     {
         if(opt == 6)
@@ -9856,6 +9941,12 @@ namespace GObject
     {
         GData::LootResult lt = {itemId, num};
         _RegisterAward.push_back(lt);
+    }
+
+    void Player::BirthdayAward(UInt16 itemId, UInt16 num)
+    {
+        GData::LootResult lt = {itemId, num};
+        _BirthdayAward.push_back(lt);
     }
 
     void Player::lastQueqiaoAwardPush(UInt16 itemId, UInt16 num)

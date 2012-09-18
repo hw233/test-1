@@ -201,6 +201,7 @@ namespace GObject
         VAR_RECHARGE_TOTAL3366 = 169, //3366合作充值活动
         VAR_BDIAMOND_CMD = 170, //蓝钻用户每日可领取当前等级寻宝令
 
+        VAR_AWARD_BIRTHDAY     = 190, //周年庆活动(生日罗盘许愿星)
         VAR_MAX,
     };
 
@@ -268,6 +269,7 @@ namespace GObject
             REGISTER_VAR(VAR_AWARD_SSDT_1, CYCLE_DAY);
             REGISTER_VAR(VAR_AWARD_SSDT_2, CYCLE_NONE);
             REGISTER_VAR(VAR_AWARD_NEWREGISTER, CYCLE_NONE);
+            REGISTER_VAR(VAR_AWARD_BIRTHDAY, CYCLE_DAY);
 
             REGISTER_VAR(VAR_CLANBATTLE_HONOUR, CYCLE_DAY);
             REGISTER_VAR(VAR_CLAN_WEAL, CYCLE_DAY);
