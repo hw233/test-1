@@ -12321,6 +12321,7 @@ namespace GObject
                 fgt->getAttrExtraEquip(st);
 
                 st << fgt->getSoulExtraAura();
+                st << fgt->getSoulAuraLeft();
                 st << fgt->getBattlePortrait();
                 fgt->appendElixirAttr2(st);
             }

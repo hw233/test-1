@@ -13,7 +13,7 @@ namespace GObject
 
 
 const static UInt32 COPY_ROUTE_COUNT = 3;  // 帮派副本的路径数目
-const static UInt32 COPY_MIN_PLAYER = 2;
+const static UInt32 COPY_MIN_PLAYER = 5;
 
 #ifdef DEBUG_CLAN_COPY
 UInt32 clanCopyFileIndex = 1;

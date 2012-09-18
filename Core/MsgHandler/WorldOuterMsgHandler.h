@@ -2187,8 +2187,6 @@ void OnTownDeamonReq( GameMsgHdr& hdr, const void* data)
                 return;
             if(player->hasFlag(GObject::Player::InHeroIsland))
                 return;
-            if(GObject::ClanRankBattleMgr::Instance().IsInBattle(player->getClan()))
-                return;
 
             UInt16 level = 0;
             UInt8 type = 0;
