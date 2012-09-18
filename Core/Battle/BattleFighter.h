@@ -259,10 +259,10 @@ public:
     inline UInt32 getConfuseRound() { return _confuseRound; }
     inline void setConfuseRound(UInt32 r) { _confuseRound = r; }
 
-	inline UInt32 getWeakLevel() { return _weakLevel; }
-	inline void setWeakLevel(UInt32 l) { _weakLevel = l; }
-    inline UInt32 getWeakRound() { return _weakRound; }
-    inline void setWeakRound(UInt32 r) { _weakRound = r; }
+//    inline UInt32 getWeakLevel() { return _weakLevel; }
+//    inline void setWeakLevel(UInt32 l) { _weakLevel = l; }
+//    inline UInt32 getWeakRound() { return _weakRound; }
+//    inline void setWeakRound(UInt32 r) { _weakRound = r; }
 
     const GData::SkillBase* getActiveSkill(bool need_therapy = false);
     const GData::SkillBase* getPassiveSkillPrvAtk100(size_t& idx);
@@ -487,11 +487,14 @@ private:
     float _deep_stun_dmg_extra;
     UInt8 _deep_stun_last;
 
-    float _therapy_dec;
-    UInt8 _therapy_dec_last;
+//    float _therapy_dec;
+//    UInt8 _therapy_dec_last;
 
-	float _therapy_add;
-	UInt8 _therapy_add_last;
+//    float _therapy_add;
+//    UInt8 _therapy_add_last;
+
+    UInt8 _therapy_buff_last;
+    float _therapy_buff;
 
     float _aura_dec;
     UInt8 _aura_dec_last;
@@ -601,14 +604,18 @@ public:
     inline float getDeepStunDmgExtra() { return _deep_stun_dmg_extra; }
     inline void setDeepStunDmgExtra(float v, UInt8 l) { _deep_stun_dmg_extra = v; _deep_stun_last = l; }
 
-    inline UInt8& getTherapyDecLast() { return _therapy_dec_last; }
-    inline float getTherapyDec() { return _therapy_dec; }
-    inline void setTherapyDec(float value, UInt8 last) { _therapy_dec = value; _therapy_dec_last = last; }
+//    inline UInt8& getTherapyDecLast() { return _therapy_dec_last; }
+//    inline float getTherapyDec() { return _therapy_dec; }
+//    inline void setTherapyDec(float value, UInt8 last) { _therapy_dec = value; _therapy_dec_last = last; }
 
-	// 加治疗效果
-	inline UInt8& getTherapyAddLast() { return _therapy_add_last; }
-	inline float getTherapyAdd() { return _therapy_add; }
-	inline void setTherapyAdd(float value, UInt8 last) { _therapy_add = value; _therapy_add_last = last; }
+    // 加治疗效果
+//    inline UInt8& getTherapyAddLast() { return _therapy_add_last; }
+//    inline float getTherapyAdd() { return _therapy_add; }
+//    inline void setTherapyAdd(float value, UInt8 last) { _therapy_add = value; _therapy_add_last = last; }
+    // 治疗效果加成（可能正可能负）
+    inline UInt8& getTherapyBuffLast() { return _therapy_buff_last; }
+    inline float getTherapyBuff() { return _therapy_buff; }
+    inline void setTherapyBuff(float value, UInt8 last) { _therapy_buff = value; _therapy_buff_last = last; }
 
     inline UInt8& getAuraDecLast() { return _aura_dec_last; }
     inline float getAuraDec() { return _aura_dec; }

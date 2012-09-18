@@ -1769,7 +1769,7 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
             }
 
             state[0] = effect_state;
-            if(boSkill->effect->state & 0xe)
+            if(boSkill->effect->state & 0x2e)
             {
                 if(boSkill->effect->state & 0x2)
                 {
@@ -1874,14 +1874,21 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
                 }
                 break;
             case 0x20:
-                if(bo->getWeakRound() < 1)
                 {
+                    // 虚弱，就是治疗效果减半。。。
                     defList[defCount].damage = 0;
                     defList[defCount].damType = e_Weak;
-                    bo->setWeakLevel(SKILL_LEVEL(boSkill->getId()));
-                    bo->setWeakRound(nStateLast);
+                    bo->setTherapyBuff(-0.5f, nStateLast);
                 }
                 break;
+//                 if(bo->getWeakRound() < 1)
+//                 {
+//                     defList[defCount].damage = 0;
+//                     defList[defCount].damType = e_Weak;
+//                     bo->setWeakLevel(SKILL_LEVEL(boSkill->getId()));
+//                     bo->setWeakRound(nStateLast);
+//                 }
+//                 break;
             }
 
             defList[defCount].pos = bo->getPos() + (activeFlag ? 0 : 25);
@@ -2544,13 +2551,20 @@ void BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
         }
         break;
     case 0x20:
-        if(target_bo->getWeakRound() < 1)
         {
+            // 虚弱，就是治疗效果减半。。。
+            defList[defCount].damage = 0;
             defList[defCount].damType = e_Weak;
-            target_bo->setWeakLevel(SKILL_LEVEL(skill->getId()));
-            target_bo->setWeakRound(skill->last);
+            target_bo->setTherapyBuff(-0.5f, skill->last);
         }
         break;
+//         if(target_bo->getWeakRound() < 1)
+//         {
+//             defList[defCount].damType = e_Weak;
+//             target_bo->setWeakLevel(SKILL_LEVEL(skill->getId()));
+//             target_bo->setWeakRound(skill->last);
+//         }
+//         break;
     }
 
     return;
@@ -3282,11 +3296,12 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                     bo->setForgetRound(0);
                 }
 
-                if(skill->effect->disperse & 0x20 && SKILL_LEVEL(skill->getId()) >= bo->getWeakLevel())
-                {
-                    bo->setWeakLevel(0);
-                    bo->setWeakRound(0);
-                }
+                // 减治疗效果改成攻击力一样处理，不能被驱散了。。。
+//                 if(skill->effect->disperse & 0x20 && SKILL_LEVEL(skill->getId()) >= bo->getWeakLevel())
+//                 {
+//                     bo->setWeakLevel(0);
+//                     bo->setWeakRound(0);
+//                 }
 
                 defList[defCount].damage = 0;
                 defList[defCount].pos = target_pos + 25;
@@ -3366,15 +3381,19 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                         continue;
 
                     BattleFighter* bo = static_cast<BattleFighter*>(this_side[i]);
-                    if(bo->getHP() == 0 && bo->getTherapyDecLast() != 0)
+//                     if(bo->getHP() == 0 && bo->getTherapyDecLast() != 0)
+//                         continue;
+                    if (bo->getHP() == 0)
                         continue;
 
-                    defList[defCount].damType = e_neishan;
+                    //defList[defCount].damType = e_neishan;
+                    defList[defCount].damType = e_Weak;  // 减治疗效果以后就叫e_Weak，增加就是 e_TherapyBuff，e_neishang废除了
                     defList[defCount].damage = 0;
                     defList[defCount].pos = i;
                     defList[defCount].leftHP = bo->getHP();
                     defCount ++;
-                    bo->setTherapyDec(ef->value/100, ef->last);
+                    //bo->setTherapyDec(ef->value/100, ef->last);
+                    bo->setTherapyBuff(-ef->value/100, ef->last);
                 }
             }
         }
@@ -3717,9 +3736,9 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 float nstateRate = rate/100;  // 前面被扩大了100倍。。。缩小回去先。。>_<
                 ModifySingleAttackValue_SkillStrengthen(bf, skill, nstateRate, true);
                 nstateRate = nstateRate*100;  // 扩大回去。。。汗一个。。。
-#ifdef _DEBUG
-               fprintf(stderr, "old rate = %f, new rate = %f\n", rate, nstateRate);
-#endif
+// #ifdef _DEBUG
+//                fprintf(stderr, "old rate = %f, new rate = %f\n", rate, nstateRate);
+// #endif
 
                 BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][target_pos]);
                 if(bo != NULL && bo->getHP() != 0 && bo->isChar())
@@ -6814,21 +6833,42 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
 
 void BattleSimulator::releaseWeak(BattleFighter* bo, DefStatus* defList, size_t& defCount)
 {
-    UInt32 weak = bo->getWeakRound();
-    if(weak > 0)
+    UInt8& last = bo->getTherapyBuffLast();
+    if(last > 0)
     {
-        -- weak;
-        if(weak == 0)
+        float factor = bo->getTherapyBuff();
+        -- last;
+        if(last == 0)
+            bo->setTherapyBuff(0, 0);
+        if (factor > 0)  // 增益效果
+        {
+            defList[defCount].damType = e_unTherapyBuff;
+        }
+        else
         {
             defList[defCount].damType = e_UnWeak;
-            defList[defCount].damage = 0;
-            defList[defCount].pos = bo->getPos() + 25;
-            defList[defCount].leftHP = bo->getHP();
-            defCount++;
         }
-
-        bo->setWeakRound(weak);
+        defList[defCount].damage = 0;
+        defList[defCount].pos = bo->getPos() + 25;
+        defList[defCount].leftHP = bo->getHP();
+        defCount ++;
     }
+
+//     UInt32 weak = bo->getWeakRound();
+//     if(weak > 0)
+//     {
+//         -- weak;
+//         if(weak == 0)
+//         {
+//             defList[defCount].damType = e_UnWeak;
+//             defList[defCount].damage = 0;
+//             defList[defCount].pos = bo->getPos() + 25;
+//             defList[defCount].leftHP = bo->getHP();
+//             defCount++;
+//         }
+// 
+//         bo->setWeakRound(weak);
+//     }
 }
 
 bool BattleSimulator::isImmuneDecAura(const GData::SkillBase* skill, int target_side, int target_pos, DefStatus* defList, size_t& defCount)
@@ -7831,18 +7871,13 @@ bool BattleSimulator::doSkillStrengthen_bufTherapy( BattleFighter* bf, const GDa
     if(!bf || !ef || bf->getHP() <= 0)
         return false;
 
-    int pos0 = 0;
-    if(active && bf->getSide() == target_side)
-        pos0 = 25;
-    else if(!active && bf->getSide() != target_side)
-        pos0 = 25;
-
     defList[defCount].damType = e_TherapyBuff;
     defList[defCount].damage = 0;
-    defList[defCount].pos = pos0;
+    defList[defCount].pos = bf->getPos() + 25;
     defList[defCount].leftHP = bf->getHP();
     defCount ++;
-    bf->setTherapyAdd(ef->value/100, ef->last);
+   // bf->setTherapyAdd(ef->value/100, ef->last);
+    bf->setTherapyBuff(ef->value/100, ef->last);
     return true;
 }
 
@@ -8255,12 +8290,16 @@ bool BattleSimulator::AddSkillStrengthenState(BattleFighter* pFighter, BattleFig
             break;
         case 0x20:
             {
-                if(pTarget->getWeakRound() < 1)
-                {
-                    defList[defCount].damType = e_Weak;
-                    pTarget->setWeakLevel(SKILL_LEVEL(nSkillId));
-                    pTarget->setWeakRound(nLast);
-                }
+                // 虚弱，就是治疗效果减半。。。
+                defList[defCount].damage = 0;
+                defList[defCount].damType = e_Weak;
+                pTarget->setTherapyBuff(-0.5f, nLast);
+//                 if(pTarget->getWeakRound() < 1)
+//                 {
+//                     defList[defCount].damType = e_Weak;
+//                     pTarget->setWeakLevel(SKILL_LEVEL(nSkillId));
+//                     pTarget->setWeakRound(nLast);
+//                 }
             }
             break;
         default:
@@ -8637,51 +8676,80 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
 float BattleSimulator::calcTherapyFactor(BattleFighter* bo, DefStatus* defList, size_t& defCount)
 {
     float factor = 0.0f;
-    factor = 1.0f - calcTherapyDebuf(bo, defList, defCount) + calcTherapyAddBuff(bo, defList, defCount);
+   // factor = 1.0f - calcTherapyDebuf(bo, defList, defCount) + calcTherapyAddBuff(bo, defList, defCount);
+    factor = 1.0f + calcTherapyBuff(bo, defList, defCount);
     return factor;
 }
 
-float BattleSimulator::calcTherapyDebuf(BattleFighter* bo, DefStatus* defList, size_t& defCount)
+float BattleSimulator::calcTherapyBuff(BattleFighter* bo, DefStatus* defList, size_t& defCount)
 {
     float factor = 0.0f;
-    UInt8& last = bo->getTherapyDecLast();
+    UInt8& last = bo->getTherapyBuffLast();
     if(last > 0)
     {
-        //factor *= (1.0f - bo->getTherapyDec());
-        factor = bo->getTherapyDec();
-        -- last;
-        if(last == 0)
-            bo->setTherapyDec(0, 0);
-        defList[defCount].damType = e_unneishan;
-        defList[defCount].damage = 0;
-        defList[defCount].pos = bo->getPos() + 25;
-        defList[defCount].leftHP = bo->getHP();
-        defCount ++;
+        factor = bo->getTherapyBuff();
+        // 移到releaseWeak函数处理
+//         -- last;
+//         if(last == 0)
+//             bo->setTherapyBuff(0, 0);
+//         if (factor > 0)  // 增益效果
+//         {
+//             defList[defCount].damType = e_unTherapyBuff;
+//         }
+//         else
+//         {
+//             defList[defCount].damType = e_UnWeak;
+//         }
+//         defList[defCount].damage = 0;
+//         defList[defCount].pos = bo->getPos() + 25;
+//         defList[defCount].leftHP = bo->getHP();
+//         defCount ++;
     }
-
+ 
     return factor;
 }
 
-float BattleSimulator::calcTherapyAddBuff(BattleFighter* bo, DefStatus* defList, size_t& defCount)
-{
-    float factor = 0.0f;
-    UInt8& last = bo->getTherapyAddLast();
-    if(last > 0)
-    {
-        //factor *= (1.0f + bo->getTherapyAdd());
-        factor = bo->getTherapyAdd();
-        -- last;
-        if(last == 0)
-            bo->setTherapyAdd(0, 0);
-        defList[defCount].damType = e_unTherapyBuff;
-        defList[defCount].damage = 0;
-        defList[defCount].pos = bo->getPos() + 25;
-        defList[defCount].leftHP = bo->getHP();
-        defCount ++;
-    }
-
-    return factor;
-}
+// float BattleSimulator::calcTherapyDebuf(BattleFighter* bo, DefStatus* defList, size_t& defCount)
+// {
+//     float factor = 0.0f;
+//     UInt8& last = bo->getTherapyDecLast();
+//     if(last > 0)
+//     {
+//         //factor *= (1.0f - bo->getTherapyDec());
+//         factor = bo->getTherapyDec();
+//         -- last;
+//         if(last == 0)
+//             bo->setTherapyDec(0, 0);
+//         defList[defCount].damType = e_unneishan;
+//         defList[defCount].damage = 0;
+//         defList[defCount].pos = bo->getPos() + 25;
+//         defList[defCount].leftHP = bo->getHP();
+//         defCount ++;
+//     }
+// 
+//     return factor;
+// }
+// 
+// float BattleSimulator::calcTherapyAddBuff(BattleFighter* bo, DefStatus* defList, size_t& defCount)
+// {
+//     float factor = 0.0f;
+//     UInt8& last = bo->getTherapyAddLast();
+//     if(last > 0)
+//     {
+//         //factor *= (1.0f + bo->getTherapyAdd());
+//         factor = bo->getTherapyAdd();
+//         -- last;
+//         if(last == 0)
+//             bo->setTherapyAdd(0, 0);
+//         defList[defCount].damType = e_unTherapyBuff;
+//         defList[defCount].damage = 0;
+//         defList[defCount].pos = bo->getPos() + 25;
+//         defList[defCount].leftHP = bo->getHP();
+//         defCount ++;
+//     }
+// 
+//     return factor;
+// }
 
 float BattleSimulator::calcAuraDebuf( BattleFighter* bo, DefStatus* defList, size_t& defCount )
 {
