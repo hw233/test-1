@@ -2457,6 +2457,7 @@ namespace GObject
                             fgt->addSkillsFromCT(attr->skills, true);
                     }
                 }
+                enchantUdpLog(equip, ied.enchant);
             }
             else if(type != 0 && ied.enchant > 3)
             {
@@ -2486,6 +2487,7 @@ namespace GObject
                     {
                         ((ItemTrump*)equip)->fixSkills();
                     }
+                    enchantUdpLog(equip, ied.enchant);
 
                     ++enc_times;
                     if(ied.enchant >= level)
@@ -2670,6 +2672,48 @@ namespace GObject
 
 		return 1;
 	}
+    void Package::enchantUdpLog(ItemEquip * equip, UInt8 level)
+    {
+        static const int logId[] = {1120, 1121,1122,1123,1124,1125};
+        char udpStr[64] = {0};
+        if (equip->getClass() == Item_Trump) //法宝
+        {
+            const GData::ItemBaseType& itemType =  equip-> GetItemType();
+            sprintf(udpStr, "F_1126_%d_%d", itemType.getId(), level);
+        }
+        else
+        {
+            //非橙色装备
+            if (equip->getQuality() < 5)
+                return;
+            int udpId = 0;
+            switch (equip->getReqLev())
+            {
+            case 45:
+                udpId = logId[0];
+                break;
+            case 60:
+                udpId = logId[1];
+                break;
+            case 70:
+                udpId = logId[2];
+                break;
+            case 80:
+                udpId = logId[3];
+                break;
+            case 90:
+                udpId = logId[4];
+                break;
+            case 100:
+                udpId = logId[5];
+                break;
+            }
+            if (udpId == 0)
+                return;
+            sprintf(udpStr, "F_%d_%d", udpId, level);
+        }
+        m_Owner->udpLog("enchant", udpStr, "", "", "", "", "act");
+    }
 
     void  Package::OnFailEnchAttainment( UInt32 failThisTime)
     {

@@ -560,6 +560,13 @@ namespace GObject
         m_csFlag = 0;
         _mditem = 0;
         _qixiBinding = false;
+
+        char buf[64] = {0};
+        snprintf(buf, sizeof(buf), "%"I64_FMT"u", _id);
+#ifndef _WIN32
+        m_ulog = _analyzer.GetInstance(buf);
+        m_ulog->SetUserIP("0.0.0.0");
+#endif
 	}
 
 
@@ -1009,7 +1016,8 @@ namespace GObject
         char buf[64] = {0};
         snprintf(buf, sizeof(buf), "%"I64_FMT"u", _id);
 #ifndef _WIN32
-        m_ulog = _analyzer.GetInstance(buf);
+        if (!m_ulog)
+            m_ulog = _analyzer.GetInstance(buf);
         if (m_ulog)
         {
             TcpConnection conn = NETWORK()->GetConn(_session);
@@ -1107,8 +1115,9 @@ namespace GObject
             m_ulog->SetUserMsg(buf);
             if (platform != WEBDOWNLOAD)
                 m_ulog->LogMsg(str1, str2, str3, str4, str5, str6, type, count, 0);
-            if (platform)
-                m_ulog->LogMsg(str1, str2, str3, str4, str5, str6, type, count, platform);
+            // XXX: 不再分平台发送
+            //if (platform)
+            //    m_ulog->LogMsg(str1, str2, str3, str4, str5, str6, type, count, platform);
 
             TRACE_LOG("%s - (%s,%s,%s,%s,%s,%s,%s,%u)", buf, str1, str2, str3, str4, str5, str6, type, count);
         }
@@ -9107,7 +9116,7 @@ namespace GObject
             st << qqvipl << _playerData.qqvipyear << static_cast<UInt8>((_playerData.qqawardgot>>flag) & 0x03);
             UInt8 maxCnt = GObjectManager::getYDMaxCount();
             if(flag == 8)
-                st << static_cast<UInt8>(maxCnt - 2);
+                st << static_cast<UInt8>(maxCnt - 1);
             else if (flag == 16)
                 st << static_cast<UInt8>(maxCnt - 1);
             else
@@ -9120,7 +9129,7 @@ namespace GObject
 
             for(UInt8 i = 0; i < maxCnt; ++ i)
             {
-                if(flag == 8 && (i == 0 || i > 6))
+                if(flag == 8 && (i == 0 || i > 7))
                     continue;
                 if (flag == 16 && i > 6)
                     continue;
@@ -12498,7 +12507,7 @@ namespace GObject
                 //刷新任务
             case 3:
                 {
-                    if (GetVar(VAR_TJ_TASK1_NUMBER) == 5)
+                    if (GetVar(VAR_TJ_TASK1_NUMBER) >= 5)
                     {
                         rcmd = 1;
                     }
@@ -12642,7 +12651,7 @@ namespace GObject
                 break;
             case 1: //前往破阵
                 {
-                    if (GetVar(VAR_TJ_TASK3_COPYID) == 51)
+                    if (GetVar(VAR_TJ_TASK3_COPYID) >= 51)
                     {
                         rcmd = 1;
                         st << type << rcmd << Stream::eos;
@@ -12672,7 +12681,7 @@ namespace GObject
         if (id > 3) 
             return 4;
         
-        if (GetVar(VAR_TJ_TASK1_NUMBER) == 5)
+        if (GetVar(VAR_TJ_TASK1_NUMBER) >= 5)
             return 1;
 
         if (cmd == 2 && getGold() < 5) //双倍奖励
@@ -12803,7 +12812,7 @@ namespace GObject
     {
         UInt8 finish = 0;
         UInt8 copyid = GetVar(VAR_TJ_TASK3_COPYID);
-        if (copyid == (s_tjTask3CopyCount+1)) //已完成
+        if (copyid >= (s_tjTask3CopyCount+1)) //已完成
         {
             finish = 1;
         }
@@ -12898,7 +12907,7 @@ namespace GObject
         if (hasFlag(Player::AutoTlz))
             return;
 
-        if (GetVar(VAR_TJ_TASK3_COPYID) == (s_tjTask3CopyCount+1))
+        if (GetVar(VAR_TJ_TASK3_COPYID) >= (s_tjTask3CopyCount+1))
         {
             rcmd = 1;
             st << type << rcmd << Stream::eos;
@@ -12911,7 +12920,7 @@ namespace GObject
         }
         if (getTael() < 1000)
         {
-            rcmd = 2; //银币不足
+            rcmd = 3; //银币不足
             st << type << rcmd << Stream::eos;
             send(st);
             return;
@@ -12947,7 +12956,7 @@ namespace GObject
         if (!hasFlag(Player::AutoTlz))
             return;
 
-        if (GetVar(VAR_TJ_TASK3_COPYID) == (s_tjTask3CopyCount+1))
+        if (GetVar(VAR_TJ_TASK3_COPYID) >= (s_tjTask3CopyCount+1))
         {
             rcmd = 1;
         }
@@ -13006,8 +13015,6 @@ void EventTlzAuto::complete() const
 }
 void EventTlzAuto::notify(bool isBeginAuto)
 {
-    if(m_Player == NULL || !m_Player->isOnline())
-        return;
     int copyid = m_Player->GetVar(VAR_TJ_TASK3_COPYID);
     if (!isBeginAuto)
     {
@@ -13019,6 +13026,10 @@ void EventTlzAuto::notify(bool isBeginAuto)
         m_Player->delFlag(Player::AutoTlz);
         m_Player->udpLog("tianjie", "F_1114", "", "", "", "", "act");
     }
+
+    if(!m_Player->isOnline())
+        return;
+
     Stream st(REQ::TIANJIE);
     UInt8 type = 3;
     UInt8 cmd = 0;

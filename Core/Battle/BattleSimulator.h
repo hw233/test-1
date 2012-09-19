@@ -365,9 +365,10 @@ private:
     // 计算普通攻击产生的伤害值
     UInt32 CalcNormalAttackDamage(BattleFighter * bf, BattleObject* bo, StateType& eStateType);
     // 计算治疗因子
-	float calcTherapyFactor(BattleFighter* bo, DefStatus* defList, size_t& defCount);
-    float calcTherapyDebuf(BattleFighter* bo, DefStatus* defList, size_t& defCount);
-	float calcTherapyAddBuff(BattleFighter* bo, DefStatus* defList, size_t& defCount);
+    float calcTherapyFactor(BattleFighter* bo, DefStatus* defList, size_t& defCount);
+    float calcTherapyBuff(BattleFighter* bo, DefStatus* defList, size_t& defCount);  // 这个是加治疗、减治疗和虚弱三种效果相互覆盖的结果，这个治疗状态不可驱散
+//    float calcTherapyDebuf(BattleFighter* bo, DefStatus* defList, size_t& defCount);
+//    float calcTherapyAddBuff(BattleFighter* bo, DefStatus* defList, size_t& defCount);
     float calcAuraDebuf(BattleFighter* bo, DefStatus* defList, size_t& defCount);
 private:
 	int _id, _winner, _turns;

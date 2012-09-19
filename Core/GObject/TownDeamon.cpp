@@ -443,7 +443,7 @@ bool TownDeamon::attackNpc(Player* pl, UInt16 level)
     st << Stream::eos;
     pl->send(st);
 
-    bsim.applyFighterHP(0, pl);
+    //bsim.applyFighterHP(0, pl);
 
     pl->setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns());
 

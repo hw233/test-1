@@ -992,7 +992,10 @@ void WBossMgr::process(UInt32 now)
     {
         disapper(now);
         if (m_boss)
+        {
             m_boss->flee();
+            m_boss->setId(0); // XXX: 修正心魔逃走后无法显示BOSS问题
+        }
     }
 }
 

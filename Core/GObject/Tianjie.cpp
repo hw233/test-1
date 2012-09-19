@@ -13,7 +13,7 @@
 namespace GObject
 {
 extern URandom GRND;
-#define START_WITH_59 0
+#define START_WITH_59 0 
 //事件2捐赠的ID
 enum ENUM_ID_TJ2
 {
@@ -216,7 +216,6 @@ bool Tianjie::isOpenTj(Player* pl)
  {
  	if (!m_isTjExecute) return false;
 
-    m_locMutex.lock();
  	multimap<int, int>::iterator iter = m_locNpcMap.find(loc);
 	//验证怪物和玩家是否在同一个据点
 	while (iter != m_locNpcMap.end())
@@ -225,12 +224,10 @@ bool Tianjie::isOpenTj(Player* pl)
             break;
 	    if (iter->second == npcid)
 	    {
-            m_locMutex.unlock();
 	        return true;
 	    }
         ++iter;
 	}
-    m_locMutex.unlock();
  	return false;
  }
 bool  Tianjie::isTjRateNpc(int npcid)
@@ -324,7 +321,8 @@ bool Tianjie::LoadFromDB()
 		m_openTime = dbexp.opentime;
         m_isOpenNextTianjie = dbexp.open_next;
         m_isWait = dbexp.is_wait;
-       
+
+      
         //只有天劫打开了，才能插入数据到map
         initSortMap();
 
@@ -398,8 +396,19 @@ bool Tianjie::LoadFromDB()
             if (!m_isTjOpened)
             {
                 clearPlayerTaskScore();
+                //天劫全都跑完了
+                if (m_tjTypeId == (sizeof(s_tjRoleLevel)/sizeof(s_tjRoleLevel[0])-1) && m_currTjRate >= 4)
+                {
+                   m_currOpenedTjLevel = 0;
+                }
             }
-            else if (int(TimeUtil::Now() - m_openTime) > TJ_EVENT_PROCESS_TIME)
+            else if ( TimeUtil::Now() >= m_openTime &&  TimeUtil::Now() < (m_openTime + TJ_EVENT_PROCESS_TIME))
+            {
+                if (m_currTjRate == 1)
+                    clearPlayerTaskScore();
+                startTianjie(true);
+            }
+            else if (TimeUtil::Now()  > (m_openTime + TJ_EVENT_PROCESS_TIME))
             {
                 if (m_currTjRate == 1)
                     clearPlayerTaskScore();
@@ -470,6 +479,8 @@ bool Tianjie::LoadFromDB()
 }
 void Tianjie::onTianjieReq( GameMsgHdr& hdr, const void* data)
 {
+	FastMutex::ScopedLock lk(_opMutex);
+
     MSG_QUERY_PLAYER(pl);
     BinaryReader br(data, hdr.msgHdr.bodyLen);
     UInt8 type = 0;
@@ -1001,7 +1012,6 @@ void Tianjie::closeTianjie()
 }
 void Tianjie::goNext()
 {
-    m_notifyRate = 0;
     if ((m_currTjRate == 4 && !m_isFinish) || m_currTjRate == 5)
     {
        udplogTjStatus(false);
@@ -1011,8 +1021,7 @@ void Tianjie::goNext()
            m_eventSortMap.clear();
            m_scoreSortMap.clear();
        }
-       broadTianjiePassed();
-       DB1().PushUpdateData("update tianjie set is_opened=%d,is_execute=%d,is_finish=%d,is_ok=%d where level=%d", 0, 0, m_isFinish, m_isOk, m_currOpenedTjLevel);
+       DB1().PushUpdateData("update tianjie set is_opened=%d,is_execute=%d,is_finish=%d,is_ok=%d,is_wait=0 where level=%d", 0, 0, m_isFinish, m_isOk, m_currOpenedTjLevel);
 
        m_isTjOpened = false;
 	   m_isTjExecute = 0;
@@ -1022,6 +1031,7 @@ void Tianjie::goNext()
 //	   m_openTime = 0;
        m_bossDay =  0;
        m_isWait = false;
+       m_notifyRate = 0;
        
        broadTianjiePassed();
 
@@ -1040,7 +1050,10 @@ void Tianjie::goNext()
 	   else
        {
            if ((UInt8)(m_tjTypeId+1) < sizeof(s_tjRoleLevel)/sizeof(s_tjRoleLevel[0]))
+           {
                m_currOpenedTjLevel = s_tjRoleLevel[++m_tjTypeId];
+	   	       DB1().PushUpdateData("INSERT INTO `tianjie`(`level`) VALUES(%d)",m_currOpenedTjLevel);
+           }
            else
            {
                m_currOpenedTjLevel = 0;
@@ -1058,6 +1071,7 @@ void Tianjie::goNext()
     {
 		m_isTjExecute = 0;
 		m_isFinish = 0;
+        m_notifyRate = 0;
         if (START_WITH_59)
             m_openTime = TimeUtil::Now() + TJ_EVENT_WAIT_TIME;
         else
@@ -1121,6 +1135,7 @@ void Tianjie::attack(Player* pl, UInt16 loc, UInt32 npcid)
 {
     if (!m_isTjExecute) return;
 
+	FastMutex::ScopedLock lk(_opMutex);
     if (1 == m_currTjRate)
     {
         attack1(pl, loc, npcid);
@@ -1159,7 +1174,6 @@ void Tianjie::attack1(Player* pl, UInt16 loc, UInt32 npcid)
 	if (index == -1) return;
 
     bool res = false;
-    m_locMutex.lock();
     multimap<int, int>::iterator iter = m_locNpcMap.find(loc);
 	//验证怪物和玩家是否在同一个据点
 	while (iter != m_locNpcMap.end())
@@ -1175,7 +1189,6 @@ void Tianjie::attack1(Player* pl, UInt16 loc, UInt32 npcid)
 	    }
         ++iter;
 	}
-    m_locMutex.unlock();
 	//玩家赢了
 	if (res)
 	{
@@ -1802,10 +1815,9 @@ void Tianjie::startBoss()
 bool Tianjie::attackBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool final)
 {
    static UInt32 sendflag = 7;
-
     ++sendflag;
 
-    if (!pl) return false;
+    if (!pl ) return false;
     UInt32 now = TimeUtil::Now();
     UInt32 buffLeft = pl->getBuffData(PLAYER_BUFF_ATTACKING, now);
     if(buffLeft > now)
@@ -2054,9 +2066,7 @@ bool Tianjie::addNpc(int npcid)
     {
         p_map->Show(npcid, true, mo.m_Type);
 
-        m_locMutex.lock();
         m_locNpcMap.insert(make_pair(spot, npcid));
-        m_locMutex.unlock();
 
         m_loc = spot;
 
@@ -2106,7 +2116,6 @@ void Tianjie::insertToEventSortMap(Player* pl, int newScore, int oldScore)
     if (!m_isTjExecute || m_currTjRate >= 4)
         return;
 
-    m_eventMutex.lock();
     TSortMap::iterator iter = m_eventSortMap.find(oldScore);
 
     while (iter != m_eventSortMap.end())
@@ -2121,15 +2130,12 @@ void Tianjie::insertToEventSortMap(Player* pl, int newScore, int oldScore)
         ++iter;
     }
     m_eventSortMap.insert(make_pair(newScore, pl));
-
-    m_eventMutex.unlock();
 }
 void Tianjie::insertToScoreSortMap(Player* pl, int newScore, int oldScore)
 {
     if (!m_isTjOpened)
         return;
 
-    m_totalMutex.lock();
     TSortMap::iterator iter = m_scoreSortMap.find(oldScore);
 
     while (iter != m_scoreSortMap.end())
@@ -2144,42 +2150,35 @@ void Tianjie::insertToScoreSortMap(Player* pl, int newScore, int oldScore)
         ++iter;
     }
     m_scoreSortMap.insert(make_pair(newScore, pl));
-    m_totalMutex.unlock();
 }
 short Tianjie::getEventRank(Player* pl)
 {
     short rank = 0;
 
-    m_eventMutex.lock();
     TSortMap::iterator iter;
     for (iter=m_eventSortMap.begin(); iter!=m_eventSortMap.end(); ++iter)
     {
         rank++;
         if (iter->second == pl)
         {
-            m_eventMutex.unlock();
             return rank;
         }
     }
-    m_eventMutex.unlock();
     return 0;
 }
 short Tianjie::getScoreRank(Player* pl)
 {
     short rank = 0;
 
-    m_totalMutex.lock();
     TSortMap::iterator iter;
     for (iter=m_scoreSortMap.begin(); iter!=m_scoreSortMap.end(); ++iter)
     {
         rank++;
         if (iter->second == pl)
         {
-            m_totalMutex.unlock();
             return rank;
         }
     }
-    m_totalMutex.unlock();
     return 0;
 }
 void Tianjie::rewardEventBox(Player*pl, int score)
@@ -2187,10 +2186,10 @@ void Tianjie::rewardEventBox(Player*pl, int score)
     //积分奖励
     const UInt32* pBoxId = s_tjEventBoxId;
 
-    int itemCount = score/5000 + 3;
+    int itemCount = score/5000 + 4;
     MailPackage::MailItem* pItems = new MailPackage::MailItem[itemCount];
     int j = 0;
-    while (score >= 500)
+    while (score > 0)
     {
         if (score >= 5000)
         {
@@ -2206,6 +2205,11 @@ void Tianjie::rewardEventBox(Player*pl, int score)
         {
             pItems[j].id = pBoxId[1];
             score -= 1000;
+        }
+        else if (score >= 500)
+        {
+            pItems[j].id = pBoxId[0];
+            score -= 500;
         }
         else
         {
@@ -2227,10 +2231,10 @@ void Tianjie::rewardTotalBox(Player*pl, int score)
     //积分奖励
     const UInt32* pBoxId = s_tjTotalBoxId;
 
-    int itemCount = score/10000 + 3;
+    int itemCount = score/10000 + 4;
     MailPackage::MailItem* pItems = new MailPackage::MailItem[itemCount];
     int j = 0;
-    while (score >= 1000)
+    while (score > 0)
     {
         if (score >= 10000)
         {
@@ -2246,6 +2250,11 @@ void Tianjie::rewardTotalBox(Player*pl, int score)
         {
             pItems[j].id = pBoxId[1];
             score -= 2000;
+        }
+        else if (score >= 1000)
+        {
+            pItems[j].id = pBoxId[0];
+            score -= 1000;
         }
         else
         {
@@ -2424,6 +2433,16 @@ void Tianjie::initSortMap()
         }
         if (score > 0)
         {
+            if (p->GetVar(VAR_TJ_TASK3_COPYID) > 51)
+            {
+                int s = (p->GetVar(VAR_TJ_TASK3_COPYID)-51) * 50;
+                if (score > s)
+                    score -= s;
+                else
+                    score = 0;
+                p->SetVar(VAR_TJ_TASK3_COPYID, 51);
+                p->SetVar(VAR_TJ_TASK_PRESTIGE, score);
+            }
             insertToScoreSortMap(p, score, 0);
         }
     }
@@ -2465,7 +2484,7 @@ void Tianjie::udplogScore(Player* pl, int score, bool isEvent)
 {
     char udpStr[32] = {0};
     if (isEvent)
-        sprintf(udpStr, "F_1106_%d", m_currTjRate);
+        sprintf(udpStr, "F_1106_%d", m_currTjRate);//正确应该是1117,将错就错
     else
         strcpy(udpStr, "F_1106_6");
     pl->udpLog("tianjie", udpStr, "", "", "", "", "act", score);

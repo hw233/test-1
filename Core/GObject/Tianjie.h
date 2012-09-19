@@ -217,9 +217,7 @@ namespace GObject
         bool m_isOpenNextTianjie;
         int m_nextTjLevel;
 
-        Mutex m_eventMutex;
-        Mutex m_totalMutex;
-        Mutex m_locMutex;
+        FastMutex _opMutex;
     };
 }
 #endif

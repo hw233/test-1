@@ -501,7 +501,7 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
 	if(field != NULL)
 	{
 		if(_id <= GREAT_FIGHTER_MAX && _owner != NULL)
-			DB2().PushUpdateData("UPDATE `fighter` SET `%s` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", field, v, _id, _owner->getId());
+			DB2().PushUpdateData("UPDATE `fighter` SET `%s` = %"I64_FMT"u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", field, v, _id, _owner->getId());
 	}
 }
 
@@ -4138,6 +4138,16 @@ void Fighter::getAllSSAndLevel(Stream& st)
                 UInt16 skill_id = SKILL_ID(_skill[i]);
                 st << static_cast<UInt16>(SKILLANDLEVEL(skill_id, ss->lvl));
             }
+        }
+    }
+    if (peerless != 0)
+    {
+        SStrengthen* ss = SSGetInfo(peerless);
+        if (ss)
+        {
+            ++c;
+            UInt16 skill_id = SKILL_ID(peerless);
+            st << static_cast<UInt16>(SKILLANDLEVEL(skill_id, ss->lvl));
         }
     }
     st.data<UInt8>(offset) = c;
