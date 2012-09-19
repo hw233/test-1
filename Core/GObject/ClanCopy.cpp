@@ -46,7 +46,7 @@ ClanCopy::ClanCopy(Clan *c, UInt32 copyId, Player * player) : _clan(c), _copyId 
 
     _npcIndex = 1;
 
-    _tickTimeInterval = 4;
+    _tickTimeInterval = 5;
     _startTick = 1;
     _monsterRefreshTick = 3;
     _tickCount = 0;
@@ -1444,7 +1444,7 @@ ClanCopyMgr::ClanCopyMgr()
 {
     UInt32 now = TimeUtil::Now();
     UInt32 sweek = TimeUtil::SharpWeek(1, now);
-    _interval = 3;
+    _interval = 5;
     if ((sweek - now) <= 1800 || (now + 3600 * 24 * 7 - sweek) <= 1800)
     {
         _reset = true;
