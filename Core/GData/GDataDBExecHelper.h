@@ -233,6 +233,44 @@ struct DBClanSkillType
     float value;        // 技能效果值
 };
 
+struct DBClanCopy
+{
+    UInt16 level;               // 帮派副本等级
+    UInt32 expOutput;           // 该等级每小时给予神像的经验值
+    UInt16 monsterWaveCount;    // 该等级刷怪的波数
+    UInt16 minPlayer;           // 该等级副本最小参与人数
+    UInt16 maxPlayer;           // 该等级副本最大参与人数
+    UInt8  spotMaxPlayer;       // 该等级据点最大的玩家数
+    UInt32 homeHp;              // 该等级基地的生命值
+    UInt32 maxReward;           // 该等级获胜给予奖励经验值的最大值
+};
+
+struct DBClanCopyMonster
+{
+    UInt16 level;              // 副本等级
+    UInt16 appearRound;        // 生产该怪的波数
+    UInt32 npcId;              // 怪物npcGroupId
+    UInt8  npcCount;           // 每一路怪物的数量
+    UInt8  npcRouteIndex;      // 出现的路数 
+    UInt16 npcValue;           // 怪物对主基地的破坏值
+    UInt8  monsterType;        // 怪物类型（普通，精英，boss）
+};
+
+struct DBClanStatue
+{
+    // 帮派神像模板参数
+    UInt16 level;       // 神像等级
+    UInt32 needExp;     // 升级所需经验值
+    UInt32 consumeExp;  // 每小时减少的经验值
+    UInt32 exHp;        // 神像增加的hp
+    UInt32 exAttack;    // 神像增加的物攻值
+    UInt32 exDefend;    // 神像增加的物防值
+    UInt32 exMagAtk;    // 神像增加的法攻值
+    UInt32 exMagDef;    // 神像增加的法防值
+    UInt32 exAction;    // 神像增加的身法值
+    UInt32 exHitRate;   // 神像增加的命中值
+};
+
 struct DBSoulSkillType
 {
 	UInt16 id;          // 技能ID
@@ -608,6 +646,50 @@ SPECIALDEF(5)
 	UInt32, needs,
     float, value
 	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBClanCopy)
+SPECIALDEF(8)
+    (
+    UInt16, level,         
+    UInt32, expOutput,     
+    UInt16, monsterWaveCount,
+    UInt16, minPlayer,     
+    UInt16, maxPlayer,     
+    UInt8,  spotMaxPlayer, 
+    UInt32, homeHp,
+    UInt32, maxReward
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBClanCopyMonster)
+SPECIALDEF(7)
+    (
+    UInt16, level,
+    UInt16, appearRound,
+    UInt32, npcId,
+    UInt8,  npcCount,
+    UInt8,  npcRouteIndex,
+    UInt16, npcValue,
+    UInt8,  monsterType
+    )
+SPECIALEND()
+
+
+SPECIALBEGIN(GData::DBClanStatue)
+SPECIALDEF(10)
+    (
+    UInt16, level,       
+    UInt32, needExp,         
+    UInt32, consumeExp,   
+    UInt32, exHp,        
+    UInt32, exAttack,    
+    UInt32, exDefend,    
+    UInt32, exMagAtk,    
+    UInt32, exMagDef,    
+    UInt32, exAction,    
+    UInt32, exHitRate
+    )
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBSoulSkillType)

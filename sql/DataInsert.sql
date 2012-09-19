@@ -174,3 +174,15 @@ LOCK TABLES `skillstrengthen_effect` WRITE;
 source skillstrengthen_effect
 UNLOCK TABLES;
 
+LOCK TABLES `clan_statue_template` WRITE;
+source clanstatuetemplate
+UNLOCK TABLES;
+
+LOCK TABLES `clan_copy_monster_template` WRITE;
+source clancopymonstertemplate
+UNLOCK TABLES;
+
+LOCK TABLES `clan_copy_template` WRITE;
+source clancopytemplate
+UNLOCK TABLES;
+

@@ -35,6 +35,8 @@
 #include "GObject/HeroMemo.h"
 #include "MsgHandler/JsonParser.h"
 #include "GObject/LuckyDraw.h"
+#include "GObject/ClanCopy.h"
+
 #include "GObject/Tianjie.h"
 GMHandler gmHandler;
 
@@ -190,6 +192,10 @@ GMHandler::GMHandler()
     Reg(2, "idip", &GMHandler::OnAddIdip);
     Reg(2, "clear", &GMHandler::OnClearTask);
     Reg(2, "reset", &GMHandler::OnClearCFT);
+
+    Reg(3, "statue", &GMHandler::OnStatueExp);
+    Reg(3, "setcopy", &GMHandler::OnSetClanCopyLevel);
+    Reg(3, "setcopytime", &GMHandler::OnSetClanCopyTime);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2919,6 +2925,48 @@ void GMHandler::OnClearCFT(GObject::Player* player, std::vector<std::string>& ar
     DB1().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = 0, `copyGoldCnt` = 0, `copyUpdate` = %u WHERE `id` = %"I64_FMT"u", TimeUtil::Now(), player->getId());
 	DB1().PushUpdateData("UPDATE `player` SET `dungeonCnt` = 0 where `id` = %"I64_FMT"u", player->getId());
     player->sendDailyInfo();
+}
+
+void GMHandler::OnStatueExp(GObject::Player* player, std::vector<std::string>& args)
+{
+    if(args.empty())
+        return;
+    if(args.size() == 1)
+    {
+        Int32 exp = atoi(args[0].c_str());
+        if(exp >= 0)
+            player->AddStatueExp(exp);
+        else
+            player->SubStatueExp(-exp);
+
+    }
+}
+
+void GMHandler::OnSetClanCopyLevel(GObject::Player* player, std::vector<std::string>& args)
+{
+    if(args.empty())
+        return;
+    if(args.size() == 1)
+    {
+        UInt32 level = atoi(args[0].c_str());
+
+        player->setClanCopyLevel(level);
+
+    }
+}
+
+void GMHandler::OnSetClanCopyTime(GObject::Player* player, std::vector<std::string>& args)
+{
+    if(args.empty())
+        return;
+    if (args.size() == 1)
+    {
+        Int32 copyTime = atoi(args[0].c_str());
+        if(copyTime < 0)
+            return;
+        else
+            player->setClanCopyTime(static_cast<UInt32>(copyTime));
+    }
 }
 
 void GMHandler::OnTj3(GObject::Player* player, std::vector<std::string>& args)

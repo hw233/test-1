@@ -1,4 +1,4 @@
-﻿#include "Config.h"
+#include "Config.h"
 #include "World.h"
 #include "Leaderboard.h"
 #include "ClanManager.h"
@@ -37,6 +37,7 @@
 #include "GData/Store.h"
 #include "CountryBattle.h"
 #include "ClanRankBattle.h"
+#include "ClanCopy.h"
 #include "ShuoShuo.h"
 #include "CFriend.h"
 #include "Common/Itoa.h"
@@ -935,6 +936,25 @@ void World::TownDeamonTmAward(void *)
     townDeamonManager->process();
 }
 
+void World::ClanStatueCheck(void *)
+{
+    class UpdateStatueVisitor : public Visitor<Clan>
+    {
+        public:
+            UpdateStatueVisitor()
+            {
+            }
+
+            bool operator()(Clan* clan)
+            {
+                clan->updateStatueExp();
+                return true;
+            }
+            
+    };
+    UpdateStatueVisitor visitor;
+    globalClans.enumerate(visitor);
+}
 
 #if 0
 bool advancedHookEnumerate(Player * pl, UInt8 para)
@@ -1003,6 +1023,9 @@ bool World::Init()
     AddTimer(86400 * 1000, TownDeamonTmAward, static_cast<void *>(NULL), (tdChkPoint >= now ? tdChkPoint - now : 86400 + tdChkPoint - now) * 1000);
 
     //AddTimer(60 * 1000, advancedHookTimer, static_cast<void *>(NULL), (60 - now % 60) * 1000);
+
+    AddTimer(3600 * 1000, ClanStatueCheck, static_cast<void *>(NULL), (3600 - now % 3600) * 1000);
+    //AddTimer(5 * 60 * 1000, ClanStatueCheck, static_cast<void *>(NULL));
 
     return true;
 }

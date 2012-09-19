@@ -14,6 +14,7 @@
 #include "Server/Cfg.h"
 #include "GObject/HeroIsland.h"
 #include "GObject/TeamCopy.h"
+#include "GObject/ClanCopy.h"
 
 namespace Script
 {
@@ -196,6 +197,9 @@ void WorldScript::init()
     class_add<GData::Discount>("Discount");
 	class_add<GData::TitleList>("TitleList");
 	class_def<GData::TitleList>("set", &GData::TitleList::set);
+
+    //def("setInterval", GObject::ClanCopy::setInterval);
+    //def("setStartTick", GObject::ClanCopy::setStartTick);
 }
 
 void WorldScript::postInit()

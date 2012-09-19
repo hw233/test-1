@@ -1,4 +1,4 @@
-﻿#include "Config.h"
+#include "Config.h"
 #include "GDataManager.h"
 #include "Area.h"
 #include "WeaponDef.h"
@@ -8,6 +8,8 @@
 #include "LootTable.h"
 #include "ClanTechTable.h"
 #include "ClanSkillTable.h"
+#include "ClanCopyTable.h"
+#include "ClanStatueTable.h"
 #include "GObject/Item.h"
 #include "DB/DBConnectionMgr.h"
 #include "GDataDBExecHelper.h"
@@ -259,6 +261,24 @@ namespace GData
         {
 			fprintf(stderr, "Load Skill Strengthen Table Error !\n");
 			return false;
+        }
+        
+        if (!LoadClanCopy())
+        {
+            fprintf (stderr, "Load Clan Copy Table Error !\n");
+            return false;
+        }
+
+        if (!LoadClanCopyMonster())
+        {
+            fprintf (stderr, "Load Clan Copy Monster Table Error !\n");
+            return false;
+        }
+
+        if (!LoadClanStatue())
+        {
+            fprintf (stderr, "Load Clan Statue Error !\n");
+            return false;
         }
 
 		return true;
@@ -1356,6 +1376,99 @@ namespace GData
 
 		return true;
 	}
+
+    bool GDataManager::LoadClanCopy()
+    {
+        // 读取和帮派副本有关的配置参数
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+        DBClanCopy cc;
+		if (execu->Prepare("SELECT `level`, `expOutput`, `monsterWaveCount`, `minPlayer`, `maxPlayer`, `spotMaxPlayer`, `homeHp`, `maxReward` FROM `clan_copy_template` ORDER BY `level` ASC", cc) != DB::DB_OK)
+			return false;
+		while (execu->Next() == DB::DB_OK)
+		{
+            if (cc.level >= clanCopyTable.size())
+            {
+                clanCopyTable.resize(static_cast<size_t>(cc.level + 1));
+            }
+            clanCopyTable[cc.level] = ClanCopyData(cc.level, cc.expOutput, cc.monsterWaveCount,
+                    cc.minPlayer, cc.maxPlayer, cc.spotMaxPlayer, cc.homeHp, cc.maxReward);
+		}
+        clanCopyTable.push_back(ClanCopyData());
+
+        lua_State* L = lua_open();
+        luaopen_base(L);
+        luaopen_string(L);
+        luaopen_table(L);
+        {
+            std::string path = cfg.scriptPath + "formula/clancopy.lua";
+            lua_tinker::dofile(L, path.c_str());
+            lua_tinker::table bufferTypes = lua_tinker::call<lua_tinker::table>(L, "LoadClanCopySpotBufferType");
+            UInt32 size = bufferTypes.size();
+            for (UInt32 i = 1; i <= size; i++)
+            {
+                UInt8 bufferType = bufferTypes.get<UInt8>(i);
+                lua_tinker::table bufferValues = lua_tinker::call<lua_tinker::table>(L, "LoadClanCopySpotBufferValue", bufferType);
+                UInt32 bufferValueSize = bufferValues.size();
+                ClanCopySpotData clanCopySpotData(bufferType);
+                for (UInt32 j = 1; j <= bufferValueSize; j++)
+                {
+                    clanCopySpotData.bufferValue.push_back(bufferValues.get<float>(j));
+                }
+                clanCopySpotMap.insert(std::make_pair(bufferType, clanCopySpotData));
+            }
+        }
+        lua_close(L);
+
+		return true;
+    }
+
+    bool GDataManager::LoadClanCopyMonster()
+    {
+        // 读取和帮派副本怪物配置
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+        DBClanCopyMonster ccs;
+		if (execu->Prepare("SELECT `level`, `appearRound`, `npcId`, `npcCount`, `npcRouteIndex`, `npcValue`, `monsterType` FROM `clan_copy_monster_template` ORDER BY `level` ASC, `appearRound` ASC", ccs) != DB::DB_OK) return false;
+		while (execu->Next() == DB::DB_OK)
+		{
+            
+            UInt32 key = ((static_cast<UInt32>(ccs.level)) << 16 | ccs.appearRound) << 8 | ccs.npcRouteIndex;
+            clanCopyMonsterMap.insert(std::make_pair(key, 
+                        ClanCopyMonsterData(ccs.level, ccs.appearRound, ccs.npcId, 
+                            ccs.npcCount, ccs.npcRouteIndex, ccs.npcValue, ccs.monsterType)));
+		}
+
+		return true;
+    }
+
+
+    bool GDataManager::LoadClanStatue()
+    {
+        // 读取帮派神像数据
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+        DBClanStatue cs;
+		if (execu->Prepare("SELECT `level`, `needExp`, `consumeExp`, \
+                    `exHp`, `exAttack`, `exDefend`, `exMagAtk`, `exMagDef`, `exAction`, `exHitRate`\
+                    FROM `clan_statue_template` ORDER BY `level` ASC", cs) != DB::DB_OK)
+			return false;
+		while (execu->Next() == DB::DB_OK)
+		{
+			if (cs.level >= clanStatueTable.size())
+			{
+				clanStatueTable.resize(cs.level + 1);
+			}
+            clanStatueTable[cs.level] = ClanStatueTableData(
+                                     cs.level, cs.needExp, cs.consumeExp, 
+                                     cs.exHp, cs.exAttack, cs.exDefend, 
+                                     cs.exMagAtk, cs.exMagDef, cs.exAction, cs.exHitRate);
+
+		}
+        clanStatueTable[0] = (ClanStatueTableData());
+        return true;
+    }
+
 	bool GDataManager::LoadFighterProb()
 	{
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());

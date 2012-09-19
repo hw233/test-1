@@ -400,6 +400,8 @@ void OnClanCreateReq( GameMsgHdr& hdr, ClanCreateReq& ccr )
 	SYSMSG_SEND(120, player);
 	SYSMSG_SENDV(1020, player, clan->getName().c_str());
 
+    clan->notifyUpdateStatueAttr();
+
     int type = 0;
 	GameMsgHdr hdr1(0x310, player->getThreadId(), player, sizeof(type));
 	GLOBAL().PushMsg(hdr1, &type);
@@ -1129,6 +1131,54 @@ void OnClanCityBattleListReq( GameMsgHdr& hdr, const void * data )
 			GObject::clanCache.search2(player, name);
 		}
 	}
+}
+
+void OnClanCopyReq (GameMsgHdr& hdr, const void * data )
+{
+    // TODO: 帮派副本系统的请求协议
+    MSG_QUERY_PLAYER(player);
+    if (!player->hasChecked())
+        return;
+
+	GObject::Clan * clan = player->getClan();
+	if(clan == NULL)
+	{
+		Stream st(REP::CLAN_COPY);
+		st << static_cast<UInt8>(0);
+		st << Stream::eos;
+		player->send(st);
+		return;
+	}
+
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    UInt8 command = 0;
+    UInt8 val = 0;
+    brd >> type;
+    brd >> command;
+    switch(type)
+    {
+        case CLAN_COPY_TAB_INFO:
+            // 请求帮派副本信息
+            if (command == 0)
+                clan->sendClanCopyInfo(player);
+            else
+            {
+                brd >> val;
+                clan->clanCopyTabOperate(player, command, val);
+            }
+            break;
+        case CLAN_COPY_MEMBER_LIST_OP:
+            // 帮派副本成员操作
+            clan->clanCopyMemberOperate(player, command, brd);
+            break;
+        case CLAN_COPY_BATTLE:
+            // 帮派副本的战斗操作
+            clan->clanCopyBattleOperate(player, command, brd);
+            break;
+        default:
+                break;
+    }
 }
 
 struct PlayerIdRep
@@ -2023,7 +2073,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
     brd >> type;
     switch(type)
     {
-    case 0x01:
+        case 0x01:
         {
             if(!WORLD().getQixi())
                 break;

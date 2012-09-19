@@ -13,13 +13,14 @@ function update_data()
     #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20111219_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20111228_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20120104_1.sql
-    mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20120227_1.sql
-    mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20120301_1.sql
-    mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20120317_1.sql
-    mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20120411_1.sql
-    mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20120717_1.sql
-    mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20120814_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20120227_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20120301_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20120317_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20120411_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20120717_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20120814_1.sql
     mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20120828_1.sql
+    mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20120903_1.sql
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from loot; source loot;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from map_object; source mapobject;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from item_template; source itemtemplate;";
@@ -57,6 +58,9 @@ function update_data()
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from skillstrengthenprob; source skillstrengthenprob;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from skillstrengthen_skill; source skillstrengthen_skill;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from skillstrengthen_effect; source skillstrengthen_effect;";
+    mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from clan_copy_template; source clancopytemplate;";
+    mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from clan_copy_monster_template; source clancopymonstertemplate;";
+    mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from clan_statue_template; source clanstatuetemplate;";
 }
 
 update_data

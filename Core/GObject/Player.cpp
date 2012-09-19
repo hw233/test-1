@@ -1,4 +1,4 @@
-﻿#include "Config.h"
+#include "Config.h"
 #include "Server/WorldServer.h"
 #include "MsgID.h"
 #include "Player.h"
@@ -23,6 +23,7 @@
 #include "GData/NpcGroup.h"
 #include "GData/Title.h"
 #include "Clan.h"
+#include "ClanCopy.h"
 #include "Mail.h"
 #include "Boss.h"
 #include "Athletics.h"
@@ -53,6 +54,7 @@
 #include "GData/ClanTechTable.h"
 #include "GData/ClanLvlTable.h"
 #include "GData/ClanSkillTable.h"
+#include "GData/ClanStatueTable.h"
 #include "Common/StringTokenizer.h"
 #include "TownDeamon.h"
 #include "ArenaBattle.h"
@@ -1399,6 +1401,21 @@ namespace GObject
         char action[16] = "";
         snprintf (action, 16, "F_%d", id);
         udpLog("worldBoss", action, "", "", "", "", "act");
+    }
+
+    void Player::clanCopyUdpLog(UInt32 id, UInt32 val /* = 0 */, UInt32 num /* = 1 */)
+    {
+        // 帮派副本相关日志
+        char action[16] = "";
+        if (val)
+        {
+            snprintf (action, 16, "F_%d_%d", id, val);
+        }
+        else
+        {
+            snprintf (action, 16, "F_%d", id);
+        }
+        udpLog("clanCopy", action, "", "", "", "", "act", num);
     }
 
     void Player::sendHalloweenOnlineAward(UInt32 now, bool _online)
@@ -4902,6 +4919,11 @@ namespace GObject
         }
         ClanRankBattleMgr::Instance().PlayerLeave(this);
 
+        if (_playerData.location == CLAN_COPY_LOCATION)
+        {
+            ClanCopyMgr::Instance().playerLeave(this);
+        }
+
         if(hasFlag(InCopyTeam))
             teamCopyManager->leaveTeamCopy(this);
 
@@ -4960,6 +4982,9 @@ namespace GObject
 		}
 		map->SendAtCity(this, inCity, !sameMap);
         setJumpingMap(false);
+
+        ClanCopyMgr::Instance().playerEnter(this);
+
 	}
 
 	bool Player::regenHP( UInt32 hp )
@@ -5496,6 +5521,30 @@ namespace GObject
 
         clan->addMemberProffer(this, contrib);
     }
+
+
+    ////////////////////////////////////////////
+    // 帮派副本
+
+    void Player::setClanCopyLevel(UInt16 level)
+    {
+        // GM命令设置帮派副本等级
+        if (_clan == NULL)
+            return;
+        _clan->setCopyLevel(level);
+    }
+
+    void Player::setClanCopyTime(UInt32 time)
+    {
+        // GM命令设置帮派副本每轮时间
+        ClanCopyMgr::Instance().setInterval(time);
+    }
+
+
+
+    // 帮派副本
+    ////////////////////////////////////////////
+
 
 	inline UInt32 getTavernPriceByColor(UInt8 color)
 	{
@@ -10600,6 +10649,77 @@ namespace GObject
         return GData::clanSkillTable[skill.id][skill.level].value;
     }
 
+    float Player::getClanStatueHPEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        UInt16 level = _clan->getStatueLevel();
+        return static_cast<float>(GData::clanStatueTable[level].exHp);
+    }
+
+    float Player::getClanStatueAtkEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        UInt16 level = _clan->getStatueLevel();
+        return static_cast<float>(GData::clanStatueTable[level].exAttack);
+    }
+
+    float Player::getClanStatueDefendEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        UInt16 level = _clan->getStatueLevel();
+        return static_cast<float>(GData::clanStatueTable[level].exDefend);
+    }
+
+    float Player::getClanStatueMagAtkEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        UInt16 level = _clan->getStatueLevel();
+        return static_cast<float>(GData::clanStatueTable[level].exMagAtk);
+    }
+
+    float Player::getClanStatueMagDefentEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        UInt16 level = _clan->getStatueLevel();
+        return static_cast<float>(GData::clanStatueTable[level].exMagDef);
+    }
+
+    float Player::getClanStatueActionEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        UInt16 level = _clan->getStatueLevel();
+        return static_cast<float>(GData::clanStatueTable[level].exAction);
+    }
+
+    float Player::getClanStatueHitrLvlEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        UInt16 level = _clan->getStatueLevel();
+        return static_cast<float>(GData::clanStatueTable[level].exHitRate);
+    }
+
+    void  Player::AddStatueExp(UInt32 exp)
+    {
+        if (_clan == NULL)
+            return;
+        _clan->addStatueExp(exp);
+    }
+
+    void Player::SubStatueExp(UInt32 exp)
+    {
+        if (_clan == NULL)
+            return;
+        _clan->subStatueExp(exp);
+    }
+
+
     void Player::onBlueactiveday()
     {
         // XXX: 原来是为蓝钻准备的，现在全平台也要了
@@ -13197,6 +13317,11 @@ void EventTlzAuto::notify(bool isBeginAuto)
         DB1().PushUpdateData("UPDATE `qixi` SET `bind`=0, `lover`=0 WHERE `playerId` = %"I64_FMT"u", getId());
     }
 
+    ///////////////////////////////////////////////
+    // 帮派副本相关
+
+    // 帮派副本相关
+    ///////////////////////////////////////////////
     void Player::postKillMonsterRoamResult(UInt32 pos, UInt8 curType, UInt8 curCount, UInt8 tips)
     {
         struct _Roam

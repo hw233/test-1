@@ -79,16 +79,171 @@ Fighter::Fighter(UInt32 id, Player * owner):
     _wbextmagatk = 0;
 }
 
+/*
+Fighter::Fighter(const Fighter& fighter)
+{
+    // TODO: 从Fighter模板获取一个新的fighter对象
+    memset(_acupoints, 0, sizeof(_acupoints));
+    memset(_skill, 0, sizeof(_skill));
+    //_skills.resize(32); // 默认为32个
+    memset(_citta, 0, sizeof(_citta));
+    //_cittas.resize(32); // 默认为32个
+    memset(_armor, 0, 5 * sizeof(ItemEquip *));
+    memset(_trump, 0, sizeof(_trump));
+    memset(_buffData, 0, FIGHTER_BUFF_COUNT * sizeof(UInt32));
+    m_2ndSoul = NULL;
+    _iswboss = false;
+    _wbextatk = 0;
+    _wbextmagatk = 0;
+
+    this->_id = fighter._id;
+    this->_owner = fighter._owner;
+    this->setName(fighter._name);
+    this->setClass(fighter._class);
+    this->setLevel(fighter._level);
+    this->setExp(GData::expTable.getLevelMin(this->getLevel()));
+    this->setSex(fighter._sex);
+    //ItemWeapon * nwp = GData::GDataManager::GetNpcWeapon(fighter._weapon);
+    //this->setWeapon(nwp, false);
+
+    std::string skills;
+    char skillString[16] = "";
+    bool firstFlag = true;
+
+    for (UInt8 i = 0; i < fighter._skills.size(); ++ i)
+    {
+        UInt16 skillId = fighter._skills[i] / SKILL_LEVEL_MAX;
+        if (skillId)
+        {
+            if (firstFlag)
+            {
+                snprintf(skillString, 16, "%u", skillId);
+                skills += skillString;
+                firstFlag = false;
+            }
+            else
+            {
+                snprintf(skillString, 16, ",%u", skillId);
+                skills += skillString;
+            }
+        }
+    }
+
+    for (size_t i = 0; i < GData::SKILL_PASSIVES-GData::SKILL_PASSSTART; ++i)
+    {
+        for (size_t j = 0; j < fighter._passkl[i].size(); ++j)
+        {
+            UInt16 skillId = fighter._passkl[i][j];
+            if (skillId)
+            {
+                if (firstFlag)
+                {
+                    snprintf(skillString, 16, "%u", skillId);
+                    skills += skillString;
+                    firstFlag = false;
+                }
+                else
+                {
+                    snprintf(skillString, 16, ",%u", skillId);
+                    skills + skillString;
+                }
+            }
+        }
+    }
+    for (size_t i = 0; i < GData::SKILL_PASSIVES-GData::SKILL_PASSSTART; ++i)
+    {
+        for (size_t j = 0; j < fighter._rpasskl[i].size(); ++j)
+        {
+            UInt16 skillId = fighter._rpasskl[i][j];
+            if (skillId)
+            {
+                if (firstFlag)
+                {
+                    snprintf(skillString, 16, "%u", skillId);
+                    skills + skillString;
+                    firstFlag = false;
+                }
+                else
+                {
+                    snprintf(skillString, 16, ",%u", skillId);
+                    skills += skillString;
+                }
+            }
+        }
+    }
+
+    UInt16 skillId = fighter.peerless / SKILL_LEVEL_MAX;
+    if (skillId)
+    {
+        if (firstFlag)
+        {
+            snprintf(skillString, 16, "%u", skillId);
+            skills += skillString;
+            firstFlag = false;
+        }
+        else
+        {
+            snprintf(skillString, 16, ",%u", skillId);
+            skills += skillString;
+        }
+    }
+    this->setSkills(skills, false);
+    this->_pexp = fighter._pexp;
+    this->_pexpAddTmp = fighter._pexpAddTmp;
+    this->_pexpMax = fighter._pexpMax;
+    this->setPotential(fighter._potential, false);
+    this->setCapacity(fighter._capacity, false);
+    this->_color = fighter._color;
+    this->strength = fighter.strength;
+    this->physique = fighter.physique;
+    this->agility = fighter.agility;
+    this->intelligence = fighter.intelligence;
+    this->will = fighter.will;
+    this->soulMax = fighter.soul;
+    this->baseSoul = fighter.soul;
+    this->aura = fighter.aura;
+    this->auraMax = fighter.auraMax;
+    this->tough = fighter.tough;
+    this->attack = fighter.attack;
+    this->magatk = fighter.magatk;
+    this->defend = fighter.defend;
+    this->magdef = fighter.magdef;
+    this->maxhp = fighter.maxhp;
+    this->action = fighter.action;
+    this->talent = fighter.talent;
+    this->hitrate = fighter.hitrate;
+    this->evade = fighter.evade;
+    this->critical = fighter.critical;
+    this->criticaldmg = fighter.criticaldmg;
+    this->pierce = fighter.pierce;
+    this->counter = fighter.counter;
+    this->magres = fighter.magres;
+
+    for (std::vector<Offset>::const_iterator it = fighter.extraPos.begin(); it != fighter.extraPos.end(); ++it)
+    {
+        Offset off;
+        off.x = it->x;
+        off.y = it->y;
+        this->extraPos.push_back(off);
+    }
+}
+*/
+
 Fighter::~Fighter()
 {
-	SAFE_DELETE(_fashion);
-	SAFE_DELETE(_weapon);
-	SAFE_DELETE(_ring);
-	SAFE_DELETE(_amulet);
-	for(int i = 0; i < 5; ++ i)
-	{
-		SAFE_DELETE(_armor[i]);
-	}
+    if (!_fashion)
+        SAFE_DELETE(_fashion);
+    if (!_weapon)
+        SAFE_DELETE(_weapon);
+    if (!_ring)
+        SAFE_DELETE(_ring);
+    if (!_amulet)
+        SAFE_DELETE(_amulet);
+    for(int i = 0; i < 5; ++ i)
+    {
+        if (!_armor[i])
+            SAFE_DELETE(_armor[i]);
+    }
 }
 
 const std::string& Fighter::getName()
@@ -1419,6 +1574,18 @@ void Fighter::rebuildEquipAttr()
         if (ae)
             addAttrExtra(_attrExtraEquip, ae);
 #endif
+    }
+
+    if (_owner)
+    {
+        // 帮派神像对额外属性的加成
+        _attrExtraEquip.hp += _owner->getClanStatueHPEffect();
+        _attrExtraEquip.attack += _owner->getClanStatueAtkEffect();
+        _attrExtraEquip.defend += _owner->getClanStatueDefendEffect();
+        _attrExtraEquip.magatk += _owner->getClanStatueMagAtkEffect();
+        _attrExtraEquip.magdef += _owner->getClanStatueMagDefentEffect();
+        _attrExtraEquip.action += _owner->getClanStatueActionEffect();
+        _attrExtraEquip.hitrlvl += _owner->getClanStatueHitrLvlEffect();
     }
 
     if(m_2ndSoul)

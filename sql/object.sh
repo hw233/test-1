@@ -68,12 +68,19 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120813_1.sql # must be once for delete recharge total
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120816_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120820_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120831_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120911_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120831_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120911_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120915_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/cleartotalrecharge.sql # must be once for delete recharge total
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120831_1.sql
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120911_1.sql
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120915_1.sql
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/cleartotalrecharge.sql # must be once for delete recharge total
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/cleartotalrecharge.sql # must be once for delete recharge total
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearconsume.sql # must be once for delete total consume
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clear3366totalrecharge.sql # must be once for delete recharge total
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120903_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/cleartianjie.sql # must be once for delete recharge total
 
     #. clearshiyamen.sh
