@@ -698,6 +698,11 @@ namespace Script
         return Run<Table>(NULL, "getClanBattleWeekScoreRewards");
     }
 
+    Table GameActionLua::GetClanCopyRewards(UInt32 level)
+    {
+        return Run<Table>(NULL, "getClanCopyRewards", level);
+    }
+
 
 	bool GameActionLua::MonsterKilled(Player* player, UInt32 monsterId, UInt16 monsterNum)
 	{

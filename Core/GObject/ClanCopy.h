@@ -8,6 +8,7 @@
 #include "GData/NpcGroup.h"
 #include "GData/ClanCopyTable.h"
 #include "Fighter.h"
+#include "Mail.h"
 
 //#define DEBUG_CLAN_COPY
 
@@ -335,10 +336,11 @@ class ClanCopy
         void putSpotMonster(BattleSimulator& bsim, ClanCopyMonster& clanCopyMonster);
 
         void notifyAll(Stream st);
+        void notifyWaitForWin(Stream st);
         void notifySpotPlayerInfo(Player * player = NULL);
         void notifySpotBattleInfo(Player * player = NULL);
         void notifyCopyLose();
-        void notifyCopyWin(UInt32 awardValue);
+        void notifyCopyWin(UInt32 awardValue, UInt8 itemTypes, MailPackage::MailItem * mitem);
         void notifyLauncherEscape();
 
         void notifyCopyCreate();
