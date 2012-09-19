@@ -321,7 +321,8 @@ bool Tianjie::LoadFromDB()
 		m_openTime = dbexp.opentime;
         m_isOpenNextTianjie = dbexp.open_next;
         m_isWait = dbexp.is_wait;
-       
+
+      
         //只有天劫打开了，才能插入数据到map
         initSortMap();
 
@@ -395,6 +396,11 @@ bool Tianjie::LoadFromDB()
             if (!m_isTjOpened)
             {
                 clearPlayerTaskScore();
+                //天劫全都跑完了
+                if (m_tjTypeId == (sizeof(s_tjRoleLevel)/sizeof(s_tjRoleLevel[0])-1) && m_currTjRate >= 4)
+                {
+                   m_currOpenedTjLevel = 0;
+                }
             }
             else if ( TimeUtil::Now() >= m_openTime &&  TimeUtil::Now() < (m_openTime + TJ_EVENT_PROCESS_TIME))
             {
