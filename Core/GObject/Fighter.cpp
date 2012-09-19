@@ -501,7 +501,7 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
 	if(field != NULL)
 	{
 		if(_id <= GREAT_FIGHTER_MAX && _owner != NULL)
-			DB2().PushUpdateData("UPDATE `fighter` SET `%s` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", field, v, _id, _owner->getId());
+			DB2().PushUpdateData("UPDATE `fighter` SET `%s` = %"I64_FMT"u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", field, v, _id, _owner->getId());
 	}
 }
 
