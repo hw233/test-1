@@ -87,8 +87,6 @@ bool Country::Init()
 		AddTimer(5000, Hero_Island_Check, static_cast<void *>(NULL), (5 - (now % 5)) * 1000);
         AddTimer(1000, ClanRankBattleCheck);
         //townDeamonManager->process();
-<<<<<<< HEAD
-=======
         UInt32 tdChkPoint = TimeUtil::SharpDayT(0, now) + TOWNDEAMONENDTM;
 
         AddTimer(1000, ClanCopyCheck);
@@ -103,8 +101,6 @@ bool Country::Init()
 
 
 
-        AddTimer(86400 * 1000, TownDeamonTmAward, static_cast<void *>(NULL), (tdChkPoint >= now ? tdChkPoint - now : 86400 + tdChkPoint - now) * 1000);
->>>>>>> clanCopy
 	}
 
 	return true;
