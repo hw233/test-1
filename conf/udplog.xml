@@ -52,7 +52,7 @@
 		<item id="31" typeinfo="guide" />
 		<item id="32" typeinfo="inventory" />
 		<item id="33" typeinfo="currency" />
-		<item id="34" typeinfo="bac3" />
+		<item id="34" typeinfo="ser" />
 		<item id="35" typeinfo="paypv" />
 		<item id="36" typeinfo="feed" />
 	</log_file_type>

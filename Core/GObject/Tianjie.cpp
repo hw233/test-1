@@ -321,7 +321,8 @@ bool Tianjie::LoadFromDB()
 		m_openTime = dbexp.opentime;
         m_isOpenNextTianjie = dbexp.open_next;
         m_isWait = dbexp.is_wait;
-       
+
+      
         //只有天劫打开了，才能插入数据到map
         initSortMap();
 
@@ -395,6 +396,11 @@ bool Tianjie::LoadFromDB()
             if (!m_isTjOpened)
             {
                 clearPlayerTaskScore();
+                //天劫全都跑完了
+                if (m_tjTypeId == (sizeof(s_tjRoleLevel)/sizeof(s_tjRoleLevel[0])-1) && m_currTjRate >= 4)
+                {
+                   m_currOpenedTjLevel = 0;
+                }
             }
             else if ( TimeUtil::Now() >= m_openTime &&  TimeUtil::Now() < (m_openTime + TJ_EVENT_PROCESS_TIME))
             {
@@ -1006,7 +1012,6 @@ void Tianjie::closeTianjie()
 }
 void Tianjie::goNext()
 {
-    m_notifyRate = 0;
     if ((m_currTjRate == 4 && !m_isFinish) || m_currTjRate == 5)
     {
        udplogTjStatus(false);
@@ -1026,6 +1031,7 @@ void Tianjie::goNext()
 //	   m_openTime = 0;
        m_bossDay =  0;
        m_isWait = false;
+       m_notifyRate = 0;
        
        broadTianjiePassed();
 
@@ -1044,7 +1050,10 @@ void Tianjie::goNext()
 	   else
        {
            if ((UInt8)(m_tjTypeId+1) < sizeof(s_tjRoleLevel)/sizeof(s_tjRoleLevel[0]))
+           {
                m_currOpenedTjLevel = s_tjRoleLevel[++m_tjTypeId];
+	   	       DB1().PushUpdateData("INSERT INTO `tianjie`(`level`) VALUES(%d)",m_currOpenedTjLevel);
+           }
            else
            {
                m_currOpenedTjLevel = 0;
@@ -1062,6 +1071,7 @@ void Tianjie::goNext()
     {
 		m_isTjExecute = 0;
 		m_isFinish = 0;
+        m_notifyRate = 0;
         if (START_WITH_59)
             m_openTime = TimeUtil::Now() + TJ_EVENT_WAIT_TIME;
         else
@@ -1805,10 +1815,9 @@ void Tianjie::startBoss()
 bool Tianjie::attackBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool final)
 {
    static UInt32 sendflag = 7;
-
     ++sendflag;
 
-    if (!pl) return false;
+    if (!pl ) return false;
     UInt32 now = TimeUtil::Now();
     UInt32 buffLeft = pl->getBuffData(PLAYER_BUFF_ATTACKING, now);
     if(buffLeft > now)
@@ -2424,6 +2433,16 @@ void Tianjie::initSortMap()
         }
         if (score > 0)
         {
+            if (p->GetVar(VAR_TJ_TASK3_COPYID) > 51)
+            {
+                int s = (p->GetVar(VAR_TJ_TASK3_COPYID)-51) * 50;
+                if (score > s)
+                    score -= s;
+                else
+                    score = 0;
+                p->SetVar(VAR_TJ_TASK3_COPYID, 51);
+                p->SetVar(VAR_TJ_TASK_PRESTIGE, score);
+            }
             insertToScoreSortMap(p, score, 0);
         }
     }

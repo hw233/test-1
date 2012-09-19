@@ -4140,6 +4140,16 @@ void Fighter::getAllSSAndLevel(Stream& st)
             }
         }
     }
+    if (peerless != 0)
+    {
+        SStrengthen* ss = SSGetInfo(peerless);
+        if (ss)
+        {
+            ++c;
+            UInt16 skill_id = SKILL_ID(peerless);
+            st << static_cast<UInt16>(SKILLANDLEVEL(skill_id, ss->lvl));
+        }
+    }
     st.data<UInt8>(offset) = c;
 }
 

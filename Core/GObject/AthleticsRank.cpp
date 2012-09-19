@@ -1382,6 +1382,10 @@ void AthleticsRank::TmExtraAward()
             }
 
         }
+        //udplog
+        char udpStr[32] = {0};
+        sprintf(udpStr, "F_1119_%d", rank);
+        ranker->udpLog("athleticsRank", udpStr, "", "", "", "", "act");
     }
 
 	AthleticsList::iterator start1 = _athleticses[1].begin();
