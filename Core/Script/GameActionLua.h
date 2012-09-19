@@ -158,6 +158,7 @@ namespace Script
         Table GetClanBattleDailyRewards();
         Table GetClanBattleWeekSortRewards();
         Table GetClanBattleWeekScoreRewards();
+        Table GetClanCopyRewards(UInt32 level);
 
 		bool  MonsterKilled(Player* player, UInt32 monsterId, UInt16 monsterNum = 1);
 

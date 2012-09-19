@@ -3958,7 +3958,7 @@ void   Clan::sendClanCopyInfo(Player * player, UInt8 val)
     st << static_cast<UInt16>(getStatueLevel());
     st << static_cast<UInt32>(getStatueExp());
     st << static_cast<UInt32>(getStatueNextExp());
-    st << static_cast<UInt32>(getOutputExp());
+    st << static_cast<Int32>(static_cast<Int32>(getOutputExp()) - static_cast<Int32>(getStatueConsumeExp()));
     st << static_cast<UInt32>(getStatueConsumeExp());
     st << static_cast<UInt32>(getStatueExHp());
     st << static_cast<UInt32>(getStatueExAttack());

@@ -4,6 +4,8 @@
 #include "GData/ClanCopyTable.h"
 #include "Player.h"
 #include "Common/Stream.h"
+#include "Country.h"
+#include "Script/GameActionLua.h"
 
 
 namespace GObject
@@ -605,7 +607,6 @@ void ClanCopy::process(UInt32 now)
             UInt32 awardValue = static_cast<UInt32> (static_cast<float>(_homeHp) / _homeMaxHp * _maxReward);
             addWinReward(awardValue);
             notifySpotBattleInfo();
-            notifyCopyWin(awardValue);
             _status = CLAN_COPY_OVER;
             return;
         }
@@ -1070,19 +1071,32 @@ void ClanCopy::addWinReward(UInt32 awardValue)
 {
     // 发送胜利奖励
     _clan->addStatueExp(awardValue);
-    MailPackage::MailItem mitem[1] = {{1325, 1}};
+    Table rewards = GameAction()->GetClanCopyRewards(_copyLevel);
+    UInt32 types = rewards.size();
+    MailPackage::MailItem *mitem = new MailPackage::MailItem [types];
+
+    for (UInt8 i = 1; i <= types; ++i)
+    {
+        Table item = rewards.get<Table>(i);
+        if (item.size() < 2) return;
+        mitem[i - 1].id = item.get<UInt16>(1);
+        mitem[i - 1].count = item.get<UInt32>(2);
+    }
+
     for (std::map<Player *, UInt8>::iterator playerIt = _playerIndex.begin();
             playerIt != _playerIndex.end(); ++ playerIt)
     {
-        // 通知副本战斗玩家
-        playerIt->first->sendMailItem(800, 801, mitem, 1, true);
+        // 副本战斗玩家
+        playerIt->first->sendMailItem(800, 801, mitem, types, true);
     }
     for (std::vector<Player* >::iterator playerIt = _waitForWinPlayer.begin();
             playerIt != _waitForWinPlayer.end(); ++ playerIt)
     {
-        // 通知战死后离开的玩家
-        (*playerIt)->sendMailItem(800, 801, mitem, 1, true);
+        // 战死后离开的玩家
+        (*playerIt)->sendMailItem(800, 801, mitem, types, true);
     }
+    notifyCopyWin(awardValue, types, mitem);
+    delete[] mitem;
 
 }
 
@@ -1101,6 +1115,17 @@ void ClanCopy::notifyAll(Stream st)
     {
         // 通知围观群众
         (*obIt)->send(st);
+    }
+}
+
+void ClanCopy::notifyWaitForWin(Stream st)
+{
+    // 通知战死后逃跑的玩家
+    for (std::vector<Player* >::iterator playerIt = _waitForWinPlayer.begin();
+            playerIt != _waitForWinPlayer.end(); ++ playerIt)
+    {
+        // 战死后离开的玩家
+        (*playerIt)->send(st);
     }
 }
 
@@ -1244,38 +1269,11 @@ void ClanCopy::notifyCopyLose()
     st << static_cast<UInt8>(0x04);
     st << Stream::eos;
 
-    for (std::map<Player *, UInt8>::iterator playerIt = _playerIndex.begin();
-            playerIt != _playerIndex.end(); ++ playerIt)
-    {
-        // 通知副本战斗玩家
-        playerIt->first->send(st);
-    }
-    /*
-    class CopyLoseVisitor : public Visitor<ClanMember>
-    {
-        public:
-            CopyLoseVisitor()
-            {
-            }
-
-            bool operator() (ClanMember * member)
-            {
-                Stream st (REP::CLAN_COPY);
-                st << static_cast<UInt8>(0x02);
-                st << static_cast<UInt8>(0x04);
-                st << Stream::eos;
-                member->player->send(st);
-                return true;
-            }
-
-    };
-
-    CopyLoseVisitor visitor;
-    _clan->VisitMembers(visitor);
-    */
+    notifyAll(st);
+    notifyWaitForWin(st);
 }
 
-void ClanCopy::notifyCopyWin(UInt32 awardValue)
+void ClanCopy::notifyCopyWin(UInt32 awardValue, UInt8 itemTypes, MailPackage::MailItem *mitem)
 {
     // 通知玩家副本成功
 
@@ -1283,41 +1281,16 @@ void ClanCopy::notifyCopyWin(UInt32 awardValue)
     st << static_cast<UInt8>(0x02);
     st << static_cast<UInt8>(0x03);
     st << static_cast<UInt32>(awardValue);
+    st << static_cast<UInt8>(itemTypes);
+    for (UInt8 i = 0; i < itemTypes; ++i)
+    {
+        st << static_cast<UInt32> (mitem[i].id);
+        st << static_cast<UInt16> (mitem[i].count);
+    }
     st << Stream::eos;
 
-    for (std::map<Player *, UInt8>::iterator playerIt = _playerIndex.begin();
-            playerIt != _playerIndex.end(); ++ playerIt)
-    {
-        // 通知副本战斗玩家
-        playerIt->first->send(st);
-    }
-    /*
-    class CopyWinVisitor : public Visitor<ClanMember>
-    {
-        public:
-            CopyWinVisitor(UInt32 awardValue)
-                : awardValue(awardValue)
-            {
-            }
-
-            bool operator() (ClanMember * member)
-            {
-                Stream st (REP::CLAN_COPY);
-                st << static_cast<UInt8>(0x02);
-                st << static_cast<UInt8>(0x03);
-                st << static_cast<UInt32>(awardValue);
-                st << Stream::eos;
-                member->player->send(st);
-                return true;
-            }
-        private:
-            UInt32 awardValue;
-
-    };
-
-    CopyWinVisitor visitor(awardValue);
-    _clan->VisitMembers(visitor);
-    */
+    notifyAll(st);
+    notifyWaitForWin(st);
 }
 
 void ClanCopy::notifyLauncherEscape()

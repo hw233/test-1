@@ -1403,6 +1403,21 @@ namespace GObject
         udpLog("worldBoss", action, "", "", "", "", "act");
     }
 
+    void Player::clanCopyUdpLog(UInt32 id, UInt32 val /* = 0 */, UInt32 num /* = 1 */)
+    {
+        // 帮派副本相关日志
+        char action[16] = "";
+        if (val)
+        {
+            snprintf (action, 16, "F_%d", id);
+        }
+        else
+        {
+            snprintf (action, 16, "F_%d_%d", id, val);
+        }
+        udpLog("clanCopy", action, "", "", "", "", "act", num);
+    }
+
     void Player::sendHalloweenOnlineAward(UInt32 now, bool _online)
     {
         _online = false; // XXX: fuck
