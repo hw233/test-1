@@ -10,8 +10,12 @@ DBD=data_jlt;
 DBO=asss_jlt;
 =======
 DBD=data_jlt
+<<<<<<< HEAD
 DBO=asss_jlt
 >>>>>>> 9a2af98... clanCopy (Wait for testing.)
+=======
+DBO=asss_s110
+>>>>>>> 3c77e0c... clanCopy set tick=5.
 
 OPTIONS="Yes/No/Exit"
 IFS=/
