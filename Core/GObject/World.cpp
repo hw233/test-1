@@ -43,6 +43,7 @@
 #include "Server/SysMsg.h"
 #include "Arena.h"
 #include "Tianjie.h"
+#include "TownDeamon.h"
 
 namespace GObject
 {
@@ -928,6 +929,13 @@ void World::AthleticsPhysicalCheck(void *)
 {
     gAthleticsRank.process();
 }
+
+void World::TownDeamonTmAward(void *)
+{
+    townDeamonManager->process();
+}
+
+
 #if 0
 bool advancedHookEnumerate(Player * pl, UInt8 para)
 {
@@ -990,6 +998,9 @@ bool World::Init()
 
     AddTimer(5 * 1000, Team_Copy_Process, static_cast<void*>(NULL));
     AddTimer(3600 * 1000, AthleticsPhysicalCheck, static_cast<void *>(NULL), (3600 - now % 3600) * 1000);
+
+    UInt32 tdChkPoint = TimeUtil::SharpDayT(0, now) + TOWNDEAMONENDTM;
+    AddTimer(86400 * 1000, TownDeamonTmAward, static_cast<void *>(NULL), (tdChkPoint >= now ? tdChkPoint - now : 86400 + tdChkPoint - now) * 1000);
 
     //AddTimer(60 * 1000, advancedHookTimer, static_cast<void *>(NULL), (60 - now % 60) * 1000);
 
