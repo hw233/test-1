@@ -64,6 +64,11 @@ private:
     static void Hero_Island_Check(void *);
     static void ClanRankBattleCheck(void *);
 
+    static void ClanCopyCheck(void *);
+    static void ClanCopyResetBegin(void *);
+    static void ClanCopyReset(void *);
+    static void ClanCopyResetEnd(void *);
+
 private:
 	UInt8		m_ThreadID;					//?????߳?
 

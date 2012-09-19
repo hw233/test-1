@@ -1211,6 +1211,17 @@ namespace GObject
         void AddClanBuilding(UInt32);
         void AddClanContrib(UInt32);
 
+        ////////////////////////////////////////////
+        // 帮派副本
+
+        // GM命令设置帮派副本等级
+        void setClanCopyLevel(UInt16 level);
+        void setClanCopyTime(UInt32 time);
+
+
+        // 帮派副本
+        ////////////////////////////////////////////
+
 		void listRecruit(UInt8 type, UInt8, UInt16);
 		void flushTaskColor(UInt8 tasktype, UInt8 type, UInt8, UInt16, bool = false);
         void sendColorTask(UInt8 ttype, UInt16 ncount);
@@ -1577,6 +1588,7 @@ namespace GObject
         void countryBattleUdpLog(UInt32 id, UInt8 country);
         void secondSoulUdpLog(UInt32 id, UInt32 val = 0, UInt32 num = 1);
         void wBossUdpLog(UInt32 id);
+        void clanCopyUdpLog(UInt32 id, UInt32 val = 0, UInt32 num = 1);
         void guideUdp(UInt8 type, std::string& p1, std::string& p2);
         void moneyLog(int type, int gold, int coupon = 0, int tael = 0, int achievement = 0, int prestige = 0);
         void actUdp(UInt8 type, std::string& p1, std::string& p2);
@@ -1699,6 +1711,17 @@ namespace GObject
         void checkLastQueqiaoAward();
         void lastKillMonsterAwardPush(UInt16 itemId, UInt16 num);
         void checkLastKillMonsterAward();
+
+        // 帮派神像
+        float getClanStatueHPEffect();
+        float getClanStatueAtkEffect();
+        float getClanStatueDefendEffect();
+        float getClanStatueMagAtkEffect();
+        float getClanStatueMagDefentEffect();
+        float getClanStatueActionEffect();
+        float getClanStatueHitrLvlEffect();
+        void  AddStatueExp(UInt32 exp);
+        void  SubStatueExp(UInt32 exp);
 
     private:
         bool m_hasTripod;

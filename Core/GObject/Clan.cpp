@@ -1,4 +1,4 @@
-﻿#include "Config.h"
+#include "Config.h"
 #include "Clan.h"
 #include "GObject/Country.h"
 #include "GObject/TaskMgr.h"
@@ -11,6 +11,8 @@
 #include "GData/ClanTechTable.h"
 #include "GData/ClanLvlTable.h"
 #include "GData/ClanSkillTable.h"
+#include "GData/ClanStatueTable.h"
+#include "GData/ClanCopyTable.h"
 #include "Player.h"
 #include "Package.h"
 #include "Mail.h"
@@ -23,6 +25,8 @@
 #include "MsgHandler/CountryMsgStruct.h"
 #include "ClanRankBattle.h"
 #include "HeroMemo.h"
+#include "ClanStatue.h"
+#include "ClanCopy.h"
 
 #include "GObject/AthleticsRank.h"
 #include <mysql.h>
@@ -31,17 +35,20 @@
 namespace GObject
 {
 
+#define MAX_COPY_LOG 20
+
 GlobalClans globalClans, globalClansByCountry[COUNTRY_MAX];
 GlobalNamedClans globalGlobalNamedClans, globalNamedClans[COUNTRY_MAX];
 GlobalNamedClans globalOwnedClans[COUNTRY_MAX];
 
-UInt8 ClanAuthority[5][7] =
+#define CLAN_AUTHORITY_COPY 7
+UInt8 ClanAuthority[5][8] = 
 {
-	{ 0, 1, 0, 0, 0, 0, 0 },
-	{ 0, 1, 0, 0, 0, 0, 0 },
-	{ 1, 1, 0, 0, 0, 0, 0 },
-	{ 1, 1, 1, 1, 0, 0, 0 },
-	{ 1, 1, 1, 1, 1, 1, 1 }
+	{ 0, 1, 0, 0, 0, 0, 0, 0 },
+	{ 0, 1, 0, 0, 0, 0, 0, 0 },
+	{ 1, 1, 0, 0, 0, 0, 0, 1 },
+	{ 1, 1, 1, 1, 0, 0, 0, 1 },
+	{ 1, 1, 1, 1, 1, 1, 1, 1 }
 };
 
 
@@ -257,6 +264,7 @@ Clan::Clan( UInt32 id, const std::string& name, UInt32 ft, UInt8 lvl ) :
     _itemPkg.Init(_id, 0, GData::clanLvlTable.getPkgSize(_level));
 
 	_techs = new ClanTech(this);
+    _statue = new ClanStatue(this);
     _maxMemberCount = BASE_MEMBER_COUNT + _techs->getMemberCount();
 	memset(_favorId, 0, sizeof(_favorId));
 	_clanDynamicMsg = new ClanDynamicMsg();
@@ -266,11 +274,15 @@ Clan::Clan( UInt32 id, const std::string& name, UInt32 ft, UInt8 lvl ) :
     m_DailyBattleScore = 0;
     m_BattleRanking = 0;
     m_LastBattleRanking = 0;
+
+    _copyLevel = 0;
+    _copyLevelUpdateTime = 0;
 }
 
 Clan::~Clan()
 {
 	delete _techs;
+    delete _statue;
 	delete _clanDynamicMsg;
 	delete _clanBattle;
 }
@@ -278,6 +290,11 @@ Clan::~Clan()
 bool Clan::accept(Player * player, UInt64 pid )
 {
     bool ret = false;
+    if (ClanCopyMgr::Instance().getClanCopyByClan(this))
+    {
+        player->sendMsgCode(0, 1358);
+        return ret;
+    }
 	if (_clanBattle->isInBattling())
 	{
 		player->sendMsgCode(2, 1317);
@@ -468,6 +485,11 @@ bool Clan::join(ClanMember * cm)
 
 bool Clan::kick(Player * player, UInt64 pid)
 {
+    if (ClanCopyMgr::Instance().getClanCopyByClan(this))
+    {
+        player->sendMsgCode(0, 1358);
+        return false;
+    }
 	if (_clanBattle->isInBattling())
 	{
         player->sendMsgCode(0, 1317);
@@ -508,6 +530,7 @@ bool Clan::kick(Player * player, UInt64 pid)
     ClanRankBattleMgr::Instance().Signout(kicker);
     player->SetVar(VAR_CLANBATTLE_HONOUR, 0);
     kicker->SetVar(VAR_CLAN_LEAVE_TIME, now);
+    kicker->setFightersDirty(true);
 
 	getAllocBack(*member);
 
@@ -581,6 +604,11 @@ bool Clan::leave(Player * player)
 		player->sendMsgCode(0, 1317);
 		return false;
 	}
+    if (ClanCopyMgr::Instance().getClanCopyByClan(this))
+    {
+        player->sendMsgCode(0, 1358);
+        return false;
+    }
     if(ClanRankBattleMgr::Instance().IsInBattle(this))
     {
         SYSMSG_SEND(2235, player);
@@ -605,6 +633,7 @@ bool Clan::leave(Player * player)
     ClanRankBattleMgr::Instance().Signout(player);
     player->SetVar(VAR_CLANBATTLE_HONOUR, 0);
     player->SetVar(VAR_CLAN_LEAVE_TIME, now);
+    player->setFightersDirty(true);
 
 	_members.erase(found);
 	delete member;
@@ -817,6 +846,7 @@ UInt8 Clan::apply( Player * player, UInt32 optime, bool writedb )
 			leader->player->GetMailBox()->newMail(player, 0x23, title, content);
 		}
 	}
+    player->setFightersDirty(true);
 
 	return 0;
 }
@@ -1200,6 +1230,25 @@ void Clan::VisitMembers(ClanMemberVisitor& visitor)
     }
 }
 
+UInt8 Clan::getOnlineMembersCount()
+{
+	Mutex::ScopedLock lk(_mutex);
+    UInt8 c = 0;
+    Members::iterator offset = _members.begin();
+    for (; offset != _members.end(); ++ offset)
+    {
+		ClanMember * mem = *offset;
+        if (!mem || !mem->player)
+            continue;
+        if (mem->player->isOnline())
+            ++ c;
+        else
+            continue;
+    }
+    return c;
+    
+}
+
 void Clan::listMembers( Player * player )
 {
 	Mutex::ScopedLock lk(_mutex);
@@ -1395,6 +1444,24 @@ void Clan::broadcastMemberInfo( ClanMember& cmem, UInt8 t )
 	else
 		st << cmem.cls << cmem.player->GetLev() << static_cast<UInt8>(cmem.player->isOnline() ? 1 : 0) << cmem.proffer << cmem.player->getLastOnline() << Stream::eos;
 	broadcast(st);
+    //broadcastCopyInfo();
+
+}
+
+void Clan::broadcastCopyInfo()
+{
+	Mutex::ScopedLock lk(_mutex);
+	ClanMember * mem = NULL;
+	Members::iterator offset;
+	for(offset = _members.begin(); offset != _members.end(); ++ offset)
+	{
+		mem = *offset;
+        if (!mem)
+            continue;
+        if (!mem->player)
+            continue;
+        sendClanCopyInfo(mem->player);
+	}
 }
 
 void Clan::broadcastPendingMemberInfo( ClanPendingMember& cpmem )
@@ -2916,7 +2983,7 @@ bool Clan::setClanRank(Player* pl, UInt64 inviteeId, UInt8 cls)
 		DB5().PushUpdateData("UPDATE `clan_player` SET `cls` = %u WHERE `playerId` = %"I64_FMT"u", cls, inviteeId);
     }
 
-
+    sendClanCopyInfo(clan_pl);
     return true;
 }
 
@@ -3521,5 +3588,534 @@ void Clan::sendClanList(Player *player, UInt8 type, UInt8 start, UInt8 cnt)
     st << Stream::eos;
     player->send(st);
 }
+
+//////////////////////////////////////////
+// 帮派神像
+
+void Clan::LoadStatue(UInt16 level, UInt32 exp, UInt32 expUpdateTime)
+{
+    // 读取帮派神像数据
+    Mutex::ScopedLock lk(_mutex);
+    _statue->updateLevel(exp, expUpdateTime, _techs->getMaxStatueLevel());
+}
+
+void Clan::addStatueExp(UInt32 exp)
+{
+    Mutex::ScopedLock lk(_mutex);
+    _statue->addExp(exp, _techs->getMaxStatueLevel());
+    broadcastCopyInfo();
+}
+
+void Clan::subStatueExp(UInt32 exp)
+{
+    Mutex::ScopedLock lk(_mutex);
+    _statue->subExp(exp, _techs->getMaxStatueLevel());
+    broadcastCopyInfo();
+}
+
+void Clan::updateStatueExp()
+{
+    //每小时更新神像等级
+    Mutex::ScopedLock lk(_mutex);
+    _statue->updateLevel(0, 0, _techs->getMaxStatueLevel());
+    broadcastCopyInfo();
+}
+
+void Clan::resetCopyLevel()
+{
+    // 帮派副本等级下降五级
+    ClanCopy * clanCopy = ClanCopyMgr::Instance().getClanCopyByClan(this);
+    if (clanCopy)
+    {
+        // 不应该出现还未结束的副本信息，强制结束后重置
+        clanCopy->forceEnd(FORCE_END_BY_ERROR);
+    }
+    ClanCopyLog clanCopyLog(_id, TimeUtil::Now(), 2, COPY_RESET_LEVEL > _copyLevel ? _copyLevel : COPY_RESET_LEVEL, getName());
+    if (_copyLevel <= COPY_RESET_LEVEL)
+        _copyLevel = 0;
+    else
+        _copyLevel -= COPY_RESET_LEVEL;
+
+    _copyLog.push_back(clanCopyLog);
+    if (_copyLog.size() > MAX_COPY_LOG)
+    {
+        _copyLog.pop_front();
+        DB5().PushUpdateData("DELETE FROM `clan_copy_log` where `clanid` = %u ORDER BY `logTime` ASC limit 1", _id);
+        DB5().PushUpdateData("Insert INTO `clan_copy_log` (`clanid`, `logTime`, `logType`, `playerName`, `logVal`) VALUES (%u, %u, %u, '%s', %u)", _id, clanCopyLog.logTime, clanCopyLog.logType, clanCopyLog.playerName.c_str(), clanCopyLog.logVal);
+    }
+    else
+    {
+        DB5().PushUpdateData("INSERT INTO  `clan_copy_log` (`clanId`, `logTime`, `logType`, `playerName`, `logVal`) VALUES (%u, %u, %u, '%s', %u)", _id, clanCopyLog.logTime, clanCopyLog.logType, clanCopyLog.playerName.c_str(), clanCopyLog.logVal);
+    }
+}
+
+UInt16 Clan::getStatueLevel()
+{
+    return _statue->getLevel();
+}
+
+UInt32 Clan::getStatueExp()
+{
+    return _statue->getShownExp();
+}
+
+UInt32 Clan::getStatueNextExp()
+{
+    return _statue->getShownNextExp();
+}
+
+UInt32 Clan::getStatueConsumeExp()
+{
+    return GData::clanStatueTable[_statue->getLevel()].consumeExp;
+}
+
+UInt32 Clan::getStatueExHp()
+{
+    return GData::clanStatueTable[_statue->getLevel()].exHp;
+}
+
+UInt32 Clan::getStatueExAttack()
+{
+    return GData::clanStatueTable[_statue->getLevel()].exAttack;
+}
+
+UInt32 Clan::getStatueExDefend()
+{
+    return GData::clanStatueTable[_statue->getLevel()].exDefend;
+}
+
+UInt32 Clan::getStatueExMagAtk()
+{
+    return GData::clanStatueTable[_statue->getLevel()].exMagAtk;
+}
+
+UInt32 Clan::getStatueExMagDef()
+{
+    return GData::clanStatueTable[_statue->getLevel()].exMagDef;
+}
+
+UInt32 Clan::getStatueExAction()
+{
+    return GData::clanStatueTable[_statue->getLevel()].exAction;
+}
+
+UInt32 Clan::getStatueExHitRate()
+{
+    return GData::clanStatueTable[_statue->getLevel()].exHitRate;
+}
+
+void  Clan::notifyUpdateStatueAttr()
+{
+    Mutex::ScopedLock lk(_mutex);
+
+    class StatueAttrVisitor : public Visitor<ClanMember>
+    {
+        public:
+            bool operator() (ClanMember * member)
+            {
+                member->player->setFightersDirty(true);
+                return true;
+            }
+    };
+
+    StatueAttrVisitor visitor;
+    VisitMembers(visitor);
+}
+
+// 帮派神像
+//////////////////////////////////////////
+
+//////////////////////////////////////////
+// 帮派副本
+
+void   Clan::LoadCopy(UInt16 level, UInt32 levelUpdateTime, UInt16 maxLevel, UInt32 maxTime)
+{
+    // 副本重置
+    UInt32 now = TimeUtil::Now();
+    UInt32 count = 0;
+    if (now < levelUpdateTime)
+    {
+        // 又穿越了？
+        count = (TimeUtil::SharpWeek(1, levelUpdateTime) - TimeUtil::SharpWeek(1, now)) / (3600 * 24 * 7) * 5;
+        if (level < count * 5)
+            level = 1;
+        else
+            level -= count * 5;
+    }
+    else
+    {
+        count = (TimeUtil::SharpWeek(1, now) - TimeUtil::SharpWeek(1, levelUpdateTime)) / (3600 * 24 * 7) * 5;
+        if (level < count * 5)
+            level = 1;
+        else
+            level -= count * 5;
+    }
+    _copyLevel = level;
+    _copyLevelUpdateTime = now;
+    _copyMaxLevel = maxLevel;
+    _copyMaxTime = maxTime;
+}
+
+void   Clan::LoadCopyLog(UInt32 logTime, UInt8 logType, std::string playerName, UInt32 logVal)
+{
+    // 数据库读取帮派副本历史日志
+    _copyLog.push_back(ClanCopyLog(_id, logTime, logType, logVal, playerName));
+}
+
+UInt16 Clan::getCopyLevel()
+{
+    return _copyLevel;
+}
+
+UInt32 Clan::getOutputExp()
+{
+    return GData::clanCopyTable[_copyLevel].expOutput;
+}
+
+UInt32 Clan::getNextOutputExp()
+{
+    return GData::clanCopyTable[_copyLevel + 1].expOutput;
+}
+
+UInt8  Clan::getCopyStatus()
+{
+    // 返回帮派副本状态
+    return GObject::ClanCopyMgr::Instance().getCopyStatus(_id);
+}
+
+UInt16  Clan::getCopyMeberCount()
+{
+    // 返回帮派副本的参与人数
+    return ClanCopyMgr::Instance().getTotalPlayer(this);
+}
+
+void   Clan::clanCopyTabOperate(Player * player, UInt8 command, UInt8 val /* = 0 */)
+{
+    // 帮派副本信息标签页相关操作
+    if (command == 1)
+    {
+        // 按下帮派副本标签页的按钮
+        switch (val)
+        {
+            case 0x04:
+                // "召集帮众并前往"
+                if (hasClanAuthority(player, CLAN_AUTHORITY_COPY))
+                {
+                    broadcastCopyInfo();
+                    notifyCopyCreated(player);
+                }
+                else
+                {
+                    player->sendMsgCode(0, 1342);
+                }
+                break;
+            case 0x00:
+                // "前往观战"
+            case 0x02:
+                // "前往副本"
+                if(player->getLocation() == CLAN_COPY_LOCATION
+                        && player->getThreadId() == WORKER_THREAD_NEUTRAL)
+                {
+                    return;
+                }
+                break;
+            case 0x01:
+                // "只有长老级以上才可开启副本"
+                return;
+            case 0x03:
+                // "开启副本"
+                if (hasClanAuthority(player, CLAN_AUTHORITY_COPY))
+                {
+                    if (_techs->getMaxCopyLevel() < static_cast<UInt32>(_copyLevel + 1))
+                    {
+                        player->sendMsgCode(0, 1340);  // 帮派科技不够开启更高等级
+                        return;
+                    }
+                    GObject::ClanCopyMgr::Instance().createClanCopy(player, this);
+                    sendClanCopyInfo(player);
+                }
+                else
+                {
+                    player->sendMsgCode(0, 1341); // 不是长老以上职位，权限不够开启副本
+                }
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+void   Clan::clanCopyMemberOperate(Player * player, UInt8 command, BinaryReader & brd)
+{
+    // 帮派副本成员相关操作
+    switch (command)
+    {
+        case 0:
+            // 强制刷新准备页面
+            {
+                ClanCopy * clanCopy = GObject::ClanCopyMgr::Instance().getClanCopyByClan(this);
+                if (!clanCopy)
+                {
+                    player->sendMsgCode(0, 1352);
+                    return;
+                }
+                clanCopy->notifySpotPlayerInfo(player);
+            }
+            break;
+        case 1:
+            // 请求开始副本
+            if (hasClanAuthority(player, CLAN_AUTHORITY_COPY))
+            {
+                GObject::ClanCopyMgr::Instance().playerRequestStart(player);
+            }
+            else
+            {
+                player->sendMsgCode(0, 1344);
+            }
+            break;
+        case 2:
+            // 帮派成员操作调整
+            if (!hasClanAuthority(player, CLAN_AUTHORITY_COPY))
+            {
+                player->sendMsgCode(0, 1349);
+            }
+            else
+            {
+                UInt64 playerId;
+                brd >> playerId;
+                Player * targetPlayer = globalPlayers[playerId];
+                if (!targetPlayer)
+                    return;
+                UInt8 oldSpotId;
+                UInt8 oldPosition;
+                UInt8 newSpotId;
+                UInt8 newPosition;
+                brd >> oldSpotId;
+                brd >> oldPosition;
+                brd >> newSpotId;
+                brd >> newPosition;
+                ClanCopy * clanCopy = GObject::ClanCopyMgr::Instance().getClanCopyByClan(this);
+                if (!clanCopy)
+                {
+                    player->sendMsgCode(0, 1352);
+                    return;
+                }
+                clanCopy->adjustPlayerPosition(player, targetPlayer, oldSpotId, oldPosition, newSpotId, newPosition);
+            }
+            break;
+        default:
+            break;
+    }
+}
+
+void   Clan::clanCopyBattleOperate(Player * player, UInt8 command, BinaryReader & brd)
+{
+    // TODO: 帮派副本战斗操作
+    switch (command)
+    {
+        case 0:
+            // 强制刷新准备页面
+            {
+                ClanCopy * clanCopy = GObject::ClanCopyMgr::Instance().getClanCopyByClan(this);
+                if (!clanCopy)
+                {
+                    player->sendMsgCode(0, 1352);
+                    return;
+                }
+                clanCopy->notifySpotPlayerInfo(player);
+            }
+            break;
+        default:
+            break;
+    }
+}
+
+bool   Clan::copyLevelAvailable()
+{
+    // 判断科技等级是否支持开启更高级的副本
+    if (_techs->getMaxCopyLevel() > _copyLevel)
+        if (_copyLevel < GData::clanCopyTable.size() - 1)
+        return true;
+    return false;
+}
+
+void   Clan::sendClanCopyInfo(Player * player, UInt8 val)
+{
+    // 发送帮派副本标签页的所有有关信息
+    Mutex::ScopedLock lk(_mutex);
+    Members::iterator found = find(player);
+    if (found == _members.end())
+        return;
+    Stream st(REP::CLAN_COPY);
+    st << static_cast<UInt8>(CLAN_COPY_TAB_INFO);
+    st << _name;
+    st << static_cast<UInt8>(getOnlineMembersCount());
+
+    st << static_cast<UInt16>(_techs->getLev(CLAN_TECH_STATUE));     // 神像科技等级
+    st << static_cast<UInt16>(_techs->getLev(CLAN_TECH_COPY_LEVEL)); // 副本科技等级
+    st << static_cast<UInt16>(_techs->getLev(CLAN_TECH_COPY_ROB));    // 掠夺科技等级
+
+    st << static_cast<UInt16>(getStatueLevel());
+    st << static_cast<UInt32>(getStatueExp());
+    st << static_cast<UInt32>(getStatueNextExp());
+    st << static_cast<Int32>(static_cast<Int32>(getOutputExp()) - static_cast<Int32>(getStatueConsumeExp()));
+    st << static_cast<UInt32>(getStatueConsumeExp());
+    st << static_cast<UInt32>(getStatueExHp());
+    st << static_cast<UInt32>(getStatueExAttack());
+    //st << static_cast<UInt32>(getStatueExDefend());
+    //st << static_cast<UInt32>(getStatueExMagAtk());
+    //st << static_cast<UInt32>(getStatueExMagDef());
+    st << static_cast<UInt32>(getStatueExAction());
+    //st << static_cast<UInt32>(getStatueExHitRate());
+
+    st << static_cast<UInt16>(getCopyLevel() + 1);
+    st << static_cast<UInt32>(getOutputExp());
+    st << static_cast<UInt32>(getNextOutputExp());
+
+    // 副本按钮状态
+    if (val)
+    {
+        st << static_cast<UInt8>(val);
+    }
+    else
+    {
+        UInt8 status = getCopyStatus();
+        if (status == CLAN_COPY_READY)
+        {
+            // 副本开启报名阶段
+            if (hasClanAuthority(player, CLAN_AUTHORITY_COPY))
+                st << static_cast<UInt8>(4);
+            else
+                st << static_cast<UInt8>(2);
+        }
+        else if (status == CLAN_COPY_NONE || status == CLAN_COPY_OVER)
+        {
+            // 副本还未开启
+            if (hasClanAuthority(player, CLAN_AUTHORITY_COPY))
+                st << static_cast<UInt8>(3);
+            else
+                st << static_cast<UInt8>(1);
+        }
+        else
+        {
+            // 副本已经开始，只能观战
+            st << static_cast<UInt8>(0);
+        }
+    }
+
+    st << static_cast<UInt8> (getCopyMeberCount());
+
+    st << static_cast<UInt8> (0);  // 掠夺疲劳
+    st << static_cast<UInt8> (0);  // 掠夺按钮状态
+
+    UInt8 logNum = _copyLog.size();
+    st << static_cast<UInt8>(logNum);  
+    for (std::list<ClanCopyLog>::reverse_iterator it = _copyLog.rbegin(); it != _copyLog.rend(); ++ it)
+    {
+        struct tm t_tm;
+        time_t logTime = it->logTime;
+        localtime_r(&logTime, &t_tm);
+        st << static_cast<UInt16>(t_tm.tm_year + 1900); // 年
+        st << static_cast<UInt8>(t_tm.tm_mon + 1);      // 月
+        st << static_cast<UInt8>(t_tm.tm_mday);         // 日
+        switch (it->logType)
+        {
+            case 1:
+                // 通关副本日志
+                st << static_cast<UInt8> (1);
+                st << it->playerName;
+                st << static_cast<UInt8>(it->logVal);
+                break;
+            case 2:
+                // 副本等级重置
+                st << static_cast<UInt8> (2);
+                st << static_cast<UInt8>(it->logVal);
+                break;
+            default:
+                return;
+        }
+    }
+    st << Stream::eos;
+    player->send(st);
+}
+
+void   Clan::addCopyLevel()
+{
+    // 更新并保存新帮派副本的等级
+    if (_copyLevel < GData::clanCopyTable.size() - 1)
+    {
+        ++_copyLevel;
+        _copyMaxLevel = _copyLevel >= _copyMaxLevel ? _copyLevel : _copyMaxLevel;
+        _copyMaxTime = _copyLevel >= _copyMaxLevel ? TimeUtil::Now() : _copyMaxTime;
+        DB5().PushUpdateData("REPLACE INTO `clan_copy` (`clanId`, `level`, `levelUpdateTime`, `maxCopyLevel`, `maxCopyTime`) VALUES (%u, %u, %u, %u, %u)", _id, _copyLevel, TimeUtil::Now(), _copyMaxLevel, _copyMaxTime);
+    }
+}
+
+void   Clan::addCopyWinLog(Player* player)
+{
+    if (!player)
+        return;
+    ClanCopyLog clanCopyLog(_id, TimeUtil::Now(), 1, _copyLevel, player->getName());
+    _copyLog.push_back(clanCopyLog);
+    if (_copyLog.size() > MAX_COPY_LOG)
+    {
+        _copyLog.pop_front();
+        DB5().PushUpdateData("DELETE FROM `clan_copy_log` where `clanid` = %u ORDER BY `logTime` ASC limit 1", _id);
+        DB5().PushUpdateData("Insert INTO `clan_copy_log` (`clanid`, `logTime`, `logType`, `playerName`, `logVal`) VALUES (%u, %u, %u, '%s', %u)", _id, clanCopyLog.logTime, clanCopyLog.logType, clanCopyLog.playerName.c_str(), clanCopyLog.logVal);
+    }
+    else
+    {
+        DB5().PushUpdateData("INSERT INTO  `clan_copy_log` (`clanId`, `logTime`, `logType`, `playerName`, `logVal`) VALUES (%u, %u, %u, '%s', %u)", _id, clanCopyLog.logTime, clanCopyLog.logType, clanCopyLog.playerName.c_str(), clanCopyLog.logVal);
+    }
+}
+
+void   Clan::notifyCopyCreated(Player * player)
+{
+    // 通知其他帮众玩家副本开始
+    Mutex::ScopedLock lk(_mutex);
+
+    class CopyCreateVisitor : public Visitor<ClanMember>
+    {
+        public:
+            CopyCreateVisitor(Player * player)
+                : player(player)
+            {
+            }
+
+            bool operator() (ClanMember * member)
+            {
+                if (member->player == player) return true;
+                Stream st (REP::CLAN_COPY);
+                st << static_cast<UInt8>(0x02);
+                st << static_cast<UInt8>(0x01);
+                st << Stream::eos;
+                member->player->send(st);
+                return true;
+            }
+
+        private:
+            Player * player;
+    };
+
+    CopyCreateVisitor visitor(player);
+    VisitMembers(visitor);
+}
+
+void    Clan::setCopyLevel(UInt16 level)
+{ 
+    ClanCopy * clanCopy = ClanCopyMgr::Instance().getClanCopyByClan(this);
+    if (clanCopy)
+    {
+        // 不应该出现还未结束的副本信息，强制结束后重置
+        clanCopy->forceEnd(FORCE_END_BY_GM);
+    }
+
+    _copyLevel = level;
+}
+
+
+// 帮派副本
+//////////////////////////////////////////
+
 
 }

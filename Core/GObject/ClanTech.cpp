@@ -131,6 +131,26 @@ bool ClanTech::techLevelUp(UInt8 id, UInt8& level, UInt32& extra, UInt32 count)
         case CLAN_TECH_PRACTICE_SLOT:
             practicePlace.addSlotFromTech(_clan->getOwner());
             break;
+        case CLAN_TECH_STATUE:
+            {
+                if (_clan)
+                {
+                    Player *player = _clan->getOwner();
+                    if (player)
+                        player->clanCopyUdpLog(1135, level);
+                }
+            }
+            break;
+        case CLAN_TECH_COPY_LEVEL:
+            {
+                if (_clan)
+                {
+                    Player *player = _clan->getOwner();
+                    if (player)
+                        player->clanCopyUdpLog(1136, level);
+                }
+            }
+            break;
         }
 	}
 	if (r)
@@ -342,6 +362,39 @@ UInt32 ClanTech::getMemberCount()
         return 0;
 
 	return GData::clanTechTable[CLAN_TECH_MEMBER_COUNT][found->second.level].effect1;
+}
+
+UInt32 ClanTech::getMaxCopyLevel()
+{
+	Mutex::ScopedLock lk(_mutex);
+    Techs::iterator found = _techs.find(CLAN_TECH_COPY_LEVEL);
+    if(found == _techs.end())
+        return 0;
+
+	return GData::clanTechTable[CLAN_TECH_COPY_LEVEL][found->second.level].effect1;
+}
+
+UInt32 ClanTech::getMaxStatueLevel()
+{
+	Mutex::ScopedLock lk(_mutex);
+    Techs::iterator found = _techs.find(CLAN_TECH_STATUE);
+    if(found == _techs.end())
+        return 0;
+
+	UInt32 maxLevel = GData::clanTechTable[CLAN_TECH_STATUE][found->second.level].effect1;
+    if (!maxLevel)
+        ++ maxLevel;
+    return maxLevel;
+}
+
+UInt32 ClanTech::getMaxCopyRobLevel()
+{
+	Mutex::ScopedLock lk(_mutex);
+    Techs::iterator found = _techs.find(CLAN_TECH_COPY_ROB);
+    if(found == _techs.end())
+        return 0;
+
+	return GData::clanTechTable[CLAN_TECH_COPY_ROB][found->second.level].effect1;
 }
 
 UInt32 ClanTech::getSkillExtend(UInt8 skillId)

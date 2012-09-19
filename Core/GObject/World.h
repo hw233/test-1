@@ -465,6 +465,7 @@ private:
     static void Team_Copy_Process(void*);
 	static void World_One_Min( World * );
     static void AthleticsPhysicalCheck(void *);
+    static void ClanStatueCheck(void *);
 	static void Tianjie_Refresh(void*);
     static void TownDeamonTmAward(void *);
     //static void advancedHookTimer(void *para);

@@ -661,6 +661,32 @@ struct DBClanRewardRecord
 	std::string items;
 };
 
+struct DBClanStatue
+{
+    UInt32 clanId;
+    UInt16 level;
+    UInt32 exp;
+    UInt32 expUpdateTime;
+};
+
+struct DBClanCopy
+{
+    UInt32 clanId;
+    UInt16 level;
+    UInt32 levelUpdateTime;
+    UInt16 maxLevel;
+    UInt32 maxLevelTime;
+};
+
+struct DBClanCopyLog
+{
+    UInt32 clanId;
+    UInt32 logTime;
+    UInt8  logType;
+    std::string playerName;
+    UInt32 logVal;
+};
+
 struct DBTaskData
 {
 	UInt64 m_ownerId;
@@ -1738,6 +1764,38 @@ SPECIALDEF(5)
 	UInt32, timeAlloc,
 	std::string, playerName,
 	std::string, items
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBClanStatue)
+SPECIALDEF(4)
+(
+    UInt32, clanId,
+    UInt16, level,
+    UInt32, exp,
+    UInt32, expUpdateTime
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBClanCopy)
+SPECIALDEF(5)
+(
+    UInt32, clanId,
+    UInt16, level,
+    UInt32, levelUpdateTime,
+    UInt16, maxLevel,
+    UInt32, maxLevelTime
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBClanCopyLog)
+SPECIALDEF(5)
+(
+    UInt32, clanId,
+    UInt32, logTime,
+    UInt8,  logType,
+    std::string, playerName,
+    UInt32, logVal
 )
 SPECIALEND()
 

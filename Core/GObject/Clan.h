@@ -1,4 +1,4 @@
-﻿#ifndef _CLAN_H_
+#ifndef _CLAN_H_
 #define _CLAN_H_
 
 #include <set>
@@ -7,15 +7,21 @@
 #include "GObjectManager.h"
 #include "ClanDynamicMsg.h"
 #include "Server/ServerTypes.h"
+#include "Common/BinaryReader.h"
 
 class SysMsgItem;
 namespace GObject
 {
 
+static const UInt16 COPY_RESET_LEVEL = 5;
+
 class Player;
 class ClanTech;
 class ClanBattle;
 class Clan;
+class ClanStatue;
+class ClanCopy;
+struct ClanCopyLog;
 
 #define BASE_MEMBER_COUNT 30
 struct AllocItem
@@ -415,6 +421,7 @@ public:
     void GetWeal(Player* player);
     void GetItems(Player* player);
 
+
 public:
 	inline bool alive() { return !_deleted; }
 
@@ -472,13 +479,62 @@ public:
 	ClanBattle * getClanBattle() { return _clanBattle; }
 	ClanDynamicMsg * getClanDynamicMsg() { return _clanDynamicMsg; }
 
-	inline Player * getOwner()
-	{
-		if (_members.size() > 0)
-			return (*_members.begin())->player;
-		return NULL;
-	}
+public:
+    // 帮派副本，帮派神像
 
+    void LoadStatue(UInt16 level, UInt32 exp, UInt32 expUpdateTime);
+    void LoadCopy(UInt16 level, UInt32 levelUpdateTime, UInt16 maxLevel, UInt32 maxTime);
+    void LoadCopyLog(UInt32 logTime, UInt8 logType, std::string playerName, UInt32 logVal);
+
+    void updateStatueExp();
+    void resetCopyLevel();
+
+    bool copyLevelAvailable();
+    void sendClanCopyInfo(Player * player, UInt8 val = 0);
+    void notifyCopyCreated(Player * player);
+
+    void   addStatueExp(UInt32 exp);
+    void   subStatueExp(UInt32 exp);
+
+    UInt16 getStatueLevel();
+    UInt32 getStatueExp();
+    UInt32 getStatueNextExp();
+    UInt32 getStatueConsumeExp();
+    UInt32 getStatueExHp();
+    UInt32 getStatueExAttack();
+    UInt32 getStatueExDefend();
+    UInt32 getStatueExMagAtk();
+    UInt32 getStatueExMagDef();
+    UInt32 getStatueExAction();
+    UInt32 getStatueExHitRate();
+
+    void   notifyUpdateStatueAttr();
+
+    UInt16 getCopyLevel();
+    UInt32 getOutputExp();
+    UInt32 getNextOutputExp();
+    UInt8  getCopyStatus();
+    UInt16 getCopyMeberCount();
+
+    void   clanCopyTabOperate(Player * player, UInt8 command, UInt8 val = 0);
+    void   clanCopyMemberOperate(Player * player, UInt8 command, BinaryReader& brd);
+    void   clanCopyBattleOperate(Player * player, UInt8 command, BinaryReader & brd);
+
+    void   addCopyLevel();
+    void   addCopyWinLog(Player* player);
+
+    void   setCopyLevel(UInt16 level);
+
+public:
+
+    inline Player * getOwner()
+    {
+        if (_members.size() > 0)
+            return (*_members.begin())->player;
+        return NULL;
+    }
+
+    UInt8 getOnlineMembersCount();
     void VisitMembers(ClanMemberVisitor& visitor);
 	void listMembers(Player *);
 	void listPending(Player *);
@@ -496,6 +552,7 @@ public:
 	void broadcast(Stream&);
 	void broadcast(const void *, size_t);
 	void broadcast(SysMsgItem *);
+    void broadcastCopyInfo();
 
 public:
 	ClanMember * getClanMember(Player *);
@@ -555,7 +612,16 @@ private:
 
 	std::map<UInt32, UInt8> _repoNum;
 	std::multimap<UInt32, AllocRecord> _allocRecords;
+
 	ClanTech * _techs;
+    ClanStatue * _statue;
+    UInt16 _copyLevel;
+    UInt32 _copyLevelUpdateTime;
+    UInt16 _copyMaxLevel;
+    UInt32 _copyMaxTime;
+
+    std::list<ClanCopyLog> _copyLog;
+
 	bool _deleted;
 	std::vector<std::string> _keywords;
 
