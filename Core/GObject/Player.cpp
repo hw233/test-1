@@ -1115,8 +1115,9 @@ namespace GObject
             m_ulog->SetUserMsg(buf);
             if (platform != WEBDOWNLOAD)
                 m_ulog->LogMsg(str1, str2, str3, str4, str5, str6, type, count, 0);
-            if (platform)
-                m_ulog->LogMsg(str1, str2, str3, str4, str5, str6, type, count, platform);
+            // XXX: 不再分平台发送
+            //if (platform)
+            //    m_ulog->LogMsg(str1, str2, str3, str4, str5, str6, type, count, platform);
 
             TRACE_LOG("%s - (%s,%s,%s,%s,%s,%s,%s,%u)", buf, str1, str2, str3, str4, str5, str6, type, count);
         }
