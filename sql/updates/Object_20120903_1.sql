@@ -15,11 +15,11 @@ CREATE TABLE IF NOT EXISTS `clan_copy` (
     PRIMARY KEY(`clanId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE `clan_copy_log` (
+CREATE TABLE IF NOT EXISTS `clan_copy_log` (
     `clanId` bigint(20) unsigned NOT NULL,
     `logTime` bigint(20) unsigned NOT NULL,
     `logType` smallint(6) NOT NULL,
     `playerName` varchar(255) NOT NULL,
     `logVal` bigint(20) unsigned NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
