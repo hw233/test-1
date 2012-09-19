@@ -46,7 +46,7 @@ ClanCopy::ClanCopy(Clan *c, UInt32 copyId, Player * player) : _clan(c), _copyId 
 
     _npcIndex = 1;
 
-    _tickTimeInterval = 3;
+    _tickTimeInterval = 4;
     _startTick = 1;
     _monsterRefreshTick = 3;
     _tickCount = 0;
