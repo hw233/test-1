@@ -7917,6 +7917,7 @@ bool BattleSimulator::doSkillStrengthen_bufTherapy( BattleFighter* bf, const GDa
     if(!bf || !ef || bf->getHP() <= 0)
         return false;
 
+    int pos0 = bf == _activeFgt ? 25 : 0;
     if(bf->getTherapyBuff() != 0)  // 去掉以前的buff
     {
         if (bf->getTherapyBuff() > 0)
@@ -7928,14 +7929,14 @@ bool BattleSimulator::doSkillStrengthen_bufTherapy( BattleFighter* bf, const GDa
             defList[defCount].damType = e_UnWeak;
         }
         defList[defCount].damage = 0;
-        defList[defCount].pos = bf->getPos() + 25;
+        defList[defCount].pos = bf->getPos() + pos0;
         defList[defCount].leftHP = bf->getHP();
         defCount ++;
     }
 
     defList[defCount].damType = e_TherapyBuff;
     defList[defCount].damage = 0;
-    defList[defCount].pos = bf->getPos() + 25;
+    defList[defCount].pos = bf->getPos() + pos0;
     defList[defCount].leftHP = bf->getHP();
     defCount ++;
    // bf->setTherapyAdd(ef->value/100, ef->last);
