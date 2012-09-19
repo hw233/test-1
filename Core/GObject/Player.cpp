@@ -560,6 +560,13 @@ namespace GObject
         m_csFlag = 0;
         _mditem = 0;
         _qixiBinding = false;
+
+        char buf[64] = {0};
+        snprintf(buf, sizeof(buf), "%"I64_FMT"u", _id);
+#ifndef _WIN32
+        m_ulog = _analyzer.GetInstance(buf);
+        m_ulog->SetUserIP("0.0.0.0");
+#endif
 	}
 
 
@@ -1009,7 +1016,8 @@ namespace GObject
         char buf[64] = {0};
         snprintf(buf, sizeof(buf), "%"I64_FMT"u", _id);
 #ifndef _WIN32
-        m_ulog = _analyzer.GetInstance(buf);
+        if (!m_ulog)
+            m_ulog = _analyzer.GetInstance(buf);
         if (m_ulog)
         {
             TcpConnection conn = NETWORK()->GetConn(_session);
@@ -12911,7 +12919,7 @@ namespace GObject
         }
         if (getTael() < 1000)
         {
-            rcmd = 2; //银币不足
+            rcmd = 3; //银币不足
             st << type << rcmd << Stream::eos;
             send(st);
             return;
