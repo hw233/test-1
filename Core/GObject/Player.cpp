@@ -1409,11 +1409,11 @@ namespace GObject
         char action[16] = "";
         if (val)
         {
-            snprintf (action, 16, "F_%d", id);
+            snprintf (action, 16, "F_%d_%d", id, val);
         }
         else
         {
-            snprintf (action, 16, "F_%d_%d", id, val);
+            snprintf (action, 16, "F_%d", id);
         }
         udpLog("clanCopy", action, "", "", "", "", "act", num);
     }
