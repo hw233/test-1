@@ -12498,7 +12498,7 @@ namespace GObject
                 //刷新任务
             case 3:
                 {
-                    if (GetVar(VAR_TJ_TASK1_NUMBER) == 5)
+                    if (GetVar(VAR_TJ_TASK1_NUMBER) >= 5)
                     {
                         rcmd = 1;
                     }
@@ -12642,7 +12642,7 @@ namespace GObject
                 break;
             case 1: //前往破阵
                 {
-                    if (GetVar(VAR_TJ_TASK3_COPYID) == 51)
+                    if (GetVar(VAR_TJ_TASK3_COPYID) >= 51)
                     {
                         rcmd = 1;
                         st << type << rcmd << Stream::eos;
@@ -12672,7 +12672,7 @@ namespace GObject
         if (id > 3) 
             return 4;
         
-        if (GetVar(VAR_TJ_TASK1_NUMBER) == 5)
+        if (GetVar(VAR_TJ_TASK1_NUMBER) >= 5)
             return 1;
 
         if (cmd == 2 && getGold() < 5) //双倍奖励
@@ -12803,7 +12803,7 @@ namespace GObject
     {
         UInt8 finish = 0;
         UInt8 copyid = GetVar(VAR_TJ_TASK3_COPYID);
-        if (copyid == (s_tjTask3CopyCount+1)) //已完成
+        if (copyid >= (s_tjTask3CopyCount+1)) //已完成
         {
             finish = 1;
         }
@@ -12898,7 +12898,7 @@ namespace GObject
         if (hasFlag(Player::AutoTlz))
             return;
 
-        if (GetVar(VAR_TJ_TASK3_COPYID) == (s_tjTask3CopyCount+1))
+        if (GetVar(VAR_TJ_TASK3_COPYID) >= (s_tjTask3CopyCount+1))
         {
             rcmd = 1;
             st << type << rcmd << Stream::eos;
@@ -12947,7 +12947,7 @@ namespace GObject
         if (!hasFlag(Player::AutoTlz))
             return;
 
-        if (GetVar(VAR_TJ_TASK3_COPYID) == (s_tjTask3CopyCount+1))
+        if (GetVar(VAR_TJ_TASK3_COPYID) >= (s_tjTask3CopyCount+1))
         {
             rcmd = 1;
         }
