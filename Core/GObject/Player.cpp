@@ -13006,8 +13006,6 @@ void EventTlzAuto::complete() const
 }
 void EventTlzAuto::notify(bool isBeginAuto)
 {
-    if(m_Player == NULL || !m_Player->isOnline())
-        return;
     int copyid = m_Player->GetVar(VAR_TJ_TASK3_COPYID);
     if (!isBeginAuto)
     {
@@ -13019,6 +13017,10 @@ void EventTlzAuto::notify(bool isBeginAuto)
         m_Player->delFlag(Player::AutoTlz);
         m_Player->udpLog("tianjie", "F_1114", "", "", "", "", "act");
     }
+
+    if(!m_Player->isOnline())
+        return;
+
     Stream st(REQ::TIANJIE);
     UInt8 type = 3;
     UInt8 cmd = 0;
