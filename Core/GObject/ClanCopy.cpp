@@ -15,7 +15,8 @@ namespace GObject
 
 
 const static UInt32 COPY_ROUTE_COUNT = 3;  // 帮派副本的路径数目
-const static UInt32 COPY_MIN_PLAYER = 2;
+const static UInt32 COPY_MIN_PLAYER = 5;
+const static UInt32 COPY_EXTRA_PLAYER = 10;     // 怪物冲阵时玩家多拦截的数目（例如据点有人可以多拦怪的数量）
 
 #ifdef DEBUG_CLAN_COPY
 UInt32 clanCopyFileIndex = 1;
@@ -602,11 +603,11 @@ void ClanCopy::process(UInt32 now)
     {
         if (checkWin())
         {
-            _clan->addCopyLevel();
             _clan->addCopyWinLog(_launchPlayer);
             UInt32 awardValue = static_cast<UInt32> (static_cast<float>(_homeHp) / _homeMaxHp * _maxReward);
             addWinReward(awardValue);
             notifySpotBattleInfo();
+            _clan->addCopyLevel();
             _status = CLAN_COPY_OVER;
             return;
         }
@@ -795,6 +796,7 @@ void ClanCopy::spotCombat(UInt8 spotId)
         *fileSt << "Start monsters match players." << std::endl;
 #endif
         _spotMonster[spotId].remove_if(isMonsterDead());
+
         for (playerIt = _spotPlayer[spotId].begin(); playerIt != _spotPlayer[spotId].end(); ++ playerIt)
         {
             if (playerIt->deadType)
@@ -805,6 +807,8 @@ void ClanCopy::spotCombat(UInt8 spotId)
 
     playerIt = _spotPlayer[spotId].begin();
     monsterIt = _spotMonster[spotId].begin();
+
+
     while (monsterIt != _spotMonster[spotId].end() && count < BATTLER_COUNT)
     {
 
@@ -914,6 +918,7 @@ void ClanCopy::spotCombat(UInt8 spotId)
                 st << Stream::eos;
                 playerIt->player->send(st);
                 bsim.applyFighterHP(0, playerIt->player, false);
+                ++ count;
                 break;
             }
         }
@@ -932,8 +937,35 @@ void ClanCopy::spotCombat(UInt8 spotId)
         }
     }
 
+    while (monsterIt != _spotMonster[spotId].end())
+    {
+        if (playerIt == _spotPlayer[spotId].end())
+        {
+            // 没有玩家与怪物匹配
+#ifdef DEBUG_CLAN_COPY
+            *fileSt << "No player to fight to monster." << std::endl;
+#endif
+            break;
+        }
+        else
+        {
+            ++ monsterIt;
+            ++playerIt;
+        }
+
+    }
+
     if (flag)
     {
+        if (_spotPlayer[spotId].size())
+        {
+            count = 0;
+            while (monsterIt != _spotMonster[spotId].end() && count < COPY_EXTRA_PLAYER)
+            {
+                ++ monsterIt;
+                ++ count;
+            }
+        }
 
         while (monsterIt != _spotMonster[spotId].end())
         {
@@ -961,7 +993,7 @@ void ClanCopy::monsterMove(UInt8 spotId)
             UInt8 nextSpotId = (*monsterIt)->nextSpotId; // 获取目标据点Id
             (*monsterIt)->justMoved = true;
             (*monsterIt)->nextMoveTick = _tickCount + _monsterRefreshTick;
-            (*monsterIt)->nextSpotId = _spotMap[nextSpotId].nextSpotId[0]; // FIXME:
+            (*monsterIt)->nextSpotId = nextSpotId;
             _spotMonster[nextSpotId].push_back(*monsterIt);
 #ifdef DEBUG_CLAN_COPY
             *fileSt << "Enemy move from Enemy_Base to " << (UInt32) nextSpotId << "." << std::endl;
@@ -974,6 +1006,18 @@ void ClanCopy::monsterMove(UInt8 spotId)
         // 存在玩家防守的据点
         SpotPlayerList::iterator playerIt = _spotPlayer[spotId].begin();
         SpotMonsterList::iterator monsterIt = _spotMonster[spotId].begin();
+
+        // 冲阵据点只要有人就要多留住一定数量的怪
+        if (_spotPlayer[spotId].size())
+        {
+            for (UInt8 i = 0; i < COPY_EXTRA_PLAYER; ++i)
+            {
+                if (monsterIt == _spotMonster[spotId].end())
+                    break;
+                (*monsterIt)->nextSpotId = spotId;
+                ++ monsterIt;
+            }
+        }
 
         while (monsterIt != _spotMonster[spotId].end())
         {
@@ -1010,7 +1054,7 @@ void ClanCopy::monsterMove(UInt8 spotId)
 
                 (*monsterIt)->nextMoveTick = _tickCount + _monsterRefreshTick;
                 _spotMonster[nextSpotId].push_back(*monsterIt);
-                (*monsterIt)->nextSpotId = _spotMap[nextSpotId].nextSpotId[0]; // FIXME:
+                (*monsterIt)->nextSpotId = nextSpotId;
                 (*monsterIt)->deadType = 1;
                 (*monsterIt)->justMoved = true;
 #ifdef DEBUG_CLAN_COPY
@@ -1071,7 +1115,7 @@ void ClanCopy::addWinReward(UInt32 awardValue)
 {
     // 发送胜利奖励
     _clan->addStatueExp(awardValue);
-    Table rewards = GameAction()->GetClanCopyRewards(_copyLevel);
+    Table rewards = GameAction()->GetClanCopyRewards(_copyLevel + 1);
     UInt32 types = rewards.size();
     MailPackage::MailItem *mitem = new MailPackage::MailItem [types];
 
@@ -1240,7 +1284,7 @@ void ClanCopy::notifySpotBattleInfo(Player * player /* = NULL */)
             st << static_cast<UInt32> ((*monsterListIt)->npcId);
             st << static_cast<UInt8> ((*monsterListIt)->monsterType);
             st << static_cast<UInt16> ((*monsterListIt)->npcValue);
-            st << static_cast<UInt8> ((*monsterListIt)->justMoved ? spotId : (*monsterListIt)->nextSpotId);
+            st << static_cast<UInt8> ((*monsterListIt)->nextSpotId);
             st << static_cast<UInt8> ((*monsterListIt)->deadType);
         }
         st << static_cast<UInt8> (_spotBattleInfo[spotId].size());
@@ -1281,6 +1325,7 @@ void ClanCopy::notifyCopyWin(UInt32 awardValue, UInt8 itemTypes, MailPackage::Ma
     st << static_cast<UInt8>(0x02);
     st << static_cast<UInt8>(0x03);
     st << static_cast<UInt32>(awardValue);
+    st << static_cast<UInt32>(GData::clanCopyTable[_copyLevel + 1].expOutput);
     st << static_cast<UInt8>(itemTypes);
     for (UInt8 i = 0; i < itemTypes; ++i)
     {
