@@ -729,8 +729,8 @@ namespace GObject
             _playerData.qqvipl = lvl;
             if(lvl > 8 && lvl < 10)
                 _playerData.qqvipl = 8;
-            else if(lvl > 16 && lvl < 20)
-                _playerData.qqvipl = 16;
+            else if(lvl > 17 && lvl < 20)
+                _playerData.qqvipl = 17;
             else if (lvl > 26 && lvl < 30)
                 _playerData.qqvipl = 26;
             else if (lvl > 38 && lvl < 40)
