@@ -9116,7 +9116,7 @@ namespace GObject
             st << qqvipl << _playerData.qqvipyear << static_cast<UInt8>((_playerData.qqawardgot>>flag) & 0x03);
             UInt8 maxCnt = GObjectManager::getYDMaxCount();
             if(flag == 8)
-                st << static_cast<UInt8>(maxCnt - 2);
+                st << static_cast<UInt8>(maxCnt - 1);
             else if (flag == 16)
                 st << static_cast<UInt8>(maxCnt - 1);
             else
@@ -9129,7 +9129,7 @@ namespace GObject
 
             for(UInt8 i = 0; i < maxCnt; ++ i)
             {
-                if(flag == 8 && (i == 0 || i > 6))
+                if(flag == 8 && (i == 0 || i > 7))
                     continue;
                 if (flag == 16 && i > 6)
                     continue;
