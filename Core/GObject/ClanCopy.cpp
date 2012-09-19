@@ -554,6 +554,11 @@ void ClanCopy::requestStart(Player * player)
 #ifdef DEBUG_CLAN_COPY
     *fileSt << "\"" << player->getName() << "\" start clan copy." << std::endl;
 #endif
+
+    _launchPlayer->clanCopyUdpLog(1131, 0, _playerIndex.size());
+    UInt32 sday = TimeUtil::SharpDay();
+    UInt32 hour = (_startTime - sday) / 3600;
+    _launchPlayer->clanCopyUdpLog(1137, static_cast<UInt8>(hour));
     notifySpotBattleInfo();
 }
 
@@ -1308,6 +1313,7 @@ void ClanCopy::notifyCopyLose()
 {
     // 通知玩家副本失败
 
+    _launchPlayer->clanCopyUdpLog(1134, static_cast<UInt8>(_copyLevel));
     Stream st (REP::CLAN_COPY);
     st << static_cast<UInt8>(0x02);
     st << static_cast<UInt8>(0x04);
@@ -1321,6 +1327,7 @@ void ClanCopy::notifyCopyWin(UInt32 awardValue, UInt8 itemTypes, MailPackage::Ma
 {
     // 通知玩家副本成功
 
+    _launchPlayer->clanCopyUdpLog(1133, static_cast<UInt8>(_copyLevel));
     Stream st (REP::CLAN_COPY);
     st << static_cast<UInt8>(0x02);
     st << static_cast<UInt8>(0x03);

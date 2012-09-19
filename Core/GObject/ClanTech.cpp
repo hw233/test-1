@@ -131,6 +131,26 @@ bool ClanTech::techLevelUp(UInt8 id, UInt8& level, UInt32& extra, UInt32 count)
         case CLAN_TECH_PRACTICE_SLOT:
             practicePlace.addSlotFromTech(_clan->getOwner());
             break;
+        case CLAN_TECH_STATUE:
+            {
+                if (_clan)
+                {
+                    Player *player = _clan->getOwner();
+                    if (player)
+                        player->clanCopyUdpLog(1135, level);
+                }
+            }
+            break;
+        case CLAN_TECH_COPY_LEVEL:
+            {
+                if (_clan)
+                {
+                    Player *player = _clan->getOwner();
+                    if (player)
+                        player->clanCopyUdpLog(1136, level);
+                }
+            }
+            break;
         }
 	}
 	if (r)
