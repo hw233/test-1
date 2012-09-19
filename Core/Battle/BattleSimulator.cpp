@@ -1876,6 +1876,22 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
             case 0x20:
                 {
                     // 虚弱，就是治疗效果减半。。。
+                    if(bo->getTherapyBuff() != 0)  // 去掉以前的buff
+                    {
+                        if (bo->getTherapyBuff() > 0)
+                        {
+                            defList[defCount].damType = e_unTherapyBuff;
+                        }
+                        else
+                        {
+                            defList[defCount].damType = e_UnWeak;
+                        }
+                        defList[defCount].damage = 0;
+                        defList[defCount].pos = bo->getPos() + (activeFlag ? 0 : 25);
+                        defList[defCount].leftHP = bo->getHP();
+                        defCount ++;
+                    }
+
                     defList[defCount].damage = 0;
                     defList[defCount].damType = e_Weak;
                     bo->setTherapyBuff(-0.5f, nStateLast);
@@ -2272,10 +2288,10 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
                             factor = skill->factor[idx];
                         if(((skill->cond != GData::SKILL_ACTIVE && skill->cond != GData::SKILL_PEERLESS) || (rate * factor) > _rnd(10000)))
                         {
+                            doSkillState(bf, skill, bo, defList, defCount, NULL, NULL, scList, scCount);
                             defList[defCount].damage = 0;
                             defList[defCount].pos = pos + (activeFlag ? 0 : 25);
                             defList[defCount].leftHP = bo->getHP();
-                            doSkillState(bf, skill, bo, defList, defCount, NULL, NULL, scList, scCount);
                             defCount ++;
                         }
                         ++ i;
@@ -2290,10 +2306,10 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
                         {
                             std::vector<AttackAct> atkAct2;
                             atkAct2.clear();
+                            doSkillState(bf, skill, bo, defList, defCount, &atkAct2, atkAct, scList, scCount);
                             defList[defCount].damage = 0;
                             defList[defCount].pos = target_pos + (activeFlag ? 0 : 25);
                             defList[defCount].leftHP = bo->getHP();
-                            doSkillState(bf, skill, bo, defList, defCount, &atkAct2, atkAct, scList, scCount);
                             defCount ++;
                             doSkillAtk2(!activeFlag, &atkAct2, defList, defCount, scList, scCount);
                         }
@@ -2312,10 +2328,10 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
                         {
                             std::vector<AttackAct> atkAct2;
                             atkAct2.clear();
+                            doSkillState(bf, skill, bo, defList, defCount, &atkAct2, atkAct, scList, scCount);
                             defList[defCount].damage = 0;
                             defList[defCount].pos = target_pos + (activeFlag ? 0 : 25);
                             defList[defCount].leftHP = bo->getHP();
-                            doSkillState(bf, skill, bo, defList, defCount, &atkAct2, atkAct, scList, scCount);
                             defCount ++;
                             doSkillAtk2(!activeFlag, &atkAct2, defList, defCount, scList, scCount);
                         }
@@ -2331,10 +2347,10 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
                         {
                             std::vector<AttackAct> atkAct2;
                             atkAct2.clear();
+                            doSkillState(bf, skill, bo, defList, defCount, &atkAct2, atkAct, scList, scCount);
                             defList[defCount].damage = 0;
                             defList[defCount].pos = ap[i].pos + (activeFlag ? 0 : 25);
                             defList[defCount].leftHP = bo->getHP();
-                            doSkillState(bf, skill, bo, defList, defCount, &atkAct2, atkAct, scList, scCount);
                             defCount ++;
                             doSkillAtk2(!activeFlag, &atkAct2, defList, defCount, scList, scCount);
                         }
@@ -2553,6 +2569,21 @@ void BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
     case 0x20:
         {
             // 虚弱，就是治疗效果减半。。。
+            if(target_bo->getTherapyBuff() != 0)  // 去掉以前的buff
+            {
+                if (target_bo->getTherapyBuff() > 0)
+                {
+                    defList[defCount].damType = e_unTherapyBuff;
+                }
+                else
+                {
+                    defList[defCount].damType = e_UnWeak;
+                }
+                defList[defCount].damage = 0;
+                defList[defCount].pos = target_bo->getPos();
+                defList[defCount].leftHP = target_bo->getHP();
+                defCount ++;
+            }
             defList[defCount].damage = 0;
             defList[defCount].damType = e_Weak;
             target_bo->setTherapyBuff(-0.5f, skill->last);
@@ -3387,6 +3418,21 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                         continue;
 
                     //defList[defCount].damType = e_neishan;
+                    if(bo->getTherapyBuff() != 0)  // 去掉以前的buff
+                    {
+                        if (bo->getTherapyBuff() > 0)
+                        {
+                            defList[defCount].damType = e_unTherapyBuff;
+                        }
+                        else
+                        {
+                            defList[defCount].damType = e_UnWeak;
+                        }
+                        defList[defCount].damage = 0;
+                        defList[defCount].pos = i;
+                        defList[defCount].leftHP = bo->getHP();
+                        defCount ++;
+                    }
                     defList[defCount].damType = e_Weak;  // 减治疗效果以后就叫e_Weak，增加就是 e_TherapyBuff，e_neishang废除了
                     defList[defCount].damage = 0;
                     defList[defCount].pos = i;
@@ -3664,10 +3710,10 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                         factor = skill->factor[idx];
                     if(((skill->cond != GData::SKILL_ACTIVE && skill->cond != GData::SKILL_PEERLESS) || (rate * factor) > _rnd(10000)))
                     {
+                        doSkillState(bf, skill, bo, defList, defCount, NULL, NULL, scList, scCount);
                         defList[defCount].damage = 0;
                         defList[defCount].pos = pos;
                         defList[defCount].leftHP = bo->getHP();
-                        doSkillState(bf, skill, bo, defList, defCount, NULL, NULL, scList, scCount);
                         defCount ++;
                     }
                     ++ i;
@@ -3682,10 +3728,10 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                     {
                         std::vector<AttackAct> atkAct2;
                         atkAct2.clear();
+                        doSkillState(bf, skill, bo, defList, defCount, &atkAct2, atkAct, scList, scCount);
                         defList[defCount].damage = 0;
                         defList[defCount].pos = target_pos;
                         defList[defCount].leftHP = bo->getHP();
-                        doSkillState(bf, skill, bo, defList, defCount, &atkAct2, atkAct, scList, scCount);
                         defCount ++;
                         doSkillAtk2(false, &atkAct2, defList, defCount, scList, scCount);
                     }
@@ -3722,10 +3768,10 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
 //#endif
                        std::vector<AttackAct> atkAct2;
                        atkAct2.clear();
+                       doSkillState(bf, skill, bo, defList, defCount, &atkAct2, atkAct, scList, scCount);
                        defList[defCount].damage = 0;
                        defList[defCount].pos = ntarpos;
                        defList[defCount].leftHP = bo->getHP();
-                       doSkillState(bf, skill, bo, defList, defCount, &atkAct2, atkAct, scList, scCount);
                        defCount ++;
                        doSkillAtk2(false, &atkAct2, defList, defCount, scList, scCount);
                    }
@@ -3751,10 +3797,10 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                     {
                         std::vector<AttackAct> atkAct2;
                         atkAct2.clear();
+                        doSkillState(bf, skill, bo, defList, defCount, &atkAct2, atkAct, scList, scCount);
                         defList[defCount].damage = 0;
                         defList[defCount].pos = target_pos;
                         defList[defCount].leftHP = bo->getHP();
-                        doSkillState(bf, skill, bo, defList, defCount, &atkAct2, atkAct, scList, scCount);
                         defCount ++;
                         doSkillAtk2(false, &atkAct2, defList, defCount, scList, scCount);
                     }
@@ -3770,10 +3816,10 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                     {
                         std::vector<AttackAct> atkAct2;
                         atkAct2.clear();
+                        doSkillState(bf, skill, bo, defList, defCount, &atkAct2, atkAct, scList, scCount);
                         defList[defCount].damage = 0;
                         defList[defCount].pos = ap[i].pos;
                         defList[defCount].leftHP = bo->getHP();
-                        doSkillState(bf, skill, bo, defList, defCount, &atkAct2, atkAct, scList, scCount);
                         defCount ++;
                         doSkillAtk2(false, &atkAct2, defList, defCount, scList, scCount);
                     }
@@ -7871,6 +7917,22 @@ bool BattleSimulator::doSkillStrengthen_bufTherapy( BattleFighter* bf, const GDa
     if(!bf || !ef || bf->getHP() <= 0)
         return false;
 
+    if(bf->getTherapyBuff() != 0)  // 去掉以前的buff
+    {
+        if (bf->getTherapyBuff() > 0)
+        {
+            defList[defCount].damType = e_unTherapyBuff;
+        }
+        else
+        {
+            defList[defCount].damType = e_UnWeak;
+        }
+        defList[defCount].damage = 0;
+        defList[defCount].pos = bf->getPos() + 25;
+        defList[defCount].leftHP = bf->getHP();
+        defCount ++;
+    }
+
     defList[defCount].damType = e_TherapyBuff;
     defList[defCount].damage = 0;
     defList[defCount].pos = bf->getPos() + 25;
@@ -8158,9 +8220,9 @@ bool BattleSimulator::AddSkillStrengthenState(BattleFighter* pFighter, BattleFig
         return false;
     std::vector<AttackAct> vAttackAct; // 这个存被动技能等造成的更多动作
     vAttackAct.clear();
-    defList[defCount].damage = 0;
-    defList[defCount].pos = pTarget->getPos();
-    defList[defCount].leftHP = pTarget->getHP();
+//     defList[defCount].damage = 0;
+//     defList[defCount].pos = pTarget->getPos();
+//     defList[defCount].leftHP = pTarget->getHP();
     // 下面开始上状态的逻辑
     UInt8 arrayState[3] = {0};
     UInt8 nCount = 0;
@@ -8291,6 +8353,21 @@ bool BattleSimulator::AddSkillStrengthenState(BattleFighter* pFighter, BattleFig
         case 0x20:
             {
                 // 虚弱，就是治疗效果减半。。。
+                if(pTarget->getTherapyBuff() != 0)  // 去掉以前的buff
+                {
+                    if (pTarget->getTherapyBuff() > 0)
+                    {
+                        defList[defCount].damType = e_unTherapyBuff;
+                    }
+                    else
+                    {
+                        defList[defCount].damType = e_UnWeak;
+                    }
+                    defList[defCount].damage = 0;
+                    defList[defCount].pos = pTarget->getPos();
+                    defList[defCount].leftHP = pTarget->getHP();
+                    defCount ++;
+                }
                 defList[defCount].damage = 0;
                 defList[defCount].damType = e_Weak;
                 pTarget->setTherapyBuff(-0.5f, nLast);
@@ -8305,6 +8382,9 @@ bool BattleSimulator::AddSkillStrengthenState(BattleFighter* pFighter, BattleFig
         default:
             break;
     }
+    defList[defCount].damage = 0;
+    defList[defCount].pos = pTarget->getPos();
+    defList[defCount].leftHP = pTarget->getHP();
     defCount ++;
     return true;
 }
