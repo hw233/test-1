@@ -6,7 +6,7 @@ P=kingxin
 PT=3306
 
 DBD=data_jlt
-DBO=asss_jlt
+DBO=asss_s110
 
 OPTIONS="Yes/No/Exit"
 IFS=/
