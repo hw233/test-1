@@ -1,4 +1,4 @@
-#ifndef CLANBATTLE_INC
+ï»¿#ifndef CLANBATTLE_INC
 #define CLANBATTLE_INC
 
 #include "Common/TimeUtil.h"
@@ -43,7 +43,7 @@ struct ClanBattlePlayer
 	UInt16 maxSerailWins;
 	UInt8  southEdurance;
 	UInt8  northEdurance;
-	UInt32 grabAchieve;		//¶ÔÓÚ¶á³ÇÕ½£¬²ÉÓÃ»ı·ÖÖÆ
+	UInt32 grabAchieve;		//å¯¹äºå¤ºåŸæˆ˜ï¼Œé‡‡ç”¨ç§¯åˆ†åˆ¶
 	UInt32 offTime;
 	UInt8  hasEnter;
 	UInt8  hasAttack;
@@ -112,7 +112,7 @@ struct ClanBattleHold
 	bool existBattler(ClanBattlePlayer *);
 	ClanBattlePlayer * getBattler(Player *);
 	ClanBattlePlayer * getBattler(const std::string&);
-	void changeBattlerStatus(ClanBattlePlayer *, UInt8, bool = true);	//ÔÚÍ¬Ò»¾İµã¸Ä±ä×´Ì¬
+	void changeBattlerStatus(ClanBattlePlayer *, UInt8, bool = true);	//åœ¨åŒä¸€æ®ç‚¹æ”¹å˜çŠ¶æ€
 	void clear();
 
 	inline UInt16 size() { return static_cast<UInt16>(battlers.size()); }
@@ -279,11 +279,11 @@ protected:
 	UInt8	_nextBattleTime;
 
 	UInt8	_hasBattle;
-	UInt8	_isInbattling; // 0:Î´¿ªÆô 1:¿ªÆô 2:½áÊø (Õë¶ÔÒ»Ìì¶øÑÔ) 0xFF:²»¿ª·Å
+	UInt8	_isInbattling; // 0:æœªå¼€å¯ 1:å¼€å¯ 2:ç»“æŸ (é’ˆå¯¹ä¸€å¤©è€Œè¨€) 0xFF:ä¸å¼€æ”¾
 	UInt8	_isOldInBattling;
 	bool	_isInAttacking;
 
-	ClanBattleHold _holds[4];	// 0xF001:×Úìô 0xF002:ÄÏÃÅ 0xF003:±±ÃÅ 0xF004:¸´»îµã
+	ClanBattleHold _holds[4];	// 0xF001:å®—ç¥  0xF002:å—é—¨ 0xF003:åŒ—é—¨ 0xF004:å¤æ´»ç‚¹
 	bool _firstAttack[2];
 	std::map<Player *, ClanBattlePlayer *> _clanBattlePlayerLocs;
 	std::set<ClanBattlePlayer *> _recoverClanBattlers;
@@ -439,7 +439,7 @@ private:
 
 private:
 	//static const UInt8 _battleTime = 39;
-	UInt8  _status;	//×´Ì¬ 0: ÇÀ¶áÕ½ 1: ÊØ³ÇÕ½  0xFF: Î´¿ª·Å×´Ì¬(¹Ø±Õ×´Ì¬)
+	UInt8  _status;	//çŠ¶æ€ 0: æŠ¢å¤ºæˆ˜ 1: å®ˆåŸæˆ˜  0xFF: æœªå¼€æ”¾çŠ¶æ€(å…³é—­çŠ¶æ€)
 	std::string _heroClanName;
 	UInt32 _heroClanId;
 	UInt8 _heroClanLev;

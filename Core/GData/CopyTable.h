@@ -1,4 +1,4 @@
-
+﻿
 #ifndef COPYTABLE_H_
 #define COPYTABLE_H_
 

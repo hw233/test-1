@@ -1,4 +1,4 @@
-#ifndef CLANLVLTABLE_H_
+﻿#ifndef CLANLVLTABLE_H_
 #define CLANLVLTABLE_H_
 
 #include "Server/ServerTypes.h"

@@ -1,4 +1,4 @@
-#include "Config.h"
+﻿#include "Config.h"
 
 #include "Common/Stream.h"
 #include "Player.h"
@@ -54,7 +54,7 @@ void ClanStatue::updateLevel(UInt32 exp, UInt32 expUpdateTime, UInt16 maxLevel)
         _exp = static_cast<UInt32>(bigExp);
     _level = 0;
 
-    for (std::vector<GData::ClanStatueTableData>::iterator it = GData::clanStatueTable.begin(); 
+    for (std::vector<GData::ClanStatueTableData>::iterator it = GData::clanStatueTable.begin();
             it != GData::clanStatueTable.end(); ++it)
     {
         if (_exp < it->needExp)
@@ -99,7 +99,7 @@ void ClanStatue::addExp(UInt32 exp, UInt16 maxLevel)
     UInt16 formalLevel = _level;
     _exp += exp;
     _level = 0;
-    for (std::vector<GData::ClanStatueTableData>::iterator it = GData::clanStatueTable.begin(); 
+    for (std::vector<GData::ClanStatueTableData>::iterator it = GData::clanStatueTable.begin();
             it != GData::clanStatueTable.end(); ++it)
     {
         if (_exp < it->needExp)
@@ -147,7 +147,7 @@ void ClanStatue::subExp(UInt32 exp, UInt16 maxLevel)
     else
         _exp -= exp;
     _level = 0;
-    for (std::vector<GData::ClanStatueTableData>::iterator it = GData::clanStatueTable.begin(); 
+    for (std::vector<GData::ClanStatueTableData>::iterator it = GData::clanStatueTable.begin();
             it != GData::clanStatueTable.end(); ++it)
     {
         if (_exp < it->needExp)
@@ -211,7 +211,7 @@ UInt32 ClanStatue::getShownExp()
 UInt32 ClanStatue::getShownNextExp()
 {
     // 返回客户端实际显示需要的下一级的exp
-    
+
     if (!_level)
         return GData::clanStatueTable[2].needExp;
     else
@@ -219,7 +219,7 @@ UInt32 ClanStatue::getShownNextExp()
         UInt32 maxLevel = GData::clanStatueTable.size() - 2;
         if (_level < maxLevel)
             return GData::clanStatueTable[_level + 1].needExp - GData::clanStatueTable[_level].needExp;
-        else 
+        else
             return 0;
     }
 }

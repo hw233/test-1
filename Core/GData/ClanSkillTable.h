@@ -1,4 +1,4 @@
-#ifndef CLANSKILLTABLE_INC
+﻿#ifndef CLANSKILLTABLE_INC
 #define CLANSKILLTABLE_INC
 
 #include <string>
