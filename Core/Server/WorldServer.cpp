@@ -24,16 +24,11 @@
 #include "GObject/Tianjie.h"
 const char* s_HelpInfo = "";
 //////////////////////////////////////////////////////////////////////////
-WorldServer::WorldServer() : m_IsActive(false)
-#ifndef _WIN32
-	, curl(NULL)
-#endif
+WorldServer::WorldServer() : m_IsActive(false), curl(NULL)
 {
 	memset(m_AllWorker, 0x00, sizeof(m_AllWorker));
 	m_TcpService = NULL;
-#ifndef _WIN32
     curl = curl_easy_init();
-#endif
 }
 
 WorldServer::~WorldServer()
@@ -43,9 +38,7 @@ WorldServer::~WorldServer()
 		delete m_AllWorker[i];
 	}
 	//delete m_TcpService;
-#ifndef _WIN32
     if (curl) curl_easy_cleanup(curl);
-#endif
 }
 
 bool WorldServer::ParseCommandInfor(Int32 argc, char * argv[])
@@ -329,7 +322,6 @@ static int recvret(char* data, size_t size, size_t nmemb, char* buf)
 
 void WorldServer::State(const char* action, int serverNum)
 {
-#ifndef _WIN32
     if (!curl || !action || !serverNum)
         return;
     char url[4096] = {0};
@@ -353,7 +345,6 @@ void WorldServer::State(const char* action, int serverNum)
     {
         fprintf(stderr, "URL: %s [ERROR]\n", url);
     }
-#endif
 }
 
 void WorldServer::Up()
