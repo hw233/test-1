@@ -1154,6 +1154,11 @@ namespace GObject
         }
     }
 
+    void Player::luaUdpLog(const char* str1, const char* str2, const char* type)
+    {
+        udpLog(str1, str2, "", "", "", "", type);
+    }
+
     void Player::guideUdp(UInt8 type, std::string& p1, std::string& p2)
     {
         if (type == 0)
