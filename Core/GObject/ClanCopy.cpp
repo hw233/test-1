@@ -6,11 +6,13 @@
 #include "Common/Stream.h"
 #include "Country.h"
 #include "Script/GameActionLua.h"
+#include "Server/SysMsg.h"
 
 
 namespace GObject
 {
 
+//SYSMSG_BROADCASTV(2337, pl->getCountry(), pl->getName().c_str(), level);
 
 
 
@@ -64,9 +66,11 @@ ClanCopy::ClanCopy(Clan *c, UInt32 copyId, Player * player) : _clan(c), _copyId 
 
 ClanCopy::~ClanCopy()
 {
+    _clan->clearCopySnap();
     for (std::map<Player *, UInt8>::iterator it = _playerIndex.begin(); it != _playerIndex.end(); ++ it)
     {
         it->first->regenAll();
+        _clan->insertIntoCopySnap(it->first, it->second);
     }
     for (SpotMonster::iterator it = _spotMonster.begin(); it != _spotMonster.end(); ++it)
     {
@@ -124,6 +128,28 @@ void ClanCopy::addPlayer(Player * player, bool needNotify /* = true */)
 #endif
         _observerPlayer.erase(obIt);
     }
+
+    // 先寻找上次副本结束时快照，来快速将玩家放入历史据点
+
+    if (UInt8 spotId = _clan->getCopyPlayerSnap(player))
+    {
+        if (_spotPlayer[spotId].size() < _spotMap[spotId].maxPlayerCount)
+        {
+            // 加入某一据点的玩家列表中
+            _spotPlayer[spotId].push_back(ClanCopyPlayer(player));
+            _playerIndex.insert(std::make_pair(player, spotId));
+            updateSpotBufferValue(spotId);
+#ifdef DEBUG_CLAN_COPY
+            *fileSt << "\"" << player->getName() << "\" change to spot(" << (UInt32) spotId << ")." << std::endl;
+#endif
+            if (needNotify)
+            {
+                notifySpotPlayerInfo();
+            }
+            return;
+        }
+    }
+
     for (SpotMap::iterator mapIt = _spotMap.begin(); mapIt != _spotMap.end(); ++mapIt)
     {
         //一个一个据点的找空位置
@@ -613,8 +639,8 @@ void ClanCopy::process(UInt32 now)
         {
             _clan->addCopyWinLog(_launchPlayer);
             UInt32 awardValue = static_cast<UInt32> (static_cast<float>(_homeHp) / _homeMaxHp * _maxReward);
-            addWinReward(awardValue);
             notifySpotBattleInfo();
+            addWinReward(awardValue);
             _clan->addCopyLevel();
             _status = CLAN_COPY_OVER;
             return;
@@ -1324,6 +1350,9 @@ void ClanCopy::notifyCopyLose()
 
     notifyAll(st);
     notifyWaitForWin(st);
+    Stream st2;
+    SYSMSGVP(st2, 807, _launchPlayer->getName().c_str());
+    _clan->broadcast(st2);
 }
 
 void ClanCopy::notifyCopyWin(UInt32 awardValue, UInt8 itemTypes, MailPackage::MailItem *mitem)
@@ -1603,6 +1632,11 @@ bool ClanCopyMgr::createClanCopy(Player* player, Clan *c)
     copy->addPlayerFromSpot(c);
     c->broadcastCopyInfo();
     c->notifyCopyCreated(player);
+
+    Stream st;
+    SYSMSGVP(st, 806, player->getName().c_str());
+    c->broadcast(st);
+
     return true;
 }
 

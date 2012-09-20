@@ -525,6 +525,11 @@ public:
 
     void   setCopyLevel(UInt16 level);
 
+    void   clearCopySnap();
+    void   insertIntoCopySnap(Player *player, UInt8 spotId);
+    UInt8  getCopyPlayerSnap(Player *player);
+
+
 public:
 
     inline Player * getOwner()
@@ -621,6 +626,7 @@ private:
     UInt32 _copyMaxTime;
 
     std::list<ClanCopyLog> _copyLog;
+    std::map<Player *, UInt8> _copySpotSnap;
 
 	bool _deleted;
 	std::vector<std::string> _keywords;

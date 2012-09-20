@@ -27,6 +27,7 @@
 #include "HeroMemo.h"
 #include "ClanStatue.h"
 #include "ClanCopy.h"
+#include "GVar.h"
 
 #include "GObject/AthleticsRank.h"
 #include <mysql.h>
@@ -4048,6 +4049,11 @@ void   Clan::addCopyLevel()
         _copyMaxLevel = _copyLevel >= _copyMaxLevel ? _copyLevel : _copyMaxLevel;
         _copyMaxTime = _copyLevel >= _copyMaxLevel ? TimeUtil::Now() : _copyMaxTime;
         DB5().PushUpdateData("REPLACE INTO `clan_copy` (`clanId`, `level`, `levelUpdateTime`, `maxCopyLevel`, `maxCopyTime`) VALUES (%u, %u, %u, %u, %u)", _id, _copyLevel, TimeUtil::Now(), _copyMaxLevel, _copyMaxTime);
+        if (GVAR.GetVar(GVAR_CLANCOPYPASS) < _copyLevel)
+        {
+            GVAR.SetVar(GVAR_CLANCOPYPASS, _copyLevel);
+			SYSMSG_BROADCASTV(805, _name.c_str(), _copyLevel);
+        }
     }
 }
 
@@ -4113,6 +4119,24 @@ void    Clan::setCopyLevel(UInt16 level)
     _copyLevel = level;
 }
 
+void    Clan::clearCopySnap()
+{
+    _copySpotSnap.clear();
+}
+
+void    Clan::insertIntoCopySnap(Player *player, UInt8 spotId)
+{
+    _copySpotSnap.insert(std::make_pair(player, spotId));
+}
+
+UInt8   Clan::getCopyPlayerSnap(Player *player)
+{
+    if (_copySpotSnap.find(player) != _copySpotSnap.end())
+    {
+        return _copySpotSnap[player];
+    }
+    return 0;
+}
 
 // 帮派副本
 //////////////////////////////////////////
