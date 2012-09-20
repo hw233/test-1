@@ -555,7 +555,10 @@ void ClanCopy::requestStart(Player * player)
     *fileSt << "\"" << player->getName() << "\" start clan copy." << std::endl;
 #endif
 
-    _launchPlayer->clanCopyUdpLog(1131, 0, _playerIndex.size());
+    for (std::map<Player*, UInt8>::iterator it = _playerIndex.begin(); it != _playerIndex.end(); ++ it)
+    {
+        it->first->clanCopyUdpLog(1131);
+    }
     UInt32 sday = TimeUtil::SharpDay();
     UInt32 hour = (_startTime - sday) / 3600;
     _launchPlayer->clanCopyUdpLog(1137, static_cast<UInt8>(hour));
