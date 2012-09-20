@@ -9,9 +9,7 @@
 #include "Login/LoginWorker.h"
 #include "WorkerThread.h"
 
-#ifndef _WIN32
 #include <curl/curl.h>
-#endif
 
 extern const char* s_HelpInfo;
 
@@ -87,9 +85,7 @@ public:
     void State(const char* action, int serverNum);
 
 private:
-#ifndef _WIN32
     CURL* curl;
-#endif
 };
 
 #define SERVER()		WorldServer::Instance()

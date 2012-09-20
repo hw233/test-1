@@ -13317,6 +13317,11 @@ void EventTlzAuto::notify(bool isBeginAuto)
         DB1().PushUpdateData("UPDATE `qixi` SET `bind`=0, `lover`=0 WHERE `playerId` = %"I64_FMT"u", getId());
     }
 
+    ///////////////////////////////////////////////
+    // 帮派副本相关
+
+    // 帮派副本相关
+    ///////////////////////////////////////////////
     void Player::postKillMonsterRoamResult(UInt32 pos, UInt8 curType, UInt8 curCount, UInt8 tips)
     {
         struct _Roam

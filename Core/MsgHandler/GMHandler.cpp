@@ -35,6 +35,8 @@
 #include "GObject/HeroMemo.h"
 #include "MsgHandler/JsonParser.h"
 #include "GObject/LuckyDraw.h"
+#include "GObject/ClanCopy.h"
+
 #include "GObject/Tianjie.h"
 #include "GObject/ClanCopy.h"
 
@@ -2928,22 +2930,6 @@ void GMHandler::OnClearCFT(GObject::Player* player, std::vector<std::string>& ar
     player->sendDailyInfo();
 }
 
-void GMHandler::OnTj3(GObject::Player* player, std::vector<std::string>& args)
-{
-	if(args.size() < 1)
-		return;
-    int tlzLevelCount = atoi(args[0].c_str());
-    GObject::Tianjie::instance().setTj3Count(tlzLevelCount);
-}
-
-void GMHandler::OnTj4(GObject::Player* player, std::vector<std::string>& args)
-{
-	if(args.size() < 1)
-		return;
-    int bossMaxHp = atoi(args[0].c_str());
-    GObject::Tianjie::instance().setTj4BossHp(bossMaxHp);
-}
-
 void GMHandler::OnStatueExp(GObject::Player* player, std::vector<std::string>& args)
 {
     if(args.empty())
@@ -2984,5 +2970,21 @@ void GMHandler::OnSetClanCopyTime(GObject::Player* player, std::vector<std::stri
         else
             player->setClanCopyTime(static_cast<UInt32>(copyTime));
     }
+}
+
+void GMHandler::OnTj3(GObject::Player* player, std::vector<std::string>& args)
+{
+	if(args.size() < 1)
+		return;
+    int tlzLevelCount = atoi(args[0].c_str());
+    GObject::Tianjie::instance().setTj3Count(tlzLevelCount);
+}
+
+void GMHandler::OnTj4(GObject::Player* player, std::vector<std::string>& args)
+{
+	if(args.size() < 1)
+		return;
+    int bossMaxHp = atoi(args[0].c_str());
+    GObject::Tianjie::instance().setTj4BossHp(bossMaxHp);
 }
 

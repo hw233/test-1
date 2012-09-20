@@ -69,7 +69,6 @@ private:
     static void ClanCopyResetBegin(void *);
     static void ClanCopyReset(void *);
     static void ClanCopyResetEnd(void *);
-
 private:
 	UInt8		m_ThreadID;					//?????߳?
 

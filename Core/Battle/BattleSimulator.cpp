@@ -1361,15 +1361,14 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
             ++ defCount;
         }
 
-        if (dmg > 0)  // 一次有效的物理攻击，减少上次吸收的物理伤害和被减掉的伤害
+        // 一次有效的法术攻击，减少法术特殊加成效果和被减掉的效果
+        // 一次有效的物理攻击，减少上次吸收的物理伤害和被减掉的伤害
+        if (dmg > 0 || magdmg > 0)
         {
             if (bf->getAtkSpecialLast() > 0)
                 ReduceSpecialAttrLast(bf, e_ss_Atk, 1, scList, scCount);
             if (bf->getAtkDecSpecialLast() > 0)
                 ReduceSpecialAttrLast(bf, e_ss_DecAtk, 1, scList, scCount);
-        }
-        if (magdmg > 0)  // 一次有效的法术攻击，减少法术特殊加成效果和被减掉的效果
-        {
             if (bf->getMagAtkSpecialLast() > 0)
                 ReduceSpecialAttrLast(bf, e_ss_MagAtk, 1, scList, scCount);
             if (bf->getMagAtkDecSpecialLast() > 0 )
@@ -4468,7 +4467,7 @@ bool BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GD
                     //continue;
 
                 fighter = static_cast<BattleFighter*>(this_side_obj[i]);
-                if(fighter && fighter->getHP() > 0 && fighter->getAttack()>maxatk)
+                if(fighter && fighter->getHP() > 0 && (fighter->getAttack()+fighter->getMagAttack()) >maxatk)
                 {
                     maxatk = fighter->getAttack() + fighter->getMagAttack();
                     maxatk_pos = i;
@@ -6352,6 +6351,32 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo, DefStatus* defL
         // remove from action queue
         BattleFighter* toremove = static_cast<BattleFighter *>(bo);
         removeFighterStatus(toremove);
+
+        int idx = 0;
+        for(idx = 0; idx < _onTherapy.size(); ++ idx)
+        {
+            if(_onTherapy[idx] == toremove)
+            {
+                _onTherapy.erase(_onTherapy.begin() + idx);
+                break;
+            }
+        }
+        for(idx = 0; idx < _onSkillDmg.size(); ++ idx)
+        {
+            if(_onSkillDmg[idx] == toremove)
+            {
+                _onSkillDmg.erase(_onSkillDmg.begin() + idx);
+                break;
+            }
+        }
+        for(idx = 0; idx < _onOtherDead.size(); ++ idx)
+        {
+            if(_onOtherDead[idx] == toremove)
+            {
+                _onOtherDead.erase(_onOtherDead.begin() + idx);
+                break;
+            }
+        }
 
         // re-test winner
         _winner = testWinner();
