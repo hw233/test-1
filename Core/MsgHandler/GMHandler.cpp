@@ -198,7 +198,7 @@ GMHandler::GMHandler()
 
     Reg(3, "statue", &GMHandler::OnStatueExp);
     Reg(3, "setcopy", &GMHandler::OnSetClanCopyLevel);
-    Reg(3, "setcopytime", &GMHandler::OnSetClanCopyTime);
+    Reg(3, "setcopytm", &GMHandler::OnSetClanCopyTime);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
