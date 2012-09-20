@@ -55,9 +55,6 @@ MSG_REG(GameMsgHdr, OnArenaInfoReq);
 MSG_REG(GameMsgHdr, OnArenaLeaderBoardReq);
 MSG_REG_2(GameMsgHdr, REQ::SERVER_ARENA_OP, OnArenaOpReq);
 
-MSG_REG_2(GameMsgHdr, REQ::CLAN_COPY, OnClanCopyReq);
-
-
 MSG_REG_2(GameMsgHdr, REQ::ACTIVE, OnQixiReq);
 
 MSG_REG_2(GameMsgHdr, REQ::TOWN_DEAMON, OnTownDeamonReq);

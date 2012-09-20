@@ -3624,6 +3624,7 @@ void Clan::updateStatueExp()
 void Clan::resetCopyLevel()
 {
     // 帮派副本等级下降五级
+    Mutex::ScopedLock lk(_mutex);
     ClanCopy * clanCopy = ClanCopyMgr::Instance().getClanCopyByClan(this);
     if (clanCopy)
     {
@@ -3651,16 +3652,19 @@ void Clan::resetCopyLevel()
 
 UInt16 Clan::getStatueLevel()
 {
+    Mutex::ScopedLock lk(_mutex);
     return _statue->getLevel();
 }
 
 UInt32 Clan::getStatueExp()
 {
+    Mutex::ScopedLock lk(_mutex);
     return _statue->getShownExp();
 }
 
 UInt32 Clan::getStatueNextExp()
 {
+    Mutex::ScopedLock lk(_mutex);
     return _statue->getShownNextExp();
 }
 
