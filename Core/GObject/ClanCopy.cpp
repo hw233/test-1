@@ -1,4 +1,4 @@
-#include "ClanCopy.h"
+﻿#include "ClanCopy.h"
 #include "Clan.h"
 #include "MsgID.h"
 #include "GData/ClanCopyTable.h"
@@ -422,7 +422,7 @@ void ClanCopy::adjustPlayerPosition(Player * opPlayer, Player* player, UInt8 old
     if (_status != CLAN_COPY_READY)
         return;
 #ifdef DEBUG_CLAN_COPY
-    *fileSt << "Operater : " << opPlayer->getName() << "."  << std::endl; 
+    *fileSt << "Operater : " << opPlayer->getName() << "."  << std::endl;
     *fileSt << "Move player \"" << player->getName() << "\" from (" << (UInt32) oldSpotId << ", " << (UInt32) oldPosition << ") \
         to (" << (UInt32) newSpotId << ", " << (UInt32) newPosition << ")." << std::endl;
 #endif
@@ -555,7 +555,10 @@ void ClanCopy::requestStart(Player * player)
     *fileSt << "\"" << player->getName() << "\" start clan copy." << std::endl;
 #endif
 
-    _launchPlayer->clanCopyUdpLog(1131, 0, _playerIndex.size());
+    for (std::map<Player*, UInt8>::iterator it = _playerIndex.begin(); it != _playerIndex.end(); ++ it)
+    {
+        it->first->clanCopyUdpLog(1131);
+    }
     UInt32 sday = TimeUtil::SharpDay();
     UInt32 hour = (_startTime - sday) / 3600;
     _launchPlayer->clanCopyUdpLog(1137, static_cast<UInt8>(hour));
@@ -582,8 +585,8 @@ void ClanCopy::process(UInt32 now)
     _tickTime = now;
 
 #ifdef DEBUG_CLAN_COPY
-    *fileSt << "process (" << ++ count << ") start: " << std::endl; 
-    *fileSt << "status = " << (UInt32)_status << "." << std::endl; 
+    *fileSt << "process (" << ++ count << ") start: " << std::endl;
+    *fileSt << "status = " << (UInt32)_status << "." << std::endl;
 #endif
 
     for (SpotMap::reverse_iterator rit = _spotMap.rbegin(); rit != _spotMap.rend(); ++rit)
@@ -620,9 +623,9 @@ void ClanCopy::process(UInt32 now)
     notifySpotBattleInfo();
     ++_tickCount;
 #ifdef DEBUG_CLAN_COPY
-    *fileSt << "tickCount = " << _tickCount << std::endl; 
-    *fileSt << "process (" << count << ") end: " << std::endl; 
-    *fileSt << "status = " << (UInt32)_status << "." << std::endl << std::endl; 
+    *fileSt << "tickCount = " << _tickCount << std::endl;
+    *fileSt << "process (" << count << ") end: " << std::endl;
+    *fileSt << "status = " << (UInt32)_status << "." << std::endl << std::endl;
 #endif
 }
 
@@ -658,7 +661,7 @@ void ClanCopy::enemyBaseAct()
 
 void ClanCopy::createEnemy()
 {
-    // 敌人老巢产生敌人 
+    // 敌人老巢产生敌人
     UInt32 key = (((static_cast<UInt32>(_copyLevel)) << 16) | _curMonsterWave) << 8;
     UInt8 routeCount = _spotMap[Enemy_Base].nextSpotId.size();
     UInt8 routeBit = 0;  // 路径bit图
@@ -690,7 +693,7 @@ void ClanCopy::createEnemy()
 
     // 如果这里配置表出错，怪物大于剩余的空余路数，那就不知道会出现什么错误
     UInt8 count = GData::clanCopyMonsterMap.count(key);
-    
+
     while (it != endIt)
     {
         // 随机在一路产生怪物
@@ -771,7 +774,7 @@ void ClanCopy::spotCombat(UInt8 spotId)
     *fileSt << "SpotCombat (" << (UInt32)spotId <<") ." << std::endl;
 #endif
     SpotPlayerList::iterator playerIt = _spotPlayer[spotId].begin();
-    SpotMonsterList::iterator monsterIt = _spotMonster[spotId].begin(); 
+    SpotMonsterList::iterator monsterIt = _spotMonster[spotId].begin();
     UInt8 count = 0;
 
     bool flag = false;// 是否有新怪物达到，需要冲阵的标志位
@@ -911,7 +914,7 @@ void ClanCopy::spotCombat(UInt8 spotId)
                     }
                 }
                 _spotBattleInfo[spotId].push_back(
-                        ClanCopyBattleInfo(playerIt->player->getId(), (*monsterIt)->npcIndex, res, 
+                        ClanCopyBattleInfo(playerIt->player->getId(), (*monsterIt)->npcIndex, res,
                             res?playerIt->player->allHpP():(*monsterIt)->allHpP()));
 #ifdef DEBUG_CLAN_COPY
                 if (!res)
@@ -1206,7 +1209,7 @@ void ClanCopy::notifySpotPlayerInfo(Player * player /* = NULL */)
 
         st << static_cast<UInt8> (_spotPlayer[spotId].size() + _spotDeadPlayer[spotId].size());
         UInt8 i = 0;
-        for (SpotPlayerList::iterator playerListIt = _spotPlayer[spotId].begin(); 
+        for (SpotPlayerList::iterator playerListIt = _spotPlayer[spotId].begin();
                 playerListIt != _spotPlayer[spotId].end();++ i, ++ playerListIt)
         {
             // 据点内每个活玩家的信息
@@ -1215,7 +1218,7 @@ void ClanCopy::notifySpotPlayerInfo(Player * player /* = NULL */)
             st << playerListIt->player->getName();
             st << static_cast<UInt8> (playerListIt->player->GetLev());
         }
-        for (SpotPlayerList::iterator playerDeadListIt =  _spotDeadPlayer[spotId].begin(); 
+        for (SpotPlayerList::iterator playerDeadListIt =  _spotDeadPlayer[spotId].begin();
                 playerDeadListIt != _spotDeadPlayer[spotId].end();++ i, ++ playerDeadListIt)
         {
             // 据点内每个死/逃跑玩家的信息
@@ -1265,7 +1268,7 @@ void ClanCopy::notifySpotBattleInfo(Player * player /* = NULL */)
 
         UInt8 i = 0;
         st << static_cast<UInt8> (_spotPlayer[spotId].size() + _spotDeadPlayer[spotId].size());
-        for (SpotPlayerList::iterator playerListIt =  _spotPlayer[spotId].begin(); 
+        for (SpotPlayerList::iterator playerListIt =  _spotPlayer[spotId].begin();
                 playerListIt != _spotPlayer[spotId].end();++ i, ++ playerListIt)
         {
             // 据点内每个活玩家的信息
@@ -1274,7 +1277,7 @@ void ClanCopy::notifySpotBattleInfo(Player * player /* = NULL */)
             st << static_cast<UInt8> (playerListIt->deadType);
         }
 
-        for (SpotPlayerList::iterator playerDeadListIt = _spotDeadPlayer[spotId].begin(); 
+        for (SpotPlayerList::iterator playerDeadListIt = _spotDeadPlayer[spotId].begin();
                 playerDeadListIt != _spotDeadPlayer[spotId].end();++ i, ++ playerDeadListIt)
         {
             // 据点内每个死/逃跑玩家的信息
@@ -1456,7 +1459,7 @@ ClanCopyMgr::ClanCopyMgr()
 }
 
 ClanCopyMgr::~ClanCopyMgr()
-{   
+{
 
 }
 
@@ -1527,7 +1530,7 @@ void ClanCopyMgr::process(UInt32 now)
 }
 
 void ClanCopyMgr::forceEndAllClanCopy()
-{ 
+{
     for (ClanCopyMap::iterator it = _clanCopyMap.begin(); it != _clanCopyMap.end();)
     {
         forceEndClanCopy(it->second);
@@ -1663,7 +1666,7 @@ void ClanCopyMgr::playerLeave(Player * player)
 
 void ClanCopyMgr::playerRequestStart(Player * player)
 {
-    // 玩家请求开始副本 
+    // 玩家请求开始副本
     if(player->getLocation() != CLAN_COPY_LOCATION) return;
 
     Clan* clan = player->getClan();

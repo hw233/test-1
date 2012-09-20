@@ -1,4 +1,4 @@
-#ifndef _CLANASSISTANTDATA_H_
+﻿#ifndef _CLANASSISTANTDATA_H_
 #define _CLANASSISTANTDATA_H_
 
 #include "ObjectManager.h"

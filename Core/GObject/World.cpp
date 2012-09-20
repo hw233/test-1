@@ -1,4 +1,4 @@
-#include "Config.h"
+﻿#include "Config.h"
 #include "World.h"
 #include "Leaderboard.h"
 #include "ClanManager.h"
@@ -955,7 +955,7 @@ void World::ClanStatueCheck(void *)
                 clan->updateStatueExp();
                 return true;
             }
-            
+
     };
     UpdateStatueVisitor visitor;
     globalClans.enumerate(visitor);
@@ -980,7 +980,7 @@ bool World::Init()
 {
 	GObject::Tianjie::instance().Init();
 	AddTimer(5 * 1000, Tianjie_Refresh, static_cast<void*>(NULL));
-	
+
 	GObjectManager::delayLoad();
 	GObjectManager::LoadPracticeData();
 	GObjectManager::LoadTripodData();

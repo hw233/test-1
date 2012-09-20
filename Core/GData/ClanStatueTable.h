@@ -1,4 +1,4 @@
-#ifndef _CLAN_STATUE_TABLE_H_
+﻿#ifndef _CLAN_STATUE_TABLE_H_
 #define _CLAN_STATUE_TABLE_H_
 
 #include "Config.h"
@@ -12,8 +12,8 @@ struct ClanStatueTableData
             UInt32 exHp = 0, UInt32 exAttack = 0, UInt32 exDefend = 0,
             UInt32 exMagAtk = 0, UInt32 exMagDef = 0,
             UInt32 exAction = 0, UInt32 exHitRate =0)
-        : level(level), needExp(needExp), consumeExp(consumeExp), 
-        exHp(exHp), exAttack(exAttack), exDefend(exDefend), 
+        : level(level), needExp(needExp), consumeExp(consumeExp),
+        exHp(exHp), exAttack(exAttack), exDefend(exDefend),
         exMagAtk(exMagAtk), exMagDef(exMagDef), exAction(exAction), exHitRate(exHitRate)
     {
     }
@@ -23,13 +23,13 @@ struct ClanStatueTableData
         level      = cstd.level;
         needExp    = cstd.needExp;
         consumeExp = cstd.consumeExp;
-        exHp       = cstd.exHp;      
-        exAttack   = cstd.exAttack;  
-        exDefend   = cstd.exDefend;  
-        exMagAtk   = cstd.exMagAtk;  
-        exMagDef   = cstd.exMagDef;  
-        exAction   = cstd.exAction;  
-        exHitRate  = cstd.exHitRate; 
+        exHp       = cstd.exHp;
+        exAttack   = cstd.exAttack;
+        exDefend   = cstd.exDefend;
+        exMagAtk   = cstd.exMagAtk;
+        exMagDef   = cstd.exMagDef;
+        exAction   = cstd.exAction;
+        exHitRate  = cstd.exHitRate;
     }
 
     ClanStatueTableData& operator= (const ClanStatueTableData& cstd)
@@ -37,13 +37,13 @@ struct ClanStatueTableData
         level      = cstd.level;
         needExp    = cstd.needExp;
         consumeExp = cstd.consumeExp;
-        exHp       = cstd.exHp;      
-        exAttack   = cstd.exAttack;  
-        exDefend   = cstd.exDefend;  
-        exMagAtk   = cstd.exMagAtk;  
-        exMagDef   = cstd.exMagDef;  
-        exAction   = cstd.exAction;  
-        exHitRate  = cstd.exHitRate; 
+        exHp       = cstd.exHp;
+        exAttack   = cstd.exAttack;
+        exDefend   = cstd.exDefend;
+        exMagAtk   = cstd.exMagAtk;
+        exMagDef   = cstd.exMagDef;
+        exAction   = cstd.exAction;
+        exHitRate  = cstd.exHitRate;
         return *this;
     }
 
