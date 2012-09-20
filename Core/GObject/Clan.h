@@ -1,4 +1,4 @@
-#ifndef _CLAN_H_
+﻿#ifndef _CLAN_H_
 #define _CLAN_H_
 
 #include <set>

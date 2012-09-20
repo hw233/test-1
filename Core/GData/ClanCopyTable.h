@@ -1,4 +1,4 @@
-#ifndef _CLAN_COPY_TABLE_
+﻿#ifndef _CLAN_COPY_TABLE_
 #define _CLAN_COPY_TABLE_
 
 namespace GData
@@ -63,7 +63,7 @@ struct ClanCopyData
 
     ClanCopyData(UInt16 level, UInt32 expOutput, UInt16 maxWaveCount,
             UInt16 minPlayer, UInt16 maxPlayer, UInt8 spotMaxPlayer, UInt32 homeHp, UInt32 maxReward)
-        : level(level), expOutput(expOutput), maxWaveCount(maxWaveCount), 
+        : level(level), expOutput(expOutput), maxWaveCount(maxWaveCount),
         minPlayer(minPlayer), maxPlayer(maxPlayer), spotMaxPlayer(spotMaxPlayer),
         homeHp(homeHp), maxReward(maxReward)
     {
@@ -71,7 +71,7 @@ struct ClanCopyData
     ClanCopyData():level(0), expOutput(0), maxWaveCount(0), minPlayer(0), maxPlayer(0), spotMaxPlayer(0), homeHp(0), maxReward(0)
     {
     }
-    
+
 };
 
 typedef std::vector<ClanCopyData> ClanCopyTable;
@@ -88,7 +88,7 @@ struct ClanCopyMonsterData
     UInt16 appearRound;        // 生产该怪的波数
     UInt32 npcId;              // 怪物npcGroupId
     UInt8  npcCount;           // 每一路怪物的数量
-    UInt8  npcRouteIndex;      // 出现的路数 
+    UInt8  npcRouteIndex;      // 出现的路数
     UInt16 npcValue;           // 怪物对主基地的破坏值
     UInt8  monsterType;        // 怪物类型（普通怪 ，精英怪，boss）
 };

@@ -194,8 +194,10 @@ copy $(ProjectDir)..\lib3rd\bin\libcurl.dll $(TargetDir)</Command>
     <ClCompile Include="..\Core\GData\Area.cpp" />
     <ClCompile Include="..\Core\GData\CittaTable.cpp" />
     <ClCompile Include="..\Core\GData\ClanAssistantData.cpp" />
+    <ClCompile Include="..\Core\GData\ClanCopyTable.cpp" />
     <ClCompile Include="..\Core\GData\ClanLvlTable.cpp" />
     <ClCompile Include="..\Core\GData\ClanSkillTable.cpp" />
+    <ClCompile Include="..\Core\GData\ClanStatueTable.cpp" />
     <ClCompile Include="..\Core\GData\ClanTechTable.cpp" />
     <ClCompile Include="..\Core\GData\CopyTable.cpp" />
     <ClCompile Include="..\Core\GData\DungeonData.cpp" />
@@ -229,9 +231,11 @@ copy $(ProjectDir)..\lib3rd\bin\libcurl.dll $(TargetDir)</Command>
     <ClCompile Include="..\Core\GObject\ChatItem.cpp" />
     <ClCompile Include="..\Core\GObject\Clan.cpp" />
     <ClCompile Include="..\Core\GObject\ClanBattle.cpp" />
+    <ClCompile Include="..\Core\GObject\ClanCopy.cpp" />
     <ClCompile Include="..\Core\GObject\ClanDynamicMsg.cpp" />
     <ClCompile Include="..\Core\GObject\ClanManager.cpp" />
     <ClCompile Include="..\Core\GObject\ClanRankBattle.cpp" />
+    <ClCompile Include="..\Core\GObject\ClanStatue.cpp" />
     <ClCompile Include="..\Core\GObject\ClanTech.cpp" />
     <ClCompile Include="..\Core\GObject\Copy.cpp" />
     <ClCompile Include="..\Core\GObject\Country.cpp" />
@@ -694,8 +698,10 @@ copy $(ProjectDir)..\lib3rd\bin\libcurl.dll $(TargetDir)</Command>
     <ClInclude Include="..\Core\GData\AttrExtra.h" />
     <ClInclude Include="..\Core\GData\CittaTable.h" />
     <ClInclude Include="..\Core\GData\ClanAssistantData.h" />
+    <ClInclude Include="..\Core\GData\ClanCopyTable.h" />
     <ClInclude Include="..\Core\GData\ClanLvlTable.h" />
     <ClInclude Include="..\Core\GData\ClanSkillTable.h" />
+    <ClInclude Include="..\Core\GData\ClanStatueTable.h" />
     <ClInclude Include="..\Core\GData\ClanTechTable.h" />
     <ClInclude Include="..\Core\GData\CopyTable.h" />
     <ClInclude Include="..\Core\GData\DungeonData.h" />
@@ -737,9 +743,11 @@ copy $(ProjectDir)..\lib3rd\bin\libcurl.dll $(TargetDir)</Command>
     <ClInclude Include="..\Core\GObject\ChatItem.h" />
     <ClInclude Include="..\Core\GObject\Clan.h" />
     <ClInclude Include="..\Core\GObject\ClanBattle.h" />
+    <ClInclude Include="..\Core\GObject\ClanCopy.h" />
     <ClInclude Include="..\Core\GObject\ClanDynamicMsg.h" />
     <ClInclude Include="..\Core\GObject\ClanManager.h" />
     <ClInclude Include="..\Core\GObject\ClanRankBattle.h" />
+    <ClInclude Include="..\Core\GObject\ClanStatue.h" />
     <ClInclude Include="..\Core\GObject\ClanTech.h" />
     <ClInclude Include="..\Core\GObject\Copy.h" />
     <ClInclude Include="..\Core\GObject\Country.h" />

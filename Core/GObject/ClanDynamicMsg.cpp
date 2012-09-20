@@ -1,12 +1,12 @@
-#include "Config.h"
+ï»¿#include "Config.h"
 #include "Clan.h"
 #include "Server/WorldServer.h"
 #include "MsgID.h"
 
 namespace GObject
 {
-//ÈËÊÂ0 ³ÇÕ½1 ¼¼ÒÕ2 ÆäËû3
-//ÈËÊÂ0x0001 ³ÇÕ½0x0010 ¼¼ÒÕ0x0100 ÆäËû0x1000
+//äººäº‹0 åŸæˆ˜1 æŠ€è‰º2 å…¶ä»–3
+//äººäº‹0x0001 åŸæˆ˜0x0010 æŠ€è‰º0x0100 å…¶ä»–0x1000
 static const UInt8 CDMTypeCvt[] = { 0, 0, 1, 1, 1, 1, 1, 1, 2, 0, 3, 3, 3, 0, 1, 1, 1, 1, 1, 1, 1, 1, 3 };
 static const UInt8 CDMTCvt[] = { 0x01, 0x02, 0x04, 0x08 };
 

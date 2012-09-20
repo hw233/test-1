@@ -639,6 +639,18 @@
     <ClCompile Include="..\Core\GObject\Tianjie.cpp">
       <Filter>GObject</Filter>
     </ClCompile>
+    <ClCompile Include="..\Core\GObject\ClanCopy.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GObject\ClanStatue.cpp">
+      <Filter>GObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GData\ClanCopyTable.cpp">
+      <Filter>GData</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\GData\ClanStatueTable.cpp">
+      <Filter>GData</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Core\Common\Ascii.h">
@@ -1377,6 +1389,18 @@
     </ClInclude>
     <ClInclude Include="..\Core\GObject\Tianjie.h">
       <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\ClanCopy.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GObject\ClanStatue.h">
+      <Filter>GObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GData\ClanCopyTable.h">
+      <Filter>GData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\GData\ClanStatueTable.h">
+      <Filter>GData</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

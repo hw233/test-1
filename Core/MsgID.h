@@ -1,4 +1,4 @@
-#ifndef _ASSS_MSGID_H_
+﻿#ifndef _ASSS_MSGID_H_
 #define _ASSS_MSGID_H_
 
 #include "Config.h"
@@ -674,8 +674,8 @@ namespace SPEQ
     const UInt16 ADDDISCOUNT         = 0x121; // 增加限时活动
     const UInt16 QUERYDISCOUNT       = 0x122; // 查询限时活动
     const UInt16 CLEARDISCOUNT       = 0x123; // 清空限时活动
-    const UInt16 REALAWARDINFO       = 0x124; // 
-    const UInt16 ADDREALAWARD        = 0x125; // 
+    const UInt16 REALAWARDINFO       = 0x124; //
+    const UInt16 ADDREALAWARD        = 0x125; //
 }
 
 namespace SPEP
@@ -713,8 +713,8 @@ namespace SPEP
     const UInt8 QUERYDISCOUNT       = 0x22; // 查询限时活动
     const UInt8 CLEARDISCOUNT       = 0x23; // 清空限时活动
 
-    const UInt16 REALAWARDINFO       = 0x24; // 
-    const UInt16 ADDREALAWARD        = 0x25; // 
+    const UInt16 REALAWARDINFO       = 0x24; //
+    const UInt16 ADDREALAWARD        = 0x25; //
 }
 
 namespace ARENAREQ

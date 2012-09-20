@@ -1,4 +1,4 @@
-#include "Config.h"
+ï»¿#include "Config.h"
 
 #include "Common/Stream.h"
 #include "Server/SysMsg.h"
@@ -12,7 +12,7 @@
 namespace GObject
 {
 
-static UInt8 clanTechDonateType[] = { 0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }; //×Ú×åµÈ¼¶1¡¢×Ú×å¾­Ñé2¡¢ÄÏÃÅ·À»¤3(ÄÏÃÅÄÍ¾Ã¶È)¡¢±±ÃÅ·À»¤4£¨±±ÃÅÄÍ¾Ã¶È£©¡¢»¤ÎÀµÈ¼¶5(NPCµÈ¼¶)¡¢»¤ÎÀÊýÁ¿6(NPCÊýÁ¿)¡¢(ÇàÁú¡¢°×»¢¡¢ÖìÈ¸¡¢ÐþÎä7)¡¢³ÇÃÅÍ¼ÌÚ8¡¢×ÚìôÍ¼ÌÚ9
+static UInt8 clanTechDonateType[] = { 0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }; //å®—æ—ç­‰çº§1ã€å®—æ—ç»éªŒ2ã€å—é—¨é˜²æŠ¤3(å—é—¨è€ä¹…åº¦)ã€åŒ—é—¨é˜²æŠ¤4ï¼ˆåŒ—é—¨è€ä¹…åº¦ï¼‰ã€æŠ¤å«ç­‰çº§5(NPCç­‰çº§)ã€æŠ¤å«æ•°é‡6(NPCæ•°é‡)ã€(é’é¾™ã€ç™½è™Žã€æœ±é›€ã€çŽ„æ­¦7)ã€åŸŽé—¨å›¾è…¾8ã€å®—ç¥ å›¾è…¾9
 
 ClanTech::ClanTech(Clan * c) : _clanLev(0), _clan(c)
 {
@@ -86,7 +86,7 @@ bool ClanTech::donate(Player * player, UInt8 id, UInt16 type, UInt32 count)
 		break;
 	default:
 		{
-			//¾èÏ×Ï²ºÃÆ·
+			//æçŒ®å–œå¥½å“
 			//const UInt8 index[] = {0, 0, 0, 0, 0, 0, 0, 7, 7, 7, 7};
 			//if(id > 10  || id < 7)
 			//	return false;
@@ -250,7 +250,7 @@ UInt16 ClanTech::getClanAchieve()
 	return static_cast<UInt16>(achieve <= 0 ? 0 : achieve);
 }
 
-UInt32 ClanTech::getAtuobattleSpeed() //¹Ò»ú¼ÓËÙ
+UInt32 ClanTech::getAtuobattleSpeed() //æŒ‚æœºåŠ é€Ÿ
 {
 	Mutex::ScopedLock lk(_mutex);
 	Techs::iterator found = _techs.find(2);
