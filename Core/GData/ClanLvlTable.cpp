@@ -1,4 +1,4 @@
-#include "Config.h"
+﻿#include "Config.h"
 #include "ClanLvlTable.h"
 #include "Server/ServerTypes.h"
 

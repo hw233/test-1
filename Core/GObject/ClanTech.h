@@ -1,4 +1,4 @@
-#ifndef CLANTECH_INC
+ï»¿#ifndef CLANTECH_INC
 #define CLANTECH_INC
 
 namespace GObject
@@ -8,11 +8,11 @@ class Clan;
 class Player;
 
 /*
-	1:Õ½¹¦(×ÛºÏ) 2:ÒøÁ½(ÆäËû) 3:Ï²ºÃÆ·(ÉñÊÞ)
+	1:æˆ˜åŠŸ(ç»¼åˆ) 2:é“¶ä¸¤(å…¶ä»–) 3:å–œå¥½å“(ç¥žå…½)
 */
 
 /*
-    1 : ×Ú×åµÈ¼¶ 2: ×Ú×å¾­Ñé 3 : Ï²ºÃÆ·(ÉñÊÞ)
+    1 : å®—æ—ç­‰çº§ 2: å®—æ—ç»éªŒ 3 : å–œå¥½å“(ç¥žå…½)
 */
 
 #define CLAN_TECH_PRACTICE_SPEED    1
@@ -33,7 +33,7 @@ struct ClanTechData
 
 	UInt8  techId;
 	UInt16 type;
-	UInt8  level;	//Èç¹û = 0£¬ ±íÊ¾´Ë¼¼ÄÜÉÐÎ´±»¼¤»î
+	UInt8  level;	//å¦‚æžœ = 0ï¼Œ è¡¨ç¤ºæ­¤æŠ€èƒ½å°šæœªè¢«æ¿€æ´»
 	UInt32 extra;
 };
 

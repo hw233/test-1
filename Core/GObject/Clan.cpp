@@ -1,4 +1,4 @@
-#include "Config.h"
+﻿#include "Config.h"
 #include "Clan.h"
 #include "GObject/Country.h"
 #include "GObject/TaskMgr.h"
@@ -42,7 +42,7 @@ GlobalNamedClans globalGlobalNamedClans, globalNamedClans[COUNTRY_MAX];
 GlobalNamedClans globalOwnedClans[COUNTRY_MAX];
 
 #define CLAN_AUTHORITY_COPY 7
-UInt8 ClanAuthority[5][8] = 
+UInt8 ClanAuthority[5][8] =
 {
 	{ 0, 1, 0, 0, 0, 0, 0, 0 },
 	{ 0, 1, 0, 0, 0, 0, 0, 0 },
@@ -1246,7 +1246,7 @@ UInt8 Clan::getOnlineMembersCount()
             continue;
     }
     return c;
-    
+
 }
 
 void Clan::listMembers( Player * player )
@@ -4009,7 +4009,7 @@ void   Clan::sendClanCopyInfo(Player * player, UInt8 val)
     st << static_cast<UInt8> (0);  // 掠夺按钮状态
 
     UInt8 logNum = _copyLog.size();
-    st << static_cast<UInt8>(logNum);  
+    st << static_cast<UInt8>(logNum);
     for (std::list<ClanCopyLog>::reverse_iterator it = _copyLog.rbegin(); it != _copyLog.rend(); ++ it)
     {
         struct tm t_tm;
@@ -4102,7 +4102,7 @@ void   Clan::notifyCopyCreated(Player * player)
 }
 
 void    Clan::setCopyLevel(UInt16 level)
-{ 
+{
     ClanCopy * clanCopy = ClanCopyMgr::Instance().getClanCopyByClan(this);
     if (clanCopy)
     {

@@ -1,4 +1,4 @@
-#ifndef CLANMANAGER_INC
+﻿#ifndef CLANMANAGER_INC
 #define CLANMANAGER_INC
 
 #include "Common/Stream.h"

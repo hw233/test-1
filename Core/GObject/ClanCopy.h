@@ -1,4 +1,4 @@
-#ifndef _CLAN_COPY_H_
+﻿#ifndef _CLAN_COPY_H_
 #define _CLAN_COPY_H_
 
 #include "Config.h"
@@ -36,14 +36,14 @@ namespace GObject
 #define MONSTER_BOSS   2   // BOSS
 //物攻  法攻  物防  法防  生命  身法  命中   闪避   反击   法术抵抗
 static const float  s_rate3NpcBaseModulus[][6] = {
-{0.005, 0.005, 0.01, 0.01, 0.05, 0.001},
-{0.002, 0.002, 0.01, 0.01, 0.02, 0.001},
-{0.002, 0.002, 0.01, 0.01, 0.02, 0.001},
+{0.005f, 0.005f, 0.01f, 0.01f, 0.05f, 0.001f},
+{0.002f, 0.002f, 0.01f, 0.01f, 0.02f, 0.001f},
+{0.002f, 0.002f, 0.01f, 0.01f, 0.02f, 0.001f},
 };
 static const float  s_rate3NpcAdvanceModulus[][4] = {
-{0.0002, 0.005, 0.004, 0.01},
-{0.0002, 0.005, 0.004, 0.01},
-{0.0002, 0.005, 0.004, 0.01},
+{0.0002f, 0.005f, 0.004f, 0.01f},
+{0.0002f, 0.005f, 0.004f, 0.01f},
+{0.0002f, 0.005f, 0.004f, 0.01f},
 };
 
 static const float  s_rate3NpcAdvanceModMax[] =  {200, 100, 100, 200};
@@ -63,21 +63,21 @@ static const UInt8 SpotId[SPOT_COUNT] =
     0x01, 0x11, 0x21, 0x31, 0xff
 };
 
-static const UInt8 SpotBufferId[SPOT_COUNT] = 
+static const UInt8 SpotBufferId[SPOT_COUNT] =
 {
     0x01, 0x11, 0x21, 0x31, 0x01
 };
 
-static const UInt8 NextSpotNum[SPOT_COUNT] = 
+static const UInt8 NextSpotNum[SPOT_COUNT] =
 {
     1, 1, 1, 1, 3
 };
-static const UInt8 NextMoveTick[SPOT_COUNT] = 
+static const UInt8 NextMoveTick[SPOT_COUNT] =
 {
     4, 3, 3, 3, 2
 };
 
-static const UInt8 NextSpotId[SPOT_COUNT][16] = 
+static const UInt8 NextSpotId[SPOT_COUNT][16] =
 {
     {0x01},
     {0x01},
@@ -106,7 +106,7 @@ enum Copy_Spot_Buffer
 enum CLAN_COPY_STATUS
 {
     // 帮派副本状态列表
-    CLAN_COPY_NONE    = 0x00, 
+    CLAN_COPY_NONE    = 0x00,
     CLAN_COPY_READY   = 0x01,
     CLAN_COPY_PROCESS = 0x02,
     CLAN_COPY_WIN     = 0x03,
@@ -158,8 +158,8 @@ struct ClanCopyMonster
     UInt16 formation;       // 怪物阵型
     std::string name;
     UInt8 level;
-    std::vector<GData::NpcFData> npcList;  // 具体怪物列表 
-    
+    std::vector<GData::NpcFData> npcList;  // 具体怪物列表
+
 
 
     ClanCopyMonster(UInt32 npcIndex, UInt32 npcId, UInt8 monsterType, UInt16 waveCount, UInt16 npcValue, UInt8 nextSpotId, UInt32 nextMoveTick, UInt16 copyLevel)
@@ -297,7 +297,7 @@ class ClanCopy
         typedef std::set<ClanCopyMonster* > DeadMonster;
 
     public:
-        ClanCopy(Clan *c, UInt32 copyId, Player *player); 
+        ClanCopy(Clan *c, UInt32 copyId, Player *player);
         ~ClanCopy();
 
         UInt8 getStatus();
@@ -390,7 +390,7 @@ class ClanCopy
 #ifdef DEBUG_CLAN_COPY
         // 谁能告诉我为什么一定需要通过指针new一个才能编译通过
         // 测试不用指针，居然又好了，真的是人品驱动编程啊
-        std::fstream * fileSt;           
+        std::fstream * fileSt;
 #endif
 };
 
@@ -443,7 +443,7 @@ struct ClanCopyLog
     UInt8  logType;
     UInt32 logVal;
     std::string playerName;
-    ClanCopyLog (UInt32 clanId, UInt32 logTime, 
+    ClanCopyLog (UInt32 clanId, UInt32 logTime,
             UInt8 logType, UInt32 logVal, std::string playerName)
         : clanId(clanId), logTime(logTime), logType(logType), logVal(logVal), playerName(playerName)
     {

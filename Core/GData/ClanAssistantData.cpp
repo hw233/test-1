@@ -1,4 +1,4 @@
-#include "Config.h"
+﻿#include "Config.h"
 #include "GObject/Fighter.h"
 #include "ClanAssistantData.h"
 
