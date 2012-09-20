@@ -539,6 +539,19 @@ public:
     inline void setMagAtkDecSpecialLast(Int16 nLast) { _magAtkDecSpecialLast = nLast; }
     inline void setMagAtkDecSpecial(float v, Int16 nlast){ _magAtkDecSpecial = v; _magAtkDecSpecialLast = nlast; }
 
+    inline void setSkillUsedChangeAttr(float fvalue, Int16 nlast, int nattr)
+    {
+        _skillUsedChangeAttrValue = fvalue;
+        _skillUsedChangeAttrLast = nlast;
+        _skillUsedChangeAttr = nattr;
+    }
+    inline void getSkillUsedChangeAttr(float& fvalue, Int16& nlast, int& nattr)
+    {
+       fvalue = _skillUsedChangeAttrValue;
+       nlast = _skillUsedChangeAttrLast;
+       nattr = _skillUsedChangeAttr;
+    }
+
     inline bool getSingleAttackFlag(){ return _bSingleAttackFlag; }
     inline void setSingleAttackFlag(bool b){ _bSingleAttackFlag =  b; }
 
@@ -576,6 +589,12 @@ private:
     Int16 _atkDecSpecialLast;
     float _magAtkDecSpecial;
     Int16 _magAtkDecSpecialLast;
+
+    // 自己对自己上buf的时候，部分属性在技能使用的过程中计算，但是加成放在技能使用之后，所以加了以下三个变态的变量暂存，策划强烈要求的，后来人掉进这个坑里，或者看不明白什么意思，请无视
+    float _skillUsedChangeAttrValue;
+    Int16 _skillUsedChangeAttrLast;
+    int   _skillUsedChangeAttr;
+    // end
 
     float _bleedRandom;
     Int16 _bleedRandomLast;
