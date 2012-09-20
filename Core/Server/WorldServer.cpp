@@ -345,6 +345,30 @@ void WorldServer::State(const char* action, int serverNum)
     {
         fprintf(stderr, "URL: %s [ERROR]\n", url);
     }
+
+#ifdef _DEBUG
+    char serverIp[20];
+    in_addr iaddr;
+    iaddr.S_un.S_addr = cfg.serverIp;
+    strcpy(serverIp, inet_ntoa(iaddr));
+    snprintf(url, sizeof(url), "http://192.168.88.250/serverstate.php?ip=%s&port=%d&state=%s", serverIp, cfg.tcpPort, action);
+    curl_easy_setopt(curl, CURLOPT_URL, url);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, recvret);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10);
+    fprintf(stderr, "URL: %s\n", url);
+
+    res = curl_easy_perform(curl);
+    if (CURLE_OK == res)
+    {
+        // TODO:
+        fprintf(stderr, "URL: %s [OK]\n", url);
+    }
+    else
+    {
+        fprintf(stderr, "URL: %s [ERROR]\n", url);
+    }
+#endif
 }
 
 void WorldServer::Up()
