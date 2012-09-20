@@ -737,6 +737,7 @@ public:
     Int32 getElixirAttrByOffset(UInt8 off);
     void appendElixirAttr(Stream& st);
     void appendElixirAttr2(Stream& st);
+    ElixirAttr& getElixirAttr() { return _elixirattr; }
 private:
     ElixirAttr _elixirattr;
 
