@@ -46,7 +46,18 @@ void Cfg::setIfName(const char* iname)
     if (fd < 0)
         return;
 
-#ifndef _WIN32
+#ifdef _WIN32
+    unsigned long broadcastIP = 0;
+    char bufName[20];
+    unsigned long* pLocalIP = NULL;
+    unsigned long subMask = 0;
+    HOSTENT *pHost = NULL;
+    gethostname(bufName, 20);
+    pHost = gethostbyname(bufName);
+    pLocalIP = (unsigned long*)pHost->h_addr_list[0];
+
+    serverIp = *pLocalIP;
+#else
     struct ifreq ifr;
     size_t ilen = strlen(ifName.c_str());
     ilen = ilen > IF_NAMESIZE ? IF_NAMESIZE - 1: ilen;
