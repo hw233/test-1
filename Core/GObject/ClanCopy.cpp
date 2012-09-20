@@ -1075,7 +1075,7 @@ void ClanCopy::attackHome(ClanCopyMonster* clanCopyMonster)
 {
     // 怪物攻击主基地
     _deadMonster.insert(clanCopyMonster);
-    _spotBattleInfo[Home].push_back(ClanCopyBattleInfo(0, clanCopyMonster->npcId, 0xFF, 0));
+    _spotBattleInfo[Home].push_back(ClanCopyBattleInfo(clanCopyMonster->npcId, clanCopyMonster->npcIndex, 0xFF, 0));
     clanCopyMonster->deadType = 0xff;
     if (_homeHp <= clanCopyMonster->npcValue)
     {
