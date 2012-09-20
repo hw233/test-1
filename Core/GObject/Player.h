@@ -1723,6 +1723,9 @@ namespace GObject
         void  AddStatueExp(UInt32 exp);
         void  SubStatueExp(UInt32 exp);
 
+        // 所有将互斥法宝
+        bool checkTrumpMutually(UInt32 trumpid);
+
     private:
         bool m_hasTripod;
         TripodData m_td;
