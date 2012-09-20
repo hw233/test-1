@@ -2986,19 +2986,3 @@ void GMHandler::OnSetClanCopyTime(GObject::Player* player, std::vector<std::stri
     }
 }
 
-void GMHandler::OnTj3(GObject::Player* player, std::vector<std::string>& args)
-{
-	if(args.size() < 1)
-		return;
-    int tlzLevelCount = atoi(args[0].c_str());
-    GObject::Tianjie::instance().setTj3Count(tlzLevelCount);
-}
-
-void GMHandler::OnTj4(GObject::Player* player, std::vector<std::string>& args)
-{
-	if(args.size() < 1)
-		return;
-    int bossMaxHp = atoi(args[0].c_str());
-    GObject::Tianjie::instance().setTj4BossHp(bossMaxHp);
-}
->>>>>>> db48d4f... clanCopy statueAttr fixed. GM setcopytime add.

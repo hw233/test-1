@@ -406,7 +406,7 @@ void ClanCopy::updateSpotBufferValue(UInt8 spotId)
         count = _spotPlayer[spotId].size();
     else
     {
-        for (ClanCopyPlayer::iterator it = _spotPlayer[spotId],begin(); it != _spotPlayer[spotId].end(); ++ it)
+        for (SpotPlayerList::iterator it = _spotPlayer[spotId].begin(); it != _spotPlayer[spotId].end(); ++ it)
         {
             if (!it->deadType)
                 ++ count;
