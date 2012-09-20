@@ -68,6 +68,8 @@ void WorldScript::init()
 	def("setRechargeActive", GObject::World::setRechargeActive);
 	def("getYearActive", GObject::World::getYearActive);
 	def("setYearActive", GObject::World::setYearActive);
+	def("getQgameGiftAct", GObject::World::getQgameGiftAct);
+	def("setQgameGiftAct", GObject::World::setQgameGiftAct);
 	def("getRechargeActive3366", GObject::World::getRechargeActive3366);
 	def("setRechargeActive3366", GObject::World::setRechargeActive3366);
 	def("getValentineDay", GObject::World::getValentineDay);
@@ -142,7 +144,9 @@ void WorldScript::init()
 	def("setOpenTest", GObject::World::setOpenTest);
 	def("getOpenTest", GObject::World::getOpenTest);
 	def("setConsumeActive", GObject::World::setConsumeActive);
-	def("getConsumeActive", GObject::World::getConsumeActive);
+	def("setConsume918", GObject::World::setConsume918);
+	def("getConsume918", GObject::World::getConsume918);
+    def("getConsumeActive", GObject::World::getConsumeActive);
     def("setKillMonsterAct", GObject::World::setKillMonsterAct);
     def("getKillMonsterAct", GObject::World::getKillMonsterAct);
 	def("setNeedRechargeRank", GObject::World::setNeedRechargeRank);

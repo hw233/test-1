@@ -189,6 +189,30 @@ function RunNewRegisterAward(player)
     return j;
 end
 
+function RunBirthdayAward(player)
+    if player == nil then
+        return 0;
+    end
+    local package = player:GetPackage();
+	if package:GetRestPackageSize() < 1 then
+		player:sendMsgCode(2, 1011, 0);
+		return 0;
+	end
+    local chance = {5000, 5300, 5500, 5500, 5500, 6000, 6000, 10000}
+    local item = {503, 509, 515, "QB", "Ipad", 507, "Iphone", 500 }
+    local j = 0; 
+    local g = math.random(1, 10000)
+    for i = 1, #chance do
+        if g <= chance[i] then
+            player:BirthdayAward(item[i], 1);
+            package:AddItem(item[i], 1, true, true, 31);
+            j = i;
+            break
+        end
+    end
+    return j;
+end
+
 local PlatformAward =  
 { --平台id
     [1]  = {    -- "QQ空间"

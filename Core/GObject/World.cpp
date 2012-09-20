@@ -43,6 +43,7 @@
 #include "Common/Itoa.h"
 #include "Server/SysMsg.h"
 #include "Arena.h"
+#include "Tianjie.h"
 
 namespace GObject
 {
@@ -85,6 +86,7 @@ bool World::_blueactiveday = false;
 bool World::_rechargeactive = false;
 bool World::_rechargeactive3366 = false;
 bool World::_yearact = false;
+bool World::_qgamegiftact = false;
 UInt8 World::_rechargeactiveno = 0;
 bool World::_valentineday = false;
 bool World::_netvalentineday = false;
@@ -128,6 +130,7 @@ bool World::_pexpitems;
 UInt32 World::_sosomapbegin = 0;
 bool World::_opentest;
 bool World::_consumeactive;
+bool World::_consume918 = false;
 RCSortType World::rechargeSort;
 RCSortType World::consumeSort;
 bool World::_needrechargerank = false;
@@ -140,6 +143,8 @@ UInt32 World::_rechargebegin = 0;
 UInt32 World::_rechargeend = 0;
 UInt32 World::_consumebegin = 0;
 UInt32 World::_consumeend = 0;
+/** 0：侠骨；1：柔情；2财富；3传奇 **/
+RCSortType World::killMonsterSort[4];
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
@@ -304,6 +309,30 @@ bool enum_midnight(void * ptr, void* next)
             pl->SetVar(VAR_RECHARGE_TOTAL, 0);
         }
     }
+    if (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 24) ||
+        TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 24))
+    {
+        int couponCount = 0;
+        int total = pl->GetVar(VAR_CONSUME_918);
+        if (total >= 1000 && total < 5000)
+            couponCount = 300;
+        else if (total >= 5000 && total < 10000)
+            couponCount = 800;
+        else if (total >= 10000 && total < 50000)
+            couponCount = 1500;
+        else if (total >= 50000)
+            couponCount = 5000;
+        if (couponCount > 0)
+        {
+            MailPackage::MailItem mitem[1] = {{0xA000, couponCount}};
+            MailItemsInfo itemsInfo(mitem, Activity, 1);
+            SYSMSGV(title, 5100);
+            SYSMSGV(content, 5102, total, couponCount);
+            Mail* mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content,0xFFFE0000, true, &itemsInfo);
+            GObject::mailPackageManager.push(mail->id, mitem, 1, true);
+        }
+    }
+
 #ifdef _FB
     if (TimeUtil::SharpDay(0, nextday) == TimeUtil::SharpDay(0, World::_levelawardend))
         pl->sendLevelAward();
@@ -696,6 +725,32 @@ void SendConsumeRankAward()
     }
 }
 
+void SendKillMonsterRankAward()
+{
+    for(UInt8 index = 0; index < 4; index++)
+    {
+        Int32 pos = 0;
+        for (RCSortType::iterator i = World::killMonsterSort[index].begin(), e = World::killMonsterSort[index].end(); i != e; ++i)
+        {
+            ++pos;
+            if(pos > 1) break;
+
+            Player* player = i->player;
+            if (!player)
+                continue;
+            //if (player->isOnline())
+            //{
+            //    GameMsgHdr hdr(0x258, player->getThreadId(), player, sizeof(pos));
+            //    GLOBAL().PushMsg(hdr, &pos);
+            //}
+            //else
+            //{
+                player->sendKillMonsterRankAward(index, pos);
+            //}
+        }
+    }
+}
+
 void World::World_Midnight_Check( World * world )
 {
 	UInt32 curtime = TimeUtil::Now();
@@ -711,6 +766,7 @@ void World::World_Midnight_Check( World * world )
     bool bRecharge = (getRechargeActive() || getRechargeActive3366()) && getNeedRechargeRank();
     bool bConsume = getConsumeActive() && getNeedConsumeRank();
     bool bPExpItems = getPExpItems();
+    bool bMonsterAct = getKillMonsterAct();
 	world->_worldScript->onActivityCheck(curtime+30);
 
 	world->_today = TimeUtil::SharpDay(0, curtime+30);
@@ -734,6 +790,7 @@ void World::World_Midnight_Check( World * world )
     bQixiEnd = bQixi && !getQixi();
     bRechargeEnd = bRecharge && !(getRechargeActive()||getRechargeActive3366());
     bConsumeEnd = bConsume && !getConsumeActive();
+    bool bMonsterActEnd = bMonsterAct && !getKillMonsterAct();
 
     UInt32 nextday = curtime + 30;
 	globalPlayers.enumerate(enum_midnight, static_cast<void *>(&nextday));
@@ -776,7 +833,12 @@ void World::World_Midnight_Check( World * world )
         SendRechargeRankAward();
     if (bConsumeEnd)
         SendConsumeRankAward();
-	
+    if(bMonsterActEnd)
+    {
+        world->killMonsterInit();
+	    SendKillMonsterRankAward();
+    }
+
 	dungeonManager.enumerate(enum_dungeon_midnight, &curtime);
 	globalClans.enumerate(enum_clan_midnight, &curtime);
 	clanManager.reConfigClanBattle();
@@ -854,7 +916,10 @@ void World::World_Boss_Refresh(void*)
 {
     worldBoss.process(TimeUtil::Now());
 }
-
+void World::Tianjie_Refresh(void*)
+{
+	GObject::Tianjie::instance().process(TimeUtil::Now());
+}
 void World::Team_Copy_Process(void*)
 {
     teamCopyManager->process(TimeUtil::Now());
@@ -908,6 +973,9 @@ void World::advancedHookTimer(void *para)
 #endif
 bool World::Init()
 {
+	GObject::Tianjie::instance().Init();
+	AddTimer(5 * 1000, Tianjie_Refresh, static_cast<void*>(NULL));
+	
 	GObjectManager::delayLoad();
 	GObjectManager::LoadPracticeData();
 	GObjectManager::LoadTripodData();
@@ -1176,6 +1244,17 @@ bool enum_openact(void * ptr, void * v)
     return true;
 }
 
+bool enum_qgamegift(void * ptr, void * v)
+{
+	Player * pl = static_cast<Player *>(ptr);
+	if(pl == NULL)
+		return true;
+    if(!pl->isOnline())
+        return true;
+    pl->getQgameGiftAward();
+    return true;
+}
+
 void World::World_One_Min( World * world )
 {
 #ifdef _FB
@@ -1207,6 +1286,17 @@ void World::World_One_Min( World * world )
 
     if (day)
         globalPlayers.enumerate(enum_openact, (void*)&day);
+#else
+    if(!World::getQgameGiftAct())
+        return;
+	UInt32 now = world->_now;
+    struct tm t;
+    time_t tt = now;
+    localtime_r(&tt, &t);
+    if(t.tm_hour == 21 && t.tm_min == 0)
+    {
+        globalPlayers.enumerate(enum_qgamegift, static_cast<void *>(NULL));
+    }
 #endif
 }
 
@@ -1596,6 +1686,154 @@ void World::initRCRank()
         return;
     GObject::globalPlayers.enumerate(player_enum_rc, 0);
     init = true;
+}
+
+inline bool player_enum_killmonster(GObject::Player * p, int)
+{
+    using namespace GObject;
+    if (World::getKillMonsterAct())
+    {
+        UInt32 total;
+        RCSort s;
+        total = p->GetVar(VAR_XIAGU_CNT);
+        if (total)
+        {
+            s.player = p;
+            s.total = total;
+            World::killMonsterSort[0].insert(s);
+        }
+        total = p->GetVar(VAR_ROUQING_CNT);
+        if (total)
+        {
+            s.player = p;
+            s.total = total;
+            World::killMonsterSort[1].insert(s);
+        }
+        total = p->GetVar(VAR_CAIFU_CNT);
+        if (total)
+        {
+            s.player = p;
+            s.total = total;
+            World::killMonsterSort[2].insert(s);
+        }
+        total = p->GetVar(VAR_CHUANQI_CNT);
+        if (total)
+        {
+            s.player = p;
+            s.total = total;
+            World::killMonsterSort[3].insert(s);
+        }
+    }
+    return true;
+}
+
+#define RANK_CNT 1
+void World::killMonsterAppend(Stream& st, UInt8 index)
+{
+    using namespace GObject;
+    if(index > 3)
+        return;
+
+    UInt8 cnt = killMonsterSort[index].size();
+    if (cnt > RANK_CNT)
+        cnt = RANK_CNT;
+    UInt32 c = 0;
+    for (RCSortType::iterator i = killMonsterSort[index].begin(), e = killMonsterSort[index].end(); i != e; ++i)
+    {
+        st << i->player->getName();
+        st << i->total;
+        ++c;
+        if (c >= RANK_CNT)
+            break;
+    }
+    if(c == 0)
+    {
+        std::string nullName;
+        st << nullName;
+        st << c;
+    }
+}
+
+void World::killMonsterInit()
+{
+    static bool sortInit = false;
+    if(!sortInit)
+    {
+        sortInit = true;
+        GObject::globalPlayers.enumerate(player_enum_killmonster, 0);
+    }
+}
+
+void World::UpdateKillMonsterRank(Player* pl, UInt8 type, UInt8 count)
+{
+    Stream st(REP::COUNTRY_ACT);
+    UInt8 subType = 0x02;
+    st << subType;
+    UInt8 subType2 = 0x01;
+    st << subType2;
+    st << pl->GetVar(VAR_ZYCM_POS);
+    st << static_cast<UInt8>(pl->GetVar(VAR_ZYCM_TIPS));
+    st << type;
+    UInt32 curCnt;
+    if(type == 1)
+    {
+        curCnt = pl->GetVar(VAR_XIAGU_CNT);
+    }
+    else if(type == 2)
+    {
+        curCnt = pl->GetVar(VAR_ROUQING_CNT);
+    }
+    else if(type == 3)
+    {
+        curCnt = pl->GetVar(VAR_CAIFU_CNT);
+    }
+    else if(type == 4)
+    {
+        curCnt = pl->GetVar(VAR_CHUANQI_CNT);
+    }
+    else
+        curCnt = 0;
+    st << curCnt;
+    st << Stream::eos;
+    pl->send(st);
+
+    if(type < 1 || type > 4)
+        return;
+
+    UInt8 index = type -1;
+    for (RCSortType::iterator i = World::killMonsterSort[index].begin(), e = World::killMonsterSort[index].end(); i != e; ++i)
+    {
+        if (i->player == pl)
+        {
+            World::killMonsterSort[index].erase(i);
+            break;
+        }
+    }
+    RCSort s;
+    s.player = pl;
+    s.total = curCnt;
+    World::killMonsterSort[index].insert(s);
+
+    UInt32 newrank = 0;
+    for (RCSortType::iterator i = World::killMonsterSort[index].begin(), e = World::killMonsterSort[index].end(); i != e; ++i)
+    {
+        ++newrank;
+        if (i->player == pl)
+            break;
+    }
+
+    if (newrank <= RANK_CNT)
+    {
+        Stream st(REP::COUNTRY_ACT);
+        UInt8 subType = 0x02;
+        st << subType;
+        UInt8 subType2 = 2;
+        st << subType2;
+        st << static_cast<UInt8>(index + 1);
+        killMonsterAppend(st, index);
+        st << Stream::eos;
+        NETWORK()->Broadcast(st);
+    }
 }
 
 }

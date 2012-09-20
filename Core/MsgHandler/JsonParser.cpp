@@ -10,6 +10,7 @@
 #include "Common/BinaryReader.h"
 #include "GObject/Leaderboard.h"
 #include "GObject/ActivityMgr.h"
+#include "GObject/TownDeamon.h"
 
 extern "C" {
 //#include "bits.h"
@@ -348,6 +349,7 @@ int query_gangcopy_complete_layer_req(JsonHead* head, json_t* body, json_t* retb
     head->cmd = 58;
     return 0;
 }
+
 int query_activity_req(JsonHead* head, json_t* body, json_t* retbody, std::string& err)
 {
     if (!head || !body || !retbody)
@@ -384,6 +386,43 @@ int query_activity_req(JsonHead* head, json_t* body, json_t* retbody, std::strin
     head->cmd = 60;
     return 0;
 }
+
+int query_role_pagoda_req(JsonHead* head, json_t* body, json_t* retbody, std::string& err)
+{
+    if (!head || !body || !retbody)
+        return EUNKNOW;
+
+    body = body->child;
+    if (!body)
+        return EUNKNOW;
+
+    char openid[36] = {0};
+    char playerId[32] = {0};
+    UInt64 playerid = 0;
+    UInt32 areaid = 0;
+
+    GET_STRING(body, "szOpenId", openid, 36);
+    GET_STRING(body, "playerId", playerId, 32);
+    json_t* val = json_find_first_label(body, "uiAreaId");
+    if (val && val->child && val->child->text)
+        areaid = atoi(val->child->text);
+
+    playerid = atoll(playerId);
+    GObject::Player* player = GObject::globalPlayers[playerid];
+    if (!player)
+    {
+        err += "player not exist!";
+        return EPLAYER_NOT_EXIST;
+    }
+
+    json_insert_pair_into_object(retbody, "ullRoleId", json_new_string(playerId));
+    json_insert_pair_into_object(retbody, "szRoleName", json_new_string(fixPlayerName(player->getName()).c_str()));
+    json_insert_pair_into_object(retbody, "uiLayers", my_json_new_number(player->getDeamonPlayerData()?player->getDeamonPlayerData()->maxLevel:0));
+
+    head->cmd = 62;
+    return 0;
+}
+
 void jsonParser2(void * buf, int len, Stream& st)
 {
 	BinaryReader br(buf, len);
@@ -458,6 +497,9 @@ void jsonParser2(void * buf, int len, Stream& st)
             break;
         case 59:
             ret = query_activity_req(&head, body, retbody, err);
+            break;
+        case 61:
+            ret = query_role_pagoda_req(&head, body, retbody, err);
             break;
         default:
             break;

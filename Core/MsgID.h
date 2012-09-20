@@ -380,8 +380,9 @@ namespace REQ
     const UInt8 NEWRELATION         = 0x17;
     /** 符文 (内丹) * */
     const UInt8 SKILLSTRENGTHEN     = 0x18;
-
-    /** 活动 * */
+    /** 天劫 **/
+    const UInt8 TIANJIE             = 0x19;
+    /** 活动 **/
     const UInt8 ACTIVE              = 0X8B;
 }
 
@@ -627,7 +628,9 @@ namespace REP
     const UInt8 NEWRELATION         = 0x17;
     /** 符文 (内丹) * */
     const UInt8 SKILLSTRENGTHEN     = 0x18;
-    /** 活动 * */
+    /** 天劫 **/
+    const UInt8 TIANJIE             = 0x19;
+    /** 活动 **/
     const UInt8 ACTIVE              = 0X8B;
 }
 
@@ -671,6 +674,8 @@ namespace SPEQ
     const UInt16 ADDDISCOUNT         = 0x121; // 增加限时活动
     const UInt16 QUERYDISCOUNT       = 0x122; // 查询限时活动
     const UInt16 CLEARDISCOUNT       = 0x123; // 清空限时活动
+    const UInt16 REALAWARDINFO       = 0x124; // 
+    const UInt16 ADDREALAWARD        = 0x125; // 
 }
 
 namespace SPEP
@@ -707,6 +712,9 @@ namespace SPEP
     const UInt8 ADDDISCOUNT         = 0x21; // 增加限时活动
     const UInt8 QUERYDISCOUNT       = 0x22; // 查询限时活动
     const UInt8 CLEARDISCOUNT       = 0x23; // 清空限时活动
+
+    const UInt16 REALAWARDINFO       = 0x24; // 
+    const UInt16 ADDREALAWARD        = 0x25; // 
 }
 
 namespace ARENAREQ

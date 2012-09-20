@@ -39,6 +39,7 @@
 #include "GObject/Dungeon.h"
 #include "GObject/World.h"
 #include "GObject/Var.h"
+#include "GObject/RealItemAward.h"
 //#include "MsgHandler/JsonParser.h"
 
 #ifndef _WIN32
@@ -163,9 +164,12 @@ struct NewUserStruct
     std::string _openkey;
     std::string _via;
     std::string _invited;
-	MESSAGE_DEF10(REQ::CREATE_ROLE, std::string, _name, UInt8, _class, UInt8, _level, UInt8, _level1, UInt8, _isYear,
+    UInt8 _rp;
+	MESSAGE_DEF11(REQ::CREATE_ROLE, std::string, _name, UInt8, _class, UInt8, _level, UInt8, _level1, UInt8, _isYear,
+            std::string, _platform, std::string, _openid, std::string, _openkey, std::string, _via, std::string, _invited, UInt8, _rp);
+/*	MESSAGE_DEF10(REQ::CREATE_ROLE, std::string, _name, UInt8, _class, UInt8, _level, UInt8, _level1, UInt8, _isYear,
             std::string, _platform, std::string, _openid, std::string, _openkey, std::string, _via, std::string, _invited);
-
+*/
 };
 
 
@@ -618,7 +622,9 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->setSysDailog(true);
             GameMsgHdr hdr(0x297, country, pl, 0);
             GLOBAL().PushMsg(hdr, NULL);
-		}
+
+            pl->SetVar(GObject::VAR_RP_VALUE, nu._rp);
+        }
 	}
 
 	if(res == 0)
@@ -2250,6 +2256,63 @@ void ClearDiscountFromBs(LoginMsgHdr& hdr, const void* data)
     GData::store.storeDiscount();
     GData::store.makePacket();
 }
+
+void QueryRealAwardInfo(LoginMsgHdr& hdr, const void* data)
+{
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+    Stream st(SPEP::REALAWARDINFO);
+    GObject::realItemAwardMgr.getInfo(st);
+    st << Stream::eos;
+	NETWORK()->SendMsgToClient(hdr.sessionID, st);
+}
+
+void AddRealAward(LoginMsgHdr& hdr, const void* data)
+{
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+
+    UInt8 type = 0;
+    UInt8 ret = 0;
+    br >> type;
+
+    Stream st(SPEP::ADDREALAWARD);
+    st << type;
+    switch(type)
+    {
+    case 1:
+        {
+            UInt32 id = 0;
+            UInt32 cd = 0;
+            std::string card_no;
+            std::string card_psw;
+            br >> id >> cd >> card_no >> card_psw;
+            if(id == 0 || cd == 0 || card_no.length() == 0 || card_psw.length() == 0)
+                ret = 0;
+            else if(GObject::realItemAwardMgr.addAward(id, cd, card_no, card_psw))
+                ret = 1;
+            else
+                ret = 2;
+        }
+        break;
+    case 2:
+        {
+            UInt32 id = 0;
+            br >> id;
+            if(id == 0)
+                ret = 0;
+            else if(GObject::realItemAwardMgr.delAward(id))
+                ret = 1;
+            else
+                ret = 2;
+        }
+        break;
+    }
+    st << ret << Stream::eos;
+
+	NETWORK()->SendMsgToClient(hdr.sessionID, st);
+}
+
 
 
 #endif // _LOGINOUTERMSGHANDLER_H_

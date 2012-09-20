@@ -63,7 +63,7 @@
 #endif
 #include "GData/Store.h"
 #include "RealItemAward.h"
-
+#include "GObject/Tianjie.h"
 #include <cmath>
 
 #define NTD_ONLINE_TIME (4*60*60)
@@ -851,6 +851,7 @@ namespace GObject
 
         continuousLogin(curtime);
         continuousLoginRF(curtime);
+        //sendYearRPInfo();
 
         if (World::_halloween)
             sendHalloweenOnlineAward(curtime);
@@ -1099,11 +1100,11 @@ namespace GObject
             char buf[1024] = {0};
             char* pbuf = &buf[0];
             if (cfg.isTestPlatform)
-                pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u|%u||%u|||%u||%u||%u|1|",
-                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId().c_str(), GetLev(), _playerData.gold, _playerData.coupon, getVipLevel(), _playerData.qqvipl, cfg.serverNum, platform);
+                pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u|%u|%u|%u|||%u||%u||%u|1|",
+                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId().c_str(), GetLev(), _playerData.gold, _playerData.coupon, _playerData.tael, getVipLevel(), _playerData.qqvipl, cfg.serverNum, platform);
             else
-                pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u|%u||%u|||%u||%u||%u|",
-                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId().c_str(), GetLev(), _playerData.gold, _playerData.coupon, getVipLevel(), _playerData.qqvipl, cfg.serverNum, platform);
+                pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u|%u|%u|%u|||%u||%u||%u|",
+                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId().c_str(), GetLev(), _playerData.gold, _playerData.coupon, _playerData.tael, getVipLevel(), _playerData.qqvipl, cfg.serverNum, platform);
 
             m_ulog->SetUserMsg(buf);
             if (platform != WEBDOWNLOAD)
@@ -1153,6 +1154,11 @@ namespace GObject
             snprintf(_price, 32, "%u", price/num);
             udpLog(op, _type, _id, _price, "", "", "props", num);
         }
+    }
+
+    void Player::luaUdpLog(const char* str1, const char* str2, const char* type)
+    {
+        udpLog(str1, str2, "", "", "", "", type);
     }
 
     void Player::guideUdp(UInt8 type, std::string& p1, std::string& p2)
@@ -1949,6 +1955,28 @@ namespace GObject
 		}
 	}
 
+    void Player::addLastTjScore()
+    {
+        if (!GObject::Tianjie::instance().isTjOpened())
+        {
+            _playerData.lastTjEventScore = 0;
+            _playerData.lastTjTotalScore = 0;
+            return;
+        }
+        
+        if (_playerData.lastTjEventScore > 0)
+        {
+            SYSMSG_SENDV(167, this, _playerData.lastTjEventScore);
+            SYSMSG_SENDV(169, this, _playerData.lastTjEventScore);
+        }
+        if (_playerData.lastTjTotalScore > 0)
+        {
+            SYSMSG_SENDV(168, this, _playerData.lastTjTotalScore);
+            SYSMSG_SENDV(170, this, _playerData.lastTjTotalScore);
+        }
+        _playerData.lastTjEventScore = 0;
+        _playerData.lastTjTotalScore = 0;
+    }
 	void Player::setBuffData(UInt8 id, UInt32 data, bool writedb)
 	{
 		UInt32 now = TimeUtil::Now();
@@ -2850,7 +2878,7 @@ namespace GObject
 		return res;
 	}
 
-	bool Player::attackNpc( UInt32 npcId, UInt32 turns, bool regen, bool needtype )
+	bool Player::attackNpc( UInt32 npcId, UInt32 turns, bool regen, bool needtype)
 	{
 		UInt32 now = TimeUtil::Now();
 		UInt32 buffLeft = getBuffData(PLAYER_BUFF_ATTACKING, now);
@@ -2866,7 +2894,7 @@ namespace GObject
 				return false;
 		}
 		GData::NpcGroups::iterator it = GData::npcGroups.find(npcId);
-		if(it == GData::npcGroups.end())
+        if(it == GData::npcGroups.end())
 			return false;
 
 		GData::NpcGroup * ng = it->second;
@@ -2874,7 +2902,7 @@ namespace GObject
         if (!ng)
             return false;
 
-        if (cfg.GMCheck && needtype && ng->getType()) // XXX: 必须是野外怪
+        if (cfg.GMCheck && needtype && ng->getType()) // XXX: 必须是野外怪,天劫怪除外
             return false;
 
 		if(GameAction()->RunExploreTask(this, npcId))
@@ -2934,6 +2962,7 @@ namespace GObject
                 pendExp(exp);
                 ng->getLoots(this, _lastLoot);
             }
+            
             //战胜特定NPC之后 荣誉
             GameAction()->doAttainment(this, 10351, npcId);
 		}
@@ -2964,6 +2993,73 @@ namespace GObject
 
 		return res;
 	}
+
+    bool Player::attackTianjieNpc(UInt32 npcId, UInt32 expMulti, bool isEvent,bool isBoss)
+	{
+        int turns = 100;
+		UInt32 now = TimeUtil::Now();
+		UInt32 buffLeft = getBuffData(PLAYER_BUFF_ATTACKING, now);
+		if(buffLeft > now)
+		{
+			sendMsgCode(0, 1407, buffLeft - now);
+			return false;
+		}
+		checkLastBattled();
+		
+        GData::NpcGroups::iterator it = GData::npcGroups.find(npcId);
+        if(it == GData::npcGroups.end())
+			return false;
+
+		GData::NpcGroup * ng = it->second;
+
+        if (!ng)
+            return false;
+
+        if (cfg.GMCheck && (ng->getType() != 8 || GObject::Tianjie::instance().isTjOpened() == false)) //只能在天劫期间 
+            return false;
+
+		if(GameAction()->RunExploreTask(this, npcId))
+			turns = 0;
+        UInt16 location = _playerData.location;
+        if (isBoss) 
+            location = Battle::BS_WBOSS;
+		Battle::BattleSimulator bsim(location, this, ng->getName(), ng->getLevel(), false, turns);
+		PutFighters( bsim, 0 );
+        ng->putFighters( bsim );
+		bsim.start();
+	
+        Stream& packet = bsim.getPacket();
+		if(packet.size() <= 8)
+			return false;
+
+		bool res = bsim.getWinner() == 1;
+		if(res)
+		{
+			_lastNg = ng;
+            UInt32 exp = TIANJIE_EXP(GetLev()) * ng->getExp() * expMulti;
+            addExpOrTjScore(exp, 0, isEvent, true);
+		}
+        
+        UInt16 ret = 0x0100;
+        if (res) ret = 0x0101;
+
+        Stream st(REP::ATTACK_NPC);                                                                                                      
+        st << ret << PLAYER_DATA(this, lastExp) << static_cast<UInt8>(0); 
+        UInt8 size = _lastLoot.size();    
+        st << size;   
+        for (UInt8 i = 0; i < size; ++i)
+        {
+            st << _lastLoot[i].id << _lastLoot[i].count;                                                                                  
+        }
+        st.append(&packet[8], packet.size() - 8);    
+        st << Stream::eos;                                                                                                                                    
+        send(st);
+       
+        turns = bsim.getTurns() > 15 ? 15 : bsim.getTurns();
+		setBuffData(PLAYER_BUFF_ATTACKING, now + turns);
+		return res;
+	}
+
 
     void Player::autoFrontMapFailed()
     {
@@ -4711,7 +4807,8 @@ namespace GObject
 			mlvl = 255;
 		else
 			mlvl += 10;
-		if(cfg.enableWallow && _playerData.wallow)
+
+        if(cfg.enableWallow && _playerData.wallow)
 		{
 			UInt32 onlineDuration = (_onlineDuration + TimeUtil::Now() - _playerData.lastOnline);
 			if(onlineDuration >= 5 * 60 * 60)
@@ -4734,7 +4831,9 @@ namespace GObject
 			if(fgt != NULL)
 				fgt->addExp(exp);
 		}
-        sendLevelPack(GetLev()); // XXX:
+        //是否开启天劫
+        GObject::Tianjie::instance().isOpenTj(this);
+        sendLevelPack(GetLev()); // XXX: 
 	}
 
     void Player::addHIAttr(const GData::AttrExtra& attr)
@@ -5458,15 +5557,7 @@ namespace GObject
     {
         if (rcnt > 100)
             return false;
-
-        int cnt = tasks.size();
-        UInt32* t = &tasks[0];
-        for (int i = 0; i < cnt; ++i)
-        {
-            if (*t++ == task)
-                return true;
-        }
-        return false;
+        return find(tasks.begin(), tasks.end(), task) != tasks.end();
     }
 
 	void Player::flushTaskColor(UInt8 tasktype, UInt8 type, UInt8 color, UInt16 count, bool force)
@@ -9664,6 +9755,9 @@ namespace GObject
             //领取礼物卡
             getAwardGiftCard();
             break;
+        case 10:
+            getAwardBirthday(opt);
+            break;
         }
     }
 
@@ -9787,6 +9881,88 @@ namespace GObject
         SetVar(VAR_AWARD_NEWREGISTER, 5);
     }
 
+    void Player::getAwardBirthday(UInt8 opt)
+    {
+    #define NUM 3
+        if(opt != 0 && opt != 1 && opt != 2)
+            return;
+        UInt32 day = 1;
+        UInt32 mon = 1;
+        UInt32 year = 2012;
+        TimeUtil::GetDMY(&day, &mon, &year);
+        if(year != 2012 || mon != 9 || day < 16 || day > 30)
+            return;
+        UInt8 num = GetVar(VAR_AWARD_BIRTHDAY);
+        if(opt == 2){    //邀请好友成功
+            if(num >= NUM) return;
+            Stream st(REP::GETAWARD);
+            st << static_cast<UInt8>(10) << static_cast<UInt8>(0);
+            st << static_cast<UInt8>(2 - num) << static_cast<UInt8>(1)<< Stream::eos;
+            send(st);
+            SetVar(VAR_AWARD_BIRTHDAY, num + NUM);
+        }
+        else if(opt == 1){  //领奖
+			std::vector<GData::LootResult>::iterator it;
+			for(it = _BirthdayAward.begin(); it != _BirthdayAward.end(); ++ it)
+			{
+				m_Package->ItemNotify(it->id, it->count);
+			}
+			_BirthdayAward.clear();
+            OnShuoShuo(SS_SLLP);
+        }
+        else if(opt == 0){  //抽奖
+            UInt8 flag = 0;
+            if(num >= NUM){ //已邀请过好友
+                num -= NUM;
+                if(num < 0 || num >= NUM)
+                    num = 2;
+                flag = 1;
+                if(num >= 2) return;
+            }
+            else{
+                if(num >= 1) //未邀请过好友
+                    return;
+            }
+            UInt8 id = GameAction()->RunBirthdayAward(this);
+            if(!id) return;
+            {
+                Stream st(REP::GETAWARD);
+                st << static_cast<UInt8>(10) << id << Stream::eos;
+                send(st);
+            }
+            SetVar(VAR_AWARD_BIRTHDAY, flag ? (num + 1 + NUM) : (num + 1));
+            {
+                Stream st(REP::GETAWARD);
+                st << static_cast<UInt8>(10) << static_cast<UInt8>(0);
+                st << static_cast<UInt8>(flag ? (2 - num - 1) : 0) << flag << Stream::eos;
+                send(st);
+            }
+        }
+    #undef NUM
+    }
+    void Player::CheckCanAwardBirthday()
+    {
+        UInt32 day = 1;
+        UInt32 mon = 1;
+        UInt32 year = 2012;
+        TimeUtil::GetDMY(&day, &mon, &year);
+        if(year == 2012 && mon == 9 && day >= 16 && day <= 30){
+            //生日罗盘许愿星(周年庆活动) 
+            UInt8 num = GetVar(VAR_AWARD_BIRTHDAY);
+            UInt8 flag = 0;
+            if(num >= 3){
+                num -= 3;
+                if(num < 0 || num >= 3)
+                    num = 2;
+                flag = 1;
+            }
+            Stream st(REP::GETAWARD);
+            st << static_cast<UInt8>(10) << static_cast<UInt8>(0);
+            st << static_cast<UInt8>(flag ? (2 - num) : (1 - num)) << flag << Stream::eos;
+            send(st);
+        }
+    }
+
     void Player::getHappyAward(UInt8 opt)
     {
         if(opt == 6)
@@ -9893,6 +10069,12 @@ namespace GObject
         _RegisterAward.push_back(lt);
     }
 
+    void Player::BirthdayAward(UInt16 itemId, UInt16 num)
+    {
+        GData::LootResult lt = {itemId, num};
+        _BirthdayAward.push_back(lt);
+    }
+
     void Player::lastQueqiaoAwardPush(UInt16 itemId, UInt16 num)
     {
         GData::LootResult lt = {itemId, num};
@@ -9971,38 +10153,38 @@ namespace GObject
             else if(isBD())
             {
                 if((status & 0x01) == 0)
-                    newStatus = status | 0x01;
-                else
                 {
+                    newStatus = status | 0x01;
                     char action[16] = "";
                     snprintf (action, 16, "F_%d_%d", 1098, 2);
                     udpLog("916", action, "", "", "", "", "act");
-                    return;
                 }
+                else
+                    return;
             }
             else if(isYD())
             {
                 if((status & 0x02) == 0)
-                    newStatus = status | 0x02;
-                else
                 {
                     char action[16] = "";
                     snprintf (action, 16, "F_%d_%d", 1098, 3);
                     udpLog("916", action, "", "", "", "", "act");
-                    return;
+                    newStatus = status | 0x02;
                 }
+                else
+                    return;
             }
             else if(isQQVIP())
             {
                 if((status & 0x04) == 0)
-                    newStatus = status | 0x04;
-                else
                 {
                     char action[16] = "";
                     snprintf (action, 16, "F_%d_%d", 1098, 4);
                     udpLog("916", action, "", "", "", "", "act");
-                    return;
+                    newStatus = status | 0x04;
                 }
+                else
+                    return;
             }
             else
                 return;
@@ -10017,6 +10199,17 @@ namespace GObject
         }
     }
 
+    void Player::getQgameGiftAward()
+    {
+        if(atoi(m_domain.c_str()) != 10)
+            return;
+        if(GetVar(VAR_QGAME_GIFT) == 0)
+        {
+            MailPackage::MailItem item[2] = {{503, 1},{514, 1}};
+            sendMailItem(2380, 2381, item, 2);
+            SetVar(VAR_QGAME_GIFT, 1);
+        }
+    }
     void Player::sendYearActInfo()
     {
         Stream st(REP::COUNTRY_ACT);
@@ -10612,6 +10805,20 @@ namespace GObject
         sendMailItem(2331, 2332, &item[pos-1][0], 1, false);
     }
 
+    void Player::sendKillMonsterRankAward(UInt8 index, Int32 pos)
+    {
+        if (index > 3 || !pos || pos > 1)
+            return;
+        MailPackage::MailItem item[5][1] =
+        {
+            {{1329, 1},},
+            {{1330, 1},},
+            {{1331, 1},},
+            {{1332, 1},},
+        };
+        sendMailItem(2372, 2373, &item[index][0], 1, false);
+    }
+
     void Player::sendCreateMail()
     {
 #ifdef _FB
@@ -10621,8 +10828,8 @@ namespace GObject
         GetMailBox()->newMail(NULL, 0x12, title, content);
 
 
-        MailPackage::MailItem item[2] = {{9161, 1}, {9162, 1}};
-        sendMailItem(4028, 4028, item, 2);
+        MailPackage::MailItem item[5] = {{9161, 1}, {9162, 1}, {9164, 1}, {9165, 1}, {9166, 1}};
+        sendMailItem(4028, 4028, item, 5);
 #endif
     }
 
@@ -11099,7 +11306,53 @@ namespace GObject
         ctslanding |= (1<<off);
         SetVar(VAR_CTSLANDINGRF, ctslanding);
     }
+    UInt8 Player::getRPLoginDay()
+    {
+        UInt32 now = TimeUtil::Now();
+        UInt32 now_sharp = TimeUtil::SharpDay(0, now);
+        UInt32 created_sharp = TimeUtil::SharpDay(0, getCreated());
+        if (created_sharp > now_sharp)
+            return 0;
 
+        if (now_sharp - created_sharp > 7 * DAY_SECS)
+            return 0;
+
+        UInt32 ctslanding = GetVar(VAR_CTSLANDING);
+        UInt32 off = CREATE_OFFSET(created_sharp, now_sharp);
+        if (off >= 7)
+            return 0;
+        UInt32 cts = 0;
+        for (int i = off; i >= 0; --i)
+        {
+            if (ctslanding & (1<<i))
+                ++cts;
+            else
+                break;
+        }
+
+        return cts;
+    }
+    void Player::sendYearRPInfo()
+    {
+        UInt8 cts = getRPLoginDay();
+        if (cts == 0)
+            return;
+
+        UInt32 rpValue = GetVar(VAR_RP_VALUE); 
+        UInt8 packageType = rpValue;
+        if (packageType > 0)
+        {
+            UInt8 packageGot = rpValue >> 8;
+            UInt8 rewardGot = GetVar(VAR_RP_REWARD_GOT);
+
+            Stream st(REP::RC7DAY);
+            st << static_cast<UInt8>(8); 
+            st << static_cast<UInt8>(0); 
+            st << packageType << packageGot << cts << rewardGot;
+            st << Stream::eos;
+            send(st);
+        }
+    }
     void Player::sendRC7DayInfo(UInt32 now)
     {
         if (!World::getRC7Day())
@@ -11216,6 +11469,86 @@ namespace GObject
         st << static_cast<UInt8>(GetVar(VAR_CTSAWARDRF)); // 抽奖
         st << Stream::eos;
         send(st);
+    }
+    const int g_rpCoupon = 365;
+    const int g_rp1Items[][2] = {
+    {15, 20}, {510, 10}, {56, 10}, {57, 10}, {502, 100},
+    {514, 10}, {508, 10}, {506, 10},{1700, 1} };
+    const int g_rp2Items[][2] = {
+    {15, 30}, {56, 20}, {57, 20}, {502, 100}, {503,20},
+    {515, 10}, {508, 10}, {506, 10},{1700, 1} };
+    const int g_rp3Items[][2] = {
+    {15, 50}, {515, 20}, {509, 20}, {507, 20},
+    {1700, 1}, {1701, 1}, {1704, 1}, {1705,1} };
+    const int g_rpRewardItems[][2] = {{15,1},{502,2},{509,1}};
+
+    void Player::getYearRPPackage()
+    {
+        UInt32 rpValue = GetVar(VAR_RP_VALUE); 
+        UInt8 packageType = rpValue;
+        if (packageType > 0)
+        {
+            UInt8 packageGot = rpValue >> 8;
+            if (packageGot == 1)
+            {
+                Stream st(REP::RF7DAY);
+                st << static_cast<UInt8>(8);
+                st << static_cast<UInt8>(1);
+                st << Stream::eos;
+                send(st);
+                return;
+            }
+            getCoupon(g_rpCoupon);
+            if (1 == packageType)
+            {
+                for (int i = 0; i < 9; ++i)
+                    GetPackage()->Add(g_rp1Items[i][0], g_rp1Items[i][1], true);
+
+                udpLog("rpPacket", "F_1100_1", "", "", "", "", "act");
+            }
+            else if (2 == packageType)
+            {
+                for (int i = 0; i < 9; ++i)
+                    GetPackage()->Add(g_rp2Items[i][0], g_rp2Items[i][1], true);
+                udpLog("rpPacket", "F_1100_2", "", "", "", "", "act");
+            }
+            else if (3 == packageType)
+            {
+                for (int i = 0; i < 8; ++i)
+                    GetPackage()->Add(g_rp3Items[i][0], g_rp3Items[i][1], true);
+                udpLog("rpPacket", "F_1100_3", "", "", "", "", "act");
+            }
+            rpValue += (0xFF+1);
+            SetVar(VAR_RP_VALUE, rpValue);
+
+            sendYearRPInfo();
+        }
+    }
+    void Player::getYearRPReward()
+    {
+        UInt8 cts = getRPLoginDay();
+        if (cts == 0)
+            return;
+
+        UInt8 isGot = GetVar(VAR_RP_REWARD_GOT);
+        if (isGot == 1)
+        {
+            Stream st(REP::RF7DAY);
+            st << static_cast<UInt8>(8);
+            st << static_cast<UInt8>(2);
+            st << Stream::eos;
+            send(st);
+            return;
+        }
+        cts = cts > 3 ? 3 : cts;
+        getCoupon(10*cts);
+        for (int i = 0; i < 3; ++i)
+        {
+           GetPackage()->Add(g_rpRewardItems[i][0], g_rpRewardItems[i][1]*cts, true);
+        }
+        SetVar(VAR_RP_REWARD_GOT, 1);
+
+        sendYearRPInfo();
     }
 
     void Player::getContinuousReward(UInt8 type, UInt8 idx)
@@ -12136,18 +12469,18 @@ namespace GObject
 
     void Player::getKillMonsterAward()
     {
+        if (GetPackage()->GetRestPackageSize() < 1)
+        {
+            sendMsgCode(0, 1011);
+            return;
+        }
         if(GetPackage()->GetItemAnyNum(9163) < 1)
         {
             return;
         }
-        UInt8 idx;
-        UInt8 subType = 2;
-        Stream st(REP::COUNTRY_ACT);
-        st << subType;
-        idx = GameAction()->onGetKillMonsterReward(this);
-        st << idx;
-        st << Stream::eos;
-        send(st);
+        GetPackage()->DelItemAny(9163, 1);
+        GameAction()->onGetKillMonsterReward(this);
+        udpLog("916", "F_1099", "", "", "", "", "act");
     }
 
     void Player::consumeGold(UInt32 c)
@@ -12159,7 +12492,640 @@ namespace GObject
             SetVar(VAR_CONSUME, total+c);
             sendConsumeInfo(true);
         }
+        if (World::getConsume918())
+        {
+            UInt32 total = GetVar(VAR_CONSUME_918);
+            if (total < 100)
+            {
+                if (total+c >= 100)
+                {
+                    MailPackage::MailItem item = {515,2};
+                    sendMailItem(5100, 5101, &item, 1, true);
+                }
+            }
+            int gold = 0;
+            int coupon = 0;
+            if (total < 1000 && total+c>=1000)
+            {
+                gold = 1000;
+                coupon = 300;
+                SYSMSGV(title, 5103);
+                SYSMSGV(content, 5104, gold, coupon, coupon);
+                GetMailBox()->newMail(NULL, 0x21, title, content);
+            }
+            if (total < 5000 && total+c>=5000)
+            {
+                gold = 5000;
+                coupon = 500;
+                SYSMSGV(title, 5103);
+                SYSMSGV(content, 5104, gold, coupon, coupon);
+                GetMailBox()->newMail(NULL, 0x21, title, content);
+            
+            }
+            if (total < 10000 && total+c>=10000)
+            {
+                gold = 10000;
+                coupon = 700;
+                SYSMSGV(title, 5103);
+                SYSMSGV(content, 5104, gold, coupon, coupon);
+                GetMailBox()->newMail(NULL, 0x21, title, content);
+            
+            }
+            if (total < 50000 && total+c>=50000)
+            {
+                gold = 50000;
+                coupon = 3500;
+                SYSMSGV(title, 5103);
+                SYSMSGV(content, 5104, gold, coupon, coupon);
+                GetMailBox()->newMail(NULL, 0x21, title, content);
+            }
+            AddVar(VAR_CONSUME_918, c);
+
+            Stream st(REP::DAILY_DATA);
+		    st << static_cast<UInt8>(17) << total+c << Stream::eos;
+		    send((st));
+
+            udpLog("consumeGold", "F_1103", "", "", "", "", "act", c);
+        }
     }
+
+    static const UInt32 s_task1ColorScore[] = {100, 200, 300, 400}; //日常任务的积分
+    static const UInt32 s_tjTask1MaxCount = 5;       //天劫日常任务1的最大可完成数
+    static const UInt32 s_tjTask2MaxScore = 16000;    //天劫日常任务2的最大捐献积分
+    static const UInt8  s_tjTask2Score[4] = {200, 200, 200, 200};
+    static const UInt8  s_tjTask2ExpMulti[4] = {30, 30, 30, 30};
+    static const UInt8  s_tjTask3CopyCount = 50;
+    static const UInt8  s_tjTask3AutoTime  = 30;
+    static const UInt8  s_task3ExpMulti = 8;
+    static const UInt8  s_task3Score    = 50; 
+    void Player::OnDoTianjieTask(UInt8 eventId, UInt8 cmd, UInt8 id)
+    {
+        Stream st(REQ::TIANJIE);
+        UInt8 type = 0;
+        UInt8 rcmd = 0;
+        if (1 == eventId)
+        {
+            type = 1;
+            switch (cmd)
+            {
+                //查询列表
+            case 0:
+                {
+                    st << type << rcmd;
+                    //获取数据列表
+                    getTjTask1Data(st);
+                    st << Stream::eos;
+
+                    send(st);
+                }
+                break;
+                //攻击据点 默认攻击
+            case 1:
+            case 2:
+                {
+                    UInt8 res = attackTjEvent1(id, cmd);
+                    if (res > 0)
+                    {
+                        UInt8 rcmd = res;
+                        st << type << rcmd << Stream::eos;
+                        send(st);
+                    }
+                }
+                break;
+                //刷新任务
+            case 3:
+                {
+                    if (GetVar(VAR_TJ_TASK1_NUMBER) == 5)
+                    {
+                        rcmd = 1;
+                    }
+                    else if (getTael() < 500)
+                    {
+                        rcmd = 3;
+                    }
+                    if (rcmd > 0)
+                    {
+                        st << type << rcmd << Stream::eos;
+                        send(st);
+                        return;
+                    }
+                    ConsumeInfo ci(TianjieTask, 0, 0);
+                    useTael(500, &ci);
+
+                    memset(_playerData.tjEvent1, 0, sizeof(_playerData.tjEvent1));
+                    memset(_playerData.tjColor1, 0, sizeof(_playerData.tjColor1));
+                    memset(_playerData.tjExp1,   0, sizeof(_playerData.tjExp1));
+                    for (int i = 0; i < 3; ++i)
+                        GObject::Tianjie::instance().randomTask1Data(GetLev(),_playerData.tjEvent1[i], _playerData.tjColor1[i], _playerData.tjExp1[i]);
+                    
+                    st << type << rcmd;
+                    getTjTask1Data(st, true);
+                    st << Stream::eos;
+                    send(st);
+                }
+                break;
+           default:
+                break;
+            }
+        }
+        else if (2 == eventId)
+        {
+            type = 2;
+            int score = GetVar(VAR_TJ_TASK2_SCORE);
+            switch (cmd)
+            {
+                    //查询列表
+                case 0:
+                    {
+                        st << type << rcmd;
+                        getTjTask2Data(st);
+                        st << Stream::eos;
+                        send(st);
+                    }
+                    break;
+                    //捐款
+                case 1:
+                    {
+                        if (score >= s_tjTask2MaxScore) //达到上限
+                        {
+                            rcmd = 5;
+                            st << type << rcmd << Stream::eos;
+                            send(st);
+                            return;
+                        }
+                        int tjScore = 0;
+                        if (0 == id) //白银
+                        {
+                            if (getTael() < 1000)
+                            {
+                                rcmd = 1; //银币不足
+                                st << type << rcmd << Stream::eos;
+                                send(st);
+                                return;
+                            }
+                            ConsumeInfo ci(TianjieTask, 0, 0);
+                            useTael(1000, &ci);
+                            AddVar(VAR_TJ_TASK2_TAEL, 1);
+                            tjScore = s_tjTask2Score[0];
+
+                            udpLog("tianjie", "F_1109_3", "", "", "", "", "act");
+                        }
+                        else if (1 == id) //仙石
+                        {
+                            if (getGold() < 10)
+                            {
+                                rcmd = 2; //仙石不足
+                                st << type << rcmd << Stream::eos;
+                                send(st);
+                                return;
+                            }
+                            ConsumeInfo ci(TianjieTask, 0, 0);
+                            useGold(10, &ci);
+                            AddVar(VAR_TJ_TASK2_GOLD, 1);
+                            tjScore = s_tjTask2Score[1];
+                            udpLog("tianjie", "F_1109_1", "", "", "", "", "act");
+                        }
+                        else if (2 == id) //礼券
+                        {
+                            if (getCoupon() < 10)
+                            {
+                                rcmd = 3; //不足
+                                st << type << rcmd << Stream::eos;
+                                send(st);
+                                return;
+                            }
+                            ConsumeInfo ci(TianjieTask, 0, 0);
+                            useCoupon(10, &ci);
+                            AddVar(VAR_TJ_TASK2_COUPON, 1);
+                            tjScore = s_tjTask2Score[2];
+                            udpLog("tianjie", "F_1109_2", "", "", "", "", "act");
+                        }
+                        else if (3 == id) //天劫印记
+                        {
+                            if (!GetPackage()->DelItemAny(9138, 1))
+                            {
+                                rcmd = 4; //印记不足
+                                st << type << rcmd << Stream::eos;
+                                send(st);
+                                return;
+                            }
+                            AddVar(VAR_TJ_TASK2_TJYJ, 1);
+                            tjScore = s_tjTask2Score[3];
+                            udpLog("tianjie", "F_1109_4", "", "", "", "", "act");
+                        }
+                        if (tjScore > 0)
+                        {
+                            int exp = TIANJIE_EXP(GetLev()) * s_tjTask2ExpMulti[id];
+                            addExpOrTjScore(exp, tjScore, false, false);
+
+                            AddVar(VAR_TJ_TASK2_SCORE, tjScore);
+                        }
+                        st << type << rcmd;
+                        getTjTask2Data(st);
+                        st << Stream::eos;
+                        send(st);
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+        else if (3 == eventId)
+        {
+            type = 3;
+            switch (cmd)
+            {
+            case 0: //列表
+                break;
+            case 1: //前往破阵
+                {
+                    if (GetVar(VAR_TJ_TASK3_COPYID) == 51)
+                    {
+                        rcmd = 1;
+                        st << type << rcmd << Stream::eos;
+                        send(st);
+                        return;
+                    }
+                    attackTjEvent3(id);
+                }
+                break;
+            case 2: //自动破阵
+                {
+                    processAutoTlz();
+                }
+                break;
+            case 3: //自动完成
+                {
+                    completeAutoTlz();
+                }
+                break;
+            default:
+                break;
+            }
+        }
+    }
+    UInt8 Player::attackTjEvent1(UInt8 id, UInt8 cmd)
+    {
+        if (id > 3) 
+            return 4;
+        
+        if (GetVar(VAR_TJ_TASK1_NUMBER) == 5)
+            return 1;
+
+        if (cmd == 2 && getGold() < 5) //双倍奖励
+            return 2; //仙石不足
+       
+        bool res = attackTianjieNpc(_playerData.tjEvent1[id], cmd, false);
+        if (res)
+        {
+            if (2 == cmd)
+            {
+                ConsumeInfo ci(TianjieTask, 0, 0);
+                useGold(5, &ci);
+            }
+            int taskScore = s_task1ColorScore[_playerData.tjColor1[id]] * cmd;
+
+            int exp = _playerData.tjExp1[id] * cmd;
+            addExpOrTjScore(exp, taskScore, false, true);
+
+            AddVar(VAR_TJ_TASK1_NUMBER, 1);
+
+            _playerData.tjEvent1[id] = 0;
+            _playerData.tjColor1[id] = 0;
+            _playerData.tjExp1[id] = 0;
+
+            if (cmd == 1)
+                udpLog("tianjie", "F_1111", "", "", "", "", "act");
+            else if (cmd == 2)
+                udpLog("tianjie", "F_1112", "", "", "", "", "act");
+        }
+        Stream st(REQ::TIANJIE);
+        st <<  static_cast<UInt8>(1) << static_cast<UInt8>(0);
+        //获取数据列表
+        getTjTask1Data(st);
+        st << Stream::eos;
+        send(st);
+        return 0;
+    }
+    
+   
+   UInt8 Player::attackTjEvent3(UInt8 id)
+    {
+        UInt8 copyid = GetVar(VAR_TJ_TASK3_COPYID);
+        if (copyid > s_tjTask3CopyCount) return 1;
+
+        if (0 == copyid) 
+        {
+            copyid = 1;
+            AddVar(VAR_TJ_TASK3_COPYID, 1);
+        }
+        bool res = GObject::Tianjie::instance().attackTlz(this, copyid);
+        if (res)
+        {
+            copyid++;
+            AddVar(VAR_TJ_TASK3_COPYID, 1);
+            int exp = TIANJIE_EXP(GetLev()) * s_task3ExpMulti;
+            addExpOrTjScore(exp, s_task3Score, false, true);
+
+            Stream st(REQ::TIANJIE);
+            st << static_cast<UInt8>(3) << static_cast<UInt8>(0);
+            getTjTask3Data(st);
+            st << Stream::eos;
+            send(st); 
+
+            if (copyid == 51)
+            {
+                udpLog("tianjie", "F_1114", "", "", "", "", "act");
+            }
+        } 
+        return 0;
+    }
+    void Player::getTjTask1Data(Stream& st, bool isRefresh)
+    {
+        if (isRefresh || GetVar(VAR_TJ_TASK1_NUMBER) == 0) //今日还没做任务
+        {
+            for (int i = 0; i < 3; ++i)
+            {
+                if (_playerData.tjEvent1[i] == 0)
+                {
+                    GObject::Tianjie::instance().randomTask1Data(GetLev(),_playerData.tjEvent1[i], _playerData.tjColor1[i], _playerData.tjExp1[i]);
+                }
+            }
+        }
+        UInt8 type = 0;
+        int value[3] = {0};
+        value[0] = _playerData.tjExp1[0];
+        value[1] = _playerData.tjExp1[1];
+        value[2] = _playerData.tjExp1[2];
+        for (int i = 0; i < 3; ++i)
+        {
+            GData::NpcGroups::iterator it = GData::npcGroups.find(_playerData.tjEvent1[i]);
+            if(it != GData::npcGroups.end())
+            {
+		        GData::NpcGroup * ng = it->second;
+                value[i] +=  TIANJIE_EXP(GetLev()) * ng->getExp();
+            }
+        }
+        if (GObject::Tianjie::instance().isPlayerInTj(GetLev()))
+        {
+            type = 1;
+            value[0] = value[0] * 2 / TIANJIE_EXP(GetLev()) + s_task1ColorScore[_playerData.tjColor1[0]];
+            value[1] = value[1] * 2 / TIANJIE_EXP(GetLev()) + s_task1ColorScore[_playerData.tjColor1[1]];
+            value[2] = value[2] * 2 / TIANJIE_EXP(GetLev()) + s_task1ColorScore[_playerData.tjColor1[2]];
+        }
+        UInt8 num1 = 5-GetVar(VAR_TJ_TASK1_NUMBER);
+        st << num1 << type;
+        st << _playerData.tjEvent1[0] << _playerData.tjColor1[0] << value[0];
+        st << _playerData.tjEvent1[1] << _playerData.tjColor1[1] << value[1];
+        st << _playerData.tjEvent1[2] << _playerData.tjColor1[2] << value[2];
+
+    }
+    void Player::getTjTask2Data(Stream& st)
+    {
+        short n1 = GetVar(VAR_TJ_TASK2_TAEL);
+        short n2 = GetVar(VAR_TJ_TASK2_GOLD);
+        short n3 = GetVar(VAR_TJ_TASK2_COUPON);
+        short n4 = GetVar(VAR_TJ_TASK2_TJYJ);
+        UInt8 percent = GetVar(VAR_TJ_TASK2_SCORE)*100/s_tjTask2MaxScore;      //捐献百分比
+        int exp2 = TIANJIE_EXP(GetLev()) * s_tjTask2ExpMulti[0] ; //经验
+        int score = s_tjTask2Score[0];
+        if (GObject::Tianjie::instance().isPlayerInTj(GetLev()))
+        {
+            score += exp2*2/TIANJIE_EXP(GetLev());
+            exp2 = 0;
+        }
+        st << n1 << n2 << n3 << n4 << percent << exp2 << score;
+    }
+    void Player::getTjTask3Data(Stream& st)
+    {
+        UInt8 finish = 0;
+        UInt8 copyid = GetVar(VAR_TJ_TASK3_COPYID);
+        if (copyid == (s_tjTask3CopyCount+1)) //已完成
+        {
+            finish = 1;
+        }
+        if (copyid == 0) copyid = 1;
+        
+        UInt8 percent = (copyid-1) * 100/ s_tjTask3CopyCount;
+        int exp3 = TIANJIE_EXP(GetLev()) * s_task3ExpMulti;
+        int score = s_task3Score;
+        int time3 = 0;
+        if (hasFlag(Player::AutoTlz)) 
+            time3 = (s_tjTask3CopyCount-copyid+1) * s_tjTask3AutoTime;
+         if (GObject::Tianjie::instance().isPlayerInTj(GetLev()))
+        {
+            score += exp3*2/TIANJIE_EXP(GetLev());
+            exp3 = 0;
+        }
+        
+        st << finish << static_cast<UInt8>(copyid-1) << percent << time3 << exp3 << score;
+    }
+    void Player::addExpOrTjScore(int exp, int score, bool isEventScore, bool isEndScore)
+    {
+        int eventScore = 0;
+        //天劫事件的经验转换为天劫积分
+        if (isEventScore) eventScore = score;
+
+        if (GObject::Tianjie::instance().isPlayerInTj(GetLev()))
+        {
+            if (isEventScore)
+                eventScore += exp*2/TIANJIE_EXP(GetLev());
+            score += exp*2/TIANJIE_EXP(GetLev());;
+        }
+        else if (isEndScore) //战斗结束后再加经验
+        {
+            pendExp(exp);
+        }
+        else                 //立即加经验
+        {
+            AddExp(exp);
+        }
+        if (isEndScore)
+        {
+            if (isEventScore) 
+                _playerData.lastTjEventScore += eventScore;
+            _playerData.lastTjTotalScore += score;
+        }
+        if (eventScore > 0)
+        {
+            int oldScore = GetVar(VAR_TJ_EVENT_PRESTIGE);
+            AddVar(VAR_TJ_EVENT_PRESTIGE, eventScore);
+            //捐款不会超过40000积分
+            GObject::Tianjie::instance().setEvent2MaxScore(this);
+            GObject::Tianjie::instance().insertToEventSortMap(this, GetVar(VAR_TJ_EVENT_PRESTIGE), oldScore);
+            GObject::Tianjie::instance().updateEventData(this);
+            GObject::Tianjie::instance().broadEventTop1(this);
+
+            GObject::Tianjie::instance().udplogScore(this, eventScore, 1);
+        
+            if (!isEndScore) 
+            {
+                SYSMSG_SENDV(167, this, eventScore);
+                SYSMSG_SENDV(169, this, eventScore);
+            }
+        }
+        if (score > 0)
+        {
+            AddVar(VAR_TJ_TASK_PRESTIGE, score);
+            GObject::Tianjie::instance().insertToScoreSortMap(this, GetVar(VAR_TJ_TASK_PRESTIGE),GetVar(VAR_TJ_TASK_PRESTIGE)-score);
+            GObject::Tianjie::instance().updateRankData(this);
+
+            GObject::Tianjie::instance().udplogScore(this, score, 0);
+         
+            if (!isEndScore)
+            {
+                SYSMSG_SENDV(168, this, score);
+                SYSMSG_SENDV(170, this, score);
+            }
+         }
+    }
+    void Player::clearTjTaskData()
+    {
+        memset(_playerData.tjEvent1, 0, sizeof(_playerData.tjEvent1));
+        memset(_playerData.tjColor1, 0, sizeof(_playerData.tjColor1));
+        memset(_playerData.tjExp1, 0, sizeof(_playerData.tjExp1));
+
+        cancleAutoTlz();
+    }
+    void Player::processAutoTlz()
+    {
+        Stream st(REQ::TIANJIE);
+        UInt8 type = 3;
+        UInt8 rcmd = 0;
+        if (hasFlag(Player::AutoTlz))
+            return;
+
+        if (GetVar(VAR_TJ_TASK3_COPYID) == (s_tjTask3CopyCount+1))
+        {
+            rcmd = 1;
+            st << type << rcmd << Stream::eos;
+            send(st);
+            return;
+        }
+        else if (GetVar(VAR_TJ_TASK3_COPYID) == 0)
+        {
+            SetVar(VAR_TJ_TASK3_COPYID, 1);
+        }
+        if (getTael() < 1000)
+        {
+            rcmd = 2; //银币不足
+            st << type << rcmd << Stream::eos;
+            send(st);
+            return;
+        }
+        ConsumeInfo ci(TianjieTask, 0, 0);
+        useTael(1000, &ci);
+        
+        addFlag(Player::AutoTlz);
+        
+        int count = s_tjTask3CopyCount+1 - GetVar(VAR_TJ_TASK3_COPYID);
+        EventTlzAuto* event = new(std::nothrow) EventTlzAuto(this, s_tjTask3AutoTime, count);
+        if (event == NULL) return;
+        PushTimerEvent(event);
+    
+        event->notify(true);
+        
+        udpLog("tianjie", "F_1116", "", "", "", "", "act");
+    }
+    void Player::cancleAutoTlz()
+    {
+        if (hasFlag(Player::AutoTlz))
+        {
+            //删除定时事件
+            PopTimerEvent(this, EVENT_TLZAUTO, getId());
+            delFlag(Player::AutoTlz);
+        }
+    }
+    void Player::completeAutoTlz()
+    {
+        Stream st(REQ::TIANJIE);
+        UInt8 type = 3;
+        UInt8 rcmd = 0;
+        if (!hasFlag(Player::AutoTlz))
+            return;
+
+        if (GetVar(VAR_TJ_TASK3_COPYID) == (s_tjTask3CopyCount+1))
+        {
+            rcmd = 1;
+        }
+        if (getGold() < 10)
+        {
+            rcmd = 2; //xs不足
+        }
+        if (rcmd > 0 )
+        {
+            st << type << rcmd << Stream::eos;
+            send(st);
+            return;
+        }
+        ConsumeInfo ci(TianjieTask, 0, 0);
+        useGold(10, &ci);
+   
+        int currCopyId = GetVar(VAR_TJ_TASK3_COPYID);
+        if (currCopyId == 0)
+            currCopyId = 1;
+        int copyCount = s_tjTask3CopyCount - currCopyId + 1;
+
+        SetVar(VAR_TJ_TASK3_COPYID, (s_tjTask3CopyCount+1));
+        //加积分和经验
+        int exp = TIANJIE_EXP(GetLev()) * s_task3ExpMulti * copyCount;
+        addExpOrTjScore(exp, s_task3Score*copyCount, false);
+
+        st << type << rcmd;
+        getTjTask3Data(st);
+        st << Stream::eos;
+        send(st); 
+        //删除定时事件
+        PopTimerEvent(this, EVENT_TLZAUTO, getId());
+        delFlag(Player::AutoTlz);
+        
+        udpLog("tianjie", "F_1115", "", "", "", "", "act");
+       }
+
+EventTlzAuto::EventTlzAuto( Player * player, UInt32 interval, UInt32 count)
+	: EventBase(player, interval, count)
+{
+}
+
+void EventTlzAuto::Process(UInt32 leftCount)
+{
+    m_Player->AddVar(VAR_TJ_TASK3_COPYID, 1);
+
+    notify();
+    if (leftCount == 0)
+    {
+        PopTimerEvent(m_Player, EVENT_TLZAUTO,  m_Player->getId());
+    }
+}
+
+void EventTlzAuto::complete() const
+{
+}
+void EventTlzAuto::notify(bool isBeginAuto)
+{
+    if(m_Player == NULL || !m_Player->isOnline())
+        return;
+    int copyid = m_Player->GetVar(VAR_TJ_TASK3_COPYID);
+    if (!isBeginAuto)
+    {
+        int exp = TIANJIE_EXP(m_Player->GetLev()) * s_task3ExpMulti;
+        m_Player->addExpOrTjScore(exp, s_task3Score, false);
+    }
+    if (copyid  >= (s_tjTask3CopyCount+1))
+    {
+        m_Player->delFlag(Player::AutoTlz);
+        m_Player->udpLog("tianjie", "F_1114", "", "", "", "", "act");
+    }
+    Stream st(REQ::TIANJIE);
+    UInt8 type = 3;
+    UInt8 cmd = 0;
+
+    st << type << cmd;
+    m_Player->getTjTask3Data(st);
+    st << Stream::eos;
+         
+    m_Player->send(st); 
+}
 
     void Player::sendQixiInfo()
     {
@@ -12322,22 +13288,36 @@ namespace GObject
 
     // 帮派副本相关
     ///////////////////////////////////////////////
-    void Player::postKillMonsterRoamResult(UInt8 pos, UInt8 curType, UInt8 curCount)
+    void Player::postKillMonsterRoamResult(UInt32 pos, UInt8 curType, UInt8 curCount, UInt8 tips)
     {
-#if 0
-        if(pos != GetVar(VAR_ZYCM_POS))
-            SetVar(VAR_ZYCM_POS, pos);
+        struct _Roam
+        {
+            UInt32 _pos;
+            UInt8 _curType;
+            UInt8 _curCount;
+            UInt8 _tips;
+        }curRoam = {pos, curType, curCount, tips};
+
+		GameMsgHdr hdr(0x1FE, WORKER_THREAD_WORLD, this, sizeof(curRoam));
+		GLOBAL().PushMsg(hdr, &curRoam);
+    }
+
+    void Player::killMonsterStepAdvance(UInt32 pos, UInt8 curType, UInt8 curCount, UInt8 tips)
+    {
+        SetVar(VAR_ZYCM_POS, pos);
         if(curType == 1)
-            SetVar(VAR_XIAGU_CNT, curCount);
+            AddVar(VAR_XIAGU_CNT, curCount);
         else if(curType == 2)
-            SetVar(VAR_ROUQING, curCount);
+            AddVar(VAR_ROUQING_CNT, curCount);
         else if(curType == 3)
-            SetVar(VAR_CAIFU_CNT, curCount);
+            AddVar(VAR_CAIFU_CNT, curCount);
         else if(curType == 4)
-            SetVar(VAR_CHUANQI_CNT, curCount);
-#endif
-		//GameMsgHdr hdr(0x1F9, WORKER_THREAD_WORLD, this, sizeof(Roam));
-		//GLOBAL().PushMsg(hdr, &roam);
+            AddVar(VAR_CHUANQI_CNT, curCount);
+
+        if(GetVar(VAR_ZYCM_TIPS) != tips)
+            SetVar(VAR_ZYCM_TIPS, tips);
+
+        WORLD().UpdateKillMonsterRank(this, curType, curCount);
     }
 
 } // namespace GObject

@@ -58,6 +58,8 @@
 #include "GObject/TownDeamon.h"
 #include "GObject/Arena.h"
 
+#include "GObject/Tianjie.h"
+
 struct NullReq
 {
 	UInt32 ticket;
@@ -983,6 +985,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     {
         if(!pl->GetVar(VAR_AWARD_NEWREGISTER) && pl->GetLev() == 1)
             pl->sendNewRegisterAward(0);  //0:表示新用户注册还可以邀请好友进行抽奖
+        pl->CheckCanAwardBirthday(); //生日罗盘许愿星(周年庆活动)
     }
 	{
 		Stream st;
@@ -1154,6 +1157,15 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     {
         pl->sendSoSoMapInfo();
     }
+    {
+        GObject::Tianjie::instance().getTianjieData(pl, true);
+        if (World::getConsume918())
+        {
+            Stream st(REP::DAILY_DATA);
+            st << static_cast<UInt8>(17) << pl->GetVar(VAR_CONSUME_918) << Stream::eos;
+            pl->send((st));
+        }
+    }
     if (World::getNeedRechargeRank() || time(NULL) <= World::getRechargeEnd() + 24*60*60)
     {
         GameMsgHdr hdr(0x1C3, WORKER_THREAD_WORLD, pl, 0);
@@ -1164,8 +1176,21 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         GameMsgHdr hdr(0x1C4, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr, NULL);
     }
+    pl->sendYearRPInfo();
     //if(World::getYearActive())
     //    pl->sendYearActInfo();
+    if (World::getQgameGiftAct())
+    {
+        UInt32 now = TimeUtil::Now();
+        struct tm t;
+        time_t tt = now;
+        localtime_r(&tt, &t);
+        if(t.tm_hour == 21 && t.tm_min <= 10)
+        {
+            GameMsgHdr hdr(0x1C5, WORKER_THREAD_WORLD, pl, 0);
+            GLOBAL().PushMsg(hdr, NULL);
+        }
+    }
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -1654,7 +1679,17 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
         {
             if(!World::getKillMonsterAct())
                 return;
-            player->getKillMonsterAward();
+            UInt8 type = 0;
+            br >> type;
+            if(type == 0)
+            {
+                GameMsgHdr hdr(0x1FF, WORKER_THREAD_WORLD, player, 0);
+                GLOBAL().PushMsg(hdr, NULL);
+            }
+            else if(type == 1)
+                player->getKillMonsterAward();
+            else if(type == 2)
+                player->checkLastKillMonsterAward();
         }
         break;
         default:
@@ -2568,6 +2603,12 @@ void OnAttackNpcReq( GameMsgHdr& hdr, AttackNpcReq& anr )
 		return;
 	}
 
+	if (GObject::Tianjie::instance().isTjNpc(anr._npcId, loc))
+	{
+	    GObject::Tianjie::instance().attack(player, loc, anr._npcId);
+	    return;
+	}
+
     if (WBossMgr::isWorldBoss(anr._npcId))
         worldBoss.attack(player, loc, anr._npcId);
     else
@@ -2625,8 +2666,9 @@ void OnBattleEndReq( GameMsgHdr& hdr, BattleEndReq& req )
         tcpInfo->sendAwardInfo();
     }
 
+    player->addLastTjScore();
 
-	if(now <= PLAYER_DATA(player, battlecdtm))
+    if(now <= PLAYER_DATA(player, battlecdtm))
 		return ;
 
 	player->checkLastBattled();
@@ -4312,6 +4354,10 @@ void OnFourCopReq( GameMsgHdr& hdr, const void* data)
         pl->send(st);
     }
 }
+void OnTianjieReq( GameMsgHdr& hdr, const void* data)
+{
+    GObject::Tianjie::instance().onTianjieReq(hdr, data);
+}
 
 void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
 {
@@ -4853,6 +4899,13 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
 
         case 5:
             player->turnOnRC7Day();
+            break;
+
+        case 6:
+            player->getYearRPPackage();
+            break;
+        case 7:
+            player->getYearRPReward();
             break;
 
         default:

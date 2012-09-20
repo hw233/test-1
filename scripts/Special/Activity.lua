@@ -2247,7 +2247,7 @@ function onGetYearActAward(player, type)
     end
 end
 
-function onGetKillMonsterReward(player, pos)
+function onGetKillMonsterReward(player)
     local roamPlace = {
      -- 1  2  3  4  5  6  7  8
         1, 2, 3, 4, 5, 6, 7, 8,
@@ -2259,10 +2259,10 @@ function onGetKillMonsterReward(player, pos)
     local eventItem = {
         --{物品ID，物品数，剑侠（或柔情、或财富、或传奇），剑侠个数}
         {{502,  1, 1, 1}, {55,  1, 0, 0}, {510,  1, 0, 0}},
-        {{56,   1, 0, 0}, {57,  1, 0, 0}, {1525, 1, 1, 1}},
+        {{56,   1, 0, 0}, {57,  1, 0, 0}, {1526, 1, 1, 1}},
         {{502,  1, 1, 1}, {55,  1, 0, 0}, {510,  1, 0, 0}},
         {{1326, 1, 0, 0}, {466, 1, 0, 0}, {8000, 1, 3, 1}},
-        {{56,   1, 0, 0}, {57,  1, 0, 0}, {1525, 1, 3, 1}},
+        {{56,   1, 0, 0}, {57,  1, 0, 0}, {1526, 1, 3, 1}},
         {{502,  1, 2, 1}, {55,  1, 0, 0}, {510,  1, 0, 0}},
         {{1326, 1, 0, 0}, {466, 1, 0, 0}, {8000, 1, 2, 1}},
         {{502,  1, 3, 1}, {55,  1, 0, 0}, {510,  1, 0, 0}},
@@ -2276,19 +2276,54 @@ function onGetKillMonsterReward(player, pos)
         {{9076, 1, 4, 1}, {9076,1, 4, 1}, {9076, 1, 4, 1}},
     }
 
+    local pos = player:GetVar(182)
     local step = math.random(1, 3)
     local pos2 = pos + step
-    if pos2 > 28 then
-        pos2 = pos2 - 28
+    --if pos2 > 28 then
+    --    pos2 = pos2 - 28
+    --end
+    --player:SetVar(182, pos2)
+
+    local posTmp = pos2 % 28
+    if posTmp == 0 then
+        posTmp  = 28
     end
 
     local package = player:GetPackage()
-    i = roamPlace[pos2]
-    j = math.random(1, 3)
+    local i = roamPlace[posTmp]
+    local j = math.random(1, 3)
 
-    package:Add(eventItem[i][j][1], eventItem[i][j][2], true, true, 32)
+    package:Add(eventItem[i][j][1], eventItem[i][j][2], true, true, 33)
     player:lastKillMonsterAwardPush(eventItem[i][j][1], eventItem[i][j][2]);
-    player:postKillMonsterRoamResult(pos2, eventItem[i][j][3], eventItem[i][j][4]);
+    if eventItem[i][j][3] >=1 and eventItem[i][j][3] <= 4 then
+        local curType = eventItem[i][j][3]
+        local extAward = 0
+        if curType == 1 and player:GetVar(183) == (1-1) then
+            extAward = 1757
+        elseif curType == 2 and player:GetVar(184) == (1-1) then
+            extAward = 1751
+        elseif curType == 3 and player:GetVar(185) == (1-1) then
+            extAward = 1750
+        elseif curType == 4 and player:GetVar(186) == (1-1) then
+            extAward = 1752
+        elseif curType == 1 and player:GetVar(183) == (5-1) then
+            extAward = 1753
+        elseif curType == 2 and player:GetVar(184) == (3-1) then
+            extAward = 1754
+        elseif curType == 3 and player:GetVar(185) == (4-1) then
+            extAward = 1755
+        elseif curType == 4 and player:GetVar(186) == (2-1) then
+            extAward = 1756
+        end
+
+        if extAward ~= 0 then
+            --package:Add(extAward, 1, true, true, 33)
+            --player:lastKillMonsterAwardPush(extAward, 1);
+            player:luaUdpLog("916", "F_1099_"..curType, "act")
+            sendItemPackageMail(player, msg_120, msg_121, {extAward,1,1})
+        end
+    end
+    player:postKillMonsterRoamResult(pos2, eventItem[i][j][3], eventItem[i][j][4], j);
 
     return pos2;
 end

@@ -2120,6 +2120,10 @@ void Fighter::setPeerless( UInt16 pl, bool writedb )
     if (_owner && writedb)
         _owner->OnHeroMemo(MC_SKILL, MD_ADVANCED, 0, 1);
     sendModification(0x30, peerless, 0, writedb);
+
+    // 装备无双技能，通知前端符文相关内容
+    if(peerless)
+        PeerlessSSNotify(peerless);
 }
 
 UInt8 Fighter::getAcupointCnt()
@@ -4276,6 +4280,12 @@ void Fighter::makeFighterSSInfo(Stream& st)
                 ++c;
         }
     }
+    // append peerless skill
+    if (peerless)
+    {
+        if (appendFighterSSInfo(st, peerless))
+            ++c;
+    }
     st.data<UInt8>(offset) = c;
 }
 
@@ -4305,9 +4315,15 @@ void Fighter::SSOpen(UInt16 id)
 {
     if (!_owner)
         return;
-    int idx = isSkillUp(id);
-    if (idx < 0)
-        return;
+
+    bool bIsPeerLess = (SKILL_ID(peerless) == SKILL_ID(id));
+    int idx = -1;
+    if(!bIsPeerLess)
+    {
+        idx = isSkillUp(id);
+        if (idx < 0)
+            return;
+    }
 
     UInt16 sid = SKILL_ID(id);
     if (GData::skill2item.find(sid) == GData::skill2item.end())
@@ -4321,7 +4337,11 @@ void Fighter::SSOpen(UInt16 id)
     std::map<UInt16, SStrengthen>::iterator i = m_ss.find(sid);
     if (i != m_ss.end())
     {
-        UInt8 mlvl = getUpSkillLevel(idx);
+        UInt8 mlvl = 0;
+        if(bIsPeerLess)
+            mlvl = getPeerlessLevel();
+        else
+            mlvl = getUpSkillLevel(idx);
         if (i->second.maxLvl >= mlvl && mlvl == 9)
         {
             _owner->sendMsgCode(0, 1021);
@@ -4341,8 +4361,11 @@ void Fighter::SSOpen(UInt16 id)
     }
 
     UInt16 itemId = 550;
-    if (i->second.maxLvl >= 4)
-        itemId = 551;
+	if (i != m_ss.end())
+	{
+		if (i->second.maxLvl >= 4)
+			itemId = 551;
+	}
     Package* pkg = _owner->GetPackage();
     ItemBase* item = pkg->FindItem(itemId, true);
     if (!item)
@@ -4425,9 +4448,14 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, bool bind)
     if (GetItemSubClass(itemId) != Item_Citta)
         return 0;
 
-    int idx = isSkillUp(id);
-    if (idx < 0)
-        return 0;
+    int idx = -1;
+    bool bIsPeerLess = (SKILL_ID(id) == SKILL_ID(peerless));
+    if(!bIsPeerLess)
+    {
+        idx = isSkillUp(id);
+        if (idx < 0)
+            return 0;
+    }
 
     if (ss.lvl >= ss.maxLvl)
     {
@@ -4521,6 +4549,15 @@ void Fighter::SSNotify(UInt16 id, SStrengthen& ss)
     appendFighterSSInfo(st, id, &ss);
     st << Stream::eos;
     _owner->send(st);
+}
+
+void Fighter::PeerlessSSNotify(UInt16 id)
+{
+    UInt16 sid = SKILL_ID(id);
+    std::map<UInt16, SStrengthen>::iterator it = m_ss.find(sid);
+    if (it == m_ss.end())
+        return;
+    SSNotify(id, it->second);
 }
 
 void Fighter::SSDeleteDB(UInt16 id)

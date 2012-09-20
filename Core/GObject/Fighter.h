@@ -498,6 +498,8 @@ public:
 public:
     inline void setExtraAttack(Int32 atk) { setDirty(true); _wbextatk = atk; }
 	inline void setExtraMagAttack(Int32 atk) { setDirty(true); _wbextmagatk = atk; }
+    inline void setAttrExtraEquip(const GData::AttrExtra& other){_attrExtraEquip += other;}
+    inline void resetAttrExtraEquip(){setDirty(true); _attrExtraEquip.reset();}
 
 public:
 	inline Int16 getBaseStrength()
@@ -758,6 +760,7 @@ public:
     void makeFighterSSInfo(Stream& st);
     bool appendFighterSSInfo(Stream& st, UInt16 skillid);
     bool appendFighterSSInfo(Stream& st, UInt16 skillid, SStrengthen* ss);
+    void PeerlessSSNotify(UInt16 id);
 private:
     std::map<UInt16, SStrengthen> m_ss;
 

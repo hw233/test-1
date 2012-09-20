@@ -1097,7 +1097,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
         DBSkillStrengthenEffect dbne;
-        if(execu->Prepare("SELECT `id`, `cond`, `target`, `prob`, `area`, `factor`, `last`, `type`, `value` FROM  `skillstrengthen_effect`", dbne) != DB::DB_OK)
+        if(execu->Prepare("SELECT `id`, `cond`, `target`, `prob`, `area`, `factor`, `last`, `type`, `value`, `valueExtend1`, `valueExtend2` FROM  `skillstrengthen_effect`", dbne) != DB::DB_OK)
             return false;
         while(execu->Next() == DB::DB_OK)
         {
@@ -1111,6 +1111,8 @@ namespace GData
             ef->last = dbne.last;
             ef->type = dbne.type;
             ef->value = dbne.value;
+            ef->valueExt1 = dbne.valueExt1;
+            ef->valueExt2 = dbne.valueExt2;
 
             StringTokenizer tk(dbne.factor, ",");
             if (tk.count())

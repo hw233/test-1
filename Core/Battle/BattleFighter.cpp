@@ -36,15 +36,19 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _atkreduce3(0), _magatkreduce3(0), _pudu_debuf(0),
     _atkreduce3_last(0), _magatkreduce3_last(0), _pudu_debuf_last(0),
     _deep_forget_dmg_extra(0), _deep_forget_last(0), _deep_stun_dmg_extra(0), _deep_stun_last(0),
-    _therapy_dec(0), _therapy_dec_last(0),
+    _therapy_dec(0), _therapy_dec_last(0),_therapy_add(0),_therapy_add_last(0),
+    _aura_dec(0), _aura_dec_last(0),
     _bleed1(0), _bleed2(0), _bleed3(0),
     _bleed1_last(0), _bleed2_last(0), _bleed3_last(0),
     _immune2(0), _def_dec(0), _def_dec_last(0), _def_dec_times(0),
     _aura_bleed(0), _aura_dec_cd(0), _aura_bleed_last(0),
     _stun_bleed(0), _stun_cd(0), _stun_bleed_last(0),
     _confuse_bleed(0), _confuse_cd(0), _confuse_bleed_last(0),
-    _colorStock(0), _colorStockTimes(0), _colorStockLast(0)
-
+    _colorStock(0), _colorStockTimes(0), _colorStockLast(0),
+    _atkAddSpecial(0), _atkSpecialLast(0), _magAtkAddSpecial(0), _magAtkSpecialLast(0), 
+    _atkDecSpecial(0), _atkDecSpecialLast(0), _magAtkDecSpecial(0), _magAtkDecSpecialLast(0),
+    _bleedRandom(0), _bleedRandomLast(0), _bleedAttackClass(1),_bleedBySkill(0), _bleedBySkillLast(0), _bleedBySkillClass(1),
+    _hitChangeByPeerless(0),_counterChangeByPeerless(0),_bSingleAttackFlag(false),_bMainTargetDead(false),_nCurrentAttackIndex(0)
 {
     memset(_immuneLevel, 0, sizeof(_immuneLevel));
     memset(_immuneRound, 0, sizeof(_immuneRound));
@@ -56,6 +60,8 @@ void BattleFighter::setFighter( GObject::Fighter * f )
 	_fighter = f;
 
     _peerlessSkill.base = GData::skillManager[_fighter->getPeerlessAndLevel()];
+    // reg skillstrenghten
+    updateSkillStrengthen(_fighter->getPeerlessAndLevel());
 
     std::vector<UInt16> activeSkill;
     _fighter->getUpSkillAndLevel(activeSkill);
@@ -679,7 +685,7 @@ float BattleFighter::calcTherapy(bool& isCritical, bool& first, const GData::Ski
         }
     }
 
-    return aura_factor * ((_magatk + _magAtkAdd + _magAtkAdd2) * skill->effect->hpP + skill->effect->addhp + skill->effect->hp);
+    return aura_factor * (getMagAttack() * skill->effect->hpP + skill->effect->addhp + skill->effect->hp);
 }
 
 float BattleFighter::calcPoison(const GData::SkillBase* skill, BattleFighter* defender, bool cs)
@@ -1102,10 +1108,16 @@ float BattleFighter::getHitrate(BattleFighter* defgt)
 {
     float hiterate = 0;
     if(defgt == NULL)
-        hiterate = _hitrate + _hitrateAdd + _hitrateAdd2;
+        hiterate = _hitrate + _hitrateAdd + _hitrateAdd2 + _hitChangeByPeerless;
     else
-        hiterate = _formula->calcHitrate(this, defgt) + _hitrateAdd + _hitrateAdd2;
+        hiterate = _formula->calcHitrate(this, defgt) + _hitrateAdd + _hitrateAdd2 + _hitChangeByPeerless;
 
+// #ifdef _DEBUG
+//     if (_hitChangeByPeerless != 0)
+//     {
+//         fprintf(stderr, "old hitrate = %f, new hitrate = %f\n", hiterate - _hitChangeByPeerless, hiterate);
+//     }
+// #endif
     if(hiterate > GObject::GObjectManager::getHiterateMax() && !isNpc())
         hiterate = GObject::GObjectManager::getHiterateMax();
 
@@ -1170,9 +1182,16 @@ float BattleFighter::getCounter(BattleFighter* defgt)
 {
     float counter = 0;
     if(defgt == NULL)
-        counter = _counter + _counterAdd + _counterAdd2;
+        counter = _counter + _counterAdd + _counterAdd2 + _counterChangeByPeerless;
     else
-        counter = _formula->calcCounter(this, defgt) + _counterAdd + _counterAdd2;
+        counter = _formula->calcCounter(this, defgt) + _counterAdd + _counterAdd2 + _counterChangeByPeerless;
+
+// #ifdef _DEBUG
+//     if (_counterChangeByPeerless != 0)
+//     {
+//         fprintf(stderr, "old counter = %f, new counter = %f\n", counter - _counterChangeByPeerless, counter);
+//     }
+// #endif
 
     if(counter > GObject::GObjectManager::getCounterMax() && !isNpc())
         counter = GObject::GObjectManager::getCounterMax();

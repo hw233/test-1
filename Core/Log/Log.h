@@ -73,6 +73,8 @@ enum PurchaseType
     ArenaBet,
     AthleticKillCD2,
     AthleticPhysical,
+    TianjieDonate,
+    TianjieTask,
     DiscountSp1,
     DiscountSp2,
     DiscountSp3,
@@ -153,6 +155,7 @@ enum ItemFrom
 	FromHappyAward,
     FromIDIP,
     FromQixi,
+    FromKillMonster, //斩妖除魔
 };
 
 enum ItemTo
