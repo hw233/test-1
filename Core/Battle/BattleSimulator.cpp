@@ -6355,6 +6355,32 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo, DefStatus* defL
         BattleFighter* toremove = static_cast<BattleFighter *>(bo);
         removeFighterStatus(toremove);
 
+        int idx = 0;
+        for(idx = 0; idx < _onTherapy.size(); ++ idx)
+        {
+            if(_onTherapy[idx] == toremove)
+            {
+                _onTherapy.erase(_onTherapy.begin() + idx);
+                break;
+            }
+        }
+        for(idx = 0; idx < _onSkillDmg.size(); ++ idx)
+        {
+            if(_onSkillDmg[idx] == toremove)
+            {
+                _onSkillDmg.erase(_onSkillDmg.begin() + idx);
+                break;
+            }
+        }
+        for(idx = 0; idx < _onOtherDead.size(); ++ idx)
+        {
+            if(_onOtherDead[idx] == toremove)
+            {
+                _onOtherDead.erase(_onOtherDead.begin() + idx);
+                break;
+            }
+        }
+
         // re-test winner
         _winner = testWinner();
 
