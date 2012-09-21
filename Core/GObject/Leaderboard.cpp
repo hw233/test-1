@@ -77,6 +77,15 @@ SPECIALDEF(4)
 )
 SPECIALEND()
 
+SPECIALBEGIN(GObject::LeaderboardClanCopy)
+SPECIALDEF(4)
+(
+    UInt64, id,
+	std::string, name,
+    UInt32, level,
+    UInt64, time
+)
+SPECIALEND()
 }
 
 namespace GObject
@@ -247,6 +256,14 @@ void Leaderboard::doUpdate()
         FastMutex::ScopedLock lk(_tmutex);
         _towndown.clear();
         _towndown.insert(_towndown.end(), blist3.begin(), blist3.end());
+    }
+
+	std::vector<LeaderboardClanCopy> blist4;
+	execu->ExtractData("select a.id, a.name, b.maxCopyLevel, b.maxCopyTime from clan a, clan_copy b where a.id=b.clanId order by b.maxCopyLevel desc, b.maxCopyTime  asc limit 10;", blist4);
+    {
+        FastMutex::ScopedLock lk(_cmutex);
+        _clancopy.clear();
+        _clancopy.insert(_clancopy.end(), blist4.begin(), blist4.end());
     }
 
 	std::vector<UInt64> ilist;

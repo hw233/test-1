@@ -264,7 +264,11 @@ void WorldServer::Run()
 	//主线程等待所有子线程结束
 	for (worker = 0; worker < MAX_THREAD_NUM; worker++)
 	{
-		m_AllWorker[worker]->Wait();
+        while(!m_AllWorker[worker]->tryJoin(300000))
+        {
+            updateState("open");
+        }
+		//m_AllWorker[worker]->Wait();
 	}
 
 	m_TcpService->Join();
@@ -320,13 +324,8 @@ static int recvret(char* data, size_t size, size_t nmemb, char* buf)
     return nsize;
 }
 
-void WorldServer::State(const char* action, int serverNum)
+void WorldServer::do_curl_request( const char* url )
 {
-    if (!curl || !action || !serverNum)
-        return;
-    char url[4096] = {0};
-    snprintf(url, sizeof(url), "%s&state=%s&server=s%d", cfg.stateUrl.c_str(), action, serverNum);
-
     char buffer[MAX_RET_LEN] = {0};
     curl_easy_setopt(curl, CURLOPT_URL, url);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, recvret);
@@ -345,29 +344,34 @@ void WorldServer::State(const char* action, int serverNum)
     {
         fprintf(stderr, "URL: %s [ERROR]\n", url);
     }
+}
 
+void WorldServer::State(const char* action, int serverNum)
+{
+    if (!curl || !action || !serverNum)
+        return;
+    char url[4096] = {0};
+    snprintf(url, sizeof(url), "%s&state=%s&server=s%d", cfg.stateUrl.c_str(), action, serverNum);
+
+    do_curl_request(url);
+
+    updateState(action);
+}
+
+
+void WorldServer::updateState(const char* action)
+{
 #ifdef _DEBUG
+    if (!curl || !action)
+        return;
+    char url[4096] = {0};
+
     char serverIp[20];
     in_addr iaddr;
     iaddr.s_addr = cfg.serverIp;
     strcpy(serverIp, inet_ntoa(iaddr));
     snprintf(url, sizeof(url), "http://192.168.88.250/serverstate.php?ip=%s&port=%d&state=%s", serverIp, cfg.tcpPort, action);
-    curl_easy_setopt(curl, CURLOPT_URL, url);
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, recvret);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
-    curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10);
-    fprintf(stderr, "URL: %s\n", url);
-
-    res = curl_easy_perform(curl);
-    if (CURLE_OK == res)
-    {
-        // TODO:
-        fprintf(stderr, "URL: %s [OK]\n", url);
-    }
-    else
-    {
-        fprintf(stderr, "URL: %s [ERROR]\n", url);
-    }
+    do_curl_request(url);
 #endif
 }
 

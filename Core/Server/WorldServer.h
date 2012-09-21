@@ -84,6 +84,10 @@ public:
     void Down();
     void State(const char* action, int serverNum);
 
+    void do_curl_request( const char* url );
+
+    void updateState(const char* action);
+
 private:
     CURL* curl;
 };
