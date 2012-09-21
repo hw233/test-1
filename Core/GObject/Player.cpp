@@ -12663,7 +12663,7 @@ namespace GObject
         else if (2 == eventId)
         {
             type = 2;
-            int score = GetVar(VAR_TJ_TASK2_SCORE);
+            UInt32 score = GetVar(VAR_TJ_TASK2_SCORE);
             switch (cmd)
             {
                     //查询列表

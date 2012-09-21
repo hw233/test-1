@@ -3151,7 +3151,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
 
         if(hpr_first && skill->cond == GData::SKILL_ACTIVE)
         {
-            for(int i = 0; i < _onTherapy.size(); ++ i)
+            for(size_t i = 0; i < _onTherapy.size(); ++ i)
             {
                 BattleFighter* bo = _onTherapy[i];
                 if(!bo || bo->getHP() == 0)
@@ -3658,7 +3658,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][target_pos]);
             if(bo != NULL && bo->getHP() != 0 && bo->isChar())
             {
-                for(int i = 0; i < _onSkillDmg.size(); ++ i)
+                for(size_t i = 0; i < _onSkillDmg.size(); ++ i)
                 {
                     BattleFighter* bf = _onSkillDmg[i];
                     if(!bf || bf->getHP() == 0)
@@ -6392,7 +6392,7 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo, DefStatus* defL
         BattleFighter* toremove = static_cast<BattleFighter *>(bo);
         removeFighterStatus(toremove);
 
-        int idx = 0;
+        size_t idx = 0;
         for(idx = 0; idx < _onTherapy.size(); ++ idx)
         {
             if(_onTherapy[idx] == toremove)
@@ -6422,7 +6422,7 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo, DefStatus* defL
         _winner = testWinner();
 
         // 五彩石
-        for(int i = 0; i < _onOtherDead.size(); ++ i)
+        for(size_t i = 0; i < _onOtherDead.size(); ++ i)
         {
             BattleFighter* bo2 = _onOtherDead[i];
             if(!bo2 || bo2->getHP() == 0 || bo2 == bo)
