@@ -334,6 +334,7 @@ int query_gangcopy_complete_layer_req(JsonHead* head, json_t* body, json_t* retb
         for (UInt32 i = 0; i < count; ++i)
         {
             char id[32] = {0};
+            char time[32] = {0};
             json_t* obj = json_new_object();
             if (obj)
             {
@@ -341,7 +342,8 @@ int query_gangcopy_complete_layer_req(JsonHead* head, json_t* body, json_t* retb
                 json_insert_pair_into_object(obj, "uiFactionID", json_new_string(id));
                 json_insert_pair_into_object(obj, "szFactionName", json_new_string(fixPlayerName(clancopy[i].name).c_str()));
                 json_insert_pair_into_object(obj, "uiFactionMaxLevel", my_json_new_number(clancopy[i].level));
-                json_insert_pair_into_object(obj, "uiFactiontime2MaxLvl", my_json_new_number(clancopy[i].time));
+                snprintf(time, sizeof(time), "%"I64_FMT"u", clancopy[i].time);
+                json_insert_pair_into_object(obj, "uiFactiontime2MaxLvl", json_new_string(time));
                 json_insert_child(arr, obj);
             }
         }
