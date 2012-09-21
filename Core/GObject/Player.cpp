@@ -13359,6 +13359,32 @@ void EventTlzAuto::notify(bool isBeginAuto)
 
     // 帮派副本相关
     ///////////////////////////////////////////////
+    bool Player::checkTrumpMutually(UInt32 trumpid)
+    {
+        static UInt32 muttrumps[] = {1532, 1530};
+        if (trumpid == 1530 || trumpid == 1532)
+        {
+            for (size_t i = 0; i < sizeof(muttrumps)/sizeof(UInt32); ++i)
+            {
+                for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++it)
+                {
+                    Fighter* fgt = it->second;
+                    UInt32 trumpids[32];
+                    size_t c = fgt->getAllTrumpTypeId(trumpids, sizeof(trumpids)/sizeof(UInt32));
+                    if (!c)
+                        continue;
+                    for (size_t j = 0; j < c; ++j)
+                    {
+                        if (!trumpids[j])
+                            continue;
+                        if (trumpids[j] == muttrumps[i])
+                            return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
 
 } // namespace GObject
 

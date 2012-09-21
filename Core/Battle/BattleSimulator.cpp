@@ -1361,14 +1361,17 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
             ++ defCount;
         }
 
-        // 一次有效的法术攻击，减少法术特殊加成效果和被减掉的效果
         // 一次有效的物理攻击，减少上次吸收的物理伤害和被减掉的伤害
-        if (dmg > 0 || magdmg > 0)
+        if (dmg > 0)
         {
             if (bf->getAtkSpecialLast() > 0)
                 ReduceSpecialAttrLast(bf, e_ss_Atk, 1, scList, scCount);
             if (bf->getAtkDecSpecialLast() > 0)
                 ReduceSpecialAttrLast(bf, e_ss_DecAtk, 1, scList, scCount);
+        }
+        // 一次有效的法术攻击，减少法术特殊加成效果和被减掉的效果
+        if (magdmg > 0)
+        {
             if (bf->getMagAtkSpecialLast() > 0)
                 ReduceSpecialAttrLast(bf, e_ss_MagAtk, 1, scList, scCount);
             if (bf->getMagAtkDecSpecialLast() > 0 )
@@ -3886,6 +3889,21 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
         }
     }
 
+    // 有给自己加的属性驻留在临时变量中，取出来，加上去
+    if (bf->getHP() > 0)
+    {
+        float fAtk = 0;
+        Int16 nLast = 0;
+        int esstype = 0;
+        bf->getSkillUsedChangeAttr(fAtk, nLast, esstype);
+        if (fAtk > 0)
+        {
+            SpecialStatus etype = static_cast<SpecialStatus>(esstype);
+            SetSpecialAttrChange(bf, skill, etype, nLast, fAtk, true, scList, scCount);
+        }
+        bf->setSkillUsedChangeAttr(0, 0, 0);  // clear
+    }
+
     bf->setSingleAttackFlag(false);  // 攻击完毕，取消此次造成的增加概率的效果
     bf->setMainTargetDeadFlag(false);
 
@@ -4460,6 +4478,7 @@ bool BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GD
             BattleObject** this_side_obj = _objs[bf->getSide()];
             float maxatk = 0;
             UInt8 maxatk_pos = 0;
+            UInt8 maxatk_class = 0;
             BattleFighter* fighter = NULL;
             for(UInt8 i=0; i<25; ++i)
             {
@@ -4467,28 +4486,48 @@ bool BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GD
                     //continue;
 
                 fighter = static_cast<BattleFighter*>(this_side_obj[i]);
-                if(fighter && fighter->getHP() > 0 && (fighter->getAttack()+fighter->getMagAttack()) >maxatk)
+                if (fighter && fighter->getHP() > 0)
                 {
-                    maxatk = fighter->getAttack() + fighter->getMagAttack();
-                    maxatk_pos = i;
+                    float fatkvalue = 0;
+                    UInt8 nClass = fighter->getClass();
+                    if (nClass == 1 || nClass == 2)
+                        fatkvalue = fighter->getMagAttack();
+                    else
+                        fatkvalue = fighter->getAttack();
+                    if(fatkvalue >maxatk)
+                    {
+                        maxatk = fatkvalue;
+                        maxatk_pos = i;
+                        maxatk_class = nClass;
+                    }
                 }
             }
             fighter = static_cast<BattleFighter*>(this_side_obj[maxatk_pos]);
             if(fighter && fighter->getHP() > 0)
             {
                 float fAtk = bo->_attack * skill->effect->atkP + skill->effect->atk;
+                fAtk = -fAtk*ef->value/100;
                 float fmagicAtk = bo->_magatk * skill->effect->magatkP + skill->effect->magatk;
-                if(fAtk < 0)
+                fmagicAtk = -fmagicAtk*ef->value/100;
+                if (bf->getPos() == maxatk_pos)  // 如果是给自己增加，那么放到技能使用之后，让他下次使用技能再享受，省得看不到buf，以为没效果
                 {
-                    fAtk = -fAtk*ef->value/100;
-                    SetSpecialAttrChange(fighter, skill, e_ss_Atk, ef->last, fAtk, true, scList, scCount);
+                    if(fAtk > 0 && maxatk_class == 3)
+                        fighter->setSkillUsedChangeAttr(fAtk, ef->last, e_ss_Atk);
+                    if(fmagicAtk > 0 && (maxatk_class == 1 || maxatk_class == 2))
+                        fighter->setSkillUsedChangeAttr(fmagicAtk, ef->last, e_ss_MagAtk);
                 }
-                if(fmagicAtk< 0)
+                else
                 {
-                    fmagicAtk = -fmagicAtk*ef->value/100;
-                    SetSpecialAttrChange(fighter, skill, e_ss_MagAtk, ef->last, fmagicAtk, true, scList, scCount);
+                    if(fAtk > 0 && maxatk_class == 3)
+                    {
+                        SetSpecialAttrChange(fighter, skill, e_ss_Atk, ef->last, fAtk, true, scList, scCount);
+                    }
+                    if(fmagicAtk > 0 && (maxatk_class == 1 || maxatk_class == 2))
+                    {
+                        SetSpecialAttrChange(fighter, skill, e_ss_MagAtk, ef->last, fmagicAtk, true, scList, scCount);
+                    }
                 }
-            }				
+            }
             //setStatusChange(bf, bf->getSide(), maxatk_pos, 1, skill, e_stAtk, value, 1, scList, scCount, activeFlag);					
         }
     }	
@@ -7973,7 +8012,7 @@ bool BattleSimulator::doSkillStrengthen_bufTherapy( BattleFighter* bf, const GDa
 // skill导致bf的属性etype产生value的改变，持续last次有效，新的覆盖旧的。
 void BattleSimulator::SetSpecialAttrChange(BattleFighter* bf, const GData::SkillBase* skill, SpecialStatus eType, Int16 nLast, float value, bool bOffset, StatusChange* scList, size_t& scCount)
 {
-    if(!bf || eType >= MAX_SPECIAL_STATUS || eType < MIN_SPECIAL_STATUS)
+    if(!bf || eType >= MAX_SPECIAL_STATUS || eType <= MIN_SPECIAL_STATUS)
         return;
 
     if(nLast <= 0)
@@ -8246,9 +8285,6 @@ bool BattleSimulator::AddSkillStrengthenState(BattleFighter* pFighter, BattleFig
         return false;
     std::vector<AttackAct> vAttackAct; // 这个存被动技能等造成的更多动作
     vAttackAct.clear();
-//     defList[defCount].damage = 0;
-//     defList[defCount].pos = pTarget->getPos();
-//     defList[defCount].leftHP = pTarget->getHP();
     // 下面开始上状态的逻辑
     UInt8 arrayState[3] = {0};
     UInt8 nCount = 0;
@@ -8284,12 +8320,19 @@ bool BattleSimulator::AddSkillStrengthenState(BattleFighter* pFighter, BattleFig
     if(arrayState[nIndex]& nImmu2)
     {
         pTarget->setImmune2(0);
+
+        defList[defCount].damage = 0;
+        defList[defCount].pos = pTarget->getPos();
+        defList[defCount].leftHP = pTarget->getHP();
         defList[defCount].damType = e_unImmune2;  // 技能符文里面的那个免疫起效了
         defCount ++;
         return true;
     }
     if((arrayState[nIndex] & nImmu) && SKILL_LEVEL(nSkillId) <= pTarget->getImmuneLevel(arrayState[nIndex]))
     {
+        defList[defCount].damage = 0;
+        defList[defCount].pos = pTarget->getPos();
+        defList[defCount].leftHP = pTarget->getHP();
         defList[defCount].damType = e_Immune;
         defCount ++;
         return true;
@@ -8297,6 +8340,9 @@ bool BattleSimulator::AddSkillStrengthenState(BattleFighter* pFighter, BattleFig
     float fResRate = pTarget->getMagRes(pFighter) * 100;
     if(fResRate > _rnd(10000))  // 成功抵抗
     {
+        defList[defCount].damage = 0;
+        defList[defCount].pos = pTarget->getPos();
+        defList[defCount].leftHP = pTarget->getHP();
         defList[defCount].damType = e_Res;
         
         size_t nidx = 0;

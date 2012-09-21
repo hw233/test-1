@@ -1409,7 +1409,7 @@ namespace GObject
             case 0x0c:
                 if(item->getClass() != Item_Trump)
                     return false;
-                if (fgt->canSetTrump(part-0x0a, item->getId()))
+                if (fgt->canSetTrump(part-0x0a, item->getId()) && !m_Owner->checkTrumpMutually(item->GetItemType().getId()))
                     old = fgt->setTrump(static_cast<GObject::ItemTrump*>(item), part-0x0a);
                 else
                     return false;
