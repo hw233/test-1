@@ -163,6 +163,7 @@ function loadStore()
 
         discount(store)
 
+        store:add(2,1700,599)
         store:add(2,1701,599)
         store:add(2,1702,599)
         store:add(2,1703,599)
