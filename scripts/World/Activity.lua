@@ -107,6 +107,11 @@ function is0808_0814()
     return is_0808_0814
 end
 
+is_0921_0924 = false
+function is0921_0924()
+    return is_0921_0924
+end
+
 function onActivityCheck(tm)
   local osmax = oldServersMax[serverName]
   if osmax ~= nil and serverNum <= osmax then
@@ -593,6 +598,12 @@ function onActivityCheck(tm)
       else
           setRechargeActive(false, 16)
       end
+
+      if tm >= actTime509 and tm < actTime509_1 then
+          is_0921_0924 = true
+      else
+          is_0921_0924 = false
+      end
       
       setRechargeTime(actTime508, actTime508_1)
 
@@ -691,6 +702,8 @@ function initActTime(y, m, d)
   local  SerStartTm503= { ['year'] = 2012, ['month'] = 9, ['day'] = 13, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --充值返礼(9/22-9/23)
   local  SerStartTm508= { ['year'] = 2012, ['month'] = 9, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --变身法宝(9/21-9/24)
+  local  SerStartTm509= { ['year'] = 2012, ['month'] = 9, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 繁体版
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm102 = { ['year'] = 2012, ['month'] = 6, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -888,6 +901,8 @@ function initActTime(y, m, d)
   actTime508 = os.time(SerStartTm508);
   actTime508_1 = os.time(SerStartTm508) + 2 * 86400;
 
+  actTime509 = os.time(SerStartTm509);
+  actTime509_1 = os.time(SerStartTm509) + 4 * 86400;
 
   -- 繁体版
   actTime101 = os.time(SerStartTm101);
