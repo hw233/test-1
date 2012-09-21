@@ -1,4 +1,4 @@
-#include "Config.h"
+ï»¿#include "Config.h"
 #include "ClanBattle.h"
 #include "Clan.h"
 #include "ClanTech.h"
@@ -237,7 +237,7 @@ void ClanBattle::disbandClanBattle()
 		delete offset->second;
 	}
 
-	//¾İµã»¤ÎÀÎö¹¹
+	//æ®ç‚¹æŠ¤å«ææ„
 	for (UInt8 i = 0; i < 4; ++ i)
 	{
 		if (_holds[i].guarder != NULL)
@@ -251,7 +251,7 @@ void ClanBattle::disbandClanBattle()
 
 void ClanBattle::startClanBattle(UInt32 battleThisDay, bool writedb)
 {
-    return; // TODO: °ïÅÉÕ½´ı¿ª·¢
+    return; // TODO: å¸®æ´¾æˆ˜å¾…å¼€å‘
 	_isInbattling = 1;
 	configClanBattleData(writedb);
 	_battleThisDay = battleThisDay;
@@ -303,7 +303,7 @@ void ClanBattle::configClanBattleData(bool writedb)
 	UInt32 guarderId = 0;
 	ClanTech* techs = clan->getClanTech();
 
-	//×ÛºÏ×Ú×å¼¼ÒÕÅäÖÃÏà¹ØÕ½¶·Êı¾İ
+	//ç»¼åˆå®—æ—æŠ€è‰ºé…ç½®ç›¸å…³æˆ˜æ–—æ•°æ®
 	_holds[0].endurance = _holds[0].totalendurance = 30;
 	_holds[3].endurance = _holds[3].totalendurance = 0;
 	UInt8 edurance =  static_cast<UInt8>(techs->getNorthEdurance());
@@ -313,7 +313,7 @@ void ClanBattle::configClanBattleData(bool writedb)
 	if (writedb)
 		DB5().PushUpdateData("UPDATE `clan` SET `southEdurance` = %u, `northEdurance` = %u, `hallEdurance` = %u WHERE `id` = %u", _holds[1].endurance, _holds[2].endurance, _holds[0].endurance, getOwnerClanId());
 
-	//ÅäÖÃ×ÚìôÊØÎÀÕß
+	//é…ç½®å®—ç¥ å®ˆå«è€…
 	{
 		guarderId = techs->getHoldTotemGuarder();
 		if (guarderId == 0) guarderId = 4562;
@@ -328,11 +328,11 @@ void ClanBattle::configClanBattleData(bool writedb)
 		assert(_holds[0].guarder != NULL);
 	}
 
-	//ÅäÖÃÄÏ±±ÃÅÊØÎÀÕß£¬»¤ÎÀÕß
+	//é…ç½®å—åŒ—é—¨å®ˆå«è€…ï¼ŒæŠ¤å«è€…
 	{
 		guarderId = techs->getHoldCityGuarder();
 		if (guarderId == 0) guarderId = 4540;
-		//ÅäÖÃÄÏÃÅÍ¼ÌÚ
+		//é…ç½®å—é—¨å›¾è…¾
 		{
 			const GData::ClanAssistant * cat = GData::clanAssistants[guarderId];
 			if (cat == NULL)
@@ -344,7 +344,7 @@ void ClanBattle::configClanBattleData(bool writedb)
 			_holds[1].guarder = new(std::nothrow) ClanCityHoldMonster(name, cat->getLevel(), cat->getClass(), _holds[1].hold, 0, cat);
 			assert(_holds[1].guarder != NULL);
 		}
-		//ÅäÖÃ±±ÃÅÍ¼ÌÚ
+		//é…ç½®åŒ—é—¨å›¾è…¾
 		{
 			const GData::ClanAssistant * cat = GData::clanAssistants[guarderId];
 			if (cat == NULL)
@@ -359,7 +359,7 @@ void ClanBattle::configClanBattleData(bool writedb)
 		_firstAttack[0] = _firstAttack[1] = false;
 
 
-		//ÅäÖÃ»¤ÎÀÕß
+		//é…ç½®æŠ¤å«è€…
 		UInt16 assistCnt;
 		UInt32 assistId;
 		if (!techs->getHoldAssist(assistCnt, assistId))
@@ -372,7 +372,7 @@ void ClanBattle::configClanBattleData(bool writedb)
 		}
 		for (UInt16 i = 0; i < assistCnt; ++ i)
 		{
-			//ÄÏÃÅ
+			//å—é—¨
 			{
 				SYSMSG(name, 414);
 				std::string southName;
@@ -380,7 +380,7 @@ void ClanBattle::configClanBattleData(bool writedb)
 				southName.append(Itoa<UInt16>(i+1));
 				_holds[1].assists.insert(std::make_pair(southName, new ClanCityHoldMonster(southName, cat->getLevel(), cat->getClass(), _holds[1].hold, 0, cat)));
 			}
-			//±±ÃÅ
+			//åŒ—é—¨
 			{
 				SYSMSG(name, 415);
 				std::string northName;
@@ -454,7 +454,7 @@ void ClanBattle::listClanHoldPlayerInfo(Player * player, UInt16 pos)
 	Stream st(REP::CLAN_BATTLE);
 	st << static_cast<UInt8>(5) << static_cast<UInt8>(0);
 
-	//¹ÖÎï, ·ÇÕ½³¡Ê±¼ä²»ÏÔÊ¾
+	//æ€ªç‰©, éæˆ˜åœºæ—¶é—´ä¸æ˜¾ç¤º
 	UInt8 usedCnt = 0;
 	if (hold != 3 && isInBattling() && !isClanHoldDestroy(pos))
 	{
@@ -589,14 +589,14 @@ void ClanBattle::notifyClanBattlePlayerCount(Player * player)
 		{
 			if ((*offset)->side == 2)
 			{
-				//¹¥»÷·½
+				//æ”»å‡»æ–¹
 				++ akterTotalNum;
 				if ((*offset)->status == 1)
 					++ atkerAliveNum;
 			}
 			else
 			{
-				//·ÀÊØ·½
+				//é˜²å®ˆæ–¹
 				++ deferTotalNum;
 				if ((*offset)->status == 1)
 					++ deferAliveNum;
@@ -656,13 +656,13 @@ void ClanBattle::notifyClanHoldAssistEnterInfo(std::string name, UInt16 pos, UIn
 	{
 		if ((*iter)->side == 2)
 		{
-			//¹¥»÷·½
+			//æ”»å‡»æ–¹
 			st.data<UInt8>(offset) = 0x04;
 			(*iter)->player->send(st);
 		}
 		else
 		{
-			//·ÀÊØ·½
+			//é˜²å®ˆæ–¹
 			st.data<UInt8>(offset) = 0x01;
 			(*iter)->player->send(st);
 		}
@@ -684,13 +684,13 @@ void ClanBattle::notifyClanHoldGuarderEnterInfo(UInt16 pos, UInt8 enter)
 	{
 		if ((*iter)->side == 2)
 		{
-			//¹¥»÷·½
+			//æ”»å‡»æ–¹
 			st.data<UInt8>(offset) = 0x04;
 			(*iter)->player->send(st);
 		}
 		else
 		{
-			//·ÀÊØ·½
+			//é˜²å®ˆæ–¹
 			st.data<UInt8>(offset) = 0x01;
 			(*iter)->player->send(st);
 		}
@@ -811,7 +811,7 @@ bool ClanBattle::moveToHold(Player * player, UInt16 pos)
 	UInt32 now = TimeUtil::Now();
 	if (cbPlayer->side != 2)
 	{
-		//·ÀÊØ·½
+		//é˜²å®ˆæ–¹
 		if (cbPlayer->status != 1)
 		{
 			ERROR_LOG("Player cannot move now !!!");
@@ -822,7 +822,7 @@ bool ClanBattle::moveToHold(Player * player, UInt16 pos)
 	}
 	else
 	{
-		//¹¥»÷·½
+		//æ”»å‡»æ–¹
 		if ((cbPlayer->hold == _holds[1].hold || cbPlayer->hold == _holds[2].hold || cbPlayer->hold == _holds[3].hold) && !isClanHoldDestroy(_holds[1].hold) && !isClanHoldDestroy(_holds[2].hold) && pos == _holds[0].hold)
 		{
 			SYSMSG_SEND(416, cbPlayer->player);
@@ -864,7 +864,7 @@ bool ClanBattle::moveToHold(Player * player, UInt16 pos)
 
 void ClanBattle::kickClanBattler(Player * player)
 {
-	//Ìß³öÕ½³¡Íæ¼Ò
+	//è¸¢å‡ºæˆ˜åœºç©å®¶
 	std::map<Player *, ClanBattlePlayer *>::iterator found = _clanBattlePlayerLocs.find(player);
 	if (found == _clanBattlePlayerLocs.end())
 		return;
@@ -875,7 +875,7 @@ void ClanBattle::kickClanBattler(Player * player)
 	_offClanBattlers.erase(cbPlayer);
 	notifyClanBattlePlayerCount();
 	{
-		//¿çµØÍ¼
+		//è·¨åœ°å›¾
 		UInt16 spot = player->getLocation();
 		CountryEnterStruct ces(true, player->isInCity() ? 1 : 0, spot);
         GameMsgHdr hdr(0x1F0, mapCollection.getCountryFromSpot(spot), player, sizeof(CountryEnterStruct));
@@ -1096,7 +1096,7 @@ bool ClanBattle::attackAssist(Player * atker, std::string& name, UInt32& turns, 
 	bool r = bsim.getWinner() == 1;
 	if (r)
 	{
-		//Íæ¼ÒÓ®
+		//ç©å®¶èµ¢
 		bsim.applyFighterHP(0, atker, false, 30);
 		atker->setBuffData(PLAYER_BUFF_ATTACKING, TimeUtil::Now() + bsim.getTurns() * 2);
 	}
@@ -1138,10 +1138,10 @@ bool ClanBattle::attackGuarder(Player * atker, std::string& name, UInt32& turns,
 	bsim.setPortrait(1, afds[0].fighter->favor);
 	UInt32 seed = TimeUtil::Now() + static_cast<UInt32>(atker->getId()) + static_cast<UInt32>(atker->getId() >> 32) + static_cast<UInt32>(atker->GetLev() << 16);
 	URandom rnd(seed);
-	//ÉèÖÃbossµÄËæ»úÎ»ÖÃ
+	//è®¾ç½®bossçš„éšæœºä½ç½®
 	UInt8 bossPos = afds[0].pos[rnd(afds[0].pos.size())];
 	bsim.newFighter(1, bossPos, afds[0].fighter);
-	//ÉèÖÃmonsterµÄËæ»úÎ»ÖÃ
+	//è®¾ç½®monsterçš„éšæœºä½ç½®
 	if (afds.size() >= 2)
 	{
 		std::vector<UInt8> positions = afds[1].pos;
@@ -1164,7 +1164,7 @@ bool ClanBattle::attackGuarder(Player * atker, std::string& name, UInt32& turns,
 	bool r = bsim.getWinner() == 1;
 	if (r)
 	{
-		//Íæ¼ÒÓ®
+		//ç©å®¶èµ¢
 		bsim.applyFighterHP(0, atker, false, 30);
 		atker->setBuffData(PLAYER_BUFF_ATTACKING, TimeUtil::Now() + bsim.getTurns() * 2);
 	}
@@ -1192,12 +1192,12 @@ bool ClanBattle::attackGuarder(Player * atker, std::string& name, UInt32& turns,
 
 void ClanBattle::clearClanBattle()
 {
-	//ÇåÀíÕ½³¡
+	//æ¸…ç†æˆ˜åœº
 	Player * player = NULL;
 	std::map<Player *, ClanBattlePlayer *>::iterator offset = _clanBattlePlayerLocs.begin();
 	for (; offset != _clanBattlePlayerLocs.end(); ++ offset)
 	{
-		//¿çµØÍ¼
+		//è·¨åœ°å›¾
 		player = offset->first;
 		UInt16 spot = player->getLocation();
 		CountryEnterStruct ces(true, player->isInCity() ? 1 : 0, spot);
@@ -1432,7 +1432,7 @@ bool ClanBattle::leaveClanCity(Player * player)
 	delClanBattlePlayer(cbPlayer->hold, cbPlayer->side, cbPlayer->status, player);
 	notifyClanBattlePlayerCount();
 	{
-		//¿çµØÍ¼
+		//è·¨åœ°å›¾
 		UInt16 spot = player->getLocation();
 		CountryEnterStruct ces(true, player->isInCity() ? 1 : 0, spot);
         GameMsgHdr hdr(0x1F0, mapCollection.getCountryFromSpot(spot), player, sizeof(CountryEnterStruct));
@@ -1606,7 +1606,7 @@ bool ClanCityBattle::enterTotem(Player * player)
 	if(hold > 3) return false;
 	_holds[hold].addBattler(clanBattlePlayerEx);
 	{
-		//¿çµØÍ¼
+		//è·¨åœ°å›¾
 		GameMsgHdr hdr(0x1F1, player->getThreadId(), player, 0);
 		GLOBAL().PushMsg( hdr, NULL );
 	}
@@ -1622,7 +1622,7 @@ bool ClanCityBattle::enterTotem(Player * player)
 	notifyClanHoldPlayerInfo(player, clanBattlePlayerEx->hold, clanBattlePlayerEx->status, 1);
 	if (isInBattling())
 	{
-		//´¦ÔÚÕ½¶·ÖĞ
+		//å¤„åœ¨æˆ˜æ–—ä¸­
 		player->setBuffData(PLAYER_BUFF_CLANBATTING, getBattleOverTime(now));
 		player->addGlobalFlag(Player::ClanBattleFlag);
 		player->addFlag(Player::ClanBattling);
@@ -1952,7 +1952,7 @@ bool ClanCityBattle::attackPlayer2(ClanBattlePlayer * cbAtker, ClanBattlePlayer 
 	cbDeath->hold = _holds[3].hold;
 	cbDeath->status = 0;
 	addClanBattlePlayer(cbDeath);
-	listClanHoldPlayerInfo(cbDeath->player, cbDeath->hold);	//×Ô¼º¿ÉÒÔ¿´µ½
+	listClanHoldPlayerInfo(cbDeath->player, cbDeath->hold);	//è‡ªå·±å¯ä»¥çœ‹åˆ°
 	notifyClanBattlePlayerInfo(cbDeath->player, cbDeath->player, 1);
 	UInt32 recoveTime = static_cast<UInt32>((isClanHoldDestroy(_holds[1].hold) || isClanHoldDestroy(_holds[2].hold)) ? 60 + bsim.getTurns() * 1.8f : 75 + bsim.getTurns() * 1.8f);
 	cbDeath->player->setBuffData(PLAYER_BUFF_CLANRECOVE, TimeUtil::Now() + recoveTime);
@@ -2029,10 +2029,10 @@ bool ClanCityBattle::attackPlayer(Player * atker, std::string deferName)
 		atker->send(_attackClanBattlerStream);
 		return false;
 	}
-	//¿ÉÄÜÊÇ¸´»î×´Ì¬
+	//å¯èƒ½æ˜¯å¤æ´»çŠ¶æ€
 	if (cbDefer->status != 1)
 	{
-		//ÔÚ¸´»î£¬²»ÄÜ¹¥»÷
+		//åœ¨å¤æ´»ï¼Œä¸èƒ½æ”»å‡»
 		atker->sendMsgCode(0, 1315);
 		atker->send(_attackClanBattlerStream);
 		return false;
@@ -2071,8 +2071,8 @@ bool ClanCityBattle::attackPlayer(Player * atker, std::string deferName)
 
 	if (res)
 	{
-		//¹¥·½Ó®
-		//½«ÊØ·½ËÍ»Ø¸´»îµã
+		//æ”»æ–¹èµ¢
+		//å°†å®ˆæ–¹é€å›å¤æ´»ç‚¹
 		bsim.applyFighterHP(0, atker, false, 30);
 		atker->setBuffData(PLAYER_BUFF_ATTACKING, TimeUtil::Now() + bsim.getTurns() * 2);
 		cbDefer->player->regenAll();
@@ -2102,7 +2102,7 @@ bool ClanCityBattle::attackPlayer(Player * atker, std::string deferName)
 		UInt16 recover = cbDefer->side == 2 ? _holds[3].hold : _holds[0].hold;
 		if (cbDefer->hold != recover)
 		{
-			//ÔÚ²»Í¬¾İµã
+			//åœ¨ä¸åŒæ®ç‚¹
 			delClanBattlePlayer(cbDefer->hold, cbDefer->side, cbDefer->status, cbDefer->player);
 			Stream st(REP::CLAN_BATTLE);
 			st << static_cast<UInt8>(3) << static_cast<UInt8>(0) << static_cast<UInt16>(recover) << Stream::eos;
@@ -2110,12 +2110,12 @@ bool ClanCityBattle::attackPlayer(Player * atker, std::string deferName)
 			cbDefer->status = 0;
 			cbDefer->hold = recover;
 			addClanBattlePlayer(cbDefer);
-			listClanHoldPlayerInfo(cbDefer->player, cbDefer->hold);	//×Ô¼º¿ÉÒÔ¿´µ½
+			listClanHoldPlayerInfo(cbDefer->player, cbDefer->hold);	//è‡ªå·±å¯ä»¥çœ‹åˆ°
 			notifyClanBattlePlayerInfo(cbDefer->player, cbDefer->player, 1);
 		}
 		else
 		{
-			//ÔÚÏàÍ¬¾İµã
+			//åœ¨ç›¸åŒæ®ç‚¹
 			Stream st(REP::CLAN_BATTLE);
 			st << static_cast<UInt8>(17) << static_cast<UInt8>(1) << cbDefer->player->getName() << static_cast<UInt8>(0) << Stream::eos;
 			cbDefer->status = 0;
@@ -2132,8 +2132,8 @@ bool ClanCityBattle::attackPlayer(Player * atker, std::string deferName)
 	}
 	else
 	{
-		//ÊØ·½Ó®
-		//½«¹¥·½ËÍ»Ø¸´»îµã
+		//å®ˆæ–¹èµ¢
+		//å°†æ”»æ–¹é€å›å¤æ´»ç‚¹
 		bsim.applyFighterHP(1, cbDefer->player, false, 30);
 		atker->regenAll();
 		cbDefer->wins ++;
@@ -2162,7 +2162,7 @@ bool ClanCityBattle::attackPlayer(Player * atker, std::string deferName)
 		UInt16 recover = cbAtker->side == 2 ? _holds[3].hold : _holds[0].hold;
 		if (cbAtker->hold != recover)
 		{
-			//ÔÚ²»Í¬¾İµã
+			//åœ¨ä¸åŒæ®ç‚¹
 			delClanBattlePlayer(cbAtker->hold, cbAtker->side, cbAtker->status, atker);
 			Stream st(REP::CLAN_BATTLE);
 			st << static_cast<UInt8>(3) << static_cast<UInt8>(0) << static_cast<UInt16>(recover) << Stream::eos;
@@ -2170,12 +2170,12 @@ bool ClanCityBattle::attackPlayer(Player * atker, std::string deferName)
 			cbAtker->hold = recover;
 			cbAtker->status = 0;
 			addClanBattlePlayer(cbAtker);
-			listClanHoldPlayerInfo(cbAtker->player, cbAtker->hold);	//×Ô¼º¿ÉÒÔ¿´µ½
+			listClanHoldPlayerInfo(cbAtker->player, cbAtker->hold);	//è‡ªå·±å¯ä»¥çœ‹åˆ°
 			notifyClanBattlePlayerInfo(cbAtker->player, cbAtker->player, 1);
 		}
 		else
 		{
-			//ÔÚÏàÍ¬¾İµã
+			//åœ¨ç›¸åŒæ®ç‚¹
 			Stream st(REP::CLAN_BATTLE);
 			st << static_cast<UInt8>(17) << static_cast<UInt8>(1) << cbAtker->player->getName() << static_cast<UInt8>(0) << Stream::eos;
 			cbAtker->status = 0;
@@ -2259,7 +2259,7 @@ bool ClanCityBattle::attackNpc(Player * atker, std::string npcName)
 	{
 		if (hold == 1 || hold == 2)
 		{
-			if (!_holds[hold].assists.empty())	//´æÔÚ´æ»îµÄ¹ÖÎï
+			if (!_holds[hold].assists.empty())	//å­˜åœ¨å­˜æ´»çš„æ€ªç‰©
 			{
 				SYSMSG_SEND(427, atker);
 				atker->send(_attackClanBattlerStream);
@@ -2270,7 +2270,7 @@ bool ClanCityBattle::attackNpc(Player * atker, std::string npcName)
 	}
 	else
 	{
-		//¹¥»÷»¤ÎÀÕß
+		//æ”»å‡»æŠ¤å«è€…
 		std::map<std::string, ClanHoldMonster *>::iterator found = _holds[hold].assists.find(npcName);
 		if (found == _holds[hold].assists.end())
 			return false;
@@ -2289,13 +2289,13 @@ bool ClanCityBattle::attackNpc(Player * atker, std::string npcName)
 		setAwardClanBattleVictor(cbAtker);
 		if (_holds[hold].guarder != NULL && npcName == _holds[hold].guarder->name)
 		{
-			//´ò°ÜÊØÎÀÕß
+			//æ‰“è´¥å®ˆå«è€…
 			UInt16 endurance = _holds[hold].endurance <= 1 ? _holds[hold].endurance : 1;
 			_holds[hold].endurance -= endurance;
 			switch (hold)
 			{
 			case 0:
-				cbAtker->grabAchieve ++;	//¼ÇÂ¼É±ËÀ×Ú×åÊØÎÀÕß´ÎÊı£¬×îºó½áËã
+				cbAtker->grabAchieve ++;	//è®°å½•æ€æ­»å®—æ—å®ˆå«è€…æ¬¡æ•°ï¼Œæœ€åç»“ç®—
 				DB5().PushUpdateData("UPDATE `clan` SET `hallEdurance` = %u WHERE `id` = %u", _holds[hold].endurance, getOwnerClanId());
 				DB5().PushUpdateData("UPDATE `clan_battler` SET `grabAchieve` = %u WHERE `id` = %u",cbAtker->grabAchieve, cbAtker->id);
 				break;
@@ -2351,8 +2351,8 @@ bool ClanCityBattle::attackNpc(Player * atker, std::string npcName)
 	}
 	else
 	{
-		//Íæ¼Ò±»´ò°Ü
-		//´òÊä
+		//ç©å®¶è¢«æ‰“è´¥
+		//æ‰“è¾“
 		delClanBattlePlayer(cbAtker->hold, cbAtker->side, cbAtker->status, atker);
 		Stream st(REP::CLAN_BATTLE);
 		st << static_cast<UInt8>(3) << static_cast<UInt8>(0) << static_cast<UInt16>(_holds[3].hold) << Stream::eos;
@@ -2360,7 +2360,7 @@ bool ClanCityBattle::attackNpc(Player * atker, std::string npcName)
 		cbAtker->hold = _holds[3].hold;
 		cbAtker->status = 0;
 		addClanBattlePlayer(cbAtker);
-		listClanHoldPlayerInfo(cbAtker->player, cbAtker->hold);	//×Ô¼º¿ÉÒÔ¿´µ½
+		listClanHoldPlayerInfo(cbAtker->player, cbAtker->hold);	//è‡ªå·±å¯ä»¥çœ‹åˆ°
 		notifyClanBattlePlayerInfo(cbAtker->player, cbAtker->player, 1);
 		UInt32 recoveTime = static_cast<UInt32>((isClanHoldDestroy(_holds[1].hold) || isClanHoldDestroy(_holds[2].hold)) ? 60 + 1.8f * turns : 75 + 1.8f * turns);
 		cbAtker->player->setBuffData(PLAYER_BUFF_CLANRECOVE, TimeUtil::Now() + recoveTime);
@@ -2452,7 +2452,7 @@ void ClanCityBattle::update(UInt32 now)
 		else
 			++ rcIter;
 	}
-	//³ÇÃÅ¹ÖÎï¸´»î¼ì²é
+	//åŸé—¨æ€ªç‰©å¤æ´»æ£€æŸ¥
 	std::map<std::string, ClanHoldMonster *>::iterator rcIter2 = _recoverClanHoldAssistant.begin();
 	for (; rcIter2 != _recoverClanHoldAssistant.end();)
 	{
@@ -2471,7 +2471,7 @@ void ClanCityBattle::update(UInt32 now)
 			++ rcIter2;
 	}
 
-	//ÏÂÏß´ıÌßÕß
+	//ä¸‹çº¿å¾…è¸¢è€…
 	std::set<ClanBattlePlayer *>::iterator rcIter3 = _offClanBattlers.begin();
 	for (; rcIter3 != _offClanBattlers.end();)
 	{
@@ -2488,7 +2488,7 @@ void ClanCityBattle::update(UInt32 now)
 			++ rcIter3;
 	}
 
-	//ÄÍ¾Ã¶È»Ö¸´¼ì²é
+	//è€ä¹…åº¦æ¢å¤æ£€æŸ¥
 	for (UInt8 i = 1; i <= 2; ++ i)
 	{
 		if (_holds[i].atkerSize() > 0 || _holds[i].deferSize() <= 0 || _holds[i].endurance >= _holds[i].totalendurance)
@@ -2759,7 +2759,7 @@ void ClanRobBattle::configClanBattleData(bool writedb)
 	if (_status == 1)
 		return ClanBattle::configClanBattleData(writedb);
 
-	//×ÛºÏ×Ú×å¼¼ÒÕÅäÖÃÏà¹ØÕ½¶·Êı¾İ
+	//ç»¼åˆå®—æ—æŠ€è‰ºé…ç½®ç›¸å…³æˆ˜æ–—æ•°æ®
 	_holds[0].endurance = _holds[0].totalendurance = 30;
 	_holds[1].endurance = _holds[1].totalendurance = 30;
 	_holds[2].endurance = _holds[2].totalendurance = 30;
@@ -2769,7 +2769,7 @@ void ClanRobBattle::configClanBattleData(bool writedb)
 
 	//////////////////////////////////////////////////////////////////////////
 	UInt8 bossLev = getBattlerLev();
-	//ÅäÖÃ×Úìô»¤ÎÀ×Å£¬ÊØÎÀ×Å
+	//é…ç½®å®—ç¥ æŠ¤å«ç€ï¼Œå®ˆå«ç€
 	{
 		GData::NpcGroup * guarder = GData::clanRobMonster._clanTotemGuarderBoss;
 		if (guarder == NULL)
@@ -2794,7 +2794,7 @@ void ClanRobBattle::configClanBattleData(bool writedb)
 	}
 
 	UInt32 assistId;
-	//ÅäÖÃÄÏÃÅÊØÎÀÕß£¬ »¤ÎÀÕß
+	//é…ç½®å—é—¨å®ˆå«è€…ï¼Œ æŠ¤å«è€…
 	{
 		GData::NpcGroup * guarder = GData::clanRobMonster._clanSouthGuarderBoss;
 		if (guarder == NULL)
@@ -2822,7 +2822,7 @@ void ClanRobBattle::configClanBattleData(bool writedb)
 
 	}
 
-	//ÅäÖÃ±±ÃÅÊØÎÀÕß£¬ »¤ÎÀÕß
+	//é…ç½®åŒ—é—¨å®ˆå«è€…ï¼Œ æŠ¤å«è€…
 	{
 		GData::NpcGroup * guarder = GData::clanRobMonster._clanNorthGuarderBoss;
 		if (guarder == NULL)
@@ -3169,10 +3169,10 @@ bool ClanRobBattle::attackPlayer(Player * atker,  std::string deferName)
 		atker->send(_attackClanBattlerStream);
 		return false;
 	}
-	//¿ÉÄÜÊÇ¸´»î×´Ì¬
+	//å¯èƒ½æ˜¯å¤æ´»çŠ¶æ€
 	if (cbDefer->status != 1)
 	{
-		//ÔÚ¸´»î£¬²»ÄÜ¹¥»÷
+		//åœ¨å¤æ´»ï¼Œä¸èƒ½æ”»å‡»
 		atker->sendMsgCode(0, 1315);
 		atker->send(_attackClanBattlerStream);
 		return false;
@@ -3232,8 +3232,8 @@ bool ClanRobBattle::attackPlayer(Player * atker,  std::string deferName)
 	}
 	if (res)
 	{
-		//¹¥·½Ó®
-		//½«ÊØ·½ËÍ»Ø¸´»îµã
+		//æ”»æ–¹èµ¢
+		//å°†å®ˆæ–¹é€å›å¤æ´»ç‚¹
 		bsim.applyFighterHP(0, atker, false, 30);
 		atker->setBuffData(PLAYER_BUFF_ATTACKING, TimeUtil::Now() + bsim.getTurns() * 2);
 		cbDefer->player->regenAll();
@@ -3263,7 +3263,7 @@ bool ClanRobBattle::attackPlayer(Player * atker,  std::string deferName)
 		UInt16 recover = cbDefer->side == 2 ? _holds[3].hold : _holds[0].hold;
 		if (cbDefer->hold != recover)
 		{
-			//ÔÚ²»Í¬¾İµã
+			//åœ¨ä¸åŒæ®ç‚¹
 			delClanBattlePlayer(cbDefer->hold, cbDefer->side, cbDefer->status, cbDefer->player);
 			Stream st(REP::CLAN_BATTLE);
 			st << static_cast<UInt8>(3) << static_cast<UInt8>(0) << static_cast<UInt16>(recover) << Stream::eos;
@@ -3271,12 +3271,12 @@ bool ClanRobBattle::attackPlayer(Player * atker,  std::string deferName)
 			cbDefer->status = 0;
 			cbDefer->hold = recover;
 			addClanBattlePlayer(cbDefer);
-			listClanHoldPlayerInfo(cbDefer->player, cbDefer->hold);	//×Ô¼º¿ÉÒÔ¿´µ½
+			listClanHoldPlayerInfo(cbDefer->player, cbDefer->hold);	//è‡ªå·±å¯ä»¥çœ‹åˆ°
 			notifyClanBattlePlayerInfo(cbDefer->player, cbDefer->player, 1);
 		}
 		else
 		{
-			//ÔÚÏàÍ¬¾İµã
+			//åœ¨ç›¸åŒæ®ç‚¹
 			Stream st(REP::CLAN_BATTLE);
 			st << static_cast<UInt8>(17) << static_cast<UInt8>(1) << cbDefer->player->getName() << static_cast<UInt8>(0) << Stream::eos;
 			cbDefer->status = 0;
@@ -3293,8 +3293,8 @@ bool ClanRobBattle::attackPlayer(Player * atker,  std::string deferName)
 	}
 	else
 	{
-		//ÊØ·½Ó®
-		//½«¹¥·½ËÍ»Ø¸´»îµã
+		//å®ˆæ–¹èµ¢
+		//å°†æ”»æ–¹é€å›å¤æ´»ç‚¹
 		bsim.applyFighterHP(1, cbDefer->player, false, 30);
 		atker->regenAll();
 		cbDefer->wins ++;
@@ -3323,7 +3323,7 @@ bool ClanRobBattle::attackPlayer(Player * atker,  std::string deferName)
 		UInt16 recover = cbAtker->side == 2 ? _holds[3].hold : _holds[0].hold;
 		if (cbAtker->hold != recover)
 		{
-			//ÔÚ²»Í¬¾İµã
+			//åœ¨ä¸åŒæ®ç‚¹
 			delClanBattlePlayer(cbAtker->hold, cbAtker->side, cbAtker->status, atker);
 			Stream st(REP::CLAN_BATTLE);
 			st << static_cast<UInt8>(3) << static_cast<UInt8>(0) << static_cast<UInt16>(recover) << Stream::eos;
@@ -3331,12 +3331,12 @@ bool ClanRobBattle::attackPlayer(Player * atker,  std::string deferName)
 			cbAtker->hold = recover;
 			cbAtker->status = 0;
 			addClanBattlePlayer(cbAtker);
-			listClanHoldPlayerInfo(cbAtker->player, cbAtker->hold);	//×Ô¼º¿ÉÒÔ¿´µ½
+			listClanHoldPlayerInfo(cbAtker->player, cbAtker->hold);	//è‡ªå·±å¯ä»¥çœ‹åˆ°
 			notifyClanBattlePlayerInfo(cbAtker->player, cbAtker->player, 1);
 		}
 		else
 		{
-			//ÔÚÏàÍ¬¾İµã
+			//åœ¨ç›¸åŒæ®ç‚¹
 			Stream st(REP::CLAN_BATTLE);
 			st << static_cast<UInt8>(17) << static_cast<UInt8>(1) << cbAtker->player->getName() << static_cast<UInt8>(0) << Stream::eos;
 			cbAtker->status = 0;
@@ -3394,7 +3394,7 @@ bool ClanRobBattle::attackPlayer2(ClanBattlePlayer * cbAtker, ClanBattlePlayer *
 	cbDeath->hold = _holds[3].hold;
 	cbDeath->status = 0;
 	addClanBattlePlayer(cbDeath);
-	listClanHoldPlayerInfo(cbDeath->player, cbDeath->hold);	//×Ô¼º¿ÉÒÔ¿´µ½
+	listClanHoldPlayerInfo(cbDeath->player, cbDeath->hold);	//è‡ªå·±å¯ä»¥çœ‹åˆ°
 	notifyClanBattlePlayerInfo(cbDeath->player, cbDeath->player, 1);
 	UInt32 recoveTime = static_cast<UInt32>((isClanHoldDestroy(_holds[1].hold) || isClanHoldDestroy(_holds[2].hold)) ? 60 + bsim.getTurns() * 1.8f : 75 + bsim.getTurns() * 1.8f);
 	cbDeath->player->setBuffData(PLAYER_BUFF_CLANRECOVE, TimeUtil::Now() + recoveTime);
@@ -3467,7 +3467,7 @@ bool ClanRobBattle::attackNpc(Player * atker, std::string npcName)
 	ClanHoldMonster * cat = NULL;
 	if (_holds[hold].guarder != NULL && npcName == _holds[hold].guarder->name)
 	{
-		if (!_holds[hold].assists.empty())	//´æÔÚ´æ»îµÄ¹ÖÎï
+		if (!_holds[hold].assists.empty())	//å­˜åœ¨å­˜æ´»çš„æ€ªç‰©
 		{
 			SYSMSG_SEND(518, atker);
 			atker->send(_attackClanBattlerStream);
@@ -3477,7 +3477,7 @@ bool ClanRobBattle::attackNpc(Player * atker, std::string npcName)
 	}
 	else
 	{
-		//¹¥»÷»¤ÎÀÕß
+		//æ”»å‡»æŠ¤å«è€…
 		std::map<std::string, ClanHoldMonster *>::iterator found = _holds[hold].assists.find(npcName);
 		if (found == _holds[hold].assists.end())
 			return false;
@@ -3496,13 +3496,13 @@ bool ClanRobBattle::attackNpc(Player * atker, std::string npcName)
 		//setAwardClanBattleVictor(cbAtker);
 		if (_holds[hold].guarder != NULL && npcName == _holds[hold].guarder->name)
 		{
-			//´ò°ÜÊØÎÀÕß
+			//æ‰“è´¥å®ˆå«è€…
 			UInt16 endurance = _holds[hold].endurance <= 1 ? _holds[hold].endurance : 1;
 			_holds[hold].endurance -= endurance;
 			switch (hold)
 			{
 			case 0:
-				//cbAtker->grabAchieve ++;	//¼ÇÂ¼É±ËÀ×Ú×åÊØÎÀÕß´ÎÊı£¬×îºó½áËã
+				//cbAtker->grabAchieve ++;	//è®°å½•æ€æ­»å®—æ—å®ˆå«è€…æ¬¡æ•°ï¼Œæœ€åç»“ç®—
 				DB5().PushUpdateData("UPDATE `clan` SET `hallEdurance` = %u WHERE `id` = %u", _holds[hold].endurance, getOwnerClanId());
 				//DB5().PushUpdateData("UPDATE `clan_battler` SET `grabAchieve` = %u WHERE `id` = %u",cbAtker->grabAchieve, cbAtker->id);
 				break;
@@ -3561,8 +3561,8 @@ bool ClanRobBattle::attackNpc(Player * atker, std::string npcName)
 	}
 	else
 	{
-		//Íæ¼Ò±»´ò°Ü
-		//´òÊä
+		//ç©å®¶è¢«æ‰“è´¥
+		//æ‰“è¾“
 		delClanBattlePlayer(cbAtker->hold, cbAtker->side, cbAtker->status, atker);
 		Stream st(REP::CLAN_BATTLE);
 		st << static_cast<UInt8>(3) << static_cast<UInt8>(0) << static_cast<UInt16>(_holds[3].hold) << Stream::eos;
@@ -3570,7 +3570,7 @@ bool ClanRobBattle::attackNpc(Player * atker, std::string npcName)
 		cbAtker->hold = _holds[3].hold;
 		cbAtker->status = 0;
 		addClanBattlePlayer(cbAtker);
-		listClanHoldPlayerInfo(cbAtker->player, cbAtker->hold);	//×Ô¼º¿ÉÒÔ¿´µ½
+		listClanHoldPlayerInfo(cbAtker->player, cbAtker->hold);	//è‡ªå·±å¯ä»¥çœ‹åˆ°
 		notifyClanBattlePlayerInfo(cbAtker->player, cbAtker->player, 1);
 		UInt32 recoveTime = static_cast<UInt32>((isClanHoldDestroy(_holds[1].hold) || isClanHoldDestroy(_holds[2].hold)) ? 60 + 1.8f * turns : 75 + 1.8f * turns);
 		cbAtker->player->setBuffData(PLAYER_BUFF_CLANRECOVE, TimeUtil::Now() + recoveTime);
@@ -3657,7 +3657,7 @@ bool ClanRobBattle::attackMonster(Player * atker, std::string& name, UInt32& tur
 	bool r = bsim.getWinner() == 1;
 	if (r)
 	{
-		//Íæ¼ÒÓ®
+		//ç©å®¶èµ¢
 		bsim.applyFighterHP(0, atker, false, 30);
 		atker->setBuffData(PLAYER_BUFF_ATTACKING, TimeUtil::Now() + bsim.getTurns() * 2);
 		if (type == 1)
@@ -3839,8 +3839,8 @@ static bool find_assist(GData::NpcGroup * npc, UInt32 id)
 
 void ClanRobBattle::displayHiddenMonster(UInt16 hold, bool notify)
 {
-	//hold == 1: ÄÏÃÅ hold == 2 £º ±±ÃÅ
-	//klass == 1: Öî¸ğÁÁ klass == 2: ÓÚÇ«
+	//hold == 1: å—é—¨ hold == 2 ï¼š åŒ—é—¨
+	//klass == 1: è¯¸è‘›äº® klass == 2: äºè°¦
 	static const UInt32 assistId[2] = { 4930, 4931 };
 	static const float bound[2] = { 50.0f, 30.0f };
 	using namespace std::placeholders;
@@ -4068,7 +4068,7 @@ void ClanRobBattle::notifyBattleOverMailNotify(UInt8 succ)
 	{
 	case 0:
 		{
-			//¶á³ÇÕ½
+			//å¤ºåŸæˆ˜
 			if (succ == 0)
 			{
 				SYSMSG(title, 520);
@@ -4166,10 +4166,10 @@ void ClanRobBattle::notifyBattleOverMailNotify(UInt8 succ)
 	case 1:
 		{
 			SYSMSG(title, 481);
-			//ÊØ³ÇÕ½
+			//å®ˆåŸæˆ˜
 			if (succ == 0)
 			{
-				//±»¹¥ÆÆ
+				//è¢«æ”»ç ´
 				SYSMSG(title1, 526);
 				SYSMSG(title2, 523);
 				SYSMSG(title3, 524);
@@ -4303,7 +4303,7 @@ void ClanRobBattle::notifyBattleOverMailNotify(UInt8 succ)
 			}
 			else
 			{
-				//Î´±»¹¥ÆÆ
+				//æœªè¢«æ”»ç ´
 				SYSMSG(title, 522);
 				SYSMSG(title1, 524);
 				SYSMSG(msg1, 492);
@@ -4376,7 +4376,7 @@ void ClanRobBattle::switchBattleClanOwner()
 		st << static_cast<UInt8>(20) << clan->getId() << clan->getName() << Stream::eos;
 		broadcastHold(st);
 	}
-	_status = 0xFF;	//¹Ø±Õ³Ç³Ø
+	_status = 0xFF;	//å…³é—­åŸæ± 
 }
 
 void ClanRobBattle::update(UInt32 now)
@@ -4395,7 +4395,7 @@ void ClanRobBattle::update(UInt32 now)
 		else
 			++ rcIter;
 	}
-	//³ÇÃÅ¹ÖÎï¸´»î¼ì²é
+	//åŸé—¨æ€ªç‰©å¤æ´»æ£€æŸ¥
 	std::map<std::string, ClanHoldMonster *>::iterator rcIter2 = _recoverClanHoldAssistant.begin();
 	for (; rcIter2 != _recoverClanHoldAssistant.end();)
 	{
@@ -4415,7 +4415,7 @@ void ClanRobBattle::update(UInt32 now)
 			++ rcIter2;
 	}
 
-	//ÏÂÏß´ıÌßÕß
+	//ä¸‹çº¿å¾…è¸¢è€…
 	std::set<ClanBattlePlayer *>::iterator rcIter3 = _offClanBattlers.begin();
 	for (; rcIter3 != _offClanBattlers.end();)
 	{
@@ -4432,7 +4432,7 @@ void ClanRobBattle::update(UInt32 now)
 			++ rcIter3;
 	}
 
-	//ÄÍ¾Ã¶È»Ö¸´¼ì²é
+	//è€ä¹…åº¦æ¢å¤æ£€æŸ¥
 	for (UInt8 i = 1; i <= 2; ++ i)
 	{
 		if (_holds[i].atkerSize() > 0 || _holds[i].deferSize() <= 0 || _holds[i].endurance >= _holds[i].totalendurance)

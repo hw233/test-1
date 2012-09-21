@@ -896,6 +896,9 @@ bool Fighter::hasTrumpType(UInt32 trumpid)
 
 bool Fighter::canSetTrump(UInt8 idx, UInt32 trumpid)
 {
+    if (_owner && _owner->checkTrumpMutually(trumpid))
+        return false;
+
     if (idx == 0)
         return true;
 
@@ -950,10 +953,18 @@ UInt32  Fighter:: getTrumpNum()
      }
      return num;
 }
+
+inline bool checkTrumpMutually(Player* _owner, UInt32 trumpid)
+{
+    if (!_owner)
+        return false;
+    return _owner->checkTrumpMutually(trumpid);
+}
+
 ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
 {
     ItemEquip* t = 0;
-    if (!trump || canSetTrump(idx, trump->getId()))
+    if (!trump || (canSetTrump(idx, trump->getId()) && !checkTrumpMutually(_owner, trump->GetItemType().getId())))
     {
         if
             (
@@ -1033,6 +1044,21 @@ int Fighter::getAllTrumpId( UInt32* trumps, int size )
     {
         if (_trump[i])
             trumps[i] = _trump[i]->getId();
+        else
+            trumps[i] = 0;
+    }
+    return getMaxTrumps();
+}
+
+int Fighter::getAllTrumpTypeId( UInt32* trumps, int size )
+{
+    if (!trumps || !size)
+        return 0;
+
+    for (int i = 0; i < getMaxTrumps(); ++i)
+    {
+        if (_trump[i])
+            trumps[i] = _trump[i]->GetItemType().getId();
         else
             trumps[i] = 0;
     }

@@ -1,4 +1,4 @@
-#ifndef CLANDYNAMICMSG_INC
+ï»¿#ifndef CLANDYNAMICMSG_INC
 #define CLANDYNAMICMSG_INC
 
 namespace GObject
@@ -18,7 +18,7 @@ struct CDMValType
 };
 struct CDMsg
 {
-	UInt8 type;			//×Ú×å¶¯Ì¬ĞÅÏ¢ÀàĞÍ
+	UInt8 type;			//å®—æ—åŠ¨æ€ä¿¡æ¯ç±»å‹
 	std::vector<CDMValType> value;
 
 	CDMsg(UInt8 t = 0xFF) : type(t) {}
@@ -41,7 +41,7 @@ struct ClanBattleReport
 		: battlerName(bn), clanName(cn), battlerLev(bl), reliveCount(rc), serailWins(sw), maxSerailWins(msw), side(sd), northEdurance(ne), southEdurance(se), grabAchieve(ga) {};
 };
 typedef std::pair<UInt8, std::vector<ClanBattleReport> > ClanBattleReportElem;
-typedef std::map<UInt32, ClanBattleReportElem, std::greater<UInt32> > ClanBattleReportElems;	//Ê±¼ä -> Õ½±¨
+typedef std::map<UInt32, ClanBattleReportElem, std::greater<UInt32> > ClanBattleReportElems;	//æ—¶é—´ -> æˆ˜æŠ¥
 
 struct CDMKey
 {
@@ -97,7 +97,7 @@ public:
 
 private:
 	static const UInt8	MSIZE = 22;
-	std::multimap<CDMKey, CDMsg *, CDMKeyLess > _cdm[4];	//ÈËÊÂ ³ÇÕ½ ¼¼ÒÕ ÆäËû
+	std::multimap<CDMKey, CDMsg *, CDMKeyLess > _cdm[4];	//äººäº‹ åŸæˆ˜ æŠ€è‰º å…¶ä»–
 	ClanBattleReportElems _cbrElem;
 	UInt32 _key;
 	Mutex _mutex;

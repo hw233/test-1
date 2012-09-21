@@ -1,4 +1,4 @@
-#ifndef _CLAN_STATUE_H_
+﻿#ifndef _CLAN_STATUE_H_
 #define _CLAN_STATUE_H_
 
 namespace GObject

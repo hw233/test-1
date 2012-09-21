@@ -1,4 +1,4 @@
-#include "ClanStatueTable.h"
+﻿#include "ClanStatueTable.h"
 
 namespace GData
 {

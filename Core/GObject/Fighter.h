@@ -366,6 +366,7 @@ public:
     inline UInt8 getMaxTrumps () { return TRUMP_UPMAX; }
     UInt32 getTrumpId(int idx);
     int getAllTrumpId(UInt32* trumps, int size = TRUMP_UPMAX);
+    int getAllTrumpTypeId(UInt32* ids, int size = TRUMP_UPMAX);
     void getAllTrumps(Stream& st);
 
     UInt32 getTrumpNum();

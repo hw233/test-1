@@ -1,4 +1,4 @@
-#include "Config.h"
+﻿#include "Config.h"
 #include "Clan.h"
 #include "GObject/Country.h"
 #include "GObject/TaskMgr.h"
@@ -42,7 +42,7 @@ GlobalNamedClans globalGlobalNamedClans, globalNamedClans[COUNTRY_MAX];
 GlobalNamedClans globalOwnedClans[COUNTRY_MAX];
 
 #define CLAN_AUTHORITY_COPY 7
-UInt8 ClanAuthority[5][8] = 
+UInt8 ClanAuthority[5][8] =
 {
 	{ 0, 1, 0, 0, 0, 0, 0, 0 },
 	{ 0, 1, 0, 0, 0, 0, 0, 0 },
@@ -1246,7 +1246,7 @@ UInt8 Clan::getOnlineMembersCount()
             continue;
     }
     return c;
-    
+
 }
 
 void Clan::listMembers( Player * player )
@@ -3624,6 +3624,7 @@ void Clan::updateStatueExp()
 void Clan::resetCopyLevel()
 {
     // 帮派副本等级下降五级
+    Mutex::ScopedLock lk(_mutex);
     ClanCopy * clanCopy = ClanCopyMgr::Instance().getClanCopyByClan(this);
     if (clanCopy)
     {
@@ -3651,16 +3652,19 @@ void Clan::resetCopyLevel()
 
 UInt16 Clan::getStatueLevel()
 {
+    Mutex::ScopedLock lk(_mutex);
     return _statue->getLevel();
 }
 
 UInt32 Clan::getStatueExp()
 {
+    Mutex::ScopedLock lk(_mutex);
     return _statue->getShownExp();
 }
 
 UInt32 Clan::getStatueNextExp()
 {
+    Mutex::ScopedLock lk(_mutex);
     return _statue->getShownNextExp();
 }
 
@@ -4009,7 +4013,7 @@ void   Clan::sendClanCopyInfo(Player * player, UInt8 val)
     st << static_cast<UInt8> (0);  // 掠夺按钮状态
 
     UInt8 logNum = _copyLog.size();
-    st << static_cast<UInt8>(logNum);  
+    st << static_cast<UInt8>(logNum);
     for (std::list<ClanCopyLog>::reverse_iterator it = _copyLog.rbegin(); it != _copyLog.rend(); ++ it)
     {
         struct tm t_tm;
@@ -4102,7 +4106,7 @@ void   Clan::notifyCopyCreated(Player * player)
 }
 
 void    Clan::setCopyLevel(UInt16 level)
-{ 
+{
     ClanCopy * clanCopy = ClanCopyMgr::Instance().getClanCopyByClan(this);
     if (clanCopy)
     {

@@ -1,4 +1,4 @@
-
+﻿
 #include "CopyTable.h"
 
 namespace GData
