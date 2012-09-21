@@ -376,7 +376,6 @@ class ClanCopy
 
         UInt32 _maxMonsterWave;        // 该等级副本刷怪的波数（包括轮空的）
         UInt32 _curMonsterWave;        // 当前已经刷新的怪的波数（包括轮空的）
-        UInt8  _lastWave;              // 是否已经是最后一波结束了
 
         UInt32 _npcIndex;
 

@@ -55,7 +55,6 @@ ClanCopy::ClanCopy(Clan *c, UInt32 copyId, Player * player) : _clan(c), _copyId 
 
     _maxMonsterWave = 20;
     _curMonsterWave = 0;
-    _lastWave = 0;
 
     _observerPlayer.clear();
 #ifdef DEBUG_CLAN_COPY
@@ -661,8 +660,6 @@ void ClanCopy::process(UInt32 now)
 void ClanCopy::enemyBaseAct()
 {
     // 敌人老巢的行动
-    if (_lastWave)
-        --_lastWave;
     monsterMove(Enemy_Base); // 上一轮产生的怪物先行移动
     if (_curMonsterWave * _monsterRefreshTick + _startTick > _tickCount)
     {
@@ -683,8 +680,7 @@ void ClanCopy::enemyBaseAct()
     }
     else
     {
-        if (!_lastWave)
-            _lastWave = 2;
+        // 最后一波怪刷完后需要的冲阵
     }
 }
 
@@ -823,12 +819,15 @@ void ClanCopy::spotCombat(UInt8 spotId)
         ++ monsterIt;
     }
 
-    if (_lastWave == 1)
+    if (_spotMap[spotId].nextMoveTick == (_tickCount + 1) )
         flag = true;
+    else
+        flag = false;
 
     if (flag)
     {
         // 需要重新冲阵
+        //std::cout << "_tickCount = " << _tickCount << ", nextMoveTick = " << _spotMap[spotId].nextMoveTick << "." << std::endl;
 #ifdef DEBUG_CLAN_COPY
         *fileSt << "Start monsters match players." << std::endl;
 #endif
