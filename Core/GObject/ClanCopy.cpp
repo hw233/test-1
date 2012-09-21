@@ -239,6 +239,9 @@ void ClanCopy::playerEscape(Player *player)
             *fileSt << "Launcher \"" << player->getName() << "\" leave." << std::endl;
 #endif
             notifyLauncherEscape();
+            Stream st2;
+            SYSMSGVP(st2, 807, _launchPlayer->getName().c_str());
+            _clan->broadcast(st2);
             return;
         }
         else
@@ -637,11 +640,11 @@ void ClanCopy::process(UInt32 now)
     {
         if (checkWin())
         {
-            _clan->addCopyWinLog(_launchPlayer);
             UInt32 awardValue = static_cast<UInt32> (static_cast<float>(_homeHp) / _homeMaxHp * _maxReward);
             notifySpotBattleInfo();
             addWinReward(awardValue);
             _clan->addCopyLevel();
+            _clan->addCopyWinLog(_launchPlayer);
             _status = CLAN_COPY_OVER;
             return;
         }
@@ -1350,9 +1353,6 @@ void ClanCopy::notifyCopyLose()
 
     notifyAll(st);
     notifyWaitForWin(st);
-    Stream st2;
-    SYSMSGVP(st2, 807, _launchPlayer->getName().c_str());
-    _clan->broadcast(st2);
 }
 
 void ClanCopy::notifyCopyWin(UInt32 awardValue, UInt8 itemTypes, MailPackage::MailItem *mitem)

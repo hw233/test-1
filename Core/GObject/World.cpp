@@ -936,11 +936,6 @@ void World::TownDeamonTmAward(void *)
     townDeamonManager->process();
 }
 
-void World::ClanCopyCheck(void *)
-{
-    ClanCopyMgr::Instance().process(TimeUtil::Now());
-}
-
 void World::ClanStatueCheck(void *)
 {
     class UpdateStatueVisitor : public Visitor<Clan>
@@ -1023,7 +1018,6 @@ bool World::Init()
 
     AddTimer(5 * 1000, Team_Copy_Process, static_cast<void*>(NULL));
     AddTimer(3600 * 1000, AthleticsPhysicalCheck, static_cast<void *>(NULL), (3600 - now % 3600) * 1000);
-    AddTimer(1000, ClanCopyCheck);
     AddTimer(3600 * 1000, ClanStatueCheck, static_cast<void *>(NULL), (3600 - now % 3600) * 1000);
 
     UInt32 tdChkPoint = TimeUtil::SharpDayT(0, now) + TOWNDEAMONENDTM;
