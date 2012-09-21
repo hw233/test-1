@@ -6951,9 +6951,10 @@ namespace GObject
 
         for (UInt8 i = 0; i < size; i += 2)
         {
-            if(!m_Package->Add(ids[i], ((UInt8)(i+1)>=ids.size())?1:ids[i+1], true, false, FromOnlineAward))
+            ItemBase* item = m_Package->Add(ids[i], ((UInt8)(i+1)>=ids.size())?1:ids[i+1], true, false, FromOnlineAward);
+            //if(!item)
                 // return false;
-                ; // XXX: ugly
+                //; // XXX: ugly
         }
 
         UInt8 count = GData::GDataManager::GetOnlineAwardCount();

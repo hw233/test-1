@@ -18,6 +18,14 @@ struct LeaderboardTowndown
     UInt32 time;
 };
 
+struct LeaderboardClanCopy
+{
+    UInt64 id;
+	std::string name;
+    UInt32 level;
+    UInt64 time;
+};
+
 class Leaderboard
 {
 public:
@@ -33,6 +41,12 @@ public:
     {
         FastMutex::ScopedLock lk(_tmutex);
         return _towndown;
+    };
+
+    const std::vector<LeaderboardClanCopy>& getClanCopy()
+    {
+        FastMutex::ScopedLock lk(_cmutex);
+        return _clancopy;
     };
 
     void begin() { m_sorting = true; }
@@ -60,6 +74,8 @@ private:
 
     FastMutex _tmutex;
     std::vector<LeaderboardTowndown> _towndown;
+    FastMutex _cmutex;
+    std::vector<LeaderboardClanCopy> _clancopy;
 
     AtomicVal<bool> m_sorting;
 };
