@@ -3684,7 +3684,12 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                     defList[defCount].damage = pskill->getId();
                     defList[defCount].leftHP = bf->getHP();
                     ++ defCount;
-                    dmg += attackOnce(bf, first, cs, pr, pskill, _objs[target_side][target_pos], 1, defList, defCount, scList, scCount);
+                    float factor = 0.50f;
+                    if(bf == _activeFgt)
+                        factor = skill->factor[0];
+                    if(factor < 0.001f)
+                        factor = 1.0f;
+                    dmg += attackOnce(bf, first, cs, pr, pskill, _objs[target_side][target_pos], factor, defList, defCount, scList, scCount);
                 }
             }
         }
