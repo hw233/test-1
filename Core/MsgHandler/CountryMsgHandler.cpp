@@ -35,6 +35,8 @@ MSG_REG_2(GameMsgHdr, REQ::CLAN_RANKBATTLE_SORTLIST, OnClanRankBattleSortList);
 MSG_REG_2(GameMsgHdr, REQ::LUCKYDRAW, OnLuckyDrawReq);
 MSG_REG_2(GameMsgHdr, REQ::COUNTRY_ACT, OnCountryActReq);
 
+MSG_REG_2(GameMsgHdr, REQ::CLAN_COPY, OnClanCopyReq);
+
 MSG_REG(GameMsgHdr, OnPracticeHookAddReq);
 MSG_REG(GameMsgHdr, OnExtendPackageReq);
 MSG_REG(GameMsgHdr, OnTakeOnlineRewardReq);
