@@ -4825,15 +4825,16 @@ UInt32 BattleSimulator::doAttack( int pos )
     }
 #endif
     //fs.resetAction();
-    UInt32 stun = bf->getStunRound();
-    UInt32 confuse = bf->getConfuseRound();
-    UInt32 forget = bf->getForgetRound();
 
     insertFighterStatus(bf);
     _activeFgt = bf;
 
     do {
         rcnt += doDeBufAttack(bf);
+
+        UInt32 stun = bf->getStunRound();
+        UInt32 confuse = bf->getConfuseRound();
+        UInt32 forget = bf->getForgetRound();
         if(stun > 0)
         {
             break;
@@ -7981,7 +7982,7 @@ bool BattleSimulator::doSkillStrengthen_bufTherapy( BattleFighter* bf, const GDa
     if(!bf || !ef || bf->getHP() <= 0)
         return false;
 
-    int pos0 = bf == _activeFgt ? 25 : 0;
+    int pos0 = bf->getSide() == _activeFgt->getSide() ? 25 : 0;
     if(bf->getTherapyBuff() != 0)  // 去掉以前的buff
     {
         if (bf->getTherapyBuff() > 0)
