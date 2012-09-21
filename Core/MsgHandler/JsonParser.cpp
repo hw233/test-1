@@ -325,21 +325,23 @@ int query_gangcopy_complete_layer_req(JsonHead* head, json_t* body, json_t* retb
     if (val && val->child && val->child->text)
         areaid = atoi(val->child->text);
 
-    // TODO: 
-    UInt32 count = 1;
+    const std::vector<GObject::LeaderboardClanCopy>& clancopy = GObject::leaderboard.getClanCopy();
+    UInt32 count = clancopy.size();
     json_insert_pair_into_object(retbody, "uiCount", my_json_new_number(count));
     json_t* arr = json_new_array();
     if (arr)
     {
         for (UInt32 i = 0; i < count; ++i)
         {
+            char id[32] = {0};
             json_t* obj = json_new_object();
             if (obj)
             {
-                json_insert_pair_into_object(obj, "uiFactionID", json_new_string("1"));
-                json_insert_pair_into_object(obj, "szFactionName", json_new_string(fixPlayerName("YYF").c_str()));
-                json_insert_pair_into_object(obj, "uiFactionMaxLevel", my_json_new_number(100));
-                json_insert_pair_into_object(obj, "uiFactiontime2MaxLvl", my_json_new_number(time(NULL)));
+                snprintf(id, sizeof(id), "%"I64_FMT"u", clancopy[i].id);
+                json_insert_pair_into_object(obj, "uiFactionID", json_new_string(id));
+                json_insert_pair_into_object(obj, "szFactionName", json_new_string(fixPlayerName(clancopy[i].name).c_str()));
+                json_insert_pair_into_object(obj, "uiFactionMaxLevel", my_json_new_number(clancopy[i].level));
+                json_insert_pair_into_object(obj, "uiFactiontime2MaxLvl", my_json_new_number(clancopy[i].time));
                 json_insert_child(arr, obj);
             }
         }
