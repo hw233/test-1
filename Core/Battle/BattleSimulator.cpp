@@ -4825,15 +4825,16 @@ UInt32 BattleSimulator::doAttack( int pos )
     }
 #endif
     //fs.resetAction();
-    UInt32 stun = bf->getStunRound();
-    UInt32 confuse = bf->getConfuseRound();
-    UInt32 forget = bf->getForgetRound();
 
     insertFighterStatus(bf);
     _activeFgt = bf;
 
     do {
         rcnt += doDeBufAttack(bf);
+
+        UInt32 stun = bf->getStunRound();
+        UInt32 confuse = bf->getConfuseRound();
+        UInt32 forget = bf->getForgetRound();
         if(stun > 0)
         {
             break;
