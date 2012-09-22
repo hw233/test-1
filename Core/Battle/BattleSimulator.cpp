@@ -4620,9 +4620,9 @@ UInt32 BattleSimulator::FightersEnter(UInt8 prevWin)
 
     for(size_t idx = 0; idx < cnt; idx++)
     {
+        BattleFighter* bf = cur_fgtlist[idx];
         if((prevWin-1) != bf->getSide())
         {
-            BattleFighter* bf = cur_fgtlist[idx];
             if(bf->getPassiveSkillOnTherapy())
                 _onTherapy.push_back(bf);
             if(bf->getPassiveSkillOnSkillDmg())
@@ -8223,7 +8223,7 @@ bool BattleSimulator::AddExtraDamageAfterResist_SkillStrengthen(BattleFighter* p
 
     if(pTarget->getHP() == 0)
     {
-        onDead(true, pTarget, defList, defCount, scList, scCount);
+        onDead(false, pTarget, defList, defCount, scList, scCount);
     }
     else if(_winner == 0)
     {
