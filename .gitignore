@@ -20,4 +20,4 @@ Debug
 Release
 lib3rd
 conf/config.lua
-sql/conf.sh
+sql/conf.user.sh
