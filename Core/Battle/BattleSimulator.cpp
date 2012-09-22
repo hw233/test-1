@@ -4620,16 +4620,16 @@ UInt32 BattleSimulator::FightersEnter(UInt8 prevWin)
 
     for(size_t idx = 0; idx < cnt; idx++)
     {
-        BattleFighter* bf = cur_fgtlist[idx];
-        if(bf->getPassiveSkillOnTherapy())
-            _onTherapy.push_back(bf);
-        if(bf->getPassiveSkillOnSkillDmg())
-            _onSkillDmg.push_back(bf);
-        if(bf->getPassiveSkillOnOtherDead())
-            _onOtherDead.push_back(bf);
-
         if((prevWin-1) != bf->getSide())
         {
+            BattleFighter* bf = cur_fgtlist[idx];
+            if(bf->getPassiveSkillOnTherapy())
+                _onTherapy.push_back(bf);
+            if(bf->getPassiveSkillOnSkillDmg())
+                _onSkillDmg.push_back(bf);
+            if(bf->getPassiveSkillOnOtherDead())
+                _onOtherDead.push_back(bf);
+
             const GData::SkillBase* passiveSkill = NULL;
             size_t skillIdx = 0;
             while(NULL != (passiveSkill = bf->getPassiveSkillEnter100(skillIdx)))
