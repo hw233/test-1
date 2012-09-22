@@ -1358,8 +1358,8 @@ void BattleFighter::setAttackAdd(float v, UInt16 last)
     if((v < 0.001f) || (_attackAdd < 0.001f)
             || ( _attackAdd > 0 && v < 0)
             || ( _attackAdd < 0 && v > 0)
-            || ((_attackAdd > 0) && (v > 0) && (_attackAdd < v))
-            || ((_attackAdd < 0) && (v < 0) && (_attackAdd > v)))
+            || ((_attackAdd > 0) && (v > 0) && (_attackAdd + 0.001f  < v))
+            || ((_attackAdd < 0) && (v < 0) && (_attackAdd + 0.001f  > v)))
     {
         _attackAdd = v;
         _atkAdd_last = last;
@@ -1371,8 +1371,8 @@ void BattleFighter::setMagAttackAdd(float v, UInt16 last)
     if((v < 0.001f) || (_magAtkAdd < 0.001f)
             || ( _magAtkAdd > 0 && v < 0)
             || ( _magAtkAdd < 0 && v > 0)
-            || ((_magAtkAdd > 0) && (v > 0) && (_magAtkAdd < v))
-            || ((_magAtkAdd < 0) && (v < 0) && (_magAtkAdd > v)))
+            || ((_magAtkAdd > 0) && (v > 0) && (_magAtkAdd + 0.001f  < v))
+            || ((_magAtkAdd < 0) && (v < 0) && (_magAtkAdd + 0.001f  > v)))
     {
         _magAtkAdd = v;
         _magAtkAdd_last = last;
@@ -1384,8 +1384,8 @@ void BattleFighter::setDefendAdd(float v, UInt16 last)
     if((v < 0.001f) || (_defAdd < 0.001f)
             || ( _defAdd > 0 && v < 0)
             || ( _defAdd < 0 && v > 0)
-            || ((_defAdd > 0) && (v > 0) && (_defAdd < v))
-            || ((_defAdd < 0) && (v < 0) && (_defAdd > v)))
+            || ((_defAdd > 0) && (v > 0) && (_defAdd + 0.001f  < v))
+            || ((_defAdd < 0) && (v < 0) && (_defAdd + 0.001f  > v)))
     {
         _defAdd = v;
         _defAdd_last = last;
@@ -1397,8 +1397,8 @@ void BattleFighter::setMagDefendAdd(float v, UInt16 last)
     if((v < 0.001f) || (_magDefAdd < 0.001f)
             || ( _magDefAdd > 0 && v < 0)
             || ( _magDefAdd < 0 && v > 0)
-            || ((_magDefAdd > 0) && (v > 0) && (_magDefAdd < v))
-            || ((_magDefAdd < 0) && (v < 0) && (_magDefAdd > v)))
+            || ((_magDefAdd > 0) && (v > 0) && (_magDefAdd + 0.001f  < v))
+            || ((_magDefAdd < 0) && (v < 0) && (_magDefAdd + 0.001f  > v)))
     {
         _magDefAdd = v;
         _magDefAdd_last = last;
@@ -1410,8 +1410,8 @@ void BattleFighter::setHitrateAdd(float v, UInt16 last)
     if((v < 0.001f) || (_hitrateAdd < 0.001f)
             || ( _hitrateAdd > 0 && v < 0)
             || ( _hitrateAdd < 0 && v > 0)
-            || ((_hitrateAdd > 0) && (v > 0) && (_hitrateAdd < v))
-            || ((_hitrateAdd < 0) && (v < 0) && (_hitrateAdd > v)))
+            || ((_hitrateAdd > 0) && (v > 0) && (_hitrateAdd + 0.001f  < v))
+            || ((_hitrateAdd < 0) && (v < 0) && (_hitrateAdd + 0.001f  > v)))
     {
         _hitrateAdd = v;
         _hitrateAdd_last = last;
@@ -1423,8 +1423,8 @@ void BattleFighter::setEvadeAdd(float v, UInt16 last)
     if((v < 0.001f) || (_evadeAdd < 0.001f)
             || ( _evadeAdd > 0 && v < 0)
             || ( _evadeAdd < 0 && v > 0)
-            || ((_evadeAdd > 0) && (v > 0) && (_evadeAdd < v))
-            || ((_evadeAdd < 0) && (v < 0) && (_evadeAdd > v)))
+            || ((_evadeAdd > 0) && (v > 0) && (_evadeAdd + 0.001f  < v))
+            || ((_evadeAdd < 0) && (v < 0) && (_evadeAdd + 0.001f  > v)))
     {
         _evadeAdd = v;
         _evadeAdd_last = last;
@@ -1436,8 +1436,8 @@ void BattleFighter::setCriticalAdd(float v, UInt16 last)
     if((v < 0.001f) || (_criticalAdd < 0.001f)
             || ( _criticalAdd > 0 && v < 0)
             || ( _criticalAdd < 0 && v > 0)
-            || ((_criticalAdd > 0) && (v > 0) && (_criticalAdd < v))
-            || ((_criticalAdd < 0) && (v < 0) && (_criticalAdd > v)))
+            || ((_criticalAdd > 0) && (v > 0) && (_criticalAdd + 0.001f  < v))
+            || ((_criticalAdd < 0) && (v < 0) && (_criticalAdd + 0.001f  > v)))
     {
         _criticalAdd = v;
         _criticalAdd_last = last;
@@ -1449,8 +1449,8 @@ void BattleFighter::setCriticalDmgAdd(float v, UInt16 last)
     if((v < 0.001f) || (_criticalDmgAdd < 0.001f)
             || ( _criticalDmgAdd > 0 && v < 0)
             || ( _criticalDmgAdd < 0 && v > 0)
-            || ((_criticalDmgAdd > 0) && (v > 0) && (_criticalDmgAdd < v))
-            || ((_criticalDmgAdd < 0) && (v < 0) && (_criticalDmgAdd > v)))
+            || ((_criticalDmgAdd > 0) && (v > 0) && (_criticalDmgAdd + 0.001f  < v))
+            || ((_criticalDmgAdd < 0) && (v < 0) && (_criticalDmgAdd + 0.001f  > v)))
     {
         _criticalDmgAdd = v;
         _criticalDmgAdd_last = last;
@@ -1462,8 +1462,8 @@ void BattleFighter::setPierceAdd(float v, UInt16 last)
     if((v < 0.001f) || (_pierceAdd < 0.001f)
             || ( _pierceAdd > 0 && v < 0)
             || ( _pierceAdd < 0 && v > 0)
-            || ((_pierceAdd > 0) && (v > 0) && (_pierceAdd < v))
-            || ((_pierceAdd < 0) && (v < 0) && (_pierceAdd > v)))
+            || ((_pierceAdd > 0) && (v > 0) && (_pierceAdd + 0.001f  < v))
+            || ((_pierceAdd < 0) && (v < 0) && (_pierceAdd + 0.001f  > v)))
     {
         _pierceAdd = v;
         _pierceAdd_last = last;
@@ -1475,8 +1475,8 @@ void BattleFighter::setCounterAdd(float v, UInt16 last)
     if((v < 0.001f) || (_counterAdd < 0.001f)
             || ( _counterAdd > 0 && v < 0)
             || ( _counterAdd < 0 && v > 0)
-            || ((_counterAdd > 0) && (v > 0) && (_counterAdd < v))
-            || ((_counterAdd < 0) && (v < 0) && (_counterAdd > v)))
+            || ((_counterAdd > 0) && (v > 0) && (_counterAdd + 0.001f  < v))
+            || ((_counterAdd < 0) && (v < 0) && (_counterAdd + 0.001f  > v)))
     {
         _counterAdd = v;
         _counterAdd_last = last;
@@ -1488,8 +1488,8 @@ void BattleFighter::setMagResAdd(float v, UInt16 last)
     if((v < 0.001f) || (_magResAdd < 0.001f)
             || ( _magResAdd > 0 && v < 0)
             || ( _magResAdd < 0 && v > 0)
-            || ((_magResAdd > 0) && (v > 0) && (_magResAdd < v))
-            || ((_magResAdd < 0) && (v < 0) && (_magResAdd > v)))
+            || ((_magResAdd > 0) && (v > 0) && (_magResAdd + 0.001f  < v))
+            || ((_magResAdd < 0) && (v < 0) && (_magResAdd + 0.001f  > v)))
     {
         _magResAdd = v;
         _magResAdd_last = last;
@@ -1501,8 +1501,8 @@ void BattleFighter::setMaxHPAdd(Int32 v, UInt16 last)
     if((v == 0) || (_maxhpAdd == 0)
             || ( _maxhpAdd > 0 && v < 0)
             || ( _maxhpAdd < 0 && v > 0)
-            || ((_maxhpAdd > 0) && (v > 0) && (_maxhpAdd < v))
-            || ((_maxhpAdd < 0) && (v < 0) && (_maxhpAdd > v)))
+            || ((_maxhpAdd > 0) && (v > 0) && (_maxhpAdd <= v))
+            || ((_maxhpAdd < 0) && (v < 0) && (_maxhpAdd >= v)))
     {
         _maxhpAdd = v;
         _maxhpAdd_last = last;
@@ -1514,8 +1514,8 @@ void BattleFighter::setActionAdd(Int32 v, UInt16 last)
     if((v == 0) || (_maxActionAdd == 0)
             || ( _maxActionAdd > 0 && v < 0)
             || ( _maxActionAdd < 0 && v > 0)
-            || ((_maxActionAdd > 0) && (v > 0) && (_maxActionAdd < v))
-            || ((_maxActionAdd < 0) && (v < 0) && (_maxActionAdd > v)))
+            || ((_maxActionAdd > 0) && (v > 0) && (_maxActionAdd <= v))
+            || ((_maxActionAdd < 0) && (v < 0) && (_maxActionAdd >= v)))
     {
         _maxActionAdd = v;
         _maxActionAdd_last = last;
@@ -1527,8 +1527,8 @@ void BattleFighter::setToughAdd(float v, UInt16 last)
     if((v < 0.001f) || (_toughAdd < 0.001f)
             || ( _toughAdd > 0 && v < 0)
             || ( _toughAdd < 0 && v > 0)
-            || ((_toughAdd > 0) && (v > 0) && (_toughAdd < v))
-            || ((_toughAdd < 0) && (v < 0) && (_toughAdd > v)))
+            || ((_toughAdd > 0) && (v > 0) && (_toughAdd + 0.001f  < v))
+            || ((_toughAdd < 0) && (v < 0) && (_toughAdd + 0.001f  > v)))
     {
         _toughAdd = v;
         _toughAdd_last = last;
@@ -1540,8 +1540,8 @@ void BattleFighter::setAtkReduce(float v, UInt16 last)
     if((v < 0.001f) || (_atkreduce < 0.001f)
             || ( _atkreduce > 0 && v < 0)
             || ( _atkreduce < 0 && v > 0)
-            || ((_atkreduce > 0) && (v > 0) && (_atkreduce < v))
-            || ((_atkreduce < 0) && (v < 0) && (_atkreduce > v)))
+            || ((_atkreduce > 0) && (v > 0) && (_atkreduce + 0.001f  < v))
+            || ((_atkreduce < 0) && (v < 0) && (_atkreduce + 0.001f  > v)))
     {
         _atkreduce = v;
         _atkreduce_last = last;
@@ -1553,8 +1553,8 @@ void BattleFighter::setMagAtkReduce(float v, UInt16 last)
     if((v < 0.001f) || (_magatkreduce < 0.001f)
             || ( _magatkreduce > 0 && v < 0)
             || ( _magatkreduce < 0 && v > 0)
-            || ((_magatkreduce > 0) && (v > 0) && (_magatkreduce < v))
-            || ((_magatkreduce < 0) && (v < 0) && (_magatkreduce > v)))
+            || ((_magatkreduce > 0) && (v > 0) && (_magatkreduce + 0.001f  < v))
+            || ((_magatkreduce < 0) && (v < 0) && (_magatkreduce + 0.001f  > v)))
     {
         _magatkreduce = v;
         _magatkreduce_last = last;
@@ -1566,8 +1566,8 @@ void BattleFighter::setAtkReduce3(float v, UInt16 last)
     if((v < 0.001f) || (_atkreduce3 < 0.001f)
             || ( _atkreduce3 > 0 && v < 0)
             || ( _atkreduce3 < 0 && v > 0)
-            || ((_atkreduce3 > 0) && (v > 0) && (_atkreduce3 < v))
-            || ((_atkreduce3 < 0) && (v < 0) && (_atkreduce3 > v)))
+            || ((_atkreduce3 > 0) && (v > 0) && (_atkreduce3 + 0.001f  < v))
+            || ((_atkreduce3 < 0) && (v < 0) && (_atkreduce3 + 0.001f  > v)))
     {
         _atkreduce3 = v;
         _atkreduce3_last = last;
@@ -1579,8 +1579,8 @@ void BattleFighter::setMagAtkReduce3(float v, UInt16 last)
     if((v < 0.001f) || (_magatkreduce3 < 0.001f)
             || ( _magatkreduce3 > 0 && v < 0)
             || ( _magatkreduce3 < 0 && v > 0)
-            || ((_magatkreduce3 > 0) && (v > 0) && (_magatkreduce3 < v))
-            || ((_magatkreduce3 < 0) && (v < 0) && (_magatkreduce3 > v)))
+            || ((_magatkreduce3 > 0) && (v > 0) && (_magatkreduce3 + 0.001f < v))
+            || ((_magatkreduce3 < 0) && (v < 0) && (_magatkreduce3 + 0.001f  > v)))
     {
         _magatkreduce3 = v;
         _magatkreduce3_last = last;
