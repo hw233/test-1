@@ -4050,8 +4050,8 @@ void   Clan::addCopyLevel()
     if (_copyLevel < GData::clanCopyTable.size() - 1)
     {
         ++_copyLevel;
-        _copyMaxLevel = _copyLevel >= _copyMaxLevel ? _copyLevel : _copyMaxLevel;
-        _copyMaxTime = _copyLevel >= _copyMaxLevel ? TimeUtil::Now() : _copyMaxTime;
+        _copyMaxLevel = _copyLevel > _copyMaxLevel ? _copyLevel : _copyMaxLevel;
+        _copyMaxTime = _copyLevel > _copyMaxLevel ? TimeUtil::Now() : _copyMaxTime;
         DB5().PushUpdateData("REPLACE INTO `clan_copy` (`clanId`, `level`, `levelUpdateTime`, `maxCopyLevel`, `maxCopyTime`) VALUES (%u, %u, %u, %u, %u)", _id, _copyLevel, TimeUtil::Now(), _copyMaxLevel, _copyMaxTime);
         if (GVAR.GetVar(GVAR_CLANCOPYPASS) < _copyLevel)
         {
