@@ -1679,7 +1679,17 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
         {
             if(!World::getKillMonsterAct())
                 return;
-            player->getKillMonsterAward();
+            UInt8 type = 0;
+            br >> type;
+            if(type == 0)
+            {
+                GameMsgHdr hdr(0x1FF, WORKER_THREAD_WORLD, player, 0);
+                GLOBAL().PushMsg(hdr, NULL);
+            }
+            else if(type == 1)
+                player->getKillMonsterAward();
+            else if(type == 2)
+                player->checkLastKillMonsterAward();
         }
         break;
         default:

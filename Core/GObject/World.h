@@ -438,6 +438,8 @@ public:
     static RCSortType consumeSort;
     static void initRCRank();
 
+    static RCSortType killMonsterSort[4];
+
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }
 	void OnTimer();
@@ -483,6 +485,10 @@ public:
     void LoadQixiScore(Player* pl, Player* lover);
     void SendQixiAward();
     void sendQixiScoreAward(Player* pl);
+
+    void killMonsterAppend(Stream& st, UInt8 index);
+    void killMonsterInit();
+    void UpdateKillMonsterRank(Player* pl, UInt8 Type, UInt8 count);
 
 private:
 	void testUpdate();

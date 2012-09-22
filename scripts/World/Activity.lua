@@ -675,8 +675,7 @@ function initActTime(y, m, d)
   local  SerStartTm501= { ['year'] = 2012, ['month'] = 8, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm502= { ['year'] = 2012, ['month'] = 9, ['day'] = 6, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 斩妖
-  --local  SerStartTm505= { ['year'] = 2012, ['month'] = 9, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTm505= { ['year'] = 2012, ['month'] = 9, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm505= { ['year'] = 2012, ['month'] = 9, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 周岁红包送不停
   local  SerStartTm506= { ['year'] = 2012, ['month'] = 9, ['day'] = 13, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- Qgame大厅礼包
@@ -867,7 +866,7 @@ function initActTime(y, m, d)
   actTime502_1 = os.time(SerStartTm502) + 4 * 86400;
 
   actTime505 = os.time(SerStartTm505);
-  actTime505_1 = os.time(SerStartTm505) + 15 * 86400;
+  actTime505_1 = os.time(SerStartTm505) + 8 * 86400;
 
   actTime506 = os.time(SerStartTm506);
   actTime506_1 = os.time(SerStartTm506) + 18 * 86400;
