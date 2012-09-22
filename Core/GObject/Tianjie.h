@@ -146,6 +146,7 @@ namespace GObject
         short getScoreRank(Player* pl);
 
 	private:
+        void notifyTianjieStatus(Player* pl= NULL);
         void clearEventData();
 	    bool addNpc(int npcid);
 		void deleteNpc(int npcid, UInt16 loc);
@@ -211,6 +212,7 @@ namespace GObject
         //天劫后排行榜保留5个小时
         UInt32 m_rankKeepTime;
         bool m_isRankKeep;
+        bool m_isWait;
 
         bool m_isOpenNextTianjie;
         int m_nextTjLevel;

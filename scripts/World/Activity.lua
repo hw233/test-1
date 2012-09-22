@@ -701,7 +701,7 @@ function initActTime(y, m, d)
   -- 七夕
   local  SerStartTm202= { ['year'] = 2012, ['month'] = 8, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --商城消费大酬宾(9/18-9/24)
-  local  SerStartTm210= { ['year'] = 2012, ['month'] = 9, ['day'] = 13, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm210= { ['year'] = 2012, ['month'] = 9, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
