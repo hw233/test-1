@@ -605,7 +605,7 @@ function onActivityCheck(tm)
           is_0921_0924 = false
       end
       
-      setRechargeTime(actTime508, actTime508_1)
+      setRechargeTime(actTime503, actTime503_1)
 
       setShuoShuo(true);
   end
