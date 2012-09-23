@@ -895,6 +895,7 @@ namespace GObject
     
     void buchang1530(Player* p)
     {
+        return; // XXX: 不需要了
         if (!p)
             return;
         Package* pkg = p->GetPackage();
