@@ -6951,7 +6951,8 @@ namespace GObject
 
         for (UInt8 i = 0; i < size; i += 2)
         {
-            ItemBase* item = m_Package->Add(ids[i], ((UInt8)(i+1)>=ids.size())?1:ids[i+1], true, false, FromOnlineAward);
+            //ItemBase* item = 
+            m_Package->Add(ids[i], ((UInt8)(i+1)>=ids.size())?1:ids[i+1], true, false, FromOnlineAward);
             //if(!item)
                 // return false;
                 //; // XXX: ugly
@@ -12664,7 +12665,7 @@ namespace GObject
         else if (2 == eventId)
         {
             type = 2;
-            int score = GetVar(VAR_TJ_TASK2_SCORE);
+            UInt32 score = GetVar(VAR_TJ_TASK2_SCORE);
             switch (cmd)
             {
                     //查询列表
@@ -13355,6 +13356,11 @@ void EventTlzAuto::notify(bool isBeginAuto)
         WORLD().UpdateKillMonsterRank(this, curType, curCount);
     }
 
+    ///////////////////////////////////////////////
+    // 帮派副本相关
+
+    // 帮派副本相关
+    ///////////////////////////////////////////////
     bool Player::checkTrumpMutually(UInt32 trumpid)
     {
         static UInt32 muttrumps[] = {1532, 1530};

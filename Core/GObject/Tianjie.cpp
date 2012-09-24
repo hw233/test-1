@@ -33,7 +33,7 @@ static const UInt32 s_rate1Npc[][4] = {
 {7031, 7032, 7033, 7034},
 {7037, 7038, 7039, 7040}
 };
-static const int s_rate1MinNpcIds[][4] = {
+static const UInt32 s_rate1MinNpcIds[][4] = {
 {8000, 8009, 8013, 8015},
 {8016, 8025, 8029, 8031},
 {8032, 8041, 8045, 8047},
@@ -42,7 +42,7 @@ static const int s_rate1MinNpcIds[][4] = {
 {8080, 8089, 8093, 8095}
 };
 
-static const int s_rate1MaxNpcIds[][4] = {
+static const UInt32 s_rate1MaxNpcIds[][4] = {
 {8008, 8012, 8014, 8015},
 {8024, 8028, 8030, 8031},
 {8040, 8044, 8046, 8047},
@@ -61,7 +61,7 @@ static const UInt32 s_tj2PlayerMaxScore   = 40000;
 static const UInt32 s_rate2DonateScore[] = {200, 200, 200, 200};
 static const UInt32 s_rate2DonateExpMulti[] = {30, 30, 30, 30};
 //天劫事件3的2种怪
-static const int s_tlzNpcId[][2] = {
+static const UInt32 s_tlzNpcId[][2] = {
 {7011, 7012},
 {7017, 7018},
 {7023, 7024},
@@ -212,11 +212,11 @@ bool Tianjie::isOpenTj(Player* pl)
     }
     return m_isTjOpened;
 }
- bool Tianjie::isTjNpc(int npcid, UInt16 loc)
+ bool Tianjie::isTjNpc(UInt32 npcid, UInt16 loc)
  {
  	if (!m_isTjExecute) return false;
 
- 	multimap<int, int>::iterator iter = m_locNpcMap.find(loc);
+ 	multimap<UInt16, UInt32>::iterator iter = m_locNpcMap.find(loc);
 	//验证怪物和玩家是否在同一个据点
 	while (iter != m_locNpcMap.end())
 	{
@@ -230,7 +230,7 @@ bool Tianjie::isOpenTj(Player* pl)
 	}
  	return false;
  }
-bool  Tianjie::isTjRateNpc(int npcid)
+bool  Tianjie::isTjRateNpc(UInt32 npcid)
 {
     if (!m_isTjExecute)
        return false;
@@ -1174,13 +1174,13 @@ void Tianjie::attack1(Player* pl, UInt16 loc, UInt32 npcid)
 	if (index == -1) return;
 
     bool res = false;
-    multimap<int, int>::iterator iter = m_locNpcMap.find(loc);
+    multimap<UInt16, UInt32>::iterator iter = m_locNpcMap.find(loc);
 	//验证怪物和玩家是否在同一个据点
 	while (iter != m_locNpcMap.end())
 	{
         if (iter->first != loc)
             break;
-	    if (iter->second == (int)npcid)
+	    if (iter->second == npcid)
 	    {
 	        res = pl->attackTianjieNpc(npcid, 1, true);
             if (res)
@@ -1256,7 +1256,7 @@ bool Tianjie::isFinish()
 void Tianjie::close1()
 {
     printf("--------------------------------------------close1\n");
-	multimap<int, int>::iterator iter;
+	multimap<UInt16, UInt32>::iterator iter;
 	for (iter = m_locNpcMap.begin(); iter != m_locNpcMap.end(); ++iter)
 	{
 		deleteNpc(iter->second, iter->first);
@@ -1729,7 +1729,7 @@ void Tianjie::close4()
 {
     printf("----------------------close4()\n");
 
-    multimap<int, int>::iterator iter = m_locNpcMap.find(m_loc);
+    multimap<UInt16, UInt32>::iterator iter = m_locNpcMap.find(m_loc);
     while (iter != m_locNpcMap.end())
     {
        if (iter->first != m_loc)
@@ -1767,8 +1767,8 @@ void Tianjie::startBoss()
 
         const float WBOSS_BASE_TIME = 300.f;
         const float WBOSS_ATK_FACTOR = 0.5f;
-        const UInt32 WBOSS_MIN_HP = 20000000;
-        const UInt32 WBOSS_MAX_HP = 350000000;
+        const Int32 WBOSS_MIN_HP = 20000000;
+        const Int32 WBOSS_MAX_HP = 350000000;
         const float WBOSS_MAX_ASC_HP_FACTOR = 1.40f;
 
         Int32 extatk = 0;
@@ -1852,7 +1852,7 @@ bool Tianjie::attackBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool final)
         nflist[0].fighter->setBaseHP(m_bossMaxHp);
         nflist[0].fighter->setDirty();
 
-        if (bf->getHP() > m_tj4BossHp)
+        if (bf->getHP() > (UInt32)m_tj4BossHp)
         {
             _hp = m_tj4BossHp;
             _percent = 100;
@@ -1988,7 +1988,7 @@ void Tianjie::closeBoss()
 {
     printf("----------------------closeBoss()\n");
 
-    multimap<int, int>::iterator iter = m_locNpcMap.find(m_loc);
+    multimap<UInt16, UInt32>::iterator iter = m_locNpcMap.find(m_loc);
     while (iter != m_locNpcMap.end())
     {
        if (iter->first != m_loc)
@@ -2040,7 +2040,7 @@ void  Tianjie::clearEventData()
     m_Top1PlayerName = "";
     m_Top1Pl = NULL;
 }
-bool Tianjie::addNpc(int npcid)
+bool Tianjie::addNpc(UInt32 npcid)
 {
     //随即地点
     std::vector<UInt16> spots;
@@ -2078,7 +2078,7 @@ bool Tianjie::addNpc(int npcid)
     return true;
 }
 
-void Tianjie::deleteNpc(int npcid, UInt16 loc)
+void Tianjie::deleteNpc(UInt32 npcid, UInt16 loc)
 {
     Map * p_map = Map::FromSpot(loc);
     if (!p_map) return;

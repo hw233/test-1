@@ -365,8 +365,8 @@ public:
     static MoneyIn _moneyIn[7][2];
 
 	static int _activityStage;
-	static bool _actAvailable;//开服到+6日
-	static bool _actAvailable1;//开服到+7日
+	static bool _actAvailable;//??????+6??
+	static bool _actAvailable1;//??????+7??
 	static UInt8 _wday;
     static bool _autoHeal;//disable autoheal
 	static bool _isNewServer;
@@ -465,9 +465,10 @@ private:
     static void Team_Copy_Process(void*);
 	static void World_One_Min( World * );
     static void AthleticsPhysicalCheck(void *);
-    static void ClanStatueCheck(void *);
 	static void Tianjie_Refresh(void*);
     static void TownDeamonTmAward(void *);
+    static void ClanCopyCheck(void *);
+    static void ClanStatueCheck(void *);
     //static void advancedHookTimer(void *para);
 
 public:

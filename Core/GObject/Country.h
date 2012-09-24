@@ -63,12 +63,12 @@ private:
 	static void Country_Battle_Check(void *);
     static void Hero_Island_Check(void *);
     static void ClanRankBattleCheck(void *);
+    static void TownDeamonTmAward(void *);
 
     static void ClanCopyCheck(void *);
     static void ClanCopyResetBegin(void *);
     static void ClanCopyReset(void *);
     static void ClanCopyResetEnd(void *);
-
 private:
 	UInt8		m_ThreadID;					//?????߳?
 

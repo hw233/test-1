@@ -4087,8 +4087,6 @@ void OnClanCopyReq (GameMsgHdr& hdr, const void * data )
 {
     // TODO: 帮派副本系统的请求协议
     MSG_QUERY_PLAYER(player);
-    if (!player->hasChecked())
-        return;
 
 	GObject::Clan * clan = player->getClan();
 	if(clan == NULL)
