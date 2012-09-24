@@ -1715,6 +1715,7 @@ void Tianjie::attack4(Player* pl, UInt16 loc, UInt32 npcid)
              SYSMSG_BROADCASTV(552, pl->getCountry(), pl->getName().c_str(), m_loc, m_eventCurrNumber, npcid);
 
              pl->addExpOrTjScore(0, s_tj4Score, false, true);
+             udplogScore(pl, s_tj4Score, true);
 
              if (m_isFinish)
              {
@@ -2364,6 +2365,7 @@ void Tianjie::rewardBoss()
             SYSMSG_BROADCASTV(5060, j, (*i).player->getCountry(), (*i).player->getName().c_str(), item.id, item.count, (s_tjBossScore-(j-1)*300));
 
             udplogItem((*i).player, item.id, item.count);
+            udplogScore((*i).player, (s_tjBossScore-(j-1)*300), true);
         }
 
         if (m_isOk)
