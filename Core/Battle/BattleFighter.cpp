@@ -364,7 +364,10 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         skillItem.base = GData::skillManager[passiveSkillOnOtherDead[idx]];
         skillItem.cd = 0;
         skillItem.rateExtent = 0;
-        _passiveSkillOnOtherDead.insert(_passiveSkillOnOtherDead.end(), skillItem);
+        if(SKILL_ID(skillItem.base->getId()) == 215)
+            _passiveSkillOnOtherDead.insert(_passiveSkillOnOtherDead.begin(), skillItem);
+        else
+            _passiveSkillOnOtherDead.insert(_passiveSkillOnOtherDead.end(), skillItem);
 
         updateSkillStrengthen(passiveSkillOnOtherDead[idx]);
     }
@@ -934,9 +937,10 @@ const GData::SkillBase* BattleFighter::getPassiveSkill100(std::vector<GData::Ski
                 continue;
             if(passiveSkill100[idx].base->effect == NULL)
                 continue;
-            passiveSkill100[idx].cd = passiveSkill100[idx].base->cd + 1;
+
             if (_fighter->getOwner())
                 _fighter->getOwner()->OnHeroMemo(GObject::MC_SKILL, GObject::MD_MASTER, 0, 1);
+
             return passiveSkill100[idx++].base;
         }
     }
@@ -976,7 +980,12 @@ const GData::SkillBase* BattleFighter::getPassiveSkillEnter100(size_t& idx)
 
 const GData::SkillBase* BattleFighter::getPassiveSkillDead100(size_t& idx)
 {
-    return getPassiveSkill100(_passiveSkillDead100, idx);
+    const GData::SkillBase* skill = getPassiveSkill100(_passiveSkillDead100, idx);
+
+    if(skill != NULL && SKILL_ID(skill->getId()) == 215)
+        _passiveSkillDead100.erase(_passiveSkillDead100.begin() + idx - 1);
+
+    return skill;
 }
 
 const GData::SkillBase* BattleFighter::getPassiveSkillAftNAtk100(size_t& idx)
@@ -1103,6 +1112,7 @@ const GData::SkillBase* BattleFighter::getPassiveSkillOnSkillDmg()
 const GData::SkillBase* BattleFighter::getPassiveSkillOnOtherDead()
 {
     size_t idx = 0;
+
     return getPassiveSkill100(_passiveSkillOnOtherDead, idx);
 }
 

@@ -6370,6 +6370,17 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo, DefStatus* defL
                 }
             }
             break;
+        case 215:
+            {
+                // 兜率宝伞
+                if(uRand(10000) < passiveSkill->prob * 100)
+                {
+                    fFakeDead = true;
+                    float factor = passiveSkill->effect->hpP;
+                    (static_cast<BattleFighter*>(bo))->regenHP(factor * static_cast<BattleFighter*>(bo)->getMaxHP());
+                }
+            }
+            break;
         default:
             {
                 if(!(static_cast<BattleFighter*>(bo))->isRevival())
