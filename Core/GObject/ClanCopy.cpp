@@ -1508,6 +1508,8 @@ void ClanCopyMgr::ResetBegin()
             delete (it->second);
             _clanCopyMap.erase(it ++);
         }
+        else
+            ++ it;
     }
     _reset = true;
     INFO_LOG("Start reset clanCopy.");
