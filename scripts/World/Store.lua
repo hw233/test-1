@@ -163,12 +163,14 @@ function loadStore()
 
         discount(store)
 
-        store:add(2,1700,599)
-        store:add(2,1701,599)
-        store:add(2,1702,599)
-        store:add(2,1703,599)
-        store:add(2,1704,599)
-        store:add(2,1705,599)
+        if is0921_0924() then
+            store:add(2,1700,599)
+            store:add(2,1701,599)
+            store:add(2,1702,599)
+            store:add(2,1703,599)
+            store:add(2,1704,599)
+            store:add(2,1705,599)
+        end
         store:add(2,1706,599)
         store:add(2,9163,10)
         -- store:add(2,1706,599)
