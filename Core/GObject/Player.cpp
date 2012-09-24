@@ -13356,6 +13356,11 @@ void EventTlzAuto::notify(bool isBeginAuto)
         WORLD().UpdateKillMonsterRank(this, curType, curCount);
     }
 
+    ///////////////////////////////////////////////
+    // 帮派副本相关
+
+    // 帮派副本相关
+    ///////////////////////////////////////////////
     bool Player::checkTrumpMutually(UInt32 trumpid)
     {
         static UInt32 muttrumps[] = {1532, 1530};

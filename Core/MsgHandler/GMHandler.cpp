@@ -38,6 +38,9 @@
 #include "GObject/ClanCopy.h"
 
 #include "GObject/Tianjie.h"
+#include "GObject/ClanCopy.h"
+
+#include "GObject/Tianjie.h"
 GMHandler gmHandler;
 
 GMHandler::GMHandler()
@@ -195,7 +198,7 @@ GMHandler::GMHandler()
 
     Reg(3, "statue", &GMHandler::OnStatueExp);
     Reg(3, "setcopy", &GMHandler::OnSetClanCopyLevel);
-    Reg(3, "setcopytime", &GMHandler::OnSetClanCopyTime);
+    Reg(3, "setcopytm", &GMHandler::OnSetClanCopyTime);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2984,3 +2987,4 @@ void GMHandler::OnTj4(GObject::Player* player, std::vector<std::string>& args)
     int bossMaxHp = atoi(args[0].c_str());
     GObject::Tianjie::instance().setTj4BossHp(bossMaxHp);
 }
+
