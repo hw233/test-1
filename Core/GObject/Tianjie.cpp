@@ -1767,8 +1767,8 @@ void Tianjie::startBoss()
 
         const float WBOSS_BASE_TIME = 300.f;
         const float WBOSS_ATK_FACTOR = 0.5f;
-        const UInt32 WBOSS_MIN_HP = 20000000;
-        const UInt32 WBOSS_MAX_HP = 350000000;
+        const Int32 WBOSS_MIN_HP = 20000000;
+        const Int32 WBOSS_MAX_HP = 350000000;
         const float WBOSS_MAX_ASC_HP_FACTOR = 1.40f;
 
         Int32 extatk = 0;
@@ -1852,7 +1852,7 @@ bool Tianjie::attackBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool final)
         nflist[0].fighter->setBaseHP(m_bossMaxHp);
         nflist[0].fighter->setDirty();
 
-        if (bf->getHP() > m_tj4BossHp)
+        if (bf->getHP() > (UInt32)m_tj4BossHp)
         {
             _hp = m_tj4BossHp;
             _percent = 100;
