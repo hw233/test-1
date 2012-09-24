@@ -1035,12 +1035,12 @@ namespace GObject
         {
             StringTokenizer via(m_via, "_");
             if (via.count() > 1)
-                udpLog(via[0].c_str(), via[1].c_str(), "", "", "", "1", "login");
+                udpLog(via[0].c_str(), via[1].c_str(), "", "", "", "0", "login");
             else
-                udpLog(m_via.c_str(), "", "", "", "", "1", "login");
+                udpLog(m_via.c_str(), "", "", "", "", "0", "login");
         }
         else
-            udpLog("", "", "", "", "", "1", "login");
+            udpLog("", "", "", "", "", "0", "login");
 
         if (!m_invited.empty())
         {
@@ -1777,12 +1777,14 @@ namespace GObject
         }
 
 		DBLOG1().PushUpdateData("update login_states set logout_time=%u where server_id=%u and player_id=%"I64_FMT"u and login_time=%u", curtime, cfg.serverLogId, _id, _playerData.lastOnline);
-		//_playerData.lastOnline = curtime; // XXX: 在线时间统计问题
 		writeOnlineRewardToDB();
 
 		removeStatus(SGPunish);
         LogoutSaveOnlineTimeToday();
-        udpLog("", "", "", "", "", "2", "login");
+
+        char online[32] = {0,};
+        snprintf(online, sizeof(online), "%u", curtime - _playerData.lastOnline);
+        udpLog("", "", "", "", "", online, "login");
 	}
 
 	void Player::Logout(bool nobroadcast)
@@ -1863,7 +1865,9 @@ namespace GObject
 #endif // _WIN32
         heroIsland.playerOffline(this);
 		removeStatus(SGPunish);
-        udpLog("", "", "", "", "", "2", "login");
+        char online[32] = {0,};
+        snprintf(online, sizeof(online), "%u", TimeUtil::Now() - _playerData.lastOnline);
+        udpLog("", "", "", "", "", online, "login");
 	}
 
 	void Player::checkLastBattled()
