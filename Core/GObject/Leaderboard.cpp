@@ -251,7 +251,7 @@ void Leaderboard::doUpdate()
 #endif
 
 	std::vector<LeaderboardTowndown> blist3;
-	execu->ExtractData("select a.id, a.name, b.maxLevel, b.time2MaxLvl from player a, towndeamon_player b where a.id=b.playerId order by b.maxLevel desc, b.time2MaxLvl asc limit 10;", blist3);
+	execu->ExtractData("select a.id, a.name, b.maxLevel, b.time2MaxLvl from player a, towndeamon_player b where a.id=b.playerId order by b.maxLevel desc, b.time2MaxLvl asc limit 100;", blist3);
     {
         FastMutex::ScopedLock lk(_tmutex);
         _towndown.clear();
