@@ -3640,6 +3640,8 @@ void Clan::resetCopyLevel()
     else
         _copyLevel -= COPY_RESET_LEVEL;
 
+    _copyLevelUpdateTime = TimeUtil::Now();
+    DB5().PushUpdateData("REPLACE INTO `clan_copy` (`clanId`, `level`, `levelUpdateTime`, `maxCopyLevel`, `maxCopyTime`) VALUES (%u, %u, %u, %u, %u)", _id, _copyLevel, _copyLevelUpdateTime, _copyMaxLevel, _copyMaxTime);
     _copyLog.push_back(clanCopyLog);
     if (_copyLog.size() > MAX_COPY_LOG)
     {
@@ -3758,13 +3760,16 @@ void   Clan::LoadCopy(UInt16 level, UInt32 levelUpdateTime, UInt16 maxLevel, UIn
             level -= count * 5;
     }
     _copyLevel = level;
-    _copyLevelUpdateTime = now;
+    if (count)
+        _copyLevelUpdateTime = levelUpdateTime;
+    else
+        _copyLevelUpdateTime = now;
     if (maxLevel > 30)
     {
         // 由于开始未初始化导致历史最大层数出现错误，重置数据
         maxLevel = level;
         maxTime = TimeUtil::Now();
-        DB5().PushUpdateData("REPLACE INTO `clan_copy` (`clanId`, `level`, `levelUpdateTime`, `maxCopyLevel`, `maxCopyTime`) VALUES (%u, %u, %u, %u, %u)", _id, _copyLevel, TimeUtil::Now(), _copyMaxLevel, _copyMaxTime);
+        DB5().PushUpdateData("REPLACE INTO `clan_copy` (`clanId`, `level`, `levelUpdateTime`, `maxCopyLevel`, `maxCopyTime`) VALUES (%u, %u, %u, %u, %u)", _id, _copyLevel, levelUpdateTime, maxLevel, maxTime);
     }
     _copyMaxLevel = maxLevel;
     _copyMaxTime = maxTime;
