@@ -6376,8 +6376,10 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo, DefStatus* defL
                 if(uRand(10000) < passiveSkill->prob * 100)
                 {
                     fFakeDead = true;
-                    float factor = passiveSkill->effect->hpP;
-                    (static_cast<BattleFighter*>(bo))->regenHP(factor * static_cast<BattleFighter*>(bo)->getMaxHP());
+                    UInt32 rhp = passiveSkill->effect->hpP * static_cast<BattleFighter*>(bo)->getMaxHP();
+                    if(rhp == 0)
+                        rhp = 1;
+                    (static_cast<BattleFighter*>(bo))->regenHP(rhp);
                 }
             }
             break;
