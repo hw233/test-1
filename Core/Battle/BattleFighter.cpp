@@ -192,7 +192,10 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         skillItem.base = GData::skillManager[passiveSkillDead100Id[idx]];
         skillItem.cd = 0;
         skillItem.rateExtent = 0;
-        _passiveSkillDead100.insert(_passiveSkillDead100.end(), skillItem);
+        if(SKILL_ID(skillItem.base->getId()) == 215)
+            _passiveSkillDead100.insert(_passiveSkillDead100.begin(), skillItem);
+        else
+            _passiveSkillDead100.insert(_passiveSkillDead100.end(), skillItem);
 
         updateSkillStrengthen(passiveSkillDead100Id[idx]);
     }
@@ -364,10 +367,7 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         skillItem.base = GData::skillManager[passiveSkillOnOtherDead[idx]];
         skillItem.cd = 0;
         skillItem.rateExtent = 0;
-        if(SKILL_ID(skillItem.base->getId()) == 215)
-            _passiveSkillOnOtherDead.insert(_passiveSkillOnOtherDead.begin(), skillItem);
-        else
-            _passiveSkillOnOtherDead.insert(_passiveSkillOnOtherDead.end(), skillItem);
+        _passiveSkillOnOtherDead.insert(_passiveSkillOnOtherDead.end(), skillItem);
 
         updateSkillStrengthen(passiveSkillOnOtherDead[idx]);
     }
