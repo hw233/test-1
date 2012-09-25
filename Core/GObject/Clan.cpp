@@ -3764,7 +3764,7 @@ void   Clan::LoadCopy(UInt16 level, UInt32 levelUpdateTime, UInt16 maxLevel, UIn
         // 由于开始未初始化导致历史最大层数出现错误，重置数据
         maxLevel = level;
         maxTime = TimeUtil::Now();
-        DB5().PushUpdateData("REPLACE INTO `clan_copy` (`clanId`, `level`, `levelUpdateTime`, `maxCopyLevel`, `maxCopyTime`) VALUES (%u, %u, %u, %u, %u)", _id, _copyLevel, TimeUtil::Now(), _copyMaxLevel, _copyMaxTime);
+        DB5().PushUpdateData("REPLACE INTO `clan_copy` (`clanId`, `level`, `levelUpdateTime`, `maxCopyLevel`, `maxCopyTime`) VALUES (%u, %u, %u, %u, %u)", _id, level, levelUpdateTime, maxLevel, maxTime);
     }
     _copyMaxLevel = maxLevel;
     _copyMaxTime = maxTime;
