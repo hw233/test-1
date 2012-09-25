@@ -937,6 +937,7 @@ const GData::SkillBase* BattleFighter::getPassiveSkill100(std::vector<GData::Ski
                 continue;
             if(passiveSkill100[idx].base->effect == NULL)
                 continue;
+            passiveSkill100[idx].cd = passiveSkill100[idx].base->cd + 1;
 
             if (_fighter->getOwner())
                 _fighter->getOwner()->OnHeroMemo(GObject::MC_SKILL, GObject::MD_MASTER, 0, 1);

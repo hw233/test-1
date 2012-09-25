@@ -902,7 +902,7 @@ function initActTime(y, m, d)
   actTime508_1 = os.time(SerStartTm508) + 2 * 86400;
 
   actTime509 = os.time(SerStartTm509);
-  actTime509_1 = os.time(SerStartTm509) + 4 * 86400;
+  actTime509_1 = os.time(SerStartTm509) + 3 * 86400;
 
   -- 繁体版
   actTime101 = os.time(SerStartTm101);
