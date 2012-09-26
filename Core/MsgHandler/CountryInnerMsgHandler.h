@@ -175,7 +175,7 @@ void OnCompleteDungeonAutoNotifyReq(GameMsgHdr& hdr, const void * data)
 void OnResetRecharge(GameMsgHdr& hdr, const void * data)
 {
 	MSG_QUERY_PLAYER(player);
-    if (pl->GetVar(VAR_RECHARGE_TOTAL))
+    if (player->GetVar(VAR_RECHARGE_TOTAL))
         player->SetVar(VAR_RECHARGE_TOTAL, 0);
     player->sendRechargeInfo();
 }

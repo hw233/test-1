@@ -2044,24 +2044,15 @@ end
 
 function sendRechargeMails_2012_10_05(player, ototal, ntotal)
     local lvls = {
-        199,399,599,999,1299,1599,1999,2999,3999,4999,5999,6999,7999,8999,9999
+        10,99,199,399,699,999,
     }
     local items = {
-        {514,3,1},
-        {503,3,1},
-        {516,3,1},
-        {514,5,1, 503,5,1, 516,5,1},
-        {0xA000,80,1},
-        {0xA000,100,1},
-        {507,2,1, 509,2,1, 30,10,1, 0xA000,100,1},
-        {0xA000,120,1},
-        {0xA000,140,1},
-        {0xA000,160,1},
-        {0xA000,180,1},
-        {0xA000,200,1},
-        {0xA000,220,1},
-        {0xA000,240,1},
-        {515,10,1, 507,10,1, 509,10,1, 30,10,1, 0xA000,300,1},
+        {1325,1,1},
+        {503,2,1, 15,2,1},
+        {516,1,1, 547,2,1},
+        {507,1,1},
+        {509,1,1, 33,1,1},
+        {1528,1,1, 515,1,1},
     }
 
     local olvl = calcRechargeLevel(lvls, ototal)
@@ -2105,8 +2096,7 @@ function sendRechargeMails(player, ototal, ntotal)
     local n = os.time()
     if n >= s1 and n < (s1 + 4*86400) then
         sendRechargeMails_2012_09_27(player, ototal, ntotal)
-    end
-    if n >= s2 and n < (s2 + 2*86400) then
+    elseif n >= s2 and n < (s2 + 2*86400) then
         sendRechargeMails_2012_10_05(player, ototal, ntotal)
     end
 end
@@ -2244,9 +2234,49 @@ function sendConsumeMails2(player, ototal, ntotal)
     end
 end
 
+function sendConsumeMails_2012_10_01(player, ototal, ntotal)
+    local lvls = {
+        10,99,399,899,1599,2599,4099,5699,7599,9999,15999,22999,31999,45999,69999,
+    }    
+    local items = {
+        {503,1,1},
+        {516,1,1},
+        {517,1,1, 9088,1,1},
+        {1528,1,1},
+        {549,1,1},
+        {509,2,1, 507,2,1},
+        {515,2,1},
+        {1325,2,1},
+        {507,3,1, 509,3,1},
+        {515,3,1},
+        {9076,5,1},
+        {1325,3,1, 515,3,1},
+        {1528,3,1, 515,4,1},
+        {9076,8,1, 9177,1,1},
+        {9076,10,1, 9177,2,1},
+    }
+
+    local olvl = calcRechargeLevel(lvls, ototal)
+    local nlvl = calcRechargeLevel(lvls, ntotal)
+
+    if nlvl == 0 or olvl == nlvl then
+        return
+    end
+
+    for k = olvl+1, nlvl do
+        if lvls[k] == nil or items[k] == nil then
+            return
+        end
+        local title = string.format(msg_105, lvls[k])
+        local ctx = string.format(msg_106, lvls[k])
+        sendItemPackageMail(player, title, ctx, items[k]);
+    end
+end
+
 function sendConsumeMails(player, ototal, ntotal)
     --sendConsumeMails1(player, ototal, ntotal);
-    sendConsumeMails2(player, ototal, ntotal);
+    --sendConsumeMails2(player, ototal, ntotal);
+    sendConsumeMails_2012_10_01(player, ototal, ntotal);
 end
 
 local awardPool = {
