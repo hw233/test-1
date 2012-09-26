@@ -806,7 +806,7 @@ function initActTime(y, m, d)
   actTime44 = os.time(SerStartTm20) + 17 * 86400;
 
   actTime45 = os.time(SerStartTm21);
-  actTime46 = os.time(SerStartTm21) + 30 * 86400;
+  actTime46 = os.time(SerStartTm21) + 61 * 86400;
 
   actTime47 = os.time(SerStartTm22);
   actTime48 = os.time(SerStartTm22) + 12 * 86400;
