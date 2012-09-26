@@ -13421,7 +13421,10 @@ void EventTlzAuto::notify(bool isBeginAuto)
                     if (!trumpids[j])
                         continue;
                     if (trumpids[j] == muttrumps[i][0] || trumpids[j] == muttrumps[i][1])
+                    {
+                        sendMsgCode(0, 1032);
                         return true;
+                    }
                 }
             }
         }
