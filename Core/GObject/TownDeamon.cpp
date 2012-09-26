@@ -10,6 +10,7 @@
 #include "Server/SysMsg.h"
 #include "Var.h"
 #include "MsgHandler/CountryMsgStruct.h"
+#include "GObject/Tianjie.h"
 
 namespace GObject
 {
@@ -927,6 +928,53 @@ void TownDeamon::addActivity(Player* pl)
         GameAction()->doAty(pl, AtyTownDeamon, 0, 0);
         pl->SetVar(VAR_TOWNDEAMON, 1);
     }
+}
+void TownDeamon::getTjItem(Player* pl, UInt8 townLevel)
+{
+    static const int s_tjLevTownLev[][2] = {{59,50},{69,60},{79,70},{89,80},{99,90},{109,100}};
+    static const int s_tjItemId[] = {1653, 1654, 1655, 1532, 1533, 1534};
+    UInt8 tjLevel = GObject::Tianjie::instance().getLastPassedLevel();
+    for (int i = 0; i < 6; ++i)
+    {
+        if (townLevel != s_tjLevTownLev[i][1])
+            continue;
+        int flag = pl->GetVar(VAR_TJ_TOWN_ITEM_GOT);
+        if ((flag >> i) == 0 && tjLevel >= s_tjLevTownLev[i][0] && pl->GetVar(VAR_TOWNDEAMON) >= townLevel)
+        {
+            pl->GetPackage().Add(s_tjItemId[i], 1, true);
+        }
+        break;
+    }
+    sendTjItemInfo(pl);
+}
+
+void TownDeamon::sendTjItemInfo(Player* pl)
+{
+    static const int s_tjLevTownLev[][2] = {{59,50},{69,60},{79,70},{89,80},{99,90},{109,100}};
+    static const int s_tjItemId[] = {1653, 1654, 1655, 1532, 1533, 1534};
+    Stream st(REP::TOWN_DEAMON);
+    UInt8 tjLevel = GObject::Tianjie::instance().getLastPassedLevel();
+    st << tjLevel;
+    for (int i = 0; i < 6; ++i)
+    {
+        UInt8 townLevel = s_tjLevTownLev[i][1];
+        UInt8 status = 0; //可领取
+        UInt16 itemId = s_tjItemId[i]; 
+
+        int flag = pl->GetVar(VAR_TJ_TOWN_ITEM_GOT);
+        if ((flag >> i) == 1)
+            status = 1; //已领取
+        else
+        {
+            if (tjLevel < s_tjLevTownLev[i][0])
+                status = 2; //天劫未渡过
+            else if (pl->GetVar(VAR_TOWNDEAMON) < townLevel)
+                status = 3; //锁妖塔未封印
+        }
+        st << townLevel << status << itemId;
+    }
+    st << Stream::eos;
+    pl->send(st);
 }
 
 }
