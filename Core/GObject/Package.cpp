@@ -4385,6 +4385,26 @@ namespace GObject
 		return fgt->findEquip(id, pos);
 	}
 
+    bool eachFighter(Fighter* fgt)
+    {
+        return true;
+    }
+
+    void Package::FindEquipByTypeId(std::vector<ItemEquip*>& ret, UInt32 id, bool bind)
+    {
+        if (!m_Owner)
+            return;
+        for (item_elem_iter i = m_Items.begin(); i != m_Items.end(); ++i)
+        {
+            if (i->second && IsEquipId(i->second->getId()))
+            {
+                ItemEquip* item = (ItemEquip*)i->second;
+                if (item->GetItemType().getId() == id)
+                    ret.push_back(item);
+            }
+        }
+    }
+
 	void Package::ItemNotify( UInt32 id, UInt16 num )
 	{
         if(IsEquipId(id))

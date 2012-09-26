@@ -191,7 +191,7 @@ void LuckyDraw::pushLog(const std::string& name, const std::string& its)
 
 void LuckyDraw::notifyPass(UInt8 id)
 {
-    if (id <= 1)
+    if (id <= 1 || id == 8)
         return;
     UInt8 maxid = GVAR.GetVar(GVAR_TCPASS);
     if (id > maxid)

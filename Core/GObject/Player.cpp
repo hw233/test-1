@@ -1035,12 +1035,12 @@ namespace GObject
         {
             StringTokenizer via(m_via, "_");
             if (via.count() > 1)
-                udpLog(via[0].c_str(), via[1].c_str(), "", "", "", "1", "login");
+                udpLog(via[0].c_str(), via[1].c_str(), "", "", "", "0", "login");
             else
-                udpLog(m_via.c_str(), "", "", "", "", "1", "login");
+                udpLog(m_via.c_str(), "", "", "", "", "0", "login");
         }
         else
-            udpLog("", "", "", "", "", "1", "login");
+            udpLog("", "", "", "", "", "0", "login");
 
         if (!m_invited.empty())
         {
@@ -1777,12 +1777,14 @@ namespace GObject
         }
 
 		DBLOG1().PushUpdateData("update login_states set logout_time=%u where server_id=%u and player_id=%"I64_FMT"u and login_time=%u", curtime, cfg.serverLogId, _id, _playerData.lastOnline);
-		//_playerData.lastOnline = curtime; // XXX: 在线时间统计问题
 		writeOnlineRewardToDB();
 
 		removeStatus(SGPunish);
         LogoutSaveOnlineTimeToday();
-        udpLog("", "", "", "", "", "2", "login");
+
+        char online[32] = {0,};
+        snprintf(online, sizeof(online), "%u", curtime - _playerData.lastOnline);
+        udpLog("", "", "", "", "", online, "login");
 	}
 
 	void Player::Logout(bool nobroadcast)
@@ -1863,7 +1865,9 @@ namespace GObject
 #endif // _WIN32
         heroIsland.playerOffline(this);
 		removeStatus(SGPunish);
-        udpLog("", "", "", "", "", "2", "login");
+        char online[32] = {0,};
+        snprintf(online, sizeof(online), "%u", TimeUtil::Now() - _playerData.lastOnline);
+        udpLog("", "", "", "", "", online, "login");
 	}
 
 	void Player::checkLastBattled()
@@ -6951,7 +6955,8 @@ namespace GObject
 
         for (UInt8 i = 0; i < size; i += 2)
         {
-            ItemBase* item = m_Package->Add(ids[i], ((UInt8)(i+1)>=ids.size())?1:ids[i+1], true, false, FromOnlineAward);
+            //ItemBase* item = 
+            m_Package->Add(ids[i], ((UInt8)(i+1)>=ids.size())?1:ids[i+1], true, false, FromOnlineAward);
             //if(!item)
                 // return false;
                 //; // XXX: ugly
@@ -12664,7 +12669,7 @@ namespace GObject
         else if (2 == eventId)
         {
             type = 2;
-            int score = GetVar(VAR_TJ_TASK2_SCORE);
+            UInt32 score = GetVar(VAR_TJ_TASK2_SCORE);
             switch (cmd)
             {
                     //查询列表
@@ -13355,6 +13360,11 @@ void EventTlzAuto::notify(bool isBeginAuto)
         WORLD().UpdateKillMonsterRank(this, curType, curCount);
     }
 
+    ///////////////////////////////////////////////
+    // 帮派副本相关
+
+    // 帮派副本相关
+    ///////////////////////////////////////////////
     bool Player::checkTrumpMutually(UInt32 trumpid)
     {
         static UInt32 muttrumps[] = {1532, 1530};

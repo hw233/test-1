@@ -6,11 +6,13 @@
 #include "Common/Stream.h"
 #include "Country.h"
 #include "Script/GameActionLua.h"
+#include "Server/SysMsg.h"
 
 
 namespace GObject
 {
 
+//SYSMSG_BROADCASTV(2337, pl->getCountry(), pl->getName().c_str(), level);
 
 
 
@@ -53,7 +55,6 @@ ClanCopy::ClanCopy(Clan *c, UInt32 copyId, Player * player) : _clan(c), _copyId 
 
     _maxMonsterWave = 20;
     _curMonsterWave = 0;
-    _lastWave = 0;
 
     _observerPlayer.clear();
 #ifdef DEBUG_CLAN_COPY
@@ -64,9 +65,11 @@ ClanCopy::ClanCopy(Clan *c, UInt32 copyId, Player * player) : _clan(c), _copyId 
 
 ClanCopy::~ClanCopy()
 {
+    _clan->clearCopySnap();
     for (std::map<Player *, UInt8>::iterator it = _playerIndex.begin(); it != _playerIndex.end(); ++ it)
     {
         it->first->regenAll();
+        _clan->insertIntoCopySnap(it->first, it->second);
     }
     for (SpotMonster::iterator it = _spotMonster.begin(); it != _spotMonster.end(); ++it)
     {
@@ -124,6 +127,28 @@ void ClanCopy::addPlayer(Player * player, bool needNotify /* = true */)
 #endif
         _observerPlayer.erase(obIt);
     }
+
+    // 先寻找上次副本结束时快照，来快速将玩家放入历史据点
+
+    if (UInt8 spotId = _clan->getCopyPlayerSnap(player))
+    {
+        if (_spotPlayer[spotId].size() < _spotMap[spotId].maxPlayerCount)
+        {
+            // 加入某一据点的玩家列表中
+            _spotPlayer[spotId].push_back(ClanCopyPlayer(player));
+            _playerIndex.insert(std::make_pair(player, spotId));
+            updateSpotBufferValue(spotId);
+#ifdef DEBUG_CLAN_COPY
+            *fileSt << "\"" << player->getName() << "\" change to spot(" << (UInt32) spotId << ")." << std::endl;
+#endif
+            if (needNotify)
+            {
+                notifySpotPlayerInfo();
+            }
+            return;
+        }
+    }
+
     for (SpotMap::iterator mapIt = _spotMap.begin(); mapIt != _spotMap.end(); ++mapIt)
     {
         //一个一个据点的找空位置
@@ -213,6 +238,9 @@ void ClanCopy::playerEscape(Player *player)
             *fileSt << "Launcher \"" << player->getName() << "\" leave." << std::endl;
 #endif
             notifyLauncherEscape();
+            Stream st2;
+            SYSMSGVP(st2, 807, _launchPlayer->getName().c_str());
+            _clan->broadcast(st2);
             return;
         }
         else
@@ -611,11 +639,11 @@ void ClanCopy::process(UInt32 now)
     {
         if (checkWin())
         {
-            _clan->addCopyWinLog(_launchPlayer);
             UInt32 awardValue = static_cast<UInt32> (static_cast<float>(_homeHp) / _homeMaxHp * _maxReward);
-            addWinReward(awardValue);
             notifySpotBattleInfo();
+            addWinReward(awardValue);
             _clan->addCopyLevel();
+            _clan->addCopyWinLog(_launchPlayer);
             _status = CLAN_COPY_OVER;
             return;
         }
@@ -632,8 +660,6 @@ void ClanCopy::process(UInt32 now)
 void ClanCopy::enemyBaseAct()
 {
     // 敌人老巢的行动
-    if (_lastWave)
-        --_lastWave;
     monsterMove(Enemy_Base); // 上一轮产生的怪物先行移动
     if (_curMonsterWave * _monsterRefreshTick + _startTick > _tickCount)
     {
@@ -654,8 +680,7 @@ void ClanCopy::enemyBaseAct()
     }
     else
     {
-        if (!_lastWave)
-            _lastWave = 2;
+        // 最后一波怪刷完后需要的冲阵
     }
 }
 
@@ -794,12 +819,15 @@ void ClanCopy::spotCombat(UInt8 spotId)
         ++ monsterIt;
     }
 
-    if (_lastWave == 1)
+    if (_spotMap[spotId].nextMoveTick == (_tickCount + 1) )
         flag = true;
+    else
+        flag = false;
 
     if (flag)
     {
         // 需要重新冲阵
+        //std::cout << "_tickCount = " << _tickCount << ", nextMoveTick = " << _spotMap[spotId].nextMoveTick << "." << std::endl;
 #ifdef DEBUG_CLAN_COPY
         *fileSt << "Start monsters match players." << std::endl;
 #endif
@@ -1078,7 +1106,7 @@ void ClanCopy::attackHome(ClanCopyMonster* clanCopyMonster)
 {
     // 怪物攻击主基地
     _deadMonster.insert(clanCopyMonster);
-    _spotBattleInfo[Home].push_back(ClanCopyBattleInfo(0, clanCopyMonster->npcId, 0xFF, 0));
+    _spotBattleInfo[Home].push_back(ClanCopyBattleInfo(clanCopyMonster->npcId, clanCopyMonster->npcIndex, 0xFF, 0));
     clanCopyMonster->deadType = 0xff;
     if (_homeHp <= clanCopyMonster->npcValue)
     {
@@ -1480,6 +1508,8 @@ void ClanCopyMgr::ResetBegin()
             delete (it->second);
             _clanCopyMap.erase(it ++);
         }
+        else
+            ++ it;
     }
     _reset = true;
     INFO_LOG("Start reset clanCopy.");
@@ -1603,6 +1633,11 @@ bool ClanCopyMgr::createClanCopy(Player* player, Clan *c)
     copy->addPlayerFromSpot(c);
     c->broadcastCopyInfo();
     c->notifyCopyCreated(player);
+
+    Stream st;
+    SYSMSGVP(st, 806, player->getName().c_str());
+    c->broadcast(st);
+
     return true;
 }
 

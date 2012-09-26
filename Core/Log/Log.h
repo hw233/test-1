@@ -121,6 +121,7 @@ enum MailItemType
     SplitCitta,
     BlueDiamondCmd,
     ClanCopyAward,
+    BuChang1530,
 };
 enum ItemFrom
 {

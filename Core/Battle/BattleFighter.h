@@ -493,8 +493,8 @@ private:
 //    float _therapy_add;
 //    UInt8 _therapy_add_last;
 
-    UInt8 _therapy_buff_last;
     float _therapy_buff;
+    UInt8 _therapy_buff_last;
 
     float _aura_dec;
     UInt8 _aura_dec_last;

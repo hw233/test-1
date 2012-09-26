@@ -1540,4 +1540,3 @@ CREATE TABLE `reportid` (
     PRIMARY KEY (`maxid`)                  
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-

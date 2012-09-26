@@ -1018,6 +1018,7 @@ bool World::Init()
 
     AddTimer(5 * 1000, Team_Copy_Process, static_cast<void*>(NULL));
     AddTimer(3600 * 1000, AthleticsPhysicalCheck, static_cast<void *>(NULL), (3600 - now % 3600) * 1000);
+    AddTimer(3600 * 1000, ClanStatueCheck, static_cast<void *>(NULL), (3600 - now % 3600) * 1000);
 
     UInt32 tdChkPoint = TimeUtil::SharpDayT(0, now) + TOWNDEAMONENDTM;
     AddTimer(86400 * 1000, TownDeamonTmAward, static_cast<void *>(NULL), (tdChkPoint >= now ? tdChkPoint - now : 86400 + tdChkPoint - now) * 1000);

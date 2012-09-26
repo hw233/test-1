@@ -4,6 +4,7 @@
 #include "GObjectDBExecHelper.h"
 #include "DB/DBExecutor.h"
 #include "Server/OidGenerator.h"
+#include "Common/Itoa.h"
 
 #include "Server/WorldServer.h"
 #include "Server/Cfg.h"
@@ -829,12 +830,90 @@ namespace GObject
         }
     }
 
+    void buchang1530_1(Player* p, ItemEquip* item)
+    {
+        if (!p || !item)
+            return;
+
+        UInt8 enchant = item->getItemEquipData().enchant;
+        UInt8 count = 0;
+        if (enchant == 1)
+            count = 1;
+        else if (enchant == 2)
+            count = 2;
+        else if (enchant == 3)
+            count = 3;
+        else if (enchant == 4)
+            count = 4;
+        else if (enchant == 5)
+            count = 6;
+        else if (enchant == 6)
+            count = 12;
+        else if (enchant == 7)
+            count = 20;
+        else if (enchant == 8)
+            count = 30;
+
+        if (!count && !item->getItemEquipData().trumpExp)
+            return;
+
+        SYSMSG(title, 4029);
+        SYSMSGV(content, 4030, enchant, item->getItemEquipData().trumpExp);
+
+        MailPackage::MailItem mitem[2] = {{515,count},{1528,UInt32(0.3f*item->getItemEquipData().trumpExp/1000)}};
+        Mail * mail = p->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFD0000/*free*/);
+        if (mail)
+            mailPackageManager.push(mail->id, mitem, 2, true);
+
+        std::string strItems;
+        for (int i = 0; i < 1; ++i)
+        {
+            strItems += Itoa(mitem[i].id);
+            strItems += ",";
+            strItems += Itoa(mitem[i].count);
+            strItems += "|";
+        }
+
+        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, p->getId(), mail->id, BuChang1530, title, content, strItems.c_str(), mail->recvTime);
+    }
+
+    bool buchang1530_2(std::pair<const unsigned int, GObject::Fighter*>& f)
+    {
+        Fighter* fgt = f.second;
+        if (!fgt)
+            return true;
+        Player* pl = fgt->getOwner();
+        if (!pl)
+            return true;
+
+        std::vector<ItemEquip*> ret;
+        fgt->findTrumpByTypeId(ret, 1530);
+        for (size_t i = 0; i < ret.size(); ++i)
+            buchang1530_1(pl, ret[i]);
+        return true;
+    }
+    
+    void buchang1530(Player* p)
+    {
+        return; // XXX: 不需要了
+        if (!p)
+            return;
+        Package* pkg = p->GetPackage();
+        std::vector<ItemEquip*> ret;
+        pkg->FindEquipByTypeId(ret, 1530, true);
+        for (size_t i = 0; i < ret.size(); ++i)
+            buchang1530_1(p, ret[i]);
+        p->foreachFighter(buchang1530_2);
+    }
+
 	inline bool player_load(Player * p, int)
 	{
 		p->Load();
 		gBlockbossmgr.addPlayerRank(p, p->getBlockBossLevel(), p->GetLev());
         if (!GVAR.GetVar(GVAR_CITTASMERGE))
             mergeCittaPages(p);
+        if (!GVAR.GetVar(GVAR_1530BUCHANG))
+            buchang1530(p);
 		return true;
 	}
 
@@ -2147,6 +2226,7 @@ namespace GObject
 
 		globalPlayers.enumerate(player_load, 0);
         GVAR.SetVar(GVAR_CITTASMERGE, 1);
+        GVAR.SetVar(GVAR_1530BUCHANG, 1);
 
 		return true;
 	}
