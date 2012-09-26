@@ -604,8 +604,24 @@ function onActivityCheck(tm)
       else
           is_0921_0924 = false
       end
+
+      -- 必须放在这，别动
+      -- setRechargeTime(actTime503, actTime503_1)
+
+      if tm >= actTime510 and tm < actTime510_1 then
+          setRechargeActive(true, 16)
+      else
+          setRechargeActive(false, 16)
+      end
       
-      setRechargeTime(actTime503, actTime503_1)
+      if tm >= actTime511 and tm < actTime511_1 then
+          setRechargeActive(true, 16)
+          setNeedRechargeRank(true)
+          -- setRechargeTime(actTime511, actTime511_1)
+      else
+          setRechargeActive(false, 16)
+          setNeedRechargeRank(false)
+      end
 
       setShuoShuo(true);
   end
@@ -704,6 +720,9 @@ function initActTime(y, m, d)
   local  SerStartTm508= { ['year'] = 2012, ['month'] = 9, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --变身法宝(9/21-9/24)
   local  SerStartTm509= { ['year'] = 2012, ['month'] = 9, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm510= { ['year'] = 2012, ['month'] = 9, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm511= { ['year'] = 2012, ['month'] = 10, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
   -- 繁体版
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm102 = { ['year'] = 2012, ['month'] = 6, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -903,6 +922,12 @@ function initActTime(y, m, d)
 
   actTime509 = os.time(SerStartTm509);
   actTime509_1 = os.time(SerStartTm509) + 3 * 86400;
+
+  actTime510 = os.time(SerStartTm510);
+  actTime510_1 = os.time(SerStartTm510) + 4 * 86400;
+
+  actTime511 = os.time(SerStartTm511);
+  actTime511_1 = os.time(SerStartTm511) + 2 * 86400;
 
   -- 繁体版
   actTime101 = os.time(SerStartTm101);
