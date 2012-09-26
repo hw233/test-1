@@ -1166,12 +1166,14 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
             pl->send((st));
         }
     }
-    if (World::getNeedRechargeRank() || time(NULL) <= World::getRechargeEnd() + 24*60*60)
+    //if (World::getNeedRechargeRank() || time(NULL) <= World::getRechargeEnd() + 24*60*60)
+    if (World::getNeedRechargeRank())
     {
         GameMsgHdr hdr(0x1C3, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr, NULL);
     }
-    if (World::getNeedConsumeRank() || time(NULL) <= World::getConsumeEnd() + 24*60*60)
+    //if (World::getNeedConsumeRank() || time(NULL) <= World::getConsumeEnd() + 24*60*60)
+    if (World::getNeedConsumeRank())
     {
         GameMsgHdr hdr(0x1C4, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr, NULL);

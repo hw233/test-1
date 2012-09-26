@@ -1418,6 +1418,21 @@ namespace GObject
         udpLog("clanCopy", action, "", "", "", "", "act", num);
     }
 
+    void Player::tripodUdpLog(UInt32 id, UInt32 val /* = 0 */, UInt32 num /* = 1 */)
+    {
+        // 九疑鼎相关日志
+        char action[16] = "";
+        if (val)
+        {
+            snprintf (action, 16, "F_%d_%d", id, val);
+        }
+        else
+        {
+            snprintf (action, 16, "F_%d", id);
+        }
+        udpLog("tripod", action, "", "", "", "", "act", num);
+    }
+
     void Player::sendHalloweenOnlineAward(UInt32 now, bool _online)
     {
         _online = false; // XXX: fuck
@@ -9733,9 +9748,15 @@ namespace GObject
             return;
 
         if (IsEquipTypeId(m_td.itemId))
+        {
             GetPackage()->AddEquip(m_td.itemId, true, false, FromTripod);
+            tripodUdpLog(1140, m_td.itemId);
+        }
         else
+        {
             GetPackage()->AddItem(m_td.itemId, m_td.num, true, false, FromTripod);
+            tripodUdpLog(1140, m_td.itemId, m_td.num);
+        }
 
         m_td.fire = 0;
         if (getVipLevel() > 2)
@@ -10800,15 +10821,15 @@ namespace GObject
     {
         if (!pos || pos > 7)
             return;
-        MailPackage::MailItem item[7][4] =
+        MailPackage::MailItem item[7][3] =
         {
-            {{9076,20},{509,20},{30,100},},
-            {{9076,10},{509,10},{30,50},},
-            {{9076,5},{509,10},{30,20},},
-            {{9076,5},{509,5},},
-            {{9076,5},{509,5},},
-            {{9076,5},{509,5},},
-            {{9076,5},{509,5},},
+            {{9076,30},{509,30},{9177,10},},
+            {{9076,20},{509,10},{9177,5},},
+            {{9076,10},{509,10},{9177,2},},
+            {{9076,5},{509,5},{9177,1},},
+            {{9076,5},{509,5},{9177,1},},
+            {{9076,5},{509,5},{9177,1},},
+            {{9076,5},{509,5},{9177,1},},
         };
 
         SYSMSGV(_title, 4026, pos);
@@ -10817,7 +10838,7 @@ namespace GObject
         if(mail)
         {
             MailPackage::MailItem* mitem = &item[pos-1][0];
-            UInt32 size = 4;
+            UInt32 size = 3;
             std::string strItems;
             for (UInt32 i = 0; i < size; ++i)
             {
@@ -12573,6 +12594,9 @@ namespace GObject
             {
                 gold = 50000;
                 coupon = 3500;
+            }
+            if (gold > 0)
+            {
                 SYSMSGV(title, 5103);
                 SYSMSGV(content, 5104, gold, coupon, coupon);
                 GetMailBox()->newMail(NULL, 0x21, title, content);

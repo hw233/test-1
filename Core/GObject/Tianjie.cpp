@@ -173,6 +173,8 @@ Tianjie::Tianjie()
 
     m_isOpenNextTianjie = false;
     m_nextTjLevel = 0;
+
+    m_lastPassedLevel = 0;
 }
 
 bool Tianjie::isPlayerInTj(int playerLevel)
@@ -295,9 +297,24 @@ void Tianjie::OpenTj()
 
 bool Tianjie::Init()
 {
+    LoadLastPassed();
     LoadFromDB();
 
 	return true;
+}
+void Tianjie::LoadLastPassed()
+{
+	std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+	if (execu.get() == NULL || !execu->isConnected()) return ;
+
+	GData::DBPlayerMaxLevel dbexp;//借用DBPlayerMaxLevel结构
+    if(execu->Prepare("SELECT `level` FROM `tianjie` where is_opened=0 and rate>=4 order by level desc limit 1", dbexp) != DB::DB_OK)
+		return;
+
+	if(execu->Next() == DB::DB_OK)
+    {
+        m_lastPassedLevel = dbexp.level;
+    }
 }
 bool Tianjie::LoadFromDB()
 {
@@ -1014,6 +1031,9 @@ void Tianjie::goNext()
 {
     if ((m_currTjRate == 4 && !m_isFinish) || m_currTjRate == 5)
     {
+       if (m_lastPassedLevel < m_currOpenedTjLevel)
+           m_lastPassedLevel = m_currOpenedTjLevel;
+
        udplogTjStatus(false);
 
        if (!m_isRankKeep)

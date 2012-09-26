@@ -616,7 +616,21 @@ function onActivityCheck(tm)
           is_0926_0927 = false
       end
       
-      setRechargeTime(actTime503, actTime503_1)
+      if tm >= actTime511 and tm < actTime511_1 then
+          setRechargeActive(true, 16)
+      elseif tm >= actTime512 and tm < actTime512_1 then
+          setRechargeActive(true, 16)
+          setNeedRechargeRank(true)
+      else
+          setRechargeActive(false, 16)
+      end
+
+      if tm >= actTime513 and tm < actTime513_1 then
+          setConsumeActive(true)
+      else
+          setConsumeActive(false)
+      end
+
 
       setShuoShuo(true);
   end
@@ -717,6 +731,10 @@ function initActTime(y, m, d)
   local  SerStartTm509= { ['year'] = 2012, ['month'] = 9, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --商城限购(9/26-9/27)
   local  SerStartTm510= { ['year'] = 2012, ['month'] = 9, ['day'] = 26, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm511= { ['year'] = 2012, ['month'] = 9, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm512= { ['year'] = 2012, ['month'] = 10, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm513= { ['year'] = 2012, ['month'] = 10, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
   -- 繁体版
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm102 = { ['year'] = 2012, ['month'] = 6, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -919,6 +937,15 @@ function initActTime(y, m, d)
 
   actTime510 = os.time(SerStartTm510);
   actTime510_1 = os.time(SerStartTm510) + 2 * 86400;
+
+  actTime511 = os.time(SerStartTm511);
+  actTime511_1 = os.time(SerStartTm511) + 4 * 86400;
+
+  actTime512 = os.time(SerStartTm512);
+  actTime512_1 = os.time(SerStartTm512) + 2 * 86400;
+
+  actTime513 = os.time(SerStartTm513);
+  actTime513_1 = os.time(SerStartTm513) + 7 * 86400;
 
   -- 繁体版
   actTime101 = os.time(SerStartTm101);

@@ -298,7 +298,8 @@ bool enum_midnight(void * ptr, void* next)
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 7, 4) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 7, 9) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 7, 17) ||
-            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 7, 25)))
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 7, 25) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 5)))
     {
         if (pl->isOnline())
         {
@@ -307,7 +308,8 @@ bool enum_midnight(void * ptr, void* next)
         }
         else
         {
-            pl->SetVar(VAR_RECHARGE_TOTAL, 0);
+            if (pl->GetVar(VAR_RECHARGE_TOTAL))
+                pl->SetVar(VAR_RECHARGE_TOTAL, 0);
         }
     }
     if (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 24) ||
