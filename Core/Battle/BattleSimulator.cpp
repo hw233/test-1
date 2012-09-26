@@ -3587,14 +3587,14 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                     factor = skill->factor[0];
                 if((rate * factor) > _rnd(10000))
                 {
-                    if(skillId == 150)
+                    if(skillId == 150 || skillId == 153)
                     {
                         UInt32 magdef = bo->getMagDefend();
                         UInt32 dmg = _formula->calcDamage(factor*bf->getMagAttack()*0.35f, magdef, bf->getLevel(), 1, 0);
                         defList[defCount].damType = e_Bleed1;
                         bo->setAuraBleed(dmg, skill->last, 5);
                     }
-                    else if(skillId == 151)
+                    else if(skillId == 151 || skillId == 154)
                     {
                         UInt32 magdef = bo->getMagDefend();
                         UInt32 dmg = _formula->calcDamage(factor*bf->getMagAttack()*0.35f, magdef, bf->getLevel(), 1, 0);
@@ -3624,14 +3624,14 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
 
                 if(rate > _rnd(10000))
                 {
-                    if(skillId == 150)
+                    if(skillId == 150 || skillId == 153)
                     {
                         UInt32 magdef = bo->getMagDefend();
                         UInt32 dmg = _formula->calcDamage(ap[i].factor*bf->getMagAttack()*0.35f, magdef, bf->getLevel(), 1, 0);
                         defList[defCount].damType = e_Bleed1;
                         bo->setAuraBleed(dmg, skill->last, 5);
                     }
-                    else if(skillId == 151)
+                    else if(skillId == 151 || skillId == 154)
                     {
                         UInt32 magdef = bo->getMagDefend();
                         UInt32 dmg = _formula->calcDamage(ap[i].factor*bf->getMagAttack()*0.35f, magdef, bf->getLevel(), 1, 0);

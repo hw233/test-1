@@ -13378,6 +13378,13 @@ void EventTlzAuto::notify(bool isBeginAuto)
         if ((trumpid >= 1529 && trumpid <= 1534)
                 || (trumpid >= 1650 && trumpid <= 1655))
         {
+            size_t i = 0;
+            for (; i < sizeof(muttrumps)/(sizeof(UInt32)*2); ++i)
+            {
+                if (trumpid == muttrumps[i][0] || trumpid == muttrumps[i][1])
+                    break;
+            }
+
             for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++it)
             {
                 Fighter* fgt = it->second;
@@ -13387,13 +13394,10 @@ void EventTlzAuto::notify(bool isBeginAuto)
                     continue;
                 for (size_t j = 0; j < c; ++j)
                 {
-                    for (size_t i = 0; i < sizeof(muttrumps)/(sizeof(UInt32)*2); ++i)
-                    {
-                        if (!trumpids[j])
-                            continue;
-                        if (trumpids[j] == muttrumps[i][0] || trumpids[j] == muttrumps[i][1])
-                            return true;
-                    }
+                    if (!trumpids[j])
+                        continue;
+                    if (trumpids[j] == muttrumps[i][0] || trumpids[j] == muttrumps[i][1])
+                        return true;
                 }
             }
         }
