@@ -3574,7 +3574,8 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
 
         // 天劫:御雷神针、芭蕉巨扇、盘古神斧
         UInt16 skillId = SKILL_ID(skill->getId());
-        if((skillId == 150) || (skillId == 151) || (skillId == 152))
+        if((skillId == 150) || (skillId == 151) || (skillId == 152)
+                || (skillId == 153) || (skillId == 154) || (skillId == 155))
         {
             float rate = skill->prob * 100;
             BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][target_pos]);
