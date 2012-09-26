@@ -710,6 +710,8 @@ void TownDeamon::notifyAttackNpcResult(Player* pl, bool win)
     st << static_cast<UInt8>(0x05);
     st << level << static_cast<UInt8>(0) << static_cast<UInt8>(win ? 0 : 1) << Stream::eos;
     pl->send(st);
+
+    sendTjItemInfo(pl);
 }
 
 
