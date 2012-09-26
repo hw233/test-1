@@ -12594,6 +12594,9 @@ namespace GObject
             {
                 gold = 50000;
                 coupon = 3500;
+            }
+            if (gold > 0)
+            {
                 SYSMSGV(title, 5103);
                 SYSMSGV(content, 5104, gold, coupon, coupon);
                 GetMailBox()->newMail(NULL, 0x21, title, content);
