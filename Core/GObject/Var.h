@@ -211,6 +211,7 @@ namespace GObject
         VAR_RP_VALUE=165,           //周年庆回流用户礼包
         VAR_RP_REWARD_GOT=166,      //回流用户奖励,是否已领取
         VAR_CONSUME_918 = 167, // 9/18-9/24活动 消耗累积
+        VAR_TJ_TOWN_ITEM_GOT=168,   //锁妖塔的天劫物品领取标志
 
         /** 结束 **/
         VAR_RECHARGE_TOTAL3366 = 169, //3366合作充值活动
@@ -427,6 +428,7 @@ namespace GObject
             REGISTER_VAR(VAR_RP_VALUE, CYCLE_NONE);
             REGISTER_VAR(VAR_RP_REWARD_GOT, CYCLE_DAY);
             REGISTER_VAR(VAR_CONSUME_918, CYCLE_NONE);
+            REGISTER_VAR(VAR_TJ_TOWN_ITEM_GOT, CYCLE_NONE);
 
             REGISTER_VAR(VAR_QQVIP_BUF, CYCLE_DAY);
             REGISTER_VAR(VAR_QQVIP_CNT, CYCLE_DAY);
