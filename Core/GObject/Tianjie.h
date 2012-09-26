@@ -62,6 +62,7 @@ namespace GObject
     public:
 		Tianjie();
 		bool Init();
+        void LoadLastPassed();
 		bool LoadFromDB();
         UInt8 getTjTypeId() {return m_tjTypeId;};
         void setNetOk() {m_isNetOk = true;};
@@ -138,6 +139,7 @@ namespace GObject
         bool isTjOpened() {return m_isTjOpened;};
 		bool isTjNpc(UInt32 npcid, UInt16 loc);
         void OpenTj();
+        int  getLastPassedLevel() {return m_lastPassedLevel;};
 
         void initSortMap();
         void insertToScoreSortMap(Player* pl, int newScore, int oldScore);
@@ -218,6 +220,9 @@ namespace GObject
         int m_nextTjLevel;
 
         FastMutex _opMutex;
+
+        //最后一次渡过的天劫
+        int m_lastPassedLevel;
     };
 }
 #endif

@@ -115,6 +115,8 @@ class TownDeamon
         void attackPlayer(Player* pl, Player* defer, UInt32 spirit);
         void beAttackByPlayer(Player* defer, Player * atker, UInt32 spirit, UInt16 formation, UInt16 portrait, Lineup * lineup);
         void addActivity(Player* pl);
+        void getTjItem(Player* pl, UInt8 townLevel);
+        void sendTjItemInfo(Player* pl);
 
     private:
         void quitDeamon(Player* pl, Player* attacker = NULL);
