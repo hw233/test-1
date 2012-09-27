@@ -1208,9 +1208,19 @@ namespace GObject
         udpLog("discount", action, "", "", "", "", "act");
     }
 
-    void Player::tradeUdpLog(UInt32 price)
+    void Player::tradeUdpLog(UInt32 id, UInt32 val /* = 0 */, UInt32 num /* = 1 */)
     {
-        udpLog("trade", "F_1081", "", "", "", "", "act", price);
+        // 交易相关日志
+        char action[16] = "";
+        if (val)
+        {
+            snprintf (action, 16, "F_%d_%d", id, val);
+        }
+        else
+        {
+            snprintf (action, 16, "F_%d", id);
+        }
+        udpLog("trade", action, "", "", "", "", "act", num);
     }
 
     void Player::skillStrengthenLog(UInt8 type, UInt32 val)

@@ -3256,6 +3256,7 @@ namespace GObject
         if (execu->Prepare("SELECT `clanid`, `logTime`, `logType`, `playerName`, `logVal` FROM `clan_copy_log` ORDER BY `clanid` ASC, `logTime` ASC", ccl) != DB::DB_OK)
             return false;
         clan = NULL;
+        lc.reset(1000);
         lastId = 0xFFFFFFFF;
         while(execu->Next() == DB::DB_OK)
         {
