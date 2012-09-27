@@ -6521,7 +6521,7 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo, DefStatus* defL
                     ++ defCount;
                 }
 
-                bo2->setColorStock(0xE, SKILL_LEVEL(pskill->getId()), pskill->last);
+                bo2->setColorStock(0xE, SKILL_LEVEL(pskill->getId()), last);
                 defList[defCount].pos = bo2->getPos() + pos0;
                 defList[defCount].damType = e_Immune3;
                 defList[defCount].damage = 0;
