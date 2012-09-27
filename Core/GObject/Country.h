@@ -43,7 +43,6 @@ public:
 	}
 
 public:
-	bool PlayerMapSwitch(UInt8 index, UInt32 playerId);		//???ҿ??????л?????
 	void MergePendingPlayerList();
 	void PlayerEnter(Player * pl, bool = true);
 	void PlayerLeave(Player * pl);

@@ -45,6 +45,11 @@ public:
     void newDrawingGame(UInt32 nextday); //新人冲级赛
 	inline UInt8 getMaxLevel() { return _maxLevel; }
 
+    std::vector<RankingInfoList>* getLevelList() {return &_level;};
+    std::vector<RankingInfoList>* getAthleticsList() {return &_athletics;};
+    std::vector<RankingInfoList>* getAchievementList() {return &_achievement;};
+    std::vector<RankingInfoList>* getClanList() {return &_clan;};
+
     const std::vector<LeaderboardTowndown>& getTowndown()
     {
         FastMutex::ScopedLock lk(_tmutex);
@@ -92,6 +97,9 @@ private:
     std::vector<LeaderboardClanCopy> _clancopy;
     FastMutex _lmutex;
     std::vector<RankingInfoList> _level;
+    std::vector<RankingInfoList> _athletics;
+    std::vector<RankingInfoList> _achievement;
+    std::vector<RankingInfoList> _clan;
 
     AtomicVal<bool> m_sorting;
 };
