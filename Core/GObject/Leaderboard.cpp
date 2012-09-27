@@ -158,6 +158,7 @@ void Leaderboard::doUpdate()
 		" ON `player`.`id` = `clan_player`.`playerId` AND `clan_player`.`id` = `clan`.`id`"
 		" ORDER BY `fighter`.`experience` DESC"
 		" LIMIT 0, 100", blist2);
+    _level.clear();
     for(UInt8 c = 0; c < blist2.size(); c++)
     {
         Player* curPlayer = globalPlayers[blist2[c].id];
@@ -165,7 +166,10 @@ void Leaderboard::doUpdate()
         {
             curPlayer->patchMergedName(curPlayer->getClan()->getFounder(), blist2[c].clan);
         }
+        RankingInfoList r;
+        _level.push_back(r);
     }
+
     buildPacket2(_levelStream, 0, _id, blist2);
 	if(!blist2.empty())
 		_maxLevel = blist2[0].lvl;
@@ -259,7 +263,7 @@ void Leaderboard::doUpdate()
     }
 
 	std::vector<LeaderboardClanCopy> blist4;
-	execu->ExtractData("select a.id, a.name, b.maxCopyLevel, b.maxCopyTime from clan a, clan_copy b where a.id=b.clanId order by b.maxCopyLevel desc, b.maxCopyTime  asc limit 10;", blist4);
+	execu->ExtractData("select a.id, a.name, b.maxCopyLevel, b.maxCopyTime from clan a, clan_copy b where a.id=b.clanId order by b.maxCopyLevel desc, b.maxCopyTime  asc limit 100;", blist4);
     {
         FastMutex::ScopedLock lk(_cmutex);
         _clancopy.clear();
