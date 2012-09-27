@@ -278,6 +278,12 @@ function onActivityCheck(tm)
       setQixi(false)
   end
 
+  if tm >= actTime205 and tm < actTime206 then
+      setGuoqing(true)
+  else
+      setGuoqing(false)
+  end
+
   if tm >= actTime210 and tm < actTime211 then
       setConsume918(true)
   else
@@ -618,11 +624,13 @@ function onActivityCheck(tm)
       
       if tm >= actTime511 and tm < actTime511_1 then
           setRechargeActive(true, 16)
+          setNeedRechargeRank(false)
       elseif tm >= actTime512 and tm < actTime512_1 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
       else
           setRechargeActive(false, 16)
+          setNeedRechargeRank(false)
       end
 
       if tm >= actTime513 and tm < actTime513_1 then
@@ -753,6 +761,9 @@ function initActTime(y, m, d)
   local  SerStartTm202= { ['year'] = 2012, ['month'] = 8, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --商城消费大酬宾(9/18-9/24)
   local  SerStartTm210= { ['year'] = 2012, ['month'] = 9, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 中秋国庆
+  local  SerStartTm205= { ['year'] = 2012, ['month'] = 10, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm206= { ['year'] = 2012, ['month'] = 10, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
@@ -978,6 +989,9 @@ function initActTime(y, m, d)
 
   actTime203= os.time(SerStartTm202);
   actTime204= os.time(SerStartTm202) + 7 * 86400;
+
+  actTime205= os.time(SerStartTm205);
+  actTime206= os.time(SerStartTm206);
 
   actTime210= os.time(SerStartTm210);
   actTime211= os.time(SerStartTm210) + 7 * 86400;

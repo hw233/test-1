@@ -944,6 +944,11 @@ void TownDeamon::getTjItem(Player* pl, UInt8 townLevel)
         int flag = pl->GetVar(VAR_TJ_TOWN_ITEM_GOT);
         if (!(flag & (1 << i)) && tjLevel >= s_tjLevTownLev[i][0] && dpd->maxLevel >= townLevel)
         {
+            if(pl->GetPackage()->GetRestPackageSize() < 1)
+            {
+                pl->sendMsgCode(0, 1011);
+                return;
+            }
             pl->GetPackage()->Add(s_tjItemId[i], 1, true);
             flag |= (1 << i);
             pl->SetVar(VAR_TJ_TOWN_ITEM_GOT, flag);

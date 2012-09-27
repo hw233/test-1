@@ -5599,6 +5599,62 @@ function ItemNormal_00009178(iid, num, bind, param)
     return used;
 end
 
+function ItemNormal_00009179(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    local items = {
+        {503,1,657}, --太乙精金(价值:20)
+        {551,1,1971}, --高级符文解封石(价值:10)
+        {9088,1,3285}, --轩辕灵石(价值:10)
+        {33,1,4600}, --无字天书(价值:10)
+        {15,1,5914}, --银票(价值:10)
+        {514,1,7228}, --五行真金(价值:10)
+        {501,1,8105}, --洗炼保护符(价值:15)
+        {513,1,8981}, --宝石保护符(价值:15)
+        {1325,1,9244}, --技能符文熔炼诀(价值:50)
+        {1528,1,9507}, --法灵精金(价值:50)
+        {507,1,9671}, --补髓益元丹(价值:80)
+        {509,1,9835}, --凝神易筋丹(价值:80)
+        {515,1,10000}, --五行精金(价值:80)
+    }
+    local isz = #items
+    local used = 0
+    for n = 1,num do
+        if package:GetRestPackageSize() < 1 then
+            if used ~= 0 then
+                player:AddVar(used);
+                package:DelItemSendMsg(iid, player);
+            end
+            player:sendMsgCode(2, 1011, 0);
+            return used
+        end
+
+        local r = math.random(1,10000)
+        for i = 1,isz do
+            if r <= items[i][3] then
+                package:Add(items[i][1], items[i][2], true, 0, 2);
+                break;
+            end
+        end
+        used = used + 1
+    end
+
+    player:AddVar(191, used);
+    package:DelItemSendMsg(iid, player);
+    return used;
+end
+function ItemNormal_00009180(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    if iid ~= 9180 then
+        return 0
+    end
+    player:setTitle(36)
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
 local ItemNormal_Table = {
   [1] = ItemNormal_00000001,
 	[8] = ItemNormal_00000008,
@@ -7139,6 +7195,9 @@ local ItemNormal_Table = {
     [9172] = ItemNormal_9170_9172,
 
     [9178] = ItemNormal_00009178,
+
+    [9179] = ItemNormal_00009179,
+    [9180] = ItemNormal_00009180,
 
 
     [10000] = ItemNormal_00010000,

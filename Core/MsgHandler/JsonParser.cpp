@@ -270,6 +270,62 @@ int add_playeritem_req(JsonHead* head, json_t* body, json_t* retbody, std::strin
     return 0;
 }
 
+int query_ranking_req(JsonHead* head, json_t* body, json_t* retbody, std::string& err)
+{
+    if (!head || !body || !retbody)
+        return EUNKNOW;
+
+    body = body->child;
+    if (!body)
+        return EUNKNOW;
+
+    UInt32 areaid = 0;
+    UInt32 type = 0;
+    json_t* val = json_find_first_label(body, "uiAreaId");
+    if (val && val->child && val->child->text)
+        areaid = atoi(val->child->text);
+
+    val = json_find_first_label(body, "ucType");
+    if (val && val->child && val->child->text)
+        type = atoi(val->child->text);
+
+    if (type == 1)
+    {
+        UInt32 count = 0;
+        json_insert_pair_into_object(retbody, "uiCount", my_json_new_number(count));
+        json_t* arr = json_new_array();
+        if (arr)
+        {
+            for (UInt32 i = 0; i < count; ++i)
+            {
+                char playerId[32] = {0};
+                json_t* obj = json_new_object();
+                if (obj)
+                {
+                    json_insert_pair_into_object(obj, "szOpenId", json_new_string(""));
+                    json_insert_pair_into_object(obj, "szRoleName", json_new_string(""));
+                    json_insert_pair_into_object(obj, "uiRanking", my_json_new_number(0));
+                    json_insert_pair_into_object(obj, "ucFaction", my_json_new_number(0));
+                    json_insert_child(arr, obj);
+                }
+            }
+            json_insert_pair_into_object(retbody, "pRankingInfoList", arr);
+        }
+    }
+    else if (type == 2)
+    {
+    }
+    else if (type == 3)
+    {
+    }
+    else if (type == 4)
+    {
+    }
+
+    head->cmd = 28;
+    return 0;
+}
+
 int query_pagoda_rsq(JsonHead* head, json_t* body, json_t* retbody, std::string& err)
 {
     if (!head || !body || !retbody)
@@ -492,6 +548,9 @@ void jsonParser2(void * buf, int len, Stream& st)
             break;
         case 5:
             ret = add_playeritem_req(&head, body, retbody, err);
+            break;
+        case 27:
+            ret = query_ranking_req(&head, body, retbody, err);
             break;
         case 55:
             ret = query_pagoda_rsq(&head, body, retbody, err);
