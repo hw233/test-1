@@ -318,7 +318,7 @@ int query_ranking_req(JsonHead* head, json_t* body, json_t* retbody, std::string
                 char playerId[64] = {0};
                 sprintf(playerId, "%"I64_FMT"u", info.id);
                 json_insert_pair_into_object(obj, "szOpenId", json_new_string(playerId));
-                json_insert_pair_into_object(obj, "szRoleName", json_new_string(info.name.c_str()));
+                json_insert_pair_into_object(obj, "szRoleName", json_new_string(fixPlayerName(info.name).c_str()));
                 json_insert_pair_into_object(obj, "uiRanking", my_json_new_number(info.ranking));
                 json_insert_pair_into_object(obj, "ucFaction", my_json_new_number(info.country));
                 json_insert_child(arr, obj);
