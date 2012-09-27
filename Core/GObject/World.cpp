@@ -861,7 +861,6 @@ void World::World_Midnight_Check( World * world )
     worldBoss.resetBossSt();
     globalCountryBattle.setStatus(0);
     ClanRankBattleMgr::Instance().setStatus(0);
-    teamCopyManager->resetStatus();
     heroIsland.setStatus(0);
 }
 void World::World_CreateNewDB_Check()
@@ -1024,7 +1023,7 @@ bool World::Init()
     UInt32 athChkPoint = TimeUtil::SharpDayT(0, now) + EXTRAREWARDTM;
     AddTimer(86400 * 1000, World_Athletics_Check, static_cast<void *>(NULL), (athChkPoint >= now ? athChkPoint - now : 86400 + athChkPoint - now) * 1000);
 
-    AddTimer(5 * 1000, Team_Copy_Process, static_cast<void*>(NULL));
+    //AddTimer(5 * 1000, Team_Copy_Process, static_cast<void*>(NULL));
     AddTimer(3600 * 1000, AthleticsPhysicalCheck, static_cast<void *>(NULL), (3600 - now % 3600) * 1000);
     AddTimer(3600 * 1000, ClanStatueCheck, static_cast<void *>(NULL), (3600 - now % 3600) * 1000);
 
