@@ -2313,6 +2313,49 @@ void AddRealAward(LoginMsgHdr& hdr, const void* data)
 	NETWORK()->SendMsgToClient(hdr.sessionID, st);
 }
 
+void AddClanAward(LoginMsgHdr& hdr, const void* data)
+{
+    // 发送物品给指定帮派仓库
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+    UInt8 ret = 0;
+
+    UInt32 clanId = 0;
+    br >> clanId;
+    GObject::Clan *clan = GObject::globalClans[clanId];
+
+    Stream st(SPEP::ADDCLANAWARD);
+    if(clan == NULL) 
+    {
+        st << ret << Stream::eos;
+    }
+    else
+    {
+        UInt16 num = 0;
+        br >> num;
+        st << num;
+        UInt16 * itemId = new UInt16[num];
+        UInt32 * itemCount = new UInt32[num];
+        for (UInt16 i = 0; i < num; ++i)
+        {
+            br >> itemId[i];
+            br >> itemCount[i];
+            st << itemId[i] << clan->AddItem(itemId[i], itemCount[i]);
+        }
+
+        if(cfg.merged)
+        {
+            UInt16 serverNo = 0;
+            br>>serverNo;
+        }
+        delete [] itemId;
+        delete [] itemCount;
+
+        st << ret << Stream::eos;
+    }
+    NETWORK()->SendMsgToClient(hdr.sessionID, st);
+}
+
 
 
 #endif // _LOGINOUTERMSGHANDLER_H_
