@@ -910,10 +910,10 @@ namespace GObject
 	{
 		p->Load();
 		gBlockbossmgr.addPlayerRank(p, p->getBlockBossLevel(), p->GetLev());
-        if (!GVAR.GetVar(GVAR_CITTASMERGE))
-            mergeCittaPages(p);
-        if (!GVAR.GetVar(GVAR_1530BUCHANG))
-            buchang1530(p);
+        //if (!GVAR.GetVar(GVAR_CITTASMERGE))
+        //    mergeCittaPages(p);
+        //if (!GVAR.GetVar(GVAR_1530BUCHANG))
+        //    buchang1530(p);
 		return true;
 	}
 
@@ -2225,8 +2225,8 @@ namespace GObject
 		/////////////////////////////////
 
 		globalPlayers.enumerate(player_load, 0);
-        GVAR.SetVar(GVAR_CITTASMERGE, 1);
-        GVAR.SetVar(GVAR_1530BUCHANG, 1);
+        //GVAR.SetVar(GVAR_CITTASMERGE, 1);
+        //GVAR.SetVar(GVAR_1530BUCHANG, 1);
 
 		return true;
 	}
