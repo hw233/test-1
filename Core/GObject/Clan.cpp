@@ -488,11 +488,6 @@ bool Clan::join(ClanMember * cm)
 
 bool Clan::kick(Player * player, UInt64 pid)
 {
-    if (ClanCopyMgr::Instance().getClanCopyByClan(this))
-    {
-        player->sendMsgCode(0, 1358);
-        return false;
-    }
 	if (_clanBattle->isInBattling())
 	{
         player->sendMsgCode(0, 1317);
@@ -501,6 +496,12 @@ bool Clan::kick(Player * player, UInt64 pid)
     if(ClanRankBattleMgr::Instance().IsInBattle(this))
     {
         SYSMSG_SEND(2235, player);
+        return false;
+    }
+
+    if (ClanCopyMgr::Instance().getClanCopyByClan(this))
+    {
+        player->sendMsgCode(0, 1358);
         return false;
     }
 
@@ -609,9 +610,10 @@ bool Clan::leave(Player * player)
 	}
     if (ClanCopyMgr::Instance().getClanCopyByClan(this))
     {
-        player->sendMsgCode(0, 1358);
-        return false;
+		player->sendMsgCode(0, 1358);
+		return false;
     }
+
     if(ClanRankBattleMgr::Instance().IsInBattle(this))
     {
         SYSMSG_SEND(2235, player);
