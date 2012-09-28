@@ -230,8 +230,11 @@ namespace GObject
         VAR_QGAME_GIFT = 188, //Qgame大厅礼包
         VAR_AWARD_BIRTHDAY     = 190, //周年庆活动(生日罗盘许愿星)
         
-        VAR_YUEBING_USED = 191, //中秋国庆使用月饼数量
-        VAR_MAX_CLAN_COPY_LEVEL = 192, // 本周已通关的最大层数
+        VAR_THIEF_CAMP     = 191, //贼兵营地(新手任务中使用)
+        VAR_FOR_OLDUSER    = 192, //兼容老区老用户的新手任务
+        
+        VAR_YUEBING_USED = 193, //中秋国庆使用月饼数量
+        VAR_MAX_CLAN_COPY_LEVEL = 194, // 本周已通关的最大层数
         VAR_MAX,
     };
 
@@ -301,7 +304,7 @@ namespace GObject
             REGISTER_VAR(VAR_AWARD_NEWREGISTER, CYCLE_NONE);
             REGISTER_VAR(VAR_AWARD_BIRTHDAY, CYCLE_DAY);
 
-            REGISTER_VAR(VAR_YUEBING_USED, CYCLE_WEEK);
+            REGISTER_VAR(VAR_YUEBING_USED, CYCLE_NONE);
 
             REGISTER_VAR(VAR_CLANBATTLE_HONOUR, CYCLE_DAY);
             REGISTER_VAR(VAR_CLAN_WEAL, CYCLE_DAY);

@@ -5640,7 +5640,7 @@ function ItemNormal_00009179(iid, num, bind, param)
         used = used + 1
     end
 
-    player:AddVar(191, used);
+    player:AddVar(193, used);
     package:DelItemSendMsg(iid, player);
     return used;
 end
