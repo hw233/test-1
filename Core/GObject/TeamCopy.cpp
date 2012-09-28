@@ -21,7 +21,7 @@ const UInt8 TeamCopyPlayerInfo::_needRoll = 1;
 const UInt8 TeamCopyPlayerInfo::_hasRoll = 2;
 std::vector<TeamCopyAwards> TeamCopyPlayerInfo::_awards[TEAMCOPY_MAXCOPYCNT];
 
-TeamCopy::TeamCopy() : _notify1(false), _notify2(false), _isDoubleExp1(0), _isDoubleExp2(0)
+TeamCopy::TeamCopy() : _notify1(false), _notify2(false), _isDoubleExp1(2), _isDoubleExp2(2)
 {
     for(int t = 0; t < TEAMCOPY_MAXTYPECNT; ++t)
     {
@@ -982,11 +982,14 @@ void TeamCopy::sendBattleReport(TeamData* td, GData::NpcGroup* ng, Battle::Battl
 
             //if (ng->getLevel() <= pl->GetLev() || (ng->getLevel() > pl->GetLev() && (ng->getLevel() - pl->GetLev()) < 10))
             {
+
+                /**
                 UInt32 now = TimeUtil::Now();
                 UInt32 chkPoint1 = TimeUtil::SharpDayT(0, now) + TEAMCOPY_EXTRAREWARDTM1;
                 UInt32 chkPoint2 = TimeUtil::SharpDayT(0, now) + TEAMCOPY_EXTRAREWARDTM2;
                 bool flag = (now > chkPoint1 && now < chkPoint1 + 3600) || (now > chkPoint2 && now < chkPoint2 + 3600);
-                if(flag)
+                */
+                //if(flag)
                 {
                     pl->pendExp(ng->getExp());
                     ng->getLoots(pl, pl->_lastLoot, td->count - 1, NULL);
