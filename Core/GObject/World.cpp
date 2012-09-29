@@ -45,6 +45,7 @@
 #include "Arena.h"
 #include "Tianjie.h"
 #include "TownDeamon.h"
+#include "SingleHeroStage.h"
 
 namespace GObject
 {
@@ -177,6 +178,8 @@ void World::World_Multi_Check( World * world )
 	gTradeCheck.update(now);
 	gSaleMgr.update(now);
 	clanManager.process(now, world->_today);
+
+	shStageMgr.process();
 }
 
 void World::ReCalcWeekDay( World * world )
@@ -996,6 +999,10 @@ bool World::Init()
 	AddTimer(60 * 1000, World_testUpdate, this);
 	//AddTimer(3600 * 1000, World_Leaderboard_Update);
 	AddTimer(3600 * 4 * 1000, World_ChatItem_Purge);
+
+	if(!shStageMgr.loadFromDB())
+		shStageMgr.init(_now, _wday);
+
 	AddTimer(5000, World_Multi_Check, this);
 	AddTimer(60 * 1000, World_One_Min, this);
     AddTimer(60 * 1000 * 5, World_Store_Check);

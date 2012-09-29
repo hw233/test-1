@@ -231,19 +231,21 @@ Fighter::Fighter(const Fighter& fighter)
 
 Fighter::~Fighter()
 {
-    if (!_fashion)
+    if (_fashion)
         SAFE_DELETE(_fashion);
-    if (!_weapon)
+    if (_weapon)
         SAFE_DELETE(_weapon);
-    if (!_ring)
+    if (_ring)
         SAFE_DELETE(_ring);
-    if (!_amulet)
+    if (_amulet)
         SAFE_DELETE(_amulet);
     for(int i = 0; i < 5; ++ i)
     {
-        if (!_armor[i])
+        if (_armor[i])
             SAFE_DELETE(_armor[i]);
     }
+    if(m_2ndSoul)
+        SAFE_DELETE(m_2ndSoul);
 }
 
 const std::string& Fighter::getName()
@@ -1649,10 +1651,39 @@ Fighter * Fighter::clone(Player * player)
 	fgt->_attrDirty = true;
 	fgt->_bPDirty = true;
     fgt->_pexpMax = 100000; // XXX: 100000
+    if(m_2ndSoul != NULL)
+        fgt->m_2ndSoul = new SecondSoul(*m_2ndSoul);
+
 	memset(fgt->_armor, 0, 5 * sizeof(ItemEquip *));
     memset(fgt->_trump, 0, TRUMP_UPMAX * sizeof(ItemEquip*));
 	return fgt;
 }
+
+Fighter * Fighter::cloneWithOutDirty(Player * player)
+{
+    checkDirty();
+	Fighter * fgt = new Fighter(*this);
+	if(player != NULL)
+	{
+		fgt->_level = 1;
+		fgt->_exp = 0;
+	}
+	fgt->_owner = player;
+	fgt->_fashion = NULL;
+	fgt->_weapon = NULL;
+	fgt->_ring = NULL;
+	fgt->_amulet = NULL;
+	fgt->_attrDirty = false;
+	fgt->_bPDirty = false;
+    fgt->_pexpMax = 100000; // XXX: 100000
+    if(m_2ndSoul != NULL)
+        fgt->m_2ndSoul = new SecondSoul(*m_2ndSoul);
+
+	memset(fgt->_armor, 0, 5 * sizeof(ItemEquip *));
+    memset(fgt->_trump, 0, TRUMP_UPMAX * sizeof(ItemEquip*));
+	return fgt;
+}
+
 
 ItemEquip * Fighter::findEquip( UInt32 id, UInt8& pos )
 {
@@ -4608,6 +4639,62 @@ void Fighter::SSFromDB(UInt16 id, SStrengthen& ss)
     // XXX: DO Delete
     m_ss[id] = ss;
 }
+
+void Fighter::setUpPasskl(const std::string& skls)
+{
+    StringTokenizer pass(skls, "|");
+    //for (size_t i = 0; i < GData::SKILL_PASSIVES-GData::SKILL_PASSSTART; ++i)
+    for (size_t i = 0; i < pass.count(); ++i)
+    {
+        if (pass[i].length())
+        {
+            StringTokenizer skills(pass[i], ",");
+            _passkl[i].resize(skills.count());
+            for (UInt8 j = 0; j < _passkl[i].size(); ++j)
+            {
+                _passkl[i][j] = atoi(skills[j].c_str());
+            }
+        }
+    }
+}
+
+void Fighter::setUpRPasskl(const std::string& skls)
+{
+    StringTokenizer pass(skls, "|");
+    for (size_t i = 0; i < pass.count(); ++i)
+    {
+        if (pass[i].length())
+        {
+            StringTokenizer skills(pass[i], ",");
+            _rpasskl[i].resize(skills.count());
+            for (UInt8 j = 0; j < _rpasskl[i].size(); ++j)
+            {
+                _rpasskl[i][j] = atoi(skills[j].c_str());
+            }
+        }
+    }
+}
+
+void Fighter::setUpSS(std::string& skillstrengthen)
+{
+    StringTokenizer skills(skillstrengthen, ",");
+    for (UInt8 i = 0; i < skills.count(); ++i)
+    {
+        UInt16 skillId = atoi(skills[i].c_str());
+        UInt16 sid = SKILL_ID(skillId);
+        UInt16 slv = SKILL_LEVEL(skillId);
+
+        SStrengthen s;
+        s.father = 0;
+        s.maxVal = 0;
+        s.curVal = 0;
+        s.lvl = slv;
+        s.maxLvl = 0;
+
+        m_ss[sid] = s;
+    }
+}
+
 
 }
 

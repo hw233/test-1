@@ -384,6 +384,9 @@ namespace REQ
     const UInt8 TIANJIE             = 0x19;
     /** 活动 **/
     const UInt8 ACTIVE              = 0X8B;
+
+    /** 单挑 **/
+    const UInt8 SINGLE_HERO         = 0XA5;
 }
 
 namespace REP
@@ -632,6 +635,9 @@ namespace REP
     const UInt8 TIANJIE             = 0x19;
     /** 活动 **/
     const UInt8 ACTIVE              = 0X8B;
+
+    /** 单挑 **/
+    const UInt8 SINGLE_HERO         = 0XA5;
 }
 
 namespace SPEQ

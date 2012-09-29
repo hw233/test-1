@@ -119,6 +119,7 @@ public:
 
 	Fighter * clone(Player * owner);
 	Fighter * cloneWithEquip(Player * owner);
+    Fighter * cloneWithOutDirty(Player * player);
 
 	inline UInt32 getId() { return _id; }
 	inline Player * getOwner() { return _owner; }
@@ -746,6 +747,13 @@ private:
     bool _iswboss;
     Int32 _wbextatk;
     Int32 _wbextmagatk;
+
+public:
+    // 仅仅用于内存拷贝出来的Fighter, 切勿她用
+    void setUpPasskl(const std::string& skls);
+    void setUpRPasskl(const std::string& skls);
+    void setUpSS(std::string& skillstrengthen);
+    void setPl(UInt16 pl) { peerless = pl; }
 
     // 内丹系统
 public:

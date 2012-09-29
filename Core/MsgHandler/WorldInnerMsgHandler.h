@@ -28,6 +28,7 @@
 #include "GObject/World.h"
 #include "Common/Itoa.h"
 #include <set>
+#include "GObject/SingleHeroStage.h"
 
 void OnPushTimerEvent( GameMsgHdr& hdr, const void * data )
 {
@@ -581,6 +582,13 @@ void OnLevelChange( GameMsgHdr& hdr, const void* data)
 
         lvPlayer->push_back(player->getId());
     }
+    if(!GObject::shStageMgr.getActive())
+    {
+        if(lvc->oldLv < 70 && lvc->newLv > 69)
+            GObject::shStageMgr.incActive(1);
+        else if(lvc->oldLv > 69 && lvc->newLv < 70)
+            GObject::shStageMgr.incActive(-1);
+    }
 }
 
 void OnAthleticsMartialFlush( GameMsgHdr& hdr, const void* data )
@@ -1053,7 +1061,13 @@ void OnTownDeamonAttackNpcNotify( GameMsgHdr& hdr, const void* data )
     GObject::townDeamonManager->notifyAttackNpcResult(player, win);
 }
 
+void OnSHFighterCloneRes( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    GObject::Fighter* fgt = *reinterpret_cast<GObject::Fighter**>(const_cast<void*>(data));
 
+    GObject::shStageMgr.onFighterClone(player, fgt);
+}
 
 
 #endif // _WORLDINNERMSGHANDLER_H_
