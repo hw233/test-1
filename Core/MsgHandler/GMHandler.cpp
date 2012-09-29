@@ -39,6 +39,9 @@
 #include "GObject/SingleHeroStage.h"
 
 #include "GObject/Tianjie.h"
+#include "GObject/ClanCopy.h"
+
+#include "GObject/Tianjie.h"
 GMHandler gmHandler;
 
 GMHandler::GMHandler()
@@ -2993,6 +2996,7 @@ void GMHandler::OnTj4(GObject::Player* player, std::vector<std::string>& args)
     GObject::Tianjie::instance().setTj4BossHp(bossMaxHp);
 }
 
+<<<<<<< HEAD
 inline bool enterSingleHeroStage(GObject::Player* p, UInt32 cnt)
 {
     GObject::shStageMgr.enter(p, p->getMainFighter());
@@ -3126,3 +3130,5 @@ void GMHandler::OnNewPlayerAutoSuper(GObject::Player* player, std::vector<std::s
 }
 
 
+=======
+>>>>>>> master

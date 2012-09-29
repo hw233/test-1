@@ -107,6 +107,16 @@ function is0808_0814()
     return is_0808_0814
 end
 
+is_0921_0924 = false
+function is0921_0924()
+    return is_0921_0924
+end
+
+is_0926_0927 = false
+function is0926_0927()
+    return is_0926_0927
+end
+
 function onActivityCheck(tm)
   local osmax = oldServersMax[serverName]
   if osmax ~= nil and serverNum <= osmax then
@@ -266,6 +276,12 @@ function onActivityCheck(tm)
       setQixi(true)
   else
       setQixi(false)
+  end
+
+  if tm >= actTime205 and tm < actTime206 then
+      setGuoqing(true)
+  else
+      setGuoqing(false)
   end
 
   if tm >= actTime210 and tm < actTime211 then
@@ -593,8 +609,36 @@ function onActivityCheck(tm)
       else
           setRechargeActive(false, 16)
       end
+
+      if tm >= actTime509 and tm < actTime509_1 then
+          is_0921_0924 = true
+      else
+          is_0921_0924 = false
+      end
+
+      if tm >= actTime510 and tm < actTime510_1 then
+          is_0926_0927 = true
+      else
+          is_0926_0927 = false
+      end
       
-      setRechargeTime(actTime508, actTime508_1)
+      if tm >= actTime511 and tm < actTime511_1 then
+          setRechargeActive(true, 16)
+          setNeedRechargeRank(false)
+      elseif tm >= actTime512 and tm < actTime512_1 then
+          setRechargeActive(true, 16)
+          setNeedRechargeRank(true)
+      else
+          setRechargeActive(false, 16)
+          setNeedRechargeRank(false)
+      end
+
+      if tm >= actTime513 and tm < actTime513_1 then
+          setConsumeActive(true)
+      else
+          setConsumeActive(false)
+      end
+
 
       setShuoShuo(true);
   end
@@ -691,6 +735,14 @@ function initActTime(y, m, d)
   local  SerStartTm503= { ['year'] = 2012, ['month'] = 9, ['day'] = 13, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --充值返礼(9/22-9/23)
   local  SerStartTm508= { ['year'] = 2012, ['month'] = 9, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --变身法宝(9/21-9/24)
+  local  SerStartTm509= { ['year'] = 2012, ['month'] = 9, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --商城限购(9/26-9/27)
+  local  SerStartTm510= { ['year'] = 2012, ['month'] = 9, ['day'] = 26, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm511= { ['year'] = 2012, ['month'] = 9, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm512= { ['year'] = 2012, ['month'] = 10, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm513= { ['year'] = 2012, ['month'] = 10, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
   -- 繁体版
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm102 = { ['year'] = 2012, ['month'] = 6, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -709,6 +761,9 @@ function initActTime(y, m, d)
   local  SerStartTm202= { ['year'] = 2012, ['month'] = 8, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --商城消费大酬宾(9/18-9/24)
   local  SerStartTm210= { ['year'] = 2012, ['month'] = 9, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 中秋国庆
+  local  SerStartTm205= { ['year'] = 2012, ['month'] = 10, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm206= { ['year'] = 2012, ['month'] = 10, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
@@ -780,7 +835,7 @@ function initActTime(y, m, d)
   actTime44 = os.time(SerStartTm20) + 17 * 86400;
 
   actTime45 = os.time(SerStartTm21);
-  actTime46 = os.time(SerStartTm21) + 30 * 86400;
+  actTime46 = os.time(SerStartTm21) + 61 * 86400;
 
   actTime47 = os.time(SerStartTm22);
   actTime48 = os.time(SerStartTm22) + 12 * 86400;
@@ -888,6 +943,20 @@ function initActTime(y, m, d)
   actTime508 = os.time(SerStartTm508);
   actTime508_1 = os.time(SerStartTm508) + 2 * 86400;
 
+  actTime509 = os.time(SerStartTm509);
+  actTime509_1 = os.time(SerStartTm509) + 3 * 86400;
+
+  actTime510 = os.time(SerStartTm510);
+  actTime510_1 = os.time(SerStartTm510) + 2 * 86400;
+
+  actTime511 = os.time(SerStartTm511);
+  actTime511_1 = os.time(SerStartTm511) + 4 * 86400;
+
+  actTime512 = os.time(SerStartTm512);
+  actTime512_1 = os.time(SerStartTm512) + 2 * 86400;
+
+  actTime513 = os.time(SerStartTm513);
+  actTime513_1 = os.time(SerStartTm513) + 7 * 86400;
 
   -- 繁体版
   actTime101 = os.time(SerStartTm101);
@@ -920,6 +989,9 @@ function initActTime(y, m, d)
 
   actTime203= os.time(SerStartTm202);
   actTime204= os.time(SerStartTm202) + 7 * 86400;
+
+  actTime205= os.time(SerStartTm205);
+  actTime206= os.time(SerStartTm206);
 
   actTime210= os.time(SerStartTm210);
   actTime211= os.time(SerStartTm210) + 7 * 86400;

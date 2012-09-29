@@ -453,6 +453,7 @@ struct DBPlayerMaxLevel
 {
     int level;
 };
+
 struct DBTianleizhen
 {
     int type;

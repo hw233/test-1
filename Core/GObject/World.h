@@ -266,6 +266,11 @@ public:
     inline static bool getQixi()
     { return _qixi; }
 
+    inline static void setGuoqing(bool v)
+    { _guoqing = v; }
+    inline static bool getGuoqing()
+    { return _guoqing; }
+
     inline static void setRechargeNextRet(bool v)
     { _rechargenextret = v; }
     inline static bool getRechargeNextRet()
@@ -365,8 +370,8 @@ public:
     static MoneyIn _moneyIn[7][2];
 
 	static int _activityStage;
-	static bool _actAvailable;//开服到+6日
-	static bool _actAvailable1;//开服到+7日
+	static bool _actAvailable;//??????+6??
+	static bool _actAvailable1;//??????+7??
 	static UInt8 _wday;
     static bool _autoHeal;//disable autoheal
 	static bool _isNewServer;
@@ -411,6 +416,7 @@ public:
     static bool _june1;
     static bool _july;
     static bool _qixi;
+    static bool _guoqing;
     static bool _enchant_gt11;
     static bool _rechargenextret;
     static UInt32 _rechargenextretstart;
@@ -465,9 +471,10 @@ private:
     static void Team_Copy_Process(void*);
 	static void World_One_Min( World * );
     static void AthleticsPhysicalCheck(void *);
-    static void ClanStatueCheck(void *);
 	static void Tianjie_Refresh(void*);
     static void TownDeamonTmAward(void *);
+    static void ClanCopyCheck(void *);
+    static void ClanStatueCheck(void *);
     //static void advancedHookTimer(void *para);
 
 public:
@@ -486,6 +493,7 @@ public:
     void DivorceQixiPair(Player* pl);
     void LoadQixiScore(Player* pl, Player* lover);
     void SendQixiAward();
+    void SendGuoqingAward();
     void sendQixiScoreAward(Player* pl);
 
     void killMonsterAppend(Stream& st, UInt8 index);

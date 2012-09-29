@@ -129,6 +129,8 @@ public:
     Int8 getSkillNum1() { return m_skill_num1; }
     Int8 getSkillNum2() { return m_skill_num2; }
 
+    void setDirty(bool f) { m_dirty = f; }
+
 private:
     Fighter* m_fgt;
     UInt8 m_cls;
@@ -147,6 +149,8 @@ private:
     float m_xinxiu_hp;
     Int8 m_skill_num1;
     Int8 m_skill_num2;
+
+    bool m_dirty;
 
     std::vector<SoulSkill> m_skills;
 };

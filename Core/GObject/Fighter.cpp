@@ -1726,6 +1726,18 @@ ItemEquip * Fighter::findEquip( UInt32 id, UInt8& pos )
 	return NULL;
 }
 
+void Fighter::findTrumpByTypeId(std::vector<ItemEquip*>& ret, UInt32 id)
+{
+    for(int idx = 0; idx < TRUMP_UPMAX; ++ idx)
+    {
+        if(_trump[idx] != NULL)
+        {
+            if (_trump[idx]->GetItemType().getId() == id)
+                ret.push_back(_trump[idx]);
+        }
+    }
+}
+
 void Fighter::removeEquip( UInt8 pos, ItemEquip * equip, UInt8 toWhere )
 {
 	bool found = false;

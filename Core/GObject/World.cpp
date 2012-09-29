@@ -119,6 +119,7 @@ bool World::_june = false;
 bool World::_june1 = false;
 bool World::_july = false;
 bool World::_qixi= false;
+bool World::_guoqing= false;
 bool World::_enchant_gt11 = false;
 bool World::_rechargenextret;
 UInt32 World::_rechargenextretstart;
@@ -212,6 +213,7 @@ bool bMayDayEnd = false;
 bool bJuneEnd = false;
 bool bPExpItemsEnd = false;
 bool bQixiEnd = false;
+bool bGuoqingEnd = false;
 bool bRechargeEnd = false;
 bool bConsumeEnd = false;
 
@@ -301,7 +303,8 @@ bool enum_midnight(void * ptr, void* next)
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 7, 4) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 7, 9) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 7, 17) ||
-            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 7, 25)))
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 7, 25) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 5)))
     {
         if (pl->isOnline())
         {
@@ -310,7 +313,8 @@ bool enum_midnight(void * ptr, void* next)
         }
         else
         {
-            pl->SetVar(VAR_RECHARGE_TOTAL, 0);
+            if (pl->GetVar(VAR_RECHARGE_TOTAL))
+                pl->SetVar(VAR_RECHARGE_TOTAL, 0);
         }
     }
     if (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 24) ||
@@ -767,6 +771,7 @@ void World::World_Midnight_Check( World * world )
     bool bMayDay = getMayDay();
     bool bJune = getJune();
     bool bQixi = getQixi();
+    bool bGuoqing = getGuoqing();
     bool bRecharge = (getRechargeActive() || getRechargeActive3366()) && getNeedRechargeRank();
     bool bConsume = getConsumeActive() && getNeedConsumeRank();
     bool bPExpItems = getPExpItems();
@@ -792,6 +797,7 @@ void World::World_Midnight_Check( World * world )
     bJuneEnd = bJune && !getJune();
     bPExpItemsEnd = bPExpItems && !getPExpItems();
     bQixiEnd = bQixi && !getQixi();
+    bGuoqingEnd = bGuoqing && !getGuoqing();
     bRechargeEnd = bRecharge && !(getRechargeActive()||getRechargeActive3366());
     bConsumeEnd = bConsume && !getConsumeActive();
     bool bMonsterActEnd = bMonsterAct && !getKillMonsterAct();
@@ -833,6 +839,8 @@ void World::World_Midnight_Check( World * world )
 #endif
     if(bQixiEnd)
         world->SendQixiAward();
+    if(bGuoqingEnd)
+        world->SendGuoqingAward();
     if (bRechargeEnd)
         SendRechargeRankAward();
     if (bConsumeEnd)
@@ -856,7 +864,6 @@ void World::World_Midnight_Check( World * world )
     worldBoss.resetBossSt();
     globalCountryBattle.setStatus(0);
     ClanRankBattleMgr::Instance().setStatus(0);
-    teamCopyManager->resetStatus();
     heroIsland.setStatus(0);
 }
 void World::World_CreateNewDB_Check()
@@ -1023,8 +1030,9 @@ bool World::Init()
     UInt32 athChkPoint = TimeUtil::SharpDayT(0, now) + EXTRAREWARDTM;
     AddTimer(86400 * 1000, World_Athletics_Check, static_cast<void *>(NULL), (athChkPoint >= now ? athChkPoint - now : 86400 + athChkPoint - now) * 1000);
 
-    AddTimer(5 * 1000, Team_Copy_Process, static_cast<void*>(NULL));
+    //AddTimer(5 * 1000, Team_Copy_Process, static_cast<void*>(NULL));
     AddTimer(3600 * 1000, AthleticsPhysicalCheck, static_cast<void *>(NULL), (3600 - now % 3600) * 1000);
+    AddTimer(3600 * 1000, ClanStatueCheck, static_cast<void *>(NULL), (3600 - now % 3600) * 1000);
 
     UInt32 tdChkPoint = TimeUtil::SharpDayT(0, now) + TOWNDEAMONENDTM;
     AddTimer(86400 * 1000, TownDeamonTmAward, static_cast<void *>(NULL), (tdChkPoint >= now ? tdChkPoint - now : 86400 + tdChkPoint - now) * 1000);
@@ -1643,6 +1651,37 @@ void World::sendQixiScoreAward(Player* pl)
     }
 
     DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+}
+
+struct SSelectYuebingUsedMost : public Visitor<Player>
+{
+    Player* _player;
+    UInt32 _used;
+    SSelectYuebingUsedMost() : _player(NULL), _used(0) {}
+    bool operator()(Player* player)
+    {
+        UInt32 used = player->GetVar(VAR_YUEBING_USED);
+        if(_player == NULL || used > _used)
+        {
+            _player = player;
+            _used = used;
+        }
+        return true;
+    }
+};
+void World::SendGuoqingAward()
+{
+    SSelectYuebingUsedMost selector;
+    globalPlayers.enumerate(selector);
+    if(selector._player == NULL)
+        return;
+    MailPackage::MailItem items[] =
+    {
+        {9180, 1}
+    };
+    selector._player->sendMailItem(4031, 4032, items, sizeof(items)/sizeof(items[0]), false);
+
+
 }
 
 #ifndef _WIN32

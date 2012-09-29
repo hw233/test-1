@@ -27,6 +27,7 @@
 #include "HeroMemo.h"
 #include "ClanStatue.h"
 #include "ClanCopy.h"
+#include "GVar.h"
 
 #include "GObject/AthleticsRank.h"
 #include <mysql.h>
@@ -277,6 +278,8 @@ Clan::Clan( UInt32 id, const std::string& name, UInt32 ft, UInt8 lvl ) :
 
     _copyLevel = 0;
     _copyLevelUpdateTime = 0;
+    _copyMaxLevel = 0;
+    _copyMaxTime = 0;
 }
 
 Clan::~Clan()
@@ -485,11 +488,6 @@ bool Clan::join(ClanMember * cm)
 
 bool Clan::kick(Player * player, UInt64 pid)
 {
-    if (ClanCopyMgr::Instance().getClanCopyByClan(this))
-    {
-        player->sendMsgCode(0, 1358);
-        return false;
-    }
 	if (_clanBattle->isInBattling())
 	{
         player->sendMsgCode(0, 1317);
@@ -498,6 +496,12 @@ bool Clan::kick(Player * player, UInt64 pid)
     if(ClanRankBattleMgr::Instance().IsInBattle(this))
     {
         SYSMSG_SEND(2235, player);
+        return false;
+    }
+
+    if (ClanCopyMgr::Instance().getClanCopyByClan(this))
+    {
+        player->sendMsgCode(0, 1358);
         return false;
     }
 
@@ -606,9 +610,10 @@ bool Clan::leave(Player * player)
 	}
     if (ClanCopyMgr::Instance().getClanCopyByClan(this))
     {
-        player->sendMsgCode(0, 1358);
-        return false;
+		player->sendMsgCode(0, 1358);
+		return false;
     }
+
     if(ClanRankBattleMgr::Instance().IsInBattle(this))
     {
         SYSMSG_SEND(2235, player);
@@ -3637,6 +3642,8 @@ void Clan::resetCopyLevel()
     else
         _copyLevel -= COPY_RESET_LEVEL;
 
+    _copyLevelUpdateTime = TimeUtil::Now();
+    DB5().PushUpdateData("REPLACE INTO `clan_copy` (`clanId`, `level`, `levelUpdateTime`, `maxCopyLevel`, `maxCopyTime`) VALUES (%u, %u, %u, %u, %u)", _id, _copyLevel, _copyLevelUpdateTime, _copyMaxLevel, _copyMaxTime);
     _copyLog.push_back(clanCopyLog);
     if (_copyLog.size() > MAX_COPY_LOG)
     {
@@ -3755,7 +3762,17 @@ void   Clan::LoadCopy(UInt16 level, UInt32 levelUpdateTime, UInt16 maxLevel, UIn
             level -= count * 5;
     }
     _copyLevel = level;
-    _copyLevelUpdateTime = now;
+    if (count)
+        _copyLevelUpdateTime = levelUpdateTime;
+    else
+        _copyLevelUpdateTime = now;
+    if (maxLevel > 30)
+    {
+        // 由于开始未初始化导致历史最大层数出现错误，重置数据
+        maxLevel = level;
+        maxTime = TimeUtil::Now();
+        DB5().PushUpdateData("REPLACE INTO `clan_copy` (`clanId`, `level`, `levelUpdateTime`, `maxCopyLevel`, `maxCopyTime`) VALUES (%u, %u, %u, %u, %u)", _id, _copyLevel, levelUpdateTime, maxLevel, maxTime);
+    }
     _copyMaxLevel = maxLevel;
     _copyMaxTime = maxTime;
 }
@@ -4049,9 +4066,14 @@ void   Clan::addCopyLevel()
     if (_copyLevel < GData::clanCopyTable.size() - 1)
     {
         ++_copyLevel;
-        _copyMaxLevel = _copyLevel >= _copyMaxLevel ? _copyLevel : _copyMaxLevel;
-        _copyMaxTime = _copyLevel >= _copyMaxLevel ? TimeUtil::Now() : _copyMaxTime;
+        _copyMaxLevel = _copyLevel > _copyMaxLevel ? _copyLevel : _copyMaxLevel;
+        _copyMaxTime = _copyLevel > _copyMaxLevel ? TimeUtil::Now() : _copyMaxTime;
         DB5().PushUpdateData("REPLACE INTO `clan_copy` (`clanId`, `level`, `levelUpdateTime`, `maxCopyLevel`, `maxCopyTime`) VALUES (%u, %u, %u, %u, %u)", _id, _copyLevel, TimeUtil::Now(), _copyMaxLevel, _copyMaxTime);
+        if (GVAR.GetVar(GVAR_CLANCOPYPASS) < _copyLevel)
+        {
+            GVAR.SetVar(GVAR_CLANCOPYPASS, _copyLevel);
+			SYSMSG_BROADCASTV(805, _name.c_str(), _copyLevel);
+        }
     }
 }
 
@@ -4117,6 +4139,24 @@ void    Clan::setCopyLevel(UInt16 level)
     _copyLevel = level;
 }
 
+void    Clan::clearCopySnap()
+{
+    _copySpotSnap.clear();
+}
+
+void    Clan::insertIntoCopySnap(Player *player, UInt8 spotId)
+{
+    _copySpotSnap.insert(std::make_pair(player, spotId));
+}
+
+UInt8   Clan::getCopyPlayerSnap(Player *player)
+{
+    if (_copySpotSnap.find(player) != _copySpotSnap.end())
+    {
+        return _copySpotSnap[player];
+    }
+    return 0;
+}
 
 // 帮派副本
 //////////////////////////////////////////

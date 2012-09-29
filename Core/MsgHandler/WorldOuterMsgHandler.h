@@ -2097,6 +2097,7 @@ void OnTownDeamonReq( GameMsgHdr& hdr, const void* data)
     case 0x00:
         {
             GObject::townDeamonManager->showTown(player);
+            GObject::townDeamonManager->sendTjItemInfo(player);
         }
         break;
     case 0x01:
@@ -2169,6 +2170,14 @@ void OnTownDeamonReq( GameMsgHdr& hdr, const void* data)
         {
             player->getDeamonAwards();
         }
+        break;
+    case 0x09:
+        {
+            UInt8 townId = 0;
+            br >> townId;
+            GObject::townDeamonManager->getTjItem(player, townId);
+        }
+        break;
     default:
         return;
     }

@@ -62,6 +62,7 @@ namespace GObject
     public:
 		Tianjie();
 		bool Init();
+        void LoadLastPassed();
 		bool LoadFromDB();
         UInt8 getTjTypeId() {return m_tjTypeId;};
         void setNetOk() {m_isNetOk = true;};
@@ -134,10 +135,11 @@ namespace GObject
 		bool isPlayerInTj(int playerLevel);
 		bool isOpenTj(Player* pl);
         bool isTjExecute() {return m_isTjExecute;};
-        bool isTjRateNpc(int npcid);
+        bool isTjRateNpc(UInt32 npcid);
         bool isTjOpened() {return m_isTjOpened;};
-		bool isTjNpc(int npcid, UInt16 loc);
+		bool isTjNpc(UInt32 npcid, UInt16 loc);
         void OpenTj();
+        int  getLastPassedLevel() {return m_lastPassedLevel;};
 
         void initSortMap();
         void insertToScoreSortMap(Player* pl, int newScore, int oldScore);
@@ -148,8 +150,8 @@ namespace GObject
 	private:
         void notifyTianjieStatus(Player* pl= NULL);
         void clearEventData();
-	    bool addNpc(int npcid);
-		void deleteNpc(int npcid, UInt16 loc);
+	    bool addNpc(UInt32 npcid);
+		void deleteNpc(UInt32 npcid, UInt16 loc);
         void rewardEventBox(Player*pl, int score);
         void rewardTotalBox(Player*pl, int score);
         void reward(TSortMap& m, UInt8 varId, UInt8 EventOrTotal);
@@ -164,7 +166,7 @@ namespace GObject
         void udplogScore(Player* pl, int score, bool isEvent);
     private:
 		GData::NpcGroup* _ng;
-		multimap<int, int> m_locNpcMap; //据点上的怪物
+		multimap<UInt16, UInt32> m_locNpcMap; //据点上的怪物
 	    UInt8 m_tjTypeId;
         bool m_isNetOk;
 
@@ -218,6 +220,9 @@ namespace GObject
         int m_nextTjLevel;
 
         FastMutex _opMutex;
+
+        //最后一次渡过的天劫
+        int m_lastPassedLevel;
     };
 }
 #endif

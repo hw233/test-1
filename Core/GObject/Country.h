@@ -43,7 +43,6 @@ public:
 	}
 
 public:
-	bool PlayerMapSwitch(UInt8 index, UInt32 playerId);		//???ҿ??????л?????
 	void MergePendingPlayerList();
 	void PlayerEnter(Player * pl, bool = true);
 	void PlayerLeave(Player * pl);
@@ -63,12 +62,12 @@ private:
 	static void Country_Battle_Check(void *);
     static void Hero_Island_Check(void *);
     static void ClanRankBattleCheck(void *);
+    static void TownDeamonTmAward(void *);
 
     static void ClanCopyCheck(void *);
     static void ClanCopyResetBegin(void *);
     static void ClanCopyReset(void *);
     static void ClanCopyResetEnd(void *);
-
 private:
 	UInt8		m_ThreadID;					//?????߳?
 

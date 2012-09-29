@@ -109,7 +109,8 @@ namespace Script
 		lua_tinker::def(_L, "getJune", GObject::World::getJune);
 		lua_tinker::def(_L, "getJune1", GObject::World::getJune1);
 		lua_tinker::def(_L, "getJuly", GObject::World::getJuly);
-		lua_tinker::def(_L, "getQixi", GObject::World::getQixi);
+        lua_tinker::def(_L, "getQixi", GObject::World::getQixi);
+        lua_tinker::def(_L, "getGuoqing", GObject::World::getGuoqing);
 		lua_tinker::def(_L, "getYDMDAct", GObject::World::getYDMDAct);
 		lua_tinker::def(_L, "getWeekDay",	GObject::World::getWeekDay);
 		lua_tinker::def(_L, "getThanksgiving",	GObject::World::getThanksgiving);

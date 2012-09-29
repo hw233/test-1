@@ -1035,12 +1035,12 @@ namespace GObject
         {
             StringTokenizer via(m_via, "_");
             if (via.count() > 1)
-                udpLog(via[0].c_str(), via[1].c_str(), "", "", "", "1", "login");
+                udpLog(via[0].c_str(), via[1].c_str(), "", "", "", "0", "login");
             else
-                udpLog(m_via.c_str(), "", "", "", "", "1", "login");
+                udpLog(m_via.c_str(), "", "", "", "", "0", "login");
         }
         else
-            udpLog("", "", "", "", "", "1", "login");
+            udpLog("", "", "", "", "", "0", "login");
 
         if (!m_invited.empty())
         {
@@ -1208,9 +1208,19 @@ namespace GObject
         udpLog("discount", action, "", "", "", "", "act");
     }
 
-    void Player::tradeUdpLog(UInt32 price)
+    void Player::tradeUdpLog(UInt32 id, UInt32 val /* = 0 */, UInt32 num /* = 1 */)
     {
-        udpLog("trade", "F_1081", "", "", "", "", "act", price);
+        // 交易相关日志
+        char action[16] = "";
+        if (val)
+        {
+            snprintf (action, 16, "F_%d_%d", id, val);
+        }
+        else
+        {
+            snprintf (action, 16, "F_%d", id);
+        }
+        udpLog("trade", action, "", "", "", "", "act", num);
     }
 
     void Player::skillStrengthenLog(UInt8 type, UInt32 val)
@@ -1416,6 +1426,21 @@ namespace GObject
             snprintf (action, 16, "F_%d", id);
         }
         udpLog("clanCopy", action, "", "", "", "", "act", num);
+    }
+
+    void Player::tripodUdpLog(UInt32 id, UInt32 val /* = 0 */, UInt32 num /* = 1 */)
+    {
+        // 九疑鼎相关日志
+        char action[16] = "";
+        if (val)
+        {
+            snprintf (action, 16, "F_%d_%d", id, val);
+        }
+        else
+        {
+            snprintf (action, 16, "F_%d", id);
+        }
+        udpLog("tripod", action, "", "", "", "", "act", num);
     }
 
     void Player::sendHalloweenOnlineAward(UInt32 now, bool _online)
@@ -1777,12 +1802,14 @@ namespace GObject
         }
 
 		DBLOG1().PushUpdateData("update login_states set logout_time=%u where server_id=%u and player_id=%"I64_FMT"u and login_time=%u", curtime, cfg.serverLogId, _id, _playerData.lastOnline);
-		//_playerData.lastOnline = curtime; // XXX: 在线时间统计问题
 		writeOnlineRewardToDB();
 
 		removeStatus(SGPunish);
         LogoutSaveOnlineTimeToday();
-        udpLog("", "", "", "", "", "2", "login");
+
+        char online[32] = {0,};
+        snprintf(online, sizeof(online), "%u", curtime - _playerData.lastOnline);
+        udpLog("", "", "", "", "", online, "login");
 	}
 
 	void Player::Logout(bool nobroadcast)
@@ -1863,7 +1890,9 @@ namespace GObject
 #endif // _WIN32
         heroIsland.playerOffline(this);
 		removeStatus(SGPunish);
-        udpLog("", "", "", "", "", "2", "login");
+        char online[32] = {0,};
+        snprintf(online, sizeof(online), "%u", TimeUtil::Now() - _playerData.lastOnline);
+        udpLog("", "", "", "", "", online, "login");
 	}
 
 	void Player::checkLastBattled()
@@ -6951,9 +6980,11 @@ namespace GObject
 
         for (UInt8 i = 0; i < size; i += 2)
         {
-            if(!m_Package->Add(ids[i], ((UInt8)(i+1)>=ids.size())?1:ids[i+1], true, false, FromOnlineAward))
+            //ItemBase* item = 
+            m_Package->Add(ids[i], ((UInt8)(i+1)>=ids.size())?1:ids[i+1], true, false, FromOnlineAward);
+            //if(!item)
                 // return false;
-                ; // XXX: ugly
+                //; // XXX: ugly
         }
 
         UInt8 count = GData::GDataManager::GetOnlineAwardCount();
@@ -9727,9 +9758,15 @@ namespace GObject
             return;
 
         if (IsEquipTypeId(m_td.itemId))
+        {
             GetPackage()->AddEquip(m_td.itemId, true, false, FromTripod);
+            tripodUdpLog(1140, m_td.itemId);
+        }
         else
+        {
             GetPackage()->AddItem(m_td.itemId, m_td.num, true, false, FromTripod);
+            tripodUdpLog(1140, m_td.itemId, m_td.num);
+        }
 
         m_td.fire = 0;
         if (getVipLevel() > 2)
@@ -10794,15 +10831,15 @@ namespace GObject
     {
         if (!pos || pos > 7)
             return;
-        MailPackage::MailItem item[7][4] =
+        MailPackage::MailItem item[7][3] =
         {
-            {{9076,20},{509,20},{30,100},},
-            {{9076,10},{509,10},{30,50},},
-            {{9076,5},{509,10},{30,20},},
-            {{9076,5},{509,5},},
-            {{9076,5},{509,5},},
-            {{9076,5},{509,5},},
-            {{9076,5},{509,5},},
+            {{9076,30},{509,30},{9177,10},},
+            {{9076,20},{509,10},{9177,5},},
+            {{9076,10},{509,10},{9177,2},},
+            {{9076,5},{509,5},{9177,1},},
+            {{9076,5},{509,5},{9177,1},},
+            {{9076,5},{509,5},{9177,1},},
+            {{9076,5},{509,5},{9177,1},},
         };
 
         SYSMSGV(_title, 4026, pos);
@@ -10811,7 +10848,7 @@ namespace GObject
         if(mail)
         {
             MailPackage::MailItem* mitem = &item[pos-1][0];
-            UInt32 size = 4;
+            UInt32 size = 3;
             std::string strItems;
             for (UInt32 i = 0; i < size; ++i)
             {
@@ -12567,6 +12604,9 @@ namespace GObject
             {
                 gold = 50000;
                 coupon = 3500;
+            }
+            if (gold > 0)
+            {
                 SYSMSGV(title, 5103);
                 SYSMSGV(content, 5104, gold, coupon, coupon);
                 GetMailBox()->newMail(NULL, 0x21, title, content);
@@ -12663,7 +12703,7 @@ namespace GObject
         else if (2 == eventId)
         {
             type = 2;
-            int score = GetVar(VAR_TJ_TASK2_SCORE);
+            UInt32 score = GetVar(VAR_TJ_TASK2_SCORE);
             switch (cmd)
             {
                     //查询列表
@@ -13354,26 +13394,46 @@ void EventTlzAuto::notify(bool isBeginAuto)
         WORLD().UpdateKillMonsterRank(this, curType, curCount);
     }
 
+    ///////////////////////////////////////////////
+    // 帮派副本相关
+
+    // 帮派副本相关
+    ///////////////////////////////////////////////
     bool Player::checkTrumpMutually(UInt32 trumpid)
     {
-        static UInt32 muttrumps[] = {1532, 1530};
-        if (trumpid == 1530 || trumpid == 1532)
+        static UInt32 muttrumps[][2] = {
+            {1529, 1532},
+            {1530, 1533},
+            {1531, 1534},
+            {1650, 1653},
+            {1651, 1654},
+            {1652, 1655}
+        };
+        if ((trumpid >= 1529 && trumpid <= 1534)
+                || (trumpid >= 1650 && trumpid <= 1655))
         {
-            for (size_t i = 0; i < sizeof(muttrumps)/sizeof(UInt32); ++i)
+            size_t i = 0;
+            for (; i < sizeof(muttrumps)/(sizeof(UInt32)*2); ++i)
             {
-                for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++it)
+                if (trumpid == muttrumps[i][0] || trumpid == muttrumps[i][1])
+                    break;
+            }
+
+            for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++it)
+            {
+                Fighter* fgt = it->second;
+                UInt32 trumpids[32];
+                size_t c = fgt->getAllTrumpTypeId(trumpids, sizeof(trumpids)/sizeof(UInt32));
+                if (!c)
+                    continue;
+                for (size_t j = 0; j < c; ++j)
                 {
-                    Fighter* fgt = it->second;
-                    UInt32 trumpids[32];
-                    size_t c = fgt->getAllTrumpTypeId(trumpids, sizeof(trumpids)/sizeof(UInt32));
-                    if (!c)
+                    if (!trumpids[j])
                         continue;
-                    for (size_t j = 0; j < c; ++j)
+                    if (trumpids[j] == muttrumps[i][0] || trumpids[j] == muttrumps[i][1])
                     {
-                        if (!trumpids[j])
-                            continue;
-                        if (trumpids[j] == muttrumps[i])
-                            return true;
+                        sendMsgCode(0, 1032);
+                        return true;
                     }
                 }
             }

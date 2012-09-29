@@ -176,8 +176,10 @@ function onDungeonWin(player, id, count, free)
     Qixi(player, 0);
     if free == true then
         FallActivity(player, 1)
+        Guoqing(player, 0);
     else
         FallActivity(player, 2)
+        Guoqing(player, 3);
     end
     if getKillMonsterAct() then
         local package = player:GetPackage();
@@ -815,6 +817,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     MayDay(player, lootlvl)
     June(player, lootlvl);
     Qixi(player, lootlvl);
+    Guoqing(player, lootlvl);
     LuckyDrawBox(player, id)
     if player:getQQVipPrivilege() == true then
         player:setQQVipPrivilege(false)
@@ -847,6 +850,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
     MayDay(player, lootlvl)
     June(player, lootlvl);
     Qixi(player, lootlvl);
+    Guoqing(player, lootlvl);
     if lootlvl == 0 then
         FallActivity(player, 1)
     else
@@ -2004,6 +2008,71 @@ function sendRechargeMails_2012_09_22(player, ototal, ntotal)
     end
 end
 
+function sendRechargeMails_2012_09_27(player, ototal, ntotal)
+    local lvls = {
+        10,99,199,399,699,1099,1599,2199,2899,3699,4599,5599,8999,15999,26999,42999,64999,
+    }
+    local items = {
+        {1325,1,1, 551,2,1},
+        {503,2,1, 516,2,1},
+        {8000,1,1, 551,2,1},
+        {517,2,1, 1325,1,1},
+        {505,2,1, 15,6,1},
+        {512,1,1, 513,1,1, 9076,1,1},
+        {1528,1,1, 1325,1,1, 9076,1,1},
+        {515,3,1, 509,2,1, 9076,1,1},
+        {503,2,1, 516,2,1, 9076,1,1},
+        {1325,2,1, 515,1,1, 9076,1,1},
+        {517,3,1, 549,2,1, 509,2,1, 9076,1,1},
+        {1528,2,1, 9076,1,1},
+        {1325,5,1, 516,3,1, 9076,1,1},
+        {1528,2,1, 549,2,1, 515,2,1, 9076,2,1},
+        {509,2,1, 507,2,1, 515,3,1, 9076,3,1},
+        {509,2,1, 507,2,1, 515,3,1, 9076,3,1},
+        {509,3,1, 507,3,1, 515,5,1, 9076,5,1},
+    }
+
+    local olvl = calcRechargeLevel(lvls, ototal)
+    local nlvl = calcRechargeLevel(lvls, ntotal)
+
+    if nlvl == 0 or olvl == nlvl then
+        return
+    end
+
+    for k = olvl+1, nlvl do
+        local title = string.format(msg_100, lvls[k])
+        local ctx = string.format(msg_101, lvls[k])
+        sendItemPackageMail(player, title, ctx, items[k]);
+    end
+end
+
+function sendRechargeMails_2012_10_05(player, ototal, ntotal)
+    local lvls = {
+        10,99,199,399,699,999,
+    }
+    local items = {
+        {1325,1,1},
+        {503,2,1, 15,2,1},
+        {516,1,1, 547,2,1},
+        {507,1,1},
+        {509,1,1, 33,1,1},
+        {1528,1,1, 515,1,1},
+    }
+
+    local olvl = calcRechargeLevel(lvls, ototal)
+    local nlvl = calcRechargeLevel(lvls, ntotal)
+
+    if nlvl == 0 or olvl == nlvl then
+        return
+    end
+
+    for k = olvl+1, nlvl do
+        local title = string.format(msg_100, lvls[k])
+        local ctx = string.format(msg_101, lvls[k])
+        sendItemPackageMail(player, title, ctx, items[k]);
+    end
+end
+
 
 function sendRechargeMails(player, ototal, ntotal)
     --sendRechargeMails1(player, ototal, ntotal)
@@ -2023,7 +2092,17 @@ function sendRechargeMails(player, ototal, ntotal)
     -- sendRechargeMails6(player, ototal, ntotal)
     --sendRechargeMails7(player, ototal, ntotal)
     --sendRechargeMails_2012_09_13(player, ototal, ntotal)
-    sendRechargeMails_2012_09_22(player, ototal, ntotal)
+    --sendRechargeMails_2012_09_22(player, ototal, ntotal)
+    local t1 = { ['year'] = 2012, ['month'] = 9, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local t2 = { ['year'] = 2012, ['month'] = 10, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local s1 = os.time(t1)
+    local s2 = os.time(t2)
+    local n = os.time()
+    if n >= s1 and n < (s1 + 4*86400) then
+        sendRechargeMails_2012_09_27(player, ototal, ntotal)
+    elseif n >= s2 and n < (s2 + 2*86400) then
+        sendRechargeMails_2012_10_05(player, ototal, ntotal)
+    end
 end
 
 function onEquipForge(player, id, onums)
@@ -2159,9 +2238,49 @@ function sendConsumeMails2(player, ototal, ntotal)
     end
 end
 
+function sendConsumeMails_2012_10_01(player, ototal, ntotal)
+    local lvls = {
+        10,99,399,899,1599,2599,4099,5699,7599,9999,15999,22999,31999,45999,69999,
+    }    
+    local items = {
+        {503,1,1},
+        {516,1,1},
+        {517,1,1, 9088,1,1},
+        {1528,1,1},
+        {549,1,1},
+        {509,2,1, 507,2,1},
+        {515,2,1},
+        {1325,2,1},
+        {507,3,1, 509,3,1},
+        {515,3,1},
+        {9076,5,1},
+        {1325,3,1, 515,3,1},
+        {1528,3,1, 515,4,1},
+        {9076,8,1, 9177,1,1},
+        {9076,10,1, 9177,2,1},
+    }
+
+    local olvl = calcRechargeLevel(lvls, ototal)
+    local nlvl = calcRechargeLevel(lvls, ntotal)
+
+    if nlvl == 0 or olvl == nlvl then
+        return
+    end
+
+    for k = olvl+1, nlvl do
+        if lvls[k] == nil or items[k] == nil then
+            return
+        end
+        local title = string.format(msg_105, lvls[k])
+        local ctx = string.format(msg_106, lvls[k])
+        sendItemPackageMail(player, title, ctx, items[k]);
+    end
+end
+
 function sendConsumeMails(player, ototal, ntotal)
     --sendConsumeMails1(player, ototal, ntotal);
-    sendConsumeMails2(player, ototal, ntotal);
+    --sendConsumeMails2(player, ototal, ntotal);
+    sendConsumeMails_2012_10_01(player, ototal, ntotal);
 end
 
 local awardPool = {
@@ -2247,6 +2366,23 @@ function Qixi(player, lootlvl)
         -- 喜鹊
         local package = player:GetPackage();
         package:AddItem(9122, 1, true, 0, 10);
+    end
+end
+
+function Guoqing(player, lootlvl)
+    if getGuoqing() then
+        if lootlvl > 3 then
+            return;
+        end
+        local itemNum = {
+            [0] = 1,
+            [1] = 1,
+            [2] = 1,
+            [3] = 2,
+        };
+        -- 月饼
+        local package = player:GetPackage();
+        package:AddItem(9179, itemNum[lootlvl], true, 0, 10);
     end
 end
 

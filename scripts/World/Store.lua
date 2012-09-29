@@ -163,8 +163,23 @@ function loadStore()
 
         discount(store)
 
-        store:add(2,9163,10)
+        if is0921_0924() then
+            store:add(2,1700,599)
+            store:add(2,1701,599)
+            store:add(2,1702,599)
+            store:add(2,1703,599)
+            store:add(2,1704,599)
+            store:add(2,1705,599)
+        end
+        if is0926_0927() then
+        store:add(2,493,10)
+        store:add(2,494,20)
+        store:add(2,495,50)
+        end
+
         store:add(2,1706,599)
+        store:add(2,9163,10)
+        -- store:add(2,1706,599)
         store:add(2,1325,50)
         if is7_16_8_15() then
             store:add(2,1704,999)
@@ -210,6 +225,10 @@ function loadStore()
 
         if getQixi() then
             store:add(2,9122,10)
+        end
+
+        if getGuoqing() then
+            store:add(2,9179,30)
         end
 
         store:add(2,9123,50)
@@ -305,6 +324,9 @@ function loadStore()
         store:add(4,5113,20)
         store:add(4,5123,20)
         store:add(4,5133,15)
+        if is0926_0927() then
+            store:add(5,492,1000)
+        end
         store:add(4,5143,20)
         store:add(5,550,1000)
         store:add(5,9081,500)

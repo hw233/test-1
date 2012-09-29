@@ -555,8 +555,65 @@ function calcBattlePoint( fgt )
       return atk * (1 + 0.005 * crt) * hit / act
     end
   end
-  return calcAttack(fgt) * (1 + 0.005 * calcCritical(fgt, nil)) * calcHitrate(fgt, nil) / calcAction(fgt)
+  local attack = 0;
+  if fgt:getClass() == 3 then
+      attack = calcAttack(fgt);
+  else
+      attack = calcMagAttack(fgt);
+  end
+
+--  print("strenght  "..calcStrength(fgt))
+--  print("physique  "..calcPhysique(fgt))
+--  print("agility  "..calcAgility(fgt))
+--  print("intelligence  "..calcIntelligence(fgt))
+--  print("will  "..calcWill(fgt))
+--  print("hp  "..calcHP(fgt))
+--  print("defend  "..calcDefend(fgt))
+--  print("magDefend  "..calcMagDefend(fgt))
+--  print("attack  "..attack)
+--  print("critical  "..calcCritical(fgt,nil))
+--  print("criticaldmg  "..calcCriticalDmg(fgt))
+--  print("pierce  "..calcPierce(fgt,nil))
+--  print("counter  "..calcCounter(fgt,nil))
+--  print("hitrate  "..calcHitrate(fgt,nil))
+--  print("aura  "..calcAura(fgt))
+--  print("auraMax  "..calcAuraMax(fgt))
+--  print("magres  "..calcMagRes(fgt,nil))
+--  print("evade  "..calcEvade(fgt,nil))
+--  print("tough  "..calcTough(fgt,nil))
+--  print("")
+
+  local dmgP = ((calcDefend(fgt)/(calcDefend(fgt) + deflvl_factor*fgt:getLevel() + deflvl_addon_factor)) + (calcMagDefend(fgt)/(calcMagDefend(fgt) + deflvl_factor*fgt:getLevel() + deflvl_addon_factor))) / 2
+
+  return attack * (3 + (calcCritical(fgt, nil)*calcCriticalDmg(fgt) + calcPierce(fgt, nil) + calcCounter(fgt, nil) + calcHitrate(fgt, nil) + calcAura(fgt)*(2+(calcAuraMax(fgt)-100)*0.0025) + calcMagRes(fgt, nil))/100) + (calcHP(fgt)/(1-calcEvade(fgt,nil)/100) + calcHP(fgt)/(1-dmgP*calcTough(fgt,nil)/100))/12
+  --return calcAttack(fgt) * (1 + 0.005 * calcCritical(fgt, nil)) * calcHitrate(fgt, nil) / calcAction(fgt)
 end
+
+
+
+--function calcBattlePoint( fgt )
+--  if fgt == nil then
+--    return 0
+--  end
+--  if fgt:isNpc() then
+--    local lvl = fgt:getLevel() - 1
+--    if lvl >= 70 then
+--      local cls = 1
+--      local atk = fgt:getBaseAttack()
+--      local str = fgt:getBaseStrength() + str_factor[cls] * lvl
+--      local intr = fgt:getBaseIntelligence() + int_factor[cls] * lvl
+--      local agi = fgt:getBaseAgility() + agi_factor[cls] * lvl
+--      local atk = ((fgt:getBaseAttack() + atk_factor[cls] * lvl) * (1 + str_atk_factor * str / 100)) * (40 + lvl) / 120
+--      local crt = fgt:getBaseCritical()
+--      local hit = fgt:getBaseHitrate() + int_hit_factor * intr
+--      local act = fgt:getBaseAction() / (1 + agi_act_factor * agi / 100)
+--      return atk * (1 + 0.005 * crt) * hit / act
+--    end
+--  end
+--  return calcAttack(fgt) * (1 + 0.005 * calcCritical(fgt, nil)) * calcHitrate(fgt, nil) / calcAction(fgt)
+--end
+
+
 
 function calcAutoBattle( mybp, theirbp )
   if mybp >= theirbp then

@@ -18,6 +18,22 @@ struct LeaderboardTowndown
     UInt32 time;
 };
 
+struct LeaderboardClanCopy
+{
+    UInt64 id;
+	std::string name;
+    UInt32 level;
+    UInt64 time;
+};
+
+struct RankingInfoList
+{
+    UInt64 id;
+	std::string name;
+    UInt32 ranking;
+    UInt64 country;
+};
+
 class Leaderboard
 {
 public:
@@ -29,10 +45,27 @@ public:
     void newDrawingGame(UInt32 nextday); //新人冲级赛
 	inline UInt8 getMaxLevel() { return _maxLevel; }
 
+    std::vector<RankingInfoList>* getLevelList() {return &_level;};
+    std::vector<RankingInfoList>* getAthleticsList() {return &_athletics;};
+    std::vector<RankingInfoList>* getAchievementList() {return &_achievement;};
+    std::vector<RankingInfoList>* getClanList() {return &_clan;};
+
     const std::vector<LeaderboardTowndown>& getTowndown()
     {
         FastMutex::ScopedLock lk(_tmutex);
         return _towndown;
+    };
+
+    const std::vector<LeaderboardClanCopy>& getClanCopy()
+    {
+        FastMutex::ScopedLock lk(_cmutex);
+        return _clancopy;
+    };
+
+    const std::vector<RankingInfoList>& getLevel()
+    {
+        FastMutex::ScopedLock lk(_lmutex);
+        return _level;
     };
 
     void begin() { m_sorting = true; }
@@ -60,6 +93,13 @@ private:
 
     FastMutex _tmutex;
     std::vector<LeaderboardTowndown> _towndown;
+    FastMutex _cmutex;
+    std::vector<LeaderboardClanCopy> _clancopy;
+    FastMutex _lmutex;
+    std::vector<RankingInfoList> _level;
+    std::vector<RankingInfoList> _athletics;
+    std::vector<RankingInfoList> _achievement;
+    std::vector<RankingInfoList> _clan;
 
     AtomicVal<bool> m_sorting;
 };

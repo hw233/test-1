@@ -273,11 +273,11 @@ struct ClanCopySpot
 struct ClanCopyBattleInfo
 {
     // 帮派副本战斗信息
-    UInt32 playerId;        // 玩家Id
+    UInt64 playerId;        // 玩家Id
     UInt32 monsterIndex;    // 怪物唯一索引
     UInt8  battleResult;    // 战斗结果 1.玩家胜利 2.怪物胜利
     UInt8  remainHpP;       // 胜利方剩余的hp
-    ClanCopyBattleInfo (UInt32 playerId, UInt32 monsterIndex, UInt8 battleResult, UInt8 remainHpP)
+    ClanCopyBattleInfo (UInt64 playerId, UInt32 monsterIndex, UInt8 battleResult, UInt8 remainHpP)
         : playerId(playerId), monsterIndex(monsterIndex), battleResult(battleResult), remainHpP(remainHpP)
     {
     }
@@ -376,7 +376,6 @@ class ClanCopy
 
         UInt32 _maxMonsterWave;        // 该等级副本刷怪的波数（包括轮空的）
         UInt32 _curMonsterWave;        // 当前已经刷新的怪的波数（包括轮空的）
-        UInt8  _lastWave;              // 是否已经是最后一波结束了
 
         UInt32 _npcIndex;
 
