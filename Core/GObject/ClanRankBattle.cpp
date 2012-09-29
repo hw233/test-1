@@ -2182,6 +2182,7 @@ namespace GObject
             m_SignupCountDown = RANK_BATTLE_SIGNUP_TIME / 60;
             m_State = STATE_SIGNUP;
             SyncState();
+            setStatus(3);
         }
         else
         {
