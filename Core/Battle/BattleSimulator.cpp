@@ -406,9 +406,12 @@ void BattleSimulator::start(UInt8 prevWin, bool checkEnh)
                             bf->addFlag2(flag2);
                         if((prevWin-1) != i)
                             bf->initStats(checkEnh);
-                        UInt8 justice_roar = (_player[i] != NULL ? _player[i]->getJusticeRoar() : 0);
-                        if(justice_roar)
-                            bf->AddAura(justice_roar);
+                        if(checkEnh)
+                        {
+                            UInt8 justice_roar = (_player[i] != NULL ? _player[i]->getJusticeRoar() : 0);
+                            if(justice_roar)
+                                bf->AddAura(justice_roar);
+                        }
 
                         aura = bf->getAura();
                         maxAura = bf->getAuraMax();
