@@ -1673,7 +1673,7 @@ void World::SendGuoqingAward()
     {
         {9180, 1}
     };
-    selector._player->sendMailItem(4031, 4032, items, sizeof(items)/sizeof(items[0]));
+    selector._player->sendMailItem(4031, 4032, items, sizeof(items)/sizeof(items[0]), false);
 
 
 }
