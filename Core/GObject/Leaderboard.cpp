@@ -167,6 +167,10 @@ void Leaderboard::doUpdate()
             curPlayer->patchMergedName(curPlayer->getClan()->getFounder(), blist2[c].clan);
         }
         RankingInfoList r;
+        r.id = curPlayer->getId();
+        r.name = curPlayer->getName();
+        r.ranking = c+1;
+        r.country = curPlayer->getCountry();
         _level.push_back(r);
     }
 
@@ -175,6 +179,7 @@ void Leaderboard::doUpdate()
 		_maxLevel = blist2[0].lvl;
 
 	blist.clear();
+    _athletics.clear();
 	std::list<AthleticsRankData *> *pathleticsrank = gAthleticsRank.getAthleticsRank();
 	std::list<AthleticsRankData *> athleticsrank = pathleticsrank[1];
 	blist.resize(100);
@@ -188,11 +193,19 @@ void Leaderboard::doUpdate()
 		blist[i].country = (*it)->ranker->getCountry();
 		blist[i].value = i + 1;
 		blist[i].clan = (*it)->ranker->getClanName();
+       
+        RankingInfoList r;
+        r.id = (*it)->ranker->getId();
+        r.name = (*it)->ranker->getName();
+        r.ranking = i+1;
+        r.country = (*it)->ranker->getCountry();
+        _athletics.push_back(r);
 	}
 	blist.resize(i);
 	buildPacket(_moneyStream, 1, _id, blist);
 
 	blist.clear();
+    _achievement.clear();
 	execu->ExtractData("SELECT `player`.`id`, `player`.`name`, `fighter`.`level`, `player`.`country`, `player`.`archievement`, `clan`.`name` FROM"
 		" (`player` CROSS JOIN `fighter`"
 		" ON `player`.`id` = `fighter`.`playerId` AND `fighter`.`id` < 10)"
@@ -212,6 +225,13 @@ void Leaderboard::doUpdate()
         if(curPlayer && curPlayer->getClan())
         {
             curPlayer->patchMergedName(curPlayer->getClan()->getFounder(), blist[c].clan);
+
+            RankingInfoList r;
+            r.id = curPlayer->getId();
+            r.name = curPlayer->getName();
+            r.ranking = c+1;
+            r.country = curPlayer->getCountry();
+            _achievement.push_back(r);
         }
     }
     buildPacket(_achievementStream, 2, _id, blist);
@@ -229,6 +249,7 @@ void Leaderboard::doUpdate()
     UInt32 size = clanRanking.size();
     if (size > 1000) size = 100;
 	blist.resize(size);
+    _clan.clear();
     for (std::vector<Clan*>::const_iterator it = clanRanking.begin(), e = clanRanking.end(); it != e; ++i, ++it)
     {
 		//blist[i].id = (*it)->getId();
@@ -250,6 +271,13 @@ void Leaderboard::doUpdate()
 		blist[i].lvl = (*it)->getLev();
 		blist[i].value = (*it)->getCount();
 		blist[i].clan = (*it)->getName();
+
+        RankingInfoList r;
+        r.id = (*it)->getId();
+        r.name = (*it)->getName();
+        r.ranking = i+1;
+        r.country = (*it)->getCountry();
+        _clan.push_back(r);
     }
 	buildPacket(_clanStream, 3, _id, blist);
 #endif
