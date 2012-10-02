@@ -171,6 +171,12 @@ function loadStore()
             store:add(2,1704,599)
             store:add(2,1705,599)
         end
+        if is0926_0927() then
+        store:add(2,493,10)
+        store:add(2,494,20)
+        store:add(2,495,50)
+        end
+
         store:add(2,1706,599)
         store:add(2,9163,10)
         -- store:add(2,1706,599)
@@ -314,6 +320,9 @@ function loadStore()
         store:add(4,5113,20)
         store:add(4,5123,20)
         store:add(4,5133,15)
+        if is0926_0927() then
+            store:add(5,492,1000)
+        end
         store:add(4,5143,20)
         store:add(5,550,1000)
         store:add(5,9081,500)
