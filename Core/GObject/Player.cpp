@@ -1418,6 +1418,21 @@ namespace GObject
         udpLog("clanCopy", action, "", "", "", "", "act", num);
     }
 
+    void Player::tripodUdpLog(UInt32 id, UInt32 val /* = 0 */, UInt32 num /* = 1 */)
+    {
+        // 九疑鼎相关日志
+        char action[16] = "";
+        if (val)
+        {
+            snprintf (action, 16, "F_%d_%d", id, val);
+        }
+        else
+        {
+            snprintf (action, 16, "F_%d", id);
+        }
+        udpLog("tripod", action, "", "", "", "", "act", num);
+    }
+
     void Player::sendHalloweenOnlineAward(UInt32 now, bool _online)
     {
         _online = false; // XXX: fuck
@@ -9733,9 +9748,15 @@ namespace GObject
             return;
 
         if (IsEquipTypeId(m_td.itemId))
+        {
             GetPackage()->AddEquip(m_td.itemId, true, false, FromTripod);
+            tripodUdpLog(1140, m_td.itemId);
+        }
         else
+        {
             GetPackage()->AddItem(m_td.itemId, m_td.num, true, false, FromTripod);
+            tripodUdpLog(1140, m_td.itemId, m_td.num);
+        }
 
         m_td.fire = 0;
         if (getVipLevel() > 2)
