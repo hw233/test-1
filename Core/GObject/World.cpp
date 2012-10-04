@@ -118,6 +118,7 @@ bool World::_june = false;
 bool World::_june1 = false;
 bool World::_july = false;
 bool World::_qixi= false;
+bool World::_guoqing= false;
 bool World::_enchant_gt11 = false;
 bool World::_rechargenextret;
 UInt32 World::_rechargenextretstart;
@@ -209,6 +210,7 @@ bool bMayDayEnd = false;
 bool bJuneEnd = false;
 bool bPExpItemsEnd = false;
 bool bQixiEnd = false;
+bool bGuoqingEnd = false;
 bool bRechargeEnd = false;
 bool bConsumeEnd = false;
 
@@ -766,6 +768,7 @@ void World::World_Midnight_Check( World * world )
     bool bMayDay = getMayDay();
     bool bJune = getJune();
     bool bQixi = getQixi();
+    bool bGuoqing = getGuoqing();
     bool bRecharge = (getRechargeActive() || getRechargeActive3366()) && getNeedRechargeRank();
     bool bConsume = getConsumeActive() && getNeedConsumeRank();
     bool bPExpItems = getPExpItems();
@@ -791,6 +794,7 @@ void World::World_Midnight_Check( World * world )
     bJuneEnd = bJune && !getJune();
     bPExpItemsEnd = bPExpItems && !getPExpItems();
     bQixiEnd = bQixi && !getQixi();
+    bGuoqingEnd = bGuoqing && !getGuoqing();
     bRechargeEnd = bRecharge && !(getRechargeActive()||getRechargeActive3366());
     bConsumeEnd = bConsume && !getConsumeActive();
     bool bMonsterActEnd = bMonsterAct && !getKillMonsterAct();
@@ -832,6 +836,8 @@ void World::World_Midnight_Check( World * world )
 #endif
     if(bQixiEnd)
         world->SendQixiAward();
+    if(bGuoqingEnd)
+        world->SendGuoqingAward();
     if (bRechargeEnd)
         SendRechargeRankAward();
     if (bConsumeEnd)
@@ -1639,6 +1645,37 @@ void World::sendQixiScoreAward(Player* pl)
     }
 
     DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+}
+
+struct SSelectYuebingUsedMost : public Visitor<Player>
+{
+    Player* _player;
+    UInt32 _used;
+    SSelectYuebingUsedMost() : _player(NULL), _used(0) {}
+    bool operator()(Player* player)
+    {
+        UInt32 used = player->GetVar(VAR_YUEBING_USED);
+        if(_player == NULL || used > _used)
+        {
+            _player = player;
+            _used = used;
+        }
+        return false;
+    }
+};
+void World::SendGuoqingAward()
+{
+    SSelectYuebingUsedMost selector;
+    globalPlayers.enumerate(selector);
+    if(selector._player == NULL)
+        return;
+    MailPackage::MailItem items[] =
+    {
+        {9180, 1}
+    };
+    selector._player->sendMailItem(4031, 4032, items, sizeof(items));
+
+
 }
 
 #ifndef _WIN32

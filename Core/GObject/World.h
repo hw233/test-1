@@ -266,6 +266,11 @@ public:
     inline static bool getQixi()
     { return _qixi; }
 
+    inline static void setGuoqing(bool v)
+    { _guoqing = v; }
+    inline static bool getGuoqing()
+    { return _guoqing; }
+
     inline static void setRechargeNextRet(bool v)
     { _rechargenextret = v; }
     inline static bool getRechargeNextRet()
@@ -411,6 +416,7 @@ public:
     static bool _june1;
     static bool _july;
     static bool _qixi;
+    static bool _guoqing;
     static bool _enchant_gt11;
     static bool _rechargenextret;
     static UInt32 _rechargenextretstart;
@@ -487,6 +493,7 @@ public:
     void DivorceQixiPair(Player* pl);
     void LoadQixiScore(Player* pl, Player* lover);
     void SendQixiAward();
+    void SendGuoqingAward();
     void sendQixiScoreAward(Player* pl);
 
     void killMonsterAppend(Stream& st, UInt8 index);

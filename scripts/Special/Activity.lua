@@ -176,8 +176,10 @@ function onDungeonWin(player, id, count, free)
     Qixi(player, 0);
     if free == true then
         FallActivity(player, 1)
+        Guoqing(player, 0);
     else
         FallActivity(player, 2)
+        Guoqing(player, 3);
     end
     if getKillMonsterAct() then
         local package = player:GetPackage();
@@ -815,6 +817,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     MayDay(player, lootlvl)
     June(player, lootlvl);
     Qixi(player, lootlvl);
+    Guoqing(player, lootlvl);
     LuckyDrawBox(player, id)
     if player:getQQVipPrivilege() == true then
         player:setQQVipPrivilege(false)
@@ -847,6 +850,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
     MayDay(player, lootlvl)
     June(player, lootlvl);
     Qixi(player, lootlvl);
+    Guoqing(player, lootlvl);
     if lootlvl == 0 then
         FallActivity(player, 1)
     else
@@ -2362,6 +2366,23 @@ function Qixi(player, lootlvl)
         -- 喜鹊
         local package = player:GetPackage();
         package:AddItem(9122, 1, true, 0, 10);
+    end
+end
+
+function Guoqing(player, lootlvl)
+    if getGuoqing() then
+        if lootlvl > 3 then
+            return;
+        end
+        local itemNum = {
+            [0] = 1,
+            [1] = 1,
+            [2] = 1,
+            [3] = 2,
+        };
+        -- 月饼
+        local package = player:GetPackage();
+        package:AddItem(9179, itemNum[lootlvl], true, 0, 10);
     end
 end
 
