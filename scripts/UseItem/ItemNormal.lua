@@ -5640,14 +5640,14 @@ function ItemNormal_00009179(iid, num, bind, param)
         used = used + 1
     end
 
-    player:AddVar(used);
+    player:AddVar(191, used);
     package:DelItemSendMsg(iid, player);
     return used;
 end
 function ItemNormal_00009180(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
-    if iid != 9180 then
+    if iid ~= 9180 then
         return 0
     end
     player:setTitle(36)

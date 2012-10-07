@@ -1660,7 +1660,7 @@ struct SSelectYuebingUsedMost : public Visitor<Player>
             _player = player;
             _used = used;
         }
-        return false;
+        return true;
     }
 };
 void World::SendGuoqingAward()
@@ -1673,7 +1673,7 @@ void World::SendGuoqingAward()
     {
         {9180, 1}
     };
-    selector._player->sendMailItem(4031, 4032, items, sizeof(items));
+    selector._player->sendMailItem(4031, 4032, items, sizeof(items)/sizeof(items[0]));
 
 
 }
