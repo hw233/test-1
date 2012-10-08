@@ -771,6 +771,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
         ret = 4;
     }
 
+    GObject::Player * pl = NULL;
     if (!err.length())
     {
         if (id == 29999 && num)
@@ -778,6 +779,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
             GObject::Player * player=GObject::globalPlayers[player_Id];
             if(player != NULL)
             {
+                pl = player;
                 struct Recharge
                 {
                     UInt8 type;
@@ -815,7 +817,18 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
 
     Stream st;
     st.init(SPEP::USERRECHARGE, 0x01);
-    st<< ret << err << Stream::eos;
+    st<< ret << err;
+    if (pl)
+    {
+        st << static_cast<UInt16>(pl->GetLev()); 
+        st << static_cast<UInt16>(pl->isYD());
+        if (pl->isYD())
+            st << static_cast<UInt16>(pl->getQQVipl());
+        else
+            st << static_cast<UInt16>(0);
+    }
+    st << Stream::eos;
+
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 
     return;
@@ -837,11 +850,13 @@ void onUserReRecharge( LoginMsgHdr& hdr, const void * data )
 
     std::string err = "";
     UInt8 ret = GObject::GObjectManager::reRecharge(no, id, num, err);
+    GObject::Player * pl = NULL;
     if (!ret)
     {
         GObject::Player * player=GObject::globalPlayers[player_Id];
         if(player != NULL)
         {
+            pl = player;
             struct Recharge
             {
                 UInt8 type;
@@ -869,7 +884,17 @@ void onUserReRecharge( LoginMsgHdr& hdr, const void * data )
 
     Stream st;
     st.init(SPEP::RERECHARGE, 0x01);
-    st<< ret << err << Stream::eos;
+    st<< ret << err;
+    if (pl)
+    {
+        st << static_cast<UInt16>(pl->GetLev()); 
+        st << static_cast<UInt16>(pl->isYD());
+        if (pl->isYD())
+            st << static_cast<UInt16>(pl->getQQVipl());
+        else
+            st << static_cast<UInt16>(0);
+    }
+    st << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
     return;
 }
