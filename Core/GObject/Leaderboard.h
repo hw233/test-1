@@ -30,9 +30,41 @@ struct RankingInfoList
 {
     UInt64 id;
 	std::string name;
-    UInt32 ranking;
-    UInt64 country;
+    UInt32 country;
+    std::string clanName;
+    UInt32 roleLevel;
+    UInt32 value;
 };
+struct TownRankingInfoList
+{
+    UInt64 id;
+	std::string name;
+    UInt32 country;
+    std::string clanName;
+    UInt32 roleLevel;
+    UInt32 value; //锁妖塔层数
+    UInt64 reachTime;
+};
+struct ClanCopyRankingInfoList
+{
+	std::string name;
+    std::string leaderName;
+    UInt32 level;
+    UInt32 memberCount;
+    UInt32 country;
+    UInt32 value; //帮派副本层数 
+    UInt64 reachTime;
+};
+struct ClanBattleRankingInfoList
+{
+	std::string name;
+    std::string leaderName;
+    UInt32 level;
+    UInt32 memberCount;
+    UInt32 country;
+    UInt32 value; //帮派积分 
+};
+
 
 class Leaderboard
 {
@@ -48,7 +80,9 @@ public:
     std::vector<RankingInfoList>* getLevelList() {return &_level;};
     std::vector<RankingInfoList>* getAthleticsList() {return &_athletics;};
     std::vector<RankingInfoList>* getAchievementList() {return &_achievement;};
-    std::vector<RankingInfoList>* getClanList() {return &_clan;};
+    std::vector<TownRankingInfoList>& getTownList() {return _town;};
+    std::vector<ClanCopyRankingInfoList>& getClanCopyList() {return _clanCopyInfo;};
+    std::vector<ClanBattleRankingInfoList>& getClanBattleList() {return _clanBattleInfo;};
 
     const std::vector<LeaderboardTowndown>& getTowndown()
     {
@@ -99,7 +133,9 @@ private:
     std::vector<RankingInfoList> _level;
     std::vector<RankingInfoList> _athletics;
     std::vector<RankingInfoList> _achievement;
-    std::vector<RankingInfoList> _clan;
+    std::vector<TownRankingInfoList> _town;
+    std::vector<ClanCopyRankingInfoList> _clanCopyInfo;
+    std::vector<ClanBattleRankingInfoList> _clanBattleInfo;
 
     AtomicVal<bool> m_sorting;
 };

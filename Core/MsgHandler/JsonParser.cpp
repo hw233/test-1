@@ -270,6 +270,53 @@ int add_playeritem_req(JsonHead* head, json_t* body, json_t* retbody, std::strin
     json_insert_pair_into_object(retbody, "szRetMsg", json_new_string("success"));
     return 0;
 }
+int query_town_ranking_req(JsonHead* head, json_t* body, json_t* retbody, std::string& err)
+{
+    if (!head || !body || !retbody)
+        return EUNKNOW;
+
+    body = body->child;
+    if (!body)
+        return EUNKNOW;
+
+    UInt32 areaid = 0;
+    json_t* val = json_find_first_label(body, "uiAreaId");
+    if (val && val->child && val->child->text)
+        areaid = atoi(val->child->text);
+
+    std::vector<GObject::TownRankingInfoList>& townVec = GObject::leaderboard.getTownList();
+    UInt32 count = townVec.size();
+
+    json_insert_pair_into_object(retbody, "uiCount", my_json_new_number(count));
+    json_t* arr = json_new_array();
+    if (arr)
+    {
+        for (UInt32 i = 0; i < count; ++i)
+        {
+            GObject::TownRankingInfoList& info = townVec[i];
+            json_t* obj = json_new_object();
+            if (obj)
+            {
+                char playerId[64] = {0};
+                char time[64] = {0};
+                sprintf(playerId, "%"I64_FMT"u", info.id);
+                snprintf(time, sizeof(time), "%"I64_FMT"u", info.reachTime);
+                json_insert_pair_into_object(obj, "ullRoleId", json_new_string(playerId));
+                json_insert_pair_into_object(obj, "szRoleName", json_new_string(fixPlayerName(info.name).c_str()));
+                json_insert_pair_into_object(obj, "ucCamp", my_json_new_number(info.country));
+                json_insert_pair_into_object(obj, "szFactionName", json_new_string(fixPlayerName(info.clanName).c_str()));
+                json_insert_pair_into_object(obj, "usLevel", my_json_new_number(info.roleLevel));
+                json_insert_pair_into_object(obj, "uiLayers", my_json_new_number(info.value));
+                json_insert_pair_into_object(obj, "uiReachedTime", json_new_string(time));
+                json_insert_child(arr, obj);
+            }
+        }
+        json_insert_pair_into_object(retbody, "pSealDevilList", arr);
+    }
+    head->cmd = 64;
+    return 0;
+}
+
 
 int query_ranking_req(JsonHead* head, json_t* body, json_t* retbody, std::string& err)
 {
@@ -298,8 +345,6 @@ int query_ranking_req(JsonHead* head, json_t* body, json_t* retbody, std::string
         levelVec = GObject::leaderboard.getAthleticsList();
     else if (type == 3)
         levelVec = GObject::leaderboard.getAchievementList();
-    else if (type == 4)
-        levelVec = GObject::leaderboard.getClanList();
 
     if (NULL == levelVec)
         return EUNKNOW;
@@ -317,10 +362,12 @@ int query_ranking_req(JsonHead* head, json_t* body, json_t* retbody, std::string
             {
                 char playerId[64] = {0};
                 sprintf(playerId, "%"I64_FMT"u", info.id);
-                json_insert_pair_into_object(obj, "szOpenId", json_new_string(playerId));
+                json_insert_pair_into_object(obj, "ullRoleId", json_new_string(playerId));
                 json_insert_pair_into_object(obj, "szRoleName", json_new_string(fixPlayerName(info.name).c_str()));
-                json_insert_pair_into_object(obj, "uiRanking", my_json_new_number(info.ranking));
-                json_insert_pair_into_object(obj, "ucFaction", my_json_new_number(info.country));
+                json_insert_pair_into_object(obj, "ucCamp", my_json_new_number(info.country));
+                json_insert_pair_into_object(obj, "szFactionName", json_new_string(fixPlayerName(info.clanName).c_str()));
+                json_insert_pair_into_object(obj, "usLevel", my_json_new_number(info.roleLevel));
+                json_insert_pair_into_object(obj, "uiRankValue", my_json_new_number(info.value));
                 json_insert_child(arr, obj);
             }
         }
@@ -413,6 +460,93 @@ int query_gangcopy_complete_layer_req(JsonHead* head, json_t* body, json_t* retb
     head->cmd = 58;
     return 0;
 }
+int query_clancopy_ranking_req(JsonHead* head, json_t* body, json_t* retbody, std::string& err)
+{
+    if (!head || !body || !retbody)
+        return EUNKNOW;
+
+    body = body->child;
+    if (!body)
+        return EUNKNOW;
+
+    UInt32 areaid = 0;
+    json_t* val = json_find_first_label(body, "uiAreaId");
+    if (val && val->child && val->child->text)
+        areaid = atoi(val->child->text);
+
+    const std::vector<GObject::ClanCopyRankingInfoList>& clancopy = GObject::leaderboard.getClanCopyList();
+    UInt32 count = clancopy.size();
+    json_insert_pair_into_object(retbody, "uiCount", my_json_new_number(count));
+    json_t* arr = json_new_array();
+    if (arr)
+    {
+        for (UInt32 i = 0; i < count; ++i)
+        {
+            char time[32] = {0};
+            json_t* obj = json_new_object();
+            if (obj)
+            {
+                const GObject::ClanCopyRankingInfoList& info = clancopy[i];
+                json_insert_pair_into_object(obj, "szFactionName", json_new_string(fixPlayerName(info.name).c_str()));
+                json_insert_pair_into_object(obj, "szBangzhu", json_new_string(fixPlayerName(info.leaderName).c_str()));
+                json_insert_pair_into_object(obj, "usLevel", my_json_new_number(info.level));
+                json_insert_pair_into_object(obj, "usNum", my_json_new_number(info.memberCount));
+                json_insert_pair_into_object(obj, "ucCamp", my_json_new_number(info.country));
+                json_insert_pair_into_object(obj, "uiLayers", my_json_new_number(info.value));
+                snprintf(time, sizeof(time), "%"I64_FMT"u", info.reachTime);
+                json_insert_pair_into_object(obj, "uiReachedTime", json_new_string(time));
+                json_insert_child(arr, obj);
+            }
+        }
+        json_insert_pair_into_object(retbody, "pGangCopyList", arr);
+    }
+
+    head->cmd = 66;
+    return 0;
+}
+
+int query_clanbattle_ranking_req(JsonHead* head, json_t* body, json_t* retbody, std::string& err)
+{
+    if (!head || !body || !retbody)
+        return EUNKNOW;
+
+    body = body->child;
+    if (!body)
+        return EUNKNOW;
+
+    UInt32 areaid = 0;
+    json_t* val = json_find_first_label(body, "uiAreaId");
+    if (val && val->child && val->child->text)
+        areaid = atoi(val->child->text);
+
+    const std::vector<GObject::ClanBattleRankingInfoList>& clanbattle = GObject::leaderboard.getClanBattleList();
+    UInt32 count = clanbattle.size();
+    json_insert_pair_into_object(retbody, "uiCount", my_json_new_number(count));
+    json_t* arr = json_new_array();
+    if (arr)
+    {
+        for (UInt32 i = 0; i < count; ++i)
+        {
+            json_t* obj = json_new_object();
+            if (obj)
+            {
+                const GObject::ClanBattleRankingInfoList& info = clanbattle[i];
+                json_insert_pair_into_object(obj, "szFactionName", json_new_string(fixPlayerName(info.name).c_str()));
+                json_insert_pair_into_object(obj, "szBangzhu", json_new_string(fixPlayerName(info.leaderName).c_str()));
+                json_insert_pair_into_object(obj, "usLevel", my_json_new_number(info.level));
+                json_insert_pair_into_object(obj, "usNum", my_json_new_number(info.memberCount));
+                json_insert_pair_into_object(obj, "ucCamp", my_json_new_number(info.country));
+                json_insert_pair_into_object(obj, "uiIntegral", my_json_new_number(info.value));
+                json_insert_child(arr, obj);
+            }
+        }
+        json_insert_pair_into_object(retbody, "pGangWarList", arr);
+    }
+
+    head->cmd = 68;
+    return 0;
+}
+
 
 int query_activity_req(JsonHead* head, json_t* body, json_t* retbody, std::string& err)
 {
@@ -567,6 +701,15 @@ void jsonParser2(void * buf, int len, Stream& st)
             break;
         case 61:
             ret = query_role_pagoda_req(&head, body, retbody, err);
+            break;
+        case 63:
+            ret = query_town_ranking_req(&head, body, retbody, err);
+            break;
+        case 65:
+            ret = query_clancopy_ranking_req(&head, body, retbody, err);
+            break;
+        case 67:
+            ret = query_clanbattle_ranking_req(&head, body, retbody, err);
             break;
         default:
             break;

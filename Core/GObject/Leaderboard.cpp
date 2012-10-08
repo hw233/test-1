@@ -166,11 +166,15 @@ void Leaderboard::doUpdate()
         {
             curPlayer->patchMergedName(curPlayer->getClan()->getFounder(), blist2[c].clan);
         }
+        if (curPlayer == NULL)
+            continue;
         RankingInfoList r;
         r.id = curPlayer->getId();
         r.name = curPlayer->getName();
-        r.ranking = c+1;
         r.country = curPlayer->getCountry();
+        r.clanName = curPlayer->getClanName();
+        r.roleLevel = curPlayer->GetLev();
+        r.value = c+1;
         _level.push_back(r);
     }
 
@@ -196,9 +200,11 @@ void Leaderboard::doUpdate()
        
         RankingInfoList r;
         r.id = (*it)->ranker->getId();
-        r.name = (*it)->ranker->getName();
-        r.ranking = i+1;
         r.country = (*it)->ranker->getCountry();
+        r.name = (*it)->ranker->getName();
+        r.clanName = (*it)->ranker->getClanName();
+        r.roleLevel = (*it)->ranker->GetLev();
+        r.value = i+1;
         _athletics.push_back(r);
 	}
 	blist.resize(i);
@@ -229,8 +235,10 @@ void Leaderboard::doUpdate()
             RankingInfoList r;
             r.id = curPlayer->getId();
             r.name = curPlayer->getName();
-            r.ranking = c+1;
             r.country = curPlayer->getCountry();
+            r.clanName = curPlayer->getClanName();
+            r.roleLevel = curPlayer->GetLev();
+            r.value = c+1;
             _achievement.push_back(r);
         }
     }
@@ -249,7 +257,6 @@ void Leaderboard::doUpdate()
     UInt32 size = clanRanking.size();
     if (size > 1000) size = 100;
 	blist.resize(size);
-    _clan.clear();
     for (std::vector<Clan*>::const_iterator it = clanRanking.begin(), e = clanRanking.end(); it != e; ++i, ++it)
     {
 		//blist[i].id = (*it)->getId();
@@ -271,13 +278,6 @@ void Leaderboard::doUpdate()
 		blist[i].lvl = (*it)->getLev();
 		blist[i].value = (*it)->getCount();
 		blist[i].clan = (*it)->getName();
-
-        RankingInfoList r;
-        r.id = (*it)->getId();
-        r.name = (*it)->getName();
-        r.ranking = i+1;
-        r.country = (*it)->getCountry();
-        _clan.push_back(r);
     }
 	buildPacket(_clanStream, 3, _id, blist);
 #endif
@@ -288,6 +288,24 @@ void Leaderboard::doUpdate()
         FastMutex::ScopedLock lk(_tmutex);
         _towndown.clear();
         _towndown.insert(_towndown.end(), blist3.begin(), blist3.end());
+
+        _town.clear();
+        for (int i = 0; i < blist3.size(); ++i)
+        {
+            Player * pl = GObject::globalPlayers[blist3[i].id];
+            if (pl == NULL)
+                continue;
+            TownRankingInfoList r;
+            r.id = blist3[i].id;
+            r.name = blist3[i].name;
+            r.country = pl->getCountry();
+            r.clanName = pl->getClanName();
+            r.roleLevel = pl->GetLev();
+            r.value = blist3[i].level;
+            r.reachTime = blist3[i].time;
+
+            _town.push_back(r);
+        }
     }
 
 	std::vector<LeaderboardClanCopy> blist4;
@@ -296,6 +314,24 @@ void Leaderboard::doUpdate()
         FastMutex::ScopedLock lk(_cmutex);
         _clancopy.clear();
         _clancopy.insert(_clancopy.end(), blist4.begin(), blist4.end());
+
+         _clanCopyInfo.clear(); 
+        for (int i = 0; i < blist4.size(); ++i)
+        {
+            GObject::Clan * clan = GObject::globalClans[blist4[i].id];
+            if (clan == NULL)
+               continue;
+            ClanCopyRankingInfoList r;
+            r.name = blist4[i].name;
+            r.leaderName = clan->getLeader()->getName();
+            r.level = clan->getLev();
+            r.memberCount = clan->getCount();
+            r.country = clan->getCountry();
+            r.value = blist4[i].level;
+            r.reachTime = blist4[i].time;
+
+            _clanCopyInfo.push_back(r);
+        }
     }
 
 	std::vector<UInt64> ilist;
@@ -465,9 +501,23 @@ void Leaderboard::doUpdate()
 		"ORDER BY `clan_skill`.`level` DESC, `clan`.`proffer` DESC, COUNT(`clan_player`.`id`) DESC LIMIT 0, 100", clist);
 
 	cnt = clist.size();
+    _clanBattleInfo.clear();
 	for(size_t i = 0; i < cnt; ++ i)
 	{
 		_clanRankWorld[clist[i]] = static_cast<UInt16>(i + 1);
+
+        GObject::Clan * clan = GObject::globalClans[clist[i]];
+        if (clan == NULL)
+            continue;
+        ClanBattleRankingInfoList r;
+        r.name = clan->getName();
+        r.leaderName = clan->getLeader()->getName();
+        r.level = clan->getLev();
+        r.memberCount = clan->getCount();
+        r.country = clan->getCountry();
+        r.value = clan->GetBattleScore();
+
+        _clanBattleInfo.push_back(r);
 	}
 
 	clist.clear();
