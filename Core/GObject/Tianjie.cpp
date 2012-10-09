@@ -113,7 +113,8 @@ static const UInt32 s_tjTotalRewardId = 9132;
 static const UInt32 s_tjWeaponId[] = {1650,1651,1652,1529,1530,1531};
 static const UInt32 s_tjNameCardId[] = {9154,9155,9156,9157,9158,9159};
 static  MailPackage::MailItem s_eventItem[2]= {{30,10}, {509,1}};
-#define TJ_START_TIME_HOUR 19
+#define TJ_START_TIME_HOUR 21
+#define TJ_START_TIME_MIN  45
 #define TIME_60 60
 #define ONE_DAY_SECOND (24*3600)
 static const int s_rankKeepTime = 5*3600;
@@ -277,10 +278,11 @@ void Tianjie::OpenTj()
     else
     {
         int currHour = local->tm_hour;
-        if (currHour < TJ_START_TIME_HOUR)
-	    	m_openTime = TimeUtil::MkTime(local->tm_year+1900, local->tm_mon+1, local->tm_mday, TJ_START_TIME_HOUR+1,0,0);
+        int currMin = local->tm_min;
+        if (currHour < TJ_START_TIME_HOUR && currMin < TJ_START_TIME_MIN)
+	    	m_openTime = TimeUtil::MkTime(local->tm_year+1900, local->tm_mon+1, local->tm_mday, TJ_START_TIME_HOUR+1, TJ_START_TIME_MIN+1,0);
 	    else
-            m_openTime = t + (23-currHour)*3600 + (59-local->tm_min)*60 + (60-local->tm_sec) + TJ_START_TIME_HOUR*3600;
+            m_openTime = t + (23-currHour)*3600 + (59-local->tm_min)*60 + (60-local->tm_sec) + TJ_START_TIME_HOUR*3600 + TJ_START_TIME_MIN*60;
     }
     DB1().PushUpdateData("REPLACE INTO `tianjie`(`is_opened`,`level`,`opentime`,`rate`) VALUES(%d, %d, from_unixtime(%d), %d)",m_isTjOpened, m_currOpenedTjLevel, m_openTime, m_currTjRate);
 
@@ -873,6 +875,7 @@ void Tianjie::getRate3DailyData(Player* pl, Stream& st)
 }
 void Tianjie::process(UInt32 now)
 {
+	FastMutex::ScopedLock lk(_opMutex);
     if (m_isRankKeep && now >= m_rankKeepTime && m_rankKeepTime > 0)
     {
         printf("------------------------------------------------process passed\n");
@@ -931,6 +934,7 @@ void Tianjie::process(UInt32 now)
                     return;
 				closeTianjie();
 				m_notifyRate = 0;
+                break;
 
 	        default:
 	            break;
