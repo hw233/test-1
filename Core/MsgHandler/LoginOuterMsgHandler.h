@@ -328,6 +328,22 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 		UInt64 pid = ul._userid;
 		if(cfg.merged)
 		{
+            if (!cfg.mergeList.empty())
+            {
+                StringTokenizer st(cfg.mergeList, " ");
+                if(st.count())
+                {
+                    UInt32 i;
+                    for (i = 0; i < st.count(); ++i)
+                    {
+                        printf("atoi(st[i].c_str()):%d, getServerNo(ul._server):%lu\n", atoi(st[i].c_str()), getServerNo(ul._server));
+                        if(static_cast<UInt64>(atoi(st[i].c_str())) == getServerNo(ul._server))
+                            break;
+                    }
+                    if(i == st.count())
+                        return;
+                }
+            }
 			pid |= (getServerNo(ul._server) << 48);
 		}
 		res = doLogin(cl, pid, hdr.sessionID, player);
