@@ -506,7 +506,11 @@ void Leaderboard::doUpdate()
     _clanBattleInfo.clear();
 	for(size_t i = 0; i < cnt; ++ i)
 	{
+<<<<<<< Updated upstream
        // _clanRankWorld[clist[i]] = static_cast<UInt16>(i + 1);
+=======
+        _clanRankWorld[clist[i]] = static_cast<UInt16>(i + 1);
+>>>>>>> Stashed changes
 
         GObject::Clan * clan = clanRanking0[i];
         if (clan == NULL)

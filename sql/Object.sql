@@ -1494,6 +1494,8 @@ CREATE TABLE IF NOT EXISTS `tianjie` (
     `r4_day` int(11) DEFAULT '0' COMMENT '打BOSS的天数',                                                 
     `open_next` tinyint(4) DEFAULT '0',
     `is_wait` tinyint(4) DEFAULT '0',
+    `is_manual` tinyint(4) DEFAULT '0',
+    `is_touch` tinyint(4) DEFAULT '0',
     PRIMARY KEY (`id`),                                                                                  
     UNIQUE KEY `level_only` (`level`)                                                                    
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 CHECKSUM=1 DELAY_KEY_WRITE=1 ROW_FORMAT=DYNAMIC;

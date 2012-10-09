@@ -280,7 +280,11 @@ void Tianjie::OpenTj()
         int currHour = local->tm_hour;
         int currMin = local->tm_min;
         if (currHour < TJ_START_TIME_HOUR && currMin < TJ_START_TIME_MIN)
+<<<<<<< Updated upstream
 	    	m_openTime = TimeUtil::MkTime(local->tm_year+1900, local->tm_mon+1, local->tm_mday, TJ_START_TIME_HOUR+1, TJ_START_TIME_MIN+1,0);
+=======
+	    	m_openTime = TimeUtil::MkTime(local->tm_year+1900, local->tm_mon+1, local->tm_mday, TJ_START_TIME_HOUR+1, TJ_START_TIME_MIN,0);
+>>>>>>> Stashed changes
 	    else
             m_openTime = t + (23-currHour)*3600 + (59-local->tm_min)*60 + (60-local->tm_sec) + TJ_START_TIME_HOUR*3600 + TJ_START_TIME_MIN*60;
     }
