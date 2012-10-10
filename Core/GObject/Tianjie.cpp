@@ -113,11 +113,11 @@ static const UInt32 s_tjTotalRewardId = 9132;
 static const UInt32 s_tjWeaponId[] = {1650,1651,1652,1529,1530,1531};
 static const UInt32 s_tjNameCardId[] = {9154,9155,9156,9157,9158,9159};
 static  MailPackage::MailItem s_eventItem[2]= {{30,10}, {509,1}};
-#define TJ_START_TIME_HOUR 21
+#define TJ_START_TIME_HOUR 19 
 #define TJ_START_TIME_MIN  45
 #define TIME_60 60
 #define ONE_DAY_SECOND (24*3600)
-static const int s_rankKeepTime = 5*3600;
+static const int s_rankKeepTime = (4*3600+15*60);
 static const int TJ_EVENT_WAIT_TIME = 10*60;      //天劫事件间隔时间
 static const int TJ_EVENT_PROCESS_TIME = 15*60;   //天劫事件持续时间
 
