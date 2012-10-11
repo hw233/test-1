@@ -812,6 +812,7 @@ function LuckyDrawBox(player, id)
 end
 
 function sendWinReward(player, lootlvl, typeId)
+    return;
     local package = player:GetPackage();
     local items = {{51,30,1}, {48,35,1}, {49,20,1}, {50,15,1}};
     local i = math.random(1, 100)
