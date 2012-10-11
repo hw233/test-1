@@ -113,11 +113,11 @@ static const UInt32 s_tjTotalRewardId = 9132;
 static const UInt32 s_tjWeaponId[] = {1650,1651,1652,1529,1530,1531};
 static const UInt32 s_tjNameCardId[] = {9154,9155,9156,9157,9158,9159};
 static  MailPackage::MailItem s_eventItem[2]= {{30,10}, {509,1}};
-#define TJ_START_TIME_HOUR 21
+#define TJ_START_TIME_HOUR 19 
 #define TJ_START_TIME_MIN  45
 #define TIME_60 60
 #define ONE_DAY_SECOND (24*3600)
-static const int s_rankKeepTime = 5*3600;
+static const int s_rankKeepTime = (4*3600+15*60);
 static const int TJ_EVENT_WAIT_TIME = 10*60;      //天劫事件间隔时间
 static const int TJ_EVENT_PROCESS_TIME = 15*60;   //天劫事件持续时间
 
@@ -280,7 +280,7 @@ void Tianjie::OpenTj()
         int currHour = local->tm_hour;
         int currMin = local->tm_min;
         if (currHour < TJ_START_TIME_HOUR && currMin < TJ_START_TIME_MIN)
-	    	m_openTime = TimeUtil::MkTime(local->tm_year+1900, local->tm_mon+1, local->tm_mday, TJ_START_TIME_HOUR+1, TJ_START_TIME_MIN,0);
+	    	m_openTime = TimeUtil::MkTime(local->tm_year+1900, local->tm_mon+1, local->tm_mday, TJ_START_TIME_HOUR+1, TJ_START_TIME_MIN+1,0);
 	    else
             m_openTime = t + (23-currHour)*3600 + (59-local->tm_min)*60 + (60-local->tm_sec) + TJ_START_TIME_HOUR*3600 + TJ_START_TIME_MIN*60;
     }

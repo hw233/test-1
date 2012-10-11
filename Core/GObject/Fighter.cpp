@@ -4535,7 +4535,10 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, UInt16 itemNum, bool bind)
 
     UInt16 yanum = itemNum;
     UInt8 ret = 1;
-    do {
+    while (itemNum)
+    {
+        --itemNum;
+
         ss.curVal += exp;
         _owner->skillStrengthenLog(2, exp);
 
@@ -4557,7 +4560,7 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, UInt16 itemNum, bool bind)
 
         if (!ret)
             break;
-    } while (--itemNum);
+    }
 
     if (item->getClass() != Item_Trump)
     {
