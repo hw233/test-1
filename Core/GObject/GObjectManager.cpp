@@ -1448,6 +1448,17 @@ namespace GObject
 				newPlayers.add(id, pl);
 			}
 			globalNamedPlayers.add(pl->getName(), pl);
+/*
+            if (dbpd.titleAll.length())
+            {
+				StringTokenizer tk(dbpd.titleAll, "|");
+				size_t count = tk.count();
+                for(size_t idx = 0; idx < count; ++ idx)
+			    {
+				    PLAYER_DATA(pl, titleAll)[idx] = atoi(tk[idx].c_str());
+                }
+            }
+            */
 		}
 		lc.finalize();
 

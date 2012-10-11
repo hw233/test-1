@@ -428,6 +428,7 @@ namespace GObject
             memset(tjExp1, 0, sizeof(tjExp1));
             lastTjEventScore = 0;
             lastTjTotalScore = 0;
+            //titleAll.reserve(32);
         }
 
 
@@ -511,6 +512,7 @@ namespace GObject
         int   tjExp1[3];         //经验  
         int   lastTjEventScore;      //天劫事件积分
         int   lastTjTotalScore;      //天劫活动积分
+        //std::vector<UInt8> titleAll;      //玩家所有的称号id
     };
 
 	class Player:

@@ -1571,15 +1571,24 @@ void OnFighterDismissReq( GameMsgHdr& hdr, FighterDismissReq& fdr )
 		UInt16 rCount2 = static_cast<UInt16>(exp / 500000);
 		exp = exp % 500000;
 		UInt16 rCount3 = static_cast<UInt16>(exp / 5000);
+		
+	    UInt64 pexp = fgt->getPExp() * 0.6;
+        UInt16 rCount4 = static_cast<UInt16>(pexp / 1000000);
+        pexp = pexp % 1000000;
+		UInt16 rCount5 = static_cast<UInt16>(pexp / 10000);
+        pexp = pexp % 10000;
+		UInt16 rCount6 = static_cast<UInt16>(pexp / 100);
 		SYSMSG(title, 236);
 		SYSMSGV(content, 237, fgt->getLevel(), fgt->getColor(), fgt->getName().c_str());
-		MailPackage::MailItem mitem[3] = {{14, rCount1}, {13, rCount2}, {12, rCount3}};
-		MailItemsInfo itemsInfo(mitem, DismissFighter, 3);
+		MailPackage::MailItem mitem[6] = {{14, rCount1}, {13, rCount2}, {12, rCount3}, {31, rCount4}, {30, rCount5}, {29, rCount6}};
+		MailItemsInfo itemsInfo(mitem, DismissFighter, 6);
 		GObject::Mail * pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
 		if(pmail != NULL)
 		{
-			GObject::mailPackageManager.push(pmail->id, mitem, 3, true);
+			GObject::mailPackageManager.push(pmail->id, mitem, 6, true);
 		}
+	}
+	{
 	}
     fgt->delAllCitta();
 	delete fgt;
