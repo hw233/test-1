@@ -1973,7 +1973,7 @@ void PlayerInfoFromBs(LoginMsgHdr &hdr, const void * data)
         {
             st << player->getId();
         }
-        st << player->patchShowName(player->getName().c_str());
+        st << player->getNameNoSuffix(player->getName());
         st << player->GetLev();
         st << player->getCountry();
         st << player->GetClass();

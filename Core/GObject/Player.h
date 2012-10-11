@@ -511,6 +511,8 @@ namespace GObject
         int   tjExp1[3];         //经验  
         int   lastTjEventScore;      //天劫事件积分
         int   lastTjTotalScore;      //天劫活动积分
+
+        std::string nameNoSuffix;     //(合服)不带后缀的用户名
     };
 
 	class Player:
@@ -1276,7 +1278,10 @@ namespace GObject
         void patchDeleteDotS(std::string& name);
 		inline void patchMergedName() { patchMergedName(_id, _playerData.name); }
 		static void patchMergedName(UInt64 id, std::string& name);
+#if 0
         const char *patchShowName(const char* name, const UInt64 playerId = 0);
+#endif
+        const char* getNameNoSuffix(std::string name);
 		void autoCB(bool = true);
 
 	public:
