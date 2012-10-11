@@ -183,6 +183,14 @@ void DBWorker::InfoLog(const char* p)
     {
         DB6().GetLog()->OutInfo("[%u]Push [%s]\n", m_Worker, p);
     }
+    else if (m_Worker == WORKER_THREAD_DB7) // 
+    {
+        DB7().GetLog()->OutInfo("[%u]Push [%s]\n", m_Worker, p);
+    }
+    else if (m_Worker == WORKER_THREAD_DB8) // 
+    {
+        DB8().GetLog()->OutInfo("[%u]Push [%s]\n", m_Worker, p);
+    }
 }
 void DBWorker::PushUpdateData(const char * fmt, ...)
 {

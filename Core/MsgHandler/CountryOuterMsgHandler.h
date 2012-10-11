@@ -5116,7 +5116,6 @@ void OnSkillStrengthen( GameMsgHdr& hdr, const void* data)
         br >> skillid;
         br >> num;
 
-        bool brk = false;
         for (UInt16 i = 0; i < num; ++i)
         {
             UInt32 itemid = 0;
@@ -5126,16 +5125,7 @@ void OnSkillStrengthen( GameMsgHdr& hdr, const void* data)
             br >> itemnum;
             br >> bind;
 
-            for (UInt16 j = 0; j < itemnum; ++j)
-            {
-                if (!fgt->SSUpgrade(skillid, itemid, bind))
-                {
-                    brk = true;
-                    break;
-                }
-            }
-
-            if (brk)
+            if (!fgt->SSUpgrade(skillid, itemid, itemnum, bind))
                 break;
         }
     }
