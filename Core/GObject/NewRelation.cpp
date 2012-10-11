@@ -147,7 +147,7 @@ static void msgTips(UInt16 index, Player *player, Player *defer = NULL)
         return;
     if(index == 4011)
     {
-        SYSMSG_SENDV(index, player, player->getCountry(), player->patchShowName(player->getName().c_str()));
+        SYSMSG_SENDV(index, player, player->getCountry(), player->getNameNoSuffix(player->getName()));
 
         printf("[test][%s:%d], %d:%d\n", __func__, __LINE__, player->getThreadId(), defer->getThreadId());
         if(defer)
