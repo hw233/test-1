@@ -4669,6 +4669,25 @@ namespace GObject
 	{
 		if(t == _playerData.title)
 			return;
+        /*
+        std::vector<UInt8>& titleAll = _playerData.titleAll;
+        bool flag = false;
+        std::vector<UInt8>::iterator it = find(titleAll.begin(), titleAll.end(), t);
+        if(it == titleAll.end()){
+            titleAll.push_back(t);
+            flag = true;
+        }
+        int cnt = titleAll.size();
+        if(flag){
+            std::string title = "";
+            for(int i = 0; i < cnt; ++i)
+            {
+                title += Itoa(titleAll[i]);
+                title += '|';
+            }
+            DB1().PushUpdateData("UPDATE `player` SET `titleAll` = '%s' WHERE `id` = %"I64_FMT"u", title, getId());
+        }
+        */
 		_playerData.title = t;
 		sendModification(6, _playerData.title);
 		rebuildBattleName();
