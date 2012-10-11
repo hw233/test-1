@@ -736,7 +736,7 @@ function initActTime(y, m, d)
   --充值返礼(9/22-9/23)
   local  SerStartTm508= { ['year'] = 2012, ['month'] = 9, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --变身法宝(9/21-9/24)
-  local  SerStartTm509= { ['year'] = 2012, ['month'] = 9, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm509= { ['year'] = 2012, ['month'] = 10, ['day'] = 10, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --商城限购(9/26-9/27)
   local  SerStartTm510= { ['year'] = 2012, ['month'] = 9, ['day'] = 26, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm511= { ['year'] = 2012, ['month'] = 9, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -944,7 +944,7 @@ function initActTime(y, m, d)
   actTime508_1 = os.time(SerStartTm508) + 2 * 86400;
 
   actTime509 = os.time(SerStartTm509);
-  actTime509_1 = os.time(SerStartTm509) + 3 * 86400;
+  actTime509_1 = os.time(SerStartTm509) + 2 * 86400;
 
   actTime510 = os.time(SerStartTm510);
   actTime510_1 = os.time(SerStartTm510) + 2 * 86400;
