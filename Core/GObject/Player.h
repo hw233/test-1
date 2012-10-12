@@ -428,6 +428,8 @@ namespace GObject
             memset(tjExp1, 0, sizeof(tjExp1));
             lastTjEventScore = 0;
             lastTjTotalScore = 0;
+            isHHBlue = false;
+            //titleAll.reserve(32);
         }
 
 
@@ -511,6 +513,10 @@ namespace GObject
         int   tjExp1[3];         //经验  
         int   lastTjEventScore;      //天劫事件积分
         int   lastTjTotalScore;      //天劫活动积分
+
+        bool isHHBlue;
+        std::string nameNoSuffix;     //(合服)不带后缀的用户名
+        //std::vector<UInt8> titleAll;      //玩家所有的称号id
     };
 
 	class Player:
@@ -735,16 +741,30 @@ namespace GObject
                 _playerData.qqvipl = 26;
             else if (lvl > 38 && lvl < 40)
                 _playerData.qqvipl = 38;
-            else if (lvl > 47)
+            else if (lvl > 47 && lvl < 50)
                 _playerData.qqvipl = 47;
+            else if (lvl > 57 && lvl < 60)
+                _playerData.qqvipl = 57;
+
+            if (_playerData.qqvipl >= 50 && _playerData.qqvipl < 60)
+            {
+                _playerData.qqvipl -= 40;
+                _playerData.isHHBlue = true; // XXX: 豪华蓝钻
+            }
         }
         inline void setQQVipl1(UInt8 lvl)
         {
             _playerData.qqvipl1 = lvl;
             if (lvl > 7 && lvl < 10)
                 _playerData.qqvipl1 = 7;
-            else if (lvl >= 20 && lvl < 40)
+            else if (lvl >= 20 && lvl < 30)
                  _playerData.qqvipl1 = 16;
+            else if (lvl >= 50 && lvl < 60)
+            {
+                 _playerData.qqvipl1 -= 40;
+                 if (_playerData.qqvipl >= 30 && _playerData.qqvipl < 40)
+                     _playerData.isHHBlue = true;
+            }
         }
         inline UInt8 getQQVipl() { return _playerData.qqvipl; }
         inline UInt8 getQQVipl1() { return _playerData.qqvipl1; }
@@ -755,9 +775,19 @@ namespace GObject
             if (_playerData.qqvipl >= 1 && _playerData.qqvipl <= 9)
                 return (2<<4)|_playerData.qqvipl;
             if (_playerData.qqvipl >= 10 && _playerData.qqvipl <= 19)
-                return (1<<4)|(_playerData.qqvipl-10);
+            {
+                if (_playerData.isHHBlue)
+                    return (5<<4)|(_playerData.qqvipl-10);
+                else
+                    return (1<<4)|(_playerData.qqvipl-10);
+            }
             if (_playerData.qqvipl == 20)
-                return (1<<4)|(_playerData.qqvipl1-10);
+            {
+                if (_playerData.isHHBlue)
+                    return (5<<4)|(_playerData.qqvipl-10);
+                else
+                    return (1<<4)|(_playerData.qqvipl1-10);
+            }
             if (_playerData.qqvipl >= 20 && _playerData.qqvipl <= 29)
                 return (3<<4)|(_playerData.qqvipl-20);
             if (_playerData.qqvipl >= 30 && _playerData.qqvipl <= 39)
@@ -771,6 +801,7 @@ namespace GObject
         //      20-29 3366等级,另qqvipl1 为蓝钻等级
         //      30-39 Q+等级,另qqvipl1为会员等级(现归属QQ会员)
         //      40-49 QQ会员等级
+        //      50-60 豪华蓝钻(需要转换成蓝钻)
         inline bool isYD() const
         {
             //return (_playerData.qqvipl >= 1 && _playerData.qqvipl <= 9) || (_playerData.qqvipl >= 30 && _playerData.qqvipl <= 39);
@@ -1276,7 +1307,10 @@ namespace GObject
         void patchDeleteDotS(std::string& name);
 		inline void patchMergedName() { patchMergedName(_id, _playerData.name); }
 		static void patchMergedName(UInt64 id, std::string& name);
+#if 0
         const char *patchShowName(const char* name, const UInt64 playerId = 0);
+#endif
+        const char* getNameNoSuffix(std::string name);
 		void autoCB(bool = true);
 
 	public:
@@ -1707,6 +1741,7 @@ namespace GObject
         void BirthdayAward(UInt16 itemId, UInt16 num);
         void getAwardBirthday(UInt8 opt);
         void CheckCanAwardBirthday();
+        void getAwardLogin(UInt8 opt);
         void IDIPAddItem(UInt16 itemId, UInt16 num, bool bind = true);
         void lastQueqiaoAwardPush(UInt16 itemId, UInt16 num);
         void checkLastQueqiaoAward();

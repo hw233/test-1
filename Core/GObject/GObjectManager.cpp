@@ -910,10 +910,10 @@ namespace GObject
 	{
 		p->Load();
 		gBlockbossmgr.addPlayerRank(p, p->getBlockBossLevel(), p->GetLev());
-        if (!GVAR.GetVar(GVAR_CITTASMERGE))
-            mergeCittaPages(p);
-        if (!GVAR.GetVar(GVAR_1530BUCHANG))
-            buchang1530(p);
+        //if (!GVAR.GetVar(GVAR_CITTASMERGE))
+        //    mergeCittaPages(p);
+        //if (!GVAR.GetVar(GVAR_1530BUCHANG))
+        //    buchang1530(p);
 		return true;
 	}
 
@@ -1448,6 +1448,17 @@ namespace GObject
 				newPlayers.add(id, pl);
 			}
 			globalNamedPlayers.add(pl->getName(), pl);
+/*
+            if (dbpd.titleAll.length())
+            {
+				StringTokenizer tk(dbpd.titleAll, "|");
+				size_t count = tk.count();
+                for(size_t idx = 0; idx < count; ++ idx)
+			    {
+				    PLAYER_DATA(pl, titleAll)[idx] = atoi(tk[idx].c_str());
+                }
+            }
+            */
 		}
 		lc.finalize();
 
@@ -2225,8 +2236,8 @@ namespace GObject
 		/////////////////////////////////
 
 		globalPlayers.enumerate(player_load, 0);
-        GVAR.SetVar(GVAR_CITTASMERGE, 1);
-        GVAR.SetVar(GVAR_1530BUCHANG, 1);
+        //GVAR.SetVar(GVAR_CITTASMERGE, 1);
+        //GVAR.SetVar(GVAR_1530BUCHANG, 1);
 
 		return true;
 	}

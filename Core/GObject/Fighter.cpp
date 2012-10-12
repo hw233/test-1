@@ -4474,9 +4474,9 @@ void Fighter::SSOpen(UInt16 id)
     }
 }
 
-UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, bool bind)
+UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, UInt16 itemNum, bool bind)
 {
-    if (!_owner)
+    if (!_owner || !itemNum)
         return 0;
 
     UInt32 sid = SKILL_ID(id);
@@ -4493,6 +4493,7 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, bool bind)
         _owner->sendMsgCode(0, 1021);
         return 0;
     }
+
     if (GetItemSubClass(itemId) != Item_Citta)
         return 0;
 
@@ -4516,8 +4517,15 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, bool bind)
 
     Package* pkg = _owner->GetPackage();
 
+    UInt16 num = pkg->GetItemNum(itemId, bind);
+    if (num < itemNum)
+        return 0;
+
     ItemBase* item = pkg->FindItem(itemId, bind);
     if (!item)
+        return 0;
+
+    if (item->getClass() == Item_Trump && itemNum > 1)
         return 0;
 
     const GData::ItemBaseType& ibt = item->GetItemType();
@@ -4525,35 +4533,44 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, bool bind)
     if (!exp)
         return 0;
 
+    UInt16 yanum = itemNum;
+    UInt8 ret = 1;
+    while (itemNum)
+    {
+        --itemNum;
+
+        ss.curVal += exp;
+        _owner->skillStrengthenLog(2, exp);
+
+        while (ss.curVal >= ss.maxVal)
+        {
+            ss.curVal -= ss.maxVal;
+            ++ss.lvl;
+
+            ss.maxVal = GData::GDataManager::getMaxStrengthenVal(sid, ss.lvl);
+            if (ss.lvl >= ss.maxLvl)
+            {
+                ss.curVal = 0;
+                if (ss.lvl == 9) // XXX: max level
+                    ss.maxVal = 0;
+                ret = 0;
+                break;
+            }
+        }
+
+        if (!ret)
+            break;
+    }
+
     if (item->getClass() != Item_Trump)
     {
-        if(!pkg->DelItem2(item, 1, ToSkillStrengthenOpen))
+        if(!pkg->DelItem2(item, yanum-itemNum, ToSkillStrengthenOpen))
             return 0;
     }
     else
     {
         if(!pkg->DelEquip(itemId, ToSkillStrengthenOpen))
             return 0;
-    }
-
-    ss.curVal += exp;
-    _owner->skillStrengthenLog(2, exp);
-
-    UInt8 ret = 1;
-    while (ss.curVal >= ss.maxVal)
-    {
-        ss.curVal -= ss.maxVal;
-        ++ss.lvl;
-
-        ss.maxVal = GData::GDataManager::getMaxStrengthenVal(sid, ss.lvl);
-        if (ss.lvl >= ss.maxLvl)
-        {
-            ss.curVal = 0;
-            if (ss.lvl == 9) // XXX: max level
-                ss.maxVal = 0;
-            ret = 0;
-            break;
-        }
     }
 
     SSUpdate2DB(id, ss);

@@ -4669,6 +4669,25 @@ namespace GObject
 	{
 		if(t == _playerData.title)
 			return;
+        /*
+        std::vector<UInt8>& titleAll = _playerData.titleAll;
+        bool flag = false;
+        std::vector<UInt8>::iterator it = find(titleAll.begin(), titleAll.end(), t);
+        if(it == titleAll.end()){
+            titleAll.push_back(t);
+            flag = true;
+        }
+        int cnt = titleAll.size();
+        if(flag){
+            std::string title = "";
+            for(int i = 0; i < cnt; ++i)
+            {
+                title += Itoa(titleAll[i]);
+                title += '|';
+            }
+            DB1().PushUpdateData("UPDATE `player` SET `titleAll` = '%s' WHERE `id` = %"I64_FMT"u", title, getId());
+        }
+        */
 		_playerData.title = t;
 		sendModification(6, _playerData.title);
 		rebuildBattleName();
@@ -7831,7 +7850,7 @@ namespace GObject
 			while(sid > 0);
 		}
 	}
-
+#if 0
     static char nameStr[2048];
     const char* Player::patchShowName(const char* name, const UInt64 playerId)
     {
@@ -7869,6 +7888,24 @@ namespace GObject
             return reinterpret_cast<const char*>(nameStr);
         }
         return name;
+    }
+#endif
+    const char* Player::getNameNoSuffix(std::string name)
+    {
+        if(!cfg.merged || name.size() == 0)
+        {
+            _playerData.nameNoSuffix = name;
+            return _playerData.nameNoSuffix.c_str();
+        }
+        Int32 len = name.size() - 1;
+        for (; len > 0; --len)
+        {
+            if (static_cast<UInt8>(name[len]) >= 32)
+                break;
+        }
+        name.resize(len+1);
+        _playerData.nameNoSuffix = name;
+        return _playerData.nameNoSuffix.c_str();
     }
 
 	void Player::sendYDVIPMails( UInt8 l, UInt8 h )
@@ -9826,6 +9863,9 @@ namespace GObject
         case 10:
             getAwardBirthday(opt);
             break;
+        case 11:
+            getAwardLogin(opt);
+            break;
         }
     }
 
@@ -10028,6 +10068,50 @@ namespace GObject
             st << static_cast<UInt8>(10) << static_cast<UInt8>(0);
             st << static_cast<UInt8>(flag ? (2 - num) : (1 - num)) << flag << Stream::eos;
             send(st);
+        }
+    }
+    
+    void Player::getAwardLogin(UInt8 opt)
+    {
+        if(opt == 1) //领奖
+        {
+            if(1 != GetVar(VAR_AWARD_LOGIN))
+                return;
+            //10.14登录抽奖合作与生日罗盘许愿星(周年庆活动)相同的抽奖
+			std::vector<GData::LootResult>::iterator it;
+			for(it = _BirthdayAward.begin(); it != _BirthdayAward.end(); ++ it)
+			{
+				m_Package->ItemNotify(it->id, it->count);
+                //m_Package->AddItem(it->id, it->count, true, true, 31);
+			}
+			_BirthdayAward.clear();
+            SetVar(VAR_AWARD_LOGIN, 2);
+        }
+        else if(opt == 0) //抽奖
+        {
+            if(GetVar(VAR_AWARD_LOGIN))
+                return;
+            UInt8 idx = 0;
+            if( 0 == (idx = GameAction()->RunBirthdayAward(this)) )
+                return;
+            Stream st(REP::GETAWARD);
+            st << static_cast<UInt8>(11) << idx << Stream::eos;
+            send(st);
+            SetVar(VAR_AWARD_LOGIN, 1);
+        }
+        else if(opt == 2) //告诉客户端可以抽奖
+        {
+            if(GetVar(VAR_AWARD_LOGIN))
+                return;
+            UInt32 day = 1;
+            UInt32 mon = 1;
+            UInt32 year = 2012;
+            TimeUtil::GetDMY(&day, &mon, &year);
+            if(year == 2012 && mon == 10 && day == 14){
+                Stream st(REP::GETAWARD);
+                st << static_cast<UInt8>(11) << static_cast<UInt8>(0) << Stream::eos;
+                send(st);
+            }
         }
     }
 

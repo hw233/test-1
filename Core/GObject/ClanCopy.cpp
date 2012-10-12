@@ -1151,7 +1151,7 @@ void ClanCopy::addWinReward(UInt32 awardValue)
 {
     // 发送胜利奖励
     _clan->addStatueExp(awardValue);
-    Table rewards = GameAction()->GetClanCopyRewards(_copyLevel + 1);
+    Table rewards = GameAction()->GetClanCopyRewards(_copyLevel);
     UInt32 types = rewards.size();
     MailPackage::MailItem *mitem = new MailPackage::MailItem [types];
 
@@ -1163,17 +1163,40 @@ void ClanCopy::addWinReward(UInt32 awardValue)
         mitem[i - 1].count = item.get<UInt32>(2);
     }
 
+    Stream st (REP::CLAN_COPY);
+    st << static_cast<UInt8>(0x02);
+    st << static_cast<UInt8>(0x06);
+    st << static_cast<UInt32>(awardValue);
+    st << static_cast<UInt32>(GData::clanCopyTable[_copyLevel + 1].expOutput);
+    st << Stream::eos;
+
     for (std::map<Player *, UInt8>::iterator playerIt = _playerIndex.begin();
             playerIt != _playerIndex.end(); ++ playerIt)
     {
         // 副本战斗玩家
-        playerIt->first->sendMailItem(800, 801, mitem, types, true);
+        if (playerIt->first->GetVar(VAR_MAX_CLAN_COPY_LEVEL) < _copyLevel)
+        {
+            playerIt->first->sendMailItem(800, 801, mitem, types, true);
+            playerIt->first->SetVar(VAR_MAX_CLAN_COPY_LEVEL, _copyLevel);
+        }
+        else
+        {
+            playerIt->first->send(st);
+        }
     }
     for (std::vector<Player* >::iterator playerIt = _waitForWinPlayer.begin();
             playerIt != _waitForWinPlayer.end(); ++ playerIt)
     {
         // 战死后离开的玩家
-        (*playerIt)->sendMailItem(800, 801, mitem, types, true);
+        if ((*playerIt)->GetVar(VAR_MAX_CLAN_COPY_LEVEL) < _copyLevel)
+        {
+            (*playerIt)->sendMailItem(800, 801, mitem, types, true);
+            (*playerIt)->SetVar(VAR_MAX_CLAN_COPY_LEVEL, _copyLevel);
+        }
+        else
+        {
+            (*playerIt)->send(st);
+        }
     }
     notifyCopyWin(awardValue, types, mitem);
     delete[] mitem;

@@ -14,7 +14,7 @@ SecondSoul::SecondSoul(Fighter* fgt, UInt8 cls, UInt8 practiceLevel, UInt32 stat
     : m_fgt(fgt), m_cls(cls), m_practiceLevel(practiceLevel), m_stateExp(stateExp), m_stateLevel(stateLevel), m_xinxiu(xinxiu),
         m_strength(0), m_agility(0), m_physique(0), m_intelligence(0), m_will(0),
         m_xinxiu_attack(0), m_xinxiu_action(0), m_xinxiu_defend(0), m_xinxiu_hp(0), m_skill_num1(0), m_skill_num2(0),
-        m_dirty(false)
+        m_dirty(true)
 {
 }
 
@@ -40,10 +40,11 @@ void SecondSoul::addAttr(GData::AttrExtra& ae)
         m_xinxiu_action = Script::BattleFormula::getCurrent()->calcSoulXinxiuAction(this);
         m_xinxiu_defend = Script::BattleFormula::getCurrent()->calcSoulXinxiuDefend(this);
         m_xinxiu_hp = Script::BattleFormula::getCurrent()->calcSoulXinxiuHp(this);
+        m_dirty = false;
     }
 
     //ae.hpP += hpFactor;
-    ae.strength += m_strength * (1 + strenghtFactor + attrTransFactor) ;
+    ae.strength += m_strength * (1 + strenghtFactor + attrTransFactor);
     ae.agility += m_agility * (1 + agilityFactor + attrTransFactor);
     ae.physique += m_physique * (1 + physiqueFactor + attrTransFactor);
     ae.intelligence += m_intelligence * (1 + intelligenceFactor + attrTransFactor);
@@ -212,6 +213,7 @@ UInt32 SecondSoul::setSoulSkill(UInt8 idx, SoulSkill ss, bool writeDB)
     case SOUL_SKILL_WILL:
     //case SOUL_SKILL_ALLATTR:
     case SOUL_SKILL_HPFACTOR:
+        setDirty(true);
         m_fgt->setDirty(true);
         break;
     default:

@@ -82,20 +82,20 @@ function Task_00000080(npcId)
 		action.m_ActionID = 80
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = task_msg_001768;
+		action.m_ActionMsg = task_msg_002167;
 	elseif task:GetTaskSubmitNpc(80) == npcId then
 		if Task_Submit_00000080() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 80
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = task_msg_001769;
+			action.m_ActionMsg = task_msg_002168;
 		elseif task:HasAcceptedTask(80) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 80
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = task_msg_001770;
+			action.m_ActionMsg = task_msg_002169;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000080_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = task_msg_001771;
-	action.m_ActionMsg = task_msg_001772;
+	action.m_NpcMsg = task_msg_002170;
+	action.m_ActionMsg = task_msg_002171;
 	return action;
 end
 
@@ -119,8 +119,8 @@ function Task_00000080_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = task_msg_001773;
-	action.m_ActionMsg = task_msg_001774;
+	action.m_NpcMsg = task_msg_002172;
+	action.m_ActionMsg = task_msg_002173;
 	return action;
 end
 
@@ -129,7 +129,7 @@ function Task_00000080_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = task_msg_001775;
+	action.m_NpcMsg = task_msg_002174;
 	action.m_ActionMsg = "";
 	return action;
 end
@@ -173,7 +173,7 @@ function Task_00000080_submit(itemId, itemNum)
 	end
 
 
-	player:AddExp(20000);
+	player:AddExp(260000);
 	return true;
 end
 

@@ -676,6 +676,9 @@ namespace SPEQ
     const UInt16 CLEARDISCOUNT       = 0x123; // 清空限时活动
     const UInt16 REALAWARDINFO       = 0x124; //
     const UInt16 ADDREALAWARD        = 0x125; //
+
+    const UInt16 ADDCLANAWARD        = 0x128; // 发放物品给帮派仓库
+    const UInt16 MANUALOPENTJ        = 0x129; // 手动开启天劫
 }
 
 namespace SPEP
@@ -715,6 +718,8 @@ namespace SPEP
 
     const UInt16 REALAWARDINFO       = 0x24; //
     const UInt16 ADDREALAWARD        = 0x25; //
+    const UInt16 ADDCLANAWARD        = 0x28; // 发放物品给帮派仓库
+    const UInt16 MANUALOPENTJ        = 0x29; //手动开启天劫 
 }
 
 namespace ARENAREQ

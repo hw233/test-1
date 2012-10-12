@@ -49,6 +49,8 @@ MSG_REG_2(LoginMsgHdr,SPEQ::CLEARDISCOUNT,ClearDiscountFromBs);
 
 MSG_REG_2(LoginMsgHdr,SPEQ::REALAWARDINFO, QueryRealAwardInfo);
 MSG_REG_2(LoginMsgHdr,SPEQ::ADDREALAWARD, AddRealAward);
+MSG_REG_2(LoginMsgHdr,SPEQ::ADDCLANAWARD, AddClanAward);
+MSG_REG_2(LoginMsgHdr,SPEQ::MANUALOPENTJ, ManualOpenTj);
 
 MSG_REG_2(LoginMsgHdr, 0x300, OnCheckPackKey);
 
