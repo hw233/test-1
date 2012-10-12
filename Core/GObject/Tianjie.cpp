@@ -14,6 +14,7 @@ namespace GObject
 {
 extern URandom GRND;
 #define START_WITH_59 0 
+#define TEST_TIANJIE  0 
 //事件2捐赠的ID
 enum ENUM_ID_TJ2
 {
@@ -122,9 +123,9 @@ static const int s_rankKeepTime = (4*3600+15*60);
 static const int TJ_EVENT_WAIT_TIME = 10*60;      //天劫事件间隔时间
 static const int TJ_EVENT_PROCESS_TIME = 15*60;   //天劫事件持续时间
 
-//static const int s_rankKeepTime = 4*60;
-//static const int TJ_EVENT_WAIT_TIME  = 2*60;      //天劫事件间隔时间
-//static const int TJ_EVENT_PROCESS_TIME = 3*60;   //天劫事件持续时间
+//static const int s_rankKeepTime = 20*60;
+//static const int TJ_EVENT_WAIT_TIME  = 10*60;      //天劫事件间隔时间
+//static const int TJ_EVENT_PROCESS_TIME = 15*60;   //天劫事件持续时间
 
 Tianjie::Tianjie()
 {
@@ -187,6 +188,8 @@ int  Tianjie::manualOpenTj(int level)
 {
     if ((level % 10 != 9) || level < 59 || level > 109)
         return 1;
+    if (m_manualTjLevel > 0)
+        return 4;
  	std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 	if (execu.get() == NULL || !execu->isConnected()) return 2;
 
@@ -221,11 +224,13 @@ int  Tianjie::manualOpenTj(int level)
     //满足手动开启天劫条件
     if (m_manualTjLevel > 0)
 	{
-        m_autoTjLevel = m_currOpenedTjLevel;
-        m_currOpenedTjLevel = m_manualTjLevel;
+        //m_autoTjLevel = m_currOpenedTjLevel;
+        //m_currOpenedTjLevel = m_manualTjLevel;
         DB1().PushUpdateData("INSERT INTO `tianjie`(`level`,`is_manual`) VALUES(%d,%d)", m_manualTjLevel, 1);
         if (m_isManualOpening)
         {
+            m_autoTjLevel = m_currOpenedTjLevel;
+            m_currOpenedTjLevel = m_manualTjLevel;
             //如果手动开启天劫,刚好是处于上个天劫保留排行榜的事件点
             //则清空所有用户贡献
             m_rankKeepTime = 0;
@@ -333,6 +338,7 @@ void Tianjie::OpenTj()
         }
     }
 
+    clearPlayerTaskScore();
     m_eventSortMap.clear();
     m_scoreSortMap.clear();
 
@@ -340,7 +346,7 @@ void Tianjie::OpenTj()
 	time_t t = time(NULL);
 	local = localtime(&t);
 
-    if (START_WITH_59)
+    if (START_WITH_59 || TEST_TIANJIE)
         m_openTime = TimeUtil::Now()+ TJ_EVENT_WAIT_TIME;
     else
     {
@@ -1218,7 +1224,7 @@ void Tianjie::goNext()
 		m_isTjExecute = 0;
 		m_isFinish = 0;
         m_notifyRate = 0;
-        if (START_WITH_59)
+        if (START_WITH_59 || TEST_TIANJIE)
             m_openTime = TimeUtil::Now() + TJ_EVENT_WAIT_TIME;
         else
             m_openTime += ONE_DAY_SECOND;
