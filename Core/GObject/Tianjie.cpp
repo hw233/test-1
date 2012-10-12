@@ -271,7 +271,7 @@ bool Tianjie::isOpenTj(Player* pl)
         
         notifyTianjieStatus();
     }
-    if (m_isTjOpened && playerLevel == m_currOpenedTjLevel+10)
+    if (m_isTjOpened && playerLevel == m_currOpenedTjLevel+10 && !m_isManualOpening)
     {
         //达到了下个天劫等级
         if ((UInt8)(m_tjTypeId + 1) < sizeof(s_tjRoleLevel)/sizeof(s_tjRoleLevel[0]))
