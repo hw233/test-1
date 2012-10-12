@@ -192,7 +192,7 @@ int  Tianjie::manualOpenTj(int level)
 
 	GData::DBTianjie dbexp;
     if(execu->Prepare("SELECT `id`, `is_opened`,`is_execute`,`is_finish`,`is_ok`,`level`,`rate`,UNIX_TIMESTAMP(opentime),`r1_killed`,`r2_donated`,`r3_copyid`,`r4_day`,`open_next`, `is_wait`,`is_manual`,`is_touch` FROM `tianjie` order by level desc", dbexp) != DB::DB_OK)
-		return 2;
+		return 99;
 
     int maxLevel = 0;
 	while (execu->Next() == DB::DB_OK)
@@ -200,12 +200,12 @@ int  Tianjie::manualOpenTj(int level)
         if (maxLevel < dbexp.level)
             maxLevel = dbexp.level;
         if (maxLevel < level)    //玩家等级过低,不能手动启动天劫
-            return 3;
+            return 2;
         if (dbexp.level == level) //已经触发了
         {
             m_isManualOpening = false;
             m_manualTjLevel = 0;
-            return 4;
+            return 3;
         }
         if (dbexp.is_opened == 1)
         {
