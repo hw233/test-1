@@ -21,7 +21,7 @@ public:
 
 public:
 	UInt8 TID() const { return m_Worker; }
-    void Push(const char* msg, size_t len);
+    void Push(const char* msg, size_t len, const char logType = LT_NORMAL);
 
 protected:
 	bool Init();
@@ -32,11 +32,17 @@ protected:
 	std::string GetLogName();
 
 private:
+    struct LogMsg
+    {
+
+        const char * logString;
+        char logType;
+    };
 	FastMutex m_Mutex;
 	UInt8 m_Type;
 	UInt8 m_Worker;
     AtomicVal<UInt32> m_Limit;
-	std::vector<const char *> m_DCLog;
+	std::vector<LogMsg> m_DCLog;
     CLogger* m_logger;
     bool m_inited;
 };
