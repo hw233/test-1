@@ -185,6 +185,7 @@ function onDungeonWin(player, id, count, free)
         local package = player:GetPackage();
         package:Add(9163, 1, true)
     end
+    sendWinReward(player, free);
 end
 
 function onClanBattleAttend(player)
@@ -806,6 +807,20 @@ function LuckyDrawBox(player, id)
     package:Add(item, 1, true)
 end
 
+function sendWinReward(player, lootlvl)
+    local items = {{51,30,1}, {48,35,1}, {49,20,1}, {50,15,1}};
+    local i = math.random(1, 100)
+    local v = 0;
+    for n = 1, #items do
+        v = v + items[n][2]
+        if i <= v then
+            local package = player:GetPackage();
+            package:Add(items[n][1], items[n][3], true);
+            break
+        end
+    end
+end
+
 function onCopyWin(player, id, floor, spot, lootlvl)
     SingleDayReward(player, lootlvl);
     Christmas(player, lootlvl, 0);
@@ -833,6 +848,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
         local package = player:GetPackage();
         package:Add(9163, 1, true)
     end
+    sendWinReward(player, lootlvl);
 end
 
 
@@ -860,6 +876,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
         local package = player:GetPackage();
         package:Add(9163, 1, true)
     end
+    sendWinReward(player, lootlvl);
 end
 
 local vippack = {
