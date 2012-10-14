@@ -812,9 +812,9 @@ function LuckyDrawBox(player, id)
 end
 
 function sendWinReward(player, lootlvl, typeId)
-    return;
+    --return;
     local package = player:GetPackage();
-    local items = {{51,30,1}, {48,35,1}, {49,20,1}, {50,15,1}};
+    --[[local items = {{51,30,1}, {48,35,1}, {49,20,1}, {50,15,1}};
     local i = math.random(1, 100)
     local v = 0;
     for n = 1, #items do
@@ -823,7 +823,7 @@ function sendWinReward(player, lootlvl, typeId)
             package:Add(items[n][1], items[n][3], true);
             break
         end
-    end
+    end]]
     local actItems = {493, 494, 495};
     local startTm = { ['year'] = 2012, ['month'] = 10, ['day'] = 15, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local endTm = { ['year'] = 2012, ['month'] = 10, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };

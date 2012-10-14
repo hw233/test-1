@@ -10082,7 +10082,7 @@ namespace GObject
 			for(it = _BirthdayAward.begin(); it != _BirthdayAward.end(); ++ it)
 			{
 				m_Package->ItemNotify(it->id, it->count);
-                m_Package->AddItem(it->id, it->count, true, true, 31);
+                //m_Package->AddItem(it->id, it->count, true, true, 31);
 			}
 			_BirthdayAward.clear();
             SetVar(VAR_AWARD_LOGIN, 2);
