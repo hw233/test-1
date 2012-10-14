@@ -228,6 +228,7 @@ namespace GObject
         VAR_ZYCM_TIPS = 187, //随机数1～3，为TIPS
 
         VAR_QGAME_GIFT = 188, //Qgame大厅礼包
+        VAR_AWARD_LOGIN = 189, //2012.10.14登录抽奖合作
         VAR_AWARD_BIRTHDAY     = 190, //周年庆活动(生日罗盘许愿星)
         
         VAR_THIEF_CAMP     = 191, //贼兵营地(新手任务中使用)
@@ -303,6 +304,7 @@ namespace GObject
             REGISTER_VAR(VAR_AWARD_SSDT_2, CYCLE_NONE);
             REGISTER_VAR(VAR_AWARD_NEWREGISTER, CYCLE_NONE);
             REGISTER_VAR(VAR_AWARD_BIRTHDAY, CYCLE_DAY);
+            REGISTER_VAR(VAR_AWARD_LOGIN, CYCLE_NONE);
 
             REGISTER_VAR(VAR_YUEBING_USED, CYCLE_NONE);
 

@@ -1741,6 +1741,7 @@ namespace GObject
         void BirthdayAward(UInt16 itemId, UInt16 num);
         void getAwardBirthday(UInt8 opt);
         void CheckCanAwardBirthday();
+        void getAwardLogin(UInt8 opt);
         void IDIPAddItem(UInt16 itemId, UInt16 num, bool bind = true);
         void lastQueqiaoAwardPush(UInt16 itemId, UInt16 num);
         void checkLastQueqiaoAward();

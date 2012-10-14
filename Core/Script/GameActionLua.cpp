@@ -1227,7 +1227,7 @@ namespace Script
     UInt8 GameActionLua::RunNewRegisterAward(Player* player)
     {
 		assert(player != NULL);
-		return Call<UInt16>("RunNewRegisterAward", player);
+		return Call<UInt8>("RunNewRegisterAward", player);
     }
 
     UInt8 GameActionLua::RunNewRegisterAwardAD_RF(Player* player, UInt8 idx)
@@ -1239,7 +1239,7 @@ namespace Script
     UInt8 GameActionLua::RunBirthdayAward(Player* player)
     {
 		assert(player != NULL);
-		return Call<UInt16>("RunBirthdayAward", player);
+		return Call<UInt8>("RunBirthdayAward", player);
     }
 
     void GameActionLua::sendRNR(Player* player, UInt32 now, UInt32 date, UInt32 total)

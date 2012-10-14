@@ -82,20 +82,20 @@ function Task_00000065(npcId)
 		action.m_ActionID = 65
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = task_msg_001715;
+		action.m_ActionMsg = task_msg_002077;
 	elseif task:GetTaskSubmitNpc(65) == npcId then
 		if Task_Submit_00000065() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 65
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = task_msg_001716;
+			action.m_ActionMsg = task_msg_002078;
 		elseif task:HasAcceptedTask(65) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 65
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = task_msg_001717;
+			action.m_ActionMsg = task_msg_002079;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000065_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = task_msg_001718;
-	action.m_ActionMsg = task_msg_001719;
+	action.m_NpcMsg = task_msg_002080;
+	action.m_ActionMsg = task_msg_002081;
 	return action;
 end
 
@@ -119,8 +119,8 @@ function Task_00000065_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = task_msg_001720;
-	action.m_ActionMsg = task_msg_001721;
+	action.m_NpcMsg = task_msg_002082;
+	action.m_ActionMsg = task_msg_002083;
 	return action;
 end
 
@@ -129,7 +129,7 @@ function Task_00000065_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = task_msg_001722;
+	action.m_NpcMsg = task_msg_002084;
 	action.m_ActionMsg = "";
 	return action;
 end
@@ -186,7 +186,7 @@ function Task_00000065_submit(itemId, itemNum)
 
 	package:DelItem(807,1,1);
 
-	player:AddExp(20000);
+	player:AddExp(80000);
 	return true;
 end
 
