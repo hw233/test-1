@@ -236,6 +236,8 @@ namespace GObject
         
         VAR_YUEBING_USED = 193, //中秋国庆使用月饼数量
         VAR_MAX_CLAN_COPY_LEVEL = 194, // 本周已通关的最大层数
+
+        VAR_TOWN_REWARD = 195, //镇妖封神 修仙夺宝 10-15--10-18
         VAR_MAX,
     };
 
@@ -452,6 +454,7 @@ namespace GObject
             REGISTER_VAR(VAR_ZYCM_TIPS, CYCLE_NONE);
             REGISTER_VAR(VAR_QGAME_GIFT, CYCLE_DAY);
             REGISTER_VAR(VAR_MAX_CLAN_COPY_LEVEL, CYCLE_WEEK);
+            REGISTER_VAR(VAR_TOWN_REWARD, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

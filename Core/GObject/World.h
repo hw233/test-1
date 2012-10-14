@@ -352,6 +352,11 @@ public:
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
     static void commitArenaForceOnce();
 
+    inline static void setTownReward_10_15(bool v)
+    { _townReward_10_15 = v; }
+    inline static bool getTownReward_10_15()
+    { return _townReward_10_15; }
+
 public:
 	inline static UInt8 getWeekDay()
 	{ return _wday; }
@@ -438,6 +443,7 @@ public:
     static UInt32 _rechargeend;
     static UInt32 _consumebegin;
     static UInt32 _consumeend;
+    static bool  _townReward_10_15;
 
 public:
     static RCSortType rechargeSort;
