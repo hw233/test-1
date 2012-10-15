@@ -78,7 +78,7 @@ bool Country::Init()
 	m_BattleFormula = new Script::BattleFormula(path.c_str());
 	if(TID() == WORKER_THREAD_NEUTRAL)
 	{
-		UInt32 now = TimeUtil::Now(), sweek = TimeUtil::SharpWeek(1) - 10;
+		UInt32 now = TimeUtil::Now(), sweek = TimeUtil::SharpWeek(1);
 		bossManager.getNextBoss();
 		bossManager.process(now);
         ClanRankBattleMgr::Instance().Init();
