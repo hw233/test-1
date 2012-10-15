@@ -416,6 +416,7 @@ struct DBFighter2
     Int32 counter;
     Int32 tough;
     Int32 action;
+    UInt8 hideFashion;
 };
 
 
@@ -1440,7 +1441,7 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBFighter2)
-SPECIALDEF(53)
+SPECIALDEF(54)
 	(
 	UInt32, id,
 	UInt64, playerId,
@@ -1494,7 +1495,8 @@ SPECIALDEF(53)
     Int32, evade,
     Int32, counter,
     Int32, tough,
-    Int32, action
+    Int32, action,
+    UInt8, hideFashion
 	)
 SPECIALEND()
 
