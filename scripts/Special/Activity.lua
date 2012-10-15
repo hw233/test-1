@@ -185,7 +185,11 @@ function onDungeonWin(player, id, count, free)
         local package = player:GetPackage();
         package:Add(9163, 1, true)
     end
-    sendWinReward(player, free);
+    local lootlvl = 1;
+    if  free then
+        lootlvl = 0
+    end
+    sendWinReward(player, lootlvl, 3);
 end
 
 function onClanBattleAttend(player)
@@ -807,16 +811,31 @@ function LuckyDrawBox(player, id)
     package:Add(item, 1, true)
 end
 
-function sendWinReward(player, lootlvl)
+function sendWinReward(player, lootlvl, typeId)
+    local package = player:GetPackage();
     local items = {{51,30,1}, {48,35,1}, {49,20,1}, {50,15,1}};
     local i = math.random(1, 100)
     local v = 0;
     for n = 1, #items do
         v = v + items[n][2]
         if i <= v then
-            local package = player:GetPackage();
             package:Add(items[n][1], items[n][3], true);
             break
+        end
+    end
+    local actItems = {493, 494, 495};
+    local startTm = { ['year'] = 2012, ['month'] = 10, ['day'] = 15, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local endTm = { ['year'] = 2012, ['month'] = 10, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local s = os.time(startTm);
+    local e = os.time(endTm);
+    local n = os.time();
+    if n >= s and n < e then
+        if lootlvl==0 then
+            package:Add(492, 1, true);
+        elseif lootlvl==1 and typeId==3 then
+            package:Add(495, 1, true);
+        else
+            package:Add(actItems[lootlvl], 1, true);
         end
     end
 end
@@ -848,7 +867,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
         local package = player:GetPackage();
         package:Add(9163, 1, true)
     end
-    sendWinReward(player, lootlvl);
+    sendWinReward(player, lootlvl, 1);
 end
 
 
@@ -876,7 +895,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
         local package = player:GetPackage();
         package:Add(9163, 1, true)
     end
-    sendWinReward(player, lootlvl);
+    sendWinReward(player, lootlvl, 2);
 end
 
 local vippack = {

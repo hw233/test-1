@@ -463,6 +463,9 @@ bool TownDeamon::attackNpc(Player* pl, UInt16 level)
 	GameMsgHdr hdr(0x1FD, WORKER_THREAD_WORLD, pl, sizeof(bool));
 	GLOBAL().PushMsg(hdr, &res);
 
+    //镇妖封神 修仙夺宝 10-15--10-18
+    if (res)
+        getTownReward_10_15(pl, level);
     return res;
 }
 
@@ -758,6 +761,7 @@ void TownDeamon::autoCompleteQuiteCheck(Player* pl, UInt16 levels)
         st << Stream::eos;
         pl->send(st);
     }
+    getTownReward_10_15(pl, levels);
 }
 
 void TownDeamon::autoCompleteQuite(Player* pl, UInt16 curLevel, UInt16 levels)
@@ -987,6 +991,41 @@ void TownDeamon::sendTjItemInfo(Player* pl)
     }
     st << Stream::eos;
     pl->send(st);
+}
+void TownDeamon::getTownReward_10_15(Player* pl, UInt16 level)
+{
+    if (!World::getTownReward_10_15() || level < 50)
+        return;
+    static const int s_50rewardItem[][2] = {{33,10}, {8000,10},{503,10}};
+    static const int s_60rewardItem[][2] = {{33,20}, {9076,5}};
+
+    UInt32 var = pl->GetVar(VAR_TOWN_REWARD);
+    UInt32 newVar = var;
+    if (level >= 50 && var < 1)
+    {
+        MailPackage::MailItem item[3];
+        for (int i = 0; i < 3; ++i)
+        {
+            item[i].id = s_50rewardItem[i][0];
+            item[i].count = s_50rewardItem[i][1];
+        }
+        pl->sendMailItem(4040, 4041, item, 3, true);
+        newVar = 1;
+    }
+    if (level >= 60 && var < 2)
+    {
+        MailPackage::MailItem item[2];
+        for (int i = 0; i < 2; ++i)
+        {
+            item[i].id = s_60rewardItem[i][0];
+            item[i].count = s_60rewardItem[i][1];
+        }
+        pl->sendMailItem(4040, 4041, item, 2, true);
+        newVar = 2;
+    }
+    if (newVar != var)
+        pl->SetVar(VAR_TOWN_REWARD, newVar);
+
 }
 
 }

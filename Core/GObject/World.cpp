@@ -145,6 +145,7 @@ UInt32 World::_rechargebegin = 0;
 UInt32 World::_rechargeend = 0;
 UInt32 World::_consumebegin = 0;
 UInt32 World::_consumeend = 0;
+bool   World::_townReward_10_15 = false;
 /** 0：侠骨；1：柔情；2财富；3传奇 **/
 RCSortType World::killMonsterSort[4];
 

@@ -284,6 +284,12 @@ function onActivityCheck(tm)
       setGuoqing(false)
   end
 
+  if tm >= actTime207 and tm < actTime207_1 then
+      setTownReward_10_15(true)
+  else
+      setTownReward_10_15(false)
+  end
+
   if tm >= actTime210 and tm < actTime211 then
       setConsume918(true)
   else
@@ -771,6 +777,9 @@ function initActTime(y, m, d)
   -- 中秋国庆
   local  SerStartTm205= { ['year'] = 2012, ['month'] = 10, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm206= { ['year'] = 2012, ['month'] = 10, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --镇妖封神 修仙夺宝
+  local  SerStartTm207= { ['year'] = 2012, ['month'] = 10, ['day'] = 15, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm207_1= { ['year'] = 2012, ['month'] = 10, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
@@ -1002,6 +1011,9 @@ function initActTime(y, m, d)
 
   actTime205= os.time(SerStartTm205);
   actTime206= os.time(SerStartTm206);
+
+  actTime207= os.time(SerStartTm207);
+  actTime207_1= os.time(SerStartTm207_1);
 
   actTime210= os.time(SerStartTm210);
   actTime211= os.time(SerStartTm210) + 7 * 86400;
