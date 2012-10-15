@@ -2996,7 +2996,6 @@ void GMHandler::OnTj4(GObject::Player* player, std::vector<std::string>& args)
     GObject::Tianjie::instance().setTj4BossHp(bossMaxHp);
 }
 
-<<<<<<< HEAD
 inline bool enterSingleHeroStage(GObject::Player* p, UInt32 cnt)
 {
     GObject::shStageMgr.enter(p, p->getMainFighter());
@@ -3071,7 +3070,7 @@ void GMHandler::OnNewPlayerAuto(GObject::Player* player, std::vector<std::string
         pl->addNewFormation(FORMATION_1);
         pl->addNewFormation(FORMATION_2);
 
-        UInt32 fgtId = playerID%9 + 1;
+        UInt32 fgtId = playerID%6 + 1;
         PLAYER_DATA(pl, newGuild) = 0;
 
         GObject::Fighter * fgt2 = GObject::globalFighters[fgtId];
@@ -3129,6 +3128,3 @@ void GMHandler::OnNewPlayerAutoSuper(GObject::Player* player, std::vector<std::s
     }
 }
 
-
-=======
->>>>>>> master

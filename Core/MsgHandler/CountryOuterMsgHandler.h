@@ -57,6 +57,7 @@
 #include "GObject/CFriend.h"
 #include "GObject/TownDeamon.h"
 #include "GObject/Arena.h"
+#include "GObject/SingleHeroStage.h"
 
 #include "GObject/Tianjie.h"
 
@@ -1152,6 +1153,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 
     {
         GObject::arena.sendActive(pl);
+        GObject::shStageMgr.sendActive(pl);
     }
 
     {

@@ -29,6 +29,7 @@
 #include "Common/Itoa.h"
 #include <set>
 #include "GObject/SingleHeroStage.h"
+#include "GObject/SHSYTmpl.h"
 
 void OnPushTimerEvent( GameMsgHdr& hdr, const void * data )
 {
@@ -475,6 +476,7 @@ void OnReloadLuaReq( GameMsgHdr& hdr, const void * data )
 		GLOBAL().PushMsg(hdr3, &flag);
 	}
     WORLD().getWorldScript()->forceCommitArena();
+    GObject::shsyTmpl.load();
 }
 
 void OnSpecialAward( GameMsgHdr& hdr, const void * data )
@@ -540,6 +542,16 @@ void OnDoInstantPracticeAccReq( GameMsgHdr& hdr, const void* data)
     player->practiceUdpLog();
 }
 
+bool enum_send_sh_active(void * ptr, void * data )
+{
+    GObject::Player* player = static_cast<GObject::Player*>(ptr);
+    if(player == NULL)
+        return true;
+
+    GObject::shStageMgr.sendActive(player);
+    return true;
+}
+
 void OnLevelChange( GameMsgHdr& hdr, const void* data)
 {
 	MSG_QUERY_PLAYER(player);
@@ -588,6 +600,8 @@ void OnLevelChange( GameMsgHdr& hdr, const void* data)
             GObject::shStageMgr.incActive(1);
         else if(lvc->oldLv > 69 && lvc->newLv < 70)
             GObject::shStageMgr.incActive(-1);
+        if(GObject::shStageMgr.getActive())
+            GObject::globalPlayers.enumerate(enum_send_sh_active, static_cast<void *>(NULL));
     }
 }
 

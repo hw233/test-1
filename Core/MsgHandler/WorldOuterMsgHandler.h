@@ -2299,6 +2299,33 @@ void OnSingleHeroReq( GameMsgHdr& hdr, const void* data)
             }
         }
         break;
+    case 0x03:
+        {
+            UInt8 trump_cnt = 0;
+            UInt8 citta_cnt = 0;
+            std::vector<UInt16> trumps;
+            std::vector<UInt16> cittas;
+
+            br >> trump_cnt;
+            if(trump_cnt)
+            {
+                trumps.resize(trump_cnt);
+                br.read((UInt8*)(&trumps[0]), sizeof(UInt16)*trump_cnt);
+            }
+            br >> citta_cnt;
+            if(citta_cnt)
+            {
+                cittas.resize(citta_cnt);
+                br.read((UInt8*)(&cittas[0]), sizeof(UInt16)*citta_cnt);
+            }
+            GObject::shStageMgr.saveStrategyFighter(player, trumps, cittas);
+        }
+        break;
+    case 0x04:
+        {
+            GObject::shStageMgr.showStrategyFighter(player);
+        }
+        break;
     }
 
 }

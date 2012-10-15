@@ -501,8 +501,9 @@ public:
 public:
     inline void setExtraAttack(Int32 atk) { setDirty(true); _wbextatk = atk; }
 	inline void setExtraMagAttack(Int32 atk) { setDirty(true); _wbextmagatk = atk; }
-    inline void setAttrExtraEquip(const GData::AttrExtra& other){_attrExtraEquip += other;}
+    inline void setAttrExtraEquip(const GData::AttrExtra& other){ _attrExtraEquip += other; }
     inline void resetAttrExtraEquip(){setDirty(true); _attrExtraEquip.reset();}
+    inline void resetAttrExtraEquip2(){setDirty(false); _attrExtraEquip.reset();}
 
 public:
 	inline Int16 getBaseStrength()
@@ -751,10 +752,17 @@ private:
 
 public:
     // 仅仅用于内存拷贝出来的Fighter, 切勿她用
-    void setUpPasskl(const std::string& skls);
-    void setUpRPasskl(const std::string& skls);
     void setUpSS(std::string& skillstrengthen);
-    void setPl(UInt16 pl) { peerless = pl; }
+    inline void setSoulMax(Int32 v) { _soulMax = v; }
+    inline void setSoulExtraAura(Int32 v) { _soulExtraAura = v; }
+    inline void setSoulAuraLeft(Int32 v) { _soulAuraLeft = v; }
+    inline void setUpCittasMax() { _cittaslot = CITTA_UPMAX; }
+    bool upCittaWithOutCheck( UInt16 citta, int idx );
+    UInt16 getTrumpSkill(int i) { if(i >= TRUMP_UPMAX) return 0; else return _trumpSkill[i]; }
+    Int32 _soulMax;
+    UInt8 _soulExtraAura;
+    UInt8 _soulAuraLeft;
+    UInt16 _trumpSkill[TRUMP_UPMAX];
 
     // 内丹系统
 public:

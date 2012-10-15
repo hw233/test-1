@@ -46,6 +46,7 @@
 #include "Tianjie.h"
 #include "TownDeamon.h"
 #include "SingleHeroStage.h"
+#include "SHSYTmpl.h"
 
 namespace GObject
 {
@@ -994,6 +995,9 @@ bool World::Init()
 	_worldScript = new Script::WorldScript(path.c_str());
 	path = cfg.scriptPath + "formula/main.lua";
 	_battleFormula = new Script::BattleFormula(path.c_str());
+    path = cfg.scriptPath + "shsytmpl.lua";
+    shsyTmpl.setFilename(path.c_str());
+    shsyTmpl.load();
 
 	calWeekDay(this);
     UInt32 day = 1;

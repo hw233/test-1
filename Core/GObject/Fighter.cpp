@@ -72,11 +72,15 @@ Fighter::Fighter(UInt32 id, Player * owner):
     //_cittas.resize(32); // 默认为32个
 	memset(_armor, 0, 5 * sizeof(ItemEquip *));
 	memset(_trump, 0, sizeof(_trump));
+	memset(_trumpSkill, 0, sizeof(_trumpSkill));
 	memset(_buffData, 0, FIGHTER_BUFF_COUNT * sizeof(UInt32));
     m_2ndSoul = NULL;
     _iswboss = false;
     _wbextatk = 0;
     _wbextmagatk = 0;
+    _soulMax = 0;
+    _soulExtraAura = 0;
+    _soulAuraLeft = 0;
 }
 
 /*
@@ -1680,6 +1684,18 @@ Fighter * Fighter::cloneWithOutDirty(Player * player)
         fgt->m_2ndSoul = new SecondSoul(*m_2ndSoul);
 
 	memset(fgt->_armor, 0, 5 * sizeof(ItemEquip *));
+    for(int i = 0; i < TRUMP_UPMAX; ++ i)
+    {
+        ItemEquip* trump = _trump[i];
+        if(!trump)
+            continue;
+        const GData::AttrExtra* attr = trump->getAttrExtra();
+        if(attr->skills.size() > 0)
+        {
+            if(attr->skills[0])
+                fgt->_trumpSkill[i] = attr->skills[0]->getId();
+        }
+    }
     memset(fgt->_trump, 0, TRUMP_UPMAX * sizeof(ItemEquip*));
 	return fgt;
 }
@@ -2745,6 +2761,77 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool lvlup, bool onl
 
     return ret;
 }
+bool Fighter::upCittaWithOutCheck( UInt16 citta, int idx )
+{
+    if (!citta)
+        return false;
+    const GData::CittaBase* cb = GData::cittaManager[citta];
+    if (!cb)
+        return false;
+
+    // XXX: 只能装备3个主动技能
+    if (cb->effect && cb->effect->skill.size() && getUpSkillsNum() >= 3)
+        return false;
+
+    int op = 0;
+    bool ret = false;
+    int src = isCittaUp(citta);
+    if (src < 0)
+    {
+        if (cb->needsoul > getMaxSoul() - getSoul())
+            return false;
+
+        idx = getUpCittasNum();
+        if (!(idx >= 0 && idx < getUpCittasMax())) // dst
+            return false;
+
+        if (_citta[idx])
+            offCitta(_citta[idx], false, true, false);
+
+        _citta[idx] = citta;
+        ret = true;
+        op = 1;
+    }
+    else
+    {
+        idx = src;
+        if (_citta[idx] != citta) // upgrade
+        {
+            const GData::CittaBase* yacb = GData::cittaManager[_citta[idx]];
+            if (!yacb)
+                return false;
+            if (cb->needsoul > getMaxSoul() - (getSoul() - yacb->needsoul))
+                return false;
+
+            // XXX: do not send message to client
+            offCitta(_citta[idx], false, false, false); // delete skills was taken out by old citta first
+            _citta[idx] = citta;
+            ret = true;
+            op = 3;
+        }
+    }
+
+    if (ret)
+    {
+        _attrDirty = true;
+        _bPDirty = true;
+    }
+
+    if (ret)
+    {
+        bool up = true;//_owner?(_owner->getMainFighter()?_owner->getMainFighter()->getLevel()>=10:true):false;
+        /*
+        if (!writedb)
+            up = false;
+            */
+        addSkillsFromCT(skillFromCitta(citta), false, up, false);
+
+        soul += cb->needsoul;
+    }
+
+    return ret;
+}
+
 bool Fighter::lvlUpCitta(UInt16 citta, bool writedb)
 {
     const GData::CittaBase* cb = GData::cittaManager[citta];
@@ -3497,6 +3584,9 @@ void GlobalFighters::buildSummonSet()
 
 Int16 Fighter::getMaxSoul()
 {
+    if(_soulMax)
+        return _soulMax;
+
     if(_owner == NULL)
         return soulMax + _elixirattr.soul;
     else
@@ -3849,6 +3939,8 @@ void Fighter::setSecondSoul(SecondSoul* secondSoul)
 
 UInt8 Fighter::getSoulExtraAura()
 {
+    if(_soulExtraAura)
+        return _soulExtraAura;
     if(!m_2ndSoul)
         return 0;
 
@@ -3857,6 +3949,8 @@ UInt8 Fighter::getSoulExtraAura()
 
 UInt8 Fighter::getSoulAuraLeft()
 {
+    if(_soulAuraLeft)
+        return _soulAuraLeft;
     if(!m_2ndSoul)
         return 0;
 
@@ -4650,41 +4744,6 @@ void Fighter::SSFromDB(UInt16 id, SStrengthen& ss)
         return;
     // XXX: DO Delete
     m_ss[id] = ss;
-}
-
-void Fighter::setUpPasskl(const std::string& skls)
-{
-    StringTokenizer pass(skls, "|");
-    //for (size_t i = 0; i < GData::SKILL_PASSIVES-GData::SKILL_PASSSTART; ++i)
-    for (size_t i = 0; i < pass.count(); ++i)
-    {
-        if (pass[i].length())
-        {
-            StringTokenizer skills(pass[i], ",");
-            _passkl[i].resize(skills.count());
-            for (UInt8 j = 0; j < _passkl[i].size(); ++j)
-            {
-                _passkl[i][j] = atoi(skills[j].c_str());
-            }
-        }
-    }
-}
-
-void Fighter::setUpRPasskl(const std::string& skls)
-{
-    StringTokenizer pass(skls, "|");
-    for (size_t i = 0; i < pass.count(); ++i)
-    {
-        if (pass[i].length())
-        {
-            StringTokenizer skills(pass[i], ",");
-            _rpasskl[i].resize(skills.count());
-            for (UInt8 j = 0; j < _rpasskl[i].size(); ++j)
-            {
-                _rpasskl[i][j] = atoi(skills[j].c_str());
-            }
-        }
-    }
 }
 
 void Fighter::setUpSS(std::string& skillstrengthen)
