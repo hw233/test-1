@@ -357,6 +357,11 @@ public:
     inline static bool getTownReward_10_15()
     { return _townReward_10_15; }
 
+    inline static void setLoginAward(bool v)
+    { _loginAward = v; }
+    inline static bool getLoginAward()
+    { return _loginAward; }
+
 public:
 	inline static UInt8 getWeekDay()
 	{ return _wday; }
@@ -444,6 +449,7 @@ public:
     static UInt32 _consumebegin;
     static UInt32 _consumeend;
     static bool  _townReward_10_15;
+    static bool _loginAward;
 
 public:
     static RCSortType rechargeSort;

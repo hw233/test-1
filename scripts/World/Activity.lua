@@ -296,6 +296,12 @@ function onActivityCheck(tm)
       setConsume918(false)
   end
 
+  if tm >= actTime212 and tm < actTime213 then
+      setLoginAward(true)
+  else
+      setLoginAward(false)
+  end
+
 
   if tm >= actTime59 and tm < actTime60 then
       is_6_22 = true
@@ -781,6 +787,9 @@ function initActTime(y, m, d)
   local  SerStartTm207= { ['year'] = 2012, ['month'] = 10, ['day'] = 15, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm207_1= { ['year'] = 2012, ['month'] = 10, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
+  -- 2012.10.14登录抽奖合作
+  local  SerStartTm211 = { ['year'] = 2012, ['month'] = 10, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
 
@@ -1018,6 +1027,8 @@ function initActTime(y, m, d)
   actTime210= os.time(SerStartTm210);
   actTime211= os.time(SerStartTm210) + 7 * 86400;
 
+  actTime212= os.time(SerStartTm211);
+  actTime213= os.time(SerStartTm211) + 3 * 86400;
 
   onActivityCheck(os.time() + 30);
 
