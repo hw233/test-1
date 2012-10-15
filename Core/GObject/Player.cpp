@@ -4672,8 +4672,8 @@ namespace GObject
 		_playerData.title = t;
 		sendModification(6, _playerData.title);
 		rebuildBattleName();
-        std::vector<UInt8>& titleAll = _playerData.titleAll;
 /*
+        std::vector<UInt8>& titleAll = _playerData.titleAll;
         bool flag = false;
         std::vector<UInt8>::iterator it = find(titleAll.begin(), titleAll.end(), t);
         if(it == titleAll.end()){
