@@ -4669,7 +4669,10 @@ namespace GObject
 	{
 		if(t == _playerData.title)
 			return;
-        /*
+		_playerData.title = t;
+		sendModification(6, _playerData.title);
+		rebuildBattleName();
+/*
         std::vector<UInt8>& titleAll = _playerData.titleAll;
         bool flag = false;
         std::vector<UInt8>::iterator it = find(titleAll.begin(), titleAll.end(), t);
@@ -4677,20 +4680,31 @@ namespace GObject
             titleAll.push_back(t);
             flag = true;
         }
-        int cnt = titleAll.size();
+        UInt8 cnt = titleAll.size();
         if(flag){
             std::string title = "";
-            for(int i = 0; i < cnt; ++i)
+            if(!cnt)
+                title += "0|";
+            for(UInt8 i = 0; i < cnt; ++i)
             {
                 title += Itoa(titleAll[i]);
                 title += '|';
             }
-            DB1().PushUpdateData("UPDATE `player` SET `titleAll` = '%s' WHERE `id` = %"I64_FMT"u", title, getId());
+            printf("############################:%s\n",title.c_str());
+            DB1().PushUpdateData("UPDATE `player` SET `titleAll` = '%s' WHERE `id` = %"I64_FMT"u", title.c_str(), getId());
         }
+	    Stream st(REP::USER_INFO_CHANGE);
+        st << static_cast<UInt8>(0x17) << cnt;
+        printf("**************************begin\n");
+        for(UInt8 i = 0; i < cnt; ++i)
+        {
+            st << titleAll[i];
+            printf("++++++++++++:%u\n",titleAll[i]);
+        }
+        printf("**************************end\n");
+        st << Stream::eos;
+        send(st);
         */
-		_playerData.title = t;
-		sendModification(6, _playerData.title);
-		rebuildBattleName();
 	}
 
 	UInt32 Player::getAchievement( UInt32 a )
@@ -10082,7 +10096,6 @@ namespace GObject
 			for(it = _BirthdayAward.begin(); it != _BirthdayAward.end(); ++ it)
 			{
 				m_Package->ItemNotify(it->id, it->count);
-                //m_Package->AddItem(it->id, it->count, true, true, 31);
 			}
 			_BirthdayAward.clear();
             SetVar(VAR_AWARD_LOGIN, 2);
@@ -10103,11 +10116,8 @@ namespace GObject
         {
             if(GetVar(VAR_AWARD_LOGIN))
                 return;
-            UInt32 day = 1;
-            UInt32 mon = 1;
-            UInt32 year = 2012;
-            TimeUtil::GetDMY(&day, &mon, &year);
-            if(year == 2012 && mon == 10 && day == 14){
+            if(World::getLoginAward())
+            {
                 Stream st(REP::GETAWARD);
                 st << static_cast<UInt8>(11) << static_cast<UInt8>(0) << Stream::eos;
                 send(st);

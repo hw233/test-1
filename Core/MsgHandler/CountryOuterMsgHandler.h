@@ -1589,8 +1589,6 @@ void OnFighterDismissReq( GameMsgHdr& hdr, FighterDismissReq& fdr )
 			GObject::mailPackageManager.push(pmail->id, mitem, 6, true);
 		}
 	}
-	{
-	}
     fgt->delAllCitta();
 	delete fgt;
 	rep._fgtid = fdr._fgtid;

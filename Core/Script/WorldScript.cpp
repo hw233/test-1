@@ -201,6 +201,8 @@ void WorldScript::init()
 	class_add<GData::TitleList>("TitleList");
 	class_def<GData::TitleList>("set", &GData::TitleList::set);
 
+    def("setLoginAward", GObject::World::setLoginAward);
+    def("getLoginAward", GObject::World::getLoginAward);
     //def("setInterval", GObject::ClanCopy::setInterval);
     //def("setStartTick", GObject::ClanCopy::setStartTick);
 }
