@@ -6753,21 +6753,10 @@ namespace GObject
 
         if (World::getRechargeActive())
         {
-#if 0
-            UInt32 total = GetVar(VAR_RECHARGE_TOTAL);
-            UInt8 maxlevel = 0;
-            UInt8 oldVipLevel = calcRechargeLevel(total, maxlevel);
-            total += r;
-            UInt8 vipLevel = calcRechargeLevel(total, maxlevel);
-            sendRechargeMails(oldVipLevel + 1, vipLevel, maxlevel);
-            SetVar(VAR_RECHARGE_TOTAL, total);
-            sendRechargeInfo();
-#else
             UInt32 total = GetVar(VAR_RECHARGE_TOTAL);
             GameAction()->sendRechargeMails(this, total, total+r);
             SetVar(VAR_RECHARGE_TOTAL, total+r);
             sendRechargeInfo(true);
-#endif
         }
 
         if (World::getRechargeActive3366() && atoi(m_domain.c_str()) == 11)
@@ -10926,6 +10915,7 @@ namespace GObject
     {
         if (!pos || pos > 7)
             return;
+#if 0
         MailPackage::MailItem item[7][3] =
         {
             {{9076,30},{509,30},{9177,10},},
@@ -10955,6 +10945,9 @@ namespace GObject
             mailPackageManager.push(mail->id, mitem, size, true);
             DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, _title, _content, strItems.c_str(), mail->recvTime);
         }
+#else
+        GameAction()->sendRechargeRankAward(this, pos);
+#endif
     }
 
     void Player::sendConsumeRankAward(int pos)

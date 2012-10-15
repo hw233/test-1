@@ -1250,6 +1250,10 @@ namespace Script
     {
 		return Call<void>("sendRechargeMails", player, ototal, ntotal);
     }
+    void GameActionLua::sendRechargeRankAward(Player* player, Int32 pos)
+    {
+		return Call<void>("sendRechargeRankAward", player, pos);
+    }
 
     void GameActionLua::doAtySignIn(Player* pl, UInt32 id, UInt32 month, UInt32 day)
     {

@@ -303,7 +303,10 @@ bool enum_midnight(void * ptr, void* next)
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 7, 9) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 7, 17) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 7, 25) ||
-            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 5)))
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 5) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 17) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 18)
+            ))
     {
         if (pl->isOnline())
         {
@@ -692,16 +695,13 @@ void SendRechargeRankAward()
             Player* player = i->player;
             if (!player)
                 continue;
-            if (player->isOnline())
-            {
-                GameMsgHdr hdr(0x257, player->getThreadId(), player, sizeof(pos));
-                GLOBAL().PushMsg(hdr, &pos);
-            }
-            else
-            {
-                player->sendRechargeRankAward(pos);
-            }
+
+            GameMsgHdr hdr(0x257, player->getThreadId(), player, sizeof(pos));
+            GLOBAL().PushMsg(hdr, &pos);
+
+            SYSMSG_BROADCASTV(4033, pos, player->getCountry(), player->getPName(), i->total);
         }
+        World::rechargeSort.clear();
     }
 }
 
@@ -729,6 +729,8 @@ void SendConsumeRankAward()
                 player->sendConsumeRankAward(pos);
             }
         }
+        //SYSMSG_BROADCASTV(2142, player->getCountry(), player->getPName(), titles[pos]);
+        World::consumeSort.clear();
     }
 }
 
@@ -800,8 +802,13 @@ void World::World_Midnight_Check( World * world )
     bRechargeEnd = bRecharge && !(getRechargeActive()||getRechargeActive3366());
     bConsumeEnd = bConsume && !getConsumeActive();
     bool bMonsterActEnd = bMonsterAct && !getKillMonsterAct();
-
     UInt32 nextday = curtime + 30;
+
+    if (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 17) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 18) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 19))
+        bRechargeEnd = true;
+
 	globalPlayers.enumerate(enum_midnight, static_cast<void *>(&nextday));
     leaderboard.newDrawingGame(nextday);
     //给筷子使用称号
