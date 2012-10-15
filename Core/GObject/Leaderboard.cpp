@@ -500,13 +500,15 @@ void Leaderboard::doUpdate()
 		"AND `clan`.`leader` = `player`.`id` GROUP BY `clan_player`.`id`"
 		"ORDER BY `clan_skill`.`level` DESC, `clan`.`proffer` DESC, COUNT(`clan_player`.`id`) DESC LIMIT 0, 100", clist);
 
-	cnt = clist.size();
+    const std::vector<Clan*>& clanRanking0 = ClanRankBattleMgr::Instance().getClanRanking();
+    cnt = clanRanking0.size() ;
+    if (cnt > 100) cnt = 100;
     _clanBattleInfo.clear();
 	for(size_t i = 0; i < cnt; ++ i)
 	{
-		_clanRankWorld[clist[i]] = static_cast<UInt16>(i + 1);
+        _clanRankWorld[clist[i]] = static_cast<UInt16>(i + 1);
 
-        GObject::Clan * clan = GObject::globalClans[clist[i]];
+        GObject::Clan * clan = clanRanking0[i];
         if (clan == NULL)
             continue;
         ClanBattleRankingInfoList r;
