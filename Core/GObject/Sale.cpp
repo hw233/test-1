@@ -318,6 +318,7 @@ void Sale::sellSaleResp(UInt32 id, Player *buyer, UInt32 itemId, UInt16 itemNum)
 			_owner->getGold(saleSellRespData->price, &ii);
             _owner->tradeUdpLog(1081, 0, saleSellRespData->price);
             _owner->tradeUdpLog(1081, itemId, itemNum);
+            _owner->tradeUdpLog(1081, itemId, saleSellRespData->price, true); 
 			SYSMSGV(content, 314, saleSellRespData->itemName, buyer->getNameNoSuffix(buyer->getName()), saleSellRespData->price);
             MailItemsInfo itemsInfo(NULL, SaleSell, 0);
 			_owner->GetMailBox()->newMail(_owner, 0x07, title, content, 0, true, &itemsInfo);

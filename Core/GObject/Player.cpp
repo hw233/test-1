@@ -1208,13 +1208,16 @@ namespace GObject
         udpLog("discount", action, "", "", "", "", "act");
     }
 
-    void Player::tradeUdpLog(UInt32 id, UInt32 val /* = 0 */, UInt32 num /* = 1 */)
+    void Player::tradeUdpLog(UInt32 id, UInt32 val /* = 0 */, UInt32 num /* = 1 */, bool priceLog /* = false */)
     {
         // 交易相关日志
-        char action[16] = "";
+        char action[32] = "";
         if (val)
         {
-            snprintf (action, 16, "F_%d_%d", id, val);
+            if (priceLog)
+                snprintf (action, 16, "F_%d_%d_2", id, val);
+            else
+                snprintf (action, 16, "F_%d_%d", id, val);
         }
         else
         {
