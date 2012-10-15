@@ -864,6 +864,7 @@ CREATE TABLE `player` (
   `status` int(10) unsigned NOT NULL DEFAULT '0',
   `country` tinyint(1) unsigned NOT NULL,
   `title` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `titleAll` varchar(255) NOT NULL DEFAULT '0|',
   `archievement` int(10) unsigned NOT NULL DEFAULT '0',
   `attainment` int(10) unsigned NOT NULL DEFAULT '0',
   `qqvipl` tinyint(3) unsigned NOT NULL DEFAULT '0',

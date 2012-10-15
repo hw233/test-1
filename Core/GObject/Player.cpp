@@ -4672,7 +4672,7 @@ namespace GObject
 		_playerData.title = t;
 		sendModification(6, _playerData.title);
 		rebuildBattleName();
-/*
+
         std::vector<UInt8>& titleAll = _playerData.titleAll;
         bool flag = false;
         std::vector<UInt8>::iterator it = find(titleAll.begin(), titleAll.end(), t);
@@ -4680,19 +4680,21 @@ namespace GObject
             titleAll.push_back(t);
             flag = true;
         }
+        else
+            titleAll.erase(it);
         UInt8 cnt = titleAll.size();
-        if(flag){
-            std::string title = "";
-            if(!cnt)
-                title += "0|";
-            for(UInt8 i = 0; i < cnt; ++i)
-            {
-                title += Itoa(titleAll[i]);
-                title += '|';
-            }
-            printf("############################:%s\n",title.c_str());
-            DB1().PushUpdateData("UPDATE `player` SET `titleAll` = '%s' WHERE `id` = %"I64_FMT"u", title.c_str(), getId());
+        //if(flag){
+        std::string title = "";
+        if(!cnt)
+            title += "0|";
+        for(UInt8 i = 0; i < cnt; ++i)
+        {
+            title += Itoa(titleAll[i]);
+            title += '|';
         }
+        printf("############################:%s\n",title.c_str());
+        DB1().PushUpdateData("UPDATE `player` SET `titleAll` = '%s' WHERE `id` = %"I64_FMT"u", title.c_str(), getId());
+       // }
 	    Stream st(REP::USER_INFO_CHANGE);
         st << static_cast<UInt8>(0x17) << cnt;
         printf("**************************begin\n");
@@ -4704,7 +4706,6 @@ namespace GObject
         printf("**************************end\n");
         st << Stream::eos;
         send(st);
-        */
 	}
 
 	UInt32 Player::getAchievement( UInt32 a )

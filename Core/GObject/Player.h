@@ -429,7 +429,7 @@ namespace GObject
             lastTjEventScore = 0;
             lastTjTotalScore = 0;
             isHHBlue = false;
-            //titleAll.reserve(32);
+            titleAll.reserve(32);
         }
 
 
@@ -516,7 +516,7 @@ namespace GObject
 
         bool isHHBlue;
         std::string nameNoSuffix;     //(合服)不带后缀的用户名
-        //std::vector<UInt8> titleAll;      //玩家所有的称号id
+        std::vector<UInt8> titleAll;      //玩家所有的称号id
     };
 
 	class Player:

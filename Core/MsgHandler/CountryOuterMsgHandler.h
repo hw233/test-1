@@ -1204,22 +1204,29 @@ void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
 	br >> field;
 	switch (field)
 	{
-    case 0x09:
-        {
-            UInt32 mounts;
-            br >> mounts;
-            player->setMounts(static_cast<UInt8>(mounts));
-        }
-        break;
-	case 0x10:
-		{
-			UInt32 step;
-			br >> step;
-			player->setNewGuildTaskStep(step);
-		}
-		break;
-	default:
-		return;
+        case 0x06:
+            {
+                UInt32 id;
+                br >> id;
+                player->setTitle(static_cast<UInt8>(id));
+            }
+            break;
+        case 0x09:
+            {
+                UInt32 mounts;
+                br >> mounts;
+                player->setMounts(static_cast<UInt8>(mounts));
+            }
+            break;
+        case 0x10:
+            {
+                UInt32 step;
+                br >> step;
+                player->setNewGuildTaskStep(step);
+            }
+            break;
+        default:
+            return;
 	}
 }
 
@@ -5054,6 +5061,20 @@ void OnActivitySignIn( GameMsgHdr& hdr, const void * data )
                 ConsumeInfo ci(DailyActivity, 0, 0);
                 player->useTael(100, &ci);
                 id = GameAction()->GetExchangePropsID();
+                if(mgr->GetPropsID() == id)
+                {
+                    switch(id)
+                    {
+                        case 29:
+                            id = 500;
+                            break;
+                        case 500:
+                            id = 29;
+                            break;
+                        default:
+                            id = 29;
+                    }
+                }
                 mgr->SetPropsID(id);
                 mgr->UpdateToDB();
 
@@ -5084,6 +5105,20 @@ void OnActivitySignIn( GameMsgHdr& hdr, const void * data )
                 player->activityUdpLog(1028, score);
                 //兑换后重新刷新一次
                 id = GameAction()->GetExchangePropsID();
+                if(mgr->GetPropsID() == id)
+                {
+                    switch(id)
+                    {
+                        case 29:
+                            id = 500;
+                            break;
+                        case 500:
+                            id = 29;
+                            break;
+                        default:
+                            id = 29;
+                    }
+                }
                 mgr->SetPropsID(id);
                 mgr->UpdateToDB();
                 lua_tinker::table p = GameAction()->GetExchangeProps(id);

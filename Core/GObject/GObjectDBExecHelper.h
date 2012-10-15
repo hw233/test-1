@@ -157,6 +157,7 @@ struct DBPlayerData
 	UInt64 id;
 	PlayerData pdata;
 	UInt8 bossLevel;
+    std::string titleAll;
 	std::string icCount;
 	std::string lineup;
 	std::string nextreward;
@@ -1107,7 +1108,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPlayerData)
-SPECIALDEF(55)
+SPECIALDEF(56)
 	(
 	UInt64, id,
 	std::string, pdata.name,
@@ -1119,6 +1120,7 @@ SPECIALDEF(55)
 	UInt32, pdata.status,
 	UInt8, pdata.country,
 	UInt8, pdata.title,
+    std::string, titleAll,
 	UInt32, pdata.achievement,
     UInt32, pdata.attainment,
 	UInt8, pdata.qqvipl,
