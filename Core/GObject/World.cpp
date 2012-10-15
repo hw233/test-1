@@ -1034,9 +1034,6 @@ bool World::Init()
 
     //AddTimer(60 * 1000, advancedHookTimer, static_cast<void *>(NULL), (60 - now % 60) * 1000);
 
-    AddTimer(3600 * 1000, ClanStatueCheck, static_cast<void *>(NULL), (3600 - now % 3600) * 1000);
-    //AddTimer(5 * 60 * 1000, ClanStatueCheck, static_cast<void *>(NULL));
-
     return true;
 }
 

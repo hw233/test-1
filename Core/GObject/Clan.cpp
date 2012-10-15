@@ -3747,32 +3747,29 @@ void   Clan::LoadCopy(UInt16 level, UInt32 levelUpdateTime, UInt16 maxLevel, UIn
     if (now < levelUpdateTime)
     {
         // 又穿越了？
-        count = (TimeUtil::SharpWeek(1, levelUpdateTime) - TimeUtil::SharpWeek(1, now)) / (3600 * 24 * 7) * 5;
+        count = (TimeUtil::SharpWeek(1, levelUpdateTime) - TimeUtil::SharpWeek(1, now)) / (3600 * 24 * 7);
         if (level < count * 5)
-            level = 1;
+            level = 0;
         else
             level -= count * 5;
     }
     else
     {
-        count = (TimeUtil::SharpWeek(1, now) - TimeUtil::SharpWeek(1, levelUpdateTime)) / (3600 * 24 * 7) * 5;
+        count = (TimeUtil::SharpWeek(1, now) - TimeUtil::SharpWeek(1, levelUpdateTime)) / (3600 * 24 * 7);
         if (level < count * 5)
-            level = 1;
+            level = 0;
         else
             level -= count * 5;
     }
     _copyLevel = level;
     if (count)
-        _copyLevelUpdateTime = levelUpdateTime;
-    else
-        _copyLevelUpdateTime = now;
-    if (maxLevel > 30)
     {
-        // 由于开始未初始化导致历史最大层数出现错误，重置数据
-        maxLevel = level;
-        maxTime = TimeUtil::Now();
-        DB5().PushUpdateData("REPLACE INTO `clan_copy` (`clanId`, `level`, `levelUpdateTime`, `maxCopyLevel`, `maxCopyTime`) VALUES (%u, %u, %u, %u, %u)", _id, _copyLevel, levelUpdateTime, maxLevel, maxTime);
+        _copyLevelUpdateTime = now;
+         DB5().PushUpdateData("REPLACE INTO `clan_copy` (`clanId`, `level`, `levelUpdateTime`, `maxCopyLevel`, `maxCopyTime`) VALUES (%u, %u, %u, %u, %u)", 
+                 _id, _copyLevel, levelUpdateTime, maxLevel, maxTime);
     }
+    else
+        _copyLevelUpdateTime = levelUpdateTime;
     _copyMaxLevel = maxLevel;
     _copyMaxTime = maxTime;
 }
@@ -3931,7 +3928,7 @@ void   Clan::clanCopyMemberOperate(Player * player, UInt8 command, BinaryReader 
 
 void   Clan::clanCopyBattleOperate(Player * player, UInt8 command, BinaryReader & brd)
 {
-    // TODO: 帮派副本战斗操作
+    // 帮派副本战斗操作
     switch (command)
     {
         case 0:
@@ -4137,6 +4134,7 @@ void    Clan::setCopyLevel(UInt16 level)
     }
 
     _copyLevel = level;
+    DB5().PushUpdateData("REPLACE INTO `clan_copy` (`clanId`, `level`, `levelUpdateTime`, `maxCopyLevel`, `maxCopyTime`) VALUES (%u, %u, %u, %u, %u)", _id, _copyLevel, _copyLevelUpdateTime = TimeUtil::Now(), _copyMaxLevel, _copyMaxTime);
 }
 
 void    Clan::clearCopySnap()
