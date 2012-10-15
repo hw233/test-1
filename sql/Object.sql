@@ -634,6 +634,7 @@ CREATE TABLE `fighter` (
   `skills` varchar(255) NOT NULL,
   `cittas` varchar(255) NOT NULL,
   `summoned` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `hideFashion` tinyint(4) DEFAULT '0',
   UNIQUE KEY `id_playerId` (`id`,`playerId`),
   KEY `playerId` (`playerId`),
   KEY `id` (`id`)
