@@ -1606,7 +1606,7 @@ namespace GObject
         void udpLog(UInt32 type, UInt32 id, UInt32 num, UInt32 price, const char* op);
         void luaUdpLog(const char* str1, const char* str2, const char* type);
         void discountLog(UInt8 discountType);
-        void tradeUdpLog(UInt32 id, UInt32 val = 0, UInt32 num = 1);
+        void tradeUdpLog(UInt32 id, UInt32 val = 0, UInt32 num = 1, bool priceLog = false);
         void skillStrengthenLog(UInt8 type, UInt32 val);
         void townDeamonUdpLog(UInt16 level);
         void dungeonUdpLog(UInt8 levelReq, UInt8 type);
