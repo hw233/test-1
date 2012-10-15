@@ -417,8 +417,7 @@ function GetExchangeProps(id)
 end
 
 function GetExchangePropsID()
-    --local ratio = math.random(10000)
-    local ratio = math.random(3919)
+    local ratio = math.random(10000)
     for _, val in pairs(exchangeProps) do
        if val[4] <= ratio and ratio < val[5]
         then

@@ -1472,7 +1472,6 @@ void OnFighterEquipReq( GameMsgHdr& hdr, FighterEquipReq& fer )
     case 0x33:
         fgt->setHideFashion(static_cast<UInt8>(fer._equipId));
         break;
-    
     case 0x2a:
         {
             UInt16 skill = (fer._equipId >> 16) & 0xFFFF;
