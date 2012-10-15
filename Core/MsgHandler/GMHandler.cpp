@@ -192,6 +192,7 @@ GMHandler::GMHandler()
     Reg(3, "tj2", &GMHandler::OnTj2);
     Reg(3, "tj3", &GMHandler::OnTj3);
     Reg(3, "tj4", &GMHandler::OnTj4);
+    Reg(3, "opentj", &GMHandler::OnOpenTj);
     Reg(2, "idip", &GMHandler::OnAddIdip);
     Reg(2, "clear", &GMHandler::OnClearTask);
     Reg(2, "reset", &GMHandler::OnClearCFT);
@@ -2988,5 +2989,12 @@ void GMHandler::OnTj4(GObject::Player* player, std::vector<std::string>& args)
 		return;
     int bossMaxHp = atoi(args[0].c_str());
     GObject::Tianjie::instance().setTj4BossHp(bossMaxHp);
+}
+void GMHandler::OnOpenTj(GObject::Player* player, std::vector<std::string>& args)
+{
+	if(args.size() < 1)
+		return;
+    int level = atoi(args[0].c_str());
+    GObject::Tianjie::instance().manualOpenTj(level);
 }
 

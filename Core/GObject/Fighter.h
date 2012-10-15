@@ -715,6 +715,9 @@ protected:
     UInt16 _attrValue3;
 
     SecondSoul* m_2ndSoul;
+
+    //是否隐藏时装
+    bool _hideFashion;
 public:
 	float getSoulPracticeAddOn();
 	float getSoulPracticeFactor();
@@ -733,6 +736,14 @@ public:
 
     UInt8 getSoulSkillIdx(UInt16 itemId);
 
+    void setHideFashion(bool v) 
+    {
+        _hideFashion = v;
+        UInt8 cmd = 0x33;
+        UInt64 value = v;
+        sendModification(1, &cmd, &value);
+    };
+    bool getHideFashion() {return _hideFashion;};
 public:
     inline void setElixirAttr(ElixirAttr& attr) { _elixirattr = attr; }
     bool addElixirAttrByOffset(UInt8 off, Int32 v);

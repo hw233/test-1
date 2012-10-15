@@ -14,6 +14,7 @@ namespace GObject
 {
 extern URandom GRND;
 #define START_WITH_59 0 
+#define TEST_TIANJIE  0 
 //事件2捐赠的ID
 enum ENUM_ID_TJ2
 {
@@ -117,13 +118,14 @@ static  MailPackage::MailItem s_eventItem[2]= {{30,10}, {509,1}};
 #define TJ_START_TIME_MIN  45
 #define TIME_60 60
 #define ONE_DAY_SECOND (24*3600)
+//static const int s_rankKeepTime = 5*3600;
 static const int s_rankKeepTime = (4*3600+15*60);
 static const int TJ_EVENT_WAIT_TIME = 10*60;      //天劫事件间隔时间
 static const int TJ_EVENT_PROCESS_TIME = 15*60;   //天劫事件持续时间
 
-//static const int s_rankKeepTime = 4*60;
-//static const int TJ_EVENT_WAIT_TIME  = 2*60;      //天劫事件间隔时间
-//static const int TJ_EVENT_PROCESS_TIME = 3*60;   //天劫事件持续时间
+//static const int s_rankKeepTime = 20*60;
+//static const int TJ_EVENT_WAIT_TIME  = 10*60;      //天劫事件间隔时间
+//static const int TJ_EVENT_PROCESS_TIME = 15*60;   //天劫事件持续时间
 
 Tianjie::Tianjie()
 {
@@ -176,8 +178,69 @@ Tianjie::Tianjie()
     m_nextTjLevel = 0;
 
     m_lastPassedLevel = 0;
-}
 
+    m_isManualOpening = false;
+    m_isAutoTouched = false;
+    m_manualTjLevel = 0;
+    m_autoTjLevel = 0;
+}
+int  Tianjie::manualOpenTj(int level)
+{
+    if ((level % 10 != 9) || level < 59 || level > 109)
+        return 1;
+    if (m_manualTjLevel > 0)
+        return 4;
+ 	std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+	if (execu.get() == NULL || !execu->isConnected()) return 2;
+
+	GData::DBTianjie dbexp;
+    if(execu->Prepare("SELECT `id`, `is_opened`,`is_execute`,`is_finish`,`is_ok`,`level`,`rate`,UNIX_TIMESTAMP(opentime),`r1_killed`,`r2_donated`,`r3_copyid`,`r4_day`,`open_next`, `is_wait`,`is_manual`,`is_touch` FROM `tianjie` order by level desc", dbexp) != DB::DB_OK)
+		return 99;
+
+    int maxLevel = 0;
+	while (execu->Next() == DB::DB_OK)
+	{
+        if (maxLevel < dbexp.level)
+            maxLevel = dbexp.level;
+        if (maxLevel < level)    //玩家等级过低,不能手动启动天劫
+            return 2;
+        if (dbexp.level == level) //已经触发了
+        {
+            m_isManualOpening = false;
+            m_manualTjLevel = 0;
+            return 3;
+        }
+        if (dbexp.is_opened == 1)
+        {
+           m_isManualOpening = false;
+           m_manualTjLevel = level;
+        }
+        else if (dbexp.is_opened == 0 && m_manualTjLevel == 0)
+        {
+            m_isManualOpening = true;
+            m_manualTjLevel = level;
+        }
+    }
+    //满足手动开启天劫条件
+    if (m_manualTjLevel > 0)
+	{
+        //m_autoTjLevel = m_currOpenedTjLevel;
+        //m_currOpenedTjLevel = m_manualTjLevel;
+        DB1().PushUpdateData("INSERT INTO `tianjie`(`level`,`is_manual`) VALUES(%d,%d)", m_manualTjLevel, 1);
+        if (m_isManualOpening)
+        {
+            m_autoTjLevel = m_currOpenedTjLevel;
+            m_currOpenedTjLevel = m_manualTjLevel;
+            //如果手动开启天劫,刚好是处于上个天劫保留排行榜的事件点
+            //则清空所有用户贡献
+            m_rankKeepTime = 0;
+            clearPlayerTaskScore();
+
+            OpenTj();
+        }
+    }
+    return 0;
+}
 bool Tianjie::isPlayerInTj(int playerLevel)
 {
     return m_isTjOpened && playerLevel >= m_currOpenedTjLevel;
@@ -185,6 +248,13 @@ bool Tianjie::isPlayerInTj(int playerLevel)
 bool Tianjie::isOpenTj(Player* pl)
 {
     int playerLevel = pl->GetLev();
+    //在手动开启的天劫运行中,又达到了自动天劫的等级
+    if (m_isManualOpening && playerLevel == m_autoTjLevel)
+    {
+        m_isAutoTouched = true;
+		DB1().PushUpdateData("update tianjie set is_touch=1 where level=%d", m_autoTjLevel); 
+        return true;
+    }
     //有玩家达到了开启天劫的条件
     if (!m_isTjOpened && playerLevel == m_currOpenedTjLevel)
     {
@@ -201,7 +271,7 @@ bool Tianjie::isOpenTj(Player* pl)
         
         notifyTianjieStatus();
     }
-    if (m_isTjOpened && playerLevel == m_currOpenedTjLevel+10)
+    if (m_isTjOpened && playerLevel == m_currOpenedTjLevel+10 && !m_isManualOpening)
     {
         //达到了下个天劫等级
         if ((UInt8)(m_tjTypeId + 1) < sizeof(s_tjRoleLevel)/sizeof(s_tjRoleLevel[0]))
@@ -252,6 +322,8 @@ bool  Tianjie::isTjRateNpc(UInt32 npcid)
  //开启天劫
 void Tianjie::OpenTj()
 {
+    if (m_currOpenedTjLevel == 0)
+        return;
     m_notifyRate = 0;
 	m_isTjOpened = 1;
 	m_currTjRate = 1;
@@ -266,6 +338,7 @@ void Tianjie::OpenTj()
         }
     }
 
+    clearPlayerTaskScore();
     m_eventSortMap.clear();
     m_scoreSortMap.clear();
 
@@ -273,7 +346,7 @@ void Tianjie::OpenTj()
 	time_t t = time(NULL);
 	local = localtime(&t);
 
-    if (START_WITH_59)
+    if (START_WITH_59 || TEST_TIANJIE)
         m_openTime = TimeUtil::Now()+ TJ_EVENT_WAIT_TIME;
     else
     {
@@ -284,7 +357,7 @@ void Tianjie::OpenTj()
 	    else
             m_openTime = t + (23-currHour)*3600 + (59-local->tm_min)*60 + (60-local->tm_sec) + TJ_START_TIME_HOUR*3600 + TJ_START_TIME_MIN*60;
     }
-    DB1().PushUpdateData("REPLACE INTO `tianjie`(`is_opened`,`level`,`opentime`,`rate`) VALUES(%d, %d, from_unixtime(%d), %d)",m_isTjOpened, m_currOpenedTjLevel, m_openTime, m_currTjRate);
+    DB1().PushUpdateData("REPLACE INTO `tianjie`(`is_opened`,`level`,`opentime`,`rate`, `is_manual`) VALUES(%d, %d, from_unixtime(%d), %d, %d)",m_isTjOpened, m_currOpenedTjLevel, m_openTime, m_currTjRate, m_isManualOpening);
 
     if (m_isNetOk)
         SYSMSG_BROADCASTV(5001);
@@ -321,26 +394,56 @@ void Tianjie::LoadLastPassed()
 bool Tianjie::LoadFromDB()
 {
 	std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+	std::unique_ptr<DB::DBExecutor> execu1(DB::gObjectDBConnectionMgr->GetExecutor());
 	if (execu.get() == NULL || !execu->isConnected()) return false;
 
-	GData::DBTianjie dbexp;
-    if(execu->Prepare("SELECT `id`, `is_opened`,`is_execute`,`is_finish`,`is_ok`,`level`,`rate`,UNIX_TIMESTAMP(opentime),`r1_killed`,`r2_donated`,`r3_copyid`,`r4_day`,`open_next`, `is_wait` FROM `tianjie` order by level desc limit 1", dbexp) != DB::DB_OK)
-		return false;
-
+    GData::DBTianjie* dbexp = NULL;
+	GData::DBTianjie dbexp0;
+    if(execu->Prepare("SELECT `id`, `is_opened`,`is_execute`,`is_finish`,`is_ok`,`level`,`rate`,UNIX_TIMESTAMP(opentime),`r1_killed`,`r2_donated`,`r3_copyid`,`r4_day`,`open_next`, `is_wait`,`is_manual`,`is_touch` FROM `tianjie`  where is_manual=1 order by level desc limit 1", dbexp0) != DB::DB_OK)
+        return false;
+    GData::DBTianjie dbexp1;
+    if(execu1->Prepare("SELECT `id`, `is_opened`,`is_execute`,`is_finish`,`is_ok`,`level`,`rate`,UNIX_TIMESTAMP(opentime),`r1_killed`,`r2_donated`,`r3_copyid`,`r4_day`,`open_next`, `is_wait`,`is_manual`,`is_touch` FROM `tianjie` order by level desc limit 1", dbexp1) != DB::DB_OK)
+        return false;
+    //有手动的天劫
+    bool isManual = execu->Next() == DB::DB_OK;
+    bool isAuto = execu1->Next() == DB::DB_OK; 
+    if (isManual)
+    {
+        if (dbexp0.is_opened)
+        {
+            dbexp = &dbexp0;
+            m_isManualOpening = dbexp0.is_manual;
+            if (isAuto && dbexp1.is_opened == 0 && dbexp1.rate < 4)
+            {
+                m_autoTjLevel = dbexp1.level;
+                m_isAutoTouched = dbexp1.is_touch;
+            }
+        }
+        else
+        {
+            if (isAuto)
+                dbexp = &dbexp1;
+            if (dbexp0.rate < 4)
+                m_manualTjLevel = dbexp0.level;
+        }
+    }
+    else if (isAuto)
+    {
+        dbexp = &dbexp1;
+    }
 	bool isTjDBNull = true;
-	if(execu->Next() == DB::DB_OK)
+	if(dbexp != NULL)
 	{
 	    isTjDBNull = false;
-		m_isTjOpened = dbexp.is_opened;
-		m_isTjExecute = dbexp.is_execute;
-		m_isFinish = dbexp.is_finish;
-		m_isOk = dbexp.is_ok;
-		m_currOpenedTjLevel = dbexp.level;
-		m_currTjRate = dbexp.rate;
-		m_openTime = dbexp.opentime;
-        m_isOpenNextTianjie = dbexp.open_next;
-        m_isWait = dbexp.is_wait;
-
+		m_isTjOpened = dbexp->is_opened;
+		m_isTjExecute = dbexp->is_execute;
+		m_isFinish = dbexp->is_finish;
+		m_isOk = dbexp->is_ok;
+		m_currOpenedTjLevel = dbexp->level;
+		m_currTjRate = dbexp->rate;
+		m_openTime = dbexp->opentime;
+        m_isOpenNextTianjie = dbexp->open_next;
+        m_isWait = dbexp->is_wait;
       
         //只有天劫打开了，才能插入数据到map
         initSortMap();
@@ -350,14 +453,14 @@ bool Tianjie::LoadFromDB()
         if (m_isTjOpened)
             m_isRankKeep = true;
 
-        std::string s_r1_killed = dbexp.r1_killed;
-        std::string s_r2_donated = dbexp.r2_donated;
+        std::string s_r1_killed = dbexp->r1_killed;
+        std::string s_r2_donated = dbexp->r2_donated;
         if (m_currTjRate == 3)
         {
-            m_eventCurrNumber = dbexp.r3_copyid;
+            m_eventCurrNumber = dbexp->r3_copyid;
             m_eventMaxNumber = s_maxTlzLevel;
         }
-        m_bossDay = dbexp.r4_day;
+        m_bossDay = dbexp->r4_day;
 
         size_t i = 0;
         std::string s;
@@ -957,6 +1060,14 @@ void Tianjie::process(UInt32 now)
         m_isOpenNextTianjie = false;
         OpenTj();
     }
+    else if (m_isManualOpening && !m_isRankKeep) //正常天劫执行完后,进行手动开启的天劫
+    {
+        OpenTj();
+    }
+    else if (m_isAutoTouched && !m_isRankKeep) //在手动开启天劫过程中,有玩家触发最高级天劫
+    {
+        OpenTj();
+    }
 }
 
 void Tianjie::startTianjie(bool isRestart)
@@ -1073,15 +1184,32 @@ void Tianjie::goNext()
        }
 	   else
        {
-           if ((UInt8)(m_tjTypeId+1) < sizeof(s_tjRoleLevel)/sizeof(s_tjRoleLevel[0]))
+           if (m_isManualOpening) //手动开启的天劫
            {
-               m_currOpenedTjLevel = s_tjRoleLevel[++m_tjTypeId];
-	   	       DB1().PushUpdateData("INSERT INTO `tianjie`(`level`) VALUES(%d)",m_currOpenedTjLevel);
+               m_isManualOpening = false;
+               m_manualTjLevel = 0;
+               m_currOpenedTjLevel = m_autoTjLevel;
+               m_autoTjLevel = 0;
            }
            else
            {
-               m_currOpenedTjLevel = 0;
-               m_tjTypeId = 0;
+               if ((UInt8)(m_tjTypeId+1) < sizeof(s_tjRoleLevel)/sizeof(s_tjRoleLevel[0]))
+               {
+                   m_currOpenedTjLevel = s_tjRoleLevel[++m_tjTypeId];
+	   	           DB1().PushUpdateData("INSERT INTO `tianjie`(`level`) VALUES(%d)",m_currOpenedTjLevel);
+               }
+               else
+               {
+                   m_currOpenedTjLevel = 0;
+                   m_tjTypeId = 0;
+               }
+               //在正常的天劫进行期间，手动开启了天劫
+               if (m_manualTjLevel > 0)
+               {
+                   m_autoTjLevel = m_currOpenedTjLevel;
+                   m_currOpenedTjLevel = m_manualTjLevel;
+                   m_isManualOpening = true;
+               }
            }
            m_openTime = 0;
 	   }
@@ -1096,7 +1224,7 @@ void Tianjie::goNext()
 		m_isTjExecute = 0;
 		m_isFinish = 0;
         m_notifyRate = 0;
-        if (START_WITH_59)
+        if (START_WITH_59 || TEST_TIANJIE)
             m_openTime = TimeUtil::Now() + TJ_EVENT_WAIT_TIME;
         else
             m_openTime += ONE_DAY_SECOND;

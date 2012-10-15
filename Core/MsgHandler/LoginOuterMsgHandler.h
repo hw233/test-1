@@ -40,6 +40,7 @@
 #include "GObject/World.h"
 #include "GObject/Var.h"
 #include "GObject/RealItemAward.h"
+#include "GObject/Tianjie.h"
 //#include "MsgHandler/JsonParser.h"
 
 #ifndef _WIN32
@@ -2394,6 +2395,22 @@ void AddClanAward(LoginMsgHdr& hdr, const void* data)
 
         st << ret << Stream::eos;
     }
+    NETWORK()->SendMsgToClient(hdr.sessionID, st);
+}
+
+void ManualOpenTj(LoginMsgHdr& hdr, const void* data)
+{
+    //手动开启天劫
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+
+    UInt16 level = 0;
+    br >> level;
+    UInt8 ret = GObject::Tianjie::instance().manualOpenTj(level);
+
+    Stream st(SPEP::MANUALOPENTJ);
+
+    st << ret << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID, st);
 }
 

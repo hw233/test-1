@@ -66,6 +66,7 @@ namespace GObject
 		bool LoadFromDB();
         UInt8 getTjTypeId() {return m_tjTypeId;};
         void setNetOk() {m_isNetOk = true;};
+        int  manualOpenTj(int level);
        
         void onTianjieReq(GameMsgHdr&, const void*);
         void getTianjieData(Player* pl, bool isLogin=false);
@@ -223,6 +224,13 @@ namespace GObject
 
         //最后一次渡过的天劫
         int m_lastPassedLevel;
+
+        //手动开启天劫
+        bool m_isManualOpening;
+        bool m_isAutoTouched;
+        int m_manualTjLevel;
+        int m_autoTjLevel; //正常的天劫等级,手动天劫过后需要改回去
+
     };
 }
 #endif

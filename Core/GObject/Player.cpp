@@ -2769,6 +2769,7 @@ namespace GObject
 			{
 				st << buffid[i] << buffleft[i];
 			}
+            st << static_cast<UInt8>(fgt->getHideFashion());
 		}
 	}
 

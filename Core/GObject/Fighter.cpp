@@ -77,6 +77,7 @@ Fighter::Fighter(UInt32 id, Player * owner):
     _iswboss = false;
     _wbextatk = 0;
     _wbextmagatk = 0;
+    _hideFashion = 0;
 }
 
 /*
@@ -651,6 +652,7 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
 	case 0x27: field = "amulet"; break;
 	case 0x28: field = "ring"; break;
 	case 0x30: field = "peerless"; break;
+	case 0x33: field = "hideFashion"; break;
     }
 
 	if(field != NULL)
@@ -796,6 +798,7 @@ ItemEquip * Fighter::setFashion( ItemFashion* r, bool writedb )
 			r->DoEquipBind(true);
 		}
 		sendModification(0x20, r);
+        setHideFashion(false);
 	}
 	return rr;
 }
