@@ -117,6 +117,138 @@ bool DCLogger::login(Player* player)
     return true;
 }
 
+bool DCLogger::login_sec(Player* player)
+{
+    if (!cfg.dclog)
+        return true;
+    std::ostringstream msg;
+
+    static const char *msgVersion = "0.1";
+    static const char *ver = "1.5";
+
+    msg << "APPV=";
+    msg << version;
+    msg << "&MSGV=";
+    msg << msgVersion;
+    msg << "&VER=";
+    msg << ver;
+    msg << "&APPID=";
+    msg << appid;
+    msg << "&OID=";
+    msg << player->getOpenId();
+    msg << "&WID=";
+    msg << cfg.serverNum;
+    msg << "&UIP=";
+    msg << player->getClientIp();
+    msg << "&OKY=";
+    msg << player->getOpenKey();
+    msg << "&SIP=";
+    char serverIp[20];
+    in_addr iaddr;
+    iaddr.s_addr = cfg.serverIp;
+    strcpy(serverIp, inet_ntoa(iaddr));
+    msg << serverIp;
+    msg << "&MTM=";
+    msg << TimeUtil::GetTick();
+    msg << "&DOM=";
+    msg << player->getDomain();
+    msg << "&MLV=0";
+    msg << "&AID=1";
+
+    msg << "&ACT=" << static_cast<UInt64>(player->getCreated() * 1000);
+    msg << "&PAY=";
+    msg << "&RID=" << player->getId();
+    msg << "&RNA=" << player->getName();
+    msg << "&RLV=" << static_cast<UInt32>(player->GetLev());
+    msg << "&EXP=" << static_cast<UInt32>(player->GetExp());
+    msg << "&RTN=2";
+    msg << "&RTI=" << "job";
+    msg << "&RTP=" << static_cast<UInt32>(player->GetClass());
+    msg << "&RTI=" << "country";
+    msg << "&RTP=" << static_cast<UInt32>(player->getCountry());
+    msg << "&GTN=2";
+    msg << "&GTI=tael";
+    msg << "&GOD=" << static_cast<UInt32>(player->getTael());
+    msg << "&GTI=coin";
+    msg << "&GOD=" << static_cast<UInt32>(player->getCoin());
+    msg << "&CTN=1";
+    msg << "&CTI=gold";
+    msg << "&CAS=" << static_cast<UInt32>(player->getGold());
+    msg << "&RCT=" << static_cast<UInt64>(player->getCreated() * 1000);
+
+    DC().Push(msg.str().c_str(), msg.str().length(), LT_SECDATA);
+    return true;
+}
+
+bool DCLogger::protol_sec(Player* player, int cmd)
+{
+    if (!cfg.dclog)
+        return true;
+    std::ostringstream msg;
+
+    static const char *msgVersion = "0.1";
+    static const char *ver = "1.5";
+
+    msg << "APPV=";
+    msg << version;
+    msg << "&MSGV=";
+    msg << msgVersion;
+    msg << "&VER=";
+    msg << ver;
+    msg << "&APPID=";
+    msg << appid;
+    msg << "&OID=";
+    msg << player->getOpenId();
+    msg << "&WID=";
+    msg << cfg.serverNum;
+    msg << "&UIP=";
+    msg << player->getClientIp();
+    msg << "&OKY=";
+    msg << player->getOpenKey();
+    msg << "&SIP=";
+    char serverIp[20];
+    in_addr iaddr;
+    iaddr.s_addr = cfg.serverIp;
+    strcpy(serverIp, inet_ntoa(iaddr));
+    msg << serverIp;
+    msg << "&MTM=";
+    msg << TimeUtil::GetTick();
+    msg << "&DOM=";
+    msg << player->getDomain();
+    msg << "&MLV=0";
+    msg << "&AID=1";
+
+    msg << "&PID=" << static_cast<UInt32>(cmd);
+    msg << "&FID=";
+    msg << "&PTP=" << static_cast<UInt32>(cmd ? 1 : 0);
+    msg << "&RST=0";
+    /*
+    msg << "&ACT=" << static_cast<UInt64>(player->getCreated() * 1000);
+    msg << "&PAY=";
+    msg << "&RID=" << player->getId();
+    msg << "&RNA=" << player->getName();
+    msg << "&RLV=" << static_cast<UInt32>(player->GetLev());
+    msg << "&EXP=" << static_cast<UInt32>(player->GetExp());
+    msg << "&RTN=2";
+    msg << "&RTI=" << "job";
+    msg << "&RTP=" << static_cast<UInt32>(player->GetClass());
+    msg << "&RTI=" << "country";
+    msg << "&RTP=" << static_cast<UInt32>(player->getCountry());
+    msg << "&GTN=2";
+    msg << "&GTI=tael";
+    msg << "&GOD=" << static_cast<UInt32>(player->getTael());
+    msg << "&GTI=coin";
+    msg << "&GOD=" << static_cast<UInt32>(player->getCoin());
+    msg << "&CTN=1";
+    msg << "&CTI=gold";
+    msg << "&CAS=" << static_cast<UInt32>(player->getGold());
+    msg << "&RCT=" << static_cast<UInt64>(player->getCreated() * 1000);
+    */
+
+    DC().Push(msg.str().c_str(), msg.str().length(), LT_SECDATA);
+    return true;
+}
+
 bool DCLogger::logout(Player* player)
 {
     if (!cfg.dclog)

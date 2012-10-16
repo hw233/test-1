@@ -34,7 +34,6 @@ protected:
 private:
     struct LogMsg
     {
-
         const char * logString;
         char logType;
     };

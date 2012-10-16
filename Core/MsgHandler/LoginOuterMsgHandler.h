@@ -149,8 +149,9 @@ struct UserLoginStruct
     std::string _openid;
     std::string _openkey;
     std::string _via;
-	MESSAGE_DEF11(REQ::LOGIN, UInt64, _userid, UInt8, _level, UInt8, _level1, UInt8, _isYear, UInt32, _lang,
-            HashValType, _hashval, std::string, _server, std::string, _platform, std::string, _openid, std::string, _openkey, std::string, _via);
+    std::string _clientIp;
+	MESSAGE_DEF12(REQ::LOGIN, UInt64, _userid, UInt8, _level, UInt8, _level1, UInt8, _isYear, UInt32, _lang,
+            HashValType, _hashval, std::string, _server, std::string, _platform, std::string, _openid, std::string, _openkey, std::string, _via, std::string, _clientIp);
 };
 
 struct NewUserStruct
@@ -357,6 +358,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             player->setOpenId(ul._openid);
             player->setOpenKey(ul._openkey);
             player->setVia(ul._via);
+            player->setClientIp(ul._clientIp);
 #ifdef _FB
             PLAYER_DATA(player, wallow) = 0;
 #endif

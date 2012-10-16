@@ -40,6 +40,8 @@ public:
 
     bool reg(Player* player);
     bool login(Player* player);
+    bool login_sec(Player* player);
+    bool protol_sec(Player* player, int cmd);
     bool logout(Player* player);
     bool online(UInt32 num, UInt8 domain);
     bool consume(Player* player, UInt32 total, UInt32 c);

@@ -1052,6 +1052,59 @@ UInt32 Unserialize(void * buffer, UInt32 size)	\
 	return len;	\
 }
 
+#define MSG_SllN_12(member1type, member1name, member2type, member2name, member3type, member3name, member4type, member4name, member5type, member5name, member6type, member6name, member7type, member7name, member8type, member8name, member9type,member9name, member10type,member10name, member11type,member11name, member12type,member12name)	\
+UInt32 Size()	\
+{	\
+	return S11NTraits<member1type >::Size(this->member1name) +	\
+	S11NTraits<member2type >::Size(this->member2name) +	\
+	S11NTraits<member3type >::Size(this->member3name) + \
+	S11NTraits<member4type >::Size(this->member4name) + \
+	S11NTraits<member5type >::Size(this->member5name) +	\
+	S11NTraits<member6type >::Size(this->member6name) +	\
+	S11NTraits<member7type >::Size(this->member7name) +	\
+	S11NTraits<member8type >::Size(this->member8name) +	\
+	S11NTraits<member9type >::Size(this->member9name) + \
+	S11NTraits<member10type >::Size(this->member10name) + \
+	S11NTraits<member11type >::Size(this->member11name);\
+	S11NTraits<member12type >::Size(this->member12name);\
+}	\
+UInt32 Serialize(std::vector<UInt8>& buffer)	\
+{	\
+	UInt32 len = 0;	\
+	len += S11NTraits<member1type >::Serialize(this->member1name, buffer);	\
+	len += S11NTraits<member2type >::Serialize(this->member2name, buffer);	\
+	len += S11NTraits<member3type >::Serialize(this->member3name, buffer);	\
+	len += S11NTraits<member4type >::Serialize(this->member4name, buffer);	\
+	len += S11NTraits<member5type >::Serialize(this->member5name, buffer);	\
+	len += S11NTraits<member6type >::Serialize(this->member6name, buffer);	\
+	len += S11NTraits<member7type >::Serialize(this->member7name, buffer);	\
+	len += S11NTraits<member8type >::Serialize(this->member8name, buffer);	\
+	len += S11NTraits<member9type >::Serialize(this->member9name, buffer);	\
+	len += S11NTraits<member10type >::Serialize(this->member10name, buffer);\
+	len += S11NTraits<member11type >::Serialize(this->member11name, buffer);\
+	len += S11NTraits<member11type >::Serialize(this->member12name, buffer);\
+	return len;	\
+}	\
+UInt32 Unserialize(void * buffer, UInt32 size)	\
+{	\
+	UInt32 len = 0;	\
+	UInt32 r; \
+	MSG_SllN_MEMBER(member1type, member1name); \
+	MSG_SllN_MEMBER(member2type, member2name); \
+	MSG_SllN_MEMBER(member3type, member3name); \
+	MSG_SllN_MEMBER(member4type, member4name); \
+	MSG_SllN_MEMBER(member5type, member5name); \
+	MSG_SllN_MEMBER(member6type, member6name); \
+	MSG_SllN_MEMBER(member7type, member7name); \
+	MSG_SllN_MEMBER(member8type, member8name); \
+	MSG_SllN_MEMBER(member9type, member9name); \
+	MSG_SllN_MEMBER(member10type, member10name); \
+	MSG_SllN_MEMBER(member11type, member11name); \
+	MSG_SllN_MEMBER(member12type, member12name); \
+	return len;	\
+}
+
+
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 #define MESSAGE_HEAD_DEF(msgid) \
@@ -1116,6 +1169,10 @@ UInt32 Unserialize(void * buffer, UInt32 size)	\
 
 #define MESSAGE_DEF11(msgid, member1type, member1name, member2type, member2name, member3type, member3name, member4type, member4name,member5type, member5name,member6type, member6name,member7type, member7name,member8type, member8name, member9type,member9name, member10type,member10name, member11type,member11name) \
 	MSG_SllN_11(member1type, member1name, member2type, member2name, member3type, member3name, member4type, member4name, member5type, member5name,member6type, member6name,member7type, member7name,member8type, member8name, member9type,member9name, member10type,member10name, member11type,member11name) \
+	MESSAGE_HEAD_DEF(msgid)
+
+#define MESSAGE_DEF12(msgid, member1type, member1name, member2type, member2name, member3type, member3name, member4type, member4name,member5type, member5name,member6type, member6name,member7type, member7name,member8type, member8name, member9type,member9name, member10type,member10name, member11type,member11name, member12type,member12name) \
+	MSG_SllN_12(member1type, member1name, member2type, member2name, member3type, member3name, member4type, member4name, member5type, member5name,member6type, member6name,member7type, member7name,member8type, member8name, member9type,member9name, member10type,member10name, member11type,member11name, member12type,member12name) \
 	MESSAGE_HEAD_DEF(msgid)
 
 #endif

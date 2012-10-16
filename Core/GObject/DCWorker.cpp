@@ -43,42 +43,36 @@ namespace GObject
 
     void DCWorker::OnTimer()
     {
-        std::vector<LogMsg> l;
+        FastMutex::ScopedLock lk(m_Mutex);
+        if (!m_DCLog.empty())
         {
-            FastMutex::ScopedLock lk(m_Mutex);
-            if(m_DCLog.empty())
-                return;
-
-            l = m_DCLog;
-            m_DCLog.clear();
-            m_Limit = 0;
-        }
-
-        if (!l.empty())
-        {
-            size_t size = l.size();
+            size_t size = m_DCLog.size();
             size_t sz = size;
-            const char** msg = &(l[0].logString);
-            const char logType = l[0].logType;
-            while (size)
+            size_t i = 0;
+            while (i < size)
             {
-                --size;
+                const char* msg = m_DCLog[i].logString;
+                const char logType = m_DCLog[i].logType;
                 bool r = false;
 #ifndef _DEBUG
-                if (*msg)
+                if (msg)
                 {
-                    std::string data = *msg;
+                    std::string data = msg;
                     if (m_inited && m_logger && !m_logger->write_baselog(logType, data, true))
                         r = true;
                 }
 #endif
-                if (*msg)
-                    TRACE_LOG("[%u]%u:%u-[%s] -> %d", m_Worker, sz, size, *msg, r ? 1 : 0);
+                if (msg)
+                {
+                    TRACE_LOG("[%u]%u:%u-[%s] -> %d", m_Worker, sz, size, msg, r ? 1 : 0);
+                    TRACE_LOG("logType = %u", (UInt32)logType);
+                }
 
-                delete[] *msg;
-                ++msg;
+                delete[] msg;
+                ++i;
             }
         }
+        m_DCLog.clear();
     }
 
     void DCWorker::OnPause()
