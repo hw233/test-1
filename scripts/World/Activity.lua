@@ -284,10 +284,22 @@ function onActivityCheck(tm)
       setGuoqing(false)
   end
 
+  if tm >= actTime207 and tm < actTime207_1 then
+      setTownReward_10_15(true)
+  else
+      setTownReward_10_15(false)
+  end
+
   if tm >= actTime210 and tm < actTime211 then
       setConsume918(true)
   else
       setConsume918(false)
+  end
+
+  if tm >= actTime212 and tm < actTime213 then
+      setLoginAward(true)
+  else
+      setLoginAward(false)
   end
 
 
@@ -639,6 +651,19 @@ function onActivityCheck(tm)
           setConsumeActive(false)
       end
 
+      if tm >= actTime514 and tm < actTime514_1 then
+          setRechargeActive(true, 16)
+      else
+          setRechargeActive(false, 16)
+      end
+
+      if tm >= actTime515 and tm < actTime515_1 then
+          setNeedRechargeRank(true)
+          setRechargeActive(true, 16)
+      else
+          setRechargeActive(false, 16)
+          setNeedRechargeRank(false)
+      end
 
       setShuoShuo(true);
   end
@@ -736,12 +761,14 @@ function initActTime(y, m, d)
   --充值返礼(9/22-9/23)
   local  SerStartTm508= { ['year'] = 2012, ['month'] = 9, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --变身法宝(9/21-9/24)
-  local  SerStartTm509= { ['year'] = 2012, ['month'] = 9, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm509= { ['year'] = 2012, ['month'] = 10, ['day'] = 10, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --商城限购(9/26-9/27)
   local  SerStartTm510= { ['year'] = 2012, ['month'] = 9, ['day'] = 26, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm511= { ['year'] = 2012, ['month'] = 9, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm512= { ['year'] = 2012, ['month'] = 10, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm513= { ['year'] = 2012, ['month'] = 10, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm514= { ['year'] = 2012, ['month'] = 10, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm515= { ['year'] = 2012, ['month'] = 10, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   -- 繁体版
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -764,6 +791,12 @@ function initActTime(y, m, d)
   -- 中秋国庆
   local  SerStartTm205= { ['year'] = 2012, ['month'] = 10, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm206= { ['year'] = 2012, ['month'] = 10, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --镇妖封神 修仙夺宝
+  local  SerStartTm207= { ['year'] = 2012, ['month'] = 10, ['day'] = 15, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm207_1= { ['year'] = 2012, ['month'] = 10, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
+  -- 2012.10.14登录抽奖合作
+  local  SerStartTm211 = { ['year'] = 2012, ['month'] = 10, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
@@ -944,7 +977,7 @@ function initActTime(y, m, d)
   actTime508_1 = os.time(SerStartTm508) + 2 * 86400;
 
   actTime509 = os.time(SerStartTm509);
-  actTime509_1 = os.time(SerStartTm509) + 3 * 86400;
+  actTime509_1 = os.time(SerStartTm509) + 2 * 86400;
 
   actTime510 = os.time(SerStartTm510);
   actTime510_1 = os.time(SerStartTm510) + 2 * 86400;
@@ -957,6 +990,12 @@ function initActTime(y, m, d)
 
   actTime513 = os.time(SerStartTm513);
   actTime513_1 = os.time(SerStartTm513) + 7 * 86400;
+
+  actTime514 = os.time(SerStartTm514);
+  actTime514_1 = os.time(SerStartTm514) + 3 * 86400;
+
+  actTime515 = os.time(SerStartTm515);
+  actTime515_1 = os.time(SerStartTm515) + 3 * 86400;
 
   -- 繁体版
   actTime101 = os.time(SerStartTm101);
@@ -993,9 +1032,14 @@ function initActTime(y, m, d)
   actTime205= os.time(SerStartTm205);
   actTime206= os.time(SerStartTm206);
 
+  actTime207= os.time(SerStartTm207);
+  actTime207_1= os.time(SerStartTm207_1);
+
   actTime210= os.time(SerStartTm210);
   actTime211= os.time(SerStartTm210) + 7 * 86400;
 
+  actTime212= os.time(SerStartTm211);
+  actTime213= os.time(SerStartTm211) + 3 * 86400;
 
   onActivityCheck(os.time() + 30);
 

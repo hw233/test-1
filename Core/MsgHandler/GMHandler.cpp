@@ -193,6 +193,7 @@ GMHandler::GMHandler()
     Reg(3, "tj2", &GMHandler::OnTj2);
     Reg(3, "tj3", &GMHandler::OnTj3);
     Reg(3, "tj4", &GMHandler::OnTj4);
+    Reg(3, "opentj", &GMHandler::OnOpenTj);
     Reg(2, "idip", &GMHandler::OnAddIdip);
     Reg(2, "clear", &GMHandler::OnClearTask);
     Reg(2, "reset", &GMHandler::OnClearCFT);
@@ -2725,7 +2726,9 @@ void GMHandler::OnJson(GObject::Player* player, std::vector<std::string>& args)
 #if !defined(_FB) && !defined(_VT)
     UInt64 begin = TimeUtil::GetTick();
     //std::string json = "{\"head\": {\"uiPacketLen\":100,\"uiCmdid\":\"1\",\"uiSeqid\":1,\"szServiceName\":\"IDIP\",\"uiSendTime\": 20110820,\"uiVersion\":1001,\"ucAuthenticate\":\"\",\"iResult\":0,\" szRetErrMsg\":\"\"},\"body\":{\"szOpenId\":\"100001\",\" uiAreaId\":0,\"playerId\":1111}}";
-    const char* json = "{\"head\": {\"uiPacketLen\":100,\"uiCmdid\":\"5\",\"uiSeqid\":1,\"szServiceName\":\"IDIP\",\"uiSendTime\": 20110820,\"uiVersion\":1001,\"ucAuthenticate\":\"\",\"iResult\":0,\" szRetErrMsg\":\"\"},\"body\":{\"szOpenId\":\"100001\",\" uiAreaId\":0,\"playerId\":1111,\"iNum\":1,\"uiItemId\":507}}";
+    //const char* json = "                                       {\"head\": {\"uiPacketLen\":100,\"uiCmdid\":\"5\",\"uiSeqid\":1,\"szServiceName\":\"IDIP\",\"uiSendTime\": 20110820,\"uiVersion\":1001,\"ucAuthenticate\":\"\",\"iResult\":0,\" szRetErrMsg\":\"\"},\"body\":{\"szOpenId\":\"100001\",\" uiAreaId\":0,\"playerId\":1111,\"iNum\":1,\"uiItemId\":507}}";
+    //const char* json = "                                       {\"head\": {\"uiPacketLen\":100,\"uiCmdid\":27,\"uiSeqid\":1,\"szServiceName\":\"IDIP\",\"uiSendTime\": 20121008,\"uiVersion\":1001,\"ucAuthenticate\":\"\",\"iResult\":0,\" szRetErrMsg\":\"\"},\"body\":{\"uiAreaId\":0,\"ucType\":3}}";
+    const char* json = "                                       {\"head\": {\"uiPacketLen\":100,\"uiCmdid\":63,\"uiSeqid\":1,\"szServiceName\":\"IDIP\",\"uiSendTime\": 20121008,\"uiVersion\":1001,\"ucAuthenticate\":\"\",\"iResult\":0,\" szRetErrMsg\":\"\"},\"body\":{\"uiAreaId\":0}}";
     Stream st(0);
     for (UInt16 i = 0; i < 1; ++i)
         jsonParser2((void*)json, strlen(json), st);
@@ -2994,6 +2997,13 @@ void GMHandler::OnTj4(GObject::Player* player, std::vector<std::string>& args)
 		return;
     int bossMaxHp = atoi(args[0].c_str());
     GObject::Tianjie::instance().setTj4BossHp(bossMaxHp);
+}
+void GMHandler::OnOpenTj(GObject::Player* player, std::vector<std::string>& args)
+{
+	if(args.size() < 1)
+		return;
+    int level = atoi(args[0].c_str());
+    GObject::Tianjie::instance().manualOpenTj(level);
 }
 
 inline bool enterSingleHeroStage(GObject::Player* p, UInt32 cnt)

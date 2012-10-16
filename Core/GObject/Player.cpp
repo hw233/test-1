@@ -1208,13 +1208,16 @@ namespace GObject
         udpLog("discount", action, "", "", "", "", "act");
     }
 
-    void Player::tradeUdpLog(UInt32 id, UInt32 val /* = 0 */, UInt32 num /* = 1 */)
+    void Player::tradeUdpLog(UInt32 id, UInt32 val /* = 0 */, UInt32 num /* = 1 */, bool priceLog /* = false */)
     {
         // 交易相关日志
-        char action[16] = "";
+        char action[32] = "";
         if (val)
         {
-            snprintf (action, 16, "F_%d_%d", id, val);
+            if (priceLog)
+                snprintf (action, 16, "F_%d_%d_2", id, val);
+            else
+                snprintf (action, 16, "F_%d_%d", id, val);
         }
         else
         {
@@ -2769,6 +2772,7 @@ namespace GObject
 			{
 				st << buffid[i] << buffleft[i];
 			}
+            st << static_cast<UInt8>(fgt->getHideFashion());
 		}
 	}
 
@@ -4672,6 +4676,39 @@ namespace GObject
 		_playerData.title = t;
 		sendModification(6, _playerData.title);
 		rebuildBattleName();
+/*
+        std::vector<UInt8>& titleAll = _playerData.titleAll;
+        bool flag = false;
+        std::vector<UInt8>::iterator it = find(titleAll.begin(), titleAll.end(), t);
+        if(it == titleAll.end()){
+            titleAll.push_back(t);
+            flag = true;
+        }
+        UInt8 cnt = titleAll.size();
+        if(flag){
+            std::string title = "";
+            if(!cnt)
+                title += "0|";
+            for(UInt8 i = 0; i < cnt; ++i)
+            {
+                title += Itoa(titleAll[i]);
+                title += '|';
+            }
+            printf("############################:%s\n",title.c_str());
+            DB1().PushUpdateData("UPDATE `player` SET `titleAll` = '%s' WHERE `id` = %"I64_FMT"u", title.c_str(), getId());
+        }
+	    Stream st(REP::USER_INFO_CHANGE);
+        st << static_cast<UInt8>(0x17) << cnt;
+        printf("**************************begin\n");
+        for(UInt8 i = 0; i < cnt; ++i)
+        {
+            st << titleAll[i];
+            printf("++++++++++++:%u\n",titleAll[i]);
+        }
+        printf("**************************end\n");
+        st << Stream::eos;
+        send(st);
+        */
 	}
 
 	UInt32 Player::getAchievement( UInt32 a )
@@ -6719,21 +6756,10 @@ namespace GObject
 
         if (World::getRechargeActive())
         {
-#if 0
-            UInt32 total = GetVar(VAR_RECHARGE_TOTAL);
-            UInt8 maxlevel = 0;
-            UInt8 oldVipLevel = calcRechargeLevel(total, maxlevel);
-            total += r;
-            UInt8 vipLevel = calcRechargeLevel(total, maxlevel);
-            sendRechargeMails(oldVipLevel + 1, vipLevel, maxlevel);
-            SetVar(VAR_RECHARGE_TOTAL, total);
-            sendRechargeInfo();
-#else
             UInt32 total = GetVar(VAR_RECHARGE_TOTAL);
             GameAction()->sendRechargeMails(this, total, total+r);
             SetVar(VAR_RECHARGE_TOTAL, total+r);
             sendRechargeInfo(true);
-#endif
         }
 
         if (World::getRechargeActive3366() && atoi(m_domain.c_str()) == 11)
@@ -7831,7 +7857,7 @@ namespace GObject
 			while(sid > 0);
 		}
 	}
-
+#if 0
     static char nameStr[2048];
     const char* Player::patchShowName(const char* name, const UInt64 playerId)
     {
@@ -7869,6 +7895,24 @@ namespace GObject
             return reinterpret_cast<const char*>(nameStr);
         }
         return name;
+    }
+#endif
+    const char* Player::getNameNoSuffix(std::string name)
+    {
+        if(!cfg.merged || name.size() == 0)
+        {
+            _playerData.nameNoSuffix = name;
+            return _playerData.nameNoSuffix.c_str();
+        }
+        Int32 len = name.size() - 1;
+        for (; len > 0; --len)
+        {
+            if (static_cast<UInt8>(name[len]) >= 32)
+                break;
+        }
+        name.resize(len+1);
+        _playerData.nameNoSuffix = name;
+        return _playerData.nameNoSuffix.c_str();
     }
 
 	void Player::sendYDVIPMails( UInt8 l, UInt8 h )
@@ -9826,6 +9870,9 @@ namespace GObject
         case 10:
             getAwardBirthday(opt);
             break;
+        case 11:
+            getAwardLogin(opt);
+            break;
         }
     }
 
@@ -10028,6 +10075,46 @@ namespace GObject
             st << static_cast<UInt8>(10) << static_cast<UInt8>(0);
             st << static_cast<UInt8>(flag ? (2 - num) : (1 - num)) << flag << Stream::eos;
             send(st);
+        }
+    }
+    
+    void Player::getAwardLogin(UInt8 opt)
+    {
+        if(opt == 1) //领奖
+        {
+            if(1 != GetVar(VAR_AWARD_LOGIN))
+                return;
+            //10.14登录抽奖合作与生日罗盘许愿星(周年庆活动)相同的抽奖
+			std::vector<GData::LootResult>::iterator it;
+			for(it = _BirthdayAward.begin(); it != _BirthdayAward.end(); ++ it)
+			{
+				m_Package->ItemNotify(it->id, it->count);
+			}
+			_BirthdayAward.clear();
+            SetVar(VAR_AWARD_LOGIN, 2);
+        }
+        else if(opt == 0) //抽奖
+        {
+            if(GetVar(VAR_AWARD_LOGIN))
+                return;
+            UInt8 idx = 0;
+            if( 0 == (idx = GameAction()->RunBirthdayAward(this)) )
+                return;
+            Stream st(REP::GETAWARD);
+            st << static_cast<UInt8>(11) << idx << Stream::eos;
+            send(st);
+            SetVar(VAR_AWARD_LOGIN, 1);
+        }
+        else if(opt == 2) //告诉客户端可以抽奖
+        {
+            if(GetVar(VAR_AWARD_LOGIN))
+                return;
+            if(World::getLoginAward())
+            {
+                Stream st(REP::GETAWARD);
+                st << static_cast<UInt8>(11) << static_cast<UInt8>(0) << Stream::eos;
+                send(st);
+            }
         }
     }
 
@@ -10831,6 +10918,7 @@ namespace GObject
     {
         if (!pos || pos > 7)
             return;
+#if 0
         MailPackage::MailItem item[7][3] =
         {
             {{9076,30},{509,30},{9177,10},},
@@ -10860,6 +10948,9 @@ namespace GObject
             mailPackageManager.push(mail->id, mitem, size, true);
             DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, _title, _content, strItems.c_str(), mail->recvTime);
         }
+#else
+        GameAction()->sendRechargeRankAward(this, pos);
+#endif
     }
 
     void Player::sendConsumeRankAward(int pos)

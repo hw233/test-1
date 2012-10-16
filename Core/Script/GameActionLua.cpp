@@ -853,7 +853,7 @@ namespace Script
 		const std::string& name = player->getName();
         if(cfg.merged)
         {
-            return player->patchShowName(name.c_str());
+            return player->getNameNoSuffix(name);
         }
         return name.c_str();
 	}
@@ -1227,7 +1227,7 @@ namespace Script
     UInt8 GameActionLua::RunNewRegisterAward(Player* player)
     {
 		assert(player != NULL);
-		return Call<UInt16>("RunNewRegisterAward", player);
+		return Call<UInt8>("RunNewRegisterAward", player);
     }
 
     UInt8 GameActionLua::RunNewRegisterAwardAD_RF(Player* player, UInt8 idx)
@@ -1239,7 +1239,7 @@ namespace Script
     UInt8 GameActionLua::RunBirthdayAward(Player* player)
     {
 		assert(player != NULL);
-		return Call<UInt16>("RunBirthdayAward", player);
+		return Call<UInt8>("RunBirthdayAward", player);
     }
 
     void GameActionLua::sendRNR(Player* player, UInt32 now, UInt32 date, UInt32 total)
@@ -1249,6 +1249,10 @@ namespace Script
     void GameActionLua::sendRechargeMails(Player* player, UInt32 ototal, UInt32 ntotal)
     {
 		return Call<void>("sendRechargeMails", player, ototal, ntotal);
+    }
+    void GameActionLua::sendRechargeRankAward(Player* player, Int32 pos)
+    {
+		return Call<void>("sendRechargeRankAward", player, pos);
     }
 
     void GameActionLua::doAtySignIn(Player* pl, UInt32 id, UInt32 month, UInt32 day)

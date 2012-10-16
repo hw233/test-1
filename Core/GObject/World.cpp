@@ -147,6 +147,8 @@ UInt32 World::_rechargebegin = 0;
 UInt32 World::_rechargeend = 0;
 UInt32 World::_consumebegin = 0;
 UInt32 World::_consumeend = 0;
+bool   World::_townReward_10_15 = false;
+bool World::_loginAward = false;
 /** 0：侠骨；1：柔情；2财富；3传奇 **/
 RCSortType World::killMonsterSort[4];
 
@@ -305,7 +307,10 @@ bool enum_midnight(void * ptr, void* next)
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 7, 9) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 7, 17) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 7, 25) ||
-            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 5)))
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 5) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 17) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 18)
+            ))
     {
         if (pl->isOnline())
         {
@@ -694,16 +699,13 @@ void SendRechargeRankAward()
             Player* player = i->player;
             if (!player)
                 continue;
-            if (player->isOnline())
-            {
-                GameMsgHdr hdr(0x257, player->getThreadId(), player, sizeof(pos));
-                GLOBAL().PushMsg(hdr, &pos);
-            }
-            else
-            {
-                player->sendRechargeRankAward(pos);
-            }
+
+            GameMsgHdr hdr(0x257, player->getThreadId(), player, sizeof(pos));
+            GLOBAL().PushMsg(hdr, &pos);
+
+            SYSMSG_BROADCASTV(4033, pos, player->getCountry(), player->getPName(), i->total);
         }
+        World::rechargeSort.clear();
     }
 }
 
@@ -731,6 +733,8 @@ void SendConsumeRankAward()
                 player->sendConsumeRankAward(pos);
             }
         }
+        //SYSMSG_BROADCASTV(2142, player->getCountry(), player->getPName(), titles[pos]);
+        World::consumeSort.clear();
     }
 }
 
@@ -802,8 +806,13 @@ void World::World_Midnight_Check( World * world )
     bRechargeEnd = bRecharge && !(getRechargeActive()||getRechargeActive3366());
     bConsumeEnd = bConsume && !getConsumeActive();
     bool bMonsterActEnd = bMonsterAct && !getKillMonsterAct();
-
     UInt32 nextday = curtime + 30;
+
+    if (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 17) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 18) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 19))
+        bRechargeEnd = true;
+
 	globalPlayers.enumerate(enum_midnight, static_cast<void *>(&nextday));
     leaderboard.newDrawingGame(nextday);
     //给筷子使用称号
@@ -1042,9 +1051,6 @@ bool World::Init()
     AddTimer(86400 * 1000, TownDeamonTmAward, static_cast<void *>(NULL), (tdChkPoint >= now ? tdChkPoint - now : 86400 + tdChkPoint - now) * 1000);
 
     //AddTimer(60 * 1000, advancedHookTimer, static_cast<void *>(NULL), (60 - now % 60) * 1000);
-
-    AddTimer(3600 * 1000, ClanStatueCheck, static_cast<void *>(NULL), (3600 - now % 3600) * 1000);
-    //AddTimer(5 * 60 * 1000, ClanStatueCheck, static_cast<void *>(NULL));
 
     return true;
 }

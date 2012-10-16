@@ -524,6 +524,7 @@ namespace GObject
 		if(itemType == NULL) return NULL;
 		ITEM_BIND_CHECK(itemType->bindType,bind);
 		ItemBase * item = FindItem(typeId, bind);
+        
 		if (item != NULL)
 		{
 			bool ret = TryAddItem(item, num);
@@ -570,7 +571,13 @@ namespace GObject
                     m_Owner->udpLog("item", strBuf, "", "", "", "", "act", num);
                 }
 
-
+                if (typeId >= 48 && typeId <= 51)//乾坤净水等4个物品
+                {   
+                    char udpStr[32] = {0};            
+                    sprintf(udpStr, "F_1140%d%d_%d", bind, typeId, fromWhere);
+                    m_Owner->udpLog("tripod", udpStr, "", "", "", "", "act", num);
+                 }
+		
 
                 if (typeId == 1209)
                     m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
@@ -601,7 +608,7 @@ namespace GObject
                 }
                 cittaUdpLog(1, typeId, num);
                 secondSoulItemUdpLog(1, typeId, num);
-
+               
                 if (fromWhere == FromQixi)
                 {
                     qixiUdpLog(typeId, num);
@@ -628,7 +635,13 @@ namespace GObject
                     snprintf(strBuf, 32, "I_%u_1_%u", typeId, (UInt32)fromWhere);
                     m_Owner->udpLog("item", strBuf, "", "", "", "", "act", num);
                 }
-
+                if (typeId >= 48 && typeId <= 51)//乾坤净水等4个物品
+                {   
+                    char udpStr[32] = {0};            
+                    sprintf(udpStr, "F_1140%d%d_%d", bind, typeId, fromWhere);
+                    m_Owner->udpLog("tripod", udpStr, "", "", "", "", "act", num);
+                 }
+	
                 //增加获取物品的荣誉
                 //GameAction()->doAttainment(m_Owner, Script::ON_ADD_ITEM, typeId);
                 if (typeId == 1209)
@@ -659,6 +672,7 @@ namespace GObject
 		bool bind = item->GetBindStatus();
 		UInt16 count = item->Count();
 		ItemBase * exist = FindItem(typeId, bind);
+        
 		if (exist != NULL)
 		{
 			if (TryAddItem(exist, count))
@@ -701,7 +715,13 @@ namespace GObject
                 snprintf(strBuf, 32, "I_%u_1_%u", typeId, (UInt32)fromWhere);
                 m_Owner->udpLog("item", strBuf, "", "", "", "", "act", count);
             }
-
+            if (typeId >= 48 && typeId <= 51)//乾坤净水等4个物品
+            {   
+                char udpStr[32] = {0};            
+                sprintf(udpStr, "F_1140%d%d_%d", bind, typeId, fromWhere);
+                m_Owner->udpLog("tripod", udpStr, "", "", "", "", "act", count);
+            }
+	
             if (typeId == 1209)
                 m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
             if (typeId == 1223)
@@ -760,6 +780,13 @@ namespace GObject
             //{
             AddItemCoursesLog(typeId, static_cast<UInt32>(count), fromWhere);
             //}
+            if (typeId >= 48 && typeId <= 51)//乾坤净水等4个物品
+            {   
+                char udpStr[32] = {0};            
+                sprintf(udpStr, "F_1140%d%d_%d", bind, typeId, fromWhere);
+                m_Owner->udpLog("tripod", udpStr, "", "", "", "", "act", count);
+            }
+	           
             if (typeId == 1209)
                 m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
             if (typeId == 1223)

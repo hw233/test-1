@@ -178,6 +178,7 @@ void WorldScript::init()
     def("setFFAttrChance", GObject::GObjectManager::setFFAttrChance);
     def("setFFAttrMaxValProp", GObject::GObjectManager::setFFAttrMaxValProp);
     def("setFFAttrMaxVal", GObject::GObjectManager::setFFAttrMaxVal);
+	def("setTownReward_10_15", GObject::World::setTownReward_10_15);
 
     def("setMergeAthAct", GObject::World::setMergeAthAct);
     def("getMergeAthAct", GObject::World::getMergeAthAct);
@@ -200,6 +201,8 @@ void WorldScript::init()
 	class_add<GData::TitleList>("TitleList");
 	class_def<GData::TitleList>("set", &GData::TitleList::set);
 
+    def("setLoginAward", GObject::World::setLoginAward);
+    def("getLoginAward", GObject::World::getLoginAward);
     //def("setInterval", GObject::ClanCopy::setInterval);
     //def("setStartTick", GObject::ClanCopy::setStartTick);
 }

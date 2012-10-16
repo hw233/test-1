@@ -203,9 +203,15 @@ void ClanCopy::addObserver(Player * player)
 {
     // 增加帮派副本围观人员（不明真相的围观群众）
     if (_observerPlayer.find(player) != _observerPlayer.end())
+    {
+        TRACE_LOG("ClanCopy: addObserver error1.");
         return;    // 已经是围观人员，不需要再次加入（这里也是异常流程）
+    }
     if (_playerIndex.find(player) != _playerIndex.end())
+    {
+        TRACE_LOG("ClanCopy: addObserver error2.");
         return;    // 已经是副本战斗人员（这里也是异常流程）
+    }
     _observerPlayer.insert(player);
 #ifdef DEBUG_CLAN_COPY
     *fileSt << "observer \"" << player->getName() << "\" add." << std::endl;
@@ -277,6 +283,7 @@ void ClanCopy::playerEscape(Player *player)
 #ifdef DEBUG_CLAN_COPY
                 *fileSt << "\"" << player->getName() << "\" is not in playerIndex." << std::endl;
 #endif
+                TRACE_LOG("ClanCopy: playerEscape error.");
 
             }
 
@@ -695,6 +702,7 @@ void ClanCopy::createEnemy()
 #ifdef DEBUG_CLAN_COPY
         *fileSt << "routeCount error." << std::endl;
 #endif
+        TRACE_LOG("ClanCopy: RouteCount error. routeCount = %u", (UInt32) routeCount);
     }
 
     for (UInt8 i = 0; i < routeCount; ++ i)
@@ -827,7 +835,6 @@ void ClanCopy::spotCombat(UInt8 spotId)
     if (flag)
     {
         // 需要重新冲阵
-        //std::cout << "_tickCount = " << _tickCount << ", nextMoveTick = " << _spotMap[spotId].nextMoveTick << "." << std::endl;
 #ifdef DEBUG_CLAN_COPY
         *fileSt << "Start monsters match players." << std::endl;
 #endif
@@ -885,6 +892,7 @@ void ClanCopy::spotCombat(UInt8 spotId)
 #ifdef DEBUG_CLAN_COPY
                     *fileSt << "Battle error1." << std::endl;
 #endif
+                    TRACE_LOG("ClanCopy: Battle error. npcList.size() == 0.");
                     return;
                 }
                 bsim.setFormation(1, (*monsterIt)->formation);
@@ -906,6 +914,7 @@ void ClanCopy::spotCombat(UInt8 spotId)
 #ifdef DEBUG_CLAN_COPY
                     *fileSt << "Battle error2." << std::endl;
 #endif
+                    TRACE_LOG("ClanCopy: Battle error.");
                     return;
                 }
 

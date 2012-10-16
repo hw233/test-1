@@ -455,6 +455,7 @@ void BattleSimulator::start(UInt8 prevWin, bool checkEnh)
                     else if (bf->getFighter()->getFashionTypeId() == 1707)
                         portrait = 1090;
 
+                    bool isBuff = true;
                     if(bf->getBuffData(FIGHTER_BUFF_CRMASGIRL, now))
                         portrait = 1058;
                     else if(bf->getBuffData(FIGHTER_BUFF_DRESS, now))
@@ -499,9 +500,12 @@ void BattleSimulator::start(UInt8 prevWin, bool checkEnh)
                         portrait = 1091;
                     else
                     {
+                        isBuff = false;
                         if (!portrait)
                             portrait = bf->getPortrait();
                     }
+                    if (bf->getFighter()->getHideFashion() && !isBuff)
+                        portrait = bf->getPortrait();
 
                     if(bf->getFighter()->isNpc())
                         _packet << static_cast<UInt8>(bf->getFighter()->reqFriendliness);

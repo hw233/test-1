@@ -987,6 +987,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         if(!pl->GetVar(VAR_AWARD_NEWREGISTER) && pl->GetLev() == 1)
             pl->sendNewRegisterAward(0);  //0:表示新用户注册还可以邀请好友进行抽奖
         pl->CheckCanAwardBirthday(); //生日罗盘许愿星(周年庆活动)
+        pl->getAwardLogin(2); // 2012/10/14登录抽奖合作活动
     }
 	{
 		Stream st;
@@ -1463,6 +1464,10 @@ void OnFighterEquipReq( GameMsgHdr& hdr, FighterEquipReq& fer )
     case 0x30:
         fgt->setPeerless(static_cast<UInt16>(fer._equipId), true);
         break;
+    case 0x33:
+        fgt->setHideFashion(static_cast<UInt8>(fer._equipId));
+        break;
+    
     case 0x2a:
         {
             UInt16 skill = (fer._equipId >> 16) & 0xFFFF;
@@ -1573,14 +1578,21 @@ void OnFighterDismissReq( GameMsgHdr& hdr, FighterDismissReq& fdr )
 		UInt16 rCount2 = static_cast<UInt16>(exp / 500000);
 		exp = exp % 500000;
 		UInt16 rCount3 = static_cast<UInt16>(exp / 5000);
+		
+	    UInt64 pexp = fgt->getPExp() * 0.6;
+        UInt16 rCount4 = static_cast<UInt16>(pexp / 1000000);
+        pexp = pexp % 1000000;
+		UInt16 rCount5 = static_cast<UInt16>(pexp / 10000);
+        pexp = pexp % 10000;
+		UInt16 rCount6 = static_cast<UInt16>(pexp / 100);
 		SYSMSG(title, 236);
 		SYSMSGV(content, 237, fgt->getLevel(), fgt->getColor(), fgt->getName().c_str());
-		MailPackage::MailItem mitem[3] = {{14, rCount1}, {13, rCount2}, {12, rCount3}};
-		MailItemsInfo itemsInfo(mitem, DismissFighter, 3);
+		MailPackage::MailItem mitem[6] = {{14, rCount1}, {13, rCount2}, {12, rCount3}, {31, rCount4}, {30, rCount5}, {29, rCount6}};
+		MailItemsInfo itemsInfo(mitem, DismissFighter, 6);
 		GObject::Mail * pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
 		if(pmail != NULL)
 		{
-			GObject::mailPackageManager.push(pmail->id, mitem, 3, true);
+			GObject::mailPackageManager.push(pmail->id, mitem, 6, true);
 		}
 	}
     fgt->delAllCitta();
@@ -5118,7 +5130,6 @@ void OnSkillStrengthen( GameMsgHdr& hdr, const void* data)
         br >> skillid;
         br >> num;
 
-        bool brk = false;
         for (UInt16 i = 0; i < num; ++i)
         {
             UInt32 itemid = 0;
@@ -5128,16 +5139,7 @@ void OnSkillStrengthen( GameMsgHdr& hdr, const void* data)
             br >> itemnum;
             br >> bind;
 
-            for (UInt16 j = 0; j < itemnum; ++j)
-            {
-                if (!fgt->SSUpgrade(skillid, itemid, bind))
-                {
-                    brk = true;
-                    break;
-                }
-            }
-
-            if (brk)
+            if (!fgt->SSUpgrade(skillid, itemid, itemnum, bind))
                 break;
         }
     }

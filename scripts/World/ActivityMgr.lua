@@ -181,7 +181,7 @@ function GetAtyReward(player, flag)
     local rand = math.random(100);
 
     local isChristmas = getChristmas();
-    if flag == 4 then
+    if flag == 4 then -- 60
         local gemid =  getRandGem(1);
         package:AddItem(gemid, 1, true, false, 24 ); 
         if  isChristmas == true then
@@ -190,7 +190,7 @@ function GetAtyReward(player, flag)
         end
     end
 
-    if flag == 8 then
+    if flag == 8 then -- 80
 
         player:getTael(500);
         package:AddItem(502, 1, true, false, 24 );
@@ -201,9 +201,10 @@ function GetAtyReward(player, flag)
 
     end
 
-    if flag == 16 then
+    if flag == 16 then -- 100
        player:getCoupon(20); 
        package:AddItem(503, 1, true, false, 24 );
+       package:AddItem(50, 1, true, false, 24 );
 
         if  isChristmas == true then
             package:AddItem(401, 2, true, false, 24 );
@@ -212,7 +213,7 @@ function GetAtyReward(player, flag)
         player:OnShuoShuo(1)
     end
 
-    if flag == 32 then
+    if flag == 32 then -- 120
          package:AddItem(30, 1, true, false, 24 );
          if rand <= 20 then
              package:AddItem(514, 1, true, false, 24 );

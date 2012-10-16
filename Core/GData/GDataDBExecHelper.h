@@ -448,6 +448,8 @@ struct DBTianjie
     UInt8 r4_day;
     UInt8 open_next;
     UInt8 is_wait;
+    UInt8 is_manual;
+    UInt8 is_touch;
 };
 struct DBPlayerMaxLevel
 {
@@ -959,7 +961,7 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBTianjie)
-SPECIALDEF(14)
+SPECIALDEF(16)
     (
     int,id,
     bool,is_opened,
@@ -974,7 +976,9 @@ SPECIALDEF(14)
     int, r3_copyid,
     UInt8, r4_day,
     UInt8, open_next,
-    UInt8, is_wait
+    UInt8, is_wait,
+    UInt8, is_manual,
+    UInt8, is_touch
     )
 SPECIALEND()
 

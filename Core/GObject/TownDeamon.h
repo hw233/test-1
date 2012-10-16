@@ -117,7 +117,7 @@ class TownDeamon
         void addActivity(Player* pl);
         void getTjItem(Player* pl, UInt8 townLevel);
         void sendTjItemInfo(Player* pl);
-
+        void getTownReward_10_15(Player* pl, UInt16 level);
     private:
         void quitDeamon(Player* pl, Player* attacker = NULL);
         void occupyDeamon(Player* pl, UInt16 level);

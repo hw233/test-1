@@ -40,6 +40,7 @@
 #include "GObject/World.h"
 #include "GObject/Var.h"
 #include "GObject/RealItemAward.h"
+#include "GObject/Tianjie.h"
 //#include "MsgHandler/JsonParser.h"
 
 #ifndef _WIN32
@@ -328,6 +329,22 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 		UInt64 pid = ul._userid;
 		if(cfg.merged)
 		{
+            if (!cfg.mergeList.empty())
+            {
+                StringTokenizer st(cfg.mergeList, " ");
+                if(st.count())
+                {
+                    UInt32 i;
+                    for (i = 0; i < st.count(); ++i)
+                    {
+                        printf("atoi(st[i].c_str()):%d, getServerNo(ul._server):%lu\n", atoi(st[i].c_str()), getServerNo(ul._server));
+                        if(static_cast<UInt64>(atoi(st[i].c_str())) == getServerNo(ul._server))
+                            break;
+                    }
+                    if(i == st.count())
+                        return;
+                }
+            }
 			pid |= (getServerNo(ul._server) << 48);
 		}
 		res = doLogin(cl, pid, hdr.sessionID, player);
@@ -755,6 +772,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
         ret = 4;
     }
 
+    GObject::Player * pl = NULL;
     if (!err.length())
     {
         if (id == 29999 && num)
@@ -762,6 +780,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
             GObject::Player * player=GObject::globalPlayers[player_Id];
             if(player != NULL)
             {
+                pl = player;
                 struct Recharge
                 {
                     UInt8 type;
@@ -799,7 +818,18 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
 
     Stream st;
     st.init(SPEP::USERRECHARGE, 0x01);
-    st<< ret << err << Stream::eos;
+    st<< ret << err;
+    if (pl)
+    {
+        st << static_cast<UInt16>(pl->GetLev()); 
+        st << static_cast<UInt16>(pl->isYD());
+        if (pl->isYD())
+            st << static_cast<UInt16>(pl->getQQVipl());
+        else
+            st << static_cast<UInt16>(0);
+    }
+    st << Stream::eos;
+
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 
     return;
@@ -821,11 +851,13 @@ void onUserReRecharge( LoginMsgHdr& hdr, const void * data )
 
     std::string err = "";
     UInt8 ret = GObject::GObjectManager::reRecharge(no, id, num, err);
+    GObject::Player * pl = NULL;
     if (!ret)
     {
         GObject::Player * player=GObject::globalPlayers[player_Id];
         if(player != NULL)
         {
+            pl = player;
             struct Recharge
             {
                 UInt8 type;
@@ -853,7 +885,17 @@ void onUserReRecharge( LoginMsgHdr& hdr, const void * data )
 
     Stream st;
     st.init(SPEP::RERECHARGE, 0x01);
-    st<< ret << err << Stream::eos;
+    st<< ret << err;
+    if (pl)
+    {
+        st << static_cast<UInt16>(pl->GetLev()); 
+        st << static_cast<UInt16>(pl->isYD());
+        if (pl->isYD())
+            st << static_cast<UInt16>(pl->getQQVipl());
+        else
+            st << static_cast<UInt16>(0);
+    }
+    st << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
     return;
 }
@@ -1957,7 +1999,7 @@ void PlayerInfoFromBs(LoginMsgHdr &hdr, const void * data)
         {
             st << player->getId();
         }
-        st << player->patchShowName(player->getName().c_str());
+        st << player->getNameNoSuffix(player->getName());
         st << player->GetLev();
         st << player->getCountry();
         st << player->GetClass();
@@ -2353,6 +2395,22 @@ void AddClanAward(LoginMsgHdr& hdr, const void* data)
 
         st << ret << Stream::eos;
     }
+    NETWORK()->SendMsgToClient(hdr.sessionID, st);
+}
+
+void ManualOpenTj(LoginMsgHdr& hdr, const void* data)
+{
+    //手动开启天劫
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+
+    UInt16 level = 0;
+    br >> level;
+    UInt8 ret = GObject::Tianjie::instance().manualOpenTj(level);
+
+    Stream st(SPEP::MANUALOPENTJ);
+
+    st << ret << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID, st);
 }
 
