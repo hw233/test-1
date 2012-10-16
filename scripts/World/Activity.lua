@@ -311,6 +311,12 @@ function onActivityCheck(tm)
       setDuanWu(false)
   end
 
+  if tm >= actTime214 and tm < actTime215 then
+      set3366PrivilegeAct(true)
+  else
+      set3366PrivilegeAct(false)
+  end
+
   if isFBVersion() then
       if tm >= actTime101 and tm < actTime102 then
           setFighter1368(true)
@@ -797,6 +803,8 @@ function initActTime(y, m, d)
 
   -- 2012.10.14登录抽奖合作
   local  SerStartTm211 = { ['year'] = 2012, ['month'] = 10, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 3366特权活动(通游戏大厅)
+  local  SerStartTm212 = { ['year'] = 2012, ['month'] = 10, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
@@ -1040,6 +1048,9 @@ function initActTime(y, m, d)
 
   actTime212= os.time(SerStartTm211);
   actTime213= os.time(SerStartTm211) + 3 * 86400;
+
+  actTime214= os.time(SerStartTm212);
+  actTime215= os.time(SerStartTm212) + 1 * 86400;
 
   onActivityCheck(os.time() + 30);
 

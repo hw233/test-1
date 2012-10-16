@@ -233,6 +233,10 @@ public:
     { _qqgameact = v; }
     inline static bool getQQGameAct()
     { return _qqgameact; }
+    inline static void set3366PrivilegeAct(bool v)
+    { _3366privilegeact = v; }
+    inline static bool get3366PrivilegeAct()
+    { return _3366privilegeact; }
 
     inline static void setTrainFighter(bool v)
     { _trainfighter = v; }
@@ -421,6 +425,7 @@ public:
     static bool _qqvipact;
     static bool _fallact;
     static bool _qqgameact;
+    static bool _3366privilegeact;
     static void* _recalcwd;
     static bool _june;
     static bool _june1;
