@@ -153,6 +153,8 @@ sysMsg:set(1091, 1, "您消费%u点声望")
 
 sysMsg:set(1092, 0x1, "QQ大厅特权额外获得%u经验")
 sysMsg:set(1093, 0x35, "QQ大厅特权额外获得%u经验")
+sysMsg:set(1094, 0x1, "3366特权额外获得%u经验")
+sysMsg:set(1095, 0x35, "3366特权额外获得%u经验")
 sysMsg:set(200, 0, "竞拍成功")
 sysMsg:set(201, 0, "散仙名: %s\n请确认并接收散仙。")
 sysMsg:set(202, 0, "竞拍价被超越")

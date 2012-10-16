@@ -3009,11 +3009,19 @@ namespace GObject
 
                 if (isOffical())
                     exp -= (exp/10);
-                if(this->getPlatform() == 10 && World::getQQGameAct())
+                if((this->getPlatform() == 10 && World::getQQGameAct()) || (this->getPlatform() == 11 && World::get3366PrivilegeAct()))
                 {
                     UInt32 extraExp = exp / 2;//蓝黄钻野外手动打怪经验+50%
-                    SYSMSG_SENDV(1092, this, extraExp);
-                    SYSMSG_SENDV(1093, this, extraExp);
+                    if(this->getPlatform() == 10 && World::getQQGameAct())
+                    {
+                        SYSMSG_SENDV(1092, this, extraExp);
+                        SYSMSG_SENDV(1093, this, extraExp);
+                    }
+                    else
+                    {
+                        SYSMSG_SENDV(1094, this, extraExp);
+                        SYSMSG_SENDV(1095, this, extraExp);
+                    }
                     exp += extraExp;
                 }
                 pendExp(exp);
@@ -8676,7 +8684,7 @@ namespace GObject
 	void Player::updateNextBookStoreUpdate(UInt32 curtime)
 	{
         UInt32 tmp = _bookStoreInterval;
-        if(this->getPlatform() == 10 && World::getQQGameAct())
+        if((this->getPlatform() == 10 && World::getQQGameAct()) || (this->getPlatform() == 11 && World::get3366PrivilegeAct()))
             tmp /= 2;
         if(tmp == 0)
             tmp = 1;
