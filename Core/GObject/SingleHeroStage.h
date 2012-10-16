@@ -377,6 +377,7 @@ namespace GObject
         std::map<Player*, TowerBattles> _battleMap;
         SingleHeroFighter* m_topTowerFighter[3];
 
+        URandom _rnd;
         UInt8 m_gpId;
         UInt8 m_round;
         UInt8 m_type;
@@ -429,6 +430,7 @@ namespace GObject
 
             return itTeam->second;
         }
+
     private:
         UInt8 m_currIdx;
         UInt8 m_swapIdx;

@@ -653,7 +653,10 @@ namespace GObject
             return true;
         UInt32 pCnt = getPlayerCount();
         if(pCnt == 0)
+        {
+            ++ m_progress;
             return true;
+        }
         else if(pCnt <= STAGE_FINAL_PLAYER_CNT)
         {
             std::swap(m_currIdx, m_swapIdx);
@@ -735,8 +738,16 @@ namespace GObject
                 sbr2._battleTime = TimeUtil::Now();
                 sbr2._battleId = rid;
                 pl2->_battles.push_back(sbr2);
+                Stream st1(REP::SINGLE_HERO);
+                Stream st2(REP::SINGLE_HERO);
+                st1 << static_cast<UInt8>(0x06) << static_cast<UInt8>(m_gpId) << static_cast<UInt8>(0x01);
+                st2 << static_cast<UInt8>(0x06) << static_cast<UInt8>(m_gpId) << static_cast<UInt8>(0x01);
+                st1 << static_cast<UInt8>((m_type & e_sh_slsy) ? 0 : 1);
+                st2 << static_cast<UInt8>((m_type & e_sh_slsy) ? 0 : 1);
                 if(result)
                 {
+                    st1 << static_cast<UInt8>(0x00);
+                    st2 << static_cast<UInt8>(0x01);
                     ++ pl1->_won;
                     m_preliminary[m_swapIdx][i].push_back(pl1);
                     if(i < 4)
@@ -764,6 +775,8 @@ namespace GObject
                 }
                 else
                 {
+                    st1 << static_cast<UInt8>(0x01);
+                    st2 << static_cast<UInt8>(0x00);
                     ++ pl2->_won;
                     m_preliminary[m_swapIdx][i].push_back(pl2);
                     if(i < 4)
@@ -790,6 +803,12 @@ namespace GObject
                     }
                 }
                 -- size;
+
+                st1 << static_cast<UInt16>(pl2->_fgt->getId()) << static_cast<UInt32>(rid) << pl2->_player->getName() << Stream::eos;
+                st2 << static_cast<UInt16>(pl1->_fgt->getId()) << static_cast<UInt32>(rid) << pl1->_player->getName() << Stream::eos;
+
+                pl1->_player->send(st1);
+                pl2->_player->send(st2);
 
                 DB1().PushUpdateData("REPLACE INTO `sh_preliminary`(`gpId`, `cls`, `type`, `won`, `player1`, `player2`, `battleTime`, `battleId`) VALUES(%u, %u, %u, %u, %"I64_FMT"u, %"I64_FMT"u, %u, %u)", m_gpId, m_cls, m_type, result ? 1 : 0, pl1->_player->getId(), pl2->_player->getId(), sbr._battleTime, sbr._battleId);
             }
@@ -824,7 +843,9 @@ namespace GObject
 
     bool SHBattleStage::processFinals()
     {
-        if(m_progress < e_sh_16 || m_progress > e_sh_2)
+        if(m_progress < e_sh_16)
+            return false;
+        if(m_progress > e_sh_2)
             return true;
 
         int idx = m_progress - 2;
@@ -917,8 +938,6 @@ namespace GObject
         }
 
         write2DB();
-        if(m_progress > e_sh_2)
-            return true;
 
         return false;
     }
@@ -1726,7 +1745,10 @@ namespace GObject
         {
             UInt8 cnt = 3;
             UInt8 wonFlag = 0;
-            st << cnt << wonFlag;
+            st << cnt;
+
+            size_t offset = st.size();
+            st << wonFlag;
             for(int j = 0; j < cnt; ++ j)
             {
                 UInt8 idx1 = chelun[r][j][0];
@@ -1749,12 +1771,14 @@ namespace GObject
                     {
                         if(battles[i]._other == sp2->_player)
                         {
+                            wonFlag |= (battles[i]._won << j);
                             st << battles[i]._battleId;
                             break;
                         }
                     }
                 }
             }
+            st.data<UInt8>(offset) = wonFlag;
         }
 
         return true;
@@ -1845,8 +1869,8 @@ namespace GObject
         char querystr[1024] = {0};
         DBSHTowerBattle shtb;
         memset(querystr, 0, sizeof(querystr));
-        sprintf(querystr, "SELECT `player`, `won`, `level`, `turns`, `battleId`, `npcId`  FROM `sh_towerbattle` \
-                WHERE `cls`=%u ORDER BY `player` ASC, `level` ASC`", m_cls);
+        sprintf(querystr, "SELECT `player`, `won`, `level`, `turns`, `battleId`, `npcId`  FROM `sh_towerbattle` WHERE `cls`=%u ORDER BY `player` ASC, `level` ASC", 
+                m_cls);
         if(execu->Prepare(querystr, shtb) == DB::DB_OK)
         {
             while(execu->Next() == DB::DB_OK)
@@ -1919,6 +1943,10 @@ namespace GObject
             if (challenge(*it))
                 stillAlive = true;
         }
+        for (TowerFighterIt it = m_towerFighters.begin(); it != m_towerFighters.end(); ++ it)
+        {
+            sendTowerInfo((*it)->getPlayer(), (*it)->getTLevel(), (*it)->getTTurns());
+        }
         ++ m_round;
         if (stillAlive)
             return false; // 还有人在坚持爬塔。
@@ -1951,6 +1979,35 @@ namespace GObject
         fgt->setTTurns(turns);
         fgt->setTLastTurns(lastTurns);
         enter(player, fgt);
+
+        UInt8 pos = 3;
+        for (UInt8 i = 0; i < 3; ++i)
+        {
+            if (m_topTowerFighter[i] == fgt)
+            {
+                pos = i + 1;
+                break;
+            }
+        }
+        for (UInt8 i = 0; i < pos - 1; ++i)
+        {
+            if (!m_topTowerFighter[i])
+            {
+                m_topTowerFighter[i] = fgt;
+                break;
+            }
+            if (TowerPlayerBetter(fgt, m_topTowerFighter[i]))
+            {
+                // 需要更新排名
+                for (UInt8 j = pos - 1; j > i; --j)
+                {
+                    if (m_topTowerFighter[j - 1])
+                        m_topTowerFighter[j] = m_topTowerFighter[j - 1];
+                }
+                m_topTowerFighter[i] = fgt;
+                break;
+            }
+        }
     }
 
     void SHTowerStage::clear()
@@ -1966,15 +2023,15 @@ namespace GObject
     bool SHTowerStage::challenge(SingleHeroFighter* fighter)
     {
         // 对于该玩家的具体战斗，返回bool为是否胜利
-        // FIXME: 怪物配置不知道怎么玩
-        static GData::NpcGroups::iterator it = GData::npcGroups.find(6069);
+
+        const UInt32 defaultNpcIdBegin = 12052;
+        const UInt32 defaultNpcIdEnd = 12061;
+
+        UInt32 npcId = defaultNpcIdBegin + m_round / 10;
+        if (npcId > defaultNpcIdEnd)
+            npcId = defaultNpcIdEnd;
+        GData::NpcGroups::iterator it = GData::npcGroups.find(12052);
         GData::NpcGroup * ng = it->second;
-        UInt32 npcId = it->first;
-        if (!ng)
-            return false;
-        if (it == GData::npcGroups.find(6557))
-            it = GData::npcGroups.find(6069);
-        ++it;
 
 
         UInt32 turns = 0;
@@ -1982,12 +2039,64 @@ namespace GObject
         Battle::BattleFighter * bf = bsim.newFighter(0, 12, fighter->getFighter());
         bf->setHP(fighter->getCurrentHP());
         ng->putFighters(bsim);
+        // 基础值 * (1 + 层数 * 系数 * 随机值)
+        //物攻  法攻  物防  法防  生命  身法  命中   闪避   反击   法术抵抗
+        static const float  s_rate3NpcBaseModulus[6] = {0.01f, 0.01f, 0.1f, 0.1f, 0.1f, 0.01f};
+        static const float  s_rate3NpcAdvanceModulus[4] = {0.01f, 0.01f, 0.01f, 0.01f};
+
+        static const float  s_rate3NpcAdvanceModMax[] =  {200, 100, 100, 200};
+
+        UInt16 formation = ng->getFormation();
+        bsim.setFormation(1, formation);
+        std::vector<GData::NpcFData>& nl = ng->getList();
+        UInt32 npcCount = nl.size();
+        Fighter ** fighterList = new Fighter *[npcCount];
+        UInt32 i = 0;
+        for (std::vector<GData::NpcFData>::iterator it = nl.begin(); it != nl.end(); ++ it)
+        {
+            fighterList[i] = it->fighter->clone(NULL);
+
+            fighterList[i]->maxhp = fighterList[i]->getBaseHP();
+            fighterList[i]->setCurrentHP(fighterList[i]->maxhp, false);
+            fighterList[i]->attack  = fighterList[i]->getBaseAttack()    * (1 + s_rate3NpcBaseModulus[0]*m_round*(_rnd(10) + 1));
+            fighterList[i]->magatk  = fighterList[i]->getBaseMagAttack() * (1 + s_rate3NpcBaseModulus[1]*m_round*(_rnd(10) + 1));
+            fighterList[i]->defend  = fighterList[i]->getBaseDefend()    * (1 + s_rate3NpcBaseModulus[2]*m_round*(_rnd(10) + 1));
+            fighterList[i]->magdef  = fighterList[i]->getBaseMagDefend() * (1 + s_rate3NpcBaseModulus[3]*m_round*(_rnd(10) + 1));
+            fighterList[i]->maxhp   = fighterList[i]->getBaseHP()        * (1 + s_rate3NpcBaseModulus[4]*m_round*(_rnd(10) + 1));
+            fighterList[i]->action  = fighterList[i]->getBaseAction()    * (1 + s_rate3NpcBaseModulus[5]*m_round*(_rnd(10) + 1));
+            fighterList[i]->hitrate = fighterList[i]->getBaseHitrate()   * (1 + s_rate3NpcAdvanceModulus[0]*m_round*(_rnd(10) + 1));
+            fighterList[i]->evade   = fighterList[i]->getBaseEvade()     * (1 + s_rate3NpcAdvanceModulus[1]*m_round*(_rnd(10) + 1));
+            fighterList[i]->counter = fighterList[i]->getBaseCounter()   * (1 + s_rate3NpcAdvanceModulus[2]*m_round*(_rnd(10) + 1));
+            fighterList[i]->magres  = fighterList[i]->getBaseMagRes()    * (1 + s_rate3NpcAdvanceModulus[3]*m_round*(_rnd(10) + 1));
+
+            fighterList[i]->hitrate = fighterList[i]->hitrate < s_rate3NpcAdvanceModMax[0] ? fighterList[i]->hitrate : s_rate3NpcAdvanceModMax[0];
+            fighterList[i]->evade = fighterList[i]->evade < s_rate3NpcAdvanceModMax[1] ? fighterList[i]->evade : s_rate3NpcAdvanceModMax[1];
+            fighterList[i]->counter = fighterList[i]->counter < s_rate3NpcAdvanceModMax[2] ? fighterList[i]->counter : s_rate3NpcAdvanceModMax[2];
+            fighterList[i]->magres = fighterList[i]->magres < s_rate3NpcAdvanceModMax[3] ? fighterList[i]->magres : s_rate3NpcAdvanceModMax[3];
+            fighterList[i]->setDirty(false);
+
+            if(fighterList[i]->getId() <= GREAT_FIGHTER_MAX)
+                bsim.setPortrait(1, fighterList[i]->getId());
+            else
+                bsim.setPortrait(1, fighterList[i]->favor);
+            bsim.newFighter(1, it->pos, fighterList[i]);
+            ++ i;
+        }
+
         bsim.start(0xFF, false);
+
+        for (i = 0; i < npcCount; ++ i)
+        {
+            delete fighterList[i];
+        }
+        delete [] fighterList;
+
+
         bool res = bsim.getWinner() == 1;
+        turns = bsim.getTurns();
         if (res)
         {
             // 战斗胜利，增加玩家身上的战斗数据
-            turns = bsim.getTurns();
             fighter->stepTLevel();
             fighter->addTTurns (turns);
             fighter->setTLastTurns (turns);
@@ -2053,14 +2162,14 @@ namespace GObject
 
         TowerBattleReport tbr;
         tbr._won = res ? 0 : 1;
-        UInt16 tLevel = fighter->getTLevel();
+        UInt16 tLevel = fighter->getTLevel() + (res ? 0 : 1);
         tbr._level = tLevel;
         tbr._battleId = bsim.getId();
-        tbr._turns = fighter->getTTurns();
+        tbr._turns = turns;
         tbr._npcId = npcId;
         _battleMap[fighter->getPlayer()].push_back(tbr);
-        DB1().PushUpdateData("INSERT INTO `sh_towerbattle`(`cls`, `player`, `won`, `level`, `turns`, `battleId`, `npcId` )\
-                VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u, %u)", m_cls, fighter->getPlayer()->getId(), tbr._won, tbr._level, tbr._turns, tbr._battleId, tbr._npcId );
+        DB1().PushUpdateData("INSERT INTO `sh_towerbattle`(`cls`, `player`, `won`, `level`, `turns`, `battleId`, `npcId` ) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u, %u)", 
+                m_cls, fighter->getPlayer()->getId(), tbr._won, tbr._level, tbr._turns, tbr._battleId, tbr._npcId );
         return res;
     }
 
@@ -2100,7 +2209,7 @@ namespace GObject
             for (TowerBattles::iterator it = _battleMap[player].begin(); it != _battleMap[player].end(); ++ it)
             {
                 st << static_cast<UInt16>(it->_level);    // 层数
-                st << static_cast<UInt32>(it->_turns);    // 耗时
+                st << static_cast<UInt32>(it->_turns * 2);// 耗时
                 st << static_cast<UInt8> (it->_won);      // 战斗结果
                 st << static_cast<UInt32>(it->_battleId); // 战报Id
                 st << static_cast<UInt32>(it->_npcId);    // 怪物Id
@@ -2113,7 +2222,6 @@ namespace GObject
         }
         st << Stream::eos;
         player->send(st);
-
     }
 
 
@@ -2232,7 +2340,10 @@ namespace GObject
             return true;
         UInt32 pCnt = getTeamCount();
         if(pCnt == 0)
+        {
+            ++ m_progress;
             return true;
+        }
         else if(pCnt <= STAGE_FINAL_PLAYER_CNT)
         {
             std::swap(m_currIdx, m_swapIdx);
@@ -2314,8 +2425,17 @@ namespace GObject
                 sbr2._battleTime = TimeUtil::Now();
                 sbr2._battleId = rid;
                 pl2->_battles.push_back(sbr2);
+
+                Stream st1(REP::SINGLE_HERO);
+                Stream st2(REP::SINGLE_HERO);
+                st1 << static_cast<UInt8>(0x06) << static_cast<UInt8>(m_gpId) << static_cast<UInt8>(0x01);
+                st2 << static_cast<UInt8>(0x06) << static_cast<UInt8>(m_gpId) << static_cast<UInt8>(0x01);
+                st1 << static_cast<UInt8>((m_type & e_sh_sr) ? 0 : 1);
+                st2 << static_cast<UInt8>((m_type & e_sh_sr) ? 0 : 1);
                 if(result)
                 {
+                    st1 << static_cast<UInt8>(0x00);
+                    st2 << static_cast<UInt8>(0x01);
                     ++ pl1->_won;
                     m_preliminary[m_swapIdx][i].push_back(pl1);
                     if(i < 4)
@@ -2332,6 +2452,8 @@ namespace GObject
                 }
                 else
                 {
+                    st1 << static_cast<UInt8>(0x01);
+                    st2 << static_cast<UInt8>(0x00);
                     ++ pl2->_won;
                     m_preliminary[m_swapIdx][i].push_back(pl2);
                     if(i < 4)
@@ -2347,6 +2469,26 @@ namespace GObject
                     }
                 }
                 -- size;
+
+                st1 << static_cast<UInt16>(pl2->_teamId) << static_cast<UInt32>(rid) << "" << Stream::eos;
+                st2 << static_cast<UInt16>(pl1->_teamId) << static_cast<UInt32>(rid) << "" << Stream::eos;
+
+                {
+                    std::vector<SingleHeroPlayer*>& playerList = pl1->_playerList;
+                    size_t cnt = playerList.size();
+                    for(size_t i = 0; i < cnt; ++ i)
+                    {
+                        playerList[i]->_player->send(st1);
+                    }
+                }
+                {
+                    std::vector<SingleHeroPlayer*>& playerList = pl2->_playerList;
+                    size_t cnt = playerList.size();
+                    for(size_t i = 0; i < cnt; ++ i)
+                    {
+                        playerList[i]->_player->send(st2);
+                    }
+                }
 
                 DB1().PushUpdateData("REPLACE INTO `sh_preliminary`(`gpId`, `cls`, `type`, `won`, `player1`, `player2`, `battleTime`, `battleId`) VALUES(%u, 0, %u, %u, %"I64_FMT"u, %"I64_FMT"u, %u, %u)", m_gpId, m_type, result ? 1 : 0, pl1->_teamId, pl2->_teamId, sbr._battleTime, sbr._battleId);
             }
@@ -2382,7 +2524,9 @@ namespace GObject
 
     bool SHStarStage::processFinals()
     {
-        if(m_progress < e_sh_16 || m_progress > e_sh_2)
+        if(m_progress < e_sh_16)
+            return false;
+        if(m_progress > e_sh_2)
             return true;
 
         int idx = m_progress - 2;
@@ -2468,9 +2612,6 @@ namespace GObject
         }
 
         write2DB();
-
-        if(m_progress > e_sh_2)
-            return true;
 
         return false;
     }
@@ -3119,6 +3260,7 @@ namespace GObject
             UInt8 cnt = 3;
             UInt8 wonFlag = 0;
             st << cnt << wonFlag;
+            size_t offset = st.size();
             for(int j = 0; j < cnt; ++ j)
             {
                 UInt8 idx1 = chelun[r][j][0];
@@ -3141,12 +3283,14 @@ namespace GObject
                     {
                         if(battles[i]._other == sp2)
                         {
+                            wonFlag |= (battles[i]._won << j);
                             st << battles[i]._battleId;
                             break;
                         }
                     }
                 }
             }
+            st.data<UInt8>(offset) = wonFlag;
         }
 
         return true;
@@ -3588,8 +3732,11 @@ namespace GObject
         return true;
     }
 
-    bool SHBroad(GObject::Player *player, void *v)
+    bool enum_stream(GObject::Player *player, void *v)
     {
+        if(player == NULL)
+            return true;
+
         Stream *st = static_cast<Stream *>(v);
         player->send(*st);
         return true;
@@ -3757,6 +3904,7 @@ namespace GObject
     {
         bool ret = true;
 
+        UInt8 process = 0;
         for(int i = 0; i < 4; ++ i)
         {
             if(!m_singleStage[i])
@@ -3773,16 +3921,19 @@ namespace GObject
                 ret2 = m_singleStage[i]->processFinals();
                 if(m_singleStage2[i])
                     ret2 = m_singleStage2[i]->processFinals();
+                process = 2;
                 if(ret2)
                 {
                     ret2 = m_singleStage[i]->process3Finals();
                     if(m_singleStage2[i])
                         ret2 = m_singleStage2[i]->process3Finals();
+                    process = 3;
                 }
                 break;
             case e_sh_single_fin:
                 {
                     ret2 = m_singleFinalStage[i]->process();
+                    process = 4;
                 }
                 break;
             }
@@ -3790,6 +3941,12 @@ namespace GObject
                 ret = ret2;
         }
 
+        if(process != 0)
+        {
+            Stream st(REP::SINGLE_HERO);
+            st << static_cast<UInt8>(0x06) << static_cast<UInt8>(e_sh_gp_sl) << process << Stream::eos;
+            globalPlayers.enumerate(enum_stream, (void *)(&st));
+        }
         return ret;
     }
 
@@ -3797,6 +3954,7 @@ namespace GObject
     {
         bool ret = true;
 
+        UInt8 process = 0;
         for(int i = 0; i < 4; ++ i)
         {
             if(!m_strategyStage[i])
@@ -3813,16 +3971,19 @@ namespace GObject
                 ret2 = m_strategyStage[i]->processFinals();
                 if(m_strategyStage2[i])
                     ret2 = m_strategyStage2[i]->processFinals();
+                process = 2;
                 if(ret2)
                 {
                     ret2 = m_strategyStage[i]->process3Finals();
                     if(m_strategyStage2[i])
                         ret2 = m_strategyStage2[i]->process3Finals();
+                    process = 3;
                 }
                 break;
             case e_sh_strategy_fin:
                 {
                     ret2 = m_strategyFinalStage[i]->process();
+                    process = 4;
                 }
                 break;
             }
@@ -3830,6 +3991,12 @@ namespace GObject
                 ret = ret2;
         }
 
+        if(process != 0)
+        {
+            Stream st(REP::SINGLE_HERO);
+            st << static_cast<UInt8>(0x06) << static_cast<UInt8>(e_sh_gp_sy) << process << Stream::eos;
+            globalPlayers.enumerate(enum_stream, (void *)(&st));
+        }
         return ret;
     }
 
@@ -3847,6 +4014,7 @@ namespace GObject
             return ret;
 
         bool ret2 = true;
+        UInt8 process = 0;
         switch(m_progress)
         {
         case e_sh_star_pre:
@@ -3858,22 +4026,31 @@ namespace GObject
             ret2 = m_starStage->processFinals();
             if(m_starStage2)
                 ret2 = m_starStage2->processFinals();
+            process = 2;
             if(ret2)
             {
                 ret2 = m_starStage->process3Finals();
                 if(m_starStage2)
                     ret2 = m_starStage2->process3Finals();
+                process = 3;
             }
             break;
         case e_sh_star_fin:
             {
                 ret2 = m_starFinalStage->process();
+                process = 4;
             }
             break;
         }
         if(!ret2)
             ret = ret2;
 
+        if(process != 0)
+        {
+            Stream st(REP::SINGLE_HERO);
+            st << static_cast<UInt8>(0x06) << static_cast<UInt8>(e_sh_gp_sr) << process << Stream::eos;
+            globalPlayers.enumerate(enum_stream, (void *)(&st));
+        }
         return ret;
     }
 
@@ -4722,7 +4899,7 @@ namespace GObject
             player->sendMsgCode(0, 2214);
             return;
         }
-        if (progress < e_sh_strategy_eli_s)
+        if (progress < e_sh_strategy_eli_s || progress >= e_sh_result)
         {
             // 还未进入投票开始阶段
             player->sendMsgCode(0, 2210);
@@ -4808,6 +4985,8 @@ namespace GObject
             {
                 m_topPopular[cls][i] = votePlayer;
                 (*m_candidateMap[votePlayer])->_pos = i + 1;
+                DB1().PushUpdateData("REPLACE INTO `sh_candidate` (`playerId`, `jobClass`, `supportedCount`, `pos`) VALUES (%"I64_FMT"u, %u, %u, %u)", 
+                        votePlayer->getId(), (UInt32)cls, ((*m_candidateMap[votePlayer])->_supportedCount),(UInt32)((*m_candidateMap[votePlayer])->_pos));
                 st << static_cast<UInt64>(m_topPopular[cls][0] ? m_topPopular[cls][0]->getId() : 0);
                 st << static_cast<UInt64>(m_topPopular[cls][1] ? m_topPopular[cls][1]->getId() : 0);
                 st << static_cast<UInt64>(m_topPopular[cls][2] ? m_topPopular[cls][2]->getId() : 0);
@@ -4820,12 +4999,18 @@ namespace GObject
                 for (UInt32 j = pos - 1; j > i; --j)
                 {
                     if (m_topPopular[cls][j])
+                    {
                         ++((*m_candidateMap[m_topPopular[cls][j]])->_pos);
+                        DB1().PushUpdateData("REPLACE INTO `sh_candidate` (`playerId`, `jobClass`, `supportedCount`, `pos`) VALUES (%"I64_FMT"u, %u, %u, %u)", 
+                                m_topPopular[cls][j]->getId(), (UInt32)cls, ((*m_candidateMap[m_topPopular[cls][j]])->_supportedCount),(UInt32)((*m_candidateMap[m_topPopular[cls][j]])->_pos));
+                    }
                     if (m_topPopular[cls][j - 1])
                         m_topPopular[cls][j] = m_topPopular[cls][j - 1];
                 }
                 m_topPopular[cls][i] = votePlayer;
                 (*m_candidateMap[votePlayer])->_pos = i + 1;
+                DB1().PushUpdateData("REPLACE INTO `sh_candidate` (`playerId`, `jobClass`, `supportedCount`, `pos`) VALUES (%"I64_FMT"u, %u, %u, %u)", 
+                        votePlayer->getId(), (UInt32)cls, ((*m_candidateMap[votePlayer])->_supportedCount),(UInt32)((*m_candidateMap[votePlayer])->_pos));
                 st << static_cast<UInt64>(m_topPopular[cls][0] ? m_topPopular[cls][0]->getId() : 0);
                 st << static_cast<UInt64>(m_topPopular[cls][1] ? m_topPopular[cls][1]->getId() : 0);
                 st << static_cast<UInt64>(m_topPopular[cls][2] ? m_topPopular[cls][2]->getId() : 0);
@@ -4836,7 +5021,7 @@ namespace GObject
         // 广播通知所有玩家更新某一人的票数
 
         st << Stream::eos;
-        globalPlayers.enumerate(SHBroad, (void *)(&st));
+        globalPlayers.enumerate(enum_stream, (void *)(&st));
     }
 
     void SHBattleStageMgr::clearVoteData()

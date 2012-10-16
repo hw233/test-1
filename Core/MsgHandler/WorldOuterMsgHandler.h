@@ -2208,6 +2208,8 @@ void OnSingleHeroReq( GameMsgHdr& hdr, const void* data)
                     UInt32 fgtId = 0;
                     br >> fgtId;
                     GObject::Fighter* fgt = player->findFighter( fgtId );
+                    if(fgtId > 6 || !fgt)
+                        break;
                     GObject::shStageMgr.enter(player, fgt);
                 }
                 break;
