@@ -429,7 +429,7 @@ namespace GObject
             lastTjEventScore = 0;
             lastTjTotalScore = 0;
             isHHBlue = false;
-            titleAll.reserve(32);
+            //titleAll.reserve(32);
         }
 
 
@@ -965,6 +965,7 @@ namespace GObject
 
 		void setTitle(UInt8 s);
 		inline UInt8 getTitle() { return _playerData.title; }
+		inline std::vector<UInt8>& getTitleAll() { return _playerData.titleAll; }
 
 		UInt32 getAchievement(UInt32 a = 0);
 		UInt32 useAchievement(UInt32 a,ConsumeInfo * ci=NULL);

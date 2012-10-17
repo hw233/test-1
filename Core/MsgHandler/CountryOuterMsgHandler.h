@@ -1208,7 +1208,10 @@ void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
             {
                 UInt32 id;
                 br >> id;
-                player->setTitle(static_cast<UInt8>(id));
+                std::vector<UInt8> titleAll = player->getTitleAll();
+                std::vector<UInt8>::iterator it = find(titleAll.begin(), titleAll.end(), static_cast<UInt8>(id));
+                if(it != titleAll.end())
+                    player->setTitle(static_cast<UInt8>(id));
             }
             break;
         case 0x09:
@@ -2801,6 +2804,15 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 	UInt32 price = 0;
     if (lr._type == 1)
         price = GData::store.getPrice(lr._type, lr._itemId, lr._count); // XXX: when discount need one item id
+    else if(lr._type == 125) //蓝砖超人活动页
+    {
+        price = GameAction()->GetBDSupermanPrice(player, lr._itemId);
+        price = price * lr._count;
+        if(!price)
+            return;
+        if(!World::getBDSuperman())
+            return;
+    }
     else
         price = GData::store.getPrice(lr._type, lr._itemId);
 	Stream st(REP::STORE_BUY);
@@ -3131,18 +3143,27 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                 }
             }
             break;
-		default:
+        default:
+            if (player->GetPackage()->GetRestPackageSize() < lr._count)
+            {
+                // 背包空间不足
+                player->sendMsgCode(0, 1011);
+                return;
+            }
 			if(PLAYER_DATA(player, gold) < price)
 			{
 				st << static_cast<UInt8>(1);
 			}
 			else
 			{
+				bool bind = false;
+                if(lr._type == 125 && World::getBDSuperman())     //蓝砖超人活动
+                    bind = true;
 				GObject::ItemBase * item;
-				if(IsEquipTypeId(lr._itemId))
-					item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, false, false, FromNpcBuy);
+                if(IsEquipTypeId(lr._itemId))
+					item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, bind, false, FromNpcBuy);
 				else
-					item = player->GetPackage()->AddItem(lr._itemId, lr._count, false, false, FromNpcBuy);
+					item = player->GetPackage()->AddItem(lr._itemId, lr._count, bind, false, FromNpcBuy);
 				if(item == NULL)
 					st << static_cast<UInt8>(2);
 				else

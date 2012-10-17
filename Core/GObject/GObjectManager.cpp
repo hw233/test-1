@@ -1457,6 +1457,8 @@ namespace GObject
 				    PLAYER_DATA(pl, titleAll).push_back(atoi(tk[idx].c_str()));
                 }
             }
+            else
+                PLAYER_DATA(pl, titleAll).push_back(static_cast<UInt8>(0));
 		}
 		lc.finalize();
 

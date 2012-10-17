@@ -361,6 +361,10 @@ public:
     { _loginAward = v; }
     inline static bool getLoginAward()
     { return _loginAward; }
+    inline static void setBDSuperman(bool v)
+    { _bluediamonSuperman = v; }
+    inline static bool getBDSuperman()
+    { return _bluediamonSuperman; }
 
 public:
 	inline static UInt8 getWeekDay()
@@ -450,6 +454,7 @@ public:
     static UInt32 _consumeend;
     static bool  _townReward_10_15;
     static bool _loginAward;
+    static bool _bluediamonSuperman;
 
 public:
     static RCSortType rechargeSort;

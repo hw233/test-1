@@ -147,6 +147,7 @@ UInt32 World::_consumebegin = 0;
 UInt32 World::_consumeend = 0;
 bool   World::_townReward_10_15 = false;
 bool World::_loginAward = false;
+bool World::_bluediamonSuperman = false;
 /** 0：侠骨；1：柔情；2财富；3传奇 **/
 RCSortType World::killMonsterSort[4];
 

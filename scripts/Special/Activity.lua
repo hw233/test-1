@@ -2580,3 +2580,28 @@ function onGetKillMonsterReward(player)
     return pos2;
 end
 
+--蓝钻优惠活动(购买蓝砖超人)
+function GetBDSupermanPrice(player, itemId)
+    if nil == player or nil == itemId
+    then
+        return 0
+    end
+    if player:isBD()
+    then
+        itemId = itemId * 10 + 1
+    else
+        itemId = itemId * 10
+    end
+
+    local items =
+    {
+        [17070] = 399;
+        [17071] = 599; --原价
+    }
+    if nil == items[itemId]
+    then
+        return 0
+    end
+    return items[itemId]
+end
+

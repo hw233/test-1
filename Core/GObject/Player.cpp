@@ -2674,7 +2674,13 @@ namespace GObject
 		}
         st << GetVar(VAR_MONEY_ARENA);
         st << getClanProffer();
-		st << Stream::eos;
+        UInt8 cnt = _playerData.titleAll.size();
+        st << cnt;
+        for(UInt8 i = 0; i < cnt; ++i)
+        {
+            st << _playerData.titleAll[i];
+        }
+        st << Stream::eos;
 	}
 
 	void Player::makeFormationInfo( Stream& st )
@@ -4681,30 +4687,24 @@ namespace GObject
             titleAll.push_back(t);
             flag = true;
         }
-        else
-            titleAll.erase(it);
         UInt8 cnt = titleAll.size();
-        //if(flag){
-        std::string title = "";
-        if(!cnt)
-            title += "0|";
-        for(UInt8 i = 0; i < cnt; ++i)
-        {
-            title += Itoa(titleAll[i]);
-            title += '|';
+        if(flag){
+            std::string title = "";
+            if(!cnt)
+                title += "0|";
+            for(UInt8 i = 0; i < cnt; ++i)
+            {
+                title += Itoa(titleAll[i]);
+                title += '|';
+            }
+            DB1().PushUpdateData("UPDATE `player` SET `titleAll` = '%s' WHERE `id` = %"I64_FMT"u", title.c_str(), getId());
         }
-        printf("############################:%s\n",title.c_str());
-        DB1().PushUpdateData("UPDATE `player` SET `titleAll` = '%s' WHERE `id` = %"I64_FMT"u", title.c_str(), getId());
-       // }
 	    Stream st(REP::USER_INFO_CHANGE);
         st << static_cast<UInt8>(0x17) << cnt;
-        printf("**************************begin\n");
         for(UInt8 i = 0; i < cnt; ++i)
         {
             st << titleAll[i];
-            printf("++++++++++++:%u\n",titleAll[i]);
         }
-        printf("**************************end\n");
         st << Stream::eos;
         send(st);
 	}

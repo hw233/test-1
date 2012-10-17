@@ -302,6 +302,12 @@ function onActivityCheck(tm)
       setLoginAward(false)
   end
 
+  if tm >= actTime214 and tm < actTime215 then
+      setBDSuperman(true)
+  else
+      setBDSuperman(false)
+  end
+
 
   if tm >= actTime59 and tm < actTime60 then
       is_6_22 = true
@@ -788,7 +794,11 @@ function initActTime(y, m, d)
   local  SerStartTm207_1= { ['year'] = 2012, ['month'] = 10, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   -- 2012.10.14登录抽奖合作
-  local  SerStartTm211 = { ['year'] = 2012, ['month'] = 10, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local SerStartTm211 = { ['year'] = 2012, ['month'] = 10, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
+  -- 蓝钻优惠活动(蓝钻超人)
+  local SerStartTm212 = { ['year'] = 2012, ['month'] = 10, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local SerStartTm213 = { ['year'] = 2012, ['month'] = 10, ['day'] = 17, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
@@ -1029,6 +1039,9 @@ function initActTime(y, m, d)
 
   actTime212= os.time(SerStartTm211);
   actTime213= os.time(SerStartTm211) + 3 * 86400;
+
+  actTime214= os.time(SerStartTm212);
+  actTime215= os.time(SerStartTm213);
 
   onActivityCheck(os.time() + 30);
 

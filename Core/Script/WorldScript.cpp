@@ -203,6 +203,7 @@ void WorldScript::init()
 
     def("setLoginAward", GObject::World::setLoginAward);
     def("getLoginAward", GObject::World::getLoginAward);
+    def("setBDSuperman", GObject::World::setBDSuperman);
     //def("setInterval", GObject::ClanCopy::setInterval);
     //def("setStartTick", GObject::ClanCopy::setStartTick);
 }
