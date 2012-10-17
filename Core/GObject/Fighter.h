@@ -752,7 +752,7 @@ public:
     UInt8 SSGetLvl(UInt16 skillid);
     SStrengthen* SSGetInfo(UInt16 skillid);
     void SSOpen(UInt16 id);
-    UInt8 SSUpgrade(UInt16 id, UInt32 itemId, bool bind = false);
+    UInt8 SSUpgrade(UInt16 id, UInt32 itemId, UInt16 itemNum, bool bind = false);
     void SSErase(UInt16 id);
     void SSUpdate2DB(UInt16 id, SStrengthen& ss);
     void SSDeleteDB(UInt16 id);

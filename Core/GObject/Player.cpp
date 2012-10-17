@@ -7831,7 +7831,7 @@ namespace GObject
 			while(sid > 0);
 		}
 	}
-
+#if 0
     static char nameStr[2048];
     const char* Player::patchShowName(const char* name, const UInt64 playerId)
     {
@@ -7869,6 +7869,24 @@ namespace GObject
             return reinterpret_cast<const char*>(nameStr);
         }
         return name;
+    }
+#endif
+    const char* Player::getNameNoSuffix(std::string name)
+    {
+        if(!cfg.merged || name.size() == 0)
+        {
+            _playerData.nameNoSuffix = name;
+            return _playerData.nameNoSuffix.c_str();
+        }
+        Int32 len = name.size() - 1;
+        for (; len > 0; --len)
+        {
+            if (static_cast<UInt8>(name[len]) >= 32)
+                break;
+        }
+        name.resize(len+1);
+        _playerData.nameNoSuffix = name;
+        return _playerData.nameNoSuffix.c_str();
     }
 
 	void Player::sendYDVIPMails( UInt8 l, UInt8 h )

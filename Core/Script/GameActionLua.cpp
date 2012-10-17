@@ -853,7 +853,7 @@ namespace Script
 		const std::string& name = player->getName();
         if(cfg.merged)
         {
-            return player->patchShowName(name.c_str());
+            return player->getNameNoSuffix(name);
         }
         return name.c_str();
 	}
