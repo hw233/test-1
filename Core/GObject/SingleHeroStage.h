@@ -12,6 +12,7 @@ namespace GObject
 #define STAGE_FINAL_PLAYER_CNT 32
 #define SINGLE_HERO_OPEN_LEVEL 70
 #define MIN_VOTE_LEVEL         60
+#define SH_OPEN_COND           99
 
     class Player;
     class StarTeam;
@@ -572,7 +573,7 @@ namespace GObject
             return m_towerStage[cls];
         }
 
-        bool getActive() { return m_lvlCnt70 > 99; }
+        bool getActive() { return m_lvlCnt70 > SH_OPEN_COND; }
         void incActive(UInt8 v) { m_lvlCnt70 += v; }
         void sendActive(Player* pl);
 

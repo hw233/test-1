@@ -4394,8 +4394,6 @@ UInt16 Fighter::getBattlePortrait()
 
 UInt8 Fighter::SSGetLvl(UInt16 skillid)
 {
-    if (!_owner)
-        return 0;
     UInt32 sid = SKILL_ID(skillid);
     std::map<UInt16, SStrengthen>::iterator i = m_ss.find(sid);
     if (i == m_ss.end())
@@ -4405,8 +4403,6 @@ UInt8 Fighter::SSGetLvl(UInt16 skillid)
 
 SStrengthen* Fighter::SSGetInfo(UInt16 skillid)
 {
-    if (!_owner)
-        return 0;
     UInt32 sid = SKILL_ID(skillid);
     std::map<UInt16, SStrengthen>::iterator i = m_ss.find(sid);
     if (i == m_ss.end())

@@ -67,6 +67,37 @@ soul_xinxiu_hp =     {0, 0, 0, 10}
 soul_potential = {1,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,2}
 
 
+-- 战斗力系数
+bp_factor_atk      = 1.2      -- 物理攻击
+bp_factor_magatk   = 1.2      -- 法术攻击
+bp_factor_def      = 0.3      -- 物理防御
+bp_factor_magdef   = 0.3      -- 法术防御
+bp_factor_hp       = 0.4      -- 生命
+bp_factor_toughl   = 3.5      -- 坚韧等级
+bp_factor_action   = 1        -- 身法
+bp_factor_hitrl    = 4        -- 命中等级
+bp_factor_evadl    = 4        -- 闪避等级
+bp_factor_crtl     = 3.5      -- 暴击等级
+bp_factor_pirl     = 3.5      -- 破击等级
+bp_factor_counterl = 3        -- 反击等级
+bp_factor_magresl  = 3        -- 反击等级
+bp_factor_aura     = 50       -- 初始灵气
+bp_factor_auraMax  = 8        -- 最大灵气
+bp_factor_crtdmg   = 8000     -- 暴击伤害
+bp_factor_tough    = 14000    -- 坚韧
+bp_factor_hitr     = 8000     -- 命中
+bp_factor_evad     = 16000    -- 闪避
+bp_factor_crt      = 14000    -- 暴击
+bp_factor_pir      = 14000    -- 破击
+bp_factor_counter  = 12000    -- 反击
+bp_factor_magres   = 12000    -- 法术抵抗
+
+bp_factor_skill_color = {0, 10, 15, 20, 25}    -- 技能颜色
+bp_factor_skill_level = {3.05, 3.66, 4.4, 5.27, 6.28, 7.45, 8.78, 10.3, 12}  -- 技能等级
+bp_factor_skill_type = {6, 10, 8}  -- 技能类型
+bp_factor_ss_level = {1.56, 2.22, 3, 3.89, 4.9, 6, 7.22, 8.56, 10}  -- 技能符文等级
+
+
 function calcSoulStrength( ss )
   if ss == nil then
     return 0
@@ -534,6 +565,45 @@ function calcTough( fgt, defgt )
     local tough = fgt:getBaseTough()
     local toughlvl = calcToughLevel(fgt)
     return tough + fgt:getExtraTough() + toughlvl/(toughlvl + toughlvl_factor*deflev + toughlvl_addon_factor)*100
+end
+
+function calcBattlePoint_new(fgt)
+    if fgt == nil then
+        return 0;
+    end
+    local bp = 0;
+    bp = bp + calcAttack(fgt) * bp_factor_atk
+    bp = bp + calcMagAttack(fgt) * bp_factor_magatk
+    bp = bp + calcDefend(fgt) * bp_factor_def
+    bp = bp + calcMagDefend(fgt) * bp_factor_magdef
+    bp = bp + calcHP(fgt) * bp_factor_hp
+    bp = bp + calcToughLevel(fgt) * bp_factor_toughl
+    bp = bp + calcAction(fgt) * bp_factor_action
+    bp = bp + calcHitRateLevel(fgt) * bp_factor_hitrl
+    bp = bp + calcEvadeLevel(fgt) * bp_factor_evadl
+    bp = bp + calcCriticalLevel(fgt) * bp_factor_crtl
+    bp = bp + calcPierceLevel(fgt) * bp_factor_pirl
+    bp = bp + calcCounterLevel(fgt) * bp_factor_counterl
+    bp = bp + calcMagResLevel(fgt) * bp_factor_magresl
+    bp = bp + calcAura(fgt) * bp_factor_aura
+    bp = bp + calcAuraMax(fgt) * bp_factor_auraMax
+    bp = bp + fgt:getExtraCriticalDmg() * bp_factor_crtdmg
+    bp = bp + (fgt:getBaseTough() + fgt:getExtraTough()) * bp_factor_tough
+    bp = bp + fgt:getExtraHitrate() * bp_factor_hitr
+    bp = bp + (fgt:getBaseEvade() + fgt:getExtraEvade()) * bp_factor_evad
+    bp = bp + (fgt:getBaseCritical() + fgt:getExtraCritical()) * bp_factor_crt
+    bp = bp + (fgt:getBasePierce() + fgt:getExtraPierce()) * bp_factor_pir
+    bp = bp + (fgt:getBaseCounter() + fgt:getExtraCounter()) * bp_factor_counter
+    bp = bp + (fgt:getBaseMagRes() + fgt:getExtraMagRes()) * bp_factor_magres
+
+    return bp;
+end
+
+function calcSkillBattlePoint(c, l, t, s)
+    if s == 0 then
+        return bp_factor_skill_color[c] * bp_factor_skill_type[t] * bp_factor_skill_level[l] 
+    end
+    return bp_factor_skill_color[c] * bp_factor_skill_type[t] * (bp_factor_skill_level[l] + bp_factor_ss_level[s])
 end
 
 function calcBattlePoint( fgt )

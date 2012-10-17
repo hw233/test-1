@@ -14,7 +14,9 @@
 #include "Common/Itoa.h"
 
 #define HOUR (60*60)
-#define MIN 60
+// XXX neice
+//#define MIN 60
+#define MIN 6
 
 #if 1
 #define DEBUG(x, ...) fprintf(stderr, x, ##__VA_ARGS__);
@@ -2563,8 +2565,10 @@ namespace GObject
                         m_3finals[0][j] = bspl1;
                         m_3finals[0][j+2] = bspl2;
 
-                        DB1().PushUpdateData("UPDATE `sh_final_player` SET `final3pos`=%u WHERE `gpId`=%u AND `type`=%u AND `playerId`=%u", j+1, m_gpId, m_type, bspl1->_teamId);
-                        DB1().PushUpdateData("UPDATE `sh_final_player` SET `final3pos`=%u WHERE `gpId`=%u AND `type`=%u AND `playerId`=%u", j+3, m_gpId, m_type, bspl2->_teamId);
+                        if(bspl1)
+                            DB1().PushUpdateData("UPDATE `sh_final_player` SET `final3pos`=%u WHERE `gpId`=%u AND `type`=%u AND `playerId`=%u", j+1, m_gpId, m_type, bspl1->_teamId);
+                        if(bspl2)
+                            DB1().PushUpdateData("UPDATE `sh_final_player` SET `final3pos`=%u WHERE `gpId`=%u AND `type`=%u AND `playerId`=%u", j+3, m_gpId, m_type, bspl2->_teamId);
                     }
                 }
                 else if(r == 1)
@@ -2572,11 +2576,16 @@ namespace GObject
                     m_finals[j][idx + 1][i] = bspl2;
                     if(idx == 3)
                     {
-                        m_3finals[0][j] = bspl2;
-                        m_3finals[0][j+2] = bspl1;
-
-                        DB1().PushUpdateData("UPDATE `sh_final_player` SET `final3pos`=%u WHERE `gpId`=%u AND `type`=%u AND `playerId`=%u", j+1, m_gpId, m_type, bspl2->_teamId);
-                        DB1().PushUpdateData("UPDATE `sh_final_player` SET `final3pos`=%u WHERE `gpId`=%u AND `type`=%u AND `playerId`=%u", j+3, m_gpId, m_type, bspl1->_teamId);
+                        if(bspl2 != NULL)
+                        {
+                            m_3finals[0][j] = bspl2;
+                            DB1().PushUpdateData("UPDATE `sh_final_player` SET `final3pos`=%u WHERE `gpId`=%u AND `type`=%u AND `playerId`=%u", j+1, m_gpId, m_type, bspl2->_teamId);
+                        }
+                        if(bspl1 != NULL)
+                        {
+                            m_3finals[0][j+2] = bspl1;
+                            DB1().PushUpdateData("UPDATE `sh_final_player` SET `final3pos`=%u WHERE `gpId`=%u AND `type`=%u AND `playerId`=%u", j+3, m_gpId, m_type, bspl1->_teamId);
+                        }
                     }
                 }
 
@@ -3259,8 +3268,9 @@ namespace GObject
         {
             UInt8 cnt = 3;
             UInt8 wonFlag = 0;
-            st << cnt << wonFlag;
+            st << cnt;
             size_t offset = st.size();
+            st << wonFlag;
             for(int j = 0; j < cnt; ++ j)
             {
                 UInt8 idx1 = chelun[r][j][0];
@@ -3380,6 +3390,10 @@ namespace GObject
             sbr2._battleTime = TimeUtil::Now();
             sbr2._battleId = rid;
             sp2->_battles.push_back(sbr2);
+            if(result)
+                ++ sp1->_won;
+            else
+                ++ sp2->_won;
 
             DB1().PushUpdateData("REPLACE INTO `sh_preliminary`(`gpId`, `cls`, `type`, `won`, `player1`, `player2`, `battleTime`, `battleId`) VALUES(%u, 0, %u, %u, %u, %u, %u, %u)", m_gpId, m_type, result ? 1 : 0, sp1->_teamId, sp2->_teamId, sbr._battleTime, sbr._battleId);
         }
@@ -3775,12 +3789,15 @@ namespace GObject
             clear();
             ++ m_progress;
             // nextTime报名结束 周一12点
-            m_nextTime = TimeUtil::SharpDay(1, m_nextTime) + stageStartTime[m_progress]; 
+            // XXX neice
+            //m_nextTime = TimeUtil::SharpDay(1, m_nextTime) + stageStartTime[m_progress]; 
+            m_nextTime = now + 900; 
             break;
         case e_sh_signIn: // 报名结束
             ++ m_progress;
             // nextTime单职业预赛 周一13点
-            m_nextTime = TimeUtil::SharpDay(0, m_nextTime) + stageStartTime[m_progress]; 
+            // XXX neice
+            //m_nextTime = TimeUtil::SharpDay(0, m_nextTime) + stageStartTime[m_progress]; 
             break;
         case e_sh_signIn_end:  // 开赛
             ++ m_progress;
@@ -3790,7 +3807,9 @@ namespace GObject
         case e_sh_single_fin:  // 单职业决赛
             if(processSingleStage())
             {
-                m_nextTime = TimeUtil::SharpDay(nextDay, m_nextTime) + stageStartTime[m_progress]; 
+                // XXX neice
+                //m_nextTime = TimeUtil::SharpDay(nextDay, m_nextTime) + stageStartTime[m_progress]; 
+                m_nextTime = now + 300; 
                 m_progress += SH_GP_OFFSET_B_E;
             }
             else
@@ -3804,7 +3823,9 @@ namespace GObject
         case e_sh_strategy_fin:   // 策略决赛
             if(processStrategyStage())
             {
-                m_nextTime = TimeUtil::SharpDay(nextDay, m_nextTime) + stageStartTime[m_progress]; 
+                // XXX neice
+                //m_nextTime = TimeUtil::SharpDay(nextDay, m_nextTime) + stageStartTime[m_progress]; 
+                m_nextTime = now + 300; 
                 m_progress += SH_GP_OFFSET_B_E;
             }
             else
@@ -3817,7 +3838,9 @@ namespace GObject
         case e_sh_star_fin:  // 明星决赛
             if(processStarStage())
             {
-                m_nextTime = TimeUtil::SharpDay(1, m_nextTime) + stageStartTime[m_progress]; 
+                // XXX neice
+                //m_nextTime = TimeUtil::SharpDay(1, m_nextTime) + stageStartTime[m_progress]; 
+                m_nextTime = now + 300; 
                 m_progress += SH_GP_OFFSET_B_E;
             }
             else
@@ -3828,7 +3851,9 @@ namespace GObject
         case e_sh_tower:    // 塔
             if(processTowerStage())
             {
-                m_nextTime = TimeUtil::SharpDay(1, m_nextTime) + stageStartTime[m_progress]; 
+                // XXX neice
+                //m_nextTime = TimeUtil::SharpDay(1, m_nextTime) + stageStartTime[m_progress]; 
+                m_nextTime = now + 300; 
                 m_progress += SH_GP_OFFSET_B_E;
             }
             else
@@ -3842,7 +3867,9 @@ namespace GObject
             m_progress += SH_GP_OFFSET_B_E;
             processStageOver();
             // nextTime 下次报名 下周日12点
-            m_nextTime = TimeUtil::SharpWeek(1, m_nextTime+3600) + stageStartTime[m_progress]; 
+            // XXX neice
+            //m_nextTime = TimeUtil::SharpWeek(1, m_nextTime+3600) + stageStartTime[0]; 
+            m_nextTime = now + 600;
             break;
         }
 
@@ -4057,6 +4084,10 @@ namespace GObject
     bool SHBattleStageMgr::processTowerStage()
     {
         bool ret = true;
+        UInt32 now = TimeUtil::Now();
+        if(now >= m_nextTime) 
+            return ret;
+
         for(int i = 0; i < 4; ++ i)
         {
             if(!m_towerStage[i])
@@ -5005,7 +5036,11 @@ namespace GObject
                                 m_topPopular[cls][j]->getId(), (UInt32)cls, ((*m_candidateMap[m_topPopular[cls][j]])->_supportedCount),(UInt32)((*m_candidateMap[m_topPopular[cls][j]])->_pos));
                     }
                     if (m_topPopular[cls][j - 1])
+                    {
                         m_topPopular[cls][j] = m_topPopular[cls][j - 1];
+                        DB1().PushUpdateData("REPLACE INTO `sh_candidate` (`playerId`, `jobClass`, `supportedCount`, `pos`) VALUES (%"I64_FMT"u, %u, %u, %u)", 
+                                m_topPopular[cls][j-1]->getId(), (UInt32)cls, ((*m_candidateMap[m_topPopular[cls][j-1]])->_supportedCount),(UInt32)((*m_candidateMap[m_topPopular[cls][j-1]])->_pos));
+                    }
                 }
                 m_topPopular[cls][i] = votePlayer;
                 (*m_candidateMap[votePlayer])->_pos = i + 1;
@@ -5086,8 +5121,9 @@ namespace GObject
         {
             for(int i = 0; i < 3; ++ i)
             {
-
-                Player *player = m_towerStage[i + 1]->getTopPlayer(i + 1);
+                if(!m_towerStage[cls])
+                    continue;
+                Player *player = m_towerStage[cls]->getTopPlayer(i + 1);
                 if (player)
                 {
                     addScore(player, cls, score[i], true);

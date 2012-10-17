@@ -5,7 +5,7 @@
 
 namespace GObject
 {
-
+// XXX neice
 //#define SH_FIGHTER_STRATEGY_CD 900
 #define SH_FIGHTER_STRATEGY_CD 60
 #define SH_SY_SKILL_LEVEL      9
@@ -13,8 +13,6 @@ namespace GObject
     class SingleHeroFighter
     {
     public:
-
-        static GData::AttrExtra _attrExtraEquipTemplate[4];
 
         SingleHeroFighter(Player* pl, UInt8 type);
         SingleHeroFighter(Player* pl, Fighter* fgt, UInt8 type);
