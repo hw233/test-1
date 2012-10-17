@@ -58,7 +58,7 @@ namespace GObject
                 if (msg)
                 {
                     std::string data = msg;
-                    if (m_inited && m_logger && !m_logger->write_baselog(logType, data, true))
+                    if (m_inited && m_logger && !m_logger->write_baselog(logType, data, (logType == LT_SECDATA)? false:true))
                         r = true;
                 }
 #endif

@@ -1082,7 +1082,7 @@ UInt32 Serialize(std::vector<UInt8>& buffer)	\
 	len += S11NTraits<member9type >::Serialize(this->member9name, buffer);	\
 	len += S11NTraits<member10type >::Serialize(this->member10name, buffer);\
 	len += S11NTraits<member11type >::Serialize(this->member11name, buffer);\
-	len += S11NTraits<member11type >::Serialize(this->member12name, buffer);\
+	len += S11NTraits<member12type >::Serialize(this->member12name, buffer);\
 	return len;	\
 }	\
 UInt32 Unserialize(void * buffer, UInt32 size)	\

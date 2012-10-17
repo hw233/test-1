@@ -167,8 +167,12 @@ struct NewUserStruct
     std::string _via;
     std::string _invited;
     UInt8 _rp;
-	MESSAGE_DEF11(REQ::CREATE_ROLE, std::string, _name, UInt8, _class, UInt8, _level, UInt8, _level1, UInt8, _isYear,
+    std::string _clientIp;
+    MESSAGE_DEF12(REQ::CREATE_ROLE, std::string, _name, UInt8, _class, UInt8, _level, UInt8, _level1, UInt8, _isYear,
+            std::string, _platform, std::string, _openid, std::string, _openkey, std::string, _via, std::string, _invited, UInt8, _rp, std::string, _clientIp);
+    /*MESSAGE_DEF11(REQ::CREATE_ROLE, std::string, _name, UInt8, _class, UInt8, _level, UInt8, _level1, UInt8, _isYear,
             std::string, _platform, std::string, _openid, std::string, _openkey, std::string, _via, std::string, _invited, UInt8, _rp);
+            */
 /*	MESSAGE_DEF10(REQ::CREATE_ROLE, std::string, _name, UInt8, _class, UInt8, _level, UInt8, _level1, UInt8, _isYear,
             std::string, _platform, std::string, _openid, std::string, _openkey, std::string, _via, std::string, _invited);
 */
@@ -481,12 +485,26 @@ void trimName(std::string& str)
 
 void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 {
+    UserStruct us;
+	us._name	 = nu._name;
+	us._class	 = nu._class;
+    us._level	 = nu._level;
+    us._level1	 = nu._level1;
+    us._isYear	 = nu._isYear;
+    us._platform = nu._platform;
+    us._openid	 = nu._openid;
+    us._openkey	 = nu._openkey;
+    us._via	     = nu._via;
+    us._invited	 = nu._invited;
+    us._rp	     = nu._rp;
+    us._clientIp = nu._clientIp;
 	TcpConnection conn = NETWORK()->GetConn(hdr.sessionID);
 	if(conn.get() == NULL)
 		return;
 
     if (!hdr.playerID)
     {
+        GObject::dclogger.create_sec(us);
 		conn->pendClose();
         return;
     }
@@ -495,6 +513,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
     {
 		UserLogonRepStruct rep;
 		rep._result = 5;
+        GObject::dclogger.create_sec(us);
 		NETWORK()->SendMsgToClient(conn.get(), rep);
 		conn->pendClose();
         return;
@@ -513,6 +532,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 	{
 		NewUserRepStruct rep;
 		rep._result = 2;
+        GObject::dclogger.create_sec(us);
 		NETWORK()->SendMsgToClient(conn.get(), rep);
 		return;
 	}
@@ -543,7 +563,10 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 	{
 		pl = new(std::nothrow) GObject::Player(hdr.playerID);
 		if(pl == NULL)
+        {
+            GObject::dclogger.create_sec(us);
 			return;
+        }
 
 		UInt16 loc = 0x0002;
         UInt8 country = COUNTRY_NEUTRAL; // XXX: 低级玩家暂时规为中立
@@ -585,6 +608,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 			GObject::globalPlayers.add(pl);
 			GObject::newPlayers.add(pl);
 			GObject::globalNamedPlayers.add(newname, pl);
+            pl->setClientIp(nu._clientIp);
 			res = 0;
 
 			pl->SetSessionID(hdr.sessionID);
@@ -648,8 +672,12 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 	}
 
 	if(res == 0)
+    {
 		return;
+    }
 
+    
+    GObject::dclogger.create_sec(us);
 	NewUserRepStruct rep;
 	rep._result = res;
 	NETWORK()->SendMsgToClient(conn.get(), rep);
