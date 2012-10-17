@@ -354,6 +354,7 @@ public:
     void addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills, bool = true, bool = false, bool = true);
     void delSkillsFromCT(const std::vector<const GData::SkillBase*>& skills, bool = true);
 
+	inline ItemHalo* getHalo() { return _halo; }
 	inline ItemFashion* getFashion() { return _fashion; }
 	inline ItemWeapon * getWeapon() { return _weapon; }
 	inline ItemArmor * getArmor(int idx) { return (idx >= 0 && idx < 5) ? _armor[idx] : NULL; }
@@ -398,12 +399,14 @@ public:
 	UInt32 getBuffData(UInt8 idx, UInt32 now = TimeUtil::Now());
 	void setBuffData(UInt8, UInt32, bool = true);
 
+	UInt32 getHaloId();
 	UInt32 getFashionId();
 	UInt32 getWeaponId();
 	UInt32 getArmorId(int idx);
 	UInt32 getAmuletId();
 	UInt32 getRingId();
 
+	UInt32 getHaloTypeId();
 	UInt32 getFashionTypeId();
 
 	UInt16 getWeaponAttack();
@@ -412,6 +415,7 @@ public:
 	inline UInt8 getColor() { return _color; }
 	static UInt8 getColor2(float);
 
+	ItemEquip * setHalo(ItemHalo* r, bool = true);
 	ItemEquip * setFashion(ItemFashion* r, bool = true);
 	ItemWeapon * setWeapon(ItemWeapon * w, bool = true);
 	ItemArmor * setArmor(int idx, ItemArmor * a, bool = true);
@@ -684,6 +688,7 @@ protected:
     std::vector<UInt16> _rpasskl[GData::SKILL_PASSIVES-GData::SKILL_PASSSTART];
     std::vector<UInt16> _passkl[GData::SKILL_PASSIVES-GData::SKILL_PASSSTART]; // 100%触发技能
 
+	ItemHalo* _halo;
 	ItemFashion* _fashion;
 	ItemWeapon * _weapon;
 	ItemArmor * _armor[5];

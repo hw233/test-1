@@ -233,6 +233,10 @@ public:
     { _qqgameact = v; }
     inline static bool getQQGameAct()
     { return _qqgameact; }
+    inline static void set3366PrivilegeAct(bool v)
+    { _3366privilegeact = v; }
+    inline static bool get3366PrivilegeAct()
+    { return _3366privilegeact; }
 
     inline static void setTrainFighter(bool v)
     { _trainfighter = v; }
@@ -366,6 +370,28 @@ public:
     inline static bool getBDSuperman()
     { return _bluediamonSuperman; }
 
+    inline static void setTgcEvent(bool v)
+    { _tgcevent = v; }
+    inline static bool getTgcEvent()
+    { return _tgcevent; }
+
+    inline static bool canDestory(UInt32 itemid)
+    {
+        static UInt32 items[] =
+        {
+            9184,9185,9186,9187,9188,
+        };
+        if (World::getTgcEvent())
+        {
+            for (size_t i = 0; i < sizeof(items)/sizeof(items[0]); ++i)
+            {
+                if (items[i] == itemid)
+                    return false;
+            }
+        }
+        return true;
+    }
+
 public:
 	inline static UInt8 getWeekDay()
 	{ return _wday; }
@@ -425,6 +451,7 @@ public:
     static bool _qqvipact;
     static bool _fallact;
     static bool _qqgameact;
+    static bool _3366privilegeact;
     static void* _recalcwd;
     static bool _june;
     static bool _june1;
@@ -455,6 +482,7 @@ public:
     static bool  _townReward_10_15;
     static bool _loginAward;
     static bool _bluediamonSuperman;
+    static bool _tgcevent;
 
 public:
     static RCSortType rechargeSort;

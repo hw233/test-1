@@ -303,6 +303,12 @@ function onActivityCheck(tm)
   end
 
   if tm >= actTime214 and tm < actTime215 then
+      set3366PrivilegeAct(true)
+  else
+      set3366PrivilegeAct(false)
+  end
+
+  if tm >= actTime216 and tm < actTime217 then
       setBDSuperman(true)
   else
       setBDSuperman(false)
@@ -663,6 +669,25 @@ function onActivityCheck(tm)
           setRechargeActive(false, 16)
       end
 
+      if tm >= actTime515 and tm < actTime515_1 then
+          setNeedRechargeRank(true)
+          setRechargeActive(true, 16)
+      else
+          setRechargeActive(false, 16)
+          setNeedRechargeRank(false)
+      end
+
+      if tm >= actTime516 and tm < actTime516_1 then
+          setRechargeActive(true, 16)
+      else
+          setRechargeActive(false, 16)
+      end
+
+      if tm >= actTime520 and tm < actTime520_1 then
+          setTgcEvent(true)
+      else
+          setTgcEvent(false)
+      end
 
       setShuoShuo(true);
   end
@@ -767,6 +792,9 @@ function initActTime(y, m, d)
   local  SerStartTm512= { ['year'] = 2012, ['month'] = 10, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm513= { ['year'] = 2012, ['month'] = 10, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm514= { ['year'] = 2012, ['month'] = 10, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm515= { ['year'] = 2012, ['month'] = 10, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm516= { ['year'] = 2012, ['month'] = 10, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm520= { ['year'] = 2012, ['month'] = 10, ['day'] = 31, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   -- 繁体版
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -796,9 +824,12 @@ function initActTime(y, m, d)
   -- 2012.10.14登录抽奖合作
   local SerStartTm211 = { ['year'] = 2012, ['month'] = 10, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
-  -- 蓝钻优惠活动(蓝钻超人)
-  local SerStartTm212 = { ['year'] = 2012, ['month'] = 10, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local SerStartTm213 = { ['year'] = 2012, ['month'] = 10, ['day'] = 17, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm211 = { ['year'] = 2012, ['month'] = 10, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 3366特权活动(通游戏大厅)
+  local  SerStartTm212 = { ['year'] = 2012, ['month'] = 10, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 蓝钻优惠活动(蓝钻超人) //10.19上线推迟
+  local SerStartTm213 = { ['year'] = 2012, ['month'] = 10, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local SerStartTm214 = { ['year'] = 2012, ['month'] = 10, ['day'] = 17, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
@@ -996,6 +1027,15 @@ function initActTime(y, m, d)
   actTime514 = os.time(SerStartTm514);
   actTime514_1 = os.time(SerStartTm514) + 3 * 86400;
 
+  actTime515 = os.time(SerStartTm515);
+  actTime515_1 = os.time(SerStartTm515) + 3 * 86400;
+
+  actTime516 = os.time(SerStartTm516);
+  actTime516_1 = os.time(SerStartTm516) + 4 * 86400;
+
+  actTime520 = os.time(SerStartTm520);
+  actTime520_1 = os.time(SerStartTm520) + 26 * 86400;
+
   -- 繁体版
   actTime101 = os.time(SerStartTm101);
   actTime102 = os.time(SerStartTm101) + 8 * 86400;
@@ -1040,8 +1080,10 @@ function initActTime(y, m, d)
   actTime212= os.time(SerStartTm211);
   actTime213= os.time(SerStartTm211) + 3 * 86400;
 
-  actTime214= os.time(SerStartTm212);
-  actTime215= os.time(SerStartTm213);
+  actTime215= os.time(SerStartTm212) + 1 * 86400;
+  
+  actTime216= os.time(SerStartTm213);
+  actTime217= os.time(SerStartTm214);
 
   onActivityCheck(os.time() + 30);
 

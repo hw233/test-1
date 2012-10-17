@@ -117,11 +117,13 @@ void WorldScript::init()
     def("setQQVipAct", GObject::World::setQQVipAct);
     def("setFallAct", GObject::World::setFallAct);
     def("setQQGameAct", GObject::World::setQQGameAct);
+    def("set3366PrivilegeAct", GObject::World::set3366PrivilegeAct);
     def("getBlueDiamondAct", GObject::World::getBlueDiamondAct);
     def("getYellowDiamondAct", GObject::World::getYellowDiamondAct);
     def("getQQVipAct", GObject::World::getQQVipAct);
     def("getFallAct", GObject::World::getFallAct);
     def("getQQGameAct", GObject::World::getQQGameAct);
+    def("get3366PrivilegeAct", GObject::World::get3366PrivilegeAct);
 	def("setJune", GObject::World::setJune);
 	def("getJune", GObject::World::getJune);
 	def("setJune1", GObject::World::setJune1);
@@ -157,6 +159,8 @@ void WorldScript::init()
 	def("getNeedConsumeRank", GObject::World::getNeedConsumeRank);
 	def("setRechargeTime", GObject::World::setRechargeTime);
 	def("setConsumeTime", GObject::World::setConsumeTime);
+	def("setTgcEvent", GObject::World::setTgcEvent);
+	def("getTgcEvent", GObject::World::getTgcEvent);
 	def("Broadcast", SysBroadcast);
 	def("GetStore", GetStore);
 	def("GetTitleList", GetTitleList);

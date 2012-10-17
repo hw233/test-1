@@ -51,6 +51,7 @@ enum ItemClass
 	Item_Reserved,		//保留 9
 	Item_Trump,			//法宝 10
 	Item_Fashion,		//时装 11
+    Item_Halo,          //光环 12
 	Item_Normal = 20,	//普通物品 20~29
     Item_Normal28 = 28,
     Item_Normal29 = 29,
@@ -125,7 +126,7 @@ inline bool IsGemId(UInt32 id)
 
 inline bool IsEquip(UInt8 subClass)
 {
-	return subClass >= static_cast<UInt8>(Item_Weapon) && subClass <= static_cast<UInt8>(Item_Fashion);
+	return subClass >= static_cast<UInt8>(Item_Weapon) && subClass <= static_cast<UInt8>(Item_Halo);
 }
 
 inline bool IsWeapon(UInt8 subClass)

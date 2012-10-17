@@ -753,6 +753,7 @@ void TownDeamon::autoCompleteQuiteCheck(Player* pl, UInt16 levels)
             dpd->startTime = TimeUtil::Now();
         dpd->curLevel += maxCnt;
         DB3().PushUpdateData("UPDATE `towndeamon_player` SET `curLevel`=%u, `startTime`=%u WHERE `playerId` = %"I64_FMT"u", dpd->curLevel, dpd->startTime, pl->getId());
+        getTownReward_10_15(pl, dpd->curLevel);
     }
     else
     {
@@ -761,7 +762,7 @@ void TownDeamon::autoCompleteQuiteCheck(Player* pl, UInt16 levels)
         st << Stream::eos;
         pl->send(st);
     }
-    getTownReward_10_15(pl, levels);
+    //getTownReward_10_15(pl, levels);
 }
 
 void TownDeamon::autoCompleteQuite(Player* pl, UInt16 curLevel, UInt16 levels)

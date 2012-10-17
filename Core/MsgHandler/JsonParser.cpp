@@ -628,6 +628,44 @@ int query_role_pagoda_req(JsonHead* head, json_t* body, json_t* retbody, std::st
     return 0;
 }
 
+int query_event_state_req(JsonHead* head, json_t* body, json_t* retbody, std::string& err)
+{
+    if (!head || !body || !retbody)
+        return EUNKNOW;
+
+    char openid[36] = {0};
+    char playerId[32] = {0};
+    UInt32 areaid = 0;
+    UInt64 playerid = 0;
+    UInt32 eventid = 0;
+
+    body = body->child;
+    if (!body)
+        return EUNKNOW;
+
+    GET_STRING(body, "szOpenId", openid, 36);
+    GET_STRING(body, "playerId", playerId, 32);
+    json_t* val = json_find_first_label(body, "uiAreaId");
+    if (val && val->child && val->child->text)
+        areaid = atoi(val->child->text);
+
+    playerid = atoll(playerId);
+    GObject::Player* player = GObject::globalPlayers[playerid];
+    if (!player)
+    {
+        err += "player not exist!";
+        return EPLAYER_NOT_EXIST;
+    }
+
+    val = json_find_first_label(body, "uiEventId");
+    if (val && val->child && val->child->text)
+        eventid = atoi(val->child->text);
+
+    json_insert_pair_into_object(retbody, "ucState", my_json_new_number(player->getEventState(eventid)));
+
+    head->cmd = 70;
+    return 0;
+}
 void jsonParser2(void * buf, int len, Stream& st)
 {
 	BinaryReader br(buf, len);
@@ -717,6 +755,9 @@ void jsonParser2(void * buf, int len, Stream& st)
             break;
         case 67:
             ret = query_clanbattle_ranking_req(&head, body, retbody, err);
+            break;
+        case 69:
+            ret = query_event_state_req(&head, body, retbody, err);
             break;
         default:
             break;
