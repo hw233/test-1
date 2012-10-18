@@ -2277,8 +2277,9 @@ void SetCFriend(LoginMsgHdr& hdr, const void* data)
 
 bool SwitchSecDC(UInt32 val)
 {
-    // TODO: 设置是否开启安全DCLogger，返回设置是否成功
-    return val ? true:false;
+    // 设置是否开启安全DCLogger，返回设置是否成功
+    cfg.setSecDCLog(val? true:false);
+    return true;
 }
 
 void GMCmd(LoginMsgHdr& hdr, const void* data)

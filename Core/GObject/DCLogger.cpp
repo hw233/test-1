@@ -122,6 +122,8 @@ bool DCLogger::login(Player* player)
 
 bool DCLogger::login_sec(Player* player)
 {
+    if (!cfg.secdclog)
+        return true;
     if (!cfg.dclog)
         return true;
     if (!player)
@@ -186,6 +188,8 @@ bool DCLogger::login_sec(Player* player)
 
 bool DCLogger::create_sec(UserStruct const &nu, Player* player /* = NULL */)
 {
+    if (!cfg.secdclog)
+        return true;
     if (!cfg.dclog)
         return true;
     std::ostringstream msg;
@@ -250,6 +254,8 @@ bool DCLogger::create_sec(UserStruct const &nu, Player* player /* = NULL */)
 
 bool DCLogger::protol_sec(Player* player, int cmd)
 {
+    if (!cfg.secdclog)
+        return true;
     if (!cfg.dclog)
         return true;
     std::ostringstream msg;
