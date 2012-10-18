@@ -15,6 +15,7 @@
 #include "ClanRankBattle.h"
 #include "ClanCopy.h"
 #include "TownDeamon.h"
+#include "Athletics.h"
 
 namespace GObject
 {
@@ -63,11 +64,23 @@ void Country::ClanCopyReset(void *)
     ClanCopyMgr::Instance().Reset();
 }
 
+bool PhysicalCheckEnumerate(Player * pl, UInt8 para)
+{
+    if(!pl || !(pl->GetAthletics()))
+        return false;
+    pl->GetAthletics()->PhysicalCheck();
+    return true;
+}
+
+void Country::PhysicalCheckTimer(void *para)
+{
+	globalPlayers.enumerate(PhysicalCheckEnumerate, static_cast<UInt8>(0));
+}
+
 void Country::ClanCopyResetEnd(void *)
 {
     ClanCopyMgr::Instance().ResetEnd();
 }
-
 
 bool Country::Init()
 {
@@ -88,6 +101,7 @@ bool Country::Init()
         AddTimer(1000, ClanRankBattleCheck);
         //townDeamonManager->process();
         //UInt32 tdChkPoint = TimeUtil::SharpDayT(0, now) + TOWNDEAMONENDTM;
+	    AddTimer(3600 * 1000, PhysicalCheckTimer, static_cast<void *>(NULL), (60 - now % 60) * 1000);
 
         AddTimer(1000, ClanCopyCheck);
 

@@ -582,20 +582,23 @@ void OnLevelChange( GameMsgHdr& hdr, const void* data)
         lvPlayer->push_back(player->getId());
     }
 }
-
+#if 0
 void OnAthleticsMartialFlush( GameMsgHdr& hdr, const void* data )
 {
 	MSG_QUERY_PLAYER(player);
-    GObject::gAthleticsRank.updateAthleticsMartial(player);
+    //GObject::gAthleticsRank.updateAthleticsMartial(player);
+    player->GetAthletics()->updateAthleticsMartial(player);
 }
-
+#endif
+#if 0
 void OnAthleticsFlush( GameMsgHdr& hdr, const void* data )
 {
 	MSG_QUERY_PLAYER(player);
     UInt8 type = *(UInt8 *)data;
-    GObject::gAthleticsRank.updateAthleticsP(player, type);
+    //GObject::gAthleticsRank.updateAthleticsP(player, type);
+    player->GetAthletics()->updateAthleticsP(player, type);
 }
-
+#endif
 void OnAthleticsPayRet( GameMsgHdr& hdr,  const void* data)
 {
     MSG_QUERY_PLAYER(player);

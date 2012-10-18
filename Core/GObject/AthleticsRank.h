@@ -57,6 +57,7 @@ struct AthleticsRankData
     UInt32  first4rank;
     UInt32  extrachallenge;
     UInt32  pageNum; //???
+#if 0
     UInt32  eChallengeTime;
     UInt8   ePhysical;
     UInt8 eSelectIndex;
@@ -64,6 +65,7 @@ struct AthleticsRankData
     UInt64 eRival[5];
     UInt8 eCanAttack[5];
     UInt8 eRivalType[5];
+#endif
     //UInt32  first4rank;
         //// 0x1 第一次成为竞技场第一
         //// 0x2 第一次杀入竞技场二强
@@ -203,9 +205,6 @@ public:
     UInt32 getAthleticsFirst4Rank(Player*, UInt32 first4rank);
     UInt32 setAthleticsFirst4Rank(Player*, UInt32 first4rank);
 
-    void updateAthleticsMartial(Player* pl);
-    void updateAthleticsP(Player* pl, UInt8 type);
-
     void giveAward(Player* pl, UInt8 type = 0);
 
     void notifyAthMartialOver(Player * atker, Player * defer, UInt32 id, UInt8 res);
@@ -281,15 +280,14 @@ public:
 public:
     void updateOrginal_martial(Player* owner, UInt8 index, UInt64 arivalId);
     Player* getOrginal_martial(Player* owner, UInt8 index);
-    void setOrginal_martial(Player* owner, UInt8 index, Player* pl);
+    //void setOrginal_martial(Player* owner, UInt8 index, Player* pl);
     void updateOrginal_canAttack(Player* owner, UInt8 index, UInt8 canAttack);
     UInt8 getOrginal_canAttack(Player* owner, UInt8 index);
     void setOrginal_canAttack(Player* owner, UInt8 index, UInt8 canAttack);
     void updateOrginal_eCategory(Player* owner, UInt8 index, UInt32 combineValue);
     void setOrginal_eCategory(Player* owner, UInt8 index, UInt32 combineValue);
-    void RequestSubDir(Player *player, UInt8 athlDiffculty, UInt8 athlCategory);
-    AthleticsRankData* getAthleticsRankData(Player* player);
-    void process();
+    //void RequestSubDir(Player *player, UInt8 athlDiffculty, UInt8 athlCategory);
+    //void process();
 
 private:
 	RankList		_ranks[2];

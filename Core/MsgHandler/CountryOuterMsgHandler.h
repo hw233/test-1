@@ -4194,8 +4194,9 @@ void OnRefreshMartialReq( GameMsgHdr& hdr, AthleticsRefreshMartialReq& req )
     GameMsgHdr hdr2(0x1F1, WORKER_THREAD_WORLD, player, 0);
     GLOBAL().PushMsg(hdr2, NULL);
 #endif
-    GameMsgHdr hdr2(0x1F8, WORKER_THREAD_WORLD, player, 1);
-    GLOBAL().PushMsg(hdr2, &(req._type));
+    //GameMsgHdr hdr2(0x1F8, WORKER_THREAD_WORLD, player, 1);
+    //GLOBAL().PushMsg(hdr2, &(req._type));
+    player->GetAthletics()->updateAthleticsP(player, req._type);
 }
 
 void OnTrumpUpgrade( GameMsgHdr& hdr, const void* data)

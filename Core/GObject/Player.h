@@ -1532,6 +1532,8 @@ namespace GObject
         inline void setJusticeRoar(UInt8 v) { _justice_roar = v; }
         inline UInt8 getJusticeRoar() { return _justice_roar; }
 
+        inline bool isSameServer(Player* player) {return player && (getId() >> 48) == (player->getId() >> 48);}
+
         inline void setSpiritFactor(float v) { _spirit_factor = v; }
         inline float getSpiritFactor() { return _spirit_factor; }
 

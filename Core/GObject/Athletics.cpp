@@ -20,12 +20,7 @@ namespace GObject
 
 Athletics::Athletics(Player * player) : _owner(player), _hasEnterAthletics(false)
 {
-    UInt8 i;
-    for(i = 0; i < 5; i++)
-    {
-        gAthleticsRank.setOrginal_martial(_owner, 0, NULL);
-        gAthleticsRank.setOrginal_canAttack(_owner, 0, 0);
-    }
+    memset(&PlayerPInfo, 0, sizeof(PlayerPInfo));
 }
 
 Athletics::~Athletics()
@@ -213,21 +208,18 @@ void Athletics::adjustAthlDeferBuffData(Player *atker, Player *defer, bool reset
 {
     if(!atker || !defer)
         return;
-    AthleticsRankData* curData = gAthleticsRank.getAthleticsRankData(atker);
-    if(!curData)
-        return;
 
     UInt8 index;
     UInt8 rivalType;
     UInt32 bufFlag = Battle::BattleFighter::AthlEnh31;
     for(index = 0; index < 5; index++)
     {
-        if(curData->eRival[index] == defer->getId())
+        if(PlayerPInfo.eRival[index] == defer->getId())
             break;
     }
     if(index >= 5)
         return;
-    rivalType = curData->eRivalType[index];
+    rivalType = PlayerPInfo.eRivalType[index];
     if(rivalType == 0 || rivalType > 7)
         return;
     if(reset)
@@ -512,20 +504,20 @@ bool Athletics::addAthleticsExtraAward(UInt32 EquipId, UInt8 rank)
 
 	return true;
 }
-
+#if 0
 void Athletics::updateMartial(const MartialData* md)
 {
     if(!md)
         return;
 
+
     if(md->idx > 4)
         return;
-
     gAthleticsRank.setOrginal_martial(_owner, md->idx, md->defer);
     gAthleticsRank.setOrginal_canAttack(_owner, md->idx, md->canAttack);
     //listAthleticsMartial();
 }
-
+#endif
 void Athletics::attackMartial(Player* defer)
 {
     struct AthleticsResult
@@ -545,7 +537,7 @@ void Athletics::attackMartial(Player* defer)
         UInt8 idx = 0xFF;
         for(UInt8 i = 0; i < 5; ++i)
         {
-            if(gAthleticsRank.getOrginal_martial(_owner, i) == defer)
+            if(globalPlayers[PlayerPInfo.eRival[i]] == defer)
             {
                 idx = i;
                 break;
@@ -555,7 +547,7 @@ void Athletics::attackMartial(Player* defer)
         if(idx > 4)
             break;
 
-        if(0 == gAthleticsRank.getOrginal_canAttack(_owner, idx))
+        if(0 == PlayerPInfo.eCanAttack[idx])
             break;
 
         UInt8 tid = defer->getThreadId();
@@ -692,9 +684,15 @@ void Athletics::awardMartial(Player* defer, bool win)
         UInt8 i;
         for(i = 0; i < 5; ++i)
         {
-            if(gAthleticsRank.getOrginal_martial(_owner, i) == defer)
+            if(globalPlayers[PlayerPInfo.eRival[i]] == defer)
             {
-                gAthleticsRank.setOrginal_canAttack(_owner, i, 0);
+                if(PlayerPInfo.eCanAttack[i] != 0)
+                {
+                    PlayerPInfo.eCanAttack[i] = 0;
+                    char column[32];
+                    sprintf(column, "eCanAttack%u", i + 1);
+                    DB6().PushUpdateData("UPDATE `athletics_rank` SET `%s` = %u WHERE `ranker` = %"I64_FMT"u", column, PlayerPInfo.eCanAttack[i], _owner->getId());
+                }
                 break;
             }
         }
@@ -713,23 +711,19 @@ void Athletics::awardMartial(Player* defer, bool win)
         }
         */
 
-        AthleticsRankData* curData = gAthleticsRank.getAthleticsRankData(_owner);
-        if(curData)
+        UInt8 index;
+        UInt8 category;
+        UInt32 bufFlag;
+        index = PlayerPInfo.eSelectIndex;
+        if(index== 0 || index > 5)
+            index = 1;
+        if(PlayerPInfo.eRivalType[i] != 0)
         {
-            UInt8 index;
-            UInt8 category;
-            UInt32 bufFlag;
-            index = curData->eSelectIndex;
-            if(index== 0 || index > 5)
-                index = 1;
-            if(curData->eRivalType[i] != 0)
-            {
-                category = (curData->eCombine[index - 1] >> 16) & 0xFF;
-                if(category > 8)
-                    category = 0;
-                bufFlag = 1 << category;
-                _owner->adjustAthlBuffData(bufFlag);
-            }
+            category = (PlayerPInfo.eCombine[index - 1] >> 16) & 0xFF;
+            if(category > 8)
+                category = 0;
+            bufFlag = 1 << category;
+            _owner->adjustAthlBuffData(bufFlag);
         }
 
         //la.prestige = 10 * (World::_wday == 3 ? 2 : 1);
@@ -746,7 +740,7 @@ void Athletics::awardMartial(Player* defer, bool win)
 
     _owner->delayNotifyAthleticsAward(&la);
 }
-
+#if 0
 void Athletics::updateMartialHdr(const MartialHeader* mh)
 {
     Player* defer = mh->md.defer;
@@ -787,7 +781,7 @@ void Athletics::updateMartialHdr(const MartialHeader* mh)
     }
 #endif
 }
-
+#endif
 #define COUNT_PER        5
 #define COUNT_MAX        9
 void getAthlRandomCategory(UInt8 *arr, UInt8 count)
@@ -817,10 +811,7 @@ void Athletics::listAthleticsMartial()
 {
 	Stream st(REP::ARENA_IFNO);
     st << static_cast<UInt16>(0x20);
-    AthleticsRankData* curData = gAthleticsRank.getAthleticsRankData(_owner);
-    if(!curData)
-        return;
-    st << curData->ePhysical;
+    st << PlayerPInfo.ePhysical;
     st << gAthleticsRank.GetMaxPhysical(_owner->getVipLevel());
 
     if(_owner->getBuffData(PLAYER_BUFF_AMARTIAL_WIN) > 5)
@@ -830,13 +821,13 @@ void Athletics::listAthleticsMartial()
     UInt8 wins =  5 - _owner->getBuffData(PLAYER_BUFF_AMARTIAL_WIN);
     st << wins;
     /** 选择过 **/
-    if(curData->eSelectIndex != 0)
+    if(PlayerPInfo.eSelectIndex != 0)
     {
         st << static_cast<UInt8>(1);
-        UInt8 index = curData->eSelectIndex;
+        UInt8 index = PlayerPInfo.eSelectIndex;
         if(index == 0 || index > 5)
             index = 1;
-        UInt32 dbValue = curData->eCombine[index - 1];
+        UInt32 dbValue = PlayerPInfo.eCombine[index - 1];
         UInt8 athlDiffculty = dbValue >> 24;
         UInt8 athlCategory = (dbValue >> 16) & 0xFF;
         st << athlDiffculty;
@@ -853,15 +844,15 @@ void Athletics::listAthleticsMartial()
         UInt8 i;
         for(i = 0; i < 5; i++)
         {
-            if(gAthleticsRank.getOrginal_martial(_owner, i) != NULL)
+            if(globalPlayers[PlayerPInfo.eRival[i]] != NULL)
                 count++;
         }
         st << count;
         for(i = 0; i < 5/*count*/; i++)
         {
-            Player* pl = gAthleticsRank.getOrginal_martial(_owner, i);
+            Player* pl = globalPlayers[PlayerPInfo.eRival[i]];
             if(pl)
-                st << pl->getName() << pl->getCountry() << pl->GetClass() << static_cast<UInt8>(pl->GetClassAndSex() & 0x0F) << pl->GetLev() << gAthleticsRank.getOrginal_canAttack(_owner, i) << curData->eRivalType[i] << pl->getPF();
+                st << pl->getName() << pl->getCountry() << pl->GetClass() << static_cast<UInt8>(pl->GetClassAndSex() & 0x0F) << pl->GetLev() << PlayerPInfo.eCanAttack[i] << PlayerPInfo.eRivalType[i] << pl->getPF();
             //else
             //    st << "" << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0);
         }
@@ -877,7 +868,7 @@ void Athletics::listAthleticsMartial()
     else
     {
         st << static_cast<UInt8>(0);
-        if(curData->eCombine[0] == 0 && curData->eCombine[1] == 0 && curData->eCombine[2] == 0 && curData->eCombine[3] == 0 && curData->eCombine[4] == 0)
+        if(PlayerPInfo.eCombine[0] == 0 && PlayerPInfo.eCombine[1] == 0 && PlayerPInfo.eCombine[2] == 0 && PlayerPInfo.eCombine[3] == 0 && PlayerPInfo.eCombine[4] == 0)
         {
             st << static_cast<UInt8>(COUNT_PER);
             UInt8 a[COUNT_PER];
@@ -902,7 +893,13 @@ void Athletics::listAthleticsMartial()
                 curAward.assign(a);
                 st << curAward;
                 dbValue = (tmp1 << 24) + (tmp2 << 16) + (tmp3 << 8) + tmp4;
-                gAthleticsRank.setOrginal_eCategory(_owner, i, dbValue);
+                if(PlayerPInfo.eCombine[i] != dbValue)
+                {
+                    char column[32];
+                    sprintf(column, "eCombine%u", i + 1);
+                    PlayerPInfo.eCombine[i] = dbValue;
+                    DB6().PushUpdateData("UPDATE `athletics_rank` SET `%s` = %u WHERE `ranker` = %"I64_FMT"u", column, PlayerPInfo.eCombine[i], _owner->getId());
+                }
             }
             st << Stream::eos;
             _owner->send(st);
@@ -914,7 +911,7 @@ void Athletics::listAthleticsMartial()
             UInt8 tmp1, tmp2, tmp3, tmp4;
             for(UInt8 i = 0; i < COUNT_PER; i++)
             {
-                dbValue = curData->eCombine[i];
+                dbValue = PlayerPInfo.eCombine[i];
                 tmp1 = dbValue >> 24;
                 st << tmp1;
                 tmp2 = (dbValue >> 16) & 0xFF;
@@ -939,35 +936,32 @@ void Athletics::listAthleticsMartial()
 
 void Athletics::listAthleticsMartial2(UInt8 type, bool update)
 {
-    AthleticsRankData* curData = gAthleticsRank.getAthleticsRankData(_owner);
-    if(!curData)
-        return;
     if(type == 0)
         update = true;
     if(type == 3)
         type = 0;
     Stream st(REP::ATHLETICS_REFRESH_MARTIAL);
     st << type;
-    if(curData->eSelectIndex != 0)
+    if(PlayerPInfo.eSelectIndex != 0)
     {
         UInt8 count = 0;
         UInt8 i;
         for(i = 0; i < 5; i++)
         {
-            if(gAthleticsRank.getOrginal_martial(_owner, i) != NULL)
+            if(globalPlayers[PlayerPInfo.eRival[i]] != NULL)
                 count++;
         }
         st << count;
         for(i = 0; i < count; i++)
         {
-            Player* player = gAthleticsRank.getOrginal_martial(_owner, i);
+            Player* player = globalPlayers[PlayerPInfo.eRival[i]];
             if(player)
-                st << player->getName() << player->getCountry() << player->GetClass() << static_cast<UInt8>(player->GetClassAndSex() & 0x0F) << player->GetLev() << gAthleticsRank.getOrginal_canAttack(_owner, i) << curData->eRivalType[i] <<  player->getPF();
+                st << player->getName() << player->getCountry() << player->GetClass() << static_cast<UInt8>(player->GetClassAndSex() & 0x0F) << player->GetLev() << PlayerPInfo.eCanAttack[i] << PlayerPInfo.eRivalType[i] << player->getPF();
         }
     }
     else
     {
-        if(update || (curData->eCombine[0] == 0 && curData->eCombine[1] == 0 && curData->eCombine[2] == 0 && curData->eCombine[3] == 0 && curData->eCombine[4] == 0))
+        if(update || (PlayerPInfo.eCombine[0] == 0 && PlayerPInfo.eCombine[1] == 0 && PlayerPInfo.eCombine[2] == 0 && PlayerPInfo.eCombine[3] == 0 && PlayerPInfo.eCombine[4] == 0))
         {
             st << static_cast<UInt8>(COUNT_PER);
             UInt8 a[COUNT_PER];
@@ -992,7 +986,13 @@ void Athletics::listAthleticsMartial2(UInt8 type, bool update)
                 curAward.assign(a);
                 st << curAward;
                 dbValue = (tmp1 << 24) + (tmp2 << 16) + (tmp3 << 8) + tmp4;
-                gAthleticsRank.setOrginal_eCategory(_owner, i, dbValue);
+                if(PlayerPInfo.eCombine[i] != dbValue)
+                {
+                    char column[32];
+                    sprintf(column, "eCombine%u", i + 1);
+                    PlayerPInfo.eCombine[i] = dbValue;
+                    DB6().PushUpdateData("UPDATE `athletics_rank` SET `%s` = %u WHERE `ranker` = %"I64_FMT"u", column, PlayerPInfo.eCombine[i], _owner->getId());
+                }
             }
         }
         else
@@ -1002,7 +1002,7 @@ void Athletics::listAthleticsMartial2(UInt8 type, bool update)
             UInt8 tmp1, tmp2, tmp3, tmp4;
             for(UInt8 i = 0; i < COUNT_PER; i++)
             {
-                dbValue = curData->eCombine[i];
+                dbValue = PlayerPInfo.eCombine[i];
                 tmp1 = dbValue >> 24;
                 st << tmp1;
                 tmp2 = (dbValue >> 16) & 0xFF;
@@ -1046,6 +1046,7 @@ void  Athletics:: PayForPaging(UInt8 type)
     GameMsgHdr hdr(0x19A, WORKER_THREAD_WORLD, _owner, sizeof(msg));
     GLOBAL().PushMsg(hdr, &msg);
 }
+
 void Athletics:: PayForKillCD(UInt8 type)
 {
     UInt32 cost = 1;
@@ -1063,5 +1064,372 @@ void Athletics:: PayForKillCD(UInt8 type)
    GameMsgHdr hdr(0x19A, WORKER_THREAD_WORLD, _owner, sizeof(msg));
    GLOBAL().PushMsg(hdr, &msg);
 }
+
+UInt8 getRivalRandomDiffculty()
+{
+    UInt16 rate;
+    UInt8 rivalDiffculty;
+    rate = uRand(1000);
+    if(rate >= 996)
+        rivalDiffculty = 7;
+    else if(rate >= 992)
+        rivalDiffculty = 6;
+    else if(rate >= 988)
+        rivalDiffculty = 5;
+     else if(rate >= 984)
+        rivalDiffculty = 4;
+     else if(rate >= 980)
+        rivalDiffculty = 3;
+     else if(rate >= 976)
+        rivalDiffculty = 2;
+     else if(rate >= 972)
+        rivalDiffculty = 1;
+     else
+        rivalDiffculty = 0;
+    return rivalDiffculty;
 }
 
+void Athletics::updateAthleticsMartial(Player *pl)
+{
+    if(!pl)
+        return;
+    UInt64 idIdx[5] = {0};
+    UInt8 level = pl->GetLev();
+    UInt8 index = PlayerPInfo.eSelectIndex;
+    if(index == 0 || index > 5)
+        index = 1;
+    UInt8 diffculty = (PlayerPInfo.eCombine[index - 1] >> 24) & 0xFF;
+    if(diffculty == 2)
+        ;
+    else if(diffculty == 3)
+        level += 1;
+    else if(diffculty == 4)
+        level += 2;
+    else if(diffculty == 5)
+        level += 3;
+    else
+        level -= 1;
+
+    UInt32 size = 0;
+    std::map<UInt16, UInt64> mapList;
+    UInt32 mapCnt = 0;
+    UInt32 j;
+    GObject::GlobalLevelsPlayersIterator it = GObject::globalLevelsPlayers.find(level);
+    if(it != GObject::globalLevelsPlayers.end())
+    {
+        GObject::LevelPlayers* lvPlayer = it->second;
+        size = lvPlayer->size();
+        for(j = 0; j < size; j++)
+            mapList[mapCnt++] = (*lvPlayer)[j];
+    }
+    UInt8 cnt = 1;
+    UInt16 k;
+    URandom rnd(time(NULL));
+    Int32 rollId;
+    Int32 rollId2;
+    bool repeat;
+    while(size < 100 && (level - cnt) >= 29)
+    {
+        it = GObject::globalLevelsPlayers.find(level - cnt);
+        ++cnt;
+        if(it == GObject::globalLevelsPlayers.end())
+            continue;
+        GObject::LevelPlayers* lvPlayer2 = it->second;
+        size += lvPlayer2->size();
+        for(j = 0; j < lvPlayer2->size(); j++)
+            mapList[mapCnt++] = (*lvPlayer2)[j];
+    }
+
+    UInt32 showCnt = size;
+    if(showCnt > 5)
+        showCnt = 5;
+    for(k = 0; k < showCnt; k++)
+    {
+        rollId = rnd(size);
+        rollId2 = rollId;
+        while(rollId < static_cast<Int32>(size))
+        {
+            if(mapList[rollId] == pl->getId())
+            {
+                rollId += 1;
+                continue;
+            }
+            repeat = false;
+            for(j = 0; j < k; j++)
+            {
+                if(mapList[rollId] == idIdx[j])
+                {
+                    repeat = true;
+                    break;
+                }
+            }
+            if(repeat)
+            {
+                rollId += 1;
+                continue;
+            }
+            break;
+        }
+        if(rollId == static_cast<Int32>(size))
+        {
+            rollId = rollId2 - 1;
+            while(rollId >= 0)
+            {
+                if(mapList[rollId] == pl->getId())
+                {
+                    rollId -= 1;
+                    continue;
+                }
+                repeat = false;
+                for(j = 0; j < k; j++)
+                {
+                    if(mapList[rollId] == idIdx[j])
+                    {
+                        repeat = true;
+                        break;
+                    }
+                }
+                if(repeat)
+                {
+                    rollId -= 1;
+                    continue;
+                }
+                break;
+            }
+        }
+        if(rollId == -1)
+            break;
+        idIdx[k] = mapList[rollId];
+    }
+
+    UInt8 i;
+    for(i = 0; i < 5; ++i)
+    {
+        char column1[32];
+        char column2[32];
+        char column3[32];
+        sprintf(column1, "eRival%u", i + 1);
+        sprintf(column2, "eCanAttack%u", i + 1);
+        sprintf(column3, "eRivalType%u", i + 1);
+        if(globalPlayers[idIdx[i]])
+        {
+             PlayerPInfo.eRival[i] = idIdx[i];
+             PlayerPInfo.eCanAttack[i] = 1;
+             PlayerPInfo.eRivalType[i] = getRivalRandomDiffculty();
+        }
+        else
+        {
+            PlayerPInfo.eRival[i] = 0;
+            PlayerPInfo.eCanAttack[i] = 0;
+            PlayerPInfo.eRivalType[i] = 0;
+        }
+        DB6().PushUpdateData("UPDATE `athletics_rank` SET `%s` = %"I64_FMT"u, `%s` = %u, `%s` = %u WHERE `ranker` = %"I64_FMT"u", column1, PlayerPInfo.eRival[i], column2, PlayerPInfo.eCanAttack[i], column3, PlayerPInfo.eRivalType[i], pl->getId());
+
+    }
+}
+
+void Athletics::updateAthleticsP(Player* pl, UInt8 type)
+{
+    if(!pl)
+        return;
+    switch(type)
+    {
+        case 0:
+            {
+                if(pl->getTael() < 100)
+                {
+                    pl->sendMsgCode(0, 1100);
+                    return;
+                }
+                ConsumeInfo ci(FlushAthletics,0,0);
+                pl->useTael(100, &ci);
+                UInt8 para = type;
+                listAthleticsMartial2(para);
+                pl->athleticsUdpLog(1030);
+                pl->athleticsUdpLog(1030, 1);
+            }
+            break;
+        case 1:
+            {
+                if(pl->getTael() < 100)
+                {
+                    pl->sendMsgCode(0, 1100);
+                    return;
+                }
+                ConsumeInfo ci(FlushAthletics,0,0);
+                pl->useTael(100, &ci);
+                updateAthleticsMartial(pl);
+                UInt8 para = type;
+                listAthleticsMartial2(para);
+                pl->athleticsUdpLog(1030);
+                pl->athleticsUdpLog(1030, 2);
+            }
+            break;
+        case 2:
+            {
+                UInt8 index = PlayerPInfo.eSelectIndex;
+                if(index == 0 || index > 5)
+                    index = 1;
+                UInt32 dbValue = PlayerPInfo.eCombine[index - 1];
+                UInt8 status = 2;
+                dbValue = (dbValue & 0xFFFF00FF) | (status << 8);
+                PlayerPInfo.eSelectIndex = 0;
+                char column[32];
+                sprintf(column, "eCombine%u", index);
+                PlayerPInfo.eCombine[index - 1] = dbValue;
+                DB6().PushUpdateData("UPDATE `athletics_rank` SET `eSelectIndex` = %u, `%s` = %u WHERE `ranker` = %"I64_FMT"u", PlayerPInfo.eSelectIndex, column, PlayerPInfo.eCombine[index - 1], pl->getId());
+                pl->setBuffData(PLAYER_BUFF_AMARTIAL_WIN, 0);
+                Stream st(REP::ATHLETICS_REFRESH_MARTIAL);
+                st << type << Stream::eos;
+                pl->send(st);
+                UInt8 para = 3;
+                listAthleticsMartial2(para);
+            }
+            break;
+        case 3:
+            {
+                if(pl->getBuffData(PLAYER_BUFF_ATHLETICS_P) == 0)
+                    return;
+                if(pl->getGold() < 1)
+                {
+                    pl->sendMsgCode(0, 1104);
+                    return;
+                }
+                ConsumeInfo ci(AthleticKillCD2,0,0);
+                pl->useGold(1, &ci);
+                pl->setBuffData(PLAYER_BUFF_ATHLETICS_P, 0);
+                pl->athleticsUdpLog(1031);
+                Stream st(REP::ATHLETICS_REFRESH_MARTIAL);
+                st << type << Stream::eos;
+                pl->send(st);
+            }
+            break;
+        case 4:
+            {
+                if(PlayerPInfo.ePhysical >= gAthleticsRank.GetMaxPhysical(pl->getVipLevel()))
+                    return;
+                if(pl->GetVar(VAR_PHYSICAL_BUY) >= gAthleticsRank.GetMaxPhysical(pl->getVipLevel()))
+                {
+                    pl->sendMsgCode(0, 1496);
+                    return;
+                }
+                pl->AddVar(VAR_PHYSICAL_BUY, 1);
+                if(pl->getGold() < 1)
+                {
+                    pl->sendMsgCode(0, 1104);
+                    return;
+                }
+                ConsumeInfo ci(AthleticPhysical,0,0);
+                pl->useGold(1, &ci);
+                PlayerPInfo.ePhysical += 1;
+                pl->athleticsUdpLog(1029);
+                DB6().PushUpdateData("UPDATE `athletics_rank` SET `ePhysical` = %u WHERE `ranker` = %"I64_FMT"u", PlayerPInfo.ePhysical, pl->getId());
+                Stream st(REP::ATHLETICS_REFRESH_MARTIAL);
+                st << type << PlayerPInfo.ePhysical << Stream::eos;
+                pl->send(st);
+            }
+            break;
+        default:
+            break;
+    }
+
+}
+
+void Athletics::RequestSubDir(Player* player, UInt8 athlDiffculty, UInt8 athlCategory)
+{
+    UInt8 i;
+    for(i = 0; i < 5; i++)
+    {
+        UInt32 dbValue = PlayerPInfo.eCombine[i];
+        UInt8 diffcult = dbValue >> 24;
+        UInt8 category = (dbValue >> 16) & 0xFF;
+        if(athlDiffculty == diffcult && athlCategory == category)
+            break;
+    }
+    if(i >= 5)
+        return;
+    UInt8 status = (PlayerPInfo.eCombine[i] >> 8) & 0xFF;
+    if(status != 0)
+        return;
+    if(PlayerPInfo.ePhysical < 3)
+    {
+        player->sendMsgCode(0, 1497);
+        return;
+    }
+    PlayerPInfo.ePhysical -= 3;
+    Stream st(REP::ATHLETICS_REFRESH_MARTIAL);
+    st << static_cast<UInt8>(4) << PlayerPInfo.ePhysical << Stream::eos;
+    player->send(st);
+    PlayerPInfo.eSelectIndex = i + 1;
+    DB6().PushUpdateData("UPDATE `athletics_rank` SET `ePhysical` = %u, `eSelectIndex` = %u WHERE `ranker` = %"I64_FMT"u", PlayerPInfo.ePhysical, PlayerPInfo.eSelectIndex, player->getId());
+    updateAthleticsMartial(player);
+    //player->GetAthletics()->listAthleticsMartial();
+    //GameMsgHdr hdr(0x232, player->getThreadId(), player, 0);
+    //GLOBAL().PushMsg(hdr, NULL);
+    listAthleticsMartial();
+}
+#if 0
+void Athletics::process()
+{
+    RankList::iterator it;
+    UInt8 row;
+    AthleticsRankData *data;
+    UInt32 Viplvl;
+    bool needSave;
+
+    for(row = 0; row <= 1; ++row)
+    {
+        for(it = _ranks[row].begin(); it != _ranks[row].end(); ++it)
+        {
+            data = *(it->second);
+            if(!data->ranker)
+                continue;
+            needSave = false;
+            //考虑5分钟误差
+            Viplvl = data->ranker->getVipLevel();
+            if(((TimeUtil::Now() % 86400 < 300) || (TimeUtil::Now() % 86400 > 86100)) && (Viplvl >= 6))
+            {
+                needSave = true;
+                data->ePhysical += 6;
+            }
+            if(data->ePhysical == MaxPhysical[Viplvl])
+            {
+                if(needSave)
+                    DB6().PushUpdateData("UPDATE `athletics_rank` SET `ePhysical` = %u WHERE `ranker` = %"I64_FMT"u", data->ePhysical, data->ranker->getId());
+                continue;
+            }
+            else if(data->ePhysical > MaxPhysical[Viplvl])
+                data->ePhysical = MaxPhysical[Viplvl];
+            else
+                data->ePhysical += 1;
+            DB6().PushUpdateData("UPDATE `athletics_rank` SET `ePhysical` = %u WHERE `ranker` = %"I64_FMT"u", data->ePhysical, data->ranker->getId());
+        }
+    }
+#endif
+
+    void Athletics::PhysicalCheck(void)
+    {
+        UInt32 Viplvl = _owner->getVipLevel();
+        bool needSave = false;
+
+        //考虑5分钟误差
+        Viplvl = _owner->getVipLevel();
+        if(((TimeUtil::Now() % 86400 < 300) || (TimeUtil::Now() % 86400 > 86100)) && (Viplvl >= 6))
+        {
+            needSave = true;
+            PlayerPInfo.ePhysical += 6;
+        }
+        if(PlayerPInfo.ePhysical == gAthleticsRank.GetMaxPhysical(Viplvl))
+        {
+            if(needSave)
+                DB6().PushUpdateData("UPDATE `athletics_rank` SET `ePhysical` = %u WHERE `ranker` = %"I64_FMT"u", PlayerPInfo.ePhysical, _owner->getId());
+            return;
+        }
+        else if(PlayerPInfo.ePhysical > gAthleticsRank.GetMaxPhysical(Viplvl))
+            PlayerPInfo.ePhysical = gAthleticsRank.GetMaxPhysical(Viplvl);
+        else
+            PlayerPInfo.ePhysical += 1;
+        DB6().PushUpdateData("UPDATE `athletics_rank` SET `ePhysical` = %u WHERE `ranker` = %"I64_FMT"u", PlayerPInfo.ePhysical, _owner->getId());
+    }
+
+}

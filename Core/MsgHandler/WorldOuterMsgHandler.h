@@ -1341,7 +1341,10 @@ void OnAthleticsPaging( GameMsgHdr& hdr, const void * data)
          UInt8 athlCategory = 0;
          brd >> athlDiffculty;
          brd >> athlCategory;
-         GObject::gAthleticsRank.RequestSubDir(player, athlDiffculty, athlCategory);
+         //GObject::gAthleticsRank.RequestSubDir(player, athlDiffculty, athlCategory);
+         UInt16 tmp = (athlDiffculty << 8) | athlCategory;
+         GameMsgHdr hdr(0x226, player->getThreadId(), player, sizeof(tmp));
+         GLOBAL().PushMsg(hdr, &tmp);
      }
      else
          GObject::gAthleticsRank.RequestPageNum(player);
