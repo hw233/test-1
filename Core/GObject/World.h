@@ -366,6 +366,28 @@ public:
     inline static bool getLoginAward()
     { return _loginAward; }
 
+    inline static void setTgcEvent(bool v)
+    { _tgcevent = v; }
+    inline static bool getTgcEvent()
+    { return _tgcevent; }
+
+    inline static bool canDestory(UInt32 itemid)
+    {
+        static UInt32 items[] =
+        {
+            9184,9185,9186,9187,9188,
+        };
+        if (World::getTgcEvent())
+        {
+            for (size_t i = 0; i < sizeof(items)/sizeof(items[0]); ++i)
+            {
+                if (items[i] == itemid)
+                    return false;
+            }
+        }
+        return true;
+    }
+
 public:
 	inline static UInt8 getWeekDay()
 	{ return _wday; }
@@ -455,6 +477,7 @@ public:
     static UInt32 _consumeend;
     static bool  _townReward_10_15;
     static bool _loginAward;
+    static bool _tgcevent;
 
 public:
     static RCSortType rechargeSort;

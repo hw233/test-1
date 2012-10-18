@@ -9639,6 +9639,9 @@ namespace GObject
         Package* pk = GetPackage();
         if (!pk) return;
 
+        if (!World::canDestory(itemid))
+            return;
+
         ItemBase* ib = NULL;
         ib = pk->FindItem(itemid, bind);
         if (ib)
@@ -13538,6 +13541,27 @@ void EventTlzAuto::notify(bool isBeginAuto)
             }
         }
         return false;
+    }
+
+    UInt32 Player::getEventState(UInt32 type)
+    {
+        if (!World::getTgcEvent())
+            return 0;
+
+        switch (type)
+        {
+            case 1:
+                {
+                    ItemBase* ib = GetPackage()->GetItem(9188, true);
+                    if (!ib)
+                        return 0;
+                    return 1;
+                }
+                break;
+            default:
+                break;
+        }
+        return 0;
     }
 
 } // namespace GObject

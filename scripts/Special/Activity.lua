@@ -110,6 +110,26 @@ function onTakeMailPackage(player, pkgId)
   return true
 end
 
+function TgcEvent(player, _type)
+    if not getTgcEvent() then
+        return
+    end
+    local package = player:GetPackage();
+    if _type == 0 and player:GetVar(200) == 0 then
+        sendItemPackageMail(player, msg_112, msg_112, {9187,1,1})
+        player:SetVar(200, 1)
+    elseif _type == 1 and player:GetVar(201)  == 0 and package:GetRestPackageSize() >= 1 then
+        package:AddItem(9184, 1, true)
+        player:SetVar(201, 1)
+    elseif _type == 2 and player:GetVar(202) == 0 and package:GetRestPackageSize() >= 1 then
+        package:AddItem(9186, 1, true)
+        player:SetVar(202, 1)
+    elseif _type == 3 and player:GetVar(203) == 0 and package:GetRestPackageSize() >= 1 then
+        package:AddItem(9185, 1, true)
+        player:SetVar(203, 1)
+    end
+end
+
 function onLogin(player)
 	local stage = getActivityStage();
     checkExpire2(player, stage);
@@ -132,6 +152,7 @@ function onLogin(player)
     if getJuly() then
         onJuly(player)
     end
+    TgcEvent(player, 0)
 end
 
 function onNVDLogin(player)
@@ -190,6 +211,7 @@ function onDungeonWin(player, id, count, free)
         lootlvl = 0
     end
     sendWinReward(player, lootlvl, 3);
+    TgcEvent(player, 3)
 end
 
 function onClanBattleAttend(player)
@@ -869,8 +891,8 @@ function onCopyWin(player, id, floor, spot, lootlvl)
         package:Add(9163, 1, true)
     end
     sendWinReward(player, lootlvl, 1);
+    TgcEvent(player, 1)
 end
-
 
 function onFrontMapFloorWin(player, id, spot, lootlvl)
 end
@@ -897,6 +919,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
         package:Add(9163, 1, true)
     end
     sendWinReward(player, lootlvl, 2);
+    TgcEvent(player, 2)
 end
 
 local vippack = {

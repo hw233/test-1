@@ -11,6 +11,7 @@ namespace GObject
 {
 	class ItemEquip;
     class ItemFashion;
+    class ItemHalo;
 	class ItemWeapon;
 	class ItemArmor;
 #ifndef CHANCECOND
@@ -113,6 +114,7 @@ namespace GObject
         static UInt8 reRecharge(const std::string& no, UInt16 id, UInt32 num, std::string& err);
 
 		static ItemEquip * fetchEquipment(UInt32, bool = true);  //获取装备
+		static ItemHalo * fetchHalo(UInt32);    //获取武器，基于fetchEquipment函数实现
 		static ItemFashion * fetchFashion(UInt32);    //获取武器，基于fetchEquipment函数实现
 		static ItemWeapon * fetchWeapon(UInt32);    //获取武器，基于fetchEquipment函数实现
 		static ItemArmor * fetchArmor(UInt32);      //获取盔甲,基于fetchEquipment函数实现

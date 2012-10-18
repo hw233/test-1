@@ -159,6 +159,8 @@ void WorldScript::init()
 	def("getNeedConsumeRank", GObject::World::getNeedConsumeRank);
 	def("setRechargeTime", GObject::World::setRechargeTime);
 	def("setConsumeTime", GObject::World::setConsumeTime);
+	def("setTgcEvent", GObject::World::setTgcEvent);
+	def("getTgcEvent", GObject::World::getTgcEvent);
 	def("Broadcast", SysBroadcast);
 	def("GetStore", GetStore);
 	def("GetTitleList", GetTitleList);

@@ -246,6 +246,14 @@ namespace GObject
             }
         }
 	};
+
+    class ItemHalo: public ItemTrump
+    {
+	public:
+		ItemHalo(UInt32 id, const GData::ItemBaseType* itemEquipType, ItemEquipData& itemEquipData)
+		    : ItemTrump(id, itemEquipType, itemEquipData)
+		{ }
+    };
 }
 
 #endif

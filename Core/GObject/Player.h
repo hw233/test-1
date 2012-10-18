@@ -696,6 +696,7 @@ namespace GObject
         void sendRechargeRankAward(int pos);
         void sendConsumeRankAward(int pos);
         void sendKillMonsterRankAward(UInt8 index, Int32 pos);
+        UInt32 getEventState(UInt32 type);
 
 	public:
 		void sendTopupMail(const char* title, const char* content, UInt32 gold, UInt8 num);
