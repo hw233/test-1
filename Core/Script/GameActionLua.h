@@ -251,7 +251,6 @@ namespace Script
         UInt8 RunNewRegisterAward(Player* player);
         UInt8 RunNewRegisterAwardAD_RF(Player* player, UInt8 idx);
         UInt8 RunBirthdayAward(Player* player);
-        //UInt8 RunAwardLogin(Player* player);
         void sendRNR(Player* player, UInt32 now, UInt32 date, UInt32 total);
         void sendRechargeMails(Player* player, UInt32 ototal, UInt32 ntotal);
         void sendRechargeRankAward(Player* player, Int32 pos);
@@ -312,6 +311,7 @@ namespace Script
         UInt32 GetExchangePropsID();
         lua_tinker::table GetdayExtraAward(UInt32 month, UInt32 day);
         UInt8 onRoamingQueqiao(Player* pl, UInt8 pos);
+        UInt32 GetBDSupermanPrice(Player* player, UInt32 itemId);
 
 	private:
 		Player* _player1;	//?ű???????Ϊ????1

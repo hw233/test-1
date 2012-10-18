@@ -167,6 +167,7 @@ namespace Script
 		CLASS_ADD(Player);
 		CLASS_DEF(Player, getPName);
 		CLASS_DEF(Player, IsMale);
+		CLASS_DEF(Player, isBD);
 		CLASS_DEF(Player, GetLev);
 		CLASS_DEF(Player, getTotalRecharge);
 		CLASS_DEF(Player, GetExp);
@@ -1308,6 +1309,12 @@ namespace Script
     UInt8 GameActionLua::onRoamingQueqiao(Player* pl, UInt8 pos)
     {
 		return Call<UInt8 >("onRoamingQueqiao", pl, pos);
+    }
+    
+    UInt32 GameActionLua::GetBDSupermanPrice(Player* player, UInt32 itemId)
+    {
+		assert(player != NULL);
+		return Call<UInt32>("GetBDSupermanPrice", player, itemId);
     }
 }
 

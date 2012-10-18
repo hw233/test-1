@@ -6,6 +6,23 @@
 #include "Common/Mutex.h"
 #include "dcapi_cpp.h"
 
+struct UserStruct
+{
+	std::string _name;
+	UInt8 _class;
+    UInt8 _level;
+    UInt8 _level1;
+    UInt8 _isYear;
+    std::string _platform;
+    std::string _openid;
+    std::string _openkey;
+    std::string _via;
+    std::string _invited;
+    UInt8 _rp;
+    std::string _clientIp;
+};
+
+
 using namespace DataCollector;
 
 #if 0
@@ -28,6 +45,7 @@ namespace GObject
 {
 #define MAX_DOMAIN 256
 
+
 class Player;
 
 class DCLogger
@@ -40,6 +58,9 @@ public:
 
     bool reg(Player* player);
     bool login(Player* player);
+    bool login_sec(Player* player);
+    bool create_sec(UserStruct const &nu, Player* player = NULL);
+    bool protol_sec(Player* player, int cmd);
     bool logout(Player* player);
     bool online(UInt32 num, UInt8 domain);
     bool consume(Player* player, UInt32 total, UInt32 c);

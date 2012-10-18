@@ -8,6 +8,7 @@
 #include "MsgID.h"
 #include <event2/buffer.h>
 #include "MsgHandler/JsonParser.h"
+#include "GObject/DCLogger.h"
 
 namespace Network
 {
@@ -267,6 +268,7 @@ void GameClient::onRecv( int cmd, int len, void * buf )
 		{
 			GameMsgHdr hdr( cmd, thrd, pl, len );
 			GLOBAL().PushMsg( hdr,  buf );
+            GObject::dclogger.protol_sec(pl, cmd);
 		}
 	}
 }

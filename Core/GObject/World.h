@@ -365,6 +365,10 @@ public:
     { _loginAward = v; }
     inline static bool getLoginAward()
     { return _loginAward; }
+    inline static void setBDSuperman(bool v)
+    { _bluediamonSuperman = v; }
+    inline static bool getBDSuperman()
+    { return _bluediamonSuperman; }
 
     inline static void setTgcEvent(bool v)
     { _tgcevent = v; }
@@ -477,6 +481,7 @@ public:
     static UInt32 _consumeend;
     static bool  _townReward_10_15;
     static bool _loginAward;
+    static bool _bluediamonSuperman;
     static bool _tgcevent;
 
 public:

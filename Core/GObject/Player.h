@@ -516,7 +516,7 @@ namespace GObject
 
         bool isHHBlue;
         std::string nameNoSuffix;     //(合服)不带后缀的用户名
-        //std::vector<UInt8> titleAll;      //玩家所有的称号id
+        std::vector<UInt8> titleAll;      //玩家所有的称号id
     };
 
 	class Player:
@@ -966,6 +966,7 @@ namespace GObject
 
 		void setTitle(UInt8 s);
 		inline UInt8 getTitle() { return _playerData.title; }
+		inline std::vector<UInt8>& getTitleAll() { return _playerData.titleAll; }
 
 		UInt32 getAchievement(UInt32 a = 0);
 		UInt32 useAchievement(UInt32 a,ConsumeInfo * ci=NULL);
@@ -1644,6 +1645,7 @@ namespace GObject
         std::string m_source;
         std::string m_via;
         std::string m_invited;
+        std::string m_clientIp;
         bool m_isOffical;
     public:
         inline void setDomain(const std::string& domain)
@@ -1653,6 +1655,7 @@ namespace GObject
             if (atoi(domain.c_str()) == 12)
                 m_isOffical = true;
         }
+        inline void setClientIp(const std::string& clientIp) { m_clientIp = clientIp; }
         inline void setOpenId(const std::string& openid) { m_openid = openid; }
         inline void setOpenKey(const std::string& openkey) { m_openkey = openkey; }
         inline void setSource(const std::string& source) { m_source = source; }
@@ -1665,6 +1668,7 @@ namespace GObject
         inline const std::string& getVia() const { return m_via; }
         inline const std::string& getInvited() const { return m_invited; }
         inline bool isOffical() const { return m_isOffical; }
+        inline const std::string& getClientIp() const { return m_clientIp; }
 
         inline UInt8 getPlatform() const { return atoi(m_domain.c_str()); }
 
