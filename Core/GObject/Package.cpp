@@ -576,8 +576,14 @@ namespace GObject
                     char udpStr[32] = {0};            
                     sprintf(udpStr, "F_1140%d%d_%d", bind, typeId, fromWhere);
                     m_Owner->udpLog("tripod", udpStr, "", "", "", "", "act", num);
-                 }
+                }
 		
+                if (typeId >= 5001 && typeId <= 5152)// 宝石
+                {   
+                    char udpStr[32] = {0};            
+                    sprintf(udpStr, "I_%d_%d_%d", bind, typeId, fromWhere);
+                    m_Owner->udpLog("item", udpStr, "", "", "", "", "act", num);
+                }
 
                 if (typeId == 1209)
                     m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
@@ -641,6 +647,12 @@ namespace GObject
                     sprintf(udpStr, "F_1140%d%d_%d", bind, typeId, fromWhere);
                     m_Owner->udpLog("tripod", udpStr, "", "", "", "", "act", num);
                  }
+                if (typeId >= 5001 && typeId <= 5152)// 宝石
+                {   
+                    char udpStr[32] = {0};            
+                    sprintf(udpStr, "I_%d_%d_%d", bind, typeId, fromWhere);
+                    m_Owner->udpLog("item", udpStr, "", "", "", "", "act", num);
+                }
 	
                 //增加获取物品的荣誉
                 //GameAction()->doAttainment(m_Owner, Script::ON_ADD_ITEM, typeId);
@@ -721,6 +733,12 @@ namespace GObject
                 sprintf(udpStr, "F_1140%d%d_%d", bind, typeId, fromWhere);
                 m_Owner->udpLog("tripod", udpStr, "", "", "", "", "act", count);
             }
+                if (typeId >= 5001 && typeId <= 5152)// 宝石
+                {   
+                    char udpStr[32] = {0};            
+                    sprintf(udpStr, "I_%d_%d_%d", bind, typeId, fromWhere);
+                    m_Owner->udpLog("item", udpStr, "", "", "", "", "act", count);
+                }
 	
             if (typeId == 1209)
                 m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
@@ -786,6 +804,12 @@ namespace GObject
                 sprintf(udpStr, "F_1140%d%d_%d", bind, typeId, fromWhere);
                 m_Owner->udpLog("tripod", udpStr, "", "", "", "", "act", count);
             }
+                if (typeId >= 5001 && typeId <= 5152)// 宝石
+                {   
+                    char udpStr[32] = {0};            
+                    sprintf(udpStr, "I_%d_%d_%d", bind, typeId, fromWhere);
+                    m_Owner->udpLog("item", udpStr, "", "", "", "", "act", count);
+                }
 	           
             if (typeId == 1209)
                 m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
