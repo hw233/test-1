@@ -565,6 +565,7 @@ namespace GData
 					wt = new ItemEquipType(idt.typeId, idt.name, idt.attrExtra);
 				}
 				break;
+            case Item_Halo:
 			case Item_Fashion: // XXX:
 			case Item_Trump:
 				{

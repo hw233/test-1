@@ -138,6 +138,7 @@ namespace Script
         lua_tinker::def(_L, "getNeedRechargeRank", GObject::World::getNeedRechargeRank);
         lua_tinker::def(_L, "getNeedConsumeRank", GObject::World::getNeedConsumeRank);
         lua_tinker::def(_L, "getKillMonsterAct", GObject::World::getKillMonsterAct);
+        lua_tinker::def(_L, "getTgcEvent", GObject::World::getTgcEvent);
 
         CLASS_DEF(GameActionLua, Print);
         lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);

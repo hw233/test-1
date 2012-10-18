@@ -3357,7 +3357,7 @@ namespace GObject
 
         bool ret = false;
 
-        for(UInt8 i; i < 3; ++ i)
+        for(UInt8 i = 0; i < 3; ++ i)
         {
             UInt32 rid = 0;
             UInt8 idx1 = chelun[m_round][i][0];
@@ -4114,6 +4114,8 @@ namespace GObject
 
         m_progress = 0;
         m_session = 1;
+        // XXX neice
+        m_nextTime = now;
 
         DB1().PushUpdateData("INSERT INTO `sh_global`(`session`, `progress`, `nextTime`) VALUES(%u, %u, %u)", m_session, m_progress, m_nextTime);
     }

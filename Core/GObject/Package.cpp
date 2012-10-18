@@ -861,6 +861,7 @@ namespace GObject
 		case Item_Armor5:
 		case Item_Ring:
 		case Item_Amulet:
+        case Item_Halo:
         case Item_Fashion:
         case Item_Trump:
 			{
@@ -869,7 +870,7 @@ namespace GObject
 
 				UInt8 lv = itype->vLev;
                 UInt8 crr = itype->career;
-				if(itype->quality > 2 && itype->subClass != Item_Trump && itype->subClass != Item_Fashion)
+				if(itype->quality > 2 && itype->subClass != Item_Trump && itype->subClass != Item_Fashion && itype->subClass != Item_Halo)
 				{
 					UInt8 q = itype->quality - 3;
 					UInt8 t[3] = {0, 0, 0};
@@ -902,6 +903,7 @@ namespace GObject
 				case Item_Armor5:
                     equip = new ItemArmor(id, itype, edata);
 					break;
+                case Item_Halo:
                 case Item_Fashion:
                 case Item_Trump:
                     {
@@ -919,7 +921,11 @@ namespace GObject
                                 break;
                             }
                         }
-                        if (itype->subClass == Item_Fashion)
+                        if (itype->subClass == Item_Halo)
+                        {
+                            equip = new ItemHalo(id, itype, edata);
+                        }
+                        else if (itype->subClass == Item_Fashion)
                         {
                             equip = new ItemFashion(id, itype, edata);
                         }
@@ -940,9 +946,9 @@ namespace GObject
 				ITEM_BIND_CHECK(itype->bindType,bind);
 				equip->SetBindStatus(bind);
 
-                if (itype->subClass != Item_Trump && itype->subClass != Item_Fashion && itype->quality == 5)
+                if (itype->subClass != Item_Trump && itype->subClass != Item_Fashion && itype->subClass != Item_Halo && itype->quality == 5)
                     m_Owner->OnShuoShuo(SS_OE);
-                if (itype->subClass == Item_Trump)
+                if (itype->subClass == Item_Trump || itype->subClass == Item_Halo || itype->subClass == Item_Fashion)
                     m_Owner->OnShuoShuo(SS_TRUMP);
 
 				ItemBase *& e = m_Items[id];
@@ -1050,7 +1056,7 @@ namespace GObject
         if(FromWhere == FromDungeon || FromWhere  == FromNpc)
         {
                     //获取法宝成就
-            if(itype->subClass == Item_Trump)
+            if(itype->subClass == Item_Trump || itype->subClass == Item_Halo || itype->subClass == Item_Fashion)
             {
                 GameAction()->doAttainment(this->m_Owner, Script::ADD_TRUMP, itype->quality);
     //                if(itype->quality == 5)
@@ -1105,9 +1111,9 @@ namespace GObject
 			++ m_Size;
 		e = equip;
 
-        if (equip->getClass() != Item_Trump && equip->getClass() != Item_Fashion && equip->getQuality() == 5)
+        if (equip->getClass() != Item_Trump && equip->getClass() != Item_Fashion && equip->getClass() != Item_Halo && equip->getQuality() == 5)
             m_Owner->OnShuoShuo(SS_OE);
-        if (equip->getClass() == Item_Trump)
+        if (equip->getClass() == Item_Trump || equip->getClass() == Item_Halo || equip->getClass() == Item_Fashion)
             m_Owner->OnShuoShuo(SS_TRUMP);
 
 		DB4().PushUpdateData("REPLACE INTO `item` VALUES(%u, %u, %"I64_FMT"u, %d)", equip->getId(), 1, m_Owner->getId(), equip->GetBindStatus() ? 1 : 0);
@@ -1383,6 +1389,11 @@ namespace GObject
             }
 			switch(part)
 			{
+            case 0x1f:
+				if(item->getClass() != Item_Halo)
+					return false;
+				old = fgt->setHalo(static_cast<GObject::ItemHalo*>(item));
+                break;
             case 0x20:
 				if(item->getClass() != Item_Fashion)
 					return false;
@@ -1504,6 +1515,7 @@ namespace GObject
 			return 0;
 		ItemBase* item = GetItem(id, bind);
 		if (item == NULL) return 0;
+        if (!World::canDestory(id)) return 0;
 		UInt32 price = item->getPrice();
 		if (price == 0) return 0;
 		if (DelItem2(item, num, ToSellNpc))
@@ -2064,7 +2076,7 @@ namespace GObject
             esa.appendAttrToStream(st);
         }
 
-        if(equip->getClass() == Item_Trump || equip->getClass() == Item_Fashion)
+        if(equip->getClass() == Item_Trump || equip->getClass() == Item_Fashion || equip->getClass() == Item_Halo)
         {
             st << ied.maxTRank << ied.trumpExp;
         }
@@ -2402,7 +2414,7 @@ namespace GObject
         {
             quality = 1;
         }
-        else if(equip->getClass() == Item_Trump)
+        else if(equip->getClass() == Item_Trump || equip->getClass() == Item_Halo)
         {
             maxEnchantLevel = TRUMP_ENCHANT_LEVEL_MAX;
             item_enchant_l = TRUMP_ENCHANT_L1;
@@ -2426,7 +2438,7 @@ namespace GObject
         HoneyFall* hf = m_Owner->getHoneyFall();
 
         HoneyFallType hft;
-        if(equip->getClass() == Item_Trump)
+        if(equip->getClass() == Item_Trump || equip->getClass() == Item_Halo)
             hft = e_HFT_Trump_Enchant;
         else
             hft = e_HFT_Equip_Enchant;
@@ -2474,7 +2486,7 @@ namespace GObject
 
                 flag_suc = true;
                 ++ ied.enchant;
-                if (equip->getClass() == Item_Trump && ied.enchant == 1)
+                if ((equip->getClass() == Item_Trump || equip->getClass() == Item_Halo) && ied.enchant == 1)
                 {
                     ((ItemTrump*)equip)->fixSkills();
                     if (fgt)
@@ -2510,7 +2522,7 @@ namespace GObject
                         updateHft = true;
                         hf->setHftValue(hft, 0);
                     }
-                    if (equip->getClass() == Item_Trump && ied.enchant == 1)
+                    if ((equip->getClass() == Item_Trump || equip->getClass() == Item_Halo) && ied.enchant == 1)
                     {
                         ((ItemTrump*)equip)->fixSkills();
                     }
@@ -2567,7 +2579,7 @@ namespace GObject
 				equip->DoEquipBind();
 			}
 
-            if(equip->getClass() == Item_Trump)
+            if(equip->getClass() == Item_Trump || equip->getClass() == Item_Halo)
             {
                 GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(equip->getAttrExtra());
                 if(ied.enchant != 1)
@@ -2611,7 +2623,9 @@ namespace GObject
 			{
 				fgt->setDirty();
 
-                if(equip->getClass() == Item_Trump)
+                if(equip->getClass() == Item_Halo)
+                    fgt->sendModification(0x1f, equip, false);
+                else if(equip->getClass() == Item_Trump)
                     fgt->sendModification(0x0a+ pos, equip, false);
                 else
                     fgt->sendModification(0x20 + pos, equip, false);
@@ -2634,7 +2648,9 @@ namespace GObject
 			case 11:
 			case 12:
                 {
-                    if (World::_halloween && ied.enchant == 8 && equip->GetItemType().subClass != Item_Trump)
+                    if (World::_halloween && ied.enchant == 8 &&
+                            equip->GetItemType().subClass != Item_Trump &&
+                            equip->GetItemType().subClass != Item_Halo)
                     {
                         if (!m_Owner->enchanted8(equip->getId()))
                             m_Owner->sendEnchanted8Box();
@@ -2677,7 +2693,7 @@ namespace GObject
 			DB4().PushUpdateData("UPDATE `equipment` SET `enchant` = %u WHERE `id` = %u", ied.enchant, equip->getId());
 			DBLOG().PushUpdateData("insert into enchant_histories (server_id, player_id, equip_id, template_id, enchant_level, enchant_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), equip->getId(), equip->GetItemType().getId(), ied.enchant, TimeUtil::Now());
 
-            if(equip->getClass() == Item_Trump)
+            if(equip->getClass() == Item_Trump || equip->getClass() == Item_Halo)
             {
                 GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(equip->getAttrExtra());
                 ((ItemTrump*)equip)->enchant(ied.enchant, attr);
@@ -2690,6 +2706,8 @@ namespace GObject
 				fgt->setDirty();
                 if(equip->getClass() == Item_Trump)
                     fgt->sendModification(0x0a+ pos, equip, false);
+                else if(equip->getClass() == Item_Halo)
+                    fgt->sendModification(0x1f, equip, false);
                 else
                     fgt->sendModification(0x20 + pos, equip, false);
 			}
@@ -2703,7 +2721,7 @@ namespace GObject
     {
         static const int logId[] = {1120, 1121,1122,1123,1124,1125};
         char udpStr[64] = {0};
-        if (equip->getClass() == Item_Trump) //法宝
+        if (equip->getClass() == Item_Trump || equip->getClass() == Item_Halo) //法宝
         {
             const GData::ItemBaseType& itemType =  equip-> GetItemType();
             sprintf(udpStr, "F_1126_%d_%d", itemType.getId(), level);
@@ -3194,7 +3212,7 @@ namespace GObject
 
         if(IsEquip(t.subClass))
         {
-            if(t.subClass == Item_Trump || t.subClass == Item_Fashion)
+            if(t.subClass == Item_Trump || t.subClass == Item_Fashion || t.subClass == Item_Halo)
             {
                 UInt32 n = m_Owner->GetVar(VAR_SPLIT_THRUMP);
                 n ++ ;
@@ -3964,7 +3982,9 @@ namespace GObject
 
             UInt8 equip_t = EQUIPTYPE_EQUIP;
             lv = equip->getValueLev();
-            if(equip->GetItemType().subClass == Item_Trump || equip->GetItemType().subClass == Item_Fashion)
+            if(equip->GetItemType().subClass == Item_Trump ||
+                    equip->GetItemType().subClass == Item_Fashion ||
+                    equip->GetItemType().subClass == Item_Halo)
             {
                 equip_t = EQUIPTYPE_TRUMP;
                 lv = ied.tRank;
@@ -3979,7 +3999,9 @@ namespace GObject
 			{
 				fgt->setDirty();
                 if(equip->getClass() == Item_Trump)
-                    fgt->sendModification(0x0a+ pos, equip, false);
+                    fgt->sendModification(0x0a + pos, equip, false);
+                else if(equip->getClass() == Item_Halo)
+                    fgt->sendModification(0x1f, equip, false);
                 else
                     fgt->sendModification(0x20 + pos, equip, false);
 			}
@@ -4138,7 +4160,9 @@ namespace GObject
 		ItemEquip * equip = FindEquip(fgt, pos, fighterId, itemId);
 		if (equip == NULL) return 2;
 		ItemEquipData& ied = equip->getItemEquipData();
-        if((equip->GetItemType().subClass == Item_Trump || equip->GetItemType().subClass == Item_Fashion) && ied.tRank < 1)
+        if((equip->GetItemType().subClass == Item_Trump ||
+                    equip->GetItemType().subClass == Item_Fashion ||
+                    equip->GetItemType().subClass == Item_Halo) && ied.tRank < 1)
             return 2;
 		bool isBound = equip->GetBindStatus();
 		switch(equip->getQuality())
@@ -4188,7 +4212,9 @@ namespace GObject
         UInt8 crr = equip->GetCareer();
 
         UInt8 equip_t = EQUIPTYPE_EQUIP;
-        if(equip->GetItemType().subClass == Item_Trump || equip->GetItemType().subClass == Item_Fashion)
+        if(equip->GetItemType().subClass == Item_Trump ||
+                equip->GetItemType().subClass == Item_Fashion ||
+                equip->GetItemType().subClass == Item_Halo)
         {
             equip_t = EQUIPTYPE_TRUMP;
             lv = ied.tRank;
@@ -4278,7 +4304,9 @@ namespace GObject
 		{
 			fgt->setDirty();
             if(equip->GetItemType().subClass == Item_Trump)
-                fgt->sendModification(0x0a+ pos, equip, false);
+                fgt->sendModification(0x0a + pos, equip, false);
+            else if(equip->GetItemType().subClass == Item_Halo)
+                fgt->sendModification(0x1f, equip, false);
             else
                 fgt->sendModification(0x20 + pos, equip, false);
 		}
@@ -4454,8 +4482,8 @@ namespace GObject
             return 2;
 		ItemEquip * trump = FindEquip(fgt, pos, fighterId, trumpId);
 		ItemEquip * item = FindEquip(fgt, pos, 0, itemId);
-		if(trump == NULL || (trump->getClass() != Item_Trump && trump->getClass() != Item_Fashion)
-                || item == NULL || (item->getClass() != Item_Trump && item->getClass() != Item_Fashion))
+		if(trump == NULL || (trump->getClass() != Item_Trump && trump->getClass() != Item_Fashion && trump->getClass() != Item_Halo)
+                || item == NULL || (item->getClass() != Item_Trump && item->getClass() != Item_Fashion && item->getClass() != Item_Halo))
 			return 2;
 
 		bool isBound = item->GetBindStatus();
@@ -4585,7 +4613,9 @@ namespace GObject
         {
             if(l != ied_trump.tRank)
                 fgt->setDirty();
-            if (trump->getClass() == Item_Fashion)
+            if (trump->getClass() == Item_Halo)
+                fgt->sendModification(0x1f, trump, false);
+            else if (trump->getClass() == Item_Fashion)
                 fgt->sendModification(0x20, trump, false);
             else
                 fgt->sendModification(0x0a+ pos, trump, false);
@@ -4607,7 +4637,7 @@ namespace GObject
 		Fighter * fgt = NULL;
 		UInt8 pos = 0;
 		ItemEquip * trump = FindEquip(fgt, pos, fighterId, trumpId);
-		if(trump == NULL || (trump->getClass() != Item_Trump && trump->getClass() != Item_Fashion))
+		if(trump == NULL || (trump->getClass() != Item_Trump && trump->getClass() != Item_Fashion && trump->getClass() != Item_Halo))
 			return 2;
 
         UInt8 q = trump->getQuality();
@@ -4637,7 +4667,9 @@ namespace GObject
 			trump->DoEquipBind();
 		if(fgt != NULL)
         {
-            if (trump->getClass() == Item_Fashion)
+            if (trump->getClass() == Item_Halo)
+                fgt->sendModification(0x1f, trump, false);
+            else if (trump->getClass() == Item_Fashion)
                 fgt->sendModification(0x20, trump, false);
             else
                 fgt->sendModification(0x0a + pos, trump, false);
