@@ -718,22 +718,17 @@ void SendConsumeRankAward()
         {
             ++pos;
 
-            if(pos > 1) break;
+            if(pos > 7) break;
 
             Player* player = i->player;
             if (!player)
                 continue;
-            if (player->isOnline())
-            {
-                GameMsgHdr hdr(0x258, player->getThreadId(), player, sizeof(pos));
-                GLOBAL().PushMsg(hdr, &pos);
-            }
-            else
-            {
-                player->sendConsumeRankAward(pos);
-            }
+
+            GameMsgHdr hdr(0x258, player->getThreadId(), player, sizeof(pos));
+            GLOBAL().PushMsg(hdr, &pos);
+
+            SYSMSG_BROADCASTV(4034, pos, player->getCountry(), player->getPName(), i->total);
         }
-        //SYSMSG_BROADCASTV(2142, player->getCountry(), player->getPName(), titles[pos]);
         World::consumeSort.clear();
     }
 }

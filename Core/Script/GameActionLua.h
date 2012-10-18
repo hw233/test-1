@@ -254,6 +254,7 @@ namespace Script
         void sendRNR(Player* player, UInt32 now, UInt32 date, UInt32 total);
         void sendRechargeMails(Player* player, UInt32 ototal, UInt32 ntotal);
         void sendRechargeRankAward(Player* player, Int32 pos);
+        void sendConsumeRankAward(Player* player, Int32 pos);
         void sendConsumeMails(Player* player, UInt32 ototal, UInt32 ntotal);
         void onEquipForge(Player* player, UInt32 itemId, UInt32 onums);
         bool onSoSoMapAward(Player* player, UInt8 off);
