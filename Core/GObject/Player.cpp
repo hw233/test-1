@@ -1091,7 +1091,11 @@ namespace GObject
 #ifndef _WIN32
 #ifdef _FB
 #else
+#ifdef _VT
+#else
         dclogger.login(this);
+        dclogger.login_sec(this);
+#endif
 #endif
 #endif // _WIN32
 	}
