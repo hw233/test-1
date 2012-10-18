@@ -829,7 +829,7 @@ function initActTime(y, m, d)
   local  SerStartTm212 = { ['year'] = 2012, ['month'] = 10, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 蓝钻优惠活动(蓝钻超人) //10.19上线推迟
   local SerStartTm213 = { ['year'] = 2012, ['month'] = 10, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local SerStartTm214 = { ['year'] = 2012, ['month'] = 10, ['day'] = 20, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local SerStartTm214 = { ['year'] = 2012, ['month'] = 10, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;

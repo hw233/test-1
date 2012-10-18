@@ -2806,11 +2806,11 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
         price = GData::store.getPrice(lr._type, lr._itemId, lr._count); // XXX: when discount need one item id
     else if(lr._type == 125) //蓝砖超人活动页
     {
+        if(!World::getBDSuperman())
+            return;
         price = GameAction()->GetBDSupermanPrice(player, lr._itemId, lr._count > 0);
         price = price * 1;
         if(!price)
-            return;
-        if(!World::getBDSuperman())
             return;
     }
     else
