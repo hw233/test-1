@@ -671,6 +671,8 @@ namespace SPEQ
     const UInt16 JASON              = 0x11D;//PHP过来的JASON请求
     const UInt16 CFRIEND            = 0x11E;//设置成密友
 
+    const UInt16 GMCMD               = 0x120; // 接受GM命令
+
     const UInt16 ADDDISCOUNT         = 0x121; // 增加限时活动
     const UInt16 QUERYDISCOUNT       = 0x122; // 查询限时活动
     const UInt16 CLEARDISCOUNT       = 0x123; // 清空限时活动
@@ -712,6 +714,7 @@ namespace SPEP
     const UInt8 MAILVIP             = 0x1C;
     const UInt8 JASON               = 0x1D;
     const UInt8 CFRIEND             = 0x1E;//设置成密友
+    const UInt8 GMCMD               = 0x20; // 接受GM命令
     const UInt8 ADDDISCOUNT         = 0x21; // 增加限时活动
     const UInt8 QUERYDISCOUNT       = 0x22; // 查询限时活动
     const UInt8 CLEARDISCOUNT       = 0x23; // 清空限时活动
