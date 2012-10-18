@@ -2802,27 +2802,33 @@ function onGetKillMonsterReward(player)
 end
 
 --蓝钻优惠活动(购买蓝砖超人)
-function GetBDSupermanPrice(player, itemId)
+function GetBDSupermanPrice(player, itemId, isUsed)
     if nil == player or nil == itemId
     then
         return 0
     end
-    if player:isBD()
-    then
-        itemId = itemId * 10 + 1
+    if isUsed then
+        --if player:isBD()
+        if player:GetPackage():ExistItem(0xFFFF)
+        then
+            itemId = itemId * 10 + 1
+        else
+            itemId = itemId * 10
+        end
     else
         itemId = itemId * 10
     end
-
     local items =
     {
-        [17070] = 399;
-        [17071] = 599; --原价
+        [17070] = 599; --原价
+        [17071] = 399;
     }
     if nil == items[itemId]
     then
         return 0
     end
+    player:GetPackage():DelItemSendMsg(0xFFFF, player)
+    player:GetPackage():DelItem(0xFFFF, 1, 1) 
     return items[itemId]
 end
 

@@ -1311,10 +1311,10 @@ namespace Script
 		return Call<UInt8 >("onRoamingQueqiao", pl, pos);
     }
     
-    UInt32 GameActionLua::GetBDSupermanPrice(Player* player, UInt32 itemId)
+    UInt32 GameActionLua::GetBDSupermanPrice(Player* player, UInt32 itemId, bool isUsed)
     {
 		assert(player != NULL);
-		return Call<UInt32>("GetBDSupermanPrice", player, itemId);
+		return Call<UInt32>("GetBDSupermanPrice", player, itemId, isUsed);
     }
 }
 

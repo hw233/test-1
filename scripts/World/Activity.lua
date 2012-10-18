@@ -307,7 +307,7 @@ function onActivityCheck(tm)
   else
       set3366PrivilegeAct(false)
   end
-
+  
   if tm >= actTime216 and tm < actTime217 then
       setBDSuperman(true)
   else
@@ -829,7 +829,7 @@ function initActTime(y, m, d)
   local  SerStartTm212 = { ['year'] = 2012, ['month'] = 10, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 蓝钻优惠活动(蓝钻超人) //10.19上线推迟
   local SerStartTm213 = { ['year'] = 2012, ['month'] = 10, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local SerStartTm214 = { ['year'] = 2012, ['month'] = 10, ['day'] = 17, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local SerStartTm214 = { ['year'] = 2012, ['month'] = 10, ['day'] = 20, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
@@ -1080,6 +1080,7 @@ function initActTime(y, m, d)
   actTime212= os.time(SerStartTm211);
   actTime213= os.time(SerStartTm211) + 3 * 86400;
 
+  actTime214= os.time(SerStartTm212);
   actTime215= os.time(SerStartTm212) + 1 * 86400;
   
   actTime216= os.time(SerStartTm213);
