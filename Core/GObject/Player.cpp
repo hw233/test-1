@@ -569,6 +569,10 @@ namespace GObject
         m_ulog = _analyzer.GetInstance(buf);
         m_ulog->SetUserIP("0.0.0.0");
 #endif
+        if(cfg.merged)
+            _switch_diff_rank = true;
+        else
+            _switch_diff_rank = false;
 	}
 
 

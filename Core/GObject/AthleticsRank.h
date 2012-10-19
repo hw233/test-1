@@ -87,6 +87,20 @@ struct AthleticsRankData
     }
 };
 
+struct AthlSort
+{
+    GObject::Player* player;
+    UInt32 rank;
+};
+struct lt_athlsort
+{
+    bool operator()(const AthlSort& a, const AthlSort& b) const { return a.rank < b.rank; }
+};
+typedef std::set<AthlSort, lt_athlsort> AthlSortType;
+typedef AthlSortType::iterator RankL;
+typedef std::map<UInt16, AthlSortType> RankListL;
+static RankListL _ranksL[2];
+
 struct AthleticsAward
 {
 	UInt32 athleticsid;
@@ -236,26 +250,80 @@ public:
         return Pos;
 #endif
     }
+
+    inline UInt32 getRankPosL(Player* player)
+    {
+        UInt32 Pos;
+        UInt8 row = getRankRow(player->GetLev());
+        AthlSortType& curType = _ranksL[row][player->getServerNo()];
+        if(curType.empty())
+            return 0;
+        AthlSort cur = {player, player->GetVar(VAR_LOCAL_RANK)};
+        RankL curIter = curType.find(cur);
+        if(curIter == curType.end())
+            return 0;
+        Pos = std::distance(curType.begin(), curIter) + 1;
+        if(Pos > ATHLETICS_RANK_MAX_CNT)
+        {
+            Pos = ATHLETICS_RANK_MAX_CNT + 1;
+        }
+        return Pos;
+    }
+
 	inline Rank getRankBegin(UInt8 row)
 	{
 		return _athleticses[row].begin();
 	}
+
+    inline RankL getRankBeginL(Player* player)
+    {
+        UInt8 row = getRankRow(player->GetLev());
+        return _ranksL[row][player->getServerNo()].begin();
+    }
+
 	inline Rank getRankEnd(UInt8 row)
 	{
 		return _athleticses[row].end();
 	}
+
+    inline RankL getRankEndL(Player* player)
+    {
+        UInt8 row = getRankRow(player->GetLev());
+        return _ranksL[row][player->getServerNo()].end();
+    }
+
 	inline UInt32 getRankSize(UInt8 row)
 	{
 		return static_cast<UInt16>(_athleticses[row].size());
 	}
+
+    inline UInt32 getRankSizeL(Player* player)
+    {
+        UInt8 row = getRankRow(player->GetLev());
+        return _ranksL[row][player->getServerNo()].size();
+    }
+
 	inline bool frontRankPos(UInt8 row, Rank rank)
 	{
 		return (*rank) == _athleticses[row].front();
 	}
+
+    inline bool frontRankPosL(Player* player, RankL cur)
+    {
+        UInt8 row = getRankRow(player->GetLev());
+        return cur == _ranksL[row][player->getServerNo()].begin();
+    }
+
 	inline bool backRankPos(UInt8 row, Rank rank)
 	{
 		return (*rank) == _athleticses[row].back();
 	}
+
+    inline bool backRankPosL(Player* player, RankL cur)
+    {
+        UInt8 row = getRankRow(player->GetLev());
+        return static_cast<UInt32>(std::distance(_ranksL[row][player->getServerNo()].begin(), cur) + 1) == _ranksL[row][player->getServerNo()].size();
+    }
 
     void updateAthleticsRank(AthleticsRankData* data);
 	void updateBatchRanker(UInt8, Rank, Rank);
