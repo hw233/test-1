@@ -2275,6 +2275,41 @@ void SetCFriend(LoginMsgHdr& hdr, const void* data)
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
+bool SwitchSecDC(UInt32 val)
+{
+    // 设置是否开启安全DCLogger，返回设置是否成功
+    cfg.setSecDCLog(val? true:false);
+    return true;
+}
+
+void GMCmd(LoginMsgHdr& hdr, const void* data)
+{
+    // 接受后台传来的GM指令
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+
+    UInt16 id = 0;
+    UInt32 val = 0;
+
+    br >> id;
+    br >> val;
+    bool result = false;
+    switch (id)
+    {
+        case 0x01:
+            result = SwitchSecDC(val);
+            break;
+        default:
+            break;
+    }
+
+
+    Stream st(SPEP::GMCMD);
+    st << result << Stream::eos;
+	NETWORK()->SendMsgToClient(hdr.sessionID,st);
+
+}
+
 void AddDiscountFromBs(LoginMsgHdr& hdr, const void* data)
 {
     // GM增加限时限购活动

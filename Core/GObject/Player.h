@@ -429,7 +429,7 @@ namespace GObject
             lastTjEventScore = 0;
             lastTjTotalScore = 0;
             isHHBlue = false;
-            //titleAll.reserve(32);
+            titleAll.reserve(32);
         }
 
 

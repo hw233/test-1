@@ -88,6 +88,7 @@ public:
 
     bool udplog;
     bool dclog;
+    bool secdclog;
 
 public:
 	inline void setTcpPort(UInt16 p) {tcpPort = p;}
@@ -127,6 +128,7 @@ public:
     inline void setMergeList(const char* list) { mergeList = list?list:"";}
     inline void setUdpLog(bool v) { udplog = v; }
     inline void setDCLog(bool v) { dclog = v; }
+    inline void setSecDCLog(bool v) { secdclog = v; }
 
 
 	inline void setVerifyTokenServer(const char* server, UInt16 port)
