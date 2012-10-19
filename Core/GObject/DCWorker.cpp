@@ -62,7 +62,7 @@ namespace GObject
                         r = true;
                 }
 #endif
-                if (msg)
+                if (msg && logType != LT_SECDATA)
                 {
                     TRACE_LOG("[%u]%u:%u-[%s] -> %d", m_Worker, sz, size, msg, r ? 1 : 0);
                     TRACE_LOG("logType = %u", (UInt32)logType);
