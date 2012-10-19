@@ -76,17 +76,17 @@ void RealItemAwardMgr::getAward(Player* pl, UInt32 id)
 void RealItemAwardMgr::getInfo(Stream& st)
 {
     FastMutex::ScopedLock lk(m_mutex);
-    UInt8 cnt = 0;
-    st << cnt;
+    UInt16 cnt = 0;
     size_t offset = st.size();
+    st << cnt;
     for(std::map<UInt32, RealItemAward>::iterator it = m_awards.begin(); it != m_awards.end(); ++ it)
     {
         RealItemAward& award = it->second;
-        st << static_cast<UInt8>(it->first);
+        st << static_cast<UInt32>(it->first);
         st << award.cd << award.card_no << award.card_psw;
         ++ cnt;
     }
-    st.data<UInt8>(offset) = cnt;
+    st.data<UInt16>(offset) = cnt;
 }
 
 bool RealItemAwardMgr::addAward(UInt32 id, UInt32 cd, std::string& card_no, std::string& card_psw)

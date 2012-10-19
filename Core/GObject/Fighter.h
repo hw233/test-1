@@ -492,15 +492,15 @@ public:
 	inline float getExtraPierce() { checkDirty(); return _attrExtraEquip.pierce; }
 	inline float getExtraCounter() { checkDirty(); return _attrExtraEquip.counter; }
 	inline float getExtraMagRes() { checkDirty(); return _attrExtraEquip.magres; }
-	inline float getBattlePoint() { checkBPDirty(); return _battlePoint; }
+	inline float getBattlePoint() { checkBPDirty(); return _battlePoint + _skillBP; }
 
-    inline float getExtraHitrateLevel() { checkBPDirty(); return _attrExtraEquip.hitrlvl; }
-    inline float getExtraEvadeLevel() { checkBPDirty(); return _attrExtraEquip.evdlvl; }
-    inline float getExtraCriticalLevel() { checkBPDirty(); return _attrExtraEquip.crilvl; }
-    inline float getExtraPierceLevel() { checkBPDirty(); return _attrExtraEquip.pirlvl; }
-    inline float getExtraCounterLevel() { checkBPDirty(); return _attrExtraEquip.counterlvl; }
-    inline float getExtraToughLevel() { checkBPDirty(); return _attrExtraEquip.toughlvl; }
-    inline float getExtraMagResLevel() { checkBPDirty(); return _attrExtraEquip.mreslvl; }
+    inline float getExtraHitrateLevel() { checkDirty(); return _attrExtraEquip.hitrlvl; }
+    inline float getExtraEvadeLevel() { checkDirty(); return _attrExtraEquip.evdlvl; }
+    inline float getExtraCriticalLevel() { checkDirty(); return _attrExtraEquip.crilvl; }
+    inline float getExtraPierceLevel() { checkDirty(); return _attrExtraEquip.pirlvl; }
+    inline float getExtraCounterLevel() { checkDirty(); return _attrExtraEquip.counterlvl; }
+    inline float getExtraToughLevel() { checkDirty(); return _attrExtraEquip.toughlvl; }
+    inline float getExtraMagResLevel() { checkDirty(); return _attrExtraEquip.mreslvl; }
 
 public:
     inline void setExtraAttack(Int32 atk) { setDirty(true); _wbextatk = atk; }
@@ -619,6 +619,7 @@ public:
 protected:
 	void rebuildEquipAttr();
 	void rebuildBattlePoint();
+	void rebuildSkillBattlePoint();
 	inline void checkDirty()
 	{
 		if(_attrDirty)
@@ -634,6 +635,11 @@ protected:
 			_bPDirty = false;
 			rebuildBattlePoint();
 		}
+        if(_skillBPDirty)
+        {
+			_skillBPDirty = false;
+			rebuildSkillBattlePoint();
+        }
 	}
 
     template <typename T>
@@ -701,12 +707,14 @@ protected:
 	bool _attrDirty;
 	UInt32 _maxHP;
 	bool _bPDirty;
+	bool _skillBPDirty;
     bool _expFlush;
     UInt16 _expMods;
     UInt32 _expEnd;
     UInt16 _pexpMods;
     bool _forceWrite;
 	float _battlePoint;
+	float _skillBP;
 	GData::AttrExtra _attrExtraEquip;
 
 	UInt32 _buffData[FIGHTER_BUFF_COUNT];
@@ -796,6 +804,8 @@ public:
     bool appendFighterSSInfo(Stream& st, UInt16 skillid);
     bool appendFighterSSInfo(Stream& st, UInt16 skillid, SStrengthen* ss);
     void PeerlessSSNotify(UInt16 id);
+
+    UInt16 calcSkillBattlePoint(UInt16 skillId);
 private:
     std::map<UInt16, SStrengthen> m_ss;
 

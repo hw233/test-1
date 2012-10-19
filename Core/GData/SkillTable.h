@@ -103,6 +103,7 @@ struct SkillBase : public ObjectBaseT<UInt16>
         prob(0), area(0), last(0), cd(0), effect(0) {}
     ~SkillBase() { if (effect) delete effect; }
 
+    UInt8 color;               // 技能颜色 1-白色 2-绿色 3-蓝色 4-紫色 5-橙色
     UInt8 target;              // 作用对象: 0-友方,1-敌方,2-自己(对友方和自己加,对敌方减)
                                // 触发条件: SKILL_ACTIVE   - 主动
                                //           SKILL_PEERLESS - 无双技能,当灵气>=100释放

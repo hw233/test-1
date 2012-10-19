@@ -1206,13 +1206,14 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBSkill skills;
-		if(execu->Prepare("SELECT `id`, `name`, `target`, `cond`, `prob`, `area`, `factor`, `last`, `cd`, `effectid` FROM `skills`", skills) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `name`, `color`, `target`, `cond`, `prob`, `area`, `factor`, `last`, `cd`, `effectid` FROM `skills`", skills) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
             SkillBase* skill = new SkillBase(skills.id, skills.name);
             if (!skill)
                 return false;
+            skill->color = skills.color;
             skill->target = skills.target;
             skill->cond = skills.cond;
             skill->prob = skills.prob;
@@ -1595,7 +1596,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBFormation dbf;
-		if(execu->Prepare("SELECT `id`, `name`, `grid1`, `prop1`, `grid2`, `prop2`, `grid3`, `prop3`, `grid4`, `prop4`, `grid5`, `prop5`, `levelup_item` FROM `formation`", dbf) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `name`, `battlePoint`, `grid1`, `prop1`, `grid2`, `prop2`, `grid3`, `prop3`, `grid4`, `prop4`, `grid5`, `prop5`, `levelup_item` FROM `formation`", dbf) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -1603,6 +1604,7 @@ namespace GData
             Formation::GridEffect effect;
             const AttrExtraItem* ae = NULL;
 
+            form->setBattlePoint(dbf.battlePoint);
             ae = attrExtraManager[dbf.prop1];
             effect.pos = dbf.grid1;
             if (ae)

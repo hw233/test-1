@@ -219,6 +219,7 @@ DROP TABLE IF EXISTS `formation`;
 CREATE TABLE `formation` (
   `id` smallint(5) unsigned NOT NULL,
   `name` varchar(255) NOT NULL,
+  `battlePoint` smallint(5) unsigned NOT NULL DEFAULT '0',
   `grid1` tinyint(3) NOT NULL,
   `prop1` int(10) NOT NULL,
   `grid2` tinyint(3) NOT NULL,
@@ -423,6 +424,7 @@ DROP TABLE IF EXISTS `skills`;
 CREATE TABLE `skills` (
   `id` smallint(5) unsigned NOT NULL,
   `name` varchar(255) NOT NULL DEFAULT '',
+  `color` tinyint(3) NOT NULL DEFAULT '1',
   `cond` smallint(5) NOT NULL DEFAULT '0',
   `prob` float(10,4) NOT NULL DEFAULT '0.0000',
   `target` tinyint(3) NOT NULL DEFAULT '0',
