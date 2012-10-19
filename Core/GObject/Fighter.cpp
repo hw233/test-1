@@ -820,16 +820,33 @@ ItemEquip * Fighter::setHalo( ItemHalo* r, bool writedb )
 {
 	ItemEquip * rr = _halo;
 	_halo = r;
-	if(writedb)
-	{
-		_attrDirty = true;
-		_bPDirty = true;
-		if(r != NULL)
-		{
-			r->DoEquipBind(true);
-		}
-		sendModification(0x1f, r);
-	}
+
+    if (rr)
+    {
+        const GData::AttrExtra* attr = rr->getAttrExtra();
+        if (attr)
+            delSkillsFromCT(attr->skills, writedb);
+    }
+
+    if (r)
+    {
+        const GData::AttrExtra* attr = r->getAttrExtra();
+        if (attr)
+            addSkillsFromCT(attr->skills, writedb, true);
+    }
+
+    if(writedb && r)
+    {
+        //判断穿法宝的成就
+        GameAction()->doAttainment(_owner, 10211, 0);
+    }
+
+    _attrDirty = true;
+    _bPDirty = true;
+    if(r != NULL)
+        r->DoEquipBind(true);
+
+    sendModification(0x1f, r, writedb);
 	return rr;
 }
 
@@ -1508,6 +1525,12 @@ void Fighter::rebuildEquipAttr()
     if (equip != NULL)
     { // XXX: like trump
         addTrumpAttr(equip);
+    }
+
+	ItemEquip * halo = getHalo();
+    if (halo != NULL)
+    { // XXX: like trump
+        addTrumpAttr(halo);
     }
 
 	equip = getWeapon();
