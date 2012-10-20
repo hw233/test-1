@@ -161,6 +161,8 @@ private:
     void OnSingleHeroStageGoTo(GObject::Player* player, std::vector<std::string>& arge);
     void OnNewPlayerAuto(GObject::Player* player, std::vector<std::string>& arge);
     void OnNewPlayerAutoSuper(GObject::Player* player, std::vector<std::string>& arge);
+    void OnShowBattlePoint(GObject::Player* player, std::vector<std::string>& arge);
+    
 };
 
 extern GMHandler gmHandler;

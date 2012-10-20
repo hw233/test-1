@@ -344,6 +344,9 @@ sysMsg:set(620, 1, "当前在线人数: %u");
 sysMsg:set(621, 1, "目标据点[0x%x]不可达");
 sysMsg:set(622, 1, "所在线程: 0x%x");
 
+sysMsg:set(623, 1, "玩家战力: %u")
+sysMsg:set(624, 1, "散仙[%s]: %u")
+
 sysMsg:set(400, 0x27, "")
 sysMsg:set(401, 0x27, "")
 sysMsg:set(402, 0x27, "")

@@ -208,6 +208,8 @@ GMHandler::GMHandler()
     Reg(3, "gotoshs", &GMHandler::OnSingleHeroStageGoTo);
     Reg(3, "autonp", &GMHandler::OnNewPlayerAuto);
     Reg(3, "autosupper", &GMHandler::OnNewPlayerAutoSuper);
+
+    Reg(3, "bp", &GMHandler::OnShowBattlePoint);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -3130,6 +3132,19 @@ void GMHandler::OnNewPlayerAutoSuper(GObject::Player* player, std::vector<std::s
 
         std::vector<std::string> cmd;
         OnSuper(pl, cmd);
+    }
+}
+
+void GMHandler::OnShowBattlePoint(GObject::Player* player, std::vector<std::string>& arge)
+{
+	SYSMSG_SENDV(623, player, static_cast<UInt32>(player->getBattlePoint()));
+
+    for(int i = 0; i < 5; ++ i)
+    {
+        GObject::Lineup& lup = PLAYER_DATA(player, lineup)[i];
+        Fighter* fighter = lup.fighter;
+        if(fighter)
+            SYSMSG_SENDV(624, player, fighter->getName().c_str(), static_cast<UInt32>(fighter->getBattlePoint()));
     }
 }
 

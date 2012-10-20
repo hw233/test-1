@@ -13580,7 +13580,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
 		{
             Fighter* fighter = _playerData.lineup[j].fighter;
             if(fighter)
-                bp = fighter->getBattlePoint();
+                bp += fighter->getBattlePoint();
 		}
         const GData::Formation* form = GData::formationManager[_playerData.formation];
         if(form)

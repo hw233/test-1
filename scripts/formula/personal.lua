@@ -587,24 +587,29 @@ function calcBattlePoint(fgt)
     bp = bp + calcMagResLevel(fgt) * bp_factor_magresl
     bp = bp + calcAura(fgt) * bp_factor_aura
     bp = bp + calcAuraMax(fgt) * bp_factor_auraMax
-    bp = bp + fgt:getExtraCriticalDmg() * bp_factor_crtdmg
-    bp = bp + (fgt:getBaseTough() + fgt:getExtraTough()) * bp_factor_tough
-    bp = bp + fgt:getExtraHitrate() * bp_factor_hitr
-    bp = bp + (fgt:getBaseEvade() + fgt:getExtraEvade()) * bp_factor_evad
-    bp = bp + (fgt:getBaseCritical() + fgt:getExtraCritical()) * bp_factor_crt
-    bp = bp + (fgt:getBasePierce() + fgt:getExtraPierce()) * bp_factor_pir
-    bp = bp + (fgt:getBaseCounter() + fgt:getExtraCounter()) * bp_factor_counter
-    bp = bp + (fgt:getBaseMagRes() + fgt:getExtraMagRes()) * bp_factor_magres
+    bp = bp + fgt:getExtraCriticalDmg()/100 * bp_factor_crtdmg
+    bp = bp + (fgt:getBaseTough() + fgt:getExtraTough())/100 * bp_factor_tough
+    bp = bp + fgt:getExtraHitrate()/100 * bp_factor_hitr
+    bp = bp + (fgt:getBaseEvade() + fgt:getExtraEvade())/100 * bp_factor_evad
+    bp = bp + (fgt:getBaseCritical() + fgt:getExtraCritical())/100 * bp_factor_crt
+    bp = bp + (fgt:getBasePierce() + fgt:getExtraPierce())/100 * bp_factor_pir
+    bp = bp + (fgt:getBaseCounter() + fgt:getExtraCounter())/100 * bp_factor_counter
+    bp = bp + (fgt:getBaseMagRes() + fgt:getExtraMagRes())/100 * bp_factor_magres
 
+    print(bp)
     return bp;
 end
 
 -- c:skill_color l:skill_level t:skill_type s:skillstrengthen_level
 function calcSkillBattlePoint(c, l, t, s)
+    local bp = 0;
     if s == 0 then
-        return bp_factor_skill_color[c] * bp_factor_skill_type[t] * bp_factor_skill_level[l] 
+        bp = bp_factor_skill_color[c] * bp_factor_skill_type[t] * bp_factor_skill_level[l] 
+    else
+        bp = bp_factor_skill_color[c] * bp_factor_skill_type[t] * (bp_factor_skill_level[l] + bp_factor_ss_level[s])
     end
-    return bp_factor_skill_color[c] * bp_factor_skill_type[t] * (bp_factor_skill_level[l] + bp_factor_ss_level[s])
+
+    return bp;
 end
 
 function calcBattlePoint_old( fgt )
