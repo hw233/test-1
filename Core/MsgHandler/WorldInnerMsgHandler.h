@@ -28,6 +28,8 @@
 #include "GObject/World.h"
 #include "Common/Itoa.h"
 #include <set>
+#include "GObject/SingleHeroStage.h"
+#include "GObject/SHSYTmpl.h"
 
 void OnPushTimerEvent( GameMsgHdr& hdr, const void * data )
 {
@@ -474,6 +476,7 @@ void OnReloadLuaReq( GameMsgHdr& hdr, const void * data )
 		GLOBAL().PushMsg(hdr3, &flag);
 	}
     WORLD().getWorldScript()->forceCommitArena();
+    GObject::shsyTmpl.load();
 }
 
 void OnSpecialAward( GameMsgHdr& hdr, const void * data )
@@ -539,6 +542,16 @@ void OnDoInstantPracticeAccReq( GameMsgHdr& hdr, const void* data)
     player->practiceUdpLog();
 }
 
+bool enum_send_sh_active(void * ptr, void * data )
+{
+    GObject::Player* player = static_cast<GObject::Player*>(ptr);
+    if(player == NULL)
+        return true;
+
+    GObject::shStageMgr.sendActive(player);
+    return true;
+}
+
 void OnLevelChange( GameMsgHdr& hdr, const void* data)
 {
 	MSG_QUERY_PLAYER(player);
@@ -580,6 +593,15 @@ void OnLevelChange( GameMsgHdr& hdr, const void* data)
         }
 
         lvPlayer->push_back(player->getId());
+    }
+    if(!GObject::shStageMgr.getActive())
+    {
+        if(lvc->oldLv < 70 && lvc->newLv > 69)
+            GObject::shStageMgr.incActive(1);
+        else if(lvc->oldLv > 69 && lvc->newLv < 70)
+            GObject::shStageMgr.incActive(-1);
+        if(GObject::shStageMgr.getActive())
+            GObject::globalPlayers.enumerate(enum_send_sh_active, static_cast<void *>(NULL));
     }
 }
 
@@ -1053,7 +1075,32 @@ void OnTownDeamonAttackNpcNotify( GameMsgHdr& hdr, const void* data )
     GObject::townDeamonManager->notifyAttackNpcResult(player, win);
 }
 
+void OnSHFighterCloneRes( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    GObject::Fighter* fgt = *reinterpret_cast<GObject::Fighter**>(const_cast<void*>(data));
 
+    GObject::shStageMgr.onFighterClone(player, fgt);
+}
+
+void OnSHReset( GameMsgHdr& hdr, const void* data )
+{
+    GObject::shStageMgr.reset();
+}
+
+inline bool enterSingleHeroStage(GObject::Player* p, UInt32 cnt)
+{
+    GObject::shStageMgr.enter(p, p->getMainFighter());
+    if(cnt != 0 && GObject::shStageMgr.getPlayerCount() > cnt)
+        return false;
+    return true;
+}
+
+void OnSHEnter( GameMsgHdr& hdr, const void* data )
+{
+    UInt32 cnt = *reinterpret_cast<UInt32*>(const_cast<void*>(data));
+    GObject::globalPlayers.enumerate(enterSingleHeroStage, cnt);
+}
 
 
 #endif // _WORLDINNERMSGHANDLER_H_

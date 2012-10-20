@@ -64,6 +64,7 @@
 #include "NewRelation.h"
 #include "GVar.h"
 #include "Server/SysMsg.h"
+#include "SingleHeroStage.h" 
 
 namespace GObject
 {
@@ -1623,6 +1624,12 @@ namespace GObject
                 }
 
                 lvPlayer->push_back(pl->getId());
+
+                if(!GObject::shStageMgr.getActive())
+                {
+                    if(specfgtobj.level > 69)
+                        GObject::shStageMgr.incActive(1);
+                }
             }
 
             if(specfgtobj.fighterId != 0 && specfgtobj.level >= 60)
@@ -3872,6 +3879,8 @@ namespace GObject
                         if (itype->subClass == Item_Halo)
                         {
                             equip = new ItemHalo(dbe.id, itype, ied);
+                            if (equip && ied.enchant)
+                                ((ItemTrump*)equip)->fixSkills();
                         }
                         else if (itype->subClass == Item_Fashion)
                         {

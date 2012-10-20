@@ -300,7 +300,7 @@ void  BattleSimulator::InitAttainRecord()
 // #############################
 // change the battle queue but not pass client check
 // prevWin for 组队
-void BattleSimulator::start(UInt8 prevWin)
+void BattleSimulator::start(UInt8 prevWin, bool checkEnh)
 {
     if(prevWin != 0xFF && (prevWin == 0 || prevWin > 2))
         return;
@@ -338,73 +338,73 @@ void BattleSimulator::start(UInt8 prevWin)
     // for the insertFighterStatus can only insert to next fgtlist, so to make sure to insert fighter status to _figtlist[0] and set the _cur_fgtlist to 1
     UInt8 cur_idx = _cur_fgtlist_idx;
     _cur_fgtlist_idx = (cur_idx + 1)%2;
-    UInt8 cnt[2] = {0, 0};
-    bool loaded[2] = {false, false};
-    //bool checkEnh = _player[1] == NULL;
-    bool checkEnh = true; // XXX: 对怪对人都有用
-    UInt32 now = TimeUtil::Now();
-    for(int i = 0; i < 2; ++ i)
-    {
-        UInt32 flag = 0;
+	UInt8 cnt[2] = {0, 0};
+	bool loaded[2] = {false, false};
+	//bool checkEnh = _player[1] == NULL;
+	//bool checkEnh = true; // XXX: 对怪对人都有用
+	UInt32 now = TimeUtil::Now();
+	for(int i = 0; i < 2; ++ i)
+	{
+		UInt32 flag = 0;
         UInt32 flag2 = 0;
-        if(_player[i] != NULL)
-        {
-            if(checkEnh)
-            {
-                if(_player[i]->getBuffData(PLAYER_BUFF_ATTR3, now) > 0)
-                    flag = 0x0C;
-                else if(_player[i]->getBuffData(PLAYER_BUFF_ATTR2, now) > 0)
-                    flag = 0x08;
-                else if(_player[i]->getBuffData(PLAYER_BUFF_ATTR1, now) > 0)
-                    flag = 0x04;
-            }
-            if(_player[i]->getBuffData(PLAYER_BUFF_CLANRCENHANCE, now) > 0)
-            {
-                flag |= BattleFighter::Enh3;
-            }
-            if (_player[i]->getBuffData(PLAYER_BUFF_YBUF, now) > 0)
-                flag |= BattleFighter::Enh4;
-            if (_player[i]->getBuffData(PLAYER_BUFF_BBUF, now) > 0)
-                flag |= BattleFighter::Enh5;
-            if (_player[i]->getBuffData(PLAYER_BUFF_QQVIPBUF, now) > 0)
-                flag |= BattleFighter::Enh6;
-            /*if(_player[i]->hasFlag(GObject::Player::Copy)
-             || _player[i]->hasFlag(GObject::Player::AutoCopy)
-             || _player[i]->hasFlag(GObject::Player::InCopyTeam)
-             || _player[i]->hasFlag(GObject::Player::AutoDungeon)
-             || _player[i]->hasFlag(GObject::Player::AutoFrontMap))*/
-            if(_player[i]->hasFlag(GObject::Player::AthleticsBuff))
-            {
-                if (_player[i]->getBuffData(PLAYER_BUFF_ATHL1, now) > 0)
-                    flag2 |= BattleFighter::AthlEnh1;
-                if (_player[i]->getBuffData(PLAYER_BUFF_ATHL2, now) > 0)
-                    flag2 |= BattleFighter::AthlEnh2;
-                if (_player[i]->getBuffData(PLAYER_BUFF_ATHL3, now) > 0)
-                    flag2 |= BattleFighter::AthlEnh3;
-                if (_player[i]->getBuffData(PLAYER_BUFF_ATHL4, now) > 0)
-                    flag2 |= BattleFighter::AthlEnh4;
-                if (_player[i]->getBuffData(PLAYER_BUFF_ATHL5, now) > 0)
-                    flag2 |= BattleFighter::AthlEnh5;
-                if (_player[i]->getBuffData(PLAYER_BUFF_ATHL6, now) > 0)
-                    flag2 |= BattleFighter::AthlEnh6;
-                if (_player[i]->getBuffData(PLAYER_BUFF_ATHL7, now) > 0)
-                    flag2 |= BattleFighter::AthlEnh7;
-                if (_player[i]->getBuffData(PLAYER_BUFF_ATHL8, now) > 0)
-                    flag2 |= BattleFighter::AthlEnh8;
-                if (_player[i]->getBuffData(PLAYER_BUFF_ATHL9, now) > 0)
-                    flag2 |= BattleFighter::AthlEnh9;
-            }
-            flag2 |= _player[i]->getAthlRivalBuff();
-        }
-        for(int j = 0; j < 25; ++ j)
-        {
-            BattleObject * bo = _objs[i][j];
-            if(bo != NULL)
-            {
-                if(bo->isChar())
+		if(_player[i] != NULL)
+		{
+			if(checkEnh)
+			{
+				if(_player[i]->getBuffData(PLAYER_BUFF_ATTR3, now) > 0)
+					flag = 0x0C;
+				else if(_player[i]->getBuffData(PLAYER_BUFF_ATTR2, now) > 0)
+					flag = 0x08;
+				else if(_player[i]->getBuffData(PLAYER_BUFF_ATTR1, now) > 0)
+					flag = 0x04;
+                if(_player[i]->getBuffData(PLAYER_BUFF_CLANRCENHANCE, now) > 0)
                 {
-                    BattleFighter * bf = static_cast<BattleFighter *>(bo);
-                    bool ismain = !_isBody[i][j];
+                    flag |= BattleFighter::Enh3;
+                }
+                if (_player[i]->getBuffData(PLAYER_BUFF_YBUF, now) > 0)
+                    flag |= BattleFighter::Enh4;
+                if (_player[i]->getBuffData(PLAYER_BUFF_BBUF, now) > 0)
+                    flag |= BattleFighter::Enh5;
+                if (_player[i]->getBuffData(PLAYER_BUFF_QQVIPBUF, now) > 0)
+                    flag |= BattleFighter::Enh6;
+                /*if(_player[i]->hasFlag(GObject::Player::Copy)
+                 || _player[i]->hasFlag(GObject::Player::AutoCopy)
+                 || _player[i]->hasFlag(GObject::Player::InCopyTeam)
+                 || _player[i]->hasFlag(GObject::Player::AutoDungeon)
+                 || _player[i]->hasFlag(GObject::Player::AutoFrontMap))*/
+                if(_player[i]->hasFlag(GObject::Player::AthleticsBuff))
+                {
+                    if (_player[i]->getBuffData(PLAYER_BUFF_ATHL1, now) > 0)
+                        flag2 |= BattleFighter::AthlEnh1;
+                    if (_player[i]->getBuffData(PLAYER_BUFF_ATHL2, now) > 0)
+                        flag2 |= BattleFighter::AthlEnh2;
+                    if (_player[i]->getBuffData(PLAYER_BUFF_ATHL3, now) > 0)
+                        flag2 |= BattleFighter::AthlEnh3;
+                    if (_player[i]->getBuffData(PLAYER_BUFF_ATHL4, now) > 0)
+                        flag2 |= BattleFighter::AthlEnh4;
+                    if (_player[i]->getBuffData(PLAYER_BUFF_ATHL5, now) > 0)
+                        flag2 |= BattleFighter::AthlEnh5;
+                    if (_player[i]->getBuffData(PLAYER_BUFF_ATHL6, now) > 0)
+                        flag2 |= BattleFighter::AthlEnh6;
+                    if (_player[i]->getBuffData(PLAYER_BUFF_ATHL7, now) > 0)
+                        flag2 |= BattleFighter::AthlEnh7;
+                    if (_player[i]->getBuffData(PLAYER_BUFF_ATHL8, now) > 0)
+                        flag2 |= BattleFighter::AthlEnh8;
+                    if (_player[i]->getBuffData(PLAYER_BUFF_ATHL9, now) > 0)
+                        flag2 |= BattleFighter::AthlEnh9;
+                }
+                flag2 |= _player[i]->getAthlRivalBuff();
+			}
+		}
+		for(int j = 0; j < 25; ++ j)
+		{
+			BattleObject * bo = _objs[i][j];
+			if(bo != NULL)
+			{
+				if(bo->isChar())
+				{
+					BattleFighter * bf = static_cast<BattleFighter *>(bo);
+					bool ismain = !_isBody[i][j];
                     UInt8 aura = 0;
                     UInt8 maxAura = 0;
                     if(ismain)
@@ -422,9 +422,12 @@ void BattleSimulator::start(UInt8 prevWin)
                             bf->addFlag2(flag2);
                         if((prevWin-1) != i)
                             bf->initStats(checkEnh);
-                        UInt8 justice_roar = (_player[i] != NULL ? _player[i]->getJusticeRoar() : 0);
-                        if(justice_roar)
-                            bf->AddAura(justice_roar);
+                        if(checkEnh)
+                        {
+                            UInt8 justice_roar = (_player[i] != NULL ? _player[i]->getJusticeRoar() : 0);
+                            if(justice_roar)
+                                bf->AddAura(justice_roar);
+                        }
 
                         aura = bf->getAura();
                         maxAura = bf->getAuraMax();
@@ -1180,7 +1183,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                 sc.statusId = 0;
                 area_target->setMagAtkReduce3(0, 0);
                 sc.type = e_stMagAtkReduce;
-                sc.data = static_cast<UInt32>(area_target->getMagAtkReduce());
+                sc.data = static_cast<UInt32>(area_target->getMagAtkReduce()*100);
                 ++scCount;
             }
             if(area_target->getAtkReduce3Last() > 0)
@@ -1190,7 +1193,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                 sc.statusId = 0;
                 area_target->setAtkReduce3(0, 0);
                 sc.type = e_stAtkReduce;
-                sc.data = static_cast<UInt32>(area_target->getAtkReduce());
+                sc.data = static_cast<UInt32>(area_target->getAtkReduce()*100);
                 ++scCount;
             }
 
@@ -1313,7 +1316,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
             }
 
             defList[defCount].damType = e_damEvade;
-            if(enterEvade && !colorStock)
+            if(!colorStock)
                 area_target->setEvad100(false);
 
             if(defend100 || colorStock)
@@ -1432,7 +1435,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                         sc.statusId = 0;
                         bf->setMagAtkReduce3(0, 0);
                         sc.type = e_stMagAtkReduce;
-                        sc.data = static_cast<UInt32>(bf->getMagAtkReduce());
+                        sc.data = static_cast<UInt32>(bf->getMagAtkReduce()*100);
                         ++scCount;
                     }
 
@@ -1443,7 +1446,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                         sc.statusId = 0;
                         bf->setAtkReduce3(0, 0);
                         sc.type = e_stAtkReduce;
-                        sc.data = static_cast<UInt32>(bf->getAtkReduce());
+                        sc.data = static_cast<UInt32>(bf->getAtkReduce()*100);
                         ++scCount;
                     }
 
@@ -3943,11 +3946,11 @@ bool BattleSimulator::doSkillStatus2(BattleFighter* bf, const GData::SkillBase* 
             if(value > 0 && bf->getSide() != target_side)
             {
                 float value = bf->_aura * skill->effect->auraP + skill->effect->aura;
-                setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stAura, value, skill->last, scList, scCount, target_side != 0);
+                setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stAura, value, skill->last, scList, scCount, bf->getSide() != 0);
             }
             else
             {
-                setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stAura, value, skill->last, scList, scCount, bf->getSide() != 0);
+                setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stAura, value, skill->last, scList, scCount, target_side != 0);
             }
         }
     }
@@ -3958,11 +3961,11 @@ bool BattleSimulator::doSkillStatus2(BattleFighter* bf, const GData::SkillBase* 
         if(value > 0 && bf->getSide() != target_side)
         {
             float value = bf->_attack * skill->effect->atkP + skill->effect->atk;
-            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stAtk, value, skill->last, scList, scCount, target_side != 0);
+            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stAtk, value, skill->last, scList, scCount, bf->getSide() != 0);
         }
         else
         {
-            setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stAtk, value, skill->last, scList, scCount, bf->getSide() != 0);
+            setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stAtk, value, skill->last, scList, scCount, target_side != 0);
         }
     }
 
@@ -3972,11 +3975,11 @@ bool BattleSimulator::doSkillStatus2(BattleFighter* bf, const GData::SkillBase* 
         if(value > 0 && bf->getSide() != target_side)
         {
             float value = bf->_defend * skill->effect->defP + skill->effect->def;
-            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stDef, value, skill->last, scList, scCount, target_side != 0);
+            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stDef, value, skill->last, scList, scCount, bf->getSide() != 0);
         }
         else
         {
-            setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stDef, value, skill->last, scList, scCount, bf->getSide() != 0);
+            setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stDef, value, skill->last, scList, scCount, target_side != 0);
         }
     }
 
@@ -3986,11 +3989,11 @@ bool BattleSimulator::doSkillStatus2(BattleFighter* bf, const GData::SkillBase* 
         if(value > 0 && bf->getSide() != target_side)
         {
             float value = bf->_magatk * skill->effect->magatkP + skill->effect->magatk;
-            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stMagAtk, value, skill->last, scList, scCount, target_side != 0);
+            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stMagAtk, value, skill->last, scList, scCount, bf->getSide() != 0);
         }
         else
         {
-            setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stMagAtk, value, skill->last, scList, scCount, bf->getSide() != 0);
+            setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stMagAtk, value, skill->last, scList, scCount, target_side != 0);
         }
     }
 
@@ -4000,11 +4003,11 @@ bool BattleSimulator::doSkillStatus2(BattleFighter* bf, const GData::SkillBase* 
         if(value > 0 && bf->getSide() != target_side)
         {
             float value = bf->_magdef * skill->effect->magdefP + skill->effect->magdef;
-            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stMagDef, value, skill->last, scList, scCount, target_side != 0);
+            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stMagDef, value, skill->last, scList, scCount, bf->getSide() != 0);
         }
         else
         {
-            setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stMagDef, value, skill->last, scList, scCount, bf->getSide() != 0);
+            setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stMagDef, value, skill->last, scList, scCount, target_side != 0);
         }
     }
 
@@ -4013,11 +4016,11 @@ bool BattleSimulator::doSkillStatus2(BattleFighter* bf, const GData::SkillBase* 
         float value = skill->effect->tough;
         if(value > 0 && bf->getSide() != target_side)
         {
-            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stTough, value, skill->last, scList, scCount, target_side != 0);
+            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stTough, value, skill->last, scList, scCount, bf->getSide() != 0);
         }
         else
         {
-            setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stTough, value, skill->last, scList, scCount, bf->getSide() != 0);
+            setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stTough, value, skill->last, scList, scCount, target_side != 0);
         }
     }
 
@@ -4027,11 +4030,11 @@ bool BattleSimulator::doSkillStatus2(BattleFighter* bf, const GData::SkillBase* 
         if(value > 0 && bf->getSide() != target_side)
         {
             float value = bf->_maxAction * skill->effect->actionP + skill->effect->action;
-            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stAction, value, skill->last, scList, scCount, target_side != 0);
+            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stAction, value, skill->last, scList, scCount, bf->getSide() != 0);
         }
         else
         {
-            setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stAction, value, skill->last, scList, scCount, bf->getSide() != 0);
+            setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stAction, value, skill->last, scList, scCount, target_side != 0);
         }
     }
 
@@ -4040,11 +4043,11 @@ bool BattleSimulator::doSkillStatus2(BattleFighter* bf, const GData::SkillBase* 
         float value = skill->effect->evade;
         if(value > 0 && bf->getSide() != target_side)
         {
-            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stEvade, value, skill->last, scList, scCount, target_side != 0);
+            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stEvade, value, skill->last, scList, scCount, bf->getSide() != 0);
         }
         else
         {
-            setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stEvade, value, skill->last, scList, scCount, bf->getSide() != 0);
+            setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stEvade, value, skill->last, scList, scCount, target_side != 0);
         }
     }
 
@@ -4053,11 +4056,11 @@ bool BattleSimulator::doSkillStatus2(BattleFighter* bf, const GData::SkillBase* 
         float value = skill->effect->critical;
         if(value > 0 && bf->getSide() != target_side)
         {
-            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stCritical, value, skill->last, scList, scCount, target_side != 0);
+            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stCritical, value, skill->last, scList, scCount, bf->getSide() != 0);
         }
         else
         {
-            setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stCritical, value, skill->last, scList, scCount, bf->getSide() != 0);
+            setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stCritical, value, skill->last, scList, scCount, target_side != 0);
         }
     }
 
@@ -4066,11 +4069,11 @@ bool BattleSimulator::doSkillStatus2(BattleFighter* bf, const GData::SkillBase* 
         float value = skill->effect->pierce;
         if(value > 0 && bf->getSide() != target_side)
         {
-            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stPierce, value, skill->last, scList, scCount, target_side != 0);
+            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stPierce, value, skill->last, scList, scCount, bf->getSide() != 0);
         }
         else
         {
-            setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stPierce, value, skill->last, scList, scCount, bf->getSide() != 0);
+            setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stPierce, value, skill->last, scList, scCount, target_side != 0);
         }
     }
 
@@ -4079,11 +4082,11 @@ bool BattleSimulator::doSkillStatus2(BattleFighter* bf, const GData::SkillBase* 
         float value = skill->effect->counter;
         if(value > 0 && bf->getSide() != target_side)
         {
-            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stCounter, value, skill->last, scList, scCount, target_side != 0);
+            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stCounter, value, skill->last, scList, scCount, bf->getSide() != 0);
         }
         else
         {
-            setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stCounter, value, skill->last, scList, scCount, bf->getSide() != 0);
+            setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stCounter, value, skill->last, scList, scCount, target_side != 0);
         }
     }
 
@@ -4092,11 +4095,11 @@ bool BattleSimulator::doSkillStatus2(BattleFighter* bf, const GData::SkillBase* 
         float value = skill->effect->magres;
         if(value > 0 && bf->getSide() != target_side)
         {
-            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stMagRes, value, skill->last, scList, scCount, target_side != 0);
+            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stMagRes, value, skill->last, scList, scCount, bf->getSide() != 0);
         }
         else
         {
-            setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stMagRes, value, skill->last, scList, scCount, bf->getSide() != 0);
+            setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stMagRes, value, skill->last, scList, scCount, target_side != 0);
         }
     }
 
@@ -4105,11 +4108,11 @@ bool BattleSimulator::doSkillStatus2(BattleFighter* bf, const GData::SkillBase* 
         float value = skill->effect->hitrate;
         if(value > 0 && bf->getSide() != target_side)
         {
-            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stHitRate, value, skill->last, scList, scCount, target_side != 0);
+            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stHitRate, value, skill->last, scList, scCount, bf->getSide() != 0);
         }
         else
         {
-            setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stHitRate, value, skill->last, scList, scCount, bf->getSide() != 0);
+            setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stHitRate, value, skill->last, scList, scCount, target_side != 0);
         }
     }
 
@@ -4118,11 +4121,11 @@ bool BattleSimulator::doSkillStatus2(BattleFighter* bf, const GData::SkillBase* 
         float value = skill->effect->atkreduce;
         if(value > 0 && bf->getSide() != target_side)
         {
-            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stAtkReduce, value, skill->last, scList, scCount, target_side != 0);
+            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stAtkReduce, value, skill->last, scList, scCount, bf->getSide() != 0);
         }
         else
         {
-            setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stAtkReduce, value, skill->last, scList, scCount, bf->getSide() != 0);
+            setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stAtkReduce, value, skill->last, scList, scCount, target_side != 0);
         }
     }
 
@@ -4131,11 +4134,11 @@ bool BattleSimulator::doSkillStatus2(BattleFighter* bf, const GData::SkillBase* 
         float value = skill->effect->magatkreduce;
         if(value > 0 && bf->getSide() != target_side)
         {
-            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stMagAtkReduce, value, skill->last, scList, scCount, target_side != 0);
+            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stMagAtkReduce, value, skill->last, scList, scCount, bf->getSide() != 0);
         }
         else
         {
-            setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stMagAtkReduce, value, skill->last, scList, scCount, bf->getSide() != 0);
+            setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stMagAtkReduce, value, skill->last, scList, scCount, target_side != 0);
         }
     }
 
@@ -7082,7 +7085,7 @@ void BattleSimulator::setStatusChange2_Evade(BattleFighter* bf, UInt8 side, UInt
     sc.statusId = skillId;
     sc.type = e_stEvade;
     bfgt->setEvadeAdd2(value);
-    sc.data = static_cast<UInt32>(bfgt->getEvade(NULL));
+    sc.data = static_cast<UInt32>(bfgt->getEvade(NULL)*100);
 
     ++ scCount;
 }
@@ -7098,7 +7101,7 @@ void BattleSimulator::setStatusChange2_Critical(BattleFighter* bf, UInt8 side, U
     sc.statusId = skillId;
     sc.type = e_stCritical;
     bfgt->setCriticalAdd2(value);
-    sc.data = static_cast<UInt32>(bfgt->getCritical(NULL));
+    sc.data = static_cast<UInt32>(bfgt->getCritical(NULL)*100);
 
     ++ scCount;
 }
@@ -7114,7 +7117,7 @@ void BattleSimulator::setStatusChange2_Pierce(BattleFighter* bf, UInt8 side, UIn
     sc.statusId = skillId;
     sc.type = e_stPierce;
     bfgt->setPierceAdd2(value);
-    sc.data = static_cast<UInt32>(bfgt->getPierce(NULL));
+    sc.data = static_cast<UInt32>(bfgt->getPierce(NULL)*100);
 
     ++ scCount;
 }
@@ -7130,7 +7133,7 @@ void BattleSimulator::setStatusChange2_Counter(BattleFighter* bf, UInt8 side, UI
     sc.statusId = skillId;
     sc.type = e_stCounter;
     bfgt->setCounterAdd2(value);
-    sc.data = static_cast<UInt32>(bfgt->getCounter(NULL));
+    sc.data = static_cast<UInt32>(bfgt->getCounter(NULL)*100);
 
     ++ scCount;
 }
@@ -7162,7 +7165,7 @@ void BattleSimulator::setStatusChange2_Tough(BattleFighter* bf, UInt8 side, UInt
     sc.statusId = skillId;
     sc.type = e_stTough;
     bfgt->setToughAdd2(value);
-    sc.data = static_cast<UInt32>(bfgt->getTough(NULL));
+    sc.data = static_cast<UInt32>(bfgt->getTough(NULL)*100);
 
     ++ scCount;
 }
@@ -7210,7 +7213,7 @@ void BattleSimulator::setStatusChange2_MagRes(BattleFighter* bf, UInt8 side, UIn
     sc.statusId = skillId;
     sc.type = e_stMagRes;
     bfgt->setMagResAdd2(value);
-    sc.data = static_cast<UInt32>(bfgt->getMagRes(NULL));
+    sc.data = static_cast<UInt32>(bfgt->getMagRes(NULL)*100);
 
     ++ scCount;
 }
@@ -7259,7 +7262,7 @@ void BattleSimulator::setStatusChange2_HitR(BattleFighter* bf, UInt8 side, UInt8
     sc.statusId = skillId;
     sc.type = e_stHitRate;
     bfgt->setHitrateAdd2(value);
-    sc.data = static_cast<UInt32>(bfgt->getHitrate(NULL));
+    sc.data = static_cast<UInt32>(bfgt->getHitrate(NULL)*100);
 
     ++ scCount;
 }
@@ -7275,7 +7278,7 @@ void BattleSimulator::setStatusChange2_AtkReduce(BattleFighter* bf, UInt8 side, 
     sc.statusId = skillId;
     sc.type = e_stAtkReduce;
     bfgt->setAtkReduce2(value);
-    sc.data = static_cast<UInt32>(bfgt->getAtkReduce());
+    sc.data = static_cast<UInt32>(bfgt->getAtkReduce()*100);
 
     ++ scCount;
 }
@@ -7291,7 +7294,7 @@ void BattleSimulator::setStatusChange2_MagAtkReduce(BattleFighter* bf, UInt8 sid
     sc.statusId = skillId;
     sc.type = e_stMagAtkReduce;
     bfgt->setMagAtkReduce2(value);
-    sc.data = static_cast<UInt32>(bfgt->getMagAtkReduce());
+    sc.data = static_cast<UInt32>(bfgt->getMagAtkReduce()*100);
 
     ++ scCount;
 }
@@ -7354,7 +7357,7 @@ void BattleSimulator::setStatusChange_Evade(BattleFighter * bf, UInt8 side, UInt
     if(skill && skill->cond == GData::SKILL_BEATKED && bf->getPos() + 25 != sc.pos)
         ++last;
     bfgt->setEvadeAdd(value, last);
-    sc.data = static_cast<UInt32>(bfgt->getEvade(NULL));
+    sc.data = static_cast<UInt32>(bfgt->getEvade(NULL)*100);
 
     ++ scCount;
 }
@@ -7375,7 +7378,7 @@ void BattleSimulator::setStatusChange_Critical(BattleFighter * bf, UInt8 side, U
     if(skill && skill->cond == GData::SKILL_BEATKED && bf->getPos() + 25 != sc.pos)
         ++last;
     bfgt->setCriticalAdd(value, last);
-    sc.data = static_cast<UInt32>(bfgt->getCritical(NULL));
+    sc.data = static_cast<UInt32>(bfgt->getCritical(NULL)*100);
 
     ++ scCount;
 }
@@ -7396,7 +7399,7 @@ void BattleSimulator::setStatusChange_Pierce(BattleFighter * bf, UInt8 side, UIn
     if(skill && skill->cond == GData::SKILL_BEATKED && bf->getPos() + 25 != sc.pos)
         ++last;
     bfgt->setPierceAdd(value, last);
-    sc.data = static_cast<UInt32>(bfgt->getPierce(NULL));
+    sc.data = static_cast<UInt32>(bfgt->getPierce(NULL)*100);
 
     ++ scCount;
 }
@@ -7417,7 +7420,7 @@ void BattleSimulator::setStatusChange_Counter(BattleFighter * bf, UInt8 side, UI
     if(skill && skill->cond == GData::SKILL_BEATKED && bf->getPos() + 25 != sc.pos)
         ++last;
     bfgt->setCounterAdd(value, last);
-    sc.data = static_cast<UInt32>(bfgt->getCounter(NULL));
+    sc.data = static_cast<UInt32>(bfgt->getCounter(NULL)*100);
 
     ++ scCount;
 }
@@ -7460,7 +7463,7 @@ void BattleSimulator::setStatusChange_Tough(BattleFighter * bf, UInt8 side, UInt
     if(skill && skill->cond == GData::SKILL_BEATKED && bf->getPos() + 25 != sc.pos)
         ++last;
     bfgt->setToughAdd(value, last);
-    sc.data = static_cast<UInt32>(bfgt->getTough(NULL));
+    sc.data = static_cast<UInt32>(bfgt->getTough(NULL)*100);
 
     ++ scCount;
 }
@@ -7523,7 +7526,7 @@ void BattleSimulator::setStatusChange_MagRes(BattleFighter * bf, UInt8 side, UIn
     if(skill && skill->cond == GData::SKILL_BEATKED && bf->getPos() + 25 != sc.pos)
         ++last;
     bfgt->setMagResAdd(value, last);
-    sc.data = static_cast<UInt32>(bfgt->getMagRes(NULL));
+    sc.data = static_cast<UInt32>(bfgt->getMagRes(NULL)*100);
 
     ++ scCount;
 }
@@ -7587,7 +7590,7 @@ void BattleSimulator::setStatusChange_HitR(BattleFighter * bf, UInt8 side, UInt8
     if(skill && skill->cond == GData::SKILL_BEATKED && bf->getPos() + 25 != sc.pos)
         ++last;
     bfgt->setHitrateAdd(value, last);
-    sc.data = static_cast<UInt32>(bfgt->getHitrate(NULL));
+    sc.data = static_cast<UInt32>(bfgt->getHitrate(NULL)*100);
 
     ++ scCount;
 }
@@ -7608,7 +7611,7 @@ void BattleSimulator::setStatusChange_AtkReduce(BattleFighter * bf, UInt8 side, 
     if(skill && skill->cond == GData::SKILL_BEATKED && bf->getPos() + 25 != sc.pos)
         ++last;
     bfgt->setAtkReduce(value, last);
-    sc.data = static_cast<UInt32>(bfgt->getAtkReduce());
+    sc.data = static_cast<UInt32>(bfgt->getAtkReduce()*100);
 
     ++ scCount;
 }
@@ -7629,7 +7632,7 @@ void BattleSimulator::setStatusChange_MagAtkReduce(BattleFighter * bf, UInt8 sid
     if(skill && skill->cond == GData::SKILL_BEATKED && bf->getPos() + 25 != sc.pos)
         ++last;
     bfgt->setMagAtkReduce(value, last);
-    sc.data = static_cast<UInt32>(bfgt->getMagAtkReduce());
+    sc.data = static_cast<UInt32>(bfgt->getMagAtkReduce()*100);
 
     ++ scCount;
 }
@@ -7723,7 +7726,7 @@ bool BattleSimulator::doSkillStrengthen_reduce(BattleFighter* bf, const GData::S
 
         sc.type = e_stAtkReduce;
         bo->setAtkReduce3(ef->value, ef->last);
-        sc.data = static_cast<UInt32>(bo->getAtkReduce());
+        sc.data = static_cast<UInt32>(bo->getAtkReduce()*100);
         ++scCount;
     }
     {
@@ -7736,7 +7739,7 @@ bool BattleSimulator::doSkillStrengthen_reduce(BattleFighter* bf, const GData::S
 
         sc.type = e_stMagAtkReduce;
         bo->setMagAtkReduce3(ef->value, ef->last);
-        sc.data = static_cast<UInt32>(bo->getMagAtkReduce());
+        sc.data = static_cast<UInt32>(bo->getMagAtkReduce()*100);
         ++scCount;
     }
 
@@ -7754,7 +7757,7 @@ bool BattleSimulator::doSkillStrengthen_week(BattleFighter* bf, const GData::Ski
         pos0 = 25;
     else if(!active && bf->getSide() != target_side)
         pos0 = 25;
-    if( ((float)bo->getHP()/bo->getMaxHP()) < ef->value/100)
+    if( ((float)(bo->getHP()-1)/bo->getMaxHP()) < ef->value/100)
     {
         bo->setImmune2(0xE);
         defList[defCount].pos = bo->getPos() + pos0;

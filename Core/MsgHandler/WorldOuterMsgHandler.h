@@ -31,6 +31,7 @@
 #include "GData/Money.h"
 #include "GObject/TownDeamon.h"
 #include "GObject/ClanRankBattle.h"
+#include "GObject/SingleHeroStage.h"
 
 #ifdef _ARENA_SERVER
 #include "GObject/GameServer.h"
@@ -2180,6 +2181,155 @@ void OnTownDeamonReq( GameMsgHdr& hdr, const void* data)
     default:
         return;
     }
+}
+
+void OnSingleHeroReq( GameMsgHdr& hdr, const void* data)
+{
+	MSG_QUERY_PLAYER(player);
+
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 op = 0;
+    br >> op;
+
+    switch(op)
+    {
+    case 0x00:
+        {
+            UInt8 type = 0;
+            br >> type;
+            switch(type)
+            {
+            case 0x00:
+                GObject::shStageMgr.sendActive(player);
+                break;
+            case 0x01:
+                if(GObject::shStageMgr.getActive())
+                {
+                    UInt32 fgtId = 0;
+                    br >> fgtId;
+                    GObject::Fighter* fgt = player->findFighter( fgtId );
+                    if(fgtId > 6 || !fgt)
+                        break;
+                    GObject::shStageMgr.enter(player, fgt);
+                }
+                break;
+            case 0x02:
+                {
+                    UInt32 rptId = 0;
+                    br >> rptId;
+                    std::vector<UInt8> *r = Battle::battleReport[rptId];
+                    if(r == NULL)
+                        return;
+                    player->send(&(*r)[0], r->size());
+                }
+                break;
+            case 0x03:
+                break;
+            case 0x04:
+                // 人气投票
+                {
+                    UInt8 cls = 0;
+                    UInt64 playerId = 0;
+                    br >> cls;
+                    br >> playerId;
+                    GObject::Player * votePlayer = GObject::globalPlayers[playerId];
+                    if(votePlayer == NULL)
+                        return;
+                    GObject::shStageMgr.voteForHero(player, cls, votePlayer);
+                }
+                break;
+            }
+        }
+        break;
+    case 0x01:
+        {
+            UInt8 type = 0;
+            UInt8 cls = 0;
+            UInt8 state = 0;
+            br >> type >> cls >> state;
+
+            switch(type)
+            {
+            case 0x00:
+                GObject::shStageMgr.sendProgress(player);
+                break;
+            case 0x01:
+                GObject::shStageMgr.sendStatus(player);
+                break;
+            case 0x02:
+                GObject::shStageMgr.sendSHStageInfo(player, cls, state);
+                break;
+            case 0x03:
+                GObject::shStageMgr.sendSYStageInfo(player, cls, state);
+                break;
+            case 0x04:
+                GObject::shStageMgr.sendSRStageInfo(player, cls, state);
+                break;
+            case 0x05:
+                GObject::shStageMgr.sendSupportInfo(player);
+                break;
+            case 0x06:
+                GObject::shStageMgr.sendTowerInfo(player, cls);
+                break;
+            }
+        }
+        break;
+    case 0x02:
+        {
+            UInt8 type = 0;
+            br >> type;
+            switch(type)
+            {
+            case 0x01:
+                GObject::shStageMgr.sendLeaderBoard(player);
+                break;
+            case 0x02:
+                GObject::shStageMgr.sendSHLeaderBoard(player);
+                break;
+            case 0x03:
+                GObject::shStageMgr.sendSYLeaderBoard(player);
+                break;
+            case 0x04:
+                GObject::shStageMgr.sendSRLeaderBoard(player);
+                break;
+            case 0x05:
+                GObject::shStageMgr.sendSupportLeaderBoard(player);
+                break;
+            case 0x06:
+                GObject::shStageMgr.sendTowerLeaderBoard(player);
+                break;
+            }
+        }
+        break;
+    case 0x03:
+        {
+            UInt8 trump_cnt = 0;
+            UInt8 citta_cnt = 0;
+            std::vector<UInt16> trumps;
+            std::vector<UInt16> cittas;
+
+            br >> trump_cnt;
+            if(trump_cnt)
+            {
+                trumps.resize(trump_cnt);
+                br.read((UInt8*)(&trumps[0]), sizeof(UInt16)*trump_cnt);
+            }
+            br >> citta_cnt;
+            if(citta_cnt)
+            {
+                cittas.resize(citta_cnt);
+                br.read((UInt8*)(&cittas[0]), sizeof(UInt16)*citta_cnt);
+            }
+            GObject::shStageMgr.saveStrategyFighter(player, trumps, cittas);
+        }
+        break;
+    case 0x04:
+        {
+            GObject::shStageMgr.showStrategyFighter(player);
+        }
+        break;
+    }
+
 }
 
 

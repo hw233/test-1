@@ -13573,5 +13573,21 @@ void EventTlzAuto::notify(bool isBeginAuto)
         return 0;
     }
 
+    UInt32 Player::getBattlePoint()
+    {
+        UInt32 bp = 0;
+		for(int j = 0; j < 5; ++ j)
+		{
+            Fighter* fighter = _playerData.lineup[j].fighter;
+            if(fighter)
+                bp += fighter->getBattlePoint();
+		}
+        const GData::Formation* form = GData::formationManager[_playerData.formation];
+        if(form)
+            bp += form->getBattlePoint();
+
+        return bp;
+    }
+
 } // namespace GObject
 
