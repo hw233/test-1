@@ -826,16 +826,33 @@ ItemEquip * Fighter::setHalo( ItemHalo* r, bool writedb )
 {
 	ItemEquip * rr = _halo;
 	_halo = r;
-	if(writedb)
-	{
-		_attrDirty = true;
-		_bPDirty = true;
-		if(r != NULL)
-		{
-			r->DoEquipBind(true);
-		}
-		sendModification(0x1f, r);
-	}
+
+    if (rr)
+    {
+        const GData::AttrExtra* attr = rr->getAttrExtra();
+        if (attr)
+            delSkillsFromCT(attr->skills, writedb);
+    }
+
+    if (r)
+    {
+        const GData::AttrExtra* attr = r->getAttrExtra();
+        if (attr)
+            addSkillsFromCT(attr->skills, writedb, true);
+    }
+
+    if(writedb && r)
+    {
+        //判断穿法宝的成就
+        GameAction()->doAttainment(_owner, 10211, 0);
+    }
+
+    _attrDirty = true;
+    _bPDirty = true;
+    if(r != NULL)
+        r->DoEquipBind(true);
+
+    sendModification(0x1f, r, writedb);
 	return rr;
 }
 
@@ -1516,6 +1533,12 @@ void Fighter::rebuildEquipAttr()
         addTrumpAttr(equip);
     }
 
+	ItemEquip * halo = getHalo();
+    if (halo != NULL)
+    { // XXX: like trump
+        addTrumpAttr(halo);
+    }
+
 	equip = getWeapon();
 	if(equip != NULL)
 	{
@@ -1669,7 +1692,7 @@ void Fighter::rebuildEquipAttr()
 	_maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
 }
 
-UInt16 Fighter::calcSkillBattlePoint(UInt16 skillId)
+UInt16 Fighter::calcSkillBattlePoint(UInt16 skillId, UInt8 type)
 {
     const GData::SkillBase* s = GData::skillManager[skillId];
     if(s)
@@ -1680,7 +1703,7 @@ UInt16 Fighter::calcSkillBattlePoint(UInt16 skillId)
         SStrengthen* ss = SSGetInfo(skillId);
         if(ss)
             ssl = ss->lvl;
-        return Script::BattleFormula::getCurrent()->calcSkillBattlePoint(sc, sl, 2, ssl);
+        return Script::BattleFormula::getCurrent()->calcSkillBattlePoint(sc, sl, type, ssl);
     }
     return 0;
 }
@@ -1690,12 +1713,12 @@ void Fighter::rebuildSkillBattlePoint()
     _skillBP = 0;
     if(peerless)
     {
-        _skillBP += calcSkillBattlePoint(peerless);
+        _skillBP += calcSkillBattlePoint(peerless, 2);
     }
     for(size_t i = 0; i < SKILL_UPMAX; ++ i)
     {
         if(_skill[i])
-            _skillBP += calcSkillBattlePoint(_skill[i]);
+            _skillBP += calcSkillBattlePoint(_skill[i], 1);
     }
     for (size_t i = 0; i < GData::SKILL_PASSIVES-GData::SKILL_PASSSTART; ++i)
     {
@@ -1703,7 +1726,7 @@ void Fighter::rebuildSkillBattlePoint()
         {
             if(_passkl[i][j])
             {
-                _skillBP += calcSkillBattlePoint(_passkl[i][j]);
+                _skillBP += calcSkillBattlePoint(_passkl[i][j], 3);
             }
         }
     }
@@ -1713,7 +1736,7 @@ void Fighter::rebuildSkillBattlePoint()
         {
             if(_rpasskl[i][j])
             {
-                _skillBP += calcSkillBattlePoint(_rpasskl[i][j]);
+                _skillBP += calcSkillBattlePoint(_rpasskl[i][j], 3);
             }
         }
     }

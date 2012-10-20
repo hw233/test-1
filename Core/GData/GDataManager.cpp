@@ -1189,6 +1189,7 @@ namespace GData
             SetValOrPercent(ef->magdef, ef->magdefP, effs.magdef);
             ef->tough = effs.tough;
             SetValOrPercent(ef->action, ef->actionP, effs.action);
+            ef->hitrate = effs.hitrate;
             ef->evade = effs.evade;
             ef->critical = effs.critical;
             ef->pierce = effs.pierce;

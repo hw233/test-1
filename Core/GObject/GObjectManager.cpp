@@ -3879,6 +3879,8 @@ namespace GObject
                         if (itype->subClass == Item_Halo)
                         {
                             equip = new ItemHalo(dbe.id, itype, ied);
+                            if (equip && ied.enchant)
+                                ((ItemTrump*)equip)->fixSkills();
                         }
                         else if (itype->subClass == Item_Fashion)
                         {

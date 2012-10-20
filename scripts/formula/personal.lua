@@ -80,22 +80,22 @@ bp_factor_evadl    = 4        -- 闪避等级
 bp_factor_crtl     = 3.5      -- 暴击等级
 bp_factor_pirl     = 3.5      -- 破击等级
 bp_factor_counterl = 3        -- 反击等级
-bp_factor_magresl  = 3        -- 反击等级
+bp_factor_magresl  = 3        -- 法术抵抗等级
 bp_factor_aura     = 50       -- 初始灵气
 bp_factor_auraMax  = 8        -- 最大灵气
 bp_factor_crtdmg   = 8000     -- 暴击伤害
 bp_factor_tough    = 14000    -- 坚韧
-bp_factor_hitr     = 8000     -- 命中
+bp_factor_hitr     = 16000     -- 命中
 bp_factor_evad     = 16000    -- 闪避
 bp_factor_crt      = 14000    -- 暴击
 bp_factor_pir      = 14000    -- 破击
 bp_factor_counter  = 12000    -- 反击
 bp_factor_magres   = 12000    -- 法术抵抗
 
-bp_factor_skill_color = {0, 10, 15, 20, 25}    -- 技能颜色
-bp_factor_skill_level = {3.05, 3.66, 4.4, 5.27, 6.28, 7.45, 8.78, 10.3, 12}  -- 技能等级
-bp_factor_skill_type = {6, 10, 8}  -- 技能类型
-bp_factor_ss_level = {1.56, 2.22, 3, 3.89, 4.9, 6, 7.22, 8.56, 10}  -- 技能符文等级
+bp_factor_skill_color = {0, 20, 30, 40, 50}    -- 技能颜色
+bp_factor_skill_level = {3.81, 4.58, 5.5, 6.59, 7.85, 9.31, 10.98, 12.87, 15}  -- 技能等级
+bp_factor_skill_type = {15, 25, 20}  -- 技能类型
+bp_factor_ss_level = {2.49, 3.09, 3.78, 4.57, 5.46, 6.44, 7.53, 8.72, 10}  -- 技能符文等级
 
 
 function calcSoulStrength( ss )
@@ -567,7 +567,7 @@ function calcTough( fgt, defgt )
     return tough + fgt:getExtraTough() + toughlvl/(toughlvl + toughlvl_factor*deflev + toughlvl_addon_factor)*100
 end
 
-function calcBattlePoint_new(fgt)
+function calcBattlePoint(fgt)
     if fgt == nil then
         return 0;
     end
@@ -607,7 +607,7 @@ function calcSkillBattlePoint(c, l, t, s)
     return bp_factor_skill_color[c] * bp_factor_skill_type[t] * (bp_factor_skill_level[l] + bp_factor_ss_level[s])
 end
 
-function calcBattlePoint( fgt )
+function calcBattlePoint_old( fgt )
   if fgt == nil then
     return 0
   end
