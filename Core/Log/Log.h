@@ -80,6 +80,7 @@ enum PurchaseType
     DiscountSp3                 = 69,
     ArenaFromCard               = 70,
     ArenaFromMail               = 71,
+    FromTJ                      = 72,
 };
 
 enum IncomingType
