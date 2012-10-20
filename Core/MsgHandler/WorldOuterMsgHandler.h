@@ -2191,6 +2191,9 @@ void OnSingleHeroReq( GameMsgHdr& hdr, const void* data)
     UInt8 op = 0;
     br >> op;
 
+    if(!GObject::shStageMgr.getActive())
+        return;
+
     switch(op)
     {
     case 0x00:

@@ -596,12 +596,15 @@ void OnLevelChange( GameMsgHdr& hdr, const void* data)
     }
     if(!GObject::shStageMgr.getActive())
     {
-        if(lvc->oldLv < 70 && lvc->newLv > 69)
+        if(lvc->oldLv < SINGLE_HERO_OPEN_LEVEL && lvc->newLv >= SINGLE_HERO_OPEN_LEVEL)
             GObject::shStageMgr.incActive(1);
-        else if(lvc->oldLv > 69 && lvc->newLv < 70)
+        else if(lvc->oldLv >= SINGLE_HERO_OPEN_LEVEL && lvc->newLv < SINGLE_HERO_OPEN_LEVEL)
             GObject::shStageMgr.incActive(-1);
         if(GObject::shStageMgr.getActive())
+        {
+            GObject::shStageMgr.init(WORLD().Now(), WORLD().getWeekDay());
             GObject::globalPlayers.enumerate(enum_send_sh_active, static_cast<void *>(NULL));
+        }
     }
 }
 

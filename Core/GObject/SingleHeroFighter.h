@@ -6,8 +6,8 @@
 namespace GObject
 {
 // XXX neice
-//#define SH_FIGHTER_STRATEGY_CD 900
-#define SH_FIGHTER_STRATEGY_CD 60
+//#define SH_FIGHTER_STRATEGY_CD 60
+#define SH_FIGHTER_STRATEGY_CD 900
 #define SH_SY_SKILL_LEVEL      9
 
     class SingleHeroFighter

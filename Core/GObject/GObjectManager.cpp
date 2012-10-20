@@ -1627,7 +1627,7 @@ namespace GObject
 
                 if(!GObject::shStageMgr.getActive())
                 {
-                    if(specfgtobj.level > 69)
+                    if(specfgtobj.level >= SINGLE_HERO_OPEN_LEVEL)
                         GObject::shStageMgr.incActive(1);
                 }
             }

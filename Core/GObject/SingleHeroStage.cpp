@@ -15,8 +15,8 @@
 
 #define HOUR (60*60)
 // XXX neice
-//#define MIN 60
-#define MIN 6
+//#define MIN 6
+#define MIN 60
 
 #if 1
 #define DEBUG(x, ...) fprintf(stderr, x, ##__VA_ARGS__);
@@ -3602,8 +3602,8 @@ namespace GObject
         m_session = global.session;
         if(m_progress == e_sh_tower)
             // XXX neice
-            // m_towerEndTime = TimeUtil::SharpDay(1, m_nextTime) + stageStartTime[m_progress];
-            m_towerEndTime = TimeUtil::Now() + 600;
+            //m_towerEndTime = TimeUtil::Now() + 600;
+            m_towerEndTime = TimeUtil::SharpDay(1, m_nextTime) + stageStartTime[m_progress];
 
 
         DBSHFighter shFighter;
@@ -3779,6 +3779,8 @@ namespace GObject
 
     void SHBattleStageMgr::process()
     {
+        if(!getActive())
+            return;
         UInt32 now = TimeUtil::Now();
         if (now < m_nextTime && getProgress() >= m_dstprogress)
         {
@@ -3805,8 +3807,8 @@ namespace GObject
         case e_sh_star_fin_end:
             m_progress = m_progress - SH_GP_OFFSET_B_E + 1;
             // XXX neice
-            //m_towerEndTime = TimeUtil::SharpDay(1, m_nextTime) + stageStartTime[m_progress];
-            m_towerEndTime = now + 600;
+            //m_towerEndTime = now + 600;
+            m_towerEndTime = TimeUtil::SharpDay(1, m_nextTime) + stageStartTime[m_progress];
             break;
         case e_sh_result_end:
             m_progress = 0;
@@ -3816,14 +3818,14 @@ namespace GObject
             ++ m_progress;
             // nextTime报名结束 周一12点
             // XXX neice
-            //m_nextTime = TimeUtil::SharpDay(1, m_nextTime) + stageStartTime[m_progress]; 
-            m_nextTime = now + 900; 
+            //m_nextTime = now + 900; 
+            m_nextTime = TimeUtil::SharpDay(1, m_nextTime) + stageStartTime[m_progress]; 
             break;
         case e_sh_signIn: // 报名结束
             ++ m_progress;
             // nextTime单职业预赛 周一13点
             // XXX neice
-            //m_nextTime = TimeUtil::SharpDay(0, m_nextTime) + stageStartTime[m_progress]; 
+            m_nextTime = TimeUtil::SharpDay(0, m_nextTime) + stageStartTime[m_progress]; 
             break;
         case e_sh_signIn_end:  // 开赛
             ++ m_progress;
@@ -3834,8 +3836,8 @@ namespace GObject
             if(processSingleStage())
             {
                 // XXX neice
-                //m_nextTime = TimeUtil::SharpDay(nextDay, m_nextTime) + stageStartTime[m_progress]; 
-                m_nextTime = now + 300; 
+                //m_nextTime = now + 300; 
+                m_nextTime = TimeUtil::SharpDay(nextDay, m_nextTime) + stageStartTime[m_progress]; 
                 m_progress += SH_GP_OFFSET_B_E;
             }
             else
@@ -3850,8 +3852,8 @@ namespace GObject
             if(processStrategyStage())
             {
                 // XXX neice
-                //m_nextTime = TimeUtil::SharpDay(nextDay, m_nextTime) + stageStartTime[m_progress]; 
-                m_nextTime = now + 300; 
+                //m_nextTime = now + 300; 
+                m_nextTime = TimeUtil::SharpDay(nextDay, m_nextTime) + stageStartTime[m_progress]; 
                 m_progress += SH_GP_OFFSET_B_E;
             }
             else
@@ -3865,8 +3867,8 @@ namespace GObject
             if(processStarStage())
             {
                 // XXX neice
-                //m_nextTime = TimeUtil::SharpDay(1, m_nextTime) + stageStartTime[m_progress]; 
-                m_nextTime = now + 300; 
+                //m_nextTime = now + 300; 
+                m_nextTime = TimeUtil::SharpDay(1, m_nextTime) + stageStartTime[m_progress]; 
                 m_progress += SH_GP_OFFSET_B_E;
             }
             else
@@ -3878,8 +3880,8 @@ namespace GObject
             if(processTowerStage())
             {
                 // XXX neice
-                //m_nextTime = TimeUtil::SharpDay(1, m_nextTime) + stageStartTime[m_progress]; 
-                m_nextTime = now + 300; 
+                //m_nextTime = now + 300; 
+                m_nextTime = TimeUtil::SharpDay(1, m_nextTime) + stageStartTime[m_progress]; 
                 m_progress += SH_GP_OFFSET_B_E;
             }
             else
@@ -3894,8 +3896,8 @@ namespace GObject
             processStageOver();
             // nextTime 下次报名 下周日12点
             // XXX neice
-            //m_nextTime = TimeUtil::SharpWeek(1, m_nextTime+3600) + stageStartTime[0]; 
-            m_nextTime = now + 600;
+            //m_nextTime = now + 600;
+            m_nextTime = TimeUtil::SharpWeek(1, m_nextTime+3600) + stageStartTime[0]; 
             break;
         }
 
@@ -4131,20 +4133,14 @@ namespace GObject
 
     void SHBattleStageMgr::init(UInt32 now, UInt8 weekday)
     {
-        if(weekday > 1)
-        {
-            UInt32 curtime = TimeUtil::SharpDay(0, now);
-            m_nextTime = curtime + (8 - weekday) * 86400;
-        }
-        else if(weekday == 1)
-            m_nextTime = TimeUtil::SharpDay(0, now);
-        else
-            m_nextTime = TimeUtil::SharpDay(1, now);
+        if(!getActive())
+            return;
+        m_nextTime = TimeUtil::SharpDay(0, now)  + (7 - weekday) * 86400 + stageStartTime[0];
 
         m_progress = 0;
         m_session = 1;
         // XXX neice
-        m_nextTime = now;
+        //m_nextTime = now;
 
         DB1().PushUpdateData("INSERT INTO `sh_global`(`session`, `progress`, `nextTime`) VALUES(%u, %u, %u)", m_session, m_progress, m_nextTime);
     }

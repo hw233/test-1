@@ -596,7 +596,6 @@ function calcBattlePoint(fgt)
     bp = bp + (fgt:getBaseCounter() + fgt:getExtraCounter())/100 * bp_factor_counter
     bp = bp + (fgt:getBaseMagRes() + fgt:getExtraMagRes())/100 * bp_factor_magres
 
-    print(bp)
     return bp;
 end
 
