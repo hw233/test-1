@@ -12,3 +12,4 @@ cfg:setOpening([year], [month], [day]);
 cfg:setGMCheck(false);
 cfg:setLoginLimit(false);
 cfg:setLoginMax(3000);
+cfg:setSecDCLog(false);
