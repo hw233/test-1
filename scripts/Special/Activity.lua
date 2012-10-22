@@ -2282,6 +2282,47 @@ function sendRechargeMails_2012_10_19(player, ototal, ntotal)
     end
 end
 
+
+function _sendRechargeMails(player, ototal, ntotal, lvls, items)
+    local olvl = calcRechargeLevel(lvls, ototal)
+    local nlvl = calcRechargeLevel(lvls, ntotal)
+
+    if nlvl == 0 or olvl == nlvl then
+        return
+    end
+
+    for k = olvl+1, nlvl do
+        local title = string.format(msg_100, lvls[k])
+        local ctx = string.format(msg_101, lvls[k])
+        sendItemPackageMail(player, title, ctx, items[k]);
+    end
+end
+
+function sendRechargeMails_2012_10_23(player, ototal, ntotal)
+    local lvls = {
+        10,99,199,399,699,1099,1599,2199,2899,3699,4599,5599,7999,10999,14999,19999,
+    }
+    local items = {
+        {516,1,1},
+        {503,2,1, 514,1,1},
+        {500,3,1},
+        {1325,1,1},
+        {512,2,1, 8000,2,1},
+        {515,2,1},
+        {513,2,1, 547,2,1},
+        {1528,1,1, 503,2,1},
+        {515,1,1, 509,1,1},
+        {549,1,1, 516,3,1},
+        {509,1,1, 507,1,1},
+        {9076,2,1},
+        {515,3,1},
+        {507,2,1, 509,2,1},
+        {9076,5,1},
+        {515,3,1, 1325,3,1, 1528,3,1},
+    }
+    _sendRechargeMails(player, ototal, ntotal, lvls, items)
+end
+
 function sendRechargeMails(player, ototal, ntotal)
     --sendRechargeMails1(player, ototal, ntotal)
     --[[local start = { ['year'] = 2012, ['month'] = 7, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -2317,8 +2358,10 @@ function sendRechargeMails(player, ototal, ntotal)
     --end
     local t = { ['year'] = 2012, ['month'] = 10, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local t1 = { ['year'] = 2012, ['month'] = 10, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local t2 = { ['year'] = 2012, ['month'] = 10, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local s = os.time(t)
     local s1 = os.time(t1)
+    local s2 = os.time(t2)
     local n = os.time()
     if n >= s and n < (s + 86400) then
         sendRechargeMails_2012_10_16(player, ototal, ntotal)
@@ -2328,6 +2371,8 @@ function sendRechargeMails(player, ototal, ntotal)
         sendRechargeMails_2012_10_18(player, ototal, ntotal)
     elseif n >= s1 and n < (s1 + 4*86400) then
         sendRechargeMails_2012_10_19(player, ototal, ntotal)
+    elseif n >= s2 and n < (s2 + 3*86400) then
+        sendRechargeMails_2012_10_23(player, ototal, ntotal)
     end
 end
 

@@ -1027,7 +1027,8 @@ namespace GObject
             {
                 Network::GameClient * cl = static_cast<Network::GameClient *>(conn.get());
                 struct in_addr inaddr = inet_makeaddr(cl->GetClientIP(), 0);
-                m_ulog->SetUserIP(inet_ntoa(inaddr));
+                //m_ulog->SetUserIP(inet_ntoa(inaddr));
+                m_ulog->SetUserIP(m_clientIp.c_str());
             }
         }
 #endif
