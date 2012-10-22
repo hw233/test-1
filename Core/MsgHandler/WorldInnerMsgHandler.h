@@ -1083,5 +1083,24 @@ void OnSHFighterCloneRes( GameMsgHdr& hdr, const void* data )
     GObject::shStageMgr.onFighterClone(player, fgt);
 }
 
+void OnSHReset( GameMsgHdr& hdr, const void* data )
+{
+    GObject::shStageMgr.reset();
+}
+
+inline bool enterSingleHeroStage(GObject::Player* p, UInt32 cnt)
+{
+    GObject::shStageMgr.enter(p, p->getMainFighter());
+    if(cnt != 0 && GObject::shStageMgr.getPlayerCount() > cnt)
+        return false;
+    return true;
+}
+
+void OnSHEnter( GameMsgHdr& hdr, const void* data )
+{
+    UInt32 cnt = *reinterpret_cast<UInt32*>(const_cast<void*>(data));
+    GObject::globalPlayers.enumerate(enterSingleHeroStage, cnt);
+}
+
 
 #endif // _WORLDINNERMSGHANDLER_H_

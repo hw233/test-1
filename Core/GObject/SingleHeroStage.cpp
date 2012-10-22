@@ -1465,6 +1465,7 @@ namespace GObject
         m_finals.resize(0);
         DB1().PushUpdateData("DELETE FROM `sh_preliminary` WHERE `gpId` = %u AND `type`=%u AND `cls`=%u", m_gpId, m_type, m_cls);
         DB1().PushUpdateData("DELETE FROM `sh_final_player` WHERE `gpId` = %u AND `type`=%u AND `cls`=%u", m_gpId, m_type, m_cls);
+        DB1().PushUpdateData("DELETE FROM `sh_stage_progress` WHERE `gpId`=%u AND `type` = %u AND `cls`=%u", m_gpId, m_type, m_cls);
     }
 
     bool SHFinalBattleStage::enter(Player* player, SingleHeroFighter* fgt)
@@ -1869,6 +1870,14 @@ namespace GObject
         // 从数据库读取爬塔数据
         std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
         char querystr[1024] = {0};
+
+        sprintf(querystr, "SELECT `round`, `progress` FROM `sh_stage_progress` WHERE `type`=%u AND `gpId`=%u AND `cls`=%u", m_type, m_gpId, m_cls);
+        DBSHStageProgress stageProgress = {0};
+        if(execu->Extract(querystr, stageProgress) == DB::DB_OK)
+        {
+            m_round = stageProgress.round;
+        }
+
         DBSHTowerBattle shtb;
         memset(querystr, 0, sizeof(querystr));
         sprintf(querystr, "SELECT `player`, `won`, `level`, `turns`, `battleId`, `npcId`  FROM `sh_towerbattle` WHERE `cls`=%u ORDER BY `player` ASC, `level` ASC", 
@@ -1950,10 +1959,16 @@ namespace GObject
             sendTowerInfo((*it)->getPlayer(), (*it)->getTLevel(), (*it)->getTTurns());
         }
         ++ m_round;
+        write2DB();
         if (stillAlive)
             return false; // 还有人在坚持爬塔。
         else
             return true; // 全死光了，没人可以爬塔了，结束了。
+    }
+
+    void SHTowerStage::write2DB()
+    {
+        DB1().PushUpdateData("REPLACE INTO `sh_stage_progress` (`gpId`, `type`, `cls`, `round`, `progress`) VALUES(%u, %u, %u, %u, 0)", m_gpId, m_type, m_cls, m_round);
     }
 
     bool SHTowerStage::enter(Player* player, SingleHeroFighter* fgt)
@@ -2020,6 +2035,7 @@ namespace GObject
         _battleMap.clear();
         m_round = 0;
         DB1().PushUpdateData("DELETE FROM `sh_towerbattle` WHERE `cls`=%u", m_cls);
+        DB1().PushUpdateData("DELETE FROM `sh_stage_progress` WHERE `gpId`=%u AND `type` = %u AND `cls`=%u", m_gpId, m_type, m_cls);
     }
 
     bool SHTowerStage::challenge(SingleHeroFighter* fighter)
@@ -2037,7 +2053,7 @@ namespace GObject
 
 
         UInt32 turns = 0;
-        Battle::BattleSimulator bsim(Battle::BS_ATHLETICS1, fighter->getPlayer(), ng->getName(), ng->getLevel(), true);
+        Battle::BattleSimulator bsim(Battle::BS_ATHLETICS1, fighter->getPlayer(), ng->getName(), m_round, true);
         Battle::BattleFighter * bf = bsim.newFighter(0, 12, fighter->getFighter());
         bf->setHP(fighter->getCurrentHP());
         ng->putFighters(bsim);
@@ -2120,6 +2136,8 @@ namespace GObject
                     m_topTowerFighter[i] = fighter;
                     break;
                 }
+                if(m_topTowerFighter[i] == fighter)
+                    continue;
                 if (TowerPlayerBetter(fighter, m_topTowerFighter[i]))
                 {
                     // 需要更新排名
@@ -3158,6 +3176,7 @@ namespace GObject
         m_finals.resize(0);
         DB1().PushUpdateData("DELETE FROM `sh_preliminary` WHERE `gpId` = %u AND `type`=%u AND `cls`=0", m_gpId, m_type);
         DB1().PushUpdateData("DELETE FROM `sh_final_player` WHERE `gpId` = %u AND `type`=%u AND `cls`=0", m_gpId, m_type);
+        DB1().PushUpdateData("DELETE FROM `sh_stage_progress` WHERE `gpId`=%u AND `type` = %u AND `cls`=0", m_gpId, m_type);
     }
 
     bool SHFinalStarStage::enter(StarTeam* starTeam)
@@ -3545,7 +3564,7 @@ namespace GObject
     }
 
 
-    SHBattleStageMgr::SHBattleStageMgr() : m_progress(0), m_nextTime(0), m_session(0), m_lvlCnt70(0)
+    SHBattleStageMgr::SHBattleStageMgr() : m_progress(0), m_nextTime(0), m_session(0), m_lvlCnt70(0), m_towerEndTime(0)
     {
         m_dstprogress = 0;
 
@@ -3581,9 +3600,11 @@ namespace GObject
         m_progress = global.progress;
         m_nextTime = global.nextTime;
         m_session = global.session;
-        towerStage(1)-> setLevel(global.cls1TowerLevel);
-        towerStage(2)-> setLevel(global.cls2TowerLevel);
-        towerStage(3)-> setLevel(global.cls3TowerLevel);
+        if(m_progress == e_sh_tower)
+            // XXX neice
+            // m_towerEndTime = TimeUtil::SharpDay(1, m_nextTime) + stageStartTime[m_progress];
+            m_towerEndTime = TimeUtil::Now() + 600;
+
 
         DBSHFighter shFighter;
 		if(execu->Prepare("SELECT `id`, `playerId`, `type`, `level`, `soulMax`, `potential`, `capacity`, `citta`, `trump`, `skillstrengthen`  FROM `sh_fighter` ORDER BY `playerId`", shFighter) != DB::DB_OK)
@@ -3778,9 +3799,14 @@ namespace GObject
         case e_sh_strategy_eli_s_end:
         case e_sh_star_eli_end:
         case e_sh_strategy_fin_end:
-        case e_sh_star_fin_end:
         case e_sh_tower_end:
             m_progress = m_progress - SH_GP_OFFSET_B_E + 1;
+            break;
+        case e_sh_star_fin_end:
+            m_progress = m_progress - SH_GP_OFFSET_B_E + 1;
+            // XXX neice
+            //m_towerEndTime = TimeUtil::SharpDay(1, m_nextTime) + stageStartTime[m_progress];
+            m_towerEndTime = now + 600;
             break;
         case e_sh_result_end:
             m_progress = 0;
@@ -3959,7 +3985,8 @@ namespace GObject
                 break;
             case e_sh_single_fin:
                 {
-                    ret2 = m_singleFinalStage[i]->process();
+                    if(m_singleFinalStage[i])
+                        ret2 = m_singleFinalStage[i]->process();
                     process = 4;
                 }
                 break;
@@ -4009,7 +4036,8 @@ namespace GObject
                 break;
             case e_sh_strategy_fin:
                 {
-                    ret2 = m_strategyFinalStage[i]->process();
+                    if(m_strategyFinalStage[i])
+                        ret2 = m_strategyFinalStage[i]->process();
                     process = 4;
                 }
                 break;
@@ -4064,7 +4092,8 @@ namespace GObject
             break;
         case e_sh_star_fin:
             {
-                ret2 = m_starFinalStage->process();
+                if(m_starFinalStage)
+                    ret2 = m_starFinalStage->process();
                 process = 4;
             }
             break;
@@ -4085,7 +4114,7 @@ namespace GObject
     {
         bool ret = true;
         UInt32 now = TimeUtil::Now();
-        if(now >= m_nextTime) 
+        if(now >= m_towerEndTime)
             return ret;
 
         for(int i = 0; i < 4; ++ i)
@@ -5025,29 +5054,30 @@ namespace GObject
                 st << static_cast<UInt64>(m_topPopular[cls][2] ? m_topPopular[cls][2]->getId() : 0);
                 break;
             }
+            if(m_topPopular[cls][i] == votePlayer)
+                continue;
             if ((*m_candidateMap[votePlayer])->_supportedCount 
                     > (*m_candidateMap[m_topPopular[cls][i]])->_supportedCount)
             {
                 // 需要更新排名
-                for (UInt32 j = pos - 1; j > i; --j)
+                Player* pl = votePlayer;
+                for (UInt32 j = i; j < pos - 1; ++j)
                 {
+                    Player* tmppl = m_topPopular[cls][j];
                     if (m_topPopular[cls][j])
                     {
                         ++((*m_candidateMap[m_topPopular[cls][j]])->_pos);
                         DB1().PushUpdateData("REPLACE INTO `sh_candidate` (`playerId`, `jobClass`, `supportedCount`, `pos`) VALUES (%"I64_FMT"u, %u, %u, %u)", 
                                 m_topPopular[cls][j]->getId(), (UInt32)cls, ((*m_candidateMap[m_topPopular[cls][j]])->_supportedCount),(UInt32)((*m_candidateMap[m_topPopular[cls][j]])->_pos));
-                    }
-                    if (m_topPopular[cls][j - 1])
-                    {
-                        m_topPopular[cls][j] = m_topPopular[cls][j - 1];
+                        m_topPopular[cls][j] = pl;
+                        (*m_candidateMap[pl])->_pos = j + 1;
                         DB1().PushUpdateData("REPLACE INTO `sh_candidate` (`playerId`, `jobClass`, `supportedCount`, `pos`) VALUES (%"I64_FMT"u, %u, %u, %u)", 
-                                m_topPopular[cls][j-1]->getId(), (UInt32)cls, ((*m_candidateMap[m_topPopular[cls][j-1]])->_supportedCount),(UInt32)((*m_candidateMap[m_topPopular[cls][j-1]])->_pos));
+                                m_topPopular[cls][j]->getId(), (UInt32)cls, ((*m_candidateMap[m_topPopular[cls][j]])->_supportedCount),(UInt32)((*m_candidateMap[m_topPopular[cls][j]])->_pos));
+                        if(tmppl == votePlayer)
+                            break;
+                        pl = tmppl;
                     }
                 }
-                m_topPopular[cls][i] = votePlayer;
-                (*m_candidateMap[votePlayer])->_pos = i + 1;
-                DB1().PushUpdateData("REPLACE INTO `sh_candidate` (`playerId`, `jobClass`, `supportedCount`, `pos`) VALUES (%"I64_FMT"u, %u, %u, %u)", 
-                        votePlayer->getId(), (UInt32)cls, ((*m_candidateMap[votePlayer])->_supportedCount),(UInt32)((*m_candidateMap[votePlayer])->_pos));
                 st << static_cast<UInt64>(m_topPopular[cls][0] ? m_topPopular[cls][0]->getId() : 0);
                 st << static_cast<UInt64>(m_topPopular[cls][1] ? m_topPopular[cls][1]->getId() : 0);
                 st << static_cast<UInt64>(m_topPopular[cls][2] ? m_topPopular[cls][2]->getId() : 0);

@@ -599,6 +599,7 @@ function calcBattlePoint_new(fgt)
     return bp;
 end
 
+-- c:skill_color l:skill_level t:skill_type s:skillstrengthen_level
 function calcSkillBattlePoint(c, l, t, s)
     if s == 0 then
         return bp_factor_skill_color[c] * bp_factor_skill_type[t] * bp_factor_skill_level[l] 

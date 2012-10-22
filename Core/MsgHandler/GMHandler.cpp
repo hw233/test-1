@@ -3006,20 +3006,14 @@ void GMHandler::OnOpenTj(GObject::Player* player, std::vector<std::string>& args
     GObject::Tianjie::instance().manualOpenTj(level);
 }
 
-inline bool enterSingleHeroStage(GObject::Player* p, UInt32 cnt)
-{
-    GObject::shStageMgr.enter(p, p->getMainFighter());
-    if(cnt != 0 && GObject::shStageMgr.getPlayerCount() > cnt)
-        return false;
-    return true;
-}
-
 void GMHandler::OnEnterSingleHeroStage(GObject::Player* player, std::vector<std::string>& arge)
 {
     UInt32 cnt = 0;
 	if(arge.size() >= 1)
         cnt = atoi(arge[0].c_str());
-    GObject::globalPlayers.enumerate(enterSingleHeroStage, cnt);
+
+    GameMsgHdr imh(0x1AA, WORKER_THREAD_WORLD, NULL, sizeof(cnt));
+    GLOBAL().PushMsg(imh, &cnt);
 }
 
 void GMHandler::OnSingleHeroStageNextTime(GObject::Player* player, std::vector<std::string>& arge)
@@ -3029,7 +3023,8 @@ void GMHandler::OnSingleHeroStageNextTime(GObject::Player* player, std::vector<s
 
 void GMHandler::OnSingleHeroStageReset(GObject::Player* player, std::vector<std::string>& arge)
 {
-    GObject::shStageMgr.reset();
+    GameMsgHdr imh(0x1A9, WORKER_THREAD_WORLD, NULL, NULL);
+    GLOBAL().PushMsg(imh, NULL);
 }
 
 void GMHandler::OnSingleHeroStageGoTo(GObject::Player* player, std::vector<std::string>& arge)

@@ -342,6 +342,7 @@ namespace GObject
         Player *getTopPlayer(UInt8 pos);
         UInt16 getTopPlayerLevel(UInt8 pos);
         UInt32 getTopPlayerTurns(UInt8 pos);
+        void write2DB();
        
     private:
         std::vector<UInt32> m_Monsters;
@@ -676,6 +677,7 @@ namespace GObject
         UInt32 m_nextTime; // 下次擂台开始时间
         UInt32 m_session;  // 届数
         UInt32 m_lvlCnt70;
+        UInt32 m_towerEndTime;
     };
 
 
