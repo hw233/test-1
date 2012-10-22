@@ -671,6 +671,12 @@ function onActivityCheck(tm)
           setNeedRechargeRank(false)
       end
 
+      if tm >= actTime516 and tm < actTime516_1 then
+          setRechargeActive(true, 16)
+      else
+          setRechargeActive(false, 16)
+      end
+
       if tm >= actTime520 and tm < actTime520_1 then
           setTgcEvent(true)
       else
@@ -781,6 +787,7 @@ function initActTime(y, m, d)
   local  SerStartTm513= { ['year'] = 2012, ['month'] = 10, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm514= { ['year'] = 2012, ['month'] = 10, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm515= { ['year'] = 2012, ['month'] = 10, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm516= { ['year'] = 2012, ['month'] = 10, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm520= { ['year'] = 2012, ['month'] = 10, ['day'] = 31, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   -- 繁体版
@@ -1011,6 +1018,9 @@ function initActTime(y, m, d)
 
   actTime515 = os.time(SerStartTm515);
   actTime515_1 = os.time(SerStartTm515) + 3 * 86400;
+
+  actTime516 = os.time(SerStartTm516);
+  actTime516_1 = os.time(SerStartTm516) + 4 * 86400;
 
   actTime520 = os.time(SerStartTm520);
   actTime520_1 = os.time(SerStartTm520) + 26 * 86400;
