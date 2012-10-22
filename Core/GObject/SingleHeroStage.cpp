@@ -4981,7 +4981,14 @@ namespace GObject
             return;
         }
 
-        if (!cls || cls > 3)
+        SingleHeroFighter* sfg = m_singlFgt[votePlayer];
+        if(!sfg)
+        {
+            m_singlFgt.erase(votePlayer);
+            return;
+        }
+
+        if (!cls || cls > 3 || sfg->getClass() != cls)
             return;
         
         SHSupportPlayer * shsPlayer = NULL;
