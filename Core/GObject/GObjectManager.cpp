@@ -1454,11 +1454,24 @@ namespace GObject
 				size_t count = tk.count();
                 for(size_t idx = 0; idx < count; ++ idx)
 			    {
-				    PLAYER_DATA(pl, titleAll).push_back(atoi(tk[idx].c_str()));
+				    PLAYER_DATA(pl, titleAll).push_back(static_cast<UInt8>(atoi(tk[idx].c_str())));
                 }
             }
             else
                 PLAYER_DATA(pl, titleAll).push_back(static_cast<UInt8>(0));
+        #if 1
+            std::vector<UInt8>::iterator it = find(PLAYER_DATA(pl, titleAll).begin(), PLAYER_DATA(pl, titleAll).end(), dbpd.pdata.title);
+            if(it == PLAYER_DATA(pl, titleAll).end()){
+                PLAYER_DATA(pl, titleAll).push_back(dbpd.pdata.title);
+                std::string title = "";
+                for(UInt8 i = 0; i < PLAYER_DATA(pl, titleAll).size(); ++i)
+                {
+                    title += Itoa(PLAYER_DATA(pl, titleAll)[i]);
+                    title += '|';
+                }
+                DB1().PushUpdateData("UPDATE `player` SET `titleAll` = '%s' WHERE `id` = %"I64_FMT"u", title.c_str(), pl->getId());
+            }
+        #endif
 		}
 		lc.finalize();
 
