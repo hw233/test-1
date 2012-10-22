@@ -13604,9 +13604,12 @@ void EventTlzAuto::notify(bool isBeginAuto)
                 else if( fgt->getLevel() <= mfgt->getLevel())
                 {
                     DB1().PushUpdateData("DELETE FROM `fighter` where `id`=%d and `playerId`=%"I64_FMT"u", fgt->getId(), _id);
-                    _fighters.erase(fgt->getId());
+                    std::map<UInt32, Fighter *>::iterator tmp = it;
+                    -- tmp;
+                    _fighters.erase(it);
                     delete fgt;
                     find = true;
+                    it = tmp;
                 }
                 else
                 {

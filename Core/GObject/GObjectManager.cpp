@@ -1067,7 +1067,7 @@ namespace GObject
 	{
 		p->Load();
 		gBlockbossmgr.addPlayerRank(p, p->getBlockBossLevel(), p->GetLev());
-        p->verifyFighter();
+        //p->verifyFighter();
         //if (!GVAR.GetVar(GVAR_CITTASMERGE))
         //    mergeCittaPages(p);
         //if (!GVAR.GetVar(GVAR_1530BUCHANG))
