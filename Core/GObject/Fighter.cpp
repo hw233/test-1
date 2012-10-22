@@ -1021,7 +1021,7 @@ ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
 {
     ItemEquip* t = 0;
     if (trump && trump->getClass() == Item_Halo)
-        return setHalo((ItemHalo*)trump, true);
+        return setHalo((ItemHalo*)trump, writedb);
     if (!trump || (canSetTrump(idx, trump->getId()) && !checkTrumpMutually(_owner, trump->GetItemType().getId())))
     {
         if
