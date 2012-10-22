@@ -524,6 +524,13 @@ namespace GObject
 		if(itemType == NULL) return NULL;
 		ITEM_BIND_CHECK(itemType->bindType,bind);
 		ItemBase * item = FindItem(typeId, bind);
+        
+        if (typeId >= 48 && typeId <= 51)//乾坤净水等4个物品
+        {   
+            char udpStr[32] = {0};            
+            sprintf(udpStr, "F_1140%d%d_%d", bind, typeId, fromWhere);
+            m_Owner->udpLog("tripod", udpStr, "", "", "", "", "act", num);
+        }
 		if (item != NULL)
 		{
 			bool ret = TryAddItem(item, num);
@@ -601,7 +608,7 @@ namespace GObject
                 }
                 cittaUdpLog(1, typeId, num);
                 secondSoulItemUdpLog(1, typeId, num);
-
+               
                 if (fromWhere == FromQixi)
                 {
                     qixiUdpLog(typeId, num);
@@ -659,6 +666,14 @@ namespace GObject
 		bool bind = item->GetBindStatus();
 		UInt16 count = item->Count();
 		ItemBase * exist = FindItem(typeId, bind);
+        
+        if (typeId >= 48 && typeId <= 51)//乾坤净水等4个物品
+        {   
+            char udpStr[32] = {0};
+            sprintf(udpStr, "F_1140%d%d_%d", bind, typeId, fromWhere);
+            m_Owner->udpLog("tripod", udpStr, "", "", "", "", "act", count);
+        }
+     
 		if (exist != NULL)
 		{
 			if (TryAddItem(exist, count))
