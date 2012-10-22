@@ -174,7 +174,7 @@ void Leaderboard::doUpdate()
         r.country = curPlayer->getCountry();
         r.clanName = curPlayer->getClanName();
         r.roleLevel = curPlayer->GetLev();
-        r.value = c+1;
+        r.value = blist2[c].value;
         _level.push_back(r);
     }
 
