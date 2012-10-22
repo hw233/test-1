@@ -2141,12 +2141,20 @@ namespace GObject
                 if (TowerPlayerBetter(fighter, m_topTowerFighter[i]))
                 {
                     // 需要更新排名
-                    for (UInt8 j = pos - 1; j > i; --j)
+                    SingleHeroFighter* fgt = fighter;
+                    for (UInt8 j = i; j < pos - 1; ++j)
                     {
-                        if (m_topTowerFighter[j - 1])
-                            m_topTowerFighter[j] = m_topTowerFighter[j - 1];
+                        SingleHeroFighter* tmpfgt = m_topTowerFighter[j];
+                        if (m_topTowerFighter[j])
+                        {
+                            m_topTowerFighter[j] = fgt;
+                            if (tmpfgt == fighter)
+                                break;
+                            fgt = tmpfgt;
+                        }
                     }
-                    m_topTowerFighter[i] = fighter;
+                    if (pos - 1 < 3)
+                        m_topTowerFighter[pos - 1]=fgt;
                     break;
                 }
             }
@@ -5064,7 +5072,7 @@ namespace GObject
             {
                 // 需要更新排名
                 Player* pl = votePlayer;
-                for (UInt32 j = i; j < pos - 1; ++j)
+                for (UInt8 j = i; j < pos - 1; ++j)
                 {
                     Player* tmppl = m_topPopular[cls][j];
                     if (m_topPopular[cls][j])
@@ -5081,6 +5089,8 @@ namespace GObject
                         pl = tmppl;
                     }
                 }
+                if (pos - 1 < 3)
+                    m_topPopular[cls][pos - 1] = pl;
                 st << static_cast<UInt64>(m_topPopular[cls][0] ? m_topPopular[cls][0]->getId() : 0);
                 st << static_cast<UInt64>(m_topPopular[cls][1] ? m_topPopular[cls][1]->getId() : 0);
                 st << static_cast<UInt64>(m_topPopular[cls][2] ? m_topPopular[cls][2]->getId() : 0);
