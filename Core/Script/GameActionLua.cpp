@@ -1257,6 +1257,10 @@ namespace Script
     {
 		return Call<void>("sendRechargeRankAward", player, pos);
     }
+    void GameActionLua::sendConsumeRankAward(Player* player, Int32 pos)
+    {
+		return Call<void>("sendConsumeRankAward", player, pos);
+    }
 
     void GameActionLua::doAtySignIn(Player* pl, UInt32 id, UInt32 month, UInt32 day)
     {
@@ -1311,10 +1315,10 @@ namespace Script
 		return Call<UInt8 >("onRoamingQueqiao", pl, pos);
     }
     
-    UInt32 GameActionLua::GetBDSupermanPrice(Player* player, UInt32 itemId)
+    UInt32 GameActionLua::GetBDSupermanPrice(Player* player, UInt32 itemId, bool isUsed)
     {
 		assert(player != NULL);
-		return Call<UInt32>("GetBDSupermanPrice", player, itemId);
+		return Call<UInt32>("GetBDSupermanPrice", player, itemId, isUsed);
     }
 }
 

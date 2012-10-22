@@ -307,7 +307,7 @@ function onActivityCheck(tm)
   else
       set3366PrivilegeAct(false)
   end
-
+  
   if tm >= actTime216 and tm < actTime217 then
       setBDSuperman(true)
   else
@@ -683,6 +683,14 @@ function onActivityCheck(tm)
           setRechargeActive(false, 16)
       end
 
+      if tm >= actTime517 and tm < actTime517_1 then
+          setConsumeActive(true)
+          setNeedConsumeRank(true)
+      else
+          setConsumeActive(false)
+          setNeedConsumeRank(false)
+      end
+
       if tm >= actTime520 and tm < actTime520_1 then
           setTgcEvent(true)
       else
@@ -794,6 +802,7 @@ function initActTime(y, m, d)
   local  SerStartTm514= { ['year'] = 2012, ['month'] = 10, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm515= { ['year'] = 2012, ['month'] = 10, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm516= { ['year'] = 2012, ['month'] = 10, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm517= { ['year'] = 2012, ['month'] = 10, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm520= { ['year'] = 2012, ['month'] = 10, ['day'] = 31, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   -- 繁体版
@@ -829,7 +838,7 @@ function initActTime(y, m, d)
   local  SerStartTm212 = { ['year'] = 2012, ['month'] = 10, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 蓝钻优惠活动(蓝钻超人) //10.19上线推迟
   local SerStartTm213 = { ['year'] = 2012, ['month'] = 10, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local SerStartTm214 = { ['year'] = 2012, ['month'] = 10, ['day'] = 17, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local SerStartTm214 = { ['year'] = 2012, ['month'] = 10, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
@@ -1032,6 +1041,9 @@ function initActTime(y, m, d)
 
   actTime516 = os.time(SerStartTm516);
   actTime516_1 = os.time(SerStartTm516) + 4 * 86400;
+
+  actTime517 = os.time(SerStartTm517);
+  actTime517_1 = os.time(SerStartTm517) + 4 * 86400;
 
   actTime520 = os.time(SerStartTm520);
   actTime520_1 = os.time(SerStartTm520) + 26 * 86400;

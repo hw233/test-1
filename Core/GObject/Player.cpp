@@ -10971,13 +10971,17 @@ namespace GObject
 
     void Player::sendConsumeRankAward(int pos)
     {
-        if (!pos || pos > 3)
+        if (!pos || pos > 7)
             return;
+#if 0
         MailPackage::MailItem item[1][1] =
         {
             {{444, 1},},
         };
         sendMailItem(2331, 2332, &item[pos-1][0], 1, false);
+#else
+        GameAction()->sendConsumeRankAward(this, pos);
+#endif
     }
 
     void Player::sendKillMonsterRankAward(UInt8 index, Int32 pos)
