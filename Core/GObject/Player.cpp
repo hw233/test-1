@@ -2310,7 +2310,7 @@ namespace GObject
 		{
 			UInt32 p = static_cast<UInt32>((fgt->getPotential()+0.005) * 100);
 			UInt32 c = static_cast<UInt32>((fgt->getCapacity()+0.05) * 100);
-			DB2().PushUpdateData("REPLACE INTO `fighter` (`id`, `playerId`, `potential`, `capacity`, `level`, `experience`)\
+			DB2().PushUpdateData("INSERT INTO `fighter` (`id`, `playerId`, `potential`, `capacity`, `level`, `experience`)\
                     VALUES(%u, %"I64_FMT"u, %u.%02u, %u.%02u, %u, %u)",
                     id, getId(), p / 100, p % 100, c / 100, c % 100, fgt->getLevel(), fgt->getExp());
 
