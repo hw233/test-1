@@ -79,11 +79,12 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20121015_2.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20121017_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20121017_2.sql
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/cleartotalrecharge.sql # must be once for delete recharge total
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/cleartotalrecharge.sql # must be once for delete recharge total
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearconsume.sql # must be once for delete total consume
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clear3366totalrecharge.sql # must be once for delete recharge total
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/cleartianjie.sql # must be once for delete recharge total
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20121012_1.sql
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20121022_1.sql
 
     #. clearshiyamen.sh
 }

@@ -49,7 +49,7 @@ void SaleMgr::addRowSale(SaleData * sale)
 
     UInt8 pIdx = 0;
     UInt8 stIdx = StatIndex(subClass, typeId, pIdx);
-    if(stIdx > 61)
+    if(stIdx > 62)
     {
         stIdx = 1;
         pIdx = 1;
@@ -98,7 +98,7 @@ void SaleMgr::delRowSale(SaleData * sale)
 
     UInt8 pIdx = 0;
     UInt8 stIdx = StatIndex(subClass, typeId, pIdx);
-    if(stIdx > 61)
+    if(stIdx > 62)
     {
         stIdx = 1;
         pIdx = 1;
@@ -828,13 +828,27 @@ void SaleMgr::update(UInt32 curr)
 
 UInt8 SaleMgr::StatIndex(UInt8 type, UInt32 typeId, UInt8& parent)
 {
-    static UInt8 cvt[] = { 1, 4, 5, 6, 7, 8, 9, 10, 11, 1, 16, 16, 1, 1, 1, 1, 1, 1, 1, 1,         // 装备，法宝   [0-19]
-                           1, 1, 1, 1, 1, 1, 1, 1, 1, 16, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20,  // 普通物品， 阵法 [20-39]
-                           12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,  // 心法， 强化 [40-59]
-                           34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 33, 33, 33, 33,  // 宝石 [60-79]
-                           0,0,0,0,0,0,0,0,0,0,
-                           51, 52, 53, 54, 55, 56, 57, 58, 50, 50, // 魂 [90-99]
-                           61, 60, 60 // 元神 [100-102]
+    // 装备3  武器4 头盔5 胸甲6 肩甲7 腰带8 腿甲9 项链10 戒指11
+    // 心法12 增益心法13 技能心法14, 技能碎片15
+    // 法宝16 被动法宝17 无双法宝18, 法宝碎片19，光环法宝20
+    // 阵法21       七绝锁云阵22 四象元灵阵23 奇门遁甲阵24 天罡地煞阵25 都天烈火阵26 颠倒八卦阵27
+    // 北斗七星阵28 五行灭绝阵29 紫微太极阵30 金刚伏魔阵31 须弥九宫阵32 两仪微尘阵33
+    // 宝石34 力量35 敏捷36 智力37 耐力38 意志39 生命40 攻击41 防御42 命中43 反击44
+    // 闪避45 暴击46 破击47 身法48 坚韧49 法抗50
+    // 魂51 52攻击 53防御 54暴击 55破击 56身法 57坚韧 58毁灭 59生命
+    // 元神60 61元神技能 62元神
+    //                     0   1   2   3   4   5   6   7   8   9
+    static UInt8 cvt[] = { 1,  4,  5,  6,  7,  8,  9,  10, 11, 1, // 0
+                           16, 16, 20, 1,  1,  1,  1,  1,  1,  1, // 1
+                           1,  1,  1,  1,  1,  1,  1,  1,  1,  19,// 2
+                           21, 21, 21, 21, 21, 21, 21, 21, 21, 21,// 3
+                           12, 12, 12, 12, 12, 12, 12, 12, 12, 12,// 4
+                           2,  2,  2,  2,  2,  2,  2,  2,  2,  2, // 5
+                           35, 36, 37, 38, 39, 40, 41, 42, 43, 44,// 6
+                           45, 46, 47, 48, 49, 50, 34, 34, 34, 34,// 7
+                           0,  0,  0,  0,  0,  0,  0,  0,  0,  0, // 8
+                           52, 53, 54, 55, 56, 57, 58, 59, 51, 51,// 9
+                           62, 61, 61                             // 10
                          };
 
     UInt8 res = cvt[type];
@@ -847,32 +861,32 @@ UInt8 SaleMgr::StatIndex(UInt8 type, UInt32 typeId, UInt8& parent)
     {
         parent = 3;
     }
-    else if(res > 33 && res < 50)
+    else if(res > 34 && res < 51)
     {
-        parent = 33;
+        parent = 34;
     }
-    else if (res > 50 && res < 59)
+    else if (res > 51 && res < 60)
     {
-        parent = 50;
+        parent = 51;
     }
-    else if(res > 59 && res < 62)
+    else if(res > 60 && res < 63)
     {
-        parent = 59;
+        parent = 60;
     }
 
     switch(res)
     {
-    case 16:                                      //法宝
-        parent = 16;
-        if(type == 29)
-            res += 3;
-        else if(typeId > 1499 && typeId < 1600)        //被动技能法宝
+    case 16:
+        if(typeId > 1499 && typeId < 1600)        // 被动技能法宝
             res += 1;
-        else if(typeId > 1599 && typeId < 1700)   //主动技能法宝
+        else if(typeId > 1599 && typeId < 1700)   // 主动技能法宝
             res += 2;
+    case 19:                                      // 法宝碎片
+    case 20:                                      // 光环法宝
+        parent = 16;                              // 法宝
         break;
-    case 20:                                                         //阵法
-        parent = 20;
+    case 21:                                                         //阵法
+        parent = 21;
         if(typeId == 1000 || (typeId > 1011 && typeId < 1020))       //两仪微尘阵
             res += 12;
         else if(typeId == 1001 || (typeId > 1019 && typeId < 1031))  //须弥九宫阵
@@ -923,7 +937,7 @@ UInt8 SaleMgr::Index(UInt8 type, UInt32 typeId)
 {
     UInt8 parent = 0;
     UInt8 stIdx = StatIndex(type, typeId, parent);
-    if(stIdx > 61)
+    if(stIdx > 62)
     {
         stIdx = 1;
         parent = 1;

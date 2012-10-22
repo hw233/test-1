@@ -587,7 +587,7 @@ function calcBattlePoint(fgt)
     bp = bp + calcMagResLevel(fgt) * bp_factor_magresl
     bp = bp + calcAura(fgt) * bp_factor_aura
     bp = bp + calcAuraMax(fgt) * bp_factor_auraMax
-    bp = bp + fgt:getExtraCriticalDmg()/100 * bp_factor_crtdmg
+    bp = bp + fgt:getExtraCriticalDmg() * bp_factor_crtdmg
     bp = bp + (fgt:getBaseTough() + fgt:getExtraTough())/100 * bp_factor_tough
     bp = bp + fgt:getExtraHitrate()/100 * bp_factor_hitr
     bp = bp + (fgt:getBaseEvade() + fgt:getExtraEvade())/100 * bp_factor_evad

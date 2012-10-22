@@ -750,6 +750,8 @@ public:
     void send2ndSoulInfo();
 
     UInt8 getSoulSkillIdx(UInt16 itemId);
+    void reload2ndSoul();
+    void resetLevelAndExp(UInt8 maxLevel);
 
     void setHideFashion(bool v) 
     {
