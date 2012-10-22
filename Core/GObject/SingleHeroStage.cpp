@@ -2120,7 +2120,7 @@ namespace GObject
             fighter->setTLastTurns (turns);
             fighter->saveTowerProgress();
 
-            UInt8 pos = 3;
+            UInt8 pos = 4;
             for (UInt8 i = 0; i < 3; ++i)
             {
                 if (m_topTowerFighter[i] == fighter)
