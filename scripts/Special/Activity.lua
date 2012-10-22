@@ -2404,6 +2404,35 @@ function sendRechargeRankAward(player, pos)
     end
 end
 
+function sendConsumeRankAward_2012_10_19(player, pos)
+    local items = {
+        {509,30,1, 507,30,1, 1325,30,1, 1528,30,1, 9189,1,0},
+        {509,20,1, 507,20,1, 1325,30,1, 1528,30,1},
+        {509,15,1, 507,15,1, 1325,20,1, 1528,20,1},
+        {509,10,1, 507,10,1, 1325,10,1, 1528,10,1},
+        {509,10,1, 507,10,1, 1325,10,1, 1528,10,1},
+        {509,10,1, 507,10,1, 1325,10,1, 1528,10,1},
+        {509,10,1, 507,10,1, 1325,10,1, 1528,10,1},
+    }
+
+    if items[pos] == nil then
+        return
+    end
+
+    local title = string.format(msg_113, pos)
+    local ctx = string.format(msg_113, pos)
+    sendItemPackageMail(player, title, ctx, items[pos]);
+end
+
+function sendConsumeRankAward(player, pos)
+    local t = { ['year'] = 2012, ['month'] = 10, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local s = os.time(t)
+    local n = os.time()
+    if n >= s and n < (s + 4*86400) then
+        sendConsumeRankAward_2012_10_19(player, pos)
+    end
+end
+
 function onEquipForge(player, id, onums)
     local start = { ['year'] = 2012, ['month'] = 7, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local s = os.time(start)
@@ -2576,10 +2605,53 @@ function sendConsumeMails_2012_10_01(player, ototal, ntotal)
     end
 end
 
+function _sendConsumeMails(player, ototal, ntotal, lvls, items)
+    local olvl = calcRechargeLevel(lvls, ototal)
+    local nlvl = calcRechargeLevel(lvls, ntotal)
+
+    if nlvl == 0 or olvl == nlvl then
+        return
+    end
+
+    for k = olvl+1, nlvl do
+        if lvls[k] == nil or items[k] == nil then
+            return
+        end
+        local title = string.format(msg_105, lvls[k])
+        local ctx = string.format(msg_106, lvls[k])
+        sendItemPackageMail(player, title, ctx, items[k]);
+    end
+end
+
+function sendConsumeMails_2012_10_19(player, ototal, ntotal)
+    local lvls = {
+        100,299,699,1199,1899,2699,3699,4999,6599,8599,11999,15999,21999,29999,39999,
+    }    
+    local items = {
+        {503,2,1},
+        {500,1,1, 517,1,1},
+        {15,2,1},
+        {547,2,1, 515,1,1, 1325,2,1},
+        {505,2,1, 512,2,1, 1528,1,1},
+        {516,1,1, 515,1,1, 509,2,1},
+        {513,2,1, 551,2,1},
+        {503,2,1, 1528,2,1},
+        {509,2,1, 507,2,1},
+        {1325,2,1, 1528,2,1, 515,2,1},
+        {9076,3,1},
+        {549,2,1, 515,2,1},
+        {9076,5,1},
+        {515,5,1, 1528,5,1},
+        {9076,20,1},
+    }
+    _sendConsumeMails(player, ototal, ntotal, lvls, items)
+end
+
 function sendConsumeMails(player, ototal, ntotal)
     --sendConsumeMails1(player, ototal, ntotal);
     --sendConsumeMails2(player, ototal, ntotal);
-    sendConsumeMails_2012_10_01(player, ototal, ntotal);
+    --sendConsumeMails_2012_10_01(player, ototal, ntotal);
+    sendConsumeMails_2012_10_19(player, ototal, ntotal);
 end
 
 local awardPool = {
