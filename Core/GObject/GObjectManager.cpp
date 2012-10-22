@@ -179,46 +179,202 @@ namespace GObject
 
 	void GObjectManager::loadAllData()
 	{
-        loadGVar();
-        loadRealItemAward();
-        loadEquipForge();
-		loadMapData();
-        loadAttrFactor();
-        loadCopy();
-        loadFrontMap();
-		loadEquipments();
-		loadEquipmentsSpirit();
-        loadFightersPCChance();
-		loadFighters();
-		loadClanAssist();
-		loadClanRobMonster();
-        loadQQVipAward();
-		loadAllPlayers();
+        if(!loadGVar())
+        {
+            fprintf(stderr, "loadGVar error!\n");
+            std::abort();
+        }
+        if(!loadRealItemAward())
+        {
+            fprintf(stderr, "loadRealItemAward error!\n");
+            std::abort();
+        }
+        if(!loadEquipForge())
+        {
+            fprintf(stderr, "loadEquipForge error!\n");
+            std::abort();
+        }
+		if(!loadMapData())
+        {
+            fprintf(stderr, "loadMapData error!\n");
+            std::abort();
+        }
+        if(!loadAttrFactor())
+        {
+            fprintf(stderr, "loadMapData error!\n");
+            std::abort();
+        }
+        if(!loadCopy())
+        {
+            fprintf(stderr, "loadCopy error!\n");
+            std::abort();
+        }
+        if(!loadFrontMap())
+        {
+            fprintf(stderr, "loadFrontMap error!\n");
+            std::abort();
+        }
+		if(!loadEquipments())
+        {
+            fprintf(stderr, "loadEquipments error!\n");
+            std::abort();
+        }
+		if(!loadEquipmentsSpirit())
+        {
+            fprintf(stderr, "loadEquipmentsSpirit error!\n");
+            std::abort();
+        }
+        if(!loadFightersPCChance())
+        {
+            fprintf(stderr, "loadFightersPCChance error!\n");
+            std::abort();
+        }
+		if(!loadFighters())
+        {
+            fprintf(stderr, "loadFighters error!\n");
+            std::abort();
+        }
+		if(!loadClanAssist())
+        {
+            fprintf(stderr, "loadClanAssist error!\n");
+            std::abort();
+        }
+		if(!loadClanRobMonster())
+        {
+            fprintf(stderr, "loadClanRobMonster error!\n");
+            std::abort();
+        }
+        if(!loadQQVipAward())
+        {
+            fprintf(stderr, "loadQQVipAward error!\n");
+            std::abort();
+        }
+		if(!loadAllPlayers())
+        {
+            fprintf(stderr, "loadAllPlayers error!\n");
+            std::abort();
+        }
         //loadSecondSoul();
-		loadAllAthletics();
-		loadAllAthleticsEvent();
-		unloadEquipments();
-		loadAllFriends();
-		LoadDungeon();
-        loadTeamCopy();
-		loadAllClans();
-		LoadSpecialAward();
-		LoadArena();
-        LoadPracticePlace();
-        LoadWorldBoss();
-        LoadTownDeamon();
-        InitMoneyLog();
-        LoadShuoShuo(); // XXX: must before LoadHeroMemo
-        LoadHeroMemo();
-        LoadCFriendAwards();
-        LoadWBoss();
-        LoadDiscount();
-        LoadSoulItemChance();
-        LoadLuckyLog();
-        loadRNR();
-        loadNewRelation();
-        loadSkillStrengthen();
-        loadQixi();
+		if(!loadAllAthletics())
+        {
+            fprintf(stderr, "loadAllAthletics error!\n");
+            std::abort();
+        }
+		if(!loadAllAthleticsEvent())
+        {
+            fprintf(stderr, "loadAllAthleticsEvent error!\n");
+            std::abort();
+        }
+		if(!unloadEquipments())
+        {
+            fprintf(stderr, "unloadEquipments error!\n");
+            std::abort();
+        }
+		if(!loadAllFriends())
+        {
+            fprintf(stderr, "loadAllFriends error!\n");
+            std::abort();
+        }
+		if(!LoadDungeon())
+        {
+            fprintf(stderr, "LoadDungeon error!\n");
+            std::abort();
+        }
+        if(!loadTeamCopy())
+        {
+            fprintf(stderr, "loadTeamCopy error!\n");
+            std::abort();
+        }
+		if(!loadAllClans())
+        {
+            fprintf(stderr, "loadAllClans error!\n");
+            std::abort();
+        }
+		if(!LoadSpecialAward())
+        {
+            fprintf(stderr, "LoadSpecialAward error!\n");
+            std::abort();
+        }
+		if(!LoadArena())
+        {
+            fprintf(stderr, "LoadArena error!\n");
+            std::abort();
+        }
+        if(!LoadPracticePlace())
+        {
+            fprintf(stderr, "LoadPracticePlace error!\n");
+            std::abort();
+        }
+        if(!LoadWorldBoss())
+        {
+            fprintf(stderr, "LoadWorldBoss error!\n");
+            std::abort();
+        }
+        if(!LoadTownDeamon())
+        {
+            fprintf(stderr, "LoadTownDeamon error!\n");
+            std::abort();
+        }
+        if(!InitMoneyLog())
+        {
+            fprintf(stderr, "InitMoneyLog error!\n");
+            std::abort();
+        }
+        if(!LoadShuoShuo()) // XXX: must before LoadHeroMemo
+        {
+            fprintf(stderr, "LoadShuoShuo error!\n");
+            std::abort();
+        }
+        if(!LoadHeroMemo())
+        {
+            fprintf(stderr, "LoadHeroMemo error!\n");
+            std::abort();
+        }
+        if(!LoadCFriendAwards())
+        {
+            fprintf(stderr, "LoadCFriendAwards error!\n");
+            std::abort();
+        }
+        if(!LoadWBoss())
+        {
+            fprintf(stderr, "LoadWBoss error!\n");
+            std::abort();
+        }
+        if(!LoadDiscount())
+        {
+            fprintf(stderr, "LoadDiscount error!\n");
+            std::abort();
+        }
+        if(!LoadSoulItemChance())
+        {
+            fprintf(stderr, "LoadSoulItemChance error!\n");
+            std::abort();
+        }
+        if(!LoadLuckyLog())
+        {
+            fprintf(stderr, "LoadLuckyLog error!\n");
+            std::abort();
+        }
+        if(!loadRNR())
+        {
+            fprintf(stderr, "loadRNR error!\n");
+            std::abort();
+        }
+        if(!loadNewRelation())
+        {
+            fprintf(stderr, "loadNewRelation error!\n");
+            std::abort();
+        }
+        if(!loadSkillStrengthen())
+        {
+            fprintf(stderr, "loadSkillStrengthen error!\n");
+            std::abort();
+        }
+        if(!loadQixi())
+        {
+            fprintf(stderr, "loadQixi error!\n");
+            std::abort();
+        }
 		DB::gDataDBConnectionMgr->UnInit();
 	}
 
