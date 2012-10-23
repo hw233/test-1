@@ -14,7 +14,7 @@ namespace GObject
 {
 
 SaleMgr gSaleMgr;
-static const UInt8 ReqCvt[] = { 0xFF, 1, 2, 3, 12, 16, 20, 33, 50, 59};
+static const UInt8 ReqCvt[] = { 0xFF, 1, 2, 3, 12, 16, 21, 34, 51, 60};
 
 SaleMgr::SaleMgr()
 {
