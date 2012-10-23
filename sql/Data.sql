@@ -770,13 +770,15 @@ DROP TABLE IF EXISTS `clan_copy_monster_template`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `clan_copy_monster_template` (
+    `npcIndex` int(10) unsigned NOT NULL DEFAULT 0,
     `level` int(10) unsigned NOT NULL DEFAULT 0,
     `appearRound` int(10) unsigned NOT NULL DEFAULT 0,
     `npcId` bigint(20) unsigned NOT NULL DEFAULT 0,
     `npcCount` smallint(5) unsigned NOT NULL DEFAULT 0,
     `npcRouteIndex` smallint(5) unsigned NOT NULL DEFAULT 0,
     `npcValue` smallint(5) unsigned NOT NULL DEFAULT 0,
-    `monsterType` smallint(5) unsigned NOT NULL DEFAULT 0
+    `monsterType` smallint(5) unsigned NOT NULL DEFAULT 0,
+    PRIMARY KEY (`npcIndex`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
