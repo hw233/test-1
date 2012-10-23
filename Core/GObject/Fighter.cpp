@@ -26,6 +26,7 @@
 #include "GData/SpiritAttrTable.h"
 #include "SecondSoul.h"
 #include "GVar.h"
+#include "GObjectDBExecHelper.h"
 
 namespace GObject
 {
@@ -57,8 +58,8 @@ bool existGreatFighter(UInt32 id)
 Fighter::Fighter(UInt32 id, Player * owner):
 	_id(id), _owner(owner), _class(0), _level(1), _exp(0), _pexp(0),  _pexpAddTmp(0) , _pexpMax(0), _potential(1.0f),
     _capacity(1.0f), _color(2), _hp(0), _cittaslot(CITTA_INIT), _halo(NULL), _fashion(NULL), _weapon(NULL),
-    _ring(NULL), _amulet(NULL), _attrDirty(false), _maxHP(0), _bPDirty(false),
-    _expFlush(false), _expMods(0), _expEnd(0), _pexpMods(0), _forceWrite(false), _battlePoint(0.0f), _praadd(0),
+    _ring(NULL), _amulet(NULL), _attrDirty(false), _maxHP(0), _bPDirty(false), _skillBPDirty(false),
+    _expFlush(false), _expMods(0), _expEnd(0), _pexpMods(0), _forceWrite(false), _battlePoint(0.0f), _skillBP(0.0f), _praadd(0),
     _attrType1(0), _attrValue1(0), _attrType2(0), _attrValue2(0), _attrType3(0), _attrValue3(0),
     favor(0), reqFriendliness(0), strength(0), physique(0),
     agility(0), intelligence(0), will(0), soulMax(0), soul(0), baseSoul(0), aura(0), tough(0),
@@ -72,11 +73,15 @@ Fighter::Fighter(UInt32 id, Player * owner):
     //_cittas.resize(32); // 默认为32个
 	memset(_armor, 0, 5 * sizeof(ItemEquip *));
 	memset(_trump, 0, sizeof(_trump));
+	memset(_trumpSkill, 0, sizeof(_trumpSkill));
 	memset(_buffData, 0, FIGHTER_BUFF_COUNT * sizeof(UInt32));
     m_2ndSoul = NULL;
     _iswboss = false;
     _wbextatk = 0;
     _wbextmagatk = 0;
+    _soulMax = 0;
+    _soulExtraAura = 0;
+    _soulAuraLeft = 0;
     _hideFashion = 0;
 }
 
@@ -236,17 +241,19 @@ Fighter::~Fighter()
         SAFE_DELETE(_halo);
     if (!_fashion)
         SAFE_DELETE(_fashion);
-    if (!_weapon)
+    if (_weapon)
         SAFE_DELETE(_weapon);
-    if (!_ring)
+    if (_ring)
         SAFE_DELETE(_ring);
-    if (!_amulet)
+    if (_amulet)
         SAFE_DELETE(_amulet);
     for(int i = 0; i < 5; ++ i)
     {
-        if (!_armor[i])
+        if (_armor[i])
             SAFE_DELETE(_armor[i]);
     }
+    if(m_2ndSoul)
+        SAFE_DELETE(m_2ndSoul);
 }
 
 const std::string& Fighter::getName()
@@ -820,16 +827,33 @@ ItemEquip * Fighter::setHalo( ItemHalo* r, bool writedb )
 {
 	ItemEquip * rr = _halo;
 	_halo = r;
-	if(writedb)
-	{
-		_attrDirty = true;
-		_bPDirty = true;
-		if(r != NULL)
-		{
-			r->DoEquipBind(true);
-		}
-		sendModification(0x1f, r);
-	}
+
+    if (rr)
+    {
+        const GData::AttrExtra* attr = rr->getAttrExtra();
+        if (attr)
+            delSkillsFromCT(attr->skills, writedb);
+    }
+
+    if (r)
+    {
+        const GData::AttrExtra* attr = r->getAttrExtra();
+        if (attr)
+            addSkillsFromCT(attr->skills, writedb, true);
+    }
+
+    if(writedb && r)
+    {
+        //判断穿法宝的成就
+        GameAction()->doAttainment(_owner, 10211, 0);
+    }
+
+    _attrDirty = true;
+    _bPDirty = true;
+    if(r != NULL)
+        r->DoEquipBind(true);
+
+    sendModification(0x1f, r, writedb);
 	return rr;
 }
 
@@ -998,7 +1022,12 @@ ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
 {
     ItemEquip* t = 0;
     if (trump && trump->getClass() == Item_Halo)
-        return setHalo((ItemHalo*)trump, true);
+    {
+        //return setHalo((ItemHalo*)trump, writedb);
+        // XXX: 直接放入包裹
+        GObjectManager::pushEquipment(trump);
+        return NULL;
+    }
     if (!trump || (canSetTrump(idx, trump->getId()) && !checkTrumpMutually(_owner, trump->GetItemType().getId())))
     {
         if
@@ -1510,6 +1539,12 @@ void Fighter::rebuildEquipAttr()
         addTrumpAttr(equip);
     }
 
+	ItemEquip * halo = getHalo();
+    if (halo != NULL)
+    { // XXX: like trump
+        addTrumpAttr(halo);
+    }
+
 	equip = getWeapon();
 	if(equip != NULL)
 	{
@@ -1663,9 +1698,65 @@ void Fighter::rebuildEquipAttr()
 	_maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
 }
 
+UInt16 Fighter::calcSkillBattlePoint(UInt16 skillId, UInt8 type)
+{
+    const GData::SkillBase* s = GData::skillManager[skillId];
+    if(s)
+    {
+        UInt8 sc = s->color;
+        UInt8 sl = SKILL_LEVEL(skillId);
+        UInt8 ssl = 0;
+        SStrengthen* ss = SSGetInfo(skillId);
+        if(ss)
+            ssl = ss->lvl;
+        return Script::BattleFormula::getCurrent()->calcSkillBattlePoint(sc, sl, type, ssl);
+    }
+    return 0;
+}
+
+void Fighter::rebuildSkillBattlePoint()
+{
+    _skillBP = 0;
+    if(peerless)
+    {
+        _skillBP += calcSkillBattlePoint(peerless, 2);
+    }
+    for(size_t i = 0; i < SKILL_UPMAX; ++ i)
+    {
+        if(_skill[i])
+            _skillBP += calcSkillBattlePoint(_skill[i], 1);
+    }
+    for (size_t i = 0; i < GData::SKILL_PASSIVES-GData::SKILL_PASSSTART; ++i)
+    {
+        for (size_t j = 0; j < _passkl[i].size(); ++j)
+        {
+            if(_passkl[i][j])
+            {
+                _skillBP += calcSkillBattlePoint(_passkl[i][j], 3);
+            }
+        }
+    }
+    for (size_t i = 0; i < GData::SKILL_PASSIVES-GData::SKILL_PASSSTART; ++i)
+    {
+        for (size_t j = 0; j < _rpasskl[i].size(); ++j)
+        {
+            if(_rpasskl[i][j])
+            {
+                _skillBP += calcSkillBattlePoint(_rpasskl[i][j], 3);
+            }
+        }
+    }
+}
+
 void Fighter::rebuildBattlePoint()
 {
 	_battlePoint = Script::BattleFormula::getCurrent()->calcBattlePoint(this);
+    if(_owner)
+    {
+        const GData::Formation* form = GData::formationManager[_owner->getFormation()];
+        if(form)
+            _battlePoint += form->getBattlePoint();
+    }
 }
 
 Fighter * Fighter::clone(Player * player)
@@ -1685,10 +1776,51 @@ Fighter * Fighter::clone(Player * player)
 	fgt->_attrDirty = true;
 	fgt->_bPDirty = true;
     fgt->_pexpMax = 100000; // XXX: 100000
+    if(m_2ndSoul != NULL)
+        fgt->m_2ndSoul = new SecondSoul(*m_2ndSoul);
+
 	memset(fgt->_armor, 0, 5 * sizeof(ItemEquip *));
     memset(fgt->_trump, 0, TRUMP_UPMAX * sizeof(ItemEquip*));
 	return fgt;
 }
+
+Fighter * Fighter::cloneWithOutDirty(Player * player)
+{
+    checkDirty();
+	Fighter * fgt = new Fighter(*this);
+	if(player != NULL)
+	{
+		fgt->_level = 1;
+		fgt->_exp = 0;
+	}
+	fgt->_owner = player;
+	fgt->_fashion = NULL;
+	fgt->_weapon = NULL;
+	fgt->_ring = NULL;
+	fgt->_amulet = NULL;
+	fgt->_attrDirty = false;
+	fgt->_bPDirty = false;
+    fgt->_pexpMax = 100000; // XXX: 100000
+    if(m_2ndSoul != NULL)
+        fgt->m_2ndSoul = new SecondSoul(*m_2ndSoul);
+
+	memset(fgt->_armor, 0, 5 * sizeof(ItemEquip *));
+    for(int i = 0; i < TRUMP_UPMAX; ++ i)
+    {
+        ItemEquip* trump = _trump[i];
+        if(!trump)
+            continue;
+        const GData::AttrExtra* attr = trump->getAttrExtra();
+        if(attr->skills.size() > 0)
+        {
+            if(attr->skills[0])
+                fgt->_trumpSkill[i] = attr->skills[0]->getId();
+        }
+    }
+    memset(fgt->_trump, 0, TRUMP_UPMAX * sizeof(ItemEquip*));
+	return fgt;
+}
+
 
 ItemEquip * Fighter::findEquip( UInt32 id, UInt8& pos )
 {
@@ -2207,6 +2339,7 @@ void Fighter::setPeerless( UInt16 pl, bool writedb )
             return;
     }
 
+    _skillBPDirty = true;
     peerless = pl;
     if (_owner && writedb)
         _owner->OnHeroMemo(MC_SKILL, MD_ADVANCED, 0, 1);
@@ -2430,6 +2563,7 @@ bool Fighter::upSkill( UInt16 skill, int idx, bool writedb, bool online )
     int src = isSkillUp(skill);
     if (src < 0)
     {
+        _skillBPDirty = true;
         UInt8  max = getUpSkillsMax();
         UInt16 i = getUpSkillsNum();
         if (!i)
@@ -2479,6 +2613,7 @@ bool Fighter::upSkill( UInt16 skill, int idx, bool writedb, bool online )
             if (_skill[idx] != skill)
             {
                 _skill[idx] = skill;
+                _skillBPDirty = true;
                 ret = true;
             }
         }
@@ -2520,6 +2655,7 @@ bool Fighter::offSkill( UInt16 skill, bool writedb )
         sendModification(0x2a, _skill[i], i, false);
     }
     _skill[i] = 0;
+    _skillBPDirty = true;
     sendModification(0x2a, 0, i, writedb);
 #else
     _skill[idx] = 0;
@@ -2544,6 +2680,7 @@ bool Fighter::updateSkill( UInt16 skill, UInt16 nskill, bool sync, bool writedb 
         sendModification(0x2a, nskill, idx, writedb);
     }
 
+    _skillBPDirty = true;
     _attrDirty = true;
     _bPDirty = true;
     if (sync)
@@ -2565,6 +2702,7 @@ bool Fighter::delSkill( UInt16 skill, bool writedb, bool sync, bool offskill )
     *it = 0;
     _skills.erase(it);
 
+    _skillBPDirty = true;
     _attrDirty = true;
     _bPDirty = true;
     if (sync)
@@ -2767,6 +2905,77 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool lvlup, bool onl
 
     return ret;
 }
+bool Fighter::upCittaWithOutCheck( UInt16 citta, int idx )
+{
+    if (!citta)
+        return false;
+    const GData::CittaBase* cb = GData::cittaManager[citta];
+    if (!cb)
+        return false;
+
+    // XXX: 只能装备3个主动技能
+    if (cb->effect && cb->effect->skill.size() && getUpSkillsNum() >= 3)
+        return false;
+
+    int op = 0;
+    bool ret = false;
+    int src = isCittaUp(citta);
+    if (src < 0)
+    {
+        if (cb->needsoul > getMaxSoul() - getSoul())
+            return false;
+
+        idx = getUpCittasNum();
+        if (!(idx >= 0 && idx < getUpCittasMax())) // dst
+            return false;
+
+        if (_citta[idx])
+            offCitta(_citta[idx], false, true, false);
+
+        _citta[idx] = citta;
+        ret = true;
+        op = 1;
+    }
+    else
+    {
+        idx = src;
+        if (_citta[idx] != citta) // upgrade
+        {
+            const GData::CittaBase* yacb = GData::cittaManager[_citta[idx]];
+            if (!yacb)
+                return false;
+            if (cb->needsoul > getMaxSoul() - (getSoul() - yacb->needsoul))
+                return false;
+
+            // XXX: do not send message to client
+            offCitta(_citta[idx], false, false, false); // delete skills was taken out by old citta first
+            _citta[idx] = citta;
+            ret = true;
+            op = 3;
+        }
+    }
+
+    if (ret)
+    {
+        _attrDirty = true;
+        _bPDirty = true;
+    }
+
+    if (ret)
+    {
+        bool up = true;//_owner?(_owner->getMainFighter()?_owner->getMainFighter()->getLevel()>=10:true):false;
+        /*
+        if (!writedb)
+            up = false;
+            */
+        addSkillsFromCT(skillFromCitta(citta), false, up, false);
+
+        soul += cb->needsoul;
+    }
+
+    return ret;
+}
+
 bool Fighter::lvlUpCitta(UInt16 citta, bool writedb)
 {
     const GData::CittaBase* cb = GData::cittaManager[citta];
@@ -2924,6 +3133,7 @@ bool Fighter::upPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb)
         {
             if (SKILL_ID(_passkl[idx][j]) == SKILL_ID(skill))
             {
+                _skillBPDirty = true;
                 ret = true;
                 if (skill != _passkl[idx][j])
                 { // upgrade
@@ -2936,6 +3146,7 @@ bool Fighter::upPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb)
 
         if(!ret)
         {  // up
+            _skillBPDirty = true;
             ret = true;
             _passkl[idx].push_back(skill);
             sendModification(0x2e, skill, 1/*1add,2del,3mod*/, writedb);
@@ -2947,6 +3158,7 @@ bool Fighter::upPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb)
         {
             if (SKILL_ID(_rpasskl[idx][j]) == SKILL_ID(skill))
             {
+                _skillBPDirty = true;
                 ret = true;
                 if (skill != _rpasskl[idx][j])
                 { // upgrade
@@ -2959,6 +3171,7 @@ bool Fighter::upPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb)
 
         if (!ret)
         { // up
+            _skillBPDirty = true;
             ret = true;
             _rpasskl[idx].push_back(skill);
             sendModification(0x2e, skill, 1/*1add,2del,3mod*/, writedb);
@@ -3013,6 +3226,7 @@ bool Fighter::offPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb
                 std::advance(i, j);
                 _passkl[idx].erase(i);
                 ret = true;
+                _skillBPDirty = true;
             }
         }
     }
@@ -3026,6 +3240,7 @@ bool Fighter::offPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb
                 std::advance(i, j);
                 _rpasskl[idx].erase(i);
                 ret = true;
+                _skillBPDirty = true;
             }
         }
     }
@@ -3519,6 +3734,9 @@ void GlobalFighters::buildSummonSet()
 
 Int16 Fighter::getMaxSoul()
 {
+    if(_soulMax)
+        return _soulMax;
+
     if(_owner == NULL)
         return soulMax + _elixirattr.soul;
     else
@@ -3871,6 +4089,8 @@ void Fighter::setSecondSoul(SecondSoul* secondSoul)
 
 UInt8 Fighter::getSoulExtraAura()
 {
+    if(_soulExtraAura)
+        return _soulExtraAura;
     if(!m_2ndSoul)
         return 0;
 
@@ -3879,6 +4099,8 @@ UInt8 Fighter::getSoulExtraAura()
 
 UInt8 Fighter::getSoulAuraLeft()
 {
+    if(_soulAuraLeft)
+        return _soulAuraLeft;
     if(!m_2ndSoul)
         return 0;
 
@@ -4319,8 +4541,6 @@ UInt16 Fighter::getBattlePortrait()
 
 UInt8 Fighter::SSGetLvl(UInt16 skillid)
 {
-    if (!_owner)
-        return 0;
     UInt32 sid = SKILL_ID(skillid);
     std::map<UInt16, SStrengthen>::iterator i = m_ss.find(sid);
     if (i == m_ss.end())
@@ -4330,8 +4550,6 @@ UInt8 Fighter::SSGetLvl(UInt16 skillid)
 
 SStrengthen* Fighter::SSGetInfo(UInt16 skillid)
 {
-    if (!_owner)
-        return 0;
     UInt32 sid = SKILL_ID(skillid);
     std::map<UInt16, SStrengthen>::iterator i = m_ss.find(sid);
     if (i == m_ss.end())
@@ -4689,6 +4907,61 @@ void Fighter::SSFromDB(UInt16 id, SStrengthen& ss)
         return;
     // XXX: DO Delete
     m_ss[id] = ss;
+}
+
+void Fighter::setUpSS(std::string& skillstrengthen)
+{
+    StringTokenizer skills(skillstrengthen, ",");
+    for (UInt8 i = 0; i < skills.count(); ++i)
+    {
+        UInt16 skillId = atoi(skills[i].c_str());
+        UInt16 sid = SKILL_ID(skillId);
+        UInt16 slv = SKILL_LEVEL(skillId);
+
+        SStrengthen s;
+        s.father = 0;
+        s.maxVal = 0;
+        s.curVal = 0;
+        s.lvl = slv;
+        s.maxLvl = 0;
+
+        m_ss[sid] = s;
+    }
+}
+
+void Fighter::reload2ndSoul()
+{
+    if(m_2ndSoul || !_owner)
+        return;
+
+    std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+    if (execu.get() == NULL || !execu->isConnected()) return;
+
+    DBSecondSoul dbss;
+    char sqlstr[1024] = {0};
+    sprintf(sqlstr, "SELECT `fighterId`, `playerId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `skills` FROM `second_soul` WHERE `playerId`=%"I64_FMT"u AND `fighterId`=%u", _owner->getId(), _id);
+    if(execu->Extract(sqlstr, dbss) != DB::DB_OK)
+        return;
+    {
+        SecondSoul* secondSoul = new SecondSoul(this, dbss.cls, dbss.practiceLevel, dbss.stateExp, dbss.stateLevel, dbss.xinxiu);
+        StringTokenizer tokenizer(dbss.skills, ",");
+        int idx = 0;
+        for(size_t j = 0; j < tokenizer.count(); ++ j)
+        {
+            UInt16 skillId = atoi(tokenizer[j].c_str());
+            secondSoul->setSoulSkill(idx, skillId);
+            ++ idx;
+        }
+        setSecondSoul(secondSoul);
+    }
+}
+
+void Fighter::resetLevelAndExp(UInt8 maxLevel)
+{
+    UInt64 exp = GData::expTable.getLevelMin(maxLevel);
+    _level = maxLevel;
+    _exp = exp;
+    DB1().PushUpdateData("UPDATE `fighter` SET `experience` = %"I64_FMT"u, `level`=%u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", exp, _level, _id, _owner->getId());
 }
 
 }

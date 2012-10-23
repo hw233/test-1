@@ -2275,16 +2275,16 @@ void SetCFriend(LoginMsgHdr& hdr, const void* data)
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
-bool SwitchSecDC(UInt32 val)
+UInt8 SwitchSecDC(UInt32 val)
 {
-    // 设置是否开启安全DCLogger，返回设置是否成功
+    // 设置是否开启安全DCLogger，返回设置是否成功(0 成功，非0 失败)
     cfg.setSecDCLog(val? true:false);
-    return true;
+    return 0;
 }
 
 void GMCmd(LoginMsgHdr& hdr, const void* data)
 {
-    // 接受后台传来的GM指令
+    // 接受后台传来的GM指令，返回0表示操作成功，非0为操作失败
 	BinaryReader br(data,hdr.msgHdr.bodyLen);
     CHKKEY();
 
@@ -2293,7 +2293,7 @@ void GMCmd(LoginMsgHdr& hdr, const void* data)
 
     br >> id;
     br >> val;
-    bool result = false;
+    UInt8 result = 1;
     switch (id)
     {
         case 0x01:

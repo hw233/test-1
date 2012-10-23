@@ -1349,6 +1349,9 @@ namespace GObject
 
         switch (c)
         {
+            case Item_Halo:
+                return 0x1f;
+
             case Item_Fashion:
                 return 0x20;
 
@@ -1489,6 +1492,9 @@ namespace GObject
 		{
 			switch(part)
 			{
+            case 0x1f:
+				old = fgt->setHalo(NULL);
+                break;
             case 0x20:
 				old = fgt->setFashion(NULL);
                 break;

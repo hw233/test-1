@@ -360,6 +360,11 @@ float BattleFormula::calcBattlePoint(GObject::Fighter * fgt)
 	return call<float>("calcBattlePoint", fgt);
 }
 
+float BattleFormula::calcSkillBattlePoint(UInt8 color, UInt8 level, UInt8 type, UInt8 ssLevel)
+{
+	return call<float>("calcSkillBattlePoint", color, level, type, ssLevel);
+}
+
 float BattleFormula::calcHitRateLevel(GObject::Fighter * fgt)
 {
 	return call<float>("calcHitRateLevel", fgt);

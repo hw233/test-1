@@ -107,6 +107,7 @@ public:
 	float calcAction(GObject::Fighter *);
 	float calcBattlePoint(GObject::Fighter *);
 	float calcAutoBattle(float, float);
+	float calcSkillBattlePoint(UInt8 color, UInt8 level, UInt8 type, UInt8 ssLevel);
 
 	float calcHP(Battle::BattleFighter *);
 	float calcAction(Battle::BattleFighter *);

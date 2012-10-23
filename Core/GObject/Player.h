@@ -1828,6 +1828,8 @@ namespace GObject
         void sendSoSoMapInfo();
         void getKillMonsterAward();
 
+        UInt32 getBattlePoint();
+        void verifyFighter();
 #ifdef _FB
     public:
         void sendLevelAward();

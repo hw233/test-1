@@ -113,6 +113,7 @@ namespace GObject
 
         static UInt8 reRecharge(const std::string& no, UInt16 id, UInt32 num, std::string& err);
 
+        static void pushEquipment(ItemEquip* e);
 		static ItemEquip * fetchEquipment(UInt32, bool = true);  //获取装备
 		static ItemHalo * fetchHalo(UInt32);    //获取武器，基于fetchEquipment函数实现
 		static ItemFashion * fetchFashion(UInt32);    //获取武器，基于fetchEquipment函数实现

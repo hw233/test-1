@@ -81,6 +81,7 @@ struct DBFormation
 {
 	UInt16 id;
 	std::string name;
+    UInt16 battlePoint;
     UInt8 grid1;
     UInt32 prop1;
     UInt8 grid2;
@@ -120,6 +121,7 @@ struct DBSkill
 {
     UInt16 id;
     std::string name;
+    UInt8 color;        // 技能颜色 1-白色 2-绿色 3-蓝色 4-紫色 5-橙色
     UInt16 cond;        // 触发条件: SKILL_ACTIVE   - 主动
                         //           SKILL_PEERLESS - 无双技能,当灵气>=100释放
                         //           SKILL_PREATK   - 攻击前被动触发(回血技能,无概率)
@@ -556,10 +558,11 @@ SPECIALDEF(24)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBFormation)
-SPECIALDEF(13)
+SPECIALDEF(14)
 	(
 	UInt16, id,
 	std::string, name,
+    UInt16, battlePoint,
     UInt8, grid1,
     UInt32, prop1,
     UInt8, grid2,
@@ -735,10 +738,11 @@ SPECIALEND()
 
 
 SPECIALBEGIN(GData::DBSkill)
-SPECIALDEF(10)
+SPECIALDEF(11)
     (
         UInt16, id,
         std::string, name,
+        UInt8, color,
         UInt8, target,
         UInt16, cond,
         float, prob,

@@ -36,6 +36,7 @@
 #include "MsgHandler/JsonParser.h"
 #include "GObject/LuckyDraw.h"
 #include "GObject/ClanCopy.h"
+#include "GObject/SingleHeroStage.h"
 
 #include "GObject/Tianjie.h"
 #include "GObject/ClanCopy.h"
@@ -199,7 +200,16 @@ GMHandler::GMHandler()
 
     Reg(3, "statue", &GMHandler::OnStatueExp);
     Reg(3, "setcopy", &GMHandler::OnSetClanCopyLevel);
-    Reg(3, "setcopytm", &GMHandler::OnSetClanCopyTime);
+    Reg(3, "setcopytime", &GMHandler::OnSetClanCopyTime);
+
+    Reg(3, "entershs", &GMHandler::OnEnterSingleHeroStage);
+    Reg(3, "nextshs", &GMHandler::OnSingleHeroStageNextTime);
+    Reg(3, "resetshs", &GMHandler::OnSingleHeroStageReset);
+    Reg(3, "gotoshs", &GMHandler::OnSingleHeroStageGoTo);
+    Reg(3, "autonp", &GMHandler::OnNewPlayerAuto);
+    Reg(3, "autosupper", &GMHandler::OnNewPlayerAutoSuper);
+
+    Reg(3, "bp", &GMHandler::OnShowBattlePoint);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -3006,5 +3016,145 @@ void GMHandler::OnOpenTj(GObject::Player* player, std::vector<std::string>& args
 		return;
     int level = atoi(args[0].c_str());
     GObject::Tianjie::instance().manualOpenTj(level);
+}
+
+void GMHandler::OnEnterSingleHeroStage(GObject::Player* player, std::vector<std::string>& arge)
+{
+    UInt32 cnt = 0;
+	if(arge.size() >= 1)
+        cnt = atoi(arge[0].c_str());
+
+    GameMsgHdr imh(0x1AA, WORKER_THREAD_WORLD, NULL, sizeof(cnt));
+    GLOBAL().PushMsg(imh, &cnt);
+}
+
+void GMHandler::OnSingleHeroStageNextTime(GObject::Player* player, std::vector<std::string>& arge)
+{
+    GObject::shStageMgr.setNextTime();
+}
+
+void GMHandler::OnSingleHeroStageReset(GObject::Player* player, std::vector<std::string>& arge)
+{
+    GameMsgHdr imh(0x1A9, WORKER_THREAD_WORLD, NULL, NULL);
+    GLOBAL().PushMsg(imh, NULL);
+}
+
+void GMHandler::OnSingleHeroStageGoTo(GObject::Player* player, std::vector<std::string>& arge)
+{
+	if(arge.size() < 1)
+		return;
+    UInt8 dst = atoi(arge[0].c_str());
+    GObject::shStageMgr.setDstProgress(dst);
+}
+
+void GMHandler::OnNewPlayerAuto(GObject::Player* player, std::vector<std::string>& arge)
+{
+	if(arge.size() < 1)
+		return;
+
+    int cnt = atoi(arge[0].c_str()) + 1000;
+    std::string newname;
+    newname.resize(10);
+
+    for(int playerID = 1000; playerID < cnt; ++ playerID)
+    {
+        newname.clear();
+        char buf[10] = {0};
+        sprintf(buf, "%d", playerID);
+        newname = buf;
+
+        GObject::Player::patchMergedName(playerID, newname);
+        GObject::Player * pl = GObject::globalNamedPlayers[newname];
+        if(pl == NULL)
+        {
+            pl = GObject::globalPlayers[playerID];
+        }
+
+        if(pl != NULL)
+            continue;
+
+        pl = new(std::nothrow) GObject::Player(playerID);
+        if(pl == NULL)
+            continue;
+
+        UInt16 loc = 0x0002;
+        UInt8 country = COUNTRY_NEUTRAL; // XXX: 低级玩家暂时规为中立
+
+        PLAYER_DATA(pl, name) = newname;
+        PLAYER_DATA(pl, country) = country;
+        PLAYER_DATA(pl, formation) = FORMATION_1;
+        PLAYER_DATA(pl, created) = TimeUtil::Now();
+        pl->addNewFormation(FORMATION_1);
+        pl->addNewFormation(FORMATION_2);
+
+        UInt32 fgtId = playerID%6 + 1;
+        PLAYER_DATA(pl, newGuild) = 0;
+
+        GObject::Fighter * fgt2 = GObject::globalFighters[fgtId];
+        GObject::Fighter * fgt = NULL;
+        if(fgt2 != NULL)
+        {
+            fgt = fgt2->clone(pl);
+            if(fgt != NULL)
+                pl->addFighter(fgt, true);
+        }
+        if(fgt == NULL)
+        {
+            delete pl;
+        }
+        else
+        {
+            GObject::Lineup& lup = PLAYER_DATA(pl, lineup)[0];
+            lup.pos = 12;
+            lup.fighter = fgt;
+            lup.updateId();
+
+            DB1().PushUpdateData("INSERT INTO `player` (`id`, `name`, `country`, `location`, `lineup`, `wallow`, `formation`, `formations`) VALUES (%" I64_FMT "u, '%s', %u, %u, '%u,12', %u, %u, '%u,%u')", pl->getId(), newname.c_str(), country, loc, fgtId, PLAYER_DATA(pl, wallow), FORMATION_1, FORMATION_1, FORMATION_2);
+
+            GObject::globalPlayers.add(pl);
+            GObject::newPlayers.add(pl);
+            GObject::globalNamedPlayers.add(newname, pl);
+            pl->SetVar(GObject::VAR_VIPFIRST, 1); // XXX: fix old servers
+
+            DBLOG1().PushUpdateData("insert into register_states(server_id,player_id,player_name,platform,reg_time) values(%u,%"I64_FMT"u, '%s', %u, %u)", cfg.serverLogId, pl->getId(), pl->getName().c_str(), 0, TimeUtil::Now());
+
+            CountryEnterStruct ces(false, 1, loc);
+            GameMsgHdr imh(0x1F0, country, pl, sizeof(CountryEnterStruct));
+            GLOBAL().PushMsg(imh, &ces);
+            UInt8 flag = 0;
+            GameMsgHdr imh2(0x201, country, pl, 1);
+            GLOBAL().PushMsg(imh2, &flag);
+        }
+    }
+}
+
+void GMHandler::OnNewPlayerAutoSuper(GObject::Player* player, std::vector<std::string>& arge)
+{
+	if(arge.size() < 1)
+		return;
+
+    int cnt = atoi(arge[0].c_str()) + 1000;
+    for(int playerID = 1000; playerID < cnt; ++ playerID)
+    {
+        Player* pl = GObject::globalPlayers[playerID];
+        if(!pl)
+            continue;
+
+        std::vector<std::string> cmd;
+        OnSuper(pl, cmd);
+    }
+}
+
+void GMHandler::OnShowBattlePoint(GObject::Player* player, std::vector<std::string>& arge)
+{
+	SYSMSG_SENDV(623, player, static_cast<UInt32>(player->getBattlePoint()));
+
+    for(int i = 0; i < 5; ++ i)
+    {
+        GObject::Lineup& lup = PLAYER_DATA(player, lineup)[i];
+        Fighter* fighter = lup.fighter;
+        if(fighter)
+            SYSMSG_SENDV(624, player, fighter->getName().c_str(), static_cast<UInt32>(fighter->getBattlePoint()));
+    }
 }
 

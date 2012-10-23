@@ -954,7 +954,7 @@ void TownDeamon::getTjItem(Player* pl, UInt8 townLevel)
                 pl->sendMsgCode(0, 1011);
                 return;
             }
-            pl->GetPackage()->Add(s_tjItemId[i], 1, true);
+            pl->GetPackage()->Add(s_tjItemId[i], 1, true, false, FromTJ);
             flag |= (1 << i);
             pl->SetVar(VAR_TJ_TOWN_ITEM_GOT, flag);
         }

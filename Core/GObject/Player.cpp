@@ -1031,7 +1031,8 @@ namespace GObject
             {
                 Network::GameClient * cl = static_cast<Network::GameClient *>(conn.get());
                 struct in_addr inaddr = inet_makeaddr(cl->GetClientIP(), 0);
-                m_ulog->SetUserIP(inet_ntoa(inaddr));
+                //m_ulog->SetUserIP(inet_ntoa(inaddr));
+                m_ulog->SetUserIP(m_clientIp.c_str());
             }
         }
 #endif
@@ -2314,7 +2315,7 @@ namespace GObject
 		{
 			UInt32 p = static_cast<UInt32>((fgt->getPotential()+0.005) * 100);
 			UInt32 c = static_cast<UInt32>((fgt->getCapacity()+0.05) * 100);
-			DB2().PushUpdateData("REPLACE INTO `fighter` (`id`, `playerId`, `potential`, `capacity`, `level`, `experience`)\
+			DB2().PushUpdateData("INSERT INTO `fighter` (`id`, `playerId`, `potential`, `capacity`, `level`, `experience`)\
                     VALUES(%u, %"I64_FMT"u, %u.%02u, %u.%02u, %u, %u)",
                     id, getId(), p / 100, p % 100, c / 100, c % 100, fgt->getLevel(), fgt->getExp());
 
@@ -13575,6 +13576,90 @@ void EventTlzAuto::notify(bool isBeginAuto)
                 break;
         }
         return 0;
+    }
+
+    UInt32 Player::getBattlePoint()
+    {
+        UInt32 bp = 0;
+		for(int j = 0; j < 5; ++ j)
+		{
+            Fighter* fighter = _playerData.lineup[j].fighter;
+            if(fighter)
+                bp += fighter->getBattlePoint();
+		}
+
+        return bp;
+    }
+
+    void Player::verifyFighter()
+    {
+        Fighter* mfgt = NULL;
+        bool find = false;
+        UInt8 maxLevel = 0;
+        for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++it)
+        {
+            Fighter* fgt = it->second;
+            if(fgt->getLevel() > maxLevel)
+                maxLevel = fgt->getLevel();
+            if(fgt->isMainFighter())
+            {
+                if(!mfgt)
+                    mfgt = fgt;
+                else if( fgt->getLevel() <= mfgt->getLevel())
+                {
+                    DB1().PushUpdateData("DELETE FROM `fighter` where `id`=%d and `playerId`=%"I64_FMT"u", fgt->getId(), _id);
+                    std::map<UInt32, Fighter *>::iterator tmp = it;
+                    -- tmp;
+                    _fighters.erase(it);
+                    delete fgt;
+                    find = true;
+                    it = tmp;
+                }
+                else
+                {
+                    DB1().PushUpdateData("DELETE FROM `fighter` where `id`=%d and `playerId`=%"I64_FMT"u", mfgt->getId(), _id);
+                    _fighters.erase(mfgt->getId());
+                    delete mfgt;
+                    mfgt = fgt;
+                    find = true;
+                }
+            }
+        }
+
+        if(find)
+        {
+            bool first = false;
+            bool lfind = false;
+            for(int i = 0; i < 5; ++ i)
+            {
+                Lineup& lup = _playerData.lineup[i];
+                if(lup.fid < 10)
+                {
+                    if(!first)
+                    {
+                        if(lup.fid != mfgt->getId())
+                            lfind = true;
+                        lup.fid = mfgt->getId();
+                        lup.fighter = mfgt;
+                        first = true;
+                    }
+                    else
+                    {
+                        lfind = true;
+                        lup.fid = 0;
+                        lup.fighter = NULL;
+                    }
+                }
+            }
+            if(lfind)
+                storeFighters();
+        }
+
+        if(mfgt->getLevel() < maxLevel)
+        {
+            mfgt->resetLevelAndExp(maxLevel);
+            mfgt->reload2ndSoul();
+        }
     }
 
 } // namespace GObject

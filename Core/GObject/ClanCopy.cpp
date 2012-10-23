@@ -12,13 +12,13 @@
 namespace GObject
 {
 
-//SYSMSG_BROADCASTV(2337, pl->getCountry(), pl->getName().c_str(), level);
 
 
 
 const static UInt32 COPY_ROUTE_COUNT = 3;  // 帮派副本的路径数目
 const static UInt32 COPY_MIN_PLAYER = 5;
 const static UInt32 COPY_EXTRA_PLAYER = 10;     // 怪物冲阵时玩家多拦截的数目（例如据点有人可以多拦怪的数量）
+const static UInt32 MAX_TICK_COUNT = 100;
 
 #ifdef DEBUG_CLAN_COPY
 UInt32 clanCopyFileIndex = 1;
@@ -609,10 +609,24 @@ void ClanCopy::process(UInt32 now)
 
     if (_status != CLAN_COPY_PROCESS)
     {
+        if (_status == CLAN_COPY_LOSE || _status == CLAN_COPY_WIN)
+        {
+            // 这个是怎么进来的？
+            WARN_LOG("ClanCopy: _status = %d.", (UInt32) _status);
+            _status = CLAN_COPY_OVER;
+        }
 #ifdef DEBUG_CLAN_COPY
         count = 0;
 #endif
         return;
+    }
+
+    if (_tickCount > MAX_TICK_COUNT)
+    {
+            // 这个又是怎么进来的？
+            WARN_LOG("ClanCopy: _tickCount = %d.", (UInt32) _tickCount);
+            _status = CLAN_COPY_OVER;
+            return;
     }
 
     if ((now - _tickTime) < _tickTimeInterval)

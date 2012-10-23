@@ -79,8 +79,14 @@ std::vector<UInt8>* BattleReport::operator[]( UInt32 id )
 	FastMutex::ScopedLock lk(_mutex);
 	std::map<UInt32, std::vector<UInt8> >::iterator it = _reports.find(id);
 	if(it == _reports.end())
-		return NULL;
-	if(it->second.empty())
+    {
+        std::vector<UInt8> v;
+        loadReport(id, v);
+        if(!v.empty())
+            _reports[id] = v;
+        return &(_reports[id]);
+    }
+    else if(it->second.empty())
 	{
 		loadReport(id, it->second);
 		if(it->second.empty())

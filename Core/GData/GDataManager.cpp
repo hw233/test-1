@@ -74,211 +74,211 @@ namespace GData
 		if (!LoadExpData())
 		{
 			fprintf(stderr, "Load ExpData Error !\n");
-			return false;
+            std::abort();
 		}
         if(!LoadSoulExpData())
         {
 			fprintf(stderr, "Load SoulExpData Error !\n");
-			return false;
+            std::abort();
         }
 		if (!LoadAcuPraData())
 		{
 			fprintf(stderr, "Load AcuPra Error !\n");
-			return false;
+            std::abort();
 		}
 		if (!LoadAreaData())
 		{
 			fprintf(stderr, "Load AreaData Error !\n");
-			return false;
+            std::abort();
 		}
 		if (!LoadWeaponDefData())
 		{
 			fprintf(stderr, "Load WeaponDefData Error !\n");
-			return false;
+            std::abort();
 		}
         if (!LoadSkillEffect())
         {
 			fprintf(stderr, "Load skill effect Error !\n");
-			return false;
+            std::abort();
         }
         if (!LoadSkills())
         {
 			fprintf(stderr, "Load skills template Error !\n");
-			return false;
+            std::abort();
         }
 		if (!LoadAttrExtraData())
 		{
 			fprintf(stderr, "Load AttrExtraData Error !\n");
-			return false;
+            std::abort();
 		}
 		if (!LoadItemTypeData())
 		{
 			fprintf(stderr, "Load ItemTypeData Error !\n");
-			return false;
+            std::abort();
 		}
 		if (!LoadFormationData())
 		{
 			fprintf(stderr, "Load FormationData Error !\n");
-			return false;
+            std::abort();
 		}
 
         if(!LoadEUpgradeData())
         {
             fprintf(stderr, "Load EUpgradeData Error !\n");
-            return false;
+            std::abort();
         }
 		if (!LoadTaskTypeData())
 		{
 			fprintf(stderr, "Load TaskTypeData Error !\n");
-			return false;
+            std::abort();
 		}
 		if (!LoadLootData())
 		{
 			fprintf(stderr, "Load LootData Error !\n");
-			return false;
+            std::abort();
 		}
 		if(!LoadQueRule())
 		{
 			fprintf(stderr, "Load sale que rule Error !\n");
-			return false;
+            std::abort();
 		}
 		if (!LoadFighterTrainData())
 		{
 			fprintf(stderr, "Load fighter train data Error !\n");
-			return false;
+            std::abort();
 		}
 		if (!LoadPracticeData())
 		{
 			fprintf(stderr, "Load practice data Error !\n");
-			return false;
+            std::abort();
 		}
 		if (!LoadFlushTaskFactor())
 		{
 			fprintf(stderr, "Load flush task factor Error !\n");
-			return false;
+            std::abort();
 		}
 		if (!LoadFlushBookFactor())
 		{
 			fprintf(stderr, "Load flush book factor Error !\n");
-			return false;
+            std::abort();
 		}
 		if (!LoadTripodAward())
 		{
 			fprintf(stderr, "Load flush task factor Error !\n");
-			return false;
+            std::abort();
 		}
         if (!LoadTalent())
         {
 			fprintf(stderr, "Load talent template Error !\n");
-			return false;
+            std::abort();
         }
         if (!LoadCittaEffect())
         {
 			fprintf(stderr, "Load citta effect Error !\n");
-			return false;
+            std::abort();
         }
         if (!LoadCittas())
         {
 			fprintf(stderr, "Load cittas template Error !\n");
-			return false;
+            std::abort();
         }
 		if (!LoadClanLvlData())
 		{
 			fprintf(stderr, "Load clan level template Error !\n");
-			return false;
+            std::abort();
 		}
 		if (!LoadClanTechTable())
 		{
 			fprintf(stderr, "Load clan tech template Error !\n");
-			return false;
+            std::abort();
 		}
 		if (!LoadClanSkillTable())
 		{
 			fprintf(stderr, "Load clan skill template Error !\n");
-			return false;
+            std::abort();
 		}
         if(!LoadSoulSkillTable())
         {
 			fprintf(stderr, "Load soul skill template Error !\n");
-			return false;
+            std::abort();
         }
 		if (!LoadFighterProb())
 		{
 			fprintf(stderr, "Load fighter prob template Error !\n");
-			return false;
+            std::abort();
 		}
 		if (!LoadCopyData())
 		{
 			fprintf(stderr, "Load copy data template Error !\n");
-			return false;
+            std::abort();
 		}
 		if (!LoadFrontMapData())
 		{
 			fprintf(stderr, "Load front map data template Error !\n");
-			return false;
+            std::abort();
 		}
 		if (!LoadOnlineAwardData())
 		{
 			fprintf(stderr, "Load online award template Error !\n");
-			return false;
+            std::abort();
 		}
 		if (!LoadMoney())
 		{
 			fprintf(stderr, "Load money Error !\n");
-			return false;
+            std::abort();
 		}
         if (!LoadHeroMemoMaxSoul())
         {
 			fprintf(stderr, "Load Hero Memo Max Soul Error !\n");
-			return false;
+            std::abort();
         }
         if (!LoadSpiritAttrTable())
         {
 			fprintf(stderr, "Load Spirit Attr Type Error !\n");
-			return false;
+            std::abort();
         }
         if(!LoadSoulItemExp())
         {
 			fprintf(stderr, "Load Soul Item Exp Table Error !\n");
-			return false;
+            std::abort();
         }
         if(!LoadSkillStrengthenExp())
         {
 			fprintf(stderr, "Load Skill Strengthen Exp Table Error !\n");
-			return false;
+            std::abort();
         }
         if(!LoadSkillStrengthenProb())
         {
 			fprintf(stderr, "Load Skill Strengthen Prob Table Error !\n");
-			return false;
+            std::abort();
         }
         if(!LoadSkillStrengthenEffect())
         {
 			fprintf(stderr, "Load Skill Strengthen effect Table Error !\n");
-			return false;
+            std::abort();
         }
         if(!LoadSkillStrengthens())
         {
 			fprintf(stderr, "Load Skill Strengthen Table Error !\n");
-			return false;
+            std::abort();
         }
         
         if (!LoadClanCopy())
         {
             fprintf (stderr, "Load Clan Copy Table Error !\n");
-            return false;
+            std::abort();
         }
 
         if (!LoadClanCopyMonster())
         {
             fprintf (stderr, "Load Clan Copy Monster Table Error !\n");
-            return false;
+            std::abort();
         }
 
         if (!LoadClanStatue())
         {
             fprintf (stderr, "Load Clan Statue Error !\n");
-            return false;
+            std::abort();
         }
 
 		return true;
@@ -1189,6 +1189,7 @@ namespace GData
             SetValOrPercent(ef->magdef, ef->magdefP, effs.magdef);
             ef->tough = effs.tough;
             SetValOrPercent(ef->action, ef->actionP, effs.action);
+            ef->hitrate = effs.hitrate;
             ef->evade = effs.evade;
             ef->critical = effs.critical;
             ef->pierce = effs.pierce;
@@ -1206,13 +1207,14 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBSkill skills;
-		if(execu->Prepare("SELECT `id`, `name`, `target`, `cond`, `prob`, `area`, `factor`, `last`, `cd`, `effectid` FROM `skills`", skills) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `name`, `color`, `target`, `cond`, `prob`, `area`, `factor`, `last`, `cd`, `effectid` FROM `skills`", skills) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
             SkillBase* skill = new SkillBase(skills.id, skills.name);
             if (!skill)
                 return false;
+            skill->color = skills.color;
             skill->target = skills.target;
             skill->cond = skills.cond;
             skill->prob = skills.prob;
@@ -1595,7 +1597,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBFormation dbf;
-		if(execu->Prepare("SELECT `id`, `name`, `grid1`, `prop1`, `grid2`, `prop2`, `grid3`, `prop3`, `grid4`, `prop4`, `grid5`, `prop5`, `levelup_item` FROM `formation`", dbf) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `name`, `battlePoint`, `grid1`, `prop1`, `grid2`, `prop2`, `grid3`, `prop3`, `grid4`, `prop4`, `grid5`, `prop5`, `levelup_item` FROM `formation`", dbf) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -1603,6 +1605,7 @@ namespace GData
             Formation::GridEffect effect;
             const AttrExtraItem* ae = NULL;
 
+            form->setBattlePoint(dbf.battlePoint);
             ae = attrExtraManager[dbf.prop1];
             effect.pos = dbf.grid1;
             if (ae)

@@ -1681,5 +1681,19 @@ void OnSendConsumeRankAward( GameMsgHdr& hdr, const void* data )
     MSG_QUERY_PLAYER(player);
     player->sendConsumeRankAward(*(int*)data);
 }
+
+void OnSHFighterCloneReq( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+	Fighter* fgt = *reinterpret_cast<Fighter**>(const_cast<void *>(data));
+    Fighter* fgtClone = fgt->cloneWithOutDirty(NULL);
+    if(fgt->getId() < 10)
+        fgtClone->setName(fgt->getName());
+
+    GameMsgHdr hdr2(0x1A8, WORKER_THREAD_WORLD, player, sizeof(Fighter**));
+    GLOBAL().PushMsg(hdr2, &fgtClone);
+}
+
+
 #endif // _COUNTRYINNERMSGHANDLER_H_
 

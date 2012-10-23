@@ -34,6 +34,8 @@ public:
 	inline const GridEffect& operator[](int i) const { return _grids[i]; }
 	inline int getLevUpItemCount() const { return static_cast<int>(_levUpItem.size()); }
 	inline const UInt32 LevUpItem(int i) const { return _levUpItem[i]; }
+    inline void setBattlePoint(UInt16 v) { _battlePoint = v; }
+    inline UInt16 getBattlePoint() const { return _battlePoint; }
 
     static bool Testless(const GridEffect& a, const GridEffect& b)
     {
@@ -43,6 +45,7 @@ public:
 private:
 	std::vector<GridEffect> _grids;
     std::vector<UInt32> _levUpItem;
+    UInt16 _battlePoint;
 };
 
 inline void Formation::addGrid(int c, GridEffect* ge)

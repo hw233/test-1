@@ -309,4 +309,6 @@ MSG_REG_2(GameMsgHdr, 0x262, OnTownDeamonAttackNpc);
 MSG_REG_2(GameMsgHdr, 0x257, OnSendRechargeRankAward);
 MSG_REG_2(GameMsgHdr, 0x258, OnSendConsumeRankAward);
 
+MSG_REG_2(GameMsgHdr, 0x263, OnSHFighterCloneReq);
+
 MSG_HANDLER_END()
