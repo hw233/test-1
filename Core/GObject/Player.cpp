@@ -10719,8 +10719,8 @@ namespace GObject
         GetMailBox()->newMail(NULL, 0x12, title, content);
 
 
-        MailPackage::MailItem item[2] = {{9161, 1}, {9162, 1}};
-        sendMailItem(4028, 4028, item, 2);
+        MailPackage::MailItem item[5] = {{9161, 1}, {9162, 1}, {9164, 1}, {9165, 1}, {9166, 1}};
+        sendMailItem(4028, 4028, item, 5);
 #endif
     }
 
