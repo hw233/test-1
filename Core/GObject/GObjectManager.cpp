@@ -4598,6 +4598,13 @@ namespace GObject
 		return base;
 	}
 
+    void GObjectManager::pushEquipment(ItemEquip* e)
+    {
+        if (!e)
+            return;
+        equips[e->getId()] = e;
+    }
+
 	ItemFashion * GObjectManager::fetchFashion( UInt32 id )
 	{
 		ItemEquip * equip = fetchEquipment(id);

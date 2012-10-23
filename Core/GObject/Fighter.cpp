@@ -1022,7 +1022,12 @@ ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
 {
     ItemEquip* t = 0;
     if (trump && trump->getClass() == Item_Halo)
-        return setHalo((ItemHalo*)trump, writedb);
+    {
+        //return setHalo((ItemHalo*)trump, writedb);
+        // XXX: 直接放入包裹
+        GObjectManager::pushEquipment(trump);
+        return NULL;
+    }
     if (!trump || (canSetTrump(idx, trump->getId()) && !checkTrumpMutually(_owner, trump->GetItemType().getId())))
     {
         if
