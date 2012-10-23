@@ -2323,6 +2323,7 @@ namespace GObject
             }
 			gAthleticsRank.addAthleticsFromDB(dbd.row, data);
 		}
+        gAthleticsRank.checkRankL();
 		lc.finalize();
 
 		return true;

@@ -327,6 +327,8 @@ public:
 
     void updateAthleticsRank(AthleticsRankData* data);
     void updateRankL(UInt8 row, Player* player, UInt32 newRank);
+    void adjustRankL(UInt8 row, UInt16 serverNo);
+    void checkRankL();
     void switchRankL(UInt8 row, Player* atker, Player* defer);
     void updateBatchRankerL(UInt8 row, Player* player1, Player* player2);
 	void updateBatchRanker(UInt8, Rank, Rank);

@@ -118,6 +118,65 @@ void AthleticsRank::updateRankL(UInt8 row, Player* player, UInt32 newRank)
     _ranksL[row][player->getServerNo()].insert(cur);
 }
 
+void AthleticsRank::adjustRankL(UInt8 row, UInt16 serverNo)
+{
+    AthlSortType& curType = _ranksL[row][serverNo];
+    bool need = false;
+    RankL iter;
+    UInt32 i;
+    AthlSort cur;
+    AthlSortType sortTypeTmp;
+    for(iter = curType.begin(), i = 1; iter != curType.end() && i <= ATHLETICS_RANK_MAX_CNT; ++iter, ++i)
+    {
+        if(iter->rank != i)
+        {
+            need = true;
+            break;
+        }
+    }
+    if(!need)
+        return;
+    for(iter = curType.begin(), i = 1; iter != curType.end() && i <= ATHLETICS_RANK_MAX_CNT; ++iter, ++i)
+	{
+        cur.player = iter->player;
+        cur.rank = i;
+        sortTypeTmp.insert(cur);
+	}
+
+    for(iter = sortTypeTmp.begin(); iter != sortTypeTmp.end(); ++iter)
+        updateRankL(row, iter->player, iter->rank);
+}
+
+void AthleticsRank::checkRankL()
+{
+    std::vector<UInt16> keys;
+    UInt16 curKey;
+    std::vector<UInt16>::iterator vec_iter;
+    if(!cfg.merged)
+        return;
+    for(UInt8 row = 0; row <= 1; ++row)
+    {
+        RankListL& curList = _ranksL[row];
+        for(std::map<UInt16, AthlSortType>::iterator iter = curList.begin(); iter != curList.end(); ++iter)
+        {
+            curKey = (*iter).first;
+            if(curKey == 0)
+                continue;
+            for(vec_iter = keys.begin(); vec_iter != keys.end(); ++vec_iter)
+            {
+                if(*vec_iter == curKey)
+                    break;
+            }
+            if(vec_iter == keys.end())
+                keys.insert(keys.end(), curKey);
+        }
+        for(vec_iter = keys.begin(); vec_iter != keys.end(); ++vec_iter)
+        {
+            adjustRankL(row, *vec_iter);
+        }
+    }
+}
+
 void AthleticsRank::switchRankL(UInt8 row, Player* atker, Player* defer)
 {
     UInt32 atkerPos = getRankPosL(atker);
@@ -127,28 +186,39 @@ void AthleticsRank::switchRankL(UInt8 row, Player* atker, Player* defer)
     updateRankL(row, defer, atkerPos);
 }
 
-void AthleticsRank::updateBatchRankerL(UInt8 row, Player* player1, Player* player2)
+void AthleticsRank::updateBatchRankerL(UInt8 row, Player* atker, Player* defer)
 {
-    AthlSortType curType = _ranksL[row][player1->getServerNo()];
-    AthlSort cur = {player1, player1->GetVar(VAR_LOCAL_RANK)};
-    AthlSort cur2 = {player2, player2->GetVar(VAR_LOCAL_RANK)};
+    AthlSortType curType = _ranksL[row][atker->getServerNo()];
+    AthlSort cur = {defer, defer->GetVar(VAR_LOCAL_RANK)};
+    AthlSort cur2 = {atker, atker->GetVar(VAR_LOCAL_RANK)};
     RankL begin, end;
     begin = curType.find(cur);
+    if(begin == curType.end())
+        return;
 	end = curType.find(cur2);
-    UInt32 newRank = getRankPosL(player1);
-    UInt32 newRankTmp = newRank;
+    if(end == curType.end())
+        return;
+    AthlSortType sortTypeTmp;
+    AthlSort cur3;
+    UInt32 newRank = getRankPosL(begin->player);
 
-	for (; begin != end && newRank != 0 && newRank <= ATHLETICS_RANK_MAX_CNT;)
+    cur3.player = atker;
+    cur3.rank = newRank;
+    sortTypeTmp.insert(cur3);
+
+	for (RankL iter = begin; iter != end && newRank != 0 && newRank <= ATHLETICS_RANK_MAX_CNT;)
 	{
         ++newRank;
-        updateRankL(row, begin->player, newRank);
-        ++begin;
-        newRank = getRankPosL(row, begin);
+        cur3.player = iter->player;
+        cur3.rank = newRank;
+        sortTypeTmp.insert(cur3);
+        ++iter;
+        if(iter != end)
+            newRank = getRankPosL(iter->player);
 	}
 
-    newRank = newRankTmp;
-    if(newRank != 0 && newRank <= ATHLETICS_RANK_MAX_CNT)
-        updateRankL(row, player2, newRank);
+    for(begin = sortTypeTmp.begin(); begin != sortTypeTmp.end(); ++begin)
+        updateRankL(row, begin->player, begin->rank);
 }
 
 void AthleticsRank::updateBatchRanker(UInt8 row, Rank rank1, Rank rank2)
@@ -176,7 +246,6 @@ void AthleticsRank::addAthleticsFromDB(UInt8 row, AthleticsRankData * data)
         if(rankTmp > ATHLETICS_RANK_MAX_CNT + 1)
             rankTmp = ATHLETICS_RANK_MAX_CNT + 1;
         pl->SetVar(VAR_LOCAL_RANK, rankTmp);
-        rankTmp = data->maxrank;
         if(rankTmp > ATHLETICS_RANK_MAX_CNT + 1)
             rankTmp = ATHLETICS_RANK_MAX_CNT + 1;
         pl->SetVar(VAR_LOCAL_MAXRANK, rankTmp);
@@ -242,28 +311,31 @@ bool AthleticsRank::enterAthleticsReq(Player * player ,UInt8 lev)
             data->oldrank = data->rank;
 			data->maxrank = std::min(_athleticses[1].size(), (size_t)(ATHLETICS_RANK_MAX_CNT + 1));
             DB6().PushUpdateData("UPDATE `athletics_rank` SET `row`=1, `rank`=%u, `maxRank`=%u, `oldrank`=%u where ranker=%"I64_FMT"u", data->rank, data->maxrank, data->oldrank, data->ranker->getId());
-
-            AthlSort cur = {player, player->GetVar(VAR_LOCAL_RANK)};
-            AthlSortType& curType = _ranksL[0][player->getServerNo()];
-            if(!curType.empty())
+            if(cfg.merged)
             {
-                RankL curIter = curType.find(cur);
-                if(curIter != curType.end())
+                AthlSort cur = {player, player->GetVar(VAR_LOCAL_RANK)};
+                AthlSortType& curType = _ranksL[0][player->getServerNo()];
+                if(!curType.empty())
                 {
-                    curType.erase(curIter);
+                    RankL curIter = curType.find(cur);
+                    if(curIter != curType.end())
+                    {
+                        curType.erase(curIter);
+                    }
                 }
-            }
 #if 0
-            UInt32 rankTmp = _ranksL[1][player->getServerNo()].size() + 1;
-            player->SetVar(VAR_LOCAL_RANK, rankTmp);
-            player->SetVar(VAR_LOCAL_MAXRANK, rankTmp);
-            _ranksL[1][player->getServerNo()].insert(cur);
+                UInt32 rankTmp = _ranksL[1][player->getServerNo()].size() + 1;
+                player->SetVar(VAR_LOCAL_RANK, rankTmp);
+                player->SetVar(VAR_LOCAL_MAXRANK, rankTmp);
+                _ranksL[1][player->getServerNo()].insert(cur);
 #endif
-            UInt32 rankTmp = _ranksL[row][player->getServerNo()].size() + 1;
-            if(rankTmp > ATHLETICS_RANK_MAX_CNT + 1)
-                rankTmp = ATHLETICS_RANK_MAX_CNT + 1;
-            player->SetVar(VAR_LOCAL_MAXRANK, rankTmp);
-            updateRankL(row, player, rankTmp);
+                UInt32 rankTmp = _ranksL[row][player->getServerNo()].size() + 1;
+                if(rankTmp > ATHLETICS_RANK_MAX_CNT + 1)
+                    rankTmp = ATHLETICS_RANK_MAX_CNT + 1;
+                player->SetVar(VAR_LOCAL_MAXRANK, rankTmp);
+                updateRankL(row, player, rankTmp);
+                adjustRankL(row, player->getServerNo());
+            }
         }
 	}
 	if (data == NULL)
@@ -322,8 +394,12 @@ bool AthleticsRank::enterAthleticsReq(Player * player ,UInt8 lev)
         AthlSort cur = {player, player->GetVar(VAR_LOCAL_RANK)};
         _ranksL[row][player->getServerNo()].insert(cur);
 #endif
-        player->SetVar(VAR_LOCAL_MAXRANK, _ranksL[row][player->getServerNo()].size() + 1);
-        updateRankL(row, player, _ranksL[row][player->getServerNo()].size() + 1);
+        if(cfg.merged)
+        {
+            player->SetVar(VAR_LOCAL_MAXRANK, _ranksL[row][player->getServerNo()].size() + 1);
+            updateRankL(row, player, _ranksL[row][player->getServerNo()].size() + 1);
+            adjustRankL(row, player->getServerNo());
+        }
 	}
 
 	GameMsgHdr hdr(0x219, player->getThreadId(), player, sizeof(Player *));
@@ -655,6 +731,11 @@ void AthleticsRank::requestAthleticsList(Player * player, UInt16 type)
         {
             pos = getRankPosL(player);
             maxRank = player->GetVar(VAR_LOCAL_MAXRANK);
+            if(maxRank > pos)
+            {
+                maxRank = pos;
+                player->SetVar(VAR_LOCAL_MAXRANK, maxRank);
+            }
             prestige = player->GetVar(VAR_LOCAL_PRESTIGE);
         }
         else
@@ -1510,93 +1591,192 @@ bool AthleticsRank::updateBoxTimeoutAward(Rank rank, UInt8 row, UInt32 now)
 
 void AthleticsRank::TmExtraAward()
 {
-	AthleticsList::iterator start = _athleticses[1].begin();
-	AthleticsList::iterator end = start;
     size_t awardCnt = 10;
 
     if(cfg.merged && World::getMergeAthAct())
     {
         awardCnt = 30;
     }
-    if (_athleticses[1].size() >= awardCnt)
-		std::advance(end, awardCnt);
-	else
-		end = _athleticses[1].end();
-
-	for (UInt16 rank = 1; start != end; ++start, ++rank)
+    if(cfg.merged)
     {
-        UInt16 itemId = 0;
-        UInt8  itemCount = 1;
-		Player *ranker = (*start)->ranker;
-        if(rank == 1)
+        RankListL& curList = _ranksL[1];
+        UInt16 curKey;
+        for(std::map<UInt16, AthlSortType>::iterator iter = curList.begin(); iter != curList.end(); ++iter)
         {
-            itemId = 2;
-            SYSMSG_BROADCASTV(330, ranker->getCountry(), ranker->getName().c_str(), itemId);
-        }
-        else if(rank == 2)
-        {
-            itemId = 3;
-        }
-        else if(rank == 3)
-        {
-            itemId = 4;
-        }
-        else
-        {
-            itemId = 5;
-        }
+            curKey = (*iter).first;
+            if(curKey == 0)
+                continue;
+            AthlSortType curType = _ranksL[1][curKey];
+            RankL startL = curType.begin();
+            RankL endL = startL;
+            if (curType.size() >= awardCnt)
+                std::advance(endL, awardCnt);
+            else
+                endL = curType.end();
 
-        const GData::ItemBaseType *item1 = Package::GetItemBaseType(itemId);
-        if(item1)
-        {
-            Mail *pmail = NULL;
-            MailPackage::MailItem mitem[5] = {{itemId, itemCount}};
-            UInt32 count = 1;
-			MailItemsInfo itemsInfo(mitem, AthliticisTimeAward, count);
-
-            SYSMSG(title, 318);
-			//SYSMSGV(awardStr, 326, item1->getName().c_str());
-			SYSMSGV(content, 325, rank, itemId, itemCount);
-			pmail = ranker->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
-
-            if(pmail != NULL)
+            for (UInt16 rank = 1; startL != endL; ++startL, ++rank)
             {
-                mailPackageManager.push(pmail->id, mitem, count, false);
+                UInt16 itemId = 0;
+                UInt8  itemCount = 1;
+                Player *ranker = (*startL).player;
+                if(rank == 1)
+                {
+                    itemId = 2;
+                    SYSMSG_BROADCASTV(330, ranker->getCountry(), ranker->getName().c_str(), itemId);
+                }
+                else if(rank == 2)
+                {
+                    itemId = 3;
+                }
+                else if(rank == 3)
+                {
+                    itemId = 4;
+                }
+                else
+                {
+                    itemId = 5;
+                }
+
+                const GData::ItemBaseType *item1 = Package::GetItemBaseType(itemId);
+                if(item1)
+                {
+                    Mail *pmail = NULL;
+                    MailPackage::MailItem mitem[5] = {{itemId, itemCount}};
+                    UInt32 count = 1;
+                    MailItemsInfo itemsInfo(mitem, AthliticisTimeAward, count);
+
+                    SYSMSG(title, 318);
+                    //SYSMSGV(awardStr, 326, item1->getName().c_str());
+                    SYSMSGV(content, 325, rank, itemId, itemCount);
+                    pmail = ranker->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+
+                    if(pmail != NULL)
+                    {
+                        mailPackageManager.push(pmail->id, mitem, count, false);
+                    }
+
+                }
+                //udplog
+                char udpStr[32] = {0};
+                sprintf(udpStr, "F_1119_%d", rank);
+                ranker->udpLog("athleticsRank", udpStr, "", "", "", "", "act");
+            }
+
+            RankL start1L = curType.begin();
+            RankL end1L = curType.end();
+            for (UInt32 i = 1; start1L != end1L; ++start1L, ++i)
+            {
+                UInt32 prestige = 0;
+                UInt32 tael = 0;
+                if( i < 25 )
+                    prestige = 850 - ( 25 * ( i - 1 ) - ( i - 1 ) * ( i - 2 ) / 2 );
+                else if( i < 501 )
+                    prestige = 551 - i;
+                else
+                    prestige = 50;
+
+                if( i < 39 )
+                    tael = 18000 - ( 400 * ( i - 1 ) - 10 * ( i - 1 ) * ( i - 2 ) / 2 );
+                else if( i < 501 )
+                    tael = 9830 - ( i - 39 ) * 20;
+                else
+                    tael = 600;
+
+              	RankList::iterator found = _ranks[1].find(start1L->player);
+                start1L->player->SetVar(VAR_LOCAL_PRESTIGE, prestige);
+	            if (found != _ranks[1].end())
+                {
+                    (*found->second)->tael = tael;
+                    DB6().PushUpdateData("UPDATE `athletics_rank` SET `tael` = %u WHERE `ranker` = %"I64_FMT"u", tael, start1L->player);
+                }
             }
 
         }
-        //udplog
-        char udpStr[32] = {0};
-        sprintf(udpStr, "F_1119_%d", rank);
-        ranker->udpLog("athleticsRank", udpStr, "", "", "", "", "act");
+        return;
     }
-
-	AthleticsList::iterator start1 = _athleticses[1].begin();
-	AthleticsList::iterator end1 = _athleticses[1].end();
-	for (UInt32 i = 1; start1 != end1; ++start1, ++i)
+    else
     {
-        UInt32 prestige = 0;
-        UInt32 tael = 0;
-        if( i < 25 )
-            prestige = 850 - ( 25 * ( i - 1 ) - ( i - 1 ) * ( i - 2 ) / 2 );
-        else if( i < 501 )
-            prestige = 551 - i;
+        AthleticsList::iterator start = _athleticses[1].begin();
+        AthleticsList::iterator end = start;
+        if (_athleticses[1].size() >= awardCnt)
+            std::advance(end, awardCnt);
         else
-            prestige = 50;
+            end = _athleticses[1].end();
 
-        if( i < 39 )
-            tael = 18000 - ( 400 * ( i - 1 ) - 10 * ( i - 1 ) * ( i - 2 ) / 2 );
-        else if( i < 501 )
-            tael = 9830 - ( i - 39 ) * 20;
-        else
-            tael = 600;
+        for (UInt16 rank = 1; start != end; ++start, ++rank)
+        {
+            UInt16 itemId = 0;
+            UInt8  itemCount = 1;
+            Player *ranker = (*start)->ranker;
+            if(rank == 1)
+            {
+                itemId = 2;
+                SYSMSG_BROADCASTV(330, ranker->getCountry(), ranker->getName().c_str(), itemId);
+            }
+            else if(rank == 2)
+            {
+                itemId = 3;
+            }
+            else if(rank == 3)
+            {
+                itemId = 4;
+            }
+            else
+            {
+                itemId = 5;
+            }
 
-        AthleticsRankData *rank = *start1;
-        rank->prestige = prestige;
-        rank->tael = tael;
-		DB6().PushUpdateData("UPDATE `athletics_rank` SET `prestige` = %u, `tael` = %u WHERE `ranker` = %"I64_FMT"u", rank->prestige, rank->tael, rank->ranker->getId());
+            const GData::ItemBaseType *item1 = Package::GetItemBaseType(itemId);
+            if(item1)
+            {
+                Mail *pmail = NULL;
+                MailPackage::MailItem mitem[5] = {{itemId, itemCount}};
+                UInt32 count = 1;
+                MailItemsInfo itemsInfo(mitem, AthliticisTimeAward, count);
+
+                SYSMSG(title, 318);
+                //SYSMSGV(awardStr, 326, item1->getName().c_str());
+                SYSMSGV(content, 325, rank, itemId, itemCount);
+                pmail = ranker->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+
+                if(pmail != NULL)
+                {
+                    mailPackageManager.push(pmail->id, mitem, count, false);
+                }
+
+            }
+            //udplog
+            char udpStr[32] = {0};
+            sprintf(udpStr, "F_1119_%d", rank);
+            ranker->udpLog("athleticsRank", udpStr, "", "", "", "", "act");
+        }
+
+        AthleticsList::iterator start1 = _athleticses[1].begin();
+        AthleticsList::iterator end1 = _athleticses[1].end();
+        for (UInt32 i = 1; start1 != end1; ++start1, ++i)
+        {
+            UInt32 prestige = 0;
+            UInt32 tael = 0;
+            if( i < 25 )
+                prestige = 850 - ( 25 * ( i - 1 ) - ( i - 1 ) * ( i - 2 ) / 2 );
+            else if( i < 501 )
+                prestige = 551 - i;
+            else
+                prestige = 50;
+
+            if( i < 39 )
+                tael = 18000 - ( 400 * ( i - 1 ) - 10 * ( i - 1 ) * ( i - 2 ) / 2 );
+            else if( i < 501 )
+                tael = 9830 - ( i - 39 ) * 20;
+            else
+                tael = 600;
+
+            AthleticsRankData *rank = *start1;
+            rank->prestige = prestige;
+            rank->tael = tael;
+            DB6().PushUpdateData("UPDATE `athletics_rank` SET `prestige` = %u, `tael` = %u WHERE `ranker` = %"I64_FMT"u", rank->prestige, rank->tael, rank->ranker->getId());
+        }
     }
-
 #ifdef _FB
     if (World::getNetValentineDay())
     {
