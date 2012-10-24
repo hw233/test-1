@@ -1533,7 +1533,7 @@ namespace GObject
         inline void setJusticeRoar(UInt8 v) { _justice_roar = v; }
         inline UInt8 getJusticeRoar() { return _justice_roar; }
 
-        inline void switchDiffServerRank(bool v) { if(cfg.merged) _switch_diff_rank = v; }
+        inline void switchDiffServerRank(bool v) { if(cfg.merged && _switch_diff_rank != v) _switch_diff_rank = v; }
         inline bool isDiffServerRank() { return cfg.merged && _switch_diff_rank; }
         inline bool isSameServer(Player* player) { return player && (getId() >> 48) == (player->getId() >> 48); }
         inline UInt16 getServerNo() { return static_cast<UInt16>(getId() >> 48); }
