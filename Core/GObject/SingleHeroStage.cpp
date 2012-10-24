@@ -5434,7 +5434,7 @@ namespace GObject
                 {
                     for(int i = 0; i < 3; ++ i)
                     {
-                        Player* pl = m_towerStage[cls]->getTopPlayer(i + 1);
+                        Player* pl = m_towerStage[cls] ? m_towerStage[cls]->getTopPlayer(i + 1) : NULL;
                         if(!pl)
                             st << "" << static_cast<UInt16>(0);
                         else
