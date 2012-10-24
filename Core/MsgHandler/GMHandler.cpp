@@ -211,6 +211,7 @@ GMHandler::GMHandler()
 
     Reg(3, "bp", &GMHandler::OnShowBattlePoint);
     Reg(3, "enterarena", &GMHandler::OnEnterArena);
+    Reg(3, "idipbuy", &GMHandler::OnIdipBuy);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -3155,5 +3156,11 @@ void GMHandler::OnEnterArena(GObject::Player* player, std::vector<std::string>& 
 {
     GameMsgHdr imh(0x1AB, WORKER_THREAD_WORLD, NULL, 0);
     GLOBAL().PushMsg(imh, NULL);
+}
+
+void GMHandler::OnIdipBuy(GObject::Player* player, std::vector<std::string>& arge)
+{
+    std::string err;
+    player->IDIPBuy(505, 2, 100, err);
 }
 

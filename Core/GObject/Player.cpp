@@ -12443,6 +12443,34 @@ namespace GObject
         }
     }
 
+    int Player::IDIPBuy(UInt32 itemId, UInt32 num, UInt32 price, std::string& err, bool bind)
+    {
+        const GData::ItemBaseType* ibt = GData::itemBaseTypeManager[itemId];
+        if (!ibt)
+        {
+            err = "物品不存在";
+            return -101;
+        }
+
+        if (getGold() < price)
+        {
+            err = "仙石不足";
+            return -102;
+        }
+
+        if (GetPackage()->GetRestPackageSize() < (itemId+ibt->maxQuantity)/ibt->maxQuantity)
+        {
+            err = "背包空间不足";
+            return -103;
+        }
+
+		ConsumeInfo ci(IDIPBuyItem,0,0);
+        useGold(price, &ci);
+
+        GetPackage()->Add(itemId, num, bind);
+        return 0;
+    }
+
     void Player::sendFourCopAct()
     {
         UInt16 lengxueCnt;
