@@ -160,6 +160,9 @@ enum ItemFrom
     FromIDIP,
     FromQixi,
     FromKillMonster, //斩妖除魔
+    FromNewRC7DayLogin,
+    FromNewRC7DayRecharge,
+    FromNewRC7DayTarget,
 };
 
 enum ItemTo

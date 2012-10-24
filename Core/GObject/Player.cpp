@@ -10480,6 +10480,26 @@ namespace GObject
         _lastKillMonsterAward.clear();
     }
 
+    void Player::sendNewRC7DayInfo(UInt8 type /* = 0 */)
+    {
+        // TODO:  发送新注册七日活动页面信息
+    }
+
+    void Player::getNewRC7DayLoginAward(UInt8 val)
+    {
+        // TODO: 申请领取新注册七天登录奖励 (包括补签)
+    }
+
+    void Player::getNewRC7DayRechargeAward(UInt8 val)
+    {
+        // TODO: 申请领取新注册七天充值奖励 (神龙许愿)
+    }
+    
+    void Player::getNewRC7DayTargetAward(UInt8 val)
+    {
+        // TODO: 申请领取新注册七天每日目标奖励 
+    }
+
     TripodData& Player::runTripodData(TripodData& data, bool init)
     {
         if (&data != &m_td)

@@ -1753,6 +1753,10 @@ namespace GObject
         void checkLastQueqiaoAward();
         void lastKillMonsterAwardPush(UInt16 itemId, UInt16 num);
         void checkLastKillMonsterAward();
+        void sendNewRC7DayInfo(UInt8 type = 0);
+        void getNewRC7DayLoginAward(UInt8 val);
+        void getNewRC7DayRechargeAward(UInt8 val);
+        void getNewRC7DayTargetAward(UInt8 val);
 
         // 帮派神像
         float getClanStatueHPEffect();

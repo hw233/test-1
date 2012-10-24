@@ -189,15 +189,87 @@ function RunNewRegisterAward(player)
     return j;
 end
 
+function RunNewRC7DayLoginAward(player, cts)
+    -- 领取新注册七日登录奖励
+    local item = {
+        [1] = {{499,20},{56, 2}, {57, 2}},
+        [2] = {{499,20},{502, 5}, {503, 2},{15,5}},
+        [3] = {{499,30},{500, 5}, {501, 2},{15,5}},
+        [4] = {{499,30},{509, 1}, {507, 1},{511,3}},
+        [5] = {{499,40},{509, 1}, {507, 1},{5025,1},{512,4}},
+        [6] = {{499,40},{509, 1}, {507, 1},{514,5},{515,2}},
+        [7] = {{499,50},{509, 1}, {507, 1},{517,5},{1528,2},{15,5}},
+    };
+    local package = player:GetPackage();
+
+    if cts == 0 then
+        return false
+    end
+    if cts > 7 then
+        return false
+    end
+
+    if package:GetRestPackageSize() < ((#item[cts] - 1) +((#item[cts] - 1)*num*4)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    for count = 1, #item[cts] do
+        package:Add(item[cts][count][1], item[cts][count][2], true, 0, 34);
+    end
+end
+
+function RunNewRC7DayRechargeAward(player)
+    -- TODO: 领取新注册七日充值奖励（神龙许愿）
+end
+
+function RunNewRC7DayTargetAward(player)
+    -- TODO: 领取新注册七日每日目标奖励
+    if player == nil then
+        return 0;
+    end
+
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < 1 then
+        player:sendMsgCode(2, 1011, 0);
+        return 0;
+    end
+    if not isFBVersion() then
+        for i = 3, 32 do
+            if player:hasRealItemAward(i) then
+                player:getRealItemAward(i)
+                Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]在新手注册邀请好友抽奖活动中获得10QB大奖，让我们一起来祝贺他。玩蜀山传奇，下一个幸运儿就是你！！！！！！！")
+                return 8;
+            end
+        end
+    end
+    --local chance = {379,1895,2400,5768,9558,9991,10000}
+    local chance = {379, 1895, 5000, 5000, 5000, 9991, 10000}
+    local item =   {515, 503,  507,  501,  56,   509,  500,--[["10QB"]] }
+    local j = 0;
+    local g = math.random(1, 10000)
+    for i = 1, #chance do
+        if g <= chance[i] then
+            player:RegisterAward(item[i], 1);
+            package:AddItem(item[i], 1, true, true, 31);
+            j = i;
+            break
+        end
+    end
+
+    return j;
+end
+
 function RunBirthdayAward(player)
     if player == nil then
         return 0;
     end
     local package = player:GetPackage();
-	if package:GetRestPackageSize() < 1 then
-		player:sendMsgCode(2, 1011, 0);
-		return 0;
-	end
+    if package:GetRestPackageSize() < 1 then
+        player:sendMsgCode(2, 1011, 0);
+        return 0;
+    end
     local chance = {5000, 5300, 5500, 5500, 5500, 6000, 6000, 10000}
     local item = {503, 509, 515, "QB", "Ipad", 507, "Iphone", 500 }
     local j = 0; 
@@ -215,58 +287,58 @@ end
 
 local PlatformAward =  
 { --平台id
-    [1]  = {    -- "QQ空间"
-        --1:推广用注册玩家登录奖励领取
-        --2:回流用户新区道具奖
-        [1] = {}, --id,num
-		[2] = {},
-		[3] = {{515, 5},{503, 5},{507,5},{509,5},{1528,5},{440,5},{1325,5}},
+[1]  = {    -- "QQ空间"
+--1:推广用注册玩家登录奖励领取
+--2:回流用户新区道具奖
+[1] = {}, --id,num
+[2] = {},
+[3] = {{515, 5},{503, 5},{507,5},{509,5},{1528,5},{440,5},{1325,5}},
     },
     [2]  = {    -- "朋友网"
-        [1] = {}, --id,num
-		[2] = {},
-		[3] = {{515, 5},{503, 5},{507,5},{509,5},{1528,5},{440,5},{1325,5}},
-    },
-    [3]  = {    -- "qq微博"
-        [1] = {}, --id,num
-		[2] = {},
-		[3] = {{515, 5},{503, 5},{507,5},{509,5},{1528,5},{440,5},{1325,5}},
+    [1] = {}, --id,num
+    [2] = {},
+    [3] = {{515, 5},{503, 5},{507,5},{509,5},{1528,5},{440,5},{1325,5}},
+},
+[3]  = {    -- "qq微博"
+[1] = {}, --id,num
+[2] = {},
+[3] = {{515, 5},{503, 5},{507,5},{509,5},{1528,5},{440,5},{1325,5}},
     },
     [4]  = {    -- "Q+"
-        [1] = {}, --id,num
-		[2] = {},
-		[3] = {{515, 5},{503, 5},{507,5},{509,5},{1528,5},{440,5},{1325,5}},
-    },
-    [5]  = {    -- "财付通"
-        [1] = {}, --id,num
-		[2] = {},
-		[3] = {{515, 5},{503, 5},{507,5},{509,5},{1528,5},{440,5},{1325,5}},
+    [1] = {}, --id,num
+    [2] = {},
+    [3] = {{515, 5},{503, 5},{507,5},{509,5},{1528,5},{440,5},{1325,5}},
+},
+[5]  = {    -- "财付通"
+[1] = {}, --id,num
+[2] = {},
+[3] = {{515, 5},{503, 5},{507,5},{509,5},{1528,5},{440,5},{1325,5}},
     },
     [10] = {    -- "QQ游戏大厅"
-        [1] = {}, --id,num
-		[2] = {},
-		[3] = {{515, 5},{503, 5},{507,5},{509,5},{1528,5},{440,5},{1325,5}},
-    },
-    [11] = {    -- "3366"
-        [1] = {}, --id,num
-		[2] = {},
-		[3] = {{515, 5},{503, 5},{507,5},{509,5},{1528,5},{440,5},{1325,5}},
+    [1] = {}, --id,num
+    [2] = {},
+    [3] = {{515, 5},{503, 5},{507,5},{509,5},{1528,5},{440,5},{1325,5}},
+},
+[11] = {    -- "3366"
+[1] = {}, --id,num
+[2] = {},
+[3] = {{515, 5},{503, 5},{507,5},{509,5},{1528,5},{440,5},{1325,5}},
     },
     [12] = {    -- "官网"
-        [1] = {}, --id,num
-        [2] = {},
-		[3] = {{515, 5},{503, 5},{507,5},{509,5},{1528,5},{440,5},{1325,5}},
-    },
-    [16] = {    -- gamelife
-        [1] = {}, --id,num
-		[2] = {},
-		[3] = {{515, 5},{503, 5},{507,5},{509,5},{1528,5},{440,5},{1325,5}},
+    [1] = {}, --id,num
+    [2] = {},
+    [3] = {{515, 5},{503, 5},{507,5},{509,5},{1528,5},{440,5},{1325,5}},
+},
+[16] = {    -- gamelife
+[1] = {}, --id,num
+[2] = {},
+[3] = {{515, 5},{503, 5},{507,5},{509,5},{1528,5},{440,5},{1325,5}},
     },
     [17] = {    -- qqunion
-        [1] = {}, --id,num
-		[2] = {},
-		[3] = {{515, 5},{503, 5},{507,5},{509,5},{1528,5},{440,5},{1325,5}},
-    },
+    [1] = {}, --id,num
+    [2] = {},
+    [3] = {{515, 5},{503, 5},{507,5},{509,5},{1528,5},{440,5},{1325,5}},
+},
 }
 
 function RunNewRegisterAwardAD_RF(player, idx)
@@ -284,10 +356,10 @@ function RunNewRegisterAwardAD_RF(player, idx)
     end
     local award = aw[idx]
     local package = player:GetPackage()
-	if package:GetRestPackageSize() < #award then
-		player:sendMsgCode(2, 1011, 0)
-		return 0
-	end
+    if package:GetRestPackageSize() < #award then
+        player:sendMsgCode(2, 1011, 0)
+        return 0
+    end
     for _, val in pairs(award) do 
         package:Add(val[1], val[2], true, false, 31)
     end

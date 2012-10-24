@@ -5039,6 +5039,50 @@ void OnRF7Day( GameMsgHdr& hdr, const void* data )
     }
 }
 
+void OnNewRC7Day(GameMsgHdr& hdr, const void* data )
+{
+    // TODO: 新版注册七日活动
+	MSG_QUERY_PLAYER(player);
+
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 op = 0;
+    br >> op;
+
+    switch(op)
+    {
+        case 0:
+            // 刷新新注册七日活动页面信息
+            player->sendNewRC7DayInfo();
+            break;
+        case 1:
+            // 登录签到
+            {
+                UInt8 val = 0;
+                br >> val;
+                player->getNewRC7DayLoginAward(val);
+            }
+            break;
+        case 2:
+            // 神龙许愿（新注册充值奖励）
+            {
+                UInt8 val = 0;
+                br >> val;
+                player->getNewRC7DayRechargeAward(val);
+            }
+            break;
+        case 3:
+            // 每日目标抽奖
+            {
+                UInt8 val = 0;
+                br >> val;
+                player->getNewRC7DayTargetAward(val);
+            }
+            break;
+        default:
+            break;
+    }
+}
+
 void OnYBBuf( GameMsgHdr& hdr, YBBuf& req )
 {
     MSG_QUERY_PLAYER(player);

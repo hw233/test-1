@@ -1245,6 +1245,24 @@ namespace Script
 		return Call<UInt8>("RunBirthdayAward", player);
     }
 
+    UInt8 GameActionLua::RunNewRC7DayLoginAward(Player* player)
+    {
+        assert(player != NULL);
+        return Call<UInt8>("RunNewRC7DayLoginAward", player);
+    }
+
+    UInt8 GameActionLua::RunNewRC7DayRechargeAward(Player* player)
+    {
+        assert(player != NULL);
+        return Call<UInt8>("RunNewRC7DayRechargeAward", player);
+    }
+
+    UInt8 GameActionLua::RunNewRC7DayTargetAward(Player* player)
+    {
+        assert(player != NULL);
+        return Call<UInt8>("RunNewRC7DayTargetAward", player);
+    }
+
     void GameActionLua::sendRNR(Player* player, UInt32 now, UInt32 date, UInt32 total)
     {
 		return Call<void>("sendRNR", player, now, date, total);

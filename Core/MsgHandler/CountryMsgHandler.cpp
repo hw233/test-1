@@ -161,6 +161,7 @@ MSG_REG_2(GameMsgHdr, REQ::ACTIVITY_SIGNIN, OnActivitySignIn);
 MSG_REG_2(GameMsgHdr, REQ::SECOND_SOUL, OnSecondSoulReq);
 MSG_REG_2(GameMsgHdr, REQ::RC7DAY, OnRC7Day);
 MSG_REG_2(GameMsgHdr, REQ::RF7DAY, OnRF7Day);
+MSG_REG_2(GameMsgHdr, REQ::NEWRC7DAY, OnNewRC7Day);
 
 MSG_REG_2(GameMsgHdr, REQ::TIANJIE, OnTianjieReq);
 
