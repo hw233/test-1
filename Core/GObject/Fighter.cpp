@@ -4959,6 +4959,5 @@ void Fighter::resetLevelAndExp(UInt8 maxLevel)
     DB1().PushUpdateData("UPDATE `fighter` SET `experience` = %"I64_FMT"u, `level`=%u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", exp, _level, _id, _owner->getId());
 }
 
-
 }
 

@@ -1823,9 +1823,7 @@ namespace GObject
         void getKillMonsterAward();
 
         UInt32 getBattlePoint();
-
         void verifyFighter();
-
 #ifdef _FB
     public:
         void sendLevelAward();
