@@ -315,6 +315,80 @@ function RunBirthdayAward(player)
     return j;
 end
 
+function RunBlueDiamondAward(player, opt)
+    if player == nil then
+        return 0;
+    end
+    local package = player:GetPackage();
+	if package:GetRestPackageSize() < 8 then
+		player:sendMsgCode(2, 1011, 0);
+		return 0;
+	end
+    local date_9190_0 = { ['year'] = 2012, ['month'] = 10, ['day'] = 26, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+    local date_9190_1 = { ['year'] = 2012, ['month'] = 11, ['day'] = 2, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+    local date_9191_0 = { ['year'] = 2012, ['month'] = 10, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+    local date_9191_1 = { ['year'] = 2012, ['month'] = 11, ['day'] = 3, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+    local date_0 = os.time(date_9190_0);
+    local date_1 = os.time(date_9190_1);
+
+    local chance = {1852, 2593, 3333, 4444, 5926, 6667, 8148, 10000}
+    local item_9190 = {{515,3},{507,2},{509,2},{503,10},{1325,4},{47,3},{1528,4},{5026,1}}
+    local item_9191 = {{515,3},{507,3},{509,3},{503,10},{1325,4},{47,3},{1528,4},{5026,1}}
+    local items = item_9190;
+    local itemId = 9190;
+
+    if opt == 2 then
+        itemId = 9191;
+        items = item_9191;
+        date_0 = os.time(date_9191_0);
+        date_1 = os.time(date_9190_1);
+    end
+    now = os.time()
+    if now < date_0 or now >= date_1 then
+        return 0;
+    end
+
+    if  not package:DelItem(itemId, 1, true) then
+        if  not package:DelItem(itemId, 1, false) then
+            player:sendMsgCode(2, 1110, 0);
+            return 0;
+        end
+    end
+
+    local j = 0; 
+    local g = math.random(1, 10000)
+    for i = 1, #chance do
+        if g <= chance[i] then
+            package:Add(items[i][1], items[i][2], true, 0, 31);
+            j = i;
+            break
+        end
+    end
+
+    local VAR_BLUE_AWARD_COUNT = 196;
+    local VAR_YELLOW_AWARD_COUNT = 197;
+    local count = 0;
+    if opt == 1 then
+        player:AddVar(VAR_BLUE_AWARD_COUNT, 1);
+        count = player:GetVar(VAR_BLUE_AWARD_COUNT);
+        if count == 5 then
+            package:Add(1707, 1, true, 0, 31);
+        end
+    elseif opt == 2 then
+        player:AddVar(VAR_YELLOW_AWARD_COUNT, 1);
+        count = player:GetVar(VAR_YELLOW_AWARD_COUNT);
+        if count == 12 then
+            package:Add(9076, 5, true, 0, 31); 
+            package:Add(515, 5, true, 0, 31); 
+            package:Add(507, 5, true, 0, 31); 
+            package:Add(509, 5, true, 0, 31); 
+        end
+    end
+
+    return j;
+end
+
+
 local PlatformAward =  
 { --平台id
 [1]  = {    -- "QQ空间"

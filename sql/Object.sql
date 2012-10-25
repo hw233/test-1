@@ -1550,6 +1550,9 @@ CREATE TABLE `sh_global` (
     `session` int(11) NOT NULL DEFAULT '1',
     `nextTime` int(11) NOT NULL DEFAULT '0',
     `progress` tinyint(3) NOT NULL DEFAULT '0',
+    `open` tinyint(3) NOT NULL DEFAULT '0',
+    `timeBegin` int(11) NOT NULL DEFAULT '0',
+    `timeEnd` int(11) NOT NULL DEFAULT '0',
     `cls1TowerLevel` smallint(6) NOT NULL DEFAULT '0',
     `cls2TowerLevel` smallint(6) NOT NULL DEFAULT '0',
     `cls3TowerLevel` smallint(6) NOT NULL DEFAULT '0'

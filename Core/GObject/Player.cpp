@@ -527,7 +527,7 @@ namespace GObject
 		_availInit(false), _vipLevel(0), _clan(NULL), _clanBattle(NULL), _flag(0), _gflag(0), _onlineDuration(0), _offlineTime(0),
 		_nextTavernUpdate(0), _nextBookStoreUpdate(0), _bossLevel(21), _ng(NULL), _lastNg(NULL),
 		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), m_autoCopyFailed(false),
-        _justice_roar(0), _spirit_factor(1.0f), _diamond_privilege(false), _qqvip_privilege(false), _athlRivalBuf(0), _worldBossHp(0), m_autoCopyComplete(0), hispot(0xFF), hitype(0),
+        _justice_roar(0), _spirit_factor(1.0f), _diamond_privilege(false), _qqvip_privilege(false), _athlRivalBuf(0), _new_rank(false), _worldBossHp(0), m_autoCopyComplete(0), hispot(0xFF), hitype(0),
 #ifndef _WIN32
 		m_ulog(NULL),
 #endif
@@ -569,6 +569,10 @@ namespace GObject
         m_ulog = _analyzer.GetInstance(buf);
         m_ulog->SetUserIP("0.0.0.0");
 #endif
+        /*if(cfg.merged)
+            _new_rank = true;
+        else
+            _new_rank = false;*/
 	}
 
 
@@ -1449,6 +1453,14 @@ namespace GObject
             snprintf (action, 16, "F_%d", id);
         }
         udpLog("tripod", action, "", "", "", "", "act", num);
+    }
+
+    void Player::storeUdpLog(UInt32 id, UInt32 type, UInt32 itemId, UInt32 num /* = 1 */)
+    {
+        // TODO: 商城购买相关日志（现在只有荣誉和声望）
+        char action[32] = "";
+        snprintf (action, 16, "F_%d_%d_%d", id, type, itemId);
+        udpLog("store", action, "", "", "", "", "act", num);
     }
 
     void Player::sendHalloweenOnlineAward(UInt32 now, bool _online)
@@ -2503,6 +2515,7 @@ namespace GObject
 				m_Package->EquipTo(0, fgt, z+0x20, equip, true);
             for(UInt8 t = 0; t < 3; ++ t)
 				m_Package->EquipTo(0, fgt, t+0x0a, equip, true);
+            m_Package->EquipTo(0, fgt, 0x1f, equip, true);
 
 			_fighters.erase(it);
 			DB2().PushUpdateData("DELETE FROM `fighter` WHERE `id` = %u AND `playerId` = %"I64_FMT"u", id, getId());
@@ -2682,13 +2695,11 @@ namespace GObject
 		}
         st << GetVar(VAR_MONEY_ARENA);
         st << getClanProffer();
-        UInt8 cnt = _playerData.titleAll.size();
-        st << cnt;
-        for(UInt8 i = 0; i < cnt; ++i)
-        {
-            st << _playerData.titleAll[i];
-        }
+        bool fchange = makeTitleAllInfo(st);
         st << Stream::eos;
+
+        if(fchange)
+            writeTitleAll();
 	}
 
 	void Player::makeFormationInfo( Stream& st )
@@ -4688,42 +4699,112 @@ namespace GObject
 		return _playerData.status;
 	}
 
-	void Player::setTitle( UInt8 t )
+    UInt8 Player::getTitle()
+    {
+        UInt32 timeLeft = 0;
+        if(CURRENT_THREAD_ID() == getThreadId())
+        {
+            GameMsgHdr h(0x264,  getThreadId(), this, 0);
+            GLOBAL().PushMsg(h, NULL);
+            if(!checkTitleTimeEnd(_playerData.title, timeLeft))
+            {
+                notifyTitleAll();
+                writeTitleAll();
+                changeTitle(0);
+            }
+        }
+
+        return _playerData.title;
+    }
+
+    void Player::loadTitleAll(UInt8 t, UInt32 timeEnd)
+    {
+        std::map<UInt8, UInt32>& titleAll = _playerData.titleAll;
+        titleAll[t] = timeEnd;
+    }
+
+	void Player::fixOldVertionTitle( UInt8 t)
 	{
+        _playerData.titleAll[t] = 0;
+        writeTitleAll();
+	}
+
+	void Player::setTitle( UInt8 t, UInt32 timeLen )
+	{
+        if(CURRENT_THREAD_ID() != getThreadId())
+        {
+            struct TitleData
+            {
+                UInt8 title;
+                UInt32 timeLen;
+            } titleData = {t, timeLen};
+            GameMsgHdr h(0x265,  getThreadId(), this, sizeof(titleData));
+            GLOBAL().PushMsg(h, &titleData);
+            return;
+        }
+
+        std::map<UInt8, UInt32>& titleAll = _playerData.titleAll;
+        bool flag = false;
+        std::map<UInt8, UInt32>::iterator it = _playerData.titleAll.find(t);
+        if(it == titleAll.end())
+        {
+            if(timeLen == 0)
+                titleAll[t] = 0;
+            else
+                titleAll[t] = TimeUtil::Now() + timeLen;
+            flag = true;
+        }
+        else if(it->second != 0)
+        {
+            if(timeLen == 0)
+                titleAll[t] = 0;
+            else
+                titleAll[t] = TimeUtil::Now() + timeLen;
+            flag = true;
+        }
+        bool fchange = notifyTitleAll();
+        if(flag || fchange)
+        {
+            writeTitleAll();
+        }
+
 		if(t == _playerData.title)
 			return;
 		_playerData.title = t;
 		sendModification(6, _playerData.title);
 		rebuildBattleName();
+	}
 
-        std::vector<UInt8>& titleAll = _playerData.titleAll;
-        bool flag = false;
-        std::vector<UInt8>::iterator it = find(titleAll.begin(), titleAll.end(), t);
-        if(it == titleAll.end()){
-            titleAll.push_back(t);
-            flag = true;
-        }
-        UInt8 cnt = titleAll.size();
-        if(flag){
-            std::string title = "";
-            if(!cnt)
-                title += "0|";
-            for(UInt8 i = 0; i < cnt; ++i)
-            {
-                title += Itoa(titleAll[i]);
-                title += '|';
-            }
-            DB1().PushUpdateData("UPDATE `player` SET `titleAll` = '%s' WHERE `id` = %"I64_FMT"u", title.c_str(), getId());
-        }
-	    Stream st(REP::USER_INFO_CHANGE);
-        st << static_cast<UInt8>(0x17) << cnt;
-        for(UInt8 i = 0; i < cnt; ++i)
-        {
-            st << titleAll[i];
-        }
+    bool Player::notifyTitleAll()
+    {
+        Stream st(REP::USER_INFO_CHANGE);
+        st << static_cast<UInt8>(0x17);
+        bool flag = makeTitleAllInfo(st);
         st << Stream::eos;
         send(st);
-	}
+
+        return flag;
+    }
+
+    void Player::changeTitle(UInt8 t)
+    {
+        if(!hasTitle(t))
+            return;
+
+        UInt32 timeLeft = 0;
+        if(!checkTitleTimeEnd(t, timeLeft))
+        {
+            notifyTitleAll();
+            writeTitleAll();
+            return;
+        }
+
+		if(t == _playerData.title)
+			return;
+		_playerData.title = t;
+		sendModification(6, _playerData.title);
+		rebuildBattleName();
+    }
 
 	UInt32 Player::getAchievement( UInt32 a )
 	{
@@ -9890,6 +9971,10 @@ namespace GObject
         case 11:
             getAwardLogin(opt);
             break;
+        case 12:
+            getAwardBlueDiamond(opt);
+            break;
+     
         }
     }
 
@@ -10132,6 +10217,19 @@ namespace GObject
                 st << static_cast<UInt8>(11) << static_cast<UInt8>(0) << Stream::eos;
                 send(st);
             }
+        }
+    }
+
+    void Player::getAwardBlueDiamond(UInt8 opt)
+    {
+        if(opt == 1 || opt == 2) //抽奖
+        {
+            UInt8 idx = 0;
+            if( 0 == (idx = GameAction()->RunBlueDiamondAward(this, opt)) )
+                return;
+            Stream st(REP::GETAWARD);
+            st << static_cast<UInt8>(12) << idx << Stream::eos;
+            send(st);
         }
     }
 
@@ -12592,6 +12690,7 @@ namespace GObject
         useGold(price, &ci);
 
         GetPackage()->Add(itemId, num, bind);
+        err = "购买成功";
         return 0;
     }
 
@@ -13808,6 +13907,83 @@ void EventTlzAuto::notify(bool isBeginAuto)
             mfgt->resetLevelAndExp(maxLevel);
             mfgt->reload2ndSoul();
         }
+    }
+
+    bool Player::hasTitle(UInt8 title)
+    {
+        std::map<UInt8, UInt32>::iterator it = _playerData.titleAll.find(title);
+        if(it == _playerData.titleAll.end())
+            return false;
+        return true;
+    }
+
+    bool Player::checkTitleTimeEnd(UInt8 title, UInt32& timeLeft)
+    {
+        UInt32 now = TimeUtil::Now();
+        std::map<UInt8, UInt32>::iterator it = _playerData.titleAll.find(title);
+        if(it == _playerData.titleAll.end())
+            return false;
+
+        timeLeft = 0;
+        if(it->second == 0)
+            return true;
+
+        if(it->second > now)
+        {
+            timeLeft = it->second - now;
+            return true;
+        }
+
+        _playerData.titleAll.erase(title);
+        return false;
+    }
+
+    bool Player::makeTitleAllInfo(Stream& st)
+    {
+        bool flag = false;
+        std::map<UInt8, UInt32>& titleAll = _playerData.titleAll;
+        UInt8 cnt = titleAll.size();
+        size_t offset = st.size();
+        st << cnt;
+        for(std::map<UInt8, UInt32>::iterator it = titleAll.begin(); it != titleAll.end();)
+        {
+            UInt32 timeLeft = 0;
+            std::map<UInt8, UInt32>::iterator tmp = it;
+            ++ tmp;
+            if(checkTitleTimeEnd(it->first, timeLeft))
+            {
+                st << it->first << static_cast<UInt32>(timeLeft);
+            }
+            else
+            {
+                flag = true;
+                -- cnt;
+            }
+            it = tmp;
+        }
+        st.data<UInt8>(offset) = cnt;
+
+        return flag;
+    }
+
+    void Player::writeTitleAll()
+    {
+        std::map<UInt8, UInt32>& titleAll = _playerData.titleAll;
+        UInt8 cnt = titleAll.size();
+        std::string title = "";
+
+        if(!cnt)
+            title += "0,0|";
+
+        for(std::map<UInt8, UInt32>::iterator it = titleAll.begin(); it != titleAll.end(); ++ it)
+        {
+            title += Itoa(it->first);
+            title += ',';
+            title += Itoa(it->second);
+            title += '|';
+        }
+
+        DB1().PushUpdateData("UPDATE `player` SET `titleAll` = '%s' WHERE `id` = %"I64_FMT"u", title.c_str(), getId());
     }
 
 } // namespace GObject

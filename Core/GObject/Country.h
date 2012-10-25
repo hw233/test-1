@@ -63,6 +63,7 @@ private:
     static void Hero_Island_Check(void *);
     static void ClanRankBattleCheck(void *);
     static void TownDeamonTmAward(void *);
+    static void PhysicalCheckTimer(void *para);
 
     static void ClanCopyCheck(void *);
     static void ClanCopyResetBegin(void *);

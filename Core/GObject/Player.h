@@ -429,14 +429,13 @@ namespace GObject
             lastTjEventScore = 0;
             lastTjTotalScore = 0;
             isHHBlue = false;
-            titleAll.reserve(32);
         }
 
 
 		std::string name;           // ????
 		UInt32 gold;	            // Ԫ??
 		UInt32 coupon;	            // ??ȯ
-		UInt32 tael;	            // ??}
+		UInt32 tael;	            // ??
 		UInt32 coin;	            // ͭǮ
         UInt32 prestige;            // ????
 		UInt32 status;              // ״̬:0x01 - pk???? 0x02 - ?д轿0x04 - С?????? 0x80 - ??ֹ̽??
@@ -516,7 +515,7 @@ namespace GObject
 
         bool isHHBlue;
         std::string nameNoSuffix;     //(合服)不带后缀的用户名
-        std::vector<UInt8> titleAll;      //玩家所有的称号id
+        std::map<UInt8, UInt32> titleAll;      //玩家所有的称号id
     };
 
 	class Player:
@@ -964,9 +963,16 @@ namespace GObject
 		{ return (_playerData.status >> bitStart) & (((1 << bitCount) - 1)); }
 		bool canClosePK();
 
-		void setTitle(UInt8 s);
-		inline UInt8 getTitle() { return _playerData.title; }
-		inline std::vector<UInt8>& getTitleAll() { return _playerData.titleAll; }
+        void loadTitleAll(UInt8 t, UInt32 timeEnd);
+        void fixOldVertionTitle(UInt8 t);
+		void setTitle(UInt8 s, UInt32 timeLen = 0);
+		UInt8 getTitle();
+        bool checkTitleTimeEnd(UInt8 title, UInt32& timeLeft);
+        bool makeTitleAllInfo(Stream& st);
+        bool hasTitle(UInt8);
+        void changeTitle(UInt8 t);
+        bool notifyTitleAll();
+        void writeTitleAll();
 
 		UInt32 getAchievement(UInt32 a = 0);
 		UInt32 useAchievement(UInt32 a,ConsumeInfo * ci=NULL);
@@ -1511,6 +1517,7 @@ namespace GObject
         bool _diamond_privilege;
         bool _qqvip_privilege;
         UInt32 _athlRivalBuf;
+        bool _new_rank;
     public:
         static UInt8 _yaMenActiveCount;
         static UInt8 _shiMenActiveCount;
@@ -1531,6 +1538,11 @@ namespace GObject
 
         inline void setJusticeRoar(UInt8 v) { _justice_roar = v; }
         inline UInt8 getJusticeRoar() { return _justice_roar; }
+
+        inline void setNewRank(bool v) { if(cfg.merged && _new_rank != v) _new_rank = v; }
+        inline bool isNewRank() { return cfg.merged && _new_rank; }
+        inline bool isSameServer(Player* player) { return player && (getId() >> 48) == (player->getId() >> 48); }
+        inline UInt16 getServerNo() { return static_cast<UInt16>(getId() >> 48); }
 
         inline void setSpiritFactor(float v) { _spirit_factor = v; }
         inline float getSpiritFactor() { return _spirit_factor; }
@@ -1626,6 +1638,7 @@ namespace GObject
         void wBossUdpLog(UInt32 id);
         void clanCopyUdpLog(UInt32 id, UInt32 val = 0, UInt32 num = 1);
         void tripodUdpLog(UInt32 id, UInt32 val = 0, UInt32 num = 1);
+        void storeUdpLog(UInt32 id, UInt32 type, UInt32 itemId, UInt32 num = 1);
         void guideUdp(UInt8 type, std::string& p1, std::string& p2);
         void moneyLog(int type, int gold, int coupon = 0, int tael = 0, int achievement = 0, int prestige = 0);
         void actUdp(UInt8 type, std::string& p1, std::string& p2);
@@ -1747,6 +1760,7 @@ namespace GObject
         void getAwardBirthday(UInt8 opt);
         void CheckCanAwardBirthday();
         void getAwardLogin(UInt8 opt);
+        void getAwardBlueDiamond(UInt8 opt);
         void IDIPAddItem(UInt16 itemId, UInt16 num, bool bind = true);
         int IDIPBuy(UInt32 itemId, UInt32 num, UInt32 price, std::string& err, bool bind = true);
         void lastQueqiaoAwardPush(UInt16 itemId, UInt16 num);

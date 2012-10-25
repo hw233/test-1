@@ -42,6 +42,7 @@
 #include "GObject/RealItemAward.h"
 #include "GObject/Tianjie.h"
 //#include "MsgHandler/JsonParser.h"
+#include "GObject/SingleHeroStage.h"
 
 #ifndef _WIN32
 #include <libmemcached/memcached.h>
@@ -629,7 +630,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             }
             pl->setInvited(nu._invited);
             pl->SetVar(GObject::VAR_VIPFIRST, 1); // XXX: fix old servers
-            pl->getTitleAll().push_back(static_cast<UInt8>(0));
+            pl->setTitle(0, 0);
 
 			DBLOG1().PushUpdateData("insert into register_states(server_id,player_id,player_name,platform,reg_time) values(%u,%"I64_FMT"u, '%s', %u, %u)", cfg.serverLogId, pl->getId(), pl->getName().c_str(), atoi(nu._platform.c_str()), TimeUtil::Now());
 
@@ -2480,7 +2481,34 @@ void ManualOpenTj(LoginMsgHdr& hdr, const void* data)
     NETWORK()->SendMsgToClient(hdr.sessionID, st);
 }
 
+void SHStageOnOff(LoginMsgHdr& hdr, const void* data)
+{
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
 
+    struct OnOffData
+    {
+        UInt32 begin;
+        UInt32 end;
+        int	sessionID;
+    } onOff = {0};
+    br >> onOff.begin >> onOff.end;
+    onOff.sessionID = hdr.sessionID;
+
+	GameMsgHdr imh(0x1AC, WORKER_THREAD_WORLD, NULL, sizeof(onOff));
+	GLOBAL().PushMsg(imh, &onOff);
+}
+
+void QuerySHStageOnOff(LoginMsgHdr& hdr, const void* data)
+{
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+    GObject::SHOnOffTime onOff = GObject::shStageMgr.getSHOnOffTime();
+
+    Stream st(SPEP::QUERYSHSTAGEONOFF);
+    st << onOff._timeBegin << onOff._timeEnd << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID, st);
+}
 
 #endif // _LOGINOUTERMSGHANDLER_H_
 

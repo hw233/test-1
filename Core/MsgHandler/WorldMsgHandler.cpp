@@ -115,6 +115,7 @@ MSG_REG_2(GameMsgHdr, 0x1A8, OnSHFighterCloneRes);
 MSG_REG_2(GameMsgHdr, 0x1A9, OnSHReset);
 MSG_REG_2(GameMsgHdr, 0x1AA, OnSHEnter);
 MSG_REG_2(GameMsgHdr, 0x1AB, OnEnterArena);
+MSG_REG_2(GameMsgHdr, 0x1AC, OnSHStageOnOff);
 
 MSG_REG_2(GameMsgHdr, 0x1B1, OnSearchSaleNotify);
 MSG_REG_2(GameMsgHdr, 0x1B2, OnPutSaleNotify);
@@ -133,7 +134,7 @@ MSG_REG_2(GameMsgHdr, 0x1ED, OnRunscriptReq);
 MSG_REG_2(GameMsgHdr, 0x1EF, OnRunscriptBattleReq);
 
 MSG_REG_2(GameMsgHdr, 0x1F0, OnLevelChange);
-MSG_REG_2(GameMsgHdr, 0x1F1, OnAthleticsMartialFlush);
+//MSG_REG_2(GameMsgHdr, 0x1F1, OnAthleticsMartialFlush);
 MSG_REG_2(GameMsgHdr, 0x1F2, OnAthMartialOver);
 
 MSG_REG_2(GameMsgHdr, 0x1F3, OnReleaseClanSkillLevelOp);
@@ -144,7 +145,7 @@ MSG_REG_2(GameMsgHdr, 0x1F5, OnReplaceOwner);
 MSG_REG_2(GameMsgHdr, 0x1F6, OnPracticeAddExp);
 MSG_REG_2(GameMsgHdr, 0x1F7, OnPracticeStop);
 
-MSG_REG_2(GameMsgHdr, 0x1F8, OnAthleticsFlush);
+//MSG_REG_2(GameMsgHdr, 0x1F8, OnAthleticsFlush);
 
 MSG_REG_2(GameMsgHdr, 0x1F9, OnRoamResult);
 

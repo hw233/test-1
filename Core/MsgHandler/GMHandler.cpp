@@ -2802,6 +2802,16 @@ void GMHandler::OnNewRelation(GObject::Player* player, std::vector<std::string>&
             accept = atoi(args[2].c_str());
         player->GetNewRelation()->challengeRespond(player, senderName, accept);
     }
+    else if(type == 7)
+    {
+        GObject::gAthleticsRank.requestAthleticsList(player, 0x40);
+        return;
+    }
+    else if(type == 8)
+    {
+        GObject::gAthleticsRank.requestAthleticsList(player, 0x80);
+        return;
+    }
 
     if (args.size() >= 2)
         start = atoi(args[1].c_str());

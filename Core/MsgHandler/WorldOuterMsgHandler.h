@@ -1342,7 +1342,10 @@ void OnAthleticsPaging( GameMsgHdr& hdr, const void * data)
          UInt8 athlCategory = 0;
          brd >> athlDiffculty;
          brd >> athlCategory;
-         GObject::gAthleticsRank.RequestSubDir(player, athlDiffculty, athlCategory);
+         //GObject::gAthleticsRank.RequestSubDir(player, athlDiffculty, athlCategory);
+         UInt16 tmp = (athlDiffculty << 8) | athlCategory;
+         GameMsgHdr hdr(0x226, player->getThreadId(), player, sizeof(tmp));
+         GLOBAL().PushMsg(hdr, &tmp);
      }
      else
          GObject::gAthleticsRank.RequestPageNum(player);
@@ -2191,9 +2194,6 @@ void OnSingleHeroReq( GameMsgHdr& hdr, const void* data)
     UInt8 op = 0;
     br >> op;
 
-    if(!GObject::shStageMgr.getActive())
-        return;
-
     switch(op)
     {
     case 0x00:
@@ -2206,7 +2206,7 @@ void OnSingleHeroReq( GameMsgHdr& hdr, const void* data)
                 GObject::shStageMgr.sendActive(player);
                 break;
             case 0x01:
-                if(GObject::shStageMgr.getActive())
+                if(GObject::shStageMgr.isOpen())
                 {
                     UInt32 fgtId = 0;
                     br >> fgtId;
@@ -2229,6 +2229,7 @@ void OnSingleHeroReq( GameMsgHdr& hdr, const void* data)
             case 0x03:
                 break;
             case 0x04:
+                if(GObject::shStageMgr.isOpen())
                 // 人气投票
                 {
                     UInt8 cls = 0;

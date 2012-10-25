@@ -282,6 +282,37 @@ void OnAthleticsEnterResp( GameMsgHdr& hdr, const void * )
 	player->GetAthletics()->setEnterAthletics();
 }
 
+void OnAthleticsSetPInfo( GameMsgHdr& hdr, const void *data )
+{
+	MSG_QUERY_PLAYER(player);
+    AthleticsPInfo *newPInfo = reinterpret_cast<AthleticsPInfo *>(const_cast<void *>(data));
+	AthleticsPInfo *orgPInfo = player->GetAthletics()->getPlayerPInfo();
+    memcpy(orgPInfo, newPInfo, sizeof(AthleticsPInfo));
+}
+
+void OnAthleticsSetChallengeTime( GameMsgHdr& hdr, const void *data )
+{
+	MSG_QUERY_PLAYER(player);
+    UInt32 challengeTime = *reinterpret_cast<UInt32 *>(const_cast<void *>(data));
+	AthleticsPInfo *orgPInfo = player->GetAthletics()->getPlayerPInfo();
+    orgPInfo->eChallengeTime = challengeTime;
+}
+
+void OnAthleticsSetIndex( GameMsgHdr& hdr, const void *data )
+{
+	MSG_QUERY_PLAYER(player);
+    struct AthleticsUpdate {
+        UInt8 eSelectIndex;
+        UInt8 eCombineIndex;
+        UInt32 eCombine;
+    };
+    AthleticsUpdate *curUpdate = reinterpret_cast<AthleticsUpdate *>(const_cast<void *>(data));
+	AthleticsPInfo *orgPInfo = player->GetAthletics()->getPlayerPInfo();
+    orgPInfo->eSelectIndex = curUpdate->eSelectIndex;
+    if(curUpdate->eCombineIndex < 5)
+        orgPInfo->eCombine[curUpdate->eCombineIndex] = curUpdate->eCombine;
+}
+
 void OnAthleticsDeferNotify( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
@@ -356,6 +387,17 @@ void OnAthleticsAwardReq2(GameMsgHdr& hdr, const void * data)
         else
             player->GetPackage()->AddItem(itemId, count, 1, false, FromAthletAward);
     }
+}
+
+void OnAthleticsSubDir(GameMsgHdr& hdr, const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+    UInt8 athlDiffculty;
+    UInt8 athlCategory;
+    UInt16 tmp = *reinterpret_cast<const UInt16 *>(data);
+    athlDiffculty = tmp >> 8;
+    athlCategory = tmp & 0xFF;
+    player->GetAthletics()->RequestSubDir(player, athlDiffculty, athlCategory);
 }
 
 void OnGetBoxAddSource(GameMsgHdr& hdr, const void * data)
@@ -1252,7 +1294,7 @@ void OnClearTaskReq( GameMsgHdr& hdr, const void* data )
         player->resetYaMen();
     }
 }
-
+#if 0
 void OnMartialUpdateHdr( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);
@@ -1261,7 +1303,8 @@ void OnMartialUpdateHdr( GameMsgHdr& hdr, const void* data )
 	const GObject::MartialHeader* mh = reinterpret_cast<const GObject::MartialHeader*>(data);
     player->GetAthletics()->updateMartialHdr(mh);
 }
-
+#endif
+#if 0
 void OnMartialUpdate( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);
@@ -1270,14 +1313,15 @@ void OnMartialUpdate( GameMsgHdr& hdr, const void* data )
 	const GObject::MartialData* md = reinterpret_cast<const GObject::MartialData*>(data);
     player->GetAthletics()->updateMartial(md);
 }
-
+#endif
+#if 0
 void OnMartialUpdate2( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);
     UInt8 type = *(UInt8*)(data);
     player->GetAthletics()->listAthleticsMartial2(type);
 }
-
+#endif
 void OnAthleticsMartialAttack( GameMsgHdr& hdr, const void* data )
 {
 	MSG_QUERY_PLAYER(player);
@@ -1650,6 +1694,24 @@ void OnSHFighterCloneReq( GameMsgHdr& hdr, const void* data )
     GLOBAL().PushMsg(hdr2, &fgtClone);
 }
 
+void OnTitleCheck( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    player->getTitle();
+}
+
+void OnSetTitle( GameMsgHdr& hdr, const void* data )
+{
+    struct TitleData
+    {
+        UInt8 title;
+        UInt32 timeLen;
+    } titleData = {0};
+
+    MSG_QUERY_PLAYER(player);
+    titleData = *reinterpret_cast<TitleData*>(const_cast<void *>(data));
+    player->setTitle(titleData.title, titleData.timeLen);
+}
 
 #endif // _COUNTRYINNERMSGHANDLER_H_
 

@@ -1210,10 +1210,7 @@ void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
             {
                 UInt32 id;
                 br >> id;
-                std::vector<UInt8> titleAll = player->getTitleAll();
-                std::vector<UInt8>::iterator it = find(titleAll.begin(), titleAll.end(), static_cast<UInt8>(id));
-                if(it != titleAll.end())
-                    player->setTitle(static_cast<UInt8>(id));
+                player->changeTitle(static_cast<UInt8>(id));
             }
             break;
         case 0x09:
@@ -2995,6 +2992,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 			break;
 #endif
 		case 6:
+            // 荣誉购买
 			if(PLAYER_DATA(player, achievement) < price)
 			{
 				st << static_cast<UInt8>(1);
@@ -3021,10 +3019,12 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 					player->useAchievement(price,&ci);
 					st << static_cast<UInt8>(0);
                     GameAction()->doAty( player, AtyBuy, 0,0);
+                    player->storeUdpLog(1141, 6, lr._itemId, lr._count);
 				}
 			}
 			break;
         case 7:
+            // 声望购买
             {
                 UInt32 prestige = player->getPrestige();
                 if (prestige < price)
@@ -3054,6 +3054,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                         st << static_cast<UInt8>(0);
 
                         GameAction()->doAty(player, AtyBuy, 0,0);
+                        player->storeUdpLog(1141, 7, lr._itemId, lr._count);
                     }
                 }
             }
@@ -4198,8 +4199,9 @@ void OnRefreshMartialReq( GameMsgHdr& hdr, AthleticsRefreshMartialReq& req )
     GameMsgHdr hdr2(0x1F1, WORKER_THREAD_WORLD, player, 0);
     GLOBAL().PushMsg(hdr2, NULL);
 #endif
-    GameMsgHdr hdr2(0x1F8, WORKER_THREAD_WORLD, player, 1);
-    GLOBAL().PushMsg(hdr2, &(req._type));
+    //GameMsgHdr hdr2(0x1F8, WORKER_THREAD_WORLD, player, 1);
+    //GLOBAL().PushMsg(hdr2, &(req._type));
+    player->GetAthletics()->updateAthleticsP(player, req._type);
 }
 
 void OnTrumpUpgrade( GameMsgHdr& hdr, const void* data)

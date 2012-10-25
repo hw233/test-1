@@ -24,6 +24,13 @@ namespace GObject
     class SHFinalStarStage;
     class SHFinalBattleStage;
 
+    struct SHOnOffTime
+    {
+        SHOnOffTime() : _timeBegin(0), _timeEnd(0) {}
+        UInt32 _timeBegin;
+        UInt32 _timeEnd;
+    };
+
     struct StageBattleReport
     {
         UInt8 _won;
@@ -575,8 +582,12 @@ namespace GObject
         }
 
         bool getActive() { return m_lvlCnt70 > SH_OPEN_COND; }
+        bool isOpen() { return m_fOpen; }
         void incActive(UInt8 v) { m_lvlCnt70 += v; }
         void sendActive(Player* pl);
+        bool openStage(UInt32 nextTime);
+        bool setOnOffTime(UInt32 timeBegin, UInt32 timeEnd);
+        SHOnOffTime getSHOnOffTime() { return m_onOffTime; }
 
         void sendProgress(Player* player);
         void sendStatus(Player* player);
@@ -678,6 +689,8 @@ namespace GObject
         UInt32 m_session;  // 届数
         UInt32 m_lvlCnt70;
         UInt32 m_towerEndTime;
+        SHOnOffTime m_onOffTime;
+        bool m_fOpen;
     };
 
 

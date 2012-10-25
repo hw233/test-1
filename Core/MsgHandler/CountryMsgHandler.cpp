@@ -197,6 +197,10 @@ MSG_REG_2(GameMsgHdr, 0x222, OnAthlectisPayPaging);
 MSG_REG_2(GameMsgHdr, 0x223, OnNewRelationAttack);
 MSG_REG_2(GameMsgHdr, 0x224, OnNewRelationCountryReq);
 MSG_REG_2(GameMsgHdr, 0x225, OnAthleticsAwardReq2);
+MSG_REG_2(GameMsgHdr, 0x226, OnAthleticsSubDir);
+MSG_REG_2(GameMsgHdr, 0x227, OnAthleticsSetPInfo);
+MSG_REG_2(GameMsgHdr, 0x228, OnAthleticsSetChallengeTime);
+MSG_REG_2(GameMsgHdr, 0x229, OnAthleticsSetIndex);
 
 MSG_REG_2(GameMsgHdr, 0x230, OnArenaBet);
 MSG_REG_2(GameMsgHdr, 0x231, OnArenaBetResult);
@@ -261,10 +265,10 @@ MSG_REG_2(GameMsgHdr, 0x323, OnSetMoneyReq);
 MSG_REG_2(GameMsgHdr, 0x324, OnSetVipLReq);
 MSG_REG_2(GameMsgHdr, 0x325, OnClearTaskReq);
 
-MSG_REG_2(GameMsgHdr, 0x330, OnMartialUpdateHdr);
-MSG_REG_2(GameMsgHdr, 0x331, OnMartialUpdate);
+//MSG_REG_2(GameMsgHdr, 0x330, OnMartialUpdateHdr);
+//MSG_REG_2(GameMsgHdr, 0x331, OnMartialUpdate);
 
-MSG_REG_2(GameMsgHdr, 0x351, OnMartialUpdate2);
+//MSG_REG_2(GameMsgHdr, 0x351, OnMartialUpdate2);
 
 MSG_REG_2(GameMsgHdr, 0x232, OnAthleticsMartialReq);
 MSG_REG_2(GameMsgHdr, 0x233, OnAthleticsMartialAttack);
@@ -307,5 +311,8 @@ MSG_REG_2(GameMsgHdr, 0x257, OnSendRechargeRankAward);
 MSG_REG_2(GameMsgHdr, 0x258, OnSendConsumeRankAward);
 
 MSG_REG_2(GameMsgHdr, 0x263, OnSHFighterCloneReq);
+
+MSG_REG_2(GameMsgHdr, 0x264, OnTitleCheck);
+MSG_REG_2(GameMsgHdr, 0x265, OnSetTitle);
 
 MSG_HANDLER_END()

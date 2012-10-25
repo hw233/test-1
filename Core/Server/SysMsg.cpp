@@ -83,6 +83,61 @@ void SysMsgItem::sendva( GObject::Player * player, ... )
 		NETWORK()->Broadcast(st);
 }
 
+bool enum_send_same_server_no(GObject::Player* player, void* ptr)
+{
+    struct _data{
+        UInt16 _serverNo;
+        Stream _st;
+    };
+    _data* curData = reinterpret_cast<_data *>(ptr);
+	if(player != NULL && player->getServerNo() == curData->_serverNo)
+		player->send(curData->_st);
+    return true;
+}
+
+void SysMsgItem::sendva2(UInt16 serverNo, ... )
+{
+#if 0
+	if(player != NULL && player->GetLev() < 6)
+		return;
+#endif
+	/* Guess we need no more than 256 bytes. */
+	int size = 256;
+
+	char *p = new(std::nothrow) char[size];
+	if (p == NULL)
+		return;
+
+	while (1) {
+		va_list ap;
+		/* Try to print in the allocated space. */
+		va_start(ap, serverNo);
+		int n = vsnprintf(p, size, _msgBody.c_str(), ap);
+		va_end(ap);
+		/* If that worked, return the string. */
+		if (n > -1 && n < size)
+			break;
+		/* Else try again with more space. */
+		if (n > -1)    /* glibc 2.1 */
+			size = n+1; /* precisely what is needed */
+		else           /* glibc 2.0 */
+			size *= 2;  /* twice the old size */
+		delete[] p;
+		if ((p = new(std::nothrow) char[size]) == NULL) {
+			return;
+		}
+	}
+
+	Stream st(REP::SYSTEM_INFO);
+	st << _type << p << Stream::eos;
+	delete[] p;
+    struct _data{
+        UInt16 _serverNo;
+        Stream _st;
+    }curData = {serverNo, st};
+    GObject::globalPlayers.enumerate(enum_send_same_server_no, static_cast<void *>(&curData));
+}
+
 void SysMsgItem::get( char * str )
 {
 	strncpy(str, _msgBody.c_str(), 1023);

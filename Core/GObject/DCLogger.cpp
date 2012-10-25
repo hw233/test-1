@@ -152,7 +152,7 @@ bool DCLogger::login_sec(Player* player)
     char serverIp[20];
     in_addr iaddr;
     iaddr.s_addr = cfg.serverIp;
-    strcpy(serverIp, inet_ntoa(iaddr));
+    strncpy(serverIp, inet_ntoa(iaddr), 20);
     msg << serverIp;
     msg << "&MTM=";
     msg << TimeUtil::GetTick() / 1000;
@@ -283,7 +283,7 @@ bool DCLogger::protol_sec(Player* player, int cmd)
     char serverIp[20];
     in_addr iaddr;
     iaddr.s_addr = cfg.serverIp;
-    strcpy(serverIp, inet_ntoa(iaddr));
+    strncpy(serverIp, inet_ntoa(iaddr), 20);
     msg << serverIp;
     msg << "&MTM=";
     msg << TimeUtil::GetTick() / 1000;

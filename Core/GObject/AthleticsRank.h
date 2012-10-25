@@ -57,6 +57,7 @@ struct AthleticsRankData
     UInt32  first4rank;
     UInt32  extrachallenge;
     UInt32  pageNum; //???
+#if 0
     UInt32  eChallengeTime;
     UInt8   ePhysical;
     UInt8 eSelectIndex;
@@ -64,6 +65,7 @@ struct AthleticsRankData
     UInt64 eRival[5];
     UInt8 eCanAttack[5];
     UInt8 eRivalType[5];
+#endif
     //UInt32  first4rank;
         //// 0x1 第一次成为竞技场第一
         //// 0x2 第一次杀入竞技场二强
@@ -84,6 +86,20 @@ struct AthleticsRankData
     {
     }
 };
+
+struct AthlSort
+{
+    GObject::Player* player;
+    UInt32 rank;
+};
+struct lt_athlsort
+{
+    bool operator()(const AthlSort& a, const AthlSort& b) const { return a.rank < b.rank; }
+};
+typedef std::multiset<AthlSort, lt_athlsort> AthlSortType;
+typedef AthlSortType::iterator RankL;
+typedef std::map<UInt16, AthlSortType> RankListL;
+static RankListL _ranksL[2];
 
 struct AthleticsAward
 {
@@ -203,15 +219,12 @@ public:
     UInt32 getAthleticsFirst4Rank(Player*, UInt32 first4rank);
     UInt32 setAthleticsFirst4Rank(Player*, UInt32 first4rank);
 
-    void updateAthleticsMartial(Player* pl);
-    void updateAthleticsP(Player* pl, UInt8 type);
-
     void giveAward(Player* pl, UInt8 type = 0);
 
     void notifyAthMartialOver(Player * atker, Player * defer, UInt32 id, UInt8 res);
 
 public:
-	void TmExtraAward();
+	void TmExtraAward(UInt8 type);
 
 	inline UInt8 getRankRow(UInt8 lev)
 	{
@@ -237,28 +250,87 @@ public:
         return Pos;
 #endif
     }
+
+    inline UInt32 getRankPosL(Player* player)
+    {
+        UInt32 Pos;
+        UInt8 row = getRankRow(player->GetLev());
+        AthlSortType& curType = _ranksL[row][player->getServerNo()];
+        if(curType.empty())
+            return 0;
+        AthlSort cur = {player, player->GetVar(VAR_LOCAL_RANK)};
+        RankL curIter = curType.find(cur);
+        if(curIter == curType.end())
+            return 0;
+        Pos = std::distance(curType.begin(), curIter) + 1;
+        if(Pos > ATHLETICS_RANK_MAX_CNT)
+        {
+            Pos = ATHLETICS_RANK_MAX_CNT + 1;
+        }
+        return Pos;
+    }
+
 	inline Rank getRankBegin(UInt8 row)
 	{
 		return _athleticses[row].begin();
 	}
+
+    inline RankL getRankBeginL(Player* player)
+    {
+        UInt8 row = getRankRow(player->GetLev());
+        return _ranksL[row][player->getServerNo()].begin();
+    }
+
 	inline Rank getRankEnd(UInt8 row)
 	{
 		return _athleticses[row].end();
 	}
+
+    inline RankL getRankEndL(Player* player)
+    {
+        UInt8 row = getRankRow(player->GetLev());
+        return _ranksL[row][player->getServerNo()].end();
+    }
+
 	inline UInt32 getRankSize(UInt8 row)
 	{
 		return static_cast<UInt16>(_athleticses[row].size());
 	}
+
+    inline UInt32 getRankSizeL(Player* player)
+    {
+        UInt8 row = getRankRow(player->GetLev());
+        return _ranksL[row][player->getServerNo()].size();
+    }
+
 	inline bool frontRankPos(UInt8 row, Rank rank)
 	{
 		return (*rank) == _athleticses[row].front();
 	}
+
+    inline bool frontRankPosL(Player* player, RankL cur)
+    {
+        UInt8 row = getRankRow(player->GetLev());
+        return cur == _ranksL[row][player->getServerNo()].begin();
+    }
+
 	inline bool backRankPos(UInt8 row, Rank rank)
 	{
 		return (*rank) == _athleticses[row].back();
 	}
 
+    inline bool backRankPosL(Player* player, RankL cur)
+    {
+        UInt8 row = getRankRow(player->GetLev());
+        return static_cast<UInt32>(std::distance(_ranksL[row][player->getServerNo()].begin(), cur) + 1) == _ranksL[row][player->getServerNo()].size();
+    }
+
     void updateAthleticsRank(AthleticsRankData* data);
+    void updateRankL(UInt8 row, Player* player, UInt32 newRank);
+    void adjustRankL(UInt8 row, UInt16 serverNo);
+    void checkRankL();
+    void switchRankL(UInt8 row, Player* atker, Player* defer);
+    void updateBatchRankerL(UInt8 row, Player* player1, Player* player2);
 	void updateBatchRanker(UInt8, Rank, Rank);
 	UInt8 updateChallengeNum(UInt8, UInt32);
     void  updatePageNum(Rank r);
@@ -281,15 +353,14 @@ public:
 public:
     void updateOrginal_martial(Player* owner, UInt8 index, UInt64 arivalId);
     Player* getOrginal_martial(Player* owner, UInt8 index);
-    void setOrginal_martial(Player* owner, UInt8 index, Player* pl);
+    //void setOrginal_martial(Player* owner, UInt8 index, Player* pl);
     void updateOrginal_canAttack(Player* owner, UInt8 index, UInt8 canAttack);
     UInt8 getOrginal_canAttack(Player* owner, UInt8 index);
     void setOrginal_canAttack(Player* owner, UInt8 index, UInt8 canAttack);
     void updateOrginal_eCategory(Player* owner, UInt8 index, UInt32 combineValue);
     void setOrginal_eCategory(Player* owner, UInt8 index, UInt32 combineValue);
-    void RequestSubDir(Player *player, UInt8 athlDiffculty, UInt8 athlCategory);
-    AthleticsRankData* getAthleticsRankData(Player* player);
-    void process();
+    //void RequestSubDir(Player *player, UInt8 athlDiffculty, UInt8 athlCategory);
+    //void process();
 
 private:
 	RankList		_ranks[2];

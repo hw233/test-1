@@ -1270,6 +1270,11 @@ namespace Script
         return Call<UInt8>("RunNewRC7DayTargetAward", player);
     }
 
+    UInt8 GameActionLua::RunBlueDiamondAward(Player* player, UInt8 opt)
+    {
+		assert(player != NULL);
+		return Call<UInt8>("RunBlueDiamondAward", player, opt);
+    }
     void GameActionLua::sendRNR(Player* player, UInt32 now, UInt32 date, UInt32 total)
     {
 		return Call<void>("sendRNR", player, now, date, total);

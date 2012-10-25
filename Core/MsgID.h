@@ -692,6 +692,8 @@ namespace SPEQ
 
     const UInt16 ADDCLANAWARD        = 0x128; // 发放物品给帮派仓库
     const UInt16 MANUALOPENTJ        = 0x129; // 手动开启天劫
+    const UInt16 SHSTAGEONOFF        = 0x130; // 职业第一开关
+    const UInt16 QUERYSHSTAGEONOFF   = 0x131; // 查询职业第一
 }
 
 namespace SPEP
@@ -734,6 +736,8 @@ namespace SPEP
     const UInt16 ADDREALAWARD        = 0x25; //
     const UInt16 ADDCLANAWARD        = 0x28; // 发放物品给帮派仓库
     const UInt16 MANUALOPENTJ        = 0x29; //手动开启天劫 
+    const UInt16 SHSTAGEONOFF        = 0x30; // 职业第一开关
+    const UInt16 QUERYSHSTAGEONOFF   = 0x31; // 查询职业第一
 }
 
 namespace ARENAREQ
