@@ -245,6 +245,9 @@ namespace GObject
         VAR_TGC_1_FRONTMAP = 202,
         VAR_TGC_1_DUNGEON = 203,
 
+        VAR_CTSLANDING_AWARD = 204, // 创建角色前七天连续登陆奖励领取记录
+        VAR_CTSLANDING_AWARD2 = 205, // 创建角色前七天累计登录奖励领取记录
+
         VAR_MAX,
     };
 
@@ -466,6 +469,9 @@ namespace GObject
             REGISTER_VAR(VAR_TGC_1_COPY, CYCLE_NONE);
             REGISTER_VAR(VAR_TGC_1_FRONTMAP, CYCLE_NONE);
             REGISTER_VAR(VAR_TGC_1_DUNGEON, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_CTSLANDING_AWARD, CYCLE_NONE);
+            REGISTER_VAR(VAR_CTSLANDING_AWARD2, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

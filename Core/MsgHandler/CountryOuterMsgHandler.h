@@ -5041,9 +5041,26 @@ void OnRF7Day( GameMsgHdr& hdr, const void* data )
 
 void OnNewRC7Day(GameMsgHdr& hdr, const void* data )
 {
-    // TODO: 新版注册七日活动
+    // 新版注册七日活动
 	MSG_QUERY_PLAYER(player);
 
+    if (!World::getRC7Day())
+        return;
+
+    UInt32 now = TimeUtil::Now();
+    UInt32 now_sharp = TimeUtil::SharpDay(0, now);
+    UInt32 created_sharp = TimeUtil::SharpDay(0, player->getCreated());
+    if (created_sharp > now_sharp)
+        return; // 创建时间错误（穿越了）
+
+    if (now_sharp - created_sharp > 7 * 24*60*60)
+        return; // 玩家注册时间超过7日，无法参与活动
+
+#define CREATE_OFFSET(c, n) (((n) - (c)) / (24*60*60))
+    UInt32 off = CREATE_OFFSET(created_sharp, now_sharp);
+#undef CREATE_OFFSET
+    if (off >= 7)
+        return; // 玩家注册时间超过7日，无法参与活动
 	BinaryReader br(data, hdr.msgHdr.bodyLen);
     UInt8 op = 0;
     br >> op;
@@ -5059,7 +5076,7 @@ void OnNewRC7Day(GameMsgHdr& hdr, const void* data )
             {
                 UInt8 val = 0;
                 br >> val;
-                player->getNewRC7DayLoginAward(val);
+                player->getNewRC7DayLoginAward(val, off);
             }
             break;
         case 2:

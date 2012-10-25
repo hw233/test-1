@@ -82,6 +82,7 @@ enum PurchaseType
     ArenaFromMail               = 71,
     FromTJ                      = 72,
     IDIPBuyItem                 = 73,
+    RC7DayLogin                 = 74,
 };
 
 enum IncomingType

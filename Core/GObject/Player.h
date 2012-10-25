@@ -1754,7 +1754,10 @@ namespace GObject
         void lastKillMonsterAwardPush(UInt16 itemId, UInt16 num);
         void checkLastKillMonsterAward();
         void sendNewRC7DayInfo(UInt8 type = 0);
-        void getNewRC7DayLoginAward(UInt8 val);
+        void sendNewRC7DayLogin();
+        void sendNewRC7DayRecharge();
+        void sendNewRC7DayTarget();
+        void getNewRC7DayLoginAward(UInt8 val, UInt8 off);
         void getNewRC7DayRechargeAward(UInt8 val);
         void getNewRC7DayTargetAward(UInt8 val);
 

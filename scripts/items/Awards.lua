@@ -219,6 +219,36 @@ function RunNewRC7DayLoginAward(player, cts)
     end
 end
 
+function RunNewRC7DayLoginAward2(player, val)
+    -- 领取新注册七日累计登录奖励
+    local item = {
+        [1] = {{1703, 3}},
+        [3] = {{516, 5}},
+        [4] = {{1610, 1},{1609, 1},{1608, 1}},
+    };
+    local package = player:GetPackage();
+
+    if val == 0 then
+        return false
+    end
+    if val > 5 then
+        return false
+    end
+    if val == 2 then
+        return addFighterFromItem(9011, 0)
+    end
+
+        
+    if package:GetRestPackageSize() < ((#item[val] - 1) +((#item[val] - 1)*num*3)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    for count = 1, #item[val] do
+        package:Add(item[val][count][1], item[val][count][2], true, 0, 34);
+    end
+end
+
 function RunNewRC7DayRechargeAward(player)
     -- TODO: 领取新注册七日充值奖励（神龙许愿）
 end
