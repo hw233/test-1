@@ -1759,7 +1759,35 @@ void AthleticsRank::TmExtraAward(UInt8 type)
                 DB6().PushUpdateData("UPDATE `athletics_rank` SET `prestige` = %u WHERE `ranker` = %"I64_FMT"u", rank->prestige, rank->ranker->getId());
 
                 if(i == 1)
-                    SYSMSG_BROADCASTV(334, rank->ranker->getCountry(), rank->ranker->getName().c_str());
+                {
+                    SYSMSG_BROADCASTV(358, rank->ranker->getCountry(), rank->ranker->getName().c_str());
+
+                    UInt16 itemId = 9192;
+                    UInt8  itemCount = 1;
+                    const GData::ItemBaseType *item1 = Package::GetItemBaseType(itemId);
+                    if(item1)
+                    {
+                        Mail *pmail = NULL;
+                        MailPackage::MailItem mitem[1] = {{itemId, itemCount}};
+                        UInt32 count = 1;
+                        MailItemsInfo itemsInfo(mitem, AthliticisTimeAward, count);
+
+                        SYSMSG(title, 318);
+                        //SYSMSGV(awardStr, 326, item1->getName().c_str());
+                        SYSMSGV(content, 325, i, itemId, itemCount);
+                        pmail = rank->ranker->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+
+                        if(pmail != NULL)
+                        {
+                            mailPackageManager.push(pmail->id, mitem, count, false);
+                        }
+
+                    }
+                    //udplog
+                    char udpStr[32] = {0};
+                    sprintf(udpStr, "F_1119_%d", i);
+                    rank->ranker->udpLog("athleticsRank", udpStr, "", "", "", "", "act");
+                }
             }
         }
         return;
