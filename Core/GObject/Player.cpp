@@ -12472,6 +12472,7 @@ namespace GObject
         useGold(price, &ci);
 
         GetPackage()->Add(itemId, num, bind);
+        err = "购买成功";
         return 0;
     }
 
