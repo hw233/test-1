@@ -96,7 +96,7 @@ struct lt_athlsort
 {
     bool operator()(const AthlSort& a, const AthlSort& b) const { return a.rank < b.rank; }
 };
-typedef std::set<AthlSort, lt_athlsort> AthlSortType;
+typedef std::multiset<AthlSort, lt_athlsort> AthlSortType;
 typedef AthlSortType::iterator RankL;
 typedef std::map<UInt16, AthlSortType> RankListL;
 static RankListL _ranksL[2];
@@ -326,6 +326,9 @@ public:
     }
 
     void updateAthleticsRank(AthleticsRankData* data);
+    void updateRankL(UInt8 row, Player* player, UInt32 newRank);
+    void switchRankL(UInt8 row, Player* atker, Player* defer);
+    void updateBatchRankerL(UInt8 row, Player* player1, Player* player2);
 	void updateBatchRanker(UInt8, Rank, Rank);
 	UInt8 updateChallengeNum(UInt8, UInt32);
     void  updatePageNum(Rank r);

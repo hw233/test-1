@@ -2281,8 +2281,8 @@ namespace GObject
 			data->ranker = pl;
 
             ++ rank[dbd.row];
-            if(rank[dbd.row] > ATHLETICS_RANK_MAX_CNT)
-                rank[dbd.row] = ATHLETICS_RANK_MAX_CNT + 1;
+            //if(rank[dbd.row] > ATHLETICS_RANK_MAX_CNT)
+            //    rank[dbd.row] = ATHLETICS_RANK_MAX_CNT + 1;
             data->rank = rank[dbd.row];
             if(rank[dbd.row] != dbd.rank/* && rank[dbd.row] <= ATHLETICS_RANK_MAX_CNT*/)
             {
