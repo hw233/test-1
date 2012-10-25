@@ -748,6 +748,8 @@ public:
     bool equipSoulSkill(UInt8 idx, UInt32 itemId, bool bind=true);
 
     void send2ndSoulInfo();
+    void reload2ndSoul();
+    void resetLevelAndExp(UInt8 maxLevel);
 
     UInt8 getSoulSkillIdx(UInt16 itemId);
 

@@ -1341,11 +1341,12 @@ SPECIALDEF(33)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBSecondSoul)
-SPECIALDEF(7)
+SPECIALDEF(8)
 (
 	UInt32, fighterId,
     UInt64, playerId,
 	UInt8, cls,
+	UInt8, xinxiu,
 	UInt8, practiceLevel,
 	UInt8, stateLevel,
 	UInt32, stateExp,

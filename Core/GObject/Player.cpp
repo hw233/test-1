@@ -13590,5 +13590,73 @@ void EventTlzAuto::notify(bool isBeginAuto)
         return bp;
     }
 
+    void Player::verifyFighter()
+    {
+        Fighter* mfgt = NULL;
+        bool find = false;
+        UInt8 maxLevel = 0;
+        for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++it)
+        {
+            Fighter* fgt = it->second;
+            if(fgt->getLevel() > maxLevel)
+                maxLevel = fgt->getLevel();
+            if(fgt->isMainFighter())
+            {
+                if(!mfgt)
+                    mfgt = fgt;
+                else if( fgt->getLevel() <= mfgt->getLevel())
+                {
+                    DB1().PushUpdateData("DELETE FROM `fighter` where `id`=%d and `playerId`=%"I64_FMT"u", fgt->getId(), _id);
+                    _fighters.erase(fgt->getId());
+                    delete fgt;
+                    find = true;
+                }
+                else
+                {
+                    DB1().PushUpdateData("DELETE FROM `fighter` where `id`=%d and `playerId`=%"I64_FMT"u", mfgt->getId(), _id);
+                    _fighters.erase(mfgt->getId());
+                    delete mfgt;
+                    mfgt = fgt;
+                    find = true;
+                }
+            }
+        }
+
+        if(find)
+        {
+            bool first = false;
+            bool lfind = false;
+            for(int i = 0; i < 5; ++ i)
+            {
+                Lineup& lup = _playerData.lineup[i];
+                if(lup.fid < 10)
+                {
+                    if(!first)
+                    {
+                        if(lup.fid != mfgt->getId())
+                            lfind = true;
+                        lup.fid = mfgt->getId();
+                        lup.fighter = mfgt;
+                        first = true;
+                    }
+                    else
+                    {
+                        lfind = true;
+                        lup.fid = 0;
+                        lup.fighter = NULL;
+                    }
+                }
+            }
+            if(lfind)
+                storeFighters();
+        }
+
+        if(mfgt->getLevel() < maxLevel)
+        {
+            mfgt->resetLevelAndExp(maxLevel);
+            mfgt->reload2ndSoul();
+        }
+    }
+
 } // namespace GObject
 

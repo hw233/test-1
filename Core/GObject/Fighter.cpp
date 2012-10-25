@@ -26,6 +26,7 @@
 #include "GData/SpiritAttrTable.h"
 #include "SecondSoul.h"
 #include "GVar.h"
+#include "GObjectDBExecHelper.h"
 
 namespace GObject
 {
@@ -4917,6 +4918,40 @@ void Fighter::setUpSS(std::string& skillstrengthen)
     }
 }
 
+void Fighter::reload2ndSoul()
+{
+    if(m_2ndSoul || !_owner)
+        return;
+
+    std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+    if (execu.get() == NULL || !execu->isConnected()) return;
+
+    DBSecondSoul dbss;
+    char sqlstr[1024] = {0};
+    sprintf(sqlstr, "SELECT `fighterId`, `playerId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `skills` FROM `second_soul` WHERE `playerId`=%"I64_FMT"u AND `fighterId`=%u", _owner->getId(), _id);
+    if(execu->Extract(sqlstr, dbss) != DB::DB_OK)
+        return;
+    {
+        SecondSoul* secondSoul = new SecondSoul(this, dbss.cls, dbss.practiceLevel, dbss.stateExp, dbss.stateLevel, dbss.xinxiu);
+        StringTokenizer tokenizer(dbss.skills, ",");
+        int idx = 0;
+        for(size_t j = 0; j < tokenizer.count(); ++ j)
+        {
+            UInt16 skillId = atoi(tokenizer[j].c_str());
+            secondSoul->setSoulSkill(idx, skillId);
+            ++ idx;
+        }
+        setSecondSoul(secondSoul);
+    }
+}
+
+void Fighter::resetLevelAndExp(UInt8 maxLevel)
+{
+    UInt64 exp = GData::expTable.getLevelMin(maxLevel);
+    _level = maxLevel;
+    _exp = exp;
+    DB1().PushUpdateData("UPDATE `fighter` SET `experience` = %"I64_FMT"u, `level`=%u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", exp, _level, _id, _owner->getId());
+}
 
 }
 
