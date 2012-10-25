@@ -2,6 +2,7 @@
 #include "MsgHandler.h"
 #include "Server/WorldServer.h"
 #include "GObject/Player.h"
+#include "GObject/DCLogger.h"
 
 void MsgHandler::DeregisterAllMsg()
 {
@@ -38,6 +39,7 @@ bool MsgHandler::ProcessMsg()
                     delete[] (char *)hdr;
 					continue;
 				}
+                GObject::dclogger.protol_sec(ihdr->player, hdr->cmdID);
 			}
 		}
 		handler = m_HandlerList[hdr->cmdID];
