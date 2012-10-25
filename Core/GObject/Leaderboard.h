@@ -33,7 +33,7 @@ struct RankingInfoList
     UInt32 country;
     std::string clanName;
     UInt32 roleLevel;
-    UInt32 value;
+    UInt64 value;
 };
 struct TownRankingInfoList
 {

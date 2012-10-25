@@ -364,7 +364,9 @@ int query_ranking_req(JsonHead* head, json_t* body, json_t* retbody, std::string
             if (obj)
             {
                 char playerId[64] = {0};
+                char exp[64] = {0};
                 sprintf(playerId, "%"I64_FMT"u", info.id);
+                sprintf(exp, "%"I64_FMT"u", info.value);
                 std::string clanName = fixPlayerName(info.clanName);
                 if (clanName.empty())
                     clanName = "-";
@@ -374,7 +376,7 @@ int query_ranking_req(JsonHead* head, json_t* body, json_t* retbody, std::string
                 json_insert_pair_into_object(obj, "ucCamp", my_json_new_number(info.country));
                 json_insert_pair_into_object(obj, "szFactionName", json_new_string(clanName.c_str()));
                 json_insert_pair_into_object(obj, "usLevel", my_json_new_number(info.roleLevel));
-                json_insert_pair_into_object(obj, "uiRankValue", my_json_new_number(info.value));
+                json_insert_pair_into_object(obj, "uiRankValue", json_new_string(exp));
                 json_insert_child(arr, obj);
             }
         }
