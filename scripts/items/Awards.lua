@@ -203,20 +203,26 @@ function RunNewRC7DayLoginAward(player, cts)
     local package = player:GetPackage();
 
     if cts == 0 then
+        print ("false")
         return false
     end
     if cts > 7 then
+        print ("false1")
         return false
     end
 
-    if package:GetRestPackageSize() < ((#item[cts] - 1) +((#item[cts] - 1)*num*4)/99) then
+    num = #item[cts]
+    if package:GetRestPackageSize() < ((num - 1) +((num - 1)*num*4/99)) then
         player:sendMsgCode(2, 1011, 0);
+        print ("false2")
         return false
     end
 
     for count = 1, #item[cts] do
         package:Add(item[cts][count][1], item[cts][count][2], true, 0, 34);
     end
+    print("true")
+    return true
 end
 
 function RunNewRC7DayLoginAward2(player, val)
@@ -229,24 +235,30 @@ function RunNewRC7DayLoginAward2(player, val)
     local package = player:GetPackage();
 
     if val == 0 then
+        print ("false")
         return false
     end
     if val > 5 then
+        print ("false1")
         return false
     end
     if val == 2 then
-        return addFighterFromItem(9011, 0)
+        return player:addFighterFromItem(9011, 0)
     end
 
         
-    if package:GetRestPackageSize() < ((#item[val] - 1) +((#item[val] - 1)*num*3)/99) then
+    num = #item[val]
+    if package:GetRestPackageSize() < ((num - 1) +((num - 1)*num*3)/99) then
         player:sendMsgCode(2, 1011, 0);
+        print ("false2")
         return false
     end
 
     for count = 1, #item[val] do
         package:Add(item[val][count][1], item[val][count][2], true, 0, 34);
     end
+    print ("true")
+    return true
 end
 
 function RunNewRC7DayRechargeAward(player)

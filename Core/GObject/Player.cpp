@@ -10651,6 +10651,8 @@ namespace GObject
             else
                 break;
         }
+        if (val == 0)
+            return;
         if (val <= 7)
         {
             // 领取签到登录奖励
@@ -10662,11 +10664,12 @@ namespace GObject
                 ConsumeInfo ci(RC7DayLogin, 0, 0);
                 useGold(10, &ci);
 
-                ctslanding |= (1<<off);
+                ctslanding |= (1<<(val - 1));
                 SetVar(VAR_CTSLANDING, ctslanding);
 
-                ctslandingAward |= (1<<off);
+                ctslandingAward |= (1<<(val - 1));
                 SetVar(VAR_CTSLANDING_AWARD, ctslandingAward);
+                sendNewRC7DayLogin();
             }
             else if (val == off + 1)
             {
@@ -10674,8 +10677,9 @@ namespace GObject
                 if (!GameAction()->RunNewRC7DayLoginAward(this, val))
                     return;
 
-                ctslandingAward |= (1<<off);
+                ctslandingAward |= (1<<(val - 1));
                 SetVar(VAR_CTSLANDING_AWARD, ctslandingAward);
+                sendNewRC7DayLogin();
             }
             else
             {
@@ -10688,7 +10692,7 @@ namespace GObject
             val -= 7;
             if (val < cts)
             {
-                if (1<<val & ctslandingAward2)
+                if (1<<(val - 1) & ctslandingAward2)
                 {
                     // 已经领取过了
                     sendMsgCode(0, 1340);
@@ -10696,11 +10700,12 @@ namespace GObject
                 else
                 {
                     // 正常领取
-                    if (!GameAction()->RunNewRC7DayLoginAward(this, val))
+                    if (!GameAction()->RunNewRC7DayLoginAward2(this, val))
                         return;
 
-                    ctslandingAward2 |= 1 << val;
+                    ctslandingAward2 |= 1 << (val - 1);
                     SetVar(VAR_CTSLANDING_AWARD2, ctslandingAward2);
+                    sendNewRC7DayLogin();
                 }
             }
             else

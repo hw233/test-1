@@ -1246,16 +1246,16 @@ namespace Script
 		return Call<UInt8>("RunBirthdayAward", player);
     }
 
-    UInt8 GameActionLua::RunNewRC7DayLoginAward(Player* player, UInt8 val)
+    bool GameActionLua::RunNewRC7DayLoginAward(Player* player, UInt8 val)
     {
         assert(player != NULL);
-        return Call<UInt8>("RunNewRC7DayLoginAward", player, val);
+        return Call<bool>("RunNewRC7DayLoginAward", player, val);
     }
 
-    UInt8 GameActionLua::RunNewRC7DayLoginAward2(Player* player, UInt8 val)
+    bool GameActionLua::RunNewRC7DayLoginAward2(Player* player, UInt8 val)
     {
         assert(player != NULL);
-        return Call<UInt8>("RunNewRC7DayLoginAward2", player, val);
+        return Call<bool>("RunNewRC7DayLoginAward2", player, val);
     }
 
     UInt8 GameActionLua::RunNewRC7DayRechargeAward(Player* player)
