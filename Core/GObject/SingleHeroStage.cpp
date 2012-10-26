@@ -3593,8 +3593,6 @@ namespace GObject
     SHBattleStageMgr::SHBattleStageMgr() : m_progress(0), m_nextTime(0), m_session(0), m_lvlCnt70(0), m_towerEndTime(0), m_fOpen(false)
     {
         m_dstprogress = 0;
-        if(!cfg.GMCheck)
-            m_fOpen = true;
 
         m_starStage = NULL;
         m_starStage2 = NULL;
@@ -5544,8 +5542,6 @@ namespace GObject
 
     bool SHBattleStageMgr::openStage(UInt32 openTime)
     {
-        if(!cfg.GMCheck)
-            return true;
         bool oldOpenFlag = m_fOpen;
         if(openTime < m_onOffTime._timeBegin || openTime > m_onOffTime._timeEnd)
             m_fOpen = false;
