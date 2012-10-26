@@ -4704,19 +4704,27 @@ namespace GObject
 		return _playerData.status;
 	}
 
+    UInt8 Player::getTitle_noCheck()
+    {
+        return _playerData.title;
+    }
+
     UInt8 Player::getTitle()
     {
         UInt32 timeLeft = 0;
         if(CURRENT_THREAD_ID() == getThreadId())
         {
-            GameMsgHdr h(0x264,  getThreadId(), this, 0);
-            GLOBAL().PushMsg(h, NULL);
             if(!checkTitleTimeEnd(_playerData.title, timeLeft))
             {
                 notifyTitleAll();
                 writeTitleAll();
                 changeTitle(0);
             }
+        }
+        else
+        {
+            GameMsgHdr h(0x264,  getThreadId(), this, 0);
+            GLOBAL().PushMsg(h, NULL);
         }
 
         return _playerData.title;
@@ -4738,12 +4746,16 @@ namespace GObject
 	{
         if(CURRENT_THREAD_ID() != getThreadId())
         {
+            UInt8 thr = getThreadId();
+            if(0xFF == thr)
+                thr = getCountry();
+
             struct TitleData
             {
                 UInt8 title;
                 UInt32 timeLen;
             } titleData = {t, timeLen};
-            GameMsgHdr h(0x265,  getThreadId(), this, sizeof(titleData));
+            GameMsgHdr h(0x265,  thr, this, sizeof(titleData));
             GLOBAL().PushMsg(h, &titleData);
             return;
         }
@@ -13854,7 +13866,10 @@ void EventTlzAuto::notify(bool isBeginAuto)
         std::string title = "";
 
         if(!cnt)
+        {
+            _playerData.titleAll[0] = 0;
             title += "0,0|";
+        }
 
         for(std::map<UInt8, UInt32>::iterator it = titleAll.begin(); it != titleAll.end(); ++ it)
         {

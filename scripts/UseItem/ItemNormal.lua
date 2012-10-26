@@ -332,7 +332,7 @@ function ItemNormal_9147_9159(iid, num, bind, param)
     if iid < 9147 or iid > 9159 then
         return 0
     end
-    player:setTitle(iid-9147+20)
+    player:setTitle(iid-9147+20, 0)
     package:DelItemSendMsg(iid, player);
     return num;
 end
@@ -343,7 +343,7 @@ function ItemNormal_9170_9172(iid, num, bind, param)
     if iid < 9170 or iid > 9172 then
         return 0
     end
-    player:setTitle(iid-9170+33)
+    player:setTitle(iid-9170+33, 0)
     package:DelItemSendMsg(iid, player);
     return num;
 end
@@ -1340,7 +1340,7 @@ end
 function ItemNormal_shusanLoveCard(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
-    player:setTitle(iid-442+5)
+    player:setTitle(iid-442+5, 0)
     package:DelItemSendMsg(iid, player);
     return num;
 end
@@ -2959,7 +2959,7 @@ end
 function ItemNormal_00009007(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
-    player:setTitle(iid-9007+11)
+    player:setTitle(iid-9007+11, 0)
     package:DelItemSendMsg(iid, player);
     return num;
 end
@@ -3897,7 +3897,7 @@ end
 function ItemNormal_00009029(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
-    player:setTitle(iid-9029+14)
+    player:setTitle(iid-9029+14, 0)
     package:DelItemSendMsg(iid, player);
     return num;
 end
@@ -3955,7 +3955,7 @@ end
 function ItemNormal_00009034(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
-    player:setTitle(16)
+    player:setTitle(16, 0)
     package:DelItemSendMsg(iid, player);
     return num;
 end
@@ -4203,7 +4203,7 @@ end
 function ItemNormal_00009089(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
-    player:setTitle(17)
+    player:setTitle(17, 0)
     package:DelItemSendMsg(iid, player);
     return num;
 end
@@ -5960,7 +5960,7 @@ end
 function ItemNormal_QixiLoveCard(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
-    player:setTitle(iid-9124+18)
+    player:setTitle(iid-9124+18, 0)
     package:DelItemSendMsg(iid, player);
     return num;
 end
@@ -6093,7 +6093,7 @@ function ItemNormal_00009180(iid, num, bind, param)
     if iid ~= 9180 then
         return 0
     end
-    player:setTitle(36)
+    player:setTitle(36, 0)
     package:DelItemSendMsg(iid, player);
     return num;
 end
@@ -6104,7 +6104,7 @@ function ItemNormal_00009189(iid, num, bind, param)
     if iid ~= 9189 then
         return 0
     end
-    player:setTitle(37)
+    player:setTitle(37, 0)
     package:DelItemSendMsg(iid, player);
     return num;
 end

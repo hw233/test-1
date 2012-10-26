@@ -630,7 +630,6 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             }
             pl->setInvited(nu._invited);
             pl->SetVar(GObject::VAR_VIPFIRST, 1); // XXX: fix old servers
-            pl->setTitle(0, 0);
 
 			DBLOG1().PushUpdateData("insert into register_states(server_id,player_id,player_name,platform,reg_time) values(%u,%"I64_FMT"u, '%s', %u, %u)", cfg.serverLogId, pl->getId(), pl->getName().c_str(), atoi(nu._platform.c_str()), TimeUtil::Now());
 
@@ -669,6 +668,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             GLOBAL().PushMsg(hdr, NULL);
 
             pl->SetVar(GObject::VAR_RP_VALUE, nu._rp);
+            pl->setTitle(0, 0);
         }
 	}
 

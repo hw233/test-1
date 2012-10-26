@@ -967,6 +967,7 @@ namespace GObject
         void fixOldVertionTitle(UInt8 t);
 		void setTitle(UInt8 s, UInt32 timeLen = 0);
 		UInt8 getTitle();
+        UInt8 getTitle_noCheck();
         bool checkTitleTimeEnd(UInt8 title, UInt32& timeLeft);
         bool makeTitleAllInfo(Stream& st);
         bool hasTitle(UInt8);
