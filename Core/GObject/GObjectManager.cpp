@@ -1622,6 +1622,8 @@ namespace GObject
             else
                 pl->loadTitleAll(0, 0);
 
+            if(!pl->hasTitle(0))
+                pl->fixOldVertionTitle(0);
             if(!pl->hasTitle(dbpd.pdata.title))
                 pl->fixOldVertionTitle(dbpd.pdata.title);
 		}
@@ -4661,8 +4663,7 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
-		LoadingCounter lc("TownDeamon");
-		lc.prepare("Loading TownDeamon Monsters:");
+		LoadingCounter lc("Loading TownDeamon Monsters:");
 		GData::DBTownDeamonMonster dbtdm;
 		if(execu->Prepare("SELECT `level`, `npcId`, `itemId`, `itemNum` FROM `towndeamon_monster` order by level asc", dbtdm) != DB::DB_OK)
 			return false;
