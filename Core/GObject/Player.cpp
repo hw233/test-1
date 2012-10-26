@@ -1451,6 +1451,14 @@ namespace GObject
         udpLog("tripod", action, "", "", "", "", "act", num);
     }
 
+    void Player::storeUdpLog(UInt32 id, UInt32 type, UInt32 itemId, UInt32 num /* = 1 */)
+    {
+        // TODO: 商城购买相关日志（现在只有荣誉和声望）
+        char action[32] = "";
+        snprintf (action, 16, "F_%d_%d_%d", id, type, itemId);
+        udpLog("store", action, "", "", "", "", "act", num);
+    }
+
     void Player::sendHalloweenOnlineAward(UInt32 now, bool _online)
     {
         _online = false; // XXX: fuck
