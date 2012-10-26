@@ -3,6 +3,7 @@
 #include "Server/WorldServer.h"
 #include "GObject/Player.h"
 #include "GObject/DCLogger.h"
+#include "MsgID.h"
 
 void MsgHandler::DeregisterAllMsg()
 {
@@ -39,15 +40,42 @@ bool MsgHandler::ProcessMsg()
                     delete[] (char *)hdr;
 					continue;
 				}
-                GObject::dclogger.protol_sec(ihdr->player, hdr->cmdID);
 			}
 		}
-		handler = m_HandlerList[hdr->cmdID];
-		if (handler != NULL)
-		{
-			if (!handler->m_Wrapper(handler->m_Func, hdr))
-			{
-				//Error
+
+        if (hdr->cmdID <= 0xff)
+        {
+            // 安全上报协议转发
+            if (hdr->desWorkerID == WORKER_THREAD_NEUTRAL ||
+                    hdr->desWorkerID == WORKER_THREAD_COUNTRY_1 ||
+                    hdr->desWorkerID == WORKER_THREAD_COUNTRY_2 ||
+                    hdr->desWorkerID == WORKER_THREAD_WORLD) 
+
+            {
+                if (hdr->cmdID != REQ::LOGIN &&
+                        hdr->cmdID != REQ::CREATE_ROLE &&
+                        hdr->cmdID != REQ::RECONNECT)
+                {
+                    GameMsgHdr * ihdr = reinterpret_cast<GameMsgHdr *>(hdr);
+
+                    if(ihdr->player != NULL)     
+                    {
+                        UInt8 tid = ihdr->player->getThreadId();
+                        if(tid == m_Worker)
+                        {
+                            GObject::dclogger.protol_sec(ihdr->player, hdr->cmdID);
+                        }
+                    }
+                }
+            }
+        }
+
+        handler = m_HandlerList[hdr->cmdID];
+        if (handler != NULL)
+        {
+            if (!handler->m_Wrapper(handler->m_Func, hdr))
+            {
+                //Error
 			}
 		}
 		else
