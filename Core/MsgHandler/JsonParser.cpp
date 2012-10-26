@@ -196,7 +196,7 @@ int query_rolebaseinfo_req(JsonHead* head, json_t* body, json_t* retbody, std::s
     json_insert_pair_into_object(retbody, "szRoleName", json_new_string(fixPlayerName(player->getName()).c_str()));
     json_insert_pair_into_object(retbody, "ucGender", my_json_new_number(player->IsMale()?1:2));
     char title[32] = {0};
-    snprintf(title, sizeof(title), "%u", player->getTitle());
+    snprintf(title, sizeof(title), "%u", player->getTitle_noCheck());
     json_insert_pair_into_object(retbody, "szCharTitle", json_new_string(title));
     json_insert_pair_into_object(retbody, "ucJob", my_json_new_number(player->GetClass()));
     json_insert_pair_into_object(retbody, "ucNation", my_json_new_number(player->getCountry()));

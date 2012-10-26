@@ -4699,6 +4699,11 @@ namespace GObject
 		return _playerData.status;
 	}
 
+    UInt8 Player::getTitle_noCheck()
+    {
+        return _playerData.title;
+    }
+
     UInt8 Player::getTitle()
     {
         UInt32 timeLeft = 0;
