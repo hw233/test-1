@@ -257,7 +257,7 @@ function RunBlueDiamondAward(player, opt)
     local g = math.random(1, 10000)
     for i = 1, #chance do
         if g <= chance[i] then
-            package:Add(items[i][1], items[i][2], true, 0, 31);
+            package:Add(items[i][1], items[i][2], true, true, 31);
             j = i;
             break
         end
