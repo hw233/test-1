@@ -39,7 +39,8 @@ bool MsgHandler::ProcessMsg()
                     delete[] (char *)hdr;
 					continue;
 				}
-                GObject::dclogger.protol_sec(ihdr->player, hdr->cmdID);
+                if (hdr->cmdID < 130)
+                    GObject::dclogger.protol_sec(ihdr->player, hdr->cmdID);
 			}
 		}
 		handler = m_HandlerList[hdr->cmdID];
