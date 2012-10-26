@@ -4704,14 +4704,17 @@ namespace GObject
         UInt32 timeLeft = 0;
         if(CURRENT_THREAD_ID() == getThreadId())
         {
-            GameMsgHdr h(0x264,  getThreadId(), this, 0);
-            GLOBAL().PushMsg(h, NULL);
             if(!checkTitleTimeEnd(_playerData.title, timeLeft))
             {
                 notifyTitleAll();
                 writeTitleAll();
                 changeTitle(0);
             }
+        }
+        else
+        {
+            GameMsgHdr h(0x264,  getThreadId(), this, 0);
+            GLOBAL().PushMsg(h, NULL);
         }
 
         return _playerData.title;
