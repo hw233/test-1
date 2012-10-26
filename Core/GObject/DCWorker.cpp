@@ -1,6 +1,7 @@
 
 #include "Config.h"
 #include "DCWorker.h"
+#include "Server/Cfg.h"
 
 namespace GObject
 {
@@ -66,6 +67,10 @@ namespace GObject
                 {
                     TRACE_LOG("[%u]%u:%u-[%s] -> %d", m_Worker, sz, size, msg, r ? 1 : 0);
                     TRACE_LOG("logType = %u", (UInt32)logType);
+                }
+                if (logType == LT_SECDATA && cfg.secdclogTest && cfg.isTestPlatform)
+                {
+                    TRACE_LOG("[%u]%u:%u-[%s] -> %d", m_Worker, sz, size, msg, r ? 1 : 0);
                 }
 
                 delete[] msg;

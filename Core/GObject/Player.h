@@ -1653,38 +1653,39 @@ namespace GObject
         void setVipAwardFlag(UInt8 type, UInt32 value);
 
     private:
-        std::string m_domain;
-        std::string m_openid;
-        std::string m_openkey;
+        char m_domain[256];
+        char m_openid[256];
+        char m_openkey[256];
+        char m_clientIp[256];
+
         std::string m_source;
         std::string m_via;
         std::string m_invited;
-        std::string m_clientIp;
         bool m_isOffical;
     public:
         inline void setDomain(const std::string& domain)
         {
-            m_domain = domain;
+            strncpy (m_domain, domain.c_str(), 256);
             m_isOffical = false;
             if (atoi(domain.c_str()) == 12)
                 m_isOffical = true;
         }
-        inline void setClientIp(const std::string& clientIp) { m_clientIp = clientIp; }
-        inline void setOpenId(const std::string& openid) { m_openid = openid; }
-        inline void setOpenKey(const std::string& openkey) { m_openkey = openkey; }
+        inline void setClientIp(const std::string& clientIp) { strncpy(m_clientIp, clientIp.c_str(), 256);}
+        inline void setOpenId(const std::string& openid) { strncpy(m_openid, openid.c_str(), 256); }
+        inline void setOpenKey(const std::string& openkey) { strncpy(m_openkey, openkey.c_str(), 256); }
         inline void setSource(const std::string& source) { m_source = source; }
         inline void setVia(const std::string& via) { m_via = via; }
         inline void setInvited(const std::string& inv) { m_invited = inv; }
-        inline const std::string& getDomain() const { return m_domain; }
-        inline const std::string& getOpenId() const { return m_openid; }
-        inline const std::string& getOpenKey() const { return m_openkey; }
+        inline const char* getDomain() const { return m_domain; }
+        inline const char* getOpenId() const { return m_openid; }
+        inline const char* getOpenKey() const { return m_openkey; }
         inline const std::string& getSource() const { return m_source; }
         inline const std::string& getVia() const { return m_via; }
         inline const std::string& getInvited() const { return m_invited; }
         inline bool isOffical() const { return m_isOffical; }
-        inline const std::string& getClientIp() const { return m_clientIp; }
+        inline const char* getClientIp() const { return m_clientIp; }
 
-        inline UInt8 getPlatform() const { return atoi(m_domain.c_str()); }
+        inline UInt8 getPlatform() const { return atoi(m_domain); }
 
     public:
         inline void setSysDailog(bool v) { m_sysDailog = v; }
