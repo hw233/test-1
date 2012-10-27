@@ -327,7 +327,7 @@ bool Dungeon::doChallenge( Player * player, DungeonPlayerInfo& dpi, bool report,
     player->OnHeroMemo(MC_SLAYER, MD_STARTED, 0, 0);
 
     player->setJusticeRoar(dpi.justice_roar);
-	Battle::BattleSimulator bsim(player->getLocation(), player, dm->fighter->getName(), dm->fighter->getLevel(), dm->formated);
+	Battle::BattleSimulator bsim(player->getLocation(), player, dm->fighter->getName(), dm->fighter->getLevel(), false);
 	player->PutFighters(bsim, 0);
 	bsim.setPortrait(1, dm->fighter->favor);
 	if(dm->formated)
