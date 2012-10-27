@@ -563,6 +563,11 @@ namespace GObject
         _mditem = 0;
         _qixiBinding = false;
 
+        memset (m_domain, 0, sizeof(m_domain));
+        memset (m_openid, 0, sizeof(m_openid));
+        memset (m_openkey, 0, sizeof(m_openkey));
+        memset (m_clientIp, 0, sizeof(m_clientIp));
+
         char buf[64] = {0};
         snprintf(buf, sizeof(buf), "%"I64_FMT"u", _id);
 #ifndef _WIN32
@@ -1032,7 +1037,7 @@ namespace GObject
                 Network::GameClient * cl = static_cast<Network::GameClient *>(conn.get());
                 struct in_addr inaddr = inet_makeaddr(cl->GetClientIP(), 0);
                 //m_ulog->SetUserIP(inet_ntoa(inaddr));
-                m_ulog->SetUserIP(m_clientIp.c_str());
+                m_ulog->SetUserIP(m_clientIp);
             }
         }
 #endif
@@ -1118,10 +1123,10 @@ namespace GObject
             char* pbuf = &buf[0];
             if (cfg.isTestPlatform)
                 pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u|%u|%u|%u|%u||%u||%u||%u|1|",
-                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId().c_str(), GetLev(), _playerData.gold, _playerData.coupon, _playerData.tael, getVipLevel(), _clan? _clan->getId() : 0, _playerData.qqvipl, cfg.serverNum, platform);
+                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId(), GetLev(), _playerData.gold, _playerData.coupon, _playerData.tael, getVipLevel(), _clan? _clan->getId() : 0, _playerData.qqvipl, cfg.serverNum, platform);
             else
                 pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u|%u|%u|%u|%u||%u||%u||%u|",
-                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId().c_str(), GetLev(), _playerData.gold, _playerData.coupon, _playerData.tael, getVipLevel(), _clan? _clan->getId() : 0, _playerData.qqvipl, cfg.serverNum, platform);
+                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId(), GetLev(), _playerData.gold, _playerData.coupon, _playerData.tael, getVipLevel(), _clan? _clan->getId() : 0, _playerData.qqvipl, cfg.serverNum, platform);
 
             m_ulog->SetUserMsg(buf);
             if (platform != WEBDOWNLOAD)
@@ -1141,7 +1146,7 @@ namespace GObject
 #ifndef _WIN32
         if (m_ulog)
         {
-            UInt8 platform = atoi(getDomain().c_str());
+            UInt8 platform = atoi(getDomain());
             if (platform == OFFICAL && strstr(m_via.c_str(), "webdownload"))
                 platform = WEBDOWNLOAD;
 
@@ -4699,19 +4704,27 @@ namespace GObject
 		return _playerData.status;
 	}
 
+    UInt8 Player::getTitle_noCheck()
+    {
+        return _playerData.title;
+    }
+
     UInt8 Player::getTitle()
     {
         UInt32 timeLeft = 0;
         if(CURRENT_THREAD_ID() == getThreadId())
         {
-            GameMsgHdr h(0x264,  getThreadId(), this, 0);
-            GLOBAL().PushMsg(h, NULL);
             if(!checkTitleTimeEnd(_playerData.title, timeLeft))
             {
                 notifyTitleAll();
                 writeTitleAll();
                 changeTitle(0);
             }
+        }
+        else
+        {
+            GameMsgHdr h(0x264,  getThreadId(), this, 0);
+            GLOBAL().PushMsg(h, NULL);
         }
 
         return _playerData.title;
@@ -4733,12 +4746,16 @@ namespace GObject
 	{
         if(CURRENT_THREAD_ID() != getThreadId())
         {
+            UInt8 thr = getThreadId();
+            if(0xFF == thr)
+                thr = getCountry();
+
             struct TitleData
             {
                 UInt8 title;
                 UInt32 timeLen;
             } titleData = {t, timeLen};
-            GameMsgHdr h(0x265,  getThreadId(), this, sizeof(titleData));
+            GameMsgHdr h(0x265,  thr, this, sizeof(titleData));
             GLOBAL().PushMsg(h, &titleData);
             return;
         }
@@ -6857,7 +6874,7 @@ namespace GObject
             sendRechargeInfo(true);
         }
 
-        if (World::getRechargeActive3366() && atoi(m_domain.c_str()) == 11)
+        if (World::getRechargeActive3366() && atoi(m_domain) == 11)
         {
             UInt32 total = GetVar(VAR_RECHARGE_TOTAL3366);
             GameAction()->sendRechargeMails(this, total, total+r);
@@ -9240,7 +9257,7 @@ namespace GObject
 
         bool blue = false;
         bool qplus = false;
-        UInt8 domain = atoi(m_domain.c_str());
+        UInt8 domain = atoi(m_domain);
         if (domain == 11 && _playerData.qqvipl >= 20 && _playerData.qqvipl < 40)
         {
             Stream st(REP::YD_INFO);
@@ -9382,7 +9399,7 @@ namespace GObject
         UInt8 nRes = 0;
         Stream st(REP::YD_AWARD_RCV);
 
-        UInt8 domain = atoi(m_domain.c_str());
+        UInt8 domain = atoi(m_domain);
         if (domain == 11 && _playerData.qqvipl >= 20 && _playerData.qqvipl < 40 && d3d6 == 1)
         {
             UInt8 qqvipl = _playerData.qqvipl % 10;
@@ -10408,7 +10425,7 @@ namespace GObject
         {
             UInt8 status = GetVar(VAR_YEAR_NOBLE);
             UInt8 newStatus;
-            if(atoi(m_domain.c_str()) == 11)
+            if(atoi(m_domain) == 11)
             {
                 if(is3366AndLevel4() && (status & 0x08) == 0)
                 {
@@ -10471,7 +10488,7 @@ namespace GObject
 
     void Player::getQgameGiftAward()
     {
-        if(atoi(m_domain.c_str()) != 10)
+        if(atoi(m_domain) != 10)
             return;
         if(GetVar(VAR_QGAME_GIFT) == 0)
         {
@@ -10521,7 +10538,7 @@ namespace GObject
          * 0x08:3366且大于等于4级
          */
         UInt8 status = GetVar(VAR_YEAR_NOBLE);
-        if(atoi(m_domain.c_str()) == 11)
+        if(atoi(m_domain) == 11)
         {
             if(is3366AndLevel4())
             {
@@ -11109,7 +11126,7 @@ namespace GObject
     void Player::onBlueactiveday()
     {
         // XXX: 原来是为蓝钻准备的，现在全平台也要了
-        //if (!(atoi(m_domain.c_str()) == 11 || atoi(m_domain.c_str()) == 10))
+        //if (!(atoi(m_domain) == 11 || atoi(m_domain) == 10))
         //    return;
 
         UInt32 online = GetOnlineTimeToday();
@@ -13978,7 +13995,10 @@ void EventTlzAuto::notify(bool isBeginAuto)
         std::string title = "";
 
         if(!cnt)
+        {
+            _playerData.titleAll[0] = 0;
             title += "0,0|";
+        }
 
         for(std::map<UInt8, UInt32>::iterator it = titleAll.begin(); it != titleAll.end(); ++ it)
         {

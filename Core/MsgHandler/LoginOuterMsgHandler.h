@@ -189,7 +189,7 @@ void UserDisconnect( GameMsgHdr& hdr, UserDisconnectStruct& )
 #ifndef _WIN32
 #ifdef _FB
 #else
-    GObject::dclogger.decDomainOnlineNum(atoi(player->getDomain().c_str()));
+    GObject::dclogger.decDomainOnlineNum(atoi(player->getDomain()));
 #endif
 #endif // _WIN32
 }
@@ -355,10 +355,10 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 		}
 		res = doLogin(cl, pid, hdr.sessionID, player);
 
-        std::string domain = "";
+        char domain[256] = "";
         if (player)
         {
-            domain = player->getDomain();
+            strncpy (domain, player->getDomain(), 256);
             player->setDomain(ul._platform);
             player->setOpenId(ul._openid);
             player->setOpenKey(ul._openkey);
@@ -391,7 +391,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 #ifndef _WIN32
 #ifdef _FB
 #else
-            GObject::dclogger.decDomainOnlineNum(atoi(domain.c_str()));
+            GObject::dclogger.decDomainOnlineNum(atoi(domain));
             GObject::dclogger.incDomainOnlineNum(atoi(ul._platform.c_str()));
 #endif
 #endif //_WIN32
@@ -630,14 +630,13 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             }
             pl->setInvited(nu._invited);
             pl->SetVar(GObject::VAR_VIPFIRST, 1); // XXX: fix old servers
-            pl->setTitle(0, 0);
 
 			DBLOG1().PushUpdateData("insert into register_states(server_id,player_id,player_name,platform,reg_time) values(%u,%"I64_FMT"u, '%s', %u, %u)", cfg.serverLogId, pl->getId(), pl->getName().c_str(), atoi(nu._platform.c_str()), TimeUtil::Now());
 
 #ifndef _WIN32
 #ifdef _FB
 #else
-            GObject::dclogger.incDomainOnlineNum(atoi(pl->getDomain().c_str()));
+            GObject::dclogger.incDomainOnlineNum(atoi(pl->getDomain()));
 #endif
 #endif //_WIN32
 			CountryEnterStruct ces(false, 1, loc);
@@ -669,6 +668,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             GLOBAL().PushMsg(hdr, NULL);
 
             pl->SetVar(GObject::VAR_RP_VALUE, nu._rp);
+            pl->setTitle(0, 0);
         }
 	}
 
@@ -1036,7 +1036,7 @@ inline bool player_enum_1(GObject::Player* p, void* msg)
     };
 
     Msg* _msg = (Msg*)msg;
-    if (p->isOnline() && atoi(p->getDomain().c_str()) == _msg->pf)
+    if (p->isOnline() && atoi(p->getDomain()) == _msg->pf)
         p->send(*_msg->msg);
 
     return true;
@@ -1632,7 +1632,7 @@ void AddItemToAllFromBs(LoginMsgHdr &hdr,const void * data)
 		}
 		else
 		{
-            if (!pf || (pf && player->isOnline() && atoi(player->getDomain().c_str())==pf))
+            if (!pf || (pf && player->isOnline() && atoi(player->getDomain())==pf))
             {
                 GObject::MailItemsInfo itemsInfo(item, BackStage, nums);
                 GObject::Mail *pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFD0000, true, &itemsInfo);
@@ -2280,6 +2280,8 @@ UInt8 SwitchSecDC(UInt32 val)
 {
     // 设置是否开启安全DCLogger，返回设置是否成功(0 成功，非0 失败)
     cfg.setSecDCLog(val? true:false);
+    if (cfg.isTestPlatform)
+        cfg.setSecDCLogTest(val? true:false);
     return 0;
 }
 

@@ -89,6 +89,7 @@ public:
     bool udplog;
     bool dclog;
     bool secdclog;
+    bool secdclogTest;
 
 public:
 	inline void setTcpPort(UInt16 p) {tcpPort = p;}
@@ -129,6 +130,7 @@ public:
     inline void setUdpLog(bool v) { udplog = v; }
     inline void setDCLog(bool v) { dclog = v; }
     inline void setSecDCLog(bool v) { secdclog = v; }
+    inline void setSecDCLogTest(bool v) { secdclogTest = v; }
 
 
 	inline void setVerifyTokenServer(const char* server, UInt16 port)

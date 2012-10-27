@@ -2699,7 +2699,7 @@ namespace GObject
             if (World::getEnchantAct() && (equip->getClass() == Item_Weapon || equip->getClass() == Item_Armor1 || equip->getClass() == Item_Armor2 || equip->getClass() == Item_Armor4 || equip->getClass() == Item_Armor5))
                 enchantAct(m_Owner, quality, oldEnchant, ied.enchant, autoEnch?0:1);
 #else
-            //UInt8 platform = atoi(m_Owner->getDomain().c_str());
+            //UInt8 platform = atoi(m_Owner->getDomain());
             if (World::getEnchantAct()/* && platform == 10*/)
                 enchantAct(m_Owner, quality, oldEnchant, ied.enchant, autoEnch?0:1);
 #endif

@@ -3593,8 +3593,6 @@ namespace GObject
     SHBattleStageMgr::SHBattleStageMgr() : m_progress(0), m_nextTime(0), m_session(0), m_lvlCnt70(0), m_towerEndTime(0), m_fOpen(false)
     {
         m_dstprogress = 0;
-        if(!cfg.GMCheck)
-            m_fOpen = true;
 
         m_starStage = NULL;
         m_starStage2 = NULL;
@@ -4309,7 +4307,6 @@ namespace GObject
         DB1().PushUpdateData("DELETE FROM `sh_fighter_attr2`;");
         m_progress = 0;
         m_dstprogress = 0;
-        m_nextTime = TimeUtil::Now();
     }
 
 
@@ -4919,8 +4916,8 @@ namespace GObject
     void SHBattleStageMgr::reset()
     {
         m_progress = 0;
-        m_nextTime = TimeUtil::Now();
         clear();
+        DB1().PushUpdateData("UPDATE `sh_global` SET `progress`=%u, `nextTime`=%u where `session`=%u", m_progress, m_nextTime, m_session);
     }
 
     void SHBattleStageMgr::addScore(Player* pl, UInt8 cls, UInt32 score, bool writeDB)
@@ -5544,8 +5541,8 @@ namespace GObject
 
     bool SHBattleStageMgr::openStage(UInt32 openTime)
     {
-        if(!cfg.GMCheck)
-            return true;
+        if(!m_nextTime)
+            return false;
         bool oldOpenFlag = m_fOpen;
         if(openTime < m_onOffTime._timeBegin || openTime > m_onOffTime._timeEnd)
             m_fOpen = false;
@@ -5566,7 +5563,7 @@ namespace GObject
         bool ret = true;
         m_onOffTime._timeBegin = timeBegin;
         m_onOffTime._timeEnd = timeEnd;
-        DB1().PushUpdateData("UPDATE `sh_global` SET `timeBegin`=`%u, `timeEnd`=%u WHERE `session`=%u", timeBegin, timeEnd, m_session);
+        DB1().PushUpdateData("UPDATE `sh_global` SET `timeBegin`=%u, `timeEnd`=%u WHERE `session`=%u", timeBegin, timeEnd, m_session);
         if(!isOpen())
         {
             time_t curtime = time(NULL);
@@ -5578,9 +5575,8 @@ namespace GObject
 
             m_nextTime = TimeUtil::SharpDay(0, now)  + (7 - wday) * 86400 + stageStartTime[0];
 
-            m_progress = 0;
             ret = openStage(m_nextTime);
-            DB1().PushUpdateData("UPDATE `sh_global` SET `progress`=%u, `nextTime`=%u where `session`=%u", m_progress, m_nextTime, m_session);
+            reset();
         }
 
         return ret;
