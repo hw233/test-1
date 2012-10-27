@@ -1772,7 +1772,7 @@ namespace GObject
         void sendNewRC7DayInfo(UInt8 type = 0);
         void sendNewRC7DayLogin();
         void sendNewRC7DayRecharge();
-        void sendNewRC7DayTarget();
+        void sendNewRC7DayTarget(UInt8 idx = 0);
         void getNewRC7DayLoginAward(UInt8 val, UInt8 off);
         void getNewRC7DayRechargeAward(UInt8 val);
         void getNewRC7DayTargetAward(UInt8 val);

@@ -6653,8 +6653,9 @@ namespace GObject
 
 	void Player::checkLevUp(UInt8 oLev, UInt8 nLev)
 	{
-        if(nLev >= 40)
+        if(nLev >= 47)
         {
+#if 0
             UInt32 thisDay = TimeUtil::SharpDay();
             UInt32 firstDay = TimeUtil::SharpDay(0, PLAYER_DATA(this, created));
             if(thisDay == firstDay && !this->GetVar(VAR_CLAWARD2))
@@ -6662,10 +6663,27 @@ namespace GObject
                  this->SetVar(VAR_CLAWARD2, 1);
                  this->sendRC7DayInfo(TimeUtil::Now());
             }
+#else
+
+            UInt32 thisDay = TimeUtil::SharpDay();
+            UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA(this, created));
+            if(thisDay <= endDay && !GetVar(VAR_CLAWARD2))
+            {
+                UInt32 targetVal = GetVar(VAR_CLAWARD2);
+                if (targetVal & TARGET_LEVEL)
+                {
+                    targetVal |=TARGET_LEVEL;
+                    AddVar(VAR_CTS_TARGET_COUNT, 1);
+                    SetVar(VAR_CLAWARD2, targetVal);
+                    sendNewRC7DayTarget();
+                }
+            }
+
+#endif
         }
 
         if(_clan != NULL)
-		{
+        {
 			_clan->broadcastMemberInfo(this);
 		}
 		m_TaskMgr->CheckCanAcceptTaskByLev(nLev);
@@ -10636,20 +10654,24 @@ namespace GObject
     {
         // TODO: 发送新注册七日活动充值奖励页面信息
         Stream st(REP::NEWRC7DAY);
+        st << static_cast<UInt8> (2);
         UInt32 totalRecharge = GetVar(VAR_RC7DAYRECHARGE);
         UInt32 rechargeAward = GetVar(VAR_RC7DAYWILL);
-        st << static_cast<UInt32>(totalRecharge);
-        st << static_cast<UInt32>(rechargeAward);
+        st << static_cast<UInt8>(totalRecharge);
+        st << static_cast<UInt8>(rechargeAward);
         st << Stream::eos;
         send(st);
     }
 
-    void Player::sendNewRC7DayTarget()
+    void Player::sendNewRC7DayTarget(UInt8 idx /* = 0 */)
     {
         // TODO: 发送新注册七日活动每日目标页面信息
         Stream st(REP::NEWRC7DAY);
+        st << static_cast<UInt8> (3);
         st << static_cast<UInt16>(0); // 抽奖情况bit表
         st << static_cast<UInt8>(0);  // 剩余抽奖次数
+        if (idx)
+            st << static_cast<UInt8>(idx);
         st << Stream::eos;
         send(st);
     }
@@ -10735,11 +10757,42 @@ namespace GObject
     void Player::getNewRC7DayRechargeAward(UInt8 val)
     {
         // TODO: 申请领取新注册七天充值奖励 (神龙许愿)
+        // val 1-7 七龙珠奖励， 8-11 声望，荣誉，修为，经验
+        sendNewRC7DayRecharge();
     }
     
     void Player::getNewRC7DayTargetAward(UInt8 val)
     {
         // TODO: 申请领取新注册七天每日目标奖励 
+        // val 0:转盘开始 1:转盘结束
+        UInt8 idx = 0;
+        switch (val)
+        {
+            case 0:
+                {
+                    UInt8 count = GetVar(VAR_CTS_TARGET_COUNT);
+                    if (count)
+                    {
+                        idx = GameAction()->RunNewRC7DayTargetAward(this);
+                        --count;
+                        SetVar(VAR_CTS_TARGET_COUNT, count);
+                    }
+                }
+                break;
+            case 1:
+                {
+                    std::vector<GData::LootResult>::iterator it;
+                    for(it = _lastLoot.begin(); it != _lastLoot.end(); ++ it)
+                    {
+                        m_Package->ItemNotify(it->id, it->count);
+                    }
+                    _lastLoot.clear();
+                }
+                break;
+            default:
+                break;
+        }
+        sendNewRC7DayTarget(idx);
     }
 
     TripodData& Player::runTripodData(TripodData& data, bool init)

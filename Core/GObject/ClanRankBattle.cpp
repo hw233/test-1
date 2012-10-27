@@ -183,6 +183,21 @@ namespace GObject
             (*iter)->OnHeroMemo(MC_ATHLETICS, MD_LEGEND, 0, 0);
             (*iter)->OnShuoShuo(SS_CLANRANK);
             (*iter)->setContinuousRFAward(2);
+
+            UInt32 thisDay = TimeUtil::SharpDay();
+            UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA((*iter), created));
+            if(thisDay <= endDay && !(*iter)->GetVar(VAR_CLAWARD2))
+            {
+                UInt32 targetVal = (*iter)->GetVar(VAR_CLAWARD2);
+                if (targetVal & TARGET_CLAN_BATTLE)
+                {
+                    targetVal |=TARGET_CLAN_BATTLE;
+                    (*iter)->AddVar(VAR_CTS_TARGET_COUNT, 1);
+                    (*iter)->SetVar(VAR_CLAWARD2, targetVal);
+                    (*iter)->sendNewRC7DayTarget();
+                }
+            }
+
         }
         for(PlayerVec::const_iterator iter = team2.begin();
                 iter != team2.end(); ++iter){
@@ -196,6 +211,22 @@ namespace GObject
             (*iter)->OnHeroMemo(MC_ATHLETICS, MD_LEGEND, 0, 0);
             (*iter)->OnShuoShuo(SS_CLANRANK);
             (*iter)->setContinuousRFAward(2);
+
+            UInt32 thisDay = TimeUtil::SharpDay();
+            UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA((*iter), created));
+            if(thisDay <= endDay && !(*iter)->GetVar(VAR_CLAWARD2))
+            {
+                UInt32 targetVal = (*iter)->GetVar(VAR_CLAWARD2);
+                if (targetVal & TARGET_CLAN_BATTLE)
+                {
+                    targetVal |=TARGET_CLAN_BATTLE;
+                    (*iter)->AddVar(VAR_CTS_TARGET_COUNT, 1);
+                    (*iter)->SetVar(VAR_CLAWARD2, targetVal);
+                    (*iter)->sendNewRC7DayTarget();
+                }
+            }
+
+
         }
 
         m_WaitPlayers.clear();

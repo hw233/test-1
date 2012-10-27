@@ -145,6 +145,34 @@ void CountryBattle::process(UInt32 curtime)
 			UInt32 achieve = 0, loserAchieve = 2 * (lvl + 1);
 			if(World::_wday == 1)
 				loserAchieve *= 2;
+
+            UInt32 thisDay = TimeUtil::SharpDay();
+            UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA(cbd1->player, created));
+            if(thisDay <= endDay && !cbd1->player->GetVar(VAR_CLAWARD2))
+            {
+                UInt32 targetVal = cbd1->player->GetVar(VAR_CLAWARD2);
+                if (targetVal & TARGET_COUNTRY_BATTLE)
+                {
+                    targetVal |=TARGET_COUNTRY_BATTLE;
+                    cbd1->player->AddVar(VAR_CTS_TARGET_COUNT, 1);
+                    cbd1->player->SetVar(VAR_CLAWARD2, targetVal);
+                    cbd1->player->sendNewRC7DayTarget();
+                }
+            }
+
+            endDay = TimeUtil::SharpDay(6, PLAYER_DATA(cbd2->player, created));
+            if(thisDay <= endDay && !cbd2->player->GetVar(VAR_CLAWARD2))
+            {
+                UInt32 targetVal = cbd2->player->GetVar(VAR_CLAWARD2);
+                if (targetVal & TARGET_COUNTRY_BATTLE)
+                {
+                    targetVal |=TARGET_COUNTRY_BATTLE;
+                    cbd2->player->AddVar(VAR_CTS_TARGET_COUNT, 1);
+                    cbd2->player->SetVar(VAR_CLAWARD2, targetVal);
+                    cbd2->player->sendNewRC7DayTarget();
+                }
+            }
+
 			if(res)
 			{
 				CBStatusData data;

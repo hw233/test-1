@@ -362,6 +362,7 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
             else
                 pl->frontMapUdpLog(id,4);
 
+#if 0
             UInt32 thisDay = TimeUtil::SharpDay();
             UInt32 fifthDay = TimeUtil::SharpDay(4, PLAYER_DATA(pl, created));
             if(id == 2 && thisDay == fifthDay && !pl->GetVar(VAR_CLAWARD2))
@@ -369,6 +370,23 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
                 pl->SetVar(VAR_CLAWARD2, 1);
                 pl->sendRC7DayInfo(TimeUtil::Now());
             }
+
+#else
+            UInt32 thisDay = TimeUtil::SharpDay();
+            UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA(pl, created));
+            if(id == 2 && thisDay <= endDay && !pl->GetVar(VAR_CLAWARD2))
+            {
+                UInt32 targetVal = pl->GetVar(VAR_CLAWARD2);
+                if (targetVal & TARGET_FRONT_MAP)
+                {
+                    targetVal |=TARGET_FRONT_MAP;
+                    pl->AddVar(VAR_CTS_TARGET_COUNT, 1);
+                    pl->SetVar(VAR_CLAWARD2, targetVal);
+                    pl->sendNewRC7DayTarget();
+                }
+            }
+#endif
+
 
             if(World::getFourCopAct())
             {

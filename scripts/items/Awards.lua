@@ -203,31 +203,27 @@ function RunNewRC7DayLoginAward(player, cts)
     local package = player:GetPackage();
 
     if cts == 0 then
-        print ("false")
         return false
     end
     if cts > 7 then
-        print ("false1")
         return false
     end
 
     num = #item[cts]
     if package:GetRestPackageSize() < ((num - 1) +((num - 1)*num*4/99)) then
         player:sendMsgCode(2, 1011, 0);
-        print ("false2")
         return false
     end
 
     for count = 1, #item[cts] do
         package:Add(item[cts][count][1], item[cts][count][2], true, 0, 34);
     end
-    print("true")
     return true
 end
 
 function RunNewRC7DayLoginAward2(player, val)
     -- 领取新注册七日累计登录奖励
-    local item = {
+    local items = {
         [1] = {{1703, 3}},
         [3] = {{516, 5}},
         [4] = {{1610, 1},{1609, 1},{1608, 1}},
@@ -247,54 +243,103 @@ function RunNewRC7DayLoginAward2(player, val)
     end
 
         
-    num = #item[val]
+    local item = items[val]
+    num = #item
     if package:GetRestPackageSize() < ((num - 1) +((num - 1)*num*3)/99) then
         player:sendMsgCode(2, 1011, 0);
         print ("false2")
         return false
     end
 
-    for count = 1, #item[val] do
-        package:Add(item[val][count][1], item[val][count][2], true, 0, 34);
+    local 
+    for k,v in pairs(item) do
+        package:AddItem(v[1], v[2], 1)
     end
-    print ("true")
     return true
 end
 
-function RunNewRC7DayRechargeAward(player)
-    -- TODO: 领取新注册七日充值奖励（神龙许愿）
+function RunNewRC7DayRechargeAward(player, val, gold)
+    -- 领取新注册七日充值奖励（神龙许愿）
+    local needGold = {
+        [1] = 10,
+        [2] = 50,
+        [3] = 100,
+        [4] = 200,
+        [5] = 300,
+        [6] = 400,
+        [7] = 500,
+    }
+    local items = {
+        [1] = {{499,10},{400,2},{509,1},{507,1},{15,2}},
+        [2] = {{499,10},{400,2},{509,1},{507,1},{15,2},{500,5}},
+        [3] = {{499,10},{400,3},{509,1},{507,1},{15,2},{512,5},{513,5}},
+        [4] = {{499,10},{400,3},{509,1},{507,1},{15,2},{502,5},{503,5}},
+        [5] = {{499,10},{400,4},{509,1},{507,1},{15,2},{501,5},{505,5}},
+        [6] = {{499,10},{400,4},{509,2},{507,2},{15,2},{514,5},{515,5}},
+        [7] = {{499,10},{400,4},{509,2},{507,2},{15,2},{517,3},{1528,3}},
+    }
+
+    if val == 0 then
+        return false
+    end
+
+    if val > #items then
+        return false
+    end
+
+    if gold < needGold[val] then
+        return false
+    end
+
+
+    local item = items[val]
+    local package = player:GetPackage()
+    if package:GetRestPackageSize() < #item then
+        player:sendMsgCode(2, 1011, 0)
+        return false
+    end
+
+    for k,v in pairs(item) do
+        package:AddItem(v[1], v[2], 1)
+    end
+
+    return true
 end
 
 function RunNewRC7DayTargetAward(player)
-    -- TODO: 领取新注册七日每日目标奖励
+    -- 领取新注册七日每日目标奖励
     if player == nil then
         return 0;
     end
 
     local package = player:GetPackage();
 
-    if package:GetRestPackageSize() < 1 then
-        player:sendMsgCode(2, 1011, 0);
-        return 0;
-    end
+	if package:GetRestPackageSize() < 1 then
+		player:sendMsgCode(2, 1011, 0);
+		return 0;
+	end
+
     if not isFBVersion() then
-        for i = 3, 32 do
-            if player:hasRealItemAward(i) then
-                player:getRealItemAward(i)
-                Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]在新手注册邀请好友抽奖活动中获得10QB大奖，让我们一起来祝贺他。玩蜀山传奇，下一个幸运儿就是你！！！！！！！")
-                return 8;
-            end
+        if player:hasRealItemAward(1) then
+            player:getRealItemAward(1)
+            Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]在七日目标实物抽奖中获得了60QB大奖，让我们一起来祝贺他。玩蜀山传奇，下一个幸运儿就是你！！！！！！！")
+            return 7;
+        end
+        if player:hasRealItemAward(2) then
+            player:getRealItemAward(2)
+            Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]在七日目标实物抽奖中获得了100QB大奖，让我们一起来祝贺他。玩蜀山传奇，下一个幸运儿就是你！！！！！！！")
+            return 8;
         end
     end
-    --local chance = {379,1895,2400,5768,9558,9991,10000}
-    local chance = {379, 1895, 5000, 5000, 5000, 9991, 10000}
-    local item =   {515, 503,  507,  501,  56,   509,  500,--[["10QB"]] }
+
+    local chance = {379, 1895, 2400, 5768, 9558, 10000, 10000, 10000}
+    local item = {515, 503, 507, 56, 57, 509, 60, 100}
     local j = 0;
     local g = math.random(1, 10000)
     for i = 1, #chance do
         if g <= chance[i] then
-            player:RegisterAward(item[i], 1);
-            package:AddItem(item[i], 1, true, true, 31);
+            player:lastLootPush(item[i], 1);
+            package:AddItem(item[i], 1, true, true, 41);
             j = i;
             break
         end

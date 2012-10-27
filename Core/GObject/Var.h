@@ -248,6 +248,8 @@ namespace GObject
 
         VAR_CTSLANDING_AWARD = 204, // 创建角色前七天连续登陆奖励领取记录
         VAR_CTSLANDING_AWARD2 = 205, // 创建角色前七天累计登录奖励领取记录
+        VAR_CTS_TARGET_COUNT  = 206, // 七天目标抽奖之剩余抽奖次数
+
         VAR_LOCAL_RANK = 240, //本服斗剑，最好排名
         VAR_LOCAL_MAXRANK = 241, //本服斗剑，当前排名
         VAR_LOCAL_PRESTIGE = 242, //本服斗剑，声望数
@@ -256,6 +258,18 @@ namespace GObject
 
         VAR_MAX,
     };
+
+#define TARGET_LEVEL              0x0001
+#define TARGET_ATHLETICSRANK      0x0002
+#define TARGET_BOSS               0x0004
+#define TARGET_COUNTRY_BATTLE     0x0008
+#define TARGET_CLAN_BATTLE        0x0010
+#define TARGET_TEAM_COPY          0x0020
+#define TARGET_TOWN_DEAMON        0x0040
+#define TARGET_FRONT_MAP          0x0080
+#define TARGET_ENHANCE            0x0100
+#define TARGET_TRUMP_UPGRADE      0x0200
+#define TARGET_RECHARGE_PACKGE    0x0400
 
 
 #define REGISTER_VAR(Var, Type) \
@@ -410,7 +424,7 @@ namespace GObject
             REGISTER_VAR(VAR_JUNE_HAPPY_ITEM_CNT, CYCLE_NONE);
             REGISTER_VAR(VAR_LUCKYDRAW_CNT, CYCLE_NONE);
 
-            REGISTER_VAR(VAR_CLAWARD2, CYCLE_DAY);
+            REGISTER_VAR(VAR_CLAWARD2, CYCLE_NONE);
 
             REGISTER_VAR(VAR_OFFLINE_EQUIP, CYCLE_NONE);
 
@@ -480,6 +494,8 @@ namespace GObject
 
             REGISTER_VAR(VAR_CTSLANDING_AWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_CTSLANDING_AWARD2, CYCLE_NONE);
+            REGISTER_VAR(VAR_CTS_TARGET_COUNT, CYCLE_NONE);
+
             REGISTER_VAR(VAR_LOCAL_RANK, CYCLE_NONE);
             REGISTER_VAR(VAR_LOCAL_MAXRANK, CYCLE_NONE);
             REGISTER_VAR(VAR_LOCAL_PRESTIGE, CYCLE_NONE);
