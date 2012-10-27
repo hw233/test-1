@@ -43,7 +43,7 @@ bool MsgHandler::ProcessMsg()
 			}
 		}
 
-        if (hdr->cmdID <= 0xff)
+        if (hdr->cmdID <= 0xff && hdr->cmdID != 0)
         {
             // 安全上报协议转发
             if (hdr->desWorkerID == WORKER_THREAD_NEUTRAL ||
