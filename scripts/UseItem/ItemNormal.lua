@@ -5999,6 +5999,25 @@ function ItemNormal_00009189(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00009193(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < 1 then
+        player:sendMsgCode(2, 1011, 0);
+        return false;
+    end
+
+    local item = {502,510,504,55}
+    local i = math.random(1,#item)
+
+    package:AddItem(item[i], 1, true, false)
+    player:getTael(500*num)  
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+
 local ItemNormal_Table = {
   [1] = ItemNormal_00000001,
 	[8] = ItemNormal_00000008,
@@ -7552,6 +7571,7 @@ local ItemNormal_Table = {
     [9179] = ItemNormal_00009179,
     [9180] = ItemNormal_00009180,
     [9189] = ItemNormal_00009189,
+    [9193] = ItemNormal_00009193,
 
 
     [10000] = ItemNormal_00010000,

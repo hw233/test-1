@@ -251,6 +251,7 @@ namespace Script
         UInt8 RunNewRegisterAward(Player* player);
         UInt8 RunNewRegisterAwardAD_RF(Player* player, UInt8 idx);
         UInt8 RunBirthdayAward(Player* player);
+        UInt8 RunBlueDiamondAward(Player* player, UInt8 opt);
         void sendRNR(Player* player, UInt32 now, UInt32 date, UInt32 total);
         void sendRechargeMails(Player* player, UInt32 ototal, UInt32 ntotal);
         void sendRechargeRankAward(Player* player, Int32 pos);

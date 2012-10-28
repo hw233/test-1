@@ -9898,6 +9898,10 @@ namespace GObject
         case 11:
             getAwardLogin(opt);
             break;
+        case 12:
+            getAwardBlueDiamond(opt);
+            break;
+     
         }
     }
 
@@ -10140,6 +10144,19 @@ namespace GObject
                 st << static_cast<UInt8>(11) << static_cast<UInt8>(0) << Stream::eos;
                 send(st);
             }
+        }
+    }
+
+    void Player::getAwardBlueDiamond(UInt8 opt)
+    {
+        if(opt == 1 || opt == 2) //抽奖
+        {
+            UInt8 idx = 0;
+            if( 0 == (idx = GameAction()->RunBlueDiamondAward(this, opt)) )
+                return;
+            Stream st(REP::GETAWARD);
+            st << static_cast<UInt8>(12) << idx << Stream::eos;
+            send(st);
         }
     }
 

@@ -1748,6 +1748,7 @@ namespace GObject
         void getAwardBirthday(UInt8 opt);
         void CheckCanAwardBirthday();
         void getAwardLogin(UInt8 opt);
+        void getAwardBlueDiamond(UInt8 opt);
         void IDIPAddItem(UInt16 itemId, UInt16 num, bool bind = true);
         int IDIPBuy(UInt32 itemId, UInt32 num, UInt32 price, std::string& err, bool bind = true);
         void lastQueqiaoAwardPush(UInt16 itemId, UInt16 num);

@@ -1193,6 +1193,7 @@ function onLoginPF(player)
             [10] = "QQ游戏大厅",
             --[11] = "3366",
             --[12] = "官网",
+            [17] = "逍遥游戏平台",
         }
         local titles = {
             [1] = pfnames[1].."登陆奖励",
@@ -1201,6 +1202,7 @@ function onLoginPF(player)
             [10] = pfnames[10].."登陆奖励",
             --[11] = pfnames[11].."登陆奖励",
             --[12] = pfnames[12].."登陆奖励",
+            [17] = pfnames[17].."登陆奖励",
         }
         local ctxs = {
             [1] = "每日通过"..pfnames[1].."登陆《蜀山传奇》都可以获得【"..pfnames[1].."登陆礼包】 \n登陆礼包每日只能领取一次\n<font color=\"#FF0000\">黄钻贵族通过"..pfnames[1].."登陆，可以领取黄钻每日礼包，内容包括：太乙真金、高级挂机加速符、银票、一级宝石、七星元木等。请在游戏主界面领取。</font><font color=\"#3399FF\"><u><a href=\"event:openYellow\">开通黄钻</a></u></font>",
@@ -1209,6 +1211,7 @@ function onLoginPF(player)
             [10] = "每日通过"..pfnames[10].."登陆《蜀山传奇》都可以获得【"..pfnames[10].."登陆礼包】 \n登陆礼包每日只能领取一次\n<font color=\"#FF0000\">蓝钻贵族通过"..pfnames[10].."登陆，可以领取蓝钻每日礼包，内容包括：太乙真金、高级挂机加速符、银票、一级宝石、七星元木等。请在游戏主界面领取。</font><font color=\"#3399ff\"><u><a href=\"event:openBlue\">开通蓝钻</a></u></font>",
             --[11] = "每日通过"..pfnames[11].."登陆《蜀山传奇》都可以获得【"..pfnames[11].."登陆礼包】 登陆礼包每日只能领取一次\n<font color=\"#FF0000\">蓝钻贵族通过"..pfnames[11].."登陆，可以领取蓝钻每日礼包，内容包括：太乙真金、高级挂机加速符、银票、一级宝石、七星元木等。请在游戏主界面领取。</font><font color=\"#00FFFF\"><u><a href=\"event:openYellow\">开通蓝钻</a></u></font>",
             --[12] = "每日通过"..pfnames[12].."登陆《蜀山传奇》都可以获得【"..pfnames[12].."登陆礼包】 登陆礼包每日只能领取一次\n<font color=\"#FF0000\">QQ会员贵族通过"..pfnames[12].."登陆，可以领取QQ会员每日礼包，内容包括：太乙真金、高级挂机加速符、银票、一级宝石、七星元木等。请在游戏主界面领取。</font><font color=\"#FF0000\"><u><a href=\"event:openQQVip\">开通QQ会员</a></u></font>",
+            [17] = "每日通过"..pfnames[17].."登陆《蜀山传奇》都可以获得【"..pfnames[17].."登陆礼包】 \n登陆礼包每日只能领取一次",
         }
         local pkgs = {
             [1] = {469,1,1},
@@ -1217,6 +1220,7 @@ function onLoginPF(player)
             [10] = {468,1,1},
             --[11] = {448,1,1},
             -- [12] = {448,1,1},
+            [17] = {9193,1,1},
         }
 
         local pf = player:getPlatform()
