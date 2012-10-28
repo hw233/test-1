@@ -1017,12 +1017,12 @@ namespace GObject
 			std::for_each(_fighters.begin(), _fighters.end(), fn);
 		}
 		template<typename _FN>
-		void foreachLineup(_FN fn)
+		void foreachLineup(_FN& fn)
 		{
 			for(int i = 0; i < 5; ++ i)
 			{
 				if(_playerData.lineup[i].fighter != NULL)
-					_FN(_playerData.lineup[i].fighter);
+					fn(_playerData.lineup[i].fighter);
 			}
 		}
 
