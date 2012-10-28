@@ -1455,6 +1455,14 @@ namespace GObject
         udpLog("tripod", action, "", "", "", "", "act", num);
     }
 
+    void Player::storeUdpLog(UInt32 id, UInt32 type, UInt32 itemId, UInt32 num /* = 1 */)
+    {
+        // TODO: 商城购买相关日志（现在只有荣誉和声望）
+        char action[32] = "";
+        snprintf (action, 16, "F_%d_%d_%d", id, type, itemId);
+        udpLog("store", action, "", "", "", "", "act", num);
+    }
+
     void Player::sendHalloweenOnlineAward(UInt32 now, bool _online)
     {
         _online = false; // XXX: fuck
@@ -9894,6 +9902,10 @@ namespace GObject
         case 11:
             getAwardLogin(opt);
             break;
+        case 12:
+            getAwardBlueDiamond(opt);
+            break;
+     
         }
     }
 
@@ -10136,6 +10148,19 @@ namespace GObject
                 st << static_cast<UInt8>(11) << static_cast<UInt8>(0) << Stream::eos;
                 send(st);
             }
+        }
+    }
+
+    void Player::getAwardBlueDiamond(UInt8 opt)
+    {
+        if(opt == 1 || opt == 2) //抽奖
+        {
+            UInt8 idx = 0;
+            if( 0 == (idx = GameAction()->RunBlueDiamondAward(this, opt)) )
+                return;
+            Stream st(REP::GETAWARD);
+            st << static_cast<UInt8>(12) << idx << Stream::eos;
+            send(st);
         }
     }
 

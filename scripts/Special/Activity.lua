@@ -1193,6 +1193,7 @@ function onLoginPF(player)
             [10] = "QQ游戏大厅",
             --[11] = "3366",
             --[12] = "官网",
+            [17] = "逍遥游戏平台",
         }
         local titles = {
             [1] = pfnames[1].."登陆奖励",
@@ -1201,6 +1202,7 @@ function onLoginPF(player)
             [10] = pfnames[10].."登陆奖励",
             --[11] = pfnames[11].."登陆奖励",
             --[12] = pfnames[12].."登陆奖励",
+            [17] = pfnames[17].."登陆奖励",
         }
         local ctxs = {
             [1] = "每日通过"..pfnames[1].."登陆《蜀山传奇》都可以获得【"..pfnames[1].."登陆礼包】 \n登陆礼包每日只能领取一次\n<font color=\"#FF0000\">黄钻贵族通过"..pfnames[1].."登陆，可以领取黄钻每日礼包，内容包括：太乙真金、高级挂机加速符、银票、一级宝石、七星元木等。请在游戏主界面领取。</font><font color=\"#3399FF\"><u><a href=\"event:openYellow\">开通黄钻</a></u></font>",
@@ -1209,6 +1211,7 @@ function onLoginPF(player)
             [10] = "每日通过"..pfnames[10].."登陆《蜀山传奇》都可以获得【"..pfnames[10].."登陆礼包】 \n登陆礼包每日只能领取一次\n<font color=\"#FF0000\">蓝钻贵族通过"..pfnames[10].."登陆，可以领取蓝钻每日礼包，内容包括：太乙真金、高级挂机加速符、银票、一级宝石、七星元木等。请在游戏主界面领取。</font><font color=\"#3399ff\"><u><a href=\"event:openBlue\">开通蓝钻</a></u></font>",
             --[11] = "每日通过"..pfnames[11].."登陆《蜀山传奇》都可以获得【"..pfnames[11].."登陆礼包】 登陆礼包每日只能领取一次\n<font color=\"#FF0000\">蓝钻贵族通过"..pfnames[11].."登陆，可以领取蓝钻每日礼包，内容包括：太乙真金、高级挂机加速符、银票、一级宝石、七星元木等。请在游戏主界面领取。</font><font color=\"#00FFFF\"><u><a href=\"event:openYellow\">开通蓝钻</a></u></font>",
             --[12] = "每日通过"..pfnames[12].."登陆《蜀山传奇》都可以获得【"..pfnames[12].."登陆礼包】 登陆礼包每日只能领取一次\n<font color=\"#FF0000\">QQ会员贵族通过"..pfnames[12].."登陆，可以领取QQ会员每日礼包，内容包括：太乙真金、高级挂机加速符、银票、一级宝石、七星元木等。请在游戏主界面领取。</font><font color=\"#FF0000\"><u><a href=\"event:openQQVip\">开通QQ会员</a></u></font>",
+            [17] = "每日通过"..pfnames[17].."登陆《蜀山传奇》都可以获得【"..pfnames[17].."登陆礼包】 \n登陆礼包每日只能领取一次",
         }
         local pkgs = {
             [1] = {469,1,1},
@@ -1217,6 +1220,7 @@ function onLoginPF(player)
             [10] = {468,1,1},
             --[11] = {448,1,1},
             -- [12] = {448,1,1},
+            [17] = {9193,1,1},
         }
 
         local pf = player:getPlatform()
@@ -2323,6 +2327,45 @@ function sendRechargeMails_2012_10_23(player, ototal, ntotal)
     _sendRechargeMails(player, ototal, ntotal, lvls, items)
 end
 
+function sendRechargeMails_2012_10_26(player, ototal, ntotal)
+    local lvls = {
+        10,99,399,999,
+    }
+    local items = {
+        {503,1,1},
+        {515,1,1},
+        {551,2,1},
+        {509,2,1, 507,2,1},
+    }
+    _sendRechargeMails(player, ototal, ntotal, lvls, items)
+end
+
+function sendRechargeMails_2012_10_27(player, ototal, ntotal)
+    local lvls = {
+        10,199,599,1299,
+    }
+    local items = {
+        {1325,1,1},
+        {503,2,1},
+        {516,2,1, 507,1,1},
+        {515,2,1, 509,2,1},
+    }
+    _sendRechargeMails(player, ototal, ntotal, lvls, items)
+end
+
+function sendRechargeMails_2012_10_28(player, ototal, ntotal)
+    local lvls = {
+        10,399,899,1599,
+    }
+    local items = {
+        {503,2,1},
+        {516,2,1},
+        {1325,1,1, 1528,1,1},
+        {515,3,1},
+    }
+    _sendRechargeMails(player, ototal, ntotal, lvls, items)
+end
+
 function sendRechargeMails(player, ototal, ntotal)
     --sendRechargeMails1(player, ototal, ntotal)
     --[[local start = { ['year'] = 2012, ['month'] = 7, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -2359,9 +2402,11 @@ function sendRechargeMails(player, ototal, ntotal)
     local t = { ['year'] = 2012, ['month'] = 10, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local t1 = { ['year'] = 2012, ['month'] = 10, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local t2 = { ['year'] = 2012, ['month'] = 10, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local t3 = { ['year'] = 2012, ['month'] = 10, ['day'] = 26, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local s = os.time(t)
     local s1 = os.time(t1)
     local s2 = os.time(t2)
+    local s3 = os.time(t3)
     local n = os.time()
     if n >= s and n < (s + 86400) then
         sendRechargeMails_2012_10_16(player, ototal, ntotal)
@@ -2373,6 +2418,12 @@ function sendRechargeMails(player, ototal, ntotal)
         sendRechargeMails_2012_10_19(player, ototal, ntotal)
     elseif n >= s2 and n < (s2 + 3*86400) then
         sendRechargeMails_2012_10_23(player, ototal, ntotal)
+    elseif n >= s3 and n < (s3 + 1*86400) then
+        sendRechargeMails_2012_10_26(player, ototal, ntotal)
+    elseif n >= (s3 + 1*86400) and n < (s3 + 2*86400) then
+        sendRechargeMails_2012_10_27(player, ototal, ntotal)
+    elseif n >= (s3 + 2*86400) and n < (s3 + 3*86400) then
+        sendRechargeMails_2012_10_28(player, ototal, ntotal)
     end
 end
 
@@ -2436,16 +2487,76 @@ function sendRechargeRankAward_2012_10_18(player, pos)
     sendItemPackageMail(player, title, ctx, items[pos]);
 end
 
+function sendRechargeRankAward_2012_10_26(player, pos)
+    local items = {
+        {9022,20,1, 1325,30,1},
+        {9022,15,1, 1325,20,1},
+        {9022,10,1, 1325,15,1},
+        {9022,5,1, 1325,10,1},
+        {9022,5,1, 1325,10,1},
+        {9022,5,1, 1325,10,1},
+        {9022,5,1, 1325,10,1},
+    }
+
+    if items[pos] == nil then
+        return
+    end
+
+    local title = string.format(msg_111, pos)
+    local ctx = string.format(msg_111, pos)
+    sendItemPackageMail(player, title, ctx, items[pos]);
+end
+
+function sendRechargeRankAward_2012_10_27(player, pos)
+    local items = {
+        {9076,50,1, 1528,30,1},
+        {9076,30,1, 1528,20,1},
+        {9076,20,1, 1528,15,1},
+        {9076,10,1, 1528,10,1},
+        {9076,10,1, 1528,10,1},
+        {9076,10,1, 1528,10,1},
+        {9076,10,1, 1528,10,1},
+    }
+
+    if items[pos] == nil then
+        return
+    end
+
+    local title = string.format(msg_111, pos)
+    local ctx = string.format(msg_111, pos)
+    sendItemPackageMail(player, title, ctx, items[pos]);
+end
+
+function sendRechargeRankAward_2012_10_28(player, pos)
+    local items = {
+        {33,100,1, 509,30,1, 507,30,1},
+        {33,80,1, 509,20,1, 507,20,1},
+        {33,50,1, 509,15,1, 507,15,1},
+        {33,30,1, 509,10,1, 507,10,1},
+        {33,30,1, 509,10,1, 507,10,1},
+        {33,30,1, 509,10,1, 507,10,1},
+        {33,30,1, 509,10,1, 507,10,1},
+    }
+
+    if items[pos] == nil then
+        return
+    end
+
+    local title = string.format(msg_111, pos)
+    local ctx = string.format(msg_111, pos)
+    sendItemPackageMail(player, title, ctx, items[pos]);
+end
+
 function sendRechargeRankAward(player, pos)
-    local t = { ['year'] = 2012, ['month'] = 10, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local t = { ['year'] = 2012, ['month'] = 10, ['day'] = 26, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local s = os.time(t)
     local n = os.time()
     if n >= s and n < (s + 86400 + 10*60) then
-        sendRechargeRankAward_2012_10_16(player, pos)
+        sendRechargeRankAward_2012_10_26(player, pos)
     elseif n >= (s + 86400 + 10*60) and n < (s + 2*86400 + 10*60) then
-        sendRechargeRankAward_2012_10_17(player, pos)
+        sendRechargeRankAward_2012_10_27(player, pos)
     elseif n >= (s + 2*86400 + 10*60) and n < (s + 3*86400 + 10*60) then
-        sendRechargeRankAward_2012_10_18(player, pos)
+        sendRechargeRankAward_2012_10_28(player, pos)
     end
 end
 

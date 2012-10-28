@@ -237,6 +237,8 @@ namespace GObject
         VAR_YUEBING_USED = 193, //中秋国庆使用月饼数量
         VAR_MAX_CLAN_COPY_LEVEL = 194, // 本周已通关的最大层数
         VAR_TOWN_REWARD = 195, //镇妖封神 修仙夺宝 10-15--10-18
+        VAR_BLUE_AWARD_COUNT = 196 ,//蓝钻抽奖次数
+        VAR_YELLOW_AWARD_COUNT = 197, //黄钻抽奖次数
 
         // TGC活动
         VAR_TGC_1_LOGIN = 200,
@@ -467,6 +469,8 @@ namespace GObject
             REGISTER_VAR(VAR_QGAME_GIFT, CYCLE_DAY);
             REGISTER_VAR(VAR_MAX_CLAN_COPY_LEVEL, CYCLE_WEEK);
             REGISTER_VAR(VAR_TOWN_REWARD, CYCLE_NONE);
+            REGISTER_VAR(VAR_BLUE_AWARD_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_YELLOW_AWARD_COUNT, CYCLE_NONE);
             REGISTER_VAR(VAR_TGC_1_LOGIN, CYCLE_NONE);
             REGISTER_VAR(VAR_TGC_1_COPY, CYCLE_NONE);
             REGISTER_VAR(VAR_TGC_1_FRONTMAP, CYCLE_NONE);

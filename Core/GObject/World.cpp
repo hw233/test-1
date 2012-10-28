@@ -313,7 +313,10 @@ bool enum_midnight(void * ptr, void* next)
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 5) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 17) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 18) ||
-            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 19)
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 19) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 27) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 28) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 29)
             ))
     {
         if (pl->isOnline())
@@ -809,7 +812,11 @@ void World::World_Midnight_Check( World * world )
 
     if (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 17) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 18) ||
-            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 19))
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 19) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 27) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 28) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 29)
+            )
         bRechargeEnd = true;
 
 	globalPlayers.enumerate(enum_midnight, static_cast<void *>(&nextday));
