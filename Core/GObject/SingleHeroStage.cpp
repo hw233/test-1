@@ -3972,7 +3972,7 @@ namespace GObject
                 UInt32 cType = 892;
                 if(idx == 0)
                 {
-                    UInt32 contents[4] = {894, 895, 896};
+                    UInt32 contents[4] = {0, 894, 895, 896};
                     cType = contents[cls];
                     pl->setTitle(titles[cls], TITLE_TIME_LEN);
                 }
@@ -4920,7 +4920,6 @@ namespace GObject
     {
         m_progress = 0;
         m_nextTime = TimeUtil::Now();
-        m_session = 1;
         clear();
     }
 
