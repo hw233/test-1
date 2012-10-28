@@ -3984,6 +3984,14 @@ namespace GObject
         UInt8 c = ied.extraAttr2.getCount();
 		if(c == 0 && c > 2) return 1;
 
+        if( (ied.tRank == 0) &&
+                (equip->GetItemType().subClass == Item_Trump ||
+                equip->GetItemType().subClass == Item_Fashion ||
+                equip->GetItemType().subClass == Item_Halo))
+        {
+            return 1;
+        }
+
 		UInt8 lv = (equip->getReqLev() + 5) / 10 - 1;
 		q -= 3;
 		UInt32 amount = GData::moneyNeed[GData::ATTR_ACTIVATE].tael;
