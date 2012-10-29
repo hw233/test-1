@@ -12794,16 +12794,22 @@ namespace GObject
             return -101;
         }
 
+        if (!num)
+        {
+            err = "购买的物品个数不对";
+            return -102;
+        }
+
         if (getGold() < price)
         {
             err = "仙石不足";
-            return -102;
+            return -103;
         }
 
         if (GetPackage()->GetRestPackageSize() < (itemId+ibt->maxQuantity)/ibt->maxQuantity)
         {
             err = "背包空间不足";
-            return -103;
+            return -104;
         }
 
 		ConsumeInfo ci(IDIPBuyItem,0,0);

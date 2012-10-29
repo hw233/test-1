@@ -383,7 +383,7 @@ function RunBlueDiamondAward(player, opt)
     local date_9190_0 = { ['year'] = 2012, ['month'] = 10, ['day'] = 26, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
     local date_9190_1 = { ['year'] = 2012, ['month'] = 11, ['day'] = 2, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
     local date_9191_0 = { ['year'] = 2012, ['month'] = 10, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
-    local date_9191_1 = { ['year'] = 2012, ['month'] = 11, ['day'] = 3, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+    local date_9191_1 = { ['year'] = 2012, ['month'] = 11, ['day'] = 4, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
     local date_0 = os.time(date_9190_0);
     local date_1 = os.time(date_9190_1);
 
@@ -397,7 +397,7 @@ function RunBlueDiamondAward(player, opt)
         itemId = 9191;
         items = item_9191;
         date_0 = os.time(date_9191_0);
-        date_1 = os.time(date_9190_1);
+        date_1 = os.time(date_9191_1);
     end
     now = os.time()
     if now < date_0 or now >= date_1 then
