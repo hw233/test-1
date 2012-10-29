@@ -1498,6 +1498,7 @@ namespace GObject
 		std::vector<GData::LootResult> _BirthdayAward;
 		std::vector<GData::LootResult> _lastQueqiaoAward;
         std::vector<GData::LootResult> _lastKillMonsterAward;
+        std::vector<GData::LootResult> _lastNew7DayTargetAward;
 
     private:
 		UInt16 _lastDungeon;
@@ -1768,7 +1769,9 @@ namespace GObject
         void lastQueqiaoAwardPush(UInt16 itemId, UInt16 num);
         void checkLastQueqiaoAward();
         void lastKillMonsterAwardPush(UInt16 itemId, UInt16 num);
+        void lastNew7DayTargetAwardPush(UInt16 itemId, UInt16 num);
         void checkLastKillMonsterAward();
+        void checkLastNew7DayTargetAward();
         void sendNewRC7DayInfo(UInt8 type = 0);
         void sendNewRC7DayLogin();
         void sendNewRC7DayRecharge();

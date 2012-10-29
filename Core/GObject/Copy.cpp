@@ -431,13 +431,6 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
             else
                 pl->copyUdpLog(id, 4);
 
-            UInt32 thisDay = TimeUtil::SharpDay();
-            UInt32 fourthDay = TimeUtil::SharpDay(3, PLAYER_DATA(pl, created));
-            if(id == 2 && thisDay == fourthDay && !pl->GetVar(VAR_CLAWARD2))
-            {
-                pl->SetVar(VAR_CLAWARD2, 1);
-                pl->sendRC7DayInfo(TimeUtil::Now());
-            }
 
             if(World::getFourCopAct())
             {

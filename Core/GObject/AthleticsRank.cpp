@@ -1194,22 +1194,12 @@ void AthleticsRank::challenge2(Player * atker, std::string& name, UInt8 type, UI
 
     if(data->challengenum >= 5)
     {
-#if 0
-        UInt32 thisDay = TimeUtil::SharpDay();
-        UInt32 secondDay = TimeUtil::SharpDay(1, PLAYER_DATA(atker, created));
-        if(thisDay == secondDay && !atker->GetVar(VAR_CLAWARD2))
-        {
-             atker->SetVar(VAR_CLAWARD2, 1);
-             atker->sendRC7DayInfo(TimeUtil::Now());
-        }
-#else
-
         UInt32 thisDay = TimeUtil::SharpDay();
         UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA(atker, created));
-        if(thisDay <= endDay && !atker->GetVar(VAR_CLAWARD2))
+        if(thisDay <= endDay)
         {
             UInt32 targetVal = atker->GetVar(VAR_CLAWARD2);
-            if (targetVal & TARGET_ATHLETICSRANK)
+            if (!(targetVal & TARGET_ATHLETICSRANK))
             {
                 targetVal |=TARGET_ATHLETICSRANK;
                 atker->AddVar(VAR_CTS_TARGET_COUNT, 1);
@@ -1217,7 +1207,6 @@ void AthleticsRank::challenge2(Player * atker, std::string& name, UInt8 type, UI
                 atker->sendNewRC7DayTarget();
             }
         }
-#endif
     }
 
     UInt32 challengeBuff = eChallengeTime + (cfg.GMCheck ? (5 * 60) : 10);

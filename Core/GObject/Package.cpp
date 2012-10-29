@@ -1699,10 +1699,10 @@ namespace GObject
 
             UInt32 thisDay = TimeUtil::SharpDay();
             UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA(m_Owner, created));
-            if(ret == true && id == 32 && thisDay <= endDay && !m_Owner->GetVar(VAR_CLAWARD2))
+            if(ret == true && id == 32 && thisDay <= endDay)
             {
                 UInt32 targetVal = m_Owner->GetVar(VAR_CLAWARD2);
-                if (targetVal & TARGET_RECHARGE_PACKGE)
+                if (!(targetVal & TARGET_RECHARGE_PACKGE))
                 {
                     targetVal |=TARGET_RECHARGE_PACKGE;
                     m_Owner->AddVar(VAR_CTS_TARGET_COUNT, 1);
@@ -2648,10 +2648,10 @@ namespace GObject
                      m_Owner->OnHeroMemo(MC_FORGE, MD_LEGEND, 0, 1);
                      UInt32 thisDay = TimeUtil::SharpDay();
                      UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA(m_Owner, created));
-                     if(thisDay <= endDay && !m_Owner->GetVar(VAR_CLAWARD2))
+                     if(thisDay <= endDay)
                      {
                          UInt32 targetVal = m_Owner->GetVar(VAR_CLAWARD2);
-                         if (targetVal & TARGET_TRUMP_UPGRADE)
+                         if (!(targetVal & TARGET_TRUMP_UPGRADE))
                          {
                              targetVal |=TARGET_TRUMP_UPGRADE;
                              m_Owner->AddVar(VAR_CTS_TARGET_COUNT, 1);
@@ -2679,10 +2679,10 @@ namespace GObject
                      m_Owner->OnHeroMemo(MC_FORGE, MD_STARTED, 0, 1);
                      UInt32 thisDay = TimeUtil::SharpDay();
                      UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA(m_Owner, created));
-                     if(thisDay <= endDay && !m_Owner->GetVar(VAR_CLAWARD2))
+                     if(thisDay <= endDay)
                      {
                          UInt32 targetVal = m_Owner->GetVar(VAR_CLAWARD2);
-                         if (targetVal & TARGET_ENHANCE)
+                         if (!(targetVal & TARGET_ENHANCE))
                          {
                              targetVal |=TARGET_ENHANCE;
                              m_Owner->AddVar(VAR_CTS_TARGET_COUNT, 1);

@@ -273,6 +273,7 @@ namespace Script
 		CLASS_DEF(Player, postKillMonsterRoamResult);
         CLASS_DEF(Player, lastQueqiaoAwardPush);
         CLASS_DEF(Player, lastKillMonsterAwardPush);
+        CLASS_DEF(Player, lastNew7DayTargetAwardPush);
         CLASS_DEF(Player, luaUdpLog);
         CLASS_DEF(Player, addFighterFromItem);
 
@@ -1258,10 +1259,10 @@ namespace Script
         return Call<bool>("RunNewRC7DayLoginAward2", player, val);
     }
 
-    UInt8 GameActionLua::RunNewRC7DayRechargeAward(Player* player)
+    UInt8 GameActionLua::RunNewRC7DayRechargeAward(Player* player, UInt8 val, UInt32 totalRecharge)
     {
         assert(player != NULL);
-        return Call<UInt8>("RunNewRC7DayRechargeAward", player);
+        return Call<UInt8>("RunNewRC7DayRechargeAward", player, val, totalRecharge);
     }
 
     UInt8 GameActionLua::RunNewRC7DayTargetAward(Player* player)

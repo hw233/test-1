@@ -6655,31 +6655,19 @@ namespace GObject
 	{
         if(nLev >= 47)
         {
-#if 0
-            UInt32 thisDay = TimeUtil::SharpDay();
-            UInt32 firstDay = TimeUtil::SharpDay(0, PLAYER_DATA(this, created));
-            if(thisDay == firstDay && !this->GetVar(VAR_CLAWARD2))
-            {
-                 this->SetVar(VAR_CLAWARD2, 1);
-                 this->sendRC7DayInfo(TimeUtil::Now());
-            }
-#else
-
             UInt32 thisDay = TimeUtil::SharpDay();
             UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA(this, created));
-            if(thisDay <= endDay && !GetVar(VAR_CLAWARD2))
+            if(thisDay <= endDay)
             {
                 UInt32 targetVal = GetVar(VAR_CLAWARD2);
-                if (targetVal & TARGET_LEVEL)
+                if (!(targetVal & TARGET_LEVEL))
                 {
-                    targetVal |=TARGET_LEVEL;
+                    targetVal |= TARGET_LEVEL;
                     AddVar(VAR_CTS_TARGET_COUNT, 1);
                     SetVar(VAR_CLAWARD2, targetVal);
                     sendNewRC7DayTarget();
                 }
             }
-
-#endif
         }
 
         if(_clan != NULL)
@@ -10603,6 +10591,12 @@ namespace GObject
         _lastKillMonsterAward.push_back(lt);
     }
 
+    void Player::lastNew7DayTargetAwardPush(UInt16 itemId, UInt16 num)
+    {
+        GData::LootResult lt = {itemId, num};
+        _lastNew7DayTargetAward.push_back(lt);
+    }
+
     void Player::checkLastKillMonsterAward()
     {
         std::vector<GData::LootResult>::iterator it;
@@ -10611,6 +10605,16 @@ namespace GObject
             m_Package->ItemNotify(it->id, it->count);
         }
         _lastKillMonsterAward.clear();
+    }
+
+    void Player::checkLastNew7DayTargetAward()
+    {
+        std::vector<GData::LootResult>::iterator it;
+        for(it = _lastNew7DayTargetAward.begin(); it != _lastNew7DayTargetAward.end(); ++ it)
+        {
+            m_Package->ItemNotify(it->id, it->count);
+        }
+        _lastNew7DayTargetAward.clear();
     }
 
     void Player::sendNewRC7DayInfo(UInt8 type /* = 0 */)
@@ -10652,24 +10656,29 @@ namespace GObject
 
     void Player::sendNewRC7DayRecharge()
     {
-        // TODO: 发送新注册七日活动充值奖励页面信息
+        // 发送新注册七日活动充值奖励页面信息
         Stream st(REP::NEWRC7DAY);
         st << static_cast<UInt8> (2);
         UInt32 totalRecharge = GetVar(VAR_RC7DAYRECHARGE);
         UInt32 rechargeAward = GetVar(VAR_RC7DAYWILL);
-        st << static_cast<UInt8>(totalRecharge);
-        st << static_cast<UInt8>(rechargeAward);
+        UInt8 wishIndex = rechargeAward & 0xff;
+        UInt8 wishType = (rechargeAward >> 8) & 0xff;
+        st << static_cast<UInt8>(wishIndex);
+        st << static_cast<UInt8>(wishType);
+        st << static_cast<UInt32>(totalRecharge);
         st << Stream::eos;
         send(st);
     }
 
     void Player::sendNewRC7DayTarget(UInt8 idx /* = 0 */)
     {
-        // TODO: 发送新注册七日活动每日目标页面信息
+        // 发送新注册七日活动每日目标页面信息
         Stream st(REP::NEWRC7DAY);
+        UInt32 awardIndex = GetVar(VAR_CLAWARD2);
+        UInt32 count = GetVar(VAR_CTS_TARGET_COUNT);
         st << static_cast<UInt8> (3);
-        st << static_cast<UInt16>(0); // 抽奖情况bit表
-        st << static_cast<UInt8>(0);  // 剩余抽奖次数
+        st << static_cast<UInt16>(awardIndex); // 抽奖情况bit表
+        st << static_cast<UInt8>(count);  // 剩余抽奖次数
         if (idx)
             st << static_cast<UInt8>(idx);
         st << Stream::eos;
@@ -10756,14 +10765,47 @@ namespace GObject
 
     void Player::getNewRC7DayRechargeAward(UInt8 val)
     {
-        // TODO: 申请领取新注册七天充值奖励 (神龙许愿)
+        // 申请领取新注册七天充值奖励 (神龙许愿)
         // val 1-7 七龙珠奖励， 8-11 声望，荣誉，修为，经验
+        UInt32 totalRecharge = GetVar(VAR_RC7DAYRECHARGE);
+        UInt32 rechargeAward = GetVar(VAR_RC7DAYWILL);
+        UInt8 wishIndex = rechargeAward & 0xff;
+        UInt8 wishType = (rechargeAward >> 8) & 0xff;
+
+        if (val == 0 || val > 11)
+            return;
+
+        if (val <= 7)
+        {
+            // 点亮龙珠
+            if (wishIndex != (val - 1))
+            {
+                if (GameAction()->RunNewRC7DayRechargeAward(this, val, totalRecharge))
+                {
+                    ++ wishIndex;
+                    SetVar(VAR_RC7DAYWILL, static_cast<UInt32>(wishType) << 8 | wishIndex);
+                }
+            }
+        }
+        else if (val <= 11)
+        {
+            // 神龙许愿
+            if (wishIndex >= 7 && !wishType)
+            {
+                if (GameAction()->onRC7DayWill(this, val - 7))
+                {
+                    wishType = val - 7;
+                    SetVar(VAR_RC7DAYWILL, static_cast<UInt32>(wishType) << 8 | wishIndex);
+                }
+            }
+        }
+
         sendNewRC7DayRecharge();
     }
     
     void Player::getNewRC7DayTargetAward(UInt8 val)
     {
-        // TODO: 申请领取新注册七天每日目标奖励 
+        // 申请领取新注册七天每日目标奖励 
         // val 0:转盘开始 1:转盘结束
         UInt8 idx = 0;
         switch (val)
@@ -10774,19 +10816,22 @@ namespace GObject
                     if (count)
                     {
                         idx = GameAction()->RunNewRC7DayTargetAward(this);
-                        --count;
-                        SetVar(VAR_CTS_TARGET_COUNT, count);
+                        if (idx)
+                        {
+                            --count;
+                            SetVar(VAR_CTS_TARGET_COUNT, count);
+                        }
                     }
                 }
                 break;
             case 1:
                 {
                     std::vector<GData::LootResult>::iterator it;
-                    for(it = _lastLoot.begin(); it != _lastLoot.end(); ++ it)
+                    for(it = _lastNew7DayTargetAward.begin(); it != _lastNew7DayTargetAward.end(); ++ it)
                     {
                         m_Package->ItemNotify(it->id, it->count);
                     }
-                    _lastLoot.clear();
+                    _lastNew7DayTargetAward.clear();
                 }
                 break;
             default:

@@ -251,7 +251,6 @@ function RunNewRC7DayLoginAward2(player, val)
         return false
     end
 
-    local 
     for k,v in pairs(item) do
         package:AddItem(v[1], v[2], 1)
     end
@@ -338,7 +337,7 @@ function RunNewRC7DayTargetAward(player)
     local g = math.random(1, 10000)
     for i = 1, #chance do
         if g <= chance[i] then
-            player:lastLootPush(item[i], 1);
+            player:lastNew7DayTargetAwardPush(item[i], 1);
             package:AddItem(item[i], 1, true, true, 41);
             j = i;
             break

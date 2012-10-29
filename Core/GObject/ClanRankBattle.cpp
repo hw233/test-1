@@ -186,10 +186,10 @@ namespace GObject
 
             UInt32 thisDay = TimeUtil::SharpDay();
             UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA((*iter), created));
-            if(thisDay <= endDay && !(*iter)->GetVar(VAR_CLAWARD2))
+            if(thisDay <= endDay)
             {
                 UInt32 targetVal = (*iter)->GetVar(VAR_CLAWARD2);
-                if (targetVal & TARGET_CLAN_BATTLE)
+                if (!(targetVal & TARGET_CLAN_BATTLE))
                 {
                     targetVal |=TARGET_CLAN_BATTLE;
                     (*iter)->AddVar(VAR_CTS_TARGET_COUNT, 1);
@@ -214,10 +214,10 @@ namespace GObject
 
             UInt32 thisDay = TimeUtil::SharpDay();
             UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA((*iter), created));
-            if(thisDay <= endDay && !(*iter)->GetVar(VAR_CLAWARD2))
+            if(thisDay <= endDay)
             {
                 UInt32 targetVal = (*iter)->GetVar(VAR_CLAWARD2);
-                if (targetVal & TARGET_CLAN_BATTLE)
+                if (!(targetVal & TARGET_CLAN_BATTLE))
                 {
                     targetVal |=TARGET_CLAN_BATTLE;
                     (*iter)->AddVar(VAR_CTS_TARGET_COUNT, 1);
