@@ -227,6 +227,10 @@ function loadStore()
             store:add(2,9122,10)
         end
 
+        if getWansheng() then
+            store:add(2,9194,10)
+        end
+
         if getGuoqing() then
             store:add(2,9179,30)
         end

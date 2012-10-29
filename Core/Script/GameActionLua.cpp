@@ -12,6 +12,7 @@
 #include "GObject/RealItemAward.h"
 #include "Log/Log.h"
 #include "MsgID.h"
+#include "GObject/QixiTmpl.h"
 
 #include "MsgHandler/CountryMsgStruct.h"
 #include "Network/TcpServerWrapper.h"
@@ -110,6 +111,7 @@ namespace Script
 		lua_tinker::def(_L, "getJune1", GObject::World::getJune1);
 		lua_tinker::def(_L, "getJuly", GObject::World::getJuly);
         lua_tinker::def(_L, "getQixi", GObject::World::getQixi);
+        lua_tinker::def(_L, "getWansheng", GObject::World::getWansheng);
         lua_tinker::def(_L, "getGuoqing", GObject::World::getGuoqing);
 		lua_tinker::def(_L, "getYDMDAct", GObject::World::getYDMDAct);
 		lua_tinker::def(_L, "getWeekDay",	GObject::World::getWeekDay);
@@ -1317,7 +1319,7 @@ namespace Script
 
     UInt8 GameActionLua::onRoamingQueqiao(Player* pl, UInt8 pos)
     {
-		return Call<UInt8 >("onRoamingQueqiao", pl, pos);
+		return Call<UInt8 >(qixiTmpl._onRoamingFunc, pl, pos);
     }
     
     UInt32 GameActionLua::GetBDSupermanPrice(Player* player, UInt32 itemId, bool isUsed)

@@ -132,6 +132,8 @@ void WorldScript::init()
 	def("getJuly", GObject::World::getJuly);
     def("setQixi", GObject::World::setQixi);
     def("getQixi", GObject::World::getQixi);
+    def("setWansheng", GObject::World::setWansheng);
+    def("getWansheng", GObject::World::getWansheng);
     def("setGuoqing", GObject::World::setGuoqing);
     def("getGuoqing", GObject::World::getGuoqing);
 	def("setRechargeNextRet", GObject::World::setRechargeNextRet);

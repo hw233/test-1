@@ -269,6 +269,11 @@ public:
     { _qixi = v; }
     inline static bool getQixi()
     { return _qixi; }
+    inline static void setWansheng(bool v)
+    { _wansheng= v; }
+    inline static bool getWansheng()
+    { return _wansheng; }
+
 
     inline static void setGuoqing(bool v)
     { _guoqing = v; }
@@ -457,6 +462,7 @@ public:
     static bool _june1;
     static bool _july;
     static bool _qixi;
+    static bool _wansheng;
     static bool _guoqing;
     static bool _enchant_gt11;
     static bool _rechargenextret;

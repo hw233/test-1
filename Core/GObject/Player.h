@@ -380,6 +380,8 @@ namespace GObject
         UInt8 level;	//???? = 0?? ??ʾ?˼?????δ??????
     };
 
+    // Use in Qixi Active
+    // Use in Wansheng Active
     struct QixiInfo
     {
         Player* lover;

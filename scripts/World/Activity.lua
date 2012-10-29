@@ -278,6 +278,12 @@ function onActivityCheck(tm)
       setQixi(false)
   end
 
+  if tm >= actTime218 and tm < actTime219 then
+      setWansheng(true)
+  else
+      setWansheng(false)
+  end
+
   if tm >= actTime205 and tm < actTime206 then
       setGuoqing(true)
   else
@@ -855,6 +861,8 @@ function initActTime(y, m, d)
   -- 蓝钻优惠活动(蓝钻超人) //10.19上线推迟
   local SerStartTm213 = { ['year'] = 2012, ['month'] = 10, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local SerStartTm214 = { ['year'] = 2012, ['month'] = 10, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 万圣节
+  local  SerStartTm215 = { ['year'] = 2012, ['month'] = 11, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
@@ -1119,6 +1127,9 @@ function initActTime(y, m, d)
   
   actTime216= os.time(SerStartTm213);
   actTime217= os.time(SerStartTm214);
+
+  actTime218= os.time(SerStartTm215);
+  actTime219= os.time(SerStartTm215) + 7 * 86400;
 
   onActivityCheck(os.time() + 30);
 

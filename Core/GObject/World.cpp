@@ -47,6 +47,7 @@
 #include "TownDeamon.h"
 #include "SingleHeroStage.h"
 #include "SHSYTmpl.h"
+#include "QixiTmpl.h"
 
 namespace GObject
 {
@@ -121,6 +122,7 @@ bool World::_june = false;
 bool World::_june1 = false;
 bool World::_july = false;
 bool World::_qixi= false;
+bool World::_wansheng= false;
 bool World::_guoqing= false;
 bool World::_enchant_gt11 = false;
 bool World::_rechargenextret;
@@ -219,6 +221,7 @@ bool bMayDayEnd = false;
 bool bJuneEnd = false;
 bool bPExpItemsEnd = false;
 bool bQixiEnd = false;
+bool bWanshengEnd = false;
 bool bGuoqingEnd = false;
 bool bRechargeEnd = false;
 bool bConsumeEnd = false;
@@ -778,6 +781,7 @@ void World::World_Midnight_Check( World * world )
     bool bMayDay = getMayDay();
     bool bJune = getJune();
     bool bQixi = getQixi();
+    bool bWansheng = getWansheng();
     bool bGuoqing = getGuoqing();
     bool bRecharge = (getRechargeActive() || getRechargeActive3366()) && getNeedRechargeRank();
     bool bConsume = getConsumeActive() && getNeedConsumeRank();
@@ -804,6 +808,7 @@ void World::World_Midnight_Check( World * world )
     bJuneEnd = bJune && !getJune();
     bPExpItemsEnd = bPExpItems && !getPExpItems();
     bQixiEnd = bQixi && !getQixi();
+    bWanshengEnd = bWansheng && !getWansheng();
     bGuoqingEnd = bGuoqing && !getGuoqing();
     bRechargeEnd = bRecharge && !(getRechargeActive()||getRechargeActive3366());
     bConsumeEnd = bConsume && !getConsumeActive();
@@ -853,7 +858,7 @@ void World::World_Midnight_Check( World * world )
     if(bJuneEnd)
         world->SendLuckyDrawAward();
 #endif
-    if(bQixiEnd)
+    if(bQixiEnd || bWanshengEnd)
         world->SendQixiAward();
     if(bGuoqingEnd)
         world->SendGuoqingAward();
@@ -1016,6 +1021,9 @@ bool World::Init()
     path = cfg.scriptPath + "shsytmpl.lua";
     shsyTmpl.setFilename(path.c_str());
     shsyTmpl.load();
+    path = cfg.scriptPath + "qixitmpl.lua";
+    qixiTmpl.setFilename(path.c_str());
+    qixiTmpl.load();
 
 	calWeekDay(this);
     UInt32 day = 1;
@@ -1040,7 +1048,7 @@ bool World::Init()
     if(getJune())
         globalPlayers.enumerate(enum_lucky_draw_rank_list, static_cast<void *>(NULL));
 #endif
-    if(getQixi())
+    if(getQixi() || getWansheng())
         globalPlayers.enumerate(enum_qixi_rank_list, static_cast<void *>(NULL));
 
 	UInt32 now = TimeUtil::Now(), sday = TimeUtil::SharpDay(1) - 10;
@@ -1492,46 +1500,21 @@ void World::DivorceQixiPair(Player* pl)
 
 void World::SendQixiAward()
 {
-    int pos = 0;
+    UInt32 pos = 0;
 
     globalPlayers.enumerate(enum_qixi_score, static_cast<void *>(NULL));
     std::vector<MailPackage::MailItem> mitems;
-    SYSMSG(title, 4020);
+    SYSMSG(title, qixiTmpl._lbTitle);
     for(QixiPlayersIt qpIt = _qixiPlayerSet.begin(); qpIt != _qixiPlayerSet.end() && pos < 99; ++ qpIt, ++ pos)
     {
         mitems.clear();
-        if(pos == 0)
+        for(size_t idx = 0; idx < qixiTmpl._lbAwards.size(); ++ idx)
         {
-            // 9124:牛郎 9125:织女
-            MailPackage::MailItem mitem1 = {9124, 1};
-            MailPackage::MailItem mitem2 = {1325, 30};
-            mitems.push_back(mitem1);
-            mitems.push_back(mitem2);
-        }
-        else if(pos == 1)
-        {
-            MailPackage::MailItem mitem = {1325, 25};
-            mitems.push_back(mitem);
-        }
-        else if(pos == 2)
-        {
-            MailPackage::MailItem mitem = {1325, 20};
-            mitems.push_back(mitem);
-        }
-        else if(pos < 10)
-        {
-            MailPackage::MailItem mitem = {1325, 15};
-            mitems.push_back(mitem);
-        }
-        else if(pos < 50)
-        {
-            MailPackage::MailItem mitem = {1325, 10};
-            mitems.push_back(mitem);
-        }
-        else if(pos < 100)
-        {
-            MailPackage::MailItem mitem = {1325, 5};
-            mitems.push_back(mitem);
+            if(pos < qixiTmpl._lbAwards[idx].lbPos)
+            {
+                mitems = qixiTmpl._lbAwards[idx].items;
+                break;
+            }
         }
 
         UInt16 mitemNum = mitems.size();
@@ -1545,7 +1528,7 @@ void World::SendQixiAward()
             {
                 Player* pl = player[idx];
                 Player* lover = pl->getLover();
-                SYSMSGV(content, 4021, lover->getName().c_str(), pos+1, pos+1);
+                SYSMSGV(content, qixiTmpl._lbContent, lover->getName().c_str(), pos+1, pos+1);
                 Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
                 if(mail)
                 {
@@ -1554,7 +1537,7 @@ void World::SendQixiAward()
                     {
                         MailPackage::MailItem mitem;
                         bool bind = true;
-                        if(mitems[i].id == 9124)
+                        if(mitems[i].id == qixiTmpl._titleItem)
                         {
                             mitem.id = mitems[i].id + (pl->GetClassAndSex() & 0x0F);
                             bind = false;
@@ -1581,95 +1564,50 @@ void World::sendQixiScoreAward(Player* pl)
 {
     if(pl->queQiaoCheck())
     {
-        SYSMSG(title, 4022);
+        SYSMSG(title, qixiTmpl._partnerTitle);
         Player* lover = pl->getLover();
-        SYSMSGV(content, 4023, lover->getName().c_str());
+        SYSMSGV(content, qixiTmpl._partnerContent, lover->getName().c_str());
 
         Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
-        MailPackage::MailItem mitem = {1325, 7};
-        mailPackageManager.push(mail->id, &mitem, 1, true);
+        std::vector<MailPackage::MailItem>& mitem = qixiTmpl._partnerAward;
+        mailPackageManager.push(mail->id, &mitem[0], mitem.size(), true);
 
         std::string strItems;
-        strItems += Itoa(mitem.id);
-        strItems += ",";
-        strItems += Itoa(mitem.count);
-        strItems += "|";
+        for(size_t i = 0; i < mitem.size(); ++ i)
+        {
+            strItems += Itoa(mitem[i].id);
+            strItems += ",";
+            strItems += Itoa(mitem[i].count);
+            strItems += "|";
+        }
         DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
     }
 
     UInt32 score = pl->getScore();
-    if(score < 50)
+    if(score < qixiTmpl._minAwardScore)
         return;
 
-    SYSMSG(title, 4024);
-    SYSMSGV(content, 4025, score);
+    SYSMSG(title, qixiTmpl._scoreTitle);
+    SYSMSGV(content, qixiTmpl._scoreContent, score);
 
     std::string strItems;
     Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
 
-    if(score > 999)
+    for(size_t idx = 0; idx < qixiTmpl._scoreAwards.size(); ++ idx)
     {
-        MailPackage::MailItem mitem[3] = {{515, 7}, {509, 7}, {507, 7}};
-        mailPackageManager.push(mail->id, mitem, 3, true);
-
-        for(int i = 0; i < 3; ++ i)
+        if(score >= qixiTmpl._scoreAwards[idx].score)
         {
-            strItems += Itoa(mitem[i].id);
-            strItems += ",";
-            strItems += Itoa(mitem[i].count);
-            strItems += "|";
-        }
-    }
-    else if(score > 799)
-    {
-        MailPackage::MailItem mitem[3] = {{503, 7}, {514, 7}, {512, 7}};
-        mailPackageManager.push(mail->id, mitem, 3, true);
+            std::vector<MailPackage::MailItem>& mitem = qixiTmpl._scoreAwards[idx].items;
+            mailPackageManager.push(mail->id, &mitem[0], mitem.size(), true);
 
-        for(int i = 0; i < 3; ++ i)
-        {
-            strItems += Itoa(mitem[i].id);
-            strItems += ",";
-            strItems += Itoa(mitem[i].count);
-            strItems += "|";
-        }
-    }
-    else if(score > 599)
-    {
-        MailPackage::MailItem mitem[3] = {{500, 7}, {511, 7}, {1526, 7}};
-        mailPackageManager.push(mail->id, mitem, 3, true);
-
-        for(int i = 0; i < 3; ++ i)
-        {
-            strItems += Itoa(mitem[i].id);
-            strItems += ",";
-            strItems += Itoa(mitem[i].count);
-            strItems += "|";
-        }
-    }
-    else if(score > 199)
-    {
-        MailPackage::MailItem mitem[3] = {{56, 7}, {57, 7}, {15, 7}};
-        mailPackageManager.push(mail->id, mitem, 3, true);
-
-        for(int i = 0; i < 3; ++ i)
-        {
-            strItems += Itoa(mitem[i].id);
-            strItems += ",";
-            strItems += Itoa(mitem[i].count);
-            strItems += "|";
-        }
-    }
-    else if(score > 49)
-    {
-        MailPackage::MailItem mitem[3] = {{502, 7}, {510, 7}, {504, 7}};
-        mailPackageManager.push(mail->id, mitem, 3, true);
-
-        for(int i = 0; i < 3; ++ i)
-        {
-            strItems += Itoa(mitem[i].id);
-            strItems += ",";
-            strItems += Itoa(mitem[i].count);
-            strItems += "|";
+            for(size_t i = 0; i < mitem.size(); ++ i)
+            {
+                strItems += Itoa(mitem[i].id);
+                strItems += ",";
+                strItems += Itoa(mitem[i].count);
+                strItems += "|";
+            }
+            break;
         }
     }
 

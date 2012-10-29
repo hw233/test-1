@@ -240,6 +240,8 @@ namespace GObject
         VAR_BLUE_AWARD_COUNT = 196 ,//蓝钻抽奖次数
         VAR_YELLOW_AWARD_COUNT = 197, //黄钻抽奖次数
 
+        VAR_WANSHENG_ITEM = 198, // 万圣节是否领取
+
         // TGC活动
         VAR_TGC_1_LOGIN = 200,
         VAR_TGC_1_COPY = 201,
