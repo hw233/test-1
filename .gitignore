@@ -21,3 +21,4 @@ Release
 lib3rd
 conf/config.lua
 sql/conf.user.sh
+Makefile
