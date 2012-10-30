@@ -14,10 +14,14 @@
 #include "Cfg.h"
 #include "SysMsg.h"
 #include "Common/TimeUtil.h"
+#ifndef _FB
+#ifndef _VT
 #ifndef _WIN32
 #include "GObject/DCWorker.h"
 #include "GObject/DCLogger.h"
 #include "kingnet_analyzer.h"
+#endif
+#endif
 #endif
 #include "GObject/SortWorker.h"
 #include "Common/StringTokenizer.h"
@@ -140,9 +144,13 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 
 	worker = WORKER_THREAD_SORT;
 	m_AllWorker[worker] = new WorkerThread<GObject::SortWorker>(new GObject::SortWorker(0, WORKER_THREAD_SORT));
+#ifndef _FB
+#ifndef _VT
 #ifndef _WIN32
 	worker = WORKER_THREAD_DC;
 	m_AllWorker[worker] = new WorkerThread<GObject::DCWorker>(new GObject::DCWorker(0, WORKER_THREAD_DC));
+#endif
+#endif
 #endif
 	worker = WORKER_THREAD_DB;
 	m_AllWorker[worker] = new WorkerThread<DB::DBWorker>(new DB::DBWorker(0, WORKER_THREAD_DB));

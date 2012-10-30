@@ -45,8 +45,12 @@
 #include "FrontMap.h"
 #include "HeroIsland.h"
 #include "GObject/AthleticsRank.h"
+#ifndef _FB
+#ifndef _VT
 #ifndef _WIN32
 #include "DCLogger.h"
+#endif
+#endif
 #endif
 #include "ClanRankBattle.h"
 #include "TeamCopy.h"
