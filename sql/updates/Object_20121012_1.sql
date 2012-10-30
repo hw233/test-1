@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS `sh_global` (
     `cls1TowerLevel` smallint(6) NOT NULL DEFAULT '0',
     `cls2TowerLevel` smallint(6) NOT NULL DEFAULT '0',
     `cls3TowerLevel` smallint(6) NOT NULL DEFAULT '0'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE IF NOT EXISTS `sh_stage_progress` (                
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS `sh_stage_progress` (
     `round` tinyint(3) NOT NULL DEFAULT '0',
     `progress` tinyint(3) NOT NULL DEFAULT '0',
     PRIMARY KEY (`type`, `gpId`, `cls`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `sh_final_player` (                
     `gpId` tinyint(3) NOT NULL DEFAULT '0',
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `sh_final_player` (
     `stage_idx` tinyint(3) NOT NULL DEFAULT '0',
     `cls` tinyint(3) NOT NULL DEFAULT '0',
     PRIMARY KEY (`gpId`, `type`, `playerId`, `cls`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `sh_elimination` (                
     `gpId` tinyint(3) NOT NULL DEFAULT '0',
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS `sh_elimination` (
     `won` varchar(255) NOT NULL DEFAULT '',
     `battleId` varchar(255) NOT NULL DEFAULT '',
     PRIMARY KEY (`gpId`, `type`, `cls`, `stage_idx`, `id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `sh_preliminary` (                
     `gpId` tinyint(3) NOT NULL DEFAULT '0',
@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS `sh_preliminary` (
     `battleTime` int(11) NOT NULL,
     `battleId` int(11) NOT NULL,
     PRIMARY KEY (`gpId`, `cls`, `type`, `battleId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `sh_towerbattle` (                
     `player` bigint(20) unsigned NOT NULL,
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS `sh_towerbattle` (
     `battleId` int(11) NOT NULL,
     `npcId` int(11) NOT NULL,
     PRIMARY KEY (`player`, `cls`, `battleId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `sh_player` (
     `playerId` bigint(20) unsigned NOT NULL,
@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS `sh_player` (
     `tLastTurns` smallint(6) NOT NULL DEFAULT '0',
     `score` int(11) NOT NULL,
     PRIMARY KEY (`playerId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `sh_fighter` (
     `id` int(11) NOT NULL,
@@ -86,7 +86,7 @@ CREATE TABLE IF NOT EXISTS `sh_fighter` (
     `trump` varchar(255) NOT NULL,
     `skillstrengthen` varchar(255) NOT NULL,
     PRIMARY KEY (`id`, `playerId`, `type`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `sh_fighter_attr_extra` (
     `fighterId` int(10) NOT NULL,
@@ -145,7 +145,7 @@ CREATE TABLE IF NOT EXISTS `sh_fighter_attr_extra` (
     `toughlvl` float(10,2) unsigned NOT NULL DEFAULT '0.00',
   PRIMARY KEY (`fighterId`,`playerId`, `type`),
   KEY `playerId` (`playerId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `sh_fighter_attr2` (
     `fighterId` int(10) NOT NULL,
@@ -169,7 +169,7 @@ CREATE TABLE IF NOT EXISTS `sh_fighter_attr2` (
     `elixir_action` int(10) NOT NULL,
   PRIMARY KEY (`fighterId`,`playerId`, `type`),
   KEY `playerId` (`playerId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `sh_supporter` (
     `playerId` bigint(20) unsigned NOT NULL,
@@ -178,7 +178,7 @@ CREATE TABLE IF NOT EXISTS `sh_supporter` (
     `class2PlayerId` bigint(20) unsigned NOT NULL,
     `class3PlayerId` bigint(20) unsigned NOT NULL,
   PRIMARY KEY (`playerId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `sh_candidate` (
     `playerId` bigint(20) unsigned NOT NULL,
@@ -186,6 +186,6 @@ CREATE TABLE IF NOT EXISTS `sh_candidate` (
     `supportedCount` int(11) NOT NULL DEFAULT '0',
     `pos` tinyint(3) NOT NULL DEFAULT '0',
   PRIMARY KEY (`playerId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 

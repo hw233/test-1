@@ -152,6 +152,8 @@ function onLogin(player)
     if getJuly() then
         onJuly(player)
     end
+
+    onWansheng(player)
     TgcEvent(player, 0)
 end
 
@@ -195,6 +197,7 @@ end
 function onDungeonWin(player, id, count, free)
     June(player, 0);
     Qixi(player, 0);
+    Wansheng(player, lootlvl);
     if free == true then
         FallActivity(player, 1)
         Guoqing(player, 0);
@@ -874,6 +877,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     MayDay(player, lootlvl)
     June(player, lootlvl);
     Qixi(player, lootlvl);
+    Wansheng(player, lootlvl);
     Guoqing(player, lootlvl);
     LuckyDrawBox(player, id)
     if player:getQQVipPrivilege() == true then
@@ -908,6 +912,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
     MayDay(player, lootlvl)
     June(player, lootlvl);
     Qixi(player, lootlvl);
+    Wansheng(player, lootlvl);
     Guoqing(player, lootlvl);
     if lootlvl == 0 then
         FallActivity(player, 1)
@@ -2912,11 +2917,74 @@ function onRoamingQueqiao(player, pos)
     return pos2;
 end
 
+-- 1:聊天 2:避开 3:遇险 4:糖果 5:奇观 6:击杀 7:补给站
+function onRoamingWansheng(player, pos)
+    local roamPlace = {
+     -- 1  2  3  4  5  6  7  8
+        2, 3, 5, 1, 3, 2, 2, 6,
+        5, 1, 4, 2, 6, 3, 5, 2,
+        3, 2, 5, 6, 3, 2, 1, 7
+    }
+
+    local eventItem = {
+        {{502, 2, 10}, {510, 1, 10}, {29, 10, 10}},
+        {{56, 1, 20}, {500, 1, 20}, {57, 1, 20}},
+        {{511, 2, 20}, {512, 1, 30}, {517, 1, 30}},
+        {{9194, 1, 10}, {9194, 1, 10}, {9194, 1, 10}},
+        {{503, 1, 30}, {514, 1, 30}, {501, 1, 30}},
+        {{509, 1, 40}, {1528, 1, 40}, {1325, 1, 40}},
+        {{509, 1, 50}, {507, 1, 50}, {515, 1, 50}},
+    }
+
+    step = math.random(1, 3)
+    pos2 = pos + step
+    if pos2 > 24 then
+        pos2 = pos2 - 24
+    end
+
+    local package = player:GetPackage()
+    i = roamPlace[pos2]
+    j = math.random(1, 3)
+
+    package:Add(eventItem[i][j][1], eventItem[i][j][2], true, true, 32)
+    player:lastQueqiaoAwardPush(eventItem[i][j][1], eventItem[i][j][2]);
+    player:postRoamResult(pos2, j, eventItem[i][j][3]);
+
+    return pos2;
+end
+
+
+
 function Qixi(player, lootlvl)
     if getQixi() then
         -- 喜鹊
         local package = player:GetPackage();
         package:AddItem(9122, 1, true, 0, 10);
+    end
+end
+
+function Wansheng(player, lootlvl)
+    if getWansheng() then
+        -- 糖果
+        local package = player:GetPackage();
+        package:AddItem(9194, 1, true, 0, 10);
+    end
+end
+
+-- 万圣节套装
+function onWansheng(player)
+    if not getWansheng() then
+        return
+    end
+
+    local lvl = player:GetLev()
+    if lvl < 40 then
+        return
+    end
+
+    if lvl >= 40 and player:GetVar(198) == 0 then
+        sendItemPackageMail(player, msg_51, msg_52, {1761,1,1});
+        player:SetVar(198, 1)
     end
 end
 

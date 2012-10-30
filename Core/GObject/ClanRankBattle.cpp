@@ -2042,7 +2042,7 @@ namespace GObject
             for(RewardsMap::iterator iter = m_WeeklyRewards.begin();
                 iter != m_WeeklyRewards.end(); ++iter)
             {
-                if(score <= iter->first)
+                if(score > iter->first)
                 {
                     RewardVec& rewards = iter->second;
                     MailItemsInfo info(&rewards[0], ClanBattleAward, rewards.size());
@@ -2091,7 +2091,7 @@ namespace GObject
             for(RewardsMap::iterator iter = m_WeeklyClanRewards.begin();
                     iter != m_WeeklyClanRewards.end(); ++iter)
             {
-                if(score <= iter->first)
+                if(score > iter->first)
                 {
                     GiveClanRewards(clan, iter->second);
                     break;
@@ -2138,7 +2138,7 @@ namespace GObject
         for(RewardsMap::iterator iter = m_WeeklyRewards.begin();
                 iter != m_WeeklyRewards.end(); ++iter)
         {
-            if(score <= iter->first)
+            if(score > iter->first)
             {
                 MakeMailInfo(st, iter->second);
                 return;
@@ -2174,7 +2174,7 @@ namespace GObject
         for(RewardsMap::iterator iter = m_WeeklyRewards.begin();
                 iter != m_WeeklyRewards.end(); ++iter)
         {
-            if(score <= iter->first)
+            if(score > iter->first)
             {
                 return AddMailItems(player, iter->second);
             }

@@ -2999,6 +2999,7 @@ function ItemNormal_00009010(iid, num, bind, param)
             package:AddItem(item, nums[k], 1, 0, 2)
         end
     end
+    player:getTael(500)
     package:DelItemSendMsg(iid, player);
     return num;
 end
@@ -6156,6 +6157,17 @@ function ItemNormal_00009193(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00009195(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    if iid < 9195 or iid > 9196 then
+        return 0
+    end
+    player:setTitle(iid-9195+41, 0)
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
 local ItemNormal_Table = {
   [1] = ItemNormal_00000001,
 	[8] = ItemNormal_00000008,
@@ -7712,6 +7724,8 @@ local ItemNormal_Table = {
     [9192] = ItemNormal_00009192,
     [9193] = ItemNormal_00009193,
 
+    [9195] = ItemNormal_00009195,
+    [9196] = ItemNormal_00009195,
 
     [10000] = ItemNormal_00010000,
     [10001] = ItemNormal_00010001,

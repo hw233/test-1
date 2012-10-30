@@ -2029,9 +2029,10 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
     brd >> type;
     switch(type)
     {
-        case 0x01:
+        case 0x01:  // 七夕
+        case 0x03:  // 万圣节
         {
-            if(!WORLD().getQixi())
+            if(!WORLD().getQixi() && !WORLD().getWansheng())
                 break;
             brd >> op;
             switch(op)

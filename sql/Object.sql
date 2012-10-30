@@ -1556,7 +1556,7 @@ CREATE TABLE `sh_global` (
     `cls1TowerLevel` smallint(6) NOT NULL DEFAULT '0',
     `cls2TowerLevel` smallint(6) NOT NULL DEFAULT '0',
     `cls3TowerLevel` smallint(6) NOT NULL DEFAULT '0'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `sh_stage_progress`;
 CREATE TABLE `sh_stage_progress` (                
@@ -1566,7 +1566,7 @@ CREATE TABLE `sh_stage_progress` (
     `round` tinyint(3) NOT NULL DEFAULT '0',
     `progress` tinyint(3) NOT NULL DEFAULT '0',
     PRIMARY KEY (`type`, `gpId`, `cls`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `sh_final_player`;
 CREATE TABLE `sh_final_player` (                
@@ -1578,7 +1578,7 @@ CREATE TABLE `sh_final_player` (
     `stage_idx` tinyint(3) NOT NULL DEFAULT '0',
     `cls` tinyint(3) NOT NULL DEFAULT '0',
     PRIMARY KEY (`gpId`, `type`, `playerId`, `cls`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `sh_elimination`;
 CREATE TABLE `sh_elimination` (                
@@ -1590,7 +1590,7 @@ CREATE TABLE `sh_elimination` (
     `won` varchar(255) NOT NULL DEFAULT '',
     `battleId` varchar(255) NOT NULL DEFAULT '',
     PRIMARY KEY (`gpId`, `type`, `cls`, `stage_idx`, `id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `sh_preliminary`;
 CREATE TABLE `sh_preliminary` (                
@@ -1603,7 +1603,7 @@ CREATE TABLE `sh_preliminary` (
     `battleTime` int(11) NOT NULL,
     `battleId` int(11) NOT NULL,
     PRIMARY KEY (`gpId`, `cls`, `type`, `battleId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `sh_towerbattle`;
 CREATE TABLE `sh_towerbattle` (                
@@ -1615,7 +1615,7 @@ CREATE TABLE `sh_towerbattle` (
     `battleId` int(11) NOT NULL,
     `npcId` int(11) NOT NULL,
     PRIMARY KEY (`player`, `cls`, `battleId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `sh_player`;
 CREATE TABLE `sh_player` (                
@@ -1627,7 +1627,7 @@ CREATE TABLE `sh_player` (
     `tLastTurns` smallint(6) NOT NULL DEFAULT '0',
     `score` int(11) NOT NULL,
     PRIMARY KEY (`playerId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `sh_fighter`;
 CREATE TABLE `sh_fighter` (                
@@ -1642,7 +1642,7 @@ CREATE TABLE `sh_fighter` (
     `trump` varchar(255) NOT NULL,
     `skillstrengthen` varchar(255) NOT NULL,
     PRIMARY KEY (`id`, `playerId`, `type`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `sh_fighter_attr_extra`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -1704,7 +1704,7 @@ CREATE TABLE `sh_fighter_attr_extra` (
     `toughlvl` float(10,2) unsigned NOT NULL DEFAULT '0.00',
   PRIMARY KEY (`fighterId`,`playerId`, `type`),
   KEY `playerId` (`playerId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 DROP TABLE IF EXISTS `sh_fighter_attr2`;
@@ -1732,7 +1732,7 @@ CREATE TABLE `sh_fighter_attr2` (
     `elixir_action` int(10) NOT NULL,
   PRIMARY KEY (`fighterId`,`playerId`, `type`),
   KEY `playerId` (`playerId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `sh_supporter`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -1744,7 +1744,7 @@ CREATE TABLE `sh_supporter` (
     `class2PlayerId` bigint(20) unsigned NOT NULL,
     `class3PlayerId` bigint(20) unsigned NOT NULL,
   PRIMARY KEY (`playerId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `sh_candidate`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -1755,6 +1755,6 @@ CREATE TABLE `sh_candidate` (
     `supportedCount` int(11) NOT NULL DEFAULT '0',
     `pos` tinyint(3) NOT NULL DEFAULT '0',
   PRIMARY KEY (`playerId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 

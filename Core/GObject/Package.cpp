@@ -4558,6 +4558,46 @@ namespace GObject
 		}
 	}
 
+    // get item trump exp and delelte item
+    UInt8 Package::SmeltItemTrumpExp(Fighter * fgt, UInt32 itemId, UInt8& bind, UInt16 num, UInt32& exp)
+    {
+        if(itemId > 30000)
+        {
+            UInt8 pos = 0;
+            ItemEquip * item = FindEquip(fgt, pos, 0, itemId);
+            if(item == NULL || (item->getClass() != Item_Trump && item->getClass() != Item_Fashion && item->getClass() != Item_Halo))
+                return 2;
+
+            bind = item->GetBindStatus();
+            ItemEquipData& ied_item = item->getItemEquipData();
+
+            UInt8 item_q = item->getQuality();
+            UInt8 item_enchant = ied_item.enchant;
+            const GData::ItemBaseType& ibt = item->GetItemType();
+            exp = (ibt.trumpExp * GObjectManager::getTrumpSmelt(item_q - 2, item_enchant)) + ied_item.trumpExp * 0.5;
+            if(exp == 0)
+                return 2;
+
+            if(!DelEquip(itemId, ToTrumpUpgrade))
+                return 2;
+        }
+        else
+        {
+            ItemBase* item = GetItem(itemId, bind > 0);
+            if(item->getClass() != Item_Normal29)
+                return 2;
+            const GData::ItemBaseType& ibt = item->GetItemType();
+            exp = ibt.trumpExp * num;
+            if(exp == 0)
+                return 2;
+
+            if(!DelItem(itemId, num, bind, ToTrumpUpgrade))
+                return 2;
+        }
+
+        return 0;
+    }
+
     UInt8 Package::TrumpUpgrade(UInt16 fighterId, UInt32 trumpId, UInt32 itemId)
     {
 		Fighter * fgt = NULL;

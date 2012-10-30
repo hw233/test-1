@@ -45,8 +45,12 @@
 #include "FrontMap.h"
 #include "HeroIsland.h"
 #include "GObject/AthleticsRank.h"
+#ifndef _FB
+#ifndef _VT
 #ifndef _WIN32
 #include "DCLogger.h"
+#endif
+#endif
 #endif
 #include "ClanRankBattle.h"
 #include "TeamCopy.h"
@@ -65,6 +69,7 @@
 #include "RealItemAward.h"
 #include "GObject/Tianjie.h"
 #include <cmath>
+#include "QixiTmpl.h"
 
 #define NTD_ONLINE_TIME (4*60*60)
 #ifndef _DEBUG
@@ -1099,10 +1104,8 @@ namespace GObject
 		}
 
 #ifndef _WIN32
-#ifdef _FB
-#else
-#ifdef _VT
-#else
+#ifndef _FB
+#ifndef _VT
         dclogger.login(this);
         dclogger.login_sec(this);
 #endif
@@ -13749,7 +13752,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
             sendMsgCode(0, 1011);
             return;
         }
-        if(false == GetPackage()->DelItemAny(QIXI_XIQUE, 1, NULL, ToQixi))
+        if(false == GetPackage()->DelItemAny(qixiTmpl._qixiItem, 1, NULL, ToQixi))
         {
             return;
         }
@@ -13771,7 +13774,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
 
         m_qixi.bind = 0;
 
-        sendMsgCode(0, 1029);
+        sendMsgCode(0, qixiTmpl._divorceMsgCode);
 		DB1().PushUpdateData("UPDATE `qixi` SET `bind`=0 WHERE `playerId` = %"I64_FMT"u", getId());
         sendQixiInfo();
     }

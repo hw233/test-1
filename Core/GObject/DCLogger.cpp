@@ -13,6 +13,15 @@ class SysMsgItem;
 namespace GObject
 {
 
+#ifndef _FB
+#ifndef _VT
+#ifndef _WIN32
+
+
+#endif
+#endif
+#endif
+
 static const char *msgVersion = "0.1";
 static const char *ver = "1.5";
 
@@ -81,7 +90,13 @@ bool DCLogger::reg(Player* player)
     msg << player->getSource();
     msg << "&touid=&toopenid=&level=&itemid=&itemtype=&itemcnt=&modifyexp=&totalexp=&modifycoin=&totalcoin=&modifyfee=&totalfee=&onlinetime=&keycheckret=&safebuf=&remark=&user_num=";
 
+#ifndef _FB
+#ifndef _VT
+#ifndef _WIN32
     DC().Push(msg.str().c_str(), msg.str().length());
+#endif
+#endif
+#endif
     return true;
 }
 
@@ -116,7 +131,13 @@ bool DCLogger::login(Player* player)
     msg << player->getSource();
     msg << "&touid=&toopenid=&level=&itemid=&itemtype=&itemcnt=&modifyexp=&totalexp=&modifycoin=&totalcoin=&modifyfee=&totalfee=&onlinetime=&keycheckret=&safebuf=&remark=&user_num=";
 
+#ifndef _FB
+#ifndef _VT
+#ifndef _WIN32
     DC().Push(msg.str().c_str(), msg.str().length());
+#endif
+#endif
+#endif
     return true;
 }
 
@@ -182,7 +203,13 @@ bool DCLogger::login_sec(Player* player)
     msg << "&CAS=" << static_cast<UInt32>(player->getGold());
     msg << "&RCT=" << static_cast<UInt64>(static_cast<UInt64>(player->getCreated()) * 1000);
 
+#ifndef _FB
+#ifndef _VT
+#ifndef _WIN32
     DC().Push(msg.str().c_str(), msg.str().length(), LT_SECDATA);
+#endif
+#endif
+#endif
     return true;
 }
 
@@ -248,7 +275,13 @@ bool DCLogger::create_sec(UserStruct const &nu, Player* player /* = NULL */)
     msg << "&CAS=" << static_cast<UInt32>(0);
     msg << "&RCT=" << static_cast<UInt64>(0);
 
+#ifndef _FB
+#ifndef _VT
+#ifndef _WIN32
     DC().Push(msg.str().c_str(), msg.str().length(), LT_SECDATA);
+#endif
+#endif
+#endif
     return true;
 }
 
@@ -296,7 +329,13 @@ bool DCLogger::protol_sec(Player* player, int cmd)
     msg << "&FID=";
     msg << "&PTP=" << static_cast<UInt32>(cmd ? 1 : 0);
     msg << "&RST=0";
+#ifndef _FB
+#ifndef _VT
+#ifndef _WIN32
     DC().Push(msg.str().c_str(), msg.str().length(), LT_SECDATA);
+#endif
+#endif
+#endif
     return true;
 }
 
@@ -333,7 +372,13 @@ bool DCLogger::logout(Player* player)
     msg << player->getSource();
     msg << "&touid=&toopenid=&level=&itemid=&itemtype=&itemcnt=&modifyexp=&totalexp=&modifycoin=&totalcoin=&modifyfee=&totalfee=&keycheckret=&safebuf=&remark=&user_num=";
 
+#ifndef _FB
+#ifndef _VT
+#ifndef _WIN32
     DC().Push(msg.str().c_str(), msg.str().length());
+#endif
+#endif
+#endif
     return true;
 }
 
@@ -371,7 +416,13 @@ bool DCLogger::online(UInt32 num, UInt8 domain)
     msg << cfg.serverNum;
     msg << "&userip=&svrip=&opopenid=&touid=&toopenid=&level=&source=&itemid=&itemtype=&itemcnt=&modifyexp=&totalexp=&modifycoin=&totalcoin=&modifyfee=&totalfee=&onlinetime=&key=&keycheckret=&safebuf=&remark=";
 
+#ifndef _FB
+#ifndef _VT
+#ifndef _WIN32
     DC().Push(msg.str().c_str(), msg.str().length());
+#endif
+#endif
+#endif
     return true;
 }
 
@@ -410,7 +461,13 @@ bool DCLogger::consume(Player* player, UInt32 total, UInt32 c)
     msg << total*10;
     msg << "&touid=&toopenid=&level=&source=&modifyexp=&totalexp=&modifycoin=&totalcoin=&onlinetime=&keycheckret=&safebuf=&remark=&user_num=";
 
+#ifndef _FB
+#ifndef _VT
+#ifndef _WIN32
     DC().Push(msg.str().c_str(), msg.str().length());
+#endif
+#endif
+#endif
     return true;
 }
 
@@ -456,7 +513,13 @@ bool DCLogger::fee(Player* player, UInt32 total, Int32 c)
         msg << "&totalfee=";
     msg << "&touid=&toopenid=&level=&source=&modifyexp=&totalexp=&modifycoin=&totalcoin=&onlinetime=&keycheckret=&safebuf=&remark=&user_num=";
 
+#ifndef _FB
+#ifndef _VT
+#ifndef _WIN32
     DC().Push(msg.str().c_str(), msg.str().length());
+#endif
+#endif
+#endif
     return true;
 }
 
@@ -489,7 +552,13 @@ bool DCLogger::blue(Player* player)
     msg << player->getOpenKey();
     msg << "&touid=&toopenid=&level=&source=&itemid=&itemtype=&itemcnt=&modifyexp=&totalexp=&modifycoin=&totalcoin=&modifyfee=&totalfee=&onlinetime=&keycheckret=&safebuf=&remark=&user_num=";
 
+#ifndef _FB
+#ifndef _VT
+#ifndef _WIN32
     DC().Push(msg.str().c_str(), msg.str().length());
+#endif
+#endif
+#endif
     return true;
 }
 
@@ -522,7 +591,13 @@ bool DCLogger::d3d6(Player* player)
     msg << player->getOpenKey();
     msg << "&touid=&toopenid=&level=&source=&itemid=&itemtype=&itemcnt=&modifyexp=&totalexp=&modifycoin=&totalcoin=&modifyfee=&totalfee=&onlinetime=&keycheckret=&safebuf=&remark=&user_num=";
 
+#ifndef _FB
+#ifndef _VT
+#ifndef _WIN32
     DC().Push(msg.str().c_str(), msg.str().length());
+#endif
+#endif
+#endif
     return true;
 }
 
