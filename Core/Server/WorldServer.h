@@ -95,7 +95,13 @@ private:
 #define SERVER()		WorldServer::Instance()
 #define NETWORK()		SERVER().GetTcpService()
 #define WORLD()			SERVER().GetWorld()
+#ifndef _FB
+#ifndef _VT
+#ifndef _WIN32
 #define DC()			SERVER().GetDC()
+#endif
+#endif
+#endif
 #define DB()			SERVER().GetDB()
 #define DB1()			SERVER().GetDB1()
 #define DB2()			SERVER().GetDB2()

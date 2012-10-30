@@ -2,7 +2,13 @@
 #include "MsgHandler.h"
 #include "Server/WorldServer.h"
 #include "GObject/Player.h"
+#ifndef _FB
+#ifndef _VT
+#ifndef _WIN32
 #include "GObject/DCLogger.h"
+#endif
+#endif
+#endif
 #include "MsgID.h"
 
 void MsgHandler::DeregisterAllMsg()
@@ -43,6 +49,9 @@ bool MsgHandler::ProcessMsg()
 			}
 		}
 
+#ifndef _FB
+#ifndef _VT
+#ifndef _WIN32
         if (hdr->cmdID <= 0xff && hdr->cmdID != 0)
         {
             // 安全上报协议转发
@@ -69,6 +78,9 @@ bool MsgHandler::ProcessMsg()
                 }
             }
         }
+#endif
+#endif
+#endif
 
         handler = m_HandlerList[hdr->cmdID];
         if (handler != NULL)

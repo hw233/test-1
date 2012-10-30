@@ -45,8 +45,12 @@
 #include "FrontMap.h"
 #include "HeroIsland.h"
 #include "GObject/AthleticsRank.h"
+#ifndef _FB
+#ifndef _VT
 #ifndef _WIN32
 #include "DCLogger.h"
+#endif
+#endif
 #endif
 #include "ClanRankBattle.h"
 #include "TeamCopy.h"
@@ -1100,10 +1104,8 @@ namespace GObject
 		}
 
 #ifndef _WIN32
-#ifdef _FB
-#else
-#ifdef _VT
-#else
+#ifndef _FB
+#ifndef _VT
         dclogger.login(this);
         dclogger.login_sec(this);
 #endif

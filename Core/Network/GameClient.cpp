@@ -8,7 +8,6 @@
 #include "MsgID.h"
 #include <event2/buffer.h>
 #include "MsgHandler/JsonParser.h"
-#include "GObject/DCLogger.h"
 
 namespace Network
 {

@@ -29,8 +29,12 @@
 #include "WBossMgr.h"
 #include "HeroIsland.h"
 #include "MsgID.h"
+#ifndef _FB
+#ifndef _VT
 #ifndef _WIN32
 #include "DCLogger.h"
+#endif
+#endif
 #endif
 #include "TeamCopy.h"
 #include "ArenaBattle.h"
