@@ -11,6 +11,7 @@ namespace DB
 	extern DBConnectionMgr* gDataDBConnectionMgr;
 	extern DBConnectionMgr* gObjectDBConnectionMgr;
 	extern DBConnectionMgr* gLogDBConnectionMgr;
+	extern DBConnectionMgr* gLockDBConnectionMgr;
 	class DBConnectionMgr
 	{
 	public:

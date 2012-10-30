@@ -34,6 +34,13 @@ public:
 	std::string	dbLogPassword;
 	std::string	dbLogSource;
 
+    std::string	dbLockHost;
+	UInt16		dbLockPort;
+	std::string	dbLockUser;
+	std::string	dbLockPassword;
+	std::string	dbLockSource;
+
+
 	std::string	cryptKey1, cryptKey2;
 	std::string	gmCryptKey1, gmCryptKey2;
 	std::string	fbrCryptKey1, fbrCryptKey2;
@@ -104,6 +111,8 @@ public:
 	{dbObjectHost = h; dbObjectPort = p; dbObjectUser = u; dbObjectPassword = pw; dbObjectSource = s;}
 	inline void setLogDatabase(const char * h, UInt16 p, const char * u, const char * pw, const char * s )
 	{dbLogHost = h; dbLogPort = p; dbLogUser = u; dbLogPassword = pw; dbLogSource = s;}
+    inline void setLockDatabase(const char * h, UInt16 p, const char * u, const char * pw, const char * s )
+	{dbLockHost = h; dbLockPort = p; dbLockUser = u; dbLockPassword = pw; dbLockSource = s;}
 	inline void setCryptKeys(const char * k1, const char * k2) {cryptKey1 = k1; cryptKey2 = k2;}
 	inline void setGMCryptKeys(const char * k1, const char * k2) {gmCryptKey1 = k1; gmCryptKey2 = k2;}
 	inline void setFBRechargeKeys(const char * k1, const char * k2) {fbrCryptKey1 = k1; fbrCryptKey2 = k2;}

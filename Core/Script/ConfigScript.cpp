@@ -18,6 +18,7 @@ ConfigScript::ConfigScript( Cfg * cfg )
 	class_def<Cfg>("setDataDatabase", &Cfg::setDataDatabase);
 	class_def<Cfg>("setObjectDatabase", &Cfg::setObjectDatabase);
 	class_def<Cfg>("setLogDatabase", &Cfg::setLogDatabase);
+	class_def<Cfg>("setLockDatabase", &Cfg::setLockDatabase);
 	class_def<Cfg>("setCryptKeys", &Cfg::setCryptKeys);
 	class_def<Cfg>("setGMCryptKeys", &Cfg::setGMCryptKeys);
 	class_def<Cfg>("setFBRechargeKeys", &Cfg::setFBRechargeKeys);
