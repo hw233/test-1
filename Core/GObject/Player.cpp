@@ -2682,13 +2682,11 @@ namespace GObject
 		}
         st << GetVar(VAR_MONEY_ARENA);
         st << getClanProffer();
-        UInt8 cnt = _playerData.titleAll.size();
-        st << cnt;
-        for(UInt8 i = 0; i < cnt; ++i)
-        {
-            st << _playerData.titleAll[i];
-        }
+        bool fchange = makeTitleAllInfo(st);
         st << Stream::eos;
+
+        if(fchange)
+            writeTitleAll();
 	}
 
 	void Player::makeFormationInfo( Stream& st )
@@ -4688,42 +4686,112 @@ namespace GObject
 		return _playerData.status;
 	}
 
-	void Player::setTitle( UInt8 t )
+    UInt8 Player::getTitle()
+    {
+        UInt32 timeLeft = 0;
+        if(CURRENT_THREAD_ID() == getThreadId())
+        {
+            GameMsgHdr h(0x264,  getThreadId(), this, 0);
+            GLOBAL().PushMsg(h, NULL);
+            if(!checkTitleTimeEnd(_playerData.title, timeLeft))
+            {
+                notifyTitleAll();
+                writeTitleAll();
+                changeTitle(0);
+            }
+        }
+
+        return _playerData.title;
+    }
+
+    void Player::loadTitleAll(UInt8 t, UInt32 timeEnd)
+    {
+        std::map<UInt8, UInt32>& titleAll = _playerData.titleAll;
+        titleAll[t] = timeEnd;
+    }
+
+	void Player::fixOldVertionTitle( UInt8 t)
 	{
+        _playerData.titleAll[t] = 0;
+        writeTitleAll();
+	}
+
+	void Player::setTitle( UInt8 t, UInt32 timeLen )
+	{
+        if(CURRENT_THREAD_ID() != getThreadId())
+        {
+            struct TitleData
+            {
+                UInt8 title;
+                UInt32 timeLen;
+            } titleData = {t, timeLen};
+            GameMsgHdr h(0x265,  getThreadId(), this, sizeof(titleData));
+            GLOBAL().PushMsg(h, &titleData);
+            return;
+        }
+
+        std::map<UInt8, UInt32>& titleAll = _playerData.titleAll;
+        bool flag = false;
+        std::map<UInt8, UInt32>::iterator it = _playerData.titleAll.find(t);
+        if(it == titleAll.end())
+        {
+            if(timeLen == 0)
+                titleAll[t] = 0;
+            else
+                titleAll[t] = TimeUtil::Now() + timeLen;
+            flag = true;
+        }
+        else if(it->second != 0)
+        {
+            if(timeLen == 0)
+                titleAll[t] = 0;
+            else
+                titleAll[t] = TimeUtil::Now() + timeLen;
+            flag = true;
+        }
+        bool fchange = notifyTitleAll();
+        if(flag || fchange)
+        {
+            writeTitleAll();
+        }
+
 		if(t == _playerData.title)
 			return;
 		_playerData.title = t;
 		sendModification(6, _playerData.title);
 		rebuildBattleName();
+	}
 
-        std::vector<UInt8>& titleAll = _playerData.titleAll;
-        bool flag = false;
-        std::vector<UInt8>::iterator it = find(titleAll.begin(), titleAll.end(), t);
-        if(it == titleAll.end()){
-            titleAll.push_back(t);
-            flag = true;
-        }
-        UInt8 cnt = titleAll.size();
-        if(flag){
-            std::string title = "";
-            if(!cnt)
-                title += "0|";
-            for(UInt8 i = 0; i < cnt; ++i)
-            {
-                title += Itoa(titleAll[i]);
-                title += '|';
-            }
-            DB1().PushUpdateData("UPDATE `player` SET `titleAll` = '%s' WHERE `id` = %"I64_FMT"u", title.c_str(), getId());
-        }
-	    Stream st(REP::USER_INFO_CHANGE);
-        st << static_cast<UInt8>(0x17) << cnt;
-        for(UInt8 i = 0; i < cnt; ++i)
-        {
-            st << titleAll[i];
-        }
+    bool Player::notifyTitleAll()
+    {
+        Stream st(REP::USER_INFO_CHANGE);
+        st << static_cast<UInt8>(0x17);
+        bool flag = makeTitleAllInfo(st);
         st << Stream::eos;
         send(st);
-	}
+
+        return flag;
+    }
+
+    void Player::changeTitle(UInt8 t)
+    {
+        if(!hasTitle(t))
+            return;
+
+        UInt32 timeLeft = 0;
+        if(!checkTitleTimeEnd(t, timeLeft))
+        {
+            notifyTitleAll();
+            writeTitleAll();
+            return;
+        }
+
+		if(t == _playerData.title)
+			return;
+		_playerData.title = t;
+		sendModification(6, _playerData.title);
+		rebuildBattleName();
+    }
 
 	UInt32 Player::getAchievement( UInt32 a )
 	{
@@ -13656,6 +13724,83 @@ void EventTlzAuto::notify(bool isBeginAuto)
             mfgt->resetLevelAndExp(maxLevel);
             mfgt->reload2ndSoul();
         }
+    }
+
+    bool Player::hasTitle(UInt8 title)
+    {
+        std::map<UInt8, UInt32>::iterator it = _playerData.titleAll.find(title);
+        if(it == _playerData.titleAll.end())
+            return false;
+        return true;
+    }
+
+    bool Player::checkTitleTimeEnd(UInt8 title, UInt32& timeLeft)
+    {
+        UInt32 now = TimeUtil::Now();
+        std::map<UInt8, UInt32>::iterator it = _playerData.titleAll.find(title);
+        if(it == _playerData.titleAll.end())
+            return false;
+
+        timeLeft = 0;
+        if(it->second == 0)
+            return true;
+
+        if(it->second > now)
+        {
+            timeLeft = it->second - now;
+            return true;
+        }
+
+        _playerData.titleAll.erase(title);
+        return false;
+    }
+
+    bool Player::makeTitleAllInfo(Stream& st)
+    {
+        bool flag = false;
+        std::map<UInt8, UInt32>& titleAll = _playerData.titleAll;
+        UInt8 cnt = titleAll.size();
+        size_t offset = st.size();
+        st << cnt;
+        for(std::map<UInt8, UInt32>::iterator it = titleAll.begin(); it != titleAll.end();)
+        {
+            UInt32 timeLeft = 0;
+            std::map<UInt8, UInt32>::iterator tmp = it;
+            ++ tmp;
+            if(checkTitleTimeEnd(it->first, timeLeft))
+            {
+                st << it->first << static_cast<UInt32>(timeLeft);
+            }
+            else
+            {
+                flag = true;
+                -- cnt;
+            }
+            it = tmp;
+        }
+        st.data<UInt8>(offset) = cnt;
+
+        return flag;
+    }
+
+    void Player::writeTitleAll()
+    {
+        std::map<UInt8, UInt32>& titleAll = _playerData.titleAll;
+        UInt8 cnt = titleAll.size();
+        std::string title = "";
+
+        if(!cnt)
+            title += "0,0|";
+
+        for(std::map<UInt8, UInt32>::iterator it = titleAll.begin(); it != titleAll.end(); ++ it)
+        {
+            title += Itoa(it->first);
+            title += ',';
+            title += Itoa(it->second);
+            title += '|';
+        }
+
+        DB1().PushUpdateData("UPDATE `player` SET `titleAll` = '%s' WHERE `id` = %"I64_FMT"u", title.c_str(), getId());
     }
 
 } // namespace GObject

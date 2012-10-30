@@ -34,6 +34,9 @@ struct DBSHGlobal
     UInt32 session;
     UInt32 nextTime;
     UInt8 progress;
+    UInt8 open;
+    UInt32 timeBegin;
+    UInt32 timeEnd;
     UInt16 cls1TowerLevel;
     UInt16 cls2TowerLevel;
     UInt16 cls3TowerLevel;
@@ -213,11 +216,14 @@ namespace DB
 {
 
 SPECIALBEGIN(GObject::DBSHGlobal)
-SPECIALDEF(6)
+SPECIALDEF(9)
 (
     UInt32, session,
     UInt32, nextTime,
     UInt8, progress,
+    UInt8, open,
+    UInt32, timeBegin,
+    UInt32, timeEnd,
     UInt16, cls1TowerLevel,
     UInt16, cls2TowerLevel,
     UInt16, cls3TowerLevel
@@ -1597,11 +1603,11 @@ namespace GObject
 
     void SHFinalBattleStage::sendStageMail(SingleHeroPlayer* spl, UInt8 idx)
     {
-        static UInt32 award[3][2] = 
+        static MailPackage::MailItem award[3][2] = 
         {
-            {503, 3},
-            {503, 2},
-            {503, 1}
+            {{509, 3}, {9076, 3}},
+            {{509, 2}, {9076, 2}},
+            {{509, 1}, {9076, 1}},
         };
 
         GET_STAGE_NAME(sn, m_gpId)
@@ -1611,13 +1617,19 @@ namespace GObject
         Mail * mail = spl->_player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
         if(mail != NULL)
         {
+            Player* pl = spl->_player;
+            MailPackage::MailItem* mitem = &award[idx][0];
+            UInt32 size = 2;
             std::string strItems;
-            strItems += Itoa(award[idx][0]);
-            strItems += ",";
-            strItems += Itoa(award[idx][1]);
-            strItems += "|";
-            mailPackageManager.push(mail->id, award[idx][0], award[idx][1], true);
-            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, spl->_player->getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+            for (UInt32 i = 0; i < size; ++i)
+            {
+                strItems += Itoa(mitem[i].id);
+                strItems += ",";
+                strItems += Itoa(mitem[i].count);
+                strItems += "|";
+            }
+            mailPackageManager.push(mail->id, mitem, size, true);
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
         }
     }
 
@@ -3467,11 +3479,11 @@ namespace GObject
 
     void SHFinalStarStage::sendStageMail(SingleHeroPlayer* spl, UInt8 idx)
     {
-        static UInt32 award[3][2] = 
+        static MailPackage::MailItem award[3][2] = 
         {
-            {503, 3},
-            {503, 2},
-            {503, 1}
+            {{509, 3}, {9076, 3}},
+            {{509, 2}, {9076, 2}},
+            {{509, 1}, {9076, 1}},
         };
 
         GET_STAGE_NAME(sn, m_gpId)
@@ -3481,13 +3493,19 @@ namespace GObject
         Mail * mail = spl->_player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
         if(mail != NULL)
         {
+            Player* pl = spl->_player;
+            MailPackage::MailItem* mitem = &award[idx][0];
+            UInt32 size = 2;
             std::string strItems;
-            strItems += Itoa(award[idx][0]);
-            strItems += ",";
-            strItems += Itoa(award[idx][1]);
-            strItems += "|";
-            mailPackageManager.push(mail->id, award[idx][0], award[idx][1], true);
-            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, spl->_player->getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+            for (UInt32 i = 0; i < size; ++i)
+            {
+                strItems += Itoa(mitem[i].id);
+                strItems += ",";
+                strItems += Itoa(mitem[i].count);
+                strItems += "|";
+            }
+            mailPackageManager.push(mail->id, mitem, size, true);
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
         }
     }
 
@@ -3572,9 +3590,11 @@ namespace GObject
     }
 
 
-    SHBattleStageMgr::SHBattleStageMgr() : m_progress(0), m_nextTime(0), m_session(0), m_lvlCnt70(0), m_towerEndTime(0)
+    SHBattleStageMgr::SHBattleStageMgr() : m_progress(0), m_nextTime(0), m_session(0), m_lvlCnt70(0), m_towerEndTime(0), m_fOpen(false)
     {
         m_dstprogress = 0;
+        if(!cfg.GMCheck)
+            m_fOpen = true;
 
         m_starStage = NULL;
         m_starStage2 = NULL;
@@ -3602,12 +3622,15 @@ namespace GObject
         std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 
         DBSHGlobal global;
-        if(execu->Extract("SELECT `session`, `nextTime`, `progress`, `cls1TowerLevel`, `cls2TowerLevel`, `cls3TowerLevel` FROM `sh_global`", global) != DB::DB_OK)
+        if(execu->Extract("SELECT `session`, `nextTime`, `progress`, `open`, `timeBegin`, `timeEnd`, `cls1TowerLevel`, `cls2TowerLevel`, `cls3TowerLevel` FROM `sh_global`", global) != DB::DB_OK)
             return false;
 
         m_progress = global.progress;
         m_nextTime = global.nextTime;
         m_session = global.session;
+        m_fOpen = global.open;
+        m_onOffTime._timeBegin = global.timeBegin;
+        m_onOffTime._timeEnd = global.timeEnd;
         if(m_progress == e_sh_tower)
             // XXX neice
             //m_towerEndTime = TimeUtil::Now() + 600;
@@ -3787,7 +3810,7 @@ namespace GObject
 
     void SHBattleStageMgr::process()
     {
-        if(!getActive())
+        if(!isOpen())
             return;
         UInt32 now = TimeUtil::Now();
         if (now < m_nextTime && getProgress() >= m_dstprogress)
@@ -3819,9 +3842,15 @@ namespace GObject
             m_towerEndTime = TimeUtil::SharpDay(1, m_nextTime) + stageStartTime[m_progress];
             break;
         case e_sh_result_end:
+            ++ m_session;
             m_progress = 0;
             break;
         case 0:    // 开始报名
+            if(!openStage(m_nextTime))
+            {
+                m_progress = e_sh_result_end;
+                break;
+            }
             clear();
             ++ m_progress;
             // nextTime报名结束 周一12点
@@ -3902,10 +3931,10 @@ namespace GObject
             towerEnd();
             m_progress += SH_GP_OFFSET_B_E;
             processStageOver();
-            // nextTime 下次报名 下周日12点
+            // nextTime 下次报名 周日12点
             // XXX neice
             //m_nextTime = now + 600;
-            m_nextTime = TimeUtil::SharpWeek(1, m_nextTime+3600) + stageStartTime[0]; 
+            m_nextTime = TimeUtil::SharpDay(1, m_nextTime) + stageStartTime[0]; 
             break;
         }
 
@@ -3924,13 +3953,15 @@ namespace GObject
         if(progress != e_sh_result)
             return false;
 
-        static MailPackage::MailItem award[3][2] = 
+        static MailPackage::MailItem award[3][1] = 
         {
-            {{509, 5}, {9076, 1}},
-            {{509, 3}, {9076, 1}},
-            {{509, 1}, {9076, 1}}
+            {{8555, 9}},
+            {{8555, 6}},
+            {{8555, 3}}
         };
 
+        UInt32 titles[4] = {0, 40, 39, 38};
+#define TITLE_TIME_LEN 7*86400
         for(int cls = 1; cls < 4; ++ cls)
         {
             int idx = 0;
@@ -3938,14 +3969,21 @@ namespace GObject
             {
                 Player* pl = (*it)->_player;
 
+                UInt32 cType = 892;
+                if(idx == 0)
+                {
+                    UInt32 contents[4] = {894, 895, 896};
+                    cType = contents[cls];
+                    pl->setTitle(titles[cls], TITLE_TIME_LEN);
+                }
                 SYSMSGV(title, 891);
-                SYSMSGV(content, 892, idx + 1);
+                SYSMSGV(content, cType, idx + 1);
 
                 Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
                 if(mail)
                 {
                     MailPackage::MailItem* mitem = &award[idx][0];
-                    UInt32 size = 2;
+                    UInt32 size = 1;
                     std::string strItems;
                     for (UInt32 i = 0; i < size; ++i)
                     {
@@ -4147,10 +4185,11 @@ namespace GObject
 
         m_progress = 0;
         m_session = 1;
+        m_fOpen = false;
         // XXX neice
         //m_nextTime = now;
 
-        DB1().PushUpdateData("INSERT INTO `sh_global`(`session`, `progress`, `nextTime`) VALUES(%u, %u, %u)", m_session, m_progress, m_nextTime);
+        DB1().PushUpdateData("INSERT INTO `sh_global`(`session`, `progress`, `nextTime`, `open`, `timeBegin`, `timeEnd`) VALUES(%u, %u, %u, 0, 0, 0)", m_session, m_progress, m_nextTime);
     }
 
     bool SHBattleStageMgr::enter(Player* player, Fighter* fgt)
@@ -4277,7 +4316,7 @@ namespace GObject
     void SHBattleStageMgr::sendActive(Player* pl)
     {
 		Stream st(REP::SINGLE_HERO);
-        st << static_cast<UInt16>(0x0000) << static_cast<UInt8>(getActive());
+        st << static_cast<UInt16>(0x0000) << static_cast<UInt8>(isOpen());
         st << Stream::eos;
 
         pl->send(st);
@@ -4647,7 +4686,7 @@ namespace GObject
             tTurns = it->second->_fgt->getTTurns();
         }
 
-        if (cls > 0 && cls < 4)
+        if (cls > 0 && cls < 4 && m_towerStage[cls])
             m_towerStage[cls]->sendTowerInfo(player, tLevel, tTurns);
     }
 
@@ -5434,7 +5473,7 @@ namespace GObject
                 {
                     for(int i = 0; i < 3; ++ i)
                     {
-                        Player* pl = m_towerStage[cls]->getTopPlayer(i + 1);
+                        Player* pl = m_towerStage[cls] == NULL ? NULL : m_towerStage[cls]->getTopPlayer(i + 1);
                         if(!pl)
                             st << "" << static_cast<UInt16>(0);
                         else
@@ -5502,6 +5541,50 @@ namespace GObject
             st << Stream::eos;
             player->send(st);
         }
+    }
+
+    bool SHBattleStageMgr::openStage(UInt32 openTime)
+    {
+        if(!cfg.GMCheck)
+            return true;
+        bool oldOpenFlag = m_fOpen;
+        if(openTime < m_onOffTime._timeBegin || openTime > m_onOffTime._timeEnd)
+            m_fOpen = false;
+        else
+            m_fOpen = true;
+
+        if(oldOpenFlag != m_fOpen)
+            DB1().PushUpdateData("UPDATE `sh_global` SET `open`=%u WHERE `session`=%u", m_fOpen, m_session);
+
+        return m_fOpen;
+    }
+
+    bool SHBattleStageMgr::setOnOffTime(UInt32 timeBegin, UInt32 timeEnd)
+    {
+        if(!getActive())
+            return false;
+
+        bool ret = true;
+        m_onOffTime._timeBegin = timeBegin;
+        m_onOffTime._timeEnd = timeEnd;
+        DB1().PushUpdateData("UPDATE `sh_global` SET `timeBegin`=`%u, `timeEnd`=%u WHERE `session`=%u", timeBegin, timeEnd, m_session);
+        if(!isOpen())
+        {
+            time_t curtime = time(NULL);
+            UInt32 now = TimeUtil::Now();
+            struct tm *local = localtime(&curtime);
+            UInt8 wday = static_cast<UInt8>(local->tm_wday);
+            if(wday == 0)
+                wday = static_cast<UInt8>(7);
+
+            m_nextTime = TimeUtil::SharpDay(0, now)  + (7 - wday) * 86400 + stageStartTime[0];
+
+            m_progress = 0;
+            ret = openStage(m_nextTime);
+            DB1().PushUpdateData("UPDATE `sh_global` SET `progress`=%u, `nextTime`=%u where `session`=%u", m_progress, m_nextTime, m_session);
+        }
+
+        return ret;
     }
 }
 

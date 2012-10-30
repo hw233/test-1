@@ -1119,5 +1119,21 @@ void OnEnterArena( GameMsgHdr& hdr, const void* data )
     GObject::globalPlayers.enumerate(enterArena, static_cast<void*>(NULL));
 }
 
+void OnSHStageOnOff( GameMsgHdr& hdr, const void* data )
+{
+    struct OnOffData
+    {
+        UInt32 begin;
+        UInt32 end;
+        int	sessionID;
+    } onOff = {0};
+
+    onOff = *reinterpret_cast<OnOffData*>(const_cast<void*>(data));
+    bool ret = GObject::shStageMgr.setOnOffTime(onOff.begin, onOff.end);
+
+    Stream st(SPEP::SHSTAGEONOFF);
+    st << static_cast<UInt8>(ret) << Stream::eos;
+    NETWORK()->SendMsgToClient(onOff.sessionID, st);
+}
 
 #endif // _WORLDINNERMSGHANDLER_H_

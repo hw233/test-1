@@ -115,6 +115,7 @@ MSG_REG_2(GameMsgHdr, 0x1A8, OnSHFighterCloneRes);
 MSG_REG_2(GameMsgHdr, 0x1A9, OnSHReset);
 MSG_REG_2(GameMsgHdr, 0x1AA, OnSHEnter);
 MSG_REG_2(GameMsgHdr, 0x1AB, OnEnterArena);
+MSG_REG_2(GameMsgHdr, 0x1AC, OnSHStageOnOff);
 
 MSG_REG_2(GameMsgHdr, 0x1B1, OnSearchSaleNotify);
 MSG_REG_2(GameMsgHdr, 0x1B2, OnPutSaleNotify);

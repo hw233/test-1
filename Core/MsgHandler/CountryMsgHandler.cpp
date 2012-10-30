@@ -307,4 +307,7 @@ MSG_REG_2(GameMsgHdr, 0x258, OnSendConsumeRankAward);
 
 MSG_REG_2(GameMsgHdr, 0x263, OnSHFighterCloneReq);
 
+MSG_REG_2(GameMsgHdr, 0x264, OnTitleCheck);
+MSG_REG_2(GameMsgHdr, 0x265, OnSetTitle);
+
 MSG_HANDLER_END()

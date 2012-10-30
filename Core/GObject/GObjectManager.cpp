@@ -1612,24 +1612,18 @@ namespace GObject
 				size_t count = tk.count();
                 for(size_t idx = 0; idx < count; ++ idx)
 			    {
-				    PLAYER_DATA(pl, titleAll).push_back(static_cast<UInt8>(atoi(tk[idx].c_str())));
+                    StringTokenizer tk1(tk[idx].c_str(), ",");
+                    if(tk1.count() > 1)
+                        pl->loadTitleAll(atoi(tk1[0].c_str()), atoi(tk1[1].c_str()));
+                    else
+                        pl->loadTitleAll(atoi(tk1[0].c_str()), 0);
                 }
             }
             else
-                PLAYER_DATA(pl, titleAll).push_back(static_cast<UInt8>(0));
-        #if 1
-            std::vector<UInt8>::iterator it = find(PLAYER_DATA(pl, titleAll).begin(), PLAYER_DATA(pl, titleAll).end(), dbpd.pdata.title);
-            if(it == PLAYER_DATA(pl, titleAll).end()){
-                PLAYER_DATA(pl, titleAll).push_back(dbpd.pdata.title);
-                std::string title = "";
-                for(UInt8 i = 0; i < PLAYER_DATA(pl, titleAll).size(); ++i)
-                {
-                    title += Itoa(PLAYER_DATA(pl, titleAll)[i]);
-                    title += '|';
-                }
-                DB1().PushUpdateData("UPDATE `player` SET `titleAll` = '%s' WHERE `id` = %"I64_FMT"u", title.c_str(), pl->getId());
-            }
-        #endif
+                pl->loadTitleAll(0, 0);
+
+            if(!pl->hasTitle(dbpd.pdata.title))
+                pl->fixOldVertionTitle(dbpd.pdata.title);
 		}
 		lc.finalize();
 

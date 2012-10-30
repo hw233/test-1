@@ -397,8 +397,10 @@ void ActivityMgr::SendActivityInfo(Stream& s)
             m1 = 8;
         else if(lev >= 80 && lev < 90)
             m1 = 10;
-        else if(lev >= 90)
-            m1 =12;
+        else if(lev >= 90 && lev < 100)
+            m1 = 12;
+        else if(lev >= 100)
+            m1 = 14;
     }
     s<< GetAtyIDInClient( AtyGroupCopy) << c1 << m1;
     s << GetAtyIDInClient(AtyTownDeamon) << static_cast<UInt8>(_owner->GetVar(VAR_TOWNDEAMON)) << static_cast<UInt8>(1);

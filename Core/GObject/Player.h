@@ -429,14 +429,13 @@ namespace GObject
             lastTjEventScore = 0;
             lastTjTotalScore = 0;
             isHHBlue = false;
-            titleAll.reserve(32);
         }
 
 
 		std::string name;           // ????
 		UInt32 gold;	            // Ԫ??
 		UInt32 coupon;	            // ??ȯ
-		UInt32 tael;	            // ??}
+		UInt32 tael;	            // ??
 		UInt32 coin;	            // ͭǮ
         UInt32 prestige;            // ????
 		UInt32 status;              // ״̬:0x01 - pk???? 0x02 - ?д轿0x04 - С?????? 0x80 - ??ֹ̽??
@@ -516,7 +515,7 @@ namespace GObject
 
         bool isHHBlue;
         std::string nameNoSuffix;     //(合服)不带后缀的用户名
-        std::vector<UInt8> titleAll;      //玩家所有的称号id
+        std::map<UInt8, UInt32> titleAll;      //玩家所有的称号id
     };
 
 	class Player:
@@ -964,9 +963,16 @@ namespace GObject
 		{ return (_playerData.status >> bitStart) & (((1 << bitCount) - 1)); }
 		bool canClosePK();
 
-		void setTitle(UInt8 s);
-		inline UInt8 getTitle() { return _playerData.title; }
-		inline std::vector<UInt8>& getTitleAll() { return _playerData.titleAll; }
+        void loadTitleAll(UInt8 t, UInt32 timeEnd);
+        void fixOldVertionTitle(UInt8 t);
+		void setTitle(UInt8 s, UInt32 timeLen = 0);
+		UInt8 getTitle();
+        bool checkTitleTimeEnd(UInt8 title, UInt32& timeLeft);
+        bool makeTitleAllInfo(Stream& st);
+        bool hasTitle(UInt8);
+        void changeTitle(UInt8 t);
+        bool notifyTitleAll();
+        void writeTitleAll();
 
 		UInt32 getAchievement(UInt32 a = 0);
 		UInt32 useAchievement(UInt32 a,ConsumeInfo * ci=NULL);

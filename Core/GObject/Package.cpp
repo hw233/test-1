@@ -4521,7 +4521,7 @@ namespace GObject
 		ItemEquip * trump = FindEquip(fgt, pos, fighterId, trumpId);
 		ItemEquip * item = FindEquip(fgt, pos, 0, itemId);
 		if(trump == NULL || (trump->getClass() != Item_Trump && trump->getClass() != Item_Fashion && trump->getClass() != Item_Halo)
-                || item == NULL || (item->getClass() != Item_Trump && item->getClass() != Item_Fashion && item->getClass() != Item_Halo))
+                || item == NULL || (item->getClass() != Item_Normal29 && item->getClass() != Item_Trump && item->getClass() != Item_Fashion && item->getClass() != Item_Halo))
 			return 2;
 
 		bool isBound = item->GetBindStatus();

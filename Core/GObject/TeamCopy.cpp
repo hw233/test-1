@@ -1396,7 +1396,7 @@ UInt8 TeamCopyPlayerInfo::getPassNum()
     {
         for(UInt8 j = 0 ; j < TEAMCOPY_MAXTYPECNT; j ++)
         if( m_passTimes[j][i] )
-            num ++;
+            ++ num;
     }
     return num;
 }

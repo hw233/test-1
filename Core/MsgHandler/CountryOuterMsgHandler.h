@@ -1210,10 +1210,7 @@ void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
             {
                 UInt32 id;
                 br >> id;
-                std::vector<UInt8> titleAll = player->getTitleAll();
-                std::vector<UInt8>::iterator it = find(titleAll.begin(), titleAll.end(), static_cast<UInt8>(id));
-                if(it != titleAll.end())
-                    player->setTitle(static_cast<UInt8>(id));
+                player->changeTitle(static_cast<UInt8>(id));
             }
             break;
         case 0x09:

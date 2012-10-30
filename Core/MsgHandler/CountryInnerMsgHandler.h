@@ -1650,6 +1650,24 @@ void OnSHFighterCloneReq( GameMsgHdr& hdr, const void* data )
     GLOBAL().PushMsg(hdr2, &fgtClone);
 }
 
+void OnTitleCheck( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    player->getTitle();
+}
+
+void OnSetTitle( GameMsgHdr& hdr, const void* data )
+{
+    struct TitleData
+    {
+        UInt8 title;
+        UInt32 timeLen;
+    } titleData = {0};
+
+    MSG_QUERY_PLAYER(player);
+    titleData = *reinterpret_cast<TitleData*>(const_cast<void *>(data));
+    player->setTitle(titleData.title, titleData.timeLen);
+}
 
 #endif // _COUNTRYINNERMSGHANDLER_H_
 
