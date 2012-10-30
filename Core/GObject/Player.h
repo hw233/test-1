@@ -1017,12 +1017,12 @@ namespace GObject
 			std::for_each(_fighters.begin(), _fighters.end(), fn);
 		}
 		template<typename _FN>
-		void foreachLineup(_FN fn)
+		void foreachLineup(_FN& fn)
 		{
 			for(int i = 0; i < 5; ++ i)
 			{
 				if(_playerData.lineup[i].fighter != NULL)
-					_FN(_playerData.lineup[i].fighter);
+					fn(_playerData.lineup[i].fighter);
 			}
 		}
 
@@ -1754,6 +1754,7 @@ namespace GObject
         void CheckCanAwardBirthday();
         void getAwardLogin(UInt8 opt);
         void IDIPAddItem(UInt16 itemId, UInt16 num, bool bind = true);
+        int IDIPBuy(UInt32 itemId, UInt32 num, UInt32 price, std::string& err, bool bind = true);
         void lastQueqiaoAwardPush(UInt16 itemId, UInt16 num);
         void checkLastQueqiaoAward();
         void lastKillMonsterAwardPush(UInt16 itemId, UInt16 num);

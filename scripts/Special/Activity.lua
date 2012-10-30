@@ -2470,12 +2470,7 @@ function sendConsumeRankAward_2012_10_19(player, pos)
 end
 
 function sendConsumeRankAward(player, pos)
-    local t = { ['year'] = 2012, ['month'] = 10, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-    local s = os.time(t)
-    local n = os.time()
-    if n >= s and n < (s + 4*86400) then
-        sendConsumeRankAward_2012_10_19(player, pos)
-    end
+    -- sendConsumeRankAward_2012_10_19(player, pos)
 end
 
 function onEquipForge(player, id, onums)

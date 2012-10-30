@@ -81,6 +81,7 @@ enum PurchaseType
     ArenaFromCard               = 70,
     ArenaFromMail               = 71,
     FromTJ                      = 72,
+    IDIPBuyItem                 = 73,
 };
 
 enum IncomingType

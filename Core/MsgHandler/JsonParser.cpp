@@ -668,6 +668,58 @@ int query_event_state_req(JsonHead* head, json_t* body, json_t* retbody, std::st
     head->cmd = 70;
     return 0;
 }
+
+int do_item_pay_req(JsonHead* head, json_t* body, json_t* retbody, std::string& err)
+{
+    if (!head || !body || !retbody)
+        return EUNKNOW;
+
+    char openid[36] = {0};
+    char playerId[32] = {0};
+    UInt32 areaid = 0;
+    UInt64 playerid = 0;
+    UInt32 itemId = 0;
+    UInt32 itemCount = 0;
+    UInt32 price = 0;
+
+    body = body->child;
+    if (!body)
+        return EUNKNOW;
+
+    GET_STRING(body, "szOpenId", openid, 36);
+    GET_STRING(body, "playerId", playerId, 32);
+    json_t* val = json_find_first_label(body, "uiAreaId");
+    if (val && val->child && val->child->text)
+        areaid = atoi(val->child->text);
+
+    playerid = atoll(playerId);
+    GObject::Player* player = GObject::globalPlayers[playerid];
+    if (!player)
+    {
+        err += "player not exist!";
+        return EPLAYER_NOT_EXIST;
+    }
+
+    val = json_find_first_label(body, "uiItemId");
+    if (val && val->child && val->child->text)
+        itemId = atoi(val->child->text);
+
+    val = json_find_first_label(body, "uiItemCount");
+    if (val && val->child && val->child->text)
+        itemCount = atoi(val->child->text);
+
+    val = json_find_first_label(body, "uiPrice");
+    if (val && val->child && val->child->text)
+        price = atoi(val->child->text);
+
+    int ret = player->IDIPBuy(itemId, itemCount, price, err);
+    json_insert_pair_into_object(retbody, "iResult", my_json_new_number(ret));
+    json_insert_pair_into_object(retbody, "szRetMsg", json_new_string(err.c_str()));
+
+    head->cmd = 72;
+    return 0;
+}
+
 void jsonParser2(void * buf, int len, Stream& st)
 {
 	BinaryReader br(buf, len);
@@ -760,6 +812,9 @@ void jsonParser2(void * buf, int len, Stream& st)
             break;
         case 69:
             ret = query_event_state_req(&head, body, retbody, err);
+            break;
+        case 71:
+            ret = do_item_pay_req(&head, body, retbody, err);
             break;
         default:
             break;

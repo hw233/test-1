@@ -49,7 +49,7 @@ GMHandler::GMHandler()
 
 	Reg(1, "pinfo", &GMHandler::OnPlayerInfo);
 	Reg(1, "cinfo", &GMHandler::OnCharInfo);
-	Reg(1, "enterarena", &GMHandler::OnEnterArena);
+//	Reg(1, "enterarena", &GMHandler::OnEnterArena);
 	Reg(1, "enterClan", &GMHandler::OnEnterClan);
 
 	Reg(2, "holy", &GMHandler::OnHoly);
@@ -210,6 +210,8 @@ GMHandler::GMHandler()
     Reg(3, "autosupper", &GMHandler::OnNewPlayerAutoSuper);
 
     Reg(3, "bp", &GMHandler::OnShowBattlePoint);
+    Reg(3, "enterarena", &GMHandler::OnEnterArena);
+    Reg(3, "idipbuy", &GMHandler::OnIdipBuy);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2125,10 +2127,12 @@ void GMHandler::OnAutoFB( GObject::Player * player, std::vector<std::string>& ar
     frontMap.autoBattle(player, id, type, false);
 }
 
+#if 0
 void GMHandler::OnEnterArena( GObject::Player * player, std::vector<std::string>& )
 {
 	GObject::arena.enterArena(player);
 }
+#endif
 
 void GMHandler::OnNextArena( GObject::Player * player, std::vector<std::string>& )
 {
@@ -3156,5 +3160,17 @@ void GMHandler::OnShowBattlePoint(GObject::Player* player, std::vector<std::stri
         if(fighter)
             SYSMSG_SENDV(624, player, fighter->getName().c_str(), static_cast<UInt32>(fighter->getBattlePoint()));
     }
+}
+
+void GMHandler::OnEnterArena(GObject::Player* player, std::vector<std::string>& arge)
+{
+    GameMsgHdr imh(0x1AB, WORKER_THREAD_WORLD, NULL, 0);
+    GLOBAL().PushMsg(imh, NULL);
+}
+
+void GMHandler::OnIdipBuy(GObject::Player* player, std::vector<std::string>& arge)
+{
+    std::string err;
+    player->IDIPBuy(505, 2, 100, err);
 }
 

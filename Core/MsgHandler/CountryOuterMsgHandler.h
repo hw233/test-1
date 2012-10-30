@@ -3146,12 +3146,14 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
             }
             break;
         default:
+#if 0 // XXX: 不需要这个检查
             if (player->GetPackage()->GetRestPackageSize() < lr._count)
             {
                 // 背包空间不足
                 player->sendMsgCode(0, 1011);
                 return;
             }
+#endif
 			if(PLAYER_DATA(player, gold) < price)
 			{
 				st << static_cast<UInt8>(1);

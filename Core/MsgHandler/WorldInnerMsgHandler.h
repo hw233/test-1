@@ -1109,4 +1109,18 @@ void OnSHEnter( GameMsgHdr& hdr, const void* data )
 }
 
 
+inline bool enterArena(GObject::Player* p, void * param)
+{
+    if(!p)
+        return true;
+    GObject::arena.enterArena(p);
+    return true;
+}
+
+void OnEnterArena( GameMsgHdr& hdr, const void* data )
+{
+    GObject::globalPlayers.enumerate(enterArena, static_cast<void*>(NULL));
+}
+
+
 #endif // _WORLDINNERMSGHANDLER_H_
