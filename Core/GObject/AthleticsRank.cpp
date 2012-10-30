@@ -1760,10 +1760,9 @@ void AthleticsRank::TmExtraAward(UInt8 type)
 
                 if(i == 1)
                 {
-                    SYSMSG_BROADCASTV(358, rank->ranker->getCountry(), rank->ranker->getName().c_str());
-
                     UInt16 itemId = 9192;
                     UInt8  itemCount = 1;
+                    SYSMSG_BROADCASTV(358, rank->ranker->getCountry(), rank->ranker->getName().c_str(), itemId);
                     const GData::ItemBaseType *item1 = Package::GetItemBaseType(itemId);
                     if(item1)
                     {
