@@ -927,9 +927,10 @@ void World::World_Store_Check(void *)
     GData::store.process(TimeUtil::Now());
 }
 
-void World::World_Athletics_Check( void * )
+void World::World_Athletics_Check( void* data)
 {
-	gAthleticsRank.TmExtraAward();
+    UInt8 type = *reinterpret_cast<UInt8 *>(data);
+	gAthleticsRank.TmExtraAward(type);
 }
 
 void World::World_Boss_Refresh(void*)
@@ -992,6 +993,8 @@ void World::advancedHookTimer(void *para)
 #endif
 bool World::Init()
 {
+    static UInt8 type = 0;
+    static UInt8 type2 = 1;
 	GObject::Tianjie::instance().Init();
 	AddTimer(5 * 1000, Tianjie_Refresh, static_cast<void*>(NULL));
 
@@ -1040,8 +1043,12 @@ bool World::Init()
     AddTimer(5 * 1000, World_Boss_Refresh, static_cast<void*>(NULL));
 
     UInt32 athChkPoint = TimeUtil::SharpDayT(0, now) + EXTRAREWARDTM;
-    AddTimer(86400 * 1000, World_Athletics_Check, static_cast<void *>(NULL), (athChkPoint >= now ? athChkPoint - now : 86400 + athChkPoint - now) * 1000);
-
+    AddTimer(86400 * 1000, World_Athletics_Check, static_cast<void *>(&type), (athChkPoint >= now ? athChkPoint - now : 86400 + athChkPoint - now) * 1000);
+    if(cfg.merged)
+    {
+        athChkPoint += 30 * 60;
+        AddTimer(86400 * 1000, World_Athletics_Check, static_cast<void *>(&type2), (athChkPoint >= now ? athChkPoint - now : 86400 + athChkPoint - now) * 1000);
+    }
     //AddTimer(5 * 1000, Team_Copy_Process, static_cast<void*>(NULL));
     //AddTimer(3600 * 1000, AthleticsPhysicalCheck, static_cast<void *>(NULL), (3600 - now % 3600) * 1000);
     AddTimer(3600 * 1000, ClanStatueCheck, static_cast<void *>(NULL), (3600 - now % 3600) * 1000);

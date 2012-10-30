@@ -4647,7 +4647,7 @@ namespace GObject
             tTurns = it->second->_fgt->getTTurns();
         }
 
-        if (cls > 0 && cls < 4)
+        if (cls > 0 && cls < 4 && m_towerStage[cls])
             m_towerStage[cls]->sendTowerInfo(player, tLevel, tTurns);
     }
 

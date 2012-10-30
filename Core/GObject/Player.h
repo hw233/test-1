@@ -1511,7 +1511,7 @@ namespace GObject
         bool _diamond_privilege;
         bool _qqvip_privilege;
         UInt32 _athlRivalBuf;
-        bool _switch_diff_rank;
+        bool _new_rank;
     public:
         static UInt8 _yaMenActiveCount;
         static UInt8 _shiMenActiveCount;
@@ -1533,8 +1533,8 @@ namespace GObject
         inline void setJusticeRoar(UInt8 v) { _justice_roar = v; }
         inline UInt8 getJusticeRoar() { return _justice_roar; }
 
-        inline void switchDiffServerRank(bool v) { if(cfg.merged && _switch_diff_rank != v) _switch_diff_rank = v; }
-        inline bool isDiffServerRank() { return cfg.merged && _switch_diff_rank; }
+        inline void setNewRank(bool v) { if(cfg.merged && _new_rank != v) _new_rank = v; }
+        inline bool isNewRank() { return cfg.merged && _new_rank; }
         inline bool isSameServer(Player* player) { return player && (getId() >> 48) == (player->getId() >> 48); }
         inline UInt16 getServerNo() { return static_cast<UInt16>(getId() >> 48); }
 

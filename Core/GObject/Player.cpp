@@ -527,7 +527,7 @@ namespace GObject
 		_availInit(false), _vipLevel(0), _clan(NULL), _clanBattle(NULL), _flag(0), _gflag(0), _onlineDuration(0), _offlineTime(0),
 		_nextTavernUpdate(0), _nextBookStoreUpdate(0), _bossLevel(21), _ng(NULL), _lastNg(NULL),
 		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), m_autoCopyFailed(false),
-        _justice_roar(0), _spirit_factor(1.0f), _diamond_privilege(false), _qqvip_privilege(false), _athlRivalBuf(0), _worldBossHp(0), m_autoCopyComplete(0), hispot(0xFF), hitype(0),
+        _justice_roar(0), _spirit_factor(1.0f), _diamond_privilege(false), _qqvip_privilege(false), _athlRivalBuf(0), _new_rank(false), _worldBossHp(0), m_autoCopyComplete(0), hispot(0xFF), hitype(0),
 #ifndef _WIN32
 		m_ulog(NULL),
 #endif
@@ -569,10 +569,10 @@ namespace GObject
         m_ulog = _analyzer.GetInstance(buf);
         m_ulog->SetUserIP("0.0.0.0");
 #endif
-        if(cfg.merged)
-            _switch_diff_rank = true;
+        /*if(cfg.merged)
+            _new_rank = true;
         else
-            _switch_diff_rank = false;
+            _new_rank = false;*/
 	}
 
 

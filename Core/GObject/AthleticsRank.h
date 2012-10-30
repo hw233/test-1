@@ -224,7 +224,7 @@ public:
     void notifyAthMartialOver(Player * atker, Player * defer, UInt32 id, UInt8 res);
 
 public:
-	void TmExtraAward();
+	void TmExtraAward(UInt8 type);
 
 	inline UInt8 getRankRow(UInt8 lev)
 	{
