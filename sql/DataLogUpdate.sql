@@ -1,5 +1,6 @@
 ALTER TABLE `login_states` ADD INDEX up_login_status (`server_id`, `player_id`, `login_time`);
 ALTER TABLE `mailitem_histories` ADD INDEX up_mail_status (`server_id`, `mail_id`, `status`);
+ALTER TABLE `mailitem_histories` ADD INDEX player_time (`player_id`, `receive_time`);
 ALTER TABLE `topup_num` ADD INDEX server_player (`server_id`, `player_id`);
 ALTER TABLE `consume_gold` ADD INDEX server_player (`server_id`, `player_id`);
 ALTER TABLE `consume_gold` ADD INDEX server_player_item (`server_id`, `player_id`, `item_id`);

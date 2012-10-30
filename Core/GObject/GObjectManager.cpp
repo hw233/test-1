@@ -2439,8 +2439,8 @@ namespace GObject
 			data->ranker = pl;
 
             ++ rank[dbd.row];
-            if(rank[dbd.row] > ATHLETICS_RANK_MAX_CNT)
-                rank[dbd.row] = ATHLETICS_RANK_MAX_CNT + 1;
+            //if(rank[dbd.row] > ATHLETICS_RANK_MAX_CNT)
+            //    rank[dbd.row] = ATHLETICS_RANK_MAX_CNT + 1;
             data->rank = rank[dbd.row];
             if(rank[dbd.row] != dbd.rank/* && rank[dbd.row] <= ATHLETICS_RANK_MAX_CNT*/)
             {
@@ -2466,20 +2466,22 @@ namespace GObject
             data->first4rank = dbd.first4rank;
             data->extrachallenge = dbd.extrachallenge;
             data->pageNum = dbd.pageNum;
-            data->eChallengeTime = dbd.eChallengeTime;
-            data->ePhysical = dbd.ePhysical;
-            if(data->ePhysical > gAthleticsRank.GetMaxPhysical(pl->getVipLevel()))
-                data->ePhysical = gAthleticsRank.GetMaxPhysical(pl->getVipLevel());
-            data->eSelectIndex = dbd.eSelectIndex;
+            AthleticsPInfo *PlayerPInfo = pl->GetAthletics()->getPlayerPInfo();
+            PlayerPInfo->eChallengeTime = dbd.eChallengeTime;
+            PlayerPInfo->ePhysical = dbd.ePhysical;
+            if(PlayerPInfo->ePhysical > gAthleticsRank.GetMaxPhysical(pl->getVipLevel()))
+                PlayerPInfo->ePhysical = gAthleticsRank.GetMaxPhysical(pl->getVipLevel());
+            PlayerPInfo->eSelectIndex = dbd.eSelectIndex;
             for(UInt8 index = 0; index < 5; index++)
             {
-                data->eCombine[index] = dbd.eCombine[index];
-                data->eRival[index] = dbd.eRival[index];
-                data->eCanAttack[index] = dbd.eCanAttack[index];
-                data->eRivalType[index] = dbd.eRivalType[index];
+                PlayerPInfo->eCombine[index] = dbd.eCombine[index];
+                PlayerPInfo->eRival[index] = dbd.eRival[index];
+                PlayerPInfo->eCanAttack[index] = dbd.eCanAttack[index];
+                PlayerPInfo->eRivalType[index] = dbd.eRivalType[index];
             }
 			gAthleticsRank.addAthleticsFromDB(dbd.row, data);
 		}
+        gAthleticsRank.checkRankL();
 		lc.finalize();
 
 		return true;

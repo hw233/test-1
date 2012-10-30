@@ -236,14 +236,21 @@ namespace GObject
         
         VAR_YUEBING_USED = 193, //中秋国庆使用月饼数量
         VAR_MAX_CLAN_COPY_LEVEL = 194, // 本周已通关的最大层数
-
         VAR_TOWN_REWARD = 195, //镇妖封神 修仙夺宝 10-15--10-18
+        VAR_BLUE_AWARD_COUNT = 196 ,//蓝钻抽奖次数
+        VAR_YELLOW_AWARD_COUNT = 197, //黄钻抽奖次数
 
         // TGC活动
         VAR_TGC_1_LOGIN = 200,
         VAR_TGC_1_COPY = 201,
         VAR_TGC_1_FRONTMAP = 202,
         VAR_TGC_1_DUNGEON = 203,
+
+        VAR_LOCAL_RANK = 240, //本服斗剑，最好排名
+        VAR_LOCAL_MAXRANK = 241, //本服斗剑，当前排名
+        VAR_LOCAL_PRESTIGE = 242, //本服斗剑，声望数
+        VAR_LOCAL_PAGE = 243, //本服斗剑，翻页数
+
 
         VAR_MAX,
     };
@@ -462,10 +469,16 @@ namespace GObject
             REGISTER_VAR(VAR_QGAME_GIFT, CYCLE_DAY);
             REGISTER_VAR(VAR_MAX_CLAN_COPY_LEVEL, CYCLE_WEEK);
             REGISTER_VAR(VAR_TOWN_REWARD, CYCLE_NONE);
+            REGISTER_VAR(VAR_BLUE_AWARD_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_YELLOW_AWARD_COUNT, CYCLE_NONE);
             REGISTER_VAR(VAR_TGC_1_LOGIN, CYCLE_NONE);
             REGISTER_VAR(VAR_TGC_1_COPY, CYCLE_NONE);
             REGISTER_VAR(VAR_TGC_1_FRONTMAP, CYCLE_NONE);
             REGISTER_VAR(VAR_TGC_1_DUNGEON, CYCLE_NONE);
+            REGISTER_VAR(VAR_LOCAL_RANK, CYCLE_NONE);
+            REGISTER_VAR(VAR_LOCAL_MAXRANK, CYCLE_NONE);
+            REGISTER_VAR(VAR_LOCAL_PRESTIGE, CYCLE_NONE);
+            REGISTER_VAR(VAR_LOCAL_PAGE, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

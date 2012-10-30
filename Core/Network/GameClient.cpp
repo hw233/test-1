@@ -268,7 +268,6 @@ void GameClient::onRecv( int cmd, int len, void * buf )
 		{
 			GameMsgHdr hdr( cmd, thrd, pl, len );
 			GLOBAL().PushMsg( hdr,  buf );
-            GObject::dclogger.protol_sec(pl, cmd);
 		}
 	}
 }

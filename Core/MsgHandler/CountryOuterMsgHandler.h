@@ -2992,6 +2992,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 			break;
 #endif
 		case 6:
+            // 荣誉购买
 			if(PLAYER_DATA(player, achievement) < price)
 			{
 				st << static_cast<UInt8>(1);
@@ -3018,10 +3019,12 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 					player->useAchievement(price,&ci);
 					st << static_cast<UInt8>(0);
                     GameAction()->doAty( player, AtyBuy, 0,0);
+                    player->storeUdpLog(1141, 6, lr._itemId, lr._count);
 				}
 			}
 			break;
         case 7:
+            // 声望购买
             {
                 UInt32 prestige = player->getPrestige();
                 if (prestige < price)
@@ -3051,6 +3054,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                         st << static_cast<UInt8>(0);
 
                         GameAction()->doAty(player, AtyBuy, 0,0);
+                        player->storeUdpLog(1141, 7, lr._itemId, lr._count);
                     }
                 }
             }
@@ -3143,12 +3147,14 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
             }
             break;
         default:
+#if 0 // XXX: 不需要这个检查
             if (player->GetPackage()->GetRestPackageSize() < lr._count)
             {
                 // 背包空间不足
                 player->sendMsgCode(0, 1011);
                 return;
             }
+#endif
 			if(PLAYER_DATA(player, gold) < price)
 			{
 				st << static_cast<UInt8>(1);
@@ -4193,8 +4199,9 @@ void OnRefreshMartialReq( GameMsgHdr& hdr, AthleticsRefreshMartialReq& req )
     GameMsgHdr hdr2(0x1F1, WORKER_THREAD_WORLD, player, 0);
     GLOBAL().PushMsg(hdr2, NULL);
 #endif
-    GameMsgHdr hdr2(0x1F8, WORKER_THREAD_WORLD, player, 1);
-    GLOBAL().PushMsg(hdr2, &(req._type));
+    //GameMsgHdr hdr2(0x1F8, WORKER_THREAD_WORLD, player, 1);
+    //GLOBAL().PushMsg(hdr2, &(req._type));
+    player->GetAthletics()->updateAthleticsP(player, req._type);
 }
 
 void OnTrumpUpgrade( GameMsgHdr& hdr, const void* data)

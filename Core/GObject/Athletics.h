@@ -41,6 +41,17 @@ struct MartialHeader
     MartialData md;
 };
 
+typedef struct
+{
+    UInt32 eChallengeTime;
+    UInt8 ePhysical;
+    UInt8 eSelectIndex;
+    UInt32 eCombine[5];
+    UInt64 eRival[5];
+    UInt8 eCanAttack[5];
+    UInt8 eRivalType[5];
+}AthleticsPInfo;
+
 struct Lineup;
 class Player;
 class Athletics
@@ -84,7 +95,7 @@ public:
 	void GetBoxAddSourceNotify(UInt8 type, UInt32 count);
 
     void updateMartialHdr(const MartialHeader* mh);
-    void updateMartial(const MartialData* md);
+    //void updateMartial(const MartialData* md);
     void attackMartial(Player* defer);
 
     void beAttackMartial(Player * atker, UInt16 formation, UInt16 portrait, Lineup * lineup);
@@ -94,11 +105,20 @@ public:
 	bool addAthleticsExtraAward(UInt32 EquipId, UInt8 rank);
     void PayForPaging(UInt8 type);
     void PayForKillCD(UInt8 type);
+    void updateAthleticsMartial(Player *pl);
+    void updateAthleticsP(Player* pl, UInt8 type);
+    void RequestSubDir(Player* player, UInt8 athlDiffculty, UInt8 athlCategory);
+    void PhysicalCheck(void);
+    AthleticsPInfo *getPlayerPInfo()
+    {
+        return &PlayerPInfo;
+    }
 
 private:
 	Player * _owner;
 	bool _hasEnterAthletics;
 	std::deque<AthleticsData *> _athleticses;
+    AthleticsPInfo PlayerPInfo;
     //Player* _martial[5];
     //Battle::BattleSimulator* _martial_battle[3];
     //UInt8 _canAttack[5];

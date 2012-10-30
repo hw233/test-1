@@ -527,7 +527,7 @@ namespace GObject
 		_availInit(false), _vipLevel(0), _clan(NULL), _clanBattle(NULL), _flag(0), _gflag(0), _onlineDuration(0), _offlineTime(0),
 		_nextTavernUpdate(0), _nextBookStoreUpdate(0), _bossLevel(21), _ng(NULL), _lastNg(NULL),
 		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), m_autoCopyFailed(false),
-        _justice_roar(0), _spirit_factor(1.0f), _diamond_privilege(false), _qqvip_privilege(false), _athlRivalBuf(0), _worldBossHp(0), m_autoCopyComplete(0), hispot(0xFF), hitype(0),
+        _justice_roar(0), _spirit_factor(1.0f), _diamond_privilege(false), _qqvip_privilege(false), _athlRivalBuf(0), _new_rank(false), _worldBossHp(0), m_autoCopyComplete(0), hispot(0xFF), hitype(0),
 #ifndef _WIN32
 		m_ulog(NULL),
 #endif
@@ -569,6 +569,10 @@ namespace GObject
         m_ulog = _analyzer.GetInstance(buf);
         m_ulog->SetUserIP("0.0.0.0");
 #endif
+        /*if(cfg.merged)
+            _new_rank = true;
+        else
+            _new_rank = false;*/
 	}
 
 
@@ -1449,6 +1453,14 @@ namespace GObject
             snprintf (action, 16, "F_%d", id);
         }
         udpLog("tripod", action, "", "", "", "", "act", num);
+    }
+
+    void Player::storeUdpLog(UInt32 id, UInt32 type, UInt32 itemId, UInt32 num /* = 1 */)
+    {
+        // TODO: 商城购买相关日志（现在只有荣誉和声望）
+        char action[32] = "";
+        snprintf (action, 16, "F_%d_%d_%d", id, type, itemId);
+        udpLog("store", action, "", "", "", "", "act", num);
     }
 
     void Player::sendHalloweenOnlineAward(UInt32 now, bool _online)
@@ -9958,6 +9970,10 @@ namespace GObject
         case 11:
             getAwardLogin(opt);
             break;
+        case 12:
+            getAwardBlueDiamond(opt);
+            break;
+     
         }
     }
 
@@ -10200,6 +10216,19 @@ namespace GObject
                 st << static_cast<UInt8>(11) << static_cast<UInt8>(0) << Stream::eos;
                 send(st);
             }
+        }
+    }
+
+    void Player::getAwardBlueDiamond(UInt8 opt)
+    {
+        if(opt == 1 || opt == 2) //抽奖
+        {
+            UInt8 idx = 0;
+            if( 0 == (idx = GameAction()->RunBlueDiamondAward(this, opt)) )
+                return;
+            Stream st(REP::GETAWARD);
+            st << static_cast<UInt8>(12) << idx << Stream::eos;
+            send(st);
         }
     }
 
@@ -12509,6 +12538,35 @@ namespace GObject
             }
             DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
         }
+    }
+
+    int Player::IDIPBuy(UInt32 itemId, UInt32 num, UInt32 price, std::string& err, bool bind)
+    {
+        const GData::ItemBaseType* ibt = GData::itemBaseTypeManager[itemId];
+        if (!ibt)
+        {
+            err = "物品不存在";
+            return -101;
+        }
+
+        if (getGold() < price)
+        {
+            err = "仙石不足";
+            return -102;
+        }
+
+        if (GetPackage()->GetRestPackageSize() < (itemId+ibt->maxQuantity)/ibt->maxQuantity)
+        {
+            err = "背包空间不足";
+            return -103;
+        }
+
+		ConsumeInfo ci(IDIPBuyItem,0,0);
+        useGold(price, &ci);
+
+        GetPackage()->Add(itemId, num, bind);
+        err = "购买成功";
+        return 0;
     }
 
     void Player::sendFourCopAct()

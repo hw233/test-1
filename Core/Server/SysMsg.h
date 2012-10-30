@@ -14,6 +14,7 @@ public:
 	SysMsgItem(UInt8, const std::string&);
 	void send(GObject::Player *);
 	void sendva(GObject::Player *, ...);
+	void sendva2(UInt16 serverNo, ...);
 
 	void get(char *);
 	void getva(char *, ...);
@@ -46,6 +47,7 @@ extern SysMsg globalSysMsg;
 #define SYSMSG_BROADCAST(idx) { SysMsgItem * mi = globalSysMsg[idx]; if(mi != NULL) mi->send(NULL); }
 #define SYSMSG_SENDV(idx, player, ...) { SysMsgItem * mi = globalSysMsg[idx]; if(mi != NULL) mi->sendva(player, ##__VA_ARGS__); }
 #define SYSMSG_BROADCASTV(idx, ...) { SysMsgItem * mi = globalSysMsg[idx]; if(mi != NULL) mi->sendva(NULL, ##__VA_ARGS__); }
+#define SYSMSG_BROADCASTV2(idx, serverNo, ...) { SysMsgItem * mi = globalSysMsg[idx]; if(mi != NULL) mi->sendva2(serverNo, ##__VA_ARGS__); }
 #define SYSMSG2(msg, idx) { SysMsgItem * mi = globalSysMsg[idx]; if(mi != NULL) mi->get(msg); else msg[0] = 0; }
 #define SYSMSGV2(msg, idx, ...) { SysMsgItem * mi = globalSysMsg[idx]; if(mi != NULL) mi->getva(msg, ##__VA_ARGS__); else msg[0] = 0; }
 
