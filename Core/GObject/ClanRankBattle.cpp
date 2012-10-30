@@ -2008,10 +2008,10 @@ namespace GObject
             if(msg1 != NULL) msg1->getva(content1, score);
 
             //每周个人奖励
-            for(RewardsMap::iterator iter = m_WeeklyRewards.begin();
-                iter != m_WeeklyRewards.end(); ++iter)
+            for(RewardsMap::reverse_iterator iter = m_WeeklyRewards.rbegin();
+                iter != m_WeeklyRewards.rend(); ++iter)
             {
-                if(score > iter->first)
+                if(score >= iter->first)
                 {
                     RewardVec& rewards = iter->second;
                     MailItemsInfo info(&rewards[0], ClanBattleAward, rewards.size());
@@ -2057,10 +2057,10 @@ namespace GObject
             }
 
             //周积分奖励
-            for(RewardsMap::iterator iter = m_WeeklyClanRewards.begin();
-                    iter != m_WeeklyClanRewards.end(); ++iter)
+            for(RewardsMap::reverse_iterator iter = m_WeeklyClanRewards.rbegin();
+                    iter != m_WeeklyClanRewards.rend(); ++iter)
             {
-                if(score > iter->first)
+                if(score >= iter->first)
                 {
                     GiveClanRewards(clan, iter->second);
                     break;
@@ -2104,10 +2104,10 @@ namespace GObject
 
     void ClanRankBattleMgr::MakeWeeklyMailInfo(UInt32 score, Stream& st)
     {
-        for(RewardsMap::iterator iter = m_WeeklyRewards.begin();
-                iter != m_WeeklyRewards.end(); ++iter)
+        for(RewardsMap::reverse_iterator iter = m_WeeklyRewards.rbegin();
+                iter != m_WeeklyRewards.rend(); ++iter)
         {
-            if(score > iter->first)
+            if(score >= iter->first)
             {
                 MakeMailInfo(st, iter->second);
                 return;
@@ -2140,10 +2140,10 @@ namespace GObject
 
     bool ClanRankBattleMgr::AddWeeklyMailItems(Player* player, UInt32 score)
     {
-        for(RewardsMap::iterator iter = m_WeeklyRewards.begin();
-                iter != m_WeeklyRewards.end(); ++iter)
+        for(RewardsMap::reverse_iterator iter = m_WeeklyRewards.rbegin();
+                iter != m_WeeklyRewards.rend(); ++iter)
         {
-            if(score > iter->first)
+            if(score >= iter->first)
             {
                 return AddMailItems(player, iter->second);
             }
