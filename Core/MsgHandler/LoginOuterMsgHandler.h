@@ -505,7 +505,14 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 
     if (!hdr.playerID)
     {
+
+#ifndef _FB
+#ifndef _VT
+#ifndef _WIN32
         GObject::dclogger.create_sec(us);
+#endif
+#endif
+#endif
 		conn->pendClose();
         return;
     }
@@ -514,7 +521,13 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
     {
 		UserLogonRepStruct rep;
 		rep._result = 5;
+#ifndef _FB
+#ifndef _VT
+#ifndef _WIN32
         GObject::dclogger.create_sec(us);
+#endif
+#endif
+#endif
 		NETWORK()->SendMsgToClient(conn.get(), rep);
 		conn->pendClose();
         return;
@@ -533,7 +546,13 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 	{
 		NewUserRepStruct rep;
 		rep._result = 2;
+#ifndef _FB
+#ifndef _VT
+#ifndef _WIN32
         GObject::dclogger.create_sec(us);
+#endif
+#endif
+#endif
 		NETWORK()->SendMsgToClient(conn.get(), rep);
 		return;
 	}
@@ -565,7 +584,13 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 		pl = new(std::nothrow) GObject::Player(hdr.playerID);
 		if(pl == NULL)
         {
+#ifndef _FB
+#ifndef _VT
+#ifndef _WIN32
             GObject::dclogger.create_sec(us);
+#endif
+#endif
+#endif
 			return;
         }
 
@@ -678,7 +703,13 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
     }
 
     
+#ifndef _FB
+#ifndef _VT
+#ifndef _WIN32
     GObject::dclogger.create_sec(us);
+#endif
+#endif
+#endif
 	NewUserRepStruct rep;
 	rep._result = res;
 	NETWORK()->SendMsgToClient(conn.get(), rep);
