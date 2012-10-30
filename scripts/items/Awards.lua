@@ -218,7 +218,7 @@ function RunBlueDiamondAward(player, opt)
         return 0;
     end
     local package = player:GetPackage();
-	if package:GetRestPackageSize() < 5 then
+	if package:GetRestPackageSize() < 8 then
 		player:sendMsgCode(2, 1011, 0);
 		return 0;
 	end
