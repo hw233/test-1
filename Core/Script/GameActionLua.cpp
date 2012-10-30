@@ -1261,10 +1261,10 @@ namespace Script
         return Call<bool>("RunNewRC7DayLoginAward2", player, val);
     }
 
-    UInt8 GameActionLua::RunNewRC7DayRechargeAward(Player* player, UInt8 val, UInt32 totalRecharge)
+    bool GameActionLua::RunNewRC7DayRechargeAward(Player* player, UInt8 val, UInt32 totalRecharge)
     {
         assert(player != NULL);
-        return Call<UInt8>("RunNewRC7DayRechargeAward", player, val, totalRecharge);
+        return Call<bool>("RunNewRC7DayRechargeAward", player, val, totalRecharge);
     }
 
     UInt8 GameActionLua::RunNewRC7DayTargetAward(Player* player)

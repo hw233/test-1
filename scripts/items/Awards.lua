@@ -216,7 +216,11 @@ function RunNewRC7DayLoginAward(player, cts)
     end
 
     for count = 1, #item[cts] do
-        package:Add(item[cts][count][1], item[cts][count][2], true, 0, 34);
+        if item[cts][count][1] == 499 then
+            player:getCoupon(item[cts][count][2])
+        else
+            package:Add(item[cts][count][1], item[cts][count][2], true, 0, 34);
+        end
     end
     return true
 end
@@ -231,11 +235,9 @@ function RunNewRC7DayLoginAward2(player, val)
     local package = player:GetPackage();
 
     if val == 0 then
-        print ("false")
         return false
     end
     if val > 5 then
-        print ("false1")
         return false
     end
     if val == 2 then
@@ -247,7 +249,6 @@ function RunNewRC7DayLoginAward2(player, val)
     num = #item
     if package:GetRestPackageSize() < ((num - 1) +((num - 1)*num*3)/99) then
         player:sendMsgCode(2, 1011, 0);
-        print ("false2")
         return false
     end
 
@@ -271,11 +272,11 @@ function RunNewRC7DayRechargeAward(player, val, gold)
     local items = {
         [1] = {{499,10},{400,2},{509,1},{507,1},{15,2}},
         [2] = {{499,10},{400,2},{509,1},{507,1},{15,2},{500,5}},
-        [3] = {{499,10},{400,3},{509,1},{507,1},{15,2},{512,5},{513,5}},
+        [3] = {{499,10},{400,3},{509,1},{507,1},{15,2},{512,5},{513,3}},
         [4] = {{499,10},{400,3},{509,1},{507,1},{15,2},{502,5},{503,5}},
-        [5] = {{499,10},{400,4},{509,1},{507,1},{15,2},{501,5},{505,5}},
-        [6] = {{499,10},{400,4},{509,2},{507,2},{15,2},{514,5},{515,5}},
-        [7] = {{499,10},{400,4},{509,2},{507,2},{15,2},{517,3},{1528,3}},
+        [5] = {{499,10},{400,4},{509,1},{507,1},{15,2},{501,5},{505,2}},
+        [6] = {{499,10},{400,4},{509,2},{507,2},{15,2},{514,5},{515,2}},
+        [7] = {{499,10},{400,5},{509,2},{507,2},{15,2},{517,3},{1528,3}},
     }
 
     if val == 0 then
@@ -299,7 +300,15 @@ function RunNewRC7DayRechargeAward(player, val, gold)
     end
 
     for k,v in pairs(item) do
-        package:AddItem(v[1], v[2], 1)
+        if v[1] == 499 then
+            player:getCoupon(v[2])
+        else
+            if v[1] == 1528 then
+                package:AddEquipN(v[1], v[2], 1, 0, 35)
+            else
+                package:AddItem(v[1], v[2], 1)
+            end
+        end
     end
 
     return true

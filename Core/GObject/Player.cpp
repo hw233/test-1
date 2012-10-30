@@ -10781,7 +10781,7 @@ namespace GObject
         if (val <= 7)
         {
             // 点亮龙珠
-            if (wishIndex != (val - 1))
+            if (wishIndex == (val - 1))
             {
                 if (GameAction()->RunNewRC7DayRechargeAward(this, val, totalRecharge))
                 {
@@ -12505,6 +12505,8 @@ namespace GObject
         if (!World::getRC7Day())
             return;
         AddVar(VAR_RC7DAYRECHARGE, r);
+        
+        sendNewRC7DayRecharge();
 
         Stream st(REP::RC7DAY);
         st << static_cast<UInt8>(5) << GetVar(VAR_RC7DAYRECHARGE);

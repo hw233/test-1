@@ -1699,8 +1699,9 @@ namespace GObject
 
             UInt32 thisDay = TimeUtil::SharpDay();
             UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA(m_Owner, created));
-            if(ret == true && id == 32 && thisDay <= endDay)
+            if(ret == true && id == 449 && thisDay <= endDay)
             {
+                // 新注册七日内开启首充礼包，完成每日目标
                 UInt32 targetVal = m_Owner->GetVar(VAR_CLAWARD2);
                 if (!(targetVal & TARGET_RECHARGE_PACKGE))
                 {
