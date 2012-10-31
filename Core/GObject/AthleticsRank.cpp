@@ -246,6 +246,7 @@ void AthleticsRank::addAthleticsFromDB(UInt8 row, AthleticsRankData * data)
         if(rankTmp > ATHLETICS_RANK_MAX_CNT + 1)
             rankTmp = ATHLETICS_RANK_MAX_CNT + 1;
         pl->SetVar(VAR_LOCAL_RANK, rankTmp);
+        rankTmp = data->maxrank;
         if(rankTmp > ATHLETICS_RANK_MAX_CNT + 1)
             rankTmp = ATHLETICS_RANK_MAX_CNT + 1;
         pl->SetVar(VAR_LOCAL_MAXRANK, rankTmp);
