@@ -6,6 +6,7 @@
 #include "GObject/Country.h"
 #include "GObject/World.h"
 #include "Server/OidGenerator.h"
+#include "GObject/SortWorker.h"
 
 namespace Script
 {
@@ -587,6 +588,8 @@ BattleFormula * BattleFormula::getCurrent()
 	case WORKER_THREAD_COUNTRY_2:
 	case WORKER_THREAD_NEUTRAL:
 		return reinterpret_cast<GObject::Country &>(worker).GetBattleFormula();
+    case WORKER_THREAD_SORT:
+        return reinterpret_cast<GObject::SortWorker &>(worker).getBattleFormula();
 	}
 	return NULL;
 }

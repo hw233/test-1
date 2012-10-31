@@ -2,6 +2,9 @@
 #include "Config.h"
 #include "SortWorker.h"
 #include "GObject/Leaderboard.h"
+#include "Script/GameActionLua.h"
+#include "Script/BattleFormula.h"
+#include "Server/Cfg.h"
 
 namespace GObject
 {
@@ -14,7 +17,13 @@ namespace GObject
 
     bool SortWorker::Init()
     {
-        return true;
+       //GameActionLua
+	   std::string path = cfg.scriptPath + "main.lua";
+	   m_GameActionLua = new Script::GameActionLua(TID(), path.c_str());
+	   path = cfg.scriptPath + "formula/main.lua";
+	   m_BattleFormula = new Script::BattleFormula(path.c_str());
+	
+       return true;
     }
 
     void SortWorker::UnInit()

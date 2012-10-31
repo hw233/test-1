@@ -2130,8 +2130,13 @@ void ClearTaskFromBs(LoginMsgHdr &hdr, const void * data)
     GObject::Player * pl = GObject::globalPlayers[id];
     if (pl)
     {
-        GameMsgHdr msg(0x325, pl->getThreadId(), pl, sizeof(type));
-        GLOBAL().PushMsg(msg, &type);
+        if (type == 3)
+            pl->buildClanTask(true);
+        else
+        {
+            GameMsgHdr msg(0x325, pl->getThreadId(), pl, sizeof(type));
+            GLOBAL().PushMsg(msg, &type);
+        }
         ret = 0;
     }
     st << ret << Stream::eos;
@@ -2155,8 +2160,13 @@ void ClearTaskAllFromBs(LoginMsgHdr &hdr, const void * data)
         GObject::Player* pl = iter->second;
         if (pl)
         {
-            GameMsgHdr msg(0x325, pl->getThreadId(), pl, sizeof(type));
-            GLOBAL().PushMsg(msg, &type);
+            if (type == 3)
+                pl->buildClanTask(true); 
+            else
+            {
+                GameMsgHdr msg(0x325, pl->getThreadId(), pl, sizeof(type));
+                GLOBAL().PushMsg(msg, &type);
+            }
             ret = 0;
         }
     }
