@@ -70,6 +70,7 @@
 #include "GObject/Tianjie.h"
 #include <cmath>
 #include "QixiTmpl.h"
+#include "MsgHandler/Memcached.h"
 
 #define NTD_ONLINE_TIME (4*60*60)
 #ifndef _DEBUG
@@ -1838,6 +1839,8 @@ namespace GObject
         char online[32] = {0,};
         snprintf(online, sizeof(online), "%u", curtime - _playerData.lastOnline);
         udpLog("", "", "", "", "", online, "login");
+
+        setCrackValue(getClientIp(), 0);
 	}
 
 	void Player::Logout(bool nobroadcast)
@@ -1921,6 +1924,8 @@ namespace GObject
         char online[32] = {0,};
         snprintf(online, sizeof(online), "%u", TimeUtil::Now() - _playerData.lastOnline);
         udpLog("", "", "", "", "", online, "login");
+
+        setCrackValue(getClientIp(), 0);
 	}
 
 	void Player::checkLastBattled()
