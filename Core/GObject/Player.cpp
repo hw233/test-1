@@ -1139,7 +1139,7 @@ namespace GObject
             //if (platform)
             //    m_ulog->LogMsg(str1, str2, str3, str4, str5, str6, type, count, platform);
 
-            TRACE_LOG("%s - (%s,%s,%s,%s,%s,%s,%s,%u)", buf, str1, str2, str3, str4, str5, str6, type, count);
+            TRACE_LOG("%s - (%s,%s,%s,%s,%s,%s,%s,%u) - %u", buf, str1, str2, str3, str4, str5, str6, type, count, platform);
         }
 #endif
 	}
