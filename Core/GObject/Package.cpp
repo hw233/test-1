@@ -4513,7 +4513,7 @@ namespace GObject
 	}
 
     // get item trump exp and delelte item
-    UInt8 Package::SmeltItemTrumpExp(Fighter * fgt, UInt32 itemId, UInt8& bind, UInt16 num, UInt32& exp)
+    UInt8 Package::SmeltItemTrumpExp(Fighter * fgt, UInt32 itemId, bool& bind, UInt16 num, UInt32& exp)
     {
         if(itemId > 30000)
         {
@@ -4537,37 +4537,32 @@ namespace GObject
         }
         else
         {
-            ItemBase* item = GetItem(itemId, bind > 0);
-            if(item->getClass() != Item_Normal29)
+            ItemBase* item = GetItem(itemId, bind);
+            if(item == NULL || item->getClass() != Item_Normal29)
                 return 2;
             const GData::ItemBaseType& ibt = item->GetItemType();
             exp = ibt.trumpExp * num;
             if(exp == 0)
                 return 2;
 
-            if(!DelItem(itemId, num, bind, ToTrumpUpgrade))
+            if(!DelItem2(item, num, ToTrumpUpgrade))
                 return 2;
         }
 
         return 0;
     }
 
-    UInt8 Package::TrumpUpgrade(UInt16 fighterId, UInt32 trumpId, UInt32 itemId)
+    UInt8 Package::TrumpUpgrade(UInt16 fighterId, UInt32 trumpId, UInt32 itemId, UInt8 bind, UInt16 num)
     {
 		Fighter * fgt = NULL;
 		UInt8 pos = 0;
         if(trumpId == itemId)
             return 2;
 		ItemEquip * trump = FindEquip(fgt, pos, fighterId, trumpId);
-		ItemEquip * item = FindEquip(fgt, pos, 0, itemId);
-		if(trump == NULL || (trump->getClass() != Item_Trump && trump->getClass() != Item_Fashion && trump->getClass() != Item_Halo)
-                || item == NULL || (item->getClass() != Item_Normal29 && item->getClass() != Item_Trump && item->getClass() != Item_Fashion && item->getClass() != Item_Halo))
+		if(trump == NULL || (trump->getClass() != Item_Trump && trump->getClass() != Item_Fashion && trump->getClass() != Item_Halo))
 			return 2;
 
-		bool isBound = item->GetBindStatus();
 		ItemEquipData& ied_trump = trump->getItemEquipData();
-		ItemEquipData& ied_item = item->getItemEquipData();
-
         UInt8 q = trump->getQuality();
         if(q < 2)
             return 2;
@@ -4576,15 +4571,11 @@ namespace GObject
         if(l >= ied_trump.maxTRank || rankUpExp == 0)
             return 2;
 
-        UInt8 item_q = item->getQuality();
-        UInt8 item_enchant = ied_item.enchant;
-		const GData::ItemBaseType& ibt = item->GetItemType();
-        UInt32 exp = (ibt.trumpExp * GObjectManager::getTrumpSmelt(item_q - 2, item_enchant)) + ied_item.trumpExp * 0.5;
-        if(exp == 0)
-            return 2;
-
-        if(!DelEquip(itemId, ToTrumpUpgrade))
-            return 2;
+        UInt32 exp = 0;
+        bool isBound = (bind > 0);
+        UInt8 res = SmeltItemTrumpExp(fgt, itemId, isBound, num, exp);
+        if(res != 0)
+            return res;
 
         UInt8 q1 = q - 3;
         UInt8 oldTRank = ied_trump.tRank;
