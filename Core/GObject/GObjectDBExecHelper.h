@@ -1035,6 +1035,11 @@ struct DBCFriendAwards
     UInt64 invitedId;
 	std::string awards;
 };
+struct DBBigLock
+{
+    UInt32 playerId;
+    UInt32 lockExpireTime;
+};
 
 }
 
@@ -2347,6 +2352,15 @@ SPECIALDEF(1)
 	std::string, version
 )
 SPECIALEND()
+
+SPECIALBEGIN(GObject::DBBigLock)
+SPECIALDEF(2)
+(
+	UInt32, playerId,
+    UInt32, lockExpireTime
+)
+SPECIALEND()
+
 
 }
 

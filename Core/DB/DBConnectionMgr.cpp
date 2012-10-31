@@ -8,6 +8,7 @@ namespace DB
 DBConnectionMgr* gDataDBConnectionMgr;
 DBConnectionMgr* gObjectDBConnectionMgr;
 DBConnectionMgr* gLogDBConnectionMgr;
+DBConnectionMgr* gLockDBConnectionMgr;
 
 DBExecutor * DBConnectionMgr::GetExecutor()
 {

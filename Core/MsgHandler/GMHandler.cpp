@@ -212,6 +212,10 @@ GMHandler::GMHandler()
     Reg(3, "bp", &GMHandler::OnShowBattlePoint);
     Reg(3, "enterarena", &GMHandler::OnEnterArena);
     Reg(3, "idipbuy", &GMHandler::OnIdipBuy);
+
+    Reg(3, "biglock", &GMHandler::OnBigLock);
+    Reg(3, "bigunlock", &GMHandler::OnBigUnLock);
+   
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -3173,4 +3177,35 @@ void GMHandler::OnIdipBuy(GObject::Player* player, std::vector<std::string>& arg
     std::string err;
     player->IDIPBuy(505, 2, 100, err);
 }
+void GMHandler::OnBigLock(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return;
+
+    UInt64 playerId = atoll(args[0].c_str());
+    UInt64 expireTime = 0;
+    if (args.size() >= 2)
+        expireTime = atoi(args[1].c_str()) * 60 * 60 + TimeUtil::Now();
+
+    std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());
+    if (execu.get() != NULL && execu->isConnected())
+    {
+        execu->Execute2("REPLACE INTO `locked_player`(`player_id`, `lockExpireTime`) VALUES(%"I64_FMT"u, %u)", playerId, expireTime);
+    }
+}
+
+void GMHandler::OnBigUnLock(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return;
+
+    UInt64 playerId = atoll(args[0].c_str());
+
+    std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());
+    if (execu.get() != NULL && execu->isConnected())
+    {
+        execu->Execute2("DELETE FROM `locked_player` WHERE `player_id` = %"I64_FMT"u", playerId);
+    }
+}
+
 
