@@ -373,9 +373,12 @@ void Leaderboard::doUpdate()
             GObject::Clan * clan = GObject::globalClans[blist4[i].id];
             if (clan == NULL)
                continue;
+            Player* leader = clan->getLeader();
+            if(leader == NULL)
+                continue;
             ClanCopyRankingInfoList r;
             r.name = blist4[i].name;
-            r.leaderName = clan->getLeader()->getName();
+            r.leaderName = leader->getName();
             r.level = clan->getLev();
             r.memberCount = clan->getCount();
             r.country = clan->getCountry();
@@ -563,9 +566,12 @@ void Leaderboard::doUpdate()
         GObject::Clan * clan = clanRanking0[i];
         if (clan == NULL)
             continue;
+        Player* leader = clan->getLeader();
+        if(leader == NULL)
+            continue;
         ClanBattleRankingInfoList r;
         r.name = clan->getName();
-        r.leaderName = clan->getLeader()->getName();
+        r.leaderName = leader->getName();
         r.level = clan->getLev();
         r.memberCount = clan->getCount();
         r.country = clan->getCountry();
