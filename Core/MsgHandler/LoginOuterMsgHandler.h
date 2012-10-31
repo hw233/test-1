@@ -43,6 +43,7 @@
 #include "GObject/Tianjie.h"
 //#include "MsgHandler/JsonParser.h"
 #include "GObject/SingleHeroStage.h"
+#include "GObject/GObjectDBExecHelper.h"
 
 #ifndef _WIN32
 #include <libmemcached/memcached.h>
@@ -202,6 +203,24 @@ struct UserLogonRepStruct
 	MESSAGE_DEF2(REP::LOGIN, UInt32, _result, std::string, _name);
 };
 
+bool IsBigLock(UInt64 pid)
+{
+    pid = pid & 0xFFFFFFFFFF;
+    std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());
+    if (execu.get() != NULL && execu->isConnected())
+    {
+        GObject::DBBigLock lockData;
+        char sql[256] = {0};
+        sprintf(sql,"SELECT `player_id`, `lockExpireTime` FROM `locked_player` where `player_id`=%"I64_FMT"u",pid);
+        if(execu->Prepare(sql, lockData) == DB::DB_OK && 
+           execu->Next() == DB::DB_OK &&
+           lockData.lockExpireTime > TimeUtil::Now())
+        {
+            return true;
+        }
+    }
+    return false;
+}
 inline UInt8 doLogin(Network::GameClient * cl, UInt64 pid, UInt32 hsid, GObject::Player *& player, bool kickOld = true, bool reconnect = false)
 {
 	player = GObject::globalPlayers[pid];
@@ -224,6 +243,11 @@ inline UInt8 doLogin(Network::GameClient * cl, UInt64 pid, UInt32 hsid, GObject:
 				return 6;
 		}
 	}
+    //查看是否被全服禁号
+    if (IsBigLock(pid))
+    {
+        return 6;
+    }
 	UInt32 sid = player->GetSessionID();
 	UInt8 res = 0;
 	if(sid != static_cast<UInt32>(-1) && sid != hsid)
@@ -513,6 +537,15 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 #endif
 #endif
 #endif
+		conn->pendClose();
+        return;
+    }
+    if (IsBigLock(hdr.playerID))
+    {
+    	UserLogonRepStruct rep;
+		rep._result = 6;
+        GObject::dclogger.create_sec(us);
+		NETWORK()->SendMsgToClient(conn.get(), rep);
 		conn->pendClose();
         return;
     }
@@ -1217,6 +1250,78 @@ void UnlockUser(LoginMsgHdr& hdr,const void * data)
         }
     }
     st<<Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+std::string GetNextSection(std::string& strString , char cSeperator)
+{
+    std::string strRet;
+    int nIndex=(int)strString.find(cSeperator);
+    if(nIndex>=0)
+    {
+        strRet=strString.substr(0,nIndex);//Section
+        strString=strString.substr(nIndex+1);
+    }
+    else
+    {
+        strRet=strString;
+        strString="";
+    }
+    return strRet;
+}
+
+void BigLockUser(LoginMsgHdr& hdr,const void * data)
+{
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    std::string playerIds;
+    UInt32 expireTime;
+    CHKKEY();
+    br>>playerIds;
+    br>>expireTime;
+
+    UInt8 ret = 1;
+    INFO_LOG("GMBIGLOCK: %s, %u", playerIds.c_str(), expireTime);
+    std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());
+    if (execu.get() != NULL && execu->isConnected())
+    {
+        std::string playerId = GetNextSection(playerIds, ',');
+        while (!playerId.empty())
+        {
+            UInt64 pid = atoll(playerId.c_str());
+            pid = pid & 0xFFFFFFFFFF;
+            execu->Execute2("REPLACE INTO `locked_player`(`player_id`, `lockExpireTime`) VALUES(%"I64_FMT"u, %u)", pid,expireTime);
+            playerId = GetNextSection(playerIds, ',');
+        }
+        ret = 0;
+    }
+    Stream st(SPEP::BIGLOCKUSER);
+    st << ret << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+void BigUnlockUser(LoginMsgHdr& hdr,const void * data)
+{
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+
+    std::string playerIds;
+    CHKKEY();
+    br>>playerIds;
+
+    INFO_LOG("GMBIGUNLOCK: %s", playerIds.c_str());
+    UInt8 ret = 1;
+    std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());
+    if (execu.get() != NULL && execu->isConnected())
+    {
+        std::string playerId = GetNextSection(playerIds, ',');
+        while (!playerId.empty())
+        {
+            UInt64 pid = atoll(playerId.c_str());
+            pid = pid & 0xFFFFFFFFFF;
+            execu->Execute2("DELETE FROM `locked_player` WHERE `player_id` = %"I64_FMT"u", pid);
+            playerId = GetNextSection(playerIds, ',');
+        }
+        ret = 0;
+    }
+    Stream st(SPEP::BIGUNLOCKUSER);
+    st << ret << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
@@ -1994,6 +2099,33 @@ void ClearTaskFromBs(LoginMsgHdr &hdr, const void * data)
     st << ret << Stream::eos;
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
+void ClearTaskAllFromBs(LoginMsgHdr &hdr, const void * data)
+{
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    Stream st(SPEP::CLSTASKALL);
+    UInt8 type;
+    CHKKEY();
+    br>>type;
+
+    INFO_LOG("GM[%s]: %u", __PRETTY_FUNCTION__, type);
+
+    UInt8 ret = 1;
+    std::unordered_map<UInt64, GObject::Player*>& pm = GObject::globalPlayers.getMap(); 
+    std::unordered_map<UInt64, GObject::Player*>::iterator iter;
+    for (iter = pm.begin(); iter != pm.end(); ++iter)
+    {
+        GObject::Player* pl = iter->second;
+        if (pl)
+        {
+            GameMsgHdr msg(0x325, pl->getThreadId(), pl, sizeof(type));
+            GLOBAL().PushMsg(msg, &type);
+            ret = 0;
+        }
+    }
+    st << ret << Stream::eos;
+	NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
 
 void reqSaleOnOffFromBs(LoginMsgHdr &hdr, const void * data)
 {

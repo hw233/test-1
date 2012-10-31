@@ -689,6 +689,9 @@ namespace SPEQ
     const UInt16 MANUALOPENTJ        = 0x129; // 手动开启天劫
     const UInt16 SHSTAGEONOFF        = 0x130; // 职业第一开关
     const UInt16 QUERYSHSTAGEONOFF   = 0x131; // 查询职业第一
+    const UInt16 BIGLOCKUSER         = 0x132;// 0x102
+    const UInt16 BIGUNLOCKUSER       = 0x133;// 0x103
+    const UInt16 CLSTASKALL          = 0x134;//
 }
 
 namespace SPEP
@@ -733,6 +736,9 @@ namespace SPEP
     const UInt16 MANUALOPENTJ        = 0x29; //手动开启天劫 
     const UInt16 SHSTAGEONOFF        = 0x30; // 职业第一开关
     const UInt16 QUERYSHSTAGEONOFF   = 0x31; // 查询职业第一
+    const UInt16 BIGLOCKUSER         = 0x32;
+    const UInt16 BIGUNLOCKUSER       = 0x33;
+    const UInt16 CLSTASKALL          = 0x34;//
 }
 
 namespace ARENAREQ

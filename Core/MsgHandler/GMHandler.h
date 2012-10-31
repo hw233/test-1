@@ -101,6 +101,9 @@ private:
     void OnAutoCopy(GObject::Player *player, std::vector<std::string>&);
     void OnLock(GObject::Player *player, std::vector<std::string>&);
     void OnUnLock(GObject::Player *player, std::vector<std::string>&);
+    void OnBigLock(GObject::Player *player, std::vector<std::string>&);
+    void OnBigUnLock(GObject::Player *player, std::vector<std::string>&);
+    
     void OnSetBosslevel(GObject::Player *player, std::vector<std::string>&);
     void OnQQVipKey(GObject::Player *player, std::vector<std::string>&);
     void OnClanBuild(GObject::Player *player, std::vector<std::string>&);
