@@ -125,6 +125,7 @@ enum MailItemType
     BlueDiamondCmd,
     ClanCopyAward,
     BuChang1530,
+    BuChangNewRC7Day,
 };
 enum ItemFrom
 {

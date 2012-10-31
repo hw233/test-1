@@ -315,4 +315,6 @@ MSG_REG_2(GameMsgHdr, 0x263, OnSHFighterCloneReq);
 MSG_REG_2(GameMsgHdr, 0x264, OnTitleCheck);
 MSG_REG_2(GameMsgHdr, 0x265, OnSetTitle);
 
+MSG_REG_2(GameMsgHdr, 0x266, OnNewRC7DayLastLoot);
+
 MSG_HANDLER_END()

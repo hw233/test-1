@@ -218,6 +218,8 @@ function RunNewRC7DayLoginAward(player, cts)
     for count = 1, #item[cts] do
         if item[cts][count][1] == 499 then
             player:getCoupon(item[cts][count][2])
+        elseif item[cts][count][1] == 1528 then
+            package:AddEquipN(item[cts][count][1], item[cts][count][2], true, 0, 34);
         else
             package:Add(item[cts][count][1], item[cts][count][2], true, 0, 34);
         end
@@ -228,7 +230,7 @@ end
 function RunNewRC7DayLoginAward2(player, val)
     -- 领取新注册七日累计登录奖励
     local items = {
-        [1] = {{1703, 3}},
+        [1] = {{439, 3}},
         [3] = {{516, 5}},
         [4] = {{1610, 1},{1609, 1},{1608, 1}},
     };
@@ -247,13 +249,17 @@ function RunNewRC7DayLoginAward2(player, val)
         
     local item = items[val]
     num = #item
-    if package:GetRestPackageSize() < ((num - 1) +((num - 1)*num*3)/99) then
+    if package:GetRestPackageSize() < num then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
 
     for k,v in pairs(item) do
-        package:AddItem(v[1], v[2], 1)
+        if val == 4 then
+            package:AddEquip(v[1], v[2])
+        else
+            package:AddItem(v[1], v[2], 1)
+        end
     end
     return true
 end
@@ -333,10 +339,12 @@ function RunNewRC7DayTargetAward(player)
             Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]在七日目标实物抽奖中获得了60QB大奖，让我们一起来祝贺他。玩蜀山传奇，下一个幸运儿就是你！！！！！！！")
             return 7;
         end
-        if player:hasRealItemAward(2) then
-            player:getRealItemAward(2)
-            Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]在七日目标实物抽奖中获得了100QB大奖，让我们一起来祝贺他。玩蜀山传奇，下一个幸运儿就是你！！！！！！！")
-            return 8;
+        for i = 41, 70 do
+            if player:hasRealItemAward(i) then
+                player:getRealItemAward(i)
+                Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]在七日目标实物抽奖中获得了10QB大奖，让我们一起来祝贺他。玩蜀山传奇，下一个幸运儿就是你！！！！！！！")
+                return 8;
+            end
         end
     end
 

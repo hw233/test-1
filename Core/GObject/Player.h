@@ -1726,6 +1726,7 @@ namespace GObject
 
     public:
         void sendSingleEnchant(UInt8 enchant);
+        void sendOldRC7DayAward();
 
         TeamData* getTeamData();
         void setTeamData(TeamData* td);
