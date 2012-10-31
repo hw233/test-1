@@ -131,6 +131,47 @@ void buildPacket2(Stream& st, UInt8 t, UInt32 id, std::vector<LeaderboardItem2>&
 	st << Stream::eos;
 }
 
+void Leaderboard::buildBattlePacket()
+{
+    _battleRankWorld.clear();
+    std::unordered_map<UInt64, Player*>& pm = GObject::globalPlayers.getMap();
+    std::unordered_map<UInt64, Player*>::iterator iter;
+    for (iter = pm.begin(); iter != pm.end(); ++iter)
+    {
+        Player* pl = iter->second;
+        if (NULL != pl)
+        {
+            UInt32 battlePoint = pl->getBattlePoint();
+            _battleRankWorld.insert(std::make_pair(battlePoint, pl));
+        }
+    }
+    //每个人的战斗力排行
+    _playerBattleRank.clear();
+    int rank = 0;
+    std::multimap<int, Player*, std::greater<int> >::iterator iter1;
+    for (iter1 = _battleRankWorld.begin(); iter1 != _battleRankWorld.end(); ++iter1)
+    {
+        rank++;
+        Player* pl = iter1->second;
+        if (pl)
+            _playerBattleRank[pl->getId()] =  rank;
+	}
+    int rankCount = _battleRankWorld.size();
+    if (rankCount > 100 )
+        rankCount = 100;
+	_battleStream.init(REP::SORT_LIST);
+    _battleStream << static_cast<UInt8>(4) << static_cast<UInt32>(0) << static_cast<UInt8>(rankCount);
+
+    int i = 0;
+    std::multimap<int, Player*, std::greater<int> >::iterator iter2;
+    for (iter2 = _battleRankWorld.begin(); iter2 != _battleRankWorld.end() && i < rankCount; ++iter2, ++i)
+    {
+        Player* pl = iter2->second;
+        if (pl)
+           _battleStream << pl->getName() << pl->getPF() << pl->GetLev() << pl->getCountry() << iter2->first << pl->getClanName();
+	}
+	_battleStream << Stream::eos;
+}
 
 void Leaderboard::update()
 {
@@ -139,6 +180,7 @@ void Leaderboard::update()
 
 void Leaderboard::doUpdate()
 {
+    FastMutex::ScopedLock lk(_opMutex);
     UInt8 count;
     UInt8 index;
     std::unique_ptr<DB::DBExecutor> execu;
@@ -151,6 +193,7 @@ void Leaderboard::doUpdate()
 
 	std::vector<LeaderboardItem2> blist2;
 	blist2.clear();
+    _playerLevelRank.clear();
 	execu->ExtractData("SELECT `player`.`id`, `player`.`name`, `fighter`.`level`, `player`.`country`, `fighter`.`experience`, `clan`.`name` FROM"
 		" (`player` CROSS JOIN `fighter`"
 		" ON `player`.`id` = `fighter`.`playerId` AND `fighter`.`id` < 10)"
@@ -176,6 +219,8 @@ void Leaderboard::doUpdate()
         r.roleLevel = curPlayer->GetLev();
         r.value = blist2[c].value;
         _level.push_back(r);
+
+        _playerLevelRank[curPlayer->getId()] = c+1;
     }
 
     buildPacket2(_levelStream, 0, _id, blist2);
@@ -187,25 +232,30 @@ void Leaderboard::doUpdate()
 	std::list<AthleticsRankData *> *pathleticsrank = gAthleticsRank.getAthleticsRank();
 	std::list<AthleticsRankData *> athleticsrank = pathleticsrank[1];
 	blist.resize(100);
+    _playerAthleticsRank.clear();
 	UInt32 i = 0;
-	for(std::list<AthleticsRankData *>::iterator it = athleticsrank.begin(); i < 100 && it != athleticsrank.end(); ++ i, ++ it )
+	for(std::list<AthleticsRankData *>::iterator it = athleticsrank.begin(); it != athleticsrank.end(); ++ i, ++ it )
 	{
-		blist[i].id = (*it)->ranker->getId();
-		blist[i].name = (*it)->ranker->getName();
-		blist[i].pf = (*it)->ranker->getPF();
-		blist[i].lvl = (*it)->ranker->GetLev();
-		blist[i].country = (*it)->ranker->getCountry();
-		blist[i].value = i + 1;
-		blist[i].clan = (*it)->ranker->getClanName();
-       
-        RankingInfoList r;
-        r.id = (*it)->ranker->getId();
-        r.country = (*it)->ranker->getCountry();
-        r.name = (*it)->ranker->getName();
-        r.clanName = (*it)->ranker->getClanName();
-        r.roleLevel = (*it)->ranker->GetLev();
-        r.value = i+1;
-        _athletics.push_back(r);
+        if (i < 100)
+        {
+		    blist[i].id = (*it)->ranker->getId();
+	    	blist[i].name = (*it)->ranker->getName();
+	    	blist[i].pf = (*it)->ranker->getPF();
+	    	blist[i].lvl = (*it)->ranker->GetLev();
+	    	blist[i].country = (*it)->ranker->getCountry();
+	    	blist[i].value = i + 1;
+	    	blist[i].clan = (*it)->ranker->getClanName();
+           
+            RankingInfoList r;
+            r.id = (*it)->ranker->getId();
+            r.country = (*it)->ranker->getCountry();
+            r.name = (*it)->ranker->getName();
+            r.clanName = (*it)->ranker->getClanName();
+            r.roleLevel = (*it)->ranker->GetLev();
+            r.value = i+1;
+            _athletics.push_back(r);
+        }
+        _playerAthleticsRank[(*it)->ranker->getId()] = i+1;
 	}
 	blist.resize(i);
 	buildPacket(_moneyStream, 1, _id, blist);
@@ -257,6 +307,7 @@ void Leaderboard::doUpdate()
     UInt32 size = clanRanking.size();
     if (size > 1000) size = 100;
 	blist.resize(size);
+    _playerClanRank.clear();
     for (std::vector<Clan*>::const_iterator it = clanRanking.begin(), e = clanRanking.end(); it != e; ++i, ++it)
     {
 		//blist[i].id = (*it)->getId();
@@ -278,6 +329,7 @@ void Leaderboard::doUpdate()
 		blist[i].lvl = (*it)->getLev();
 		blist[i].value = (*it)->getCount();
 		blist[i].clan = (*it)->getName();
+        _playerClanRank[(*it)->getId()] = i+1;
     }
 	buildPacket(_clanStream, 3, _id, blist);
 #endif
@@ -547,6 +599,8 @@ void Leaderboard::doUpdate()
 	{
 		_clanRankCountry[1][clist[i]] = static_cast<UInt16>(i + 1);
 	}
+
+    buildBattlePacket();
 }
 
 bool Leaderboard::hasUpdate( UInt32 id )
@@ -554,31 +608,38 @@ bool Leaderboard::hasUpdate( UInt32 id )
 	return _id != id;
 }
 
-bool Leaderboard::getPacket( UInt8 t, Stream*& st )
+bool Leaderboard::getPacket( UInt8 t, Stream*& st, Player* pl)
 {
     if (isSorting())
         return false;
 
+    FastMutex::ScopedLock lk(_opMutex);
 	switch(t)
 	{
 	case 0:
 		st = &_levelStream;
+        makeRankStream(st, t, pl);
 		break;
 	case 1:
 		st = &_moneyStream;
+        makeRankStream(st, t, pl);
 		break;
 	case 2:
 		st = &_achievementStream;
 		break;
 	case 3:
 		st = &_clanStream;
+        makeRankStream(st, t, pl);
 		break;
+    case 4:
+        st = &_battleStream;
+        makeRankStream(st, t, pl);
+        break;
 	default:
 		return false;
 	}
 	return true;
 }
-
 template<typename T1, typename T2>
 void _searchInside(Stream& st, T1 mapv, T2 v)
 {
@@ -657,6 +718,59 @@ void Leaderboard::newDrawingGame(UInt32 nextday)
             DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, _levelRankWorld10[rank], mail->id, NewDrawingGameAward, title, content, strItems.c_str(), mail->recvTime);
         }
     }
+}
+
+int Leaderboard::getMyRank(Player* pl, UInt8 type)
+{
+    int rank = 0;
+    if (NULL == pl)
+        return 0;
+    std::map<UInt64, int>::iterator iter;
+    Clan* cl = pl->getClan(); 
+    switch (type)
+    {
+        case 0:
+            iter = _playerLevelRank.find(pl->getId());
+            if (_playerLevelRank.end() != iter)
+                rank = iter->second;
+            break;
+        case 1:
+            iter = _playerAthleticsRank.find(pl->getId());
+            if (_playerAthleticsRank.end() != iter)
+                rank = iter->second;
+            break;
+        case 2:
+            break;
+        case 3:
+           if (NULL != cl)
+           {
+               iter = _playerClanRank.find(cl->getId());
+               if (_playerClanRank.end() != iter)
+                   rank = iter->second;
+           }
+           break;
+        case 4:
+            iter = _playerBattleRank.find(pl->getId());
+            if (_playerBattleRank.end() != iter)
+            {
+                rank = iter->second;
+            }
+            break;
+        default:
+            break;
+    }
+    return rank;   
+}
+void Leaderboard::makeRankStream(Stream*& st, UInt8 type, Player* pl)
+{
+    int rank = getMyRank(pl, type);
+    st->pop_front(9); //将type,rank总共5个字节删除
+    st->prepend((UInt8*)&rank, 4); //头先插入自己的排行
+    st->prepend((UInt8*)&type, 1);    //最后插入类型
+    UInt16 len = st->size();
+    UInt8 buf[4] = {0, 0, 0xFF, REP::SORT_LIST};
+    memcpy(buf, &len, 2);
+    st->prepend(buf, 4);
 }
 
 }
