@@ -248,8 +248,8 @@ namespace GObject
         VAR_TGC_1_FRONTMAP = 202,
         VAR_TGC_1_DUNGEON = 203,
 
-        VAR_LOCAL_RANK = 240, //本服斗剑，最好排名
-        VAR_LOCAL_MAXRANK = 241, //本服斗剑，当前排名
+        VAR_LOCAL_RANK = 240, //本服斗剑，当前排名
+        VAR_LOCAL_MAXRANK = 241, //本服斗剑，最好排名
         VAR_LOCAL_PRESTIGE = 242, //本服斗剑，声望数
         VAR_LOCAL_PAGE = 243, //本服斗剑，翻页数
 
