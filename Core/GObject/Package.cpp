@@ -564,6 +564,14 @@ namespace GObject
                     m_Owner->udpLog("item", strBuf, "", "", "", "", "act", num);
                 }
 
+                if (typeId == 9193)
+                {
+                    char strBuf[32] = "";
+                    m_Owner->udpLog("item", "I_9193_1", "", "", "", "", "act", num);
+                    snprintf(strBuf, 32, "I_9193_1_%d", fromWhere);
+                    m_Owner->udpLog("item", strBuf, "", "", "", "", "act", num);
+                }
+
                 if (fromWhere == FromKillMonster)
                 {
                     char strBuf[32] = "";
@@ -632,6 +640,14 @@ namespace GObject
                     char strBuf[32] = "";
                     m_Owner->udpLog("item", "I_550_1", "", "", "", "", "act", num);
                     snprintf(strBuf, 32, "I_550_1_%d", fromWhere);
+                    m_Owner->udpLog("item", strBuf, "", "", "", "", "act", num);
+                }
+
+                if (typeId == 9193)
+                {
+                    char strBuf[32] = "";
+                    m_Owner->udpLog("item", "I_9193_1", "", "", "", "", "act", num);
+                    snprintf(strBuf, 32, "I_9193_1_%d", fromWhere);
                     m_Owner->udpLog("item", strBuf, "", "", "", "", "act", num);
                 }
 
@@ -721,6 +737,14 @@ namespace GObject
                 snprintf(strBuf, 32, "I_550_1_%d", fromWhere);
                 m_Owner->udpLog("item", strBuf, "", "", "", "", "act", count);
             }
+
+            if (typeId == 9193)
+            {
+                char strBuf[32] = "";
+                m_Owner->udpLog("item", "I_9193_1", "", "", "", "", "act", count);
+                snprintf(strBuf, 32, "I_9193_1_%d", fromWhere);
+                m_Owner->udpLog("item", strBuf, "", "", "", "", "act", count);
+            }
             if (fromWhere == FromKillMonster)
             {
                 char strBuf[32] = "";
@@ -783,6 +807,13 @@ namespace GObject
                 m_Owner->udpLog("item", strBuf, "", "", "", "", "act", count);
             }
 
+            if (typeId == 9193)
+            {
+                char strBuf[32] = "";
+                m_Owner->udpLog("item", "I_9193_1", "", "", "", "", "act", count);
+                snprintf(strBuf, 32, "I_9193_1_%d", fromWhere);
+                m_Owner->udpLog("item", strBuf, "", "", "", "", "act", count);
+            }
             if (fromWhere == FromKillMonster)
             {
                 char strBuf[32] = "";
@@ -1218,6 +1249,13 @@ namespace GObject
                 m_Owner->udpLog("item", strBuf, "", "", "", "", "act", num);
             }
 
+            if (id == 9193)
+            {
+                char strBuf[32] = "";
+                m_Owner->udpLog("item", "I_9193_2", "", "", "", "", "act", num);
+                snprintf(strBuf, 32, "I_9193_2_%d", toWhere);
+                m_Owner->udpLog("item", strBuf, "", "", "", "", "act", num);
+            }
             SendItemData(item);
 			if (cnt == 0)
 			{
@@ -1270,6 +1308,14 @@ namespace GObject
                 char strBuf[32] = "";
                 m_Owner->udpLog("item", "I_550_2", "", "", "", "", "act", num);
                 snprintf(strBuf, 32, "I_550_2_%d", toWhere);
+                m_Owner->udpLog("item", strBuf, "", "", "", "", "act", num);
+            }
+
+            if (item->getId() == 9193)
+            {
+                char strBuf[32] = "";
+                m_Owner->udpLog("item", "I_9193_2", "", "", "", "", "act", num);
+                snprintf(strBuf, 32, "I_9193_2_%d", toWhere);
                 m_Owner->udpLog("item", strBuf, "", "", "", "", "act", num);
             }
 
