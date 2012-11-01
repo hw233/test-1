@@ -441,6 +441,7 @@ bool TownDeamon::attackNpc(Player* pl, UInt16 level)
                 pl->AddVar(VAR_CTS_TARGET_COUNT, 1);
                 pl->SetVar(VAR_CLAWARD2, targetVal);
                 pl->sendNewRC7DayTarget();
+                pl->newRC7DayUdpLog(1152, 7);
             }
         }
     }

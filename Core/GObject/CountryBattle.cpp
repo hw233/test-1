@@ -157,6 +157,7 @@ void CountryBattle::process(UInt32 curtime)
                     cbd1->player->AddVar(VAR_CTS_TARGET_COUNT, 1);
                     cbd1->player->SetVar(VAR_CLAWARD2, targetVal);
                     cbd1->player->sendNewRC7DayTarget();
+                    cbd1->player->newRC7DayUdpLog(1152, 4);
                 }
             }
 
@@ -170,6 +171,7 @@ void CountryBattle::process(UInt32 curtime)
                     cbd2->player->AddVar(VAR_CTS_TARGET_COUNT, 1);
                     cbd2->player->SetVar(VAR_CLAWARD2, targetVal);
                     cbd2->player->sendNewRC7DayTarget();
+                    cbd2->player->newRC7DayUdpLog(1152, 4);
                 }
             }
 

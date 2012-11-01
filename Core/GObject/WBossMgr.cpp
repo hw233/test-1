@@ -184,6 +184,7 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
             pl->AddVar(VAR_CTS_TARGET_COUNT, 1);
             pl->SetVar(VAR_CLAWARD2, targetVal);
             pl->sendNewRC7DayTarget();
+            pl->newRC7DayUdpLog(1152, 3);
         }
     }
 

@@ -1643,6 +1643,7 @@ namespace GObject
         void clanCopyUdpLog(UInt32 id, UInt32 val = 0, UInt32 num = 1);
         void tripodUdpLog(UInt32 id, UInt32 val = 0, UInt32 num = 1);
         void storeUdpLog(UInt32 id, UInt32 type, UInt32 itemId, UInt32 num = 1);
+        void newRC7DayUdpLog(UInt32 id, UInt32 type = 0, UInt32 num  = 1);
         void guideUdp(UInt8 type, std::string& p1, std::string& p2);
         void moneyLog(int type, int gold, int coupon = 0, int tael = 0, int achievement = 0, int prestige = 0);
         void actUdp(UInt8 type, std::string& p1, std::string& p2);

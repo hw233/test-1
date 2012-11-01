@@ -195,6 +195,7 @@ namespace GObject
                     (*iter)->AddVar(VAR_CTS_TARGET_COUNT, 1);
                     (*iter)->SetVar(VAR_CLAWARD2, targetVal);
                     (*iter)->sendNewRC7DayTarget();
+                    (*iter)->newRC7DayUdpLog(1152, 5);
                 }
             }
 

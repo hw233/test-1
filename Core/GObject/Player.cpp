@@ -1466,10 +1466,21 @@ namespace GObject
 
     void Player::storeUdpLog(UInt32 id, UInt32 type, UInt32 itemId, UInt32 num /* = 1 */)
     {
-        // TODO: 商城购买相关日志（现在只有荣誉和声望）
+        // 商城购买相关日志（现在只有荣誉和声望）
         char action[32] = "";
         snprintf (action, 16, "F_%d_%d_%d", id, type, itemId);
         udpLog("store", action, "", "", "", "", "act", num);
+    }
+
+    void Player::newRC7DayUdpLog(UInt32 id, UInt32 type /* = 0 */, UInt32 num /* = 1 */)
+    {
+        // 新版注册七日活动日志
+        char action[32] = "";
+        if (type)
+            snprintf (action, 16, "F_%d_%d", id, type);
+        else
+            snprintf (action, 16, "F_%d", id);
+        udpLog("register", action, "", "", "", "", "act", num);
     }
 
     void Player::sendHalloweenOnlineAward(UInt32 now, bool _online)
@@ -6674,6 +6685,7 @@ namespace GObject
                     AddVar(VAR_CTS_TARGET_COUNT, 1);
                     SetVar(VAR_CLAWARD2, targetVal);
                     sendNewRC7DayTarget();
+                    newRC7DayUdpLog(1152, 1);
                 }
             }
         }
@@ -10730,6 +10742,7 @@ namespace GObject
                 ctslandingAward |= (1<<(val - 1));
                 SetVar(VAR_CTSLANDING_AWARD, ctslandingAward);
                 sendNewRC7DayLogin();
+                newRC7DayUdpLog(1143, val);
             }
             else if (val == off + 1)
             {
@@ -10740,6 +10753,7 @@ namespace GObject
                 ctslandingAward |= (1<<(val - 1));
                 SetVar(VAR_CTSLANDING_AWARD, ctslandingAward);
                 sendNewRC7DayLogin();
+                newRC7DayUdpLog(1142, val);
             }
             else
             {
@@ -10766,6 +10780,7 @@ namespace GObject
                     ctslandingAward2 |= 1 << (val - 1);
                     SetVar(VAR_CTSLANDING_AWARD2, ctslandingAward2);
                     sendNewRC7DayLogin();
+                    newRC7DayUdpLog(1144 + val - 1);
                 }
             }
             else
@@ -10797,6 +10812,7 @@ namespace GObject
                 {
                     wishIndex |= 0x01 << (val - 1);
                     SetVar(VAR_RC7DAYWILL, static_cast<UInt32>(wishType) << 8 | wishIndex);
+                    newRC7DayUdpLog(1154, val);
                 }
             }
         }
@@ -10809,6 +10825,7 @@ namespace GObject
                 {
                     wishType = val - 7;
                     SetVar(VAR_RC7DAYWILL, static_cast<UInt32>(wishType) << 8 | wishIndex);
+                    newRC7DayUdpLog(1148 + val - 8);
                 }
             }
         }
@@ -10835,6 +10852,7 @@ namespace GObject
                         {
                             --count;
                             SetVar(VAR_CTS_TARGET_COUNT, count);
+                            newRC7DayUdpLog(1153);
                         }
                     }
                 }
@@ -10976,6 +10994,7 @@ namespace GObject
                     targetVal |= TARGET_LEVEL;
                     AddVar(VAR_CTS_TARGET_COUNT, 1);
                     SetVar(VAR_CLAWARD2, targetVal);
+                    newRC7DayUdpLog(1152, 1);
                 }
             }
         }

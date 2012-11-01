@@ -1208,6 +1208,7 @@ void AthleticsRank::challenge2(Player * atker, std::string& name, UInt8 type, UI
                 atker->AddVar(VAR_CTS_TARGET_COUNT, 1);
                 atker->SetVar(VAR_CLAWARD2, targetVal);
                 atker->sendNewRC7DayTarget();
+                atker->newRC7DayUdpLog(1152, 2);
             }
         }
     }

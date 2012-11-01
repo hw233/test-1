@@ -1709,6 +1709,7 @@ namespace GObject
                     m_Owner->AddVar(VAR_CTS_TARGET_COUNT, 1);
                     m_Owner->SetVar(VAR_CLAWARD2, targetVal);
                     m_Owner->sendNewRC7DayTarget();
+                    m_Owner->newRC7DayUdpLog(1152, 11);
                 }
             }
 
@@ -2658,6 +2659,7 @@ namespace GObject
                              m_Owner->AddVar(VAR_CTS_TARGET_COUNT, 1);
                              m_Owner->SetVar(VAR_CLAWARD2, targetVal);
                              m_Owner->sendNewRC7DayTarget();
+                             m_Owner->newRC7DayUdpLog(1152, 10);
                          }
                      }
                  }
@@ -2689,6 +2691,7 @@ namespace GObject
                              m_Owner->AddVar(VAR_CTS_TARGET_COUNT, 1);
                              m_Owner->SetVar(VAR_CLAWARD2, targetVal);
                              m_Owner->sendNewRC7DayTarget();
+                             m_Owner->newRC7DayUdpLog(1152, 9);
                          }
                      }
                  }

@@ -921,6 +921,7 @@ void TeamCopy::teamBattleStart(Player* pl, UInt8 type)
                     pl->AddVar(VAR_CTS_TARGET_COUNT, 1);
                     pl->SetVar(VAR_CLAWARD2, targetVal);
                     pl->sendNewRC7DayTarget();
+                    pl->newRC7DayUdpLog(1152, 6);
                 }
             }
 
