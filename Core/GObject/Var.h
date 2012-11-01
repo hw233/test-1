@@ -252,6 +252,9 @@ namespace GObject
         VAR_CTSLANDING_AWARD2 = 205, // 创建角色前七天累计登录奖励领取记录
         VAR_CTS_TARGET_COUNT  = 206, // 七天目标抽奖之剩余抽奖次数
 
+        VAR_ITEM_9178_FAILED_COUNT = 207, // 都率宝伞礼包连续开启失败次数
+                                          // （ItemNormal.lua里面值已经写死）
+
         VAR_LOCAL_RANK = 240, //本服斗剑，最好排名
         VAR_LOCAL_MAXRANK = 241, //本服斗剑，当前排名
         VAR_LOCAL_PRESTIGE = 242, //本服斗剑，声望数
@@ -497,6 +500,8 @@ namespace GObject
             REGISTER_VAR(VAR_CTSLANDING_AWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_CTSLANDING_AWARD2, CYCLE_NONE);
             REGISTER_VAR(VAR_CTS_TARGET_COUNT, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_ITEM_9178_FAILED_COUNT, CYCLE_NONE);
 
             REGISTER_VAR(VAR_LOCAL_RANK, CYCLE_NONE);
             REGISTER_VAR(VAR_LOCAL_MAXRANK, CYCLE_NONE);
