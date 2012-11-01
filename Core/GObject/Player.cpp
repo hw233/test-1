@@ -10731,6 +10731,8 @@ namespace GObject
             if (val < off + 1)
             {
                 // 补签，需要消耗10仙石
+                if (ctslandingAward & (1<<(val - 1)))
+                    return;
                 if (!GameAction()->RunNewRC7DayLoginAward(this, val))
                     return;
                 ConsumeInfo ci(RC7DayLogin, 0, 0);
@@ -10747,6 +10749,9 @@ namespace GObject
             else if (val == off + 1)
             {
                 // 正常签到登录奖励
+                if (ctslandingAward & (1<<(val - 1)))
+                    return;
+
                 if (!GameAction()->RunNewRC7DayLoginAward(this, val))
                     return;
 
@@ -10819,7 +10824,7 @@ namespace GObject
         else if (val <= 11)
         {
             // 神龙许愿
-            if (wishIndex >= 7 && !wishType)
+            if (wishIndex == 127 && !wishType)
             {
                 if (GameAction()->onRC7DayWill(this, val - 7))
                 {
