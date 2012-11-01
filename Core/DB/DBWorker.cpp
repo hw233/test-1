@@ -255,9 +255,10 @@ void DBWorker::PushUpdateData(const char * fmt, ...)
 			return;
 		}
 	}
-
-	FastMutex::ScopedLock lk(m_Mutex);
-	m_UpdateItems.push_back(p);
+    {
+        FastMutex::ScopedLock lk(m_Mutex);
+        m_UpdateItems.push_back(p);
+    }
 
     if(m_Type == 0)
         InfoLog(p);
@@ -297,10 +298,10 @@ void DBWorker::PushUpdateDataL(const char * fmt, ...)
 			return;
 		}
 	}
-
-	FastMutex::ScopedLock lk(m_Mutex);
-	m_UpdateItems.push_back(p);
-
+    {
+        FastMutex::ScopedLock lk(m_Mutex);
+        m_UpdateItems.push_back(p);
+    }
 	if(m_Type == 0)
         InfoLog(p);
 }
@@ -337,9 +338,10 @@ void DBWorker::PushUpdateDataF(const char * fmt, ...)
 	}
 
     ++m_Limit;
-	FastMutex::ScopedLock lk(m_Mutex);
-	m_UpdateItems.push_back(p);
-
+    {
+        FastMutex::ScopedLock lk(m_Mutex);
+        m_UpdateItems.push_back(p);
+    }
 	if(m_Type == 0)
         InfoLog(p);
 }
