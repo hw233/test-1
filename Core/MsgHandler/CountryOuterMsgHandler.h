@@ -4223,7 +4223,11 @@ void OnTrumpUpgrade( GameMsgHdr& hdr, const void* data)
 	{
 
 		UInt32 itemId;
+        UInt8 bind = 0;
+        UInt16 num = 1;
 		br >> itemId;
+        if(itemId < 30000)
+            br >> bind >> num;
 
         amount += GData::moneyNeed[GData::TRUMPUPGRADE].tael;
 		if(player->getTael() < amount)
@@ -4233,12 +4237,12 @@ void OnTrumpUpgrade( GameMsgHdr& hdr, const void* data)
             break;
 		}
 
-		res = pkg->TrumpUpgrade(fgtId, trumpId, itemId);
+		res = pkg->TrumpUpgrade(fgtId, trumpId, itemId, bind, num);
         if(res == 2)
         {
             if( i > 0 )
                 res = 0;
-            amount -= GData::moneyNeed[GData::TRUMPUPGRADE].tael;
+            amount -= GData::moneyNeed[GData::TRUMPUPGRADE].tael * num;
             break;
         }
 	}

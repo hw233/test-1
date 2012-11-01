@@ -72,7 +72,7 @@ public:
 	Leaderboard(): _id(0), _maxLevel(100), m_sorting(false) {}
 	void update();
 	bool hasUpdate(UInt32);
-	bool getPacket(UInt8, Stream*&);
+	bool getPacket(UInt8, Stream*&, Player* pl=NULL);
 	void sendOwnRank(Player *, UInt32);
     void newDrawingGame(UInt32 nextday); //新人冲级赛
 	inline UInt8 getMaxLevel() { return _maxLevel; }
@@ -105,13 +105,17 @@ public:
     void begin() { m_sorting = true; }
     void end() { m_sorting = false; }
     bool isSorting() const { return m_sorting; }
+    void buildBattlePacket();
 private:
 	void doUpdate();
+    int getMyRank(Player* pl, UInt8 type);
+    void makeRankStream(Stream*& st, UInt8 type, Player* pl);
 
 	Stream _levelStream;
 	Stream _moneyStream;
 	Stream _achievementStream;
 	Stream _clanStream;
+    Stream _battleStream;
 	UInt32 _id;
 	UInt8 _maxLevel;
 
@@ -124,7 +128,7 @@ private:
 	std::map<UInt32, UInt16> _clanRankWorld;
 	std::map<UInt32, UInt16> _clanRankCountry[2];
     std::vector<UInt64> _levelRankWorld10;  //世界等级前十名
-
+    std::multimap<int, Player*, std::greater<int> > _battleRankWorld;
     FastMutex _tmutex;
     std::vector<LeaderboardTowndown> _towndown;
     FastMutex _cmutex;
@@ -138,6 +142,12 @@ private:
     std::vector<ClanBattleRankingInfoList> _clanBattleInfo;
 
     AtomicVal<bool> m_sorting;
+
+    std::map<UInt64, int> _playerLevelRank;
+    std::map<UInt64, int> _playerAthleticsRank;
+    std::map<UInt64, int> _playerClanRank;
+    std::map<UInt64, int> _playerBattleRank;
+    FastMutex _opMutex;
 };
 
 extern Leaderboard leaderboard;
