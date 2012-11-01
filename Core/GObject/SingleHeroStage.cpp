@@ -3840,7 +3840,6 @@ namespace GObject
             m_towerEndTime = TimeUtil::SharpDay(1, m_nextTime) + stageStartTime[m_progress];
             break;
         case e_sh_result_end:
-            ++ m_session;
             m_progress = 0;
             break;
         case 0:    // 开始报名
@@ -3850,6 +3849,7 @@ namespace GObject
                 break;
             }
             clear();
+            ++ m_session;
             ++ m_progress;
             // nextTime报名结束 周一12点
             // XXX neice
@@ -4182,7 +4182,7 @@ namespace GObject
         m_nextTime = TimeUtil::SharpDay(0, now)  + (7 - weekday) * 86400 + stageStartTime[0];
 
         m_progress = 0;
-        m_session = 1;
+        m_session = 0;
         m_fOpen = false;
         // XXX neice
         //m_nextTime = now;

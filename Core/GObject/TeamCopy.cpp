@@ -911,13 +911,19 @@ void TeamCopy::teamBattleStart(Player* pl, UInt8 type)
             }
 
             UInt32 thisDay = TimeUtil::SharpDay();
-            UInt32 thirdDay = TimeUtil::SharpDay(2, PLAYER_DATA(pl, created));
-            if(thisDay == thirdDay && !pl->GetVar(VAR_CLAWARD2))
+            UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA(pl, created));
+            if(thisDay <= endDay)
             {
-                pl->SetVar(VAR_CLAWARD2, 1);
-                pl->sendRC7DayInfo(TimeUtil::Now());
+                UInt32 targetVal = pl->GetVar(VAR_CLAWARD2);
+                if (!(targetVal & TARGET_TEAM_COPY))
+                {
+                    targetVal |=TARGET_TEAM_COPY;
+                    pl->AddVar(VAR_CTS_TARGET_COUNT, 1);
+                    pl->SetVar(VAR_CLAWARD2, targetVal);
+                    pl->sendNewRC7DayTarget();
+                    pl->newRC7DayUdpLog(1152, 6);
+                }
             }
-
 
             if (t == 0)
                 pl->OnHeroMemo(MC_SLAYER, MD_MASTER, 0, 1);

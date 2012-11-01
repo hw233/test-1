@@ -1696,6 +1696,23 @@ namespace GObject
                     ret = true;
 				}
 			}
+
+            UInt32 thisDay = TimeUtil::SharpDay();
+            UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA(m_Owner, created));
+            if(ret == true && id == 449 && thisDay <= endDay)
+            {
+                // 新注册七日内开启首充礼包，完成每日目标
+                UInt32 targetVal = m_Owner->GetVar(VAR_CLAWARD2);
+                if (!(targetVal & TARGET_RECHARGE_PACKGE))
+                {
+                    targetVal |=TARGET_RECHARGE_PACKGE;
+                    m_Owner->AddVar(VAR_CTS_TARGET_COUNT, 1);
+                    m_Owner->SetVar(VAR_CLAWARD2, targetVal);
+                    m_Owner->sendNewRC7DayTarget();
+                    m_Owner->newRC7DayUdpLog(1152, 11);
+                }
+            }
+
 		}
 
 		Stream st(REP::PACK_USE);
@@ -2629,14 +2646,31 @@ namespace GObject
                  if (ied.enchant >= 1)
                      m_Owner->OnHeroMemo(MC_FORGE, MD_LEGEND, 0, 0);
                  if (ied.enchant >= 2)
+                 {
                      m_Owner->OnHeroMemo(MC_FORGE, MD_LEGEND, 0, 1);
+                     UInt32 thisDay = TimeUtil::SharpDay();
+                     UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA(m_Owner, created));
+                     if(thisDay <= endDay)
+                     {
+                         UInt32 targetVal = m_Owner->GetVar(VAR_CLAWARD2);
+                         if (!(targetVal & TARGET_TRUMP_UPGRADE))
+                         {
+                             targetVal |=TARGET_TRUMP_UPGRADE;
+                             m_Owner->AddVar(VAR_CTS_TARGET_COUNT, 1);
+                             m_Owner->SetVar(VAR_CLAWARD2, targetVal);
+                             m_Owner->sendNewRC7DayTarget();
+                             m_Owner->newRC7DayUdpLog(1152, 10);
+                         }
+                     }
+                 }
+ 
                  if (ied.enchant >= 4)
                      m_Owner->OnHeroMemo(MC_FORGE, MD_LEGEND, 0, 2);
             }
             else
             {
                 //装备强化
-                 GameAction()->doAttainment(this->m_Owner, 10164, ied.enchant);
+                GameAction()->doAttainment(this->m_Owner, 10164, ied.enchant);
 
                  if(fgt)
                      fgt->CheckEquipEnchantAttainment(ied.enchant);
@@ -2644,7 +2678,23 @@ namespace GObject
                  if (ied.enchant >= 2)
                      m_Owner->OnHeroMemo(MC_FORGE, MD_STARTED, 0, 0);
                  if (ied.enchant >= 4)
+                 {
                      m_Owner->OnHeroMemo(MC_FORGE, MD_STARTED, 0, 1);
+                     UInt32 thisDay = TimeUtil::SharpDay();
+                     UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA(m_Owner, created));
+                     if(thisDay <= endDay)
+                     {
+                         UInt32 targetVal = m_Owner->GetVar(VAR_CLAWARD2);
+                         if (!(targetVal & TARGET_ENHANCE))
+                         {
+                             targetVal |=TARGET_ENHANCE;
+                             m_Owner->AddVar(VAR_CTS_TARGET_COUNT, 1);
+                             m_Owner->SetVar(VAR_CLAWARD2, targetVal);
+                             m_Owner->sendNewRC7DayTarget();
+                             m_Owner->newRC7DayUdpLog(1152, 9);
+                         }
+                     }
+                 }
                  if (ied.enchant >= 6)
                      m_Owner->OnHeroMemo(MC_FORGE, MD_STARTED, 0, 2);
             }
@@ -4513,7 +4563,7 @@ namespace GObject
 	}
 
     // get item trump exp and delelte item
-    UInt8 Package::SmeltItemTrumpExp(Fighter * fgt, UInt32 itemId, bool& bind, UInt16 num, UInt32& exp)
+    UInt8 Package::SmeltItemTrumpExp(Fighter * fgt, UInt32 itemId, bool& bind, UInt32& exp)
     {
         if(itemId > 30000)
         {
@@ -4541,18 +4591,18 @@ namespace GObject
             if(item == NULL || item->getClass() != Item_Normal29)
                 return 2;
             const GData::ItemBaseType& ibt = item->GetItemType();
-            exp = ibt.trumpExp * num;
+            exp = ibt.trumpExp;
             if(exp == 0)
                 return 2;
 
-            if(!DelItem2(item, num, ToTrumpUpgrade))
+            if(!DelItem2(item, 1, ToTrumpUpgrade))
                 return 2;
         }
 
         return 0;
     }
 
-    UInt8 Package::TrumpUpgrade(UInt16 fighterId, UInt32 trumpId, UInt32 itemId, UInt8 bind, UInt16 num)
+    UInt8 Package::TrumpUpgrade(UInt16 fighterId, UInt32 trumpId, UInt32 itemId, UInt8 bind)
     {
 		Fighter * fgt = NULL;
 		UInt8 pos = 0;
@@ -4573,7 +4623,7 @@ namespace GObject
 
         UInt32 exp = 0;
         bool isBound = (bind > 0);
-        UInt8 res = SmeltItemTrumpExp(fgt, itemId, isBound, num, exp);
+        UInt8 res = SmeltItemTrumpExp(fgt, itemId, isBound, exp);
         if(res != 0)
             return res;
 

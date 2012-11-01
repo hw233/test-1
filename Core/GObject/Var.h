@@ -116,7 +116,7 @@ namespace GObject
         VAR_CLAWARD = 85, // 七天连续登陆奖励
         VAR_CL3DAY = 86, // 七天连接三天登陆奖励
         VAR_RC7DAYRECHARGE = 87, // 创建角色后前七天充值总额
-        VAR_RC7DAYWILL = 88, // 所选择的愿望索引
+        VAR_RC7DAYWILL = 88, // 创建角色后前七天充值奖励领取（许愿类型 << 8 | 点亮龙珠数量）
         VAR_INVITES = 89, // 邀请好友的次数
         VAR_MDSOUL = 90, // 五一活动灵气值
         VAR_MDSOUL_CNT1 = 91, // 五一活动风雷宝珠使用次数 9000
@@ -248,14 +248,33 @@ namespace GObject
         VAR_TGC_1_FRONTMAP = 202,
         VAR_TGC_1_DUNGEON = 203,
 
-        VAR_LOCAL_RANK = 240, //本服斗剑，当前排名
-        VAR_LOCAL_MAXRANK = 241, //本服斗剑，最好排名
+        VAR_CTSLANDING_AWARD = 204, // 创建角色前七天连续登陆奖励领取记录
+        VAR_CTSLANDING_AWARD2 = 205, // 创建角色前七天累计登录奖励领取记录
+        VAR_CTS_TARGET_COUNT  = 206, // 七天目标抽奖之剩余抽奖次数
+
+        VAR_ITEM_9178_FAILED_COUNT = 207, // 都率宝伞礼包连续开启失败次数
+                                          // （ItemNormal.lua里面值已经写死）
+
+        VAR_LOCAL_RANK = 240, //本服斗剑，最好排名
+        VAR_LOCAL_MAXRANK = 241, //本服斗剑，当前排名
         VAR_LOCAL_PRESTIGE = 242, //本服斗剑，声望数
         VAR_LOCAL_PAGE = 243, //本服斗剑，翻页数
 
 
         VAR_MAX,
     };
+
+#define TARGET_LEVEL              0x0001
+#define TARGET_ATHLETICSRANK      0x0002
+#define TARGET_BOSS               0x0004
+#define TARGET_COUNTRY_BATTLE     0x0008
+#define TARGET_CLAN_BATTLE        0x0010
+#define TARGET_TEAM_COPY          0x0020
+#define TARGET_TOWN_DEAMON        0x0040
+#define TARGET_FRONT_MAP          0x0080
+#define TARGET_ENHANCE            0x0100
+#define TARGET_TRUMP_UPGRADE      0x0200
+#define TARGET_RECHARGE_PACKGE    0x0400
 
 
 #define REGISTER_VAR(Var, Type) \
@@ -410,7 +429,7 @@ namespace GObject
             REGISTER_VAR(VAR_JUNE_HAPPY_ITEM_CNT, CYCLE_NONE);
             REGISTER_VAR(VAR_LUCKYDRAW_CNT, CYCLE_NONE);
 
-            REGISTER_VAR(VAR_CLAWARD2, CYCLE_DAY);
+            REGISTER_VAR(VAR_CLAWARD2, CYCLE_NONE);
 
             REGISTER_VAR(VAR_OFFLINE_EQUIP, CYCLE_NONE);
 
@@ -477,6 +496,13 @@ namespace GObject
             REGISTER_VAR(VAR_TGC_1_COPY, CYCLE_NONE);
             REGISTER_VAR(VAR_TGC_1_FRONTMAP, CYCLE_NONE);
             REGISTER_VAR(VAR_TGC_1_DUNGEON, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_CTSLANDING_AWARD, CYCLE_NONE);
+            REGISTER_VAR(VAR_CTSLANDING_AWARD2, CYCLE_NONE);
+            REGISTER_VAR(VAR_CTS_TARGET_COUNT, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_ITEM_9178_FAILED_COUNT, CYCLE_NONE);
+
             REGISTER_VAR(VAR_LOCAL_RANK, CYCLE_NONE);
             REGISTER_VAR(VAR_LOCAL_MAXRANK, CYCLE_NONE);
             REGISTER_VAR(VAR_LOCAL_PRESTIGE, CYCLE_NONE);

@@ -160,9 +160,9 @@ namespace GObject
 		UInt8 BatchMergeGem(UInt16 gemId, UInt16 unbindCount, UInt16 bindCount, UInt8 protect, UInt16& gemIdOut, UInt16& unbindGemsOut, UInt16& bindGemsOut, UInt16& succTimes, UInt16& failedTimes);
 		//UInt8 ActivateAttr(UInt16 fighterId, UInt32 itemId, UInt32 itemId2);
 		UInt8 ActivateAttr(UInt16 fighterId, UInt32 itemId);
-        UInt8 TrumpUpgrade(UInt16 fighterId, UInt32 trumpId, UInt32 itemId, UInt8 bind, UInt16 num);
+        UInt8 TrumpUpgrade(UInt16 fighterId, UInt32 trumpId, UInt32 itemId, UInt8 bind);
 		UInt8 TrumpLOrder(UInt16 fighterId, UInt32 trumpId);
-        UInt8 SmeltItemTrumpExp(Fighter * fgt, UInt32 itemId, bool& bind, UInt16 num, UInt32& exp);
+        UInt8 SmeltItemTrumpExp(Fighter * fgt, UInt32 itemId, bool& bind, UInt32& exp);
 
 		void AutoRegen(Fighter *);
 
