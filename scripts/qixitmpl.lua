@@ -48,5 +48,5 @@ qixitmpl:addLBAwards(10, 1325, 15)
 -- 第11-49名：技能符文熔炼诀(1325)x10
 qixitmpl:addLBAwards(49, 1325, 10)
 -- 第50-99名：技能符文熔炼诀(1325)x5
-qixitmpl:addLBAwards(49, 1325, 5)
+qixitmpl:addLBAwards(99, 1325, 5)
 

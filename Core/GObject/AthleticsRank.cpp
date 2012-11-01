@@ -240,17 +240,20 @@ void AthleticsRank::updatePageNum(Rank r)
 void AthleticsRank::addAthleticsFromDB(UInt8 row, AthleticsRankData * data)
 {
     Player *pl = data->ranker;
-    if(cfg.merged && pl->GetVar(VAR_LOCAL_RANK) == 0)
+    if(cfg.merged && pl->GetVar(VAR_LOCAL_RANK) == 0 && pl->GetVar(VAR_LOCAL_MAXRANK) == 0)
     {
         UInt32 rankTmp = data->rank;
         if(rankTmp > ATHLETICS_RANK_MAX_CNT + 1)
             rankTmp = ATHLETICS_RANK_MAX_CNT + 1;
         pl->SetVar(VAR_LOCAL_RANK, rankTmp);
+        rankTmp = data->maxrank;
         if(rankTmp > ATHLETICS_RANK_MAX_CNT + 1)
             rankTmp = ATHLETICS_RANK_MAX_CNT + 1;
         pl->SetVar(VAR_LOCAL_MAXRANK, rankTmp);
         pl->SetVar(VAR_LOCAL_PRESTIGE, data->prestige);
         pl->SetVar(VAR_LOCAL_PAGE, data->pageNum);
+        if(data->maxrank != data->rank)
+            data->maxrank = data->rank;
     }
 
     if(data->rank > ATHLETICS_RANK_MAX_CNT)

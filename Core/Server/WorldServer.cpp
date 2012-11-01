@@ -129,6 +129,9 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 	DB::gLogDBConnectionMgr = new DB::DBConnectionMgr();
 	DB::gLogDBConnectionMgr->Init( cfg.dbLogHost.c_str(), cfg.dbLogUser.c_str(), cfg.dbLogPassword.c_str(), cfg.dbLogSource.c_str(), 4, 32, cfg.dbLogPort );
 
+    DB::gLockDBConnectionMgr = new DB::DBConnectionMgr();
+	DB::gLockDBConnectionMgr->Init( cfg.dbLockHost.c_str(), cfg.dbLockUser.c_str(), cfg.dbLockPassword.c_str(), cfg.dbLockSource.c_str(), 4, 32, cfg.dbLockPort );
+
 	int worker;
 
 	worker = WORKER_THREAD_WORLD;

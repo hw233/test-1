@@ -52,6 +52,7 @@
 #include "SingleHeroStage.h"
 #include "SHSYTmpl.h"
 #include "QixiTmpl.h"
+#include "MsgHandler/Memcached.h"
 
 namespace GObject
 {
