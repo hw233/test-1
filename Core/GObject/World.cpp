@@ -371,8 +371,6 @@ bool enum_midnight(void * ptr, void* next)
         pl->sendLevelAward();
 #endif
 
-    World::initRCRank();
-
 	return true;
 }
 
@@ -837,6 +835,8 @@ void World::World_Midnight_Check( World * world )
         bRechargeEnd = true;
 
 	globalPlayers.enumerate(enum_midnight, static_cast<void *>(&nextday));
+    World::initRCRank();
+
     leaderboard.newDrawingGame(nextday);
     //给筷子使用称号
     if(bSingleDayEnd)
