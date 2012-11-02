@@ -123,7 +123,24 @@ void OnSetCrackValue( LoginMsgHdr& hdr, const void * data )
         int v;
     };
     CrackValue* p = (CrackValue*)(data);
-    setCrackValue(p->ip, p->v);
+
+    initMemcache();
+    int v = 0;
+    if (memc)
+    {
+        size_t len = 0;
+        char key[MEMCACHED_MAX_KEY] = {0};
+        char value[32] = {0};
+
+        len = snprintf(key, sizeof(key), "%d_%s_%d", memc_version, p->ip, cfg.serverNum);
+        if (MemcachedGet(key, len, value, sizeof(value)))
+        {
+            v = atoi(value);
+            if (v > 0)
+                v--;
+        }
+    }         
+    setCrackValue(p->ip, v);
 }
 
 #endif // _LOGININNERMSGHANDLER_H_

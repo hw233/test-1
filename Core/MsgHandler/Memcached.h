@@ -144,16 +144,18 @@ static bool checkCrack(std::string& platform, std::string& ip, UInt64 id)
             char value[32] = {0};
 
             len = snprintf(key, sizeof(key), "%d_%s_%d", memc_version, ip.c_str(), cfg.serverNum);
+            int v = 0;
             if (MemcachedGet(key, len, value, sizeof(value)))
             {
-                int v = atoi(value);
-                if (v)
+                v = atoi(value);
+                if (v >= 3)
                 {
                     TRACE_LOG("id: %"I64_FMT"u from %s of asss_%d is cracking...", id, ip.c_str(), cfg.serverNum);
                     return true;
                 }
             }
-            setCrackValue(ip.c_str(), 1);
+            v += 1;
+            setCrackValue(ip.c_str(), v);
         }
     }
 
