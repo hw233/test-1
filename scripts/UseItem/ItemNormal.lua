@@ -6050,9 +6050,32 @@ function ItemNormal_00009178(iid, num, bind, param)
             package:Add(v[1], v[2], true, 0, 2);
         end
 
-        local nr = math.random(1,100)
-        if nr <= 10 then
+        local nr = math.random(1,10000)
+        local max = {
+            [1] = 10,
+            [2] = 20,
+            [3] = 40,
+            [4] = 60,
+            [5] = 100,
+            [6] = 300,
+            [7] = 500,
+            [8] = 800,
+            [9] = 1200,
+            [10] = 2000,
+            [11] = 5000,
+        }
+        local toggle = player:GetVar(207)
+        if toggle == 0 then
+            toggle = 1
+        end
+        if toggle >= 11 then
+            toggle = 11
+        end
+        if nr <= max[toggle] then
             package:Add(1514, 1, true, 0, 2);
+            player:SetVar(207, 1)
+        else
+            player:SetVar(207, toggle + 1)
         end
 
         used = used + 1

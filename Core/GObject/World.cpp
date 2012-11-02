@@ -324,7 +324,11 @@ bool enum_midnight(void * ptr, void* next)
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 19) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 27) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 28) ||
-            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 29)
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 29) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 3) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 4) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 5) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 6)
             ))
     {
         if (pl->isOnline())
@@ -366,8 +370,6 @@ bool enum_midnight(void * ptr, void* next)
     if (TimeUtil::SharpDay(0, nextday) == TimeUtil::SharpDay(0, World::_levelawardend))
         pl->sendLevelAward();
 #endif
-
-    World::initRCRank();
 
 	return true;
 }
@@ -825,11 +827,16 @@ void World::World_Midnight_Check( World * world )
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 19) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 27) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 28) ||
-            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 29)
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 29) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 4) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 5) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 6)
             )
         bRechargeEnd = true;
 
 	globalPlayers.enumerate(enum_midnight, static_cast<void *>(&nextday));
+    World::initRCRank();
+
     leaderboard.newDrawingGame(nextday);
     //给筷子使用称号
     if(bSingleDayEnd)

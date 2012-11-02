@@ -348,8 +348,8 @@ namespace GObject
 
         for(i = 0; i < TRUMP_UPMAX; ++ i)
         {
-            _trump[i] = 0;
             trumps_skill.push_back(GData::skillManager[_trump[i]]);
+            _trump[i] = 0;
         }
         offTrump( trumps_skill );
         trumps_skill.resize(0);

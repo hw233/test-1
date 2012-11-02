@@ -359,7 +359,6 @@ void Tianjie::OpenTj()
     else
     {
         int currHour = local->tm_hour;
-        int currMin = local->tm_min;
         if (currHour < TJ_START_TIME_HOUR)
 	    	m_openTime = TimeUtil::MkTime(local->tm_year+1900, local->tm_mon+1, local->tm_mday, TJ_START_TIME_HOUR+1, TJ_START_TIME_MIN+1,0);
 	    else

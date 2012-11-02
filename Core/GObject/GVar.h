@@ -29,6 +29,7 @@ namespace GObject
         GVAR_CITTASMERGE = 3, // 心法残页合并
         GVAR_CLANCOPYPASS = 4, // 帮派副本最高通过等级
         GVAR_1530BUCHANG = 5,
+        GVAR_OLDRC7DAYBUCHANG = 6,
         GVAR_MAX,
     };
 
@@ -55,6 +56,7 @@ namespace GObject
             GREGISTER_VAR(GVAR_CITTASMERGE, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_CLANCOPYPASS, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_1530BUCHANG, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_OLDRC7DAYBUCHANG, GCYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

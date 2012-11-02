@@ -1500,6 +1500,7 @@ namespace GObject
 		std::vector<GData::LootResult> _BirthdayAward;
 		std::vector<GData::LootResult> _lastQueqiaoAward;
         std::vector<GData::LootResult> _lastKillMonsterAward;
+        std::vector<GData::LootResult> _lastNew7DayTargetAward;
 
     private:
 		UInt16 _lastDungeon;
@@ -1642,6 +1643,7 @@ namespace GObject
         void clanCopyUdpLog(UInt32 id, UInt32 val = 0, UInt32 num = 1);
         void tripodUdpLog(UInt32 id, UInt32 val = 0, UInt32 num = 1);
         void storeUdpLog(UInt32 id, UInt32 type, UInt32 itemId, UInt32 num = 1);
+        void newRC7DayUdpLog(UInt32 id, UInt32 type = 0, UInt32 num  = 1);
         void guideUdp(UInt8 type, std::string& p1, std::string& p2);
         void moneyLog(int type, int gold, int coupon = 0, int tael = 0, int achievement = 0, int prestige = 0);
         void actUdp(UInt8 type, std::string& p1, std::string& p2);
@@ -1725,6 +1727,7 @@ namespace GObject
 
     public:
         void sendSingleEnchant(UInt8 enchant);
+        void sendOldRC7DayAward();
 
         TeamData* getTeamData();
         void setTeamData(TeamData* td);
@@ -1770,7 +1773,16 @@ namespace GObject
         void lastQueqiaoAwardPush(UInt16 itemId, UInt16 num);
         void checkLastQueqiaoAward();
         void lastKillMonsterAwardPush(UInt16 itemId, UInt16 num);
+        void lastNew7DayTargetAwardPush(UInt16 itemId, UInt16 num);
         void checkLastKillMonsterAward();
+        void checkLastNew7DayTargetAward();
+        void sendNewRC7DayInfo(UInt8 type = 0);
+        void sendNewRC7DayLogin();
+        void sendNewRC7DayRecharge();
+        void sendNewRC7DayTarget(UInt8 idx = 0);
+        void getNewRC7DayLoginAward(UInt8 val, UInt8 off);
+        void getNewRC7DayRechargeAward(UInt8 val);
+        void getNewRC7DayTargetAward(UInt8 val);
 
         // 帮派神像
         float getClanStatueHPEffect();

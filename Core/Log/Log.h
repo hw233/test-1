@@ -82,6 +82,7 @@ enum PurchaseType
     ArenaFromMail               = 71,
     FromTJ                      = 72,
     IDIPBuyItem                 = 73,
+    RC7DayLogin                 = 74,
 };
 
 enum IncomingType
@@ -124,6 +125,7 @@ enum MailItemType
     BlueDiamondCmd,
     ClanCopyAward,
     BuChang1530,
+    BuChangNewRC7Day,
 };
 enum ItemFrom
 {
@@ -160,6 +162,9 @@ enum ItemFrom
     FromIDIP,
     FromQixi,
     FromKillMonster, //斩妖除魔
+    FromNewRC7DayLogin,
+    FromNewRC7DayRecharge,
+    FromNewRC7DayTarget,
 };
 
 enum ItemTo
