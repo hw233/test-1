@@ -234,6 +234,7 @@ inline UInt8 doLogin(Network::GameClient * cl, UInt64 pid, UInt32 hsid, GObject:
 			}
 		}
 	}
+
 	player->SetSessionID(hsid);
 	cl->SetPlayer(player);
 
@@ -334,11 +335,31 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             }
 			pid |= (getServerNo(ul._server) << 48);
 		}
+
 		res = doLogin(cl, pid, hdr.sessionID, player);
 
-        TRACE_LOG("id: %"I64_FMT"u from %s of asss_%d", ul._userid, ul._clientIp.c_str(), cfg.serverNum);
-        if (player && cfg.GMCheck && checkCrack(ul._platform, ul._clientIp, ul._userid))
+        if (4 == res)
         {
+            UInt8 platform = atoi(player->getDomain());
+            if (cfg.GMCheck && platform == 11)
+            {
+                size_t len = 0;
+                char key[MEMCACHED_MAX_KEY] = {0};
+                char value[32] = {0};
+                len = snprintf(key, sizeof(key), "%d_%s_%d", memc_version, ul._clientIp.c_str(), cfg.serverNum);
+                if (MemcachedGet(key, len, value, sizeof(value)))
+                {
+                    int v = atoi(value) + 1;
+                    setCrackValue(ul._clientIp.c_str(), v);
+                }
+            }
+        }
+        
+        TRACE_LOG("id: %"I64_FMT"u from %s of asss_%d", ul._userid, ul._clientIp.c_str(), cfg.serverNum);
+        if (res == 0 && player && cfg.GMCheck && checkCrack(ul._platform, ul._clientIp, ul._userid))
+        {
+            player->SetSessionID(-1);
+            cl->SetPlayer(NULL);
             conn->pendClose();
             return;
         }
@@ -504,6 +525,12 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 		conn->pendClose();
         return;
     }
+    if (cfg.GMCheck && checkCrack(us._platform, us._clientIp, hdr.playerID))
+    {
+        conn->pendClose();
+        return;
+    }
+ 
     if (IsBigLock(hdr.playerID))
     {
     	UserLogonRepStruct rep;
