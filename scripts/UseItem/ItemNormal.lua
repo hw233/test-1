@@ -2999,6 +2999,7 @@ function ItemNormal_00009010(iid, num, bind, param)
             package:AddItem(item, nums[k], 1, 0, 2)
         end
     end
+    player:getTael(500)
     package:DelItemSendMsg(iid, player);
     return num;
 end
