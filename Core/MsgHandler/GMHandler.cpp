@@ -3023,7 +3023,11 @@ void GMHandler::OnOpenTj(GObject::Player* player, std::vector<std::string>& args
 	if(args.size() < 1)
 		return;
     int level = atoi(args[0].c_str());
-    GObject::Tianjie::instance().manualOpenTj(level);
+    bool force = 0;
+    if (args.size() >= 2)
+        force = atoi(args[1].c_str());
+
+    GObject::Tianjie::instance().manualOpenTj(level, force);
 }
 
 void GMHandler::OnEnterSingleHeroStage(GObject::Player* player, std::vector<std::string>& arge)

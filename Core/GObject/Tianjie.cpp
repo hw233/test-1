@@ -184,7 +184,7 @@ Tianjie::Tianjie()
     m_manualTjLevel = 0;
     m_autoTjLevel = 0;
 }
-int  Tianjie::manualOpenTj(int level)
+int  Tianjie::manualOpenTj(int level, bool force)
 {
     if ((level % 10 != 9) || level < 59 || level > 109)
         return 1;
@@ -193,6 +193,14 @@ int  Tianjie::manualOpenTj(int level)
  	std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 	if (execu.get() == NULL || !execu->isConnected()) return 2;
 
+    //强制开天劫
+    if (force)
+    {
+        //正在进行该等级的天劫
+        if (m_currOpenedTjLevel == level && m_isTjOpened)
+            return 5;
+        execu->Execute2("delete from tianjie where level = %d", level);
+    }
 	GData::DBTianjie dbexp;
     if(execu->Prepare("SELECT `id`, `is_opened`,`is_execute`,`is_finish`,`is_ok`,`level`,`rate`,UNIX_TIMESTAMP(opentime),`r1_killed`,`r2_donated`,`r3_copyid`,`r4_day`,`open_next`, `is_wait`,`is_manual`,`is_touch` FROM `tianjie` order by level desc", dbexp) != DB::DB_OK)
 		return 99;

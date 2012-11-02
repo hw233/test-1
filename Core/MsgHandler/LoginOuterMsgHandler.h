@@ -2611,8 +2611,10 @@ void ManualOpenTj(LoginMsgHdr& hdr, const void* data)
     CHKKEY();
 
     UInt16 level = 0;
+    UInt8 force = 0;
     br >> level;
-    UInt8 ret = GObject::Tianjie::instance().manualOpenTj(level);
+    br >> force;
+    UInt8 ret = GObject::Tianjie::instance().manualOpenTj(level, force);
 
     Stream st(SPEP::MANUALOPENTJ);
 

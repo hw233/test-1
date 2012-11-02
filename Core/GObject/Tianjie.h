@@ -66,7 +66,7 @@ namespace GObject
 		bool LoadFromDB();
         UInt8 getTjTypeId() {return m_tjTypeId;};
         void setNetOk() {m_isNetOk = true;};
-        int  manualOpenTj(int level);
+        int  manualOpenTj(int level, bool force=false);
        
         void onTianjieReq(GameMsgHdr&, const void*);
         void getTianjieData(Player* pl, bool isLogin=false);
