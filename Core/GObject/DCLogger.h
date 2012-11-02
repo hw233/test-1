@@ -38,6 +38,8 @@ using namespace DataCollector;
     16  gamelife
     17  qqunion
     40  kingxin
+    41  6waves
+    42  113
     60  fb
 #endif
 
