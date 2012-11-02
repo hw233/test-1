@@ -4869,6 +4869,10 @@ namespace GObject
             m_singlFgt.erase(pl);
             return;
         }
+        SingleHeroFighter* sfgt = m_strategyFgt[pl];
+        if(sfgt == NULL)
+            m_strategyFgt.erase(pl);
+
         sp->_fgt = fgt;
 
         UInt8 cls = fgt->getClass();
@@ -4876,10 +4880,7 @@ namespace GObject
         if(type & e_sh_slsy)
         {
             singleStage(cls)->pushPlayer(pl, fgt);
-            SingleHeroFighter* sfgt = m_strategyFgt[pl];
-            if(sfgt == NULL)
-                m_strategyFgt.erase(pl);
-            else
+            if(sfgt != NULL)
                 strategyStage(cls)->pushPlayer(pl, sfgt);
             towerStage(cls)->pushPlayer(pl, fgt, lvl, turns, lastTurns);
         }
@@ -4893,11 +4894,13 @@ namespace GObject
         }
         if(type & e_sh_sy_earth)
         {
-            strategyStage2(cls)->pushPlayer(pl, fgt);
+            if(sfgt != NULL)
+                strategyStage2(cls)->pushPlayer(pl, sfgt);
         }
         if(type & e_sh_sy_final)
         {
-            strategyFinalStage(cls)->pushPlayer(pl, fgt);
+            if(sfgt != NULL)
+                strategyFinalStage(cls)->pushPlayer(pl, sfgt);
         }
         if(type & e_sh_sr)
         {
