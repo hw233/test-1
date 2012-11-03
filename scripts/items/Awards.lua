@@ -239,7 +239,7 @@ function RunBlueDiamondAward(player, opt)
         itemId = 9191;
         items = item_9191;
         date_0 = os.time(date_9191_0);
-        date_1 = os.time(date_9190_1);
+        date_1 = os.time(date_9191_1);
     end
     now = os.time()
     if now < date_0 or now >= date_1 then
