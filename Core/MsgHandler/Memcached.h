@@ -43,14 +43,8 @@ static bool initMemcache()
 
     if (hasServer)
     {
-        const char* version = "memc_version";
-        char value[32] = {0};
-        MemcachedGet(version, strlen(version), value, sizeof(value));
-        memc_version = atoi(value);
-        ++memc_version;
+        memc_version = (rand()*(rand()/132))%0x8FFFFFFF;
         TRACE_LOG("memc_version: %d", memc_version);
-        snprintf(value, sizeof(value), "%d", memc_version);
-        MemcachedSet(version, strlen(version), value, sizeof(value));
     }
     return hasServer;
 }
@@ -111,7 +105,7 @@ bool MemcachedSet(const char* key, size_t key_size, const char* value, size_t si
         --retry;
     }
 
-    TRACE_LOG("memc set: %s => %s", key, value);
+    TRACE_LOG("memc set: %s => %s [%d]", key, value, rc);
     return rc == MEMCACHED_SUCCESS;
 }
 

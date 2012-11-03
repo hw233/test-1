@@ -115,4 +115,15 @@ void OnCheckPackKey( LoginMsgHdr& hdr, const void * data )
     }
 }
 
+void OnSetCrackValue( LoginMsgHdr& hdr, const void * data )
+{
+    struct CrackValue
+    {
+        char ip[1024];
+        int v;
+    };
+    CrackValue* p = (CrackValue*)(data);
+    setCrackValue(p->ip, p->v);
+}
+
 #endif // _LOGININNERMSGHANDLER_H_

@@ -1851,7 +1851,20 @@ namespace GObject
         snprintf(online, sizeof(online), "%u", curtime - _playerData.lastOnline);
         udpLog("", "", "", "", "", online, "login");
 
-        setCrackValue(getClientIp(), 0);
+        UInt8 platform = atoi(getDomain());
+        if (cfg.GMCheck && platform == 11)
+        {
+            struct CrackValue
+            {
+                char ip[1024];
+                int v;
+            } crackValue;
+            snprintf(crackValue.ip, sizeof(crackValue.ip), "%s", getClientIp());
+            crackValue.v = 0;
+
+            LoginMsgHdr hdr1(0x301, WORKER_THREAD_LOGIN, 0, this->GetSessionID(), sizeof(crackValue));
+            GLOBAL().PushMsg(hdr1, &crackValue);
+        }
 	}
 
 	void Player::Logout(bool nobroadcast)
@@ -1936,7 +1949,20 @@ namespace GObject
         snprintf(online, sizeof(online), "%u", TimeUtil::Now() - _playerData.lastOnline);
         udpLog("", "", "", "", "", online, "login");
 
-        setCrackValue(getClientIp(), 0);
+        UInt8 platform = atoi(getDomain());
+        if (cfg.GMCheck && platform == 11)
+        {
+            struct CrackValue
+            {
+                char ip[1024];
+                int v;
+            } crackValue;
+            snprintf(crackValue.ip, sizeof(crackValue.ip), "%s", getClientIp());
+            crackValue.v = 0;
+
+            LoginMsgHdr hdr1(0x301, WORKER_THREAD_LOGIN, 0, this->GetSessionID(), sizeof(crackValue));
+            GLOBAL().PushMsg(hdr1, &crackValue);
+        }
 	}
 
 	void Player::checkLastBattled()
