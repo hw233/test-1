@@ -11025,7 +11025,7 @@ namespace GObject
                     targetVal |= TARGET_LEVEL;
                     AddVar(VAR_CTS_TARGET_COUNT, 1);
                     SetVar(VAR_CLAWARD2, targetVal);
-                    newRC7DayUdpLog(1152, 1);
+                    //newRC7DayUdpLog(1152, 1);
                 }
             }
         }
