@@ -3933,7 +3933,7 @@ namespace GObject
             // nextTime 下次报名 周日12点
             // XXX neice
             //m_nextTime = now + 600;
-            m_nextTime = TimeUtil::SharpDay(1, m_nextTime) + stageStartTime[0]; 
+            m_nextTime = TimeUtil::SharpDay(1, m_nextTime - 3600) + stageStartTime[0]; 
             break;
         }
 
