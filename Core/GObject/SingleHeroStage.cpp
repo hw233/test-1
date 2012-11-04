@@ -3916,7 +3916,8 @@ namespace GObject
             {
                 // XXX neice
                 //m_nextTime = now + 300; 
-                m_nextTime = TimeUtil::SharpDay(1, m_nextTime) + stageStartTime[m_progress]; 
+                // 为防止爬塔爬到24点还没结束，这里sharpDay的时间参数－1小时，从而避免将nextTime时间延迟
+                m_nextTime = TimeUtil::SharpDay(1, m_nextTime - 3600) + stageStartTime[m_progress]; 
                 m_progress += SH_GP_OFFSET_B_E;
             }
             else
