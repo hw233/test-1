@@ -217,6 +217,8 @@ namespace GObject
         VAR_RECHARGE_TOTAL3366 = 169, //3366合作充值活动
         VAR_BDIAMOND_CMD = 170, //蓝钻用户每日可领取当前等级寻宝令
 
+        VAR_DONTIAN_KILLPOINT = 171, //洞天福地击杀点数
+
         VAR_YEAR_SWORDSMAN = 180, //周岁剑侠红包
         VAR_YEAR_NOBLE = 181, //周岁贵族红包
         /** 斩妖除魔剑侠路 **/
@@ -496,6 +498,8 @@ namespace GObject
             REGISTER_VAR(VAR_TGC_1_COPY, CYCLE_NONE);
             REGISTER_VAR(VAR_TGC_1_FRONTMAP, CYCLE_NONE);
             REGISTER_VAR(VAR_TGC_1_DUNGEON, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_DONTIAN_KILLPOINT, CYCLE_NONE);
 
             REGISTER_VAR(VAR_CTSLANDING_AWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_CTSLANDING_AWARD2, CYCLE_NONE);
