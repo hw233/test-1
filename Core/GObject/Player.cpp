@@ -1233,13 +1233,13 @@ namespace GObject
         if (val)
         {
             if (priceLog)
-                snprintf (action, 16, "F_%d_%d_2", id, val);
+                snprintf (action, 32, "F_%d_%d_2", id, val);
             else
-                snprintf (action, 16, "F_%d_%d", id, val);
+                snprintf (action, 32, "F_%d_%d", id, val);
         }
         else
         {
-            snprintf (action, 16, "F_%d", id);
+            snprintf (action, 32, "F_%d", id);
         }
         udpLog("trade", action, "", "", "", "", "act", num);
     }
@@ -1468,7 +1468,7 @@ namespace GObject
     {
         // 商城购买相关日志（现在只有荣誉和声望）
         char action[32] = "";
-        snprintf (action, 16, "F_%d_%d_%d", id, type, itemId);
+        snprintf (action, 32, "F_%d_%d_%d", id, type, itemId);
         udpLog("store", action, "", "", "", "", "act", num);
     }
 
@@ -1477,9 +1477,9 @@ namespace GObject
         // 新版注册七日活动日志
         char action[32] = "";
         if (type)
-            snprintf (action, 16, "F_%d_%d", id, type);
+            snprintf (action, 32, "F_%d_%d", id, type);
         else
-            snprintf (action, 16, "F_%d", id);
+            snprintf (action, 32, "F_%d", id);
         udpLog("register", action, "", "", "", "", "act", num);
     }
 
