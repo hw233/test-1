@@ -3975,7 +3975,7 @@ namespace GObject
                     cType = contents[cls];
                     pl->setTitle(titles[cls], TITLE_TIME_LEN);
                 }
-                SYSMSGV(title, 891);
+                SYSMSG(title, 891);
                 SYSMSGV(content, cType, idx + 1);
 
                 Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
