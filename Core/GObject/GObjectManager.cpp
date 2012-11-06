@@ -1867,7 +1867,7 @@ namespace GObject
             fgt2->setAttrValue2(specfgtobj.attrValue2);
             fgt2->setAttrType3(specfgtobj.attrType3);
             fgt2->setAttrValue3(specfgtobj.attrValue3);
-            fgt2->setHideFashion(specfgtobj.hideFashion);
+            fgt2->setHideFashion(specfgtobj.hideFashion,false);
 			pl->addFighter(fgt2, false, true);
             if (specfgtobj.level > lvl_max)
                 lvl_max = specfgtobj.level;

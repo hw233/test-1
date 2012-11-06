@@ -712,7 +712,7 @@ void Fighter::sendModification( UInt8 t, UInt16 value, int idx, bool writedb)
 	_owner->send(st);
 }
 
-void Fighter::sendModification( UInt8 n, UInt8 * t, UInt64 * v )
+void Fighter::sendModification( UInt8 n, UInt8 * t, UInt64 * v ,bool writedb)
 {
 	if(_owner == NULL)
 		return;
@@ -733,7 +733,8 @@ void Fighter::sendModification( UInt8 n, UInt8 * t, UInt64 * v )
 		{
 			st << static_cast<UInt32>(v[i]);
 		}
-        updateToDB(t[i], v[i]);
+        if (writedb)
+            updateToDB(t[i], v[i]);
 	}
 	st << Stream::eos;
 	_owner->send(st);
