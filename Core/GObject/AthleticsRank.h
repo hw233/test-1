@@ -251,10 +251,10 @@ public:
 #endif
     }
 
-    inline UInt32 getRankPosL(Player* player)
+    inline UInt32 getRankPosL(UInt8 row, Player* player)
     {
         UInt32 Pos;
-        UInt8 row = getRankRow(player->GetLev());
+        //UInt8 row = getRankRow(player->GetLev());
         AthlSortType& curType = _ranksL[row][player->getServerNo()];
         if(curType.empty())
             return 0;
@@ -275,9 +275,9 @@ public:
 		return _athleticses[row].begin();
 	}
 
-    inline RankL getRankBeginL(Player* player)
+    inline RankL getRankBeginL(UInt8 row, Player* player)
     {
-        UInt8 row = getRankRow(player->GetLev());
+        //UInt8 row = getRankRow(player->GetLev());
         return _ranksL[row][player->getServerNo()].begin();
     }
 
@@ -286,9 +286,9 @@ public:
 		return _athleticses[row].end();
 	}
 
-    inline RankL getRankEndL(Player* player)
+    inline RankL getRankEndL(UInt8 row, Player* player)
     {
-        UInt8 row = getRankRow(player->GetLev());
+        //UInt8 row = getRankRow(player->GetLev());
         return _ranksL[row][player->getServerNo()].end();
     }
 
@@ -297,9 +297,9 @@ public:
 		return static_cast<UInt16>(_athleticses[row].size());
 	}
 
-    inline UInt32 getRankSizeL(Player* player)
+    inline UInt32 getRankSizeL(UInt8 row, Player* player)
     {
-        UInt8 row = getRankRow(player->GetLev());
+        //UInt8 row = getRankRow(player->GetLev());
         return _ranksL[row][player->getServerNo()].size();
     }
 
@@ -308,9 +308,9 @@ public:
 		return (*rank) == _athleticses[row].front();
 	}
 
-    inline bool frontRankPosL(Player* player, RankL cur)
+    inline bool frontRankPosL(UInt8 row, Player* player, RankL cur)
     {
-        UInt8 row = getRankRow(player->GetLev());
+        //UInt8 row = getRankRow(player->GetLev());
         return cur == _ranksL[row][player->getServerNo()].begin();
     }
 
@@ -319,9 +319,9 @@ public:
 		return (*rank) == _athleticses[row].back();
 	}
 
-    inline bool backRankPosL(Player* player, RankL cur)
+    inline bool backRankPosL(UInt8 row, Player* player, RankL cur)
     {
-        UInt8 row = getRankRow(player->GetLev());
+        //UInt8 row = getRankRow(player->GetLev());
         return static_cast<UInt32>(std::distance(_ranksL[row][player->getServerNo()].begin(), cur) + 1) == _ranksL[row][player->getServerNo()].size();
     }
 
