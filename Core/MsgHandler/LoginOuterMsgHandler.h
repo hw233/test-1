@@ -45,11 +45,13 @@
 #include "GObject/SingleHeroStage.h"
 #include "GObject/GObjectDBExecHelper.h"
 
+#include "Memcached.h"
+
 #ifndef _WIN32
-#include <libmemcached/memcached.h>
+//#include <libmemcached/memcached.h>
 #include "GObject/DCLogger.h"
 
-static memcached_st* memc = NULL;
+//static memcached_st* memc = NULL;
 #endif
 
 bool getId(char buf[64], UInt8 type = 0);
@@ -80,51 +82,6 @@ static void serverNameToGlobalName(std::string& name, UInt16 sid)
         while(sid > 0);
     }
 }
-
-#ifndef _WIN32
-static bool initMemcache()
-{
-    bool hasServer = false;
-    if (!memc)
-    {
-        memcached_return rc;
-        memc = memcached_create(NULL);
-
-        size_t sz = cfg.tokenServer.size();
-        for (size_t i = 0; i < sz; ++i)
-        {
-            memcached_server_st* servers = memcached_server_list_append(NULL, cfg.tokenServer[i].ip.c_str(), cfg.tokenServer[i].port, &rc);
-            if (rc == MEMCACHED_SUCCESS)
-            {
-                rc = memcached_server_push(memc, servers);
-                memcached_server_free(servers);
-                hasServer = true;
-            }
-        }
-
-        if (!hasServer)
-        {
-            memcached_free(memc);
-            memc = NULL;
-        }
-        else
-        {
-            //err += "can not connect to token server ";
-            //err += cfg.tokenServer[i].ip;
-        }
-    }
-    return hasServer;
-}
-
-__attribute__((destructor)) static void uninitMemcache()
-{
-    if (memc)
-    {
-        memcached_free(memc);
-        memc = NULL;
-    }
-}
-#endif // _WIN32
 
 struct UserDisconnectStruct
 {
@@ -333,6 +290,80 @@ static inline UInt64 getServerNo(std::string& sv)
 	return atoi(sv.c_str() + n + 1);
 }
 
+static void setCrackValue(std::string& ip, int v)
+{
+    int timeout = 24*60*60;
+    initMemcache();
+    if (memc)
+    {
+        char value[64] = {0};
+        char key[MEMCACHED_MAX_KEY] = {0};
+        size_t len = snprintf(key, sizeof(key), "%s_%d", ip.c_str(), cfg.serverNum);
+        size_t vlen = snprintf(value, sizeof(value), "%d", v);
+        memcached_return_t rc = memcached_set(memc, key, len, value, vlen, (time_t)(timeout), 0);
+        int retry = 2;
+        while (rc != MEMCACHED_SUCCESS && retry)
+        {
+            rc = memcached_set(memc, key, len, value, vlen, (time_t)(timeout), 0);
+            --retry;
+            usleep(500);
+        }
+    }
+}
+
+static bool checkCrack(std::string& platform, std::string& ip, UInt64 id)
+{
+    int pf = atoi(platform.c_str());
+    if (!pf)
+        return false;
+
+    if (ip.empty())
+        return false;
+
+    if (pf == 11)
+    {
+        initMemcache();
+        if (memc)
+        {
+            size_t len = 0;
+            size_t tlen = 0;
+            unsigned int flags = 0;
+            char key[MEMCACHED_MAX_KEY] = {0};
+
+            int retry = 3;
+            memcached_return rc;
+            UInt8 ret = 1;
+            len = snprintf(key, sizeof(key), "%s_%d", ip.c_str(), cfg.serverNum);
+            while (retry)
+            {
+                --retry;
+                char* value = memcached_get(memc, key, len, &tlen, &flags, &rc);
+                if (rc == MEMCACHED_SUCCESS && value)
+                {
+                    ret = 0;
+                    int v = atoi(value);
+                    free(value);
+                    if (v)
+                    {
+                        TRACE_LOG("id: %"I64_FMT"u from %s of asss_%d is cracking...", id, ip.c_str(), cfg.serverNum);
+                        return true;
+                    }
+
+                    break;
+                }
+                else
+                {
+                    ret = 1;
+                    usleep(500);
+                }
+            }
+            setCrackValue(ip, 1);
+        }
+    }
+
+    return false;
+}
+
 void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 {
 	TcpConnection conn = NETWORK()->GetConn(hdr.sessionID);
@@ -378,6 +409,13 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 			pid |= (getServerNo(ul._server) << 48);
 		}
 		res = doLogin(cl, pid, hdr.sessionID, player);
+
+        TRACE_LOG("id: %"I64_FMT"u from %s of asss_%d", ul._userid, ul._clientIp.c_str(), cfg.serverNum);
+        if (player && cfg.GMCheck && checkCrack(ul._platform, ul._clientIp, ul._userid))
+        {
+            conn->pendClose();
+            return;
+        }
 
         char domain[256] = "";
         if (player)
