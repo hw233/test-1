@@ -4513,7 +4513,7 @@ namespace GObject
 	}
 
     // get item trump exp and delelte item
-    UInt8 Package::SmeltItemTrumpExp(Fighter * fgt, UInt32 itemId, bool& bind, UInt16 num, UInt32& exp)
+    UInt8 Package::SmeltItemTrumpExp(Fighter * fgt, UInt32 itemId, bool& bind, UInt32& exp)
     {
         if(itemId > 30000)
         {
@@ -4541,18 +4541,18 @@ namespace GObject
             if(item == NULL || item->getClass() != Item_Normal29)
                 return 2;
             const GData::ItemBaseType& ibt = item->GetItemType();
-            exp = ibt.trumpExp * num;
+            exp = ibt.trumpExp;
             if(exp == 0)
                 return 2;
 
-            if(!DelItem2(item, num, ToTrumpUpgrade))
+            if(!DelItem2(item, 1, ToTrumpUpgrade))
                 return 2;
         }
 
         return 0;
     }
 
-    UInt8 Package::TrumpUpgrade(UInt16 fighterId, UInt32 trumpId, UInt32 itemId, UInt8 bind, UInt16 num)
+    UInt8 Package::TrumpUpgrade(UInt16 fighterId, UInt32 trumpId, UInt32 itemId, UInt8 bind)
     {
 		Fighter * fgt = NULL;
 		UInt8 pos = 0;
@@ -4573,7 +4573,7 @@ namespace GObject
 
         UInt32 exp = 0;
         bool isBound = (bind > 0);
-        UInt8 res = SmeltItemTrumpExp(fgt, itemId, isBound, num, exp);
+        UInt8 res = SmeltItemTrumpExp(fgt, itemId, isBound, exp);
         if(res != 0)
             return res;
 
