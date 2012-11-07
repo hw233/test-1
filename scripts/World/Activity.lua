@@ -878,9 +878,8 @@ function initActTime(y, m, d)
   local  SerStartTm207_1= { ['year'] = 2012, ['month'] = 10, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   -- 2012.10.14登录抽奖合作
-  local SerStartTm211 = { ['year'] = 2012, ['month'] = 10, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local SerStartTm211 = { ['year'] = 2012, ['month'] = 11, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
-  local  SerStartTm211 = { ['year'] = 2012, ['month'] = 10, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 3366特权活动(通游戏大厅)
   local  SerStartTm212 = { ['year'] = 2012, ['month'] = 10, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 蓝钻优惠活动(蓝钻超人) //10.19上线推迟
