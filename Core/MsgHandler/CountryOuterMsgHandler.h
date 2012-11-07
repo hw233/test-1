@@ -4977,6 +4977,9 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
     if(!player->hasChecked())
          return;
 
+    // XXX: 不使用老版本新注册七日活动
+    return; // XXX: 不使用老版本新注册七日活动
+
 	BinaryReader br(data, hdr.msgHdr.bodyLen);
     UInt8 op = 0;
     br >> op;
@@ -5043,6 +5046,67 @@ void OnRF7Day( GameMsgHdr& hdr, const void* data )
             player->turnOnRF7Day();
             break;
 
+        default:
+            break;
+    }
+}
+
+void OnNewRC7Day(GameMsgHdr& hdr, const void* data )
+{
+    // 新版注册七日活动
+	MSG_QUERY_PLAYER(player);
+
+    if (!World::getRC7Day())
+        return;
+
+    UInt32 now = TimeUtil::Now();
+    UInt32 now_sharp = TimeUtil::SharpDay(0, now);
+    UInt32 created_sharp = TimeUtil::SharpDay(0, player->getCreated());
+    if (created_sharp > now_sharp)
+        return; // 创建时间错误（穿越了）
+
+    if (now_sharp - created_sharp > 7 * 24*60*60)
+        return; // 玩家注册时间超过7日，无法参与活动
+
+#define CREATE_OFFSET(c, n) (((n) - (c)) / (24*60*60))
+    UInt32 off = CREATE_OFFSET(created_sharp, now_sharp);
+#undef CREATE_OFFSET
+    if (off >= 7)
+        return; // 玩家注册时间超过7日，无法参与活动
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 op = 0;
+    br >> op;
+
+    switch(op)
+    {
+        case 0:
+            // 刷新新注册七日活动页面信息
+            player->sendNewRC7DayInfo();
+            break;
+        case 1:
+            // 登录签到
+            {
+                UInt8 val = 0;
+                br >> val;
+                player->getNewRC7DayLoginAward(val, off);
+            }
+            break;
+        case 2:
+            // 神龙许愿（新注册充值奖励）
+            {
+                UInt8 val = 0;
+                br >> val;
+                player->getNewRC7DayRechargeAward(val);
+            }
+            break;
+        case 3:
+            // 每日目标抽奖
+            {
+                UInt8 val = 0;
+                br >> val;
+                player->getNewRC7DayTargetAward(val);
+            }
+            break;
         default:
             break;
     }

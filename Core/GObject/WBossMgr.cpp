@@ -173,13 +173,19 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
     Stream& packet = bsim.getPacket();
     if(packet.size() <= 8)
         return false;
-
     UInt32 thisDay = TimeUtil::SharpDay();
-    UInt32 sixthDay = TimeUtil::SharpDay(5, PLAYER_DATA(pl, created));
-    if(thisDay == sixthDay && !pl->GetVar(VAR_CLAWARD2))
+    UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA(pl, created));
+    if(thisDay <= endDay)
     {
-        pl->SetVar(VAR_CLAWARD2, 1);
-        pl->sendRC7DayInfo(TimeUtil::Now());
+        UInt32 targetVal = pl->GetVar(VAR_CLAWARD2);
+        if (!(targetVal & TARGET_BOSS))
+        {
+            targetVal |=TARGET_BOSS;
+            pl->AddVar(VAR_CTS_TARGET_COUNT, 1);
+            pl->SetVar(VAR_CLAWARD2, targetVal);
+            pl->sendNewRC7DayTarget();
+            pl->newRC7DayUdpLog(1152, 3);
+        }
     }
 
     UInt16 ret = 0x0100;

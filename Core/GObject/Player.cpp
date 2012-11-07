@@ -1466,10 +1466,21 @@ namespace GObject
 
     void Player::storeUdpLog(UInt32 id, UInt32 type, UInt32 itemId, UInt32 num /* = 1 */)
     {
-        // TODO: 商城购买相关日志（现在只有荣誉和声望）
+        // 商城购买相关日志（现在只有荣誉和声望）
         char action[32] = "";
         snprintf (action, 16, "F_%d_%d_%d", id, type, itemId);
         udpLog("store", action, "", "", "", "", "act", num);
+    }
+
+    void Player::newRC7DayUdpLog(UInt32 id, UInt32 type /* = 0 */, UInt32 num /* = 1 */)
+    {
+        // 新版注册七日活动日志
+        char action[32] = "";
+        if (type)
+            snprintf (action, 16, "F_%d_%d", id, type);
+        else
+            snprintf (action, 16, "F_%d", id);
+        udpLog("register", action, "", "", "", "", "act", num);
     }
 
     void Player::sendHalloweenOnlineAward(UInt32 now, bool _online)
@@ -2380,7 +2391,7 @@ namespace GObject
         if(isFighterFull())
         {
             sendMsgCode(0, 1200);
-            return 0;
+            return false;
         }
 
         UInt32 id = 0;
@@ -6661,19 +6672,26 @@ namespace GObject
 
 	void Player::checkLevUp(UInt8 oLev, UInt8 nLev)
 	{
-        if(nLev >= 40)
+        if(nLev >= 47)
         {
             UInt32 thisDay = TimeUtil::SharpDay();
-            UInt32 firstDay = TimeUtil::SharpDay(0, PLAYER_DATA(this, created));
-            if(thisDay == firstDay && !this->GetVar(VAR_CLAWARD2))
+            UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA(this, created));
+            if(thisDay <= endDay)
             {
-                 this->SetVar(VAR_CLAWARD2, 1);
-                 this->sendRC7DayInfo(TimeUtil::Now());
+                UInt32 targetVal = GetVar(VAR_CLAWARD2);
+                if (!(targetVal & TARGET_LEVEL))
+                {
+                    targetVal |= TARGET_LEVEL;
+                    AddVar(VAR_CTS_TARGET_COUNT, 1);
+                    SetVar(VAR_CLAWARD2, targetVal);
+                    sendNewRC7DayTarget();
+                    newRC7DayUdpLog(1152, 1);
+                }
             }
         }
 
         if(_clan != NULL)
-		{
+        {
 			_clan->broadcastMemberInfo(this);
 		}
 		m_TaskMgr->CheckCanAcceptTaskByLev(nLev);
@@ -10593,6 +10611,12 @@ namespace GObject
         _lastKillMonsterAward.push_back(lt);
     }
 
+    void Player::lastNew7DayTargetAwardPush(UInt16 itemId, UInt16 num)
+    {
+        GData::LootResult lt = {itemId, num};
+        _lastNew7DayTargetAward.push_back(lt);
+    }
+
     void Player::checkLastKillMonsterAward()
     {
         std::vector<GData::LootResult>::iterator it;
@@ -10601,6 +10625,252 @@ namespace GObject
             m_Package->ItemNotify(it->id, it->count);
         }
         _lastKillMonsterAward.clear();
+    }
+
+    void Player::checkLastNew7DayTargetAward()
+    {
+        std::vector<GData::LootResult>::iterator it;
+        for(it = _lastNew7DayTargetAward.begin(); it != _lastNew7DayTargetAward.end(); ++ it)
+        {
+            m_Package->ItemNotify(it->id, it->count);
+        }
+        _lastNew7DayTargetAward.clear();
+    }
+
+    void Player::sendNewRC7DayInfo(UInt8 type /* = 0 */)
+    {
+        // 发送新注册七日活动页面信息
+        switch (type)
+        {
+            case 0:
+                sendNewRC7DayLogin();
+                sendNewRC7DayRecharge();
+                sendNewRC7DayTarget();
+                break;
+            case 1:
+                sendNewRC7DayLogin();
+                break;
+            case 2:
+                sendNewRC7DayRecharge();
+                break;
+            case 3:
+                sendNewRC7DayTarget();
+                break;
+            default:
+                break;
+        }
+    }
+
+    void Player::sendNewRC7DayLogin()
+    {
+        // 发送新注册七日活动登录奖励页面信息
+        Stream st(REP::NEWRC7DAY);
+        UInt32 loginAward = GetVar(VAR_CTSLANDING_AWARD);
+        UInt32 totalLoginAward = GetVar(VAR_CTSLANDING_AWARD2);
+        st << static_cast<UInt8> (1);
+        st << static_cast<UInt8> (loginAward);
+        st << static_cast<UInt8> (totalLoginAward);
+        st << Stream::eos;
+        send(st);
+
+        GameMsgHdr hdr1(0x266, getThreadId(), this, 0);
+        GLOBAL().PushMsg(hdr1, NULL);
+    }
+
+    void Player::sendNewRC7DayRecharge()
+    {
+        // 发送新注册七日活动充值奖励页面信息
+        Stream st(REP::NEWRC7DAY);
+        st << static_cast<UInt8> (2);
+        UInt32 totalRecharge = GetVar(VAR_RC7DAYRECHARGE);
+        UInt32 rechargeAward = GetVar(VAR_RC7DAYWILL);
+        UInt8 wishIndex = rechargeAward & 0xff;
+        UInt8 wishType = (rechargeAward >> 8) & 0xff;
+        st << static_cast<UInt8>(wishIndex);
+        st << static_cast<UInt8>(wishType);
+        st << static_cast<UInt32>(totalRecharge);
+        st << Stream::eos;
+        send(st);
+    }
+
+    void Player::sendNewRC7DayTarget(UInt8 idx /* = 0 */)
+    {
+        // 发送新注册七日活动每日目标页面信息
+        Stream st(REP::NEWRC7DAY);
+        UInt32 awardIndex = GetVar(VAR_CLAWARD2);
+        UInt32 count = GetVar(VAR_CTS_TARGET_COUNT);
+        st << static_cast<UInt8> (3);
+        st << static_cast<UInt16>(awardIndex); // 抽奖情况bit表
+        st << static_cast<UInt8>(count);  // 剩余抽奖次数
+        if (idx)
+            st << static_cast<UInt8>(idx);
+        st << Stream::eos;
+        send(st);
+    }
+
+    void Player::getNewRC7DayLoginAward(UInt8 val, UInt8 off)
+    {
+        // 申请领取新注册七天登录奖励 (包括补签和累计登录）
+        UInt32 ctslanding = GetVar(VAR_CTSLANDING);
+        UInt32 ctslandingAward = GetVar(VAR_CTSLANDING_AWARD);
+        UInt32 ctslandingAward2 = GetVar(VAR_CTSLANDING_AWARD2);
+        UInt32 cts = 0;  // 累计登录
+        UInt32 ctsAwd = 0;
+        for (int i = off; i >= 0; --i)
+        {
+            if (ctslanding & (1<<i))
+                ++cts;
+            if (ctslandingAward & (1 << i))
+                ++ctsAwd;
+        }
+        if (val == 0)
+            return;
+        if (val <= 7)
+        {
+            // 领取签到登录奖励
+            if (val < off + 1)
+            {
+                // 补签，需要消耗10仙石
+                if (!GameAction()->RunNewRC7DayLoginAward(this, val))
+                    return;
+                ConsumeInfo ci(RC7DayLogin, 0, 0);
+                useGold(10, &ci);
+
+                ctslanding |= (1<<(val - 1));
+                SetVar(VAR_CTSLANDING, ctslanding);
+
+                ctslandingAward |= (1<<(val - 1));
+                SetVar(VAR_CTSLANDING_AWARD, ctslandingAward);
+                sendNewRC7DayLogin();
+                newRC7DayUdpLog(1143, val);
+            }
+            else if (val == off + 1)
+            {
+                // 正常签到登录奖励
+                if (!GameAction()->RunNewRC7DayLoginAward(this, val))
+                    return;
+
+                ctslandingAward |= (1<<(val - 1));
+                SetVar(VAR_CTSLANDING_AWARD, ctslandingAward);
+                sendNewRC7DayLogin();
+                newRC7DayUdpLog(1142, val);
+            }
+            else
+            {
+                // 穿越签到，不予理会
+            }
+        }
+        else if (val <= 11)
+        {
+            // 领取累计签到
+            val -= 7;
+            if (val <= ctsAwd)
+            {
+                if (1<<(val - 1) & ctslandingAward2)
+                {
+                    // 已经领取过了
+                    sendMsgCode(0, 1340);
+                }
+                else
+                {
+                    // 正常领取
+                    if (!GameAction()->RunNewRC7DayLoginAward2(this, val))
+                        return;
+
+                    ctslandingAward2 |= 1 << (val - 1);
+                    SetVar(VAR_CTSLANDING_AWARD2, ctslandingAward2);
+                    sendNewRC7DayLogin();
+                    newRC7DayUdpLog(1144 + val - 1);
+                }
+            }
+            else
+            {
+                // 穿越领取累计登录奖励，不予理会
+            }
+        }
+    }
+
+    void Player::getNewRC7DayRechargeAward(UInt8 val)
+    {
+        // 申请领取新注册七天充值奖励 (神龙许愿)
+        // val 1-7 七龙珠奖励bit图（1为点亮，0为未点亮）， 
+        //     8-11 声望，荣誉，修为，经验
+        UInt32 totalRecharge = GetVar(VAR_RC7DAYRECHARGE);
+        UInt32 rechargeAward = GetVar(VAR_RC7DAYWILL);
+        UInt8 wishIndex = rechargeAward & 0xff;
+        UInt8 wishType = (rechargeAward >> 8) & 0xff;
+
+        if (val == 0 || val > 11)
+            return;
+
+        if (val <= 7)
+        {
+            // 点亮龙珠
+            if (!(wishIndex & (0x01 << (val - 1))))
+            {
+                if (GameAction()->RunNewRC7DayRechargeAward(this, val, totalRecharge))
+                {
+                    wishIndex |= 0x01 << (val - 1);
+                    SetVar(VAR_RC7DAYWILL, static_cast<UInt32>(wishType) << 8 | wishIndex);
+                    newRC7DayUdpLog(1154, val);
+                }
+            }
+        }
+        else if (val <= 11)
+        {
+            // 神龙许愿
+            if (wishIndex >= 7 && !wishType)
+            {
+                if (GameAction()->onRC7DayWill(this, val - 7))
+                {
+                    wishType = val - 7;
+                    SetVar(VAR_RC7DAYWILL, static_cast<UInt32>(wishType) << 8 | wishIndex);
+                    newRC7DayUdpLog(1148 + val - 8);
+                }
+            }
+        }
+
+        sendNewRC7DayRecharge();
+    }
+    
+    void Player::getNewRC7DayTargetAward(UInt8 val)
+    {
+        // 申请领取新注册七天每日目标奖励 
+        // val 0:转盘开始 1:转盘结束
+        UInt8 idx = 0;
+        switch (val)
+        {
+            case 0:
+                {
+                    if (!_lastNew7DayTargetAward.empty()) // 转盘正在转
+                        return;
+                    UInt8 count = GetVar(VAR_CTS_TARGET_COUNT);
+                    if (count)
+                    {
+                        idx = GameAction()->RunNewRC7DayTargetAward(this);
+                        if (idx)
+                        {
+                            --count;
+                            SetVar(VAR_CTS_TARGET_COUNT, count);
+                            newRC7DayUdpLog(1153);
+                        }
+                    }
+                }
+                break;
+            case 1:
+                {
+                    std::vector<GData::LootResult>::iterator it;
+                    for(it = _lastNew7DayTargetAward.begin(); it != _lastNew7DayTargetAward.end(); ++ it)
+                    {
+                        m_Package->ItemNotify(it->id, it->count);
+                    }
+                    _lastNew7DayTargetAward.clear();
+                }
+                break;
+            default:
+                break;
+        }
+        sendNewRC7DayTarget(idx);
     }
 
     TripodData& Player::runTripodData(TripodData& data, bool init)
@@ -10658,6 +10928,77 @@ namespace GObject
 
             sendMailItem(2205, 2206, item[enchant-1], 3);
         }
+    }
+
+    void Player::sendOldRC7DayAward()
+    {
+        // 老版本转换成新版本的注册七日签到补偿
+        MailPackage::MailItem item1[3] = {{MailPackage::Coupon,20},{56, 2}, {57, 2}};
+        MailPackage::MailItem item2[4] = {{MailPackage::Coupon,20},{502, 5}, {503, 2},{15,5}};
+        MailPackage::MailItem item3[4] = {{MailPackage::Coupon,30},{500, 5}, {501, 2},{15,5}};
+        MailPackage::MailItem item4[4] = {{MailPackage::Coupon,30},{509, 1}, {507, 1},{511,3}};
+        MailPackage::MailItem item5[5] = {{MailPackage::Coupon,40},{509, 1}, {507, 1},{5025,1},{512,4}};
+        MailPackage::MailItem item6[5] = {{MailPackage::Coupon,40},{509, 1}, {507, 1},{514,5},{515,2}};
+        MailPackage::MailItem item7[6] = {{MailPackage::Coupon,50},{509, 1}, {507, 1},{517,5},{1528,2},{15,5}};
+        UInt16 size[7] = {3,4,4,4,5,5,6};
+
+        MailPackage::MailItem* item[7] = {item1,item2,item3,item4,item5,item6,item7};
+
+
+        UInt32 now = TimeUtil::Now();
+        UInt32 now_sharp = TimeUtil::SharpDay(0, now);
+        UInt32 created_sharp = TimeUtil::SharpDay(0, getCreated());
+        if (created_sharp > now_sharp)
+            return; // 创建时间错误（穿越了）
+
+        if (now_sharp - created_sharp > 7 * 24*60*60)
+            return; // 玩家注册时间超过7日，无法参与活动
+
+        UInt32 off = CREATE_OFFSET(created_sharp, now_sharp);
+        if (off >= 7)
+            return; // 玩家注册时间超过7日，无法参与活动
+
+        UInt32 ctslanding = GetVar(VAR_CTSLANDING);
+        UInt32 ctslandingAward = GetVar(VAR_CTSLANDING_AWARD);
+        for (UInt8 i = 0; i < off; ++i)
+        {
+            if (ctslanding & (0x01<<i))
+            {
+                SYSMSG(title, 2207);
+                SYSMSGV(content, 2208, i + 1);
+                Mail * mail = GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFD0000/*free*/);
+                if (mail)
+                {
+                    mailPackageManager.push(mail->id, item[i], size[i], true);
+
+                    std::string strItems;
+                    for (int j = 0; j < size[i]; ++j)
+                    {
+                        strItems += Itoa(item[i][j].id);
+                        strItems += ",";
+                        strItems += Itoa(item[i][j].count);
+                        strItems += "|";
+                    }
+
+                    DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, BuChangNewRC7Day, title, content, strItems.c_str(), mail->recvTime);
+
+                    ctslandingAward |= (1<<i);
+                    SetVar(VAR_CTSLANDING_AWARD, ctslandingAward);
+                }
+            }
+            if (GetLev() >= 47)
+            {
+                UInt32 targetVal = GetVar(VAR_CLAWARD2);
+                if (!(targetVal & TARGET_LEVEL))
+                {
+                    targetVal |= TARGET_LEVEL;
+                    AddVar(VAR_CTS_TARGET_COUNT, 1);
+                    SetVar(VAR_CLAWARD2, targetVal);
+                    newRC7DayUdpLog(1152, 1);
+                }
+            }
+        }
+
     }
 
     void Player::resetThanksgiving()
@@ -11867,25 +12208,7 @@ namespace GObject
 
         if (now_sharp - created_sharp > 7 * DAY_SECS)
             return;
-#if 0
-        // 简体今日目标
-        if (type == 9 && 1 == GetVar(VAR_CLAWARD2))
-        {
-            if(this->GetFreePackageSize() < 1)
-            {
-                this->sendMsgCode(0, 1011);
-                return;
-            }
-            SetVar(VAR_CLAWARD2, 2);
-            Stream st(REP::RC7DAY);
-            UInt8 idx;
-            idx = GameAction()->RunTargetAward(this);
-            st << static_cast<UInt8>(2) << idx;
-            st << Stream::eos;
-            send(st);
-            return;
-        }
-#endif
+
         UInt32 ctslanding = GetVar(VAR_CTSLANDING);
         UInt32 off = CREATE_OFFSET(created_sharp, now_sharp);
         if (off >= 7)
@@ -11900,6 +12223,7 @@ namespace GObject
                 break;
         }
 
+#if 0
         if (type == 1 && !GetVar(VAR_CTSAWARD))
         {
             GameAction()->onCLLoginReward(this, cts);
@@ -11910,6 +12234,7 @@ namespace GObject
             send(st);
             return;
         }
+#endif
         if (type == 2 && !GetVar(VAR_CLAWARD) && cts)
         {
             GameAction()->onCLLoginReward(this, cts);
@@ -12283,6 +12608,8 @@ namespace GObject
         if (!World::getRC7Day())
             return;
         AddVar(VAR_RC7DAYRECHARGE, r);
+        
+        sendNewRC7DayRecharge();
 
         Stream st(REP::RC7DAY);
         st << static_cast<UInt8>(5) << GetVar(VAR_RC7DAYRECHARGE);
