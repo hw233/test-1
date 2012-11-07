@@ -380,7 +380,7 @@ public:
 
 	void sendModification(UInt8 t, UInt64 v);
 	void sendMaxSoul();
-	void sendModification(UInt8 n, UInt8 * t, UInt64 * v);
+	void sendModification(UInt8 n, UInt8 * t, UInt64 * v, bool = true);
 	void sendModification(UInt8 t, ItemEquip * v, bool = true);
 	void sendModification(UInt8 n, UInt8 * t, ItemEquip ** v, bool = true);
 
@@ -753,12 +753,12 @@ public:
     void reload2ndSoul();
     void resetLevelAndExp(UInt8 maxLevel);
 
-    void setHideFashion(bool v) 
+    void setHideFashion(bool v, bool writedb = true) 
     {
         _hideFashion = v;
         UInt8 cmd = 0x33;
         UInt64 value = v;
-        sendModification(1, &cmd, &value);
+        sendModification(1, &cmd, &value, writedb);
     };
     bool getHideFashion() {return _hideFashion;};
 public:

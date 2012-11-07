@@ -257,7 +257,7 @@ void Leaderboard::doUpdate()
         }
         _playerAthleticsRank[(*it)->ranker->getId()] = i+1;
 	}
-	blist.resize(i);
+	blist.resize(i > 100 ? 100 : i);
 	buildPacket(_moneyStream, 1, _id, blist);
 
 	blist.clear();

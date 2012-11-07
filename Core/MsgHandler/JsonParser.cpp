@@ -386,6 +386,64 @@ int query_ranking_req(JsonHead* head, json_t* body, json_t* retbody, std::string
     return 0;
 }
 
+int query_inviter_req(JsonHead* head, json_t* body, json_t* retbody, std::string& err)
+{
+    if (!head || !body || !retbody)
+        return EUNKNOW;
+
+    char openid[36] = {0};
+    char playerId[32] = {0};
+    UInt32 areaid = 0;
+    UInt64 playerid = 0;
+
+    body = body->child;
+    if (!body)
+        return EUNKNOW;
+
+    GET_STRING(body, "szOpenId", openid, 36);
+    GET_STRING(body, "playerId", playerId, 32);
+    json_t* val = json_find_first_label(body, "uiAreaId");
+    if (val && val->child && val->child->text)
+        areaid = atoi(val->child->text);
+
+    playerid = atoll(playerId);
+    GObject::Player* player = GObject::globalPlayers[playerid];
+    if (!player)
+    {
+        err += "player not exist!";
+        return EPLAYER_NOT_EXIST;
+    }
+
+    std::set<GObject::Player *>& inviters = player->getInviters();
+    UInt32 count = inviters.size();
+    json_insert_pair_into_object(retbody, "pInviteList_count", my_json_new_number(count));
+    json_t* arr = json_new_array();
+    if (arr)
+    {
+        std::set<GObject::Player *>::iterator iter;
+        for (iter = inviters.begin(); iter != inviters.end(); ++iter)
+        {
+            GObject::Player* pl = *iter; 
+            json_t* obj = json_new_object();
+            if (obj && pl)
+            {
+                char inviterId[64] = {0};
+                sprintf(inviterId, "%"I64_FMT"u", pl->getId());
+                
+                json_insert_pair_into_object(obj, "ullRoleId", json_new_string(inviterId));
+                json_insert_pair_into_object(obj, "szRoleName", json_new_string(fixPlayerName(pl->getName()).c_str()));
+                json_insert_pair_into_object(obj, "uiCreateTime", my_json_new_number(pl->getCreated()));
+                json_insert_child(arr, obj);
+            }
+        }
+        json_insert_pair_into_object(retbody, "pInviteList", arr);
+    }
+ 
+    head->cmd = 108;
+    return 0;
+}
+
+
 int query_pagoda_rsq(JsonHead* head, json_t* body, json_t* retbody, std::string& err)
 {
     if (!head || !body || !retbody)
@@ -816,6 +874,10 @@ void jsonParser2(void * buf, int len, Stream& st)
         case 71:
             ret = do_item_pay_req(&head, body, retbody, err);
             break;
+        case 107:
+            ret = query_inviter_req(&head, body, retbody, err);
+            break;
+       
         default:
             break;
     }

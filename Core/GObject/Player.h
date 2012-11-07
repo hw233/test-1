@@ -1402,7 +1402,7 @@ namespace GObject
         inline UInt8 getQueqiaoPos() { return m_qixi.pos; }
         inline Player* getLover() { return m_qixi.lover; }
         inline UInt32 getScore() { return m_qixi.score; }
-
+        std::set<Player *>& getInviters() {return _friends[3];};
 	private:
 		Mutex _mutex;
 
