@@ -255,13 +255,13 @@ void DBWorker::PushUpdateData(const char * fmt, ...)
 			return;
 		}
 	}
+
     {
         FastMutex::ScopedLock lk(m_Mutex);
         m_UpdateItems.push_back(p);
+        if(m_Type == 0)
+            InfoLog(p);
     }
-
-    if(m_Type == 0)
-        InfoLog(p);
 }
 
 void DBWorker::PushUpdateDataL(const char * fmt, ...)
@@ -298,12 +298,13 @@ void DBWorker::PushUpdateDataL(const char * fmt, ...)
 			return;
 		}
 	}
+
     {
         FastMutex::ScopedLock lk(m_Mutex);
         m_UpdateItems.push_back(p);
+        if(m_Type == 0)
+            InfoLog(p);
     }
-	if(m_Type == 0)
-        InfoLog(p);
 }
 
 void DBWorker::PushUpdateDataF(const char * fmt, ...)
@@ -338,12 +339,13 @@ void DBWorker::PushUpdateDataF(const char * fmt, ...)
 	}
 
     ++m_Limit;
+
     {
         FastMutex::ScopedLock lk(m_Mutex);
         m_UpdateItems.push_back(p);
+        if(m_Type == 0)
+            InfoLog(p);
     }
-	if(m_Type == 0)
-        InfoLog(p);
 }
 
 bool DBWorker::DoDBQuery(const char* query)
@@ -429,6 +431,7 @@ void DBWorker::FreeMemBlock(void* ptr)
     }
 }
 
-
-
 }
+
+/* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */
+
