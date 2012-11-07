@@ -1072,6 +1072,8 @@ namespace GObject
         //    mergeCittaPages(p);
         //if (!GVAR.GetVar(GVAR_1530BUCHANG))
         //    buchang1530(p);
+        if (!GVAR.GetVar(GVAR_OLDRC7DAYBUCHANG))
+            p->sendOldRC7DayAward();
 		return true;
 	}
 
@@ -2414,6 +2416,7 @@ namespace GObject
 		globalPlayers.enumerate(player_load, 0);
         //GVAR.SetVar(GVAR_CITTASMERGE, 1);
         //GVAR.SetVar(GVAR_1530BUCHANG, 1);
+        GVAR.SetVar(GVAR_OLDRC7DAYBUCHANG, 1);
 
 		return true;
 	}

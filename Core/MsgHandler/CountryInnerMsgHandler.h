@@ -1597,6 +1597,12 @@ void OnRoamintQueqiaoLastLoot( GameMsgHdr& hdr, const void* data )
     player->checkLastQueqiaoAward();
 }
 
+void OnNewRC7DayLastLoot( GameMsgHdr& hdr, const void* data)
+{
+    MSG_QUERY_PLAYER(player);
+    player->checkLastNew7DayTargetAward();
+}
+
 void OnDelItemAny( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);

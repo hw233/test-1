@@ -275,7 +275,9 @@ namespace Script
 		CLASS_DEF(Player, postKillMonsterRoamResult);
         CLASS_DEF(Player, lastQueqiaoAwardPush);
         CLASS_DEF(Player, lastKillMonsterAwardPush);
+        CLASS_DEF(Player, lastNew7DayTargetAwardPush);
         CLASS_DEF(Player, luaUdpLog);
+        CLASS_DEF(Player, addFighterFromItem);
 
         CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);
@@ -1245,6 +1247,30 @@ namespace Script
     {
 		assert(player != NULL);
 		return Call<UInt8>("RunBirthdayAward", player);
+    }
+
+    bool GameActionLua::RunNewRC7DayLoginAward(Player* player, UInt8 val)
+    {
+        assert(player != NULL);
+        return Call<bool>("RunNewRC7DayLoginAward", player, val);
+    }
+
+    bool GameActionLua::RunNewRC7DayLoginAward2(Player* player, UInt8 val)
+    {
+        assert(player != NULL);
+        return Call<bool>("RunNewRC7DayLoginAward2", player, val);
+    }
+
+    bool GameActionLua::RunNewRC7DayRechargeAward(Player* player, UInt8 val, UInt32 totalRecharge)
+    {
+        assert(player != NULL);
+        return Call<bool>("RunNewRC7DayRechargeAward", player, val, totalRecharge);
+    }
+
+    UInt8 GameActionLua::RunNewRC7DayTargetAward(Player* player)
+    {
+        assert(player != NULL);
+        return Call<UInt8>("RunNewRC7DayTargetAward", player);
     }
 
     UInt8 GameActionLua::RunBlueDiamondAward(Player* player, UInt8 opt)
