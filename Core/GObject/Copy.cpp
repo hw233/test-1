@@ -70,6 +70,7 @@ UInt8 PlayerCopy::getFreeCount()
 
 UInt8 PlayerCopy::getGoldCount(UInt8 vipl)
 {
+    return 3;
     if (vipl == 1)
         return 1;
     if (vipl == 2)
@@ -77,6 +78,21 @@ UInt8 PlayerCopy::getGoldCount(UInt8 vipl)
     if (vipl >= 3)
         return 3;
     return 0; // TODO:
+}
+
+UInt32 PlayerCopy::getEnterGold(Player* pl)
+{
+    UInt8 vipl = pl->getVipLevel();
+    if(vipl > 3)
+        vipl = 3;
+    UInt32 extraVipGold[4][3] = {
+        {20, 20, 20},
+        { 0, 20, 20},
+        { 0,  0, 20},
+        { 0,  0,  0},
+    };
+
+    return GData::moneyNeed[GData::COPY_ENTER1+PLAYER_DATA(pl, copyGoldCnt)].gold + extraVipGold[vipl][PLAYER_DATA(pl, copyGoldCnt)];
 }
 
 void PlayerCopy::sendInfo(Player* pl, UInt8 id)
@@ -234,13 +250,14 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
         pl->copyUdpLog(id, 1);
         return 0;
     } else if (PLAYER_DATA(pl, copyGoldCnt) < getGoldCount(pl->getVipLevel())) {
-        if (pl->getGold() < GData::moneyNeed[GData::COPY_ENTER1+PLAYER_DATA(pl, copyGoldCnt)].gold) {
+        UInt32 gold = getEnterGold(pl);
+        if (pl->getGold() < gold) {
             pl->sendMsgCode(0, 1104);
             return 1;
         }
 
         ConsumeInfo ci(EnterCopy,0,0);
-        pl->useGold(GData::moneyNeed[GData::COPY_ENTER1+PLAYER_DATA(pl, copyGoldCnt)].gold, &ci);
+        pl->useGold(gold, &ci);
 
         ++PLAYER_DATA(pl, copyGoldCnt);
         DB1().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = %u, `copyGoldCnt` = %u WHERE `id` = %"I64_FMT"u",

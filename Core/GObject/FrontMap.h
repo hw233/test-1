@@ -34,6 +34,7 @@ public:
 
     static UInt8 getFreeCount();
     static UInt8 getGoldCount(UInt8 vipl);
+    static UInt32 getEnterGold(Player*);
 
 public:
     FrontMap() {}
