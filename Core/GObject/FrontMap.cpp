@@ -408,7 +408,7 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
                 }
                 else
                     randNum = randNum + 1;
-                pl->GetPackage()->AddItem2(9057, randNum, true, true);
+                pl->GetPackage()->AddItem2(9209, randNum, true, true);
             }
             if (GObject::Tianjie::instance().isTjOpened())
             { 

@@ -869,7 +869,8 @@ function initActTime(y, m, d)
   -- 合服斗剑排名奖励增加至30名活动(6/25-7/1)
   local  SerStartTm106 = { ['year'] = 2012, ['month'] = 6, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 四大名捕（6/25-7/31）
-  local  SerStartTm107 = { ['year'] = 2012, ['month'] = 6, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 单身剑侠party(与四大名捕相同)
+  local  SerStartTm107 = { ['year'] = 2012, ['month'] = 11, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm200= { ['year'] = 2012, ['month'] = 6, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm201= { ['year'] = 2012, ['month'] = 7, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
@@ -1145,7 +1146,7 @@ function initActTime(y, m, d)
   actTime113 = os.time(SerStartTm106);
   actTime114 = os.time(SerStartTm106) + 7 * 86400;
   actTime115 = os.time(SerStartTm107);
-  actTime116 = os.time(SerStartTm107) + 37 * 86400;
+  actTime116 = os.time(SerStartTm107) + 7 * 86400;
   actTime200= os.time(SerStartTm200);
   actTime201= os.time(SerStartTm200) + 6 * 86400;
 

@@ -532,7 +532,7 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
             }
             else
                 randNum = randNum + 1;
-            player->GetPackage()->AddItem2(9057, randNum, true, true);
+            player->GetPackage()->AddItem2(9209, randNum, true, true);
         }
         if (GObject::Tianjie::instance().isTjOpened())
         { 

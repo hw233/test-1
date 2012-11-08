@@ -468,7 +468,7 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                 }
                 else
                     randNum = randNum + 1;
-                pl->GetPackage()->AddItem2(9057, randNum, true, true);
+                pl->GetPackage()->AddItem2(9209, randNum, true, true);
             }
             if (GObject::Tianjie::instance().isTjOpened())
             {
