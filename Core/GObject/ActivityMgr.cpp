@@ -17,6 +17,7 @@ using namespace std;
 
 namespace GObject
 {
+#define SIGNIN_RECORD 7
 ActivityMgr::ActivityMgr(Player* p):_owner(p)
 {
 
@@ -33,14 +34,28 @@ void ActivityMgr::LoadFromDB(DBActivityData& data)
     _item.award    = data.award;
     _item.scores   = data.scores;
     _item.propsID  = data.propsID;
-
-    //解析flag
-    StringTokenizer ntk(data.flags, "|");
-    UInt32 size = std::min<UInt32>(ntk.count(), static_cast <UInt32>(AtyMaxFlag));
-
-    for(UInt32 i = 0 ; i < size; i ++)
     {
-        _item.flag[i] = atoi(ntk[i].c_str());
+        //解析flag
+        StringTokenizer ntk(data.flags, "|");
+        UInt32 size = std::min<UInt32>(ntk.count(), static_cast <UInt32>(AtyMaxFlag));
+
+        for(UInt32 i = 0 ; i < size; i ++)
+        {
+            _item.flag[i] = atoi(ntk[i].c_str());
+        }
+    }
+    {
+        //解析签到记录(7天)
+        StringTokenizer ntk(data.signRecord, "|");
+        UInt8 size = ntk.count();
+        for(UInt8 i = 0; i < size && i < SIGNIN_RECORD; ++i)
+        {
+            StringTokenizer tk(ntk[i].c_str(), ",");
+            Sign s;
+            s.day = atoi(tk[0].c_str());
+            s.time = atoi(tk[1].c_str());
+            _signRecord.push_back(s);
+        }
     }
 }
 UInt32 ActivityMgr::GetRandomReward()
@@ -131,6 +146,7 @@ void ActivityMgr::SubScores(UInt32 v)
 void ActivityMgr::UpdateToDB()
 {
     std::string strFlag;
+    std::string strSign;
 
     for (UInt32 i = 0; i < AtyMaxFlag; i ++)
     {
@@ -138,9 +154,18 @@ void ActivityMgr::UpdateToDB()
          if(i != AtyMaxFlag - 1)
              strFlag += "|";
     }
+    std::vector<Sign>::iterator it = _signRecord.begin();
+    while(it != _signRecord.end())
+    {
+        strSign += Itoa((*it).day);
+        strSign += ",";
+        strSign += Itoa((*it).time);
+        strSign += "|";
+        it ++;
+    }
 
-    DB().PushUpdateData("REPLACE INTO `activityData` (`playerId`, `overTime`, `awardId`,`point`,`award`, `flags`, `scores`, `propsID`) VALUES (%"I64_FMT"u, %u, %u, %u, %u, '%s', '%u', '%u')"  ,
-            this->_owner->getId(), _item.overTime,    _item.awardID,    _item.point, _item.award, strFlag.c_str(), _item.scores, _item.propsID);
+    DB().PushUpdateData("REPLACE INTO `activityData` (`playerId`, `overTime`, `awardId`,`point`,`award`, `flags`, `scores`, `propsID`, `signRecord`) VALUES (%"I64_FMT"u, %u, %u, %u, %u, '%s', '%u', '%u', '%s')"  ,
+            this->_owner->getId(), _item.overTime, _item.awardID, _item.point, _item.award, strFlag.c_str(), _item.scores, _item.propsID, strSign.c_str());
 }
 
 UInt8 ActivityMgr::GetOnlineRewardGetNum()
@@ -319,6 +344,7 @@ inline UInt8 GetAtyIDInClient(UInt32 item_enum)
 {
     return  static_cast<UInt8>(item_enum + 1);
 }
+
 void ActivityMgr::SendActivityInfo(Stream& s)
 {
     UInt8 c1, m1 = 0;
@@ -475,6 +501,25 @@ void ActivityMgr::ActivityList(UInt8 type)
     }
     st << Stream::eos;
     _owner->send(st);
+}
+
+void ActivityMgr::AddSignTime(UInt8 day)
+{
+   UInt32 now = TimeUtil::Now();
+   if(_signRecord.size() >= SIGNIN_RECORD){
+       std::vector<Sign>::iterator it = _signRecord.begin();
+       while(it != _signRecord.end())
+       {
+            if(0 != day && (*it).day == day)
+                return;
+            it ++;
+       }
+       _signRecord.erase(_signRecord.begin());
+   }
+   Sign s;
+   s.day = day;
+   s.time = now;
+   _signRecord.push_back(s);
 }
 
 }

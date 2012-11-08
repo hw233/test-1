@@ -1354,5 +1354,40 @@ namespace Script
 		assert(player != NULL);
 		return Call<UInt32>("GetBDSupermanPrice", player, itemId, isUsed);
     }
+    
+    void GameActionLua::doStrong(Player* pl, UInt8 id, UInt32 param1, UInt32 param2)
+    {
+        Call<void>("doStrong", pl, id, param1, param2);
+    }
+    
+    UInt8 GameActionLua::GetSthCheckFlag(UInt8 idx)
+    {
+        return Call<UInt8>("GetSthCheckFlag", idx);
+    }
+    
+    UInt8 GameActionLua::EveryDayRoarSoul()
+    {
+        return Call<UInt8>("EveryDayRoarSoul");
+    }
+    
+    lua_tinker::table GameActionLua::openGreenBoxStrong()
+    {
+        return Call<lua_tinker::table>("openGreenBoxStrong");
+    }
+    
+    lua_tinker::table GameActionLua::openBlueBoxStrong()
+    {
+        return Call<lua_tinker::table>("openBlueBoxStrong");
+    }
+    
+    lua_tinker::table GameActionLua::openPurpleBoxStrong()
+    {
+        return Call<lua_tinker::table>("openPurpleBoxStrong");
+    }
+    
+    lua_tinker::table GameActionLua::openOrangeBoxStrong()
+    {
+        return Call<lua_tinker::table>("openOrangeBoxStrong");
+    }
 }
 

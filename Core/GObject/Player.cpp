@@ -555,6 +555,7 @@ namespace GObject
 		m_Athletics = new Athletics(this);
 		m_AttainMgr = new AttainMgr(this);
         m_ActivityMgr = new ActivityMgr(this);
+        m_StrengthenMgr = new StrengthenMgr(this);
         m_HeroMemo = new HeroMemo(this);
         m_ShuoShuo = new ShuoShuo(this);
         m_CFriend = new CFriend(this);
@@ -3384,6 +3385,7 @@ namespace GObject
 		event->updateDB(true);
 
         OnHeroMemo(MC_FIGHTER, MD_STARTED, 0, 0);
+        GameAction()->doStrong(this, SthTaskHook, 0,0);
 		return true;
 	}
 #if 0
@@ -3465,7 +3467,7 @@ namespace GObject
         incIcCount();
 		GameMsgHdr hdr(0x178, WORKER_THREAD_WORLD, this, 0);
 		GLOBAL().PushMsg(hdr, NULL);
-        GameAction()->doAty(this, AtyTaskHook, 0,0);
+        GameAction()->doStrong(this, SthHookSpeed, 0,0);
         OnHeroMemo(MC_FIGHTER, MD_STARTED, 0, 1);
 	}
 
@@ -4044,6 +4046,7 @@ namespace GObject
         dclogger.consume(this, _playerData.gold, c);
 #endif
 #endif // _WIN32
+        AddVar(VAR_USEGOLD_CNT, c);
 		return _playerData.gold;
 	}
 
@@ -4160,6 +4163,7 @@ namespace GObject
 		SYSMSG_SENDV(156, this, c);
 		SYSMSG_SENDV(1056, this, c);
 		sendModification(2, _playerData.coupon);
+        AddVar(VAR_USECOUPON_CNT, c);
 		return _playerData.coupon;
 	}
 
@@ -4221,6 +4225,7 @@ namespace GObject
 		SYSMSG_SENDV(152, this, c);
 		SYSMSG_SENDV(1052, this, c);
 		sendModification(3, _playerData.tael);
+        AddVar(VAR_USETAEL_CNT, c);
 		return _playerData.tael;
 	}
 	void Player::useTael2(UInt32 c, Player *attacker, ConsumeInfo * ci)//nature challengge use
@@ -6274,8 +6279,10 @@ namespace GObject
 		}
 		st << Stream::eos;
 		send(st);
+        /*
         if(type > 0)
             GameAction()->doAty(this, AtyBarRef, 0, 0);
+        */
 	}
 
 	UInt16 Player::calcNextTavernUpdate(UInt32 curtime)
@@ -8844,8 +8851,10 @@ namespace GObject
 		}
 		st << Stream::eos;
 		send(st);
+        /*
         if(type > 0)
             GameAction()->doAty(this, AtyBookStore, 0 , 0);
+        */
 	}
 
 	UInt16 Player::calcNextBookStoreUpdate(UInt32 curtime)
@@ -9992,7 +10001,7 @@ namespace GObject
         GetPackage()->DelItem2(ib2, 1);
         SYSMSG_SEND(2002, this);
 
-        GameAction()->doAty(this, AtyTripodFire , 0, 0);
+        GameAction()->doStrong(this, SthTripodFire , 0, 0);
     }
 
     void Player::getAward()

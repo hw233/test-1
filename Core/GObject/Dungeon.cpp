@@ -126,7 +126,7 @@ UInt8 Dungeon::playerEnter( Player * player )
 	enterLevel(player, dpi->level);
 	updateToDB(player, *dpi);
 
-    GameAction()->doAty( player, AtyDungeon, 0 , 0);
+    GameAction()->doStrong( player, SthDungeon, 0 , 0);
 	return 0;
 }
 

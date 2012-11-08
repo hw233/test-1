@@ -353,9 +353,10 @@ local dayScore = {
 function doAtySignIn(player, id, month, day)
     if nil == player or nil == id or nil == month or nil == day
     then
-        return
+        return 0
     end
     local mgr = player:GetActivityMgr()
+    --[[
     local mon_tbl = dayScore[tonumber(month)]
     if nil == mon_tbl
     then
@@ -366,21 +367,32 @@ function doAtySignIn(player, id, month, day)
     then 
         return
     end
+    --]]
     --判断标志位
     local needflag = checkFlag[id]
     if nil == needflag
     then
-        return
+        return 0
     end
     local curflag = mgr:GetFlag(id)
     if curflag >= 1 or curflag >= needflag
     then
-         return
+         return 0
     else
         mgr:UpdateFlag(id, curflag + 1)
     end 
+    local chance = { 17, 34, 51, 68, 85, 100 }
+    local scores = { 10, 20, 30, 40, 50, 60 }
+    local rand = math.random(100)
+    local score = 0
+    for i = 1, #chance do
+        if rand <= chance[i] then
+            score = scores[i]
+        end
+    end
     mgr:AddScores(score)
     mgr:UpdateToDB()
+    return score
 end
 
 local exchangeProps = {

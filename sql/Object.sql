@@ -1199,11 +1199,26 @@ CREATE TABLE `activityData` (
    `playerId` bigint(20) unsigned NOT NULL,
    `overTime` int(10) unsigned NOT NULL,
    `awardId`  int(10) unsigned NOT NULL,
-    `point`   int(10) unsigned NOT NULL,
-    `award`   int(10) unsigned NOT NULL,
-   `flags`    varchar(255) NOT NULL DEFAULT '',
-    `scores`  int(10) unsigned NOT NULL,
-    `propsID` int(10) unsigned NOT NULL,
+   `point`   int(10) unsigned NOT NULL,
+   `award`   int(10) unsigned NOT NULL,
+   `flags`   varchar(255) NOT NULL DEFAULT '',
+   `scores`  int(10) unsigned NOT NULL,
+   `propsID` int(10) unsigned NOT NULL,
+   `signRecord` varchar(255) NOT NULL DEFAULT '',
+    PRIMARY KEY (`playerId`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `strengthenData`;
+CREATE TABLE `strengthenData` (
+   `playerId` bigint(20) unsigned NOT NULL,
+   `overTime` int(10) unsigned NOT NULL,
+   `souls`  int(10) unsigned NOT NULL,
+   `soulId` tinyint(3) unsigned NOT NULL,
+   `flags`  varchar(255) NOT NULL DEFAULT '',
+   `greenBox`  varchar(255) NOT NULL DEFAULT '',
+   `blueBox`  varchar(255) NOT NULL DEFAULT '',
+   `purpleBox`  varchar(255) NOT NULL DEFAULT '',
+   `orangeBox`  varchar(255) NOT NULL DEFAULT '',
     PRIMARY KEY (`playerId`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 

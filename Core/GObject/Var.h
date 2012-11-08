@@ -256,6 +256,9 @@ namespace GObject
 
         VAR_ITEM_9178_FAILED_COUNT = 207, // 都率宝伞礼包连续开启失败次数
                                           // （ItemNormal.lua里面值已经写死）
+        VAR_USETAEL_CNT = 208, //玩家每日使用银币的总数
+        VAR_USECOUPON_CNT = 209, //玩家每日使用礼券的总数
+        VAR_USEGOLD_CNT = 210,  //玩家每日使用仙石的总数
 
         VAR_LOCAL_RANK = 240, //本服斗剑，当前排名
         VAR_LOCAL_MAXRANK = 241, //本服斗剑，最好排名
@@ -506,6 +509,9 @@ namespace GObject
             REGISTER_VAR(VAR_CTS_TARGET_COUNT, CYCLE_NONE);
 
             REGISTER_VAR(VAR_ITEM_9178_FAILED_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_USETAEL_CNT, CYCLE_DAY);
+            REGISTER_VAR(VAR_USECOUPON_CNT, CYCLE_DAY);
+            REGISTER_VAR(VAR_USEGOLD_CNT, CYCLE_DAY);
 
             REGISTER_VAR(VAR_LOCAL_RANK, CYCLE_NONE);
             REGISTER_VAR(VAR_LOCAL_MAXRANK, CYCLE_NONE);

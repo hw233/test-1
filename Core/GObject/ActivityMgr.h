@@ -87,6 +87,12 @@ namespace GObject
 
     typedef std::vector<stRtyReward>  RtyRewards;
     typedef std::vector<RtyRewards> OnlineRewards;
+    struct Sign
+    {
+        UInt8 day;
+        UInt32 time;
+    };
+    typedef std::vector<Sign> SignRecord;
 //    struct stOnlineReward
   //  {
      //   Rty
@@ -107,6 +113,7 @@ namespace GObject
             Player*  _owner;
             ActivityItem  _item;
             RtyRewards    _onlineReward;
+            SignRecord    _signRecord; 
             //std::Map<UInt32, UInt32> _randmap;  //上线奖励中， 多种奖中励随机一个的，需要记录这个随机值。
             //func
             UInt32 GetRandomReward() ;
@@ -164,6 +171,7 @@ namespace GObject
             UInt32 GetScores() { return _item.scores;}
             UInt32 GetPropsID() { return _item.propsID;}
             void SetPropsID(UInt32 id = 0);
+            void AddSignTime(UInt8 day = 0);
     };
 
 }

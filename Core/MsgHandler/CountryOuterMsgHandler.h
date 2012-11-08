@@ -1616,12 +1616,17 @@ void OnFighterTrainReq( GameMsgHdr& hdr, FighterTrainReq& ftr )
     if (ftr._type > 4 && (ftr._type&0xF) == 5)
     {
         player->trainFighter(ftr._fgtId, ftr._type);
+        GameAction()->doStrong(player, SthGenius, 0, 0);
         return;
     }
 
 	Stream st(REP::POTENCIAL);
 	st << ftr._type << player->trainFighter(ftr._fgtId, ftr._type) << Stream::eos;;
 	player->send(st);
+    if(1 == ftr._type || 2 == ftr._type)
+        GameAction()->doStrong(player, SthPotential, 0, 0);
+    if(3 == ftr._type || 4 == ftr._type)
+        GameAction()->doStrong(player, SthCapacity, 0, 0);
 }
 
 void OnTakeOnlineRewardReq( GameMsgHdr& hdr, TakeOnlineRewardReq& req)
@@ -1904,6 +1909,7 @@ void OnBatchMergeReq( GameMsgHdr& hdr, BatchMergeReq& bmr )
 	st << result << gemIdOut << gemUnbindOut << gemBindOut << succTimes << failedTimes;
 	st << Stream::eos;
 	player->send(st);
+    GameAction()->doStrong(player, SthMergeGem, 0, 0);
 }
 
 #if 0
@@ -2900,7 +2906,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                     }
                     st << static_cast<UInt8>(0);
 
-                    GameAction()->doAty(player, AtyBuy, 0, 0);
+                    //GameAction()->doAty(player, AtyBuy, 0, 0);
 
                     player->AddVar(VAR_DISCOUNT_1+varoff, 1);   // 更新购买次数（限购商品）
                     player->sendDiscountLimit();
@@ -2927,7 +2933,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 					player->useCoupon(price,&ci);
 					st << static_cast<UInt8>(0);
 
-                    GameAction()->doAty( player, AtyBuy, 0,0);
+                    //GameAction()->doAty( player, AtyBuy, 0,0);
                 }
 			}
 			break;
@@ -2950,7 +2956,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 				    ConsumeInfo ci(Item,lr._itemId,lr._count);
 					player->useTael(price,&ci);
 					st << static_cast<UInt8>(0);
-                    GameAction()->doAty( player,AtyBuy, 0,0);
+                    //GameAction()->doAty( player,AtyBuy, 0,0);
                 }
 			}
 			break;
@@ -3006,7 +3012,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 					ConsumeInfo ci(Item,lr._itemId, lr._count);
 					player->useAchievement(price,&ci);
 					st << static_cast<UInt8>(0);
-                    GameAction()->doAty( player, AtyBuy, 0,0);
+                    //GameAction()->doAty( player, AtyBuy, 0,0);
                     player->storeUdpLog(1141, 6, lr._itemId, lr._count);
 				}
 			}
@@ -3041,7 +3047,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                         player->usePrestige(price,&ci);
                         st << static_cast<UInt8>(0);
 
-                        GameAction()->doAty(player, AtyBuy, 0,0);
+                        //GameAction()->doAty(player, AtyBuy, 0,0);
                         player->storeUdpLog(1141, 7, lr._itemId, lr._count);
                     }
                 }
@@ -3102,7 +3108,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 				        ConsumeInfo ci(Item,lr._itemId,lr._count);
 					    player->useMoneyArena(price,&ci);
                         st << static_cast<UInt8>(0);
-                        GameAction()->doAty( player,AtyBuy, 0,0);
+                        //GameAction()->doAty( player,AtyBuy, 0,0);
                     }
                 }
             }
@@ -3129,7 +3135,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                         player->useClanProffer(price,&ci);
                         st << static_cast<UInt8>(0);
 
-                        GameAction()->doAty(player, AtyBuy, 0,0);
+                        //GameAction()->doAty(player, AtyBuy, 0,0);
                     }
                 }
             }
@@ -3166,7 +3172,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                     player->consumeGold(price);
 					st << static_cast<UInt8>(0);
 
-                    GameAction()->doAty(player, AtyBuy ,0,0);
+                    //GameAction()->doAty(player, AtyBuy ,0,0);
                 }
 			}
 			break;
@@ -5262,6 +5268,49 @@ void OnSkillStrengthen( GameMsgHdr& hdr, const void* data)
         }
     }
 }
+
+void OnMakeStrong( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    StrengthenMgr* mgr = player->GetStrengthenMgr();
+    mgr->CheckTimeOver();
+    UInt8 type = 0;
+    brd >> type;
+    switch(type)
+    {
+        case 0x01: //变强之魂信息改变
+            {
+                mgr->SendStrengthenInfo();
+            }
+            break;
+        case 0x02: //变强之路信息
+            {
+                mgr->SendStrengthenRank();
+            }
+            break;
+        case 0x03: //请求及打开变强秘宝宝箱
+            {
+                UInt8 boxId = 0;
+                UInt8 index = 0;
+                brd >> boxId;
+                brd >> index;
+                if(boxId > 8 || index > STRONGBOX_CNT)
+                    return;
+                mgr->SendOpenChestsInfo(boxId, index);
+            }
+            break;
+        case 0x04: //每天一次变强之吼
+            {
+                mgr->EveryDayRoar();
+            }
+            break;
+        default:
+            return;
+            break;
+    }
+}
+
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

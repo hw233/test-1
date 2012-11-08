@@ -375,7 +375,7 @@ void HeroIsland::rankReward()
         }
         else
         {
-            GameAction()->doAty((*i)->player, AtyHeroIsland, 0 ,0);
+            GameAction()->doStrong((*i)->player, SthHeroIsland, 0 ,0);
         }
     }
 }

@@ -86,6 +86,8 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20121029_2.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20121031_1.sql # must be once for delete var total
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20121108_1.sql # must be once for delete var total
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20121111_1.sql
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20121111_2.sql
 
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/cleartotalrecharge.sql # must be once for delete recharge total
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearconsume.sql # must be once for delete total consume

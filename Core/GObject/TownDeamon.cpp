@@ -941,7 +941,7 @@ void TownDeamon::addActivity(Player* pl)
 {
     if (!pl->GetVar(VAR_TOWNDEAMON))
     {
-        GameAction()->doAty(pl, AtyTownDeamon, 0, 0);
+        GameAction()->doStrong(pl, SthTownDeamon, 0, 0);
         pl->SetVar(VAR_TOWNDEAMON, 1);
     }
 }

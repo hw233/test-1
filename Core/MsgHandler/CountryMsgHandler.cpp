@@ -157,6 +157,7 @@ MSG_REG_2(GameMsgHdr, REQ::SKILLSTRENGTHEN, OnSkillStrengthen);
 MSG_REG_2(GameMsgHdr, REQ::ACTIVITY_LIST, OnActivityList);
 MSG_REG_2(GameMsgHdr, REQ::ACTIVITY_REWARD,OnActivityReward);
 MSG_REG_2(GameMsgHdr, REQ::ACTIVITY_SIGNIN, OnActivitySignIn);
+MSG_REG_2(GameMsgHdr, REQ::STRENGTHEN_LIST, OnMakeStrong);
 
 MSG_REG_2(GameMsgHdr, REQ::SECOND_SOUL, OnSecondSoulReq);
 MSG_REG_2(GameMsgHdr, REQ::RC7DAY, OnRC7Day);

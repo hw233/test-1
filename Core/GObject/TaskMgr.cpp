@@ -343,17 +343,17 @@ namespace GObject
         if(taskType->m_Class == 4)
         {
             GameAction()->doAttainment(m_PlayerOwner,  Script::SUBMIT_SHIMEN_TASKS,   1);
-            GameAction()->doAty(m_PlayerOwner, AtyShimenTask, 0, 0);
+            GameAction()->doStrong(m_PlayerOwner, SthShimenTask, 0, 0);
         }
         else if(taskType->m_Class == 5)
         {
             GameAction()->doAttainment(m_PlayerOwner,  Script:: SUBMIT_YAMEN_TASKS,   1);
-            GameAction()->doAty(m_PlayerOwner, AtyYamenTask, 0, 0);
+            GameAction()->doStrong(m_PlayerOwner, SthYamenTask, 0, 0);
         }
         else if(taskType->m_Class == 6)
         {
             GameAction()->doAttainment(m_PlayerOwner,  Script:: SUBMIT_CLAN_TASKS,   1);
-            GameAction()->doAty(m_PlayerOwner, AtyClanTask, 0, 0);
+            //GameAction()->doAty(m_PlayerOwner, AtyClanTask, 0, 0);
         }
 
     }

@@ -228,6 +228,7 @@ void OnAthleticsReq( GameMsgHdr& hdr, const void * data )
 	player->GetAthletics()->attack(defer);
 	GameAction()->RunOperationTaskAction0(player, 1);
 	GameAction()->RunOperationTaskAction0(player, 2);
+    GameAction()->doStrong(player, SthAthletics1, 0,0);
 }
 
 void OnAthleticsMartialReq( GameMsgHdr& hdr, const void * data )
@@ -1398,7 +1399,7 @@ void  OnDoActivity( GameMsgHdr& hdr, const void* data)
             player->SetVar(VAR_TOWNDEAMON, 1);
     }
 
-    GameAction()->doAty(player, co->id, co->param1, co->param2);
+    GameAction()->doStrong(player, co->id, co->param1, co->param2);
 }
 void OnAwardHIPrestige( GameMsgHdr& hdr, const void* data )
 {

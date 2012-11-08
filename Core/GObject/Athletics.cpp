@@ -531,7 +531,7 @@ void Athletics::attackMartial(Player* defer)
     UInt8 res = 2;
     UInt32 id = 0;
 
-    GameAction()->doAty(this->_owner, AtyAthletics, 0, 0);
+    GameAction()->doStrong(this->_owner, SthAthletics2, 0, 0);
     do
     {
         UInt8 idx = 0xFF;

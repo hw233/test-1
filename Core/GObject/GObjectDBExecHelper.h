@@ -1016,6 +1016,7 @@ struct DBActivityData
     std::string flags;
     UInt32 scores;
     UInt32 propsID;
+    std::string signRecord;
 };
 struct DBHeroMemo
 {
@@ -1039,6 +1040,19 @@ struct DBBigLock
 {
     UInt32 playerId;
     UInt32 lockExpireTime;
+};
+
+struct DBStrengthenData
+{
+    UInt64 playerId;
+    UInt32 overTime;
+    UInt8  souls;
+    UInt8  soulId;
+    std::string flags;
+    std::string greenBox;
+    std::string blueBox;
+    std::string purpleBox;
+    std::string orangeBox;
 };
 
 }
@@ -2237,7 +2251,7 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBActivityData)
-SPECIALDEF(8)
+SPECIALDEF(9)
 (
     UInt64, playerId,
     UInt32, overTime,
@@ -2246,7 +2260,8 @@ SPECIALDEF(8)
     UInt32, award,
     std::string, flags,
     UInt32, scores,
-    UInt32, propsID
+    UInt32, propsID,
+    std::string, signRecord
 )
 SPECIALEND()
 
@@ -2358,6 +2373,21 @@ SPECIALDEF(2)
 (
 	UInt32, playerId,
     UInt32, lockExpireTime
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBStrengthenData)
+SPECIALDEF(9)
+(
+    UInt64, playerId,
+    UInt32, overTime,
+    UInt8, souls,
+    UInt8, soulId,
+    std::string, flags,
+    std::string, greenBox,
+    std::string, blueBox,
+    std::string, purpleBox,
+    std::string, orangeBox
 )
 SPECIALEND()
 
