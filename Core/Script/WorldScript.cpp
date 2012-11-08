@@ -118,12 +118,14 @@ void WorldScript::init()
     def("setFallAct", GObject::World::setFallAct);
     def("setQQGameAct", GObject::World::setQQGameAct);
     def("set3366PrivilegeAct", GObject::World::set3366PrivilegeAct);
+    def("setQzonePYPrivilegeAct", GObject::World::setQzonePYPrivilegeAct);
     def("getBlueDiamondAct", GObject::World::getBlueDiamondAct);
     def("getYellowDiamondAct", GObject::World::getYellowDiamondAct);
     def("getQQVipAct", GObject::World::getQQVipAct);
     def("getFallAct", GObject::World::getFallAct);
     def("getQQGameAct", GObject::World::getQQGameAct);
     def("get3366PrivilegeAct", GObject::World::get3366PrivilegeAct);
+    def("getQzonePYPrivilegeAct", GObject::World::getQzonePYPrivilegeAct);
 	def("setJune", GObject::World::setJune);
 	def("getJune", GObject::World::getJune);
 	def("setJune1", GObject::World::setJune1);

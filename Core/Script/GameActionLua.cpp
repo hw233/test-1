@@ -128,6 +128,7 @@ namespace Script
         lua_tinker::def(_L, "getFallAct", GObject::World::getFallAct);
         lua_tinker::def(_L, "getQQGameAct", GObject::World::getQQGameAct);
         lua_tinker::def(_L, "get3366PrivilegeAct", GObject::World::get3366PrivilegeAct);
+        lua_tinker::def(_L, "getQzonePYPrivilegeAct", GObject::World::getQzonePYPrivilegeAct);
         lua_tinker::def(_L, "getRechargeNextRet", GObject::World::getRechargeNextRet);
         lua_tinker::def(_L, "setRechargeNextRetStart", GObject::World::setRechargeNextRetStart);
         lua_tinker::def(_L, "setMergeAthAct", GObject::World::setMergeAthAct);

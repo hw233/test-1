@@ -3081,10 +3081,20 @@ namespace GObject
 
                 if (isOffical())
                     exp -= (exp/10);
-                if((this->getPlatform() == 10 && World::getQQGameAct()) || (this->getPlatform() == 11 && World::get3366PrivilegeAct()))
+                if((this->getPlatform() == 10 && World::getQQGameAct()) || (this->getPlatform() == 11 && World::get3366PrivilegeAct()) || ((getPlatform() == 1 || getPlatform() == 2) && World::getQzonePYPrivilegeAct()))
                 {
                     UInt32 extraExp = exp / 2;//蓝黄钻野外手动打怪经验+50%
-                    if(this->getPlatform() == 10 && World::getQQGameAct())
+                    if(getPlatform() == 1 && World::getQzonePYPrivilegeAct())
+                    {
+                        SYSMSG_SENDV(1096, this, extraExp);
+                        SYSMSG_SENDV(1097, this, extraExp);
+                    }
+                    else if(getPlatform() == 2 && World::getQzonePYPrivilegeAct())
+                    {
+                        SYSMSG_SENDV(1098, this, extraExp);
+                        SYSMSG_SENDV(1099, this, extraExp);
+                    }
+                    else if(this->getPlatform() == 10 && World::getQQGameAct())
                     {
                         SYSMSG_SENDV(1092, this, extraExp);
                         SYSMSG_SENDV(1093, this, extraExp);
@@ -8840,7 +8850,7 @@ namespace GObject
 	void Player::updateNextBookStoreUpdate(UInt32 curtime)
 	{
         UInt32 tmp = _bookStoreInterval;
-        if((this->getPlatform() == 10 && World::getQQGameAct()) || (this->getPlatform() == 11 && World::get3366PrivilegeAct()))
+        if((this->getPlatform() == 10 && World::getQQGameAct()) || (this->getPlatform() == 11 && World::get3366PrivilegeAct()) || ((getPlatform() == 1 || getPlatform() == 2) && World::getQzonePYPrivilegeAct()))
             tmp /= 2;
         if(tmp == 0)
             tmp = 1;

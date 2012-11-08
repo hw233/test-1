@@ -1387,7 +1387,7 @@ void AthleticsRank::notifyAthletcisOver(Player * atker, Player * defer, UInt32 i
         if(bNeedChangePos)
 		{
             flag |= 0x04;
-            UInt32 atkDataRank;
+            UInt32 atkDataRank = ATHLETICS_RANK_MAX_CNT + 1;
             if(!atker->isNewRank())
             {
                 atkDataRank = data->rank;
