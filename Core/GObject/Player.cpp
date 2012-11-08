@@ -10221,7 +10221,14 @@ namespace GObject
             return;
         Stream st(REP::GETAWARD);
         st << static_cast<UInt8>(7);
-        st << GameAction()->RunNewRegisterAwardAD_RF(this, 1) << Stream::eos;
+        UInt8 succ = GameAction()->RunNewRegisterAwardAD_RF(this, 1);
+        if(0 == succ)
+        {
+            st << succ << Stream::eos;
+            send(st);
+            return;
+        }
+        st << succ << Stream::eos;
         send(st);
         SetVar(VAR_AWARD_NEWREGISTER, 3);
     }
@@ -10232,7 +10239,14 @@ namespace GObject
             return;
         Stream st(REP::GETAWARD);
         st << static_cast<UInt8>(8);
-        st << GameAction()->RunNewRegisterAwardAD_RF(this, 2) << Stream::eos;
+        UInt8 succ = GameAction()->RunNewRegisterAwardAD_RF(this, 2);
+        if(0 == succ)
+        {
+            st << succ << Stream::eos;
+            send(st);
+            return;
+        }
+        st << succ << Stream::eos;
         send(st);
         SetVar(VAR_AWARD_NEWREGISTER, 4);
     }
@@ -10243,7 +10257,14 @@ namespace GObject
             return;
         Stream st(REP::GETAWARD);
         st << static_cast<UInt8>(9);
-        st << GameAction()->RunNewRegisterAwardAD_RF(this, 3) << Stream::eos;
+        UInt8 succ = GameAction()->RunNewRegisterAwardAD_RF(this, 3);
+        if(0 == succ)
+        {
+            st << succ << Stream::eos;
+            send(st);
+            return;
+        }
+        st << succ << Stream::eos;
         send(st);
         SetVar(VAR_AWARD_NEWREGISTER, 5);
     }
