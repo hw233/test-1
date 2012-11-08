@@ -1214,6 +1214,11 @@ namespace Script
 		assert(player != NULL);
 		return Call<bool>("RunSSDTAward", player, opt);
 	}
+    bool GameActionLua::Run11ActAward(Player* player, UInt8 opt)
+	{
+		assert(player != NULL);
+		return Call<bool>("Run11ActAward", player, opt);
+	}
 
     UInt16 GameActionLua::RunHappyAward(Player* player, UInt8 opt)
     {

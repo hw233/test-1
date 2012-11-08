@@ -10093,8 +10093,48 @@ namespace GObject
         case 12:
             getAwardBlueDiamond(opt);
             break;
-     
+        case 13:
+            get11DailyAward(opt);
+            break;
         }
+    }
+
+    void Player::get11DailyAward(UInt8 opt)
+    {
+        if(!World::get11Act())
+            return;
+
+        if(opt == 1) 
+        {
+            if(GetVar(VAR_ACT_LOGIN_AWARD) != 0)
+                return;
+            if(!GameAction()->Run11ActAward(this, opt))
+                return;
+            SetVar(VAR_ACT_LOGIN_AWARD, 1);
+        }
+        else if(opt == 2) 
+        {
+            if(GetVar(VAR_ACT_LOGIN_AWARD_VIP) != 0 || getVipLevel() == 0)
+                return;
+            if(!GameAction()->Run11ActAward(this, opt))
+                return;
+            SetVar(VAR_ACT_LOGIN_AWARD_VIP, 1);
+        }     
+
+        send11DailyInfo();
+    }
+
+    void Player::send11DailyInfo()
+    {
+        if(!World::get11Act())
+            return;
+
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(13);
+        UInt8 normal_award = GetVar(VAR_ACT_LOGIN_AWARD);
+        UInt8 vip_award = GetVar(VAR_ACT_LOGIN_AWARD_VIP);
+        st << normal_award << vip_award << Stream::eos;
+        send(st);
     }
 
     void Player::getSSDTAward(UInt8 opt)
@@ -10190,7 +10230,14 @@ namespace GObject
             return;
         Stream st(REP::GETAWARD);
         st << static_cast<UInt8>(7);
-        st << GameAction()->RunNewRegisterAwardAD_RF(this, 1) << Stream::eos;
+        UInt8 succ = GameAction()->RunNewRegisterAwardAD_RF(this, 1);
+        if(0 == succ)
+        {
+            st << succ << Stream::eos;
+            send(st);
+            return;
+        }
+        st << succ << Stream::eos;
         send(st);
         SetVar(VAR_AWARD_NEWREGISTER, 3);
     }
@@ -10201,7 +10248,14 @@ namespace GObject
             return;
         Stream st(REP::GETAWARD);
         st << static_cast<UInt8>(8);
-        st << GameAction()->RunNewRegisterAwardAD_RF(this, 2) << Stream::eos;
+        UInt8 succ = GameAction()->RunNewRegisterAwardAD_RF(this, 2);
+        if(0 == succ)
+        {
+            st << succ << Stream::eos;
+            send(st);
+            return;
+        }
+        st << succ << Stream::eos;
         send(st);
         SetVar(VAR_AWARD_NEWREGISTER, 4);
     }
@@ -10212,7 +10266,14 @@ namespace GObject
             return;
         Stream st(REP::GETAWARD);
         st << static_cast<UInt8>(9);
-        st << GameAction()->RunNewRegisterAwardAD_RF(this, 3) << Stream::eos;
+        UInt8 succ = GameAction()->RunNewRegisterAwardAD_RF(this, 3);
+        if(0 == succ)
+        {
+            st << succ << Stream::eos;
+            send(st);
+            return;
+        }
+        st << succ << Stream::eos;
         send(st);
         SetVar(VAR_AWARD_NEWREGISTER, 5);
     }
@@ -14148,12 +14209,27 @@ void EventTlzAuto::notify(bool isBeginAuto)
     UInt32 Player::getBattlePoint()
     {
         UInt32 bp = 0;
-		for(int j = 0; j < 5; ++ j)
-		{
-            Fighter* fighter = _playerData.lineup[j].fighter;
-            if(fighter)
-                bp += fighter->getBattlePoint();
-		}
+        if(CURRENT_THREAD_ID() == getThreadId())
+        {
+            for(int j = 0; j < 5; ++ j)
+            {
+                Fighter* fighter = _playerData.lineup[j].fighter;
+                if(fighter)
+                    bp += fighter->getBattlePoint();
+            }
+        }
+        else
+        {
+            GameMsgHdr hdr(0x267, getThreadId(), this, 0);
+            GLOBAL().PushMsg(hdr, NULL);
+
+            for(int j = 0; j < 5; ++ j)
+            {
+                Fighter* fighter = _playerData.lineup[j].fighter;
+                if(fighter)
+                    bp += fighter->getBattlePoint_Dirty();
+            }
+        }
 
         return bp;
     }

@@ -719,6 +719,7 @@ void OnDailyCheck( GameMsgHdr& hdr, const void * data )
     player->GetShuoShuo()->reset();
     player->GetCFriend()->reset();
     player->sendSSDTInfo();
+    player->send11DailyInfo();
     player->SetVar(VAR_JUNE_HAPPY, 0);
     player->SetVar(VAR_JUNE_ITEM, 0);
     player->sendHappyInfo();
@@ -1718,6 +1719,12 @@ void OnSetTitle( GameMsgHdr& hdr, const void* data )
     MSG_QUERY_PLAYER(player);
     titleData = *reinterpret_cast<TitleData*>(const_cast<void *>(data));
     player->setTitle(titleData.title, titleData.timeLen);
+}
+
+void OnFighterCheckDiry( GameMsgHdr& hdr, const void * data )
+{
+    MSG_QUERY_PLAYER(player);
+    player->getBattlePoint();
 }
 
 #endif // _COUNTRYINNERMSGHANDLER_H_

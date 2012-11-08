@@ -278,6 +278,10 @@ public:
     inline static bool getWansheng()
     { return _wansheng; }
 
+    inline static void set11Act(bool v)
+    { _11Act= v; }
+    inline static bool get11Act()
+    { return _11Act; }
 
     inline static void setGuoqing(bool v)
     { _guoqing = v; }
@@ -468,6 +472,7 @@ public:
     static bool _july;
     static bool _qixi;
     static bool _wansheng;
+    static bool _11Act;
     static bool _guoqing;
     static bool _enchant_gt11;
     static bool _rechargenextret;

@@ -244,6 +244,7 @@ namespace Script
         bool onTurnOnRF7Day(Player* player, UInt32 total, UInt32 offset);
         lua_tinker::table luckyDraw(Player* player, UInt8 id, UInt8 num);
         bool RunSSDTAward(Player* player, UInt8 opt);
+        bool Run11ActAward(Player* player, UInt8 opt);
         lua_tinker::table luckyDraw(Player* player, UInt8 id, UInt8 num, bool bind);
         UInt16 RunHappyAward(Player* player, UInt8 opt);
         UInt16 RunTargetAward(Player* player);
