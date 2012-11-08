@@ -958,6 +958,11 @@ namespace GObject
         if (World::_blueactiveday)
             onBlueactiveday();
 
+        if (World::getQgameGiftAct())
+        {
+            getQgameGiftAward();
+        }
+
         /**
          * 1：蓝钻
          * 2：黄钻
@@ -1116,6 +1121,9 @@ namespace GObject
 
 #define WEBDOWNLOAD 255
 #define OFFICAL 12
+#define PF_UNION 17
+#define PF_XY 171
+#define PF_XY_CH 10040
 
     void Player::udpLog(UInt8 platform, const char* str1, const char* str2, const char* str3, const char* str4,
                 const char* str5, const char* str6, const char* type, UInt32 count)
@@ -1153,6 +1161,29 @@ namespace GObject
             UInt8 platform = atoi(getDomain());
             if (platform == OFFICAL && strstr(m_via.c_str(), "webdownload"))
                 platform = WEBDOWNLOAD;
+
+            if (platform == PF_UNION)
+            {
+                StringTokenizer source(m_source, "-");
+                if (source.count() >= 3)
+                {
+                    UInt32 channel = atoi(source[1].c_str());
+                    if (channel == PF_XY_CH)
+                    {
+                        channel = atoi(source[2].c_str());
+                        const UInt32 XY_CHANNEL[] = {41, 47, 48, 49, 50, 51, 52, 53, 54, 56};
+                        for (UInt32 i = 0; i < (sizeof(XY_CHANNEL) / sizeof(UInt32)); ++ i)
+                        {
+                            if (XY_CHANNEL[i] == channel)
+                            {
+                                platform = PF_XY;
+                                break;
+                            }
+                        }
+                    }
+                }
+                    
+            }
 
             udpLog(platform, str1, str2, str3, str4, str5, str6, type, count);
         }
@@ -10592,13 +10623,18 @@ namespace GObject
     {
         if(atoi(m_domain) != 10)
             return;
+        if(GetLev() < 40)
+            return;
         if(GetVar(VAR_QGAME_GIFT) == 0)
         {
-            MailPackage::MailItem item[2] = {{503, 1},{514, 1}};
-            sendMailItem(2380, 2381, item, 2);
+
+            MailPackage::MailItem item[5] = {{512, 1}, {49, 1}, {50, 1}, {548, 1}, {551, 1}};
+            sendMailItem(2382, 2383, item, 5);
             SetVar(VAR_QGAME_GIFT, 1);
+
         }
     }
+
     void Player::sendYearActInfo()
     {
         Stream st(REP::COUNTRY_ACT);

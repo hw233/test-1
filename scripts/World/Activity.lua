@@ -621,6 +621,12 @@ function onActivityCheck(tm)
           setQgameGiftAct(false)
       end
 
+      if tm >= actTime504 and tm < actTime504_1 then
+          setQgameGiftAct(true)
+      else
+          setQgameGiftAct(false)
+      end
+
       if tm >= actTime505 and tm < actTime505_1 then
           setKillMonsterAct(true)
       else
@@ -729,6 +735,12 @@ function onActivityCheck(tm)
 
       if tm >= actTime523 and tm < actTime523_1 then
           setRechargeActive(true, 16)
+      elseif tm >= actTime530 and tm < actTime530_1 then
+          setRechargeActive(true, 16)
+          setNeedRechargeRank(true)
+      elseif tm >= actTime531 and tm < actTime531_1 then
+          setRechargeActive(true, 16)
+          setNeedRechargeRank(false)
       else
           setRechargeActive(false, 16)
       end
@@ -836,6 +848,7 @@ function initActTime(y, m, d)
   local  SerStartTm506= { ['year'] = 2012, ['month'] = 9, ['day'] = 13, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- Qgame大厅礼包
   local  SerStartTm507= { ['year'] = 2012, ['month'] = 9, ['day'] = 17, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm504= { ['year'] = 2012, ['month'] = 11, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm503= { ['year'] = 2012, ['month'] = 9, ['day'] = 13, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --充值返礼(9/22-9/23)
@@ -858,6 +871,9 @@ function initActTime(y, m, d)
   local  SerStartTm522= { ['year'] = 2012, ['month'] = 11, ['day'] = 3, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm523= { ['year'] = 2012, ['month'] = 11, ['day'] = 6, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
+  local  SerStartTm530= { ['year'] = 2012, ['month'] = 11, ['day'] = 10, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm531= { ['year'] = 2012, ['month'] = 11, ['day'] = 13, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
   -- 繁体版
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm102 = { ['year'] = 2012, ['month'] = 6, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -868,7 +884,8 @@ function initActTime(y, m, d)
   -- 合服斗剑排名奖励增加至30名活动(6/25-7/1)
   local  SerStartTm106 = { ['year'] = 2012, ['month'] = 6, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 四大名捕（6/25-7/31）
-  local  SerStartTm107 = { ['year'] = 2012, ['month'] = 6, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 单身剑侠party(与四大名捕相同)
+  local  SerStartTm107 = { ['year'] = 2012, ['month'] = 11, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm200= { ['year'] = 2012, ['month'] = 6, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm201= { ['year'] = 2012, ['month'] = 7, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
@@ -1071,6 +1088,9 @@ function initActTime(y, m, d)
   actTime507 = os.time(SerStartTm507);
   actTime507_1 = os.time(SerStartTm507) + 3 * 86400;
 
+  actTime504 = os.time(SerStartTm504);
+  actTime504_1 = os.time(SerStartTm504) + 7 * 86400;
+
   actTime503 = os.time(SerStartTm503);
   actTime503_1 = os.time(SerStartTm503) + 4 * 86400;
 
@@ -1122,6 +1142,12 @@ function initActTime(y, m, d)
   actTime523 = os.time(SerStartTm523);
   actTime523_1 = os.time(SerStartTm523) + 4 * 86400;
 
+  actTime530 = os.time(SerStartTm530);
+  actTime530_1 = os.time(SerStartTm530) + 3 * 86400;
+
+  actTime531 = os.time(SerStartTm531);
+  actTime531_1 = os.time(SerStartTm531) + 3 * 86400;
+
   -- 繁体版
   actTime101 = os.time(SerStartTm101);
   actTime102 = os.time(SerStartTm101) + 8 * 86400;
@@ -1144,7 +1170,7 @@ function initActTime(y, m, d)
   actTime113 = os.time(SerStartTm106);
   actTime114 = os.time(SerStartTm106) + 7 * 86400;
   actTime115 = os.time(SerStartTm107);
-  actTime116 = os.time(SerStartTm107) + 37 * 86400;
+  actTime116 = os.time(SerStartTm107) + 7 * 86400;
   actTime200= os.time(SerStartTm200);
   actTime201= os.time(SerStartTm200) + 6 * 86400;
 

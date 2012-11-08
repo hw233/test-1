@@ -333,6 +333,15 @@ void WBoss::getRandList(UInt32 sz, UInt32 num, std::set<UInt32>& ret)
 {
     if (sz > AWARD_MAN)
     {
+#if 0
+        if (sz - AWARD_MAN <= num)
+        {
+            for (UInt32 j = 0; j < sz - AWARD_MAN; ++j)
+                ret.insert(j+AWARD_MAN);
+            return;
+        }
+#endif
+
         UInt32 j = uRand(sz-AWARD_MAN);
         for (UInt32 i = 0; i < num; ++i)
         {

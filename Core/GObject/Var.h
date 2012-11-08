@@ -166,10 +166,10 @@ namespace GObject
         VAR_MONEY_ARENA = 128, // 剑魂
         VAR_MONEY_ARENA2 = 129, // 入围赛获得剑魂
         VAR_MONEY_ARENA3 = 130, // 32强赛获得剑魂
-        VAR_LX_CNT = 131, //冷血
-        VAR_WQ_CNT = 132, //无情
-        VAR_TS_CNT = 133, //铁手
-        VAR_ZM_CNT = 134, //追命
+        VAR_LX_CNT = 131, //冷血,鸡蛋小仙
+        VAR_WQ_CNT = 132, //无情,油条师兄
+        VAR_TS_CNT = 133, //铁手,包子智者
+        VAR_ZM_CNT = 134, //追命,面馆BOSS
 
         VAR_DUANWU = 135, // 端午上线邮件
         VAR_JULY = 136, // 七月礼包
@@ -345,7 +345,7 @@ namespace GObject
             REGISTER_VAR(VAR_AWARD_QPLUS, CYCLE_DAY);
             REGISTER_VAR(VAR_AWARD_SSDT_1, CYCLE_DAY);
             REGISTER_VAR(VAR_AWARD_SSDT_2, CYCLE_NONE);
-            REGISTER_VAR(VAR_AWARD_NEWREGISTER, CYCLE_NONE);
+            REGISTER_VAR(VAR_AWARD_NEWREGISTER, CYCLE_DAY);
             REGISTER_VAR(VAR_AWARD_BIRTHDAY, CYCLE_DAY);
             REGISTER_VAR(VAR_AWARD_LOGIN, CYCLE_DAY);
 

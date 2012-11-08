@@ -1185,18 +1185,6 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendYearRPInfo();
     //if(World::getYearActive())
     //    pl->sendYearActInfo();
-    if (World::getQgameGiftAct())
-    {
-        UInt32 now = TimeUtil::Now();
-        struct tm t;
-        time_t tt = now;
-        localtime_r(&tt, &t);
-        if(t.tm_hour == 21 && t.tm_min <= 10)
-        {
-            GameMsgHdr hdr(0x1C5, WORKER_THREAD_WORLD, pl, 0);
-            GLOBAL().PushMsg(hdr, NULL);
-        }
-    }
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -4369,12 +4357,12 @@ void OnFourCopReq( GameMsgHdr& hdr, const void* data)
         UInt16 tmpCnt = 0;
         br >> count;
 
-        if(count > pl->GetPackage()->GetItemAnyNum(9057))
+        if(count > pl->GetPackage()->GetItemAnyNum(9209))
         {
             //sendMsgCode(0, 1011);
             return;
         }
-        pl->GetPackage()->DelItemAny(9057, count);
+        pl->GetPackage()->DelItemAny(9209, count);
         switch(opt)
         {
             case 1:
@@ -4417,7 +4405,7 @@ void OnFourCopReq( GameMsgHdr& hdr, const void* data)
                 {
                     tmpCnt -= 10;
                     pl->SetVar(VAR_LX_CNT, tmpCnt);
-                    pl->GetPackage()->AddItem(9055, 1, true);
+                    pl->GetPackage()->AddItem(9210, 1, true);
                 }
             break;
             case 2:
@@ -4426,7 +4414,7 @@ void OnFourCopReq( GameMsgHdr& hdr, const void* data)
                 {
                     tmpCnt -= 10;
                     pl->SetVar(VAR_WQ_CNT, tmpCnt);
-                    pl->GetPackage()->AddItem(9054, 1, true);
+                    pl->GetPackage()->AddItem(9211, 1, true);
                 }
             break;
             case 3:
@@ -4435,7 +4423,7 @@ void OnFourCopReq( GameMsgHdr& hdr, const void* data)
                 {
                     tmpCnt -= 10;
                     pl->SetVar(VAR_TS_CNT, tmpCnt);
-                    pl->GetPackage()->AddItem(9053, 1, true);
+                    pl->GetPackage()->AddItem(9212, 1, true);
                 }
             break;
             case 4:
@@ -4444,7 +4432,7 @@ void OnFourCopReq( GameMsgHdr& hdr, const void* data)
                 {
                     tmpCnt -= 10;
                     pl->SetVar(VAR_ZM_CNT, tmpCnt);
-                    pl->GetPackage()->AddItem(9056, 1, true);
+                    pl->GetPackage()->AddItem(9213, 1, true);
                 }
             break;
             default:

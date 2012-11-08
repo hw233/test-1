@@ -108,9 +108,9 @@ struct UserLoginStruct
     std::string _openid;
     std::string _openkey;
     std::string _via;
-    std::string _clientIp;
+    std::string _para;
 	MESSAGE_DEF12(REQ::LOGIN, UInt64, _userid, UInt8, _level, UInt8, _level1, UInt8, _isYear, UInt32, _lang,
-            HashValType, _hashval, std::string, _server, std::string, _platform, std::string, _openid, std::string, _openkey, std::string, _via, std::string, _clientIp);
+            HashValType, _hashval, std::string, _server, std::string, _platform, std::string, _openid, std::string, _openkey, std::string, _via, std::string, _para);
 };
 
 struct NewUserStruct
@@ -126,9 +126,9 @@ struct NewUserStruct
     std::string _via;
     std::string _invited;
     UInt8 _rp;
-    std::string _clientIp;
+    std::string _para;
     MESSAGE_DEF12(REQ::CREATE_ROLE, std::string, _name, UInt8, _class, UInt8, _level, UInt8, _level1, UInt8, _isYear,
-            std::string, _platform, std::string, _openid, std::string, _openkey, std::string, _via, std::string, _invited, UInt8, _rp, std::string, _clientIp);
+            std::string, _platform, std::string, _openid, std::string, _openkey, std::string, _via, std::string, _invited, UInt8, _rp, std::string, _para);
     /*MESSAGE_DEF11(REQ::CREATE_ROLE, std::string, _name, UInt8, _class, UInt8, _level, UInt8, _level1, UInt8, _isYear,
             std::string, _platform, std::string, _openid, std::string, _openkey, std::string, _via, std::string, _invited, UInt8, _rp);
             */
@@ -338,6 +338,20 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 
 		res = doLogin(cl, pid, hdr.sessionID, player);
 
+        std::string clientIp;
+        std::string pf;
+        {
+            StringTokenizer st(ul._para, ":");
+            if(st.count() >= 2)
+            {
+                clientIp = st[0].c_str();
+                pf = st[1].c_str();
+            }
+            else if (st.count() == 1)
+            {
+                clientIp = st[0].c_str();
+            }
+        }
         if (4 == res)
         {
             UInt8 platform = atoi(player->getDomain());
@@ -346,17 +360,17 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
                 size_t len = 0;
                 char key[MEMCACHED_MAX_KEY] = {0};
                 char value[32] = {0};
-                len = snprintf(key, sizeof(key), "%d_%s_%d", memc_version, ul._clientIp.c_str(), cfg.serverNum);
+                len = snprintf(key, sizeof(key), "%d_%s_%d", memc_version, clientIp.c_str(), cfg.serverNum);
                 if (MemcachedGet(key, len, value, sizeof(value)))
                 {
                     int v = atoi(value) + 1;
-                    setCrackValue(ul._clientIp.c_str(), v);
+                    setCrackValue(clientIp.c_str(), v);
                 }
             }
         }
         
-        TRACE_LOG("id: %"I64_FMT"u from %s of asss_%d", ul._userid, ul._clientIp.c_str(), cfg.serverNum);
-        if (res == 0 && player && cfg.GMCheck && checkCrack(ul._platform, ul._clientIp, ul._userid))
+        TRACE_LOG("id: %"I64_FMT"u from %s of asss_%d", ul._userid, clientIp.c_str(), cfg.serverNum);
+        if (res == 0 && player && cfg.GMCheck && checkCrack(ul._platform, clientIp, ul._userid))
         {
             player->SetSessionID(-1);
             cl->SetPlayer(NULL);
@@ -372,7 +386,8 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             player->setOpenId(ul._openid);
             player->setOpenKey(ul._openkey);
             player->setVia(ul._via);
-            player->setClientIp(ul._clientIp);
+            player->setClientIp(clientIp);
+            player->setSource(pf);
 #ifdef _FB
             PLAYER_DATA(player, wallow) = 0;
 #endif
@@ -507,7 +522,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
     us._via	     = nu._via;
     us._invited	 = nu._invited;
     us._rp	     = nu._rp;
-    us._clientIp = nu._clientIp;
+    us._clientIp = "";
 	TcpConnection conn = NETWORK()->GetConn(hdr.sessionID);
 	if(conn.get() == NULL)
 		return;
@@ -525,25 +540,42 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 		conn->pendClose();
         return;
     }
-    if (cfg.GMCheck && checkCrack(us._platform, us._clientIp, hdr.playerID))
+
+    std::string clientIp;
+    std::string pf;
+    {
+        StringTokenizer st(nu._para, ":");
+        if(st.count() >= 2)
+        {
+            clientIp = st[0].c_str();
+            us._clientIp = clientIp;
+            pf = st[1].c_str();
+        }
+        else if (st.count() == 1)
+        {
+            clientIp = st[0].c_str();
+        }
+    }
+
+    if (cfg.GMCheck && checkCrack(us._platform, clientIp, hdr.playerID))
     {
         conn->pendClose();
         return;
     }
- 
+
     if (IsBigLock(hdr.playerID))
     {
-    	UserLogonRepStruct rep;
-		rep._result = 6;
+        UserLogonRepStruct rep;
+        rep._result = 6;
         GObject::dclogger.create_sec(us);
-		NETWORK()->SendMsgToClient(conn.get(), rep);
-		conn->pendClose();
+        NETWORK()->SendMsgToClient(conn.get(), rep);
+        conn->pendClose();
         return;
     }
 
     if (cfg.enableLoginLimit && SERVER().GetTcpService()->getOnlineNum() > cfg.loginLimit)
     {
-		UserLogonRepStruct rep;
+        UserLogonRepStruct rep;
 		rep._result = 5;
 #ifndef _FB
 #ifndef _VT
@@ -658,7 +690,8 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 			GObject::globalPlayers.add(pl);
 			GObject::newPlayers.add(pl);
 			GObject::globalNamedPlayers.add(newname, pl);
-            pl->setClientIp(nu._clientIp);
+            pl->setClientIp(clientIp);
+            pl->setSource(pf);
 			res = 0;
 
 			pl->SetSessionID(hdr.sessionID);

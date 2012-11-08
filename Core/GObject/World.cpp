@@ -330,7 +330,11 @@ bool enum_midnight(void * ptr, void* next)
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 3) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 4) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 5) ||
-            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 6)
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 6) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 10) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 11) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 12) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 13)
             ))
     {
         if (pl->isOnline())
@@ -814,7 +818,10 @@ void World::World_Midnight_Check( World * world )
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 29) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 4) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 5) ||
-            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 6)
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 6) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 11) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 12) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 13)
             )
         bRechargeEnd = true;
 
@@ -1291,17 +1298,6 @@ bool enum_openact(void * ptr, void * v)
     return true;
 }
 
-bool enum_qgamegift(void * ptr, void * v)
-{
-	Player * pl = static_cast<Player *>(ptr);
-	if(pl == NULL)
-		return true;
-    if(!pl->isOnline())
-        return true;
-    pl->getQgameGiftAward();
-    return true;
-}
-
 void World::World_One_Min( World * world )
 {
 #ifdef _FB
@@ -1334,16 +1330,6 @@ void World::World_One_Min( World * world )
     if (day)
         globalPlayers.enumerate(enum_openact, (void*)&day);
 #else
-    if(!World::getQgameGiftAct())
-        return;
-	UInt32 now = world->_now;
-    struct tm t;
-    time_t tt = now;
-    localtime_r(&tt, &t);
-    if(t.tm_hour == 21 && t.tm_min == 0)
-    {
-        globalPlayers.enumerate(enum_qgamegift, static_cast<void *>(NULL));
-    }
 #endif
 }
 
