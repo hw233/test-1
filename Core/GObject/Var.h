@@ -262,6 +262,10 @@ namespace GObject
         VAR_LOCAL_PRESTIGE = 242, //本服斗剑，声望数
         VAR_LOCAL_PAGE = 243, //本服斗剑，翻页数
 
+        // 270-280 占用 for zhgc
+        VAR_ACT_LOGIN_AWARD     = 270, // 节日每日登陆奖励普通
+        VAR_ACT_LOGIN_AWARD_VIP = 271, // 节日每日登陆奖励VIP
+
 
         VAR_MAX,
     };
@@ -511,6 +515,9 @@ namespace GObject
             REGISTER_VAR(VAR_LOCAL_MAXRANK, CYCLE_NONE);
             REGISTER_VAR(VAR_LOCAL_PRESTIGE, CYCLE_NONE);
             REGISTER_VAR(VAR_LOCAL_PAGE, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_ACT_LOGIN_AWARD, CYCLE_DAY);
+            REGISTER_VAR(VAR_ACT_LOGIN_AWARD_VIP, CYCLE_DAY);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

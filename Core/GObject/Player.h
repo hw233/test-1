@@ -1783,6 +1783,8 @@ namespace GObject
         void getNewRC7DayLoginAward(UInt8 val, UInt8 off);
         void getNewRC7DayRechargeAward(UInt8 val);
         void getNewRC7DayTargetAward(UInt8 val);
+        void get11DailyAward(UInt8 opt);
+        void send11DailyInfo();
 
         // 帮派神像
         float getClanStatueHPEffect();
