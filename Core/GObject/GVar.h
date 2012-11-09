@@ -30,6 +30,12 @@ namespace GObject
         GVAR_CLANCOPYPASS = 4, // 帮派副本最高通过等级
         GVAR_1530BUCHANG = 5,
         GVAR_OLDRC7DAYBUCHANG = 6,
+        GVAR_DT_SESSIONTIME = 7,
+        GVAR_DT_STAGE = 8,
+        GVAR_DT_RESPOINT_RED = 9,
+        GVAR_DT_RESPOINT_BLUE = 10,
+        GVAR_DT_TOTALRES_RED = 11,
+        GVAR_DT_TOTALRES_BLUE = 12,
         GVAR_MAX,
     };
 

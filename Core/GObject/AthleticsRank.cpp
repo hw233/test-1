@@ -102,6 +102,8 @@ void AthleticsRank::getRankNeighbour(UInt8 row, Rank me, Rank& up, Rank& down)
 
 void AthleticsRank::updateRankL(UInt8 row, Player* player, UInt32 newRank)
 {
+    if(player->GetVar(VAR_LOCAL_RANK) == newRank)
+        return;
     AthlSort cur = {player, player->GetVar(VAR_LOCAL_RANK)};
     AthlSortType& curType = _ranksL[row][player->getServerNo()];
     if(!curType.empty())

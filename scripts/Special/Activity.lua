@@ -2434,77 +2434,34 @@ function sendRechargeMails_2012_11_05(player, ototal, ntotal)
     _sendRechargeMails(player, ototal, ntotal, lvls, items)
 end
 
+function sendRechargeMails_2012_11_06(player, ototal, ntotal)
+    local lvls = {
+        10,99,199,399,699,1099,1599,2199,2899,3699,4599,5599,8999,15999,26999,42999,64999,
+    }
+    local items = {
+        {1325,1,1, 551,2,1},
+        {503,2,1, 516,2,1},
+        {8000,1,1, 551,2,1},
+        {517,2,1, 1325,1,1},
+        {15,6,1},
+        {515,1,1},
+        {1528,1,1, 1325,1,1},
+        {515,3,1, 509,2,1},
+        {503,2,1, 516,2,1},
+        {1325,2,1, 515,1,1},
+        {517,3,1, 549,2,1, 509,2,1},
+        {1528,2,1, 1325,2,1},
+        {509,3,1, 507,3,1},
+        {1528,2,1, 549,2,1, 515,2,1},
+        {509,2,1, 507,2,1, 515,3,1},
+        {9076,6,1, 515,6,1, 1528,6,1},
+        {9076,8,1, 515,8,1, 1325,8,1},
+    }
+    _sendRechargeMails(player, ototal, ntotal, lvls, items)
+end
+
 function sendRechargeMails(player, ototal, ntotal)
-    --sendRechargeMails1(player, ototal, ntotal)
-    --[[local start = { ['year'] = 2012, ['month'] = 7, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-    local s = os.time(start)
-    if os.time() >= s then
-        sendRechargeMails3(player, ototal, ntotal)
-    else
-        sendRechargeMails2(player, ototal, ntotal)
-    end--]]
-    --if getRechargeActive() then
-    --    sendRechargeMails4(player, ototal, ntotal)
-    --end
-    --if getRechargeActive3366() then
-    --    sendRechargeMails5(player, ototal, ntotal)
-    --end
-    -- sendRechargeMails6(player, ototal, ntotal)
-    --sendRechargeMails7(player, ototal, ntotal)
-    --sendRechargeMails_2012_09_13(player, ototal, ntotal)
-    --sendRechargeMails_2012_09_22(player, ototal, ntotal)
-    --local t1 = { ['year'] = 2012, ['month'] = 9, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-    --local t2 = { ['year'] = 2012, ['month'] = 10, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-    --local t3 = { ['year'] = 2012, ['month'] = 10, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-    --local s1 = os.time(t1)
-    --local s2 = os.time(t2)
-    --local s3 = os.time(t3)
-    --local n = os.time()
-    --if n >= s1 and n < (s1 + 4*86400) then
-    --    sendRechargeMails_2012_09_27(player, ototal, ntotal)
-    --elseif n >= s2 and n < (s2 + 2*86400) then
-    --    sendRechargeMails_2012_10_05(player, ototal, ntotal)
-    --elseif n >= s3 and n < (s3 + 3*86400) then
-    --    sendRechargeMails_2012_10_12(player, ototal, ntotal)
-    --end
-    local t = { ['year'] = 2012, ['month'] = 10, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-    local t1 = { ['year'] = 2012, ['month'] = 10, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-    local t2 = { ['year'] = 2012, ['month'] = 10, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-    local t3 = { ['year'] = 2012, ['month'] = 10, ['day'] = 26, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-    local t4 = { ['year'] = 2012, ['month'] = 10, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-    local t5 = { ['year'] = 2012, ['month'] = 11, ['day'] = 3, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-    local s = os.time(t)
-    local s1 = os.time(t1)
-    local s2 = os.time(t2)
-    local s3 = os.time(t3)
-    local s4 = os.time(t4)
-    local s5 = os.time(t5)
-    local n = os.time()
-    if n >= s and n < (s + 86400) then
-        sendRechargeMails_2012_10_16(player, ototal, ntotal)
-    elseif n >= (s + 86400) and n < (s + 2*86400) then
-        sendRechargeMails_2012_10_17(player, ototal, ntotal)
-    elseif n >= (s + 2*86400) and n < (s + 3*86400) then
-        sendRechargeMails_2012_10_18(player, ototal, ntotal)
-    elseif n >= s1 and n < (s1 + 4*86400) then
-        sendRechargeMails_2012_10_19(player, ototal, ntotal)
-    elseif n >= s2 and n < (s2 + 3*86400) then
-        sendRechargeMails_2012_10_23(player, ototal, ntotal)
-    elseif n >= s3 and n < (s3 + 1*86400) then
-        sendRechargeMails_2012_10_26(player, ototal, ntotal)
-    elseif n >= (s3 + 1*86400) and n < (s3 + 2*86400) then
-        sendRechargeMails_2012_10_27(player, ototal, ntotal)
-    elseif n >= (s3 + 2*86400) and n < (s3 + 3*86400) then
-        sendRechargeMails_2012_10_28(player, ototal, ntotal)
-    elseif n >= s4 and n < (s4 + 4*86400) then
-        sendRechargeMails_2012_10_30(player, ototal, ntotal)
-    elseif n >= s5 and n < (s5 + 1*86400) then
-        sendRechargeMails_2012_11_03(player, ototal, ntotal)
-    elseif n >= (s5 + 1*86400) and n < (s5 + 2*86400) then
-        sendRechargeMails_2012_11_04(player, ototal, ntotal)
-    elseif n >= (s5 + 2*86400) and n < (s5 + 3*86400) then
-        sendRechargeMails_2012_11_05(player, ototal, ntotal)
-    end
+    sendRechargeMails_2012_11_06(player, ototal, ntotal)
 end
 
 function sendRechargeRankAward_2012_10_16(player, pos)
