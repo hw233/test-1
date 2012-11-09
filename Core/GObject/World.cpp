@@ -129,6 +129,7 @@ bool World::_june1 = false;
 bool World::_july = false;
 bool World::_qixi= false;
 bool World::_wansheng= false;
+bool World::_11Act= false;
 bool World::_guoqing= false;
 bool World::_enchant_gt11 = false;
 bool World::_rechargenextret;
@@ -329,7 +330,11 @@ bool enum_midnight(void * ptr, void* next)
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 3) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 4) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 5) ||
-            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 6)
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 6) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 10) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 11) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 12) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 13)
             ))
     {
         if (pl->isOnline())
@@ -450,29 +455,11 @@ void World::makeActivityInfo(Stream &st)
 }
 void World::calWeekDay( World * world )
 {
-	time_t curtime1 = time(NULL) + 30;
+	time_t curtime1 = time(NULL) + 300;
 	struct tm *local = localtime(&curtime1);
-	UInt8 wday = static_cast<UInt8>(local->tm_wday);
-	if(wday == 0)
-		wday = static_cast<UInt8>(7);
-    if(_wday == wday)
-    {
-        if(!_recalcwd)
-        {
-            GameMsgHdr hdr(0x1FA, WORKER_THREAD_WORLD, NULL, 0);
-            GLOBAL().PushMsg(hdr, NULL);
-        }
-        return;
-    }
-    else
-    {
-        if(_recalcwd)
-        {
-            GameMsgHdr hdr(0x1FB, WORKER_THREAD_WORLD, NULL, 0);
-            GLOBAL().PushMsg(hdr, NULL);
-        }
-        _wday = wday;
-    }
+	_wday = static_cast<UInt8>(local->tm_wday);
+	if(_wday == 0)
+		_wday = static_cast<UInt8>(7);
 	if(_wday == 4)
 		ClanCityBattle::setMaxEnterCount(3 * 2);
 	else
@@ -795,7 +782,7 @@ void World::World_Midnight_Check( World * world )
     bool bConsume = getConsumeActive() && getNeedConsumeRank();
     bool bPExpItems = getPExpItems();
     bool bMonsterAct = getKillMonsterAct();
-	world->_worldScript->onActivityCheck(curtime+30);
+	world->_worldScript->onActivityCheck(curtime+300);
 
 	world->_today = TimeUtil::SharpDay(0, curtime+30);
 	DB1().PushUpdateData("UPDATE `player` SET `icCount` = 0;");
@@ -831,7 +818,10 @@ void World::World_Midnight_Check( World * world )
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 29) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 4) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 5) ||
-            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 6)
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 6) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 11) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 12) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 13)
             )
         bRechargeEnd = true;
 
@@ -1308,17 +1298,6 @@ bool enum_openact(void * ptr, void * v)
     return true;
 }
 
-bool enum_qgamegift(void * ptr, void * v)
-{
-	Player * pl = static_cast<Player *>(ptr);
-	if(pl == NULL)
-		return true;
-    if(!pl->isOnline())
-        return true;
-    pl->getQgameGiftAward();
-    return true;
-}
-
 void World::World_One_Min( World * world )
 {
 #ifdef _FB
@@ -1351,16 +1330,6 @@ void World::World_One_Min( World * world )
     if (day)
         globalPlayers.enumerate(enum_openact, (void*)&day);
 #else
-    if(!World::getQgameGiftAct())
-        return;
-	UInt32 now = world->_now;
-    struct tm t;
-    time_t tt = now;
-    localtime_r(&tt, &t);
-    if(t.tm_hour == 21 && t.tm_min == 0)
-    {
-        globalPlayers.enumerate(enum_qgamegift, static_cast<void *>(NULL));
-    }
 #endif
 }
 

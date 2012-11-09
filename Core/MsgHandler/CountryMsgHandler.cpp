@@ -318,4 +318,6 @@ MSG_REG_2(GameMsgHdr, 0x265, OnSetTitle);
 
 MSG_REG_2(GameMsgHdr, 0x266, OnNewRC7DayLastLoot);
 
+MSG_REG_2(GameMsgHdr, 0x267, OnFighterCheckDiry);
+
 MSG_HANDLER_END()

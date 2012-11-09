@@ -52,6 +52,7 @@ UInt8 FrontMap::getFreeCount()
 
 UInt8 FrontMap::getGoldCount(UInt8 vipl)
 {
+    return 3;
     if (vipl == 1)
         return 1;
     if (vipl == 2)
@@ -59,6 +60,21 @@ UInt8 FrontMap::getGoldCount(UInt8 vipl)
     if (vipl >= 3)
         return 3;
     return 0;
+}
+
+UInt32 FrontMap::getEnterGold(Player* pl)
+{
+    UInt8 vipl = pl->getVipLevel();
+    if(vipl > 3)
+        vipl = 3;
+    UInt32 extraVipGold[4][3] = {
+        {20, 20, 20},
+        { 0, 20, 20},
+        { 0,  0, 20},
+        { 0,  0,  0},
+    };
+
+    return GData::moneyNeed[GData::FRONTMAP_ENTER1+PLAYER_DATA(pl, frontGoldCnt)].gold + extraVipGold[vipl][PLAYER_DATA(pl, frontGoldCnt)];
 }
 
 void FrontMap::sendInfo(Player* pl, UInt8 id, bool needspot, bool force)
@@ -198,7 +214,8 @@ void FrontMap::enter(Player* pl, UInt8 id)
             ret = 0;
             pl->frontMapUdpLog(id, 1);
         } else if (PLAYER_DATA(pl, frontGoldCnt) < getGoldCount(pl->getVipLevel())) {
-            if (pl->getGold() < GData::moneyNeed[GData::FRONTMAP_ENTER1+PLAYER_DATA(pl, frontGoldCnt)].gold) {
+            UInt32 gold = getEnterGold(pl);
+            if (pl->getGold() < gold) {
                 Stream st(REP::FORMATTON_INFO);
                 st << static_cast<UInt8>(1) << id << static_cast<UInt8>(1) << Stream::eos;
                 pl->send(st);
@@ -214,7 +231,7 @@ void FrontMap::enter(Player* pl, UInt8 id)
             ret = 0;
 
             ConsumeInfo ci(EnterFrontMap,0,0);
-            pl->useGold(20*PLAYER_DATA(pl, frontGoldCnt), &ci);
+            pl->useGold(gold, &ci);
             pl->frontMapUdpLog(id, 3);
         } else {
             // XXX:
@@ -379,19 +396,19 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
 
             if(World::getFourCopAct())
             {
-                UInt32 randNum = uRand(3);
+                UInt32 randNum;
                 if(PLAYER_DATA(pl, frontFreeCnt) == getFreeCount() && PLAYER_DATA(pl, frontGoldCnt) > 0)
                 {
                     if(3 <= PLAYER_DATA(pl, frontGoldCnt))
-                        randNum = randNum + 4;
+                        randNum = 15;
                     else if(2 == PLAYER_DATA(pl, frontGoldCnt))
-                        randNum = randNum + 3;
+                        randNum = 12 + uRand(3);
                     else
-                        randNum = randNum + 2;
+                        randNum = 11 + uRand(2);
                 }
                 else
-                    randNum = randNum + 1;
-                pl->GetPackage()->AddItem2(9057, randNum, true, true);
+                    randNum = 10;
+                pl->GetPackage()->AddItem2(9209, randNum, true, true);
             }
             if (GObject::Tianjie::instance().isTjOpened())
             { 

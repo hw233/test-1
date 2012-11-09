@@ -494,6 +494,8 @@ public:
 	inline float getExtraMagRes() { checkDirty(); return _attrExtraEquip.magres; }
 	inline float getBattlePoint() { checkBPDirty(); return _battlePoint + _skillBP; }
 
+	inline float getBattlePoint_Dirty() { return _battlePoint + _skillBP; }
+
     inline float getExtraHitrateLevel() { checkDirty(); return _attrExtraEquip.hitrlvl; }
     inline float getExtraEvadeLevel() { checkDirty(); return _attrExtraEquip.evdlvl; }
     inline float getExtraCriticalLevel() { checkDirty(); return _attrExtraEquip.crilvl; }
