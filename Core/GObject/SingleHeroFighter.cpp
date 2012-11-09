@@ -378,6 +378,7 @@ namespace GObject
 
         UInt8 cls = _fgt->getClass();
         GData::AttrExtra attrExtraEquip = shsyTmpl._attrExtraEquip[cls];
+        _fgt->setDirty(true);
         attrExtraEquip += *(_fgt->getAttrExtraEquip());
 
         setAttrExtraEquip(attrExtraEquip);
