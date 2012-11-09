@@ -544,3 +544,30 @@ function RunNewRegisterAwardAD_RF(player, idx)
 end
 
 
+function Run11ActAward(player, opt)
+    if player == nil or opt < 1 or opt > 2 then
+        return false;
+    end
+
+    local package = player:GetPackage();
+
+	if package:GetRestPackageSize() < 6 then		
+		player:sendMsgCode(2, 1011, 0);
+		return false;
+	end
+
+    local awards = {
+        {{517, 1}, {29, 10}, {510, 1}, {15, 1}, {514, 1}, {9214, 1}},
+        {{503, 1}, {501, 1}, {512, 1}, {517, 1}, {30, 1}, {33, 1}}
+    }
+
+    local award = awards[opt]
+    for i = 1, #award do
+        package:Add(award[i][1], award[i][2], true, false, 30)
+    end
+
+    return true;
+end
+
+
+

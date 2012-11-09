@@ -1064,6 +1064,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendRF7DayInfo(now);
     pl->sendMDSoul(0);
     pl->sendSSDTInfo();
+    pl->send11DailyInfo();
     pl->sendHappyInfo();
     pl->sendYBBufInfo(pl->GetVar(VAR_YBBUF), pl->GetVar(VAR_QQVIP_BUF));
     pl->sendAthlBufInfo();

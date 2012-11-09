@@ -112,9 +112,6 @@ bool Country::Init()
         //AddTimer(4 * 60 * 1000, ClanCopyResetBegin, static_cast<void * >(NULL), 60 * 1000);
         //AddTimer(4 * 60 * 1000, ClanCopyReset, static_cast<void * >(NULL), 120 * 1000);
         //AddTimer(4 * 60 * 1000, ClanCopyResetEnd, static_cast<void * >(NULL), 180 * 1000);
-
-
-
 	}
 
 	return true;

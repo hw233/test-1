@@ -129,6 +129,7 @@ bool World::_june1 = false;
 bool World::_july = false;
 bool World::_qixi= false;
 bool World::_wansheng= false;
+bool World::_11Act= false;
 bool World::_guoqing= false;
 bool World::_enchant_gt11 = false;
 bool World::_rechargenextret;
