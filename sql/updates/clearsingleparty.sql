@@ -1,1 +1,1 @@
-delete from var where id >=151 and id <= 134;
+delete from var where id >=131 and id <= 134;
