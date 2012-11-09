@@ -143,6 +143,7 @@ MSG_REG(GameMsgHdr, OnTrumpLOrder);
 
 MSG_REG(GameMsgHdr, OnEquipUpgrade);
 MSG_REG(GameMsgHdr, OnEquipSpirit);
+MSG_REG(GameMsgHdr, OnEquipMoveReq);
 MSG_REG(GameMsgHdr, OnUseToken);
 MSG_REG(GameMsgHdr, OnMDSoul);
 MSG_REG(GameMsgHdr, OnSvrSt);

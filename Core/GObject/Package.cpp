@@ -4278,6 +4278,244 @@ namespace GObject
         return 0;
     }
 
+    void Package::setItemBind(UInt32 typeId)
+    {
+        DB4().PushUpdateData("UPDATE `item` SET `bindType` = 1 WHERE `id` = %u  AND `ownerId` = %"I64_FMT"u", typeId, m_Owner->getId());
+    }
+    UInt8 Package::EquipMove( UInt16 fFighterId, UInt16 tFighterId,UInt32 fromItemId, UInt32 toItemId, UInt8 type)
+    {
+        UInt8 res = 0;
+        Fighter * fFgt = NULL;
+        Fighter * tFgt = NULL;
+        UInt8 fPos = 0;
+        UInt8 tPos = 0;
+
+        ItemEquip * fromEquip = FindEquip(fFgt, fPos, fFighterId, fromItemId);
+        ItemEquip * toEquip = FindEquip(tFgt, tPos, tFighterId, toItemId);
+        if (fromEquip == NULL || toEquip == NULL)
+            return 1;
+
+        if (fromEquip->getClass() != toEquip->getClass() ||
+            fromEquip->getQuality() != toEquip->getQuality())
+            return 2;
+
+        if (m_Owner->GetVar(VAR_EQUIP_MOVE_COUNT) >= 8)
+            return 9;
+        res = isCanMove(fromEquip, toEquip, type);
+        if (res > 0)
+            return res;
+        res = moveUseMoney(fromEquip, toEquip, type);
+        if (res > 0) 
+            return res;
+
+        toEquip->SetBindStatus(true);
+        if (type & 1)
+            res = moveEquipEnchant(fFgt,tFgt,fromEquip, fPos, toEquip, tPos);
+        if (type & 2)
+            res = moveEquipGem(fFgt,tFgt,fromEquip, fPos, toEquip, tPos);
+        if (type & 4)
+            res = moveEquipSpirit(fFgt,tFgt,fromEquip, fPos, toEquip, tPos);
+
+        m_Owner->AddVar(VAR_EQUIP_MOVE_COUNT,1);
+        return res;
+    }
+    UInt8 Package::isCanMove(ItemEquip* fromEquip, ItemEquip* toEquip, UInt8 type)
+    {
+        ItemEquipData& fIed = fromEquip->getItemEquipData();
+        ItemEquipData& tIed = toEquip->getItemEquipData();
+        if (type & 1)
+        {
+            if (fIed.enchant  < 2)
+                return 4;
+            if (fIed.enchant-1 <= tIed.enchant)
+                return 5;
+            if ((fromEquip->getClass() < Item_Weapon || fromEquip->getClass() > Item_Ring)) 
+                return 6;
+        }
+        if (type & 2)
+        {
+            if(GetRestPackageSize() < 6)
+            {
+                m_Owner->sendMsgCode(0, 1011);
+                return 7;
+            }
+            if (fIed.sockets == 0 )
+                return 8;
+        }
+        if (type & 4)
+        {
+            //注灵条件限制
+           if ((fIed.spiritAttr.spLev[0]+fIed.spiritAttr.spLev[1]+fIed.spiritAttr.spLev[2]+fIed.spiritAttr.spLev[3])==0)
+               return 10;
+        }
+        return 0;
+    }
+    UInt8 Package::moveUseMoney(ItemEquip* fromEquip, ItemEquip* toEquip, UInt8 type)
+    {
+        static const UInt32 s_money1[] = {10,10,10,10,15,20,50,150,900,2100,4600};
+        static const UInt32 s_money2[] = {10,10,10,10,10,10,15,40,340,940,2200};
+        
+        ItemEquipData& fIed = fromEquip->getItemEquipData();
+        ItemEquipData& tIed = toEquip->getItemEquipData();
+        UInt32 money = 0;
+        if (type & 1 && fIed.enchant >= 2)
+        {
+            if (fromEquip->getClass() == Item_Weapon)
+                money += s_money1[fIed.enchant-2];
+            else
+                 money += s_money2[fIed.enchant-2];
+        }
+        if (type & 2)
+        {
+            for (int i = 1; i <= 6; i++)
+            {
+                //开孔的仙石
+                if (tIed.sockets < i && fIed.sockets >= i)
+                {
+                    if (i <= 2)
+                        money += 5;
+                    else if (i <=4 )
+                        money += 10;
+                    else
+                        money += 25;
+                }
+                //一个宝石15仙石
+                if (fIed.gems[i-1] > 0)
+                    money += 15;
+            }
+        }
+        if (type & 4)
+            money += (fIed.spiritAttr.spLev[0]+fIed.spiritAttr.spLev[1]+fIed.spiritAttr.spLev[2]+fIed.spiritAttr.spLev[3])/1;
+       if(m_Owner->getGold() < money)
+	    {
+            m_Owner->sendMsgCode(0, 1101);
+            return 3;
+        }
+        if (money > 0)
+        {
+            ConsumeInfo ci(MoveEquip,0,0);
+            m_Owner->useGold(money, &ci);
+        }
+        return 0;
+    }
+    UInt8 Package::moveEquipEnchant(Fighter* fFgt,Fighter* tFgt, ItemEquip* fromEquip, UInt8 fPos, ItemEquip* toEquip, UInt8 tPos)
+    {
+        ItemEquipData& fIed = fromEquip->getItemEquipData();
+        ItemEquipData& tIed = toEquip->getItemEquipData();
+        if ((fromEquip->getClass() >= Item_Weapon && fromEquip->getClass() <= Item_Ring)) 
+        {
+            tIed.enchant = fIed.enchant-1;
+            fIed.enchant = 0; 
+            ((ItemTrump*)toEquip)->fixSkills();
+            ((ItemTrump*)fromEquip)->fixSkills();
+
+			DB4().PushUpdateData("UPDATE `equipment` SET `enchant` = %u WHERE `id` = %u", fIed.enchant, fromEquip->getId());
+			DB4().PushUpdateData("UPDATE `equipment` SET `enchant` = %u WHERE `id` = %u", tIed.enchant, toEquip->getId());
+            enchantUdpLog(fromEquip, fIed.enchant);
+            enchantUdpLog(toEquip, tIed.enchant);
+
+            char str[32] = {0};
+            sprintf(str, "F_1115_%03d%02d%03d", fromEquip->getValueLev(), tIed.enchant+1, toEquip->getValueLev());
+            m_Owner->udpLog("move", str, "", "", "", "", "act");
+        }
+        if(fFgt != NULL)
+        {
+            fFgt->setDirty();
+            fFgt->sendModification(0x20 + fPos, fromEquip, false);
+        }
+        else
+            SendSingleEquipData(fromEquip);
+
+        if(tFgt != NULL)
+        {
+            tFgt->setDirty();
+            tFgt->sendModification(0x20 + tPos, toEquip, false);
+        }
+        else
+            SendSingleEquipData(toEquip);
+        return 0;
+    }
+
+    UInt8 Package::moveEquipGem(Fighter* fFgt,Fighter* tFgt, ItemEquip* fromEquip,UInt8 fPos, ItemEquip* toEquip,UInt8 tPos)
+    {
+        ItemEquipData& fIed = fromEquip->getItemEquipData();
+        ItemEquipData& tIed = toEquip->getItemEquipData();
+        //转移宝石
+        if (tIed.sockets < fIed.sockets)
+        {
+            tIed.sockets = fIed.sockets;
+            DB4().PushUpdateData("UPDATE `equipment` SET `sockets` = %u WHERE `id` = %u",tIed.sockets,toEquip->getId());
+        }
+        for (int i = 0; i < fIed.sockets; i++)
+        {
+            if (tIed.gems[i] > 0)
+		        AddItem(tIed.gems[i], 1, true, false, FromDetachGem);
+            tIed.gems[i] = fIed.gems[i];
+            fIed.gems[i] = 0;
+        }
+
+        char str[32] = {0};
+        sprintf(str, "F_1116_%03d00%03d", fromEquip->getValueLev(),  toEquip->getValueLev());
+        m_Owner->udpLog("move", str, "", "", "", "", "act");
+    
+        DB4().PushUpdateData("UPDATE `equipment` SET `socket1` = %u,`socket2` = %u,`socket3` = %u,`socket4` = %u,`socket5` = %u,`socket6` = %u WHERE `id` = %u",tIed.gems[0],tIed.gems[1],tIed.gems[2],tIed.gems[3],tIed.gems[4],tIed.gems[5],toEquip->getId());
+        DB4().PushUpdateData("UPDATE `equipment` SET `socket1` = %u,`socket2` = %u,`socket3` = %u,`socket4` = %u,`socket5` = %u,`socket6` = %u WHERE `id` = %u",fIed.gems[0],fIed.gems[1],fIed.gems[2],fIed.gems[3],fIed.gems[4],fIed.gems[5],fromEquip->getId());
+        if(fFgt != NULL)
+        {
+            fFgt->setDirty();
+            fFgt->sendModification(0x20 + fPos, fromEquip, false);
+        }
+        else
+            SendSingleEquipData(fromEquip);
+
+        if(tFgt != NULL)
+        {
+            tFgt->setDirty();
+            tFgt->sendModification(0x20 + tPos, toEquip, false);
+        }
+        else
+            SendSingleEquipData(toEquip);
+        return 0;
+    }
+
+    UInt8 Package::moveEquipSpirit(Fighter* fFgt,Fighter* tFgt, ItemEquip* fromEquip,UInt8 fPos, ItemEquip* toEquip,UInt8 tPos)
+    {
+        ItemEquipData& fIed = fromEquip->getItemEquipData();
+        ItemEquipData& tIed = toEquip->getItemEquipData();
+        
+        //直接内存拷贝
+        memcpy(&tIed.spiritAttr, &fIed.spiritAttr, sizeof(tIed.spiritAttr));
+        memset(&fIed.spiritAttr, 0, sizeof(fIed.spiritAttr));
+        fIed.spiritAttr.spForm[0] = uRand(4) + 1;
+        fIed.spiritAttr.spForm[1] = uRand(4) + 1;
+        fIed.spiritAttr.spForm[2] = uRand(4) + 1;
+
+        char str[32] = {0};
+        sprintf(str, "F_1117_%03d00%03d", fromEquip->getValueLev(),  toEquip->getValueLev());
+        m_Owner->udpLog("move", str, "", "", "", "", "act");
+
+        
+        DB4().PushUpdateData("UPDATE `equipment_spirit` SET `spLev1` = %u,`spLev2` = %u,`spLev3` = %u,`spLev4` = %u, `spform1` = %u, `spform2` = %u, `spform3` = %u WHERE `id` = %u", tIed.spiritAttr.spLev[0],tIed.spiritAttr.spLev[1],tIed.spiritAttr.spLev[2], tIed.spiritAttr.spLev[3],tIed.spiritAttr.spForm[0], tIed.spiritAttr.spForm[1],tIed.spiritAttr.spForm[2],toEquip->getId());
+        DB4().PushUpdateData("UPDATE `equipment_spirit` SET `spLev1` = %u,`spLev2` = %u,`spLev3` = %u,`spLev4` = %u, `spform1` = %u, `spform2` = %u, `spform3` = %u WHERE `id` = %u", fIed.spiritAttr.spLev[0],fIed.spiritAttr.spLev[1],fIed.spiritAttr.spLev[2],fIed.spiritAttr.spLev[3], fIed.spiritAttr.spForm[0], fIed.spiritAttr.spForm[1],fIed.spiritAttr.spForm[2],fromEquip->getId());
+        
+        if(fFgt != NULL)
+        {
+            fFgt->setDirty();
+            fFgt->sendModification(0x20 + fPos, fromEquip, false);
+        }
+        else
+            SendSingleEquipData(fromEquip);
+
+        if(tFgt != NULL)
+        {
+            tFgt->setDirty();
+            tFgt->sendModification(0x20 + tPos, toEquip, false);
+        }
+        else
+            SendSingleEquipData(toEquip);
+        return 0;
+    }
+
 	UInt8 Package::Forge( UInt16 fighterId, UInt32 itemId, /*UInt8 t,*/ UInt8 * types, Int16 * values, UInt8 protect )
 	{
 		// if (t > 2) return 2;
