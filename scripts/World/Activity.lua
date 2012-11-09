@@ -733,6 +733,12 @@ function onActivityCheck(tm)
           setRechargeActive(false, 16)
       end
 
+      if tm >= actTime220 and tm < actTime221 then
+          setQzonePYPrivilegeAct(true)
+      else
+          setQzonePYPrivilegeAct(false)
+      end
+
       setShuoShuo(true);
   end
 
@@ -882,6 +888,8 @@ function initActTime(y, m, d)
   local SerStartTm214 = { ['year'] = 2012, ['month'] = 10, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 万圣节
   local  SerStartTm215 = { ['year'] = 2012, ['month'] = 11, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 空间、朋友平台特权活动
+  local  SerStartTm216 = { ['year'] = 2012, ['month'] = 11, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
@@ -1158,6 +1166,9 @@ function initActTime(y, m, d)
 
   actTime218= os.time(SerStartTm215);
   actTime219= os.time(SerStartTm215) + 7 * 86400;
+
+  actTime220= os.time(SerStartTm216);
+  actTime221= os.time(SerStartTm216) + 38 * 86400;
 
   onActivityCheck(os.time() + 30);
 

@@ -237,6 +237,10 @@ public:
     { _3366privilegeact = v; }
     inline static bool get3366PrivilegeAct()
     { return _3366privilegeact; }
+    inline static void setQzonePYPrivilegeAct(bool v)
+    { _qzonepyprivilegeact = v; }
+    inline static bool getQzonePYPrivilegeAct()
+    { return _qzonepyprivilegeact; }
 
     inline static void setTrainFighter(bool v)
     { _trainfighter = v; }
@@ -457,6 +461,7 @@ public:
     static bool _fallact;
     static bool _qqgameact;
     static bool _3366privilegeact;
+    static bool _qzonepyprivilegeact;
     static void* _recalcwd;
     static bool _june;
     static bool _june1;
