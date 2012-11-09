@@ -257,8 +257,8 @@ namespace GObject
         VAR_ITEM_9178_FAILED_COUNT = 207, // 都率宝伞礼包连续开启失败次数
                                           // （ItemNormal.lua里面值已经写死）
 
-        VAR_LOCAL_RANK = 240, //本服斗剑，最好排名
-        VAR_LOCAL_MAXRANK = 241, //本服斗剑，当前排名
+        VAR_LOCAL_RANK = 240, //本服斗剑，当前排名
+        VAR_LOCAL_MAXRANK = 241, //本服斗剑，最好排名
         VAR_LOCAL_PRESTIGE = 242, //本服斗剑，声望数
         VAR_LOCAL_PAGE = 243, //本服斗剑，翻页数
 
