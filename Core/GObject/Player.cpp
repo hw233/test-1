@@ -958,6 +958,11 @@ namespace GObject
         if (World::_blueactiveday)
             onBlueactiveday();
 
+        if (World::getQgameGiftAct())
+        {
+            getQgameGiftAward();
+        }
+
         /**
          * 1：蓝钻
          * 2：黄钻
@@ -10552,13 +10557,18 @@ namespace GObject
     {
         if(atoi(m_domain) != 10)
             return;
+        if(GetLev() < 40)
+            return;
         if(GetVar(VAR_QGAME_GIFT) == 0)
         {
-            MailPackage::MailItem item[2] = {{503, 1},{514, 1}};
-            sendMailItem(2380, 2381, item, 2);
+
+            MailPackage::MailItem item[5] = {{512, 1}, {49, 1}, {50, 1}, {548, 1}, {551, 1}};
+            sendMailItem(2382, 2383, item, 5);
             SetVar(VAR_QGAME_GIFT, 1);
+
         }
     }
+
     void Player::sendYearActInfo()
     {
         Stream st(REP::COUNTRY_ACT);
