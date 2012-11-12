@@ -249,6 +249,7 @@ namespace Script
         CLASS_DEF(Player, AddClanContrib);
 		CLASS_DEF(Player, GetAttainMgr);
         CLASS_DEF(Player, GetActivityMgr);
+        CLASS_DEF(Player, GetStrengthenMgr);
 		CLASS_DEF(Player, addNewFormation);
 		CLASS_DEF(Player, openLevelBox);
 		CLASS_DEF(Player, sendMailPack);
@@ -366,6 +367,15 @@ namespace Script
         CLASS_DEF(ActivityMgr, GetPoint);
         CLASS_DEF(ActivityMgr, AddRewardFlag);
         CLASS_DEF(ActivityMgr, AddScores);
+
+		//变强之路
+        CLASS_ADD(StrengthenMgr);
+        CLASS_DEF(StrengthenMgr, GetFlag);
+        CLASS_DEF(StrengthenMgr, UpdateFlag);
+        CLASS_DEF(StrengthenMgr, CheckTimeOver);
+        CLASS_DEF(StrengthenMgr, AddSouls);
+        CLASS_DEF(StrengthenMgr, UpdateToDB);
+        CLASS_DEF(StrengthenMgr, GetSouls);
 
         //????
 		CLASS_ADD(Package);
@@ -1301,9 +1311,9 @@ namespace Script
 		return Call<void>("sendConsumeRankAward", player, pos);
     }
 
-    void GameActionLua::doAtySignIn(Player* pl, UInt32 id, UInt32 month, UInt32 day)
+    UInt16 GameActionLua::doAtySignIn()
     {
-        return Call<void>("doAtySignIn", pl, id, month, day);
+        return Call<UInt16>("doAtySignIn");
     }
 
     lua_tinker::table GameActionLua::GetExchangeProps(UInt32 id)

@@ -1058,7 +1058,7 @@ bool World::Init()
 	if(sday < now) sday += 86400;
 	AddTimer(86400 * 1000, World_Midnight_Check, this, (sday - now) * 1000);
     AddTimer(5 * 60 * 1000, World_Online_Log, static_cast<void *>(NULL), ((now + 300) / 300 * 300 - now) * 1000);
-    AddTimer(5 * 1000, World_Boss_Refresh, static_cast<void*>(NULL));
+    AddTimer(5 * 1000, World_Boss_Refresh, static_cast<void*>(NULL), 5 * 1000);
 
     UInt32 athChkPoint = TimeUtil::SharpDayT(0, now) + EXTRAREWARDTM;
     AddTimer(86400 * 1000, World_Athletics_Check, static_cast<void *>(&type), (athChkPoint >= now ? athChkPoint - now : 86400 + athChkPoint - now) * 1000);

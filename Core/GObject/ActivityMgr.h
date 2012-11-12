@@ -40,15 +40,16 @@ namespace GObject
         AtyEnd,
     };
 
-
+#define SIGNIN_RECORD 31
     struct ActivityItem
     {
-        UInt32  overTime;//结束时间
+        UInt32  overTime;//月结束时间
+        UInt32  scores;  //玩家签到总积分
+        UInt32  propsID; //刷新出来的道具ID，待兑换
+        UInt16  signRecord[SIGNIN_RECORD]; //每日签到记录(一整月)
         UInt32  awardID; //上线领取奖励物品ID
         UInt32  point;   //活跃点数
         UInt32  award;   //领取的奖励
-        UInt32  scores;  //玩家签到总积分
-        UInt32  propsID; //刷新出来的道具ID，待兑换
         /*
         UInt8   practice;//修炼次数
         UInt8   tripodFire;//点火次数
@@ -78,6 +79,19 @@ namespace GObject
             if(pid)
                 propsID = pid;
         }
+        /*
+        void Reset(UInt32 ot = 0, UInt32 s = 0, UInt32 pid = 0)
+        {
+            memset(this, 0, sizeof(ActivityItem));
+            if(ot)
+                overTime = ot;
+            if(s)
+                scores = s;
+            propsID = 29;
+            if(pid)
+                propsID = pid;
+        }
+        */
     };
     struct stRtyReward
     {
@@ -87,12 +101,6 @@ namespace GObject
 
     typedef std::vector<stRtyReward>  RtyRewards;
     typedef std::vector<RtyRewards> OnlineRewards;
-    struct Sign
-    {
-        UInt8 day;
-        UInt32 time;
-    };
-    typedef std::vector<Sign> SignRecord;
 //    struct stOnlineReward
   //  {
      //   Rty
@@ -113,7 +121,6 @@ namespace GObject
             Player*  _owner;
             ActivityItem  _item;
             RtyRewards    _onlineReward;
-            SignRecord    _signRecord; 
             //std::Map<UInt32, UInt32> _randmap;  //上线奖励中， 多种奖中励随机一个的，需要记录这个随机值。
             //func
             UInt32 GetRandomReward() ;
@@ -170,8 +177,13 @@ namespace GObject
             void SubScores(UInt32 v);
             UInt32 GetScores() { return _item.scores;}
             UInt32 GetPropsID() { return _item.propsID;}
+            UInt16 GetOneDayRecord(UInt8 day);
             void SetPropsID(UInt32 id = 0);
             void AddSignTime(UInt8 day = 0);
+            void ActivitySignIn();
+            void RefreshProps();
+            void ExchangeProps();
+            void SendActivityInfo();
     };
 
 }

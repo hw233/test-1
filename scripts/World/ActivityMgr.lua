@@ -349,14 +349,13 @@ local dayScore = {
     },
 }
 
---处理玩家每日签到积分累加
+    --[[
 function doAtySignIn(player, id, month, day)
     if nil == player or nil == id or nil == month or nil == day
     then
         return 0
     end
     local mgr = player:GetActivityMgr()
-    --[[
     local mon_tbl = dayScore[tonumber(month)]
     if nil == mon_tbl
     then
@@ -367,7 +366,6 @@ function doAtySignIn(player, id, month, day)
     then 
         return
     end
-    --]]
     --判断标志位
     local needflag = checkFlag[id]
     if nil == needflag
@@ -381,17 +379,23 @@ function doAtySignIn(player, id, month, day)
     else
         mgr:UpdateFlag(id, curflag + 1)
     end 
-    local chance = { 17, 34, 51, 68, 85, 100 }
-    local scores = { 10, 20, 30, 40, 50, 60 }
-    local rand = math.random(100)
-    local score = 0
+    --]]
+--处理玩家每日签到积分累加
+function doAtySignIn()
+    local chance = { 500, 1500, 4500, 7500, 8500, 9000, 9500, 9700, 9900, 1000 }
+    local scores = { 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
+    local rand = math.random(10000)
+    local score = 10
     for i = 1, #chance do
         if rand <= chance[i] then
             score = scores[i]
+            break
         end
     end
-    mgr:AddScores(score)
-    mgr:UpdateToDB()
+    local player = GetPlayer()
+    if socre == 100 then
+        Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]人品究极爆发，在活跃度中签到获得了100分！众生膜拜！")
+    end
     return score
 end
 

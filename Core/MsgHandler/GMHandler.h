@@ -166,6 +166,7 @@ private:
     void OnNewPlayerAutoSuper(GObject::Player* player, std::vector<std::string>& arge);
     void OnShowBattlePoint(GObject::Player* player, std::vector<std::string>& arge);
     void OnIdipBuy(GObject::Player* player, std::vector<std::string>& arge);
+    void OnStrengthen(GObject::Player *player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;

@@ -2382,7 +2382,7 @@ namespace GObject
 			lc.advance();
 			if(sthdata.playerId != last_id)
 			{
-				last_id = atydata.playerId;
+				last_id = sthdata.playerId;
 				pl = globalPlayers[last_id];
 			}
 			if(pl == NULL)

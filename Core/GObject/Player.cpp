@@ -10231,15 +10231,10 @@ namespace GObject
         Stream st(REP::GETAWARD);
         st << static_cast<UInt8>(7);
         UInt8 succ = GameAction()->RunNewRegisterAwardAD_RF(this, 1);
-        if(0 == succ)
-        {
-            st << succ << Stream::eos;
-            send(st);
-            return;
-        }
+        if(succ)
+            SetVar(VAR_AWARD_NEWREGISTER, 3);
         st << succ << Stream::eos;
         send(st);
-        SetVar(VAR_AWARD_NEWREGISTER, 3);
     }
 
     void Player::getAwardFromRF()
@@ -10249,15 +10244,10 @@ namespace GObject
         Stream st(REP::GETAWARD);
         st << static_cast<UInt8>(8);
         UInt8 succ = GameAction()->RunNewRegisterAwardAD_RF(this, 2);
-        if(0 == succ)
-        {
-            st << succ << Stream::eos;
-            send(st);
-            return;
-        }
+        if(succ)
+            SetVar(VAR_AWARD_NEWREGISTER, 4);
         st << succ << Stream::eos;
         send(st);
-        SetVar(VAR_AWARD_NEWREGISTER, 4);
     }
 
     void Player::getAwardGiftCard()
@@ -10267,15 +10257,10 @@ namespace GObject
         Stream st(REP::GETAWARD);
         st << static_cast<UInt8>(9);
         UInt8 succ = GameAction()->RunNewRegisterAwardAD_RF(this, 3);
-        if(0 == succ)
-        {
-            st << succ << Stream::eos;
-            send(st);
-            return;
-        }
+        if(succ)
+            SetVar(VAR_AWARD_NEWREGISTER, 5);
         st << succ << Stream::eos;
         send(st);
-        SetVar(VAR_AWARD_NEWREGISTER, 5);
     }
 
     void Player::getAwardBirthday(UInt8 opt)
@@ -13159,7 +13144,11 @@ namespace GObject
                     GetPackage()->Add(a.get<UInt32>(1), a.get<UInt32>(2), true, false, FromDailyActivity);
             }
         }
-        GameAction()->doAtySignIn(this, AtySignIn, mon, day);
+        //GameAction()->doAtySignIn(this, AtySignIn, mon, day);
+        UInt32 score = GameAction()->doAtySignIn();
+        GetActivityMgr()->UpdateFlag(AtySignIn, 1);
+        GetActivityMgr()->AddScores(score);
+        GetActivityMgr()->UpdateToDB();
         activityUdpLog(1025);
 
     }
@@ -13170,11 +13159,12 @@ namespace GObject
         st << static_cast<UInt8>(1);
         st << nextDay << Stream::eos;
         send(st);
-        Stream st1(REP::ACTIVITY_SIGNIN);
         ActivityMgr* mgr = this->GetActivityMgr();
         mgr->CheckTimeOver();
-        st1 << static_cast<UInt8> (0);
-        st1 << static_cast<UInt32>(mgr->GetScores()) << static_cast<UInt8>(mgr->GetFlag(AtySignIn)) << Stream::eos;
+        UInt8 day = TimeUtil::MonthDay(nextDay);
+        Stream st1(REP::ACTIVITY_SIGNIN);
+        st1 << static_cast<UInt8>(0);
+        st1 << static_cast<UInt32>(mgr->GetScores()) << static_cast<UInt16>(mgr->GetOneDayRecord(day)) << Stream::eos;
         send(st1);
     }
 

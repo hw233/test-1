@@ -215,6 +215,7 @@ GMHandler::GMHandler()
 
     Reg(3, "biglock", &GMHandler::OnBigLock);
     Reg(3, "bigunlock", &GMHandler::OnBigUnLock);
+    Reg(3, "strong", &GMHandler::OnStrengthen);
    
 }
 
@@ -3212,4 +3213,40 @@ void GMHandler::OnBigUnLock(GObject::Player *player, std::vector<std::string>& a
     }
 }
 
+void GMHandler::OnStrengthen(GObject::Player *player, std::vector<std::string>& args)
+{
+	if(args.size() <= 1)
+		return;
+	else
+	{
+		StrengthenMgr* mgr = player->GetStrengthenMgr();
+        switch(atoi(args[0].c_str()))
+		{
+		case 1:
+			{
+				UInt32 val = atoi(args[1].c_str());
+                if(val <= 0 || val > 256)
+                    return;
+                mgr->AddSouls(val);
+                mgr->UpdateToDB();
+            }
+            break;
+        case 2:
+			{
+                UInt8 id = atoi(args[1].c_str());
+                GameAction()->doStrong(player, id, 0, 0);
+            }
+            break;
+        case 3:
+			{
+                mgr->SetSoulId(0);
+                mgr->UpdateToDB();
+            }
+            break;
+        default:
+            return;
+            break;
+        }
+    }
+}
 
