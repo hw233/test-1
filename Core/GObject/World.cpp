@@ -48,6 +48,7 @@
 #include "Server/SysMsg.h"
 #include "Arena.h"
 #include "Tianjie.h"
+#include "DaysRank.h"
 #include "TownDeamon.h"
 #include "SingleHeroStage.h"
 #include "SHSYTmpl.h"
@@ -956,6 +957,11 @@ void World::Tianjie_Refresh(void*)
 {
 	GObject::Tianjie::instance().process(TimeUtil::Now());
 }
+void World::DaysRank_Refresh(void*)
+{
+	GObject::DaysRank::instance().process();
+}
+
 void World::Team_Copy_Process(void*)
 {
     teamCopyManager->process(TimeUtil::Now());
@@ -1011,7 +1017,9 @@ bool World::Init()
     static UInt8 type = 0;
     static UInt8 type2 = 1;
 	GObject::Tianjie::instance().Init();
+//	GObject::DaysRank::instance().Init();
 	AddTimer(5 * 1000, Tianjie_Refresh, static_cast<void*>(NULL));
+//	AddTimer(60 * 1000, DaysRank_Refresh, static_cast<void*>(NULL));
 
 	GObjectManager::delayLoad();
 	GObjectManager::LoadPracticeData();

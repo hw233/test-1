@@ -106,9 +106,9 @@ public:
     void end() { m_sorting = false; }
     bool isSorting() const { return m_sorting; }
     void buildBattlePacket();
+    int getMyRank(Player* pl, UInt8 type);
 private:
 	void doUpdate();
-    int getMyRank(Player* pl, UInt8 type);
     void makeRankStream(Stream*& st, UInt8 type, Player* pl);
 
 	Stream _levelStream;
