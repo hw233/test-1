@@ -243,6 +243,16 @@ struct ActivateAttrReq
 	MESSAGE_DEF2(REQ::EQ_ACTIVATE, UInt16, _fighterId, UInt32, _itemId);
 };
 
+struct EquipMoveReq
+{
+	UInt16 _ffighterId;
+	UInt16 _tfighterId;
+	UInt32 _fitemId;
+	UInt32 _titemId;
+    UInt8  _type;
+	MESSAGE_DEF5(REQ::EQ_MOVE, UInt16, _ffighterId,UInt16, _tfighterId, UInt32, _fitemId,UInt32, _titemId,UInt8,_type);
+};
+
 #if 0
 struct OutCitySwitchStruct
 {
@@ -1972,6 +1982,18 @@ void OnActivateAttrReq( GameMsgHdr& hdr, ActivateAttrReq& aar )
 	st << player->GetPackage()->ActivateAttr(aar._fighterId, aar._itemId) << aar._fighterId << aar._itemId << Stream::eos;
 	player->send(st);
 }
+void OnEquipMoveReq( GameMsgHdr& hdr, EquipMoveReq& aar )
+{
+	MSG_QUERY_PLAYER(player);
+	if(!player->hasChecked())
+		return;
+    UInt8 res = player->GetPackage()->EquipMove(aar._ffighterId, aar._tfighterId, aar._fitemId,aar._titemId,aar._type);
+    UInt8 count = player->GetVar(VAR_EQUIP_MOVE_COUNT);
+	Stream st(REP::EQ_MOVE);
+	st <<  res << count << Stream::eos;
+	player->send(st);
+}
+
 
 #if 0
 void OutCitySwitchReq( GameMsgHdr& hdr, OutCitySwitchStruct& lms )

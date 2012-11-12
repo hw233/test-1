@@ -54,7 +54,7 @@ function RunHappyAward(player, opt)
                 itemId = item[i]
 
                 if i <=4 then
-                    Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]在歡樂大轉盤中幸運地獲得了[4:"..itemId.."]x1")
+                    Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]在欢乐大转盘中幸运地获得了[4:"..itemId.."]x1")
                 end
                 break
             end

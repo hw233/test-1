@@ -243,6 +243,7 @@ namespace GObject
         VAR_YELLOW_AWARD_COUNT = 197, //黄钻抽奖次数
 
         VAR_WANSHENG_ITEM = 198, // 万圣节是否领取
+        VAR_EQUIP_MOVE_COUNT = 199,
 
         // TGC活动
         VAR_TGC_1_LOGIN = 200,
@@ -522,6 +523,7 @@ namespace GObject
             REGISTER_VAR(VAR_LOCAL_PRESTIGE, CYCLE_NONE);
             REGISTER_VAR(VAR_LOCAL_PAGE, CYCLE_NONE);
 
+            REGISTER_VAR(VAR_EQUIP_MOVE_COUNT, CYCLE_NONE);
             REGISTER_VAR(VAR_ACT_LOGIN_AWARD, CYCLE_DAY);
             REGISTER_VAR(VAR_ACT_LOGIN_AWARD_VIP, CYCLE_DAY);
         }
