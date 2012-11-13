@@ -42,6 +42,7 @@
 #include "GObject/ClanCopy.h"
 
 #include "GObject/Tianjie.h"
+#include "Memcached.h"
 GMHandler gmHandler;
 
 GMHandler::GMHandler()
@@ -216,6 +217,10 @@ GMHandler::GMHandler()
     Reg(3, "biglock", &GMHandler::OnBigLock);
     Reg(3, "bigunlock", &GMHandler::OnBigUnLock);
    
+    Reg(3, "fsale", &GMHandler::OnForbidSale);
+    Reg(3, "unfsale", &GMHandler::OnUnForbidSale);
+   
+
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -3211,5 +3216,21 @@ void GMHandler::OnBigUnLock(GObject::Player *player, std::vector<std::string>& a
         execu->Execute2("DELETE FROM `locked_player` WHERE `player_id` = %"I64_FMT"u", playerId);
     }
 }
+
+void GMHandler::OnForbidSale(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return;
+    UInt64 playerId = atoll(args[0].c_str());
+    setForbidSaleValue(playerId, true);
+}
+void GMHandler::OnUnForbidSale(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return;
+    UInt64 playerId = atoll(args[0].c_str());
+    setForbidSaleValue(playerId, false);
+}
+
 
 

@@ -1349,6 +1349,53 @@ void BigUnlockUser(LoginMsgHdr& hdr,const void * data)
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
+void ForbidSale(LoginMsgHdr& hdr,const void * data)
+{
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    std::string playerIds;
+    CHKKEY();
+    br>>playerIds;
+
+    UInt8 ret = 1;
+    //INFO_LOG("GMBIGLOCK: %s, %u", playerIds.c_str(), expireTime);
+    std::string playerId = GetNextSection(playerIds, ',');
+    while (!playerId.empty())
+    {
+        UInt64 pid = atoll(playerId.c_str());
+        pid = pid & 0xFFFFFFFFFF;
+        setForbidSaleValue(pid, true);
+        playerId = GetNextSection(playerIds, ',');
+    }
+    ret = 0;
+    Stream st(SPEP::FORBIDSALE);
+    st << ret << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
+void UnForbidSale(LoginMsgHdr& hdr,const void * data)
+{
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    std::string playerIds;
+    CHKKEY();
+    br>>playerIds;
+
+    UInt8 ret = 1;
+    //INFO_LOG("GMBIGLOCK: %s, %u", playerIds.c_str(), expireTime);
+    std::string playerId = GetNextSection(playerIds, ',');
+    while (!playerId.empty())
+    {
+        UInt64 pid = atoll(playerId.c_str());
+        pid = pid & 0xFFFFFFFFFF;
+        setForbidSaleValue(pid, false);
+        playerId = GetNextSection(playerIds, ',');
+    }
+    ret = 0;
+    Stream st(SPEP::UNFORBIDSALE);
+    st << ret << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
+
 void GmHandlerFromBs(LoginMsgHdr &hdr,const void * data)
 {
     BinaryReader br(data,hdr.msgHdr.bodyLen);

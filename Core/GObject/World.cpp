@@ -55,6 +55,8 @@
 #include "QixiTmpl.h"
 #include "MsgHandler/Memcached.h"
 
+static const UInt32 DAYSRANKTM = 23 * 3600+50*60;
+
 namespace GObject
 {
 
@@ -1081,6 +1083,9 @@ bool World::Init()
 
     UInt32 tdChkPoint = TimeUtil::SharpDayT(0, now) + TOWNDEAMONENDTM;
     AddTimer(86400 * 1000, TownDeamonTmAward, static_cast<void *>(NULL), (tdChkPoint >= now ? tdChkPoint - now : 86400 + tdChkPoint - now) * 1000);
+
+    UInt32 drChkPoint = TimeUtil::SharpDayT(0, now) + DAYSRANKTM;
+    //AddTimer(86400 * 1000, DaysRank_Refresh, static_cast<void *>(NULL), (drChkPoint >= now ? drChkPoint - now : 86400 + drChkPoint - now) * 1000);
 
     //AddTimer(60 * 1000, advancedHookTimer, static_cast<void *>(NULL), (60 - now % 60) * 1000);
 
