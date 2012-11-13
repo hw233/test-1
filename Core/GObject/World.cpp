@@ -694,6 +694,7 @@ void SendRechargeRankAward()
 {
     if(bRechargeEnd)
     {
+        World::initRCRank();
         int pos = 0;
         for (RCSortType::iterator i = World::rechargeSort.begin(), e = World::rechargeSort.end(); i != e; ++i)
         {
@@ -718,6 +719,7 @@ void SendConsumeRankAward()
 {
     if(bConsumeEnd)
     {
+        World::initRCRank();
         int pos = 0;
         for (RCSortType::iterator i = World::consumeSort.begin(), e = World::consumeSort.end(); i != e; ++i)
         {
@@ -826,7 +828,6 @@ void World::World_Midnight_Check( World * world )
         bRechargeEnd = true;
 
 	globalPlayers.enumerate(enum_midnight, static_cast<void *>(&nextday));
-    World::initRCRank();
 
     leaderboard.newDrawingGame(nextday);
     //给筷子使用称号
