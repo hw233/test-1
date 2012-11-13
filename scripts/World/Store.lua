@@ -171,6 +171,8 @@ function loadStore()
             store:add(2, 1704, 599) --轩辕双剑
             store:add(2, 1705, 599) --伏羲古琴
             store:add(2, 1707, 599) --蓝钻超人
+            store:add(2,509,80)
+            store:add(2,507,80)
         end
         if is0926_0927() then
         store:add(2,493,10)
