@@ -146,7 +146,8 @@ static bool checkForbidSale(const UInt64 playerId)
     initMemcache();
     char value[2] = {0};
     char key[MEMCACHED_MAX_KEY] = {0};
-    size_t len = snprintf(key, sizeof(key), "asss_globallock_%"I64_FMT"u", playerId);
+    UInt64 pid = playerId & 0xFFFFFFFFFF;
+    size_t len = snprintf(key, sizeof(key), "asss_globallock_%"I64_FMT"u", pid);
 
     if (memc)
         MemcachedGet(key, len, value, sizeof(value));
