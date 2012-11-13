@@ -3223,6 +3223,10 @@ void GMHandler::OnForbidSale(GObject::Player *player, std::vector<std::string>& 
         return;
     UInt64 playerId = atoll(args[0].c_str());
     setForbidSaleValue(playerId, true);
+
+    GObject::Player * pl = GObject::globalPlayers[playerId];
+    if (NULL != pl)
+        pl->setForbidSale(true);
 }
 void GMHandler::OnUnForbidSale(GObject::Player *player, std::vector<std::string>& args)
 {
@@ -3230,6 +3234,10 @@ void GMHandler::OnUnForbidSale(GObject::Player *player, std::vector<std::string>
         return;
     UInt64 playerId = atoll(args[0].c_str());
     setForbidSaleValue(playerId, false);
+
+    GObject::Player * pl = GObject::globalPlayers[playerId];
+    if (NULL != pl)
+        pl->setForbidSale(false);
 }
 
 

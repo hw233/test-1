@@ -1365,6 +1365,9 @@ void ForbidSale(LoginMsgHdr& hdr,const void * data)
         UInt64 pid = atoll(playerId.c_str());
         pid = pid & 0xFFFFFFFFFF;
         setForbidSaleValue(pid, true);
+	    GObject::Player * pl = GObject::globalPlayers[pid];
+        if (NULL != pl)
+            pl->setForbidSale(true);
         playerId = GetNextSection(playerIds, ',');
     }
     ret = 0;
@@ -1388,6 +1391,10 @@ void UnForbidSale(LoginMsgHdr& hdr,const void * data)
         UInt64 pid = atoll(playerId.c_str());
         pid = pid & 0xFFFFFFFFFF;
         setForbidSaleValue(pid, false);
+        GObject::Player * pl = GObject::globalPlayers[pid];
+        if (NULL != pl)
+            pl->setForbidSale(false);
+        
         playerId = GetNextSection(playerIds, ',');
     }
     ret = 0;
