@@ -43,6 +43,7 @@
 #endif
 
 #include <mysql.h>
+#include "Memcached.h"
 
 struct ClanListReq
 {
@@ -1235,7 +1236,11 @@ void OnSaleBuyAndCancelReq( GameMsgHdr& hdr, SaleBuyAndCancelReq& req )
     {
         return;
     }
-
+    if (req._token == 0 && checkForbidSale(player->getId()))
+    {
+        player->sendMsgCode(0, 1040);  
+        return;
+    }
 	if (req._token == 0)
 	{
 		if(!player->hasChecked())

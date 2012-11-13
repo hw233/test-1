@@ -124,6 +124,35 @@ static void setCrackValue(const char* ip, int v)
     }
 }
 
+static void setForbidSaleValue(const UInt64 playerId, bool isForbid)
+{
+    (void)setForbidSaleValue;
+    initMemcache();
+    if (memc)
+    {
+        char value[2] = {'0'};
+        char key[MEMCACHED_MAX_KEY] = {0};
+        size_t len = snprintf(key, sizeof(key), "asss_globallock_%"I64_FMT"u", playerId);
+        size_t vlen = 1;
+        if (isForbid) value[0] = '1';
+
+        MemcachedSet(key, len, value, vlen, 0);
+    }
+}
+
+static bool checkForbidSale(const UInt64 playerId)
+{
+    (void)checkForbidSale;
+    initMemcache();
+    char value[2] = {0};
+    char key[MEMCACHED_MAX_KEY] = {0};
+    size_t len = snprintf(key, sizeof(key), "asss_globallock_%"I64_FMT"u", playerId);
+
+    if (memc)
+        MemcachedGet(key, len, value, sizeof(value));
+
+    return value[0] == '1';
+}
 static bool checkCrack(std::string& platform, std::string& ip, UInt64 id)
 {
     (void)checkCrack;

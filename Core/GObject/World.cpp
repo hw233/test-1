@@ -48,11 +48,14 @@
 #include "Server/SysMsg.h"
 #include "Arena.h"
 #include "Tianjie.h"
+#include "DaysRank.h"
 #include "TownDeamon.h"
 #include "SingleHeroStage.h"
 #include "SHSYTmpl.h"
 #include "QixiTmpl.h"
 #include "MsgHandler/Memcached.h"
+
+static const UInt32 DAYSRANKTM = 23 * 3600+50*60;
 
 namespace GObject
 {
@@ -957,6 +960,11 @@ void World::Tianjie_Refresh(void*)
 {
 	GObject::Tianjie::instance().process(TimeUtil::Now());
 }
+void World::DaysRank_Refresh(void*)
+{
+	GObject::DaysRank::instance().process();
+}
+
 void World::Team_Copy_Process(void*)
 {
     teamCopyManager->process(TimeUtil::Now());
@@ -1012,7 +1020,9 @@ bool World::Init()
     static UInt8 type = 0;
     static UInt8 type2 = 1;
 	GObject::Tianjie::instance().Init();
+//	GObject::DaysRank::instance().Init();
 	AddTimer(5 * 1000, Tianjie_Refresh, static_cast<void*>(NULL));
+//	AddTimer(60 * 1000, DaysRank_Refresh, static_cast<void*>(NULL));
 
 	GObjectManager::delayLoad();
 	GObjectManager::LoadPracticeData();
@@ -1074,6 +1084,9 @@ bool World::Init()
 
     UInt32 tdChkPoint = TimeUtil::SharpDayT(0, now) + TOWNDEAMONENDTM;
     AddTimer(86400 * 1000, TownDeamonTmAward, static_cast<void *>(NULL), (tdChkPoint >= now ? tdChkPoint - now : 86400 + tdChkPoint - now) * 1000);
+
+    UInt32 drChkPoint = TimeUtil::SharpDayT(0, now) + DAYSRANKTM;
+    //AddTimer(86400 * 1000, DaysRank_Refresh, static_cast<void *>(NULL), (drChkPoint >= now ? drChkPoint - now : 86400 + drChkPoint - now) * 1000);
 
     //AddTimer(60 * 1000, advancedHookTimer, static_cast<void *>(NULL), (60 - now % 60) * 1000);
 

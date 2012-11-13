@@ -4415,7 +4415,7 @@ namespace GObject
             enchantUdpLog(toEquip, tIed.enchant);
 
             char str[32] = {0};
-            sprintf(str, "F_1115_%03d%02d%03d", fromEquip->getValueLev(), tIed.enchant+1, toEquip->getValueLev());
+            sprintf(str, "F_1155_%03d%02d%03d", fromEquip->getReqLev(), tIed.enchant+1, toEquip->getReqLev());
             m_Owner->udpLog("move", str, "", "", "", "", "act");
         }
         if(fFgt != NULL)
@@ -4455,7 +4455,7 @@ namespace GObject
         }
 
         char str[32] = {0};
-        sprintf(str, "F_1116_%03d00%03d", fromEquip->getValueLev(),  toEquip->getValueLev());
+        sprintf(str, "F_1156_%03d00%03d", fromEquip->getReqLev(),  toEquip->getReqLev());
         m_Owner->udpLog("move", str, "", "", "", "", "act");
     
         DB4().PushUpdateData("UPDATE `equipment` SET `socket1` = %u,`socket2` = %u,`socket3` = %u,`socket4` = %u,`socket5` = %u,`socket6` = %u WHERE `id` = %u",tIed.gems[0],tIed.gems[1],tIed.gems[2],tIed.gems[3],tIed.gems[4],tIed.gems[5],toEquip->getId());
@@ -4491,7 +4491,7 @@ namespace GObject
         fIed.spiritAttr.spForm[2] = uRand(4) + 1;
 
         char str[32] = {0};
-        sprintf(str, "F_1117_%03d00%03d", fromEquip->getValueLev(),  toEquip->getValueLev());
+        sprintf(str, "F_1157_%03d00%03d", fromEquip->getReqLev(),  toEquip->getReqLev());
         m_Owner->udpLog("move", str, "", "", "", "", "act");
 
         
