@@ -1365,6 +1365,9 @@ void ForbidSale(LoginMsgHdr& hdr,const void * data)
         UInt64 pid = atoll(playerId.c_str());
         pid = pid & 0xFFFFFFFFFF;
         setForbidSaleValue(pid, true);
+
+        if(cfg.merged)
+            pid += (static_cast<UInt64>(cfg.serverNo) << 48);
 	    GObject::Player * pl = GObject::globalPlayers[pid];
         if (NULL != pl)
             pl->setForbidSale(true);
@@ -1391,6 +1394,9 @@ void UnForbidSale(LoginMsgHdr& hdr,const void * data)
         UInt64 pid = atoll(playerId.c_str());
         pid = pid & 0xFFFFFFFFFF;
         setForbidSaleValue(pid, false);
+
+        if(cfg.merged)
+            pid += (static_cast<UInt64>(cfg.serverNo) << 48);
         GObject::Player * pl = GObject::globalPlayers[pid];
         if (NULL != pl)
             pl->setForbidSale(false);
