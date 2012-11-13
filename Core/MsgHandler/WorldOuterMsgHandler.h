@@ -1236,7 +1236,7 @@ void OnSaleBuyAndCancelReq( GameMsgHdr& hdr, SaleBuyAndCancelReq& req )
     {
         return;
     }
-    if (req._token == 0 && checkForbidSale(player->getId()))
+    if (req._token == 0 && player->getForbidSale())
     {
         player->sendMsgCode(0, 1040);  
         return;

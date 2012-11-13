@@ -238,6 +238,7 @@ inline UInt8 doLogin(Network::GameClient * cl, UInt64 pid, UInt32 hsid, GObject:
 	player->SetSessionID(hsid);
 	cl->SetPlayer(player);
 
+    player->setForbidSale(checkForbidSale(player->getId()));
 	return res;
 }
 

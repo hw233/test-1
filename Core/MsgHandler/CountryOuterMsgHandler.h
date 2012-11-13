@@ -3560,7 +3560,7 @@ void OnSaleSellReq( GameMsgHdr& hdr, SaleSellReq& req )
 
     if (player->GetLev() < 45)
         return;
-    if (checkForbidSale(player->getId()))
+    if (player->getForbidSale())
     {
         player->sendMsgCode(0, 1040);  
         return;

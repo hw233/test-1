@@ -1403,6 +1403,9 @@ namespace GObject
         inline Player* getLover() { return m_qixi.lover; }
         inline UInt32 getScore() { return m_qixi.score; }
         std::set<Player *>& getInviters() {return _friends[3];};
+
+        void setForbidSale(bool b) {_isForbidSale = b;}
+        bool getForbidSale() {return _isForbidSale;}
 	private:
 		Mutex _mutex;
 
@@ -1449,6 +1452,7 @@ namespace GObject
 		AtomicVal<UInt8> _threadId;
 		AtomicVal<int> _session;
 		bool _availInit;
+        AtomicVal<bool> _isForbidSale;
 
 		UInt32 _vipLevel;
 
