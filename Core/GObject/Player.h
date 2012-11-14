@@ -1004,6 +1004,7 @@ namespace GObject
         void setFightersDirty(bool bDirty=true);
         bool IsFighterEquipEnchantLev(UInt8 en, UInt8 num);
 		inline size_t getFighterCount() { return _fighters.size(); }
+        std::map<UInt32, Fighter *>& getFighterMap() {return _fighters;}
 		bool isFighterFull() const;
 		inline bool isMainFighter(UInt32 id) { return Fighter::isMainFighter(id); }
         void upInitCitta(Fighter* fgt,bool = false);
