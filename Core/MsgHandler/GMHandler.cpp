@@ -42,6 +42,7 @@
 #include "GObject/ClanCopy.h"
 
 #include "GObject/Tianjie.h"
+#include "Memcached.h"
 GMHandler gmHandler;
 
 GMHandler::GMHandler()
@@ -216,6 +217,10 @@ GMHandler::GMHandler()
     Reg(3, "biglock", &GMHandler::OnBigLock);
     Reg(3, "bigunlock", &GMHandler::OnBigUnLock);
    
+    Reg(3, "fsale", &GMHandler::OnForbidSale);
+    Reg(3, "unfsale", &GMHandler::OnUnForbidSale);
+   
+
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2738,7 +2743,8 @@ void GMHandler::OnJson(GObject::Player* player, std::vector<std::string>& args)
     //std::string json = "{\"head\": {\"uiPacketLen\":100,\"uiCmdid\":\"1\",\"uiSeqid\":1,\"szServiceName\":\"IDIP\",\"uiSendTime\": 20110820,\"uiVersion\":1001,\"ucAuthenticate\":\"\",\"iResult\":0,\" szRetErrMsg\":\"\"},\"body\":{\"szOpenId\":\"100001\",\" uiAreaId\":0,\"playerId\":1111}}";
     //const char* json = "                                       {\"head\": {\"uiPacketLen\":100,\"uiCmdid\":\"5\",\"uiSeqid\":1,\"szServiceName\":\"IDIP\",\"uiSendTime\": 20110820,\"uiVersion\":1001,\"ucAuthenticate\":\"\",\"iResult\":0,\" szRetErrMsg\":\"\"},\"body\":{\"szOpenId\":\"100001\",\" uiAreaId\":0,\"playerId\":1111,\"iNum\":1,\"uiItemId\":507}}";
     //const char* json = "                                       {\"head\": {\"uiPacketLen\":100,\"uiCmdid\":27,\"uiSeqid\":1,\"szServiceName\":\"IDIP\",\"uiSendTime\": 20121008,\"uiVersion\":1001,\"ucAuthenticate\":\"\",\"iResult\":0,\" szRetErrMsg\":\"\"},\"body\":{\"uiAreaId\":0,\"ucType\":3}}";
-    const char* json = "                                       {\"head\": {\"uiPacketLen\":100,\"uiCmdid\":63,\"uiSeqid\":1,\"szServiceName\":\"IDIP\",\"uiSendTime\": 20121008,\"uiVersion\":1001,\"ucAuthenticate\":\"\",\"iResult\":0,\" szRetErrMsg\":\"\"},\"body\":{\"uiAreaId\":0}}";
+    //const char* json = "                                       {\"head\": {\"uiPacketLen\":100,\"uiCmdid\":63,\"uiSeqid\":1,\"szServiceName\":\"IDIP\",\"uiSendTime\": 20121008,\"uiVersion\":1001,\"ucAuthenticate\":\"\",\"iResult\":0,\" szRetErrMsg\":\"\"},\"body\":{\"uiAreaId\":0}}";
+    const char* json = "                                       {\"head\": {\"uiPacketLen\":100,\"uiCmdid\":109,\"uiSeqid\":1,\"szServiceName\":\"IDIP\",\"uiSendTime\": 20121114,\"uiVersion\":1001,\"ucAuthenticate\":\"\",\"iResult\":0,\" szRetErrMsg\":\"\"},\"body\":{\"szOpenId\":\"1\",\"playerId\":\"1\",\"uiAreaId\":0}}";
     Stream st(0);
     for (UInt16 i = 0; i < 1; ++i)
         jsonParser2((void*)json, strlen(json), st);
@@ -3211,5 +3217,29 @@ void GMHandler::OnBigUnLock(GObject::Player *player, std::vector<std::string>& a
         execu->Execute2("DELETE FROM `locked_player` WHERE `player_id` = %"I64_FMT"u", playerId);
     }
 }
+
+void GMHandler::OnForbidSale(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return;
+    UInt64 playerId = atoll(args[0].c_str());
+    setForbidSaleValue(playerId, true);
+
+    GObject::Player * pl = GObject::globalPlayers[playerId];
+    if (NULL != pl)
+        pl->setForbidSale(true);
+}
+void GMHandler::OnUnForbidSale(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return;
+    UInt64 playerId = atoll(args[0].c_str());
+    setForbidSaleValue(playerId, false);
+
+    GObject::Player * pl = GObject::globalPlayers[playerId];
+    if (NULL != pl)
+        pl->setForbidSale(false);
+}
+
 
 

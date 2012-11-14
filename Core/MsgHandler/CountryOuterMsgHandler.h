@@ -60,6 +60,7 @@
 #include "GObject/SingleHeroStage.h"
 
 #include "GObject/Tianjie.h"
+#include "Memcached.h"
 
 struct NullReq
 {
@@ -3559,6 +3560,11 @@ void OnSaleSellReq( GameMsgHdr& hdr, SaleSellReq& req )
 
     if (player->GetLev() < 45)
         return;
+    if (player->getForbidSale())
+    {
+        player->sendMsgCode(0, 1040);  
+        return;
+    }
 
 	player->GetSale()->sellSaleReq(req._data);
 }

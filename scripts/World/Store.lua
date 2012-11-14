@@ -164,12 +164,15 @@ function loadStore()
         discount(store)
 
         if is0921_0924() then
-            store:add(2,1700,599)
-            store:add(2,1701,599)
-            store:add(2,1702,599)
-            store:add(2,1703,599)
-            store:add(2,1704,599)
-            store:add(2,1705,599)
+            store:add(2, 1700, 599) --仙墨笔
+            store:add(2, 1701, 599) --折翼扇
+            store:add(2, 1702, 599) --西方之焰
+            store:add(2, 1703, 599) --玫瑰情缘
+            store:add(2, 1704, 599) --轩辕双剑
+            store:add(2, 1705, 599) --伏羲古琴
+            store:add(2, 1707, 599) --蓝钻超人
+            store:add(2,509,80)
+            store:add(2,507,80)
         end
         if is0926_0927() then
         store:add(2,493,10)

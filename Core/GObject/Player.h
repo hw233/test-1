@@ -1004,6 +1004,7 @@ namespace GObject
         void setFightersDirty(bool bDirty=true);
         bool IsFighterEquipEnchantLev(UInt8 en, UInt8 num);
 		inline size_t getFighterCount() { return _fighters.size(); }
+        std::map<UInt32, Fighter *>& getFighterMap() {return _fighters;}
 		bool isFighterFull() const;
 		inline bool isMainFighter(UInt32 id) { return Fighter::isMainFighter(id); }
         void upInitCitta(Fighter* fgt,bool = false);
@@ -1403,6 +1404,9 @@ namespace GObject
         inline Player* getLover() { return m_qixi.lover; }
         inline UInt32 getScore() { return m_qixi.score; }
         std::set<Player *>& getInviters() {return _friends[3];};
+
+        void setForbidSale(bool b) {_isForbidSale = b;}
+        bool getForbidSale() {return _isForbidSale;}
 	private:
 		Mutex _mutex;
 
@@ -1449,6 +1453,7 @@ namespace GObject
 		AtomicVal<UInt8> _threadId;
 		AtomicVal<int> _session;
 		bool _availInit;
+        AtomicVal<bool> _isForbidSale;
 
 		UInt32 _vipLevel;
 

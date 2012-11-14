@@ -238,6 +238,7 @@ inline UInt8 doLogin(Network::GameClient * cl, UInt64 pid, UInt32 hsid, GObject:
 	player->SetSessionID(hsid);
 	cl->SetPlayer(player);
 
+    player->setForbidSale(checkForbidSale(player->getId()));
 	return res;
 }
 
@@ -1348,6 +1349,66 @@ void BigUnlockUser(LoginMsgHdr& hdr,const void * data)
     st << ret << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
+
+void ForbidSale(LoginMsgHdr& hdr,const void * data)
+{
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    std::string playerIds;
+    CHKKEY();
+    br>>playerIds;
+
+    UInt8 ret = 1;
+    //INFO_LOG("GMBIGLOCK: %s, %u", playerIds.c_str(), expireTime);
+    std::string playerId = GetNextSection(playerIds, ',');
+    while (!playerId.empty())
+    {
+        UInt64 pid = atoll(playerId.c_str());
+        pid = pid & 0xFFFFFFFFFF;
+        setForbidSaleValue(pid, true);
+
+        if(cfg.merged)
+            pid += (static_cast<UInt64>(cfg.serverNo) << 48);
+	    GObject::Player * pl = GObject::globalPlayers[pid];
+        if (NULL != pl)
+            pl->setForbidSale(true);
+        playerId = GetNextSection(playerIds, ',');
+    }
+    ret = 0;
+    Stream st(SPEP::FORBIDSALE);
+    st << ret << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
+void UnForbidSale(LoginMsgHdr& hdr,const void * data)
+{
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    std::string playerIds;
+    CHKKEY();
+    br>>playerIds;
+
+    UInt8 ret = 1;
+    //INFO_LOG("GMBIGLOCK: %s, %u", playerIds.c_str(), expireTime);
+    std::string playerId = GetNextSection(playerIds, ',');
+    while (!playerId.empty())
+    {
+        UInt64 pid = atoll(playerId.c_str());
+        pid = pid & 0xFFFFFFFFFF;
+        setForbidSaleValue(pid, false);
+
+        if(cfg.merged)
+            pid += (static_cast<UInt64>(cfg.serverNo) << 48);
+        GObject::Player * pl = GObject::globalPlayers[pid];
+        if (NULL != pl)
+            pl->setForbidSale(false);
+        
+        playerId = GetNextSection(playerIds, ',');
+    }
+    ret = 0;
+    Stream st(SPEP::UNFORBIDSALE);
+    st << ret << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
 
 void GmHandlerFromBs(LoginMsgHdr &hdr,const void * data)
 {
