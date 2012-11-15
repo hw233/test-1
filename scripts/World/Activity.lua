@@ -848,7 +848,7 @@ function initActTime(y, m, d)
   local  SerStartTm506= { ['year'] = 2012, ['month'] = 9, ['day'] = 13, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- Qgame大厅礼包
   local  SerStartTm507= { ['year'] = 2012, ['month'] = 9, ['day'] = 17, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTm504= { ['year'] = 2012, ['month'] = 11, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm504= { ['year'] = 2012, ['month'] = 11, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm503= { ['year'] = 2012, ['month'] = 9, ['day'] = 13, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --充值返礼(9/22-9/23)
