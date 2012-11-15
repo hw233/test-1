@@ -163,7 +163,7 @@ struct UserLogonRepStruct
 bool IsBigLock(UInt64 pid)
 {
     pid = pid & 0xFFFFFFFFFF;
-    std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());
+/*    std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());
     if (execu.get() != NULL && execu->isConnected())
     {
         GObject::DBBigLock lockData;
@@ -176,6 +176,9 @@ bool IsBigLock(UInt64 pid)
             return true;
         }
     }
+    */
+    if (getLockUserValue(pid) >= TimeUtil::Now())
+        return true;
     return false;
 }
 inline UInt8 doLogin(Network::GameClient * cl, UInt64 pid, UInt32 hsid, GObject::Player *& player, bool kickOld = true, bool reconnect = false)
@@ -1313,7 +1316,8 @@ void BigLockUser(LoginMsgHdr& hdr,const void * data)
         {
             UInt64 pid = atoll(playerId.c_str());
             pid = pid & 0xFFFFFFFFFF;
-            execu->Execute2("REPLACE INTO `locked_player`(`player_id`, `lockExpireTime`) VALUES(%"I64_FMT"u, %u)", pid,expireTime);
+            memLockUser(pid, expireTime);
+//            execu->Execute2("REPLACE INTO `locked_player`(`player_id`, `lockExpireTime`) VALUES(%"I64_FMT"u, %u)", pid,expireTime);
             playerId = GetNextSection(playerIds, ',');
         }
         ret = 0;
@@ -1340,7 +1344,8 @@ void BigUnlockUser(LoginMsgHdr& hdr,const void * data)
         {
             UInt64 pid = atoll(playerId.c_str());
             pid = pid & 0xFFFFFFFFFF;
-            execu->Execute2("DELETE FROM `locked_player` WHERE `player_id` = %"I64_FMT"u", pid);
+            memUnLockUser(pid);
+            //execu->Execute2("DELETE FROM `locked_player` WHERE `player_id` = %"I64_FMT"u", pid);
             playerId = GetNextSection(playerIds, ',');
         }
         ret = 0;

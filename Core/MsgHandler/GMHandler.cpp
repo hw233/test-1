@@ -2743,7 +2743,8 @@ void GMHandler::OnJson(GObject::Player* player, std::vector<std::string>& args)
     //std::string json = "{\"head\": {\"uiPacketLen\":100,\"uiCmdid\":\"1\",\"uiSeqid\":1,\"szServiceName\":\"IDIP\",\"uiSendTime\": 20110820,\"uiVersion\":1001,\"ucAuthenticate\":\"\",\"iResult\":0,\" szRetErrMsg\":\"\"},\"body\":{\"szOpenId\":\"100001\",\" uiAreaId\":0,\"playerId\":1111}}";
     //const char* json = "                                       {\"head\": {\"uiPacketLen\":100,\"uiCmdid\":\"5\",\"uiSeqid\":1,\"szServiceName\":\"IDIP\",\"uiSendTime\": 20110820,\"uiVersion\":1001,\"ucAuthenticate\":\"\",\"iResult\":0,\" szRetErrMsg\":\"\"},\"body\":{\"szOpenId\":\"100001\",\" uiAreaId\":0,\"playerId\":1111,\"iNum\":1,\"uiItemId\":507}}";
     //const char* json = "                                       {\"head\": {\"uiPacketLen\":100,\"uiCmdid\":27,\"uiSeqid\":1,\"szServiceName\":\"IDIP\",\"uiSendTime\": 20121008,\"uiVersion\":1001,\"ucAuthenticate\":\"\",\"iResult\":0,\" szRetErrMsg\":\"\"},\"body\":{\"uiAreaId\":0,\"ucType\":3}}";
-    const char* json = "                                       {\"head\": {\"uiPacketLen\":100,\"uiCmdid\":63,\"uiSeqid\":1,\"szServiceName\":\"IDIP\",\"uiSendTime\": 20121008,\"uiVersion\":1001,\"ucAuthenticate\":\"\",\"iResult\":0,\" szRetErrMsg\":\"\"},\"body\":{\"uiAreaId\":0}}";
+    //const char* json = "                                       {\"head\": {\"uiPacketLen\":100,\"uiCmdid\":63,\"uiSeqid\":1,\"szServiceName\":\"IDIP\",\"uiSendTime\": 20121008,\"uiVersion\":1001,\"ucAuthenticate\":\"\",\"iResult\":0,\" szRetErrMsg\":\"\"},\"body\":{\"uiAreaId\":0}}";
+    const char* json = "                                       {\"head\": {\"uiPacketLen\":100,\"uiCmdid\":109,\"uiSeqid\":1,\"szServiceName\":\"IDIP\",\"uiSendTime\": 20121114,\"uiVersion\":1001,\"ucAuthenticate\":\"\",\"iResult\":0,\" szRetErrMsg\":\"\"},\"body\":{\"szOpenId\":\"1\",\"playerId\":\"1\",\"uiAreaId\":0}}";
     Stream st(0);
     for (UInt16 i = 0; i < 1; ++i)
         jsonParser2((void*)json, strlen(json), st);
@@ -3192,15 +3193,17 @@ void GMHandler::OnBigLock(GObject::Player *player, std::vector<std::string>& arg
         return;
 
     UInt64 playerId = atoll(args[0].c_str());
-    UInt64 expireTime = 0;
+    UInt32 expireTime = 0;
     if (args.size() >= 2)
         expireTime = atoi(args[1].c_str()) * 60 * 60 + TimeUtil::Now();
+    memLockUser(playerId, expireTime);
 
-    std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());
+/*    std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());
     if (execu.get() != NULL && execu->isConnected())
     {
         execu->Execute2("REPLACE INTO `locked_player`(`player_id`, `lockExpireTime`) VALUES(%"I64_FMT"u, %u)", playerId, expireTime);
     }
+    */
 }
 
 void GMHandler::OnBigUnLock(GObject::Player *player, std::vector<std::string>& args)
@@ -3209,12 +3212,14 @@ void GMHandler::OnBigUnLock(GObject::Player *player, std::vector<std::string>& a
         return;
 
     UInt64 playerId = atoll(args[0].c_str());
-
+    memUnLockUser(playerId);
+/*
     std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());
     if (execu.get() != NULL && execu->isConnected())
     {
         execu->Execute2("DELETE FROM `locked_player` WHERE `player_id` = %"I64_FMT"u", playerId);
     }
+    */
 }
 
 void GMHandler::OnForbidSale(GObject::Player *player, std::vector<std::string>& args)

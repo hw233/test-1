@@ -106,9 +106,18 @@ void AthleticsRank::updateRankL(UInt8 row, Player* player, UInt32 newRank)
         return;
     AthlSort cur = {player, player->GetVar(VAR_LOCAL_RANK)};
     AthlSortType& curType = _ranksL[row][player->getServerNo()];
-    if(!curType.empty())
+    if(!curType.empty() && curType.count(cur) > 0)
     {
-        RankL curIter = curType.find(cur);
+        RankL curIter = curType.end();
+        std::pair<RankL, RankL> curPair = curType.equal_range(cur);
+        for(RankL iter = curPair.first; iter != curPair.second; ++iter)
+        {
+            if((*iter).player == player)
+            {
+                curIter = iter;
+                break;
+            }
+        }
         if(curIter != curType.end())
         {
             curType.erase(curIter);
