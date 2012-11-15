@@ -1414,6 +1414,22 @@ void UnForbidSale(LoginMsgHdr& hdr,const void * data)
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
+void QueryLockUser(LoginMsgHdr& hdr,const void * data)
+{
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    UInt64 pid = 0;
+    CHKKEY();
+    br>>pid;
+
+    pid = pid & 0xFFFFFFFFFF;
+    UInt8 isLockLogin = IsBigLock(pid);
+    UInt8 isForbidSale = checkForbidSale(pid);
+        
+    Stream st(SPEP::QUERYLOCKUSER);
+    st << isLockLogin << isForbidSale << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
 
 void GmHandlerFromBs(LoginMsgHdr &hdr,const void * data)
 {

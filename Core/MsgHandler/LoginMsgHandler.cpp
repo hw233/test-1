@@ -61,6 +61,7 @@ MSG_REG_2(LoginMsgHdr,SPEQ::BIGUNLOCKUSER,BigUnlockUser);
 
 MSG_REG_2(LoginMsgHdr,SPEQ::FORBIDSALE,ForbidSale);
 MSG_REG_2(LoginMsgHdr,SPEQ::UNFORBIDSALE,UnForbidSale);
+MSG_REG_2(LoginMsgHdr,SPEQ::QUERYLOCKUSER,QueryLockUser);
 
 MSG_REG_2(LoginMsgHdr, 0x300, OnCheckPackKey);
 MSG_REG_2(LoginMsgHdr, 0x301, OnSetCrackValue);
