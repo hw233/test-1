@@ -163,6 +163,9 @@ function loadStore()
 
         discount(store)
 
+        if is1116_1122() then
+            store:add(2, 9215, 10) --逍遥礼包
+        end
         if is0921_0924() then
             store:add(2, 1700, 599) --仙墨笔
             store:add(2, 1701, 599) --折翼扇
@@ -179,7 +182,6 @@ function loadStore()
         store:add(2,494,20)
         store:add(2,495,50)
         end
-
         store:add(2,1706,599)
         --store:add(2,9163,10)
         -- store:add(2,1706,599)

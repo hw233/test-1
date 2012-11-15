@@ -263,6 +263,9 @@ namespace GObject
         VAR_LOCAL_PRESTIGE = 242, //本服斗剑，声望数
         VAR_LOCAL_PAGE = 243, //本服斗剑，翻页数
 
+        VAR_9215_USED = 244,  //逍遥礼包使用数
+        //250-269 越南版已占用
+
         // 270-280 占用 for zhgc
         VAR_ACT_LOGIN_AWARD     = 270, // 节日每日登陆奖励普通
         VAR_ACT_LOGIN_AWARD_VIP = 271, // 节日每日登陆奖励VIP
@@ -516,6 +519,7 @@ namespace GObject
             REGISTER_VAR(VAR_LOCAL_MAXRANK, CYCLE_NONE);
             REGISTER_VAR(VAR_LOCAL_PRESTIGE, CYCLE_NONE);
             REGISTER_VAR(VAR_LOCAL_PAGE, CYCLE_NONE);
+            REGISTER_VAR(VAR_9215_USED, CYCLE_NONE);
 
             REGISTER_VAR(VAR_EQUIP_MOVE_COUNT, CYCLE_NONE);
             REGISTER_VAR(VAR_ACT_LOGIN_AWARD, CYCLE_DAY);

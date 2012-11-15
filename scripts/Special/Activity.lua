@@ -130,6 +130,30 @@ function TgcEvent(player, _type)
     end
 end
 
+function _9215Act(player, _type)
+    if not get9215Act() then
+        return
+    end
+    local package = player:GetPackage();
+    if _type == 0 then
+        package:AddItem(9215, 1, true)
+        player:luaUdpLog("huodong", "F_10000_10", "act")
+    elseif _type == 1 then
+        package:AddItem(9215, 2, true)
+        player:luaUdpLog("huodong", "F_10000_11", "act")
+    elseif _type == 2 then
+        package:AddItem(9215, 4, true)
+        player:luaUdpLog("huodong", "F_10000_12", "act")
+    elseif _type == 3 then
+        package:AddItem(9215, 6, true)
+        player:luaUdpLog("huodong", "F_10000_14", "act")
+    elseif _type == 5 then
+        package:AddItem(9215, 5, true)
+        player:luaUdpLog("huodong", "F_10000_13", "act")
+    end
+end
+
+
 function onLogin(player)
 	local stage = getActivityStage();
     checkExpire2(player, stage);
@@ -215,6 +239,11 @@ function onDungeonWin(player, id, count, free)
     end
     sendWinReward(player, lootlvl, 3);
     TgcEvent(player, 3)
+    local count = 0;
+    if not free then
+        count = 5
+    end
+    _9215Act(player, count);
 end
 
 function onClanBattleAttend(player)
@@ -896,6 +925,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     end
     sendWinReward(player, lootlvl, 1);
     TgcEvent(player, 1)
+    _9215Act(player, lootlvl);
 end
 
 function onFrontMapFloorWin(player, id, spot, lootlvl)
@@ -925,6 +955,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
     end
     sendWinReward(player, lootlvl, 2);
     TgcEvent(player, 2)
+    _9215Act(player, lootlvl);
 end
 
 local vippack = {

@@ -288,6 +288,11 @@ public:
     inline static bool getGuoqing()
     { return _guoqing; }
 
+    inline static void set9215Act(bool v)
+    { _9215Act= v; }
+    inline static bool get9215Act()
+    { return _9215Act; }
+
     inline static void setRechargeNextRet(bool v)
     { _rechargenextret = v; }
     inline static bool getRechargeNextRet()
@@ -474,6 +479,7 @@ public:
     static bool _wansheng;
     static bool _11Act;
     static bool _guoqing;
+    static bool _9215Act;
     static bool _enchant_gt11;
     static bool _rechargenextret;
     static UInt32 _rechargenextretstart;
@@ -557,6 +563,7 @@ public:
     void SendQixiAward();
     void SendGuoqingAward();
     void sendQixiScoreAward(Player* pl);
+    void SendXiaoyaoAward();
 
     void killMonsterAppend(Stream& st, UInt8 index);
     void killMonsterInit();

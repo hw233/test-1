@@ -1081,7 +1081,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendAthlBufInfo();
     luckyDraw.notifyDisplay(pl);
 
-    if (World::getTrumpEnchRet())
+    if (World::getTrumpEnchRet() || World::get9215Act())
         pl->sendTokenInfo();
 
     if(World::getFourCopAct())
@@ -4959,7 +4959,7 @@ void OnUseToken( GameMsgHdr& hdr, UseToken& req )
     if(!player->hasChecked())
          return;
 
-    if (World::getTrumpEnchRet())
+    if (World::getTrumpEnchRet() || World::get9215Act())
     {
         player->useToken(req._type);
     }

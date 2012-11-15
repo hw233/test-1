@@ -1317,6 +1317,7 @@ void BigLockUser(LoginMsgHdr& hdr,const void * data)
             UInt64 pid = atoll(playerId.c_str());
             pid = pid & 0xFFFFFFFFFF;
             memLockUser(pid, expireTime);
+            setForbidSaleValue(pid, true);
 //            execu->Execute2("REPLACE INTO `locked_player`(`player_id`, `lockExpireTime`) VALUES(%"I64_FMT"u, %u)", pid,expireTime);
             playerId = GetNextSection(playerIds, ',');
         }

@@ -134,6 +134,7 @@ bool World::_qixi= false;
 bool World::_wansheng= false;
 bool World::_11Act= false;
 bool World::_guoqing= false;
+bool World::_9215Act= false;
 bool World::_enchant_gt11 = false;
 bool World::_rechargenextret;
 UInt32 World::_rechargenextretstart;
@@ -235,6 +236,7 @@ bool bWanshengEnd = false;
 bool bGuoqingEnd = false;
 bool bRechargeEnd = false;
 bool bConsumeEnd = false;
+bool bXiaoyaoEnd = false;
 
 bool enum_midnight(void * ptr, void* next)
 {
@@ -790,6 +792,7 @@ void World::World_Midnight_Check( World * world )
     bool bQixi = getQixi();
     bool bWansheng = getWansheng();
     bool bGuoqing = getGuoqing();
+    bool bXiaoyao = get9215Act();
     bool bRecharge = (getRechargeActive() || getRechargeActive3366()) && getNeedRechargeRank();
     bool bConsume = getConsumeActive() && getNeedConsumeRank();
     bool bPExpItems = getPExpItems();
@@ -817,6 +820,7 @@ void World::World_Midnight_Check( World * world )
     bQixiEnd = bQixi && !getQixi();
     bWanshengEnd = bWansheng && !getWansheng();
     bGuoqingEnd = bGuoqing && !getGuoqing();
+    bXiaoyaoEnd = bXiaoyao && !get9215Act();
     bRechargeEnd = bRecharge && !(getRechargeActive()||getRechargeActive3366());
     bConsumeEnd = bConsume && !getConsumeActive();
     bool bMonsterActEnd = bMonsterAct && !getKillMonsterAct();
@@ -892,6 +896,8 @@ void World::World_Midnight_Check( World * world )
         world->killMonsterInit();
 	    SendKillMonsterRankAward();
     }
+    if (bXiaoyaoEnd)
+        world->SendXiaoyaoAward();
 
 	dungeonManager.enumerate(enum_dungeon_midnight, &curtime);
 	globalClans.enumerate(enum_clan_midnight, &curtime);
@@ -1654,6 +1660,35 @@ void World::SendGuoqingAward()
 
 
 }
+struct SSelectXiaoyaoUsedMost : public Visitor<Player>
+{
+    Player* _player;
+    UInt32 _used;
+    SSelectXiaoyaoUsedMost() : _player(NULL), _used(0) {}
+    bool operator()(Player* player)
+    {
+        UInt32 used = player->GetVar(VAR_9215_USED);
+        if(_player == NULL || used > _used)
+        {
+            _player = player;
+            _used = used;
+        }
+        return true;
+    }
+};
+void World::SendXiaoyaoAward()
+{
+    SSelectXiaoyaoUsedMost selector;
+    globalPlayers.enumerate(selector);
+    if(selector._player == NULL)
+        return;
+    MailPackage::MailItem items[] =
+    {
+        {9216, 1}
+    };
+    selector._player->sendMailItem(4062, 4063, items, sizeof(items)/sizeof(items[0]), false);
+}
+
 
 #ifndef _WIN32
 void World::udpLog(const char* str1, const char* str2, const char* str3, const char* str4,

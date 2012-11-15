@@ -11846,8 +11846,8 @@ namespace GObject
 
         static UInt16 items[3][4] = {
             {515,509,507,47},
-            {503,514,501,547},
-            {56,57,15,500},
+            {503,1325,1528,516},
+            {8000,551,517,500},
         };
 
         bool same = true;
@@ -11864,13 +11864,13 @@ namespace GObject
 
         if (same)
         {
-            GetPackage()->AddItem(ids[0], 6, true, false);
+            GetPackage()->Add(ids[0], 6, true, false);
         }
         else
         {
             for (UInt8 i = 0; i < 3; ++i)
             {
-                GetPackage()->AddItem(ids[i], 1, true, false);
+                GetPackage()->Add(ids[i], 1, true, false);
             }
         }
 
@@ -11882,9 +11882,9 @@ namespace GObject
         sendTokenInfo();
 
         if (type == 0 && !same)
-            SYSMSG_BROADCASTV(2351, _playerData.country, _playerData.name.c_str(), ids[0], ids[1], ids[2]);
+            SYSMSG_BROADCASTV(4060, _playerData.country, _playerData.name.c_str(), ids[0], ids[1], ids[2]);
         if (type == 0 && same)
-            SYSMSG_BROADCASTV(2352, _playerData.country, _playerData.name.c_str(), ids[0]);
+            SYSMSG_BROADCASTV(4061, _playerData.country, _playerData.name.c_str(), ids[0]);
     }
 
     void Player::sendTokenInfo()
