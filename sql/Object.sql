@@ -1782,6 +1782,6 @@ CREATE TABLE `days_rank` (
     `battle` char(100) NOT NULL DEFAULT '',
     PRIMARY KEY (`player_id`),
     UNIQUE KEY `unq` (`player_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
