@@ -2669,6 +2669,10 @@ namespace GObject
         if(updateHft)
             hf->updateHftValueToDB(hft);
 
+        if(equip->getClass() == Item_Trump || equip->getClass() == Item_Halo)
+            GameAction()->doStrong(this->m_Owner, SthTrumpEnchant, 0, 0);
+        else
+            GameAction()->doStrong(this->m_Owner, SthEnchant, 0, 0);
 		AddItemHistoriesLog(item_enchant_l + type, enc_times);
         //DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), item_enchant_l + type, enc_times, TimeUtil::Now());
         ConsumeInfo ci(EnchantEquipment,0,0);
@@ -2697,7 +2701,6 @@ namespace GObject
                 }
                 //法宝强化
                 GameAction()->doAttainment(this->m_Owner, 10204, ied.enchant);
-                GameAction()->doStrong(this->m_Owner, SthTrumpEnchant, 0, 0);
 
                 if(ied.enchant == 9)
                 {
@@ -2732,7 +2735,6 @@ namespace GObject
             {
                 //装备强化
                 GameAction()->doAttainment(this->m_Owner, 10164, ied.enchant);
-                GameAction()->doStrong(this->m_Owner, SthEnchant, 0, 0);
 
                  if(fgt)
                      fgt->CheckEquipEnchantAttainment(ied.enchant);
@@ -2971,7 +2973,6 @@ namespace GObject
             m_Owner->OnHeroMemo(MC_FORGE, MD_MASTER, 0, 1);
         else if (ied.sockets >= 1)
             m_Owner->OnHeroMemo(MC_FORGE, MD_MASTER, 0, 0);
-        GameAction()->doStrong(this->m_Owner, SthOpenSocket, 0,0);
 		return 0;
 	}
 
@@ -3175,7 +3176,6 @@ namespace GObject
 		}
 		else
 			SendSingleEquipData(equip);
-        GameAction()->doStrong(this->m_Owner, SthAttachGem, 0, 0);
 		return 0;
 	}
 
@@ -3254,7 +3254,6 @@ namespace GObject
 			SendSingleEquipData(equip);
 
         m_Owner->OnHeroMemo(MC_FORGE, MD_MASTER, 1, 1);
-        GameAction()->doStrong(this->m_Owner, SthDetachGem, 0, 0);
 		return 0;
 	}
 
@@ -3828,6 +3827,7 @@ namespace GObject
 		if(protectUnbindUsed > 0)
 			DelItem(ITEM_GEM_PROTECT, protectUnbindUsed, false, ToGemMgerge);
 
+        GameAction()->doStrong(this->m_Owner, SthMergeGem, 0, 0);
 		return result;
     }
 
@@ -5100,7 +5100,6 @@ namespace GObject
 		else
 			SendSingleEquipData(trump);
  
-        GameAction()->doStrong(m_Owner, SthTrumpLOrder, 0, 0);
         return 0;
     }
 

@@ -4048,7 +4048,7 @@ namespace GObject
 #endif
 #endif // _WIN32
         AddVar(VAR_USEGOLD_CNT, c);
-		return _playerData.gold;
+        return _playerData.gold;
 	}
 
     UInt32 Player::useGold4LuckDraw(UInt32 c)
@@ -4164,7 +4164,15 @@ namespace GObject
 		SYSMSG_SENDV(156, this, c);
 		SYSMSG_SENDV(1056, this, c);
 		sendModification(2, _playerData.coupon);
-        AddVar(VAR_USECOUPON_CNT, c);
+        {
+            AddVar(VAR_USECOUPON_CNT, c);
+            daysValueRankMsg msg;
+            msg.playerId = getId();
+            msg.type = 2;
+            msg.value = GetVar(VAR_USETAEL_CNT) + GetVar(VAR_USECOUPON_CNT) * 100;
+            GameMsgHdr hdr(0x1EC, WORKER_THREAD_WORLD, this, sizeof(msg));
+            GLOBAL().PushMsg(hdr, &msg);
+        }
 		return _playerData.coupon;
 	}
 
@@ -4226,7 +4234,15 @@ namespace GObject
 		SYSMSG_SENDV(152, this, c);
 		SYSMSG_SENDV(1052, this, c);
 		sendModification(3, _playerData.tael);
-        AddVar(VAR_USETAEL_CNT, c);
+        {
+            AddVar(VAR_USETAEL_CNT, c);
+            daysValueRankMsg msg;
+            msg.playerId = getId();
+            msg.type = 2;
+            msg.value = GetVar(VAR_USETAEL_CNT) + GetVar(VAR_USECOUPON_CNT) * 100;
+            GameMsgHdr hdr(0x1EC, WORKER_THREAD_WORLD, this, sizeof(msg));
+            GLOBAL().PushMsg(hdr, &msg);
+        }
 		return _playerData.tael;
 	}
 	void Player::useTael2(UInt32 c, Player *attacker, ConsumeInfo * ci)//nature challengge use
@@ -4923,7 +4939,15 @@ namespace GObject
 		// SYSMSG_SENDV(105, this, a);
 		SYSMSG_SENDV(1005, this, a);
 		sendModification(8, _playerData.achievement);
-        AddVar(VAR_GETACHIEVEMENT_CNT, a);
+        {
+            AddVar(VAR_GETACHIEVEMENT_CNT, a);
+            daysValueRankMsg msg;
+            msg.playerId = getId();
+            msg.type = 3;
+            msg.value = GetVar(VAR_GETACHIEVEMENT_CNT) + GetVar(VAR_GETPRESTIGE_CNT);
+            GameMsgHdr hdr(0x1EC, WORKER_THREAD_WORLD, this, sizeof(msg));
+            GLOBAL().PushMsg(hdr, &msg);
+        }
 		return _playerData.achievement;
 	}
 
@@ -5013,7 +5037,15 @@ namespace GObject
         Stream st(REP::USER_INFO_CHANGE);
         st << static_cast<UInt8>(0x15) << _playerData.prestige << Stream::eos;
         send(st);
-        AddVar(VAR_GETPRESTIGE_CNT, a);
+        {
+            AddVar(VAR_GETPRESTIGE_CNT, a);
+            daysValueRankMsg msg;
+            msg.playerId = getId();
+            msg.type = 3;
+            msg.value = GetVar(VAR_GETACHIEVEMENT_CNT) + GetVar(VAR_GETPRESTIGE_CNT);
+            GameMsgHdr hdr(0x1EC, WORKER_THREAD_WORLD, this, sizeof(msg));
+            GLOBAL().PushMsg(hdr, &msg);
+        }
 		return _playerData.prestige;
     }
 

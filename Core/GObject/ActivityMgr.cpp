@@ -64,6 +64,12 @@ void ActivityMgr::LoadFromDB(DBActivityData& data)
 bool ActivityMgr::CheckTimeOver()
 {
     UInt32 now = TimeUtil::Now();
+#if 1
+    //更新1天即可
+    UInt32 overTime = TimeUtil::SharpMonth(1, now);
+    if(overTime > _item.overTime)
+        _item.overTime = overTime;
+#endif
     if(now < _item.overTime)
         return false;
     /*
@@ -72,7 +78,7 @@ bool ActivityMgr::CheckTimeOver()
     _onlineReward.clear() ;
     GetOnlineReward(GetOnlineRewardGetNum());
     */
-    UInt32 over = TimeUtil::SharpMonth(1 , now);
+    UInt32 over = TimeUtil::SharpMonth(1, now);
     _item.Reset(over, _item.scores, _item.propsID);
     UpdateToDB();
     return true;
@@ -199,7 +205,7 @@ UInt8 ActivityMgr::GetContinueSignInCnt(UInt8 day)
         if(cnt == day)
         {
             UInt8 dayCnt = TimeUtil::GetOneMonthDays(TimeUtil::Now() - 7 * 86400);
-            for(UInt8 j = dayCnt; j > dayCnt - 7 + cnt; --j)
+            for(UInt8 j = dayCnt; j > dayCnt - 7 + day; --j)
             {
                 if(_item.signRecord[0][j-1] <= 0)
                     break;

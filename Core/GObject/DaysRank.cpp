@@ -1,5 +1,4 @@
-﻿#include "DaysRank.h"
-#include "Config.h"
+﻿#include "Config.h"
 #include "Common/TimeUtil.h"
 #include "GObject/Leaderboard.h"
 #include "DB/DBExecutor.h"
@@ -7,6 +6,7 @@
 #include "GData/GDataDBExecHelper.h"
 #include "GObject/Leaderboard.h"
 #include "Player.h"
+#include "DaysRank.h"
 
 namespace GObject
 {
@@ -19,7 +19,7 @@ void DaysRank::Init()
 {
     LoadFromDB();
 }
-void DaysRank::process()
+void DaysRank::process(bool toDB)
 {
     FastMutex::ScopedLock lk(_opMutex);
     std::unordered_map<UInt64, Player*>& pm = GObject::globalPlayers.getMap();
@@ -53,8 +53,8 @@ void DaysRank::process()
             std::string s3 = pInfo->toString(2);
             std::string s4 = pInfo->toString(3);
             std::string s5 = pInfo->toString(4);
-
-            DB1().PushUpdateData("REPLACE INTO `days_rank` VALUES(%"I64_FMT"u,'%s','%s','%s','%s','%s')", 
+            if(toDB)
+                DB1().PushUpdateData("REPLACE INTO `days_rank` VALUES(%"I64_FMT"u,'%s','%s','%s','%s','%s')", 
                     pl->getId(),s1.c_str(),s2.c_str(),s3.c_str(),s4.c_str(),s5.c_str());
 
         }
@@ -83,10 +83,10 @@ void DaysRank::LoadFromDB()
     }
 }
 
-PlayerRankInfo* DaysRank::getDaysRank(Player* pl)
+PlayerRankInfo* DaysRank::getDaysRank(UInt64 playerId)
 {
     FastMutex::ScopedLock lk(_opMutex);
-    std::map<UInt64, PlayerRankInfo>::iterator iter = m_playerDaysRank.find(pl->getId());
+    std::map<UInt64, PlayerRankInfo>::iterator iter = m_playerDaysRank.find(playerId);
     if (iter != m_playerDaysRank.end())
     {
         return &(iter->second);
@@ -94,6 +94,20 @@ PlayerRankInfo* DaysRank::getDaysRank(Player* pl)
     return NULL;
 }
 
+void DaysRank::updateDaysValue(daysValueRankMsg * msg)
+{
+    if(!msg)
+        return;
+    UInt8 type = msg->type;
+    PlayerRankInfo* pInfo = getDaysRank(msg->playerId);
+    if(pInfo)
+    {
+        if (type < DAYS_RANK_TYPE)
+        {
+            pInfo->rank[type][DAYS_RANK_COUNT-1] = msg->value;
+        }
+    }
+}
 
 }
 

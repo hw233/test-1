@@ -1753,9 +1753,12 @@ void OnOpenSocketReq( GameMsgHdr& hdr, OpenSocketReq& osr )
 	MSG_QUERY_PLAYER(player);
     if (!player->hasChecked())
         return;
+	UInt8 result = player->GetPackage()->OpenSocket(osr._fighterId, osr._itemid);
 	Stream st(REP::EQ_TO_PUNCH);
-	st << player->GetPackage()->OpenSocket(osr._fighterId, osr._itemid) << osr._fighterId << osr._itemid << Stream::eos;
+	st << result << osr._fighterId << osr._itemid << Stream::eos;
 	player->send(st);
+    if(result != 2)
+        GameAction()->doStrong(player, SthOpenSocket, 0, 0);
 }
 
 #if 0
@@ -1776,9 +1779,12 @@ void OnAttachGemReq( GameMsgHdr& hdr, AttachGemReq& agr )
 	MSG_QUERY_PLAYER(player);
 	if(!player->hasChecked())
 		return;
+	UInt8 result = player->GetPackage()->AttachGem(agr._fighterId, agr._itemid, agr._gemid, agr._bind > 0);
 	Stream st(REP::EQ_EMBED);
 	st << player->GetPackage()->AttachGem(agr._fighterId, agr._itemid, agr._gemid, agr._bind > 0) << agr._fighterId << agr._itemid << Stream::eos;
 	player->send(st);
+    if(!result)
+        GameAction()->doStrong(player, SthAttachGem, 0, 0);
 }
 
 void OnDetachGemReq( GameMsgHdr& hdr, DetachGemReq& dgr )
@@ -1786,9 +1792,12 @@ void OnDetachGemReq( GameMsgHdr& hdr, DetachGemReq& dgr )
 	MSG_QUERY_PLAYER(player);
 	if(!player->hasChecked())
 		return;
+	UInt8 result = player->GetPackage()->DetachGem(dgr._fighterId, dgr._itemid, dgr._pos, dgr._protect);
 	Stream st(REP::EQ_UN_EMBED);
-	st << player->GetPackage()->DetachGem(dgr._fighterId, dgr._itemid, dgr._pos, dgr._protect) << dgr._fighterId << dgr._itemid << dgr._pos << Stream::eos;
+	st << result << dgr._fighterId << dgr._itemid << dgr._pos << Stream::eos;
 	player->send(st);
+    if(result != 2)
+        GameAction()->doStrong(player, SthDetachGem, 0, 0);
 }
 
 #if 0
@@ -1926,7 +1935,6 @@ void OnBatchMergeReq( GameMsgHdr& hdr, BatchMergeReq& bmr )
 	st << result << gemIdOut << gemUnbindOut << gemBindOut << succTimes << failedTimes;
 	st << Stream::eos;
 	player->send(st);
-    GameAction()->doStrong(player, SthMergeGem, 0, 0);
 }
 
 #if 0
@@ -4307,6 +4315,7 @@ void OnTrumpLOrder( GameMsgHdr& hdr, TrumpLOrderReq& req)
     {
         ConsumeInfo ci(TrumpLOrder,0,0);
         player->useTael(amount, &ci);
+        GameAction()->doStrong(player, SthTrumpLOrder, 0, 0);
     }
 
 	Stream st(REP::EQ_TRUMP_L_ORDER);

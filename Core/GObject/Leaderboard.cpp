@@ -13,6 +13,7 @@
 #include "MsgID.h"
 #include "ClanRankBattle.h"
 #include "Common/Itoa.h"
+#include "DaysRank.h"
 
 namespace GObject
 {
@@ -189,6 +190,7 @@ void Leaderboard::buildBattlePacket()
 void Leaderboard::update()
 {
 	doUpdate();
+    GObject::DaysRank::instance().process(false);
 }
 
 void Leaderboard::doUpdate()
