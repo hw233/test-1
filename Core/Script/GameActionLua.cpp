@@ -250,6 +250,7 @@ namespace Script
         CLASS_DEF(Player, AddClanContrib);
 		CLASS_DEF(Player, GetAttainMgr);
         CLASS_DEF(Player, GetActivityMgr);
+        CLASS_DEF(Player, GetStrengthenMgr);
 		CLASS_DEF(Player, addNewFormation);
 		CLASS_DEF(Player, openLevelBox);
 		CLASS_DEF(Player, sendMailPack);
@@ -359,14 +360,23 @@ namespace Script
 
 		//????
         CLASS_ADD(ActivityMgr);
-        CLASS_DEF(ActivityMgr, GetFlag);
-        CLASS_DEF(ActivityMgr, UpdateFlag);
+        //CLASS_DEF(ActivityMgr, GetFlag);
+        //CLASS_DEF(ActivityMgr, UpdateFlag);
         CLASS_DEF(ActivityMgr, CheckTimeOver);
-        CLASS_DEF(ActivityMgr, AddPoint);
+        //CLASS_DEF(ActivityMgr, AddPoint);
         CLASS_DEF(ActivityMgr, UpdateToDB);
-        CLASS_DEF(ActivityMgr, GetPoint);
-        CLASS_DEF(ActivityMgr, AddRewardFlag);
+        //CLASS_DEF(ActivityMgr, GetPoint);
+        //CLASS_DEF(ActivityMgr, AddRewardFlag);
         CLASS_DEF(ActivityMgr, AddScores);
+
+		//变强之路
+        CLASS_ADD(StrengthenMgr);
+        CLASS_DEF(StrengthenMgr, GetFlag);
+        CLASS_DEF(StrengthenMgr, UpdateFlag);
+        CLASS_DEF(StrengthenMgr, CheckTimeOver);
+        CLASS_DEF(StrengthenMgr, AddSouls);
+        CLASS_DEF(StrengthenMgr, UpdateToDB);
+        CLASS_DEF(StrengthenMgr, GetSouls);
 
         //????
 		CLASS_ADD(Package);
@@ -1302,9 +1312,9 @@ namespace Script
 		return Call<void>("sendConsumeRankAward", player, pos);
     }
 
-    void GameActionLua::doAtySignIn(Player* pl, UInt32 id, UInt32 month, UInt32 day)
+    UInt16 GameActionLua::doAtySignIn(Player* player)
     {
-        return Call<void>("doAtySignIn", pl, id, month, day);
+        return Call<UInt16>("doAtySignIn", player);
     }
 
     lua_tinker::table GameActionLua::GetExchangeProps(UInt32 id)
@@ -1359,6 +1369,41 @@ namespace Script
     {
 		assert(player != NULL);
 		return Call<UInt32>("GetBDSupermanPrice", player, itemId, isUsed);
+    }
+    
+    void GameActionLua::doStrong(Player* pl, UInt8 id, UInt32 param1, UInt32 param2)
+    {
+        Call<void>("doStrong", pl, id, param1, param2);
+    }
+    
+    UInt8 GameActionLua::GetSthCheckFlag(UInt8 idx)
+    {
+        return Call<UInt8>("GetSthCheckFlag", idx);
+    }
+    
+    UInt8 GameActionLua::EveryDayRoarSoul()
+    {
+        return Call<UInt8>("EveryDayRoarSoul");
+    }
+    
+    lua_tinker::table GameActionLua::openGreenBoxStrong()
+    {
+        return Call<lua_tinker::table>("openGreenBoxStrong");
+    }
+    
+    lua_tinker::table GameActionLua::openBlueBoxStrong()
+    {
+        return Call<lua_tinker::table>("openBlueBoxStrong");
+    }
+    
+    lua_tinker::table GameActionLua::openPurpleBoxStrong()
+    {
+        return Call<lua_tinker::table>("openPurpleBoxStrong");
+    }
+    
+    lua_tinker::table GameActionLua::openOrangeBoxStrong()
+    {
+        return Call<lua_tinker::table>("openOrangeBoxStrong");
     }
 }
 

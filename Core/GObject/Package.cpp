@@ -1743,6 +1743,21 @@ namespace GObject
 				}
 			}
 
+            if(ret) //变强之路
+            {
+                UInt32 guaji[] = { 55, 56, 9100, 9092, 9126, 9141, 9142, 9143 };
+                UInt32 xiuwei[] = { 57, 9093, 9133, 9144, 9145, 9146 };
+                for(UInt32 i = 0; i < sizeof(guaji) / sizeof(guaji[0]); ++i)
+                {
+                    if(guaji[i] == id)
+                        GameAction()->doStrong(m_Owner, SthHookUse, 0, 0);
+                }
+                for(UInt32 i = 0; i < sizeof(xiuwei) / sizeof(xiuwei[0]); ++i)
+                {
+                    if(xiuwei[i] == id)
+                        GameAction()->doStrong(m_Owner, SthPUse, 0, 0);
+                }
+            }
             UInt32 thisDay = TimeUtil::SharpDay();
             UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA(m_Owner, created));
             if(ret == true && id == 449 && thisDay <= endDay)
@@ -2674,7 +2689,10 @@ namespace GObject
         if(updateHft)
             hf->updateHftValueToDB(hft);
 
-        GameAction()->doAty(this->m_Owner,  AtyEnchant, 0, 0);
+        if(equip->getClass() == Item_Trump || equip->getClass() == Item_Halo)
+            GameAction()->doStrong(this->m_Owner, SthTrumpEnchant, 0, 0);
+        else
+            GameAction()->doStrong(this->m_Owner, SthEnchant, 0, 0);
 		AddItemHistoriesLog(item_enchant_l + type, enc_times);
         //DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), item_enchant_l + type, enc_times, TimeUtil::Now());
         ConsumeInfo ci(EnchantEquipment,0,0);
@@ -3320,7 +3338,7 @@ namespace GObject
         const GData::ItemBaseType& t = item->GetItemType();
         UInt32 itemOutId = 0;
         UInt32 count = 0;
-        GameAction()->doAty(this->m_Owner, AtySplit, 0,0);
+        GameAction()->doStrong(this->m_Owner, SthSplit, 0,0);
 		{
 
 			UInt32 r = uRand(100);
@@ -3831,6 +3849,7 @@ namespace GObject
 		if(protectUnbindUsed > 0)
 			DelItem(ITEM_GEM_PROTECT, protectUnbindUsed, false, ToGemMgerge);
 
+        GameAction()->doStrong(this->m_Owner, SthMergeGem, 0, 0);
 		return result;
     }
 
@@ -4574,7 +4593,7 @@ namespace GObject
         //
         //装备洗练成就
         GameAction()->doAttainment(this->m_Owner, 10175, 0);
-        GameAction()->doAty(this->m_Owner, AtyForge, 0, 0);
+        GameAction()->doStrong(this->m_Owner, SthForge, 0, 0);
         m_Owner->OnHeroMemo(MC_FORGE, MD_ADVANCED, 0, 0);
 		UInt8 lv = equip->getValueLev();
 		UInt8 q = equip->getQuality() - 3;
@@ -5054,6 +5073,7 @@ namespace GObject
         else if (ied_trump.tRank >= 1)
             m_Owner->OnHeroMemo(MC_FORGE, MD_LEGEND, 1, 1);
 
+        GameAction()->doStrong(m_Owner, SthTrumpUpgrade, 0, 0);
         return 0;
     }
 
@@ -5101,7 +5121,7 @@ namespace GObject
         }
 		else
 			SendSingleEquipData(trump);
-
+ 
         return 0;
     }
 

@@ -399,7 +399,7 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
         st << static_cast<UInt8>(0) << Stream::eos;
 
         stActivityMsg msg;
-        msg.id = AtyPractice;
+        msg.id = SthPractice;
         GameMsgHdr hdr(0x245, pl->getThreadId(), pl, sizeof(stActivityMsg));
         GLOBAL().PushMsg(hdr, &msg);
 

@@ -1176,8 +1176,7 @@ void TeamCopyPlayerInfo::incPass(UInt8 copyId, UInt8 t)
 
     if(m_passTimes[t][copyIdx] == 1)
     {
-
-               GameAction()->doAty(m_owner, AtyGroupCopy, 1,0);
+        GameAction()->doStrong(m_owner, SthGroupCopy, 1,0);
     }
     UInt32 now = TimeUtil::Now();
     if(now > m_vTime[t][copyIdx])

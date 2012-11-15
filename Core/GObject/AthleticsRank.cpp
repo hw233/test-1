@@ -21,7 +21,7 @@
 #include "MsgID.h"
 #include "Common/URandom.h"
 #include "HeroMemo.h"
-
+#include "MsgHandler/CountryMsgStruct.h"
 
 namespace GObject
 {
@@ -2811,6 +2811,10 @@ void AthleticsRank::giveAward( Player* pl, UInt8 type)
             GameMsgHdr hdr(0x232, pl->getThreadId(), pl, 0);
             GLOBAL().PushMsg(hdr, NULL);
 
+            stActivityMsg msg;
+            msg.id = SthAthletics2;
+            GameMsgHdr hdr5(0x245, pl->getThreadId(), pl, sizeof(stActivityMsg));
+            GLOBAL().PushMsg(hdr5, &msg);
         }
         return;
     }

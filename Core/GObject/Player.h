@@ -20,6 +20,7 @@
 #include "Script/lua_tinker.h"
 #include "Mail.h"
 #include "GObject/NewRelation.h"
+#include "StrengthenMgr.h"
 
 namespace Battle
 {
@@ -1178,6 +1179,7 @@ namespace GObject
 		MailBox* GetMailBox() { return m_MailBox; }
 		AttainMgr* GetAttainMgr() { return m_AttainMgr; }
         ActivityMgr* GetActivityMgr(){return m_ActivityMgr;}
+        StrengthenMgr* GetStrengthenMgr(){return m_StrengthenMgr;}
         HeroMemo* GetHeroMemo(){return m_HeroMemo;}
         ShuoShuo* GetShuoShuo(){return m_ShuoShuo;}
         CFriend* GetCFriend(){return m_CFriend;}
@@ -1435,6 +1437,7 @@ namespace GObject
 
 		AttainMgr* m_AttainMgr;
         ActivityMgr*  m_ActivityMgr;
+        StrengthenMgr*  m_StrengthenMgr;
         HeroMemo* m_HeroMemo;
         ShuoShuo* m_ShuoShuo;
         CFriend* m_CFriend;

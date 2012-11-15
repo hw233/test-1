@@ -216,6 +216,7 @@ GMHandler::GMHandler()
 
     Reg(3, "biglock", &GMHandler::OnBigLock);
     Reg(3, "bigunlock", &GMHandler::OnBigUnLock);
+    Reg(3, "strong", &GMHandler::OnStrengthen);
    
     Reg(3, "fsale", &GMHandler::OnForbidSale);
     Reg(3, "unfsale", &GMHandler::OnUnForbidSale);
@@ -2913,10 +2914,11 @@ void GMHandler::OnHandleSignIn(GObject::Player* player, std::vector<std::string>
             break;
         case 2:
             {
-				UInt32 val = atoi(args[1].c_str());
-                if(val < 0 || val > 1)
+				UInt16 val = atoi(args[1].c_str());
+                if(val < 0)
                     return;
-                mgr->UpdateFlag(AtySignIn, val);
+                UInt8 day = TimeUtil::MonthDay();
+                mgr->SetOneDayRecord(day, val);
                 mgr->UpdateToDB();
             }
             break;
@@ -3222,6 +3224,50 @@ void GMHandler::OnBigUnLock(GObject::Player *player, std::vector<std::string>& a
     */
 }
 
+void GMHandler::OnStrengthen(GObject::Player *player, std::vector<std::string>& args)
+{
+	if(args.size() <= 1)
+		return;
+	else
+	{
+		StrengthenMgr* mgr = player->GetStrengthenMgr();
+        switch(atoi(args[0].c_str()))
+		{
+		case 1:
+			{
+				UInt32 val = atoi(args[1].c_str());
+                if(val <= 0 || val > 256)
+                    return;
+                mgr->AddSouls(val);
+                mgr->UpdateToDB();
+            }
+            break;
+        case 2:
+			{
+                UInt8 id = atoi(args[1].c_str());
+                GameAction()->doStrong(player, id, 0, 0);
+            }
+            break;
+        case 3:
+			{
+                mgr->SetSoulId(0);
+                mgr->UpdateToDB();
+            }
+            break;
+        case 4:
+			{
+                mgr->GMClearSthAll();
+                mgr->AddSouls(100);
+                mgr->UpdateToDB();
+            }
+            break;
+        default:
+            return;
+            break;
+        }
+    }
+}
+
 void GMHandler::OnForbidSale(GObject::Player *player, std::vector<std::string>& args)
 {
     if (args.size() < 1)
@@ -3233,6 +3279,7 @@ void GMHandler::OnForbidSale(GObject::Player *player, std::vector<std::string>& 
     if (NULL != pl)
         pl->setForbidSale(true);
 }
+
 void GMHandler::OnUnForbidSale(GObject::Player *player, std::vector<std::string>& args)
 {
     if (args.size() < 1)

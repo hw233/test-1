@@ -1040,9 +1040,9 @@ bool World::Init()
     static UInt8 type = 0;
     static UInt8 type2 = 1;
 	GObject::Tianjie::instance().Init();
-//	GObject::DaysRank::instance().Init();
 	AddTimer(5 * 1000, Tianjie_Refresh, static_cast<void*>(NULL));
-//	AddTimer(60 * 1000, DaysRank_Refresh, static_cast<void*>(NULL));
+	GObject::DaysRank::instance().Init(); 
+	//AddTimer(60 * 1000, DaysRank_Refresh, static_cast<void*>(NULL)); //调试用
 
 	GObjectManager::delayLoad();
 	GObjectManager::LoadPracticeData();
@@ -1089,7 +1089,7 @@ bool World::Init()
 	if(sday < now) sday += 86400;
 	AddTimer(86400 * 1000, World_Midnight_Check, this, (sday - now) * 1000);
     AddTimer(5 * 60 * 1000, World_Online_Log, static_cast<void *>(NULL), ((now + 300) / 300 * 300 - now) * 1000);
-    AddTimer(5 * 1000, World_Boss_Refresh, static_cast<void*>(NULL));
+    AddTimer(5 * 1000, World_Boss_Refresh, static_cast<void*>(NULL), 5 * 1000);
 
     UInt32 athChkPoint = TimeUtil::SharpDayT(0, now) + EXTRAREWARDTM;
     AddTimer(86400 * 1000, World_Athletics_Check, static_cast<void *>(&type), (athChkPoint >= now ? athChkPoint - now : 86400 + athChkPoint - now) * 1000);
@@ -1106,7 +1106,7 @@ bool World::Init()
     AddTimer(86400 * 1000, TownDeamonTmAward, static_cast<void *>(NULL), (tdChkPoint >= now ? tdChkPoint - now : 86400 + tdChkPoint - now) * 1000);
 
     UInt32 drChkPoint = TimeUtil::SharpDayT(0, now) + DAYSRANKTM;
-    //AddTimer(86400 * 1000, DaysRank_Refresh, static_cast<void *>(NULL), (drChkPoint >= now ? drChkPoint - now : 86400 + drChkPoint - now) * 1000);
+    AddTimer(86400 * 1000, DaysRank_Refresh, static_cast<void *>(NULL), (drChkPoint >= now ? drChkPoint - now : 86400 + drChkPoint - now) * 1000);
 
     //AddTimer(60 * 1000, advancedHookTimer, static_cast<void *>(NULL), (60 - now % 60) * 1000);
 

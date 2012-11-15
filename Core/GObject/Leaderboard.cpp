@@ -13,6 +13,7 @@
 #include "MsgID.h"
 #include "ClanRankBattle.h"
 #include "Common/Itoa.h"
+#include "DaysRank.h"
 
 namespace GObject
 {
@@ -189,6 +190,7 @@ void Leaderboard::buildBattlePacket()
 void Leaderboard::update()
 {
 	doUpdate();
+    GObject::DaysRank::instance().process(false);
 }
 
 void Leaderboard::doUpdate()
@@ -355,7 +357,7 @@ void Leaderboard::doUpdate()
         _towndown.insert(_towndown.end(), blist3.begin(), blist3.end());
 
         _town.clear();
-        for (int i = 0; i < blist3.size(); ++i)
+        for (UInt32 i = 0; i < blist3.size(); ++i)
         {
             Player * pl = GObject::globalPlayers[blist3[i].id];
             if (pl == NULL)
@@ -381,7 +383,7 @@ void Leaderboard::doUpdate()
         _clancopy.insert(_clancopy.end(), blist4.begin(), blist4.end());
 
          _clanCopyInfo.clear(); 
-        for (int i = 0; i < blist4.size(); ++i)
+        for (UInt32 i = 0; i < blist4.size(); ++i)
         {
             GObject::Clan * clan = GObject::globalClans[blist4[i].id];
             if (clan == NULL)

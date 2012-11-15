@@ -166,6 +166,7 @@ enum ItemFrom
     FromNewRC7DayLogin,
     FromNewRC7DayRecharge,
     FromNewRC7DayTarget,
+    FromDailyStrengthen,
 };
 
 enum ItemTo

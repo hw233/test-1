@@ -2,10 +2,12 @@
 #define DAYSRANK_H_
 
 #include <map>
+#include <list>
 #include <string>
 #include <string.h>
 #include "Common/Platform.h"
 #include "Common/Mutex.h"
+#include "MsgHandler/CountryMsgStruct.h"
 
 #define DAYS_RANK_TYPE  5
 #define DAYS_RANK_COUNT 10
@@ -95,9 +97,10 @@ namespace GObject
         DaysRank();
         void Init();
         void LoadFromDB();
-        void process();
-        PlayerRankInfo* getDaysRank(Player* pl);
-//    GObject::DaysRank::instance().getDaysRank(pl);
+        void process(bool toDB = true);
+        void updateDaysValue(daysValueRankMsg * msg);
+        PlayerRankInfo* getDaysRank(UInt64 playerId);
+//    GObject::DaysRank::instance().getDaysRank(playerId);
 
     private:
         std::map<UInt64, PlayerRankInfo> m_playerDaysRank;
