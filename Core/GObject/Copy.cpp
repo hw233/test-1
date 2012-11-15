@@ -451,23 +451,23 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
 
             if(World::getFourCopAct())
             {
-                UInt32 randNum = uRand(3);
+                UInt32 randNum;
                 if(pl->getDiamondPrivilege())
                 {
                     pl->setDiamondPrivilege(false);
-                    randNum = randNum + 1;
+                    randNum = 10;
                 }
                 else if(PLAYER_DATA(pl, copyFreeCnt) == getFreeCount() && PLAYER_DATA(pl, copyGoldCnt) > 0)
                 {
                     if(3 <= PLAYER_DATA(pl, copyGoldCnt))
-                        randNum = randNum + 4;
+                        randNum = 15;
                     else if(2 == PLAYER_DATA(pl, copyGoldCnt))
-                        randNum = randNum + 3;
+                        randNum = 12 + uRand(3);
                     else
-                        randNum = randNum + 2;
+                        randNum = 11 + uRand(2);
                 }
                 else
-                    randNum = randNum + 1;
+                    randNum = 10;
                 pl->GetPackage()->AddItem2(9209, randNum, true, true);
             }
             if (GObject::Tianjie::instance().isTjOpened())

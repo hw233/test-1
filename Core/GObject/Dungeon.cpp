@@ -525,13 +525,13 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
 
         if(World::getFourCopAct())
         {
-            UInt32 randNum = uRand(3);
+            UInt32 randNum;
             if(PLAYER_DATA(player, dungeonCnt) > getMaxCount())
             {
-                randNum = randNum + 2;
+                randNum = 11 + uRand(2);
             }
             else
-                randNum = randNum + 1;
+                randNum = 10;
             player->GetPackage()->AddItem2(9209, randNum, true, true);
         }
         if (GObject::Tianjie::instance().isTjOpened())
