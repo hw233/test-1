@@ -323,8 +323,10 @@ bool DCLogger::protol_sec(Player* player, int cmd)
     msg << "&DOM=";
     msg << player->getDomain();
     msg << "&MLV=0";
-    msg << "&AID=13";
+    msg << "&AID=20";
 
+    msg << "&RID=";
+    msg << player->getId();
     msg << "&PID=" << static_cast<UInt32>(cmd);
     msg << "&FID=";
     msg << "&PTP=" << static_cast<UInt32>(cmd ? 1 : 0);

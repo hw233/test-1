@@ -359,7 +359,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
         if (4 == res)
         {
             UInt8 platform = atoi(player->getDomain());
-            if (cfg.GMCheck && platform == 11)
+            if (cfg.GMCheck && (platform == 11 || platform == 17))
             {
                 size_t len = 0;
                 char key[MEMCACHED_MAX_KEY] = {0};

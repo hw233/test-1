@@ -177,7 +177,7 @@ void Leaderboard::buildBattlePacket()
     //等级排行榜
     _playerLevelRank.clear();
     i = 0;
-    std::multimap<UInt64, Player*, std::greater<int> >::iterator iter3;
+    std::multimap<UInt64, Player*, std::greater<UInt64> >::iterator iter3;
     for (iter3 = _expRankWorld.begin(); iter3 != _expRankWorld.end(); ++iter3)
     {
         i++;
