@@ -43,6 +43,15 @@ void DaysRank::process(bool toDB)
             int rank3 = pl->GetVar(VAR_USETAEL_CNT) + pl->GetVar(VAR_USECOUPON_CNT) * 100;
             int rank4 = pl->GetVar(VAR_GETACHIEVEMENT_CNT) + pl->GetVar(VAR_GETPRESTIGE_CNT);
             int rank5 = GObject::leaderboard.getMyRank(pl, 4);
+            if (!toDB)
+            {
+                pInfo->update(rank1, 0);
+                pInfo->update(rank2, 1);
+                pInfo->update(rank3, 2);
+                pInfo->update(rank4, 3);
+                pInfo->update(rank5, 4);
+                continue;
+            }
             pInfo->push_back(rank1, 0);
             pInfo->push_back(rank2, 1);
             pInfo->push_back(rank3, 2);
