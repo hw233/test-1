@@ -164,7 +164,7 @@ static bool checkCrack(std::string& platform, std::string& ip, UInt64 id)
     if (ip.empty())
         return false;
 
-    if (pf == 11)
+    if (pf == 11 || pf == 17)
     {
         initMemcache();
         if (memc)
@@ -178,7 +178,12 @@ static bool checkCrack(std::string& platform, std::string& ip, UInt64 id)
             if (MemcachedGet(key, len, value, sizeof(value)))
             {
                 v = atoi(value);
-                if (v >= 3)
+                if (pf == 11 && v >= 3)
+                {
+                    TRACE_LOG("id: %"I64_FMT"u from %s of asss_%d is cracking...", id, ip.c_str(), cfg.serverNum);
+                    return true;
+                }
+                else if (pf == 17 && v >= 5)
                 {
                     TRACE_LOG("id: %"I64_FMT"u from %s of asss_%d is cracking...", id, ip.c_str(), cfg.serverNum);
                     return true;

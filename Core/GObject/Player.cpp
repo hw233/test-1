@@ -1885,7 +1885,7 @@ namespace GObject
         udpLog("", "", "", "", "", online, "login");
 
         UInt8 platform = atoi(getDomain());
-        if (cfg.GMCheck && platform == 11)
+        if (cfg.GMCheck && (platform == 11 || platform == 17))
         {
             struct CrackValue
             {
@@ -1983,7 +1983,7 @@ namespace GObject
         udpLog("", "", "", "", "", online, "login");
 
         UInt8 platform = atoi(getDomain());
-        if (cfg.GMCheck && platform == 11)
+        if (cfg.GMCheck && (platform == 11 || platform == 17))
         {
             struct CrackValue
             {

@@ -54,6 +54,13 @@ namespace GObject
             memcpy(&p[0], &p[1], sizeof(int)*(DAYS_RANK_COUNT-1));
             p[DAYS_RANK_COUNT-1] = value;
         }
+        void update(int value, UInt8 type = 0)
+        {
+            if (type >= 5)
+                return;
+            int* p = rank[type];
+            p[DAYS_RANK_COUNT-1] = value;
+        }
         string toString(UInt8 type = 0)
         {
             string str;
