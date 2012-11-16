@@ -64,12 +64,6 @@ void ActivityMgr::LoadFromDB(DBActivityData& data)
 bool ActivityMgr::CheckTimeOver()
 {
     UInt32 now = TimeUtil::Now();
-#if 1
-    //更新1天即可
-    UInt32 overTime = TimeUtil::SharpMonth(1, now);
-    if(overTime > _item.overTime)
-        _item.overTime = overTime;
-#endif
     if(now < _item.overTime)
         return false;
     /*
