@@ -13,6 +13,7 @@
 #include "GObject/Package.h"
 #include "TeamCopy.h"
 #include "DaysRank.h"
+#include "ShuoShuo.h"
 #include <stdio.h>
 
 using namespace std;
@@ -516,6 +517,7 @@ void StrengthenMgr::SendOpenChestsInfo(UInt8 boxId, UInt8 index)
                             _owner->GetPackage()->Add(item.get<UInt32>(1), item.get<UInt32>(2), true, false, FromDailyStrengthen);
                         _item.orangeBox[0][index-1] = item.get<UInt32>(1) * 100 + item.get<UInt32>(2);
                         toDB = true;
+                        _owner->OnShuoShuo(SS_STH100);
                         _owner->activityUdpLog(1025, 4);
                     }
                 }
@@ -642,6 +644,7 @@ void StrengthenMgr::SendOpenChestsInfo(UInt8 boxId, UInt8 index)
                             _owner->GetPackage()->Add(item.get<UInt32>(1), item.get<UInt32>(2), true, false, FromDailyStrengthen);
                         _item.orangeBox[1][index-1] = item.get<UInt32>(1) * 100 + item.get<UInt32>(2);
                         toDB = true;
+                        _owner->OnShuoShuo(SS_STH100);
                         _owner->activityUdpLog(1025, 8);
                     }
                 }
