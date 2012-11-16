@@ -4119,7 +4119,7 @@ namespace GObject
 		UInt8 q = equip->getQuality();
 		ItemEquipData& ied = equip->getItemEquipData();
         UInt8 c = ied.extraAttr2.getCount();
-		if(c == 0 && c > 2) return 1;
+		if(c == 0 || c > 2) return 1;
 
         if( (ied.tRank == 0) &&
                 (equip->GetItemType().subClass == Item_Trump ||
