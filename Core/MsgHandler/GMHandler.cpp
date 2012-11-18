@@ -3257,6 +3257,8 @@ void GMHandler::OnStrengthen(GObject::Player *player, std::vector<std::string>& 
         case 4:
 			{
                 mgr->GMClearSthAll();
+                mgr->AddSouls(100);
+                mgr->UpdateToDB();
             }
             break;
         default:
