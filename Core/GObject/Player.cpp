@@ -4047,7 +4047,8 @@ namespace GObject
         dclogger.consume(this, _playerData.gold, c);
 #endif
 #endif // _WIN32
-        AddVar(VAR_USEGOLD_CNT, c);
+        if(ci && ci->purchaseType != TrainFighter)
+            AddVar(VAR_USEGOLD_CNT, c);
         return _playerData.gold;
 	}
 
@@ -4234,6 +4235,7 @@ namespace GObject
 		SYSMSG_SENDV(152, this, c);
 		SYSMSG_SENDV(1052, this, c);
 		sendModification(3, _playerData.tael);
+        if(ci && ci->purchaseType != TrainFighter)
         {
             AddVar(VAR_USETAEL_CNT, c);
             daysValueRankMsg msg;
