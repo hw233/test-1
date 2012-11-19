@@ -22,7 +22,6 @@ namespace Script
 
 namespace GObject
 {
-
 struct MoneyIn
 {
     int gold;
@@ -73,6 +72,16 @@ struct ScoreGreater
 typedef std::multiset<QixiPair*, ScoreGreater> QixiPlayerSet;
 typedef QixiPlayerSet::iterator QixiPlayersIt;
 typedef std::map<Player*, QixiPlayersIt> QixiScoreMap;
+
+struct ValueSort
+{
+    Player* player;
+};
+struct lt_valuesort
+{
+    bool operator()(const ValueSort& a, const ValueSort& b) const;
+};
+typedef std::set<ValueSort, lt_valuesort> ValueSortType;
 
 class World:
 	public WorkerRunner<WorldMsgHandler>
@@ -519,6 +528,7 @@ public:
     static bool _tgcevent;
     static Player* _arenaPlayer[5];
     static UInt32 _arenaCount;
+    static ValueSortType _arenaPlayerRank[5];
 
 public:
     static RCSortType rechargeSort;

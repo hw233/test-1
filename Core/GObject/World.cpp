@@ -57,6 +57,8 @@
 namespace GObject
 {
 
+bool lt_valuesort::operator()(const ValueSort& a, const ValueSort& b) const { return a.player->GetVar(VAR_ARENA_SUFFERED) < b.player->GetVar(GObject::VAR_ARENA_SUFFERED); }
+
 struct DBDataLatest
 {
 	UInt32 announce;
@@ -163,6 +165,7 @@ bool World::_bluediamonSuperman = false;
 bool World::_tgcevent = false;
 Player* World::_arenaPlayer[5];
 UInt32 World::_arenaCount;
+ValueSortType World::_arenaPlayerRank[5];
 /** 0：侠骨；1：柔情；2财富；3传奇 **/
 RCSortType World::killMonsterSort[4];
 
@@ -1035,7 +1038,7 @@ void World::ArenaExtraActTimer(void *)
 {
     UInt32 now = TimeUtil::Now();
     UInt32 week = TimeUtil::GetWeekDay(now);
-    static UInt8 type1 = 1;
+    //static UInt8 type1 = 1;
     static UInt8 type2 = 2;
     if(week < ARENA_ACT_WEEK_START || week > ARENA_ACT_WEEK_END)
     {
@@ -1049,7 +1052,7 @@ void World::ArenaExtraActTimer(void *)
     if(now >= t1 && now < t2 )
     {
         printf("t1-t2\n");
-        globalPlayers.enumerate(enum_extra_act_update_status, static_cast<void *>(&type1));
+        //globalPlayers.enumerate(enum_extra_act_update_status, static_cast<void *>(&type1));
     }
     else if(now >= t2 && now < t2 + 60)
     {
