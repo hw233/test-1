@@ -537,7 +537,7 @@ namespace GObject
 #ifndef _WIN32
 		m_ulog(NULL),
 #endif
-		m_isOffical(false), m_sysDailog(false), m_hasTripod(false)
+		m_isOffical(false), m_sysDailog(false), m_hasTripod(false), _jobHunter(NULL)
 	{
         m_ClanBattleStatus = 1;
         m_ClanBattleScore = 0;
@@ -1829,7 +1829,7 @@ namespace GObject
     }
     UInt32  Player::GetOnlineTimeTodaySinceLastLogin(UInt32 now)
     {
-//        UInt32 now  = TimeUtil::Now();
+        //UInt32 now  = TimeUtil::Now();
         UInt32 today = TimeUtil::SharpDayT( 0 , now);
         UInt32 lastOnline = _playerData.lastOnline;
         if( today >= lastOnline)
@@ -5889,7 +5889,6 @@ namespace GObject
         // GM命令设置帮派副本每轮时间
         ClanCopyMgr::Instance().setInterval(time);
     }
-
 
 
     // 帮派副本
@@ -13776,42 +13775,42 @@ namespace GObject
    }
    void Player::getTjTask1Data(Stream& st, bool isRefresh)
    {
-       if (isRefresh || GetVar(VAR_TJ_TASK1_NUMBER) == 0) //今日还没做任务
-       {
-           for (int i = 0; i < 3; ++i)
-           {
-               if (_playerData.tjEvent1[i] == 0)
-               {
-                   GObject::Tianjie::instance().randomTask1Data(GetLev(),_playerData.tjEvent1[i], _playerData.tjColor1[i], _playerData.tjExp1[i]);
-               }
-           }
-       }
-       UInt8 type = 0;
-       int value[3] = {0};
-       value[0] = _playerData.tjExp1[0];
-       value[1] = _playerData.tjExp1[1];
-       value[2] = _playerData.tjExp1[2];
-       for (int i = 0; i < 3; ++i)
-       {
-           GData::NpcGroups::iterator it = GData::npcGroups.find(_playerData.tjEvent1[i]);
-           if(it != GData::npcGroups.end())
-           {
-               GData::NpcGroup * ng = it->second;
-               value[i] +=  TIANJIE_EXP(GetLev()) * ng->getExp();
-           }
-       }
-       if (GObject::Tianjie::instance().isPlayerInTj(GetLev()))
-       {
-           type = 1;
-           value[0] = value[0] * 2 / TIANJIE_EXP(GetLev()) + s_task1ColorScore[_playerData.tjColor1[0]];
-           value[1] = value[1] * 2 / TIANJIE_EXP(GetLev()) + s_task1ColorScore[_playerData.tjColor1[1]];
-           value[2] = value[2] * 2 / TIANJIE_EXP(GetLev()) + s_task1ColorScore[_playerData.tjColor1[2]];
-       }
-       UInt8 num1 = 5-GetVar(VAR_TJ_TASK1_NUMBER);
-       st << num1 << type;
-       st << _playerData.tjEvent1[0] << _playerData.tjColor1[0] << value[0];
-       st << _playerData.tjEvent1[1] << _playerData.tjColor1[1] << value[1];
-       st << _playerData.tjEvent1[2] << _playerData.tjColor1[2] << value[2];
+        if (isRefresh || GetVar(VAR_TJ_TASK1_NUMBER) == 0) //今日还没做任务
+        {
+            for (int i = 0; i < 3; ++i)
+            {
+                if (_playerData.tjEvent1[i] == 0)
+                {
+                    GObject::Tianjie::instance().randomTask1Data(GetLev(),_playerData.tjEvent1[i], _playerData.tjColor1[i], _playerData.tjExp1[i]);
+                }
+            }
+        }
+        UInt8 type = 0;
+        int value[3] = {0};
+        value[0] = _playerData.tjExp1[0];
+        value[1] = _playerData.tjExp1[1];
+        value[2] = _playerData.tjExp1[2];
+        for (int i = 0; i < 3; ++i)
+        {
+            GData::NpcGroups::iterator it = GData::npcGroups.find(_playerData.tjEvent1[i]);
+            if(it != GData::npcGroups.end())
+            {
+		        GData::NpcGroup * ng = it->second;
+                value[i] +=  TIANJIE_EXP(GetLev()) * ng->getExp();
+            }
+        }
+        if (GObject::Tianjie::instance().isPlayerInTj(GetLev()))
+        {
+            type = 1;
+            value[0] = value[0] * 2 / TIANJIE_EXP(GetLev()) + s_task1ColorScore[_playerData.tjColor1[0]];
+            value[1] = value[1] * 2 / TIANJIE_EXP(GetLev()) + s_task1ColorScore[_playerData.tjColor1[1]];
+            value[2] = value[2] * 2 / TIANJIE_EXP(GetLev()) + s_task1ColorScore[_playerData.tjColor1[2]];
+        }
+        UInt8 num1 = 5-GetVar(VAR_TJ_TASK1_NUMBER);
+        st << num1 << type;
+        st << _playerData.tjEvent1[0] << _playerData.tjColor1[0] << value[0];
+        st << _playerData.tjEvent1[1] << _playerData.tjColor1[1] << value[1];
+        st << _playerData.tjEvent1[2] << _playerData.tjColor1[2] << value[2];
 
    }
    void Player::getTjTask2Data(Stream& st)
@@ -14020,6 +14019,15 @@ namespace GObject
    {
        strncpy(m_openid, openid.c_str(), 256);
        DB1().PushUpdateData("UPDATE `player` SET `openid` = '%s' WHERE `id` = %"I64_FMT"u", m_openid, getId());
+   }
+
+   JobHunter* Player::getJobHunter()
+   {
+       if (!_jobHunter)
+       {
+           _jobHunter = new JobHunter(this);
+       }
+       return _jobHunter;
    }
 
 EventTlzAuto::EventTlzAuto( Player * player, UInt32 interval, UInt32 count)

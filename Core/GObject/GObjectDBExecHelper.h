@@ -240,6 +240,12 @@ struct DBArenaExtraBoard
     UInt32 lasttime[5];
 };
 
+struct DBExJob
+{
+    UInt64 playerId;
+	std::string list;
+};
+
 struct DBFighterBuffData
 {
 	UInt64 playerId;
@@ -2431,6 +2437,14 @@ SPECIALDEF(9)
     std::string, blueBox,
     std::string, purpleBox,
     std::string, orangeBox
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBExJob)
+SPECIALDEF(2)
+(
+    UInt64, playerId,
+    std::string, list
 )
 SPECIALEND()
 

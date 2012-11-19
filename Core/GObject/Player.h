@@ -22,6 +22,7 @@
 #include "Mail.h"
 #include "GObject/NewRelation.h"
 #include "StrengthenMgr.h"
+#include "JobHunter.h"
 
 namespace Battle
 {
@@ -1897,6 +1898,11 @@ namespace GObject
     private:
         std::map<UInt32, UInt32> _forges;
 #endif
+
+    public:
+        JobHunter * getJobHunter();
+    private:
+        JobHunter * _jobHunter;
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

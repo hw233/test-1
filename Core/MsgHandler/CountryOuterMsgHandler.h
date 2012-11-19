@@ -5301,6 +5301,54 @@ void OnMakeStrong( GameMsgHdr& hdr, const void * data )
     }
 }
 
+void OnExJob( GameMsgHdr & hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    JobHunter * jobHunter = player->getJobHunter();
+    if (!jobHunter)
+        return;
+    UInt8 type = 0;
+    br >> type;
+    switch (type)
+    {
+        case 1:
+            // 墨家长老页面
+            {
+                if (br.left() == 0)
+                {
+                    // 刷新页面请求
+                    jobHunter->SendFighterList();
+                }
+                UInt16 fighterId = 0;
+                br >> fighterId;
+            }
+            break;
+        case 2:
+            // 寻墨页面
+            break;
+        default:
+            break;
+    }
+}
+
+void OnJobHunter( GameMsgHdr & hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    br >> type;
+    switch (type)
+    {
+        case 0:
+            break;
+        case 1:
+            break;
+        default:
+            break;
+    }
+}
+
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

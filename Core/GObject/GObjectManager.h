@@ -130,6 +130,8 @@ namespace GObject
 
         static bool loadQQVipAward();
 
+        static bool loadExJob();
+
         static void setFFTypeChance(UInt32);
         static void setFFAttrChance(UInt32);
         static void setFFAttrMaxValProp(UInt32);
