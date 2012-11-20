@@ -1743,6 +1743,21 @@ namespace GObject
 				}
 			}
 
+            if(ret) //变强之路
+            {
+                UInt32 guaji[] = { 55, 56, 9100, 9092, 9126, 9141, 9142, 9143 };
+                UInt32 xiuwei[] = { 57, 9093, 9133, 9144, 9145, 9146 };
+                for(UInt32 i = 0; i < sizeof(guaji) / sizeof(guaji[0]); ++i)
+                {
+                    if(guaji[i] == id)
+                        GameAction()->doStrong(m_Owner, SthHookUse, 0, 0);
+                }
+                for(UInt32 i = 0; i < sizeof(xiuwei) / sizeof(xiuwei[0]); ++i)
+                {
+                    if(xiuwei[i] == id)
+                        GameAction()->doStrong(m_Owner, SthPUse, 0, 0);
+                }
+            }
             UInt32 thisDay = TimeUtil::SharpDay();
             UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA(m_Owner, created));
             if(ret == true && id == 449 && thisDay <= endDay)
@@ -2213,28 +2228,32 @@ namespace GObject
     void enchantToken(Player* player, UInt8 quality, UInt8 slevel, UInt8 level, UInt8 type)
     {
         bool writedb = false;
+        Player* pl = player;
         // 强化送代币活动
         if (quality == 0) // 防具
         {
-            if (type)
+            //if (type)
             {
-                if (level == 6)
+                if (slevel < 6 && level >= 6)
                 {
                     player->AddVar(VAR_COIN_TOKEN, 1);
                     writedb = true;
+                    pl->udpLog("huodong", "F_10000_4", "", "", "", "", "act");
                 }
-                if (level == 8)
+                if (slevel < 8 && level >= 8)
                 {
                     player->AddVar(VAR_TAEL_TOKEN, 2);
                     writedb = true;
+                    pl->udpLog("huodong", "F_10000_5", "", "", "", "", "act");
                 }
-                if (level == 10)
+                if (slevel < 10 && level >= 10)
                 {
                     player->AddVar(VAR_GOLD_TOKEN, 3);
                     writedb = true;
+                    pl->udpLog("huodong", "F_10000_6", "", "", "", "", "act");
                 }
             }
-            else
+            /*else
             {
                 if (slevel < 6 && level >= 6)
                 {
@@ -2243,41 +2262,45 @@ namespace GObject
                 }
                 if (slevel < 8 && level >= 8)
                 {
-                    player->AddVar(VAR_TAEL_TOKEN, 2);
+                    player->AddVar(VAR_TAEL_TOKEN, 1);
                     writedb = true;
                 }
                 if (slevel < 10 && level >= 10)
                 {
-                    player->AddVar(VAR_GOLD_TOKEN, 3);
+                    player->AddVar(VAR_GOLD_TOKEN, 1);
                     writedb = true;
                 }
             }
+            */
         }
         else if (quality == 1) // 武器
         {
-            if (type)
-            {
-                if (level == 6)
-                {
-                    player->AddVar(VAR_COIN_TOKEN, 1);
-                    writedb = true;
-                }
-                if (level == 8)
-                {
-                    player->AddVar(VAR_GOLD_TOKEN, 2);
-                    writedb = true;
-                }
-                if (level == 10)
-                {
-                    player->AddVar(VAR_GOLD_TOKEN, 5);
-                    writedb = true;
-                }
-            }
-            else
+            //if (type)
             {
                 if (slevel < 6 && level >= 6)
                 {
                     player->AddVar(VAR_COIN_TOKEN, 1);
+                    writedb = true;
+                    pl->udpLog("huodong", "F_10000_1", "", "", "", "", "act");
+                }
+                if (slevel < 8 && level >= 8)
+                {
+                    player->AddVar(VAR_GOLD_TOKEN, 2);
+                    writedb = true;
+                    pl->udpLog("huodong", "F_10000_2", "", "", "", "", "act");
+                }
+                if (slevel < 10 && level >= 10)
+                {
+                    player->AddVar(VAR_GOLD_TOKEN, 5);
+                    writedb = true;
+                    pl->udpLog("huodong", "F_10000_3", "", "", "", "", "act");
+                }
+            }
+           /* else
+            {
+                if (slevel < 6 && level >= 6)
+                {
+                    player->AddVar(VAR_COIN_TOKEN, 2);
                     writedb = true;
                 }
                 if (slevel < 8 && level >= 8)
@@ -2287,34 +2310,37 @@ namespace GObject
                 }
                 if (slevel < 10 && level >= 10)
                 {
-                    player->AddVar(VAR_GOLD_TOKEN, 5);
+                    player->AddVar(VAR_GOLD_TOKEN, 3);
                     writedb = true;
                 }
-            }
+            }*/
         }
         else // 法宝
         {
             if (quality == 3)
             {
-                if (type)
+            //    if (type)
                 {
-                    if (level == 4)
+                    if (slevel < 4 && level >= 4)
                     {
                         player->AddVar(VAR_COIN_TOKEN, 1);
                         writedb = true;
+                        pl->udpLog("huodong", "F_10000_7", "", "", "", "", "act");
                     }
-                    if (level == 6)
+                    if (slevel < 6 && level >= 6)
                     {
                         player->AddVar(VAR_TAEL_TOKEN, 2);
                         writedb = true;
+                        pl->udpLog("huodong", "F_10000_8", "", "", "", "", "act");
                     }
-                    if (level == 8)
+                    if (slevel < 8 && level == 8)
                     {
                         player->AddVar(VAR_GOLD_TOKEN, 2);
                         writedb = true;
+                        pl->udpLog("huodong", "F_10000_9", "", "", "", "", "act");
                     }
                 }
-                else
+        /*        else
                 {
                     if (slevel < 4 && level >= 4)
                     {
@@ -2332,28 +2358,32 @@ namespace GObject
                         writedb = true;
                     }
                 }
+                */
             }
             if (quality == 4)
             {
-                if (type)
+               // if (type)
                 {
-                    if (level == 4)
+                    if (slevel < 4 && level >= 4)
                     {
                         player->AddVar(VAR_COIN_TOKEN, 1);
                         writedb = true;
+                        pl->udpLog("huodong", "F_10000_7", "", "", "", "", "act");
                     }
-                    if (level == 6)
+                    if (slevel < 6 && level >= 6)
                     {
                         player->AddVar(VAR_TAEL_TOKEN, 2);
                         writedb = true;
+                        pl->udpLog("huodong", "F_10000_8", "", "", "", "", "act");
                     }
-                    if (level == 8)
+                    if (slevel < 8 && level == 8)
                     {
                         player->AddVar(VAR_GOLD_TOKEN, 3);
                         writedb = true;
+                        pl->udpLog("huodong", "F_10000_9", "", "", "", "", "act");
                     }
                 }
-                else
+               /* else
                 {
                     if (slevel < 4 && level >= 4)
                     {
@@ -2371,28 +2401,32 @@ namespace GObject
                         writedb = true;
                     }
                 }
+                */
             }
             if (quality == 5)
             {
-                if (type)
+            //    if (type)
                 {
-                    if (level == 4)
+                    if (slevel < 4 && level >= 4)
                     {
                         player->AddVar(VAR_COIN_TOKEN, 1);
                         writedb  = true;
+                        pl->udpLog("huodong", "F_10000_7", "", "", "", "", "act");
                     }
-                    if (level == 6)
+                    if (slevel < 6 && level >= 6)
                     {
                         player->AddVar(VAR_GOLD_TOKEN, 2);
                         writedb  = true;
+                        pl->udpLog("huodong", "F_10000_8", "", "", "", "", "act");
                     }
-                    if (level == 8)
+                    if (slevel < 8 && level >= 8)
                     {
                         player->AddVar(VAR_GOLD_TOKEN, 4);
                         writedb  = true;
+                        pl->udpLog("huodong", "F_10000_9", "", "", "", "", "act");
                     }
                 }
-                else
+              /*  else
                 {
                     if (slevel < 4 && level >= 4)
                     {
@@ -2410,6 +2444,7 @@ namespace GObject
                         writedb  = true;
                     }
                 }
+                */   
             }
         }
 
@@ -2654,7 +2689,10 @@ namespace GObject
         if(updateHft)
             hf->updateHftValueToDB(hft);
 
-        GameAction()->doAty(this->m_Owner,  AtyEnchant, 0, 0);
+        if(equip->getClass() == Item_Trump || equip->getClass() == Item_Halo)
+            GameAction()->doStrong(this->m_Owner, SthTrumpEnchant, 0, 0);
+        else
+            GameAction()->doStrong(this->m_Owner, SthEnchant, 0, 0);
 		AddItemHistoriesLog(item_enchant_l + type, enc_times);
         //DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), item_enchant_l + type, enc_times, TimeUtil::Now());
         ConsumeInfo ci(EnchantEquipment,0,0);
@@ -2791,6 +2829,8 @@ namespace GObject
                 enchantAct(m_Owner, quality, oldEnchant, ied.enchant, autoEnch?0:1);
                 // enchantToken(m_Owner, quality, oldEnchant, ied.enchant, autoEnch?0:1);
             }
+            if (World::get9215Act())
+                    enchantToken(m_Owner, quality, oldEnchant, ied.enchant, autoEnch?0:1);
 #ifdef _FB
             if (World::getEnchantAct() && (equip->getClass() == Item_Weapon || equip->getClass() == Item_Armor1 || equip->getClass() == Item_Armor2 || equip->getClass() == Item_Armor4 || equip->getClass() == Item_Armor5))
                 enchantAct(m_Owner, quality, oldEnchant, ied.enchant, autoEnch?0:1);
@@ -3298,7 +3338,7 @@ namespace GObject
         const GData::ItemBaseType& t = item->GetItemType();
         UInt32 itemOutId = 0;
         UInt32 count = 0;
-        GameAction()->doAty(this->m_Owner, AtySplit, 0,0);
+        GameAction()->doStrong(this->m_Owner, SthSplit, 0,0);
 		{
 
 			UInt32 r = uRand(100);
@@ -3809,6 +3849,7 @@ namespace GObject
 		if(protectUnbindUsed > 0)
 			DelItem(ITEM_GEM_PROTECT, protectUnbindUsed, false, ToGemMgerge);
 
+        GameAction()->doStrong(this->m_Owner, SthMergeGem, 0, 0);
 		return result;
     }
 
@@ -4078,7 +4119,7 @@ namespace GObject
 		UInt8 q = equip->getQuality();
 		ItemEquipData& ied = equip->getItemEquipData();
         UInt8 c = ied.extraAttr2.getCount();
-		if(c == 0 && c > 2) return 1;
+		if(c == 0 || c > 2) return 1;
 
         if( (ied.tRank == 0) &&
                 (equip->GetItemType().subClass == Item_Trump ||
@@ -4415,7 +4456,7 @@ namespace GObject
             enchantUdpLog(toEquip, tIed.enchant);
 
             char str[32] = {0};
-            sprintf(str, "F_1115_%03d%02d%03d", fromEquip->getValueLev(), tIed.enchant+1, toEquip->getValueLev());
+            sprintf(str, "F_1155_%03d%02d%03d", fromEquip->getReqLev(), tIed.enchant+1, toEquip->getReqLev());
             m_Owner->udpLog("move", str, "", "", "", "", "act");
         }
         if(fFgt != NULL)
@@ -4455,7 +4496,7 @@ namespace GObject
         }
 
         char str[32] = {0};
-        sprintf(str, "F_1116_%03d00%03d", fromEquip->getValueLev(),  toEquip->getValueLev());
+        sprintf(str, "F_1156_%03d00%03d", fromEquip->getReqLev(),  toEquip->getReqLev());
         m_Owner->udpLog("move", str, "", "", "", "", "act");
     
         DB4().PushUpdateData("UPDATE `equipment` SET `socket1` = %u,`socket2` = %u,`socket3` = %u,`socket4` = %u,`socket5` = %u,`socket6` = %u WHERE `id` = %u",tIed.gems[0],tIed.gems[1],tIed.gems[2],tIed.gems[3],tIed.gems[4],tIed.gems[5],toEquip->getId());
@@ -4491,7 +4532,7 @@ namespace GObject
         fIed.spiritAttr.spForm[2] = uRand(4) + 1;
 
         char str[32] = {0};
-        sprintf(str, "F_1117_%03d00%03d", fromEquip->getValueLev(),  toEquip->getValueLev());
+        sprintf(str, "F_1157_%03d00%03d", fromEquip->getReqLev(),  toEquip->getReqLev());
         m_Owner->udpLog("move", str, "", "", "", "", "act");
 
         
@@ -4552,7 +4593,7 @@ namespace GObject
         //
         //装备洗练成就
         GameAction()->doAttainment(this->m_Owner, 10175, 0);
-        GameAction()->doAty(this->m_Owner, AtyForge, 0, 0);
+        GameAction()->doStrong(this->m_Owner, SthForge, 0, 0);
         m_Owner->OnHeroMemo(MC_FORGE, MD_ADVANCED, 0, 0);
 		UInt8 lv = equip->getValueLev();
 		UInt8 q = equip->getQuality() - 3;
@@ -5032,6 +5073,7 @@ namespace GObject
         else if (ied_trump.tRank >= 1)
             m_Owner->OnHeroMemo(MC_FORGE, MD_LEGEND, 1, 1);
 
+        GameAction()->doStrong(m_Owner, SthTrumpUpgrade, 0, 0);
         return 0;
     }
 
@@ -5079,7 +5121,7 @@ namespace GObject
         }
 		else
 			SendSingleEquipData(trump);
-
+ 
         return 0;
     }
 

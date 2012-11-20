@@ -574,11 +574,12 @@ void TownDeamon::challenge(Player* pl, UInt16 level, UInt8 type)
     if(!checkTownDeamon(pl))
         return;
 
+    stActivityMsg msg;
     DeamonPlayerData* dpd = pl->getDeamonPlayerData();
     UInt16 idx = level - 1;
     switch(type)
     {
-    case 0:
+    case 0:     //封妖
         {
             if(level != dpd->curLevel + 1)
                 break;
@@ -587,10 +588,11 @@ void TownDeamon::challenge(Player* pl, UInt16 level, UInt8 type)
                 GameMsgHdr hdr(0x262, pl->getThreadId(), pl, sizeof(UInt16));
                 GLOBAL().PushMsg(hdr, &(level));
             }
+            msg.id = SthTownDeamon;
 
         }
         break;
-    case 1:
+    case 1:     //镇守聚魂阵
         {
             Player* def = m_Monsters[idx].player;
             if(dpd->inChallenge || level == 0 || 0 != dpd->deamonLevel || level > dpd->curLevel || TimeUtil::Now() - dpd->challengeTime < TD_CHALLENGE_TIMEUNIT)
@@ -632,12 +634,12 @@ void TownDeamon::challenge(Player* pl, UInt16 level, UInt8 type)
                 st << level << type << res << challengeCD << Stream::eos;
                 pl->send(st);
             }
+            msg.id = SthCHTownDeamon;
+
         }
         break;
     }
 
-    stActivityMsg msg;
-    msg.id = AtyTownDeamon;
     GameMsgHdr hdr2(0x245, pl->getThreadId(), pl, sizeof(stActivityMsg));
     GLOBAL().PushMsg(hdr2, &msg);
 
@@ -941,7 +943,7 @@ void TownDeamon::addActivity(Player* pl)
 {
     if (!pl->GetVar(VAR_TOWNDEAMON))
     {
-        GameAction()->doAty(pl, AtyTownDeamon, 0, 0);
+        GameAction()->doStrong(pl, SthTownDeamon, 0, 0);
         pl->SetVar(VAR_TOWNDEAMON, 1);
     }
 }

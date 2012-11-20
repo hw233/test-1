@@ -9,7 +9,7 @@ namespace GObject
 
 enum {
     SS_WBOSS            = 0,
-    SS_ACT100           = 1,
+    SS_STH100           = 1,
     SS_ATHWIN           = 2,
     SS_CTRYBATTLE       = 3,
     SS_CLANRANK         = 4,

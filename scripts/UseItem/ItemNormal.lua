@@ -6015,6 +6015,26 @@ function ItemNormal_00010073(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00010074(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (6+(6*num*1)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    package:Add(56, num*1, true, 0, 2);
+    package:Add(57, num*1, true, 0, 2);
+    package:Add(508, num*1, true, 0, 2);
+    package:Add(506, num*1, true, 0, 2);
+    package:Add(51, num*1, true, 0, 2);
+    package:Add(48, num*1, true, 0, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
 function ItemNormal_QixiLoveCard(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -6309,6 +6329,46 @@ function ItemNormal_00009210(iid, num, bind, param)
 
     return num;
 end
+
+function ItemNormal_00009215(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < 14 then
+		player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    local items = {{547,1271},{507,1398},{551,2669},{509,2796},{514,4067},
+                   {515,4173},{500,5444},{49,6080},{503,6716},{9214,7140},
+                   {517,8411},{1325,8570},{1528,8729},{512,10000}}
+    local broad = {0,1,0,1,0,1,0,1,0,1,0,1,1,0};
+    local total = 0;
+    for x=1,num do
+        local i = math.random(1, 10000)
+        for n = 1, #items do
+            if i <= items[n][2] then
+                package:Add(items[n][1], 1, 1, 0, 2);
+                --if broad[n] == 1 then
+                --    Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."] "..msg_60.."[4:9215]，"..msg_61.."[4:"..items[n][1].."]")
+               -- end
+                break
+            end
+        end
+        total = total +1;
+    end
+    player:AddVar(244, total);
+    package:DelItemSendMsg(iid, player)
+    return total
+end
+
+function ItemNormal_00009216(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    player:setTitle(43, 0)
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
 
 local ItemNormal_Table = {
   [1] = ItemNormal_00000001,
@@ -7873,6 +7933,8 @@ local ItemNormal_Table = {
     [9211] = ItemNormal_00009210,
     [9212] = ItemNormal_00009210,
     [9213] = ItemNormal_00009210,
+    [9215] = ItemNormal_00009215,
+    [9216] = ItemNormal_00009216,
 
     [10000] = ItemNormal_00010000,
     [10001] = ItemNormal_00010001,
@@ -7948,6 +8010,7 @@ local ItemNormal_Table = {
     [10071] = ItemNormal_00010071,
     [10072] = ItemNormal_00010072,
     [10073] = ItemNormal_00010073,
+    [10074] = ItemNormal_00010074,
 };
 
 function ItemNormalOther_00000441(iid, num, bind, other)

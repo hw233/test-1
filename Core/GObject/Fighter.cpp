@@ -3020,7 +3020,7 @@ bool Fighter::lvlUpCitta(UInt16 citta, bool writedb)
                      GameAction()->doAttainment(_owner,  10086, num9Type8);
                 }
             }
-
+            GameAction()->doStrong(_owner, SthCittaUpgrade, 0, 0);
         }
         return re;
     }

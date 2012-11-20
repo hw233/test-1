@@ -179,7 +179,7 @@ namespace GObject
             (*iter)->SetVar(VAR_DAILY_CLANBATTLE, 1);
             (*iter)->SetVar(VAR_WEEKLY_CLANBATTLE, 1);
 
-            GameAction()->doAty((*iter), AtyClanWar, 1, 0);
+            GameAction()->doStrong((*iter), SthClanWar, 1, 0);
             (*iter)->OnHeroMemo(MC_ATHLETICS, MD_LEGEND, 0, 0);
             (*iter)->OnShuoShuo(SS_CLANRANK);
             (*iter)->setContinuousRFAward(2);
@@ -208,7 +208,7 @@ namespace GObject
             (*iter)->SetVar(VAR_DAILY_CLANBATTLE, 1);
             (*iter)->SetVar(VAR_WEEKLY_CLANBATTLE, 1);
 
-            GameAction()->doAty((*iter), AtyClanWar, 1, 0);
+            GameAction()->doStrong((*iter), SthClanWar, 1, 0);
             (*iter)->OnHeroMemo(MC_ATHLETICS, MD_LEGEND, 0, 0);
             (*iter)->OnShuoShuo(SS_CLANRANK);
             (*iter)->setContinuousRFAward(2);

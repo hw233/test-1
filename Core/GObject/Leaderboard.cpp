@@ -13,6 +13,7 @@
 #include "MsgID.h"
 #include "ClanRankBattle.h"
 #include "Common/Itoa.h"
+#include "DaysRank.h"
 
 namespace GObject
 {
@@ -134,6 +135,7 @@ void buildPacket2(Stream& st, UInt8 t, UInt32 id, std::vector<LeaderboardItem2>&
 void Leaderboard::buildBattlePacket()
 {
     _battleRankWorld.clear();
+    _expRankWorld.clear();
     std::unordered_map<UInt64, Player*>& pm = GObject::globalPlayers.getMap();
     std::unordered_map<UInt64, Player*>::iterator iter;
     for (iter = pm.begin(); iter != pm.end(); ++iter)
@@ -143,6 +145,7 @@ void Leaderboard::buildBattlePacket()
         {
             UInt32 battlePoint = pl->getBattlePoint();
             _battleRankWorld.insert(std::make_pair(battlePoint, pl));
+            _expRankWorld.insert(std::make_pair(pl->GetExp(), pl));
         }
     }
     //每个人的战斗力排行
@@ -171,11 +174,23 @@ void Leaderboard::buildBattlePacket()
            _battleStream << pl->getName() << pl->getPF() << pl->GetLev() << pl->getCountry() << iter2->first << pl->getClanName();
 	}
 	_battleStream << Stream::eos;
+    //等级排行榜
+    _playerLevelRank.clear();
+    i = 0;
+    std::multimap<UInt64, Player*, std::greater<UInt64> >::iterator iter3;
+    for (iter3 = _expRankWorld.begin(); iter3 != _expRankWorld.end(); ++iter3)
+    {
+        i++;
+        Player* pl = iter3->second;  
+        if (pl)
+            _playerLevelRank[pl->getId()] =  i; 
+	}
 }
 
 void Leaderboard::update()
 {
 	doUpdate();
+    GObject::DaysRank::instance().process(false);
 }
 
 void Leaderboard::doUpdate()
@@ -193,7 +208,7 @@ void Leaderboard::doUpdate()
 
 	std::vector<LeaderboardItem2> blist2;
 	blist2.clear();
-    _playerLevelRank.clear();
+    //_playerLevelRank.clear();
 	execu->ExtractData("SELECT `player`.`id`, `player`.`name`, `fighter`.`level`, `player`.`country`, `fighter`.`experience`, `clan`.`name` FROM"
 		" (`player` CROSS JOIN `fighter`"
 		" ON `player`.`id` = `fighter`.`playerId` AND `fighter`.`id` < 10)"
@@ -220,7 +235,7 @@ void Leaderboard::doUpdate()
         r.value = blist2[c].value;
         _level.push_back(r);
 
-        _playerLevelRank[curPlayer->getId()] = c+1;
+        //_playerLevelRank[curPlayer->getId()] = c+1;
     }
 
     buildPacket2(_levelStream, 0, _id, blist2);
@@ -342,7 +357,7 @@ void Leaderboard::doUpdate()
         _towndown.insert(_towndown.end(), blist3.begin(), blist3.end());
 
         _town.clear();
-        for (int i = 0; i < blist3.size(); ++i)
+        for (UInt32 i = 0; i < blist3.size(); ++i)
         {
             Player * pl = GObject::globalPlayers[blist3[i].id];
             if (pl == NULL)
@@ -368,7 +383,7 @@ void Leaderboard::doUpdate()
         _clancopy.insert(_clancopy.end(), blist4.begin(), blist4.end());
 
          _clanCopyInfo.clear(); 
-        for (int i = 0; i < blist4.size(); ++i)
+        for (UInt32 i = 0; i < blist4.size(); ++i)
         {
             GObject::Clan * clan = GObject::globalClans[blist4[i].id];
             if (clan == NULL)

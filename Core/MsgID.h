@@ -251,6 +251,8 @@ namespace REQ
     const UInt8 ACTIVITY_REWARD     = 0x4B;
     /**活跃度签到积分 */
     const UInt8 ACTIVITY_SIGNIN     = 0x4C;
+    /**变强之路*/
+    const UInt8 STRENGTHEN_LIST     = 0x4D;
     /**关系列表请求 */
     const UInt8 FRIEND_LIST         = 0xD8;// 0xA8
     /**关系列表操作 */
@@ -554,6 +556,8 @@ namespace REP
     /** 活跃度领取奖励 */
     const UInt8 ACTIVITY_REWARD     = 0x4B;
     const UInt8 ACTIVITY_SIGNIN     = 0x4C;
+    /**变强之路*/
+    const UInt8 STRENGTHEN_LIST     = 0x4D;
 
     const UInt8 FRIEND_LIST         = 0xD8;// 0xA8
     const UInt8 FRIEND_ACTION       = 0xD9;// 0xA9
@@ -704,6 +708,9 @@ namespace SPEQ
     const UInt16 BIGLOCKUSER         = 0x132;// 0x102
     const UInt16 BIGUNLOCKUSER       = 0x133;// 0x103
     const UInt16 CLSTASKALL          = 0x134;//
+    const UInt16 FORBIDSALE          = 0x135;// 全区禁止交易
+    const UInt16 UNFORBIDSALE        = 0x136;// 全区解除禁止交易
+    const UInt16 QUERYLOCKUSER       = 0x137;// 查询玩家是否被禁止登陆和交易
 }
 
 namespace SPEP
@@ -751,6 +758,10 @@ namespace SPEP
     const UInt16 BIGLOCKUSER         = 0x32;
     const UInt16 BIGUNLOCKUSER       = 0x33;
     const UInt16 CLSTASKALL          = 0x34;//
+    const UInt16 FORBIDSALE          = 0x35;// 全区禁止交易
+    const UInt16 UNFORBIDSALE        = 0x36;// 全区解除禁止交易
+    const UInt16 QUERYLOCKUSER       = 0x37;// 查询玩家是否被禁止登陆和交易
+
 }
 
 namespace ARENAREQ

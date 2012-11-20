@@ -20,6 +20,7 @@
 #include "Script/lua_tinker.h"
 #include "Mail.h"
 #include "GObject/NewRelation.h"
+#include "StrengthenMgr.h"
 
 namespace Battle
 {
@@ -135,21 +136,20 @@ namespace GObject
 #define MAX_CFRIENDS 50
 
 #define QIXI_MAX_STEPS  24
-#if 1
-#define ARENA_ACT_WEEK_START      1
-#define ARENA_ACT_WEEK_END        7
-#define ARENA_ACT_SINGUP_START    17*3600
-#define ARENA_ACT_SUFFER_START    ARENA_ACT_SINGUP_START+60*60
-#define ARENA_ACT_AWARD           ARENA_ACT_SUFFER_START+60*60
-#define ARENA_ACT_SYSTEM          10
+#if 0
+#define ARENA_ACT_WEEK_START      2
+#define ARENA_ACT_WEEK_END        3
+#define ARENA_ACT_SINGUP_START    14*3600
+#define ARENA_ACT_SINGUP_END      ARENA_ACT_SINGUP_START+2*60*60
+#define ARENA_ACT_SUFFER_END      ARENA_ACT_SINGUP_END+2*60*60
 #else
 #define ARENA_ACT_WEEK_START      2
 #define ARENA_ACT_WEEK_END        3
 #define ARENA_ACT_SINGUP_START    13*3600
-#define ARENA_ACT_SUFFER_START    ARENA_ACT_SINGUP_START+30*60
-#define ARENA_ACT_AWARD           ARENA_ACT_SUFFER_START+15*60
-#define ARENA_ACT_SYSTEM          10
+#define ARENA_ACT_SINGUP_END      ARENA_ACT_SINGUP_START+30*60
+#define ARENA_ACT_SUFFER_END      ARENA_ACT_SINGUP_END+30*60
 #endif
+#define ARENA_ACT_SYSTEM          10
 	class Map;
 	class Player;
 	class ItemBase;
@@ -1021,6 +1021,7 @@ namespace GObject
         void setFightersDirty(bool bDirty=true);
         bool IsFighterEquipEnchantLev(UInt8 en, UInt8 num);
 		inline size_t getFighterCount() { return _fighters.size(); }
+        std::map<UInt32, Fighter *>& getFighterMap() {return _fighters;}
 		bool isFighterFull() const;
 		inline bool isMainFighter(UInt32 id) { return Fighter::isMainFighter(id); }
         void upInitCitta(Fighter* fgt,bool = false);
@@ -1194,6 +1195,7 @@ namespace GObject
 		MailBox* GetMailBox() { return m_MailBox; }
 		AttainMgr* GetAttainMgr() { return m_AttainMgr; }
         ActivityMgr* GetActivityMgr(){return m_ActivityMgr;}
+        StrengthenMgr* GetStrengthenMgr(){return m_StrengthenMgr;}
         HeroMemo* GetHeroMemo(){return m_HeroMemo;}
         ShuoShuo* GetShuoShuo(){return m_ShuoShuo;}
         CFriend* GetCFriend(){return m_CFriend;}
@@ -1420,6 +1422,9 @@ namespace GObject
         inline Player* getLover() { return m_qixi.lover; }
         inline UInt32 getScore() { return m_qixi.score; }
         std::set<Player *>& getInviters() {return _friends[3];};
+
+        void setForbidSale(bool b) {_isForbidSale = b;}
+        bool getForbidSale() {return _isForbidSale;}
 	private:
 		Mutex _mutex;
 
@@ -1448,6 +1453,7 @@ namespace GObject
 
 		AttainMgr* m_AttainMgr;
         ActivityMgr*  m_ActivityMgr;
+        StrengthenMgr*  m_StrengthenMgr;
         HeroMemo* m_HeroMemo;
         ShuoShuo* m_ShuoShuo;
         CFriend* m_CFriend;
@@ -1466,6 +1472,7 @@ namespace GObject
 		AtomicVal<UInt8> _threadId;
 		AtomicVal<int> _session;
 		bool _availInit;
+        AtomicVal<bool> _isForbidSale;
 
 		UInt32 _vipLevel;
 

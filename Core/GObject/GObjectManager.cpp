@@ -2353,7 +2353,8 @@ namespace GObject
     	last_id = 0xFFFFFFFFFFFFFFFFull;
 		pl = NULL;
 		DBActivityData atydata;
-		if(execu->Prepare("SELECT `playerId`, `overTime`, `awardId`, `point`, `award`, `flags`, `scores`, `propsID` FROM `activityData` ORDER BY  `playerId`", atydata) != DB::DB_OK)
+		//if(execu->Prepare("SELECT `playerId`, `overTime`, `awardId`, `point`, `award`, `flags`, `scores`, `propsID`, `signRecord` FROM `activityData` ORDER BY  `playerId`", atydata) != DB::DB_OK)
+		if(execu->Prepare("SELECT `playerId`, `overTime`, `scores`, `propsID`, `signRecord` FROM `activityData` ORDER BY  `playerId`", atydata) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -2369,6 +2370,26 @@ namespace GObject
 			pl->GetActivityMgr()->LoadFromDB(atydata);
 		}
 
+        // Load player Strengthen souls
+        lc.prepare("Loading player StrengthenData:");
+    	last_id = 0xFFFFFFFFFFFFFFFFull;
+		pl = NULL;
+		DBStrengthenData sthdata;
+		if(execu->Prepare("SELECT `playerId`, `overTime`, `souls`, `soulId`, `flags`, `greenBox`, `blueBox`, `purpleBox`, `orangeBox` FROM `strengthenData` ORDER BY  `playerId`", sthdata) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(sthdata.playerId != last_id)
+			{
+				last_id = sthdata.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+			pl->GetStrengthenMgr()->LoadFromDB(sthdata);
+		}
 
         lc.finalize();
 		lc.prepare("Loading mail package:");

@@ -297,6 +297,11 @@ public:
     inline static bool getGuoqing()
     { return _guoqing; }
 
+    inline static void set9215Act(bool v)
+    { _9215Act= v; }
+    inline static bool get9215Act()
+    { return _9215Act; }
+
     inline static void setRechargeNextRet(bool v)
     { _rechargenextret = v; }
     inline static bool getRechargeNextRet()
@@ -397,23 +402,31 @@ public:
     inline static bool getTgcEvent()
     { return _tgcevent; }
 
-    inline static void setArenaPlayerAndCount(Player** szPlayer, UInt8 cntPlayer, UInt32 totalCount)
+    inline static void setArenaPlayer(UInt8 pos, Player* szPlayer)
     {
-        for(UInt8 i = 0; i < 5 && i < cntPlayer; i++)
+        if(pos < 5)
         {
-            _arenaPlayer[i] = szPlayer[i];
+            printf("set szPlayer = %p\n", szPlayer);
+            _arenaPlayer[pos] = szPlayer;
         }
-        _arenaCount = totalCount;
     }
-    inline static void getArenaPlayerAndCount(Player** szPlayer, UInt8 cntPlayer, UInt32* totalCount)
+    inline static void getArenaPlayer(UInt8 pos, Player** szPlayer)
     {
-        for(UInt8 i = 0; i < 5 && i < cntPlayer; i++)
+        if(pos < 5)
         {
-            szPlayer[i] = _arenaPlayer[i];
+            *szPlayer = _arenaPlayer[pos];
+            printf("get szPlayer = %p\n", *szPlayer);
         }
-        if(totalCount)
-            *totalCount = _arenaCount;
     }
+    inline static void setArenaTotalCnt(UInt16 total)
+    {
+        _arenaTotalCnt = total;
+    }
+    inline static UInt16 getArenaTotalCnt()
+    {
+        return _arenaTotalCnt;
+    }
+    static void setArenaInfo(UInt8 type);
 
     inline static bool canDestory(UInt32 itemid)
     {
@@ -501,6 +514,7 @@ public:
     static bool _wansheng;
     static bool _11Act;
     static bool _guoqing;
+    static bool _9215Act;
     static bool _enchant_gt11;
     static bool _rechargenextret;
     static UInt32 _rechargenextretstart;
@@ -526,9 +540,10 @@ public:
     static bool _loginAward;
     static bool _bluediamonSuperman;
     static bool _tgcevent;
+    static RCSortType arenaSupported;
     static Player* _arenaPlayer[5];
-    static UInt32 _arenaCount;
-    static ValueSortType _arenaPlayerRank[5];
+    static UInt16 _arenaTotalCnt;
+    static UInt8 _arenaResultRank[5];
 
 public:
     static RCSortType rechargeSort;
@@ -563,6 +578,7 @@ private:
 	static void World_One_Min( World * );
     static void AthleticsPhysicalCheck(void *);
 	static void Tianjie_Refresh(void*);
+	static void DaysRank_Refresh(void*);
     static void TownDeamonTmAward(void *);
     static void ArenaExtraActTimer(void *);
     static void ClanCopyCheck(void *);
@@ -587,7 +603,7 @@ public:
     void SendQixiAward();
     void SendGuoqingAward();
     void sendQixiScoreAward(Player* pl);
-    void value2rank(UInt8* rank);
+    void SendXiaoyaoAward();
 
     void killMonsterAppend(Stream& st, UInt8 index);
     void killMonsterInit();

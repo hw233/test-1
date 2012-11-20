@@ -48,11 +48,14 @@
 #include "Server/SysMsg.h"
 #include "Arena.h"
 #include "Tianjie.h"
+#include "DaysRank.h"
 #include "TownDeamon.h"
 #include "SingleHeroStage.h"
 #include "SHSYTmpl.h"
 #include "QixiTmpl.h"
 #include "MsgHandler/Memcached.h"
+
+static const UInt32 DAYSRANKTM = 23 * 3600+50*60;
 
 namespace GObject
 {
@@ -133,6 +136,7 @@ bool World::_qixi= false;
 bool World::_wansheng= false;
 bool World::_11Act= false;
 bool World::_guoqing= false;
+bool World::_9215Act= false;
 bool World::_enchant_gt11 = false;
 bool World::_rechargenextret;
 UInt32 World::_rechargenextretstart;
@@ -163,9 +167,11 @@ bool   World::_townReward_10_15 = false;
 bool World::_loginAward = false;
 bool World::_bluediamonSuperman = false;
 bool World::_tgcevent = false;
+/** 场外活动 **/
+RCSortType World::arenaSupported;
 Player* World::_arenaPlayer[5];
-UInt32 World::_arenaCount;
-ValueSortType World::_arenaPlayerRank[5];
+UInt16 World::_arenaTotalCnt;
+UInt8 World::_arenaResultRank[5];
 /** 0：侠骨；1：柔情；2财富；3传奇 **/
 RCSortType World::killMonsterSort[4];
 
@@ -237,6 +243,7 @@ bool bWanshengEnd = false;
 bool bGuoqingEnd = false;
 bool bRechargeEnd = false;
 bool bConsumeEnd = false;
+bool bXiaoyaoEnd = false;
 
 bool enum_midnight(void * ptr, void* next)
 {
@@ -339,7 +346,14 @@ bool enum_midnight(void * ptr, void* next)
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 10) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 11) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 12) ||
-            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 13)
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 13) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 16) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 17) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 18) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 19) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 20) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 21) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 22)
             ))
     {
         if (pl->isOnline())
@@ -462,8 +476,7 @@ bool enum_extra_act_award(Player* player, void* data)
     UInt8 supportId = player->GetVar(VAR_ARENA_SUPPORT);
     if(supportId == 0 || supportId > 5)
         return true;
-    UInt8* rank = reinterpret_cast<UInt8 *>(data);
-    UInt8 curRank = rank[supportId - 1];
+    UInt8 curRank = World::_arenaResultRank[supportId];
     UInt32 moneyArena = 0;
     switch(curRank)
     {
@@ -757,6 +770,7 @@ void SendRechargeRankAward()
 {
     if(bRechargeEnd)
     {
+        World::initRCRank();
         int pos = 0;
         for (RCSortType::iterator i = World::rechargeSort.begin(), e = World::rechargeSort.end(); i != e; ++i)
         {
@@ -781,6 +795,7 @@ void SendConsumeRankAward()
 {
     if(bConsumeEnd)
     {
+        World::initRCRank();
         int pos = 0;
         for (RCSortType::iterator i = World::consumeSort.begin(), e = World::consumeSort.end(); i != e; ++i)
         {
@@ -841,6 +856,7 @@ void World::World_Midnight_Check( World * world )
     bool bQixi = getQixi();
     bool bWansheng = getWansheng();
     bool bGuoqing = getGuoqing();
+    bool bXiaoyao = get9215Act();
     bool bRecharge = (getRechargeActive() || getRechargeActive3366()) && getNeedRechargeRank();
     bool bConsume = getConsumeActive() && getNeedConsumeRank();
     bool bPExpItems = getPExpItems();
@@ -868,6 +884,7 @@ void World::World_Midnight_Check( World * world )
     bQixiEnd = bQixi && !getQixi();
     bWanshengEnd = bWansheng && !getWansheng();
     bGuoqingEnd = bGuoqing && !getGuoqing();
+    bXiaoyaoEnd = bXiaoyao && !get9215Act();
     bRechargeEnd = bRecharge && !(getRechargeActive()||getRechargeActive3366());
     bConsumeEnd = bConsume && !getConsumeActive();
     bool bMonsterActEnd = bMonsterAct && !getKillMonsterAct();
@@ -884,12 +901,18 @@ void World::World_Midnight_Check( World * world )
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 6) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 11) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 12) ||
-            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 13)
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 13) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 17) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 18) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 19) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 20) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 21) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 22) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 23)
             )
         bRechargeEnd = true;
 
 	globalPlayers.enumerate(enum_midnight, static_cast<void *>(&nextday));
-    World::initRCRank();
 
     leaderboard.newDrawingGame(nextday);
     //给筷子使用称号
@@ -937,6 +960,11 @@ void World::World_Midnight_Check( World * world )
         world->killMonsterInit();
 	    SendKillMonsterRankAward();
     }
+    if (bXiaoyaoEnd)
+        world->SendXiaoyaoAward();
+    if(getArenaTotalCnt() > 0)
+        setArenaTotalCnt(0);
+
 
 	dungeonManager.enumerate(enum_dungeon_midnight, &curtime);
 	globalClans.enumerate(enum_clan_midnight, &curtime);
@@ -1019,6 +1047,11 @@ void World::Tianjie_Refresh(void*)
 {
 	GObject::Tianjie::instance().process(TimeUtil::Now());
 }
+void World::DaysRank_Refresh(void*)
+{
+	GObject::DaysRank::instance().process();
+}
+
 void World::Team_Copy_Process(void*)
 {
     teamCopyManager->process(TimeUtil::Now());
@@ -1034,6 +1067,12 @@ void World::TownDeamonTmAward(void *)
     townDeamonManager->process();
 }
 
+void World::setArenaInfo(UInt8 type)
+{
+    GObject::arena.setArenaPlayer(type);
+    GObject::arena.setArenaTotalCnt(type);
+}
+
 void World::ArenaExtraActTimer(void *)
 {
     UInt32 now = TimeUtil::Now();
@@ -1046,10 +1085,32 @@ void World::ArenaExtraActTimer(void *)
         return;
     }
     UInt32 t1 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SINGUP_START;
-    UInt32 t2 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SUFFER_START;
-    UInt32 t3 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_AWARD;
+    UInt32 t2 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SINGUP_END;
+    UInt32 t3 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SUFFER_END;
 
-    if(now >= t1 && now < t2 )
+    if(now < t1 || now >= t3 + 60)
+        return;
+
+    if(getArenaTotalCnt() == 0)
+    {
+        if(week == ARENA_ACT_WEEK_START)
+        {
+            setArenaInfo(0);
+        }
+        else
+        {
+            setArenaInfo(1);
+        }
+    }
+    Player *pl = NULL;
+    for(UInt8 i = 0; i < 5; i++)
+    {
+        WORLD().getArenaPlayer(i, &pl);
+        if(pl == NULL)
+            return;
+    }
+
+    if(now >=t1 && now < t2)
     {
         printf("t1-t2\n");
         //globalPlayers.enumerate(enum_extra_act_update_status, static_cast<void *>(&type1));
@@ -1062,9 +1123,19 @@ void World::ArenaExtraActTimer(void *)
     else if(now >= t3 && now < t3 + 60)
     {
         printf("t3\n");
-        UInt8 rank[5] = {0, 0, 0, 0, 0};
-        WORLD().value2rank(rank);
-        globalPlayers.enumerate(enum_extra_act_award, static_cast<void *>(rank));
+        ValueSort cur;
+        ValueSortType resultRank;
+        for(UInt8 i = 0; i < 5; i++)
+        {
+            WORLD().getArenaPlayer(i, &cur.player);
+            resultRank.insert(cur);
+        }
+        for(UInt8 i = 0; i < 5; i++)
+        {
+            WORLD().getArenaPlayer(i, &cur.player);
+            _arenaResultRank[i] = std::distance(resultRank.begin(), resultRank.find(cur)) + 1;
+        }
+        globalPlayers.enumerate(enum_extra_act_award, static_cast<void *>(NULL));
     }
     else
     {
@@ -1113,6 +1184,8 @@ bool World::Init()
     static UInt8 type2 = 1;
 	GObject::Tianjie::instance().Init();
 	AddTimer(5 * 1000, Tianjie_Refresh, static_cast<void*>(NULL));
+	GObject::DaysRank::instance().Init(); 
+	//AddTimer(60 * 1000, DaysRank_Refresh, static_cast<void*>(NULL)); //调试用
 
 	GObjectManager::delayLoad();
 	GObjectManager::LoadPracticeData();
@@ -1159,7 +1232,7 @@ bool World::Init()
 	if(sday < now) sday += 86400;
 	AddTimer(86400 * 1000, World_Midnight_Check, this, (sday - now) * 1000);
     AddTimer(5 * 60 * 1000, World_Online_Log, static_cast<void *>(NULL), ((now + 300) / 300 * 300 - now) * 1000);
-    AddTimer(5 * 1000, World_Boss_Refresh, static_cast<void*>(NULL));
+    AddTimer(5 * 1000, World_Boss_Refresh, static_cast<void*>(NULL), 5 * 1000);
 
     UInt32 athChkPoint = TimeUtil::SharpDayT(0, now) + EXTRAREWARDTM;
     AddTimer(86400 * 1000, World_Athletics_Check, static_cast<void *>(&type), (athChkPoint >= now ? athChkPoint - now : 86400 + athChkPoint - now) * 1000);
@@ -1175,8 +1248,11 @@ bool World::Init()
     UInt32 tdChkPoint = TimeUtil::SharpDayT(0, now) + TOWNDEAMONENDTM;
     AddTimer(86400 * 1000, TownDeamonTmAward, static_cast<void *>(NULL), (tdChkPoint >= now ? tdChkPoint - now : 86400 + tdChkPoint - now) * 1000);
 
+    UInt32 drChkPoint = TimeUtil::SharpDayT(0, now) + DAYSRANKTM;
+    AddTimer(86400 * 1000, DaysRank_Refresh, static_cast<void *>(NULL), (drChkPoint >= now ? drChkPoint - now : 86400 + drChkPoint - now) * 1000);
+
     //AddTimer(60 * 1000, advancedHookTimer, static_cast<void *>(NULL), (60 - now % 60) * 1000);
-    AddTimer(60 * 1000, ArenaExtraActTimer, static_cast<void *>(NULL));
+    AddTimer(60 * 1000, ArenaExtraActTimer, static_cast<void *>(NULL), (60 - now % 60) * 1000);
 
     return true;
 }
@@ -1698,41 +1774,6 @@ void World::sendQixiScoreAward(Player* pl)
     DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
 }
 
-void World::value2rank(UInt8* rank)
-{
-    Player* pl[5];
-    getArenaPlayerAndCount(pl, 5, NULL);
-    UInt32 sz[5];
-    UInt32 tmp;
-    for(UInt8 i = 0; i < 5; i++)
-        sz[i] = pl[i]->GetVar(GObject::VAR_ARENA_SUFFERED);
-    for(UInt8 i = 0; i < 5; i++)
-    {
-        for(UInt8 j = i + 1; j < 5; j++)
-        {
-            if(sz[i] < sz[j])
-            {
-                tmp = sz[i];
-                sz[i] = sz[j];
-                sz[j] = tmp;
-            }
-        }
-    }
-    //sz已排好序
-    for(UInt8 i = 0; i < 5; i++)
-    {
-        for(UInt8 j = 0; j < 5; j++)
-        {
-            if(sz[j] == pl[i]->GetVar(GObject::VAR_ARENA_SUFFERED))
-            {
-                sz[j] = 0xFFFFFFFF;//置sz[j]无效
-                rank[i] = j + 1;
-                break;
-            }
-        }
-    }
-}
-
 struct SSelectYuebingUsedMost : public Visitor<Player>
 {
     Player* _player;
@@ -1763,6 +1804,35 @@ void World::SendGuoqingAward()
 
 
 }
+struct SSelectXiaoyaoUsedMost : public Visitor<Player>
+{
+    Player* _player;
+    UInt32 _used;
+    SSelectXiaoyaoUsedMost() : _player(NULL), _used(0) {}
+    bool operator()(Player* player)
+    {
+        UInt32 used = player->GetVar(VAR_9215_USED);
+        if(_player == NULL || used > _used)
+        {
+            _player = player;
+            _used = used;
+        }
+        return true;
+    }
+};
+void World::SendXiaoyaoAward()
+{
+    SSelectXiaoyaoUsedMost selector;
+    globalPlayers.enumerate(selector);
+    if(selector._player == NULL)
+        return;
+    MailPackage::MailItem items[] =
+    {
+        {9216, 1}
+    };
+    selector._player->sendMailItem(4062, 4063, items, sizeof(items)/sizeof(items[0]), false);
+}
+
 
 #ifndef _WIN32
 void World::udpLog(const char* str1, const char* str2, const char* str3, const char* str4,

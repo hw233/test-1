@@ -30,6 +30,7 @@
 #include <set>
 #include "GObject/SingleHeroStage.h"
 #include "GObject/SHSYTmpl.h"
+#include "GObject/DaysRank.h"
 
 void OnPushTimerEvent( GameMsgHdr& hdr, const void * data )
 {
@@ -1137,6 +1138,13 @@ void OnSHStageOnOff( GameMsgHdr& hdr, const void* data )
     Stream st(SPEP::SHSTAGEONOFF);
     st << static_cast<UInt8>(ret) << Stream::eos;
     NETWORK()->SendMsgToClient(onOff.sessionID, st);
+}
+
+void OnDaysRankMsg( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    daysValueRankMsg* msg = reinterpret_cast<daysValueRankMsg*>(const_cast<void*>(data));
+    GObject::DaysRank::instance().updateDaysValue(msg); 
 }
 
 #endif // _WORLDINNERMSGHANDLER_H_

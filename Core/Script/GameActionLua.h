@@ -311,7 +311,7 @@ namespace Script
 
     public:
         void doAty( Player* pl, UInt32 id,  UInt32 param1, UInt32 param2);
-        void doAtySignIn(Player* pl, UInt32 id, UInt32 month, UInt32 day);
+        UInt16 doAtySignIn(Player* pl);
         UInt32 GetAtyCheckFlag(UInt32 idx);
         UInt32 GetMaxActivity(UInt32 vip);
         lua_tinker::table GetExchangeProps(UInt32 id);
@@ -319,6 +319,13 @@ namespace Script
         lua_tinker::table GetdayExtraAward(UInt32 month, UInt32 day);
         UInt8 onRoamingQueqiao(Player* pl, UInt8 pos);
         UInt32 GetBDSupermanPrice(Player* player, UInt32 itemId, bool isUsed);
+        void doStrong(Player* pl, UInt8 id, UInt32 param1, UInt32 param2);
+        UInt8 GetSthCheckFlag(UInt8 idx);
+        UInt8 EveryDayRoarSoul();
+        lua_tinker::table openGreenBoxStrong();
+        lua_tinker::table openBlueBoxStrong();
+        lua_tinker::table openPurpleBoxStrong();
+        lua_tinker::table openOrangeBoxStrong();
 
 	private:
 		Player* _player1;	//?ű???????Ϊ????1
