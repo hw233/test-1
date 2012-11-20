@@ -96,6 +96,8 @@ namespace GObject
             bool CanOpenBlueBox(UInt8 type, UInt32 useTael);
             bool CanOpenPurpleBox(UInt8 type, UInt32 useCoupon);
             bool CanOpenOrangeBox(UInt8 type, UInt32 useGold);
+            void CheckeFixedSouls(UInt8 v);
+            void SendFlickerToClient();
             
             void GMClearSthAll(){_item.Reset(); UpdateToDB();} //For GM
     };
