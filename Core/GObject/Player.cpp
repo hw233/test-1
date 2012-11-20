@@ -14537,19 +14537,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
                 UInt32 seconds = 0;
                 if(now >= t2 && now < t3)
                     seconds = t3 - now;
-                UInt16 lefttime;
-                UInt8 supportid;
-                if(broadfreq < 5)
-                {
-                    supportid = static_cast<UInt8>(GetVar(VAR_ARENA_SUPPORT));
-                    lefttime = static_cast<UInt16>(getBuffLeft(PLAYER_BUFF_SUFFER));
-                }
-                else
-                {
-                    supportid = 0xFF;
-                    lefttime = 0xFFFF;
-                }
-                st << supportid << seconds << lefttime;
+                st << static_cast<UInt8>(GetVar(VAR_ARENA_SUPPORT)) << seconds << static_cast<UInt16>(getBuffLeft(PLAYER_BUFF_SUFFER));
                 for(UInt8 i = 0; i < 5; i++)
                 {
                     st << pl[i]->GetVar(VAR_ARENA_SUFFERED);
@@ -14560,7 +14548,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
                     send(st);
                 else
                 {
-                    NETWORK()->Broadcast(st);
+                    ArenaExtraAct(4, 0);
                     broadfreq = 0;
                 }
                 }
@@ -14601,6 +14589,17 @@ void EventTlzAuto::notify(bool isBeginAuto)
                     }
                     st << Stream::eos;
                     send(st);
+                }
+                break;
+                case 4:
+                {
+                    Stream st(REP::SERVER_ARENA_EXTRA_ACT);
+                    st << static_cast<UInt8>(4);
+                    for(UInt8 i = 0; i < 5; i++)
+                    {
+                        st << pl[i]->GetVar(VAR_ARENA_SUFFERED);
+                    }
+                    NETWORK()->Broadcast(st);
                 }
                 break;
                 default:
