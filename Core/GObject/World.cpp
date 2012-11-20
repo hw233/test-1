@@ -1151,6 +1151,25 @@ void World::ArenaExtraActTimer(void *)
             ValueSortType resultRank;
             for(UInt8 i = 0; i < 5; i++)
             {
+                SYSMSGV(title, 739);
+                SYSMSGV(content, 740);
+                Mail * mail = pl[i]->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+                if(mail)
+                {
+                    MailPackage::MailItem mitem[1] = {{9076,1}};
+                    mailPackageManager.push(mail->id, mitem, 1, true);
+
+                    std::string strItems;
+                    for(int index = 0; index < 1; ++ index)
+                    {
+                        strItems += Itoa(mitem[index].id);
+                        strItems += ",";
+                        strItems += Itoa(mitem[index].count);
+                        strItems += "|";
+                    }
+                    DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl[i]->getId(), mail->id, ArenaExtraAct, title, content, strItems.c_str(), mail->recvTime);
+                }
+
                 cur.player = pl[i];
                 cur.lastTime = pl[i]->GetVar(VAR_ARENA_LASTTIME);
                 resultRank.insert(cur);
