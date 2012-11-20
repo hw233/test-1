@@ -471,7 +471,7 @@ struct DBReportId
 };
 struct DBDaysRank
 {
-    int player_id;
+    UInt64 player_id;
     std::string athletics;
     std::string level;
     std::string money;
@@ -1024,7 +1024,7 @@ SPECIALEND()
 SPECIALBEGIN(GData::DBDaysRank)
 SPECIALDEF(6)
 	(
-	int,player_id,
+	UInt64,player_id,
     std::string, athletics,
     std::string, level,
     std::string, money,
