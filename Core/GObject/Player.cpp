@@ -14469,6 +14469,10 @@ void EventTlzAuto::notify(bool isBeginAuto)
                     if(supportId == 0 || supportId > 5)
                         return;
                     SetVar(VAR_ARENA_SUPPORT, supportId);
+                    if(week == 2)
+                        SetVar(VAR_ARENA_SUPPORT_TUE, supportId);
+                    else
+                        SetVar(VAR_ARENA_SUPPORT_WED, supportId);
                 }
                 Stream st(REP::SERVER_ARENA_EXTRA_ACT);
                 st << week;

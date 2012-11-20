@@ -1601,7 +1601,10 @@ void OnArenaExtraActReq( GameMsgHdr& hdr, const void * data )
             Stream st2(REP::SERVER_ARENA_EXTRA_ACT);
             st2 << week;
             st2 << static_cast<UInt8>(3);
-            st2 << static_cast<UInt8>(0);
+            if(week == 2)
+                st2 << static_cast<UInt8>(player->GetVar(GObject::VAR_ARENA_SUPPORT_TUE));
+            else
+                st2 << static_cast<UInt8>(player->GetVar(GObject::VAR_ARENA_SUPPORT_WED));
             for(UInt8 i = 0; i < 5; i++)
             {
                 st2 << GObject::World::_arenaOldBoard[week-2].sufferCnt[i];
