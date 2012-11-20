@@ -1571,7 +1571,7 @@ void OnArenaExtraActReq( GameMsgHdr& hdr, const void * data )
     }
     else
     {
-        if(GObject::World::_arenaOldBoard[week-2].week == week)
+        if(serverWeek > week && GObject::World::_arenaOldBoard[week-2].week == week)
         {
             GObject::Player* pl[5];
             for(UInt8 i = 0; i < 5; i++)
