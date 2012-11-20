@@ -14392,7 +14392,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
             return;
         if(now < t1)
             return;
-        if(now < t3 + 60 && WORLD().getArenaTotalCnt() == 0)
+        if(/*now < t3 + 60 && */WORLD().getArenaTotalCnt() == 0)
         {
             if(week == ARENA_ACT_WEEK_START)
             {
@@ -14421,8 +14421,8 @@ void EventTlzAuto::notify(bool isBeginAuto)
                 //if(week < ARENA_ACT_WEEK_START || week > ARENA_ACT_WEEK_END)
                 //    return;
                 //if(now < t1 || now > t3)
-                if(now > t3)
-                    return;
+                //if(now > t3)
+                //    return;
                 Stream st(REP::SERVER_ARENA_EXTRA_ACT);
                 st << type;
                 UInt8 mainId = 0;
@@ -14491,6 +14491,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
 
                     setBuffData(PLAYER_BUFF_SUFFER, TimeUtil::Now() + 7 - 5);//5秒误差，10秒仅仅为了测试
                     pl[sufferId - 1]->AddVar(VAR_ARENA_SUFFERED, 1);
+                    pl[sufferId - 1]->SetVar(VAR_ARENA_LASTTIME, now);
                     if(pl[sufferId - 1]->GetVar(VAR_ARENA_SUFFERED) == totalSufferCnt)
                     {
                         UInt32 moneyArena = 500;
@@ -14536,6 +14537,29 @@ void EventTlzAuto::notify(bool isBeginAuto)
                 break;
                 case 3:
                 {
+                    if(World::_arenaResultRank[0] == 0 && World::_arenaResultRank[1] == 0 && World::_arenaResultRank[2] == 0 && World::_arenaResultRank[3] == 0 && World::_arenaResultRank[4] == 0)
+                    {
+                        ValueSort cur;
+                        ValueSortType resultRank;
+                        for(UInt8 i = 0; i < 5; i++)
+                        {
+                            //WORLD().getArenaPlayer(i, &cur.player);
+                            cur.player = pl[i];
+                            cur.lastTime = pl[i]->GetVar(VAR_ARENA_LASTTIME);
+                            resultRank.insert(cur);
+                        }
+                        for(UInt8 i = 0; i < 5; i++)
+                        {
+                            WORLD().getArenaPlayer(i, &cur.player);
+                            UInt8 j = 0;
+                            for(ValueSortType::iterator iter = resultRank.begin(), e = resultRank.end(); iter != e && j < 5; ++iter, ++j)
+                            {
+                                if(cur.player == iter->player)
+                                    break;
+                            }
+                            World::_arenaResultRank[i] = j + 1;
+                        }
+                    }
                     Stream st(REP::SERVER_ARENA_EXTRA_ACT);
                     st << type;
                     st << static_cast<UInt8>(GetVar(VAR_ARENA_SUPPORT));

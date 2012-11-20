@@ -60,7 +60,7 @@ static const UInt32 DAYSRANKTM = 23 * 3600+50*60;
 namespace GObject
 {
 
-bool lt_valuesort::operator()(const ValueSort& a, const ValueSort& b) const { return a.player->GetVar(VAR_ARENA_SUFFERED) < b.player->GetVar(GObject::VAR_ARENA_SUFFERED); }
+bool lt_valuesort::operator()(const ValueSort& a, const ValueSort& b) const { return (a.player->GetVar(VAR_ARENA_SUFFERED) < b.player->GetVar(GObject::VAR_ARENA_SUFFERED)) || (a.player->GetVar(VAR_ARENA_SUFFERED) == b.player->GetVar(GObject::VAR_ARENA_SUFFERED) && a.lastTime > b.lastTime); }
 
 struct DBDataLatest
 {
@@ -171,7 +171,7 @@ bool World::_tgcevent = false;
 RCSortType World::arenaSupported;
 Player* World::_arenaPlayer[5];
 UInt16 World::_arenaTotalCnt;
-UInt8 World::_arenaResultRank[5];
+UInt8 World::_arenaResultRank[5] = {0, 0, 0, 0, 0};
 /** 0：侠骨；1：柔情；2财富；3传奇 **/
 RCSortType World::killMonsterSort[4];
 
@@ -476,7 +476,7 @@ bool enum_extra_act_award(Player* player, void* data)
     UInt8 supportId = player->GetVar(VAR_ARENA_SUPPORT);
     if(supportId == 0 || supportId > 5)
         return true;
-    UInt8 curRank = World::_arenaResultRank[supportId];
+    UInt8 curRank = World::_arenaResultRank[supportId-1];
     UInt32 moneyArena = 0;
     switch(curRank)
     {
@@ -1088,7 +1088,7 @@ void World::ArenaExtraActTimer(void *)
     UInt32 t2 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SINGUP_END;
     UInt32 t3 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SUFFER_END;
 
-    if(now < t1 || now >= t3 + 60)
+    if(now < t1 && now >= t3 + 60)
         return;
 
     if(getArenaTotalCnt() == 0)
@@ -1102,11 +1102,11 @@ void World::ArenaExtraActTimer(void *)
             setArenaInfo(1);
         }
     }
-    Player *pl = NULL;
+    Player *pl[5] = {NULL, NULL, NULL, NULL, NULL};
     for(UInt8 i = 0; i < 5; i++)
     {
-        WORLD().getArenaPlayer(i, &pl);
-        if(pl == NULL)
+        WORLD().getArenaPlayer(i, &pl[i]);
+        if(pl[i] == NULL)
             return;
     }
 
@@ -1123,17 +1123,26 @@ void World::ArenaExtraActTimer(void *)
     else if(now >= t3 && now < t3 + 60)
     {
         printf("t3\n");
-        ValueSort cur;
-        ValueSortType resultRank;
-        for(UInt8 i = 0; i < 5; i++)
+        //if(_arenaResultRank[0] == 0 && _arenaResultRank[1] == 0 && _arenaResultRank[2] == 0 && _arenaResultRank[3] == 0 && _arenaResultRank[4] == 0)
         {
-            WORLD().getArenaPlayer(i, &cur.player);
-            resultRank.insert(cur);
-        }
-        for(UInt8 i = 0; i < 5; i++)
-        {
-            WORLD().getArenaPlayer(i, &cur.player);
-            _arenaResultRank[i] = std::distance(resultRank.begin(), resultRank.find(cur)) + 1;
+            ValueSort cur;
+            ValueSortType resultRank;
+            for(UInt8 i = 0; i < 5; i++)
+            {
+                cur.player = pl[i];
+                cur.lastTime = pl[i]->GetVar(VAR_ARENA_LASTTIME);
+                resultRank.insert(cur);
+            }
+            for(UInt8 i = 0; i < 5; i++)
+            {
+                UInt8 j = 0;
+                for(ValueSortType::iterator iter = resultRank.begin(), e = resultRank.end(); iter != e && j < 5; ++iter, ++j)
+                {
+                    if(pl[i] == iter->player)
+                        break;
+                }
+                _arenaResultRank[i] = j + 1;
+            }
         }
         globalPlayers.enumerate(enum_extra_act_award, static_cast<void *>(NULL));
     }

@@ -278,6 +278,7 @@ namespace GObject
         // 281-290 占用 fro qiwy
         VAR_ARENA_SUPPORT = 281, //场外活动，支持的序列id
         VAR_ARENA_SUFFERED = 282, //场外活动，被陷害的次数
+        VAR_ARENA_LASTTIME = 283, //场外活动，最后被陷害的时间
 
         VAR_MAX,
     };
@@ -539,6 +540,7 @@ namespace GObject
             REGISTER_VAR(VAR_ACT_LOGIN_AWARD_VIP, CYCLE_DAY);
             REGISTER_VAR(VAR_ARENA_SUPPORT, CYCLE_DAY);
             REGISTER_VAR(VAR_ARENA_SUFFERED, CYCLE_DAY);
+            REGISTER_VAR(VAR_ARENA_LASTTIME, CYCLE_DAY);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

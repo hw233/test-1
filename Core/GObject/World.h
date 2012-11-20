@@ -76,12 +76,13 @@ typedef std::map<Player*, QixiPlayersIt> QixiScoreMap;
 struct ValueSort
 {
     Player* player;
+    UInt32 lastTime;
 };
 struct lt_valuesort
 {
     bool operator()(const ValueSort& a, const ValueSort& b) const;
 };
-typedef std::set<ValueSort, lt_valuesort> ValueSortType;
+typedef std::multiset<ValueSort, lt_valuesort> ValueSortType;
 
 class World:
 	public WorkerRunner<WorldMsgHandler>
