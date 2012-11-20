@@ -573,7 +573,8 @@ namespace GObject
         memset (m_domain, 0, sizeof(m_domain));
         memset (m_openid, 0, sizeof(m_openid));
         memset (m_openkey, 0, sizeof(m_openkey));
-        memset (m_clientIp, 0, sizeof(m_clientIp));
+        //memset (m_clientIp, 0, sizeof(m_clientIp));
+        strncpy (m_clientIp, "0.0.0.0", 10);
         _isForbidSale = false;
 
         char buf[64] = {0};
