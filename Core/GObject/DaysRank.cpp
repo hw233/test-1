@@ -107,6 +107,8 @@ void DaysRank::updateDaysValue(daysValueRankMsg * msg)
 {
     if(!msg)
         return;
+    FastMutex::ScopedLock lk(_opMutex);
+
     UInt8 type = msg->type;
     PlayerRankInfo* pInfo = getDaysRank(msg->playerId);
     if(pInfo)

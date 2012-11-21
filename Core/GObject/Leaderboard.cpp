@@ -746,6 +746,8 @@ int Leaderboard::getMyRank(Player* pl, UInt8 type)
     int rank = 0;
     if (NULL == pl)
         return 0;
+    FastMutex::ScopedLock lk(_opMutex);
+
     std::map<UInt64, int>::iterator iter;
     Clan* cl = pl->getClan(); 
     switch (type)
