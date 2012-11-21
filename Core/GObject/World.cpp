@@ -170,7 +170,7 @@ bool World::_tgcevent = false;
 /** 场外活动 **/
 RCSortType World::arenaSupported;
 Player* World::_arenaPlayer[5];
-UInt16 World::_arenaTotalCnt;
+UInt16 World::_arenaTotalCnt = ARENA_ACT_CNT_FLAG;
 UInt8 World::_arenaResultRank[5] = {0, 0, 0, 0, 0};
 /** 0：侠骨；1：柔情；2财富；3传奇 **/
 RCSortType World::killMonsterSort[4];
@@ -474,7 +474,7 @@ bool enum_extra_act_update_status(Player* player, void* data)
     if(player->isOnline())
     {
         UInt8 type = *reinterpret_cast<UInt8 *>(data);
-        player->ArenaExtraAct(type+ARENA_ACT_SYSTEM, 0);
+        player->ArenaExtraAct(type, 0);
     }
     return true;
 }
@@ -973,7 +973,7 @@ void World::World_Midnight_Check( World * world )
     if (bXiaoyaoEnd)
         world->SendXiaoyaoAward();
     if(getArenaTotalCnt() > 0)
-        setArenaTotalCnt(0);
+        setArenaTotalCnt(ARENA_ACT_CNT_FLAG);
 
 
 	dungeonManager.enumerate(enum_dungeon_midnight, &curtime);
@@ -1093,7 +1093,7 @@ void World::ArenaExtraActTimer(void *)
     UInt32 now = TimeUtil::Now();
     UInt32 week = TimeUtil::GetWeekDay(now);
     //static UInt8 type1 = 1;
-    static UInt8 type2 = 2;
+    static UInt8 type2 = 0;
     if(week < ARENA_ACT_WEEK_START || week > ARENA_ACT_WEEK_END)
     {
         printf("day isn't valid\n");
@@ -1106,7 +1106,7 @@ void World::ArenaExtraActTimer(void *)
     if(now < t1 && now >= t3 + 60)
         return;
 
-    if(getArenaTotalCnt() == 0)
+    if(getArenaTotalCnt() == ARENA_ACT_CNT_FLAG)
     {
         if(week == ARENA_ACT_WEEK_START)
         {
@@ -1124,8 +1124,11 @@ void World::ArenaExtraActTimer(void *)
         if(pl[i] == NULL)
             return;
     }
-    if(getArenaTotalCnt() == 0)
+    if(now < t2)
+        setArenaTotalCnt(0);
+    else if(getArenaTotalCnt() == 0 || getArenaTotalCnt() == ARENA_ACT_CNT_FLAG)
     {
+        setArenaTotalCnt(0);
         setAreanTotalCntEnum();
     }
 

@@ -149,6 +149,7 @@ namespace GObject
 #define ARENA_ACT_SINGUP_END      ARENA_ACT_SINGUP_START+30*60
 #define ARENA_ACT_SUFFER_END      ARENA_ACT_SINGUP_END+15*60
 #endif
+#define ARENA_ACT_CNT_FLAG        0xFFFF
 #define ARENA_ACT_SYSTEM          10
 	class Map;
 	class Player;

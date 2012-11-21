@@ -14394,7 +14394,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
             return;
         if(now < t1)
             return;
-        if(/*now < t3 + 60 && */WORLD().getArenaTotalCnt() == 0)
+        if(/*now < t3 + 60 && */WORLD().getArenaTotalCnt() == ARENA_ACT_CNT_FLAG)
         {
             if(week == ARENA_ACT_WEEK_START)
             {
@@ -14412,8 +14412,11 @@ void EventTlzAuto::notify(bool isBeginAuto)
             if(pl[i] == NULL)
                 return;
         }
-        if(WORLD().getArenaTotalCnt() == 0)
+        if(now < t2)
+            WORLD().setArenaTotalCnt(0);
+        else if(WORLD().getArenaTotalCnt() == 0 || WORLD().getArenaTotalCnt() == ARENA_ACT_CNT_FLAG)
         {
+            WORLD().setArenaTotalCnt(0);
             WORLD().setAreanTotalCntEnum();
         }
         UInt16 totalCnt;
