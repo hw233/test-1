@@ -5157,6 +5157,7 @@ namespace GObject
     bool GObjectManager::loadExJob()
     {
         // 读取寻墨有关数据
+        /*
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading ExJob");
@@ -5175,6 +5176,7 @@ namespace GObject
 			lc.advance();
         }
         lc.finalize();
+        */
         return true;
     }
 }

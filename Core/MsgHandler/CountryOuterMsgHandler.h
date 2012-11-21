@@ -5319,13 +5319,42 @@ void OnExJob( GameMsgHdr & hdr, const void * data )
                 {
                     // 刷新页面请求
                     jobHunter->SendFighterList();
+                    return;
                 }
                 UInt16 fighterId = 0;
                 br >> fighterId;
+                jobHunter->OnHireFighter(fighterId);
             }
             break;
         case 2:
             // 寻墨页面
+            {
+                if (br.left() == 0)
+                {
+                    jobHunter->SendGameInfo(type);
+                    return;
+                }
+                UInt8 val = 0;
+                br >> val;
+                switch (val)
+                {
+                    case 0:
+                        // TODO: 放弃寻墨游戏
+                        break;
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                        jobHunter->OnRequestStart(val);
+                        break;
+                    case 5: 
+                        // 老虎机转盘转动
+                        jobHunter->OnUpdateSlot();
+                        break;
+                    default:
+                        break;
+                }
+            }
             break;
         default:
             break;
@@ -5337,16 +5366,13 @@ void OnJobHunter( GameMsgHdr & hdr, const void * data )
 	MSG_QUERY_PLAYER(player);
     BinaryReader br(data, hdr.msgHdr.bodyLen);
     UInt8 type = 0;
+    UInt32 val = 0;
     br >> type;
-    switch (type)
-    {
-        case 0:
-            break;
-        case 1:
-            break;
-        default:
-            break;
-    }
+    br >> val;
+    JobHunter * jobHunter = player->getJobHunter();
+    if (!jobHunter)
+        return;
+    jobHunter->OnCommand(type, val);
 }
 
 

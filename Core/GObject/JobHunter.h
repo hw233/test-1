@@ -13,26 +13,94 @@
 
 namespace GObject
 {
+#ifdef  _DEBUG
+#define JOB_HUNTER_DEBUG
+#endif
 
 class Player;
 
+#define POS_TO_INDEX(x,y)  ((x)+((UInt16)(y)<<8))
+
+#define INDEX_TO_POS(x,y,index) \
+    x = (index) & 0xff;\
+    y = ((index) >> 8) & 0xff;
+
 class JobHunter
 {
+
+    static const UInt8 MAX_POS_X = 5;
+    static const UInt8 MAX_POS_Y = 5;
+    static const UInt8 MAX_GRID  = 12;
+
+#define KNOWN_FLAG 0x80
+
     enum GridType
     {
-        GRID_UNKNOWN = 1,   // 未知格子
-        GRID_MONSTER,       // 怪物格子
-        GRID_BOSS,          // boss格子
-        GRID_NORMAL,        // 普通已探索格子
-        GRID_TREASURE,      // 宝箱格子
-        GRID_TRAP,          // 陷阱格子
+        GRID_INVALID    = 0,    // 无法到达的格子
+        GRID_NORMAL     = 1,    // 普通已探索格子
+        GRID_MONSTER,           // 怪物格子
+        GRID_BOSS,              // boss格子
+        GRID_TREASURE,          // 宝箱格子
+        GRID_TRAP,              // 陷阱格子
+        GRID_NORMAL_MAX,
+        GRID_CAVE       = 0x11, // 目标格子，墨家秘洞存在宝物和散仙（概率存在）
+        GRID_BORN       = 0x12, // 玩家出生点
     };
 
     enum Progress
     {
         PROGRESS_NONE = 0,  // 没有开始寻墨
-        PROGRESS_START,
-        PROGRESS_END,
+        PROGRESS_70,        //  70级副本寻墨
+        PROGRESS_80,        //  80级副本寻墨
+        PROGRESS_90,        //  90级副本寻墨
+        PROGRESS_100,       // 100级副本寻墨
+    };
+
+    struct GridInfo
+    {
+        UInt8 neighbCount;  // 已经和该点相邻的格子的个数
+        UInt8 posX;         // 在大地图上的X坐标
+        UInt8 posY;         // 在大地图上的Y坐标
+        UInt8 gridType;     // 格子类型（GridType类型）
+
+        /*
+        typedef std::list<UInt16> Route;
+        typedef std::map<UInt16, Route> GridRoute;
+        GridRoute route;    // 该点与其他连通点的路径
+        */
+
+        /*
+        GridInfo(UInt8 x, UInt8 y, UInt8 type)
+            : neighbCount(0), posX(x), posY(y), gridType(type)
+        {
+        }
+        */
+        GridInfo(UInt16 index, UInt8 type, UInt8 neighbourCount)
+            : neighbCount(neighbourCount)
+        {
+            INDEX_TO_POS(posX, posY, index);
+            gridType = type;
+        }
+    };
+
+#if 0
+    enum SlotType
+    {                           //                         每个  三个相同额外增加
+        SLOT_DRAGON     = 1,    // 青龙 （法宝、心法、装备  10%，   20%）
+        SLOT_TIGER      = 2,    // 白虎 （法宝              20%，   40%）
+        SLOT_PHOENIX    = 3,    // 朱雀 （心法              20%，   40%）
+        SLOT_TURTLE     = 4,    // 玄武 （装备              20%，   40%）
+        SLOT_MAX,
+    };
+#endif
+    enum SlotType
+    {
+        SLOT_GOLD   = 1,    // 每点25强度
+        SLOT_WOOD   = 2,    // 每点20强度
+        SLOT_WATAR  = 3,    // 每点15强度
+        SLOT_FIRE   = 4,    // 每点10强度
+        SLOT_MUD    = 5,    // 每点 5强度
+        SLOT_MAX,
     };
 
     public:
@@ -42,22 +110,87 @@ class JobHunter
         void LoadFighterList(std::string& str);
         void AddToFighterList(UInt16 id);
         void SendFighterList();
+        void OnHireFighter(UInt16 id);
 
-        void SendGameInfo();
+        void OnRequestStart(UInt8 index);
+        void OnUpdateSlot(bool isAuto = false);
+
+        void SendGameInfo(UInt8 type);
+
+        void OnCommand(UInt8 command, UInt32 val);
+
+    private:
+
+        bool InitMap();
+        void AddBossGrid();
+        void SelectBornGrid();
+
+        void OnMove(UInt32 pos);
+        void OnSkipMonster();
+        void OnAttackMonster();
+        void OnSolveTrap();
+        void OnBreakthroughTrap();
+        void OnAutoExplore();
+        void OnAbort();
 
     private:
         bool list2string(std::string& str);
 
     private:
+
+#if 0
+        static UInt8 spotMapType[] =
+        {
+                    /*0123456789ABCDEF */
+            /*0x00*/ "OOOOOXXXXXXXXXXX"\
+            /*0x10*/ "OOOOOXXXXXXXXXXX"\
+            /*0x20*/ "OOOOOXXXXXXXXXXX"\
+            /*0x30*/ "OOOOOXXXXXXXXXXX"\
+            /*0x40*/ "OOOOOXXXXXXXXXXX"\
+            /*0x50*/ "XXXXXXXXXXXXXXXX"\
+            /*0x60*/ "XXXXXXXXXXXXXXXX"\
+            /*0x70*/ "XXXXXXXXXXXXXXXX"\
+            /*0x80*/ "XXXXXXXXXXXXXXXX"\
+            /*0x90*/ "XXXXXXXXXXXXXXXX"\
+            /*0xA0*/ "XXXXXXXXXXXXXXXX"\
+            /*0xB0*/ "XXXXXXXXXXXXXXXX"\
+            /*0xC0*/ "XXXXXXXXXXXXXXXX"\
+            /*0xD0*/ "XXXXXXXXXXXXXXXX"\
+            /*0xE0*/ "XXXXXXXXXXXXXXXX"\
+            /*0xF0*/ "XXXXXXXXXXXXXXXX"\
+                    /*0123456789ABCDEF */
+        };
+#endif
+
+
+        typedef std::map<UInt16, GridInfo> MapInfo;
         Player *_owner;
-        std::set<UInt16> _fighterList;
-        UInt8 _gameProgress;             // 寻墨游戏状态
-        UInt8 _equipProb;                // 装备寻得率
-        UInt8 _cittaProb;                // 心法寻得率
-        UInt8 _trumpProb;                // 法宝寻得率
-        UInt8 _posX;                     // 玩家在寻墨游戏中的X坐标
-        UInt8 _posY;                     // 玩家在寻墨游戏中的Y坐标
+        std::set<UInt16> _fighterList;  // 可招募散仙列表
+        MapInfo _mapInfo;               // 寻墨游戏地图信息
+        UInt8 _slot1;                   // 一号神兽感应位
+        UInt8 _slot2;                   // 二号神兽感应位
+        UInt8 _slot3;                   // 三号神兽感应位
+
+#if 0
+        UInt8 _equipProb;               // 装备寻得率
+        UInt8 _cittaProb;               // 心法寻得率
+        UInt8 _trumpProb;               // 法宝寻得率
+#endif
+        UInt8 _strengthPoint;           // 神兽强度（为了刷地图上的神兽boss的）
+
+        UInt8 _gameProgress;            // 寻墨游戏状态
+        UInt8 _posX;                    // 玩家在寻墨游戏中的X坐标
+        UInt8 _posY;                    // 玩家在寻墨游戏中的Y坐标
+        UInt32 _stepCount;              // 寻墨游戏中花费的行动步数
+
+
+        URandom _rnd;                   // 用于产生随机数
+
+    private:
+        void DumpMapData();
+
 };
+
 }
 
 #endif

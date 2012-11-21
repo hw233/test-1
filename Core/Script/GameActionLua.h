@@ -268,6 +268,10 @@ namespace Script
         UInt8 onGetAthlRandomMaxValue(UInt8 diffculty);
         UInt32 onGetAthlRandomAward(UInt8 diffculty, UInt8 opt);
         UInt8 onGetAthlRandomDiffculty();
+        UInt32 getRandomNormalMonster(UInt8 id);
+        UInt32 getBossMonster(UInt8 id);
+        UInt32 calcGridType(UInt8 prob);
+
     public:
 
 		template <typename R>

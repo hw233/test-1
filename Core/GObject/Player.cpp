@@ -1120,6 +1120,9 @@ namespace GObject
 #endif
 #endif
 #endif // _WIN32
+#ifdef JOB_HUNTER_DEBUG
+        getJobHunter();
+#endif
 	}
 
 #define WEBDOWNLOAD 255
@@ -14027,6 +14030,14 @@ namespace GObject
        {
            _jobHunter = new JobHunter(this);
        }
+#ifdef JOB_HUNTER_DEBUG
+       else
+       {
+           delete _jobHunter;
+           _jobHunter = NULL;
+           _jobHunter = new JobHunter(this);
+       }
+#endif
        return _jobHunter;
    }
 
