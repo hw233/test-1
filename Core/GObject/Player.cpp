@@ -14486,7 +14486,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
                     //    return;
                     if(now < t2 || now >= t3)
                         return;
-                    if(getBuffLeft(PLAYER_BUFF_SUFFER) > 0)
+                    if(getBuffLeft(PLAYER_BUFF_SUFFER) >= 5)//5秒误差
                         return;
                     UInt8 sufferId = opt;
                     if(sufferId == 0 || sufferId > 5)
@@ -14499,7 +14499,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
                     GameMsgHdr hdr2(0x238, getThreadId(), this, sizeof(pexp));
                     GLOBAL().PushMsg(hdr2, &pexp);
 
-                    setBuffData(PLAYER_BUFF_SUFFER, TimeUtil::Now() + 90 - 5);//5秒误差
+                    setBuffData(PLAYER_BUFF_SUFFER, TimeUtil::Now() + 90);
                     pl[sufferId - 1]->AddVar(VAR_ARENA_SUFFERED, 1);
                     pl[sufferId - 1]->SetVar(VAR_ARENA_LASTTIME, now);
                     if(pl[sufferId - 1]->GetVar(VAR_ARENA_SUFFERED) == totalSufferCnt)
