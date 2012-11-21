@@ -1151,7 +1151,7 @@ void makeSuper( GObject::Fighter * fgt, UInt8 equipLvl = 100, UInt8 enchant = 8,
 	GObject::ItemEquip * equip;
 	switch(fgt->getClass())
 	{
-	case 1:
+	case e_cls_ru:
 		weapon = static_cast<GObject::ItemWeapon *>(package->AddEquip(itemIdStart[0][idx], false, true));
         if(weapon)
         {
@@ -1207,7 +1207,7 @@ void makeSuper( GObject::Fighter * fgt, UInt8 equipLvl = 100, UInt8 enchant = 8,
             package->EquipTo(equip->getId(), fgt, 0x0a, o);
         }
 		break;
-	case 2:
+	case e_cls_shi:
 		weapon = static_cast<GObject::ItemWeapon *>(package->AddEquip(itemIdStart[1][idx], false, true));
         if(weapon)
         {
@@ -1263,7 +1263,7 @@ void makeSuper( GObject::Fighter * fgt, UInt8 equipLvl = 100, UInt8 enchant = 8,
             package->EquipTo(equip->getId(), fgt, 0x0a, o);
         }
 		break;
-	case 3:
+	case e_cls_dao:
 		weapon = static_cast<GObject::ItemWeapon *>(package->AddEquip(itemIdStart[2][idx], false, true));
 	    if(weapon)
         {

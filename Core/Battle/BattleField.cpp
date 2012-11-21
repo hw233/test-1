@@ -91,10 +91,10 @@ int BattleField::getPossibleTarget( int side, int idx )
 	};
 	int targetidx = 4 - (idx % 5);
 	int tside = 1 - side;
-    for(int irow = 0; irow < 5; irow++)
+    for(int irow = 0; irow < 5; ++ irow)
     {
         int tidx = irow * 5 + targetidx;
-        if(_objs[tside][tidx] != NULL && _objs[tside][tidx]->getHP() > 0)
+        if(_objs[tside][tidx] != NULL && _objs[tside][tidx]->getHP() > 0 && !_objs[tside][tidx]->isHide())
         {
             return tidx;
         }
@@ -106,7 +106,7 @@ int BattleField::getPossibleTarget( int side, int idx )
 		for(int j = 0; j < 5; ++ j)
 		{
 			int tidx = tbl[j] + i * 5;
-			if(_objs[tside][tidx] != NULL && _objs[tside][tidx]->getHP() > 0)
+			if(_objs[tside][tidx] != NULL && _objs[tside][tidx]->getHP() > 0 && !_objs[tside][tidx]->isHide())
 			{
 				return tidx;
 			}

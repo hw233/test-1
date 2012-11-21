@@ -95,26 +95,12 @@ public:
     static UInt16 getSkillIdOfItem(UInt32 itemId);
     UInt8 getSoulColor()
     {
-        switch(m_stateLevel)
-        {
-        case 1:
-        case 2:
-            return 2;
-        case 3:
-        case 4:
-            return 3;
-        case 5:
-        case 6:
-            return 4;
-        case 7:
-        case 8:
-            return 5;
-        case 9:
-        case 10:
-            return 6;
-        default:
-            return 2;
-        }
+        //                        0  1  2  3  4  5  6  7  8  9  10
+        static UInt8 color[11] = {2, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6};
+        UInt8 idx = 0;
+        if(m_stateLevel <= 10)
+            idx = m_stateLevel;
+        return color[idx];
     }
 
     Int16 getSoulMax()

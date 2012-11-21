@@ -4198,7 +4198,7 @@ namespace GObject
         if(!player || !fgt)
             return false;
         UInt8 cls = fgt->getClass();
-        if(cls > 3)
+        if(cls > e_cls_dao)
             return false;
 
         UInt8 res = 0;
@@ -5031,7 +5031,7 @@ namespace GObject
             return;
         }
 
-        if (!cls || cls > 3 || sfg->getClass() != cls)
+        if (!cls || cls > e_cls_dao || sfg->getClass() != cls)
             return;
         
         SHSupportPlayer * shsPlayer = NULL;

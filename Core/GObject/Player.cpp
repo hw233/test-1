@@ -2380,14 +2380,28 @@ namespace GObject
 
     void Player::upInitCitta(Fighter* fgt, bool writedb)
     {
-        static UInt16 cittas[] = {301, 401, 701};
-        UInt16 citta = cittas[fgt->getClass()-1];
-        if (fgt->hasCitta(citta) < 0) {
-            if (fgt->addNewCitta(citta, writedb, true)) {
-                /*
-                if (fgt->upCitta(citta, 0, writedb)) {
+        static UInt16 cittas[4][9] =
+        {
+            {301, 0, 0, 0, 0, 0, 0, 0, 0},
+            {401, 0, 0, 0, 0, 0, 0, 0, 0},
+            {701, 0, 0, 0, 0, 0, 0, 0, 0},
+            {13409, 13509, 13609, 13709, 13809, 13909, 0, 0, 0}
+        };
+        if(fgt->getClass() >= e_cls_max)
+            return;
+        UInt8 clsIdx = fgt->getClass() - 1;
+        for(int i = 0; i < 9; ++ i)
+        {
+            UInt16 citta = cittas[clsIdx][i];
+            if(citta == 0)
+                continue;
+            if (fgt->hasCitta(citta) < 0) {
+                if (fgt->addNewCitta(citta, writedb, true)) {
+                    /*
+                    if (fgt->upCitta(citta, 0, writedb)) {
+                    }
+                    */
                 }
-                */
             }
         }
     }
@@ -6540,7 +6554,8 @@ namespace GObject
 			Lineup& lu1 = _playerData.lineup[0];
             if (!lu1.fighter)
                 return;
-			bool mfSolid = lu1.fighter->getClass() == 3;
+            // 道默认站前排
+			bool mfSolid = lu1.fighter->getClass() == e_cls_dao;
 			if(mfSolid)
 				lu1.pos = newPos[starti ++];
 			for(int i = 1; i < 5; ++ i)
@@ -6550,7 +6565,7 @@ namespace GObject
 					continue;
                 if (!lu.fighter)
                     continue;
-				if(lu.fighter->getClass() == 3)
+				if(lu.fighter->getClass() == e_cls_dao)
 					lu.pos = newPos[starti ++];
 				else
 					lu.pos = newPos[endi --];
