@@ -472,6 +472,17 @@ struct DBReportId
 {
     int id;
 };
+struct DBDaysRank
+{
+    UInt64 player_id;
+    std::string athletics;
+    std::string level;
+    std::string money;
+    std::string pk;
+    std::string battle;
+};
+
+
 }
 
 
@@ -1015,6 +1026,19 @@ SPECIALDEF(1)
 	int,id
 	)
 SPECIALEND()
+
+SPECIALBEGIN(GData::DBDaysRank)
+SPECIALDEF(6)
+	(
+	UInt64,player_id,
+    std::string, athletics,
+    std::string, level,
+    std::string, money,
+    std::string, pk,
+    std::string, battle
+	)
+SPECIALEND()
+
 
 
 }

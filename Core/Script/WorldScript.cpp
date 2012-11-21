@@ -140,6 +140,8 @@ void WorldScript::init()
     def("get11Act", GObject::World::get11Act);
     def("setGuoqing", GObject::World::setGuoqing);
     def("getGuoqing", GObject::World::getGuoqing);
+    def("set9215Act", GObject::World::set9215Act);
+    def("get9215Act", GObject::World::get9215Act);
 	def("setRechargeNextRet", GObject::World::setRechargeNextRet);
 	def("getRechargeNextRet", GObject::World::getRechargeNextRet);
 	def("setRechargeNextRetStart", GObject::World::setRechargeNextRetStart);

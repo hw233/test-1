@@ -124,4 +124,13 @@ struct stActivityMsg
 
     }
 };
+
+struct daysValueRankMsg
+{
+    UInt64 playerId;
+    UInt8  type;
+    UInt32 value;
+    daysValueRankMsg() : playerId(0), type(0), value(0) {}
+};
+
 #endif // _COUNTRYMSGSTRUCT_H_

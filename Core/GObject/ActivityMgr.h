@@ -5,6 +5,7 @@ namespace GObject
 {
 
     class Player;
+           /**
     enum
     {
         AtyPractice,  //修炼
@@ -39,17 +40,20 @@ namespace GObject
         AtyInvited, //领取好友邀请奖励
         AtyEnd,
     };
+*/
 
-
+#define MONTH_COUNT 2
+#define SIGNIN_RECORD 31
     struct ActivityItem
     {
-        UInt32  overTime;//结束时间
+        UInt32  overTime;//月结束时间
+        UInt32  scores;  //玩家签到总积分
+        UInt32  propsID; //刷新出来的道具ID，待兑换
+        UInt16  signRecord[MONTH_COUNT][SIGNIN_RECORD]; //每日签到记录(一整月)
+        /*
         UInt32  awardID; //上线领取奖励物品ID
         UInt32  point;   //活跃点数
         UInt32  award;   //领取的奖励
-        UInt32  scores;  //玩家签到总积分
-        UInt32  propsID; //刷新出来的道具ID，待兑换
-        /*
         UInt8   practice;//修炼次数
         UInt8   tripodFire;//点火次数
         UInt8   barRefresh;//酒馆刷新
@@ -58,12 +62,13 @@ namespace GObject
         UInt8   split;    //装备分解
         UInt8   forge;    //装备洗练
         UInt8   buy;      //商城购买
-*/
         UInt8   flag[AtyMaxFlag];
+*/
         ActivityItem()
         {
             Reset();
         }
+        /*
         void Reset(UInt32 aid = 0, UInt32 ot = 0, UInt32 s = 0, UInt32 pid = 0)
         {
             memset(this, 0, sizeof(ActivityItem));
@@ -78,7 +83,28 @@ namespace GObject
             if(pid)
                 propsID = pid;
         }
+        */
+        void Reset(UInt32 ot = 0, UInt32 s = 0, UInt32 pid = 0)
+        {
+            if(ot)
+            {
+                overTime = ot;
+                for(int i = 0; i < SIGNIN_RECORD; ++i)
+                {
+                    signRecord[0][i] = signRecord[1][i];
+                    signRecord[1][i] = 0;
+                }
+            }
+            else
+                memset(this, 0, sizeof(ActivityItem));
+            if(s)
+                scores = s;
+            propsID = 29;
+            if(pid)
+                propsID = pid;
+        }
     };
+        /*
     struct stRtyReward
     {
         UInt32 id;
@@ -91,10 +117,12 @@ namespace GObject
   //  {
      //   Rty
    // };
+        */
     struct DBActivityData;
     class ActivityMgr
     {
         private :
+            /*
             enum{
                 AtyOnlineFree = 1, //是否已经用去免费领取
                 AtyOnlineReward = 2, //是否已经领取了
@@ -104,30 +132,31 @@ namespace GObject
                 AtyReward4 = 32, //120
                 AtyReward5 = 64, //160
             };
+            */
             Player*  _owner;
             ActivityItem  _item;
-            RtyRewards    _onlineReward;
+            //RtyRewards    _onlineReward;
             //std::Map<UInt32, UInt32> _randmap;  //上线奖励中， 多种奖中励随机一个的，需要记录这个随机值。
             //func
-            UInt32 GetRandomReward() ;
+            //UInt32 GetRandomReward() ;
             //std::vector<stOnlineReward> GetOnlineReward();
-            void GetOnlineReward(UInt8 cnt);
-            UInt8 GetOnlineRewardGetNum();
-            UInt32 GetOnlineRewardNum();
-            void SendOnlineReward(Stream& s);
-            void SendActivityInfo(Stream& s);
+            //void GetOnlineReward(UInt8 cnt);
+            //UInt8 GetOnlineRewardGetNum();
+            //UInt32 GetOnlineRewardNum();
+            //void SendOnlineReward(Stream& s);
+            //void SendActivityInfo(Stream& s);
         public:
             ActivityMgr(Player* player);
             ~ActivityMgr();
            // only in script func
-           void AddPoint(UInt32 v);
-           UInt32 GetPoint(){return _item.point;}
-           UInt8  GetFlag(UInt32 idx);
+           //void AddPoint(UInt32 v);
+           //UInt32 GetPoint(){return _item.point;}
+           //UInt8  GetFlag(UInt32 idx);
 
            /**
             * @brief 领取奖励后置领取位
             */
-           void  AddRewardFlag(UInt32 flag, bool db = true);
+           //void  AddRewardFlag(UInt32 flag, bool db = true);
 
 
            //data base
@@ -137,7 +166,7 @@ namespace GObject
            /**
             * @brief  更新活跃点数依赖的标志位
             */
-           void  UpdateFlag(UInt32 idx, UInt8 v);
+           //void  UpdateFlag(UInt32 idx, UInt8 v);
            /**
             * @brief  确定时间是否重置
             */
@@ -145,16 +174,16 @@ namespace GObject
            /**
             * @brief  c->s  领取奖励
             */
-           void  GetReward(UInt32 flag);
+           //void  GetReward(UInt32 flag);
            /**
             * @brief  c->s  改变上线奖励
             */
-           void  ChangeOnlineReward();
+           //void  ChangeOnlineReward();
 
            /**
             * @brief s->c  刷新列表
-            */
            void ActivityList(UInt8 type);
+            */
 
            /**
             * @brief 增加签到积分
@@ -163,7 +192,15 @@ namespace GObject
             void SubScores(UInt32 v);
             UInt32 GetScores() { return _item.scores;}
             UInt32 GetPropsID() { return _item.propsID;}
+            UInt16 GetOneDayRecord(UInt8 day);
+            void SetOneDayRecord(UInt8 day, UInt16 score);
             void SetPropsID(UInt32 id = 0);
+            void AddSignTime(UInt8 day = 0);
+            void ActivitySignIn();
+            void RefreshProps();
+            void ExchangeProps();
+            void SendActivityInfo();
+            UInt8 GetContinueSignInCnt(UInt8 day);
     };
 
 }

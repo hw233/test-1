@@ -359,7 +359,7 @@ namespace GObject
             GLOBAL().PushMsg(hdr1, &pfexp);
 
             stActivityMsg msg;
-            msg.id = AtyPSpeed;
+            msg.id = SthPSpeed;
             GameMsgHdr hdr2(0x245, m_Player->getThreadId(), m_Player, sizeof(stActivityMsg));
             GLOBAL().PushMsg(hdr2, &msg);
 
@@ -555,6 +555,7 @@ namespace GObject
 		m_Athletics = new Athletics(this);
 		m_AttainMgr = new AttainMgr(this);
         m_ActivityMgr = new ActivityMgr(this);
+        m_StrengthenMgr = new StrengthenMgr(this);
         m_HeroMemo = new HeroMemo(this);
         m_ShuoShuo = new ShuoShuo(this);
         m_CFriend = new CFriend(this);
@@ -572,7 +573,9 @@ namespace GObject
         memset (m_domain, 0, sizeof(m_domain));
         memset (m_openid, 0, sizeof(m_openid));
         memset (m_openkey, 0, sizeof(m_openkey));
-        memset (m_clientIp, 0, sizeof(m_clientIp));
+        //memset (m_clientIp, 0, sizeof(m_clientIp));
+        strncpy (m_clientIp, "0.0.0.0", 10);
+        _isForbidSale = false;
 
         char buf[64] = {0};
         snprintf(buf, sizeof(buf), "%"I64_FMT"u", _id);
@@ -1883,7 +1886,7 @@ namespace GObject
         udpLog("", "", "", "", "", online, "login");
 
         UInt8 platform = atoi(getDomain());
-        if (cfg.GMCheck && platform == 11)
+        if (cfg.GMCheck && (platform == 11 || platform == 17))
         {
             struct CrackValue
             {
@@ -1981,7 +1984,7 @@ namespace GObject
         udpLog("", "", "", "", "", online, "login");
 
         UInt8 platform = atoi(getDomain());
-        if (cfg.GMCheck && platform == 11)
+        if (cfg.GMCheck && (platform == 11 || platform == 17))
         {
             struct CrackValue
             {
@@ -3398,6 +3401,7 @@ namespace GObject
 		event->updateDB(true);
 
         OnHeroMemo(MC_FIGHTER, MD_STARTED, 0, 0);
+        GameAction()->doStrong(this, SthTaskHook, 0,0);
 		return true;
 	}
 #if 0
@@ -3479,7 +3483,7 @@ namespace GObject
         incIcCount();
 		GameMsgHdr hdr(0x178, WORKER_THREAD_WORLD, this, 0);
 		GLOBAL().PushMsg(hdr, NULL);
-        GameAction()->doAty(this, AtyTaskHook, 0,0);
+        GameAction()->doStrong(this, SthHookSpeed, 0,0);
         OnHeroMemo(MC_FIGHTER, MD_STARTED, 0, 1);
 	}
 
@@ -4058,7 +4062,9 @@ namespace GObject
         dclogger.consume(this, _playerData.gold, c);
 #endif
 #endif // _WIN32
-		return _playerData.gold;
+        if(ci && ci->purchaseType != TrainFighter)
+            AddVar(VAR_USEGOLD_CNT, c);
+        return _playerData.gold;
 	}
 
     UInt32 Player::useGold4LuckDraw(UInt32 c)
@@ -4174,6 +4180,15 @@ namespace GObject
 		SYSMSG_SENDV(156, this, c);
 		SYSMSG_SENDV(1056, this, c);
 		sendModification(2, _playerData.coupon);
+        {
+            AddVar(VAR_USECOUPON_CNT, c);
+            daysValueRankMsg msg;
+            msg.playerId = getId();
+            msg.type = 2;
+            msg.value = GetVar(VAR_USETAEL_CNT) + GetVar(VAR_USECOUPON_CNT) * 100;
+            GameMsgHdr hdr(0x1EC, WORKER_THREAD_WORLD, this, sizeof(msg));
+            GLOBAL().PushMsg(hdr, &msg);
+        }
 		return _playerData.coupon;
 	}
 
@@ -4235,6 +4250,16 @@ namespace GObject
 		SYSMSG_SENDV(152, this, c);
 		SYSMSG_SENDV(1052, this, c);
 		sendModification(3, _playerData.tael);
+        if(ci && ci->purchaseType != TrainFighter)
+        {
+            AddVar(VAR_USETAEL_CNT, c);
+            daysValueRankMsg msg;
+            msg.playerId = getId();
+            msg.type = 2;
+            msg.value = GetVar(VAR_USETAEL_CNT) + GetVar(VAR_USECOUPON_CNT) * 100;
+            GameMsgHdr hdr(0x1EC, WORKER_THREAD_WORLD, this, sizeof(msg));
+            GLOBAL().PushMsg(hdr, &msg);
+        }
 		return _playerData.tael;
 	}
 	void Player::useTael2(UInt32 c, Player *attacker, ConsumeInfo * ci)//nature challengge use
@@ -4931,6 +4956,15 @@ namespace GObject
 		// SYSMSG_SENDV(105, this, a);
 		SYSMSG_SENDV(1005, this, a);
 		sendModification(8, _playerData.achievement);
+        {
+            AddVar(VAR_GETACHIEVEMENT_CNT, a);
+            daysValueRankMsg msg;
+            msg.playerId = getId();
+            msg.type = 3;
+            msg.value = GetVar(VAR_GETACHIEVEMENT_CNT) + GetVar(VAR_GETPRESTIGE_CNT);
+            GameMsgHdr hdr(0x1EC, WORKER_THREAD_WORLD, this, sizeof(msg));
+            GLOBAL().PushMsg(hdr, &msg);
+        }
 		return _playerData.achievement;
 	}
 
@@ -5020,7 +5054,15 @@ namespace GObject
         Stream st(REP::USER_INFO_CHANGE);
         st << static_cast<UInt8>(0x15) << _playerData.prestige << Stream::eos;
         send(st);
-
+        {
+            AddVar(VAR_GETPRESTIGE_CNT, a);
+            daysValueRankMsg msg;
+            msg.playerId = getId();
+            msg.type = 3;
+            msg.value = GetVar(VAR_GETACHIEVEMENT_CNT) + GetVar(VAR_GETPRESTIGE_CNT);
+            GameMsgHdr hdr(0x1EC, WORKER_THREAD_WORLD, this, sizeof(msg));
+            GLOBAL().PushMsg(hdr, &msg);
+        }
 		return _playerData.prestige;
     }
 
@@ -6288,8 +6330,10 @@ namespace GObject
 		}
 		st << Stream::eos;
 		send(st);
+        /*
         if(type > 0)
             GameAction()->doAty(this, AtyBarRef, 0, 0);
+        */
 	}
 
 	UInt16 Player::calcNextTavernUpdate(UInt32 curtime)
@@ -8859,8 +8903,10 @@ namespace GObject
 		}
 		st << Stream::eos;
 		send(st);
+        /*
         if(type > 0)
             GameAction()->doAty(this, AtyBookStore, 0 , 0);
+        */
 	}
 
 	UInt16 Player::calcNextBookStoreUpdate(UInt32 curtime)
@@ -10007,7 +10053,7 @@ namespace GObject
         GetPackage()->DelItem2(ib2, 1);
         SYSMSG_SEND(2002, this);
 
-        GameAction()->doAty(this, AtyTripodFire , 0, 0);
+        GameAction()->doStrong(this, SthTripodFire , 0, 0);
     }
 
     void Player::getAward()
@@ -10237,15 +10283,10 @@ namespace GObject
         Stream st(REP::GETAWARD);
         st << static_cast<UInt8>(7);
         UInt8 succ = GameAction()->RunNewRegisterAwardAD_RF(this, 1);
-        if(0 == succ)
-        {
-            st << succ << Stream::eos;
-            send(st);
-            return;
-        }
+        if(succ)
+            SetVar(VAR_AWARD_NEWREGISTER, 3);
         st << succ << Stream::eos;
         send(st);
-        SetVar(VAR_AWARD_NEWREGISTER, 3);
     }
 
     void Player::getAwardFromRF()
@@ -10255,15 +10296,10 @@ namespace GObject
         Stream st(REP::GETAWARD);
         st << static_cast<UInt8>(8);
         UInt8 succ = GameAction()->RunNewRegisterAwardAD_RF(this, 2);
-        if(0 == succ)
-        {
-            st << succ << Stream::eos;
-            send(st);
-            return;
-        }
+        if(succ)
+            SetVar(VAR_AWARD_NEWREGISTER, 4);
         st << succ << Stream::eos;
         send(st);
-        SetVar(VAR_AWARD_NEWREGISTER, 4);
     }
 
     void Player::getAwardGiftCard()
@@ -10273,15 +10309,10 @@ namespace GObject
         Stream st(REP::GETAWARD);
         st << static_cast<UInt8>(9);
         UInt8 succ = GameAction()->RunNewRegisterAwardAD_RF(this, 3);
-        if(0 == succ)
-        {
-            st << succ << Stream::eos;
-            send(st);
-            return;
-        }
+        if(succ)
+            SetVar(VAR_AWARD_NEWREGISTER, 5);
         st << succ << Stream::eos;
         send(st);
-        SetVar(VAR_AWARD_NEWREGISTER, 5);
     }
 
     void Player::getAwardBirthday(UInt8 opt)
@@ -10408,7 +10439,7 @@ namespace GObject
 
     void Player::getAwardBlueDiamond(UInt8 opt)
     {
-        if(opt == 1 || opt == 2) //抽奖
+        if(opt == 1 || opt == 2 || opt == 3) //抽奖
         {
             UInt8 idx = 0;
             if( 0 == (idx = GameAction()->RunBlueDiamondAward(this, opt)) )
@@ -11860,8 +11891,8 @@ namespace GObject
 
         static UInt16 items[3][4] = {
             {515,509,507,47},
-            {503,514,501,547},
-            {56,57,15,500},
+            {503,1325,1528,516},
+            {8000,551,517,500},
         };
 
         bool same = true;
@@ -11878,13 +11909,13 @@ namespace GObject
 
         if (same)
         {
-            GetPackage()->AddItem(ids[0], 6, true, false);
+            GetPackage()->Add(ids[0], 6, true, false);
         }
         else
         {
             for (UInt8 i = 0; i < 3; ++i)
             {
-                GetPackage()->AddItem(ids[i], 1, true, false);
+                GetPackage()->Add(ids[i], 1, true, false);
             }
         }
 
@@ -11896,9 +11927,9 @@ namespace GObject
         sendTokenInfo();
 
         if (type == 0 && !same)
-            SYSMSG_BROADCASTV(2351, _playerData.country, _playerData.name.c_str(), ids[0], ids[1], ids[2]);
+            SYSMSG_BROADCASTV(4060, _playerData.country, _playerData.name.c_str(), ids[0], ids[1], ids[2]);
         if (type == 0 && same)
-            SYSMSG_BROADCASTV(2352, _playerData.country, _playerData.name.c_str(), ids[0]);
+            SYSMSG_BROADCASTV(4061, _playerData.country, _playerData.name.c_str(), ids[0]);
     }
 
     void Player::sendTokenInfo()
@@ -13073,7 +13104,7 @@ namespace GObject
             return -104;
         }
 
-		ConsumeInfo ci(IDIPBuyItem,0,0);
+		ConsumeInfo ci(IDIPBuyItem,itemId,num);
         useGold(price, &ci);
 
         GetPackage()->Add(itemId, num, bind);
@@ -13140,47 +13171,21 @@ namespace GObject
         st.data<UInt8>(offset) = c;
     }
 
-    //玩家每日签到接口
-    void Player::ActivitySignIn()
-    {
-        if(GetActivityMgr()->GetFlag(AtySignIn) != 0)
-            return;
-        UInt32 day = 1;
-        UInt32 mon = 1;
-        UInt32 year = 2012;
-        TimeUtil::GetDMY(&day, &mon, &year);
-
-        lua_tinker::table award = GameAction()->GetdayExtraAward(mon, day);
-        UInt32 cnt = award.size();
-        if(0 != cnt){
-            if(GetPackage()->GetRestPackageSize() < cnt){    //背包预留足够的位子,否则不能签到
-                sendMsgCode(0, 1011);
-                return;
-            }
-            for(UInt32 i = 0; i < cnt; ++i){
-                lua_tinker::table a = award.get<lua_tinker::table>(i + 1);
-                if(499 == a.get<UInt32>(1))  //礼券
-                    getCoupon(a.get<UInt32>(2));
-                else
-                    GetPackage()->Add(a.get<UInt32>(1), a.get<UInt32>(2), true, false, FromDailyActivity);
-            }
-        }
-        GameAction()->doAtySignIn(this, AtySignIn, mon, day);
-        activityUdpLog(1025);
-
-    }
-
     void Player::SendNextdayTime(UInt32 nextDay)
     {
         Stream st(REP::SVRST);
         st << static_cast<UInt8>(1);
         st << nextDay << Stream::eos;
         send(st);
-        Stream st1(REP::ACTIVITY_SIGNIN);
         ActivityMgr* mgr = this->GetActivityMgr();
         mgr->CheckTimeOver();
-        st1 << static_cast<UInt8> (0);
-        st1 << static_cast<UInt32>(mgr->GetScores()) << static_cast<UInt8>(mgr->GetFlag(AtySignIn)) << Stream::eos;
+        UInt8 day = TimeUtil::MonthDay(nextDay);
+        Stream st1(REP::ACTIVITY_SIGNIN);
+        st1 << static_cast<UInt8>(0x00);
+        st1 << static_cast<UInt32>(mgr->GetScores());
+        st1 << static_cast<UInt16>(mgr->GetOneDayRecord(day));
+        st1 << mgr->GetContinueSignInCnt(day);
+        st1 << Stream::eos;
         send(st1);
     }
 

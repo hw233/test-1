@@ -129,6 +129,7 @@ MSG_REG_2(GameMsgHdr, 0x1C4, OnSendConsumeRank);
 
 MSG_REG_2(GameMsgHdr, 0x1C5, OnGetQgameGiftAward);
 
+MSG_REG_2(GameMsgHdr, 0x1EC, OnDaysRankMsg);
 MSG_REG_2(GameMsgHdr, 0x1EE, OnReloadLuaReq);
 MSG_REG_2(GameMsgHdr, 0x1ED, OnRunscriptReq);
 MSG_REG_2(GameMsgHdr, 0x1EF, OnRunscriptBattleReq);

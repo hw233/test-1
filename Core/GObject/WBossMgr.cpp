@@ -499,7 +499,7 @@ void WBoss::reward(Player* player)
             (*i).player->sendMailItem(568, 569, item, 2);
         }
 
-        GameAction()->doAty((*i).player, AtyBoss, 0, 0);
+        GameAction()->doStrong((*i).player, SthBoss, 0, 0);
         (*i).player->setContinuousRFAward(6);
     }
 

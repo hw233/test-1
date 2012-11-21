@@ -106,9 +106,9 @@ public:
     void end() { m_sorting = false; }
     bool isSorting() const { return m_sorting; }
     void buildBattlePacket();
+    int getMyRank(Player* pl, UInt8 type);
 private:
 	void doUpdate();
-    int getMyRank(Player* pl, UInt8 type);
     void makeRankStream(Stream*& st, UInt8 type, Player* pl);
 
 	Stream _levelStream;
@@ -129,6 +129,7 @@ private:
 	std::map<UInt32, UInt16> _clanRankCountry[2];
     std::vector<UInt64> _levelRankWorld10;  //世界等级前十名
     std::multimap<int, Player*, std::greater<int> > _battleRankWorld;
+    std::multimap<UInt64, Player*, std::greater<UInt64> > _expRankWorld;
     FastMutex _tmutex;
     std::vector<LeaderboardTowndown> _towndown;
     FastMutex _cmutex;

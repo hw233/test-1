@@ -28,6 +28,7 @@ require("World/ActivityMgr")
 require("World/HeroMemo")
 require("World/ShuoShuo")
 require("World/CFriend")
+require("World/StrengthenMgr")
 require("items/LuckyDraw")
 require("items/Awards")
 

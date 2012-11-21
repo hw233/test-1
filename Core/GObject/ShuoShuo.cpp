@@ -121,7 +121,7 @@ void ShuoShuo::getAward(UInt8 idx)
 
         if (!m_owner->GetVar(VAR_SHUOSHUO))
         {
-            GameAction()->doAty(m_owner, AtyShuoShuo, 0, 0);
+            GameAction()->doStrong(m_owner, SthShuoShuo, 0, 0);
             m_owner->SetVar(VAR_SHUOSHUO, 1);
         }
     }

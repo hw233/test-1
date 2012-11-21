@@ -60,6 +60,7 @@
 #include "GObject/SingleHeroStage.h"
 
 #include "GObject/Tianjie.h"
+#include "Memcached.h"
 
 struct NullReq
 {
@@ -1080,7 +1081,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendAthlBufInfo();
     luckyDraw.notifyDisplay(pl);
 
-    if (World::getTrumpEnchRet())
+    if (World::getTrumpEnchRet() || World::get9215Act())
         pl->sendTokenInfo();
 
     if(World::getFourCopAct())
@@ -1625,14 +1626,24 @@ void OnFighterTrainReq( GameMsgHdr& hdr, FighterTrainReq& ftr )
 {
 	MSG_QUERY_PLAYER(player);
     if (ftr._type > 4 && (ftr._type&0xF) == 5)
-    {
-        player->trainFighter(ftr._fgtId, ftr._type);
+    {   //天赋洗炼
+        UInt8 result = player->trainFighter(ftr._fgtId, ftr._type);
+        if(result != 2)
+            GameAction()->doStrong(player, SthGenius, 0, 0);
         return;
     }
 
 	Stream st(REP::POTENCIAL);
-	st << ftr._type << player->trainFighter(ftr._fgtId, ftr._type) << Stream::eos;;
+    UInt8 result = player->trainFighter(ftr._fgtId, ftr._type);
+	st << ftr._type << result << Stream::eos;;
 	player->send(st);
+    if(result != 2)
+    {
+        if(1 == ftr._type || 2 == ftr._type) //资质洗炼
+            GameAction()->doStrong(player, SthCapacity, 0, 0);
+        if(3 == ftr._type || 4 == ftr._type) //潜力洗炼
+            GameAction()->doStrong(player, SthPotential, 0, 0);
+    }
 }
 
 void OnTakeOnlineRewardReq( GameMsgHdr& hdr, TakeOnlineRewardReq& req)
@@ -1742,9 +1753,12 @@ void OnOpenSocketReq( GameMsgHdr& hdr, OpenSocketReq& osr )
 	MSG_QUERY_PLAYER(player);
     if (!player->hasChecked())
         return;
+	UInt8 result = player->GetPackage()->OpenSocket(osr._fighterId, osr._itemid);
 	Stream st(REP::EQ_TO_PUNCH);
-	st << player->GetPackage()->OpenSocket(osr._fighterId, osr._itemid) << osr._fighterId << osr._itemid << Stream::eos;
+	st << result << osr._fighterId << osr._itemid << Stream::eos;
 	player->send(st);
+    if(result != 2)
+        GameAction()->doStrong(player, SthOpenSocket, 0, 0);
 }
 
 #if 0
@@ -1765,9 +1779,12 @@ void OnAttachGemReq( GameMsgHdr& hdr, AttachGemReq& agr )
 	MSG_QUERY_PLAYER(player);
 	if(!player->hasChecked())
 		return;
+	UInt8 result = player->GetPackage()->AttachGem(agr._fighterId, agr._itemid, agr._gemid, agr._bind > 0);
 	Stream st(REP::EQ_EMBED);
 	st << player->GetPackage()->AttachGem(agr._fighterId, agr._itemid, agr._gemid, agr._bind > 0) << agr._fighterId << agr._itemid << Stream::eos;
 	player->send(st);
+    if(!result)
+        GameAction()->doStrong(player, SthAttachGem, 0, 0);
 }
 
 void OnDetachGemReq( GameMsgHdr& hdr, DetachGemReq& dgr )
@@ -1775,9 +1792,12 @@ void OnDetachGemReq( GameMsgHdr& hdr, DetachGemReq& dgr )
 	MSG_QUERY_PLAYER(player);
 	if(!player->hasChecked())
 		return;
+	UInt8 result = player->GetPackage()->DetachGem(dgr._fighterId, dgr._itemid, dgr._pos, dgr._protect);
 	Stream st(REP::EQ_UN_EMBED);
-	st << player->GetPackage()->DetachGem(dgr._fighterId, dgr._itemid, dgr._pos, dgr._protect) << dgr._fighterId << dgr._itemid << dgr._pos << Stream::eos;
+	st << result << dgr._fighterId << dgr._itemid << dgr._pos << Stream::eos;
 	player->send(st);
+    if(result != 2)
+        GameAction()->doStrong(player, SthDetachGem, 0, 0);
 }
 
 #if 0
@@ -2923,7 +2943,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                     }
                     st << static_cast<UInt8>(0);
 
-                    GameAction()->doAty(player, AtyBuy, 0, 0);
+                    //GameAction()->doAty(player, AtyBuy, 0, 0);
 
                     player->AddVar(VAR_DISCOUNT_1+varoff, 1);   // 更新购买次数（限购商品）
                     player->sendDiscountLimit();
@@ -2950,7 +2970,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 					player->useCoupon(price,&ci);
 					st << static_cast<UInt8>(0);
 
-                    GameAction()->doAty( player, AtyBuy, 0,0);
+                    //GameAction()->doAty( player, AtyBuy, 0,0);
                 }
 			}
 			break;
@@ -2973,7 +2993,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 				    ConsumeInfo ci(Item,lr._itemId,lr._count);
 					player->useTael(price,&ci);
 					st << static_cast<UInt8>(0);
-                    GameAction()->doAty( player,AtyBuy, 0,0);
+                    //GameAction()->doAty( player,AtyBuy, 0,0);
                 }
 			}
 			break;
@@ -3029,7 +3049,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 					ConsumeInfo ci(Item,lr._itemId, lr._count);
 					player->useAchievement(price,&ci);
 					st << static_cast<UInt8>(0);
-                    GameAction()->doAty( player, AtyBuy, 0,0);
+                    //GameAction()->doAty( player, AtyBuy, 0,0);
                     player->storeUdpLog(1141, 6, lr._itemId, lr._count);
 				}
 			}
@@ -3064,7 +3084,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                         player->usePrestige(price,&ci);
                         st << static_cast<UInt8>(0);
 
-                        GameAction()->doAty(player, AtyBuy, 0,0);
+                        //GameAction()->doAty(player, AtyBuy, 0,0);
                         player->storeUdpLog(1141, 7, lr._itemId, lr._count);
                     }
                 }
@@ -3125,7 +3145,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 				        ConsumeInfo ci(Item,lr._itemId,lr._count);
 					    player->useMoneyArena(price,&ci);
                         st << static_cast<UInt8>(0);
-                        GameAction()->doAty( player,AtyBuy, 0,0);
+                        //GameAction()->doAty( player,AtyBuy, 0,0);
                     }
                 }
             }
@@ -3152,7 +3172,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                         player->useClanProffer(price,&ci);
                         st << static_cast<UInt8>(0);
 
-                        GameAction()->doAty(player, AtyBuy, 0,0);
+                        //GameAction()->doAty(player, AtyBuy, 0,0);
                     }
                 }
             }
@@ -3189,7 +3209,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                     player->consumeGold(price);
 					st << static_cast<UInt8>(0);
 
-                    GameAction()->doAty(player, AtyBuy ,0,0);
+                    //GameAction()->doAty(player, AtyBuy ,0,0);
                 }
 			}
 			break;
@@ -3559,6 +3579,11 @@ void OnSaleSellReq( GameMsgHdr& hdr, SaleSellReq& req )
 
     if (player->GetLev() < 45)
         return;
+    if (player->getForbidSale())
+    {
+        player->sendMsgCode(0, 1040);  
+        return;
+    }
 
 	player->GetSale()->sellSaleReq(req._data);
 }
@@ -4290,6 +4315,7 @@ void OnTrumpLOrder( GameMsgHdr& hdr, TrumpLOrderReq& req)
     {
         ConsumeInfo ci(TrumpLOrder,0,0);
         player->useTael(amount, &ci);
+        GameAction()->doStrong(player, SthTrumpLOrder, 0, 0);
     }
 
 	Stream st(REP::EQ_TRUMP_L_ORDER);
@@ -4329,12 +4355,13 @@ void OnActivityList( GameMsgHdr& hdr, const void * data)
 {
     MSG_QUERY_PLAYER(player);
     //BinaryReader brd(data, hdr.msgHdr.bodyLen);
-    ActivityMgr* mgr = player->GetActivityMgr();
-    mgr->ActivityList(7);
+    //ActivityMgr* mgr = player->GetActivityMgr();
+    //mgr->ActivityList(7);
 
 }
 void OnActivityReward(  GameMsgHdr& hdr, const void * data)
 {
+    /*
     MSG_QUERY_PLAYER(player);
     BinaryReader brd(data, hdr.msgHdr.bodyLen);
     ActivityMgr* mgr = player->GetActivityMgr();
@@ -4350,7 +4377,7 @@ void OnActivityReward(  GameMsgHdr& hdr, const void * data)
 
         case 1:
             // getDailyReward
-            mgr->GetReward(2);
+            //mgr->GetReward(2);
             break;
         case 2:
             UInt16 flag = 0;
@@ -4359,6 +4386,7 @@ void OnActivityReward(  GameMsgHdr& hdr, const void * data)
             break;
 
     }
+    */
 }
 
 void OnFourCopReq( GameMsgHdr& hdr, const void* data)
@@ -4953,7 +4981,7 @@ void OnUseToken( GameMsgHdr& hdr, UseToken& req )
     if(!player->hasChecked())
          return;
 
-    if (World::getTrumpEnchRet())
+    if (World::getTrumpEnchRet() || World::get9215Act())
     {
         player->useToken(req._type);
     }
@@ -5146,104 +5174,41 @@ void OnActivitySignIn( GameMsgHdr& hdr, const void * data )
 	MSG_QUERY_PLAYER(player);
     BinaryReader brd(data, hdr.msgHdr.bodyLen);
     ActivityMgr* mgr = player->GetActivityMgr();
+    mgr->CheckTimeOver();
     UInt8 type = 0;
-    UInt32 id = 0;
     brd >> type;
-    Stream st(REP::ACTIVITY_SIGNIN);
-    st << static_cast<UInt8> (type);
     switch(type)
     {
-        case 0:
+        case 0x00:
             {
                 //每日签到
-                player->ActivitySignIn();
-                st << static_cast<UInt32>(mgr->GetScores()) << static_cast<UInt8>(mgr->GetFlag(AtySignIn)) << Stream::eos;
-                //st << mgr->GetScores() << static_cast<UInt8>(1) << Stream::eos;
+                mgr->ActivitySignIn();
             }
             break;
-        case 1:
+        case 0x01:
             {
                 //刷新待兑换的道具
-                if(!player->hasChecked())
-                    return;
-                if(player->getTael() < 100){
-                    player->sendMsgCode(0, 1100);
-                    return;
-                }
-                ConsumeInfo ci(DailyActivity, 0, 0);
-                player->useTael(100, &ci);
-                id = GameAction()->GetExchangePropsID();
-                if(mgr->GetPropsID() == id)
-                {
-                    switch(id)
-                    {
-                        case 29:
-                            id = 500;
-                            break;
-                        case 500:
-                            id = 29;
-                            break;
-                        default:
-                            id = 29;
-                    }
-                }
-                mgr->SetPropsID(id);
-                mgr->UpdateToDB();
-
-                lua_tinker::table p = GameAction()->GetExchangeProps(id);
-                player->activityUdpLog(1026);
-                st << static_cast<UInt16>(id) << p.get<UInt8>(3) << p.get<UInt16>(2) << Stream::eos;
+                mgr->RefreshProps();
             }
             break;
-        case 2:
+        case 0x02:
             {
                 //积分兑换道具
-                if(!player->hasChecked())
-                    return;
-                lua_tinker::table props = GameAction()->GetExchangeProps( mgr->GetPropsID() );
-                if(5 != props.size())
-                    return;
-                UInt32 score = props.get<UInt32>(2);
-                if(mgr->GetScores() < score)
-                    return;
-                if(player->GetPackage()->GetRestPackageSize() <= 0)
-                {
-                    player->sendMsgCode(0, 1011);
-                    return;
-                }
-                mgr->SubScores(score);
-                player->GetPackage()->Add(mgr->GetPropsID(), props.get<UInt8>(3), true, false, FromDailyActivity);
-                player->activityUdpLog(1027, score);
-                player->activityUdpLog(1028, score);
-                //兑换后重新刷新一次
-                id = GameAction()->GetExchangePropsID();
-                if(mgr->GetPropsID() == id)
-                {
-                    switch(id)
-                    {
-                        case 29:
-                            id = 500;
-                            break;
-                        case 500:
-                            id = 29;
-                            break;
-                        default:
-                            id = 29;
-                    }
-                }
-                mgr->SetPropsID(id);
-                mgr->UpdateToDB();
-                lua_tinker::table p = GameAction()->GetExchangeProps(id);
-                st << mgr->GetScores() << static_cast<UInt16>(id) << p.get<UInt8>(3) << p.get<UInt16>(2) << Stream::eos;
+                mgr->ExchangeProps();
             }
             break;
-
+        case 0x03:
+            {
+                //积分兑换道具
+                mgr->SendActivityInfo();
+            }
+            break;
         default:
             return;
             break;
 
     }
-    player->send(st);
+    //player->send(st);
 }
 
 void OnSkillStrengthen( GameMsgHdr& hdr, const void* data)
@@ -5285,6 +5250,49 @@ void OnSkillStrengthen( GameMsgHdr& hdr, const void* data)
         }
     }
 }
+
+void OnMakeStrong( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    StrengthenMgr* mgr = player->GetStrengthenMgr();
+    mgr->CheckTimeOver();
+    UInt8 type = 0;
+    brd >> type;
+    switch(type)
+    {
+        case 0x01: //变强之魂信息改变
+            {
+                mgr->SendStrengthenInfo();
+            }
+            break;
+        case 0x02: //变强之路信息
+            {
+                mgr->SendStrengthenRank();
+            }
+            break;
+        case 0x03: //请求及打开变强秘宝宝箱
+            {
+                UInt8 boxId = 0;
+                UInt8 index = 0;
+                brd >> boxId;
+                brd >> index;
+                if(boxId > 8 || index > STRONGBOX_CNT)
+                    return;
+                mgr->SendOpenChestsInfo(boxId, index);
+            }
+            break;
+        case 0x04: //每天一次变强之吼
+            {
+                mgr->EveryDayRoar();
+            }
+            break;
+        default:
+            return;
+            break;
+    }
+}
+
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

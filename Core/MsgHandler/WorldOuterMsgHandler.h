@@ -43,6 +43,7 @@
 #endif
 
 #include <mysql.h>
+#include "Memcached.h"
 
 struct ClanListReq
 {
@@ -1235,7 +1236,11 @@ void OnSaleBuyAndCancelReq( GameMsgHdr& hdr, SaleBuyAndCancelReq& req )
     {
         return;
     }
-
+    if (req._token == 0 && player->getForbidSale())
+    {
+        player->sendMsgCode(0, 1040);  
+        return;
+    }
 	if (req._token == 0)
 	{
 		if(!player->hasChecked())
@@ -1313,14 +1318,14 @@ void OnAthleticsChallengeReq( GameMsgHdr& hdr, const void * data)
         GObject::gAthleticsRank.challenge(player, type);
         break;
 #endif
-    case 1:
+    case 1:  //斗剑天梯
         {
             std::string name;
             brd >> name;
             GObject::gAthleticsRank.challenge(player, name);
         }
         break;
-    case 2:
+    case 2:  //斗剑历练
         {
             std::string name;
             UInt8 rivalDifficulty = 0;

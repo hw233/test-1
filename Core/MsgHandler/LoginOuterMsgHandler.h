@@ -163,7 +163,7 @@ struct UserLogonRepStruct
 bool IsBigLock(UInt64 pid)
 {
     pid = pid & 0xFFFFFFFFFF;
-    std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());
+/*    std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());
     if (execu.get() != NULL && execu->isConnected())
     {
         GObject::DBBigLock lockData;
@@ -176,6 +176,9 @@ bool IsBigLock(UInt64 pid)
             return true;
         }
     }
+    */
+    if (getLockUserValue(pid) >= TimeUtil::Now())
+        return true;
     return false;
 }
 inline UInt8 doLogin(Network::GameClient * cl, UInt64 pid, UInt32 hsid, GObject::Player *& player, bool kickOld = true, bool reconnect = false)
@@ -238,6 +241,7 @@ inline UInt8 doLogin(Network::GameClient * cl, UInt64 pid, UInt32 hsid, GObject:
 	player->SetSessionID(hsid);
 	cl->SetPlayer(player);
 
+    player->setForbidSale(checkForbidSale(player->getId()));
 	return res;
 }
 
@@ -355,7 +359,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
         if (4 == res)
         {
             UInt8 platform = atoi(player->getDomain());
-            if (cfg.GMCheck && platform == 11)
+            if (cfg.GMCheck && (platform == 11 || platform == 17))
             {
                 size_t len = 0;
                 char key[MEMCACHED_MAX_KEY] = {0};
@@ -1312,7 +1316,9 @@ void BigLockUser(LoginMsgHdr& hdr,const void * data)
         {
             UInt64 pid = atoll(playerId.c_str());
             pid = pid & 0xFFFFFFFFFF;
-            execu->Execute2("REPLACE INTO `locked_player`(`player_id`, `lockExpireTime`) VALUES(%"I64_FMT"u, %u)", pid,expireTime);
+            memLockUser(pid, expireTime);
+            setForbidSaleValue(pid, true);
+//            execu->Execute2("REPLACE INTO `locked_player`(`player_id`, `lockExpireTime`) VALUES(%"I64_FMT"u, %u)", pid,expireTime);
             playerId = GetNextSection(playerIds, ',');
         }
         ret = 0;
@@ -1339,7 +1345,8 @@ void BigUnlockUser(LoginMsgHdr& hdr,const void * data)
         {
             UInt64 pid = atoll(playerId.c_str());
             pid = pid & 0xFFFFFFFFFF;
-            execu->Execute2("DELETE FROM `locked_player` WHERE `player_id` = %"I64_FMT"u", pid);
+            memUnLockUser(pid);
+            //execu->Execute2("DELETE FROM `locked_player` WHERE `player_id` = %"I64_FMT"u", pid);
             playerId = GetNextSection(playerIds, ',');
         }
         ret = 0;
@@ -1348,6 +1355,82 @@ void BigUnlockUser(LoginMsgHdr& hdr,const void * data)
     st << ret << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
+
+void ForbidSale(LoginMsgHdr& hdr,const void * data)
+{
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    std::string playerIds;
+    CHKKEY();
+    br>>playerIds;
+
+    UInt8 ret = 1;
+    //INFO_LOG("GMBIGLOCK: %s, %u", playerIds.c_str(), expireTime);
+    std::string playerId = GetNextSection(playerIds, ',');
+    while (!playerId.empty())
+    {
+        UInt64 pid = atoll(playerId.c_str());
+        pid = pid & 0xFFFFFFFFFF;
+        setForbidSaleValue(pid, true);
+
+        if(cfg.merged)
+            pid += (static_cast<UInt64>(cfg.serverNo) << 48);
+	    GObject::Player * pl = GObject::globalPlayers[pid];
+        if (NULL != pl)
+            pl->setForbidSale(true);
+        playerId = GetNextSection(playerIds, ',');
+    }
+    ret = 0;
+    Stream st(SPEP::FORBIDSALE);
+    st << ret << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
+void UnForbidSale(LoginMsgHdr& hdr,const void * data)
+{
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    std::string playerIds;
+    CHKKEY();
+    br>>playerIds;
+
+    UInt8 ret = 1;
+    //INFO_LOG("GMBIGLOCK: %s, %u", playerIds.c_str(), expireTime);
+    std::string playerId = GetNextSection(playerIds, ',');
+    while (!playerId.empty())
+    {
+        UInt64 pid = atoll(playerId.c_str());
+        pid = pid & 0xFFFFFFFFFF;
+        setForbidSaleValue(pid, false);
+
+        if(cfg.merged)
+            pid += (static_cast<UInt64>(cfg.serverNo) << 48);
+        GObject::Player * pl = GObject::globalPlayers[pid];
+        if (NULL != pl)
+            pl->setForbidSale(false);
+        
+        playerId = GetNextSection(playerIds, ',');
+    }
+    ret = 0;
+    Stream st(SPEP::UNFORBIDSALE);
+    st << ret << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
+void QueryLockUser(LoginMsgHdr& hdr,const void * data)
+{
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    UInt64 pid = 0;
+    CHKKEY();
+    br>>pid;
+
+    pid = pid & 0xFFFFFFFFFF;
+    UInt8 isLockLogin = IsBigLock(pid);
+    UInt8 isForbidSale = checkForbidSale(pid);
+        
+    Stream st(SPEP::QUERYLOCKUSER);
+    st << isLockLogin << isForbidSale << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
 
 void GmHandlerFromBs(LoginMsgHdr &hdr,const void * data)
 {
