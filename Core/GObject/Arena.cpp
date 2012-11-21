@@ -2250,12 +2250,12 @@ void Arena::setArenaPlayer(UInt8 type)
         WORLD().setArenaPlayer(i, it->player);
 }
 
-void Arena::setArenaTotalCnt(UInt8 type)
-{
-    if(type > 1)
-        return;
-    WORLD().setArenaTotalCnt(static_cast<UInt16>(_preliminaryPlayers_list[type].size()));
-}
+//void Arena::setArenaTotalCnt(UInt8 type)
+//{
+//    if(type > 1)
+//        return;
+//    WORLD().setArenaTotalCnt(static_cast<UInt16>(_preliminaryPlayers_list[type].size()));
+//}
 
 
 }

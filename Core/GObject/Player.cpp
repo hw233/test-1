@@ -14388,6 +14388,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
         UInt32 t1 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SINGUP_START;
         UInt32 t2 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SINGUP_END;
         UInt32 t3 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SUFFER_END;
+        static UInt32 broadfreq;
 
         if(week < ARENA_ACT_WEEK_START || week > ARENA_ACT_WEEK_END)
             return;
@@ -14410,6 +14411,10 @@ void EventTlzAuto::notify(bool isBeginAuto)
             WORLD().getArenaPlayer(i, &pl[i]);
             if(pl[i] == NULL)
                 return;
+        }
+        if(WORLD().getArenaTotalCnt() == 0)
+        {
+            WORLD().setAreanTotalCntEnum();
         }
         UInt16 totalCnt;
         totalCnt = WORLD().getArenaTotalCnt();
@@ -14486,6 +14491,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
                     if(pl[sufferId - 1]->GetVar(VAR_ARENA_SUFFERED) >= totalSufferCnt)
                         return;
 
+                    ++broadfreq;
                     UInt32 pexp = 1000;
                     GameMsgHdr hdr2(0x238, getThreadId(), this, sizeof(pexp));
                     GLOBAL().PushMsg(hdr2, &pexp);
@@ -14519,6 +14525,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
                             return;
                         }
                         */
+                        broadfreq = 5;
                     }
                 }
                 Stream st(REP::SERVER_ARENA_EXTRA_ACT);
@@ -14527,13 +14534,32 @@ void EventTlzAuto::notify(bool isBeginAuto)
                 UInt32 seconds = 0;
                 if(now >= t2 && now < t3)
                     seconds = t3 - now;
-                st << static_cast<UInt8>(GetVar(VAR_ARENA_SUPPORT)) << seconds << static_cast<UInt16>(getBuffLeft(PLAYER_BUFF_SUFFER));
+                UInt16 lefttime;
+                UInt8 supportid;
+                if(broadfreq < 5)
+                {
+                    supportid = static_cast<UInt8>(GetVar(VAR_ARENA_SUPPORT));
+                    lefttime = static_cast<UInt16>(getBuffLeft(PLAYER_BUFF_SUFFER));
+                }
+                else
+                {
+                    supportid = 0xFF;
+                    lefttime = 0xFFFF;
+                }
+                st << supportid << seconds << lefttime;
                 for(UInt8 i = 0; i < 5; i++)
                 {
                     st << pl[i]->GetVar(VAR_ARENA_SUFFERED);
                 }
                 st << Stream::eos;
-                send(st);
+                printf("broadfreq = %u\n", broadfreq);
+                if(broadfreq < 5)
+                    send(st);
+                else
+                {
+                    NETWORK()->Broadcast(st);
+                    broadfreq = 0;
+                }
                 }
                 break;
                 case 3:
@@ -14551,7 +14577,8 @@ void EventTlzAuto::notify(bool isBeginAuto)
                         }
                         for(UInt8 i = 0; i < 5; i++)
                         {
-                            WORLD().getArenaPlayer(i, &cur.player);
+                            //WORLD().getArenaPlayer(i, &cur.player);
+                            cur.player = pl[i];
                             UInt8 j = 0;
                             for(ValueSortType::iterator iter = resultRank.begin(), e = resultRank.end(); iter != e && j < 5; ++iter, ++j)
                             {

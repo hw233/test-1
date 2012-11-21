@@ -421,6 +421,8 @@ public:
     }
     inline static void setArenaTotalCnt(UInt16 total)
     {
+        if(total >= 1 && total < 20)
+            total = 20;
         _arenaTotalCnt = total;
     }
     inline static UInt16 getArenaTotalCnt()
@@ -428,6 +430,7 @@ public:
         return _arenaTotalCnt;
     }
     static void setArenaInfo(UInt8 type);
+    static void setAreanTotalCntEnum();
 
     inline static bool canDestory(UInt32 itemid)
     {

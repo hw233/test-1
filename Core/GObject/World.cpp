@@ -456,6 +456,16 @@ bool enum_qixi_rank_list(void * ptr, void * data )
     return true;
 }
 
+bool enum_extra_act_calc_total(Player* player, void* data)
+{
+    if(player == NULL)
+        return true;
+    UInt8 supportid = player->GetVar(GObject::VAR_ARENA_SUPPORT);
+    if(supportid >= 1 && supportid <= 5)
+        World::setArenaTotalCnt(World::getArenaTotalCnt() + 1);
+    return true;
+}
+
 bool enum_extra_act_update_status(Player* player, void* data)
 {
     if(player == NULL)
@@ -1070,7 +1080,12 @@ void World::TownDeamonTmAward(void *)
 void World::setArenaInfo(UInt8 type)
 {
     GObject::arena.setArenaPlayer(type);
-    GObject::arena.setArenaTotalCnt(type);
+    //GObject::arena.setArenaTotalCnt(type);
+}
+
+void World::setAreanTotalCntEnum()
+{
+    globalPlayers.enumerate(enum_extra_act_calc_total, static_cast<void *>(NULL));
 }
 
 void World::ArenaExtraActTimer(void *)
@@ -1105,9 +1120,13 @@ void World::ArenaExtraActTimer(void *)
     Player *pl[5] = {NULL, NULL, NULL, NULL, NULL};
     for(UInt8 i = 0; i < 5; i++)
     {
-        WORLD().getArenaPlayer(i, &pl[i]);
+        getArenaPlayer(i, &pl[i]);
         if(pl[i] == NULL)
             return;
+    }
+    if(getArenaTotalCnt() == 0)
+    {
+        setAreanTotalCntEnum();
     }
 
     if(now >=t1 && now < t2)
