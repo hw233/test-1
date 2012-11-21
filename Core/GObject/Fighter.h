@@ -51,6 +51,16 @@ namespace GObject
 
 #define PEERLESS_UPMAX 1
 
+enum
+{
+    e_cls_ru = 1,
+    e_cls_shi = 2,
+    e_cls_dao = 3,
+    e_cls_mo = 4,
+
+    e_cls_max
+};
+
 struct SStrengthen
 {
     SStrengthen() : father(0), maxVal(0), curVal(0), lvl(0) {}
@@ -303,6 +313,8 @@ public:
     // 取得心法带出技能的ID表
     const std::vector<const GData::SkillBase*>& skillFromCitta(UInt16 citta);
 
+    // 是否可散功心法
+    bool canCittaBeDel(UInt16 citta);
     // 初始化装备的心法
     void setUpCittas(std::string& citta, bool = false);
     // 初始化可装备的心法

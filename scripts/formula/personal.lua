@@ -2,12 +2,12 @@
 -- TODO: 
 
 -- 属性成长不分主副将
---           儒     释      道
-str_factor = {4,   5,     7}  -- 力量
-phy_factor = {8,   9,     10}  -- 耐力
-agi_factor = {5,   4,     7}  -- 敏捷
-int_factor = {8,   7,     4}  -- 智力
-wil_factor = {5,   9,     5}  -- 意志
+--           儒    释     道     墨
+str_factor = {4,   5,     7,     8}  -- 力量
+phy_factor = {8,   9,     10,    8}  -- 耐力
+agi_factor = {5,   4,     7,     6}  -- 敏捷
+int_factor = {8,   7,     4,     4}  -- 智力
+wil_factor = {5,   9,     5,     4}  -- 意志
 
 hp_factor     = { 0,   0,   0}  -- 生命
 atk_factor    = { 0,   0,   0}  -- 物功
@@ -15,15 +15,15 @@ def_factor    = { 0,   0,   0}  -- 物防
 magatk_factor = { 0,   0,   0}  -- 法功
 magdef_factor = { 0,   0,   0}  -- 法防
 
-tough_factor       = { 0,  0,  0}  -- 坚韧
-action_factor      = {11, 12, 10}  -- 身法
-hitrate_factor     = { 1,  1,  1}  -- 命中
-evade_factor       = { 0,  0,  0}  -- 闪避
-critical_factor    = { 0,  0,  0}  -- 暴击
-criticaldmg_factor = { 0,  0,  0}  -- 暴击伤害
-pierce_factor      = { 0,  0,  0}  -- 破击
-counter_factor     = { 0,  0,  0}  -- 反击
-magres_factor      = { 0,  0,  0}  -- 法术抵抗
+tough_factor       = { 0,  0,  0, 0}  -- 坚韧
+action_factor      = {11, 12, 10, 12}  -- 身法
+hitrate_factor     = { 1,  1,  1, 1}  -- 命中
+evade_factor       = { 0,  0,  0, 0}  -- 闪避
+critical_factor    = { 0,  0,  0, 0}  -- 暴击
+criticaldmg_factor = { 0,  0,  0, 0}  -- 暴击伤害
+pierce_factor      = { 0,  0,  0, 0}  -- 破击
+counter_factor     = { 0,  0,  0, 0}  -- 反击
+magres_factor      = { 0,  0,  0, 0}  -- 法术抵抗
 
 str_atk_factor = 1.0            -- 力量影响的物理攻击系数
 int_atk_factor = 1.0            -- 智力影响的法术攻击系数
@@ -50,11 +50,12 @@ autobattle_A = 2.5
 
 -- 第二元神属性成长
 --           1青龙 2朱雀 3玄武 4狂雷•青龙 5烈阳•青龙 6雨泽•青龙 7炽炎•朱雀 8羽焰•朱雀 9浴火•朱雀 10冰锋•玄武 11凛风•玄武 12水盾•玄武 
-soul_str_factor = {2, 3, 5, 3, 5, 3, 4, 4, 4, 8, 6, 6}
-soul_phy_factor = {6, 7, 8, 7, 7, 9, 8, 8, 10,9, 9, 11}
-soul_agi_factor = {3, 2, 5, 4, 4, 4, 3, 3, 3, 6, 8, 6}
-soul_int_factor = {6, 5, 2, 9, 7, 7, 8, 6, 6, 3, 3, 3}
-soul_wil_factor = {3, 6, 3, 4, 4, 4, 7, 9, 7, 4, 4, 4}
+--           13白虎 14战神•白虎 15森罗•白虎 16金刚•白虎
+soul_str_factor = {2, 3, 5, 3, 5, 3, 4, 4, 4, 8, 6, 6, 6, 9, 7, 7}
+soul_phy_factor = {6, 7, 8, 7, 7, 9, 8, 8, 10,9, 9, 11, 6, 7, 7, 7}
+soul_agi_factor = {3, 2, 5, 4, 4, 4, 3, 3, 3, 6, 8, 6, 4, 5, 7, 5}
+soul_int_factor = {6, 5, 2, 9, 7, 7, 8, 6, 6, 3, 3, 3, 2, 3, 3, 3}
+soul_wil_factor = {3, 6, 3, 4, 4, 4, 7, 9, 7, 4, 4, 4, 3, 4, 4, 6}
 
 -- 1角宿：攻击 2翼宿：身法 3斗宿：防御 4奎宿：生命
 soul_xinxiu_attack = {3, 0, 0, 0}
@@ -208,8 +209,6 @@ function calcSoulXinxiuHp( ss )
   local lvl = ss:getPracticeLevel()
   return soul_potential[stlvl] * soul_xinxiu_hp[xinxiu] * lvl
 end
-
-
 
 
 -- 辅助函数

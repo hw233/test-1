@@ -3406,6 +3406,13 @@ bool Fighter::CanDelCitta(UInt16 citta)
         if(cId == cittaIds[i])
             return false;
     }
+}
+
+bool Fighter::canCittaBeDel(UInt16 citta)
+{
+    if(citta > 133 && citta < 140)
+        return false;
+
     return true;
 }
 
@@ -3416,6 +3423,9 @@ bool Fighter::delCitta( UInt16 citta, bool writedb )
         return false;
     if(!CanDelCitta(citta))
         return false;
+    if(!canCittaBeDel(citta))
+        return false;
+
     std::vector<UInt16>::iterator it = _cittas.begin();
     std::advance(it, idx);
 
@@ -4070,7 +4080,7 @@ float Fighter::getSoulPracticeFactor()
 
 bool Fighter::openSecondSoul(UInt8 cls)
 {
-    if(m_2ndSoul || _level < 60 || cls < 1 || cls > 3)
+    if(m_2ndSoul || _level < 60 || cls < 1 || cls >= e_cls_max)
         return false;
 
     m_2ndSoul = new SecondSoul(this, cls);

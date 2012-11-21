@@ -199,41 +199,9 @@ namespace GObject
 
         static UInt16 getAttrTypeChance(UInt8 q, UInt8 idx) { return _attrTypeChances[q][idx]; }
         static UInt16 getAttrChance( UInt8 q, UInt8 idx ) { return _attrChances[q][idx]; }
-        static float  getAttrMax( UInt8 lvl, UInt8 t, UInt8 q, UInt8 crr )
-        {
-            if(q > 2)
-                q = 2;
-            if(t > 8)
-                t = 8;
-            if(crr > 3)
-                crr = 3;
-            std::map<UInt8, stAttrMax*>::iterator it = _attrMax.find(lvl);
-            stAttrMax* attr = NULL;
-            if(it != _attrMax.end())
-                attr = it->second;
-            else
-                attr = _attrMax[10];
-
-            return attr->attrMax[q][crr][t];
-        }
+        static float  getAttrMax( UInt8 lvl, UInt8 t, UInt8 q, UInt8 crr );
         static UInt16 getAttrDics(UInt8 q, UInt8 idx) { return _attrDics[q][idx]; }
-        static float  getAttrTrumpMax( UInt8 lvl, UInt8 t, UInt8 q, UInt8 crr )
-        {
-            if(q > 2)
-                q = 2;
-            if(t > 8)
-                t = 8;
-            if(crr > 3)
-                crr = 3;
-            std::map<UInt8, stAttrMax*>::iterator it = _attrTrumpMax.find(lvl);
-            stAttrMax* attr = NULL;
-            if(it != _attrTrumpMax.end())
-                attr = it->second;
-            else
-                attr = _attrTrumpMax[0];
-
-            return attr->attrMax[q][crr][t];
-        }
+        static float  getAttrTrumpMax( UInt8 lvl, UInt8 t, UInt8 q, UInt8 crr );
 
         static UInt32 getColorFighterChance(UInt16 idx, UInt8 f_g, UInt8 color )
         {
@@ -365,33 +333,7 @@ namespace GObject
             return 0;
         }
 
-        static float getRingHpFromEnchant(UInt8 lvl, UInt8 crr, UInt8 enchant)
-        {
-            if(enchant == 0)
-                return 0;
-
-            if(crr > 3)
-                crr = 0;
-            if(enchant > 12)
-                enchant = 0;
-            -- enchant;
-
-            std::map<UInt8, stRingHpBase*>::iterator it = _ringHpBase.find(lvl);
-            if(it == _ringHpBase.end())
-            {
-                UInt8 lvl2 = lvl - lvl%10;
-                it = _ringHpBase.find(lvl2);
-            }
-
-            stRingHpBase* ringHp = NULL;
-            if(it == _ringHpBase.end())
-                ringHp = _ringHpBase[10];
-            else
-                ringHp = it->second;
-
-            return ringHp->hpBase[crr] * _ringHpFactor[enchant];
-        }
-
+        static float getRingHpFromEnchant(UInt8 lvl, UInt8 crr, UInt8 enchant);
         static UInt32 getSoulEnchantChance(UInt8 soulStateLevel, UInt8 itemColor)
         {
             if(soulStateLevel < 1 || itemColor < 2)

@@ -3807,7 +3807,7 @@ namespace GObject
                     UInt8 crr = table_temp2.get<float>(3);
                     UInt32 size2 = table_temp2.size();
 
-                    if(q > 2 || crr > 3)
+                    if(q > 2 || crr >= e_cls_max)
                         continue;
 
                     for(UInt8 t = 3; t < size2; ++t)
@@ -3838,7 +3838,7 @@ namespace GObject
                     UInt8 crr = table_temp2.get<float>(3);
                     UInt32 size2 = table_temp2.size();
 
-                    if(q > 2 || crr > 3)
+                    if(q > 2 || crr >= e_cls_max)
                         continue;
 
                     for(UInt8 t = 3; t < size2; ++t)
@@ -5085,6 +5085,67 @@ namespace GObject
         lc.finalize();
         return true;
 
+    float  GObjectManager::getAttrMax( UInt8 lvl, UInt8 t, UInt8 q, UInt8 crr )
+    {
+        if(q > 2)
+            q = 2;
+        if(t > 8)
+            t = 8;
+        if(crr >= e_cls_max)
+            crr = e_cls_max - 1;
+        std::map<UInt8, stAttrMax*>::iterator it = _attrMax.find(lvl);
+        stAttrMax* attr = NULL;
+        if(it != _attrMax.end())
+            attr = it->second;
+        else
+            attr = _attrMax[10];
+
+        return attr->attrMax[q][crr][t];
+    }
+
+    float  GObjectManager::getAttrTrumpMax( UInt8 lvl, UInt8 t, UInt8 q, UInt8 crr )
+    {
+        if(q > 2)
+            q = 2;
+        if(t > 8)
+            t = 8;
+        if(crr >= e_cls_max)
+            crr = e_cls_max - 1;
+        std::map<UInt8, stAttrMax*>::iterator it = _attrTrumpMax.find(lvl);
+        stAttrMax* attr = NULL;
+        if(it != _attrTrumpMax.end())
+            attr = it->second;
+        else
+            attr = _attrTrumpMax[0];
+
+        return attr->attrMax[q][crr][t];
+    }
+
+    float GObjectManager::getRingHpFromEnchant(UInt8 lvl, UInt8 crr, UInt8 enchant)
+    {
+        if(enchant == 0)
+            return 0;
+
+        if(crr >= e_cls_max)
+            crr = 0;
+        if(enchant > 12)
+            enchant = 0;
+        -- enchant;
+
+        std::map<UInt8, stRingHpBase*>::iterator it = _ringHpBase.find(lvl);
+        if(it == _ringHpBase.end())
+        {
+            UInt8 lvl2 = lvl - lvl%10;
+            it = _ringHpBase.find(lvl2);
+        }
+
+        stRingHpBase* ringHp = NULL;
+        if(it == _ringHpBase.end())
+            ringHp = _ringHpBase[10];
+        else
+            ringHp = it->second;
+
+        return ringHp->hpBase[crr] * _ringHpFactor[enchant];
     }
 }
 

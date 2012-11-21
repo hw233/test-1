@@ -1197,6 +1197,42 @@ namespace GData
             ef->magres = effs.magres;
             ef->atkreduce = effs.atkreduce;
             ef->magatkreduce = effs.magatkreduce;
+            {
+                StringTokenizer tk(effs.eft, ",");
+                if (tk.count())
+                {
+                    for (size_t i = 0; i < tk.count(); ++i)
+                    {
+                        UInt16 eft = ::atoi(tk[i].c_str());
+                        if(eft > 0)
+                            ef->eft.push_back(eft);
+                    }
+                }
+            }
+            {
+                StringTokenizer tk(effs.efl, ",");
+                if (tk.count())
+                {
+                    for (size_t i = 0; i < tk.count(); ++i)
+                    {
+                        UInt8 efl = ::atoi(tk[i].c_str());
+                        if(efl > 0)
+                            ef->efl.push_back(efl);
+                    }
+                }
+            }
+            {
+                StringTokenizer tk(effs.efv, ",");
+                if (tk.count())
+                {
+                    for (size_t i = 0; i < tk.count(); ++i)
+                    {
+                        float efv = ::atof(tk[i].c_str());
+                        if(efv > 0.001f)
+                            ef->efv.push_back(efv);
+                    }
+                }
+            }
             skillEffectManager.add(ef);
         }
         return true;
