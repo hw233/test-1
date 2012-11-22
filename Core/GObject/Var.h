@@ -280,6 +280,8 @@ namespace GObject
         VAR_ARENA_SUPPORT = 281, //场外活动，支持的序列id
         VAR_ARENA_SUFFERED = 282, //场外活动，被陷害的次数
         VAR_ARENA_LASTTIME = 283, //场外活动，最后被陷害的时间
+        VAR_ARENA_SUPPORT_TUE = 284, //场外活动，星期二支持的玩家
+        VAR_ARENA_SUPPORT_WED = 285, //场外活动，星期三支持的玩家
 
         //繁体版占用301-330
 

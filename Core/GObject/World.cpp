@@ -1103,7 +1103,7 @@ void World::ArenaExtraActTimer(void *)
     UInt32 t2 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SINGUP_END;
     UInt32 t3 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SUFFER_END;
 
-    if(now < t1 && now >= t3 + 60)
+    if(now < t1 && now >= t3 + 30)
         return;
 
     if(getArenaTotalCnt() == ARENA_ACT_CNT_FLAG)
@@ -1132,21 +1132,17 @@ void World::ArenaExtraActTimer(void *)
         setAreanTotalCntEnum();
     }
 
-    if(now >=t1 && now < t2)
+    if(now >= t1 && now < t1 + 30)
     {
-        printf("t1-t2\n");
-        if(now >= t1 && now < t1 + 60)
-        {
-            printf("t1\n");
-            globalPlayers.enumerate(enum_extra_act_update_status, static_cast<void *>(/*&type1*/NULL));
-        }
+        printf("t1\n");
+        globalPlayers.enumerate(enum_extra_act_update_status, static_cast<void *>(/*&type1*/NULL));
     }
-    else if(now >= t2 && now < t2 + 60)
+    else if(now >= t2 && now < t2 + 30)
     {
-        printf("t2-t3\n");
+        printf("t2\n");
         globalPlayers.enumerate(enum_extra_act_update_status, static_cast<void *>(/*&type2*/NULL));
     }
-    else if(now >= t3 && now < t3 + 60)
+    else if(now >= t3 && now < t3 + 30)
     {
         printf("t3\n");
         //if(_arenaResultRank[0] == 0 && _arenaResultRank[1] == 0 && _arenaResultRank[2] == 0 && _arenaResultRank[3] == 0 && _arenaResultRank[4] == 0)
@@ -1316,7 +1312,7 @@ bool World::Init()
     AddTimer(86400 * 1000, DaysRank_Refresh, static_cast<void *>(NULL), (drChkPoint >= now ? drChkPoint - now : 86400 + drChkPoint - now) * 1000);
 
     //AddTimer(60 * 1000, advancedHookTimer, static_cast<void *>(NULL), (60 - now % 60) * 1000);
-    AddTimer(60 * 1000, ArenaExtraActTimer, static_cast<void *>(NULL), (60 - now % 60) * 1000);
+    AddTimer(30 * 1000, ArenaExtraActTimer, static_cast<void *>(NULL), (30 - now % 30) * 1000);
 
     return true;
 }

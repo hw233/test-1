@@ -14394,7 +14394,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
             return;
         if(now < t1)
             return;
-        if(/*now < t3 + 60 && */WORLD().getArenaTotalCnt() == ARENA_ACT_CNT_FLAG)
+        if(WORLD().getArenaTotalCnt() == ARENA_ACT_CNT_FLAG)
         {
             if(week == ARENA_ACT_WEEK_START)
             {

@@ -1577,7 +1577,7 @@ void OnArenaExtraActReq( GameMsgHdr& hdr, const void * data )
             for(UInt8 i = 0; i < 5; i++)
             {
                 pl[i] = GObject::globalPlayers[GObject::World::_arenaOldBoard[week-2].playerId[i]];
-                if(pl[0] == NULL);
+                if(pl[i] == NULL)
                     return;
             }
 
@@ -1601,14 +1601,14 @@ void OnArenaExtraActReq( GameMsgHdr& hdr, const void * data )
             Stream st2(REP::SERVER_ARENA_EXTRA_ACT);
             st2 << week;
             st2 << static_cast<UInt8>(3);
+            st2 << static_cast<UInt8>(0);
             for(UInt8 i = 0; i < 5; i++)
             {
-                st << static_cast<UInt8>(0);
-                st << GObject::World::_arenaOldBoard[week-2].sufferCnt[i];
-                st << GObject::World::_arenaOldBoard[week-2].rank[i];
+                st2 << GObject::World::_arenaOldBoard[week-2].sufferCnt[i];
+                st2 << GObject::World::_arenaOldBoard[week-2].rank[i];
             }
-            st << Stream::eos;
-            player->send(st);
+            st2 << Stream::eos;
+            player->send(st2);
 
         }
         else
