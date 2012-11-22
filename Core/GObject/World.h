@@ -388,6 +388,24 @@ public:
     inline static bool getTgcEvent()
     { return _tgcevent; }
 
+    inline static void setArenaPlayerAndCount(Player** szPlayer, UInt8 cntPlayer, UInt32 totalCount)
+    {
+        for(UInt8 i = 0; i < 5 && i < cntPlayer; i++)
+        {
+            _arenaPlayer[i] = szPlayer[i];
+        }
+        _arenaCount = totalCount;
+    }
+    inline static void getArenaPlayerAndCount(Player** szPlayer, UInt8 cntPlayer, UInt32* totalCount)
+    {
+        for(UInt8 i = 0; i < 5 && i < cntPlayer; i++)
+        {
+            szPlayer[i] = _arenaPlayer[i];
+        }
+        if(totalCount)
+            *totalCount = _arenaCount;
+    }
+
     inline static bool canDestory(UInt32 itemid)
     {
         static UInt32 items[] =
@@ -499,6 +517,8 @@ public:
     static bool _loginAward;
     static bool _bluediamonSuperman;
     static bool _tgcevent;
+    static Player* _arenaPlayer[5];
+    static UInt32 _arenaCount;
 
 public:
     static RCSortType rechargeSort;
@@ -534,6 +554,7 @@ private:
     static void AthleticsPhysicalCheck(void *);
 	static void Tianjie_Refresh(void*);
     static void TownDeamonTmAward(void *);
+    static void ArenaExtraActTimer(void *);
     static void ClanCopyCheck(void *);
     static void ClanStatueCheck(void *);
     //static void advancedHookTimer(void *para);
@@ -556,6 +577,7 @@ public:
     void SendQixiAward();
     void SendGuoqingAward();
     void sendQixiScoreAward(Player* pl);
+    void value2rank(UInt8* rank);
 
     void killMonsterAppend(Stream& st, UInt8 index);
     void killMonsterInit();

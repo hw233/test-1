@@ -1517,6 +1517,32 @@ void OnArenaLeaderBoardReq( GameMsgHdr&hdr, ArenaLeaderBoardReq& aer )
 	GObject::arena.sendLeaderBoard(player);
 }
 
+void OnArenaExtraActReq( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	UInt8 type;
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+	brd >> type;
+    switch(type)
+    {
+        case 0:
+            player->ArenaExtraAct(type, 0);
+            break;
+        case 1:
+            UInt8 supportId;
+            brd >> supportId;
+            player->ArenaExtraAct(type, supportId);
+            break;
+        case 2:
+            UInt8 sufferId;
+            brd >> sufferId;
+            player->ArenaExtraAct(type, sufferId);
+            break;
+        default:
+            break;
+    }
+}
+
 void OnArenaOpReq( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);

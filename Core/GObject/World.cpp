@@ -161,6 +161,8 @@ bool   World::_townReward_10_15 = false;
 bool World::_loginAward = false;
 bool World::_bluediamonSuperman = false;
 bool World::_tgcevent = false;
+Player* World::_arenaPlayer[5];
+UInt32 World::_arenaCount;
 /** 0：侠骨；1：柔情；2财富；3传奇 **/
 RCSortType World::killMonsterSort[4];
 
@@ -434,6 +436,64 @@ bool enum_qixi_rank_list(void * ptr, void * data )
 
     Player* lover = player->getLover();
     WORLD().LoadQixiScore(player, lover);
+    return true;
+}
+
+bool enum_extra_act_update_status(Player* player, void* data)
+{
+    if(player == NULL)
+        return true;
+
+    if(player->isOnline())
+    {
+        UInt8 type = *reinterpret_cast<UInt8 *>(data);
+        player->ArenaExtraAct(type+ARENA_ACT_SYSTEM, 0);
+    }
+    return true;
+}
+
+bool enum_extra_act_award(Player* player, void* data)
+{
+    if(player == NULL)
+        return true;
+    UInt8 supportId = player->GetVar(VAR_ARENA_SUPPORT);
+    if(supportId == 0 || supportId > 5)
+        return true;
+    UInt8* rank = reinterpret_cast<UInt8 *>(data);
+    UInt8 curRank = rank[supportId - 1];
+    UInt32 moneyArena = 0;
+    switch(curRank)
+    {
+        case 1:
+            moneyArena = 800;
+            break;
+        case 2:
+            moneyArena = 600;
+            break;
+        case 3:
+            moneyArena = 500;
+            break;
+        case 4:
+            moneyArena = 400;
+            break;
+        case 5:
+            moneyArena = 300;
+            break;
+        default:
+            break;
+    }
+    if(moneyArena > 0)
+    {
+        SYSMSGV(title, 736);
+        SYSMSGV(content, 737, curRank, moneyArena);
+        player->GetMailBox()->newMail(NULL, 0x01, title, content);
+
+        GameMsgHdr hdr(0x251, player->getThreadId(), player, sizeof(moneyArena));
+        GLOBAL().PushMsg(hdr, &moneyArena);
+    }
+
+    if(player->isOnline())
+        player->ArenaExtraAct(3, 0);
     return true;
 }
 
@@ -971,6 +1031,44 @@ void World::TownDeamonTmAward(void *)
     townDeamonManager->process();
 }
 
+void World::ArenaExtraActTimer(void *)
+{
+    UInt32 now = TimeUtil::Now();
+    UInt32 week = TimeUtil::GetWeekDay(now);
+    static UInt8 type1 = 1;
+    static UInt8 type2 = 2;
+    if(week < ARENA_ACT_WEEK_START || week > ARENA_ACT_WEEK_END)
+    {
+        printf("day isn't valid\n");
+        return;
+    }
+    UInt32 t1 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SINGUP_START;
+    UInt32 t2 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SUFFER_START;
+    UInt32 t3 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_AWARD;
+
+    if(now >= t1 && now < t2 )
+    {
+        printf("t1-t2\n");
+        globalPlayers.enumerate(enum_extra_act_update_status, static_cast<void *>(&type1));
+    }
+    else if(now >= t2 && now < t2 + 60)
+    {
+        printf("t2-t3\n");
+        globalPlayers.enumerate(enum_extra_act_update_status, static_cast<void *>(&type2));
+    }
+    else if(now >= t3 && now < t3 + 60)
+    {
+        printf("t3\n");
+        UInt8 rank[5] = {0, 0, 0, 0, 0};
+        WORLD().value2rank(rank);
+        globalPlayers.enumerate(enum_extra_act_award, static_cast<void *>(rank));
+    }
+    else
+    {
+        printf("other\n");
+    }
+}
+
 void World::ClanStatueCheck(void *)
 {
     class UpdateStatueVisitor : public Visitor<Clan>
@@ -1075,6 +1173,7 @@ bool World::Init()
     AddTimer(86400 * 1000, TownDeamonTmAward, static_cast<void *>(NULL), (tdChkPoint >= now ? tdChkPoint - now : 86400 + tdChkPoint - now) * 1000);
 
     //AddTimer(60 * 1000, advancedHookTimer, static_cast<void *>(NULL), (60 - now % 60) * 1000);
+    AddTimer(60 * 1000, ArenaExtraActTimer, static_cast<void *>(NULL));
 
     return true;
 }
@@ -1594,6 +1693,41 @@ void World::sendQixiScoreAward(Player* pl)
     }
 
     DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+}
+
+void World::value2rank(UInt8* rank)
+{
+    Player* pl[5];
+    getArenaPlayerAndCount(pl, 5, NULL);
+    UInt32 sz[5];
+    UInt32 tmp;
+    for(UInt8 i = 0; i < 5; i++)
+        sz[i] = pl[i]->GetVar(GObject::VAR_ARENA_SUFFERED);
+    for(UInt8 i = 0; i < 5; i++)
+    {
+        for(UInt8 j = i + 1; j < 5; j++)
+        {
+            if(sz[i] < sz[j])
+            {
+                tmp = sz[i];
+                sz[i] = sz[j];
+                sz[j] = tmp;
+            }
+        }
+    }
+    //sz已排好序
+    for(UInt8 i = 0; i < 5; i++)
+    {
+        for(UInt8 j = 0; j < 5; j++)
+        {
+            if(sz[j] == pl[i]->GetVar(GObject::VAR_ARENA_SUFFERED))
+            {
+                sz[j] = 0xFFFFFFFF;//置sz[j]无效
+                rank[i] = j + 1;
+                break;
+            }
+        }
+    }
 }
 
 struct SSelectYuebingUsedMost : public Visitor<Player>

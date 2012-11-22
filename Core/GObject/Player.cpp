@@ -14376,5 +14376,165 @@ void EventTlzAuto::notify(bool isBeginAuto)
         DB1().PushUpdateData("UPDATE `player` SET `titleAll` = '%s' WHERE `id` = %"I64_FMT"u", title.c_str(), getId());
     }
 
-} // namespace GObject
+    void Player::ArenaExtraAct(UInt8 type, UInt8 opt)
+    {
+        UInt32 now = TimeUtil::Now();
+        UInt32 week = TimeUtil::GetWeekDay(now);
+        UInt32 t1 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SINGUP_START;
+        UInt32 t2 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SUFFER_START;
+        UInt32 t3 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_AWARD;
+                static bool test = true;
+                if(test)
+                {
+                    Player* szPlayer[5] = {globalPlayers[1728], globalPlayers[3333], globalPlayers[3334],globalPlayers[10001], globalPlayers[3340]};
+                    UInt8 cntPlayer = 5;
+                    UInt32 totalPlayer = 5;
+                    WORLD().setArenaPlayerAndCount(szPlayer, cntPlayer, totalPlayer);
+                    test = false;
+                }
+        GObject::Player* pl[5];
+        UInt32 totalPlayer;
+        WORLD().getArenaPlayerAndCount(pl, 5, &totalPlayer);
+        UInt32 totalSufferCnt = totalPlayer * 8 / 5;
+
+        switch(type)
+        {
+            case 0:
+            {
+                if(week < ARENA_ACT_WEEK_START || week > ARENA_ACT_WEEK_END)
+                    return;
+                if(now < t1 || now > t3)
+                    return;
+                Stream st(REP::SERVER_ARENA_EXTRA_ACT);
+                st << type;
+                UInt8 mainId = 0;
+                for(UInt8 i = 0; i < 5; i++)
+                {
+                    st << pl[i]->getName();
+                    if(pl[i]->getMainFighter())
+                        mainId = pl[i]->getMainFighter()->getId();
+                    st << mainId;
+                }
+                st << totalSufferCnt << Stream::eos;
+                send(st);
+                if(now >= t1 && now < t2)
+                    ArenaExtraAct(1+ARENA_ACT_SYSTEM, 0);
+                else if(now >= t2 && now < t3)
+                    ArenaExtraAct(2+ARENA_ACT_SYSTEM, 0);
+                else
+                    ArenaExtraAct(3, 0);
+            }
+            break;
+            case 1:
+            case 1+ARENA_ACT_SYSTEM:
+            {
+                if(type < ARENA_ACT_SYSTEM)
+                {
+                    if(week < ARENA_ACT_WEEK_START || week > ARENA_ACT_WEEK_END)
+                        return;
+                    if(now < t1 || now >= t2)
+                        return;
+                    UInt8 supportId = opt;
+                    if(supportId == 0 || supportId > 5)
+                        return;
+                    SetVar(GObject::VAR_ARENA_SUPPORT, supportId);
+                }
+                Stream st(REP::SERVER_ARENA_EXTRA_ACT);
+                st << static_cast<UInt8>(1);
+                UInt32 seconds = 0;
+                if(now >= t1 && now < t2)
+                    seconds = t2 - seconds;
+                st << static_cast<UInt8>(GetVar(GObject::VAR_ARENA_SUPPORT)) << seconds;
+                st << Stream::eos;
+                send(st);
+            }
+            break;
+            case 2:
+            case 2+ARENA_ACT_SYSTEM:
+            {
+                if(type < ARENA_ACT_SYSTEM)
+                {
+                    if(week < ARENA_ACT_WEEK_START || week > ARENA_ACT_WEEK_END)
+                        return;
+                    if(now < t2 || now >= t3)
+                        return;
+                    if(getBuffLeft(PLAYER_BUFF_SUFFER) > 0)
+                        return;
+                    UInt8 sufferId = opt;
+                    if(sufferId == 0 || sufferId > 5)
+                        return;
+                    if(pl[sufferId - 1]->GetVar(GObject::VAR_ARENA_SUFFERED) >= totalSufferCnt)
+                        return;
+
+                    UInt32 pexp = 1000;
+                    GameMsgHdr hdr2(0x238, getThreadId(), this, sizeof(pexp));
+                    GLOBAL().PushMsg(hdr2, &pexp);
+
+                    setBuffData(PLAYER_BUFF_SUFFER, TimeUtil::Now() + 7 - 5);//5秒误差，10秒仅仅为了测试
+                    pl[sufferId - 1]->AddVar(GObject::VAR_ARENA_SUFFERED, 1);
+                    if(pl[sufferId - 1]->GetVar(GObject::VAR_ARENA_SUFFERED) == totalSufferCnt)
+                    {
+                        UInt32 moneyArena = 500;
+                        SYSMSGV(title, 736);
+                        SYSMSGV(content, 738, moneyArena);
+                        GetMailBox()->newMail(NULL, 0x01, title, content);
+                        GameMsgHdr hdr(0x251, getThreadId(), this, sizeof(moneyArena));
+                        GLOBAL().PushMsg(hdr, &moneyArena);
+                        /*
+                        bool isfinish = true;
+                        for(UInt8 i = 0; i < 5; i++)
+                        {
+                            if(i == sufferId - 1)
+                                continue;
+                            if(pl[i]->GetVar(GObject::VAR_ARENA_SUFFERED) != totalSufferCnt)
+                            {
+                                isfinish = false;
+                                break;
+                            }
+                        }
+                        if(isfinish)
+                        {
+                            ArenaExtraAct(3, 0);
+                            return;
+                        }
+                        */
+                    }
+                }
+                Stream st(REP::SERVER_ARENA_EXTRA_ACT);
+                st << static_cast<UInt8>(2);
+
+                UInt32 seconds = 0;
+                if(now >= t2 && now < t3)
+                    seconds = t3 - now;
+                st << static_cast<UInt8>(GetVar(GObject::VAR_ARENA_SUPPORT)) << seconds << static_cast<UInt16>(getBuffLeft(PLAYER_BUFF_SUFFER));
+                for(UInt8 i = 0; i < 5; i++)
+                {
+                    st << pl[i]->GetVar(GObject::VAR_ARENA_SUFFERED);
+                }
+                st << Stream::eos;
+                send(st);
+                }
+                break;
+                case 3:
+                {
+                    Stream st(REP::SERVER_ARENA_EXTRA_ACT);
+                    st << type;
+                    st << static_cast<UInt8>(GetVar(GObject::VAR_ARENA_SUPPORT));
+                    UInt8 rank[5];
+                    WORLD().value2rank(rank);
+                    for(UInt8 i = 0; i < 5; i++)
+                    {
+                        st << pl[i]->GetVar(GObject::VAR_ARENA_SUFFERED);
+                        st << rank[i];
+                    }
+                    st << Stream::eos;
+                    send(st);
+                }
+                break;
+                default:
+                break;
+            }
+        }
+
+    } // namespace GObject
 

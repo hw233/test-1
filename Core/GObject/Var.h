@@ -267,6 +267,9 @@ namespace GObject
         VAR_ACT_LOGIN_AWARD     = 270, // 节日每日登陆奖励普通
         VAR_ACT_LOGIN_AWARD_VIP = 271, // 节日每日登陆奖励VIP
 
+        // 281-290 占用 fro qiwy
+        VAR_ARENA_SUPPORT = 281, //场外活动，支持的序列id
+        VAR_ARENA_SUFFERED = 282, //场外活动，被陷害的次数
 
         VAR_MAX,
     };
@@ -520,6 +523,8 @@ namespace GObject
             REGISTER_VAR(VAR_EQUIP_MOVE_COUNT, CYCLE_NONE);
             REGISTER_VAR(VAR_ACT_LOGIN_AWARD, CYCLE_DAY);
             REGISTER_VAR(VAR_ACT_LOGIN_AWARD_VIP, CYCLE_DAY);
+            REGISTER_VAR(VAR_ARENA_SUPPORT, CYCLE_NONE);
+            REGISTER_VAR(VAR_ARENA_SUFFERED, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

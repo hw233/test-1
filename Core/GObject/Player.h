@@ -107,6 +107,8 @@ namespace GObject
 
 #define PLAYER_BUFF_ATHLETICS_P     0x45    //历练冷却时间
 #define PLAYER_BUFF_QQVIPBUF        0x46
+#define PLAYER_BUFF_SUFFER          0x47    //陷害间隔
+
 #define PLAYER_BUFF_ATHL1           0x51
 #define PLAYER_BUFF_ATHL2           0x52
 #define PLAYER_BUFF_ATHL3           0x53
@@ -133,7 +135,21 @@ namespace GObject
 #define MAX_CFRIENDS 50
 
 #define QIXI_MAX_STEPS  24
-
+#if 1
+#define ARENA_ACT_WEEK_START      1
+#define ARENA_ACT_WEEK_END        7
+#define ARENA_ACT_SINGUP_START    17*3600
+#define ARENA_ACT_SUFFER_START    ARENA_ACT_SINGUP_START+60*60
+#define ARENA_ACT_AWARD           ARENA_ACT_SUFFER_START+60*60
+#define ARENA_ACT_SYSTEM          10
+#else
+#define ARENA_ACT_WEEK_START      2
+#define ARENA_ACT_WEEK_END        3
+#define ARENA_ACT_SINGUP_START    13*3600
+#define ARENA_ACT_SUFFER_START    ARENA_ACT_SINGUP_START+30*60
+#define ARENA_ACT_AWARD           ARENA_ACT_SUFFER_START+15*60
+#define ARENA_ACT_SYSTEM          10
+#endif
 	class Map;
 	class Player;
 	class ItemBase;
@@ -976,6 +992,7 @@ namespace GObject
         void changeTitle(UInt8 t);
         bool notifyTitleAll();
         void writeTitleAll();
+        void ArenaExtraAct(UInt8 type, UInt8 opt);
 
 		UInt32 getAchievement(UInt32 a = 0);
 		UInt32 useAchievement(UInt32 a,ConsumeInfo * ci=NULL);
