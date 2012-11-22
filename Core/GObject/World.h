@@ -302,6 +302,11 @@ public:
     inline static bool get11Act()
     { return _11Act; }
 
+    inline static void setSSToolbarAct(bool v)
+    { _ssToolbarAct= v; }
+    inline static bool getSSToolbarAct()
+    { return _ssToolbarAct; }
+
     inline static void setGuoqing(bool v)
     { _guoqing = v; }
     inline static bool getGuoqing()
@@ -525,6 +530,7 @@ public:
     static bool _qixi;
     static bool _wansheng;
     static bool _11Act;
+    static bool _ssToolbarAct;
     static bool _guoqing;
     static bool _9215Act;
     static bool _enchant_gt11;

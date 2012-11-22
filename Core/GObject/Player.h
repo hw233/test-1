@@ -703,7 +703,7 @@ namespace GObject
         void sendNationalDayOnlineAward();
         void sendHalloweenOnlineAward(UInt32, bool = false);
         void sendLevelPack(UInt8);
-        void resetThanksgiving();
+        //void resetThanksgiving();
         void offlineExp(UInt32);
         void getOfflineExp();
 
@@ -1035,6 +1035,7 @@ namespace GObject
         UInt32 getMainPExp() { return getMainFighter()?getMainFighter()->getPExp():0; }
 		bool hasFighter(UInt32);
         bool addFighterFromItem(UInt32, UInt32);
+        bool fighterFromItem(UInt32 fgtid);
 		Fighter * removeFighter(UInt32);
 		Fighter * removeFighterFromLineup(UInt32);
 		void autoLineup(Fighter *);
@@ -1793,6 +1794,7 @@ namespace GObject
         void CheckCanAwardBirthday();
         void getAwardLogin(UInt8 opt);
         void getAwardBlueDiamond(UInt8 opt);
+        void getThanksGivingDay(UInt8 opt);
         void IDIPAddItem(UInt16 itemId, UInt16 num, bool bind = true);
         int IDIPBuy(UInt32 itemId, UInt32 num, UInt32 price, std::string& err, bool bind = true);
         void lastQueqiaoAwardPush(UInt16 itemId, UInt16 num);
@@ -1810,6 +1812,8 @@ namespace GObject
         void getNewRC7DayTargetAward(UInt8 val);
         void get11DailyAward(UInt8 opt);
         void send11DailyInfo();
+        void getSSToolbarAward();
+        void sendSSToolbarInfo();
 
         // 帮派神像
         float getClanStatueHPEffect();
