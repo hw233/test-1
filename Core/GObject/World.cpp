@@ -254,8 +254,10 @@ bool enum_midnight(void * ptr, void* next)
     {
         pl->buildClanTask(true);
         pl->clearFinishCount();
+        /*
         if (World::_thanksgiving)
             pl->resetThanksgiving();
+        */
     }
 
     if(bSingleDayEnd)
@@ -347,7 +349,12 @@ bool enum_midnight(void * ptr, void* next)
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 19) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 20) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 21) ||
-            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 22)
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 22) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 23) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 27) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 28) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 29) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 30)
             ))
     {
         if (pl->isOnline())
@@ -361,6 +368,26 @@ bool enum_midnight(void * ptr, void* next)
                 pl->SetVar(VAR_RECHARGE_TOTAL, 0);
         }
     }
+
+    if (pl->GetVar(VAR_CONSUME) &&
+            (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 23) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 24) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 25) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 26)
+            ))
+    {
+        if (pl->isOnline())
+        {
+            GameMsgHdr hdr(0x283, pl->getThreadId(), pl, 0);
+            GLOBAL().PushMsg(hdr, NULL);
+        }
+        else
+        {
+            if (pl->GetVar(VAR_CONSUME))
+                pl->SetVar(VAR_CONSUME, 0);
+        }
+    }
+
     if (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 24) ||
         TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 24))
     {
@@ -845,9 +872,20 @@ void World::World_Midnight_Check( World * world )
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 20) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 21) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 22) ||
-            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 23)
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 23) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 28) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 29) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 30) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 1)
             )
         bRechargeEnd = true;
+
+    if (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 24) ||
+        TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 25) ||
+        TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 26) ||
+        TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 27)
+            )
+        bConsumeEnd = true;
 
 	globalPlayers.enumerate(enum_midnight, static_cast<void *>(&nextday));
 

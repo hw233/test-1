@@ -740,6 +740,12 @@ function onActivityCheck(tm)
 
       if tm >= actTime523 and tm < actTime523_1 then
           setRechargeActive(true, 16)
+      elseif tm >= actTime527 and tm < actTime527_1 then
+          setRechargeActive(true, 16)
+          setNeedRechargeRank(true)
+      elseif tm >= actTime528 and tm < actTime528_1 then
+          setRechargeActive(true, 16)
+          setNeedRechargeRank(false)
       elseif tm >= actTime529 and tm < actTime529_1 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
@@ -764,6 +770,14 @@ function onActivityCheck(tm)
           setQzonePYPrivilegeAct(true)
       else
           setQzonePYPrivilegeAct(false)
+      end
+
+      if tm >= actTime526 and tm < actTime526_1 then
+          setConsumeActive(true)
+          setNeedConsumeRank(true)
+      else
+          setConsumeActive(false)
+          setNeedConsumeRank(false)
       end
 
       setShuoShuo(true);
@@ -798,7 +812,7 @@ function initActTime(y, m, d)
   local  SerStartTm1 = { ['year'] = 2011, ['month'] = 10, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm2 = { ['year'] = 2011, ['month'] = 10, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm3 = { ['year'] = 2011, ['month'] = 11, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTm4 = { ['year'] = 2011, ['month'] = 11, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm4 = { ['year'] = 2012, ['month'] = 11, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm5 = { ['year'] = 2011, ['month'] = 12, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm6 = { ['year'] = 2012, ['month'] = 1, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm7 = { ['year'] = 2012, ['month'] = 1, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -896,6 +910,9 @@ function initActTime(y, m, d)
   local  SerStartTm522= { ['year'] = 2012, ['month'] = 11, ['day'] = 3, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm523= { ['year'] = 2012, ['month'] = 11, ['day'] = 6, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
+  local  SerStartTm526= { ['year'] = 2012, ['month'] = 11, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm527= { ['year'] = 2012, ['month'] = 11, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm528= { ['year'] = 2012, ['month'] = 11, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm529= { ['year'] = 2012, ['month'] = 11, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm530= { ['year'] = 2012, ['month'] = 11, ['day'] = 10, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm531= { ['year'] = 2012, ['month'] = 11, ['day'] = 13, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1173,6 +1190,15 @@ function initActTime(y, m, d)
 
   actTime523 = os.time(SerStartTm523);
   actTime523_1 = os.time(SerStartTm523) + 4 * 86400;
+
+  actTime526 = os.time(SerStartTm526);
+  actTime526_1 = os.time(SerStartTm526) + 4 * 86400;
+
+  actTime527 = os.time(SerStartTm527);
+  actTime527_1 = os.time(SerStartTm527) + 4 * 86400;
+
+  actTime528 = os.time(SerStartTm528);
+  actTime528_1 = os.time(SerStartTm528) + 4 * 86400;
 
   actTime529 = os.time(SerStartTm529);
   actTime529_1 = os.time(SerStartTm529) + 7 * 86400;
