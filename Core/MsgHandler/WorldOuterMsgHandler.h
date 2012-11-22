@@ -1534,7 +1534,14 @@ void OnArenaExtraActReq( GameMsgHdr& hdr, const void * data )
     UInt32 now = TimeUtil::Now();
     UInt8 serverWeek = TimeUtil::GetWeekDay(now);
     if(serverWeek < ARENA_ACT_WEEK_START || serverWeek > ARENA_ACT_WEEK_END)
+    {
+        Stream st(REP::SERVER_ARENA_EXTRA_ACT);
+        st << week;
+        st << static_cast<UInt8>(5);
+        st << Stream::eos;
+        player->send(st);
         return;
+    }
     UInt32 t1 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SINGUP_START;
     //UInt32 t2 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SINGUP_END;
     //UInt32 t3 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SUFFER_END;
@@ -1556,11 +1563,15 @@ void OnArenaExtraActReq( GameMsgHdr& hdr, const void * data )
                 player->ArenaExtraAct(type, 0);
                 break;
             case 1:
+                if(player->GetLev() < 45)
+                    return;
                 UInt8 supportId;
                 brd >> supportId;
                 player->ArenaExtraAct(type, supportId);
                 break;
             case 2:
+                if(player->GetLev() < 45)
+                    return;
                 UInt8 sufferId;
                 brd >> sufferId;
                 player->ArenaExtraAct(type, sufferId);
