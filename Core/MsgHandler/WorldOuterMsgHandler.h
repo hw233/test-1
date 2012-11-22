@@ -1543,8 +1543,6 @@ void OnArenaExtraActReq( GameMsgHdr& hdr, const void * data )
         return;
     }
     UInt32 t1 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SINGUP_START;
-    //UInt32 t2 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SINGUP_END;
-    //UInt32 t3 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SUFFER_END;
 
     if(serverWeek == week)
     {

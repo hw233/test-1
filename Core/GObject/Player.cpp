@@ -14427,11 +14427,6 @@ void EventTlzAuto::notify(bool isBeginAuto)
         {
             case 0:
             {
-                //if(week < ARENA_ACT_WEEK_START || week > ARENA_ACT_WEEK_END)
-                //    return;
-                //if(now < t1 || now > t3)
-                //if(now > t3)
-                //    return;
                 Stream st(REP::SERVER_ARENA_EXTRA_ACT);
                 st << week;
                 st << type;
@@ -14460,9 +14455,6 @@ void EventTlzAuto::notify(bool isBeginAuto)
             {
                 if(type < ARENA_ACT_SYSTEM)
                 {
-                    //if(week < ARENA_ACT_WEEK_START || week > ARENA_ACT_WEEK_END)
-                    //    return;
-                    //if(now < t1 || now >= t2)
                     if(now >= t2)
                         return;
                     UInt8 supportId = opt;
@@ -14490,8 +14482,6 @@ void EventTlzAuto::notify(bool isBeginAuto)
             {
                 if(type < ARENA_ACT_SYSTEM)
                 {
-                    //if(week < ARENA_ACT_WEEK_START || week > ARENA_ACT_WEEK_END)
-                    //    return;
                     if(now < t2 || now >= t3)
                         return;
                     if(getBuffLeft(PLAYER_BUFF_SUFFER) >= 5)//5秒误差
@@ -14518,24 +14508,6 @@ void EventTlzAuto::notify(bool isBeginAuto)
                         GetMailBox()->newMail(NULL, 0x01, title, content);
                         GameMsgHdr hdr(0x251, getThreadId(), this, sizeof(moneyArena));
                         GLOBAL().PushMsg(hdr, &moneyArena);
-                        /*
-                        bool isfinish = true;
-                        for(UInt8 i = 0; i < 5; i++)
-                        {
-                            if(i == sufferId - 1)
-                                continue;
-                            if(pl[i]->GetVar(VAR_ARENA_SUFFERED) != totalSufferCnt)
-                            {
-                                isfinish = false;
-                                break;
-                            }
-                        }
-                        if(isfinish)
-                        {
-                            ArenaExtraAct(3, 0);
-                            return;
-                        }
-                        */
                         broadfreq = 5;
                     }
                 }
@@ -14578,14 +14550,12 @@ void EventTlzAuto::notify(bool isBeginAuto)
                         ValueSortType resultRank;
                         for(UInt8 i = 0; i < 5; i++)
                         {
-                            //WORLD().getArenaPlayer(i, &cur.player);
                             cur.player = pl[i];
                             cur.lastTime = pl[i]->GetVar(VAR_ARENA_LASTTIME);
                             resultRank.insert(cur);
                         }
                         for(UInt8 i = 0; i < 5; i++)
                         {
-                            //WORLD().getArenaPlayer(i, &cur.player);
                             cur.player = pl[i];
                             UInt8 j = 0;
                             for(ValueSortType::iterator iter = resultRank.begin(), e = resultRank.end(); iter != e && j < 5; ++iter, ++j)

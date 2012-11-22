@@ -1082,7 +1082,6 @@ void World::TownDeamonTmAward(void *)
 void World::setArenaInfo(UInt8 type)
 {
     GObject::arena.setArenaPlayer(type);
-    //GObject::arena.setArenaTotalCnt(type);
 }
 
 void World::setAreanTotalCntEnum()
@@ -1094,8 +1093,6 @@ void World::ArenaExtraActTimer(void *)
 {
     UInt32 now = TimeUtil::Now();
     UInt32 week = TimeUtil::GetWeekDay(now);
-    //static UInt8 type1 = 1;
-    //static UInt8 type2 = 0;
     if(week < ARENA_ACT_WEEK_START || week > ARENA_ACT_WEEK_END)
     {
         printf("day isn't valid\n");
@@ -1137,12 +1134,12 @@ void World::ArenaExtraActTimer(void *)
     if(now >= t1 && now < t1 + 30)
     {
         printf("t1\n");
-        globalPlayers.enumerate(enum_extra_act_update_status, static_cast<void *>(/*&type1*/NULL));
+        globalPlayers.enumerate(enum_extra_act_update_status, static_cast<void *>(NULL));
     }
     else if(now >= t2 && now < t2 + 30)
     {
         printf("t2\n");
-        globalPlayers.enumerate(enum_extra_act_update_status, static_cast<void *>(/*&type2*/NULL));
+        globalPlayers.enumerate(enum_extra_act_update_status, static_cast<void *>(NULL));
     }
     else if(now >= t3 && now < t3 + 30)
     {

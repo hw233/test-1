@@ -416,7 +416,6 @@ public:
     {
         if(pos < 5)
         {
-            printf("set szPlayer = %p\n", szPlayer);
             _arenaPlayer[pos] = szPlayer;
         }
     }
@@ -425,7 +424,6 @@ public:
         if(pos < 5)
         {
             *szPlayer = _arenaPlayer[pos];
-            printf("get szPlayer = %p\n", *szPlayer);
         }
     }
     inline static void setArenaTotalCnt(UInt16 total)
