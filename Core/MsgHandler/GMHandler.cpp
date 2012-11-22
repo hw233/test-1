@@ -3193,15 +3193,17 @@ void GMHandler::OnBigLock(GObject::Player *player, std::vector<std::string>& arg
         return;
 
     UInt64 playerId = atoll(args[0].c_str());
-    UInt64 expireTime = 0;
+    UInt32 expireTime = 0;
     if (args.size() >= 2)
         expireTime = atoi(args[1].c_str()) * 60 * 60 + TimeUtil::Now();
+    memLockUser(playerId, expireTime);
 
-    std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());
+/*    std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());
     if (execu.get() != NULL && execu->isConnected())
     {
         execu->Execute2("REPLACE INTO `locked_player`(`player_id`, `lockExpireTime`) VALUES(%"I64_FMT"u, %u)", playerId, expireTime);
     }
+    */
 }
 
 void GMHandler::OnBigUnLock(GObject::Player *player, std::vector<std::string>& args)
@@ -3210,12 +3212,14 @@ void GMHandler::OnBigUnLock(GObject::Player *player, std::vector<std::string>& a
         return;
 
     UInt64 playerId = atoll(args[0].c_str());
-
+    memUnLockUser(playerId);
+/*
     std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());
     if (execu.get() != NULL && execu->isConnected())
     {
         execu->Execute2("DELETE FROM `locked_player` WHERE `player_id` = %"I64_FMT"u", playerId);
     }
+    */
 }
 
 void GMHandler::OnForbidSale(GObject::Player *player, std::vector<std::string>& args)
