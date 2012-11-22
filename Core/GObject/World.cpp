@@ -484,6 +484,10 @@ bool enum_extra_act_award(Player* player, void* data)
 {
     if(player == NULL)
         return true;
+
+    if(player->isOnline())
+        player->ArenaExtraAct(3, 0);
+
     UInt8 supportId = player->GetVar(VAR_ARENA_SUPPORT);
     if(supportId == 0 || supportId > 5)
         return true;
@@ -519,8 +523,6 @@ bool enum_extra_act_award(Player* player, void* data)
         GLOBAL().PushMsg(hdr, &moneyArena);
     }
 
-    if(player->isOnline())
-        player->ArenaExtraAct(3, 0);
     return true;
 }
 
