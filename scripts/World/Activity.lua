@@ -779,7 +779,11 @@ function onActivityCheck(tm)
   else
       set9215Act(false)
   end
-
+  if tm >= actTime219_0 and tm < actTime219_1 then
+      setSSToolbarAct(true)
+  else
+      setSSToolbarAct(false)
+  end
 
   setRC7Day(true)
   setCFriend(true);
@@ -940,6 +944,9 @@ function initActTime(y, m, d)
   local  SerStartTm217 = { ['year'] = 2012, ['month'] = 11, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 逍遥嘉年华礼包
   local  SerStartTm218 = { ['year'] = 2012, ['month'] = 11, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --搜搜工具栏活动
+  local  SerStartTm219 = { ['year'] = 2012, ['month'] = 11, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm219_1 = { ['year'] = 2012, ['month'] = 12, ['day'] = 26, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
@@ -1241,6 +1248,9 @@ function initActTime(y, m, d)
 
   actTime218_0= os.time(SerStartTm218);
   actTime218_1= os.time(SerStartTm218) + 7 * 86400;
+
+  actTime219_0= os.time(SerStartTm219);
+  actTime219_1= os.time(SerStartTm219_1);
 
   onActivityCheck(os.time() + 30);
 

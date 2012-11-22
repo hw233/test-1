@@ -10133,9 +10133,42 @@ namespace GObject
         case 13:
             get11DailyAward(opt);
             break;
+        case 14:
+            getSSToolbarAward();
         }
     }
 
+    void Player::getSSToolbarAward()
+    {
+        if (!World::getSSToolbarAct())
+            return;
+        if (GetPackage()->GetRestPackageSize() < 6)
+        {
+			sendMsgCode(0, 1011);
+            return;
+        }
+        if (GetVar(VAR_AWARD_SSTOOLBAR) == 0 )
+        {
+            GetPackage()->Add(509, 1, true);
+            GetPackage()->Add(50, 1, true);
+            GetPackage()->Add(49, 1, true);
+            GetPackage()->Add(1526, 1, true);
+            GetPackage()->Add(500, 1, true);
+            GetPackage()->Add(56, 1, true);
+            SetVar(VAR_AWARD_SSTOOLBAR, 1);
+        }
+        sendSSToolbarInfo();
+    }
+    void Player::sendSSToolbarInfo()
+    {
+        if (!World::getSSToolbarAct())
+            return;
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(14);
+        UInt8 res = GetVar(VAR_AWARD_SSTOOLBAR);
+        st << res << Stream::eos;
+        send(st);
+    }
     void Player::get11DailyAward(UInt8 opt)
     {
         if(!World::get11Act())
