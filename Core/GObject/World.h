@@ -35,21 +35,9 @@ struct stArenaExtraBoard
 {
     UInt8 week;
     UInt32 sufferTotal;
-    UInt64 playerId1;
-    UInt32 sufferCnt1;
-    UInt8 rank1;
-    UInt64 playerId2;
-    UInt32 sufferCnt2;
-    UInt8 rank2;
-    UInt64 playerId3;
-    UInt32 sufferCnt3;
-    UInt8 rank3;
-    UInt64 playerId4;
-    UInt32 sufferCnt4;
-    UInt8 rank4;
-    UInt64 playerId5;
-    UInt32 sufferCnt5;
-    UInt8 rank5;
+    UInt64 playerId[5];
+    UInt32 sufferCnt[5];
+    UInt8 rank[5];
 };
 
 typedef std::list<Player*> LuckyDrawList;

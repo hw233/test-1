@@ -5037,7 +5037,7 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading arena_extra_board");
         DBArenaExtraBoard extraboard;
-        if(execu->Prepare("SELECT `week`, `sufferTotal`, `playerId1`, `sufferCnt1`, `rank1`, `playerId2`, `sufferCnt2`, `rank2`, `playerId3`, `sufferCnt3`, `rank3`, `playerId4`, `sufferCnt4`, `rank4`, `playerId5`, `sufferCnt5`, `rank5` FROM `arena_extra_board` ORDER BY `playerId`", extraboard) != DB::DB_OK)
+        if(execu->Prepare("SELECT `week`, `sufferTotal`, `playerId1`, `playerId2`, `playerId3`, `playerId4`, `playerId5`, `sufferCnt1`, `sufferCnt2`, `sufferCnt3`, `sufferCnt4`, `sufferCnt5`, `rank1`, `rank2`, `rank3`, `rank4`, `rank5` FROM `arena_extra_board` ORDER BY `week`", extraboard) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -5045,25 +5045,7 @@ namespace GObject
 			lc.advance();
             UInt8 week = extraboard.week;
 			if(week == 2 || week == 3)
-			{
-                World::_arenaOldBoard[week-1].week = extraboard.week;
-                World::_arenaOldBoard[week-1].sufferTotal = extraboard.sufferTotal;
-                World::_arenaOldBoard[week-1].playerId1 = extraboard.playerId1;
-                World::_arenaOldBoard[week-1].sufferCnt1 = extraboard.sufferCnt1;
-                World::_arenaOldBoard[week-1].rank1 = extraboard.rank1;
-                World::_arenaOldBoard[week-1].playerId2 = extraboard.playerId2;
-                World::_arenaOldBoard[week-1].sufferCnt2 = extraboard.sufferCnt2;
-                World::_arenaOldBoard[week-1].rank2 = extraboard.rank2;
-                World::_arenaOldBoard[week-1].playerId3 = extraboard.playerId3;
-                World::_arenaOldBoard[week-1].sufferCnt3 = extraboard.sufferCnt3;
-                World::_arenaOldBoard[week-1].rank3 = extraboard.rank3;
-                World::_arenaOldBoard[week-1].playerId4 = extraboard.playerId4;
-                World::_arenaOldBoard[week-1].sufferCnt4 = extraboard.sufferCnt4;
-                World::_arenaOldBoard[week-1].rank4 = extraboard.rank4;
-                World::_arenaOldBoard[week-1].playerId5 = extraboard.playerId5;
-                World::_arenaOldBoard[week-1].sufferCnt5 = extraboard.sufferCnt5;
-                World::_arenaOldBoard[week-1].rank5 = extraboard.rank5;
-			}
+                memcpy(&(World::_arenaOldBoard[week-2]), &extraboard, sizeof(extraboard));
         }
         lc.finalize();
         return true;

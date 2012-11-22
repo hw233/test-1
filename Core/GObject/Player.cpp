@@ -14384,7 +14384,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
     void Player::ArenaExtraAct(UInt8 type, UInt8 opt)
     {
         UInt32 now = TimeUtil::Now();
-        UInt32 week = TimeUtil::GetWeekDay(now);
+        UInt8 week = TimeUtil::GetWeekDay(now);
         UInt32 t1 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SINGUP_START;
         UInt32 t2 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SINGUP_END;
         UInt32 t3 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SUFFER_END;
@@ -14433,13 +14433,16 @@ void EventTlzAuto::notify(bool isBeginAuto)
                 //if(now > t3)
                 //    return;
                 Stream st(REP::SERVER_ARENA_EXTRA_ACT);
+                st << week;
                 st << type;
-                UInt8 mainId = 0;
+                UInt8 mainId;
                 for(UInt8 i = 0; i < 5; i++)
                 {
                     st << pl[i]->getName();
                     if(pl[i]->getMainFighter())
                         mainId = pl[i]->getMainFighter()->getId();
+                    else
+                        mainId = 0;
                     st << mainId;
                 }
                 st << totalSufferCnt << Stream::eos;
@@ -14468,6 +14471,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
                     SetVar(VAR_ARENA_SUPPORT, supportId);
                 }
                 Stream st(REP::SERVER_ARENA_EXTRA_ACT);
+                st << week;
                 st << static_cast<UInt8>(1);
                 UInt32 seconds = 0;
                 if(now >= t1 && now < t2)
@@ -14532,6 +14536,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
                     }
                 }
                 Stream st(REP::SERVER_ARENA_EXTRA_ACT);
+                st << week;
                 st << static_cast<UInt8>(2);
 
                 UInt32 seconds = 0;
@@ -14550,6 +14555,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
                     broadfreq = 0;
 
                     Stream st(REP::SERVER_ARENA_EXTRA_ACT);
+                    st << week;
                     st << static_cast<UInt8>(4);
                     for(UInt8 i = 0; i < 5; i++)
                     {
@@ -14587,6 +14593,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
                         }
                     }
                     Stream st(REP::SERVER_ARENA_EXTRA_ACT);
+                    st << week;
                     st << type;
                     st << static_cast<UInt8>(GetVar(VAR_ARENA_SUPPORT));
                     for(UInt8 i = 0; i < 5; i++)

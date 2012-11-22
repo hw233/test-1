@@ -84,7 +84,7 @@ enum PurchaseType
     IDIPBuyItem                 = 73,
     RC7DayLogin                 = 74,
     MoveEquip                   = 75,
-    ArenaExtraAct               = 76,
+    LogArenaExtraAct            = 76,
 };
 
 enum IncomingType

@@ -474,8 +474,8 @@ bool enum_extra_act_update_status(Player* player, void* data)
 
     if(player->isOnline())
     {
-        UInt8 type = *reinterpret_cast<UInt8 *>(data);
-        player->ArenaExtraAct(type, 0);
+        //UInt8 type = *reinterpret_cast<UInt8 *>(data);
+        player->ArenaExtraAct(/*type*/0, 0);
     }
     return true;
 }
@@ -976,7 +976,6 @@ void World::World_Midnight_Check( World * world )
     if(getArenaTotalCnt() > 0)
         setArenaTotalCnt(ARENA_ACT_CNT_FLAG);
 
-
 	dungeonManager.enumerate(enum_dungeon_midnight, &curtime);
 	globalClans.enumerate(enum_clan_midnight, &curtime);
 	clanManager.reConfigClanBattle();
@@ -1094,7 +1093,7 @@ void World::ArenaExtraActTimer(void *)
     UInt32 now = TimeUtil::Now();
     UInt32 week = TimeUtil::GetWeekDay(now);
     //static UInt8 type1 = 1;
-    static UInt8 type2 = 0;
+    //static UInt8 type2 = 0;
     if(week < ARENA_ACT_WEEK_START || week > ARENA_ACT_WEEK_END)
     {
         printf("day isn't valid\n");
@@ -1136,12 +1135,16 @@ void World::ArenaExtraActTimer(void *)
     if(now >=t1 && now < t2)
     {
         printf("t1-t2\n");
-        //globalPlayers.enumerate(enum_extra_act_update_status, static_cast<void *>(&type1));
+        if(now >= t1 && now < t1 + 60)
+        {
+            printf("t1\n");
+            globalPlayers.enumerate(enum_extra_act_update_status, static_cast<void *>(/*&type1*/NULL));
+        }
     }
     else if(now >= t2 && now < t2 + 60)
     {
         printf("t2-t3\n");
-        globalPlayers.enumerate(enum_extra_act_update_status, static_cast<void *>(&type2));
+        globalPlayers.enumerate(enum_extra_act_update_status, static_cast<void *>(/*&type2*/NULL));
     }
     else if(now >= t3 && now < t3 + 60)
     {
@@ -1168,7 +1171,7 @@ void World::ArenaExtraActTimer(void *)
                         strItems += Itoa(mitem[index].count);
                         strItems += "|";
                     }
-                    DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl[i]->getId(), mail->id, ArenaExtraAct, title, content, strItems.c_str(), mail->recvTime);
+                    DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl[i]->getId(), mail->id, LogArenaExtraAct, title, content, strItems.c_str(), mail->recvTime);
                 }
 
                 cur.player = pl[i];
@@ -1186,7 +1189,17 @@ void World::ArenaExtraActTimer(void *)
                 _arenaResultRank[i] = j + 1;
             }
         }
+        _arenaOldBoard[week-2].week = week;
+        _arenaOldBoard[week-2].sufferTotal = getArenaTotalCnt() * 8 / 5;
+        for(UInt8 i = 0; i < 5; i++)
+        {
+            _arenaOldBoard[week-2].playerId[i] = pl[i]->getId();
+            _arenaOldBoard[week-2].sufferCnt[i] = pl[i]->GetVar(VAR_ARENA_SUFFERED);
+            _arenaOldBoard[week-2].rank[i] = _arenaResultRank[i];
+        }
+
         globalPlayers.enumerate(enum_extra_act_award, static_cast<void *>(NULL));
+        DB1().PushUpdateData("REPLACE INTO `arena_extra_board`(`week`, `sufferTotal`, `playerId1`, `playerId2`, `playerId3`, `playerId4`, `playerId5`, `sufferCnt1`, `sufferCnt2`, `sufferCnt3`, `sufferCnt4`, `sufferCnt5`, `rank1`, `rank2`, `rank3`, `rank4`, `rank5`) VALUES(%u, %u, %"I64_FMT"u, %"I64_FMT"u, %"I64_FMT"u, %"I64_FMT"u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", _arenaOldBoard[week-2].week, _arenaOldBoard[week-2].sufferTotal, _arenaOldBoard[week-2].playerId[0], _arenaOldBoard[week-2].playerId[1], _arenaOldBoard[week-2].playerId[2], _arenaOldBoard[week-2].playerId[3], _arenaOldBoard[week-2].playerId[4], _arenaOldBoard[week-2].sufferCnt[0], _arenaOldBoard[week-2].sufferCnt[1], _arenaOldBoard[week-2].sufferCnt[2], _arenaOldBoard[week-2].sufferCnt[3], _arenaOldBoard[week-2].sufferCnt[4], _arenaOldBoard[week-2].rank[0], _arenaOldBoard[week-2].rank[1], _arenaOldBoard[week-2].rank[2], _arenaOldBoard[week-2].rank[3], _arenaOldBoard[week-2].rank[4]);
     }
     else
     {
