@@ -13059,7 +13059,7 @@ namespace GObject
             return -104;
         }
 
-		ConsumeInfo ci(IDIPBuyItem,0,0);
+		ConsumeInfo ci(IDIPBuyItem,itemId,num);
         useGold(price, &ci);
 
         GetPackage()->Add(itemId, num, bind);
