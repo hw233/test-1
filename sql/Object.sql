@@ -1198,10 +1198,12 @@ DROP TABLE IF EXISTS `activityData`;
 CREATE TABLE `activityData` (
    `playerId` bigint(20) unsigned NOT NULL,
    `overTime` int(10) unsigned NOT NULL,
+/*
    --`awardId`  int(10) unsigned NOT NULL,
    --`point`   int(10) unsigned NOT NULL,
    --`award`   int(10) unsigned NOT NULL,
    --`flags`   varchar(255) NOT NULL DEFAULT '',
+   */
    `scores`  int(10) unsigned NOT NULL,
    `propsID` int(10) unsigned NOT NULL,
    `signRecord` varchar(1024) NOT NULL DEFAULT '',
@@ -1782,6 +1784,30 @@ CREATE TABLE `days_rank` (
     `battle` char(100) NOT NULL DEFAULT '',
     PRIMARY KEY (`player_id`),
     UNIQUE KEY `unq` (`player_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `arena_extra_board`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `arena_extra_board` (
+    `week` tinyint(3) NOT NULL,
+    `sufferTotal` int(10) unsigned NOT NULL,
+    `playerId1` bigint(20) unsigned NOT NULL,
+    `sufferCnt1` int(10) unsigned NOT NULL,
+    `rank1` tinyint(3) NOT NULL,
+    `playerId2` bigint(20) unsigned NOT NULL,
+    `sufferCnt2` int(10) unsigned NOT NULL,
+    `rank2` tinyint(3) NOT NULL,
+    `playerId3` bigint(20) unsigned NOT NULL,
+    `sufferCnt3` int(10) unsigned NOT NULL,
+    `rank3` tinyint(3) NOT NULL,
+    `playerId4` bigint(20) unsigned NOT NULL,
+    `sufferCnt4` int(10) unsigned NOT NULL,
+    `rank4` tinyint(3) NOT NULL,
+    `playerId5` bigint(20) unsigned NOT NULL,
+    `sufferCnt5` int(10) unsigned NOT NULL,
+    `rank5` tinyint(3) NOT NULL,
+    PRIMARY KEY (`week`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 

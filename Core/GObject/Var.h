@@ -281,6 +281,8 @@ namespace GObject
         VAR_ARENA_SUFFERED = 282, //场外活动，被陷害的次数
         VAR_ARENA_LASTTIME = 283, //场外活动，最后被陷害的时间
 
+        //繁体版占用301-330
+
         VAR_MAX,
     };
 

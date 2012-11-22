@@ -31,6 +31,27 @@ struct MoneyIn
     int prestige;
 };
 
+struct stArenaExtraBoard
+{
+    UInt8 week;
+    UInt32 sufferTotal;
+    UInt64 playerId1;
+    UInt32 sufferCnt1;
+    UInt8 rank1;
+    UInt64 playerId2;
+    UInt32 sufferCnt2;
+    UInt8 rank2;
+    UInt64 playerId3;
+    UInt32 sufferCnt3;
+    UInt8 rank3;
+    UInt64 playerId4;
+    UInt32 sufferCnt4;
+    UInt8 rank4;
+    UInt64 playerId5;
+    UInt32 sufferCnt5;
+    UInt8 rank5;
+};
+
 typedef std::list<Player*> LuckyDrawList;
 typedef LuckyDrawList::iterator LuckyDrawRank;
 typedef LuckyDrawList::reverse_iterator RLuckyDrawRank;
@@ -549,6 +570,7 @@ public:
     static Player* _arenaPlayer[5];
     static UInt16 _arenaTotalCnt;
     static UInt8 _arenaResultRank[5];
+    static stArenaExtraBoard _arenaOldBoard[2];
 
 public:
     static RCSortType rechargeSort;

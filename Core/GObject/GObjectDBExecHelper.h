@@ -229,6 +229,27 @@ struct DBQixi
     UInt32 score;
 };
 
+struct DBArenaExtraBoard
+{
+    UInt8 week;
+    UInt32 sufferTotal;
+    UInt64 playerId1;
+    UInt32 sufferCnt1;
+    UInt8 rank1;
+    UInt64 playerId2;
+    UInt32 sufferCnt2;
+    UInt8 rank2;
+    UInt64 playerId3;
+    UInt32 sufferCnt3;
+    UInt8 rank3;
+    UInt64 playerId4;
+    UInt32 sufferCnt4;
+    UInt8 rank4;
+    UInt64 playerId5;
+    UInt32 sufferCnt5;
+    UInt8 rank5;
+};
+
 struct DBFighterBuffData
 {
 	UInt64 playerId;
@@ -1263,6 +1284,28 @@ SPECIALDEF(6)
     )
 SPECIALEND()
 
+SPECIALBEGIN(GObject::DBArenaExtraBoard)
+SPECIALDEF(17)
+    (
+    UInt8, week,
+    UInt32, sufferTotal,
+    UInt64, playerId1,
+    UInt32, sufferCnt1,
+    UInt8, rank1,
+    UInt64, playerId2,
+    UInt32, sufferCnt2,
+    UInt8, rank2,
+    UInt64, playerId3,
+    UInt32, sufferCnt3,
+    UInt8, rank3,
+    UInt64, playerId4,
+    UInt32, sufferCnt4,
+    UInt8, rank4,
+    UInt64, playerId5,
+    UInt32, sufferCnt5,
+    UInt8, rank5
+    )
+SPECIALEND()
 
 SPECIALBEGIN(GObject::DBFighterBuffData)
 SPECIALDEF(4)

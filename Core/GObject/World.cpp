@@ -172,6 +172,7 @@ RCSortType World::arenaSupported;
 Player* World::_arenaPlayer[5];
 UInt16 World::_arenaTotalCnt = ARENA_ACT_CNT_FLAG;
 UInt8 World::_arenaResultRank[5] = {0, 0, 0, 0, 0};
+stArenaExtraBoard World::_arenaOldBoard[2];
 /** 0：侠骨；1：柔情；2财富；3传奇 **/
 RCSortType World::killMonsterSort[4];
 

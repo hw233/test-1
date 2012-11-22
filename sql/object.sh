@@ -95,6 +95,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clear3366totalrecharge.sql # must be once for delete recharge total
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/cleartianjie.sql # must be once for delete recharge total
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearsingleparty.sql # must be once for delete recharge total
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20121122_1.sql
 
     #. clearshiyamen.sh
 }
