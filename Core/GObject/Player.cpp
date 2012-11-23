@@ -10523,7 +10523,7 @@ namespace GObject
                 return;
 			if (getGold() < 20)
 			{
-				sendMsgCode(0, 1101);
+				sendMsgCode(0, 1104);
 				return;
 			}
             if(GameAction()->RunThanksGivingDayAward(this, 2))
