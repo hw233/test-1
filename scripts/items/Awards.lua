@@ -597,8 +597,8 @@ function RunThanksGivingDayAward(player, opt)
 		player:sendMsgCode(2, 1011, 0);
 		return 0
 	end
-    for i = 1, #award[opt] do
-        package:Add(award[opt][i][1], award[opt][i][2], true, false, 30)
+    for i = 1, #awards[opt] do
+        package:Add(awards[opt][i][1], awards[opt][i][2], true, false, 30)
     end
     return 1
 end

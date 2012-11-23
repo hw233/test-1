@@ -10474,15 +10474,14 @@ namespace GObject
         {
             if(GetVar(VAR_TGDT) & 0x01)
                 return;
-            UInt8 succ = GameAction()->RunThanksGivingDayAward(this, 1);
-            if(succ)
+            if(GameAction()->RunThanksGivingDayAward(this, 1))
             {
                 UInt32 var = GetVar(VAR_TGDT) | 0x01;
                 SetVar(VAR_TGDT, var);
+                Stream st(REP::GETAWARD);
+                st << static_cast<UInt8>(15) << static_cast<UInt8>(0) << Stream::eos;
+                send(st);
             }
-            Stream st(REP::GETAWARD);
-            st << static_cast<UInt8>(15) << static_cast<UInt8>(0) << Stream::eos;
-            send(st);
         }
         if(opt == 1) //付费领取(20仙石)
         {
@@ -10493,17 +10492,16 @@ namespace GObject
 				sendMsgCode(0, 1101);
 				return;
 			}
-            UInt8 succ = GameAction()->RunThanksGivingDayAward(this, 2);
-            if(succ)
+            if(GameAction()->RunThanksGivingDayAward(this, 2))
             {
                 UInt32 var = GetVar(VAR_TGDT) | 0x02;
                 SetVar(VAR_TGDT, var);
                 ConsumeInfo ci(ThanksGivingDay, 0, 0);
                 useGold(20, &ci);
+                Stream st(REP::GETAWARD);
+                st << static_cast<UInt8>(15) << static_cast<UInt8>(1) << Stream::eos;
+                send(st);
             }
-            Stream st(REP::GETAWARD);
-            st << static_cast<UInt8>(15) << succ << Stream::eos;
-            send(st);
         }
     }
 
