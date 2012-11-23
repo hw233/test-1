@@ -634,7 +634,6 @@ bool Leaderboard::getPacket( UInt8 t, Stream*& st, Player* pl)
     if (isSorting())
         return false;
 
-    FastMutex::ScopedLock lk(_opMutex);
 	switch(t)
 	{
 	case 0:
