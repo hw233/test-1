@@ -28,12 +28,37 @@ class Player;
 #define CLIENT_POS_TO_POS(x) (UInt16)(((UInt16)((x) / MAX_POS_X) << 8) + ((x) % MAX_POS_X))
 #define POS_TO_CLIENT_POS(x) ((((UInt16)(x) >> 8) * MAX_POS_X) + ((x) & 0xff))
 
+static const UInt8 MAX_POS_X = 5;
+static const UInt8 MAX_POS_Y = 5;
+static const UInt8 MAX_GRID  = 12;
+
+/*
+static const UInt8 MAX_GRID_TRAP = 2;
+static const UInt8 MAX_GRID_MONSTER = MAX_GRID;
+static const UInt8 MAX_GRID_BOSS = 1;
+static const UInt8 MAX_GRID_TREASURE = 2;
+static const UInt8 MAX_GRID_NORMAL = 1;
+*/
+
+static const UInt8 MAX_GRID_COUNT[256]
+{
+    0, // INVALID
+    1, // NORMAL
+    MAX_GRID, // MONSTER
+    1, // BOSS
+    2, // TREASURE
+    2, // TRAP
+    0, // NORMAL_MAX
+
+};
+
+static const UInt32 SPOT_ID[5] = {
+    0, 122, 23232, 32332, 111
+};
+
+
 class JobHunter
 {
-
-    static const UInt8 MAX_POS_X = 5;
-    static const UInt8 MAX_POS_Y = 5;
-    static const UInt8 MAX_GRID  = 12;
 
 #define KNOWN_FLAG 0x80
 
@@ -41,10 +66,10 @@ class JobHunter
     {
         GRID_INVALID    = 0,    // 无法到达的格子
         GRID_NORMAL     = 1,    // 普通已探索格子
-        GRID_MONSTER,           // 怪物格子
-        GRID_BOSS,              // boss格子
-        GRID_TREASURE,          // 宝箱格子
-        GRID_TRAP,              // 陷阱格子
+        GRID_MONSTER    = 2,    // 怪物格子
+        GRID_BOSS       = 3,    // boss格子
+        GRID_TREASURE   = 4,    // 宝箱格子
+        GRID_TRAP       = 5,    // 陷阱格子
         GRID_NORMAL_MAX,
         GRID_CAVE       = 0x11, // 目标格子，墨家秘洞存在宝物和散仙（概率存在）
         GRID_BORN       = 0x12, // 玩家出生点
@@ -104,8 +129,8 @@ class JobHunter
         SLOT_GOLD   = 1,    // 每点25强度
         SLOT_WOOD   = 2,    // 每点20强度
         SLOT_WATAR  = 3,    // 每点15强度
-        SLOT_FIRE   = 4,    // 每点10强度
-        SLOT_MUD    = 5,    // 每点 5强度
+        //SLOT_FIRE   = 4,    // 每点10强度
+        //SLOT_MUD    = 5,    // 每点 5强度
         SLOT_MAX,
     };
 
@@ -114,6 +139,7 @@ class JobHunter
         ~JobHunter();
 
         void LoadFighterList(std::string& str);
+        bool LoadMapInfo (std::string& str);
         void LoadGameFromDB(std::string& data);
 
 
@@ -161,7 +187,8 @@ class JobHunter
         }
 
     private:
-        bool list2string(std::string& str);
+        bool FighterList2String(std::string& str);
+        bool MapInfo2String(std::string& str);
 
     private:
 
@@ -210,6 +237,7 @@ class JobHunter
         UInt8 _posY;                    // 玩家在寻墨游戏中的Y坐标
         UInt32 _stepCount;              // 寻墨游戏中花费的行动步数
 
+        UInt32 _nextMoveTime;           // 下一次移动的时间
 
         URandom _rnd;                   // 用于产生随机数
 

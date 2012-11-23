@@ -4,6 +4,7 @@
 #include "Common/StringTokenizer.h"
 #include "Player.h"
 #include "Fighter.h"
+#include "Package.h"
 #include "MsgID.h"
 #include "Battle/BattleSimulator.h"
 #include "GData/NpcGroup.h"
@@ -21,14 +22,16 @@ JobHunter::JobHunter(Player * player)
     : _owner(player), _slot1(0), _slot2(0), _slot3(0), _strengthPoint(0),
       _gameProgress(PROGRESS_NONE), _posX(0), _posY(0), _stepCount(0)
 {
+    _nextMoveTime = TimeUtil::Now();
 }
 
 JobHunter::~JobHunter()
 {
 }
 
-bool JobHunter::list2string(std::string& str)
+bool JobHunter::FighterList2String(std::string& str)
 {
+    // 获得需要保存的散仙列表字符串
     char buf[1024] = {0};
     char* pbuf = buf;
     char* pend = &buf[sizeof(buf)-1];
@@ -38,6 +41,26 @@ bool JobHunter::list2string(std::string& str)
         pbuf += snprintf(pbuf, pend - pbuf, ",");
     }
 
+    if (pbuf != buf)
+        str = buf;
+    return true;
+}
+
+bool JobHunter::MapInfo2String(std::string& str)
+{
+    // 获得需要保存的地图信息字符串
+    char buf[1024] = {0};
+    char* pbuf = buf;
+    char * pend = &buf[sizeof(buf)-1];
+    for (MapInfo::iterator it = _mapInfo.begin(); it != _mapInfo.end(); ++ it)
+    {
+        pbuf += snprintf(pbuf, pend - pbuf, "%u", POS_TO_INDEX((it->second).posX,(it->second).posY));
+        pbuf += snprintf(pbuf, pend - pbuf, ",");
+        pbuf += snprintf(pbuf, pend - pbuf, "%u", (it->second).neighbCount);
+        pbuf += snprintf(pbuf, pend - pbuf, ",");
+        pbuf += snprintf(pbuf, pend - pbuf, "%u", (it->second).gridType);
+        pbuf += snprintf(pbuf, pend - pbuf, "|");
+    }
     if (pbuf != buf)
         str = buf;
     return true;
@@ -53,6 +76,23 @@ void JobHunter::LoadFighterList(std::string& list)
         if (id)
             _fighterList.insert(id);
     }
+}
+
+bool JobHunter::LoadMapInfo(std::string& list)
+{
+    // 加载地图数据
+    StringTokenizer tokenizer(list, "|");
+    for (UInt32 i = 0; i < tokenizer.count(); ++ i)
+    {
+        StringTokenizer tokenizer2(tokenizer[i], ",");
+        if (tokenizer.count() < 3)
+            return false;
+        UInt16 pos = atoi(tokenizer2[0].c_str());
+        UInt8 neighbCount = atoi(tokenizer2[1].c_str());
+        UInt8 gridType = atoi(tokenizer2[2].c_str());
+        _mapInfo.insert(std::make_pair(pos, GridInfo(pos, gridType, neighbCount)));
+    }
+    return true;
 }
 
 void JobHunter::LoadGameFromDB(std::string& data)
@@ -76,7 +116,7 @@ void JobHunter::AddToFighterList(UInt16 id)
     _fighterList.insert(id);
 
     std::string list;
-    list2string(list);
+    FighterList2String(list);
 
     DB2().PushUpdateData("REPLACE INTO `ExJob` (`playeyId`, `list`) VALUES (%"I64_FMT"u, '%s')", 
             _owner->getId(), list.c_str());
@@ -119,17 +159,17 @@ void JobHunter::OnRequestStart(UInt8 index)
     // 玩家请求开始共鸣
     if ( index >= PROGRESS_MAX)
         return;
+    _gameProgress = index;
     OnUpdateSlot(true);
     SendGameInfo(2);
     InitMap();
-    _gameProgress = index;
 }
 
 void JobHunter::OnUpdateSlot(bool isAuto /* = false */)
 {
     // 老虎机转动
-    if (!_gameProgress)
-        return;
+    //if (!_gameProgress)
+        //return;
 
 #if 0
     _equipProb = 0;
@@ -162,8 +202,8 @@ void JobHunter::OnUpdateSlot(bool isAuto /* = false */)
     _strengthPoint += res[SLOT_GOLD]  * 25;
     _strengthPoint += res[SLOT_WOOD]  * 20;
     _strengthPoint += res[SLOT_WATAR] * 15;
-    _strengthPoint += res[SLOT_FIRE]  * 10;
-    _strengthPoint += res[SLOT_MUD]   *  5;
+    //_strengthPoint += res[SLOT_FIRE]  * 10;
+    //_strengthPoint += res[SLOT_MUD]   *  5;
     _strengthPoint += res[SLOT_NONE]   *  0;
 
     for (UInt8 i = 1; i < SLOT_MAX; ++i)
@@ -264,6 +304,13 @@ void JobHunter::SendGridInfo(UInt16 pos)
 void JobHunter::OnCommand(UInt8 command, UInt8 val, UInt8 val2)
 {
     // 收到客户端发来请求处理游戏操作
+    UInt32 now = TimeUtil::Now();
+    if (val && now < _nextMoveTime)
+    {
+        _owner->sendMsgCode(0, 2203, _nextMoveTime - now);
+        return;
+    }
+            
     switch (command)
     {
         case 0:
@@ -314,6 +361,7 @@ void JobHunter::OnCommand(UInt8 command, UInt8 val, UInt8 val2)
 bool JobHunter::InitMap()
 {
     // 初始化地图信息
+    UInt8 gridCount[GRID_NORMAL_MAX] = {0};
     std::vector<UInt16> validGrid; // 可选格子
     std::set<UInt16> invalidGrid;  // 暂时无法放入地图的格子
     std::map<UInt16, UInt8> neighbourCount; // 相邻的已经有的格子数
@@ -422,6 +470,9 @@ bool JobHunter::InitMap()
         UInt8 prob = _rnd(100) + 1;
         type = GameAction()->calcGridType(prob);
         if (type == GRID_BOSS)
+            type = GRID_MONSTER;
+
+        if ( ++(gridCount[type]) >= MAX_GRID_COUNT[type])
             type = GRID_MONSTER;
     }
 
@@ -580,9 +631,11 @@ void JobHunter::OnMove(UInt16 pos)
 
 void JobHunter::OnSkipMonster()
 {
-    // TODO: 玩家选择避开怪物
+    // 玩家选择避开怪物
     if (! (CheckGridType(GRID_MONSTER) || CheckGridType(GRID_BOSS)))
         return;
+    SendGridInfo(POS_TO_INDEX(_posX, _posY));
+    
 }
 
 bool JobHunter::OnAttackMonster(UInt16 pos)
@@ -649,14 +702,18 @@ bool JobHunter::OnAttackMonster(UInt16 pos)
 
 void JobHunter::OnSolveTrap()
 {
-    // TODO: 解锁机关
+    // 解锁机关
     if (!CheckGridType(GRID_TRAP))
         return;
+    _nextMoveTime = TimeUtil::Now() + 30;
+    MapInfo::iterator it = _mapInfo.find(POS_TO_INDEX(_posX, _posY));
+    (it->second).gridType = GRID_NORMAL;
+    SendGridInfo(POS_TO_INDEX(_posX, _posY));
 }
 
 void JobHunter::OnBreakthroughTrap()
 {
-    // TODO: 前行突破机关
+    // 前行突破机关
     if (!CheckGridType(GRID_TRAP))
         return;
     UInt8 prob = _rnd(100);
@@ -667,18 +724,48 @@ void JobHunter::OnBreakthroughTrap()
     else
     {
         // 失败
+        _nextMoveTime = TimeUtil::Now() + 60;
     }
+    SendGridInfo(POS_TO_INDEX(_posX, _posY));
 }
 
 void JobHunter::OnGetTreasure()
 {
+    // 打开宝箱
+    if (!CheckGridType(GRID_TREASURE))
+        return;
+    Table rewards = GameAction()->getTreasure(_gameProgress);
+    Stream st(REP::JOBHUNTER);
+    st << static_cast<UInt8>(3);
+    UInt8 count = rewards.size();
+    st << static_cast<UInt8>(count);
+    for (UInt8 i = 0; i < count; ++i)
+    {
+        Table item = rewards.get<Table>(i);
+        if (item.size() < 3) return;
+        UInt32 itemId = item.get<UInt32>(1);
+        UInt32 itemCount = item.get<UInt32>(2);
+        bool   bind = item.get<bool>(3);
+        _owner->GetPackage()->AddItem2(itemId, itemCount, true, bind, FromJobHunter);
+        st << static_cast<UInt32>(itemId);
+        st << static_cast<UInt32>(itemCount);
+    }
+
+    st << Stream::eos;
+    _owner->send(st);
+        
 }
 
 void JobHunter::OnFoundCave()
 {
-    // TODO: 找到洞穴
+    // 找到洞穴
     if (!CheckGridType(GRID_CAVE))
         return;
+    UInt32 val = GameAction()->foundCave(_gameProgress);
+    if (val)
+    {
+        AddToFighterList(static_cast<UInt16>(val));
+    }
 }
 
 void JobHunter::OnAutoExplore()
@@ -689,6 +776,7 @@ void JobHunter::OnAutoExplore()
 void JobHunter::OnAbort()
 {
     // TODO: 主动放弃
+    _gameProgress = PROGRESS_NONE;
 }
 
 
