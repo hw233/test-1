@@ -14629,7 +14629,6 @@ void EventTlzAuto::notify(bool isBeginAuto)
                 }
                 st << Stream::eos;
                 send(st);
-                printf("broadfreq = %u\n", broadfreq);
                 if(broadfreq >= 5)
                 {
                     broadfreq = 0;

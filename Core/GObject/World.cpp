@@ -1134,7 +1134,6 @@ void World::ArenaExtraActTimer(void *)
     UInt32 week = TimeUtil::GetWeekDay(now);
     if(week < ARENA_ACT_WEEK_START || week > ARENA_ACT_WEEK_END)
     {
-        printf("day isn't valid\n");
         return;
     }
     UInt32 t1 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SINGUP_START;
@@ -1237,7 +1236,6 @@ void World::ArenaExtraActTimer(void *)
     }
     else
     {
-        printf("other\n");
     }
 }
 
