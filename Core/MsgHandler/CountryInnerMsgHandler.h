@@ -712,8 +712,10 @@ void OnDailyCheck( GameMsgHdr& hdr, const void * data )
 
     player->buildClanTask(true);
     player->clearFinishCount();
+    /*
     if (World::_thanksgiving)
         player->resetThanksgiving();
+    */
     if (World::_blueactiveday)
         player->onBlueactiveday();
     player->GetShuoShuo()->reset();

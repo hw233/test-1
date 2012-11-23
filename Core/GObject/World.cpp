@@ -253,8 +253,10 @@ bool enum_midnight(void * ptr, void* next)
     {
         pl->buildClanTask(true);
         pl->clearFinishCount();
+        /*
         if (World::_thanksgiving)
             pl->resetThanksgiving();
+        */
     }
 
     if(bSingleDayEnd)

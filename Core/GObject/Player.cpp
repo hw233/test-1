@@ -942,7 +942,7 @@ namespace GObject
         else
             setBuffData(PLAYER_BUFF_ONLINE, 0, true);
 #endif
-
+        /*
         if (World::_thanksgiving)
         {
             UInt32 online = GetVar(VAR_TGDT);
@@ -957,7 +957,7 @@ namespace GObject
                     GameAction()->onThanksgivingDay(this);
             }
         }
-
+        */
         if (World::_blueactiveday)
             onBlueactiveday();
 
@@ -1861,7 +1861,7 @@ namespace GObject
 		}
 
 		UInt32 curtime = TimeUtil::Now();
-
+        /*
         if (World::_thanksgiving)
         {
             PopTimerEvent(this, EVENT_TIMETICK, getId());
@@ -1874,7 +1874,7 @@ namespace GObject
                     SetVar(VAR_TGDT, online + curtime - _playerData.lastOnline);
             }
         }
-
+        */
 		DBLOG1().PushUpdateData("update login_states set logout_time=%u where server_id=%u and player_id=%"I64_FMT"u and login_time=%u", curtime, cfg.serverLogId, _id, _playerData.lastOnline);
 		writeOnlineRewardToDB();
 
@@ -1953,7 +1953,7 @@ namespace GObject
                     setBuffData(PLAYER_BUFF_ONLINE, online + curtime - _playerData.lastOnline);
             }
         }
-
+        /*
         if (World::_thanksgiving)
         {
             PopTimerEvent(this, EVENT_TIMETICK, getId());
@@ -1966,7 +1966,7 @@ namespace GObject
                     SetVar(VAR_TGDT, online + curtime - _playerData.lastOnline);
             }
         }
-
+        */
         if (World::_blueactiveday)
             PopTimerEvent(this, EVENT_TIMETICK, getId());
 
@@ -10133,6 +10133,9 @@ namespace GObject
         case 13:
             get11DailyAward(opt);
             break;
+        case 15:
+            getThanksGivingDay(opt);
+            break;
         }
     }
 
@@ -10431,6 +10434,45 @@ namespace GObject
                 return;
             Stream st(REP::GETAWARD);
             st << static_cast<UInt8>(12) << idx << Stream::eos;
+            send(st);
+        }
+    }
+
+    void Player::getThanksGivingDay(UInt8 opt)
+    {
+        if(opt == 0) //免费领取
+        {
+            if(GetVar(VAR_TGDT) & 0x01)
+                return;
+            UInt8 succ = GameAction()->RunThanksGivingDayAward(this, 1);
+            if(succ)
+            {
+                UInt32 var = GetVar(VAR_TGDT) | 0x01;
+                SetVar(VAR_TGDT, var);
+            }
+            Stream st(REP::GETAWARD);
+            st << static_cast<UInt8>(15) << static_cast<UInt8>(0) << Stream::eos;
+            send(st);
+        }
+        if(opt == 1) //付费领取(20仙石)
+        {
+            if(GetVar(VAR_TGDT) & 0x02)
+                return;
+			if (getGold() < 20)
+			{
+				sendMsgCode(0, 1101);
+				return;
+			}
+            UInt8 succ = GameAction()->RunThanksGivingDayAward(this, 2);
+            if(succ)
+            {
+                UInt32 var = GetVar(VAR_TGDT) | 0x02;
+                SetVar(VAR_TGDT, var);
+                ConsumeInfo ci(ThanksGivingDay, 0, 0);
+                useGold(20, &ci);
+            }
+            Stream st(REP::GETAWARD);
+            st << static_cast<UInt8>(15) << succ << Stream::eos;
             send(st);
         }
     }
@@ -11169,7 +11211,7 @@ namespace GObject
         }
 
     }
-
+    /*
     void Player::resetThanksgiving()
     {
         SetVar(VAR_TGDT, 0);
@@ -11181,7 +11223,7 @@ namespace GObject
             if (event) PushTimerEvent(event);
         }
     }
-
+    */
     TeamData* Player::getTeamData()
     {
         return m_teamData;

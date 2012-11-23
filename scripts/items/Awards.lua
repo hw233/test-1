@@ -559,7 +559,6 @@ function RunNewRegisterAwardAD_RF(player, idx)
     return 1
 end
 
-
 function Run11ActAward(player, opt)
     if player == nil or opt < 1 or opt > 2 then
         return false;
@@ -585,5 +584,22 @@ function Run11ActAward(player, opt)
     return true;
 end
 
-
+function RunThanksGivingDayAward(player, opt)
+    if player == nil or opt < 1 or opt > 2 then
+        return 0
+    end
+    local awards = {
+        [1] = {{517, 1},{29, 10},{511, 1},{15, 1},{514, 1},{548, 1}},
+        [2] = {{503, 1},{500, 1},{513, 1},{516, 1},{30, 1},{1525,1}},
+    }
+    local package = player:GetPackage()
+	if package:GetRestPackageSize() < #awards[opt] then
+		player:sendMsgCode(2, 1011, 0);
+		return 0
+	end
+    for i = 1, #award[opt] do
+        package:Add(award[opt][i][1], award[opt][i][2], true, false, 30)
+    end
+    return 1
+end
 
