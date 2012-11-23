@@ -5365,14 +5365,20 @@ void OnJobHunter( GameMsgHdr & hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
     BinaryReader br(data, hdr.msgHdr.bodyLen);
-    UInt8 type = 0;
-    UInt32 val = 0;
-    br >> type;
-    br >> val;
+
     JobHunter * jobHunter = player->getJobHunter();
     if (!jobHunter)
         return;
-    jobHunter->OnCommand(type, val);
+
+    UInt8 type = 0;
+    UInt8 val = 0;
+    UInt8 val2 = 0;
+    br >> type;
+    if (!br.left())
+        br >> val;
+    if (!br.left())
+        br >> val2;
+    jobHunter->OnCommand(type, val, val2);
 }
 
 

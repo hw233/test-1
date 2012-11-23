@@ -270,6 +270,7 @@ namespace Script
         UInt8 onGetAthlRandomDiffculty();
         UInt32 getRandomNormalMonster(UInt8 id);
         UInt32 getBossMonster(UInt8 id);
+        UInt32 getLengendMonster(UInt8 id, UInt8 val);
         UInt32 calcGridType(UInt8 prob);
 
     public:

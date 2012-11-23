@@ -19,11 +19,14 @@ namespace GObject
 
 class Player;
 
-#define POS_TO_INDEX(x,y)  ((x)+((UInt16)(y)<<8))
+#define POS_TO_INDEX(x,y)  (UInt16)(((x)+((UInt16)(y)<<8)))
 
-#define INDEX_TO_POS(x,y,index) \
+#define INDEX_TO_POS(index,x,y) \
     x = (index) & 0xff;\
     y = ((index) >> 8) & 0xff;
+
+#define CLIENT_POS_TO_POS(x) (UInt16)(((UInt16)((x) / MAX_POS_X) << 8) + ((x) % MAX_POS_X))
+#define POS_TO_CLIENT_POS(x) ((((UInt16)(x) >> 8) * MAX_POS_X) + ((x) & 0xff))
 
 class JobHunter
 {
@@ -45,6 +48,7 @@ class JobHunter
         GRID_NORMAL_MAX,
         GRID_CAVE       = 0x11, // 目标格子，墨家秘洞存在宝物和散仙（概率存在）
         GRID_BORN       = 0x12, // 玩家出生点
+        GRID_LENGEND    = 0x13, // 神兽格子
     };
 
     enum Progress
@@ -54,6 +58,7 @@ class JobHunter
         PROGRESS_80,        //  80级副本寻墨
         PROGRESS_90,        //  90级副本寻墨
         PROGRESS_100,       // 100级副本寻墨
+        PROGRESS_MAX,
     };
 
     struct GridInfo
@@ -78,7 +83,7 @@ class JobHunter
         GridInfo(UInt16 index, UInt8 type, UInt8 neighbourCount)
             : neighbCount(neighbourCount)
         {
-            INDEX_TO_POS(posX, posY, index);
+            INDEX_TO_POS(index, posX, posY);
             gridType = type;
         }
     };
@@ -95,6 +100,7 @@ class JobHunter
 #endif
     enum SlotType
     {
+        SLOT_NONE   = 0,
         SLOT_GOLD   = 1,    // 每点25强度
         SLOT_WOOD   = 2,    // 每点20强度
         SLOT_WATAR  = 3,    // 每点15强度
@@ -108,6 +114,9 @@ class JobHunter
         ~JobHunter();
 
         void LoadFighterList(std::string& str);
+        void LoadGameFromDB(std::string& data);
+
+
         void AddToFighterList(UInt16 id);
         void SendFighterList();
         void OnHireFighter(UInt16 id);
@@ -117,21 +126,39 @@ class JobHunter
 
         void SendGameInfo(UInt8 type);
 
-        void OnCommand(UInt8 command, UInt32 val);
+        void SendMapInfo();
+
+        void OnCommand(UInt8 command, UInt8 val, UInt8 val2);
+
+        void SendGridInfo(UInt16 pos);
 
     private:
 
         bool InitMap();
         void AddBossGrid();
+        void AddLengendGrid();
         void SelectBornGrid();
 
-        void OnMove(UInt32 pos);
+        void OnMove(UInt16 pos);
         void OnSkipMonster();
-        void OnAttackMonster();
+        bool OnAttackMonster(UInt16 pos);
         void OnSolveTrap();
         void OnBreakthroughTrap();
+        void OnGetTreasure();
+        void OnFoundCave();
         void OnAutoExplore();
         void OnAbort();
+
+        inline bool CheckGridType(UInt8 type)
+        {
+            // 检查该坐标是否和需要的类型匹配
+            MapInfo::iterator it = _mapInfo.find(POS_TO_INDEX(_posX, _posY));
+            if (it != _mapInfo.end())
+            {
+                return ((it->second).gridType == type);
+            }
+            return false;
+        }
 
     private:
         bool list2string(std::string& str);

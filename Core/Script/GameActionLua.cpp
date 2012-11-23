@@ -1426,9 +1426,15 @@ namespace Script
         return Call<UInt32>("getBossMonster", id);
     }
 
+    UInt32 GameActionLua::getLengendMonster(UInt8 id, UInt8 val)
+    {
+        return Call<UInt32>("getLengendMonster", id, val);
+    }
+
     UInt32 GameActionLua::calcGridType(UInt8 prob)
     {
         return Call<UInt8>("calcGridType", prob);
     }
+
 }
 
