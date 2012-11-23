@@ -1018,6 +1018,7 @@ namespace GObject
         UInt32 getMainPExp() { return getMainFighter()?getMainFighter()->getPExp():0; }
 		bool hasFighter(UInt32);
         bool addFighterFromItem(UInt32, UInt32);
+        bool fighterFromItem(UInt32 fgtid);
 		Fighter * removeFighter(UInt32);
 		Fighter * removeFighterFromLineup(UInt32);
 		void autoLineup(Fighter *);

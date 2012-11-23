@@ -6386,6 +6386,27 @@ function ItemNormal_00009216(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_fighterCard(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    if not num or num > 1 then
+        return false
+    end
+
+    -- TODO:
+    local fighters = {
+    }
+
+    local id = 0
+    -- TODO:
+
+    if not player:fighterFromItem(id) then
+        return false
+    end
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
 
 local ItemNormal_Table = {
   [1] = ItemNormal_00000001,

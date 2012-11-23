@@ -281,6 +281,8 @@ namespace Script
         CLASS_DEF(Player, lastNew7DayTargetAwardPush);
         CLASS_DEF(Player, luaUdpLog);
         CLASS_DEF(Player, addFighterFromItem);
+        CLASS_DEF(Player, hasFighter);
+        CLASS_DEF(Player, fighterFromItem);
 
         CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);

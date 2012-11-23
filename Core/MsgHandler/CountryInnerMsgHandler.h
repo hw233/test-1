@@ -180,6 +180,14 @@ void OnResetRecharge(GameMsgHdr& hdr, const void * data)
     player->sendRechargeInfo();
 }
 
+void OnResetConsume(GameMsgHdr& hdr, const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+    if (player->GetVar(VAR_CONSUME))
+        player->SetVar(VAR_CONSUME, 0);
+    player->sendConsumeInfo();
+}
+
 void OnTimerEventCompletedNotify( GameMsgHdr& hdr, const void * data )
 {
 	struct EventMsg
