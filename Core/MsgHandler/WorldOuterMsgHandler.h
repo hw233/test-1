@@ -1580,12 +1580,12 @@ void OnArenaExtraActReq( GameMsgHdr& hdr, const void * data )
     }
     else
     {
-        if(serverWeek > week && GObject::World::_arenaOldBoard[week-2].week == week)
+        if(serverWeek > week && GObject::World::_arenaOldBoard[week-ARENA_ACT_WEEK_START].week == week)
         {
             GObject::Player* pl[5];
             for(UInt8 i = 0; i < 5; i++)
             {
-                pl[i] = GObject::globalPlayers[GObject::World::_arenaOldBoard[week-2].playerId[i]];
+                pl[i] = GObject::globalPlayers[GObject::World::_arenaOldBoard[week-ARENA_ACT_WEEK_START].playerId[i]];
                 if(pl[i] == NULL)
                     return;
             }
@@ -1603,21 +1603,21 @@ void OnArenaExtraActReq( GameMsgHdr& hdr, const void * data )
                     mainId = 0;
                 st << mainId;
             }
-            st << GObject::World::_arenaOldBoard[week-2].sufferTotal;
+            st << GObject::World::_arenaOldBoard[week-ARENA_ACT_WEEK_START].sufferTotal;
             st << Stream::eos;
             player->send(st);
 
             Stream st2(REP::SERVER_ARENA_EXTRA_ACT);
             st2 << week;
             st2 << static_cast<UInt8>(3);
-            if(week == 2)
+            if(week == ARENA_ACT_WEEK_START)
                 st2 << static_cast<UInt8>(player->GetVar(GObject::VAR_ARENA_SUPPORT_TUE));
             else
                 st2 << static_cast<UInt8>(player->GetVar(GObject::VAR_ARENA_SUPPORT_WED));
             for(UInt8 i = 0; i < 5; i++)
             {
-                st2 << GObject::World::_arenaOldBoard[week-2].sufferCnt[i];
-                st2 << GObject::World::_arenaOldBoard[week-2].rank[i];
+                st2 << GObject::World::_arenaOldBoard[week-ARENA_ACT_WEEK_START].sufferCnt[i];
+                st2 << GObject::World::_arenaOldBoard[week-ARENA_ACT_WEEK_START].rank[i];
             }
             st2 << Stream::eos;
             player->send(st2);

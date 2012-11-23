@@ -5044,8 +5044,8 @@ namespace GObject
         {
 			lc.advance();
             UInt8 week = extraboard.week;
-			if(week == 2 || week == 3)
-                memcpy(&(World::_arenaOldBoard[week-2]), &extraboard, sizeof(extraboard));
+			if(week == ARENA_ACT_WEEK_START || week == ARENA_ACT_WEEK_END)
+                memcpy(&(World::_arenaOldBoard[week-ARENA_ACT_WEEK_START]), &extraboard, sizeof(extraboard));
         }
         lc.finalize();
         return true;

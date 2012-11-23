@@ -502,8 +502,7 @@ bool enum_extra_act_update_status(Player* player, void* data)
 
     if(player->isOnline())
     {
-        //UInt8 type = *reinterpret_cast<UInt8 *>(data);
-        player->ArenaExtraAct(/*type*/0, 0);
+        player->ArenaExtraAct(0, 0);
     }
     return true;
 }
@@ -1222,17 +1221,17 @@ void World::ArenaExtraActTimer(void *)
                 _arenaResultRank[i] = j + 1;
             }
         }
-        _arenaOldBoard[week-2].week = week;
-        _arenaOldBoard[week-2].sufferTotal = getArenaTotalCnt() * 8 / 5;
+        _arenaOldBoard[week-ARENA_ACT_WEEK_START].week = week;
+        _arenaOldBoard[week-ARENA_ACT_WEEK_START].sufferTotal = getArenaTotalCnt() * 8 / 5;
         for(UInt8 i = 0; i < 5; i++)
         {
-            _arenaOldBoard[week-2].playerId[i] = pl[i]->getId();
-            _arenaOldBoard[week-2].sufferCnt[i] = pl[i]->GetVar(VAR_ARENA_SUFFERED);
-            _arenaOldBoard[week-2].rank[i] = _arenaResultRank[i];
+            _arenaOldBoard[week-ARENA_ACT_WEEK_START].playerId[i] = pl[i]->getId();
+            _arenaOldBoard[week-ARENA_ACT_WEEK_START].sufferCnt[i] = pl[i]->GetVar(VAR_ARENA_SUFFERED);
+            _arenaOldBoard[week-ARENA_ACT_WEEK_START].rank[i] = _arenaResultRank[i];
         }
 
         globalPlayers.enumerate(enum_extra_act_award, static_cast<void *>(NULL));
-        DB1().PushUpdateData("REPLACE INTO `arena_extra_board`(`week`, `sufferTotal`, `playerId1`, `playerId2`, `playerId3`, `playerId4`, `playerId5`, `sufferCnt1`, `sufferCnt2`, `sufferCnt3`, `sufferCnt4`, `sufferCnt5`, `rank1`, `rank2`, `rank3`, `rank4`, `rank5`) VALUES(%u, %u, %"I64_FMT"u, %"I64_FMT"u, %"I64_FMT"u, %"I64_FMT"u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", _arenaOldBoard[week-2].week, _arenaOldBoard[week-2].sufferTotal, _arenaOldBoard[week-2].playerId[0], _arenaOldBoard[week-2].playerId[1], _arenaOldBoard[week-2].playerId[2], _arenaOldBoard[week-2].playerId[3], _arenaOldBoard[week-2].playerId[4], _arenaOldBoard[week-2].sufferCnt[0], _arenaOldBoard[week-2].sufferCnt[1], _arenaOldBoard[week-2].sufferCnt[2], _arenaOldBoard[week-2].sufferCnt[3], _arenaOldBoard[week-2].sufferCnt[4], _arenaOldBoard[week-2].rank[0], _arenaOldBoard[week-2].rank[1], _arenaOldBoard[week-2].rank[2], _arenaOldBoard[week-2].rank[3], _arenaOldBoard[week-2].rank[4]);
+        DB1().PushUpdateData("REPLACE INTO `arena_extra_board`(`week`, `sufferTotal`, `playerId1`, `playerId2`, `playerId3`, `playerId4`, `playerId5`, `sufferCnt1`, `sufferCnt2`, `sufferCnt3`, `sufferCnt4`, `sufferCnt5`, `rank1`, `rank2`, `rank3`, `rank4`, `rank5`) VALUES(%u, %u, %"I64_FMT"u, %"I64_FMT"u, %"I64_FMT"u, %"I64_FMT"u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", _arenaOldBoard[week-ARENA_ACT_WEEK_START].week, _arenaOldBoard[week-ARENA_ACT_WEEK_START].sufferTotal, _arenaOldBoard[week-ARENA_ACT_WEEK_START].playerId[0], _arenaOldBoard[week-ARENA_ACT_WEEK_START].playerId[1], _arenaOldBoard[week-ARENA_ACT_WEEK_START].playerId[2], _arenaOldBoard[week-ARENA_ACT_WEEK_START].playerId[3], _arenaOldBoard[week-ARENA_ACT_WEEK_START].playerId[4], _arenaOldBoard[week-ARENA_ACT_WEEK_START].sufferCnt[0], _arenaOldBoard[week-ARENA_ACT_WEEK_START].sufferCnt[1], _arenaOldBoard[week-ARENA_ACT_WEEK_START].sufferCnt[2], _arenaOldBoard[week-ARENA_ACT_WEEK_START].sufferCnt[3], _arenaOldBoard[week-ARENA_ACT_WEEK_START].sufferCnt[4], _arenaOldBoard[week-ARENA_ACT_WEEK_START].rank[0], _arenaOldBoard[week-ARENA_ACT_WEEK_START].rank[1], _arenaOldBoard[week-ARENA_ACT_WEEK_START].rank[2], _arenaOldBoard[week-ARENA_ACT_WEEK_START].rank[3], _arenaOldBoard[week-ARENA_ACT_WEEK_START].rank[4]);
     }
     else
     {
