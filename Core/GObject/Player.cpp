@@ -14525,7 +14525,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
         }
         UInt16 totalCnt;
         totalCnt = WORLD().getArenaTotalCnt();
-        UInt32 totalSufferCnt = totalCnt * 8 / 5;
+        UInt32 totalSufferCnt = totalCnt * 24 / 5;
 
         switch(type)
         {
@@ -14601,7 +14601,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
                     GameMsgHdr hdr2(0x238, getThreadId(), this, sizeof(pexp));
                     GLOBAL().PushMsg(hdr2, &pexp);
 
-                    setBuffData(PLAYER_BUFF_SUFFER, TimeUtil::Now() + 90);
+                    setBuffData(PLAYER_BUFF_SUFFER, TimeUtil::Now() + 30);
                     pl[sufferId - 1]->AddVar(VAR_ARENA_SUFFERED, 1);
                     pl[sufferId - 1]->SetVar(VAR_ARENA_LASTTIME, now);
                     if(pl[sufferId - 1]->GetVar(VAR_ARENA_SUFFERED) == totalSufferCnt)

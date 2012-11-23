@@ -499,6 +499,13 @@ bool enum_extra_act_update_status(Player* player, void* data)
 {
     if(player == NULL)
         return true;
+    UInt8 updatetype = *reinterpret_cast<UInt8 *>(data);
+    if(updatetype == 1)
+    {
+        player->SetVar(VAR_ARENA_SUPPORT, 0);
+        player->SetVar(VAR_ARENA_SUFFERED, 0);
+        player->SetVar(VAR_ARENA_LASTTIME, 0);
+    }
 
     if(player->isOnline())
     {
@@ -1125,6 +1132,8 @@ void World::setArenaInfo(UInt8 type)
 void World::setAreanTotalCntEnum()
 {
     globalPlayers.enumerate(enum_extra_act_calc_total, static_cast<void *>(NULL));
+    if(getArenaTotalCnt() < 20)
+        setArenaTotalCnt(20);
 }
 
 void World::ArenaExtraActTimer(void *)
@@ -1138,6 +1147,8 @@ void World::ArenaExtraActTimer(void *)
     UInt32 t1 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SINGUP_START;
     UInt32 t2 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SINGUP_END;
     UInt32 t3 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SUFFER_END;
+    static UInt8 updatetype1 = 1;
+    static UInt8 updatetype2 = 2;
 
     if(now < t1 && now >= t3 + 30)
         return;
@@ -1171,12 +1182,12 @@ void World::ArenaExtraActTimer(void *)
     if(now >= t1 && now < t1 + 30)
     {
         printf("t1\n");
-        globalPlayers.enumerate(enum_extra_act_update_status, static_cast<void *>(NULL));
+        globalPlayers.enumerate(enum_extra_act_update_status, static_cast<void *>(&updatetype1));
     }
     else if(now >= t2 && now < t2 + 30)
     {
         printf("t2\n");
-        globalPlayers.enumerate(enum_extra_act_update_status, static_cast<void *>(NULL));
+        globalPlayers.enumerate(enum_extra_act_update_status, static_cast<void *>(&updatetype2));
     }
     else if(now >= t3 && now < t3 + 30)
     {
@@ -1222,7 +1233,7 @@ void World::ArenaExtraActTimer(void *)
             }
         }
         _arenaOldBoard[week-ARENA_ACT_WEEK_START].week = week;
-        _arenaOldBoard[week-ARENA_ACT_WEEK_START].sufferTotal = getArenaTotalCnt() * 8 / 5;
+        _arenaOldBoard[week-ARENA_ACT_WEEK_START].sufferTotal = getArenaTotalCnt() * 24 / 5;
         for(UInt8 i = 0; i < 5; i++)
         {
             _arenaOldBoard[week-ARENA_ACT_WEEK_START].playerId[i] = pl[i]->getId();

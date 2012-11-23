@@ -433,8 +433,8 @@ public:
     }
     inline static void setArenaTotalCnt(UInt16 total)
     {
-        if(total > 0 && total < 20)
-            total = 20;
+        //if(total > 0 && total < 20)
+        //    total = 20;
         if(_arenaTotalCnt != total)
             _arenaTotalCnt = total;
     }
