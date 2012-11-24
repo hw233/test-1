@@ -14499,7 +14499,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
                     GameMsgHdr hdr2(0x238, getThreadId(), this, sizeof(pexp));
                     GLOBAL().PushMsg(hdr2, &pexp);
 
-                    setBuffData(PLAYER_BUFF_SUFFER, TimeUtil::Now() + 7 - 5);//5秒误差，10秒仅仅为了测试
+                    setBuffData(PLAYER_BUFF_SUFFER, TimeUtil::Now() + 90 - 5);//5秒误差
                     pl[sufferId - 1]->AddVar(VAR_ARENA_SUFFERED, 1);
                     pl[sufferId - 1]->SetVar(VAR_ARENA_LASTTIME, now);
                     if(pl[sufferId - 1]->GetVar(VAR_ARENA_SUFFERED) == totalSufferCnt)
@@ -14543,13 +14543,20 @@ void EventTlzAuto::notify(bool isBeginAuto)
                     st << pl[i]->GetVar(VAR_ARENA_SUFFERED);
                 }
                 st << Stream::eos;
+                send(st);
                 printf("broadfreq = %u\n", broadfreq);
-                if(broadfreq < 5)
-                    send(st);
-                else
+                if(broadfreq >= 5)
                 {
-                    ArenaExtraAct(4, 0);
                     broadfreq = 0;
+
+                    Stream st(REP::SERVER_ARENA_EXTRA_ACT);
+                    st << static_cast<UInt8>(4);
+                    for(UInt8 i = 0; i < 5; i++)
+                    {
+                        st << pl[i]->GetVar(VAR_ARENA_SUFFERED);
+                    }
+                    st << Stream::eos;
+                    NETWORK()->Broadcast(st);
                 }
                 }
                 break;
@@ -14591,18 +14598,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
                     send(st);
                 }
                 break;
-                case 4:
-                {
-                    Stream st(REP::SERVER_ARENA_EXTRA_ACT);
-                    st << static_cast<UInt8>(4);
-                    for(UInt8 i = 0; i < 5; i++)
-                    {
-                        st << pl[i]->GetVar(VAR_ARENA_SUFFERED);
-                    }
-                    NETWORK()->Broadcast(st);
-                }
-                break;
-                default:
+                 default:
                 break;
             }
         }
