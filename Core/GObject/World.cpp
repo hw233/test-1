@@ -60,7 +60,7 @@ static const UInt32 DAYSRANKTM = 23 * 3600+50*60;
 namespace GObject
 {
 
-bool lt_valuesort::operator()(const ValueSort& a, const ValueSort& b) const { return (a.player->GetVar(VAR_ARENA_SUFFERED) < b.player->GetVar(GObject::VAR_ARENA_SUFFERED)) || (a.player->GetVar(VAR_ARENA_SUFFERED) == b.player->GetVar(GObject::VAR_ARENA_SUFFERED) && a.lastTime > b.lastTime); }
+bool lt_valuesort::operator()(const ValueSort& a, const ValueSort& b) const { return a.sufferCnt < b.sufferCnt || (a.sufferCnt == b.sufferCnt && a.lastTime > b.lastTime); }
 
 struct DBDataLatest
 {
@@ -169,11 +169,8 @@ bool World::_loginAward = false;
 bool World::_bluediamonSuperman = false;
 bool World::_tgcevent = false;
 /** 场外活动 **/
-RCSortType World::arenaSupported;
-Player* World::_arenaPlayer[5];
-UInt16 World::_arenaTotalCnt = ARENA_ACT_CNT_FLAG;
-UInt8 World::_arenaResultRank[5] = {0, 0, 0, 0, 0};
-stArenaExtraBoard World::_arenaOldBoard[2];
+stArenaExtra World::stArenaOld[2];
+stArenaExtra World::stArena;
 /** 0：侠骨；1：柔情；2财富；3传奇 **/
 RCSortType World::killMonsterSort[4];
 
@@ -499,12 +496,11 @@ bool enum_extra_act_update_status(Player* player, void* data)
 {
     if(player == NULL)
         return true;
+
     UInt8 updatetype = *reinterpret_cast<UInt8 *>(data);
     if(updatetype == 1)
     {
         player->SetVar(VAR_ARENA_SUPPORT, 0);
-        player->SetVar(VAR_ARENA_SUFFERED, 0);
-        player->SetVar(VAR_ARENA_LASTTIME, 0);
     }
 
     if(player->isOnline())
@@ -525,7 +521,8 @@ bool enum_extra_act_award(Player* player, void* data)
     UInt8 supportId = player->GetVar(VAR_ARENA_SUPPORT);
     if(supportId == 0 || supportId > 5)
         return true;
-    UInt8 curRank = World::_arenaResultRank[supportId-1];
+
+    UInt8 curRank = World::stArena.rank[supportId-1];
     UInt32 moneyArena = 0;
     switch(curRank)
     {
@@ -556,7 +553,6 @@ bool enum_extra_act_award(Player* player, void* data)
         GameMsgHdr hdr(0x251, player->getThreadId(), player, sizeof(moneyArena));
         GLOBAL().PushMsg(hdr, &moneyArena);
     }
-
     return true;
 }
 
@@ -1020,8 +1016,6 @@ void World::World_Midnight_Check( World * world )
     }
     if (bXiaoyaoEnd)
         world->SendXiaoyaoAward();
-    if(getArenaTotalCnt() > 0)
-        setArenaTotalCnt(ARENA_ACT_CNT_FLAG);
 
 	dungeonManager.enumerate(enum_dungeon_midnight, &curtime);
 	globalClans.enumerate(enum_clan_midnight, &curtime);
@@ -1126,10 +1120,10 @@ void World::TownDeamonTmAward(void *)
 
 void World::setArenaInfo(UInt8 type)
 {
-    GObject::arena.setArenaPlayer(type);
+    GObject::arena.setArenaInfo(type);
 }
 
-void World::setAreanTotalCntEnum()
+void World::setArenaTotalCntEnum()
 {
     globalPlayers.enumerate(enum_extra_act_calc_total, static_cast<void *>(NULL));
     if(getArenaTotalCnt() < 20)
@@ -1140,109 +1134,103 @@ void World::ArenaExtraActTimer(void *)
 {
     UInt32 now = TimeUtil::Now();
     UInt32 week = TimeUtil::GetWeekDay(now);
-    if(week < ARENA_ACT_WEEK_START || week > ARENA_ACT_WEEK_END)
+
+    if(week < ARENA_WEEK_START || week > ARENA_WEEK_END)
     {
         return;
     }
-    UInt32 t1 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SINGUP_START;
-    UInt32 t2 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SINGUP_END;
-    UInt32 t3 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SUFFER_END;
-    static UInt8 updatetype1 = 1;
-    static UInt8 updatetype2 = 2;
 
-    if(now < t1 && now >= t3 + 30)
-        return;
+    UInt32 t1 = TimeUtil::SharpDayT(0, now) + ARENA_SINGUP_START;
+    UInt32 t2 = TimeUtil::SharpDayT(0, now) + ARENA_SINGUP_END;
+    UInt32 t3 = TimeUtil::SharpDayT(0, now) + ARENA_SUFFER_END;
+    UInt8 type;
 
-    if(getArenaTotalCnt() == ARENA_ACT_CNT_FLAG)
+    if(week == ARENA_WEEK_START)
+        type = 0;
+    else
+        type = 1;
+    static UInt8 updatetype = 0;
+    static UInt8 updatetype2 = 1;
+
+    if(now < t1)
     {
-        if(week == ARENA_ACT_WEEK_START)
-        {
-            setArenaInfo(0);
-        }
-        else
-        {
-            setArenaInfo(1);
-        }
+        if(stArena.heroId[0] != 0)
+            stArena.heroId[0] = 0;
     }
-    Player *pl[5] = {NULL, NULL, NULL, NULL, NULL};
-    for(UInt8 i = 0; i < 5; i++)
+    else
     {
-        getArenaPlayer(i, &pl[i]);
-        if(pl[i] == NULL)
+        if(stArena.heroId[0] == 0)
+            setArenaInfo(type);
+        if(stArena.heroId[0] == 0)
             return;
-    }
-    if(now < t2)
-        setArenaTotalCnt(0);
-    else if(getArenaTotalCnt() == 0 || getArenaTotalCnt() == ARENA_ACT_CNT_FLAG)
-    {
-        setArenaTotalCnt(0);
-        setAreanTotalCntEnum();
+        if(now >= t2 && World::getArenaTotalCnt() == 0)
+        {
+            WORLD().setArenaTotalCntEnum();
+            //DB1().PushUpdateData("UPDATE `arena_extra_board` SET `sufferTotal` = %u WHERE `week` = %u", stArena.sufferTotal, stArena.week);
+        }
     }
 
-    if(now >= t1 && now < t1 + 30)
+    if(now >= t1 && now < t1 + 5)
     {
         printf("t1\n");
-        globalPlayers.enumerate(enum_extra_act_update_status, static_cast<void *>(&updatetype1));
+        globalPlayers.enumerate(enum_extra_act_update_status, static_cast<void *>(&updatetype));
     }
-    else if(now >= t2 && now < t2 + 30)
+    else if(now >= t2 && now < t2 + 5)
     {
         printf("t2\n");
         globalPlayers.enumerate(enum_extra_act_update_status, static_cast<void *>(&updatetype2));
     }
-    else if(now >= t3 && now < t3 + 30)
+    else if(now >= t3 && now < t3 + 5)
     {
         printf("t3\n");
-        //if(_arenaResultRank[0] == 0 && _arenaResultRank[1] == 0 && _arenaResultRank[2] == 0 && _arenaResultRank[3] == 0 && _arenaResultRank[4] == 0)
-        {
-            ValueSort cur;
-            ValueSortType resultRank;
-            for(UInt8 i = 0; i < 5; i++)
-            {
-                SYSMSGV(title, 739);
-                SYSMSGV(content, 740);
-                Mail * mail = pl[i]->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
-                if(mail)
-                {
-                    MailPackage::MailItem mitem[1] = {{9076,1}};
-                    mailPackageManager.push(mail->id, mitem, 1, true);
 
-                    std::string strItems;
-                    for(int index = 0; index < 1; ++ index)
-                    {
-                        strItems += Itoa(mitem[index].id);
-                        strItems += ",";
-                        strItems += Itoa(mitem[index].count);
-                        strItems += "|";
-                    }
-                    DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl[i]->getId(), mail->id, LogArenaExtraAct, title, content, strItems.c_str(), mail->recvTime);
-                }
+        ValueSort cur;
+        ValueSortType resultRank;
 
-                cur.player = pl[i];
-                cur.lastTime = pl[i]->GetVar(VAR_ARENA_LASTTIME);
-                resultRank.insert(cur);
-            }
-            for(UInt8 i = 0; i < 5; i++)
-            {
-                UInt8 j = 0;
-                for(ValueSortType::iterator iter = resultRank.begin(), e = resultRank.end(); iter != e && j < 5; ++iter, ++j)
-                {
-                    if(pl[i] == iter->player)
-                        break;
-                }
-                _arenaResultRank[i] = j + 1;
-            }
-        }
-        _arenaOldBoard[week-ARENA_ACT_WEEK_START].week = week;
-        _arenaOldBoard[week-ARENA_ACT_WEEK_START].sufferTotal = getArenaTotalCnt() * 24 / 5;
         for(UInt8 i = 0; i < 5; i++)
         {
-            _arenaOldBoard[week-ARENA_ACT_WEEK_START].playerId[i] = pl[i]->getId();
-            _arenaOldBoard[week-ARENA_ACT_WEEK_START].sufferCnt[i] = pl[i]->GetVar(VAR_ARENA_SUFFERED);
-            _arenaOldBoard[week-ARENA_ACT_WEEK_START].rank[i] = _arenaResultRank[i];
+#if 0
+            SYSMSGV(title, 739);
+            SYSMSGV(content, 740);
+            Mail * mail = pl[i]->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            if(mail)
+            {
+                MailPackage::MailItem mitem[1] = {{9076,1}};
+                mailPackageManager.push(mail->id, mitem, 1, true);
+
+                std::string strItems;
+                for(int index = 0; index < 1; ++ index)
+                {
+                    strItems += Itoa(mitem[index].id);
+                    strItems += ",";
+                    strItems += Itoa(mitem[index].count);
+                    strItems += "|";
+                }
+                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl[i]->getId(), mail->id, LogArenaExtraAct, title, content, strItems.c_str(), mail->recvTime);
+            }
+#endif
+            cur.sufferCnt = World::stArena.sufferCnt[i];
+            cur.lastTime = World::stArena.lasttime[i];
+            cur.name = World::stArena.name[i];
+            resultRank.insert(cur);
+        }
+
+        for(UInt8 i = 0; i < 5; i++)
+        {
+            UInt8 j = 0;
+            for(ValueSortType::iterator iter = resultRank.begin(), e = resultRank.end(); iter != e && j < 5; ++iter, ++j)
+            {
+                if(iter->name == World::stArena.name[i])
+                    break;
+            }
+            stArena.rank[i] = j + 1;
         }
 
         globalPlayers.enumerate(enum_extra_act_award, static_cast<void *>(NULL));
-        DB1().PushUpdateData("REPLACE INTO `arena_extra_board`(`week`, `sufferTotal`, `playerId1`, `playerId2`, `playerId3`, `playerId4`, `playerId5`, `sufferCnt1`, `sufferCnt2`, `sufferCnt3`, `sufferCnt4`, `sufferCnt5`, `rank1`, `rank2`, `rank3`, `rank4`, `rank5`) VALUES(%u, %u, %"I64_FMT"u, %"I64_FMT"u, %"I64_FMT"u, %"I64_FMT"u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", _arenaOldBoard[week-ARENA_ACT_WEEK_START].week, _arenaOldBoard[week-ARENA_ACT_WEEK_START].sufferTotal, _arenaOldBoard[week-ARENA_ACT_WEEK_START].playerId[0], _arenaOldBoard[week-ARENA_ACT_WEEK_START].playerId[1], _arenaOldBoard[week-ARENA_ACT_WEEK_START].playerId[2], _arenaOldBoard[week-ARENA_ACT_WEEK_START].playerId[3], _arenaOldBoard[week-ARENA_ACT_WEEK_START].playerId[4], _arenaOldBoard[week-ARENA_ACT_WEEK_START].sufferCnt[0], _arenaOldBoard[week-ARENA_ACT_WEEK_START].sufferCnt[1], _arenaOldBoard[week-ARENA_ACT_WEEK_START].sufferCnt[2], _arenaOldBoard[week-ARENA_ACT_WEEK_START].sufferCnt[3], _arenaOldBoard[week-ARENA_ACT_WEEK_START].sufferCnt[4], _arenaOldBoard[week-ARENA_ACT_WEEK_START].rank[0], _arenaOldBoard[week-ARENA_ACT_WEEK_START].rank[1], _arenaOldBoard[week-ARENA_ACT_WEEK_START].rank[2], _arenaOldBoard[week-ARENA_ACT_WEEK_START].rank[3], _arenaOldBoard[week-ARENA_ACT_WEEK_START].rank[4]);
+        DB1().PushUpdateData("REPLACE INTO `arena_extra_board` (`week`, `name1`, `name2`, `name3`, `name4`, `name5`, `heroId1`, `heroId2`, `heroId3`, `heroId4`, `heroId5`, `sufferTotal`, `sufferCnt1`, `sufferCnt2`, `sufferCnt3`, `sufferCnt4`, `sufferCnt5`, `lasttime1`, `lasttime2`, `lasttime3`, `lasttime4`, `lasttime5`) VALUES(%u, %s, %s, %s, %s, %s, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", World::stArena.week, World::stArena.name[0].c_str(), World::stArena.name[1].c_str(), World::stArena.name[2].c_str(), World::stArena.name[3].c_str(), World::stArena.name[4].c_str(), World::stArena.heroId[0], World::stArena.heroId[1], World::stArena.heroId[2], World::stArena.heroId[3], World::stArena.heroId[4], World::stArena.sufferTotal, World::stArena.sufferCnt[0], World::stArena.sufferCnt[1], World::stArena.sufferCnt[2], World::stArena.sufferCnt[3], World::stArena.sufferCnt[4], World::stArena.lasttime[0], World::stArena.lasttime[1], World::stArena.lasttime[2], World::stArena.lasttime[3], World::stArena.lasttime[4]);
+
+        stArena.week = week;
+        memcpy(&stArenaOld[type], &stArena,sizeof(stArenaExtra));
     }
     else
     {
@@ -1358,7 +1346,7 @@ bool World::Init()
     AddTimer(86400 * 1000, DaysRank_Refresh, static_cast<void *>(NULL), (drChkPoint >= now ? drChkPoint - now : 86400 + drChkPoint - now) * 1000);
 
     //AddTimer(60 * 1000, advancedHookTimer, static_cast<void *>(NULL), (60 - now % 60) * 1000);
-    AddTimer(30 * 1000, ArenaExtraActTimer, static_cast<void *>(NULL), (30 - now % 30) * 1000);
+    AddTimer(5 * 1000, ArenaExtraActTimer, static_cast<void *>(NULL), (5 - now % 5) * 1000);
 
     return true;
 }

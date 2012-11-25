@@ -5037,15 +5037,38 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading arena_extra_board");
         DBArenaExtraBoard extraboard;
-        if(execu->Prepare("SELECT `week`, `sufferTotal`, `playerId1`, `playerId2`, `playerId3`, `playerId4`, `playerId5`, `sufferCnt1`, `sufferCnt2`, `sufferCnt3`, `sufferCnt4`, `sufferCnt5`, `rank1`, `rank2`, `rank3`, `rank4`, `rank5` FROM `arena_extra_board` ORDER BY `week`", extraboard) != DB::DB_OK)
+        if(execu->Prepare("SELECT `week`, `name1`, `name2`, `name1`, `name1`, `name1`, `heroId1`, `heroId2`, `heroId3`, `heroId4`, `heroId5`, `sufferTotal`, `sufferCnt1`, `sufferCnt2`, `sufferCnt3`, `sufferCnt4`, `sufferCnt5`, `lasttime1`, `lasttime2`, `lasttime3`, `lasttime4`, `lasttime5` FROM `arena_extra_board` ORDER BY `week`", extraboard) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
         {
 			lc.advance();
             UInt8 week = extraboard.week;
-			if(week == ARENA_ACT_WEEK_START || week == ARENA_ACT_WEEK_END)
-                memcpy(&(World::_arenaOldBoard[week-ARENA_ACT_WEEK_START]), &extraboard, sizeof(extraboard));
+			if(week == ARENA_WEEK_START || week == ARENA_WEEK_END)
+            {
+                UInt8 type = week - ARENA_WEEK_START;
+                memcpy(&(GObject::World::stArenaOld[type]), &extraboard, sizeof(DBArenaExtraBoard));
+
+                ValueSort cur;
+                ValueSortType resultRank;
+                for(UInt8 i = 0; i < 5; i++)
+                {
+                    cur.sufferCnt = World::stArenaOld[type].sufferCnt[i];
+                    cur.lastTime = World::stArenaOld[type].lasttime[i];
+                    cur.name = World::stArenaOld[type].name[i];
+                    resultRank.insert(cur);
+                }
+                for(UInt8 i = 0; i < 5; i++)
+                {
+                    UInt8 j = 0;
+                    for(ValueSortType::iterator iter = resultRank.begin(), e = resultRank.end(); iter != e && j < 5; ++iter, ++j)
+                    {
+                        if(iter->name == World::stArenaOld[type].name[i])
+                            break;
+                    }
+                    World::stArenaOld[type].rank[i] = j + 1;
+                }
+            }
         }
         lc.finalize();
         return true;

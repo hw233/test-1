@@ -14489,42 +14489,28 @@ void EventTlzAuto::notify(bool isBeginAuto)
     {
         UInt32 now = TimeUtil::Now();
         UInt8 week = TimeUtil::GetWeekDay(now);
-        UInt32 t1 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SINGUP_START;
-        UInt32 t2 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SINGUP_END;
-        UInt32 t3 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SUFFER_END;
+        UInt32 t1 = TimeUtil::SharpDayT(0, now) + ARENA_SINGUP_START;
+        UInt32 t2 = TimeUtil::SharpDayT(0, now) + ARENA_SINGUP_END;
+        UInt32 t3 = TimeUtil::SharpDayT(0, now) + ARENA_SUFFER_END;
         static UInt32 broadfreq;
+        UInt8 curtype;
 
-        if(week < ARENA_ACT_WEEK_START || week > ARENA_ACT_WEEK_END)
+        if(week < ARENA_WEEK_START || week > ARENA_WEEK_END)
             return;
         if(now < t1)
             return;
-        if(WORLD().getArenaTotalCnt() == ARENA_ACT_CNT_FLAG)
+
+        curtype = week - ARENA_WEEK_START;
+        if(WORLD().getArenaHeroId(0) == 0)
+            WORLD().setArenaInfo(curtype);
+        if(WORLD().getArenaHeroId(0) == 0)
+            return;
+        if(now >= t2 && World::getArenaTotalCnt())
         {
-            if(week == ARENA_ACT_WEEK_START)
-            {
-                WORLD().setArenaInfo(0);
-            }
-            else
-            {
-                WORLD().setArenaInfo(1);
-            }
+            WORLD().setArenaTotalCntEnum();
         }
-        Player* pl[5] = {NULL, NULL, NULL, NULL, NULL};
-        for(UInt8 i = 0; i < 5; i++)
-        {
-            WORLD().getArenaPlayer(i, &pl[i]);
-            if(pl[i] == NULL)
-                return;
-        }
-        if(now < t2)
-            WORLD().setArenaTotalCnt(0);
-        else if(WORLD().getArenaTotalCnt() == 0 || WORLD().getArenaTotalCnt() == ARENA_ACT_CNT_FLAG)
-        {
-            WORLD().setArenaTotalCnt(0);
-            WORLD().setAreanTotalCntEnum();
-        }
-        UInt16 totalCnt;
-        totalCnt = WORLD().getArenaTotalCnt();
+
+        UInt16 totalCnt = WORLD().getArenaTotalCnt();
         UInt32 totalSufferCnt = totalCnt * 24 / 5;
 
         switch(type)
@@ -14534,15 +14520,10 @@ void EventTlzAuto::notify(bool isBeginAuto)
                 Stream st(REP::SERVER_ARENA_EXTRA_ACT);
                 st << week;
                 st << type;
-                UInt8 mainId;
                 for(UInt8 i = 0; i < 5; i++)
                 {
-                    st << pl[i]->getName();
-                    if(pl[i]->getMainFighter())
-                        mainId = pl[i]->getMainFighter()->getId();
-                    else
-                        mainId = 0;
-                    st << mainId;
+                    st << WORLD().getArenaName(i);
+                    st << WORLD().getArenaHeroId(i);
                 }
                 st << totalSufferCnt << Stream::eos;
                 send(st);
@@ -14565,7 +14546,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
                     if(supportId == 0 || supportId > 5)
                         return;
                     SetVar(VAR_ARENA_SUPPORT, supportId);
-                    if(week == ARENA_ACT_WEEK_START)
+                    if(week == ARENA_WEEK_START)
                         SetVar(VAR_ARENA_SUPPORT_TUE, supportId);
                     else
                         SetVar(VAR_ARENA_SUPPORT_WED, supportId);
@@ -14593,7 +14574,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
                     UInt8 sufferId = opt;
                     if(sufferId == 0 || sufferId > 5)
                         return;
-                    if(pl[sufferId - 1]->GetVar(VAR_ARENA_SUFFERED) >= totalSufferCnt)
+                    if(World::stArena.sufferCnt[sufferId-1] >= totalSufferCnt)
                         return;
 
                     ++broadfreq;
@@ -14602,9 +14583,10 @@ void EventTlzAuto::notify(bool isBeginAuto)
                     GLOBAL().PushMsg(hdr2, &pexp);
 
                     setBuffData(PLAYER_BUFF_SUFFER, TimeUtil::Now() + 30);
-                    pl[sufferId - 1]->AddVar(VAR_ARENA_SUFFERED, 1);
-                    pl[sufferId - 1]->SetVar(VAR_ARENA_LASTTIME, now);
-                    if(pl[sufferId - 1]->GetVar(VAR_ARENA_SUFFERED) == totalSufferCnt)
+                    World::stArena.sufferCnt[sufferId-1] += 1;
+                    World::stArena.lasttime[sufferId-1] = now;
+
+                    if(World::stArena.sufferCnt[sufferId-1] == totalSufferCnt)
                     {
                         UInt32 moneyArena = 500;
                         SYSMSGV(title, 736);
@@ -14625,7 +14607,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
                 st << static_cast<UInt8>(GetVar(VAR_ARENA_SUPPORT)) << seconds << static_cast<UInt16>(getBuffLeft(PLAYER_BUFF_SUFFER));
                 for(UInt8 i = 0; i < 5; i++)
                 {
-                    st << pl[i]->GetVar(VAR_ARENA_SUFFERED);
+                    st << World::stArena.sufferCnt[i];
                 }
                 st << Stream::eos;
                 send(st);
@@ -14638,7 +14620,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
                     st << static_cast<UInt8>(4);
                     for(UInt8 i = 0; i < 5; i++)
                     {
-                        st << pl[i]->GetVar(VAR_ARENA_SUFFERED);
+                        st << World::stArena.sufferCnt[i];
                     }
                     st << Stream::eos;
                     NETWORK()->Broadcast(st);
@@ -14647,26 +14629,26 @@ void EventTlzAuto::notify(bool isBeginAuto)
                 break;
                 case 3:
                 {
-                    if(World::_arenaResultRank[0] == 0 && World::_arenaResultRank[1] == 0 && World::_arenaResultRank[2] == 0 && World::_arenaResultRank[3] == 0 && World::_arenaResultRank[4] == 0)
+                    if(GObject::World::stArena.rank[0] == 0 && GObject::World::stArena.rank[1] == 0 && GObject::World::stArena.rank[2] == 0 && GObject::World::stArena.rank[3] == 0 && GObject::World::stArena.rank[4] == 0)
                     {
                         ValueSort cur;
                         ValueSortType resultRank;
                         for(UInt8 i = 0; i < 5; i++)
                         {
-                            cur.player = pl[i];
-                            cur.lastTime = pl[i]->GetVar(VAR_ARENA_LASTTIME);
+                            cur.sufferCnt = World::stArena.sufferCnt[i];
+                            cur.lastTime = World::stArena.lasttime[i];
+                            cur.name = World::stArena.name[i];
                             resultRank.insert(cur);
                         }
                         for(UInt8 i = 0; i < 5; i++)
                         {
-                            cur.player = pl[i];
                             UInt8 j = 0;
                             for(ValueSortType::iterator iter = resultRank.begin(), e = resultRank.end(); iter != e && j < 5; ++iter, ++j)
                             {
-                                if(cur.player == iter->player)
+                                if(iter->name == World::stArena.name[i])
                                     break;
                             }
-                            World::_arenaResultRank[i] = j + 1;
+                            World::stArena.rank[i] = j + 1;
                         }
                     }
                     Stream st(REP::SERVER_ARENA_EXTRA_ACT);
@@ -14675,8 +14657,8 @@ void EventTlzAuto::notify(bool isBeginAuto)
                     st << static_cast<UInt8>(GetVar(VAR_ARENA_SUPPORT));
                     for(UInt8 i = 0; i < 5; i++)
                     {
-                        st << pl[i]->GetVar(VAR_ARENA_SUFFERED);
-                        st << World::_arenaResultRank[i];
+                        st << World::stArena.sufferCnt[i];
+                        st << World::stArena.rank[i];
                     }
                     st << Stream::eos;
                     send(st);

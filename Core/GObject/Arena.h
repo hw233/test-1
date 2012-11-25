@@ -126,7 +126,7 @@ public:
 
     void updateLeaderBoard(BinaryReader& brd);
     void sendLeaderBoard(Player* pl);
-    void setArenaPlayer(UInt8 type);
+    void setArenaInfo(UInt8 type);
     //void setArenaTotalCnt(UInt8 type);
 private:
 	static void appendLineup( Stream& st, Player * player);

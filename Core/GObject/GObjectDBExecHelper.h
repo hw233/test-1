@@ -232,10 +232,11 @@ struct DBQixi
 struct DBArenaExtraBoard
 {
     UInt8 week;
+    std::string name[5];
+    UInt8 heroId[5];
     UInt32 sufferTotal;
-    UInt64 playerId[5];
     UInt32 sufferCnt[5];
-    UInt8 rank[5];
+    UInt32 lasttime[5];
 };
 
 struct DBFighterBuffData
@@ -1273,25 +1274,30 @@ SPECIALDEF(6)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBArenaExtraBoard)
-SPECIALDEF(17)
+SPECIALDEF(22)
     (
     UInt8, week,
+    std::string, name[0],
+    std::string, name[1],
+    std::string, name[2],
+    std::string, name[3],
+    std::string, name[4],
+    UInt8, heroId[0],
+    UInt8, heroId[1],
+    UInt8, heroId[2],
+    UInt8, heroId[3],
+    UInt8, heroId[4],
     UInt32, sufferTotal,
-    UInt64, playerId[0],
-    UInt64, playerId[1],
-    UInt64, playerId[2],
-    UInt64, playerId[3],
-    UInt64, playerId[4],
     UInt32, sufferCnt[0],
     UInt32, sufferCnt[1],
     UInt32, sufferCnt[2],
     UInt32, sufferCnt[3],
     UInt32, sufferCnt[4],
-    UInt8, rank[0],
-    UInt8, rank[1],
-    UInt8, rank[2],
-    UInt8, rank[3],
-    UInt8, rank[4]
+    UInt32, lasttime[0],
+    UInt32, lasttime[1],
+    UInt32, lasttime[2],
+    UInt32, lasttime[3],
+    UInt32, lasttime[4]
     )
 SPECIALEND()
 

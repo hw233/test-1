@@ -2230,24 +2230,29 @@ void Arena::sendLeaderBoard(Player* pl)
     pl->send(st);
 }
 
-void Arena::setArenaPlayer(UInt8 type)
+void Arena::setArenaInfo(UInt8 type)
 {
     if(type > 1)
         return;
+    WORLD().resetArenaInfo();
     PreliminaryPlayerListIterator it = _preliminaryPlayers_list[type].begin();
     Mutex::ScopedLock lk(globalPlayers.getMutex());
-    RCSort cur;
+    supportSort cur;
+    SupportSortType arenaSupported;
     for(; it != _preliminaryPlayers_list[type].end(); ++ it)
     {
-        cur.player = globalPlayers[it->id];
-        if(cur.player == NULL)
-            continue;
-        cur.total = it->support;
-        GObject::World::arenaSupported.insert(cur);
+        cur.support = it->support;
+        cur.heroId = it->heroId;
+        cur.name = it->name;
+        arenaSupported.insert(cur);
     }
     UInt8 i = 0;
-    for(GObject::RCSortType::iterator it = GObject::World::arenaSupported.begin(), e = GObject::World::arenaSupported.end(); i < 5 && it != e; i++, ++it)
-        WORLD().setArenaPlayer(i, it->player);
+    for(SupportSortType::iterator it = arenaSupported.begin(), e = arenaSupported.end(); i < 5 && it != e; i++, ++it)
+    {
+        WORLD().setArenaName(i, it->name);
+        WORLD().setArenaHeroId(i, it->heroId);
+    }
+
 }
 
 //void Arena::setArenaTotalCnt(UInt8 type)

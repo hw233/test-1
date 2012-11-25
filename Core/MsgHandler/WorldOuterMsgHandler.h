@@ -1531,18 +1531,14 @@ void OnArenaExtraActReq( GameMsgHdr& hdr, const void * data )
     brd >> week;
 	brd >> type;
 
-    UInt32 now = TimeUtil::Now();
-    UInt8 serverWeek = TimeUtil::GetWeekDay(now);
-    if(serverWeek < ARENA_ACT_WEEK_START || serverWeek > ARENA_ACT_WEEK_END)
+    if(week < ARENA_WEEK_START || week > ARENA_WEEK_END)
     {
-        Stream st(REP::SERVER_ARENA_EXTRA_ACT);
-        st << week;
-        st << static_cast<UInt8>(5);
-        st << Stream::eos;
-        player->send(st);
         return;
     }
-    UInt32 t1 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SINGUP_START;
+
+    UInt32 now = TimeUtil::Now();
+    UInt8 serverWeek = TimeUtil::GetWeekDay(now);
+    UInt32 t1 = TimeUtil::SharpDayT(0, now) + ARENA_SINGUP_START;
 
     if(serverWeek == week)
     {
@@ -1580,48 +1576,35 @@ void OnArenaExtraActReq( GameMsgHdr& hdr, const void * data )
     }
     else
     {
-        if(serverWeek > week && GObject::World::_arenaOldBoard[week-ARENA_ACT_WEEK_START].week == week)
+        if(serverWeek > week && GObject::World::stArenaOld[type].week == week)
         {
-            GObject::Player* pl[5];
-            for(UInt8 i = 0; i < 5; i++)
-            {
-                pl[i] = GObject::globalPlayers[GObject::World::_arenaOldBoard[week-ARENA_ACT_WEEK_START].playerId[i]];
-                if(pl[i] == NULL)
-                    return;
-            }
-
+            UInt8 type = week - ARENA_WEEK_START;
             Stream st(REP::SERVER_ARENA_EXTRA_ACT);
             st << week;
             st << static_cast<UInt8>(0);
-            UInt8 mainId;
             for(UInt8 i = 0; i < 5; i++)
             {
-                st << pl[i]->getName();
-                if(pl[i]->getMainFighter())
-                    mainId = pl[i]->getMainFighter()->getId();
-                else
-                    mainId = 0;
-                st << mainId;
+                st << GObject::World::stArena.name[i];
+                st << GObject::World::stArena.heroId[i];
             }
-            st << GObject::World::_arenaOldBoard[week-ARENA_ACT_WEEK_START].sufferTotal;
+            st << GObject::World::stArena.sufferTotal;
             st << Stream::eos;
             player->send(st);
 
             Stream st2(REP::SERVER_ARENA_EXTRA_ACT);
             st2 << week;
             st2 << static_cast<UInt8>(3);
-            if(week == ARENA_ACT_WEEK_START)
+            if(week == ARENA_WEEK_START)
                 st2 << static_cast<UInt8>(player->GetVar(GObject::VAR_ARENA_SUPPORT_TUE));
             else
                 st2 << static_cast<UInt8>(player->GetVar(GObject::VAR_ARENA_SUPPORT_WED));
             for(UInt8 i = 0; i < 5; i++)
             {
-                st2 << GObject::World::_arenaOldBoard[week-ARENA_ACT_WEEK_START].sufferCnt[i];
-                st2 << GObject::World::_arenaOldBoard[week-ARENA_ACT_WEEK_START].rank[i];
+                st2 << GObject::World::stArena.sufferCnt[i];
+                st2 << GObject::World::stArena.rank[i];
             }
             st2 << Stream::eos;
             player->send(st2);
-
         }
         else
         {
