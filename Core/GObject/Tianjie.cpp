@@ -979,10 +979,19 @@ void Tianjie::setRatePercent()
     if (percent - m_oldBroadPercent >= 25)
     {
         int msgId = 5011;
-        if (2 == m_currTjRate) msgId = 5021;
+        if (2 == m_currTjRate) msgId = m_currOpenedTjLevel == 999 ? 5069:5021;
         if (3 == m_currTjRate) msgId = 5031;
         if (percent < 100)
-            SYSMSG_BROADCASTV(msgId, m_tjTypeId, m_currTjRate, percent);
+        {
+            if (m_currOpenedTjLevel == 999)
+            {
+                SYSMSG_BROADCASTV(msgId, percent);
+            }
+            else
+            {
+                SYSMSG_BROADCASTV(msgId, m_tjTypeId, m_currTjRate, percent);
+            }
+        }
 
         m_oldBroadPercent = percent;
     }
@@ -1322,7 +1331,14 @@ void Tianjie::start1()
 
     if (m_isNetOk)
     {
-        SYSMSG_BROADCASTV(5010);
+        if (m_currOpenedTjLevel == 999)
+        {
+            SYSMSG_BROADCASTV(5067);
+        }
+        else
+        {
+            SYSMSG_BROADCASTV(5010);
+        }
         broadEvent1();
     }
 }
@@ -1434,11 +1450,15 @@ bool Tianjie::isFinish()
         DB1().PushUpdateData("update tianjie set is_finish=%d where level=%d", 1, m_currOpenedTjLevel);
 
         int msgId = 5013;
-        if (2 == m_currTjRate) msgId = 5022;
+        if (2 == m_currTjRate) msgId = m_currOpenedTjLevel==999 ? 5070:5022;
         if (3 == m_currTjRate) msgId = 5032;
         if (msgId == 5022)
         {
             SYSMSG_BROADCASTV(msgId, m_tjTypeId, m_currTjRate, m_tjTypeId, m_currTjRate);
+        }
+        else if (msgId == 5070)
+        {
+            SYSMSG_BROADCASTV(msgId);
         }
         else
         {
@@ -1488,7 +1508,14 @@ void Tianjie::start2()
 
     if (m_isNetOk)
     {
-        SYSMSG_BROADCASTV(5020);
+        if (m_currOpenedTjLevel == 999)
+        {
+            SYSMSG_BROADCASTV(5068);
+        }
+        else
+        {
+            SYSMSG_BROADCASTV(5020);
+        }
         broadEvent2();
     }
 }
@@ -1612,7 +1639,16 @@ void Tianjie::close2()
 
     memset(m_rate2DonateCount, 0, sizeof(m_rate2DonateCount));
     if (m_isNetOk)
-        SYSMSG_BROADCASTV(5023, m_tjTypeId, m_currTjRate);
+    {
+        if (m_currOpenedTjLevel == 999)
+        {
+            SYSMSG_BROADCASTV(5071);
+        }
+        else
+        {
+            SYSMSG_BROADCASTV(5023, m_tjTypeId, m_currTjRate);
+        }
+    }
 }
 void Tianjie::setEvent2MaxScore(Player* pl)
 {
@@ -1630,7 +1666,14 @@ void Tianjie::start3()
 
     if (m_isNetOk)
     {
-        SYSMSG_BROADCASTV(5030);
+        if (m_currOpenedTjLevel == 999)
+        {
+            SYSMSG_BROADCASTV(5072);
+        }
+        else
+        {
+            SYSMSG_BROADCASTV(5030);
+        }
         broadEvent3();
     }
     getTlzFights();
@@ -1886,7 +1929,14 @@ void Tianjie::start4(bool isRestart)
             broadBossAppear(s_tjBoss[m_bossIndex][0], m_loc);
             broadBossCount(m_eventCurrNumber);
 
-            SYSMSG_BROADCASTV(5040);
+            if (m_currOpenedTjLevel == 999)
+            {
+                SYSMSG_BROADCASTV(5073);
+            }
+            else
+            {
+                SYSMSG_BROADCASTV(5040);
+            }
             SYSMSG_BROADCASTV(554, s_tjBoss[m_bossIndex][0], m_loc, s_tjBoss[m_bossIndex][0]);
         }
     }
@@ -2206,6 +2256,8 @@ void Tianjie::closeBoss()
 
         NETWORK()->Broadcast(st);
     }
+    if (m_currOpenedTjLevel == 999)
+        SYSMSG_BROADCASTV(5074);
 
     broadEvent4(NULL, 0);
 }

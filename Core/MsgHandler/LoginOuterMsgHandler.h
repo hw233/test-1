@@ -359,7 +359,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
         if (4 == res)
         {
             UInt8 platform = atoi(player->getDomain());
-            if (cfg.GMCheck && (platform == 11 || platform == 17))
+            if (cfg.GMCheck )
             {
                 size_t len = 0;
                 char key[MEMCACHED_MAX_KEY] = {0};
@@ -1431,6 +1431,26 @@ void QueryLockUser(LoginMsgHdr& hdr,const void * data)
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
+void SetPlatformLoginLimit(LoginMsgHdr& hdr,const void * data)
+{
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    UInt8 pf = 0;
+    UInt32 value = 0;
+    CHKKEY();
+    br>>pf;
+    br>>value;
+
+    UInt8 ret = 1;
+    INFO_LOG("GMSETLOGINLIMIT: %u, %u", pf, value);
+    if (pf < 256)
+    {
+        setPlatformLogin(pf, value);
+        ret = 0;
+    }
+    Stream st(SPEP::SETLOGINLIMIT);
+    st << ret << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
 
 void GmHandlerFromBs(LoginMsgHdr &hdr,const void * data)
 {

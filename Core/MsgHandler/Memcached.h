@@ -5,6 +5,7 @@
 
 extern memcached_st* memc;
 extern int memc_version;
+extern int g_platform_login_number[256];
 
 static const char* MemcachedGet(const char* key, size_t key_size, char* value, size_t size);
 static bool MemcachedSet(const char* key, size_t key_size, const char* value, size_t size, int timeout = -1);
@@ -164,7 +165,8 @@ static bool checkCrack(std::string& platform, std::string& ip, UInt64 id)
     if (ip.empty())
         return false;
 
-    if (pf == 11 || pf == 17)
+//    if (pf == 11 || pf == 17)
+    if (pf >= 0 && pf < 255) 
     {
         initMemcache();
         if (memc)
@@ -178,12 +180,17 @@ static bool checkCrack(std::string& platform, std::string& ip, UInt64 id)
             if (MemcachedGet(key, len, value, sizeof(value)))
             {
                 v = atoi(value);
-                if (pf == 11 && v >= 3)
+                /*if (pf == 11 && v >= 3)
                 {
                     TRACE_LOG("id: %"I64_FMT"u from %s of asss_%d is cracking...", id, ip.c_str(), cfg.serverNum);
                     return true;
                 }
                 else if (pf == 17 && v >= 5)
+                {
+                    TRACE_LOG("id: %"I64_FMT"u from %s of asss_%d is cracking...", id, ip.c_str(), cfg.serverNum);
+                    return true;
+                }*/
+                if (g_platform_login_number[pf] > 0 && v >= g_platform_login_number[pf])
                 {
                     TRACE_LOG("id: %"I64_FMT"u from %s of asss_%d is cracking...", id, ip.c_str(), cfg.serverNum);
                     return true;
@@ -241,6 +248,39 @@ static UInt32 getLockUserValue(const UInt64 playerId)
     v = atoi(value);
     return v;
 }
+
+static void setPlatformLogin(UInt8 pf, int v)
+{
+    (void)setPlatformLogin;
+    initMemcache();
+    if (memc)
+    {
+        char value[32] = {0};
+        char key[MEMCACHED_MAX_KEY] = {0};
+        size_t len = snprintf(key, sizeof(key), "asss_loginlimit_%u", pf);
+        size_t vlen = snprintf(value, sizeof(value), "%d", v);
+
+        MemcachedSet(key, len, value, vlen, 0);
+
+        g_platform_login_number[pf] = v;
+    }
+}
+static void initPlatformLogin()
+{
+    (void)initPlatformLogin;
+    initMemcache();
+
+    for (int i = 0; i < 256; ++i)
+    {
+        char value[32] = {0};
+        char key[MEMCACHED_MAX_KEY] = {0};
+        size_t len = snprintf(key, sizeof(key), "asss_loginlimit_%u", i);
+        if (memc)
+            MemcachedGet(key, len, value, sizeof(value));
+        g_platform_login_number[i] = atoi(value);
+    }
+}
+
 
 #endif // _WIN32
 

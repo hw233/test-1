@@ -711,6 +711,7 @@ namespace SPEQ
     const UInt16 FORBIDSALE          = 0x135;// 全区禁止交易
     const UInt16 UNFORBIDSALE        = 0x136;// 全区解除禁止交易
     const UInt16 QUERYLOCKUSER       = 0x137;// 查询玩家是否被禁止登陆和交易
+    const UInt16 SETLOGINLIMIT       = 0x138;// 设置平台一个ip最大登录数
 }
 
 namespace SPEP
@@ -761,7 +762,7 @@ namespace SPEP
     const UInt16 FORBIDSALE          = 0x35;// 全区禁止交易
     const UInt16 UNFORBIDSALE        = 0x36;// 全区解除禁止交易
     const UInt16 QUERYLOCKUSER       = 0x37;// 查询玩家是否被禁止登陆和交易
-
+    const UInt16 SETLOGINLIMIT       = 0x38;// 设置平台一个ip最大登录数
 }
 
 namespace ARENAREQ
