@@ -31,13 +31,16 @@ struct MoneyIn
     int prestige;
 };
 
-struct stArenaExtraBoard
+struct stArenaExtra
 {
     UInt8 week;
+    std::string name[5];
+    UInt8 heroId[5];
     UInt32 sufferTotal;
-    UInt64 playerId[5];
     UInt32 sufferCnt[5];
+    UInt32 lasttime[5];
     UInt8 rank[5];
+    UInt64 playerId[5];
 };
 
 typedef std::list<Player*> LuckyDrawList;
@@ -57,6 +60,19 @@ struct lt_rcsort
 };
 
 typedef std::set<RCSort, lt_rcsort> RCSortType;
+
+struct supportSort
+{
+    UInt32 support;
+    UInt8 heroId;
+    std::string name;
+    UInt64 playerId;
+};
+struct lt_ssort
+{
+    bool operator()(const supportSort& a, const supportSort& b) const { return a.support >= b.support; }
+};
+typedef std::set<supportSort, lt_ssort> SupportSortType;
 
 struct QixiScore
 {
@@ -84,8 +100,9 @@ typedef std::map<Player*, QixiPlayersIt> QixiScoreMap;
 
 struct ValueSort
 {
-    Player* player;
+    UInt32 sufferCnt;
     UInt32 lastTime;
+    std::string name;
 };
 struct lt_valuesort
 {
@@ -417,33 +434,84 @@ public:
     inline static bool getTgcEvent()
     { return _tgcevent; }
 
-    inline static void setArenaPlayer(UInt8 pos, Player* szPlayer)
+    inline static void setArenaHeroId(UInt8 pos, UInt8 heroId)
+    {
+        if(pos < 5 && stArena.heroId[pos] != heroId)
+        {
+            stArena.heroId[pos] = heroId;
+        }
+    }
+    inline static UInt8 getArenaHeroId(UInt8 pos)
     {
         if(pos < 5)
         {
-            _arenaPlayer[pos] = szPlayer;
+            return stArena.heroId[pos];
+        }
+        return 0;
+    }
+
+    inline static void setArenaName(UInt8 pos, std::string name)
+    {
+        if(pos < 5/* && stArena.name[pos].compare(name) != 0*/)
+        {
+            if(stArena.name[pos] == name)
+                return;
+            stArena.name[pos] = name;
         }
     }
-    inline static void getArenaPlayer(UInt8 pos, Player** szPlayer)
+    inline static std::string getArenaName(UInt8 pos)
     {
+        static std::string nullName;
         if(pos < 5)
         {
-            *szPlayer = _arenaPlayer[pos];
+            return stArena.name[pos];
         }
+        return nullName;
     }
+
     inline static void setArenaTotalCnt(UInt16 total)
     {
-        if(total > 0 && total < 20)
-            total = 20;
-        if(_arenaTotalCnt != total)
-            _arenaTotalCnt = total;
+        if(stArena.sufferTotal != total)
+        {
+            stArena.sufferTotal = total;
+        }
     }
     inline static UInt16 getArenaTotalCnt()
     {
-        return _arenaTotalCnt;
+        return stArena.sufferTotal;
     }
     static void setArenaInfo(UInt8 type);
-    static void setAreanTotalCntEnum();
+    void setArenaTotalCntEnum();
+    inline void resetArenaInfo()
+    {
+        static std::string nullname;
+        GObject::World::stArena.week = 0;
+        GObject::World::stArena.sufferTotal = 0;
+        for(UInt8 i = 0; i < 5; i++)
+        {
+            GObject::World::stArena.name[i] = nullname;
+            GObject::World::stArena.heroId[i] = 0;
+            GObject::World::stArena.sufferCnt[i] = 0;
+            GObject::World::stArena.lasttime[i] = 0;
+            GObject::World::stArena.rank[i] = 0;
+            GObject::World::stArena.playerId[i] = 0;
+        }
+    }
+    inline static void setArenaPlayerId(UInt8 pos, UInt64 playerId)
+    {
+        if(pos < 5 && stArena.playerId[pos] != playerId)
+        {
+            stArena.playerId[pos] = playerId;
+        }
+    }
+    inline static UInt64 getArenaPlayerId(UInt8 pos)
+    {
+        if(pos < 5)
+        {
+            return stArena.playerId[pos];
+        }
+        return 0;
+    }
 
     inline static bool canDestory(UInt32 itemid)
     {
@@ -558,11 +626,8 @@ public:
     static bool _loginAward;
     static bool _bluediamonSuperman;
     static bool _tgcevent;
-    static RCSortType arenaSupported;
-    static Player* _arenaPlayer[5];
-    static UInt16 _arenaTotalCnt;
-    static UInt8 _arenaResultRank[5];
-    static stArenaExtraBoard _arenaOldBoard[2];
+    static stArenaExtra stArenaOld[2];
+    static stArenaExtra stArena;
 
 public:
     static RCSortType rechargeSort;

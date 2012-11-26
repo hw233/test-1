@@ -3399,7 +3399,10 @@ bool Fighter::delCitta( UInt16 citta, bool writedb )
     int idx = hasCitta(citta);
     if (idx < 0)
         return false;
-
+    UInt16 itemId = CITTA_ITEMID(citta);
+    //1202:三昧真火 1203:乾元指 1206:御剑术
+    if(itemId == 1202 || itemId == 1203 || itemId == 1206)
+        return false;
     std::vector<UInt16>::iterator it = _cittas.begin();
     std::advance(it, idx);
 
@@ -3426,23 +3429,23 @@ bool Fighter::delCitta( UInt16 citta, bool writedb )
 
             // 29-100, 30-10000, 31-1000000
             exp *= 0.6;
-            if (exp) {
-                UInt16 rCount1 = static_cast<UInt16>(exp / 1000000);
+            UInt16 rCount1 = 0;
+            UInt16 rCount2 = 0;
+            UInt16 rCount3 = 0;
+            if(exp){
+                rCount1 = static_cast<UInt16>(exp / 1000000);
                 exp = exp % 1000000;
-                UInt16 rCount2 = static_cast<UInt16>(exp / 10000);
+                rCount2 = static_cast<UInt16>(exp / 10000);
                 exp = exp % 10000;
-                UInt16 rCount3 = static_cast<UInt16>(exp / 100);
-
-                SYSMSG(title, 2105);
-                SYSMSGV(content, 2106, getLevel(), getColor(), getName().c_str(), yacb->type, yacb->getName().c_str(), lvl);
-                MailPackage::MailItem mitem[3] = {{31, rCount1}, {30, rCount2}, {29, rCount3}};
-                MailItemsInfo itemsInfo(mitem, DismissCitta, 3);
-                GObject::Mail * pmail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
-                if(pmail != NULL)
-                {
-                    GObject::mailPackageManager.push(pmail->id, mitem, 3, true);
-                }
+                rCount3 = static_cast<UInt16>(exp / 100);
             }
+            SYSMSG(title, 2105);
+            SYSMSGV(content, 2106, getLevel(), getColor(), getName().c_str(), yacb->type, yacb->getName().c_str(), lvl);
+            MailPackage::MailItem mitem[4] = {{itemId, 1}, {31, rCount1}, {30, rCount2}, {29, rCount3}};
+            MailItemsInfo itemsInfo(mitem, DismissCitta, 4);
+            GObject::Mail * pmail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+            if(pmail)
+                GObject::mailPackageManager.push(pmail->id, mitem, 4, true);
         }
     }
 

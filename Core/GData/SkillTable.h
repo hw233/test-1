@@ -16,6 +16,7 @@ namespace GData
 #define CITTA_LEVEL(x) (((UInt16)(x))%CITTA_LEVEL_MAX)
 #define CITTA_ID(x) (((UInt16)(x))/CITTA_LEVEL_MAX)
 #define CITTAANDLEVEL(c,l) (((UInt16)(c))*CITTA_LEVEL_MAX + ((UInt16)(l)))
+#define CITTA_ITEMID(x) ((UInt16)(x) / CITTA_LEVEL_MAX + LCITTA_ID - 1)
 
 enum
 {

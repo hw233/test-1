@@ -137,19 +137,18 @@ namespace GObject
 
 #define QIXI_MAX_STEPS  24
 #if 0
-#define ARENA_ACT_WEEK_START      2
-#define ARENA_ACT_WEEK_END        3
-#define ARENA_ACT_SINGUP_START    14*3600
-#define ARENA_ACT_SINGUP_END      ARENA_ACT_SINGUP_START+2*60*60
-#define ARENA_ACT_SUFFER_END      ARENA_ACT_SINGUP_END+2*60*60
+#define ARENA_WEEK_START      2
+#define ARENA_WEEK_END        3
+#define ARENA_SINGUP_START    (TimeUtil::Now()-TimeUtil::SharpDay(0))/3600*3600
+#define ARENA_SINGUP_END      ARENA_SINGUP_START+30*60
+#define ARENA_SUFFER_END      ARENA_SINGUP_END+15*60
 #else
-#define ARENA_ACT_WEEK_START      2
-#define ARENA_ACT_WEEK_END        3
-#define ARENA_ACT_SINGUP_START    13*3600
-#define ARENA_ACT_SINGUP_END      ARENA_ACT_SINGUP_START+30*60
-#define ARENA_ACT_SUFFER_END      ARENA_ACT_SINGUP_END+15*60
+#define ARENA_WEEK_START      2
+#define ARENA_WEEK_END        3
+#define ARENA_SINGUP_START    13*3600
+#define ARENA_SINGUP_END      ARENA_SINGUP_START+30*60
+#define ARENA_SUFFER_END      ARENA_SINGUP_END+15*60
 #endif
-#define ARENA_ACT_CNT_FLAG        0xFFFF
 #define ARENA_ACT_SYSTEM          10
 	class Map;
 	class Player;
@@ -1701,7 +1700,7 @@ namespace GObject
                 m_isOffical = true;
         }
         inline void setClientIp(const std::string& clientIp) { strncpy(m_clientIp, clientIp.c_str(), 256);}
-        inline void setOpenId(const std::string& openid) { strncpy(m_openid, openid.c_str(), 256); }
+        void setOpenId(const std::string& openid);
         inline void setOpenKey(const std::string& openkey) { strncpy(m_openkey, openkey.c_str(), 256); }
         inline void setSource(const std::string& source) { m_source = source; }
         inline void setVia(const std::string& via) { m_via = via; }
