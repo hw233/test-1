@@ -723,7 +723,7 @@ public:
     inline void setMarkMo(bool value, UInt8 last) { _markMo = value; _markMoLast= last; }
     inline bool isMarkMo() { return _markMo; }
     bool releaseMarkMo();
-    inline void setDeepBlind(bool value, UInt8 last) { _deep_blind_dmg_extra = value; _deep_blind_last = last; }
+    inline void setDeepBlind(float value, UInt8 last) { _deep_blind_dmg_extra = value; _deep_blind_last = last; }
     inline float getDeepBlindDmgExtra() { return _deep_blind_dmg_extra; }
     bool releaseDeepBlind();
     inline void setBlind(bool value, UInt8 last) { _blind = value; _blind_last = last; }

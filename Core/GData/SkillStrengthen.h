@@ -70,9 +70,10 @@ enum
     TYPE_RESIST_ADDSTATE = 30, // 被抵抗上状态
     TYPE_THERAPY_ANOTHER_MORE = 31, // 多治疗一个目标
     TYPE_DAMAGE_AROUND_ONE = 32, // 浅射附近的一个人
-    TYPE_HITRATE_EXTRA = 33, // 额外命中率
+    TYPE_HITRATE_EXTRA = 33, // 增加当前额外命中率
     TYPE_UNSUMMON_AURA = 34, // 残影消失时召唤者增加灵气
-    TYPE_DEC_COUNTER = 35, // 减敌方反击率
+    TYPE_DEC_COUNTER = 35, // 减敌方当前反击率
+    TYPE_HITRATE_COUNTER = 36, // 增加当前命中减敌方当前反击率
     TYPE_MAX,
 };
 

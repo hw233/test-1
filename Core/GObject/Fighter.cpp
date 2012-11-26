@@ -2500,17 +2500,18 @@ UInt16 Fighter::getUpSkillsNum()
 bool Fighter::testMutual( UInt16 skill )
 {
     UInt16 mutualSkills[] = {
-        1,5,
-        2,6,
-        3,7,
-        10,28,
-        11,15,
-        11,18,
-        12,16,
-        15,18,
-        19,23,
-        20,24,
-        21,25,
+        1,5, // 三昧真火，离火真解
+        2,6, // 天雷击，五雷正心觉
+        3,7, // 烈焰爆发，上清剑气
+        10,28, // 乾元指，
+        11,15, // 回春术，甘露咒
+        11,18, // 回春术，普渡慈航
+        12,16, // 回灵术，韦驮正气
+        15,18, // 甘露咒，普渡慈航
+        19,23, // 御剑术，御剑真决
+        20,24, // 破甲术，无形剑
+        21,25, // 大道剑，大道无常剑
+        30,31, // 暗影步法，幽冥步法
     };
 
     UInt16 j = 0;
@@ -3410,7 +3411,8 @@ bool Fighter::CanDelCitta(UInt16 citta)
 
 bool Fighter::canCittaBeDel(UInt16 citta)
 {
-    if(citta > 133 && citta < 140)
+    UInt16 cittaId = CITTA_ID(citta);
+    if(cittaId > 133 && cittaId < 140)
         return false;
 
     return true;

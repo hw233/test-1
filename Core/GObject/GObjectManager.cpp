@@ -2375,6 +2375,7 @@ namespace GObject
 				continue;
 			pl->GetActivityMgr()->LoadFromDB(atydata);
 		}
+		lc.finalize();
 
         // Load player Strengthen souls
         lc.prepare("Loading player StrengthenData:");

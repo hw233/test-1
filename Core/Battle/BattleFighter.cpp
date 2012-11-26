@@ -747,7 +747,7 @@ bool BattleFighter::calcHit( BattleFighter * defender, const GData::SkillBase* s
         GData::SkillStrengthenBase* ss = getSkillStrengthen(SKILL_ID(skill->getId()));
         const GData::SkillStrengthenEffect* ef = NULL;
         if(ss)
-            ef = ss->getEffect(GData::ON_ATTACK, GData::TYPE_HITRATE_EXTRA);
+            ef = ss->getEffect(GData::ON_ATTACK, GData::TYPE_HITRATE_COUNTER);
         if(ef)
         {
             hitrate += ef->value;
@@ -896,11 +896,6 @@ const GData::SkillBase* BattleFighter::getActiveSkill(bool need_therapy, bool no
         }
     }
 
-    size_t cnt = _activeSkill.size();
-    if(cnt == 0)
-        return NULL;
-
-    // therapy skill second while need therapy
     if(need_therapy)
     {
         const GData::SkillBase* skill = getTherapySkill();
@@ -908,6 +903,11 @@ const GData::SkillBase* BattleFighter::getActiveSkill(bool need_therapy, bool no
             return skill;
     }
 
+    size_t cnt = _activeSkill.size();
+    if(cnt == 0)
+        return NULL;
+
+    // therapy skill second while need therapy
     size_t idx0 = _activeSkillIdx % cnt;
     size_t idx = 0;
     for(size_t i = 0; i < cnt; ++i)
@@ -1262,13 +1262,15 @@ float BattleFighter::getCounter(BattleFighter* defgt, const GData::SkillBase* sk
 
     if(skill)
     {
-        GData::SkillStrengthenBase* ss = getSkillStrengthen(SKILL_ID(skill->getId()));
+        GData::SkillStrengthenBase* ss = defgt->getSkillStrengthen(SKILL_ID(skill->getId()));
         const GData::SkillStrengthenEffect* ef = NULL;
         if(ss)
+            ef = ss->getEffect(GData::ON_ATTACK, GData::TYPE_HITRATE_COUNTER);
+        if(!ef)
             ef = ss->getEffect(GData::ON_ATTACK, GData::TYPE_DEC_COUNTER);
         if(ef)
         {
-            counter += ef->value;
+            counter -= ef->valueExt1;
         }
     }
 
