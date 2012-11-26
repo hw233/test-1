@@ -1801,7 +1801,7 @@ CREATE TABLE `arena_extra_board` (
     `heroId2` tinyint(3) unsigned NOT NULL DEFAULT '0',
     `heroId3` tinyint(3) unsigned NOT NULL DEFAULT '0',
     `heroId4` tinyint(3) unsigned NOT NULL DEFAULT '0',
-    `heroId5` tinyint(3) unsigned NOT NULL DEFAULT '0'
+    `heroId5` tinyint(3) unsigned NOT NULL DEFAULT '0',
     `sufferTotal` int(10) unsigned NOT NULL,
     `sufferCnt1` int(10) unsigned NOT NULL,
     `sufferCnt2` int(10) unsigned NOT NULL,
