@@ -288,7 +288,7 @@ private:
     BattleFighter* getTherapyTarget2(BattleFighter* bf, UInt8 * excepts, size_t exceptCount);
     bool doSkillStatus(bool activeFlag, BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt, StatusChange* scList, size_t& scCount, bool& self, bool ifDecAura);
     bool doSkillStatus2(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt, StatusChange* scList, size_t& scCount);
-    bool doSkillState(BattleFighter* bf, const GData::SkillBase* skill, BattleObject* bo, float factor, DefStatus* defList, size_t& defCount, std::vector<AttackAct>* atkAct2, std::vector<AttackAct>* atkAct, StatusChange* scList, size_t& scCount);
+    bool doSkillState(BattleFighter* bf, const GData::SkillBase* skill, BattleObject* bo, float factor, UInt8 poisonTimes, UInt32& dmg, DefStatus* defList, size_t& defCount, std::vector<AttackAct>* atkAct2, std::vector<AttackAct>* atkAct, StatusChange* scList, size_t& scCount);
     bool doStateMagRes(BattleFighter* bf, BattleFighter* target_bo, UInt16 state, const GData::SkillBase* skill, DefStatus* defList, size_t& defCount, std::vector<AttackAct>* atkAct2, std::vector<AttackAct>* atkAct, StatusChange* scList, size_t& scCount);
 
     void getSkillTarget(BattleFighter* bf, const GData::SkillBase* skill, int& target_side, int& target_pos, int& cnt);
@@ -395,7 +395,7 @@ private:
     UInt32 doSkillStrenghtenCriticalPierceDmgB(BattleFighter* bf, const GData::SkillBase* skill, bool cs, bool pr, GData::SkillStrengthenBase*  ss, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
 
     void getSkillEffectExtraHitrate(BattleFighter* bf, BattleFighter* bo, const GData::SkillBase* skill, float& hitrate, UInt8& last);
-    UInt32 getSkillEffectExtraHitCnt(BattleFighter* bf, BattleFighter* bo, const GData::SkillBase* skill);
+    UInt32 getSkillEffectExtraHitCnt(BattleFighter* bf, BattleFighter* bo, const GData::SkillBase* skill, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
 
     void doSkillEffectExtraAttack(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
 
@@ -417,6 +417,7 @@ private:
 
     void doSkillStrenghtenTherapyAnotherMore(BattleFighter* bf, UInt32 dmg, const GData::SkillBase* skill, GData::SkillStrengthenBase*  ss, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
 
+    int getNearOnePos(int side, int pos);
     UInt32 doSkillStrenghtenCriticalDamageAroundOne(BattleFighter* bf, const GData::SkillBase* skill, bool cs, GData::SkillStrengthenBase*  ss, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
     UInt16 getSkillEffectExtraBlind(BattleFighter* bf, BattleFighter* target_bo, const GData::SkillBase* skill);
 

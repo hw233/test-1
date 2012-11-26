@@ -9,11 +9,11 @@ agi_factor = {5,   4,     7,     6}  -- 敏捷
 int_factor = {8,   7,     4,     4}  -- 智力
 wil_factor = {5,   9,     5,     4}  -- 意志
 
-hp_factor     = { 0,   0,   0}  -- 生命
-atk_factor    = { 0,   0,   0}  -- 物功
-def_factor    = { 0,   0,   0}  -- 物防
-magatk_factor = { 0,   0,   0}  -- 法功
-magdef_factor = { 0,   0,   0}  -- 法防
+hp_factor     = { 0,   0,   0, 0}  -- 生命
+atk_factor    = { 0,   0,   0, 0}  -- 物功
+def_factor    = { 0,   0,   0, 0}  -- 物防
+magatk_factor = { 0,   0,   0, 0}  -- 法功
+magdef_factor = { 0,   0,   0, 0}  -- 法防
 
 tough_factor       = { 0,  0,  0, 0}  -- 坚韧
 action_factor      = {11, 12, 10, 12}  -- 身法
@@ -602,6 +602,15 @@ end
 function calcSkillBattlePoint(c, l, t, s)
     local bp = 0;
     if s == 0 then
+        if nil == bp_factor_skill_color[c] then
+            print("bp_factor_skill_color"..c);
+        end
+        if nil == bp_factor_skill_type[t] then
+            print("bp_factor_skill_type"..t)
+        end
+        if nil == bp_factor_skill_level then
+            print("bp_factor_skill_level"..l)
+        end
         bp = bp_factor_skill_color[c] * bp_factor_skill_type[t] * bp_factor_skill_level[l] 
     else
         bp = bp_factor_skill_color[c] * bp_factor_skill_type[t] * (bp_factor_skill_level[l] + bp_factor_ss_level[s])

@@ -471,7 +471,7 @@ CREATE TABLE `skill_effect` (
   `magres` float(10,4) NOT NULL DEFAULT '0.0000',
   `atkreduce` float(10,4) NOT NULL DEFAULT '0.0000',
   `magatkreduce` float(10,4) NOT NULL DEFAULT '0.0000',
-  `eft` smallint(5) NOT NULL DEFAULT '0',
+  `eft` varchar(255) NOT NULL DEFAULT '',
   `efl` varchar(255) NOT NULL DEFAULT '',
   `efv` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
