@@ -59,6 +59,7 @@
 #include "GData/ClanLvlTable.h"
 #include "GData/ClanSkillTable.h"
 #include "GData/ClanStatueTable.h"
+#include "GData/ExpTable.h"
 #include "Common/StringTokenizer.h"
 #include "TownDeamon.h"
 #include "ArenaBattle.h"
@@ -1121,7 +1122,6 @@ namespace GObject
 #endif
 #endif // _WIN32
 #ifdef JOB_HUNTER_DEBUG
-        getJobHunter();
 #endif
 	}
 
@@ -2464,7 +2464,18 @@ namespace GObject
         fgt->getAttrType1(true);
         fgt->getAttrType2(true);
         fgt->getAttrType3(true);
-	}
+        if (fgt->getClass() == 4)
+        {
+            // 70级，关元穴穴道，60级白虎
+            fgt->addExp(GData::expTable.getLevelMin(70));
+            fgt->openSecondSoul(4);
+            for (UInt8 i = 0; i < 11; ++i)
+            {
+                fgt->setAcupoints(i, 3, true, true);
+            }
+
+        }
+    }
 
     bool Player::addFighterFromItem(UInt32 itemid, UInt32 price)
     {
@@ -5199,8 +5210,7 @@ namespace GObject
 			{
 				exp /= 2;
 				SYSMSG_SENDV(181, this);
-				SYSMSG_SENDV(1081, this);
-			}
+				SYSMSG_SENDV(1081, this); }
 		}
 		for(int i = 0; i < 5; ++ i)
 		{
@@ -14030,16 +14040,9 @@ namespace GObject
        {
            _jobHunter = new JobHunter(this);
        }
-#ifdef JOB_HUNTER_DEBUG
-       else
-       {
-           delete _jobHunter;
-           _jobHunter = NULL;
-           _jobHunter = new JobHunter(this);
-       }
-#endif
        return _jobHunter;
    }
+
 
 EventTlzAuto::EventTlzAuto( Player * player, UInt32 interval, UInt32 count)
 	: EventBase(player, interval, count)

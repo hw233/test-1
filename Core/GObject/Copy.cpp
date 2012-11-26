@@ -480,6 +480,11 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
             if (!pl->GetShuoShuo()->getShuoShuo(id-1 + SS_COPY1))
                 pl->OnShuoShuo(id-1 + SS_COPY1);
 
+            if (pl->GetVar(VAR_MAX_COPY_PASS) < id)
+            {
+                pl->SetVar(VAR_MAX_COPY_PASS, id);
+            }
+
             pl->setContinuousRFAward(3);
 
             TeamCopyPlayerInfo* tcpInfo = pl->getTeamCopyPlayerInfo();

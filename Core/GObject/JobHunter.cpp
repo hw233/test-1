@@ -10,6 +10,7 @@
 #include "GData/NpcGroup.h"
 #include "Script/GameActionLua.h"
 #include "Country.h"
+#include "Map.h"
 
 //************************************************
 // 用于第四职业招募的——寻墨
@@ -20,7 +21,7 @@ namespace GObject
 
 JobHunter::JobHunter(Player * player)
     : _owner(player), _slot1(0), _slot2(0), _slot3(0), _strengthPoint(0),
-      _gameProgress(PROGRESS_NONE), _posX(0), _posY(0), _stepCount(0)
+      _gameProgress(PROGRESS_NONE), _posX(0), _posY(0), _earlyPosX(0), _earlyPosY(0), _stepCount(0)
 {
     _nextMoveTime = TimeUtil::Now();
 }
@@ -160,9 +161,11 @@ void JobHunter::OnRequestStart(UInt8 index)
     if ( index >= PROGRESS_MAX)
         return;
     _gameProgress = index;
-    OnUpdateSlot(true);
+    //OnUpdateSlot(true);
     SendGameInfo(2);
     InitMap();
+    UInt16 spot = GetSpotIdFromGameId(index);
+    _owner->moveTo(spot, true);
 }
 
 void JobHunter::OnUpdateSlot(bool isAuto /* = false */)
@@ -230,7 +233,7 @@ void JobHunter::SendGameInfo(UInt8 type)
         st << static_cast<UInt8> (_slot1);                  // 1号摇奖位 
         st << static_cast<UInt8> (_slot2);                  // 2号摇奖位 
         st << static_cast<UInt8> (_slot3);                  // 3号摇奖位 
-        st << static_cast<UInt8> (_gameProgress ? 0 : 1);   // 是否已经进入寻墨地图
+        st << static_cast<UInt8> (_gameProgress ? 1 : 0);   // 是否已经进入寻墨地图
         st <<Stream::eos;
         _owner->send(st);
     }
@@ -240,7 +243,6 @@ void JobHunter::SendMapInfo()
 {
     // 发送地图信息
     Stream st(REP::JOBHUNTER);
-    st << Stream::eos;
     st << static_cast<UInt8>(0);
 
     for (UInt8 y = 0; y < MAX_POS_Y; ++ y)
@@ -250,19 +252,18 @@ void JobHunter::SendMapInfo()
             MapInfo::iterator it = _mapInfo.find(POS_TO_INDEX(x,y));
             if (it != _mapInfo.end())
             {
-                if (!(it->second).gridType | KNOWN_FLAG)
+#if 0
+                if ((it->second).gridType & UNKNOWN_FLAG)
                 {
-                    st << static_cast<UInt8>(1); // 未探索
+                    st << static_cast<UInt8>(UNKNOWN_FLAG); // 未探索
                 }
                 else
                 {
-                    if ((it->second).gridType == GRID_NORMAL)
-                        st << static_cast<UInt8>(3); // 已探索且完成的
-                    else if ((it->second).gridType == GRID_BORN)
-                        st << static_cast<UInt8>(0x12); // 玩家出生点
-                    else
-                        st << static_cast<UInt8>(2); // 已探索但有事件未完成的
+                    st << static_cast<UInt8>((it->second).gridType);
                 }
+#else
+                st << static_cast<UInt8>((it->second).gridType);
+#endif
             }
             else
             {
@@ -270,6 +271,8 @@ void JobHunter::SendMapInfo()
             }
         }
     }
+    st << static_cast<UInt8>(POS_TO_CLIENT_POS(POS_TO_INDEX(_posX, _posY)));
+    st << Stream::eos;
     _owner->send(st);
 }
 
@@ -283,22 +286,24 @@ void JobHunter::SendGridInfo(UInt16 pos)
     st << static_cast<UInt8>(1);
 
     st << static_cast<UInt8>(POS_TO_CLIENT_POS(pos));
-    if (!(it->second).gridType | KNOWN_FLAG)
+#if 0
+    if (!((it->second).gridType & UNKNOWN_FLAG))
     {
-        st << static_cast<UInt8>(1); // 未探索
+        st << static_cast<UInt8>(UNKNOWN_FLAG); // 未探索
     }
     else
     {
-        if ((it->second).gridType == GRID_NORMAL)
-            st << static_cast<UInt8>(3); // 已探索且完成的
-        else
-            st << static_cast<UInt8>(2); // 已探索但有事件未完成的
+            st << static_cast<UInt8>((it->second).gridType); 
     }
+#else
+    st << static_cast<UInt8>((it->second).gridType); 
+#endif
 
     st << static_cast<UInt8>(POS_TO_CLIENT_POS(POS_TO_INDEX(_posX, _posY)));
 
     st << Stream::eos;
     _owner->send(st);
+    DumpMapData();
 }
 
 void JobHunter::OnCommand(UInt8 command, UInt8 val, UInt8 val2)
@@ -339,16 +344,20 @@ void JobHunter::OnCommand(UInt8 command, UInt8 val, UInt8 val2)
                     if (!val2)
                         OnGetTreasure();
                     break;
-                case GRID_TRAP:
+                case GRID_LENGEND:  // 功能已去除
+                    /*
+                    if (!val2)
+                        OnAttackMonster(POS_TO_INDEX(_posX, _posY));
+                    break;
+                        */
+                case GRID_TRAP: // 功能已去除
+                    /*
                     if (!val2)
                         OnSolveTrap();
                     else
                         OnBreakthroughTrap();
                     break;
-                case GRID_LENGEND:
-                    if (!val2)
-                        OnAttackMonster(POS_TO_INDEX(_posX, _posY));
-                    break;
+                        */
                 default:
                     break;
             }
@@ -356,6 +365,17 @@ void JobHunter::OnCommand(UInt8 command, UInt8 val, UInt8 val2)
         default:
             break;
     }
+    DumpMapData();
+}
+
+UInt16 JobHunter::GetSpotIdFromGameId(UInt8 id)
+{
+    // 根据游戏id获取对应的据点id
+    Map *map = Map::FromID(MAP_ID_INDEX[id]);
+    if (!map)
+        return 0;
+    else
+        return map->GetRandomSpot(9);
 }
 
 bool JobHunter::InitMap()
@@ -377,7 +397,7 @@ bool JobHunter::InitMap()
 
     // 选取一个初始点作为地图目标点（墨家秘洞）
     UInt16 curPos = POS_TO_INDEX(_rnd(MAX_POS_X), _rnd(MAX_POS_Y));
-    UInt8  type = GRID_CAVE;
+    UInt8  type = GRID_MONSTER;
     validGrid.push_back(curPos);
     UInt16 index = 0;
     invalidGrid.erase(curPos);
@@ -385,6 +405,21 @@ bool JobHunter::InitMap()
     for (UInt8 i = 0; i < MAX_GRID; ++ i)
     {
         // 选择12个点作为地图中可行进点
+        UInt8 prob = _rnd(100);
+        if (prob < 80)
+        {
+            type = GRID_MONSTER;
+        }
+        else
+        {
+            type = GRID_TREASURE;
+        }
+
+        if ( ++(gridCount[type]) >= MAX_GRID_COUNT[type])
+            type = GRID_MONSTER;
+
+        type |= UNKNOWN_FLAG;
+
         _mapInfo.insert(std::make_pair(curPos, GridInfo(curPos, type, neighbourCount[curPos])));
         validGrid.erase(validGrid.begin() + index);
         UInt8 x = 0;
@@ -467,35 +502,32 @@ bool JobHunter::InitMap()
         }
         index = _rnd(validGrid.size());
         curPos = validGrid[index];
-        UInt8 prob = _rnd(100) + 1;
+
+
+#if 0
         type = GameAction()->calcGridType(prob);
         if (type == GRID_BOSS)
             type = GRID_MONSTER;
-
-        if ( ++(gridCount[type]) >= MAX_GRID_COUNT[type])
-            type = GRID_MONSTER;
+#endif
     }
 
-    AddBossGrid();
-    AddLengendGrid();
+    SelectBossGrid();
+    SelectCaveGrid();
     SelectBornGrid();
     DumpMapData();
     return true;
 }
 
-void JobHunter::AddBossGrid()
+void JobHunter::SelectBossGrid()
 {
     // 选择符合条件的点概率出现boss
     for (MapInfo::iterator it = _mapInfo.begin(); it != _mapInfo.end(); ++ it)
     {
-        if ((it->second).neighbCount == 1 && (it->second).gridType != GRID_CAVE)
+        if ((it->second).neighbCount == 1)
         {
-            if (_rnd(2))
-            {
-                // 该点设置为BOSS点
-                (it->second).gridType = GRID_BOSS;
-                break;
-            }
+            // 该点设置为BOSS点
+            (it->second).gridType = GRID_BOSS | UNKNOWN_FLAG;
+            break;
         }
     }
 }
@@ -517,6 +549,34 @@ void JobHunter::AddLengendGrid()
     }
 }
 
+void JobHunter::SelectCaveGrid()
+{
+    // 选取一个地点作为目标点
+    UInt8 rndIndex = _rnd(_mapInfo.size());
+    UInt8 index = 0;
+    for (MapInfo::iterator it = _mapInfo.begin(); it != _mapInfo.end(); ++ it)
+    {
+        if ((index == rndIndex) && ((it->second).gridType & 0x0F) != GRID_BOSS)
+        {
+            // 就选择这个作为目标点
+            (it->second).gridType = GRID_CAVE | UNKNOWN_FLAG;
+            return;
+        }
+        ++ index;
+    }
+
+    // 洞穴点和boss或者出生点重复重新选取一个
+    for (MapInfo::iterator it = _mapInfo.begin(); it != _mapInfo.end(); ++ it)
+    {
+        if (((it->second).gridType & 0x0F) != GRID_BOSS)
+        {
+            // 就选择这个作为目标点
+            (it->second).gridType = GRID_CAVE | UNKNOWN_FLAG;
+            return;
+        }
+    }
+}
+
 void JobHunter::SelectBornGrid()
 {
     // 选取一个合适的出生点
@@ -524,22 +584,26 @@ void JobHunter::SelectBornGrid()
     UInt8 index = 0;
     for (MapInfo::iterator it = _mapInfo.begin(); it != _mapInfo.end(); ++ it)
     {
-        if ((index == rndIndex) && (it->second).gridType != GRID_CAVE && (it->second).gridType != GRID_LENGEND )
+        if ((index == rndIndex) && ((it->second).gridType & 0x0F) != GRID_BOSS && ((it->second).gridType & 0x0F) != GRID_CAVE )
         {
             // 就选择这个作为出生点了
-            (it->second).gridType = GRID_BORN;
+            (it->second).gridType &= GRID_NORMAL;
+            _earlyPosX = _posX = (it->second).posX;
+            _earlyPosY = _posY = (it->second).posY;
             return;
         }
         ++ index;
     }
 
-    // 目标点和出生点重复重新选取一个
+    // BOSS点和出生点重复重新选取一个
     for (MapInfo::iterator it = _mapInfo.begin(); it != _mapInfo.end(); ++ it)
     {
-        if ((it->second).gridType != GRID_CAVE && (it->second).gridType != GRID_LENGEND)
+        if (((it->second).gridType & 0x0F) != GRID_BOSS && ((it->second).gridType & 0x0F) != GRID_CAVE )
         {
             // 就选择这个作为出生点了
-            (it->second).gridType = GRID_BORN;
+            (it->second).gridType = GRID_NORMAL;
+            _earlyPosX = _posX = (it->second).posX;
+            _earlyPosY = _posY = (it->second).posY;
             return;
         }
     }
@@ -564,68 +628,78 @@ void JobHunter::OnMove(UInt16 pos)
         _owner->sendMsgCode(0, 2202, x * 100 + y); // 该地点无法到达
     }
 
-    switch ((it->second).gridType & ~KNOWN_FLAG)
+    if (((it->second).gridType & CLEAR_FLAG))
     {
-        case GRID_NORMAL:
-            break;
-        case GRID_MONSTER:
-            // 普通怪物，可能被偷袭
-            {
-                UInt8 prob = _rnd(100);
-                if (prob < 50)
+        // 该格子事件已经完成
+    }
+    else
+    {
+        // 该格子事件未完成
+        switch ((it->second).gridType & 0x0F)
+        {
+            case GRID_NORMAL:
+                break;
+            case GRID_MONSTER:
+                // 普通怪物，可能被偷袭
                 {
-                    // 被偷袭直接开打
-                    bool res = OnAttackMonster(pos);
-                    if (!res)
+                    UInt8 prob = _rnd(100);
+                    if (prob < 50)
                     {
-                        // 失败，停留在原位
-                        (it->second).gridType |= KNOWN_FLAG;
-                        return;
-                    }
-                    else
-                    {
-                        // 打赢，格子类型变为普通类型
-                        (it->second).gridType = GRID_NORMAL;
+                        // 被偷袭直接开打
+                        bool res = OnAttackMonster(pos);
+                        if (!res)
+                        {
+                            // 失败，停留在原位
+                            SendGridInfo(pos);
+                        }
+                        else
+                        {
+                            // 打赢，格子类型变为普通类型
+                        }
                     }
                 }
-            }
-            break;
-        case GRID_BOSS:
-            // Boss，也可能被偷袭
-            {
-                UInt8 prob = _rnd(100);
-                if (prob < 50)
+                break;
+            case GRID_BOSS:
+                // Boss，也可能被偷袭
                 {
-                    // 被偷袭直接开打
-                    bool res = OnAttackMonster(pos);
-                    if (!res)
+                    UInt8 prob = _rnd(100);
+                    if (prob < 50)
                     {
-                        // 失败，停留在原位
-                    }
-                    else
-                    {
-                        // 打赢，格子类型变为普通类型
-                        (it->second).gridType = GRID_NORMAL;
+                        // 被偷袭直接开打
+                        bool res = OnAttackMonster(pos);
+                        if (!res)
+                        {
+                            // 失败，停留在原位
+                        }
+                        else
+                        {
+                            // 打赢，格子类型变为普通类型
+                        }
                     }
                 }
-            }
-            break;
-        case GRID_TREASURE:
-            break;
-        case GRID_TRAP:
-            break;
-        case GRID_LENGEND:
-            break;
-        case GRID_CAVE:
-            break;
-        default:
-            break;
+                break;
+            case GRID_TREASURE:
+                break;
+            case GRID_TRAP:
+                break;
+            case GRID_LENGEND:
+                break;
+            case GRID_CAVE:
+                break;
+            default:
+                break;
+        }
     }
 
     //  更新该格子的信息
-    (it->second).gridType |= KNOWN_FLAG;
+    (it->second).gridType &= ~UNKNOWN_FLAG;
+
+    _earlyPosX = _posX;
+    _earlyPosY = _posY;
+
     _posX = x;
     _posY = y;
+
     SendGridInfo(pos);
 }
 
@@ -645,7 +719,7 @@ bool JobHunter::OnAttackMonster(UInt16 pos)
     MapInfo::iterator it = _mapInfo.find(pos);
     if (it == _mapInfo.end())
         return false;
-    switch((it->second).gridType & ~KNOWN_FLAG)
+    switch((it->second).gridType & 0x0F)
     {
         case GRID_MONSTER:
             npcId = GameAction()->getRandomNormalMonster(_gameProgress);
@@ -665,6 +739,8 @@ bool JobHunter::OnAttackMonster(UInt16 pos)
 
     GData::NpcGroup * ng = npcIt->second;
     Battle::BattleSimulator bsim(Battle::BS_COPY5, _owner, ng->getName(), ng->getLevel(), false);
+    _owner->PutFighters(bsim, 0);
+    ng->putFighters(bsim);
     bsim.start();
 
     Stream& packet = bsim.getPacket();
@@ -680,6 +756,7 @@ bool JobHunter::OnAttackMonster(UInt16 pos)
         _owner->_lastNg = ng;
         _owner->pendExp(ng->getExp());
         ng->getLoots(_owner, _owner->_lastLoot, 0, NULL);
+        (it->second).gridType |= CLEAR_FLAG;
     }
     else
     {
@@ -702,7 +779,7 @@ bool JobHunter::OnAttackMonster(UInt16 pos)
 
 void JobHunter::OnSolveTrap()
 {
-    // 解锁机关
+    // 解锁机关 (已删除功能)
     if (!CheckGridType(GRID_TRAP))
         return;
     _nextMoveTime = TimeUtil::Now() + 30;
@@ -713,7 +790,7 @@ void JobHunter::OnSolveTrap()
 
 void JobHunter::OnBreakthroughTrap()
 {
-    // 前行突破机关
+    // 前行突破机关 (已删除功能)
     if (!CheckGridType(GRID_TRAP))
         return;
     UInt8 prob = _rnd(100);
@@ -729,7 +806,7 @@ void JobHunter::OnBreakthroughTrap()
     SendGridInfo(POS_TO_INDEX(_posX, _posY));
 }
 
-void JobHunter::OnGetTreasure()
+void JobHunter::OnGetTreasure(bool isAuto /* = false */)
 {
     // 打开宝箱
     if (!CheckGridType(GRID_TREASURE))
@@ -750,22 +827,71 @@ void JobHunter::OnGetTreasure()
         st << static_cast<UInt32>(itemId);
         st << static_cast<UInt32>(itemCount);
     }
-
     st << Stream::eos;
     _owner->send(st);
-        
+
+    MapInfo::iterator it = _mapInfo.find(POS_TO_INDEX(_posX, _posY));
+    (it->second).gridType |= CLEAR_FLAG;
 }
 
-void JobHunter::OnFoundCave()
+bool JobHunter::OnFoundCave(bool isAuto /* = false */)
 {
     // 找到洞穴
     if (!CheckGridType(GRID_CAVE))
-        return;
-    UInt32 val = GameAction()->foundCave(_gameProgress);
-    if (val)
+        return false;
+    UInt32 npcId = GameAction()->foundCave(_gameProgress);
+    MapInfo::iterator it = _mapInfo.find(POS_TO_INDEX(_posX, _posY));
+
+    if (!npcId)
+        return false;
+    GData::NpcGroups::iterator npcIt = GData::npcGroups.find(npcId);
+    if(npcIt == GData::npcGroups.end())
+        return false;
+
+    GData::NpcGroup * ng = npcIt->second;
+    Battle::BattleSimulator bsim(Battle::BS_COPY5, _owner, ng->getName(), ng->getLevel(), false);
+    _owner->PutFighters(bsim, 0);
+    ng->putFighters(bsim);
+    bsim.start();
+
+    Stream& packet = bsim.getPacket();
+    if(packet.size() <= 8)
+        return false;
+
+    UInt16 ret = 0x0100;
+    bool res = bsim.getWinner() == 1;
+    if (res)
     {
-        AddToFighterList(static_cast<UInt16>(val));
+        // 消灭怪物
+        (it->second).gridType |= CLEAR_FLAG;
+        ret = 0x0101;
+        _owner->_lastNg = ng;
+        _owner->pendExp(ng->getExp());
+        ng->getLoots(_owner, _owner->_lastLoot, 0, NULL);
+
     }
+    else
+    {
+        // 被怪物打败
+    }
+
+    Stream st(REP::ATTACK_NPC);
+    st << ret << PLAYER_DATA(_owner, lastExp) << static_cast<UInt8>(0);
+
+    /*
+    UInt8 sz = _owner->_lastLoot.size();
+    st << sz;
+    for(UInt8 i = 0; i < sz; ++ i)
+    {
+        st << _owner->_lastLoot[i].id << _owner->_lastLoot[i].count;
+    }
+    */
+    st.append(&packet[8], packet.size() - 8);
+    st << Stream::eos;
+    _owner->send(st);
+    AddToFighterList(static_cast<UInt16>(_rnd(100) + 10));
+    SendFighterList();
+    return res;
 }
 
 void JobHunter::OnAutoExplore()
@@ -813,6 +939,8 @@ void JobHunter::DumpMapData()
     }
     puts(buffer);
     puts(buffer2);
+    snprintf (buffer, 1024, "Player pos: x = 0X%X, y = 0X%X.\n", _posX, _posY);
+    puts(buffer);
 #else
 #endif
 }

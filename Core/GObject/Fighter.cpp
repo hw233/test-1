@@ -4976,6 +4976,13 @@ void Fighter::reload2ndSoul()
     }
 }
 
+void Fighter::setSoulLevel(UInt32 level)
+{
+    if(m_2ndSoul || !_owner)
+        return;
+    m_2ndSoul->setLevel(level);
+}
+
 void Fighter::resetLevelAndExp(UInt8 maxLevel)
 {
     UInt64 exp = GData::expTable.getLevelMin(maxLevel);

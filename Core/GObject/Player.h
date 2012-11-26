@@ -470,7 +470,7 @@ namespace GObject
         UInt32 qqawardEnd;          // QQ ??????ȡ????ʱ??
         UInt32 ydGemId;             // QQ VIP??ʯ????
 		UInt16 location;            // λ??
-		UInt8 inCity;               // ????
+		UInt8 inCity;               // ???? // 现在始终为true
 		UInt32 lastOnline;          // ?ϴ?????ʱ??
 		UInt64 newGuild;            // ????????????
 		UInt16 packSize;            // ???ұ?????
@@ -1901,6 +1901,7 @@ namespace GObject
 
     public:
         JobHunter * getJobHunter();
+        void    adjustExJob(Fighter* fighter);
     private:
         JobHunter * _jobHunter;
 	};

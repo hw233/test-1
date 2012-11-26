@@ -909,7 +909,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     Wansheng(player, lootlvl);
     Guoqing(player, lootlvl);
     LuckyDrawBox(player, id)
-    ExJob(player, id)
+    ExJob(player, id, lootlvl)
     if player:getQQVipPrivilege() == true then
         player:setQQVipPrivilege(false)
         FallActivity(player, 1)

@@ -32,14 +32,6 @@ static const UInt8 MAX_POS_X = 5;
 static const UInt8 MAX_POS_Y = 5;
 static const UInt8 MAX_GRID  = 12;
 
-/*
-static const UInt8 MAX_GRID_TRAP = 2;
-static const UInt8 MAX_GRID_MONSTER = MAX_GRID;
-static const UInt8 MAX_GRID_BOSS = 1;
-static const UInt8 MAX_GRID_TREASURE = 2;
-static const UInt8 MAX_GRID_NORMAL = 1;
-*/
-
 static const UInt8 MAX_GRID_COUNT[256]
 {
     0, // INVALID
@@ -56,24 +48,33 @@ static const UInt32 SPOT_ID[5] = {
     0, 122, 23232, 32332, 111
 };
 
+static const UInt8 MAP_ID_INDEX[] = {
+    0,
+    32,
+    50,
+    41,
+    20,
+    0
+};
+
 
 class JobHunter
 {
 
-#define KNOWN_FLAG 0x80
+#define UNKNOWN_FLAG 0x80
+#define CLEAR_FLAG 0x40
 
     enum GridType
     {
-        GRID_INVALID    = 0,    // 无法到达的格子
-        GRID_NORMAL     = 1,    // 普通已探索格子
-        GRID_MONSTER    = 2,    // 怪物格子
-        GRID_BOSS       = 3,    // boss格子
-        GRID_TREASURE   = 4,    // 宝箱格子
-        GRID_TRAP       = 5,    // 陷阱格子
+        GRID_INVALID    = 0x0,    // 无法到达的格子
+        GRID_NORMAL     = 0x1,    // 普通已探索格子
+        GRID_MONSTER    = 0x2,    // 怪物格子
+        GRID_BOSS       = 0x3,    // boss格子
+        GRID_TREASURE   = 0x4,    // 宝箱格子
+        GRID_TRAP       = 0x5,    // 陷阱格子
         GRID_NORMAL_MAX,
-        GRID_CAVE       = 0x11, // 目标格子，墨家秘洞存在宝物和散仙（概率存在）
-        GRID_BORN       = 0x12, // 玩家出生点
-        GRID_LENGEND    = 0x13, // 神兽格子
+        GRID_LENGEND    = 0xA,
+        GRID_CAVE       = 0xF, // 目标格子，墨家秘洞存在宝物和散仙（概率存在）
     };
 
     enum Progress
@@ -93,11 +94,9 @@ class JobHunter
         UInt8 posY;         // 在大地图上的Y坐标
         UInt8 gridType;     // 格子类型（GridType类型）
 
-        /*
         typedef std::list<UInt16> Route;
         typedef std::map<UInt16, Route> GridRoute;
         GridRoute route;    // 该点与其他连通点的路径
-        */
 
         /*
         GridInfo(UInt8 x, UInt8 y, UInt8 type)
@@ -160,9 +159,12 @@ class JobHunter
 
     private:
 
+        UInt16 GetSpotIdFromGameId(UInt8 id);
+
         bool InitMap();
-        void AddBossGrid();
+        void SelectBossGrid();
         void AddLengendGrid();
+        void SelectCaveGrid();
         void SelectBornGrid();
 
         void OnMove(UInt16 pos);
@@ -170,8 +172,8 @@ class JobHunter
         bool OnAttackMonster(UInt16 pos);
         void OnSolveTrap();
         void OnBreakthroughTrap();
-        void OnGetTreasure();
-        void OnFoundCave();
+        void OnGetTreasure(bool isAuto = false);
+        bool OnFoundCave(bool isAuto = false);
         void OnAutoExplore();
         void OnAbort();
 
@@ -233,8 +235,12 @@ class JobHunter
         UInt8 _strengthPoint;           // 神兽强度（为了刷地图上的神兽boss的）
 
         UInt8 _gameProgress;            // 寻墨游戏状态
+
         UInt8 _posX;                    // 玩家在寻墨游戏中的X坐标
         UInt8 _posY;                    // 玩家在寻墨游戏中的Y坐标
+        UInt8 _earlyPosX;
+        UInt8 _earlyPosY;
+
         UInt32 _stepCount;              // 寻墨游戏中花费的行动步数
 
         UInt32 _nextMoveTime;           // 下一次移动的时间

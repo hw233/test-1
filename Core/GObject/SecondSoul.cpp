@@ -124,6 +124,14 @@ bool SecondSoul::practiceLevelUp(UInt32& pexp)
     return false;
 }
 
+void SecondSoul::setLevel(UInt32 level)
+{
+    m_practiceLevel = level;
+    setDirty(true);
+    m_fgt->setDirty(true);
+    DB2().PushUpdateData("UPDATE `second_soul` SET `practiceLevel` = %u WHERE `fighterId` = %u AND `playerId` = %"I64_FMT"u", m_practiceLevel, m_fgt->getId(), m_fgt->getOwner()->getId());
+}
+
 void SecondSoul::decStateExp(UInt32 exp)
 {
     if(m_stateExp == GData::soulExpTable.getLevelMin(m_stateLevel))

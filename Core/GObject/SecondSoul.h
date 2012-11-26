@@ -62,6 +62,7 @@ public:
     UInt8 getExtraAura();
     UInt8 getAuraLeft();
     bool practiceLevelUp(UInt32& pexp);
+    void setLevel(UInt32 level);
     SoulSkill* getSoulSkill(UInt8 idx);
     UInt8 getSoulSkillIdx(SoulSkill ss);
     UInt8 getSoulSkillIdx(UInt16 skillId);
