@@ -170,6 +170,7 @@ struct DBPlayerData
     std::string clantask;
     std::string formations;
     std::string atohicfg;
+    std::string openid;
 };
 
 struct DBHoneyFall
@@ -1140,7 +1141,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPlayerData)
-SPECIALDEF(56)
+SPECIALDEF(57)
 	(
 	UInt64, id,
 	std::string, pdata.name,
@@ -1197,7 +1198,8 @@ SPECIALDEF(56)
     UInt8,  pdata.dungeonCnt,
     UInt32, pdata.dungeonEnd,
 	UInt32, pdata.created,
-	UInt32, pdata.lockExpireTime
+	UInt32, pdata.lockExpireTime,
+    std::string, openid
     )
 SPECIALEND()
 

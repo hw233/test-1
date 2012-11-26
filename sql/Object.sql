@@ -912,6 +912,7 @@ CREATE TABLE `player` (
   `dungeonEnd` int(10) unsigned NOT NULL DEFAULT '0',
   `newGuild` bigint(20) unsigned NOT NULL DEFAULT '0',
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `openid` varchar(1024) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `name` (`name`),
   KEY `mainFighter` (`mainFighter`)
