@@ -1080,6 +1080,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendYBBufInfo(pl->GetVar(VAR_YBBUF), pl->GetVar(VAR_QQVIP_BUF));
     pl->sendAthlBufInfo();
     luckyDraw.notifyDisplay(pl);
+    pl->sendSSToolbarInfo();
 
     if (World::getTrumpEnchRet() || World::get9215Act())
         pl->sendTokenInfo();

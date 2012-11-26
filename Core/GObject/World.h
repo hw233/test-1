@@ -22,7 +22,6 @@ namespace Script
 
 namespace GObject
 {
-
 struct MoneyIn
 {
     int gold;
@@ -30,6 +29,15 @@ struct MoneyIn
     int tael;
     int achievement;
     int prestige;
+};
+
+struct stArenaExtraBoard
+{
+    UInt8 week;
+    UInt32 sufferTotal;
+    UInt64 playerId[5];
+    UInt32 sufferCnt[5];
+    UInt8 rank[5];
 };
 
 typedef std::list<Player*> LuckyDrawList;
@@ -73,6 +81,17 @@ struct ScoreGreater
 typedef std::multiset<QixiPair*, ScoreGreater> QixiPlayerSet;
 typedef QixiPlayerSet::iterator QixiPlayersIt;
 typedef std::map<Player*, QixiPlayersIt> QixiScoreMap;
+
+struct ValueSort
+{
+    Player* player;
+    UInt32 lastTime;
+};
+struct lt_valuesort
+{
+    bool operator()(const ValueSort& a, const ValueSort& b) const;
+};
+typedef std::multiset<ValueSort, lt_valuesort> ValueSortType;
 
 class World:
 	public WorkerRunner<WorldMsgHandler>
@@ -283,6 +302,11 @@ public:
     inline static bool get11Act()
     { return _11Act; }
 
+    inline static void setSSToolbarAct(bool v)
+    { _ssToolbarAct= v; }
+    inline static bool getSSToolbarAct()
+    { return _ssToolbarAct; }
+
     inline static void setGuoqing(bool v)
     { _guoqing = v; }
     inline static bool getGuoqing()
@@ -393,6 +417,34 @@ public:
     inline static bool getTgcEvent()
     { return _tgcevent; }
 
+    inline static void setArenaPlayer(UInt8 pos, Player* szPlayer)
+    {
+        if(pos < 5)
+        {
+            _arenaPlayer[pos] = szPlayer;
+        }
+    }
+    inline static void getArenaPlayer(UInt8 pos, Player** szPlayer)
+    {
+        if(pos < 5)
+        {
+            *szPlayer = _arenaPlayer[pos];
+        }
+    }
+    inline static void setArenaTotalCnt(UInt16 total)
+    {
+        if(total > 0 && total < 20)
+            total = 20;
+        if(_arenaTotalCnt != total)
+            _arenaTotalCnt = total;
+    }
+    inline static UInt16 getArenaTotalCnt()
+    {
+        return _arenaTotalCnt;
+    }
+    static void setArenaInfo(UInt8 type);
+    static void setAreanTotalCntEnum();
+
     inline static bool canDestory(UInt32 itemid)
     {
         static UInt32 items[] =
@@ -478,6 +530,7 @@ public:
     static bool _qixi;
     static bool _wansheng;
     static bool _11Act;
+    static bool _ssToolbarAct;
     static bool _guoqing;
     static bool _9215Act;
     static bool _enchant_gt11;
@@ -505,6 +558,11 @@ public:
     static bool _loginAward;
     static bool _bluediamonSuperman;
     static bool _tgcevent;
+    static RCSortType arenaSupported;
+    static Player* _arenaPlayer[5];
+    static UInt16 _arenaTotalCnt;
+    static UInt8 _arenaResultRank[5];
+    static stArenaExtraBoard _arenaOldBoard[2];
 
 public:
     static RCSortType rechargeSort;
@@ -541,6 +599,7 @@ private:
 	static void Tianjie_Refresh(void*);
 	static void DaysRank_Refresh(void*);
     static void TownDeamonTmAward(void *);
+    static void ArenaExtraActTimer(void *);
     static void ClanCopyCheck(void *);
     static void ClanStatueCheck(void *);
     //static void advancedHookTimer(void *para);

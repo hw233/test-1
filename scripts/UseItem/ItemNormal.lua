@@ -1373,7 +1373,7 @@ function ItemNormal_00000476(iid, num, bind, param)
     local item = 0
 
     local k = 1
-    local rand = math.random(10000)
+    local rand = math.random(1, 10000)
     for n = 1,#prob do
         if rand <= prob[n] then
             item = items[n]
@@ -1404,7 +1404,7 @@ function ItemNormal_00000478(iid, num, bind, param)
 
     for i = 1, num do
         local k = 1
-        local rand = math.random(10000)
+        local rand = math.random(1, 10000)
         for n = 1,#prob do
             if rand <= prob[n] then
                 item = items[n]
@@ -2567,7 +2567,7 @@ function ItemNormal_00000033(iid, num, bind, param)
 
     for i = 1, num do
         local k = 1
-        local rand = math.random(10000)
+        local rand = math.random(1, 10000)
         for n = 1,#prob do
             if rand <= prob[n] then
                 item = items[n]
@@ -2975,7 +2975,7 @@ function ItemNormal_00009010(iid, num, bind, param)
 
     for i = 1, num do
         local k = 1
-        local rand = math.random(10000)
+        local rand = math.random(1, 10000)
         for n = 1,#prob do
             if rand <= prob[n] then
                 item = items[n]
@@ -3101,7 +3101,7 @@ function ItemNormal_00009067(iid, num, bind, param)
         return false;
     end
 
-    local r = math.random(100)
+    local r = math.random(1, 100)
 
     local item = 0
     if r >= 67 then
@@ -3134,7 +3134,7 @@ function ItemNormal_00009076(iid, num, bind, param)
     for kk = 1, num do
         local sz = #prob
         local k = 1
-        local rand = math.random(10000)
+        local rand = math.random(1, 10000)
         for n = 1,sz do
             if rand <= prob[n] then
                 item = items[n]
@@ -4252,7 +4252,7 @@ function ItemNormal_00009094(iid, num, bind, param)
             return used
         end
 
-        local rand = math.random(10000)
+        local rand = math.random(1, 10000)
         for n = 1,#prob do
             if rand <= prob[n] then
                 item = items[n]
@@ -4369,7 +4369,7 @@ function ItemNormal_00009119(iid, num, bind, param)
 
     for count =1,num do
         local k = 1
-        local rand = math.random(10000)
+        local rand = math.random(1, 10000)
         for n = 1,#prob do
             if rand <= prob[n] then
                 item = items[n]
@@ -6035,6 +6035,23 @@ function ItemNormal_00010074(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00010075(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (3+(3*num*1)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    package:Add(51, num*1, true, false, 2);
+    package:Add(48, num*1, true, false, 2);
+    package:Add(440, num*1, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
 function ItemNormal_QixiLoveCard(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -6369,6 +6386,35 @@ function ItemNormal_00009216(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00009228(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    player:setTitle(44, 0)
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_fighterCard(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    if not num or num > 1 then
+        return false
+    end
+
+    -- TODO:
+    local fighters = {
+    }
+
+    local id = 0
+    -- TODO:
+
+    if not player:fighterFromItem(id) then
+        return false
+    end
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
 
 local ItemNormal_Table = {
   [1] = ItemNormal_00000001,
@@ -6648,6 +6694,7 @@ local ItemNormal_Table = {
     [1330] = ItemNormal_citta,
     [1331] = ItemNormal_citta,
     [1332] = ItemNormal_citta,
+    [1347] = ItemNormal_citta,
 
     [1000] = ItemNormal_formation,
     [1001] = ItemNormal_formation,
@@ -7935,6 +7982,7 @@ local ItemNormal_Table = {
     [9213] = ItemNormal_00009210,
     [9215] = ItemNormal_00009215,
     [9216] = ItemNormal_00009216,
+    [9228] = ItemNormal_00009228,
 
     [10000] = ItemNormal_00010000,
     [10001] = ItemNormal_00010001,
@@ -8011,6 +8059,7 @@ local ItemNormal_Table = {
     [10072] = ItemNormal_00010072,
     [10073] = ItemNormal_00010073,
     [10074] = ItemNormal_00010074,
+    [10075] = ItemNormal_00010075,
 };
 
 function ItemNormalOther_00000441(iid, num, bind, other)
@@ -8070,7 +8119,7 @@ function ItemNormalOther_00000475(iid, num, bind, other)
     local item = 0
 
     local k = 1
-    local rand = math.random(10000)
+    local rand = math.random(1, 10000)
     for n = 1,#prob do
         if rand <= prob[n] then
             item = items[n]

@@ -60,6 +60,8 @@ static const UInt32 DAYSRANKTM = 23 * 3600+50*60;
 namespace GObject
 {
 
+bool lt_valuesort::operator()(const ValueSort& a, const ValueSort& b) const { return (a.player->GetVar(VAR_ARENA_SUFFERED) < b.player->GetVar(GObject::VAR_ARENA_SUFFERED)) || (a.player->GetVar(VAR_ARENA_SUFFERED) == b.player->GetVar(GObject::VAR_ARENA_SUFFERED) && a.lastTime > b.lastTime); }
+
 struct DBDataLatest
 {
 	UInt32 announce;
@@ -133,6 +135,7 @@ bool World::_july = false;
 bool World::_qixi= false;
 bool World::_wansheng= false;
 bool World::_11Act= false;
+bool World::_ssToolbarAct= false;
 bool World::_guoqing= false;
 bool World::_9215Act= false;
 bool World::_enchant_gt11 = false;
@@ -165,6 +168,12 @@ bool   World::_townReward_10_15 = false;
 bool World::_loginAward = false;
 bool World::_bluediamonSuperman = false;
 bool World::_tgcevent = false;
+/** 场外活动 **/
+RCSortType World::arenaSupported;
+Player* World::_arenaPlayer[5];
+UInt16 World::_arenaTotalCnt = ARENA_ACT_CNT_FLAG;
+UInt8 World::_arenaResultRank[5] = {0, 0, 0, 0, 0};
+stArenaExtraBoard World::_arenaOldBoard[2];
 /** 0：侠骨；1：柔情；2财富；3传奇 **/
 RCSortType World::killMonsterSort[4];
 
@@ -253,8 +262,10 @@ bool enum_midnight(void * ptr, void* next)
     {
         pl->buildClanTask(true);
         pl->clearFinishCount();
+        /*
         if (World::_thanksgiving)
             pl->resetThanksgiving();
+        */
     }
 
     if(bSingleDayEnd)
@@ -346,7 +357,12 @@ bool enum_midnight(void * ptr, void* next)
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 19) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 20) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 21) ||
-            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 22)
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 22) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 23) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 27) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 28) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 29) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 30)
             ))
     {
         if (pl->isOnline())
@@ -360,6 +376,26 @@ bool enum_midnight(void * ptr, void* next)
                 pl->SetVar(VAR_RECHARGE_TOTAL, 0);
         }
     }
+
+    if (pl->GetVar(VAR_CONSUME) &&
+            (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 23) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 24) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 25) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 26)
+            ))
+    {
+        if (pl->isOnline())
+        {
+            GameMsgHdr hdr(0x283, pl->getThreadId(), pl, 0);
+            GLOBAL().PushMsg(hdr, NULL);
+        }
+        else
+        {
+            if (pl->GetVar(VAR_CONSUME))
+                pl->SetVar(VAR_CONSUME, 0);
+        }
+    }
+
     if (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 24) ||
         TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 24))
     {
@@ -446,6 +482,75 @@ bool enum_qixi_rank_list(void * ptr, void * data )
 
     Player* lover = player->getLover();
     WORLD().LoadQixiScore(player, lover);
+    return true;
+}
+
+bool enum_extra_act_calc_total(Player* player, void* data)
+{
+    if(player == NULL)
+        return true;
+    UInt8 supportid = player->GetVar(GObject::VAR_ARENA_SUPPORT);
+    if(supportid >= 1 && supportid <= 5)
+        World::setArenaTotalCnt(World::getArenaTotalCnt() + 1);
+    return true;
+}
+
+bool enum_extra_act_update_status(Player* player, void* data)
+{
+    if(player == NULL)
+        return true;
+
+    if(player->isOnline())
+    {
+        //UInt8 type = *reinterpret_cast<UInt8 *>(data);
+        player->ArenaExtraAct(/*type*/0, 0);
+    }
+    return true;
+}
+
+bool enum_extra_act_award(Player* player, void* data)
+{
+    if(player == NULL)
+        return true;
+
+    if(player->isOnline())
+        player->ArenaExtraAct(3, 0);
+
+    UInt8 supportId = player->GetVar(VAR_ARENA_SUPPORT);
+    if(supportId == 0 || supportId > 5)
+        return true;
+    UInt8 curRank = World::_arenaResultRank[supportId-1];
+    UInt32 moneyArena = 0;
+    switch(curRank)
+    {
+        case 1:
+            moneyArena = 800;
+            break;
+        case 2:
+            moneyArena = 600;
+            break;
+        case 3:
+            moneyArena = 500;
+            break;
+        case 4:
+            moneyArena = 400;
+            break;
+        case 5:
+            moneyArena = 300;
+            break;
+        default:
+            break;
+    }
+    if(moneyArena > 0)
+    {
+        SYSMSGV(title, 736);
+        SYSMSGV(content, 737, curRank, moneyArena);
+        player->GetMailBox()->newMail(NULL, 0x01, title, content);
+
+        GameMsgHdr hdr(0x251, player->getThreadId(), player, sizeof(moneyArena));
+        GLOBAL().PushMsg(hdr, &moneyArena);
+    }
+
     return true;
 }
 
@@ -844,9 +949,20 @@ void World::World_Midnight_Check( World * world )
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 20) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 21) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 22) ||
-            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 23)
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 23) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 28) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 29) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 30) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 1)
             )
         bRechargeEnd = true;
+
+    if (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 24) ||
+        TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 25) ||
+        TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 26) ||
+        TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 27)
+            )
+        bConsumeEnd = true;
 
 	globalPlayers.enumerate(enum_midnight, static_cast<void *>(&nextday));
 
@@ -898,6 +1014,8 @@ void World::World_Midnight_Check( World * world )
     }
     if (bXiaoyaoEnd)
         world->SendXiaoyaoAward();
+    if(getArenaTotalCnt() > 0)
+        setArenaTotalCnt(ARENA_ACT_CNT_FLAG);
 
 	dungeonManager.enumerate(enum_dungeon_midnight, &curtime);
 	globalClans.enumerate(enum_clan_midnight, &curtime);
@@ -998,6 +1116,129 @@ void World::AthleticsPhysicalCheck(void *)
 void World::TownDeamonTmAward(void *)
 {
     townDeamonManager->process();
+}
+
+void World::setArenaInfo(UInt8 type)
+{
+    GObject::arena.setArenaPlayer(type);
+}
+
+void World::setAreanTotalCntEnum()
+{
+    globalPlayers.enumerate(enum_extra_act_calc_total, static_cast<void *>(NULL));
+}
+
+void World::ArenaExtraActTimer(void *)
+{
+    UInt32 now = TimeUtil::Now();
+    UInt32 week = TimeUtil::GetWeekDay(now);
+    if(week < ARENA_ACT_WEEK_START || week > ARENA_ACT_WEEK_END)
+    {
+        printf("day isn't valid\n");
+        return;
+    }
+    UInt32 t1 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SINGUP_START;
+    UInt32 t2 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SINGUP_END;
+    UInt32 t3 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SUFFER_END;
+
+    if(now < t1 && now >= t3 + 30)
+        return;
+
+    if(getArenaTotalCnt() == ARENA_ACT_CNT_FLAG)
+    {
+        if(week == ARENA_ACT_WEEK_START)
+        {
+            setArenaInfo(0);
+        }
+        else
+        {
+            setArenaInfo(1);
+        }
+    }
+    Player *pl[5] = {NULL, NULL, NULL, NULL, NULL};
+    for(UInt8 i = 0; i < 5; i++)
+    {
+        getArenaPlayer(i, &pl[i]);
+        if(pl[i] == NULL)
+            return;
+    }
+    if(now < t2)
+        setArenaTotalCnt(0);
+    else if(getArenaTotalCnt() == 0 || getArenaTotalCnt() == ARENA_ACT_CNT_FLAG)
+    {
+        setArenaTotalCnt(0);
+        setAreanTotalCntEnum();
+    }
+
+    if(now >= t1 && now < t1 + 30)
+    {
+        printf("t1\n");
+        globalPlayers.enumerate(enum_extra_act_update_status, static_cast<void *>(NULL));
+    }
+    else if(now >= t2 && now < t2 + 30)
+    {
+        printf("t2\n");
+        globalPlayers.enumerate(enum_extra_act_update_status, static_cast<void *>(NULL));
+    }
+    else if(now >= t3 && now < t3 + 30)
+    {
+        printf("t3\n");
+        //if(_arenaResultRank[0] == 0 && _arenaResultRank[1] == 0 && _arenaResultRank[2] == 0 && _arenaResultRank[3] == 0 && _arenaResultRank[4] == 0)
+        {
+            ValueSort cur;
+            ValueSortType resultRank;
+            for(UInt8 i = 0; i < 5; i++)
+            {
+                SYSMSGV(title, 739);
+                SYSMSGV(content, 740);
+                Mail * mail = pl[i]->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+                if(mail)
+                {
+                    MailPackage::MailItem mitem[1] = {{9076,1}};
+                    mailPackageManager.push(mail->id, mitem, 1, true);
+
+                    std::string strItems;
+                    for(int index = 0; index < 1; ++ index)
+                    {
+                        strItems += Itoa(mitem[index].id);
+                        strItems += ",";
+                        strItems += Itoa(mitem[index].count);
+                        strItems += "|";
+                    }
+                    DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl[i]->getId(), mail->id, LogArenaExtraAct, title, content, strItems.c_str(), mail->recvTime);
+                }
+
+                cur.player = pl[i];
+                cur.lastTime = pl[i]->GetVar(VAR_ARENA_LASTTIME);
+                resultRank.insert(cur);
+            }
+            for(UInt8 i = 0; i < 5; i++)
+            {
+                UInt8 j = 0;
+                for(ValueSortType::iterator iter = resultRank.begin(), e = resultRank.end(); iter != e && j < 5; ++iter, ++j)
+                {
+                    if(pl[i] == iter->player)
+                        break;
+                }
+                _arenaResultRank[i] = j + 1;
+            }
+        }
+        _arenaOldBoard[week-2].week = week;
+        _arenaOldBoard[week-2].sufferTotal = getArenaTotalCnt() * 8 / 5;
+        for(UInt8 i = 0; i < 5; i++)
+        {
+            _arenaOldBoard[week-2].playerId[i] = pl[i]->getId();
+            _arenaOldBoard[week-2].sufferCnt[i] = pl[i]->GetVar(VAR_ARENA_SUFFERED);
+            _arenaOldBoard[week-2].rank[i] = _arenaResultRank[i];
+        }
+
+        globalPlayers.enumerate(enum_extra_act_award, static_cast<void *>(NULL));
+        DB1().PushUpdateData("REPLACE INTO `arena_extra_board`(`week`, `sufferTotal`, `playerId1`, `playerId2`, `playerId3`, `playerId4`, `playerId5`, `sufferCnt1`, `sufferCnt2`, `sufferCnt3`, `sufferCnt4`, `sufferCnt5`, `rank1`, `rank2`, `rank3`, `rank4`, `rank5`) VALUES(%u, %u, %"I64_FMT"u, %"I64_FMT"u, %"I64_FMT"u, %"I64_FMT"u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", _arenaOldBoard[week-2].week, _arenaOldBoard[week-2].sufferTotal, _arenaOldBoard[week-2].playerId[0], _arenaOldBoard[week-2].playerId[1], _arenaOldBoard[week-2].playerId[2], _arenaOldBoard[week-2].playerId[3], _arenaOldBoard[week-2].playerId[4], _arenaOldBoard[week-2].sufferCnt[0], _arenaOldBoard[week-2].sufferCnt[1], _arenaOldBoard[week-2].sufferCnt[2], _arenaOldBoard[week-2].sufferCnt[3], _arenaOldBoard[week-2].sufferCnt[4], _arenaOldBoard[week-2].rank[0], _arenaOldBoard[week-2].rank[1], _arenaOldBoard[week-2].rank[2], _arenaOldBoard[week-2].rank[3], _arenaOldBoard[week-2].rank[4]);
+    }
+    else
+    {
+        printf("other\n");
+    }
 }
 
 void World::ClanStatueCheck(void *)
@@ -1109,6 +1350,7 @@ bool World::Init()
     AddTimer(86400 * 1000, DaysRank_Refresh, static_cast<void *>(NULL), (drChkPoint >= now ? drChkPoint - now : 86400 + drChkPoint - now) * 1000);
 
     //AddTimer(60 * 1000, advancedHookTimer, static_cast<void *>(NULL), (60 - now % 60) * 1000);
+    AddTimer(30 * 1000, ArenaExtraActTimer, static_cast<void *>(NULL), (30 - now % 30) * 1000);
 
     return true;
 }

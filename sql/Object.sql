@@ -1786,4 +1786,28 @@ CREATE TABLE `days_rank` (
     UNIQUE KEY `unq` (`player_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `arena_extra_board`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `arena_extra_board` (
+    `week` tinyint(3) NOT NULL,
+    `sufferTotal` int(10) unsigned NOT NULL,
+    `playerId1` bigint(20) unsigned NOT NULL,
+    `playerId2` bigint(20) unsigned NOT NULL,
+    `playerId3` bigint(20) unsigned NOT NULL,
+    `playerId4` bigint(20) unsigned NOT NULL,
+    `playerId5` bigint(20) unsigned NOT NULL,
+    `sufferCnt1` int(10) unsigned NOT NULL,
+    `sufferCnt2` int(10) unsigned NOT NULL,
+    `sufferCnt3` int(10) unsigned NOT NULL,
+    `sufferCnt4` int(10) unsigned NOT NULL,
+    `sufferCnt5` int(10) unsigned NOT NULL,
+    `rank1` tinyint(3) NOT NULL,
+    `rank2` tinyint(3) NOT NULL,
+    `rank3` tinyint(3) NOT NULL,
+    `rank4` tinyint(3) NOT NULL,
+    `rank5` tinyint(3) NOT NULL,
+    PRIMARY KEY (`week`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 

@@ -138,6 +138,8 @@ void WorldScript::init()
     def("getWansheng", GObject::World::getWansheng);
     def("set11Act", GObject::World::set11Act);
     def("get11Act", GObject::World::get11Act);
+    def("setSSToolbarAct", GObject::World::setSSToolbarAct);
+    def("getSSToolbarAct", GObject::World::getSSToolbarAct);
     def("setGuoqing", GObject::World::setGuoqing);
     def("getGuoqing", GObject::World::getGuoqing);
     def("set9215Act", GObject::World::set9215Act);

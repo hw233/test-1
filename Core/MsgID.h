@@ -324,6 +324,8 @@ namespace REQ
     const UInt8 SERVER_ARENA_INFO   = 0xEA;
     /**请求对阵表 */
     const UInt8 SERVER_ARENA_LB     = 0xEB;
+    /**跨服战-场外活动 */
+    const UInt8 SERVER_ARENA_EXTRA_ACT = 0xE7;
     /**跨服战操作 */
     const UInt8 SERVER_ARENA_OP     = 0xE8;
     /**聊天 */
@@ -614,6 +616,8 @@ namespace REP
     const UInt8 YD_INFO             = 0x2E;
     const UInt8 YD_AWARD_RCV        = 0x2F;
 
+    /**跨服战-场外活动 */
+    const UInt8 SERVER_ARENA_EXTRA_ACT = 0xE7;
     const UInt8 SERVER_ARENA_OP     = 0xE8;
 
     const UInt8 ATHLETICS_CHALLENGE = 0xF5;// 0xD2

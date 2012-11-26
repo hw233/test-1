@@ -942,7 +942,7 @@ namespace GObject
         else
             setBuffData(PLAYER_BUFF_ONLINE, 0, true);
 #endif
-
+        /*
         if (World::_thanksgiving)
         {
             UInt32 online = GetVar(VAR_TGDT);
@@ -957,7 +957,7 @@ namespace GObject
                     GameAction()->onThanksgivingDay(this);
             }
         }
-
+        */
         if (World::_blueactiveday)
             onBlueactiveday();
 
@@ -1861,7 +1861,7 @@ namespace GObject
 		}
 
 		UInt32 curtime = TimeUtil::Now();
-
+        /*
         if (World::_thanksgiving)
         {
             PopTimerEvent(this, EVENT_TIMETICK, getId());
@@ -1874,8 +1874,10 @@ namespace GObject
                     SetVar(VAR_TGDT, online + curtime - _playerData.lastOnline);
             }
         }
+        */
 
-		DBLOG1().PushUpdateData("update login_states set logout_time=%u where server_id=%u and player_id=%"I64_FMT"u and login_time=%u", curtime, cfg.serverLogId, _id, _playerData.lastOnline);
+        int addr = inet_addr(m_clientIp);
+		DBLOG1().PushUpdateData("update login_states set logout_time=%u where server_id=%u and player_id=%"I64_FMT"u and login_time=%u", curtime, addr?addr:cfg.serverLogId, _id, _playerData.lastOnline);
 		writeOnlineRewardToDB();
 
 		removeStatus(SGPunish);
@@ -1919,7 +1921,8 @@ namespace GObject
 			_onlineDuration = _onlineDuration + curtime - _playerData.lastOnline;
 		}
 
-		DBLOG1().PushUpdateData("update login_states set logout_time=%u where server_id=%u and player_id=%"I64_FMT"u and login_time=%u", curtime, cfg.serverLogId, _id, _playerData.lastOnline);
+        int addr = inet_addr(m_clientIp);
+		DBLOG1().PushUpdateData("update login_states set logout_time=%u where server_id=%u and player_id=%"I64_FMT"u and login_time=%u", curtime, addr?addr:cfg.serverLogId, _id, _playerData.lastOnline);
 		DB1().PushUpdateData("UPDATE `player` SET `lastOnline` = %u, `nextReward` = '%u|%u|%u|%u' WHERE `id` = %"I64_FMT"u", curtime, _playerData.rewardStep, _playerData.nextRewardItem, _playerData.nextRewardCount, _playerData.nextRewardTime, _id);
         _isOnline = false;
 
@@ -1953,7 +1956,7 @@ namespace GObject
                     setBuffData(PLAYER_BUFF_ONLINE, online + curtime - _playerData.lastOnline);
             }
         }
-
+        /*
         if (World::_thanksgiving)
         {
             PopTimerEvent(this, EVENT_TIMETICK, getId());
@@ -1966,7 +1969,7 @@ namespace GObject
                     SetVar(VAR_TGDT, online + curtime - _playerData.lastOnline);
             }
         }
-
+        */
         if (World::_blueactiveday)
             PopTimerEvent(this, EVENT_TIMETICK, getId());
 
@@ -2487,6 +2490,33 @@ namespace GObject
         }
 
         return false;
+    }
+
+    bool Player::fighterFromItem(UInt32 fgtid)
+    {
+        if (!fgtid)
+            return false;
+
+        if(isFighterFull())
+        {
+            sendMsgCode(0, 1200);
+            return false;
+        }
+
+        if (hasFighter(fgtid))
+        {
+            sendMsgCode(1, 1017);
+            return false;
+        }
+
+        Fighter * fgt = globalFighters[fgtid];
+        if(fgt == NULL)
+            return false;
+        Fighter* fgt2 = fgt->clone(this);
+        addFighter(fgt2, true);
+        notifyAddFighter(fgt2);
+        autoLineup(fgt2);
+        return true;
     }
 
 	void Player::notifyAddFighter( Fighter * fgt )
@@ -10133,9 +10163,45 @@ namespace GObject
         case 13:
             get11DailyAward(opt);
             break;
+        case 14:
+            getSSToolbarAward();
+        case 15:
+            getThanksGivingDay(opt);
+            break;
         }
     }
 
+    void Player::getSSToolbarAward()
+    {
+        if (!World::getSSToolbarAct())
+            return;
+        if (GetPackage()->GetRestPackageSize() < 6)
+        {
+			sendMsgCode(0, 1011);
+            return;
+        }
+        if (GetVar(VAR_AWARD_SSTOOLBAR) == 0 )
+        {
+            GetPackage()->Add(509, 1, true);
+            GetPackage()->Add(50, 1, true);
+            GetPackage()->Add(49, 1, true);
+            GetPackage()->Add(1526, 1, true);
+            GetPackage()->Add(500, 1, true);
+            GetPackage()->Add(56, 1, true);
+            SetVar(VAR_AWARD_SSTOOLBAR, 1);
+        }
+        sendSSToolbarInfo();
+    }
+    void Player::sendSSToolbarInfo()
+    {
+        if (!World::getSSToolbarAct())
+            return;
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(14);
+        UInt8 res = GetVar(VAR_AWARD_SSTOOLBAR);
+        st << res << Stream::eos;
+        send(st);
+    }
     void Player::get11DailyAward(UInt8 opt)
     {
         if(!World::get11Act())
@@ -10432,6 +10498,44 @@ namespace GObject
             Stream st(REP::GETAWARD);
             st << static_cast<UInt8>(12) << idx << Stream::eos;
             send(st);
+        }
+    }
+
+    void Player::getThanksGivingDay(UInt8 opt)
+    {
+        if(opt == 0) //免费领取
+        {
+            if(GetVar(VAR_TGDT) & 0x01)
+                return;
+            if(GameAction()->RunThanksGivingDayAward(this, 1))
+            {
+                UInt32 var = GetVar(VAR_TGDT) | 0x01;
+                SetVar(VAR_TGDT, var);
+                Stream st(REP::GETAWARD);
+                st << static_cast<UInt8>(15) << static_cast<UInt8>(0) << Stream::eos;
+                send(st);
+                udpLog("huodong", "F_10000_15", "", "", "", "", "act");
+            }
+        }
+        if(opt == 1) //付费领取(20仙石)
+        {
+            if(GetVar(VAR_TGDT) & 0x02)
+                return;
+			if (getGold() < 20)
+			{
+				sendMsgCode(0, 1101);
+				return;
+			}
+            if(GameAction()->RunThanksGivingDayAward(this, 2))
+            {
+                UInt32 var = GetVar(VAR_TGDT) | 0x02;
+                SetVar(VAR_TGDT, var);
+                ConsumeInfo ci(ThanksGivingDay, 0, 0);
+                useGold(20, &ci);
+                Stream st(REP::GETAWARD);
+                st << static_cast<UInt8>(15) << static_cast<UInt8>(1) << Stream::eos;
+                send(st);
+            }
         }
     }
 
@@ -11169,7 +11273,7 @@ namespace GObject
         }
 
     }
-
+    /*
     void Player::resetThanksgiving()
     {
         SetVar(VAR_TGDT, 0);
@@ -11181,7 +11285,7 @@ namespace GObject
             if (event) PushTimerEvent(event);
         }
     }
-
+    */
     TeamData* Player::getTeamData()
     {
         return m_teamData;
@@ -14381,5 +14485,208 @@ void EventTlzAuto::notify(bool isBeginAuto)
         DB1().PushUpdateData("UPDATE `player` SET `titleAll` = '%s' WHERE `id` = %"I64_FMT"u", title.c_str(), getId());
     }
 
-} // namespace GObject
+    void Player::ArenaExtraAct(UInt8 type, UInt8 opt)
+    {
+        UInt32 now = TimeUtil::Now();
+        UInt8 week = TimeUtil::GetWeekDay(now);
+        UInt32 t1 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SINGUP_START;
+        UInt32 t2 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SINGUP_END;
+        UInt32 t3 = TimeUtil::SharpDayT(0, now) + ARENA_ACT_SUFFER_END;
+        static UInt32 broadfreq;
+
+        if(week < ARENA_ACT_WEEK_START || week > ARENA_ACT_WEEK_END)
+            return;
+        if(now < t1)
+            return;
+        if(WORLD().getArenaTotalCnt() == ARENA_ACT_CNT_FLAG)
+        {
+            if(week == ARENA_ACT_WEEK_START)
+            {
+                WORLD().setArenaInfo(0);
+            }
+            else
+            {
+                WORLD().setArenaInfo(1);
+            }
+        }
+        Player* pl[5] = {NULL, NULL, NULL, NULL, NULL};
+        for(UInt8 i = 0; i < 5; i++)
+        {
+            WORLD().getArenaPlayer(i, &pl[i]);
+            if(pl[i] == NULL)
+                return;
+        }
+        if(now < t2)
+            WORLD().setArenaTotalCnt(0);
+        else if(WORLD().getArenaTotalCnt() == 0 || WORLD().getArenaTotalCnt() == ARENA_ACT_CNT_FLAG)
+        {
+            WORLD().setArenaTotalCnt(0);
+            WORLD().setAreanTotalCntEnum();
+        }
+        UInt16 totalCnt;
+        totalCnt = WORLD().getArenaTotalCnt();
+        UInt32 totalSufferCnt = totalCnt * 8 / 5;
+
+        switch(type)
+        {
+            case 0:
+            {
+                Stream st(REP::SERVER_ARENA_EXTRA_ACT);
+                st << week;
+                st << type;
+                UInt8 mainId;
+                for(UInt8 i = 0; i < 5; i++)
+                {
+                    st << pl[i]->getName();
+                    if(pl[i]->getMainFighter())
+                        mainId = pl[i]->getMainFighter()->getId();
+                    else
+                        mainId = 0;
+                    st << mainId;
+                }
+                st << totalSufferCnt << Stream::eos;
+                send(st);
+                if(now >= t1 && now < t2)
+                    ArenaExtraAct(1+ARENA_ACT_SYSTEM, 0);
+                else if(now >= t2 && now < t3)
+                    ArenaExtraAct(2+ARENA_ACT_SYSTEM, 0);
+                else
+                    ArenaExtraAct(3, 0);
+            }
+            break;
+            case 1:
+            case 1+ARENA_ACT_SYSTEM:
+            {
+                if(type < ARENA_ACT_SYSTEM)
+                {
+                    if(now >= t2)
+                        return;
+                    UInt8 supportId = opt;
+                    if(supportId == 0 || supportId > 5)
+                        return;
+                    SetVar(VAR_ARENA_SUPPORT, supportId);
+                    if(week == 2)
+                        SetVar(VAR_ARENA_SUPPORT_TUE, supportId);
+                    else
+                        SetVar(VAR_ARENA_SUPPORT_WED, supportId);
+                }
+                Stream st(REP::SERVER_ARENA_EXTRA_ACT);
+                st << week;
+                st << static_cast<UInt8>(1);
+                UInt32 seconds = 0;
+                if(now >= t1 && now < t2)
+                    seconds = t2 - now;
+                st << static_cast<UInt8>(GetVar(VAR_ARENA_SUPPORT)) << seconds;
+                st << Stream::eos;
+                send(st);
+            }
+            break;
+            case 2:
+            case 2+ARENA_ACT_SYSTEM:
+            {
+                if(type < ARENA_ACT_SYSTEM)
+                {
+                    if(now < t2 || now >= t3)
+                        return;
+                    if(getBuffLeft(PLAYER_BUFF_SUFFER) >= 5)//5秒误差
+                        return;
+                    UInt8 sufferId = opt;
+                    if(sufferId == 0 || sufferId > 5)
+                        return;
+                    if(pl[sufferId - 1]->GetVar(VAR_ARENA_SUFFERED) >= totalSufferCnt)
+                        return;
+
+                    ++broadfreq;
+                    UInt32 pexp = 1000;
+                    GameMsgHdr hdr2(0x238, getThreadId(), this, sizeof(pexp));
+                    GLOBAL().PushMsg(hdr2, &pexp);
+
+                    setBuffData(PLAYER_BUFF_SUFFER, TimeUtil::Now() + 90);
+                    pl[sufferId - 1]->AddVar(VAR_ARENA_SUFFERED, 1);
+                    pl[sufferId - 1]->SetVar(VAR_ARENA_LASTTIME, now);
+                    if(pl[sufferId - 1]->GetVar(VAR_ARENA_SUFFERED) == totalSufferCnt)
+                    {
+                        UInt32 moneyArena = 500;
+                        SYSMSGV(title, 736);
+                        SYSMSGV(content, 738, moneyArena);
+                        GetMailBox()->newMail(NULL, 0x01, title, content);
+                        GameMsgHdr hdr(0x251, getThreadId(), this, sizeof(moneyArena));
+                        GLOBAL().PushMsg(hdr, &moneyArena);
+                        broadfreq = 5;
+                    }
+                }
+                Stream st(REP::SERVER_ARENA_EXTRA_ACT);
+                st << week;
+                st << static_cast<UInt8>(2);
+
+                UInt32 seconds = 0;
+                if(now >= t2 && now < t3)
+                    seconds = t3 - now;
+                st << static_cast<UInt8>(GetVar(VAR_ARENA_SUPPORT)) << seconds << static_cast<UInt16>(getBuffLeft(PLAYER_BUFF_SUFFER));
+                for(UInt8 i = 0; i < 5; i++)
+                {
+                    st << pl[i]->GetVar(VAR_ARENA_SUFFERED);
+                }
+                st << Stream::eos;
+                send(st);
+                printf("broadfreq = %u\n", broadfreq);
+                if(broadfreq >= 5)
+                {
+                    broadfreq = 0;
+
+                    Stream st(REP::SERVER_ARENA_EXTRA_ACT);
+                    st << week;
+                    st << static_cast<UInt8>(4);
+                    for(UInt8 i = 0; i < 5; i++)
+                    {
+                        st << pl[i]->GetVar(VAR_ARENA_SUFFERED);
+                    }
+                    st << Stream::eos;
+                    NETWORK()->Broadcast(st);
+                }
+                }
+                break;
+                case 3:
+                {
+                    if(World::_arenaResultRank[0] == 0 && World::_arenaResultRank[1] == 0 && World::_arenaResultRank[2] == 0 && World::_arenaResultRank[3] == 0 && World::_arenaResultRank[4] == 0)
+                    {
+                        ValueSort cur;
+                        ValueSortType resultRank;
+                        for(UInt8 i = 0; i < 5; i++)
+                        {
+                            cur.player = pl[i];
+                            cur.lastTime = pl[i]->GetVar(VAR_ARENA_LASTTIME);
+                            resultRank.insert(cur);
+                        }
+                        for(UInt8 i = 0; i < 5; i++)
+                        {
+                            cur.player = pl[i];
+                            UInt8 j = 0;
+                            for(ValueSortType::iterator iter = resultRank.begin(), e = resultRank.end(); iter != e && j < 5; ++iter, ++j)
+                            {
+                                if(cur.player == iter->player)
+                                    break;
+                            }
+                            World::_arenaResultRank[i] = j + 1;
+                        }
+                    }
+                    Stream st(REP::SERVER_ARENA_EXTRA_ACT);
+                    st << week;
+                    st << type;
+                    st << static_cast<UInt8>(GetVar(VAR_ARENA_SUPPORT));
+                    for(UInt8 i = 0; i < 5; i++)
+                    {
+                        st << pl[i]->GetVar(VAR_ARENA_SUFFERED);
+                        st << World::_arenaResultRank[i];
+                    }
+                    st << Stream::eos;
+                    send(st);
+                }
+                break;
+                 default:
+                break;
+            }
+        }
+
+    } // namespace GObject
 

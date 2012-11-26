@@ -375,6 +375,11 @@ namespace GObject
             fprintf(stderr, "loadQixi error!\n");
             std::abort();
         }
+        if(!loadArenaExtraBoard())
+        {
+            fprintf(stderr, "loadArenaExtraBoard error!\n");
+            std::abort();
+        }
 		DB::gDataDBConnectionMgr->UnInit();
 	}
 
@@ -5020,6 +5025,27 @@ namespace GObject
 				continue;
 
             pl->loadQixiInfoFromDB(lover, qixi.bind, qixi.pos, qixi.event, qixi.score);
+        }
+        lc.finalize();
+        return true;
+
+    }
+
+    bool GObjectManager::loadArenaExtraBoard()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading arena_extra_board");
+        DBArenaExtraBoard extraboard;
+        if(execu->Prepare("SELECT `week`, `sufferTotal`, `playerId1`, `playerId2`, `playerId3`, `playerId4`, `playerId5`, `sufferCnt1`, `sufferCnt2`, `sufferCnt3`, `sufferCnt4`, `sufferCnt5`, `rank1`, `rank2`, `rank3`, `rank4`, `rank5` FROM `arena_extra_board` ORDER BY `week`", extraboard) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+        {
+			lc.advance();
+            UInt8 week = extraboard.week;
+			if(week == 2 || week == 3)
+                memcpy(&(World::_arenaOldBoard[week-2]), &extraboard, sizeof(extraboard));
         }
         lc.finalize();
         return true;
