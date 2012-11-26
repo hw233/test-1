@@ -253,14 +253,14 @@ void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROCNP 
 bool GMHandler::Handle( const std::string& txt, GObject::Player * player, bool isFromBackstage)
 {
 	UInt8 gml = 3;
-	/*if(cfg.GMCheck && !isFromBackstage)
+	if(cfg.GMCheck && !isFromBackstage)
 	{
 		if(player == NULL)
 			return false;
 		gml = player->getGMLevel();
 		if(gml > 3)
 			return false;
-	}*/
+	}
 	if(txt.empty())
 		return false;
 	std::string ptxt = txt;
