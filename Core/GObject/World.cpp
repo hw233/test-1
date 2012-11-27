@@ -1156,6 +1156,8 @@ void World::ArenaExtraActTimer(void *)
     {
         if(stArena.heroId[0] != 0)
             stArena.heroId[0] = 0;
+        if(World::getArenaTotalCnt() != 0)
+            World::setArenaTotalCnt(0);
     }
     else
     {

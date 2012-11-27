@@ -14513,7 +14513,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
             WORLD().setArenaInfo(curtype);
         if(WORLD().getArenaHeroId(0) == 0)
             return;
-        if(now >= t2 && World::getArenaTotalCnt())
+        if(now >= t2 && World::getArenaTotalCnt() == 0)
         {
             WORLD().setArenaTotalCntEnum();
         }
