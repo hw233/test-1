@@ -1051,6 +1051,9 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     {
         pl->sendSecondInfo();
     }
+    {
+        pl->sendAutoJobHunter();       // 为什么上面的语句都加大括号？？？
+    }
 #ifdef _FB
     // XXX: do not need
 #else
@@ -1576,7 +1579,14 @@ void OnFighterDismissReq( GameMsgHdr& hdr, FighterDismissReq& fdr )
 		player->send(rep);
 		return;
 	}
-	UInt64 exp = fgt->getExp() / 2;
+
+    UInt64 exp = 0;
+
+    if(fgt->getClass() == 4)
+        exp = fgt->getExp() - GData::expTable.getLevelMin(70);
+    else
+        exp = fgt->getExp() / 2;
+
 	if(exp >= 25000)
 	{
 		exp += 25000;
@@ -5339,7 +5349,8 @@ void OnExJob( GameMsgHdr & hdr, const void * data )
                 switch (val)
                 {
                     case 0:
-                        // TODO: 放弃寻墨游戏
+                        // 放弃寻墨游戏
+                        jobHunter->OnAbort();
                         break;
                     case 1:
                     case 2:

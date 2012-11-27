@@ -1445,5 +1445,10 @@ namespace Script
         return Call<UInt32>("foundCave", id);
     }
 
+    lua_tinker::table GameActionLua::getStepAward(UInt32 step)
+    {
+        return Call<lua_tinker::table>("getStepAward", step);
+    }
+
 }
 

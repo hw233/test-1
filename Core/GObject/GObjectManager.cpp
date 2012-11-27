@@ -380,9 +380,9 @@ namespace GObject
             fprintf(stderr, "loadArenaExtraBoard error!\n");
             std::abort();
         }
-        if(!loadExJob())
+        if(!loadJobHunter())
         {
-            fprintf(stderr, "loadExJob error!\n");
+            fprintf(stderr, "loadJobHunter error!\n");
             std::abort();
         }
 
@@ -5093,6 +5093,30 @@ namespace GObject
         return true;
     }
 
+    bool GObjectManager::loadJobHunter()
+    {
+        // 读取寻墨有关数据
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading ExJob");
+        DBJobHunter dbjh;
+        if(execu->Prepare("SELECT `playerId`, `fighterList`, `mapInfo`, `progress`, `posX`, `posY`, `earlyPosX`, `earlyPosY`, `stepCount` FROM `job_hunter` ORDER BY `playerId`", dbjh) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+        Player * player = NULL;
+		while(execu->Next() == DB::DB_OK)
+        {
+            player = globalPlayers[dbjh.playerId];
+            if (player)
+            {
+                player->setJobHunter(dbjh.fighterList, dbjh.mapInfo, dbjh.progress, dbjh.posX, dbjh.posY, dbjh.earlyPosX, dbjh.earlyPosY, dbjh.stepCount);
+            }
+			lc.advance();
+        }
+        lc.finalize();
+        return true;
+    }
+
     float  GObjectManager::getAttrMax( UInt8 lvl, UInt8 t, UInt8 q, UInt8 crr )
     {
         if(q > 2)
@@ -5154,30 +5178,6 @@ namespace GObject
             ringHp = it->second;
 
         return ringHp->hpBase[crr] * _ringHpFactor[enchant];
-    bool GObjectManager::loadExJob()
-    {
-        // 读取寻墨有关数据
-        /*
-		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
-		if (execu.get() == NULL || !execu->isConnected()) return false;
-		LoadingCounter lc("Loading ExJob");
-        DBExJob exJob;
-        if(execu->Prepare("SELECT `playerId`, `list` FROM `ExJob` ORDER BY `playerId`", exJob) != DB::DB_OK)
-			return false;
-		lc.reset(1000);
-        Player * player = NULL;
-		while(execu->Next() == DB::DB_OK)
-        {
-            player = globalPlayers[exJob.playerId];
-            if (player)
-            {
-                player->getJobHunter()->LoadFighterList(exJob.list);
-            }
-			lc.advance();
-        }
-        lc.finalize();
-        */
-        return true;
     }
 }
 

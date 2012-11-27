@@ -8,19 +8,37 @@ local normalMonster = {
 }
 
 local bossMonster = {
-    -- boss id
-    [1] = {11540},
-    [2] = {11541},
-    [3] = {11542},
-    [4] = {11543},
+    -- Boss id
+    [1] = {12051, 12052, 12053},
+    [2] = {12051, 12052, 12053},
+    [3] = {12051, 12052, 12053},
+    [4] = {12051, 12052, 12053},
 }
 
 local caveMonster = {
     -- 秘洞守卫 id
-    [1] = {11540},
-    [2] = {11541},
-    [3] = {11542},
-    [4] = {11543},
+    [1] = 5211,
+    [2] = 5211,
+    [3] = 5211,
+    [4] = 5211,
+}
+
+--[[
+local stepAward = {
+    [5]  = {{1325, 1, 1}},
+    [10] = {{1326, 4, 1}},
+    [15] = {{1326, 2, 1}},
+    [20] = {{1326, 1, 1}},
+    [25] = {{1327, 2, 1}},
+}
+]]--
+
+local stepAward = {
+    {{1325, 1, 1}},
+    {{1326, 4, 1}},
+    {{1326, 2, 1}},
+    {{1326, 1, 1}},
+    {{1327, 2, 1}},
 }
 
 local treasure1 = {
@@ -55,12 +73,26 @@ local treasure4 = {
     {{1,4,1}, {2,4,1}, {550,19,1}},
 }
 
+-- 宝箱掉落概率配置
+local chance1 = {379, 1895, 2400, 5768, 9558, 10000, 10000, 10000}
+local chance2 = {379, 1895, 2400, 5768, 9558, 10000, 10000, 10000}
+local chance3 = {379, 1895, 2400, 5768, 9558, 10000, 10000, 10000}
+local chance4 = {379, 1895, 2400, 5768, 9558, 10000, 10000, 10000}
+
 local treasure = {
     -- 宝箱道具
     [1] = treasure1,
     [2] = treasure2,
     [3] = treasure3,
     [4] = treasure4,
+}
+
+local chance = {
+    -- 宝箱概率
+    [1] = chance1,
+    [2] = chance2,
+    [3] = chance3,
+    [4] = chance4,
 }
 
 local lengendMonster = {
@@ -75,15 +107,6 @@ local lengendMonster = {
     [8]  = {12051, 12052, 12053, 12054},
     [9]  = {12051, 12052, 12053, 12054},
     [10] = {12051, 12052, 12053, 12054},
-
-}
-
-local bossMonster = {
-    -- boss id
-    [1] = {11540},
-    [2] = {11541},
-    [3] = {11542},
-    [4] = {11543},
 }
 
 function getRandomNormalMonster(id)
@@ -125,13 +148,25 @@ end
 
 function getTreasure(id)
     -- 获得相应宝箱的道具
-    local items = treasure[id][math.random(1, #treasure[id])]
-    return items
+    local prob = math.random(1, 10000)
+    local chanceTmp = chance[id]
+    for i = 1, #chanceTmp do
+        if prob > chanceTmp[i] then
+            return treasure[id][i]
+        end
+    end
 end
-
 
 function foundCave(id)
     -- TODO: 找到山洞后的的守卫ID
-    return caveMonster(id);
+    return caveMonster[id];
+end
+
+function getStepAward(step)
+    for i = 1, #stepAward do
+        if i*5 > step then
+            return stepAward[i]
+        end
+    end
 end
 

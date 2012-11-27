@@ -3975,7 +3975,7 @@ end
 function ExJob(player, id)
     if id >= 4 then
         local package = player:GetPackage()
-        package:AddItem(59, 1, true)
+        package:AddItem(9229, 1, true)
     end
 end
 

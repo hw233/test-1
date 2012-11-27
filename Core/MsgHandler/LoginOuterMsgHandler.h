@@ -358,7 +358,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
         }
         if (4 == res)
         {
-            UInt8 platform = atoi(player->getDomain());
+            //UInt8 platform = atoi(player->getDomain());
             if (cfg.GMCheck )
             {
                 size_t len = 0;

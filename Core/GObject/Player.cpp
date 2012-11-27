@@ -1890,7 +1890,7 @@ namespace GObject
         snprintf(online, sizeof(online), "%u", curtime - _playerData.lastOnline);
         udpLog("", "", "", "", "", online, "login");
 
-        UInt8 platform = atoi(getDomain());
+        //UInt8 platform = atoi(getDomain());
         if (cfg.GMCheck )
         {
             struct CrackValue
@@ -1989,7 +1989,7 @@ namespace GObject
         snprintf(online, sizeof(online), "%u", TimeUtil::Now() - _playerData.lastOnline);
         udpLog("", "", "", "", "", online, "login");
 
-        UInt8 platform = atoi(getDomain());
+        //UInt8 platform = atoi(getDomain());
         if (cfg.GMCheck )
         {
             struct CrackValue
@@ -2468,7 +2468,8 @@ namespace GObject
         {
             // 70级，关元穴穴道，60级白虎
             fgt->addExp(GData::expTable.getLevelMin(70));
-            fgt->openSecondSoul(4);
+            fgt->openSecondSoul(13);
+            fgt->setSoulLevel(60);
             for (UInt8 i = 0; i < 11; ++i)
             {
                 fgt->setAcupoints(i, 3, true, true);
@@ -10909,6 +10910,22 @@ namespace GObject
         _lastKillMonsterAward.push_back(lt);
     }
 
+    void Player::lastExJobAwardPush(UInt16 itemId, UInt16 num)
+    {
+        GData::LootResult lt = {itemId, num};
+        _lastExJobAward.push_back(lt);
+    }
+
+    void Player::checkLastExJobAward()
+    {
+        std::vector<GData::LootResult>::iterator it;
+        for(it = _lastExJobAward.begin(); it != _lastExJobAward.end(); ++ it)
+        {
+            m_Package->ItemNotify(it->id, it->count);
+        }
+        _lastExJobAward.clear();
+    }
+
     void Player::lastNew7DayTargetAwardPush(UInt16 itemId, UInt16 num)
     {
         GData::LootResult lt = {itemId, num};
@@ -14036,11 +14053,28 @@ namespace GObject
 
    JobHunter* Player::getJobHunter()
    {
+       if (GetVar(VAR_MAX_COPY_PASS) < 4)
+           return NULL;
        if (!_jobHunter)
        {
            _jobHunter = new JobHunter(this);
        }
        return _jobHunter;
+   }
+
+   void Player::setJobHunter(std::string& fighterList, std::string& mapInfo, UInt8 progress,
+           UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY, UInt32 stepCount)
+   {
+       if (_jobHunter)
+           return;
+       _jobHunter = new JobHunter(this, fighterList, mapInfo, progress, posX, posY, earlyPosX, earlyPosY, stepCount);
+   }
+
+   void Player::sendAutoJobHunter()
+   {
+       if (!getJobHunter())
+           return;
+       _jobHunter->SendAutoInfo();
    }
 
 

@@ -274,6 +274,7 @@ namespace Script
         UInt32 calcGridType(UInt8 prob);
         lua_tinker::table getTreasure(UInt8 id);
         UInt32 foundCave(UInt8 id);
+        lua_tinker::table getStepAward(UInt32 step);
 
     public:
 

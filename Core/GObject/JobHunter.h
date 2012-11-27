@@ -28,6 +28,8 @@ class Player;
 #define CLIENT_POS_TO_POS(x) (UInt16)(((UInt16)((x) / MAX_POS_X) << 8) + ((x) % MAX_POS_X))
 #define POS_TO_CLIENT_POS(x) ((((UInt16)(x) >> 8) * MAX_POS_X) + ((x) & 0xff))
 
+#define  EX_JOB_ITEM_ID 9229
+
 static const UInt8 MAX_POS_X = 5;
 static const UInt8 MAX_POS_Y = 5;
 static const UInt8 MAX_GRID  = 12;
@@ -35,10 +37,10 @@ static const UInt8 MAX_GRID  = 12;
 static const UInt8 MAX_GRID_COUNT[256]
 {
     0, // INVALID
-    1, // NORMAL
+    0, // NORMAL
     MAX_GRID, // MONSTER
     1, // BOSS
-    2, // TREASURE
+    MAX_GRID, // TREASURE
     2, // TRAP
     0, // NORMAL_MAX
 
@@ -135,11 +137,13 @@ class JobHunter
 
     public:
         JobHunter(Player* player);
+        JobHunter(Player * player, std::string& fighterList, std::string& mapInfo, UInt8 progress,
+                UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY, UInt32 stepCount);
         ~JobHunter();
 
-        void LoadFighterList(std::string& str);
-        bool LoadMapInfo (std::string& str);
-        void LoadGameFromDB(std::string& data);
+        void LoadFighterList(const std::string& str);
+        bool LoadMapInfo (const std::string& str);
+        void SaveMapInfo ();
 
 
         void AddToFighterList(UInt16 id);
@@ -153,9 +157,12 @@ class JobHunter
 
         void SendMapInfo();
 
+        void SendAutoInfo();
+
         void OnCommand(UInt8 command, UInt8 val, UInt8 val2);
 
         void SendGridInfo(UInt16 pos);
+        void OnAbort();
 
     private:
 
@@ -166,6 +173,7 @@ class JobHunter
         void AddLengendGrid();
         void SelectCaveGrid();
         void SelectBornGrid();
+        void AddMinTreasureGrid();
 
         void OnMove(UInt16 pos);
         void OnSkipMonster();
@@ -175,7 +183,6 @@ class JobHunter
         void OnGetTreasure(bool isAuto = false);
         bool OnFoundCave(bool isAuto = false);
         void OnAutoExplore();
-        void OnAbort();
 
         inline bool CheckGridType(UInt8 type)
         {
@@ -234,6 +241,7 @@ class JobHunter
 #endif
         UInt8 _strengthPoint;           // 神兽强度（为了刷地图上的神兽boss的）
 
+        bool  _isInGame;                // 玩家是否已经进入寻墨游戏
         UInt8 _gameProgress;            // 寻墨游戏状态
 
         UInt8 _posX;                    // 玩家在寻墨游戏中的X坐标

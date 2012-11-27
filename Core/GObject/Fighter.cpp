@@ -3413,7 +3413,7 @@ bool Fighter::canCittaBeDel(UInt16 citta)
 {
     UInt16 cittaId = CITTA_ID(citta);
     UInt16 cittaCannotDel[] = {134, 137, 135, 141, 142, 143};
-    for(int i = 0; i < sizeof(cittaCannotDel); ++ i)
+    for(UInt32 i = 0; i < sizeof(cittaCannotDel); ++ i)
         if(cittaId == cittaCannotDel[i])
             return false;
 
@@ -4084,7 +4084,8 @@ float Fighter::getSoulPracticeFactor()
 
 bool Fighter::openSecondSoul(UInt8 cls)
 {
-    if(m_2ndSoul || _level < 60 || cls < 1 || cls >= e_cls_max)
+    if(m_2ndSoul || _level < 60 || cls < 1 || 
+            (cls >= e_cls_max && cls != 13))
         return false;
 
     m_2ndSoul = new SecondSoul(this, cls);
@@ -4980,7 +4981,7 @@ void Fighter::reload2ndSoul()
 
 void Fighter::setSoulLevel(UInt32 level)
 {
-    if(m_2ndSoul || !_owner)
+    if(!m_2ndSoul || !_owner)
         return;
     m_2ndSoul->setLevel(level);
 }
