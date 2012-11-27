@@ -1737,5 +1737,22 @@ void OnFighterCheckDiry( GameMsgHdr& hdr, const void * data )
     player->getBattlePoint();
 }
 
+struct IDIPBuyItemInfo
+{
+    UInt32 itemId;
+    UInt32 num;
+    UInt32 bind;
+    UInt32 price;
+};
+
+void OnIDIPBuy( GameMsgHdr& hdr, const void * data )
+{
+    MSG_QUERY_PLAYER(player);
+    IDIPBuyItemInfo* ibi = (IDIPBuyItemInfo*)data;
+    ConsumeInfo ci(IDIPBuyItem, ibi->itemId, ibi->num);
+    player->useGold(ibi->price, &ci);
+    player->GetPackage()->Add(ibi->itemId, ibi->num, ibi->bind);
+}
+
 #endif // _COUNTRYINNERMSGHANDLER_H_
 
