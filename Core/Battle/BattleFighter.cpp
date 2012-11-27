@@ -1266,7 +1266,7 @@ float BattleFighter::getCounter(BattleFighter* defgt, const GData::SkillBase* sk
         const GData::SkillStrengthenEffect* ef = NULL;
         if(ss)
             ef = ss->getEffect(GData::ON_ATTACK, GData::TYPE_HITRATE_COUNTER);
-        if(!ef)
+        if(!ef && ss)
             ef = ss->getEffect(GData::ON_ATTACK, GData::TYPE_DEC_COUNTER);
         if(ef)
         {

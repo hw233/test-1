@@ -3412,8 +3412,10 @@ bool Fighter::CanDelCitta(UInt16 citta)
 bool Fighter::canCittaBeDel(UInt16 citta)
 {
     UInt16 cittaId = CITTA_ID(citta);
-    if(cittaId > 133 && cittaId < 140)
-        return false;
+    UInt16 cittaCannotDel[] = {134, 137, 135, 141, 142, 143};
+    for(int i = 0; i < sizeof(cittaCannotDel); ++ i)
+        if(cittaId == cittaCannotDel[i])
+            return false;
 
     return true;
 }
