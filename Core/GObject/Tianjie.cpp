@@ -443,7 +443,7 @@ bool Tianjie::LoadFromDB()
     if(execu->Prepare("SELECT `id`, `is_opened`,`is_execute`,`is_finish`,`is_ok`,`level`,`rate`,UNIX_TIMESTAMP(opentime),`r1_killed`,`r2_donated`,`r3_copyid`,`r4_day`,`open_next`, `is_wait`,`is_manual`,`is_touch` FROM `tianjie`  where is_manual=1 order by level desc limit 1", dbexp0) != DB::DB_OK)
         return false;
     GData::DBTianjie dbexp1;
-    if(execu1->Prepare("SELECT `id`, `is_opened`,`is_execute`,`is_finish`,`is_ok`,`level`,`rate`,UNIX_TIMESTAMP(opentime),`r1_killed`,`r2_donated`,`r3_copyid`,`r4_day`,`open_next`, `is_wait`,`is_manual`,`is_touch` FROM `tianjie` order by level desc limit 1", dbexp1) != DB::DB_OK)
+    if(execu1->Prepare("SELECT `id`, `is_opened`,`is_execute`,`is_finish`,`is_ok`,`level`,`rate`,UNIX_TIMESTAMP(opentime),`r1_killed`,`r2_donated`,`r3_copyid`,`r4_day`,`open_next`, `is_wait`,`is_manual`,`is_touch` FROM `tianjie` where level!=999 order by level desc limit 1", dbexp1) != DB::DB_OK)
         return false;
     //有手动的天劫
     bool isManual = execu->Next() == DB::DB_OK;
