@@ -4655,6 +4655,46 @@ BattleFighter* BattleSimulator::getTherapyTarget2(BattleFighter* bf, UInt8 * exc
     return bo;
 }
 
+BattleFighter* BattleSimulator::getTherapyTarget3(BattleFighter* bf, UInt8 * excepts, size_t exceptCount)
+{
+    UInt8 side = bf->getSide();
+    BattleFighter* bo = NULL;
+    UInt32 maxHpLost = 0;
+    UInt8 pos = 0;
+    for(UInt8 i = 0; i < 25; ++ i)
+    {
+        bo = static_cast<BattleFighter*>(_objs[side][i]);
+        if(bo == NULL || bo->getHP() == 0)
+            continue;
+
+        bool except = false;
+        for(size_t j = 0; j < exceptCount; ++ j)
+        {
+            if(excepts[j] == i)
+            {
+                except = true;
+                break;
+            }
+        }
+        if(except)
+            continue;
+
+        UInt32 hp = bo->getHP();
+        UInt32 maxHp = bo->getMaxHP();
+
+        if(((float)(maxHp - hp))/maxHp > ((float)(maxHpLost))/maxHp)
+        {
+            maxHpLost = maxHp - hp;
+            pos = i;
+        }
+    }
+
+    if(maxHpLost != 0)
+        bo = static_cast<BattleFighter*>(_objs[side][pos]);
+
+    return bo;
+}
+
 UInt32 BattleSimulator::FightersEnter(UInt8 prevWin)
 {
     UInt32 rcnt = 0;
@@ -9455,7 +9495,7 @@ void BattleSimulator::doSkillEffectExtraAbsorb(BattleFighter* bf, UInt32 dmg, co
         if(eft[i] == GData::e_eft_selfside_absorb)
         {
             float rhp = (dmg) * efv[i];
-            BattleFighter* bo = getTherapyTarget2(bf, _cur_round_except, _except_count);
+            BattleFighter* bo = getTherapyTarget3(bf, _cur_round_except, _except_count);
             if(!bo)
                 break;
 
@@ -9484,7 +9524,7 @@ void BattleSimulator::doSkillStrenghtenTherapyAnotherMore(BattleFighter* bf, UIn
     if(ef)
     {
         float rhp = (dmg) * ef->value/100;
-        BattleFighter* bo = getTherapyTarget2(bf, _cur_round_except, _except_count);
+        BattleFighter* bo = getTherapyTarget3(bf, _cur_round_except, _except_count);
         if(!bo)
             return;
 
