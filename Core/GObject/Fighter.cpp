@@ -27,6 +27,7 @@
 #include "SecondSoul.h"
 #include "GVar.h"
 #include "GObjectDBExecHelper.h"
+#include "GData/SoulExpTable.h"
 
 namespace GObject
 {
