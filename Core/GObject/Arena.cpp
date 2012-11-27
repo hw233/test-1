@@ -2234,7 +2234,7 @@ void Arena::setArenaInfo(UInt8 type)
 {
     if(type > 1)
         return;
-    WORLD().resetArenaInfo();
+    //WORLD().resetArenaInfo();
     PreliminaryPlayerListIterator it = _preliminaryPlayers_list[type].begin();
     Mutex::ScopedLock lk(globalPlayers.getMutex());
     supportSort cur;
@@ -2244,7 +2244,7 @@ void Arena::setArenaInfo(UInt8 type)
         cur.support = (*it).support;
         cur.heroId = (*it).heroId;
         cur.name = (*it).name;
-        printf("userId = %"I64_FMT"u\n", (*it).id);
+        //printf("userId = %"I64_FMT"u\n", (*it).id);
         cur.playerId = (*it).id;
         arenaSupported.insert(cur);
     }

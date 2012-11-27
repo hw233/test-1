@@ -1542,7 +1542,39 @@ void OnArenaExtraActReq( GameMsgHdr& hdr, const void * data )
 
     if(serverWeek == week)
     {
-        if(now < t1)
+        UInt32 t3 = TimeUtil::SharpDayT(0, now) + ARENA_SUFFER_END;
+        UInt8 type2 = week - ARENA_WEEK_START;
+        if(now > t3 + 60 && GObject::World::stArenaOld[type2].week == week)
+        {
+            Stream st(REP::SERVER_ARENA_EXTRA_ACT);
+            st << week;
+            st << static_cast<UInt8>(0);
+            for(UInt8 i = 0; i < 5; i++)
+            {
+                st << GObject::World::stArenaOld[type2].name[i];
+                st << GObject::World::stArenaOld[type2].heroId[i];
+            }
+            st << GObject::World::stArenaOld[type2].sufferTotal * 24 / 5;
+            st << Stream::eos;
+            player->send(st);
+
+            Stream st2(REP::SERVER_ARENA_EXTRA_ACT);
+            st2 << week;
+            st2 << static_cast<UInt8>(3);
+            if(week == ARENA_WEEK_START)
+                st2 << static_cast<UInt8>(player->GetVar(GObject::VAR_ARENA_SUPPORT_TUE));
+            else
+                st2 << static_cast<UInt8>(player->GetVar(GObject::VAR_ARENA_SUPPORT_WED));
+            for(UInt8 i = 0; i < 5; i++)
+            {
+                st2 << GObject::World::stArenaOld[type2].sufferCnt[i];
+                st2 << GObject::World::stArenaOld[type2].rank[i];
+            }
+            st2 << Stream::eos;
+            player->send(st2);
+            return;
+        }
+        else if(now < t1)
         {
             Stream st(REP::SERVER_ARENA_EXTRA_ACT);
             st << week;
@@ -1587,7 +1619,7 @@ void OnArenaExtraActReq( GameMsgHdr& hdr, const void * data )
                 st << GObject::World::stArenaOld[type2].name[i];
                 st << GObject::World::stArenaOld[type2].heroId[i];
             }
-            st << GObject::World::stArenaOld[type2].sufferTotal;
+            st << GObject::World::stArenaOld[type2].sufferTotal * 24 / 5;
             st << Stream::eos;
             player->send(st);
 

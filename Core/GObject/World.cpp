@@ -1149,8 +1149,8 @@ void World::ArenaExtraActTimer(void *)
         type = 0;
     else
         type = 1;
-    static UInt8 updatetype = 0;
-    static UInt8 updatetype2 = 1;
+    static UInt8 updatetype = 1;
+    static UInt8 updatetype2 = 2;
 
     if(now < t1)
     {

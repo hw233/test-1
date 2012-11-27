@@ -1791,22 +1791,27 @@ DROP TABLE IF EXISTS `arena_extra_board`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `arena_extra_board` (
     `week` tinyint(3) NOT NULL,
+    `name1` varchar(255) NOT NULL DEFAULT '',
+    `name2` varchar(255) NOT NULL DEFAULT '',
+    `name3` varchar(255) NOT NULL DEFAULT '',
+    `name4` varchar(255) NOT NULL DEFAULT '',
+    `name5` varchar(255) NOT NULL DEFAULT '',
+    `heroId1` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `heroId2` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `heroId3` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `heroId4` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `heroId5` tinyint(3) unsigned NOT NULL DEFAULT '0'
     `sufferTotal` int(10) unsigned NOT NULL,
-    `playerId1` bigint(20) unsigned NOT NULL,
-    `playerId2` bigint(20) unsigned NOT NULL,
-    `playerId3` bigint(20) unsigned NOT NULL,
-    `playerId4` bigint(20) unsigned NOT NULL,
-    `playerId5` bigint(20) unsigned NOT NULL,
     `sufferCnt1` int(10) unsigned NOT NULL,
     `sufferCnt2` int(10) unsigned NOT NULL,
     `sufferCnt3` int(10) unsigned NOT NULL,
     `sufferCnt4` int(10) unsigned NOT NULL,
     `sufferCnt5` int(10) unsigned NOT NULL,
-    `rank1` tinyint(3) NOT NULL,
-    `rank2` tinyint(3) NOT NULL,
-    `rank3` tinyint(3) NOT NULL,
-    `rank4` tinyint(3) NOT NULL,
-    `rank5` tinyint(3) NOT NULL,
+    `lasttime1` int(10) unsigned NOT NULL  DEFAULT '0',
+    `lasttime2` int(10) unsigned NOT NULL  DEFAULT '0',
+    `lasttime3` int(10) unsigned NOT NULL  DEFAULT '0',
+    `lasttime4` int(10) unsigned NOT NULL  DEFAULT '0',
+    `lasttime5` int(10) unsigned NOT NULL  DEFAULT '0',
     PRIMARY KEY (`week`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
