@@ -1170,7 +1170,7 @@ void World::ArenaExtraActTimer(void *)
             if(stArena.rank[i] != 0)
                 stArena.rank[i] = 0;
         }
-        GVAR.SetVar(GVAR_ARENA_EXT_PROCESS, 0);
+        //GVAR.SetVar(GVAR_ARENA_EXT_PROCESS, 0);
     }
     else
     {
