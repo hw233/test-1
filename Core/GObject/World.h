@@ -469,14 +469,14 @@ public:
         return nullName;
     }
 
-    inline static void setArenaTotalCnt(UInt16 total)
+    inline static void setArenaTotalCnt(UInt32 total)
     {
         if(stArena.sufferTotal != total)
         {
             stArena.sufferTotal = total;
         }
     }
-    inline static UInt16 getArenaTotalCnt()
+    inline static UInt32 getArenaTotalCnt()
     {
         return stArena.sufferTotal;
     }
