@@ -136,9 +136,9 @@ namespace GObject
 #define MAX_CFRIENDS 50
 
 #define QIXI_MAX_STEPS  24
-#if 1
-#define ARENA_WEEK_START      5
-#define ARENA_WEEK_END        6
+#if 0
+#define ARENA_WEEK_START      2
+#define ARENA_WEEK_END        3
 #define ARENA_SINGUP_START    (TimeUtil::Now()-TimeUtil::SharpDay(0))/3600*3600
 #define ARENA_SINGUP_END      ARENA_SINGUP_START+30*60
 #define ARENA_SUFFER_END      ARENA_SINGUP_END+15*60

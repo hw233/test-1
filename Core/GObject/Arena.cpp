@@ -2241,16 +2241,19 @@ void Arena::setArenaInfo(UInt8 type)
     SupportSortType arenaSupported;
     for(; it != _preliminaryPlayers_list[type].end(); ++ it)
     {
-        cur.support = it->support;
-        cur.heroId = it->heroId;
-        cur.name = it->name;
+        cur.support = (*it).support;
+        cur.heroId = (*it).heroId;
+        cur.name = (*it).name;
+        printf("userId = %"I64_FMT"u\n", (*it).id);
+        cur.playerId = (*it).id;
         arenaSupported.insert(cur);
     }
     UInt8 i = 0;
     for(SupportSortType::iterator it = arenaSupported.begin(), e = arenaSupported.end(); i < 5 && it != e; i++, ++it)
     {
-        WORLD().setArenaName(i, it->name);
-        WORLD().setArenaHeroId(i, it->heroId);
+        WORLD().setArenaName(i, (*it).name);
+        WORLD().setArenaHeroId(i, (*it).heroId);
+        WORLD().setArenaPlayerId(i, (*it).playerId);
     }
 
 }

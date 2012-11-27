@@ -39,7 +39,8 @@ struct stArenaExtra
     UInt32 sufferTotal;
     UInt32 sufferCnt[5];
     UInt32 lasttime[5];
-    UInt32 rank[5];
+    UInt8 rank[5];
+    UInt64 playerId[5];
 };
 
 typedef std::list<Player*> LuckyDrawList;
@@ -65,10 +66,11 @@ struct supportSort
     UInt32 support;
     UInt8 heroId;
     std::string name;
+    UInt64 playerId;
 };
 struct lt_ssort
 {
-    bool operator()(const supportSort& a, const supportSort& b) const { return a.support > b.support; }
+    bool operator()(const supportSort& a, const supportSort& b) const { return a.support >= b.support; }
 };
 typedef std::set<supportSort, lt_ssort> SupportSortType;
 
@@ -450,8 +452,10 @@ public:
 
     inline static void setArenaName(UInt8 pos, std::string name)
     {
-        if(pos < 5 && stArena.name[pos] != name)
+        if(pos < 5/* && stArena.name[pos].compare(name) != 0*/)
         {
+            if(stArena.name[pos] == name)
+                return;
             stArena.name[pos] = name;
         }
     }
@@ -480,7 +484,33 @@ public:
     void setArenaTotalCntEnum();
     inline void resetArenaInfo()
     {
-        memset(&stArena, 0, sizeof(stArena));
+        static std::string nullname;
+        GObject::World::stArena.week = 0;
+        GObject::World::stArena.sufferTotal = 0;
+        for(UInt8 i = 0; i < 5; i++)
+        {
+            GObject::World::stArena.name[i] = nullname;
+            GObject::World::stArena.heroId[i] = 0;
+            GObject::World::stArena.sufferCnt[i] = 0;
+            GObject::World::stArena.lasttime[i] = 0;
+            GObject::World::stArena.rank[i] = 0;
+            GObject::World::stArena.playerId[i] = 0;
+        }
+    }
+    inline static void setArenaPlayerId(UInt8 pos, UInt64 playerId)
+    {
+        if(pos < 5 && stArena.playerId[pos] != playerId)
+        {
+            stArena.playerId[pos] = playerId;
+        }
+    }
+    inline static UInt64 getArenaPlayerId(UInt8 pos)
+    {
+        if(pos < 5)
+        {
+            return stArena.playerId[pos];
+        }
+        return 0;
     }
 
     inline static bool canDestory(UInt32 itemid)
