@@ -948,6 +948,7 @@ namespace GObject
 
 		UInt32 getGold(UInt32 c = 0, IncommingInfo* ii = NULL);
 		UInt32 useGold(UInt32 c, ConsumeInfo * ci=NULL);
+        void deleteGold(UInt32 c);
         UInt32 useGold4LuckDraw(UInt32 c);
         UInt32 getGold4LuckDraw();
 		bool holdGold(UInt32 c, UInt8, ConsumeInfo * ci = NULL);
@@ -1699,6 +1700,16 @@ namespace GObject
         void sendMailItem(UInt16 title, UInt16 content, MailPackage::MailItem* mitem, UInt16 size, bool bind = true);
         void setVipAwardFlag(UInt8 type, UInt32 value);
 
+        //传功
+        UInt8 fightTransform(UInt16 fFighterId, UInt16 tFighterId, UInt8 type);
+        UInt8 canTransform(Fighter * fFgt, Fighter * tFgt, UInt8 type);
+        UInt8 transformUseMoney(Fighter * fFgt, Fighter * tFgt, UInt8 type);
+        UInt8 transformExp(Fighter * fFgt, Fighter * tFgt);
+        UInt8 transformPotential(Fighter * fFgt, Fighter * tFgt);
+        UInt8 transformCapacity(Fighter * fFgt, Fighter * tFgt);
+        UInt8 transformSoul(Fighter * fFgt, Fighter * tFgt);
+        void transformElixir(Fighter * fFgt, Fighter * tFgt);
+            
     private:
         char m_domain[256];
         char m_openid[256];
@@ -1718,7 +1729,7 @@ namespace GObject
                 m_isOffical = true;
         }
         inline void setClientIp(const std::string& clientIp) { strncpy(m_clientIp, clientIp.c_str(), 256);}
-        void setOpenId(const std::string& openid);
+        void setOpenId(const std::string& openid, bool load = false);
         inline void setOpenKey(const std::string& openkey) { strncpy(m_openkey, openkey.c_str(), 256); }
         inline void setSource(const std::string& source) { m_source = source; }
         inline void setVia(const std::string& via) { m_via = via; }

@@ -321,6 +321,8 @@ public:
     bool upCitta(UInt16 citta, int idx, bool = true, bool = false, bool = true);
     // 卸下心法
     bool offCitta(UInt16 citta, bool = false, bool = false, bool = true);
+    // 卸下所有心法
+    void offAllCitta();
     // 增加一个心法
     bool addNewCitta(UInt16 citta, bool = true, bool = false, bool = false);
     // 删除所有心法
@@ -446,10 +448,10 @@ public:
 
     void setAttrType1(UInt8 t);
     void setAttrValue1(UInt16 v);
-    void setAttrType2(UInt8 t);
-    void setAttrValue2(UInt16 v);
-    void setAttrType3(UInt8 t);
-    void setAttrValue3(UInt16 v);
+    void setAttrType2(UInt8 t, bool force=false);
+    void setAttrValue2(UInt16 v, bool force=false);
+    void setAttrType3(UInt8 t, bool force=false);
+    void setAttrValue3(UInt16 v, bool force=false);
     UInt8 getAttrType1(bool = false);
     UInt16 getAttrValue1(bool = false);
     UInt8 getAttrType2(bool = false);
@@ -775,6 +777,7 @@ public:
         UInt64 value = v;
         sendModification(1, &cmd, &value, writedb);
     };
+    SecondSoul* getSecondSoul() {return m_2ndSoul;}
     bool getHideFashion() {return _hideFashion;};
 public:
     inline void setElixirAttr(ElixirAttr& attr) { _elixirattr = attr; }

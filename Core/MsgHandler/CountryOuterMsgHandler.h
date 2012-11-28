@@ -5380,6 +5380,21 @@ void OnExJob( GameMsgHdr & hdr, const void * data )
                         break;
                 }
             }
+        case 3:
+            {
+                UInt16 fId = 0;
+                UInt16 tId = 0;
+                UInt8 t = 0;
+                br >> fId;
+                br >> tId;
+                br >> t;
+                Stream st(REP::EXJOB);
+                UInt8 res = 0;
+                res = player->fightTransform(fId, tId, t);
+                st << type << res << Stream::eos;
+                player->send(st);
+            }
+
             break;
         default:
             break;
@@ -5388,7 +5403,7 @@ void OnExJob( GameMsgHdr & hdr, const void * data )
 
 void OnJobHunter( GameMsgHdr & hdr, const void * data )
 {
-	MSG_QUERY_PLAYER(player);
+    MSG_QUERY_PLAYER(player);
     BinaryReader br(data, hdr.msgHdr.bodyLen);
 
     JobHunter * jobHunter = player->getJobHunter();

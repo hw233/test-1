@@ -1639,7 +1639,7 @@ namespace GObject
                 pl->fixOldVertionTitle(0);
             if(!pl->hasTitle(dbpd.pdata.title))
                 pl->fixOldVertionTitle(dbpd.pdata.title);
-            pl->setOpenId(dbpd.openid);
+            pl->setOpenId(dbpd.openid, true);
 		}
 		lc.finalize();
 

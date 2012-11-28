@@ -72,6 +72,7 @@
 #include <cmath>
 #include "QixiTmpl.h"
 #include "MsgHandler/Memcached.h"
+#include "GData/ExpTable.h"
 
 #define NTD_ONLINE_TIME (4*60*60)
 #ifndef _DEBUG
@@ -4138,6 +4139,21 @@ namespace GObject
             AddVar(VAR_USEGOLD_CNT, c);
         return _playerData.gold;
 	}
+    void Player::deleteGold(UInt32 c)
+    {
+        UInt32 n = _playerData.gold;
+        if( c > _playerData.gold || c == 0)
+        {
+            _playerData.gold = 0;
+        }
+		else
+		{
+		    _playerData.gold -= c;
+            n = c;
+        }
+        sendModification(1, _playerData.gold);
+        udpLog("clear", "F_1158", "", "", "", "", "act", n);
+    }
 
     UInt32 Player::useGold4LuckDraw(UInt32 c)
     {
@@ -7855,8 +7871,10 @@ namespace GObject
                     float decp = fgt->getPotential() - 0.01f;
                     if (decp < static_cast<float>(GObjectManager::getMinPotential())/100)
                         decp = static_cast<float>(GObjectManager::getMinPotential())/100;
+                    /*
                     if (decp < fgt_orig->getPotential())
                         decp = fgt_orig->getPotential();
+                    */
                     fgt->setPotential(decp);
                 }
                 else
@@ -7864,8 +7882,10 @@ namespace GObject
                     float decp = fgt->getCapacity() - 0.1f;
                     if (decp < static_cast<float>(GObjectManager::getMinCapacity())/100)
                         decp = static_cast<float>(GObjectManager::getMinCapacity())/100;
+                    /*
                     if (decp < fgt_orig->getCapacity())
                         decp = fgt_orig->getCapacity();
+                    */
                     fgt->setCapacity(decp);
                 }
 			}
@@ -13261,17 +13281,29 @@ namespace GObject
             return -103;
         }
 
-        if (GetPackage()->GetRestPackageSize() < (itemId+ibt->maxQuantity)/ibt->maxQuantity)
+        if (GetPackage()->GetRestPackageSize() < (num+ibt->maxQuantity)/ibt->maxQuantity)
         {
             err = "背包空间不足";
             return -104;
         }
 
-		ConsumeInfo ci(IDIPBuyItem,itemId,num);
-        useGold(price, &ci);
-
-        GetPackage()->Add(itemId, num, bind);
         err = "购买成功";
+
+        struct IDIPBuyItemInfo
+        {
+            UInt32 itemId;
+            UInt32 num;
+            UInt32 bind;
+            UInt32 price;
+        };
+        IDIPBuyItemInfo ibi;
+        ibi.itemId = itemId;
+        ibi.num = num;
+        ibi.bind = bind;
+        ibi.price = price;
+        GameMsgHdr hdr1(0x268, getThreadId(), this, sizeof(ibi));
+        GLOBAL().PushMsg(hdr1, &ibi);
+
         return 0;
     }
 
@@ -14072,10 +14104,13 @@ namespace GObject
        udpLog("tianjie", "F_1115", "", "", "", "", "act");
    }
    
-   void Player::setOpenId(const std::string& openid)
+   void Player::setOpenId(const std::string& openid, bool load /* = false */)
    {
        strncpy(m_openid, openid.c_str(), 256);
-       DB1().PushUpdateData("UPDATE `player` SET `openid` = '%s' WHERE `id` = %"I64_FMT"u", m_openid, getId());
+       if (!load)
+       {
+           DB1().PushUpdateData("UPDATE `player` SET `openid` = '%s' WHERE `id` = %"I64_FMT"u", m_openid, getId());
+       }
    }
 
    JobHunter* Player::getJobHunter()
@@ -14591,7 +14626,262 @@ void EventTlzAuto::notify(bool isBeginAuto)
 
         DB1().PushUpdateData("UPDATE `player` SET `titleAll` = '%s' WHERE `id` = %"I64_FMT"u", title.c_str(), getId());
     }
+    UInt8 Player::fightTransform(UInt16 fFighterId, UInt16 tFighterId, UInt8 type)
+    {
+        UInt8 res = 0;
+        Fighter * fFgt = findFighter(fFighterId);
+        Fighter * tFgt = findFighter(tFighterId);
+        if (NULL == fFgt || NULL == tFgt)
+            return 1;
+        if (isMainFighter(fFighterId) || isMainFighter(tFighterId))
+            return 2;
+        if (fFgt->getLevel() < 70 || tFgt->getLevel() < 70)
+            return 3;
+        res = canTransform(fFgt, tFgt, type);
+        if (res > 0 )
+            return res;
+        if ((res = transformUseMoney(fFgt, tFgt, type)) > 0)
+            return res;
 
+        if (type & 0x01)
+            res = transformExp(fFgt, tFgt);
+        if ((type & 0x02) && res==0)
+            transformPotential(fFgt, tFgt);
+        //if ((type & 0x04) && res==0)
+        //    transformCapacity(fFgt, tFgt);
+        if ((type & 0x08) && res==0)
+            res = transformSoul(fFgt, tFgt);
+        if ((type & 0x10) && res==0)
+            transformElixir(fFgt, tFgt);
+
+        return res;
+    }
+    UInt8 Player::canTransform(Fighter * fFgt, Fighter * tFgt, UInt8 type)
+    {
+    //    if ((type & 0x01) && (tFgt->getLevel() >= GetLev()))
+    //            return 4;
+        if ((type & 0x02 || type & 0x04) && GetPackage()->GetRestPackageSize() < 1)
+            return 5;
+        if ((type & 0x08) && (fFgt->getSecondSoul() == NULL || tFgt->getSecondSoul() == NULL))
+            return 6;
+        return 0;
+    }
+    UInt8 Player::transformUseMoney(Fighter * fFgt, Fighter * tFgt, UInt8 type)
+    {
+        UInt32 money = 0;
+        if (type & 0x01)
+        {
+            //int n = abs(fFgt->getLevel()-tFgt->getLevel());
+            //money += n * 1;
+             money += 10;
+        }
+        if (type & 0x02)
+        {
+            float p= abs(float(fFgt->getPotential()-tFgt->getPotential()));
+            p *= 100;
+            money += (int)(p+0.5) * 5; 
+
+            float c = abs(float(fFgt->getCapacity()-tFgt->getCapacity()));
+            c *= 10;
+            money += int(c+0.5)*5;
+        }
+        /*if (type & 0x04)
+        {
+            float n = abs(float(fFgt->getCapacity()-tFgt->getCapacity()));
+            n *= 10;
+            money += int(n+0.5)*20;
+        }*/
+        if (type & 0x08)
+        {
+
+            SecondSoul* fSoul = fFgt->getSecondSoul();
+            SecondSoul* tSoul = tFgt->getSecondSoul();
+            //元神境界
+            UInt32 f = fSoul->getStateExp();
+            UInt32 t = tSoul->getStateExp();
+            //元神等级
+            UInt8 fPracLev = fSoul->getPracticeLevel();
+            UInt8 tPracLev = tSoul->getPracticeLevel();
+            //星宿
+            UInt8 fXinxiu = fSoul->getXinxiu();
+            UInt8 tXinxiu = tSoul->getXinxiu();
+            money += abs(int(f-t))/100*10;
+            money += abs(int(fPracLev-tPracLev))*1;
+            if (fXinxiu != tXinxiu)
+                money += 10;
+        }
+        if (type & 0x10)
+        {
+            for (UInt8 i = 0; i < 14; ++i)
+            {
+                Int32 f = fFgt->getElixirAttrByOffset(i);
+                Int32 t = tFgt->getElixirAttrByOffset(i);
+                money += abs(int(f-t))*10;
+            }
+        }
+        //34是测试区
+        if(getGold() < money && cfg.serverNum != 34)
+	    {
+            sendMsgCode(0, 1101);
+            return 10;
+        }
+        if (money > 0 && cfg.serverNum != 34)
+        {
+            ConsumeInfo ci(FightTransform,0,0);
+            useGold(money, &ci);
+        }
+        
+        return 0;
+    }
+    UInt8 Player::transformExp(Fighter * fFgt, Fighter * tFgt)
+    {
+     //   UInt64 exp_70 = GData::expTable.getLevelMin(70);
+     //   UInt64 exp_add = fFgt->getExp() - exp_70;
+     //   tFgt->addExp(exp_add);
+        UInt64 fExp = fFgt->getExp();
+        UInt64 tExp = tFgt->getExp();
+        UInt8 fLev = fFgt->getLevel();
+        UInt8 tLev = tFgt->getLevel();
+        fFgt->setLevelAndExp(tLev, tExp);
+        tFgt->setLevelAndExp(fLev, fExp);
+        return 0;
+    }
+    //潜力和资质,天赋
+    UInt8 Player::transformPotential(Fighter * fFgt, Fighter * tFgt)
+    {
+        //天赋对换
+        UInt8 fAttrType1 = fFgt->getAttrType1();
+        UInt8 fAttrType2 = fFgt->getAttrType2();
+        UInt8 fAttrType3 = fFgt->getAttrType3();
+        UInt8 tAttrType1 = tFgt->getAttrType1();
+        UInt8 tAttrType2 = tFgt->getAttrType2();
+        UInt8 tAttrType3 = tFgt->getAttrType3();
+
+        UInt16 fAttrValue1 = fFgt->getAttrValue1();
+        UInt16 fAttrValue2 = fFgt->getAttrValue2();
+        UInt16 fAttrValue3 = fFgt->getAttrValue3();
+        UInt16 tAttrValue1 = tFgt->getAttrValue1();
+        UInt16 tAttrValue2 = tFgt->getAttrValue2();
+        UInt16 tAttrValue3 = tFgt->getAttrValue3();
+
+        fFgt->setAttrType1(tAttrType1);
+        fFgt->setAttrType2(tAttrType2, true);
+        fFgt->setAttrType3(tAttrType3, true);
+        fFgt->setAttrValue1(tAttrValue1);
+        fFgt->setAttrValue2(tAttrValue2, true);
+        fFgt->setAttrValue3(tAttrValue3, true);
+
+        tFgt->setAttrType1(fAttrType1);
+        tFgt->setAttrType2(fAttrType2, true);
+        tFgt->setAttrType3(fAttrType3, true);
+        tFgt->setAttrValue1(fAttrValue1);
+        tFgt->setAttrValue2(fAttrValue2, true);
+        tFgt->setAttrValue3(fAttrValue3, true);
+
+        float fp = fFgt->getPotential();
+        float tp = tFgt->getPotential();
+        float fc = fFgt->getCapacity();
+        float tc = tFgt->getCapacity(); 
+        fFgt->setPotential(tp);
+        tFgt->setPotential(fp);
+        fFgt->setCapacity(tc);
+        tFgt->setCapacity(fc);
+
+        //卸载第一个被动法宝
+        GObject::ItemEquip* p =NULL;
+        if ( tp < 1.50f || tc < 7.0f)
+        {
+           p =  fFgt->setTrump(p, 1, true);
+           if (p != NULL)
+               GetPackage()->AddExistEquip(p);
+        }
+        fFgt->updateForgeAttr(true);
+        tFgt->updateForgeAttr(true);
+        return 0;
+    }
+    //资质
+    UInt8 Player::transformCapacity(Fighter * fFgt, Fighter * tFgt)
+    {
+        float f = fFgt->getCapacity();
+        float t = tFgt->getCapacity();
+        fFgt->setCapacity(t);
+        tFgt->setCapacity(f);
+
+        //卸载第一个被动法宝
+        GObject::ItemEquip* p =NULL;
+        if ( t < 7.0)
+        {
+            p =  fFgt->setTrump(p, 1, true);
+            if (p != NULL)
+                GetPackage()->AddExistEquip(p);
+        }
+        if (t < 7.0f && f >= 7.0f)
+        {
+            tFgt->getAttrType2(true);
+            tFgt->getAttrType3(true);
+        }
+        return 0;
+    }
+    UInt8 Player::transformSoul(Fighter * fFgt, Fighter * tFgt)
+    {
+        SecondSoul* fSoul = fFgt->getSecondSoul();
+        SecondSoul* tSoul = tFgt->getSecondSoul();
+        if (NULL == fSoul || NULL ==tSoul)
+            return 6;
+        UInt32 f = fSoul->getStateExp();
+        UInt32 t = tSoul->getStateExp();
+        UInt32 fLev = fSoul->getStateLevel();
+        UInt32 tLev = tSoul->getStateLevel();
+        fSoul->setStateExp(tLev, t);
+        tSoul->setStateExp(fLev, f);
+
+        //元神等级
+        UInt8 fPracLev = fSoul->getPracticeLevel();
+        UInt8 tPracLev = tSoul->getPracticeLevel();
+        if (fPracLev != tPracLev)
+        {
+            fSoul->setPracticeLevel(tPracLev);
+            tSoul->setPracticeLevel(fPracLev);
+        }
+        //星宿
+        UInt8 fXinxiu = fSoul->getXinxiu();
+        UInt8 tXinxiu = tSoul->getXinxiu();
+        if (fXinxiu != tXinxiu)
+        {
+            fSoul->setXinxiu(tXinxiu);
+            tSoul->setXinxiu(fXinxiu);
+        }
+        //原始散仙卸载所有心法
+        fFgt->offAllCitta();
+        tFgt->offAllCitta();
+
+        fFgt->send2ndSoulInfo();
+        tFgt->send2ndSoulInfo();
+
+        fFgt->sendMaxSoul();
+        tFgt->sendMaxSoul();
+        return 0;
+    }
+    void Player::transformElixir(Fighter * fFgt, Fighter * tFgt)
+    {
+        for (UInt8 i = 0; i < 14; ++i)
+        {
+            Int32 f = fFgt->getElixirAttrByOffset(i);
+            Int32 t = tFgt->getElixirAttrByOffset(i);
+            if (f != t)
+            {
+                fFgt->addElixirAttrByOffset(i, t-f);
+                tFgt->addElixirAttrByOffset(i, f-t);
+                if (i == 5)
+                {
+                    fFgt->offAllCitta();
+                    tFgt->offAllCitta();
+                }
+            }
+        }
+    }
+    
+ // namespace GObject
     void Player::ArenaExtraAct(UInt8 type, UInt8 opt)
     {
         UInt32 now = TimeUtil::Now();
