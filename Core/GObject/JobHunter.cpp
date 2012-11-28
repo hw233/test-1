@@ -1010,7 +1010,7 @@ bool JobHunter::OnFoundCave(bool isAuto /* = false */)
             return false;
 
         ng = npcIt->second;
-        ng->getLoots(_owner, _owner->_lastExJobAward, 0, NULL);
+        ng->getLoots(_owner, _owner->_lastExJobAward, 0, NULL, true);
 
     }
     else
