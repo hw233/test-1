@@ -1158,6 +1158,15 @@ void World::ArenaExtraActTimer(void *)
             stArena.heroId[0] = 0;
         if(World::getArenaTotalCnt() != 0)
             World::setArenaTotalCnt(0);
+        for(UInt8 i = 0; i < 5; i++)
+        {
+            if(stArena.sufferCnt[i] != 0)
+                stArena.sufferCnt[i] = 0;
+            if(stArena.lasttime[i] != 0)
+                stArena.lasttime[i] = 0;
+            if(stArena.rank[i] != 0)
+                stArena.rank[i] = 0;
+        }
     }
     else
     {
