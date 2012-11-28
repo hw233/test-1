@@ -1664,6 +1664,16 @@ namespace GObject
         void sendMailItem(UInt16 title, UInt16 content, MailPackage::MailItem* mitem, UInt16 size, bool bind = true);
         void setVipAwardFlag(UInt8 type, UInt32 value);
 
+        //传功
+        UInt8 fightTransform(UInt16 fFighterId, UInt16 tFighterId, UInt8 type);
+        UInt8 canTransform(Fighter * fFgt, Fighter * tFgt, UInt8 type);
+        UInt8 transformUseMoney(Fighter * fFgt, Fighter * tFgt, UInt8 type);
+        UInt8 transformExp(Fighter * fFgt, Fighter * tFgt);
+        UInt8 transformPotential(Fighter * fFgt, Fighter * tFgt);
+        UInt8 transformCapacity(Fighter * fFgt, Fighter * tFgt);
+        UInt8 transformSoul(Fighter * fFgt, Fighter * tFgt);
+        void transformElixir(Fighter * fFgt, Fighter * tFgt);
+            
     private:
         char m_domain[256];
         char m_openid[256];
