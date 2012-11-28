@@ -317,6 +317,8 @@ public:
     void delAllCitta( bool = true);
     // 删除一个心法
     bool delCitta(UInt16 citta, bool = true);
+    //是否可以删除某个心法
+    bool CanDelCitta(UInt16 citta);
     // 是否学会了此心法
     int hasCitta(UInt16 citta);
     // 是否装备了此心法
