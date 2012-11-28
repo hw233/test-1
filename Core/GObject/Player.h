@@ -5,6 +5,7 @@
 #include "TaskData.h"
 #include "EventBase.h"
 #include "Var.h"
+#include "GVar.h"
 #include "GData/LootTable.h"
 #include "GData/AttrExtra.h"
 

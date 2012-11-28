@@ -82,6 +82,7 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 	//读取配置文件
 	TimeUtil::Init();
     GObject::VarSystem::Init();
+    GObject::GVarSystem::Init();
 	cfg.load(scriptStr);
 	globalSysMsg.load();
 //	Battle::battleReport.init();
