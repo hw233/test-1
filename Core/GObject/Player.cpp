@@ -13190,17 +13190,29 @@ namespace GObject
             return -103;
         }
 
-        if (GetPackage()->GetRestPackageSize() < (itemId+ibt->maxQuantity)/ibt->maxQuantity)
+        if (GetPackage()->GetRestPackageSize() < (num+ibt->maxQuantity)/ibt->maxQuantity)
         {
             err = "背包空间不足";
             return -104;
         }
 
-		ConsumeInfo ci(IDIPBuyItem,itemId,num);
-        useGold(price, &ci);
-
-        GetPackage()->Add(itemId, num, bind);
         err = "购买成功";
+
+        struct IDIPBuyItemInfo
+        {
+            UInt32 itemId;
+            UInt32 num;
+            UInt32 bind;
+            UInt32 price;
+        };
+        IDIPBuyItemInfo ibi;
+        ibi.itemId = itemId;
+        ibi.num = num;
+        ibi.bind = bind;
+        ibi.price = price;
+        GameMsgHdr hdr1(0x268, getThreadId(), this, sizeof(ibi));
+        GLOBAL().PushMsg(hdr1, &ibi);
+
         return 0;
     }
 
