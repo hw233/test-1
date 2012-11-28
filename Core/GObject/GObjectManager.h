@@ -107,6 +107,7 @@ namespace GObject
         static bool loadRNR();
         static bool loadSkillStrengthen();
         static bool loadQixi();
+        static bool loadArenaExtraBoard();
 
         static bool addGM(UInt64 id, UInt8 lvl);
         static bool delGM(UInt64 id);
@@ -128,6 +129,8 @@ namespace GObject
         static bool loadAttrFactor();
 
         static bool loadQQVipAward();
+
+        static bool loadJobHunter();
 
         static void setFFTypeChance(UInt32);
         static void setFFAttrChance(UInt32);

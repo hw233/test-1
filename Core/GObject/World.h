@@ -22,7 +22,6 @@ namespace Script
 
 namespace GObject
 {
-
 struct MoneyIn
 {
     int gold;
@@ -30,6 +29,18 @@ struct MoneyIn
     int tael;
     int achievement;
     int prestige;
+};
+
+struct stArenaExtra
+{
+    UInt8 week;
+    std::string name[5];
+    UInt8 heroId[5];
+    UInt32 sufferTotal;
+    UInt32 sufferCnt[5];
+    UInt32 lasttime[5];
+    UInt8 rank[5];
+    UInt64 playerId[5];
 };
 
 typedef std::list<Player*> LuckyDrawList;
@@ -49,6 +60,19 @@ struct lt_rcsort
 };
 
 typedef std::set<RCSort, lt_rcsort> RCSortType;
+
+struct supportSort
+{
+    UInt32 support;
+    UInt8 heroId;
+    std::string name;
+    UInt64 playerId;
+};
+struct lt_ssort
+{
+    bool operator()(const supportSort& a, const supportSort& b) const { return a.support >= b.support; }
+};
+typedef std::set<supportSort, lt_ssort> SupportSortType;
 
 struct QixiScore
 {
@@ -73,6 +97,18 @@ struct ScoreGreater
 typedef std::multiset<QixiPair*, ScoreGreater> QixiPlayerSet;
 typedef QixiPlayerSet::iterator QixiPlayersIt;
 typedef std::map<Player*, QixiPlayersIt> QixiScoreMap;
+
+struct ValueSort
+{
+    UInt32 sufferCnt;
+    UInt32 lastTime;
+    std::string name;
+};
+struct lt_valuesort
+{
+    bool operator()(const ValueSort& a, const ValueSort& b) const;
+};
+typedef std::multiset<ValueSort, lt_valuesort> ValueSortType;
 
 class World:
 	public WorkerRunner<WorldMsgHandler>
@@ -283,6 +319,11 @@ public:
     inline static bool get11Act()
     { return _11Act; }
 
+    inline static void setSSToolbarAct(bool v)
+    { _ssToolbarAct= v; }
+    inline static bool getSSToolbarAct()
+    { return _ssToolbarAct; }
+
     inline static void setGuoqing(bool v)
     { _guoqing = v; }
     inline static bool getGuoqing()
@@ -393,6 +434,85 @@ public:
     inline static bool getTgcEvent()
     { return _tgcevent; }
 
+    inline static void setArenaHeroId(UInt8 pos, UInt8 heroId)
+    {
+        if(pos < 5 && stArena.heroId[pos] != heroId)
+        {
+            stArena.heroId[pos] = heroId;
+        }
+    }
+    inline static UInt8 getArenaHeroId(UInt8 pos)
+    {
+        if(pos < 5)
+        {
+            return stArena.heroId[pos];
+        }
+        return 0;
+    }
+
+    inline static void setArenaName(UInt8 pos, std::string name)
+    {
+        if(pos < 5/* && stArena.name[pos].compare(name) != 0*/)
+        {
+            if(stArena.name[pos] == name)
+                return;
+            stArena.name[pos] = name;
+        }
+    }
+    inline static std::string getArenaName(UInt8 pos)
+    {
+        static std::string nullName;
+        if(pos < 5)
+        {
+            return stArena.name[pos];
+        }
+        return nullName;
+    }
+
+    inline static void setArenaTotalCnt(UInt32 total)
+    {
+        if(stArena.sufferTotal != total)
+        {
+            stArena.sufferTotal = total;
+        }
+    }
+    inline static UInt32 getArenaTotalCnt()
+    {
+        return stArena.sufferTotal;
+    }
+    static void setArenaInfo(UInt8 type);
+    void setArenaTotalCntEnum();
+    inline void resetArenaInfo()
+    {
+        static std::string nullname;
+        GObject::World::stArena.week = 0;
+        GObject::World::stArena.sufferTotal = 0;
+        for(UInt8 i = 0; i < 5; i++)
+        {
+            GObject::World::stArena.name[i] = nullname;
+            GObject::World::stArena.heroId[i] = 0;
+            GObject::World::stArena.sufferCnt[i] = 0;
+            GObject::World::stArena.lasttime[i] = 0;
+            GObject::World::stArena.rank[i] = 0;
+            GObject::World::stArena.playerId[i] = 0;
+        }
+    }
+    inline static void setArenaPlayerId(UInt8 pos, UInt64 playerId)
+    {
+        if(pos < 5 && stArena.playerId[pos] != playerId)
+        {
+            stArena.playerId[pos] = playerId;
+        }
+    }
+    inline static UInt64 getArenaPlayerId(UInt8 pos)
+    {
+        if(pos < 5)
+        {
+            return stArena.playerId[pos];
+        }
+        return 0;
+    }
+
     inline static bool canDestory(UInt32 itemid)
     {
         static UInt32 items[] =
@@ -478,6 +598,7 @@ public:
     static bool _qixi;
     static bool _wansheng;
     static bool _11Act;
+    static bool _ssToolbarAct;
     static bool _guoqing;
     static bool _9215Act;
     static bool _enchant_gt11;
@@ -505,6 +626,8 @@ public:
     static bool _loginAward;
     static bool _bluediamonSuperman;
     static bool _tgcevent;
+    static stArenaExtra stArenaOld[2];
+    static stArenaExtra stArena;
 
 public:
     static RCSortType rechargeSort;
@@ -541,6 +664,7 @@ private:
 	static void Tianjie_Refresh(void*);
 	static void DaysRank_Refresh(void*);
     static void TownDeamonTmAward(void *);
+    static void ArenaExtraActTimer(void *);
     static void ClanCopyCheck(void *);
     static void ClanStatueCheck(void *);
     //static void advancedHookTimer(void *para);

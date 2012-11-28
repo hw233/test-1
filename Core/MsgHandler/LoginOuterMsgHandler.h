@@ -358,8 +358,8 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
         }
         if (4 == res)
         {
-            UInt8 platform = atoi(player->getDomain());
-            if (cfg.GMCheck && (platform == 11 || platform == 17))
+            //UInt8 platform = atoi(player->getDomain());
+            if (cfg.GMCheck )
             {
                 size_t len = 0;
                 char key[MEMCACHED_MAX_KEY] = {0};
@@ -689,7 +689,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 			lup.fighter = fgt;
 			lup.updateId();
 
-			DB1().PushUpdateData("INSERT INTO `player` (`id`, `name`, `country`, `location`, `lineup`, `wallow`, `formation`, `formations`) VALUES (%" I64_FMT "u, '%s', %u, %u, '%u,12', %u, %u, '%u,%u')", pl->getId(), nu._name.c_str(), country, loc, fgtId, PLAYER_DATA(pl, wallow), FORMATION_1, FORMATION_1, FORMATION_2);
+			DB1().PushUpdateData("INSERT INTO `player` (`id`, `name`, `country`, `location`, `lineup`, `wallow`, `formation`, `formations`, `openid`) VALUES (%" I64_FMT "u, '%s', %u, %u, '%u,12', %u, %u, '%u,%u', '%s')", pl->getId(), nu._name.c_str(), country, loc, fgtId, PLAYER_DATA(pl, wallow), FORMATION_1, FORMATION_1, FORMATION_2, nu._openid.c_str());
 
 			GObject::globalPlayers.add(pl);
 			GObject::newPlayers.add(pl);
@@ -1431,7 +1431,58 @@ void QueryLockUser(LoginMsgHdr& hdr,const void * data)
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
+void SetPlatformLoginLimit(LoginMsgHdr& hdr,const void * data)
+{
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    UInt8 pf = 0;
+    UInt32 value = 0;
+    CHKKEY();
+    br>>pf;
+    br>>value;
 
+    UInt8 ret = 1;
+    INFO_LOG("GMSETLOGINLIMIT: %u, %u", pf, value);
+    if (pf < 256)
+    {
+        setPlatformLogin(pf, value);
+        ret = 0;
+    }
+    Stream st(SPEP::SETLOGINLIMIT);
+    st << ret << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
+void DeleteGold(LoginMsgHdr& hdr,const void * data)
+{
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    std::string playerIds;
+    UInt32 gold;
+    CHKKEY();
+    br>>playerIds;
+    br>>gold;
+
+    UInt8 ret = 1;
+    INFO_LOG("GMDELETEGOLD: %s, %u", playerIds.c_str(), gold);
+    std::string playerId = GetNextSection(playerIds, ',');
+    while (!playerId.empty())
+    {
+        UInt64 pid = atoll(playerId.c_str());
+        if(cfg.merged)
+        {
+            UInt16 serverNo = 0;
+            br >> serverNo;
+            pid += (static_cast<UInt64>(serverNo) << 48);
+        }
+        GObject::Player * pl = GObject::globalPlayers[pid];
+        if (NULL != pl)
+            pl->deleteGold(gold);
+        playerId = GetNextSection(playerIds, ',');
+    }
+    ret = 0;
+    Stream st(SPEP::DELETEGOLD);
+    st << ret << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
 void GmHandlerFromBs(LoginMsgHdr &hdr,const void * data)
 {
     BinaryReader br(data,hdr.msgHdr.bodyLen);

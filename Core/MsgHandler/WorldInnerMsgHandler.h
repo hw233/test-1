@@ -1147,4 +1147,23 @@ void OnDaysRankMsg( GameMsgHdr& hdr, const void* data )
     GObject::DaysRank::instance().updateDaysValue(msg); 
 }
 
+
+void OnSendClanMemberList( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+
+    struct ClanMemberListReq
+    {
+        UInt8 _type;
+        UInt8 _start;
+        UInt8 _count;
+    };
+
+    ClanMemberListReq* cmlr = reinterpret_cast<ClanMemberListReq*>(const_cast<void*>(data));
+    GObject::Clan *clan = player->getClan();
+    if(clan != NULL)
+        clan->sendClanList(player, cmlr->_type, cmlr->_start, cmlr->_count);
+}
+
+
 #endif // _WORLDINNERMSGHANDLER_H_

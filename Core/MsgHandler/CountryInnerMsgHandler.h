@@ -180,6 +180,14 @@ void OnResetRecharge(GameMsgHdr& hdr, const void * data)
     player->sendRechargeInfo();
 }
 
+void OnResetConsume(GameMsgHdr& hdr, const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+    if (player->GetVar(VAR_CONSUME))
+        player->SetVar(VAR_CONSUME, 0);
+    player->sendConsumeInfo();
+}
+
 void OnTimerEventCompletedNotify( GameMsgHdr& hdr, const void * data )
 {
 	struct EventMsg
@@ -712,8 +720,10 @@ void OnDailyCheck( GameMsgHdr& hdr, const void * data )
 
     player->buildClanTask(true);
     player->clearFinishCount();
+    /*
     if (World::_thanksgiving)
         player->resetThanksgiving();
+    */
     if (World::_blueactiveday)
         player->onBlueactiveday();
     player->GetShuoShuo()->reset();
@@ -1725,6 +1735,23 @@ void OnFighterCheckDiry( GameMsgHdr& hdr, const void * data )
 {
     MSG_QUERY_PLAYER(player);
     player->getBattlePoint();
+}
+
+struct IDIPBuyItemInfo
+{
+    UInt32 itemId;
+    UInt32 num;
+    UInt32 bind;
+    UInt32 price;
+};
+
+void OnIDIPBuy( GameMsgHdr& hdr, const void * data )
+{
+    MSG_QUERY_PLAYER(player);
+    IDIPBuyItemInfo* ibi = (IDIPBuyItemInfo*)data;
+    ConsumeInfo ci(IDIPBuyItem, ibi->itemId, ibi->num);
+    player->useGold(ibi->price, &ci);
+    player->GetPackage()->Add(ibi->itemId, ibi->num, ibi->bind);
 }
 
 #endif // _COUNTRYINNERMSGHANDLER_H_

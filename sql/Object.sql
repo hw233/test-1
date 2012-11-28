@@ -912,6 +912,7 @@ CREATE TABLE `player` (
   `dungeonEnd` int(10) unsigned NOT NULL DEFAULT '0',
   `newGuild` bigint(20) unsigned NOT NULL DEFAULT '0',
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `openid` varchar(1024) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `name` (`name`),
   KEY `mainFighter` (`mainFighter`)
@@ -1786,4 +1787,49 @@ CREATE TABLE `days_rank` (
     UNIQUE KEY `unq` (`player_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `arena_extra_board`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `arena_extra_board` (
+    `week` tinyint(3) NOT NULL,
+    `name1` varchar(255) NOT NULL DEFAULT '',
+    `name2` varchar(255) NOT NULL DEFAULT '',
+    `name3` varchar(255) NOT NULL DEFAULT '',
+    `name4` varchar(255) NOT NULL DEFAULT '',
+    `name5` varchar(255) NOT NULL DEFAULT '',
+    `heroId1` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `heroId2` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `heroId3` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `heroId4` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `heroId5` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `sufferTotal` int(10) unsigned NOT NULL,
+    `sufferCnt1` int(10) unsigned NOT NULL,
+    `sufferCnt2` int(10) unsigned NOT NULL,
+    `sufferCnt3` int(10) unsigned NOT NULL,
+    `sufferCnt4` int(10) unsigned NOT NULL,
+    `sufferCnt5` int(10) unsigned NOT NULL,
+    `lasttime1` int(10) unsigned NOT NULL  DEFAULT '0',
+    `lasttime2` int(10) unsigned NOT NULL  DEFAULT '0',
+    `lasttime3` int(10) unsigned NOT NULL  DEFAULT '0',
+    `lasttime4` int(10) unsigned NOT NULL  DEFAULT '0',
+    `lasttime5` int(10) unsigned NOT NULL  DEFAULT '0',
+    PRIMARY KEY (`week`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `job_hunter`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `job_hunter` (
+    `playerId` bigint(20) unsigned NOT NULL, COMMENT '玩家Id'
+    `fighterList` varchar(1024) NOT NULL DEFAULT '', COMMENT '墨家散仙列表'
+    `mapInfo` varchar(1024) NOT NULL DEFAULT '', COMMENT '寻墨地图信息'
+    `progress` tinyint(3) unsigned NOT NULL DEFAULT 0, COMMENT '游戏进程状态'
+    `posX` tinyint(3) unsigned NOT NULL DEFAULT 0, COMMENT 'X坐标值'
+    `posY` tinyint(3) unsigned NOT NULL DEFAULT 0, COMMENT 'Y坐标值'
+    `earlyPosX` tinyint(3) unsigned NOT NULL DEFAULT 0, COMMENT '上一步X坐标值'
+    `earlyPosY` tinyint(3) unsigned NOT NULL DEFAULT 0, COMMENT '上一步Y坐标值'
+    `stepCount` int(10) unsigned NOT NULL DEFAULT 0, COMMENT '已使用步数'
+    PRIMARY KEY (`playerId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

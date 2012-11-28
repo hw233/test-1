@@ -336,7 +336,7 @@ bool Dungeon::doChallenge( Player * player, DungeonPlayerInfo& dpi, bool report,
 		for(iter = dm->monsterPos.begin(); iter != dm->monsterPos.end(); ++ iter)
 		{
 			GObject::Fighter * fgt = iter->first;
-			size_t c = iter->second.size();
+		    size_t c = iter->second.size();
 			for(size_t i = 0; i < c; ++ i)
 			{
 				bsim.newFighter(1, iter->second[i], fgt);

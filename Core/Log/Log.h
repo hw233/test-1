@@ -84,6 +84,9 @@ enum PurchaseType
     IDIPBuyItem                 = 73,
     RC7DayLogin                 = 74,
     MoveEquip                   = 75,
+    ThanksGivingDay             = 76,
+    LogArenaExtraAct            = 77,
+    FightTransform              = 78,
 };
 
 enum IncomingType
@@ -167,6 +170,7 @@ enum ItemFrom
     FromNewRC7DayRecharge,
     FromNewRC7DayTarget,
     FromDailyStrengthen = 37, //变强秘宝
+    FromJobHunter = 38, // 寻墨游戏
 };
 
 enum ItemTo

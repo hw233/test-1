@@ -8,6 +8,7 @@
 
 
 static memcached_st* memc = NULL;
+static int g_platform_login_number[256] = {0};
 
 struct Sp
 {
