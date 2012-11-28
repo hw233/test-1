@@ -54,6 +54,7 @@
 #include "SHSYTmpl.h"
 #include "QixiTmpl.h"
 #include "MsgHandler/Memcached.h"
+#include "GVar.h"
 
 static const UInt32 DAYSRANKTM = 23 * 3600+50*60;
 
@@ -1144,7 +1145,9 @@ void World::ArenaExtraActTimer(void *)
     UInt32 t2 = TimeUtil::SharpDayT(0, now) + ARENA_SINGUP_END;
     UInt32 t3 = TimeUtil::SharpDayT(0, now) + ARENA_SUFFER_END;
     UInt8 type;
-
+    UInt32 startTime[] = {t1, t2, t3};
+    UInt32 curProcess = GVAR.GetVar(GVAR_ARENA_EXT_PROCESS);
+    //printf("curProcess = %u\n", curProcess);
     if(week == ARENA_WEEK_START)
         type = 0;
     else
@@ -1167,6 +1170,7 @@ void World::ArenaExtraActTimer(void *)
             if(stArena.rank[i] != 0)
                 stArena.rank[i] = 0;
         }
+        //GVAR.SetVar(GVAR_ARENA_EXT_PROCESS, 0);
     }
     else
     {
@@ -1181,6 +1185,94 @@ void World::ArenaExtraActTimer(void *)
         }
     }
 
+    if(curProcess > 2 || now < startTime[curProcess])
+        return;
+    switch(curProcess)
+    {
+        case 0:
+            printf("t1\n");
+            globalPlayers.enumerate(enum_extra_act_update_status, static_cast<void *>(&updatetype));
+            GVAR.AddVar(GVAR_ARENA_EXT_PROCESS, 1);
+            break;
+        case 1:
+            printf("t2\n");
+            globalPlayers.enumerate(enum_extra_act_update_status, static_cast<void *>(&updatetype2));
+            GVAR.AddVar(GVAR_ARENA_EXT_PROCESS, 1);
+            break;
+        case 2:
+            {
+            printf("t3\n");
+
+            ValueSort cur;
+            ValueSortType resultRank;
+
+            SYSMSGV(title, 739);
+            SYSMSGV(content, 740);
+            for(UInt8 i = 0; i < 5; i++)
+            {
+
+                Player* pl = globalPlayers[World::stArena.playerId[i]];
+                if(pl == NULL)
+                    continue;
+                Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+                if(mail)
+                {
+                    MailPackage::MailItem mitem[1] = {{9076,1}};
+                    mailPackageManager.push(mail->id, mitem, 1, true);
+
+                    std::string strItems;
+                    for(int index = 0; index < 1; ++ index)
+                    {
+                        strItems += Itoa(mitem[index].id);
+                        strItems += ",";
+                        strItems += Itoa(mitem[index].count);
+                        strItems += "|";
+                    }
+                    DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, LogArenaExtraAct, title, content, strItems.c_str(), mail->recvTime);
+                }
+            }
+
+            for(UInt8 i = 0; i < 5; i++)
+            {
+                cur.sufferCnt = World::stArena.sufferCnt[i];
+                cur.lastTime = World::stArena.lasttime[i];
+                cur.name = World::stArena.name[i];
+                resultRank.insert(cur);
+            }
+            for(UInt8 i = 0; i < 5; i++)
+            {
+                UInt8 j = 0;
+                for(ValueSortType::iterator iter = resultRank.begin(), e = resultRank.end(); iter != e && j < 5; ++iter, ++j)
+                {
+                    if((*iter).name == World::stArena.name[i])
+                        break;
+                }
+                stArena.rank[i] = j + 1;
+            }
+
+            globalPlayers.enumerate(enum_extra_act_award, static_cast<void *>(NULL));
+
+            stArena.week = week;
+            DB1().PushUpdateData("REPLACE INTO `arena_extra_board` (`week`, `name1`, `name2`, `name3`, `name4`, `name5`, `heroId1`, `heroId2`, `heroId3`, `heroId4`, `heroId5`, `sufferTotal`, `sufferCnt1`, `sufferCnt2`, `sufferCnt3`, `sufferCnt4`, `sufferCnt5`, `lasttime1`, `lasttime2`, `lasttime3`, `lasttime4`, `lasttime5`) VALUES(%u, '%s', '%s', '%s', '%s', '%s', %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", World::stArena.week, World::stArena.name[0].c_str(), World::stArena.name[1].c_str(), World::stArena.name[2].c_str(), World::stArena.name[3].c_str(), World::stArena.name[4].c_str(), World::stArena.heroId[0], World::stArena.heroId[1], World::stArena.heroId[2], World::stArena.heroId[3], World::stArena.heroId[4], World::stArena.sufferTotal, World::stArena.sufferCnt[0], World::stArena.sufferCnt[1], World::stArena.sufferCnt[2], World::stArena.sufferCnt[3], World::stArena.sufferCnt[4], World::stArena.lasttime[0], World::stArena.lasttime[1], World::stArena.lasttime[2], World::stArena.lasttime[3], World::stArena.lasttime[4]);
+
+            GObject::World::stArenaOld[type].week = GObject::World::stArena.week;
+            GObject::World::stArenaOld[type].sufferTotal = GObject::World::stArena.sufferTotal;
+            for(UInt8 i = 0; i < 5; i++)
+            {
+                GObject::World::stArenaOld[type].name[i] = GObject::World::stArena.name[i];
+                GObject::World::stArenaOld[type].heroId[i] = GObject::World::stArena.heroId[i];
+                GObject::World::stArenaOld[type].sufferCnt[i] = GObject::World::stArena.sufferCnt[i];
+                GObject::World::stArenaOld[type].lasttime[i] = GObject::World::stArena.lasttime[i];
+                GObject::World::stArenaOld[type].rank[i] = GObject::World::stArena.rank[i];
+            }
+            GVAR.AddVar(GVAR_ARENA_EXT_PROCESS, 1);
+            }
+            break;
+        default:
+            break;
+
+    }
+#if 0
     if(now >= t1 && now < t1 + 5)
     {
         printf("t1\n");
@@ -1261,6 +1353,7 @@ void World::ArenaExtraActTimer(void *)
     else
     {
     }
+#endif
 }
 
 void World::ClanStatueCheck(void *)

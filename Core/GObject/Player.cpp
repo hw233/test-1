@@ -7815,8 +7815,10 @@ namespace GObject
                     float decp = fgt->getPotential() - 0.01f;
                     if (decp < static_cast<float>(GObjectManager::getMinPotential())/100)
                         decp = static_cast<float>(GObjectManager::getMinPotential())/100;
+                    /*
                     if (decp < fgt_orig->getPotential())
                         decp = fgt_orig->getPotential();
+                    */
                     fgt->setPotential(decp);
                 }
                 else
@@ -7824,8 +7826,10 @@ namespace GObject
                     float decp = fgt->getCapacity() - 0.1f;
                     if (decp < static_cast<float>(GObjectManager::getMinCapacity())/100)
                         decp = static_cast<float>(GObjectManager::getMinCapacity())/100;
+                    /*
                     if (decp < fgt_orig->getCapacity())
                         decp = fgt_orig->getCapacity();
+                    */
                     fgt->setCapacity(decp);
                 }
 			}
@@ -13205,17 +13209,29 @@ namespace GObject
             return -103;
         }
 
-        if (GetPackage()->GetRestPackageSize() < (itemId+ibt->maxQuantity)/ibt->maxQuantity)
+        if (GetPackage()->GetRestPackageSize() < (num+ibt->maxQuantity)/ibt->maxQuantity)
         {
             err = "背包空间不足";
             return -104;
         }
 
-		ConsumeInfo ci(IDIPBuyItem,itemId,num);
-        useGold(price, &ci);
-
-        GetPackage()->Add(itemId, num, bind);
         err = "购买成功";
+
+        struct IDIPBuyItemInfo
+        {
+            UInt32 itemId;
+            UInt32 num;
+            UInt32 bind;
+            UInt32 price;
+        };
+        IDIPBuyItemInfo ibi;
+        ibi.itemId = itemId;
+        ibi.num = num;
+        ibi.bind = bind;
+        ibi.price = price;
+        GameMsgHdr hdr1(0x268, getThreadId(), this, sizeof(ibi));
+        GLOBAL().PushMsg(hdr1, &ibi);
+
         return 0;
     }
 
@@ -14016,10 +14032,13 @@ namespace GObject
        udpLog("tianjie", "F_1115", "", "", "", "", "act");
    }
    
-   void Player::setOpenId(const std::string& openid)
+   void Player::setOpenId(const std::string& openid, bool load /* = false */)
    {
        strncpy(m_openid, openid.c_str(), 256);
-       DB1().PushUpdateData("UPDATE `player` SET `openid` = '%s' WHERE `id` = %"I64_FMT"u", m_openid, getId());
+       if (!load)
+       {
+           DB1().PushUpdateData("UPDATE `player` SET `openid` = '%s' WHERE `id` = %"I64_FMT"u", m_openid, getId());
+       }
    }
 
 EventTlzAuto::EventTlzAuto( Player * player, UInt32 interval, UInt32 count)
@@ -14534,7 +14553,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
             WORLD().setArenaTotalCntEnum();
         }
 
-        UInt16 totalCnt = WORLD().getArenaTotalCnt();
+        UInt32 totalCnt = WORLD().getArenaTotalCnt();
         UInt32 totalSufferCnt = totalCnt * 24 / 5;
 
         switch(type)

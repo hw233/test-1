@@ -317,6 +317,8 @@ public:
     void delAllCitta( bool = true);
     // 删除一个心法
     bool delCitta(UInt16 citta, bool = true);
+    //是否可以删除某个心法
+    bool CanDelCitta(UInt16 citta);
     // 是否学会了此心法
     int hasCitta(UInt16 citta);
     // 是否装备了此心法
@@ -746,7 +748,7 @@ public:
     bool changeSecondSoulClass(UInt8 cls);
     bool changeSecondSoulXinxiu(UInt8 xinxiu);
 
-    void enchantSoul(UInt32 itemId, bool bind, std::vector<SoulItemExp>& soulItemExpOut);
+    bool enchantSoul(UInt32 itemId, bool bind, std::vector<SoulItemExp>& soulItemExpOut);
     bool equipSoulSkill(UInt8 idx, UInt32 itemId, bool bind=true);
 
     void send2ndSoulInfo();

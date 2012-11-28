@@ -4937,7 +4937,8 @@ void OnSecondSoulReq( GameMsgHdr& hdr, const void* data)
                 UInt16 itemId = 0;
                 UInt8 bind = 0;
                 br >> itemId >> bind;
-                fgt->enchantSoul(itemId, bind != 0, soulItemExpOut);
+                if(!fgt->enchantSoul(itemId, bind != 0, soulItemExpOut))
+                    break;
             }
 
             UInt16 infoNum = soulItemExpOut.size();
