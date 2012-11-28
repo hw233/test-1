@@ -1795,6 +1795,8 @@ namespace GObject
         void getNewRC7DayTargetAward(UInt8 val);
         void get11DailyAward(UInt8 opt);
         void send11DailyInfo();
+        void getSSToolbarAward();
+        void sendSSToolbarInfo();
 
         // 帮派神像
         float getClanStatueHPEffect();

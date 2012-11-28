@@ -6386,6 +6386,14 @@ function ItemNormal_00009216(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00009228(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    player:setTitle(44, 0)
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
 function ItemNormal_fighterCard(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -6686,6 +6694,7 @@ local ItemNormal_Table = {
     [1330] = ItemNormal_citta,
     [1331] = ItemNormal_citta,
     [1332] = ItemNormal_citta,
+    [1347] = ItemNormal_citta,
 
     [1000] = ItemNormal_formation,
     [1001] = ItemNormal_formation,
@@ -7973,6 +7982,7 @@ local ItemNormal_Table = {
     [9213] = ItemNormal_00009210,
     [9215] = ItemNormal_00009215,
     [9216] = ItemNormal_00009216,
+    [9228] = ItemNormal_00009228,
 
     [10000] = ItemNormal_00010000,
     [10001] = ItemNormal_00010001,

@@ -133,6 +133,7 @@ bool World::_july = false;
 bool World::_qixi= false;
 bool World::_wansheng= false;
 bool World::_11Act= false;
+bool World::_ssToolbarAct= false;
 bool World::_guoqing= false;
 bool World::_9215Act= false;
 bool World::_enchant_gt11 = false;
