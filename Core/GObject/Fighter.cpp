@@ -27,6 +27,7 @@
 #include "SecondSoul.h"
 #include "GVar.h"
 #include "GObjectDBExecHelper.h"
+#include "GData/SoulExpTable.h"
 
 namespace GObject
 {
@@ -4120,17 +4121,19 @@ bool Fighter::practiceLevelUp()
     return true;
 }
 
-void Fighter::enchantSoul(UInt32 itemId, bool bind, std::vector<SoulItemExp>& soulItemExpOut)
+bool Fighter::enchantSoul(UInt32 itemId, bool bind, std::vector<SoulItemExp>& soulItemExpOut)
 {
     if(!m_2ndSoul)
-        return;
+        return false;
     std::map<UInt32, UInt32>::iterator it = GData::GDataManager::m_soulItemExp.find(itemId);
     if(it == GData::GDataManager::m_soulItemExp.end())
-        return;
+        return false;
+    if(m_2ndSoul->getStateLevel() >= STATE_LEVEL_MAX)
+        return false;
 
     if(!_owner->GetPackage()->DelItem(itemId, 1, bind, ToSecondSoul))
     {
-        return;
+        return false;
     }
 
     UInt32 exp = it->second;
@@ -4178,6 +4181,7 @@ void Fighter::enchantSoul(UInt32 itemId, bool bind, std::vector<SoulItemExp>& so
     }
 
     soulItemExpOut.push_back(sie);
+    return true;
 }
 
 bool Fighter::equipSoulSkill(UInt8 idx, UInt32 itemId, bool bind)
