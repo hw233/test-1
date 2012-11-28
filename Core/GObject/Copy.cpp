@@ -480,7 +480,7 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
             if (!pl->GetShuoShuo()->getShuoShuo(id-1 + SS_COPY1))
                 pl->OnShuoShuo(id-1 + SS_COPY1);
 
-            if (pl->GetVar(VAR_EX_JOB_ENABLE) == 0)
+            if (id == 4 && pl->GetVar(VAR_EX_JOB_ENABLE) == 0)
             {
                 pl->SetVar(VAR_EX_JOB_ENABLE, 1);
                 Stream st(REP::EXJOB);

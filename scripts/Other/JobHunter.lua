@@ -26,8 +26,19 @@ local caveMonster = {
 
 local stepAward = {
     {{1325, 1, 1}},
+    {{1325, 1, 1}},
+    {{1325, 1, 1}},
+    {{1326, 4, 1}},
     {{1326, 4, 1}},
     {{1326, 2, 1}},
+    {{1326, 2, 1}},
+    {{1326, 2, 1}},
+    {{1326, 2, 1}},
+    {{1326, 2, 1}},
+    {{1326, 1, 1}},
+    {{1326, 1, 1}},
+    {{1326, 1, 1}},
+    {{1326, 1, 1}},
     {{1326, 1, 1}},
     {{1327, 2, 1}},
 }
@@ -184,9 +195,10 @@ end
 
 function getStepAward(step)
     for i = 1, #stepAward do
-        if i*5 > step then
+        if i > step then
             return stepAward[i]
         end
     end
+    return stepAward[#stepAward]
 end
 

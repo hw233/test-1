@@ -1052,6 +1052,11 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         pl->sendSecondInfo();
     }
     {
+        TeamCopyPlayerInfo* tcp = pl->getTeamCopyPlayerInfo();
+        if (tcp && tcp->getPass(4) && (pl->GetVar(VAR_EX_JOB_ENABLE) == 0))
+        {
+            pl->SetVar(VAR_EX_JOB_ENABLE, 1);
+        }
         Stream st(REP::EXJOB);
         st << static_cast<UInt8>(0);
         st << static_cast<UInt8>(pl->GetVar(VAR_EX_JOB_ENABLE));
@@ -1062,9 +1067,9 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 #ifdef _FB
     // XXX: do not need
 #else
-	pl->sendWallow();
+    pl->sendWallow();
 #endif
-	pl->sendEvents();
+    pl->sendEvents();
     //pl->GetPackage()->SendPackageItemInfor();
     {
         TeamCopyPlayerInfo* tcpInfo = pl->getTeamCopyPlayerInfo();
@@ -1597,7 +1602,6 @@ void OnFighterDismissReq( GameMsgHdr& hdr, FighterDismissReq& fdr )
 
 	if(exp >= 25000 || (fgt->getClass() == 4))
 	{
-		exp += 25000;
 		UInt16 rCount1 = static_cast<UInt16>(exp / 50000000);
 		exp = exp % 50000000;
 		UInt16 rCount2 = static_cast<UInt16>(exp / 500000);
@@ -5380,6 +5384,7 @@ void OnExJob( GameMsgHdr & hdr, const void * data )
                         break;
                 }
             }
+            break;
         case 3:
             {
                 UInt16 fId = 0;
