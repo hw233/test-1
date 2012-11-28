@@ -1701,7 +1701,7 @@ namespace GObject
                 m_isOffical = true;
         }
         inline void setClientIp(const std::string& clientIp) { strncpy(m_clientIp, clientIp.c_str(), 256);}
-        void setOpenId(const std::string& openid);
+        void setOpenId(const std::string& openid, bool load = false);
         inline void setOpenKey(const std::string& openkey) { strncpy(m_openkey, openkey.c_str(), 256); }
         inline void setSource(const std::string& source) { m_source = source; }
         inline void setVia(const std::string& via) { m_via = via; }

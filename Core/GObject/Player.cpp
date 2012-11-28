@@ -14005,10 +14005,13 @@ namespace GObject
        udpLog("tianjie", "F_1115", "", "", "", "", "act");
    }
    
-   void Player::setOpenId(const std::string& openid)
+   void Player::setOpenId(const std::string& openid, bool load /* = false */)
    {
        strncpy(m_openid, openid.c_str(), 256);
-       DB1().PushUpdateData("UPDATE `player` SET `openid` = '%s' WHERE `id` = %"I64_FMT"u", m_openid, getId());
+       if (!load)
+       {
+           DB1().PushUpdateData("UPDATE `player` SET `openid` = '%s' WHERE `id` = %"I64_FMT"u", m_openid, getId());
+       }
    }
 
 EventTlzAuto::EventTlzAuto( Player * player, UInt32 interval, UInt32 count)
