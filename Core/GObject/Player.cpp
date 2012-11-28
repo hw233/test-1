@@ -14519,7 +14519,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
             WORLD().setArenaTotalCntEnum();
         }
 
-        UInt16 totalCnt = WORLD().getArenaTotalCnt();
+        UInt32 totalCnt = WORLD().getArenaTotalCnt();
         UInt32 totalSufferCnt = totalCnt * 24 / 5;
 
         switch(type)
