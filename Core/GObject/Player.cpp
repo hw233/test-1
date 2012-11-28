@@ -4082,6 +4082,21 @@ namespace GObject
             AddVar(VAR_USEGOLD_CNT, c);
         return _playerData.gold;
 	}
+    void Player::deleteGold(UInt32 c)
+    {
+        UInt32 n = _playerData.gold;
+        if( c > _playerData.gold || c == 0)
+        {
+            _playerData.gold = 0;
+        }
+		else
+		{
+		    _playerData.gold -= c;
+            n = c;
+        }
+        sendModification(1, _playerData.gold);
+        udpLog("clear", "F_1158", "", "", "", "", "act", n);
+    }
 
     UInt32 Player::useGold4LuckDraw(UInt32 c)
     {
