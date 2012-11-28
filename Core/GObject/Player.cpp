@@ -520,6 +520,31 @@ namespace GObject
 		return count == 0;
     }
 
+    bool EventAutoJobHunter::Equal(UInt32 id, size_t playerid) const
+    {
+		return 	id == GetID() && playerid == m_Player->getId();
+    }
+
+    void EventAutoJobHunter::Process(UInt32 leftCount)
+    {
+		GameMsgHdr hdr(0x2A1, m_Player->getThreadId(), m_Player, sizeof(id));
+		GLOBAL().PushMsg(hdr, &id);
+        if (!leftCount)
+			PopTimerEvent(m_Player, EVENT_AUTOCOPY, m_Player->getId());
+    }
+
+    bool EventAutoJobHunter::Accelerate(UInt32 times)
+    {
+		UInt32 count = m_Timer.GetLeftTimes();
+		if(times > count)
+		{
+			times = count;
+		}
+		count -= times;
+		m_Timer.SetLeftTimes(count);
+		return count == 0;
+    }
+
 	void Lineup::updateId()
 	{
 		if(fighter != NULL) fid = fighter->getId(); else fid = 0;
@@ -2673,6 +2698,8 @@ namespace GObject
             UInt32 fgtid = fgt->getId();
             GameMsgHdr hdr2(0x1A6, WORKER_THREAD_WORLD, this, sizeof(fgtid));
             GLOBAL().PushMsg(hdr2, &fgtid);
+            if (_jobHunter)
+                _jobHunter->AddToFighterList(fgtid);
 
 			return fgt;
 		}
@@ -14053,7 +14080,7 @@ namespace GObject
 
    JobHunter* Player::getJobHunter()
    {
-       if (GetVar(VAR_MAX_COPY_PASS) < 4)
+       if (GetVar(VAR_EX_JOB_ENABLE) < 2)
            return NULL;
        if (!_jobHunter)
        {

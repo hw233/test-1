@@ -313,8 +313,6 @@ public:
     // 取得心法带出技能的ID表
     const std::vector<const GData::SkillBase*>& skillFromCitta(UInt16 citta);
 
-    // 是否可散功心法
-    bool canCittaBeDel(UInt16 citta);
     // 初始化装备的心法
     void setUpCittas(std::string& citta, bool = false);
     // 初始化可装备的心法

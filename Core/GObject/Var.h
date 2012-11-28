@@ -272,7 +272,7 @@ namespace GObject
         VAR_QQVIP_AWARD_COUNT = 245 ,//qq会员抽奖卷
         VAR_AWARD_SSTOOLBAR = 246,   //搜搜工具栏奖励是否已领取
         
-        VAR_MAX_COPY_PASS = 247,
+        VAR_EX_JOB_ENABLE = 247,   // 墨家面板是否开启
         //250-269 越南版已占用
 
         // 270-280 占用 for zhgc
@@ -544,7 +544,7 @@ namespace GObject
             REGISTER_VAR(VAR_9215_USED, CYCLE_NONE);
             REGISTER_VAR(VAR_QQVIP_AWARD_COUNT, CYCLE_NONE);
             REGISTER_VAR(VAR_AWARD_SSTOOLBAR, CYCLE_NONE);
-            REGISTER_VAR(VAR_MAX_COPY_PASS, CYCLE_NONE);
+            REGISTER_VAR(VAR_EX_JOB_ENABLE, CYCLE_NONE);
 
             REGISTER_VAR(VAR_EQUIP_MOVE_COUNT, CYCLE_NONE);
             REGISTER_VAR(VAR_ACT_LOGIN_AWARD, CYCLE_DAY);

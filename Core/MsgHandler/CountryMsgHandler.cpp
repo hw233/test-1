@@ -169,6 +169,7 @@ MSG_REG_2(GameMsgHdr, REQ::TIANJIE, OnTianjieReq);
 
 MSG_REG_2(GameMsgHdr, REQ::EXJOB, OnExJob);
 MSG_REG_2(GameMsgHdr, REQ::JOBHUNTER, OnJobHunter);
+MSG_REG_2(GameMsgHdr, REQ::AUTOJOBHUNTER, OnAutoJobHunter);
 
 MSG_REG_2(GameMsgHdr, 0x1D0, OnDailyReq2);
 
@@ -240,6 +241,8 @@ MSG_REG_2(GameMsgHdr, 0x295, OnDelTradeNotify);
 
 MSG_REG_2(GameMsgHdr, 0x296, OnAddAwardGold);
 MSG_REG_2(GameMsgHdr, 0x297, OnCreateAward);
+
+MSG_REG_2(GameMsgHdr, 0x2A1, OnAutoJobHunter);
 
 MSG_REG_2(GameMsgHdr, 0x2F0, OnGoldRecharge);
 MSG_REG_2(GameMsgHdr, 0x2F1, OnYDPacks);

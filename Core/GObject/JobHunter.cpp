@@ -12,6 +12,7 @@
 #include "Country.h"
 #include "Map.h"
 #include "GObjectDBExecHelper.h"
+#include "TeamCopy.h"
 
 //************************************************
 // 用于第四职业招募的——寻墨
@@ -36,6 +37,7 @@ JobHunter::JobHunter(Player * player, std::string& fighterList, std::string& map
     // 从数据库加载时调用到的构造函数
     LoadFighterList(fighterList);
     LoadMapInfo(mapInfo);
+    _nextMoveTime = TimeUtil::Now();
 }
 
 JobHunter::~JobHunter()
@@ -113,19 +115,26 @@ bool JobHunter::LoadMapInfo(const std::string& list)
 void JobHunter::SaveMapInfo()
 {
     // 保存地图信息
+    char buf[1024] = {0};
+    char* pbuf = buf;
+    char* pend = &buf[sizeof(buf)-1];
     std::string mapString;
     for (MapInfo::iterator it = _mapInfo.begin(); it != _mapInfo.end(); ++it)
     {
-        mapString += it->first;
-        mapString += ",";
-        mapString += (it->second).neighbCount;
-        mapString += ",";
-        mapString += (it->second).gridType;
-        mapString += "|";
+        pbuf += snprintf(pbuf, pend - pbuf, "%u", (UInt32)it->first);
+        pbuf += snprintf(pbuf, pend - pbuf, ",");
+        pbuf += snprintf(pbuf, pend - pbuf, "%u", (UInt32)(it->second).neighbCount);
+        pbuf += snprintf(pbuf, pend - pbuf, ",");
+        pbuf += snprintf(pbuf, pend - pbuf, "%u", (UInt32)(it->second).gridType);
+        pbuf += snprintf(pbuf, pend - pbuf, "|");
     }
 
-    DB2().PushUpdateData("UPDATE `job_hunter` SET `mapInfo` = '%s', `posX` = %u, `posY` = %u, `earlyPosX` = %u, `earlyPosY` = %u WHERE `playerId` = %"I64_FMT"u", 
-            mapString.c_str(), _posX, _posY, _earlyPosX, _earlyPosY, _owner->getId());
+
+    if (pbuf != buf)
+        mapString = buf;
+
+    DB2().PushUpdateData("UPDATE `job_hunter` SET `mapInfo` = '%s', `posX` = %u, `posY` = %u, `earlyPosX` = %u, `earlyPosY` = %u, `stepCount` = %u WHERE `playerId` = %"I64_FMT"u", 
+            mapString.c_str(), _posX, _posY, _earlyPosX, _earlyPosY, _stepCount, _owner->getId());
 }
 
 void JobHunter::AddToFighterList(UInt16 id)
@@ -138,6 +147,8 @@ void JobHunter::AddToFighterList(UInt16 id)
         return;
     if (fighter->getClass() != 4)
         return;
+    if (_owner->hasFighter(id))
+        return;
 
     if (_fighterList.find(id) != _fighterList.end())
         return;
@@ -146,10 +157,9 @@ void JobHunter::AddToFighterList(UInt16 id)
     std::string list;
     FighterList2String(list);
 
-    DB2().PushUpdateData("UPDATE `job_hunter` SET `fighterList` = '%s') WHERE `playerId` = %"I64_FMT"u", list.c_str(), _owner->getId());
+    DB2().PushUpdateData("UPDATE `job_hunter` SET `fighterList` = '%s' WHERE `playerId` = %"I64_FMT"u", list.c_str(), _owner->getId());
 
     SendFighterList();
-
 }
 
 void JobHunter::SendFighterList()
@@ -173,16 +183,19 @@ void JobHunter::OnHireFighter(UInt16 id)
     // 雇佣墨家散仙
     if (_fighterList.find(id) == _fighterList.end())
         return;
-    _fighterList.erase(id);
-    Fighter * fighter = globalFighters[id];
-    if (!fighter)
+    if (_owner->isFighterFull())
+    {
+        _owner->sendMsgCode(0, 1200);
         return;
-    _owner->addFighter(fighter, true);
+    }
+    if (_owner->takeFighter(id, true) == NULL)
+        return;
+    _fighterList.erase(id);
 
     std::string list;
     FighterList2String(list);
 
-    DB2().PushUpdateData("UPDATE `job_hunter` SET `fighterList` = '%s') WHERE `playerId` = %"I64_FMT"u", list.c_str(), _owner->getId());
+    DB2().PushUpdateData("UPDATE `job_hunter` SET `fighterList` = '%s' WHERE `playerId` = %"I64_FMT"u", list.c_str(), _owner->getId());
 
     SendFighterList();
 }
@@ -192,6 +205,19 @@ void JobHunter::OnRequestStart(UInt8 index)
     // 玩家请求开始共鸣
     if ( index >= PROGRESS_MAX)
         return;
+    if ( _gameProgress != PROGRESS_NONE)
+    {
+        _owner->sendMsgCode(0, 2206, 0);
+        return;
+    }
+
+    TeamCopyPlayerInfo* tcp = _owner->getTeamCopyPlayerInfo();
+    if (!tcp || !tcp->getPass(index + 3))
+    {
+        _owner->sendMsgCode(0, 2207, 0);
+        return;
+    }
+    
     if (!_owner->GetPackage()->GetItemAnyNum(EX_JOB_ITEM_ID))
     {
         _owner->sendMsgCode(0, 2204, 0); // 墨家徽记不足
@@ -204,7 +230,7 @@ void JobHunter::OnRequestStart(UInt8 index)
     InitMap();
     UInt16 spot = GetSpotIdFromGameId(index);
     _owner->moveTo(spot, true);
-    DB2().PushUpdateData("UPDATE `job_hunter` SET `progress` = '%u') WHERE `playerId` = %"I64_FMT"u", _gameProgress, _owner->getId());
+    DB2().PushUpdateData("UPDATE `job_hunter` SET `progress` = '%u' WHERE `playerId` = %"I64_FMT"u", _gameProgress, _owner->getId());
     std::cout << "Move to " << (UInt32) spot << "."  << std::endl;
 }
 
@@ -366,8 +392,10 @@ void JobHunter::OnCommand(UInt8 command, UInt8 val, UInt8 val2)
         case 0:
             // 刷新地图信息
             if (!_isInGame)
+            {
+                _isInGame = true;
                 SendGameInfo(2);
-            _isInGame = true;
+            }
             DumpMapData();
             SendMapInfo();
             return;
@@ -424,14 +452,41 @@ void JobHunter::OnCommand(UInt8 command, UInt8 val, UInt8 val2)
             }
             break;
         case 3:
+            // 发送通关道具进入背包信息
             _owner->checkLastExJobAward();
             return;
             break;
         default:
             break;
     }
-    SaveMapInfo();
+
     DumpMapData();
+
+    if (CheckEnd())
+    {
+        OnAbort();
+    }
+    else
+        SaveMapInfo();
+}
+
+void JobHunter::OnAutoCommand(UInt8 type)
+{
+    // TODO: 自动战斗
+    switch(type)
+    {
+        case 0:
+            // 开始自动战斗
+            break;
+        case 1:
+            // 取消自动战斗
+            break;
+        case 2:
+            // 立即完成自动战斗
+            break;
+        default:
+            break;
+    }
 }
 
 UInt16 JobHunter::GetSpotIdFromGameId(UInt8 id)
@@ -655,7 +710,7 @@ void JobHunter::SelectBornGrid()
         if ((index == rndIndex) && ((it->second).gridType & 0x0F) != GRID_BOSS && ((it->second).gridType & 0x0F) != GRID_CAVE )
         {
             // 就选择这个作为出生点了
-            (it->second).gridType = GRID_NORMAL;
+            (it->second).gridType = GRID_NORMAL | CLEAR_FLAG;
             _earlyPosX = _posX = (it->second).posX;
             _earlyPosY = _posY = (it->second).posY;
             return;
@@ -669,7 +724,7 @@ void JobHunter::SelectBornGrid()
         if (((it->second).gridType & 0x0F) != GRID_BOSS && ((it->second).gridType & 0x0F) != GRID_CAVE )
         {
             // 就选择这个作为出生点了
-            (it->second).gridType = GRID_NORMAL;
+            (it->second).gridType = GRID_NORMAL | CLEAR_FLAG;
             _earlyPosX = _posX = (it->second).posX;
             _earlyPosY = _posY = (it->second).posY;
             return;
@@ -729,10 +784,11 @@ void JobHunter::OnMove(UInt16 pos)
                 // 普通怪物，可能被偷袭
                 {
                     UInt8 prob = _rnd(100);
-                    if (prob < 50)
+                    if (prob < 50 && (it->second).gridType & UNKNOWN_FLAG)
                     {
                         // 被偷袭直接开打
                         //bool res = OnAttackMonster(pos);
+                        _owner->sendMsgCode(0, 2205, 0);
                         OnAttackMonster(pos);
                     }
                 }
@@ -840,6 +896,7 @@ bool JobHunter::OnAttackMonster(UInt16 pos)
     st.append(&packet[8], packet.size() - 8);
     st << Stream::eos;
     _owner->send(st);
+    SendGridInfo(POS_TO_INDEX(_posX, _posY));
     return res;
 }
 
@@ -898,6 +955,7 @@ void JobHunter::OnGetTreasure(bool isAuto /* = false */)
 
     MapInfo::iterator it = _mapInfo.find(POS_TO_INDEX(_posX, _posY));
     (it->second).gridType |= CLEAR_FLAG;
+    SendGridInfo(POS_TO_INDEX(_posX, _posY));
 }
 
 bool JobHunter::OnFoundCave(bool isAuto /* = false */)
@@ -905,7 +963,19 @@ bool JobHunter::OnFoundCave(bool isAuto /* = false */)
     // 找到洞穴
     if (!CheckGridType(GRID_CAVE))
         return false;
-    UInt32 npcId = GameAction()->foundCave(_gameProgress);
+    UInt16 fighterId = GameAction()->foundCave(_gameProgress);
+    Fighter * fighter = globalFighters[fighterId];
+    UInt32 npcId = 0;
+    if (!fighter)
+        return false;
+    if (fighter->getSex())
+    {
+        npcId = 9600;
+    }
+    else
+    {
+        npcId = 9601;
+    }
     MapInfo::iterator it = _mapInfo.find(POS_TO_INDEX(_posX, _posY));
 
     if (!npcId)
@@ -933,6 +1003,13 @@ bool JobHunter::OnFoundCave(bool isAuto /* = false */)
         ret = 0x0101;
         _owner->_lastNg = ng;
         _owner->pendExp(ng->getExp());
+
+        npcId = GameAction()->getBossMonster(_gameProgress);
+        npcIt = GData::npcGroups.find(npcId);
+        if(npcIt == GData::npcGroups.end())
+            return false;
+
+        ng = npcIt->second;
         ng->getLoots(_owner, _owner->_lastExJobAward, 0, NULL);
 
     }
@@ -950,7 +1027,6 @@ bool JobHunter::OnFoundCave(bool isAuto /* = false */)
     st << Stream::eos;
     _owner->send(st);
 
-    UInt16 fighterId = (_rnd(100) + 10);
     AddToFighterList(static_cast<UInt16>(fighterId));
 
     Stream st2(REP::JOBHUNTER);
@@ -967,7 +1043,7 @@ bool JobHunter::OnFoundCave(bool isAuto /* = false */)
     // 步数奖励配置
     Table rewards = GameAction()->getStepAward(_stepCount);
     UInt8 count = rewards.size();
-    st2 << static_cast<UInt16>(count);
+    st2 << static_cast<UInt8>(count);
     std::cout << "Count = " << (UInt32) count << "." << std::endl;
     for (UInt8 i = 0; i < count; ++i)
     {
@@ -983,12 +1059,8 @@ bool JobHunter::OnFoundCave(bool isAuto /* = false */)
     _owner->send(st2);
 
     SendFighterList();
+    SendGridInfo(POS_TO_INDEX(_posX, _posY));
     return res;
-}
-
-void JobHunter::OnAutoExplore()
-{
-    // TODO: 自动探索
 }
 
 void JobHunter::OnAbort()
@@ -1000,11 +1072,35 @@ void JobHunter::OnAbort()
     _earlyPosX = _earlyPosY = 0;
     _mapInfo.clear();
     _isInGame = false;
-    DB2().PushUpdateData("UPDATE `job_hunter` SET `progress` = '%s') WHERE `playerId` = %"I64_FMT"u", _gameProgress, _owner->getId());
+    _nextMoveTime = TimeUtil::Now();
+    DB2().PushUpdateData("UPDATE `job_hunter` SET `progress` = '%u', `mapInfo` = '', `posX` = %u, `posY` = %u, `earlyPosX` = %u, `earlyPosY` = %u, `stepCount` = %u  WHERE `playerId` = %"I64_FMT"u", _gameProgress, _posX, _posY, _earlyPosX, _earlyPosY, _stepCount, _owner->getId());
     SendGameInfo(2);
-
 }
 
+void JobHunter::OnAutoStart()
+{
+    // TODO: 开始自动战斗
+}
+
+void JobHunter::OnAutoStop()
+{
+    // TODO: 停止自动战斗
+}
+
+void JobHunter::OnAutoFinish()
+{
+    // TODO: 立即完成自动战斗
+}
+
+bool JobHunter::CheckEnd()
+{
+    for (MapInfo::iterator it = _mapInfo.begin(); it != _mapInfo.end(); ++it)
+    {
+        if (!((it->second).gridType & CLEAR_FLAG))
+            return false;
+    }
+    return true;
+}
 
 void JobHunter::DumpMapData()
 {

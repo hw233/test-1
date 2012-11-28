@@ -3407,16 +3407,6 @@ bool Fighter::CanDelCitta(UInt16 citta)
         if(cId == cittaIds[i])
             return false;
     }
-}
-
-bool Fighter::canCittaBeDel(UInt16 citta)
-{
-    UInt16 cittaId = CITTA_ID(citta);
-    UInt16 cittaCannotDel[] = {134, 137, 135, 141, 142, 143};
-    for(UInt32 i = 0; i < sizeof(cittaCannotDel); ++ i)
-        if(cittaId == cittaCannotDel[i])
-            return false;
-
     return true;
 }
 
@@ -3426,8 +3416,6 @@ bool Fighter::delCitta( UInt16 citta, bool writedb )
     if (idx < 0)
         return false;
     if(!CanDelCitta(citta))
-        return false;
-    if(!canCittaBeDel(citta))
         return false;
 
     std::vector<UInt16>::iterator it = _cittas.begin();

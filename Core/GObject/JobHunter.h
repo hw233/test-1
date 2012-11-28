@@ -160,9 +160,11 @@ class JobHunter
         void SendAutoInfo();
 
         void OnCommand(UInt8 command, UInt8 val, UInt8 val2);
+        void OnAutoCommand(UInt8 type);
 
         void SendGridInfo(UInt16 pos);
         void OnAbort();
+        bool CheckEnd();
 
     private:
 
@@ -182,7 +184,10 @@ class JobHunter
         void OnBreakthroughTrap();
         void OnGetTreasure(bool isAuto = false);
         bool OnFoundCave(bool isAuto = false);
-        void OnAutoExplore();
+        void OnAutoStart();
+        void OnAutoStop();
+        void OnAutoFinish();
+
 
         inline bool CheckGridType(UInt8 type)
         {

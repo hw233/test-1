@@ -1052,6 +1052,11 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         pl->sendSecondInfo();
     }
     {
+        Stream st(REP::EXJOB);
+        st << static_cast<UInt8>(0);
+        st << static_cast<UInt8>(pl->GetVar(VAR_EX_JOB_ENABLE));
+        st << Stream::eos;
+        pl->send(st);
         pl->sendAutoJobHunter();       // 为什么上面的语句都加大括号？？？
     }
 #ifdef _FB
@@ -1583,11 +1588,14 @@ void OnFighterDismissReq( GameMsgHdr& hdr, FighterDismissReq& fdr )
     UInt64 exp = 0;
 
     if(fgt->getClass() == 4)
-        exp = fgt->getExp() - GData::expTable.getLevelMin(70);
+    {
+        exp = fgt->getExp() > GData::expTable.getLevelMin(70) ? fgt->getExp() - GData::expTable.getLevelMin(70) : 0;
+        exp /= 2;
+    }
     else
         exp = fgt->getExp() / 2;
 
-	if(exp >= 25000)
+	if(exp >= 25000 || (fgt->getClass() == 4))
 	{
 		exp += 25000;
 		UInt16 rCount1 = static_cast<UInt16>(exp / 50000000);
@@ -5315,11 +5323,17 @@ void OnExJob( GameMsgHdr & hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
     BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    br >> type;
+    if (type == 0)
+    {
+        player->SetVar(VAR_EX_JOB_ENABLE, 2);
+        return;
+    }
+
     JobHunter * jobHunter = player->getJobHunter();
     if (!jobHunter)
         return;
-    UInt8 type = 0;
-    br >> type;
     switch (type)
     {
         case 1:
@@ -5390,6 +5404,20 @@ void OnJobHunter( GameMsgHdr & hdr, const void * data )
     if (br.left())
         br >> val2;
     jobHunter->OnCommand(type, val, val2);
+}
+
+void OnAutoJobHunter( GameMsgHdr & hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+
+    JobHunter * jobHunter = player->getJobHunter();
+    if (!jobHunter)
+        return;
+
+    UInt8 type = 0;
+    br >> type;
+    jobHunter->OnAutoCommand(type);
 }
 
 
