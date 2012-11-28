@@ -43,13 +43,13 @@ namespace GObject
     struct stAttrMax
     {
         stAttrMax() { memset( attrMax, 0, sizeof(attrMax)); }
-        float attrMax[3][4][9];
+        float attrMax[3][5][9];
     };
 
     struct stRingHpBase
     {
         stRingHpBase() { memset(hpBase, 0, sizeof(hpBase)); }
-        float hpBase[4];
+        float hpBase[5];
     };
 
     struct stHftChance

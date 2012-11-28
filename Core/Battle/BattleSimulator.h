@@ -233,8 +233,8 @@ private:
         e_unBlind = 51, // 解除至盲
         e_hide = 52, // 潜行
         e_unHide = 53, // 解除潜行
-        e_moAuraBuf = 54, // 暗影之地
-        e_unMoAuraBuf = 55, // 解除暗影之地
+        e_moAuraBuf = 54, // 龙舞
+        e_unMoAuraBuf = 55, // 解除龙舞
         e_unSummon = 56, // 残影消失
         e_deepBlind = 57, // 深度至盲
         e_unDeepBlind = 58, // 解除深度至盲
@@ -242,6 +242,7 @@ private:
         e_unBleedMo = 60,  // 解除墨之殇
         e_markMo = 61, // 墨之印记
         e_unMarkMo = 62, // 解除墨之印记
+        e_moAuraBuf1 = 63, // 凤舞
 
         e_MAX_STATE,
     };
@@ -257,6 +258,7 @@ private:
     };
 
 private:
+    int getSideStartPos(int side);
 	int findFirstAttacker();
 	UInt32 doAttack(int);
     UInt32 FightersEnter(UInt8 prevWin = 0xFF);
@@ -421,7 +423,7 @@ private:
 
     int getNearOnePos(int side, int pos);
     UInt32 doSkillStrenghtenCriticalDamageAroundOne(BattleFighter* bf, const GData::SkillBase* skill, bool cs, GData::SkillStrengthenBase*  ss, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
-    UInt16 getSkillEffectExtraBlind(BattleFighter* bf, BattleFighter* target_bo, const GData::SkillBase* skill);
+    void getSkillEffectExtraBlind(BattleFighter* bf, BattleFighter* target_bo, const GData::SkillBase* skill, UInt16& effect_state);
 
     bool doSkillStrengthenDeepBlind(BattleFighter* bf, BattleFighter* bo, GData::SkillStrengthenBase* ss, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
 

@@ -2282,6 +2282,7 @@ namespace GObject
 	void Player::updateBattleFighters(bool updatedb)
 	{
 		int c = 0;
+        bool hasMo = false;
 		for(int i = 0; i < 5; ++ i)
 		{
 			Lineup& lup = _playerData.lineup[i];
@@ -2309,6 +2310,15 @@ namespace GObject
 			else
 			{
 				lup.fighter = it->second;
+                if(hasMo && lup.fighter->getClass() == e_cls_mo)
+                {
+                    lup.fighter = NULL;
+                    lup.fid = 0;
+                    lup.pos = 0;
+                    continue;
+                }
+                else if(lup.fighter && lup.fighter->getClass() == e_cls_mo)
+                    hasMo = true;
 				lup.updateId();
 				++ c;
 				if(i > 0 && lup.fid < 10)

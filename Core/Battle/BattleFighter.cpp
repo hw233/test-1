@@ -1694,6 +1694,8 @@ void BattleFighter::makeDamage( UInt32& u )
 
 BattleFighter* BattleFighter::summonSelf(float factor, UInt8 last)
 {
+    if(last == 0)
+        return NULL;
     BattleFighter* bf = new BattleFighter(*this);
     if(!bf)
         return NULL;
@@ -1736,16 +1738,19 @@ void BattleFighter::clearSkill()
 
 void BattleFighter::setSummonFactor(float factor, UInt8 last)
 {
+    if(last == 0)
+        return; 
     _attack = _attack * factor;
     _magatk = _magatk * factor;
-    _hp = _hp * factor;
+    _maxhp = _maxhp * factor;
+    _hp = _maxhp;
 
     if(!isHide())
         _aura = 0;
     else
         _aura = 100;
 
-    _peerlessSkill.base = GData::skillManager[29509];
+    _peerlessSkill.base = GData::skillManager[49509];
 
     _summon = true;
     _summonLast = last;
