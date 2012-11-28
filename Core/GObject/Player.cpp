@@ -7800,8 +7800,10 @@ namespace GObject
                     float decp = fgt->getPotential() - 0.01f;
                     if (decp < static_cast<float>(GObjectManager::getMinPotential())/100)
                         decp = static_cast<float>(GObjectManager::getMinPotential())/100;
+                    /*
                     if (decp < fgt_orig->getPotential())
                         decp = fgt_orig->getPotential();
+                    */
                     fgt->setPotential(decp);
                 }
                 else
@@ -7809,8 +7811,10 @@ namespace GObject
                     float decp = fgt->getCapacity() - 0.1f;
                     if (decp < static_cast<float>(GObjectManager::getMinCapacity())/100)
                         decp = static_cast<float>(GObjectManager::getMinCapacity())/100;
+                    /*
                     if (decp < fgt_orig->getCapacity())
                         decp = fgt_orig->getCapacity();
+                    */
                     fgt->setCapacity(decp);
                 }
 			}
