@@ -769,6 +769,7 @@ public:
 
     UInt8 getSoulSkillIdx(UInt16 itemId);
     void reload2ndSoul();
+    void setSoulLevel(UInt32 level);
     void resetLevelAndExp(UInt8 maxLevel);
 
     void setHideFashion(bool v, bool writedb = true) 

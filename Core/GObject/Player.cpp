@@ -59,6 +59,7 @@
 #include "GData/ClanLvlTable.h"
 #include "GData/ClanSkillTable.h"
 #include "GData/ClanStatueTable.h"
+#include "GData/ExpTable.h"
 #include "Common/StringTokenizer.h"
 #include "TownDeamon.h"
 #include "ArenaBattle.h"
@@ -520,6 +521,31 @@ namespace GObject
 		return count == 0;
     }
 
+    bool EventAutoJobHunter::Equal(UInt32 id, size_t playerid) const
+    {
+		return 	id == GetID() && playerid == m_Player->getId();
+    }
+
+    void EventAutoJobHunter::Process(UInt32 leftCount)
+    {
+		GameMsgHdr hdr(0x2A1, m_Player->getThreadId(), m_Player, sizeof(id));
+		GLOBAL().PushMsg(hdr, &id);
+        if (!leftCount)
+			PopTimerEvent(m_Player, EVENT_AUTOCOPY, m_Player->getId());
+    }
+
+    bool EventAutoJobHunter::Accelerate(UInt32 times)
+    {
+		UInt32 count = m_Timer.GetLeftTimes();
+		if(times > count)
+		{
+			times = count;
+		}
+		count -= times;
+		m_Timer.SetLeftTimes(count);
+		return count == 0;
+    }
+
 	void Lineup::updateId()
 	{
 		if(fighter != NULL) fid = fighter->getId(); else fid = 0;
@@ -538,7 +564,7 @@ namespace GObject
 #ifndef _WIN32
 		m_ulog(NULL),
 #endif
-		m_isOffical(false), m_sysDailog(false), m_hasTripod(false)
+		m_isOffical(false), m_sysDailog(false), m_hasTripod(false), _jobHunter(NULL)
 	{
         m_ClanBattleStatus = 1;
         m_ClanBattleScore = 0;
@@ -1121,6 +1147,8 @@ namespace GObject
 #endif
 #endif
 #endif // _WIN32
+#ifdef JOB_HUNTER_DEBUG
+#endif
 	}
 
 #define WEBDOWNLOAD 255
@@ -1830,7 +1858,7 @@ namespace GObject
     }
     UInt32  Player::GetOnlineTimeTodaySinceLastLogin(UInt32 now)
     {
-//        UInt32 now  = TimeUtil::Now();
+        //UInt32 now  = TimeUtil::Now();
         UInt32 today = TimeUtil::SharpDayT( 0 , now);
         UInt32 lastOnline = _playerData.lastOnline;
         if( today >= lastOnline)
@@ -1888,7 +1916,7 @@ namespace GObject
         snprintf(online, sizeof(online), "%u", curtime - _playerData.lastOnline);
         udpLog("", "", "", "", "", online, "login");
 
-        UInt8 platform = atoi(getDomain());
+        //UInt8 platform = atoi(getDomain());
         if (cfg.GMCheck )
         {
             struct CrackValue
@@ -1987,7 +2015,7 @@ namespace GObject
         snprintf(online, sizeof(online), "%u", TimeUtil::Now() - _playerData.lastOnline);
         udpLog("", "", "", "", "", online, "login");
 
-        UInt8 platform = atoi(getDomain());
+        //UInt8 platform = atoi(getDomain());
         if (cfg.GMCheck )
         {
             struct CrackValue
@@ -2472,7 +2500,19 @@ namespace GObject
         fgt->getAttrType1(true);
         fgt->getAttrType2(true);
         fgt->getAttrType3(true);
-	}
+        if (fgt->getClass() == 4)
+        {
+            // 70级，关元穴穴道，60级白虎
+            fgt->addExp(GData::expTable.getLevelMin(70));
+            fgt->openSecondSoul(13);
+            fgt->setSoulLevel(60);
+            for (UInt8 i = 0; i < 11; ++i)
+            {
+                fgt->setAcupoints(i, 3, true, true);
+            }
+
+        }
+    }
 
     bool Player::addFighterFromItem(UInt32 itemid, UInt32 price)
     {
@@ -2669,6 +2709,8 @@ namespace GObject
             UInt32 fgtid = fgt->getId();
             GameMsgHdr hdr2(0x1A6, WORKER_THREAD_WORLD, this, sizeof(fgtid));
             GLOBAL().PushMsg(hdr2, &fgtid);
+            if (_jobHunter)
+                _jobHunter->AddToFighterList(fgtid);
 
 			return fgt;
 		}
@@ -5222,8 +5264,7 @@ namespace GObject
 			{
 				exp /= 2;
 				SYSMSG_SENDV(181, this);
-				SYSMSG_SENDV(1081, this);
-			}
+				SYSMSG_SENDV(1081, this); }
 		}
 		for(int i = 0; i < 5; ++ i)
 		{
@@ -5915,7 +5956,6 @@ namespace GObject
         // GM命令设置帮派副本每轮时间
         ClanCopyMgr::Instance().setInterval(time);
     }
-
 
 
     // 帮派副本
@@ -10927,6 +10967,22 @@ namespace GObject
         _lastKillMonsterAward.push_back(lt);
     }
 
+    void Player::lastExJobAwardPush(UInt16 itemId, UInt16 num)
+    {
+        GData::LootResult lt = {itemId, num};
+        _lastExJobAward.push_back(lt);
+    }
+
+    void Player::checkLastExJobAward()
+    {
+        std::vector<GData::LootResult>::iterator it;
+        for(it = _lastExJobAward.begin(); it != _lastExJobAward.end(); ++ it)
+        {
+            m_Package->ItemNotify(it->id, it->count);
+        }
+        _lastExJobAward.clear();
+    }
+
     void Player::lastNew7DayTargetAwardPush(UInt16 itemId, UInt16 num)
     {
         GData::LootResult lt = {itemId, num};
@@ -13818,42 +13874,42 @@ namespace GObject
    }
    void Player::getTjTask1Data(Stream& st, bool isRefresh)
    {
-       if (isRefresh || GetVar(VAR_TJ_TASK1_NUMBER) == 0) //今日还没做任务
-       {
-           for (int i = 0; i < 3; ++i)
-           {
-               if (_playerData.tjEvent1[i] == 0)
-               {
-                   GObject::Tianjie::instance().randomTask1Data(GetLev(),_playerData.tjEvent1[i], _playerData.tjColor1[i], _playerData.tjExp1[i]);
-               }
-           }
-       }
-       UInt8 type = 0;
-       int value[3] = {0};
-       value[0] = _playerData.tjExp1[0];
-       value[1] = _playerData.tjExp1[1];
-       value[2] = _playerData.tjExp1[2];
-       for (int i = 0; i < 3; ++i)
-       {
-           GData::NpcGroups::iterator it = GData::npcGroups.find(_playerData.tjEvent1[i]);
-           if(it != GData::npcGroups.end())
-           {
-               GData::NpcGroup * ng = it->second;
-               value[i] +=  TIANJIE_EXP(GetLev()) * ng->getExp();
-           }
-       }
-       if (GObject::Tianjie::instance().isPlayerInTj(GetLev()))
-       {
-           type = 1;
-           value[0] = value[0] * 2 / TIANJIE_EXP(GetLev()) + s_task1ColorScore[_playerData.tjColor1[0]];
-           value[1] = value[1] * 2 / TIANJIE_EXP(GetLev()) + s_task1ColorScore[_playerData.tjColor1[1]];
-           value[2] = value[2] * 2 / TIANJIE_EXP(GetLev()) + s_task1ColorScore[_playerData.tjColor1[2]];
-       }
-       UInt8 num1 = 5-GetVar(VAR_TJ_TASK1_NUMBER);
-       st << num1 << type;
-       st << _playerData.tjEvent1[0] << _playerData.tjColor1[0] << value[0];
-       st << _playerData.tjEvent1[1] << _playerData.tjColor1[1] << value[1];
-       st << _playerData.tjEvent1[2] << _playerData.tjColor1[2] << value[2];
+        if (isRefresh || GetVar(VAR_TJ_TASK1_NUMBER) == 0) //今日还没做任务
+        {
+            for (int i = 0; i < 3; ++i)
+            {
+                if (_playerData.tjEvent1[i] == 0)
+                {
+                    GObject::Tianjie::instance().randomTask1Data(GetLev(),_playerData.tjEvent1[i], _playerData.tjColor1[i], _playerData.tjExp1[i]);
+                }
+            }
+        }
+        UInt8 type = 0;
+        int value[3] = {0};
+        value[0] = _playerData.tjExp1[0];
+        value[1] = _playerData.tjExp1[1];
+        value[2] = _playerData.tjExp1[2];
+        for (int i = 0; i < 3; ++i)
+        {
+            GData::NpcGroups::iterator it = GData::npcGroups.find(_playerData.tjEvent1[i]);
+            if(it != GData::npcGroups.end())
+            {
+		        GData::NpcGroup * ng = it->second;
+                value[i] +=  TIANJIE_EXP(GetLev()) * ng->getExp();
+            }
+        }
+        if (GObject::Tianjie::instance().isPlayerInTj(GetLev()))
+        {
+            type = 1;
+            value[0] = value[0] * 2 / TIANJIE_EXP(GetLev()) + s_task1ColorScore[_playerData.tjColor1[0]];
+            value[1] = value[1] * 2 / TIANJIE_EXP(GetLev()) + s_task1ColorScore[_playerData.tjColor1[1]];
+            value[2] = value[2] * 2 / TIANJIE_EXP(GetLev()) + s_task1ColorScore[_playerData.tjColor1[2]];
+        }
+        UInt8 num1 = 5-GetVar(VAR_TJ_TASK1_NUMBER);
+        st << num1 << type;
+        st << _playerData.tjEvent1[0] << _playerData.tjColor1[0] << value[0];
+        st << _playerData.tjEvent1[1] << _playerData.tjColor1[1] << value[1];
+        st << _playerData.tjEvent1[2] << _playerData.tjColor1[2] << value[2];
 
    }
    void Player::getTjTask2Data(Stream& st)
@@ -14066,6 +14122,33 @@ namespace GObject
            DB1().PushUpdateData("UPDATE `player` SET `openid` = '%s' WHERE `id` = %"I64_FMT"u", m_openid, getId());
        }
    }
+
+   JobHunter* Player::getJobHunter()
+   {
+       if (GetVar(VAR_EX_JOB_ENABLE) < 2)
+           return NULL;
+       if (!_jobHunter)
+       {
+           _jobHunter = new JobHunter(this);
+       }
+       return _jobHunter;
+   }
+
+   void Player::setJobHunter(std::string& fighterList, std::string& mapInfo, UInt8 progress,
+           UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY, UInt32 stepCount)
+   {
+       if (_jobHunter)
+           return;
+       _jobHunter = new JobHunter(this, fighterList, mapInfo, progress, posX, posY, earlyPosX, earlyPosY, stepCount);
+   }
+
+   void Player::sendAutoJobHunter()
+   {
+       if (!getJobHunter())
+           return;
+       _jobHunter->SendAutoInfo();
+   }
+
 
 EventTlzAuto::EventTlzAuto( Player * player, UInt32 interval, UInt32 count)
 	: EventBase(player, interval, count)

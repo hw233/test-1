@@ -909,6 +909,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     Wansheng(player, lootlvl);
     Guoqing(player, lootlvl);
     LuckyDrawBox(player, id)
+    ExJob(player, id, lootlvl)
     if player:getQQVipPrivilege() == true then
         player:setQQVipPrivilege(false)
         FallActivity(player, 1)
@@ -3969,5 +3970,12 @@ function GetBDSupermanPrice(player, itemId, isUsed)
     player:GetPackage():DelItemSendMsg(0xFFFF, player)
     player:GetPackage():DelItem(0xFFFF, 1, 1) 
     return items[itemId]
+end
+
+function ExJob(player, id)
+    if id >= 4 then
+        local package = player:GetPackage()
+        package:AddItem(9229, 1, true)
+    end
 end
 
