@@ -375,6 +375,11 @@ namespace GObject
             fprintf(stderr, "loadQixi error!\n");
             std::abort();
         }
+        if(!loadArenaExtraBoard())
+        {
+            fprintf(stderr, "loadArenaExtraBoard error!\n");
+            std::abort();
+        }
 		DB::gDataDBConnectionMgr->UnInit();
 	}
 
@@ -1304,7 +1309,7 @@ namespace GObject
 		LoadingCounter lc("Loading players:");
 		// load players
 		DBPlayerData dbpd;
-		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `prestige`, `status`, `country`, `title`, `titleAll`, `archievement`, `attainment`, `qqvipl`, `qqvipyear`, `qqawardgot`, `qqawardEnd`, `ydGemId`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `mounts`, `icCount`, `piccount`, `nextpicreset`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `fshimen`, `yamen`, `fyamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `copyUpdate`, `frontFreeCnt`, `frontGoldCnt`, `frontUpdate`, `formations`, `atohicfg`, `gmLevel`, `wallow`, `dungeonCnt`, `dungeonEnd`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
+		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `prestige`, `status`, `country`, `title`, `titleAll`, `archievement`, `attainment`, `qqvipl`, `qqvipyear`, `qqawardgot`, `qqawardEnd`, `ydGemId`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `mounts`, `icCount`, `piccount`, `nextpicreset`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `fshimen`, `yamen`, `fyamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `copyUpdate`, `frontFreeCnt`, `frontGoldCnt`, `frontUpdate`, `formations`, `atohicfg`, `gmLevel`, `wallow`, `dungeonCnt`, `dungeonEnd`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime`, `openid` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
             return false;
 
 		lc.reset(200);
@@ -1628,6 +1633,7 @@ namespace GObject
                 pl->fixOldVertionTitle(0);
             if(!pl->hasTitle(dbpd.pdata.title))
                 pl->fixOldVertionTitle(dbpd.pdata.title);
+            pl->setOpenId(dbpd.openid, true);
 		}
 		lc.finalize();
 
@@ -5020,6 +5026,61 @@ namespace GObject
 				continue;
 
             pl->loadQixiInfoFromDB(lover, qixi.bind, qixi.pos, qixi.event, qixi.score);
+        }
+        lc.finalize();
+        return true;
+
+    }
+
+    bool GObjectManager::loadArenaExtraBoard()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading arena_extra_board");
+        DBArenaExtraBoard extraboard;
+        if(execu->Prepare("SELECT `week`, `name1`, `name2`, `name3`, `name4`, `name5`, `heroId1`, `heroId2`, `heroId3`, `heroId4`, `heroId5`, `sufferTotal`, `sufferCnt1`, `sufferCnt2`, `sufferCnt3`, `sufferCnt4`, `sufferCnt5`, `lasttime1`, `lasttime2`, `lasttime3`, `lasttime4`, `lasttime5` FROM `arena_extra_board` ORDER BY `week`", extraboard) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+        {
+			lc.advance();
+            UInt8 week = extraboard.week;
+			if(week == ARENA_WEEK_START || week == ARENA_WEEK_END)
+            {
+                UInt8 type = week - ARENA_WEEK_START;
+                GObject::World::stArenaOld[type].week = extraboard.week;
+                GObject::World::stArenaOld[type].sufferTotal = extraboard.sufferTotal;
+                for(UInt8 i = 0; i < 5; i++)
+                {
+                    GObject::World::stArenaOld[type].name[i] = extraboard.name[i];
+                    GObject::World::stArenaOld[type].heroId[i] = extraboard.heroId[i];
+                    GObject::World::stArenaOld[type].sufferCnt[i] = extraboard.sufferCnt[i];
+                    GObject::World::stArenaOld[type].lasttime[i] = extraboard.lasttime[i];
+                }
+
+                ValueSort cur;
+                ValueSortType resultRank;
+                for(UInt8 i = 0; i < 5; i++)
+                {
+                    cur.sufferCnt = World::stArenaOld[type].sufferCnt[i];
+                    cur.lastTime = World::stArenaOld[type].lasttime[i];
+                    cur.name = World::stArenaOld[type].name[i];
+                    //std::cout << (UInt32)i << "::: " << cur.name << std::endl;
+                    resultRank.insert(cur);
+                }
+                for(UInt8 i = 0; i < 5; i++)
+                {
+                    UInt8 j = 0;
+                    for(ValueSortType::iterator iter = resultRank.begin(), e = resultRank.end(); iter != e && j < 5; ++iter, ++j)
+                    {
+                        //std::cout << (UInt32)j << ": " << (*iter).name << std::endl;
+                        if((*iter).name == World::stArenaOld[type].name[i])
+                            break;
+                    }
+                    //std::cout << "result: " << (UInt32)(j+1) << std::endl;
+                    World::stArenaOld[type].rank[i] = j + 1;
+                }
+            }
         }
         lc.finalize();
         return true;

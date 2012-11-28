@@ -60,6 +60,11 @@ static const UInt32 s_rate1MaxNpcIds[][4] = {
 {8056, 8060, 8062, 8063},  //89
 {8072, 8076, 8078, 8079},  //99
 {8088, 8092, 8094, 8095},  //109
+{8120, 8124, 8126, 8127},  //119
+{8120, 8124, 8126, 8127},  //129
+{8120, 8124, 8126, 8127},  //139
+{8120, 8124, 8126, 8127},  //149
+{8104, 8108, 8110, 8111}   //999
 };
 
 static const UInt32 s_rate1NpcMaxCount = 500;
@@ -95,6 +100,10 @@ static const float  s_rate3NpcBaseModulus[][6] = {
 {0.009f, 0.009f, 0.01f, 0.01f, 0.09f, 0.001f},  //99
 {0.010f, 0.010f, 0.01f, 0.01f, 0.10f, 0.001f},  //109
 {0.011f, 0.011f, 0.01f, 0.01f, 0.11f, 0.001f},  //119
+{0.011f, 0.011f, 0.01f, 0.01f, 0.11f, 0.001f},  //129
+{0.011f, 0.011f, 0.01f, 0.01f, 0.11f, 0.001f},  //139
+{0.011f, 0.011f, 0.01f, 0.01f, 0.11f, 0.001f},  //149
+{0.011f, 0.011f, 0.01f, 0.01f, 0.11f, 0.001f}   //999
 };
 static const float  s_rate3NpcAdvanceModulus[][4] = {
 {0.0002f, 0.005f, 0.004f, 0.01f},  //59
@@ -104,6 +113,10 @@ static const float  s_rate3NpcAdvanceModulus[][4] = {
 {0.0002f, 0.005f, 0.004f, 0.01f},  //99
 {0.0002f, 0.005f, 0.004f, 0.01f},  //109
 {0.0002f, 0.005f, 0.004f, 0.01f},  //119
+{0.0002f, 0.005f, 0.004f, 0.01f},  //129
+{0.0002f, 0.005f, 0.004f, 0.01f},  //139
+{0.0002f, 0.005f, 0.004f, 0.01f},  //149
+{0.0002f, 0.005f, 0.004f, 0.01f}   //999
 };
 static const float  s_rate3NpcAdvanceModMax[] =  {200, 100, 100, 200};
 static const int    s_rate3AdvanceLevel = 3000;
@@ -118,6 +131,11 @@ static const UInt32 s_tjBoss[][2] = {
 {7051, 7052},  //99
 {7053, 7054},  //109
 {7053, 7054},  //119
+{7075, 7076},  //119
+{7075, 7076},  //129
+{7075, 7076},  //139
+{7075, 7076},  //149
+{7115, 7116}   //999
 };
 
 static const UInt32 s_tj4Score = 1500;
@@ -127,8 +145,9 @@ static const UInt32 s_tjEventBoxId[] = {9134, 9135, 9136, 9137};
 static const UInt32 s_tjTotalBoxId[] = {9127, 9128, 9129, 9130};
 static const UInt32 s_tjEventRewardId = 9131;
 static const UInt32 s_tjTotalRewardId = 9132;
-static const UInt32 s_tjWeaponId[] = {1650,1651,1652,1529,1530,1531};
-static const UInt32 s_tjNameCardId[] = {9154,9155,9156,9157,9158,9159};
+                                       //59, 69,  79,  89,  99,  109, 119, 129, 139, 149, 999
+static const UInt32 s_tjWeaponId[] =   {1650,1651,1652,1529,1530,1531,1532,1533,1534,1535,1347};
+static const UInt32 s_tjNameCardId[] = {9154,9155,9156,9157,9158,9159,9160,9161,9162,9163,9228};
 static  MailPackage::MailItem s_eventItem[2]= {{30,10}, {509,1}};
 #define TJ_START_TIME_HOUR 19 
 #define TJ_START_TIME_MIN  45
@@ -202,7 +221,7 @@ Tianjie::Tianjie()
 }
 int  Tianjie::manualOpenTj(int level, bool force)
 {
-    if ((level % 10 != 9) || level < 59 || level > 109)
+    if (level != 999 && ((level % 10 != 9) || level < 59 || level > 109))
         return 1;
     if (m_manualTjLevel > 0)
         return 4;
@@ -226,7 +245,7 @@ int  Tianjie::manualOpenTj(int level, bool force)
 	{
         if (maxLevel < dbexp.level)
             maxLevel = dbexp.level;
-        if (maxLevel < level)    //玩家等级过低,不能手动启动天劫
+        if (maxLevel < level && level != 999)    //玩家等级过低,不能手动启动天劫
             return 2;
         if (dbexp.level == level) //已经触发了
         {
@@ -425,7 +444,7 @@ bool Tianjie::LoadFromDB()
     if(execu->Prepare("SELECT `id`, `is_opened`,`is_execute`,`is_finish`,`is_ok`,`level`,`rate`,UNIX_TIMESTAMP(opentime),`r1_killed`,`r2_donated`,`r3_copyid`,`r4_day`,`open_next`, `is_wait`,`is_manual`,`is_touch` FROM `tianjie`  where is_manual=1 order by level desc limit 1", dbexp0) != DB::DB_OK)
         return false;
     GData::DBTianjie dbexp1;
-    if(execu1->Prepare("SELECT `id`, `is_opened`,`is_execute`,`is_finish`,`is_ok`,`level`,`rate`,UNIX_TIMESTAMP(opentime),`r1_killed`,`r2_donated`,`r3_copyid`,`r4_day`,`open_next`, `is_wait`,`is_manual`,`is_touch` FROM `tianjie` order by level desc limit 1", dbexp1) != DB::DB_OK)
+    if(execu1->Prepare("SELECT `id`, `is_opened`,`is_execute`,`is_finish`,`is_ok`,`level`,`rate`,UNIX_TIMESTAMP(opentime),`r1_killed`,`r2_donated`,`r3_copyid`,`r4_day`,`open_next`, `is_wait`,`is_manual`,`is_touch` FROM `tianjie` where level!=999 order by level desc limit 1", dbexp1) != DB::DB_OK)
         return false;
     //有手动的天劫
     bool isManual = execu->Next() == DB::DB_OK;
@@ -542,7 +561,8 @@ bool Tianjie::LoadFromDB()
             {
                 clearPlayerTaskScore();
                 //天劫全都跑完了
-                if (m_tjTypeId == (sizeof(s_tjRoleLevel)/sizeof(s_tjRoleLevel[0])-2) && m_currTjRate >= 4)
+                //if (m_tjTypeId == (sizeof(s_tjRoleLevel)/sizeof(s_tjRoleLevel[0])-1) && m_currTjRate >= 4)
+                if (s_tjRoleLevel[m_tjTypeId] == 109 && m_currTjRate >= 4)
                 {
                    m_currOpenedTjLevel = 0;
                 }
@@ -960,10 +980,19 @@ void Tianjie::setRatePercent()
     if (percent - m_oldBroadPercent >= 25)
     {
         int msgId = 5011;
-        if (2 == m_currTjRate) msgId = 5021;
+        if (2 == m_currTjRate) msgId = m_currOpenedTjLevel == 999 ? 5069:5021;
         if (3 == m_currTjRate) msgId = 5031;
         if (percent < 100)
-            SYSMSG_BROADCASTV(msgId, m_tjTypeId, m_currTjRate, percent);
+        {
+            if (m_currOpenedTjLevel == 999)
+            {
+                SYSMSG_BROADCASTV(msgId, percent);
+            }
+            else
+            {
+                SYSMSG_BROADCASTV(msgId, m_tjTypeId, m_currTjRate, percent);
+            }
+        }
 
         m_oldBroadPercent = percent;
     }
@@ -1216,7 +1245,8 @@ void Tianjie::goNext()
            }
            else
            {
-               if ((UInt8)(m_tjTypeId+1) < sizeof(s_tjRoleLevel)/sizeof(s_tjRoleLevel[0])-1)
+               //if ((UInt8)(m_tjTypeId+1) < sizeof(s_tjRoleLevel)/sizeof(s_tjRoleLevel[0])-1)
+               if (s_tjRoleLevel[m_tjTypeId] < 109)
                {
                    m_currOpenedTjLevel = s_tjRoleLevel[++m_tjTypeId];
 	   	           DB1().PushUpdateData("INSERT INTO `tianjie`(`level`) VALUES(%d)",m_currOpenedTjLevel);
@@ -1302,7 +1332,14 @@ void Tianjie::start1()
 
     if (m_isNetOk)
     {
-        SYSMSG_BROADCASTV(5010);
+        if (m_currOpenedTjLevel == 999)
+        {
+            SYSMSG_BROADCASTV(5067);
+        }
+        else
+        {
+            SYSMSG_BROADCASTV(5010);
+        }
         broadEvent1();
     }
 }
@@ -1414,11 +1451,15 @@ bool Tianjie::isFinish()
         DB1().PushUpdateData("update tianjie set is_finish=%d where level=%d", 1, m_currOpenedTjLevel);
 
         int msgId = 5013;
-        if (2 == m_currTjRate) msgId = 5022;
+        if (2 == m_currTjRate) msgId = m_currOpenedTjLevel==999 ? 5070:5022;
         if (3 == m_currTjRate) msgId = 5032;
         if (msgId == 5022)
         {
             SYSMSG_BROADCASTV(msgId, m_tjTypeId, m_currTjRate, m_tjTypeId, m_currTjRate);
+        }
+        else if (msgId == 5070)
+        {
+            SYSMSG_BROADCASTV(msgId);
         }
         else
         {
@@ -1468,7 +1509,14 @@ void Tianjie::start2()
 
     if (m_isNetOk)
     {
-        SYSMSG_BROADCASTV(5020);
+        if (m_currOpenedTjLevel == 999)
+        {
+            SYSMSG_BROADCASTV(5068);
+        }
+        else
+        {
+            SYSMSG_BROADCASTV(5020);
+        }
         broadEvent2();
     }
 }
@@ -1592,7 +1640,16 @@ void Tianjie::close2()
 
     memset(m_rate2DonateCount, 0, sizeof(m_rate2DonateCount));
     if (m_isNetOk)
-        SYSMSG_BROADCASTV(5023, m_tjTypeId, m_currTjRate);
+    {
+        if (m_currOpenedTjLevel == 999)
+        {
+            SYSMSG_BROADCASTV(5071);
+        }
+        else
+        {
+            SYSMSG_BROADCASTV(5023, m_tjTypeId, m_currTjRate);
+        }
+    }
 }
 void Tianjie::setEvent2MaxScore(Player* pl)
 {
@@ -1610,7 +1667,14 @@ void Tianjie::start3()
 
     if (m_isNetOk)
     {
-        SYSMSG_BROADCASTV(5030);
+        if (m_currOpenedTjLevel == 999)
+        {
+            SYSMSG_BROADCASTV(5072);
+        }
+        else
+        {
+            SYSMSG_BROADCASTV(5030);
+        }
         broadEvent3();
     }
     getTlzFights();
@@ -1866,7 +1930,14 @@ void Tianjie::start4(bool isRestart)
             broadBossAppear(s_tjBoss[m_bossIndex][0], m_loc);
             broadBossCount(m_eventCurrNumber);
 
-            SYSMSG_BROADCASTV(5040);
+            if (m_currOpenedTjLevel == 999)
+            {
+                SYSMSG_BROADCASTV(5073);
+            }
+            else
+            {
+                SYSMSG_BROADCASTV(5040);
+            }
             SYSMSG_BROADCASTV(554, s_tjBoss[m_bossIndex][0], m_loc, s_tjBoss[m_bossIndex][0]);
         }
     }
@@ -2186,6 +2257,8 @@ void Tianjie::closeBoss()
 
         NETWORK()->Broadcast(st);
     }
+    if (m_currOpenedTjLevel == 999)
+        SYSMSG_BROADCASTV(5074);
 
     broadEvent4(NULL, 0);
 }
@@ -2557,7 +2630,7 @@ void Tianjie::rewardTask()
     for (iter = pm.begin(); iter != pm.end(); ++iter)
     {
         Player* p = iter->second;
-        if (p->GetLev() >= m_currOpenedTjLevel)
+        if ((p->GetLev() >= m_currOpenedTjLevel-4) || (m_currOpenedTjLevel==999 && p->GetLev()>=45))
         {
             MailPackage::MailItem item;
             item.id = 8555;         //天赋术

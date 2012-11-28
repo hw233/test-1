@@ -393,20 +393,24 @@ function RunBlueDiamondAward(player, opt)
         return 0;
     end
     local package = player:GetPackage();
-	if package:GetRestPackageSize() < 8 then
+	if package:GetRestPackageSize() < 5 then
 		player:sendMsgCode(2, 1011, 0);
 		return 0;
 	end
-    local date_9190_0 = { ['year'] = 2012, ['month'] = 10, ['day'] = 26, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
-    local date_9190_1 = { ['year'] = 2012, ['month'] = 11, ['day'] = 2, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
-    local date_9191_0 = { ['year'] = 2012, ['month'] = 10, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
-    local date_9191_1 = { ['year'] = 2012, ['month'] = 11, ['day'] = 4, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+    local date_9190_0 = { ['year'] = 2012, ['month'] = 11, ['day'] = 26, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+    local date_9190_1 = { ['year'] = 2012, ['month'] = 12, ['day'] = 3, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+    local date_9191_0 = { ['year'] = 2012, ['month'] = 11, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+    local date_9191_1 = { ['year'] = 2012, ['month'] = 11, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+    local date_9217_0 = { ['year'] = 2012, ['month'] = 11, ['day'] = 20, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+    local date_9217_1 = { ['year'] = 2012, ['month'] = 11, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+    
     local date_0 = os.time(date_9190_0);
     local date_1 = os.time(date_9190_1);
 
     local chance = {1852, 2593, 3333, 4444, 5926, 6667, 8148, 10000}
     local item_9190 = {{515,3},{507,2},{509,2},{503,10},{1325,4},{47,3},{1528,4},{5026,1}}
     local item_9191 = {{515,3},{507,3},{509,3},{503,10},{1325,4},{47,3},{1528,4},{5026,1}}
+    local item_9217 = {{515,3},{507,2},{509,2},{503,10},{1325,4},{47,3},{1528,4},{5026,1}}
     local items = item_9190;
     local itemId = 9190;
 
@@ -415,6 +419,11 @@ function RunBlueDiamondAward(player, opt)
         items = item_9191;
         date_0 = os.time(date_9191_0);
         date_1 = os.time(date_9191_1);
+    elseif opt == 3 then
+        itemId = 9217;
+        items = item_9217;
+        date_0 = os.time(date_9217_0);
+        date_1 = os.time(date_9217_1);
     end
     now = os.time()
     if now < date_0 or now >= date_1 then
@@ -440,6 +449,7 @@ function RunBlueDiamondAward(player, opt)
 
     local VAR_BLUE_AWARD_COUNT = 196;
     local VAR_YELLOW_AWARD_COUNT = 197;
+    local VAR_QQVIP_AWARD_COUNT = 245;
     local count = 0;
     if opt == 1 then
         player:AddVar(VAR_BLUE_AWARD_COUNT, 1);
@@ -455,6 +465,12 @@ function RunBlueDiamondAward(player, opt)
             package:Add(515, 5, true, 0, 31); 
             package:Add(507, 5, true, 0, 31); 
             package:Add(509, 5, true, 0, 31); 
+        end
+    elseif opt == 3 then
+        player:AddVar(VAR_QQVIP_AWARD_COUNT, 1);
+        count = player:GetVar(VAR_QQVIP_AWARD_COUNT);
+        if count == 5 then
+             package:Add(1708, 1, true, 0, 31);
         end
     end
 
@@ -543,7 +559,6 @@ function RunNewRegisterAwardAD_RF(player, idx)
     return 1
 end
 
-
 function Run11ActAward(player, opt)
     if player == nil or opt < 1 or opt > 2 then
         return false;
@@ -569,5 +584,22 @@ function Run11ActAward(player, opt)
     return true;
 end
 
-
+function RunThanksGivingDayAward(player, opt)
+    if player == nil or opt < 1 or opt > 2 then
+        return 0
+    end
+    local awards = {
+        [1] = {{517, 1},{29, 10},{511, 1},{15, 1},{514, 1},{548, 1}},
+        [2] = {{503, 1},{500, 1},{513, 1},{516, 1},{30, 1},{1525,1}},
+    }
+    local package = player:GetPackage()
+	if package:GetRestPackageSize() < #awards[opt] then
+		player:sendMsgCode(2, 1011, 0);
+		return 0
+	end
+    for i = 1, #awards[opt] do
+        package:Add(awards[opt][i][1], awards[opt][i][2], true, false, 30)
+    end
+    return 1
+end
 

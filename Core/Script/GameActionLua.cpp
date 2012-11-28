@@ -281,6 +281,8 @@ namespace Script
         CLASS_DEF(Player, lastNew7DayTargetAwardPush);
         CLASS_DEF(Player, luaUdpLog);
         CLASS_DEF(Player, addFighterFromItem);
+        CLASS_DEF(Player, hasFighter);
+        CLASS_DEF(Player, fighterFromItem);
 
         CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);
@@ -1373,6 +1375,7 @@ namespace Script
     
     void GameActionLua::doStrong(Player* pl, UInt8 id, UInt32 param1, UInt32 param2)
     {
+		assert(pl != NULL);
         Call<void>("doStrong", pl, id, param1, param2);
     }
     
@@ -1405,5 +1408,12 @@ namespace Script
     {
         return Call<lua_tinker::table>("openOrangeBoxStrong");
     }
+    
+    UInt8 GameActionLua::RunThanksGivingDayAward(Player* player, UInt8 opt)
+	{
+		assert(player != NULL);
+		return Call<UInt8>("RunThanksGivingDayAward", player, opt);
+	}
+    
 }
 

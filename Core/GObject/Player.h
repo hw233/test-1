@@ -5,6 +5,7 @@
 #include "TaskData.h"
 #include "EventBase.h"
 #include "Var.h"
+#include "GVar.h"
 #include "GData/LootTable.h"
 #include "GData/AttrExtra.h"
 
@@ -108,6 +109,8 @@ namespace GObject
 
 #define PLAYER_BUFF_ATHLETICS_P     0x45    //历练冷却时间
 #define PLAYER_BUFF_QQVIPBUF        0x46
+#define PLAYER_BUFF_SUFFER          0x47    //陷害间隔
+
 #define PLAYER_BUFF_ATHL1           0x51
 #define PLAYER_BUFF_ATHL2           0x52
 #define PLAYER_BUFF_ATHL3           0x53
@@ -134,7 +137,20 @@ namespace GObject
 #define MAX_CFRIENDS 50
 
 #define QIXI_MAX_STEPS  24
-
+#if 0
+#define ARENA_WEEK_START      2
+#define ARENA_WEEK_END        3
+#define ARENA_SINGUP_START    (TimeUtil::Now()-TimeUtil::SharpDay(0))/3600*3600
+#define ARENA_SINGUP_END      ARENA_SINGUP_START+30*60
+#define ARENA_SUFFER_END      ARENA_SINGUP_END+15*60
+#else
+#define ARENA_WEEK_START      2
+#define ARENA_WEEK_END        3
+#define ARENA_SINGUP_START    13*3600
+#define ARENA_SINGUP_END      ARENA_SINGUP_START+30*60
+#define ARENA_SUFFER_END      ARENA_SINGUP_END+15*60
+#endif
+#define ARENA_ACT_SYSTEM          10
 	class Map;
 	class Player;
 	class ItemBase;
@@ -687,7 +703,7 @@ namespace GObject
         void sendNationalDayOnlineAward();
         void sendHalloweenOnlineAward(UInt32, bool = false);
         void sendLevelPack(UInt8);
-        void resetThanksgiving();
+        //void resetThanksgiving();
         void offlineExp(UInt32);
         void getOfflineExp();
 
@@ -916,6 +932,7 @@ namespace GObject
 
 		UInt32 getGold(UInt32 c = 0, IncommingInfo* ii = NULL);
 		UInt32 useGold(UInt32 c, ConsumeInfo * ci=NULL);
+        void deleteGold(UInt32 c);
         UInt32 useGold4LuckDraw(UInt32 c);
         UInt32 getGold4LuckDraw();
 		bool holdGold(UInt32 c, UInt8, ConsumeInfo * ci = NULL);
@@ -977,6 +994,7 @@ namespace GObject
         void changeTitle(UInt8 t);
         bool notifyTitleAll();
         void writeTitleAll();
+        void ArenaExtraAct(UInt8 type, UInt8 opt);
 
 		UInt32 getAchievement(UInt32 a = 0);
 		UInt32 useAchievement(UInt32 a,ConsumeInfo * ci=NULL);
@@ -1018,6 +1036,7 @@ namespace GObject
         UInt32 getMainPExp() { return getMainFighter()?getMainFighter()->getPExp():0; }
 		bool hasFighter(UInt32);
         bool addFighterFromItem(UInt32, UInt32);
+        bool fighterFromItem(UInt32 fgtid);
 		Fighter * removeFighter(UInt32);
 		Fighter * removeFighterFromLineup(UInt32);
 		void autoLineup(Fighter *);
@@ -1693,7 +1712,7 @@ namespace GObject
                 m_isOffical = true;
         }
         inline void setClientIp(const std::string& clientIp) { strncpy(m_clientIp, clientIp.c_str(), 256);}
-        inline void setOpenId(const std::string& openid) { strncpy(m_openid, openid.c_str(), 256); }
+        void setOpenId(const std::string& openid, bool load = false);
         inline void setOpenKey(const std::string& openkey) { strncpy(m_openkey, openkey.c_str(), 256); }
         inline void setSource(const std::string& source) { m_source = source; }
         inline void setVia(const std::string& via) { m_via = via; }
@@ -1786,6 +1805,7 @@ namespace GObject
         void CheckCanAwardBirthday();
         void getAwardLogin(UInt8 opt);
         void getAwardBlueDiamond(UInt8 opt);
+        void getThanksGivingDay(UInt8 opt);
         void IDIPAddItem(UInt16 itemId, UInt16 num, bool bind = true);
         int IDIPBuy(UInt32 itemId, UInt32 num, UInt32 price, std::string& err, bool bind = true);
         void lastQueqiaoAwardPush(UInt16 itemId, UInt16 num);
@@ -1803,6 +1823,8 @@ namespace GObject
         void getNewRC7DayTargetAward(UInt8 val);
         void get11DailyAward(UInt8 opt);
         void send11DailyInfo();
+        void getSSToolbarAward();
+        void sendSSToolbarInfo();
 
         // 帮派神像
         float getClanStatueHPEffect();

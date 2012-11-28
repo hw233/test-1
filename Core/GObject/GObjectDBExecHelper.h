@@ -170,6 +170,7 @@ struct DBPlayerData
     std::string clantask;
     std::string formations;
     std::string atohicfg;
+    std::string openid;
 };
 
 struct DBHoneyFall
@@ -227,6 +228,16 @@ struct DBQixi
     UInt8 pos;
     UInt8 event;
     UInt32 score;
+};
+
+struct DBArenaExtraBoard
+{
+    UInt8 week;
+    std::string name[5];
+    UInt8 heroId[5];
+    UInt32 sufferTotal;
+    UInt32 sufferCnt[5];
+    UInt32 lasttime[5];
 };
 
 struct DBFighterBuffData
@@ -1131,7 +1142,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPlayerData)
-SPECIALDEF(56)
+SPECIALDEF(57)
 	(
 	UInt64, id,
 	std::string, pdata.name,
@@ -1188,7 +1199,8 @@ SPECIALDEF(56)
     UInt8,  pdata.dungeonCnt,
     UInt32, pdata.dungeonEnd,
 	UInt32, pdata.created,
-	UInt32, pdata.lockExpireTime
+	UInt32, pdata.lockExpireTime,
+    std::string, openid
     )
 SPECIALEND()
 
@@ -1263,6 +1275,33 @@ SPECIALDEF(6)
     )
 SPECIALEND()
 
+SPECIALBEGIN(GObject::DBArenaExtraBoard)
+SPECIALDEF(22)
+    (
+    UInt8, week,
+    std::string, name[0],
+    std::string, name[1],
+    std::string, name[2],
+    std::string, name[3],
+    std::string, name[4],
+    UInt8, heroId[0],
+    UInt8, heroId[1],
+    UInt8, heroId[2],
+    UInt8, heroId[3],
+    UInt8, heroId[4],
+    UInt32, sufferTotal,
+    UInt32, sufferCnt[0],
+    UInt32, sufferCnt[1],
+    UInt32, sufferCnt[2],
+    UInt32, sufferCnt[3],
+    UInt32, sufferCnt[4],
+    UInt32, lasttime[0],
+    UInt32, lasttime[1],
+    UInt32, lasttime[2],
+    UInt32, lasttime[3],
+    UInt32, lasttime[4]
+    )
+SPECIALEND()
 
 SPECIALBEGIN(GObject::DBFighterBuffData)
 SPECIALDEF(4)

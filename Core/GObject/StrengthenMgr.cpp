@@ -104,18 +104,42 @@ UInt8 StrengthenMgr::GetFlag(UInt8 idx)
 void StrengthenMgr::AddSouls(UInt8 v)
 {
     _item.souls += v;
-    //布点统计
-    UInt8 s = _item.souls;
-    if(s - v < 25 && s >= 25) 
-        _owner->activityUdpLog(1025, 9);
-    if(s - v < 50 && s >= 50) 
-        _owner->activityUdpLog(1025, 10);
-    if(s - v < 75 && s >= 75) 
-        _owner->activityUdpLog(1025, 11);
-    if(s - v < 100 && s >= 100) 
-        _owner->activityUdpLog(1025, 12);
+    CheckeFixedSouls(v);
 }
- 
+
+void StrengthenMgr::SendFlickerToClient()
+{
+    Stream st(REP::STRENGTHEN_LIST);
+    st << static_cast<UInt8>(0x05) << GetSouls();
+    st << Stream::eos;
+    _owner->send(st);
+}
+
+void StrengthenMgr::CheckeFixedSouls(UInt8 v)
+{
+    UInt8 s = GetSouls();
+    if(s - v < 25 && s >= 25)
+    {
+        _owner->activityUdpLog(1025, 9);    //布点统计
+        SendFlickerToClient();
+    }
+    if(s - v < 50 && s >= 50)
+    {
+        _owner->activityUdpLog(1025, 10);
+        SendFlickerToClient();
+    }
+    if(s - v < 75 && s >= 75) 
+    {
+        _owner->activityUdpLog(1025, 11);
+        SendFlickerToClient();
+    }
+    if(s - v < 100 && s >= 100) 
+    {
+        _owner->activityUdpLog(1025, 12);
+        SendFlickerToClient();
+    }
+}
+
 void StrengthenMgr::UpdateFlag(UInt8 idx,  UInt8 v)
 {
     if(idx >= SthMaxFlag)

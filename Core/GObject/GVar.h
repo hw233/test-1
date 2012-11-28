@@ -36,6 +36,7 @@ namespace GObject
         GVAR_DT_RESPOINT_BLUE = 10,
         GVAR_DT_TOTALRES_RED = 11,
         GVAR_DT_TOTALRES_BLUE = 12,
+        GVAR_ARENA_EXT_PROCESS = 13,
         GVAR_MAX,
     };
 
@@ -63,6 +64,7 @@ namespace GObject
             GREGISTER_VAR(GVAR_CLANCOPYPASS, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_1530BUCHANG, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_OLDRC7DAYBUCHANG, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_ARENA_EXT_PROCESS, GCYCLE_DAY);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

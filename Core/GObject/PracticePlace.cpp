@@ -264,6 +264,16 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
 
         st << static_cast<UInt8>(0) << pp->traintime * 60 << prot << pl->getPIcCount() << static_cast<UInt8>(place - 1) << static_cast<UInt8>(0) << Stream::eos;
         pl->send(st);
+        /*
+        //抢占修炼之后自动将玩家参战将领加入修炼位
+        for(int idx = 0; idx < 5; ++idx){
+            Fighter* fgt = pl->getLineup(idx).fighter;   
+            if(fgt){
+                UInt32 fgtId[1] = { fgt->getId() };
+                sitdown(pl, fgtId, 1);
+            }
+        }
+        */
         return true;
     }
 
@@ -394,17 +404,20 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
         }
 
         if (modified)
+        {
             updateFighters(data->fighters, pl->getId());
+            //fgtid中暂时只有一个将
+            st << static_cast<UInt8>(0) << Stream::eos;
+            //st << static_cast<UInt8>(0) << fgtid[0] << Stream::eos;
+            pl->send(st);
 
-        st << static_cast<UInt8>(0) << Stream::eos;
-
-        stActivityMsg msg;
-        msg.id = SthPractice;
-        GameMsgHdr hdr(0x245, pl->getThreadId(), pl, sizeof(stActivityMsg));
-        GLOBAL().PushMsg(hdr, &msg);
-
-        //pl->send(st);
-        return true;
+            stActivityMsg msg;
+            msg.id = SthPractice;
+            GameMsgHdr hdr(0x245, pl->getThreadId(), pl, sizeof(stActivityMsg));
+            GLOBAL().PushMsg(hdr, &msg);
+            return true;
+        }
+        return false;
     }
 
     bool PracticePlace::standup(Player* pl, UInt32* fgtid, size_t size)

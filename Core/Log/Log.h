@@ -84,7 +84,9 @@ enum PurchaseType
     IDIPBuyItem                 = 73,
     RC7DayLogin                 = 74,
     MoveEquip                   = 75,
-    FightTransform              = 76,
+    ThanksGivingDay             = 76,
+    LogArenaExtraAct            = 77,
+    FightTransform              = 78,
 };
 
 enum IncomingType
@@ -140,7 +142,7 @@ enum ItemFrom
 	FromExchange,
 	FromAthletAward,
 	FromMail,
-	FromNpc,
+	FromNpc = 10,
 	FromVipAward,
 	FromOnlineAward,
 	FromTaskAward,
@@ -150,7 +152,7 @@ enum ItemFrom
 	FromNpcBuy,
 	FromSplit,
     FromTripod,
-    FromFCMerge,
+    FromFCMerge = 20,
     FromPExp,
     FromHeroIsland,
     FromTeamCopy,
@@ -160,14 +162,14 @@ enum ItemFrom
     FromClan,
     FromTownDeamon,
 	FromSSDTAward,
-	FromHappyAward,
+	FromHappyAward = 30,
     FromIDIP,
     FromQixi,
     FromKillMonster, //斩妖除魔
     FromNewRC7DayLogin,
     FromNewRC7DayRecharge,
     FromNewRC7DayTarget,
-    FromDailyStrengthen,
+    FromDailyStrengthen = 37, //变强秘宝
 };
 
 enum ItemTo

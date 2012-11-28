@@ -326,6 +326,8 @@ namespace REQ
     const UInt8 SERVER_ARENA_INFO   = 0xEA;
     /**请求对阵表 */
     const UInt8 SERVER_ARENA_LB     = 0xEB;
+    /**跨服战-场外活动 */
+    const UInt8 SERVER_ARENA_EXTRA_ACT = 0xE7;
     /**跨服战操作 */
     const UInt8 SERVER_ARENA_OP     = 0xE8;
     /**聊天 */
@@ -618,6 +620,8 @@ namespace REP
     const UInt8 YD_INFO             = 0x2E;
     const UInt8 YD_AWARD_RCV        = 0x2F;
 
+    /**跨服战-场外活动 */
+    const UInt8 SERVER_ARENA_EXTRA_ACT = 0xE7;
     const UInt8 SERVER_ARENA_OP     = 0xE8;
 
     const UInt8 ATHLETICS_CHALLENGE = 0xF5;// 0xD2
@@ -711,6 +715,8 @@ namespace SPEQ
     const UInt16 FORBIDSALE          = 0x135;// 全区禁止交易
     const UInt16 UNFORBIDSALE        = 0x136;// 全区解除禁止交易
     const UInt16 QUERYLOCKUSER       = 0x137;// 查询玩家是否被禁止登陆和交易
+    const UInt16 SETLOGINLIMIT       = 0x138;// 设置平台一个ip最大登录数
+    const UInt16 DELETEGOLD          = 0x139;// 删除仙石
 }
 
 namespace SPEP
@@ -761,7 +767,8 @@ namespace SPEP
     const UInt16 FORBIDSALE          = 0x35;// 全区禁止交易
     const UInt16 UNFORBIDSALE        = 0x36;// 全区解除禁止交易
     const UInt16 QUERYLOCKUSER       = 0x37;// 查询玩家是否被禁止登陆和交易
-
+    const UInt16 SETLOGINLIMIT       = 0x38;// 设置平台一个ip最大登录数
+    const UInt16 DELETEGOLD          = 0x39;// 删除仙石
 }
 
 namespace ARENAREQ

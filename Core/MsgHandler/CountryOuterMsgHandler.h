@@ -1080,6 +1080,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendYBBufInfo(pl->GetVar(VAR_YBBUF), pl->GetVar(VAR_QQVIP_BUF));
     pl->sendAthlBufInfo();
     luckyDraw.notifyDisplay(pl);
+    pl->sendSSToolbarInfo();
 
     if (World::getTrumpEnchRet() || World::get9215Act())
         pl->sendTokenInfo();
@@ -3699,9 +3700,15 @@ void OnFriendListReq( GameMsgHdr& hdr, FriendListReq& flr )
 	MSG_QUERY_PLAYER(player);
     if(flr._type == 4)
     {
-        GObject::Clan *clan = player->getClan();
-        if(clan != NULL)
-            clan->sendClanList(player, flr._type, flr._start, flr._count);
+        struct ClanMemberListReq
+        {
+            UInt8 _type;
+            UInt8 _start;
+            UInt8 _count;
+        };
+        ClanMemberListReq cmlr = {flr._type, flr._start, flr._count};
+        GameMsgHdr hdr1(0x1D0, WORKER_THREAD_WORLD, player, sizeof(cmlr));
+        GLOBAL().PushMsg(hdr1, &cmlr);
     }
     else
 	    player->sendFriendList(flr._type, flr._start, flr._count);
@@ -4930,7 +4937,8 @@ void OnSecondSoulReq( GameMsgHdr& hdr, const void* data)
                 UInt16 itemId = 0;
                 UInt8 bind = 0;
                 br >> itemId >> bind;
-                fgt->enchantSoul(itemId, bind != 0, soulItemExpOut);
+                if(!fgt->enchantSoul(itemId, bind != 0, soulItemExpOut))
+                    break;
             }
 
             UInt16 infoNum = soulItemExpOut.size();

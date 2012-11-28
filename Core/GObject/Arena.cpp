@@ -2230,4 +2230,40 @@ void Arena::sendLeaderBoard(Player* pl)
     pl->send(st);
 }
 
+void Arena::setArenaInfo(UInt8 type)
+{
+    if(type > 1)
+        return;
+    //WORLD().resetArenaInfo();
+    PreliminaryPlayerListIterator it = _preliminaryPlayers_list[type].begin();
+    Mutex::ScopedLock lk(globalPlayers.getMutex());
+    supportSort cur;
+    SupportSortType arenaSupported;
+    for(; it != _preliminaryPlayers_list[type].end(); ++ it)
+    {
+        cur.support = (*it).support;
+        cur.heroId = (*it).heroId;
+        cur.name = (*it).name;
+        //printf("userId = %"I64_FMT"u\n", (*it).id);
+        cur.playerId = (*it).id;
+        arenaSupported.insert(cur);
+    }
+    UInt8 i = 0;
+    for(SupportSortType::iterator it = arenaSupported.begin(), e = arenaSupported.end(); i < 5 && it != e; i++, ++it)
+    {
+        WORLD().setArenaName(i, (*it).name);
+        WORLD().setArenaHeroId(i, (*it).heroId);
+        WORLD().setArenaPlayerId(i, (*it).playerId);
+    }
+
+}
+
+//void Arena::setArenaTotalCnt(UInt8 type)
+//{
+//    if(type > 1)
+//        return;
+//    WORLD().setArenaTotalCnt(static_cast<UInt16>(_preliminaryPlayers_list[type].size()));
+//}
+
+
 }

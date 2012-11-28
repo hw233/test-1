@@ -27,6 +27,7 @@
 #include "SecondSoul.h"
 #include "GVar.h"
 #include "GObjectDBExecHelper.h"
+#include "GData/SoulExpTable.h"
 
 namespace GObject
 {
@@ -3402,12 +3403,27 @@ void Fighter::delAllCitta( bool writedb )
     }
 }
 
+bool Fighter::CanDelCitta(UInt16 citta)
+{
+    //儒1202:三昧真火 释1203:乾元指 道1206:御剑术
+    //墨1333,1334,1336,1340,1341,1342
+    UInt16 cId = CITTA_ID(citta);
+    UInt16 cittaIds[] = { 3, 4, 7, 134, 135, 137, 141, 142, 143 };
+    for(UInt16 i = 0; i < sizeof(cittaIds) / sizeof(cittaIds[0]); ++i)
+    {
+        if(cId == cittaIds[i])
+            return false;
+    }
+    return true;
+}
+
 bool Fighter::delCitta( UInt16 citta, bool writedb )
 {
     int idx = hasCitta(citta);
     if (idx < 0)
         return false;
-
+    if(!CanDelCitta(citta))
+        return false;
     std::vector<UInt16>::iterator it = _cittas.begin();
     std::advance(it, idx);
 
@@ -3434,23 +3450,23 @@ bool Fighter::delCitta( UInt16 citta, bool writedb )
 
             // 29-100, 30-10000, 31-1000000
             exp *= 0.6;
-            if (exp) {
-                UInt16 rCount1 = static_cast<UInt16>(exp / 1000000);
+            UInt16 rCount1 = 0;
+            UInt16 rCount2 = 0;
+            UInt16 rCount3 = 0;
+            if(exp){
+                rCount1 = static_cast<UInt16>(exp / 1000000);
                 exp = exp % 1000000;
-                UInt16 rCount2 = static_cast<UInt16>(exp / 10000);
+                rCount2 = static_cast<UInt16>(exp / 10000);
                 exp = exp % 10000;
-                UInt16 rCount3 = static_cast<UInt16>(exp / 100);
-
-                SYSMSG(title, 2105);
-                SYSMSGV(content, 2106, getLevel(), getColor(), getName().c_str(), yacb->type, yacb->getName().c_str(), lvl);
-                MailPackage::MailItem mitem[3] = {{31, rCount1}, {30, rCount2}, {29, rCount3}};
-                MailItemsInfo itemsInfo(mitem, DismissCitta, 3);
-                GObject::Mail * pmail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
-                if(pmail != NULL)
-                {
-                    GObject::mailPackageManager.push(pmail->id, mitem, 3, true);
-                }
+                rCount3 = static_cast<UInt16>(exp / 100);
             }
+            SYSMSG(title, 2105);
+            SYSMSGV(content, 2106, getLevel(), getColor(), getName().c_str(), yacb->type, yacb->getName().c_str(), lvl);
+            MailPackage::MailItem mitem[4] = {{static_cast<UInt16>(CITTA_ITEMID(citta)), 1}, {31, rCount1}, {30, rCount2}, {29, rCount3}};
+            MailItemsInfo itemsInfo(mitem, DismissCitta, 4);
+            GObject::Mail * pmail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+            if(pmail)
+                GObject::mailPackageManager.push(pmail->id, mitem, 4, true);
         }
     }
 
@@ -4125,17 +4141,19 @@ bool Fighter::practiceLevelUp()
     return true;
 }
 
-void Fighter::enchantSoul(UInt32 itemId, bool bind, std::vector<SoulItemExp>& soulItemExpOut)
+bool Fighter::enchantSoul(UInt32 itemId, bool bind, std::vector<SoulItemExp>& soulItemExpOut)
 {
     if(!m_2ndSoul)
-        return;
+        return false;
     std::map<UInt32, UInt32>::iterator it = GData::GDataManager::m_soulItemExp.find(itemId);
     if(it == GData::GDataManager::m_soulItemExp.end())
-        return;
+        return false;
+    if(m_2ndSoul->getStateLevel() >= STATE_LEVEL_MAX)
+        return false;
 
     if(!_owner->GetPackage()->DelItem(itemId, 1, bind, ToSecondSoul))
     {
-        return;
+        return false;
     }
 
     UInt32 exp = it->second;
@@ -4183,6 +4201,7 @@ void Fighter::enchantSoul(UInt32 itemId, bool bind, std::vector<SoulItemExp>& so
     }
 
     soulItemExpOut.push_back(sie);
+    return true;
 }
 
 bool Fighter::equipSoulSkill(UInt8 idx, UInt32 itemId, bool bind)

@@ -34,13 +34,14 @@ using namespace DataCollector;
     5   caifutong
     10  qqgame
     11  q3366
-    12  kingxin
+    12  kingxin(s3)
     16  gamelife
     17  qqunion
-    40  kingxin
+    40  facebook
     41  6waves
     42  113
-    60  fb
+    60  kingnet(xy)
+    61  union_xy
 #endif
 
 namespace GObject
