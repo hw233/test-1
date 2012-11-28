@@ -53,6 +53,7 @@ MSG_REG_2(GameMsgHdr, REQ::CLAN_BATTLE, OnClanCityBattleReq);
 MSG_REG_2(GameMsgHdr, REQ::CLANCITYBATTLELIST, OnClanCityBattleListReq);
 MSG_REG(GameMsgHdr, OnArenaInfoReq);
 MSG_REG(GameMsgHdr, OnArenaLeaderBoardReq);
+MSG_REG_2(GameMsgHdr, REQ::SERVER_ARENA_EXTRA_ACT, OnArenaExtraActReq);
 MSG_REG_2(GameMsgHdr, REQ::SERVER_ARENA_OP, OnArenaOpReq);
 
 MSG_REG_2(GameMsgHdr, REQ::ACTIVE, OnQixiReq);
@@ -128,6 +129,8 @@ MSG_REG_2(GameMsgHdr, 0x1C3, OnSendRechargeRank);
 MSG_REG_2(GameMsgHdr, 0x1C4, OnSendConsumeRank);
 
 MSG_REG_2(GameMsgHdr, 0x1C5, OnGetQgameGiftAward);
+
+MSG_REG_2(GameMsgHdr, 0x1D0, OnSendClanMemberList);
 
 MSG_REG_2(GameMsgHdr, 0x1EC, OnDaysRankMsg);
 MSG_REG_2(GameMsgHdr, 0x1EE, OnReloadLuaReq);

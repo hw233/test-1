@@ -220,7 +220,7 @@ GMHandler::GMHandler()
    
     Reg(3, "fsale", &GMHandler::OnForbidSale);
     Reg(3, "unfsale", &GMHandler::OnUnForbidSale);
-   
+    Reg(3, "loginlimit", &GMHandler::OnSetLoginLimit);
 
 }
 
@@ -3290,6 +3290,15 @@ void GMHandler::OnUnForbidSale(GObject::Player *player, std::vector<std::string>
     GObject::Player * pl = GObject::globalPlayers[playerId];
     if (NULL != pl)
         pl->setForbidSale(false);
+}
+
+void GMHandler::OnSetLoginLimit(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 2)
+        return;
+    UInt8 pf = atoi(args[0].c_str());
+    UInt32 v = atoi(args[1].c_str());
+    setPlatformLogin(pf, v);
 }
 
 

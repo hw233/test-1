@@ -27,7 +27,7 @@ namespace GObject
         VAR_SINGLE_CHOPSTICKS = 1, //光棍节送筷子
         VAR_SENGYI = 2,     //僧衣
         VAR_APRON = 3,      //肚兜
-        VAR_TGDT = 4,       //感恩节在线时间
+        VAR_TGDT = 4,       //感恩节
         VAR_TGDCNT = 5,     //感恩节连续在线3小时次数
         VAR_ATOFM = 6,     //自动阵图id
         VAR_ICEMAN = 7,     //雪人
@@ -270,12 +270,21 @@ namespace GObject
 
         VAR_9215_USED = 244,  //逍遥礼包使用数
         VAR_QQVIP_AWARD_COUNT = 245 ,//qq会员抽奖卷
+        VAR_AWARD_SSTOOLBAR = 246,   //搜搜工具栏奖励是否已领取
         //250-269 越南版已占用
 
         // 270-280 占用 for zhgc
         VAR_ACT_LOGIN_AWARD     = 270, // 节日每日登陆奖励普通
         VAR_ACT_LOGIN_AWARD_VIP = 271, // 节日每日登陆奖励VIP
 
+        // 281-290 占用 fro qiwy
+        VAR_ARENA_SUPPORT = 281, //场外活动，支持的序列id
+        //VAR_ARENA_SUFFERED = 282, //场外活动，被陷害的次数
+        //VAR_ARENA_LASTTIME = 283, //场外活动，最后被陷害的时间
+        VAR_ARENA_SUPPORT_TUE = 284, //场外活动，星期二支持的玩家
+        VAR_ARENA_SUPPORT_WED = 285, //场外活动，星期三支持的玩家
+
+        //繁体版占用301-330
 
         VAR_MAX,
     };
@@ -314,7 +323,7 @@ namespace GObject
             REGISTER_VAR(VAR_SINGLE_CHOPSTICKS, CYCLE_YEAR)
             REGISTER_VAR(VAR_SENGYI, CYCLE_NONE);
             REGISTER_VAR(VAR_APRON, CYCLE_NONE);
-            REGISTER_VAR(VAR_TGDT, CYCLE_MONTH);
+            REGISTER_VAR(VAR_TGDT, CYCLE_DAY);
             REGISTER_VAR(VAR_TGDCNT, CYCLE_MONTH);
             REGISTER_VAR(VAR_ATOFM, CYCLE_NONE);
             REGISTER_VAR(VAR_ICEMAN, CYCLE_YEAR);
@@ -532,10 +541,16 @@ namespace GObject
             REGISTER_VAR(VAR_LOCAL_PAGE, CYCLE_NONE);
             REGISTER_VAR(VAR_9215_USED, CYCLE_NONE);
             REGISTER_VAR(VAR_QQVIP_AWARD_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_AWARD_SSTOOLBAR, CYCLE_NONE);
 
             REGISTER_VAR(VAR_EQUIP_MOVE_COUNT, CYCLE_NONE);
             REGISTER_VAR(VAR_ACT_LOGIN_AWARD, CYCLE_DAY);
             REGISTER_VAR(VAR_ACT_LOGIN_AWARD_VIP, CYCLE_DAY);
+            REGISTER_VAR(VAR_ARENA_SUPPORT, CYCLE_DAY);
+            //REGISTER_VAR(VAR_ARENA_SUFFERED, CYCLE_DAY);
+            //REGISTER_VAR(VAR_ARENA_LASTTIME, CYCLE_DAY);
+            REGISTER_VAR(VAR_ARENA_SUPPORT_TUE, CYCLE_NONE);
+            REGISTER_VAR(VAR_ARENA_SUPPORT_WED, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

@@ -307,7 +307,7 @@ end
 function doAtySignIn(player)
     local chance = { 500, 1500, 4500, 7500, 8500, 9000, 9500, 9700, 9900, 10000 }
     local scores = { 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
-    local rand = math.random(10000)
+    local rand = math.random(1, 10000)
     local score = 10
     for i = 1, #chance do
         if rand <= chance[i] then
@@ -358,7 +358,7 @@ function GetExchangeProps(id)
 end
 
 function GetExchangePropsID()
-    local ratio = math.random(10000)
+    local ratio = math.random(1, 10000)
     for _, val in pairs(exchangeProps) do
        if val[4] <= ratio and ratio < val[5]
         then
@@ -432,7 +432,13 @@ local dayExtraAward = {
         [30] = { {514,5},{499,50} },
     },
     [12] = {
-    },
+	    [1] = { {9214,2},{499,50} },
+        [7] = { {9214,2},{499,50} },
+        [13] = { {9214,2},{499,50} },
+        [19] = { {9214,2},{499,50} },
+        [25] = { {9214,2},{499,50} },
+        [31] = { {9214,2},{499,50} },
+	},
 }
 
 function GetdayExtraAward(month, day)
