@@ -103,12 +103,11 @@ local treasure4 = {
 	{{400,3,1},},
 }
 
-
 -- 宝箱掉落概率配置
-local chance1 = {379, 1895, 2400, 5768, 9558, 10000, 10000, 10000}
-local chance2 = {379, 1895, 2400, 5768, 9558, 10000, 10000, 10000}
-local chance3 = {379, 1895, 2400, 5768, 9558, 10000, 10000, 10000}
-local chance4 = {379, 1895, 2400, 5768, 9558, 10000, 10000, 10000}
+local chance1 = {1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000,9000,10000}
+local chance2 = {1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000,9000,10000}
+local chance3 = {1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000,9000,10000}
+local chance4 = {1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000,9000,10000}
 
 local treasure = {
     -- 宝箱道具
@@ -168,9 +167,9 @@ function getLengendMonster(id, val)
 end
 
 function calcGridType(prob)
-    local chance = {20, 75, 90, 95, 100}
-    for i = 1, #chance do
-        if prob <=chance[i] then
+    local chanceType = {20, 75, 90, 95, 100}
+    for i = 1, #chanceType do
+        if prob <=chanceType[i] then
             return i
         end
     end

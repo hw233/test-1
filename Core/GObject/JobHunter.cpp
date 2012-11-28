@@ -1054,6 +1054,7 @@ bool JobHunter::OnFoundCave(bool isAuto /* = false */)
         //bool   bind = item.get<bool>(3);
         st2 << static_cast<UInt16>(itemId) << static_cast<UInt16>(itemCount);
         _owner->lastExJobAwardPush(itemId, itemCount);
+        _owner->GetPackage()->Add(itemId, itemCount, true, true, FromNpc);
     }
     st2 << Stream::eos;
     _owner->send(st2);
