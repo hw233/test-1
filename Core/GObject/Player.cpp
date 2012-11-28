@@ -10481,6 +10481,7 @@ namespace GObject
                 Stream st(REP::GETAWARD);
                 st << static_cast<UInt8>(15) << static_cast<UInt8>(0) << Stream::eos;
                 send(st);
+                udpLog("huodong", "F_10000_15", "", "", "", "", "act");
             }
         }
         if(opt == 1) //付费领取(20仙石)
