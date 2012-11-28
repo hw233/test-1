@@ -486,7 +486,7 @@ int query_fighters_battle_req(JsonHead* head, json_t* body, json_t* retbody, std
             if (obj && fgt)
             {
                 UInt32 fgtId = fgt->getId();
-                UInt32 battle = fgt->getBattlePoint();
+                UInt32 battle = fgt->getBattlePoint_Dirty();
                 json_insert_pair_into_object(obj, "uiSummonId", my_json_new_number(fgtId));
                 json_insert_pair_into_object(obj, "uiSumBttlEffctv", my_json_new_number(battle));
                 json_insert_child(arr, obj);
