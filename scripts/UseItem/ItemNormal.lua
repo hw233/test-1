@@ -5607,7 +5607,7 @@ function ItemNormal_00010050(iid, num, bind, param)
     package:Add(1325, num*5, true, 0, 2);
     package:Add(515, num*5, true, 0, 2);
     package:Add(503, num*5, true, 0, 2);
-    package:Add(9022, num*5, true, 0, 2);
+    package:Add(1707, num*1, true, 0, 2);
 
     package:DelItemSendMsg(iid, player);
     return num;
