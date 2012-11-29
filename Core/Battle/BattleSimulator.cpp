@@ -1072,6 +1072,8 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
         if(skill && skill->cond == GData::SKILL_PEERLESS)
         {
             aura_factor = 1 + static_cast<float>(bf->getAura()-100) * 0.0025;
+            if(bf->isHide() || area_target->isMarkMo())
+                aura_factor += 0.1f;
         }
 
         if(!colorStock && !defend100 && (target_stun > 0 || (!enterEvade && bf->calcHit(area_target, skill) && !area_target->getMoEvade100())))
@@ -1865,7 +1867,7 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
                     float value = boSkill->effect->hitrate/100;
                     if(value < -0.001f)
                         value = -value;
-                    bo->setBlind(value, nStateLast + 1);
+                    bo->setBlind(value, nStateLast);
                     defList[defCount].damType = e_blind;
                     defList[defCount].damage = 0;
                     defCount++;
@@ -2120,7 +2122,7 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
                 }
             }
         }
-        else if( (skill->effect->state & GData::e_state_poison) && (skill->effect->hp < 0 || skill->effect->addhp < 0 || skill->effect->hpP < -0.001) )
+        else if( (!(skill->effect->state & GData::e_state_poison)) && (skill->effect->hp < 0 || skill->effect->addhp < 0 || skill->effect->hpP < -0.001) )
         {
             if(bf->getSide() != target_side)
             {
@@ -2344,7 +2346,7 @@ bool BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
             effect_state = GData::e_state_stun;
             break;
         case e_cls_mo:
-            effect_state = GData::e_state_mark_mo;
+            effect_state = GData::e_state_blind;
             break;
         }
     }
@@ -2688,7 +2690,7 @@ bool BattleSimulator::doStateMagRes(BattleFighter* bf, BattleFighter* target_bo,
 
 bool BattleSimulator::doNormalAttack(BattleFighter* bf, int otherside, int target_pos, std::vector<AttackAct>* atkAct)
 {
-    if(bf == NULL || bf->getHP() == 0)
+    if(bf == NULL || bf->getHP() == 0 || target_pos < 0)
         return false;
 
     BattleObject* target_object = _objs[otherside][target_pos];
@@ -2721,6 +2723,7 @@ bool BattleSimulator::doNormalAttack(BattleFighter* bf, int otherside, int targe
 
 void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* skill, int& target_side, int& target_pos, int& cnt)
 {
+    target_pos = -1;
     if(skill == NULL)
         return;
     if(skill->effect == NULL)
@@ -2731,6 +2734,7 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
     if(1 == skill->area)
     {
         cnt = 25;
+        target_pos = getPossibleTarget(bf->getSide(), bf->getPos());
     }
     else if( GData::e_battle_target_selfside == skill->target )
     {
@@ -2770,6 +2774,7 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
     else if( GData::e_battle_target_otherside == skill->target )
     {
         cnt = 1;
+        target_pos = getPossibleTarget(bf->getSide(), bf->getPos());
     }
     else
     {
@@ -3270,7 +3275,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 ReduceSpecialAttrLast(bf, e_ss_DecMagAtk, 1, scList, scCount);
         }
     }
-    else if( (skill->effect->state & GData::e_state_poison) && (skill->effect->hp < 0 || skill->effect->addhp < 0 || skill->effect->hpP < -0.001) )
+    else if( (!(skill->effect->state & GData::e_state_poison)) && (skill->effect->hp < 0 || skill->effect->addhp < 0 || skill->effect->hpP < -0.001) )
     {
         if(bf->getSide() != target_side)
         {
@@ -3974,7 +3979,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
 
 bool BattleSimulator::doSkillStatus2(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt ,StatusChange* scList, size_t& scCount)
 {
-    if(NULL == skill || bf == NULL)
+    if(NULL == skill || bf == NULL || target_pos < 0)
         return false;
 
     if(skill->effect == NULL)
@@ -4195,7 +4200,7 @@ bool BattleSimulator::doSkillStatus2(BattleFighter* bf, const GData::SkillBase* 
 
 bool BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt ,StatusChange* scList, size_t& scCount, bool& self, bool ifDecAura)
 {
-    if(NULL == skill || bf == NULL)
+    if(NULL == skill || bf == NULL || target_pos < 0)
         return false;
     if(skill->effect == NULL)
         return false;
@@ -4771,7 +4776,7 @@ UInt32 BattleSimulator::FightersEnter(UInt8 prevWin)
 UInt32 BattleSimulator::doSkillAttackAftEnter(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount)
 {
     UInt32 rcnt = 0;
-    if(skill->cond != GData::SKILL_ENTER)
+    if(skill->cond != GData::SKILL_ENTER || target_pos < 0)
     {
         return rcnt;
     }

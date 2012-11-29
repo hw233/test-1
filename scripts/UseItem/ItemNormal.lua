@@ -3863,6 +3863,21 @@ function ItemNormal_SecondSoul_9037(iid, num, bind, param)
     return 1;
 end
 
+function ItemNormal_SecondSoul_9231(iid, num, bind, param)
+    local player = GetPlayer()
+
+	local fgt = player:findFighter(param);
+	if fgt == nil then
+		return false;
+	end
+
+    if not fgt:changeSecondSoulClass(iid-9218) then
+        return false;
+    end
+
+    return 1;
+end
+
 function ItemNormal_SecondSoul_9046(iid, num, bind, param)
     local player = GetPlayer()
 
@@ -7871,6 +7886,11 @@ local ItemNormal_Table = {
     [9043] = ItemNormal_SecondSoul_9037,
     [9044] = ItemNormal_SecondSoul_9037,
     [9045] = ItemNormal_SecondSoul_9037,
+
+    [9231] = ItemNormal_SecondSoul_9231,
+    [9232] = ItemNormal_SecondSoul_9231,
+    [9233] = ItemNormal_SecondSoul_9231,
+    [9234] = ItemNormal_SecondSoul_9231,
 
     [9046] = ItemNormal_SecondSoul_9046,
     [9047] = ItemNormal_SecondSoul_9046,
