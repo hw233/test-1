@@ -58,6 +58,7 @@
 #include "GObject/TownDeamon.h"
 #include "GObject/Arena.h"
 #include "GObject/SingleHeroStage.h"
+#include "GObject/PracticePlace.h"
 
 #include "GObject/Tianjie.h"
 #include "Memcached.h"
@@ -1557,7 +1558,10 @@ void OnRecruitFighterReq( GameMsgHdr& hdr, RecruitFighterReq& rfr )
 	st << static_cast<UInt8>(id > 0 ? 0 : 1) << rfr._pos << Stream::eos;
 	player->send(st);
 	if (id != 0)
-
+    {   //将新招募的散仙放入修炼位
+        UInt32 fgts[1] = { id };
+        GObject::practicePlace.sitdown(player, fgts, 1);
+    }
     GameAction()->RunOperationTaskAction0(player, 3);
 }
 
