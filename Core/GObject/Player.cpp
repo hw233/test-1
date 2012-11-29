@@ -14716,7 +14716,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
             //星宿
             UInt8 fXinxiu = fSoul->getXinxiu();
             UInt8 tXinxiu = tSoul->getXinxiu();
-            money += abs(int(f-t))/100*10;
+            money += abs(int(f-t))/100*5;
             money += abs(int(fPracLev-tPracLev))*1;
             if (fXinxiu != tXinxiu)
                 money += 10;
@@ -14727,7 +14727,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
             {
                 Int32 f = fFgt->getElixirAttrByOffset(i);
                 Int32 t = tFgt->getElixirAttrByOffset(i);
-                money += abs(int(f-t))*10;
+                money += abs(int(f-t))*1;
             }
         }
         //34是测试区

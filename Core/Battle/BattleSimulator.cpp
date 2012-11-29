@@ -8879,6 +8879,15 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
             defList[defCount].damType = e_BleedMo;
 
         ++ defCount;
+
+        if(bf->getHP() == 0)
+        {
+            onDead(true, bf, defList, defCount, scList, scCount);
+        }
+        else if(_winner == 0)
+        {
+            onDamage(bf, defList, defCount, scList, scCount, false);
+        }
     }
 
     UInt8& last1 = bf->getBleed1Last();
