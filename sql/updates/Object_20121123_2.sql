@@ -1,0 +1,26 @@
+alter table `arena_extra_board` drop column `playerId1`;
+alter table `arena_extra_board` drop column `playerId2`;
+alter table `arena_extra_board` drop column `playerId3`;
+alter table `arena_extra_board` drop column `playerId4`;
+alter table `arena_extra_board` drop column `playerId5`;
+alter table `arena_extra_board` drop column `rank1`;
+alter table `arena_extra_board` drop column `rank2`;
+alter table `arena_extra_board` drop column `rank3`;
+alter table `arena_extra_board` drop column `rank4`;
+alter table `arena_extra_board` drop column `rank5`;
+alter table `arena_extra_board` add column `name1` varchar(255) NOT NULL DEFAULT '' after `week`;
+alter table `arena_extra_board` add column `name2` varchar(255) NOT NULL DEFAULT '' after `name1`;
+alter table `arena_extra_board` add column `name3` varchar(255) NOT NULL DEFAULT '' after `name2`;
+alter table `arena_extra_board` add column `name4` varchar(255) NOT NULL DEFAULT '' after `name3`;
+alter table `arena_extra_board` add column `name5` varchar(255) NOT NULL DEFAULT '' after `name4`;
+alter table `arena_extra_board` add column `heroId1` tinyint(3) unsigned NOT NULL DEFAULT '0' after `name5`;
+alter table `arena_extra_board` add column `heroId2` tinyint(3) unsigned NOT NULL DEFAULT '0' after `heroId1`;
+alter table `arena_extra_board` add column `heroId3` tinyint(3) unsigned NOT NULL DEFAULT '0' after `heroId2`;
+alter table `arena_extra_board` add column `heroId4` tinyint(3) unsigned NOT NULL DEFAULT '0' after `heroId3`;
+alter table `arena_extra_board` add column `heroId5` tinyint(3) unsigned NOT NULL DEFAULT '0' after `heroId4`;
+alter table `arena_extra_board` add column `lasttime1` int(10) unsigned NOT NULL  DEFAULT '0' after `sufferCnt5`;
+alter table `arena_extra_board` add column `lasttime2` int(10) unsigned NOT NULL  DEFAULT '0' after `lasttime1`;
+alter table `arena_extra_board` add column `lasttime3` int(10) unsigned NOT NULL  DEFAULT '0' after `lasttime2`;
+alter table `arena_extra_board` add column `lasttime4` int(10) unsigned NOT NULL  DEFAULT '0' after `lasttime3`;
+alter table `arena_extra_board` add column `lasttime5` int(10) unsigned NOT NULL  DEFAULT '0' after `lasttime4`;
+
