@@ -10519,6 +10519,8 @@ namespace GObject
         }
         if(opt == 1) //付费领取(20仙石)
         {
+            if(!hasChecked())
+                return;
             if(GetVar(VAR_TGDT) & 0x02)
                 return;
 			if (getGold() < 20)
