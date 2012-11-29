@@ -2577,7 +2577,7 @@ void Tianjie::rewardTask()
     for (iter = pm.begin(); iter != pm.end(); ++iter)
     {
         Player* p = iter->second;
-        if (p->GetLev() >= m_currOpenedTjLevel)
+        if ((p->GetLev() >= m_currOpenedTjLevel-4) || (m_currOpenedTjLevel==999 && p->GetLev()>=45))
         {
             MailPackage::MailItem item;
             item.id = 8555;         //天赋术
