@@ -2709,8 +2709,6 @@ namespace GObject
             UInt32 fgtid = fgt->getId();
             GameMsgHdr hdr2(0x1A6, WORKER_THREAD_WORLD, this, sizeof(fgtid));
             GLOBAL().PushMsg(hdr2, &fgtid);
-            if (_jobHunter)
-                _jobHunter->AddToFighterList(fgtid);
 
 			return fgt;
 		}
@@ -5340,6 +5338,9 @@ namespace GObject
         {
             ClanCopyMgr::Instance().playerLeave(this);
         }
+
+        if (_jobHunter)
+            _jobHunter->OnLeaveGame(_playerData.location);
 
         if(hasFlag(InCopyTeam))
             teamCopyManager->leaveTeamCopy(this);

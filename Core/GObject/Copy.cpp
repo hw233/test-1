@@ -18,6 +18,7 @@
 #include "LuckyDraw.h"
 #include "Package.h"
 #include "GObject/Tianjie.h"
+#include "JobHunter.h"
 namespace GObject
 {
 #define PRIVILEGE_COUNT 1
@@ -494,7 +495,15 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
 
             TeamCopyPlayerInfo* tcpInfo = pl->getTeamCopyPlayerInfo();
             if(tcpInfo && tcpInfo->getPass(id, 0) == false)
+            {
                 tcpInfo->setPass(id, 0, true, true);
+                if (id >= 4)
+                {
+                    JobHunter * jobHunter = pl->getJobHunter();
+                    if(jobHunter)
+                        jobHunter->SendGameInfo(2);
+                }
+            }
 
             luckyDraw.notifyPass(id);
 

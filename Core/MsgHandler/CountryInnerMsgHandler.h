@@ -24,6 +24,7 @@
 #include "Script/BattleFormula.h"
 #include "GObject/Clan.h"
 #include "GObject/ClanCopy.h"
+#include "GObject/JobHunter.h"
 #ifndef _WIN32
 #include "GObject/DCLogger.h"
 #endif
@@ -1752,6 +1753,15 @@ void OnIDIPBuy( GameMsgHdr& hdr, const void * data )
     ConsumeInfo ci(IDIPBuyItem, ibi->itemId, ibi->num);
     player->useGold(ibi->price, &ci);
     player->GetPackage()->Add(ibi->itemId, ibi->num, ibi->bind);
+}
+
+void OnAutoJobHunterStep( GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    JobHunter * job_hunter = player->getJobHunter();
+    if (!job_hunter)
+        return;
+    job_hunter->OnAutoCommand(0x10);
 }
 
 #endif // _COUNTRYINNERMSGHANDLER_H_

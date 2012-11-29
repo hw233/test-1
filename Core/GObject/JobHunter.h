@@ -153,17 +153,20 @@ class JobHunter
         void OnRequestStart(UInt8 index);
         void OnUpdateSlot(bool isAuto = false);
 
+        bool IsInGame();
+        bool IsInAuto();
         void SendGameInfo(UInt8 type);
 
         void SendMapInfo();
 
         void SendAutoInfo();
 
-        void OnCommand(UInt8 command, UInt8 val, UInt8 val2);
+        void OnCommand(UInt8 command, UInt8 val, UInt8 val2, bool isAuto = false);
         void OnAutoCommand(UInt8 type);
 
         void SendGridInfo(UInt16 pos);
-        void OnAbort();
+        void OnAbort(bool isAuto);
+        void OnLeaveGame(UInt16 spotId);
         bool CheckEnd();
 
     private:
@@ -177,16 +180,20 @@ class JobHunter
         void SelectBornGrid();
         void AddMinTreasureGrid();
 
-        void OnMove(UInt16 pos);
-        void OnSkipMonster();
-        bool OnAttackMonster(UInt16 pos);
-        void OnSolveTrap();
-        void OnBreakthroughTrap();
-        void OnGetTreasure(bool isAuto = false);
-        bool OnFoundCave(bool isAuto = false);
+        void OnMove(UInt16 pos, bool isAuto);
+        void OnJumpWhenAuto(UInt16 pos, UInt32 stepCount);
+        void OnSkipMonster(bool isAuto);
+        bool OnAttackMonster(UInt16 pos, bool isAuto);
+        void OnSolveTrap(bool isAuto);
+        void OnBreakthroughTrap(bool isAuto);
+        void OnGetTreasure(bool isAuto);
+        bool OnFoundCave(bool isAuto);
         void OnAutoStart();
+        void OnAutoStep();
         void OnAutoStop();
         void OnAutoFinish();
+
+        UInt16 GetPossibleGrid();
 
 
         inline bool CheckGridType(UInt8 type)
@@ -234,7 +241,10 @@ class JobHunter
         typedef std::map<UInt16, GridInfo> MapInfo;
         Player *_owner;
         std::set<UInt16> _fighterList;  // 可招募散仙列表
+
         MapInfo _mapInfo;               // 寻墨游戏地图信息
+        UInt16 _spotId;                 // 寻墨的据点ID
+
         UInt8 _slot1;                   // 一号神兽感应位
         UInt8 _slot2;                   // 二号神兽感应位
         UInt8 _slot3;                   // 三号神兽感应位

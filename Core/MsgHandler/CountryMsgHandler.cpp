@@ -242,7 +242,7 @@ MSG_REG_2(GameMsgHdr, 0x295, OnDelTradeNotify);
 MSG_REG_2(GameMsgHdr, 0x296, OnAddAwardGold);
 MSG_REG_2(GameMsgHdr, 0x297, OnCreateAward);
 
-MSG_REG_2(GameMsgHdr, 0x2A1, OnAutoJobHunter);
+MSG_REG_2(GameMsgHdr, 0x2A1, OnAutoJobHunterStep);
 
 MSG_REG_2(GameMsgHdr, 0x2F0, OnGoldRecharge);
 MSG_REG_2(GameMsgHdr, 0x2F1, OnYDPacks);

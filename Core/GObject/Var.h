@@ -273,6 +273,7 @@ namespace GObject
         VAR_AWARD_SSTOOLBAR = 246,   //搜搜工具栏奖励是否已领取
         
         VAR_EX_JOB_ENABLE = 247,   // 墨家面板是否开启
+        VAR_JOB_HUNTER_SPOT_ID = 248,   // 寻墨据点据点id
         //250-269 越南版已占用
 
         // 270-280 占用 for zhgc
@@ -545,6 +546,7 @@ namespace GObject
             REGISTER_VAR(VAR_QQVIP_AWARD_COUNT, CYCLE_NONE);
             REGISTER_VAR(VAR_AWARD_SSTOOLBAR, CYCLE_NONE);
             REGISTER_VAR(VAR_EX_JOB_ENABLE, CYCLE_NONE);
+            REGISTER_VAR(VAR_JOB_HUNTER_SPOT_ID, CYCLE_NONE);
 
             REGISTER_VAR(VAR_EQUIP_MOVE_COUNT, CYCLE_NONE);
             REGISTER_VAR(VAR_ACT_LOGIN_AWARD, CYCLE_DAY);
