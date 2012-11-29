@@ -32,9 +32,9 @@ namespace GObject
 
 
     //帮会排名战报名开始时间
-    const static UInt32 RANK_BATTLE_SIGNUP_BEGINTIME = 20 * 60 * 60 + 30 * 60;
+    const static UInt32 RANK_BATTLE_SIGNUP_BEGINTIME = 20 * 60 * 60;
     //帮会排名战报名持续时间
-    const static UInt32 RANK_BATTLE_SIGNUP_TIME = 10 * 60;
+    const static UInt32 RANK_BATTLE_SIGNUP_TIME = 40 * 60;
 
     //每次战斗时间
     const static UInt32 RANK_BATTLE_FIGHT_TIME = 40;

@@ -290,6 +290,8 @@ void ActivityMgr::ActivitySignIn()
     st << static_cast<UInt16>(GetOneDayRecord(day));
     st << cnt << Stream::eos;
     _owner->send(st);
+    //活跃度签到
+    GameAction()->doStrong(_owner, SthActSignIn, 0, 0);
 }
 
 //刷新待兑换的道具
