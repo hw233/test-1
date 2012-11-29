@@ -1200,7 +1200,7 @@ void Fighter::setPotential( float p, bool writedb )
 		{
 			_attrDirty = true;
 			_bPDirty = true;
-			sendModification(4, static_cast<UInt32>(p * 100 + 0.5f));
+			sendModification(4, static_cast<UInt32>(UInt32(p * 100) + 0.5f));
 		}
 	}
 }
@@ -1209,7 +1209,7 @@ void Fighter::setCapacity( float c, bool writedb )
 {
     _capacity = c;
     if (writedb && _owner) {
-        sendModification(5, static_cast<UInt32>(c * 100 + 0.5f));
+        sendModification(5, static_cast<UInt32>(UInt32(c * 100) + 0.5f));
     }
 }
 
@@ -3333,6 +3333,14 @@ bool Fighter::addNewCitta( UInt16 citta, bool writedb, bool init, bool split )
     return true;
 }
 
+void Fighter::offAllCitta()
+{
+    std::vector<UInt16> cittas = _cittas;
+    for (size_t i = 0; i < cittas.size(); ++i)
+    {
+        offCitta(cittas[i], true,true,true);
+    }
+}
 bool Fighter::offCitta( UInt16 citta, bool flip, bool offskill, bool writedb )
 {
     int idx = isCittaUp(citta);
@@ -3780,27 +3788,27 @@ void Fighter::setAttrValue1(UInt16 v)
     _attrValue1 = v;
 }
 
-void Fighter::setAttrType2(UInt8 t)
+void Fighter::setAttrType2(UInt8 t, bool force)
 {
-    if (_potential + 0.005f >= 1.2f)
+    if ((_potential + 0.005f >= 1.2f) || force)
         _attrType2 = t;
 }
 
-void Fighter::setAttrValue2(UInt16 v)
+void Fighter::setAttrValue2(UInt16 v, bool force)
 {
-    if (_potential + 0.005f >= 1.2f)
+    if ((_potential + 0.005f >= 1.2f) || force)
         _attrValue2 = v;
 }
 
-void Fighter::setAttrType3(UInt8 t)
+void Fighter::setAttrType3(UInt8 t, bool force)
 {
-    if (_potential + 0.005f >= 1.5f && _capacity >= 7.0)
+    if ((_potential + 0.005f >= 1.5f && _capacity >= 7.0) || force)
         _attrType3 = t;
 }
 
-void Fighter::setAttrValue3(UInt16 v)
+void Fighter::setAttrValue3(UInt16 v, bool force)
 {
-    if (_potential + 0.005f >= 1.5f && _capacity >= 7.0)
+    if ((_potential + 0.005f >= 1.5f && _capacity >= 7.0) || force)
         _attrValue3 = v;
 }
 

@@ -5304,7 +5304,30 @@ void OnMakeStrong( GameMsgHdr& hdr, const void * data )
             break;
     }
 }
+void OnExJob( GameMsgHdr & hdr, const void * data )
+{
+    MSG_QUERY_PLAYER(player);
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    br >> type;
 
+    Stream st(REP::EXJOB);
+    UInt8 res = 0;
+    switch (type)
+    {
+        case 3:
+            UInt16 fId = 0;
+            UInt16 tId = 0;
+            UInt8 t = 0;
+            br >> fId;
+            br >> tId;
+            br >> t;
+            res = player->fightTransform(fId, tId, t);
+            break;
+    }
+    st << type << res << Stream::eos;
+    player->send(st);
+}
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

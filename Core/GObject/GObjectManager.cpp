@@ -159,7 +159,7 @@ namespace GObject
 		UInt32 maxId;
 		execu->Extract("SELECT max(`mailId`) FROM `mail`", maxId);
 		IDGenerator::gMailOidGenerator.Init(maxId);
-		execu->Extract("SELECT max(`id` & 0xFFFFFF) FROM `clan`", maxId);
+		execu->Extract("SELECT max(`id`) FROM `clan`", maxId);
 		IDGenerator::gClanOidGenerator.Init(maxId);
 		execu->Extract("SELECT max(`id`) FROM `equipment`", maxId);
 		IDGenerator::gItemOidGenerator.Init(maxId);
