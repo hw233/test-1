@@ -234,6 +234,7 @@ void JobHunter::OnRequestStart(UInt8 index)
     SendGameInfo(2);
     //_owner->moveTo(_spotId, true);
     DB2().PushUpdateData("UPDATE `job_hunter` SET `progress` = '%u' WHERE `playerId` = %"I64_FMT"u", _gameProgress, _owner->getId());
+    _owner->udpLog("jobHunter", "F_1161", "", "", "", "", "act");
 }
 
 void JobHunter::OnUpdateSlot(bool isAuto)
@@ -1144,6 +1145,7 @@ bool JobHunter::OnFoundCave(bool isAuto)
 
         ng = npcIt->second;
         ng->getLoots(_owner, _owner->_lastExJobAward, 0, NULL, true);
+        _owner->udpLog("jobHunter", "F_1162", "", "", "", "", "act");
 
     }
     else
@@ -1339,6 +1341,7 @@ bool JobHunter::CheckEnd()
         if (!((it->second).gridType & CLEAR_FLAG))
             return false;
     }
+    _owner->udpLog("jobHunter", "F_1163", "", "", "", "", "act");
     return true;
 }
 
