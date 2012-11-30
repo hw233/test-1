@@ -259,6 +259,7 @@ private:
 
 private:
     int getSideStartPos(int side);
+    int getSidePos(BattleObject* bf);
 	int findFirstAttacker();
 	UInt32 doAttack(int);
     UInt32 FightersEnter(UInt8 prevWin = 0xFF);
