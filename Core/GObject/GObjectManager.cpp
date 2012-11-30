@@ -3887,6 +3887,7 @@ namespace GObject
                     ringHp->hpBase[1] = table_temp2.get<float>(3);
                     ringHp->hpBase[2] = table_temp2.get<float>(4);
                     ringHp->hpBase[3] = table_temp2.get<float>(5);
+                    ringHp->hpBase[4] = table_temp2.get<float>(6);
                 }
             }
 
