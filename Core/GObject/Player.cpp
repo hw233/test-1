@@ -14703,68 +14703,54 @@ void EventTlzAuto::notify(bool isBeginAuto)
             return 6;
         return 0;
     }
+
     UInt8 Player::transformUseMoney(Fighter * fFgt, Fighter * tFgt, UInt8 type)
     {
         UInt32 money = 0;
-        UInt32 money1 = 0;
-        UInt32 money2 = 0;
-        UInt32 money3 = 0;
-        UInt32 money4 = 0;
-        UInt8 val1 = 0;
         if (type & 0x01)
         {
-            //int n = abs(fFgt->getLevel()-tFgt->getLevel());
-            //money += n * 1;
              money += 10;
-             money1 = 10;
         }
         if (type & 0x02)
         {
-            float p= abs(float(fFgt->getPotential()-tFgt->getPotential()));
-            p *= 100;
-            money += (int)(p+0.5) * 5; 
-            if (fFgt->getPotential() >= 1.8)
-                val1 = 4;
-            else if (fFgt->getPotential() >= 1.5)
-                val1 = 3;
-            else if (fFgt->getPotential() >= 1.2)
-                val1 = 2;
-            else if (fFgt->getPotential() >= 1.0)
-                val1 = 1;
+            float p = std::max(fFgt->getPotential(), tFgt->getPotential());
+            if (p >= 1.80f)
+                money += 100;
+            else if (p >= 1.50f)
+                money += 60;
+            else if (p >= 1.20f)
+                money += 30;
+            else
+                money += 10;
 
-            float c = abs(float(fFgt->getCapacity()-tFgt->getCapacity()));
-            c *= 10;
-            money += int(c+0.5)*5;
-            money2 = (int)(p+0.5) * 5 + int(c+0.5)*5;; 
+            float c = std::max(fFgt->getCapacity(),tFgt->getCapacity());
+            if (c >= 9.0f)
+                money += 100;
+            else if (c >= 8.0f)
+                money += 60;
+            else if (c >= 7.0f)
+                money += 30;
+            else
+                money += 10;
         }
-        /*if (type & 0x04)
-        {
-            float n = abs(float(fFgt->getCapacity()-tFgt->getCapacity()));
-            n *= 10;
-            money += int(n+0.5)*20;
-        }*/
         if (type & 0x08)
         {
 
             SecondSoul* fSoul = fFgt->getSecondSoul();
             SecondSoul* tSoul = tFgt->getSecondSoul();
             //元神境界
-            UInt32 f = fSoul->getStateExp();
-            UInt32 t = tSoul->getStateExp();
+            UInt8 f = fSoul->getStateLevel();
+            UInt8 t = tSoul->getStateLevel();
             //元神等级
             UInt8 fPracLev = fSoul->getPracticeLevel();
             UInt8 tPracLev = tSoul->getPracticeLevel();
             //星宿
             UInt8 fXinxiu = fSoul->getXinxiu();
             UInt8 tXinxiu = tSoul->getXinxiu();
-            money += abs(int(f-t))/100*5;
+            money += (std::max(f,t) * 10);
             money += abs(int(fPracLev-tPracLev))*1;
-            money3 =  abs(int(f-t))/100*10 + abs(int(fPracLev-tPracLev))*1;
             if (fXinxiu != tXinxiu)
-            {
-                money += 10;
-                money3 += 10;
-            }
+                money += 50;
         }
         if (type & 0x10)
         {
@@ -14786,10 +14772,10 @@ void EventTlzAuto::notify(bool isBeginAuto)
             ConsumeInfo ci(FightTransform,0,0);
             useGold(money, &ci);
         }
-        transformUdpLog(1160, type, money1, money2, money3, money4, val1);
         
         return 0;
     }
+
     UInt8 Player::transformExp(Fighter * fFgt, Fighter * tFgt)
     {
      //   UInt64 exp_70 = GData::expTable.getLevelMin(70);
