@@ -1316,6 +1316,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                     case e_cls_dao:
                         defList[defCount].damType = e_Bleed3;
                         area_target->setBleed3(ef->value/100*(dmg + magdmg), ef->last);
+                        break;
                     case e_cls_mo:
                         defList[defCount].damType = e_BleedMo;
                         area_target->setBleedMo(ef->value/100*(dmg + magdmg), ef->last);
