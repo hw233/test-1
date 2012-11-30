@@ -2526,7 +2526,7 @@ namespace GObject
         fgt->getAttrType1(true);
         fgt->getAttrType2(true);
         fgt->getAttrType3(true);
-        if (fgt->getClass() == 4)
+        if (fgt->getClass() == e_cls_mo && !load)
         {
             // 70级，关元穴穴道，60级白虎
             fgt->addExp(GData::expTable.getLevelMin(70));
