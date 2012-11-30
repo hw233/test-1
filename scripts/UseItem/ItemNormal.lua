@@ -6536,6 +6536,34 @@ function ItemNormal_00009210(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00009214(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage()
+    
+    local items = { 1326, 400, 503, 514, 515, 15, 134, 500, 501 }
+    local chance = { 1754, 3509, 4386, 5263, 5439, 7193, 7368, 9123, 10000 }
+    local used = 0
+    for n = 1, num do
+        if package:GetRestPackageSize() < 1 then
+            if used ~= 0 then
+                package:DelItemSendMsg(iid, player)
+            end
+            player:sendMsgCode(2, 1011, 0)
+            return used
+        end
+        local r = math.random(1, 10000)
+        for i = 1, #chance do
+            if r <= chance[i] then
+                package:Add(items[i], 1, true, false, 2)
+                break
+            end
+        end
+        used = used + 1
+    end
+    package:DelItemSendMsg(iid, player)
+    return used
+end
+
 function ItemNormal_00009215(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -8169,6 +8197,7 @@ local ItemNormal_Table = {
     [9211] = ItemNormal_00009210,
     [9212] = ItemNormal_00009210,
     [9213] = ItemNormal_00009210,
+    [9214] = ItemNormal_00009214,
     [9215] = ItemNormal_00009215,
     [9216] = ItemNormal_00009216,
     [9228] = ItemNormal_00009228,
