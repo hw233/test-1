@@ -13,6 +13,7 @@
 #include "Map.h"
 #include "GObjectDBExecHelper.h"
 #include "TeamCopy.h"
+#include "Server/SysMsg.h"
 
 //************************************************
 // 用于第四职业招募的——寻墨
@@ -192,6 +193,29 @@ void JobHunter::OnHireFighter(UInt16 id)
     }
     if (_owner->takeFighter(id, true) == NULL)
         return;
+    if (!_owner->GetShuoShuo()->getShuoShuo(SS_MO_HIRE))
+        _owner->OnShuoShuo(SS_MO_HIRE);
+    if (!_owner->GetVar(VAR_EX_JOB_HAS_HAD))
+    {
+        _owner->SetVar(VAR_EX_JOB_HAS_HAD, 1);
+        Stream st(REP::EXJOB);
+        st << static_cast<UInt8>(0xFF);
+        st << Stream::eos;
+        _owner->send(st);
+
+                Mail *pmail = NULL;
+                MailPackage::MailItem mitem[9] = {{2872, 1}, {2873, 1}, {2874, 1}, {2875, 1}, {2876, 1}, {2877, 1}, {2878, 1}, {2879, 1}, {1656, 1}};
+                MailItemsInfo itemsInfo(mitem, NEWJOBHIRE, 9);
+
+                SYSMSG(title, 4070);
+                SYSMSG(content, 4071);
+                pmail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+
+                if(pmail != NULL)
+                {
+                    mailPackageManager.push(pmail->id, mitem, 9, true);
+                }
+    }
     _fighterList.erase(id);
 
     std::string list;
@@ -1341,6 +1365,7 @@ bool JobHunter::CheckEnd()
         if (!((it->second).gridType & CLEAR_FLAG))
             return false;
     }
+    _owner->OnShuoShuo(SS_MO_COPY);
     _owner->udpLog("jobHunter", "F_1163", "", "", "", "", "act");
     return true;
 }

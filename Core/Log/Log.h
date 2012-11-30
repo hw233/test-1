@@ -130,6 +130,7 @@ enum MailItemType
     ClanCopyAward,
     BuChang1530,
     BuChangNewRC7Day,
+    NEWJOBHIRE,
 };
 enum ItemFrom
 {

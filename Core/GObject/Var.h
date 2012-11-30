@@ -274,6 +274,7 @@ namespace GObject
         
         VAR_EX_JOB_ENABLE = 247,   // 墨家面板是否开启
         VAR_JOB_HUNTER_SPOT_ID = 248,   // 寻墨据点据点id
+        VAR_EX_JOB_HAS_HAD     = 249,   // 是否招募过墨家散仙
 
         //250-269 越南版已占用
 
@@ -551,6 +552,7 @@ namespace GObject
             REGISTER_VAR(VAR_AWARD_SSTOOLBAR, CYCLE_NONE);
             REGISTER_VAR(VAR_EX_JOB_ENABLE, CYCLE_NONE);
             REGISTER_VAR(VAR_JOB_HUNTER_SPOT_ID, CYCLE_NONE);
+            REGISTER_VAR(VAR_EX_JOB_HAS_HAD, CYCLE_NONE);
 
             REGISTER_VAR(VAR_EQUIP_MOVE_COUNT, CYCLE_NONE);
             REGISTER_VAR(VAR_ACT_LOGIN_AWARD, CYCLE_DAY);

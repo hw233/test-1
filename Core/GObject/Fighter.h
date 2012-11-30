@@ -13,6 +13,7 @@
 #include "GData/CittaTable.h"
 #include "GObject/WBossMgr.h"
 #include "SecondSoul.h"
+#include "ShuoShuo.h"
 
 namespace GObject
 {
@@ -646,19 +647,7 @@ protected:
 			rebuildEquipAttr();
 		}
 	}
-	inline void checkBPDirty()
-	{
-		if(_bPDirty)
-		{
-			_bPDirty = false;
-			rebuildBattlePoint();
-		}
-        if(_skillBPDirty)
-        {
-			_skillBPDirty = false;
-			rebuildSkillBattlePoint();
-        }
-	}
+	void checkBPDirty();
 
     template <typename T>
     bool value2string(T* values, int size, std::string& str)

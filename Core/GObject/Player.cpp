@@ -3640,6 +3640,8 @@ namespace GObject
 			{
 				Battle::BattleFighter * bf = bsim.newFighter(side, lup.pos, lup.fighter);
 				bf->setHP(fullhp ? 0 : lup.fighter->getCurrentHP());
+                if (lup.fighter->getClass() == 4)
+                    OnShuoShuo(SS_MO_BATTLE);
 			}
 			else if(i == 0 && !_fighters.empty())
 			{
