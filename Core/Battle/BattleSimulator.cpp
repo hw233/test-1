@@ -1528,13 +1528,6 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                     if(pr2)
                         defList[0].damType2 |= 0x20;
                     defList[0].counterDmg = dmg2;
-                    defList[0].counterLeft = bf->getHP();
-
-//					if(cs2)
-//						printf("  [Counter] %u:%u CRITICAL-STRIKEs %u:%u, made %u damage, hp left: %u\n", side, pos, 1-side, from_pos, dmg2, bf->getHP());
-//					else
-//						printf("  [Counter] %u:%u attacks %u:%u, made %u damage, hp left: %u\n", side, pos, 1-side, from_pos, dmg2, bf->getHP());
-
                     // killed the fighter
                     if(bf->getHP() == 0)
                     {
@@ -1545,6 +1538,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                     {
 						onDamage(bf, defList, defCount, scList, scCount, false);
                     }
+                    defList[0].counterLeft = bf->getHP();
                 }
 #if 0
                 else

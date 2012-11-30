@@ -45,13 +45,13 @@ public:
 
 	inline BattleObject * getObject(int side, int idx)
     {
-        if(side != 0 || side != 1 || idx < 0 || idx > 24)
+        if(side < 0 || side > 1 || idx < 0 || idx > 24)
             return NULL;
         return _objs[side][idx];
     }
     inline void deleteObject(int side, int idx)
     {
-        if(side != 0 || side != 1 || idx < 0 || idx > 24)
+        if(side < 0 || side > 1 || idx < 0 || idx > 24)
             return;
         if(_objs[side][idx])
         {
