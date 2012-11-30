@@ -1874,7 +1874,8 @@ namespace GObject
             }
         }
 
-		DBLOG1().PushUpdateData("update login_states set logout_time=%u where server_id=%u and player_id=%"I64_FMT"u and login_time=%u", curtime, cfg.serverLogId, _id, _playerData.lastOnline);
+        int addr = inet_addr(m_clientIp);
+		DBLOG1().PushUpdateData("update login_states set logout_time=%u where server_id=%u and player_id=%"I64_FMT"u and login_time=%u", curtime, addr?addr:cfg.serverLogId, _id, _playerData.lastOnline);
 		writeOnlineRewardToDB();
 
 		removeStatus(SGPunish);
@@ -1918,7 +1919,8 @@ namespace GObject
 			_onlineDuration = _onlineDuration + curtime - _playerData.lastOnline;
 		}
 
-		DBLOG1().PushUpdateData("update login_states set logout_time=%u where server_id=%u and player_id=%"I64_FMT"u and login_time=%u", curtime, cfg.serverLogId, _id, _playerData.lastOnline);
+        int addr = inet_addr(m_clientIp);
+		DBLOG1().PushUpdateData("update login_states set logout_time=%u where server_id=%u and player_id=%"I64_FMT"u and login_time=%u", curtime, addr?addr:cfg.serverLogId, _id, _playerData.lastOnline);
 		DB1().PushUpdateData("UPDATE `player` SET `lastOnline` = %u, `nextReward` = '%u|%u|%u|%u' WHERE `id` = %"I64_FMT"u", curtime, _playerData.rewardStep, _playerData.nextRewardItem, _playerData.nextRewardCount, _playerData.nextRewardTime, _id);
         _isOnline = false;
 
@@ -2486,6 +2488,33 @@ namespace GObject
         }
 
         return false;
+    }
+
+    bool Player::fighterFromItem(UInt32 fgtid)
+    {
+        if (!fgtid)
+            return false;
+
+        if(isFighterFull())
+        {
+            sendMsgCode(0, 1200);
+            return false;
+        }
+
+        if (hasFighter(fgtid))
+        {
+            sendMsgCode(1, 1017);
+            return false;
+        }
+
+        Fighter * fgt = globalFighters[fgtid];
+        if(fgt == NULL)
+            return false;
+        Fighter* fgt2 = fgt->clone(this);
+        addFighter(fgt2, true);
+        notifyAddFighter(fgt2);
+        autoLineup(fgt2);
+        return true;
     }
 
 	void Player::notifyAddFighter( Fighter * fgt )
