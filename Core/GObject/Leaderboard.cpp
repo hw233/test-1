@@ -634,7 +634,6 @@ bool Leaderboard::getPacket( UInt8 t, Stream*& st, Player* pl)
     if (isSorting())
         return false;
 
-    FastMutex::ScopedLock lk(_opMutex);
 	switch(t)
 	{
 	case 0:
@@ -746,6 +745,8 @@ int Leaderboard::getMyRank(Player* pl, UInt8 type)
     int rank = 0;
     if (NULL == pl)
         return 0;
+    FastMutex::ScopedLock lk(_opMutex);
+
     std::map<UInt64, int>::iterator iter;
     Clan* cl = pl->getClan(); 
     switch (type)

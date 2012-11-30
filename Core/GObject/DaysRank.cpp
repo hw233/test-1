@@ -107,6 +107,7 @@ void DaysRank::updateDaysValue(daysValueRankMsg * msg)
 {
     if(!msg)
         return;
+
     UInt8 type = msg->type;
     PlayerRankInfo* pInfo = getDaysRank(msg->playerId);
     if(pInfo)

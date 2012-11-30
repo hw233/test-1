@@ -276,6 +276,7 @@ namespace GObject
         VAR_ACT_LOGIN_AWARD     = 270, // 节日每日登陆奖励普通
         VAR_ACT_LOGIN_AWARD_VIP = 271, // 节日每日登陆奖励VIP
 
+        //繁体版占用301-330
 
         VAR_MAX,
     };

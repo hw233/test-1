@@ -1198,10 +1198,12 @@ DROP TABLE IF EXISTS `activityData`;
 CREATE TABLE `activityData` (
    `playerId` bigint(20) unsigned NOT NULL,
    `overTime` int(10) unsigned NOT NULL,
+/*
    --`awardId`  int(10) unsigned NOT NULL,
    --`point`   int(10) unsigned NOT NULL,
    --`award`   int(10) unsigned NOT NULL,
    --`flags`   varchar(255) NOT NULL DEFAULT '',
+   */
    `scores`  int(10) unsigned NOT NULL,
    `propsID` int(10) unsigned NOT NULL,
    `signRecord` varchar(1024) NOT NULL DEFAULT '',
