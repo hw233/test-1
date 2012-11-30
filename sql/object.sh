@@ -102,6 +102,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20121126_1.sql
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20121128_1.sql
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20121130_1.sql
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20121130_2.sql  # must be once for delete var total
 
     #. clearshiyamen.sh
 }
