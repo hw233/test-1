@@ -290,6 +290,8 @@ namespace GObject
 
         //繁体版占用301-330
 
+        //340简体版
+        VAR_RECHARGE_SCORE = 340, //累计充值的积分
         VAR_MAX,
     };
 
