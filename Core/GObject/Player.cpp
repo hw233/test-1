@@ -1546,6 +1546,32 @@ namespace GObject
         udpLog("register", action, "", "", "", "", "act", num);
     }
 
+    void Player::transformUdpLog(UInt32 id, UInt32 type, UInt32 money1, UInt32 money2, UInt32 money3, UInt32 money4, UInt8 val1)
+    {
+        // TODO: 属性转移udp日志
+        char action[64] = "";
+        if (type & 0x01)
+        {
+            snprintf (action, 64, "F_%d_%d_%d_%d", id, 1, val1, money1);
+            udpLog("transform", action, "", "", "", "", "act", 1);
+        }
+        if (type & 0x02)
+        {
+            snprintf (action, 64, "F_%d_%d_%d", id, 2, money2);
+            udpLog("transform", action, "", "", "", "", "act", 1);
+        }
+        if (type & 0x08)
+        {
+            snprintf (action, 64, "F_%d_%d_%d", id, 8, money3);
+            udpLog("transform", action, "", "", "", "", "act", 1);
+        }
+        if (type & 0x10)
+        {
+            snprintf (action, 64, "F_%d_%d_%d", id, 10, money4);
+            udpLog("transform", action, "", "", "", "", "act", 1);
+        }
+    }
+
     void Player::sendHalloweenOnlineAward(UInt32 now, bool _online)
     {
         _online = false; // XXX: fuck
@@ -14680,21 +14706,36 @@ void EventTlzAuto::notify(bool isBeginAuto)
     UInt8 Player::transformUseMoney(Fighter * fFgt, Fighter * tFgt, UInt8 type)
     {
         UInt32 money = 0;
+        UInt32 money1 = 0;
+        UInt32 money2 = 0;
+        UInt32 money3 = 0;
+        UInt32 money4 = 0;
+        UInt8 val1 = 0;
         if (type & 0x01)
         {
             //int n = abs(fFgt->getLevel()-tFgt->getLevel());
             //money += n * 1;
              money += 10;
+             money1 = 10;
         }
         if (type & 0x02)
         {
             float p= abs(float(fFgt->getPotential()-tFgt->getPotential()));
             p *= 100;
             money += (int)(p+0.5) * 5; 
+            if (fFgt->getPotential() >= 1.8)
+                val1 = 4;
+            else if (fFgt->getPotential() >= 1.5)
+                val1 = 3;
+            else if (fFgt->getPotential() >= 1.2)
+                val1 = 2;
+            else if (fFgt->getPotential() >= 1.0)
+                val1 = 1;
 
             float c = abs(float(fFgt->getCapacity()-tFgt->getCapacity()));
             c *= 10;
             money += int(c+0.5)*5;
+            money2 = (int)(p+0.5) * 5 + int(c+0.5)*5;; 
         }
         /*if (type & 0x04)
         {
@@ -14718,8 +14759,12 @@ void EventTlzAuto::notify(bool isBeginAuto)
             UInt8 tXinxiu = tSoul->getXinxiu();
             money += abs(int(f-t))/100*10;
             money += abs(int(fPracLev-tPracLev))*1;
+            money3 =  abs(int(f-t))/100*10 + abs(int(fPracLev-tPracLev))*1;
             if (fXinxiu != tXinxiu)
+            {
                 money += 10;
+                money3 += 10;
+            }
         }
         if (type & 0x10)
         {
@@ -14728,6 +14773,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
                 Int32 f = fFgt->getElixirAttrByOffset(i);
                 Int32 t = tFgt->getElixirAttrByOffset(i);
                 money += abs(int(f-t))*10;
+                money4 = abs(int(f-t))*10;
             }
         }
         //34是测试区
@@ -14741,6 +14787,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
             ConsumeInfo ci(FightTransform,0,0);
             useGold(money, &ci);
         }
+        transformUdpLog(1160, type, money1, money2, money3, money4, val1);
         
         return 0;
     }
