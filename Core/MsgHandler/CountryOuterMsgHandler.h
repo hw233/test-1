@@ -1629,6 +1629,9 @@ void OnFighterDismissReq( GameMsgHdr& hdr, FighterDismissReq& fdr )
 	rep._fgtid = fdr._fgtid;
 	rep._result = 0;
 	player->send(rep);
+    JobHunter* jobHunter = player->getJobHunter();
+    if (jobHunter)
+        jobHunter->AddToFighterList(fdr._fgtid);
 }
 
 void OnFighterRegenReq( GameMsgHdr& hdr, FighterRegenReq& frr )
@@ -5368,7 +5371,7 @@ void OnExJob( GameMsgHdr & hdr, const void * data )
                 {
                     case 0:
                         // 放弃寻墨游戏
-                        jobHunter->OnAbort();
+                        jobHunter->OnAbort(false);
                         break;
                     case 1:
                     case 2:
@@ -5428,6 +5431,7 @@ void OnJobHunter( GameMsgHdr & hdr, const void * data )
 
 void OnAutoJobHunter( GameMsgHdr & hdr, const void * data )
 {
+    return;
 	MSG_QUERY_PLAYER(player);
     BinaryReader br(data, hdr.msgHdr.bodyLen);
 

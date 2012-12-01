@@ -328,11 +328,12 @@ namespace GObject
 
     class EventAutoJobHunter : public EventBase
     {
+    public:
 		EventAutoJobHunter(Player * player, UInt32 interval, UInt32 count, UInt8 id)
 			: EventBase(player, interval, count), id(id)
 		{}
 
-        virtual UInt32 GetID() const { return EVENT_AUTOCOPY; }
+        virtual UInt32 GetID() const { return EVENT_JOBHUNTER; }
         virtual bool Equal(UInt32 id, size_t playerid) const;
         void Process(UInt32);
 		bool Accelerate(UInt32);

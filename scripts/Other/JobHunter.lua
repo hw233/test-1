@@ -181,10 +181,11 @@ function getTreasure(id)
     local prob = math.random(1, 10000)
     local chanceTmp = chance[id]
     for i = 1, #chanceTmp do
-        if prob < chanceTmp[i] then
+        if prob <= chanceTmp[i] then
             return treasure[id][i]
         end
     end
+    print ("getTreasure error.")
 end
 
 function foundCave(id)
