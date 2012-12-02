@@ -376,7 +376,7 @@ void Leaderboard::doUpdate()
     }
 
 	std::vector<LeaderboardClanCopy> blist4;
-	execu->ExtractData("select a.id, a.name, b.maxCopyLevel, b.maxCopyTime from clan a, clan_copy b where a.id=b.clanId order by b.maxCopyLevel desc, b.maxCopyTime  asc limit 100;", blist4);
+	execu->ExtractData("select a.id, a.name, b.maxCopyLevel, b.maxCopyTime from clan a, clan_copy b where a.id=b.clanId and b.maxCopyLevel > 0 order by b.maxCopyLevel desc, b.maxCopyTime  asc limit 100;", blist4);
     {
         FastMutex::ScopedLock lk(_cmutex);
         _clancopy.clear();
@@ -416,7 +416,7 @@ void Leaderboard::doUpdate()
 		    blist[i].clan = clan->getName();
             _playerClanCopyRank[clan->getId()] = i+1;
         }
-	    buildPacket(_clanCopyStream, 5, _id, blist);
+	    buildPacket(_clanCopyStream, 5, 0, blist);
     }
 
 	std::vector<UInt64> ilist;
