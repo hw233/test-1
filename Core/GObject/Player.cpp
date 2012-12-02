@@ -71,6 +71,7 @@
 #include <cmath>
 #include "QixiTmpl.h"
 #include "MsgHandler/Memcached.h"
+#include "RechargeTmpl.h"
 #include "GData/ExpTable.h"
 
 #define NTD_ONLINE_TIME (4*60*60)
@@ -7048,7 +7049,7 @@ namespace GObject
         addRC7DayRecharge(r);
         addRF7DayRecharge(r);
         addRechargeNextRet(r);
-
+        
         if (World::getRechargeActive())
         {
             UInt32 total = GetVar(VAR_RECHARGE_TOTAL);
@@ -7104,6 +7105,12 @@ namespace GObject
 #endif
 
         sendTripodInfo();
+
+        if(World::getRechargeActive())
+        {
+            GObject::RechargeTmpl::instance().addScore(this, GetVar(VAR_RECHARGE_TOTAL)-r, GetVar(VAR_RECHARGE_TOTAL));
+            GObject::RechargeTmpl::instance().sendScoreInfo(this);
+        }
 	}
 
     void Player::addRechargeNextRet(UInt32 r)
@@ -7225,10 +7232,7 @@ namespace GObject
             total = GetVar(VAR_RECHARGE_TOTAL);
         else
             total = GetVar(VAR_RECHARGE_TOTAL3366);
-		Stream st(REP::DAILY_DATA);
-		st << static_cast<UInt8>(12) << total << Stream::eos;
-		send((st));
-
+           
         if (rank && World::getNeedRechargeRank())
         {
             GameMsgHdr hdr(0x1C1, WORKER_THREAD_WORLD, this, sizeof(total));
@@ -14573,44 +14577,49 @@ void EventTlzAuto::notify(bool isBeginAuto)
         UInt32 money = 0;
         if (type & 0x01)
         {
-            //int n = abs(fFgt->getLevel()-tFgt->getLevel());
-            //money += n * 1;
              money += 10;
         }
         if (type & 0x02)
         {
-            float p= abs(float(fFgt->getPotential()-tFgt->getPotential()));
-            p *= 100;
-            money += (int)(p+0.5) * 5; 
+            float p = std::max(fFgt->getPotential(), tFgt->getPotential());
+            if (p >= 1.80f)
+                money += 100;
+            else if (p >= 1.50f)
+                money += 60;
+            else if (p >= 1.20f)
+                money += 30;
+            else
+                money += 10;
 
-            float c = abs(float(fFgt->getCapacity()-tFgt->getCapacity()));
-            c *= 10;
-            money += int(c+0.5)*5;
+            float c = std::max(fFgt->getCapacity(),tFgt->getCapacity());
+            if (c >= 9.0f)
+                money += 100;
+            else if (c >= 8.0f)
+                money += 60;
+            else if (c >= 7.0f)
+                money += 30;
+            else
+                money += 10;
         }
-        /*if (type & 0x04)
-        {
-            float n = abs(float(fFgt->getCapacity()-tFgt->getCapacity()));
-            n *= 10;
-            money += int(n+0.5)*20;
-        }*/
         if (type & 0x08)
         {
 
             SecondSoul* fSoul = fFgt->getSecondSoul();
             SecondSoul* tSoul = tFgt->getSecondSoul();
             //元神境界
-            UInt32 f = fSoul->getStateExp();
-            UInt32 t = tSoul->getStateExp();
+            UInt8 f = fSoul->getStateLevel();
+            UInt8 t = tSoul->getStateLevel();
             //元神等级
             UInt8 fPracLev = fSoul->getPracticeLevel();
             UInt8 tPracLev = tSoul->getPracticeLevel();
             //星宿
             UInt8 fXinxiu = fSoul->getXinxiu();
             UInt8 tXinxiu = tSoul->getXinxiu();
-            money += abs(int(f-t))/100*10;
+
+            money += (std::max(f,t) * 10);
             money += abs(int(fPracLev-tPracLev))*1;
             if (fXinxiu != tXinxiu)
-                money += 10;
+                money += 50;
         }
         if (type & 0x10)
         {

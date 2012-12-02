@@ -45,6 +45,7 @@ namespace GObject
         SthPotential,   //潜力洗炼
         SthCapacity = 36,   //资质洗炼
         SthCHTownDeamon, //镇守聚魂阵
+        SthActSignIn,    //活跃度签到
         SthMaxFlag,      //标志记录的个数
     };
 #define STRONGTYPE_CNT 2
