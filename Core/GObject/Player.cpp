@@ -531,7 +531,7 @@ namespace GObject
 		GameMsgHdr hdr(0x2A1, m_Player->getThreadId(), m_Player, sizeof(id));
 		GLOBAL().PushMsg(hdr, &id);
         if (!leftCount)
-			PopTimerEvent(m_Player, EVENT_AUTOCOPY, m_Player->getId());
+			PopTimerEvent(m_Player, EVENT_JOBHUNTER, m_Player->getId());
     }
 
     bool EventAutoJobHunter::Accelerate(UInt32 times)
@@ -2163,6 +2163,7 @@ namespace GObject
             _lastAthAward.clear();
         }
         sendDeamonAwardsInfo();
+        checkLastExJobAward();
 
 		if(update)
 		{
@@ -2526,7 +2527,7 @@ namespace GObject
         fgt->getAttrType1(true);
         fgt->getAttrType2(true);
         fgt->getAttrType3(true);
-        if (fgt->getClass() == 4)
+        if (fgt->getClass() == 4 && !load)
         {
             // 70级，关元穴穴道，60级白虎
             fgt->addExp(GData::expTable.getLevelMin(70));
@@ -2536,7 +2537,6 @@ namespace GObject
             {
                 fgt->setAcupoints(i, 3, true, true);
             }
-
         }
     }
 

@@ -5431,7 +5431,6 @@ void OnJobHunter( GameMsgHdr & hdr, const void * data )
 
 void OnAutoJobHunter( GameMsgHdr & hdr, const void * data )
 {
-    return;
 	MSG_QUERY_PLAYER(player);
     BinaryReader br(data, hdr.msgHdr.bodyLen);
 

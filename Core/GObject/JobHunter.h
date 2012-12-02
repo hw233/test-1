@@ -269,6 +269,9 @@ class JobHunter
         UInt32 _nextMoveTime;           // 下一次移动的时间
 
         URandom _rnd;                   // 用于产生随机数
+        
+        bool _isInAuto;
+        bool _isAutoLose;               // 自动探索是否失败
 
     private:
         void DumpMapData();
