@@ -478,7 +478,12 @@ struct DBDaysRank
     std::string pk;
     std::string battle;
 };
-
+struct DBRechargeItem 
+{
+    UInt64 player_id;
+    UInt32 item_id;
+    int    num;
+};
 
 }
 
@@ -1033,7 +1038,14 @@ SPECIALDEF(6)
 	)
 SPECIALEND()
 
-
+SPECIALBEGIN(GData::DBRechargeItem)
+SPECIALDEF(3)
+	(
+	UInt64,player_id,
+    UInt32, item_id,
+    int, num
+	)
+SPECIALEND()
 
 }
 

@@ -54,6 +54,7 @@
 #include "SHSYTmpl.h"
 #include "QixiTmpl.h"
 #include "MsgHandler/Memcached.h"
+#include "RechargeTmpl.h"
 #include "GVar.h"
 
 static const UInt32 DAYSRANKTM = 23 * 3600+50*60;
@@ -360,7 +361,8 @@ bool enum_midnight(void * ptr, void* next)
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 27) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 28) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 29) ||
-            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 30)
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 30) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 6)
             ))
     {
         if (pl->isOnline())
@@ -372,7 +374,10 @@ bool enum_midnight(void * ptr, void* next)
         {
             if (pl->GetVar(VAR_RECHARGE_TOTAL))
                 pl->SetVar(VAR_RECHARGE_TOTAL, 0);
+            if (pl->GetVar(VAR_RECHARGE_SCORE))
+                pl->SetVar(VAR_RECHARGE_SCORE, 0);
         }
+        GObject::RechargeTmpl::instance().clear();
     }
 
     if (pl->GetVar(VAR_CONSUME) &&
@@ -1414,6 +1419,10 @@ bool World::Init()
     path = cfg.scriptPath + "qixitmpl.lua";
     qixiTmpl.setFilename(path.c_str());
     qixiTmpl.load();
+    path = cfg.scriptPath + "RechargeTmpl.lua";
+    GObject::RechargeTmpl::instance().setFilename(path.c_str());
+    GObject::RechargeTmpl::instance().load();
+
 
 	calWeekDay(this);
     UInt32 day = 1;

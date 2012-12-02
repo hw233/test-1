@@ -286,6 +286,8 @@ namespace GObject
 
         //繁体版占用301-330
 
+        //340简体版
+        VAR_RECHARGE_SCORE = 340, //累计充值的积分
         VAR_MAX,
     };
 
@@ -541,6 +543,7 @@ namespace GObject
             REGISTER_VAR(VAR_LOCAL_PAGE, CYCLE_NONE);
             REGISTER_VAR(VAR_9215_USED, CYCLE_NONE);
             REGISTER_VAR(VAR_QQVIP_AWARD_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_RECHARGE_SCORE, CYCLE_NONE);
             REGISTER_VAR(VAR_AWARD_SSTOOLBAR, CYCLE_NONE);
 
             REGISTER_VAR(VAR_EQUIP_MOVE_COUNT, CYCLE_NONE);
