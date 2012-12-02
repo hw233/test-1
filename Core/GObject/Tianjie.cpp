@@ -1198,7 +1198,7 @@ void Tianjie::goNext()
 {
     if ((m_currTjRate == 4 && !m_isFinish) || m_currTjRate == 5)
     {
-       if (m_lastPassedLevel < m_currOpenedTjLevel)
+       if (m_lastPassedLevel < m_currOpenedTjLevel && m_currOpenedTjLevel != 999)
            m_lastPassedLevel = m_currOpenedTjLevel;
 
        udplogTjStatus(false);
