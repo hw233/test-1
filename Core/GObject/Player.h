@@ -22,6 +22,7 @@
 #include "Mail.h"
 #include "GObject/NewRelation.h"
 #include "StrengthenMgr.h"
+#include "JobHunter.h"
 
 namespace Battle
 {
@@ -325,6 +326,22 @@ namespace GObject
 
     };
 
+    class EventAutoJobHunter : public EventBase
+    {
+    public:
+		EventAutoJobHunter(Player * player, UInt32 interval, UInt32 count, UInt8 id)
+			: EventBase(player, interval, count), id(id)
+		{}
+
+        virtual UInt32 GetID() const { return EVENT_JOBHUNTER; }
+        virtual bool Equal(UInt32 id, size_t playerid) const;
+        void Process(UInt32);
+		bool Accelerate(UInt32);
+
+    private:
+        UInt8 id;
+    };
+
 
 	struct Lineup
 	{
@@ -469,7 +486,7 @@ namespace GObject
         UInt32 qqawardEnd;          // QQ ??????ȡ????ʱ??
         UInt32 ydGemId;             // QQ VIP??ʯ????
 		UInt16 location;            // λ??
-		UInt8 inCity;               // ????
+		UInt8 inCity;               // ???? // 现在始终为true
 		UInt32 lastOnline;          // ?ϴ?????ʱ??
 		UInt64 newGuild;            // ????????????
 		UInt16 packSize;            // ???ұ?????
@@ -1528,6 +1545,7 @@ namespace GObject
 		std::vector<GData::LootResult> _lastQueqiaoAward;
         std::vector<GData::LootResult> _lastKillMonsterAward;
         std::vector<GData::LootResult> _lastNew7DayTargetAward;
+        std::vector<GData::LootResult> _lastExJobAward;
 
     private:
 		UInt16 _lastDungeon;
@@ -1671,6 +1689,7 @@ namespace GObject
         void tripodUdpLog(UInt32 id, UInt32 val = 0, UInt32 num = 1);
         void storeUdpLog(UInt32 id, UInt32 type, UInt32 itemId, UInt32 num = 1);
         void newRC7DayUdpLog(UInt32 id, UInt32 type = 0, UInt32 num  = 1);
+        void transformUdpLog(UInt32 id, UInt32 type, UInt32 money1, UInt32 money2, UInt32 money3, UInt32 money4, UInt8 val1);
         void guideUdp(UInt8 type, std::string& p1, std::string& p2);
         void moneyLog(int type, int gold, int coupon = 0, int tael = 0, int achievement = 0, int prestige = 0);
         void actUdp(UInt8 type, std::string& p1, std::string& p2);
@@ -1808,6 +1827,8 @@ namespace GObject
         void getThanksGivingDay(UInt8 opt);
         void IDIPAddItem(UInt16 itemId, UInt16 num, bool bind = true);
         int IDIPBuy(UInt32 itemId, UInt32 num, UInt32 price, std::string& err, bool bind = true);
+        void lastExJobAwardPush(UInt16 itemId, UInt16 num);
+        void checkLastExJobAward();
         void lastQueqiaoAwardPush(UInt16 itemId, UInt16 num);
         void checkLastQueqiaoAward();
         void lastKillMonsterAwardPush(UInt16 itemId, UInt16 num);
@@ -1908,6 +1929,13 @@ namespace GObject
     private:
         std::map<UInt32, UInt32> _forges;
 #endif
+
+    public:
+        JobHunter * getJobHunter();
+        void setJobHunter(std::string& fighterList, std::string& mapInfo, UInt8 progress, UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY, UInt32 stepCount);
+        void sendAutoJobHunter();
+    private:
+        JobHunter * _jobHunter;
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

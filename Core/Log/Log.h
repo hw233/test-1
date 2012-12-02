@@ -130,6 +130,7 @@ enum MailItemType
     ClanCopyAward,
     BuChang1530,
     BuChangNewRC7Day,
+    NEWJOBHIRE,
 };
 enum ItemFrom
 {
@@ -170,6 +171,7 @@ enum ItemFrom
     FromNewRC7DayRecharge,
     FromNewRC7DayTarget,
     FromDailyStrengthen = 37, //变强秘宝
+    FromJobHunter = 38, // 寻墨游戏
 };
 
 enum ItemTo

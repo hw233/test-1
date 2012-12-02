@@ -432,7 +432,6 @@ class ClanCopyMgr : public Singleton <ClanCopyMgr>
     ClanCopyMap _clanCopyMap;
     bool _reset;           // 是否在副本重置时间段 （每周日23:30~周一00:30）
     UInt32 _interval;
-
 };
 
 struct ClanCopyLog

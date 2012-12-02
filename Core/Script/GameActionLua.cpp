@@ -1414,6 +1414,41 @@ namespace Script
 		assert(player != NULL);
 		return Call<UInt8>("RunThanksGivingDayAward", player, opt);
 	}
+
+    UInt32 GameActionLua::getRandomNormalMonster(UInt8 id)
+    {
+        return Call<UInt32>("getRandomNormalMonster", id);
+    }
+
+    UInt32 GameActionLua::getBossMonster(UInt8 id)
+    {
+        return Call<UInt32>("getBossMonster", id);
+    }
+
+    UInt32 GameActionLua::getLengendMonster(UInt8 id, UInt8 val)
+    {
+        return Call<UInt32>("getLengendMonster", id, val);
+    }
+
+    UInt32 GameActionLua::calcGridType(UInt8 prob)
+    {
+        return Call<UInt8>("calcGridType", prob);
+    }
+
+    lua_tinker::table GameActionLua::getTreasure(UInt8 id)
+    {
+        return Call<lua_tinker::table>("getTreasure", id);
+    }
     
+    UInt32 GameActionLua::foundCave(UInt8 id)
+    {
+        return Call<UInt32>("foundCave", id);
+    }
+
+    lua_tinker::table GameActionLua::getStepAward(UInt32 step)
+    {
+        return Call<lua_tinker::table>("getStepAward", step);
+    }
+
 }
 

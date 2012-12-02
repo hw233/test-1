@@ -35,8 +35,12 @@ namespace REQ
     const UInt8 COUNTRY_ACT         = 0x1B;
     /** 新版出生七天活动 */
     const UInt8 NEWRC7DAY           = 0x1C;
-    /** 墨家游戏协议 */
+    /** 墨家面板协议 */
     const UInt8 EXJOB               = 0x1D;
+    /** 墨家游戏协议 */
+    const UInt8 JOBHUNTER           = 0x1E;
+    /** 自动寻墨游戏 */
+    const UInt8 AUTOJOBHUNTER       = 0X2A;
     /**成就 */
     const UInt8 ACHIEVEMENT         = 0xF0;// 0x0C
     /**阵营选择 */
@@ -581,8 +585,14 @@ namespace REP
     /** 新版出生七天活动 */
     const UInt8 NEWRC7DAY           = 0x1C;
 
+
     /** 墨家面板协议 */
     const UInt8 EXJOB               = 0x1D;
+    /** 墨家游戏协议 */
+    const UInt8 JOBHUNTER           = 0x1E;
+    /** 自动寻墨游戏 */
+    const UInt8 AUTOJOBHUNTER       = 0X2A;
+
     const UInt8 TRADE_LIST          = 0x80;// 0xC0
     const UInt8 TRADE_DATA          = 0x81;// 0xC1
     const UInt8 TRADE_LAUNCH        = 0x82;// 0xC2

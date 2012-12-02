@@ -57,6 +57,7 @@ public:
     void switchPlayer(GObject::Player* player, UInt8 side);
     void switchPlayer(const std::string& name, UInt8 level);
     UInt32 clearLastBattle(UInt8 side, bool isLast);
+
 private:
 	struct FighterStatus
 	{
@@ -199,7 +200,7 @@ private:
         e_Res = 19,
         e_ResR = 20,
         e_Disperse = 21,
-        e_Summon = 22,
+        e_Summon = 22, // 召唤，残影
         e_Weak = 23,
         e_UnWeak = 24,
         e_skill = 25,
@@ -227,6 +228,22 @@ private:
         e_unBleed4 = 47,  // 
         e_Immune3 = 48,   // 五彩石
         e_unImmune3 = 49, // 
+
+        e_blind = 50, // 至盲
+        e_unBlind = 51, // 解除至盲
+        e_hide = 52, // 潜行
+        e_unHide = 53, // 解除潜行
+        e_moAuraBuf = 54, // 龙舞
+        e_unMoAuraBuf = 55, // 解除龙舞
+        e_unSummon = 56, // 残影消失
+        e_deepBlind = 57, // 深度至盲
+        e_unDeepBlind = 58, // 解除深度至盲
+        e_BleedMo = 59,    // 墨之殇(墨流血)
+        e_unBleedMo = 60,  // 解除墨之殇
+        e_markMo = 61, // 墨之印记
+        e_unMarkMo = 62, // 解除墨之印记
+        e_moAuraBuf1 = 63, // 凤舞
+
         e_MAX_STATE,
     };
 
@@ -241,12 +258,15 @@ private:
     };
 
 private:
+    int getSideStartPos(int side);
+    int getSidePos(BattleObject* bf);
 	int findFirstAttacker();
 	UInt32 doAttack(int);
     UInt32 FightersEnter(UInt8 prevWin = 0xFF);
     UInt32 doSkillAttackAftEnter(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
     void reQueueFighterStatus(BattleFighter* bf);
 	void insertFighterStatus(BattleFighter* bf);
+	void insertFighterStatus2Current(BattleFighter* bf);
 	void removeFighterStatus(BattleFighter* bf);
 	UInt32 attackOnce(BattleFighter * bf, bool& first, bool& cs, bool& pr, const GData::SkillBase* skill, BattleObject * bo, float factor, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, int counter_deny = -1, AttackPoint * counter_deny_list = NULL, std::vector<AttackAct>* atkAct = NULL);
 
@@ -269,9 +289,13 @@ private:
     bool doSkillAttack(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt, std::vector<AttackAct>* atkAct = NULL, UInt32 skillParam = 0);
     BattleFighter* getTherapyTarget(BattleFighter* bf);
     BattleFighter* getTherapyTarget2(BattleFighter* bf, UInt8 * excepts, size_t exceptCount);
+    BattleFighter* getTherapyTarget3(BattleFighter* bf, UInt8 * excepts, size_t exceptCount);
+
     bool doSkillStatus(bool activeFlag, BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt, StatusChange* scList, size_t& scCount, bool& self, bool ifDecAura);
     bool doSkillStatus2(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt, StatusChange* scList, size_t& scCount);
-    void doSkillState(BattleFighter* bf, const GData::SkillBase* skill, BattleObject* bo, DefStatus* defList, size_t& defCount, std::vector<AttackAct>* atkAct2, std::vector<AttackAct>* atkAct, StatusChange* scList, size_t& scCount);
+    bool doSkillState(BattleFighter* bf, const GData::SkillBase* skill, BattleObject* bo, float factor, UInt8 poisonTimes, UInt32& dmg, DefStatus* defList, size_t& defCount, std::vector<AttackAct>* atkAct2, std::vector<AttackAct>* atkAct, StatusChange* scList, size_t& scCount);
+    bool doStateMagRes(BattleFighter* bf, BattleFighter* target_bo, UInt16 state, const GData::SkillBase* skill, DefStatus* defList, size_t& defCount, std::vector<AttackAct>* atkAct2, std::vector<AttackAct>* atkAct, StatusChange* scList, size_t& scCount);
+
     void getSkillTarget(BattleFighter* bf, const GData::SkillBase* skill, int& target_side, int& target_pos, int& cnt);
 
     UInt32 doPoisonAttack(BattleFighter* bf, bool cs, const GData::SkillBase* skill, BattleFighter* area_target, float factor, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, std::vector<AttackAct>* atkAct);
@@ -370,6 +394,40 @@ private:
 //    float calcTherapyDebuf(BattleFighter* bo, DefStatus* defList, size_t& defCount);
 //    float calcTherapyAddBuff(BattleFighter* bo, DefStatus* defList, size_t& defCount);
     float calcAuraDebuf(BattleFighter* bo, DefStatus* defList, size_t& defCount);
+
+
+
+    UInt32 doSkillStrenghtenCriticalPierceDmgB(BattleFighter* bf, const GData::SkillBase* skill, bool cs, bool pr, GData::SkillStrengthenBase*  ss, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
+
+    void getSkillEffectExtraHitrate(BattleFighter* bf, BattleFighter* bo, const GData::SkillBase* skill, float& hitrate, UInt8& last);
+    UInt32 getSkillEffectExtraHitCnt(BattleFighter* bf, BattleFighter* bo, const GData::SkillBase* skill, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
+
+    void doSkillEffectExtraAttack(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
+
+    typedef void (Battle::BattleSimulator::*doSkillEffectExtraFunc)(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
+
+
+    void doSkillEffectExtra_Hide(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
+    void doSkillEffectExtra_RndFgtBufAura(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
+    void doSkillEffectExtra_Evade100(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
+    void doSkillEffectExtra_HideSummon(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
+    void doSkillEffectExtra_MarkHideWeek(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
+    void doSkillEffectExtra_HideAttack(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
+    void doSkillEffectExtra_SelfSideDaoDmgReduce(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
+    void doSkillEffectExtra_SelfSideRuShiMagAtk(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
+    void doSkillEffectExtra_SelfSideBufAura(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
+
+
+    void doSkillEffectExtraAbsorb(BattleFighter* bf, UInt32 dmg, const GData::SkillBase* skill, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
+
+    void doSkillStrenghtenTherapyAnotherMore(BattleFighter* bf, UInt32 dmg, const GData::SkillBase* skill, GData::SkillStrengthenBase*  ss, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
+
+    int getNearOnePos(int side, int pos);
+    UInt32 doSkillStrenghtenCriticalDamageAroundOne(BattleFighter* bf, const GData::SkillBase* skill, bool cs, GData::SkillStrengthenBase*  ss, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
+    void getSkillEffectExtraBlind(BattleFighter* bf, BattleFighter* target_bo, const GData::SkillBase* skill, UInt16& effect_state);
+
+    bool doSkillStrengthenDeepBlind(BattleFighter* bf, BattleFighter* bo, GData::SkillStrengthenBase* ss, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
+
 private:
 	int _id, _winner, _turns;
 	UInt8 _position;
@@ -389,6 +447,8 @@ private:
 	std::vector<BattleFighter*> _onTherapy;
 	std::vector<BattleFighter*> _onSkillDmg;
 	std::vector<BattleFighter*> _onOtherDead;
+    UInt8 _cur_round_except[25];
+    UInt8 _except_count;
 
     UInt8 _teams[2];
     std::vector<std::string> _team_name[2];
@@ -401,6 +461,7 @@ private:
     setStatusFunc2 statusFuncTable2[MAX_STATUS];
 
     doSkillStrengthenFunc skillStrengthenTable[GData::TYPE_MAX];
+    doSkillEffectExtraFunc skillEffectExtraTable[GData::e_eft_max];
 
     //成就记录
     UInt32   _evadeNum[2]; //连续闪避次数

@@ -13,6 +13,7 @@
 #include "GData/CittaTable.h"
 #include "GObject/WBossMgr.h"
 #include "SecondSoul.h"
+#include "ShuoShuo.h"
 
 namespace GObject
 {
@@ -50,6 +51,16 @@ namespace GObject
 #define ACUPOINTS_MAX 15
 
 #define PEERLESS_UPMAX 1
+
+enum
+{
+    e_cls_ru = 1,
+    e_cls_shi = 2,
+    e_cls_dao = 3,
+    e_cls_mo = 4,
+
+    e_cls_max
+};
 
 struct SStrengthen
 {
@@ -303,6 +314,8 @@ public:
     // 取得心法带出技能的ID表
     const std::vector<const GData::SkillBase*>& skillFromCitta(UInt16 citta);
 
+    // 是否可散功心法
+    bool canCittaBeDel(UInt16 citta);
     // 初始化装备的心法
     void setUpCittas(std::string& citta, bool = false);
     // 初始化可装备的心法
@@ -634,19 +647,7 @@ protected:
 			rebuildEquipAttr();
 		}
 	}
-	inline void checkBPDirty()
-	{
-		if(_bPDirty)
-		{
-			_bPDirty = false;
-			rebuildBattlePoint();
-		}
-        if(_skillBPDirty)
-        {
-			_skillBPDirty = false;
-			rebuildSkillBattlePoint();
-        }
-	}
+	void checkBPDirty();
 
     template <typename T>
     bool value2string(T* values, int size, std::string& str)
@@ -757,6 +758,7 @@ public:
 
     UInt8 getSoulSkillIdx(UInt16 itemId);
     void reload2ndSoul();
+    void setSoulLevel(UInt32 level);
     void resetLevelAndExp(UInt8 maxLevel);
 
     void setHideFashion(bool v, bool writedb = true) 

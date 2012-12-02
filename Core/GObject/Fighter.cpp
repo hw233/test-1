@@ -2500,17 +2500,18 @@ UInt16 Fighter::getUpSkillsNum()
 bool Fighter::testMutual( UInt16 skill )
 {
     UInt16 mutualSkills[] = {
-        1,5,
-        2,6,
-        3,7,
-        10,28,
-        11,15,
-        11,18,
-        12,16,
-        15,18,
-        19,23,
-        20,24,
-        21,25,
+        1,5, // 三昧真火，离火真解
+        2,6, // 天雷击，五雷正心觉
+        3,7, // 烈焰爆发，上清剑气
+        10,28, // 乾元指，
+        11,15, // 回春术，甘露咒
+        11,18, // 回春术，普渡慈航
+        12,16, // 回灵术，韦驮正气
+        15,18, // 甘露咒，普渡慈航
+        19,23, // 御剑术，御剑真决
+        20,24, // 破甲术，无形剑
+        21,25, // 大道剑，大道无常剑
+        30,31, // 暗影步法，幽冥步法
     };
 
     UInt16 j = 0;
@@ -3424,6 +3425,7 @@ bool Fighter::delCitta( UInt16 citta, bool writedb )
         return false;
     if(!CanDelCitta(citta))
         return false;
+
     std::vector<UInt16>::iterator it = _cittas.begin();
     std::advance(it, idx);
 
@@ -4078,7 +4080,8 @@ float Fighter::getSoulPracticeFactor()
 
 bool Fighter::openSecondSoul(UInt8 cls)
 {
-    if(m_2ndSoul || _level < 60 || cls < 1 || cls > 3)
+    if(m_2ndSoul || _level < 60 || cls < 1 || 
+            (cls >= e_cls_max && cls != 13))
         return false;
 
     m_2ndSoul = new SecondSoul(this, cls);
@@ -4972,6 +4975,13 @@ void Fighter::reload2ndSoul()
     }
 }
 
+void Fighter::setSoulLevel(UInt32 level)
+{
+    if(!m_2ndSoul || !_owner)
+        return;
+    m_2ndSoul->setPracticeLevel(level);
+}
+
 void Fighter::resetLevelAndExp(UInt8 maxLevel)
 {
     UInt64 exp = GData::expTable.getLevelMin(maxLevel);
@@ -4980,5 +4990,22 @@ void Fighter::resetLevelAndExp(UInt8 maxLevel)
     DB1().PushUpdateData("UPDATE `fighter` SET `experience` = %"I64_FMT"u, `level`=%u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", exp, _level, _id, _owner->getId());
 }
 
+void Fighter::checkBPDirty()
+{
+    if(_bPDirty)
+    {
+        _bPDirty = false;
+        rebuildBattlePoint();
+    }
+    if(_skillBPDirty)
+    {
+        _skillBPDirty = false;
+        rebuildSkillBattlePoint();
+    }
+    if (_class == 4)
+        if (_battlePoint + _skillBP >= 100000)
+            if (!_owner->GetShuoShuo()->getShuoShuo(SS_MO_HIRE))
+                _owner->OnShuoShuo(SS_MO_STRENGTH);
+}
 }
 

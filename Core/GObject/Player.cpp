@@ -59,6 +59,7 @@
 #include "GData/ClanLvlTable.h"
 #include "GData/ClanSkillTable.h"
 #include "GData/ClanStatueTable.h"
+#include "GData/ExpTable.h"
 #include "Common/StringTokenizer.h"
 #include "TownDeamon.h"
 #include "ArenaBattle.h"
@@ -71,6 +72,7 @@
 #include <cmath>
 #include "QixiTmpl.h"
 #include "MsgHandler/Memcached.h"
+#include "RechargeTmpl.h"
 #include "GData/ExpTable.h"
 
 #define NTD_ONLINE_TIME (4*60*60)
@@ -520,6 +522,31 @@ namespace GObject
 		return count == 0;
     }
 
+    bool EventAutoJobHunter::Equal(UInt32 id, size_t playerid) const
+    {
+		return 	id == GetID() && playerid == m_Player->getId();
+    }
+
+    void EventAutoJobHunter::Process(UInt32 leftCount)
+    {
+		GameMsgHdr hdr(0x2A1, m_Player->getThreadId(), m_Player, sizeof(id));
+		GLOBAL().PushMsg(hdr, &id);
+        if (!leftCount)
+			PopTimerEvent(m_Player, EVENT_AUTOCOPY, m_Player->getId());
+    }
+
+    bool EventAutoJobHunter::Accelerate(UInt32 times)
+    {
+		UInt32 count = m_Timer.GetLeftTimes();
+		if(times > count)
+		{
+			times = count;
+		}
+		count -= times;
+		m_Timer.SetLeftTimes(count);
+		return count == 0;
+    }
+
 	void Lineup::updateId()
 	{
 		if(fighter != NULL) fid = fighter->getId(); else fid = 0;
@@ -538,7 +565,7 @@ namespace GObject
 #ifndef _WIN32
 		m_ulog(NULL),
 #endif
-		m_isOffical(false), m_sysDailog(false), m_hasTripod(false)
+		m_isOffical(false), m_sysDailog(false), m_hasTripod(false), _jobHunter(NULL)
 	{
         m_ClanBattleStatus = 1;
         m_ClanBattleScore = 0;
@@ -1121,6 +1148,8 @@ namespace GObject
 #endif
 #endif
 #endif // _WIN32
+#ifdef JOB_HUNTER_DEBUG
+#endif
 	}
 
 #define WEBDOWNLOAD 255
@@ -1518,6 +1547,32 @@ namespace GObject
         udpLog("register", action, "", "", "", "", "act", num);
     }
 
+    void Player::transformUdpLog(UInt32 id, UInt32 type, UInt32 money1, UInt32 money2, UInt32 money3, UInt32 money4, UInt8 val1)
+    {
+        // 属性转移udp日志
+        char action[64] = "";
+        if (type & 0x01)
+        {
+            snprintf (action, 64, "F_%d_%d", id, 1);
+            udpLog("transform", action, "", "", "", "", "act", money1);
+        }
+        if (type & 0x02)
+        {
+            snprintf (action, 64, "F_%d_%d_%d", id, 2, val1);
+            udpLog("transform", action, "", "", "", "", "act", money2);
+        }
+        if (type & 0x08)
+        {
+            snprintf (action, 64, "F_%d_%d", id, 8);
+            udpLog("transform", action, "", "", "", "", "act", money3);
+        }
+        if (type & 0x10)
+        {
+            snprintf (action, 64, "F_%d_%d", id, 10);
+            udpLog("transform", action, "", "", "", "", "act", money4);
+        }
+    }
+
     void Player::sendHalloweenOnlineAward(UInt32 now, bool _online)
     {
         _online = false; // XXX: fuck
@@ -1830,7 +1885,7 @@ namespace GObject
     }
     UInt32  Player::GetOnlineTimeTodaySinceLastLogin(UInt32 now)
     {
-//        UInt32 now  = TimeUtil::Now();
+        //UInt32 now  = TimeUtil::Now();
         UInt32 today = TimeUtil::SharpDayT( 0 , now);
         UInt32 lastOnline = _playerData.lastOnline;
         if( today >= lastOnline)
@@ -1888,7 +1943,7 @@ namespace GObject
         snprintf(online, sizeof(online), "%u", curtime - _playerData.lastOnline);
         udpLog("", "", "", "", "", online, "login");
 
-        UInt8 platform = atoi(getDomain());
+        //UInt8 platform = atoi(getDomain());
         if (cfg.GMCheck )
         {
             struct CrackValue
@@ -1987,7 +2042,7 @@ namespace GObject
         snprintf(online, sizeof(online), "%u", TimeUtil::Now() - _playerData.lastOnline);
         udpLog("", "", "", "", "", online, "login");
 
-        UInt8 platform = atoi(getDomain());
+        //UInt8 platform = atoi(getDomain());
         if (cfg.GMCheck )
         {
             struct CrackValue
@@ -2286,6 +2341,7 @@ namespace GObject
 	void Player::updateBattleFighters(bool updatedb)
 	{
 		int c = 0;
+        bool hasMo = false;
 		for(int i = 0; i < 5; ++ i)
 		{
 			Lineup& lup = _playerData.lineup[i];
@@ -2313,6 +2369,15 @@ namespace GObject
 			else
 			{
 				lup.fighter = it->second;
+                if(hasMo && lup.fighter->getClass() == e_cls_mo)
+                {
+                    lup.fighter = NULL;
+                    lup.fid = 0;
+                    lup.pos = 0;
+                    continue;
+                }
+                else if(lup.fighter && lup.fighter->getClass() == e_cls_mo)
+                    hasMo = true;
 				lup.updateId();
 				++ c;
 				if(i > 0 && lup.fid < 10)
@@ -2387,14 +2452,28 @@ namespace GObject
 
     void Player::upInitCitta(Fighter* fgt, bool writedb)
     {
-        static UInt16 cittas[] = {301, 401, 701};
-        UInt16 citta = cittas[fgt->getClass()-1];
-        if (fgt->hasCitta(citta) < 0) {
-            if (fgt->addNewCitta(citta, writedb, true)) {
-                /*
-                if (fgt->upCitta(citta, 0, writedb)) {
+        static UInt16 cittas[4][9] =
+        {
+            {301, 0, 0, 0, 0, 0, 0, 0, 0},
+            {401, 0, 0, 0, 0, 0, 0, 0, 0},
+            {701, 0, 0, 0, 0, 0, 0, 0, 0},
+            {13409, 13709, 13509, 14109, 14209, 14309, 0, 0, 0}
+        };
+        if(fgt->getClass() >= e_cls_max)
+            return;
+        UInt8 clsIdx = fgt->getClass() - 1;
+        for(int i = 0; i < 9; ++ i)
+        {
+            UInt16 citta = cittas[clsIdx][i];
+            if(citta == 0)
+                continue;
+            if (fgt->hasCitta(citta) < 0) {
+                if (fgt->addNewCitta(citta, writedb, true)) {
+                    /*
+                    if (fgt->upCitta(citta, 0, writedb)) {
+                    }
+                    */
                 }
-                */
             }
         }
     }
@@ -2448,7 +2527,19 @@ namespace GObject
         fgt->getAttrType1(true);
         fgt->getAttrType2(true);
         fgt->getAttrType3(true);
-	}
+        if (fgt->getClass() == e_cls_mo && !load)
+        {
+            // 70级，关元穴穴道，60级白虎
+            fgt->addExp(GData::expTable.getLevelMin(70));
+            fgt->openSecondSoul(13);
+            fgt->setSoulLevel(60);
+            for (UInt8 i = 0; i < 11; ++i)
+            {
+                fgt->setAcupoints(i, 3, true, true);
+            }
+
+        }
+    }
 
     bool Player::addFighterFromItem(UInt32 itemid, UInt32 price)
     {
@@ -3549,6 +3640,8 @@ namespace GObject
 			{
 				Battle::BattleFighter * bf = bsim.newFighter(side, lup.pos, lup.fighter);
 				bf->setHP(fullhp ? 0 : lup.fighter->getCurrentHP());
+                if (lup.fighter->getClass() == 4)
+                    OnShuoShuo(SS_MO_BATTLE);
 			}
 			else if(i == 0 && !_fighters.empty())
 			{
@@ -5198,8 +5291,7 @@ namespace GObject
 			{
 				exp /= 2;
 				SYSMSG_SENDV(181, this);
-				SYSMSG_SENDV(1081, this);
-			}
+				SYSMSG_SENDV(1081, this); }
 		}
 		for(int i = 0; i < 5; ++ i)
 		{
@@ -5275,6 +5367,9 @@ namespace GObject
         {
             ClanCopyMgr::Instance().playerLeave(this);
         }
+
+        if (_jobHunter)
+            _jobHunter->OnLeaveGame(_playerData.location);
 
         if(hasFlag(InCopyTeam))
             teamCopyManager->leaveTeamCopy(this);
@@ -5891,7 +5986,6 @@ namespace GObject
         // GM命令设置帮派副本每轮时间
         ClanCopyMgr::Instance().setInterval(time);
     }
-
 
 
     // 帮派副本
@@ -6630,7 +6724,8 @@ namespace GObject
 			Lineup& lu1 = _playerData.lineup[0];
             if (!lu1.fighter)
                 return;
-			bool mfSolid = lu1.fighter->getClass() == 3;
+            // 道默认站前排
+			bool mfSolid = lu1.fighter->getClass() == e_cls_dao;
 			if(mfSolid)
 				lu1.pos = newPos[starti ++];
 			for(int i = 1; i < 5; ++ i)
@@ -6640,7 +6735,7 @@ namespace GObject
 					continue;
                 if (!lu.fighter)
                     continue;
-				if(lu.fighter->getClass() == 3)
+				if(lu.fighter->getClass() == e_cls_dao)
 					lu.pos = newPos[starti ++];
 				else
 					lu.pos = newPos[endi --];
@@ -7048,7 +7143,7 @@ namespace GObject
         addRC7DayRecharge(r);
         addRF7DayRecharge(r);
         addRechargeNextRet(r);
-
+        
         if (World::getRechargeActive())
         {
             UInt32 total = GetVar(VAR_RECHARGE_TOTAL);
@@ -7104,6 +7199,12 @@ namespace GObject
 #endif
 
         sendTripodInfo();
+
+        if(World::getRechargeActive())
+        {
+            GObject::RechargeTmpl::instance().addScore(this, GetVar(VAR_RECHARGE_TOTAL)-r, GetVar(VAR_RECHARGE_TOTAL));
+            GObject::RechargeTmpl::instance().sendScoreInfo(this);
+        }
 	}
 
     void Player::addRechargeNextRet(UInt32 r)
@@ -7225,10 +7326,7 @@ namespace GObject
             total = GetVar(VAR_RECHARGE_TOTAL);
         else
             total = GetVar(VAR_RECHARGE_TOTAL3366);
-		Stream st(REP::DAILY_DATA);
-		st << static_cast<UInt8>(12) << total << Stream::eos;
-		send((st));
-
+           
         if (rank && World::getNeedRechargeRank())
         {
             GameMsgHdr hdr(0x1C1, WORKER_THREAD_WORLD, this, sizeof(total));
@@ -10205,7 +10303,7 @@ namespace GObject
             GetPackage()->Add(509, 1, true);
             GetPackage()->Add(50, 1, true);
             GetPackage()->Add(49, 1, true);
-            GetPackage()->Add(1526, 1, true);
+            GetPackage()->Add(133, 1, true);
             GetPackage()->Add(500, 1, true);
             GetPackage()->Add(56, 1, true);
             SetVar(VAR_AWARD_SSTOOLBAR, 1);
@@ -10902,6 +11000,22 @@ namespace GObject
         _lastKillMonsterAward.push_back(lt);
     }
 
+    void Player::lastExJobAwardPush(UInt16 itemId, UInt16 num)
+    {
+        GData::LootResult lt = {itemId, num};
+        _lastExJobAward.push_back(lt);
+    }
+
+    void Player::checkLastExJobAward()
+    {
+        std::vector<GData::LootResult>::iterator it;
+        for(it = _lastExJobAward.begin(); it != _lastExJobAward.end(); ++ it)
+        {
+            m_Package->ItemNotify(it->id, it->count);
+        }
+        _lastExJobAward.clear();
+    }
+
     void Player::lastNew7DayTargetAwardPush(UInt16 itemId, UInt16 num)
     {
         GData::LootResult lt = {itemId, num};
@@ -11235,7 +11349,7 @@ namespace GObject
         MailPackage::MailItem item4[4] = {{MailPackage::Coupon,30},{509, 1}, {507, 1},{511,3}};
         MailPackage::MailItem item5[5] = {{MailPackage::Coupon,40},{509, 1}, {507, 1},{5025,1},{512,4}};
         MailPackage::MailItem item6[5] = {{MailPackage::Coupon,40},{509, 1}, {507, 1},{514,5},{515,2}};
-        MailPackage::MailItem item7[6] = {{MailPackage::Coupon,50},{509, 1}, {507, 1},{517,5},{1528,2},{15,5}};
+        MailPackage::MailItem item7[6] = {{MailPackage::Coupon,50},{509, 1}, {507, 1},{517,5},{134,2},{15,5}};
         UInt16 size[7] = {3,4,4,4,5,5,6};
 
         MailPackage::MailItem* item[7] = {item1,item2,item3,item4,item5,item6,item7};
@@ -12003,7 +12117,7 @@ namespace GObject
 
         static UInt16 items[3][4] = {
             {515,509,507,47},
-            {503,1325,1528,516},
+            {503,1325,134,516},
             {8000,551,517,500},
         };
 
@@ -13793,42 +13907,42 @@ namespace GObject
    }
    void Player::getTjTask1Data(Stream& st, bool isRefresh)
    {
-       if (isRefresh || GetVar(VAR_TJ_TASK1_NUMBER) == 0) //今日还没做任务
-       {
-           for (int i = 0; i < 3; ++i)
-           {
-               if (_playerData.tjEvent1[i] == 0)
-               {
-                   GObject::Tianjie::instance().randomTask1Data(GetLev(),_playerData.tjEvent1[i], _playerData.tjColor1[i], _playerData.tjExp1[i]);
-               }
-           }
-       }
-       UInt8 type = 0;
-       int value[3] = {0};
-       value[0] = _playerData.tjExp1[0];
-       value[1] = _playerData.tjExp1[1];
-       value[2] = _playerData.tjExp1[2];
-       for (int i = 0; i < 3; ++i)
-       {
-           GData::NpcGroups::iterator it = GData::npcGroups.find(_playerData.tjEvent1[i]);
-           if(it != GData::npcGroups.end())
-           {
-               GData::NpcGroup * ng = it->second;
-               value[i] +=  TIANJIE_EXP(GetLev()) * ng->getExp();
-           }
-       }
-       if (GObject::Tianjie::instance().isPlayerInTj(GetLev()))
-       {
-           type = 1;
-           value[0] = value[0] * 2 / TIANJIE_EXP(GetLev()) + s_task1ColorScore[_playerData.tjColor1[0]];
-           value[1] = value[1] * 2 / TIANJIE_EXP(GetLev()) + s_task1ColorScore[_playerData.tjColor1[1]];
-           value[2] = value[2] * 2 / TIANJIE_EXP(GetLev()) + s_task1ColorScore[_playerData.tjColor1[2]];
-       }
-       UInt8 num1 = 5-GetVar(VAR_TJ_TASK1_NUMBER);
-       st << num1 << type;
-       st << _playerData.tjEvent1[0] << _playerData.tjColor1[0] << value[0];
-       st << _playerData.tjEvent1[1] << _playerData.tjColor1[1] << value[1];
-       st << _playerData.tjEvent1[2] << _playerData.tjColor1[2] << value[2];
+        if (isRefresh || GetVar(VAR_TJ_TASK1_NUMBER) == 0) //今日还没做任务
+        {
+            for (int i = 0; i < 3; ++i)
+            {
+                if (_playerData.tjEvent1[i] == 0)
+                {
+                    GObject::Tianjie::instance().randomTask1Data(GetLev(),_playerData.tjEvent1[i], _playerData.tjColor1[i], _playerData.tjExp1[i]);
+                }
+            }
+        }
+        UInt8 type = 0;
+        int value[3] = {0};
+        value[0] = _playerData.tjExp1[0];
+        value[1] = _playerData.tjExp1[1];
+        value[2] = _playerData.tjExp1[2];
+        for (int i = 0; i < 3; ++i)
+        {
+            GData::NpcGroups::iterator it = GData::npcGroups.find(_playerData.tjEvent1[i]);
+            if(it != GData::npcGroups.end())
+            {
+		        GData::NpcGroup * ng = it->second;
+                value[i] +=  TIANJIE_EXP(GetLev()) * ng->getExp();
+            }
+        }
+        if (GObject::Tianjie::instance().isPlayerInTj(GetLev()))
+        {
+            type = 1;
+            value[0] = value[0] * 2 / TIANJIE_EXP(GetLev()) + s_task1ColorScore[_playerData.tjColor1[0]];
+            value[1] = value[1] * 2 / TIANJIE_EXP(GetLev()) + s_task1ColorScore[_playerData.tjColor1[1]];
+            value[2] = value[2] * 2 / TIANJIE_EXP(GetLev()) + s_task1ColorScore[_playerData.tjColor1[2]];
+        }
+        UInt8 num1 = 5-GetVar(VAR_TJ_TASK1_NUMBER);
+        st << num1 << type;
+        st << _playerData.tjEvent1[0] << _playerData.tjColor1[0] << value[0];
+        st << _playerData.tjEvent1[1] << _playerData.tjColor1[1] << value[1];
+        st << _playerData.tjEvent1[2] << _playerData.tjColor1[2] << value[2];
 
    }
    void Player::getTjTask2Data(Stream& st)
@@ -14041,6 +14155,33 @@ namespace GObject
            DB1().PushUpdateData("UPDATE `player` SET `openid` = '%s' WHERE `id` = %"I64_FMT"u", m_openid, getId());
        }
    }
+
+   JobHunter* Player::getJobHunter()
+   {
+       if (GetVar(VAR_EX_JOB_ENABLE) < 2)
+           return NULL;
+       if (!_jobHunter)
+       {
+           _jobHunter = new JobHunter(this);
+       }
+       return _jobHunter;
+   }
+
+   void Player::setJobHunter(std::string& fighterList, std::string& mapInfo, UInt8 progress,
+           UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY, UInt32 stepCount)
+   {
+       if (_jobHunter)
+           return;
+       _jobHunter = new JobHunter(this, fighterList, mapInfo, progress, posX, posY, earlyPosX, earlyPosY, stepCount);
+   }
+
+   void Player::sendAutoJobHunter()
+   {
+       if (!getJobHunter())
+           return;
+       _jobHunter->SendAutoInfo();
+   }
+
 
 EventTlzAuto::EventTlzAuto( Player * player, UInt32 interval, UInt32 count)
 	: EventBase(player, interval, count)
@@ -14568,34 +14709,69 @@ void EventTlzAuto::notify(bool isBeginAuto)
             return 6;
         return 0;
     }
+
     UInt8 Player::transformUseMoney(Fighter * fFgt, Fighter * tFgt, UInt8 type)
     {
         UInt32 money = 0;
+        UInt32 money1 = 0;
+        UInt32 money2 = 0;
+        UInt32 money3 = 0;
+        UInt32 money4 = 0;
+        UInt8 val1 = 0;
         if (type & 0x01)
         {
              money += 10;
+             money1 += 10;
         }
         if (type & 0x02)
         {
             float p = std::max(fFgt->getPotential(), tFgt->getPotential());
             if (p >= 1.80f)
+            {
                 money += 100;
+                money2 += 100;
+                val1 = 4;
+            }
             else if (p >= 1.50f)
+            {
                 money += 60;
+                money2 += 60;
+                val1 = 3;
+            }
             else if (p >= 1.20f)
+            {
                 money += 30;
+                money2 += 30;
+                val1 = 2;
+            }
             else
+            {
                 money += 10;
+                money2 += 10;
+                val1 = 1;
+            }
 
             float c = std::max(fFgt->getCapacity(),tFgt->getCapacity());
             if (c >= 9.0f)
+            {
                 money += 100;
+                money2 += 100;
+            }
             else if (c >= 8.0f)
+            {
                 money += 60;
+                money2 += 60;
+            }
             else if (c >= 7.0f)
+            {
                 money += 30;
+                money2 += 30;
+            }
             else
+            {
                 money += 10;
+                money2 += 10;
+            }
         }
         if (type & 0x08)
         {
@@ -14611,11 +14787,15 @@ void EventTlzAuto::notify(bool isBeginAuto)
             //星宿
             UInt8 fXinxiu = fSoul->getXinxiu();
             UInt8 tXinxiu = tSoul->getXinxiu();
-
             money += (std::max(f,t) * 10);
             money += abs(int(fPracLev-tPracLev))*1;
+            money3 += (std::max(f,t) * 10);
+            money3 += abs(int(fPracLev-tPracLev))*1;
             if (fXinxiu != tXinxiu)
+            {
                 money += 50;
+                money3 += 50;
+            }
         }
         if (type & 0x10)
         {
@@ -14623,7 +14803,8 @@ void EventTlzAuto::notify(bool isBeginAuto)
             {
                 Int32 f = fFgt->getElixirAttrByOffset(i);
                 Int32 t = tFgt->getElixirAttrByOffset(i);
-                money += abs(int(f-t))*10;
+                money += abs(int(f-t))*1;
+                money4 += abs(int(f-t))*1;
             }
         }
         //34是测试区
@@ -14637,9 +14818,12 @@ void EventTlzAuto::notify(bool isBeginAuto)
             ConsumeInfo ci(FightTransform,0,0);
             useGold(money, &ci);
         }
+
+        transformUdpLog(1164, type, money1, money2, money3, money4, val1);
         
         return 0;
     }
+
     UInt8 Player::transformExp(Fighter * fFgt, Fighter * tFgt)
     {
      //   UInt64 exp_70 = GData::expTable.getLevelMin(70);

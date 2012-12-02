@@ -110,6 +110,35 @@ void NpcGroup::getLoots( GObject::Player * player, std::vector<LootResult>& il, 
         *atoCnt = cnt;
 }
 
+void NpcGroup::getLoots( GObject::Player * player, std::vector<LootResult>& il, UInt8 lootlvl, UInt8* atoCnt , bool bind)
+{
+    if (lootlvl >= _loots.size())
+    {
+        if (_loots.size())
+            lootlvl = _loots.size() - 1;
+        else
+            return;
+    }
+
+    UInt8 cnt = 0;
+	std::vector<const LootItem *>::iterator it;
+	for(it = _loots[lootlvl].begin(); it != _loots[lootlvl].end(); ++ it)
+	{
+        std::vector<LootResult> lr;
+        (*it)->roll(lr);
+        for (size_t j = 0; j < lr.size(); ++j)
+        {
+            if (player->GetPackage()->Add(lr[j].id, lr[j].count, bind, true, FromNpc))
+            {
+                ++cnt;
+                il.push_back(lr[j]);
+            }
+        }
+	}
+    if (atoCnt)
+        *atoCnt = cnt;
+}
+
 void NpcGroup::calcBattlePoints( Script::BattleFormula * bformula )
 {
 	float t = 0.0f;

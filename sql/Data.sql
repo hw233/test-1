@@ -442,9 +442,9 @@ DROP TABLE IF EXISTS `skill_effect`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `skill_effect` (
   `id` smallint(5) NOT NULL,
-  `state` tinyint(3) NOT NULL DEFAULT '0',
-  `immune` tinyint(3) NOT NULL DEFAULT '0',
-  `disperse` tinyint(3) NOT NULL DEFAULT '0',
+  `state` smallint(5) NOT NULL DEFAULT '0',
+  `immune` smallint(5) NOT NULL DEFAULT '0',
+  `disperse` smallint(5) NOT NULL DEFAULT '0',
   `damage` varchar(255) NOT NULL DEFAULT '',
   `adddam` float(10,4) NOT NULL DEFAULT '0.0000',
   `magdam` varchar(255) NOT NULL DEFAULT '',
@@ -471,6 +471,9 @@ CREATE TABLE `skill_effect` (
   `magres` float(10,4) NOT NULL DEFAULT '0.0000',
   `atkreduce` float(10,4) NOT NULL DEFAULT '0.0000',
   `magatkreduce` float(10,4) NOT NULL DEFAULT '0.0000',
+  `eft` varchar(255) NOT NULL DEFAULT '',
+  `efl` varchar(255) NOT NULL DEFAULT '',
+  `efv` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 

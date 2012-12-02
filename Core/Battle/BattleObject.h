@@ -15,7 +15,7 @@ public:
 		Water = 255
 	};
 public:
-	BattleObject(Class c, UInt8 s, UInt8 p): _cls(c), _hp(0), _side(s), _pos(p) {}
+	BattleObject(Class c, UInt8 s, UInt8 p): _cls(c), _hp(0), _side(s), _pos(p), _hide(false) {}
 
 	inline void setSideAndPos(UInt8 s, UInt8 p) { _side = s; _pos = p; }
 
@@ -38,11 +38,14 @@ public:
 
 	inline UInt8 getSide() { return _side; }
 	inline UInt8 getPos() { return _pos; }
+    inline bool isHide() { return _hide; }
+    inline void setHide(bool hide) { _hide = hide; }
 
 protected:
 	Class _cls;
 	UInt32 _hp;
 	UInt8 _side, _pos;
+    bool _hide;
 };
 
 }

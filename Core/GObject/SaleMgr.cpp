@@ -54,7 +54,7 @@ void SaleMgr::addRowSale(SaleData * sale)
         stIdx = 1;
         pIdx = 1;
     }
-    if(career > 3)
+    if(career >= e_cls_max)
         career = 0;
     if(quality > 6)
         quality = 1;
@@ -103,7 +103,7 @@ void SaleMgr::delRowSale(SaleData * sale)
         stIdx = 1;
         pIdx = 1;
     }
-    if(career > 3)
+    if(career >= e_cls_max)
         career = 0;
     if(quality > 6)
         quality = 1;
@@ -371,7 +371,7 @@ void SaleMgr::requestSaleList(Player * player, UInt16 start, UInt16 count, std::
 #endif
 		return;
 	}
-	if (req > 10 || career > 3 || color > 6 || eqType > 16)
+	if (req > 10 || career >= e_cls_max || color > 6 || eqType > 16)
 		return;
 	if (req == 10)
 	{

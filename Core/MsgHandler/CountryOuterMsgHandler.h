@@ -62,6 +62,7 @@
 
 #include "GObject/Tianjie.h"
 #include "Memcached.h"
+#include "GObject/RechargeTmpl.h"
 
 struct NullReq
 {
@@ -1052,12 +1053,25 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     {
         pl->sendSecondInfo();
     }
+    {
+        TeamCopyPlayerInfo* tcp = pl->getTeamCopyPlayerInfo();
+        if (tcp && tcp->getPass(4) && (pl->GetVar(VAR_EX_JOB_ENABLE) == 0))
+        {
+            pl->SetVar(VAR_EX_JOB_ENABLE, 1);
+        }
+        Stream st(REP::EXJOB);
+        st << static_cast<UInt8>(0);
+        st << static_cast<UInt8>(pl->GetVar(VAR_EX_JOB_ENABLE));
+        st << Stream::eos;
+        pl->send(st);
+        pl->sendAutoJobHunter();       // 为什么上面的语句都加大括号？？？
+    }
 #ifdef _FB
     // XXX: do not need
 #else
-	pl->sendWallow();
+    pl->sendWallow();
 #endif
-	pl->sendEvents();
+    pl->sendEvents();
     //pl->GetPackage()->SendPackageItemInfor();
     {
         TeamCopyPlayerInfo* tcpInfo = pl->getTeamCopyPlayerInfo();
@@ -1081,6 +1095,11 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendYBBufInfo(pl->GetVar(VAR_YBBUF), pl->GetVar(VAR_QQVIP_BUF));
     pl->sendAthlBufInfo();
     luckyDraw.notifyDisplay(pl);
+    if (World::getRechargeActive())
+    {
+        GObject::RechargeTmpl::instance().sendStreamInfo(pl);
+        GObject::RechargeTmpl::instance().sendScoreInfo(pl);
+    }
     pl->sendSSToolbarInfo();
 
     if (World::getTrumpEnchRet() || World::get9215Act())
@@ -1580,10 +1599,19 @@ void OnFighterDismissReq( GameMsgHdr& hdr, FighterDismissReq& fdr )
 		player->send(rep);
 		return;
 	}
-	UInt64 exp = fgt->getExp() / 2;
-	if(exp >= 25000)
+
+    UInt64 exp = 0;
+
+    if(fgt->getClass() == 4)
+    {
+        exp = fgt->getExp() > GData::expTable.getLevelMin(70) ? fgt->getExp() - GData::expTable.getLevelMin(70) : 0;
+        exp /= 2;
+    }
+    else
+        exp = fgt->getExp() / 2;
+
+	if(exp >= 25000 || (fgt->getClass() == 4))
 	{
-		exp += 25000;
 		UInt16 rCount1 = static_cast<UInt16>(exp / 50000000);
 		exp = exp % 50000000;
 		UInt16 rCount2 = static_cast<UInt16>(exp / 500000);
@@ -1611,6 +1639,9 @@ void OnFighterDismissReq( GameMsgHdr& hdr, FighterDismissReq& fdr )
 	rep._fgtid = fdr._fgtid;
 	rep._result = 0;
 	player->send(rep);
+    JobHunter* jobHunter = player->getJobHunter();
+    if (jobHunter)
+        jobHunter->AddToFighterList(fdr._fgtid);
 }
 
 void OnFighterRegenReq( GameMsgHdr& hdr, FighterRegenReq& frr )
@@ -2153,7 +2184,7 @@ void OnDungeonAutoReq( GameMsgHdr& hdr, DungeonAutoReq& dar )
 	if(pl->getThreadId() != WORKER_THREAD_NEUTRAL)
 		return;
 
-	if(pl->GetPackage()->GetRestPackageSize() < 4)
+	if(pl->GetPackage()->GetRestPackageSize() < 10)
 	{
 		pl->sendMsgCode(1, 1014);
 		return;
@@ -2191,7 +2222,7 @@ void OnAutoCopy( GameMsgHdr& hdr, const void* data )
     brd >> type;
     brd >> id;
 
-	if((type == 0 || type == 2) && pl->GetPackage()->GetRestPackageSize() < 4)
+	if((type == 0 || type == 2) && pl->GetPackage()->GetRestPackageSize() < 10)
 	{
 		pl->sendMsgCode(1, 1014);
 		return;
@@ -2226,7 +2257,7 @@ void OnAutoFrontMap( GameMsgHdr& hdr, const void* data )
 	if(!pl->hasChecked())
 		return;
 
-	if(pl->GetPackage()->GetRestPackageSize() < 4)
+	if(pl->GetPackage()->GetRestPackageSize() < 10)
 	{
 		pl->sendMsgCode(1, 1014);
 		return;
@@ -4398,6 +4429,36 @@ void OnActivityReward(  GameMsgHdr& hdr, const void * data)
 
     }
     */
+    MSG_QUERY_PLAYER(player);
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    brd >> type;
+    switch(type )
+    {
+        case 3:
+            if (World::getRechargeActive())
+                player->sendRechargeInfo();
+            break;
+        case 4:
+            if (!World::getRechargeActive())
+                return;
+            UInt32 itemId = 0;
+            brd >> itemId;
+            int n = -1;
+            UInt8 res = GObject::RechargeTmpl::instance().getItem(player, itemId, n);
+            Stream st(REP::ACTIVITY_REWARD);
+            st << static_cast<UInt8>(11);
+            st << res;
+            if ( 0 == res)
+            {
+                st << player->GetVar(VAR_RECHARGE_SCORE) << itemId << n;
+            }
+            st << Stream::eos;
+            player->send(st);
+            break;
+
+    }
+ 
 }
 
 void OnFourCopReq( GameMsgHdr& hdr, const void* data)
@@ -5304,30 +5365,125 @@ void OnMakeStrong( GameMsgHdr& hdr, const void * data )
             break;
     }
 }
+
 void OnExJob( GameMsgHdr & hdr, const void * data )
 {
-    MSG_QUERY_PLAYER(player);
+	MSG_QUERY_PLAYER(player);
     BinaryReader br(data, hdr.msgHdr.bodyLen);
     UInt8 type = 0;
     br >> type;
+    if (type == 0)
+    {
+        player->SetVar(VAR_EX_JOB_ENABLE, 2);
+        return;
+    }
 
-    Stream st(REP::EXJOB);
-    UInt8 res = 0;
+    JobHunter * jobHunter = player->getJobHunter();
+    if (!jobHunter)
+        return;
     switch (type)
     {
+        case 1:
+            // 墨家长老页面
+            {
+                if (br.left() == 0)
+                {
+                    // 刷新页面请求
+                    jobHunter->SendFighterList();
+                    return;
+                }
+                UInt16 fighterId = 0;
+                br >> fighterId;
+                jobHunter->OnHireFighter(fighterId);
+            }
+            break;
+        case 2:
+            // 寻墨页面
+            {
+                if (br.left() == 0)
+                {
+                    jobHunter->SendGameInfo(type);
+                    return;
+                }
+                UInt8 val = 0;
+                br >> val;
+                switch (val)
+                {
+                    case 0:
+                        // 放弃寻墨游戏
+                        jobHunter->OnAbort(false);
+                        break;
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                        jobHunter->OnRequestStart(val);
+                        break;
+                    case 5: 
+                        // 老虎机转盘转动
+                        jobHunter->OnUpdateSlot();
+                        break;
+                    default:
+                        break;
+                }
+            }
+            break;
         case 3:
-            UInt16 fId = 0;
-            UInt16 tId = 0;
-            UInt8 t = 0;
-            br >> fId;
-            br >> tId;
-            br >> t;
-            res = player->fightTransform(fId, tId, t);
+            {
+                UInt16 fId = 0;
+                UInt16 tId = 0;
+                UInt8 t = 0;
+                br >> fId;
+                br >> tId;
+                br >> t;
+                Stream st(REP::EXJOB);
+                UInt8 res = 0;
+                res = player->fightTransform(fId, tId, t);
+                st << type << res << Stream::eos;
+                player->send(st);
+            }
+
+            break;
+        default:
             break;
     }
-    st << type << res << Stream::eos;
-    player->send(st);
 }
+
+void OnJobHunter( GameMsgHdr & hdr, const void * data )
+{
+    MSG_QUERY_PLAYER(player);
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+
+    JobHunter * jobHunter = player->getJobHunter();
+    if (!jobHunter)
+        return;
+
+    UInt8 type = 0;
+    UInt8 val = 0;
+    UInt8 val2 = 0;
+    br >> type;
+    if (br.left())
+        br >> val;
+    if (br.left())
+        br >> val2;
+    jobHunter->OnCommand(type, val, val2);
+}
+
+void OnAutoJobHunter( GameMsgHdr & hdr, const void * data )
+{
+    return;
+	MSG_QUERY_PLAYER(player);
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+
+    JobHunter * jobHunter = player->getJobHunter();
+    if (!jobHunter)
+        return;
+
+    UInt8 type = 0;
+    br >> type;
+    jobHunter->OnAutoCommand(type);
+}
+
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 
