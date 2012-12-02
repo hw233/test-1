@@ -414,10 +414,34 @@ void Tianjie::OpenTj()
 
 bool Tianjie::Init()
 {
+    fix999Bug();
     LoadLastPassed();
     LoadFromDB();
 
 	return true;
+}
+void Tianjie::fix999Bug()
+{
+    if (GVAR.GetVar(GVAR_TJ_TOWN_999_BUG) > 0)
+        return;
+    std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+    if (execu.get() == NULL || !execu->isConnected()) return ;
+    GData::DBPlayerMaxLevel dbexp;
+    if(execu->Prepare("select max(maxLevel) from towndeamon_player", dbexp) != DB::DB_OK)
+        return;
+    if (execu->Next() != DB::DB_OK)
+        return;
+    UInt32 v = 0;
+    int c = 0;
+    for (int i = 50; i <= 100; i+=10)
+    {
+        if (dbexp.level >= i)
+        {
+            v |= (1 << c);
+        }
+        c += 1;
+    }
+    GVAR.SetVar(GVAR_TJ_TOWN_999_BUG, v);
 }
 void Tianjie::LoadLastPassed()
 {
@@ -1198,7 +1222,7 @@ void Tianjie::goNext()
 {
     if ((m_currTjRate == 4 && !m_isFinish) || m_currTjRate == 5)
     {
-       if (m_lastPassedLevel < m_currOpenedTjLevel)
+       if (m_lastPassedLevel < m_currOpenedTjLevel && m_currOpenedTjLevel != 999)
            m_lastPassedLevel = m_currOpenedTjLevel;
 
        udplogTjStatus(false);

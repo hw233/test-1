@@ -951,6 +951,7 @@ void TownDeamon::getTjItem(Player* pl, UInt8 townLevel)
 {
     static const int s_tjLevTownLev[][2] = {{59,50},{69,60},{79,70},{89,80},{99,90},{109,100}};
     static const int s_tjItemId[] = {1653, 1654, 1655, 1532, 1533, 1534};
+    UInt32 v = GVAR.GetVar(GVAR_TJ_TOWN_999_BUG);
     UInt8 tjLevel = GObject::Tianjie::instance().getLastPassedLevel();
     DeamonPlayerData* dpd = pl->getDeamonPlayerData();
     for (int i = 0; i < 6; ++i)
@@ -958,7 +959,8 @@ void TownDeamon::getTjItem(Player* pl, UInt8 townLevel)
         if (townLevel != s_tjLevTownLev[i][1])
             continue;
         int flag = pl->GetVar(VAR_TJ_TOWN_ITEM_GOT);
-        if (!(flag & (1 << i)) && tjLevel >= s_tjLevTownLev[i][0] && dpd->maxLevel >= townLevel)
+        bool f = (v&(1<<i));
+        if (!(flag & (1 << i)) && (tjLevel >= s_tjLevTownLev[i][0] || f) && dpd->maxLevel >= townLevel)
         {
             if(pl->GetPackage()->GetRestPackageSize() < 1)
             {
@@ -978,6 +980,7 @@ void TownDeamon::sendTjItemInfo(Player* pl)
 {
     static const int s_tjLevTownLev[][2] = {{59,50},{69,60},{79,70},{89,80},{99,90},{109,100}};
     static const int s_tjItemId[] = {1653, 1654, 1655, 1532, 1533, 1534};
+    UInt32 v = GVAR.GetVar(GVAR_TJ_TOWN_999_BUG);
     UInt8 tjLevel = GObject::Tianjie::instance().getLastPassedLevel();
     DeamonPlayerData* dpd = pl->getDeamonPlayerData();
     Stream st(REP::TOWN_DEAMON);
@@ -994,7 +997,8 @@ void TownDeamon::sendTjItemInfo(Player* pl)
             status = 1; //已领取
         else
         {
-            if (tjLevel == 0 || tjLevel < s_tjLevTownLev[i][0])
+            bool f = (v&(1<<i)) == 0;
+            if (tjLevel == 0 || (tjLevel < s_tjLevTownLev[i][0] && f))
                 status = 2; //天劫未渡过
             else if (dpd->maxLevel < townLevel)
                 status = 3; //锁妖塔未封印
