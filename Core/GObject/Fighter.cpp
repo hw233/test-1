@@ -4990,5 +4990,22 @@ void Fighter::resetLevelAndExp(UInt8 maxLevel)
     DB1().PushUpdateData("UPDATE `fighter` SET `experience` = %"I64_FMT"u, `level`=%u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", exp, _level, _id, _owner->getId());
 }
 
+void Fighter::checkBPDirty()
+{
+    if(_bPDirty)
+    {
+        _bPDirty = false;
+        rebuildBattlePoint();
+    }
+    if(_skillBPDirty)
+    {
+        _skillBPDirty = false;
+        rebuildSkillBattlePoint();
+    }
+    if (_class == 4)
+        if (_battlePoint + _skillBP >= 100000)
+            if (!_owner->GetShuoShuo()->getShuoShuo(SS_MO_HIRE))
+                _owner->OnShuoShuo(SS_MO_STRENGTH);
+}
 }
 
