@@ -58,6 +58,7 @@
 #include "GObject/TownDeamon.h"
 #include "GObject/Arena.h"
 #include "GObject/SingleHeroStage.h"
+#include "GObject/PracticePlace.h"
 
 #include "GObject/Tianjie.h"
 #include "Memcached.h"
@@ -1086,6 +1087,8 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         GObject::RechargeTmpl::instance().sendStreamInfo(pl);
         GObject::RechargeTmpl::instance().sendScoreInfo(pl);
     }
+    pl->sendSSToolbarInfo();
+
     if (World::getTrumpEnchRet() || World::get9215Act())
         pl->sendTokenInfo();
 
@@ -1561,7 +1564,10 @@ void OnRecruitFighterReq( GameMsgHdr& hdr, RecruitFighterReq& rfr )
 	st << static_cast<UInt8>(id > 0 ? 0 : 1) << rfr._pos << Stream::eos;
 	player->send(st);
 	if (id != 0)
-
+    {   //将新招募的散仙放入修炼位
+        UInt32 fgts[1] = { id };
+        GObject::practicePlace.sitdown(player, fgts, 1);
+    }
     GameAction()->RunOperationTaskAction0(player, 3);
 }
 
@@ -3704,9 +3710,15 @@ void OnFriendListReq( GameMsgHdr& hdr, FriendListReq& flr )
 	MSG_QUERY_PLAYER(player);
     if(flr._type == 4)
     {
-        GObject::Clan *clan = player->getClan();
-        if(clan != NULL)
-            clan->sendClanList(player, flr._type, flr._start, flr._count);
+        struct ClanMemberListReq
+        {
+            UInt8 _type;
+            UInt8 _start;
+            UInt8 _count;
+        };
+        ClanMemberListReq cmlr = {flr._type, flr._start, flr._count};
+        GameMsgHdr hdr1(0x1D0, WORKER_THREAD_WORLD, player, sizeof(cmlr));
+        GLOBAL().PushMsg(hdr1, &cmlr);
     }
     else
 	    player->sendFriendList(flr._type, flr._start, flr._count);
@@ -4965,7 +4977,8 @@ void OnSecondSoulReq( GameMsgHdr& hdr, const void* data)
                 UInt16 itemId = 0;
                 UInt8 bind = 0;
                 br >> itemId >> bind;
-                fgt->enchantSoul(itemId, bind != 0, soulItemExpOut);
+                if(!fgt->enchantSoul(itemId, bind != 0, soulItemExpOut))
+                    break;
             }
 
             UInt16 infoNum = soulItemExpOut.size();
@@ -5327,7 +5340,30 @@ void OnMakeStrong( GameMsgHdr& hdr, const void * data )
             break;
     }
 }
+void OnExJob( GameMsgHdr & hdr, const void * data )
+{
+    MSG_QUERY_PLAYER(player);
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    br >> type;
 
+    Stream st(REP::EXJOB);
+    UInt8 res = 0;
+    switch (type)
+    {
+        case 3:
+            UInt16 fId = 0;
+            UInt16 tId = 0;
+            UInt8 t = 0;
+            br >> fId;
+            br >> tId;
+            br >> t;
+            res = player->fightTransform(fId, tId, t);
+            break;
+    }
+    st << type << res << Stream::eos;
+    player->send(st);
+}
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

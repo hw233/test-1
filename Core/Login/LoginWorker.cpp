@@ -1,6 +1,7 @@
 #include "Config.h"
 #include "LoginWorker.h"
-
+#include "Server/Cfg.h"
+#include "MsgHandler/Memcached.h"
 namespace Login
 {
 
@@ -16,7 +17,8 @@ LoginWorker::~LoginWorker()
 
 bool LoginWorker::Init()
 {
-	return true;
+	initPlatformLogin();
+    return true;
 }
 
 void LoginWorker::UnInit()

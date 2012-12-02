@@ -912,6 +912,7 @@ CREATE TABLE `player` (
   `dungeonEnd` int(10) unsigned NOT NULL DEFAULT '0',
   `newGuild` bigint(20) unsigned NOT NULL DEFAULT '0',
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `openid` varchar(1024) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `name` (`name`),
   KEY `mainFighter` (`mainFighter`)
@@ -1198,10 +1199,12 @@ DROP TABLE IF EXISTS `activityData`;
 CREATE TABLE `activityData` (
    `playerId` bigint(20) unsigned NOT NULL,
    `overTime` int(10) unsigned NOT NULL,
+/*
    --`awardId`  int(10) unsigned NOT NULL,
    --`point`   int(10) unsigned NOT NULL,
    --`award`   int(10) unsigned NOT NULL,
    --`flags`   varchar(255) NOT NULL DEFAULT '',
+   */
    `scores`  int(10) unsigned NOT NULL,
    `propsID` int(10) unsigned NOT NULL,
    `signRecord` varchar(1024) NOT NULL DEFAULT '',
@@ -1784,6 +1787,7 @@ CREATE TABLE `days_rank` (
     UNIQUE KEY `unq` (`player_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+<<<<<<< HEAD
 DROP TABLE IF EXISTS `recharge_item`;
 CREATE TABLE `recharge_item` (               
     `player_id` int(20) NOT NULL DEFAULT '0',  
@@ -1791,4 +1795,35 @@ CREATE TABLE `recharge_item` (
     `num` int(11) DEFAULT NULL,                
     PRIMARY KEY (`player_id`,`item_id`)        
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+=======
+DROP TABLE IF EXISTS `arena_extra_board`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `arena_extra_board` (
+    `week` tinyint(3) NOT NULL,
+    `name1` varchar(255) NOT NULL DEFAULT '',
+    `name2` varchar(255) NOT NULL DEFAULT '',
+    `name3` varchar(255) NOT NULL DEFAULT '',
+    `name4` varchar(255) NOT NULL DEFAULT '',
+    `name5` varchar(255) NOT NULL DEFAULT '',
+    `heroId1` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `heroId2` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `heroId3` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `heroId4` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `heroId5` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `sufferTotal` int(10) unsigned NOT NULL,
+    `sufferCnt1` int(10) unsigned NOT NULL,
+    `sufferCnt2` int(10) unsigned NOT NULL,
+    `sufferCnt3` int(10) unsigned NOT NULL,
+    `sufferCnt4` int(10) unsigned NOT NULL,
+    `sufferCnt5` int(10) unsigned NOT NULL,
+    `lasttime1` int(10) unsigned NOT NULL  DEFAULT '0',
+    `lasttime2` int(10) unsigned NOT NULL  DEFAULT '0',
+    `lasttime3` int(10) unsigned NOT NULL  DEFAULT '0',
+    `lasttime4` int(10) unsigned NOT NULL  DEFAULT '0',
+    `lasttime5` int(10) unsigned NOT NULL  DEFAULT '0',
+    PRIMARY KEY (`week`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+>>>>>>> 209825b2b1eb4fc141f1d459e029348d0879989f
 

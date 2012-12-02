@@ -24,32 +24,47 @@ enum ENUM_ID_TJ2
     ID_TJ2_TLYJ,
 };
 //天劫触发等级
-static const int s_tjRoleLevel[] = {59,69,79,89,99,109};
+static const int s_tjRoleLevel[] = {59,69,79,89,99,109,119,129,139,149,999};
 //天劫事件1的小怪ID
 static const UInt32 s_rate1Npc[][4] = {
-{7007, 7008, 7009, 7010},
-{7013, 7014, 7015, 7016},
-{7019, 7020, 7021, 7022},
-{7025, 7026, 7027, 7028},
-{7031, 7032, 7033, 7034},
-{7037, 7038, 7039, 7040}
+{7007, 7008, 7009, 7010},  //59
+{7013, 7014, 7015, 7016},  //69
+{7019, 7020, 7021, 7022},  //79
+{7025, 7026, 7027, 7028},  //89
+{7031, 7032, 7033, 7034},  //99
+{7037, 7038, 7039, 7040},  //109
+{7069, 7070, 7071, 7072},  //119
+{7069, 7070, 7071, 7072},  //129
+{7069, 7070, 7071, 7072},  //139
+{7069, 7070, 7071, 7072},  //149
+{7109, 7110, 7111, 7112}   //999
 };
 static const UInt32 s_rate1MinNpcIds[][4] = {
-{8000, 8009, 8013, 8015},
-{8016, 8025, 8029, 8031},
-{8032, 8041, 8045, 8047},
-{8048, 8057, 8061, 8063},
-{8064, 8073, 8077, 8079},
-{8080, 8089, 8093, 8095}
+{8000, 8009, 8013, 8015},  //59
+{8016, 8025, 8029, 8031},  //69
+{8032, 8041, 8045, 8047},  //79
+{8048, 8057, 8061, 8063},  //89
+{8064, 8073, 8077, 8079},  //99
+{8080, 8089, 8093, 8095},  //109
+{8112, 8121, 8125, 8127},  //119
+{8112, 8121, 8125, 8127},  //129
+{8112, 8121, 8125, 8127},  //139
+{8112, 8121, 8125, 8127},  //149
+{8096, 8105, 8109, 8111}   //999
 };
 
 static const UInt32 s_rate1MaxNpcIds[][4] = {
-{8008, 8012, 8014, 8015},
-{8024, 8028, 8030, 8031},
-{8040, 8044, 8046, 8047},
-{8056, 8060, 8062, 8063},
-{8072, 8076, 8078, 8079},
-{8088, 8092, 8094, 8095}
+{8008, 8012, 8014, 8015},  //59
+{8024, 8028, 8030, 8031},  //69
+{8040, 8044, 8046, 8047},  //79
+{8056, 8060, 8062, 8063},  //89
+{8072, 8076, 8078, 8079},  //99
+{8088, 8092, 8094, 8095},  //109
+{8120, 8124, 8126, 8127},  //119
+{8120, 8124, 8126, 8127},  //129
+{8120, 8124, 8126, 8127},  //139
+{8120, 8124, 8126, 8127},  //149
+{8104, 8108, 8110, 8111}   //999
 };
 
 static const UInt32 s_rate1NpcMaxCount = 500;
@@ -63,32 +78,45 @@ static const UInt32 s_rate2DonateScore[] = {200, 200, 200, 200};
 static const UInt32 s_rate2DonateExpMulti[] = {30, 30, 30, 30};
 //天劫事件3的2种怪
 static const UInt32 s_tlzNpcId[][2] = {
-{7011, 7012},
-{7017, 7018},
-{7023, 7024},
-{7029, 7030},
-{7035, 7036},
-{7041, 7042}
+{7011, 7012},  //59
+{7017, 7018},  //69
+{7023, 7024},  //79
+{7029, 7030},  //89
+{7035, 7036},  //99
+{7041, 7042},  //109
+{7073, 7074},  //119
+{7073, 7074},  //129
+{7073, 7074},  //139
+{7073, 7074},  //149
+{7113, 7114}   //999
 };
 //天劫事件3怪物每层的成长系数
 //物攻  法攻  物防  法防  生命  身法  命中   闪避   反击   法术抵抗
 static const float  s_rate3NpcBaseModulus[][6] = {
-{0.005f, 0.005f, 0.01f, 0.01f, 0.05f, 0.001f},
-{0.006f, 0.006f, 0.01f, 0.01f, 0.06f, 0.001f},
-{0.007f, 0.007f, 0.01f, 0.01f, 0.07f, 0.001f},
-{0.008f, 0.008f, 0.01f, 0.01f, 0.08f, 0.001f},
-{0.009f, 0.009f, 0.01f, 0.01f, 0.09f, 0.001f},
-{0.010f, 0.010f, 0.01f, 0.01f, 0.10f, 0.001f},
-{0.011f, 0.011f, 0.01f, 0.01f, 0.11f, 0.001f}
+{0.005f, 0.005f, 0.01f, 0.01f, 0.05f, 0.001f},  //59
+{0.006f, 0.006f, 0.01f, 0.01f, 0.06f, 0.001f},  //69
+{0.007f, 0.007f, 0.01f, 0.01f, 0.07f, 0.001f},  //79
+{0.008f, 0.008f, 0.01f, 0.01f, 0.08f, 0.001f},  //89
+{0.009f, 0.009f, 0.01f, 0.01f, 0.09f, 0.001f},  //99
+{0.010f, 0.010f, 0.01f, 0.01f, 0.10f, 0.001f},  //109
+{0.011f, 0.011f, 0.01f, 0.01f, 0.11f, 0.001f},  //119
+{0.011f, 0.011f, 0.01f, 0.01f, 0.11f, 0.001f},  //129
+{0.011f, 0.011f, 0.01f, 0.01f, 0.11f, 0.001f},  //139
+{0.011f, 0.011f, 0.01f, 0.01f, 0.11f, 0.001f},  //149
+{0.011f, 0.011f, 0.01f, 0.01f, 0.11f, 0.001f}   //999
 };
 static const float  s_rate3NpcAdvanceModulus[][4] = {
-{0.0002f, 0.005f, 0.004f, 0.01f},
-{0.0002f, 0.005f, 0.004f, 0.01f},
-{0.0002f, 0.005f, 0.004f, 0.01f},
-{0.0002f, 0.005f, 0.004f, 0.01f},
-{0.0002f, 0.005f, 0.004f, 0.01f},
-{0.0002f, 0.005f, 0.004f, 0.01f},
-{0.0002f, 0.005f, 0.004f, 0.01f}
+{0.0002f, 0.005f, 0.004f, 0.01f},  //59
+{0.0002f, 0.005f, 0.004f, 0.01f},  //69
+{0.0002f, 0.005f, 0.004f, 0.01f},  //79
+{0.0002f, 0.005f, 0.004f, 0.01f},  //89
+{0.0002f, 0.005f, 0.004f, 0.01f},  //99
+{0.0002f, 0.005f, 0.004f, 0.01f},  //109
+{0.0002f, 0.005f, 0.004f, 0.01f},  //119
+{0.0002f, 0.005f, 0.004f, 0.01f},  //129
+{0.0002f, 0.005f, 0.004f, 0.01f},  //139
+{0.0002f, 0.005f, 0.004f, 0.01f},  //149
+{0.0002f, 0.005f, 0.004f, 0.01f}   //999
 };
 static const float  s_rate3NpcAdvanceModMax[] =  {200, 100, 100, 200};
 static const int    s_rate3AdvanceLevel = 3000;
@@ -96,12 +124,18 @@ static const UInt8  s_rate3NpcScore = 150;    //天劫事件3每层积分
 static const UInt8  s_rate3ExpMulti = 10;     //天雷阵的经验倍数
 //天劫事件4的分身和真身BOSS
 static const UInt32 s_tjBoss[][2] = {
-{7043, 7044},
-{7045, 7046},
-{7047, 7048},
-{7049, 7050},
-{7051, 7052},
-{7053, 7054}
+{7043, 7044},  //59
+{7045, 7046},  //69
+{7047, 7048},  //79
+{7049, 7050},  //89
+{7051, 7052},  //99
+{7053, 7054},  //109
+{7053, 7054},  //119
+{7075, 7076},  //119
+{7075, 7076},  //129
+{7075, 7076},  //139
+{7075, 7076},  //149
+{7115, 7116}   //999
 };
 
 static const UInt32 s_tj4Score = 1500;
@@ -111,8 +145,9 @@ static const UInt32 s_tjEventBoxId[] = {9134, 9135, 9136, 9137};
 static const UInt32 s_tjTotalBoxId[] = {9127, 9128, 9129, 9130};
 static const UInt32 s_tjEventRewardId = 9131;
 static const UInt32 s_tjTotalRewardId = 9132;
-static const UInt32 s_tjWeaponId[] = {1650,1651,1652,1529,1530,1531};
-static const UInt32 s_tjNameCardId[] = {9154,9155,9156,9157,9158,9159};
+                                       //59, 69,  79,  89,  99,  109, 119, 129, 139, 149, 999
+static const UInt32 s_tjWeaponId[] =   {1650,1651,1652,1529,1530,1531,1532,1533,1534,1535,1347};
+static const UInt32 s_tjNameCardId[] = {9154,9155,9156,9157,9158,9159,9160,9161,9162,9163,9228};
 static  MailPackage::MailItem s_eventItem[2]= {{30,10}, {509,1}};
 #define TJ_START_TIME_HOUR 19 
 #define TJ_START_TIME_MIN  45
@@ -186,7 +221,7 @@ Tianjie::Tianjie()
 }
 int  Tianjie::manualOpenTj(int level, bool force)
 {
-    if ((level % 10 != 9) || level < 59 || level > 109)
+    if (level != 999 && ((level % 10 != 9) || level < 59 || level > 109))
         return 1;
     if (m_manualTjLevel > 0)
         return 4;
@@ -210,7 +245,7 @@ int  Tianjie::manualOpenTj(int level, bool force)
 	{
         if (maxLevel < dbexp.level)
             maxLevel = dbexp.level;
-        if (maxLevel < level)    //玩家等级过低,不能手动启动天劫
+        if (maxLevel < level && level != 999)    //玩家等级过低,不能手动启动天劫
             return 2;
         if (dbexp.level == level) //已经触发了
         {
@@ -390,7 +425,7 @@ void Tianjie::LoadLastPassed()
 	if (execu.get() == NULL || !execu->isConnected()) return ;
 
 	GData::DBPlayerMaxLevel dbexp;//借用DBPlayerMaxLevel结构
-    if(execu->Prepare("SELECT `level` FROM `tianjie` where is_opened=0 and rate>=4 order by level desc limit 1", dbexp) != DB::DB_OK)
+    if(execu->Prepare("SELECT `level` FROM `tianjie` where is_opened=0 and rate>=4 and level != 999 order by level desc limit 1", dbexp) != DB::DB_OK)
 		return;
 
 	if(execu->Next() == DB::DB_OK)
@@ -409,7 +444,7 @@ bool Tianjie::LoadFromDB()
     if(execu->Prepare("SELECT `id`, `is_opened`,`is_execute`,`is_finish`,`is_ok`,`level`,`rate`,UNIX_TIMESTAMP(opentime),`r1_killed`,`r2_donated`,`r3_copyid`,`r4_day`,`open_next`, `is_wait`,`is_manual`,`is_touch` FROM `tianjie`  where is_manual=1 order by level desc limit 1", dbexp0) != DB::DB_OK)
         return false;
     GData::DBTianjie dbexp1;
-    if(execu1->Prepare("SELECT `id`, `is_opened`,`is_execute`,`is_finish`,`is_ok`,`level`,`rate`,UNIX_TIMESTAMP(opentime),`r1_killed`,`r2_donated`,`r3_copyid`,`r4_day`,`open_next`, `is_wait`,`is_manual`,`is_touch` FROM `tianjie` order by level desc limit 1", dbexp1) != DB::DB_OK)
+    if(execu1->Prepare("SELECT `id`, `is_opened`,`is_execute`,`is_finish`,`is_ok`,`level`,`rate`,UNIX_TIMESTAMP(opentime),`r1_killed`,`r2_donated`,`r3_copyid`,`r4_day`,`open_next`, `is_wait`,`is_manual`,`is_touch` FROM `tianjie` where level!=999 order by level desc limit 1", dbexp1) != DB::DB_OK)
         return false;
     //有手动的天劫
     bool isManual = execu->Next() == DB::DB_OK;
@@ -526,7 +561,8 @@ bool Tianjie::LoadFromDB()
             {
                 clearPlayerTaskScore();
                 //天劫全都跑完了
-                if (m_tjTypeId == (sizeof(s_tjRoleLevel)/sizeof(s_tjRoleLevel[0])-1) && m_currTjRate >= 4)
+                //if (m_tjTypeId == (sizeof(s_tjRoleLevel)/sizeof(s_tjRoleLevel[0])-1) && m_currTjRate >= 4)
+                if (s_tjRoleLevel[m_tjTypeId] == 109 && m_currTjRate >= 4)
                 {
                    m_currOpenedTjLevel = 0;
                 }
@@ -944,10 +980,19 @@ void Tianjie::setRatePercent()
     if (percent - m_oldBroadPercent >= 25)
     {
         int msgId = 5011;
-        if (2 == m_currTjRate) msgId = 5021;
+        if (2 == m_currTjRate) msgId = m_currOpenedTjLevel == 999 ? 5069:5021;
         if (3 == m_currTjRate) msgId = 5031;
         if (percent < 100)
-            SYSMSG_BROADCASTV(msgId, m_tjTypeId, m_currTjRate, percent);
+        {
+            if (m_currOpenedTjLevel == 999)
+            {
+                SYSMSG_BROADCASTV(msgId, percent);
+            }
+            else
+            {
+                SYSMSG_BROADCASTV(msgId, m_tjTypeId, m_currTjRate, percent);
+            }
+        }
 
         m_oldBroadPercent = percent;
     }
@@ -1200,7 +1245,8 @@ void Tianjie::goNext()
            }
            else
            {
-               if ((UInt8)(m_tjTypeId+1) < sizeof(s_tjRoleLevel)/sizeof(s_tjRoleLevel[0]))
+               //if ((UInt8)(m_tjTypeId+1) < sizeof(s_tjRoleLevel)/sizeof(s_tjRoleLevel[0])-1)
+               if (s_tjRoleLevel[m_tjTypeId] < 109)
                {
                    m_currOpenedTjLevel = s_tjRoleLevel[++m_tjTypeId];
 	   	           DB1().PushUpdateData("INSERT INTO `tianjie`(`level`) VALUES(%d)",m_currOpenedTjLevel);
@@ -1286,7 +1332,14 @@ void Tianjie::start1()
 
     if (m_isNetOk)
     {
-        SYSMSG_BROADCASTV(5010);
+        if (m_currOpenedTjLevel == 999)
+        {
+            SYSMSG_BROADCASTV(5067);
+        }
+        else
+        {
+            SYSMSG_BROADCASTV(5010);
+        }
         broadEvent1();
     }
 }
@@ -1398,11 +1451,15 @@ bool Tianjie::isFinish()
         DB1().PushUpdateData("update tianjie set is_finish=%d where level=%d", 1, m_currOpenedTjLevel);
 
         int msgId = 5013;
-        if (2 == m_currTjRate) msgId = 5022;
+        if (2 == m_currTjRate) msgId = m_currOpenedTjLevel==999 ? 5070:5022;
         if (3 == m_currTjRate) msgId = 5032;
         if (msgId == 5022)
         {
             SYSMSG_BROADCASTV(msgId, m_tjTypeId, m_currTjRate, m_tjTypeId, m_currTjRate);
+        }
+        else if (msgId == 5070)
+        {
+            SYSMSG_BROADCASTV(msgId);
         }
         else
         {
@@ -1452,7 +1509,14 @@ void Tianjie::start2()
 
     if (m_isNetOk)
     {
-        SYSMSG_BROADCASTV(5020);
+        if (m_currOpenedTjLevel == 999)
+        {
+            SYSMSG_BROADCASTV(5068);
+        }
+        else
+        {
+            SYSMSG_BROADCASTV(5020);
+        }
         broadEvent2();
     }
 }
@@ -1576,7 +1640,16 @@ void Tianjie::close2()
 
     memset(m_rate2DonateCount, 0, sizeof(m_rate2DonateCount));
     if (m_isNetOk)
-        SYSMSG_BROADCASTV(5023, m_tjTypeId, m_currTjRate);
+    {
+        if (m_currOpenedTjLevel == 999)
+        {
+            SYSMSG_BROADCASTV(5071);
+        }
+        else
+        {
+            SYSMSG_BROADCASTV(5023, m_tjTypeId, m_currTjRate);
+        }
+    }
 }
 void Tianjie::setEvent2MaxScore(Player* pl)
 {
@@ -1594,7 +1667,14 @@ void Tianjie::start3()
 
     if (m_isNetOk)
     {
-        SYSMSG_BROADCASTV(5030);
+        if (m_currOpenedTjLevel == 999)
+        {
+            SYSMSG_BROADCASTV(5072);
+        }
+        else
+        {
+            SYSMSG_BROADCASTV(5030);
+        }
         broadEvent3();
     }
     getTlzFights();
@@ -1850,7 +1930,14 @@ void Tianjie::start4(bool isRestart)
             broadBossAppear(s_tjBoss[m_bossIndex][0], m_loc);
             broadBossCount(m_eventCurrNumber);
 
-            SYSMSG_BROADCASTV(5040);
+            if (m_currOpenedTjLevel == 999)
+            {
+                SYSMSG_BROADCASTV(5073);
+            }
+            else
+            {
+                SYSMSG_BROADCASTV(5040);
+            }
             SYSMSG_BROADCASTV(554, s_tjBoss[m_bossIndex][0], m_loc, s_tjBoss[m_bossIndex][0]);
         }
     }
@@ -2170,6 +2257,8 @@ void Tianjie::closeBoss()
 
         NETWORK()->Broadcast(st);
     }
+    if (m_currOpenedTjLevel == 999)
+        SYSMSG_BROADCASTV(5074);
 
     broadEvent4(NULL, 0);
 }
@@ -2541,7 +2630,7 @@ void Tianjie::rewardTask()
     for (iter = pm.begin(); iter != pm.end(); ++iter)
     {
         Player* p = iter->second;
-        if (p->GetLev() >= m_currOpenedTjLevel)
+        if ((p->GetLev() >= m_currOpenedTjLevel-4) || (m_currOpenedTjLevel==999 && p->GetLev()>=45))
         {
             MailPackage::MailItem item;
             item.id = 8555;         //天赋术

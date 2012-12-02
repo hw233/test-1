@@ -164,6 +164,7 @@ MSG_REG_2(GameMsgHdr, REQ::SECOND_SOUL, OnSecondSoulReq);
 MSG_REG_2(GameMsgHdr, REQ::RC7DAY, OnRC7Day);
 MSG_REG_2(GameMsgHdr, REQ::RF7DAY, OnRF7Day);
 MSG_REG_2(GameMsgHdr, REQ::NEWRC7DAY, OnNewRC7Day);
+MSG_REG_2(GameMsgHdr, REQ::EXJOB, OnExJob);
 
 MSG_REG_2(GameMsgHdr, REQ::TIANJIE, OnTianjieReq);
 
@@ -224,6 +225,7 @@ MSG_REG_2(GameMsgHdr, 0x279, OnCancelAutoBattleNotifyReq);
 MSG_REG_2(GameMsgHdr, 0x280, OnCancelDungeonAutoNotifyReq);
 MSG_REG_2(GameMsgHdr, 0x281, OnCompleteDungeonAutoNotifyReq);
 MSG_REG_2(GameMsgHdr, 0x282, OnResetRecharge);
+MSG_REG_2(GameMsgHdr, 0x283, OnResetConsume);
 MSG_REG_2(GameMsgHdr, 0x289, OnTimerEventCompletedNotify);
 MSG_REG_2(GameMsgHdr, 0x28C, OnSearchAutoBattleResult);
 MSG_REG_2(GameMsgHdr, 0x28D, OnSearchAutoDungeonResult);
@@ -320,5 +322,6 @@ MSG_REG_2(GameMsgHdr, 0x265, OnSetTitle);
 MSG_REG_2(GameMsgHdr, 0x266, OnNewRC7DayLastLoot);
 
 MSG_REG_2(GameMsgHdr, 0x267, OnFighterCheckDiry);
+MSG_REG_2(GameMsgHdr, 0x268, OnIDIPBuy);
 
 MSG_HANDLER_END()

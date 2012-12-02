@@ -252,17 +252,35 @@ void ActivityMgr::ActivitySignIn()
     SetOneDayRecord(day, score);
     UInt8 cnt = GetContinueSignInCnt(day);
     if(cnt == 2)
+    {
         score += 1;
+        _owner->activityUdpLog(1025, 13);
+    }
     if(cnt == 3)
+    {
         score += 2;
+        _owner->activityUdpLog(1025, 14);
+    }
     if(cnt == 4)
+    {
         score += 5;
+        _owner->activityUdpLog(1025, 15);
+    }
     if(cnt == 5)
+    {
         score += 10;
+        _owner->activityUdpLog(1025, 16);
+    }
     if(cnt == 6)
+    {
         score += 15;
+        _owner->activityUdpLog(1025, 17);
+    }
     if(cnt >= 7)
+    {
         score += 20;
+        _owner->activityUdpLog(1025, 18);
+    }
     AddScores(score);
     UpdateToDB();
     _owner->activityUdpLog(1025);
@@ -272,6 +290,8 @@ void ActivityMgr::ActivitySignIn()
     st << static_cast<UInt16>(GetOneDayRecord(day));
     st << cnt << Stream::eos;
     _owner->send(st);
+    //活跃度签到
+    GameAction()->doStrong(_owner, SthActSignIn, 0, 0);
 }
 
 //刷新待兑换的道具

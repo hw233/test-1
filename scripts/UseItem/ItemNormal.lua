@@ -1373,7 +1373,7 @@ function ItemNormal_00000476(iid, num, bind, param)
     local item = 0
 
     local k = 1
-    local rand = math.random(10000)
+    local rand = math.random(1, 10000)
     for n = 1,#prob do
         if rand <= prob[n] then
             item = items[n]
@@ -1404,7 +1404,7 @@ function ItemNormal_00000478(iid, num, bind, param)
 
     for i = 1, num do
         local k = 1
-        local rand = math.random(10000)
+        local rand = math.random(1, 10000)
         for n = 1,#prob do
             if rand <= prob[n] then
                 item = items[n]
@@ -2567,7 +2567,7 @@ function ItemNormal_00000033(iid, num, bind, param)
 
     for i = 1, num do
         local k = 1
-        local rand = math.random(10000)
+        local rand = math.random(1, 10000)
         for n = 1,#prob do
             if rand <= prob[n] then
                 item = items[n]
@@ -2975,7 +2975,7 @@ function ItemNormal_00009010(iid, num, bind, param)
 
     for i = 1, num do
         local k = 1
-        local rand = math.random(10000)
+        local rand = math.random(1, 10000)
         for n = 1,#prob do
             if rand <= prob[n] then
                 item = items[n]
@@ -3101,7 +3101,7 @@ function ItemNormal_00009067(iid, num, bind, param)
         return false;
     end
 
-    local r = math.random(100)
+    local r = math.random(1, 100)
 
     local item = 0
     if r >= 67 then
@@ -3134,7 +3134,7 @@ function ItemNormal_00009076(iid, num, bind, param)
     for kk = 1, num do
         local sz = #prob
         local k = 1
-        local rand = math.random(10000)
+        local rand = math.random(1, 10000)
         for n = 1,sz do
             if rand <= prob[n] then
                 item = items[n]
@@ -4252,7 +4252,7 @@ function ItemNormal_00009094(iid, num, bind, param)
             return used
         end
 
-        local rand = math.random(10000)
+        local rand = math.random(1, 10000)
         for n = 1,#prob do
             if rand <= prob[n] then
                 item = items[n]
@@ -4369,7 +4369,7 @@ function ItemNormal_00009119(iid, num, bind, param)
 
     for count =1,num do
         local k = 1
-        local rand = math.random(10000)
+        local rand = math.random(1, 10000)
         for n = 1,#prob do
             if rand <= prob[n] then
                 item = items[n]
@@ -5607,7 +5607,7 @@ function ItemNormal_00010050(iid, num, bind, param)
     package:Add(1325, num*5, true, 0, 2);
     package:Add(515, num*5, true, 0, 2);
     package:Add(503, num*5, true, 0, 2);
-    package:Add(9022, num*5, true, 0, 2);
+    package:Add(1707, num*1, true, 0, 2);
 
     package:DelItemSendMsg(iid, player);
     return num;
@@ -6035,6 +6035,212 @@ function ItemNormal_00010074(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00010075(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (3+(3*num*1)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    package:Add(51, num*1, true, false, 2);
+    package:Add(48, num*1, true, false, 2);
+    package:Add(440, num*1, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010076(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (2+(2*num*1)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    package:Add(401, num*1, true, false, 2);
+    package:Add(440, num*1, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010077(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (4+(4*num*2)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    package:Add(508, num*2, true, false, 2);
+    package:Add(51, num*2, true, false, 2);
+    package:Add(49, num*2, true, false, 2);
+    package:Add(439, num*2, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010078(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (4+(4*num*2)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    package:Add(56, num*2, true, false, 2);
+    package:Add(48, num*2, true, false, 2);
+    package:Add(50, num*2, true, false, 2);
+    package:Add(438, num*2, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010079(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (3+(3*num*3)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    package:Add(51, num*3, true, false, 2);
+    package:Add(48, num*3, true, false, 2);
+    package:Add(49, num*1, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010080(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (5+(5*num*2)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    package:Add(56, num*2, true, false, 2);
+    package:Add(57, num*2, true, false, 2);
+    package:Add(15, num*2, true, false, 2);
+    package:Add(51, num*2, true, false, 2);
+    package:Add(48, num*2, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010081(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (6+(6*num*3)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    package:Add(56, num*3, true, false, 2);
+    package:Add(57, num*3, true, false, 2);
+    package:Add(15, num*3, true, false, 2);
+    package:Add(51, num*2, true, false, 2);
+    package:Add(48, num*2, true, false, 2);
+    package:Add(49, num*2, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010082(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (7+(7*num*4)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    package:Add(56, num*5, true, false, 2);
+    package:Add(57, num*5, true, false, 2);
+    package:Add(15, num*5, true, false, 2);
+    package:Add(51, num*2, true, false, 2);
+    package:Add(48, num*2, true, false, 2);
+    package:Add(49, num*2, true, false, 2);
+    package:Add(50, num*2, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010083(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (5+(5*num*2)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    package:Add(508, num*2, true, false, 2);
+    package:Add(506, num*2, true, false, 2);
+    package:Add(15, num*2, true, false, 2);
+    package:Add(51, num*2, true, false, 2);
+    package:Add(48, num*2, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010084(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (6+(6*num*3)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    package:Add(508, num*3, true, false, 2);
+    package:Add(506, num*3, true, false, 2);
+    package:Add(15, num*3, true, false, 2);
+    package:Add(51, num*2, true, false, 2);
+    package:Add(48, num*2, true, false, 2);
+    package:Add(49, num*2, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010085(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (7+(7*num*4)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    package:Add(508, num*5, true, false, 2);
+    package:Add(506, num*5, true, false, 2);
+    package:Add(15, num*5, true, false, 2);
+    package:Add(51, num*2, true, false, 2);
+    package:Add(48, num*2, true, false, 2);
+    package:Add(49, num*2, true, false, 2);
+    package:Add(50, num*2, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
 function ItemNormal_QixiLoveCard(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -6330,6 +6536,34 @@ function ItemNormal_00009210(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00009214(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage()
+    
+    local items = { 1326, 400, 503, 514, 515, 15, 134, 500, 501 }
+    local chance = { 1754, 3509, 4386, 5263, 5439, 7193, 7368, 9123, 10000 }
+    local used = 0
+    for n = 1, num do
+        if package:GetRestPackageSize() < 1 then
+            if used ~= 0 then
+                package:DelItemSendMsg(iid, player)
+            end
+            player:sendMsgCode(2, 1011, 0)
+            return used
+        end
+        local r = math.random(1, 10000)
+        for i = 1, #chance do
+            if r <= chance[i] then
+                package:Add(items[i], 1, true, false, 2)
+                break
+            end
+        end
+        used = used + 1
+    end
+    package:DelItemSendMsg(iid, player)
+    return used
+end
+
 function ItemNormal_00009215(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -6369,6 +6603,7 @@ function ItemNormal_00009216(iid, num, bind, param)
     return num;
 end
 
+<<<<<<< HEAD
 function ItemNormal_00009230(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -6384,6 +6619,35 @@ function ItemNormal_00009230(iid, num, bind, param)
     package:Add(133, num, 1, 0, 2);
     package:DelItemSendMsg(iid, player)
 
+=======
+function ItemNormal_00009228(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    player:setTitle(44, 0)
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_fighterCard(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    if not num or num > 1 then
+        return false
+    end
+
+    -- TODO:
+    local fighters = {
+    }
+
+    local id = 0
+    -- TODO:
+
+    if not player:fighterFromItem(id) then
+        return false
+    end
+
+    package:DelItemSendMsg(iid, player);
+>>>>>>> 209825b2b1eb4fc141f1d459e029348d0879989f
     return num;
 end
 
@@ -6665,6 +6929,7 @@ local ItemNormal_Table = {
     [1330] = ItemNormal_citta,
     [1331] = ItemNormal_citta,
     [1332] = ItemNormal_citta,
+    [1347] = ItemNormal_citta,
 
     [1000] = ItemNormal_formation,
     [1001] = ItemNormal_formation,
@@ -7950,9 +8215,14 @@ local ItemNormal_Table = {
     [9211] = ItemNormal_00009210,
     [9212] = ItemNormal_00009210,
     [9213] = ItemNormal_00009210,
+    [9214] = ItemNormal_00009214,
     [9215] = ItemNormal_00009215,
     [9216] = ItemNormal_00009216,
+<<<<<<< HEAD
     [9230] = ItemNormal_00009230,
+=======
+    [9228] = ItemNormal_00009228,
+>>>>>>> 209825b2b1eb4fc141f1d459e029348d0879989f
 
     [10000] = ItemNormal_00010000,
     [10001] = ItemNormal_00010001,
@@ -8029,6 +8299,17 @@ local ItemNormal_Table = {
     [10072] = ItemNormal_00010072,
     [10073] = ItemNormal_00010073,
     [10074] = ItemNormal_00010074,
+    [10075] = ItemNormal_00010075,
+    [10076] = ItemNormal_00010076,
+    [10077] = ItemNormal_00010077,
+    [10078] = ItemNormal_00010078,
+    [10079] = ItemNormal_00010079,
+    [10080] = ItemNormal_00010080,
+    [10081] = ItemNormal_00010081,
+    [10082] = ItemNormal_00010082,
+    [10083] = ItemNormal_00010083,
+    [10084] = ItemNormal_00010084,
+    [10085] = ItemNormal_00010085,
 };
 
 function ItemNormalOther_00000441(iid, num, bind, other)
@@ -8088,7 +8369,7 @@ function ItemNormalOther_00000475(iid, num, bind, other)
     local item = 0
 
     local k = 1
-    local rand = math.random(10000)
+    local rand = math.random(1, 10000)
     for n = 1,#prob do
         if rand <= prob[n] then
             item = items[n]

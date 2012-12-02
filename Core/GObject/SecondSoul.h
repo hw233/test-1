@@ -50,6 +50,7 @@ public:
     UInt8 getStateLevel() { return m_stateLevel; }
     void addStateExp(UInt32 exp);
     void decStateExp(UInt32 exp);
+    void setStateExp(UInt8 lev, UInt32 exp);
     bool setXinxiu(UInt8 xinxiu);
     UInt8 getXinxiu() { return m_xinxiu; }
 
@@ -62,6 +63,7 @@ public:
     UInt8 getExtraAura();
     UInt8 getAuraLeft();
     bool practiceLevelUp(UInt32& pexp);
+    void setPracticeLevel(UInt8 lev);
     SoulSkill* getSoulSkill(UInt8 idx);
     UInt8 getSoulSkillIdx(SoulSkill ss);
     UInt8 getSoulSkillIdx(UInt16 skillId);
