@@ -178,6 +178,8 @@ void OnResetRecharge(GameMsgHdr& hdr, const void * data)
 	MSG_QUERY_PLAYER(player);
     if (player->GetVar(VAR_RECHARGE_TOTAL))
         player->SetVar(VAR_RECHARGE_TOTAL, 0);
+    if (player->GetVar(VAR_RECHARGE_SCORE))
+        player->SetVar(VAR_RECHARGE_SCORE, 0);
     player->sendRechargeInfo();
 }
 
