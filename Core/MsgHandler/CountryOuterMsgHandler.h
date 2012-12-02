@@ -61,6 +61,7 @@
 
 #include "GObject/Tianjie.h"
 #include "Memcached.h"
+#include "GObject/RechargeTmpl.h"
 
 struct NullReq
 {
@@ -1080,7 +1081,11 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendYBBufInfo(pl->GetVar(VAR_YBBUF), pl->GetVar(VAR_QQVIP_BUF));
     pl->sendAthlBufInfo();
     luckyDraw.notifyDisplay(pl);
-
+    if (World::getRechargeActive())
+    {
+        GObject::RechargeTmpl::instance().sendStreamInfo(pl);
+        GObject::RechargeTmpl::instance().sendScoreInfo(pl);
+    }
     if (World::getTrumpEnchRet() || World::get9215Act())
         pl->sendTokenInfo();
 
@@ -4387,6 +4392,36 @@ void OnActivityReward(  GameMsgHdr& hdr, const void * data)
 
     }
     */
+    MSG_QUERY_PLAYER(player);
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    brd >> type;
+    switch(type )
+    {
+        case 3:
+            if (World::getRechargeActive())
+                player->sendRechargeInfo();
+            break;
+        case 4:
+            if (!World::getRechargeActive())
+                return;
+            UInt32 itemId = 0;
+            brd >> itemId;
+            int n = -1;
+            UInt8 res = GObject::RechargeTmpl::instance().getItem(player, itemId, n);
+            Stream st(REP::ACTIVITY_REWARD);
+            st << static_cast<UInt8>(11);
+            st << res;
+            if ( 0 == res)
+            {
+                st << player->GetVar(VAR_RECHARGE_SCORE) << itemId << n;
+            }
+            st << Stream::eos;
+            player->send(st);
+            break;
+
+    }
+ 
 }
 
 void OnFourCopReq( GameMsgHdr& hdr, const void* data)

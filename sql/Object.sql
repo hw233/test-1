@@ -1784,4 +1784,11 @@ CREATE TABLE `days_rank` (
     UNIQUE KEY `unq` (`player_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `recharge_item`;
+CREATE TABLE `recharge_item` (               
+    `player_id` int(20) NOT NULL DEFAULT '0',  
+    `item_id` int(11) NOT NULL DEFAULT '0',    
+    `num` int(11) DEFAULT NULL,                
+    PRIMARY KEY (`player_id`,`item_id`)        
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 

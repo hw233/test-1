@@ -6369,6 +6369,23 @@ function ItemNormal_00009216(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00009230(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    if package:GetRestPackageSize() < 6 then
+		player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    package:Add(511, num, 1, 0, 2);
+    package:Add(51, num, 1, 0, 2);
+    package:Add(501, num, 1, 0, 2);
+    package:Add(514, num, 1, 0, 2);
+    package:Add(513, num, 1, 0, 2);
+    package:Add(133, num, 1, 0, 2);
+    package:DelItemSendMsg(iid, player)
+
+    return num;
+end
 
 local ItemNormal_Table = {
   [1] = ItemNormal_00000001,
@@ -7935,6 +7952,7 @@ local ItemNormal_Table = {
     [9213] = ItemNormal_00009210,
     [9215] = ItemNormal_00009215,
     [9216] = ItemNormal_00009216,
+    [9230] = ItemNormal_00009230,
 
     [10000] = ItemNormal_00010000,
     [10001] = ItemNormal_00010001,

@@ -71,6 +71,7 @@
 #include <cmath>
 #include "QixiTmpl.h"
 #include "MsgHandler/Memcached.h"
+#include "RechargeTmpl.h"
 
 #define NTD_ONLINE_TIME (4*60*60)
 #ifndef _DEBUG
@@ -7002,7 +7003,7 @@ namespace GObject
         addRC7DayRecharge(r);
         addRF7DayRecharge(r);
         addRechargeNextRet(r);
-
+        
         if (World::getRechargeActive())
         {
             UInt32 total = GetVar(VAR_RECHARGE_TOTAL);
@@ -7058,6 +7059,12 @@ namespace GObject
 #endif
 
         sendTripodInfo();
+
+        if(World::getRechargeActive())
+        {
+            GObject::RechargeTmpl::instance().addScore(this, GetVar(VAR_RECHARGE_TOTAL)-r, GetVar(VAR_RECHARGE_TOTAL));
+            GObject::RechargeTmpl::instance().sendScoreInfo(this);
+        }
 	}
 
     void Player::addRechargeNextRet(UInt32 r)
@@ -7179,10 +7186,7 @@ namespace GObject
             total = GetVar(VAR_RECHARGE_TOTAL);
         else
             total = GetVar(VAR_RECHARGE_TOTAL3366);
-		Stream st(REP::DAILY_DATA);
-		st << static_cast<UInt8>(12) << total << Stream::eos;
-		send((st));
-
+           
         if (rank && World::getNeedRechargeRank())
         {
             GameMsgHdr hdr(0x1C1, WORKER_THREAD_WORLD, this, sizeof(total));

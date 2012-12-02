@@ -54,6 +54,7 @@
 #include "SHSYTmpl.h"
 #include "QixiTmpl.h"
 #include "MsgHandler/Memcached.h"
+#include "RechargeTmpl.h"
 
 static const UInt32 DAYSRANKTM = 23 * 3600+50*60;
 
@@ -346,7 +347,8 @@ bool enum_midnight(void * ptr, void* next)
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 19) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 20) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 21) ||
-            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 22)
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 22) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 6)
             ))
     {
         if (pl->isOnline())
@@ -358,7 +360,10 @@ bool enum_midnight(void * ptr, void* next)
         {
             if (pl->GetVar(VAR_RECHARGE_TOTAL))
                 pl->SetVar(VAR_RECHARGE_TOTAL, 0);
+            if (pl->GetVar(VAR_RECHARGE_SCORE))
+                pl->SetVar(VAR_RECHARGE_SCORE, 0);
         }
+        GObject::RechargeTmpl::instance().clear();
     }
     if (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 10, 24) ||
         TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 24))
@@ -1058,6 +1063,10 @@ bool World::Init()
     path = cfg.scriptPath + "qixitmpl.lua";
     qixiTmpl.setFilename(path.c_str());
     qixiTmpl.load();
+    path = cfg.scriptPath + "RechargeTmpl.lua";
+    GObject::RechargeTmpl::instance().setFilename(path.c_str());
+    GObject::RechargeTmpl::instance().load();
+
 
 	calWeekDay(this);
     UInt32 day = 1;
