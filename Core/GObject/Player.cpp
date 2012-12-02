@@ -574,6 +574,7 @@ namespace GObject
         memset (m_openid, 0, sizeof(m_openid));
         memset (m_openkey, 0, sizeof(m_openkey));
         memset (m_clientIp, 0, sizeof(m_clientIp));
+        _isForbidSale = false;
 
         char buf[64] = {0};
         snprintf(buf, sizeof(buf), "%"I64_FMT"u", _id);
@@ -13053,7 +13054,7 @@ namespace GObject
             return -104;
         }
 
-		ConsumeInfo ci(IDIPBuyItem,0,0);
+		ConsumeInfo ci(IDIPBuyItem,itemId,num);
         useGold(price, &ci);
 
         GetPackage()->Add(itemId, num, bind);

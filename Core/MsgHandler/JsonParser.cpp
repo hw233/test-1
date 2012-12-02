@@ -443,6 +443,62 @@ int query_inviter_req(JsonHead* head, json_t* body, json_t* retbody, std::string
     return 0;
 }
 
+int query_fighters_battle_req(JsonHead* head, json_t* body, json_t* retbody, std::string& err)
+{
+    if (!head || !body || !retbody)
+        return EUNKNOW;
+
+    char openid[36] = {0};
+    char playerId[32] = {0};
+    UInt32 areaid = 0;
+    UInt64 playerid = 0;
+
+    body = body->child;
+    if (!body)
+        return EUNKNOW;
+
+    GET_STRING(body, "szOpenId", openid, 36);
+    GET_STRING(body, "playerId", playerId, 32);
+    json_t* val = json_find_first_label(body, "uiAreaId");
+    if (val && val->child && val->child->text)
+        areaid = atoi(val->child->text);
+
+    playerid = atoll(playerId);
+    GObject::Player* player = GObject::globalPlayers[playerid];
+    if (!player)
+    {
+        err += "player not exist!";
+        return EPLAYER_NOT_EXIST;
+    }
+    std::map<UInt32, GObject::Fighter *>& fm = player->getFighterMap();    
+    UInt32 count = fm.size();
+    json_insert_pair_into_object(retbody, "ullRoleId", json_new_string(playerId));
+    json_insert_pair_into_object(retbody, "szRoleName", json_new_string(fixPlayerName(player->getName()).c_str()));
+    json_insert_pair_into_object(retbody, "pSummonList_count", my_json_new_number(count));
+    json_t* arr = json_new_array();
+    if (arr)
+    {
+        std::map<UInt32, GObject::Fighter *>::iterator iter;
+        for (iter = fm.begin(); iter != fm.end(); ++iter)
+        {
+            GObject::Fighter* fgt = iter->second; 
+            json_t* obj = json_new_object();
+            if (obj && fgt)
+            {
+                UInt32 fgtId = fgt->getId();
+                UInt32 battle = fgt->getBattlePoint();
+                json_insert_pair_into_object(obj, "uiSummonId", my_json_new_number(fgtId));
+                json_insert_pair_into_object(obj, "uiSumBttlEffctv", my_json_new_number(battle));
+                json_insert_child(arr, obj);
+            }
+        }
+        json_insert_pair_into_object(retbody, "pSummonList", arr);
+    }
+ 
+    head->cmd = 110;
+    return 0;
+}
+
 
 int query_pagoda_rsq(JsonHead* head, json_t* body, json_t* retbody, std::string& err)
 {
@@ -876,6 +932,9 @@ void jsonParser2(void * buf, int len, Stream& st)
             break;
         case 107:
             ret = query_inviter_req(&head, body, retbody, err);
+            break;
+        case 109:
+            ret = query_fighters_battle_req(&head, body, retbody, err);
             break;
        
         default:

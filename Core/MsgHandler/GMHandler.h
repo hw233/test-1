@@ -103,7 +103,9 @@ private:
     void OnUnLock(GObject::Player *player, std::vector<std::string>&);
     void OnBigLock(GObject::Player *player, std::vector<std::string>&);
     void OnBigUnLock(GObject::Player *player, std::vector<std::string>&);
-    
+    void OnForbidSale(GObject::Player *player, std::vector<std::string>&);
+    void OnUnForbidSale(GObject::Player *player, std::vector<std::string>&);
+
     void OnSetBosslevel(GObject::Player *player, std::vector<std::string>&);
     void OnQQVipKey(GObject::Player *player, std::vector<std::string>&);
     void OnClanBuild(GObject::Player *player, std::vector<std::string>&);

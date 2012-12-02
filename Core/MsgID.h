@@ -704,6 +704,8 @@ namespace SPEQ
     const UInt16 BIGLOCKUSER         = 0x132;// 0x102
     const UInt16 BIGUNLOCKUSER       = 0x133;// 0x103
     const UInt16 CLSTASKALL          = 0x134;//
+    const UInt16 FORBIDSALE          = 0x135;// 全区禁止交易
+    const UInt16 UNFORBIDSALE        = 0x136;// 全区解除禁止交易
 }
 
 namespace SPEP
@@ -751,6 +753,9 @@ namespace SPEP
     const UInt16 BIGLOCKUSER         = 0x32;
     const UInt16 BIGUNLOCKUSER       = 0x33;
     const UInt16 CLSTASKALL          = 0x34;//
+    const UInt16 FORBIDSALE          = 0x35;// 全区禁止交易
+    const UInt16 UNFORBIDSALE        = 0x36;// 全区解除禁止交易
+
 }
 
 namespace ARENAREQ
