@@ -1549,27 +1549,27 @@ namespace GObject
 
     void Player::transformUdpLog(UInt32 id, UInt32 type, UInt32 money1, UInt32 money2, UInt32 money3, UInt32 money4, UInt8 val1)
     {
-        // TODO: 属性转移udp日志
+        // 属性转移udp日志
         char action[64] = "";
         if (type & 0x01)
         {
-            snprintf (action, 64, "F_%d_%d_%d_%d", id, 1, val1, money1);
-            udpLog("transform", action, "", "", "", "", "act", 1);
+            snprintf (action, 64, "F_%d_%d", id, 1);
+            udpLog("transform", action, "", "", "", "", "act", money1);
         }
         if (type & 0x02)
         {
-            snprintf (action, 64, "F_%d_%d_%d", id, 2, money2);
-            udpLog("transform", action, "", "", "", "", "act", 1);
+            snprintf (action, 64, "F_%d_%d_%d", id, 2, val1);
+            udpLog("transform", action, "", "", "", "", "act", money2);
         }
         if (type & 0x08)
         {
-            snprintf (action, 64, "F_%d_%d_%d", id, 8, money3);
-            udpLog("transform", action, "", "", "", "", "act", 1);
+            snprintf (action, 64, "F_%d_%d", id, 8);
+            udpLog("transform", action, "", "", "", "", "act", money3);
         }
         if (type & 0x10)
         {
-            snprintf (action, 64, "F_%d_%d_%d", id, 10, money4);
-            udpLog("transform", action, "", "", "", "", "act", 1);
+            snprintf (action, 64, "F_%d_%d", id, 10);
+            udpLog("transform", action, "", "", "", "", "act", money4);
         }
     }
 
@@ -14713,31 +14713,65 @@ void EventTlzAuto::notify(bool isBeginAuto)
     UInt8 Player::transformUseMoney(Fighter * fFgt, Fighter * tFgt, UInt8 type)
     {
         UInt32 money = 0;
+        UInt32 money1 = 0;
+        UInt32 money2 = 0;
+        UInt32 money3 = 0;
+        UInt32 money4 = 0;
+        UInt8 val1 = 0;
         if (type & 0x01)
         {
              money += 10;
+             money1 += 10;
         }
         if (type & 0x02)
         {
             float p = std::max(fFgt->getPotential(), tFgt->getPotential());
             if (p >= 1.80f)
+            {
                 money += 100;
+                money2 += 100;
+                val1 = 4;
+            }
             else if (p >= 1.50f)
+            {
                 money += 60;
+                money2 += 60;
+                val1 = 3;
+            }
             else if (p >= 1.20f)
+            {
                 money += 30;
+                money2 += 30;
+                val1 = 2;
+            }
             else
+            {
                 money += 10;
+                money2 += 10;
+                val1 = 1;
+            }
 
             float c = std::max(fFgt->getCapacity(),tFgt->getCapacity());
             if (c >= 9.0f)
+            {
                 money += 100;
+                money2 += 100;
+            }
             else if (c >= 8.0f)
+            {
                 money += 60;
+                money2 += 60;
+            }
             else if (c >= 7.0f)
+            {
                 money += 30;
+                money2 += 30;
+            }
             else
+            {
                 money += 10;
+                money2 += 10;
+            }
         }
         if (type & 0x08)
         {
@@ -14755,8 +14789,13 @@ void EventTlzAuto::notify(bool isBeginAuto)
             UInt8 tXinxiu = tSoul->getXinxiu();
             money += (std::max(f,t) * 10);
             money += abs(int(fPracLev-tPracLev))*1;
+            money3 += (std::max(f,t) * 10);
+            money3 += abs(int(fPracLev-tPracLev))*1;
             if (fXinxiu != tXinxiu)
+            {
                 money += 50;
+                money3 += 50;
+            }
         }
         if (type & 0x10)
         {
@@ -14765,6 +14804,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
                 Int32 f = fFgt->getElixirAttrByOffset(i);
                 Int32 t = tFgt->getElixirAttrByOffset(i);
                 money += abs(int(f-t))*1;
+                money4 += abs(int(f-t))*1;
             }
         }
         //34是测试区
@@ -14778,6 +14818,8 @@ void EventTlzAuto::notify(bool isBeginAuto)
             ConsumeInfo ci(FightTransform,0,0);
             useGold(money, &ci);
         }
+
+        transformUdpLog(1164, type, money1, money2, money3, money4, val1);
         
         return 0;
     }
