@@ -2159,7 +2159,7 @@ void OnDungeonAutoReq( GameMsgHdr& hdr, DungeonAutoReq& dar )
 	if(pl->getThreadId() != WORKER_THREAD_NEUTRAL)
 		return;
 
-	if(pl->GetPackage()->GetRestPackageSize() < 4)
+	if(pl->GetPackage()->GetRestPackageSize() < 10)
 	{
 		pl->sendMsgCode(1, 1014);
 		return;
@@ -2197,7 +2197,7 @@ void OnAutoCopy( GameMsgHdr& hdr, const void* data )
     brd >> type;
     brd >> id;
 
-	if((type == 0 || type == 2) && pl->GetPackage()->GetRestPackageSize() < 4)
+	if((type == 0 || type == 2) && pl->GetPackage()->GetRestPackageSize() < 10)
 	{
 		pl->sendMsgCode(1, 1014);
 		return;
@@ -2232,7 +2232,7 @@ void OnAutoFrontMap( GameMsgHdr& hdr, const void* data )
 	if(!pl->hasChecked())
 		return;
 
-	if(pl->GetPackage()->GetRestPackageSize() < 4)
+	if(pl->GetPackage()->GetRestPackageSize() < 10)
 	{
 		pl->sendMsgCode(1, 1014);
 		return;

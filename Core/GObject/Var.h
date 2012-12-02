@@ -271,7 +271,6 @@ namespace GObject
         VAR_9215_USED = 244,  //逍遥礼包使用数
         VAR_QQVIP_AWARD_COUNT = 245 ,//qq会员抽奖卷
         VAR_AWARD_SSTOOLBAR = 246,   //搜搜工具栏奖励是否已领取
-        VAR_RECHARGE_SCORE = 247, //累计充值的积分
         //250-269 越南版已占用
 
         // 270-280 占用 for zhgc
@@ -287,6 +286,8 @@ namespace GObject
 
         //繁体版占用301-330
 
+        //340简体版
+        VAR_RECHARGE_SCORE = 340, //累计充值的积分
         VAR_MAX,
     };
 
