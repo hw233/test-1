@@ -226,7 +226,7 @@ function GetAtyReward(player, flag)
     end
 
     if flag == 64 then -- 140
-        package:Add(1526, 1 , true, false , 24);
+        package:Add(133, 1 , true, false , 24);
         if rand <= 20 then
             package:AddItem(514, 1, true, false, 24);
         end
