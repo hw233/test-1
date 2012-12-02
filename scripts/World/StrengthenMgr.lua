@@ -39,6 +39,7 @@ local checkFlag = {
     [35] = 1, --SthPotential,   --潜力洗炼
     [36] = 1, --SthCapacity,   --资质洗炼
     [37] = 1, --SthCHTownDeamon,   --镇守锁妖塔
+    [38] = 1, --SthActSignIn,   --活跃度签到
 }
 
 --增加的变强之魂
@@ -81,6 +82,7 @@ local addSouls = {
     [35] = 1, --SthPotential,   --潜力洗炼
     [36] = 1, --SthCapacity,   --资质洗炼
     [37] = 1, --SthCHTownDeamon,   --镇守锁妖塔
+    [38] = 1, --SthActSignIn,   --活跃度签到
 }
 
 --某一项的最大值
@@ -224,7 +226,7 @@ function openOrangeBoxStrong()
         {{1325, 1}}, --技能符文熔炼诀
         {{49,   1}}, --乾坤净水
         {{515,  1}}, --五行精金
-        {{1528, 1}}, --法灵精金
+        {{134, 1}}, --法灵精金
         {{9204, 1}}, --补丁
         {{9201, 1}}, --桃木林地图碎片
     }

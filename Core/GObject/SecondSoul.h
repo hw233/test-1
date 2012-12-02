@@ -20,6 +20,7 @@ struct SoulSkill
 #define MAX_SKILL_NUM_1 5
 #define MAX_SKILL_NUM_2 5
 #define MAX_SKILL_NUM 10
+#define SOUL_CLS_MAX  16
 
 #define SOUL_SKILL_ATTRTRANS     1          // 增幅术, 给角色提供元神属性x%的提升
 #define SOUL_SKILL_STRENGHT      2          // 力量, 增加元神的力量

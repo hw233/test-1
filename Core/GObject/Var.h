@@ -274,6 +274,7 @@ namespace GObject
         
         VAR_EX_JOB_ENABLE = 247,   // 墨家面板是否开启
         VAR_JOB_HUNTER_SPOT_ID = 248,   // 寻墨据点据点id
+
         //250-269 越南版已占用
 
         // 270-280 占用 for zhgc
@@ -289,6 +290,8 @@ namespace GObject
 
         //繁体版占用301-330
 
+        //340简体版
+        VAR_RECHARGE_SCORE = 340, //累计充值的积分
         VAR_MAX,
     };
 
@@ -544,6 +547,7 @@ namespace GObject
             REGISTER_VAR(VAR_LOCAL_PAGE, CYCLE_NONE);
             REGISTER_VAR(VAR_9215_USED, CYCLE_NONE);
             REGISTER_VAR(VAR_QQVIP_AWARD_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_RECHARGE_SCORE, CYCLE_NONE);
             REGISTER_VAR(VAR_AWARD_SSTOOLBAR, CYCLE_NONE);
             REGISTER_VAR(VAR_EX_JOB_ENABLE, CYCLE_NONE);
             REGISTER_VAR(VAR_JOB_HUNTER_SPOT_ID, CYCLE_NONE);
