@@ -359,13 +359,13 @@ namespace Script
 
 		//????
         CLASS_ADD(ActivityMgr);
-        CLASS_DEF(ActivityMgr, GetFlag);
-        CLASS_DEF(ActivityMgr, UpdateFlag);
+        //CLASS_DEF(ActivityMgr, GetFlag);
+        //CLASS_DEF(ActivityMgr, UpdateFlag);
         CLASS_DEF(ActivityMgr, CheckTimeOver);
-        CLASS_DEF(ActivityMgr, AddPoint);
+        //CLASS_DEF(ActivityMgr, AddPoint);
         CLASS_DEF(ActivityMgr, UpdateToDB);
-        CLASS_DEF(ActivityMgr, GetPoint);
-        CLASS_DEF(ActivityMgr, AddRewardFlag);
+        //CLASS_DEF(ActivityMgr, GetPoint);
+        //CLASS_DEF(ActivityMgr, AddRewardFlag);
         CLASS_DEF(ActivityMgr, AddScores);
 
 		//变强之路
@@ -1311,9 +1311,9 @@ namespace Script
 		return Call<void>("sendConsumeRankAward", player, pos);
     }
 
-    UInt16 GameActionLua::doAtySignIn()
+    UInt16 GameActionLua::doAtySignIn(Player* player)
     {
-        return Call<UInt16>("doAtySignIn");
+        return Call<UInt16>("doAtySignIn", player);
     }
 
     lua_tinker::table GameActionLua::GetExchangeProps(UInt32 id)

@@ -1392,7 +1392,7 @@ void  OnDoActivity( GameMsgHdr& hdr, const void* data)
 {
     MSG_QUERY_PLAYER(player);
     const stActivityMsg* co = reinterpret_cast<const stActivityMsg*>(data);
-    if(co->id == AtyTownDeamon)
+    if(co->id == SthTownDeamon)
     {
         if(player->GetVar(VAR_TOWNDEAMON))
             return;

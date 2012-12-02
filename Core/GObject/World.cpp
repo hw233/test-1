@@ -1017,9 +1017,9 @@ bool World::Init()
     static UInt8 type = 0;
     static UInt8 type2 = 1;
 	GObject::Tianjie::instance().Init();
-//	GObject::DaysRank::instance().Init();
 	AddTimer(5 * 1000, Tianjie_Refresh, static_cast<void*>(NULL));
-//	AddTimer(60 * 1000, DaysRank_Refresh, static_cast<void*>(NULL));
+	GObject::DaysRank::instance().Init(); 
+	AddTimer(60 * 1000, DaysRank_Refresh, static_cast<void*>(NULL)); //调试用
 
 	GObjectManager::delayLoad();
 	GObjectManager::LoadPracticeData();

@@ -2,6 +2,7 @@
 #define DAYSRANK_H_
 
 #include <map>
+#include <list>
 #include <string>
 #include <string.h>
 #include "Common/Platform.h"

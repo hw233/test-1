@@ -1010,10 +1010,12 @@ struct DBActivityData
 {
     UInt64 playerId;
     UInt32 overTime;
+    /*
     UInt32 awardID;
     UInt32 point;
     UInt32 award;
     std::string flags;
+    */
     UInt32 scores;
     UInt32 propsID;
     std::string signRecord;
@@ -2251,14 +2253,16 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBActivityData)
-SPECIALDEF(9)
+SPECIALDEF(5)
 (
     UInt64, playerId,
     UInt32, overTime,
+    /*
     UInt32, awardID,
     UInt32, point,
     UInt32, award,
     std::string, flags,
+    */
     UInt32, scores,
     UInt32, propsID,
     std::string, signRecord

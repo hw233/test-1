@@ -1625,19 +1625,24 @@ void OnFighterTrainReq( GameMsgHdr& hdr, FighterTrainReq& ftr )
 {
 	MSG_QUERY_PLAYER(player);
     if (ftr._type > 4 && (ftr._type&0xF) == 5)
-    {
-        player->trainFighter(ftr._fgtId, ftr._type);
-        GameAction()->doStrong(player, SthGenius, 0, 0);
+    {   //天赋洗炼
+        UInt8 result = player->trainFighter(ftr._fgtId, ftr._type);
+        if(result != 2)
+            GameAction()->doStrong(player, SthGenius, 0, 0);
         return;
     }
 
 	Stream st(REP::POTENCIAL);
-	st << ftr._type << player->trainFighter(ftr._fgtId, ftr._type) << Stream::eos;;
+    UInt8 result = player->trainFighter(ftr._fgtId, ftr._type);
+	st << ftr._type << result << Stream::eos;;
 	player->send(st);
-    if(1 == ftr._type || 2 == ftr._type)
-        GameAction()->doStrong(player, SthPotential, 0, 0);
-    if(3 == ftr._type || 4 == ftr._type)
-        GameAction()->doStrong(player, SthCapacity, 0, 0);
+    if(result != 2)
+    {
+        if(1 == ftr._type || 2 == ftr._type) //资质洗炼
+            GameAction()->doStrong(player, SthCapacity, 0, 0);
+        if(3 == ftr._type || 4 == ftr._type) //潜力洗炼
+            GameAction()->doStrong(player, SthPotential, 0, 0);
+    }
 }
 
 void OnTakeOnlineRewardReq( GameMsgHdr& hdr, TakeOnlineRewardReq& req)
@@ -4341,6 +4346,7 @@ void OnActivityList( GameMsgHdr& hdr, const void * data)
 }
 void OnActivityReward(  GameMsgHdr& hdr, const void * data)
 {
+    /*
     MSG_QUERY_PLAYER(player);
     BinaryReader brd(data, hdr.msgHdr.bodyLen);
     ActivityMgr* mgr = player->GetActivityMgr();
@@ -4356,7 +4362,7 @@ void OnActivityReward(  GameMsgHdr& hdr, const void * data)
 
         case 1:
             // getDailyReward
-            mgr->GetReward(2);
+            //mgr->GetReward(2);
             break;
         case 2:
             UInt16 flag = 0;
@@ -4365,6 +4371,7 @@ void OnActivityReward(  GameMsgHdr& hdr, const void * data)
             break;
 
     }
+    */
 }
 
 void OnFourCopReq( GameMsgHdr& hdr, const void* data)
@@ -5152,101 +5159,27 @@ void OnActivitySignIn( GameMsgHdr& hdr, const void * data )
 	MSG_QUERY_PLAYER(player);
     BinaryReader brd(data, hdr.msgHdr.bodyLen);
     ActivityMgr* mgr = player->GetActivityMgr();
+    mgr->CheckTimeOver();
     UInt8 type = 0;
-    //UInt32 id = 0;
     brd >> type;
-    //Stream st(REP::ACTIVITY_SIGNIN);
-    //st << static_cast<UInt8> (type);
     switch(type)
     {
         case 0x00:
             {
                 //每日签到
                 mgr->ActivitySignIn();
-                //player->ActivitySignIn();
-                //st << static_cast<UInt32>(mgr->GetScores()) << static_cast<UInt8>(mgr->GetFlag(AtySignIn)) << Stream::eos;
             }
             break;
         case 0x01:
             {
                 //刷新待兑换的道具
                 mgr->RefreshProps();
-                /*
-                if(!player->hasChecked())
-                    return;
-                if(player->getTael() < 100){
-                    player->sendMsgCode(0, 1100);
-                    return;
-                }
-                ConsumeInfo ci(DailyActivity, 0, 0);
-                player->useTael(100, &ci);
-                id = GameAction()->GetExchangePropsID();
-                if(mgr->GetPropsID() == id)
-                {
-                    switch(id)
-                    {
-                        case 29:
-                            id = 500;
-                            break;
-                        case 500:
-                            id = 29;
-                            break;
-                        default:
-                            id = 29;
-                    }
-                }
-                mgr->SetPropsID(id);
-                mgr->UpdateToDB();
-
-                lua_tinker::table p = GameAction()->GetExchangeProps(id);
-                player->activityUdpLog(1026);
-                st << static_cast<UInt16>(id) << p.get<UInt8>(3) << p.get<UInt16>(2) << Stream::eos;
-                */
             }
             break;
         case 0x02:
             {
                 //积分兑换道具
                 mgr->ExchangeProps();
-                /*
-                if(!player->hasChecked())
-                    return;
-                lua_tinker::table props = GameAction()->GetExchangeProps( mgr->GetPropsID() );
-                if(5 != props.size())
-                    return;
-                UInt32 score = props.get<UInt32>(2);
-                if(mgr->GetScores() < score)
-                    return;
-                if(player->GetPackage()->GetRestPackageSize() <= 0)
-                {
-                    player->sendMsgCode(0, 1011);
-                    return;
-                }
-                mgr->SubScores(score);
-                player->GetPackage()->Add(mgr->GetPropsID(), props.get<UInt8>(3), true, false, FromDailyActivity);
-                player->activityUdpLog(1027, score);
-                player->activityUdpLog(1028, score);
-                //兑换后重新刷新一次
-                id = GameAction()->GetExchangePropsID();
-                if(mgr->GetPropsID() == id)
-                {
-                    switch(id)
-                    {
-                        case 29:
-                            id = 500;
-                            break;
-                        case 500:
-                            id = 29;
-                            break;
-                        default:
-                            id = 29;
-                    }
-                }
-                mgr->SetPropsID(id);
-                mgr->UpdateToDB();
-                lua_tinker::table p = GameAction()->GetExchangeProps(id);
-                st << mgr->GetScores() << static_cast<UInt16>(id) << p.get<UInt8>(3) << p.get<UInt16>(2) << Stream::eos;
-                */
             }
             break;
         case 0x03:

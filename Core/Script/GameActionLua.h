@@ -311,7 +311,7 @@ namespace Script
 
     public:
         void doAty( Player* pl, UInt32 id,  UInt32 param1, UInt32 param2);
-        UInt16 doAtySignIn();
+        UInt16 doAtySignIn(Player* pl);
         UInt32 GetAtyCheckFlag(UInt32 idx);
         UInt32 GetMaxActivity(UInt32 vip);
         lua_tinker::table GetExchangeProps(UInt32 id);

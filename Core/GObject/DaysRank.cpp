@@ -40,9 +40,8 @@ void DaysRank::process()
 
             int rank1 = GObject::leaderboard.getMyRank(pl, 1);
             int rank2 = GObject::leaderboard.getMyRank(pl, 0);
-            int rank3 = 0;
-            //pl->GetVar(VAR_USETAEL_CNT) + pl->GetVar(VAR_USECOUPON_CNT)*100;
-            int rank4 = 0;
+            int rank3 = pl->GetVar(VAR_USETAEL_CNT) + pl->GetVar(VAR_USECOUPON_CNT) * 100;
+            int rank4 = pl->GetVar(VAR_GETACHIEVEMENT_CNT) + pl->GetVar(VAR_GETPRESTIGE_CNT);
             int rank5 = GObject::leaderboard.getMyRank(pl, 4);
             pInfo->push_back(rank1, 0);
             pInfo->push_back(rank2, 1);
@@ -94,6 +93,7 @@ PlayerRankInfo* DaysRank::getDaysRank(Player* pl)
     }
     return NULL;
 }
+
 
 }
 

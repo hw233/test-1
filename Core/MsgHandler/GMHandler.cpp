@@ -2908,10 +2908,11 @@ void GMHandler::OnHandleSignIn(GObject::Player* player, std::vector<std::string>
             break;
         case 2:
             {
-				UInt32 val = atoi(args[1].c_str());
-                if(val < 0 || val > 1)
+				UInt16 val = atoi(args[1].c_str());
+                if(val < 0)
                     return;
-                mgr->UpdateFlag(AtySignIn, val);
+                UInt8 day = TimeUtil::MonthDay();
+                mgr->SetOneDayRecord(day, val);
                 mgr->UpdateToDB();
             }
             break;
@@ -3241,6 +3242,11 @@ void GMHandler::OnStrengthen(GObject::Player *player, std::vector<std::string>& 
 			{
                 mgr->SetSoulId(0);
                 mgr->UpdateToDB();
+            }
+            break;
+        case 4:
+			{
+                mgr->GMClearSthAll();
             }
             break;
         default:

@@ -1198,13 +1198,13 @@ DROP TABLE IF EXISTS `activityData`;
 CREATE TABLE `activityData` (
    `playerId` bigint(20) unsigned NOT NULL,
    `overTime` int(10) unsigned NOT NULL,
-   `awardId`  int(10) unsigned NOT NULL,
-   `point`   int(10) unsigned NOT NULL,
-   `award`   int(10) unsigned NOT NULL,
-   `flags`   varchar(255) NOT NULL DEFAULT '',
+   --`awardId`  int(10) unsigned NOT NULL,
+   --`point`   int(10) unsigned NOT NULL,
+   --`award`   int(10) unsigned NOT NULL,
+   --`flags`   varchar(255) NOT NULL DEFAULT '',
    `scores`  int(10) unsigned NOT NULL,
    `propsID` int(10) unsigned NOT NULL,
-   `signRecord` varchar(255) NOT NULL DEFAULT '',
+   `signRecord` varchar(1024) NOT NULL DEFAULT '',
     PRIMARY KEY (`playerId`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
@@ -1771,5 +1771,17 @@ CREATE TABLE `sh_candidate` (
     `pos` tinyint(3) NOT NULL DEFAULT '0',
   PRIMARY KEY (`playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `days_rank`;
+CREATE TABLE `days_rank` (
+    `player_id` bigint(20) unsigned NOT NULL,
+    `athletics` char(100) NOT NULL DEFAULT '', 
+    `level` char(100) NOT NULL DEFAULT '', 
+    `money` char(100) NOT NULL DEFAULT '', 
+    `pk` char(100) NOT NULL DEFAULT '',
+    `battle` char(100) NOT NULL DEFAULT '',
+    PRIMARY KEY (`player_id`),
+    UNIQUE KEY `unq` (`player_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 

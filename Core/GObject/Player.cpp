@@ -359,7 +359,7 @@ namespace GObject
             GLOBAL().PushMsg(hdr1, &pfexp);
 
             stActivityMsg msg;
-            msg.id = AtyPSpeed;
+            msg.id = SthPSpeed;
             GameMsgHdr hdr2(0x245, m_Player->getThreadId(), m_Player, sizeof(stActivityMsg));
             GLOBAL().PushMsg(hdr2, &msg);
 
@@ -4922,6 +4922,7 @@ namespace GObject
 		// SYSMSG_SENDV(105, this, a);
 		SYSMSG_SENDV(1005, this, a);
 		sendModification(8, _playerData.achievement);
+        AddVar(VAR_GETACHIEVEMENT_CNT, a);
 		return _playerData.achievement;
 	}
 
@@ -5011,7 +5012,7 @@ namespace GObject
         Stream st(REP::USER_INFO_CHANGE);
         st << static_cast<UInt8>(0x15) << _playerData.prestige << Stream::eos;
         send(st);
-
+        AddVar(VAR_GETPRESTIGE_CNT, a);
 		return _playerData.prestige;
     }
 
@@ -13119,40 +13120,6 @@ namespace GObject
         st.data<UInt8>(offset) = c;
     }
 
-    //玩家每日签到接口
-    void Player::ActivitySignIn()
-    {
-        if(GetActivityMgr()->GetFlag(AtySignIn) != 0)
-            return;
-        UInt32 day = 1;
-        UInt32 mon = 1;
-        UInt32 year = 2012;
-        TimeUtil::GetDMY(&day, &mon, &year);
-
-        lua_tinker::table award = GameAction()->GetdayExtraAward(mon, day);
-        UInt32 cnt = award.size();
-        if(0 != cnt){
-            if(GetPackage()->GetRestPackageSize() < cnt){    //背包预留足够的位子,否则不能签到
-                sendMsgCode(0, 1011);
-                return;
-            }
-            for(UInt32 i = 0; i < cnt; ++i){
-                lua_tinker::table a = award.get<lua_tinker::table>(i + 1);
-                if(499 == a.get<UInt32>(1))  //礼券
-                    getCoupon(a.get<UInt32>(2));
-                else
-                    GetPackage()->Add(a.get<UInt32>(1), a.get<UInt32>(2), true, false, FromDailyActivity);
-            }
-        }
-        //GameAction()->doAtySignIn(this, AtySignIn, mon, day);
-        UInt32 score = GameAction()->doAtySignIn();
-        GetActivityMgr()->UpdateFlag(AtySignIn, 1);
-        GetActivityMgr()->AddScores(score);
-        GetActivityMgr()->UpdateToDB();
-        activityUdpLog(1025);
-
-    }
-
     void Player::SendNextdayTime(UInt32 nextDay)
     {
         Stream st(REP::SVRST);
@@ -13163,8 +13130,11 @@ namespace GObject
         mgr->CheckTimeOver();
         UInt8 day = TimeUtil::MonthDay(nextDay);
         Stream st1(REP::ACTIVITY_SIGNIN);
-        st1 << static_cast<UInt8>(0);
-        st1 << static_cast<UInt32>(mgr->GetScores()) << static_cast<UInt16>(mgr->GetOneDayRecord(day)) << Stream::eos;
+        st1 << static_cast<UInt8>(0x00);
+        st1 << static_cast<UInt32>(mgr->GetScores());
+        st1 << static_cast<UInt16>(mgr->GetOneDayRecord(day));
+        st1 << mgr->GetContinueSignInCnt(day);
+        st1 << Stream::eos;
         send(st1);
     }
 

@@ -369,7 +369,7 @@ void HeroIsland::rankReward()
         if((*i)->player->getThreadId() != WORKER_THREAD_NEUTRAL)
         {
             stActivityMsg msg;
-            msg.id = AtyHeroIsland;
+            msg.id = SthHeroIsland;
             GameMsgHdr hdr2(0x245, (*i)->player->getThreadId(), (*i)->player, sizeof(stActivityMsg));
             GLOBAL().PushMsg(hdr2, &msg);
         }

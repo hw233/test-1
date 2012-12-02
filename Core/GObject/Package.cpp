@@ -1745,8 +1745,8 @@ namespace GObject
 
             if(ret) //变强之路
             {
-                UInt32 guaji[] = { 55, 56, 9100, 9192, 9126 };
-                UInt32 xiuwei[] = { 57, 9093, 9133 };
+                UInt32 guaji[] = { 55, 56, 9100, 9092, 9126, 9141, 9142, 9143 };
+                UInt32 xiuwei[] = { 57, 9093, 9133, 9144, 9145, 9146 };
                 for(UInt32 i = 0; i < sizeof(guaji) / sizeof(guaji[0]); ++i)
                 {
                     if(guaji[i] == id)

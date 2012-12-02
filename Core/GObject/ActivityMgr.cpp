@@ -28,11 +28,12 @@ ActivityMgr::~ActivityMgr()
 void ActivityMgr::LoadFromDB(DBActivityData& data)
 {
     _item.overTime = data.overTime;
+    _item.scores   = data.scores;
+    _item.propsID  = data.propsID;
+/**
     _item.awardID  = data.awardID;
     _item.point    = data.point;
     _item.award    = data.award;
-    _item.scores   = data.scores;
-    _item.propsID  = data.propsID;
     //解析flag
     StringTokenizer ntk(data.flags, "|");
     UInt32 size = std::min<UInt32>(ntk.count(), static_cast <UInt32>(AtyMaxFlag));
@@ -41,21 +42,20 @@ void ActivityMgr::LoadFromDB(DBActivityData& data)
     {
         _item.flag[i] = atoi(ntk[i].c_str());
     }
-    //解析签到记录(一个月)
-    StringTokenizer tk(data.signRecord, ",");
+ */
+    //解析签到记录(两个月)
+    StringTokenizer tk(data.signRecord, "|");
     UInt8 cnt = tk.count();
-    for(UInt8 i = 0; i < cnt && i < SIGNIN_RECORD; ++i)
+    for(UInt8 idx = 0; idx < cnt && idx < MONTH_COUNT; ++idx)
     {
-        _item.signRecord[i] = atoi(tk[i].c_str());
+        StringTokenizer ntk(tk[idx].c_str(), ",");
+        UInt8 size = ntk.count();
+        for(UInt8 i = 0; i < size && i < SIGNIN_RECORD; ++i)
+        {
+            _item.signRecord[idx][i] = atoi(ntk[i].c_str());
+        }
+        //SetOneDayRecord(i + 1, atoi(tk[i].c_str()));
     }
-}
-UInt32 ActivityMgr::GetRandomReward()
-{
-    UInt32 s = GetOnlineRewardNum();
-    if(s == 0)
-      return 1;
-    UInt32 idx = uRand(s);
-    return idx + 1;
 }
 /**
  *   @return  是否到期 需要重置数据库
@@ -66,44 +66,16 @@ bool ActivityMgr::CheckTimeOver()
     UInt32 now = TimeUtil::Now();
     if(now < _item.overTime)
         return false;
+    /*
     UInt32 over = TimeUtil::SharpDayT(1 , now);
     _item.Reset( 0, over, _item.scores, _item.propsID);
     _onlineReward.clear() ;
     GetOnlineReward(GetOnlineRewardGetNum());
-    //UInt32 over = TimeUtil::SharpMonth(1 , now);
-    //_item.Reset(over, _item.scores, _item.propsID);
+    */
+    UInt32 over = TimeUtil::SharpMonth(1 , now);
+    _item.Reset(over, _item.scores, _item.propsID);
     UpdateToDB();
     return true;
-}
-/**
- *  获取标志位
- *
- */
-UInt8 ActivityMgr::GetFlag(UInt32 idx )
-{
-    if( idx >= AtyMaxFlag)
-        return 0xFF;
-    else
-        return _item.flag[idx];
-}
-/**
- *  更新标志位
- */
-void ActivityMgr::UpdateFlag(UInt32 idx,  UInt8 v)
-{
-    if(idx >=  AtyMaxFlag)
-        return ;
-
-    _item.flag[idx] = v;
-}
-
-/**
- * 添加活跃点数
- *
- */
-void ActivityMgr::AddPoint(UInt32 v)
-{
-    _item.point += v;
 }
 
 /**
@@ -137,7 +109,16 @@ UInt16 ActivityMgr::GetOneDayRecord(UInt8 day)
 {
     if(day <= 0 || day > SIGNIN_RECORD)
         return 0;
-    return _item.signRecord[day-1];
+    return _item.signRecord[1][day-1];
+}
+
+void ActivityMgr::SetOneDayRecord(UInt8 day, UInt16 score)
+{
+    if(score < 0)
+        return;
+    if(day <= 0 || day > SIGNIN_RECORD)
+        return;
+    _item.signRecord[1][day-1] = score;
 }
 
 /**
@@ -145,26 +126,282 @@ UInt16 ActivityMgr::GetOneDayRecord(UInt8 day)
  */
 void ActivityMgr::UpdateToDB()
 {
+    /*
     std::string strFlag;
-    std::string strSign;
-
     for (UInt32 i = 0; i < AtyMaxFlag; i ++)
     {
          strFlag += Itoa(_item.flag[i]);
          if(i != AtyMaxFlag - 1)
              strFlag += "|";
     }
-    for (UInt32 i = 0; i < SIGNIN_RECORD; i ++)
+    */
+    std::string strSign;
+    for (int i = 0; i < MONTH_COUNT; i ++)
     {
-        strSign += Itoa(_item.signRecord[i]);
-        if(i < SIGNIN_RECORD - 1)
-            strSign += ",";
+        for (int j = 0; j < SIGNIN_RECORD; j ++)
+        {
+            strSign += Itoa(_item.signRecord[i][j]);
+            if(j < SIGNIN_RECORD - 1)
+                strSign += ",";
+        }
+        if(i < MONTH_COUNT - 1)
+            strSign += "|";
     }
 
-    DB().PushUpdateData("REPLACE INTO `activityData` (`playerId`, `overTime`, `awardId`,`point`,`award`, `flags`, `scores`, `propsID`, `signRecord`) VALUES (%"I64_FMT"u, %u, %u, %u, %u, '%s', '%u', '%u', '%s')"  ,
-            this->_owner->getId(), _item.overTime, _item.awardID, _item.point, _item.award, strFlag.c_str(), _item.scores, _item.propsID, strSign.c_str());
+    //DB().PushUpdateData("REPLACE INTO `activityData` (`playerId`, `overTime`, `awardId`,`point`,`award`, `flags`, `scores`, `propsID`, `signRecord`) VALUES (%"I64_FMT"u, %u, %u, %u, %u, '%s', '%u', '%u', '%s')"  ,
+    //        this->_owner->getId(), _item.overTime, _item.awardID, _item.point, _item.award, strFlag.c_str(), _item.scores, _item.propsID, strSign.c_str());
+    DB().PushUpdateData("REPLACE INTO `activityData` (`playerId`, `overTime`, `scores`, `propsID`, `signRecord`) VALUES (%"I64_FMT"u, %u, %u, %u, '%s')"  ,
+            this->_owner->getId(), _item.overTime, _item.scores, _item.propsID, strSign.c_str());
 }
 
+void ActivityMgr::SendActivityInfo()
+{
+    Stream st(REP::ACTIVITY_SIGNIN);
+    st << static_cast<UInt8>(0x03);
+    //刷新活跃度签到积分、待兑换道具id
+    st << static_cast<UInt32>(_item.scores);
+    lua_tinker::table props = GameAction()->GetExchangeProps(_item.propsID);
+    st << static_cast<UInt16>(_item.propsID) << props.get<UInt8>(3) << props.get<UInt16>(2);
+    UInt32 day = 1;
+    UInt32 mon = 1;
+    UInt32 year = 2012;
+    TimeUtil::GetDMY(&day, &mon, &year);
+    UInt8 dayCnt = TimeUtil::GetOneMonthDays();
+    st << static_cast<UInt8>(dayCnt);
+    for(UInt8 i = 0; i < dayCnt; ++i)
+    {
+        st << static_cast<UInt16>(GetOneDayRecord(i + 1));
+        st << GetContinueSignInCnt(i + 1);
+        lua_tinker::table award = GameAction()->GetdayExtraAward(mon, i + 1);
+        UInt8 size = award.size();
+        st << size;
+        for(UInt8 j = 0; j < size; ++j)
+        {
+            lua_tinker::table a = award.get<lua_tinker::table>(j + 1);
+            st << a.get<UInt16>(1) << a.get<UInt8>(2);
+        }
+    }
+    st << Stream::eos;
+    _owner->send(st);
+}
+
+UInt8 ActivityMgr::GetContinueSignInCnt(UInt8 day)
+{   //最多连续签到7天
+    UInt8 cnt = 0;
+    if(day < 7)
+    {
+        for(UInt32 i = day; i > 0; i--)
+        {
+            if(GetOneDayRecord(i) <= 0)
+                break;
+            cnt++;
+        }
+        if(cnt == day)
+        {
+            UInt8 dayCnt = TimeUtil::MonthDay(TimeUtil::Now() - day * 86400);
+            for(UInt8 j = dayCnt; j > dayCnt - 7 + cnt; --j)
+            {
+                if(_item.signRecord[0][j-1] <= 0)
+                    break;
+                cnt++;
+            }
+        }
+    }
+    else
+    {
+        for(UInt32 i = day, j = 0; i > 0 && j < 7; i--, j++)
+        {
+            if(GetOneDayRecord(i) <= 0)
+                break;
+            cnt++;
+        }
+    }
+    return cnt;
+}
+
+//玩家每日签到接口
+void ActivityMgr::ActivitySignIn()
+{
+    UInt32 day = 1;
+    UInt32 mon = 1;
+    UInt32 year = 2012;
+    TimeUtil::GetDMY(&day, &mon, &year);
+    if(GetOneDayRecord(day) > 0)
+        return;
+    lua_tinker::table award = GameAction()->GetdayExtraAward(mon, day);
+    UInt32 size = award.size();
+    if(0 != size)
+    {
+        if(_owner->GetPackage()->GetRestPackageSize() < size)
+        {    //背包预留足够的位子,否则不能签到
+            _owner->sendMsgCode(0, 1011);
+            return;
+        }
+        for(UInt32 i = 0; i < size; ++i)
+        {
+            lua_tinker::table a = award.get<lua_tinker::table>(i + 1);
+            if(499 == a.get<UInt32>(1))  //礼券
+                _owner->getCoupon(a.get<UInt32>(2));
+            else
+                _owner->GetPackage()->Add(a.get<UInt32>(1), a.get<UInt32>(2), true, false, FromDailyActivity);
+        }
+    }
+    UInt16 score = GameAction()->doAtySignIn(_owner);
+    if(World::_wday == 7) //周日双倍
+        score *= 2;
+    SetOneDayRecord(day, score);
+    UInt8 cnt = GetContinueSignInCnt(day);
+    if(cnt == 2)
+        score += 1;
+    if(cnt == 3)
+        score += 2;
+    if(cnt == 4)
+        score += 5;
+    if(cnt == 5)
+        score += 10;
+    if(cnt == 6)
+        score += 15;
+    if(cnt >= 7)
+        score += 20;
+    AddScores(score);
+    UpdateToDB();
+    _owner->activityUdpLog(1025);
+    Stream st(REP::ACTIVITY_SIGNIN);
+    st << static_cast<UInt8>(0x00);
+    st << static_cast<UInt32>(GetScores());
+    st << static_cast<UInt16>(GetOneDayRecord(day));
+    st << cnt << Stream::eos;
+    _owner->send(st);
+}
+
+//刷新待兑换的道具
+void ActivityMgr::RefreshProps()
+{
+    if(!_owner->hasChecked())
+        return;
+    if(_owner->getTael() < 100)
+    {
+        _owner->sendMsgCode(0, 1100);
+        return;
+    }
+    ConsumeInfo ci(DailyActivity, 0, 0);
+    _owner->useTael(100, &ci);
+    UInt32 id = GameAction()->GetExchangePropsID();
+    if(GetPropsID() == id)
+    {
+        switch(id)
+        {
+            case 29:
+                id = 500;
+                break;
+            case 500:
+                id = 29;
+                break;
+            default:
+                id = 29;
+                break;
+        }
+    }
+    SetPropsID(id);
+    UpdateToDB();
+    _owner->activityUdpLog(1026);
+
+    Stream st(REP::ACTIVITY_SIGNIN);
+    st << static_cast<UInt8>(0x01);
+    lua_tinker::table p = GameAction()->GetExchangeProps(id);
+    st << static_cast<UInt16>(id) << p.get<UInt8>(3) << p.get<UInt16>(2);
+    st << Stream::eos;
+    _owner->send(st);
+}
+
+//积分兑换道具
+void ActivityMgr::ExchangeProps()
+{
+    if(!_owner->hasChecked())
+        return;
+    lua_tinker::table props = GameAction()->GetExchangeProps(GetPropsID());
+    if(5 != props.size())
+        return;
+    UInt32 score = props.get<UInt32>(2);
+    if(GetScores() < score)
+        return;
+    if(_owner->GetPackage()->GetRestPackageSize() <= 0)
+    {
+        _owner->sendMsgCode(0, 1011);
+        return;
+    }
+    SubScores(score);
+    _owner->GetPackage()->Add(GetPropsID(), props.get<UInt8>(3), true, false, FromDailyActivity);
+    _owner->activityUdpLog(1027, score);
+    _owner->activityUdpLog(1028, score);
+    //兑换后重新刷新一次
+    UInt32 id = GameAction()->GetExchangePropsID();
+    if(GetPropsID() == id)
+    {
+        switch(id)
+        {
+            case 29:
+                id = 500;
+                break;
+            case 500:
+                id = 29;
+                break;
+            default:
+                id = 29;
+                break;
+        }
+    }
+    SetPropsID(id);
+    UpdateToDB();
+    lua_tinker::table p = GameAction()->GetExchangeProps(id);
+    Stream st(REP::ACTIVITY_SIGNIN);
+    st << static_cast<UInt8>(0x02);
+    st << GetScores() << static_cast<UInt16>(id) << p.get<UInt8>(3) << p.get<UInt16>(2);
+    st << Stream::eos;
+    _owner->send(st);
+}
+
+/*
+UInt32 ActivityMgr::GetRandomReward()
+{
+    UInt32 s = GetOnlineRewardNum();
+    if(s == 0)
+      return 1;
+    UInt32 idx = uRand(s);
+    return idx + 1;
+}
+*/
+/**
+ *  获取标志位
+ *
+UInt8 ActivityMgr::GetFlag(UInt32 idx )
+{
+    if( idx >= AtyMaxFlag)
+        return 0xFF;
+    else
+        return _item.flag[idx];
+}
+ */
+/**
+ *  更新标志位
+void ActivityMgr::UpdateFlag(UInt32 idx,  UInt8 v)
+{
+    if(idx >=  AtyMaxFlag)
+        return ;
+
+    _item.flag[idx] = v;
+}
+ */
+
+/**
+ * 添加活跃点数
+ *
+void ActivityMgr::AddPoint(UInt32 v)
+{
+    _item.point += v;
+}
+ */
+/*
 UInt8 ActivityMgr::GetOnlineRewardGetNum()
 {
     UInt8 cnt = 0;
@@ -219,9 +456,11 @@ UInt32  ActivityMgr::GetOnlineRewardNum()
     }
      return s;
 }
+ */
 /**
  * 改变上线奖励
  */
+/**
 void ActivityMgr::ChangeOnlineReward()
 {
     // XXX: 取消这个功能 yangyoufa@ 01/04/12 14:11:39
@@ -259,9 +498,11 @@ void ActivityMgr::ChangeOnlineReward()
      st<<Stream::eos;
      _owner->send(st);
 }
+ */
 /**
  *  获取奖励
  */
+/**
 void ActivityMgr::GetReward(UInt32 flag)
 {
     CheckTimeOver();
@@ -461,9 +702,11 @@ void ActivityMgr::SendActivityInfo(Stream& s)
 }
 
 static const UInt32 ATY_ONLINE_TIME = 4*60*60;
+ */
 /**
  *  刷新给客户端
  */
+/**
 void ActivityMgr::ActivityList(UInt8 type)
 {
     //自我刷新一下
@@ -499,183 +742,7 @@ void ActivityMgr::ActivityList(UInt8 type)
     st << Stream::eos;
     _owner->send(st);
 }
+ */
 
-void ActivityMgr::SendActivityInfo()
-{
-    Stream st(REP::ACTIVITY_SIGNIN);
-    st << static_cast<UInt8>(0x03);
-    //刷新活跃度签到积分、待兑换道具id
-    st << static_cast<UInt32>(_item.scores);
-    lua_tinker::table props = GameAction()->GetExchangeProps(_item.propsID);
-    st << static_cast<UInt16>(_item.propsID) << props.get<UInt8>(3) << props.get<UInt16>(2);
-    UInt32 day = 1;
-    UInt32 mon = 1;
-    UInt32 year = 2012;
-    TimeUtil::GetDMY(&day, &mon, &year);
-    UInt8 dayCnt = TimeUtil::GetOneMonthDays();
-    st << static_cast<UInt8>(dayCnt);
-    for(UInt8 i = 0; i < dayCnt; ++i)
-    {
-        st << static_cast<UInt16>(GetOneDayRecord(i + 1));
-        lua_tinker::table award = GameAction()->GetdayExtraAward(mon, i + 1);
-        UInt8 size = award.size();
-        st << size;
-        for(UInt8 j = 0; j < size; ++j)
-        {
-            lua_tinker::table a = award.get<lua_tinker::table>(j + 1);
-            st << a.get<UInt16>(1) << a.get<UInt8>(2);
-        }
-    }
-    st << Stream::eos;
-    _owner->send(st);
-}
-
-//玩家每日签到接口
-void ActivityMgr::ActivitySignIn()
-{
-    UInt32 day = 1;
-    UInt32 mon = 1;
-    UInt32 year = 2012;
-    TimeUtil::GetDMY(&day, &mon, &year);
-    if(GetOneDayRecord(day) > 0)
-        return;
-    lua_tinker::table award = GameAction()->GetdayExtraAward(mon, day);
-    UInt32 size = award.size();
-    if(0 != size)
-    {
-        if(_owner->GetPackage()->GetRestPackageSize() < size)
-        {    //背包预留足够的位子,否则不能签到
-            _owner->sendMsgCode(0, 1011);
-            return;
-        }
-        for(UInt32 i = 0; i < size; ++i)
-        {
-            lua_tinker::table a = award.get<lua_tinker::table>(i + 1);
-            if(499 == a.get<UInt32>(1))  //礼券
-                _owner->getCoupon(a.get<UInt32>(2));
-            else
-                _owner->GetPackage()->Add(a.get<UInt32>(1), a.get<UInt32>(2), true, false, FromDailyActivity);
-        }
-    }
-    UInt16 score = GameAction()->doAtySignIn();
-    if(World::_wday == 7) //周日双倍
-        score *= 2;
-    _item.signRecord[day-1] = score;
-    UInt8 cnt = 0;
-    for(UInt32 i = day, j = 0; day > 0 && j < 7; i--, j++)
-    {
-        if(GetOneDayRecord(i) <= 0)
-            break;
-        cnt++;
-    }
-    if(cnt == 2)
-        score += 1;
-    if(cnt == 3)
-        score += 2;
-    if(cnt == 4)
-        score += 5;
-    if(cnt == 5)
-        score += 10;
-    if(cnt == 6)
-        score += 15;
-    if(cnt >= 7)
-        score += 20;
-    AddScores(score);
-    UpdateToDB();
-    _owner->activityUdpLog(1025);
-    Stream st(REP::ACTIVITY_SIGNIN);
-    st << static_cast<UInt8>(0x00);
-    st << static_cast<UInt32>(GetScores());
-    st << static_cast<UInt16>(GetOneDayRecord(day)); 
-    st << Stream::eos;
-    _owner->send(st);
-}
-
-//刷新待兑换的道具
-void ActivityMgr::RefreshProps()
-{
-    if(!_owner->hasChecked())
-        return;
-    if(_owner->getTael() < 100)
-    {
-        _owner->sendMsgCode(0, 1100);
-        return;
-    }
-    ConsumeInfo ci(DailyActivity, 0, 0);
-    _owner->useTael(100, &ci);
-    UInt32 id = GameAction()->GetExchangePropsID();
-    if(GetPropsID() == id)
-    {
-        switch(id)
-        {
-            case 29:
-                id = 500;
-                break;
-            case 500:
-                id = 29;
-                break;
-            default:
-                id = 29;
-                break;
-        }
-    }
-    SetPropsID(id);
-    UpdateToDB();
-    _owner->activityUdpLog(1026);
-
-    Stream st(REP::ACTIVITY_SIGNIN);
-    st << static_cast<UInt8>(0x01);
-    lua_tinker::table p = GameAction()->GetExchangeProps(id);
-    st << static_cast<UInt16>(id) << p.get<UInt8>(3) << p.get<UInt16>(2);
-    st << Stream::eos;
-    _owner->send(st);
-}
-
-//积分兑换道具
-void ActivityMgr::ExchangeProps()
-{
-    if(!_owner->hasChecked())
-        return;
-    lua_tinker::table props = GameAction()->GetExchangeProps(GetPropsID());
-    if(5 != props.size())
-        return;
-    UInt32 score = props.get<UInt32>(2);
-    if(GetScores() < score)
-        return;
-    if(_owner->GetPackage()->GetRestPackageSize() <= 0)
-    {
-        _owner->sendMsgCode(0, 1011);
-        return;
-    }
-    SubScores(score);
-    _owner->GetPackage()->Add(GetPropsID(), props.get<UInt8>(3), true, false, FromDailyActivity);
-    _owner->activityUdpLog(1027, score);
-    _owner->activityUdpLog(1028, score);
-    //兑换后重新刷新一次
-    UInt32 id = GameAction()->GetExchangePropsID();
-    if(GetPropsID() == id)
-    {
-        switch(id)
-        {
-            case 29:
-                id = 500;
-                break;
-            case 500:
-                id = 29;
-                break;
-            default:
-                id = 29;
-                break;
-        }
-    }
-    SetPropsID(id);
-    UpdateToDB();
-    lua_tinker::table p = GameAction()->GetExchangeProps(id);
-    Stream st(REP::ACTIVITY_SIGNIN);
-    st << static_cast<UInt8>(0x02);
-    st << GetScores() << static_cast<UInt16>(id) << p.get<UInt8>(3) << p.get<UInt16>(2);
-    st << Stream::eos;
-    _owner->send(st);
-}
 
 }

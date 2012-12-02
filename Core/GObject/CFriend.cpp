@@ -131,7 +131,7 @@ void CFriend::getAward(UInt8 idx)
 
         if (!m_owner->GetVar(VAR_INVITED))
         {
-            //GameAction()->doAty(m_owner, AtyInvited, 0, 0);
+            GameAction()->doStrong(m_owner, SthInvited, 0, 0);
             m_owner->SetVar(VAR_INVITED, 1);
         }
     }
