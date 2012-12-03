@@ -14,7 +14,7 @@
 namespace GObject
 {
 #ifdef  _DEBUG
-#define JOB_HUNTER_DEBUG
+//#define JOB_HUNTER_DEBUG
 #endif
 
 class Player;

@@ -836,12 +836,14 @@ void JobHunter::OnMove(UInt16 pos, bool isAuto)
     if ((dx + dy) != 1)
     {
         _owner->sendMsgCode(0, 2201, x * 100 + y); // 请移动至相邻的坐标
+        SendMapInfo();
         return;
     }
     MapInfo::iterator it = _mapInfo.find(pos);
     if (it == _mapInfo.end())
     {
         _owner->sendMsgCode(0, 2202, x * 100 + y); // 该地点无法到达
+        SendMapInfo();
         return;
     }
 
@@ -1030,12 +1032,13 @@ bool JobHunter::OnAttackMonster(UInt16 pos, bool isAuto)
         // 被怪物打败
         _posX = _earlyPosX;
         _posY = _earlyPosY;
-        -- type;
+        ++ type;
         _isInAuto = false;
         _isAutoLose = true;
         GObject::EventBase * ev = GObject::eventWrapper.RemoveTimerEvent(_owner, EVENT_JOBHUNTER, _owner->getId());
         if (ev)
             ev->release();
+        SendMapInfo();
     }
 
     if (!isAuto)
@@ -1127,8 +1130,8 @@ void JobHunter::OnGetTreasure(bool isAuto)
         UInt32 itemCount = item.get<UInt32>(2);
         bool   bind = item.get<bool>(3);
         _owner->GetPackage()->AddItem2(itemId, itemCount, true, bind, FromJobHunter);
-        st << static_cast<UInt32>(itemId);
-        st << static_cast<UInt32>(itemCount);
+        st << static_cast<UInt16>(itemId);
+        st << static_cast<UInt16>(itemCount);
     }
     st << Stream::eos;
     _owner->send(st);
@@ -1152,11 +1155,11 @@ bool JobHunter::OnFoundCave(bool isAuto)
         return false;
     if (fighter->getSex())
     {
-        npcId = 9600;
+        npcId = 9601;
     }
     else
     {
-        npcId = 9601;
+        npcId = 9600;
     }
     if (_owner->hasFighter(fighterId))
         fighterId = 0;
@@ -1209,6 +1212,7 @@ bool JobHunter::OnFoundCave(bool isAuto)
         GObject::EventBase * ev = GObject::eventWrapper.RemoveTimerEvent(_owner, EVENT_JOBHUNTER, _owner->getId());
         if (ev)
             ev->release();
+        SendMapInfo();
 
     }
 
@@ -1262,7 +1266,7 @@ bool JobHunter::OnFoundCave(bool isAuto)
         //bool   bind = item.get<bool>(3);
         st2 << static_cast<UInt16>(itemId) << static_cast<UInt16>(itemCount);
         _owner->lastExJobAwardPush(itemId, itemCount);
-        _owner->GetPackage()->Add(itemId, itemCount, true, true, FromNpc);
+        _owner->GetPackage()->Add(itemId, itemCount, true, isAuto? true:false, FromNpc);
     }
     st2 << Stream::eos;
     _owner->send(st2);
@@ -1270,6 +1274,8 @@ bool JobHunter::OnFoundCave(bool isAuto)
     AddToFighterList(static_cast<UInt16>(fighterId));
     if (!isAuto)
         SendGridInfo(POS_TO_INDEX(_posX, _posY));
+    else
+        _owner->checkLastExJobAward();
     return res;
 }
 
@@ -1314,7 +1320,7 @@ void JobHunter::OnAutoStart()
     ConsumeInfo ci(AutoJobHunter,0,0);
     _owner->useGoldOrCoupon(10, &ci);
 
-    EventAutoJobHunter* event = new (std::nothrow) EventAutoJobHunter(_owner, 3, MAX_GRID, _gameProgress);
+    EventAutoJobHunter* event = new (std::nothrow) EventAutoJobHunter(_owner, 20, MAX_GRID, _gameProgress);
     if (!event) 
     {
 #ifdef JOB_HUNTER_DEBUG
@@ -1348,6 +1354,7 @@ void JobHunter::OnAutoStep()
         st << Stream::eos;
         _owner->send(st);
         _isInAuto = false;
+        SendMapInfo();
         return;
     }
     UInt16 nextPos = GetPossibleGrid();
@@ -1374,7 +1381,13 @@ void JobHunter::OnAutoStep()
     if (CheckEnd())
     {
         OnAbort(true);
+        Stream st(REP::AUTOJOBHUNTER);
+        st << static_cast<UInt8>(4);
+        st << Stream::eos;
+        _owner->send(st);
+        _owner->checkLastExJobAward();
     }
+    _owner->checkLastExJobAward();
     DumpMapData();
 }
 
@@ -1395,8 +1408,8 @@ void JobHunter::OnAutoStop()
 
 void JobHunter::OnAutoFinish()
 {
-    // TODO: 立即完成自动战斗
-    if (10 > _owner->getGoldOrCoupon())
+    // 立即完成自动战斗
+    if (20 > _owner->getGoldOrCoupon())
     {
         _owner->sendMsgCode(0, 1101);
         return;
@@ -1408,7 +1421,7 @@ void JobHunter::OnAutoFinish()
     for (UInt8 i = 0; i < MAX_GRID; ++i)
     {
         OnAutoStep();
-        if (_isInAuto)
+        if (!_isInAuto)
             break;
     }
     GObject::EventBase * ev = GObject::eventWrapper.RemoveTimerEvent(_owner, EVENT_JOBHUNTER, _owner->getId());
