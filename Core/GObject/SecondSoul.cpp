@@ -345,7 +345,7 @@ void SecondSoul::sendSoulSkill(Player* pl)
 
 bool SecondSoul::setClass(UInt8 cls)
 {
-    if(cls == 0 || cls == m_cls || cls > 12)
+    if(cls == 0 || cls == m_cls || cls > SOUL_CLS_MAX)
     {
         m_fgt->getOwner()->sendMsgCode(0, 1073);
         return false;

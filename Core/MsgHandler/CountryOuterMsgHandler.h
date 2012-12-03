@@ -58,9 +58,11 @@
 #include "GObject/TownDeamon.h"
 #include "GObject/Arena.h"
 #include "GObject/SingleHeroStage.h"
+#include "GObject/PracticePlace.h"
 
 #include "GObject/Tianjie.h"
 #include "Memcached.h"
+#include "GObject/RechargeTmpl.h"
 
 struct NullReq
 {
@@ -1093,6 +1095,11 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendYBBufInfo(pl->GetVar(VAR_YBBUF), pl->GetVar(VAR_QQVIP_BUF));
     pl->sendAthlBufInfo();
     luckyDraw.notifyDisplay(pl);
+    if (World::getRechargeActive())
+    {
+        GObject::RechargeTmpl::instance().sendStreamInfo(pl);
+        GObject::RechargeTmpl::instance().sendScoreInfo(pl);
+    }
     pl->sendSSToolbarInfo();
 
     if (World::getTrumpEnchRet() || World::get9215Act())
@@ -1570,7 +1577,10 @@ void OnRecruitFighterReq( GameMsgHdr& hdr, RecruitFighterReq& rfr )
 	st << static_cast<UInt8>(id > 0 ? 0 : 1) << rfr._pos << Stream::eos;
 	player->send(st);
 	if (id != 0)
-
+    {   //将新招募的散仙放入修炼位
+        UInt32 fgts[1] = { id };
+        GObject::practicePlace.sitdown(player, fgts, 1);
+    }
     GameAction()->RunOperationTaskAction0(player, 3);
 }
 
@@ -2174,7 +2184,7 @@ void OnDungeonAutoReq( GameMsgHdr& hdr, DungeonAutoReq& dar )
 	if(pl->getThreadId() != WORKER_THREAD_NEUTRAL)
 		return;
 
-	if(pl->GetPackage()->GetRestPackageSize() < 4)
+	if(pl->GetPackage()->GetRestPackageSize() < 10)
 	{
 		pl->sendMsgCode(1, 1014);
 		return;
@@ -2212,7 +2222,7 @@ void OnAutoCopy( GameMsgHdr& hdr, const void* data )
     brd >> type;
     brd >> id;
 
-	if((type == 0 || type == 2) && pl->GetPackage()->GetRestPackageSize() < 4)
+	if((type == 0 || type == 2) && pl->GetPackage()->GetRestPackageSize() < 10)
 	{
 		pl->sendMsgCode(1, 1014);
 		return;
@@ -2247,7 +2257,7 @@ void OnAutoFrontMap( GameMsgHdr& hdr, const void* data )
 	if(!pl->hasChecked())
 		return;
 
-	if(pl->GetPackage()->GetRestPackageSize() < 4)
+	if(pl->GetPackage()->GetRestPackageSize() < 10)
 	{
 		pl->sendMsgCode(1, 1014);
 		return;
@@ -4419,6 +4429,36 @@ void OnActivityReward(  GameMsgHdr& hdr, const void * data)
 
     }
     */
+    MSG_QUERY_PLAYER(player);
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    brd >> type;
+    switch(type )
+    {
+        case 3:
+            if (World::getRechargeActive())
+                player->sendRechargeInfo();
+            break;
+        case 4:
+            if (!World::getRechargeActive())
+                return;
+            UInt32 itemId = 0;
+            brd >> itemId;
+            int n = -1;
+            UInt8 res = GObject::RechargeTmpl::instance().getItem(player, itemId, n);
+            Stream st(REP::ACTIVITY_REWARD);
+            st << static_cast<UInt8>(11);
+            st << res;
+            if ( 0 == res)
+            {
+                st << player->GetVar(VAR_RECHARGE_SCORE) << itemId << n;
+            }
+            st << Stream::eos;
+            player->send(st);
+            break;
+
+    }
+ 
 }
 
 void OnFourCopReq( GameMsgHdr& hdr, const void* data)

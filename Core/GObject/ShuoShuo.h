@@ -53,9 +53,9 @@ enum {
     SS_HM_80            = 42,
     SS_PUBTST_PKG       = 43, // 每天领取完公测剑侠红包分享
     SS_SLLP             = 44, // 生日罗盘分享
-    SS_MO_ADD           = 45,
-    SS_MO_UP            = 46,
-    SS_MO_FIGHT         = 47,
+    SS_MO_HIRE          = 45,
+    SS_MO_STRENGTH      = 46,
+    SS_MO_BATTLE        = 47,
     SS_MO_COPY          = 48,
     SS_MAX
 };

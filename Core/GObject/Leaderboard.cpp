@@ -376,13 +376,17 @@ void Leaderboard::doUpdate()
     }
 
 	std::vector<LeaderboardClanCopy> blist4;
-	execu->ExtractData("select a.id, a.name, b.maxCopyLevel, b.maxCopyTime from clan a, clan_copy b where a.id=b.clanId order by b.maxCopyLevel desc, b.maxCopyTime  asc limit 100;", blist4);
+	execu->ExtractData("select a.id, a.name, b.maxCopyLevel, b.maxCopyTime from clan a, clan_copy b where a.id=b.clanId and b.maxCopyLevel > 0 order by b.maxCopyLevel desc, b.maxCopyTime  asc limit 100;", blist4);
     {
         FastMutex::ScopedLock lk(_cmutex);
         _clancopy.clear();
         _clancopy.insert(_clancopy.end(), blist4.begin(), blist4.end());
 
          _clanCopyInfo.clear(); 
+	    blist.resize(100);
+        if (blist4.size() < 100)
+            blist.resize(blist4.size());
+        _playerClanCopyRank.clear();
         for (UInt32 i = 0; i < blist4.size(); ++i)
         {
             GObject::Clan * clan = GObject::globalClans[blist4[i].id];
@@ -401,7 +405,18 @@ void Leaderboard::doUpdate()
             r.reachTime = blist4[i].time;
 
             _clanCopyInfo.push_back(r);
+
+            //帮派副本排行榜
+            blist[i].id = clan->getId();
+            blist[i].name = leader->getName();
+            blist[i].pf = leader->getPF();
+            blist[i].country = clan->getCountry();
+		    blist[i].lvl = clan->getLev();
+		    blist[i].value = blist4[i].level;
+		    blist[i].clan = clan->getName();
+            _playerClanCopyRank[clan->getId()] = i+1;
         }
+	    buildPacket(_clanCopyStream, 5, 0, blist);
     }
 
 	std::vector<UInt64> ilist;
@@ -655,6 +670,10 @@ bool Leaderboard::getPacket( UInt8 t, Stream*& st, Player* pl)
         st = &_battleStream;
         makeRankStream(st, t, pl);
         break;
+    case 5:
+        st = &_clanCopyStream;
+        makeRankStream(st, t, pl);
+        break;
 	default:
 		return false;
 	}
@@ -778,6 +797,15 @@ int Leaderboard::getMyRank(Player* pl, UInt8 type)
                 rank = iter->second;
             }
             break;
+        case 5:
+           if (NULL != cl)
+           {
+               iter = _playerClanCopyRank.find(cl->getId());
+               if (_playerClanCopyRank.end() != iter)
+                   rank = iter->second;
+           }
+           break;
+      
         default:
             break;
     }

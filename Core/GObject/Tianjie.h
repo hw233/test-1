@@ -62,6 +62,7 @@ namespace GObject
     public:
 		Tianjie();
 		bool Init();
+        void fix999Bug();
         void LoadLastPassed();
 		bool LoadFromDB();
         UInt8 getTjTypeId() {return m_tjTypeId;};

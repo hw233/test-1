@@ -72,6 +72,7 @@
 #include <cmath>
 #include "QixiTmpl.h"
 #include "MsgHandler/Memcached.h"
+#include "RechargeTmpl.h"
 #include "GData/ExpTable.h"
 
 #define NTD_ONLINE_TIME (4*60*60)
@@ -1548,27 +1549,27 @@ namespace GObject
 
     void Player::transformUdpLog(UInt32 id, UInt32 type, UInt32 money1, UInt32 money2, UInt32 money3, UInt32 money4, UInt8 val1)
     {
-        // TODO: 属性转移udp日志
+        // 属性转移udp日志
         char action[64] = "";
         if (type & 0x01)
         {
-            snprintf (action, 64, "F_%d_%d_%d_%d", id, 1, val1, money1);
-            udpLog("transform", action, "", "", "", "", "act", 1);
+            snprintf (action, 64, "F_%d_%d", id, 1);
+            udpLog("transform", action, "", "", "", "", "act", money1);
         }
         if (type & 0x02)
         {
-            snprintf (action, 64, "F_%d_%d_%d", id, 2, money2);
-            udpLog("transform", action, "", "", "", "", "act", 1);
+            snprintf (action, 64, "F_%d_%d_%d", id, 2, val1);
+            udpLog("transform", action, "", "", "", "", "act", money2);
         }
         if (type & 0x08)
         {
-            snprintf (action, 64, "F_%d_%d_%d", id, 8, money3);
-            udpLog("transform", action, "", "", "", "", "act", 1);
+            snprintf (action, 64, "F_%d_%d", id, 8);
+            udpLog("transform", action, "", "", "", "", "act", money3);
         }
         if (type & 0x10)
         {
-            snprintf (action, 64, "F_%d_%d_%d", id, 10, money4);
-            udpLog("transform", action, "", "", "", "", "act", 1);
+            snprintf (action, 64, "F_%d_%d", id, 10);
+            udpLog("transform", action, "", "", "", "", "act", money4);
         }
     }
 
@@ -2527,14 +2528,21 @@ namespace GObject
         fgt->getAttrType1(true);
         fgt->getAttrType2(true);
         fgt->getAttrType3(true);
-        if (fgt->getClass() == 4 && !load)
+
+        if (fgt->getClass() == e_cls_mo)    // XXX: 更新前招募未完全打通穴道
+        //if (fgt->getClass() == e_cls_mo && !load)
         {
             // 70级，关元穴穴道，60级白虎
-            fgt->addExp(GData::expTable.getLevelMin(70));
-            fgt->openSecondSoul(13);
-            fgt->setSoulLevel(60);
+            if (!load)
+            {
+                fgt->addExp(GData::expTable.getLevelMin(70));
+                fgt->openSecondSoul(13);
+                fgt->setSoulLevel(60);
+            }
             for (UInt8 i = 0; i < 11; ++i)
             {
+                fgt->setAcupoints(i, 1, true, true);
+                fgt->setAcupoints(i, 2, true, true);
                 fgt->setAcupoints(i, 3, true, true);
             }
         }
@@ -3639,6 +3647,8 @@ namespace GObject
 			{
 				Battle::BattleFighter * bf = bsim.newFighter(side, lup.pos, lup.fighter);
 				bf->setHP(fullhp ? 0 : lup.fighter->getCurrentHP());
+                if (lup.fighter->getClass() == 4)
+                    OnShuoShuo(SS_MO_BATTLE);
 			}
 			else if(i == 0 && !_fighters.empty())
 			{
@@ -7140,7 +7150,7 @@ namespace GObject
         addRC7DayRecharge(r);
         addRF7DayRecharge(r);
         addRechargeNextRet(r);
-
+        
         if (World::getRechargeActive())
         {
             UInt32 total = GetVar(VAR_RECHARGE_TOTAL);
@@ -7196,6 +7206,12 @@ namespace GObject
 #endif
 
         sendTripodInfo();
+
+        if(World::getRechargeActive())
+        {
+            GObject::RechargeTmpl::instance().addScore(this, GetVar(VAR_RECHARGE_TOTAL)-r, GetVar(VAR_RECHARGE_TOTAL));
+            GObject::RechargeTmpl::instance().sendScoreInfo(this);
+        }
 	}
 
     void Player::addRechargeNextRet(UInt32 r)
@@ -7317,10 +7333,7 @@ namespace GObject
             total = GetVar(VAR_RECHARGE_TOTAL);
         else
             total = GetVar(VAR_RECHARGE_TOTAL3366);
-		Stream st(REP::DAILY_DATA);
-		st << static_cast<UInt8>(12) << total << Stream::eos;
-		send((st));
-
+           
         if (rank && World::getNeedRechargeRank())
         {
             GameMsgHdr hdr(0x1C1, WORKER_THREAD_WORLD, this, sizeof(total));
@@ -10297,7 +10310,7 @@ namespace GObject
             GetPackage()->Add(509, 1, true);
             GetPackage()->Add(50, 1, true);
             GetPackage()->Add(49, 1, true);
-            GetPackage()->Add(1526, 1, true);
+            GetPackage()->Add(133, 1, true);
             GetPackage()->Add(500, 1, true);
             GetPackage()->Add(56, 1, true);
             SetVar(VAR_AWARD_SSTOOLBAR, 1);
@@ -11343,7 +11356,7 @@ namespace GObject
         MailPackage::MailItem item4[4] = {{MailPackage::Coupon,30},{509, 1}, {507, 1},{511,3}};
         MailPackage::MailItem item5[5] = {{MailPackage::Coupon,40},{509, 1}, {507, 1},{5025,1},{512,4}};
         MailPackage::MailItem item6[5] = {{MailPackage::Coupon,40},{509, 1}, {507, 1},{514,5},{515,2}};
-        MailPackage::MailItem item7[6] = {{MailPackage::Coupon,50},{509, 1}, {507, 1},{517,5},{1528,2},{15,5}};
+        MailPackage::MailItem item7[6] = {{MailPackage::Coupon,50},{509, 1}, {507, 1},{517,5},{134,2},{15,5}};
         UInt16 size[7] = {3,4,4,4,5,5,6};
 
         MailPackage::MailItem* item[7] = {item1,item2,item3,item4,item5,item6,item7};
@@ -12111,7 +12124,7 @@ namespace GObject
 
         static UInt16 items[3][4] = {
             {515,509,507,47},
-            {503,1325,1528,516},
+            {503,1325,134,516},
             {8000,551,517,500},
         };
 
@@ -14703,6 +14716,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
             return 6;
         return 0;
     }
+
     UInt8 Player::transformUseMoney(Fighter * fFgt, Fighter * tFgt, UInt8 type)
     {
         UInt32 money = 0;
@@ -14713,57 +14727,81 @@ void EventTlzAuto::notify(bool isBeginAuto)
         UInt8 val1 = 0;
         if (type & 0x01)
         {
-            //int n = abs(fFgt->getLevel()-tFgt->getLevel());
-            //money += n * 1;
              money += 10;
-             money1 = 10;
+             money1 += 10;
         }
         if (type & 0x02)
         {
-            float p= abs(float(fFgt->getPotential()-tFgt->getPotential()));
-            p *= 100;
-            money += (int)(p+0.5) * 5; 
-            if (fFgt->getPotential() >= 1.8)
+            float p = std::max(fFgt->getPotential(), tFgt->getPotential());
+            if (p >= 1.80f)
+            {
+                money += 100;
+                money2 += 100;
                 val1 = 4;
-            else if (fFgt->getPotential() >= 1.5)
+            }
+            else if (p >= 1.50f)
+            {
+                money += 60;
+                money2 += 60;
                 val1 = 3;
-            else if (fFgt->getPotential() >= 1.2)
+            }
+            else if (p >= 1.20f)
+            {
+                money += 30;
+                money2 += 30;
                 val1 = 2;
-            else if (fFgt->getPotential() >= 1.0)
+            }
+            else
+            {
+                money += 10;
+                money2 += 10;
                 val1 = 1;
+            }
 
-            float c = abs(float(fFgt->getCapacity()-tFgt->getCapacity()));
-            c *= 10;
-            money += int(c+0.5)*5;
-            money2 = (int)(p+0.5) * 5 + int(c+0.5)*5;; 
+            float c = std::max(fFgt->getCapacity(),tFgt->getCapacity());
+            if (c >= 9.0f)
+            {
+                money += 100;
+                money2 += 100;
+            }
+            else if (c >= 8.0f)
+            {
+                money += 60;
+                money2 += 60;
+            }
+            else if (c >= 7.0f)
+            {
+                money += 30;
+                money2 += 30;
+            }
+            else
+            {
+                money += 10;
+                money2 += 10;
+            }
         }
-        /*if (type & 0x04)
-        {
-            float n = abs(float(fFgt->getCapacity()-tFgt->getCapacity()));
-            n *= 10;
-            money += int(n+0.5)*20;
-        }*/
         if (type & 0x08)
         {
 
             SecondSoul* fSoul = fFgt->getSecondSoul();
             SecondSoul* tSoul = tFgt->getSecondSoul();
             //元神境界
-            UInt32 f = fSoul->getStateExp();
-            UInt32 t = tSoul->getStateExp();
+            UInt8 f = fSoul->getStateLevel();
+            UInt8 t = tSoul->getStateLevel();
             //元神等级
             UInt8 fPracLev = fSoul->getPracticeLevel();
             UInt8 tPracLev = tSoul->getPracticeLevel();
             //星宿
             UInt8 fXinxiu = fSoul->getXinxiu();
             UInt8 tXinxiu = tSoul->getXinxiu();
-            money += abs(int(f-t))/100*10;
+            money += (std::max(f,t) * 10);
             money += abs(int(fPracLev-tPracLev))*1;
-            money3 =  abs(int(f-t))/100*10 + abs(int(fPracLev-tPracLev))*1;
+            money3 += (std::max(f,t) * 10);
+            money3 += abs(int(fPracLev-tPracLev))*1;
             if (fXinxiu != tXinxiu)
             {
-                money += 10;
-                money3 += 10;
+                money += 50;
+                money3 += 50;
             }
         }
         if (type & 0x10)
@@ -14772,8 +14810,8 @@ void EventTlzAuto::notify(bool isBeginAuto)
             {
                 Int32 f = fFgt->getElixirAttrByOffset(i);
                 Int32 t = tFgt->getElixirAttrByOffset(i);
-                money += abs(int(f-t))*10;
-                money4 = abs(int(f-t))*10;
+                money += abs(int(f-t))*1;
+                money4 += abs(int(f-t))*1;
             }
         }
         //34是测试区
@@ -14787,10 +14825,12 @@ void EventTlzAuto::notify(bool isBeginAuto)
             ConsumeInfo ci(FightTransform,0,0);
             useGold(money, &ci);
         }
-        transformUdpLog(1160, type, money1, money2, money3, money4, val1);
+
+        transformUdpLog(1164, type, money1, money2, money3, money4, val1);
         
         return 0;
     }
+
     UInt8 Player::transformExp(Fighter * fFgt, Fighter * tFgt)
     {
      //   UInt64 exp_70 = GData::expTable.getLevelMin(70);

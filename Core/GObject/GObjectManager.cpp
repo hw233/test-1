@@ -159,7 +159,7 @@ namespace GObject
 		UInt32 maxId;
 		execu->Extract("SELECT max(`mailId`) FROM `mail`", maxId);
 		IDGenerator::gMailOidGenerator.Init(maxId);
-		execu->Extract("SELECT max(`id` & 0xFFFFFF) FROM `clan`", maxId);
+		execu->Extract("SELECT max(`id`) FROM `clan`", maxId);
 		IDGenerator::gClanOidGenerator.Init(maxId);
 		execu->Extract("SELECT max(`id`) FROM `equipment`", maxId);
 		IDGenerator::gItemOidGenerator.Init(maxId);
@@ -1028,7 +1028,7 @@ namespace GObject
         SYSMSG(title, 4029);
         SYSMSGV(content, 4030, enchant, item->getItemEquipData().trumpExp);
 
-        MailPackage::MailItem mitem[2] = {{515,count},{1528,UInt32(0.3f*item->getItemEquipData().trumpExp/1000)}};
+        MailPackage::MailItem mitem[2] = {{515,count},{134,UInt32(0.3f*item->getItemEquipData().trumpExp/1000)}};
         Mail * mail = p->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFD0000/*free*/);
         if (mail)
             mailPackageManager.push(mail->id, mitem, 2, true);
@@ -3887,6 +3887,7 @@ namespace GObject
                     ringHp->hpBase[1] = table_temp2.get<float>(3);
                     ringHp->hpBase[2] = table_temp2.get<float>(4);
                     ringHp->hpBase[3] = table_temp2.get<float>(5);
+                    ringHp->hpBase[4] = table_temp2.get<float>(6);
                 }
             }
 

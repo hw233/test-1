@@ -4340,6 +4340,9 @@ namespace GObject
             fromEquip->getQuality() != toEquip->getQuality())
             return 2;
 
+        if ( toEquip->GetCareer() != 4)
+            return 11;
+
         if (m_Owner->GetVar(VAR_EQUIP_MOVE_COUNT) >= 8)
             return 9;
         res = isCanMove(fromEquip, toEquip, type);
@@ -4357,7 +4360,6 @@ namespace GObject
         if (type & 4)
             res = moveEquipSpirit(fFgt,tFgt,fromEquip, fPos, toEquip, tPos);
 
-        m_Owner->AddVar(VAR_EQUIP_MOVE_COUNT,1);
         return res;
     }
     UInt8 Package::isCanMove(ItemEquip* fromEquip, ItemEquip* toEquip, UInt8 type)
@@ -4427,15 +4429,16 @@ namespace GObject
         }
         if (type & 4)
             money += (fIed.spiritAttr.spLev[0]+fIed.spiritAttr.spLev[1]+fIed.spiritAttr.spLev[2]+fIed.spiritAttr.spLev[3])/1;
-       if(m_Owner->getGold() < money)
+       if(m_Owner->getGold() < money && cfg.serverNum != 34)
 	    {
             m_Owner->sendMsgCode(0, 1101);
             return 3;
         }
-        if (money > 0)
+        if (money > 0 && cfg.serverNum != 34)
         {
             ConsumeInfo ci(MoveEquip,0,0);
             m_Owner->useGold(money, &ci);
+            m_Owner->AddVar(VAR_EQUIP_MOVE_COUNT,1);
         }
         return 0;
     }
@@ -4445,7 +4448,7 @@ namespace GObject
         ItemEquipData& tIed = toEquip->getItemEquipData();
         if ((fromEquip->getClass() >= Item_Weapon && fromEquip->getClass() <= Item_Ring)) 
         {
-            tIed.enchant = fIed.enchant-1;
+            tIed.enchant = fIed.enchant;
             fIed.enchant = 0; 
             ((ItemTrump*)toEquip)->fixSkills();
             ((ItemTrump*)fromEquip)->fixSkills();
