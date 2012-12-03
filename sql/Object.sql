@@ -1787,7 +1787,6 @@ CREATE TABLE `days_rank` (
     UNIQUE KEY `unq` (`player_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-<<<<<<< HEAD
 DROP TABLE IF EXISTS `recharge_item`;
 CREATE TABLE `recharge_item` (               
     `player_id` int(20) NOT NULL DEFAULT '0',  
@@ -1795,7 +1794,6 @@ CREATE TABLE `recharge_item` (
     `num` int(11) DEFAULT NULL,                
     PRIMARY KEY (`player_id`,`item_id`)        
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-=======
 DROP TABLE IF EXISTS `arena_extra_board`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -1825,21 +1823,20 @@ CREATE TABLE `arena_extra_board` (
     PRIMARY KEY (`week`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
->>>>>>> 209825b2b1eb4fc141f1d459e029348d0879989f
 
 DROP TABLE IF EXISTS `job_hunter`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `job_hunter` (
-    `playerId` bigint(20) unsigned NOT NULL, COMMENT '玩家Id'
-    `fighterList` varchar(1024) NOT NULL DEFAULT '', COMMENT '墨家散仙列表'
-    `mapInfo` varchar(1024) NOT NULL DEFAULT '', COMMENT '寻墨地图信息'
-    `progress` tinyint(3) unsigned NOT NULL DEFAULT 0, COMMENT '游戏进程状态'
-    `posX` tinyint(3) unsigned NOT NULL DEFAULT 0, COMMENT 'X坐标值'
-    `posY` tinyint(3) unsigned NOT NULL DEFAULT 0, COMMENT 'Y坐标值'
-    `earlyPosX` tinyint(3) unsigned NOT NULL DEFAULT 0, COMMENT '上一步X坐标值'
-    `earlyPosY` tinyint(3) unsigned NOT NULL DEFAULT 0, COMMENT '上一步Y坐标值'
-    `stepCount` int(10) unsigned NOT NULL DEFAULT 0, COMMENT '已使用步数'
+    `playerId` bigint(20) unsigned NOT NULL COMMENT '玩家Id',
+    `fighterList` varchar(1024) NOT NULL DEFAULT '' COMMENT '墨家散仙列表',
+    `mapInfo` varchar(1024) NOT NULL DEFAULT '' COMMENT '寻墨地图信息',
+    `progress` tinyint(3) unsigned NOT NULL DEFAULT 0 COMMENT '游戏进程状态',
+    `posX` tinyint(3) unsigned NOT NULL DEFAULT 0 COMMENT 'X坐标值',
+    `posY` tinyint(3) unsigned NOT NULL DEFAULT 0 COMMENT 'Y坐标值',
+    `earlyPosX` tinyint(3) unsigned NOT NULL DEFAULT 0 COMMENT '上一步X坐标值',
+    `earlyPosY` tinyint(3) unsigned NOT NULL DEFAULT 0 COMMENT '上一步Y坐标值',
+    `stepCount` int(10) unsigned NOT NULL DEFAULT 0 COMMENT '已使用步数',
     PRIMARY KEY (`playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
