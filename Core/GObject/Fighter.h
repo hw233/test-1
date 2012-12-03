@@ -426,6 +426,7 @@ public:
 
 	UInt32 getHaloTypeId();
 	UInt32 getFashionTypeId();
+    UInt16 getPortrait();
 
 	UInt16 getWeaponAttack();
 	void getArmorDefendAndHP(UInt16& def, UInt16& hp);
@@ -634,7 +635,6 @@ public:
     bool  IsEquipEnchantLev(UInt8 e);
 
     void getAttrExtraEquip(Stream& st);
-    UInt16 getBattlePortrait();
 protected:
 	void rebuildEquipAttr();
 	void rebuildBattlePoint();

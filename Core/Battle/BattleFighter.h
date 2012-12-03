@@ -43,6 +43,7 @@ public:
 	inline UInt8 getColor() { return _fighter->getColor(); }
 	inline float getPotential() { return _fighter->getPotential(); }
     inline UInt32 getBuffData( UInt8 idx, UInt32 now ) { return _fighter->getBuffData(idx, now); }
+    UInt8 getClassAndSex();
 
 	inline UInt16 getExtraStrength() { return _attrExtra.strength; }
 	inline UInt16 getExtraPhysique() { return _attrExtra.physique; }

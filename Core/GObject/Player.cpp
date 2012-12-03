@@ -13409,7 +13409,7 @@ namespace GObject
 
                 st << fgt->getSoulExtraAura();
                 st << fgt->getSoulAuraLeft();
-                st << fgt->getBattlePortrait();
+                st << fgt->getPortrait();
                 fgt->appendElixirAttr2(st);
             }
         }
