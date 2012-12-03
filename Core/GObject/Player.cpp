@@ -14971,7 +14971,6 @@ void EventTlzAuto::notify(bool isBeginAuto)
         }
     }
     
- // namespace GObject
     void Player::ArenaExtraAct(UInt8 type, UInt8 opt)
     {
         UInt32 now = TimeUtil::Now();
@@ -15155,6 +15154,17 @@ void EventTlzAuto::notify(bool isBeginAuto)
                 break;
             }
         }
+    bool Player::hasFighterWithClass(UInt8 cls)
+    {
+        for ( std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
+        {
+            if (it->second->getClass() == cls)
+                return true;
+        }
+        return false;
+        
+    }
 
-    } // namespace GObject
+
+} // namespace GObject
 

@@ -133,6 +133,7 @@ enum MailItemType
     BuChang1530,
     BuChangNewRC7Day,
     NEWJOBHIRE,
+    BuChangMo,
 };
 enum ItemFrom
 {

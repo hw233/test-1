@@ -38,6 +38,7 @@ namespace GObject
         GVAR_DT_TOTALRES_BLUE = 12,
         GVAR_ARENA_EXT_PROCESS = 13,
         GVAR_TJ_TOWN_999_BUG = 14,  //999级天劫关闭时,导致未过天劫但过了锁妖塔等级,领取法宝的BUG
+        GVAR_JOB_MO_PEXP = 15,  // 墨修为补偿
         GVAR_MAX,
     };
 
@@ -67,6 +68,7 @@ namespace GObject
             GREGISTER_VAR(GVAR_OLDRC7DAYBUCHANG, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_ARENA_EXT_PROCESS, GCYCLE_DAY);
             GREGISTER_VAR(GVAR_TJ_TOWN_999_BUG, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_JOB_MO_PEXP, GCYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);
