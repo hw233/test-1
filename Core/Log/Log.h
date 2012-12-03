@@ -87,6 +87,8 @@ enum PurchaseType
     ThanksGivingDay             = 76,
     LogArenaExtraAct            = 77,
     FightTransform              = 78,
+    AutoJobHunter               = 79,
+    AutoJobHunterComplete       = 80,
 };
 
 enum IncomingType
@@ -131,6 +133,7 @@ enum MailItemType
     BuChang1530,
     BuChangNewRC7Day,
     NEWJOBHIRE,
+    BuChangMo,
 };
 enum ItemFrom
 {

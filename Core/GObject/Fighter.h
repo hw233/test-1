@@ -197,6 +197,8 @@ public:
     void getAllAcupointsBits(Stream& st);
     void setAcupoints(std::string& acupoints, bool = true);
 
+    bool setToAcupoints(int idx, bool writedb);
+
     // XXX: 由心法和法宝带出技能，且技能不需要升级
 #if 0
     // 学习技能

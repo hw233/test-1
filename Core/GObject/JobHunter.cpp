@@ -13,6 +13,7 @@
 #include "Map.h"
 #include "GObjectDBExecHelper.h"
 #include "TeamCopy.h"
+#include "ShuoShuo.h"
 #include "Server/SysMsg.h"
 
 //************************************************
@@ -25,7 +26,7 @@ namespace GObject
 JobHunter::JobHunter(Player * player)
     : _owner(player), _spotId(0), _slot1(0), _slot2(0), _slot3(0), _strengthPoint(0),
       _isInGame(false), _gameProgress(PROGRESS_NONE), 
-      _posX(0), _posY(0), _earlyPosX(0), _earlyPosY(0), _stepCount(0)
+      _posX(0), _posY(0), _earlyPosX(0), _earlyPosY(0), _stepCount(0), _isInAuto(false), _isAutoLose(false)
 {
     _nextMoveTime = TimeUtil::Now();
     DB2().PushUpdateData("INSERT IGNORE INTO `job_hunter` (`playerId`) VALUES (%"I64_FMT"u)", player->getId()); 
@@ -33,7 +34,8 @@ JobHunter::JobHunter(Player * player)
 
 JobHunter::JobHunter(Player * player, std::string& fighterList, std::string& mapInfo, UInt8 progress,
         UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY, UInt32 stepCount)
-    : _owner(player), _spotId(0), _gameProgress(progress), _posX(posX), _posY(posY), _earlyPosX(earlyPosX), _earlyPosY(earlyPosY), _stepCount(stepCount)
+    : _owner(player), _spotId(0), _gameProgress(progress), _posX(posX), _posY(posY), _earlyPosX(earlyPosX), _earlyPosY(earlyPosY), _stepCount(stepCount),
+      _isInAuto(false), _isAutoLose(false)
 {
     // 从数据库加载时调用到的构造函数
     LoadFighterList(fighterList);
@@ -395,7 +397,14 @@ void JobHunter::SendMapInfo()
 
 void JobHunter::SendAutoInfo()
 {
-    // TODO: 发送自动探索的信息
+    // 发送自动探索的信息
+    if (_isInAuto)
+    {
+        Stream st(REP::AUTOJOBHUNTER);
+        st << static_cast<UInt8>(0);
+        st << Stream::eos;
+        _owner->send(st);
+    }
 }
 
 void JobHunter::SendGridInfo(UInt16 pos)
@@ -531,7 +540,7 @@ void JobHunter::OnCommand(UInt8 command, UInt8 val, UInt8 val2, bool isAuto /* =
 
 void JobHunter::OnAutoCommand(UInt8 type)
 {
-    // TODO: 自动战斗
+    // 自动战斗
     switch(type)
     {
         case 0:
@@ -827,12 +836,14 @@ void JobHunter::OnMove(UInt16 pos, bool isAuto)
     if ((dx + dy) != 1)
     {
         _owner->sendMsgCode(0, 2201, x * 100 + y); // 请移动至相邻的坐标
+        SendMapInfo();
         return;
     }
     MapInfo::iterator it = _mapInfo.find(pos);
     if (it == _mapInfo.end())
     {
         _owner->sendMsgCode(0, 2202, x * 100 + y); // 该地点无法到达
+        SendMapInfo();
         return;
     }
 
@@ -890,42 +901,10 @@ void JobHunter::OnMove(UInt16 pos, bool isAuto)
 
 void JobHunter::OnJumpWhenAuto(UInt16 pos, UInt32 stepCount)
 {
-    // TODO: 自动战斗直接跳到目标格子
+    // 自动战斗直接跳到目标格子
     MapInfo::iterator it = _mapInfo.find(pos);
     if (it == _mapInfo.end())
         return;
-    // 该格子事件未完成
-    switch ((it->second).gridType & 0x0F)
-    {
-        case GRID_NORMAL:
-            break;
-        case GRID_MONSTER:
-            // 普通怪物，可能被偷袭
-            {
-                UInt8 prob = _rnd(100);
-                if (prob < 50 && (it->second).gridType & UNKNOWN_FLAG)
-                {
-                    // 被偷袭直接开打
-                    OnAttackMonster(pos, true);
-                }
-            }
-            break;
-        case GRID_BOSS:
-            OnAttackMonster(pos, true);
-            break;
-        case GRID_TREASURE:
-            OnGetTreasure(true);
-            break;
-        case GRID_TRAP:
-            break;
-        case GRID_LENGEND:
-            break;
-        case GRID_CAVE:
-            OnFoundCave(true);
-            break;
-        default:
-            break;
-    }
     (it->second).gridType &= ~UNKNOWN_FLAG;
 
     _earlyPosX = _posX;
@@ -937,9 +916,53 @@ void JobHunter::OnJumpWhenAuto(UInt16 pos, UInt32 stepCount)
     _posX = x;
     _posY = y;
     _stepCount += stepCount;
+
+    // 该格子事件未完成
+    switch ((it->second).gridType & 0x0F)
+    {
+        case GRID_NORMAL:
+            break;
+        case GRID_MONSTER:
+            // 普通怪物，可能被偷袭
+            {
+                OnAttackMonster(pos, true);
+            }
+#ifdef JOB_HUNTER_DEBUG
+            std::cout << "tick monster" << std::endl;
+#endif
+            break;
+        case GRID_BOSS:
+            OnAttackMonster(pos, true);
+#ifdef JOB_HUNTER_DEBUG
+            std::cout << "tick boss" << std::endl;
+#endif
+            break;
+        case GRID_TREASURE:
+            OnGetTreasure(true);
+#ifdef JOB_HUNTER_DEBUG
+            std::cout << "tick treasure" << std::endl;
+#endif
+            break;
+        case GRID_TRAP:
+            break;
+        case GRID_LENGEND:
+            break;
+        case GRID_CAVE:
+            OnFoundCave(true);
+#ifdef JOB_HUNTER_DEBUG
+            std::cout << "tick cave" << std::endl;
+#endif
+            break;
+        default:
+            break;
+    }
+#ifdef JOB_HUNTER_DEBUG
+    std::cout << "tick gridType = " << (UInt32) (it->second).gridType <<std::endl;
+#endif
     if (CheckEnd())
     {
         Stream st(REP::AUTOJOBHUNTER);
+        st << static_cast<UInt8>(4);
         st << Stream::eos;
         _owner->send(st);
     }
@@ -1009,7 +1032,13 @@ bool JobHunter::OnAttackMonster(UInt16 pos, bool isAuto)
         // 被怪物打败
         _posX = _earlyPosX;
         _posY = _earlyPosY;
-        -- type;
+        ++ type;
+        _isInAuto = false;
+        _isAutoLose = true;
+        GObject::EventBase * ev = GObject::eventWrapper.RemoveTimerEvent(_owner, EVENT_JOBHUNTER, _owner->getId());
+        if (ev)
+            ev->release();
+        SendMapInfo();
     }
 
     if (!isAuto)
@@ -1031,6 +1060,7 @@ bool JobHunter::OnAttackMonster(UInt16 pos, bool isAuto)
     {
         Stream st(REP::AUTOJOBHUNTER);
         st << type;
+        st << static_cast<UInt32>(npcId);
         UInt8 sz = _owner->_lastLoot.size();
         st << sz;
         for(UInt8 i = 0; i < sz; ++ i)
@@ -1100,8 +1130,8 @@ void JobHunter::OnGetTreasure(bool isAuto)
         UInt32 itemCount = item.get<UInt32>(2);
         bool   bind = item.get<bool>(3);
         _owner->GetPackage()->AddItem2(itemId, itemCount, true, bind, FromJobHunter);
-        st << static_cast<UInt32>(itemId);
-        st << static_cast<UInt32>(itemCount);
+        st << static_cast<UInt16>(itemId);
+        st << static_cast<UInt16>(itemCount);
     }
     st << Stream::eos;
     _owner->send(st);
@@ -1125,11 +1155,11 @@ bool JobHunter::OnFoundCave(bool isAuto)
         return false;
     if (fighter->getSex())
     {
-        npcId = 9600;
+        npcId = 9601;
     }
     else
     {
-        npcId = 9601;
+        npcId = 9600;
     }
     if (_owner->hasFighter(fighterId))
         fighterId = 0;
@@ -1177,6 +1207,13 @@ bool JobHunter::OnFoundCave(bool isAuto)
         // 被怪物打败
         _posX = _earlyPosX;
         _posY = _earlyPosY;
+        _isInAuto = false;
+        _isAutoLose = true;
+        GObject::EventBase * ev = GObject::eventWrapper.RemoveTimerEvent(_owner, EVENT_JOBHUNTER, _owner->getId());
+        if (ev)
+            ev->release();
+        SendMapInfo();
+
     }
 
     Stream st(REP::ATTACK_NPC);
@@ -1229,7 +1266,7 @@ bool JobHunter::OnFoundCave(bool isAuto)
         //bool   bind = item.get<bool>(3);
         st2 << static_cast<UInt16>(itemId) << static_cast<UInt16>(itemCount);
         _owner->lastExJobAwardPush(itemId, itemCount);
-        _owner->GetPackage()->Add(itemId, itemCount, true, true, FromNpc);
+        _owner->GetPackage()->Add(itemId, itemCount, true, isAuto? true:false, FromNpc);
     }
     st2 << Stream::eos;
     _owner->send(st2);
@@ -1237,10 +1274,12 @@ bool JobHunter::OnFoundCave(bool isAuto)
     AddToFighterList(static_cast<UInt16>(fighterId));
     if (!isAuto)
         SendGridInfo(POS_TO_INDEX(_posX, _posY));
+    else
+        _owner->checkLastExJobAward();
     return res;
 }
 
-void JobHunter::OnAbort(bool isAuto)
+void JobHunter::OnAbort(bool isAuto /* = false */)
 {
     // 主动放弃
     _gameProgress = PROGRESS_NONE;
@@ -1250,6 +1289,7 @@ void JobHunter::OnAbort(bool isAuto)
     _mapInfo.clear();
     _isInGame = false;
     _spotId = 0;
+    _isInAuto = false;
     _owner->SetVar(VAR_JOB_HUNTER_SPOT_ID, _spotId);
     _nextMoveTime = TimeUtil::Now();
     DB2().PushUpdateData("UPDATE `job_hunter` SET `progress` = '%u', `mapInfo` = '', `posX` = %u, `posY` = %u, `earlyPosX` = %u, `earlyPosY` = %u, `stepCount` = %u  WHERE `playerId` = %"I64_FMT"u", 
@@ -1265,22 +1305,66 @@ void JobHunter::OnLeaveGame(UInt16 spotId)
         //_isInGame = false;
         SendGameInfo(2);
     }
+    OnAutoStop();
 }
 
 void JobHunter::OnAutoStart()
 {
-    // TODO: 开始自动战斗
-    EventAutoJobHunter* event = new (std::nothrow) EventAutoJobHunter(_owner, 10, MAX_GRID, _gameProgress);
-    if (!event) return;
+    // 开始自动战斗
+    if (10 > _owner->getGoldOrCoupon())
+    {
+        _owner->sendMsgCode(0, 1101);
+        return;
+    }
+
+    ConsumeInfo ci(AutoJobHunter,0,0);
+    _owner->useGoldOrCoupon(10, &ci);
+
+    EventAutoJobHunter* event = new (std::nothrow) EventAutoJobHunter(_owner, 20, MAX_GRID, _gameProgress);
+    if (!event) 
+    {
+#ifdef JOB_HUNTER_DEBUG
+        std::cout << "create error." << std::endl;
+#endif
+        return;
+    }
     PushTimerEvent(event);
+#ifdef JOB_HUNTER_DEBUG
+    std::cout << "create success." << std::endl;
+#endif
+    Stream st(REP::AUTOJOBHUNTER);
+    st << static_cast<UInt8>(0);
+    st << Stream::eos;
+    _owner->send(st);
+    _isInAuto = true;
+    _isAutoLose = false;
 }
 
 void JobHunter::OnAutoStep()
 {
-    // TODO: 自动战斗中单步操作
-    UInt16 nextPos = GetPossibleGrid();
-    if (!nextPos)
+    // 自动战斗中单步操作
+    if (_isInAuto == false)
         return;
+    if (_isAutoLose == true)
+        return;
+    if (_owner->GetPackage()->GetRestPackageSize() < 3)
+    {
+        Stream st(REP::AUTOJOBHUNTER);
+        st << static_cast<UInt8>(5);
+        st << Stream::eos;
+        _owner->send(st);
+        _isInAuto = false;
+        SendMapInfo();
+        return;
+    }
+    UInt16 nextPos = GetPossibleGrid();
+    if (nextPos == 0xffff)
+    {
+#ifdef JOB_HUNTER_DEBUG
+        std::cout << "tick0" << std::endl;
+#endif
+        return;
+    }
     UInt8 x = 0;
     UInt8 y = 0;
     INDEX_TO_POS(nextPos, x, y);
@@ -1294,17 +1378,55 @@ void JobHunter::OnAutoStep()
     else
         steps += _posY - y;
     OnJumpWhenAuto(nextPos, steps);
+    if (CheckEnd())
+    {
+        OnAbort(true);
+        Stream st(REP::AUTOJOBHUNTER);
+        st << static_cast<UInt8>(4);
+        st << Stream::eos;
+        _owner->send(st);
+        _owner->checkLastExJobAward();
+    }
+    _owner->checkLastExJobAward();
+    DumpMapData();
 }
 
 void JobHunter::OnAutoStop()
 {
-    // TODO: 停止自动战斗
-    PopTimerEvent(_owner,  EVENT_JOBHUNTER, _gameProgress);
+    // 停止自动战斗
+	GObject::EventBase * ev = GObject::eventWrapper.RemoveTimerEvent(_owner, EVENT_JOBHUNTER, _owner->getId());
+	if(ev == NULL)
+		return;
+	ev->release();
+    Stream st(REP::AUTOJOBHUNTER);
+    st << static_cast<UInt8>(1);
+    st << Stream::eos;
+    _owner->send(st);
+    _isInAuto = false;
+    SendMapInfo();
 }
 
 void JobHunter::OnAutoFinish()
 {
-    // TODO: 立即完成自动战斗
+    // 立即完成自动战斗
+    if (20 > _owner->getGoldOrCoupon())
+    {
+        _owner->sendMsgCode(0, 1101);
+        return;
+    }
+
+    ConsumeInfo ci(AutoJobHunterComplete,0,0);
+    _owner->useGoldOrCoupon(20, &ci);
+
+    for (UInt8 i = 0; i < MAX_GRID; ++i)
+    {
+        OnAutoStep();
+        if (!_isInAuto)
+            break;
+    }
+    GObject::EventBase * ev = GObject::eventWrapper.RemoveTimerEvent(_owner, EVENT_JOBHUNTER, _owner->getId());
+    if (ev)
+        ev->release();
 }
 
 UInt16 JobHunter::GetPossibleGrid()
@@ -1323,6 +1445,10 @@ UInt16 JobHunter::GetPossibleGrid()
             MapInfo::iterator it2 = _mapInfo.find(pos);
             if (it2 != _mapInfo.end() && ((it2->second).gridType & CLEAR_FLAG))
             {
+#ifdef JOB_HUNTER_DEBUG
+                std::cout << "x = " << (UInt32) (x) << ". y = " << (UInt32) (y) << "." << std::endl;
+                std::cout << "Grid type = " << (UInt32) (it->second).gridType << "." << std::endl;
+#endif
                 return it->first;
             }
         }
@@ -1332,6 +1458,10 @@ UInt16 JobHunter::GetPossibleGrid()
             MapInfo::iterator it2 = _mapInfo.find(pos);
             if (it2 != _mapInfo.end() && ((it2->second).gridType & CLEAR_FLAG))
             {
+#ifdef JOB_HUNTER_DEBUG
+                std::cout << "x = " << (UInt32) (x) << ". y = " << (UInt32) (y) << "." << std::endl;
+                std::cout << "Grid type = " << (UInt32) (it->second).gridType << "." << std::endl;
+#endif
                 return it->first;
             }
         }
@@ -1341,6 +1471,10 @@ UInt16 JobHunter::GetPossibleGrid()
             MapInfo::iterator it2 = _mapInfo.find(pos);
             if (it2 != _mapInfo.end() && ((it2->second).gridType & CLEAR_FLAG))
             {
+#ifdef JOB_HUNTER_DEBUG
+                std::cout << "x = " << (UInt32) (x) << ". y = " << (UInt32) (y) << "." << std::endl;
+                std::cout << "Grid type = " << (UInt32) (it->second).gridType << "." << std::endl;
+#endif
                 return it->first;
             }
         }
@@ -1350,11 +1484,15 @@ UInt16 JobHunter::GetPossibleGrid()
             MapInfo::iterator it2 = _mapInfo.find(pos);
             if (it2 != _mapInfo.end() && ((it2->second).gridType & CLEAR_FLAG))
             {
+#ifdef JOB_HUNTER_DEBUG
+                std::cout << "x = " << (UInt32) (x) << ". y = " << (UInt32) (y) << "." << std::endl;
+                std::cout << "Grid type = " << (UInt32) (it->second).gridType << "." << std::endl;
+#endif
                 return it->first;
             }
         }
     }
-    return 0;
+    return 0xffff;
 }
 
 bool JobHunter::CheckEnd()
@@ -1367,6 +1505,8 @@ bool JobHunter::CheckEnd()
     }
     _owner->OnShuoShuo(SS_MO_COPY);
     _owner->udpLog("jobHunter", "F_1163", "", "", "", "", "act");
+    if (!_owner->GetShuoShuo()->getShuoShuo(SS_MO_COPY))
+        _owner->OnShuoShuo(SS_MO_COPY);
     return true;
 }
 

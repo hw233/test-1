@@ -2431,6 +2431,58 @@ bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb, bool init )
     return false;
 }
 
+// XXX: 穴道 id (0-14) lvl [1-3]
+bool Fighter::setToAcupoints(int idx, bool writedb)
+{
+    for (UInt8 i = 0; i < idx; ++i)
+    {
+        for (UInt8 v = 1; v <= 3; ++v)
+        {
+            UInt8 vMax =  getAcupointsCntMax();
+            if (i >= 0  && i < ACUPOINTS_MAX && v <= vMax)
+            {
+                if (_acupoints[i] >= v)
+                    return false;
+
+                const GData::AcuPra* pap = GData::acupraManager[i<<8|v];
+                if (!pap)
+                    return false;
+
+                if (pap->needlvl > getLevel())
+                    return false;
+
+                _acupoints[i] = v;
+                if (_acupoints[i] < 3)
+                    ++_praadd; // 第3层不加
+
+                if (_owner && writedb)
+                    _owner->OnHeroMemo(MC_CITTA, MD_STARTED, 1, 0);
+                if (_owner && writedb && i == 1 && _acupoints[i] == 3)
+                    _owner->OnHeroMemo(MC_CITTA, MD_STARTED, 1, 1);
+                if (_owner && writedb && i == 2 && _acupoints[i] == 3)
+                    _owner->OnHeroMemo(MC_CITTA, MD_STARTED, 1, 2);
+
+                soulMax += pap->soulmax;
+
+                //增加元神力后 查看成就
+                GameAction()->doAttainment(this->_owner, Script::AddSoulMax , soulMax);
+                _pexpMax += pap->pramax;
+                _cittaslot += pap->citslot;
+
+                _attrDirty = true;
+                _bPDirty = true;
+                sendModificationAcupoints(0x29, i, writedb);
+                sendModification(7, _pexpMax);
+                sendModification(9, getMaxSoul() );
+                sendModification(0x32, getUpCittasMax());
+                if(v ==vMax )
+                    GameAction()->doAttainment(this->_owner, Script::AddAcupoint, i); //增加穴道的成就
+            }
+        }
+    }
+    return true;
+}
+
 bool Fighter::incAcupointsBit( int idx, bool writedb )
 {
     if (idx >= 0 && idx < ACUPOINTS_MAX)
