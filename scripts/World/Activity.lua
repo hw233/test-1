@@ -969,6 +969,7 @@ function initActTime(y, m, d)
   local  SerStartTm219 = { ['year'] = 2012, ['month'] = 11, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm219_1 = { ['year'] = 2012, ['month'] = 12, ['day'] = 26, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
+  --300-399越南版用了
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
 
