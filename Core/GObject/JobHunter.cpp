@@ -899,7 +899,7 @@ void JobHunter::OnMove(UInt16 pos, bool isAuto)
 
 void JobHunter::OnJumpWhenAuto(UInt16 pos, UInt32 stepCount)
 {
-    // TODO: 自动战斗直接跳到目标格子
+    // 自动战斗直接跳到目标格子
     MapInfo::iterator it = _mapInfo.find(pos);
     if (it == _mapInfo.end())
         return;
@@ -1299,11 +1299,21 @@ void JobHunter::OnLeaveGame(UInt16 spotId)
         //_isInGame = false;
         SendGameInfo(2);
     }
+    OnAutoStop();
 }
 
 void JobHunter::OnAutoStart()
 {
     // 开始自动战斗
+    if (10 > _owner->getGoldOrCoupon())
+    {
+        _owner->sendMsgCode(0, 1101);
+        return;
+    }
+
+    ConsumeInfo ci(AutoJobHunter,0,0);
+    _owner->useGoldOrCoupon(10, &ci);
+
     EventAutoJobHunter* event = new (std::nothrow) EventAutoJobHunter(_owner, 3, MAX_GRID, _gameProgress);
     if (!event) 
     {
@@ -1314,7 +1324,7 @@ void JobHunter::OnAutoStart()
     }
     PushTimerEvent(event);
 #ifdef JOB_HUNTER_DEBUG
-        std::cout << "create success." << std::endl;
+    std::cout << "create success." << std::endl;
 #endif
     Stream st(REP::AUTOJOBHUNTER);
     st << static_cast<UInt8>(0);
@@ -1322,7 +1332,6 @@ void JobHunter::OnAutoStart()
     _owner->send(st);
     _isInAuto = true;
     _isAutoLose = false;
-
 }
 
 void JobHunter::OnAutoStep()
@@ -1387,12 +1396,24 @@ void JobHunter::OnAutoStop()
 void JobHunter::OnAutoFinish()
 {
     // TODO: 立即完成自动战斗
+    if (10 > _owner->getGoldOrCoupon())
+    {
+        _owner->sendMsgCode(0, 1101);
+        return;
+    }
+
+    ConsumeInfo ci(AutoJobHunterComplete,0,0);
+    _owner->useGoldOrCoupon(20, &ci);
+
     for (UInt8 i = 0; i < MAX_GRID; ++i)
     {
         OnAutoStep();
         if (_isInAuto)
             break;
     }
+    GObject::EventBase * ev = GObject::eventWrapper.RemoveTimerEvent(_owner, EVENT_JOBHUNTER, _owner->getId());
+    if (ev)
+        ev->release();
 }
 
 UInt16 JobHunter::GetPossibleGrid()
