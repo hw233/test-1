@@ -532,7 +532,7 @@ namespace GObject
 		GameMsgHdr hdr(0x2A1, m_Player->getThreadId(), m_Player, sizeof(id));
 		GLOBAL().PushMsg(hdr, &id);
         if (!leftCount)
-			PopTimerEvent(m_Player, EVENT_AUTOCOPY, m_Player->getId());
+			PopTimerEvent(m_Player, EVENT_JOBHUNTER, m_Player->getId());
     }
 
     bool EventAutoJobHunter::Accelerate(UInt32 times)
@@ -2164,6 +2164,7 @@ namespace GObject
             _lastAthAward.clear();
         }
         sendDeamonAwardsInfo();
+        checkLastExJobAward();
 
 		if(update)
 		{
@@ -2528,23 +2529,14 @@ namespace GObject
         fgt->getAttrType2(true);
         fgt->getAttrType3(true);
 
-        if (fgt->getClass() == e_cls_mo)    // XXX: 更新前招募未完全打通穴道
-        //if (fgt->getClass() == e_cls_mo && !load)
+        //if (fgt->getClass() == e_cls_mo)    // XXX: 更新前招募未完全打通穴道
+        if (fgt->getClass() == e_cls_mo && !load)
         {
             // 70级，关元穴穴道，60级白虎
-            if (!load)
-            {
-                fgt->addExp(GData::expTable.getLevelMin(70));
-                fgt->openSecondSoul(13);
-                fgt->setSoulLevel(60);
-            }
-            for (UInt8 i = 0; i < 11; ++i)
-            {
-                fgt->setAcupoints(i, 1, true, true);
-                fgt->setAcupoints(i, 2, true, true);
-                fgt->setAcupoints(i, 3, true, true);
-            }
-
+            fgt->addExp(GData::expTable.getLevelMin(70));
+            fgt->openSecondSoul(13);
+            fgt->setSoulLevel(60);
+            fgt->setToAcupoints(11, true);
         }
     }
 
@@ -14979,7 +14971,6 @@ void EventTlzAuto::notify(bool isBeginAuto)
         }
     }
     
- // namespace GObject
     void Player::ArenaExtraAct(UInt8 type, UInt8 opt)
     {
         UInt32 now = TimeUtil::Now();
@@ -15163,6 +15154,17 @@ void EventTlzAuto::notify(bool isBeginAuto)
                 break;
             }
         }
+    bool Player::hasFighterWithClass(UInt8 cls)
+    {
+        for ( std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
+        {
+            if (it->second->getClass() == cls)
+                return true;
+        }
+        return false;
+        
+    }
 
-    } // namespace GObject
+
+} // namespace GObject
 

@@ -1946,6 +1946,9 @@ namespace GObject
         void sendAutoJobHunter();
     private:
         JobHunter * _jobHunter;
+
+    public:
+        bool hasFighterWithClass(UInt8 cls);
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n
