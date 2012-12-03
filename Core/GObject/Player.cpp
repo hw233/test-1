@@ -2529,22 +2529,14 @@ namespace GObject
         fgt->getAttrType2(true);
         fgt->getAttrType3(true);
 
-        if (fgt->getClass() == e_cls_mo)    // XXX: 更新前招募未完全打通穴道
-        //if (fgt->getClass() == e_cls_mo && !load)
+        //if (fgt->getClass() == e_cls_mo)    // XXX: 更新前招募未完全打通穴道
+        if (fgt->getClass() == e_cls_mo && !load)
         {
             // 70级，关元穴穴道，60级白虎
-            if (!load)
-            {
-                fgt->addExp(GData::expTable.getLevelMin(70));
-                fgt->openSecondSoul(13);
-                fgt->setSoulLevel(60);
-            }
-            for (UInt8 i = 0; i < 11; ++i)
-            {
-                fgt->setAcupoints(i, 1, true, true);
-                fgt->setAcupoints(i, 2, true, true);
-                fgt->setAcupoints(i, 3, true, true);
-            }
+            fgt->addExp(GData::expTable.getLevelMin(70));
+            fgt->openSecondSoul(13);
+            fgt->setSoulLevel(60);
+            fgt->setToAcupoints(11, true);
         }
     }
 
