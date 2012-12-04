@@ -10643,13 +10643,13 @@ namespace GObject
                 udpLog("huodong", "F_10000_15", "", "", "", "", "act");
             }
         }
-        if(opt == 1) //付费领取(20仙石)
+        if(opt == 1) //付费领取(30仙石)
         {
             if(!hasChecked())
                 return;
             if(GetVar(VAR_TGDT) & 0x02)
                 return;
-			if (getGold() < 20)
+			if (getGold() < 30)
 			{
 				sendMsgCode(0, 1104);
 				return;
@@ -10659,7 +10659,7 @@ namespace GObject
                 UInt32 var = GetVar(VAR_TGDT) | 0x02;
                 SetVar(VAR_TGDT, var);
                 ConsumeInfo ci(ThanksGivingDay, 0, 0);
-                useGold(20, &ci);
+                useGold(30, &ci);
                 Stream st(REP::GETAWARD);
                 st << static_cast<UInt8>(15) << static_cast<UInt8>(1) << Stream::eos;
                 send(st);
