@@ -1372,7 +1372,13 @@ namespace Script
 		assert(player != NULL);
 		return Call<UInt32>("GetBDSupermanPrice", player, itemId, isUsed);
     }
-    
+
+    bool GameActionLua::onFirstRecharge(Player* player, UInt8 index)
+    {
+		assert(player != NULL);
+		return Call<UInt32>("onFirstRecharge", player, index);
+    }
+
     void GameActionLua::doStrong(Player* pl, UInt8 id, UInt32 param1, UInt32 param2)
     {
 		assert(pl != NULL);

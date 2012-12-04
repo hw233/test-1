@@ -7212,6 +7212,9 @@ namespace GObject
             GObject::RechargeTmpl::instance().addScore(this, GetVar(VAR_RECHARGE_TOTAL)-r, GetVar(VAR_RECHARGE_TOTAL));
             GObject::RechargeTmpl::instance().sendScoreInfo(this);
         }
+
+        AddVar(VAR_FIRST_RECHARGE_VALUE, r);
+        sendFirstRecharge();
 	}
 
     void Player::addRechargeNextRet(UInt32 r)
@@ -15163,6 +15166,91 @@ void EventTlzAuto::notify(bool isBeginAuto)
                 break;
             }
         }
+
+    static UInt32 newRecharge[] = {10, 88, 188, 588};
+    void Player::FirstRechargeAct(UInt8 step, UInt8 type, UInt8 career)
+    {
+        if(step == 0 || step > 4)
+            return;
+        if(type > 1)
+            return;
+        if(career == 0 || career > 3)
+            return;
+        UInt32 curStep = GetVar(VAR_FIRST_RECHARGE_STEP);
+        /*
+         * bit 1: 10XS
+         * bit 2: 88XS
+         * bit 3: 188XS
+         * bit 4: 588XS
+         */
+        if(curStep & (1 << (step-1)))
+            return;
+        UInt8 index;
+        if(step == 1)
+            index = 1 + type;
+        else
+            index = 1 + career * 2 + type;
+        UInt32 goldNum = 0;
+        if(type == 1)
+        {
+            if(step == 1)
+                goldNum = 10;
+            else
+                goldNum = 50;
+            if(getGold() < goldNum)
+            {
+                sendMsgCode(2, 1104, 0);
+                return;
+            }
+        }
+
+        bool bRet = GameAction()->onFirstRecharge(this, index);
+        if(bRet)
+        {
+            if(goldNum > 0)
+                useGold(goldNum);
+            ConsumeInfo ci(EnumFirstRecharge, 0, 0);
+            useGold(goldNum, &ci);
+            curStep |= (1 << (step-1));
+            SetVar(VAR_FIRST_RECHARGE_STEP, curStep);
+            sendFirstRecharge();
+        }
+    }
+
+    void Player::sendFirstRecharge()
+    {
+        UInt32 lostValue = 0;
+        UInt8 lostStep = 4;
+        UInt8 canStep = 4;
+        //之前充过
+        if(_playerData.totalRecharge > GetVar(VAR_FIRST_RECHARGE_VALUE))
+        {
+            lostValue = _playerData.totalRecharge - GetVar(VAR_FIRST_RECHARGE_VALUE);
+        }
+        while(lostStep > 0)
+        {
+            if(newRecharge[lostStep - 1] <= lostValue)
+                break;
+            --lostStep;
+        }
+
+        while(canStep > 0)
+        {
+            if(newRecharge[canStep - 1] <= _playerData.totalRecharge)
+                break;
+            --canStep;
+        }
+
+        UInt8 index;
+        for(index = canStep; index >= lostStep + 1; --index)
+        {
+            if(GetVar(VAR_FIRST_RECHARGE_STEP)&(1 << (index-1)))
+                break;
+        }
+        Stream st(REP::COUNTRY_ACT);
+        st << static_cast<UInt8>(0x03) << index << Stream::eos;
+        send(st);
+    }
 
     } // namespace GObject
 

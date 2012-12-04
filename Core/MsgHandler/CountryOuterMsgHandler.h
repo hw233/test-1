@@ -1217,6 +1217,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendYearRPInfo();
     //if(World::getYearActive())
     //    pl->sendYearActInfo();
+    pl->sendFirstRecharge();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -1763,6 +1764,19 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
         default:
         break;
     }
+}
+
+void OnFirstRechargeActReq( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 step = 0;
+    UInt8 type;
+    UInt8 career;
+    br >> step;
+    br >> type;
+    br >> career;
+    player->FirstRechargeAct(step, type, career);
 }
 
 void OnEnchantReq( GameMsgHdr& hdr, EnchantReq& er )

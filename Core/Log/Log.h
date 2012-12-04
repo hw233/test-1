@@ -87,6 +87,7 @@ enum PurchaseType
     ThanksGivingDay             = 76,
     LogArenaExtraAct            = 77,
     FightTransform              = 78,
+    EnumFirstRecharge           = 79,
 };
 
 enum IncomingType
