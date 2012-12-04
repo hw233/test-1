@@ -65,6 +65,7 @@ namespace GObject
         void clear();
         void addItem(UInt32 id, UInt32 score, int num);
         void addScore(Player* pl, UInt32 oldRecharge, UInt32 newRecharge);
+        void addScore(Player* pl, UInt32 s);
         void sendStreamInfo(Player* pl);
         void sendScoreInfo(Player* pl);
 

@@ -99,6 +99,10 @@ namespace GObject
         }
         pl->AddVar(VAR_RECHARGE_SCORE, s);
     }
+    void RechargeTmpl::addScore(Player* pl, UInt32 s)
+    {
+        pl->AddVar(VAR_RECHARGE_SCORE, s);
+    }
     void RechargeTmpl::sendStreamInfo(Player* pl)
     {
         Stream st(REP::ACTIVITY_REWARD);
@@ -172,6 +176,10 @@ namespace GObject
         pl->GetPackage()->Add(itemId, 1, true); 
         s -= pItem->score;
         pl->SetVar(VAR_RECHARGE_SCORE, s);
+
+        char str[32] = {0};
+        sprintf(str, "F_10000_1201_%d", itemId);
+        pl->udpLog("huodong", str, "", "", "", "", "act");
         return 0;
     }
     int RechargeTmpl::findNum(Player* pl, UInt32 itemId, int maxNum)

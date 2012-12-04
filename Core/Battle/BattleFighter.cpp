@@ -838,10 +838,72 @@ UInt32 BattleFighter::regenHP( UInt32 u, bool weak )
 
 UInt16 BattleFighter::getPortrait()
 {
-//	if(_fighter->isNpc())
-//		return _fighter->favor;
-//	else
-		return _fighter->getId();
+    UInt16 portrait = 0;
+    if(!isNpc())
+    {
+        UInt32 now = TimeUtil::Now();
+        if(getBuffData(FIGHTER_BUFF_CRMASGIRL, now))
+            portrait = 1058;
+        else if(getBuffData(FIGHTER_BUFF_DRESS, now))
+            portrait = 1063;
+        else if(getBuffData(FIGHTER_BUFF_WEDDING, now))
+            portrait = 1064;
+        else if(getBuffData(FIGHTER_BUFF_RMAN, now))
+            portrait = 1;
+        else if(getBuffData(FIGHTER_BUFF_RWMAN, now))
+            portrait = 2;
+        else if(getBuffData(FIGHTER_BUFF_SMAN, now))
+            portrait = 3;
+        else if(getBuffData(FIGHTER_BUFF_SWMAN, now))
+            portrait = 4;
+        else if(getBuffData(FIGHTER_BUFF_DMAN, now))
+            portrait = 5;
+        else if(getBuffData(FIGHTER_BUFF_DWMAN, now))
+            portrait = 6;
+        else if(getBuffData(FIGHTER_BUFF_RDIAMOND, now))
+            portrait = 1089;
+        else if(getBuffData(FIGHTER_BUFF_BLUE, now))
+            portrait = 1090;
+        else if(getBuffData(FIGHTER_BUFF_QQVIP, now))
+            portrait = 1091;
+        else
+            portrait = getFighter()->getPortrait();
+    }
+    else
+    {
+        portrait = getFighter()->getPortrait();
+    }
+
+    return portrait;
+}
+
+UInt8 BattleFighter::getClassAndSex()
+{
+    UInt8 clsnsex = 0;
+    if(!isNpc())
+    {
+        UInt32 now = TimeUtil::Now();
+        if(getBuffData(FIGHTER_BUFF_RMAN, now))
+            clsnsex = GObject::e_cls_ru<<4;
+        else if(getBuffData(FIGHTER_BUFF_RWMAN, now))
+            clsnsex = GObject::e_cls_ru<<4|1;
+        else if(getBuffData(FIGHTER_BUFF_SMAN, now))
+            clsnsex = GObject::e_cls_shi<<4;
+        else if(getBuffData(FIGHTER_BUFF_SWMAN, now))
+            clsnsex = GObject::e_cls_shi<<4|1;
+        else if(getBuffData(FIGHTER_BUFF_DMAN, now))
+            clsnsex = GObject::e_cls_dao<<4;
+        else if(getBuffData(FIGHTER_BUFF_DWMAN, now))
+            clsnsex = GObject::e_cls_dao<<4|1;
+        else
+            clsnsex = getFighter()->getClassAndSex();
+    }
+    else
+    {
+        clsnsex = static_cast<UInt8>(getFighter()->reqFriendliness);
+    }
+
+    return clsnsex;
 }
 
 void BattleFighter::postInit()
