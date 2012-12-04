@@ -51,7 +51,7 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _blind(0), _blind_last(0), _deep_blind_dmg_extra(0), _deep_blind_last(0),
 	_moAttackAdd(0), _moMagAtkAdd(0), _moAtkReduce(0), _moMagAtkReduce(0),
 	_moAttackAddCD(0), _moMagAtkAddCD(0), _moAtkReduceCD(0), _moMagAtkReduceCD(0),
-    _bleedMo(0), _bleedMoLast(0), _summoner(NULL), _unSummonAura(0),
+    _bleedMo(0), _bleedMoLast(0), _summoner(NULL), _unSummonAura(0), _shieldHP(0), _shieldHPLast(0),
     _atkAddSpecial(0), _atkSpecialLast(0), _magAtkAddSpecial(0), _magAtkSpecialLast(0), 
     _atkDecSpecial(0), _atkDecSpecialLast(0), _magAtkDecSpecial(0), _magAtkDecSpecialLast(0),
     _skillUsedChangeAttrValue(0), _skillUsedChangeAttrLast(0), _skillUsedChangeAttr(0),
@@ -1754,6 +1754,30 @@ void BattleFighter::makeDamage( UInt32& u )
 		_hp -= u;
 }
 
+bool BattleFighter::makeShieldDamage(UInt32& u)
+{
+    BattleFighter* shieldObj = static_cast<BattleFighter*>(getShieldObj());
+    if(!shieldObj)
+        return false;
+
+    float& shieldHP = shieldObj->getShieldHPBuf();
+    if(shieldHP < 0.001f)
+        return false;
+    if(shieldHP < u)
+    {
+        u -= shieldHP;
+        shieldObj->setShieldHPBuf(0, 0);
+        setShieldObj(NULL);
+    }
+    else
+    {
+        u = 0;
+        shieldHP -= u;
+    }
+
+    return true;
+}
+
 BattleFighter* BattleFighter::summonSelf(float factor, UInt8 last)
 {
     if(last == 0)
@@ -1883,6 +1907,8 @@ bool BattleFighter::releaseHideBuf()
     {
         _hideBuf = false;
         setHide(false);
+        _shieldHP = 0;
+        _shieldHPLast = 0;
         return true;
     }
     return false;
@@ -1989,6 +2015,25 @@ bool BattleFighter::releaseBleedMo()
     if(_bleedMoLast == 0)
     {
         _bleedMo = 0;
+        return true;
+    }
+    return false;
+}
+
+void BattleFighter::setShieldHPBuf(float value, UInt8 last)
+{
+    _shieldHP = value;
+    _shieldHPLast = last;
+}
+
+bool BattleFighter::releaseShieldHPBuf()
+{
+    if(_shieldHP == 0 || _shieldHPLast < 0.001)
+        return false;
+    -- _shieldHPLast;
+    if(_shieldHPLast== 0)
+    {
+        _shieldHP = 0;
         return true;
     }
     return false;

@@ -394,6 +394,10 @@ private:
 //    float calcTherapyDebuf(BattleFighter* bo, DefStatus* defList, size_t& defCount);
 //    float calcTherapyAddBuff(BattleFighter* bo, DefStatus* defList, size_t& defCount);
     float calcAuraDebuf(BattleFighter* bo, DefStatus* defList, size_t& defCount);
+    void calcAuraAdd(BattleFighter* bf, BattleFighter* bo, const GData::SkillBase* skill, float& bfAuraAdd, float& boAuraAdd, DefStatus* defList, size_t& defCount);
+    float getSkillEffectExtraHideAura(BattleFighter* bf, BattleFighter* bo, const GData::SkillBase* skill);
+    void doShieldHPAttack(BattleFighter* bo, UInt32& dmg, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
+    bool doSkillStrengthen_ShieldHP(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active);
 
 
 

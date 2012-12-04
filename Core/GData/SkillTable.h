@@ -66,6 +66,7 @@ enum
     e_eft_evade100 = 11, // 百分百闪避一次主动攻击
     e_eft_selfside_buf_aura = 12, // 全体队友获得心动后涨灵气的buf
     e_eft_selfside_absorb = 13, // 给队友吸血
+    e_eft_hide_aura = 14, // (墨印或潜行时)敌方被攻击时不增加灵气
 
     e_eft_max
 };

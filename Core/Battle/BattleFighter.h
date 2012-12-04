@@ -542,6 +542,8 @@ private:
     BattleFighter* _summoner;
     UInt8 _unSummonAura;
 
+    float _shieldHP;
+    UInt8 _shieldHPLast;
     // cotton add for skillstrengthen
 public:
     inline float getAtkAddSpecial(){ return _atkAddSpecial; }
@@ -708,6 +710,7 @@ public:
 
 
 	virtual void makeDamage(UInt32& u);
+    bool makeShieldDamage(UInt32& u);
 
     BattleFighter* summonSelf(float factor, UInt8 last);
     void clearSkill();
@@ -754,6 +757,10 @@ public:
     bool isSummon() { return _summon; }
     BattleFighter* getSummoner() { return _summoner; }
     UInt8 getUnSummonAura() { return _unSummonAura; }
+
+    inline float& getShieldHPBuf() { return _shieldHP; }
+    void setShieldHPBuf(float value, UInt8 last);
+    bool releaseShieldHPBuf();
 
 public:
 	enum StatusFlag

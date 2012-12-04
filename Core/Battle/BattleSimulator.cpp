@@ -109,6 +109,7 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, cons
         skillStrengthenTable[GData::TYPE_DEBUF_AURA] = &BattleSimulator::doSkillStrengthen_DebufAura;
         skillStrengthenTable[GData::TYPE_ATTACK_FRIEND] = &BattleSimulator::doSkillStrengthen_AttackFriend;
         skillStrengthenTable[GData::TYPE_BLEED_BYSKILL] = &BattleSimulator::doSkillStrengthen_BleedBySkill;
+        skillStrengthenTable[GData::TYPE_SHIELD_HP] = &BattleSimulator::doSkillStrengthen_ShieldHP;
     }
     {
         for(int i = 0; i < GData::e_eft_max; ++ i)
@@ -199,6 +200,7 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, GObj
         skillStrengthenTable[GData::TYPE_DEBUF_AURA] = &BattleSimulator::doSkillStrengthen_DebufAura;
         skillStrengthenTable[GData::TYPE_ATTACK_FRIEND] = &BattleSimulator::doSkillStrengthen_AttackFriend;
         skillStrengthenTable[GData::TYPE_BLEED_BYSKILL] = &BattleSimulator::doSkillStrengthen_BleedBySkill;
+        skillStrengthenTable[GData::TYPE_SHIELD_HP] = &BattleSimulator::doSkillStrengthen_ShieldHP;
     }
     {
         for(int i = 0; i < GData::e_eft_max; ++ i)
@@ -1192,27 +1194,29 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                 ++scCount;
             }
 
-            defList[defCount].damType = e_damNormal;
             UInt32 dmg3 = dmg + magdmg;
-            area_target->makeDamage(dmg3);
-            defList[defCount].damage = dmg3;
-
-            defList[defCount].leftHP = area_target->getHP();
-            defList[defCount].pos = getSidePos(area_target);
-            ++ defCount;
+            doShieldHPAttack(area_target, dmg3, defList, defCount, scList, scCount);
+            if(dmg3 > 0)
+            {
+                defList[defCount].damType = e_damNormal;
+                area_target->makeDamage(dmg3);
+                defList[defCount].damage = dmg3;
+                defList[defCount].leftHP = area_target->getHP();
+                defList[defCount].pos = getSidePos(area_target);
+                ++ defCount;
+            }
 //			printf("%u:%u %s %u:%u, made %u damage, hp left: %u\n", 1-side, from_pos, cs2 ? "CRITICALs" : "hits", side, pos, dmg, area_target->getHP());
             // killed the target fighter
 
             if(bf->getSide() != area_target->getSide() && counter_deny >= 0 && (!skill || skill->cond == GData::SKILL_ACTIVE))
             {
-                float aura_add = 25+bf->getSoulExtraAura()-calcAuraDebuf(bf, defList, defCount);
-                if(aura_add < 0)
-                    aura_add = 0;
-                setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAura, aura_add, 0, scList, scCount, false);
-                aura_add = 25+area_target->getSoulExtraAura()-calcAuraDebuf(area_target, defList, defCount);
-                if(aura_add < 0)
-                    aura_add = 0;
-                setStatusChange(bf, area_target->getSide(), area_target->getPos(), 1, 0, e_stAura, aura_add, 0, scList, scCount, true);
+                float bfAuraAdd = 0;
+                float boAuraAdd = 0;
+                calcAuraAdd(bf, area_target, skill, bfAuraAdd, boAuraAdd, defList, defCount);
+                if(bfAuraAdd > 0.1f)
+                    setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAura, bfAuraAdd, 0, scList, scCount, false);
+                if(boAuraAdd > 0.1f)
+                    setStatusChange(bf, area_target->getSide(), area_target->getPos(), 1, 0, e_stAura, boAuraAdd, 0, scList, scCount, true);
             }
 
             if(area_target->getHP() == 0)
@@ -1326,14 +1330,13 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
 
                 if(bf->getSide() != area_target->getSide() && counter_deny >= 0 && (!skill || skill->cond == GData::SKILL_ACTIVE))
                 {
-                    float aura_add = 25+bf->getSoulExtraAura()-calcAuraDebuf(bf, defList, defCount);
-                    if(aura_add < 0)
-                        aura_add = 0;
-                    setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAura, aura_add, 0, scList, scCount, false);
-                    aura_add = 25+area_target->getSoulExtraAura()-calcAuraDebuf(area_target, defList, defCount);
-                    if(aura_add < 0)
-                        aura_add = 0;
-                    setStatusChange(bf, area_target->getSide(), area_target->getPos(), 1, 0, e_stAura, aura_add, 0, scList, scCount, true);
+                    float bfAuraAdd = 0;
+                    float boAuraAdd = 0;
+                    calcAuraAdd(bf, area_target, skill, bfAuraAdd, boAuraAdd, defList, defCount);
+                    if(bfAuraAdd > 0.1f)
+                        setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAura, bfAuraAdd, 0, scList, scCount, false);
+                    if(boAuraAdd > 0.1f)
+                        setStatusChange(bf, area_target->getSide(), area_target->getPos(), 1, 0, e_stAura, boAuraAdd, 0, scList, scCount, true);
                 }
             }
 
@@ -2361,12 +2364,17 @@ bool BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
                 defList[defCount].damType = e_UnPoison;
             else
                 defList[defCount].damType = e_Poison;
+
             dmg = dmg * dmgfactor[poisonTimes];
-            target_bo->makeDamage(dmg);
-            defList[defCount].damage = dmg;
-            defList[defCount].pos = getSidePos(target_bo);
-            defList[defCount].leftHP = target_bo->getHP();
-            defCount ++;
+            doShieldHPAttack(target_bo, dmg, defList, defCount, scList, scCount);
+            if(dmg > 0)
+            {
+                target_bo->makeDamage(dmg);
+                defList[defCount].damage = dmg;
+                defList[defCount].pos = getSidePos(target_bo);
+                defList[defCount].leftHP = target_bo->getHP();
+                defCount ++;
+            }
 
             if(target_bo->getHP() == 0)
             {
@@ -4866,6 +4874,7 @@ UInt32 BattleSimulator::doAttack( int pos )
     insertFighterStatus(bf);
     _activeFgt = bf;
 
+    BattleFighter* mainTarget = NULL;
     do {
         rcnt += doDeBufAttack(bf);
 
@@ -4895,6 +4904,7 @@ UInt32 BattleSimulator::doAttack( int pos )
             if(NULL == rnd_bf)
             {
                 target_pos = getPossibleTarget(bf->getSide(), bf->getPos());
+                mainTarget = static_cast<BattleFighter*>(getObject(otherside, target_pos));
             }
             else
             {
@@ -4926,6 +4936,7 @@ UInt32 BattleSimulator::doAttack( int pos )
         else if(forget > 0)
         {
             target_pos = getPossibleTarget(bf->getSide(), bf->getPos());
+            mainTarget = static_cast<BattleFighter*>(getObject(otherside, target_pos));
 
             if(target_pos < 0)
                 break;
@@ -4954,6 +4965,7 @@ UInt32 BattleSimulator::doAttack( int pos )
             size_t skillIdx = 0;
             int cnt = 0;
             target_pos = getPossibleTarget(bf->getSide(), bf->getPos());
+            mainTarget = static_cast<BattleFighter*>(getObject(otherside, target_pos));
             bool noPossibleTarget = (target_pos == -1);
             while(NULL != (skill = bf->getPassiveSkillPrvAtk100(skillIdx, noPossibleTarget)))
             {
@@ -5525,6 +5537,9 @@ UInt32 BattleSimulator::doAttack( int pos )
 #endif
     }
     while(false);
+
+    if(mainTarget)
+        mainTarget->setShieldObj(NULL);
 
     rcnt += releaseCD(bf);
     return rcnt;
@@ -8036,6 +8051,17 @@ bool BattleSimulator::doSkillStrengthen_AttackFriend(BattleFighter* bf, const GD
     return true;
 }
 
+bool BattleSimulator::doSkillStrengthen_ShieldHP(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, bool active)
+{
+    if(!bf || !ef || !skill || bf->getHP() == 0)
+        return false;
+
+    float value = bf->getMaxHP() * (ef->value / 100);
+    bf->setShieldHPBuf(value, ef->last);
+
+    return true;
+}
+
 UInt32 BattleSimulator::CalcNormalAttackDamage(BattleFighter * bf, BattleObject* bo, StateType& eStateType)
 {
     if(!bf || !bo || bf->getHP() == 0 || bo->getHP() == 0)
@@ -9559,6 +9585,63 @@ int BattleSimulator::getSidePos(BattleObject* bf)
         bfPos += 25;
 
     return bfPos;
+}
+
+void BattleSimulator::calcAuraAdd(BattleFighter* bf, BattleFighter* bo, const GData::SkillBase* skill, float& bfAuraAdd, float& boAuraAdd, DefStatus* defList, size_t& defCount)
+{
+    if(bf)
+    {
+        bfAuraAdd = 25+bf->getSoulExtraAura()-calcAuraDebuf(bf, defList, defCount);
+        if(bfAuraAdd < 0.1f)
+            bfAuraAdd = 0;
+    }
+    if(bo)
+    {
+        boAuraAdd = 25+bo->getSoulExtraAura()-calcAuraDebuf(bo, defList, defCount);
+        boAuraAdd += getSkillEffectExtraHideAura(bf, bo, skill);
+        if(boAuraAdd < 0.1f)
+            boAuraAdd = 0;
+    }
+}
+
+float BattleSimulator::getSkillEffectExtraHideAura(BattleFighter* bf, BattleFighter* bo, const GData::SkillBase* skill)
+{
+    if(!bo || !skill || !skill->effect)
+        return 0;
+    const std::vector<UInt16>& eft = skill->effect->eft;
+    const std::vector<float>& efv = skill->effect->efv;
+
+    size_t cnt = eft.size();
+    if(cnt != efv.size())
+        return 0;
+    float aura = 0;
+    for(size_t i = 0; i < cnt; ++ i)
+    {
+        if(eft[i] == GData::e_eft_hide_aura)
+        {
+            if(bf->isHide() || bo->isMarkMo())
+            {
+                if(efv[i] > 0.001f)
+                    aura = -efv[i];
+                else
+                    aura = efv[i];
+            }
+        }
+    }
+
+    return aura;
+}
+
+void BattleSimulator::doShieldHPAttack(BattleFighter* bo, UInt32& dmg, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount)
+{
+    if(bo->makeShieldDamage(dmg))
+    {
+        defList[defCount].damType = e_damNormal;
+        defList[defCount].damage = 0;
+        defList[defCount].leftHP = bo->getHP();
+        defList[defCount].pos = getSidePos(bo);
+        ++ defCount;
+    }
 }
 
 }

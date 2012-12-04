@@ -34,6 +34,7 @@ enum
     ON_BLIND = 17,      // 至盲时
     ON_ATTACK = 18 ,     // 攻击时
     ON_SUMMON = 19,     // 召唤时
+    ON_HIDE = 20,       // 隐身时
 };
 
 enum
@@ -74,6 +75,7 @@ enum
     TYPE_UNSUMMON_AURA = 34, // 残影消失时召唤者增加灵气
     TYPE_DEC_COUNTER = 35, // 减敌方当前反击率
     TYPE_HITRATE_COUNTER = 36, // 增加当前命中减敌方当前反击率
+    TYPE_SHIELD_HP = 37,   // 生命护盾
     TYPE_MAX,
 };
 
