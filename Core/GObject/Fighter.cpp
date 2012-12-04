@@ -1200,7 +1200,7 @@ void Fighter::setPotential( float p, bool writedb )
 		{
 			_attrDirty = true;
 			_bPDirty = true;
-			sendModification(4, static_cast<UInt32>(UInt32(p * 100) + 0.5f));
+			sendModification(4, static_cast<UInt32>((p * 100) + 0.5f));
 		}
 	}
 }
@@ -1209,7 +1209,7 @@ void Fighter::setCapacity( float c, bool writedb )
 {
     _capacity = c;
     if (writedb && _owner) {
-        sendModification(5, static_cast<UInt32>(UInt32(c * 100) + 0.5f));
+        sendModification(5, static_cast<UInt32>((c * 100) + 0.5f));
     }
 }
 
@@ -2429,6 +2429,58 @@ bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb, bool init )
         return true;
     }
     return false;
+}
+
+// XXX: 穴道 id (0-14) lvl [1-3]
+bool Fighter::setToAcupoints(int idx, bool writedb)
+{
+    for (UInt8 i = 0; i < idx; ++i)
+    {
+        for (UInt8 v = 1; v <= 3; ++v)
+        {
+            UInt8 vMax =  getAcupointsCntMax();
+            if (i >= 0  && i < ACUPOINTS_MAX && v <= vMax)
+            {
+                if (_acupoints[i] >= v)
+                    return false;
+
+                const GData::AcuPra* pap = GData::acupraManager[i<<8|v];
+                if (!pap)
+                    return false;
+
+                if (pap->needlvl > getLevel())
+                    return false;
+
+                _acupoints[i] = v;
+                if (_acupoints[i] < 3)
+                    ++_praadd; // 第3层不加
+
+                if (_owner && writedb)
+                    _owner->OnHeroMemo(MC_CITTA, MD_STARTED, 1, 0);
+                if (_owner && writedb && i == 1 && _acupoints[i] == 3)
+                    _owner->OnHeroMemo(MC_CITTA, MD_STARTED, 1, 1);
+                if (_owner && writedb && i == 2 && _acupoints[i] == 3)
+                    _owner->OnHeroMemo(MC_CITTA, MD_STARTED, 1, 2);
+
+                soulMax += pap->soulmax;
+
+                //增加元神力后 查看成就
+                GameAction()->doAttainment(this->_owner, Script::AddSoulMax , soulMax);
+                _pexpMax += pap->pramax;
+                _cittaslot += pap->citslot;
+
+                _attrDirty = true;
+                _bPDirty = true;
+                sendModificationAcupoints(0x29, i, writedb);
+                sendModification(7, _pexpMax);
+                sendModification(9, getMaxSoul() );
+                sendModification(0x32, getUpCittasMax());
+                if(v ==vMax )
+                    GameAction()->doAttainment(this->_owner, Script::AddAcupoint, i); //增加穴道的成就
+            }
+        }
+    }
+    return true;
 }
 
 bool Fighter::incAcupointsBit( int idx, bool writedb )
@@ -4521,43 +4573,6 @@ void Fighter::appendElixirAttr2(Stream& st)
     st << _elixirattr.action;
 }
 
-
-UInt16 Fighter::getBattlePortrait()
-{
-    UInt16 portrait = 0;
-    UInt32 fashion = getFashionTypeId();
-
-    switch(fashion)
-    {
-    case 1700:
-        portrait = 1072;
-        break;
-    case 1701:
-        portrait = 1074;
-        break;
-    case 1702:
-        portrait = 1063;
-        break;
-    case 1703:
-        portrait = 1064;
-        break;
-    case 1704:
-        portrait = 1076;
-        break;
-    case 1705:
-        portrait = 1077;
-        break;
-    case 1706:
-        portrait = 1088;
-        break;
-    case 1707:
-        portrait = 1090;
-        break;
-    }
-
-    return portrait;
-}
-
 UInt8 Fighter::SSGetLvl(UInt16 skillid)
 {
     UInt32 sid = SKILL_ID(skillid);
@@ -5007,5 +5022,35 @@ void Fighter::checkBPDirty()
             if (!_owner->GetShuoShuo()->getShuoShuo(SS_MO_HIRE))
                 _owner->OnShuoShuo(SS_MO_STRENGTH);
 }
+
+UInt16 Fighter::getPortrait()
+{
+    UInt16 portrait = getId();
+    if(!_hideFashion)
+    {
+        if (getFashionTypeId() == 1700)
+            portrait = 1072;
+        else if (getFashionTypeId() == 1701)
+            portrait = 1074;
+        else if (getFashionTypeId() == 1702)
+            portrait = 1063;
+        else if (getFashionTypeId() == 1703)
+            portrait = 1064;
+        else if (getFashionTypeId() == 1704)
+            portrait = 1076;
+        else if (getFashionTypeId() == 1705)
+            portrait = 1077;
+        else if (getFashionTypeId() == 1706)
+            portrait = 1088;
+        else if (getFashionTypeId() == 1707)
+            portrait = 1090;
+        else if (getFashionTypeId() == 1708)
+            portrait = 1091;
+    }
+
+    return portrait;
+}
+
+
 }
 

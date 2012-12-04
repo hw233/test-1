@@ -197,6 +197,8 @@ public:
     void getAllAcupointsBits(Stream& st);
     void setAcupoints(std::string& acupoints, bool = true);
 
+    bool setToAcupoints(int idx, bool writedb);
+
     // XXX: 由心法和法宝带出技能，且技能不需要升级
 #if 0
     // 学习技能
@@ -426,6 +428,7 @@ public:
 
 	UInt32 getHaloTypeId();
 	UInt32 getFashionTypeId();
+    UInt16 getPortrait();
 
 	UInt16 getWeaponAttack();
 	void getArmorDefendAndHP(UInt16& def, UInt16& hp);
@@ -634,7 +637,6 @@ public:
     bool  IsEquipEnchantLev(UInt8 e);
 
     void getAttrExtraEquip(Stream& st);
-    UInt16 getBattlePortrait();
 protected:
 	void rebuildEquipAttr();
 	void rebuildBattlePoint();

@@ -532,7 +532,7 @@ namespace GObject
 		GameMsgHdr hdr(0x2A1, m_Player->getThreadId(), m_Player, sizeof(id));
 		GLOBAL().PushMsg(hdr, &id);
         if (!leftCount)
-			PopTimerEvent(m_Player, EVENT_AUTOCOPY, m_Player->getId());
+			PopTimerEvent(m_Player, EVENT_JOBHUNTER, m_Player->getId());
     }
 
     bool EventAutoJobHunter::Accelerate(UInt32 times)
@@ -2164,6 +2164,7 @@ namespace GObject
             _lastAthAward.clear();
         }
         sendDeamonAwardsInfo();
+        checkLastExJobAward();
 
 		if(update)
 		{
@@ -2528,23 +2529,14 @@ namespace GObject
         fgt->getAttrType2(true);
         fgt->getAttrType3(true);
 
-        if (fgt->getClass() == e_cls_mo)    // XXX: 更新前招募未完全打通穴道
-        //if (fgt->getClass() == e_cls_mo && !load)
+        //if (fgt->getClass() == e_cls_mo)    // XXX: 更新前招募未完全打通穴道
+        if (fgt->getClass() == e_cls_mo && !load)
         {
             // 70级，关元穴穴道，60级白虎
-            if (!load)
-            {
-                fgt->addExp(GData::expTable.getLevelMin(70));
-                fgt->openSecondSoul(13);
-                fgt->setSoulLevel(60);
-            }
-            for (UInt8 i = 0; i < 11; ++i)
-            {
-                fgt->setAcupoints(i, 1, true, true);
-                fgt->setAcupoints(i, 2, true, true);
-                fgt->setAcupoints(i, 3, true, true);
-            }
-
+            fgt->addExp(GData::expTable.getLevelMin(70));
+            fgt->openSecondSoul(13);
+            fgt->setSoulLevel(60);
+            fgt->setToAcupoints(11, true);
         }
     }
 
@@ -10632,6 +10624,8 @@ namespace GObject
 
     void Player::getThanksGivingDay(UInt8 opt)
     {
+        if(!World::getThanksgiving())
+            return;
         if(opt == 0) //免费领取
         {
             if(GetVar(VAR_TGDT) & 0x01)
@@ -10641,18 +10635,18 @@ namespace GObject
                 UInt32 var = GetVar(VAR_TGDT) | 0x01;
                 SetVar(VAR_TGDT, var);
                 Stream st(REP::GETAWARD);
-                st << static_cast<UInt8>(15) << static_cast<UInt8>(0) << Stream::eos;
+                st << static_cast<UInt8>(15) << static_cast<UInt8>(4) << Stream::eos;
                 send(st);
                 udpLog("huodong", "F_10000_15", "", "", "", "", "act");
             }
         }
-        if(opt == 1) //付费领取(20仙石)
+        if(opt == 1) //付费领取(30仙石)
         {
             if(!hasChecked())
                 return;
             if(GetVar(VAR_TGDT) & 0x02)
                 return;
-			if (getGold() < 20)
+			if (getGold() < 30)
 			{
 				sendMsgCode(0, 1104);
 				return;
@@ -10662,11 +10656,17 @@ namespace GObject
                 UInt32 var = GetVar(VAR_TGDT) | 0x02;
                 SetVar(VAR_TGDT, var);
                 ConsumeInfo ci(ThanksGivingDay, 0, 0);
-                useGold(20, &ci);
+                useGold(30, &ci);
                 Stream st(REP::GETAWARD);
-                st << static_cast<UInt8>(15) << static_cast<UInt8>(1) << Stream::eos;
+                st << static_cast<UInt8>(15) << static_cast<UInt8>(5) << Stream::eos;
                 send(st);
             }
+        }
+        if(opt == 2) //告诉客户端领取情况
+        {
+            Stream st(REP::GETAWARD);
+            st << static_cast<UInt8>(15) << static_cast<UInt8>(GetVar(VAR_TGDT)) << Stream::eos;
+            send(st);
         }
     }
 
@@ -13412,7 +13412,7 @@ namespace GObject
 
                 st << fgt->getSoulExtraAura();
                 st << fgt->getSoulAuraLeft();
-                st << fgt->getBattlePortrait();
+                st << fgt->getPortrait();
                 fgt->appendElixirAttr2(st);
             }
         }
@@ -14982,7 +14982,6 @@ void EventTlzAuto::notify(bool isBeginAuto)
         }
     }
     
- // namespace GObject
     void Player::ArenaExtraAct(UInt8 type, UInt8 opt)
     {
         UInt32 now = TimeUtil::Now();
@@ -15166,6 +15165,17 @@ void EventTlzAuto::notify(bool isBeginAuto)
                 break;
             }
         }
+    bool Player::hasFighterWithClass(UInt8 cls)
+    {
+        for ( std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
+        {
+            if (it->second->getClass() == cls)
+                return true;
+        }
+        return false;
+        
+    }
+
 
     static UInt32 newRecharge[] = {10, 88, 188, 588};
     void Player::FirstRechargeAct(UInt8 step, UInt8 type, UInt8 career)
@@ -15252,5 +15262,5 @@ void EventTlzAuto::notify(bool isBeginAuto)
         send(st);
     }
 
-    } // namespace GObject
+} // namespace GObject
 

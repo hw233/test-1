@@ -1001,6 +1001,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
             pl->sendNewRegisterAward(0);  //0:表示新用户注册还可以邀请好友进行抽奖
         pl->CheckCanAwardBirthday(); //生日罗盘许愿星(周年庆活动)
         pl->getAwardLogin(2); // 2012/10/14登录抽奖合作活动
+        pl->getThanksGivingDay(2); //感恩节活动,qq大厅登录礼包
     }
 	{
 		Stream st;
@@ -5485,8 +5486,8 @@ void OnJobHunter( GameMsgHdr & hdr, const void * data )
 
 void OnAutoJobHunter( GameMsgHdr & hdr, const void * data )
 {
-    return;
 	MSG_QUERY_PLAYER(player);
+    return;
     BinaryReader br(data, hdr.msgHdr.bodyLen);
 
     JobHunter * jobHunter = player->getJobHunter();

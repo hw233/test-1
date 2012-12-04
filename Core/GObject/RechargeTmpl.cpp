@@ -88,6 +88,10 @@ namespace GObject
         }
         pl->AddVar(VAR_RECHARGE_SCORE, s);
     }
+    void RechargeTmpl::addScore(Player* pl, UInt32 s)
+    {
+        pl->AddVar(VAR_RECHARGE_SCORE, s);
+    }
     void RechargeTmpl::sendStreamInfo(Player* pl)
     {
         Stream st(REP::ACTIVITY_REWARD);
