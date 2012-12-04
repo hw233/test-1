@@ -1074,10 +1074,36 @@ namespace GObject
         p->foreachFighter(buchang1530_2);
     }
 
-	inline bool player_load(Player * p, int)
-	{
-		p->Load();
-		gBlockbossmgr.addPlayerRank(p, p->getBlockBossLevel(), p->GetLev());
+    void buchangMo(Player *p)
+    {
+        if (!p)
+            return;
+        if (p->hasFighterWithClass(4))
+        {
+
+
+            SYSMSG(title, 4072);
+            SYSMSGV(content, 4073);
+
+            MailPackage::MailItem mitem[1] = {{30,20}};
+            Mail * mail = p->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFD0000/*free*/);
+            if (mail)
+                mailPackageManager.push(mail->id, mitem, 2, true);
+
+            std::string strItems;
+            strItems += Itoa(mitem[0].id);
+            strItems += ",";
+            strItems += Itoa(mitem[0].count);
+            strItems += "|";
+
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, p->getId(), mail->id, BuChangMo, title, content, strItems.c_str(), mail->recvTime);
+        }
+    }
+
+    inline bool player_load(Player * p, int)
+    {
+        p->Load();
+        gBlockbossmgr.addPlayerRank(p, p->getBlockBossLevel(), p->GetLev());
         //p->verifyFighter();
         //if (!GVAR.GetVar(GVAR_CITTASMERGE))
         //    mergeCittaPages(p);
@@ -1085,6 +1111,8 @@ namespace GObject
         //    buchang1530(p);
         if (!GVAR.GetVar(GVAR_OLDRC7DAYBUCHANG))
             p->sendOldRC7DayAward();
+        if (!GVAR.GetVar( GVAR_JOB_MO_PEXP))
+            buchangMo(p);
 		return true;
 	}
 
@@ -2451,6 +2479,7 @@ namespace GObject
         //GVAR.SetVar(GVAR_CITTASMERGE, 1);
         //GVAR.SetVar(GVAR_1530BUCHANG, 1);
         GVAR.SetVar(GVAR_OLDRC7DAYBUCHANG, 1);
+        GVAR.SetVar(GVAR_JOB_MO_PEXP, 1);
 
 		return true;
 	}

@@ -46,6 +46,7 @@
 #include "GObject/GObjectDBExecHelper.h"
 
 #include "Memcached.h"
+#include "GObject/RechargeTmpl.h"
 
 #ifndef _WIN32
 //#include <libmemcached/memcached.h>
@@ -1483,6 +1484,41 @@ void DeleteGold(LoginMsgHdr& hdr,const void * data)
     st << ret << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
+void addRechargeScore(LoginMsgHdr& hdr,const void * data)
+{
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    std::string playerIds;
+    UInt32 score;
+    CHKKEY();
+    br>>playerIds;
+    br>>score;
+
+    UInt8 ret = 1;
+    INFO_LOG("GMADDCHARGESCORE: %s, %u", playerIds.c_str(), score);
+    std::string playerId = GetNextSection(playerIds, ',');
+    while (!playerId.empty())
+    {
+        UInt64 pid = atoll(playerId.c_str());
+        if(cfg.merged)
+        {
+            UInt16 serverNo = 0;
+            br >> serverNo;
+            pid += (static_cast<UInt64>(serverNo) << 48);
+        }
+        GObject::Player * pl = GObject::globalPlayers[pid];
+        if (NULL != pl)
+        {
+            GObject::RechargeTmpl::instance().addScore(pl, score);
+            GObject::RechargeTmpl::instance().sendScoreInfo(pl);
+        }
+        playerId = GetNextSection(playerIds, ',');
+    }
+    ret = 0;
+    Stream st(SPEP::ADDRECHARGESCORE);
+    st << ret << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
 void GmHandlerFromBs(LoginMsgHdr &hdr,const void * data)
 {
     BinaryReader br(data,hdr.msgHdr.bodyLen);

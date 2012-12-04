@@ -727,6 +727,7 @@ namespace SPEQ
     const UInt16 QUERYLOCKUSER       = 0x137;// 查询玩家是否被禁止登陆和交易
     const UInt16 SETLOGINLIMIT       = 0x138;// 设置平台一个ip最大登录数
     const UInt16 DELETEGOLD          = 0x139;// 删除仙石
+    const UInt16 ADDRECHARGESCORE    = 0x140;// 增加充值的积分
 }
 
 namespace SPEP
@@ -779,6 +780,7 @@ namespace SPEP
     const UInt16 QUERYLOCKUSER       = 0x37;// 查询玩家是否被禁止登陆和交易
     const UInt16 SETLOGINLIMIT       = 0x38;// 设置平台一个ip最大登录数
     const UInt16 DELETEGOLD          = 0x39;// 删除仙石
+    const UInt16 ADDRECHARGESCORE    = 0x40;// 增加充值的积分
 }
 
 namespace ARENAREQ
