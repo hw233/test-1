@@ -89,7 +89,7 @@ int BattleField::getPossibleTarget( int side, int idx )
 		{3 , 2 , 4 , 1 , 0},
 		{4 , 3 , 2 , 1 , 0},
 	};
-    BattleObject* hideObj;
+    BattleObject* hideObj = NULL;
 	int targetidx = 4 - (idx % 5);
 	int tside = 1 - side;
     for(int irow = 0; irow < 5; ++ irow)
