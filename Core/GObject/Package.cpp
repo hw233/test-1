@@ -4352,7 +4352,11 @@ namespace GObject
         if (res > 0) 
             return res;
 
-        toEquip->SetBindStatus(true);
+        if (!toEquip->GetBindStatus())
+        {
+			DB4().PushUpdateData("UPDATE `item` SET `bindType` = 1 WHERE `id` = %u and ownerId=%"I64_FMT"u", toEquip->getId(), m_Owner->getId());
+            toEquip->SetBindStatus(true);
+        }
         if (type & 1)
             res = moveEquipEnchant(fFgt,tFgt,fromEquip, fPos, toEquip, tPos);
         if (type & 2)
