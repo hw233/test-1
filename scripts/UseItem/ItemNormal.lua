@@ -7998,6 +7998,7 @@ local ItemNormal_Table = {
     [9213] = ItemNormal_00009210,
     [9215] = ItemNormal_00009215,
     [9216] = ItemNormal_00009216,
+    [9218] = ItemNormal_00009160,
     [9228] = ItemNormal_00009228,
 
     [10000] = ItemNormal_00010000,
