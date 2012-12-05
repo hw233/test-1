@@ -255,7 +255,7 @@ end
 
 function getStepAward(step)
     for i = 1, #stepAward do
-        if i > step then
+        if i >= step then
             return stepAward[i]
         end
     end
