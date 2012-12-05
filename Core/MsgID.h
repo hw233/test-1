@@ -35,6 +35,8 @@ namespace REQ
     const UInt8 COUNTRY_ACT         = 0x1B;
     /** 新版出生七天活动 */
     const UInt8 NEWRC7DAY           = 0x1C;
+    /** 墨家游戏协议 */
+    const UInt8 EXJOB               = 0x1D;
     /**成就 */
     const UInt8 ACHIEVEMENT         = 0xF0;// 0x0C
     /**阵营选择 */
@@ -579,6 +581,8 @@ namespace REP
     /** 新版出生七天活动 */
     const UInt8 NEWRC7DAY           = 0x1C;
 
+    /** 墨家面板协议 */
+    const UInt8 EXJOB               = 0x1D;
     const UInt8 TRADE_LIST          = 0x80;// 0xC0
     const UInt8 TRADE_DATA          = 0x81;// 0xC1
     const UInt8 TRADE_LAUNCH        = 0x82;// 0xC2
@@ -712,6 +716,7 @@ namespace SPEQ
     const UInt16 UNFORBIDSALE        = 0x136;// 全区解除禁止交易
     const UInt16 QUERYLOCKUSER       = 0x137;// 查询玩家是否被禁止登陆和交易
     const UInt16 SETLOGINLIMIT       = 0x138;// 设置平台一个ip最大登录数
+    const UInt16 DELETEGOLD          = 0x139;// 删除仙石
 }
 
 namespace SPEP
@@ -763,6 +768,7 @@ namespace SPEP
     const UInt16 UNFORBIDSALE        = 0x36;// 全区解除禁止交易
     const UInt16 QUERYLOCKUSER       = 0x37;// 查询玩家是否被禁止登陆和交易
     const UInt16 SETLOGINLIMIT       = 0x38;// 设置平台一个ip最大登录数
+    const UInt16 DELETEGOLD          = 0x39;// 删除仙石
 }
 
 namespace ARENAREQ

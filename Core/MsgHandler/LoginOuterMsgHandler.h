@@ -1452,6 +1452,37 @@ void SetPlatformLoginLimit(LoginMsgHdr& hdr,const void * data)
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
+void DeleteGold(LoginMsgHdr& hdr,const void * data)
+{
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    std::string playerIds;
+    UInt32 gold;
+    CHKKEY();
+    br>>playerIds;
+    br>>gold;
+
+    UInt8 ret = 1;
+    INFO_LOG("GMDELETEGOLD: %s, %u", playerIds.c_str(), gold);
+    std::string playerId = GetNextSection(playerIds, ',');
+    while (!playerId.empty())
+    {
+        UInt64 pid = atoll(playerId.c_str());
+        if(cfg.merged)
+        {
+            UInt16 serverNo = 0;
+            br >> serverNo;
+            pid += (static_cast<UInt64>(serverNo) << 48);
+        }
+        GObject::Player * pl = GObject::globalPlayers[pid];
+        if (NULL != pl)
+            pl->deleteGold(gold);
+        playerId = GetNextSection(playerIds, ',');
+    }
+    ret = 0;
+    Stream st(SPEP::DELETEGOLD);
+    st << ret << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
 void GmHandlerFromBs(LoginMsgHdr &hdr,const void * data)
 {
     BinaryReader br(data,hdr.msgHdr.bodyLen);
