@@ -226,7 +226,7 @@ function GetAtyReward(player, flag)
     end
 
     if flag == 64 then -- 140
-        package:Add(1526, 1 , true, false , 24);
+        package:Add(133, 1 , true, false , 24);
         if rand <= 20 then
             package:AddItem(514, 1, true, false, 24);
         end
@@ -411,7 +411,7 @@ local dayExtraAward = {
         [3]  = { {501,5},{499,20} },
         [4]  = { {503,5},{499,20} },
         [5]  = { {509,2},{499,20} },
-        [6]  = { {1528,2},{499,20} },
+        [6]  = { {134,2},{499,20} },
         [7]  = { {1325,2},{499,20} },
         [12] = { {57,5},{499,50} },
         [18] = { {56,5},{499,50} },

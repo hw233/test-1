@@ -10205,7 +10205,7 @@ namespace GObject
             GetPackage()->Add(509, 1, true);
             GetPackage()->Add(50, 1, true);
             GetPackage()->Add(49, 1, true);
-            GetPackage()->Add(1526, 1, true);
+            GetPackage()->Add(133, 1, true);
             GetPackage()->Add(500, 1, true);
             GetPackage()->Add(56, 1, true);
             SetVar(VAR_AWARD_SSTOOLBAR, 1);
@@ -11235,7 +11235,7 @@ namespace GObject
         MailPackage::MailItem item4[4] = {{MailPackage::Coupon,30},{509, 1}, {507, 1},{511,3}};
         MailPackage::MailItem item5[5] = {{MailPackage::Coupon,40},{509, 1}, {507, 1},{5025,1},{512,4}};
         MailPackage::MailItem item6[5] = {{MailPackage::Coupon,40},{509, 1}, {507, 1},{514,5},{515,2}};
-        MailPackage::MailItem item7[6] = {{MailPackage::Coupon,50},{509, 1}, {507, 1},{517,5},{1528,2},{15,5}};
+        MailPackage::MailItem item7[6] = {{MailPackage::Coupon,50},{509, 1}, {507, 1},{517,5},{134,2},{15,5}};
         UInt16 size[7] = {3,4,4,4,5,5,6};
 
         MailPackage::MailItem* item[7] = {item1,item2,item3,item4,item5,item6,item7};
@@ -12003,7 +12003,7 @@ namespace GObject
 
         static UInt16 items[3][4] = {
             {515,509,507,47},
-            {503,1325,1528,516},
+            {503,1325,134,516},
             {8000,551,517,500},
         };
 

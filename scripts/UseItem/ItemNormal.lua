@@ -490,7 +490,7 @@ end
 function ItemNormal_00000409(id, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
-    local reqgrids = package:GetItemUsedGrids(1526, 2, 1);
+    local reqgrids = package:GetItemUsedGrids(133, 2, 1);
 
     local prob = {33, 66, 100}
     local items = {{55,1}, {510,1}, {502,1}}
@@ -509,7 +509,7 @@ function ItemNormal_00000409(id, num, bind, param)
 
     if reqgrids <= package:GetRestPackageSize() then 
         package:DelItemSendMsg(409, player);
-        package:AddEquipN(1526, 2, 1, 0, 2);
+        package:AddItem(133, 2, 1, 0, 2);
         package:AddItem(item[1], item[2], 1, 0, 2);
         return num;
     end
@@ -520,7 +520,7 @@ end
 function ItemNormal_00000410(id, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
-    local reqgrids = package:GetItemUsedGrids(1526, 3, 1);
+    local reqgrids = package:GetItemUsedGrids(133, 3, 1);
 
     local prob = {33, 66, 100}
     local items = {{56,1}, {511,1}, {15,1}}
@@ -539,7 +539,7 @@ function ItemNormal_00000410(id, num, bind, param)
 
     if reqgrids <= package:GetRestPackageSize() then 
         package:DelItemSendMsg(410, player);
-        package:AddEquipN(1526, 3, 1, 0, 2);
+        package:AddItem(133, 3, 1, 0, 2);
         package:AddItem(item[1], item[2], 1, 0, 2);
         return num;
     end
@@ -550,7 +550,7 @@ end
 function ItemNormal_00000411(id, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
-    local reqgrids = package:GetItemUsedGrids(1526, 4, 1);
+    local reqgrids = package:GetItemUsedGrids(133, 4, 1);
 
     local prob = {33, 66, 100}
     local items = {{503,1}, {514,1}, {512,1}}
@@ -569,7 +569,7 @@ function ItemNormal_00000411(id, num, bind, param)
 
     if reqgrids <= package:GetRestPackageSize() then 
         package:DelItemSendMsg(411, player);
-        package:AddEquipN(1526, 4, 1, 0, 2);
+        package:AddItem(133, 3, 1, 0, 2);
         package:AddItem(item[1], item[2], 1, 0, 2);
         return num;
     end
@@ -580,7 +580,7 @@ end
 function ItemNormal_00000412(id, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
-    local reqgrids = package:GetItemUsedGrids(1526, 6, 1);
+    local reqgrids = package:GetItemUsedGrids(133, 6, 1);
 
     local prob = {33, 66, 100}
     local items = {{515,1}, {507,1}, {509,1}}
@@ -599,7 +599,7 @@ function ItemNormal_00000412(id, num, bind, param)
 
     if reqgrids <= package:GetRestPackageSize() then 
         package:DelItemSendMsg(412, player);
-        package:AddEquipN(1526, 6, 1, 0, 2);
+        package:AddItem(133, 6, 1, 0, 2);
         package:AddItem(item[1], item[2], 1, 0, 2);
         return num;
     end
@@ -788,7 +788,7 @@ function ItemNormal_00000418(iid, num, bind, param)
         package:AddItem(57, 6*factor, true, 0, 2);
         package:AddItem(514, 6*factor, true, 0, 2);
 
-        package:Add(1526, 6*factor, true, 0, 2);
+        package:Add(133, 6*factor, true, 0, 2);
 
         package:DelItemSendMsg(418, player);
         return num
@@ -822,7 +822,7 @@ function ItemNormal_00000419(iid, num, bind, param)
         package:AddItem(57, 6*factor, true, 0, 2);
         package:AddItem(515, 3*factor, true, 0, 2);
 
-        package:Add(1526, 6*factor, true, 0, 2);
+        package:Add(133, 6*factor, true, 0, 2);
 
         package:DelItemSendMsg(419, player);
         return num
@@ -1461,7 +1461,7 @@ function ItemNormal_00000479(iid, num, bind, param)
     package:AddItem(506, factor, 1, 0, 2);
     package:AddItem(508, factor, 1, 0, 2);
     package:AddItem(500, factor, 1, 0, 2);
-    package:Add(1526, factor, 1, 0, 2);
+    package:Add(133, factor, 1, 0, 2);
     package:AddItem(548, 5*factor, 1, 0, 2);
 
     return num
@@ -2908,7 +2908,7 @@ function ItemNormal_00009001(iid, num, bind, param)
     local items = {
         {{56,6},{57,6},{503,6},{60000,100}},
         {{56,6},{57,6},{514,6},{60000,100}},
-        {{56,6},{57,6},{1526,6},{60000,100}},
+        {{56,6},{57,6},{133,6},{60000,100}},
         {{56,6},{57,6},{509,6},{60000,100}},
         {{56,6},{57,6},{507,6},{60000,100}},
         {{56,6},{57,6},{30000,1},{60000,100}},
@@ -4271,7 +4271,7 @@ function ItemNormal_00009095(iid, num, bind, param)
     local package = player:GetPackage();
 
     local items = {
-        {{511,10}, {1528,1},},
+        {{511,10}, {134,1},},
         {{57,2}, {507,1},},
         {{16,2}, {509,1},},
         {{514,5}, {440,1},},
@@ -4280,7 +4280,7 @@ function ItemNormal_00009095(iid, num, bind, param)
         {{515,1}, {56,2},},
         {{511,10}, {500,5},},
         {{57,4}, {503,3},},
-        {{56,5}, {1528,1},},
+        {{56,5}, {134,1},},
         {{512,4}, {16,4},},
     }
 
@@ -4322,8 +4322,8 @@ function ItemNormal_00009099(iid, num, bind, param)
         return false
     end
 
-    package:Add(1526, num*8, true, 0, 2);
-    package:Add(1528, num*8, true, 0, 2);
+    package:Add(133, num*8, true, 0, 2);
+    package:Add(134, num*8, true, 0, 2);
 
     package:DelItemSendMsg(iid, player);
     return num;
@@ -4456,10 +4456,10 @@ function ItemNormal_00009134(iid, num, bind, param)
         return false
     end
 
-    local items_9134 = {{29,100}, {15,2}, {1526,2}};
-    local items_9135 = {{30,1}, {500,3}, {15,5}, {1526,2}};
-    local items_9136 = {{30,5}, {503,3}, {514,2}, {1528,1}};
-    local items_9137 = {{30,10}, {515,2}, {1528,2}};
+    local items_9134 = {{29,100}, {15,2}, {133,2}};
+    local items_9135 = {{30,1}, {500,3}, {15,5}, {133,2}};
+    local items_9136 = {{30,5}, {503,3}, {514,2}, {134,1}};
+    local items_9137 = {{30,10}, {515,2}, {134,2}};
     local items;
     if (iid == 9134) then
         items = items_9134;
@@ -5603,7 +5603,7 @@ function ItemNormal_00010050(iid, num, bind, param)
         return false
     end
 
-    package:Add(1528, num*5, true, 0, 2);
+    package:Add(134, num*5, true, 0, 2);
     package:Add(1325, num*5, true, 0, 2);
     package:Add(515, num*5, true, 0, 2);
     package:Add(503, num*5, true, 0, 2);
@@ -5875,7 +5875,7 @@ function ItemNormal_00010067(iid, num, bind, param)
     end
 
     package:Add(1325, num*1, true, 0, 2);
-    package:Add(1528, num*1, true, 0, 2);
+    package:Add(134, num*1, true, 0, 2);
     package:Add(56, num*5, true, 0, 2);
     package:Add(57, num*5, true, 0, 2);
     package:Add(440, num*5, true, 0, 2);
@@ -6111,7 +6111,7 @@ function ItemNormal_00009178(iid, num, bind, param)
     local package = player:GetPackage();
 
     local items = {
-        {{511,10}, {1528,1},},
+        {{511,10}, {134,1},},
         {{57,2}, {507,1},},
         {{16,2}, {509,1},},
         {{514,5}, {440,1},},
@@ -6190,7 +6190,7 @@ function ItemNormal_00009179(iid, num, bind, param)
         {501,1,8105}, --洗炼保护符(价值:15)
         {513,1,8981}, --宝石保护符(价值:15)
         {1325,1,9244}, --技能符文熔炼诀(价值:50)
-        {1528,1,9507}, --法灵精金(价值:50)
+        {134,1,9507}, --法灵精金(价值:50)
         {507,1,9671}, --补髓益元丹(价值:80)
         {509,1,9835}, --凝神易筋丹(价值:80)
         {515,1,10000}, --五行精金(价值:80)
@@ -6252,7 +6252,7 @@ function ItemNormal_00009192(iid, num, bind, param)
         return false
     end
 
-    package:Add(1528, 1, true, 0, 2);
+    package:Add(134, 1, true, 0, 2);
     package:Add(1325, 1, true, 0, 2);
 
     local prob = {2000, 4000, 6000, 8000, 10000}
@@ -6266,7 +6266,7 @@ function ItemNormal_00009192(iid, num, bind, param)
             break
         end
     end
-    Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."] "..msg_60.."[4:9192]，"..msg_61.."[4:1528]x1、[4:1325]x1、[4:"..items[i][1].."]x1")
+    Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."] "..msg_60.."[4:9192]，"..msg_61.."[4:134]x1、[4:1325]x1、[4:"..items[i][1].."]x1")
 
     package:DelItemSendMsg(iid, player);
     return 1;
@@ -6311,7 +6311,7 @@ function ItemNormal_00009210(iid, num, bind, param)
     end
     package:DelItemSendMsg(iid, player);
 
-    local items = {506, 507, 508, 509, 514, 515, 500, 49, 503, 1528, 517, 1325}
+    local items = {506, 507, 508, 509, 514, 515, 500, 49, 503, 134, 517, 1325}
     local prob = {1575,1732,3307,3464,5039,5236,6811,7008,7795,8110,9685,10000}
     local broad = {0,1,0,1,0,1,0,0,0,1,0,1}
     local item
@@ -6373,7 +6373,7 @@ function ItemNormal_00009215(iid, num, bind, param)
     end
     local items = {{547,1271},{507,1398},{551,2669},{509,2796},{514,4067},
                    {515,4173},{500,5444},{49,6080},{503,6716},{9214,7140},
-                   {517,8411},{1325,8570},{1528,8729},{512,10000}}
+                   {517,8411},{1325,8570},{134,8729},{512,10000}}
     local broad = {0,1,0,1,0,1,0,1,0,1,0,1,1,0};
     local total = 0;
     for x=1,num do
