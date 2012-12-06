@@ -10621,6 +10621,8 @@ namespace GObject
 
     void Player::getThanksGivingDay(UInt8 opt)
     {
+        if(!World::getThanksgiving())
+            return;
         if(opt == 0) //免费领取
         {
             if(GetVar(VAR_TGDT) & 0x01)
@@ -10630,7 +10632,7 @@ namespace GObject
                 UInt32 var = GetVar(VAR_TGDT) | 0x01;
                 SetVar(VAR_TGDT, var);
                 Stream st(REP::GETAWARD);
-                st << static_cast<UInt8>(15) << static_cast<UInt8>(0) << Stream::eos;
+                st << static_cast<UInt8>(15) << static_cast<UInt8>(4) << Stream::eos;
                 send(st);
                 udpLog("huodong", "F_10000_15", "", "", "", "", "act");
             }
@@ -10653,9 +10655,15 @@ namespace GObject
                 ConsumeInfo ci(ThanksGivingDay, 0, 0);
                 useGold(30, &ci);
                 Stream st(REP::GETAWARD);
-                st << static_cast<UInt8>(15) << static_cast<UInt8>(1) << Stream::eos;
+                st << static_cast<UInt8>(15) << static_cast<UInt8>(5) << Stream::eos;
                 send(st);
             }
+        }
+        if(opt == 2) //告诉客户端领取情况
+        {
+            Stream st(REP::GETAWARD);
+            st << static_cast<UInt8>(15) << static_cast<UInt8>(GetVar(VAR_TGDT)) << Stream::eos;
+            send(st);
         }
     }
 
