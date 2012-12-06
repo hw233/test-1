@@ -41,11 +41,6 @@ void PlayerCopy::setCopyActiveCount(UInt8 c) { _activeCount = c; }
 
 void autoClear(Player* pl, bool complete = false, UInt8 id = 0, UInt8 floor = 0, UInt8 spot = 0)
 {
-    if (pl->GetPackage()->GetRestPackageSize() == 0)
-    {
-        pl->sendMsgCode(0, 1011);
-        return;
-    }
     if (!pl)
         return;
 
