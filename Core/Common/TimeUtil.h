@@ -202,12 +202,13 @@ public:
                ++ (*pY) ;
         }
     }
-    static inline UInt8 GetOneMonthDays()
+    static inline UInt8 GetOneMonthDays(UInt32 nowTime = Now())
     {
-        UInt32 day = 1;
-        UInt32 mon = 1;
-        UInt32 year = 2012;
-        GetDMY(&day, &mon, &year);
+        time_t now = static_cast<time_t>(nowTime);
+        struct tm local;
+        localtime_r(&now,&local);
+        UInt32 mon = local.tm_mon + 1;
+        UInt32 year = local.tm_year + 1900;
         bool leapYear = ((year%4 == 0 && year%100 != 0) || year%400 == 0) ? true : false;
         switch(mon)
         {

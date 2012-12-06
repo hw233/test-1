@@ -1022,7 +1022,7 @@ bool World::Init()
 	GObject::Tianjie::instance().Init();
 	AddTimer(5 * 1000, Tianjie_Refresh, static_cast<void*>(NULL));
 	GObject::DaysRank::instance().Init(); 
-	AddTimer(60 * 1000, DaysRank_Refresh, static_cast<void*>(NULL)); //调试用
+	//AddTimer(60 * 1000, DaysRank_Refresh, static_cast<void*>(NULL)); //调试用
 
 	GObjectManager::delayLoad();
 	GObjectManager::LoadPracticeData();
@@ -1086,7 +1086,7 @@ bool World::Init()
     AddTimer(86400 * 1000, TownDeamonTmAward, static_cast<void *>(NULL), (tdChkPoint >= now ? tdChkPoint - now : 86400 + tdChkPoint - now) * 1000);
 
     UInt32 drChkPoint = TimeUtil::SharpDayT(0, now) + DAYSRANKTM;
-    //AddTimer(86400 * 1000, DaysRank_Refresh, static_cast<void *>(NULL), (drChkPoint >= now ? drChkPoint - now : 86400 + drChkPoint - now) * 1000);
+    AddTimer(86400 * 1000, DaysRank_Refresh, static_cast<void *>(NULL), (drChkPoint >= now ? drChkPoint - now : 86400 + drChkPoint - now) * 1000);
 
     //AddTimer(60 * 1000, advancedHookTimer, static_cast<void *>(NULL), (60 - now % 60) * 1000);
 

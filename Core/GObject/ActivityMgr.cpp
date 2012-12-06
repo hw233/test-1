@@ -198,7 +198,7 @@ UInt8 ActivityMgr::GetContinueSignInCnt(UInt8 day)
         }
         if(cnt == day)
         {
-            UInt8 dayCnt = TimeUtil::MonthDay(TimeUtil::Now() - day * 86400);
+            UInt8 dayCnt = TimeUtil::GetOneMonthDays(TimeUtil::Now() - 7 * 86400);
             for(UInt8 j = dayCnt; j > dayCnt - 7 + cnt; --j)
             {
                 if(_item.signRecord[0][j-1] <= 0)
