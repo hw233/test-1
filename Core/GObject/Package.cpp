@@ -4757,21 +4757,25 @@ namespace GObject
 
     bool Package::TryBuyItem(UInt32 typeId, UInt32 num, bool bind /*= false */)
     {      
-        if (!typeId || !num) return NULL;
-		if (IsEquipTypeId(typeId)) return NULL;
+        if (!typeId || !num) return false;
+		if (IsEquipTypeId(typeId)) return false;
 		const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[typeId];
-		if(itemType == NULL) return NULL;
+		if(itemType == NULL) return false;
 		ITEM_BIND_CHECK(itemType->bindType,bind);
 		ItemBase * item = FindItem(typeId, bind);
-   
-		UInt16 cur = m_Size;
-		UInt16 oldq = item->Size(), newq = item->Size(item->Count() + num);
-		cur = cur - oldq + newq;
-		if(cur > m_Owner->getPacksize())
-			return false;
-		if(!item->IncItem(num))
-			return false;
-		m_Size = cur;
+        if(item)
+        {
+            UInt16 cur = m_Size;
+            UInt16 oldq = item->Size(), newq = item->Size(item->Count() + num);
+            cur = cur - oldq + newq;
+            if(cur > m_Owner->getPacksize())
+                return false;
+        }
+        else if(itemType->Size(num) > GetRestPackageSize())
+        {
+            return false;
+        }
+
 		return true;
     }
 
