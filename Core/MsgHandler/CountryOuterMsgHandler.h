@@ -2771,10 +2771,10 @@ void OnBattleEndReq( GameMsgHdr& hdr, BattleEndReq& req )
 
     player->addLastTjScore();
 
+	player->checkLastBattled();
+
     if(now <= PLAYER_DATA(player, battlecdtm))
 		return ;
-
-	player->checkLastBattled();
 }
 
 void OnCopyReq( GameMsgHdr& hdr, CopyReq& req )

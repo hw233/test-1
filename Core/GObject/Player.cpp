@@ -3388,6 +3388,11 @@ namespace GObject
 	bool Player::attackCopyNpc( UInt32 npcId, UInt8 type, UInt8 copyId,
             UInt8 expfactor, UInt8 lootlvl, bool ato, std::vector<UInt16>* loot, bool applayhp )
 	{
+        if (GetPackage()->GetRestPackageSize() == 0)
+        {
+            sendMsgCode(0, 1011);
+            return false;
+        }
 		UInt32 now = TimeUtil::Now();
 		UInt32 buffLeft = getBuffData(PLAYER_BUFF_ATTACKING, now);
 		if(cfg.GMCheck && buffLeft > now && !ato)

@@ -3314,7 +3314,16 @@ namespace GObject
 		if(item == NULL || item->getQuality() < 2 || item->getReqLev() < 1)
 			return 2;
 
-		if((m_Size  + 2) >= (m_Owner->getPacksize() + 50))
+        bool spirit = false;
+        UInt8 itemTypeNumMayOut = 2;
+        ItemEquip* equip = static_cast<ItemEquip*>(item);
+        if (equip->isSpirited())
+        {
+            spirit = true;
+            itemTypeNumMayOut = 6;
+        }
+
+		if((m_Size + itemTypeNumMayOut) > (m_Owner->getPacksize() + 50))
         {
             m_Owner->sendMsgCode(0, 1011);
             return 2;
@@ -3399,7 +3408,7 @@ namespace GObject
             }
         }
 
-        bool spirit = false;
+        if(spirit)
         {
             ItemEquip* equip = static_cast<ItemEquip*>(item);
             if (equip->isSpirited())
@@ -3417,7 +3426,6 @@ namespace GObject
                     {
                         AddItem(tmpId, count, isBound, silence, FromSplit);
                         pushBackSplitItem( m_Owner, splitOut, tmpId, count );
-                        spirit = true;
                     }
                 }
             }
