@@ -4152,6 +4152,16 @@ namespace GObject
             snprintf(gold, sizeof(gold), "%u", c);
             udpLog("sale", gold, "", "", "", "", "currency");
         }
+
+#ifndef _WIN32
+#ifdef _FB
+#else
+        if (ii)
+            dclogger.gold_sec(this, c, ii->incommingType, true);
+        else
+            dclogger.gold_sec(this, c, 0, true);
+#endif
+#endif
 		return _playerData.gold;
 	}
 
@@ -4188,12 +4198,18 @@ namespace GObject
 #ifdef _FB
 #else
         dclogger.consume(this, _playerData.gold, c);
+        if (ci)
+            dclogger.gold_sec(this, c, ci->purchaseType, false);
+        else
+            dclogger.gold_sec(this, c, 0, false);
+
 #endif
 #endif // _WIN32
         if(ci && ci->purchaseType != TrainFighter)
             AddVar(VAR_USEGOLD_CNT, c);
         return _playerData.gold;
 	}
+
     void Player::deleteGold(UInt32 c)
     {
         UInt32 n = _playerData.gold;
@@ -4240,10 +4256,20 @@ namespace GObject
                 _playerData.gold -= _holdGold;
 				sendModification(1, _playerData.gold);
 
+#ifndef _WIN32
+#ifdef _FB
+#else
+                if (ci)
+                    dclogger.gold_sec(this, c, ci->purchaseType, false);
+                else
+                    dclogger.gold_sec(this, c, 0, false);
+#endif
+#endif
+
                 if(ci!=NULL)
                 {
                     DBLOG1().PushUpdateData("insert into consume_gold (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
-                        cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, c, TimeUtil::Now());
+                            cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, c, TimeUtil::Now());
                 }
 
                 if (ci && ci->purchaseType == PurchaseSale)
@@ -4299,6 +4325,12 @@ namespace GObject
 		if(c == 0)
 			return _playerData.coupon;
 		_playerData.coupon += c;
+#ifndef _WIN32
+#ifdef _FB
+#else
+        dclogger.coupon_sec(this, c, 0, true);
+#endif
+#endif
 		SYSMSG_SENDV(155, this, c);
 		SYSMSG_SENDV(1055, this, c);
 		sendModification(2, _playerData.coupon);
@@ -4319,6 +4351,15 @@ namespace GObject
 				DBLOG1().PushUpdateData("insert into consume_coupon (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
 					cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, c, TimeUtil::Now());
             }
+#ifndef _WIN32
+#ifdef _FB
+#else
+            if (ci)
+                dclogger.coupon_sec(this, c, ci->purchaseType, false);
+            else
+                dclogger.coupon_sec(this, c, 0, false);
+#endif
+#endif
         }
 		SYSMSG_SENDV(156, this, c);
 		SYSMSG_SENDV(1056, this, c);
@@ -4370,6 +4411,12 @@ namespace GObject
 		{
 			_playerData.tael += c;
 			sendModification(3, _playerData.tael);
+#ifndef _WIN32
+#ifdef _FB
+#else
+        dclogger.tael_sec(this, c, 0, true);
+#endif
+#endif
 		}
 		return _playerData.tael;
 	}
@@ -4389,9 +4436,18 @@ namespace GObject
 				DBLOG1().PushUpdateData("insert into %s (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",tbn.c_str(), cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, c, TimeUtil::Now());
 			}
 			_playerData.tael -= c;
-		}
-		SYSMSG_SENDV(152, this, c);
-		SYSMSG_SENDV(1052, this, c);
+#ifndef _WIN32
+#ifdef _FB
+#else
+            if (ci)
+                dclogger.tael_sec(this, c, ci->purchaseType, false);
+            else
+                dclogger.tael_sec(this, c, 0, false);
+#endif
+#endif
+        }
+        SYSMSG_SENDV(152, this, c);
+        SYSMSG_SENDV(1052, this, c);
 		sendModification(3, _playerData.tael);
         if(ci && ci->purchaseType != TrainFighter)
         {
@@ -4405,6 +4461,7 @@ namespace GObject
         }
 		return _playerData.tael;
 	}
+
 	void Player::useTael2(UInt32 c, Player *attacker, ConsumeInfo * ci)//nature challengge use
 	{
 		if(c == 0 || _playerData.tael == 0)
@@ -4421,11 +4478,20 @@ namespace GObject
 					tbn.c_str(),cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, c, TimeUtil::Now());
 			}
 			_playerData.tael -= c;
-		}
-		SYSMSG_SENDV(152, this, c);
-		//SYSMSG_SENDV(1060, this, attacker->getCountry(), attacker->getName().c_str(), c);
-		sendModification(3, _playerData.tael);
-	}
+#ifndef _WIN32
+#ifdef _FB
+#else
+            if (ci)
+                dclogger.tael_sec(this, c, ci->purchaseType, false);
+            else
+                dclogger.tael_sec(this, c, 0, false);
+#endif
+#endif
+        }
+        SYSMSG_SENDV(152, this, c);
+        //SYSMSG_SENDV(1060, this, attacker->getCountry(), attacker->getName().c_str(), c);
+        sendModification(3, _playerData.tael);
+    }
 
     UInt32 Player::getMoneyArenaLua(UInt32 c)
     {
@@ -4433,8 +4499,8 @@ namespace GObject
         return getMoneyArena(c, &ii);
     }
 
-	UInt32 Player::getMoneyArena( UInt32 c, IncommingInfo* ii)
-	{
+    UInt32 Player::getMoneyArena( UInt32 c, IncommingInfo* ii)
+    {
         UInt32 moneyArena = GetVar(VAR_MONEY_ARENA);
 		if(c == 0)
 			return moneyArena;
