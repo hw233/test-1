@@ -416,6 +416,7 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
             }
 
             GameAction()->onFrontMapWin(pl, id, spot, tmp[spot].lootlvl);
+            pl->copyFrontWinAward(2);
             DB3().PushUpdateData("DELETE FROM `player_frontmap` WHERE `playerId` = %"I64_FMT"u AND `id` = %u", pl->getId(), id);
             if (ato)
                 autoClear(pl, complate);
