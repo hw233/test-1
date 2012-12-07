@@ -3382,15 +3382,17 @@ namespace GObject
 
     bool Player::attackRareAnimal(UInt32 id)
     {
-        return attackCopyNpc(id, 1/*XXX:使用这个背景*/, 5, 1, 1, false, NULL, false);
+        bool isFull = false;
+        return attackCopyNpc(id, 1/*XXX:使用这个背景*/, 5, 1, isFull, 1, false, NULL, false);
     }
 
 	bool Player::attackCopyNpc( UInt32 npcId, UInt8 type, UInt8 copyId,
-            UInt8 expfactor, UInt8 lootlvl, bool ato, std::vector<UInt16>* loot, bool applayhp )
+            UInt8 expfactor, bool& full, UInt8 lootlvl, bool ato, std::vector<UInt16>* loot, bool applayhp )
 	{
         if (GetPackage()->GetRestPackageSize() == 0)
         {
             sendMsgCode(0, 1011);
+            full = true;
             return false;
         }
 		UInt32 now = TimeUtil::Now();
@@ -7220,7 +7222,7 @@ namespace GObject
             GObject::RechargeTmpl::instance().sendScoreInfo(this);
         }
 
-        AddVar(VAR_FIRST_RECHARGE_VALUE, r);
+        //AddVar(VAR_FIRST_RECHARGE_VALUE, r);
         sendFirstRecharge();
 	}
 
@@ -7343,6 +7345,10 @@ namespace GObject
             total = GetVar(VAR_RECHARGE_TOTAL);
         else
             total = GetVar(VAR_RECHARGE_TOTAL3366);
+
+        Stream st(REP::DAILY_DATA);
+        st << static_cast<UInt8>(12) << total << Stream::eos;
+        send((st));
            
         if (rank && World::getNeedRechargeRank())
         {
@@ -15203,6 +15209,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
     static UInt32 newRecharge[] = {10, 88, 188, 588};
     void Player::FirstRechargeAct(UInt8 step, UInt8 type, UInt8 career)
     {
+        return;
         if(step == 0 || step > 4)
             return;
         if(type > 1)
@@ -15253,6 +15260,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
 
     void Player::sendFirstRecharge(bool isLogin)
     {
+        return;
         UInt32 lostValue = 0;
         UInt8 lostStep = 4;
         UInt8 canStep = 4;
