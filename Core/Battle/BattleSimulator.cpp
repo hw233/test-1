@@ -4875,6 +4875,8 @@ UInt32 BattleSimulator::doAttack( int pos )
     BattleFighter* mainTarget = NULL;
     do {
         rcnt += doDeBufAttack(bf);
+        if(bf->getHP() == 0)
+            break;
 
         UInt32 stun = bf->getStunRound();
         UInt32 confuse = bf->getConfuseRound();
@@ -6589,6 +6591,24 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo, DefStatus* defL
                         ++ defCount;
                     }
 
+                    if(bo2->getBlind() > 0.001f)
+                    {
+                        bo2->resetBlind();
+                        if(bo2->getDeepBlindDmgExtra() > 0.001f)
+                        {
+                            bo2->resetDeepBlind();
+                            defList[defCount].damType = e_unDeepBlind;
+                        }
+                        else
+                        {
+                            defList[defCount].damType = e_unBlind;
+                        }
+                        defList[defCount].pos = getSidePos(bo2);
+                        defList[defCount].damage = 0;
+                        defList[defCount].leftHP = bo2->getHP();
+                        ++ defCount;
+                    }
+
                     bo2->setColorStock(GData::e_state_c_s_f_b, SKILL_LEVEL(pskill->getId()), last);
                     defList[defCount].pos = getSidePos(bo2);
                     defList[defCount].damType = e_Immune3;
@@ -7804,6 +7824,24 @@ bool BattleSimulator::doSkillStrengthen_disperse(BattleFighter* bf, const GData:
             else
                 defList[defCount].damType = e_UnForget;
 
+            defList[defCount].pos = getSidePos(bo);
+            defList[defCount].damage = 0;
+            defList[defCount].leftHP = bo->getHP();
+            ++ defCount;
+        }
+
+        if(bo->getBlind() > 0.001f)
+        {
+            bo->resetBlind();
+            if(bo->getDeepBlindDmgExtra() > 0.001f)
+            {
+                bo->resetDeepBlind();
+                defList[defCount].damType = e_unDeepBlind;
+            }
+            else
+            {
+                defList[defCount].damType = e_unBlind;
+            }
             defList[defCount].pos = getSidePos(bo);
             defList[defCount].damage = 0;
             defList[defCount].leftHP = bo->getHP();

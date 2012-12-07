@@ -717,20 +717,25 @@ public:
     void setSummonFactor(float factor, UInt8 last);
     bool releaseSummon();
     inline void setMoAuraBuf(UInt8 value, UInt8 last) { if(last == 0) return; _moAuraBuf = value; _moAuraBufLast = last; }
+    inline void resetMoAuraBuf() { _moAuraBuf = 0; _moAuraBufLast = 0; }
     inline UInt8 getMoAuraBuf() { return _moAuraBuf; }
     bool releaseMoAuraBuf();
     inline void setMoEvade100(UInt8 value, UInt8 last) { if(last == 0) return; _moEvade100 = value; _moEvade100Last = last; }
+    inline void resetMoEvade100() { _moEvade100 = 0; _moEvade100Last = 0; }
     bool getMoEvade100();
     bool releaseMoEvade100();
     void setHideBuf(UInt8 value, UInt8 last);
     bool releaseHideBuf();
     inline void setMarkMo(bool value, UInt8 last) { if(last == 0) return; _markMo = value; _markMoLast= last; }
+    inline void resetMarkMo() { _markMo = 0; _markMoLast = 0; }
     inline bool isMarkMo() { return _markMo; }
     bool releaseMarkMo();
     inline void setDeepBlind(float value, UInt8 last) { if(last == 0) return; _deep_blind_dmg_extra = value; _deep_blind_last = last; }
+    inline void resetDeepBlind() { _deep_blind_dmg_extra = 0; _deep_blind_last = 0; }
     inline float getDeepBlindDmgExtra() { return _deep_blind_dmg_extra; }
     bool releaseDeepBlind();
     inline void setBlind(float value, UInt8 last) { if(last == 0) return; _blind = value; _blind_last = last; }
+    inline void resetBlind() { _blind = 0; _blind_last = 0; }
     inline float getBlind() { return _blind; }
     bool releaseBlind();
 
@@ -738,6 +743,11 @@ public:
     inline void setMoMagAtkAdd(float value, UInt8 last) { if(last == 0) return; _moMagAtkAdd = value; _moMagAtkAddCD = last; }
     inline void setMoAtkReduce(float value, UInt8 last) { if(last == 0) return; _moAtkReduce = value; _moAtkReduceCD = last; }
     inline void setMoMagAtkReduce(float value, UInt8 last) { if(last == 0) return; _moMagAtkReduce = value; _moMagAtkReduceCD = last; }
+
+    inline void resetMoAttackAdd() { _moAttackAdd = 0; _moAttackAddCD = 0; }
+    inline void resetMoMagAtkAdd() { _moMagAtkAdd = 0; _moMagAtkAddCD = 0; }
+    inline void resetMoAtkReduce() { _moAtkReduce = 0; _moAtkReduceCD = 0; }
+    inline void resetMoMagAtkReduce() { _moMagAtkReduce = 0; _moMagAtkReduceCD = 0; }
 
     inline float getMoAttackAdd() { return _moAttackAdd; }
     inline float getMoMagAtkAdd() { return _moMagAtkAdd; }
@@ -751,6 +761,7 @@ public:
 
     inline float getBleedMo() { return _bleedMo; }
     inline void setBleedMo(float value, UInt8 last) { if(last == 0) return; _bleedMo = value; _bleedMoLast = last; }
+    inline void resetBleedMo() { _bleedMo = 0; _bleedMoLast = 0; }
     bool releaseBleedMo();
 
     void setUnSummonAura(BattleFighter* bf, UInt32 aura) { _summoner = bf, _unSummonAura = aura; }
