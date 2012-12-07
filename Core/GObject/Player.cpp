@@ -615,6 +615,10 @@ namespace GObject
             _new_rank = true;
         else
             _new_rank = false;*/
+        memset(cf_posOrig, 0, sizeof(cf_posOrig));
+        memset(cf_posPut, 0, sizeof(cf_posPut));
+        memset(cf_itemId, 0, sizeof(cf_itemId));
+        memset(cf_ratio, 0 ,sizeof(cf_ratio));
 	}
 
 
@@ -15297,6 +15301,67 @@ void EventTlzAuto::notify(bool isBeginAuto)
         st << static_cast<UInt8>(0x03) << index << Stream::eos;
         send(st);
     }
+
+void Player::copyFrontWinAward(UInt8 index)
+{
+    UInt8 step;
+    UInt32 itemId;
+    UInt32 ratio;
+
+    if(index == 0 || index > 2)
+        return;
+    for(UInt8 i = 0; i < 5; i++)
+    {
+        if(i == 0)
+            step = 1;
+        else if(i == 1)
+            step = 2;
+        else
+            step = 0;
+        Table award = GameAction()->getCopyFrontmapAward(step, PLAYER_DATA(this, location));
+        if (award.size() < 2)
+            continue;
+        itemId = award.get<UInt32>(1);
+        ratio = award.get<UInt32>(2);
+        printf("itemId = %u, ratio = %u\n", itemId, ratio);
+    }
+}
+
+void Player::loadCopyFrontWinFromDB(UInt8 posOrig, UInt8 posPut, UInt32 itemId, UInt16 ratio)
+{
+    if(posOrig == 0 || posOrig > 5)
+        return;
+    cf_itemId[posOrig - 1] = itemId;
+    cf_ratio[posOrig - 1] = ratio;
+    if(posPut >= 1 && posPut <= 5)
+        cf_posPut[posOrig - 1] = posPut;
+}
+
+void Player::getCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index)
+{
+    if(copy_or_front != GetVar(VAR_CF_FLAG))
+        return;
+    if(index == 0 || index > 5)
+        return;
+
+}
+
+void Player::freshCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index)
+{
+    if(copy_or_front != GetVar(VAR_CF_FLAG))
+        return;
+    if(index == 0 || index > 5)
+        return;
+
+}
+
+void Player::sendCopyFrontAllAward()
+{
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(0x04) << index << Stream::eos;
+    send(st);
+
+}
 
 } // namespace GObject
 

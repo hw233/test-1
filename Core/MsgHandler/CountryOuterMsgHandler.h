@@ -1219,6 +1219,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     //if(World::getYearActive())
     //    pl->sendYearActInfo();
     pl->sendFirstRecharge(true);
+    pl->sendCopyFrontAllAward();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -1774,6 +1775,22 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
             player->FirstRechargeAct(step, type, career);
         }
         break;
+
+        case 4:
+        {
+            UInt8 type;
+            UInt8 copy_or_front;
+            UInt8 index;
+
+            br >> type;
+            br >> copy_or_front;
+            br >> index;
+
+            if(type == 0)
+                player->getCopyFrontAwardByIndex(copy_or_front, index);
+            else if(type == 1)
+                player->freshCopyFrontAwardByIndex(copy_or_front, index);
+        }
         default:
         break;
     }

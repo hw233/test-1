@@ -2805,10 +2805,11 @@ void GMHandler::OnNewRelation(GObject::Player* player, std::vector<std::string>&
             responderName = args[1];
         player->GetNewRelation()->challengeRequest(player, responderName);
         */
-        playerCopy.copyWinAward(player);
+        player->copyFrontWinAward(1);
     }
     else if(type == 6)
     {
+        /*
         std::string senderName("70603");
         if(args.size() >= 2)
             senderName = args[1];
@@ -2816,6 +2817,8 @@ void GMHandler::OnNewRelation(GObject::Player* player, std::vector<std::string>&
         if(args.size() >= 3)
             accept = atoi(args[2].c_str());
         player->GetNewRelation()->challengeRespond(player, senderName, accept);
+        */
+        player->copyFrontWinAward(2);
     }
     else if(type == 7)
     {

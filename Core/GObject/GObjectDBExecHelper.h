@@ -253,6 +253,16 @@ struct DBJobHunter
     UInt32 stepCount;
 };
 
+struct DBCopyFrontWin
+{
+    UInt64 playerId;
+    UInt8 posOrig;
+    UInt8 posPut;
+    UInt32 itemId;
+    UInt16 ratio;
+};
+
+
 struct DBFighterBuffData
 {
 	UInt64 playerId;
@@ -2462,6 +2472,16 @@ SPECIALDEF(9)
 )
 SPECIALEND()
 
+SPECIALBEGIN(GObject::DBCopyFrontWin)
+SPECIALDEF(5)
+(
+    UInt64, playerId,
+    UInt8, posOrig,
+    UInt8, posPut,
+    UInt32, itemId,
+    UInt16, ratio
+)
+SPECIALEND()
 
 }
 
