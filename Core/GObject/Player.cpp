@@ -1112,7 +1112,7 @@ namespace GObject
                 }
             }
         }
-
+        /*
 		if(!_playerData.totalRecharge && !GetVar(VAR_VIPFIRST))
 		{
             SetVar(VAR_VIPFIRST, 1);
@@ -1139,7 +1139,7 @@ namespace GObject
                 DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
             }
 		}
-
+        */
 #ifndef _WIN32
 #ifndef _FB
 #ifndef _VT
@@ -1835,7 +1835,8 @@ namespace GObject
                 DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardgot, getId());
             }
         }
-
+        /** deleted by qiwy 2012-12-07 **/
+#if 0
         if (lvl >= 40 && !(_playerData.qqawardgot & 0x08))
         {
             SYSMSG(title, 2114);
@@ -1857,6 +1858,7 @@ namespace GObject
                 DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardgot, getId());
             }
         }
+#endif
     }
 
 	void Player::Reconnect()
@@ -7222,7 +7224,7 @@ namespace GObject
             GObject::RechargeTmpl::instance().sendScoreInfo(this);
         }
 
-        //AddVar(VAR_FIRST_RECHARGE_VALUE, r);
+        AddVar(VAR_FIRST_RECHARGE_VALUE, r);
         sendFirstRecharge();
 	}
 
@@ -11908,10 +11910,12 @@ namespace GObject
     {
 #ifdef _FB
 #else
+        /** deleted by qiwy 2012-12-07 **/
+#if 0
         SYSMSG(title, 2335);
         SYSMSG(content, 2336);
         GetMailBox()->newMail(NULL, 0x12, title, content);
-
+#endif
 
         MailPackage::MailItem item[5] = {{9161, 1}, {9162, 1}, {9164, 1}, {9165, 1}, {9166, 1}};
         sendMailItem(4028, 4028, item, 5);
@@ -15209,7 +15213,6 @@ void EventTlzAuto::notify(bool isBeginAuto)
     static UInt32 newRecharge[] = {10, 88, 188, 588};
     void Player::FirstRechargeAct(UInt8 step, UInt8 type, UInt8 career)
     {
-        return;
         if(step == 0 || step > 4)
             return;
         if(type > 1)
@@ -15260,7 +15263,6 @@ void EventTlzAuto::notify(bool isBeginAuto)
 
     void Player::sendFirstRecharge(bool isLogin)
     {
-        return;
         UInt32 lostValue = 0;
         UInt8 lostStep = 4;
         UInt8 canStep = 4;
