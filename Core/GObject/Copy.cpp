@@ -477,6 +477,10 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                 pl->GetPackage()->AddItem(9138, 1, false, false);
             }
             GameAction()->onCopyWin(pl, id, tcd.floor, tcd.spot, tcd.lootlvl);
+            UInt32 bind = 1;
+            if(PLAYER_DATA(pl, copyFreeCnt) == getFreeCount() && PLAYER_DATA(pl, copyGoldCnt) > 0)
+                bind = 0;
+            pl->SetVar(VAR_CF_BIND, bind);
             pl->copyFrontWinAward(1);
 
             pl->OnHeroMemo(MC_SLAYER, MD_ADVANCED, 0, 2);

@@ -1840,3 +1840,16 @@ CREATE TABLE `job_hunter` (
     PRIMARY KEY (`playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `copy_front_win`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `copy_front_win` (
+    `playerId` int(20) NOT NULL DEFAULT '0',
+    `posOrig` tinyint(3) NOT NULL DEFAULT '0',
+    `posPut` tinyint(3) NOT NULL DEFAULT '0',
+    `itemId` int(10) unsigned NOT NULL DEFAULT '0',
+    `ratio` mediumint(5) unsigned NOT NULL DEFAULT '0',
+    PRIMARY KEY (`playerId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+

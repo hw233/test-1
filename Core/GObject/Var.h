@@ -297,6 +297,7 @@ namespace GObject
         VAR_FIRST_RECHARGE_VALUE = 286, //充值数
         VAR_FIRST_RECHARGE_STEP = 287, //已领阶段
         VAR_CF_FLAG = 288, //是副本，还是阵图
+        VAR_CF_BIND = 289, //是否绑定
 
         //繁体版占用301-330
 
@@ -578,6 +579,7 @@ namespace GObject
             REGISTER_VAR(VAR_FIRST_RECHARGE_VALUE, CYCLE_NONE);
             REGISTER_VAR(VAR_FIRST_RECHARGE_STEP, CYCLE_NONE);
             REGISTER_VAR(VAR_CF_FLAG, CYCLE_NONE);
+            REGISTER_VAR(VAR_CF_BIND, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

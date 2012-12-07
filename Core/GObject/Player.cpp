@@ -15459,6 +15459,9 @@ void Player::getCopyFrontCurrentAward(UInt8 index)
         st << static_cast<UInt16>(cf_itemId[curId]);
         st << Stream::eos;
         send(st);
+
+        bool bind = GetVar(VAR_CF_BIND);
+        m_Package->Add(cf_itemId[curId], 1, bind);
     }
 }
 
