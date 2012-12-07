@@ -6,6 +6,7 @@
 #include "Server/Cfg.h"
 #include "Mail.h"
 #include "MsgID.h"
+#include "DCLogger.h"
 
 
 namespace GObject
@@ -253,8 +254,8 @@ void Sale::buySellResp(SaleItemBuy& saleItemBuy)
 			_owner->holdCoin(saleItemBuy.price, 2);
 		else
 #endif
-			_owner->holdGold(saleItemBuy.price, 2);
-		_owner->sendMsgCode(0, 1055);
+            _owner->holdGold(saleItemBuy.price, 2);
+        _owner->sendMsgCode(0, 1055);
 	}
 }
 
@@ -322,6 +323,7 @@ void Sale::sellSaleResp(UInt32 id, Player *buyer, UInt32 itemId, UInt16 itemNum)
 			SYSMSGV(content, 314, saleSellRespData->itemName, buyer->getNameNoSuffix(buyer->getName()), saleSellRespData->price);
             MailItemsInfo itemsInfo(NULL, SaleSell, 0);
 			_owner->GetMailBox()->newMail(_owner, 0x07, title, content, 0, true, &itemsInfo);
+            dclogger.trade_sec(_owner, buyer, itemId, itemNum, saleSellRespData->price);
 		}
 		SAFE_DELETE(saleSellRespData);
 		_sellItems.erase(found);
