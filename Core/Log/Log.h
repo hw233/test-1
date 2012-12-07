@@ -90,6 +90,7 @@ enum PurchaseType
     AutoJobHunter               = 79,
     AutoJobHunterComplete       = 80,
     EnumFirstRecharge           = 81,
+    EnumCopyFrontWin            = 82,
     //繁体私有占150～200
 };
 

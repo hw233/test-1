@@ -4340,13 +4340,13 @@ local copyFrontAward = {
     },
 }
 local item = {}
-function getCopyFrontmapAward(step, spot)
+function getCopyFrontmapAward(step, localtion)
     if step > 2 then
         return {}
     end
     local order
     if step == 1 then
-        local itemsAll = copyFrontAward[spot];
+        local itemsAll = copyFrontAward[localtion];
         if itemsAll == nil then
             -- print("itemsAll1")
             return {}
@@ -4368,7 +4368,7 @@ function getCopyFrontmapAward(step, spot)
         return item;
     else
         -- print("---000------"..step.."----------")
-        local itemsAll = copyFrontAward[spot];
+        local itemsAll = copyFrontAward[localtion];
         local items1 = {}
         local items3 = {}
         if itemsAll ~= nil then

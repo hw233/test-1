@@ -615,7 +615,6 @@ namespace GObject
             _new_rank = true;
         else
             _new_rank = false;*/
-        memset(cf_posOrig, 0, sizeof(cf_posOrig));
         memset(cf_posPut, 0, sizeof(cf_posPut));
         memset(cf_itemId, 0, sizeof(cf_itemId));
         memset(cf_ratio, 0 ,sizeof(cf_ratio));
@@ -15304,12 +15303,85 @@ void EventTlzAuto::notify(bool isBeginAuto)
 
 void Player::copyFrontWinAward(UInt8 index)
 {
+    SetVar(VAR_CF_FLAG, index);
+    resetCopyFrontWinAward();
+    sendCopyFrontAllAward();
+}
+
+void Player::loadCopyFrontWinFromDB(UInt8 posOrig, UInt8 posPut, UInt32 itemId, UInt16 ratio)
+{
+    if(posOrig >= 5)
+        return;
+    cf_itemId[posOrig] = itemId;
+    cf_ratio[posOrig] = ratio;
+    if(posPut <= 5)
+        cf_posPut[posOrig] = posPut;
+}
+
+void Player::getCopyFrontCurrentAward(UInt8 index)
+{
+    UInt32 leftIndex[5];
+    UInt32 leftCnt = 0;
+    UInt8 i;
+    for(i = 0; i < 5; i++)
+    {
+        if(cf_posPut[i] == 0)
+            leftIndex[leftCnt++] = i;
+    }
+    UInt16 totalRatio = 0;
+    for(i = 0; i < leftCnt; i++)
+        totalRatio = cf_ratio[leftIndex[i]];
+    UInt16 totalRatioTmp = 0;
+    UInt16 curRatio = uRand(totalRatio);
+    UInt8 curId = 5;
+    for(i = 0; i < leftCnt; i++)
+    {
+        totalRatioTmp += cf_ratio[leftIndex[i]];
+        if(curRatio < totalRatioTmp)
+        {
+            curId = leftIndex[i];
+            break;
+        }
+    }
+    if(curId < 5)
+    {
+        cf_posPut[curId] = index;
+        DB1().PushUpdateData("UPDATE `copy_front_win` SET `posPut` = %u where `playerId` = %"I64_FMT"u)", cf_posPut[curId], getId());
+    }
+}
+
+void Player::getCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index)
+{
+    if(copy_or_front > 2)
+        return;
+    if(static_cast<UInt32>(copy_or_front + 1) != GetVar(VAR_CF_FLAG))
+        return;
+    if(index == 0 || index > 5)
+        return;
+
+    UInt8 i;
+    bool isPut = false;;
+    for(i = 0; i < 5; i++)
+    {
+        if(cf_posPut[i] != index)
+        {
+            isPut = true;
+            break;
+        }
+    }
+    if(isPut)
+        return;
+    getCopyFrontCurrentAward(index);
+}
+
+void Player::resetCopyFrontWinAward()
+{
+    UInt8 index = GetVar(VAR_CF_FLAG);
     UInt8 step;
-    UInt32 itemId;
-    UInt32 ratio;
 
     if(index == 0 || index > 2)
         return;
+
     for(UInt8 i = 0; i < 5; i++)
     {
         if(i == 0)
@@ -15321,46 +15393,116 @@ void Player::copyFrontWinAward(UInt8 index)
         Table award = GameAction()->getCopyFrontmapAward(step, PLAYER_DATA(this, location));
         if (award.size() < 2)
             continue;
-        itemId = award.get<UInt32>(1);
-        ratio = award.get<UInt32>(2);
-        printf("itemId = %u, ratio = %u\n", itemId, ratio);
+        cf_itemId[i] = award.get<UInt32>(1);
+        cf_ratio[i] = award.get<UInt32>(2);
+        cf_posPut[i] = 0;
+        printf("cf_itemId[%u] = %u, cf_ratio[%u] = %u\n", i, cf_itemId[i], i, cf_ratio[i]);
+        DB1().PushUpdateData("REPLACE INTO `copy_front_win` (`playerId`, `posOrig`, `posPut`, `itemId`, `ratio`) VALUES(%"I64_FMT"u, %u, %u, %u, %u)", getId(), i, cf_posPut[i], cf_itemId[i], cf_ratio[i]);
     }
-}
-
-void Player::loadCopyFrontWinFromDB(UInt8 posOrig, UInt8 posPut, UInt32 itemId, UInt16 ratio)
-{
-    if(posOrig == 0 || posOrig > 5)
-        return;
-    cf_itemId[posOrig - 1] = itemId;
-    cf_ratio[posOrig - 1] = ratio;
-    if(posPut >= 1 && posPut <= 5)
-        cf_posPut[posOrig - 1] = posPut;
-}
-
-void Player::getCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index)
-{
-    if(copy_or_front != GetVar(VAR_CF_FLAG))
-        return;
-    if(index == 0 || index > 5)
-        return;
-
 }
 
 void Player::freshCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index)
 {
-    if(copy_or_front != GetVar(VAR_CF_FLAG))
+    if(copy_or_front > 2)
+        return;
+    if(static_cast<UInt32>(copy_or_front + 1) != GetVar(VAR_CF_FLAG))
         return;
     if(index == 0 || index > 5)
         return;
 
+    if(getTael() < 50)
+    {
+        sendMsgCode(0, 1100);
+        return;
+    }
+    ConsumeInfo ci(EnumCopyFrontWin, 0, 0);
+    useTael(50, &ci);
+
+    resetCopyFrontWinAward();
+    sendCopyFrontAllAward();
 }
 
 void Player::sendCopyFrontAllAward()
 {
-    Stream st(REP::COUNTRY_ACT);
-    st << static_cast<UInt8>(0x04) << index << Stream::eos;
-    send(st);
+    if(GetVar(VAR_CF_FLAG) == 0)
+        return;
 
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(0x04);
+    st << static_cast<UInt8>(0x01);
+    st << static_cast<UInt8>(GetVar(VAR_CF_FLAG));
+    if(GetVar(VAR_CF_FLAG) == 1)
+        st << getCopyId();
+    else
+        st << getFrontmapId();
+    st << static_cast<UInt8>(5);
+    bool isPut = false;
+    UInt8 index;
+    UInt8 i;
+    UInt16 itemId;
+    UInt8 itemCnt = 1;
+    for(index = 0; index < 5; index++)
+    {
+        if(cf_posPut[index] != 0)
+        {
+            isPut = true;
+            break;
+        }
+    }
+    if(!isPut)
+    {
+        for(index = 0; index < 5; index++)
+        {
+            itemId = cf_itemId[index];
+            st << itemId;
+            st << itemCnt;
+        }
+    }
+    else
+    {
+        for(index = 0; i < 5; i++)
+        {
+            for(i = 0; i < 5; i++)
+            {
+                if(cf_posPut[i] == index + 1)
+                    break;
+            }
+            if(i < 5)
+                itemId = cf_itemId[i];
+            else
+                itemCnt = 0;
+            st << itemId;
+            st << itemCnt;
+        }
+    }
+
+    st << Stream::eos;
+    send(st);
+}
+
+UInt8 Player::getCopyId()
+{
+    static UInt16 spots[] = {776, 2067, 5906, 8198, 12818, 10512, 0x1411};
+
+    UInt16 currentSpot = PLAYER_DATA(this, location);
+    for(UInt8 i = 0; i < sizeof(spots)/sizeof(spots[0]); i++)
+    {
+        if(spots[i] == currentSpot)
+            return (i+1);
+    }
+    return 0;
+}
+
+UInt8 Player::getFrontmapId()
+{
+    static UInt16 spots[] = {1284, 2053, 4360, 4611, 5893, 5637, 8195, 6153, 9222, 9481, 10244, 5129};
+    UInt16 currentSpot = PLAYER_DATA(this, location);
+    for(UInt8 i = 0; i < sizeof(spots)/sizeof(spots[0]); i++)
+    {
+        if(spots[i] == currentSpot)
+            return (i+1);
+    }
+    return 0;
 }
 
 } // namespace GObject

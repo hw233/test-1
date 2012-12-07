@@ -1956,11 +1956,14 @@ namespace GObject
     public:
         void copyFrontWinAward(UInt8 index);
         void loadCopyFrontWinFromDB(UInt8 posOrig, UInt8 posPut, UInt32 itemId, UInt16 ratio);
+        void getCopyFrontCurrentAward(UInt8 index);
         void getCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index);
+        void resetCopyFrontWinAward();
         void freshCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index);
         void sendCopyFrontAllAward();
+        UInt8 getCopyId();
+        UInt8 getFrontmapId();
     private:
-        UInt8 cf_posOrig[5];//范围1-5
         UInt8 cf_posPut[5];//范围1-5
         UInt32 cf_itemId[5];
         UInt16 cf_ratio[5];
