@@ -1790,6 +1790,8 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
                 player->getCopyFrontAwardByIndex(copy_or_front, index);
             else if(type == 1)
                 player->freshCopyFrontAwardByIndex(copy_or_front, index);
+            else if(type == 2)
+                player->closeCopyFrontAwardByIndex(copy_or_front, index);
         }
         default:
         break;

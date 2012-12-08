@@ -1849,7 +1849,7 @@ CREATE TABLE `copy_front_win` (
     `posPut` tinyint(3) NOT NULL DEFAULT '0',
     `itemId` int(10) unsigned NOT NULL DEFAULT '0',
     `ratio` mediumint(5) unsigned NOT NULL DEFAULT '0',
-    PRIMARY KEY (`playerId`)
+    PRIMARY KEY (`playerId`, `posOrig`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 

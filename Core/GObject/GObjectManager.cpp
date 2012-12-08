@@ -5104,7 +5104,7 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading copy_front_win");
         DBCopyFrontWin dbcf;
-        if(execu->Prepare("SELECT `playerId`, `posOrig`, `posPut`, `itemId`, `ratio` FROM `copy_front_win` ORDER BY `playerId`", dbcf) != DB::DB_OK)
+        if(execu->Prepare("SELECT `playerId`, `posOrig`, `posPut`, `itemId`, `ratio` FROM `copy_front_win` ORDER BY `playerId`, `posOrig`", dbcf) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
         Player* pl = NULL;

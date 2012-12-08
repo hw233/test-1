@@ -15467,7 +15467,7 @@ void Player::getCopyFrontCurrentAward(UInt8 index)
 
 void Player::getCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index)
 {
-    if(copy_or_front > 2)
+    if(copy_or_front > 1)
         return;
     if(static_cast<UInt32>(copy_or_front + 1) != GetVar(VAR_CF_FLAG))
         return;
@@ -15489,7 +15489,7 @@ void Player::getCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index)
     getCopyFrontCurrentAward(index);
 }
 
-void Player::resetCopyFrontWinAward()
+void Player::resetCopyFrontWinAward(bool fresh)
 {
     UInt8 index = GetVar(VAR_CF_FLAG);
     UInt8 step;
@@ -15512,19 +15512,23 @@ void Player::resetCopyFrontWinAward()
         cf_ratio[i] = award.get<UInt32>(2);
         cf_posPut[i] = 0;
         printf("cf_itemId[%u] = %u, cf_ratio[%u] = %u\n", i, cf_itemId[i], i, cf_ratio[i]);
-        DB1().PushUpdateData("REPLACE INTO `copy_front_win` (`playerId`, `posOrig`, `posPut`, `itemId`, `ratio`) VALUES(%"I64_FMT"u, %u, %u, %u, %u)", getId(), i, cf_posPut[i], cf_itemId[i], cf_ratio[i]);
+        if(fresh)
+            DB1().PushUpdateData("UPDATE `copy_front_win` SET `posOrig` = %u, `posPut` = %u, `itemId` = %u, `ratio` = %u WHERE `playerId` = %"I64_FMT"u", i, cf_posPut[i], cf_itemId[i], cf_ratio[i], getId());
+        else
+            DB1().PushUpdateData("REPLACE INTO `copy_front_win` (`playerId`, `posOrig`, `posPut`, `itemId`, `ratio`) VALUES(%"I64_FMT"u, %u, %u, %u, %u)", getId(), i, cf_posPut[i], cf_itemId[i], cf_ratio[i]);
     }
 }
 
 void Player::freshCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index)
 {
-    if(copy_or_front > 2)
+    if(copy_or_front > 1)
         return;
     if(static_cast<UInt32>(copy_or_front + 1) != GetVar(VAR_CF_FLAG))
         return;
+#if 0
     if(index == 0 || index > 5)
         return;
-
+#endif
     if(getTael() < 50)
     {
         sendMsgCode(0, 1100);
@@ -15533,8 +15537,28 @@ void Player::freshCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index)
     ConsumeInfo ci(EnumCopyFrontWin, 0, 0);
     useTael(50, &ci);
 
-    resetCopyFrontWinAward();
+    resetCopyFrontWinAward(true);
     sendCopyFrontAllAward();
+}
+
+void Player::closeCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index)
+{
+    if(copy_or_front > 1)
+        return;
+    if(static_cast<UInt32>(copy_or_front + 1) != GetVar(VAR_CF_FLAG))
+        return;
+#if 0
+    if(index == 0 || index > 5)
+        return;
+#endif
+    SetVar(VAR_CF_FLAG, 0);
+    for(UInt8 i = 0; i < 5; i++)
+    {
+        cf_posPut[i] = 0;
+        cf_itemId[i] = 0;
+        cf_ratio[i] = 0;
+        DB1().PushUpdateData("UPDATE `copy_front_win` SET `posOrig` = %u, `posPut` = %u, `itemId` = %u, `ratio` = %u WHERE `playerId` = %"I64_FMT"u", i, cf_posPut[i], cf_itemId[i], cf_ratio[i], getId());
+    }
 }
 
 void Player::sendCopyFrontAllAward()
