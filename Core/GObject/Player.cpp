@@ -15404,6 +15404,8 @@ void Player::getCopyFrontCurrentAward(UInt8 index)
         if(cf_posPut[i] == 0)
             leftIndex[leftCnt++] = i;
     }
+    if(leftCnt == 0)
+        return;
     UInt16 totalRatio = 0;
     for(i = 0; i < leftCnt; i++)
         totalRatio = cf_ratio[leftIndex[i]];
@@ -15419,50 +15421,50 @@ void Player::getCopyFrontCurrentAward(UInt8 index)
             break;
         }
     }
-    if(curId < 5)
+    if(curId >= 5)
+        return;
+
+    UInt8 order = 5 - leftCnt + 1;
+    if(order == 2)
     {
-        UInt8 order = 5 - leftCnt + 1;
-        if(order == 2)
-        {
-            if(getGoldOrCoupon() < 10)
-             {
-                 sendMsgCode(0, 1104);
-                 return;
-             }
-             ConsumeInfo ci(EnumCopyFrontWin, 0, 0);
-             useGoldOrCoupon(10, &ci);
-        }
-        else if(order >= 3)
-        {
-            UInt32 needGold;
-            if(order ==  4)
-                needGold = 20;
-            else if(order >= 5)
-                needGold = 40;
-            else
-                needGold = 10;
-            if(getGold() < needGold)
-            {
-                 sendMsgCode(0, 1104);
-                 return;
-            }
-            ConsumeInfo ci(EnumCopyFrontWin, 0, 0);
-            useGold(needGold, &ci);
-        }
-        cf_posPut[curId] = index;
-        DB1().PushUpdateData("UPDATE `copy_front_win` SET `posPut` = %u where `playerId` = %"I64_FMT"u)", cf_posPut[curId], getId());
-
-        Stream st(REP::COUNTRY_ACT);
-        st << static_cast<UInt8>(0x04);
-        st << static_cast<UInt8>(0x00);
-        st << static_cast<UInt8>(curId + 1);
-        st << static_cast<UInt16>(cf_itemId[curId]);
-        st << Stream::eos;
-        send(st);
-
-        bool bind = GetVar(VAR_CF_BIND);
-        m_Package->Add(cf_itemId[curId], 1, bind);
+        if(getGoldOrCoupon() < 10)
+         {
+             sendMsgCode(0, 1104);
+             return;
+         }
+         ConsumeInfo ci(EnumCopyFrontWin, 0, 0);
+         useGoldOrCoupon(10, &ci);
     }
+    else if(order >= 3)
+    {
+        UInt32 needGold;
+        if(order ==  4)
+            needGold = 20;
+        else if(order >= 5)
+            needGold = 40;
+        else
+            needGold = 10;
+        if(getGold() < needGold)
+        {
+             sendMsgCode(0, 1104);
+             return;
+        }
+        ConsumeInfo ci(EnumCopyFrontWin, 0, 0);
+        useGold(needGold, &ci);
+    }
+    cf_posPut[curId] = index;
+    DB1().PushUpdateData("UPDATE `copy_front_win` SET `posPut` = %u where `playerId` = %"I64_FMT"u)", cf_posPut[curId], getId());
+
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(0x04);
+    st << static_cast<UInt8>(0x00);
+    st << static_cast<UInt8>(curId + 1);
+    st << static_cast<UInt16>(cf_itemId[curId]);
+    st << Stream::eos;
+    send(st);
+
+    bool bind = GetVar(VAR_CF_BIND);
+    m_Package->Add(cf_itemId[curId], 1, bind);
 }
 
 void Player::getCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index)
@@ -15473,6 +15475,11 @@ void Player::getCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index)
         return;
     if(index == 0 || index > 5)
         return;
+    if(GetFreePackageSize() < 1)
+    {
+        sendMsgCode(0, 1011);
+        return;
+    }
 
     UInt8 i;
     bool isPut = false;;
