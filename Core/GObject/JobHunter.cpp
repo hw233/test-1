@@ -1269,7 +1269,7 @@ bool JobHunter::OnFoundCave(bool isAuto)
             st2 << static_cast<UInt16>(itemId) << static_cast<UInt16>(itemCount);
             if (!isAuto)
                 _owner->lastExJobAwardPush(itemId, itemCount);
-            _owner->GetPackage()->Add(itemId, itemCount, true, isAuto? true:false, FromNpc);
+            _owner->GetPackage()->Add(itemId, itemCount, true, isAuto? false:true, FromNpc);
         }
     }
     else
@@ -1280,10 +1280,9 @@ bool JobHunter::OnFoundCave(bool isAuto)
 
     if (res)
         AddToFighterList(static_cast<UInt16>(fighterId));
+
     if (!isAuto)
         SendGridInfo(POS_TO_INDEX(_posX, _posY));
-    else
-        _owner->checkLastExJobAward();
     return res;
 }
 
