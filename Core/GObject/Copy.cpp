@@ -865,7 +865,7 @@ void PlayerCopy::copyWinAward(Player* pl)
         else
             step = 0;
         Table award = GameAction()->getCopyFrontmapAward(0, step, PLAYER_DATA(pl, location));
-        if (award.size() < 3)
+        if (award.size() < 2)
             continue;
         itemId = award.get<UInt32>(1);
         ratio = award.get<UInt32>(2);

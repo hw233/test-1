@@ -4254,7 +4254,7 @@ local copyAward = {
             {2396,1},
             {2397,1},
             {2398,1},
-        }
+        },
         [3] = {
             {2399,1},
         }
@@ -4281,7 +4281,7 @@ local copyAward = {
         {511,10},
         {1327,10},
         {1326,10},
-    }
+    },
     -- 3档
     [3] = {
         {507,50},
@@ -4302,7 +4302,7 @@ local copyAward = {
         {5121,50},
         {5131,50},
         {5141,50},
-    }
+    },
 }
 local item = {}
 -- type: 0-副本；1-阵图
@@ -4315,29 +4315,57 @@ function getCopyFrontmapAward(type, step, spot)
         if step == 1 then
             local itemsAll = copyAward[spot];
             if itemsAll == nil then
+                -- print("itemsAll1")
                 return {}
             end
             local items = itemsAll[step]
-            if items== nil then
+            if items == nil then
+                -- print("items1")
                 return {}
             end
             order = math.random(1, #items)
             item = items[order]
+            -- print("step:"..step.." "..item[1]..": "..item[2])
+            return item;
+        elseif step == 2 then
+            -- print("---------"..step.."----------")
+            order = math.random(1, #copyAward[step])
+            item = copyAward[step][order]
+            -- print("step:"..step.." "..item[1]..": "..item[2])
             return item;
         else
+            -- print("---000------"..step.."----------")
             local itemsAll = copyAward[spot];
-            local items = {}
+            local items1 = {}
+            local items3 = {}
             if itemsAll ~= nil then
-                items = itemsAll[step]
+                -- print("itemsAll2")
+                items1 = itemsAll[1]
+                items3 = itemsAll[3]
             end
-            local total1 = #items
-            local total2 = #copyAward[step]
-            order = math.random(1, total1 + total2)
+            local total1 = 0
+            if items1 ~= nil then
+                -- print("items1")
+                total1 = #items1
+            end
+            local total3 = 0
+            if items3 ~= nil then
+                -- print("items3")
+                total3 = #items3
+            end
+            local total2 = #copyAward[2]
+            local total = total1 + total2 + total3 + #copyAward[3]
+            order = math.random(1, total)
             if order <= total1 then
-                item = items[order]
+                item = items1[order]
+            elseif order <= total1 + total2 then
+                item = copyAward[2][order - total1]
+            elseif order <= total1 + total2 + total3 then
+                item = items3[order - total1 - total2]
             else
-                item = copyAward[step][order - total1]
+                item = copyAward[3][order - total1 - total2 - total3]
             end
+            -- print("step:"..step.." "..item[1]..": "..item[2])
             return item;
         end
     end
