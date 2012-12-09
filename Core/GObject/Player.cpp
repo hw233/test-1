@@ -7345,6 +7345,10 @@ namespace GObject
             total = GetVar(VAR_RECHARGE_TOTAL);
         else
             total = GetVar(VAR_RECHARGE_TOTAL3366);
+
+        Stream st(REP::DAILY_DATA);
+        st << static_cast<UInt8>(12) << total << Stream::eos;
+        send((st));
            
         if (rank && World::getNeedRechargeRank())
         {
