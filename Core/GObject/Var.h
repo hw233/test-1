@@ -263,6 +263,11 @@ namespace GObject
         VAR_GETACHIEVEMENT_CNT = 211, //玩家每日获得的荣誉总数
         VAR_GETPRESTIGE_CNT = 212, //玩家每日获得的声望总数
 
+        VAR_ITEM_9279_FAILED_COUNT = 213, // 锦云兜·壁礼包连续开启失败次数
+        VAR_ITEM_9280_FAILED_COUNT = 214, // 锦云兜·破礼包连续开启失败次数
+        VAR_ITEM_9281_FAILED_COUNT = 215, // 锦云兜·龙礼包连续开启失败次数
+        VAR_ITEM_9282_FAILED_COUNT = 216, // 锦云兜·墨礼包连续开启失败次数
+
         VAR_LOCAL_RANK = 240, //本服斗剑，当前排名
         VAR_LOCAL_MAXRANK = 241, //本服斗剑，最好排名
         VAR_LOCAL_PRESTIGE = 242, //本服斗剑，声望数
@@ -545,6 +550,10 @@ namespace GObject
             REGISTER_VAR(VAR_CTS_TARGET_COUNT, CYCLE_NONE);
 
             REGISTER_VAR(VAR_ITEM_9178_FAILED_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_ITEM_9279_FAILED_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_ITEM_9280_FAILED_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_ITEM_9281_FAILED_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_ITEM_9282_FAILED_COUNT, CYCLE_NONE);
             REGISTER_VAR(VAR_USETAEL_CNT, CYCLE_DAY);
             REGISTER_VAR(VAR_USECOUPON_CNT, CYCLE_DAY);
             REGISTER_VAR(VAR_USEGOLD_CNT, CYCLE_DAY);

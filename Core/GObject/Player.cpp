@@ -3164,6 +3164,11 @@ namespace GObject
 
 	bool Player::attackNpc( UInt32 npcId, UInt32 turns, bool regen, bool needtype)
 	{
+        if (GetPackage()->GetRestPackageSize() <= 0)
+        {
+            sendMsgCode(0, 1011);
+            return false;
+        }
 		UInt32 now = TimeUtil::Now();
 		UInt32 buffLeft = getBuffData(PLAYER_BUFF_ATTACKING, now);
 		if(buffLeft > now)
@@ -3383,6 +3388,11 @@ namespace GObject
 	bool Player::attackCopyNpc( UInt32 npcId, UInt8 type, UInt8 copyId,
             UInt8 expfactor, UInt8 lootlvl, bool ato, std::vector<UInt16>* loot, bool applayhp )
 	{
+        if (GetPackage()->GetRestPackageSize() == 0)
+        {
+            sendMsgCode(0, 1011);
+            return false;
+        }
 		UInt32 now = TimeUtil::Now();
 		UInt32 buffLeft = getBuffData(PLAYER_BUFF_ATTACKING, now);
 		if(cfg.GMCheck && buffLeft > now && !ato)
@@ -3469,6 +3479,11 @@ namespace GObject
 
 	bool Player::autoBattle( UInt32 npcId )
 	{
+        if (GetPackage()->GetRestPackageSize() == 0)
+        {
+            sendMsgCode(0, 1011);
+            return false;
+        }
 		GData::NpcGroups::iterator it = GData::npcGroups.find(npcId);
 		if(it == GData::npcGroups.end())
 			return false;

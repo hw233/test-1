@@ -212,6 +212,14 @@ namespace GData
 		virtual ~ItemBaseType() { }	//RTTI
 		bool operator<(const ItemBaseType& other) const { return getId() < other.getId(); }
 		bool operator==(const ItemBaseType& other) const { return getId() == other.getId(); }
+		inline UInt16 Size(UInt16 num) const
+		{
+			if(subClass == Item_Task)
+				return 0;
+			if(IsEquip(subClass))
+				return num;
+			return (num + maxQuantity - 1) / maxQuantity;
+		}
 	};
 
 	//普通物品

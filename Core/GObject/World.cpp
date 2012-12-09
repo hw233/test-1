@@ -362,7 +362,14 @@ bool enum_midnight(void * ptr, void* next)
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 28) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 29) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 30) ||
-            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 6)
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 6) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 8) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 9) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 10) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 11) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 12) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 13) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 14)
             ))
     {
         if (pl->isOnline())
@@ -961,7 +968,13 @@ void World::World_Midnight_Check( World * world )
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 28) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 29) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 30) ||
-            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 1)
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 9) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 10) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 11) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 12) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 13) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 14) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 15)
             )
         bRechargeEnd = true;
 

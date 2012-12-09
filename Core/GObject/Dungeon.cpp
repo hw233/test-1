@@ -241,10 +241,15 @@ void Dungeon::takeLoot( Player * player, DungeonPlayerInfo& dpi, UInt32& exp )
 
 bool Dungeon::doAttack( Player * player, UInt8 level)
 {
-	if(level >= _levels.size())
-		return false;
-	const GData::DungeonLevel * dgl = _dungeon->monsters[level];
-	if(dgl == NULL)
+    if (player->GetPackage()->GetRestPackageSize() <= 0)
+    {
+        player->sendMsgCode(0, 1011);
+        return false;
+    }
+    if(level >= _levels.size())
+        return false;
+    const GData::DungeonLevel * dgl = _dungeon->monsters[level];
+    if(dgl == NULL)
 		return false;
 	const GData::DungeonMonster * dm = dgl->monsterSet;
 	if(dm == NULL)

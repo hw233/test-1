@@ -2771,10 +2771,10 @@ void OnBattleEndReq( GameMsgHdr& hdr, BattleEndReq& req )
 
     player->addLastTjScore();
 
+	player->checkLastBattled();
+
     if(now <= PLAYER_DATA(player, battlecdtm))
 		return ;
-
-	player->checkLastBattled();
 }
 
 void OnCopyReq( GameMsgHdr& hdr, CopyReq& req )
@@ -2912,7 +2912,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 		{
         case 1:
             {
-                // TODO(JLT): 折扣商品的购买
+                // (JLT): 折扣商品的购买
                 UInt8 discountType = lr._count;
                 UInt8 varoff = GData::store.getDisTypeVarOffset(discountType);
                 if (varoff == 0xfe)
@@ -3009,9 +3009,19 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 			{
 				GObject::ItemBase * item;
 				if(IsEquipTypeId(lr._itemId))
-					item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, true, false, FromNpcBuy);
+                {
+                    if (player->GetPackage()->TryBuyEquip(lr._itemId, lr._count, true))
+                        item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    else
+                        item = NULL;
+                }
 				else
-					item = player->GetPackage()->AddItem(lr._itemId, lr._count, true, false, FromNpcBuy);
+                {
+                    if (player->GetPackage()->TryBuyItem(lr._itemId, lr._count, true))
+                        item = player->GetPackage()->AddItem(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    else
+                        item = NULL;
+                }
 				if(item == NULL)
 					st << static_cast<UInt8>(2);
 				else
@@ -3033,9 +3043,19 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 			{
 				GObject::ItemBase * item;
 				if(IsEquipTypeId(lr._itemId))
-					item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, true, false, FromNpcBuy);
+                {
+                    if (player->GetPackage()->TryBuyEquip(lr._itemId, lr._count, true))
+                        item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    else
+                        item = NULL;
+                }
 				else
-					item = player->GetPackage()->AddItem(lr._itemId, lr._count, true, false, FromNpcBuy);
+                {
+                    if (player->GetPackage()->TryBuyItem(lr._itemId, lr._count, true))
+                        item = player->GetPackage()->AddItem(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    else
+                        item = NULL;
+                }
 				if(item == NULL)
 					st << static_cast<UInt8>(2);
 				else
@@ -3083,7 +3103,12 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                 bool buyFgt = false;
 				GObject::ItemBase * item = NULL;
 				if(IsEquipTypeId(lr._itemId))
-					item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, true, false, FromNpcBuy);
+                {
+                    if (player->GetPackage()->TryBuyEquip(lr._itemId, lr._count, true))
+                        item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    else
+                        item = NULL;
+                }
 				else if (IsFighterTypeId(lr._itemId))
                 {
                     buyFgt = player->addFighterFromItem(lr._itemId, price);
@@ -3091,7 +3116,12 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                         price /= lr._count;
                 }
                 else
-					item = player->GetPackage()->AddItem(lr._itemId, lr._count, true, false, FromNpcBuy);
+                {
+                    if (player->GetPackage()->TryBuyItem(lr._itemId, lr._count, true))
+                        item = player->GetPackage()->AddItem(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    else
+                        item = NULL;
+                }
 				if(item == NULL && !buyFgt)
 					st << static_cast<UInt8>(2);
 				else if (item || buyFgt)
@@ -3117,7 +3147,12 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                     bool buyFgt = false;
                     GObject::ItemBase * item = NULL;
                     if(IsEquipTypeId(lr._itemId))
-                        item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    {
+                        if (player->GetPackage()->TryBuyEquip(lr._itemId, lr._count, true))
+                            item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, true, false, FromNpcBuy);
+                        else
+                            item = NULL;
+                    }
                     else if (IsFighterTypeId(lr._itemId))
                     {
                         buyFgt = player->addFighterFromItem(lr._itemId, price);
@@ -3125,7 +3160,12 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                             price /= lr._count;
                     }
                     else
-                        item = player->GetPackage()->AddItem(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    {
+                        if (player->GetPackage()->TryBuyItem(lr._itemId, lr._count, true))
+                            item = player->GetPackage()->AddItem(lr._itemId, lr._count, true, false, FromNpcBuy);
+                        else
+                            item = NULL;
+                    }
                     if(item == NULL && !buyFgt)
                         st << static_cast<UInt8>(2);
                     else if (item || buyFgt)
@@ -3154,9 +3194,20 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                 {
                     GObject::ItemBase * item;
                     if(IsEquipTypeId(lr._itemId))
-                        item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    {
+                        if (player->GetPackage()->TryBuyEquip(lr._itemId, lr._count, true))
+                            item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, true, false, FromNpcBuy);
+                        else
+                            item = NULL;
+                    }
                     else
-                        item = player->GetPackage()->AddItem(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    {
+                        if (player->GetPackage()->TryBuyItem(lr._itemId, lr._count, true))
+                            item = player->GetPackage()->AddItem(lr._itemId, lr._count, true, false, FromNpcBuy);
+                        else
+                            item = NULL;
+                    }
+
                     if(item == NULL)
                         st << static_cast<UInt8>(2);
                     else
@@ -3184,9 +3235,19 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                 {
                     GObject::ItemBase * item;
                     if(IsEquipTypeId(lr._itemId))
-                        item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    {
+                        if (player->GetPackage()->TryBuyEquip(lr._itemId, lr._count, true))
+                            item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, true, false, FromNpcBuy);
+                        else
+                            item = NULL;
+                    }
                     else
-                        item = player->GetPackage()->AddItem(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    {
+                        if (player->GetPackage()->TryBuyItem(lr._itemId, lr._count, true))
+                            item = player->GetPackage()->AddItem(lr._itemId, lr._count, true, false, FromNpcBuy);
+                        else
+                            item = NULL;
+                    }
                     if(item == NULL)
                         st << static_cast<UInt8>(2);
                     else
@@ -3211,9 +3272,19 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                 {
                     GObject::ItemBase * item = NULL;
                     if(IsEquipTypeId(lr._itemId))
-                        item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    {
+                        if (player->GetPackage()->TryBuyEquip(lr._itemId, lr._count, true))
+                            item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, true, false, FromNpcBuy);
+                        else
+                            item = NULL;
+                    }
                     else
-                        item = player->GetPackage()->AddItem(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    {
+                        if (player->GetPackage()->TryBuyItem(lr._itemId, lr._count, true))
+                            item = player->GetPackage()->AddItem(lr._itemId, lr._count, true, false, FromNpcBuy);
+                        else
+                            item = NULL;
+                    }
                     if(item == NULL)
                         st << static_cast<UInt8>(2);
                     else
@@ -3247,11 +3318,21 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                     bind = true;
 				GObject::ItemBase * item;
                 if(IsEquipTypeId(lr._itemId))
-					item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, bind, false, FromNpcBuy);
-				else
-					item = player->GetPackage()->AddItem(lr._itemId, lr._count, bind, false, FromNpcBuy);
-				if(item == NULL)
-					st << static_cast<UInt8>(2);
+                {
+                    if (player->GetPackage()->TryBuyEquip(lr._itemId, lr._count, bind))
+                        item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, bind, false, FromNpcBuy);
+                    else
+                        item = NULL;
+                }
+                else
+                {
+                    if (player->GetPackage()->TryBuyItem(lr._itemId, lr._count, bind))
+                        item = player->GetPackage()->AddItem(lr._itemId, lr._count, bind, false, FromNpcBuy);
+                    else
+                        item = NULL;
+                }
+                if(item == NULL)
+                    st << static_cast<UInt8>(2);
 				else
 				{
 					ConsumeInfo ci(Item,lr._itemId,lr._count);
@@ -5489,7 +5570,6 @@ void OnJobHunter( GameMsgHdr & hdr, const void * data )
 void OnAutoJobHunter( GameMsgHdr & hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
-    return;
     BinaryReader br(data, hdr.msgHdr.bodyLen);
 
     JobHunter * jobHunter = player->getJobHunter();
