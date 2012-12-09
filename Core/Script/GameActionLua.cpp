@@ -1456,5 +1456,10 @@ namespace Script
         return Call<lua_tinker::table>("getStepAward", step);
     }
 
+    lua_tinker::table GameActionLua::getCopyFrontmapAward(UInt8 type, UInt8 step, UInt16 location)
+    {
+        return Call<lua_tinker::table>("getCopyFrontmapAward", type, step, location);
+    }
+
 }
 

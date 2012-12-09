@@ -4012,3 +4012,120 @@ function onFirstRecharge(player, index)
     return true
 end
 
+-- 奖品池
+local copyAward = {
+    [776] = {
+        -- 1档
+        [1] = {
+            {2376,1},
+            {2377,1},
+            {2378,1},
+            {2379,1},
+            {2380,1},
+            {2381,1},
+            {2382,1},
+            {2383,1},
+            {2384,1},
+            {2385,1},
+            {2386,1},
+            {2387,1},
+            {2388,1},
+            {2389,1},
+            {2390,1},
+            {2391,1},
+            {2392,1},
+            {2393,1},
+            {2394,1},
+            {2395,1},
+            {2396,1},
+            {2397,1},
+            {2398,1},
+        }
+        [3] = {
+            {2399,1},
+        }
+    },
+    [2067] = {
+    },
+    [5906] = {
+    },
+    [8198] = {
+    },
+    [12818] = {
+    },
+    [10512] = {
+    },
+    [5137] = {
+    },
+
+    -- 2档
+    [2] = {
+        {509,10},
+        {49,10},
+        {514,10},
+        {133,10},
+        {511,10},
+        {1327,10},
+        {1326,10},
+    }
+    -- 3档
+    [3] = {
+        {507,50},
+        {509,50},
+        {4000,50},
+        {5001,50},
+        {5011,50},
+        {5021,50},
+        {5031,50},
+        {5041,50},
+        {5051,50},
+        {5061,50},
+        {5071,50},
+        {5081,50},
+        {5091,50},
+        {5101,50},
+        {5111,50},
+        {5121,50},
+        {5131,50},
+        {5141,50},
+    }
+}
+local item = {}
+-- type: 0-副本；1-阵图
+function getCopyFrontmapAward(type, step, spot)
+    if type == 0 then
+        if step > 2 then
+            return {}
+        end
+        local order
+        if step == 1 then
+            local itemsAll = copyAward[spot];
+            if itemsAll == nil then
+                return {}
+            end
+            local items = itemsAll[step]
+            if items== nil then
+                return {}
+            end
+            order = math.random(1, #items)
+            item = items[order]
+            return item;
+        else
+            local itemsAll = copyAward[spot];
+            local items = {}
+            if itemsAll ~= nil then
+                items = itemsAll[step]
+            end
+            local total1 = #items
+            local total2 = #copyAward[step]
+            order = math.random(1, total1 + total2)
+            if order <= total1 then
+                item = items[order]
+            else
+                item = copyAward[step][order - total1]
+            end
+            return item;
+        end
+    end
+end
+

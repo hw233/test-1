@@ -476,6 +476,7 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                 pl->GetPackage()->AddItem(9138, 1, false, false);
             }
             GameAction()->onCopyWin(pl, id, tcd.floor, tcd.spot, tcd.lootlvl);
+            copyWinAward(pl);
 
             pl->OnHeroMemo(MC_SLAYER, MD_ADVANCED, 0, 2);
             if (!pl->GetShuoShuo()->getShuoShuo(id-1 + SS_COPY1))
@@ -845,6 +846,31 @@ void PlayerCopy::sendAutoCopy(Player* pl)
     Stream st(REP::AUTO_COPY);
     st << static_cast<UInt8>(0) << id << tcd.floor << tcd.spot << Stream::eos;
     pl->send(st);
+}
+
+void PlayerCopy::copyWinAward(Player* pl)
+{
+    UInt8 step;
+    UInt32 itemId;
+    UInt32 ratio;
+    if(!pl)
+        return;
+    pl->SetVar(VAR_CF_FLAG, 1);
+    for(UInt8 i = 0; i < 5; i++)
+    {
+        if(i == 0)
+            step = 1;
+        else if(i == 1)
+            step = 2;
+        else
+            step = 0;
+        Table award = GameAction()->getCopyFrontmapAward(0, step, PLAYER_DATA(pl, location));
+        if (award.size() < 3)
+            continue;
+        itemId = award.get<UInt32>(1);
+        ratio = award.get<UInt32>(2);
+        printf("itemId = %u, ratio = %u\n", itemId, ratio);
+    }
 }
 
 } // namespace GObject

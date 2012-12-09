@@ -295,6 +295,12 @@ namespace GObject
         //繁体版占用301-330
 
         //340简体版
+        VAR_CF_FLAG = 334, //1代表通过副本，2代表通过阵图
+        VAR_CF_INDEX1 = 335, //低4位代表lua中的索引，高4位代表翻拍的位置
+        VAR_CF_INDEX2 = 336,
+        VAR_CF_INDEX3 = 337,
+        VAR_CF_INDEX4 = 338,
+        VAR_CF_INDEX5 = 339,
         VAR_RECHARGE_SCORE = 340, //累计充值的积分
         VAR_MAX,
     };
@@ -567,6 +573,12 @@ namespace GObject
             REGISTER_VAR(VAR_ARENA_SUPPORT_WED, CYCLE_WEEK);
             REGISTER_VAR(VAR_FIRST_RECHARGE_VALUE, CYCLE_NONE);
             REGISTER_VAR(VAR_FIRST_RECHARGE_STEP, CYCLE_NONE);
+            REGISTER_VAR(VAR_CF_FLAG, CYCLE_NONE);
+            REGISTER_VAR(VAR_CF_INDEX1, CYCLE_NONE);
+            REGISTER_VAR(VAR_CF_INDEX2, CYCLE_NONE);
+            REGISTER_VAR(VAR_CF_INDEX3, CYCLE_NONE);
+            REGISTER_VAR(VAR_CF_INDEX4, CYCLE_NONE);
+            REGISTER_VAR(VAR_CF_INDEX5, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);
