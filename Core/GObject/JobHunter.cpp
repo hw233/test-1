@@ -1421,7 +1421,7 @@ void JobHunter::OnAutoStop()
 void JobHunter::OnAutoFinish()
 {
     // 立即完成自动战斗
-    if (20 > _owner->getGoldOrCoupon())
+    if (10 > _owner->getGoldOrCoupon())
     {
         _owner->sendMsgCode(0, 1101);
         return;
