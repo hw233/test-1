@@ -6364,6 +6364,138 @@ function ItemNormal_00009178(iid, num, bind, param)
     return used;
 end
 
+function ItemNormal_00009279(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    local no = iid - 9279 + 1
+
+    local _items = {
+        [1] = {
+            {{502,1},},
+            {{504,1},},
+            {{5002,1},{5012,1},{5022,1},{5032,1},{5042,1},{5052,1},{5062,1},{5072,1},{5082,1},{5092,1},{5102,1},{5112,1},{5122,1},{5132,1},{5142,1},},
+            {{55,2},},
+            {{510,1},},
+        },
+        [2] = {
+            {{56,1},},
+            {{57,1},},
+            {{511,2},},
+            {{16,1},},
+            {{500,1},},
+            {{15,1},},
+        },
+        [3] = {
+            {{503,1},},
+            {{514,2},},
+            {{512,2},},
+            {{16,2},},
+            {{508,2},},
+            {{506,2},},
+            {{517,2},},
+        },
+        [4] = {
+            {{515,1},},
+            {{47,1},},
+            {{501,4},},
+            {{513,4},},
+            {{16,6},},
+            {{1325,1},},
+            {{134,1},},
+            {{440,1},},
+            {{9123,1},},
+            {{547,4},},
+        },
+    }
+
+    local var = {
+        [1] = 213,
+        [2] = 214,
+        [3] = 215,
+        [4] = 216,
+    }
+
+    local probitem = {
+        [1] = 6132,
+        [2] = 6129,
+        [3] = 6133,
+        [4] = {6130,6131},
+    }
+
+    local items = _items[no]
+    if items == nil then
+        return false
+    end
+    local isz = #items
+    local used = 0
+    for n = 1,num do
+        if package:GetRestPackageSize() < 2 then
+            if used ~= 0 then
+                package:DelItemSendMsg(iid, player);
+            end
+            player:sendMsgCode(2, 1011, 0);
+            return used
+        end
+
+        local r = math.random(1,isz)
+        local item = items[r]
+        if no == 1 and r == 3 then
+            local rr = math.random(1,#item)
+            package:Add(item[rr][1], item[rr][2], true, 0, 2);
+        else
+            for k,v in pairs(item) do
+                if no > 1 then
+                    package:Add(v[1], v[2], bind, 0, 2);
+                else
+                    package:Add(v[1], v[2], true, 0, 2);
+                end
+            end
+        end
+
+        local nr = math.random(1,10000)
+        local max = {
+            [1] = 10,
+            [2] = 20,
+            [3] = 40,
+            [4] = 60,
+            [5] = 100,
+            [6] = 300,
+            [7] = 500,
+            [8] = 800,
+            [9] = 1200,
+            [10] = 2000,
+            [11] = 5000,
+        }
+        local toggle = player:GetVar(var[no])
+        if toggle == 0 then
+            toggle = 1
+        end
+        if toggle >= 11 then
+            toggle = 11
+        end
+        if nr <= max[toggle] then
+            if no == 4 then
+                if math.random(1,10000) <=  6666 then
+                    package:Add(probitem[no][1], 1, bind, 0, 2);
+                else
+                    package:Add(probitem[no][2], 1, bind, 0, 2);
+                end
+            else
+                package:Add(probitem[no], 1, bind, 0, 2);
+            end
+            player:SetVar(var[no], 1)
+        else
+            player:SetVar(var[no], toggle + 1)
+        end
+
+        used = used + 1
+    end
+
+    package:DelItemSendMsg(iid, player);
+    return used;
+end
+
 function ItemNormal_00009179(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -6995,6 +7127,11 @@ local ItemNormal_Table = {
     [1345] = ItemNormal_citta,
     [1346] = ItemNormal_citta,
     [1347] = ItemNormal_citta,
+    [1348] = ItemNormal_citta,
+    [1349] = ItemNormal_citta,
+    [1350] = ItemNormal_citta,
+    [1351] = ItemNormal_citta,
+    [1352] = ItemNormal_citta,
 
     [1000] = ItemNormal_formation,
     [1001] = ItemNormal_formation,
@@ -8328,6 +8465,11 @@ local ItemNormal_Table = {
     [9270] = ItemNormal_fighterCard,
     [9271] = ItemNormal_fighterCard,
     [9272] = ItemNormal_fighterCard,
+
+    [9279] = ItemNormal_00009279,
+    [9280] = ItemNormal_00009279,
+    [9281] = ItemNormal_00009279,
+    [9282] = ItemNormal_00009279,
 
     [10000] = ItemNormal_00010000,
     [10001] = ItemNormal_00010001,
