@@ -1112,7 +1112,7 @@ namespace GObject
                 }
             }
         }
-
+        /*
 		if(!_playerData.totalRecharge && !GetVar(VAR_VIPFIRST))
 		{
             SetVar(VAR_VIPFIRST, 1);
@@ -1139,7 +1139,7 @@ namespace GObject
                 DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
             }
 		}
-
+        */
 #ifndef _WIN32
 #ifndef _FB
 #ifndef _VT
