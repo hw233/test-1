@@ -1112,7 +1112,7 @@ namespace GObject
                 }
             }
         }
-        /*
+
 		if(!_playerData.totalRecharge && !GetVar(VAR_VIPFIRST))
 		{
             SetVar(VAR_VIPFIRST, 1);
@@ -1139,7 +1139,7 @@ namespace GObject
                 DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
             }
 		}
-        */
+
 #ifndef _WIN32
 #ifndef _FB
 #ifndef _VT
@@ -7220,7 +7220,7 @@ namespace GObject
             GObject::RechargeTmpl::instance().sendScoreInfo(this);
         }
 
-        AddVar(VAR_FIRST_RECHARGE_VALUE, r);
+        //AddVar(VAR_FIRST_RECHARGE_VALUE, r);
         sendFirstRecharge();
 	}
 
@@ -15203,6 +15203,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
     static UInt32 newRecharge[] = {10, 88, 188, 588};
     void Player::FirstRechargeAct(UInt8 step, UInt8 type, UInt8 career)
     {
+        return;
         if(step == 0 || step > 4)
             return;
         if(type > 1)
@@ -15253,6 +15254,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
 
     void Player::sendFirstRecharge(bool isLogin)
     {
+        return;
         UInt32 lostValue = 0;
         UInt8 lostStep = 4;
         UInt8 canStep = 4;
