@@ -396,7 +396,8 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
 
     pl->OnHeroMemo(MC_SLAYER, MD_ADVANCED, 0, 0);
     std::vector<UInt16> loot;
-    if (pl->attackCopyNpc(fgtid, 1, id, World::_wday==6?2:1, tcd.lootlvl, ato, &loot)) {
+    bool isFull = false;
+    if (pl->attackCopyNpc(fgtid, 1, id, World::_wday==6?2:1, isFull, tcd.lootlvl, ato, &loot)) {
         if (ato)
             pl->checkLastBattled();
         bool nextfloor = false;
@@ -547,15 +548,26 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                 tcd.floor, tcd.spot, pl->getId(), id);
         return 1;
     } else {
-        if (ato) {
+        if (isFull)
+        {
             Stream st(REP::AUTO_COPY);
-            st << static_cast<UInt8>(2) << id << tcd.floor << tcd.spot << Stream::eos;
+            st << static_cast<UInt8>(5) << Stream::eos;
             pl->send(st);
             autoClear(pl, complete, id, tcd.floor, tcd.spot);
-        } else {
-            Stream st(REP::COPY_INFO);
-            st << static_cast<UInt8>(2) << id << tcd.floor << tcd.spot << Stream::eos;
-            pl->send(st);
+            return 0;
+        }
+        else
+        {
+            if (ato) {
+                Stream st(REP::AUTO_COPY);
+                st << static_cast<UInt8>(2) << id << tcd.floor << tcd.spot << Stream::eos;
+                pl->send(st);
+                autoClear(pl, complete, id, tcd.floor, tcd.spot);
+            } else {
+                Stream st(REP::COPY_INFO);
+                st << static_cast<UInt8>(2) << id << tcd.floor << tcd.spot << Stream::eos;
+                pl->send(st);
+            }
         }
     }
     return 0;

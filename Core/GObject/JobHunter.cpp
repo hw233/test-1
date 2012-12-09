@@ -1319,14 +1319,18 @@ void JobHunter::OnLeaveGame(UInt16 spotId)
 void JobHunter::OnAutoStart()
 {
     // 开始自动战斗
-    if (10 > _owner->getGoldOrCoupon())
+    if (_owner->getVipLevel() < 4)
     {
-        _owner->sendMsgCode(0, 1101);
+        return;
+    }
+    if (1000 > _owner->getTael())
+    {
+        _owner->sendMsgCode(0, 1100);
         return;
     }
 
     ConsumeInfo ci(AutoJobHunter,0,0);
-    _owner->useGoldOrCoupon(10, &ci);
+    _owner->useTael(1000, &ci);
 
     EventAutoJobHunter* event = new (std::nothrow) EventAutoJobHunter(_owner, 20, MAX_GRID, _gameProgress);
     if (!event) 
@@ -1424,7 +1428,7 @@ void JobHunter::OnAutoFinish()
     }
 
     ConsumeInfo ci(AutoJobHunterComplete,0,0);
-    _owner->useGoldOrCoupon(20, &ci);
+    _owner->useGoldOrCoupon(10, &ci);
 
     for (UInt8 i = 0; i < MAX_GRID; ++i)
     {

@@ -332,7 +332,8 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
     pl->OnHeroMemo(MC_SLAYER, MD_MASTER, 1, 0);
 
     std::vector<UInt16> loot;
-    if (pl->attackCopyNpc(fgtid, 0, id, World::_wday==7?2:1, tmp[spot].lootlvl, ato, &loot)) {
+    bool isFull = false;
+    if (pl->attackCopyNpc(fgtid, 0, id, World::_wday==7?2:1, isFull, tmp[spot].lootlvl, ato, &loot)) {
         ret = true;
         if (ato)
             pl->checkLastBattled();
@@ -475,14 +476,26 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
     }
     else
     {
-        if (ato)
+        if (isFull)
         {
             Stream st(REP::AUTO_FRONTMAP);
-            st << static_cast<UInt8>(2) << id << spot << Stream::eos;
+            st << static_cast<UInt8>(5) << Stream::eos;
             pl->send(st);
-
             autoClear(pl, complate);
             return 0;
+        }
+        else
+        {
+
+            if (ato)
+            {
+                Stream st(REP::AUTO_FRONTMAP);
+                st << static_cast<UInt8>(2) << id << spot << Stream::eos;
+                pl->send(st);
+
+                autoClear(pl, complate);
+                return 0;
+            }
         }
     }
 
