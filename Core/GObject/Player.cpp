@@ -1069,6 +1069,10 @@ namespace GObject
         sendLevelPack(GetLev());
         offlineExp(curtime);
 
+        sendCopyFrontAllAward();
+        sendGoodVoiceInfo();
+        send3366GiftInfo();
+
         char buf[64] = {0};
         snprintf(buf, sizeof(buf), "%"I64_FMT"u", _id);
 #ifndef _WIN32
@@ -15327,6 +15331,22 @@ void EventTlzAuto::notify(bool isBeginAuto)
             curStep |= (1 << (step-1));
             SetVar(VAR_FIRST_RECHARGE_STEP, curStep);
             sendFirstRecharge();
+
+            UInt32 thisDay = TimeUtil::SharpDay();
+            UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA(this, created));
+            if(thisDay <= endDay)
+            {
+                // 新注册七日内开启首充礼包，完成每日目标
+                UInt32 targetVal = GetVar(VAR_CLAWARD2);
+                if (!(targetVal & TARGET_RECHARGE_PACKGE))
+                {
+                    targetVal |=TARGET_RECHARGE_PACKGE;
+                    AddVar(VAR_CTS_TARGET_COUNT, 1);
+                    SetVar(VAR_CLAWARD2, targetVal);
+                    sendNewRC7DayTarget();
+                    newRC7DayUdpLog(1152, 11);
+                }
+            }
         }
     }
 
@@ -15455,13 +15475,15 @@ void Player::getCopyFrontCurrentAward(UInt8 index)
         useGold(needGold, &ci);
     }
     cf_posPut[curId] = index;
-    DB1().PushUpdateData("UPDATE `copy_front_win` SET `posPut` = %u where `playerId` = %"I64_FMT"u)", cf_posPut[curId], getId());
+    DB1().PushUpdateData("UPDATE `copy_front_win` SET `posPut` = %u where `playerId` = %"I64_FMT"u and `posOrig` = %u", cf_posPut[curId], getId(), curId);
 
     Stream st(REP::COUNTRY_ACT);
     st << static_cast<UInt8>(0x04);
     st << static_cast<UInt8>(0x00);
-    st << static_cast<UInt8>(curId + 1);
+    st << cf_posPut[curId];
     st << static_cast<UInt16>(cf_itemId[curId]);
+    UInt8 curCnt = 1;
+    st << curCnt;
     st << Stream::eos;
     send(st);
 
@@ -15469,16 +15491,20 @@ void Player::getCopyFrontCurrentAward(UInt8 index)
     m_Package->Add(cf_itemId[curId], 1, bind);
 
     if(leftCnt == 1)
-        closeCopyFrontAwardByIndex(GetVar(VAR_CF_FLAG), 0);
+        closeCopyFrontAwardByIndex(GetVar(VAR_CF_FLAG) - 1, 0);
 }
 
-void Player::getCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index)
+void Player::getCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index, UInt8 indexPut)
 {
     if(copy_or_front > 1)
         return;
     if(static_cast<UInt32>(copy_or_front + 1) != GetVar(VAR_CF_FLAG))
         return;
-    if(index == 0 || index > 5)
+#if 0
+    if(index !=  PLAYER_DATA(this, location))
+        return;
+#endif
+    if(indexPut == 0 || indexPut > 5)
         return;
     if(GetFreePackageSize() < 1)
     {
@@ -15490,7 +15516,7 @@ void Player::getCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index)
     bool isPut = false;;
     for(i = 0; i < 5; i++)
     {
-        if(cf_posPut[i] != index)
+        if(cf_posPut[i] == indexPut)
         {
             isPut = true;
             break;
@@ -15498,7 +15524,7 @@ void Player::getCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index)
     }
     if(isPut)
         return;
-    getCopyFrontCurrentAward(index);
+    getCopyFrontCurrentAward(indexPut);
 }
 
 void Player::resetCopyFrontWinAward(bool fresh)
@@ -15525,7 +15551,7 @@ void Player::resetCopyFrontWinAward(bool fresh)
         cf_posPut[i] = 0;
         printf("cf_itemId[%u] = %u, cf_ratio[%u] = %u\n", i, cf_itemId[i], i, cf_ratio[i]);
         if(fresh)
-            DB1().PushUpdateData("UPDATE `copy_front_win` SET `posOrig` = %u, `posPut` = %u, `itemId` = %u, `ratio` = %u WHERE `playerId` = %"I64_FMT"u", i, cf_posPut[i], cf_itemId[i], cf_ratio[i], getId());
+            DB1().PushUpdateData("UPDATE `copy_front_win` SET `posPut` = %u, `itemId` = %u, `ratio` = %u WHERE `playerId` = %"I64_FMT"u AND `posOrig` = %u", cf_posPut[i], cf_itemId[i], cf_ratio[i], getId(), i);
         else
             DB1().PushUpdateData("REPLACE INTO `copy_front_win` (`playerId`, `posOrig`, `posPut`, `itemId`, `ratio`) VALUES(%"I64_FMT"u, %u, %u, %u, %u)", getId(), i, cf_posPut[i], cf_itemId[i], cf_ratio[i]);
     }
@@ -15538,7 +15564,7 @@ void Player::freshCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index)
     if(static_cast<UInt32>(copy_or_front + 1) != GetVar(VAR_CF_FLAG))
         return;
 #if 0
-    if(index == 0 || index > 5)
+    if(index !=  PLAYER_DATA(this, location))
         return;
 #endif
     if(getTael() < 50)
@@ -15560,7 +15586,7 @@ void Player::closeCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index)
     if(static_cast<UInt32>(copy_or_front + 1) != GetVar(VAR_CF_FLAG))
         return;
 #if 0
-    if(index == 0 || index > 5)
+    if(index !=  PLAYER_DATA(this, location))
         return;
 #endif
     SetVar(VAR_CF_FLAG, 0);
@@ -15569,8 +15595,9 @@ void Player::closeCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index)
         cf_posPut[i] = 0;
         cf_itemId[i] = 0;
         cf_ratio[i] = 0;
-        DB1().PushUpdateData("UPDATE `copy_front_win` SET `posOrig` = %u, `posPut` = %u, `itemId` = %u, `ratio` = %u WHERE `playerId` = %"I64_FMT"u", i, cf_posPut[i], cf_itemId[i], cf_ratio[i], getId());
+        //DB1().PushUpdateData("UPDATE `copy_front_win` SET `posPut` = %u, `itemId` = %u, `ratio` = %u WHERE `playerId` = %"I64_FMT"u AND `posOrig` = %u", cf_posPut[i], cf_itemId[i], cf_ratio[i], getId(), i);
     }
+    DB1().PushUpdateData("DELETE FROM `copy_front_win` WHERE `playerId` = %"I64_FMT"u", getId());
 }
 
 void Player::sendCopyFrontAllAward()
@@ -15581,7 +15608,7 @@ void Player::sendCopyFrontAllAward()
     Stream st(REP::COUNTRY_ACT);
     st << static_cast<UInt8>(0x04);
     st << static_cast<UInt8>(0x01);
-    st << static_cast<UInt8>(GetVar(VAR_CF_FLAG));
+    st << static_cast<UInt8>(GetVar(VAR_CF_FLAG) - 1);
     if(GetVar(VAR_CF_FLAG) == 1)
         st << getCopyId();
     else
@@ -15611,7 +15638,7 @@ void Player::sendCopyFrontAllAward()
     }
     else
     {
-        for(index = 0; i < 5; i++)
+        for(index = 0; index < 5; index++)
         {
             for(i = 0; i < 5; i++)
             {
@@ -15619,9 +15646,9 @@ void Player::sendCopyFrontAllAward()
                     break;
             }
             if(i < 5)
-                itemId = cf_itemId[i];
+                itemId = cf_itemId[index];
             else
-                itemCnt = 0;
+                itemId = 0;
             st << itemId;
             st << itemCnt;
         }

@@ -1789,7 +1789,11 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
             br >> index;
 
             if(type == 0)
-                player->getCopyFrontAwardByIndex(copy_or_front, index);
+            {
+                UInt8 indexPut;
+                br >> indexPut;
+                player->getCopyFrontAwardByIndex(copy_or_front, index, indexPut);
+            }
             else if(type == 1)
                 player->freshCopyFrontAwardByIndex(copy_or_front, index);
             else if(type == 2)
