@@ -92,6 +92,7 @@ bool World::_actAvailable = false;
 bool World::_actAvailable1 = false;
 bool World::_isNewServer = false;
 bool World::_autoHeal = false;
+bool World::_copyfrontwin = false;
 bool World::_nationalDay = false;
 bool World::_halloween = false;
 bool World::_singleday = false;

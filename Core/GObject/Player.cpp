@@ -15379,6 +15379,8 @@ void EventTlzAuto::notify(bool isBeginAuto)
 
 void Player::copyFrontWinAward(UInt8 index)
 {
+    if(!World::getCopyFrontWinSwitch())
+        return;
     SetVar(VAR_CF_FLAG, index);
     resetCopyFrontWinAward();
     sendCopyFrontAllAward();

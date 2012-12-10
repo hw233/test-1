@@ -54,6 +54,7 @@ void WorldScript::init()
 	def("setHalloween", GObject::World::setHalloween);
 	def("setAutoHeal", GObject::World::setAutoHeal);
 	def("getAutoHeal", GObject::World::getAutoHeal);
+	def("setCopyFrontWinSwitch", GObject::World::setCopyFrontWinSwitch);
 	def("setSingleDay", GObject::World::setSingleDay);
 	def("getSingleDay", GObject::World::getSingleDay);
 	def("setThanksgiving", GObject::World::setThanksgiving);

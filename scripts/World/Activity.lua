@@ -821,6 +821,7 @@ function onActivityCheck(tm)
 
   -- XXX: cancel auto heal
   setAutoHeal(true)
+  setCopyFrontWinSwitch(true)
   loadStore();
 end
 

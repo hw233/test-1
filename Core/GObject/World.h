@@ -137,6 +137,10 @@ public:
 	{ _autoHeal = v; }
 	inline static bool getAutoHeal()
 	{ return _autoHeal;}
+	inline static void setCopyFrontWinSwitch(bool v)
+	{ _copyfrontwin = v; }
+	inline static bool getCopyFrontWinSwitch()
+	{ return _copyfrontwin;}
 	inline static void setIsNewServer(bool aa)
 	{ _isNewServer = aa; }
 	inline static bool IsNewServer()
@@ -552,6 +556,7 @@ public:
 	static bool _actAvailable1;//??????+7??
 	static UInt8 _wday;
     static bool _autoHeal;//disable autoheal
+    static bool _copyfrontwin;//disable copyfrontwin
 	static bool _isNewServer;
     static bool _nationalDay;
     static bool _halloween;

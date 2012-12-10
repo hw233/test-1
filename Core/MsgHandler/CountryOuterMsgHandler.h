@@ -1782,6 +1782,8 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
             UInt8 copy_or_front;
             UInt8 index;
 
+            if(!World::getCopyFrontWinSwitch())
+                return;
             br >> type;
             br >> copy_or_front;
             br >> index;
