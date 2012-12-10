@@ -1806,6 +1806,16 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
         }
         break;
 
+        case 6:
+        {
+            UInt8 type;
+            if(!World::get3366GiftAct())
+                return;
+            br >> type;
+            player->get3366GiftAward(type);
+        }
+        break;
+
         default:
         break;
     }

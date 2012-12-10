@@ -803,6 +803,12 @@ function onActivityCheck(tm)
           setGoodVoiceAct(false)
       end
 
+      if tm >= actTime536 and tm < actTime536_1 then
+          set3366GiftAct(true)
+      else
+          set3366GiftAct(false)
+      end
+
       setShuoShuo(true);
   end
 
@@ -944,7 +950,10 @@ function initActTime(y, m, d)
   local  SerStartTm532= { ['year'] = 2012, ['month'] = 11, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm533= { ['year'] = 2012, ['month'] = 12, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm534= { ['year'] = 2012, ['month'] = 12, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 蜀山好声音合作
   local  SerStartTm535= { ['year'] = 2012, ['month'] = 12, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 3366合作礼包
+  local  SerStartTm536= { ['year'] = 2012, ['month'] = 12, ['day'] = 10, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   -- 繁体版
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1252,6 +1261,9 @@ function initActTime(y, m, d)
 
   actTime535 = os.time(SerStartTm535);
   actTime535_1 = os.time(SerStartTm535) + 4 * 86400;
+
+  actTime536 = os.time(SerStartTm536);
+  actTime536_1 = os.time(SerStartTm536) + 2 * 86400;
 
   -- 繁体版
   actTime101 = os.time(SerStartTm101);

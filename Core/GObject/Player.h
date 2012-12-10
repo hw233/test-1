@@ -1972,6 +1972,8 @@ namespace GObject
     public:
         void getGoodVoiceAward(UInt8 type);
         void sendGoodVoiceInfo();
+        void get3366GiftAward(UInt8 type);
+        void send3366GiftInfo();
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

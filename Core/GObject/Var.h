@@ -299,6 +299,7 @@ namespace GObject
         VAR_CF_FLAG = 288, //是副本，还是阵图
         VAR_CF_BIND = 289, //是否绑定
         VAR_GOOD_VOICE = 290, //是否领取蜀山好声音
+        VAR_3366GIFT = 291, //3366合作礼包
 
         //繁体版占用301-330
 
@@ -581,7 +582,8 @@ namespace GObject
             REGISTER_VAR(VAR_FIRST_RECHARGE_STEP, CYCLE_NONE);
             REGISTER_VAR(VAR_CF_FLAG, CYCLE_NONE);
             REGISTER_VAR(VAR_CF_BIND, CYCLE_NONE);
-            REGISTER_VAR(VAR_GOOD_VOICE, CYCLE_DAY);
+            REGISTER_VAR(VAR_GOOD_VOICE, CYCLE_NONE);
+            REGISTER_VAR(VAR_3366GIFT, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

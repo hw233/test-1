@@ -132,6 +132,7 @@ bool World::_qqgameact = false;
 bool World::_3366privilegeact = false;
 bool World::_qzonepyprivilegeact = false;
 bool World::_goodvoiceact = false;
+bool World::_3366giftact = false;
 void* World::_recalcwd = NULL;
 bool World::_june = false;
 bool World::_june1 = false;

@@ -15682,5 +15682,41 @@ void Player::sendGoodVoiceInfo()
     send(st);
 }
 
+void Player::get3366GiftAward(UInt8 type)
+{
+    if(type == 1 && GetVar(VAR_3366GIFT) < 9)
+    {
+        if(GetFreePackageSize() < 6)
+        {
+            sendMsgCode(0, 1011);
+            return;
+        }
+        AddVar(VAR_3366GIFT, 1);
+        m_Package->Add(5121, 1, true);
+        m_Package->Add(5121, 1, true);
+        m_Package->Add(5121, 1, true);
+        m_Package->Add(5121, 1, true);
+        m_Package->Add(5121, 1, true);
+        m_Package->Add(5121, 1, true);
+        send3366GiftInfo();
+    }
+}
+
+void Player::send3366GiftInfo()
+{
+    if(!World::get3366GiftAct())
+        return;
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(6);
+    UInt8 opt;
+    if(GetVar(VAR_3366GIFT) < 9)
+        opt = 1;
+    else
+        opt = 0;
+    st << opt;
+    st << Stream::eos;
+    send(st);
+}
+
 } // namespace GObject
 

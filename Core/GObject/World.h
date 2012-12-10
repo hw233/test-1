@@ -285,6 +285,10 @@ public:
     { _goodvoiceact = v; }
     inline static bool getGoodVoiceAct()
     { return _goodvoiceact; }
+    inline static void set3366GiftAct(bool v)
+    { _3366giftact = v; }
+    inline static bool get3366GiftAct()
+    { return _3366giftact; }
 
     inline static void setTrainFighter(bool v)
     { _trainfighter = v; }
@@ -601,6 +605,7 @@ public:
     static bool _3366privilegeact;
     static bool _qzonepyprivilegeact;
     static bool _goodvoiceact;
+    static bool _3366giftact;
     static void* _recalcwd;
     static bool _june;
     static bool _june1;
