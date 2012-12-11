@@ -64,6 +64,10 @@ public:
     bool login_sec(Player* player);
     bool create_sec(UserStruct const &nu, Player* player = NULL);
     bool protol_sec(Player* player, int cmd);
+    bool trade_sec(Player* saller, Player* buyer, UInt32 itemId, UInt32 itemCount, UInt32 price);
+    bool gold_sec(Player* player, UInt32 count, UInt32 changeType, bool isIncrease);
+    bool tael_sec(Player* player, UInt32 count, UInt32 changeType, bool isIncrease);
+    bool coupon_sec(Player* player, UInt32 count, UInt32 changeType, bool isIncrease);
     bool logout(Player* player);
     bool online(UInt32 num, UInt8 domain);
     bool consume(Player* player, UInt32 total, UInt32 c);
