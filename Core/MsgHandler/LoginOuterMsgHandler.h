@@ -1364,6 +1364,10 @@ void ForbidSale(LoginMsgHdr& hdr,const void * data)
     CHKKEY();
     br>>playerIds;
 
+    UInt16 serverNo = 0;
+    if(cfg.merged)
+        br >> serverNo;
+
     UInt8 ret = 1;
     //INFO_LOG("GMBIGLOCK: %s, %u", playerIds.c_str(), expireTime);
     std::string playerId = GetNextSection(playerIds, ',');
@@ -1374,7 +1378,7 @@ void ForbidSale(LoginMsgHdr& hdr,const void * data)
         setForbidSaleValue(pid, true);
 
         if(cfg.merged)
-            pid += (static_cast<UInt64>(cfg.serverNo) << 48);
+            pid += (static_cast<UInt64>(serverNo) << 48);
 	    GObject::Player * pl = GObject::globalPlayers[pid];
         if (NULL != pl)
             pl->setForbidSale(true);
@@ -1392,7 +1396,10 @@ void UnForbidSale(LoginMsgHdr& hdr,const void * data)
     std::string playerIds;
     CHKKEY();
     br>>playerIds;
-
+    UInt16 serverNo = 0;
+    if(cfg.merged)
+        br >> serverNo;
+ 
     UInt8 ret = 1;
     //INFO_LOG("GMBIGLOCK: %s, %u", playerIds.c_str(), expireTime);
     std::string playerId = GetNextSection(playerIds, ',');
@@ -1403,7 +1410,7 @@ void UnForbidSale(LoginMsgHdr& hdr,const void * data)
         setForbidSaleValue(pid, false);
 
         if(cfg.merged)
-            pid += (static_cast<UInt64>(cfg.serverNo) << 48);
+            pid += (static_cast<UInt64>(serverNo) << 48);
         GObject::Player * pl = GObject::globalPlayers[pid];
         if (NULL != pl)
             pl->setForbidSale(false);
@@ -1462,18 +1469,17 @@ void DeleteGold(LoginMsgHdr& hdr,const void * data)
     br>>playerIds;
     br>>gold;
 
+    UInt16 serverNo = 0;
+    if(cfg.merged)
+        br >> serverNo;
     UInt8 ret = 1;
     INFO_LOG("GMDELETEGOLD: %s, %u", playerIds.c_str(), gold);
     std::string playerId = GetNextSection(playerIds, ',');
     while (!playerId.empty())
     {
         UInt64 pid = atoll(playerId.c_str());
-        if(cfg.merged)
-        {
-            UInt16 serverNo = 0;
-            br >> serverNo;
+        if (cfg.merged)
             pid += (static_cast<UInt64>(serverNo) << 48);
-        }
         GObject::Player * pl = GObject::globalPlayers[pid];
         if (NULL != pl)
             pl->deleteGold(gold);
@@ -1492,19 +1498,18 @@ void addRechargeScore(LoginMsgHdr& hdr,const void * data)
     CHKKEY();
     br>>playerIds;
     br>>score;
-
+    UInt16 serverNo = 0;
+    if(cfg.merged)
+        br >> serverNo;
+ 
     UInt8 ret = 1;
     INFO_LOG("GMADDCHARGESCORE: %s, %u", playerIds.c_str(), score);
     std::string playerId = GetNextSection(playerIds, ',');
     while (!playerId.empty())
     {
         UInt64 pid = atoll(playerId.c_str());
-        if(cfg.merged)
-        {
-            UInt16 serverNo = 0;
-            br >> serverNo;
+        if (cfg.merged)
             pid += (static_cast<UInt64>(serverNo) << 48);
-        }
         GObject::Player * pl = GObject::globalPlayers[pid];
         if (NULL != pl)
         {
