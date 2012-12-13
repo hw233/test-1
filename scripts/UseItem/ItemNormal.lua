@@ -1348,18 +1348,23 @@ end
 function ItemNormal_00000448(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
+    local used = 0
+    for k = 1, num do
+        if package:GetRestPackageSize() < 1 then
+            if used ~= 0 then
+                package:DelItemSendMsg(iid, player)
+            end
+            player:sendMsgCode(2, 1011, 0);
+            return used
+        end
 
-    if package:GetRestPackageSize() < 1 then
-        player:sendMsgCode(2, 1011, 0);
-        return false;
+        local item = {502,510,504,55}
+        local i = math.random(1,#item)
+        used = used + 1
+        package:AddItem(item[i], 1, true, false)
+        package:DelItemSendMsg(iid, player);
     end
-
-    local item = {502,510,504,55}
-    local i = math.random(1,#item)
-
-    package:AddItem(item[i], 1, true, false)
-    package:DelItemSendMsg(iid, player);
-    return num;
+    return used
 end
 
 function ItemNormal_00000476(iid, num, bind, param)
