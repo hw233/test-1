@@ -1952,6 +1952,28 @@ namespace GObject
 
     public:
         bool hasFighterWithClass(UInt8 cls);
+
+    public:
+        void copyFrontWinAward(UInt8 index);
+        void loadCopyFrontWinFromDB(UInt8 posOrig, UInt8 posPut, UInt32 itemId, UInt16 ratio);
+        void getCopyFrontCurrentAward(UInt8 index);
+        void getCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index, UInt8 indexPut);
+        void resetCopyFrontWinAward(bool fresh = false);
+        void freshCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index);
+        void closeCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index);
+        void sendCopyFrontAllAward();
+        UInt8 getCopyId();
+        UInt8 getFrontmapId();
+    private:
+        UInt8 cf_posPut[5];//范围1-5
+        UInt32 cf_itemId[5];
+        UInt16 cf_ratio[5];
+
+    public:
+        void getGoodVoiceAward(UInt8 type);
+        void sendGoodVoiceInfo();
+        void get3366GiftAward(UInt8 type);
+        void send3366GiftInfo();
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n
