@@ -2349,7 +2349,7 @@ bool Tianjie::addNpc(UInt32 npcid)
 
         TianjieSpotNpc tjNpc = { npcid, spot };
 
-        GameMsgHdr hdr(0x269, spot_cny, NULL, sizeof(TianjieSpotNpc));
+        GameMsgHdr hdr(0x326, spot_cny, NULL, sizeof(TianjieSpotNpc));
         GLOBAL().PushMsg( hdr, &tjNpc);
 
         return true;
@@ -2394,7 +2394,7 @@ void Tianjie::deleteNpc(UInt32 npcid, UInt16 loc)
         };
 
         TianjieSpotNpc tjNpc = { npcid, loc };
-        GameMsgHdr hdr(0x270, spot_cny, NULL, sizeof(TianjieSpotNpc));
+        GameMsgHdr hdr(0x327, spot_cny, NULL, sizeof(TianjieSpotNpc));
         GLOBAL().PushMsg( hdr, &tjNpc);
 
         return;
