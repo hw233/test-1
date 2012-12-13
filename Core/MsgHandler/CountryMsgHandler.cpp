@@ -329,4 +329,7 @@ MSG_REG_2(GameMsgHdr, 0x266, OnNewRC7DayLastLoot);
 MSG_REG_2(GameMsgHdr, 0x267, OnFighterCheckDiry);
 MSG_REG_2(GameMsgHdr, 0x268, OnIDIPBuy);
 
+MSG_REG_2(GameMsgHdr, 0x269, OnAddTianjieNpc);
+MSG_REG_2(GameMsgHdr, 0x270, OnDelTianjieNpc);
+
 MSG_HANDLER_END()

@@ -1771,5 +1771,30 @@ void OnAutoJobHunterStep( GameMsgHdr& hdr, const void * data)
     job_hunter->OnAutoCommand(0x10);
 }
 
+void OnAddTianjieNpc( GameMsgHdr& hdr, const void * data)
+{
+    struct TianjieSpotNpc
+    {
+        UInt32 npcId;
+        UInt16 spot;
+    };
+    TianjieSpotNpc* tjNpc = reinterpret_cast<TianjieSpotNpc*>(const_cast<void *>(data));
+    if(!tjNpc)
+        GObject::Tianjie::instance().addTianjieNpc(tjNpc->npcId, tjNpc->spot);
+}
+
+void OnDelTianjieNpc( GameMsgHdr& hdr, const void * data)
+{
+    struct TianjieSpotNpc
+    {
+        UInt32 npcId;
+        UInt16 spot;
+    };
+    TianjieSpotNpc* tjNpc = reinterpret_cast<TianjieSpotNpc*>(const_cast<void *>(data));
+    if(!tjNpc)
+        GObject::Tianjie::instance().delTianjieNpc(tjNpc->npcId, tjNpc->spot);
+}
+
+
 #endif // _COUNTRYINNERMSGHANDLER_H_
 

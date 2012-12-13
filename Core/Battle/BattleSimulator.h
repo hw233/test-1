@@ -243,6 +243,7 @@ private:
         e_markMo = 61, // 墨之印记
         e_unMarkMo = 62, // 解除墨之印记
         e_moAuraBuf1 = 63, // 凤舞
+        e_damHPShield = 64, // 生命护盾
 
         e_MAX_STATE,
     };

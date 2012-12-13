@@ -20,6 +20,7 @@ using namespace std;
 typedef Battle::BattleSimulator BattleSimulator;
 namespace GObject
 {
+    class Map;
     struct TlzNpcAttra
     {
         float attack;                                                                                                                                                 
@@ -166,6 +167,9 @@ namespace GObject
         void udplogItem(Player* pl, UInt32 itemId, int itemCount=1);
     public:
         void udplogScore(Player* pl, int score, bool isEvent);
+        void addTianjieNpc(UInt32 npcId, UInt16 spot);
+		void delTianjieNpc(UInt32 npcid, UInt16 spot);
+
     private:
 		GData::NpcGroup* _ng;
 		multimap<UInt16, UInt32> m_locNpcMap; //据点上的怪物

@@ -9674,7 +9674,7 @@ void BattleSimulator::doShieldHPAttack(BattleFighter* bo, UInt32& dmg, DefStatus
 {
     if(bo->makeShieldDamage(dmg))
     {
-        defList[defCount].damType = e_damNormal;
+        defList[defCount].damType = e_damHPShield;
         defList[defCount].damage = 0;
         defList[defCount].leftHP = bo->getHP();
         defList[defCount].pos = getSidePos(bo);

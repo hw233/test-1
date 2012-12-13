@@ -10,6 +10,9 @@
 #include "GData/NpcGroup.h"
 #include "MsgID.h"
 #include "GObject/WBossMgr.h"
+#include "Country.h"
+#include "MapCollection.h"
+
 namespace GObject
 {
 extern URandom GRND;
@@ -2334,30 +2337,75 @@ bool Tianjie::addNpc(UInt32 npcid)
     Map * p_map = Map::FromSpot(spot);
     if (!p_map) return false;
 
+    GObject::Country& cny = CURRENT_COUNTRY();
+    UInt8 spot_cny = GObject::mapCollection.getCountryFromSpot(spot);
+    if (spot_cny != cny.GetThreadID())
+    {
+        struct TianjieSpotNpc
+        {
+            UInt32 npcId;
+            UInt16 spot;
+        };
+
+        TianjieSpotNpc tjNpc = { npcid, spot };
+
+        GameMsgHdr hdr(0x269, spot_cny, NULL, sizeof(TianjieSpotNpc));
+        GLOBAL().PushMsg( hdr, &tjNpc);
+
+        return true;
+    }
+
+    addTianjieNpc(npcid, spot);
+    return true;
+}
+
+void Tianjie::addTianjieNpc(UInt32 npcId, UInt16 spot)
+{
+    Map * pmap = Map::FromSpot(spot);
     MOData mo;
-    mo.m_ID = npcid;
+    mo.m_ID = npcId;
     mo.m_Hide = false;
     mo.m_Spot = spot;
     mo.m_Type = 6;
     mo.m_ActionType = 0;
-    if (p_map->AddObject(mo))
+    if (pmap->AddObject(mo))
     {
-        p_map->Show(npcid, true, mo.m_Type);
+        pmap->Show(npcId, true, mo.m_Type);
 
-        m_locNpcMap.insert(make_pair(spot, npcid));
+        m_locNpcMap.insert(make_pair(spot, npcId));
 
         m_loc = spot;
 
         addNpcCount++ ;
-        printf("-------------------------------------------addnpc, id:%d, loc:%d, count:%d\n", npcid, spot, addNpcCount);
+        printf("-------------------------------------------addnpc, id:%d, loc:%d, count:%d\n", npcId, spot, addNpcCount);
     }
-
-    return true;
 }
 
 void Tianjie::deleteNpc(UInt32 npcid, UInt16 loc)
 {
-    Map * p_map = Map::FromSpot(loc);
+    GObject::Country& cny = CURRENT_COUNTRY();
+    UInt8 spot_cny = GObject::mapCollection.getCountryFromSpot(loc);
+    if (spot_cny != cny.GetThreadID())
+    {
+        struct TianjieSpotNpc
+        {
+            UInt32 npcId;
+            UInt16 spot;
+        };
+
+        TianjieSpotNpc tjNpc = { npcid, loc };
+        GameMsgHdr hdr(0x270, spot_cny, NULL, sizeof(TianjieSpotNpc));
+        GLOBAL().PushMsg( hdr, &tjNpc);
+
+        return;
+    }
+
+    delTianjieNpc(npcid, loc);
+}
+
+void Tianjie::delTianjieNpc(UInt32 npcid, UInt16 spot)
+{
+    Map * p_map = Map::FromSpot(spot);
     if (!p_map) return;
     p_map->Hide(npcid, true);
 	p_map->DelObject(npcid);
