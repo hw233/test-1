@@ -95,6 +95,7 @@ enum PurchaseType
     EnumFirstRecharge4          = 84,
     EnumCopyFrontWin            = 85,
     Enum3366Gift                = 86,
+    BUYJOYBUFF                  = 87, //购买心悦buff
     //繁体私有占150～200
 };
 

@@ -13167,6 +13167,31 @@ namespace GObject
             }
             return;
         }
+        if (type == 3)
+        {
+            if (GetVar(VAR_JOYVIP_BUFF_GOT) == 0)
+            {
+                addBuffData(PLAYER_BUFF_JOYBUFF, 3600);
+                SetVar(VAR_JOYVIP_BUFF_GOT, 1);
+                sendYBBufInfo(GetVar(VAR_YBBUF), GetVar(VAR_QQVIP_BUF), 1);
+            }
+        }
+        if ( type == 4)
+        {
+            if (getBuffData(PLAYER_BUFF_JOYBUFF, TimeUtil::Now())-TimeUtil::Now() >= 99*3600)
+                return;
+
+            if (getGold() >= 5)
+            {
+                ConsumeInfo ci(BUYJOYBUFF,0,0);
+                useGold(5, &ci);
+                addBuffData(PLAYER_BUFF_JOYBUFF, 3600);
+                sendYBBufInfo(GetVar(VAR_YBBUF), GetVar(VAR_QQVIP_BUF), GetVar(VAR_JOYVIP_BUFF_GOT)+0x02);
+              //pl->udpLog("tianjie", "F_1108_1", "", "", "", "", "act");
+            }
+            else
+                sendYBBufInfo(GetVar(VAR_YBBUF), GetVar(VAR_QQVIP_BUF), GetVar(VAR_JOYVIP_BUFF_GOT)+0x00); 
+        }
 
         if((this->isBD() && World::getBlueDiamondAct()) || (this->isYD() && World::getYellowDiamondAct()))
         {
@@ -13203,11 +13228,14 @@ namespace GObject
         }
     }
 
-    void Player::sendYBBufInfo(UInt32 ybbuf, UInt32 qqvipbuf)
+    void Player::sendYBBufInfo(UInt32 ybbuf, UInt32 qqvipbuf, UInt8 joy)
     {
         Stream st(REP::YBBUF);
         UInt8 qqbuf = qqvipbuf ? true : false;
-        st << static_cast<UInt8>((ybbuf >> 16) & 0xFFFF) << static_cast<UInt8>(ybbuf & 0xFFFF) << qqbuf << Stream::eos;
+        //st << static_cast<UInt8>((ybbuf >> 16) & 0xFFFF) << static_cast<UInt8>(ybbuf & 0xFFFF) << qqbuf << Stream::eos;
+        if (joy == 0)
+            joy = GetVar(VAR_JOYVIP_BUFF_GOT);
+        st << static_cast<UInt8>((ybbuf >> 16) & 0xFFFF) << static_cast<UInt8>(ybbuf & 0xFFFF) << qqbuf << joy << Stream::eos;
         send(st);
     }
 
@@ -15712,27 +15740,27 @@ void Player::sendGoodVoiceInfo()
 
 void Player::get3366GiftAward(UInt8 type)
 {
-    if(type == 1 && GetVar(VAR_3366GIFT) < 9)
+    if(type == 1 && GetVar(VAR_3366GIFT) < 99)
     {
         if(GetFreePackageSize() < 6)
         {
             sendMsgCode(0, 1011);
             return;
         }
-        if(getGold() < 40)
+        if(getGold() < 368)
         {
             sendMsgCode(0, 1104);
             return;
         }
 		ConsumeInfo ci(Enum3366Gift,0,0);
-		useGold(40,&ci);
+		useGold(368,&ci);
         AddVar(VAR_3366GIFT, 1);
-        m_Package->Add(50, 1, true);
-        m_Package->Add(49, 1, true);
-        m_Package->Add(514, 1, true);
-        m_Package->Add(133, 1, true);
-        m_Package->Add(511, 1, true);
-        m_Package->Add(1327, 1, true);
+        m_Package->Add(500, 2, true);
+        m_Package->Add(501, 2, true);
+        m_Package->Add(1325, 2, true);
+        m_Package->Add(516, 2, true);
+        m_Package->Add(134, 2, true);
+        m_Package->Add(515, 2, true);
         send3366GiftInfo();
     }
 }

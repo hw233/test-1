@@ -1392,6 +1392,9 @@ void JobHunter::OnAutoStep()
     if (CheckEnd())
     {
         OnAbort(true);
+        GObject::EventBase * ev = GObject::eventWrapper.RemoveTimerEvent(_owner, EVENT_JOBHUNTER, _owner->getId());
+        if (ev)
+            ev->release();
         Stream st(REP::AUTOJOBHUNTER);
         st << static_cast<UInt8>(4);
         st << Stream::eos;
@@ -1406,9 +1409,8 @@ void JobHunter::OnAutoStop()
 {
     // 停止自动战斗
 	GObject::EventBase * ev = GObject::eventWrapper.RemoveTimerEvent(_owner, EVENT_JOBHUNTER, _owner->getId());
-	if(ev == NULL)
-		return;
-	ev->release();
+	if(ev != NULL)
+        ev->release();
     Stream st(REP::AUTOJOBHUNTER);
     st << static_cast<UInt8>(1);
     st << Stream::eos;

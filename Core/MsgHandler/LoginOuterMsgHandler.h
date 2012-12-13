@@ -1309,8 +1309,8 @@ void BigLockUser(LoginMsgHdr& hdr,const void * data)
 
     UInt8 ret = 1;
     INFO_LOG("GMBIGLOCK: %s, %u", playerIds.c_str(), expireTime);
-    std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());
-    if (execu.get() != NULL && execu->isConnected())
+//    std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());
+//    if (execu.get() != NULL && execu->isConnected())
     {
         std::string playerId = GetNextSection(playerIds, ',');
         while (!playerId.empty())
@@ -1338,8 +1338,8 @@ void BigUnlockUser(LoginMsgHdr& hdr,const void * data)
 
     INFO_LOG("GMBIGUNLOCK: %s", playerIds.c_str());
     UInt8 ret = 1;
-    std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());
-    if (execu.get() != NULL && execu->isConnected())
+//    std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());
+//    if (execu.get() != NULL && execu->isConnected())
     {
         std::string playerId = GetNextSection(playerIds, ',');
         while (!playerId.empty())

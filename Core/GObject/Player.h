@@ -111,6 +111,7 @@ namespace GObject
 #define PLAYER_BUFF_ATHLETICS_P     0x45    //历练冷却时间
 #define PLAYER_BUFF_QQVIPBUF        0x46
 #define PLAYER_BUFF_SUFFER          0x47    //陷害间隔
+#define PLAYER_BUFF_JOYBUFF         0x48    //心悦会员
 
 #define PLAYER_BUFF_ATHL1           0x51
 #define PLAYER_BUFF_ATHL2           0x52
@@ -1735,7 +1736,7 @@ namespace GObject
         }
         inline void setClientIp(const std::string& clientIp) 
         { 
-            if (strncmp(clientIp.c_str(), "", 1) == 0)
+            if (inet_addr(clientIp.c_str()) == INADDR_NONE)
             {
                 strncpy(m_clientIp, "0.0.0.0", 16);
             }
@@ -1897,7 +1898,7 @@ namespace GObject
         void onBlueactiveday();
         void sendSecondInfo();
         void recvYBBuf(UInt8 type);
-        void sendYBBufInfo(UInt32 ybbuf, UInt32 qqvipbuf);
+        void sendYBBufInfo(UInt32 ybbuf, UInt32 qqvipbuf, UInt8 joy = 0);
         void adjustAthlBuffData(UInt32 type);
         void sendAthlBufInfo();
 
