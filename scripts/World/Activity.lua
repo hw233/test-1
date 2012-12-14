@@ -952,8 +952,8 @@ function initActTime(y, m, d)
   local  SerStartTm534= { ['year'] = 2012, ['month'] = 12, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 蜀山好声音合作
   -- test
-  local  SerStartTm535= { ['year'] = 2012, ['month'] = 12, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  --local  SerStartTm535= { ['year'] = 2012, ['month'] = 12, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --local  SerStartTm535= { ['year'] = 2012, ['month'] = 12, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm535= { ['year'] = 2012, ['month'] = 12, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 3366合作礼包
   local  SerStartTm536= { ['year'] = 2012, ['month'] = 12, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 

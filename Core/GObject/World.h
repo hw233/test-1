@@ -527,9 +527,17 @@ public:
 
     inline static bool canDestory(UInt32 itemid)
     {
+        if(itemid == 9273)
+        {
+            if(World::getGoodVoiceAct())
+                return false;
+            else
+                return true;
+        }
+
         static UInt32 items[] =
         {
-            9184,9185,9186,9187,9188,9273,
+            9184,9185,9186,9187,9188,
         };
         if (World::getTgcEvent())
         {
