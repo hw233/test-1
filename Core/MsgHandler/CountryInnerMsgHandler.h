@@ -1779,7 +1779,7 @@ void OnAddTianjieNpc( GameMsgHdr& hdr, const void * data)
         UInt16 spot;
     };
     TianjieSpotNpc* tjNpc = reinterpret_cast<TianjieSpotNpc*>(const_cast<void *>(data));
-    if(!tjNpc)
+    if(tjNpc)
         GObject::Tianjie::instance().addTianjieNpc(tjNpc->npcId, tjNpc->spot);
 }
 
@@ -1791,7 +1791,7 @@ void OnDelTianjieNpc( GameMsgHdr& hdr, const void * data)
         UInt16 spot;
     };
     TianjieSpotNpc* tjNpc = reinterpret_cast<TianjieSpotNpc*>(const_cast<void *>(data));
-    if(!tjNpc)
+    if(tjNpc)
         GObject::Tianjie::instance().delTianjieNpc(tjNpc->npcId, tjNpc->spot);
 }
 
