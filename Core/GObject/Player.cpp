@@ -15433,14 +15433,9 @@ void Player::getCopyFrontCurrentAward(UInt8 index)
         return;
     UInt16 totalRatio = 0;
     for(i = 0; i < leftCnt; i++)
-    {
         totalRatio += cf_ratio[leftIndex[i]];
-        printf("%u: itemId:%u,ration:%u\n", leftIndex[i], cf_itemId[leftIndex[i]], cf_ratio[leftIndex[i]]);
-    }
     UInt16 totalRatioTmp = 0;
     UInt16 curRatio = uRand(totalRatio);
-    printf("totalRatio: %u\n", totalRatio);
-    printf("curRatio: %u\n", curRatio);
     UInt8 curId = 5;
     for(i = 0; i < leftCnt; i++)
     {
@@ -15453,7 +15448,6 @@ void Player::getCopyFrontCurrentAward(UInt8 index)
     }
     if(curId >= 5)
         return;
-    printf("curId: %u\n", curId);
     UInt8 order = 5 - leftCnt + 1;
     if(order == 2)
     {
@@ -15557,7 +15551,6 @@ void Player::resetCopyFrontWinAward(bool fresh)
         cf_itemId[i] = award.get<UInt32>(1);
         cf_ratio[i] = award.get<UInt32>(2);
         cf_posPut[i] = 0;
-        printf("cf_itemId[%u] = %u, cf_ratio[%u] = %u\n", i, cf_itemId[i], i, cf_ratio[i]);
         if(fresh)
             DB1().PushUpdateData("UPDATE `copy_front_win` SET `posPut` = %u, `itemId` = %u, `ratio` = %u WHERE `playerId` = %"I64_FMT"u AND `posOrig` = %u", cf_posPut[i], cf_itemId[i], cf_ratio[i], getId(), i);
         else
