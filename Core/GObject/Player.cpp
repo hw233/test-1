@@ -15619,6 +15619,7 @@ void Player::closeCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index)
         return;
 #endif
     SetVar(VAR_CF_FLAG, 0);
+    SetVar(VAR_CF_INDEX, 0);
     for(UInt8 i = 0; i < 5; i++)
     {
         cf_posPut[i] = 0;
@@ -15638,10 +15639,19 @@ void Player::sendCopyFrontAllAward()
     st << static_cast<UInt8>(0x04);
     st << static_cast<UInt8>(0x01);
     st << static_cast<UInt8>(GetVar(VAR_CF_FLAG) - 1);
+
     if(GetVar(VAR_CF_FLAG) == 1)
-        st << getCopyId();
+    {
+        if(GetVar(VAR_CF_INDEX) == 0)
+            SetVar(VAR_CF_INDEX, getCopyId());
+        st << GetVar(VAR_CF_INDEX);
+    }
     else
-        st << getFrontmapId();
+    {
+        if(GetVar(VAR_CF_INDEX) == 0)
+            SetVar(VAR_CF_INDEX, getFrontmapId());
+        st << GetVar(VAR_CF_INDEX);
+    }
     st << static_cast<UInt8>(5);
     bool isPut = false;
     UInt8 index;
