@@ -15644,13 +15644,13 @@ void Player::sendCopyFrontAllAward()
     {
         if(GetVar(VAR_CF_INDEX) == 0)
             SetVar(VAR_CF_INDEX, getCopyId());
-        st << GetVar(VAR_CF_INDEX);
+        st << static_cast<UInt8>(GetVar(VAR_CF_INDEX));
     }
     else
     {
         if(GetVar(VAR_CF_INDEX) == 0)
             SetVar(VAR_CF_INDEX, getFrontmapId());
-        st << GetVar(VAR_CF_INDEX);
+        st << static_cast<UInt8>(GetVar(VAR_CF_INDEX));
     }
     st << static_cast<UInt8>(5);
     bool isPut = false;
