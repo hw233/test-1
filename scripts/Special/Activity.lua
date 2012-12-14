@@ -4661,7 +4661,7 @@ function getCopyFrontmapAward(step, localtion)
             item = items[order]
             return item
         elseif order <= 5 then
-            order = math.random(1, #extra1)
+            order = math.random(1, #extra_2)
             item = extra_2[order]
             return item
         elseif order <= 12 then
