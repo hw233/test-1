@@ -15712,27 +15712,27 @@ void Player::sendGoodVoiceInfo()
 
 void Player::get3366GiftAward(UInt8 type)
 {
-    if(type == 1 && GetVar(VAR_3366GIFT) < 9)
+    if(type == 1 && GetVar(VAR_3366GIFT) < 99)
     {
         if(GetFreePackageSize() < 6)
         {
             sendMsgCode(0, 1011);
             return;
         }
-        if(getGold() < 40)
+        if(getGold() < 368)
         {
             sendMsgCode(0, 1104);
             return;
         }
 		ConsumeInfo ci(Enum3366Gift,0,0);
-		useGold(40,&ci);
+		useGold(368,&ci);
         AddVar(VAR_3366GIFT, 1);
-        m_Package->Add(50, 1, true);
-        m_Package->Add(49, 1, true);
-        m_Package->Add(514, 1, true);
-        m_Package->Add(133, 1, true);
-        m_Package->Add(511, 1, true);
-        m_Package->Add(1327, 1, true);
+        m_Package->Add(500, 2, true);
+        m_Package->Add(501, 2, true);
+        m_Package->Add(1325, 2, true);
+        m_Package->Add(516, 2, true);
+        m_Package->Add(134, 2, true);
+        m_Package->Add(515, 2, true);
         send3366GiftInfo();
     }
 }
