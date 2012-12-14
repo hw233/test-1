@@ -15520,16 +15520,18 @@ void Player::getCopyFrontCurrentAward(UInt8 index)
     bool bind = GetVar(VAR_CF_BIND);
     m_Package->Add(cf_itemId[curId], 1, bind);
 
-    if(leftCnt == 1)
-        closeCopyFrontAwardByIndex(GetVar(VAR_CF_FLAG) - 1, 0);
-
     {
         char tag[32];
         if(!bind)
             order += 5;
+        if(GetVar(VAR_CF_FLAG) == 2)
+            order += 11;
         sprintf(tag, "F_10000_1212_%u", order);
         udpLog("CopyFrontWin", tag, "", "", "", "", "act");
     }
+
+    if(leftCnt == 1)
+        closeCopyFrontAwardByIndex(GetVar(VAR_CF_FLAG) - 1, 0);
 }
 
 void Player::getCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index, UInt8 indexPut)
@@ -15582,7 +15584,6 @@ void Player::resetCopyFrontWinAward(bool fresh)
     {
         tmp2 = uRand(5);
         ++count;
-        printf("count = %u\n", count);
     }
 
     for(UInt8 i = 0; i < 5; i++)
@@ -15595,7 +15596,10 @@ void Player::resetCopyFrontWinAward(bool fresh)
             step = 0;
         Table award = GameAction()->getCopyFrontmapAward(step, PLAYER_DATA(this, location));
         if (award.size() < 2)
+        {
+            printf("award.size() < 2\n");
             continue;
+        }
         cf_itemId[i] = award.get<UInt32>(1);
         cf_ratio[i] = award.get<UInt32>(2);
         cf_posPut[i] = 0;
