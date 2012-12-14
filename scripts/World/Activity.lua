@@ -799,8 +799,10 @@ function onActivityCheck(tm)
 
       if tm >= actTime535 and tm < actTime535_1 then
           setGoodVoiceAct(true)
+          setTgcEvent(true)
       else
           setGoodVoiceAct(false)
+          setTgcEvent(false)
       end
 
       -- if tm >= actTime536 and tm < actTime536_1 then

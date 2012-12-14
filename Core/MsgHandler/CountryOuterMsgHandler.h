@@ -1729,6 +1729,8 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
     UInt8 opt = 0;
     br >> opt;
 
+    if(!player->hasChecked())
+        return;
     switch(opt)
     {
         /** 周岁红包送不停 **/
