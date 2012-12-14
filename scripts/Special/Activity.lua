@@ -4615,6 +4615,7 @@ local common2 = {{50,20},{49,20},{514,20},{133,20},{511,20},{1327,20},{1326,20},
 local common3 = {{400,40},}
 local gem3= {{5001,40},{5011,40},{5021,40},{5031,40},{5041,40},{5051,40},{5061,40},{5071,40},{5081,40},{5091,40},{5101,40},{5111,40},{5121,40},{5131,40},{5141,40},}
 local extra1 = {{50,20},{49,20},{133,20},{1326,20},{507,1},{509,1},}
+local extra_2 = {{50,20},{49,20},{133,20},{1326,20},}
 local item = {}
 
 function getCopyFrontmapAward(step, localtion)
@@ -4646,7 +4647,7 @@ function getCopyFrontmapAward(step, localtion)
         item = common2[order]
         return item;
     else
-        order = math.random(1, 16)
+        order = math.random(1, 14)
         if order <= 1 then
             local items_1 = equipTrump1[localtion];
             if items_1 == nil then
@@ -4659,15 +4660,15 @@ function getCopyFrontmapAward(step, localtion)
             order = math.random(1, #items)
             item = items[order]
             return item
-        elseif order <= 7 then
+        elseif order <= 5 then
             order = math.random(1, #extra1)
-            item = extra1[order]
+            item = extra_2[order]
             return item
-        elseif order <= 14 then
+        elseif order <= 12 then
             order = math.random(1, #common2)
             item = common2[order]
             return item;
-        elseif order <= 15 then
+        elseif order <= 13 then
             order = math.random(1, #common3)
             item = common3[order]
             return item;

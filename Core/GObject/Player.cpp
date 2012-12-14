@@ -15543,7 +15543,7 @@ void Player::getCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index, UInt8 in
     }
 
     UInt8 i;
-    bool isPut = false;;
+    bool isPut = false;
     for(i = 0; i < 5; i++)
     {
         if(cf_posPut[i] == indexPut)
