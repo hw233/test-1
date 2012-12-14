@@ -3622,6 +3622,8 @@ void Clan::updateStatueExp()
 {
     //每小时更新神像等级
     Mutex::ScopedLock lk(_mutex);
+    if (!_techs->getMaxCopyLevel())
+        return;
     _statue->updateLevel(0, 0, _techs->getMaxStatueLevel());
     broadcastCopyInfo();
 }
