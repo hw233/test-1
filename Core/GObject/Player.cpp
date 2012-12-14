@@ -15522,6 +15522,14 @@ void Player::getCopyFrontCurrentAward(UInt8 index)
 
     if(leftCnt == 1)
         closeCopyFrontAwardByIndex(GetVar(VAR_CF_FLAG) - 1, 0);
+
+    {
+        char tag[32];
+        if(!bind)
+            order += 5;
+        sprintf(tag, "F_10000_1212_%u", order);
+        udpLog("CopyFrontWin", tag, "", "", "", "", "act");
+    }
 }
 
 void Player::getCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index, UInt8 indexPut)
@@ -15561,15 +15569,27 @@ void Player::resetCopyFrontWinAward(bool fresh)
 {
     UInt8 index = GetVar(VAR_CF_FLAG);
     UInt8 step;
+    UInt8 tmp1;
+    UInt8 tmp2;
 
     if(index == 0 || index > 2)
         return;
 
+    tmp1 = uRand(5);
+    tmp2 = uRand(5);
+    UInt32 count = 0;
+    while(tmp2 == tmp1 && count < 10000)
+    {
+        tmp2 = uRand(5);
+        ++count;
+        printf("count = %u\n", count);
+    }
+
     for(UInt8 i = 0; i < 5; i++)
     {
-        if(i == 0)
+        if(i == tmp1)
             step = 1;
-        else if(i == 1)
+        else if(i == tmp2)
             step = 2;
         else
             step = 0;
