@@ -213,7 +213,7 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
 
     if (!copyCheckLevel(pl, id))
         return 1;
-    UInt32 cf_flag = pl->GetVar(VAR_CF_BIND);
+    UInt32 cf_bind_flag = pl->GetVar(VAR_CF_BIND);
     //diamond privilege
     if(id == 0xff)
     {
@@ -221,14 +221,16 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
             if(pl->GetVar(VAR_DIAMOND_BLUE) < PRIVILEGE_COUNT) {
                 pl->AddVar(VAR_DIAMOND_BLUE, 1);
                 pl->copyUdpLog(id, 5);
-                pl->SetVar(VAR_CF_BIND, 1);
+                cf_bind_flag &= 0x02;
+                pl->SetVar(VAR_CF_BIND, cf_bind_flag);
                 return 0;
             }
         } else if(pl->isYD() && World::getYellowDiamondAct()) {
             if(pl->GetVar(VAR_DIAMOND_YELLOW) < PRIVILEGE_COUNT) {
                 pl->AddVar(VAR_DIAMOND_YELLOW, 1);
                 pl->copyUdpLog(id, 6);
-                pl->SetVar(VAR_CF_BIND, 1);
+                cf_bind_flag &= 0x02;
+                pl->SetVar(VAR_CF_BIND, cf_bind_flag);
                 return 0;
             }
         }
@@ -240,7 +242,8 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
         if(pl->isQQVIP() && World::getQQVipAct()){
             if(pl->GetVar(VAR_QQVIP_CNT) < PRIVILEGE_COUNT){
                 pl->AddVar(VAR_QQVIP_CNT, 1);
-                pl->SetVar(VAR_CF_BIND, 1);
+                cf_bind_flag &= 0x02;
+                pl->SetVar(VAR_CF_BIND, cf_bind_flag);
                 return 0;
             }
         }
@@ -253,7 +256,8 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
         DB1().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = %u, `copyGoldCnt` = %u WHERE `id` = %"I64_FMT"u",
                 PLAYER_DATA(pl, copyFreeCnt), PLAYER_DATA(pl, copyGoldCnt), pl->getId());
         pl->copyUdpLog(id, 1);
-        pl->SetVar(VAR_CF_BIND, 1);
+        cf_bind_flag &= 0x02;
+        pl->SetVar(VAR_CF_BIND, cf_bind_flag);
         return 0;
     } else if (PLAYER_DATA(pl, copyGoldCnt) < getGoldCount(pl->getVipLevel())) {
         UInt32 gold = getEnterGold(pl);
@@ -270,7 +274,9 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
                 PLAYER_DATA(pl, copyFreeCnt), PLAYER_DATA(pl, copyGoldCnt), pl->getId());
         lootlvl = PLAYER_DATA(pl, copyGoldCnt);
         pl->copyUdpLog(id, 3);
-        pl->SetVar(VAR_CF_BIND, 0);
+        cf_bind_flag &= 0x02;
+        cf_bind_flag |= 0x01;
+        pl->SetVar(VAR_CF_BIND, cf_bind_flag);
         return 0;
     } else {
         SYSMSG_SENDV(2000, pl);

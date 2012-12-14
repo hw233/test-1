@@ -15517,7 +15517,14 @@ void Player::getCopyFrontCurrentAward(UInt8 index)
     st << Stream::eos;
     send(st);
 
-    bool bind = GetVar(VAR_CF_BIND);
+    UInt32 cf_bind_flag = GetVar(VAR_CF_BIND);
+    bool bind;
+    if(GetVar(VAR_CF_FLAG) == 1 && (cf_bind_flag&0x01))
+        bind = 0;
+    else if(GetVar(VAR_CF_FLAG) == 2 && (cf_bind_flag&0x02))
+        bind = 0;
+    else
+        bind = 1;
     m_Package->Add(cf_itemId[curId], 1, bind);
 
     {
