@@ -15594,7 +15594,9 @@ void Player::resetCopyFrontWinAward(bool fresh)
             step = 2;
         else
             step = 0;
-        Table award = GameAction()->getCopyFrontmapAward(step, PLAYER_DATA(this, location));
+        if(GetVar(VAR_CF_LOCATION) == 0)
+            SetVar(VAR_CF_LOCATION, PLAYER_DATA(this, location));
+        Table award = GameAction()->getCopyFrontmapAward(step, GetVar(VAR_CF_LOCATION));
         if (award.size() < 2)
         {
             printf("award.size() < 2\n");
@@ -15644,6 +15646,7 @@ void Player::closeCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index)
 #endif
     SetVar(VAR_CF_FLAG, 0);
     SetVar(VAR_CF_INDEX, 0);
+    SetVar(VAR_CF_LOCATION, 0);
     for(UInt8 i = 0; i < 5; i++)
     {
         cf_posPut[i] = 0;
