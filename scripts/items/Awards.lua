@@ -419,10 +419,10 @@ function RunBlueDiamondAward(player, opt)
         date_0 = os.time(date_9217_0);
         date_1 = os.time(date_9217_1);
     end
-    now = os.time()
-    if now < date_0 or now >= date_1 then
-        return 0;
-    end
+--    now = os.time()
+--    if now < date_0 or now >= date_1 then
+--        return 0;
+--    end
 
     if  not package:DelItem(itemId, 1, true) then
         if  not package:DelItem(itemId, 1, false) then
