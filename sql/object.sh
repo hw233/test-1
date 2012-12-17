@@ -105,8 +105,9 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20121130_1.sql  #add table recharge_item
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20121130_2.sql  # must be once for delete var total
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar199.sql        #清除强化装备的8次限制
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20121206_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20121206_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20121211_1.sql # must be once 场外活动
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20121217_1.sql
 
     #. clearshiyamen.sh
 }

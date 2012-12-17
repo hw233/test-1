@@ -1763,9 +1763,6 @@ void OnAutoJobHunterStep( GameMsgHdr& hdr, const void * data)
     JobHunter * job_hunter = player->getJobHunter();
     if (!job_hunter)
     {
-#ifdef JOB_HUNTER_DEBUG
-        std::cout << "Wrong Timer." << std::endl;
-#endif
         return;
     }
     job_hunter->OnAutoCommand(0x10);

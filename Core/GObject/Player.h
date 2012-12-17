@@ -1946,7 +1946,7 @@ namespace GObject
 
     public:
         JobHunter * getJobHunter();
-        void setJobHunter(std::string& fighterList, std::string& mapInfo, UInt8 progress, UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY, UInt32 stepCount);
+        void setJobHunter(std::string& fighterList, std::string& mapInfo, UInt8 progress, UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY, UInt32 stepCount, UInt8 slotVal1, UInt8 slotVal2, UInt8 slotVal3);
         void sendAutoJobHunter();
     private:
         JobHunter * _jobHunter;

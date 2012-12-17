@@ -29,6 +29,7 @@ class Player;
 #define POS_TO_CLIENT_POS(x) ((((UInt16)(x) >> 8) * MAX_POS_X) + ((x) & 0xff))
 
 #define  EX_JOB_ITEM_ID 9229
+#define  EX_JOB_SLOT_ID 9285
 
 static const UInt8 MAX_POS_X = 5;
 static const UInt8 MAX_POS_Y = 5;
@@ -46,19 +47,19 @@ static const UInt8 MAX_GRID_COUNT[256]
 
 };
 
-static const UInt32 SPOT_ID[5] = {
-    0, 122, 23232, 32332, 111
-};
-
-static const UInt8 MAP_ID_INDEX[] = {
+static const UInt8 ITEM_RATE[10] = 
+{
     0,
-    32,
-    50,
-    41,
-    20,
-    0
+    10,
+    30,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100
 };
-
 
 class JobHunter
 {
@@ -100,12 +101,6 @@ class JobHunter
         typedef std::map<UInt16, Route> GridRoute;
         GridRoute route;    // 该点与其他连通点的路径
 
-        /*
-        GridInfo(UInt8 x, UInt8 y, UInt8 type)
-            : neighbCount(0), posX(x), posY(y), gridType(type)
-        {
-        }
-        */
         GridInfo(UInt16 index, UInt8 type, UInt8 neighbourCount)
             : neighbCount(neighbourCount)
         {
@@ -114,31 +109,19 @@ class JobHunter
         }
     };
 
-#if 0
     enum SlotType
-    {                           //                         每个  三个相同额外增加
-        SLOT_DRAGON     = 1,    // 青龙 （法宝、心法、装备  10%，   20%）
-        SLOT_TIGER      = 2,    // 白虎 （法宝              20%，   40%）
-        SLOT_PHOENIX    = 3,    // 朱雀 （心法              20%，   40%）
-        SLOT_TURTLE     = 4,    // 玄武 （装备              20%，   40%）
-        SLOT_MAX,
-    };
-#endif
-    enum SlotType
-    {
-        SLOT_NONE   = 0,
-        SLOT_GOLD   = 1,    // 每点25强度
-        SLOT_WOOD   = 2,    // 每点20强度
-        SLOT_WATAR  = 3,    // 每点15强度
-        //SLOT_FIRE   = 4,    // 每点10强度
-        //SLOT_MUD    = 5,    // 每点 5强度
+    {                           //     
+        SLOT_DRAGON     = 1,    // 青龙
+        SLOT_TIGER      = 2,    // 白虎
+        SLOT_PHOENIX    = 3,    // 朱雀
+        SLOT_TURTLE     = 4,    // 玄武
         SLOT_MAX,
     };
 
     public:
         JobHunter(Player* player);
         JobHunter(Player * player, std::string& fighterList, std::string& mapInfo, UInt8 progress,
-                UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY, UInt32 stepCount);
+                UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY, UInt32 stepCount, UInt8 slotVal1, UInt8 slotVal2, UInt8 slotVal3);
         ~JobHunter();
 
         void LoadFighterList(const std::string& str);
@@ -174,7 +157,7 @@ class JobHunter
         UInt16 GetSpotIdFromGameId(UInt8 id);
 
         bool InitMap();
-        void SelectBossGrid();
+        void AddBossGrid( std::vector<UInt16>& validGrid, std::map<UInt16, UInt8>& neighbourCount);
         void AddLengendGrid();
         void SelectCaveGrid();
         void SelectBornGrid();
@@ -249,12 +232,11 @@ class JobHunter
         UInt8 _slot2;                   // 二号神兽感应位
         UInt8 _slot3;                   // 三号神兽感应位
 
-#if 0
-        UInt8 _equipProb;               // 装备寻得率
-        UInt8 _cittaProb;               // 心法寻得率
-        UInt8 _trumpProb;               // 法宝寻得率
-#endif
-        UInt8 _strengthPoint;           // 神兽强度（为了刷地图上的神兽boss的）
+        UInt8  _spItemRate[SLOT_MAX];
+                                        // 青龙梦引掉率
+                                        // 白虎梦引掉率
+                                        // 朱雀梦引掉率
+                                        // 玄武梦引掉率
 
         bool  _isInGame;                // 玩家是否已经进入寻墨游戏
         UInt8 _gameProgress;            // 寻墨游戏状态

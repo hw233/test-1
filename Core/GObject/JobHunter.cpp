@@ -24,16 +24,17 @@ namespace GObject
 {
 
 JobHunter::JobHunter(Player * player)
-    : _owner(player), _spotId(0), _slot1(0), _slot2(0), _slot3(0), _strengthPoint(0),
-      _isInGame(false), _gameProgress(PROGRESS_NONE), 
-      _posX(0), _posY(0), _earlyPosX(0), _earlyPosY(0), _stepCount(0), _isInAuto(false), _isAutoLose(false)
+    : _owner(player), _spotId(0), 
+    _slot1(0), _slot2(0), _slot3(0), _isInGame(false), _gameProgress(PROGRESS_NONE), 
+    _posX(0), _posY(0), _earlyPosX(0), _earlyPosY(0), _stepCount(0), _isInAuto(false), _isAutoLose(false)
 {
     _nextMoveTime = TimeUtil::Now();
     DB2().PushUpdateData("INSERT IGNORE INTO `job_hunter` (`playerId`) VALUES (%"I64_FMT"u)", player->getId()); 
+    memset(_spItemRate, 0, sizeof(_spItemRate));
 }
 
 JobHunter::JobHunter(Player * player, std::string& fighterList, std::string& mapInfo, UInt8 progress,
-        UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY, UInt32 stepCount)
+        UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY, UInt32 stepCount, UInt8 slotVal1, UInt8 slotVal2, UInt8 slotVal3)
     : _owner(player), _spotId(0), _gameProgress(progress), _posX(posX), _posY(posY), _earlyPosX(earlyPosX), _earlyPosY(earlyPosY), _stepCount(stepCount),
       _isInAuto(false), _isAutoLose(false)
 {
@@ -43,6 +44,9 @@ JobHunter::JobHunter(Player * player, std::string& fighterList, std::string& map
     _nextMoveTime = TimeUtil::Now();
     if (_gameProgress != PROGRESS_NONE)
         _spotId = _owner->GetVar(VAR_JOB_HUNTER_SPOT_ID);
+    _spItemRate[1] = slotVal1;
+    _spItemRate[2] = slotVal2;
+    _spItemRate[3] = slotVal3;
 }
 
 JobHunter::~JobHunter()
@@ -253,12 +257,11 @@ void JobHunter::OnRequestStart(UInt8 index)
     }
     _owner->GetPackage()->DelItemAny(EX_JOB_ITEM_ID, 1);
     _gameProgress = index;
-    //OnUpdateSlot(true);
+    OnUpdateSlot(true);
     InitMap();
     _spotId = GetSpotIdFromGameId(index);
     _owner->SetVar(VAR_JOB_HUNTER_SPOT_ID, _spotId);
     SendGameInfo(2);
-    //_owner->moveTo(_spotId, true);
     DB2().PushUpdateData("UPDATE `job_hunter` SET `progress` = '%u' WHERE `playerId` = %"I64_FMT"u", _gameProgress, _owner->getId());
     _owner->udpLog("jobHunter", "F_1161", "", "", "", "", "act");
 }
@@ -266,16 +269,18 @@ void JobHunter::OnRequestStart(UInt8 index)
 void JobHunter::OnUpdateSlot(bool isAuto)
 {
     // 老虎机转动
-    //if (!_gameProgress)
-        //return;
+    if (!_gameProgress)
+        return;
+    if (!isAuto)
+    {
+        if (!_owner->GetPackage()->GetItemAnyNum(EX_JOB_SLOT_ID))
+        {
+            _owner->sendMsgCode(0, 2209, 0); // 神兽之印不足
+            return;
+        }
+    }
+    _owner->GetPackage()->DelItemAny(EX_JOB_SLOT_ID, 1);
 
-#if 0
-    _equipProb = 0;
-    _cittaProb = 0;
-    _trumpProb = 0;
-#endif
-
-    _strengthPoint = 0;
     UInt8 res[SLOT_MAX] = {0};
     _slot1 = _rnd(SLOT_MAX);
     _slot2 = _rnd(SLOT_MAX);
@@ -284,33 +289,16 @@ void JobHunter::OnUpdateSlot(bool isAuto)
     ++(res[_slot2]);
     ++(res[_slot3]);
 
-#if 0
-    // 每个增加的概率
-    _equipProb = res[SLOT_DRAGON] * 10 + res[SLOT_TIGER]   * 20;
-    _cittaProb = res[SLOT_DRAGON] * 10 + res[SLOT_PHOENIX] * 20;
-    _trumpProb = res[SLOT_DRAGON] * 10 + res[SLOT_TIGER]   * 20;
-
-    // 三个相同的额外增加的概率
-    _equipProb += res[SLOT_DRAGON] / 3 * 20 + res[SLOT_TIGER]   / 3 * 40;
-    _cittaProb += res[SLOT_DRAGON] / 3 * 20 + res[SLOT_PHOENIX] / 3 * 40;
-    _trumpProb += res[SLOT_DRAGON] / 3 * 20 + res[SLOT_TURTLE]  / 3 * 40;
-#endif
-
-    // 每个增加的概率
-    _strengthPoint += res[SLOT_GOLD]  * 25;
-    _strengthPoint += res[SLOT_WOOD]  * 20;
-    _strengthPoint += res[SLOT_WATAR] * 15;
-    //_strengthPoint += res[SLOT_FIRE]  * 10;
-    //_strengthPoint += res[SLOT_MUD]   *  5;
-    _strengthPoint += res[SLOT_NONE]   *  0;
-
     for (UInt8 i = 1; i < SLOT_MAX; ++i)
     {
-        if (res[i] == 3)
-            _strengthPoint += 25;
-        if (res[i] == 2)
-            _strengthPoint += 10;
+        _spItemRate[i] = ITEM_RATE[res[i]];
     }
+
+#ifdef JOB_HUNTER_DEBUG
+    printf ("rate: 青龙:%d, 白虎: %d, 朱雀: %d, 玄武:%d.\n", (UInt32)_spItemRate[1], (UInt32)_spItemRate[2], (UInt32)_spItemRate[3], (UInt32)_spItemRate[4]);
+#endif
+    DB2().PushUpdateData("UPDATE `job_hunter` SET `slotVal1` = '%d',`slotVal2` = '%d', `slotVal3`= '%d' WHERE `playerId` = %"I64_FMT"u", 
+            _spItemRate[1], _spItemRate[2], _spItemRate[3], _owner->getId());
     
     if (!isAuto)
         SendGameInfo(2);
@@ -599,9 +587,10 @@ bool JobHunter::InitMap()
     UInt16 index = 0;
     invalidGrid.erase(curPos);
 
-    for (UInt8 i = 0; i < MAX_GRID; ++ i)
+    // XXX: 现在自动生成的格子比总格子数少一（为了boss格子）
+    for (UInt8 i = 0; i < MAX_GRID - 1; ++ i)
     {
-        // 选择12个点作为地图中可行进点
+        // 选择11个点作为地图中可行进点，最后循环外生成一个额外的死角boss点
         UInt8 prob = _rnd(100);
         if (prob < 70)
         {
@@ -700,15 +689,9 @@ bool JobHunter::InitMap()
         index = _rnd(validGrid.size());
         curPos = validGrid[index];
 
-
-#if 0
-        type = GameAction()->calcGridType(prob);
-        if (type == GRID_BOSS)
-            type = GRID_MONSTER;
-#endif
     }
 
-    SelectBossGrid();
+    AddBossGrid(validGrid, neighbourCount);
     SelectCaveGrid();
     SelectBornGrid();
     AddMinTreasureGrid();
@@ -717,18 +700,21 @@ bool JobHunter::InitMap()
     return true;
 }
 
-void JobHunter::SelectBossGrid()
+void JobHunter::AddBossGrid( std::vector<UInt16>& validGrid, std::map<UInt16, UInt8>& neighbourCount)
 {
-    // 选择符合条件的点概率出现boss
-    for (MapInfo::iterator it = _mapInfo.begin(); it != _mapInfo.end(); ++ it)
+    // 增加一个死角用于出现boss
+    for (std::vector<UInt16>::iterator it = validGrid.begin(); it != validGrid.end(); ++ it)
     {
-        if ((it->second).neighbCount == 1)
+        if (_mapInfo.find(*it) != _mapInfo.end())
+            continue;
+
+        if (neighbourCount[*it] == 1)
         {
-            // 该点设置为BOSS点
-            (it->second).gridType = GRID_BOSS | UNKNOWN_FLAG;
-            break;
+            _mapInfo.insert(std::make_pair(*it, GridInfo(*it, GRID_BOSS | UNKNOWN_FLAG, neighbourCount[*it])));
+            return;
         }
     }
+    TRACE_LOG("JobHunter: addBoss error.");
 }
 
 void JobHunter::AddLengendGrid()
@@ -992,7 +978,7 @@ bool JobHunter::OnAttackMonster(UInt16 pos, bool isAuto)
             npcId = GameAction()->getRandomNormalMonster(_gameProgress);
             type = 10;
             break;
-            //case GRID_LENGEND:
+        //case GRID_LENGEND:
             //npcId = GameAction()->getLengendMonster(_gameProgress);
             //break;
         case GRID_BOSS:
@@ -1026,6 +1012,23 @@ bool JobHunter::OnAttackMonster(UInt16 pos, bool isAuto)
         _owner->pendExp(ng->getExp());
         ng->getLoots(_owner, _owner->_lastLoot, 0, NULL);
         (it->second).gridType |= CLEAR_FLAG;
+
+        if (type == 10)
+        {
+            for (UInt8 i = 1; i < SLOT_MAX; ++ i)
+            {
+                struct GData::LootResult lr = {0, 1};
+                lr.id = GameAction()->getSpecialItem(_gameProgress, i);
+                UInt8 prob = _rnd(100);
+                if (prob < _spItemRate[i])
+                {
+                    if (_owner->GetPackage()->Add(lr.id, lr.count, true, true, FromNpc))
+                    {
+                        _owner->_lastLoot.push_back(lr);
+                    }
+                }
+            }
+        }
     }
     else
     {

@@ -275,6 +275,7 @@ namespace Script
         lua_tinker::table getTreasure(UInt8 id);
         UInt32 foundCave(UInt8 id);
         lua_tinker::table getStepAward(UInt32 step);
+        UInt16 getSpecialItem(UInt8 id, UInt8 index);
         lua_tinker::table getCopyFrontmapAward(UInt8 step, UInt16 localtion);
 
     public:

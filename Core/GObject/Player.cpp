@@ -1151,8 +1151,6 @@ namespace GObject
 #endif
 #endif
 #endif // _WIN32
-#ifdef JOB_HUNTER_DEBUG
-#endif
 	}
 
 #define WEBDOWNLOAD 255
@@ -14300,11 +14298,11 @@ namespace GObject
    }
 
    void Player::setJobHunter(std::string& fighterList, std::string& mapInfo, UInt8 progress,
-           UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY, UInt32 stepCount)
+           UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY, UInt32 stepCount, UInt8 slotVal1, UInt8 slotVal2, UInt8 slotVal3)
    {
        if (_jobHunter)
            return;
-       _jobHunter = new JobHunter(this, fighterList, mapInfo, progress, posX, posY, earlyPosX, earlyPosY, stepCount);
+       _jobHunter = new JobHunter(this, fighterList, mapInfo, progress, posX, posY, earlyPosX, earlyPosY, stepCount, slotVal1, slotVal2, slotVal3);
    }
 
    void Player::sendAutoJobHunter()
