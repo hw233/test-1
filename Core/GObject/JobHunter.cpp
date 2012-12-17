@@ -1289,6 +1289,7 @@ bool JobHunter::OnFoundCave(bool isAuto)
 void JobHunter::OnAbort(bool isAuto /* = false */)
 {
     // 主动放弃
+    OnAutoStop();
     _gameProgress = PROGRESS_NONE;
     _stepCount = 0;
     _posX = _posY = 0;
