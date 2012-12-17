@@ -213,6 +213,7 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
 
     if (!copyCheckLevel(pl, id))
         return 1;
+    UInt32 cf_flag = pl->GetVar(VAR_CF_BIND);
     //diamond privilege
     if(id == 0xff)
     {
