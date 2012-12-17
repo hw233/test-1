@@ -1069,6 +1069,9 @@ namespace GObject
         sendLevelPack(GetLev());
         offlineExp(curtime);
 
+        //QQGame登录奖励
+        sendQQGameGift1218();
+
         char buf[64] = {0};
         snprintf(buf, sizeof(buf), "%"I64_FMT"u", _id);
 #ifndef _WIN32
@@ -15832,6 +15835,29 @@ void Player::send3366GiftInfo()
     st << opt;
     st << Stream::eos;
     send(st);
+}
+
+void Player::sendQQGameGift1218()
+{
+    UInt8 platform = atoi(getDomain());
+    if (GetVar(VAR_QQGAME_GIFT_1218) > 0 || platform != 10)
+        return;
+    UInt32 now = TimeUtil::Now();
+    if (now < TimeUtil::MkTime(2012, 12, 18) || now > TimeUtil::MkTime(2012, 12, 21))
+        return;
+    UInt32 h = (now - TimeUtil::SharpDay())/3600;//现在的小时
+    if (h == 20)
+    {
+        SYSMSGV(title, 4100, TimeUtil::MonthDay());
+        SYSMSGV(content, 4101, TimeUtil::MonthDay());
+        Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        if(mail)
+        {
+            MailPackage::MailItem mitem = {15,5};
+            mailPackageManager.push(mail->id, &mitem, 1, true);
+        }
+        SetVar(VAR_QQGAME_GIFT_1218, 1);
+    }
 }
 
 } // namespace GObject
