@@ -797,13 +797,13 @@ function onActivityCheck(tm)
           setNeedRechargeRank(false)
       end
 
-      if tm >= actTime535 and tm < actTime535_1 then
+      --if tm >= actTime535 and tm < actTime535_1 then
           setGoodVoiceAct(true)
           setTgcEvent(true)
-      else
-          setGoodVoiceAct(false)
-          setTgcEvent(false)
-      end
+      --else
+      --    setGoodVoiceAct(false)
+      --    setTgcEvent(false)
+      --end
 
       -- if tm >= actTime536 and tm < actTime536_1 then
           set3366GiftAct(true)
