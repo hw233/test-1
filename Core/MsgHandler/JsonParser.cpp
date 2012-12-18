@@ -699,10 +699,13 @@ int query_activity_req(JsonHead* head, json_t* body, json_t* retbody, std::strin
         return EPLAYER_NOT_EXIST;
     }
 
+    UInt32 v = 0 ;
+    if (player->GetOnlineTimeToday() > 0)
+        v = player->GetStrengthenMgr()?player->GetStrengthenMgr()->GetSouls():0; 
     json_insert_pair_into_object(retbody, "szOpenId", json_new_string(openid));
     json_insert_pair_into_object(retbody, "szRoleName", json_new_string(fixPlayerName(player->getName()).c_str()));
     json_insert_pair_into_object(retbody, "ullRoleId", json_new_string(playerId));
-    json_insert_pair_into_object(retbody, "uiActval", my_json_new_number(player->GetStrengthenMgr()?player->GetStrengthenMgr()->GetSouls():0));
+    json_insert_pair_into_object(retbody, "uiActval", my_json_new_number(v));
 
     head->cmd = 60;
     return 0;
