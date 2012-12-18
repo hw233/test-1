@@ -214,7 +214,7 @@ void FrontMap::enter(Player* pl, UInt8 id)
                     pl->getId(), id);
             ret = 0;
             pl->frontMapUdpLog(id, 1);
-            cf_bind_flag &= 0x01;
+            cf_bind_flag &= 0xF1;
             pl->SetVar(VAR_CF_BIND, cf_bind_flag);
         } else if (PLAYER_DATA(pl, frontGoldCnt) < getGoldCount(pl->getVipLevel())) {
             UInt32 gold = getEnterGold(pl);
@@ -236,7 +236,7 @@ void FrontMap::enter(Player* pl, UInt8 id)
             ConsumeInfo ci(EnterFrontMap,0,0);
             pl->useGold(gold, &ci);
             pl->frontMapUdpLog(id, 3);
-            cf_bind_flag &= 0x01;
+            cf_bind_flag &= 0xF1;
             cf_bind_flag |= 0x02;
             pl->SetVar(VAR_CF_BIND, cf_bind_flag);
         } else {

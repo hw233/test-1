@@ -15432,6 +15432,9 @@ void Player::copyFrontWinAward(UInt8 index)
 {
     if(!World::getCopyFrontWinSwitch())
         return;
+    UInt32 tmp = (GetVar(VAR_CF_BIND)&0x0F);
+    UInt32 cf_tmp = ((tmp << 4) | tmp);
+    SetVar(VAR_CF_BIND, cf_tmp);
     SetVar(VAR_CF_FLAG, index);
     resetCopyFrontWinAward();
     sendCopyFrontAllAward();
@@ -15519,9 +15522,9 @@ void Player::getCopyFrontCurrentAward(UInt8 index)
 
     UInt32 cf_bind_flag = GetVar(VAR_CF_BIND);
     bool bind;
-    if(GetVar(VAR_CF_FLAG) == 1 && (cf_bind_flag&0x01))
+    if(GetVar(VAR_CF_FLAG) == 1 && (cf_bind_flag&0x10))
         bind = 0;
-    else if(GetVar(VAR_CF_FLAG) == 2 && (cf_bind_flag&0x02))
+    else if(GetVar(VAR_CF_FLAG) == 2 && (cf_bind_flag&0x20))
         bind = 0;
     else
         bind = 1;
