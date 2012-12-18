@@ -85,6 +85,7 @@ public:
     void State(const char* action, int serverNum);
 
     void do_curl_request( const char* url );
+    bool do_http_request(const char* url, int timeout);
 
     void updateState(const char* action);
 
