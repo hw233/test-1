@@ -15531,7 +15531,20 @@ void Player::getCopyFrontCurrentAward(UInt8 index)
         bind = 0;
     else
         bind = 1;
-    m_Package->Add(cf_itemId[curId], 1, bind);
+    UInt32 itemTmp = cf_itemId[curId];
+    if(bind)
+    {
+        //特殊处理4个相同的物品，绑定的全部是后者(前者可以是非全绑定，后者全部是绑定)
+        if(itemTmp == 135)
+            itemTmp = 133;
+        else if(itemTmp == 1412)
+            itemTmp = 1327;
+        else if(itemTmp == 1411)
+            itemTmp = 1326;
+        else if(itemTmp == 9283)
+            itemTmp = 400;
+    }
+    m_Package->Add(itemTmp, 1, bind);
 
     {
         char tag[32];
