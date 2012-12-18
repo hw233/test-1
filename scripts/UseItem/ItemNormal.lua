@@ -2426,7 +2426,7 @@ function ItemNormal_00000400(iid, num, bind, param)
         fgt:addPExp(n * 1000);
     end
 
-    package:DelItemSendMsg(400, player);
+    package:DelItemSendMsg(iid, player);
     return n;
 end
 
@@ -8670,6 +8670,7 @@ local ItemNormal_Table = {
     [9280] = ItemNormal_00009279,
     [9281] = ItemNormal_00009279,
     [9282] = ItemNormal_00009279,
+    [9283] = ItemNormal_00000400,
 
     [10000] = ItemNormal_00010000,
     [10001] = ItemNormal_00010001,
