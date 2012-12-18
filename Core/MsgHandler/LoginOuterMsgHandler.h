@@ -780,7 +780,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 bool callOpenApi(const std::string& param)
 {
     char curl[4096] = {0};
-    snprintf(curl, sizeof(curl), "%s/%s", cfg.chargeUrl.c_str(), param.c_str());
+    snprintf(curl, sizeof(curl), "%s%s", cfg.chargeUrl.c_str(), param.c_str());
     TRACE_LOG("CHARGE URL: %s\n", curl);
     return SERVER().do_http_request(curl, 20);
 }
@@ -866,7 +866,10 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
                 free(rtoken);
 
                 if (ret == 0 && !callOpenApi(param))
-                    ret = 1;
+                {
+                    err = "confirm error.";
+                    ret = 5;
+                }
 
                 break;
             }
@@ -891,7 +894,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
             }
         }
 
-        if (err.length())
+        if (err.length() && ret != 1)
         {
             TRACE_LOG("key: %s, token: %s, ret: %u, rc: %u, err: %s", key, token.c_str(), ret, rc, err.c_str());
             uninitMemcache();
