@@ -1069,6 +1069,9 @@ namespace GObject
         sendLevelPack(GetLev());
         offlineExp(curtime);
 
+        //QQGame登录奖励
+        sendQQGameGift1218();
+
         char buf[64] = {0};
         snprintf(buf, sizeof(buf), "%"I64_FMT"u", _id);
 #ifndef _WIN32
@@ -13176,7 +13179,7 @@ namespace GObject
         }
         if ( type == 4)
         {
-            if (getBuffData(PLAYER_BUFF_JOYBUFF, TimeUtil::Now())-TimeUtil::Now() >= 99*3600)
+            if (getBuffData(PLAYER_BUFF_JOYBUFF, TimeUtil::Now()) >= TimeUtil::Now() + 99*3600)
                 return;
 
             if (getGold() >= 5)
@@ -15430,6 +15433,9 @@ void Player::copyFrontWinAward(UInt8 index)
 {
     if(!World::getCopyFrontWinSwitch())
         return;
+    UInt32 tmp = (GetVar(VAR_CF_BIND)&0x0F);
+    UInt32 cf_tmp = ((tmp << 4) | tmp);
+    SetVar(VAR_CF_BIND, cf_tmp);
     SetVar(VAR_CF_FLAG, index);
     resetCopyFrontWinAward();
     sendCopyFrontAllAward();
@@ -15515,7 +15521,14 @@ void Player::getCopyFrontCurrentAward(UInt8 index)
     st << Stream::eos;
     send(st);
 
-    bool bind = GetVar(VAR_CF_BIND);
+    UInt32 cf_bind_flag = GetVar(VAR_CF_BIND);
+    bool bind;
+    if(GetVar(VAR_CF_FLAG) == 1 && (cf_bind_flag&0x10))
+        bind = 0;
+    else if(GetVar(VAR_CF_FLAG) == 2 && (cf_bind_flag&0x20))
+        bind = 0;
+    else
+        bind = 1;
     m_Package->Add(cf_itemId[curId], 1, bind);
 
     {
@@ -15820,6 +15833,29 @@ void Player::send3366GiftInfo()
     st << opt;
     st << Stream::eos;
     send(st);
+}
+
+void Player::sendQQGameGift1218()
+{
+    UInt8 platform = atoi(getDomain());
+    if (GetVar(VAR_QQGAME_GIFT_1218) > 0 || platform != 10)
+        return;
+    UInt32 now = TimeUtil::Now();
+    if (now < TimeUtil::MkTime(2012, 12, 18) || now > TimeUtil::MkTime(2012, 12, 21))
+        return;
+    UInt32 h = (now - TimeUtil::SharpDay())/3600;//现在的小时
+    if (h == 20)
+    {
+        SYSMSGV(title, 4100, TimeUtil::MonthDay());
+        SYSMSGV(content, 4101, TimeUtil::MonthDay());
+        Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        if(mail)
+        {
+            MailPackage::MailItem mitem = {15,5};
+            mailPackageManager.push(mail->id, &mitem, 1, true);
+        }
+        SetVar(VAR_QQGAME_GIFT_1218, 1);
+    }
 }
 
 } // namespace GObject

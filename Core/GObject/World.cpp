@@ -1146,7 +1146,30 @@ void World::DaysRank_Refresh(void*)
 {
 	GObject::DaysRank::instance().process();
 }
-
+void World::SendQQGameGift(void*)
+{
+    UInt32 now = TimeUtil::Now();
+    if (now < TimeUtil::MkTime(2012, 12, 18) || now > TimeUtil::MkTime(2012, 12, 21))
+        return;
+    std::unordered_map<UInt64, Player*>& pm = GObject::globalPlayers.getMap();
+    std::unordered_map<UInt64, Player*>::iterator iter;
+    for (iter = pm.begin(); iter != pm.end(); ++iter)
+    {
+        Player* pl = iter->second;
+        if (NULL != pl && pl->isOnline() && atoi(pl->getDomain()) == 10 && pl->GetVar(VAR_QQGAME_GIFT_1218)==0)
+        {
+            SYSMSGV(title, 4100, TimeUtil::MonthDay());
+            SYSMSGV(content, 4101, TimeUtil::MonthDay());
+            Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            if(mail)
+            {
+                MailPackage::MailItem mitem = {15,5};
+                mailPackageManager.push(mail->id, &mitem, 1, true);
+                pl->SetVar(VAR_QQGAME_GIFT_1218, 1);
+            }
+        }
+    }
+}
 void World::Team_Copy_Process(void*)
 {
     teamCopyManager->process(TimeUtil::Now());
@@ -1514,6 +1537,9 @@ bool World::Init()
     //AddTimer(60 * 1000, advancedHookTimer, static_cast<void *>(NULL), (60 - now % 60) * 1000);
     AddTimer(5 * 1000, ArenaExtraActTimer, static_cast<void *>(NULL), (5 - now % 5) * 1000);
 
+    UInt32 QQGameGiftPoint = TimeUtil::SharpDayT(0, now) + 20*3600;
+    AddTimer(86400 * 1000, SendQQGameGift, static_cast<void *>(NULL), (QQGameGiftPoint >= now ? QQGameGiftPoint - now : 86400 + QQGameGiftPoint - now) * 1000);
+    
     return true;
 }
 

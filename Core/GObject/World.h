@@ -686,6 +686,7 @@ private:
     static void AthleticsPhysicalCheck(void *);
 	static void Tianjie_Refresh(void*);
 	static void DaysRank_Refresh(void*);
+    static void SendQQGameGift(void*);
     static void TownDeamonTmAward(void *);
     static void ArenaExtraActTimer(void *);
     static void ClanCopyCheck(void *);

@@ -297,7 +297,7 @@ namespace GObject
         VAR_FIRST_RECHARGE_VALUE = 286, //充值数
         VAR_FIRST_RECHARGE_STEP = 287, //已领阶段
         VAR_CF_FLAG = 288, //是副本，还是阵图
-        VAR_CF_BIND = 289, //是否绑定
+        VAR_CF_BIND = 289, //是否绑定，低1位表示副本，低2位表示阵图，数字1表示非绑定，数字0表示绑定，低5，6位为1，2的备份
         VAR_GOOD_VOICE = 290, //是否领取蜀山好声音
         VAR_3366GIFT = 291, //3366合作礼包
         VAR_CF_INDEX = 292, //副本、阵图通关索引，从1开始
@@ -308,6 +308,7 @@ namespace GObject
         //340简体版
         VAR_RECHARGE_SCORE = 340, //累计充值的积分
         VAR_JOYVIP_BUFF_GOT     = 341, //心悦Buff
+        VAR_QQGAME_GIFT_1218 = 342,    //QQGame登录奖励 1218-1220
         VAR_MAX,
     };
 
@@ -569,6 +570,7 @@ namespace GObject
             REGISTER_VAR(VAR_QQVIP_AWARD_COUNT, CYCLE_NONE);
             REGISTER_VAR(VAR_RECHARGE_SCORE, CYCLE_NONE);
             REGISTER_VAR(VAR_JOYVIP_BUFF_GOT, CYCLE_DAY);
+            REGISTER_VAR(VAR_QQGAME_GIFT_1218, CYCLE_DAY);
             REGISTER_VAR(VAR_AWARD_SSTOOLBAR, CYCLE_NONE);
             REGISTER_VAR(VAR_EX_JOB_ENABLE, CYCLE_NONE);
             REGISTER_VAR(VAR_JOB_HUNTER_SPOT_ID, CYCLE_NONE);
