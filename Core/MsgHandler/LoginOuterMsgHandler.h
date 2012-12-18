@@ -779,6 +779,8 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 
 bool callOpenApi(const std::string& param)
 {
+    if (!cfg.chargeUrl.length())
+        return true;
     char curl[4096] = {0};
     snprintf(curl, sizeof(curl), "%s%s", cfg.chargeUrl.c_str(), param.c_str());
     TRACE_LOG("CHARGE URL: %s\n", curl);
