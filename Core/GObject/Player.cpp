@@ -13181,7 +13181,7 @@ namespace GObject
         }
         if ( type == 4)
         {
-            if (getBuffData(PLAYER_BUFF_JOYBUFF, TimeUtil::Now())-TimeUtil::Now() >= 99*3600)
+            if (getBuffData(PLAYER_BUFF_JOYBUFF, TimeUtil::Now()) >= (TimeUtil::Now() + 99*3600))
                 return;
 
             if (getGold() >= 5)
