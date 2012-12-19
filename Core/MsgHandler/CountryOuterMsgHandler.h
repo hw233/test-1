@@ -1220,6 +1220,8 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     //    pl->sendYearActInfo();
     pl->sendFirstRecharge(true);
     pl->sendCopyFrontAllAward();
+    pl->sendGoodVoiceInfo();
+    pl->send3366GiftInfo();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )

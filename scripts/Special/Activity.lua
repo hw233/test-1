@@ -4368,7 +4368,7 @@ function getCopyFrontmapAward(step, localtion)
         -- print("step:"..step.." "..item[1]..": "..item[2])
         return item;
     else
-        -- print("---000------"..step.."----------")
+        print("---000------"..step.."----------")
         local itemsAll = copyFrontAward[localtion];
         local items1 = {}
         local items3 = {}
@@ -4389,7 +4389,13 @@ function getCopyFrontmapAward(step, localtion)
         end
         local total2 = #copyFrontAward[2]
         local total = total1 + total2 + total3 + #copyFrontAward[3]
+        print("total1: "..total1)
+        print("total2: "..total2)
+        print("total3: "..total3)
+        print("total#3: "..#copyFrontAward[3])
+        print("total: "..total)
         order = math.random(1, total)
+        print("order: "..order)
         if order <= total1 then
             item = items1[order]
         elseif order <= total1 + total2 then

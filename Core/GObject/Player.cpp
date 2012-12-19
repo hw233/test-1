@@ -1069,10 +1069,6 @@ namespace GObject
         sendLevelPack(GetLev());
         offlineExp(curtime);
 
-        sendCopyFrontAllAward();
-        sendGoodVoiceInfo();
-        send3366GiftInfo();
-
         char buf[64] = {0};
         snprintf(buf, sizeof(buf), "%"I64_FMT"u", _id);
 #ifndef _WIN32
@@ -15325,9 +15321,16 @@ void EventTlzAuto::notify(bool isBeginAuto)
         {
             if(goldNum > 0)
             {
-                ConsumeInfo ci(EnumFirstRecharge, 0, 0);
+                ConsumeInfo ci(EnumFirstRecharge1 + step - 1, 0, 0);
                 useGold(goldNum, &ci);
             }
+            else
+            {
+                char tag[32];
+                sprintf(tag, "F_10000_1212_%u", step);
+                udpLog("firstRecharge", tag, "", "", "", "", "act");
+            }
+
             curStep |= (1 << (step-1));
             SetVar(VAR_FIRST_RECHARGE_STEP, curStep);
             sendFirstRecharge();
@@ -15430,9 +15433,14 @@ void Player::getCopyFrontCurrentAward(UInt8 index)
         return;
     UInt16 totalRatio = 0;
     for(i = 0; i < leftCnt; i++)
-        totalRatio = cf_ratio[leftIndex[i]];
+    {
+        totalRatio += cf_ratio[leftIndex[i]];
+        printf("%u: itemId:%u,ration:%u\n", leftIndex[i], cf_itemId[leftIndex[i]], cf_ratio[leftIndex[i]]);
+    }
     UInt16 totalRatioTmp = 0;
     UInt16 curRatio = uRand(totalRatio);
+    printf("totalRatio: %u\n", totalRatio);
+    printf("curRatio: %u\n", curRatio);
     UInt8 curId = 5;
     for(i = 0; i < leftCnt; i++)
     {
@@ -15445,13 +15453,13 @@ void Player::getCopyFrontCurrentAward(UInt8 index)
     }
     if(curId >= 5)
         return;
-
+    printf("curId: %u\n", curId);
     UInt8 order = 5 - leftCnt + 1;
     if(order == 2)
     {
         if(getGoldOrCoupon() < 10)
          {
-             sendMsgCode(0, 1104);
+             sendMsgCode(0, 1101);
              return;
          }
          ConsumeInfo ci(EnumCopyFrontWin, 0, 0);
@@ -15646,7 +15654,7 @@ void Player::sendCopyFrontAllAward()
                     break;
             }
             if(i < 5)
-                itemId = cf_itemId[index];
+                itemId = cf_itemId[i];
             else
                 itemId = 0;
             st << itemId;
@@ -15718,28 +15726,41 @@ void Player::get3366GiftAward(UInt8 type)
             sendMsgCode(0, 1011);
             return;
         }
+        if(getGold() < 40)
+        {
+            sendMsgCode(0, 1104);
+            return;
+        }
+		ConsumeInfo ci(Enum3366Gift,0,0);
+		useGold(40,&ci);
         AddVar(VAR_3366GIFT, 1);
-        m_Package->Add(5121, 1, true);
-        m_Package->Add(5121, 1, true);
-        m_Package->Add(5121, 1, true);
-        m_Package->Add(5121, 1, true);
-        m_Package->Add(5121, 1, true);
-        m_Package->Add(5121, 1, true);
+        m_Package->Add(50, 1, true);
+        m_Package->Add(49, 1, true);
+        m_Package->Add(514, 1, true);
+        m_Package->Add(133, 1, true);
+        m_Package->Add(511, 1, true);
+        m_Package->Add(1327, 1, true);
         send3366GiftInfo();
     }
 }
 
 void Player::send3366GiftInfo()
 {
+    if(getPlatform() != 11)
+        return;
+    if(!isBD())
+        return;
     if(!World::get3366GiftAct())
         return;
     Stream st(REP::COUNTRY_ACT);
     st << static_cast<UInt8>(6);
-    UInt8 opt;
+    UInt8 opt = GetVar(VAR_3366GIFT);
+    /*
     if(GetVar(VAR_3366GIFT) < 9)
-        opt = 1;
-    else
         opt = 0;
+    else
+        opt = 1;
+    */
     st << opt;
     st << Stream::eos;
     send(st);
