@@ -23,6 +23,8 @@
 #include "GObject/NewRelation.h"
 #include "StrengthenMgr.h"
 #include "JobHunter.h"
+#include "Dreamer.h"
+
 
 namespace Battle
 {
@@ -177,6 +179,8 @@ namespace GObject
     class CFriend;
     class HoneyFall;
     struct DeamonPlayerData;
+    class JobHunter;
+    class Dreamer;
 
     struct TripodData
     {
@@ -1950,6 +1954,11 @@ namespace GObject
         void sendAutoJobHunter();
     private:
         JobHunter * _jobHunter;
+
+    public:
+        Dreamer * getDreamer();
+    private:
+        Dreamer * _dreamer;
 
     public:
         bool hasFighterWithClass(UInt8 cls);

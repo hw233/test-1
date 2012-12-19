@@ -565,7 +565,7 @@ namespace GObject
 #ifndef _WIN32
 		m_ulog(NULL),
 #endif
-		m_isOffical(false), m_sysDailog(false), m_hasTripod(false), _jobHunter(NULL)
+		m_isOffical(false), m_sysDailog(false), m_hasTripod(false), _jobHunter(NULL), _dreamer(NULL)
 	{
         m_ClanBattleStatus = 1;
         m_ClanBattleScore = 0;
@@ -1154,6 +1154,9 @@ namespace GObject
 #endif
 #endif
 #endif // _WIN32
+#ifdef DREAMER_DEBUG
+        getDreamer();
+#endif
 	}
 
 #define WEBDOWNLOAD 255
@@ -15869,6 +15872,23 @@ void Player::sendQQGameGift1218()
         }
         SetVar(VAR_QQGAME_GIFT_1218, 1);
     }
+}
+
+Dreamer* Player::getDreamer()
+{
+       if (GetVar(VAR_EX_JOB_ENABLE) < 2)
+           return NULL;
+#ifdef DREAMER_DEBUG
+       if (!_dreamer)
+           delete _dreamer;
+       _dreamer = new Dreamer(this);
+#else
+       if (!_dreamer)
+       {
+           _dreamer = new Dreamer(this);
+       }
+#endif
+       return _dreamer;
 }
 
 } // namespace GObject
