@@ -138,7 +138,7 @@ class JobHunter
 
         bool IsInGame();
         bool IsInAuto();
-        void SendGameInfo(UInt8 type);
+        void SendGameInfo(UInt8 type, bool isUpdeated = false);
 
         void SendMapInfo();
 
@@ -151,6 +151,8 @@ class JobHunter
         void OnAbort(bool isAuto);
         void OnLeaveGame(UInt16 spotId);
         bool CheckEnd();
+
+        void OnAutoStop();
 
     private:
 
@@ -173,7 +175,6 @@ class JobHunter
         bool OnFoundCave(bool isAuto);
         void OnAutoStart();
         void OnAutoStep();
-        void OnAutoStop();
         void OnAutoFinish();
 
         UInt16 GetPossibleGrid();

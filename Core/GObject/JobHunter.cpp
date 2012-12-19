@@ -35,7 +35,8 @@ JobHunter::JobHunter(Player * player)
 
 JobHunter::JobHunter(Player * player, std::string& fighterList, std::string& mapInfo, UInt8 progress,
         UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY, UInt32 stepCount, UInt8 slotVal1, UInt8 slotVal2, UInt8 slotVal3)
-    : _owner(player), _spotId(0), _gameProgress(progress), _posX(posX), _posY(posY), _earlyPosX(earlyPosX), _earlyPosY(earlyPosY), _stepCount(stepCount),
+    : _owner(player), _spotId(0), _slot1(slotVal1), _slot2(slotVal2), _slot3(slotVal3), 
+    _gameProgress(progress), _posX(posX), _posY(posY), _earlyPosX(earlyPosX), _earlyPosY(earlyPosY), _stepCount(stepCount),
       _isInAuto(false), _isAutoLose(false)
 {
     // 从数据库加载时调用到的构造函数
@@ -44,9 +45,17 @@ JobHunter::JobHunter(Player * player, std::string& fighterList, std::string& map
     _nextMoveTime = TimeUtil::Now();
     if (_gameProgress != PROGRESS_NONE)
         _spotId = _owner->GetVar(VAR_JOB_HUNTER_SPOT_ID);
-    _spItemRate[1] = slotVal1;
-    _spItemRate[2] = slotVal2;
-    _spItemRate[3] = slotVal3;
+
+    UInt8 res[SLOT_MAX] = {0};
+    ++(res[_slot1]);
+    ++(res[_slot2]);
+    ++(res[_slot3]);
+
+    for (UInt8 i = 1; i < SLOT_MAX; ++i)
+    {
+        _spItemRate[i] = ITEM_RATE[res[i]];
+    }
+
 }
 
 JobHunter::~JobHunter()
@@ -117,6 +126,8 @@ bool JobHunter::LoadMapInfo(const std::string& list)
         UInt8 neighbCount = atoi(tokenizer2[1].c_str());
         UInt8 gridType = atoi(tokenizer2[2].c_str());
         _mapInfo.insert(std::make_pair(pos, GridInfo(pos, gridType, neighbCount)));
+        if (!(gridType & UNKNOWN_FLAG) && pos != POS_TO_INDEX(_posX,_posY))
+            _isInGame = true;
     }
     return true;
 }
@@ -261,7 +272,7 @@ void JobHunter::OnRequestStart(UInt8 index)
     InitMap();
     _spotId = GetSpotIdFromGameId(index);
     _owner->SetVar(VAR_JOB_HUNTER_SPOT_ID, _spotId);
-    SendGameInfo(2);
+    SendGameInfo(2, true);
     DB2().PushUpdateData("UPDATE `job_hunter` SET `progress` = '%u' WHERE `playerId` = %"I64_FMT"u", _gameProgress, _owner->getId());
     _owner->udpLog("jobHunter", "F_1161", "", "", "", "", "act");
 }
@@ -273,18 +284,33 @@ void JobHunter::OnUpdateSlot(bool isAuto)
         return;
     if (!isAuto)
     {
+        if (_isInGame)
+        {
+            _owner->sendMsgCode(0, 2200, 0);
+            return;
+        }
+
+        if(!_owner->hasChecked())
+            return;
+
         if (!_owner->GetPackage()->GetItemAnyNum(EX_JOB_SLOT_ID))
         {
             _owner->sendMsgCode(0, 2209, 0); // 神兽之印不足
             return;
         }
+        _owner->GetPackage()->DelItemAny(EX_JOB_SLOT_ID, 1);
     }
-    _owner->GetPackage()->DelItemAny(EX_JOB_SLOT_ID, 1);
 
     UInt8 res[SLOT_MAX] = {0};
+
+    /*
     _slot1 = _rnd(SLOT_MAX);
     _slot2 = _rnd(SLOT_MAX);
     _slot3 = _rnd(SLOT_MAX);
+    */
+
+    _slot1 = _slot2 = _slot3 = _rnd(SLOT_MAX);
+
     ++(res[_slot1]);
     ++(res[_slot2]);
     ++(res[_slot3]);
@@ -298,10 +324,10 @@ void JobHunter::OnUpdateSlot(bool isAuto)
     printf ("rate: 青龙:%d, 白虎: %d, 朱雀: %d, 玄武:%d.\n", (UInt32)_spItemRate[1], (UInt32)_spItemRate[2], (UInt32)_spItemRate[3], (UInt32)_spItemRate[4]);
 #endif
     DB2().PushUpdateData("UPDATE `job_hunter` SET `slotVal1` = '%d',`slotVal2` = '%d', `slotVal3`= '%d' WHERE `playerId` = %"I64_FMT"u", 
-            _spItemRate[1], _spItemRate[2], _spItemRate[3], _owner->getId());
+            _slot1, _slot2, _slot3, _owner->getId());
     
     if (!isAuto)
-        SendGameInfo(2);
+        SendGameInfo(2, true);
 }
 
 bool JobHunter::IsInGame()
@@ -314,20 +340,21 @@ bool JobHunter::IsInAuto()
     return false;
 }
 
-void JobHunter::SendGameInfo(UInt8 type)
+void JobHunter::SendGameInfo(UInt8 type, bool isUpdeated /* = false */)
 {
     // 发送寻墨游戏的具体内容
+    UInt8 flag = isUpdeated ? 0x10:0;
     if (type == 2)
     {
         Stream st (REP::EXJOB);
         st << static_cast<UInt8> (2);
 
-        st << static_cast<UInt8> (_gameProgress);           // 共鸣地点
-        st << static_cast<UInt8> (_slot1);                  // 1号摇奖位 
-        st << static_cast<UInt8> (_slot2);                  // 2号摇奖位 
-        st << static_cast<UInt8> (_slot3);                  // 3号摇奖位 
+        st << static_cast<UInt8> (_gameProgress);       // 共鸣地点
+        st << static_cast<UInt8> (_slot1 | flag);       // 1号摇奖位 
+        st << static_cast<UInt8> (_slot2 | flag);       // 2号摇奖位 
+        st << static_cast<UInt8> (_slot3 | flag);       // 3号摇奖位 
         st << static_cast<UInt8> (_isInGame ? 1 : 0);   // 是否已经进入寻墨地图
-        st << static_cast<UInt16>(_spotId);              // 寻墨需要所在的据点
+        st << static_cast<UInt16>(_spotId);             // 寻墨需要所在的据点
         UInt8 passBit = 0;
         TeamCopyPlayerInfo* tcp = _owner->getTeamCopyPlayerInfo();
         if (tcp)
@@ -945,13 +972,6 @@ void JobHunter::OnJumpWhenAuto(UInt16 pos, UInt32 stepCount)
 #ifdef JOB_HUNTER_DEBUG
     std::cout << "tick gridType = " << (UInt32) (it->second).gridType <<std::endl;
 #endif
-    if (CheckEnd())
-    {
-        Stream st(REP::AUTOJOBHUNTER);
-        st << static_cast<UInt8>(4);
-        st << Stream::eos;
-        _owner->send(st);
-    }
 }
 
 void JobHunter::OnSkipMonster(bool isAuto)
@@ -1013,7 +1033,7 @@ bool JobHunter::OnAttackMonster(UInt16 pos, bool isAuto)
         ng->getLoots(_owner, _owner->_lastLoot, 0, NULL);
         (it->second).gridType |= CLEAR_FLAG;
 
-        if (type == 10)
+        if (type == 12)
         {
             for (UInt8 i = 1; i < SLOT_MAX; ++ i)
             {
@@ -1292,7 +1312,6 @@ bool JobHunter::OnFoundCave(bool isAuto)
 void JobHunter::OnAbort(bool isAuto /* = false */)
 {
     // 主动放弃
-    OnAutoStop();
     _gameProgress = PROGRESS_NONE;
     _stepCount = 0;
     _posX = _posY = 0;
@@ -1313,7 +1332,6 @@ void JobHunter::OnLeaveGame(UInt16 spotId)
     // 判断是否离开据点
     if (_isInGame && spotId == _spotId)
     {
-        //_isInGame = false;
         SendGameInfo(2);
     }
     OnAutoStop();
@@ -1415,12 +1433,15 @@ void JobHunter::OnAutoStop()
 	GObject::EventBase * ev = GObject::eventWrapper.RemoveTimerEvent(_owner, EVENT_JOBHUNTER, _owner->getId());
 	if(ev != NULL)
         ev->release();
-    Stream st(REP::AUTOJOBHUNTER);
-    st << static_cast<UInt8>(1);
-    st << Stream::eos;
-    _owner->send(st);
-    _isInAuto = false;
-    SendMapInfo();
+    if (_isInAuto)
+    {
+        Stream st(REP::AUTOJOBHUNTER);
+        st << static_cast<UInt8>(1);
+        st << Stream::eos;
+        _owner->send(st);
+        _isInAuto = false;
+        SendMapInfo();
+    }
 }
 
 void JobHunter::OnAutoFinish()
