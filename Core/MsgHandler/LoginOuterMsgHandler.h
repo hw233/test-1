@@ -777,6 +777,16 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 	NETWORK()->SendMsgToClient(conn.get(), rep);
 }
 
+bool callOpenApi(const std::string& param)
+{
+    if (!cfg.chargeUrl.length())
+        return true;
+    char curl[4096] = {0};
+    snprintf(curl, sizeof(curl), "%s%s", cfg.chargeUrl.c_str(), param.c_str());
+    TRACE_LOG("CHARGE URL: %s\n", curl);
+    return SERVER().do_http_request(curl, 20);
+}
+
 void onUserRecharge( LoginMsgHdr& hdr, const void * data )
 {
     BinaryReader br(data, hdr.msgHdr.bodyLen);
@@ -821,15 +831,20 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
     br>>money;
     UInt64 player_Id_tmp = player_Id;
 
+    UInt16 serverNo = 0;
+    br>>serverNo;
     if(cfg.merged)
     {
-        UInt16 serverNo = 0;
-        br>>serverNo;
         player_Id += (static_cast<UInt64>(serverNo) << 48);
     }
+
 #ifndef _WIN32
 #ifdef _FB
 #else
+    // XXX: 只要简体需要这个参数
+    std::string param;
+    br>>param;
+
     initMemcache();
     if (memc)
     {
@@ -851,6 +866,13 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
                 if (strncmp(token.c_str(), rtoken, token.length()) != 0)
                     ret = 2;
                 free(rtoken);
+
+                if (ret == 0 && !callOpenApi(param))
+                {
+                    err = "confirm error.";
+                    ret = 5;
+                }
+
                 break;
             }
             else
@@ -874,7 +896,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
             }
         }
 
-        if (err.length())
+        if (err.length() && ret != 1)
         {
             TRACE_LOG("key: %s, token: %s, ret: %u, rc: %u, err: %s", key, token.c_str(), ret, rc, err.c_str());
             uninitMemcache();
