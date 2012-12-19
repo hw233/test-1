@@ -220,12 +220,14 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
             if(pl->GetVar(VAR_DIAMOND_BLUE) < PRIVILEGE_COUNT) {
                 pl->AddVar(VAR_DIAMOND_BLUE, 1);
                 pl->copyUdpLog(id, 5);
+                pl->SetVar(VAR_CF_BIND, 1);
                 return 0;
             }
         } else if(pl->isYD() && World::getYellowDiamondAct()) {
             if(pl->GetVar(VAR_DIAMOND_YELLOW) < PRIVILEGE_COUNT) {
                 pl->AddVar(VAR_DIAMOND_YELLOW, 1);
                 pl->copyUdpLog(id, 6);
+                pl->SetVar(VAR_CF_BIND, 1);
                 return 0;
             }
         }
@@ -237,6 +239,7 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
         if(pl->isQQVIP() && World::getQQVipAct()){
             if(pl->GetVar(VAR_QQVIP_CNT) < PRIVILEGE_COUNT){
                 pl->AddVar(VAR_QQVIP_CNT, 1);
+                pl->SetVar(VAR_CF_BIND, 1);
                 return 0;
             }
         }
