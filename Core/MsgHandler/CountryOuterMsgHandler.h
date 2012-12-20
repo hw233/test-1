@@ -1218,6 +1218,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendYearRPInfo();
     //if(World::getYearActive())
     //    pl->sendYearActInfo();
+    pl->sendFirstRecharge(true);
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -1759,6 +1760,18 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
                 player->getKillMonsterAward();
             else if(type == 2)
                 player->checkLastKillMonsterAward();
+        }
+        break;
+
+        case 3:
+        {
+            UInt8 step;
+            UInt8 type;
+            UInt8 career;
+            br >> step;
+            br >> type;
+            br >> career;
+            player->FirstRechargeAct(step, type, career);
         }
         break;
         default:
