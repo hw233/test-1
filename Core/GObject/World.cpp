@@ -380,7 +380,13 @@ bool enum_midnight(void * ptr, void* next)
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 19) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 20) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 21) ||
-            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 22)
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 22) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 23) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 24) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 25) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 26) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 27) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 28)
             ))
     {
         if (pl->isOnline())
@@ -999,7 +1005,13 @@ void World::World_Midnight_Check( World * world )
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 19) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 20) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 21) ||
-            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 22)
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 22) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 23) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 24) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 25) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 26) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 27) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 28)
             )
         bRechargeEnd = true;
 
