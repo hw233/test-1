@@ -1421,6 +1421,12 @@ namespace Script
 		return Call<UInt8>("RunThanksGivingDayAward", player, opt);
 	}
 
+    bool GameActionLua::onGetFeastGiftAward(Player* player, UInt8 type)
+	{
+		assert(player != NULL);
+		return Call<bool>("onGetFeastGiftAward", player, type);
+	}
+
     UInt32 GameActionLua::getRandomNormalMonster(UInt8 id)
     {
         return Call<UInt32>("getRandomNormalMonster", id);

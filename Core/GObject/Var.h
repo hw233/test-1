@@ -302,6 +302,8 @@ namespace GObject
         VAR_3366GIFT = 291, //3366合作礼包
         VAR_CF_INDEX = 292, //副本、阵图通关索引，从1开始
         VAR_CF_LOCATION = 293, //副本、阵图据点索引
+        VAR_FEAST_LOGIN = 294, //节日套装人人拿
+        VAR_FEAST_GIFT = 295, //登录礼包人人有
 
         //繁体版占用301-330
 
@@ -592,6 +594,8 @@ namespace GObject
             REGISTER_VAR(VAR_3366GIFT, CYCLE_NONE);
             REGISTER_VAR(VAR_CF_INDEX, CYCLE_NONE);
             REGISTER_VAR(VAR_CF_LOCATION, CYCLE_NONE);
+            REGISTER_VAR(VAR_FEAST_LOGIN, CYCLE_NONE);
+            REGISTER_VAR(VAR_FEAST_GIFT, CYCLE_DAY);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);
