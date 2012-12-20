@@ -700,7 +700,9 @@ int query_activity_req(JsonHead* head, json_t* body, json_t* retbody, std::strin
     }
 
     UInt32 v = 0 ;
-    if (player->GetOnlineTimeToday() > 0)
+    UInt32 today = TimeUtil::SharpDayT( 0 , TimeUtil::Now());
+    UInt32 lastOnline = PLAYER_DATA(player,lastOnline);
+    if (today < lastOnline || player->isOnline())
         v = player->GetStrengthenMgr()?player->GetStrengthenMgr()->GetSouls():0; 
     json_insert_pair_into_object(retbody, "szOpenId", json_new_string(openid));
     json_insert_pair_into_object(retbody, "szRoleName", json_new_string(fixPlayerName(player->getName()).c_str()));
