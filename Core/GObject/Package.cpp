@@ -4348,7 +4348,12 @@ namespace GObject
             fromEquip->getQuality() != toEquip->getQuality())
             return 2;
 
-        if ((type & 0x08) == 0 && toEquip->GetCareer() != 4)
+        if(type & 0x08)
+        {
+            if(fromEquip->getClass() != Item_Fashion || toEquip->getClass() != Item_Fashion)
+                return 12;
+        }
+        else if (toEquip->GetCareer() != 4)
             return 11;
 
         if (m_Owner->GetVar(VAR_EQUIP_MOVE_COUNT) >= 8)
@@ -4618,7 +4623,7 @@ namespace GObject
         tIed.extraAttr2.value1 = fIed.extraAttr2.value1;
         tIed.extraAttr2.value2 = fIed.extraAttr2.value2;
         tIed.extraAttr2.value3 = fIed.extraAttr2.value3;
-        DB4().PushUpdateData("UPDATE `equipment` SET `tRank` = %u,`maxTRank` = %u,`trumpExp` = %u,`type1` = %u,`type2` = %u,`type3` = %u,`value1` = %u,`value2` = %u,`value3` = %u WHERE `id` = %u", tIed.tRank, tIed.maxTRank, tIed.trumpExp, tIed.extraAttr2.type1, tIed.extraAttr2.type2, tIed.extraAttr2.type3, tIed.extraAttr2.value1, tIed.extraAttr2.value2, tIed.extraAttr2.value3, toEquip->getId());
+        DB4().PushUpdateData("UPDATE `equipment` SET `tRank` = %u,`maxTRank` = %u,`trumpExp` = %u,`attrType1` = %u,`attrType2` = %u,`attrType3` = %u,`attrValue1` = %u,`attrValue2` = %u,`attrValue3` = %u WHERE `id` = %u", tIed.tRank, tIed.maxTRank, tIed.trumpExp, tIed.extraAttr2.type1, tIed.extraAttr2.type2, tIed.extraAttr2.type3, tIed.extraAttr2.value1, tIed.extraAttr2.value2, tIed.extraAttr2.value3, toEquip->getId());
 
         fIed.tRank = 0;
         fIed.maxTRank = 1;
@@ -4629,7 +4634,7 @@ namespace GObject
         fIed.extraAttr2.value1 = 0;
         fIed.extraAttr2.value2 = 0;
         fIed.extraAttr2.value3 = 0;
-        DB4().PushUpdateData("UPDATE `equipment` SET `tRank` = %u,`maxTRank` = %u,`trumpExp` = %u,`type1` = %u,`type2` = %u,`type3` = %u,`value1` = %u,`value2` = %u,`value3` = %u WHERE `id` = %u", fIed.tRank, fIed.maxTRank, fIed.trumpExp, fIed.extraAttr2.type1, fIed.extraAttr2.type2, fIed.extraAttr2.type3, fIed.extraAttr2.value1, fIed.extraAttr2.value2, fIed.extraAttr2.value3, toEquip->getId());
+        DB4().PushUpdateData("UPDATE `equipment` SET `tRank` = %u,`maxTRank` = %u,`trumpExp` = %u,`attrType1` = %u,`attrType2` = %u,`attrType3` = %u,`attrValue1` = %u,`attrValue2` = %u,`attrValue3` = %u WHERE `id` = %u", fIed.tRank, fIed.maxTRank, fIed.trumpExp, fIed.extraAttr2.type1, fIed.extraAttr2.type2, fIed.extraAttr2.type3, fIed.extraAttr2.value1, fIed.extraAttr2.value2, fIed.extraAttr2.value3, fromEquip->getId());
 
         if(fFgt != NULL)
         {
