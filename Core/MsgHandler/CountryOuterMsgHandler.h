@@ -1824,6 +1824,16 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
         }
         break;
 
+        case 7:
+        {
+            UInt8 type;
+            if(!World::getFeastLoginAct())
+                return;
+            br >> type;
+            player->getFeastGiftAward(type);
+        }
+        break;
+
         default:
         break;
     }

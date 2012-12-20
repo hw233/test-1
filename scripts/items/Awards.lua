@@ -603,3 +603,25 @@ function RunThanksGivingDayAward(player, opt)
     return 1
 end
 
+function onGetFeastGiftAward(player, type)
+    if player == nil then
+        return false
+    end
+    if type == 0 || type > 2 then
+        return false
+    end
+    local awards = {
+        [1] = {{401, 1},{511, 1},{548, 1},{500, 1},{48, 1},{517, 1}},
+        [2] = {{401, 1},{50, 1},{503, 1},{516, 1},{513, 1},{1325,1}},
+    }
+    local package = player:GetPackage()
+    if package:GetRestPackageSize() < #awards[type] then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    for i = 1, #awards[type] do
+        package:Add(awards[type][i][1], awards[type][i][2], true, false, 0)
+    end
+    return true
+end
+
