@@ -15520,6 +15520,16 @@ void Player::getCopyFrontCurrentAward(UInt8 index)
     bool bind = GetVar(VAR_CF_BIND);
     m_Package->Add(cf_itemId[curId], 1, bind);
 
+    {
+        char tag[32];
+        if(!bind)
+            order += 5;
+        if(GetVar(VAR_CF_FLAG) == 2)
+            order += 11;
+        sprintf(tag, "F_10000_1212_%u", order);
+        udpLog("CopyFrontWin", tag, "", "", "", "", "act");
+    }
+
     if(leftCnt == 1)
         closeCopyFrontAwardByIndex(GetVar(VAR_CF_FLAG) - 1, 0);
 }
@@ -15543,7 +15553,7 @@ void Player::getCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index, UInt8 in
     }
 
     UInt8 i;
-    bool isPut = false;;
+    bool isPut = false;
     for(i = 0; i < 5; i++)
     {
         if(cf_posPut[i] == indexPut)
@@ -15561,21 +15571,37 @@ void Player::resetCopyFrontWinAward(bool fresh)
 {
     UInt8 index = GetVar(VAR_CF_FLAG);
     UInt8 step;
+    UInt8 tmp1;
+    UInt8 tmp2;
 
     if(index == 0 || index > 2)
         return;
 
+    tmp1 = uRand(5);
+    tmp2 = uRand(5);
+    UInt32 count = 0;
+    while(tmp2 == tmp1 && count < 10000)
+    {
+        tmp2 = uRand(5);
+        ++count;
+    }
+
     for(UInt8 i = 0; i < 5; i++)
     {
-        if(i == 0)
+        if(i == tmp1)
             step = 1;
-        else if(i == 1)
+        else if(i == tmp2)
             step = 2;
         else
             step = 0;
-        Table award = GameAction()->getCopyFrontmapAward(step, PLAYER_DATA(this, location));
+        if(GetVar(VAR_CF_LOCATION) == 0)
+            SetVar(VAR_CF_LOCATION, PLAYER_DATA(this, location));
+        Table award = GameAction()->getCopyFrontmapAward(step, GetVar(VAR_CF_LOCATION));
         if (award.size() < 2)
+        {
+            printf("award.size() < 2\n");
             continue;
+        }
         cf_itemId[i] = award.get<UInt32>(1);
         cf_ratio[i] = award.get<UInt32>(2);
         cf_posPut[i] = 0;
@@ -15619,6 +15645,8 @@ void Player::closeCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index)
         return;
 #endif
     SetVar(VAR_CF_FLAG, 0);
+    SetVar(VAR_CF_INDEX, 0);
+    SetVar(VAR_CF_LOCATION, 0);
     for(UInt8 i = 0; i < 5; i++)
     {
         cf_posPut[i] = 0;
@@ -15638,10 +15666,19 @@ void Player::sendCopyFrontAllAward()
     st << static_cast<UInt8>(0x04);
     st << static_cast<UInt8>(0x01);
     st << static_cast<UInt8>(GetVar(VAR_CF_FLAG) - 1);
+
     if(GetVar(VAR_CF_FLAG) == 1)
-        st << getCopyId();
+    {
+        if(GetVar(VAR_CF_INDEX) == 0)
+            SetVar(VAR_CF_INDEX, getCopyId());
+        st << static_cast<UInt8>(GetVar(VAR_CF_INDEX));
+    }
     else
-        st << getFrontmapId();
+    {
+        if(GetVar(VAR_CF_INDEX) == 0)
+            SetVar(VAR_CF_INDEX, getFrontmapId());
+        st << static_cast<UInt8>(GetVar(VAR_CF_INDEX));
+    }
     st << static_cast<UInt8>(5);
     bool isPut = false;
     UInt8 index;
