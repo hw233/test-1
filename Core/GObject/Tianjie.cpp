@@ -417,7 +417,7 @@ void Tianjie::OpenTj()
 
 bool Tianjie::Init()
 {
-    fix999Bug();
+//    fix999Bug();
     LoadLastPassed();
     LoadFromDB();
 
