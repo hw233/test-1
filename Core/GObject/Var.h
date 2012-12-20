@@ -288,6 +288,9 @@ namespace GObject
         //VAR_ARENA_LASTTIME = 283, //场外活动，最后被陷害的时间
         VAR_ARENA_SUPPORT_TUE = 284, //场外活动，星期二支持的玩家
         VAR_ARENA_SUPPORT_WED = 285, //场外活动，星期三支持的玩家
+        // 首充礼包
+        VAR_FIRST_RECHARGE_VALUE = 286, //充值数
+        VAR_FIRST_RECHARGE_STEP = 287, //已领阶段
 
         //繁体版占用301-330
 
@@ -560,8 +563,10 @@ namespace GObject
             REGISTER_VAR(VAR_ARENA_SUPPORT, CYCLE_DAY);
             //REGISTER_VAR(VAR_ARENA_SUFFERED, CYCLE_DAY);
             //REGISTER_VAR(VAR_ARENA_LASTTIME, CYCLE_DAY);
-            REGISTER_VAR(VAR_ARENA_SUPPORT_TUE, CYCLE_NONE);
-            REGISTER_VAR(VAR_ARENA_SUPPORT_WED, CYCLE_NONE);
+            REGISTER_VAR(VAR_ARENA_SUPPORT_TUE, CYCLE_WEEK);
+            REGISTER_VAR(VAR_ARENA_SUPPORT_WED, CYCLE_WEEK);
+            REGISTER_VAR(VAR_FIRST_RECHARGE_VALUE, CYCLE_NONE);
+            REGISTER_VAR(VAR_FIRST_RECHARGE_STEP, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

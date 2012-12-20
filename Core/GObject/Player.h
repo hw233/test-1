@@ -1013,6 +1013,9 @@ namespace GObject
         void writeTitleAll();
         void ArenaExtraAct(UInt8 type, UInt8 opt);
 
+        void FirstRechargeAct(UInt8 step, UInt8 type, UInt8 career);
+        void sendFirstRecharge(bool isLogin = false);
+
 		UInt32 getAchievement(UInt32 a = 0);
 		UInt32 useAchievement(UInt32 a,ConsumeInfo * ci=NULL);
 		void useAchievement2( UInt32 a, Player *attacker, ConsumeInfo * ci = NULL);
