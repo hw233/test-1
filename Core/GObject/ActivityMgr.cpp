@@ -54,7 +54,6 @@ void ActivityMgr::LoadFromDB(DBActivityData& data)
         {
             _item.signRecord[idx][i] = atoi(ntk[i].c_str());
         }
-        //SetOneDayRecord(i + 1, atoi(tk[i].c_str()));
     }
 }
 /**
@@ -114,8 +113,6 @@ UInt16 ActivityMgr::GetOneDayRecord(UInt8 day)
 
 void ActivityMgr::SetOneDayRecord(UInt8 day, UInt16 score)
 {
-    if(score < 0)
-        return;
     if(day <= 0 || day > SIGNIN_RECORD)
         return;
     _item.signRecord[1][day-1] = score;
@@ -290,6 +287,8 @@ void ActivityMgr::ActivitySignIn()
     st << static_cast<UInt16>(GetOneDayRecord(day));
     st << cnt << Stream::eos;
     _owner->send(st);
+    //活跃度签到
+    GameAction()->doStrong(_owner, SthActSignIn, 0, 0);
 }
 
 //刷新待兑换的道具

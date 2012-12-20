@@ -586,7 +586,7 @@ void AthleticsRank::requestAthleticsList(Player * player, UInt16 type)
 {
     if(type == 0x40)
     {
-        printf("new\n");
+        //printf("new\n");
         if(player->isNewRank())
             return;
         player->setNewRank(true);
@@ -594,7 +594,7 @@ void AthleticsRank::requestAthleticsList(Player * player, UInt16 type)
     }
     else if(type == 0x80)
     {
-        printf("old\n");
+        //printf("old\n");
         if(!player->isNewRank())
             return;
         player->setNewRank(false);

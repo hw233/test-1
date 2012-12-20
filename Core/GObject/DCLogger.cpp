@@ -23,7 +23,7 @@ namespace GObject
 #endif
 
 static const char *msgVersion = "0.1";
-static const char *ver = "1.5";
+static const char *ver = "1.6";
 
 bool DCLogger::init()
 {
@@ -293,9 +293,6 @@ bool DCLogger::protol_sec(Player* player, int cmd)
         return true;
     std::ostringstream msg;
 
-    static const char *msgVersion = "0.1";
-    static const char *ver = "1.5";
-
     msg << "APPV=";
     msg << version;
     msg << "&MSGV=";
@@ -341,6 +338,265 @@ bool DCLogger::protol_sec(Player* player, int cmd)
     return true;
 }
 
+bool DCLogger::trade_sec(Player* saller, Player* buyer, UInt32 itemId, UInt32 itemCount, UInt32 price)
+{
+    //交易日志安全上报
+    if (!cfg.secdclog)
+        return true;
+    if (!cfg.dclog)
+        return true;
+    std::ostringstream msg;
+
+    msg << "APPV=";
+    msg << version;
+    msg << "&MSGV=";
+    msg << msgVersion;
+    msg << "&VER=";
+    msg << ver;
+    msg << "&APPID=";
+    msg << appid;
+    msg << "&OID=";
+    msg << saller->getOpenId();
+    msg << "&WID=";
+    msg << cfg.serverNum;
+    msg << "&UIP=";
+    msg << saller->getClientIp();
+    msg << "&OKY=";
+    msg << saller->getOpenKey();
+    msg << "&SIP=";
+    char serverIp[20];
+    in_addr iaddr;
+    iaddr.s_addr = cfg.serverIp;
+    strncpy(serverIp, inet_ntoa(iaddr), 20);
+    msg << serverIp;
+    msg << "&MTM=";
+    msg << TimeUtil::GetTick() / 1000;
+    msg << "&DOM=";
+    msg << saller->getDomain();
+    msg << "&MLV=0";
+    msg << "&AID=3";
+
+    msg << "&RIDA=";                // 卖方ID
+    msg << saller->getId();
+
+    msg << "&ITN=1";                // 卖方道具种类(现在必定为1)
+
+    msg << "&IID=";                 // 卖方道具ID
+    msg << itemId;
+    msg << "&ICT=";                 // 卖方道具数量
+    msg << itemCount;
+
+    msg << "&GTN=0";                // 卖方支付的货币
+    //msg << "&GID=";
+    //msg << "&GOD=";
+
+    msg << "&CTN=0";                // 卖方支付的货币
+    //msg << "&CTI=";
+    //msg << "&CAS=";
+
+    msg << "&OIDB=";
+    msg << buyer->getOpenId();
+    msg << "&RIDB=";
+    msg << buyer->getId();
+
+    msg << "&ITN=0";
+    //msg << "&IID=";
+    //msg << "&ICT=";
+
+    msg << "&GTN=0";
+    //msg << "&GID=";
+    //msg << "&GOD=";
+    msg << "&CTN=1";
+    msg << "&CTI=gold";
+    msg << "&CAS=";
+    msg << price;
+#ifndef _FB
+#ifndef _VT
+#ifndef _WIN32
+    DC().Push(msg.str().c_str(), msg.str().length(), LT_SECDATA);
+#endif
+#endif
+#endif
+    return true;
+}
+
+bool DCLogger::gold_sec(Player* player, UInt32 count, UInt32 changeType, bool isIncrease)
+{
+    // 仙石变化安全上报
+    if (!cfg.secdclog)
+        return true;
+    if (!cfg.dclog)
+        return true;
+    std::ostringstream msg;
+
+    msg << "APPV=";
+    msg << version;
+    msg << "&MSGV=";
+    msg << msgVersion;
+    msg << "&VER=";
+    msg << ver;
+    msg << "&APPID=";
+    msg << appid;
+    msg << "&OID=";
+    msg << player->getOpenId();
+    msg << "&WID=";
+    msg << cfg.serverNum;
+    msg << "&UIP=";
+    msg << player->getClientIp();
+    msg << "&OKY=";
+    msg << player->getOpenKey();
+    msg << "&SIP=";
+    char serverIp[20];
+    in_addr iaddr;
+    iaddr.s_addr = cfg.serverIp;
+    strncpy(serverIp, inet_ntoa(iaddr), 20);
+    msg << serverIp;
+    msg << "&MTM=";
+    msg << TimeUtil::GetTick() / 1000;
+    msg << "&DOM=";
+    msg << player->getDomain();
+    msg << "&MLV=0";
+    msg << "&AID=6";
+
+    msg << "&RID=";
+    msg << player->getId();
+
+    msg << "&CTI=gold";
+    msg << "&CAS=";
+    msg << count;
+    msg << "&RSN=";
+    msg << changeType;
+    msg << "&FID=";
+    msg << "&TPE=";
+    msg << (UInt32) (isIncrease?1:0);
+    msg << "&QCC=";
+    msg << "0";
+#ifndef _FB
+#ifndef _VT
+#ifndef _WIN32
+    DC().Push(msg.str().c_str(), msg.str().length(), LT_SECDATA);
+#endif
+#endif
+#endif
+    return true;
+}
+
+bool DCLogger::tael_sec(Player* player, UInt32 count, UInt32 changeType, bool isIncrease)
+{
+    // 银币变化安全上报
+    if (!cfg.secdclog)
+        return true;
+    if (!cfg.dclog)
+        return true;
+    std::ostringstream msg;
+
+    msg << "APPV=";
+    msg << version;
+    msg << "&MSGV=";
+    msg << msgVersion;
+    msg << "&VER=";
+    msg << ver;
+    msg << "&APPID=";
+    msg << appid;
+    msg << "&OID=";
+    msg << player->getOpenId();
+    msg << "&WID=";
+    msg << cfg.serverNum;
+    msg << "&UIP=";
+    msg << player->getClientIp();
+    msg << "&OKY=";
+    msg << player->getOpenKey();
+    msg << "&SIP=";
+    char serverIp[20];
+    in_addr iaddr;
+    iaddr.s_addr = cfg.serverIp;
+    strncpy(serverIp, inet_ntoa(iaddr), 20);
+    msg << serverIp;
+    msg << "&MTM=";
+    msg << TimeUtil::GetTick() / 1000;
+    msg << "&DOM=";
+    msg << player->getDomain();
+    msg << "&MLV=0";
+    msg << "&AID=5";
+
+    msg << "&RID=";
+    msg << player->getId();
+
+    msg << "&GID=tael";
+    msg << "&GOD=";
+    msg << count;
+    msg << "&RSN=";
+    msg << "&FID=";
+    msg << "&TPE=";
+    msg << (UInt32) (isIncrease?1:0);
+#ifndef _FB
+#ifndef _VT
+#ifndef _WIN32
+    DC().Push(msg.str().c_str(), msg.str().length(), LT_SECDATA);
+#endif
+#endif
+#endif
+    return true;
+}
+
+bool DCLogger::coupon_sec(Player* player, UInt32 count, UInt32 changeType, bool isIncrease)
+{
+    // 礼券变化安全上报
+    if (!cfg.secdclog)
+        return true;
+    if (!cfg.dclog)
+        return true;
+    std::ostringstream msg;
+
+    msg << "APPV=";
+    msg << version;
+    msg << "&MSGV=";
+    msg << msgVersion;
+    msg << "&VER=";
+    msg << ver;
+    msg << "&APPID=";
+    msg << appid;
+    msg << "&OID=";
+    msg << player->getOpenId();
+    msg << "&WID=";
+    msg << cfg.serverNum;
+    msg << "&UIP=";
+    msg << player->getClientIp();
+    msg << "&OKY=";
+    msg << player->getOpenKey();
+    msg << "&SIP=";
+    char serverIp[20];
+    in_addr iaddr;
+    iaddr.s_addr = cfg.serverIp;
+    strncpy(serverIp, inet_ntoa(iaddr), 20);
+    msg << serverIp;
+    msg << "&MTM=";
+    msg << TimeUtil::GetTick() / 1000;
+    msg << "&DOM=";
+    msg << player->getDomain();
+    msg << "&MLV=0";
+    msg << "&AID=5";
+
+    msg << "&RID=";
+    msg << player->getId();
+
+    msg << "&GID=Coupon";
+    msg << "&GOD=";
+    msg << count;
+    msg << "&RSN=";
+    msg << "&FID=";
+    msg << "&TPE=";
+    msg << (UInt32) (isIncrease?1:0);
+#ifndef _FB
+#ifndef _VT
+#ifndef _WIN32
+    DC().Push(msg.str().c_str(), msg.str().length(), LT_SECDATA);
+#endif
+#endif
+#endif
+    return true;
+}
+
 bool DCLogger::logout(Player* player)
 {
     if (!cfg.dclog)
@@ -369,7 +625,7 @@ bool DCLogger::logout(Player* player)
     msg << "&key=";
     msg << player->getOpenKey();
     msg << "&onlinetime=";
-    msg << time(NULL) - player->getLastOnline(); // TODO:
+    msg << time(NULL) - player->getLastOnline(); 
     msg << "&source=";
     msg << player->getSource();
     msg << "&touid=&toopenid=&level=&itemid=&itemtype=&itemcnt=&modifyexp=&totalexp=&modifycoin=&totalcoin=&modifyfee=&totalfee=&keycheckret=&safebuf=&remark=&user_num=";
@@ -407,7 +663,7 @@ bool DCLogger::online(UInt32 num, UInt8 domain)
     msg << appid;
     msg << "&time=";
     msg << time(NULL);
-    msg << "&domain="; // TODO:
+    msg << "&domain="; 
     msg << (int)domain;
     msg << "&worldid=";
     msg << cfg.serverNum;

@@ -486,7 +486,7 @@ int query_fighters_battle_req(JsonHead* head, json_t* body, json_t* retbody, std
             if (obj && fgt)
             {
                 UInt32 fgtId = fgt->getId();
-                UInt32 battle = fgt->getBattlePoint();
+                UInt32 battle = fgt->getBattlePoint_Dirty();
                 json_insert_pair_into_object(obj, "uiSummonId", my_json_new_number(fgtId));
                 json_insert_pair_into_object(obj, "uiSumBttlEffctv", my_json_new_number(battle));
                 json_insert_child(arr, obj);
@@ -699,10 +699,15 @@ int query_activity_req(JsonHead* head, json_t* body, json_t* retbody, std::strin
         return EPLAYER_NOT_EXIST;
     }
 
+    UInt32 v = 0 ;
+    UInt32 today = TimeUtil::SharpDayT( 0 , TimeUtil::Now());
+    UInt32 lastOnline = PLAYER_DATA(player,lastOnline);
+    if (today < lastOnline || player->isOnline())
+        v = player->GetStrengthenMgr()?player->GetStrengthenMgr()->GetSouls():0; 
     json_insert_pair_into_object(retbody, "szOpenId", json_new_string(openid));
     json_insert_pair_into_object(retbody, "szRoleName", json_new_string(fixPlayerName(player->getName()).c_str()));
     json_insert_pair_into_object(retbody, "ullRoleId", json_new_string(playerId));
-    json_insert_pair_into_object(retbody, "uiActval", my_json_new_number(player->GetStrengthenMgr()?player->GetStrengthenMgr()->GetSouls():0));
+    json_insert_pair_into_object(retbody, "uiActval", my_json_new_number(v));
 
     head->cmd = 60;
     return 0;

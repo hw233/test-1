@@ -86,6 +86,17 @@ enum PurchaseType
     MoveEquip                   = 75,
     ThanksGivingDay             = 76,
     LogArenaExtraAct            = 77,
+    FightTransform              = 78,
+    AutoJobHunter               = 79,
+    AutoJobHunterComplete       = 80,
+    EnumFirstRecharge1          = 81,
+    EnumFirstRecharge2          = 82,
+    EnumFirstRecharge3          = 83,
+    EnumFirstRecharge4          = 84,
+    EnumCopyFrontWin            = 85,
+    Enum3366Gift                = 86,
+    BUYJOYBUFF                  = 87, //购买心悦buff
+    //繁体私有占150～200
 };
 
 enum IncomingType
@@ -129,6 +140,8 @@ enum MailItemType
     ClanCopyAward,
     BuChang1530,
     BuChangNewRC7Day,
+    NEWJOBHIRE,
+    BuChangMo,
 };
 enum ItemFrom
 {
@@ -169,6 +182,7 @@ enum ItemFrom
     FromNewRC7DayRecharge,
     FromNewRC7DayTarget,
     FromDailyStrengthen = 37, //变强秘宝
+    FromJobHunter = 38, // 寻墨游戏
 };
 
 enum ItemTo

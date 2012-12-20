@@ -1161,7 +1161,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBSkillEffect effs;
-		if(execu->Prepare("SELECT `id`, `state`, `immune`, `disperse`, `damage`, `adddam`, `magdam`, `addmag`, `crrdam`, `addcrr`, `hp`, `addhp`, `absorb`, `thorn`, `inj2hp`, `aura`, `atk`, `def`, `magatk`, `magdef`, `tough`, `action`, `hitrate`, `evade`, `critical`, `pierce`, `counter`, `magres`, `atkreduce`, `magatkreduce` FROM `skill_effect`", effs) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `state`, `immune`, `disperse`, `damage`, `adddam`, `magdam`, `addmag`, `crrdam`, `addcrr`, `hp`, `addhp`, `absorb`, `thorn`, `inj2hp`, `aura`, `atk`, `def`, `magatk`, `magdef`, `tough`, `action`, `hitrate`, `evade`, `critical`, `pierce`, `counter`, `magres`, `atkreduce`, `magatkreduce`, `eft`, `efl`, `efv` FROM `skill_effect`", effs) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -1197,6 +1197,30 @@ namespace GData
             ef->magres = effs.magres;
             ef->atkreduce = effs.atkreduce;
             ef->magatkreduce = effs.magatkreduce;
+            {
+                StringTokenizer tk(effs.eft, ",");
+                if (tk.count())
+                {
+                    for (size_t i = 0; i < tk.count(); ++i)
+                        ef->eft.push_back(::atoi(tk[i].c_str()));
+                }
+            }
+            {
+                StringTokenizer tk(effs.efl, ",");
+                if (tk.count())
+                {
+                    for (size_t i = 0; i < tk.count(); ++i)
+                        ef->efl.push_back(::atoi(tk[i].c_str()));
+                }
+            }
+            {
+                StringTokenizer tk(effs.efv, ",");
+                if (tk.count())
+                {
+                    for (size_t i = 0; i < tk.count(); ++i)
+                        ef->efv.push_back(::atof(tk[i].c_str()));
+                }
+            }
             skillEffectManager.add(ef);
         }
         return true;

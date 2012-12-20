@@ -82,6 +82,7 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 	//读取配置文件
 	TimeUtil::Init();
     GObject::VarSystem::Init();
+    GObject::GVarSystem::Init();
 	cfg.load(scriptStr);
 	globalSysMsg.load();
 //	Battle::battleReport.init();
@@ -359,6 +360,36 @@ void WorldServer::do_curl_request( const char* url )
     {
         fprintf(stderr, "URL: %s [ERROR]\n", url);
     }
+}
+
+bool WorldServer::do_http_request(const char* url, int timeout)
+{
+    char buffer[MAX_RET_LEN] = {0};
+    curl_easy_setopt(curl, CURLOPT_URL, url);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, recvret);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT, timeout);
+
+    fprintf(stderr, "URL: %s\n", url);
+
+    CURLcode res = curl_easy_perform(curl);
+    if (CURLE_OK == res)
+    {
+        fprintf(stderr, "URL: %s [OK]\n", url);
+        const char* msg = strcasestr(buffer, "msg");
+        if (!msg)
+            return false;
+        if (strcasestr(msg, "ok"))
+            return true;
+        return false;
+    }
+    else
+    {
+        fprintf(stderr, "URL: %s [ERROR]\n", url);
+        return false;
+    }
+
+    return false;
 }
 
 void WorldServer::State(const char* action, int serverNum)

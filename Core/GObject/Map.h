@@ -128,6 +128,8 @@ public:
 
     void VisitPlayers(PlayerVisitor& visitor, UInt16 location = 0);
 
+    UInt16 GetRandomSpot(UInt8 type);
+
 private:
 	std::string m_Name;
 

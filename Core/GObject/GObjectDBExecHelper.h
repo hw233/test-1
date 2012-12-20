@@ -240,6 +240,29 @@ struct DBArenaExtraBoard
     UInt32 lasttime[5];
 };
 
+struct DBJobHunter
+{
+    UInt64 playerId;
+    std::string fighterList;
+    std::string mapInfo;
+    UInt8 progress;
+    UInt8 posX;
+    UInt8 posY;
+    UInt8 earlyPosX;
+    UInt8 earlyPosY;
+    UInt32 stepCount;
+};
+
+struct DBCopyFrontWin
+{
+    UInt64 playerId;
+    UInt8 posOrig;
+    UInt8 posPut;
+    UInt32 itemId;
+    UInt16 ratio;
+};
+
+
 struct DBFighterBuffData
 {
 	UInt64 playerId;
@@ -2434,6 +2457,31 @@ SPECIALDEF(9)
 )
 SPECIALEND()
 
+SPECIALBEGIN(GObject::DBJobHunter)
+SPECIALDEF(9)
+(
+	UInt64, playerId,
+	std::string, fighterList,
+	std::string, mapInfo,
+	UInt8, progress,
+	UInt8, posX,
+	UInt8, posY,
+	UInt8, earlyPosX,
+	UInt8, earlyPosY,
+	UInt32, stepCount
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBCopyFrontWin)
+SPECIALDEF(5)
+(
+    UInt64, playerId,
+    UInt8, posOrig,
+    UInt8, posPut,
+    UInt32, itemId,
+    UInt16, ratio
+)
+SPECIALEND()
 
 }
 

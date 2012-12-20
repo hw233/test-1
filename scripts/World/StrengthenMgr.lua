@@ -39,6 +39,7 @@ local checkFlag = {
     [35] = 1, --SthPotential,   --潜力洗炼
     [36] = 1, --SthCapacity,   --资质洗炼
     [37] = 1, --SthCHTownDeamon,   --镇守锁妖塔
+    [38] = 1, --SthActSignIn,   --活跃度签到
 }
 
 --增加的变强之魂
@@ -81,6 +82,7 @@ local addSouls = {
     [35] = 1, --SthPotential,   --潜力洗炼
     [36] = 1, --SthCapacity,   --资质洗炼
     [37] = 1, --SthCHTownDeamon,   --镇守锁妖塔
+    [38] = 1, --SthActSignIn,   --活跃度签到
 }
 
 --某一项的最大值
@@ -97,7 +99,7 @@ end
 function EveryDayRoarSoul()
     local chance = { 2725, 4994, 6938, 8639, 10000 }
     local souls = { 5, 6, 7, 8, 10 }
-    local r = math.random(10000)
+    local r = math.random(1, 10000)
     local soul = 5
     for i = 1, #chance do
         if r <= chance[i] then
@@ -145,7 +147,7 @@ function openGreenBoxStrong()
     }
     local chance = { 1000, 2003, 3006, 5014, 7022, 9624, 9850, 10000 }
     local j = 1
-    local r = math.random(10000)
+    local r = math.random(1, 10000)
     for i = 1, #chance do
         if r <= chance[i] then
             j = i
@@ -153,7 +155,7 @@ function openGreenBoxStrong()
         end
     end
     if #items[j] > 1 then
-        local g = math.random(#items[j])
+        local g = math.random(1, #items[j])
         return items[j][g]
     end
     return items[j][1]
@@ -173,7 +175,7 @@ function openBlueBoxStrong()
     }
     local chance = { 1000, 2003, 3006, 5014, 7022, 9624, 9850, 10000 }
     local j = 1
-    local r = math.random(10000)
+    local r = math.random(1, 10000)
     for i = 1, #chance do
         if r <= chance[i] then
             j = i
@@ -181,7 +183,7 @@ function openBlueBoxStrong()
         end
     end
     if #items[j] > 1 then
-        local g = math.random(#items[j])
+        local g = math.random(1, #items[j])
         return items[j][g]
     end
     return items[j][1]
@@ -201,7 +203,7 @@ function openPurpleBoxStrong()
     }
     local chance = { 518, 2582, 4974, 7566, 9158, 9676, 9870, 10000 }
     local j = 1
-    local r = math.random(10000)
+    local r = math.random(1, 10000)
     for i = 1, #chance do
         if r <= chance[i] then
             j = i
@@ -209,7 +211,7 @@ function openPurpleBoxStrong()
         end
     end
     if #items[j] > 1 then
-        local g = math.random(#items[j])
+        local g = math.random(1, #items[j])
         return items[j][g]
     end
     return items[j][1]
@@ -224,13 +226,13 @@ function openOrangeBoxStrong()
         {{1325, 1}}, --技能符文熔炼诀
         {{49,   1}}, --乾坤净水
         {{515,  1}}, --五行精金
-        {{1528, 1}}, --法灵精金
+        {{134, 1}}, --法灵精金
         {{9204, 1}}, --补丁
         {{9201, 1}}, --桃木林地图碎片
     }
     local chance = { 505, 3031, 5557, 6399, 8925, 9178, 9684, 9874, 10000 }
     local j = 1
-    local r = math.random(10000)
+    local r = math.random(1, 10000)
     for i = 1, #chance do
         if r <= chance[i] then
             j = i
@@ -238,7 +240,7 @@ function openOrangeBoxStrong()
         end
     end
     if #items[j] > 1 then
-        local g = math.random(#items[j])
+        local g = math.random(1, #items[j])
         return items[j][g]
     end
     return items[j][1]

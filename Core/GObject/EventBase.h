@@ -17,6 +17,7 @@ enum EventID
     EVENT_TIMETICK = 8,
     EVENT_AUTOFRONTMAP = 9,
     EVENT_TLZAUTO = 10,
+    EVENT_JOBHUNTER = 11,
 };
 
 namespace GObject

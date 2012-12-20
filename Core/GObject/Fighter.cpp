@@ -27,6 +27,7 @@
 #include "SecondSoul.h"
 #include "GVar.h"
 #include "GObjectDBExecHelper.h"
+#include "GData/SoulExpTable.h"
 
 namespace GObject
 {
@@ -1199,7 +1200,7 @@ void Fighter::setPotential( float p, bool writedb )
 		{
 			_attrDirty = true;
 			_bPDirty = true;
-			sendModification(4, static_cast<UInt32>(p * 100 + 0.5f));
+			sendModification(4, static_cast<UInt32>((p * 100) + 0.5f));
 		}
 	}
 }
@@ -1208,7 +1209,7 @@ void Fighter::setCapacity( float c, bool writedb )
 {
     _capacity = c;
     if (writedb && _owner) {
-        sendModification(5, static_cast<UInt32>(c * 100 + 0.5f));
+        sendModification(5, static_cast<UInt32>((c * 100) + 0.5f));
     }
 }
 
@@ -2430,6 +2431,58 @@ bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb, bool init )
     return false;
 }
 
+// XXX: 穴道 id (0-14) lvl [1-3]
+bool Fighter::setToAcupoints(int idx, bool writedb)
+{
+    for (UInt8 i = 0; i < idx; ++i)
+    {
+        for (UInt8 v = 1; v <= 3; ++v)
+        {
+            UInt8 vMax =  getAcupointsCntMax();
+            if (i >= 0  && i < ACUPOINTS_MAX && v <= vMax)
+            {
+                if (_acupoints[i] >= v)
+                    return false;
+
+                const GData::AcuPra* pap = GData::acupraManager[i<<8|v];
+                if (!pap)
+                    return false;
+
+                if (pap->needlvl > getLevel())
+                    return false;
+
+                _acupoints[i] = v;
+                if (_acupoints[i] < 3)
+                    ++_praadd; // 第3层不加
+
+                if (_owner && writedb)
+                    _owner->OnHeroMemo(MC_CITTA, MD_STARTED, 1, 0);
+                if (_owner && writedb && i == 1 && _acupoints[i] == 3)
+                    _owner->OnHeroMemo(MC_CITTA, MD_STARTED, 1, 1);
+                if (_owner && writedb && i == 2 && _acupoints[i] == 3)
+                    _owner->OnHeroMemo(MC_CITTA, MD_STARTED, 1, 2);
+
+                soulMax += pap->soulmax;
+
+                //增加元神力后 查看成就
+                GameAction()->doAttainment(this->_owner, Script::AddSoulMax , soulMax);
+                _pexpMax += pap->pramax;
+                _cittaslot += pap->citslot;
+
+                _attrDirty = true;
+                _bPDirty = true;
+                sendModificationAcupoints(0x29, i, writedb);
+                sendModification(7, _pexpMax);
+                sendModification(9, getMaxSoul() );
+                sendModification(0x32, getUpCittasMax());
+                if(v ==vMax )
+                    GameAction()->doAttainment(this->_owner, Script::AddAcupoint, i); //增加穴道的成就
+            }
+        }
+    }
+    return true;
+}
+
 bool Fighter::incAcupointsBit( int idx, bool writedb )
 {
     if (idx >= 0 && idx < ACUPOINTS_MAX)
@@ -2499,17 +2552,18 @@ UInt16 Fighter::getUpSkillsNum()
 bool Fighter::testMutual( UInt16 skill )
 {
     UInt16 mutualSkills[] = {
-        1,5,
-        2,6,
-        3,7,
-        10,28,
-        11,15,
-        11,18,
-        12,16,
-        15,18,
-        19,23,
-        20,24,
-        21,25,
+        1,5, // 三昧真火，离火真解
+        2,6, // 天雷击，五雷正心觉
+        3,7, // 烈焰爆发，上清剑气
+        10,28, // 乾元指，
+        11,15, // 回春术，甘露咒
+        11,18, // 回春术，普渡慈航
+        12,16, // 回灵术，韦驮正气
+        15,18, // 甘露咒，普渡慈航
+        19,23, // 御剑术，御剑真决
+        20,24, // 破甲术，无形剑
+        21,25, // 大道剑，大道无常剑
+        30,31, // 暗影步法，幽冥步法
     };
 
     UInt16 j = 0;
@@ -3332,6 +3386,14 @@ bool Fighter::addNewCitta( UInt16 citta, bool writedb, bool init, bool split )
     return true;
 }
 
+void Fighter::offAllCitta()
+{
+    std::vector<UInt16> cittas = _cittas;
+    for (size_t i = 0; i < cittas.size(); ++i)
+    {
+        offCitta(cittas[i], true,true,true);
+    }
+}
 bool Fighter::offCitta( UInt16 citta, bool flip, bool offskill, bool writedb )
 {
     int idx = isCittaUp(citta);
@@ -3394,15 +3456,28 @@ void Fighter::delAllCitta( bool writedb )
     }
 }
 
+bool Fighter::CanDelCitta(UInt16 citta)
+{
+    //儒1202:三昧真火 释1203:乾元指 道1206:御剑术
+    //墨1333,1334,1336,1340,1341,1342
+    UInt16 cId = CITTA_ID(citta);
+    UInt16 cittaIds[] = { 3, 4, 7, 134, 135, 137, 141, 142, 143 };
+    for(UInt16 i = 0; i < sizeof(cittaIds) / sizeof(cittaIds[0]); ++i)
+    {
+        if(cId == cittaIds[i])
+            return false;
+    }
+    return true;
+}
+
 bool Fighter::delCitta( UInt16 citta, bool writedb )
 {
     int idx = hasCitta(citta);
     if (idx < 0)
         return false;
-    UInt16 itemId = CITTA_ITEMID(citta);
-    //1202:三昧真火 1203:乾元指 1206:御剑术
-    if(itemId == 1202 || itemId == 1203 || itemId == 1206)
+    if(!CanDelCitta(citta))
         return false;
+
     std::vector<UInt16>::iterator it = _cittas.begin();
     std::advance(it, idx);
 
@@ -3441,7 +3516,7 @@ bool Fighter::delCitta( UInt16 citta, bool writedb )
             }
             SYSMSG(title, 2105);
             SYSMSGV(content, 2106, getLevel(), getColor(), getName().c_str(), yacb->type, yacb->getName().c_str(), lvl);
-            MailPackage::MailItem mitem[4] = {{itemId, 1}, {31, rCount1}, {30, rCount2}, {29, rCount3}};
+            MailPackage::MailItem mitem[4] = {{static_cast<UInt16>(CITTA_ITEMID(citta)), 1}, {31, rCount1}, {30, rCount2}, {29, rCount3}};
             MailItemsInfo itemsInfo(mitem, DismissCitta, 4);
             GObject::Mail * pmail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
             if(pmail)
@@ -3767,27 +3842,27 @@ void Fighter::setAttrValue1(UInt16 v)
     _attrValue1 = v;
 }
 
-void Fighter::setAttrType2(UInt8 t)
+void Fighter::setAttrType2(UInt8 t, bool force)
 {
-    if (_potential + 0.005f >= 1.2f)
+    if ((_potential + 0.005f >= 1.2f) || force)
         _attrType2 = t;
 }
 
-void Fighter::setAttrValue2(UInt16 v)
+void Fighter::setAttrValue2(UInt16 v, bool force)
 {
-    if (_potential + 0.005f >= 1.2f)
+    if ((_potential + 0.005f >= 1.2f) || force)
         _attrValue2 = v;
 }
 
-void Fighter::setAttrType3(UInt8 t)
+void Fighter::setAttrType3(UInt8 t, bool force)
 {
-    if (_potential + 0.005f >= 1.5f && _capacity >= 7.0)
+    if ((_potential + 0.005f >= 1.5f && _capacity >= 7.0) || force)
         _attrType3 = t;
 }
 
-void Fighter::setAttrValue3(UInt16 v)
+void Fighter::setAttrValue3(UInt16 v, bool force)
 {
-    if (_potential + 0.005f >= 1.5f && _capacity >= 7.0)
+    if ((_potential + 0.005f >= 1.5f && _capacity >= 7.0) || force)
         _attrValue3 = v;
 }
 
@@ -4057,7 +4132,8 @@ float Fighter::getSoulPracticeFactor()
 
 bool Fighter::openSecondSoul(UInt8 cls)
 {
-    if(m_2ndSoul || _level < 60 || cls < 1 || cls > 3)
+    if(m_2ndSoul || _level < 60 || cls < 1 || 
+            (cls >= e_cls_max && cls != 13))
         return false;
 
     m_2ndSoul = new SecondSoul(this, cls);
@@ -4120,17 +4196,19 @@ bool Fighter::practiceLevelUp()
     return true;
 }
 
-void Fighter::enchantSoul(UInt32 itemId, bool bind, std::vector<SoulItemExp>& soulItemExpOut)
+bool Fighter::enchantSoul(UInt32 itemId, bool bind, std::vector<SoulItemExp>& soulItemExpOut)
 {
     if(!m_2ndSoul)
-        return;
+        return false;
     std::map<UInt32, UInt32>::iterator it = GData::GDataManager::m_soulItemExp.find(itemId);
     if(it == GData::GDataManager::m_soulItemExp.end())
-        return;
+        return false;
+    if(m_2ndSoul->getStateLevel() >= STATE_LEVEL_MAX)
+        return false;
 
     if(!_owner->GetPackage()->DelItem(itemId, 1, bind, ToSecondSoul))
     {
-        return;
+        return false;
     }
 
     UInt32 exp = it->second;
@@ -4178,6 +4256,7 @@ void Fighter::enchantSoul(UInt32 itemId, bool bind, std::vector<SoulItemExp>& so
     }
 
     soulItemExpOut.push_back(sie);
+    return true;
 }
 
 bool Fighter::equipSoulSkill(UInt8 idx, UInt32 itemId, bool bind)
@@ -4492,43 +4571,6 @@ void Fighter::appendElixirAttr2(Stream& st)
     st << _elixirattr.counter;
     st << _elixirattr.tough;
     st << _elixirattr.action;
-}
-
-
-UInt16 Fighter::getBattlePortrait()
-{
-    UInt16 portrait = 0;
-    UInt32 fashion = getFashionTypeId();
-
-    switch(fashion)
-    {
-    case 1700:
-        portrait = 1072;
-        break;
-    case 1701:
-        portrait = 1074;
-        break;
-    case 1702:
-        portrait = 1063;
-        break;
-    case 1703:
-        portrait = 1064;
-        break;
-    case 1704:
-        portrait = 1076;
-        break;
-    case 1705:
-        portrait = 1077;
-        break;
-    case 1706:
-        portrait = 1088;
-        break;
-    case 1707:
-        portrait = 1090;
-        break;
-    }
-
-    return portrait;
 }
 
 UInt8 Fighter::SSGetLvl(UInt16 skillid)
@@ -4948,6 +4990,13 @@ void Fighter::reload2ndSoul()
     }
 }
 
+void Fighter::setSoulLevel(UInt32 level)
+{
+    if(!m_2ndSoul || !_owner)
+        return;
+    m_2ndSoul->setPracticeLevel(level);
+}
+
 void Fighter::resetLevelAndExp(UInt8 maxLevel)
 {
     UInt64 exp = GData::expTable.getLevelMin(maxLevel);
@@ -4955,6 +5004,53 @@ void Fighter::resetLevelAndExp(UInt8 maxLevel)
     _exp = exp;
     DB1().PushUpdateData("UPDATE `fighter` SET `experience` = %"I64_FMT"u, `level`=%u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", exp, _level, _id, _owner->getId());
 }
+
+void Fighter::checkBPDirty()
+{
+    if(_bPDirty)
+    {
+        _bPDirty = false;
+        rebuildBattlePoint();
+    }
+    if(_skillBPDirty)
+    {
+        _skillBPDirty = false;
+        rebuildSkillBattlePoint();
+    }
+    if (_class == 4)
+        if (_battlePoint + _skillBP >= 100000)
+            if (!_owner->GetShuoShuo()->getShuoShuo(SS_MO_HIRE))
+                _owner->OnShuoShuo(SS_MO_STRENGTH);
+}
+
+UInt16 Fighter::getPortrait()
+{
+    UInt16 portrait = getId();
+    if(!_hideFashion)
+    {
+        if (getFashionTypeId() == 1700)
+            portrait = 1072;
+        else if (getFashionTypeId() == 1701)
+            portrait = 1074;
+        else if (getFashionTypeId() == 1702)
+            portrait = 1063;
+        else if (getFashionTypeId() == 1703)
+            portrait = 1064;
+        else if (getFashionTypeId() == 1704)
+            portrait = 1076;
+        else if (getFashionTypeId() == 1705)
+            portrait = 1077;
+        else if (getFashionTypeId() == 1706)
+            portrait = 1088;
+        else if (getFashionTypeId() == 1707)
+            portrait = 1090;
+        else if (getFashionTypeId() == 1708)
+            portrait = 1091;
+    }
+
+    return portrait;
+}
+
 
 }
 

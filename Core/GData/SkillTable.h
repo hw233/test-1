@@ -42,6 +42,54 @@ enum
     SKILL_EFFECT_FALG_VALUE = 30000
 };
 
+enum
+{
+    e_battle_target_selfside  = 0,
+    e_battle_target_otherside = 1,
+    e_battle_target_self      = 2
+};
+
+
+// 技能附加特效类型:
+enum
+{
+    e_eft_hide = 1, // 潜行 
+    e_eft_double_hit = 2, // 连击 
+    e_eft_mark_hide_dhit = 3, // (墨印或潜行时)加连击
+    e_eft_mark_hide_blind = 4, // (墨印或潜行时)至盲
+    e_eft_selfside_ru_shi_magatk = 5, // (友方全体,队友为释儒)加法术攻击
+    e_eft_selfside_dao_dmgreduce = 6, // (友方全体,队友为道)加伤害减免
+    e_eft_hide_attack = 7, // (潜行时)加攻击
+    e_eft_mark_hide_week = 8, // (墨印或潜行时)加虚弱
+    e_eft_hide_summon = 9, // (潜行时)召唤潜行的残影
+    e_eft_rnd_fgt_buf_aura = 10, // 随机队友获得心动后涨灵气的buf
+    e_eft_evade100 = 11, // 百分百闪避一次主动攻击
+    e_eft_selfside_buf_aura = 12, // 全体队友获得心动后涨灵气的buf
+    e_eft_selfside_absorb = 13, // 给队友吸血
+    e_eft_hide_aura = 14, // (墨印或潜行时)敌方被攻击时不增加灵气
+
+    e_eft_max
+};
+
+enum
+{
+    e_state_poison = 0x1, // 中毒
+    e_state_confuse = 0x2, // 混乱
+    e_state_stun = 0x4, // 晕眩
+    e_state_forget = 0x8, // 封印
+    e_state_dmgback = 0x10, // 伤害反弹
+    e_state_weak = 0x20, // 虚弱
+    e_state_dec_aura = 0x40, // 减灵气
+    e_state_mark_mo = 0x80, // 墨印
+    e_state_blind = 0x100, // 至盲
+
+    e_state_c_s_f_w = 0x2e, // 混乱，晕眩，封印，虚弱
+    e_state_c_s_f_m_b = 0x18e, // 混乱，晕眩，封印，墨印，至盲
+    e_state_c_s_f_b = 0x10e, // 混乱，晕眩，封印，至盲
+    e_state_c_s_f_w_m_b = 0x1ae, // 混乱，晕眩，封印，虚弱，墨印，至盲
+};
+
+
 struct SkillEffect : public ObjectBaseNT<UInt16>
 {
     SkillEffect(UInt16 id)
@@ -53,9 +101,9 @@ struct SkillEffect : public ObjectBaseNT<UInt16>
         critical(0), pierce(0), counter(0), magres(0), atkreduce(0), magatkreduce(0) {}
     ~SkillEffect() {}
 
-    UInt8 state; // 状态: 0-无状态 1-中毒，2-混乱，4-晕眩(无法攻击)，8-无法使用技能, 16-反伤, 32-虚弱, 64-降灵气 有等级之分
-    UInt8 immune; // 对状态技能的免疫,只能免疫比自己技能低的技能
-    UInt8 disperse; // 驱散状态,只对友方使用,除自己外,是状态的值的和
+    UInt16 state; // 状态: 0-无状态 1-中毒，2-混乱，4-晕眩(无法攻击)，8-无法使用技能, 16-反伤, 32-虚弱, 64-降灵气 有等级之分
+    UInt16 immune; // 对状态技能的免疫,只能免疫比自己技能低的技能
+    UInt16 disperse; // 驱散状态,只对友方使用,除自己外,是状态的值的和
     Int16 damage; // 物理伤害 num/num% (目前物理伤害和法术伤害互斥)
     float damageP;
     float adddam; // 物理伤害附加(具体值)
@@ -95,6 +143,11 @@ struct SkillEffect : public ObjectBaseNT<UInt16>
     float magres; // 法术抵抗[+/-]
     float atkreduce; // 物理伤害减免
     float magatkreduce; // 法术伤害减免
+
+    // 技能附加特效类型:
+    std::vector<UInt16> eft;
+    std::vector<UInt8> efl; // 技能附加特效持续回合
+    std::vector<float> efv; // 技能附加特效值
 };
 
 struct SkillBase : public ObjectBaseT<UInt16>

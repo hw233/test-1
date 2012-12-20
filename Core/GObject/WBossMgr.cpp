@@ -333,7 +333,7 @@ void WBoss::getRandList(UInt32 sz, UInt32 num, std::set<UInt32>& ret)
 {
     if (sz > AWARD_MAN)
     {
-#if 0
+#if 1
         if (sz - AWARD_MAN <= num)
         {
             for (UInt32 j = 0; j < sz - AWARD_MAN; ++j)
@@ -490,12 +490,12 @@ void WBoss::reward(Player* player)
 
         if (World::getOpenTest() && World::_wday != 7)
         {
-            MailPackage::MailItem item[] = {{1526,1},{MailPackage::Tael,1000},{9091,1}};
+            MailPackage::MailItem item[] = {{133,1},{MailPackage::Tael,1000},{9091,1}};
             (*i).player->sendMailItem(568, 569, item, 3);
         }
         else
         {
-            MailPackage::MailItem item[] = {{1526,1},{MailPackage::Tael,1000}};
+            MailPackage::MailItem item[] = {{133,1},{MailPackage::Tael,1000}};
             (*i).player->sendMailItem(568, 569, item, 2);
         }
 
@@ -571,6 +571,12 @@ bool WBoss::attack(Player* pl, UInt16 loc, UInt32 id)
     if (!m_final)
         pl->OnHeroMemo(MC_SLAYER, MD_LEGEND, 0, 2);
     pl->OnShuoShuo(SS_WBOSS);
+
+    if (pl->GetPackage()->GetRestPackageSize() <= 0)
+    {
+        pl->sendMsgCode(0, 1011);
+        return false;
+    }
 
     if (!m_final)
     {

@@ -5,6 +5,7 @@
 #include "TaskData.h"
 #include "EventBase.h"
 #include "Var.h"
+#include "GVar.h"
 #include "GData/LootTable.h"
 #include "GData/AttrExtra.h"
 
@@ -21,6 +22,7 @@
 #include "Mail.h"
 #include "GObject/NewRelation.h"
 #include "StrengthenMgr.h"
+#include "JobHunter.h"
 
 namespace Battle
 {
@@ -109,6 +111,7 @@ namespace GObject
 #define PLAYER_BUFF_ATHLETICS_P     0x45    //历练冷却时间
 #define PLAYER_BUFF_QQVIPBUF        0x46
 #define PLAYER_BUFF_SUFFER          0x47    //陷害间隔
+#define PLAYER_BUFF_JOYBUFF         0x48    //心悦会员
 
 #define PLAYER_BUFF_ATHL1           0x51
 #define PLAYER_BUFF_ATHL2           0x52
@@ -324,6 +327,22 @@ namespace GObject
 
     };
 
+    class EventAutoJobHunter : public EventBase
+    {
+    public:
+		EventAutoJobHunter(Player * player, UInt32 interval, UInt32 count, UInt8 id)
+			: EventBase(player, interval, count), id(id)
+		{}
+
+        virtual UInt32 GetID() const { return EVENT_JOBHUNTER; }
+        virtual bool Equal(UInt32 id, size_t playerid) const;
+        void Process(UInt32);
+		bool Accelerate(UInt32);
+
+    private:
+        UInt8 id;
+    };
+
 
 	struct Lineup
 	{
@@ -468,7 +487,7 @@ namespace GObject
         UInt32 qqawardEnd;          // QQ ??????ȡ????ʱ??
         UInt32 ydGemId;             // QQ VIP??ʯ????
 		UInt16 location;            // λ??
-		UInt8 inCity;               // ????
+		UInt8 inCity;               // ???? // 现在始终为true
 		UInt32 lastOnline;          // ?ϴ?????ʱ??
 		UInt64 newGuild;            // ????????????
 		UInt16 packSize;            // ???ұ?????
@@ -933,6 +952,7 @@ namespace GObject
 
 		UInt32 getGold(UInt32 c = 0, IncommingInfo* ii = NULL);
 		UInt32 useGold(UInt32 c, ConsumeInfo * ci=NULL);
+        void deleteGold(UInt32 c);
         UInt32 useGold4LuckDraw(UInt32 c);
         UInt32 getGold4LuckDraw();
 		bool holdGold(UInt32 c, UInt8, ConsumeInfo * ci = NULL);
@@ -995,6 +1015,9 @@ namespace GObject
         bool notifyTitleAll();
         void writeTitleAll();
         void ArenaExtraAct(UInt8 type, UInt8 opt);
+
+        void FirstRechargeAct(UInt8 step, UInt8 type, UInt8 career);
+        void sendFirstRecharge(bool isLogin = false);
 
 		UInt32 getAchievement(UInt32 a = 0);
 		UInt32 useAchievement(UInt32 a,ConsumeInfo * ci=NULL);
@@ -1116,7 +1139,7 @@ namespace GObject
 		bool attackNpc(UInt32, UInt32 = 0xFFFFFFFF, bool = false, bool = true);
         bool attackTianjieNpc(UInt32 npcId, UInt32 expMulti = 1, bool isEvent = false, bool isBoss = false);
         bool attackRareAnimal(UInt32 id);
-        bool attackCopyNpc(UInt32, UInt8, UInt8, UInt8, UInt8 = 0, bool = false, std::vector<UInt16>* loot = NULL, bool = true);
+        bool attackCopyNpc(UInt32, UInt8, UInt8, UInt8, bool&, UInt8 = 0, bool = false, std::vector<UInt16>* loot = NULL, bool = true);
         bool attackWorldBoss(UInt32, UInt8, UInt8, UInt8, bool = false);
         void autoFrontMapFailed();
         void autoCopyFailed(UInt8);
@@ -1528,6 +1551,7 @@ namespace GObject
 		std::vector<GData::LootResult> _lastQueqiaoAward;
         std::vector<GData::LootResult> _lastKillMonsterAward;
         std::vector<GData::LootResult> _lastNew7DayTargetAward;
+        std::vector<GData::LootResult> _lastExJobAward;
 
     private:
 		UInt16 _lastDungeon;
@@ -1671,6 +1695,7 @@ namespace GObject
         void tripodUdpLog(UInt32 id, UInt32 val = 0, UInt32 num = 1);
         void storeUdpLog(UInt32 id, UInt32 type, UInt32 itemId, UInt32 num = 1);
         void newRC7DayUdpLog(UInt32 id, UInt32 type = 0, UInt32 num  = 1);
+        void transformUdpLog(UInt32 id, UInt32 type, UInt32 money1, UInt32 money2, UInt32 money3, UInt32 money4, UInt8 val1);
         void guideUdp(UInt8 type, std::string& p1, std::string& p2);
         void moneyLog(int type, int gold, int coupon = 0, int tael = 0, int achievement = 0, int prestige = 0);
         void actUdp(UInt8 type, std::string& p1, std::string& p2);
@@ -1683,6 +1708,16 @@ namespace GObject
         void sendMailItem(UInt16 title, UInt16 content, MailPackage::MailItem* mitem, UInt16 size, bool bind = true);
         void setVipAwardFlag(UInt8 type, UInt32 value);
 
+        //传功
+        UInt8 fightTransform(UInt16 fFighterId, UInt16 tFighterId, UInt8 type);
+        UInt8 canTransform(Fighter * fFgt, Fighter * tFgt, UInt8 type);
+        UInt8 transformUseMoney(Fighter * fFgt, Fighter * tFgt, UInt8 type);
+        UInt8 transformExp(Fighter * fFgt, Fighter * tFgt);
+        UInt8 transformPotential(Fighter * fFgt, Fighter * tFgt);
+        UInt8 transformCapacity(Fighter * fFgt, Fighter * tFgt);
+        UInt8 transformSoul(Fighter * fFgt, Fighter * tFgt);
+        void transformElixir(Fighter * fFgt, Fighter * tFgt);
+            
     private:
         char m_domain[256];
         char m_openid[256];
@@ -1701,8 +1736,18 @@ namespace GObject
             if (atoi(domain.c_str()) == 12)
                 m_isOffical = true;
         }
-        inline void setClientIp(const std::string& clientIp) { strncpy(m_clientIp, clientIp.c_str(), 256);}
-        void setOpenId(const std::string& openid);
+        inline void setClientIp(const std::string& clientIp) 
+        { 
+            if (inet_addr(clientIp.c_str()) == INADDR_NONE)
+            {
+                strncpy(m_clientIp, "0.0.0.0", 16);
+            }
+            else
+            {
+                strncpy(m_clientIp, clientIp.c_str(), 256);
+            }
+        }
+        void setOpenId(const std::string& openid, bool load = false);
         inline void setOpenKey(const std::string& openkey) { strncpy(m_openkey, openkey.c_str(), 256); }
         inline void setSource(const std::string& source) { m_source = source; }
         inline void setVia(const std::string& via) { m_via = via; }
@@ -1798,6 +1843,8 @@ namespace GObject
         void getThanksGivingDay(UInt8 opt);
         void IDIPAddItem(UInt16 itemId, UInt16 num, bool bind = true);
         int IDIPBuy(UInt32 itemId, UInt32 num, UInt32 price, std::string& err, bool bind = true);
+        void lastExJobAwardPush(UInt16 itemId, UInt16 num);
+        void checkLastExJobAward();
         void lastQueqiaoAwardPush(UInt16 itemId, UInt16 num);
         void checkLastQueqiaoAward();
         void lastKillMonsterAwardPush(UInt16 itemId, UInt16 num);
@@ -1853,7 +1900,7 @@ namespace GObject
         void onBlueactiveday();
         void sendSecondInfo();
         void recvYBBuf(UInt8 type);
-        void sendYBBufInfo(UInt32 ybbuf, UInt32 qqvipbuf);
+        void sendYBBufInfo(UInt32 ybbuf, UInt32 qqvipbuf, UInt8 joy = 0);
         void adjustAthlBuffData(UInt32 type);
         void sendAthlBufInfo();
 
@@ -1898,6 +1945,39 @@ namespace GObject
     private:
         std::map<UInt32, UInt32> _forges;
 #endif
+
+    public:
+        JobHunter * getJobHunter();
+        void setJobHunter(std::string& fighterList, std::string& mapInfo, UInt8 progress, UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY, UInt32 stepCount);
+        void sendAutoJobHunter();
+    private:
+        JobHunter * _jobHunter;
+
+    public:
+        bool hasFighterWithClass(UInt8 cls);
+
+    public:
+        void copyFrontWinAward(UInt8 index);
+        void loadCopyFrontWinFromDB(UInt8 posOrig, UInt8 posPut, UInt32 itemId, UInt16 ratio);
+        void getCopyFrontCurrentAward(UInt8 index);
+        void getCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index, UInt8 indexPut);
+        void resetCopyFrontWinAward(bool fresh = false);
+        void freshCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index);
+        void closeCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index);
+        void sendCopyFrontAllAward();
+        UInt8 getCopyId();
+        UInt8 getFrontmapId();
+    private:
+        UInt8 cf_posPut[5];//范围1-5
+        UInt32 cf_itemId[5];
+        UInt16 cf_ratio[5];
+
+    public:
+        void getGoodVoiceAward(UInt8 type);
+        void sendGoodVoiceInfo();
+        void get3366GiftAward(UInt8 type);
+        void send3366GiftInfo();
+        void sendQQGameGift1218();
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

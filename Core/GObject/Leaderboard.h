@@ -115,6 +115,7 @@ private:
 	Stream _moneyStream;
 	Stream _achievementStream;
 	Stream _clanStream;
+	Stream _clanCopyStream;
     Stream _battleStream;
 	UInt32 _id;
 	UInt8 _maxLevel;
@@ -148,6 +149,7 @@ private:
     std::map<UInt64, int> _playerAthleticsRank;
     std::map<UInt64, int> _playerClanRank;
     std::map<UInt64, int> _playerBattleRank;
+    std::map<UInt64, int> _playerClanCopyRank;
     FastMutex _opMutex;
 };
 

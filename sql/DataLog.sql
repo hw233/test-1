@@ -46,7 +46,9 @@ CREATE TABLE IF NOT EXISTS `login_states` (
   `login_time` int(10) unsigned NOT NULL,
   `login_ip` varchar(255) NOT NULL,
   `logout_time` int(10) unsigned NOT NULL,
-  INDEX up_login_status (`server_id`, `player_id`, `login_time`) 
+  INDEX up_login_status (`server_id`, `player_id`, `login_time`),
+  INDEX up_player_login (`player_id`, `login_time`),
+  INDEX up_login_time (`login_time`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

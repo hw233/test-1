@@ -1382,7 +1382,13 @@ namespace Script
 		assert(player != NULL);
 		return Call<UInt32>("GetBDSupermanPrice", player, itemId, isUsed);
     }
-    
+
+    bool GameActionLua::onFirstRecharge(Player* player, UInt8 index)
+    {
+		assert(player != NULL);
+		return Call<bool>("onFirstRecharge", player, index);
+    }
+
     void GameActionLua::doStrong(Player* pl, UInt8 id, UInt32 param1, UInt32 param2)
     {
 		assert(pl != NULL);
@@ -1424,6 +1430,46 @@ namespace Script
 		assert(player != NULL);
 		return Call<UInt8>("RunThanksGivingDayAward", player, opt);
 	}
+
+    UInt32 GameActionLua::getRandomNormalMonster(UInt8 id)
+    {
+        return Call<UInt32>("getRandomNormalMonster", id);
+    }
+
+    UInt32 GameActionLua::getBossMonster(UInt8 id)
+    {
+        return Call<UInt32>("getBossMonster", id);
+    }
+
+    UInt32 GameActionLua::getLengendMonster(UInt8 id, UInt8 val)
+    {
+        return Call<UInt32>("getLengendMonster", id, val);
+    }
+
+    UInt32 GameActionLua::calcGridType(UInt8 prob)
+    {
+        return Call<UInt8>("calcGridType", prob);
+    }
+
+    lua_tinker::table GameActionLua::getTreasure(UInt8 id)
+    {
+        return Call<lua_tinker::table>("getTreasure", id);
+    }
     
+    UInt32 GameActionLua::foundCave(UInt8 id)
+    {
+        return Call<UInt32>("foundCave", id);
+    }
+
+    lua_tinker::table GameActionLua::getStepAward(UInt32 step)
+    {
+        return Call<lua_tinker::table>("getStepAward", step);
+    }
+
+    lua_tinker::table GameActionLua::getCopyFrontmapAward(UInt8 step, UInt16 localtion)
+    {
+        return Call<lua_tinker::table>("getCopyFrontmapAward", step, localtion);
+    }
+
 }
 

@@ -58,9 +58,11 @@
 #include "GObject/TownDeamon.h"
 #include "GObject/Arena.h"
 #include "GObject/SingleHeroStage.h"
+#include "GObject/PracticePlace.h"
 
 #include "GObject/Tianjie.h"
 #include "Memcached.h"
+#include "GObject/RechargeTmpl.h"
 
 struct NullReq
 {
@@ -1000,6 +1002,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
             pl->sendNewRegisterAward(0);  //0:表示新用户注册还可以邀请好友进行抽奖
         pl->CheckCanAwardBirthday(); //生日罗盘许愿星(周年庆活动)
         pl->getAwardLogin(2); // 2012/10/14登录抽奖合作活动
+        pl->getThanksGivingDay(2); //感恩节活动,qq大厅登录礼包
     }
 	{
 		Stream st;
@@ -1053,12 +1056,25 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     {
         pl->sendSecondInfo();
     }
+    {
+        TeamCopyPlayerInfo* tcp = pl->getTeamCopyPlayerInfo();
+        if (tcp && tcp->getPass(4) && (pl->GetVar(VAR_EX_JOB_ENABLE) == 0))
+        {
+            pl->SetVar(VAR_EX_JOB_ENABLE, 1);
+        }
+        Stream st(REP::EXJOB);
+        st << static_cast<UInt8>(0);
+        st << static_cast<UInt8>(pl->GetVar(VAR_EX_JOB_ENABLE));
+        st << Stream::eos;
+        pl->send(st);
+        pl->sendAutoJobHunter();       // 为什么上面的语句都加大括号？？？
+    }
 #ifdef _FB
     // XXX: do not need
 #else
-	pl->sendWallow();
+    pl->sendWallow();
 #endif
-	pl->sendEvents();
+    pl->sendEvents();
     //pl->GetPackage()->SendPackageItemInfor();
     {
         TeamCopyPlayerInfo* tcpInfo = pl->getTeamCopyPlayerInfo();
@@ -1082,6 +1098,11 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendYBBufInfo(pl->GetVar(VAR_YBBUF), pl->GetVar(VAR_QQVIP_BUF));
     pl->sendAthlBufInfo();
     luckyDraw.notifyDisplay(pl);
+    if (World::getRechargeActive())
+    {
+        GObject::RechargeTmpl::instance().sendStreamInfo(pl);
+        GObject::RechargeTmpl::instance().sendScoreInfo(pl);
+    }
     pl->sendSSToolbarInfo();
 
     if (World::getTrumpEnchRet() || World::get9215Act())
@@ -1199,6 +1220,10 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendYearRPInfo();
     //if(World::getYearActive())
     //    pl->sendYearActInfo();
+    pl->sendFirstRecharge(true);
+    pl->sendCopyFrontAllAward();
+    pl->sendGoodVoiceInfo();
+    pl->send3366GiftInfo();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -1559,7 +1584,10 @@ void OnRecruitFighterReq( GameMsgHdr& hdr, RecruitFighterReq& rfr )
 	st << static_cast<UInt8>(id > 0 ? 0 : 1) << rfr._pos << Stream::eos;
 	player->send(st);
 	if (id != 0)
-
+    {   //将新招募的散仙放入修炼位
+        UInt32 fgts[1] = { id };
+        GObject::practicePlace.sitdown(player, fgts, 1);
+    }
     GameAction()->RunOperationTaskAction0(player, 3);
 }
 
@@ -1578,10 +1606,19 @@ void OnFighterDismissReq( GameMsgHdr& hdr, FighterDismissReq& fdr )
 		player->send(rep);
 		return;
 	}
-	UInt64 exp = fgt->getExp() / 2;
-	if(exp >= 25000)
+
+    UInt64 exp = 0;
+
+    if(fgt->getClass() == 4)
+    {
+        exp = fgt->getExp() > GData::expTable.getLevelMin(70) ? fgt->getExp() - GData::expTable.getLevelMin(70) : 0;
+        exp /= 2;
+    }
+    else
+        exp = fgt->getExp() / 2;
+
+	if(exp >= 25000 || (fgt->getClass() == 4))
 	{
-		exp += 25000;
 		UInt16 rCount1 = static_cast<UInt16>(exp / 50000000);
 		exp = exp % 50000000;
 		UInt16 rCount2 = static_cast<UInt16>(exp / 500000);
@@ -1609,6 +1646,9 @@ void OnFighterDismissReq( GameMsgHdr& hdr, FighterDismissReq& fdr )
 	rep._fgtid = fdr._fgtid;
 	rep._result = 0;
 	player->send(rep);
+    JobHunter* jobHunter = player->getJobHunter();
+    if (jobHunter)
+        jobHunter->AddToFighterList(fdr._fgtid);
 }
 
 void OnFighterRegenReq( GameMsgHdr& hdr, FighterRegenReq& frr )
@@ -1691,6 +1731,8 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
     UInt8 opt = 0;
     br >> opt;
 
+    if(!player->hasChecked())
+        return;
     switch(opt)
     {
         /** 周岁红包送不停 **/
@@ -1727,6 +1769,63 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
                 player->checkLastKillMonsterAward();
         }
         break;
+
+        case 3:
+        {
+            UInt8 step;
+            UInt8 type;
+            UInt8 career;
+            br >> step;
+            br >> type;
+            br >> career;
+            player->FirstRechargeAct(step, type, career);
+        }
+        break;
+
+        case 4:
+        {
+            UInt8 type;
+            UInt8 copy_or_front;
+            UInt8 index;
+
+            if(!World::getCopyFrontWinSwitch())
+                return;
+            br >> type;
+            br >> copy_or_front;
+            br >> index;
+
+            if(type == 0)
+            {
+                UInt8 indexPut;
+                br >> indexPut;
+                player->getCopyFrontAwardByIndex(copy_or_front, index, indexPut);
+            }
+            else if(type == 1)
+                player->freshCopyFrontAwardByIndex(copy_or_front, index);
+            else if(type == 2)
+                player->closeCopyFrontAwardByIndex(copy_or_front, index);
+        }
+
+        case 5:
+        {
+            UInt8 type;
+            if(!World::getGoodVoiceAct())
+                return;
+            br >> type;
+            player->getGoodVoiceAward(type);
+        }
+        break;
+
+        case 6:
+        {
+            UInt8 type;
+            if(!World::get3366GiftAct())
+                return;
+            br >> type;
+            player->get3366GiftAward(type);
+        }
+        break;
+
         default:
         break;
     }
@@ -2151,14 +2250,14 @@ void OnDungeonAutoReq( GameMsgHdr& hdr, DungeonAutoReq& dar )
 	if(pl->getThreadId() != WORKER_THREAD_NEUTRAL)
 		return;
 
-	if(pl->GetPackage()->GetRestPackageSize() < 4)
-	{
-		pl->sendMsgCode(1, 1014);
-		return;
-	}
 	if(dar.type == 0)
 	{
 		pl->cancelAutoDungeon();
+		return;
+	}
+	if(pl->GetPackage()->GetRestPackageSize() < 1)
+	{
+		pl->sendMsgCode(1, 1014);
 		return;
 	}
 	GObject::Dungeon * dg = GObject::dungeonManager[dar.type];
@@ -2189,7 +2288,7 @@ void OnAutoCopy( GameMsgHdr& hdr, const void* data )
     brd >> type;
     brd >> id;
 
-	if((type == 0 || type == 2) && pl->GetPackage()->GetRestPackageSize() < 4)
+	if((type == 0 || type == 2) && pl->GetPackage()->GetRestPackageSize() < 1)
 	{
 		pl->sendMsgCode(1, 1014);
 		return;
@@ -2224,17 +2323,18 @@ void OnAutoFrontMap( GameMsgHdr& hdr, const void* data )
 	if(!pl->hasChecked())
 		return;
 
-	if(pl->GetPackage()->GetRestPackageSize() < 4)
-	{
-		pl->sendMsgCode(1, 1014);
-		return;
-	}
 
     BinaryReader brd(data, hdr.msgHdr.bodyLen);
     UInt8 type = 0;
     UInt8 id = 0;
     brd >> type;
     brd >> id;
+
+	if((pl->GetPackage()->GetRestPackageSize() < 1) && (type != 1))
+	{
+		pl->sendMsgCode(1, 1014);
+		return;
+	}
 
     switch (type)
     {
@@ -2758,10 +2858,10 @@ void OnBattleEndReq( GameMsgHdr& hdr, BattleEndReq& req )
 
     player->addLastTjScore();
 
+	player->checkLastBattled();
+
     if(now <= PLAYER_DATA(player, battlecdtm))
 		return ;
-
-	player->checkLastBattled();
 }
 
 void OnCopyReq( GameMsgHdr& hdr, CopyReq& req )
@@ -2899,7 +2999,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 		{
         case 1:
             {
-                // TODO(JLT): 折扣商品的购买
+                // (JLT): 折扣商品的购买
                 UInt8 discountType = lr._count;
                 UInt8 varoff = GData::store.getDisTypeVarOffset(discountType);
                 if (varoff == 0xfe)
@@ -2996,9 +3096,19 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 			{
 				GObject::ItemBase * item;
 				if(IsEquipTypeId(lr._itemId))
-					item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, true, false, FromNpcBuy);
+                {
+                    if (player->GetPackage()->TryBuyEquip(lr._itemId, lr._count, true))
+                        item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    else
+                        item = NULL;
+                }
 				else
-					item = player->GetPackage()->AddItem(lr._itemId, lr._count, true, false, FromNpcBuy);
+                {
+                    if (player->GetPackage()->TryBuyItem(lr._itemId, lr._count, true))
+                        item = player->GetPackage()->AddItem(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    else
+                        item = NULL;
+                }
 				if(item == NULL)
 					st << static_cast<UInt8>(2);
 				else
@@ -3020,9 +3130,19 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 			{
 				GObject::ItemBase * item;
 				if(IsEquipTypeId(lr._itemId))
-					item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, true, false, FromNpcBuy);
+                {
+                    if (player->GetPackage()->TryBuyEquip(lr._itemId, lr._count, true))
+                        item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    else
+                        item = NULL;
+                }
 				else
-					item = player->GetPackage()->AddItem(lr._itemId, lr._count, true, false, FromNpcBuy);
+                {
+                    if (player->GetPackage()->TryBuyItem(lr._itemId, lr._count, true))
+                        item = player->GetPackage()->AddItem(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    else
+                        item = NULL;
+                }
 				if(item == NULL)
 					st << static_cast<UInt8>(2);
 				else
@@ -3070,7 +3190,12 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                 bool buyFgt = false;
 				GObject::ItemBase * item = NULL;
 				if(IsEquipTypeId(lr._itemId))
-					item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, true, false, FromNpcBuy);
+                {
+                    if (player->GetPackage()->TryBuyEquip(lr._itemId, lr._count, true))
+                        item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    else
+                        item = NULL;
+                }
 				else if (IsFighterTypeId(lr._itemId))
                 {
                     buyFgt = player->addFighterFromItem(lr._itemId, price);
@@ -3078,7 +3203,12 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                         price /= lr._count;
                 }
                 else
-					item = player->GetPackage()->AddItem(lr._itemId, lr._count, true, false, FromNpcBuy);
+                {
+                    if (player->GetPackage()->TryBuyItem(lr._itemId, lr._count, true))
+                        item = player->GetPackage()->AddItem(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    else
+                        item = NULL;
+                }
 				if(item == NULL && !buyFgt)
 					st << static_cast<UInt8>(2);
 				else if (item || buyFgt)
@@ -3104,7 +3234,12 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                     bool buyFgt = false;
                     GObject::ItemBase * item = NULL;
                     if(IsEquipTypeId(lr._itemId))
-                        item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    {
+                        if (player->GetPackage()->TryBuyEquip(lr._itemId, lr._count, true))
+                            item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, true, false, FromNpcBuy);
+                        else
+                            item = NULL;
+                    }
                     else if (IsFighterTypeId(lr._itemId))
                     {
                         buyFgt = player->addFighterFromItem(lr._itemId, price);
@@ -3112,7 +3247,12 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                             price /= lr._count;
                     }
                     else
-                        item = player->GetPackage()->AddItem(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    {
+                        if (player->GetPackage()->TryBuyItem(lr._itemId, lr._count, true))
+                            item = player->GetPackage()->AddItem(lr._itemId, lr._count, true, false, FromNpcBuy);
+                        else
+                            item = NULL;
+                    }
                     if(item == NULL && !buyFgt)
                         st << static_cast<UInt8>(2);
                     else if (item || buyFgt)
@@ -3141,9 +3281,20 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                 {
                     GObject::ItemBase * item;
                     if(IsEquipTypeId(lr._itemId))
-                        item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    {
+                        if (player->GetPackage()->TryBuyEquip(lr._itemId, lr._count, true))
+                            item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, true, false, FromNpcBuy);
+                        else
+                            item = NULL;
+                    }
                     else
-                        item = player->GetPackage()->AddItem(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    {
+                        if (player->GetPackage()->TryBuyItem(lr._itemId, lr._count, true))
+                            item = player->GetPackage()->AddItem(lr._itemId, lr._count, true, false, FromNpcBuy);
+                        else
+                            item = NULL;
+                    }
+
                     if(item == NULL)
                         st << static_cast<UInt8>(2);
                     else
@@ -3171,9 +3322,19 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                 {
                     GObject::ItemBase * item;
                     if(IsEquipTypeId(lr._itemId))
-                        item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    {
+                        if (player->GetPackage()->TryBuyEquip(lr._itemId, lr._count, true))
+                            item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, true, false, FromNpcBuy);
+                        else
+                            item = NULL;
+                    }
                     else
-                        item = player->GetPackage()->AddItem(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    {
+                        if (player->GetPackage()->TryBuyItem(lr._itemId, lr._count, true))
+                            item = player->GetPackage()->AddItem(lr._itemId, lr._count, true, false, FromNpcBuy);
+                        else
+                            item = NULL;
+                    }
                     if(item == NULL)
                         st << static_cast<UInt8>(2);
                     else
@@ -3198,9 +3359,19 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                 {
                     GObject::ItemBase * item = NULL;
                     if(IsEquipTypeId(lr._itemId))
-                        item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    {
+                        if (player->GetPackage()->TryBuyEquip(lr._itemId, lr._count, true))
+                            item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, true, false, FromNpcBuy);
+                        else
+                            item = NULL;
+                    }
                     else
-                        item = player->GetPackage()->AddItem(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    {
+                        if (player->GetPackage()->TryBuyItem(lr._itemId, lr._count, true))
+                            item = player->GetPackage()->AddItem(lr._itemId, lr._count, true, false, FromNpcBuy);
+                        else
+                            item = NULL;
+                    }
                     if(item == NULL)
                         st << static_cast<UInt8>(2);
                     else
@@ -3234,11 +3405,21 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                     bind = true;
 				GObject::ItemBase * item;
                 if(IsEquipTypeId(lr._itemId))
-					item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, bind, false, FromNpcBuy);
-				else
-					item = player->GetPackage()->AddItem(lr._itemId, lr._count, bind, false, FromNpcBuy);
-				if(item == NULL)
-					st << static_cast<UInt8>(2);
+                {
+                    if (player->GetPackage()->TryBuyEquip(lr._itemId, lr._count, bind))
+                        item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, bind, false, FromNpcBuy);
+                    else
+                        item = NULL;
+                }
+                else
+                {
+                    if (player->GetPackage()->TryBuyItem(lr._itemId, lr._count, bind))
+                        item = player->GetPackage()->AddItem(lr._itemId, lr._count, bind, false, FromNpcBuy);
+                    else
+                        item = NULL;
+                }
+                if(item == NULL)
+                    st << static_cast<UInt8>(2);
 				else
 				{
 					ConsumeInfo ci(Item,lr._itemId,lr._count);
@@ -4430,6 +4611,36 @@ void OnActivityReward(  GameMsgHdr& hdr, const void * data)
 
     }
     */
+    MSG_QUERY_PLAYER(player);
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    brd >> type;
+    switch(type )
+    {
+        case 3:
+            if (World::getRechargeActive())
+                player->sendRechargeInfo();
+            break;
+        case 4:
+            if (!World::getRechargeActive())
+                return;
+            UInt32 itemId = 0;
+            brd >> itemId;
+            int n = -1;
+            UInt8 res = GObject::RechargeTmpl::instance().getItem(player, itemId, n);
+            Stream st(REP::ACTIVITY_REWARD);
+            st << static_cast<UInt8>(11);
+            st << res;
+            if ( 0 == res)
+            {
+                st << player->GetVar(VAR_RECHARGE_SCORE) << itemId << n;
+            }
+            st << Stream::eos;
+            player->send(st);
+            break;
+
+    }
+ 
 }
 
 void OnFourCopReq( GameMsgHdr& hdr, const void* data)
@@ -4973,7 +5184,8 @@ void OnSecondSoulReq( GameMsgHdr& hdr, const void* data)
                 UInt16 itemId = 0;
                 UInt8 bind = 0;
                 br >> itemId >> bind;
-                fgt->enchantSoul(itemId, bind != 0, soulItemExpOut);
+                if(!fgt->enchantSoul(itemId, bind != 0, soulItemExpOut))
+                    break;
             }
 
             UInt16 infoNum = soulItemExpOut.size();
@@ -5060,11 +5272,14 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
          return;
 
     // XXX: 不使用老版本新注册七日活动
-    return; // XXX: 不使用老版本新注册七日活动
+    //return; // XXX: 不使用老版本新注册七日活动
 
 	BinaryReader br(data, hdr.msgHdr.bodyLen);
     UInt8 op = 0;
     br >> op;
+
+    if (op !=6 && op !=7 )
+        return;
 
     switch(op)
     {
@@ -5334,6 +5549,123 @@ void OnMakeStrong( GameMsgHdr& hdr, const void * data )
             return;
             break;
     }
+}
+
+void OnExJob( GameMsgHdr & hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    br >> type;
+    if (type == 0)
+    {
+        player->SetVar(VAR_EX_JOB_ENABLE, 2);
+        return;
+    }
+
+    JobHunter * jobHunter = player->getJobHunter();
+    if (!jobHunter)
+        return;
+    switch (type)
+    {
+        case 1:
+            // 墨家长老页面
+            {
+                if (br.left() == 0)
+                {
+                    // 刷新页面请求
+                    jobHunter->SendFighterList();
+                    return;
+                }
+                UInt16 fighterId = 0;
+                br >> fighterId;
+                jobHunter->OnHireFighter(fighterId);
+            }
+            break;
+        case 2:
+            // 寻墨页面
+            {
+                if (br.left() == 0)
+                {
+                    jobHunter->SendGameInfo(type);
+                    return;
+                }
+                UInt8 val = 0;
+                br >> val;
+                switch (val)
+                {
+                    case 0:
+                        // 放弃寻墨游戏
+                        jobHunter->OnAbort(false);
+                        break;
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                        jobHunter->OnRequestStart(val);
+                        break;
+                    case 5: 
+                        // 老虎机转盘转动
+                        jobHunter->OnUpdateSlot();
+                        break;
+                    default:
+                        break;
+                }
+            }
+            break;
+        case 3:
+            {
+                UInt16 fId = 0;
+                UInt16 tId = 0;
+                UInt8 t = 0;
+                br >> fId;
+                br >> tId;
+                br >> t;
+                Stream st(REP::EXJOB);
+                UInt8 res = 0;
+                res = player->fightTransform(fId, tId, t);
+                st << type << res << Stream::eos;
+                player->send(st);
+            }
+
+            break;
+        default:
+            break;
+    }
+}
+
+void OnJobHunter( GameMsgHdr & hdr, const void * data )
+{
+    MSG_QUERY_PLAYER(player);
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+
+    JobHunter * jobHunter = player->getJobHunter();
+    if (!jobHunter)
+        return;
+
+    UInt8 type = 0;
+    UInt8 val = 0;
+    UInt8 val2 = 0;
+    br >> type;
+    if (br.left())
+        br >> val;
+    if (br.left())
+        br >> val2;
+    jobHunter->OnCommand(type, val, val2);
+}
+
+void OnAutoJobHunter( GameMsgHdr & hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+
+    JobHunter * jobHunter = player->getJobHunter();
+    if (!jobHunter)
+        return;
+
+    UInt8 type = 0;
+    br >> type;
+    jobHunter->OnAutoCommand(type);
 }
 
 

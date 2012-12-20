@@ -18,6 +18,7 @@
 #include "LuckyDraw.h"
 #include "Package.h"
 #include "GObject/Tianjie.h"
+#include "JobHunter.h"
 namespace GObject
 {
 #define PRIVILEGE_COUNT 1
@@ -212,6 +213,7 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
 
     if (!copyCheckLevel(pl, id))
         return 1;
+    UInt32 cf_bind_flag = pl->GetVar(VAR_CF_BIND);
     //diamond privilege
     if(id == 0xff)
     {
@@ -219,12 +221,16 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
             if(pl->GetVar(VAR_DIAMOND_BLUE) < PRIVILEGE_COUNT) {
                 pl->AddVar(VAR_DIAMOND_BLUE, 1);
                 pl->copyUdpLog(id, 5);
+                cf_bind_flag &= 0xF2;
+                pl->SetVar(VAR_CF_BIND, cf_bind_flag);
                 return 0;
             }
         } else if(pl->isYD() && World::getYellowDiamondAct()) {
             if(pl->GetVar(VAR_DIAMOND_YELLOW) < PRIVILEGE_COUNT) {
                 pl->AddVar(VAR_DIAMOND_YELLOW, 1);
                 pl->copyUdpLog(id, 6);
+                cf_bind_flag &= 0xF2;
+                pl->SetVar(VAR_CF_BIND, cf_bind_flag);
                 return 0;
             }
         }
@@ -236,6 +242,8 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
         if(pl->isQQVIP() && World::getQQVipAct()){
             if(pl->GetVar(VAR_QQVIP_CNT) < PRIVILEGE_COUNT){
                 pl->AddVar(VAR_QQVIP_CNT, 1);
+                cf_bind_flag &= 0xF2;
+                pl->SetVar(VAR_CF_BIND, cf_bind_flag);
                 return 0;
             }
         }
@@ -248,6 +256,8 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
         DB1().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = %u, `copyGoldCnt` = %u WHERE `id` = %"I64_FMT"u",
                 PLAYER_DATA(pl, copyFreeCnt), PLAYER_DATA(pl, copyGoldCnt), pl->getId());
         pl->copyUdpLog(id, 1);
+        cf_bind_flag &= 0xF2;
+        pl->SetVar(VAR_CF_BIND, cf_bind_flag);
         return 0;
     } else if (PLAYER_DATA(pl, copyGoldCnt) < getGoldCount(pl->getVipLevel())) {
         UInt32 gold = getEnterGold(pl);
@@ -264,6 +274,9 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
                 PLAYER_DATA(pl, copyFreeCnt), PLAYER_DATA(pl, copyGoldCnt), pl->getId());
         lootlvl = PLAYER_DATA(pl, copyGoldCnt);
         pl->copyUdpLog(id, 3);
+        cf_bind_flag &= 0xF2;
+        cf_bind_flag |= 0x01;
+        pl->SetVar(VAR_CF_BIND, cf_bind_flag);
         return 0;
     } else {
         SYSMSG_SENDV(2000, pl);
@@ -395,7 +408,8 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
 
     pl->OnHeroMemo(MC_SLAYER, MD_ADVANCED, 0, 0);
     std::vector<UInt16> loot;
-    if (pl->attackCopyNpc(fgtid, 1, id, World::_wday==6?2:1, tcd.lootlvl, ato, &loot)) {
+    bool isFull = false;
+    if (pl->attackCopyNpc(fgtid, 1, id, World::_wday==6?2:1, isFull, tcd.lootlvl, ato, &loot)) {
         if (ato)
             pl->checkLastBattled();
         bool nextfloor = false;
@@ -475,16 +489,35 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                 pl->GetPackage()->AddItem(9138, 1, false, false);
             }
             GameAction()->onCopyWin(pl, id, tcd.floor, tcd.spot, tcd.lootlvl);
+            pl->copyFrontWinAward(1);
 
             pl->OnHeroMemo(MC_SLAYER, MD_ADVANCED, 0, 2);
             if (!pl->GetShuoShuo()->getShuoShuo(id-1 + SS_COPY1))
                 pl->OnShuoShuo(id-1 + SS_COPY1);
 
+            if (id == 4 && pl->GetVar(VAR_EX_JOB_ENABLE) == 0)
+            {
+                pl->SetVar(VAR_EX_JOB_ENABLE, 1);
+                Stream st(REP::EXJOB);
+                st << static_cast<UInt8>(0);
+                st << static_cast<UInt8>(1);
+                st << Stream::eos;
+                pl->send(st);
+            }
+
             pl->setContinuousRFAward(3);
 
             TeamCopyPlayerInfo* tcpInfo = pl->getTeamCopyPlayerInfo();
             if(tcpInfo && tcpInfo->getPass(id, 0) == false)
+            {
                 tcpInfo->setPass(id, 0, true, true);
+                if (id >= 4)
+                {
+                    JobHunter * jobHunter = pl->getJobHunter();
+                    if(jobHunter)
+                        jobHunter->SendGameInfo(2);
+                }
+            }
 
             luckyDraw.notifyPass(id);
 
@@ -528,15 +561,26 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                 tcd.floor, tcd.spot, pl->getId(), id);
         return 1;
     } else {
-        if (ato) {
+        if (isFull)
+        {
             Stream st(REP::AUTO_COPY);
-            st << static_cast<UInt8>(2) << id << tcd.floor << tcd.spot << Stream::eos;
+            st << static_cast<UInt8>(5) << Stream::eos;
             pl->send(st);
             autoClear(pl, complete, id, tcd.floor, tcd.spot);
-        } else {
-            Stream st(REP::COPY_INFO);
-            st << static_cast<UInt8>(2) << id << tcd.floor << tcd.spot << Stream::eos;
-            pl->send(st);
+            return 0;
+        }
+        else
+        {
+            if (ato) {
+                Stream st(REP::AUTO_COPY);
+                st << static_cast<UInt8>(2) << id << tcd.floor << tcd.spot << Stream::eos;
+                pl->send(st);
+                autoClear(pl, complete, id, tcd.floor, tcd.spot);
+            } else {
+                Stream st(REP::COPY_INFO);
+                st << static_cast<UInt8>(2) << id << tcd.floor << tcd.spot << Stream::eos;
+                pl->send(st);
+            }
         }
     }
     return 0;

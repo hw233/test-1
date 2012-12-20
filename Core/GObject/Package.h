@@ -187,6 +187,7 @@ namespace GObject
         UInt8 moveEquipSpirit(Fighter*,Fighter*, ItemEquip*, UInt8, ItemEquip*, UInt8);
         UInt8 isCanMove(ItemEquip* fromEquip, ItemEquip* toEquip, UInt8 type);
         UInt8 moveUseMoney(ItemEquip* fromEquip, ItemEquip* toEquip, UInt8 type);
+        UInt8 moveEquipFashion(Fighter*,Fighter*, ItemEquip*, UInt8, ItemEquip*, UInt8);
 
         void setItemBind(UInt32 typeId);
 
@@ -195,6 +196,12 @@ namespace GObject
 		static UInt16 GetNewUsedGrids(UInt32 id, UInt16 num = 1);
 		bool TryAddItem(ItemBase * item, UInt16 num);
 		bool TryDelItem(ItemBase * item, UInt16 num);
+
+    public:
+        bool TryBuyItem(UInt32 typeId, UInt32 num, bool bind = false);
+        bool TryBuyEquip(UInt32 typeId, UInt32 num, bool bind = false);
+
+    private:
 
         void OnAddEquipAndCheckAttainment(const GData::ItemBaseType * itype, UInt8 FromWhere);
 	public:

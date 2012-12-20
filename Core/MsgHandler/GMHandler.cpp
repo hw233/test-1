@@ -134,6 +134,7 @@ GMHandler::GMHandler()
 	Reg(3, "setcountry", &GMHandler::OnSetCountry);
 	Reg(3, "setacu", &GMHandler::OnSetAcu);
 	Reg(3, "useitem", &GMHandler::OnUseItem);
+	Reg(3, "uitem", &GMHandler::OnUseItem);
     Reg(3, "ocupyplace", &GMHandler::OnOcupyPlace);
     Reg(3, "ec", &GMHandler::OnEnterCopy);
     Reg(3, "gmc", &GMHandler::OnGmCheck);
@@ -1158,7 +1159,7 @@ void makeSuper( GObject::Fighter * fgt, UInt8 equipLvl = 100, UInt8 enchant = 8,
 	GObject::ItemEquip * equip;
 	switch(fgt->getClass())
 	{
-	case 1:
+	case e_cls_ru:
 		weapon = static_cast<GObject::ItemWeapon *>(package->AddEquip(itemIdStart[0][idx], false, true));
         if(weapon)
         {
@@ -1214,7 +1215,7 @@ void makeSuper( GObject::Fighter * fgt, UInt8 equipLvl = 100, UInt8 enchant = 8,
             package->EquipTo(equip->getId(), fgt, 0x0a, o);
         }
 		break;
-	case 2:
+	case e_cls_shi:
 		weapon = static_cast<GObject::ItemWeapon *>(package->AddEquip(itemIdStart[1][idx], false, true));
         if(weapon)
         {
@@ -1270,7 +1271,7 @@ void makeSuper( GObject::Fighter * fgt, UInt8 equipLvl = 100, UInt8 enchant = 8,
             package->EquipTo(equip->getId(), fgt, 0x0a, o);
         }
 		break;
-	case 3:
+	case e_cls_dao:
 		weapon = static_cast<GObject::ItemWeapon *>(package->AddEquip(itemIdStart[2][idx], false, true));
 	    if(weapon)
         {
@@ -2799,13 +2800,17 @@ void GMHandler::OnNewRelation(GObject::Player* player, std::vector<std::string>&
 
     if(type == 5)
     {
+        /*
         std::string responderName("70603");
         if(args.size() >= 2)
             responderName = args[1];
         player->GetNewRelation()->challengeRequest(player, responderName);
+        */
+        player->copyFrontWinAward(1);
     }
     else if(type == 6)
     {
+        /*
         std::string senderName("70603");
         if(args.size() >= 2)
             senderName = args[1];
@@ -2813,6 +2818,8 @@ void GMHandler::OnNewRelation(GObject::Player* player, std::vector<std::string>&
         if(args.size() >= 3)
             accept = atoi(args[2].c_str());
         player->GetNewRelation()->challengeRespond(player, senderName, accept);
+        */
+        player->copyFrontWinAward(2);
     }
     else if(type == 7)
     {

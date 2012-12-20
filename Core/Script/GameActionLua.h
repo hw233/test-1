@@ -270,6 +270,15 @@ namespace Script
         UInt8 onGetAthlRandomMaxValue(UInt8 diffculty);
         UInt32 onGetAthlRandomAward(UInt8 diffculty, UInt8 opt);
         UInt8 onGetAthlRandomDiffculty();
+        UInt32 getRandomNormalMonster(UInt8 id);
+        UInt32 getBossMonster(UInt8 id);
+        UInt32 getLengendMonster(UInt8 id, UInt8 val);
+        UInt32 calcGridType(UInt8 prob);
+        lua_tinker::table getTreasure(UInt8 id);
+        UInt32 foundCave(UInt8 id);
+        lua_tinker::table getStepAward(UInt32 step);
+        lua_tinker::table getCopyFrontmapAward(UInt8 step, UInt16 localtion);
+
     public:
 
 		template <typename R>
@@ -329,6 +338,7 @@ namespace Script
         lua_tinker::table openPurpleBoxStrong();
         lua_tinker::table openOrangeBoxStrong();
         UInt8 RunThanksGivingDayAward(Player* player, UInt8 opt);
+        bool onFirstRecharge(Player* player, UInt8 index);
 
 	private:
 		Player* _player1;	//?ű???????Ϊ????1

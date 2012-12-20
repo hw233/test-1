@@ -124,6 +124,14 @@ bool SecondSoul::practiceLevelUp(UInt32& pexp)
     return false;
 }
 
+void SecondSoul::setPracticeLevel(UInt8 lev)
+{
+    m_practiceLevel = lev;
+    setDirty(true);
+    m_fgt->setDirty(true);  
+    DB2().PushUpdateData("UPDATE `second_soul` SET `practiceLevel` = %u WHERE `fighterId` = %u AND `playerId` = %"I64_FMT"u", m_practiceLevel, m_fgt->getId(), m_fgt->getOwner()->getId());
+}
+
 void SecondSoul::decStateExp(UInt32 exp)
 {
     if(m_stateExp == GData::soulExpTable.getLevelMin(m_stateLevel))
@@ -149,6 +157,20 @@ void SecondSoul::addStateExp(UInt32 exp)
     DB2().PushUpdateData("UPDATE `second_soul` SET `stateLevel` = %u, `stateExp` = %u WHERE `fighterId` = %u AND `playerId` = %"I64_FMT"u", m_stateLevel, m_stateExp, m_fgt->getId(), m_fgt->getOwner()->getId());
 }
 
+void SecondSoul::setStateExp(UInt8 lev, UInt32 exp)
+{
+    if (lev == m_stateLevel && exp == m_stateExp)
+        return;
+    m_stateLevel = lev;
+    m_stateExp = exp;
+    if(GData::soulExpTable.testLevelUp(m_stateLevel, m_stateExp))
+    {
+        setDirty(true);
+        m_fgt->setDirty(true);
+        m_fgt->sendMaxSoul();
+    }
+    DB2().PushUpdateData("UPDATE `second_soul` SET `stateLevel` = %u, `stateExp` = %u WHERE `fighterId` = %u AND `playerId` = %"I64_FMT"u", m_stateLevel, m_stateExp, m_fgt->getId(), m_fgt->getOwner()->getId());
+}
 SoulSkill* SecondSoul::getSoulSkill(UInt8 idx)
 {
     int size = m_skills.size();
@@ -323,7 +345,7 @@ void SecondSoul::sendSoulSkill(Player* pl)
 
 bool SecondSoul::setClass(UInt8 cls)
 {
-    if(cls == 0 || cls == m_cls || cls > 12)
+    if(cls == 0 || cls == m_cls || cls > SOUL_CLS_MAX)
     {
         m_fgt->getOwner()->sendMsgCode(0, 1073);
         return false;
@@ -370,7 +392,8 @@ UInt8 SecondSoul::getSoulSkillIdx(UInt16 skillId)
 
 bool SecondSoul::setXinxiu(UInt8 xinxiu)
 {
-    if(xinxiu == 0 || xinxiu == m_xinxiu || xinxiu > 4)
+    //if(xinxiu == 0 || xinxiu == m_xinxiu || xinxiu > 4)
+    if(xinxiu == m_xinxiu || xinxiu > 4)
     {
         m_fgt->getOwner()->sendMsgCode(0, 1079);
         return false;

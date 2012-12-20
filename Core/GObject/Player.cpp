@@ -60,6 +60,7 @@
 #include "GData/ClanLvlTable.h"
 #include "GData/ClanSkillTable.h"
 #include "GData/ClanStatueTable.h"
+#include "GData/ExpTable.h"
 #include "Common/StringTokenizer.h"
 #include "TownDeamon.h"
 #include "ArenaBattle.h"
@@ -72,6 +73,8 @@
 #include <cmath>
 #include "QixiTmpl.h"
 #include "MsgHandler/Memcached.h"
+#include "RechargeTmpl.h"
+#include "GData/ExpTable.h"
 
 #define NTD_ONLINE_TIME (4*60*60)
 #ifndef _DEBUG
@@ -520,6 +523,31 @@ namespace GObject
 		return count == 0;
     }
 
+    bool EventAutoJobHunter::Equal(UInt32 id, size_t playerid) const
+    {
+		return 	id == GetID() && playerid == m_Player->getId();
+    }
+
+    void EventAutoJobHunter::Process(UInt32 leftCount)
+    {
+		GameMsgHdr hdr(0x2A1, m_Player->getThreadId(), m_Player, sizeof(id));
+		GLOBAL().PushMsg(hdr, &id);
+        if (!leftCount)
+			PopTimerEvent(m_Player, EVENT_JOBHUNTER, m_Player->getId());
+    }
+
+    bool EventAutoJobHunter::Accelerate(UInt32 times)
+    {
+		UInt32 count = m_Timer.GetLeftTimes();
+		if(times > count)
+		{
+			times = count;
+		}
+		count -= times;
+		m_Timer.SetLeftTimes(count);
+		return count == 0;
+    }
+
 	void Lineup::updateId()
 	{
 		if(fighter != NULL) fid = fighter->getId(); else fid = 0;
@@ -538,7 +566,7 @@ namespace GObject
 #ifndef _WIN32
 		m_ulog(NULL),
 #endif
-		m_isOffical(false), m_sysDailog(false), m_hasTripod(false)
+		m_isOffical(false), m_sysDailog(false), m_hasTripod(false), _jobHunter(NULL)
 	{
         m_ClanBattleStatus = 1;
         m_ClanBattleScore = 0;
@@ -588,6 +616,9 @@ namespace GObject
             _new_rank = true;
         else
             _new_rank = false;*/
+        memset(cf_posPut, 0, sizeof(cf_posPut));
+        memset(cf_itemId, 0, sizeof(cf_itemId));
+        memset(cf_ratio, 0 ,sizeof(cf_ratio));
 	}
 
 
@@ -1039,6 +1070,9 @@ namespace GObject
         sendLevelPack(GetLev());
         offlineExp(curtime);
 
+        //QQGame登录奖励
+        sendQQGameGift1218();
+
         char buf[64] = {0};
         snprintf(buf, sizeof(buf), "%"I64_FMT"u", _id);
 #ifndef _WIN32
@@ -1085,7 +1119,7 @@ namespace GObject
                 }
             }
         }
-
+        /*
 		if(!_playerData.totalRecharge && !GetVar(VAR_VIPFIRST))
 		{
             SetVar(VAR_VIPFIRST, 1);
@@ -1112,7 +1146,7 @@ namespace GObject
                 DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
             }
 		}
-
+        */
 #ifndef _WIN32
 #ifndef _FB
 #ifndef _VT
@@ -1121,6 +1155,8 @@ namespace GObject
 #endif
 #endif
 #endif // _WIN32
+#ifdef JOB_HUNTER_DEBUG
+#endif
 	}
 
 #define WEBDOWNLOAD 255
@@ -1521,6 +1557,32 @@ namespace GObject
         udpLog("register", action, "", "", "", "", "act", num);
     }
 
+    void Player::transformUdpLog(UInt32 id, UInt32 type, UInt32 money1, UInt32 money2, UInt32 money3, UInt32 money4, UInt8 val1)
+    {
+        // 属性转移udp日志
+        char action[64] = "";
+        if (type & 0x01)
+        {
+            snprintf (action, 64, "F_%d_%d", id, 1);
+            udpLog("transform", action, "", "", "", "", "act", money1);
+        }
+        if (type & 0x02)
+        {
+            snprintf (action, 64, "F_%d_%d_%d", id, 2, val1);
+            udpLog("transform", action, "", "", "", "", "act", money2);
+        }
+        if (type & 0x08)
+        {
+            snprintf (action, 64, "F_%d_%d", id, 8);
+            udpLog("transform", action, "", "", "", "", "act", money3);
+        }
+        if (type & 0x10)
+        {
+            snprintf (action, 64, "F_%d_%d", id, 10);
+            udpLog("transform", action, "", "", "", "", "act", money4);
+        }
+    }
+
     void Player::sendHalloweenOnlineAward(UInt32 now, bool _online)
     {
         _online = false; // XXX: fuck
@@ -1783,7 +1845,8 @@ namespace GObject
                 DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardgot, getId());
             }
         }
-
+        /** deleted by qiwy 2012-12-07 **/
+#if 0
         if (lvl >= 40 && !(_playerData.qqawardgot & 0x08))
         {
             SYSMSG(title, 2114);
@@ -1805,6 +1868,7 @@ namespace GObject
                 DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardgot, getId());
             }
         }
+#endif
     }
 
 	void Player::Reconnect()
@@ -1833,7 +1897,7 @@ namespace GObject
     }
     UInt32  Player::GetOnlineTimeTodaySinceLastLogin(UInt32 now)
     {
-//        UInt32 now  = TimeUtil::Now();
+        //UInt32 now  = TimeUtil::Now();
         UInt32 today = TimeUtil::SharpDayT( 0 , now);
         UInt32 lastOnline = _playerData.lastOnline;
         if( today >= lastOnline)
@@ -1891,7 +1955,7 @@ namespace GObject
         snprintf(online, sizeof(online), "%u", curtime - _playerData.lastOnline);
         udpLog("", "", "", "", "", online, "login");
 
-        UInt8 platform = atoi(getDomain());
+        //UInt8 platform = atoi(getDomain());
         if (cfg.GMCheck )
         {
             struct CrackValue
@@ -1990,7 +2054,7 @@ namespace GObject
         snprintf(online, sizeof(online), "%u", TimeUtil::Now() - _playerData.lastOnline);
         udpLog("", "", "", "", "", online, "login");
 
-        UInt8 platform = atoi(getDomain());
+        //UInt8 platform = atoi(getDomain());
         if (cfg.GMCheck )
         {
             struct CrackValue
@@ -2112,6 +2176,7 @@ namespace GObject
             _lastAthAward.clear();
         }
         sendDeamonAwardsInfo();
+        checkLastExJobAward();
 
 		if(update)
 		{
@@ -2289,6 +2354,7 @@ namespace GObject
 	void Player::updateBattleFighters(bool updatedb)
 	{
 		int c = 0;
+        bool hasMo = false;
 		for(int i = 0; i < 5; ++ i)
 		{
 			Lineup& lup = _playerData.lineup[i];
@@ -2316,6 +2382,15 @@ namespace GObject
 			else
 			{
 				lup.fighter = it->second;
+                if(hasMo && lup.fighter->getClass() == e_cls_mo)
+                {
+                    lup.fighter = NULL;
+                    lup.fid = 0;
+                    lup.pos = 0;
+                    continue;
+                }
+                else if(lup.fighter && lup.fighter->getClass() == e_cls_mo)
+                    hasMo = true;
 				lup.updateId();
 				++ c;
 				if(i > 0 && lup.fid < 10)
@@ -2390,14 +2465,28 @@ namespace GObject
 
     void Player::upInitCitta(Fighter* fgt, bool writedb)
     {
-        static UInt16 cittas[] = {301, 401, 701};
-        UInt16 citta = cittas[fgt->getClass()-1];
-        if (fgt->hasCitta(citta) < 0) {
-            if (fgt->addNewCitta(citta, writedb, true)) {
-                /*
-                if (fgt->upCitta(citta, 0, writedb)) {
+        static UInt16 cittas[4][9] =
+        {
+            {301, 0, 0, 0, 0, 0, 0, 0, 0},
+            {401, 0, 0, 0, 0, 0, 0, 0, 0},
+            {701, 0, 0, 0, 0, 0, 0, 0, 0},
+            {13409, 13709, 13509, 14109, 14209, 14309, 0, 0, 0}
+        };
+        if(fgt->getClass() >= e_cls_max)
+            return;
+        UInt8 clsIdx = fgt->getClass() - 1;
+        for(int i = 0; i < 9; ++ i)
+        {
+            UInt16 citta = cittas[clsIdx][i];
+            if(citta == 0)
+                continue;
+            if (fgt->hasCitta(citta) < 0) {
+                if (fgt->addNewCitta(citta, writedb, true)) {
+                    /*
+                    if (fgt->upCitta(citta, 0, writedb)) {
+                    }
+                    */
                 }
-                */
             }
         }
     }
@@ -2451,7 +2540,17 @@ namespace GObject
         fgt->getAttrType1(true);
         fgt->getAttrType2(true);
         fgt->getAttrType3(true);
-	}
+
+        //if (fgt->getClass() == e_cls_mo)    // XXX: 更新前招募未完全打通穴道
+        if (fgt->getClass() == e_cls_mo && !load)
+        {
+            // 70级，关元穴穴道，60级白虎
+            fgt->addExp(GData::expTable.getLevelMin(70));
+            fgt->openSecondSoul(13);
+            fgt->setSoulLevel(60);
+            fgt->setToAcupoints(11, true);
+        }
+    }
 
     bool Player::addFighterFromItem(UInt32 itemid, UInt32 price)
     {
@@ -3101,6 +3200,11 @@ namespace GObject
 
 	bool Player::attackNpc( UInt32 npcId, UInt32 turns, bool regen, bool needtype)
 	{
+        if (GetPackage()->GetRestPackageSize() <= 0)
+        {
+            sendMsgCode(0, 1011);
+            return false;
+        }
 		UInt32 now = TimeUtil::Now();
 		UInt32 buffLeft = getBuffData(PLAYER_BUFF_ATTACKING, now);
 		if(buffLeft > now)
@@ -3314,12 +3418,19 @@ namespace GObject
 
     bool Player::attackRareAnimal(UInt32 id)
     {
-        return attackCopyNpc(id, 1/*XXX:使用这个背景*/, 5, 1, 1, false, NULL, false);
+        bool isFull = false;
+        return attackCopyNpc(id, 1/*XXX:使用这个背景*/, 5, 1, isFull, 1, false, NULL, false);
     }
 
 	bool Player::attackCopyNpc( UInt32 npcId, UInt8 type, UInt8 copyId,
-            UInt8 expfactor, UInt8 lootlvl, bool ato, std::vector<UInt16>* loot, bool applayhp )
+            UInt8 expfactor, bool& full, UInt8 lootlvl, bool ato, std::vector<UInt16>* loot, bool applayhp )
 	{
+        if (GetPackage()->GetRestPackageSize() == 0)
+        {
+            sendMsgCode(0, 1011);
+            full = true;
+            return false;
+        }
 		UInt32 now = TimeUtil::Now();
 		UInt32 buffLeft = getBuffData(PLAYER_BUFF_ATTACKING, now);
 		if(cfg.GMCheck && buffLeft > now && !ato)
@@ -3406,6 +3517,11 @@ namespace GObject
 
 	bool Player::autoBattle( UInt32 npcId )
 	{
+        if (GetPackage()->GetRestPackageSize() == 0)
+        {
+            sendMsgCode(0, 1011);
+            return false;
+        }
 		GData::NpcGroups::iterator it = GData::npcGroups.find(npcId);
 		if(it == GData::npcGroups.end())
 			return false;
@@ -3576,6 +3692,8 @@ namespace GObject
 			{
 				Battle::BattleFighter * bf = bsim.newFighter(side, lup.pos, lup.fighter);
 				bf->setHP(fullhp ? 0 : lup.fighter->getCurrentHP());
+                if (lup.fighter->getClass() == 4)
+                    OnShuoShuo(SS_MO_BATTLE);
 			}
 			else if(i == 0 && !_fighters.empty())
 			{
@@ -4068,6 +4186,16 @@ namespace GObject
             snprintf(gold, sizeof(gold), "%u", c);
             udpLog("sale", gold, "", "", "", "", "currency");
         }
+
+#ifndef _WIN32
+#ifdef _FB
+#else
+        if (ii)
+            dclogger.gold_sec(this, c, ii->incommingType, true);
+        else
+            dclogger.gold_sec(this, c, 0, true);
+#endif
+#endif
 		return _playerData.gold;
 	}
 
@@ -4104,12 +4232,33 @@ namespace GObject
 #ifdef _FB
 #else
         dclogger.consume(this, _playerData.gold, c);
+        if (ci)
+            dclogger.gold_sec(this, c, ci->purchaseType, false);
+        else
+            dclogger.gold_sec(this, c, 0, false);
+
 #endif
 #endif // _WIN32
         if(ci && ci->purchaseType != TrainFighter)
             AddVar(VAR_USEGOLD_CNT, c);
         return _playerData.gold;
 	}
+
+    void Player::deleteGold(UInt32 c)
+    {
+        UInt32 n = _playerData.gold;
+        if( c > _playerData.gold || c == 0)
+        {
+            _playerData.gold = 0;
+        }
+		else
+		{
+		    _playerData.gold -= c;
+            n = c;
+        }
+        sendModification(1, _playerData.gold);
+        udpLog("clear", "F_1158", "", "", "", "", "act", n);
+    }
 
     UInt32 Player::useGold4LuckDraw(UInt32 c)
     {
@@ -4141,10 +4290,20 @@ namespace GObject
                 _playerData.gold -= _holdGold;
 				sendModification(1, _playerData.gold);
 
+#ifndef _WIN32
+#ifdef _FB
+#else
+                if (ci)
+                    dclogger.gold_sec(this, c, ci->purchaseType, false);
+                else
+                    dclogger.gold_sec(this, c, 0, false);
+#endif
+#endif
+
                 if(ci!=NULL)
                 {
                     DBLOG1().PushUpdateData("insert into consume_gold (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
-                        cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, c, TimeUtil::Now());
+                            cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, c, TimeUtil::Now());
                 }
 
                 if (ci && ci->purchaseType == PurchaseSale)
@@ -4200,6 +4359,12 @@ namespace GObject
 		if(c == 0)
 			return _playerData.coupon;
 		_playerData.coupon += c;
+#ifndef _WIN32
+#ifdef _FB
+#else
+        dclogger.coupon_sec(this, c, 0, true);
+#endif
+#endif
 		SYSMSG_SENDV(155, this, c);
 		SYSMSG_SENDV(1055, this, c);
 		sendModification(2, _playerData.coupon);
@@ -4220,6 +4385,15 @@ namespace GObject
 				DBLOG1().PushUpdateData("insert into consume_coupon (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
 					cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, c, TimeUtil::Now());
             }
+#ifndef _WIN32
+#ifdef _FB
+#else
+            if (ci)
+                dclogger.coupon_sec(this, c, ci->purchaseType, false);
+            else
+                dclogger.coupon_sec(this, c, 0, false);
+#endif
+#endif
         }
 		SYSMSG_SENDV(156, this, c);
 		SYSMSG_SENDV(1056, this, c);
@@ -4271,6 +4445,12 @@ namespace GObject
 		{
 			_playerData.tael += c;
 			sendModification(3, _playerData.tael);
+#ifndef _WIN32
+#ifdef _FB
+#else
+        dclogger.tael_sec(this, c, 0, true);
+#endif
+#endif
 		}
 		return _playerData.tael;
 	}
@@ -4290,9 +4470,18 @@ namespace GObject
 				DBLOG1().PushUpdateData("insert into %s (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",tbn.c_str(), cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, c, TimeUtil::Now());
 			}
 			_playerData.tael -= c;
-		}
-		SYSMSG_SENDV(152, this, c);
-		SYSMSG_SENDV(1052, this, c);
+#ifndef _WIN32
+#ifdef _FB
+#else
+            if (ci)
+                dclogger.tael_sec(this, c, ci->purchaseType, false);
+            else
+                dclogger.tael_sec(this, c, 0, false);
+#endif
+#endif
+        }
+        SYSMSG_SENDV(152, this, c);
+        SYSMSG_SENDV(1052, this, c);
 		sendModification(3, _playerData.tael);
         if(ci && ci->purchaseType != TrainFighter)
         {
@@ -4306,6 +4495,7 @@ namespace GObject
         }
 		return _playerData.tael;
 	}
+
 	void Player::useTael2(UInt32 c, Player *attacker, ConsumeInfo * ci)//nature challengge use
 	{
 		if(c == 0 || _playerData.tael == 0)
@@ -4322,11 +4512,20 @@ namespace GObject
 					tbn.c_str(),cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, c, TimeUtil::Now());
 			}
 			_playerData.tael -= c;
-		}
-		SYSMSG_SENDV(152, this, c);
-		//SYSMSG_SENDV(1060, this, attacker->getCountry(), attacker->getName().c_str(), c);
-		sendModification(3, _playerData.tael);
-	}
+#ifndef _WIN32
+#ifdef _FB
+#else
+            if (ci)
+                dclogger.tael_sec(this, c, ci->purchaseType, false);
+            else
+                dclogger.tael_sec(this, c, 0, false);
+#endif
+#endif
+        }
+        SYSMSG_SENDV(152, this, c);
+        //SYSMSG_SENDV(1060, this, attacker->getCountry(), attacker->getName().c_str(), c);
+        sendModification(3, _playerData.tael);
+    }
 
     UInt32 Player::getMoneyArenaLua(UInt32 c)
     {
@@ -4334,8 +4533,8 @@ namespace GObject
         return getMoneyArena(c, &ii);
     }
 
-	UInt32 Player::getMoneyArena( UInt32 c, IncommingInfo* ii)
-	{
+    UInt32 Player::getMoneyArena( UInt32 c, IncommingInfo* ii)
+    {
         UInt32 moneyArena = GetVar(VAR_MONEY_ARENA);
 		if(c == 0)
 			return moneyArena;
@@ -5210,8 +5409,7 @@ namespace GObject
 			{
 				exp /= 2;
 				SYSMSG_SENDV(181, this);
-				SYSMSG_SENDV(1081, this);
-			}
+				SYSMSG_SENDV(1081, this); }
 		}
 		for(int i = 0; i < 5; ++ i)
 		{
@@ -5297,6 +5495,9 @@ namespace GObject
         {
             ClanCopyMgr::Instance().playerLeave(this);
         }
+
+        if (_jobHunter)
+            _jobHunter->OnLeaveGame(_playerData.location);
 
         if(hasFlag(InCopyTeam))
             teamCopyManager->leaveTeamCopy(this);
@@ -5913,7 +6114,6 @@ namespace GObject
         // GM命令设置帮派副本每轮时间
         ClanCopyMgr::Instance().setInterval(time);
     }
-
 
 
     // 帮派副本
@@ -6653,7 +6853,8 @@ namespace GObject
 			Lineup& lu1 = _playerData.lineup[0];
             if (!lu1.fighter)
                 return;
-			bool mfSolid = lu1.fighter->getClass() == 3;
+            // 道默认站前排
+			bool mfSolid = lu1.fighter->getClass() == e_cls_dao;
 			if(mfSolid)
 				lu1.pos = newPos[starti ++];
 			for(int i = 1; i < 5; ++ i)
@@ -6663,7 +6864,7 @@ namespace GObject
 					continue;
                 if (!lu.fighter)
                     continue;
-				if(lu.fighter->getClass() == 3)
+				if(lu.fighter->getClass() == e_cls_dao)
 					lu.pos = newPos[starti ++];
 				else
 					lu.pos = newPos[endi --];
@@ -7071,7 +7272,7 @@ namespace GObject
         addRC7DayRecharge(r);
         addRF7DayRecharge(r);
         addRechargeNextRet(r);
-
+        
         if (World::getRechargeActive())
         {
             UInt32 total = GetVar(VAR_RECHARGE_TOTAL);
@@ -7127,6 +7328,15 @@ namespace GObject
 #endif
 
         sendTripodInfo();
+
+        if(World::getRechargeActive())
+        {
+            GObject::RechargeTmpl::instance().addScore(this, GetVar(VAR_RECHARGE_TOTAL)-r, GetVar(VAR_RECHARGE_TOTAL));
+            GObject::RechargeTmpl::instance().sendScoreInfo(this);
+        }
+
+        AddVar(VAR_FIRST_RECHARGE_VALUE, r);
+        sendFirstRecharge();
 	}
 
     void Player::addRechargeNextRet(UInt32 r)
@@ -7248,10 +7458,11 @@ namespace GObject
             total = GetVar(VAR_RECHARGE_TOTAL);
         else
             total = GetVar(VAR_RECHARGE_TOTAL3366);
-		Stream st(REP::DAILY_DATA);
-		st << static_cast<UInt8>(12) << total << Stream::eos;
-		send((st));
 
+        Stream st(REP::DAILY_DATA);
+        st << static_cast<UInt8>(12) << total << Stream::eos;
+        send((st));
+           
         if (rank && World::getNeedRechargeRank())
         {
             GameMsgHdr hdr(0x1C1, WORKER_THREAD_WORLD, this, sizeof(total));
@@ -7839,8 +8050,10 @@ namespace GObject
                     float decp = fgt->getPotential() - 0.01f;
                     if (decp < static_cast<float>(GObjectManager::getMinPotential())/100)
                         decp = static_cast<float>(GObjectManager::getMinPotential())/100;
+                    /*
                     if (decp < fgt_orig->getPotential())
                         decp = fgt_orig->getPotential();
+                    */
                     fgt->setPotential(decp);
                 }
                 else
@@ -7848,8 +8061,10 @@ namespace GObject
                     float decp = fgt->getCapacity() - 0.1f;
                     if (decp < static_cast<float>(GObjectManager::getMinCapacity())/100)
                         decp = static_cast<float>(GObjectManager::getMinCapacity())/100;
+                    /*
                     if (decp < fgt_orig->getCapacity())
                         decp = fgt_orig->getCapacity();
+                    */
                     fgt->setCapacity(decp);
                 }
 			}
@@ -10224,7 +10439,7 @@ namespace GObject
             GetPackage()->Add(509, 1, true);
             GetPackage()->Add(50, 1, true);
             GetPackage()->Add(49, 1, true);
-            GetPackage()->Add(1526, 1, true);
+            GetPackage()->Add(133, 1, true);
             GetPackage()->Add(500, 1, true);
             GetPackage()->Add(56, 1, true);
             SetVar(VAR_AWARD_SSTOOLBAR, 1);
@@ -10543,6 +10758,8 @@ namespace GObject
 
     void Player::getThanksGivingDay(UInt8 opt)
     {
+        if(!World::getThanksgiving())
+            return;
         if(opt == 0) //免费领取
         {
             if(GetVar(VAR_TGDT) & 0x01)
@@ -10552,18 +10769,18 @@ namespace GObject
                 UInt32 var = GetVar(VAR_TGDT) | 0x01;
                 SetVar(VAR_TGDT, var);
                 Stream st(REP::GETAWARD);
-                st << static_cast<UInt8>(15) << static_cast<UInt8>(0) << Stream::eos;
+                st << static_cast<UInt8>(15) << static_cast<UInt8>(4) << Stream::eos;
                 send(st);
                 udpLog("huodong", "F_10000_15", "", "", "", "", "act");
             }
         }
-        if(opt == 1) //付费领取(20仙石)
+        if(opt == 1) //付费领取(30仙石)
         {
             if(!hasChecked())
                 return;
             if(GetVar(VAR_TGDT) & 0x02)
                 return;
-			if (getGold() < 20)
+			if (getGold() < 30)
 			{
 				sendMsgCode(0, 1104);
 				return;
@@ -10573,11 +10790,17 @@ namespace GObject
                 UInt32 var = GetVar(VAR_TGDT) | 0x02;
                 SetVar(VAR_TGDT, var);
                 ConsumeInfo ci(ThanksGivingDay, 0, 0);
-                useGold(20, &ci);
+                useGold(30, &ci);
                 Stream st(REP::GETAWARD);
-                st << static_cast<UInt8>(15) << static_cast<UInt8>(1) << Stream::eos;
+                st << static_cast<UInt8>(15) << static_cast<UInt8>(5) << Stream::eos;
                 send(st);
             }
+        }
+        if(opt == 2) //告诉客户端领取情况
+        {
+            Stream st(REP::GETAWARD);
+            st << static_cast<UInt8>(15) << static_cast<UInt8>(GetVar(VAR_TGDT)) << Stream::eos;
+            send(st);
         }
     }
 
@@ -10921,6 +11144,22 @@ namespace GObject
         _lastKillMonsterAward.push_back(lt);
     }
 
+    void Player::lastExJobAwardPush(UInt16 itemId, UInt16 num)
+    {
+        GData::LootResult lt = {itemId, num};
+        _lastExJobAward.push_back(lt);
+    }
+
+    void Player::checkLastExJobAward()
+    {
+        std::vector<GData::LootResult>::iterator it;
+        for(it = _lastExJobAward.begin(); it != _lastExJobAward.end(); ++ it)
+        {
+            m_Package->ItemNotify(it->id, it->count);
+        }
+        _lastExJobAward.clear();
+    }
+
     void Player::lastNew7DayTargetAwardPush(UInt16 itemId, UInt16 num)
     {
         GData::LootResult lt = {itemId, num};
@@ -11254,7 +11493,7 @@ namespace GObject
         MailPackage::MailItem item4[4] = {{MailPackage::Coupon,30},{509, 1}, {507, 1},{511,3}};
         MailPackage::MailItem item5[5] = {{MailPackage::Coupon,40},{509, 1}, {507, 1},{5025,1},{512,4}};
         MailPackage::MailItem item6[5] = {{MailPackage::Coupon,40},{509, 1}, {507, 1},{514,5},{515,2}};
-        MailPackage::MailItem item7[6] = {{MailPackage::Coupon,50},{509, 1}, {507, 1},{517,5},{1528,2},{15,5}};
+        MailPackage::MailItem item7[6] = {{MailPackage::Coupon,50},{509, 1}, {507, 1},{517,5},{134,2},{15,5}};
         UInt16 size[7] = {3,4,4,4,5,5,6};
 
         MailPackage::MailItem* item[7] = {item1,item2,item3,item4,item5,item6,item7};
@@ -11782,10 +12021,12 @@ namespace GObject
     {
 #ifdef _FB
 #else
+        /** deleted by qiwy 2012-12-07 **/
+#if 0
         SYSMSG(title, 2335);
         SYSMSG(content, 2336);
         GetMailBox()->newMail(NULL, 0x12, title, content);
-
+#endif
 
         MailPackage::MailItem item[5] = {{9161, 1}, {9162, 1}, {9164, 1}, {9165, 1}, {9166, 1}};
         sendMailItem(4028, 4028, item, 5);
@@ -12022,7 +12263,7 @@ namespace GObject
 
         static UInt16 items[3][4] = {
             {515,509,507,47},
-            {503,1325,1528,516},
+            {503,1325,134,516},
             {8000,551,517,500},
         };
 
@@ -12968,6 +13209,31 @@ namespace GObject
             }
             return;
         }
+        if (type == 3)
+        {
+            if (GetVar(VAR_JOYVIP_BUFF_GOT) == 0)
+            {
+                addBuffData(PLAYER_BUFF_JOYBUFF, 3600);
+                SetVar(VAR_JOYVIP_BUFF_GOT, 1);
+                sendYBBufInfo(GetVar(VAR_YBBUF), GetVar(VAR_QQVIP_BUF), 1);
+            }
+        }
+        if ( type == 4)
+        {
+            if (getBuffData(PLAYER_BUFF_JOYBUFF, TimeUtil::Now()) >= TimeUtil::Now() + 99*3600)
+                return;
+
+            if (getGold() >= 5)
+            {
+                ConsumeInfo ci(BUYJOYBUFF,0,0);
+                useGold(5, &ci);
+                addBuffData(PLAYER_BUFF_JOYBUFF, 3600);
+                sendYBBufInfo(GetVar(VAR_YBBUF), GetVar(VAR_QQVIP_BUF), GetVar(VAR_JOYVIP_BUFF_GOT)+0x02);
+              //pl->udpLog("tianjie", "F_1108_1", "", "", "", "", "act");
+            }
+            else
+                sendYBBufInfo(GetVar(VAR_YBBUF), GetVar(VAR_QQVIP_BUF), GetVar(VAR_JOYVIP_BUFF_GOT)+0x00); 
+        }
 
         if((this->isBD() && World::getBlueDiamondAct()) || (this->isYD() && World::getYellowDiamondAct()))
         {
@@ -13004,11 +13270,14 @@ namespace GObject
         }
     }
 
-    void Player::sendYBBufInfo(UInt32 ybbuf, UInt32 qqvipbuf)
+    void Player::sendYBBufInfo(UInt32 ybbuf, UInt32 qqvipbuf, UInt8 joy)
     {
         Stream st(REP::YBBUF);
         UInt8 qqbuf = qqvipbuf ? true : false;
-        st << static_cast<UInt8>((ybbuf >> 16) & 0xFFFF) << static_cast<UInt8>(ybbuf & 0xFFFF) << qqbuf << Stream::eos;
+        //st << static_cast<UInt8>((ybbuf >> 16) & 0xFFFF) << static_cast<UInt8>(ybbuf & 0xFFFF) << qqbuf << Stream::eos;
+        if (joy == 0)
+            joy = GetVar(VAR_JOYVIP_BUFF_GOT);
+        st << static_cast<UInt8>((ybbuf >> 16) & 0xFFFF) << static_cast<UInt8>(ybbuf & 0xFFFF) << qqbuf << joy << Stream::eos;
         send(st);
     }
 
@@ -13229,17 +13498,29 @@ namespace GObject
             return -103;
         }
 
-        if (GetPackage()->GetRestPackageSize() < (itemId+ibt->maxQuantity)/ibt->maxQuantity)
+        if (GetPackage()->GetRestPackageSize() < (num+ibt->maxQuantity)/ibt->maxQuantity)
         {
             err = "背包空间不足";
             return -104;
         }
 
-		ConsumeInfo ci(IDIPBuyItem,itemId,num);
-        useGold(price, &ci);
-
-        GetPackage()->Add(itemId, num, bind);
         err = "购买成功";
+
+        struct IDIPBuyItemInfo
+        {
+            UInt32 itemId;
+            UInt32 num;
+            UInt32 bind;
+            UInt32 price;
+        };
+        IDIPBuyItemInfo ibi;
+        ibi.itemId = itemId;
+        ibi.num = num;
+        ibi.bind = bind;
+        ibi.price = price;
+        GameMsgHdr hdr1(0x268, getThreadId(), this, sizeof(ibi));
+        GLOBAL().PushMsg(hdr1, &ibi);
+
         return 0;
     }
 
@@ -13295,7 +13576,7 @@ namespace GObject
 
                 st << fgt->getSoulExtraAura();
                 st << fgt->getSoulAuraLeft();
-                st << fgt->getBattlePortrait();
+                st << fgt->getPortrait();
                 fgt->appendElixirAttr2(st);
             }
         }
@@ -13800,42 +14081,42 @@ namespace GObject
    }
    void Player::getTjTask1Data(Stream& st, bool isRefresh)
    {
-       if (isRefresh || GetVar(VAR_TJ_TASK1_NUMBER) == 0) //今日还没做任务
-       {
-           for (int i = 0; i < 3; ++i)
-           {
-               if (_playerData.tjEvent1[i] == 0)
-               {
-                   GObject::Tianjie::instance().randomTask1Data(GetLev(),_playerData.tjEvent1[i], _playerData.tjColor1[i], _playerData.tjExp1[i]);
-               }
-           }
-       }
-       UInt8 type = 0;
-       int value[3] = {0};
-       value[0] = _playerData.tjExp1[0];
-       value[1] = _playerData.tjExp1[1];
-       value[2] = _playerData.tjExp1[2];
-       for (int i = 0; i < 3; ++i)
-       {
-           GData::NpcGroups::iterator it = GData::npcGroups.find(_playerData.tjEvent1[i]);
-           if(it != GData::npcGroups.end())
-           {
-               GData::NpcGroup * ng = it->second;
-               value[i] +=  TIANJIE_EXP(GetLev()) * ng->getExp();
-           }
-       }
-       if (GObject::Tianjie::instance().isPlayerInTj(GetLev()))
-       {
-           type = 1;
-           value[0] = value[0] * 2 / TIANJIE_EXP(GetLev()) + s_task1ColorScore[_playerData.tjColor1[0]];
-           value[1] = value[1] * 2 / TIANJIE_EXP(GetLev()) + s_task1ColorScore[_playerData.tjColor1[1]];
-           value[2] = value[2] * 2 / TIANJIE_EXP(GetLev()) + s_task1ColorScore[_playerData.tjColor1[2]];
-       }
-       UInt8 num1 = 5-GetVar(VAR_TJ_TASK1_NUMBER);
-       st << num1 << type;
-       st << _playerData.tjEvent1[0] << _playerData.tjColor1[0] << value[0];
-       st << _playerData.tjEvent1[1] << _playerData.tjColor1[1] << value[1];
-       st << _playerData.tjEvent1[2] << _playerData.tjColor1[2] << value[2];
+        if (isRefresh || GetVar(VAR_TJ_TASK1_NUMBER) == 0) //今日还没做任务
+        {
+            for (int i = 0; i < 3; ++i)
+            {
+                if (_playerData.tjEvent1[i] == 0)
+                {
+                    GObject::Tianjie::instance().randomTask1Data(GetLev(),_playerData.tjEvent1[i], _playerData.tjColor1[i], _playerData.tjExp1[i]);
+                }
+            }
+        }
+        UInt8 type = 0;
+        int value[3] = {0};
+        value[0] = _playerData.tjExp1[0];
+        value[1] = _playerData.tjExp1[1];
+        value[2] = _playerData.tjExp1[2];
+        for (int i = 0; i < 3; ++i)
+        {
+            GData::NpcGroups::iterator it = GData::npcGroups.find(_playerData.tjEvent1[i]);
+            if(it != GData::npcGroups.end())
+            {
+		        GData::NpcGroup * ng = it->second;
+                value[i] +=  TIANJIE_EXP(GetLev()) * ng->getExp();
+            }
+        }
+        if (GObject::Tianjie::instance().isPlayerInTj(GetLev()))
+        {
+            type = 1;
+            value[0] = value[0] * 2 / TIANJIE_EXP(GetLev()) + s_task1ColorScore[_playerData.tjColor1[0]];
+            value[1] = value[1] * 2 / TIANJIE_EXP(GetLev()) + s_task1ColorScore[_playerData.tjColor1[1]];
+            value[2] = value[2] * 2 / TIANJIE_EXP(GetLev()) + s_task1ColorScore[_playerData.tjColor1[2]];
+        }
+        UInt8 num1 = 5-GetVar(VAR_TJ_TASK1_NUMBER);
+        st << num1 << type;
+        st << _playerData.tjEvent1[0] << _playerData.tjColor1[0] << value[0];
+        st << _playerData.tjEvent1[1] << _playerData.tjColor1[1] << value[1];
+        st << _playerData.tjEvent1[2] << _playerData.tjColor1[2] << value[2];
 
    }
    void Player::getTjTask2Data(Stream& st)
@@ -14040,11 +14321,41 @@ namespace GObject
        udpLog("tianjie", "F_1115", "", "", "", "", "act");
    }
    
-   void Player::setOpenId(const std::string& openid)
+   void Player::setOpenId(const std::string& openid, bool load /* = false */)
    {
        strncpy(m_openid, openid.c_str(), 256);
-       DB1().PushUpdateData("UPDATE `player` SET `openid` = '%s' WHERE `id` = %"I64_FMT"u", m_openid, getId());
+       if (!load)
+       {
+           DB1().PushUpdateData("UPDATE `player` SET `openid` = '%s' WHERE `id` = %"I64_FMT"u", m_openid, getId());
+       }
    }
+
+   JobHunter* Player::getJobHunter()
+   {
+       if (GetVar(VAR_EX_JOB_ENABLE) < 2)
+           return NULL;
+       if (!_jobHunter)
+       {
+           _jobHunter = new JobHunter(this);
+       }
+       return _jobHunter;
+   }
+
+   void Player::setJobHunter(std::string& fighterList, std::string& mapInfo, UInt8 progress,
+           UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY, UInt32 stepCount)
+   {
+       if (_jobHunter)
+           return;
+       _jobHunter = new JobHunter(this, fighterList, mapInfo, progress, posX, posY, earlyPosX, earlyPosY, stepCount);
+   }
+
+   void Player::sendAutoJobHunter()
+   {
+       if (!getJobHunter())
+           return;
+       _jobHunter->SendAutoInfo();
+   }
+
 
 EventTlzAuto::EventTlzAuto( Player * player, UInt32 interval, UInt32 count)
 	: EventBase(player, interval, count)
@@ -14348,6 +14659,14 @@ void EventTlzAuto::notify(bool isBeginAuto)
                     return 1;
                 }
                 break;
+            case 2:
+                {
+                    ItemBase* ib = GetPackage()->GetItem(9273, true);
+                    if (!ib)
+                        return 0;
+                    return 1;
+                }
+                break;
             default:
                 break;
         }
@@ -14532,7 +14851,309 @@ void EventTlzAuto::notify(bool isBeginAuto)
 
         DB1().PushUpdateData("UPDATE `player` SET `titleAll` = '%s' WHERE `id` = %"I64_FMT"u", title.c_str(), getId());
     }
+    UInt8 Player::fightTransform(UInt16 fFighterId, UInt16 tFighterId, UInt8 type)
+    {
+        UInt8 res = 0;
+        Fighter * fFgt = findFighter(fFighterId);
+        Fighter * tFgt = findFighter(tFighterId);
+        if (NULL == fFgt || NULL == tFgt)
+            return 1;
+        if (isMainFighter(fFighterId) || isMainFighter(tFighterId))
+            return 2;
+        if (fFgt->getLevel() < 70 || tFgt->getLevel() < 70)
+            return 3;
+        res = canTransform(fFgt, tFgt, type);
+        if (res > 0 )
+            return res;
+        if ((res = transformUseMoney(fFgt, tFgt, type)) > 0)
+            return res;
 
+        if (type & 0x01)
+            res = transformExp(fFgt, tFgt);
+        if ((type & 0x02) && res==0)
+            transformPotential(fFgt, tFgt);
+        //if ((type & 0x04) && res==0)
+        //    transformCapacity(fFgt, tFgt);
+        if ((type & 0x08) && res==0)
+            res = transformSoul(fFgt, tFgt);
+        if ((type & 0x10) && res==0)
+            transformElixir(fFgt, tFgt);
+
+        return res;
+    }
+    UInt8 Player::canTransform(Fighter * fFgt, Fighter * tFgt, UInt8 type)
+    {
+    //    if ((type & 0x01) && (tFgt->getLevel() >= GetLev()))
+    //            return 4;
+        if ((type & 0x02 || type & 0x04) && GetPackage()->GetRestPackageSize() < 1)
+            return 5;
+        if ((type & 0x08) && (fFgt->getSecondSoul() == NULL || tFgt->getSecondSoul() == NULL))
+            return 6;
+        return 0;
+    }
+
+    UInt8 Player::transformUseMoney(Fighter * fFgt, Fighter * tFgt, UInt8 type)
+    {
+        UInt32 money = 0;
+        UInt32 money1 = 0;
+        UInt32 money2 = 0;
+        UInt32 money3 = 0;
+        UInt32 money4 = 0;
+        UInt8 val1 = 0;
+        if (type & 0x01)
+        {
+             money += 10;
+             money1 += 10;
+        }
+        if (type & 0x02)
+        {
+            float p = std::max(fFgt->getPotential(), tFgt->getPotential());
+            if (p >= 1.80f)
+            {
+                money += 100;
+                money2 += 100;
+                val1 = 4;
+            }
+            else if (p >= 1.50f)
+            {
+                money += 60;
+                money2 += 60;
+                val1 = 3;
+            }
+            else if (p >= 1.20f)
+            {
+                money += 30;
+                money2 += 30;
+                val1 = 2;
+            }
+            else
+            {
+                money += 10;
+                money2 += 10;
+                val1 = 1;
+            }
+
+            float c = std::max(fFgt->getCapacity(),tFgt->getCapacity());
+            if (c >= 9.0f)
+            {
+                money += 100;
+                money2 += 100;
+            }
+            else if (c >= 8.0f)
+            {
+                money += 60;
+                money2 += 60;
+            }
+            else if (c >= 7.0f)
+            {
+                money += 30;
+                money2 += 30;
+            }
+            else
+            {
+                money += 10;
+                money2 += 10;
+            }
+        }
+        if (type & 0x08)
+        {
+
+            SecondSoul* fSoul = fFgt->getSecondSoul();
+            SecondSoul* tSoul = tFgt->getSecondSoul();
+            //元神境界
+            UInt8 f = fSoul->getStateLevel();
+            UInt8 t = tSoul->getStateLevel();
+            //元神等级
+            UInt8 fPracLev = fSoul->getPracticeLevel();
+            UInt8 tPracLev = tSoul->getPracticeLevel();
+            //星宿
+            UInt8 fXinxiu = fSoul->getXinxiu();
+            UInt8 tXinxiu = tSoul->getXinxiu();
+            money += (std::max(f,t) * 10);
+            money += abs(int(fPracLev-tPracLev))*1;
+            money3 += (std::max(f,t) * 10);
+            money3 += abs(int(fPracLev-tPracLev))*1;
+            if (fXinxiu != tXinxiu)
+            {
+                money += 50;
+                money3 += 50;
+            }
+        }
+        if (type & 0x10)
+        {
+            for (UInt8 i = 0; i < 14; ++i)
+            {
+                Int32 f = fFgt->getElixirAttrByOffset(i);
+                Int32 t = tFgt->getElixirAttrByOffset(i);
+                money += abs(int(f-t))*1;
+                money4 += abs(int(f-t))*1;
+            }
+        }
+        //34是测试区
+        if(getGold() < money && cfg.serverNum != 34)
+	    {
+            sendMsgCode(0, 1101);
+            return 10;
+        }
+        if (money > 0 && cfg.serverNum != 34)
+        {
+            ConsumeInfo ci(FightTransform,0,0);
+            useGold(money, &ci);
+        }
+
+        transformUdpLog(1164, type, money1, money2, money3, money4, val1);
+        
+        return 0;
+    }
+
+    UInt8 Player::transformExp(Fighter * fFgt, Fighter * tFgt)
+    {
+     //   UInt64 exp_70 = GData::expTable.getLevelMin(70);
+     //   UInt64 exp_add = fFgt->getExp() - exp_70;
+     //   tFgt->addExp(exp_add);
+        UInt64 fExp = fFgt->getExp();
+        UInt64 tExp = tFgt->getExp();
+        UInt8 fLev = fFgt->getLevel();
+        UInt8 tLev = tFgt->getLevel();
+        fFgt->setLevelAndExp(tLev, tExp);
+        tFgt->setLevelAndExp(fLev, fExp);
+        return 0;
+    }
+    //潜力和资质,天赋
+    UInt8 Player::transformPotential(Fighter * fFgt, Fighter * tFgt)
+    {
+        //天赋对换
+        UInt8 fAttrType1 = fFgt->getAttrType1();
+        UInt8 fAttrType2 = fFgt->getAttrType2();
+        UInt8 fAttrType3 = fFgt->getAttrType3();
+        UInt8 tAttrType1 = tFgt->getAttrType1();
+        UInt8 tAttrType2 = tFgt->getAttrType2();
+        UInt8 tAttrType3 = tFgt->getAttrType3();
+
+        UInt16 fAttrValue1 = fFgt->getAttrValue1();
+        UInt16 fAttrValue2 = fFgt->getAttrValue2();
+        UInt16 fAttrValue3 = fFgt->getAttrValue3();
+        UInt16 tAttrValue1 = tFgt->getAttrValue1();
+        UInt16 tAttrValue2 = tFgt->getAttrValue2();
+        UInt16 tAttrValue3 = tFgt->getAttrValue3();
+
+        fFgt->setAttrType1(tAttrType1);
+        fFgt->setAttrType2(tAttrType2, true);
+        fFgt->setAttrType3(tAttrType3, true);
+        fFgt->setAttrValue1(tAttrValue1);
+        fFgt->setAttrValue2(tAttrValue2, true);
+        fFgt->setAttrValue3(tAttrValue3, true);
+
+        tFgt->setAttrType1(fAttrType1);
+        tFgt->setAttrType2(fAttrType2, true);
+        tFgt->setAttrType3(fAttrType3, true);
+        tFgt->setAttrValue1(fAttrValue1);
+        tFgt->setAttrValue2(fAttrValue2, true);
+        tFgt->setAttrValue3(fAttrValue3, true);
+
+        float fp = fFgt->getPotential();
+        float tp = tFgt->getPotential();
+        float fc = fFgt->getCapacity();
+        float tc = tFgt->getCapacity(); 
+        fFgt->setPotential(tp);
+        tFgt->setPotential(fp);
+        fFgt->setCapacity(tc);
+        tFgt->setCapacity(fc);
+
+        //卸载第一个被动法宝
+        GObject::ItemEquip* p =NULL;
+        if ( tp < 1.50f || tc < 7.0f)
+        {
+           p =  fFgt->setTrump(p, 1, true);
+           if (p != NULL)
+               GetPackage()->AddExistEquip(p);
+        }
+        fFgt->updateForgeAttr(true);
+        tFgt->updateForgeAttr(true);
+        return 0;
+    }
+    //资质
+    UInt8 Player::transformCapacity(Fighter * fFgt, Fighter * tFgt)
+    {
+        float f = fFgt->getCapacity();
+        float t = tFgt->getCapacity();
+        fFgt->setCapacity(t);
+        tFgt->setCapacity(f);
+
+        //卸载第一个被动法宝
+        GObject::ItemEquip* p =NULL;
+        if ( t < 7.0)
+        {
+            p =  fFgt->setTrump(p, 1, true);
+            if (p != NULL)
+                GetPackage()->AddExistEquip(p);
+        }
+        if (t < 7.0f && f >= 7.0f)
+        {
+            tFgt->getAttrType2(true);
+            tFgt->getAttrType3(true);
+        }
+        return 0;
+    }
+    UInt8 Player::transformSoul(Fighter * fFgt, Fighter * tFgt)
+    {
+        SecondSoul* fSoul = fFgt->getSecondSoul();
+        SecondSoul* tSoul = tFgt->getSecondSoul();
+        if (NULL == fSoul || NULL ==tSoul)
+            return 6;
+        UInt32 f = fSoul->getStateExp();
+        UInt32 t = tSoul->getStateExp();
+        UInt32 fLev = fSoul->getStateLevel();
+        UInt32 tLev = tSoul->getStateLevel();
+        fSoul->setStateExp(tLev, t);
+        tSoul->setStateExp(fLev, f);
+
+        //元神等级
+        UInt8 fPracLev = fSoul->getPracticeLevel();
+        UInt8 tPracLev = tSoul->getPracticeLevel();
+        if (fPracLev != tPracLev)
+        {
+            fSoul->setPracticeLevel(tPracLev);
+            tSoul->setPracticeLevel(fPracLev);
+        }
+        //星宿
+        UInt8 fXinxiu = fSoul->getXinxiu();
+        UInt8 tXinxiu = tSoul->getXinxiu();
+        if (fXinxiu != tXinxiu)
+        {
+            fSoul->setXinxiu(tXinxiu);
+            tSoul->setXinxiu(fXinxiu);
+        }
+        //原始散仙卸载所有心法
+        fFgt->offAllCitta();
+        tFgt->offAllCitta();
+
+        fFgt->send2ndSoulInfo();
+        tFgt->send2ndSoulInfo();
+
+        fFgt->sendMaxSoul();
+        tFgt->sendMaxSoul();
+        return 0;
+    }
+    void Player::transformElixir(Fighter * fFgt, Fighter * tFgt)
+    {
+        for (UInt8 i = 0; i < 14; ++i)
+        {
+            Int32 f = fFgt->getElixirAttrByOffset(i);
+            Int32 t = tFgt->getElixirAttrByOffset(i);
+            if (f != t)
+            {
+                fFgt->addElixirAttrByOffset(i, t-f);
+                tFgt->addElixirAttrByOffset(i, f-t);
+                if (i == 5)
+                {
+                    fFgt->offAllCitta();
+                    tFgt->offAllCitta();
+                }
+            }
+        }
+    }
+    
     void Player::ArenaExtraAct(UInt8 type, UInt8 opt)
     {
         UInt32 now = TimeUtil::Now();
@@ -14558,7 +15179,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
             WORLD().setArenaTotalCntEnum();
         }
 
-        UInt16 totalCnt = WORLD().getArenaTotalCnt();
+        UInt32 totalCnt = WORLD().getArenaTotalCnt();
         UInt32 totalSufferCnt = totalCnt * 24 / 5;
 
         switch(type)
@@ -14716,6 +15337,580 @@ void EventTlzAuto::notify(bool isBeginAuto)
                 break;
             }
         }
+    bool Player::hasFighterWithClass(UInt8 cls)
+    {
+        for ( std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
+        {
+            if (it->second->getClass() == cls)
+                return true;
+        }
+        return false;
+        
+    }
 
-    } // namespace GObject
+
+    static UInt32 newRecharge[] = {10, 88, 188, 588};
+    void Player::FirstRechargeAct(UInt8 step, UInt8 type, UInt8 career)
+    {
+        if(step == 0 || step > 4)
+            return;
+        if(type > 1)
+            return;
+        if(career == 0 || career > 3)
+            return;
+        UInt32 curStep = GetVar(VAR_FIRST_RECHARGE_STEP);
+        /*
+         * bit 1: 10XS
+         * bit 2: 88XS
+         * bit 3: 188XS
+         * bit 4: 588XS
+         */
+        if(curStep & (1 << (step-1)))
+            return;
+        UInt8 index;
+        if(step == 1)
+            index = 1 + type;
+        else
+            index = 1 + career * 2 + type;
+        UInt32 goldNum = 0;
+        if(type == 1)
+        {
+            if(step == 1)
+                goldNum = 10;
+            else
+                goldNum = 50;
+            if(getGold() < goldNum)
+            {
+                sendMsgCode(2, 1104, 0);
+                return;
+            }
+        }
+
+        bool bRet = GameAction()->onFirstRecharge(this, index);
+        if(bRet)
+        {
+            if(goldNum > 0)
+            {
+                ConsumeInfo ci(EnumFirstRecharge1 + step - 1, 0, 0);
+                useGold(goldNum, &ci);
+            }
+            else
+            {
+                char tag[32];
+                sprintf(tag, "F_10000_1212_%u", step);
+                udpLog("firstRecharge", tag, "", "", "", "", "act");
+            }
+
+            curStep |= (1 << (step-1));
+            SetVar(VAR_FIRST_RECHARGE_STEP, curStep);
+            sendFirstRecharge();
+
+            UInt32 thisDay = TimeUtil::SharpDay();
+            UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA(this, created));
+            if(thisDay <= endDay)
+            {
+                // 新注册七日内开启首充礼包，完成每日目标
+                UInt32 targetVal = GetVar(VAR_CLAWARD2);
+                if (!(targetVal & TARGET_RECHARGE_PACKGE))
+                {
+                    targetVal |=TARGET_RECHARGE_PACKGE;
+                    AddVar(VAR_CTS_TARGET_COUNT, 1);
+                    SetVar(VAR_CLAWARD2, targetVal);
+                    sendNewRC7DayTarget();
+                    newRC7DayUdpLog(1152, 11);
+                }
+            }
+        }
+    }
+
+    void Player::sendFirstRecharge(bool isLogin)
+    {
+        UInt32 lostValue = 0;
+        UInt8 lostStep = 4;
+        UInt8 canStep = 4;
+        UInt8 index = 0;
+
+        if(_playerData.totalRecharge < 10)
+        {
+            Stream st(REP::COUNTRY_ACT);
+            st << static_cast<UInt8>(0x03) << index << Stream::eos;
+            send(st);
+            return;
+        }
+
+        //之前充过
+        if(_playerData.totalRecharge > GetVar(VAR_FIRST_RECHARGE_VALUE))
+        {
+            lostValue = _playerData.totalRecharge - GetVar(VAR_FIRST_RECHARGE_VALUE);
+        }
+        while(lostStep > 0)
+        {
+            if(newRecharge[lostStep - 1] <= lostValue)
+                break;
+            --lostStep;
+        }
+
+        while(canStep > 0)
+        {
+            if(newRecharge[canStep - 1] <= _playerData.totalRecharge)
+                break;
+            --canStep;
+        }
+
+        for(index = lostStep + 1; index <= canStep; ++index)
+        {
+            if((GetVar(VAR_FIRST_RECHARGE_STEP)&(1 << (index-1))) == 0)
+                break;
+        }
+
+        if(isLogin && index > 4)
+            return;
+        Stream st(REP::COUNTRY_ACT);
+        st << static_cast<UInt8>(0x03) << index << Stream::eos;
+        send(st);
+    }
+
+void Player::copyFrontWinAward(UInt8 index)
+{
+    if(!World::getCopyFrontWinSwitch())
+        return;
+    UInt32 tmp = (GetVar(VAR_CF_BIND)&0x0F);
+    UInt32 cf_tmp = ((tmp << 4) | tmp);
+    SetVar(VAR_CF_BIND, cf_tmp);
+    SetVar(VAR_CF_FLAG, index);
+    resetCopyFrontWinAward();
+    sendCopyFrontAllAward();
+}
+
+void Player::loadCopyFrontWinFromDB(UInt8 posOrig, UInt8 posPut, UInt32 itemId, UInt16 ratio)
+{
+    if(posOrig >= 5)
+        return;
+    cf_itemId[posOrig] = itemId;
+    cf_ratio[posOrig] = ratio;
+    if(posPut <= 5)
+        cf_posPut[posOrig] = posPut;
+}
+
+void Player::getCopyFrontCurrentAward(UInt8 index)
+{
+    UInt32 leftIndex[5];
+    UInt32 leftCnt = 0;
+    UInt8 i;
+    for(i = 0; i < 5; i++)
+    {
+        if(cf_posPut[i] == 0)
+            leftIndex[leftCnt++] = i;
+    }
+    if(leftCnt == 0)
+        return;
+    UInt16 totalRatio = 0;
+    for(i = 0; i < leftCnt; i++)
+        totalRatio += cf_ratio[leftIndex[i]];
+    UInt16 totalRatioTmp = 0;
+    UInt16 curRatio = uRand(totalRatio);
+    UInt8 curId = 5;
+    for(i = 0; i < leftCnt; i++)
+    {
+        totalRatioTmp += cf_ratio[leftIndex[i]];
+        if(curRatio < totalRatioTmp)
+        {
+            curId = leftIndex[i];
+            break;
+        }
+    }
+    if(curId >= 5)
+        return;
+    UInt8 order = 5 - leftCnt + 1;
+    if(order == 2)
+    {
+        if(getGoldOrCoupon() < 10)
+         {
+             sendMsgCode(0, 1101);
+             return;
+         }
+         ConsumeInfo ci(EnumCopyFrontWin, 0, 0);
+         useGoldOrCoupon(10, &ci);
+    }
+    else if(order >= 3)
+    {
+        UInt32 needGold;
+        if(order ==  4)
+            needGold = 20;
+        else if(order >= 5)
+            needGold = 40;
+        else
+            needGold = 10;
+        if(getGold() < needGold)
+        {
+             sendMsgCode(0, 1104);
+             return;
+        }
+        ConsumeInfo ci(EnumCopyFrontWin, 0, 0);
+        useGold(needGold, &ci);
+    }
+    cf_posPut[curId] = index;
+    DB1().PushUpdateData("UPDATE `copy_front_win` SET `posPut` = %u where `playerId` = %"I64_FMT"u and `posOrig` = %u", cf_posPut[curId], getId(), curId);
+
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(0x04);
+    st << static_cast<UInt8>(0x00);
+    st << cf_posPut[curId];
+    st << static_cast<UInt16>(cf_itemId[curId]);
+    UInt8 curCnt = 1;
+    st << curCnt;
+    st << Stream::eos;
+    send(st);
+
+    UInt32 cf_bind_flag = GetVar(VAR_CF_BIND);
+    bool bind;
+    if(GetVar(VAR_CF_FLAG) == 1 && (cf_bind_flag&0x10))
+        bind = 0;
+    else if(GetVar(VAR_CF_FLAG) == 2 && (cf_bind_flag&0x20))
+        bind = 0;
+    else
+        bind = 1;
+    UInt32 itemTmp = cf_itemId[curId];
+    if(bind)
+    {
+        //特殊处理4个相同的物品，绑定的全部是后者(前者可以是非全绑定，后者全部是绑定)
+        if(itemTmp == 135)
+            itemTmp = 133;
+        else if(itemTmp == 1412)
+            itemTmp = 1327;
+        else if(itemTmp == 1411)
+            itemTmp = 1326;
+        else if(itemTmp == 9283)
+            itemTmp = 400;
+    }
+    m_Package->Add(itemTmp, 1, bind);
+
+    {
+        char tag[32];
+        if(!bind)
+            order += 5;
+        if(GetVar(VAR_CF_FLAG) == 2)
+            order += 11;
+        sprintf(tag, "F_10000_1212_%u", order);
+        udpLog("CopyFrontWin", tag, "", "", "", "", "act");
+    }
+
+    if(leftCnt == 1)
+        closeCopyFrontAwardByIndex(GetVar(VAR_CF_FLAG) - 1, 0);
+}
+
+void Player::getCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index, UInt8 indexPut)
+{
+    if(copy_or_front > 1)
+        return;
+    if(static_cast<UInt32>(copy_or_front + 1) != GetVar(VAR_CF_FLAG))
+        return;
+#if 0
+    if(index !=  PLAYER_DATA(this, location))
+        return;
+#endif
+    if(indexPut == 0 || indexPut > 5)
+        return;
+    if(GetFreePackageSize() < 1)
+    {
+        sendMsgCode(0, 1011);
+        return;
+    }
+
+    UInt8 i;
+    bool isPut = false;
+    for(i = 0; i < 5; i++)
+    {
+        if(cf_posPut[i] == indexPut)
+        {
+            isPut = true;
+            break;
+        }
+    }
+    if(isPut)
+        return;
+    getCopyFrontCurrentAward(indexPut);
+}
+
+void Player::resetCopyFrontWinAward(bool fresh)
+{
+    UInt8 index = GetVar(VAR_CF_FLAG);
+    UInt8 step;
+    UInt8 tmp1;
+    UInt8 tmp2;
+
+    if(index == 0 || index > 2)
+        return;
+
+    tmp1 = uRand(5);
+    tmp2 = uRand(5);
+    UInt32 count = 0;
+    while(tmp2 == tmp1 && count < 10000)
+    {
+        tmp2 = uRand(5);
+        ++count;
+    }
+
+    for(UInt8 i = 0; i < 5; i++)
+    {
+        if(i == tmp1)
+            step = 1;
+        else if(i == tmp2)
+            step = 2;
+        else
+            step = 0;
+        if(GetVar(VAR_CF_LOCATION) == 0)
+            SetVar(VAR_CF_LOCATION, PLAYER_DATA(this, location));
+        Table award = GameAction()->getCopyFrontmapAward(step, GetVar(VAR_CF_LOCATION));
+        if (award.size() < 2)
+        {
+            printf("award.size() < 2\n");
+            continue;
+        }
+        cf_itemId[i] = award.get<UInt32>(1);
+        cf_ratio[i] = award.get<UInt32>(2);
+        cf_posPut[i] = 0;
+        if(fresh)
+            DB1().PushUpdateData("UPDATE `copy_front_win` SET `posPut` = %u, `itemId` = %u, `ratio` = %u WHERE `playerId` = %"I64_FMT"u AND `posOrig` = %u", cf_posPut[i], cf_itemId[i], cf_ratio[i], getId(), i);
+        else
+            DB1().PushUpdateData("REPLACE INTO `copy_front_win` (`playerId`, `posOrig`, `posPut`, `itemId`, `ratio`) VALUES(%"I64_FMT"u, %u, %u, %u, %u)", getId(), i, cf_posPut[i], cf_itemId[i], cf_ratio[i]);
+    }
+}
+
+void Player::freshCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index)
+{
+    if(copy_or_front > 1)
+        return;
+    if(static_cast<UInt32>(copy_or_front + 1) != GetVar(VAR_CF_FLAG))
+        return;
+#if 0
+    if(index !=  PLAYER_DATA(this, location))
+        return;
+#endif
+    if(getTael() < 50)
+    {
+        sendMsgCode(0, 1100);
+        return;
+    }
+    ConsumeInfo ci(EnumCopyFrontWin, 0, 0);
+    useTael(50, &ci);
+
+    resetCopyFrontWinAward(true);
+    sendCopyFrontAllAward();
+}
+
+void Player::closeCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index)
+{
+    if(copy_or_front > 1)
+        return;
+    if(static_cast<UInt32>(copy_or_front + 1) != GetVar(VAR_CF_FLAG))
+        return;
+#if 0
+    if(index !=  PLAYER_DATA(this, location))
+        return;
+#endif
+    SetVar(VAR_CF_FLAG, 0);
+    SetVar(VAR_CF_INDEX, 0);
+    SetVar(VAR_CF_LOCATION, 0);
+    for(UInt8 i = 0; i < 5; i++)
+    {
+        cf_posPut[i] = 0;
+        cf_itemId[i] = 0;
+        cf_ratio[i] = 0;
+        //DB1().PushUpdateData("UPDATE `copy_front_win` SET `posPut` = %u, `itemId` = %u, `ratio` = %u WHERE `playerId` = %"I64_FMT"u AND `posOrig` = %u", cf_posPut[i], cf_itemId[i], cf_ratio[i], getId(), i);
+    }
+    DB1().PushUpdateData("DELETE FROM `copy_front_win` WHERE `playerId` = %"I64_FMT"u", getId());
+}
+
+void Player::sendCopyFrontAllAward()
+{
+    if(GetVar(VAR_CF_FLAG) == 0)
+        return;
+
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(0x04);
+    st << static_cast<UInt8>(0x01);
+    st << static_cast<UInt8>(GetVar(VAR_CF_FLAG) - 1);
+
+    if(GetVar(VAR_CF_FLAG) == 1)
+    {
+        if(GetVar(VAR_CF_INDEX) == 0)
+            SetVar(VAR_CF_INDEX, getCopyId());
+        st << static_cast<UInt8>(GetVar(VAR_CF_INDEX));
+    }
+    else
+    {
+        if(GetVar(VAR_CF_INDEX) == 0)
+            SetVar(VAR_CF_INDEX, getFrontmapId());
+        st << static_cast<UInt8>(GetVar(VAR_CF_INDEX));
+    }
+    st << static_cast<UInt8>(5);
+    bool isPut = false;
+    UInt8 index;
+    UInt8 i;
+    UInt16 itemId;
+    UInt8 itemCnt = 1;
+    for(index = 0; index < 5; index++)
+    {
+        if(cf_posPut[index] != 0)
+        {
+            isPut = true;
+            break;
+        }
+    }
+    if(!isPut)
+    {
+        for(index = 0; index < 5; index++)
+        {
+            itemId = cf_itemId[index];
+            st << itemId;
+            st << itemCnt;
+        }
+    }
+    else
+    {
+        for(index = 0; index < 5; index++)
+        {
+            for(i = 0; i < 5; i++)
+            {
+                if(cf_posPut[i] == index + 1)
+                    break;
+            }
+            if(i < 5)
+                itemId = cf_itemId[i];
+            else
+                itemId = 0;
+            st << itemId;
+            st << itemCnt;
+        }
+    }
+
+    st << Stream::eos;
+    send(st);
+}
+
+UInt8 Player::getCopyId()
+{
+    static UInt16 spots[] = {776, 2067, 5906, 8198, 12818, 10512, 0x1411};
+
+    UInt16 currentSpot = PLAYER_DATA(this, location);
+    for(UInt8 i = 0; i < sizeof(spots)/sizeof(spots[0]); i++)
+    {
+        if(spots[i] == currentSpot)
+            return (i+1);
+    }
+    return 0;
+}
+
+UInt8 Player::getFrontmapId()
+{
+    static UInt16 spots[] = {1284, 2053, 4360, 4611, 5893, 5637, 8195, 6153, 9222, 9481, 10244, 5129};
+    UInt16 currentSpot = PLAYER_DATA(this, location);
+    for(UInt8 i = 0; i < sizeof(spots)/sizeof(spots[0]); i++)
+    {
+        if(spots[i] == currentSpot)
+            return (i+1);
+    }
+    return 0;
+}
+
+void Player::getGoodVoiceAward(UInt8 type)
+{
+    if(type == 1 && GetVar(VAR_GOOD_VOICE) == 0)
+    {
+        if(GetFreePackageSize() < 1)
+        {
+            sendMsgCode(0, 1011);
+            return;
+        }
+        SetVar(VAR_GOOD_VOICE, 1);
+        m_Package->Add(9273, 1, true);
+        sendGoodVoiceInfo();
+    }
+}
+
+void Player::sendGoodVoiceInfo()
+{
+    if(!World::getGoodVoiceAct())
+        return;
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(5);
+    st << static_cast<UInt8>(GetVar(VAR_GOOD_VOICE));
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::get3366GiftAward(UInt8 type)
+{
+    if(type == 1 && GetVar(VAR_3366GIFT) < 99)
+    {
+        if(GetFreePackageSize() < 6)
+        {
+            sendMsgCode(0, 1011);
+            return;
+        }
+        if(getGold() < 368)
+        {
+            sendMsgCode(0, 1104);
+            return;
+        }
+		ConsumeInfo ci(Enum3366Gift,0,0);
+		useGold(368,&ci);
+        AddVar(VAR_3366GIFT, 1);
+        m_Package->Add(500, 2, true);
+        m_Package->Add(501, 2, true);
+        m_Package->Add(1325, 2, true);
+        m_Package->Add(516, 2, true);
+        m_Package->Add(134, 2, true);
+        m_Package->Add(515, 2, true);
+        send3366GiftInfo();
+    }
+}
+
+void Player::send3366GiftInfo()
+{
+    if(getPlatform() != 11)
+        return;
+    if(!isBD())
+        return;
+    if(!World::get3366GiftAct())
+        return;
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(6);
+    UInt8 opt = GetVar(VAR_3366GIFT);
+    /*
+    if(GetVar(VAR_3366GIFT) < 9)
+        opt = 0;
+    else
+        opt = 1;
+    */
+    st << opt;
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::sendQQGameGift1218()
+{
+    UInt8 platform = atoi(getDomain());
+    if (GetVar(VAR_QQGAME_GIFT_1218) > 0 || platform != 10)
+        return;
+    UInt32 now = TimeUtil::Now();
+    if (now < TimeUtil::MkTime(2012, 12, 18) || now > TimeUtil::MkTime(2012, 12, 21))
+        return;
+    UInt32 h = (now - TimeUtil::SharpDay())/3600;//现在的小时
+    if (h == 20)
+    {
+        SYSMSGV(title, 4100, TimeUtil::MonthDay());
+        SYSMSGV(content, 4101, TimeUtil::MonthDay());
+        Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        if(mail)
+        {
+            MailPackage::MailItem mitem = {15,5};
+            mailPackageManager.push(mail->id, &mitem, 1, true);
+        }
+        SetVar(VAR_QQGAME_GIFT_1218, 1);
+    }
+}
+
+} // namespace GObject
 

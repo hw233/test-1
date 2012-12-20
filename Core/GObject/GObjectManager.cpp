@@ -159,7 +159,7 @@ namespace GObject
 		UInt32 maxId;
 		execu->Extract("SELECT max(`mailId`) FROM `mail`", maxId);
 		IDGenerator::gMailOidGenerator.Init(maxId);
-		execu->Extract("SELECT max(`id` & 0xFFFFFF) FROM `clan`", maxId);
+		execu->Extract("SELECT max(`id`) FROM `clan`", maxId);
 		IDGenerator::gClanOidGenerator.Init(maxId);
 		execu->Extract("SELECT max(`id`) FROM `equipment`", maxId);
 		IDGenerator::gItemOidGenerator.Init(maxId);
@@ -380,6 +380,17 @@ namespace GObject
             fprintf(stderr, "loadArenaExtraBoard error!\n");
             std::abort();
         }
+        if(!loadJobHunter())
+        {
+            fprintf(stderr, "loadJobHunter error!\n");
+            std::abort();
+        }
+        if(!loadCopyFrontWin())
+        {
+            fprintf(stderr, "loadCopyFrontWin error!\n");
+            std::abort();
+        }
+
 		DB::gDataDBConnectionMgr->UnInit();
 	}
 
@@ -1022,7 +1033,7 @@ namespace GObject
         SYSMSG(title, 4029);
         SYSMSGV(content, 4030, enchant, item->getItemEquipData().trumpExp);
 
-        MailPackage::MailItem mitem[2] = {{515,count},{1528,UInt32(0.3f*item->getItemEquipData().trumpExp/1000)}};
+        MailPackage::MailItem mitem[2] = {{515,count},{134,UInt32(0.3f*item->getItemEquipData().trumpExp/1000)}};
         Mail * mail = p->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFD0000/*free*/);
         if (mail)
             mailPackageManager.push(mail->id, mitem, 2, true);
@@ -1068,10 +1079,36 @@ namespace GObject
         p->foreachFighter(buchang1530_2);
     }
 
-	inline bool player_load(Player * p, int)
-	{
-		p->Load();
-		gBlockbossmgr.addPlayerRank(p, p->getBlockBossLevel(), p->GetLev());
+    void buchangMo(Player *p)
+    {
+        if (!p)
+            return;
+        if (p->hasFighterWithClass(4))
+        {
+
+
+            SYSMSG(title, 4072);
+            SYSMSGV(content, 4073);
+
+            MailPackage::MailItem mitem[1] = {{30,20}};
+            Mail * mail = p->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFD0000/*free*/);
+            if (mail)
+                mailPackageManager.push(mail->id, mitem, 2, true);
+
+            std::string strItems;
+            strItems += Itoa(mitem[0].id);
+            strItems += ",";
+            strItems += Itoa(mitem[0].count);
+            strItems += "|";
+
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, p->getId(), mail->id, BuChangMo, title, content, strItems.c_str(), mail->recvTime);
+        }
+    }
+
+    inline bool player_load(Player * p, int)
+    {
+        p->Load();
+        gBlockbossmgr.addPlayerRank(p, p->getBlockBossLevel(), p->GetLev());
         //p->verifyFighter();
         //if (!GVAR.GetVar(GVAR_CITTASMERGE))
         //    mergeCittaPages(p);
@@ -1079,6 +1116,8 @@ namespace GObject
         //    buchang1530(p);
         if (!GVAR.GetVar(GVAR_OLDRC7DAYBUCHANG))
             p->sendOldRC7DayAward();
+        if (!GVAR.GetVar( GVAR_JOB_MO_PEXP))
+            buchangMo(p);
 		return true;
 	}
 
@@ -1633,7 +1672,7 @@ namespace GObject
                 pl->fixOldVertionTitle(0);
             if(!pl->hasTitle(dbpd.pdata.title))
                 pl->fixOldVertionTitle(dbpd.pdata.title);
-            pl->setOpenId(dbpd.openid);
+            pl->setOpenId(dbpd.openid, true);
 		}
 		lc.finalize();
 
@@ -1749,7 +1788,7 @@ namespace GObject
 		pl = NULL;
         UInt8 lvl_max = 0;
 		DBFighter2 specfgtobj;
-//		if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `fashion`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `acupoints`, `skill`, `citta`, `fighter`.`skills`, `cittas`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul`, `elixir`.`attack`,`elixir`.`defend`, `elixir`.`critical`, `elixir`.`pierce`, `elixir`.`evade`, `elixir`.`counter`, `elixir`.`tough`, `elixir`.`action`, `fighter`.`hideFashion` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
+        //if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `fashion`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `acupoints`, `skill`, `citta`, `fighter`.`skills`, `cittas`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul`, `elixir`.`attack`,`elixir`.`defend`, `elixir`.`critical`, `elixir`.`pierce`, `elixir`.`evade`, `elixir`.`counter`, `elixir`.`tough`, `elixir`.`action`, `fighter`.`hideFashion` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
 		if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `halo`, `fashion`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `acupoints`, `skill`, `citta`, `fighter`.`skills`, `cittas`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul`, `elixir`.`attack`,`elixir`.`defend`, `elixir`.`critical`, `elixir`.`pierce`, `elixir`.`evade`, `elixir`.`counter`, `elixir`.`tough`, `elixir`.`action`,`fighter`.`hideFashion` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
@@ -2375,6 +2414,7 @@ namespace GObject
 				continue;
 			pl->GetActivityMgr()->LoadFromDB(atydata);
 		}
+		lc.finalize();
 
         // Load player Strengthen souls
         lc.prepare("Loading player StrengthenData:");
@@ -2444,6 +2484,7 @@ namespace GObject
         //GVAR.SetVar(GVAR_CITTASMERGE, 1);
         //GVAR.SetVar(GVAR_1530BUCHANG, 1);
         GVAR.SetVar(GVAR_OLDRC7DAYBUCHANG, 1);
+        GVAR.SetVar(GVAR_JOB_MO_PEXP, 1);
 
 		return true;
 	}
@@ -3807,7 +3848,7 @@ namespace GObject
                     UInt8 crr = table_temp2.get<float>(3);
                     UInt32 size2 = table_temp2.size();
 
-                    if(q > 2 || crr > 3)
+                    if(q > 2 || crr >= e_cls_max)
                         continue;
 
                     for(UInt8 t = 3; t < size2; ++t)
@@ -3838,7 +3879,7 @@ namespace GObject
                     UInt8 crr = table_temp2.get<float>(3);
                     UInt32 size2 = table_temp2.size();
 
-                    if(q > 2 || crr > 3)
+                    if(q > 2 || crr >= e_cls_max)
                         continue;
 
                     for(UInt8 t = 3; t < size2; ++t)
@@ -3880,6 +3921,7 @@ namespace GObject
                     ringHp->hpBase[1] = table_temp2.get<float>(3);
                     ringHp->hpBase[2] = table_temp2.get<float>(4);
                     ringHp->hpBase[3] = table_temp2.get<float>(5);
+                    ringHp->hpBase[4] = table_temp2.get<float>(6);
                 }
             }
 
@@ -5032,6 +5074,121 @@ namespace GObject
 
     }
 
+    bool GObjectManager::loadJobHunter()
+    {
+        // 读取寻墨有关数据
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading ExJob");
+        DBJobHunter dbjh;
+        if(execu->Prepare("SELECT `playerId`, `fighterList`, `mapInfo`, `progress`, `posX`, `posY`, `earlyPosX`, `earlyPosY`, `stepCount` FROM `job_hunter` ORDER BY `playerId`", dbjh) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+        Player * player = NULL;
+		while(execu->Next() == DB::DB_OK)
+        {
+            player = globalPlayers[dbjh.playerId];
+            if (player)
+            {
+                player->setJobHunter(dbjh.fighterList, dbjh.mapInfo, dbjh.progress, dbjh.posX, dbjh.posY, dbjh.earlyPosX, dbjh.earlyPosY, dbjh.stepCount);
+            }
+			lc.advance();
+        }
+        lc.finalize();
+        return true;
+    }
+
+    bool GObjectManager::loadCopyFrontWin()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading copy_front_win");
+        DBCopyFrontWin dbcf;
+        if(execu->Prepare("SELECT `playerId`, `posOrig`, `posPut`, `itemId`, `ratio` FROM `copy_front_win` ORDER BY `playerId`, `posOrig`", dbcf) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+        Player* pl = NULL;
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		while(execu->Next() == DB::DB_OK)
+        {
+			lc.advance();
+			if(dbcf.playerId != last_id)
+			{
+				last_id = dbcf.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+
+            pl->loadCopyFrontWinFromDB(dbcf.posOrig, dbcf.posPut, dbcf.itemId, dbcf.ratio);
+        }
+        lc.finalize();
+        return true;
+    }
+
+    float  GObjectManager::getAttrMax( UInt8 lvl, UInt8 t, UInt8 q, UInt8 crr )
+    {
+        if(q > 2)
+            q = 2;
+        if(t > 8)
+            t = 8;
+        if(crr >= e_cls_max)
+            crr = e_cls_max - 1;
+        std::map<UInt8, stAttrMax*>::iterator it = _attrMax.find(lvl);
+        stAttrMax* attr = NULL;
+        if(it != _attrMax.end())
+            attr = it->second;
+        else
+            attr = _attrMax[10];
+
+        return attr->attrMax[q][crr][t];
+    }
+
+    float  GObjectManager::getAttrTrumpMax( UInt8 lvl, UInt8 t, UInt8 q, UInt8 crr )
+    {
+        if(q > 2)
+            q = 2;
+        if(t > 8)
+            t = 8;
+        if(crr >= e_cls_max)
+            crr = e_cls_max - 1;
+        std::map<UInt8, stAttrMax*>::iterator it = _attrTrumpMax.find(lvl);
+        stAttrMax* attr = NULL;
+        if(it != _attrTrumpMax.end())
+            attr = it->second;
+        else
+            attr = _attrTrumpMax[0];
+
+        return attr->attrMax[q][crr][t];
+    }
+
+    float GObjectManager::getRingHpFromEnchant(UInt8 lvl, UInt8 crr, UInt8 enchant)
+    {
+        if(enchant == 0)
+            return 0;
+
+        if(crr >= e_cls_max)
+            crr = 0;
+        if(enchant > 12)
+            enchant = 0;
+        -- enchant;
+
+        std::map<UInt8, stRingHpBase*>::iterator it = _ringHpBase.find(lvl);
+        if(it == _ringHpBase.end())
+        {
+            UInt8 lvl2 = lvl - lvl%10;
+            it = _ringHpBase.find(lvl2);
+        }
+
+        stRingHpBase* ringHp = NULL;
+        if(it == _ringHpBase.end())
+            ringHp = _ringHpBase[10];
+        else
+            ringHp = it->second;
+
+        return ringHp->hpBase[crr] * _ringHpFactor[enchant];
+    }
+
     bool GObjectManager::loadArenaExtraBoard()
     {
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
@@ -5084,7 +5241,6 @@ namespace GObject
         }
         lc.finalize();
         return true;
-
     }
 }
 

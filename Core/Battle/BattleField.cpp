@@ -89,14 +89,23 @@ int BattleField::getPossibleTarget( int side, int idx )
 		{3 , 2 , 4 , 1 , 0},
 		{4 , 3 , 2 , 1 , 0},
 	};
+    BattleObject* hideObj = NULL;
 	int targetidx = 4 - (idx % 5);
 	int tside = 1 - side;
-    for(int irow = 0; irow < 5; irow++)
+    for(int irow = 0; irow < 5; ++ irow)
     {
         int tidx = irow * 5 + targetidx;
         if(_objs[tside][tidx] != NULL && _objs[tside][tidx]->getHP() > 0)
         {
-            return tidx;
+            if(!_objs[tside][tidx]->isHide())
+            {
+                _objs[tside][tidx]->setShieldObj(hideObj);
+                return tidx;
+            }
+            else
+            {
+                hideObj = _objs[tside][tidx];
+            }
         }
     }
 
@@ -108,7 +117,15 @@ int BattleField::getPossibleTarget( int side, int idx )
 			int tidx = tbl[j] + i * 5;
 			if(_objs[tside][tidx] != NULL && _objs[tside][tidx]->getHP() > 0)
 			{
-				return tidx;
+                if(!_objs[tside][tidx]->isHide())
+                {
+                    _objs[tside][tidx]->setShieldObj(hideObj);
+                    return tidx;
+                }
+                else
+                {
+                    hideObj = _objs[tside][tidx];
+                }
 			}
 		}
 	}

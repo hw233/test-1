@@ -474,7 +474,7 @@ namespace GObject
 			UInt16 oldq = item->Size(), newq = item->Size(num);
 			if (oldq == newq) return item;
 			cur = cur + newq - oldq;
-			if(cur > m_Owner->getPacksize())
+			if(cur > m_Owner->getPacksize() + 50)
 				return NULL;
 			if(!item->SetItem(num))
 				return NULL;
@@ -777,7 +777,7 @@ namespace GObject
 		else
 		{
 			UInt32 newSize = m_Size + item->Size();
-			if(newSize > m_Owner->getPacksize())
+			if(newSize > (UInt32)(m_Owner->getPacksize()) + 50)
 				return item;
 			m_Size = newSize;
 			m_Items[ItemKey(typeId, bind)] = item;
@@ -901,7 +901,7 @@ namespace GObject
 	ItemBase* Package::AddEquip2(UInt32 typeId, bool notify, bool bind, UInt8 FromWhere)
 	{
 		if (!IsEquipTypeId(typeId)) return NULL;
-		if(m_Size >= m_Owner->getPacksize())
+		if(m_Size >= m_Owner->getPacksize() + 50)
 			return NULL;
 		//Add New Equip
 		const GData::ItemBaseType * itype = GData::itemBaseTypeManager[typeId];
@@ -1136,7 +1136,7 @@ namespace GObject
     }
 	ItemBase* Package::AddEquipN( UInt32 typeId, UInt32 num, bool bind, bool silence, UInt8 FromWhere )
 	{
-		if(GetRestPackageSize() < num)
+		if((UInt32)(GetRestPackageSize()) + 50 < num)
 			return NULL;
 		ItemBase * item = NULL;
 		for(UInt32 i = 0; i < num; ++ i)
@@ -3314,7 +3314,16 @@ namespace GObject
 		if(item == NULL || item->getQuality() < 2 || item->getReqLev() < 1)
 			return 2;
 
-        if(GetRestPackageSize() < 2)
+        bool spirit = false;
+        UInt8 itemTypeNumMayOut = 2;
+        ItemEquip* equip = static_cast<ItemEquip*>(item);
+        if (equip->isSpirited())
+        {
+            spirit = true;
+            itemTypeNumMayOut = 6;
+        }
+
+		if((m_Size + itemTypeNumMayOut) > (m_Owner->getPacksize() + 50))
         {
             m_Owner->sendMsgCode(0, 1011);
             return 2;
@@ -3399,7 +3408,7 @@ namespace GObject
             }
         }
 
-        bool spirit = false;
+        if(spirit)
         {
             ItemEquip* equip = static_cast<ItemEquip*>(item);
             if (equip->isSpirited())
@@ -3417,7 +3426,6 @@ namespace GObject
                     {
                         AddItem(tmpId, count, isBound, silence, FromSplit);
                         pushBackSplitItem( m_Owner, splitOut, tmpId, count );
-                        spirit = true;
                     }
                 }
             }
@@ -4195,7 +4203,7 @@ namespace GObject
             return NULL;
         if(itype->subClass < Item_Weapon || itype->subClass > Item_Ring )
             return NULL;
-        if(m_Size >= m_Owner->getPacksize())
+        if(m_Size >= m_Owner->getPacksize() + 50)
             return NULL;
         return itype;
 
@@ -4340,6 +4348,14 @@ namespace GObject
             fromEquip->getQuality() != toEquip->getQuality())
             return 2;
 
+        if(type & 0x08)
+        {
+            if(fromEquip->getClass() != Item_Fashion || toEquip->getClass() != Item_Fashion)
+                return 12;
+        }
+        else if (toEquip->GetCareer() != 4)
+            return 11;
+
         if (m_Owner->GetVar(VAR_EQUIP_MOVE_COUNT) >= 8)
             return 9;
         res = isCanMove(fromEquip, toEquip, type);
@@ -4349,15 +4365,20 @@ namespace GObject
         if (res > 0) 
             return res;
 
-        toEquip->SetBindStatus(true);
+        if (!toEquip->GetBindStatus())
+        {
+			DB4().PushUpdateData("UPDATE `item` SET `bindType` = 1 WHERE `id` = %u and ownerId=%"I64_FMT"u", toEquip->getId(), m_Owner->getId());
+            toEquip->SetBindStatus(true);
+        }
         if (type & 1)
             res = moveEquipEnchant(fFgt,tFgt,fromEquip, fPos, toEquip, tPos);
         if (type & 2)
             res = moveEquipGem(fFgt,tFgt,fromEquip, fPos, toEquip, tPos);
         if (type & 4)
             res = moveEquipSpirit(fFgt,tFgt,fromEquip, fPos, toEquip, tPos);
+        if (type & 0x08)
+            res = moveEquipFashion(fFgt,tFgt,fromEquip, fPos, toEquip, tPos);
 
-        m_Owner->AddVar(VAR_EQUIP_MOVE_COUNT,1);
         return res;
     }
     UInt8 Package::isCanMove(ItemEquip* fromEquip, ItemEquip* toEquip, UInt8 type)
@@ -4388,6 +4409,9 @@ namespace GObject
             //注灵条件限制
            if ((fIed.spiritAttr.spLev[0]+fIed.spiritAttr.spLev[1]+fIed.spiritAttr.spLev[2]+fIed.spiritAttr.spLev[3])==0)
                return 10;
+        }
+        if(type & 0x08)
+        {
         }
         return 0;
     }
@@ -4427,15 +4451,76 @@ namespace GObject
         }
         if (type & 4)
             money += (fIed.spiritAttr.spLev[0]+fIed.spiritAttr.spLev[1]+fIed.spiritAttr.spLev[2]+fIed.spiritAttr.spLev[3])/1;
-       if(m_Owner->getGold() < money)
+        if (type & 0x08)
+        {
+            money += static_cast<UInt32>(fIed.maxTRank) * 1 + (fIed.trumpExp / 1000);
+
+            UInt8 lv = fIed.tRank;
+            UInt8 q = fromEquip->getQuality() - 3;
+            UInt8 crr = fromEquip->GetCareer();
+            UInt8 types;
+            float v;
+            float values;
+            UInt32 extramoney;
+
+            types = fIed.extraAttr2.type1;
+            if(types)
+            {
+                v = GObjectManager::getAttrTrumpMax(lv, types-1, q, crr);
+                values = fIed.extraAttr2.value1;
+                if(values > v * 90)
+                    extramoney = 50;
+                else if(values > v * 70)
+                    extramoney = 20;
+                else if(values > v * 40)
+                    extramoney = 10;
+                else
+                    extramoney = 1;
+                money += extramoney;
+            }
+
+            types = fIed.extraAttr2.type2;
+            if(types)
+            {
+                v = GObjectManager::getAttrTrumpMax(lv, types-1, q, crr);
+                values = fIed.extraAttr2.value2;
+                if(values > v * 90)
+                    extramoney = 50;
+                else if(values > v * 70)
+                    extramoney = 20;
+                else if(values > v * 40)
+                    extramoney = 10;
+                else
+                    extramoney = 1;
+                money += extramoney;
+            }
+
+            types = fIed.extraAttr2.type3;
+            if(types)
+            {
+                v = GObjectManager::getAttrTrumpMax(lv, types-1, q, crr);
+                values = fIed.extraAttr2.value3;
+                if(values > v * 90)
+                    extramoney = 50;
+                else if(values > v * 70)
+                    extramoney = 20;
+                else if(values > v * 40)
+                    extramoney = 10;
+                else
+                    extramoney = 1;
+                money += extramoney;
+            }
+        }
+       if(m_Owner->getGold() < money && cfg.serverNum != 34)
 	    {
             m_Owner->sendMsgCode(0, 1101);
             return 3;
         }
-        if (money > 0)
+        if (money > 0 && cfg.serverNum != 34)
         {
             ConsumeInfo ci(MoveEquip,0,0);
             m_Owner->useGold(money, &ci);
+            m_Owner->AddVar(VAR_EQUIP_MOVE_COUNT,1);
         }
         return 0;
     }
@@ -4445,7 +4530,7 @@ namespace GObject
         ItemEquipData& tIed = toEquip->getItemEquipData();
         if ((fromEquip->getClass() >= Item_Weapon && fromEquip->getClass() <= Item_Ring)) 
         {
-            tIed.enchant = fIed.enchant-1;
+            tIed.enchant = fIed.enchant;
             fIed.enchant = 0; 
             ((ItemTrump*)toEquip)->fixSkills();
             ((ItemTrump*)fromEquip)->fixSkills();
@@ -4501,6 +4586,56 @@ namespace GObject
     
         DB4().PushUpdateData("UPDATE `equipment` SET `socket1` = %u,`socket2` = %u,`socket3` = %u,`socket4` = %u,`socket5` = %u,`socket6` = %u WHERE `id` = %u",tIed.gems[0],tIed.gems[1],tIed.gems[2],tIed.gems[3],tIed.gems[4],tIed.gems[5],toEquip->getId());
         DB4().PushUpdateData("UPDATE `equipment` SET `socket1` = %u,`socket2` = %u,`socket3` = %u,`socket4` = %u,`socket5` = %u,`socket6` = %u WHERE `id` = %u",fIed.gems[0],fIed.gems[1],fIed.gems[2],fIed.gems[3],fIed.gems[4],fIed.gems[5],fromEquip->getId());
+        if(fFgt != NULL)
+        {
+            fFgt->setDirty();
+            fFgt->sendModification(0x20 + fPos, fromEquip, false);
+        }
+        else
+            SendSingleEquipData(fromEquip);
+
+        if(tFgt != NULL)
+        {
+            tFgt->setDirty();
+            tFgt->sendModification(0x20 + tPos, toEquip, false);
+        }
+        else
+            SendSingleEquipData(toEquip);
+        return 0;
+    }
+
+    //转移时装法宝属性
+    UInt8 Package::moveEquipFashion(Fighter* fFgt,Fighter* tFgt, ItemEquip* fromEquip,UInt8 fPos, ItemEquip* toEquip,UInt8 tPos)
+    {
+        ItemEquipData& fIed = fromEquip->getItemEquipData();
+        ItemEquipData& tIed = toEquip->getItemEquipData();
+
+        char str[32] = {0};
+        sprintf(str, "F_1158_%03d00%03d", fromEquip->getReqLev(),  toEquip->getReqLev());
+        m_Owner->udpLog("move", str, "", "", "", "", "act");
+
+        tIed.tRank = fIed.tRank;
+        tIed.maxTRank = fIed.maxTRank;
+        tIed.trumpExp = fIed.trumpExp;
+        tIed.extraAttr2.type1 = fIed.extraAttr2.type1;
+        tIed.extraAttr2.type2 = fIed.extraAttr2.type2;
+        tIed.extraAttr2.type3 = fIed.extraAttr2.type3;
+        tIed.extraAttr2.value1 = fIed.extraAttr2.value1;
+        tIed.extraAttr2.value2 = fIed.extraAttr2.value2;
+        tIed.extraAttr2.value3 = fIed.extraAttr2.value3;
+        DB4().PushUpdateData("UPDATE `equipment` SET `tRank` = %u,`maxTRank` = %u,`trumpExp` = %u,`attrType1` = %u,`attrType2` = %u,`attrType3` = %u,`attrValue1` = %u,`attrValue2` = %u,`attrValue3` = %u WHERE `id` = %u", tIed.tRank, tIed.maxTRank, tIed.trumpExp, tIed.extraAttr2.type1, tIed.extraAttr2.type2, tIed.extraAttr2.type3, tIed.extraAttr2.value1, tIed.extraAttr2.value2, tIed.extraAttr2.value3, toEquip->getId());
+
+        fIed.tRank = 0;
+        fIed.maxTRank = 1;
+        fIed.trumpExp = 0;
+        fIed.extraAttr2.type1 = 0;
+        fIed.extraAttr2.type2 = 0;
+        fIed.extraAttr2.type3 = 0;
+        fIed.extraAttr2.value1 = 0;
+        fIed.extraAttr2.value2 = 0;
+        fIed.extraAttr2.value3 = 0;
+        DB4().PushUpdateData("UPDATE `equipment` SET `tRank` = %u,`maxTRank` = %u,`trumpExp` = %u,`attrType1` = %u,`attrType2` = %u,`attrType3` = %u,`attrValue1` = %u,`attrValue2` = %u,`attrValue3` = %u WHERE `id` = %u", fIed.tRank, fIed.maxTRank, fIed.trumpExp, fIed.extraAttr2.type1, fIed.extraAttr2.type2, fIed.extraAttr2.type3, fIed.extraAttr2.value1, fIed.extraAttr2.value2, fIed.extraAttr2.value3, fromEquip->getId());
+
         if(fFgt != NULL)
         {
             fFgt->setDirty();
@@ -4733,13 +4868,44 @@ namespace GObject
 		UInt16 cur = m_Size;
 		UInt16 oldq = item->Size(), newq = item->Size(item->Count() + num);
 		cur = cur - oldq + newq;
-		if(cur > m_Owner->getPacksize())
+		if(cur > m_Owner->getPacksize() + 50)
 			return false;
 		if(!item->IncItem(num))
 			return false;
 		m_Size = cur;
 		return true;
 	}
+
+    bool Package::TryBuyEquip(UInt32 typeId, UInt32 num, bool bind /*= false */)
+    {
+		if((UInt32)(GetRestPackageSize()) < num)
+			return false;
+        return true;
+    }
+
+    bool Package::TryBuyItem(UInt32 typeId, UInt32 num, bool bind /*= false */)
+    {      
+        if (!typeId || !num) return false;
+		if (IsEquipTypeId(typeId)) return false;
+		const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[typeId];
+		if(itemType == NULL) return false;
+		ITEM_BIND_CHECK(itemType->bindType,bind);
+		ItemBase * item = FindItem(typeId, bind);
+        if(item)
+        {
+            UInt16 cur = m_Size;
+            UInt16 oldq = item->Size(), newq = item->Size(item->Count() + num);
+            cur = cur - oldq + newq;
+            if(cur > m_Owner->getPacksize())
+                return false;
+        }
+        else if(itemType->Size(num) > GetRestPackageSize())
+        {
+            return false;
+        }
+
+		return true;
+    }
 
 	bool Package::TryDelItem( ItemBase * item, UInt16 num )
 	{

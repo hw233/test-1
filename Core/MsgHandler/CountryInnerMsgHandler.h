@@ -24,6 +24,7 @@
 #include "Script/BattleFormula.h"
 #include "GObject/Clan.h"
 #include "GObject/ClanCopy.h"
+#include "GObject/JobHunter.h"
 #ifndef _WIN32
 #include "GObject/DCLogger.h"
 #endif
@@ -177,6 +178,8 @@ void OnResetRecharge(GameMsgHdr& hdr, const void * data)
 	MSG_QUERY_PLAYER(player);
     if (player->GetVar(VAR_RECHARGE_TOTAL))
         player->SetVar(VAR_RECHARGE_TOTAL, 0);
+    if (player->GetVar(VAR_RECHARGE_SCORE))
+        player->SetVar(VAR_RECHARGE_SCORE, 0);
     player->sendRechargeInfo();
 }
 
@@ -1129,7 +1132,7 @@ void OnCreateAward(GameMsgHdr& hdr, const void * data)
 {
     MSG_QUERY_PLAYER(player);
     player->GetPackage()->AddItem(18, 1, true);
-    player->GetPackage()->AddItem(449, 1, true); // XXX: 首充礼包
+    //player->GetPackage()->AddItem(449, 1, true); // XXX: 首充礼包
     player->getCoupon(888);
 #if defined(_FB) && defined(_FB_TEST)
     player->getGold(20000);
@@ -1754,6 +1757,45 @@ void OnIDIPBuy( GameMsgHdr& hdr, const void * data )
     player->useGold(ibi->price, &ci);
     player->GetPackage()->Add(ibi->itemId, ibi->num, ibi->bind);
 }
+
+void OnAutoJobHunterStep( GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    JobHunter * job_hunter = player->getJobHunter();
+    if (!job_hunter)
+    {
+#ifdef JOB_HUNTER_DEBUG
+        std::cout << "Wrong Timer." << std::endl;
+#endif
+        return;
+    }
+    job_hunter->OnAutoCommand(0x10);
+}
+
+void OnAddTianjieNpc( GameMsgHdr& hdr, const void * data)
+{
+    struct TianjieSpotNpc
+    {
+        UInt32 npcId;
+        UInt16 spot;
+    };
+    TianjieSpotNpc* tjNpc = reinterpret_cast<TianjieSpotNpc*>(const_cast<void *>(data));
+    if(tjNpc)
+        GObject::Tianjie::instance().addTianjieNpc(tjNpc->npcId, tjNpc->spot);
+}
+
+void OnDelTianjieNpc( GameMsgHdr& hdr, const void * data)
+{
+    struct TianjieSpotNpc
+    {
+        UInt32 npcId;
+        UInt16 spot;
+    };
+    TianjieSpotNpc* tjNpc = reinterpret_cast<TianjieSpotNpc*>(const_cast<void *>(data));
+    if(tjNpc)
+        GObject::Tianjie::instance().delTianjieNpc(tjNpc->npcId, tjNpc->spot);
+}
+
 
 #endif // _COUNTRYINNERMSGHANDLER_H_
 

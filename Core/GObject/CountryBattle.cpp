@@ -597,6 +597,7 @@ bool CountryBattle::playerEnter( Player * player )
         player->GetPackage()->AddItem2(476, 5, 1, 1);
         player->SetVar(VAR_CBWHITEPACK, 1);
     }
+    player->countryBattleUdpLog(1090, 2);
 	return true;
 }
 

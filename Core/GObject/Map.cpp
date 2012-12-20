@@ -580,5 +580,27 @@ void Map::VisitPlayers(PlayerVisitor& visitor, UInt16 location)
     }
 }
 
+UInt16 Map::GetRandomSpot(UInt8 type)
+{
+    std::map<UInt16, SpotData>::iterator it;
+    UInt16 count = 0;
+    for (it = m_Spots.begin(); it != m_Spots.end(); ++ it)
+    {
+        if((it->second).m_Type == type)
+            ++ count;
+    }
+    UInt16 index = uRand(count);
+    count = 0;
+    for (it = m_Spots.begin(); it != m_Spots.end(); ++ it)
+    {
+        if((it->second).m_Type == type)
+        {
+            if (count ++ == index)
+                return it->first;
+        }
+    }
+
+    return 0;
+}
 
 }

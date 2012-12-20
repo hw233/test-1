@@ -8,6 +8,7 @@
 #include "DB/DBExecutor.h"
 #include "GData/GDataDBExecHelper.h"
 #include "Server/WorldServer.h"
+#include "Common/TimeUtil.h"
 
 namespace Battle
 {
@@ -119,6 +120,12 @@ void BattleReport::addReport( UInt32 id, std::vector<UInt8>& v )
 	fclose(f);
     DB1().PushUpdateData("update reportid set maxid = %d where maxid=%d", id, lastMaxId);
     lastMaxId = id;
+
+#if 0
+    RptLife rptLife = {id, TimeUtil::Now()};
+    _rptLife.insert(rptLife);
+    travelRptLife();
+#endif
 }
 
 void BattleReport::loadReport( UInt32 id, std::vector<UInt8>& v )
@@ -134,6 +141,28 @@ void BattleReport::loadReport( UInt32 id, std::vector<UInt8>& v )
 	v.resize(size);
 	fread(&v[0], 1, size, f);
 	fclose(f);
+
+#if 0
+    RptLife rptLife = {id, TimeUtil::Now()};
+    _rptLife.insert(rptLife);
+#endif
+}
+
+void BattleReport::travelRptLife()
+{
+    int cnt = 0;
+    UInt32 now = TimeUtil::Now();
+    for(RptLifeSetIt it = _rptLife.begin(); it != _rptLife.end() && cnt < 1000;)
+    {
+        const RptLife& rptLife = *it;
+        if((rptLife._loadTime + 86400*2) < now)
+        {
+			_reports.erase(rptLife._rptId);
+            _rptLife.erase(it++);
+            continue;
+        }
+        break;
+    }
 }
 
 }
