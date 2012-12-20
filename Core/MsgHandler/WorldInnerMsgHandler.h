@@ -453,6 +453,11 @@ void OnCancelDungeonAutoReq( GameMsgHdr& hdr, const void * data )
 void OnCompleteDungeonAutoReq( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
+    if (player->GetPackage()->GetRestPackageSize() == 0)
+    {
+        player->sendMsgCode(0, 1011);
+        return;
+    }
 	GObject::EventBase * ev = GObject::eventWrapper.RemoveTimerEvent(player, EVENT_DUNGEONAUTO, 0);
 	if(ev == NULL)
 		return;

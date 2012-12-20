@@ -572,6 +572,12 @@ bool WBoss::attack(Player* pl, UInt16 loc, UInt32 id)
         pl->OnHeroMemo(MC_SLAYER, MD_LEGEND, 0, 2);
     pl->OnShuoShuo(SS_WBOSS);
 
+    if (pl->GetPackage()->GetRestPackageSize() <= 0)
+    {
+        pl->sendMsgCode(0, 1011);
+        return false;
+    }
+
     if (!m_final)
     {
         // XXX: 打元神也参与抽奖

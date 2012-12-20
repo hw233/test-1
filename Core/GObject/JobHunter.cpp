@@ -1267,7 +1267,8 @@ bool JobHunter::OnFoundCave(bool isAuto)
             UInt32 itemCount = item.get<UInt32>(2);
             //bool   bind = item.get<bool>(3);
             st2 << static_cast<UInt16>(itemId) << static_cast<UInt16>(itemCount);
-            _owner->lastExJobAwardPush(itemId, itemCount);
+            if (!isAuto)
+                _owner->lastExJobAwardPush(itemId, itemCount);
             _owner->GetPackage()->Add(itemId, itemCount, true, isAuto? true:false, FromNpc);
         }
     }

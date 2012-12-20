@@ -196,6 +196,12 @@ namespace GObject
 		bool TryAddItem(ItemBase * item, UInt16 num);
 		bool TryDelItem(ItemBase * item, UInt16 num);
 
+    public:
+        bool TryBuyItem(UInt32 typeId, UInt32 num, bool bind = false);
+        bool TryBuyEquip(UInt32 typeId, UInt32 num, bool bind = false);
+
+    private:
+
         void OnAddEquipAndCheckAttainment(const GData::ItemBaseType * itype, UInt8 FromWhere);
 	public:
         void  AddItemHistoriesLog(UInt32 itemId, UInt32 num);

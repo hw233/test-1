@@ -474,7 +474,7 @@ namespace GObject
 			UInt16 oldq = item->Size(), newq = item->Size(num);
 			if (oldq == newq) return item;
 			cur = cur + newq - oldq;
-			if(cur > m_Owner->getPacksize())
+			if(cur > m_Owner->getPacksize() + 50)
 				return NULL;
 			if(!item->SetItem(num))
 				return NULL;
@@ -777,7 +777,7 @@ namespace GObject
 		else
 		{
 			UInt32 newSize = m_Size + item->Size();
-			if(newSize > m_Owner->getPacksize())
+			if(newSize > (UInt32)(m_Owner->getPacksize()) + 50)
 				return item;
 			m_Size = newSize;
 			m_Items[ItemKey(typeId, bind)] = item;
@@ -901,7 +901,7 @@ namespace GObject
 	ItemBase* Package::AddEquip2(UInt32 typeId, bool notify, bool bind, UInt8 FromWhere)
 	{
 		if (!IsEquipTypeId(typeId)) return NULL;
-		if(m_Size >= m_Owner->getPacksize())
+		if(m_Size >= m_Owner->getPacksize() + 50)
 			return NULL;
 		//Add New Equip
 		const GData::ItemBaseType * itype = GData::itemBaseTypeManager[typeId];
@@ -1136,7 +1136,7 @@ namespace GObject
     }
 	ItemBase* Package::AddEquipN( UInt32 typeId, UInt32 num, bool bind, bool silence, UInt8 FromWhere )
 	{
-		if(GetRestPackageSize() < num)
+		if((UInt32)(GetRestPackageSize()) + 50 < num)
 			return NULL;
 		ItemBase * item = NULL;
 		for(UInt32 i = 0; i < num; ++ i)
@@ -3314,7 +3314,7 @@ namespace GObject
 		if(item == NULL || item->getQuality() < 2 || item->getReqLev() < 1)
 			return 2;
 
-        if(GetRestPackageSize() < 2)
+		if((m_Size  + 2) >= (m_Owner->getPacksize() + 50))
         {
             m_Owner->sendMsgCode(0, 1011);
             return 2;
@@ -4195,7 +4195,7 @@ namespace GObject
             return NULL;
         if(itype->subClass < Item_Weapon || itype->subClass > Item_Ring )
             return NULL;
-        if(m_Size >= m_Owner->getPacksize())
+        if(m_Size >= m_Owner->getPacksize() + 50)
             return NULL;
         return itype;
 
@@ -4740,13 +4740,40 @@ namespace GObject
 		UInt16 cur = m_Size;
 		UInt16 oldq = item->Size(), newq = item->Size(item->Count() + num);
 		cur = cur - oldq + newq;
-		if(cur > m_Owner->getPacksize())
+		if(cur > m_Owner->getPacksize() + 50)
 			return false;
 		if(!item->IncItem(num))
 			return false;
 		m_Size = cur;
 		return true;
 	}
+
+    bool Package::TryBuyEquip(UInt32 typeId, UInt32 num, bool bind /*= false */)
+    {
+		if((UInt32)(GetRestPackageSize()) < num)
+			return false;
+        return true;
+    }
+
+    bool Package::TryBuyItem(UInt32 typeId, UInt32 num, bool bind /*= false */)
+    {      
+        if (!typeId || !num) return NULL;
+		if (IsEquipTypeId(typeId)) return NULL;
+		const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[typeId];
+		if(itemType == NULL) return NULL;
+		ITEM_BIND_CHECK(itemType->bindType,bind);
+		ItemBase * item = FindItem(typeId, bind);
+   
+		UInt16 cur = m_Size;
+		UInt16 oldq = item->Size(), newq = item->Size(item->Count() + num);
+		cur = cur - oldq + newq;
+		if(cur > m_Owner->getPacksize())
+			return false;
+		if(!item->IncItem(num))
+			return false;
+		m_Size = cur;
+		return true;
+    }
 
 	bool Package::TryDelItem( ItemBase * item, UInt16 num )
 	{
