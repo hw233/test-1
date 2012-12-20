@@ -1427,6 +1427,11 @@ inline void addEquipSpiritAttr( GData::AttrExtra& ae, const ItemEquipSpiritAttr&
 
 inline void testEquipInSet(UInt32 * setId, UInt32 * setNum, UInt32 id)
 {
+    if (id < 2000)
+        id = 1 + (id - 1750) / 8;
+    else
+        id = 33 + (id - 2000) / 8;
+    /*
     if(id - 1750 < 8)
     {
         id = 1;
@@ -1439,6 +1444,7 @@ inline void testEquipInSet(UInt32 * setId, UInt32 * setNum, UInt32 id)
         id -= 2000;
         id /= 8;
     }
+    */
 
 	if(id == 0)
 		return;
