@@ -90,6 +90,7 @@ enum PurchaseType
     AutoJobHunter               = 79,
     AutoJobHunterComplete       = 80,
     EnumFirstRecharge           = 81,
+    //繁体私有占150～200
 };
 
 enum IncomingType

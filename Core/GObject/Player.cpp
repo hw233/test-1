@@ -15218,20 +15218,31 @@ void EventTlzAuto::notify(bool isBeginAuto)
         if(bRet)
         {
             if(goldNum > 0)
-                useGold(goldNum);
-            ConsumeInfo ci(EnumFirstRecharge, 0, 0);
-            useGold(goldNum, &ci);
+            {
+                ConsumeInfo ci(EnumFirstRecharge, 0, 0);
+                useGold(goldNum, &ci);
+            }
             curStep |= (1 << (step-1));
             SetVar(VAR_FIRST_RECHARGE_STEP, curStep);
             sendFirstRecharge();
         }
     }
 
-    void Player::sendFirstRecharge()
+    void Player::sendFirstRecharge(bool isLogin)
     {
         UInt32 lostValue = 0;
         UInt8 lostStep = 4;
         UInt8 canStep = 4;
+        UInt8 index = 0;
+
+        if(_playerData.totalRecharge < 10)
+        {
+            Stream st(REP::COUNTRY_ACT);
+            st << static_cast<UInt8>(0x03) << index << Stream::eos;
+            send(st);
+            return;
+        }
+
         //之前充过
         if(_playerData.totalRecharge > GetVar(VAR_FIRST_RECHARGE_VALUE))
         {
@@ -15251,12 +15262,14 @@ void EventTlzAuto::notify(bool isBeginAuto)
             --canStep;
         }
 
-        UInt8 index;
-        for(index = canStep; index >= lostStep + 1; --index)
+        for(index = lostStep + 1; index <= canStep; ++index)
         {
-            if(GetVar(VAR_FIRST_RECHARGE_STEP)&(1 << (index-1)))
+            if((GetVar(VAR_FIRST_RECHARGE_STEP)&(1 << (index-1))) == 0)
                 break;
         }
+
+        if(isLogin && index > 4)
+            return;
         Stream st(REP::COUNTRY_ACT);
         st << static_cast<UInt8>(0x03) << index << Stream::eos;
         send(st);

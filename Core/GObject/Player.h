@@ -1014,7 +1014,7 @@ namespace GObject
         void ArenaExtraAct(UInt8 type, UInt8 opt);
 
         void FirstRechargeAct(UInt8 step, UInt8 type, UInt8 career);
-        void sendFirstRecharge();
+        void sendFirstRecharge(bool isLogin = false);
 
 		UInt32 getAchievement(UInt32 a = 0);
 		UInt32 useAchievement(UInt32 a,ConsumeInfo * ci=NULL);
