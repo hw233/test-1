@@ -1071,6 +1071,7 @@ namespace GObject
 
         //QQGame登录奖励
         sendQQGameGift1218();
+        sendFeastLoginAct();
 
         char buf[64] = {0};
         snprintf(buf, sizeof(buf), "%"I64_FMT"u", _id);
@@ -15871,6 +15872,74 @@ void Player::sendQQGameGift1218()
         }
         SetVar(VAR_QQGAME_GIFT_1218, 1);
     }
+}
+
+void Player::sendFeastLoginAct()
+{
+    if(GetLev() < 40 || GetVar(VAR_FEAST_LOGIN) > 0 || !World::getFeastLoginAct())
+        return;
+    SYSMSGV(title, 4102);
+    SYSMSGV(content, 4103);
+    Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+    if(mail)
+    {
+        MailPackage::MailItem mitem = {1759,1};
+        mailPackageManager.push(mail->id, &mitem, 1, true);
+    }
+    SetVar(VAR_FEAST_LOGIN, 1);
+}
+
+void Player::getFeastGiftAward(UInt8 type)
+{
+    if(type == 0 || type > 2)
+        return;
+    bool bRet;
+    UInt32 status = GetVar(VAR_FEAST_GIFT);
+
+    if(type == 1)
+    {
+        if(status & 0x01)
+            return;
+        bRet = GameAction()->onGetFeastGiftAward(this, type);
+        if(bRet)
+        {
+            udpLog("huodong", "F_10000_15", "", "", "", "", "act");
+            status |= 0x01;
+            SetVar(VAR_FEAST_GIFT, status);
+            sendFeastGiftAct();
+        }
+    }
+    else
+    {
+        if(status & 0x02)
+            return;
+        if(getGold() < 30)
+        {
+            sendMsgCode(0, 1104);
+            return;
+        }
+        bRet = GameAction()->onGetFeastGiftAward(this, type);
+        if(bRet)
+        {
+            ConsumeInfo ci(EnumFEASTGIFT,0,0);
+            useGold(30,&ci);
+            status |= 0x02;
+            SetVar(VAR_FEAST_GIFT, status);
+            sendFeastGiftAct();
+        }
+    }
+}
+
+void Player::sendFeastGiftAct()
+{
+    if(!World::getFeastLoginAct())
+        return;
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(7);
+    UInt8 opt = GetVar(VAR_FEAST_GIFT);
+    st << opt;
+    st << Stream::eos;
+    send(st);
 }
 
 } // namespace GObject

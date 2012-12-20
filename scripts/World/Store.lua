@@ -107,6 +107,11 @@ function loadStore()
 
         discount(store)
 
+        if is1221_1227() then
+            store:add(2, 1709, 599) --圣诞萌萌的糖
+            store:add(2, 1710, 599) --圣诞老人的包袱
+        end
+
         if is1116_1122() then
             store:add(2, 9215, 10) --逍遥礼包
         end

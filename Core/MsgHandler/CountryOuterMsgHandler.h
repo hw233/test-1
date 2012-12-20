@@ -1222,6 +1222,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendCopyFrontAllAward();
     pl->sendGoodVoiceInfo();
     pl->send3366GiftInfo();
+    pl->sendFeastGiftAct();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -1821,6 +1822,16 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
                 return;
             br >> type;
             player->get3366GiftAward(type);
+        }
+        break;
+
+        case 7:
+        {
+            UInt8 type;
+            if(!World::getFeastLoginAct())
+                return;
+            br >> type;
+            player->getFeastGiftAward(type);
         }
         break;
 
