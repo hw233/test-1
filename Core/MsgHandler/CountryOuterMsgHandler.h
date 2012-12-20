@@ -1084,6 +1084,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->GetHeroMemo()->sendHeroMemoInfo();
     pl->GetShuoShuo()->sendShuoShuo();
     pl->GetCFriend()->sendCFriend();
+    pl->GetStrengthenMgr()->CheckTimeOver(now);
     pl->sendRechargeInfo();
     pl->sendConsumeInfo();
     pl->sendRechargeNextRetInfo(now);
