@@ -823,14 +823,16 @@ function onActivityCheck(tm)
       end
 
       if tm >= actTime220_0 and tm < actTime220_1 then
-          --setFeastLoginAct(true)
-          setFeastLoginAct(false)
           setTowerLoginAct( (tm - actTime220_0) / 86400 + 1)
-          --is_1221_1227 = true
-          is_1221_1227 = false
+      else
+          setTowerLoginAct(0)
+      end
+
+      if tm >= actTime221_0 and tm < actTime221_1 then
+          setFeastLoginAct(true)
+          is_1221_1227 = true
       else
           setFeastLoginAct(false)
-          setTowerLoginAct(0)
           is_1221_1227 = false
       end
 
@@ -1028,9 +1030,10 @@ function initActTime(y, m, d)
   local  SerStartTm219 = { ['year'] = 2012, ['month'] = 11, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm219_1 = { ['year'] = 2012, ['month'] = 12, ['day'] = 26, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
-  -- 节日套装人人拿
   -- 楼一登录奖励时间段（21~27)
   local  SerStartTm220 = { ['year'] = 2012, ['month'] = 12, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 节日套装人人拿(22~28)
+  local  SerStartTm221 = { ['year'] = 2012, ['month'] = 12, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
 
   --300-399越南版用了
@@ -1366,6 +1369,9 @@ function initActTime(y, m, d)
 
   actTime220_0= os.time(SerStartTm220);
   actTime220_1= os.time(SerStartTm220) + 7 * 86400;
+
+  actTime221_0= os.time(SerStartTm221);
+  actTime221_1= os.time(SerStartTm221) + 7 * 86400;
 
   onActivityCheck(os.time() + 30);
 
