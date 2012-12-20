@@ -74,8 +74,19 @@ namespace GObject
     void RechargeTmpl::addScore(Player* pl, UInt32 oldRecharge, UInt32 newRecharge)
     {
         static const UInt32 s_scores[][2] = {
-            {10,100},{99,500},{399,260},{999,500},{1999,1000},{3599,1100},{5999,1300},{8999,1750},
-            {13999,2400},{19999,2500},{28999,3000},{39999,4000},{55999,5000}
+            {10,100},
+            {99,500},
+            {399,260},
+            {999,500},
+            {1999,1000},
+            {3599,1100},
+            {5999,1300},
+            {8999,1750},
+            {13999,2400},
+            {19999,2500},
+            {28999,3000},
+            {39999,4000},
+            {55999,5000}
         };
         UInt8 count = sizeof(s_scores)/sizeof(s_scores[0][0])/2;
         UInt32 s = 0;
@@ -86,6 +97,10 @@ namespace GObject
             if (oldRecharge < s_scores[i][0] && newRecharge >= s_scores[i][0])
                 s += s_scores[i][1];
         }
+        pl->AddVar(VAR_RECHARGE_SCORE, s);
+    }
+    void RechargeTmpl::addScore(Player* pl, UInt32 s)
+    {
         pl->AddVar(VAR_RECHARGE_SCORE, s);
     }
     void RechargeTmpl::sendStreamInfo(Player* pl)

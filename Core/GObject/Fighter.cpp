@@ -1200,7 +1200,7 @@ void Fighter::setPotential( float p, bool writedb )
 		{
 			_attrDirty = true;
 			_bPDirty = true;
-			sendModification(4, static_cast<UInt32>(UInt32(p * 100) + 0.5f));
+			sendModification(4, static_cast<UInt32>((p * 100) + 0.5f));
 		}
 	}
 }
@@ -1209,7 +1209,7 @@ void Fighter::setCapacity( float c, bool writedb )
 {
     _capacity = c;
     if (writedb && _owner) {
-        sendModification(5, static_cast<UInt32>(UInt32(c * 100) + 0.5f));
+        sendModification(5, static_cast<UInt32>((c * 100) + 0.5f));
     }
 }
 
@@ -4573,43 +4573,6 @@ void Fighter::appendElixirAttr2(Stream& st)
     st << _elixirattr.action;
 }
 
-
-UInt16 Fighter::getBattlePortrait()
-{
-    UInt16 portrait = 0;
-    UInt32 fashion = getFashionTypeId();
-
-    switch(fashion)
-    {
-    case 1700:
-        portrait = 1072;
-        break;
-    case 1701:
-        portrait = 1074;
-        break;
-    case 1702:
-        portrait = 1063;
-        break;
-    case 1703:
-        portrait = 1064;
-        break;
-    case 1704:
-        portrait = 1076;
-        break;
-    case 1705:
-        portrait = 1077;
-        break;
-    case 1706:
-        portrait = 1088;
-        break;
-    case 1707:
-        portrait = 1090;
-        break;
-    }
-
-    return portrait;
-}
-
 UInt8 Fighter::SSGetLvl(UInt16 skillid)
 {
     UInt32 sid = SKILL_ID(skillid);
@@ -5059,5 +5022,35 @@ void Fighter::checkBPDirty()
             if (!_owner->GetShuoShuo()->getShuoShuo(SS_MO_HIRE))
                 _owner->OnShuoShuo(SS_MO_STRENGTH);
 }
+
+UInt16 Fighter::getPortrait()
+{
+    UInt16 portrait = getId();
+    if(!_hideFashion)
+    {
+        if (getFashionTypeId() == 1700)
+            portrait = 1072;
+        else if (getFashionTypeId() == 1701)
+            portrait = 1074;
+        else if (getFashionTypeId() == 1702)
+            portrait = 1063;
+        else if (getFashionTypeId() == 1703)
+            portrait = 1064;
+        else if (getFashionTypeId() == 1704)
+            portrait = 1076;
+        else if (getFashionTypeId() == 1705)
+            portrait = 1077;
+        else if (getFashionTypeId() == 1706)
+            portrait = 1088;
+        else if (getFashionTypeId() == 1707)
+            portrait = 1090;
+        else if (getFashionTypeId() == 1708)
+            portrait = 1091;
+    }
+
+    return portrait;
+}
+
+
 }
 

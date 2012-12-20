@@ -738,6 +738,12 @@ function onActivityCheck(tm)
           setNeedRechargeRank(false)
       end
 
+      if tm >= actTime525 and tm < actTime525_1 then
+          setTgcEvent(true)
+      else
+          setTgcEvent(false)
+      end
+
       if tm >= actTime523 and tm < actTime523_1 then
           setRechargeActive(true, 16)
       elseif tm >= actTime527 and tm < actTime527_1 then
@@ -815,7 +821,7 @@ function initActTime(y, m, d)
   local  SerStartTm1 = { ['year'] = 2011, ['month'] = 10, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm2 = { ['year'] = 2011, ['month'] = 10, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm3 = { ['year'] = 2011, ['month'] = 11, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTm4 = { ['year'] = 2012, ['month'] = 11, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm4 = { ['year'] = 2012, ['month'] = 12, ['day'] = 4, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm5 = { ['year'] = 2011, ['month'] = 12, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm6 = { ['year'] = 2012, ['month'] = 1, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm7 = { ['year'] = 2012, ['month'] = 1, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -913,6 +919,7 @@ function initActTime(y, m, d)
   local  SerStartTm522= { ['year'] = 2012, ['month'] = 11, ['day'] = 3, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm523= { ['year'] = 2012, ['month'] = 11, ['day'] = 6, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
+  local  SerStartTm525= { ['year'] = 2012, ['month'] = 12, ['day'] = 4, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm526= { ['year'] = 2012, ['month'] = 11, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm527= { ['year'] = 2012, ['month'] = 11, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm528= { ['year'] = 2012, ['month'] = 11, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -969,6 +976,7 @@ function initActTime(y, m, d)
   local  SerStartTm219 = { ['year'] = 2012, ['month'] = 11, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm219_1 = { ['year'] = 2012, ['month'] = 12, ['day'] = 26, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
+  --300-399越南版用了
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
 
@@ -982,7 +990,7 @@ function initActTime(y, m, d)
   actTime6 = os.time(SerStartTm3) + 3 * 86400;
   
   actTime7 = os.time(SerStartTm4);
-  actTime8 = os.time(SerStartTm4) + 7 * 86400;
+  actTime8 = os.time(SerStartTm4) + 12 * 86400;
 
   actTime9 = os.time(SerStartTm5);
   actTime10 = os.time(SerStartTm5) + 12 * 86400;
@@ -1194,6 +1202,9 @@ function initActTime(y, m, d)
 
   actTime523 = os.time(SerStartTm523);
   actTime523_1 = os.time(SerStartTm523) + 4 * 86400;
+
+  actTime525 = os.time(SerStartTm525);
+  actTime525_1 = os.time(SerStartTm525) + 26 * 86400;
 
   actTime526 = os.time(SerStartTm526);
   actTime526_1 = os.time(SerStartTm526) + 4 * 86400;

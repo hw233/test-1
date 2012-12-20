@@ -7204,6 +7204,9 @@ namespace GObject
             GObject::RechargeTmpl::instance().addScore(this, GetVar(VAR_RECHARGE_TOTAL)-r, GetVar(VAR_RECHARGE_TOTAL));
             GObject::RechargeTmpl::instance().sendScoreInfo(this);
         }
+
+        AddVar(VAR_FIRST_RECHARGE_VALUE, r);
+        sendFirstRecharge();
 	}
 
     void Player::addRechargeNextRet(UInt32 r)
@@ -10621,6 +10624,8 @@ namespace GObject
 
     void Player::getThanksGivingDay(UInt8 opt)
     {
+        if(!World::getThanksgiving())
+            return;
         if(opt == 0) //免费领取
         {
             if(GetVar(VAR_TGDT) & 0x01)
@@ -10630,18 +10635,18 @@ namespace GObject
                 UInt32 var = GetVar(VAR_TGDT) | 0x01;
                 SetVar(VAR_TGDT, var);
                 Stream st(REP::GETAWARD);
-                st << static_cast<UInt8>(15) << static_cast<UInt8>(0) << Stream::eos;
+                st << static_cast<UInt8>(15) << static_cast<UInt8>(4) << Stream::eos;
                 send(st);
                 udpLog("huodong", "F_10000_15", "", "", "", "", "act");
             }
         }
-        if(opt == 1) //付费领取(20仙石)
+        if(opt == 1) //付费领取(30仙石)
         {
             if(!hasChecked())
                 return;
             if(GetVar(VAR_TGDT) & 0x02)
                 return;
-			if (getGold() < 20)
+			if (getGold() < 30)
 			{
 				sendMsgCode(0, 1104);
 				return;
@@ -10651,11 +10656,17 @@ namespace GObject
                 UInt32 var = GetVar(VAR_TGDT) | 0x02;
                 SetVar(VAR_TGDT, var);
                 ConsumeInfo ci(ThanksGivingDay, 0, 0);
-                useGold(20, &ci);
+                useGold(30, &ci);
                 Stream st(REP::GETAWARD);
-                st << static_cast<UInt8>(15) << static_cast<UInt8>(1) << Stream::eos;
+                st << static_cast<UInt8>(15) << static_cast<UInt8>(5) << Stream::eos;
                 send(st);
             }
+        }
+        if(opt == 2) //告诉客户端领取情况
+        {
+            Stream st(REP::GETAWARD);
+            st << static_cast<UInt8>(15) << static_cast<UInt8>(GetVar(VAR_TGDT)) << Stream::eos;
+            send(st);
         }
     }
 
@@ -13401,7 +13412,7 @@ namespace GObject
 
                 st << fgt->getSoulExtraAura();
                 st << fgt->getSoulAuraLeft();
-                st << fgt->getBattlePortrait();
+                st << fgt->getPortrait();
                 fgt->appendElixirAttr2(st);
             }
         }
@@ -14484,6 +14495,14 @@ void EventTlzAuto::notify(bool isBeginAuto)
                     return 1;
                 }
                 break;
+            case 2:
+                {
+                    ItemBase* ib = GetPackage()->GetItem(9273, true);
+                    if (!ib)
+                        return 0;
+                    return 1;
+                }
+                break;
             default:
                 break;
         }
@@ -15165,6 +15184,104 @@ void EventTlzAuto::notify(bool isBeginAuto)
         
     }
 
+
+    static UInt32 newRecharge[] = {10, 88, 188, 588};
+    void Player::FirstRechargeAct(UInt8 step, UInt8 type, UInt8 career)
+    {
+        if(step == 0 || step > 4)
+            return;
+        if(type > 1)
+            return;
+        if(career == 0 || career > 3)
+            return;
+        UInt32 curStep = GetVar(VAR_FIRST_RECHARGE_STEP);
+        /*
+         * bit 1: 10XS
+         * bit 2: 88XS
+         * bit 3: 188XS
+         * bit 4: 588XS
+         */
+        if(curStep & (1 << (step-1)))
+            return;
+        UInt8 index;
+        if(step == 1)
+            index = 1 + type;
+        else
+            index = 1 + career * 2 + type;
+        UInt32 goldNum = 0;
+        if(type == 1)
+        {
+            if(step == 1)
+                goldNum = 10;
+            else
+                goldNum = 50;
+            if(getGold() < goldNum)
+            {
+                sendMsgCode(2, 1104, 0);
+                return;
+            }
+        }
+
+        bool bRet = GameAction()->onFirstRecharge(this, index);
+        if(bRet)
+        {
+            if(goldNum > 0)
+            {
+                ConsumeInfo ci(EnumFirstRecharge, 0, 0);
+                useGold(goldNum, &ci);
+            }
+            curStep |= (1 << (step-1));
+            SetVar(VAR_FIRST_RECHARGE_STEP, curStep);
+            sendFirstRecharge();
+        }
+    }
+
+    void Player::sendFirstRecharge(bool isLogin)
+    {
+        UInt32 lostValue = 0;
+        UInt8 lostStep = 4;
+        UInt8 canStep = 4;
+        UInt8 index = 0;
+
+        if(_playerData.totalRecharge < 10)
+        {
+            Stream st(REP::COUNTRY_ACT);
+            st << static_cast<UInt8>(0x03) << index << Stream::eos;
+            send(st);
+            return;
+        }
+
+        //之前充过
+        if(_playerData.totalRecharge > GetVar(VAR_FIRST_RECHARGE_VALUE))
+        {
+            lostValue = _playerData.totalRecharge - GetVar(VAR_FIRST_RECHARGE_VALUE);
+        }
+        while(lostStep > 0)
+        {
+            if(newRecharge[lostStep - 1] <= lostValue)
+                break;
+            --lostStep;
+        }
+
+        while(canStep > 0)
+        {
+            if(newRecharge[canStep - 1] <= _playerData.totalRecharge)
+                break;
+            --canStep;
+        }
+
+        for(index = lostStep + 1; index <= canStep; ++index)
+        {
+            if((GetVar(VAR_FIRST_RECHARGE_STEP)&(1 << (index-1))) == 0)
+                break;
+        }
+
+        if(isLogin && index > 4)
+            return;
+        Stream st(REP::COUNTRY_ACT);
+        st << static_cast<UInt8>(0x03) << index << Stream::eos;
+        send(st);
+    }
 
 } // namespace GObject
 

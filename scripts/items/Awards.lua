@@ -582,9 +582,15 @@ function RunThanksGivingDayAward(player, opt)
     if player == nil or opt < 1 or opt > 2 then
         return 0
     end
+    --[[ 感恩节
     local awards = {
         [1] = {{517, 1},{29, 10},{511, 1},{15, 1},{514, 1},{548, 1}},
         [2] = {{503, 1},{500, 1},{513, 1},{516, 1},{30, 1},{1525,1}},
+    }
+    --]]
+    local awards = {
+        [1] = {{517, 1},{29, 10},{511, 1},{15, 1},{16, 1},{548, 1}},
+        [2] = {{514, 1},{465, 1},{501, 1},{516, 1},{551, 1},{134,1}},
     }
     local package = player:GetPackage()
 	if package:GetRestPackageSize() < #awards[opt] then

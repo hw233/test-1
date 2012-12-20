@@ -468,85 +468,10 @@ void BattleSimulator::start(UInt8 prevWin, bool checkEnh)
                     UInt32 maxhp = bf->getMaxHP();
                     _packet << static_cast<UInt8>(j + 1) << bf->getFighter()->getBattleName();
 
-                    UInt8 clsnsex = bf->getFighter()->getClassAndSex();
-                    UInt16 portrait = 0;
+                    UInt8 clsnsex = bf->getClassAndSex();
+                    UInt16 portrait = bf->getPortrait();
 
-                    if (bf->getFighter()->getFashionTypeId() == 1700)
-                        portrait = 1072;
-                    else if (bf->getFighter()->getFashionTypeId() == 1701)
-                        portrait = 1074;
-                    else if (bf->getFighter()->getFashionTypeId() == 1702)
-                        portrait = 1063;
-                    else if (bf->getFighter()->getFashionTypeId() == 1703)
-                        portrait = 1064;
-                    else if (bf->getFighter()->getFashionTypeId() == 1704)
-                        portrait = 1076;
-                    else if (bf->getFighter()->getFashionTypeId() == 1705)
-                        portrait = 1077;
-                    else if (bf->getFighter()->getFashionTypeId() == 1706)
-                        portrait = 1088;
-                    else if (bf->getFighter()->getFashionTypeId() == 1707)
-                        portrait = 1090;
-                    else if (bf->getFighter()->getFashionTypeId() == 1708)
-                        portrait = 1091;
-
-                    bool isBuff = true;
-                    if(bf->getBuffData(FIGHTER_BUFF_CRMASGIRL, now))
-                        portrait = 1058;
-                    else if(bf->getBuffData(FIGHTER_BUFF_DRESS, now))
-                        portrait = 1063;
-                    else if(bf->getBuffData(FIGHTER_BUFF_WEDDING, now))
-                        portrait = 1064;
-                    else if(bf->getBuffData(FIGHTER_BUFF_RMAN, now))
-                    {
-                        clsnsex = e_cls_ru<<4;
-                        portrait = 1;
-                    }
-                    else if(bf->getBuffData(FIGHTER_BUFF_RWMAN, now))
-                    {
-                        clsnsex = e_cls_ru<<4|1;
-                        portrait = 2;
-                    }
-                    else if(bf->getBuffData(FIGHTER_BUFF_SMAN, now))
-                    {
-                        clsnsex = e_cls_shi<<4;
-                        portrait = 3;
-                    }
-                    else if(bf->getBuffData(FIGHTER_BUFF_SWMAN, now))
-                    {
-                        clsnsex = e_cls_shi<<4|1;
-                        portrait = 4;
-                    }
-                    else if(bf->getBuffData(FIGHTER_BUFF_DMAN, now))
-                    {
-                        clsnsex = e_cls_dao<<4;
-                        portrait = 5;
-                    }
-                    else if(bf->getBuffData(FIGHTER_BUFF_DWMAN, now))
-                    {
-                        clsnsex = e_cls_dao<<4|1;
-                        portrait = 6;
-                    }
-                    else if (bf->getBuffData(FIGHTER_BUFF_RDIAMOND, now))
-                        portrait = 1089;
-                    else if (bf->getBuffData(FIGHTER_BUFF_BLUE, now))
-                        portrait = 1090;
-                    else if (bf->getBuffData(FIGHTER_BUFF_QQVIP, now))
-                        portrait = 1091;
-                    else
-                    {
-                        isBuff = false;
-                        if (!portrait)
-                            portrait = bf->getPortrait();
-                    }
-                    if (bf->getFighter()->getHideFashion() && !isBuff)
-                        portrait = bf->getPortrait();
-
-                    if(bf->getFighter()->isNpc())
-                        _packet << static_cast<UInt8>(bf->getFighter()->reqFriendliness);
-                    else
-                        _packet << clsnsex;
-
+                    _packet << clsnsex;
                     _packet << static_cast<UInt8>(_isBody[i][j] > 0 ? (_isBody[i][j] - 1) : bf->getFighter()->getLevel()) << portrait << static_cast<UInt8>(bf->getFlag() & 0x03);
                     _packet << static_cast<UInt8>(bf->getFighter()->getColor())
                         << static_cast<UInt32>(_isBody[i][j] ? 0 : bf->getHP()) << static_cast<UInt32>(maxhp);
@@ -3553,13 +3478,13 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
         else if(0 == skill->area)
         {
             size_t hitcnt = 1 + getSkillEffectExtraHitCnt(bf, static_cast<BattleFighter*>(getObject(target_side, target_pos)), skill, defList, defCount, scList, scCount);
-            bool cs2 = cs;
-            bool pr2 = pr;
             for(size_t idx = 0; idx < hitcnt; ++ idx)
             {
                 float factor = 1;
                 UInt32 dmg2 = 0;
                 first = true;
+                bool cs2 = false;
+                bool pr2 = false;
                 if(idx < skill->factor.size())
                     factor = skill->factor[idx];
                 if(idx == 0)
@@ -3572,8 +3497,8 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                     dmg2 = attackOnce(bf, first, cs2, pr2, skill, getObject(target_side, target_pos), factor, defList, defCount, scList, scCount);
 
                 dmg += dmg2;
-                doSkillEffectExtraAbsorb(bf, dmg, skill, defList, defCount, scList, scCount);
-                doSkillStrenghtenTherapyAnotherMore(bf, dmg, skill, ss, defList, defCount, scList, scCount);
+                doSkillEffectExtraAbsorb(bf, dmg2, skill, defList, defCount, scList, scCount);
+                doSkillStrenghtenTherapyAnotherMore(bf, dmg2, skill, ss, defList, defCount, scList, scCount);
 
                 if(dmg2 > 0)
                     doSkillStrenghtenCriticalDamageAroundOne(bf, skill, cs2, ss, target_side, target_pos, defList, defCount, scList, scCount);

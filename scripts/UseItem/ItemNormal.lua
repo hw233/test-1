@@ -6650,12 +6650,49 @@ function ItemNormal_fighterCard(iid, num, bind, param)
         return false
     end
 
-    -- TODO:
     local fighters = {
+        [9237] = 10 ,
+        [9238] = 13 ,
+        [9239] = 16 ,
+        [9240] = 11 ,
+        [9241] = 17 ,
+        [9242] = 14 ,
+        [9243] = 110,
+        [9244] = 113,
+        [9245] = 12 ,
+        [9246] = 15 ,
+        [9247] = 18 ,
+        [9248] = 111,
+        [9249] = 21 ,
+        [9250] = 27 ,
+        [9251] = 35 ,
+        [9252] = 23 ,
+        [9253] = 25 ,
+        [9254] = 32 ,
+        [9255] = 26 ,
+        [9256] = 31 ,
+        [9257] = 24 ,
+        [9258] = 36 ,
+        [9259] = 28 ,
+        [9260] = 115,
+        [9261] = 114,
+        [9262] = 19 ,
+        [9263] = 112,
+        [9264] = 20 ,
+        [9265] = 22 ,
+        [9266] = 116,
+        [9267] = 30 ,
+        [9268] = 29 ,
+        [9269] = 34 ,
+        [9270] = 33 ,
+        [9271] = 43 ,
+        [9272] = 52 ,
     }
 
-    local id = 0
-    -- TODO:
+    local id = fighters[iid]
+    if id == nil then
+        return false
+    end
 
     if not player:fighterFromItem(id) then
         return false
@@ -8254,6 +8291,43 @@ local ItemNormal_Table = {
     [9218] = ItemNormal_00009160,
     [9230] = ItemNormal_00009230,
     [9228] = ItemNormal_00009228,
+
+    [9237] = ItemNormal_fighterCard,
+    [9238] = ItemNormal_fighterCard,
+    [9239] = ItemNormal_fighterCard,
+    [9240] = ItemNormal_fighterCard,
+    [9241] = ItemNormal_fighterCard,
+    [9242] = ItemNormal_fighterCard,
+    [9243] = ItemNormal_fighterCard,
+    [9244] = ItemNormal_fighterCard,
+    [9245] = ItemNormal_fighterCard,
+    [9246] = ItemNormal_fighterCard,
+    [9247] = ItemNormal_fighterCard,
+    [9248] = ItemNormal_fighterCard,
+    [9249] = ItemNormal_fighterCard,
+    [9250] = ItemNormal_fighterCard,
+    [9251] = ItemNormal_fighterCard,
+    [9252] = ItemNormal_fighterCard,
+    [9253] = ItemNormal_fighterCard,
+    [9254] = ItemNormal_fighterCard,
+    [9255] = ItemNormal_fighterCard,
+    [9256] = ItemNormal_fighterCard,
+    [9257] = ItemNormal_fighterCard,
+    [9258] = ItemNormal_fighterCard,
+    [9259] = ItemNormal_fighterCard,
+    [9260] = ItemNormal_fighterCard,
+    [9261] = ItemNormal_fighterCard,
+    [9262] = ItemNormal_fighterCard,
+    [9263] = ItemNormal_fighterCard,
+    [9264] = ItemNormal_fighterCard,
+    [9265] = ItemNormal_fighterCard,
+    [9266] = ItemNormal_fighterCard,
+    [9267] = ItemNormal_fighterCard,
+    [9268] = ItemNormal_fighterCard,
+    [9269] = ItemNormal_fighterCard,
+    [9270] = ItemNormal_fighterCard,
+    [9271] = ItemNormal_fighterCard,
+    [9272] = ItemNormal_fighterCard,
 
     [10000] = ItemNormal_00010000,
     [10001] = ItemNormal_00010001,

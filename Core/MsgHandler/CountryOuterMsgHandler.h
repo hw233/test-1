@@ -1001,6 +1001,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
             pl->sendNewRegisterAward(0);  //0:表示新用户注册还可以邀请好友进行抽奖
         pl->CheckCanAwardBirthday(); //生日罗盘许愿星(周年庆活动)
         pl->getAwardLogin(2); // 2012/10/14登录抽奖合作活动
+        pl->getThanksGivingDay(2); //感恩节活动,qq大厅登录礼包
     }
 	{
 		Stream st;
@@ -1217,6 +1218,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendYearRPInfo();
     //if(World::getYearActive())
     //    pl->sendYearActInfo();
+    pl->sendFirstRecharge(true);
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -1758,6 +1760,18 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
                 player->getKillMonsterAward();
             else if(type == 2)
                 player->checkLastKillMonsterAward();
+        }
+        break;
+
+        case 3:
+        {
+            UInt8 step;
+            UInt8 type;
+            UInt8 career;
+            br >> step;
+            br >> type;
+            br >> career;
+            player->FirstRechargeAct(step, type, career);
         }
         break;
         default:
@@ -5090,11 +5104,14 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
          return;
 
     // XXX: 不使用老版本新注册七日活动
-    return; // XXX: 不使用老版本新注册七日活动
+    //return; // XXX: 不使用老版本新注册七日活动
 
 	BinaryReader br(data, hdr.msgHdr.bodyLen);
     UInt8 op = 0;
     br >> op;
+
+    if (op !=6 && op !=7 )
+        return;
 
     switch(op)
     {

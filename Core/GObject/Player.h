@@ -1013,6 +1013,9 @@ namespace GObject
         void writeTitleAll();
         void ArenaExtraAct(UInt8 type, UInt8 opt);
 
+        void FirstRechargeAct(UInt8 step, UInt8 type, UInt8 career);
+        void sendFirstRecharge(bool isLogin = false);
+
 		UInt32 getAchievement(UInt32 a = 0);
 		UInt32 useAchievement(UInt32 a,ConsumeInfo * ci=NULL);
 		void useAchievement2( UInt32 a, Player *attacker, ConsumeInfo * ci = NULL);
@@ -1730,7 +1733,17 @@ namespace GObject
             if (atoi(domain.c_str()) == 12)
                 m_isOffical = true;
         }
-        inline void setClientIp(const std::string& clientIp) { strncpy(m_clientIp, clientIp.c_str(), 256);}
+        inline void setClientIp(const std::string& clientIp) 
+        { 
+            if (strncmp(clientIp.c_str(), "", 1) == 0)
+            {
+                strncpy(m_clientIp, "0.0.0.0", 16);
+            }
+            else
+            {
+                strncpy(m_clientIp, clientIp.c_str(), 256);
+            }
+        }
         void setOpenId(const std::string& openid, bool load = false);
         inline void setOpenKey(const std::string& openkey) { strncpy(m_openkey, openkey.c_str(), 256); }
         inline void setSource(const std::string& source) { m_source = source; }

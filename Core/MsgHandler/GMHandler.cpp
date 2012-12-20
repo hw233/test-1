@@ -133,6 +133,7 @@ GMHandler::GMHandler()
 	Reg(3, "setcountry", &GMHandler::OnSetCountry);
 	Reg(3, "setacu", &GMHandler::OnSetAcu);
 	Reg(3, "useitem", &GMHandler::OnUseItem);
+	Reg(3, "uitem", &GMHandler::OnUseItem);
     Reg(3, "ocupyplace", &GMHandler::OnOcupyPlace);
     Reg(3, "ec", &GMHandler::OnEnterCopy);
     Reg(3, "gmc", &GMHandler::OnGmCheck);
