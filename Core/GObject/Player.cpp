@@ -14495,6 +14495,14 @@ void EventTlzAuto::notify(bool isBeginAuto)
                     return 1;
                 }
                 break;
+            case 2:
+                {
+                    ItemBase* ib = GetPackage()->GetItem(9273, true);
+                    if (!ib)
+                        return 0;
+                    return 1;
+                }
+                break;
             default:
                 break;
         }

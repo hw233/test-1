@@ -1254,24 +1254,31 @@ bool JobHunter::OnFoundCave(bool isAuto)
     }
 
     // 步数奖励配置
-    Table rewards = GameAction()->getStepAward(_stepCount);
-    UInt8 count = rewards.size();
-    st2 << static_cast<UInt8>(count);
-    for (UInt8 i = 0; i < count; ++i)
+    if (res)
     {
-        Table item = rewards.get<Table>(i + 1);
-        if (item.size() < 3) break;
-        UInt32 itemId = item.get<UInt32>(1);
-        UInt32 itemCount = item.get<UInt32>(2);
-        //bool   bind = item.get<bool>(3);
-        st2 << static_cast<UInt16>(itemId) << static_cast<UInt16>(itemCount);
-        _owner->lastExJobAwardPush(itemId, itemCount);
-        _owner->GetPackage()->Add(itemId, itemCount, true, isAuto? true:false, FromNpc);
+        Table rewards = GameAction()->getStepAward(_stepCount);
+        UInt8 count = rewards.size();
+        st2 << static_cast<UInt8>(count);
+        for (UInt8 i = 0; i < count; ++i)
+        {
+            Table item = rewards.get<Table>(i + 1);
+            if (item.size() < 3) break;
+            UInt32 itemId = item.get<UInt32>(1);
+            UInt32 itemCount = item.get<UInt32>(2);
+            //bool   bind = item.get<bool>(3);
+            st2 << static_cast<UInt16>(itemId) << static_cast<UInt16>(itemCount);
+            _owner->lastExJobAwardPush(itemId, itemCount);
+            _owner->GetPackage()->Add(itemId, itemCount, true, isAuto? true:false, FromNpc);
+        }
     }
+    else
+        st2 << static_cast<UInt8>(0);
     st2 << Stream::eos;
-    _owner->send(st2);
+    if (res)
+        _owner->send(st2);
 
-    AddToFighterList(static_cast<UInt16>(fighterId));
+    if (res)
+        AddToFighterList(static_cast<UInt16>(fighterId));
     if (!isAuto)
         SendGridInfo(POS_TO_INDEX(_posX, _posY));
     else

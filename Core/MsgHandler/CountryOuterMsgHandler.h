@@ -5104,11 +5104,14 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
          return;
 
     // XXX: 不使用老版本新注册七日活动
-    return; // XXX: 不使用老版本新注册七日活动
+    //return; // XXX: 不使用老版本新注册七日活动
 
 	BinaryReader br(data, hdr.msgHdr.bodyLen);
     UInt8 op = 0;
     br >> op;
+
+    if (op !=6 && op !=7 )
+        return;
 
     switch(op)
     {
