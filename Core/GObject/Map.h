@@ -20,6 +20,7 @@ namespace GObject
 
 
 class CountryBattle;
+class NewCountryBattle;
 //作为基础配置数据出现
 struct MapData
 {
@@ -53,10 +54,12 @@ struct SpotData
 	std::set<Player *>	m_Players;
 
 	CountryBattle *		m_CountryBattle;
+	NewCountryBattle *  m_NewCountryBattle;
 
-	SpotData(): m_ID(0), m_Type(0), m_IsCountryBattle(0), m_PosX(0), m_PosY(0), m_CountryBattle(NULL) {}
+	SpotData(): m_ID(0), m_Type(0), m_IsCountryBattle(0), m_PosX(0), m_PosY(0), m_CountryBattle(NULL), m_NewCountryBattle(NULL) {}
 	~SpotData();
 	inline CountryBattle* GetCountryBattle() { return m_CountryBattle; }
+	inline NewCountryBattle* GetNewCountryBattle() { return m_NewCountryBattle; }
 	void InitCountryBattle();
 };
 

@@ -907,6 +907,8 @@ namespace GObject
 		inline UInt32 getPendExp() { return _playerData.lastExp & 0x7FFFFFFF; }
 		bool regenHP(UInt32);
         UInt8 allHpP();
+        UInt32 getBattleMaxHp();
+        UInt32 getBattleCurrentHp(); 
 
         bool isCopyPassed(UInt8 copyid);
 
@@ -1662,7 +1664,7 @@ namespace GObject
         void luckyDrawUdpLog(UInt32 id, UInt8 type, UInt32 num = 1);
         void qixiUdpLog(UInt32 id);
         void clanUdpLog(UInt32 id);
-        void countryBattleUdpLog(UInt32 id, UInt8 country);
+        void countryBattleUdpLog(UInt32 id, UInt8 country, std::string str = "");
         void secondSoulUdpLog(UInt32 id, UInt32 val = 0, UInt32 num = 1);
         void wBossUdpLog(UInt32 id);
         void clanCopyUdpLog(UInt32 id, UInt32 val = 0, UInt32 num = 1);

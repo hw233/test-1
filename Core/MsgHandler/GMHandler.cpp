@@ -37,7 +37,7 @@
 #include "GObject/LuckyDraw.h"
 #include "GObject/ClanCopy.h"
 #include "GObject/SingleHeroStage.h"
-
+#include "GObject/NewCountryBattle.h"
 #include "GObject/Tianjie.h"
 #include "GObject/ClanCopy.h"
 
@@ -124,6 +124,7 @@ GMHandler::GMHandler()
 	Reg(3, "enchant", &GMHandler::OnEnchant);
 	Reg(3, "resetic", &GMHandler::OnResetIc);
 	Reg(3, "autocb", &GMHandler::OnAutoCB);
+	Reg(3, "newcb", &GMHandler::OnNewCountryBattle);
 	Reg(3, "autofb", &GMHandler::OnAutoFB);
 
 	Reg(3, "nextarena", &GMHandler::OnNextArena);
@@ -3299,6 +3300,48 @@ void GMHandler::OnSetLoginLimit(GObject::Player *player, std::vector<std::string
     UInt8 pf = atoi(args[0].c_str());
     UInt32 v = atoi(args[1].c_str());
     setPlatformLogin(pf, v);
+}
+
+void GMHandler::OnNewCountryBattle(GObject::Player * player, std::vector<std::string>& args)
+{
+	if(args.size() <= 1)
+		return;
+    UInt16 loc = player->getLocation();
+    GObject::Map * map = GObject::Map::FromSpot(loc);
+    if(map == NULL)
+        return;
+    GObject::SpotData * sd = map->GetSpot(loc);
+    if(!sd || !sd->m_NewCountryBattle)
+        return;
+    NewCountryBattle * ncb = sd->m_NewCountryBattle;
+    NewCBPlayerData * ncbpData = ncb->findNCBData(player);
+    if(!ncbpData)
+        return;
+    switch(atoi(args[0].c_str()))
+    {
+    case 1:
+        {
+            UInt32 val = atoi(args[1].c_str());
+            ncbpData->setAchievementLevel(val);
+            ncbpData->addAngerDomineer(0, val);
+            ncbpData->addAngerDomineer(1, val);
+            ncb->sendSelfInfo(player, ncbpData);
+        }
+        break;
+    case 2:
+        {
+            UInt32 val = atoi(args[1].c_str());
+            ncbpData->totalAchievement -= val;
+            if(ncbpData->totalAchievement < 0)
+                ncbpData->totalAchievement = 0;
+            ncbpData->setAchievementLevel();
+            ncb->sendSelfInfo(player, ncbpData);
+        }
+        break;
+    default:
+        return;
+        break;
+    }
 }
 
 

@@ -352,6 +352,7 @@ struct CountryBattleJoinStruct
 
 	MESSAGE_DEF1(REQ::CAMPS_WAR_JOIN, UInt8, _action);
 };
+
 struct LanchChallengeReq
 {
 	std::string target;
@@ -1019,6 +1020,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 		if(PLAYER_DATA(pl, inCity))
 			map->SendCityNPCs(pl);
 		map->SendAtCity(pl, PLAYER_DATA(pl, inCity) == 1);
+        globalCountryBattle.sendForNewCB(pl);
 	}
 	pl->GetMailBox()->notifyNewMail();
 	UInt8 level = pl->GetLev();
@@ -2400,6 +2402,8 @@ struct CountryBattleJoinReply
 void CountryBattleJoinReq( GameMsgHdr& hdr, CountryBattleJoinStruct& req )
 {
 	MSG_QUERY_PLAYER(player);
+    if(WORLD().isNewCountryBattle())
+		return;
 	if(!PLAYER_DATA(player, inCity))
 		return;
 	UInt16 loc = PLAYER_DATA(player, location);
@@ -2409,6 +2413,7 @@ void CountryBattleJoinReq( GameMsgHdr& hdr, CountryBattleJoinStruct& req )
 
 	CountryBattleJoinReply rep;
 	CountryBattle * cb = spot->GetCountryBattle();
+    if(!cb) return;
 	if(req._action == 0)
 	{
 		rep.result = cb->playerEnter(player) ? 0 : 2;
@@ -2421,6 +2426,37 @@ void CountryBattleJoinReq( GameMsgHdr& hdr, CountryBattleJoinStruct& req )
     if(rep.result == 0)
         player->countryBattleUdpLog(1090, player->getCountry());
 	player->send(rep);
+}
+
+void NewCountryBattleJoinReq( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+    if(!WORLD().isNewCountryBattle())
+		return;
+	if(!PLAYER_DATA(player, inCity))
+		return;
+	UInt16 loc = PLAYER_DATA(player, location);
+	GObject::SpotData * spot = GObject::Map::Spot(loc);
+	if(spot == NULL || !spot->m_NewCountryBattle)
+		return;
+
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    brd >> type;
+	NewCountryBattle * ncb = spot->GetNewCountryBattle();
+    if(!ncb) return;
+	if(type == 0)
+		ncb->playerEnter(player);
+	else if(type == 1)
+		ncb->playerLeave(player);
+    else if(type == 2)
+        ncb->sendSelfInfo(player);
+    else if(type == 3)
+    {
+        UInt8 skillId = 0;
+        brd >> skillId;
+        ncb->useSkill(player, skillId);
+    }
 }
 
 void OnLanchChallengeReq( GameMsgHdr& hdr, LanchChallengeReq& lcr)

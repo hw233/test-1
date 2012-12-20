@@ -87,7 +87,7 @@ namespace GObject
             void LoadFromDB(DBStrengthenData& data) ;
             void UpdateToDB();
             void UpdateFlag(UInt8 idx, UInt8 v);
-            bool CheckTimeOver();
+            bool CheckTimeOver(UInt32 now = TimeUtil::Now());
             void SendStrengthenInfo();
             void SendStrengthenRank();
             void SendOpenChestsInfo(UInt8 boxId, UInt8 index);

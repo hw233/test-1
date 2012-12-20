@@ -20,12 +20,15 @@ static bool find_player(Player *p1, Player *p2)
 void SpotData::InitCountryBattle()
 {
 	m_CountryBattle = new CountryBattle(m_ID);
+	m_NewCountryBattle = new NewCountryBattle(m_ID);
 }
 
 SpotData::~SpotData()
 {
 	if(m_CountryBattle != NULL)
 		delete m_CountryBattle;
+	if(m_NewCountryBattle != NULL)
+		delete m_NewCountryBattle;
 }
 
 Map::Map(UInt8 id, std::string name):
@@ -95,8 +98,19 @@ void Map::PlayerLeave(Player * pl, bool onlogout, bool notify)
 	if(sd == NULL)
 		return;
 
-	if(!onlogout && sd->m_IsCountryBattle && sd->m_CountryBattle)
-		sd->m_CountryBattle->playerLeave(pl);
+	if(!onlogout && sd->m_IsCountryBattle)
+    {
+        if(WORLD().isNewCountryBattle())
+        {
+            if(sd->m_NewCountryBattle)
+                sd->m_NewCountryBattle->playerLeave(pl);
+        }
+        else
+        {
+            if(sd->m_CountryBattle)
+                sd->m_CountryBattle->playerLeave(pl);
+        }
+    }
 	sd->m_Players.erase(pl);
 }
 
@@ -154,6 +168,7 @@ void Map::AddSpot( UInt16 id, const std::string& name, UInt8 type, UInt8 country
 		{
 			sd.InitCountryBattle();
 			globalCountryBattle.setCountryBattle(sd.m_CountryBattle);
+			globalCountryBattle.setNewCountryBattle(sd.m_NewCountryBattle);
 		}
 	}
 }
@@ -358,9 +373,10 @@ void Map::SendAtCity(Player * pl, bool inCity, bool notify)
 	SpotData * sd = GetSpot(PLAYER_DATA(pl, location));
 	if(sd == NULL)
 		return;
-	if(sd->m_IsCountryBattle)
+	if(sd->m_IsCountryBattle && !WORLD().isNewCountryBattle())
 	{
-		sd->m_CountryBattle->sendInfo(pl);
+        if(sd->m_CountryBattle)
+            sd->m_CountryBattle->sendInfo(pl);
 	}
 }
 

@@ -69,6 +69,7 @@ MSG_REG(GameMsgHdr, OnCanAcceptTaskReq);
 MSG_REG(GameMsgHdr, OnTaskActionReq);
 MSG_REG(GameMsgHdr, OnTaskNpcActionReq);
 MSG_REG(GameMsgHdr, CountryBattleJoinReq);
+MSG_REG_2(GameMsgHdr, REQ::NEW_CAMPS_WAR_JOIN, NewCountryBattleJoinReq);
 //MSG_REG(GameMsgHdr, OnChallengePlayerReq);
 MSG_REG(GameMsgHdr, OnLanchChallengeReq);
 MSG_REG(GameMsgHdr, OnRequestChallengeReq);

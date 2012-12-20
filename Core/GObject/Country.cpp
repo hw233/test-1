@@ -14,6 +14,7 @@
 #include "Common/Itoa.h"
 #include "ClanRankBattle.h"
 #include "ClanCopy.h"
+#include "NewCountryBattle.h"
 #include "TownDeamon.h"
 #include "Athletics.h"
 
@@ -95,8 +96,9 @@ bool Country::Init()
 		bossManager.getNextBoss();
 		bossManager.process(now);
         ClanRankBattleMgr::Instance().Init();
+        NewCountryBattle::Init();
 		AddTimer(30000, Country_Boss_Check);
-		AddTimer(5000, Country_Battle_Check, static_cast<void *>(NULL), (5 - (now % 5)) * 1000);
+        AddTimer(5000, Country_Battle_Check, static_cast<void *>(NULL), (5 - (now % 5)) * 1000);
 		AddTimer(5000, Hero_Island_Check, static_cast<void *>(NULL), (5 - (now % 5)) * 1000);
         AddTimer(1000, ClanRankBattleCheck);
         //townDeamonManager->process();
