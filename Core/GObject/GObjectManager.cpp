@@ -385,6 +385,11 @@ namespace GObject
             fprintf(stderr, "loadJobHunter error!\n");
             std::abort();
         }
+        if(!loadCopyFrontWin())
+        {
+            fprintf(stderr, "loadCopyFrontWin error!\n");
+            std::abort();
+        }
 
 		DB::gDataDBConnectionMgr->UnInit();
 	}
@@ -5088,6 +5093,34 @@ namespace GObject
                 player->setJobHunter(dbjh.fighterList, dbjh.mapInfo, dbjh.progress, dbjh.posX, dbjh.posY, dbjh.earlyPosX, dbjh.earlyPosY, dbjh.stepCount);
             }
 			lc.advance();
+        }
+        lc.finalize();
+        return true;
+    }
+
+    bool GObjectManager::loadCopyFrontWin()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading copy_front_win");
+        DBCopyFrontWin dbcf;
+        if(execu->Prepare("SELECT `playerId`, `posOrig`, `posPut`, `itemId`, `ratio` FROM `copy_front_win` ORDER BY `playerId`, `posOrig`", dbcf) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+        Player* pl = NULL;
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		while(execu->Next() == DB::DB_OK)
+        {
+			lc.advance();
+			if(dbcf.playerId != last_id)
+			{
+				last_id = dbcf.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+
+            pl->loadCopyFrontWinFromDB(dbcf.posOrig, dbcf.posPut, dbcf.itemId, dbcf.ratio);
         }
         lc.finalize();
         return true;
