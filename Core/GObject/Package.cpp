@@ -4453,7 +4453,13 @@ namespace GObject
             money += (fIed.spiritAttr.spLev[0]+fIed.spiritAttr.spLev[1]+fIed.spiritAttr.spLev[2]+fIed.spiritAttr.spLev[3])/1;
         if (type & 0x08)
         {
-            money += static_cast<UInt32>(fIed.maxTRank) * 1 + (fIed.trumpExp / 1000);
+            UInt32 extramoney;
+
+            money += static_cast<UInt32>(fIed.maxTRank) * 1;
+            extramoney = fIed.trumpExp / 1000;
+            if(fIed.trumpExp > extramoney * 1000)
+                extramoney += 1;
+            money += extramoney;
 
             UInt8 lv = fIed.tRank;
             UInt8 q = fromEquip->getQuality() - 3;
@@ -4461,7 +4467,6 @@ namespace GObject
             UInt8 types;
             float v;
             float values;
-            UInt32 extramoney;
 
             types = fIed.extraAttr2.type1;
             if(types)
