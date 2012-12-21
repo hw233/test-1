@@ -607,7 +607,7 @@ function onGetFeastGiftAward(player, type)
     if player == nil then
         return false
     end
-    if type == 0 || type > 2 then
+    if type == 0 or type > 2 then
         return false
     end
     local awards = {

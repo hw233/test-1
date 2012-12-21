@@ -1072,7 +1072,6 @@ namespace GObject
         //QQGame登录奖励
         sendQQGameGift1218();
         sendFeastLoginAct();
-        sendFeastGiftAct();
 
         char buf[64] = {0};
         snprintf(buf, sizeof(buf), "%"I64_FMT"u", _id);
@@ -15925,7 +15924,7 @@ void Player::getFeastGiftAward(UInt8 type)
             ConsumeInfo ci(EnumFEASTGIFT,0,0);
             useGold(30,&ci);
             status |= 0x02;
-            AddVar(VAR_FEAST_GIFT, status);
+            SetVar(VAR_FEAST_GIFT, status);
             sendFeastGiftAct();
         }
     }
@@ -15937,7 +15936,7 @@ void Player::sendFeastGiftAct()
         return;
     Stream st(REP::COUNTRY_ACT);
     st << static_cast<UInt8>(7);
-    UInt8 opt = GetVar(VAR_FEAST_LOGIN);
+    UInt8 opt = GetVar(VAR_FEAST_GIFT);
     st << opt;
     st << Stream::eos;
     send(st);

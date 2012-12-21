@@ -1222,6 +1222,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendCopyFrontAllAward();
     pl->sendGoodVoiceInfo();
     pl->send3366GiftInfo();
+    pl->sendFeastGiftAct();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )

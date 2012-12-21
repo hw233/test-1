@@ -184,6 +184,8 @@ enum ItemFrom
     FromNewRC7DayTarget,
     FromDailyStrengthen = 37, //变强秘宝
     FromJobHunter = 38, // 寻墨游戏
+
+    //80 ~ 100，繁体占用
 };
 
 enum ItemTo
