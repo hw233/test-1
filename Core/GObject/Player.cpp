@@ -907,7 +907,7 @@ namespace GObject
 
         continuousLogin(curtime);
         continuousLoginRF(curtime);
-        //sendYearRPInfo();
+        sendYearRPInfo();
 
         if (World::_halloween)
             sendHalloweenOnlineAward(curtime);
