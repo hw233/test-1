@@ -1837,6 +1837,9 @@ CREATE TABLE `job_hunter` (
     `earlyPosX` tinyint(3) unsigned NOT NULL DEFAULT 0 COMMENT '上一步X坐标值',
     `earlyPosY` tinyint(3) unsigned NOT NULL DEFAULT 0 COMMENT '上一步Y坐标值',
     `stepCount` int(10) unsigned NOT NULL DEFAULT 0 COMMENT '已使用步数',
+    `slotVal1` tinyint(3) unsigned NOT NULL DEFAULT 0 COMMENT '老虎机的值1',
+    `slotVal2` tinyint(3) unsigned NOT NULL DEFAULT 0 COMMENT '老虎机的值2',
+    `slotVal3` tinyint(3) unsigned NOT NULL DEFAULT 0 COMMENT '老虎机的值3',
     PRIMARY KEY (`playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
