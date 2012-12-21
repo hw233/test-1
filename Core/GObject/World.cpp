@@ -2518,7 +2518,7 @@ void World::SendSnowAward()
     UInt32 pos = 0;
 
   //  globalPlayers.enumerate(enum_snow_score, static_cast<void *>(NULL));
-    SYSMSG(title, 4104);
+    SYSMSG(title, 4114);
     for(SnowPlayersIt qpIt = _snowPlayerSet.begin(); qpIt != _snowPlayerSet.end() && pos < 99; ++ qpIt, ++ pos)
     {
         if (pos >= 50)
@@ -2531,7 +2531,7 @@ void World::SendSnowAward()
         {
             Player* pl = player[idx];
             Player* lover = pl->getSnowLover();
-            SYSMSGV(content, 4105, lover->getName().c_str(), pos+1);
+            SYSMSGV(content, 4115, lover->getName().c_str(), pos+1);
             Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
             if(mail)
             {

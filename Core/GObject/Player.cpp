@@ -14652,8 +14652,8 @@ void EventTlzAuto::notify(bool isBeginAuto)
 //                m_snow.lover->sendSnowScoreAward();
             if (oldScore < 300 && m_snow.score >= 300)
             {
-                SYSMSG(title, 4102);
-                SYSMSGV(ctx, 4103, 300);
+                SYSMSG(title, 4112);
+                SYSMSGV(ctx, 4113, 300);
                 Mail * mail = GetMailBox()->newMail(NULL, 0x21, title, ctx, 0xFFFE0000);
                 if (mail)
                 {
