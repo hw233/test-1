@@ -1855,4 +1855,11 @@ CREATE TABLE `copy_front_win` (
     PRIMARY KEY (`playerId`, `posOrig`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+DROP TABLE IF EXISTS `snow`;
+CREATE TABLE `snow` (                       
+    `playerId` bigint(20) unsigned NOT NULL,  
+    `lover` bigint(20) unsigned NOT NULL,     
+    `bind` tinyint(3) unsigned NOT NULL,      
+    `score` int(10) unsigned NOT NULL,        
+    PRIMARY KEY (`playerId`)                  
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
