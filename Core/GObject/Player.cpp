@@ -14521,6 +14521,261 @@ void EventTlzAuto::notify(bool isBeginAuto)
         DB1().PushUpdateData("UPDATE `qixi` SET `bind`=0, `lover`=0 WHERE `playerId` = %"I64_FMT"u", getId());
     }
 
+    void Player::resetSnow()
+    {
+        m_snow.bind = 0;
+        m_snow.lover = NULL;
+        DB1().PushUpdateData("UPDATE `snow` SET `bind`=0, `lover`=0 WHERE `playerId` = %"I64_FMT"u", getId());
+    }
+
+    void Player::sendSnowInfo()
+    {
+        Stream st(REP::ACTIVE);
+        st << static_cast<UInt8>(0x05) << static_cast<UInt8>(0x01) << static_cast<UInt8>(0x01);
+        UInt32 score = m_snow.score;
+        if(m_snow.lover && m_snow.bind)
+        {
+            st << m_snow.lover->getName();
+    //        score += m_snow.lover->getSnowScore();
+        }
+        else
+            st << "";
+
+        st << score << static_cast<UInt8>(m_snow.bind) << static_cast<UInt16>(GetVar(VAR_SNOW_AWARD));
+        st << Stream::eos;
+        send(st);
+    }
+
+    void Player::divorceSnowLover()
+    {
+        if(!m_snow.bind)
+            return;
+        Player* pl = m_snow.lover;
+        m_snow.lover = NULL;
+        m_snow.bind = 0;
+
+        pl->beDivorceSnowLover(this);
+       // qixiUdpLog(1085);
+
+		DB1().PushUpdateData("UPDATE `snow` SET `lover`=0, `bind`=0 WHERE `playerId` = %"I64_FMT"u", getId());
+        WORLD().DivorceSnowPair(this);
+        sendSnowInfo();
+    }
+    void Player::beDivorceSnowLover(Player* pl)
+    {
+        if(m_snow.lover != pl)
+            return;
+
+        m_snow.bind = 0;
+        m_snow.lover = NULL;
+
+        sendMsgCode(0, 1034);
+		DB1().PushUpdateData("UPDATE `snow` SET `bind`=0,`lover`=0 WHERE `playerId` = %"I64_FMT"u", getId());
+        sendSnowInfo();
+    }
+
+    void Player::postSnowLover(Player* pl)
+    {
+        if(m_snow.bind)
+            return;
+
+        if(!_hasFriend(0, pl))
+            return;
+        m_snow.lover = pl;
+        UInt8 bind = pl->beSnowLoverBind(this);
+        onSnowLoverResp(bind);
+        if(m_snow.bind)
+        {
+            WORLD().UpdateSnowScore(this, m_snow.lover);
+        }
+       // qixiUdpLog(1084);
+
+		DB1().PushUpdateData("REPLACE INTO `snow` (`score`, `bind`, `lover`, `playerId`) VALUES(%u, %u, %"I64_FMT"u, %"I64_FMT"u)", m_snow.score, m_snow.bind, pl->getId(), getId());
+    }
+    UInt8 Player::beSnowLoverBind(Player* pl)
+    {
+        UInt8 bind = 0;
+        if(m_snow.bind || m_snow.lover != pl)
+        {
+            bind = 0;
+        }
+        else
+        {
+            m_snow.bind = 1;
+            bind = 1;
+
+            DB1().PushUpdateData("UPDATE `snow` SET `bind`=%u WHERE `playerId` = %"I64_FMT"u", bind, getId());
+            sendSnowInfo();
+        }
+
+        return bind;
+    }
+    void Player::onSnowLoverResp(bool bind)
+    {
+        m_snow.bind = bind;
+
+        Stream st(REP::ACTIVE);
+        st << static_cast<UInt8>(0x05) << static_cast<UInt8>(0x02);
+        st << static_cast<UInt8>(bind);
+        st << Stream::eos;
+        send(st);
+    }
+    UInt8 Player::useSnowItem(UInt32 num)
+    {
+        //9275
+        if (GetPackage()->DelItemAny(9275, num))
+        {
+            UInt32 oldScore = m_snow.score;
+
+            UInt32 minScore = num * 3;
+            UInt32 maxScore = num * 5;
+            UInt32 score = minScore + uRand(maxScore-minScore);
+            m_snow.score += score;
+            AddPExp(99*num);
+
+//            sendSnowScoreAward();
+//            if (m_snow.bind && m_snow.lover != NULL)
+//                m_snow.lover->sendSnowScoreAward();
+            if (oldScore < 300 && m_snow.score >= 300)
+            {
+                SYSMSG(title, 4102);
+                SYSMSGV(ctx, 4103, 300);
+                Mail * mail = GetMailBox()->newMail(NULL, 0x21, title, ctx, 0xFFFE0000);
+                if (mail)
+                {
+                    MailPackage::MailItem item = {1637,1};
+                    mailPackageManager.push(mail->id, &item, 1, true);
+                }
+            }
+            WORLD().UpdateSnowScore(this, m_snow.lover);
+
+            DB1().PushUpdateData("UPDATE `snow` SET `score`=%u WHERE `playerId` = %"I64_FMT"u", m_snow.score, getId());
+            return 0;
+        }
+        return 1;
+    }
+    void Player::sendSnowScoreAward()
+    {
+        static  MailPackage::MailItem s_item[][3] = {
+            {{1637,1}},
+            {{401,5},{547,5}},
+            {{509,2},{507,2}},
+            {{503,10},{516,10}},
+            {{134,5},{1325,5},{9076,5}},
+            {{1325,10},{134,10},{9076,10}}
+        };
+        static int s_itemCount[]= {1,2,2,2,3,3};
+        static UInt32 s_score[] = {300, 900, 1800, 3000, 5100, 9900};
+        UInt32 score = m_snow.score;
+  //      if (NULL != m_snow.lover && m_snow.bind)
+  //          score += m_snow.lover->getSnowScore();
+        UInt32 v =  GetVar(VAR_SNOW_AWARD) >> 8; //邮件是否已发的标志
+        for (UInt8 i = 0; i < sizeof(s_score)/sizeof(s_score[0]); ++i)
+        {
+            if (score < s_score[i])
+                break;
+            if (((v>>i) & 0x01) == 0)
+            {
+                SYSMSG(title, 4102);
+                SYSMSGV(ctx, 4103, s_score[i]);
+                Mail * mail = GetMailBox()->newMail(NULL, 0x21, title, ctx, 0xFFFE0000);
+                if (mail)
+                {
+                    mailPackageManager.push(mail->id, s_item[i], s_itemCount[i], true);
+                    v |= (0x01 << i);
+                }
+            }
+        }
+        if (v > (GetVar(VAR_SNOW_AWARD) >> 8))
+        {
+            v  = v << 8;
+            v |= GetVar(VAR_SNOW_AWARD);
+            SetVar(VAR_SNOW_AWARD, v);
+        }
+    }
+    UInt8 Player::getSnowAward(UInt16 type)
+    {
+        static  MailPackage::MailItem s_item1[4] = {{56,1},{502,1},{510,1},{548,1}};
+        static  MailPackage::MailItem s_item2[4] = {{514,1},{57,1},{500,1},{15,1}};
+        static  MailPackage::MailItem s_item3[4] = {{503,1},{512,1},{516,1},{513,1}};
+        static  MailPackage::MailItem s_item4[4] = {{1325,1},{134,1},{547,1},{551,1}};
+        static  MailPackage::MailItem s_item5[4] = {{401,3},{547,3},{511,3},{514,3}};
+        static  MailPackage::MailItem s_item6[4] = {{509,2},{507,2},{501,2},{513,2}};
+        static  MailPackage::MailItem s_item7[4] = {{503,8},{516,8},{500,8},{505,8}};
+        static  MailPackage::MailItem s_item8[4] = {{134,5},{1325,5},{9076,5},{507,5}};
+        static  MailPackage::MailItem s_item9[4] = {{1325,10},{134,10},{9076,10},{509,10}};
+  
+        if(GetPackage()->GetRestPackageSize() < 4)
+        {
+            sendMsgCode(0, 1011);
+            return 2;
+        }
+        UInt16 v = GetVar(VAR_SNOW_AWARD);
+        if ((v&type) == 1)
+            return 3;
+
+        UInt32 score = m_snow.score;
+       // if (m_snow.lover != NULL && m_snow.bind)
+       //     score += m_snow.lover->getSnowScore();
+        
+        UInt32 needScore = 0;
+        MailPackage::MailItem* pItems = NULL;
+        switch (type)
+        {
+            case 0x01:
+                needScore = 60;
+                pItems = s_item1;
+                break;
+            case 0x02:
+                needScore = 140;
+                pItems = s_item2;
+                break;
+            case 0x04:
+                needScore = 220;
+                pItems = s_item3;
+                break;
+            case 0x08:
+                needScore = 300;
+                pItems = s_item4;
+                break;
+            case 0x10:
+                needScore = 450;
+                pItems = s_item5;
+                break;
+            case 0x20:
+                needScore = 900;
+                pItems = s_item6;
+                break;
+            case 0x40:
+                needScore = 1500;
+                pItems = s_item7;
+                break;
+            case 0x80:
+                needScore = 2550;
+                pItems = s_item8;
+                break;
+            case 0x100:
+                needScore = 4950;
+                pItems = s_item9;
+                break;
+        }
+        if (needScore > score)
+            return 1;
+        if (pItems != NULL)
+        {
+            for (int i = 0; i < 4; ++i)
+            {
+                if (pItems[i].id == 0 )
+                    break;
+                m_Package->Add(pItems[i].id, pItems[i].count, true);
+            }
+            v |= type;
+            SetVar(VAR_SNOW_AWARD, v);
+        }
+        return 0;
+    }
+
+
     ///////////////////////////////////////////////
     // 帮派副本相关
 

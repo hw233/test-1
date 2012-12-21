@@ -375,6 +375,11 @@ namespace GObject
             fprintf(stderr, "loadQixi error!\n");
             std::abort();
         }
+        if(!loadSnow())
+        {
+            fprintf(stderr, "loadSnow error!\n");
+            std::abort();
+        }
         if(!loadArenaExtraBoard())
         {
             fprintf(stderr, "loadArenaExtraBoard error!\n");
@@ -5073,6 +5078,41 @@ namespace GObject
         return true;
 
     }
+
+    bool GObjectManager::loadSnow()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading Snow");
+        DBSnow snow;
+        if(execu->Prepare("SELECT `playerId`, `lover`, `bind`, `score` FROM `snow` ORDER BY `playerId`", snow) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+        Player* pl = NULL;
+        Player* lover = NULL;
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		while(execu->Next() == DB::DB_OK)
+        {
+			lc.advance();
+            lover = NULL;
+			if(snow.playerId != last_id)
+			{
+				last_id = snow.playerId;
+				pl = globalPlayers[last_id];
+				lover = globalPlayers[snow.lover];
+			}
+			if(pl == NULL)
+				continue;
+
+            pl->loadSnowInfoFromDB(lover, snow.bind, snow.score);
+            if (snow.bind && lover != NULL)
+                WORLD().UpdateSnowScore(pl, lover);
+
+        }
+        lc.finalize();
+        return true;
+    }
+
 
     bool GObjectManager::loadJobHunter()
     {

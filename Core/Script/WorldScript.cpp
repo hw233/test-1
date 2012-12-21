@@ -143,6 +143,9 @@ void WorldScript::init()
     def("get11Act", GObject::World::get11Act);
     def("setSSToolbarAct", GObject::World::setSSToolbarAct);
     def("getSSToolbarAct", GObject::World::getSSToolbarAct);
+    def("setSnowAct", GObject::World::setSnowAct);
+    def("getSnowAct", GObject::World::getSnowAct);
+    
     def("setGuoqing", GObject::World::setGuoqing);
     def("getGuoqing", GObject::World::getGuoqing);
     def("set9215Act", GObject::World::set9215Act);

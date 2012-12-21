@@ -153,6 +153,24 @@ function _9215Act(player, _type)
     end
 end
 
+function _snowAct(player, _type)
+    if not getSnowAct() then
+        return
+    end
+    local package = player:GetPackage();
+    if _type == 0 then
+        package:AddItem(9275, 1, true)
+    elseif _type == 1 then
+        package:AddItem(9275, 2, true)
+    elseif _type == 2 then
+        package:AddItem(9275, 4, true)
+    elseif _type == 3 then
+        package:AddItem(9275, 6, true)
+    elseif _type == 5 then
+        package:AddItem(9275, 5, true)
+    end
+end
+
 
 function onLogin(player)
 	local stage = getActivityStage();
@@ -244,6 +262,7 @@ function onDungeonWin(player, id, count, free)
         count = 5
     end
     _9215Act(player, count);
+    _snowAct(player, count);
 end
 
 function onClanBattleAttend(player)
@@ -927,6 +946,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     sendWinReward(player, lootlvl, 1);
     TgcEvent(player, 1)
     _9215Act(player, lootlvl);
+    _snowAct(player, lootlvl);
 end
 
 function onFrontMapFloorWin(player, id, spot, lootlvl)
@@ -957,6 +977,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
     sendWinReward(player, lootlvl, 2);
     TgcEvent(player, 2)
     _9215Act(player, lootlvl);
+    _snowAct(player, lootlvl);
 end
 
 local vippack = {

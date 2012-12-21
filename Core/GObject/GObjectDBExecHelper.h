@@ -229,6 +229,13 @@ struct DBQixi
     UInt8 event;
     UInt32 score;
 };
+struct DBSnow
+{
+    UInt64 playerId;
+    UInt64 lover;
+    UInt8 bind;
+    UInt32 score;
+};
 
 struct DBArenaExtraBoard
 {
@@ -1294,6 +1301,16 @@ SPECIALDEF(6)
     UInt8, bind,
     UInt8, pos,
     UInt8, event,
+    UInt32, score
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBSnow)
+SPECIALDEF(4)
+    (
+    UInt64, playerId,
+    UInt64, lover,
+    UInt8, bind,
     UInt32, score
     )
 SPECIALEND()

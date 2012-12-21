@@ -106,6 +106,9 @@ function loadStore()
         store:clear()
 
         discount(store)
+        if getSnowAct() then
+            store:add(2, 9275, 10)
+        end
 
         if is1116_1122() then
             store:add(2, 9215, 10) --逍遥礼包

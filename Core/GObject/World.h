@@ -98,6 +98,12 @@ typedef std::multiset<QixiPair*, ScoreGreater> QixiPlayerSet;
 typedef QixiPlayerSet::iterator QixiPlayersIt;
 typedef std::map<Player*, QixiPlayersIt> QixiScoreMap;
 
+typedef QixiScore SnowScore;
+typedef QixiPair  SnowPair;
+typedef QixiPlayerSet SnowPlayerSet;
+typedef QixiPlayersIt SnowPlayersIt;
+typedef QixiScoreMap  SnowScoreMap;
+
 struct ValueSort
 {
     UInt32 sufferCnt;
@@ -335,6 +341,11 @@ public:
     { _ssToolbarAct= v; }
     inline static bool getSSToolbarAct()
     { return _ssToolbarAct; }
+
+    inline static void setSnowAct(bool v)
+    { _snowAct= v; }
+    inline static bool getSnowAct()
+    { return _snowAct; }
 
     inline static void setGuoqing(bool v)
     { _guoqing = v; }
@@ -622,6 +633,7 @@ public:
     static bool _wansheng;
     static bool _11Act;
     static bool _ssToolbarAct;
+    static bool _snowAct;
     static bool _guoqing;
     static bool _9215Act;
     static bool _enchant_gt11;
@@ -713,6 +725,12 @@ public:
     void sendQixiScoreAward(Player* pl);
     void SendXiaoyaoAward();
 
+    void UpdateSnowScore(Player* pl, Player* lover);
+    void sendSnowPlayers(Player* pl);
+    void DivorceSnowPair(Player* pl);
+    void LoadSnowScore(Player* pl, Player* lover);
+    void SendSnowAward();
+ 
     void killMonsterAppend(Stream& st, UInt8 index);
     void killMonsterInit();
     void UpdateKillMonsterRank(Player* pl, UInt8 Type, UInt8 count);
@@ -730,6 +748,8 @@ private:
 
     QixiScoreMap _qixiScoreMap;
     QixiPlayerSet _qixiPlayerSet;
+    SnowScoreMap _snowScoreMap;
+    SnowPlayerSet _snowPlayerSet;
 };
 
     void CreateNewDB(UInt32 mon = 0, UInt32 year = 2011);

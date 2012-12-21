@@ -309,6 +309,7 @@ namespace GObject
         VAR_RECHARGE_SCORE = 340, //累计充值的积分
         VAR_JOYVIP_BUFF_GOT     = 341, //心悦Buff
         VAR_QQGAME_GIFT_1218 = 342,    //QQGame登录奖励 1218-1220
+        VAR_SNOW_AWARD     = 343,     //堆雪人奖励
         VAR_MAX,
     };
 
@@ -571,6 +572,7 @@ namespace GObject
             REGISTER_VAR(VAR_RECHARGE_SCORE, CYCLE_NONE);
             REGISTER_VAR(VAR_JOYVIP_BUFF_GOT, CYCLE_DAY);
             REGISTER_VAR(VAR_QQGAME_GIFT_1218, CYCLE_DAY);
+            REGISTER_VAR(VAR_SNOW_AWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_AWARD_SSTOOLBAR, CYCLE_NONE);
             REGISTER_VAR(VAR_EX_JOB_ENABLE, CYCLE_NONE);
             REGISTER_VAR(VAR_JOB_HUNTER_SPOT_ID, CYCLE_NONE);
