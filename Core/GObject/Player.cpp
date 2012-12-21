@@ -10722,7 +10722,7 @@ namespace GObject
 
     void Player::getAwardBlueDiamond(UInt8 opt)
     {
-        if(opt == 1 || opt == 2 || opt == 3) //抽奖
+        if(opt >= 1) //抽奖
         {
             UInt8 idx = 0;
             if( 0 == (idx = GameAction()->RunBlueDiamondAward(this, opt)) )
