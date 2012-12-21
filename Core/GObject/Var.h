@@ -311,6 +311,8 @@ namespace GObject
         VAR_RECHARGE_SCORE = 340, //累计充值的积分
         VAR_JOYVIP_BUFF_GOT     = 341, //心悦Buff
         VAR_QQGAME_GIFT_1218 = 342,    //QQGame登录奖励 1218-1220
+        VAR_TOWER_LOGIN = 343,          // 楼一平台登录奖励
+        VAR_TOWER_LEVEL = 344,          // 楼一平台登录等级奖励
         VAR_MAX,
     };
 
@@ -596,6 +598,9 @@ namespace GObject
             REGISTER_VAR(VAR_CF_LOCATION, CYCLE_NONE);
             REGISTER_VAR(VAR_FEAST_LOGIN, CYCLE_NONE);
             REGISTER_VAR(VAR_FEAST_GIFT, CYCLE_DAY);
+
+            REGISTER_VAR(VAR_TOWER_LOGIN, CYCLE_DAY);
+            REGISTER_VAR(VAR_TOWER_LEVEL, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

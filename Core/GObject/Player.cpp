@@ -1101,6 +1101,8 @@ namespace GObject
         else
             udpLog("", "", "", "", "", "0", "login");
 
+        sendTowerLoginAct();
+
         if (!m_invited.empty())
         {
             if (!getInvitedBy())
@@ -7031,6 +7033,19 @@ namespace GObject
                     newRC7DayUdpLog(1152, 1);
                 }
             }
+        }
+        
+        if(World::getTowerLoginAct() && !GetVar(VAR_TOWER_LEVEL) && strcasestr(m_via.c_str(), "sscq_dlhd") && nLev >= 40)
+        {
+            SYSMSGV(title, 4106);
+            SYSMSGV(content, 4107);
+            Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            if(mail)
+            {
+                MailPackage::MailItem mitem[6] = {{516,1},{509,1},{507,1},{56,3},{57,3},{503,1}};
+                mailPackageManager.push(mail->id, mitem, 6, true);
+            }
+            SetVar(VAR_TOWER_LEVEL, 1);
         }
 
         if(_clan != NULL)
@@ -15887,6 +15902,49 @@ void Player::sendFeastLoginAct()
         mailPackageManager.push(mail->id, &mitem, 1, true);
     }
     SetVar(VAR_FEAST_LOGIN, 1);
+}
+
+void Player::sendTowerLoginAct()
+{
+    UInt8 day = World::getTowerLoginAct();
+    if (day > 7) return;
+
+    if (day && strcasestr(m_via.c_str(), "sscq_dlhd") && !GetVar(VAR_TOWER_LOGIN))
+    {
+        SYSMSGV(title, 4104);
+        SYSMSGV(content, 4105);
+        Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        if(mail)
+        {
+
+         MailPackage::MailItem item1[2] ={{56,3},   {57,3}};
+         MailPackage::MailItem item2[2] ={{508,1},  {506,1}};
+         MailPackage::MailItem item3[2] ={{56,3},   {57,3}};
+         MailPackage::MailItem item4[2] ={{508,1},  {506,1}};
+         MailPackage::MailItem item5[2] ={{56,3},   {57,3}};
+         MailPackage::MailItem item6[2] ={{508,1},  {506,1}};
+         MailPackage::MailItem item7[2] ={{509,1},  {507,1}};
+
+         MailPackage::MailItem* item[7] = {item1,item2,item3,item4,item5,item6,item7};
+
+         mailPackageManager.push(mail->id, item[day - 1], 2, true);
+        }
+        SetVar(VAR_TOWER_LOGIN, 1);
+
+        if(!GetVar(VAR_TOWER_LEVEL) && GetLev() >= 40)
+        {
+            SYSMSGV(title, 4106);
+            SYSMSGV(content, 4107);
+            Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            if(mail)
+            {
+                MailPackage::MailItem mitem[6] = {{516,1},{509,1},{507,1},{56,3},{57,3},{503,1}};
+                mailPackageManager.push(mail->id, mitem, 6, true);
+            }
+            SetVar(VAR_TOWER_LEVEL, 1);
+        }
+    }
+
 }
 
 void Player::getFeastGiftAward(UInt8 type)

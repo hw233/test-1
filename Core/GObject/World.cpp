@@ -142,6 +142,7 @@ bool World::_wansheng= false;
 bool World::_11Act= false;
 bool World::_ssToolbarAct= false;
 bool World::_feastloginAct= false;
+UInt8 World::_towerloginAct= 0;
 bool World::_guoqing= false;
 bool World::_9215Act= false;
 bool World::_enchant_gt11 = false;

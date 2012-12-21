@@ -824,9 +824,11 @@ function onActivityCheck(tm)
 
       if tm >= actTime220_0 and tm < actTime220_1 then
           setFeastLoginAct(true)
+          setTowerLoginAct( (tm - actTime220_0) / 86400 + 1)
           is_1221_1227 = true
       else
           setFeastLoginAct(false)
+          setTowerLoginAct(0)
           is_1221_1227 = false
       end
 
@@ -1023,8 +1025,11 @@ function initActTime(y, m, d)
   --搜搜工具栏活动
   local  SerStartTm219 = { ['year'] = 2012, ['month'] = 11, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm219_1 = { ['year'] = 2012, ['month'] = 12, ['day'] = 26, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
   -- 节日套装人人拿
+  -- 楼一登录奖励时间段（21~27)
   local  SerStartTm220 = { ['year'] = 2012, ['month'] = 12, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
 
   --300-399越南版用了
   actTime0 = os.time(SerStartTm);
