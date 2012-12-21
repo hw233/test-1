@@ -823,9 +823,11 @@ function onActivityCheck(tm)
       end
 
       if tm >= actTime220_0 and tm < actTime220_1 then
-          setFeastLoginAct(true)
+          --setFeastLoginAct(true)
+          setFeastLoginAct(false)
           setTowerLoginAct( (tm - actTime220_0) / 86400 + 1)
-          is_1221_1227 = true
+          --is_1221_1227 = true
+          is_1221_1227 = false
       else
           setFeastLoginAct(false)
           setTowerLoginAct(0)
