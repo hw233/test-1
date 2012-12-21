@@ -39,6 +39,7 @@ namespace GObject
 #define FIGHTER_BUFF_RDIAMOND   0x0F //红钻变身卡
 #define FIGHTER_BUFF_BLUE       0x10 //蓝钻变身卡
 #define FIGHTER_BUFF_QQVIP      0x11 //QQ会员变身卡
+#define FIGHTER_BUFF_SANTA      0x12 //圣诞老人变身卡
 
 #define FIGHTER_BUFF_COUNT 0x20
 

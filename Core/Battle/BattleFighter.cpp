@@ -810,7 +810,8 @@ void BattleFighter::initStats(bool checkEnh)
                     _fighter->getBuffData(FIGHTER_BUFF_SMAN, now) ||
                     _fighter->getBuffData(FIGHTER_BUFF_SWMAN, now) ||
                     _fighter->getBuffData(FIGHTER_BUFF_RDIAMOND, now) ||
-                    _fighter->getBuffData(FIGHTER_BUFF_QQVIP, now))
+                    _fighter->getBuffData(FIGHTER_BUFF_QQVIP, now) ||
+                    _fighter->getBuffData(FIGHTER_BUFF_SANTA, now))
 				_flag |= 1;
 			_flag |= (_fighter->getOwner()->getBuffData(PLAYER_BUFF_HOLY, 0)) << 28;
 		}
@@ -874,6 +875,8 @@ UInt16 BattleFighter::getPortrait()
             portrait = 1090;
         else if(getBuffData(FIGHTER_BUFF_QQVIP, now))
             portrait = 1091;
+        else if(getBuffData(FIGHTER_BUFF_SANTA, now))
+            portrait = 1092;
         else
             portrait = getFighter()->getPortrait();
     }

@@ -336,6 +336,16 @@ public:
     inline static bool getSSToolbarAct()
     { return _ssToolbarAct; }
 
+    inline static void setFeastLoginAct(bool v)
+    { _feastloginAct= v; }
+    inline static bool getFeastLoginAct()
+    { return _feastloginAct; }
+
+    inline static void setTowerLoginAct(UInt8 v)
+    { _towerloginAct= v; }
+    inline static UInt8 getTowerLoginAct()
+    { return _towerloginAct; }
+
     inline static void setGuoqing(bool v)
     { _guoqing = v; }
     inline static bool getGuoqing()
@@ -622,6 +632,8 @@ public:
     static bool _wansheng;
     static bool _11Act;
     static bool _ssToolbarAct;
+    static bool _feastloginAct;
+    static UInt8 _towerloginAct;
     static bool _guoqing;
     static bool _9215Act;
     static bool _enchant_gt11;
