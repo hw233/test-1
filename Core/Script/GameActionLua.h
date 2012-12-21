@@ -336,6 +336,7 @@ namespace Script
         lua_tinker::table openPurpleBoxStrong();
         lua_tinker::table openOrangeBoxStrong();
         UInt8 RunThanksGivingDayAward(Player* player, UInt8 opt);
+        bool onGetFeastGiftAward(Player* player, UInt8 type);
         bool onFirstRecharge(Player* player, UInt8 index);
 
 	private:

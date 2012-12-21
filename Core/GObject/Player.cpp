@@ -907,7 +907,7 @@ namespace GObject
 
         continuousLogin(curtime);
         continuousLoginRF(curtime);
-        //sendYearRPInfo();
+        sendYearRPInfo();
 
         if (World::_halloween)
             sendHalloweenOnlineAward(curtime);
@@ -1071,6 +1071,7 @@ namespace GObject
 
         //QQGame登录奖励
         sendQQGameGift1218();
+        sendFeastLoginAct();
 
         char buf[64] = {0};
         snprintf(buf, sizeof(buf), "%"I64_FMT"u", _id);
@@ -1099,6 +1100,8 @@ namespace GObject
         }
         else
             udpLog("", "", "", "", "", "0", "login");
+
+        sendTowerLoginAct();
 
         if (!m_invited.empty())
         {
@@ -7031,6 +7034,19 @@ namespace GObject
                 }
             }
         }
+        
+        if(World::getTowerLoginAct() && !GetVar(VAR_TOWER_LEVEL) && strcasestr(m_via.c_str(), "sscq_dlhd") && nLev >= 40)
+        {
+            SYSMSGV(title, 4106);
+            SYSMSGV(content, 4107);
+            Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            if(mail)
+            {
+                MailPackage::MailItem mitem[6] = {{516,1},{509,1},{507,1},{56,3},{57,3},{503,1}};
+                mailPackageManager.push(mail->id, mitem, 6, true);
+            }
+            SetVar(VAR_TOWER_LEVEL, 1);
+        }
 
         if(_clan != NULL)
         {
@@ -10706,7 +10722,7 @@ namespace GObject
 
     void Player::getAwardBlueDiamond(UInt8 opt)
     {
-        if(opt == 1 || opt == 2 || opt == 3) //抽奖
+        if(opt >= 1) //抽奖
         {
             UInt8 idx = 0;
             if( 0 == (idx = GameAction()->RunBlueDiamondAward(this, opt)) )
@@ -16126,6 +16142,117 @@ void Player::sendQQGameGift1218()
         }
         SetVar(VAR_QQGAME_GIFT_1218, 1);
     }
+}
+
+void Player::sendFeastLoginAct()
+{
+    if(GetLev() < 40 || GetVar(VAR_FEAST_LOGIN) > 0 || !World::getFeastLoginAct())
+        return;
+    SYSMSGV(title, 4102);
+    SYSMSGV(content, 4103);
+    Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+    if(mail)
+    {
+        MailPackage::MailItem mitem = {1759,1};
+        mailPackageManager.push(mail->id, &mitem, 1, true);
+    }
+    SetVar(VAR_FEAST_LOGIN, 1);
+}
+
+void Player::sendTowerLoginAct()
+{
+    UInt8 day = World::getTowerLoginAct();
+    if (day > 7) return;
+
+    if (day && strcasestr(m_via.c_str(), "sscq_dlhd") && !GetVar(VAR_TOWER_LOGIN))
+    {
+        SYSMSGV(title, 4104);
+        SYSMSGV(content, 4105);
+        Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        if(mail)
+        {
+
+         MailPackage::MailItem item1[2] ={{56,3},   {57,3}};
+         MailPackage::MailItem item2[2] ={{508,1},  {506,1}};
+         MailPackage::MailItem item3[2] ={{56,3},   {57,3}};
+         MailPackage::MailItem item4[2] ={{508,1},  {506,1}};
+         MailPackage::MailItem item5[2] ={{56,3},   {57,3}};
+         MailPackage::MailItem item6[2] ={{508,1},  {506,1}};
+         MailPackage::MailItem item7[2] ={{509,1},  {507,1}};
+
+         MailPackage::MailItem* item[7] = {item1,item2,item3,item4,item5,item6,item7};
+
+         mailPackageManager.push(mail->id, item[day - 1], 2, true);
+        }
+        SetVar(VAR_TOWER_LOGIN, 1);
+
+        if(!GetVar(VAR_TOWER_LEVEL) && GetLev() >= 40)
+        {
+            SYSMSGV(title, 4106);
+            SYSMSGV(content, 4107);
+            Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            if(mail)
+            {
+                MailPackage::MailItem mitem[6] = {{516,1},{509,1},{507,1},{56,3},{57,3},{503,1}};
+                mailPackageManager.push(mail->id, mitem, 6, true);
+            }
+            SetVar(VAR_TOWER_LEVEL, 1);
+        }
+    }
+
+}
+
+void Player::getFeastGiftAward(UInt8 type)
+{
+    if(type == 0 || type > 2)
+        return;
+    bool bRet;
+    UInt32 status = GetVar(VAR_FEAST_GIFT);
+
+    if(type == 1)
+    {
+        if(status & 0x01)
+            return;
+        bRet = GameAction()->onGetFeastGiftAward(this, type);
+        if(bRet)
+        {
+            udpLog("huodong", "F_10000_15", "", "", "", "", "act");
+            status |= 0x01;
+            SetVar(VAR_FEAST_GIFT, status);
+            sendFeastGiftAct();
+        }
+    }
+    else
+    {
+        if(status & 0x02)
+            return;
+        if(getGold() < 30)
+        {
+            sendMsgCode(0, 1104);
+            return;
+        }
+        bRet = GameAction()->onGetFeastGiftAward(this, type);
+        if(bRet)
+        {
+            ConsumeInfo ci(EnumFEASTGIFT,0,0);
+            useGold(30,&ci);
+            status |= 0x02;
+            SetVar(VAR_FEAST_GIFT, status);
+            sendFeastGiftAct();
+        }
+    }
+}
+
+void Player::sendFeastGiftAct()
+{
+    if(!World::getFeastLoginAct())
+        return;
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(7);
+    UInt8 opt = GetVar(VAR_FEAST_GIFT);
+    st << opt;
+    st << Stream::eos;
+    send(st);
 }
 
 } // namespace GObject

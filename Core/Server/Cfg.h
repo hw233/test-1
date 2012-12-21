@@ -89,6 +89,7 @@ public:
     std::string sql_mailitem_histories;
 
     std::string stateUrl;
+    std::string chargeUrl;
     UInt16 warZone;
 
     std::string mergeList;
@@ -132,6 +133,7 @@ public:
 	inline void setLoginMax(UInt16 max) { loginLimit = max; }
 	inline void setOnlineLimit(UInt16 limit) { onlineLimit = limit; }
     inline void setStateUrl(const char* url) { stateUrl = url; }
+    inline void setChargeUrl(const char* url) { chargeUrl = url; }
     inline void setWarZone(UInt16 zone) { warZone = zone; }
     inline void setServerNum(UInt32 no) { serverNum = no; }
     inline void setServerNo(UInt32 no) { serverNo = no; }
