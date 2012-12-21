@@ -251,6 +251,9 @@ struct DBJobHunter
     UInt8 earlyPosX;
     UInt8 earlyPosY;
     UInt32 stepCount;
+    UInt8 slotVal1;
+    UInt8 slotVal2;
+    UInt8 slotVal3;
 };
 
 struct DBCopyFrontWin
@@ -2458,7 +2461,7 @@ SPECIALDEF(9)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBJobHunter)
-SPECIALDEF(9)
+SPECIALDEF(12)
 (
 	UInt64, playerId,
 	std::string, fighterList,
@@ -2468,7 +2471,10 @@ SPECIALDEF(9)
 	UInt8, posY,
 	UInt8, earlyPosX,
 	UInt8, earlyPosY,
-	UInt32, stepCount
+	UInt32, stepCount,
+    UInt8, slotVal1,
+    UInt8, slotVal2,
+    UInt8, slotVal3
 )
 SPECIALEND()
 

@@ -186,6 +186,7 @@ enum ItemFrom
     FromJobHunter = 38, // 寻墨游戏
 
     //80 ~ 100，繁体占用
+    FromDreamer = 39, // 水晶梦境
 };
 
 enum ItemTo

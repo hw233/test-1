@@ -5572,6 +5572,7 @@ void OnExJob( GameMsgHdr & hdr, const void * data )
                 {
                     case 0:
                         // 放弃寻墨游戏
+                        jobHunter->OnAutoStop();
                         jobHunter->OnAbort(false);
                         break;
                     case 1:
