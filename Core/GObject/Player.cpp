@@ -1154,9 +1154,6 @@ namespace GObject
 #endif
 #endif
 #endif // _WIN32
-#ifdef DREAMER_DEBUG
-        getDreamer();
-#endif
 	}
 
 #define WEBDOWNLOAD 255

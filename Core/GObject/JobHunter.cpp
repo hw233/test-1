@@ -279,6 +279,7 @@ void JobHunter::OnRequestStart(UInt8 index)
 
 void JobHunter::OnUpdateSlot(bool isAuto)
 {
+    return;
     // 老虎机转动
     if (!_gameProgress)
         return;
@@ -303,13 +304,11 @@ void JobHunter::OnUpdateSlot(bool isAuto)
 
     UInt8 res[SLOT_MAX] = {0};
 
-    /*
     _slot1 = _rnd(SLOT_MAX);
     _slot2 = _rnd(SLOT_MAX);
     _slot3 = _rnd(SLOT_MAX);
-    */
 
-    _slot1 = _slot2 = _slot3 = _rnd(SLOT_MAX);
+    //_slot1 = _slot2 = _slot3 = _rnd(SLOT_MAX);
 
     ++(res[_slot1]);
     ++(res[_slot2]);
@@ -320,9 +319,6 @@ void JobHunter::OnUpdateSlot(bool isAuto)
         _spItemRate[i] = ITEM_RATE[res[i]];
     }
 
-#ifdef JOB_HUNTER_DEBUG
-    printf ("rate: 青龙:%d, 白虎: %d, 朱雀: %d, 玄武:%d.\n", (UInt32)_spItemRate[1], (UInt32)_spItemRate[2], (UInt32)_spItemRate[3], (UInt32)_spItemRate[4]);
-#endif
     DB2().PushUpdateData("UPDATE `job_hunter` SET `slotVal1` = '%d',`slotVal2` = '%d', `slotVal3`= '%d' WHERE `playerId` = %"I64_FMT"u", 
             _slot1, _slot2, _slot3, _owner->getId());
     
@@ -1035,6 +1031,7 @@ bool JobHunter::OnAttackMonster(UInt16 pos, bool isAuto)
 
         if (type == 12)
         {
+            /*
             for (UInt8 i = 1; i < SLOT_MAX; ++ i)
             {
                 struct GData::LootResult lr = {0, 1};
@@ -1048,6 +1045,7 @@ bool JobHunter::OnAttackMonster(UInt16 pos, bool isAuto)
                     }
                 }
             }
+            */
         }
     }
     else

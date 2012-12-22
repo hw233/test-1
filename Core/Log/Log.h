@@ -183,6 +183,7 @@ enum ItemFrom
     FromNewRC7DayTarget,
     FromDailyStrengthen = 37, //变强秘宝
     FromJobHunter = 38, // 寻墨游戏
+    FromDreamer = 39, // 水晶梦境
 };
 
 enum ItemTo

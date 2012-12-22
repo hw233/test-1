@@ -3,13 +3,19 @@
 //************************************************
 #include "Dreamer.h"
 #include "Player.h"
+#include "Package.h"
 #include "MsgID.h"
+#include "Country.h"
+#include "Script/GameActionLua.h"
 
 namespace GObject
 {
 
 Dreamer::Dreamer(Player * player)
-    :_owner(player)
+    :_owner(player), _maxX(0), _maxY(0), _maxGrid(0), 
+    _isInGame(false), _type(0), _gameProgress(0),
+    _posX(0), _posY(0), _earlyPosX(0), _earlyPosY(0),
+    _remainTime(0)
 {
     for (UInt8 i = 1; i < MAX_LEVEL + 1; ++i)
     {
@@ -29,7 +35,7 @@ void Dreamer::OnCommand(UInt8 command, UInt8 val)
     {
         case 1:
             // 移动至某一格
-            //OnMove(CLIENT_POS_TO_POS(val));
+            OnMove((val));
             break;
         case 2:
             // 针对某一格子的具体操作
@@ -46,7 +52,7 @@ void Dreamer::OnCommand(UInt8 command, UInt8 val)
                 {
                     case GRID_NORMAL:
                         break;
-                    case GRID_ARROR:
+                    case GRID_ARROW:
                         break;
                     case GRID_KEY:
                         break;
@@ -78,10 +84,10 @@ bool Dreamer::InitMap(UInt8 level)
     _maxX = MAX_X[level];
     _maxY = MAX_Y[level];
     _maxGrid = DREAMER_MAX_GRID[level];
-    //UInt8 gridCount[GRID_NORMAL_MAX] = {0};
     std::vector<UInt16> validGrid; // 可选格子
     std::set<UInt16> invalidGrid;  // 暂时无法放入地图的格子
     std::map<UInt16, UInt8> neighbourCount; // 相邻的已经有的格子数
+    std::map<UInt16, UInt8> typeMap;        // 可用的地图类型
 
     for (UInt8 x = 0; x < _maxX; ++ x)
     {
@@ -102,7 +108,23 @@ bool Dreamer::InitMap(UInt8 level)
     for (UInt8 i = 0; i < _maxGrid; ++ i)
     {
         // 选择N个点作为地图中可行进点
-        type = _rnd(GRID_NORMAL_MAX - 1) + 1;
+        type = GRID_NORMAL;
+        UInt8 tmpIndex = _rnd(typeMap.size());
+        UInt8 tmp = 0;
+        for (std::map<UInt16, UInt8>::iterator tmpIt = typeMap.begin(); tmpIt != typeMap.end(); ++ tmpIt)
+        {
+            if (tmpIndex == tmp)
+            {
+                type = tmpIt->first;
+                if (!(--(tmpIt->second)))
+                {
+                    typeMap.erase(tmpIt);
+                }
+                break;
+            }
+            ++tmp;
+        }
+
 
 
         type |= UNKNOWN_FLAG;
@@ -203,6 +225,12 @@ bool Dreamer::InitMap(UInt8 level)
     return true;
 }
 
+bool Dreamer::InitArrow()
+{
+    // TODO: 初始化箭头方向和类型（一定很坑爹玩家）
+    return true;
+}
+
 void Dreamer::OnMove(UInt16 pos)
 {
     // 玩家在梦境游戏中移动
@@ -236,7 +264,7 @@ void Dreamer::OnMove(UInt16 pos)
         {
             case GRID_NORMAL:
                 break;
-            case GRID_ARROR:
+            case GRID_ARROW:
                 break;
             case GRID_KEY:
                 break;
@@ -261,6 +289,37 @@ void Dreamer::OnMove(UInt16 pos)
     _posY = y;
 
     SendGridInfo(pos);
+}
+
+void Dreamer::OnGetTreasure()
+{
+    // TODO: 打开宝箱
+    UInt8 index = CheckGridType(GRID_TREASURE);
+    if (!index)
+        return;
+    Table rewards = GameAction()->getDreamerTreasure(_gameProgress, index);
+    Stream st;
+    st.init(REP::AUTOJOBHUNTER);
+    st << static_cast<UInt8>(14);
+    UInt8 count = rewards.size();
+    st << static_cast<UInt8>(count);
+    for (UInt8 i = 0; i < count; ++i)
+    {
+        Table item = rewards.get<Table>(i + 1);
+        if (item.size() < 3) return;
+        UInt32 itemId = item.get<UInt32>(1);
+        UInt32 itemCount = item.get<UInt32>(2);
+        bool   bind = item.get<bool>(3);
+        _owner->GetPackage()->AddItem2(itemId, itemCount, true, bind, FromDreamer);
+        st << static_cast<UInt16>(itemId);
+        st << static_cast<UInt16>(itemCount);
+    }
+    st << Stream::eos;
+    //_owner->send(st);
+
+    MapInfo::iterator it = _mapInfo.find(POS_TO_INDEX(_posX, _posY));
+    (it->second).gridType |= CLEAR_FLAG;
+
 }
 
 void Dreamer::SendGridInfo(UInt16 pos)
@@ -344,7 +403,7 @@ void Dreamer::DumpMapData()
         strcat(buffer2, "\n");
     }
     puts(buffer);
-    snprintf (buffer, 1024, "Player pos: x = 0X%X, y = 0X%X. Step count = %d.\n", _posX, _posY, _stepCount);
+    snprintf (buffer, 1024, "Player pos: x = 0X%X, y = 0X%X. Step count = %d.\n", _posX, _posY, _remainTime);
     puts(buffer);
 #else
 #endif
@@ -354,7 +413,7 @@ void Dreamer::DumpMapData()
 Dreamer::Dreamer(Player * player)
     : _owner(player), _spotId(0), 
     _slot1(0), _slot2(0), _slot3(0), _isInGame(false), _gameProgress(PROGRESS_NONE), 
-    _posX(0), _posY(0), _earlyPosX(0), _earlyPosY(0), _stepCount(0), _isInAuto(false), _isAutoLose(false)
+    _posX(0), _posY(0), _earlyPosX(0), _earlyPosY(0), _remainTime(0), _isInAuto(false), _isAutoLose(false)
 {
     _nextMoveTime = TimeUtil::Now();
     DB2().PushUpdateData("INSERT IGNORE INTO `job_hunter` (`playerId`) VALUES (%"I64_FMT"u)", player->getId()); 
@@ -364,7 +423,7 @@ Dreamer::Dreamer(Player * player)
 Dreamer::Dreamer(Player * player, std::string& fighterList, std::string& mapInfo, UInt8 progress,
         UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY, UInt32 stepCount, UInt8 slotVal1, UInt8 slotVal2, UInt8 slotVal3)
     : _owner(player), _spotId(0), _slot1(slotVal1), _slot2(slotVal2), _slot3(slotVal3), 
-    _gameProgress(progress), _posX(posX), _posY(posY), _earlyPosX(earlyPosX), _earlyPosY(earlyPosY), _stepCount(stepCount),
+    _gameProgress(progress), _posX(posX), _posY(posY), _earlyPosX(earlyPosX), _earlyPosY(earlyPosY), _remainTime(stepCount),
       _isInAuto(false), _isAutoLose(false)
 {
     // 从数据库加载时调用到的构造函数
@@ -482,7 +541,7 @@ void Dreamer::SaveMapInfo()
         mapString = buf;
 
     DB2().PushUpdateData("UPDATE `job_hunter` SET `mapInfo` = '%s', `posX` = %u, `posY` = %u, `earlyPosX` = %u, `earlyPosY` = %u, `stepCount` = %u WHERE `playerId` = %"I64_FMT"u", 
-            mapString.c_str(), _posX, _posY, _earlyPosX, _earlyPosY, _stepCount, _owner->getId());
+            mapString.c_str(), _posX, _posY, _earlyPosX, _earlyPosY, _remainTime, _owner->getId());
 }
 
 void Dreamer::AddToFighterList(UInt16 id)
@@ -829,7 +888,7 @@ void Dreamer::OnJumpWhenAuto(UInt16 pos, UInt32 stepCount)
     INDEX_TO_POS(pos, x, y);
     _posX = x;
     _posY = y;
-    _stepCount += stepCount;
+    _remainTime += stepCount;
 
     // 该格子事件未完成
     switch ((it->second).gridType & 0x0F)
@@ -997,76 +1056,6 @@ bool Dreamer::OnAttackMonster(UInt16 pos, bool isAuto)
     }
     return res;
 }
-
-void Dreamer::OnSolveTrap(bool isAuto)
-{
-    // 解锁机关 (已删除功能)
-    if (!CheckGridType(GRID_TRAP))
-        return;
-    _nextMoveTime = TimeUtil::Now() + 30;
-    MapInfo::iterator it = _mapInfo.find(POS_TO_INDEX(_posX, _posY));
-    (it->second).gridType = GRID_NORMAL;
-    SendGridInfo(POS_TO_INDEX(_posX, _posY));
-}
-
-void Dreamer::OnBreakthroughTrap(bool isAuto)
-{
-    // 前行突破机关 (已删除功能)
-    if (!CheckGridType(GRID_TRAP))
-        return;
-    UInt8 prob = _rnd(100);
-    if (prob < 50)
-    {
-        // 成功
-    }
-    else
-    {
-        // 失败
-        _nextMoveTime = TimeUtil::Now() + 60;
-    }
-    SendGridInfo(POS_TO_INDEX(_posX, _posY));
-}
-
-void Dreamer::OnGetTreasure(bool isAuto)
-{
-    // 打开宝箱
-    if (!CheckGridType(GRID_TREASURE))
-        return;
-    Table rewards = GameAction()->getTreasure(_gameProgress);
-    Stream st;
-    if (!isAuto)
-    {
-        st.init(REP::JOBHUNTER);
-        st << static_cast<UInt8>(3);
-    }
-    else
-    {
-        st.init(REP::AUTOJOBHUNTER);
-        st << static_cast<UInt8>(14);
-    }
-    UInt8 count = rewards.size();
-    st << static_cast<UInt8>(count);
-    for (UInt8 i = 0; i < count; ++i)
-    {
-        Table item = rewards.get<Table>(i + 1);
-        if (item.size() < 3) return;
-        UInt32 itemId = item.get<UInt32>(1);
-        UInt32 itemCount = item.get<UInt32>(2);
-        bool   bind = item.get<bool>(3);
-        _owner->GetPackage()->AddItem2(itemId, itemCount, true, bind, FromDreamer);
-        st << static_cast<UInt16>(itemId);
-        st << static_cast<UInt16>(itemCount);
-    }
-    st << Stream::eos;
-    _owner->send(st);
-
-    MapInfo::iterator it = _mapInfo.find(POS_TO_INDEX(_posX, _posY));
-    (it->second).gridType |= CLEAR_FLAG;
-
-    if (!isAuto)
-        SendGridInfo(POS_TO_INDEX(_posX, _posY));
-}
-
 bool Dreamer::OnFoundCave(bool isAuto)
 {
     // 找到洞穴
@@ -1180,7 +1169,7 @@ bool Dreamer::OnFoundCave(bool isAuto)
     // 步数奖励配置
     if (res)
     {
-        Table rewards = GameAction()->getStepAward(_stepCount);
+        Table rewards = GameAction()->getStepAward(_remainTime);
         UInt8 count = rewards.size();
         st2 << static_cast<UInt8>(count);
         for (UInt8 i = 0; i < count; ++i)
@@ -1214,7 +1203,7 @@ void Dreamer::OnAbort(bool isAuto /* = false */)
 {
     // 主动放弃
     _gameProgress = PROGRESS_NONE;
-    _stepCount = 0;
+    _remainTime = 0;
     _posX = _posY = 0;
     _earlyPosX = _earlyPosY = 0;
     _mapInfo.clear();
@@ -1224,7 +1213,7 @@ void Dreamer::OnAbort(bool isAuto /* = false */)
     _owner->SetVar(VAR_JOB_HUNTER_SPOT_ID, _spotId);
     _nextMoveTime = TimeUtil::Now();
     DB2().PushUpdateData("UPDATE `job_hunter` SET `progress` = '%u', `mapInfo` = '', `posX` = %u, `posY` = %u, `earlyPosX` = %u, `earlyPosY` = %u, `stepCount` = %u  WHERE `playerId` = %"I64_FMT"u", 
-            _gameProgress, _posX, _posY, _earlyPosX, _earlyPosY, _stepCount, _owner->getId());
+            _gameProgress, _posX, _posY, _earlyPosX, _earlyPosY, _remainTime, _owner->getId());
     SendGameInfo(2);
 }
 
