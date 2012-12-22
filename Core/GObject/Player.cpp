@@ -14662,8 +14662,11 @@ void EventTlzAuto::notify(bool isBeginAuto)
                 }
             }
             WORLD().UpdateSnowScore(this, m_snow.lover);
+            if (NULL !=  m_snow.lover)
+		        DB1().PushUpdateData("REPLACE INTO `snow` (`score`, `bind`, `lover`, `playerId`) VALUES(%u, %u, %"I64_FMT"u, %"I64_FMT"u)", m_snow.score, m_snow.bind, m_snow.lover->getId(), getId());
+            else
+		        DB1().PushUpdateData("REPLACE INTO `snow` (`score`, `bind`, `lover`, `playerId`) VALUES(%u, %u, 0, %"I64_FMT"u)", m_snow.score, m_snow.bind, getId());
 
-		    DB1().PushUpdateData("REPLACE INTO `snow` (`score`,`playerId`) VALUES(%u, %"I64_FMT"u)", m_snow.score, getId());
             return 0;
         }
         return 1;
