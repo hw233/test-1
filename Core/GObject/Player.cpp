@@ -14663,7 +14663,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
             }
             WORLD().UpdateSnowScore(this, m_snow.lover);
 
-            DB1().PushUpdateData("UPDATE `snow` SET `score`=%u WHERE `playerId` = %"I64_FMT"u", m_snow.score, getId());
+		    DB1().PushUpdateData("REPLACE INTO `snow` (`score`,`playerId`) VALUES(%u, %"I64_FMT"u)", m_snow.score, getId());
             return 0;
         }
         return 1;
