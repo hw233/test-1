@@ -1600,7 +1600,8 @@ void Fighter::rebuildEquipAttr()
 		int idx = setNum[i] / 2 - 1;
         while(idx >= 0)
         {
-            _attrExtraEquip += *iest->attrExtra[idx];
+            if(iest->attrExtra[idx])
+                _attrExtraEquip += *iest->attrExtra[idx];
             --idx;
         }
 		//_attrExtraEquip += *iest->attrExtra[idx];
