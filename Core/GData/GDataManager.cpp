@@ -645,7 +645,8 @@ namespace GData
             */
 			for(int j = 0; j < 4; ++ j)
 			{
-				iest->attrExtra[j] = *attrExtraManager[est.attrId[j]];
+                if(est.attrId[j] != 0)
+				    iest->attrExtra[j] = *attrExtraManager[est.attrId[j]];
 			}
 			itemEquipSetTypeManager.add(iest);
 		}
