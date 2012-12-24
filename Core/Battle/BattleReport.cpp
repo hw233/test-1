@@ -121,11 +121,9 @@ void BattleReport::addReport( UInt32 id, std::vector<UInt8>& v )
     DB1().PushUpdateData("update reportid set maxid = %d where maxid=%d", id, lastMaxId);
     lastMaxId = id;
 
-#if 0
     RptLife rptLife = {id, TimeUtil::Now()};
     _rptLife.insert(rptLife);
     travelRptLife();
-#endif
 }
 
 void BattleReport::loadReport( UInt32 id, std::vector<UInt8>& v )
@@ -142,10 +140,8 @@ void BattleReport::loadReport( UInt32 id, std::vector<UInt8>& v )
 	fread(&v[0], 1, size, f);
 	fclose(f);
 
-#if 0
     RptLife rptLife = {id, TimeUtil::Now()};
     _rptLife.insert(rptLife);
-#endif
 }
 
 void BattleReport::travelRptLife()
