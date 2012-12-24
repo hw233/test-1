@@ -23,6 +23,8 @@
 #include "GObject/NewRelation.h"
 #include "StrengthenMgr.h"
 #include "JobHunter.h"
+#include "Dreamer.h"
+
 
 namespace Battle
 {
@@ -179,6 +181,8 @@ namespace GObject
     class CFriend;
     class HoneyFall;
     struct DeamonPlayerData;
+    class JobHunter;
+    class Dreamer;
 
     struct TripodData
     {
@@ -427,6 +431,13 @@ namespace GObject
         UInt8 event;
         UInt32 score;
         QixiInfo() : lover(NULL), bind(0), pos(0), event(0), score(0) {}
+    };
+    struct SnowInfo
+    {
+        Player* lover;
+        bool bind;
+        UInt32 score;
+        SnowInfo() :lover(NULL),bind(0),score(0) {}
     };
 
 	struct PlayerData
@@ -1418,6 +1429,7 @@ namespace GObject
         bool _isJumpingMap;
 
         QixiInfo m_qixi;
+        SnowInfo m_snow;
         bool _qixiBinding;
     public:
         inline bool isJumpingMap() { return _isJumpingMap; }
@@ -1451,6 +1463,29 @@ namespace GObject
         inline UInt32 getScore() { return m_qixi.score; }
         std::set<Player *>& getInviters() {return _friends[3];};
 
+        //堆雪人start
+        void loadSnowInfoFromDB(Player* pl, bool bind, UInt32 score)
+        {
+            m_snow.lover = pl;
+            m_snow.bind = bind;
+            m_snow.score = score;
+        }
+        SnowInfo& getSnowInfo() {return m_snow;};
+        void resetSnow();
+        void sendSnowInfo();
+        UInt32 getSnowScore() {return  m_snow.score;};
+        bool getSnowBind() {return m_snow.bind;};
+        Player* getSnowLover() {return m_snow.lover;};
+        void divorceSnowLover();
+        void beDivorceSnowLover(Player* pl);
+        void postSnowLover(Player* pl);
+        UInt8 beSnowLoverBind(Player* pl);
+        void onSnowLoverResp(bool bind);
+        UInt8 useSnowItem(UInt32 num);
+        void sendSnowScoreAward();
+        UInt8 getSnowAward(UInt16 type);
+        //推雪人end
+        
         void setForbidSale(bool b) {_isForbidSale = b;}
         bool getForbidSale() {return _isForbidSale;}
 	private:
@@ -1950,10 +1985,15 @@ namespace GObject
 
     public:
         JobHunter * getJobHunter();
-        void setJobHunter(std::string& fighterList, std::string& mapInfo, UInt8 progress, UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY, UInt32 stepCount);
+        void setJobHunter(std::string& fighterList, std::string& mapInfo, UInt8 progress, UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY, UInt32 stepCount, UInt8 slotVal1, UInt8 slotVal2, UInt8 slotVal3);
         void sendAutoJobHunter();
     private:
         JobHunter * _jobHunter;
+
+    public:
+        Dreamer * getDreamer();
+    private:
+        Dreamer * _dreamer;
 
     public:
         bool hasFighterWithClass(UInt8 cls);
@@ -1980,6 +2020,10 @@ namespace GObject
         void get3366GiftAward(UInt8 type);
         void send3366GiftInfo();
         void sendQQGameGift1218();
+        void sendFeastLoginAct();
+        void sendTowerLoginAct();
+        void getFeastGiftAward(UInt8 type);
+        void sendFeastGiftAct();
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

@@ -15,15 +15,6 @@ local bossMonster = {
     [4] = {9598,9599},
 }
 
-local caveMonster = {
-    -- 秘洞守卫 id
-    [1] = 5211,
-    [2] = 5211,
-    [3] = 5211,
-    [4] = 5211,
-}
-
-
 local stepAward = {
     {{1325, 1, 1}},
     {{1326, 4, 1}},
@@ -199,6 +190,14 @@ local lengendMonster = {
     [10] = {12051, 12052, 12053, 12054},
 }
 
+local specialItem = {
+    -- 材料道具的配置(用于合成梦引)
+    [1]  = {9286, 9287, 9288, 9289},
+    [2]  = {9291, 9292, 9293, 9294},
+    [3]  = {9296, 9297, 9298, 9299},
+    [4]  = {9301, 9302, 9303, 9304},
+}
+
 function getRandomNormalMonster(id)
     if id >= 1 and id <= 4 then
         return normalMonster[id][math.random(1, #(normalMonster[id]))]
@@ -260,5 +259,9 @@ function getStepAward(step)
         end
     end
     return stepAward[#stepAward]
+end
+
+function getSpecialItem(id, index)
+    return specialItem[id][index];
 end
 

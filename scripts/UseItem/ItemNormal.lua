@@ -210,7 +210,7 @@ function ItemNormal_00000026(iid, num, bind, param)
 end
 
 function fixModelConflict(fgt, bufid)
-    local buffers = {5,7,8,9,0xa,0xb,0xc,0xe,0xf,0x10,0x11}
+    local buffers = {5,7,8,9,0xa,0xb,0xc,0xe,0xf,0x10,0x11,0x12}
     for n=1,#buffers do
         if bufid ~= buffers[n] then
             fgt:setBuffData(buffers[n], 0, true)
@@ -231,6 +231,24 @@ function ItemNormal_00000401(iid, num, bind, param)
 
     if ItemNormal_AddBuff(fgt, 5, 3600, num, 356400) then
         package:DelItemSendMsg(401, player);
+        return num;
+    end
+    return false
+end
+
+function ItemNormal_00009306(iid, num, bind, param)
+    local player = GetPlayer()
+    local fgt = player:findFighter(param);
+    local package = player:GetPackage();
+
+    if fgt == nil then
+        return false
+    end
+
+    fixModelConflict(fgt, 0x12)
+
+    if ItemNormal_AddBuff(fgt, 0x12, 3600, num, 356400) then
+        package:DelItemSendMsg(iid, player);
         return num;
     end
     return false
@@ -6941,6 +6959,21 @@ function ItemNormal_00009216(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00009276(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    player:setTitle(46, 0)
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+function ItemNormal_00009277(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    player:setTitle(47, 0)
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
 function ItemNormal_00009230(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -7095,6 +7128,7 @@ local ItemNormal_Table = {
     [402] = ItemNormal_00000402,
     [403] = ItemNormal_00000403,
     [401] = ItemNormal_00000401,
+    [9306] = ItemNormal_00009306,
     [438] = ItemNormal_00000438,
     [439] = ItemNormal_00000439,
 	[30] = ItemNormal_00000030,
@@ -8687,6 +8721,8 @@ local ItemNormal_Table = {
     [9271] = ItemNormal_fighterCard,
     [9272] = ItemNormal_fighterCard,
     [9274] = ItemNormal_00009274,
+    [9276] = ItemNormal_00009276,
+    [9277] = ItemNormal_00009277,
 
     [9279] = ItemNormal_00009279,
     [9280] = ItemNormal_00009279,

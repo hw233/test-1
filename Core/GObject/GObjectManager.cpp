@@ -375,6 +375,11 @@ namespace GObject
             fprintf(stderr, "loadQixi error!\n");
             std::abort();
         }
+        if(!loadSnow())
+        {
+            fprintf(stderr, "loadSnow error!\n");
+            std::abort();
+        }
         if(!loadArenaExtraBoard())
         {
             fprintf(stderr, "loadArenaExtraBoard error!\n");
@@ -5074,6 +5079,41 @@ namespace GObject
 
     }
 
+    bool GObjectManager::loadSnow()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading Snow");
+        DBSnow snow;
+        if(execu->Prepare("SELECT `playerId`, `lover`, `bind`, `score` FROM `snow` ORDER BY `playerId`", snow) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+        Player* pl = NULL;
+        Player* lover = NULL;
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		while(execu->Next() == DB::DB_OK)
+        {
+			lc.advance();
+            lover = NULL;
+			if(snow.playerId != last_id)
+			{
+				last_id = snow.playerId;
+				pl = globalPlayers[last_id];
+				lover = globalPlayers[snow.lover];
+			}
+			if(pl == NULL)
+				continue;
+
+            pl->loadSnowInfoFromDB(lover, snow.bind, snow.score);
+            if (snow.bind && lover != NULL)
+                WORLD().UpdateSnowScore(pl, lover);
+
+        }
+        lc.finalize();
+        return true;
+    }
+
+
     bool GObjectManager::loadJobHunter()
     {
         // 读取寻墨有关数据
@@ -5081,7 +5121,7 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading ExJob");
         DBJobHunter dbjh;
-        if(execu->Prepare("SELECT `playerId`, `fighterList`, `mapInfo`, `progress`, `posX`, `posY`, `earlyPosX`, `earlyPosY`, `stepCount` FROM `job_hunter` ORDER BY `playerId`", dbjh) != DB::DB_OK)
+        if(execu->Prepare("SELECT `playerId`, `fighterList`, `mapInfo`, `progress`, `posX`, `posY`, `earlyPosX`, `earlyPosY`, `stepCount`, `slotVal1`, `slotVal2`, `slotVal3` FROM `job_hunter` ORDER BY `playerId`", dbjh) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
         Player * player = NULL;
@@ -5090,7 +5130,7 @@ namespace GObject
             player = globalPlayers[dbjh.playerId];
             if (player)
             {
-                player->setJobHunter(dbjh.fighterList, dbjh.mapInfo, dbjh.progress, dbjh.posX, dbjh.posY, dbjh.earlyPosX, dbjh.earlyPosY, dbjh.stepCount);
+                player->setJobHunter(dbjh.fighterList, dbjh.mapInfo, dbjh.progress, dbjh.posX, dbjh.posY, dbjh.earlyPosX, dbjh.earlyPosY, dbjh.stepCount, dbjh.slotVal1, dbjh.slotVal2, dbjh.slotVal3);
             }
 			lc.advance();
         }

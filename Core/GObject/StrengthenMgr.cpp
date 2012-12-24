@@ -82,9 +82,9 @@ void StrengthenMgr::LoadFromDB(DBStrengthenData& data)
     }
 }
 
-bool StrengthenMgr::CheckTimeOver()
+bool StrengthenMgr::CheckTimeOver(UInt32 now)
 {
-    UInt32 now = TimeUtil::Now();
+    //UInt32 now = TimeUtil::Now();
     if(now < _item.overTime)
         return false;
     UInt32 over = TimeUtil::SharpDayT(1 , now);

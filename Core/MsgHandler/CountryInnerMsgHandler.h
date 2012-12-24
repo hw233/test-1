@@ -737,6 +737,7 @@ void OnDailyCheck( GameMsgHdr& hdr, const void * data )
     player->SetVar(VAR_JUNE_ITEM, 0);
     player->sendHappyInfo();
     player->SendNextdayTime( *(UInt32*)data );
+    player->GetStrengthenMgr()->CheckTimeOver( *(UInt32*)data );
 }
 
 void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
@@ -1763,9 +1764,6 @@ void OnAutoJobHunterStep( GameMsgHdr& hdr, const void * data)
     JobHunter * job_hunter = player->getJobHunter();
     if (!job_hunter)
     {
-#ifdef JOB_HUNTER_DEBUG
-        std::cout << "Wrong Timer." << std::endl;
-#endif
         return;
     }
     job_hunter->OnAutoCommand(0x10);
