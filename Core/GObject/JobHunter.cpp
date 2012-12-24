@@ -79,26 +79,6 @@ bool JobHunter::FighterList2String(std::string& str)
     return true;
 }
 
-bool JobHunter::MapInfo2String(std::string& str)
-{
-    // 获得需要保存的地图信息字符串
-    char buf[1024] = {0};
-    char* pbuf = buf;
-    char * pend = &buf[sizeof(buf)-1];
-    for (MapInfo::iterator it = _mapInfo.begin(); it != _mapInfo.end(); ++ it)
-    {
-        pbuf += snprintf(pbuf, pend - pbuf, "%u", POS_TO_INDEX((it->second).posX,(it->second).posY));
-        pbuf += snprintf(pbuf, pend - pbuf, ",");
-        pbuf += snprintf(pbuf, pend - pbuf, "%u", (it->second).neighbCount);
-        pbuf += snprintf(pbuf, pend - pbuf, ",");
-        pbuf += snprintf(pbuf, pend - pbuf, "%u", (it->second).gridType);
-        pbuf += snprintf(pbuf, pend - pbuf, "|");
-    }
-    if (pbuf != buf)
-        str = buf;
-    return true;
-}
-
 void JobHunter::LoadFighterList(const std::string& list)
 {
     // 加载玩家的待招列表
@@ -279,7 +259,6 @@ void JobHunter::OnRequestStart(UInt8 index)
 
 void JobHunter::OnUpdateSlot(bool isAuto)
 {
-    return;
     // 老虎机转动
     if (!_gameProgress)
         return;

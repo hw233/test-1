@@ -5645,6 +5645,21 @@ void OnAutoJobHunter( GameMsgHdr & hdr, const void * data )
     jobHunter->OnAutoCommand(type);
 }
 
+void OnDreamer( GameMsgHdr & hdr, const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+
+    Dreamer * dreamer = player->getDreamer();
+    if (!dreamer)
+        return;
+
+    UInt8 type = 0;
+    br >> type;
+    dreamer->OnCommand(type);
+}
+
+
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

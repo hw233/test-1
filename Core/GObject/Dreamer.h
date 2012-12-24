@@ -54,25 +54,16 @@ static UInt8 spotMapType[] =
 };
 #endif
 
+static const UInt8 MAX_PROGRESS = 4;
 static const UInt8 MAX_LEVEL = 5;
-static const UInt8 MAX_X[MAX_LEVEL + 1] = 
-{
-    0, 2, 3, 4, 5, 6
-};
 
-static const UInt8 MAX_Y[MAX_LEVEL + 1] = 
+static const UInt16 DREAMER_ITEM[MAX_PROGRESS + 1] =
 {
-    0, 2, 3, 4, 5, 6
-};
-
-static const UInt8 DREAMER_MAX_GRID[MAX_LEVEL + 1] = 
-{
-    0, 4, 7, 10, 12, 15
-};
-
-static const UInt8 CONSUME_TIME[MAX_LEVEL + 1] = 
-{
-    0, 6, 5, 4, 3, 2//, 1,
+    0,
+    9290,
+    9295,
+    9300,
+    9305,
 };
 
 class Dreamer
@@ -93,36 +84,36 @@ class Dreamer
 
     enum GridType
     {
-        GRID_NORMAL     = 0x1,    // 普通
-        GRID_ARROW      = 0x2,    // 箭头方向
-        GRID_KEY        = 0x3,    // 钥匙
-        GRID_TREASURE   = 0x4,    // 宝箱
-        GRID_ITEM       = 0x5,    // 道具
-        GRID_TIME       = 0x6,    // 增加剩余时间
-        GRID_TRANSPORT  = 0x7,    // 传送点
+        GRID_WAVE       = 0x1,    // 漩涡，通往下一层
+        GRID_KEY        = 0x2,    // 钥匙
+        GRID_TREASURE   = 0x3,    // 宝箱（需要钥匙）
+        GRID_EYE        = 0x4,    // 眼位（前往漩涡，钥匙，宝箱三者之一）
+        GRID_ITEM       = 0x5,    // 道具（不需要钥匙的宝箱）
+        GRID_WHIRLWIND  = 0x6,    // 旋风（随机从送至容易地点）
+        GRID_TIME       = 0x7,    // 增加剩余时间
+        GRID_ARROW      = 0x8,    // 箭头
         GRID_NORMAL_MAX,
-    };
-
-    enum DreamType
-    {
-        TYPE_NULL   = 0,
-        TYPE_1      = 1,
-        TYPE_2      = 2,
-        TYPE_3      = 3,
-        TYPE_4      = 4,
-        TYPE_MAX,
     };
 
     enum Progress
     {
-        PROGRESS_NONE = 0,  // 没有开始梦境
-        PROGRESS_LEVEL1,    // 水晶梦境第一层
-        PROGRESS_LEVEL2,    // 水晶梦境第二层
-        PROGRESS_LEVEL3,    // 水晶梦境第三层
-        PROGRESS_LEVEL4,    // 水晶梦境第四层
-        PROGRESS_LEVEL5,    // 水晶梦境第五层
-        PROGRESS_LEVEL6,    // 水晶梦境第六层
+        PROGRESS_NONE    = 0,
+        PROGRESS_70      = 1,    // 70级副本梦境
+        PROGRESS_80      = 2,    // 80级副本梦境
+        PROGRESS_90      = 3,    // 90级副本梦境
+        PROGRESS_100     = 4,    // 100级副本梦境
         PROGRESS_MAX,
+    };
+
+    enum Level
+    {
+        LEVEL_NONE = 0,     // 没有开始梦境
+        LEVEL_1,            // 水晶梦境第一层
+        LEVEL_2,            // 水晶梦境第二层
+        LEVEL_3,            // 水晶梦境第三层
+        LEVEL_4,            // 水晶梦境第四层
+        LEVEL_5,            // 水晶梦境第五层
+        LEVEL_6,            // 水晶梦境第六层
     };
 
     struct GridInfo
@@ -143,54 +134,61 @@ class Dreamer
 
     public:
         Dreamer(Player *player);
+        Dreamer(Player * player, UInt8 progress, UInt8 level, UInt8 maxX, UInt8 maxY, UInt8 maxGrid, std::string& mapInfo, 
+                UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY, UInt8 timeConsume, UInt32 remainTime, UInt8 keysCount);
         ~Dreamer();
 
-        void OnCommand(UInt8 command, UInt8 val);
+        void OnCommand(UInt8 command, UInt8 val = 0);
 
-        void SendGridInfo(UInt16 pos);
+        void SendGameInfo();
+        void SendGridInfo(UInt8 posX, UInt8 posY);
         void SendMapInfo();
 
     private:
         bool InitMap(UInt8 level);
         bool InitArrow();
+        bool InitItem();
+        bool InitEye();
+        bool SelectBornGrid();
+        bool LoadMapInfo(const std::string& list);
+        void SaveMapInfo();
 
+        void OnRequestStart(UInt8 progress);
         void OnMove(UInt16 pos);
+        void OnStepIntoWave();
         void OnGetTreasure();
+        void OnGetKey();
+        void OnGetItem();
+        void OnSufferWhirlwind();
+        void OnGetTime();
+        void OnAbort();
 
-    private:
-        UInt8 CheckGridType(UInt8 type)
-        {
-            // 检查该坐标是否和需要的类型匹配
-            MapInfo::iterator it = _mapInfo.find(POS_TO_INDEX(_posX, _posY));
-            if (it != _mapInfo.end())
-            {
-                return ((it->second).gridType == type)? 1:0;
-            }
-            return 0;
-        }
+        UInt8 CheckGridType(UInt8 type);
+        UInt8 CalcArrowType(UInt16 srcPos, UInt16 dstPos);
 
     private:
         typedef std::map<UInt16, GridInfo> MapInfo;
 
         Player * _owner;
 
+        MapInfo _mapInfo;               // 梦境游戏地图信息
+
+        UInt8 _gameProgress;            // 梦境游戏状态
+        UInt8 _gameLevel;               // 梦境层数
+        bool  _isInGame;                // 玩家是否已经进入梦境游戏
+
         UInt8 _maxX;
         UInt8 _maxY;
         UInt8 _maxGrid;
         
-
-        MapInfo _mapInfo;               // 梦境游戏地图信息
-
-        bool  _isInGame;                // 玩家是否已经进入梦境游戏
-        UInt8 _type;                    // 梦境种类
-        UInt8 _gameProgress;            // 梦境游戏状态
-
         UInt8 _posX;                    // 玩家在梦境游戏中的X坐标
         UInt8 _posY;                    // 玩家在梦境游戏中的Y坐标
         UInt8 _earlyPosX;
         UInt8 _earlyPosY;
 
+        UInt8  _timeConsume;            // 该层每步消耗的体力
         UInt32 _remainTime;             // 梦境游戏中剩余的体力
+        UInt8  _keysCount;              // 手头钥匙的数量
 
         URandom _rnd;                   // 用于产生随机数
         

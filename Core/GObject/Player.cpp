@@ -1157,6 +1157,9 @@ namespace GObject
 #endif
 #endif
 #endif // _WIN32
+#ifdef DREAMER_DEBUG
+        getDreamer();
+#endif
 	}
 
 #define WEBDOWNLOAD 255
@@ -16261,6 +16264,13 @@ Dreamer* Player::getDreamer()
        {
            _dreamer = new Dreamer(this);
        }
+#ifdef DREAMER_DEBUG
+       else
+       {
+           delete _dreamer;
+           _dreamer = new Dreamer(this);
+       }
+#endif
        return _dreamer;
 }
 
