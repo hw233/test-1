@@ -156,6 +156,7 @@ namespace Script
 
         Table GetNewCountryBattleBuffs();
         Table GetNCBEffortIdValue();
+        Table GetNewCountryBattleAward(UInt8 lvl);
         Table GetClanBattleBuffs();
         Table GetClanBattleDailyRewards();
         Table GetClanBattleWeekSortRewards();

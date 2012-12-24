@@ -6974,6 +6974,28 @@ function ItemNormal_00009274(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00009311(iid, num, bind, param)
+    if iid < 9311 or iid > 9312 then
+        return 0
+    end
+    local player = GetPlayer()
+    local package = player:GetPackage()
+    local items = {
+        [9311] = {{1326, 2}, {30, 1}, {507, 1}, {503, 1}, {9076, 1}},
+        [9312] = {{1326, 2}, {30, 1}, {509, 1}, {500, 2}, {9076, 1}},
+    }
+    local chance = { 3000, 6000, 7000, 9000, 10000}
+    local r = math.random(1, 10000)
+    for i = 1, #chance do
+        if r <= chance[i] then
+            package:Add(items[iid][i][1], items[iid][i][2], 1, 0, 2);
+            break
+        end
+    end
+    package:DelItemSendMsg(iid, player)
+    return num
+end
+
 function ItemNormal_fighterCard(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -8671,6 +8693,9 @@ local ItemNormal_Table = {
     [9281] = ItemNormal_00009279,
     [9282] = ItemNormal_00009279,
     [9283] = ItemNormal_00000400,
+
+    [9311] = ItemNormal_00009311,
+    [9312] = ItemNormal_00009311,
 
     [10000] = ItemNormal_00010000,
     [10001] = ItemNormal_00010001,

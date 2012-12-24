@@ -113,6 +113,8 @@ namespace GObject
 #define PLAYER_BUFF_SUFFER          0x47    //陷害间隔
 #define PLAYER_BUFF_JOYBUFF         0x48    //心悦会员
 
+#define PLAYER_BUFF_NEW_CBATTLE	    0x49    //新阵营战(蜀山论剑)
+
 #define PLAYER_BUFF_ATHL1           0x51
 #define PLAYER_BUFF_ATHL2           0x52
 #define PLAYER_BUFF_ATHL3           0x53

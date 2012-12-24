@@ -710,6 +710,11 @@ namespace Script
         return Run<Table>(NULL, "getNCBEffortIdValue");
     }
 
+    Table GameActionLua::GetNewCountryBattleAward(UInt8 lvl)
+    {
+        return Call<Table>("getNewCountryBattleAward", lvl);
+    }
+
     Table GameActionLua::GetClanBattleBuffs()
     {
         return Run<Table>(NULL, "getClanBattleBuffs");

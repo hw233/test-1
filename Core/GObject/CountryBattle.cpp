@@ -921,10 +921,12 @@ void GlobalCountryBattle::prepare( UInt32 t )
 {
 	_running = false;
 	if(cfg.GMCheck)
-		_prepareTime = TimeUtil::SharpDay(0) + 19 * 60 * 60 + 45 * 60;
+		//_prepareTime = TimeUtil::SharpDay(0) + 19 * 60 * 60 + 45 * 60;
+		_prepareTime = t + 15 * 60; //for 内测测试
 	else
+		_prepareTime = t + 3 * 60;
 		//_prepareTime = t + 30;
-		_prepareTime = TimeUtil::SharpDay(0) + 19 * 60 * 60 + 45 * 60;
+		//_prepareTime = TimeUtil::SharpDay(0) + 19 * 60 * 60 + 45 * 60;
 	if(_prepareTime + 45 * 60 < t)
 		_prepareTime += 24 * 60 * 60;
 	_startTime = _prepareTime + 15 * 60;
@@ -935,7 +937,7 @@ void GlobalCountryBattle::prepare( UInt32 t )
 	}
 	else
 	{
-		_startTime = _prepareTime + 15 * 60;
+		_startTime = _prepareTime + 3 * 60;
 		_endTime = _startTime + 30 * 60;
 		//_startTime = _prepareTime + 30;
 		//_endTime = _startTime + 8 * 60;
@@ -974,19 +976,12 @@ void GlobalCountryBattle::start( UInt32 t )
 
 void GlobalCountryBattle::end( )
 {
-    if (WORLD().isNewCountryBattle())
-    {
-        if (!_NewcountryBattle) return;
-    }
-    else
+    if (!WORLD().isNewCountryBattle())
     {
         if (!_countryBattle) return;
+        UInt32 curtime = TimeUtil::Now();
+        _countryBattle->end(curtime);
     }
-	UInt32 curtime = TimeUtil::Now();
-    if (WORLD().isNewCountryBattle())
-        _NewcountryBattle->end();
-    else
-	    _countryBattle->end(curtime);
     setStatus(2);
 
 	_running = false;
@@ -1031,11 +1026,6 @@ bool GlobalCountryBattle::process(UInt32 curtime)
 	case 2:
 		if(curtime < _startTime)
 		{
-            if(WORLD().isNewCountryBattle() && curtime >= _startTime - 5)
-            {
-                _NewcountryBattle->allotPlayers();
-                _NewcountryBattle->makePairPlayers();
-            }
 			return false;
 		}
 		start(curtime);
@@ -1064,7 +1054,14 @@ bool GlobalCountryBattle::process(UInt32 curtime)
 		{
 			if(curtime < _startTime - 5 * 60)
 				return false;
-			SYSMSG_BROADCASTV(241, 5);
+            if(WORLD().isNewCountryBattle())
+            {
+			    SYSMSG_BROADCASTV(239, 5);
+            }
+            else
+            {
+			    SYSMSG_BROADCASTV(241, 5);
+            }
 			_prepareTime = 2;
 		}
 		return false;
@@ -1072,27 +1069,41 @@ bool GlobalCountryBattle::process(UInt32 curtime)
 		{
 			if(curtime < _startTime - 10 * 60)
 				return false;
-			SYSMSG_BROADCASTV(241, 10);
+            if(WORLD().isNewCountryBattle())
+            {
+			    SYSMSG_BROADCASTV(239, 10);
+            }
+            else
+            {
+			    SYSMSG_BROADCASTV(241, 10);
+            }
 			_prepareTime = 3;
 		}
 		return false;
 	default:
 		{
-			SYSMSG_BROADCAST(240);
+            if(WORLD().isNewCountryBattle())
+            {
+			    SYSMSG_BROADCAST(238);
+            }
+            else
+            {
+			    SYSMSG_BROADCAST(240);
+            }
 			prepare2(curtime);
 			_prepareTime = 4;
 		}
 		return false;
 	}
 
+    if (WORLD().isNewCountryBattle())
+	    _NewcountryBattle->process(curtime); //不能用定时器去直接调用_NewcountryBattle->end()
 	if(curtime >= _endTime)
 	{
 		end();
 		return true;
 	}
-    if (WORLD().isNewCountryBattle())
-	    _NewcountryBattle->process(curtime);
-    else
+    if (!WORLD().isNewCountryBattle())
 	    _countryBattle->process(curtime);
 
 	return false;
@@ -1127,18 +1138,18 @@ void GlobalCountryBattle::sendForNewCB(Player * player)
     if(!WORLD().isNewCountryBattle())
         return;
     UInt32 curtime = TimeUtil::Now();
-    UInt32 prepareTime = _startTime - 15 * 60;
-    if(curtime >= prepareTime && curtime < _startTime)
+    //UInt32 prepareTime = _startTime - 15 * 60;
+    if(curtime >= _prepareTime && curtime < _startTime)
     {
         Stream st(REP::NEW_CAMPS_WAR_JOIN);
-        st << static_cast<UInt8>(0x05) << static_cast<UInt8>(0) << _startTime - curtime << Stream::eos;
+        st << static_cast<UInt8>(0x05) << static_cast<UInt8>(0) << static_cast<UInt16>(_startTime - curtime) << Stream::eos;
         player->send(st);
         _NewcountryBattle->sendSelfInfo(player);
     }
     else if(curtime >= _startTime && curtime < _endTime)
     {
         Stream st(REP::NEW_CAMPS_WAR_JOIN);
-        st << static_cast<UInt8>(0x05) << static_cast<UInt8>(1) << _endTime - curtime << Stream::eos;
+        st << static_cast<UInt8>(0x05) << static_cast<UInt8>(1) << static_cast<UInt16>(_endTime - curtime) << Stream::eos;
         player->send(st);
         _NewcountryBattle->sendSelfInfo(player);
     }

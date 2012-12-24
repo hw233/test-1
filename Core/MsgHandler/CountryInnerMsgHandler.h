@@ -737,7 +737,6 @@ void OnDailyCheck( GameMsgHdr& hdr, const void * data )
     player->SetVar(VAR_JUNE_ITEM, 0);
     player->sendHappyInfo();
     player->SendNextdayTime( *(UInt32*)data );
-    player->GetStrengthenMgr()->CheckTimeOver( *(UInt32*)data );
 }
 
 void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )

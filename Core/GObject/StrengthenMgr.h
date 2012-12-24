@@ -46,6 +46,7 @@ namespace GObject
         SthCapacity = 36,   //资质洗炼
         SthCHTownDeamon, //镇守聚魂阵
         SthActSignIn,    //活跃度签到
+        SthChallenge,    //切磋
         SthMaxFlag,      //标志记录的个数
     };
 #define STRONGTYPE_CNT 2
@@ -88,7 +89,7 @@ namespace GObject
             void LoadFromDB(DBStrengthenData& data) ;
             void UpdateToDB();
             void UpdateFlag(UInt8 idx, UInt8 v);
-            bool CheckTimeOver(UInt32 now = TimeUtil::Now());
+            bool CheckTimeOver();
             void SendStrengthenInfo();
             void SendStrengthenRank();
             void SendOpenChestsInfo(UInt8 boxId, UInt8 index);

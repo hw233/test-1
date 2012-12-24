@@ -2804,7 +2804,7 @@ namespace GObject
         {
             Fighter* fighter = _playerData.lineup[j].fighter;
             if(fighter)
-                Hp += fighter->getCurrentHP();
+                Hp += fighter->getCurrentHP() > 0 ? fighter->getCurrentHP() : fighter->getMaxHP();
         }
         return Hp;
     }
