@@ -126,6 +126,7 @@ public:
 public:
 	inline UInt32 ThisDay() { return _today; }
 	inline UInt32 Now() { return _now; }
+	inline bool isNewCountryBattle() { return !(_wday % 2); }
 
     inline static bool isFBVersion() { return cfg.fbVersion; }
     inline static bool isVTVersion() { return cfg.vtVersion; }
@@ -741,7 +742,7 @@ public:
     void DivorceSnowPair(Player* pl);
     void LoadSnowScore(Player* pl, Player* lover);
     void SendSnowAward();
- 
+
     void killMonsterAppend(Stream& st, UInt8 index);
     void killMonsterInit();
     void UpdateKillMonsterRank(Player* pl, UInt8 Type, UInt8 count);

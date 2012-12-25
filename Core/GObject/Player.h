@@ -115,6 +115,8 @@ namespace GObject
 #define PLAYER_BUFF_SUFFER          0x47    //陷害间隔
 #define PLAYER_BUFF_JOYBUFF         0x48    //心悦会员
 
+#define PLAYER_BUFF_NEW_CBATTLE	    0x49    //新阵营战(蜀山论剑)
+
 #define PLAYER_BUFF_ATHL1           0x51
 #define PLAYER_BUFF_ATHL2           0x52
 #define PLAYER_BUFF_ATHL3           0x53
@@ -955,6 +957,8 @@ namespace GObject
 		inline UInt32 getPendExp() { return _playerData.lastExp & 0x7FFFFFFF; }
 		bool regenHP(UInt32);
         UInt8 allHpP();
+        UInt32 getBattleMaxHp();
+        UInt32 getBattleCurrentHp(); 
 
         bool isCopyPassed(UInt8 copyid);
 
@@ -1739,7 +1743,7 @@ namespace GObject
         void luckyDrawUdpLog(UInt32 id, UInt8 type, UInt32 num = 1);
         void qixiUdpLog(UInt32 id);
         void clanUdpLog(UInt32 id);
-        void countryBattleUdpLog(UInt32 id, UInt8 country);
+        void countryBattleUdpLog(UInt32 id, UInt8 country, std::string str = "");
         void secondSoulUdpLog(UInt32 id, UInt32 val = 0, UInt32 num = 1);
         void wBossUdpLog(UInt32 id);
         void clanCopyUdpLog(UInt32 id, UInt32 val = 0, UInt32 num = 1);

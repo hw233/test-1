@@ -28,6 +28,7 @@
 #include "Boss.h"
 #include "Athletics.h"
 #include "CountryBattle.h"
+#include "NewCountryBattle.h"
 #include "Battle/BattleSimulator.h"
 #include "Battle/BattleFighter.h"
 #include "Script/GameActionLua.h"
@@ -1469,11 +1470,14 @@ namespace GObject
         udpLog("clan", action, "", "", "", "", "act");
     }
 
-    void Player::countryBattleUdpLog(UInt32 id, UInt8 country)
+    void Player::countryBattleUdpLog(UInt32 id, UInt8 country, std::string str)
     {
         // 国战相关日志
-        char action[16] = "";
-        snprintf (action, 16, "F_%d_%d", id, country);
+        char action[32] = "";
+        if(str.empty())
+            snprintf (action, 32, "F_%d_%d", id, country);
+        else
+            snprintf (action, 32, "F_%d_%d_%s", id, country, str.c_str());
         udpLog("countryBattle", action, "", "", "", "", "act");
     }
 
@@ -2779,6 +2783,30 @@ namespace GObject
 		}
 		return 0;
 	}
+    
+    UInt32 Player::getBattleMaxHp()
+    {
+        UInt32 Hp = 0;
+        for(int j = 0; j < 5; ++ j)
+        {
+            Fighter* fighter = _playerData.lineup[j].fighter;
+            if(fighter)
+                Hp += fighter->getMaxHP();
+        }
+        return Hp;
+    }
+
+    UInt32 Player::getBattleCurrentHp()
+    {
+        UInt32 Hp = 0;
+        for(int j = 0; j < 5; ++ j)
+        {
+            Fighter* fighter = _playerData.lineup[j].fighter;
+            if(fighter)
+                Hp += fighter->getCurrentHP() > 0 ? fighter->getCurrentHP() : fighter->getMaxHP();
+        }
+        return Hp;
+    }
 
     UInt8 Player::allHpP()
     {
@@ -5453,6 +5481,16 @@ namespace GObject
             heroIsland.playerLeave(this);
             delFlag(Player::InHeroIsland);
         }
+        SpotData * spotData = GetMapSpot();
+        if(spotData && spotData->m_CountryBattle)
+        {
+            GObject::CountryBattle *cb = spotData->GetCountryBattle();
+	        NewCountryBattle * ncb = spotData->GetNewCountryBattle();
+            if(WORLD().isNewCountryBattle() && ncb)
+                ncb->playerLeave(this);
+            if(!WORLD().isNewCountryBattle() && cb)
+                cb->playerLeave(this);
+        }
         ClanRankBattleMgr::Instance().PlayerLeave(this);
 
         if (_playerData.location == CLAN_COPY_LOCATION)
@@ -6662,7 +6700,8 @@ namespace GObject
 
 	void Player::autoRegenAll()
 	{
-		if(hasFlag(CountryBattle | ClanBattling | ClanRankBattle))
+		//if(hasFlag(CountryBattle | ClanBattling | ClanRankBattle))
+		if(hasFlag(ClanBattling | ClanRankBattle))
 			return;
 		UInt32 autohp = 0; // getBuffData(0);
 		//if(autohp == 0)

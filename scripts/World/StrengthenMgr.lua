@@ -40,6 +40,7 @@ local checkFlag = {
     [36] = 1, --SthCapacity,   --资质洗炼
     [37] = 1, --SthCHTownDeamon,   --镇守锁妖塔
     [38] = 1, --SthActSignIn,   --活跃度签到
+    [39] = 1, --SthActSignIn,   --切磋斗剑
 }
 
 --增加的变强之魂
@@ -83,6 +84,7 @@ local addSouls = {
     [36] = 1, --SthCapacity,   --资质洗炼
     [37] = 1, --SthCHTownDeamon,   --镇守锁妖塔
     [38] = 1, --SthActSignIn,   --活跃度签到
+    [39] = 1, --SthActSignIn,   --切磋斗剑
 }
 
 --某一项的最大值

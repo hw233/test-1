@@ -640,7 +640,7 @@ void World::makeActivityInfo(Stream &st)
 }
 void World::calWeekDay( World * world )
 {
-	time_t curtime1 = time(NULL) + 300;
+	time_t curtime1 = time(NULL) + 30;
 	struct tm *local = localtime(&curtime1);
 	_wday = static_cast<UInt8>(local->tm_wday);
 	if(_wday == 0)
