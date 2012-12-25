@@ -242,6 +242,8 @@ MSG_REG_2(GameMsgHdr, 0x295, OnDelTradeNotify);
 MSG_REG_2(GameMsgHdr, 0x296, OnAddAwardGold);
 MSG_REG_2(GameMsgHdr, 0x297, OnCreateAward);
 
+//0x298~0x299,0x314~0x319 繁体占用
+
 MSG_REG_2(GameMsgHdr, 0x2A1, OnAutoJobHunterStep);
 
 MSG_REG_2(GameMsgHdr, 0x2F0, OnGoldRecharge);
