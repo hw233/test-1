@@ -127,7 +127,8 @@ private:
     void sendEndAwardInfo(Player *, Table);
     void broadcast(Stream&);
     void updateFirst();
-    void sendWinerInfo(Player *, Player *, UInt8, UInt8, UInt8);
+    void sendWinerInfo(Player *, Player *, UInt8, UInt8);
+    void sendSelfInfo1(Player *, Player *, UInt8, UInt8);
     void handleBattle();
     bool isRunAway(NewCBPlayerData *, NewCBPlayerData *);
 private:

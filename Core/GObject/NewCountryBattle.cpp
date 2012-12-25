@@ -2,6 +2,7 @@
 #include "CountryBattle.h"
 #include "NewCountryBattle.h"
 #include "GObject/Country.h"
+#include "Common/Random.h" 
 #include "Server/WorldServer.h"
 #include "Server/SysMsg.h"
 #include "Server/Cfg.h"
@@ -315,10 +316,12 @@ void NewCountryBattle::checkAddExp(UInt32 curtime)
     {
         //计算经验
         Player * player = iter->first;
-        if(!player) continue;
-        UInt8 plvl = player->GetLev();
-        UInt32 exp = 16 * ((plvl - 10) * ((plvl > 99 ? 99 : plvl) / 10) * 5 + 25);
-        player->AddExp(exp);
+        if(player && iter->second->type != 1)
+        {
+            UInt8 plvl = player->GetLev();
+            UInt32 exp = 16 * ((plvl - 10) * ((plvl > 99 ? 99 : plvl) / 10) * 5 + 25);
+            player->AddExp(exp);
+        }
         /*
         if(plvl <= 90)
             player->AddExp(2 * (60 * ((plvl - 40) * 6 + 20)));
@@ -434,7 +437,8 @@ void NewCountryBattle::joinBye(Player * player)
     ncbpData->type = 2;
     ncbpData->setAchievementLevel(8);
     //m_ncbpData[player] = ncbpData;
-    sendWinerInfo(player, NULL, 0, 8, 0);
+    sendWinerInfo(player, NULL, 0, 8);
+    sendSelfInfo1(player, NULL, 0, 8);
     addAchievement(player, 8);
     completeEffort1(ncbpData);
     //printf("UUUUUUUUUUUUUUUUUUUUUU::轮空id:%u\n", player->getId());
@@ -442,6 +446,7 @@ void NewCountryBattle::joinBye(Player * player)
 
 void NewCountryBattle::process(UInt32 curtime)
 {
+    UInt64 tick1 = TimeUtil::GetTick();
     UInt32 startTime = globalCountryBattle.getStartTime();
     if(startTime == 0)
         return;
@@ -460,10 +465,14 @@ void NewCountryBattle::process(UInt32 curtime)
     }
     if(curtime < m_tickTime)
         return;
-    //printf("curtime:%u,m_tickTime:%u\n",curtime, m_tickTime);
+    //fprintf(stderr, "curtime:%u,m_tickTime:%u\n",curtime, m_tickTime);
     m_tickTime += NCBATTLE_TIME;
 
     handleBattle();     //战斗
+    UInt64 tick2 = TimeUtil::GetTick();
+    TRACE_LOG("NewCountryBattle=>>所有战斗开始之前时间:[%"I64_FMT"u],所有战斗结束之后时间:[%"I64_FMT"u],时间差:[%"I64_FMT"u]",tick1, tick2, tick2 - tick1);
+    //fprintf(stderr, "战斗之前时间:[%"I64_FMT"u],战斗之后时间:[%"I64_FMT"u],时间差:[%"I64_FMT"u]\n",tick1, tick2, tick2 - tick1);
+    //fprintf(stderr, "curtime1:%u\n\n", TimeUtil::Now());
     if(curtime >= globalCountryBattle.getEndTime())
     {   //策划要求这里调结束
         m_pairPlayer.clear();
@@ -471,10 +480,15 @@ void NewCountryBattle::process(UInt32 curtime)
         end();
         return;
     }
+    tick1 = TimeUtil::GetTick();
     allotPlayers();     //重新分配玩家
     makePairPlayers();  //配对玩家
     updateFirst();      //广播荣誉王连胜王
     sendAllInfo();      //发送所有玩家的个人数据
+    tick2 = TimeUtil::GetTick();
+    TRACE_LOG("NewCountryBattle=>>配对所有玩家开始时间:[%"I64_FMT"u],配对所有玩家结束时间:[%"I64_FMT"u],时间差:[%"I64_FMT"u]\n",tick1, tick2, tick2 - tick1);
+    //fprintf(stderr, "配对玩家:[%"I64_FMT"u],配对玩家:[%"I64_FMT"u],时间差:[%"I64_FMT"u]\n",tick1, tick2, tick2 - tick1);
+    //fprintf(stderr, "curtime2:%u\n\n", TimeUtil::Now());
 }
 
 void NewCountryBattle::prepare(UInt16 rt)
@@ -728,7 +742,7 @@ void NewCountryBattle::updateFirst()
     broadcast(st);
 }
 
-void NewCountryBattle::sendWinerInfo(Player * player1, Player * player2, UInt8 killStreak, UInt8 achieve, UInt8 loserAchieve)
+void NewCountryBattle::sendWinerInfo(Player * player1, Player * player2, UInt8 killStreak, UInt8 achieve)
 {   //广播战报
     if(!player1) return;
     Stream st(REP::NEW_CAMPS_WAR_JOIN);
@@ -738,9 +752,29 @@ void NewCountryBattle::sendWinerInfo(Player * player1, Player * player2, UInt8 k
         st << player2->getName() << player2->getCountry();
     else
         st << "" << static_cast<UInt8>(2);
-    st << killStreak << achieve << loserAchieve;
+    st << killStreak << achieve;
     st << Stream::eos;
     broadcast(st);
+}
+
+void NewCountryBattle::sendSelfInfo1(Player * player1, Player * player2, UInt8 killStreak, UInt8 achieve)
+{   //单播给个人
+    if(!player1) return;
+    Stream st(REP::NEW_CAMPS_WAR_JOIN);
+    st << static_cast<UInt8>(0x07);
+    st << player1->getName() << player1->getCountry();
+    if(player2)
+        st << player2->getName() << player2->getCountry();
+    else
+        st << "" << static_cast<UInt8>(2);
+    st << killStreak << achieve;
+    st << Stream::eos;
+    if(killStreak)
+        player1->send(st);
+    else if(!player2)
+        player1->send(st);
+    else
+        player2->send(st);
 }
 
 bool NewCountryBattle::isRunAway(NewCBPlayerData * ncbpData1, NewCBPlayerData * ncbpData2)
@@ -795,7 +829,13 @@ void NewCountryBattle::handleBattle()
 {
     if(m_joinByePlayer.size())  //轮空
         joinBye(m_joinByePlayer[0]);
-    for(std::map<Player *, Player *>::iterator iter = m_pairPlayer.begin(); iter != m_pairPlayer.end(); ++iter)
+    UInt32 size = m_pairPlayer.size();
+    UInt32 count = size / 10;
+    UInt32 rand = uRand(count);
+    UInt32 index = 0;
+    UInt32 j = 0;
+    TRACE_LOG("NewCountryBattle=>>size蜀山论剑该轮次的玩家数量:[%u]", size + m_joinByePlayer.size());
+    for(std::map<Player *, Player *>::iterator iter = m_pairPlayer.begin(); iter != m_pairPlayer.end(); ++iter, ++j)
     {
         Player * player1 = iter->first;
         Player * player2 = iter->second;
@@ -910,7 +950,15 @@ void NewCountryBattle::handleBattle()
             player1->OnShuoShuo(SS_CTRYBATTLE);
             if (ncbpData1->currKillStreak == 2)
                 player1->OnHeroMemo(MC_ATHLETICS, MD_ADVANCED, 0, 2);
-            sendWinerInfo(player1, player2, ncbpData1->currKillStreak, achieve, loserAchieve);
+            sendSelfInfo1(player1, player2, ncbpData1->currKillStreak, achieve);
+            sendSelfInfo1(player1, player2, 0, loserAchieve);
+            if(size < 20)
+                sendWinerInfo(player1, player2, ncbpData1->currKillStreak, achieve);
+            else if(j == index + rand)
+            {
+                index += count;
+                sendWinerInfo(player1, player2, ncbpData1->currKillStreak, achieve);
+            }
         }
         else
         {
@@ -967,7 +1015,15 @@ void NewCountryBattle::handleBattle()
             player2->OnShuoShuo(SS_CTRYBATTLE);
             if (ncbpData2->currKillStreak == 2)
                 player2->OnHeroMemo(MC_ATHLETICS, MD_ADVANCED, 0, 2);
-            sendWinerInfo(player2, player1, ncbpData2->currKillStreak, achieve, loserAchieve);
+            sendSelfInfo1(player2, player1, ncbpData2->currKillStreak, achieve);
+            sendSelfInfo1(player2, player1, 0, loserAchieve);
+            if(size < 20)
+                sendWinerInfo(player2, player1, ncbpData2->currKillStreak, achieve);
+            else if(j == index + rand)
+            {
+                index += count;
+                sendWinerInfo(player2, player1, ncbpData2->currKillStreak, achieve);
+            }
         }
         //m_ncbpData[player1] = ncbpData1;
         //m_ncbpData[player2] = ncbpData2;
