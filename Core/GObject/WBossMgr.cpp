@@ -725,10 +725,26 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
     Map * map = Map::FromSpot(m_loc);
     if (!map) return;
 
+    UInt8 thrId = mapCollection.getCountryFromSpot(m_loc);
     if (oldid && oldid != npcid)
     {
-        map->Hide(oldid);
-        map->DelObject(oldid);
+        if(CURRENT_THREAD_ID() != thrId)
+        {
+            struct MapNpc
+            {
+                UInt16 loc;
+                UInt32 npcId;
+            };
+
+            MapNpc mapNpc = {m_loc, oldid};
+            GameMsgHdr hdr1(0x328, thrId, NULL, sizeof(MapNpc));
+            GLOBAL().PushMsg(hdr1, &mapNpc);
+        }
+        else
+        {
+            map->Hide(oldid);
+            map->DelObject(oldid);
+        }
     }
 
     if (oldid != npcid)
@@ -739,8 +755,17 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
         mo.m_Spot = m_loc;
         mo.m_Type = 6;
         mo.m_ActionType = 0;
-        map->AddObject(mo);
-        map->Show(npcid, true, mo.m_Type);
+
+        if(CURRENT_THREAD_ID() != thrId)
+        {
+            GameMsgHdr hdr1(0x329, thrId, NULL, sizeof(mo));
+            GLOBAL().PushMsg(hdr1, &mo);
+        }
+        else
+        {
+            map->AddObject(mo);
+            map->Show(mo.m_ID, true, mo.m_Type);
+        }
         m_id = npcid;
     }
 
@@ -774,8 +799,18 @@ void WBoss::disapper()
 
     Map * map = Map::FromSpot(m_loc);
     if (!map) return;
-    map->Hide(m_id);
-    map->DelObject(m_id);
+    {
+        struct MapNpc
+        {
+            UInt16 loc;
+            UInt32 npcId;
+        };
+
+        UInt8 thrId = mapCollection.getCountryFromSpot(m_loc);
+        MapNpc mapNpc = {m_loc, m_id};
+        GameMsgHdr hdr1(0x328, thrId, NULL, sizeof(MapNpc));
+        GLOBAL().PushMsg(hdr1, &mapNpc);
+    }
 
     _mgr->setBossName(m_idx, ""); // XXX: must before setBossSt
     _mgr->setBossSt(m_idx, 2);
