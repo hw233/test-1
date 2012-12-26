@@ -5656,7 +5656,13 @@ void OnDreamer( GameMsgHdr & hdr, const void * data)
 
     UInt8 type = 0;
     br >> type;
-    dreamer->OnCommand(type);
+    UInt8 val  = 0xFF;
+    UInt8 val2 = 0xFF;
+    if (br.left())
+        br >> val;
+    if (br.left())
+        br >> val2;
+    dreamer->OnCommand(type, val, val2);
 }
 
 

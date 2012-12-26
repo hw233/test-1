@@ -9,6 +9,8 @@
 #include "Common/Singleton.h"
 #include "Common/Stream.h"
 #include "Common/URandom.h"
+//#include "Pos.h"
+//#include "AStar.h"
 
 namespace GObject
 {
@@ -131,6 +133,8 @@ class Dreamer
         }
     };
 
+    friend class DreamerWalker;
+
 
     public:
         Dreamer(Player *player);
@@ -138,7 +142,7 @@ class Dreamer
                 UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY, UInt8 timeConsume, UInt32 remainTime, UInt8 keysCount);
         ~Dreamer();
 
-        void OnCommand(UInt8 command, UInt8 val = 0);
+        void OnCommand(UInt8 command, UInt8 val, UInt8 val2);
 
         void SendGameInfo();
         void SendGridInfo(UInt8 posX, UInt8 posY);
@@ -154,13 +158,13 @@ class Dreamer
         void SaveMapInfo();
 
         void OnRequestStart(UInt8 progress);
-        void OnMove(UInt16 pos);
-        void OnStepIntoWave();
-        void OnGetTreasure();
-        void OnGetKey();
-        void OnGetItem();
-        void OnSufferWhirlwind();
-        void OnGetTime();
+        void OnMove(UInt8 x, UInt8 y);
+        bool OnStepIntoWave();
+        bool OnGetTreasure();
+        bool OnGetKey();
+        bool OnGetItem();
+        bool OnSufferWhirlwind();
+        bool OnGetTime();
         void OnAbort();
 
         UInt8 CheckGridType(UInt8 type);
@@ -187,7 +191,7 @@ class Dreamer
         UInt8 _earlyPosY;
 
         UInt8  _timeConsume;            // 该层每步消耗的体力
-        UInt32 _remainTime;             // 梦境游戏中剩余的体力
+        UInt8  _remainTime;             // 梦境游戏中剩余的体力
         UInt8  _keysCount;              // 手头钥匙的数量
 
         URandom _rnd;                   // 用于产生随机数
@@ -197,6 +201,33 @@ class Dreamer
         void DumpMapData();
 
 };
+
+
+/*
+class DreamerWalker : public AStar <1, 3>
+{
+    public:
+        DreamerWalker(Dreamer::MapInfo mapInfo)
+            :_mapInfo(mapInfo);
+    public:
+        bool moveable(const UInt16 src, const UInt16 dst, UInt8 radius);
+    private:
+        const Dreamer::MapInfo& _mapInfo;
+};
+
+bool DreamerWalker::moveable(const Pos& tempPos, const Pos& dst, int radius) 
+{
+    UInt16 srcIndex = POS_TO_INDEX(src.x, src.y);
+    UInt16 dstIndex = POS_TO_INDEX(dst.x, dst.y);
+    return (_mapInfo.find(dstIndex) != _mapInfo.end());
+}
+
+bool DreamerWalker::move(int direct, int step = 1)
+{
+    return true;
+}
+*/
+
 }
 
 #endif

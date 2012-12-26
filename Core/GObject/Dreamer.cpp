@@ -95,14 +95,17 @@ void Dreamer::SaveMapInfo()
             _maxX, _maxY, _maxGrid, mapString.c_str(), _posX, _posY, _earlyPosX, _earlyPosY, _remainTime, _keysCount, _owner->getId());
 }
 
-void Dreamer::OnCommand(UInt8 command, UInt8 val /* = 0 */)
+void Dreamer::OnCommand(UInt8 command, UInt8 val, UInt8 val2)
 {
     // 收到客户端发来请求处理游戏操作
     switch (command)
     {
+        case 0:
+            SendMapInfo();
+            break;
         case 1:
             // 移动至某一格
-            OnMove((val));
+            OnMove(val, val2);
             break;
         case 2:
             // 针对某一格子的具体操作
@@ -115,45 +118,52 @@ void Dreamer::OnCommand(UInt8 command, UInt8 val /* = 0 */)
                     SendGridInfo(_posX, _posY);
                     return;
                 }
+                bool res = false;
                 switch ((it->second).gridType & 0x0F)
                 {
                     case GRID_WAVE      :
-                        OnStepIntoWave();
-                        (it->second).gridType |= CLEAR_FLAG;
+                        res = OnStepIntoWave();
+                        if (res)
+                        {
+                            InitMap(++_gameLevel);
+                            SendMapInfo();
+                            return;
+                        }
                         break;
                     case GRID_KEY       :
-                        OnGetKey();
-                        (it->second).gridType |= CLEAR_FLAG;
+                        res = OnGetKey();
                         break;
                     case GRID_TREASURE  :
-                        OnGetTreasure();
+                        res = OnGetTreasure();
                         break;
                     case GRID_EYE       :
                         break;
                     case GRID_ITEM      :
-                        OnGetItem();
-                        (it->second).gridType |= CLEAR_FLAG;
+                        res = OnGetItem();
                         break;
                     case GRID_WHIRLWIND :
-                        OnSufferWhirlwind();
-                        (it->second).gridType |= CLEAR_FLAG;
+                        res = OnSufferWhirlwind();
                         break;
                     case GRID_TIME      :
-                        OnGetTime();
-                        (it->second).gridType |= CLEAR_FLAG;
+                        res = OnGetTime();
                         break;
                     case GRID_ARROW     :
+                        res = true;
                         break;
                     default:
                         break;
                 }
+
+                if (res)
+                    (it->second).gridType |= CLEAR_FLAG;
+
             }
             break;
         default:
             break;
     }
     SaveMapInfo();
-    SendMapInfo();
+    SendGridInfo(val, val2);
     DumpMapData();
 }
 
@@ -302,11 +312,13 @@ bool Dreamer::InitMap(UInt8 level)
 
     }
 
-    if(!SelectBornGrid())
-        return false;
     if (!InitArrow())
         return false;
     if (!InitItem())
+        return false;
+    if (!InitEye())
+        return false;
+    if(!SelectBornGrid())
         return false;
     SaveMapInfo();
     DumpMapData();
@@ -329,13 +341,19 @@ bool Dreamer::InitArrow()
             notArrow.push_back(it);
         }
     }
+#ifdef DREAMER_DEBUG
+    if (arrow.empty() || notArrow.empty())
+    {
+        printf ("What a fuck!\n");
+    }
+#endif
     for (std::vector<MapInfo::iterator>::iterator it = arrow.begin(); it != arrow.end(); ++it)
     {
         UInt16 srcPos = (*it)->first;
         MapInfo::iterator it2 = notArrow[_rnd(notArrow.size())];
         UInt16 dstPos = it2->first;
         (*it)->second.gridType = ((CalcArrowType(srcPos, dstPos) | ((it2->second.gridType) & 0x000F)) << 8) 
-            | CLEAR_FLAG | GRID_ARROW;
+            | UNKNOWN_FLAG | GRID_ARROW;
     }
     return true;
 }
@@ -365,13 +383,46 @@ bool Dreamer::InitItem()
 
 bool Dreamer::InitEye()
 {
-    // TODO: 初始化梦境之眼的指示类型
-    return true;
+    // 初始化梦境之眼的指示类型
+    MapInfo::iterator it;
+    for (it = _mapInfo.begin(); it != _mapInfo.end(); ++ it)
+    {
+        if (((it->second).gridType & 0x000F) == GRID_EYE)
+        {
+            break;
+        }
+    }
+    if (it == _mapInfo.end())
+    {
+        TRACE_LOG("Dream: init eye error.");
+        return false;
+    }
+    UInt8 index = _rnd(3);
+    for (MapInfo::iterator it2 = _mapInfo.begin(); it2 != _mapInfo.end(); ++ it2)
+    {
+        UInt16 type = (it2->second).gridType & 0x000F;
+        if (type == GRID_WAVE || type == GRID_KEY || type == GRID_TREASURE)
+        {
+            if (!index)
+            {
+                (it->second).gridType = GRID_EYE | UNKNOWN_FLAG | ((UInt16)type << 8);
+                return true;
+            }
+            else
+            {
+                --index;
+            }
+        }
+    }
+    TRACE_LOG("Dream: init eye error2.");
+    return false;
 }
 
 bool Dreamer::SelectBornGrid()
 {
     // 选取一个合适的出生点
+    
+    // 先统计所有可以做出生点的格子数目
     UInt8 count = 0;
     for (MapInfo::iterator it = _mapInfo.begin(); it != _mapInfo.end(); ++ it)
     {
@@ -380,14 +431,13 @@ bool Dreamer::SelectBornGrid()
             ++count;
         }
     }
-
     if (!count)
     {
         TRACE_LOG("Dreamer: select born error1.");
         return false;
     }
 
-    // 重复重新，选取一个
+    // 随机选取一个
     UInt8 rndIndex = _rnd(count);
     UInt8 index = 0;
     for (MapInfo::iterator it = _mapInfo.begin(); it != _mapInfo.end(); ++ it)
@@ -396,6 +446,7 @@ bool Dreamer::SelectBornGrid()
         {
             // 就选择这个作为出生点了
             (it->second).gridType |= CLEAR_FLAG;
+            (it->second).gridType &= ~UNKNOWN_FLAG;
             _earlyPosX = _posX = (it->second).posX;
             _earlyPosY = _posY = (it->second).posY;
             return true;
@@ -422,7 +473,7 @@ void Dreamer::OnRequestStart(UInt8 progress)
     
     if (!_owner->GetPackage()->GetItemAnyNum(DREAMER_ITEM[progress]))
     {
-        _owner->sendMsgCode(0, 2224, progress); // 墨家徽记不足
+        _owner->sendMsgCode(0, 2224, progress); // 梦引材料不足
         return;
     }
     _gameProgress = progress;
@@ -437,12 +488,10 @@ void Dreamer::OnRequestStart(UInt8 progress)
     SendGameInfo();
 }
 
-void Dreamer::OnMove(UInt16 pos)
+void Dreamer::OnMove(UInt8 x, UInt8 y)
 {
     // 玩家在梦境游戏中移动
-    UInt8 x = 0;
-    UInt8 y = 0;
-    INDEX_TO_POS(pos, x, y);
+    UInt16 pos = POS_TO_INDEX(x,y);
     UInt8 dx = (_posX > x) ? (_posX - x) : (x - _posX);
     UInt8 dy = (_posY > y) ? (_posY - y) : (y - _posY);
     if ((dx + dy) != 1)
@@ -519,38 +568,38 @@ void Dreamer::OnAbort()
     SendGameInfo();
 }
 
-void Dreamer::OnStepIntoWave()
+bool Dreamer::OnStepIntoWave()
 {
     // 进入漩涡，开始下一层
     if (CheckGridType(GRID_WAVE))
     {
         TRACE_LOG("Dream: wave error.");
-        return;
+        return false;
     }
     if (_gameLevel < GData::dreamerDataTable[_gameProgress].size() - 1)
     {
         // 还有下一层
-        InitMap(++_gameLevel);
-        SendMapInfo();
+        return true;
     }
     else
     {
         // 已经最后一层结束了，Nothing
+        return false;
     }
 }
 
-void Dreamer::OnGetTreasure()
+bool Dreamer::OnGetTreasure()
 {
     // 打开宝箱
     if (!CheckGridType(GRID_TREASURE))
     {
         TRACE_LOG("Dream: treasure error.");
-        return;
+        return false;
     }
     if (!_keysCount)
     {
         _owner->sendMsgCode(0, 2222, 0);    // 钥匙不足，无法打开宝箱
-        return;
+        return false;
     }
     Table rewards = GameAction()->getDreamerTreasure(_gameProgress);
     Stream st;
@@ -561,7 +610,7 @@ void Dreamer::OnGetTreasure()
     for (UInt8 i = 0; i < count; ++i)
     {
         Table item = rewards.get<Table>(i + 1);
-        if (item.size() < 3) return;
+        if (item.size() < 3) return false;
         UInt32 itemId = item.get<UInt32>(1);
         UInt32 itemCount = item.get<UInt32>(2);
         bool   bind = item.get<bool>(3);
@@ -572,30 +621,30 @@ void Dreamer::OnGetTreasure()
     st << Stream::eos;
 
     MapInfo::iterator it = _mapInfo.find(POS_TO_INDEX(_posX, _posY));
-    (it->second).gridType |= CLEAR_FLAG;
+    return true;
 }
 
-void Dreamer::OnGetKey()
+bool Dreamer::OnGetKey()
 {
     // 得到钥匙
     if (CheckGridType(GRID_KEY))
     {
         TRACE_LOG("Dream: key error.");
-        return;
+        return false;
     }
     ++_keysCount;
     MapInfo::iterator it = _mapInfo.find(POS_TO_INDEX(_posX, _posY));
-    (it->second).gridType |= CLEAR_FLAG;
+    return true;
 }
 
-void Dreamer::OnGetItem()
+bool Dreamer::OnGetItem()
 {
     // 获得道具
     UInt8 index = CheckGridType(GRID_ITEM);
     if (!index)
     {
         TRACE_LOG("Dream: item error.");
-        return;
+        return false;
     }
     Table rewards = GameAction()->getDreamerItem(_gameProgress, index);
     Stream st;
@@ -606,7 +655,7 @@ void Dreamer::OnGetItem()
     for (UInt8 i = 0; i < count; ++i)
     {
         Table item = rewards.get<Table>(i + 1);
-        if (item.size() < 3) return;
+        if (item.size() < 3) return false;
         UInt32 itemId = item.get<UInt32>(1);
         UInt32 itemCount = item.get<UInt32>(2);
         bool   bind = item.get<bool>(3);
@@ -617,10 +666,10 @@ void Dreamer::OnGetItem()
     st << Stream::eos;
 
     MapInfo::iterator it = _mapInfo.find(POS_TO_INDEX(_posX, _posY));
-    (it->second).gridType |= CLEAR_FLAG;
+    return true;
 }
 
-void Dreamer::OnSufferWhirlwind()
+bool Dreamer::OnSufferWhirlwind()
 {
     // 遇上飓风，随机到达任何地点
     UInt8 rndIndex = _rnd(_mapInfo.size());
@@ -631,17 +680,19 @@ void Dreamer::OnSufferWhirlwind()
         {
             INDEX_TO_POS(it->first, _posX, _posY);
             (it->second).gridType &= ~UNKNOWN_FLAG;
-            return;
+            return true;
         }
         ++index;
     }
     TRACE_LOG("Dreamer: suffer whirlwind error.");
+    return true;
 }
 
-void Dreamer::OnGetTime()
+bool Dreamer::OnGetTime()
 {
     // 增加时间
     _remainTime += _timeConsume;
+    return true;
 }
 
 void Dreamer::SendGameInfo()
@@ -678,6 +729,13 @@ void Dreamer::SendGridInfo(UInt8 posX, UInt8 posY)
     st << static_cast<UInt8>(_posX);
     st << static_cast<UInt8>(_posY);
 
+    it = _mapInfo.find(POS_TO_INDEX(_posX, _posY));
+    if (it == _mapInfo.end())
+        return;
+    st << static_cast<UInt16>((it->second).gridType);
+    st << static_cast<UInt8>(_remainTime);
+            
+
     st << Stream::eos;
     _owner->send(st);
 }
@@ -687,22 +745,25 @@ void Dreamer::SendMapInfo()
     // 发送地图信息
     Stream st(REP::DREAMER);
     st << static_cast<UInt8>(0);
-
-    for (UInt8 y = 0; y < _maxY; ++ y)
+    st << static_cast<UInt8>(_gameProgress);
+    if (_gameProgress != PROGRESS_NONE)
     {
-        for (UInt8 x = 0; x < _maxX; ++ x)
+        st << static_cast<UInt8> (_gameLevel);
+        st << static_cast<UInt8> (_maxX);
+        st << static_cast<UInt8> (_maxY);
+        st << static_cast<UInt8> (_maxGrid);
+
+        for (MapInfo::iterator it = _mapInfo.begin(); it != _mapInfo.end(); ++it)
         {
-            MapInfo::iterator it = _mapInfo.find(POS_TO_INDEX(x,y));
-            if (it != _mapInfo.end())
-            {
-                st << static_cast<UInt8>(x);
-                st << static_cast<UInt8>(y);
-                st << static_cast<UInt8>((it->second).gridType);
-            }
+            st << static_cast<UInt8>((it->second).posX);
+            st << static_cast<UInt8>((it->second).posY);
+            st << static_cast<UInt16>((it->second).gridType);
         }
+        st << static_cast<UInt8>(_posX);
+        st << static_cast<UInt8>(_posY);
+        st << static_cast<UInt8>(_remainTime);
     }
-    st << static_cast<UInt8>(_posX);
-    st << static_cast<UInt8>(_posY);
+
     st << Stream::eos;
     _owner->send(st);
 }
@@ -738,15 +799,17 @@ UInt8 Dreamer::CheckGridType(UInt8 type)
 
 UInt8 Dreamer::CalcArrowType(UInt16 srcPos, UInt16 dstPos)
 {
-    // 返回箭头类型
+    // 根据坐标计算角度，返回箭头类型
     UInt8 srcX = 0;
     UInt8 srcY = 0;
     UInt8 dstX = 0;
     UInt8 dstY = 0;
     INDEX_TO_POS(srcPos, srcX, srcY);
-    INDEX_TO_POS(srcPos, srcX, srcY);
+    INDEX_TO_POS(dstPos, dstX, dstY);
+
+    // 由于坐标系的关系，dY的计算要初值减末值
     Int16 dX = (Int16)dstX - (Int16)srcX;
-    Int16 dY = (Int16)dstY - (Int16)srcY;
+    Int16 dY = (Int16)srcY - (Int16)dstY;
     if (!dX)
     {
         return dY > 0 ? UP:DOWN;
@@ -756,24 +819,50 @@ UInt8 Dreamer::CalcArrowType(UInt16 srcPos, UInt16 dstPos)
         return dX > 0 ? RIGHT:LEFT;
     }
 
-    float res = atan2(dY, dX);
+    float res = atan2(dX, dY);
     res = res * 180 / M_PI;
+
+#ifdef DREAMER_DEBUG
+    /*
+    printf ("Src: X %2d, Y %2d\n", srcX, srcY);
+    printf ("Dst: X %2d, Y %2d\n", dstX, dstY);
+    printf ("dx: %2d, %2d\n", dX, dY);
+    printf ("degree: %.1f\n", res);
+    */
+#endif
+
     if (res <= -157.5 || res >= 157.5)
+    {
         return DOWN;
+    }
     if (res >= -157.5 && res <= -112.5)
+    {
         return LEFT_DOWN;
+    }
     if (res >= -112.5 && res <= -67.5)
+    {
         return LEFT;
+    }
     if (res >= -67.5 && res <= -22.5)
+    {
         return LEFT_UP;
+    }
     if (res >= -22.5 && res <= 22.5)
+    {
         return UP;
+    }
     if (res >= 22.5 && res <= 67.5)
+    {
         return RIGHT_UP;
+    }
     if (res >= 67.5 && res <= 112.5)
+    {
         return RIGHT;
+    }
     if (res >= 112.5 && res <= 157.5)
+    {
         return RIGHT_DOWN;
+    }
 
     return 0;
 }
@@ -782,12 +871,18 @@ void Dreamer::DumpMapData()
 {
 #ifdef DREAMER_DEBUG
     // DEBUG版本输出地图信息
-    char buffer[1024] = "\nMapInfo:\n    0 1 2 3 4 5 6 7 8 9 A B C D E F\n\n";
+    static char arrow[8][8] = 
+    {
+        "↖", "↑", "↗", "→", "↘", "↓", "↙", "←"
+    };
+
+
+    char buffer[1024] = "\nMapInfo:\n      0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F\n\n";
     char buffer2[1024] = "\nNeighbourInfo:\n    0 1 2 3 4 5 6 7 8 9 A B C D E F\n\n";
     for (UInt8 y = 0; y < _maxY; ++ y)
     {
-        char buf[16];
-        snprintf(buf, 16, "%X: ", y);
+        char buf[32];
+        snprintf(buf, 32, "%X: ", y);
         strcat (buffer, buf);
         strcat (buffer2, buf);
         for (UInt8 x = 0; x < _maxX; ++x)
@@ -798,20 +893,26 @@ void Dreamer::DumpMapData()
             {
                 if (x == _posX && y == _posY)
                 {
-                    snprintf(buf, 16, "*%1X", (UInt32)(0x0F & (it->second).gridType));
+                    if (((it->second).gridType & 0x000F) == GRID_ARROW)
+                        snprintf(buf, 32, "\033[4m%s%3X\033[0m", arrow[((it->second).gridType & 0xF000) >> 12], (UInt32)(0x0FFF & (it->second).gridType));
+                    else
+                        snprintf(buf, 32, "\033[4m%4X\033[0m", (UInt32)(0xFFFF & (it->second).gridType));
                 }
                 else
                 {
-                    snprintf(buf, 16, "%2X", (UInt32)(0x0F & (it->second).gridType));
+                    if (((it->second).gridType & 0x000F) == GRID_ARROW)
+                        snprintf(buf, 32, "%s%3X", arrow[((it->second).gridType & 0xF000) >> 12], (UInt32)(0x0FFF & (it->second).gridType));
+                    else
+                        snprintf(buf, 32, "%4X", (UInt32)(0xFFFF & (it->second).gridType));
                 }
                 strcat (buffer, buf);
-                snprintf(buf, 16, "%2X", (UInt32)((it->second).neighbCount));
+                snprintf(buf, 32, "%4X", (UInt32)((it->second).neighbCount));
                 strcat (buffer2, buf);
             }
             else
             {
-                strcat (buffer, " 0");
-                strcat (buffer2, " 0");
+                strcat (buffer, "   0");
+                strcat (buffer2, "   0");
             }
         }
         strcat(buffer, "\n");
