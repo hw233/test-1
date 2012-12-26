@@ -152,7 +152,6 @@ bool DCLogger::login_sec(Player* player)
 
     std::ostringstream msg;
 
-
     msg << "APPV=";
     msg << version;
     msg << "&MSGV=";
@@ -178,7 +177,7 @@ bool DCLogger::login_sec(Player* player)
     msg << "&MTM=";
     msg << TimeUtil::GetTick() / 1000;
     msg << "&DOM=";
-    msg << player->getDomain();
+    msg << static_cast<UInt32>(getDomain_sec(player));
     msg << "&MLV=0";
     msg << "&AID=1";
 
@@ -318,7 +317,7 @@ bool DCLogger::protol_sec(Player* player, int cmd)
     msg << "&MTM=";
     msg << TimeUtil::GetTick() / 1000;
     msg << "&DOM=";
-    msg << player->getDomain();
+    msg << static_cast<UInt32>(getDomain_sec(player));
     msg << "&MLV=0";
     msg << "&AID=20";
 
@@ -372,7 +371,7 @@ bool DCLogger::trade_sec(Player* saller, Player* buyer, UInt32 itemId, UInt32 it
     msg << "&MTM=";
     msg << TimeUtil::GetTick() / 1000;
     msg << "&DOM=";
-    msg << saller->getDomain();
+    msg << static_cast<UInt32>(getDomain_sec(saller));
     msg << "&MLV=0";
     msg << "&AID=3";
 
@@ -454,7 +453,7 @@ bool DCLogger::gold_sec(Player* player, UInt32 count, UInt32 changeType, bool is
     msg << "&MTM=";
     msg << TimeUtil::GetTick() / 1000;
     msg << "&DOM=";
-    msg << player->getDomain();
+    msg << static_cast<UInt32>(getDomain_sec(player));
     msg << "&MLV=0";
     msg << "&AID=6";
 
@@ -515,7 +514,7 @@ bool DCLogger::tael_sec(Player* player, UInt32 count, UInt32 changeType, bool is
     msg << "&MTM=";
     msg << TimeUtil::GetTick() / 1000;
     msg << "&DOM=";
-    msg << player->getDomain();
+    msg << static_cast<UInt32>(getDomain_sec(player));
     msg << "&MLV=0";
     msg << "&AID=5";
 
@@ -573,7 +572,7 @@ bool DCLogger::coupon_sec(Player* player, UInt32 count, UInt32 changeType, bool 
     msg << "&MTM=";
     msg << TimeUtil::GetTick() / 1000;
     msg << "&DOM=";
-    msg << player->getDomain();
+    msg << static_cast<UInt32>(getDomain_sec(player));
     msg << "&MLV=0";
     msg << "&AID=5";
 
@@ -857,6 +856,18 @@ bool DCLogger::d3d6(Player* player)
 #endif
 #endif
     return true;
+}
+
+UInt8 DCLogger::getDomain_sec(Player* player)
+{
+    if (!player)
+        return 0;
+
+    if (player->isXY())
+    {
+        return PF_XY;
+    }
+    return atoi(player->getDomain());
 }
 
 DCLogger dclogger;
