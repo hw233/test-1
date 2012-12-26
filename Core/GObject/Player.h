@@ -157,6 +157,14 @@ namespace GObject
 #define ARENA_SUFFER_END      ARENA_SINGUP_END+15*60
 #endif
 #define ARENA_ACT_SYSTEM          10
+
+
+
+#define OFFICAL 12
+#define PF_UNION 17
+#define PF_XY 171
+#define PF_XY_CH 10040
+
 	class Map;
 	class Player;
 	class ItemBase;
@@ -1765,6 +1773,7 @@ namespace GObject
         std::string m_via;
         std::string m_invited;
         bool m_isOffical;
+        bool m_isXY;
     public:
         inline void setDomain(const std::string& domain)
         {
@@ -1786,7 +1795,29 @@ namespace GObject
         }
         void setOpenId(const std::string& openid, bool load = false);
         inline void setOpenKey(const std::string& openkey) { strncpy(m_openkey, openkey.c_str(), 256); }
-        inline void setSource(const std::string& source) { m_source = source; }
+        inline void setSource(const std::string& source) 
+        { 
+            m_source = source; 
+
+            if (atoi(m_domain) == PF_UNION)
+            {
+                static const UInt32 XY_CHANNEL[] = {41, 47, 48, 49, 50, 51, 52, 53, 54, 56};
+                for (UInt32 i = 0; i < (sizeof(XY_CHANNEL) / sizeof(UInt32)); ++ i)
+                {
+                    char buf[16];
+                    snprintf (buf, 16, "-%d", XY_CHANNEL[i]);
+                    if (strstr(m_source.c_str(), buf))
+                    {
+                        m_isXY = true;
+                        return;
+                    }
+                    else
+                    {
+                        m_isXY = false;
+                    }
+                }
+            }
+        }
         inline void setVia(const std::string& via) { m_via = via; }
         inline void setInvited(const std::string& inv) { m_invited = inv; }
         inline const char* getDomain() const { return m_domain; }
@@ -1796,6 +1827,7 @@ namespace GObject
         inline const std::string& getVia() const { return m_via; }
         inline const std::string& getInvited() const { return m_invited; }
         inline bool isOffical() const { return m_isOffical; }
+        inline bool isXY() const { return m_isXY; }
         inline const char* getClientIp() const { return m_clientIp; }
 
         inline UInt8 getPlatform() const { return atoi(m_domain); }

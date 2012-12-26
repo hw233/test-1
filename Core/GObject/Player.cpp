@@ -566,7 +566,7 @@ namespace GObject
 #ifndef _WIN32
 		m_ulog(NULL),
 #endif
-		m_isOffical(false), m_sysDailog(false), m_hasTripod(false), _jobHunter(NULL), _dreamer(NULL)
+		m_isOffical(false), m_isXY(false), m_sysDailog(false), m_hasTripod(false), _jobHunter(NULL), _dreamer(NULL)
 	{
         m_ClanBattleStatus = 1;
         m_ClanBattleScore = 0;
@@ -1161,10 +1161,6 @@ namespace GObject
 	}
 
 #define WEBDOWNLOAD 255
-#define OFFICAL 12
-#define PF_UNION 17
-#define PF_XY 171
-#define PF_XY_CH 10040
 
     void Player::udpLog(UInt8 platform, const char* str1, const char* str2, const char* str3, const char* str4,
                 const char* str5, const char* str6, const char* type, UInt32 count)
