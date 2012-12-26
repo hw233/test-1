@@ -34,7 +34,6 @@ void NewCBPlayerData::setAllEffortInfo()
     for(UInt8 i = 1; i <= infos.size(); ++ i)
     {
         Table info = infos.get<Table>(i);
-        //printf("GetNCBEffortIdValue():id,val:%u,%u\n", info.get<UInt8>(1), info.get<UInt8>(2));
         NCB_EffortStruct effort;
         effort.effortId = info.get<UInt8>(1);
         effort.award = info.get<UInt8>(2);
@@ -299,7 +298,6 @@ void NewCountryBattle::useSkill(Player * player, UInt8 skillId)
 void NewCountryBattle::skillTriggerEffort(NewCBPlayerData * ncbpData, UInt8 effortId)
 {
     UInt8 award = ncbpData->updateEffortInfo(effortId);
-    //printf("skillTriggerEffort():%u\n", award);
     if(award)
     {
         addAchievement(ncbpData->player, award);
@@ -322,16 +320,6 @@ void NewCountryBattle::checkAddExp(UInt32 curtime)
             UInt32 exp = 16 * ((plvl - 10) * ((plvl > 99 ? 99 : plvl) / 10) * 5 + 25);
             player->AddExp(exp);
         }
-        /*
-        if(plvl <= 90)
-            player->AddExp(2 * (60 * ((plvl - 40) * 6 + 20)));
-        else if(plvl <= 100)
-            player->AddExp(2 * (60 * ((plvl - 90) * 22 + 320)));
-        else if(plvl <= 114)
-            player->AddExp(2 * (60 * ((plvl - 100) * 140 + 540)));
-        else
-            player->AddExp(2 * (60 * 2500));
-        */
         ++ iter;
     }
     m_expTime += 60;
@@ -364,13 +352,11 @@ void NewCountryBattle::allotPlayers()
             if(ncbpData->achLevel == lvl && ncbpData->type != 1)
             {
                 m_players[lvl-1].push_back(iter->first);
-                //printf("allotPlayers()::%u,,,%u\n", iter->first->getId(), ncbpData->type);
                 break;
             }
         }
         ++ iter;
     }
-    //printf("\n");
 }
 
 void NewCountryBattle::makePairPlayers()
@@ -441,12 +427,11 @@ void NewCountryBattle::joinBye(Player * player)
     sendSelfInfo1(player, NULL, 0, 8);
     addAchievement(player, 8);
     completeEffort1(ncbpData);
-    //printf("UUUUUUUUUUUUUUUUUUUUUU::轮空id:%u\n", player->getId());
 }
 
 void NewCountryBattle::process(UInt32 curtime)
 {
-    UInt64 tick1 = TimeUtil::GetTick();
+    UInt64 tick = TimeUtil::GetTick();
     UInt32 startTime = globalCountryBattle.getStartTime();
     if(startTime == 0)
         return;
@@ -465,14 +450,10 @@ void NewCountryBattle::process(UInt32 curtime)
     }
     if(curtime < m_tickTime)
         return;
-    //fprintf(stderr, "curtime:%u,m_tickTime:%u\n",curtime, m_tickTime);
     m_tickTime += NCBATTLE_TIME;
 
     handleBattle();     //战斗
-    UInt64 tick2 = TimeUtil::GetTick();
-    TRACE_LOG("NewCountryBattle=>>所有战斗开始之前时间:[%"I64_FMT"u],所有战斗结束之后时间:[%"I64_FMT"u],时间差:[%"I64_FMT"u]",tick1, tick2, tick2 - tick1);
-    //fprintf(stderr, "战斗之前时间:[%"I64_FMT"u],战斗之后时间:[%"I64_FMT"u],时间差:[%"I64_FMT"u]\n",tick1, tick2, tick2 - tick1);
-    //fprintf(stderr, "curtime1:%u\n\n", TimeUtil::Now());
+    TRACE_LOG("NewCountryBattle=>>所有战斗开始结束时间差:[%"I64_FMT"u]", TimeUtil::GetTick() - tick);
     if(curtime >= globalCountryBattle.getEndTime())
     {   //策划要求这里调结束
         m_pairPlayer.clear();
@@ -480,15 +461,12 @@ void NewCountryBattle::process(UInt32 curtime)
         end();
         return;
     }
-    tick1 = TimeUtil::GetTick();
+    tick = TimeUtil::GetTick();
     allotPlayers();     //重新分配玩家
     makePairPlayers();  //配对玩家
     updateFirst();      //广播荣誉王连胜王
     sendAllInfo();      //发送所有玩家的个人数据
-    tick2 = TimeUtil::GetTick();
-    TRACE_LOG("NewCountryBattle=>>配对所有玩家开始时间:[%"I64_FMT"u],配对所有玩家结束时间:[%"I64_FMT"u],时间差:[%"I64_FMT"u]\n",tick1, tick2, tick2 - tick1);
-    //fprintf(stderr, "配对玩家:[%"I64_FMT"u],配对玩家:[%"I64_FMT"u],时间差:[%"I64_FMT"u]\n",tick1, tick2, tick2 - tick1);
-    //fprintf(stderr, "curtime2:%u\n\n", TimeUtil::Now());
+    TRACE_LOG("NewCountryBattle=>>配对所有玩家开始结束时间差:[%"I64_FMT"u]\n", TimeUtil::GetTick() - tick);
 }
 
 void NewCountryBattle::prepare(UInt16 rt)
@@ -509,7 +487,7 @@ void NewCountryBattle::prepare(UInt16 rt)
     Stream st(REP::NEW_CAMPS_WAR_JOIN);
     st << static_cast<UInt8>(0x05);
     st << static_cast<UInt8>(0) << rt << Stream::eos;
-    broadcast(st);
+    NETWORK()->Broadcast(st);
 }
 
 void NewCountryBattle::start(UInt16 rt)
@@ -517,7 +495,7 @@ void NewCountryBattle::start(UInt16 rt)
     Stream st(REP::NEW_CAMPS_WAR_JOIN);
     st << static_cast<UInt8>(0x05);
     st << static_cast<UInt8>(1) << rt << Stream::eos;
-    broadcast(st);
+    NETWORK()->Broadcast(st);
 }
 
 void NewCountryBattle::end()
@@ -578,7 +556,7 @@ void NewCountryBattle::end()
     Stream st(REP::NEW_CAMPS_WAR_JOIN);
     st << static_cast<UInt8>(0x05);
     st << static_cast<UInt8>(2) << static_cast<UInt16>(0) << Stream::eos;
-    broadcast(st);
+    NETWORK()->Broadcast(st);
 }
 
 void NewCountryBattle::sendEndAwardInfo(Player * player, Table items)
@@ -646,21 +624,16 @@ void NewCountryBattle::sendSelfInfo(Player * player, NewCBPlayerData * ncbpData)
     Stream st(REP::NEW_CAMPS_WAR_JOIN);
     st << static_cast<UInt8>(0x01);
     st << ncbpData->currKillStreak << ncbpData->maxKillStreak;
-    //printf("A:%u,%u\n", ncbpData->currKillStreak, ncbpData->maxKillStreak);
     st << ncbpData->totalWin << ncbpData->totallose;
-    //printf("B:%u,%u\n", ncbpData->totalWin ,ncbpData->totallose);
     st << ncbpData->totalAchievement;
     st << ncbpData->domineer << ncbpData->anger;
-    //printf("C:%u,%u,%u\n", ncbpData->totalAchievement, ncbpData->domineer, ncbpData->anger);
     st << ncbpData->skillFlags;
     st << static_cast<UInt8>(ncbpData->effortInfo.size()); //成就位数量
-    //printf("D:%u,%u\n", ncbpData->skillFlags,static_cast<UInt8>(ncbpData->effortInfo.size()));
     std::map<UInt8, NCB_EffortStruct>::iterator iter = ncbpData->effortInfo.begin();
     while(iter != ncbpData->effortInfo.end())
     {
         NCB_EffortStruct info = iter->second;
         st << info.effortId << info.award << info.complete;
-        //printf("E:%u,%u,%u\n", info.effortId, info.award, info.complete);
         ++ iter;
     }
     UInt8 round = 0;
@@ -685,11 +658,9 @@ void NewCountryBattle::sendSelfInfo(Player * player, NewCBPlayerData * ncbpData)
     //st << static_cast<UInt8>((m_tickTime - globalCountryBattle.getStartTime()) / NCBATTLE_TIME);
     //st << static_cast<UInt16>((m_tickTime > 0 ? m_tickTime : globalCountryBattle.getStartTime()) - TimeUtil::Now());
     st << round << timeLeft;
-    //printf("F:%u,%u\n", round, timeLeft);
     st << player->getBattleMaxHp();
     st << player->getBattleCurrentHp();
     st << player->getBattlePoint();
-    //printf("G:%u,%u,%u\n", player->getBattleMaxHp(), player->getBattleCurrentHp(), player->getBattlePoint());
     Player * pl = findPairPlayer(player);
     bool hasPair = true;
     if(pl)
@@ -698,13 +669,11 @@ void NewCountryBattle::sendSelfInfo(Player * player, NewCBPlayerData * ncbpData)
         if(iter != m_ncbpData.end() && iter->second->type != 1)
         {
             st << iter->second->totalAchievement << iter->second->currKillStreak;
-            //printf("H:%u,%u\n", iter->second->totalAchievement, iter->second->currKillStreak);
             st << static_cast<UInt8>(pl->getMainFighter() ? pl->getMainFighter()->getId() : 0);
             st << pl->getName();
             st << pl->getBattleMaxHp();
             st << pl->getBattleCurrentHp();
             st << pl->getBattlePoint();
-            //printf("I:%u,%u,%u\n", pl->getBattleMaxHp(), pl->getBattleCurrentHp(), pl->getBattlePoint());
         }
         else
             hasPair = false;
@@ -717,7 +686,6 @@ void NewCountryBattle::sendSelfInfo(Player * player, NewCBPlayerData * ncbpData)
     }
     st << Stream::eos;
     player->send(st);
-    //printf("以上是id[%u]的数据！！！\n\n", player->getId());
 }
 
 void NewCountryBattle::broadcast( Stream& st )
@@ -795,8 +763,9 @@ bool NewCountryBattle::isRunAway(NewCBPlayerData * ncbpData1, NewCBPlayerData * 
         st << player1->getCountry();
         st << Stream::eos;
         player2->send(st);
-        
-        kills2 = kills2 > 10 ? 10 : kills2;
+       
+        ncbpData2->currKillStreak ++;
+        kills2 = ncbpData2->currKillStreak > 10 ? 10 : ncbpData2->currKillStreak;
         achieve = 8 + kills1 + kills2 + (achLvl1 + achLvl2) / 2;
         ncbpData2->setAchievementLevel(achieve);
         ncbpData2->addAngerDomineer(0, 5);
@@ -813,7 +782,8 @@ bool NewCountryBattle::isRunAway(NewCBPlayerData * ncbpData1, NewCBPlayerData * 
         st << Stream::eos;
         player1->send(st);
         
-        kills1 = kills1 > 10 ? 10 : kills1;
+        ncbpData1->currKillStreak ++;
+        kills1 = ncbpData1->currKillStreak > 10 ? 10 : ncbpData1->currKillStreak;
         achieve = 8 + kills1 + kills2 + (achLvl1 + achLvl2) / 2;
         ncbpData1->setAchievementLevel(achieve);
         ncbpData1->addAngerDomineer(0, 5);
@@ -834,7 +804,7 @@ void NewCountryBattle::handleBattle()
     UInt32 rand = uRand(count);
     UInt32 index = 0;
     UInt32 j = 0;
-    TRACE_LOG("NewCountryBattle=>>size蜀山论剑该轮次的玩家数量:[%u]", size + m_joinByePlayer.size());
+    TRACE_LOG("NewCountryBattle=>>size蜀山论剑该轮次的玩家数量:[%u]", size);
     for(std::map<Player *, Player *>::iterator iter = m_pairPlayer.begin(); iter != m_pairPlayer.end(); ++iter, ++j)
     {
         Player * player1 = iter->first;
@@ -852,6 +822,9 @@ void NewCountryBattle::handleBattle()
         if(isRunAway(ncbpData1, ncbpData2))
             continue;
 
+        UInt32 currHp1 = player1->getBattleCurrentHp();
+        UInt32 currHp2 = player2->getBattleCurrentHp();
+
         bool res = player1->challenge(player2, NULL, NULL, false, 0, true, Battle::BS_NEWCOUNTRYBATTLE);
         GameAction()->RunOperationTaskAction1(player1, 2, res);
         GameAction()->RunOperationTaskAction1(player2, 2, !res);
@@ -862,8 +835,6 @@ void NewCountryBattle::handleBattle()
         UInt8 kills2 = ncbpData2->currKillStreak;
         UInt16 achieve = 0;
         UInt16 loserAchieve = 4 + ((achLvl1 + achLvl2) / 2) / 2;
-        //printf("pl1->Id:[%d], pl2->Id:[%d], kills1:[%d], kills2:[%d]\n", player1->getId(), player2->getId(), kills1, kills2);
-        //printf("achLvl1:[%d], achLvl2:[%d], (a+b)/2:[%d], loserAchieve:[%d]\n\n", achLvl1, achLvl2, (achLvl1 + achLvl2) / 2, loserAchieve);
         if(World::_wday == 1)
             loserAchieve *= 2;
 
@@ -902,8 +873,6 @@ void NewCountryBattle::handleBattle()
             ncbpData1->totalWin ++;
             kills1 = ncbpData1->currKillStreak > 10 ? 10 : ncbpData1->currKillStreak;
             achieve = 8 + kills1 + kills2 + (achLvl1 + achLvl2) / 2;
-            //printf("WinerId:[%d], totalWin:[%d]\n", player1->getId(), ncbpData1->totalWin);
-            //printf("kills1:[%d], kills2:[%d], winAchieve:[%d], totalAchieve:[%d]\n\n", kills1, kills2, achieve, ncbpData1->totalAchievement);
             ncbpData1->setAchievementLevel(achieve);
             if(ncbpData1->type != 1)
                 ncbpData1->type = 3;
@@ -920,6 +889,14 @@ void NewCountryBattle::handleBattle()
             {
                 m_achieveKing = player1;
                 m_maxAchievement = ncbpData1->totalAchievement;
+            }
+            if(currHp1 < currHp2)
+            {   //击败一位生命高于自己的对手
+                if(UInt8 award = ncbpData1->updateEffortInfo(6))
+                {
+                    addAchievement(player1, award);
+                    ncbpData1->setAchievementLevel(award);
+                }
             }
             completeEffort(ncbpData1, ncbpData2);
             ncbpData2->currKillStreak = 0;
@@ -966,8 +943,6 @@ void NewCountryBattle::handleBattle()
             ncbpData2->totalWin ++;
             kills2 = ncbpData2->currKillStreak > 10 ? 10 : ncbpData2->currKillStreak;
             achieve = 8 + kills1 + kills2 + (achLvl1 + achLvl2) / 2;
-            //printf("WinerId:[%d], totalWin:[%d]\n", player2->getId(), ncbpData2->totalWin);
-            //printf("kills1:[%d], kills2:[%d], winAchieve:[%d], totalAchieve:[%d]\n\n", kills1, kills2, achieve, ncbpData2->totalAchievement);
             ncbpData2->setAchievementLevel(achieve);
             if(ncbpData2->type != 1)
                 ncbpData2->type = 3;
@@ -986,6 +961,14 @@ void NewCountryBattle::handleBattle()
                 m_maxAchievement = ncbpData2->totalAchievement;
             }
 
+            if(currHp2 < currHp1)
+            {   //击败一位生命高于自己的对手
+                if(UInt8 award = ncbpData2->updateEffortInfo(6))
+                {
+                    addAchievement(player2, award);
+                    ncbpData2->setAchievementLevel(award);
+                }
+            }
             completeEffort(ncbpData2, ncbpData1);
             ncbpData1->currKillStreak = 0;
             ncbpData1->totallose ++;
@@ -1087,15 +1070,10 @@ void NewCountryBattle::completeEffort(NewCBPlayerData * ncbpData1, NewCBPlayerDa
             ncbpData1->setAchievementLevel(award);
         }
     }
+    if(player->getBattlePoint() < ncbpData2->player->getBattlePoint())
     {
-        UInt8 award = 0;
-        Player * pl = ncbpData2->player;
-        if(player->getBattleCurrentHp() < pl->getBattleCurrentHp())
-            award += ncbpData1->updateEffortInfo(6);   //击败一位生命高于自己的对手
-        if(player->getBattlePoint() < pl->getBattlePoint())
-            award += ncbpData1->updateEffortInfo(5);   //击败一位战力高于自己的对手
-        if(award)
-        {
+        if(UInt8 award = ncbpData1->updateEffortInfo(5))
+        {   //击败一位战力高于自己的对手
             addAchievement(player, award);
             ncbpData1->setAchievementLevel(award);
         }
