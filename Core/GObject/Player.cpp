@@ -2402,6 +2402,7 @@ namespace GObject
 			lup.pos = 12;
 			lup.updateId();
 		}
+        SetVar(VAR_HAS_MO_BATTLER, hasMo? 1: 0);
 		if(updatedb)
 		{
 			storeFighters();
