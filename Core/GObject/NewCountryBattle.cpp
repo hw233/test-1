@@ -29,7 +29,6 @@ NewCountryBattleSkill NewCountryBattle::m_skills[NEWCOUNTRYBATTLE_SKILL_NUM + 1]
 
 void NewCBPlayerData::setAllEffortInfo()
 {
-    std::string strLog = "";
     Table infos = GameAction()->GetNCBEffortIdValue();
     for(UInt8 i = 1; i <= infos.size(); ++ i)
     {
@@ -39,10 +38,8 @@ void NewCBPlayerData::setAllEffortInfo()
         effort.award = info.get<UInt8>(2);
         effort.complete = 0;
         effortInfo.insert(std::make_pair(effort.effortId, effort));
-        strLog += Itoa(effort.effortId);
-        strLog += ",";
+        player->countryBattleUdpLog(1217, 4, Itoa(effort.effortId));
     }
-    player->countryBattleUdpLog(1217, 4, strLog);
 }
 
 UInt8 NewCBPlayerData::updateEffortInfo(UInt8 effortId)
@@ -56,6 +53,7 @@ UInt8 NewCBPlayerData::updateEffortInfo(UInt8 effortId)
         if(effort.complete)
             return 0;
         effort.complete = 1;
+        player->countryBattleUdpLog(1217, 5, Itoa(effortId));
         return effort.award;
     }
     return 0;
@@ -466,7 +464,7 @@ void NewCountryBattle::process(UInt32 curtime)
     makePairPlayers();  //配对玩家
     updateFirst();      //广播荣誉王连胜王
     sendAllInfo();      //发送所有玩家的个人数据
-    TRACE_LOG("NewCountryBattle=>>配对所有玩家开始结束时间差:[%"I64_FMT"u]\n", TimeUtil::GetTick() - tick);
+    TRACE_LOG("NewCountryBattle=>>配对所有玩家开始结束时间差:[%"I64_FMT"u]", TimeUtil::GetTick() - tick);
 }
 
 void NewCountryBattle::prepare(UInt16 rt)
@@ -512,7 +510,6 @@ void NewCountryBattle::end()
         UInt16 count = 10 * achLvl;
         UInt8 cnt = 0;
         UInt8 award = 0;
-        std::string strLog = "";
         std::map<UInt8, NCB_EffortStruct>::iterator it = ncbpData->effortInfo.begin();
         while(it != ncbpData->effortInfo.end())
         {
@@ -520,8 +517,6 @@ void NewCountryBattle::end()
             {
                 award += it->second.award;
                 ++ cnt;
-                strLog += Itoa(it->second.effortId);
-                strLog += ",";
             }
             ++ it;
         }
@@ -546,11 +541,13 @@ void NewCountryBattle::end()
         playerLeave(player);
         sendEndAwardInfo(player, items);
 
+        player->SetVar(VAR_NCB_TOTALWIN, ncbpData->totalWin);
+        player->SetVar(VAR_NCB_TOTALLOSE, ncbpData->totallose);
+        player->SetVar(VAR_NCB_TOTALACHIEVE, ncbpData->totalAchievement + count);
         player->countryBattleUdpLog(1091, player->getCountry());
-        player->countryBattleUdpLog(1217, 1, Itoa(ncbpData->totalWin));
-        player->countryBattleUdpLog(1217, 2, Itoa(ncbpData->totallose));
-        player->countryBattleUdpLog(1217, 3, Itoa(ncbpData->totalAchievement + count));
-        player->countryBattleUdpLog(1217, 5, strLog);
+        player->countryBattleUdpLog(1217, 1, Itoa(ncbpData->totalWin)+","+Itoa(ncbpData->totallose)+","+Itoa(ncbpData->totalAchievement + count));
+        //player->countryBattleUdpLog(1217, 2, ncbpData->totallose);
+        //player->countryBattleUdpLog(1217, 3, ncbpData->totalAchievement + count);
     }
 	
     Stream st(REP::NEW_CAMPS_WAR_JOIN);
@@ -596,7 +593,8 @@ void NewCountryBattle::sendEndAwardInfo(Player * player, Table items)
 
 void NewCountryBattle::sendAllInfo()
 {
-    NCBPlayerData::iterator iter = m_ncbpData.begin(); while(iter != m_ncbpData.end())
+    NCBPlayerData::iterator iter = m_ncbpData.begin();
+    while(iter != m_ncbpData.end())
     {
         sendSelfInfo(iter->first, iter->second);
         ++ iter;
@@ -804,7 +802,7 @@ void NewCountryBattle::handleBattle()
     UInt32 rand = uRand(count);
     UInt32 index = 0;
     UInt32 j = 0;
-    TRACE_LOG("NewCountryBattle=>>size蜀山论剑该轮次的玩家数量:[%u]", size);
+    TRACE_LOG("NewCountryBattle=>>size蜀山论剑该轮次的玩家总数量:[%u]", size * 2 + m_joinByePlayer.size());
     for(std::map<Player *, Player *>::iterator iter = m_pairPlayer.begin(); iter != m_pairPlayer.end(); ++iter, ++j)
     {
         Player * player1 = iter->first;

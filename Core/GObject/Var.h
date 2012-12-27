@@ -305,6 +305,11 @@ namespace GObject
         VAR_FEAST_LOGIN = 294, //节日套装人人拿
         VAR_FEAST_GIFT = 295, //登录礼包人人有
 
+        //新阵营战临时代替udplog做统计使用
+        VAR_NCB_TOTALWIN = 296,     //蜀山论剑当天胜利场次
+        VAR_NCB_TOTALLOSE = 297,    //蜀山论剑当天失败场次
+        VAR_NCB_TOTALACHIEVE = 298, //蜀山论剑当天获得的总荣誉
+
         //繁体版占用301-330
 
         //340简体版
@@ -600,6 +605,10 @@ namespace GObject
             REGISTER_VAR(VAR_CF_LOCATION, CYCLE_NONE);
             REGISTER_VAR(VAR_FEAST_LOGIN, CYCLE_NONE);
             REGISTER_VAR(VAR_FEAST_GIFT, CYCLE_DAY);
+
+            REGISTER_VAR(VAR_NCB_TOTALWIN, CYCLE_DAY);
+            REGISTER_VAR(VAR_NCB_TOTALLOSE, CYCLE_DAY);
+            REGISTER_VAR(VAR_NCB_TOTALACHIEVE, CYCLE_DAY);
 
             REGISTER_VAR(VAR_TOWER_LOGIN, CYCLE_DAY);
             REGISTER_VAR(VAR_TOWER_LEVEL, CYCLE_NONE);

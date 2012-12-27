@@ -1134,7 +1134,6 @@ void GlobalCountryBattle::sendForNewCB(Player * player)
     if(!WORLD().isNewCountryBattle())
         return;
     UInt32 curtime = TimeUtil::Now();
-    //UInt32 prepareTime = _startTime - 15 * 60;
     if(curtime >= _prepareTime && curtime < _startTime)
     {
         Stream st(REP::NEW_CAMPS_WAR_JOIN);
@@ -1148,6 +1147,12 @@ void GlobalCountryBattle::sendForNewCB(Player * player)
         st << static_cast<UInt8>(0x05) << static_cast<UInt8>(1) << static_cast<UInt16>(_endTime - curtime) << Stream::eos;
         player->send(st);
         _NewcountryBattle->sendSelfInfo(player);
+    }
+    else if(curtime < TimeUtil::SharpDay(0, _prepareTime))
+    {
+        Stream st(REP::NEW_CAMPS_WAR_JOIN);
+        st << static_cast<UInt8>(0x05) << static_cast<UInt8>(2) << static_cast<UInt16>(0) << Stream::eos;
+        player->send(st);
     }
 }
 
