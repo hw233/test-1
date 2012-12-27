@@ -761,6 +761,16 @@ namespace GObject
 
 		inline UInt16 getFormation() const { return _playerData.formation; }
 		inline Lineup& getLineup(int idx) { return _playerData.lineup[idx]; }
+        inline UInt8 getLineupCount()
+        {
+            UInt8 c = 0;
+            for(int i = 0; i < 5; ++ i)
+			{
+				if(_playerData.lineup[i].fighter != NULL)
+					++c;
+			}
+            return c;
+        }
 
 		inline void SetSessionID(int session) { _session = session; }
 		inline int GetSessionID() const { return _session; }
