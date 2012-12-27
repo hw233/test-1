@@ -43,6 +43,7 @@
 
 #include "GObject/Tianjie.h"
 #include "Memcached.h"
+#include "Version.h"
 GMHandler gmHandler;
 
 GMHandler::GMHandler()
@@ -222,6 +223,8 @@ GMHandler::GMHandler()
     Reg(3, "fsale", &GMHandler::OnForbidSale);
     Reg(3, "unfsale", &GMHandler::OnUnForbidSale);
     Reg(3, "loginlimit", &GMHandler::OnSetLoginLimit);
+
+    Reg(3, "sysup", &GMHandler::OnSysUpdate);
 
 }
 
@@ -3306,6 +3309,25 @@ void GMHandler::OnSetLoginLimit(GObject::Player *player, std::vector<std::string
     UInt8 pf = atoi(args[0].c_str());
     UInt32 v = atoi(args[1].c_str());
     setPlatformLogin(pf, v);
+}
+
+void GMHandler::OnSysUpdate(GObject::Player *player, std::vector<std::string>& args)
+{
+    UInt8 t = 0;
+    std::string v = VERSION;
+    if (args.size() >= 1)
+        t = atoll(args[0].c_str());
+    if (args.size() >= 2)
+        v = args[1];
+   //版本更新公告
+   Stream st(REP::SYSDAILOG);
+   st << static_cast<UInt8>(1);
+   st << static_cast<UInt8>(t);
+   st << v;
+   st << Stream::eos;
+   player->send(st);
+
+//    player->sendSysUpdate();
 }
 
 

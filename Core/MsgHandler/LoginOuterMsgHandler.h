@@ -47,6 +47,7 @@
 
 #include "Memcached.h"
 #include "GObject/RechargeTmpl.h"
+#include "Version.h"
 
 #ifndef _WIN32
 //#include <libmemcached/memcached.h>
@@ -2573,6 +2574,24 @@ void SysDailog(LoginMsgHdr &hdr, const void * data)
 
 	GObject::globalPlayers.enumerate(player_enum, 0);
 }
+void SysUpdate(LoginMsgHdr &hdr, const void * data)
+{
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+
+    Stream st(REP::SYSDAILOG);
+    st << static_cast<UInt8>(1);
+    st << static_cast<UInt8>(0);
+    st << (char*)VERSION;
+    st << Stream::eos;
+	NETWORK()->Broadcast(st);
+
+    Stream st1(SPEP::SYSUPDATE);
+    st1 << static_cast<UInt8>(0) << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st1);
+
+}
+
 
 void PwdInfo(LoginMsgHdr &hdr, const void * data)
 {

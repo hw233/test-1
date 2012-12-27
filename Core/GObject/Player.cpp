@@ -74,6 +74,7 @@
 #include "MsgHandler/Memcached.h"
 #include "RechargeTmpl.h"
 #include "GData/ExpTable.h"
+#include "Version.h"
 
 #define NTD_ONLINE_TIME (4*60*60)
 #ifndef _DEBUG
@@ -3302,7 +3303,10 @@ namespace GObject
 		if(!res)
 			checkDeath();
 
-		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns());
+        if (getVipLevel() >= 7 && bsim.getTurns() > 30)
+            setBuffData(PLAYER_BUFF_ATTACKING, now + 30);
+        else
+		    setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns());
 
 		return res;
 	}
@@ -16262,6 +16266,17 @@ Dreamer* Player::getDreamer()
            _dreamer = new Dreamer(this);
        }
        return _dreamer;
+}
+
+void Player::sendSysUpdate()
+{
+   //版本更新公告
+   Stream st(REP::SYSDAILOG);
+   st << static_cast<UInt8>(1);
+   st << static_cast<UInt8>(1);
+   st << (char*)VERSION;
+   st << Stream::eos;
+   send(st);
 }
 
 } // namespace GObject
