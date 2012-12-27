@@ -697,7 +697,6 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 			GObject::newPlayers.add(pl);
 			GObject::globalNamedPlayers.add(newname, pl);
             pl->setClientIp(clientIp);
-            pl->setSource(pf);
 			res = 0;
 
 			pl->SetSessionID(hdr.sessionID);
@@ -705,6 +704,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 			cl->SetPlayer(pl);
 
             pl->setDomain(nu._platform);
+            pl->setSource(pf);
             pl->setOpenId(nu._openid);
             pl->setOpenKey(nu._openkey);
             pl->setVia(nu._via);
