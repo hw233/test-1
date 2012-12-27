@@ -611,7 +611,7 @@ function onGetFeastGiftAward(player, type)
         return false
     end
     local awards = {
-        [1] = {{401, 1},{511, 1},{548, 1},{500, 1},{48, 1},{517, 1}},
+        [1] = {{9306, 1},{511, 1},{548, 1},{500, 1},{48, 1},{517, 1}},
         [2] = {{401, 1},{50, 1},{503, 1},{516, 1},{513, 1},{1325,1}},
     }
     local package = player:GetPackage()
