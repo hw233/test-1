@@ -314,6 +314,7 @@ namespace GObject
         VAR_TOWER_LOGIN = 343,          // 楼一平台登录奖励
         VAR_TOWER_LEVEL = 344,          // 楼一平台登录等级奖励
         VAR_SNOW_AWARD     = 345,     //堆雪人奖励
+        VAR_HAS_MO_BATTLER = 346,
         VAR_MAX,
     };
 
@@ -603,6 +604,8 @@ namespace GObject
 
             REGISTER_VAR(VAR_TOWER_LOGIN, CYCLE_DAY);
             REGISTER_VAR(VAR_TOWER_LEVEL, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_HAS_MO_BATTLER, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);
