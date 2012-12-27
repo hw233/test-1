@@ -103,13 +103,14 @@ bool Country::Init()
         AddTimer(1000, ClanRankBattleCheck);
         //townDeamonManager->process();
         //UInt32 tdChkPoint = TimeUtil::SharpDayT(0, now) + TOWNDEAMONENDTM;
-	    AddTimer(3600 * 1000, PhysicalCheckTimer, static_cast<void *>(NULL), (60 - now % 60) * 1000);
+        /** 延迟2分钟  **/
+	    AddTimer(3600 * 1000, PhysicalCheckTimer, static_cast<void *>(NULL), (3600 - now % 3600 + 120) * 1000);
 
         AddTimer(1000, ClanCopyCheck);
 
         AddTimer(3600 * 24 * 7 * 1000, ClanCopyResetBegin, static_cast<void * >(NULL), 
                 (sweek - now) > 1800 ? (sweek - now - 1800) * 1000 : ((sweek - now) + 3600 * 24 * 7 - 1800) * 1000 );
-        AddTimer(3600 * 24 * 7 * 1000, ClanCopyReset, static_cast<void * >(NULL), (sweek - now) * 1000);
+        AddTimer(3600 * 24 * 7 * 1000, ClanCopyReset, static_cast<void * >(NULL), (sweek - now + 240) * 1000);
         AddTimer(3600 * 24 * 7 * 1000, ClanCopyResetEnd, static_cast<void * >(NULL), (sweek - now + 1800) * 1000);
         //AddTimer(4 * 60 * 1000, ClanCopyResetBegin, static_cast<void * >(NULL), 60 * 1000);
         //AddTimer(4 * 60 * 1000, ClanCopyReset, static_cast<void * >(NULL), 120 * 1000);

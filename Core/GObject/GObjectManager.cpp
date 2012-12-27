@@ -1119,10 +1119,10 @@ namespace GObject
         //    mergeCittaPages(p);
         //if (!GVAR.GetVar(GVAR_1530BUCHANG))
         //    buchang1530(p);
-        if (!GVAR.GetVar(GVAR_OLDRC7DAYBUCHANG))
-            p->sendOldRC7DayAward();
-        if (!GVAR.GetVar( GVAR_JOB_MO_PEXP))
-            buchangMo(p);
+        //if (!GVAR.GetVar(GVAR_OLDRC7DAYBUCHANG))
+            //p->sendOldRC7DayAward();
+        //if (!GVAR.GetVar( GVAR_JOB_MO_PEXP))
+            //buchangMo(p);
 		return true;
 	}
 
