@@ -1988,6 +1988,7 @@ namespace GObject
 
     public:
         Dreamer * getDreamer();
+        void sendSysUpdate();
     private:
         Dreamer * _dreamer;
 
