@@ -4407,6 +4407,8 @@ function sendRechargeRankAward(player, pos)
         sendRechargeRankAward_2013_01_06(player, pos)
     elseif n >= (s + 30*86400 + 10*60) and n < (s + 31*86400 + 10*60) then
         sendRechargeRankAward_2013_01_07(player, pos)
+    elseif n >= (s + 31*86400 + 10*60) and n < (s + 32*86400 + 10*60) then
+        sendRechargeRankAward_2012_12_28(player, pos)
     end
 end
 
