@@ -5632,6 +5632,64 @@ void OnAutoJobHunter( GameMsgHdr & hdr, const void * data )
     jobHunter->OnAutoCommand(type);
 }
 
+void OnEquipLingbaoReq( GameMsgHdr & hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	if(!player->hasChecked())
+		return;
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 opt = 0;
+    br >> opt;
+
+	Package * pkg = player->GetPackage();
+
+    UInt8 res = 0;
+    Stream st(REP::EQ_LINGBAO);
+    st << opt;
+    switch(opt)
+    {
+    case 1:
+        {
+            UInt32 equipId = 0;
+            UInt8 protect = 0;
+            UInt8 bind = 0;
+            br >> equipId >> protect >> bind;
+            res = pkg->Tongling(equipId, protect, bind);
+        }
+        break;
+    case 2:
+        {
+            UInt16 gujiId = 0; // 古籍id
+            UInt8 type = 0; // 是否使用高级空宝具
+            UInt8 bind1 = 0;
+            UInt8 bind2 = 0;
+            br >> gujiId >> bind1 >> type >> bind2;
+            res = pkg->OpenLingbaoSmelt(gujiId, bind1, type, bind2);
+        }
+        break;
+    case 3:
+        {
+            UInt16 count = 0;
+            br >> count;
+            for(int i = 0; i < count; ++ i)
+            {
+                UInt32 itemId = 0;
+                UInt8 bind = 0;
+                br >> itemId >> bind;
+                pkg->LingbaoSmelt(itemId, bind);
+            }
+        }
+        break;
+    case 6:
+        {
+            pkg->FinishLBSmelt();
+        }
+        break;
+    }
+    st << res;
+    player->send(st);
+}
+
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

@@ -46,6 +46,123 @@ namespace GObject
         float attrMax[3][5][9];
     };
 
+    struct stLbAttrMax
+    {
+        stLbAttrMax() { memset( attrMax, 0, sizeof(attrMax)); }
+        float attrMax[3][12];
+    };
+
+    struct stLBAttrConf
+    {
+        stLBAttrConf()
+        {
+            memset( attrNumChance, 0, sizeof(attrNumChance));
+            memset( skillNumChance, 0, sizeof(skillNumChance));
+            memset( dis, 0, sizeof(dis));
+            memset( disChance, 0, sizeof(disChance));
+            memset( colorVal, 0, sizeof(colorVal));
+        }
+
+        UInt8 getAttrNum(UInt16 chance)
+        {
+            for(int i = 0; i < 4; ++ i)
+            {
+                if(chance < attrNumChance[i])
+                    return (i + 1);
+            }
+            return 1;
+        }
+
+        UInt8 getSkillNum(UInt16 chance)
+        {
+            for(int i = 0; i < 2; ++ i)
+            {
+                if(chance < skillNumChance[i])
+                    return (i + 1);
+            }
+            return 0;
+        }
+
+        float getDisFactor(UInt16 chance)
+        {
+            int maxIdx = 10;
+            UInt16 lastDisChance = 0;
+            for(int i = 0; i < 11; ++ i)
+            {
+                if(chance < disChance[i])
+                {
+                    return ( ((float)(dis[i] * (chance + 1 - lastDisChance))) / ((disChance[i] - lastDisChance) * dis[maxIdx]) );
+                }
+                lastDisChance = disChance[i];
+            }
+            return 0;
+        }
+
+        UInt8 getSkillsMaxCnt(UInt8 idx)
+        {
+            if(idx > 1)
+                return 0;
+            return skills[idx].size();
+        }
+
+        UInt16 getSkill(UInt8 idx, UInt16 chance)
+        {
+            if(idx > 1 || chance > skills[idx].size())
+                return 0;
+            return skills[idx][chance];
+        }
+
+        float getAttrMax(UInt8 lv, UInt8 itemTypeIdx, UInt8 attrTypeIdx)
+        {
+            if(itemTypeIdx > 2 || attrTypeIdx > 11)
+                return 0;
+            std::map<UInt8, stLbAttrMax>::iterator it = lbAttrMax.find(lv);
+            if(it == lbAttrMax.end())
+                return 0;
+            stLbAttrMax& lbAttr = it->second;
+            return lbAttr.attrMax[itemTypeIdx][attrTypeIdx];
+        }
+
+        UInt8 getColor(UInt8 lv, UInt8 itemTypeIdx, UInt8* at, UInt16* av, UInt8 size)
+        {
+            UInt16 colorP = 0;
+            for(int i = 0; i < size; ++ i)
+            {
+                colorP += (av[i]/getAttrMax(lv, itemTypeIdx, at[i]))*100;
+            }
+            for(int j = 0; j < 4; ++ j)
+            {
+                if(colorP < colorVal[j])
+                    return j;
+            }
+            return 0;
+        }
+
+        UInt8 getSmeltExp(UInt8 lv, UInt8 itemTypeIdx, UInt8* at, UInt16* av, UInt8 size)
+        {
+            UInt16 colorP = 0;
+            float lvFactor[8] = {1, 1.2, 1.4, 1.6, 0, 0, 0, 0};
+            UInt8 lvIdx = (lv-70)/10;
+            if(lvIdx > 3)
+                lvIdx = 3;
+            for(int i = 0; i < size; ++ i)
+            {
+                colorP += (av[i]/getAttrMax(lv, itemTypeIdx, at[i]));
+            }
+
+            return colorP*400*lvFactor[lvIdx];
+        }
+
+        UInt8 attrNumChance[4];
+        UInt8 skillNumChance[2];
+        UInt16 dis[11];
+        UInt16 disChance[11];
+        UInt16 colorVal[4];
+        std::vector<UInt8> attrType;
+        std::vector<UInt16> skills[2];
+		std::map<UInt8, stLbAttrMax> lbAttrMax;  // 灵宝属性上限
+    };
+
     struct stRingHpBase
     {
         stRingHpBase() { memset(hpBase, 0, sizeof(hpBase)); }
@@ -199,6 +316,7 @@ namespace GObject
         static float getMagResMax() { return _mres_max; }
         static float getCriticalDmgMax() { return _cridmg_max; }
 
+		static stLBAttrConf& getLBAttrConf() { return _lbAttrConf; }
 
         static UInt16 getAttrTypeChance(UInt8 q, UInt8 idx) { return _attrTypeChances[q][idx]; }
         static UInt16 getAttrChance( UInt8 q, UInt8 idx ) { return _attrChances[q][idx]; }
@@ -448,6 +566,9 @@ namespace GObject
 
         static std::vector<std::vector<UInt32>> _soulEnchantChance;
         static std::vector<UInt32> _decSoulStateExp;
+
+        // 灵宝属性上限
+		static stLBAttrConf _lbAttrConf;
 
         public:
         static  vMergeStfs  getMergeStfs( UInt32 id)

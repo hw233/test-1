@@ -52,6 +52,9 @@ enum ItemClass
 	Item_Trump,			//法宝 10
 	Item_Fashion,		//时装 11
     Item_Halo,          //光环 12
+    Item_LBling,        // 灵宝-灵 13
+    Item_LBwu,          // 灵宝-悟 14
+    Item_LBxin,         // 灵宝-信 15
 	Item_Normal = 20,	//普通物品 20~29
     Item_Normal28 = 28,
     Item_Normal29 = 29,
@@ -81,6 +84,22 @@ enum ItemClass
     Item_SL1, // 元神技能
     Item_SL2, // 元神技能
 	Item_Other = 103,	//其他
+    Item_Guji = 110, // 通用古籍
+    Item_Guji_Ling = 111, // 灵·古籍
+    Item_Guji_Wu = 112, // 灵·古籍
+    Item_Guji_Xin = 113, // 灵·古籍
+    Item_Guji_Ling_Atk = 114, // 灵·物功古籍
+    Item_Guji_Ling_MagAtk = 115, // 灵·法功古籍
+    Item_Guji_Ling_Counter = 116, // 灵·反击古籍
+    Item_Guji_Ling_Action = 117, // 灵·身法古籍
+    Item_Guji_Wu_Def = 118, // 灵·物防古籍
+    Item_Guji_Wu_MagDef = 119, // 灵·法防古籍
+    Item_Guji_Wu_Tough = 120, // 灵·坚韧古籍
+    Item_Guji_Wu_HP = 121, // 灵·生命古籍
+    Item_Guji_Xin_Critical = 122, // 灵·暴击古籍
+    Item_Guji_Xin_Pierce = 123, // 灵·破击古籍
+    Item_Guji_Xin_Evade = 124, // 灵·闪避古籍
+    Item_Guji_Xin_Hitrate = 125, // 灵·命中古籍
 };
 
 inline bool IsEquipId(UInt32 id) // XXX: 这个是流水号

@@ -183,33 +183,35 @@ enum ItemFrom
     FromNewRC7DayTarget,
     FromDailyStrengthen = 37, //变强秘宝
     FromJobHunter = 38, // 寻墨游戏
+    FromFuling = 39, // 灵宝附灵
 };
 
 enum ItemTo
 {
 	ToTrade = 128,
-	ToSale,
-	ToSplit,
-	ToDelete,
-	ToSellNpc,
-	ToExchange,
-	ToExchangeSet,
-	ToDesdroy, // ToTripod
-	ToDetachGemDesdroy,
-	ToUse,
-	ToClanDonate,
-	ToGemMgerge,
-	ToActivateAttr,
-	ToGemAttach,
-	ToTrainFighter,
-	ToTrumpUpgrade,
-    ToEquipUpgrade,
-    ToForgeFighter,
-    ToSecondSoul,
-    ToArenaBet,
-    ToSkillStrengthenOpen,
-	ToSkillStrengthenUpgrade,
-    ToQixi,
+	ToSale,  // 129
+	ToSplit, // 130
+	ToDelete, // 131
+	ToSellNpc, // 132
+	ToExchange, // 133
+	ToExchangeSet, // 134
+	ToDesdroy, // 135 ToTripod
+	ToDetachGemDesdroy, // 136
+	ToUse, // 137
+	ToClanDonate, // 138
+	ToGemMgerge, // 139
+	ToActivateAttr, // 140
+	ToGemAttach, // 141
+	ToTrainFighter, // 142
+	ToTrumpUpgrade, // 143
+    ToEquipUpgrade, // 144
+    ToForgeFighter, // 145
+    ToSecondSoul,   // 146
+    ToArenaBet,     // 147
+    ToSkillStrengthenOpen, // 148
+	ToSkillStrengthenUpgrade, // 149
+    ToQixi, // 150
+    ToLingbao, // 151
 };
 
 struct IncommingInfo

@@ -402,6 +402,34 @@ namespace GObject
 		}
     }
 
+    static void getRandomLBAttr(UInt8 lv, UInt8 subClass, ItemLingbaoAttr& lbattr)
+    {
+        if(subClass != Item_LBling && subClass != Item_LBwu && subClass != Item_LBxin)
+            return;
+		stLBAttrConf& lbAttrConf = GObjectManager::getLBAttrConf();
+        UInt8 attrNum = lbAttrConf.getAttrNum(uRand(100));
+        std::vector<UInt8> allAttrType = lbAttrConf.attrType;
+        UInt8 itemTypeIdx = subClass - Item_LBling;
+        for(int i = 0; i < attrNum; ++ i)
+        {
+            UInt8 size = allAttrType.size();
+            UInt8 idx = uRand(size);
+            lbattr.type[i] = allAttrType[idx];
+            lbattr.value[i] = lbAttrConf.getAttrMax(lv, itemTypeIdx, lbattr.type[i]) * lbAttrConf.getDisFactor(uRand(10000));
+            allAttrType.erase(allAttrType.begin() + idx);
+        }
+        lbattr.lbColor = 2 + lbAttrConf.getColor(lv, itemTypeIdx, lbattr.type, lbattr.value, attrNum);
+        if(lbattr.lbColor == 5)
+        {
+            UInt8 skillNum = lbAttrConf.getSkillNum(uRand(100));
+            for(int i = 0; i < skillNum; ++ i)
+            {
+                UInt8 skillCnt = lbAttrConf.getSkillsMaxCnt(i);
+                lbattr.skill[i] = lbAttrConf.getSkill(i, uRand(skillCnt));
+            }
+        }
+    }
+
 	Package::Package(Player* player) : m_Owner(player), m_Size(0), _lastActivateLv(0), _lastActivateQ(0), _lastActivateCount(0)
 	{
 	}
@@ -919,13 +947,30 @@ namespace GObject
         case Item_Halo:
         case Item_Fashion:
         case Item_Trump:
+        case Item_LBling:
+        case Item_LBwu:
+        case Item_LBxin:
 			{
 				ItemEquip * equip;
 				ItemEquipData edata;
 
 				UInt8 lv = itype->vLev;
                 UInt8 crr = itype->career;
-				if(itype->quality > 2 && itype->subClass != Item_Trump && itype->subClass != Item_Fashion && itype->subClass != Item_Halo)
+                bool randomAttr = false;
+				switch(itype->subClass)
+                {
+                case Item_Trump:
+                case Item_Fashion:
+                case Item_Halo:
+                case Item_LBling:
+                case Item_LBwu:
+                case Item_LBxin:
+                    break;
+                default:
+                    if(itype->quality > 2)
+                        randomAttr = true;
+                }
+				if(randomAttr)
 				{
 					UInt8 q = itype->quality - 3;
 					UInt8 t[3] = {0, 0, 0};
@@ -945,6 +990,7 @@ namespace GObject
 					edata.extraAttr2.type3 = 0; edata.extraAttr2.value3 = 0;
 				}
 
+                bool lingbao = false;
 				UInt32 id = IDGenerator::gItemOidGenerator.ID();
 				switch(itype->subClass)
 				{
@@ -992,6 +1038,16 @@ namespace GObject
                         }
                     }
                     break;
+                case Item_LBling:
+                case Item_LBwu:
+                case Item_LBxin:
+                    {
+                        ItemLingbaoAttr lbattr;
+                        getRandomLBAttr(lv, itype->subClass, lbattr);
+                        equip = new ItemLingbao(id, itype, edata, lbattr);
+                        lingbao = true;
+                    }
+                    break;
 				default:
 					equip = new ItemEquip(id, itype, edata);
 					break;
@@ -1017,7 +1073,7 @@ namespace GObject
 				SendSingleEquipData(equip);
 				if(notify)
 					ItemNotify(equip->GetItemType().getId());
-				if(FromWhere != 0 && itype->quality >= 4)
+				if((FromWhere != 0 && itype->quality >= 4) || lingbao)
 					DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), typeId, id, FromWhere, TimeUtil::Now());
 
                 OnAddEquipAndCheckAttainment(itype, FromWhere);
@@ -2183,10 +2239,14 @@ namespace GObject
             ItemEquipSpiritAttr& esa = equip->getEquipSpiritAttr();
             esa.appendAttrToStream(st);
         }
-
-        if(equip->getClass() == Item_Trump || equip->getClass() == Item_Fashion || equip->getClass() == Item_Halo)
+        else if(equip->getClass() == Item_Trump || equip->getClass() == Item_Fashion || equip->getClass() == Item_Halo)
         {
             st << ied.maxTRank << ied.trumpExp;
+        }
+        else if(equip->getClass() == Item_LBling || equip->getClass() == Item_LBwu || equip->getClass() == Item_LBxin)
+        {
+            ItemLingbaoAttr& lba = (static_cast<ItemLingbao*>(equip))->getLingbaoAttr();
+            lba.appendAttrToStream(st);
         }
 	}
 
@@ -5316,4 +5376,237 @@ namespace GObject
         }
     }
 
+    UInt8 Package::Tongling(UInt32 equipId, UInt8 protect, UInt8 bind)
+    {
+#define TONGLING_ITEM         9308
+#define TONGLING_ITEM_PROTECT 9308
+        ItemBase* item = FindItem(equipId);
+        if(Item_LBling > item->GetItemType().subClass || Item_LBxin < item->GetItemType().subClass)
+            return 2;
+        UInt16 itemId = 0;
+        if(protect)
+            itemId = TONGLING_ITEM_PROTECT;
+        else
+            itemId = TONGLING_ITEM;
+
+		ItemLingbao* equiplb = static_cast<ItemLingbao*>(item);
+        item = FindItem(itemId, bind);
+        if(!equiplb || !item || equiplb->isTongling())
+            return 2;
+
+        DelItem2(item, 1, ToLingbao);
+        ItemLingbaoAttr& lba = (static_cast<ItemLingbao*>(equiplb))->getLingbaoAttr();
+        lba.tongling = 1;
+        float factor = 0;
+        if(protect)
+        {
+            factor = ((float)(1000 + uRand(50)))/1000;
+        }
+        else
+        {
+            factor = ((float)(950 + uRand(100)))/1000;
+        }
+        for(int i = 0; i < 4; ++ i)
+        {
+            lba.value[i] *= factor;
+        }
+        return 0;
+    }
+
+    UInt8 Package::OpenLingbaoSmelt(UInt16 gujiId, UInt8 bind1, UInt8 type, UInt8 bind2)
+    {
+#define FULING_ITEM         9308
+#define FULING_ITEM_PROTECT 9308
+        UInt16 itemId = 0;
+        if(type)
+            itemId = FULING_ITEM_PROTECT;
+        else
+            itemId = FULING_ITEM;
+        ItemBase* guji = FindItem(gujiId, bind1);
+        ItemBase* item = FindItem(itemId, bind2);
+        if(!guji || !item)
+            return 2;
+
+        DelItem2(guji, 1, ToLingbao);
+        DelItem2(item, 1, ToLingbao);
+        float gujiFactor[16] = {1, 3, 3, 3, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36};
+        float itemFactor[2] = {1, 15};
+        float lvFactor[4] = {1, 1.2, 1.4, 1.6};
+        float colorFactor[4] = {1, 1.5, 20, 80};
+        UInt8 colorIdx = guji->getQuality() - 2;
+        UInt8 lvIdx = (guji->getReqLev() - 70)/10;
+        UInt8 gujiIdx = guji->GetItemType().subClass - Item_Guji;
+        UInt8 itemIdx = item->getQuality() == 2 ? 0 : 1;
+
+        m_lbSmeltInfo.gujiId = gujiId;
+        m_lbSmeltInfo.itemId = itemId;
+        m_lbSmeltInfo.bind = (bind1 != 0 || bind2 != 0) ? 1 : 0;
+        m_lbSmeltInfo.value = 0;
+        m_lbSmeltInfo.maxValue = 1250*gujiFactor[gujiIdx]*itemFactor[itemIdx]*lvFactor[lvIdx]*colorFactor[colorIdx];
+        return 0;
+    }
+
+    UInt8 Package::LingbaoSmelt(UInt32 itemId, UInt8 bind)
+    {
+        ItemBase* item = FindItem(itemId, bind);
+        if(!item)
+            return 2;
+        const GData::ItemBaseType& ibt = item->GetItemType();
+        UInt16 subClass = ibt.subClass;
+        if(Item_LBling > subClass || Item_LBxin < subClass)
+            return 2;
+
+        if(m_lbSmeltInfo.value >= m_lbSmeltInfo.maxValue)
+            return 0;
+
+        UInt32 value = 0;
+        value = ibt.trumpExp;
+        if(subClass > Item_LBling && subClass < Item_LBxin)
+        {
+            stLBAttrConf& lbAttrConf = GObjectManager::getLBAttrConf();
+            ItemLingbaoAttr& lba = (static_cast<ItemLingbao*>(item))->getLingbaoAttr();
+            UInt8 lv = item->getReqLev();
+            value += lbAttrConf.getSmeltExp(lv, subClass - Item_LBling, lba.type, lba.value, 4);
+        }
+        m_lbSmeltInfo.value += value;
+        DelItem2(item, 1, ToLingbao);
+
+        sendLingbaoSmeltInfo();
+
+        return 0;
+    }
+
+    void Package::FinishLBSmelt()
+    {
+        if(m_lbSmeltInfo.value < m_lbSmeltInfo.maxValue)
+            return;
+
+        const GData::ItemBaseType* guji = GData::itemBaseTypeManager[m_lbSmeltInfo.gujiId];
+        const GData::ItemBaseType* item = GData::itemBaseTypeManager[m_lbSmeltInfo.itemId];
+
+        UInt8 lv = guji->reqLev;
+        UInt8 lvIdx = (lv - 70)/10;
+        if(lvIdx > 3) lvIdx = 3;
+
+        UInt16 gjIdx = guji->subClass - Item_Guji;
+        UInt8 lbIdx[16] = {0xFF, 0, 1, 2, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2};
+        UInt16 lbids[4][3] = {
+            {11500, 11501, 11502},
+            {11503, 11504, 11505},
+            {11506, 11507, 11508},
+            {11509, 11510, 11511}};
+        UInt16 lbid = lbids[lvIdx][lbIdx[gjIdx]];
+
+        const GData::ItemBaseType * itype = GData::itemBaseTypeManager[lbid];
+        ItemEquipData edata;
+
+        UInt16 subClass = itype->subClass;
+        ItemLingbaoAttr lbattr;
+
+        {
+            UInt8 minAttrNum = item->quality > 3 ? 3 : 1;
+            float colorP = (guji->quality > 4 ? 90 : 70)/100;
+            stLBAttrConf& lbAttrConf = GObjectManager::getLBAttrConf();
+            UInt8 attrNum = lbAttrConf.getAttrNum(uRand(100));
+            if(attrNum < minAttrNum)
+                attrNum = minAttrNum;
+            std::vector<UInt8> allAttrType = lbAttrConf.attrType;
+            UInt8 itemTypeIdx = subClass - Item_LBling;
+            // 古籍指定的属性
+            {
+                UInt8 idx = 0;
+
+                if(gjIdx == 0)
+                {
+                    UInt8 size = allAttrType.size();
+                    idx = uRand(size);
+                }
+                else if(gjIdx < 4)
+                {
+                    UInt8 lbAttrIdx[3][4] =
+                    { {0, 1, 6, 11}, // 物功，法功，身法，反击
+                      {2, 3, 4, 5},  // 物防，法防，生命, 坚韧
+                      {7, 8, 9, 10}};// 命中，闪避，暴击，破击
+                    idx = lbAttrIdx[gjIdx - 1][uRand(4)];
+                }
+                else
+                {
+                    UInt8 lbAttrIdx[12] = {0, 1, 11, 6, 2, 3, 5, 4, 9, 10, 8, 7};
+                    idx = lbAttrIdx[gjIdx - 4];
+                }
+
+                lbattr.type[0] = allAttrType[idx];
+                UInt16 chance = uRand(10000);
+                chance = chance + ((10000 - chance) * colorP);
+                float disFactor = lbAttrConf.getDisFactor(chance);
+                lbattr.value[0] = lbAttrConf.getAttrMax(lv, itemTypeIdx, lbattr.type[0]) * disFactor;
+                allAttrType.erase(allAttrType.begin() + idx);
+            }
+            for(int i = 1; i < attrNum; ++ i)
+            {
+                UInt8 size = allAttrType.size();
+                UInt8 idx = uRand(size);
+                lbattr.type[i] = allAttrType[idx];
+                float disFactor = lbAttrConf.getDisFactor(uRand(10000));
+                lbattr.value[i] = lbAttrConf.getAttrMax(lv, itemTypeIdx, lbattr.type[i]) * disFactor;
+                allAttrType.erase(allAttrType.begin() + idx);
+            }
+            lbattr.lbColor = 2 + lbAttrConf.getColor(lv, itemTypeIdx, lbattr.type, lbattr.value, attrNum);
+            if(lbattr.lbColor == 5)
+            {
+                UInt8 skillNum = lbAttrConf.getSkillNum(uRand(100));
+                for(int i = 0; i < skillNum; ++ i)
+                {
+                    UInt8 skillCnt = lbAttrConf.getSkillsMaxCnt(i);
+                    lbattr.skill[i] = lbAttrConf.getSkill(i, uRand(skillCnt));
+                }
+            }
+        }
+
+        UInt32 id = IDGenerator::gItemOidGenerator.ID();
+        ItemLingbao* equip = new ItemLingbao(id, itype, edata, lbattr);
+        if(equip)
+            equip->SetBindStatus(m_lbSmeltInfo.bind);
+
+        ItemBase *& e = m_Items[id];
+        if(e == NULL)
+            ++ m_Size;
+        e = equip;
+
+        DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, 1, %"I64_FMT"u, %u)", id, m_Owner->getId(), m_lbSmeltInfo.bind);
+        DB4().PushUpdateData("INSERT INTO `equipment`(`id`, `itemId`, `maxTRank`, `trumpExp`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`) VALUES(%u, %u, %u, %u, %u, %d, %u, %d, %u, %d)", id, lbid, edata.maxTRank, edata.trumpExp, edata.extraAttr2.type1, edata.extraAttr2.value1, edata.extraAttr2.type2, edata.extraAttr2.value2, edata.extraAttr2.type3, edata.extraAttr2.value3);
+        GenSpirit(equip);
+
+        SendSingleEquipData(equip);
+
+        ItemNotify(equip->GetItemType().getId());
+
+        DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), lbid, id, FromFuling, TimeUtil::Now());
+
+        OnAddEquipAndCheckAttainment(itype, FromFuling);
+
+        closeLingbaoSmelt();
+    }
+
+    UInt8 Package::closeLingbaoSmelt()
+    {
+        memset(&m_lbSmeltInfo, 0, sizeof(m_lbSmeltInfo));
+        sendLingbaoSmeltInfo();
+        return 0;
+    }
+
+    void Package::sendLingbaoSmeltInfo()
+    {
+		Stream st(REP::EQ_LINGBAO);
+		st << static_cast<UInt8>(5);
+
+        st << m_lbSmeltInfo.gujiId;
+        st << m_lbSmeltInfo.itemId;
+        st << m_lbSmeltInfo.maxValue;
+        st << m_lbSmeltInfo.value;
+        st << m_lbSmeltInfo.bind;
+
+        st << Stream::eos;
+		m_Owner->send(st);
+    }
 }

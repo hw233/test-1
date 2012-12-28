@@ -49,6 +49,7 @@ namespace GObject
 #define TRUMP_UPMAX 3
 #define TRUMP_INIT 1 // 法宝最初只能装1个,由VIP等级控制装备个数
 #define ACUPOINTS_MAX 15
+#define LINGBAO_UPMAX 3
 
 #define PEERLESS_UPMAX 1
 
@@ -389,8 +390,17 @@ public:
     int getAllTrumpId(UInt32* trumps, int size = TRUMP_UPMAX);
     int getAllTrumpTypeId(UInt32* ids, int size = TRUMP_UPMAX);
     void getAllTrumps(Stream& st);
-
     UInt32 getTrumpNum();
+
+	inline ItemEquip * getLingbao(int idx) { return (idx >= 0 && idx < getMaxLingbaos()) ? _lingbao[idx] : 0; }
+    inline void * getLingbaoAddr() { return _lingbao;}
+    inline UInt8 getMaxLingbaos() { return LINGBAO_UPMAX; }
+    UInt32 getLingbaoId(int idx);
+    int getAllLingbaoId(UInt32* lingbaos, int size = LINGBAO_UPMAX);
+    int getAllLingbaoTypeId(UInt32* ids, int size = LINGBAO_UPMAX);
+    void getAllLingbaos(Stream& st);
+    UInt32 getLingbaoNum();
+
 	UInt32 getMaxHP();
 
 	UInt32 regenHP(UInt32);
@@ -451,6 +461,14 @@ public:
 	inline void setDirty(bool d = true) { _attrDirty = d; _bPDirty = d; }
     bool hasTrumpType(UInt32 trumpid);
     bool canSetTrump(UInt8 idx, UInt32 trumpid);
+
+	ItemEquip ** setLingbao(std::string& lingbaos, bool = true);
+    ItemEquip* setLingbao( UInt32 lingbao, int idx, bool = true);
+    ItemEquip* setLingbao( ItemEquip* lingbao, int idx, bool = true);
+	void findLingbaoByTypeId(std::vector<ItemEquip*>& ret, UInt32 id);
+    bool hasLingbaoType(UInt32 trumpid);
+    bool canSetLingbao(UInt8 idx, UInt32 lingbaoid);
+
 
     void setAttrType1(UInt8 t);
     void setAttrValue1(UInt16 v);
@@ -632,6 +650,7 @@ public:
 
 	void addAttr( ItemEquip * );
 	void addTrumpAttr( ItemEquip* );
+	void addLingbaoAttr( ItemEquip* );
     void addAttr( const GData::CittaEffect* ce );
     void    CheckEquipEnchantAttainment(UInt8 e);
     bool  IsEquipEnchantLev(UInt8 e);
@@ -712,6 +731,7 @@ protected:
 	ItemEquip * _ring;
 	ItemEquip * _amulet;
 	ItemEquip * _trump[TRUMP_UPMAX];// 法宝
+	ItemEquip * _lingbao[LINGBAO_UPMAX];// 灵宝
 
 	bool _attrDirty;
 	UInt32 _maxHP;
@@ -796,10 +816,12 @@ public:
     inline void setUpCittasMax() { _cittaslot = CITTA_UPMAX; }
     bool upCittaWithOutCheck( UInt16 citta, int idx );
     UInt16 getTrumpSkill(int i) { if(i >= TRUMP_UPMAX) return 0; else return _trumpSkill[i]; }
+    UInt16 getLingbaoSkill(int i) { if(i >= LINGBAO_UPMAX) return 0; else return _lingbaoSkill[i]; }
     Int32 _soulMax;
     UInt8 _soulExtraAura;
     UInt8 _soulAuraLeft;
     UInt16 _trumpSkill[TRUMP_UPMAX];
+    UInt16 _lingbaoSkill[LINGBAO_UPMAX];
 
     // 内丹系统
 public:

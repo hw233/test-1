@@ -91,6 +91,51 @@ namespace GObject
 
 		ItemEquipData(): sockets(0), enchant(0), tRank(0), maxTRank(0), trumpExp(0) { memset(gems, 0, sizeof(gems)); }
 	};
+
+    //灵宝属性
+    struct ItemLingbaoAttr
+    {
+        UInt8 tongling;
+        UInt8 lbColor;
+        UInt8 type[4];
+        UInt16 value[4];
+        UInt16 skill[2];
+
+        ItemLingbaoAttr() : tongling(0), lbColor(0)
+        {
+            memset(type, 0, sizeof(type));
+            memset(value, 0, sizeof(value));
+            memset(skill, 0, sizeof(skill));
+        }
+
+		inline void appendAttrToStream(Stream& st)
+        {
+            if(tongling == 0)
+            {
+                UInt8 zero8 = 0;
+                UInt16 zero16 = 0;
+                st << zero8 << lbColor;
+                st << zero16 << zero16;
+            }
+            else
+            {
+                st << tongling << lbColor;
+                UInt8 cnt = 0;
+                size_t offset = st.size();
+                st << cnt;
+                for(int i = 0; i < 4; ++ i)
+                {
+                    if(type[i] != 0)
+                    {
+                        st << type[i] << value[i];
+                        ++ cnt;
+                    }
+                }
+                st.data<UInt8>(offset) = cnt;
+                st << skill[0] << skill[1];
+            }
+        }
+    };
 }
 
 #endif

@@ -147,6 +147,8 @@ namespace GObject
     std::vector<std::vector<UInt32>> GObjectManager::_soulEnchantChance;
     std::vector<UInt32> GObjectManager::_decSoulStateExp;
 
+    stLBAttrConf GObjectManager::_lbAttrConf;
+
     GObjectManager:: vMergeStfs    GObjectManager:: _vMergeStfs;
     std::map <UInt32,  std::vector<UInt32> >   GObjectManager:: _mMergeStfsIndex;
     //std::map <UInt32, UInt32>  GObjectManager::_EUpgradeIdMap;
@@ -3941,6 +3943,81 @@ namespace GObject
 				{
 					_socket_chance[j] =  table_temp.get<UInt32>(j + 1);
 				}
+            }
+
+            // 灵宝
+            {
+				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getLingbaoAttrMax");
+				UInt32 size = std::min(3, table_temp.size());
+				for(UInt32 i = 0; i < size; i ++)
+				{
+					lua_tinker::table table_temp2 = table_temp.get<lua_tinker::table>(i + 1);
+                    UInt32 size2 = table_temp2.size();
+                    for(UInt32 j = 0; j < size2; ++ j)
+                    {
+                        lua_tinker::table table_temp3 = table_temp2.get<lua_tinker::table>(j + 1);
+                        UInt32 size3 = std::min(13, table_temp2.size()) - 1;
+                        UInt8 lv = table_temp2.get<UInt8>(1);
+                        stLbAttrMax lbAttrMax;
+                        for(UInt32 k = 0; k < size3; ++ k)
+                        {
+                            lbAttrMax.attrMax[i][k] = table_temp2.get<UInt8>(k+2);
+                            _lbAttrConf.attrType.push_back(k+1);
+                        }
+                        _lbAttrConf.lbAttrMax[lv] = lbAttrMax;
+                    }
+				}
+            }
+            {
+				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getLingbaoAttrNum");
+				UInt32 size = std::min(6, table_temp.size());
+                for(UInt32 i = 0; i < size; ++ i)
+                {
+                    if(i < 4)
+                        _lbAttrConf.attrNumChance[i] = table_temp.get<UInt16>(i + 1);
+                    else
+                        _lbAttrConf.skillNumChance[i-4] = table_temp.get<UInt16>(i + 1);
+                }
+            }
+            {
+				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getLingbaoAttrDis");
+				UInt32 size = std::min(2, table_temp.size());
+                if(size == 2)
+                {
+                    lua_tinker::table table_dis = table_temp.get<lua_tinker::table>(1);
+                    lua_tinker::table table_disChance = table_temp.get<lua_tinker::table>(2);
+                    UInt32 sizeDis = std::min(11, table_dis.size());
+                    UInt32 sizeDisChance = std::min(11, table_disChance.size());
+                    if(sizeDisChance == sizeDis)
+                    {
+                        for(UInt32 i = 0; i < sizeDis; ++ i)
+                        {
+                            _lbAttrConf.dis[i] = table_dis.get<UInt16>(i + 1);
+                            _lbAttrConf.disChance[i] = table_disChance.get<UInt16>(i + 1);
+                        }
+                    }
+                }
+            }
+            {
+				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getLingbaoColor");
+				UInt32 size = std::min(4, table_temp.size());
+                for(UInt32 i = 0; i < size; ++ i)
+                {
+                    _lbAttrConf.colorVal[i] = table_temp.get<UInt16>(i + 1);
+                }
+            }
+            {
+				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getLingbaoSkills");
+				UInt32 size = std::min(2, table_temp.size());
+                for(UInt32 i = 0; i < size; ++ i)
+                {
+                    lua_tinker::table table_temp2 = table_temp.get<lua_tinker::table>(i);
+                    UInt32 size2 = table_temp2.size();
+                    for(UInt32 j = 0; j < size2; ++ j)
+                    {
+                        _lbAttrConf.skills[i].push_back(table_temp2.get<UInt16>(j + 1));
+                    }
+                }
             }
         }
         lua_close(L);

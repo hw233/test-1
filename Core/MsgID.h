@@ -371,6 +371,8 @@ namespace REQ
     const UInt8 EQ_ACTIVATE         = 0xBB;
     /**装备属性转移 */
     const UInt8 EQ_MOVE             = 0xBC;
+    /**灵宝通灵*/
+    const UInt8 EQ_LINGBAO          = 0xBD;
 
     // const UInt8 GETBOX              = 0xD4;
     // const UInt8 BLOCKBOSS           = 0xD5;
@@ -474,6 +476,7 @@ namespace REP
     const UInt8 EQ_SPIRIT           = 0xBA;
     const UInt8 EQ_ACTIVATE         = 0xBB;
     const UInt8 EQ_MOVE             = 0xBC;
+    const UInt8 EQ_LINGBAO          = 0xBD;
 
     const UInt8 CITY_INSIDE_MOVE    = 0xA0;// 0x51
     const UInt8 MAP_TRANSPORT       = 0xA1;// 0x52
