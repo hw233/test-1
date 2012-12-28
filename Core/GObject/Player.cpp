@@ -620,6 +620,7 @@ namespace GObject
         memset(cf_posPut, 0, sizeof(cf_posPut));
         memset(cf_itemId, 0, sizeof(cf_itemId));
         memset(cf_ratio, 0 ,sizeof(cf_ratio));
+        _hiattrFlag = false;
 	}
 
 

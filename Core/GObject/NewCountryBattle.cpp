@@ -63,6 +63,9 @@ bool NewCBPlayerData::canAddSkillFlag(UInt8 skillId)
 {
     if(skillId == 0 || skillId > 10)
         return false;
+    if((skillFlags & (1 << skillId)) != 0)
+        return false;
+    /*
     if(skillId <= 5)
     {
         for(UInt8 i = 1; i <= 5; ++i)
@@ -79,6 +82,7 @@ bool NewCBPlayerData::canAddSkillFlag(UInt8 skillId)
                 return false;
         }
     }
+    */
     return true;
 }
 
@@ -455,6 +459,7 @@ void NewCountryBattle::process(UInt32 curtime)
     if(curtime >= globalCountryBattle.getEndTime())
     {   //策划要求这里调结束
         m_pairPlayer.clear();
+        updateFirst();
         sendAllInfo();
         end();
         return;
@@ -822,7 +827,11 @@ void NewCountryBattle::handleBattle()
         UInt32 currHp1 = player1->getBattleCurrentHp();
         UInt32 currHp2 = player2->getBattleCurrentHp();
 
+        player1->setHiAttrFlag(true);
+        player2->setHiAttrFlag(true);
         bool res = player1->challenge(player2, NULL, NULL, false, 0, true, Battle::BS_NEWCOUNTRYBATTLE);
+        player1->setHiAttrFlag(false);
+        player2->setHiAttrFlag(false);
         GameAction()->RunOperationTaskAction1(player1, 2, res);
         GameAction()->RunOperationTaskAction1(player2, 2, !res);
 

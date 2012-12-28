@@ -866,6 +866,12 @@ function onActivityCheck(tm)
       setSnowAct(false)
   end
 
+  if tm >= actTime231_0 and tm < actTime231_1 then
+      setGoldSnakeAct(true)
+  else
+      setGoldSnakeAct(false)
+  end
+
   setRC7Day(true)
   setCFriend(true);
 
@@ -1050,6 +1056,9 @@ function initActTime(y, m, d)
   --圣诞堆雪人活动
   local  SerStartTm230 = { ['year'] = 2012, ['month'] = 12, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm230_1 = { ['year'] = 2012, ['month'] = 12, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --金蛇迎新活动
+  local  SerStartTm231 = { ['year'] = 2012, ['month'] = 12, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm231_1 = { ['year'] = 2013, ['month'] = 1, ['day'] = 6, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
 
   --300-399越南版用了
@@ -1393,6 +1402,9 @@ function initActTime(y, m, d)
 
   actTime230_0= os.time(SerStartTm230);
   actTime230_1= os.time(SerStartTm230_1);
+
+  actTime231_0= os.time(SerStartTm231);
+  actTime231_1= os.time(SerStartTm231_1);
 
   onActivityCheck(os.time() + 30);
 
