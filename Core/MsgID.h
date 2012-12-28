@@ -149,6 +149,8 @@ namespace REQ
     //const UInt8 CHANGE_NAME         = 0x60;
     /**加入国战 */
     const UInt8 CAMPS_WAR_JOIN      = 0x90;// 0x62
+    /**加入新国战 */
+    const UInt8 NEW_CAMPS_WAR_JOIN  = 0x2B;
     /**副本数据 */
     const UInt8 COPY_DATA           = 0x94;// 0x67
     /**阵图数据 */
@@ -632,6 +634,8 @@ namespace REP
     const UInt8 YD_GETPACKS         = 0x2D;
     const UInt8 YD_INFO             = 0x2E;
     const UInt8 YD_AWARD_RCV        = 0x2F;
+    /**加入新国战 */
+    const UInt8 NEW_CAMPS_WAR_JOIN  = 0x2B;
 
     /**跨服战-场外活动 */
     const UInt8 SERVER_ARENA_EXTRA_ACT = 0xE7;
@@ -731,6 +735,7 @@ namespace SPEQ
     const UInt16 SETLOGINLIMIT       = 0x138;// 设置平台一个ip最大登录数
     const UInt16 DELETEGOLD          = 0x139;// 删除仙石
     const UInt16 ADDRECHARGESCORE    = 0x140;// 增加充值的积分
+    const UInt16 SYSUPDATE           = 0x141;// 系统更新公告
 }
 
 namespace SPEP
@@ -784,6 +789,7 @@ namespace SPEP
     const UInt16 SETLOGINLIMIT       = 0x38;// 设置平台一个ip最大登录数
     const UInt16 DELETEGOLD          = 0x39;// 删除仙石
     const UInt16 ADDRECHARGESCORE    = 0x40;// 增加充值的积分
+    const UInt16 SYSUPDATE           = 0x41;// 系统更新公告
 }
 
 namespace ARENAREQ

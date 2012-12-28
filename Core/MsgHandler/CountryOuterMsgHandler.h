@@ -354,6 +354,7 @@ struct CountryBattleJoinStruct
 
 	MESSAGE_DEF1(REQ::CAMPS_WAR_JOIN, UInt8, _action);
 };
+
 struct LanchChallengeReq
 {
 	std::string target;
@@ -1022,6 +1023,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 		if(PLAYER_DATA(pl, inCity))
 			map->SendCityNPCs(pl);
 		map->SendAtCity(pl, PLAYER_DATA(pl, inCity) == 1);
+        globalCountryBattle.sendForNewCB(pl);
 	}
 	pl->GetMailBox()->notifyNewMail();
 	UInt8 level = pl->GetLev();
@@ -1084,6 +1086,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->GetHeroMemo()->sendHeroMemoInfo();
     pl->GetShuoShuo()->sendShuoShuo();
     pl->GetCFriend()->sendCFriend();
+    pl->GetStrengthenMgr()->CheckTimeOver(now);
     pl->sendRechargeInfo();
     pl->sendConsumeInfo();
     pl->sendRechargeNextRetInfo(now);
@@ -1202,6 +1205,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
             st << static_cast<UInt8>(17) << pl->GetVar(VAR_CONSUME_918) << Stream::eos;
             pl->send((st));
         }
+        pl->sendSysUpdate();
     }
     //if (World::getNeedRechargeRank() || time(NULL) <= World::getRechargeEnd() + 24*60*60)
     if (World::getNeedRechargeRank())
@@ -1222,6 +1226,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendCopyFrontAllAward();
     pl->sendGoodVoiceInfo();
     pl->send3366GiftInfo();
+    pl->sendFeastGiftAct();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -1821,6 +1826,16 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
                 return;
             br >> type;
             player->get3366GiftAward(type);
+        }
+        break;
+
+        case 7:
+        {
+            UInt8 type;
+            if(!World::getFeastLoginAct())
+                return;
+            br >> type;
+            player->getFeastGiftAward(type);
         }
         break;
 
@@ -2500,6 +2515,8 @@ struct CountryBattleJoinReply
 void CountryBattleJoinReq( GameMsgHdr& hdr, CountryBattleJoinStruct& req )
 {
 	MSG_QUERY_PLAYER(player);
+    if(WORLD().isNewCountryBattle())
+		return;
 	if(!PLAYER_DATA(player, inCity))
 		return;
 	UInt16 loc = PLAYER_DATA(player, location);
@@ -2509,6 +2526,7 @@ void CountryBattleJoinReq( GameMsgHdr& hdr, CountryBattleJoinStruct& req )
 
 	CountryBattleJoinReply rep;
 	CountryBattle * cb = spot->GetCountryBattle();
+    if(!cb) return;
 	if(req._action == 0)
 	{
 		rep.result = cb->playerEnter(player) ? 0 : 2;
@@ -2521,6 +2539,37 @@ void CountryBattleJoinReq( GameMsgHdr& hdr, CountryBattleJoinStruct& req )
     if(rep.result == 0)
         player->countryBattleUdpLog(1090, player->getCountry());
 	player->send(rep);
+}
+
+void NewCountryBattleJoinReq( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+    if(!WORLD().isNewCountryBattle())
+		return;
+	if(!PLAYER_DATA(player, inCity))
+		return;
+	UInt16 loc = PLAYER_DATA(player, location);
+	GObject::SpotData * spot = GObject::Map::Spot(loc);
+	if(spot == NULL || !spot->m_NewCountryBattle)
+		return;
+
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    brd >> type;
+	NewCountryBattle * ncb = spot->GetNewCountryBattle();
+    if(!ncb) return;
+	if(type == 0)
+		ncb->playerEnter(player);
+	else if(type == 1)
+		ncb->playerLeave(player);
+    else if(type == 2)
+        ncb->sendSelfInfo(player);
+    else if(type == 3)
+    {
+        UInt8 skillId = 0;
+        brd >> skillId;
+        ncb->useSkill(player, skillId);
+    }
 }
 
 void OnLanchChallengeReq( GameMsgHdr& hdr, LanchChallengeReq& lcr)
@@ -5560,6 +5609,7 @@ void OnExJob( GameMsgHdr & hdr, const void * data )
                 {
                     case 0:
                         // 放弃寻墨游戏
+                        jobHunter->OnAutoStop();
                         jobHunter->OnAbort(false);
                         break;
                     case 1:

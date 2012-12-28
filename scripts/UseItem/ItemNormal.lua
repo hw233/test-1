@@ -210,7 +210,7 @@ function ItemNormal_00000026(iid, num, bind, param)
 end
 
 function fixModelConflict(fgt, bufid)
-    local buffers = {5,7,8,9,0xa,0xb,0xc,0xe,0xf,0x10,0x11}
+    local buffers = {5,7,8,9,0xa,0xb,0xc,0xe,0xf,0x10,0x11,0x12}
     for n=1,#buffers do
         if bufid ~= buffers[n] then
             fgt:setBuffData(buffers[n], 0, true)
@@ -231,6 +231,24 @@ function ItemNormal_00000401(iid, num, bind, param)
 
     if ItemNormal_AddBuff(fgt, 5, 3600, num, 356400) then
         package:DelItemSendMsg(401, player);
+        return num;
+    end
+    return false
+end
+
+function ItemNormal_00009306(iid, num, bind, param)
+    local player = GetPlayer()
+    local fgt = player:findFighter(param);
+    local package = player:GetPackage();
+
+    if fgt == nil then
+        return false
+    end
+
+    fixModelConflict(fgt, 0x12)
+
+    if ItemNormal_AddBuff(fgt, 0x12, 3600, num, 356400) then
+        package:DelItemSendMsg(iid, player);
         return num;
     end
     return false
@@ -2426,7 +2444,7 @@ function ItemNormal_00000400(iid, num, bind, param)
         fgt:addPExp(n * 1000);
     end
 
-    package:DelItemSendMsg(400, player);
+    package:DelItemSendMsg(iid, player);
     return n;
 end
 
@@ -6928,7 +6946,7 @@ function ItemNormal_00009215(iid, num, bind, param)
         end
         total = total +1;
     end
-    player:AddVar(244, total);
+    --player:AddVar(244, total);
     package:DelItemSendMsg(iid, player)
     return total
 end
@@ -6937,6 +6955,21 @@ function ItemNormal_00009216(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
     player:setTitle(43, 0)
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00009276(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    player:setTitle(46, 0)
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+function ItemNormal_00009277(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    player:setTitle(47, 0)
     package:DelItemSendMsg(iid, player);
     return num;
 end
@@ -6970,6 +7003,71 @@ function ItemNormal_00009274(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
     player:setTitle(45, 0)
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00009311(iid, num, bind, param)
+    if iid < 9311 or iid > 9312 then
+        return 0
+    end
+    local player = GetPlayer()
+    local package = player:GetPackage()
+    local items = {
+        [9311] = {{1326, 2}, {30, 1}, {507, 1}, {503, 1}, {9076, 1}},
+        [9312] = {{1326, 2}, {30, 1}, {509, 1}, {500, 2}, {9076, 1}},
+    }
+    local chance = { 3000, 6000, 7000, 9000, 10000}
+    local r = math.random(1, 10000)
+    for i = 1, #chance do
+        if r <= chance[i] then
+            package:Add(items[iid][i][1], items[iid][i][2], 1, 0, 2);
+            break
+        end
+    end
+    package:DelItemSendMsg(iid, player)
+    return num
+end
+
+function ItemNormal_00009314(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage()
+    local items = { 503, 9088, 512, 33, 15, 514, 501, 513, 1325, 134, 507, 509, 515, 551 }
+    local chance = { 510, 1510, 2510, 3530, 5330, 6230, 7080, 7930, 8180, 8430, 8630, 8830, 9000, 10000 }
+    local used = 0
+    for n = 1, num do
+        if package:GetRestPackageSize() < 1 then
+            if used ~= 0 then
+                package:DelItemSendMsg(iid, player)
+            end
+            player:sendMsgCode(2, 1011, 0)
+            player:AddVar(244, used)
+            return used
+        end
+        local rand = math.random(1,10000)
+        local g = 0
+        for i = 1, #chance do
+            if rand <= chance[i] then
+                g = i
+                break
+            end
+        end
+        package:Add(items[g], 1, true, false, 2)
+        if g > 8 then
+            Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."打开了金蛇宝箱，幸运的获得了".."[4:"..items[g].."]x1")
+        end
+        package:DelItemSendMsg(iid, player)
+        used = used + 1
+    end
+
+    player:AddVar(244, used)
+    return used
+end
+
+function ItemNormal_00009315(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    player:setTitle(48, 0)
     package:DelItemSendMsg(iid, player);
     return num;
 end
@@ -7073,6 +7171,7 @@ local ItemNormal_Table = {
     [402] = ItemNormal_00000402,
     [403] = ItemNormal_00000403,
     [401] = ItemNormal_00000401,
+    [9306] = ItemNormal_00009306,
     [438] = ItemNormal_00000438,
     [439] = ItemNormal_00000439,
 	[30] = ItemNormal_00000030,
@@ -8665,11 +8764,19 @@ local ItemNormal_Table = {
     [9271] = ItemNormal_fighterCard,
     [9272] = ItemNormal_fighterCard,
     [9274] = ItemNormal_00009274,
+    [9276] = ItemNormal_00009276,
+    [9277] = ItemNormal_00009277,
 
     [9279] = ItemNormal_00009279,
     [9280] = ItemNormal_00009279,
     [9281] = ItemNormal_00009279,
     [9282] = ItemNormal_00009279,
+    [9283] = ItemNormal_00000400,
+
+    [9311] = ItemNormal_00009311,
+    [9312] = ItemNormal_00009311,
+    [9314] = ItemNormal_00009314,
+    [9315] = ItemNormal_00009315,
 
     [10000] = ItemNormal_00010000,
     [10001] = ItemNormal_00010001,

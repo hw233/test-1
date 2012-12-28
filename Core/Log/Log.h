@@ -96,6 +96,7 @@ enum PurchaseType
     EnumCopyFrontWin            = 85,
     Enum3366Gift                = 86,
     BUYJOYBUFF                  = 87, //购买心悦buff
+    EnumFEASTGIFT               = 88, //圣诞-登录礼包人人有
     //繁体私有占150～200
 };
 
@@ -142,6 +143,7 @@ enum MailItemType
     BuChangNewRC7Day,
     NEWJOBHIRE,
     BuChangMo,
+    NewCountryBattleAward,
 };
 enum ItemFrom
 {
@@ -183,7 +185,9 @@ enum ItemFrom
     FromNewRC7DayTarget,
     FromDailyStrengthen = 37, //变强秘宝
     FromJobHunter = 38, // 寻墨游戏
-    FromFuling = 39, // 灵宝附灵
+    //80 ~ 100，繁体占用
+    FromDreamer = 39, // 水晶梦境
+    FromFuling = 40, // 灵宝附灵
 };
 
 enum ItemTo

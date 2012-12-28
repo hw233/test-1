@@ -539,6 +539,13 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
                 randNum = 10;
             player->GetPackage()->AddItem2(9209, randNum, true, true);
         }
+        if(World::getGoldSnakeAct())
+        {
+            if(PLAYER_DATA(player, dungeonCnt) > getMaxCount())
+                player->GetPackage()->Add(9314, 2, true, false);
+            else
+                player->GetPackage()->Add(9314, 1, true, false);
+        }
         if (GObject::Tianjie::instance().isTjOpened())
         { 
             player->GetPackage()->AddItem(9138, 1, false, false);

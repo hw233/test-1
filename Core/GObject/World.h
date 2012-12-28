@@ -98,6 +98,12 @@ typedef std::multiset<QixiPair*, ScoreGreater> QixiPlayerSet;
 typedef QixiPlayerSet::iterator QixiPlayersIt;
 typedef std::map<Player*, QixiPlayersIt> QixiScoreMap;
 
+typedef QixiScore SnowScore;
+typedef QixiPair  SnowPair;
+typedef QixiPlayerSet SnowPlayerSet;
+typedef QixiPlayersIt SnowPlayersIt;
+typedef QixiScoreMap  SnowScoreMap;
+
 struct ValueSort
 {
     UInt32 sufferCnt;
@@ -120,6 +126,7 @@ public:
 public:
 	inline UInt32 ThisDay() { return _today; }
 	inline UInt32 Now() { return _now; }
+	inline bool isNewCountryBattle() { return !(_wday % 2); }
 
     inline static bool isFBVersion() { return cfg.fbVersion; }
     inline static bool isVTVersion() { return cfg.vtVersion; }
@@ -335,6 +342,24 @@ public:
     { _ssToolbarAct= v; }
     inline static bool getSSToolbarAct()
     { return _ssToolbarAct; }
+
+    inline static void setSnowAct(bool v)
+    { _snowAct= v; }
+    inline static bool getSnowAct()
+    { return _snowAct; }
+    inline static void setGoldSnakeAct(bool v)
+    { _goldSnakeAct= v; }
+    inline static bool getGoldSnakeAct()
+    { return _goldSnakeAct; }
+    inline static void setFeastLoginAct(bool v)
+    { _feastloginAct= v; }
+    inline static bool getFeastLoginAct()
+    { return _feastloginAct; }
+
+    inline static void setTowerLoginAct(UInt8 v)
+    { _towerloginAct= v; }
+    inline static UInt8 getTowerLoginAct()
+    { return _towerloginAct; }
 
     inline static void setGuoqing(bool v)
     { _guoqing = v; }
@@ -622,6 +647,10 @@ public:
     static bool _wansheng;
     static bool _11Act;
     static bool _ssToolbarAct;
+    static bool _snowAct;
+    static bool _goldSnakeAct;
+    static bool _feastloginAct;
+    static UInt8 _towerloginAct;
     static bool _guoqing;
     static bool _9215Act;
     static bool _enchant_gt11;
@@ -712,6 +741,13 @@ public:
     void SendGuoqingAward();
     void sendQixiScoreAward(Player* pl);
     void SendXiaoyaoAward();
+    void SendGoldSnakeAward();
+
+    void UpdateSnowScore(Player* pl, Player* lover);
+    void sendSnowPlayers(Player* pl);
+    void DivorceSnowPair(Player* pl);
+    void LoadSnowScore(Player* pl, Player* lover);
+    void SendSnowAward();
 
     void killMonsterAppend(Stream& st, UInt8 index);
     void killMonsterInit();
@@ -730,6 +766,8 @@ private:
 
     QixiScoreMap _qixiScoreMap;
     QixiPlayerSet _qixiPlayerSet;
+    SnowScoreMap _snowScoreMap;
+    SnowPlayerSet _snowPlayerSet;
 };
 
     void CreateNewDB(UInt32 mon = 0, UInt32 year = 2011);

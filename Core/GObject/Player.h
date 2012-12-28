@@ -23,6 +23,8 @@
 #include "GObject/NewRelation.h"
 #include "StrengthenMgr.h"
 #include "JobHunter.h"
+#include "Dreamer.h"
+
 
 namespace Battle
 {
@@ -113,6 +115,8 @@ namespace GObject
 #define PLAYER_BUFF_SUFFER          0x47    //陷害间隔
 #define PLAYER_BUFF_JOYBUFF         0x48    //心悦会员
 
+#define PLAYER_BUFF_NEW_CBATTLE	    0x49    //新阵营战(蜀山论剑)
+
 #define PLAYER_BUFF_ATHL1           0x51
 #define PLAYER_BUFF_ATHL2           0x52
 #define PLAYER_BUFF_ATHL3           0x53
@@ -153,6 +157,14 @@ namespace GObject
 #define ARENA_SUFFER_END      ARENA_SINGUP_END+15*60
 #endif
 #define ARENA_ACT_SYSTEM          10
+
+
+
+#define OFFICAL 12
+#define PF_UNION 17
+#define PF_XY 171
+#define PF_XY_CH 10040
+
 	class Map;
 	class Player;
 	class ItemBase;
@@ -177,6 +189,8 @@ namespace GObject
     class CFriend;
     class HoneyFall;
     struct DeamonPlayerData;
+    class JobHunter;
+    class Dreamer;
 
     struct TripodData
     {
@@ -425,6 +439,13 @@ namespace GObject
         UInt8 event;
         UInt32 score;
         QixiInfo() : lover(NULL), bind(0), pos(0), event(0), score(0) {}
+    };
+    struct SnowInfo
+    {
+        Player* lover;
+        bool bind;
+        UInt32 score;
+        SnowInfo() :lover(NULL),bind(0),score(0) {}
     };
 
 	struct PlayerData
@@ -742,6 +763,16 @@ namespace GObject
 
 		inline UInt16 getFormation() const { return _playerData.formation; }
 		inline Lineup& getLineup(int idx) { return _playerData.lineup[idx]; }
+        inline UInt8 getLineupCount()
+        {
+            UInt8 c = 0;
+            for(int i = 0; i < 5; ++ i)
+			{
+				if(_playerData.lineup[i].fighter != NULL)
+					++c;
+			}
+            return c;
+        }
 
 		inline void SetSessionID(int session) { _session = session; }
 		inline int GetSessionID() const { return _session; }
@@ -926,12 +957,17 @@ namespace GObject
 		inline UInt32 getPendExp() { return _playerData.lastExp & 0x7FFFFFFF; }
 		bool regenHP(UInt32);
         UInt8 allHpP();
+        UInt32 getBattleMaxHp();
+        UInt32 getBattleCurrentHp(); 
 
         bool isCopyPassed(UInt8 copyid);
 
     private:
         GData::AttrExtra _hiattr;
+        bool _hiattrFlag;
     public:
+        inline void setHiAttrFlag(bool v) { _hiattrFlag = v; }
+        inline bool hasHiAttrFlag() { return _hiattrFlag; }
         void addHIAttr(const GData::AttrExtra&);
         void clearHIAttr();
         inline const GData::AttrExtra* getHIAttr() const { return &_hiattr; }
@@ -1414,6 +1450,7 @@ namespace GObject
         bool _isJumpingMap;
 
         QixiInfo m_qixi;
+        SnowInfo m_snow;
         bool _qixiBinding;
     public:
         inline bool isJumpingMap() { return _isJumpingMap; }
@@ -1447,6 +1484,29 @@ namespace GObject
         inline UInt32 getScore() { return m_qixi.score; }
         std::set<Player *>& getInviters() {return _friends[3];};
 
+        //堆雪人start
+        void loadSnowInfoFromDB(Player* pl, bool bind, UInt32 score)
+        {
+            m_snow.lover = pl;
+            m_snow.bind = bind;
+            m_snow.score = score;
+        }
+        SnowInfo& getSnowInfo() {return m_snow;};
+        void resetSnow();
+        void sendSnowInfo();
+        UInt32 getSnowScore() {return  m_snow.score;};
+        bool getSnowBind() {return m_snow.bind;};
+        Player* getSnowLover() {return m_snow.lover;};
+        void divorceSnowLover();
+        void beDivorceSnowLover(Player* pl);
+        void postSnowLover(Player* pl);
+        UInt8 beSnowLoverBind(Player* pl);
+        void onSnowLoverResp(bool bind);
+        UInt8 useSnowItem(UInt32 num);
+        void sendSnowScoreAward();
+        UInt8 getSnowAward(UInt16 type);
+        //推雪人end
+        
         void setForbidSale(bool b) {_isForbidSale = b;}
         bool getForbidSale() {return _isForbidSale;}
 	private:
@@ -1686,7 +1746,7 @@ namespace GObject
         void luckyDrawUdpLog(UInt32 id, UInt8 type, UInt32 num = 1);
         void qixiUdpLog(UInt32 id);
         void clanUdpLog(UInt32 id);
-        void countryBattleUdpLog(UInt32 id, UInt8 country);
+        void countryBattleUdpLog(UInt32 id, UInt8 country, std::string str = "");
         void secondSoulUdpLog(UInt32 id, UInt32 val = 0, UInt32 num = 1);
         void wBossUdpLog(UInt32 id);
         void clanCopyUdpLog(UInt32 id, UInt32 val = 0, UInt32 num = 1);
@@ -1726,6 +1786,7 @@ namespace GObject
         std::string m_via;
         std::string m_invited;
         bool m_isOffical;
+        bool m_isXY;
     public:
         inline void setDomain(const std::string& domain)
         {
@@ -1747,7 +1808,29 @@ namespace GObject
         }
         void setOpenId(const std::string& openid, bool load = false);
         inline void setOpenKey(const std::string& openkey) { strncpy(m_openkey, openkey.c_str(), 256); }
-        inline void setSource(const std::string& source) { m_source = source; }
+        inline void setSource(const std::string& source) 
+        { 
+            m_source = source; 
+
+            if (atoi(m_domain) == PF_UNION)
+            {
+                static const UInt32 XY_CHANNEL[] = {41, 47, 48, 49, 50, 51, 52, 53, 54, 56};
+                for (UInt32 i = 0; i < (sizeof(XY_CHANNEL) / sizeof(UInt32)); ++ i)
+                {
+                    char buf[16];
+                    snprintf (buf, 16, "-%d", XY_CHANNEL[i]);
+                    if (strstr(m_source.c_str(), buf))
+                    {
+                        m_isXY = true;
+                        return;
+                    }
+                    else
+                    {
+                        m_isXY = false;
+                    }
+                }
+            }
+        }
         inline void setVia(const std::string& via) { m_via = via; }
         inline void setInvited(const std::string& inv) { m_invited = inv; }
         inline const char* getDomain() const { return m_domain; }
@@ -1757,6 +1840,7 @@ namespace GObject
         inline const std::string& getVia() const { return m_via; }
         inline const std::string& getInvited() const { return m_invited; }
         inline bool isOffical() const { return m_isOffical; }
+        inline bool isXY() const { return m_isXY; }
         inline const char* getClientIp() const { return m_clientIp; }
 
         inline UInt8 getPlatform() const { return atoi(m_domain); }
@@ -1946,10 +2030,16 @@ namespace GObject
 
     public:
         JobHunter * getJobHunter();
-        void setJobHunter(std::string& fighterList, std::string& mapInfo, UInt8 progress, UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY, UInt32 stepCount);
+        void setJobHunter(std::string& fighterList, std::string& mapInfo, UInt8 progress, UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY, UInt32 stepCount, UInt8 slotVal1, UInt8 slotVal2, UInt8 slotVal3);
         void sendAutoJobHunter();
     private:
         JobHunter * _jobHunter;
+
+    public:
+        Dreamer * getDreamer();
+        void sendSysUpdate();
+    private:
+        Dreamer * _dreamer;
 
     public:
         bool hasFighterWithClass(UInt8 cls);
@@ -1976,6 +2066,10 @@ namespace GObject
         void get3366GiftAward(UInt8 type);
         void send3366GiftInfo();
         void sendQQGameGift1218();
+        void sendFeastLoginAct();
+        void sendTowerLoginAct();
+        void getFeastGiftAward(UInt8 type);
+        void sendFeastGiftAct();
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

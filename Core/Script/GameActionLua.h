@@ -154,6 +154,9 @@ namespace Script
 		Table RunDayTask(Player* player, UInt32 npcId);
 		Table RunDayTaskAccept(Player* player, UInt32 taskId, UInt32 npcId);
 
+        Table GetNewCountryBattleBuffs();
+        Table GetNCBEffortIdValue();
+        Table GetNewCountryBattleAward(UInt8 lvl);
         Table GetClanBattleBuffs();
         Table GetClanBattleDailyRewards();
         Table GetClanBattleWeekSortRewards();
@@ -275,7 +278,9 @@ namespace Script
         lua_tinker::table getTreasure(UInt8 id);
         UInt32 foundCave(UInt8 id);
         lua_tinker::table getStepAward(UInt32 step);
+        UInt16 getSpecialItem(UInt8 id, UInt8 index);
         lua_tinker::table getCopyFrontmapAward(UInt8 step, UInt16 localtion);
+        lua_tinker::table getDreamerTreasure(UInt8 id, UInt8 index);
 
     public:
 
@@ -336,6 +341,7 @@ namespace Script
         lua_tinker::table openPurpleBoxStrong();
         lua_tinker::table openOrangeBoxStrong();
         UInt8 RunThanksGivingDayAward(Player* player, UInt8 opt);
+        bool onGetFeastGiftAward(Player* player, UInt8 type);
         bool onFirstRecharge(Player* player, UInt8 index);
 
 	private:

@@ -302,6 +302,13 @@ namespace GObject
         VAR_3366GIFT = 291, //3366合作礼包
         VAR_CF_INDEX = 292, //副本、阵图通关索引，从1开始
         VAR_CF_LOCATION = 293, //副本、阵图据点索引
+        VAR_FEAST_LOGIN = 294, //节日套装人人拿
+        VAR_FEAST_GIFT = 295, //登录礼包人人有
+
+        //新阵营战临时代替udplog做统计使用
+        VAR_NCB_TOTALWIN = 296,     //蜀山论剑当天胜利场次
+        VAR_NCB_TOTALLOSE = 297,    //蜀山论剑当天失败场次
+        //注:使用298时清理数据库，之前使用过一次298
 
         //繁体版占用301-330
 
@@ -309,6 +316,10 @@ namespace GObject
         VAR_RECHARGE_SCORE = 340, //累计充值的积分
         VAR_JOYVIP_BUFF_GOT     = 341, //心悦Buff
         VAR_QQGAME_GIFT_1218 = 342,    //QQGame登录奖励 1218-1220
+        VAR_TOWER_LOGIN = 343,          // 楼一平台登录奖励
+        VAR_TOWER_LEVEL = 344,          // 楼一平台登录等级奖励
+        VAR_SNOW_AWARD     = 345,     //堆雪人奖励
+        VAR_HAS_MO_BATTLER = 346,       // 出战散仙里是否有墨家
         VAR_MAX,
     };
 
@@ -571,6 +582,7 @@ namespace GObject
             REGISTER_VAR(VAR_RECHARGE_SCORE, CYCLE_NONE);
             REGISTER_VAR(VAR_JOYVIP_BUFF_GOT, CYCLE_DAY);
             REGISTER_VAR(VAR_QQGAME_GIFT_1218, CYCLE_DAY);
+            REGISTER_VAR(VAR_SNOW_AWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_AWARD_SSTOOLBAR, CYCLE_NONE);
             REGISTER_VAR(VAR_EX_JOB_ENABLE, CYCLE_NONE);
             REGISTER_VAR(VAR_JOB_HUNTER_SPOT_ID, CYCLE_NONE);
@@ -592,6 +604,16 @@ namespace GObject
             REGISTER_VAR(VAR_3366GIFT, CYCLE_NONE);
             REGISTER_VAR(VAR_CF_INDEX, CYCLE_NONE);
             REGISTER_VAR(VAR_CF_LOCATION, CYCLE_NONE);
+            REGISTER_VAR(VAR_FEAST_LOGIN, CYCLE_NONE);
+            REGISTER_VAR(VAR_FEAST_GIFT, CYCLE_DAY);
+
+            REGISTER_VAR(VAR_NCB_TOTALWIN, CYCLE_DAY);
+            REGISTER_VAR(VAR_NCB_TOTALLOSE, CYCLE_DAY);
+
+            REGISTER_VAR(VAR_TOWER_LOGIN, CYCLE_DAY);
+            REGISTER_VAR(VAR_TOWER_LEVEL, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_HAS_MO_BATTLER, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

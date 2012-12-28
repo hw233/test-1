@@ -950,7 +950,10 @@ void TeamCopy::teamBattleStart(Player* pl, UInt8 type)
         if(res != 1)
             pl->checkDeath();
 
-        pl->setBuffData(PLAYER_BUFF_ATTACKING, now + turns);
+        if (pl->getVipLevel() >= 7 && turns > 30)
+            pl->setBuffData(PLAYER_BUFF_ATTACKING, now + 30);
+        else
+            pl->setBuffData(PLAYER_BUFF_ATTACKING, now + turns);
         pl->OnHeroMemo(MC_SLAYER, MD_MASTER, 0, 0);
     }
 }

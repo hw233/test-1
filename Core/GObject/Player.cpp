@@ -28,6 +28,7 @@
 #include "Boss.h"
 #include "Athletics.h"
 #include "CountryBattle.h"
+#include "NewCountryBattle.h"
 #include "Battle/BattleSimulator.h"
 #include "Battle/BattleFighter.h"
 #include "Script/GameActionLua.h"
@@ -74,6 +75,7 @@
 #include "MsgHandler/Memcached.h"
 #include "RechargeTmpl.h"
 #include "GData/ExpTable.h"
+#include "Version.h"
 
 #define NTD_ONLINE_TIME (4*60*60)
 #ifndef _DEBUG
@@ -565,7 +567,7 @@ namespace GObject
 #ifndef _WIN32
 		m_ulog(NULL),
 #endif
-		m_isOffical(false), m_sysDailog(false), m_hasTripod(false), _jobHunter(NULL)
+		m_isOffical(false), m_isXY(false), m_sysDailog(false), m_hasTripod(false), _jobHunter(NULL), _dreamer(NULL)
 	{
         m_ClanBattleStatus = 1;
         m_ClanBattleScore = 0;
@@ -618,6 +620,7 @@ namespace GObject
         memset(cf_posPut, 0, sizeof(cf_posPut));
         memset(cf_itemId, 0, sizeof(cf_itemId));
         memset(cf_ratio, 0 ,sizeof(cf_ratio));
+        _hiattrFlag = false;
 	}
 
 
@@ -907,7 +910,7 @@ namespace GObject
 
         continuousLogin(curtime);
         continuousLoginRF(curtime);
-        //sendYearRPInfo();
+        sendYearRPInfo();
 
         if (World::_halloween)
             sendHalloweenOnlineAward(curtime);
@@ -1071,6 +1074,7 @@ namespace GObject
 
         //QQGame登录奖励
         sendQQGameGift1218();
+        sendFeastLoginAct();
 
         char buf[64] = {0};
         snprintf(buf, sizeof(buf), "%"I64_FMT"u", _id);
@@ -1099,6 +1103,8 @@ namespace GObject
         }
         else
             udpLog("", "", "", "", "", "0", "login");
+
+        sendTowerLoginAct();
 
         if (!m_invited.empty())
         {
@@ -1154,15 +1160,9 @@ namespace GObject
 #endif
 #endif
 #endif // _WIN32
-#ifdef JOB_HUNTER_DEBUG
-#endif
 	}
 
 #define WEBDOWNLOAD 255
-#define OFFICAL 12
-#define PF_UNION 17
-#define PF_XY 171
-#define PF_XY_CH 10040
 
     void Player::udpLog(UInt8 platform, const char* str1, const char* str2, const char* str3, const char* str4,
                 const char* str5, const char* str6, const char* type, UInt32 count)
@@ -1471,11 +1471,14 @@ namespace GObject
         udpLog("clan", action, "", "", "", "", "act");
     }
 
-    void Player::countryBattleUdpLog(UInt32 id, UInt8 country)
+    void Player::countryBattleUdpLog(UInt32 id, UInt8 country, std::string str)
     {
         // 国战相关日志
-        char action[16] = "";
-        snprintf (action, 16, "F_%d_%d", id, country);
+        char action[32] = "";
+        if(str.empty())
+            snprintf (action, 32, "F_%d_%d", id, country);
+        else
+            snprintf (action, 32, "F_%d_%d_%s", id, country, str.c_str());
         udpLog("countryBattle", action, "", "", "", "", "act");
     }
 
@@ -2404,6 +2407,7 @@ namespace GObject
 			lup.pos = 12;
 			lup.updateId();
 		}
+        SetVar(VAR_HAS_MO_BATTLER, hasMo? 1: 0);
 		if(updatedb)
 		{
 			storeFighters();
@@ -2780,6 +2784,30 @@ namespace GObject
 		}
 		return 0;
 	}
+    
+    UInt32 Player::getBattleMaxHp()
+    {
+        UInt32 Hp = 0;
+        for(int j = 0; j < 5; ++ j)
+        {
+            Fighter* fighter = _playerData.lineup[j].fighter;
+            if(fighter)
+                Hp += fighter->getMaxHP();
+        }
+        return Hp;
+    }
+
+    UInt32 Player::getBattleCurrentHp()
+    {
+        UInt32 Hp = 0;
+        for(int j = 0; j < 5; ++ j)
+        {
+            Fighter* fighter = _playerData.lineup[j].fighter;
+            if(fighter)
+                Hp += fighter->getCurrentHP() > 0 ? fighter->getCurrentHP() : fighter->getMaxHP();
+        }
+        return Hp;
+    }
 
     UInt8 Player::allHpP()
     {
@@ -3304,7 +3332,10 @@ namespace GObject
 		if(!res)
 			checkDeath();
 
-		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns());
+        if (getVipLevel() >= 7 && bsim.getTurns() > 30)
+            setBuffData(PLAYER_BUFF_ATTACKING, now + 30);
+        else
+		    setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns());
 
 		return res;
 	}
@@ -5451,6 +5482,16 @@ namespace GObject
             heroIsland.playerLeave(this);
             delFlag(Player::InHeroIsland);
         }
+        SpotData * spotData = GetMapSpot();
+        if(spotData && spotData->m_CountryBattle)
+        {
+            GObject::CountryBattle *cb = spotData->GetCountryBattle();
+	        NewCountryBattle * ncb = spotData->GetNewCountryBattle();
+            if(WORLD().isNewCountryBattle() && ncb)
+                ncb->playerLeave(this);
+            if(!WORLD().isNewCountryBattle() && cb)
+                cb->playerLeave(this);
+        }
         ClanRankBattleMgr::Instance().PlayerLeave(this);
 
         if (_playerData.location == CLAN_COPY_LOCATION)
@@ -6660,7 +6701,8 @@ namespace GObject
 
 	void Player::autoRegenAll()
 	{
-		if(hasFlag(CountryBattle | ClanBattling | ClanRankBattle))
+		//if(hasFlag(CountryBattle | ClanBattling | ClanRankBattle))
+		if(hasFlag(ClanBattling | ClanRankBattle))
 			return;
 		UInt32 autohp = 0; // getBuffData(0);
 		//if(autohp == 0)
@@ -7030,6 +7072,19 @@ namespace GObject
                     newRC7DayUdpLog(1152, 1);
                 }
             }
+        }
+        
+        if(World::getTowerLoginAct() && !GetVar(VAR_TOWER_LEVEL) && strcasestr(m_via.c_str(), "sscq_dlhd") && nLev >= 40)
+        {
+            SYSMSGV(title, 4106);
+            SYSMSGV(content, 4107);
+            Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            if(mail)
+            {
+                MailPackage::MailItem mitem[6] = {{516,1},{509,1},{507,1},{56,3},{57,3},{503,1}};
+                mailPackageManager.push(mail->id, mitem, 6, true);
+            }
+            SetVar(VAR_TOWER_LEVEL, 1);
         }
 
         if(_clan != NULL)
@@ -10706,7 +10761,7 @@ namespace GObject
 
     void Player::getAwardBlueDiamond(UInt8 opt)
     {
-        if(opt == 1 || opt == 2 || opt == 3) //抽奖
+        if(opt >= 1) //抽奖
         {
             UInt8 idx = 0;
             if( 0 == (idx = GameAction()->RunBlueDiamondAward(this, opt)) )
@@ -13181,7 +13236,7 @@ namespace GObject
         }
         if ( type == 4)
         {
-            if (getBuffData(PLAYER_BUFF_JOYBUFF, TimeUtil::Now())-TimeUtil::Now() >= 99*3600)
+            if (getBuffData(PLAYER_BUFF_JOYBUFF, TimeUtil::Now()) >= TimeUtil::Now() + 99*3600)
                 return;
 
             if (getGold() >= 5)
@@ -14303,11 +14358,11 @@ namespace GObject
    }
 
    void Player::setJobHunter(std::string& fighterList, std::string& mapInfo, UInt8 progress,
-           UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY, UInt32 stepCount)
+           UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY, UInt32 stepCount, UInt8 slotVal1, UInt8 slotVal2, UInt8 slotVal3)
    {
        if (_jobHunter)
            return;
-       _jobHunter = new JobHunter(this, fighterList, mapInfo, progress, posX, posY, earlyPosX, earlyPosY, stepCount);
+       _jobHunter = new JobHunter(this, fighterList, mapInfo, progress, posX, posY, earlyPosX, earlyPosY, stepCount, slotVal1, slotVal2, slotVal3);
    }
 
    void Player::sendAutoJobHunter()
@@ -14520,6 +14575,264 @@ void EventTlzAuto::notify(bool isBeginAuto)
         m_qixi.lover = NULL;
         DB1().PushUpdateData("UPDATE `qixi` SET `bind`=0, `lover`=0 WHERE `playerId` = %"I64_FMT"u", getId());
     }
+
+    void Player::resetSnow()
+    {
+        m_snow.bind = 0;
+        m_snow.lover = NULL;
+        DB1().PushUpdateData("UPDATE `snow` SET `bind`=0, `lover`=0 WHERE `playerId` = %"I64_FMT"u", getId());
+    }
+
+    void Player::sendSnowInfo()
+    {
+        Stream st(REP::ACTIVE);
+        st << static_cast<UInt8>(0x05) << static_cast<UInt8>(0x01) << static_cast<UInt8>(0x01);
+        UInt32 score = m_snow.score;
+        if(m_snow.lover && m_snow.bind)
+        {
+            st << m_snow.lover->getName();
+    //        score += m_snow.lover->getSnowScore();
+        }
+        else
+            st << "";
+
+        st << score << static_cast<UInt8>(m_snow.bind) << static_cast<UInt16>(GetVar(VAR_SNOW_AWARD));
+        st << Stream::eos;
+        send(st);
+    }
+
+    void Player::divorceSnowLover()
+    {
+        if(!m_snow.bind)
+            return;
+        Player* pl = m_snow.lover;
+        m_snow.lover = NULL;
+        m_snow.bind = 0;
+
+        pl->beDivorceSnowLover(this);
+       // qixiUdpLog(1085);
+
+		DB1().PushUpdateData("UPDATE `snow` SET `lover`=0, `bind`=0 WHERE `playerId` = %"I64_FMT"u", getId());
+        WORLD().DivorceSnowPair(this);
+        sendSnowInfo();
+    }
+    void Player::beDivorceSnowLover(Player* pl)
+    {
+        if(m_snow.lover != pl)
+            return;
+
+        m_snow.bind = 0;
+        m_snow.lover = NULL;
+
+        sendMsgCode(0, 1034);
+		DB1().PushUpdateData("UPDATE `snow` SET `bind`=0,`lover`=0 WHERE `playerId` = %"I64_FMT"u", getId());
+        sendSnowInfo();
+    }
+
+    void Player::postSnowLover(Player* pl)
+    {
+        if(m_snow.bind)
+            return;
+
+        if(!_hasFriend(0, pl))
+            return;
+        m_snow.lover = pl;
+        UInt8 bind = pl->beSnowLoverBind(this);
+        onSnowLoverResp(bind);
+        if(m_snow.bind)
+        {
+            WORLD().UpdateSnowScore(this, m_snow.lover);
+        }
+       // qixiUdpLog(1084);
+
+		DB1().PushUpdateData("REPLACE INTO `snow` (`score`, `bind`, `lover`, `playerId`) VALUES(%u, %u, %"I64_FMT"u, %"I64_FMT"u)", m_snow.score, m_snow.bind, pl->getId(), getId());
+    }
+    UInt8 Player::beSnowLoverBind(Player* pl)
+    {
+        UInt8 bind = 0;
+        if(m_snow.bind || m_snow.lover != pl)
+        {
+            bind = 0;
+        }
+        else
+        {
+            m_snow.bind = 1;
+            bind = 1;
+
+            DB1().PushUpdateData("UPDATE `snow` SET `bind`=%u WHERE `playerId` = %"I64_FMT"u", bind, getId());
+            sendSnowInfo();
+        }
+
+        return bind;
+    }
+    void Player::onSnowLoverResp(bool bind)
+    {
+        m_snow.bind = bind;
+
+        Stream st(REP::ACTIVE);
+        st << static_cast<UInt8>(0x05) << static_cast<UInt8>(0x02);
+        st << static_cast<UInt8>(bind);
+        st << Stream::eos;
+        send(st);
+    }
+    UInt8 Player::useSnowItem(UInt32 num)
+    {
+        //9275
+        if (GetPackage()->DelItemAny(9275, num))
+        {
+            UInt32 oldScore = m_snow.score;
+
+            UInt32 minScore = num * 3;
+            UInt32 maxScore = num * 5;
+            UInt32 score = minScore + uRand(maxScore-minScore);
+            m_snow.score += score;
+            AddPExp(99*num);
+
+//            sendSnowScoreAward();
+//            if (m_snow.bind && m_snow.lover != NULL)
+//                m_snow.lover->sendSnowScoreAward();
+            if (oldScore < 300 && m_snow.score >= 300)
+            {
+                SYSMSG(title, 4112);
+                SYSMSGV(ctx, 4113, 300);
+                Mail * mail = GetMailBox()->newMail(NULL, 0x21, title, ctx, 0xFFFE0000);
+                if (mail)
+                {
+                    MailPackage::MailItem item = {1637,1};
+                    mailPackageManager.push(mail->id, &item, 1, true);
+                }
+            }
+            WORLD().UpdateSnowScore(this, m_snow.lover);
+            if (NULL !=  m_snow.lover)
+		        DB1().PushUpdateData("REPLACE INTO `snow` (`score`, `bind`, `lover`, `playerId`) VALUES(%u, %u, %"I64_FMT"u, %"I64_FMT"u)", m_snow.score, m_snow.bind, m_snow.lover->getId(), getId());
+            else
+		        DB1().PushUpdateData("REPLACE INTO `snow` (`score`, `bind`, `lover`, `playerId`) VALUES(%u, %u, 0, %"I64_FMT"u)", m_snow.score, m_snow.bind, getId());
+
+            return 0;
+        }
+        return 1;
+    }
+    void Player::sendSnowScoreAward()
+    {
+        static  MailPackage::MailItem s_item[][3] = {
+            {{1637,1}},
+            {{401,5},{547,5}},
+            {{509,2},{507,2}},
+            {{503,10},{516,10}},
+            {{134,5},{1325,5},{9076,5}},
+            {{1325,10},{134,10},{9076,10}}
+        };
+        static int s_itemCount[]= {1,2,2,2,3,3};
+        static UInt32 s_score[] = {300, 900, 1800, 3000, 5100, 9900};
+        UInt32 score = m_snow.score;
+  //      if (NULL != m_snow.lover && m_snow.bind)
+  //          score += m_snow.lover->getSnowScore();
+        UInt32 v =  GetVar(VAR_SNOW_AWARD) >> 8; //邮件是否已发的标志
+        for (UInt8 i = 0; i < sizeof(s_score)/sizeof(s_score[0]); ++i)
+        {
+            if (score < s_score[i])
+                break;
+            if (((v>>i) & 0x01) == 0)
+            {
+                SYSMSG(title, 4102);
+                SYSMSGV(ctx, 4103, s_score[i]);
+                Mail * mail = GetMailBox()->newMail(NULL, 0x21, title, ctx, 0xFFFE0000);
+                if (mail)
+                {
+                    mailPackageManager.push(mail->id, s_item[i], s_itemCount[i], true);
+                    v |= (0x01 << i);
+                }
+            }
+        }
+        if (v > (GetVar(VAR_SNOW_AWARD) >> 8))
+        {
+            v  = v << 8;
+            v |= GetVar(VAR_SNOW_AWARD);
+            SetVar(VAR_SNOW_AWARD, v);
+        }
+    }
+    UInt8 Player::getSnowAward(UInt16 type)
+    {
+        static  MailPackage::MailItem s_item1[4] = {{56,1},{502,1},{510,1},{548,1}};
+        static  MailPackage::MailItem s_item2[4] = {{514,1},{57,1},{500,1},{15,1}};
+        static  MailPackage::MailItem s_item3[4] = {{503,1},{512,1},{516,1},{513,1}};
+        static  MailPackage::MailItem s_item4[4] = {{1325,1},{134,1},{547,1},{551,1}};
+        static  MailPackage::MailItem s_item5[4] = {{401,3},{547,3},{511,3},{514,3}};
+        static  MailPackage::MailItem s_item6[4] = {{509,2},{507,2},{501,2},{513,2}};
+        static  MailPackage::MailItem s_item7[4] = {{503,8},{516,8},{500,8},{505,8}};
+        static  MailPackage::MailItem s_item8[4] = {{134,5},{1325,5},{9076,5},{507,5}};
+        static  MailPackage::MailItem s_item9[4] = {{1325,10},{134,10},{9076,10},{509,10}};
+  
+        if(GetPackage()->GetRestPackageSize() < 4)
+        {
+            sendMsgCode(0, 1011);
+            return 2;
+        }
+        UInt16 v = GetVar(VAR_SNOW_AWARD);
+        if ((v&type) == 1)
+            return 3;
+
+        UInt32 score = m_snow.score;
+       // if (m_snow.lover != NULL && m_snow.bind)
+       //     score += m_snow.lover->getSnowScore();
+        
+        UInt32 needScore = 0;
+        MailPackage::MailItem* pItems = NULL;
+        switch (type)
+        {
+            case 0x01:
+                needScore = 60;
+                pItems = s_item1;
+                break;
+            case 0x02:
+                needScore = 140;
+                pItems = s_item2;
+                break;
+            case 0x04:
+                needScore = 220;
+                pItems = s_item3;
+                break;
+            case 0x08:
+                needScore = 300;
+                pItems = s_item4;
+                break;
+            case 0x10:
+                needScore = 450;
+                pItems = s_item5;
+                break;
+            case 0x20:
+                needScore = 900;
+                pItems = s_item6;
+                break;
+            case 0x40:
+                needScore = 1500;
+                pItems = s_item7;
+                break;
+            case 0x80:
+                needScore = 2550;
+                pItems = s_item8;
+                break;
+            case 0x100:
+                needScore = 4950;
+                pItems = s_item9;
+                break;
+        }
+        if (needScore > score)
+            return 1;
+        if (pItems != NULL)
+        {
+            for (int i = 0; i < 4; ++i)
+            {
+                if (pItems[i].id == 0 )
+                    break;
+                m_Package->Add(pItems[i].id, pItems[i].count, true);
+            }
+            v |= type;
+            SetVar(VAR_SNOW_AWARD, v);
+        }
+        return 0;
+    }
+
 
     ///////////////////////////////////////////////
     // 帮派副本相关
@@ -15531,7 +15844,20 @@ void Player::getCopyFrontCurrentAward(UInt8 index)
         bind = 0;
     else
         bind = 1;
-    m_Package->Add(cf_itemId[curId], 1, bind);
+    UInt32 itemTmp = cf_itemId[curId];
+    if(bind)
+    {
+        //特殊处理4个相同的物品，绑定的全部是后者(前者可以是非全绑定，后者全部是绑定)
+        if(itemTmp == 135)
+            itemTmp = 133;
+        else if(itemTmp == 1412)
+            itemTmp = 1327;
+        else if(itemTmp == 1411)
+            itemTmp = 1326;
+        else if(itemTmp == 9283)
+            itemTmp = 400;
+    }
+    m_Package->Add(itemTmp, 1, bind);
 
     {
         char tag[32];
@@ -15635,6 +15961,17 @@ void Player::freshCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index)
     if(index !=  PLAYER_DATA(this, location))
         return;
 #endif
+    bool isPut = false;
+    for(UInt8 i = 0; i < 5; i++)
+    {
+        if(cf_posPut[i] != 0)
+        {
+            isPut = true;
+            break;
+        }
+    }
+    if(isPut)
+        return;
     if(getTael() < 50)
     {
         sendMsgCode(0, 1100);
@@ -15858,6 +16195,139 @@ void Player::sendQQGameGift1218()
         }
         SetVar(VAR_QQGAME_GIFT_1218, 1);
     }
+}
+
+void Player::sendFeastLoginAct()
+{
+    if(GetLev() < 40 || GetVar(VAR_FEAST_LOGIN) > 0 || !World::getFeastLoginAct())
+        return;
+    SYSMSGV(title, 4102);
+    SYSMSGV(content, 4103);
+    Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+    if(mail)
+    {
+        MailPackage::MailItem mitem = {1759,1};
+        mailPackageManager.push(mail->id, &mitem, 1, true);
+    }
+    SetVar(VAR_FEAST_LOGIN, 1);
+}
+
+void Player::sendTowerLoginAct()
+{
+    UInt8 day = World::getTowerLoginAct();
+    if (day > 7) return;
+
+    if (day && strcasestr(m_via.c_str(), "sscq_dlhd") && !GetVar(VAR_TOWER_LOGIN))
+    {
+        SYSMSGV(title, 4104);
+        SYSMSGV(content, 4105);
+        Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        if(mail)
+        {
+
+         MailPackage::MailItem item1[2] ={{56,3},   {57,3}};
+         MailPackage::MailItem item2[2] ={{508,1},  {506,1}};
+         MailPackage::MailItem item3[2] ={{56,3},   {57,3}};
+         MailPackage::MailItem item4[2] ={{508,1},  {506,1}};
+         MailPackage::MailItem item5[2] ={{56,3},   {57,3}};
+         MailPackage::MailItem item6[2] ={{508,1},  {506,1}};
+         MailPackage::MailItem item7[2] ={{509,1},  {507,1}};
+
+         MailPackage::MailItem* item[7] = {item1,item2,item3,item4,item5,item6,item7};
+
+         mailPackageManager.push(mail->id, item[day - 1], 2, true);
+        }
+        SetVar(VAR_TOWER_LOGIN, 1);
+
+        if(!GetVar(VAR_TOWER_LEVEL) && GetLev() >= 40)
+        {
+            SYSMSGV(title, 4106);
+            SYSMSGV(content, 4107);
+            Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            if(mail)
+            {
+                MailPackage::MailItem mitem[6] = {{516,1},{509,1},{507,1},{56,3},{57,3},{503,1}};
+                mailPackageManager.push(mail->id, mitem, 6, true);
+            }
+            SetVar(VAR_TOWER_LEVEL, 1);
+        }
+    }
+
+}
+
+void Player::getFeastGiftAward(UInt8 type)
+{
+    if(type == 0 || type > 2)
+        return;
+    bool bRet;
+    UInt32 status = GetVar(VAR_FEAST_GIFT);
+
+    if(type == 1)
+    {
+        if(status & 0x01)
+            return;
+        bRet = GameAction()->onGetFeastGiftAward(this, type);
+        if(bRet)
+        {
+            udpLog("huodong", "F_10000_15", "", "", "", "", "act");
+            status |= 0x01;
+            SetVar(VAR_FEAST_GIFT, status);
+            sendFeastGiftAct();
+        }
+    }
+    else
+    {
+        if(status & 0x02)
+            return;
+        if(getGold() < 30)
+        {
+            sendMsgCode(0, 1104);
+            return;
+        }
+        bRet = GameAction()->onGetFeastGiftAward(this, type);
+        if(bRet)
+        {
+            ConsumeInfo ci(EnumFEASTGIFT,0,0);
+            useGold(30,&ci);
+            status |= 0x02;
+            SetVar(VAR_FEAST_GIFT, status);
+            sendFeastGiftAct();
+        }
+    }
+}
+
+void Player::sendFeastGiftAct()
+{
+    if(!World::getFeastLoginAct())
+        return;
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(7);
+    UInt8 opt = GetVar(VAR_FEAST_GIFT);
+    st << opt;
+    st << Stream::eos;
+    send(st);
+}
+
+Dreamer* Player::getDreamer()
+{
+       if (GetVar(VAR_EX_JOB_ENABLE) < 2)
+           return NULL;
+       if (!_dreamer)
+       {
+           _dreamer = new Dreamer(this);
+       }
+       return _dreamer;
+}
+
+void Player::sendSysUpdate()
+{
+   //版本更新公告
+   Stream st(REP::SYSDAILOG);
+   st << static_cast<UInt8>(1);
+   st << static_cast<UInt8>(1);
+   st << (char*)VERSION;
+   st << Stream::eos;
+   send(st);
 }
 
 } // namespace GObject

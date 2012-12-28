@@ -106,6 +106,7 @@ private:
     void OnForbidSale(GObject::Player *player, std::vector<std::string>&);
     void OnUnForbidSale(GObject::Player *player, std::vector<std::string>&);
     void OnSetLoginLimit(GObject::Player *player, std::vector<std::string>&);
+    void OnSysUpdate(GObject::Player *player, std::vector<std::string>&);
 
     void OnSetBosslevel(GObject::Player *player, std::vector<std::string>&);
     void OnQQVipKey(GObject::Player *player, std::vector<std::string>&);
@@ -170,6 +171,7 @@ private:
     void OnShowBattlePoint(GObject::Player* player, std::vector<std::string>& arge);
     void OnIdipBuy(GObject::Player* player, std::vector<std::string>& arge);
     void OnStrengthen(GObject::Player *player, std::vector<std::string>& args);
+    void OnNewCountryBattle(GObject::Player *player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;
