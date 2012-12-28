@@ -314,6 +314,10 @@ public:
     // 五彩元石
     inline std::vector<UInt16>& getPassiveSkillOnOtherDead() { return _passkl[GData::SKILL_ONOTHERDEAD-GData::SKILL_PASSSTART]; }
 
+    // 反击后触发的技能
+    inline std::vector<UInt16>& getPassiveSkillOnCounter() { return _rpasskl[GData::SKILL_ONCOUNTER-GData::SKILL_PASSSTART]; }
+    inline std::vector<UInt16>& getPassiveSkillOnCounter100() { return _passkl[GData::SKILL_ONCOUNTER-GData::SKILL_PASSSTART]; }
+
     // 取得心法带出技能的ID表
     const std::vector<const GData::SkillBase*>& skillFromCitta(UInt16 citta);
 

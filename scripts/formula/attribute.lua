@@ -23,7 +23,7 @@ pierce_max = 80
 tough_max = 80
 counter_max = 65
 magres_max = 75
-critical_damage_max = 300
+critical_damage_max = 3
 
 
 function getEvadeFactor()
