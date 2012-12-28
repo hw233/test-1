@@ -470,18 +470,20 @@ int query_fighters_battle_req(JsonHead* head, json_t* body, json_t* retbody, std
         err += "player not exist!";
         return EPLAYER_NOT_EXIST;
     }
-    std::map<UInt32, GObject::Fighter *>& fm = player->getFighterMap();    
-    UInt32 count = fm.size();
+    //std::map<UInt32, GObject::Fighter *>& fm = player->getFighterMap();    
+    UInt32 count = player->getLineupCount();
     json_insert_pair_into_object(retbody, "ullRoleId", json_new_string(playerId));
     json_insert_pair_into_object(retbody, "szRoleName", json_new_string(fixPlayerName(player->getName()).c_str()));
     json_insert_pair_into_object(retbody, "pSummonList_count", my_json_new_number(count));
     json_t* arr = json_new_array();
     if (arr)
     {
-        std::map<UInt32, GObject::Fighter *>::iterator iter;
-        for (iter = fm.begin(); iter != fm.end(); ++iter)
+       // std::map<UInt32, GObject::Fighter *>::iterator iter;
+       // for (iter = fm.begin(); iter != fm.end(); ++iter)
+        for (int i = 0; i < 5; i++)
         {
-            GObject::Fighter* fgt = iter->second; 
+            GObject::Lineup& lp= player->getLineup(i);
+            GObject::Fighter* fgt = lp.fighter; 
             json_t* obj = json_new_object();
             if (obj && fgt)
             {

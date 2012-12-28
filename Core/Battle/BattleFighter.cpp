@@ -516,7 +516,7 @@ void BattleFighter::updateBuffExtras()
 		addAttrExtra(_attrExtra, &_attrbylevel);
 	}
 
-    if(_fighter && _fighter->getOwner())
+    if(_fighter && _fighter->getOwner() && _fighter->getOwner()->hasHiAttrFlag())
     {
         const GData::AttrExtra* ae = _fighter->getOwner()->getHIAttr();
         if (ae)

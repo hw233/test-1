@@ -69,6 +69,7 @@ MSG_REG(GameMsgHdr, OnCanAcceptTaskReq);
 MSG_REG(GameMsgHdr, OnTaskActionReq);
 MSG_REG(GameMsgHdr, OnTaskNpcActionReq);
 MSG_REG(GameMsgHdr, CountryBattleJoinReq);
+MSG_REG_2(GameMsgHdr, REQ::NEW_CAMPS_WAR_JOIN, NewCountryBattleJoinReq);
 //MSG_REG(GameMsgHdr, OnChallengePlayerReq);
 MSG_REG(GameMsgHdr, OnLanchChallengeReq);
 MSG_REG(GameMsgHdr, OnRequestChallengeReq);
@@ -241,6 +242,8 @@ MSG_REG_2(GameMsgHdr, 0x295, OnDelTradeNotify);
 
 MSG_REG_2(GameMsgHdr, 0x296, OnAddAwardGold);
 MSG_REG_2(GameMsgHdr, 0x297, OnCreateAward);
+
+//0x298~0x299,0x314~0x319 繁体占用
 
 MSG_REG_2(GameMsgHdr, 0x2A1, OnAutoJobHunterStep);
 

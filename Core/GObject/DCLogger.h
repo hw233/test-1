@@ -77,6 +77,7 @@ public:
     bool fee(Player* player, UInt32 total, Int32 c);
     bool blue(Player* player);
     bool d3d6(Player* player);
+    UInt8 getDomain_sec(Player* player);
 
     void online();
 

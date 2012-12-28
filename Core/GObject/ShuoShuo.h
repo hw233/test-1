@@ -57,6 +57,8 @@ enum {
     SS_MO_STRENGTH      = 46,
     SS_MO_BATTLE        = 47,
     SS_MO_COPY          = 48,
+    /** 繁体占用60~70 **/
+    SS_GEM_FRESH        = 60,
     SS_MAX
 };
 

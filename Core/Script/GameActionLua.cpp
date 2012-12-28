@@ -701,6 +701,21 @@ namespace Script
 		return Run<Table>(player, buffer, npcId);
 	}
 
+    Table GameActionLua::GetNewCountryBattleBuffs()
+    {
+        return Run<Table>(NULL, "getNewCountryBattleBuffs");
+    }
+
+    Table GameActionLua::GetNCBEffortIdValue()
+    {
+        return Run<Table>(NULL, "getNCBEffortIdValue");
+    }
+
+    Table GameActionLua::GetNewCountryBattleAward(UInt8 lvl)
+    {
+        return Call<Table>("getNewCountryBattleAward", lvl);
+    }
+
     Table GameActionLua::GetClanBattleBuffs()
     {
         return Run<Table>(NULL, "getClanBattleBuffs");

@@ -3,6 +3,8 @@
 #include "Server/SysMsg.h"
 #include "Player.h"
 #include "NewRelation.h"
+#include "Country.h"
+#include "Script/GameActionLua.h"
 
 namespace GObject
 {
@@ -93,6 +95,8 @@ void NewRelation::attack(Player *atker, Player *defer)
     atker->setBuffData(PLAYER_BUFF_N_ATHLETICS, TimeUtil::Now() + 180);
     defer->setBuffData(PLAYER_BUFF_N_ATHLETICS, TimeUtil::Now() + 180);
 
+    GameAction()->doStrong(atker, SthChallenge, 0, 0);
+    GameAction()->doStrong(defer, SthChallenge, 0, 0);
     UInt8 tid = defer->getThreadId();
 	if(tid == atker->getThreadId())
 	{

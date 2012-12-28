@@ -109,6 +109,9 @@ function loadStore()
         if getSnowAct() then
             store:add(2, 9275, 10)
         end
+        if getGoldSnakeAct() then
+            store:add(2, 9314, 20)
+        end
 
         if is1221_1227() then
             store:add(2, 1709, 599) --圣诞萌萌的糖
