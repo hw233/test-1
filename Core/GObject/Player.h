@@ -964,7 +964,10 @@ namespace GObject
 
     private:
         GData::AttrExtra _hiattr;
+        bool _hiattrFlag;
     public:
+        inline void setHiAttrFlag(bool v) { _hiattrFlag = v; }
+        inline bool hasHiAttrFlag() { return _hiattrFlag; }
         void addHIAttr(const GData::AttrExtra&);
         void clearHIAttr();
         inline const GData::AttrExtra* getHIAttr() const { return &_hiattr; }
