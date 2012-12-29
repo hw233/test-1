@@ -5730,6 +5730,15 @@ void OnEquipLingbaoReq( GameMsgHdr & hdr, const void * data )
             }
         }
         break;
+    case 4:
+        {
+            pkg->closeLingbaoSmelt();
+        }
+        break;
+    case 5:
+        {
+            pkg->sendLingbaoSmeltInfo();
+        }
     case 6:
         {
             pkg->FinishLBSmelt();
