@@ -543,7 +543,6 @@ void NewCountryBattle::end()
 
         player->SetVar(VAR_NCB_TOTALWIN, ncbpData->totalWin);
         player->SetVar(VAR_NCB_TOTALLOSE, ncbpData->totallose);
-        player->SetVar(VAR_NCB_TOTALACHIEVE, ncbpData->totalAchievement + count);
         player->countryBattleUdpLog(1091, player->getCountry());
         player->countryBattleUdpLog(1217, 1, Itoa(ncbpData->totalWin)+","+Itoa(ncbpData->totallose)+","+Itoa(ncbpData->totalAchievement + count));
         //player->countryBattleUdpLog(1217, 2, ncbpData->totallose);
@@ -833,8 +832,6 @@ void NewCountryBattle::handleBattle()
         UInt8 kills2 = ncbpData2->currKillStreak;
         UInt16 achieve = 0;
         UInt16 loserAchieve = 4 + ((achLvl1 + achLvl2) / 2) / 2;
-        if(World::_wday == 1)
-            loserAchieve *= 2;
 
         UInt32 thisDay = TimeUtil::SharpDay();
         UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA(player1, created));

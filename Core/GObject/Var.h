@@ -308,7 +308,7 @@ namespace GObject
         //新阵营战临时代替udplog做统计使用
         VAR_NCB_TOTALWIN = 296,     //蜀山论剑当天胜利场次
         VAR_NCB_TOTALLOSE = 297,    //蜀山论剑当天失败场次
-        VAR_NCB_TOTALACHIEVE = 298, //蜀山论剑当天获得的总荣誉
+        //注:使用298时清理数据库，之前使用过一次298
 
         //繁体版占用301-330
 
@@ -609,7 +609,6 @@ namespace GObject
 
             REGISTER_VAR(VAR_NCB_TOTALWIN, CYCLE_DAY);
             REGISTER_VAR(VAR_NCB_TOTALLOSE, CYCLE_DAY);
-            REGISTER_VAR(VAR_NCB_TOTALACHIEVE, CYCLE_DAY);
 
             REGISTER_VAR(VAR_TOWER_LOGIN, CYCLE_DAY);
             REGISTER_VAR(VAR_TOWER_LEVEL, CYCLE_NONE);
