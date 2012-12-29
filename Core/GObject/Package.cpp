@@ -4463,11 +4463,11 @@ namespace GObject
             {
                 v = GObjectManager::getAttrTrumpMax(lv, types-1, q, crr);
                 values = fIed.extraAttr2.value1;
-                if(values * 90 > v)
+                if(values > v * 90)
                     extramoney = 50;
-                else if(values * 70 > v)
+                else if(values > v * 70)
                     extramoney = 20;
-                else if(values * 40 > v)
+                else if(values > v * 40)
                     extramoney = 10;
                 else
                     extramoney = 1;
@@ -4479,11 +4479,11 @@ namespace GObject
             {
                 v = GObjectManager::getAttrTrumpMax(lv, types-1, q, crr);
                 values = fIed.extraAttr2.value2;
-                if(values * 90 > v)
+                if(values > v * 90)
                     extramoney = 50;
-                else if(values * 70 > v)
+                else if(values > v * 70)
                     extramoney = 20;
-                else if(values * 40 > v)
+                else if(values > v * 40)
                     extramoney = 10;
                 else
                     extramoney = 1;
@@ -4495,11 +4495,11 @@ namespace GObject
             {
                 v = GObjectManager::getAttrTrumpMax(lv, types-1, q, crr);
                 values = fIed.extraAttr2.value3;
-                if(values * 90 > v)
+                if(values > v * 90)
                     extramoney = 50;
-                else if(values * 70 > v)
+                else if(values > v * 70)
                     extramoney = 20;
-                else if(values * 40 > v)
+                else if(values > v * 40)
                     extramoney = 10;
                 else
                     extramoney = 1;
@@ -4621,7 +4621,7 @@ namespace GObject
         DB4().PushUpdateData("UPDATE `equipment` SET `tRank` = %u,`maxTRank` = %u,`trumpExp` = %u,`type1` = %u,`type2` = %u,`type3` = %u,`value1` = %u,`value2` = %u,`value3` = %u WHERE `id` = %u", tIed.tRank, tIed.maxTRank, tIed.trumpExp, tIed.extraAttr2.type1, tIed.extraAttr2.type2, tIed.extraAttr2.type3, tIed.extraAttr2.value1, tIed.extraAttr2.value2, tIed.extraAttr2.value3, toEquip->getId());
 
         fIed.tRank = 0;
-        fIed.maxTRank = 0;
+        fIed.maxTRank = 1;
         fIed.trumpExp = 0;
         fIed.extraAttr2.type1 = 0;
         fIed.extraAttr2.type2 = 0;
