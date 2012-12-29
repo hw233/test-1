@@ -1071,6 +1071,7 @@ namespace GObject
 
         //QQGame登录奖励
         sendQQGameGift1218();
+        sendFeastLoginAct();
 
         char buf[64] = {0};
         snprintf(buf, sizeof(buf), "%"I64_FMT"u", _id);
@@ -15871,6 +15872,21 @@ void Player::sendQQGameGift1218()
         }
         SetVar(VAR_QQGAME_GIFT_1218, 1);
     }
+}
+
+void Player::sendFeastLoginAct()
+{
+    if(GetLev() < 40 || GetVar(VAR_FEAST_LOGIN) > 0 || !World::getFeastLoginAct())
+        return;
+    SYSMSGV(title, 4102);
+    SYSMSGV(content, 4103);
+    Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+    if(mail)
+    {
+        MailPackage::MailItem mitem = {1759,1};
+        mailPackageManager.push(mail->id, &mitem, 1, true);
+    }
+    SetVar(VAR_FEAST_LOGIN, 1);
 }
 
 } // namespace GObject

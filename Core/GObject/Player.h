@@ -1976,6 +1976,7 @@ namespace GObject
         void get3366GiftAward(UInt8 type);
         void send3366GiftInfo();
         void sendQQGameGift1218();
+        void sendFeastLoginAct();
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n
