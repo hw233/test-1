@@ -3357,15 +3357,19 @@ void GMHandler::OnNewCountryBattle(GObject::Player * player, std::vector<std::st
 void GMHandler::OnSysUpdate(GObject::Player *player, std::vector<std::string>& args)
 {
     UInt8 t = 0;
+    UInt8 show = 0;
     std::string v = VERSION;
     if (args.size() >= 1)
         t = atoll(args[0].c_str());
     if (args.size() >= 2)
-        v = args[1];
+        show = atoll(args[1].c_str());
+    if (args.size() >= 3)
+       v = args[2]; 
    //版本更新公告
    Stream st(REP::SYSDAILOG);
    st << static_cast<UInt8>(1);
    st << static_cast<UInt8>(t);
+   st << static_cast<UInt8>(show);
    st << v;
    st << Stream::eos;
    player->send(st);
