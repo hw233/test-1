@@ -773,6 +773,20 @@ public:
     void setShieldHPBuf(float value, UInt8 last);
     bool releaseShieldHPBuf();
 
+private:
+    std::vector<GData::SkillItem> _passiveSkillOnCounter;
+    std::vector<GData::SkillItem> _passiveSkillOnCounter100;
+    float _darkVigor, _dvFactor;
+    UInt8 _darkVigorLast;
+public:
+    inline float getDarkVigor() { return _darkVigor; }
+    inline float getDarkVigorFactor() { return (_darkVigorLast == 0 ? 0 : 0.15); }
+    void setDarkVigor(float value, UInt8 last);
+    void addDarkVigor(float value);
+    bool releaseDarkVigor();
+    const GData::SkillBase* getPassiveSkillOnCounter100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnCounter(bool noPossibleTarget = false);
+
 public:
 	enum StatusFlag
 	{
