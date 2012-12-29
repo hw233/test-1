@@ -620,6 +620,7 @@ namespace GObject
         memset(cf_posPut, 0, sizeof(cf_posPut));
         memset(cf_itemId, 0, sizeof(cf_itemId));
         memset(cf_ratio, 0 ,sizeof(cf_ratio));
+        _hiattrFlag = false;
 	}
 
 
@@ -15960,6 +15961,17 @@ void Player::freshCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index)
     if(index !=  PLAYER_DATA(this, location))
         return;
 #endif
+    bool isPut = false;
+    for(UInt8 i = 0; i < 5; i++)
+    {
+        if(cf_posPut[i] != 0)
+        {
+            isPut = true;
+            break;
+        }
+    }
+    if(isPut)
+        return;
     if(getTael() < 50)
     {
         sendMsgCode(0, 1100);

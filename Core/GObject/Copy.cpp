@@ -484,6 +484,22 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                     randNum = 10;
                 pl->GetPackage()->AddItem2(9209, randNum, true, true);
             }
+            if(World::getGoldSnakeAct())
+            {
+                UInt32 num = 0;
+                if(PLAYER_DATA(pl, copyFreeCnt) == getFreeCount() && PLAYER_DATA(pl, copyGoldCnt) > 0)
+                {
+                    if(3 <= PLAYER_DATA(pl, copyGoldCnt))
+                        num = 3;
+                    else if(2 == PLAYER_DATA(pl, copyGoldCnt))
+                        num = 2;
+                    else
+                        num = 1;
+                }
+                else
+                    num = 1;
+                pl->GetPackage()->Add(9314, num, true, false);
+            }
             if (GObject::Tianjie::instance().isTjOpened())
             {
                 pl->GetPackage()->AddItem(9138, 1, false, false);

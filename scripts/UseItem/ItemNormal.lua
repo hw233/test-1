@@ -6946,7 +6946,7 @@ function ItemNormal_00009215(iid, num, bind, param)
         end
         total = total +1;
     end
-    player:AddVar(244, total);
+    --player:AddVar(244, total);
     package:DelItemSendMsg(iid, player)
     return total
 end
@@ -7027,6 +7027,49 @@ function ItemNormal_00009311(iid, num, bind, param)
     end
     package:DelItemSendMsg(iid, player)
     return num
+end
+
+function ItemNormal_00009314(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage()
+    local items = { 503, 9088, 512, 33, 15, 514, 501, 513, 1325, 134, 507, 509, 515, 551 }
+    local chance = { 510, 1510, 2510, 3530, 5330, 6230, 7080, 7930, 8180, 8430, 8630, 8830, 9000, 10000 }
+    local used = 0
+    for n = 1, num do
+        if package:GetRestPackageSize() < 1 then
+            if used ~= 0 then
+                package:DelItemSendMsg(iid, player)
+            end
+            player:sendMsgCode(2, 1011, 0)
+            player:AddVar(244, used)
+            return used
+        end
+        local rand = math.random(1,10000)
+        local g = 0
+        for i = 1, #chance do
+            if rand <= chance[i] then
+                g = i
+                break
+            end
+        end
+        package:Add(items[g], 1, true, false, 2)
+        if g > 8 then
+            Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."打开了金蛇宝箱，幸运的获得了".."[4:"..items[g].."]x1")
+        end
+        package:DelItemSendMsg(iid, player)
+        used = used + 1
+    end
+
+    player:AddVar(244, used)
+    return used
+end
+
+function ItemNormal_00009315(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    player:setTitle(48, 0)
+    package:DelItemSendMsg(iid, player);
+    return num;
 end
 
 function ItemNormal_fighterCard(iid, num, bind, param)
@@ -8732,6 +8775,8 @@ local ItemNormal_Table = {
 
     [9311] = ItemNormal_00009311,
     [9312] = ItemNormal_00009311,
+    [9314] = ItemNormal_00009314,
+    [9315] = ItemNormal_00009315,
 
     [10000] = ItemNormal_00010000,
     [10001] = ItemNormal_00010001,
