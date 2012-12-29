@@ -1794,5 +1794,36 @@ void OnDelTianjieNpc( GameMsgHdr& hdr, const void * data)
 }
 
 
+void OnDelMapObj( GameMsgHdr& hdr, const void * data)
+{
+    struct MapNpc
+    {
+        UInt16 loc;
+        UInt32 npcId;
+    };
+    MapNpc* mapNpc = reinterpret_cast<MapNpc*>(const_cast<void *>(data));
+    if(!mapNpc)
+        return;
+    Map * map = Map::FromSpot(mapNpc->loc);
+    if (!map)
+        return;
+    map->Hide(mapNpc->npcId);
+    map->DelObject(mapNpc->npcId);
+}
+
+void OnAddMapObj( GameMsgHdr& hdr, const void * data)
+{
+    MOData* mo = reinterpret_cast<MOData*>(const_cast<void *>(data));
+    if(!mo)
+        return;
+    Map * map = Map::FromSpot(mo->m_Spot);
+    if (!map)
+        return;
+
+    map->AddObject(*mo);
+    map->Show(mo->m_ID, true, mo->m_Type);
+}
+
+
 #endif // _COUNTRYINNERMSGHANDLER_H_
 

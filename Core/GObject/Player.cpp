@@ -28,6 +28,7 @@
 #include "Boss.h"
 #include "Athletics.h"
 #include "CountryBattle.h"
+#include "NewCountryBattle.h"
 #include "Battle/BattleSimulator.h"
 #include "Battle/BattleFighter.h"
 #include "Script/GameActionLua.h"
@@ -74,6 +75,7 @@
 #include "MsgHandler/Memcached.h"
 #include "RechargeTmpl.h"
 #include "GData/ExpTable.h"
+#include "Version.h"
 
 #define NTD_ONLINE_TIME (4*60*60)
 #ifndef _DEBUG
@@ -565,7 +567,7 @@ namespace GObject
 #ifndef _WIN32
 		m_ulog(NULL),
 #endif
-		m_isOffical(false), m_sysDailog(false), m_hasTripod(false), _jobHunter(NULL), _dreamer(NULL)
+		m_isOffical(false), m_isXY(false), m_sysDailog(false), m_hasTripod(false), _jobHunter(NULL), _dreamer(NULL)
 	{
         m_ClanBattleStatus = 1;
         m_ClanBattleScore = 0;
@@ -618,6 +620,7 @@ namespace GObject
         memset(cf_posPut, 0, sizeof(cf_posPut));
         memset(cf_itemId, 0, sizeof(cf_itemId));
         memset(cf_ratio, 0 ,sizeof(cf_ratio));
+        _hiattrFlag = false;
 	}
 
 
@@ -1163,10 +1166,6 @@ namespace GObject
 	}
 
 #define WEBDOWNLOAD 255
-#define OFFICAL 12
-#define PF_UNION 17
-#define PF_XY 171
-#define PF_XY_CH 10040
 
     void Player::udpLog(UInt8 platform, const char* str1, const char* str2, const char* str3, const char* str4,
                 const char* str5, const char* str6, const char* type, UInt32 count)
@@ -1475,11 +1474,14 @@ namespace GObject
         udpLog("clan", action, "", "", "", "", "act");
     }
 
-    void Player::countryBattleUdpLog(UInt32 id, UInt8 country)
+    void Player::countryBattleUdpLog(UInt32 id, UInt8 country, std::string str)
     {
         // 国战相关日志
-        char action[16] = "";
-        snprintf (action, 16, "F_%d_%d", id, country);
+        char action[32] = "";
+        if(str.empty())
+            snprintf (action, 32, "F_%d_%d", id, country);
+        else
+            snprintf (action, 32, "F_%d_%d_%s", id, country, str.c_str());
         udpLog("countryBattle", action, "", "", "", "", "act");
     }
 
@@ -2408,6 +2410,7 @@ namespace GObject
 			lup.pos = 12;
 			lup.updateId();
 		}
+        SetVar(VAR_HAS_MO_BATTLER, hasMo? 1: 0);
 		if(updatedb)
 		{
 			storeFighters();
@@ -2784,6 +2787,30 @@ namespace GObject
 		}
 		return 0;
 	}
+    
+    UInt32 Player::getBattleMaxHp()
+    {
+        UInt32 Hp = 0;
+        for(int j = 0; j < 5; ++ j)
+        {
+            Fighter* fighter = _playerData.lineup[j].fighter;
+            if(fighter)
+                Hp += fighter->getMaxHP();
+        }
+        return Hp;
+    }
+
+    UInt32 Player::getBattleCurrentHp()
+    {
+        UInt32 Hp = 0;
+        for(int j = 0; j < 5; ++ j)
+        {
+            Fighter* fighter = _playerData.lineup[j].fighter;
+            if(fighter)
+                Hp += fighter->getCurrentHP() > 0 ? fighter->getCurrentHP() : fighter->getMaxHP();
+        }
+        return Hp;
+    }
 
     UInt8 Player::allHpP()
     {
@@ -3308,7 +3335,10 @@ namespace GObject
 		if(!res)
 			checkDeath();
 
-		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns());
+        if (getVipLevel() >= 7 && bsim.getTurns() > 30)
+            setBuffData(PLAYER_BUFF_ATTACKING, now + 30);
+        else
+		    setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns());
 
 		return res;
 	}
@@ -5455,6 +5485,16 @@ namespace GObject
             heroIsland.playerLeave(this);
             delFlag(Player::InHeroIsland);
         }
+        SpotData * spotData = GetMapSpot();
+        if(spotData && spotData->m_CountryBattle)
+        {
+            GObject::CountryBattle *cb = spotData->GetCountryBattle();
+	        NewCountryBattle * ncb = spotData->GetNewCountryBattle();
+            if(WORLD().isNewCountryBattle() && ncb)
+                ncb->playerLeave(this);
+            if(!WORLD().isNewCountryBattle() && cb)
+                cb->playerLeave(this);
+        }
         ClanRankBattleMgr::Instance().PlayerLeave(this);
 
         if (_playerData.location == CLAN_COPY_LOCATION)
@@ -6664,7 +6704,8 @@ namespace GObject
 
 	void Player::autoRegenAll()
 	{
-		if(hasFlag(CountryBattle | ClanBattling | ClanRankBattle))
+		//if(hasFlag(CountryBattle | ClanBattling | ClanRankBattle))
+		if(hasFlag(ClanBattling | ClanRankBattle))
 			return;
 		UInt32 autohp = 0; // getBuffData(0);
 		//if(autohp == 0)
@@ -15923,6 +15964,17 @@ void Player::freshCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index)
     if(index !=  PLAYER_DATA(this, location))
         return;
 #endif
+    bool isPut = false;
+    for(UInt8 i = 0; i < 5; i++)
+    {
+        if(cf_posPut[i] != 0)
+        {
+            isPut = true;
+            break;
+        }
+    }
+    if(isPut)
+        return;
     if(getTael() < 50)
     {
         sendMsgCode(0, 1100);
@@ -16275,6 +16327,18 @@ Dreamer* Player::getDreamer()
        }
 #endif
        return _dreamer;
+}
+
+void Player::sendSysUpdate()
+{
+   //版本更新公告
+   Stream st(REP::SYSDAILOG);
+   st << static_cast<UInt8>(1);
+   st << static_cast<UInt8>(1); //0:老版本 1:最新版
+   st << static_cast<UInt8>(1); //0:按钮不显示 1:按钮显示
+   st << (char*)VERSION;
+   st << Stream::eos;
+   send(st);
 }
 
 } // namespace GObject

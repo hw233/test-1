@@ -836,6 +836,12 @@ function onActivityCheck(tm)
           is_1221_1227 = false
       end
 
+      if tm >= actTime538 and tm < actTime538_1 then
+          setConsumeActive(true)
+      else
+          setConsumeActive(false)
+      end
+
       setShuoShuo(true);
   end
 
@@ -858,6 +864,12 @@ function onActivityCheck(tm)
       setSnowAct(true)
   else
       setSnowAct(false)
+  end
+
+  if tm >= actTime231_0 and tm < actTime231_1 then
+      setGoldSnakeAct(true)
+  else
+      setGoldSnakeAct(false)
   end
 
   setRC7Day(true)
@@ -987,6 +999,8 @@ function initActTime(y, m, d)
   -- 3366合作礼包
   local  SerStartTm536= { ['year'] = 2012, ['month'] = 12, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm537= { ['year'] = 2012, ['month'] = 12, ['day'] = 15, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 商城消耗返利
+  local  SerStartTm538= { ['year'] = 2013, ['month'] = 1, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   -- 繁体版
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1042,6 +1056,9 @@ function initActTime(y, m, d)
   --圣诞堆雪人活动
   local  SerStartTm230 = { ['year'] = 2012, ['month'] = 12, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm230_1 = { ['year'] = 2012, ['month'] = 12, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --金蛇迎新活动
+  local  SerStartTm231 = { ['year'] = 2012, ['month'] = 12, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm231_1 = { ['year'] = 2013, ['month'] = 1, ['day'] = 6, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
 
   --300-399越南版用了
@@ -1299,7 +1316,7 @@ function initActTime(y, m, d)
   actTime533_1 = os.time(SerStartTm533) + 5 * 86400;
 
   actTime534 = os.time(SerStartTm534);
-  actTime534_1 = os.time(SerStartTm534) + 20 * 86400;
+  actTime534_1 = os.time(SerStartTm534) + 32 * 86400;
 
   actTime535 = os.time(SerStartTm535);
   actTime535_1 = os.time(SerStartTm535) + 4 * 86400;
@@ -1309,6 +1326,9 @@ function initActTime(y, m, d)
 
   actTime537 = os.time(SerStartTm537);
   actTime537_1 = os.time(SerStartTm537) + 7 * 86400;
+
+  actTime538 = os.time(SerStartTm538);
+  actTime538_1 = os.time(SerStartTm538) + 7 * 86400;
 
   -- 繁体版
   actTime101 = os.time(SerStartTm101);
@@ -1382,6 +1402,9 @@ function initActTime(y, m, d)
 
   actTime230_0= os.time(SerStartTm230);
   actTime230_1= os.time(SerStartTm230_1);
+
+  actTime231_0= os.time(SerStartTm231);
+  actTime231_1= os.time(SerStartTm231_1);
 
   onActivityCheck(os.time() + 30);
 

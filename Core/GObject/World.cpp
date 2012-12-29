@@ -142,6 +142,7 @@ bool World::_wansheng= false;
 bool World::_11Act= false;
 bool World::_ssToolbarAct= false;
 bool World::_snowAct= false;
+bool World::_goldSnakeAct= false;
 bool World::_feastloginAct= false;
 UInt8 World::_towerloginAct= 0;
 bool World::_guoqing= false;
@@ -252,6 +253,7 @@ bool bRechargeEnd = false;
 bool bConsumeEnd = false;
 bool bXiaoyaoEnd = false;
 bool bSnowEnd = false;
+bool bGoldSnakeEnd = false;
 
 bool enum_midnight(void * ptr, void* next)
 {
@@ -391,6 +393,19 @@ bool enum_midnight(void * ptr, void* next)
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 26) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 27) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 28)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 31)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 6)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 7)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 9)
             ))
     {
         if (pl->isOnline())
@@ -627,7 +642,7 @@ void World::makeActivityInfo(Stream &st)
 }
 void World::calWeekDay( World * world )
 {
-	time_t curtime1 = time(NULL) + 300;
+	time_t curtime1 = time(NULL) + 30;
 	struct tm *local = localtime(&curtime1);
 	_wday = static_cast<UInt8>(local->tm_wday);
 	if(_wday == 0)
@@ -961,6 +976,7 @@ void World::World_Midnight_Check( World * world )
     bool bGuoqing = getGuoqing();
     bool bXiaoyao = get9215Act();
     bool bSnowAct = getSnowAct();
+    bool bGoldSnakAct = getGoldSnakeAct();
     bool bRecharge = (getRechargeActive() || getRechargeActive3366()) && getNeedRechargeRank();
     bool bConsume = getConsumeActive() && getNeedConsumeRank();
     bool bPExpItems = getPExpItems();
@@ -990,6 +1006,7 @@ void World::World_Midnight_Check( World * world )
     bGuoqingEnd = bGuoqing && !getGuoqing();
     bXiaoyaoEnd = bXiaoyao && !get9215Act();
     bSnowEnd = bSnowAct && !getSnowAct();
+    bGoldSnakeEnd = bGoldSnakAct && !getGoldSnakeAct();
     bRechargeEnd = bRecharge && !(getRechargeActive()||getRechargeActive3366());
     bConsumeEnd = bConsume && !getConsumeActive();
     bool bMonsterActEnd = bMonsterAct && !getKillMonsterAct();
@@ -1037,6 +1054,19 @@ void World::World_Midnight_Check( World * world )
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 26) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 27) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 28)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 31)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 6)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 7)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 9)
             )
         bRechargeEnd = true;
 
@@ -1099,6 +1129,8 @@ void World::World_Midnight_Check( World * world )
         world->SendXiaoyaoAward();
     if (bSnowEnd)
         world->SendSnowAward();
+    if (bGoldSnakeEnd)
+        world->SendGoldSnakeAward();
 
 	dungeonManager.enumerate(enum_dungeon_midnight, &curtime);
 	globalClans.enumerate(enum_clan_midnight, &curtime);
@@ -2156,6 +2188,32 @@ void World::SendXiaoyaoAward()
         {9216, 1}
     };
     selector._player->sendMailItem(4062, 4063, items, sizeof(items)/sizeof(items[0]), false);
+}
+
+struct SSelectGoldSnakeUsedMost : public Visitor<Player>
+{
+    Player* _player;
+    UInt32 _used;
+    SSelectGoldSnakeUsedMost() : _player(NULL), _used(0) {}
+    bool operator()(Player* player)
+    {
+        UInt32 used = player->GetVar(VAR_9215_USED); //使用与逍遥仙相同的var
+        if(_player == NULL || used > _used)
+        {
+            _player = player;
+            _used = used;
+        }
+        return true;
+    }
+};
+void World::SendGoldSnakeAward()
+{
+    SSelectGoldSnakeUsedMost selector;
+    globalPlayers.enumerate(selector);
+    if(selector._player == NULL)
+        return;
+    MailPackage::MailItem items[] = { {9315, 1} };
+    selector._player->sendMailItem(4064, 4065, items, sizeof(items)/sizeof(items[0]), false);
 }
 
 

@@ -143,6 +143,7 @@ enum MailItemType
     BuChangNewRC7Day,
     NEWJOBHIRE,
     BuChangMo,
+    NewCountryBattleAward,
 };
 enum ItemFrom
 {

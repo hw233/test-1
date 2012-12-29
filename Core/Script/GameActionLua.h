@@ -154,6 +154,9 @@ namespace Script
 		Table RunDayTask(Player* player, UInt32 npcId);
 		Table RunDayTaskAccept(Player* player, UInt32 taskId, UInt32 npcId);
 
+        Table GetNewCountryBattleBuffs();
+        Table GetNCBEffortIdValue();
+        Table GetNewCountryBattleAward(UInt8 lvl);
         Table GetClanBattleBuffs();
         Table GetClanBattleDailyRewards();
         Table GetClanBattleWeekSortRewards();

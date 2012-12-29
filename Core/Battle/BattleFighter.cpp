@@ -56,7 +56,8 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _atkDecSpecial(0), _atkDecSpecialLast(0), _magAtkDecSpecial(0), _magAtkDecSpecialLast(0),
     _skillUsedChangeAttrValue(0), _skillUsedChangeAttrLast(0), _skillUsedChangeAttr(0),
     _bleedRandom(0), _bleedRandomLast(0), _bleedAttackClass(1),_bleedBySkill(0), _bleedBySkillLast(0), _bleedBySkillClass(1),
-    _hitChangeByPeerless(0),_counterChangeByPeerless(0),_bSingleAttackFlag(false),_bMainTargetDead(false),_nCurrentAttackIndex(0)
+    _hitChangeByPeerless(0),_counterChangeByPeerless(0),_bSingleAttackFlag(false),_bMainTargetDead(false),_nCurrentAttackIndex(0),
+    _darkVigor(0), _dvFactor(0), _darkVigorLast(0)
 {
     memset(_immuneLevel, 0, sizeof(_immuneLevel));
     memset(_immuneRound, 0, sizeof(_immuneRound));
@@ -382,6 +383,36 @@ void BattleFighter::setFighter( GObject::Fighter * f )
 
         updateSkillStrengthen(passiveSkillOnOtherDead[idx]);
     }
+
+    std::vector<UInt16>& passiveSkillOnCounter = _fighter->getPassiveSkillOnCounter();
+    std::vector<UInt16>& passiveSkillOnCounter100 = _fighter->getPassiveSkillOnCounter100();
+    cnt = passiveSkillOnCounter.size();
+    _passiveSkillOnCounter.clear();
+    rateExtent = 0;
+    for(idx = 0; idx < cnt; idx++)
+    {
+        GData::SkillItem skillItem;
+        skillItem.base = GData::skillManager[passiveSkillOnCounter[idx]];
+        skillItem.cd = 0;
+        rateExtent += skillItem.base->prob * 100;
+        skillItem.rateExtent = rateExtent;
+        _passiveSkillOnCounter.insert(_passiveSkillOnCounter.end(), skillItem);
+
+        updateSkillStrengthen(passiveSkillOnCounter[idx]);
+    }
+
+    cnt = passiveSkillOnCounter100.size();
+    _passiveSkillOnCounter100.clear();
+    for(idx = 0; idx < cnt; idx++)
+    {
+        GData::SkillItem skillItem;
+        skillItem.base = GData::skillManager[passiveSkillOnCounter100[idx]];
+        skillItem.cd = 0;
+        skillItem.rateExtent = 0;
+        _passiveSkillOnCounter100.insert(_passiveSkillOnCounter100.end(), skillItem);
+
+        updateSkillStrengthen(passiveSkillOnCounter100[idx]);
+    }
 }
 
 void BattleFighter::updateAllAttr()
@@ -485,7 +516,7 @@ void BattleFighter::updateBuffExtras()
 		addAttrExtra(_attrExtra, &_attrbylevel);
 	}
 
-    if(_fighter && _fighter->getOwner())
+    if(_fighter && _fighter->getOwner() && _fighter->getOwner()->hasHiAttrFlag())
     {
         const GData::AttrExtra* ae = _fighter->getOwner()->getHIAttr();
         if (ae)
@@ -1114,6 +1145,11 @@ const GData::SkillBase* BattleFighter::getPassiveSkillAftNAtk100(size_t& idx, bo
     return getPassiveSkill100(_passiveSkillAftNAtk100, idx, noPossibleTarget);
 }
 
+const GData::SkillBase* BattleFighter::getPassiveSkillOnCounter100(size_t& idx, bool noPossibleTarget)
+{
+    return getPassiveSkill100(_passiveSkillOnCounter100, idx, noPossibleTarget);
+}
+
 const GData::SkillBase* BattleFighter::getPassiveSkill(std::vector<GData::SkillItem>& passiveSkill, bool noPossibleTarget)
 {
     size_t cnt = passiveSkill.size();
@@ -1183,6 +1219,11 @@ const GData::SkillBase* BattleFighter::getPassiveSkillDead(bool noPossibleTarget
 const GData::SkillBase* BattleFighter::getPassiveSkillAftNAtk(bool noPossibleTarget)
 {
     return getPassiveSkill(_passiveSkillAftNAtk, noPossibleTarget);
+}
+
+const GData::SkillBase* BattleFighter::getPassiveSkillOnCounter(bool noPossibleTarget)
+{
+    return getPassiveSkill(_passiveSkillOnCounter, noPossibleTarget);
 }
 
 void BattleFighter::releaseSkillCD(std::vector<GData::SkillItem>& skill, int cd)
@@ -1759,6 +1800,7 @@ void BattleFighter::makeDamage( UInt32& u )
         return;
     }
 
+    addDarkVigor(u);
 	if(_hp < u)
 		_hp = 0;
 	else
@@ -2039,7 +2081,7 @@ void BattleFighter::setShieldHPBuf(float value, UInt8 last)
 
 bool BattleFighter::releaseShieldHPBuf()
 {
-    if(_shieldHP == 0 || _shieldHPLast < 0.001)
+    if(_shieldHPLast == 0 || _shieldHP < 0.001)
         return false;
     -- _shieldHPLast;
     if(_shieldHPLast== 0)
@@ -2047,6 +2089,39 @@ bool BattleFighter::releaseShieldHPBuf()
         _shieldHP = 0;
         return true;
     }
+    return false;
+}
+
+void BattleFighter::setDarkVigor(float value, UInt8 last)
+{
+    if(_darkVigorLast != 0)
+        return;
+
+    _dvFactor = value;
+    _darkVigorLast = last;
+    _darkVigor = 0;
+}
+
+void BattleFighter::addDarkVigor(float value)
+{
+    if(_darkVigorLast == 0)
+        return;
+
+    _darkVigor += value * _dvFactor;
+}
+
+bool BattleFighter::releaseDarkVigor()
+{
+    if(_darkVigorLast == 0 || _darkVigor < 0.001)
+        return false;
+    -- _darkVigorLast;
+    if(_darkVigorLast == 0)
+    {
+        _darkVigor = 0;
+        _dvFactor = 0;
+        return true;
+    }
+
     return false;
 }
 
