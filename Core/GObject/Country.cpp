@@ -103,8 +103,8 @@ bool Country::Init()
         AddTimer(1000, ClanRankBattleCheck);
         //townDeamonManager->process();
         //UInt32 tdChkPoint = TimeUtil::SharpDayT(0, now) + TOWNDEAMONENDTM;
-        /** 延迟2分钟  **/
-	    AddTimer(3600 * 1000, PhysicalCheckTimer, static_cast<void *>(NULL), (3600 - now % 3600 + 120) * 1000);
+        /** 提前2分钟 **/
+	    AddTimer(3600 * 1000, PhysicalCheckTimer, static_cast<void *>(NULL), (((3600 - now % 3600) + 58 * 60) % 3600) * 1000);
 
         AddTimer(1000, ClanCopyCheck);
 
