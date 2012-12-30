@@ -24,6 +24,9 @@ if [ $# -ge 2 -a "$2" == "fb" ]; then
 elif [ $# -ge 2 -a "$2" == "vt" ]; then
     make release_vt
     tar cvfz $R"VT."$file -X exclude bin/Release/JsonProxy.ASSS bin/Release/Server.ASSS scripts/ sql/
+elif [ $# -ge 2 -a "$2" == "jit" ]; then
+    make release_jit
+    tar cvfz $R$file -X exclude bin/Release/JsonProxy.ASSS bin/Release/Server.ASSS bin/Release/Server.ASSS.symbol scripts/ sql/
 else
     make release
     tar cvfz $R$file -X exclude bin/Release/JsonProxy.ASSS bin/Release/Server.ASSS bin/Release/Server.ASSS.symbol scripts/ sql/
