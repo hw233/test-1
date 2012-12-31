@@ -281,6 +281,10 @@ public:
     { _qzonepyprivilegeact = v; }
     inline static bool getQzonePYPrivilegeAct()
     { return _qzonepyprivilegeact; }
+    inline static void setGoodVoiceAct(bool v)
+    { _goodvoiceact = v; }
+    inline static bool getGoodVoiceAct()
+    { return _goodvoiceact; }
 
     inline static void setTrainFighter(bool v)
     { _trainfighter = v; }
@@ -596,6 +600,7 @@ public:
     static bool _qqgameact;
     static bool _3366privilegeact;
     static bool _qzonepyprivilegeact;
+    static bool _goodvoiceact;
     static void* _recalcwd;
     static bool _june;
     static bool _june1;

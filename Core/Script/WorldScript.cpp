@@ -120,6 +120,7 @@ void WorldScript::init()
     def("setQQGameAct", GObject::World::setQQGameAct);
     def("set3366PrivilegeAct", GObject::World::set3366PrivilegeAct);
     def("setQzonePYPrivilegeAct", GObject::World::setQzonePYPrivilegeAct);
+    def("setGoodVoiceAct", GObject::World::setGoodVoiceAct);
     def("getBlueDiamondAct", GObject::World::getBlueDiamondAct);
     def("getYellowDiamondAct", GObject::World::getYellowDiamondAct);
     def("getQQVipAct", GObject::World::getQQVipAct);

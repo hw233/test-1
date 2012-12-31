@@ -1795,6 +1795,17 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
             else if(type == 2)
                 player->closeCopyFrontAwardByIndex(copy_or_front, index);
         }
+
+        case 5:
+        {
+            UInt8 type;
+            if(!World::getGoodVoiceAct())
+                return;
+            br >> type;
+            player->getGoodVoiceAward(type);
+        }
+        break;
+
         default:
         break;
     }

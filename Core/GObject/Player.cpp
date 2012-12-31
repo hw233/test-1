@@ -15467,6 +15467,9 @@ void Player::getCopyFrontCurrentAward(UInt8 index)
 
     bool bind = GetVar(VAR_CF_BIND);
     m_Package->Add(cf_itemId[curId], 1, bind);
+
+    if(leftCnt == 1)
+        closeCopyFrontAwardByIndex(GetVar(VAR_CF_FLAG), 0);
 }
 
 void Player::getCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index)
@@ -15651,6 +15654,32 @@ UInt8 Player::getFrontmapId()
             return (i+1);
     }
     return 0;
+}
+
+void Player::getGoodVoiceAward(UInt8 type)
+{
+    if(type == 1 && GetVar(VAR_GOOD_VOICE) == 0)
+    {
+        if(GetFreePackageSize() < 1)
+        {
+            sendMsgCode(0, 1011);
+            return;
+        }
+        SetVar(VAR_GOOD_VOICE, 1);
+        m_Package->Add(9273, 1, true);
+        sendGoodVoiceInfo();
+    }
+}
+
+void Player::sendGoodVoiceInfo()
+{
+    if(!World::getGoodVoiceAct())
+        return;
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(5);
+    st << static_cast<UInt8>(GetVar(VAR_GOOD_VOICE));
+    st << Stream::eos;
+    send(st);
 }
 
 } // namespace GObject

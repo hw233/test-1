@@ -1968,6 +1968,10 @@ namespace GObject
         UInt8 cf_posPut[5];//范围1-5
         UInt32 cf_itemId[5];
         UInt16 cf_ratio[5];
+
+    public:
+        void getGoodVoiceAward(UInt8 type);
+        void sendGoodVoiceInfo();
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

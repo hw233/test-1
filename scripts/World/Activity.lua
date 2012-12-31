@@ -797,6 +797,12 @@ function onActivityCheck(tm)
           setNeedRechargeRank(false)
       end
 
+      if tm >= actTime535 and tm < actTime535_1 then
+          setGoodVoiceAct(true)
+      else
+          setGoodVoiceAct(false)
+      end
+
       setShuoShuo(true);
   end
 
@@ -938,6 +944,7 @@ function initActTime(y, m, d)
   local  SerStartTm532= { ['year'] = 2012, ['month'] = 11, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm533= { ['year'] = 2012, ['month'] = 12, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm534= { ['year'] = 2012, ['month'] = 12, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm535= { ['year'] = 2012, ['month'] = 12, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   -- 繁体版
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1242,6 +1249,9 @@ function initActTime(y, m, d)
 
   actTime534 = os.time(SerStartTm534);
   actTime534_1 = os.time(SerStartTm534) + 7 * 86400;
+
+  actTime535 = os.time(SerStartTm535);
+  actTime535_1 = os.time(SerStartTm535) + 4 * 86400;
 
   -- 繁体版
   actTime101 = os.time(SerStartTm101);
