@@ -14769,7 +14769,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
             return 2;
         }
         UInt16 v = GetVar(VAR_SNOW_AWARD);
-        if ((v&type) == 1)
+        if (v&type)
             return 3;
 
         UInt32 score = m_snow.score;
