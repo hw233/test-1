@@ -2578,10 +2578,13 @@ void SysUpdate(LoginMsgHdr &hdr, const void * data)
 {
 	BinaryReader br(data,hdr.msgHdr.bodyLen);
     CHKKEY();
+    UInt8 show = 0;
+    br >> show;
 
     Stream st(REP::SYSDAILOG);
     st << static_cast<UInt8>(1);
     st << static_cast<UInt8>(0);
+    st << show;
     st << (char*)VERSION;
     st << Stream::eos;
 	NETWORK()->Broadcast(st);

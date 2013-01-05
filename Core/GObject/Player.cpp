@@ -16324,7 +16324,8 @@ void Player::sendSysUpdate()
    //版本更新公告
    Stream st(REP::SYSDAILOG);
    st << static_cast<UInt8>(1);
-   st << static_cast<UInt8>(1);
+   st << static_cast<UInt8>(1); //0:老版本 1:最新版
+   st << static_cast<UInt8>(1); //0:按钮不显示 1:按钮显示
    st << (char*)VERSION;
    st << Stream::eos;
    send(st);

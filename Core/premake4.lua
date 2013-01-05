@@ -31,7 +31,7 @@ project "Server.ASSS"
     configuration "macosx"
         defines "LUA_USE_MACOSX"
     configuration "luajit"
-        links { "luajit-5.1" }
+        links { "Server.lua.jit" }
     configuration "luaorg"
         links { "Server.lua" }
 
@@ -47,16 +47,15 @@ project "Server.lua"
     configuration "macosx"
         defines "LUA_USE_MACOSX"
 else
-project "Server.lua.jit"
-    kind "StaticLib"
-
-    files { "luajit/*.c", "luajit/*.h" }
-    configuration "linux"
-        defines "LUA_USE_LINUX"
-    configuration { "Debug", "not vs*"}
-    	buildoptions { "-pg" }
-    configuration "macosx"
-        defines "LUA_USE_MACOSX"
+--project "Server.lua.jit"
+--    kind "StaticLib"
+--
+--    configuration "linux"
+--        defines "LUA_USE_LINUX"
+--    configuration { "Debug", "not vs*"}
+--    	buildoptions { "-pg" }
+--    configuration "macosx"
+--        defines "LUA_USE_MACOSX"
 end
 
 project "JsonProxy.ASSS"
@@ -93,7 +92,7 @@ project "JsonProxy.ASSS"
     configuration "macosx"
         defines { "LUA_USE_MACOSX", "_JSON_PROXY_" }
     configuration "luajit"
-        links { "luajit-5.1" }
+        links { "Server.lua.jit" }
     configuration "luaorg"
         links { "Server.lua" }
 
