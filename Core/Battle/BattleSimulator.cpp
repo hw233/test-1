@@ -8809,9 +8809,10 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
             defList[defCount].damage = 0;
             defList[defCount].leftHP = bf->getHP();
             ++ defCount;
-            if(doDarkVigorAttack(bf, darkVigor, defCount, defList, scCount, scList))
-                break;
+            doDarkVigorAttack(bf, darkVigor, defCount, defList, scCount, scList);
         }
+        if(bf->getHP() == 0)
+            break;
 
         UInt32 bleedMo = static_cast<UInt32>(bf->getBleedMo());
         if(bleedMo > 0)
@@ -8830,13 +8831,14 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
             if(bf->getHP() == 0)
             {
                 onDead(true, bf, defList, defCount, scList, scCount);
-                break;
             }
             else if(_winner == 0)
             {
                 onDamage(bf, defList, defCount, scList, scCount, false);
             }
         }
+        if(bf->getHP() == 0)
+            break;
 
         UInt8& last1 = bf->getBleed1Last();
         if(last1 != 0)
@@ -8857,7 +8859,6 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
             if(bf->getHP() == 0)
             {
                 onDead(true, bf, defList, defCount, scList, scCount);
-                break;
             }
             else if(_winner == 0)
             {
@@ -8867,6 +8868,8 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
             if(last1 == 0)
                 bf->setBleed1(0, 0);
         }
+        if(bf->getHP() == 0)
+            break;
 
         UInt8& last2 = bf->getBleed2Last();
         if(last2 != 0)
@@ -8887,7 +8890,6 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
             if(bf->getHP() == 0)
             {
                 onDead(true, bf, defList, defCount, scList, scCount);
-                break;
             }
             else if(_winner == 0)
             {
@@ -8896,6 +8898,8 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
             if(last2 == 0)
                 bf->setBleed2(0, 0);
         }
+        if(bf->getHP() == 0)
+            break;
 
         UInt8& last3 = bf->getBleed3Last();
         if(last3 != 0)
@@ -8916,7 +8920,6 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
             if(bf->getHP() == 0)
             {
                 onDead(true, bf, defList, defCount, scList, scCount);
-                break;
             }
             else if(_winner == 0)
             {
@@ -8925,6 +8928,8 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
             if(last3 == 0)
                 bf->setBleed3(0, 0);
         }
+        if(bf->getHP() == 0)
+            break;
 
         UInt8& ablast = bf->getAuraBleedLast();
         if(ablast != 0)
@@ -8945,7 +8950,6 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
             if(bf->getHP() == 0)
             {
                 onDead(true, bf, defList, defCount, scList, scCount);
-                break;
             }
             else if(_winner == 0)
             {
@@ -8954,6 +8958,8 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
             if(ablast == 0)
                 bf->setAuraBleed(0, 0, 0);
         }
+        if(bf->getHP() == 0)
+            break;
 
         UInt8& cblast = bf->getConfuceBleedLast();
         if(cblast != 0)
@@ -8974,7 +8980,6 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
             if(bf->getHP() == 0)
             {
                 onDead(true, bf, defList, defCount, scList, scCount);
-                break;
             }
             else if(_winner == 0)
             {
@@ -8983,6 +8988,8 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
             if(cblast == 0)
                 bf->setConfuceBleed(0, 0, 0);
         }
+        if(bf->getHP() == 0)
+            break;
 
         UInt8& sblast = bf->getStunBleedLast();
         if(sblast != 0)
@@ -9003,7 +9010,6 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
             if(bf->getHP() == 0)
             {
                 onDead(true, bf, defList, defCount, scList, scCount);
-                break;
             }
             else if(_winner == 0)
             {
@@ -9012,6 +9018,8 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
             if(sblast == 0)
                 bf->setStunBleed(0, 0, 0);
         }
+        if(bf->getHP() == 0)
+            break;
 
         Int16& nrandomlast = bf->getBleedRandomLast();
         if(nrandomlast != 0)
@@ -9057,13 +9065,14 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
             if(bf->getHP() == 0)
             {
                 onDead(true, bf, defList, defCount, scList, scCount);
-                break;
             }
             else if(_winner == 0)
             {
                 onDamage(bf, defList, defCount, scList, scCount, false);
             }
         }
+        if(bf->getHP() == 0)
+            break;
 
         // 取中毒伤害来流血的debuf。。。
         Int16& nbySkilllast = bf->getBleedBySkillLast();
@@ -9100,7 +9109,6 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
             if(bf->getHP() == 0)
             {
                 onDead(true, bf, defList, defCount, scList, scCount);
-                break;
             }
             else if(_winner == 0)
             {
