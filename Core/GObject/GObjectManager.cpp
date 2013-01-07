@@ -395,6 +395,12 @@ namespace GObject
             fprintf(stderr, "loadCopyFrontWin error!\n");
             std::abort();
         }
+        if(!loadDreamer())
+        {
+            fprintf(stderr, "loadDreamer error!\n");
+            std::abort();
+        }
+       
 
 		DB::gDataDBConnectionMgr->UnInit();
 	}
@@ -5278,6 +5284,31 @@ namespace GObject
                     World::stArenaOld[type].rank[i] = j + 1;
                 }
             }
+        }
+        lc.finalize();
+        return true;
+    }
+
+    bool GObjectManager::loadDreamer()
+    {
+        // TODO: 读取水晶梦境有关数据
+        return true; // XXX: 
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading dreamer");
+        DBDreamer dbd;
+        if(execu->Prepare("SELECT `playerId`, `progress`, `level`, `maxX`, `maxY`, `maxGrid`, `mapInfo`, `posX`, `posY`, `earlyPosX`, `earlyPosY`, `timeConsume`, `remainTime`, `key`, `eyes` FROM `dreamer` ORDER BY `playerId`", dbd) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+        Player * player = NULL;
+		while(execu->Next() == DB::DB_OK)
+        {
+            player = globalPlayers[dbd.playerId];
+            if (player)
+            {
+                player->setDreamer(dbd.progress, dbd.level, dbd.maxX, dbd.maxY, dbd.maxGrid, dbd.mapInfo, dbd.posX, dbd.posY, dbd.earlyPosX, dbd.earlyPosY, dbd.timeConsume, dbd.remainTime, dbd.keysCount, dbd.eyesCount);
+            }
+			lc.advance();
         }
         lc.finalize();
         return true;

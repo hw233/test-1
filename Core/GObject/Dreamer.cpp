@@ -18,7 +18,7 @@ Dreamer::Dreamer(Player * player)
     :_owner(player), _gameProgress(0), _gameLevel(0), _isInGame(false),
     _maxX(0), _maxY(0), _maxGrid(0), 
     _posX(0), _posY(0), _earlyPosX(0), _earlyPosY(0),
-    _timeConsume(0), _remainTime(50), _keysCount(0)
+    _timeConsume(0), _remainTime(50), _keysCount(0), _eyesCount(0), _eyesTime(0)
 {
 #ifdef DREAMER_DEBUG
     _gameProgress = PROGRESS_70;
@@ -35,10 +35,11 @@ Dreamer::Dreamer(Player * player)
     DB2().PushUpdateData("INSERT IGNORE INTO `dreamer` (`playerId`) VALUES (%"I64_FMT"u)", player->getId()); 
 }
 
-Dreamer::Dreamer(Player * player, UInt8 progress, UInt8 level, UInt8 maxX, UInt8 maxY, UInt8 maxGrid, std::string& mapInfo, 
-        UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY, UInt8 timeConsume, UInt32 remainTime, UInt8 keysCount)
+Dreamer::Dreamer(Player * player, UInt8 progress, UInt8 level, UInt8 maxX, UInt8 maxY, UInt8 maxGrid, const std::string& mapInfo, 
+        UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY, UInt8 timeConsume, UInt32 remainTime, UInt8 keysCount, UInt8 eyesCount)
     : _owner(player), _gameProgress(progress), _gameLevel(level), _isInGame(false), _maxX(maxX), _maxY(maxY), _maxGrid(maxGrid), 
-    _posX(posX), _posY(posY), _earlyPosX(earlyPosX), _earlyPosY(earlyPosY), _timeConsume(timeConsume), _remainTime(remainTime), _keysCount(keysCount)
+    _posX(posX), _posY(posY), _earlyPosX(earlyPosX), _earlyPosY(earlyPosY), 
+    _timeConsume(timeConsume), _remainTime(remainTime), _keysCount(keysCount), _eyesCount(eyesCount), _eyesTime(0)
 {
     // 从数据库加载时调用到的构造函数
     LoadMapInfo(mapInfo);
@@ -91,8 +92,8 @@ void Dreamer::SaveMapInfo()
         mapString = buf;
 
     DB2().PushUpdateData("UPDATE `dreamer` SET `maxX` = '%u', `maxY` = '%u', `maxGrid` = '%u', `mapInfo` = '%s', "\
-            "`posX` = '%u', `posY` = '%u', `earlyPosX` = '%u', `earlyPosY` = '%u', `remainTime` = '%u', `keys` = '%u' WHERE `playerId` = %"I64_FMT"u", 
-            _maxX, _maxY, _maxGrid, mapString.c_str(), _posX, _posY, _earlyPosX, _earlyPosY, _remainTime, _keysCount, _owner->getId());
+            "`posX` = '%u', `posY` = '%u', `earlyPosX` = '%u', `earlyPosY` = '%u', `remainTime` = '%u', `keys` = '%u', `eyes` = '%u' WHERE `playerId` = %"I64_FMT"u", 
+            _maxX, _maxY, _maxGrid, mapString.c_str(), _posX, _posY, _earlyPosX, _earlyPosY, _remainTime, _keysCount, _eyesCount, _owner->getId());
 }
 
 void Dreamer::OnCommand(UInt8 command, UInt8 val, UInt8 val2)
@@ -125,6 +126,8 @@ void Dreamer::OnCommand(UInt8 command, UInt8 val, UInt8 val2)
                         res = OnStepIntoWave();
                         if (res)
                         {
+                            _eyesCount = 0;
+                            _eyesTime = 0;
                             InitMap(++_gameLevel);
                             SendMapInfo();
                             return;
@@ -316,8 +319,8 @@ bool Dreamer::InitMap(UInt8 level)
         return false;
     if (!InitItem())
         return false;
-    if (!InitEye())
-        return false;
+    //if (!InitEye())
+        //return false;
     if(!SelectBornGrid())
         return false;
     SaveMapInfo();
@@ -383,6 +386,8 @@ bool Dreamer::InitItem()
 
 bool Dreamer::InitEye()
 {
+    // 已经用不上了
+    return true;
     // 初始化梦境之眼的指示类型
     MapInfo::iterator it;
     for (it = _mapInfo.begin(); it != _mapInfo.end(); ++ it)
@@ -547,6 +552,9 @@ void Dreamer::OnMove(UInt8 x, UInt8 y)
     _posX = x;
     _posY = y;
 
+    if (_eyesTime)
+        --_eyesTime;
+
     SendGridInfo(x, y);
 }
 
@@ -601,6 +609,7 @@ bool Dreamer::OnGetTreasure()
         _owner->sendMsgCode(0, 2222, 0);    // 钥匙不足，无法打开宝箱
         return false;
     }
+    --_keysCount;
     Table rewards = GameAction()->getDreamerTreasure(_gameProgress);
     Stream st;
     st.init(REP::DREAMER);
@@ -620,7 +629,7 @@ bool Dreamer::OnGetTreasure()
     }
     st << Stream::eos;
 
-    MapInfo::iterator it = _mapInfo.find(POS_TO_INDEX(_posX, _posY));
+    DB2().PushUpdateData("UPDATE `dreamer` SET `keys` = '%u' WHERE `playerId` = %"I64_FMT"u", _keysCount, _owner->getId());
     return true;
 }
 
@@ -633,7 +642,7 @@ bool Dreamer::OnGetKey()
         return false;
     }
     ++_keysCount;
-    MapInfo::iterator it = _mapInfo.find(POS_TO_INDEX(_posX, _posY));
+    DB2().PushUpdateData("UPDATE `dreamer` SET `keys` = '%u' WHERE `playerId` = %"I64_FMT"u", _keysCount, _owner->getId());
     return true;
 }
 
@@ -695,22 +704,35 @@ bool Dreamer::OnGetTime()
     return true;
 }
 
+bool Dreamer::OnGetEye()
+{
+    // 获得梦境之眼
+    if (CheckGridType(GRID_EYE))
+    {
+        TRACE_LOG("Dream: eye error.");
+        return false;
+    }
+    ++_eyesCount;
+    DB2().PushUpdateData("UPDATE `dreamer` SET `eyes` = '%u' WHERE `playerId` = %"I64_FMT"u", _eyesCount, _owner->getId());
+    return true;
+}
+
+bool Dreamer::OnUseEye()
+{
+    // 使用梦境之眼
+    if (!_eyesCount)
+    {
+        _owner->sendMsgCode(0, 2223, 0);
+        return false;
+    }
+    --_eyesCount;
+    _eyesTime = 3;
+    DB2().PushUpdateData("UPDATE `dreamer` SET `eyes` = '%u' WHERE `playerId` = %"I64_FMT"u", _eyesCount, _owner->getId());
+    return true;
+}
+
 void Dreamer::SendGameInfo()
 {
-    // TODO: 发送梦境游戏的具体内容
-    /*
-    UInt8 flag = isUpdeated ? 0x10:0;
-    if (type == 2)
-    {
-        Stream st (REP::DREAMER);
-        st << static_cast<UInt8> (2);
-
-        st << static_cast<UInt8> (_gameProgress);       // 共鸣地点
-        st << static_cast<UInt8> (_isInGame ? 1 : 0);   // 是否已经进入寻墨地图
-        st <<Stream::eos;
-        _owner->send(st);
-    }
-    */
 }
 
 void Dreamer::SendGridInfo(UInt8 posX, UInt8 posY)

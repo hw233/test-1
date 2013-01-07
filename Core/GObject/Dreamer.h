@@ -123,7 +123,7 @@ class Dreamer
         UInt8 neighbCount;  // 已经和该点相邻的格子的个数
         UInt8 posX;         // 在大地图上的X坐标
         UInt8 posY;         // 在大地图上的Y坐标
-        UInt16 gridType;     // 格子类型（GridType类型）
+        UInt16 gridType;    // 格子类型（GridType类型）
 
         GridInfo(UInt16 index, UInt16 type, UInt8 neighbourCount)
             : neighbCount(neighbourCount)
@@ -138,8 +138,8 @@ class Dreamer
 
     public:
         Dreamer(Player *player);
-        Dreamer(Player * player, UInt8 progress, UInt8 level, UInt8 maxX, UInt8 maxY, UInt8 maxGrid, std::string& mapInfo, 
-                UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY, UInt8 timeConsume, UInt32 remainTime, UInt8 keysCount);
+        Dreamer(Player * player, UInt8 progress, UInt8 level, UInt8 maxX, UInt8 maxY, UInt8 maxGrid, const std::string& mapInfo, 
+                UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY, UInt8 timeConsume, UInt32 remainTime, UInt8 keysCount, UInt8 eyesCount);
         ~Dreamer();
 
         void OnCommand(UInt8 command, UInt8 val, UInt8 val2);
@@ -165,6 +165,8 @@ class Dreamer
         bool OnGetItem();
         bool OnSufferWhirlwind();
         bool OnGetTime();
+        bool OnGetEye();
+        bool OnUseEye();
         void OnAbort();
 
         UInt8 CheckGridType(UInt8 type);
@@ -193,6 +195,8 @@ class Dreamer
         UInt8  _timeConsume;            // 该层每步消耗的体力
         UInt8  _remainTime;             // 梦境游戏中剩余的体力
         UInt8  _keysCount;              // 手头钥匙的数量
+        UInt8  _eyesCount;              // 手头拥有梦境之眼的数量
+        UInt8  _eyesTime;               // 梦境之眼的有效时间
 
         URandom _rnd;                   // 用于产生随机数
         
