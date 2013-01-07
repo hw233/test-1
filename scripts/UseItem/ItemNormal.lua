@@ -7089,6 +7089,76 @@ function ItemNormal_00009315(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00009316(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    local items = {
+        {{511,10}, {134,1},},
+        {{57,2}, {507,1},},
+        {{16,2}, {509,1},},
+        {{514,5}, {440,1},},
+        {{517,5}, {500,5},},
+        {{512,4}, {503,3},},
+        {{515,1}, {56,2},},
+        {{511,10}, {500,5},},
+        {{57,4}, {503,3},},
+        {{56,5}, {1325,1},},
+        {{512,6}, {15,4},},
+    }
+
+    local isz = #items
+    local used = 0
+    for n = 1,num do
+        if package:GetRestPackageSize() < 3 then
+            if used ~= 0 then
+                package:DelItemSendMsg(iid, player);
+            end
+            player:sendMsgCode(2, 1011, 0);
+            return used
+        end
+
+        local r = math.random(1,isz)
+        local item = items[r]
+        for k,v in pairs(item) do
+            package:Add(v[1], v[2], bind, 0, 2);
+        end
+
+        local nr = math.random(1,10000)
+        local max = {
+            [1] = 10,
+            [2] = 20,
+            [3] = 40,
+            [4] = 60,
+            [5] = 100,
+            [6] = 300,
+            [7] = 500,
+            [8] = 800,
+            [9] = 1200,
+            [10] = 2000,
+            [11] = 5000,
+        }
+        local toggle = player:GetVar(347)
+        if toggle == 0 then
+            toggle = 1
+        end
+        if toggle >= 11 then
+            toggle = 11
+        end
+        if nr <= max[toggle] then
+            package:Add(1537, 1, bind, 0, 2);
+            player:SetVar(347, 1)
+        else
+            player:SetVar(347, toggle + 1)
+        end
+
+        used = used + 1
+    end
+
+    package:DelItemSendMsg(iid, player);
+    return used;
+end
+
 function ItemNormal_fighterCard(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -8794,6 +8864,7 @@ local ItemNormal_Table = {
     [9312] = ItemNormal_00009311,
     [9314] = ItemNormal_00009314,
     [9315] = ItemNormal_00009315,
+    [9316] = ItemNormal_00009316,
 
     [10000] = ItemNormal_00010000,
     [10001] = ItemNormal_00010001,

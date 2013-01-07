@@ -320,6 +320,7 @@ namespace GObject
         VAR_TOWER_LEVEL = 344,          // 楼一平台登录等级奖励
         VAR_SNOW_AWARD     = 345,     //堆雪人奖励
         VAR_HAS_MO_BATTLER = 346,       // 出战散仙里是否有墨家
+        VAR_ITEM_9316_FAILED_COUNT = 347, // 都率宝伞礼包连续开启失败次数
         VAR_MAX,
     };
 
@@ -614,6 +615,7 @@ namespace GObject
             REGISTER_VAR(VAR_TOWER_LEVEL, CYCLE_NONE);
 
             REGISTER_VAR(VAR_HAS_MO_BATTLER, CYCLE_NONE);
+            REGISTER_VAR(VAR_ITEM_9316_FAILED_COUNT, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);
