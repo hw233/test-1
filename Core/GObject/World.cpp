@@ -403,6 +403,7 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 6)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 7)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 9)
             ))
     {
         if (pl->isOnline())
@@ -1061,6 +1062,7 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 6)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 7)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 9)
             )
         bRechargeEnd = true;
 

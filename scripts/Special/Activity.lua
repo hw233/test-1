@@ -3255,6 +3255,8 @@ function sendRechargeMails(player, ototal, ntotal)
         sendRechargeMails_2013_01_06(player, ototal, ntotal)
     elseif n >= (s + 30*86400) and n < (s + 31*86400) then
         sendRechargeMails_2013_01_07(player, ototal, ntotal)
+    elseif n >= (s + 31*86400) and n < (s + 32*86400) then
+        sendRechargeMails_2012_12_28(player, ototal, ntotal)
     end
 end
 
