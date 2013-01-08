@@ -842,6 +842,12 @@ function onActivityCheck(tm)
           setConsumeActive(false)
       end
 
+      if tm >= actTime232_0 and tm < actTime232_1 then
+          setFeastLoginAct(true)
+      else
+          setFeastLoginAct(false)
+      end
+
       setShuoShuo(true);
   end
 
@@ -1059,6 +1065,8 @@ function initActTime(y, m, d)
   --金蛇迎新活动
   local  SerStartTm231 = { ['year'] = 2012, ['month'] = 12, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm231_1 = { ['year'] = 2013, ['month'] = 1, ['day'] = 6, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 登录礼包人人有(2013.1.9~2013.1.18)
+  local  SerStartTm232 = { ['year'] = 2013, ['month'] = 1, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
 
   --300-399越南版用了
@@ -1316,7 +1324,7 @@ function initActTime(y, m, d)
   actTime533_1 = os.time(SerStartTm533) + 5 * 86400;
 
   actTime534 = os.time(SerStartTm534);
-  actTime534_1 = os.time(SerStartTm534) + 32 * 86400;
+  actTime534_1 = os.time(SerStartTm534) + 42 * 86400;
 
   actTime535 = os.time(SerStartTm535);
   actTime535_1 = os.time(SerStartTm535) + 4 * 86400;
@@ -1405,6 +1413,9 @@ function initActTime(y, m, d)
 
   actTime231_0= os.time(SerStartTm231);
   actTime231_1= os.time(SerStartTm231_1);
+
+  actTime232_0= os.time(SerStartTm232);
+  actTime232_1= os.time(SerStartTm232) + 10 * 86400;
 
   onActivityCheck(os.time() + 30);
 
