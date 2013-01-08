@@ -1203,6 +1203,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
             st << static_cast<UInt8>(17) << pl->GetVar(VAR_CONSUME_918) << Stream::eos;
             pl->send((st));
         }
+        pl->sendSysUpdate();
     }
     //if (World::getNeedRechargeRank() || time(NULL) <= World::getRechargeEnd() + 24*60*60)
     if (World::getNeedRechargeRank())

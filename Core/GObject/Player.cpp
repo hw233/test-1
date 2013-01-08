@@ -74,6 +74,7 @@
 #include "MsgHandler/Memcached.h"
 #include "RechargeTmpl.h"
 #include "GData/ExpTable.h"
+#include "Version.h"
 
 #define NTD_ONLINE_TIME (4*60*60)
 #ifndef _DEBUG
@@ -565,7 +566,7 @@ namespace GObject
 #ifndef _WIN32
 		m_ulog(NULL),
 #endif
-		m_isOffical(false), m_sysDailog(false), m_hasTripod(false), _jobHunter(NULL), _dreamer(NULL)
+		m_isOffical(false), m_isXY(false), m_sysDailog(false), m_hasTripod(false), _jobHunter(NULL), _dreamer(NULL)
 	{
         m_ClanBattleStatus = 1;
         m_ClanBattleScore = 0;
@@ -1160,10 +1161,6 @@ namespace GObject
 	}
 
 #define WEBDOWNLOAD 255
-#define OFFICAL 12
-#define PF_UNION 17
-#define PF_XY 171
-#define PF_XY_CH 10040
 
     void Player::udpLog(UInt8 platform, const char* str1, const char* str2, const char* str3, const char* str4,
                 const char* str5, const char* str6, const char* type, UInt32 count)
@@ -3305,7 +3302,10 @@ namespace GObject
 		if(!res)
 			checkDeath();
 
-		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns());
+        if (getVipLevel() >= 7 && bsim.getTurns() > 30)
+            setBuffData(PLAYER_BUFF_ATTACKING, now + 30);
+        else
+		    setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns());
 
 		return res;
 	}
@@ -16265,6 +16265,17 @@ Dreamer* Player::getDreamer()
            _dreamer = new Dreamer(this);
        }
        return _dreamer;
+}
+
+void Player::sendSysUpdate()
+{
+   //版本更新公告
+   Stream st(REP::SYSDAILOG);
+   st << static_cast<UInt8>(1);
+   st << static_cast<UInt8>(1);
+   st << (char*)VERSION;
+   st << Stream::eos;
+   send(st);
 }
 
 } // namespace GObject
