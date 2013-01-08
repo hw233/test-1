@@ -731,6 +731,7 @@ void OnSellItemReq( GameMsgHdr& hdr, const void * buffer)
 
 	UInt16 offset = 2;
 	UInt32 price = 0;
+    UInt16 canDestroyNum = 0;
 	for (UInt16 i = 0; i < itemCount; ++i)
 	{
 		UInt32 itemId = *reinterpret_cast<const UInt32*>(data+offset);
@@ -745,13 +746,23 @@ void OnSellItemReq( GameMsgHdr& hdr, const void * buffer)
 		{
 			price += pl->GetPackage()->SellItem(itemId, itemNum, bindType);
 		}
+        if(World::canDestory(itemId))
+            ++canDestroyNum;
 	}
 	if(price > 0)
 	{
-		SYSMSG_SEND(116, pl);
-		SYSMSG_SEND(1016, pl);
         pl->getTael(price);
 	}
+    if(canDestroyNum > 0)
+    {
+		SYSMSG_SEND(116, pl);
+		SYSMSG_SEND(1016, pl);
+    }
+    else
+    {
+		SYSMSG_SEND(172, pl);
+		SYSMSG_SEND(1072, pl);
+    }
 }
 
 
@@ -769,6 +780,7 @@ void OnDestroyItemReq( GameMsgHdr& hdr, const void * buffer )
 		return;
 
 	UInt16 offset = 2;
+    UInt16 canDestroyNum = 0;
 	for (UInt16 i = 0; i < itemCount; ++i)
 	{
 		UInt32 itemId = *reinterpret_cast<const UInt32*>(data+offset);
@@ -776,9 +788,19 @@ void OnDestroyItemReq( GameMsgHdr& hdr, const void * buffer )
 		UInt16 itemNum = *reinterpret_cast<const UInt16*>(data+offset+4+1);
 		offset += 7;
         pl->addItem(itemId, itemNum, bindType);
+        if(World::canDestory(itemId))
+            ++canDestroyNum;
 	}
-	SYSMSG_SEND(115, pl);
-	SYSMSG_SEND(1015, pl);
+    if(canDestroyNum > 0)
+    {
+        SYSMSG_SEND(115, pl);
+        SYSMSG_SEND(1015, pl);
+    }
+    else
+    {
+        SYSMSG_SEND(171, pl);
+        SYSMSG_SEND(1071, pl);
+    }
 }
 
 void OnTripodReq( GameMsgHdr& hdr, const void* data )
