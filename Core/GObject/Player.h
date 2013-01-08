@@ -694,7 +694,6 @@ namespace GObject
 		UInt8 GetCountryThread();
 
         //玩家每日签到接口
-        void ActivitySignIn();
         void SendNextdayTime(UInt32 nextDay);
 
 		void Login();
