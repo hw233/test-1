@@ -3257,6 +3257,28 @@ function sendRechargeMails(player, ototal, ntotal)
         sendRechargeMails_2013_01_07(player, ototal, ntotal)
     elseif n >= (s + 31*86400) and n < (s + 32*86400) then
         sendRechargeMails_2012_12_28(player, ototal, ntotal)
+
+    -- 20130109~20130118
+    elseif n >= (s + 32*86400) and n < (s + 33*86400) then
+        sendRechargeMails_2012_12_29(player, ototal, ntotal)
+    elseif n >= (s + 33*86400) and n < (s + 34*86400) then
+        sendRechargeMails_2012_12_30(player, ototal, ntotal)
+    elseif n >= (s + 34*86400) and n < (s + 35*86400) then
+        sendRechargeMails_2012_12_31(player, ototal, ntotal)
+    elseif n >= (s + 35*86400) and n < (s + 36*86400) then
+        sendRechargeMails_2013_01_01(player, ototal, ntotal)
+    elseif n >= (s + 36*86400) and n < (s + 37*86400) then
+        sendRechargeMails_2013_01_02(player, ototal, ntotal)
+    elseif n >= (s + 37*86400) and n < (s + 38*86400) then
+        sendRechargeMails_2013_01_03(player, ototal, ntotal)
+    elseif n >= (s + 38*86400) and n < (s + 39*86400) then
+        sendRechargeMails_2013_01_04(player, ototal, ntotal)
+    elseif n >= (s + 39*86400) and n < (s + 40*86400) then
+        sendRechargeMails_2013_01_05(player, ototal, ntotal)
+    elseif n >= (s + 40*86400) and n < (s + 41*86400) then
+        sendRechargeMails_2013_01_06(player, ototal, ntotal)
+    elseif n >= (s + 41*86400) and n < (s + 42*86400) then
+        sendRechargeMails_2013_01_07(player, ototal, ntotal)
     end
 end
 
@@ -4409,6 +4431,28 @@ function sendRechargeRankAward(player, pos)
         sendRechargeRankAward_2013_01_07(player, pos)
     elseif n >= (s + 31*86400 + 10*60) and n < (s + 32*86400 + 10*60) then
         sendRechargeRankAward_2012_12_28(player, pos)
+
+    -- 20130109~20130118
+    elseif n >= (s + 32*86400 + 10*60) and n < (s + 33*86400 + 10*60) then
+        sendRechargeRankAward_2012_12_29(player, pos)
+    elseif n >= (s + 33*86400 + 10*60) and n < (s + 34*86400 + 10*60) then
+        sendRechargeRankAward_2012_12_30(player, pos)
+    elseif n >= (s + 34*86400 + 10*60) and n < (s + 35*86400 + 10*60) then
+        sendRechargeRankAward_2012_12_31(player, pos)
+    elseif n >= (s + 35*86400 + 10*60) and n < (s + 36*86400 + 10*60) then
+        sendRechargeRankAward_2013_01_01(player, pos)
+    elseif n >= (s + 36*86400 + 10*60) and n < (s + 37*86400 + 10*60) then
+        sendRechargeRankAward_2013_01_02(player, pos)
+    elseif n >= (s + 37*86400 + 10*60) and n < (s + 38*86400 + 10*60) then
+        sendRechargeRankAward_2013_01_03(player, pos)
+    elseif n >= (s + 38*86400 + 10*60) and n < (s + 39*86400 + 10*60) then
+        sendRechargeRankAward_2013_01_04(player, pos)
+    elseif n >= (s + 39*86400 + 10*60) and n < (s + 40*86400 + 10*60) then
+        sendRechargeRankAward_2013_01_05(player, pos)
+    elseif n >= (s + 40*86400 + 10*60) and n < (s + 41*86400 + 10*60) then
+        sendRechargeRankAward_2013_01_06(player, pos)
+    elseif n >= (s + 41*86400 + 10*60) and n < (s + 42*86400 + 10*60) then
+        sendRechargeRankAward_2013_01_07(player, pos)
     end
 end
 
