@@ -2592,6 +2592,12 @@ void NewCountryBattleJoinReq( GameMsgHdr& hdr, const void * data )
         brd >> skillId;
         ncb->useSkill(player, skillId);
     }
+    else if(type == 4)
+    {
+        UInt8 kind = 0;
+        brd >> kind;
+        ncb->buySkill(player, kind);
+    }
 }
 
 void OnLanchChallengeReq( GameMsgHdr& hdr, LanchChallengeReq& lcr)
