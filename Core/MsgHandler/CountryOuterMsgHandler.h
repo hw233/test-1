@@ -3483,12 +3483,12 @@ struct ChatRep
 	UInt8 type;
 	std::string name;
 	UInt8 cny;
-    UInt8 level;
 	UInt8 sex;
 	UInt8 office;
 	UInt8 guard;
 	std::string text;
-	MESSAGE_DEF8(REP::CHAT, UInt8, type, std::string, name, UInt8, cny, UInt8, level, UInt8, sex, UInt8, office, UInt8, guard, std::string, text);
+    UInt8 level;
+	MESSAGE_DEF8(REP::CHAT, UInt8, type, std::string, name, UInt8, cny, UInt8, sex, UInt8, office, UInt8, guard, std::string, text, UInt8, level);
 };
 
 static bool inCountry(const Network::TcpConduit * conduit, UInt8 country)
@@ -3571,8 +3571,8 @@ void OnChatReq( GameMsgHdr& hdr, ChatReq& cr )
 	Stream st(REP::CHAT);
 	UInt8 office = player->getTitle(), guard = 0;
     guard = player->getPF();
-	st << cr._type << player->getName() << player->getCountry() << player->GetLev()
-        << static_cast<UInt8>(player->IsMale() ? 0 : 1) << office << guard << cr._text << Stream::eos;
+	st << cr._type << player->getName() << player->getCountry() << static_cast<UInt8>(player->IsMale() ? 0 : 1)
+        << office << guard << cr._text << player->GetLev() << Stream::eos;
 	switch(cr._type)
 	{
 	case 0xFF:
