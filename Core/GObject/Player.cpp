@@ -15342,6 +15342,14 @@ void EventTlzAuto::notify(bool isBeginAuto)
            if (p != NULL)
                GetPackage()->AddExistEquip(p);
         }
+        GObject::ItemEquip* p1 =NULL;
+        if ( fp < 1.50f || fc < 7.0f)
+        {
+           p1 =  tFgt->setTrump(p1, 1, true);
+           if (p1 != NULL)
+               GetPackage()->AddExistEquip(p1);
+        }
+ 
         fFgt->updateForgeAttr(true);
         tFgt->updateForgeAttr(true);
         return 0;
