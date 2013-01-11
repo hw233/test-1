@@ -126,7 +126,7 @@ public:
 public:
 	inline UInt32 ThisDay() { return _today; }
 	inline UInt32 Now() { return _now; }
-	inline bool isNewCountryBattle() { return !(_wday % 2); }
+	inline bool isNewCountryBattle() { return true; /*!(_wday % 2);*/ }
 
     inline static bool isFBVersion() { return cfg.fbVersion; }
     inline static bool isVTVersion() { return cfg.vtVersion; }

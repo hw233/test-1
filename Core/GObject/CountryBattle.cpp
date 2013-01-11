@@ -921,10 +921,10 @@ void GlobalCountryBattle::prepare( UInt32 t )
 {
 	_running = false;
 	if(cfg.GMCheck)
-		_prepareTime = TimeUtil::SharpDay(0) + 19 * 60 * 60 + 45 * 60;
+		//_prepareTime = TimeUtil::SharpDay(0) + 19 * 60 * 60 + 45 * 60;
+		_prepareTime = t + 15 * 60;
 	else
-		//_prepareTime = t + 30;
-		_prepareTime = TimeUtil::SharpDay(0) + 19 * 60 * 60 + 45 * 60;
+		_prepareTime = t + 30;
 	if(_prepareTime + 45 * 60 < t)
 		_prepareTime += 24 * 60 * 60;
 	_startTime = _prepareTime + 15 * 60;
@@ -935,10 +935,8 @@ void GlobalCountryBattle::prepare( UInt32 t )
 	}
 	else
 	{
-		//_startTime = _prepareTime + 30;
-		//_endTime = _startTime + 8 * 60;
-		_startTime = _prepareTime + 15 * 60;
-		_endTime = _startTime + 30 * 60;
+		_startTime = _prepareTime + 30;
+		_endTime = _startTime + 8 * 60;
 	}
 }
 

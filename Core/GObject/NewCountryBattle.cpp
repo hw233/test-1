@@ -806,6 +806,8 @@ bool NewCountryBattle::isRunAway(NewCBPlayerData * ncbpData1, NewCBPlayerData * 
        
         ncbpData2->currKillStreak ++;
         ncbpData2->totalWin ++;
+        if(ncbpData2->currKillStreak > ncbpData2->maxKillStreak)
+            ncbpData2->maxKillStreak = ncbpData2->currKillStreak;
         kills2 = ncbpData2->currKillStreak > 10 ? 10 : ncbpData2->currKillStreak;
         achieve = COUNT_WINACHIEVE(kills1, kills2, achLvl1, achLvl2);
         ncbpData2->setAchievementLevel(achieve);
@@ -826,6 +828,8 @@ bool NewCountryBattle::isRunAway(NewCBPlayerData * ncbpData1, NewCBPlayerData * 
         
         ncbpData1->currKillStreak ++;
         ncbpData1->totalWin ++;
+        if(ncbpData1->currKillStreak > ncbpData1->maxKillStreak)
+            ncbpData1->maxKillStreak = ncbpData1->currKillStreak;
         kills1 = ncbpData1->currKillStreak > 10 ? 10 : ncbpData1->currKillStreak;
         achieve = COUNT_WINACHIEVE(kills1, kills2, achLvl1, achLvl2);
         ncbpData1->setAchievementLevel(achieve);
