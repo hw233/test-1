@@ -127,6 +127,11 @@ function is1221_1227()
     return is_1221_1227
 end
 
+is_0111_0117 = false
+function is0111_0117()
+    return is_0111_0117
+end
+
 function onActivityCheck(tm)
   local osmax = oldServersMax[serverName]
   if osmax ~= nil and serverNum <= osmax then
@@ -848,6 +853,12 @@ function onActivityCheck(tm)
           setFeastLoginAct(false)
       end
 
+      if tm >= actTime233_0 and tm < actTime233_1 then
+          is_0111_0117 = true
+      else
+          is_0111_0117 = false
+      end
+
       setShuoShuo(true);
   end
 
@@ -876,6 +887,12 @@ function onActivityCheck(tm)
       setGoldSnakeAct(true)
   else
       setGoldSnakeAct(false)
+  end
+
+  if tm >= actTime234_0 and tm < actTime234_1 then
+      setHeroIslandAct(true)
+  else
+      setHeroIslandAct(false)
   end
 
   setRC7Day(true)
@@ -1067,6 +1084,11 @@ function initActTime(y, m, d)
   local  SerStartTm231_1 = { ['year'] = 2013, ['month'] = 1, ['day'] = 6, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 登录礼包人人有(2013.1.9~2013.1.18)
   local  SerStartTm232 = { ['year'] = 2013, ['month'] = 1, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 锦云兜商城
+  local  SerStartTm233 = { ['year'] = 2013, ['month'] = 1, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --英雄岛限时“自动战斗”活动
+  local  SerStartTm234 = { ['year'] = 2013, ['month'] = 1, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm234_1 = { ['year'] = 2013, ['month'] = 1, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
 
   --300-399越南版用了
@@ -1416,6 +1438,12 @@ function initActTime(y, m, d)
 
   actTime232_0= os.time(SerStartTm232);
   actTime232_1= os.time(SerStartTm232) + 10 * 86400;
+
+  actTime233_0= os.time(SerStartTm233);
+  actTime233_1= os.time(SerStartTm233) + 7 * 86400;
+
+  actTime234_0= os.time(SerStartTm234);
+  actTime234_1= os.time(SerStartTm234_1);
 
   onActivityCheck(os.time() + 30);
 
