@@ -11,6 +11,7 @@ function dreamer_template()
     f=$1
     d=dreamer_template
     sed -i /Level/d $f
+    sed -i /副本/d $f
     sed -i /^$/d $f
     sed -i s/\"//g $f
     export lines=`wc -l $f | awk '{print $1}'`

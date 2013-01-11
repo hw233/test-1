@@ -97,6 +97,7 @@ enum PurchaseType
     Enum3366Gift                = 86,
     BUYJOYBUFF                  = 87, //购买心悦buff
     EnumFEASTGIFT               = 88, //圣诞-登录礼包人人有
+    DreamerConsume                = 89,
     //繁体私有占150～200
 };
 

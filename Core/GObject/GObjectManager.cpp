@@ -5292,12 +5292,11 @@ namespace GObject
     bool GObjectManager::loadDreamer()
     {
         // TODO: 读取水晶梦境有关数据
-        return true; // XXX: 
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading dreamer");
         DBDreamer dbd;
-        if(execu->Prepare("SELECT `playerId`, `progress`, `level`, `maxX`, `maxY`, `maxGrid`, `mapInfo`, `posX`, `posY`, `earlyPosX`, `earlyPosY`, `timeConsume`, `remainTime`, `key`, `eyes` FROM `dreamer` ORDER BY `playerId`", dbd) != DB::DB_OK)
+        if(execu->Prepare("SELECT `playerId`, `progress`, `level`, `maxX`, `maxY`, `maxGrid`, `mapInfo`, `posX`, `posY`, `earlyPosX`, `earlyPosY`, `timeConsume`, `remainTime`, `keys`, `eyes`, `eyeTime`, `eyeX`, `eyeY` FROM `dreamer` ORDER BY `playerId`", dbd) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
         Player * player = NULL;
@@ -5306,7 +5305,7 @@ namespace GObject
             player = globalPlayers[dbd.playerId];
             if (player)
             {
-                player->setDreamer(dbd.progress, dbd.level, dbd.maxX, dbd.maxY, dbd.maxGrid, dbd.mapInfo, dbd.posX, dbd.posY, dbd.earlyPosX, dbd.earlyPosY, dbd.timeConsume, dbd.remainTime, dbd.keysCount, dbd.eyesCount);
+                player->setDreamer(dbd.progress, dbd.level, dbd.maxX, dbd.maxY, dbd.maxGrid, dbd.mapInfo, dbd.posX, dbd.posY, dbd.earlyPosX, dbd.earlyPosY, dbd.timeConsume, dbd.remainTime, dbd.keysCount, dbd.eyesCount, dbd.eyeTime, dbd.eyeX, dbd.eyeY);
             }
 			lc.advance();
         }

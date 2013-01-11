@@ -14377,12 +14377,14 @@ namespace GObject
 
    void Player::setDreamer(UInt8 progress, UInt8 level, UInt8 maxX, UInt8 maxY, UInt8 maxGrid,
            const std::string& mapInfo, UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY,
-           UInt8 timeConsume, UInt8 remainTime, UInt8 keysCount, UInt8 eyesCount)
+           UInt8 timeConsume, UInt8 remainTime, UInt8 keysCount, 
+           UInt8 eyesCount, UInt8 eyeTime, UInt8 eyeX, UInt8 eyeY)
    {
        if (_dreamer)
            return;
        _dreamer = new Dreamer(this, progress, level, maxX, maxY, maxGrid, mapInfo,
-               posX, posY, earlyPosX, earlyPosY, timeConsume, remainTime, keysCount, eyesCount);
+               posX, posY, earlyPosX, earlyPosY, timeConsume, remainTime, keysCount, 
+               eyesCount, eyeTime, eyeX, eyeY);
    }
 
 
@@ -16337,14 +16339,28 @@ Dreamer* Player::getDreamer()
        {
            _dreamer = new Dreamer(this);
        }
-#ifdef DREAMER_DEBUG
-       else
-       {
-           delete _dreamer;
-           _dreamer = new Dreamer(this);
-       }
-#endif
        return _dreamer;
+}
+
+void Player::setDreamerTime(UInt8 count)
+{
+    if (!_dreamer)
+        return;
+    _dreamer->SetTime(count);
+}
+
+void Player::setDreamerEye(UInt8 count)
+{
+    if (!_dreamer)
+        return;
+    _dreamer->SetEye(count);
+}
+
+void Player::setDreamerKey(UInt8 count)
+{
+    if (!_dreamer)
+        return;
+    _dreamer->SetKey(count);
 }
 
 void Player::sendSysUpdate()

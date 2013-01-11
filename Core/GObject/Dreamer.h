@@ -139,14 +139,22 @@ class Dreamer
     public:
         Dreamer(Player *player);
         Dreamer(Player * player, UInt8 progress, UInt8 level, UInt8 maxX, UInt8 maxY, UInt8 maxGrid, const std::string& mapInfo, 
-                UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY, UInt8 timeConsume, UInt32 remainTime, UInt8 keysCount, UInt8 eyesCount);
+                UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY, UInt8 timeConsume, UInt32 remainTime, UInt8 keysCount, 
+                UInt8 eyesCount, UInt8 eyeTime, UInt8 eyeX, UInt8 eyeY);
         ~Dreamer();
 
         void OnCommand(UInt8 command, UInt8 val, UInt8 val2);
 
         void SendGameInfo();
         void SendGridInfo(UInt8 posX, UInt8 posY);
-        void SendMapInfo();
+        void SendMapInfo(bool isNext = false);
+        void SendEyeInfo(UInt8 type);
+        void SendTimeOver();
+        void SendExploreOver();
+
+        void SetTime(UInt8 count);
+        void SetEye(UInt8 count);
+        void SetKey(UInt8 count);
 
     private:
         bool InitMap(UInt8 level);
@@ -158,7 +166,7 @@ class Dreamer
         void SaveMapInfo();
 
         void OnRequestStart(UInt8 progress);
-        void OnMove(UInt8 x, UInt8 y);
+        bool OnMove(UInt8 x, UInt8 y);
         bool OnStepIntoWave();
         bool OnGetTreasure();
         bool OnGetKey();
@@ -166,10 +174,12 @@ class Dreamer
         bool OnSufferWhirlwind();
         bool OnGetTime();
         bool OnGetEye();
-        bool OnUseEye();
+        bool OnUseEye(UInt8 type);
+        bool OnBuyEye(UInt8 count = 1);
         void OnAbort();
 
         UInt8 CheckGridType(UInt8 type);
+        bool CheckEnd();
         UInt8 CalcArrowType(UInt16 srcPos, UInt16 dstPos);
 
     private:
@@ -195,8 +205,11 @@ class Dreamer
         UInt8  _timeConsume;            // 该层每步消耗的体力
         UInt8  _remainTime;             // 梦境游戏中剩余的体力
         UInt8  _keysCount;              // 手头钥匙的数量
+
         UInt8  _eyesCount;              // 手头拥有梦境之眼的数量
         UInt8  _eyesTime;               // 梦境之眼的有效时间
+        UInt8  _eyeX;
+        UInt8  _eyeY;
 
         URandom _rnd;                   // 用于产生随机数
         

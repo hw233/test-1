@@ -18,9 +18,11 @@ Dreamer::Dreamer(Player * player)
     :_owner(player), _gameProgress(0), _gameLevel(0), _isInGame(false),
     _maxX(0), _maxY(0), _maxGrid(0), 
     _posX(0), _posY(0), _earlyPosX(0), _earlyPosY(0),
-    _timeConsume(0), _remainTime(50), _keysCount(0), _eyesCount(0), _eyesTime(0)
+    _timeConsume(0), _remainTime(50), _keysCount(0), 
+    _eyesCount(0), _eyesTime(0), _eyeX(0), _eyeY(0)
 {
 #ifdef DREAMER_DEBUG
+    /*
     _gameProgress = PROGRESS_70;
     for (UInt8 i = 1; i < MAX_LEVEL + 1; ++i)
     {
@@ -31,15 +33,19 @@ Dreamer::Dreamer(Player * player)
         }
         _mapInfo.clear();
     }
+    */
 #endif
     DB2().PushUpdateData("INSERT IGNORE INTO `dreamer` (`playerId`) VALUES (%"I64_FMT"u)", player->getId()); 
+    
 }
 
 Dreamer::Dreamer(Player * player, UInt8 progress, UInt8 level, UInt8 maxX, UInt8 maxY, UInt8 maxGrid, const std::string& mapInfo, 
-        UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY, UInt8 timeConsume, UInt32 remainTime, UInt8 keysCount, UInt8 eyesCount)
+        UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY, UInt8 timeConsume, UInt32 remainTime, UInt8 keysCount,
+        UInt8 eyesCount, UInt8 eyeTime, UInt8 eyeX, UInt8 eyeY)
     : _owner(player), _gameProgress(progress), _gameLevel(level), _isInGame(false), _maxX(maxX), _maxY(maxY), _maxGrid(maxGrid), 
     _posX(posX), _posY(posY), _earlyPosX(earlyPosX), _earlyPosY(earlyPosY), 
-    _timeConsume(timeConsume), _remainTime(remainTime), _keysCount(keysCount), _eyesCount(eyesCount), _eyesTime(0)
+    _timeConsume(timeConsume), _remainTime(remainTime), _keysCount(keysCount), 
+    _eyesCount(eyesCount), _eyesTime(eyeTime), _eyeX(eyeX), _eyeY(eyeY)
 {
     // 从数据库加载时调用到的构造函数
     LoadMapInfo(mapInfo);
@@ -65,9 +71,10 @@ bool Dreamer::LoadMapInfo(const std::string& list)
             return false;
         UInt16 pos = atoi(tokenizer2[0].c_str());
         UInt8 neighbCount = atoi(tokenizer2[1].c_str());
-        UInt8 gridType = atoi(tokenizer2[2].c_str());
+        UInt16 gridType = atoi(tokenizer2[2].c_str());
         _mapInfo.insert(std::make_pair(pos, GridInfo(pos, gridType, neighbCount)));
     }
+    _isInGame = true;
     return true;
 }
 
@@ -91,9 +98,14 @@ void Dreamer::SaveMapInfo()
     if (pbuf != buf)
         mapString = buf;
 
-    DB2().PushUpdateData("UPDATE `dreamer` SET `maxX` = '%u', `maxY` = '%u', `maxGrid` = '%u', `mapInfo` = '%s', "\
-            "`posX` = '%u', `posY` = '%u', `earlyPosX` = '%u', `earlyPosY` = '%u', `remainTime` = '%u', `keys` = '%u', `eyes` = '%u' WHERE `playerId` = %"I64_FMT"u", 
-            _maxX, _maxY, _maxGrid, mapString.c_str(), _posX, _posY, _earlyPosX, _earlyPosY, _remainTime, _keysCount, _eyesCount, _owner->getId());
+    DB2().PushUpdateData("UPDATE `dreamer` SET `progress` = '%u', `level` = '%u', `timeConsume` = '%u',"\
+            "`maxX` = '%u', `maxY` = '%u', `maxGrid` = '%u', `mapInfo` = '%s', "\
+            "`posX` = '%u', `posY` = '%u', `earlyPosX` = '%u', `earlyPosY` = '%u', `remainTime` = '%u', `keys` = '%u',"\
+            "`eyes` = '%u', `eyeTime` = '%u', `eyeX` = '%u', `eyeY` = '%u' WHERE `playerId` = %"I64_FMT"u", 
+            _gameProgress, _gameLevel, _timeConsume, 
+            _maxX, _maxY, _maxGrid, mapString.c_str(), 
+            _posX, _posY, _earlyPosX, _earlyPosY, _remainTime, _keysCount, 
+            _eyesCount, _eyesTime, _eyeX, _eyeY, _owner->getId());
 }
 
 void Dreamer::OnCommand(UInt8 command, UInt8 val, UInt8 val2)
@@ -106,7 +118,14 @@ void Dreamer::OnCommand(UInt8 command, UInt8 val, UInt8 val2)
             break;
         case 1:
             // 移动至某一格
-            OnMove(val, val2);
+            if (OnMove(val, val2) && !_remainTime)
+            {
+
+                SendGridInfo(val, val2);
+                SendTimeOver();
+                OnAbort();
+                return;
+            }
             break;
         case 2:
             // 针对某一格子的具体操作
@@ -126,10 +145,14 @@ void Dreamer::OnCommand(UInt8 command, UInt8 val, UInt8 val2)
                         res = OnStepIntoWave();
                         if (res)
                         {
-                            _eyesCount = 0;
                             _eyesTime = 0;
                             InitMap(++_gameLevel);
-                            SendMapInfo();
+                            SendMapInfo(true);
+                            if (!_remainTime)
+                            {
+                                SendTimeOver();
+                                OnAbort();
+                            }
                             return;
                         }
                         break;
@@ -138,15 +161,18 @@ void Dreamer::OnCommand(UInt8 command, UInt8 val, UInt8 val2)
                         break;
                     case GRID_TREASURE  :
                         res = OnGetTreasure();
+                        if (!res)
+                            return;
                         break;
                     case GRID_EYE       :
+                        res = OnGetEye();
                         break;
                     case GRID_ITEM      :
                         res = OnGetItem();
                         break;
-                    case GRID_WHIRLWIND :
-                        res = OnSufferWhirlwind();
-                        break;
+                    //case GRID_WHIRLWIND :
+                        //res = OnSufferWhirlwind();
+                        //break;
                     case GRID_TIME      :
                         res = OnGetTime();
                         break;
@@ -157,17 +183,63 @@ void Dreamer::OnCommand(UInt8 command, UInt8 val, UInt8 val2)
                         break;
                 }
 
+                if (!_remainTime)
+                {
+                    SendTimeOver();
+                    OnAbort();
+                    return;
+                }
+
                 if (res)
                     (it->second).gridType |= CLEAR_FLAG;
-
+                INDEX_TO_POS (it->first, val, val2);
             }
             break;
+        case 3:
+            // 使用道具或者购买道具
+            switch (val)
+            {
+                case 1:
+                    // 使用梦境之眼
+                    OnUseEye(val2);
+                    break;
+                case 2:
+                    // 购买梦境之眼
+                    OnBuyEye(val2);
+                    break;
+            }
+            SendEyeInfo(val);
+            val = _posX;
+            val2 = _posY;
+            return;
+            break;
+        case 4:
+            switch(val)
+            {
+                case 0:
+                    SendGameInfo();
+                    return;
+                case 0xFF:
+                    OnAbort();
+                    return;
+                default:
+                    OnRequestStart(val);
+                    return;
+
+            }
         default:
             break;
     }
+
     SaveMapInfo();
     SendGridInfo(val, val2);
     DumpMapData();
+    if(CheckEnd())
+    {
+        SendExploreOver();
+        OnAbort();
+        return;
+    }
 }
 
 bool Dreamer::InitMap(UInt8 level)
@@ -177,6 +249,7 @@ bool Dreamer::InitMap(UInt8 level)
     {
         return false;
     }
+    _mapInfo.clear();
 
     const GData::DreamerLevelData& dreamerLevelData = GData::dreamerDataTable[_gameProgress][level];
     _maxX = dreamerLevelData.maxX;
@@ -330,6 +403,8 @@ bool Dreamer::InitMap(UInt8 level)
 
 bool Dreamer::InitArrow()
 {
+    // 又给咔嚓掉的功能
+    return true;
     // 初始化箭头方向和类型（对玩家来说一定很坑爹）
     std::vector<MapInfo::iterator> arrow;
     std::vector<MapInfo::iterator> notArrow;
@@ -483,19 +558,25 @@ void Dreamer::OnRequestStart(UInt8 progress)
     }
     _gameProgress = progress;
     _gameLevel = 1;
+    _remainTime = 50;
     _keysCount = 0;
-    DB2().PushUpdateData("UPDATE `dreamer` SET `progress` = '%u' `level` = '%u', `keys` = '%u' WHERE `playerId` = %"I64_FMT"u", _gameProgress, _gameLevel, _owner->getId(), _keysCount);
+    _eyesCount = 1;
+    DB2().PushUpdateData("UPDATE `dreamer` SET `progress` = '%u', `level` = '%u', `keys` = '%u' WHERE `playerId` = %"I64_FMT"u", _gameProgress, _gameLevel, _keysCount, _owner->getId());
     if (!InitMap(_gameLevel))
     {
         OnAbort();
+        return;
     }
     _owner->GetPackage()->DelItemAny(DREAMER_ITEM[progress], 1);
+    _isInGame = true;
     SendGameInfo();
+    SendMapInfo();
 }
 
-void Dreamer::OnMove(UInt8 x, UInt8 y)
+bool Dreamer::OnMove(UInt8 x, UInt8 y)
 {
     // 玩家在梦境游戏中移动
+    bool ret = false;
     UInt16 pos = POS_TO_INDEX(x,y);
     UInt8 dx = (_posX > x) ? (_posX - x) : (x - _posX);
     UInt8 dy = (_posY > y) ? (_posY - y) : (y - _posY);
@@ -503,19 +584,32 @@ void Dreamer::OnMove(UInt8 x, UInt8 y)
     {
         _owner->sendMsgCode(0, 2201, x * 100 + y); // 请移动至相邻的坐标
         SendMapInfo();
-        return;
+        return ret;
     }
     MapInfo::iterator it = _mapInfo.find(pos);
     if (it == _mapInfo.end())
     {
         _owner->sendMsgCode(0, 2202, x * 100 + y); // 该地点无法到达
         SendMapInfo();
-        return;
+        return ret;
     }
+
+    if ( x == _eyeX && y == _eyeY)
+    {
+        _eyesTime = 0;
+    }
+
+    _earlyPosX = _posX;
+    _earlyPosY = _posY;
+
+    _posX = x;
+    _posY = y;
+
 
     if (((it->second).gridType & CLEAR_FLAG))
     {
         // 该格子事件已经完成
+        ret = true;
     }
     else
     {
@@ -533,10 +627,14 @@ void Dreamer::OnMove(UInt8 x, UInt8 y)
             case GRID_ITEM      :
                 break;
             case GRID_WHIRLWIND :
+                ret = OnSufferWhirlwind();
+                (it->second).gridType |= CLEAR_FLAG;
                 break;
             case GRID_TIME      :
                 break;
             case GRID_ARROW     :
+                (it->second).gridType |= CLEAR_FLAG;
+                ret = true;
                 break;
             default:
                 break;
@@ -546,16 +644,15 @@ void Dreamer::OnMove(UInt8 x, UInt8 y)
     //  更新该格子的信息
     (it->second).gridType &= ~UNKNOWN_FLAG;
 
-    _earlyPosX = _posX;
-    _earlyPosY = _posY;
-
-    _posX = x;
-    _posY = y;
+    if (_remainTime >= _timeConsume)
+        _remainTime -= _timeConsume;
+    else
+        _remainTime = 0;
 
     if (_eyesTime)
         --_eyesTime;
 
-    SendGridInfo(x, y);
+    return ret;
 }
 
 void Dreamer::OnAbort()
@@ -570,6 +667,10 @@ void Dreamer::OnAbort()
     _earlyPosX = _earlyPosY = 0;
     _mapInfo.clear();
     _isInGame = false;
+    _keysCount = 0;
+    _eyesCount = 0;
+    _eyesTime = 0;
+    _eyeX = _eyeY = 0;
     DB2().PushUpdateData("UPDATE `dreamer` SET `progress` = '%u', `level` = '%u', `maxX` = '%u',  `maxY` = '%u', `maxGrid` = '%u', `mapInfo` = '',"\
             "`posX` = %u, `posY` = %u, `earlyPosX` = %u, `earlyPosY` = %u, `remainTime` = %u  WHERE `playerId` = %"I64_FMT"u", 
             _gameProgress, _gameLevel, _maxX, _maxY, _maxGrid, _posX, _posY, _earlyPosX, _earlyPosY, _remainTime, _owner->getId());
@@ -579,7 +680,7 @@ void Dreamer::OnAbort()
 bool Dreamer::OnStepIntoWave()
 {
     // 进入漩涡，开始下一层
-    if (CheckGridType(GRID_WAVE))
+    if (!CheckGridType(GRID_WAVE))
     {
         TRACE_LOG("Dream: wave error.");
         return false;
@@ -606,14 +707,14 @@ bool Dreamer::OnGetTreasure()
     }
     if (!_keysCount)
     {
-        _owner->sendMsgCode(0, 2222, 0);    // 钥匙不足，无法打开宝箱
+        //_owner->sendMsgCode(0, 2222, 0);    // 钥匙不足，无法打开宝箱
         return false;
     }
     --_keysCount;
     Table rewards = GameAction()->getDreamerTreasure(_gameProgress);
     Stream st;
     st.init(REP::DREAMER);
-    st << static_cast<UInt8>(14);
+    st << static_cast<UInt8>(1);
     UInt8 count = rewards.size();
     st << static_cast<UInt8>(count);
     for (UInt8 i = 0; i < count; ++i)
@@ -636,7 +737,7 @@ bool Dreamer::OnGetTreasure()
 bool Dreamer::OnGetKey()
 {
     // 得到钥匙
-    if (CheckGridType(GRID_KEY))
+    if (!CheckGridType(GRID_KEY))
     {
         TRACE_LOG("Dream: key error.");
         return false;
@@ -681,33 +782,51 @@ bool Dreamer::OnGetItem()
 bool Dreamer::OnSufferWhirlwind()
 {
     // 遇上飓风，随机到达任何地点
+    bool ret = false;
     UInt8 rndIndex = _rnd(_mapInfo.size());
     UInt8 index = 0;
     for (MapInfo::iterator it = _mapInfo.begin(); it != _mapInfo.end(); ++it)
     {
         if (index == rndIndex)
         {
-            INDEX_TO_POS(it->first, _posX, _posY);
-            (it->second).gridType &= ~UNKNOWN_FLAG;
-            return true;
+            if (POS_TO_INDEX(_posX, _posY) == it->first)
+            {
+                if (it == _mapInfo.begin())
+                    ++it;
+                else
+                    it = _mapInfo.begin();
+            }
+            if (it != _mapInfo.end())
+            {
+                INDEX_TO_POS(it->first, _posX, _posY);
+                (it->second).gridType &= ~UNKNOWN_FLAG;
+                if (((it->second).gridType & 0x0F) == GRID_ARROW)
+                    (it->second).gridType |= CLEAR_FLAG;
+                ret = ((it->second).gridType & CLEAR_FLAG)? true: false;
+            }
+            else
+            {
+                TRACE_LOG("Dreamer: suffer whirlwind error2.");
+            }
+            return ret;
         }
         ++index;
     }
     TRACE_LOG("Dreamer: suffer whirlwind error.");
-    return true;
+    return ret;
 }
 
 bool Dreamer::OnGetTime()
 {
     // 增加时间
-    _remainTime += _timeConsume;
+    _remainTime += 5;       // 写死写死
     return true;
 }
 
 bool Dreamer::OnGetEye()
 {
     // 获得梦境之眼
-    if (CheckGridType(GRID_EYE))
+    if (!CheckGridType(GRID_EYE))
     {
         TRACE_LOG("Dream: eye error.");
         return false;
@@ -717,22 +836,68 @@ bool Dreamer::OnGetEye()
     return true;
 }
 
-bool Dreamer::OnUseEye()
+bool Dreamer::OnUseEye(UInt8 type)
 {
-    // 使用梦境之眼
+    // 使用梦境之眼 (钥匙，秘宝，漩涡)
     if (!_eyesCount)
     {
         _owner->sendMsgCode(0, 2223, 0);
         return false;
     }
-    --_eyesCount;
-    _eyesTime = 3;
-    DB2().PushUpdateData("UPDATE `dreamer` SET `eyes` = '%u' WHERE `playerId` = %"I64_FMT"u", _eyesCount, _owner->getId());
+    switch(type)
+    {
+        case GRID_WAVE:
+            break;
+        case GRID_KEY:
+            break;
+        case GRID_TREASURE:
+            break;
+        default:
+            return false;
+    }
+
+    for (MapInfo::iterator it = _mapInfo.begin(); it != _mapInfo.end(); ++ it)
+    {
+
+        if (((it->second).gridType & 0x0f) == type)
+        {
+            if ((it->second).gridType & CLEAR_FLAG) // 已经完成的格子，不需要指引了
+                return false;
+            --_eyesCount;
+            _eyesTime = 3;
+            INDEX_TO_POS(it->first, _eyeX, _eyeY);
+            DB2().PushUpdateData("UPDATE `dreamer` SET `eyes` = '%u', `eyeTime` = '%u', `eyeX` = '%u',`eyeY` = '%u' WHERE `playerId` = %"I64_FMT"u", _eyesCount, _eyesTime, _eyeX, _eyeY, _owner->getId());
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Dreamer::OnBuyEye(UInt8 count /*= 1 */)
+{
+    // 购买梦境之眼
+    UInt16 total = count * 10;
+    if (_owner->getGold() <  total)
+    {
+        _owner->sendMsgCode(0, 2225, 0);
+        return false;
+    }
+    ConsumeInfo ci(DreamerConsume, 0, count);
+    _owner->useGold(total, &ci);
+    _eyesCount += count;
     return true;
 }
 
 void Dreamer::SendGameInfo()
 {
+    // 发送水晶梦境面板信息
+    Stream st (REP::DREAMER);
+    st << static_cast<UInt8>(4);
+
+    st << static_cast<UInt8> (_gameProgress);       // 梦境等级
+    st << static_cast<UInt8> (_isInGame ? 1 : 0);   // 是否已经进入水晶梦境
+    st << Stream::eos;
+    _owner->send(st);
 }
 
 void Dreamer::SendGridInfo(UInt8 posX, UInt8 posY)
@@ -756,20 +921,29 @@ void Dreamer::SendGridInfo(UInt8 posX, UInt8 posY)
         return;
     st << static_cast<UInt16>((it->second).gridType);
     st << static_cast<UInt8>(_remainTime);
+    st << static_cast<UInt8>(_keysCount);
+    st << static_cast<UInt8>(_eyesCount);
+    st << static_cast<UInt8>(_eyesTime);
+    if (_eyesTime)
+    {
+        st << static_cast<UInt8>(_eyeX);
+        st << static_cast<UInt8>(_eyeY);
+    }
             
 
     st << Stream::eos;
     _owner->send(st);
 }
 
-void Dreamer::SendMapInfo()
+void Dreamer::SendMapInfo(bool isNext /* = false */)
 {
     // 发送地图信息
     Stream st(REP::DREAMER);
-    st << static_cast<UInt8>(0);
+    st << static_cast<UInt8>(isNext ? 5:0);
     st << static_cast<UInt8>(_gameProgress);
     if (_gameProgress != PROGRESS_NONE)
     {
+        _isInGame = true;
         st << static_cast<UInt8> (_gameLevel);
         st << static_cast<UInt8> (_maxX);
         st << static_cast<UInt8> (_maxY);
@@ -784,10 +958,72 @@ void Dreamer::SendMapInfo()
         st << static_cast<UInt8>(_posX);
         st << static_cast<UInt8>(_posY);
         st << static_cast<UInt8>(_remainTime);
+        st << static_cast<UInt8>(_keysCount);
+        st << static_cast<UInt8>(_eyesCount);
+        st << static_cast<UInt8>(_eyesTime);
+        if (_eyesTime)
+        {
+            st << static_cast<UInt8>(_eyeX);
+            st << static_cast<UInt8>(_eyeY);
+        }
     }
 
     st << Stream::eos;
     _owner->send(st);
+}
+
+void Dreamer::SendEyeInfo(UInt8 type)
+{
+    // 发送梦境之眼信息
+    Stream st(REP::DREAMER);
+    st << static_cast<UInt8>(3);
+    st << static_cast<UInt8>(type);
+    switch (type)
+    {
+        case 1:
+            st << static_cast<UInt8>(_eyesCount);
+            st << static_cast<UInt8>(_eyesTime);
+            st << static_cast<UInt8>(_eyeX);
+            st << static_cast<UInt8>(_eyeY);
+            break;
+        case 2:
+            st << static_cast<UInt8>(_eyesCount);
+            break;
+    }
+            
+
+    st << Stream::eos;
+    _owner->send(st);
+}
+
+void Dreamer::SendTimeOver()
+{
+    // 时间结束
+    Stream st(REP::DREAMER);
+    st << static_cast<UInt8>(6);
+
+    st << Stream::eos;
+    _owner->send(st);
+}
+
+void Dreamer::SendExploreOver()
+{
+    // 探索结束
+    Stream st(REP::DREAMER);
+    st << static_cast<UInt8>(7);
+
+    st << Stream::eos;
+    _owner->send(st);
+}
+
+bool Dreamer::CheckEnd()
+{
+    for (MapInfo::iterator it = _mapInfo.begin(); it != _mapInfo.end(); ++it)
+    {
+        if (!((it->second).gridType & CLEAR_FLAG))
+            return false;
+    }
+    return true;
 }
 
 UInt8 Dreamer::CheckGridType(UInt8 type)
@@ -805,7 +1041,7 @@ UInt8 Dreamer::CheckGridType(UInt8 type)
                 case GRID_ARROW     :
                 case GRID_TIME      :
                 case GRID_EYE       :
-                    return ((it->second).gridType & 0xFF00) >> 8;
+                    //return ((it->second).gridType & 0xFF00) >> 8;
                 case GRID_TREASURE  :
                 case GRID_WAVE      :
                 case GRID_KEY       :
@@ -887,6 +1123,24 @@ UInt8 Dreamer::CalcArrowType(UInt16 srcPos, UInt16 dstPos)
     }
 
     return 0;
+}
+
+void Dreamer::SetTime(UInt8 count)
+{
+    _remainTime = count;
+    SendGridInfo(_posX, _posY);
+}
+
+void Dreamer::SetKey(UInt8 count)
+{
+    _keysCount = count;
+    SendGridInfo(_posX, _posY);
+}
+
+void Dreamer::SetEye(UInt8 count)
+{
+    _eyesCount = count;
+    SendGridInfo(_posX, _posY);
 }
 
 void Dreamer::DumpMapData()

@@ -1118,6 +1118,9 @@ struct DBDreamer
     UInt8 remainTime;
     UInt8 keysCount;
     UInt8 eyesCount;
+    UInt8 eyeTime;
+    UInt8 eyeX;
+    UInt8 eyeY;
 };
 
 }
@@ -2526,7 +2529,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBDreamer)
-SPECIALDEF(15)
+SPECIALDEF(18)
 (
     UInt64, playerId,
     UInt8, progress,
@@ -2542,7 +2545,10 @@ SPECIALDEF(15)
     UInt8, timeConsume,
     UInt8, remainTime,
     UInt8, keysCount,
-    UInt8, eyesCount
+    UInt8, eyesCount,
+    UInt8, eyeTime,
+    UInt8, eyeX,
+    UInt8, eyeY
 )
 SPECIALEND()
 

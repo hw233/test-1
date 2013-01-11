@@ -1863,3 +1863,26 @@ CREATE TABLE `snow` (
     `score` int(10) unsigned NOT NULL,        
     PRIMARY KEY (`playerId`)                  
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `dreamer` (                       
+    `playerId` bigint(20) unsigned NOT NULL,  
+    `progress` tinyint(3) unsigned NOT NULL,      
+    `level` tinyint(3) unsigned NOT NULL,      
+    `maxX` tinyint(3) unsigned NOT NULL,      
+    `maxY` tinyint(3) unsigned NOT NULL,      
+    `maxGrid` tinyint(3) unsigned NOT NULL,      
+    `mapInfo` varchar(1024) NOT NULL DEFAULT '' COMMENT '水晶梦境地图信息',
+    `posX` tinyint(3) unsigned NOT NULL,      
+    `posY` tinyint(3) unsigned NOT NULL,      
+    `earlyPosX` tinyint(3) unsigned NOT NULL,      
+    `earlyPosY` tinyint(3) unsigned NOT NULL,      
+    `timeConsume` tinyint(3) unsigned NOT NULL,      
+    `remainTime` tinyint(3) unsigned NOT NULL,      
+    `keys` tinyint(3) unsigned NOT NULL,      
+    `eyes` tinyint(3) unsigned NOT NULL,      
+    `eyeTime` tinyint(3) unsigned NOT NULL,      
+    `eyeX` tinyint(3) unsigned NOT NULL,      
+    `eyeY` tinyint(3) unsigned NOT NULL,      
+    PRIMARY KEY (`playerId`)                  
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+

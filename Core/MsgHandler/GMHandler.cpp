@@ -227,6 +227,10 @@ GMHandler::GMHandler()
 
     Reg(3, "sysup", &GMHandler::OnSysUpdate);
 
+    Reg(3, "drtm", &GMHandler::OnDreamerTimeSet);
+    Reg(3, "drkey", &GMHandler::OnDreamerKeySet);
+    Reg(3, "dreye", &GMHandler::OnDreamerEyeSet);
+
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -3377,5 +3381,27 @@ void GMHandler::OnSysUpdate(GObject::Player *player, std::vector<std::string>& a
 //    player->sendSysUpdate();
 }
 
+void GMHandler::OnDreamerTimeSet(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return;
+    UInt8 count = atoi(args[0].c_str());
+    player->setDreamerTime(count);
+}
 
 
+void GMHandler::OnDreamerKeySet(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return;
+    UInt8 count = atoi(args[0].c_str());
+    player->setDreamerKey(count);
+}
+
+void GMHandler::OnDreamerEyeSet(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return;
+    UInt8 count = atoi(args[0].c_str());
+    player->setDreamerEye(count);
+}
