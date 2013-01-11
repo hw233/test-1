@@ -106,6 +106,14 @@ function loadStore()
         store:clear()
 
         discount(store)
+
+        if is0111_0117() then
+            store:add(5,9279,1000)
+            store:add(2,9280,10)
+            store:add(2,9281,20)
+            store:add(2,9282,50)
+        end
+
         if getSnowAct() then
             store:add(2, 9275, 10)
         end
