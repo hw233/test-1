@@ -889,6 +889,12 @@ function onActivityCheck(tm)
       setGoldSnakeAct(false)
   end
 
+  if tm >= actTime234_0 and tm < actTime234_1 then
+      setHeroIslandAct(true)
+  else
+      setHeroIslandAct(false)
+  end
+
   setRC7Day(true)
   setCFriend(true);
 
@@ -1080,6 +1086,9 @@ function initActTime(y, m, d)
   local  SerStartTm232 = { ['year'] = 2013, ['month'] = 1, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 锦云兜商城
   local  SerStartTm233 = { ['year'] = 2013, ['month'] = 1, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --英雄岛限时“自动战斗”活动
+  local  SerStartTm234 = { ['year'] = 2013, ['month'] = 1, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm234_1 = { ['year'] = 2013, ['month'] = 1, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
 
   --300-399越南版用了
@@ -1432,6 +1441,9 @@ function initActTime(y, m, d)
 
   actTime233_0= os.time(SerStartTm233);
   actTime233_1= os.time(SerStartTm233) + 7 * 86400;
+
+  actTime234_0= os.time(SerStartTm234);
+  actTime234_1= os.time(SerStartTm234_1);
 
   onActivityCheck(os.time() + 30);
 

@@ -149,6 +149,7 @@ void WorldScript::init()
     def("getSnowAct", GObject::World::getSnowAct);
     def("setGoldSnakeAct", GObject::World::setGoldSnakeAct);
     def("getGoldSnakeAct", GObject::World::getGoldSnakeAct);
+    def("setHeroIslandAct", GObject::World::setHeroIslandAct);
     
     def("setGuoqing", GObject::World::setGuoqing);
     def("getGuoqing", GObject::World::getGuoqing);

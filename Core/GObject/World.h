@@ -351,6 +351,10 @@ public:
     { _goldSnakeAct= v; }
     inline static bool getGoldSnakeAct()
     { return _goldSnakeAct; }
+    inline static void setHeroIslandAct(bool v)
+    { _heroIslandAct= v; }
+    inline static bool getHeroIslandAct()
+    { return _heroIslandAct; }
     inline static void setFeastLoginAct(bool v)
     { _feastloginAct= v; }
     inline static bool getFeastLoginAct()
@@ -649,6 +653,7 @@ public:
     static bool _ssToolbarAct;
     static bool _snowAct;
     static bool _goldSnakeAct;
+    static bool _heroIslandAct;
     static bool _feastloginAct;
     static UInt8 _towerloginAct;
     static bool _guoqing;
