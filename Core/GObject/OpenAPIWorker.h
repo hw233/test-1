@@ -34,9 +34,12 @@ namespace GObject
         private:
 
             void SetUrlString(char* url, UInt64 playerId, UInt16 type, const char * openId, const char * openKey, const char * pf, const char * userIp);
+            void SetUrlString2(char* url, UInt64 playerId, UInt16 type, const char * openId, const char * openKey, const char * pf, const char * userIp);
 
             std::string UrlEncode(const char *in_str);
             std::string Base64Encode(unsigned char const * byte_to_encode, unsigned int in_len);
+            Int32 ResultParse(char* result);
+
             struct UrlParam
             {
                 UInt64 playerId;

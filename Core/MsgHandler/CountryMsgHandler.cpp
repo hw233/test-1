@@ -339,4 +339,6 @@ MSG_REG_2(GameMsgHdr, 0x327, OnDelTianjieNpc);
 MSG_REG_2(GameMsgHdr, 0x328, OnDelMapObj);
 MSG_REG_2(GameMsgHdr, 0x329, OnAddMapObj);
 
+MSG_REG_2(GameMsgHdr, 0x330, OnForbidSale);
+
 MSG_HANDLER_END()

@@ -1824,6 +1824,12 @@ void OnAddMapObj( GameMsgHdr& hdr, const void * data)
     map->Show(mo->m_ID, true, mo->m_Type);
 }
 
+void OnForbidSale( GameMsgHdr &hdr, const void *data)
+{
+	MSG_QUERY_PLAYER(player);
+    player->setForbidSale(true);
+}
+
 
 #endif // _COUNTRYINNERMSGHANDLER_H_
 

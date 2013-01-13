@@ -4,8 +4,14 @@
 
 #include "Server/Cfg.h"
 #include "Common/SHA1Engine.h"
+#include "Player.h"
 #include <openssl/hmac.h>
 #include <sstream>
+
+
+extern "C" {
+#include "../../tools/json-1.4/json.h"
+}
 
 
 namespace GObject
@@ -66,31 +72,45 @@ namespace GObject
 #ifndef MAX_RET_LEN
 #define MAX_RET_LEN 1024
 #endif
-            // TODO: 
+            const static char host[] = "http://openapi.tencentyun.com";
             ++ i;
             char buffer[MAX_RET_LEN] = {0};
-            char url[MAX_RET_LEN] = "??????????";
+            char url[MAX_RET_LEN] = "/v3/csec/punish_query";
+            char res[MAX_RET_LEN] = "";
+
+            // XXX:测试用数据
 
             SetUrlString (url, it->playerId, it->type, it->openId, it->openKey, it->pf, it->userIp);
+            sprintf (res, "%s%s", host, url);
 
             int timeout = 1;
 
-            curl_easy_setopt(curl, CURLOPT_URL, url);
+            curl_easy_setopt(curl, CURLOPT_URL, res);
             curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, recvret);
             curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
             curl_easy_setopt(curl, CURLOPT_TIMEOUT, timeout);
 
 
-            CURLcode res = curl_easy_perform(curl);
-            TRACE_LOG("[%u]%u:%u[%s] -> %d", m_Worker, i, size, url, res == CURLE_OK);
-            if (CURLE_OK == res)
+            CURLcode curlRes = curl_easy_perform(curl);
+            TRACE_LOG("[%u]%u:%u[%s] -> %d", m_Worker, i, size, res, curlRes == CURLE_OK);
+            if (CURLE_OK == curlRes)
             {
-                const char* msg = strcasestr(buffer, "msg");
-                if (!msg)
-                    continue;
-                if (strcasestr(msg, "ok"))
+                Int32 ret = ResultParse(buffer);
+                if (ret < 0)
                 {
-                    // TODO: 需要封杀交易功能
+                    TRACE_LOG("Return %d.", ret);
+                    continue;
+                }
+                else if (ret == 1)
+                {
+                    // 需要封杀交易功能
+                    GObject::Player * pl = GObject::globalPlayers[it->playerId];
+                    if (NULL != pl)
+                    {
+                        GameMsgHdr imh(0x330, pl->getThreadId(), pl, 0);
+                        GLOBAL().PushMsg(imh, NULL);
+                        pl->setForbidSale(true);
+                    }
                 }
             }
             else
@@ -183,7 +203,10 @@ namespace GObject
 
     void OpenAPIWorker::SetUrlString(char* url, UInt64 playerId, UInt16 type, const char * openId, const char * openKey, const char * pf, const char * userIp)
     {
-        SHA1Engine sha1;
+        std::ostringstream strGet;
+        strGet << "GET&";
+        strGet << UrlEncode(url);
+        strGet << "&";
 
         std::ostringstream sigKey;
         sigKey << "appid=";
@@ -199,27 +222,58 @@ namespace GObject
         sigKey << (UInt32) type;
         sigKey << "&userip=";
         sigKey << userIp;
-        std::string sigValue = UrlEncode(sigKey.str().c_str());
+        std::string sigValue;
+        sigValue += strGet.str(); 
+        sigValue += UrlEncode(sigKey.str().c_str());
+
 
         unsigned int size = 0;
         unsigned char* res;
         res = HMAC(EVP_sha1(), appkey.c_str(), appkey.size(), (unsigned char *)sigValue.c_str(), sigValue.size(), NULL, &size);
         sigValue = Base64Encode(res, size);
-        /*
-           sha1.update(_hashval + 8, 4);
-           sha1.update(key1.c_str(), key1.length());
-           sha1.update(_hashval, 4);
-           sha1.update(&_userid, sizeof(UInt64));
-           sha1.update(_hashval + 12, 4);
-           sha1.update(key2.c_str(), key2.length());
-           sha1.update(_hashval + 4, 4);
+        sigKey << "&sig=";
+        sigKey << sigValue;
+        strcat (url, "?");
+        strncat(url, sigKey.str().c_str(), sigKey.str().size() + 1);
 
-           std::vector<UInt8> buf = sha1.digest();
+    }
 
-           if (memcmp(&buf.front(), _hashval + 16, 20) == 0)
-           return true;
-           return false;
-           */
+    void OpenAPIWorker::SetUrlString2(char* url, UInt64 playerId, UInt16 type, const char * openId, const char * openKey, const char * pf, const char * userIp)
+    {
+        SHA1Engine sha1;
+
+        std::ostringstream sigKey2;
+        sigKey2 << "/v3/user/get_info";
+        std::string val1 = "GET&";
+        val1 += UrlEncode ( sigKey2.str().c_str());
+        val1 += "&";
+
+        std::ostringstream sigKey;
+        sigKey << "appid=";
+        sigKey << (UInt32)123456;
+        sigKey << "&format=json"; // XXX: 返回格式先写死为json
+        sigKey << "&openid=";
+        sigKey << openId;
+        sigKey << "&openkey=";
+        sigKey << openKey;
+        sigKey << "&pf=";
+        sigKey << pf;
+        sigKey << "&userip=";
+        sigKey << userIp;
+        std::string sigValue = UrlEncode(sigKey.str().c_str());
+
+        std::string sigValue2;
+        sigValue2 += val1;
+        sigValue2 += sigValue;
+
+        unsigned int size = 0;
+        unsigned char* res;
+        unsigned char tmp[1024];
+        res = HMAC(EVP_sha1(), "228bf094169a40a3bd188ba37ebe8723&", strlen("228bf094169a40a3bd188ba37ebe8723&"), (unsigned char *)sigValue2.c_str(), sigValue2.size(), tmp, &size);
+        sigValue = Base64Encode(res, size);
+        sigKey << "&sig=";
+        sigKey << sigValue;
+        strncpy(url, sigKey.str().c_str(), sigKey.str().size());
     }
 
     std::string OpenAPIWorker::UrlEncode(const char *in_str)
@@ -316,6 +370,37 @@ namespace GObject
         }
         //std::cout << ret << std::endl; // XXX: 为什么GDB在这里我输出ret的数据
         return ret;
+    }
+
+    Int32 OpenAPIWorker::ResultParse(char* result)
+    {
+        // 解析json的结果
+#define JSON_ERR_CUSTOM -9527
+#define JSON_ERR_CUSTOM2 -9528
+#define JSON_ERR_CUSTOM3 -9529
+
+        json_t* obj = NULL;
+
+        enum json_error jerr;
+        if ((jerr = json_parse_document(&obj, result)) != JSON_OK)
+            return JSON_ERR_CUSTOM;
+
+        json_t* hdr = json_find_first_label(obj, "ret");
+        if (!hdr)
+            return JSON_ERR_CUSTOM2;
+
+        Int32 ret = atoi(hdr->text);
+        if (!ret)
+            return ret;
+
+        hdr =  json_find_first_label(obj, "punish");
+        if (!hdr)
+            return JSON_ERR_CUSTOM3;
+        ret = atoi(hdr->text);
+        return ret;
+#undef JSON_ERR_CUSTOM
+#undef JSON_ERR_CUSTOM2
+#undef JSON_ERR_CUSTOM3
     }
 
 }
