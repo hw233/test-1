@@ -2,7 +2,7 @@
 VERSION=`data +%y%m%d%H%M`
 JSON=json-1.4
 
-all:debug
+all:debug_jit
 
 debug_jit:
 	rm -rf build && cd tools/udplog_cpp/ && make 
