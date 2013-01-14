@@ -1506,7 +1506,7 @@ namespace GObject
         UInt8 getSnowAward(UInt16 type);
         //推雪人end
         
-        void setForbidSale(bool b) {_isForbidSale = b;}
+        void setForbidSale(bool b, bool isAuto = false);
         bool getForbidSale() {return _isForbidSale;}
 	private:
 		Mutex _mutex;

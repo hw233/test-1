@@ -1827,7 +1827,24 @@ void OnAddMapObj( GameMsgHdr& hdr, const void * data)
 void OnForbidSale( GameMsgHdr &hdr, const void *data)
 {
 	MSG_QUERY_PLAYER(player);
-    player->setForbidSale(true);
+    if (cfg.merged)
+    {
+        setForbidSaleValue(player->getId()&0xFFFFFFFF, true);
+    }
+    else
+    {
+        setForbidSaleValue(player->getId(), true);
+    }
+    player->setForbidSale(true, true);
+}
+
+void OnForbidSaleQueryFail( GameMsgHdr &hdr, const void *data)
+{
+	MSG_QUERY_PLAYER(player);
+    const Int32 ret = *(reinterpret_cast<Int32*>(const_cast<void *>(data)));
+    char buf[16];
+    snprintf(buf, 16, "%d", ret);
+    player->udpLog("svr_forbid_sale", buf, "", "", "", "", "act_tmp");
 }
 
 

@@ -14773,8 +14773,8 @@ void EventTlzAuto::notify(bool isBeginAuto)
             return 3;
 
         UInt32 score = m_snow.score;
-       // if (m_snow.lover != NULL && m_snow.bind)
-       //     score += m_snow.lover->getSnowScore();
+        // if (m_snow.lover != NULL && m_snow.bind)
+        //     score += m_snow.lover->getSnowScore();
         
         UInt32 needScore = 0;
         MailPackage::MailItem* pItems = NULL;
@@ -14833,12 +14833,16 @@ void EventTlzAuto::notify(bool isBeginAuto)
         return 0;
     }
 
+    void  Player::setForbidSale(bool b, bool isAuto /* = false */)
+    {
+        _isForbidSale = b;
+        if (isAuto)
+        {
+            // 服务器自助查询OpenAPI封杀交易，udp上报一下
+            udpLog("svr_forbid_sale", "success", "", "", "", "", "act_tmp");
+        }
+    }
 
-    ///////////////////////////////////////////////
-    // 帮派副本相关
-
-    // 帮派副本相关
-    ///////////////////////////////////////////////
     void Player::postKillMonsterRoamResult(UInt32 pos, UInt8 curType, UInt8 curCount, UInt8 tips)
     {
         struct _Roam

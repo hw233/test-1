@@ -92,16 +92,11 @@ namespace GObject
 
 
             CURLcode curlRes = curl_easy_perform(curl);
-            TRACE_LOG("[%u]%u:%u[%s] -> %d", m_Worker, i, size, res, curlRes == CURLE_OK);
             if (CURLE_OK == curlRes)
             {
                 Int32 ret = ResultParse(buffer);
-                if (ret < 0)
-                {
-                    TRACE_LOG("Return %d.", ret);
-                    continue;
-                }
-                else if (ret == 1)
+                TRACE_LOG("[%u]%u:%u[%s] -> %d, result = %d", m_Worker, i, size, res, curlRes == CURLE_OK, ret);
+                if (ret == 1)
                 {
                     // 需要封杀交易功能
                     GObject::Player * pl = GObject::globalPlayers[it->playerId];
@@ -109,12 +104,21 @@ namespace GObject
                     {
                         GameMsgHdr imh(0x330, pl->getThreadId(), pl, 0);
                         GLOBAL().PushMsg(imh, NULL);
-                        pl->setForbidSale(true);
+                    }
+                }
+                else
+                {
+                    GObject::Player * pl = GObject::globalPlayers[it->playerId];
+                    if (NULL != pl)
+                    {
+                        GameMsgHdr imh(0x331, pl->getThreadId(), pl, sizeof(ret));
+                        GLOBAL().PushMsg(imh, &ret);
                     }
                 }
             }
             else
             {
+                TRACE_LOG("[%u]%u:%u[%s] -> %d", m_Worker, i, size, res, curlRes == CURLE_OK);
                 continue;
             }
             delete[] it->openId;
@@ -240,6 +244,7 @@ namespace GObject
 
     void OpenAPIWorker::SetUrlString2(char* url, UInt64 playerId, UInt16 type, const char * openId, const char * openKey, const char * pf, const char * userIp)
     {
+        // 测试用的函数，现在不需要使用了
         SHA1Engine sha1;
 
         std::ostringstream sigKey2;
