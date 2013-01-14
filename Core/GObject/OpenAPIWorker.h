@@ -38,7 +38,7 @@ namespace GObject
 
             std::string UrlEncode(const char *in_str);
             std::string Base64Encode(unsigned char const * byte_to_encode, unsigned int in_len);
-            Int32 ResultParse(char* result);
+            Int32 ResultParse(char* result, bool* needForbid);
 
             struct UrlParam
             {

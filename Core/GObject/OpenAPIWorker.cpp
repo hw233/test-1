@@ -78,7 +78,6 @@ namespace GObject
             char url[MAX_RET_LEN] = "/v3/csec/punish_query";
             char res[MAX_RET_LEN] = "";
 
-            // XXX:测试用数据
 
             SetUrlString (url, it->playerId, it->type, it->openId, it->openKey, it->pf, it->userIp);
             sprintf (res, "%s%s", host, url);
@@ -94,16 +93,20 @@ namespace GObject
             CURLcode curlRes = curl_easy_perform(curl);
             if (CURLE_OK == curlRes)
             {
-                Int32 ret = ResultParse(buffer);
+                bool needForbid = false;
+                Int32 ret = ResultParse(buffer, &needForbid);
                 TRACE_LOG("[%u]%u:%u[%s] -> %d, result = %d", m_Worker, i, size, res, curlRes == CURLE_OK, ret);
-                if (ret == 1)
+                if (ret == 0)
                 {
                     // 需要封杀交易功能
-                    GObject::Player * pl = GObject::globalPlayers[it->playerId];
-                    if (NULL != pl)
+                    if(needForbid)
                     {
-                        GameMsgHdr imh(0x330, pl->getThreadId(), pl, 0);
-                        GLOBAL().PushMsg(imh, NULL);
+                        GObject::Player * pl = GObject::globalPlayers[it->playerId];
+                        if (NULL != pl)
+                        {
+                            GameMsgHdr imh(0x330, pl->getThreadId(), pl, 0);
+                            GLOBAL().PushMsg(imh, NULL);
+                        }
                     }
                 }
                 else
@@ -139,9 +142,9 @@ namespace GObject
 
     void OpenAPIWorker::Push(UInt64 playerId, UInt16 type, const char * openId, const char * openKey, const char * pf, const char * userIp)
     {
-        const static int OPEN_ID_LEN  = 20;
-        const static int OPEN_KEY_LEN = 60;
-        const static int PF_LEN = 20;
+        const static int OPEN_ID_LEN  = 64;
+        const static int OPEN_KEY_LEN = 128;
+        const static int PF_LEN = 64;
         const static int IP_LEN = 20;
         int len = 0;
         if (!openId || !openKey || !pf)
@@ -377,35 +380,39 @@ namespace GObject
         return ret;
     }
 
-    Int32 OpenAPIWorker::ResultParse(char* result)
+    Int32 OpenAPIWorker::ResultParse(char* result, bool* needForbid)
     {
         // 解析json的结果
 #define JSON_ERR_CUSTOM -9527
 #define JSON_ERR_CUSTOM2 -9528
 #define JSON_ERR_CUSTOM3 -9529
+#define JSON_ERR_CUSTOM4 -9530
 
         json_t* obj = NULL;
+
 
         enum json_error jerr;
         if ((jerr = json_parse_document(&obj, result)) != JSON_OK)
             return JSON_ERR_CUSTOM;
 
         json_t* hdr = json_find_first_label(obj, "ret");
-        if (!hdr)
+        if (!hdr && !hdr->child && !hdr->text)
             return JSON_ERR_CUSTOM2;
 
-        Int32 ret = atoi(hdr->text);
-        if (!ret)
+        Int32 ret = atoi(hdr->child->text);
+        if (ret)
             return ret;
 
         hdr =  json_find_first_label(obj, "punish");
-        if (!hdr)
+        if (!hdr && !hdr->child && !hdr->text)
             return JSON_ERR_CUSTOM3;
-        ret = atoi(hdr->text);
-        return ret;
+        ret = atoi(hdr->child->text);
+        *needForbid = ret==1? true:false;
+        return 0;
 #undef JSON_ERR_CUSTOM
 #undef JSON_ERR_CUSTOM2
 #undef JSON_ERR_CUSTOM3
+#undef JSON_ERR_CUSTOM4
     }
 
 }
