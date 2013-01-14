@@ -3639,6 +3639,7 @@ void OnPrivChatReq( GameMsgHdr& hdr, PrivChatReq& pcr )
 		rep.sex = 0;
 		rep.office = player->getTitle();
 		rep.guard = player->getPF();
+		rep.level = player->GetLev();
 		player->send(rep);
 	}
 	else
@@ -3649,6 +3650,7 @@ void OnPrivChatReq( GameMsgHdr& hdr, PrivChatReq& pcr )
 		rep.sex = player->IsMale() ? 0 : 1;
 		rep.office = player->getTitle();
 		rep.guard = player->getPF();
+		rep.level = player->GetLev();
 		pl->send(rep);
 	}
 }
