@@ -28,6 +28,6 @@ elif [ $# -ge 2 -a "$2" == "jit" ]; then
     make release_jit
     tar cvfz $R$file -X exclude bin/Release/JsonProxy.ASSS bin/Release/Server.ASSS bin/Release/Server.ASSS.symbol scripts/ sql/
 else
-    make release
+    make release_jit
     tar cvfz $R$file -X exclude bin/Release/JsonProxy.ASSS bin/Release/Server.ASSS bin/Release/Server.ASSS.symbol scripts/ sql/
 fi

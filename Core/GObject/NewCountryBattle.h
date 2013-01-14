@@ -67,7 +67,7 @@ struct NewCBPlayerData
     void setAllEffortInfo();
     void setSkillFlag(UInt8 skillId) { skillFlags |= (1 << skillId); }
     bool canAddSkillFlag(UInt8);
-    void addAngerDomineer(UInt8, UInt8);
+    bool addAngerDomineer(UInt8, UInt8);
     void setAchievementLevel(UInt8 achieve = 0);
 };
 
@@ -113,6 +113,7 @@ public:
     void allotPlayers();
     void makePairPlayers();
     void useSkill(Player *, UInt8);
+    void buySkill(Player *, UInt8);
     NewCBPlayerData * findNCBData(Player *);
 private:
     void completeEffort(NewCBPlayerData *, NewCBPlayerData *);

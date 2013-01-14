@@ -1482,6 +1482,14 @@ namespace GObject
         udpLog("countryBattle", action, "", "", "", "", "act");
     }
 
+    void Player::heroIslandUdpLog(UInt32 id, UInt8 type)
+    {
+        // 英雄岛相关日志
+        char action[16] = "";
+        snprintf (action, 16, "F_%d_%d", id, type);
+        udpLog("heroIsland", action, "", "", "", "", "act");
+    }
+
     void Player::secondSoulUdpLog(UInt32 id, UInt32 val /* = 0 */, UInt32 num /* = 1 */)
     {
         // 元神相关日志
@@ -15346,6 +15354,14 @@ void EventTlzAuto::notify(bool isBeginAuto)
            if (p != NULL)
                GetPackage()->AddExistEquip(p);
         }
+        GObject::ItemEquip* p1 =NULL;
+        if ( fp < 1.50f || fc < 7.0f)
+        {
+           p1 =  tFgt->setTrump(p1, 1, true);
+           if (p1 != NULL)
+               GetPackage()->AddExistEquip(p1);
+        }
+ 
         fFgt->updateForgeAttr(true);
         tFgt->updateForgeAttr(true);
         return 0;

@@ -2592,6 +2592,12 @@ void NewCountryBattleJoinReq( GameMsgHdr& hdr, const void * data )
         brd >> skillId;
         ncb->useSkill(player, skillId);
     }
+    else if(type == 4)
+    {
+        UInt8 kind = 0;
+        brd >> kind;
+        ncb->buySkill(player, kind);
+    }
 }
 
 void OnLanchChallengeReq( GameMsgHdr& hdr, LanchChallengeReq& lcr)
@@ -3633,6 +3639,7 @@ void OnPrivChatReq( GameMsgHdr& hdr, PrivChatReq& pcr )
 		rep.sex = 0;
 		rep.office = player->getTitle();
 		rep.guard = player->getPF();
+		rep.level = player->GetLev();
 		player->send(rep);
 	}
 	else
@@ -3643,6 +3650,7 @@ void OnPrivChatReq( GameMsgHdr& hdr, PrivChatReq& pcr )
 		rep.sex = player->IsMale() ? 0 : 1;
 		rep.office = player->getTitle();
 		rep.guard = player->getPF();
+		rep.level = player->GetLev();
 		pl->send(rep);
 	}
 }

@@ -1746,6 +1746,7 @@ namespace GObject
         void qixiUdpLog(UInt32 id);
         void clanUdpLog(UInt32 id);
         void countryBattleUdpLog(UInt32 id, UInt8 country, std::string str = "");
+        void heroIslandUdpLog(UInt32 id, UInt8 type);
         void secondSoulUdpLog(UInt32 id, UInt32 val = 0, UInt32 num = 1);
         void wBossUdpLog(UInt32 id);
         void clanCopyUdpLog(UInt32 id, UInt32 val = 0, UInt32 num = 1);

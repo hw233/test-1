@@ -97,6 +97,7 @@ enum PurchaseType
     Enum3366Gift                = 86,
     BUYJOYBUFF                  = 87, //购买心悦buff
     EnumFEASTGIFT               = 88, //圣诞-登录礼包人人有
+    NEWCountryBattleSkill       = 89, //蜀山论剑购买技能(霸气怒气)
     //繁体私有占150～200
 };
 
@@ -147,42 +148,42 @@ enum MailItemType
 };
 enum ItemFrom
 {
-	FromDungeon = 1,
-	FromBox,
-	FromTrade,
-	FromSale,
-	FromMerge,
-	FromExchangeSet,
-	FromExchange,
-	FromAthletAward,
-	FromMail,
-	FromNpc = 10,
-	FromVipAward,
-	FromOnlineAward,
-	FromTaskAward,
-	FromLuckyDraw,
-	FromDetachGem,
-	FromClanBattleAward,
-	FromNpcBuy,
-	FromSplit,
-    FromTripod,
-    FromFCMerge = 20,
-    FromPExp,
-    FromHeroIsland,
-    FromTeamCopy,
-    FromAttainment,
-    FromDailyActivity,
-    FromEquipUpgrade,
-    FromClan,
-    FromTownDeamon,
-	FromSSDTAward,
-	FromHappyAward = 30,
-    FromIDIP,
-    FromQixi,
-    FromKillMonster, //斩妖除魔
-    FromNewRC7DayLogin,
-    FromNewRC7DayRecharge,
-    FromNewRC7DayTarget,
+	FromDungeon = 1, //决战之地（之前注释是副本）
+	FromBox = 2, //宝箱
+	FromTrade = 3, //交易买入
+	FromSale = 4, //交易卖出
+	FromMerge = 5, //合成
+	FromExchangeSet = 6, //装备部位置换
+	FromExchange = 7, //装备置换
+	FromAthletAward = 8, //斗剑场奖励
+	FromMail = 9, //邮件
+	FromNpc = 10, //NPC
+	FromVipAward = 11, //vip奖励
+	FromOnlineAward = 12, //在线奖励
+	FromTaskAward = 13, //任务奖励
+	FromLuckyDraw = 14, //探险
+	FromDetachGem = 15, //宝石拆卸
+	FromClanBattleAward = 16, //帮战奖励
+	FromNpcBuy = 17, //NPC购买
+	FromSplit = 18, //装备分解
+    FromTripod = 19, //九疑鼎
+    FromFCMerge = 20, //法宝合成
+    FromPExp = 21, //散仙解雇时返回的物品
+    FromHeroIsland = 22, //英雄岛
+    FromTeamCopy = 23, //组队副本
+    FromAttainment = 24, //成就
+    FromDailyActivity = 25, //活跃度
+    FromEquipUpgrade = 26, //装备炼化
+    FromClan = 27, //帮派
+    FromTownDeamon = 28, //锁妖塔
+	FromSSDTAward = 29, //搜索地图活动奖励
+	FromHappyAward = 30, //欢乐转盘奖励(或感恩节活动)
+    FromIDIP = 31, //新用户注册邀请好友奖励（或其他活动）
+    FromQixi = 32, //七夕（或类似活动）
+    FromKillMonster = 33, //斩妖除魔
+    FromNewRC7DayLogin = 34, //注册七日登录奖励
+    FromNewRC7DayRecharge = 35, //注册七日充值返礼
+    FromNewRC7DayTarget = 36, //七日目标
     FromDailyStrengthen = 37, //变强秘宝
     FromJobHunter = 38, // 寻墨游戏
 
