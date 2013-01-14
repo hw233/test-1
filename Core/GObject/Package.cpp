@@ -23,6 +23,7 @@
 #include "HoneyFall.h"
 #include "HeroMemo.h"
 #include "ShuoShuo.h"
+#include "GData/LBSkillTable.h"
 
 #define ITEM_FORGE_L1 500      // 洗炼符
 #define ITEM_SOCKET_L1 510
@@ -421,11 +422,30 @@ namespace GObject
         lbattr.lbColor = 2 + lbAttrConf.getColor(lv, itemTypeIdx, lbattr.type, lbattr.value, attrNum);
         if(lbattr.lbColor == 5)
         {
-            UInt8 skillNum = lbAttrConf.getSkillNum(uRand(100));
-            for(int i = 0; i < skillNum; ++ i)
+            UInt8 skillSwitch = lbAttrConf.getSkillSwitch(uRand(100));
+            UInt8 startIdx = 0;
+            UInt8 endIdx = 0;
+            switch(skillSwitch)
             {
-                UInt8 skillCnt = lbAttrConf.getSkillsMaxCnt(i);
-                lbattr.skill[i] = lbAttrConf.getSkill(i, uRand(skillCnt));
+            case 0:
+                endIdx = 1;
+                break;
+            case 1:
+                startIdx = 1;
+                endIdx = 2;
+                break;
+            case 2:
+                endIdx = 2;
+                break;
+            }
+            for(int i = startIdx; i < endIdx; ++ i)
+            {
+                UInt16 lbIdx = subClass - Item_LBling + 1;
+                UInt8 maxCnt = lbAttrConf.getSkillsMaxCnt(i, lbIdx, lv);
+                UInt16 skillId = lbAttrConf.getSkill(i, lbIdx, lv, uRand(maxCnt));
+                lbattr.skill[i-startIdx] = skillId;
+                UInt16 factor = GData::lbSkillManager[skillId]->minFactor;
+                lbattr.factor[i-startIdx] = factor + uRand(10000-factor);
             }
         }
     }
@@ -1046,6 +1066,23 @@ namespace GObject
                         getRandomLBAttr(lv, itype->subClass, lbattr);
                         equip = new ItemLingbao(id, itype, edata, lbattr);
                         lingbao = true;
+
+                        std::string strType;
+                        std::string strValue;
+                        std::string strSkill;
+                        std::string strFactor;
+                        for(int i = 0; i < 4; ++ i)
+                        {
+                            char cstr[32] = {0};
+                            strType += atoi(lbattr.type[i], cstr, 10);
+                            strValue += atoi(lbattr.value[i], cstr, 10);
+                            if(i < 2)
+                            {
+                                strSkill += atoi(lbattr.skill[i], cstr, 10);
+                                strFactor += atoi(lbattr.factor[i], cstr, 10);
+                            }
+                        }
+                        DB4().PushUpdateData("INSERT INTO `lingbaoattr`(`id`, `tongling`, `lbcolor`, `types`, `values`, `skills`, `factors`) VALUES(%u, %d, %d, '%s', '%s', '%s', '%s')", id, lbattr.tongling, lbattr.lbColor, strType.c_str(), strValue.c_str(), strSkill.c_str(), strFactor.c_str());
                     }
                     break;
 				default:
@@ -5679,11 +5716,30 @@ namespace GObject
             lbattr.lbColor = 2 + lbAttrConf.getColor(lv, itemTypeIdx, lbattr.type, lbattr.value, attrNum);
             if(lbattr.lbColor == 5)
             {
-                UInt8 skillNum = lbAttrConf.getSkillNum(uRand(100));
-                for(int i = 0; i < skillNum; ++ i)
+                UInt8 skillSwitch = lbAttrConf.getSkillSwitch(uRand(100));
+                UInt8 startIdx = 0;
+                UInt8 endIdx = 0;
+                switch(skillSwitch)
                 {
-                    UInt8 skillCnt = lbAttrConf.getSkillsMaxCnt(i);
-                    lbattr.skill[i] = lbAttrConf.getSkill(i, uRand(skillCnt));
+                case 0:
+                    endIdx = 1;
+                    break;
+                case 1:
+                    startIdx = 1;
+                    endIdx = 2;
+                    break;
+                case 2:
+                    endIdx = 2;
+                    break;
+                }
+                for(int i = startIdx; i < endIdx; ++ i)
+                {
+                    UInt16 lbIdx = subClass - Item_LBling + 1;
+                    UInt8 maxCnt = lbAttrConf.getSkillsMaxCnt(i, lbIdx, lv);
+                    UInt16 skillId = lbAttrConf.getSkill(i, lbIdx, lv, uRand(maxCnt));
+                    lbattr.skill[i-startIdx] = skillId;
+                    UInt16 factor = GData::lbSkillManager[skillId]->minFactor;
+                    lbattr.factor[i-startIdx] = factor + uRand(10000-factor);
                 }
             }
         }
@@ -5700,14 +5756,28 @@ namespace GObject
 
         DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, 1, %"I64_FMT"u, %u)", id, m_Owner->getId(), m_lbSmeltInfo.bind);
         DB4().PushUpdateData("INSERT INTO `equipment`(`id`, `itemId`, `maxTRank`, `trumpExp`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`) VALUES(%u, %u, %u, %u, %u, %d, %u, %d, %u, %d)", id, lbid, edata.maxTRank, edata.trumpExp, edata.extraAttr2.type1, edata.extraAttr2.value1, edata.extraAttr2.type2, edata.extraAttr2.value2, edata.extraAttr2.type3, edata.extraAttr2.value3);
-        GenSpirit(equip);
+
+        std::string strType;
+        std::string strValue;
+        std::string strSkill;
+        std::string strFactor;
+        for(int i = 0; i < 4; ++ i)
+        {
+            char cstr[32] = {0};
+            strType += atoi(lbattr.type[i], cstr, 10);
+            strValue += atoi(lbattr.value[i], cstr, 10);
+            if(i < 2)
+            {
+                strSkill += atoi(lbattr.skill[i], cstr, 10);
+                strFactor += atoi(lbattr.factor[i], cstr, 10);
+            }
+        }
+        DB4().PushUpdateData("INSERT INTO `lingbaoattr`(`id`, `tongling`, `lbcolor`, `types`, `values`, `skills`, `factors`) VALUES(%u, %d, %d, '%s', '%s', '%s', '%s')", id, lbattr.tongling, lbattr.lbColor, strType.c_str(), strValue.c_str(), strSkill.c_str(), strFactor.c_str());
 
         SendSingleEquipData(equip);
 
         ItemNotify(equip->GetItemType().getId());
-
         DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), lbid, id, FromFuling, TimeUtil::Now());
-
         OnAddEquipAndCheckAttainment(itype, FromFuling);
 
         closeLingbaoSmelt();

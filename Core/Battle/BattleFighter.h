@@ -787,6 +787,21 @@ public:
     const GData::SkillBase* getPassiveSkillOnCounter100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnCounter(bool noPossibleTarget = false);
 
+private:
+    std::vector<GData::LBSkillItem> _onSkillCond;
+    std::vector<GData::LBSkillItem> _onActionCond;
+    std::vector<GData::LBSkillItem> _onDeadCond;
+    std::vector<GData::LBSkillItem> _onBleedCond;
+    std::vector<GData::LBSkillItem> _onStateCond;
+    bool _firstAction;
+public:
+    GData::LBSkillItem* getSkillCondItem(UInt16 skillid);
+    GData::LBSkillItem* getActionCondItem(UInt32 action);
+    GData::LBSkillItem* getDeadCondItem();
+    GData::LBSkillItem* getBleedCondItem();
+    GData::LBSkillItem* getStateCondItem(UInt16 state);
+
+
 public:
 	enum StatusFlag
 	{

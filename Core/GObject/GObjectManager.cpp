@@ -65,6 +65,7 @@
 #include "GVar.h"
 #include "Server/SysMsg.h"
 #include "SingleHeroStage.h" 
+#include "GData/LBSkillTable.h"
 
 namespace GObject
 {
@@ -196,6 +197,11 @@ namespace GObject
             fprintf(stderr, "loadEquipForge error!\n");
             std::abort();
         }
+        if(!loadLBSkill())
+        {
+            fprintf(stderr, "loadLBSkill error!\n");
+            std::abort();
+        }
 		if(!loadMapData())
         {
             fprintf(stderr, "loadMapData error!\n");
@@ -203,7 +209,7 @@ namespace GObject
         }
         if(!loadAttrFactor())
         {
-            fprintf(stderr, "loadMapData error!\n");
+            fprintf(stderr, "loadAttrFactor error!\n");
             std::abort();
         }
         if(!loadCopy())
@@ -3975,13 +3981,13 @@ namespace GObject
             }
             {
 				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getLingbaoAttrNum");
-				UInt32 size = std::min(6, table_temp.size());
+				UInt32 size = std::min(7, table_temp.size());
                 for(UInt32 i = 0; i < size; ++ i)
                 {
                     if(i < 4)
                         _lbAttrConf.attrNumChance[i] = table_temp.get<UInt16>(i + 1);
                     else
-                        _lbAttrConf.skillNumChance[i-4] = table_temp.get<UInt16>(i + 1);
+                        _lbAttrConf.skillSwitchChance[i-4] = table_temp.get<UInt16>(i + 1);
                 }
             }
             {
@@ -4009,19 +4015,6 @@ namespace GObject
                 for(UInt32 i = 0; i < size; ++ i)
                 {
                     _lbAttrConf.colorVal[i] = table_temp.get<UInt16>(i + 1);
-                }
-            }
-            {
-				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getLingbaoSkills");
-				UInt32 size = std::min(2, table_temp.size());
-                for(UInt32 i = 0; i < size; ++ i)
-                {
-                    lua_tinker::table table_temp2 = table_temp.get<lua_tinker::table>(i);
-                    UInt32 size2 = table_temp2.size();
-                    for(UInt32 j = 0; j < size2; ++ j)
-                    {
-                        _lbAttrConf.skills[i].push_back(table_temp2.get<UInt16>(j + 1));
-                    }
                 }
             }
         }
@@ -5359,5 +5352,56 @@ namespace GObject
         lc.finalize();
         return true;
     }
+
+    bool GObjectManager::loadLBSkill()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+		// load  lbskill
+        GData::DBLBSkill dblbs;
+		if(execu->Prepare("SELECT `id`, `name`, `lbtype`, `level`, `target`, `prob`, `cond`, `cond2`, `area`, `factor`, `last`, `cd`, `eftype`, `minfactor`, `efvalue`, `battlepoint` FROM `lbskills`", dblbs) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            GData::LBSkillBase* lbs = new GData::LBSkillBase(dblbs.id, dblbs.name);
+            if (!lbs)
+                return false;
+
+            if(dblbs.lbtype > 3)
+                dblbs.lbtype = 0;
+            lbs->lbtype = dblbs.lbtype;
+            lbs->level = dblbs.level;
+            lbs->target = dblbs.target;
+            lbs->prob = dblbs.prob;
+            lbs->cond = dblbs.cond;
+            lbs->cond2 = dblbs.cond2;
+            lbs->area = dblbs.area;
+            lbs->last = dblbs.last;
+            lbs->cd = dblbs.cd;
+
+            lbs->ef_type = dblbs.ef_type;
+            lbs->minFactor = dblbs.minFactor;
+            lbs->ef_value = dblbs.ef_value;
+            lbs->battlepoint = dblbs.battlepoint;
+
+            StringTokenizer tk(dblbs.factor, ",");
+            if (tk.count())
+            {
+                for (size_t i = 0; i < tk.count(); ++i)
+                    lbs->factor.push_back(::atof(tk[i].c_str()));
+            }
+            GData::lbSkillManager.add(lbs);
+            if(lbs->cond == GData::e_lb_cond_skill)
+                _lbAttrConf.skills[dblbs.lbtype][0][dblbs.level].push_back(dblbs.id);
+            else
+                _lbAttrConf.skills[dblbs.lbtype][1][dblbs.level].push_back(dblbs.id);
+
+		}
+
+        return true;
+    }
+
 }
 

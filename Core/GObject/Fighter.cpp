@@ -28,6 +28,7 @@
 #include "GVar.h"
 #include "GObjectDBExecHelper.h"
 #include "GData/SoulExpTable.h"
+#include "GData/LBSkillTable.h"
 
 namespace GObject
 {
@@ -5064,6 +5065,106 @@ UInt16 Fighter::getPortrait()
     return portrait;
 }
 
+ItemEquip* Fighter::setLingbao(UInt8 idx, ItemEquip* lb, bool writedb)
+{
+    if(!lb || idx >= e_lb_max)
+        return NULL;
+
+    UInt8 subClass = lb->getClass();
+    if (subClass != Item_LBling || subClass != Item_LBwu || subClass != Item_LBxin)
+        return NULL;
+    UInt8 clsIdx = subClass - Item_LBling;
+    if(clsIdx != idx)
+        return NULL;
+
+    ItemLingbaoAttr& lba = (static_cast<ItemLingbao*>(lb))->getLingbaoAttr();
+    if(lba.tongling == 0)
+        return NULL;
+    ItemEquip* t = _lingbao[idx];
+    if(!t)
+    {
+        ItemLingbaoAttr& lba = (static_cast<ItemLingbao*>(t))->getLingbaoAttr();
+        if(lba.skill[0])
+            delLBSkill(t->getId());
+        if(lba.skill[1])
+            delLBSkill(t->getId());
+    }
+
+    {
+        _lingbao[idx] = lb;
+        if(lba.skill[0])
+            addLBSkill(lb->getId(), lba.skill[0], lba.factor[0]);
+        if(lba.skill[1])
+            addLBSkill(lb->getId(), lba.skill[1], lba.factor[1]);
+    }
+
+    sendModification(0x50+idx, _lingbao[idx], writedb);
+    return t;
+}
+
+void Fighter::loadLingbao(std::string& lbs)
+{
+    if (!lbs.length())
+        return;
+
+    StringTokenizer tk(lbs, ",");
+    for (size_t i = 0; i < tk.count() && static_cast<int>(i) < getMaxLingbaos(); ++i)
+    {
+        UInt32 lb = ::atoi(tk[i].c_str());
+        if (lb)
+        {
+            ItemEquip* t = 0;
+            t = GObjectManager::fetchEquipment(lb);
+            setLingbao(i, t, false);
+        }
+    }
+}
+
+bool Fighter::addLBSkill(UInt32 lbid, UInt16 skillid, UInt16 factor)
+{
+    if(skillid == 0 || factor == 0)
+        return false;
+
+    UInt8 cnt = _lbSkill.size();
+    for(int i = 0; i < cnt; ++ i)
+    {
+        if(_lbSkill[i].lbid == lbid)
+            break;
+        const GData::LBSkillBase* dstSkill = GData::lbSkillManager[_lbSkill[i].skillid];
+        const GData::LBSkillBase* srcSkill = GData::lbSkillManager[skillid];
+        if(dstSkill->cond != GData::e_lb_cond_skill || srcSkill->cond != GData::e_lb_cond_skill || dstSkill->cond2 != srcSkill->cond2)
+            continue;
+        float f = ((float)factor)/10000;
+        float f2 = ((float)(_lbSkill[i].factor))/10000;
+        if(f*srcSkill->ef_value > f2*dstSkill->ef_value)
+        {
+            _lbSkill.erase(_lbSkill.begin() + i);
+            break;
+        }
+    }
+
+    LBSkill lbs = {lbid, skillid, factor};
+    _lbSkill.push_back(lbs);
+
+    return true;
+}
+
+bool Fighter::delLBSkill(UInt32 lbid)
+{
+    bool res = false;
+    UInt8 cnt = _lbSkill.size();
+    for(int i = 0; i < cnt; ++ i)
+    {
+        if(_lbSkill[i].lbid == lbid)
+        {
+            _lbSkill.erase(_lbSkill.begin() + i);
+            res = true;
+            break;
+        }
+    }
+
+    return res;
+}
 
 }
 

@@ -56,6 +56,15 @@ namespace GObject
 
 enum
 {
+    e_lb_ling = 0,
+    e_lb_wu = 1,
+    e_lb_xin = 2,
+
+    e_lb_max
+};
+
+enum
+{
     e_cls_ru = 1,
     e_cls_shi = 2,
     e_cls_dao = 3,
@@ -80,6 +89,13 @@ struct SoulItemExp
     UInt16 itemId;
     UInt8 res;
     Int16 exp;
+};
+
+struct LBSkill
+{
+    UInt32 lbid;
+    UInt16 skillid;
+    UInt16 factor;
 };
 
 struct ElixirAttr
@@ -399,10 +415,10 @@ public:
 
 	inline ItemEquip * getLingbao(int idx) { return (idx >= 0 && idx < getMaxLingbaos()) ? _lingbao[idx] : 0; }
     inline void * getLingbaoAddr() { return _lingbao;}
-    inline UInt8 getMaxLingbaos() { return LINGBAO_UPMAX; }
+    inline UInt8 getMaxLingbaos() { return e_lb_max; }
     UInt32 getLingbaoId(int idx);
-    int getAllLingbaoId(UInt32* lingbaos, int size = LINGBAO_UPMAX);
-    int getAllLingbaoTypeId(UInt32* ids, int size = LINGBAO_UPMAX);
+    int getAllLingbaoId(UInt32* lingbaos, int size = e_lb_max);
+    int getAllLingbaoTypeId(UInt32* ids, int size = e_lb_max);
     void getAllLingbaos(Stream& st);
     UInt32 getLingbaoNum();
 
@@ -729,14 +745,16 @@ protected:
     std::vector<UInt16> _rpasskl[GData::SKILL_PASSIVES-GData::SKILL_PASSSTART];
     std::vector<UInt16> _passkl[GData::SKILL_PASSIVES-GData::SKILL_PASSSTART]; // 100%触发技能
 
+    std::vector<LBSkill> _lbSkill;
+
 	ItemHalo* _halo;
 	ItemFashion* _fashion;
 	ItemWeapon * _weapon;
 	ItemArmor * _armor[5];
 	ItemEquip * _ring;
 	ItemEquip * _amulet;
-	ItemEquip * _trump[TRUMP_UPMAX];// 法宝
-	ItemEquip * _lingbao[LINGBAO_UPMAX];// 灵宝
+	ItemEquip * _trump[TRUMP_UPMAX];    // 法宝
+	ItemEquip * _lingbao[e_lb_max];// 灵宝
 
 	bool _attrDirty;
 	UInt32 _maxHP;
@@ -804,6 +822,16 @@ public:
     void appendElixirAttr(Stream& st);
     void appendElixirAttr2(Stream& st);
     ElixirAttr& getElixirAttr() { return _elixirattr; }
+
+
+    inline std::vector<LBSkill>& getLBSkill() { return _lbSkill; }
+    ItemEquip* setLingbao(UInt8 idx, ItemEquip* lb, bool writedb = true);
+    void loadLingbao(std::string& lb);
+    void loadLBSkill(LBSkill& lbSkill);
+
+    bool addLBSkill(UInt32 lbid, UInt16 skillid, UInt16 factor);
+    bool delLBSkill(UInt32 lbid);
+
 private:
     ElixirAttr _elixirattr;
 
@@ -821,12 +849,10 @@ public:
     inline void setUpCittasMax() { _cittaslot = CITTA_UPMAX; }
     bool upCittaWithOutCheck( UInt16 citta, int idx );
     UInt16 getTrumpSkill(int i) { if(i >= TRUMP_UPMAX) return 0; else return _trumpSkill[i]; }
-    UInt16 getLingbaoSkill(int i) { if(i >= LINGBAO_UPMAX) return 0; else return _lingbaoSkill[i]; }
     Int32 _soulMax;
     UInt8 _soulExtraAura;
     UInt8 _soulAuraLeft;
     UInt16 _trumpSkill[TRUMP_UPMAX];
-    UInt16 _lingbaoSkill[LINGBAO_UPMAX];
 
     // 内丹系统
 public:

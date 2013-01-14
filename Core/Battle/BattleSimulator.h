@@ -510,6 +510,9 @@ private:
     bool    _peerlessDmg1k[2];
     bool    _peerlessDmg5k[2];
     bool    _peerlessDmg1w[2];*/
+
+    std::vector<DefStatus> _defList;
+    std::vector<StatusChange> _scList;
 };
 
 }

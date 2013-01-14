@@ -70,6 +70,27 @@ struct DBClanAssistant
 	std::string assistants;
 };
 
+struct DBLBSkill
+{
+    UInt16 id;
+    std::string name;
+    UInt8 lbtype;
+    UInt8 level;
+    UInt8 target;
+    float  prob;
+    UInt16 cond;
+    UInt16 cond2;
+    UInt8 area;
+    std::string factor;
+    Int16 last;
+    UInt16 cd;
+
+    UInt16 ef_type;             
+    UInt16 minFactor;          
+    UInt16 ef_value;           
+    UInt16 battlepoint;
+};
+
 }
 
 namespace GObject
@@ -2503,6 +2524,29 @@ SPECIALDEF(5)
     UInt8, posPut,
     UInt32, itemId,
     UInt16, ratio
+)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBLBSkill)
+SPECIALDEF(16)
+(
+    UInt16, id,
+    std::string, name,
+    UInt8, lbtype,
+    UInt8, level,
+    UInt8, target,
+    float,  prob,
+    UInt16, cond,
+    UInt16, cond2,
+    UInt8, area,
+    std::string, factor,
+    Int16, last,
+    UInt16, cd,
+
+    UInt16, ef_type,
+    UInt16, minFactor,
+    UInt16, ef_value,
+    UInt16, battlepoint
 )
 SPECIALEND()
 

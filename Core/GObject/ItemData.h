@@ -100,12 +100,14 @@ namespace GObject
         UInt8 type[4];
         UInt16 value[4];
         UInt16 skill[2];
+        UInt16 factor[2];
 
         ItemLingbaoAttr() : tongling(0), lbColor(0)
         {
             memset(type, 0, sizeof(type));
             memset(value, 0, sizeof(value));
             memset(skill, 0, sizeof(skill));
+            memset(factor, 0, sizeof(factor));
         }
 
 		inline void appendAttrToStream(Stream& st)
@@ -115,7 +117,7 @@ namespace GObject
                 UInt8 zero8 = 0;
                 UInt16 zero16 = 0;
                 st << zero8 << lbColor;
-                st << zero16 << zero16;
+                st << zero16 << zero16 << zero16 << zero16;
             }
             else
             {
@@ -132,7 +134,7 @@ namespace GObject
                     }
                 }
                 st.data<UInt8>(offset) = cnt;
-                st << skill[0] << skill[1];
+                st << skill[0] << factor[0] << skill[1] << factor[1];
             }
         }
     };

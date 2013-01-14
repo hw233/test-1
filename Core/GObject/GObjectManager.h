@@ -57,7 +57,7 @@ namespace GObject
         stLBAttrConf()
         {
             memset( attrNumChance, 0, sizeof(attrNumChance));
-            memset( skillNumChance, 0, sizeof(skillNumChance));
+            memset( skillSwitchChance, 0, sizeof(skillSwitchChance));
             memset( dis, 0, sizeof(dis));
             memset( disChance, 0, sizeof(disChance));
             memset( colorVal, 0, sizeof(colorVal));
@@ -73,14 +73,15 @@ namespace GObject
             return 1;
         }
 
-        UInt8 getSkillNum(UInt16 chance)
+        UInt8 getSkillSwitch(UInt16 chance)
         {
-            for(int i = 0; i < 2; ++ i)
+            int i = 0;
+            for(; i < 3; ++ i)
             {
-                if(chance < skillNumChance[i])
-                    return (i + 1);
+                if(chance < skillSwitchChance[i])
+                    break;
             }
-            return 0;
+            return i;
         }
 
         float getDisFactor(UInt16 chance)
@@ -98,18 +99,30 @@ namespace GObject
             return 0;
         }
 
-        UInt8 getSkillsMaxCnt(UInt8 idx)
+        UInt8 getSkillsMaxCnt(UInt8 idx, UInt8 lbIdx, UInt8 lvl)
         {
-            if(idx > 1)
+            if(idx > 1 || lbIdx > 3)
                 return 0;
-            return skills[idx].size();
+            std::map<UInt8, std::vector<UInt16>>::iterator it = skills[lbIdx][idx].find(lvl);
+            if(it == skills[lbIdx][idx].end())
+                return 0;
+            std::vector<UInt16>& lv_skill = it->second;
+            return lv_skill.size();
         }
 
-        UInt16 getSkill(UInt8 idx, UInt16 chance)
+        UInt16 getSkill(UInt8 idx, UInt8 lbIdx, UInt8 lv, UInt16 chance)
         {
-            if(idx > 1 || chance > skills[idx].size())
+            if(idx > 1 || lbIdx > 3)
                 return 0;
-            return skills[idx][chance];
+            std::map<UInt8, std::vector<UInt16>>::iterator it = skills[lbIdx][idx].find(lv);
+            if(it == skills[lbIdx][idx].end())
+                return 0;
+
+            std::vector<UInt16>& lv_skill = it->second;
+            if(chance > lv_skill.size())
+                return 0;
+
+            return lv_skill[chance];
         }
 
         float getAttrMax(UInt8 lv, UInt8 itemTypeIdx, UInt8 attrTypeIdx)
@@ -154,12 +167,12 @@ namespace GObject
         }
 
         UInt8 attrNumChance[4];
-        UInt8 skillNumChance[2];
+        UInt8 skillSwitchChance[3];
         UInt16 dis[11];
         UInt16 disChance[11];
         UInt16 colorVal[4];
         std::vector<UInt8> attrType;
-        std::vector<UInt16> skills[2];
+        std::map<UInt8, std::vector<UInt16>> skills[4][2]; // map<灵宝等级, vector<技能id>>
 		std::map<UInt8, stLbAttrMax> lbAttrMax;  // 灵宝属性上限
     };
 
@@ -227,6 +240,7 @@ namespace GObject
         static bool loadSnow();
         static bool loadArenaExtraBoard();
         static bool loadCopyFrontWin();
+        static bool loadLBSkill();
 
         static bool addGM(UInt64 id, UInt8 lvl);
         static bool delGM(UInt64 id);
