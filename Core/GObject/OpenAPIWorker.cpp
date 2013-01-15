@@ -49,6 +49,13 @@ namespace GObject
 
     bool OpenAPIWorker::Init()
     {
+        size_t sz = cfg.IDQueryMemcached.size();
+        for (size_t i = 0; i < sz; ++i)
+        {
+            char buf[128];
+            snprintf(buf, 128, "%s:%d", cfg.IDQueryMemcached[i].ip.c_str(), cfg.IDQueryMemcached[i].port); 
+            m_MCached.pushHost(buf);
+        }
         return true;
     }
 
@@ -77,6 +84,16 @@ namespace GObject
             char buffer[MAX_RET_LEN] = {0};
             char url[MAX_RET_LEN] = "/v3/csec/punish_query";
             char res[MAX_RET_LEN] = "";
+
+            if (!CheckOpenId(it->playerId, it->openId))
+            {
+                GObject::Player * pl = GObject::globalPlayers[it->playerId];
+                if (NULL != pl)
+                {
+                    GameMsgHdr imh(0x332, pl->getThreadId(), pl, strlen(it->openId) + 1);
+                    GLOBAL().PushMsg(imh, it->openId);
+                }
+            }
 
 
             SetUrlString (url, it->playerId, it->type, it->openId, it->openKey, it->pf, it->userIp);
@@ -210,6 +227,7 @@ namespace GObject
 
     void OpenAPIWorker::SetUrlString(char* url, UInt64 playerId, UInt16 type, const char * openId, const char * openKey, const char * pf, const char * userIp)
     {
+
         std::ostringstream strGet;
         strGet << "GET&";
         strGet << UrlEncode(url);
@@ -238,50 +256,12 @@ namespace GObject
         unsigned char* res;
         res = HMAC(EVP_sha1(), appkey.c_str(), appkey.size(), (unsigned char *)sigValue.c_str(), sigValue.size(), NULL, &size);
         sigValue = Base64Encode(res, size);
+        sigValue = UrlEncode(sigValue.c_str());
         sigKey << "&sig=";
         sigKey << sigValue;
         strcat (url, "?");
         strncat(url, sigKey.str().c_str(), sigKey.str().size() + 1);
 
-    }
-
-    void OpenAPIWorker::SetUrlString2(char* url, UInt64 playerId, UInt16 type, const char * openId, const char * openKey, const char * pf, const char * userIp)
-    {
-        // 测试用的函数，现在不需要使用了
-        SHA1Engine sha1;
-
-        std::ostringstream sigKey2;
-        sigKey2 << "/v3/user/get_info";
-        std::string val1 = "GET&";
-        val1 += UrlEncode ( sigKey2.str().c_str());
-        val1 += "&";
-
-        std::ostringstream sigKey;
-        sigKey << "appid=";
-        sigKey << (UInt32)123456;
-        sigKey << "&format=json"; // XXX: 返回格式先写死为json
-        sigKey << "&openid=";
-        sigKey << openId;
-        sigKey << "&openkey=";
-        sigKey << openKey;
-        sigKey << "&pf=";
-        sigKey << pf;
-        sigKey << "&userip=";
-        sigKey << userIp;
-        std::string sigValue = UrlEncode(sigKey.str().c_str());
-
-        std::string sigValue2;
-        sigValue2 += val1;
-        sigValue2 += sigValue;
-
-        unsigned int size = 0;
-        unsigned char* res;
-        unsigned char tmp[1024];
-        res = HMAC(EVP_sha1(), "228bf094169a40a3bd188ba37ebe8723&", strlen("228bf094169a40a3bd188ba37ebe8723&"), (unsigned char *)sigValue2.c_str(), sigValue2.size(), tmp, &size);
-        sigValue = Base64Encode(res, size);
-        sigKey << "&sig=";
-        sigKey << sigValue;
-        strncpy(url, sigKey.str().c_str(), sigKey.str().size());
     }
 
     std::string OpenAPIWorker::UrlEncode(const char *in_str)
@@ -376,7 +356,7 @@ namespace GObject
             if(i < 3)
                 ret += '=';
         }
-        //std::cout << ret << std::endl; // XXX: 为什么GDB在这里我输出ret的数据
+        //std::cout << ret << std::endl; // XXX: 为什么GDB在这里我无法输出ret的数据
         return ret;
     }
 
@@ -413,6 +393,24 @@ namespace GObject
 #undef JSON_ERR_CUSTOM2
 #undef JSON_ERR_CUSTOM3
 #undef JSON_ERR_CUSTOM4
+    }
+
+    bool OpenAPIWorker::CheckOpenId(UInt64 playerId, char * openId)
+    {
+        char buf[128];
+        snprintf(buf, 128, "oid_%"I64_FMT"u", playerId);
+        char openId2[256]={};
+        m_MCached.get(buf, strlen(buf), openId2, 255);
+        openId2[255] = '\0';
+        if (strncmp(openId, openId2, strlen(openId)) == 0)
+        {
+            return true;
+        }
+        else
+        {
+            strcpy(openId, openId2);
+            return false;
+        }
     }
 
 }

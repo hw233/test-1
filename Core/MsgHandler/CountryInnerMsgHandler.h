@@ -1847,6 +1847,16 @@ void OnForbidSaleQueryFail( GameMsgHdr &hdr, const void *data)
     player->udpLog("svr_forbid_sale", buf, "", "", "", "", "act_tmp");
 }
 
+void OnOpenIdInvalid( GameMsgHdr &hdr, const void *data)
+{
+	MSG_QUERY_PLAYER(player);
+    char* openId = reinterpret_cast<char*>(const_cast<void *>(data));
+    std::string invalidOpenId = player->getOpenId();
+    std::string validOpenId = openId;
+    player->setOpenId(validOpenId);
+    player->udpLog("invalid_openid", invalidOpenId.c_str(), openId, "", "", "", "act_tmp");
+}
+
 
 #endif // _COUNTRYINNERMSGHANDLER_H_
 

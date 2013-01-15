@@ -188,8 +188,6 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 #ifndef _WIN32
 	worker = WORKER_THREAD_DC;
 	m_AllWorker[worker]->Run();
-	worker = WORKER_THREAD_OPEN_API;
-	m_AllWorker[worker]->Run();
 #endif
 #endif
 #endif
@@ -225,6 +223,14 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 	GObject::GObjectManager::loadAllData();
 
 	Battle::battleReport.init();
+#ifndef _FB
+#ifndef _VT
+#ifndef _WIN32
+	worker = WORKER_THREAD_OPEN_API;
+	m_AllWorker[worker]->Run();
+#endif
+#endif
+#endif
 	return true;
 }
 

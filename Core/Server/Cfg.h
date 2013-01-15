@@ -54,6 +54,7 @@ public:
         UInt16 port;
     };
     std::vector<TokenServer> tokenServer;
+    std::vector<TokenServer> IDQueryMemcached;
 
 	UInt16 openYear;
 	UInt8 openMonth, openDay;
@@ -150,6 +151,15 @@ public:
         ts.ip = server;
         ts.port = port;
         tokenServer.push_back(ts);
+    }
+
+    inline void setIDQueryMemcachedServer(const char* server, UInt16 port)
+    {
+        TokenServer ts;
+        ts.ip = server;
+        ts.port = port;
+        tokenServer.push_back(ts);
+        IDQueryMemcached.push_back(ts);
     }
 
 	bool isAdminIPAllowed(UInt32);

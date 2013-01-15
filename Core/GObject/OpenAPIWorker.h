@@ -5,12 +5,11 @@
 #include "Server/WorkerThread.h"
 #include "Common/Mutex.h"
 #include "Common/AtomicVal.h"
+#include "Common/MCached.h"
 #include <curl/curl.h>
 
 namespace GObject
 {
-
-
     class OpenAPIWorker
         : public WorkerRunner<>
     {
@@ -34,20 +33,20 @@ namespace GObject
         private:
 
             void SetUrlString(char* url, UInt64 playerId, UInt16 type, const char * openId, const char * openKey, const char * pf, const char * userIp);
-            void SetUrlString2(char* url, UInt64 playerId, UInt16 type, const char * openId, const char * openKey, const char * pf, const char * userIp);
 
             std::string UrlEncode(const char *in_str);
             std::string Base64Encode(unsigned char const * byte_to_encode, unsigned int in_len);
             Int32 ResultParse(char* result, bool* needForbid);
+            bool CheckOpenId(UInt64 playerId, char * openId);
 
             struct UrlParam
             {
                 UInt64 playerId;
                 UInt16  type;
-                const char * openId;
-                const char * openKey;
-                const char * pf;
-                const char * userIp;
+                char * openId;
+                char * openKey;
+                char * pf;
+                char * userIp;
             };
 
             UInt32 version;
@@ -63,6 +62,7 @@ namespace GObject
 
             CURL* curl;
             FastMutex m_Mutex;
+            MCached m_MCached;
     };
 
 }
