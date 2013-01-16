@@ -1067,12 +1067,17 @@ void AthleticsRank::challenge(Player * atker, std::string& name, UInt8 type)
 		return ;
 	if (row != getRankRow(atker->GetLev()))
 	{
-		atker->sendMsgCode(0, 1405);
 		Stream st(REP::ATHLETICS_CHALLENGE);
 		st << Stream::eos;
 		atker->send(st);
 		//ERROR_LOG("Cannot find the athletics player[%"I64_FMT"u][%s][%d]", atker->getId(), atker->getName().c_str(), row);
 		enterAthleticsReq(atker, atker->GetLev());
+#if 0
+		atker->sendMsgCode(0, 1405);
+#else
+        requestAthleticsList(atker, 0x07);
+		atker->sendMsgCode(0, 1417);
+#endif
 		return ;
 	}
 	RankList::iterator deferRank = _ranks[row].find(defer);
@@ -1110,7 +1115,12 @@ void AthleticsRank::challenge(Player * atker, std::string& name, UInt8 type)
 			//Stream st(REP::ATHLETICS_CHALLENGE);
 			//st << Stream::eos;
 			//atker->send(st);
+#if 0
 			atker->sendMsgCode(0, 1405);
+#else
+            requestAthleticsList(atker, 0x07);
+		    atker->sendMsgCode(0, 1417);
+#endif
 			return ;
 		}
 
