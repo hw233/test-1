@@ -7,8 +7,9 @@
 #include "Common/Itoa.h"
 #include "Common/Stream.h"
 #include "MsgID.h"
+#include "Package.h"
 
-#define MIN_ITEM 2
+//#define MIN_ITEM 2
 
 namespace GObject
 {
@@ -27,23 +28,35 @@ void CFriend::loadFromDB(const char* cf)
 
     StringTokenizer cfriend(cf, ",");
     UInt32 count = cfriend.count();
-    m_cf.resize(count);
+    m_cf.resize(count > CF_MAX ? count : CF_MAX);
     for (UInt8 i = 0; i < count; ++i)
         m_cf[i] = atoi(cfriend[i].c_str());
+    bool toDB = false;
+    /*
     if (count < MIN_ITEM)
     {
         m_cf.resize(MIN_ITEM, 0);
         count = MIN_ITEM;
-        updateToDB();
+        toDB = true;
     }
+    */
 
-    if (!m_owner->GetVar(VAR_INVITES) && m_cf[1])
+    if (!m_owner->GetVar(VAR_INVITES))
     {
-        m_cf[1] = 0;
-        updateToDB();
+        for (UInt8 i = CF_INV3; i < count && i <= CF_INV30; ++i)
+            m_cf[i] = 0;
+        toDB = true;
     }
+    if (!m_owner->GetVar(VAR_INVITEDSUCCESS))
+    {
+        for (UInt8 i = CF_INVITED2; i <= CF_INVITED20; ++i)
+            m_cf[i] = 0;
+        toDB = true;
+    }
+    if (toDB)
+        updateToDB();
 
-    m_maxIdx = count;
+    m_maxIdx = count > CF_MAX ? count : CF_MAX;
 }
 
 void CFriend::updateToDB()
@@ -79,12 +92,14 @@ void CFriend::setCFriend(UInt8 idx, UInt8 status)
     if (!World::getCFriend())
         return;
     bool w = false;
+    /*
     if (m_cf.size() < MIN_ITEM)
     {
         m_cf.resize(MIN_ITEM, 0);
         m_maxIdx = MIN_ITEM;
         w = true;
     }
+    */
 
     if (idx >= m_maxIdx)
     {
@@ -112,29 +127,29 @@ UInt8 CFriend::getCFriend(UInt8 idx)
     return m_cf[idx];
 }
 
-void CFriend::getAward(UInt8 idx)
+bool CFriend::getAward(UInt8 idx)
 {
     if (!World::getCFriend())
-        return;
+        return false;
     if (!idx)
-        return;
+        return false;
     if (idx > m_cf.size())
-        return;
+        return false;
     if (m_cf[idx-1] != 1)
-        return;
+        return false;
 
     if (GameAction()->onGetCFriendAward(m_owner, idx))
     {
         m_cf[idx-1] = 2;
         updateToDB();
         updateCFriend(idx-1);
+        updateRecordData();
 
-        if (!m_owner->GetVar(VAR_INVITED))
-        {
+        if(idx >= CF_INV3 && idx <= CF_INV30)
             GameAction()->doStrong(m_owner, SthInvited, 0, 0);
-            m_owner->SetVar(VAR_INVITED, 1);
-        }
+        return true;
     }
+    return false;
 }
 
 void CFriend::updateCFriend(UInt8 idx)
@@ -157,35 +172,137 @@ void CFriend::sendCFriend()
         st << m_cf[i];
     st << Stream::eos;
     m_owner->send(st);
+    updateRecordData();
+}
+
+void CFriend::updateRecordData()
+{
+    Stream st(REP::CFRIEND);
+    st << static_cast<UInt8>(2);
+    st << static_cast<UInt16>(m_owner->GetVar(VAR_INVITES));
+    st << static_cast<UInt16>(m_owner->GetVar(VAR_INVITEDSUCCESS));
+    st << static_cast<UInt16>(m_owner->GetVar(VAR_CFRIENDTICKETS));
+    st << Stream::eos;
+    m_owner->send(st);
 }
 
 void CFriend::setCFriendNum(UInt8 num)
 {
-    UInt32 invited = m_owner->GetVar(VAR_INVITES);
-    if (invited >= 2)
+    if(num == 0 || num > 3)
         return;
-    if (invited == 1)
-        setCFriendSafe(CF_INV1);
-    m_owner->AddVar(VAR_INVITES, 1);
+    UInt32 invited = m_owner->GetVar(VAR_INVITES);
+    if(invited + num >= 30)
+        setCFriendSafe(CF_INV30);
+    else if(invited + num >= 15)
+        setCFriendSafe(CF_INV15);
+    else if(invited + num >= 3)
+        setCFriendSafe(CF_INV3);
+    m_owner->AddVar(VAR_INVITES, num);
+    updateRecordData();
 }
 
 void CFriend::reset(bool online)
 {
-    bool w = false;
+    /*
     if (m_cf.size() < MIN_ITEM)
-    {
         m_cf.resize(MIN_ITEM, 0);
-        w = true;
-    }
-    if (m_cf[1])
+    */
+    for (UInt8 i = CF_RECALL; i <= CF_INV30; ++i)
     {
-        m_cf[1] = 0;
-        w = true;
+        m_cf[i] = 0;
+        if (online)
+            updateCFriend(i);
     }
-    if (online && w)
-        updateCFriend(1);
-    if (w)
-        updateToDB();
+    if (!m_owner->GetVar(VAR_INVITEDSUCCESS))
+    {
+        for (UInt8 i = CF_INVITED2; i <= CF_INVITED20; ++i)
+        {
+            m_cf[i] = 0;
+            if (online)
+                updateCFriend(i);
+        }
+    }
+    updateToDB();
+}
+
+void CFriend::recallFriend()
+{
+    if (!getCFriend(CF_RECALL))
+    {
+        m_cf[CF_RECALL] = 1;
+        if (!getAward(CF_RECALL))
+            m_cf[CF_RECALL] = 0;
+    }
+}
+
+void CFriend::giveLift()
+{
+    if (!getCFriend(CF_GIVELIFT))
+    {
+        m_cf[CF_GIVELIFT] = 1;
+        if (!getAward(CF_GIVELIFT))
+            m_cf[CF_GIVELIFT] = 0;
+    }
+}
+
+void CFriend::getLift()
+{
+    if (!getCFriend(CF_GETLIFE))
+    {
+        m_cf[CF_GETLIFE] = 1;
+        if (!getAward(CF_GETLIFE))
+            m_cf[CF_GETLIFE] = 0;
+    }
+}
+
+void CFriend::useTickets(UInt8 type)
+{
+    if(type == 0)
+    {
+        UInt8 id = GameAction()->onUseTickets(m_owner);
+        if(id == 0)
+            return;
+        Stream st(REP::CFRIEND);
+        st << static_cast<UInt8>(3);
+        st << id << Stream::eos;
+        m_owner->send(st);
+        updateRecordData();
+    }
+    else
+    {
+        std::vector<GData::LootResult>::iterator it;
+        for(it = m_owner->_lastCFTicketsAward.begin(); it != m_owner->_lastCFTicketsAward.end(); ++ it)
+        {
+            if(it->id == COUPON_ID)
+                m_owner->getCoupon(it->count);
+            else
+                m_owner->GetPackage()->ItemNotify(it->id, it->count);
+        }
+        m_owner->_lastCFTicketsAward.clear();
+    }
+}
+
+void CFriend::lastCFTicketsAward(UInt16 itemId, UInt16 num)
+{
+    GData::LootResult lt = {itemId, num};
+    m_owner->_lastCFTicketsAward.push_back(lt);
+}
+
+void CFriend::setCFriendSuccess(UInt8 num)
+{
+    if(num == 0)
+        return;
+    UInt32 var = m_owner->GetVar(VAR_INVITEDSUCCESS);
+    if(var + num >= 20)
+        setCFriendSafe(CF_INVITED20);
+    else if(var + num >= 10)
+        setCFriendSafe(CF_INVITED10);
+    else if(var + num >= 5)
+        setCFriendSafe(CF_INVITED5);
+    else if(var + num >= 2)
+        setCFriendSafe(CF_INVITED2);
+    m_owner->AddVar(VAR_INVITEDSUCCESS, num);
+    updateRecordData();
 }
 
 } // namespace GObject

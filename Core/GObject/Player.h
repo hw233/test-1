@@ -1304,6 +1304,8 @@ namespace GObject
 		bool testCanAddCFriend(Player *);
         void tellCFriendLvlUp(UInt8);
         void OnCFriendLvlUp(Player*, UInt8);
+        void OnCFriendAthleticsRank();
+        void setCFriendByRank();
 
 		void sendFriendList(UInt8, UInt8, UInt8);
 
@@ -1609,6 +1611,7 @@ namespace GObject
         std::vector<GData::LootResult> _lastKillMonsterAward;
         std::vector<GData::LootResult> _lastNew7DayTargetAward;
         std::vector<GData::LootResult> _lastExJobAward;
+        std::vector<GData::LootResult> _lastCFTicketsAward;
 
     private:
 		UInt16 _lastDungeon;

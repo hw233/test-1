@@ -117,7 +117,7 @@ namespace GObject
         VAR_CL3DAY = 86, // 七天连接三天登陆奖励
         VAR_RC7DAYRECHARGE = 87, // 创建角色后前七天充值总额
         VAR_RC7DAYWILL = 88, // 创建角色后前七天充值奖励领取（许愿类型 << 8 | 点亮龙珠数量）
-        VAR_INVITES = 89, // 邀请好友的次数
+        VAR_INVITES = 89, // 邀请好友的人数
         VAR_MDSOUL = 90, // 五一活动灵气值
         VAR_MDSOUL_CNT1 = 91, // 五一活动风雷宝珠使用次数 9000
         VAR_MDSOUL_CNT2 = 92, // 雷之石 497
@@ -139,7 +139,7 @@ namespace GObject
         VAR_NETVDPACK = 106, // 网络情人节礼包是否发放
         VAR_LASTATHRANK = 107, // 昨天结算前的斗剑排名
         VAR_SHUOSHUO = 108, // 今天领取过说说奖励次数
-        VAR_INVITED = 109, // 今天领取过邀请好友奖励次数
+        VAR_INVITED = 109, // 今天领取过邀请好友奖励次数    //停用[suntao:2013-1-15]
 
         VAR_JUNE = 110,      // 六月礼包是否发放
         VAR_JUNE_EQUIP = 111, // 六月节日套装是否发放
@@ -309,6 +309,9 @@ namespace GObject
         VAR_NCB_TOTALWIN = 296,     //蜀山论剑当天胜利场次
         VAR_NCB_TOTALLOSE = 297,    //蜀山论剑当天失败场次
         //注:使用298时清理数据库，之前使用过一次298
+
+        VAR_INVITEDSUCCESS = 299, //邀请成功的好友人数
+        VAR_CFRIENDTICKETS = 300, //好友邀请的抽奖券
 
         //繁体版占用301-330
 
@@ -610,6 +613,9 @@ namespace GObject
 
             REGISTER_VAR(VAR_NCB_TOTALWIN, CYCLE_DAY);
             REGISTER_VAR(VAR_NCB_TOTALLOSE, CYCLE_DAY);
+
+            REGISTER_VAR(VAR_INVITEDSUCCESS, CYCLE_MONTH);
+            REGISTER_VAR(VAR_CFRIENDTICKETS, CYCLE_NONE);
 
             REGISTER_VAR(VAR_TOWER_LOGIN, CYCLE_DAY);
             REGISTER_VAR(VAR_TOWER_LEVEL, CYCLE_NONE);

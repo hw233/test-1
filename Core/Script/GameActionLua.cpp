@@ -997,6 +997,11 @@ namespace Script
 		return Call<bool>("onGetCFriendAward", player, idx);
 	}
 
+	UInt8 GameActionLua::onUseTickets( Player* player)
+	{
+		return Call<UInt8>("onUseTickets", player);
+	}
+
 	bool GameActionLua::testTakePack( Player* player, UInt8 type, UInt8 freq )
 	{
 		return Call<bool>("testTakePack", player, type, freq);

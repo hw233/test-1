@@ -355,7 +355,7 @@ void OnAthleticsAwardReq(GameMsgHdr& hdr, const void * data)
 	struct GObject::AthleticsAward *awd = reinterpret_cast<struct GObject::AthleticsAward *>(const_cast<void *>(data));
     if(awd->itemId && awd->itemCount)
     {
-        if(awd->itemId == 499)
+        if(awd->itemId == COUPON_ID)
             player->getCoupon(awd->itemCount);
         else
             player->GetPackage()->AddItem(awd->itemId, awd->itemCount, 1, false, FromAthletAward);
@@ -394,7 +394,7 @@ void OnAthleticsAwardReq2(GameMsgHdr& hdr, const void * data)
     UInt16 count = awardId & 0xFFFF;
     if(itemId && count)
     {
-        if(itemId == 499)
+        if(itemId == COUPON_ID)
             player->getCoupon(count);
         else
             player->GetPackage()->AddItem(itemId, count, 1, false, FromAthletAward);
@@ -730,7 +730,7 @@ void OnDailyCheck( GameMsgHdr& hdr, const void * data )
     if (World::_blueactiveday)
         player->onBlueactiveday();
     player->GetShuoShuo()->reset();
-    player->GetCFriend()->reset();
+    player->GetCFriend()->reset(player->isOnline());
     player->sendSSDTInfo();
     player->send11DailyInfo();
     player->SetVar(VAR_JUNE_HAPPY, 0);
@@ -1824,6 +1824,11 @@ void OnAddMapObj( GameMsgHdr& hdr, const void * data)
     map->Show(mo->m_ID, true, mo->m_Type);
 }
 
+void OnCFriendAthleticsRank( GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    player->OnCFriendAthleticsRank();
+}
 
 #endif // _COUNTRYINNERMSGHANDLER_H_
 

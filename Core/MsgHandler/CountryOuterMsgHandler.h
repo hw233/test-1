@@ -5153,10 +5153,23 @@ void OnGetCFriendAward( GameMsgHdr& hdr, GetCFriendAward& req )
     MSG_QUERY_PLAYER(player);
     if(!player->hasChecked())
          return;
-    if (req._flag == 1)
-        player->GetCFriend()->setCFriendNum(req._idx);
-    else
-        player->GetCFriend()->getAward(req._idx);
+    CFriend * cFriend = player->GetCFriend();
+    if(!cFriend) return;
+    printf("OnGetCFriendAward:flag[%u],idx[%u]\n",req._flag,req._idx);
+    if (req._flag == 0)
+        cFriend->getAward(req._idx);
+    else if (req._flag == 1)
+        cFriend->setCFriendNum(req._idx);
+    else if (req._flag == 2)
+        cFriend->recallFriend();
+    else if (req._flag == 3)
+        cFriend->giveLift();
+    else if (req._flag == 4)
+        cFriend->getLift();
+    else if (req._flag == 5)
+        cFriend->useTickets(req._idx);
+    else if (req._flag == 6)
+        cFriend->setCFriendSuccess(req._idx);
 }
 
 void OnGetOfflineExp( GameMsgHdr& hdr, GetOfflineExp& req )

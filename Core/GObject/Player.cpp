@@ -7062,6 +7062,45 @@ namespace GObject
         setCFriends();
     }
 
+    void Player::OnCFriendAthleticsRank()
+    {
+        if(CURRENT_THREAD_ID() != getThreadId())
+        {
+            GameMsgHdr hdr(0x341, getThreadId(), this, 0);
+            GLOBAL().PushMsg(hdr, NULL);
+        }
+        else
+        {
+            for (std::set<Player *>::iterator it = _friends[3].begin(); it != _friends[3].end(); ++it)
+            {
+                (*it)->setCFriendByRank();
+            }
+        }
+    }
+
+    void Player::setCFriendByRank()
+    {
+        UInt16 cf_AthRank[2] = {0}; //斗剑排名:500名,200名
+        static UInt8 cf_AthRank_nums[] = {1, 2, 5, 10};
+        for (std::set<Player *>::iterator it = _friends[3].begin(); it != _friends[3].end(); ++it)
+        {
+            if (gAthleticsRank.getAthleticsRank(*it) <= 200)
+                ++cf_AthRank[1];
+            else if (gAthleticsRank.getAthleticsRank(*it) <= 500)
+                ++cf_AthRank[0];
+        }
+
+        for (UInt8 j = 0; j < sizeof(cf_AthRank)/sizeof(UInt16); ++j)
+        {
+            for (UInt8 i = 0; i < sizeof(cf_AthRank_nums)/sizeof(UInt8); ++i)
+            {
+                if (cf_AthRank[j] < cf_AthRank_nums[i])
+                    break;
+                GetCFriend()->setCFriendSafe(CF_RANK500_1+4*j+i);
+            }
+        }
+    }
+
 	void Player::checkLevUp(UInt8 oLev, UInt8 nLev)
 	{
         if(nLev >= 47)
