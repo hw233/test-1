@@ -1424,6 +1424,7 @@ function onUseMDSoul(player, _type)
         {1411,133,503,511,9000,9076,514,516}
 --        {497,496,15,56,57,511,500,518,},
     }
+    local broad = {0,0,0,0,1,1,0,0}
 
     if _type == 3 then
         local prob = {2451,4902,5515,7966,8211,8365,9591,10000}
@@ -1435,7 +1436,9 @@ function onUseMDSoul(player, _type)
                 break
             end
         end
-
+        if broad[i] == 1 then
+            Broadcast(0x27, "御风雷之变化，".."[p:"..player:getCountry()..":"..player:getPName().."]成功显罗盘秘宝于世，获得了[4:"..items[_type][i].."]")
+        end
         return items[_type][i]
     end
 
