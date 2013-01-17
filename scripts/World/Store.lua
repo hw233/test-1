@@ -107,6 +107,17 @@ function loadStore()
 
         discount(store)
 
+        if isfashion_shop() then
+            store:add(2, 1700, 599) --仙墨笔
+            store:add(2, 1701, 599) --折翼扇
+            store:add(2, 1702, 599) --西方之焰
+            store:add(2, 1703, 599) --玫瑰情缘
+            store:add(2, 1709, 599) --圣诞萌萌的糖
+            store:add(2, 1710, 599) --圣诞老人的包袱
+        end
+        store:add(2, 1704, 599) --轩辕双剑
+        store:add(2, 1705, 599) --伏羲古琴
+
         if is0111_0117() then
             store:add(5,9279,1000)
             store:add(2,9280,10)

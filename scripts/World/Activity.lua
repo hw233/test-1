@@ -132,6 +132,11 @@ function is0111_0117()
     return is_0111_0117
 end
 
+is_fashion_shop = false
+function isfashion_shop()
+    return is_fashion_shop
+end
+
 function onActivityCheck(tm)
   local osmax = oldServersMax[serverName]
   if osmax ~= nil and serverNum <= osmax then
@@ -859,6 +864,12 @@ function onActivityCheck(tm)
           is_0111_0117 = false
       end
 
+      if tm >= actTime235_0 and tm < actTime235_1 then
+          is_fashion_shop = true
+      else
+          is_fashion_shop = false
+      end
+
       setShuoShuo(true);
   end
 
@@ -936,7 +947,7 @@ function initActTime(y, m, d)
   -- 黄钻特权
   local  SerStartTm20= { ['year'] = 2012, ['month'] = 8, ['day'] = 24, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 游戏大厅特权
-  local  SerStartTm21= { ['year'] = 2012, ['month'] = 9, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm21= { ['year'] = 2013, ['month'] = 1, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   -- 充值返利（5/16-5/27）
   local  SerStartTm22= { ['year'] = 2012, ['month'] = 5, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1089,7 +1100,8 @@ function initActTime(y, m, d)
   --英雄岛限时“自动战斗”活动
   local  SerStartTm234 = { ['year'] = 2013, ['month'] = 1, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm234_1 = { ['year'] = 2013, ['month'] = 1, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-
+  -- 时装法宝
+  local  SerStartTm235_1 = { ['year'] = 2013, ['month'] = 1, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   --300-399越南版用了
   actTime0 = os.time(SerStartTm);
@@ -1162,7 +1174,7 @@ function initActTime(y, m, d)
   actTime44 = os.time(SerStartTm20) + 17 * 86400;
 
   actTime45 = os.time(SerStartTm21);
-  actTime46 = os.time(SerStartTm21) + 61 * 86400;
+  actTime46 = os.time(SerStartTm21) + 7 * 86400;
 
   actTime47 = os.time(SerStartTm22);
   actTime48 = os.time(SerStartTm22) + 12 * 86400;
@@ -1444,6 +1456,9 @@ function initActTime(y, m, d)
 
   actTime234_0= os.time(SerStartTm234);
   actTime234_1= os.time(SerStartTm234_1);
+
+  actTime235_0= os.time(SerStartTm235);
+  actTime235_1= os.time(SerStartTm235_1);
 
   onActivityCheck(os.time() + 30);
 
