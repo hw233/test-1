@@ -851,8 +851,20 @@ function onActivityCheck(tm)
 
       if tm >= actTime538 and tm < actTime538_1 then
           setConsumeActive(true)
+      elseif tm >= actTime550 and tm < actTime550_1 then
+          setConsumeActive(true)
       else
           setConsumeActive(false)
+      end
+      if tm >= actTime550 and tm < actTime550_1 then
+          setConsumeAwardAct(true)
+      else
+          setConsumeAwardAct(false)
+      end
+      if tm >= actTime551 and tm < actTime551_1 then
+          setCompassAct(true)
+      else
+          setCompassAct(false)
       end
 
       if tm >= actTime232_0 and tm < actTime232_1 then
@@ -1045,6 +1057,7 @@ function initActTime(y, m, d)
   -- 商城消耗返利
   local  SerStartTm538= { ['year'] = 2013, ['month'] = 1, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm539= { ['year'] = 2013, ['month'] = 1, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm550= { ['year'] = 2013, ['month'] = 1, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   -- 繁体版
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1388,6 +1401,11 @@ function initActTime(y, m, d)
   actTime539 = os.time(SerStartTm539);
   actTime539_1 = os.time(SerStartTm539) + 11 * 86400;
 
+  actTime550 = os.time(SerStartTm550);
+  actTime550_1 = os.time(SerStartTm550) + 7 * 86400;
+
+  actTime551 = os.time(SerStartTm550);
+  actTime551_1 = os.time(SerStartTm550) + 3 * 86400;
   -- 繁体版
   actTime101 = os.time(SerStartTm101);
   actTime102 = os.time(SerStartTm101) + 8 * 86400;

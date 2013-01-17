@@ -144,6 +144,7 @@ namespace Script
         lua_tinker::def(_L, "getTgcEvent", GObject::World::getTgcEvent);
         lua_tinker::def(_L, "get9215Act", GObject::World::get9215Act);
         lua_tinker::def(_L, "getSnowAct", GObject::World::getSnowAct);
+		lua_tinker::def(_L, "getCompassAct", GObject::World::getCompassAct);
 
         CLASS_DEF(GameActionLua, Print);
         lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);
@@ -1312,6 +1313,11 @@ namespace Script
     {
 		assert(player != NULL);
 		return Call<UInt8>("RunBlueDiamondAward", player, opt);
+    }
+    UInt8 GameActionLua::RunConsumeAward(Player* player, UInt8 opt)
+    {
+		assert(player != NULL);
+		return Call<UInt8>("RunConsumeAward", player, opt);
     }
     void GameActionLua::sendRNR(Player* player, UInt32 now, UInt32 date, UInt32 total)
     {

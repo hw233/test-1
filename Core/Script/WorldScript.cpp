@@ -173,6 +173,7 @@ void WorldScript::init()
 	def("setConsumeActive", GObject::World::setConsumeActive);
 	def("setConsume918", GObject::World::setConsume918);
 	def("getConsume918", GObject::World::getConsume918);
+	def("setConsumeAwardAct", GObject::World::setConsumeAwardAct);
     def("getConsumeActive", GObject::World::getConsumeActive);
     def("setKillMonsterAct", GObject::World::setKillMonsterAct);
     def("getKillMonsterAct", GObject::World::getKillMonsterAct);
@@ -206,7 +207,9 @@ void WorldScript::init()
     def("setFFAttrMaxValProp", GObject::GObjectManager::setFFAttrMaxValProp);
     def("setFFAttrMaxVal", GObject::GObjectManager::setFFAttrMaxVal);
 	def("setTownReward_10_15", GObject::World::setTownReward_10_15);
-
+	def("setCompassAct", GObject::World::setCompassAct);
+	def("getCompassAct", GObject::World::getCompassAct);
+	
     def("setMergeAthAct", GObject::World::setMergeAthAct);
     def("getMergeAthAct", GObject::World::getMergeAthAct);
     def("setFourCopAct", GObject::World::setFourCopAct);
