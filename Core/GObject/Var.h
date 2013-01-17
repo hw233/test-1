@@ -309,6 +309,18 @@ namespace GObject
         VAR_RECHARGE_SCORE = 340, //累计充值的积分
         VAR_JOYVIP_BUFF_GOT     = 341, //心悦Buff
         VAR_QQGAME_GIFT_1218 = 342,    //QQGame登录奖励 1218-1220
+
+        // 351~360 占用 for JLT
+        VAR_DISCOUNT_CONSUME1  = 351, // 消费限购的金额
+        VAR_DISCOUNT_CONSUME2  = 352, // 消费限购的金额
+        VAR_DISCOUNT_CONSUME3  = 353, // 消费限购的金额
+        VAR_DISCOUNT_RECHARGE1 = 354, // 充值限购的金额
+        VAR_DISCOUNT_RECHARGE2 = 355, // 充值限购的金额
+        VAR_DISCOUNT_RECHARGE3 = 356, // 充值限购的金额
+        VAR_DISCOUNT_EX1_TIME  = 357, // 限购栏一过期时间
+        VAR_DISCOUNT_EX2_TIME  = 358, // 限购栏二过期时间
+        VAR_DISCOUNT_EX3_TIME  = 359, // 限购栏三过期时间
+
         VAR_MAX,
     };
 

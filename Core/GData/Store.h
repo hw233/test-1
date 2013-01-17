@@ -36,7 +36,9 @@ struct Exchange
 struct Discount
 {
     UInt16 itemID;
-    UInt8 discountType;
+    UInt8  discountType;
+    UInt8  exType;
+    UInt32 exValue;
     UInt32 limitCount;
     UInt32 beginTime;
     UInt32 endTime;
@@ -49,7 +51,8 @@ class Store
 public:
     void process(UInt32 now);
 	void add(UInt8 type, UInt32 itemId, UInt32 price);
-    void addDiscountFromDB( UInt16 itemID, UInt8 discountType, UInt32 limitCount, UInt32 beginTime, UInt32 endTime, UInt16 priceOriginal, UInt16 priceDiscount);
+    void addDiscountFromDB( UInt16 itemID, UInt8 discountType, UInt8 exType, UInt32 exValue,
+            UInt32 limitCount, UInt32 beginTime, UInt32 endTime, UInt16 priceOriginal, UInt16 priceDiscount);
 	void addExchange(UInt8 type, UInt32 itemId, UInt32 priceID, UInt32 priceNum);
     void addNormalDiscount(UInt32 itemId, UInt32 discount, UInt32 num);
     void addSpecialDiscount();
@@ -74,6 +77,10 @@ public:
     UInt8 getNewDisVarOffset(UInt8 type);
     UInt32 getEndTimeByDiscountType(UInt8 type);
     UInt32 getBeginTimeByDiscountType(UInt8 type);
+    UInt8 getExDiscount(UInt8 type, UInt32& exValue);
+
+    const Discount* getDiscount(UInt8 type, UInt8 index);
+    UInt8 getDiscountItemsCount(UInt8 type);
 private:
 	std::vector<UInt32> _items[PURCHASE2-PURCHASE1+1];
 	std::map<UInt32, UInt32> _itemPrices[PURCHASE2-PURCHASE1+1];

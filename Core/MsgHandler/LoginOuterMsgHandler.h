@@ -2692,6 +2692,8 @@ void AddDiscountFromBs(LoginMsgHdr& hdr, const void* data)
     CHKKEY();
     GData::Discount discount;
     br >> discount.discountType;
+    br >> discount.exType;
+    br >> discount.exValue;
     br >> discount.beginTime;
     br >> discount.endTime;
     GData::store.clearSpecialDiscountFromBS(discount.discountType);
@@ -2720,20 +2722,45 @@ void AddDiscountFromBs(LoginMsgHdr& hdr, const void* data)
 
 void QueryDiscountFromBs(LoginMsgHdr& hdr, const void* data)
 {
-    // TODO: GM查询限时限购活动
+    // GM查询限时限购活动
 	BinaryReader br(data,hdr.msgHdr.bodyLen);
     CHKKEY();
+    Stream st (SPEP::QUERYDISCOUNT);
     for (UInt8 type = 4; type < 7; ++type)
     {
-        Stream st (SPEP::QUERYDISCOUNT);
-        st << type;
+        UInt8 i = 0;
+        const GData::Discount* discount = GData::store.getDiscount(type, i++);
+        if (discount)
+        {
+            st << type;
+            st << discount->discountType;
+            st << discount->exType;
+            st << discount->exValue;
+            st << discount->beginTime;
+            st << discount->endTime;
+
+
+        }
+        else
+            continue;
+        st << GData::store.getDiscountItemsCount(type);
+        while(discount)
+        {
+            st << discount->itemID;            // UInt16
+            st << discount->limitCount;        // UInt32
+            st << discount->priceOriginal;     // UInt16
+            st << discount->priceDiscount;     // UInt16
+            discount = GData::store.getDiscount(type, i++);
+        }
     }
+    st << Stream::eos;
+	NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
 void ClearDiscountFromBs(LoginMsgHdr& hdr, const void* data)
 {
     // GM清空限时限购活动
-	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
     CHKKEY();
     GData::store.clearSpecialDiscountFromBS();
     GData::store.storeDiscount();
@@ -2742,17 +2769,17 @@ void ClearDiscountFromBs(LoginMsgHdr& hdr, const void* data)
 
 void QueryRealAwardInfo(LoginMsgHdr& hdr, const void* data)
 {
-	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
     CHKKEY();
     Stream st(SPEP::REALAWARDINFO);
     GObject::realItemAwardMgr.getInfo(st);
     st << Stream::eos;
-	NETWORK()->SendMsgToClient(hdr.sessionID, st);
+    NETWORK()->SendMsgToClient(hdr.sessionID, st);
 }
 
 void AddRealAward(LoginMsgHdr& hdr, const void* data)
 {
-	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
     CHKKEY();
 
     UInt8 type = 0;
@@ -2763,43 +2790,43 @@ void AddRealAward(LoginMsgHdr& hdr, const void* data)
     st << type;
     switch(type)
     {
-    case 1:
-        {
-            UInt32 id = 0;
-            UInt32 cd = 0;
-            std::string card_no;
-            std::string card_psw;
-            br >> id >> cd >> card_no >> card_psw;
-            if(id == 0 || cd == 0 || card_no.length() == 0 || card_psw.length() == 0)
-                ret = 0;
-            else if(GObject::realItemAwardMgr.addAward(id, cd, card_no, card_psw))
-                ret = 1;
-            else
-                ret = 2;
-        }
-        break;
-    case 2:
-        {
-            UInt32 id = 0;
-            br >> id;
-            if(id == 0)
-                ret = 0;
-            else if(GObject::realItemAwardMgr.delAward(id))
-                ret = 1;
-            else
-                ret = 2;
-        }
-        break;
+        case 1:
+            {
+                UInt32 id = 0;
+                UInt32 cd = 0;
+                std::string card_no;
+                std::string card_psw;
+                br >> id >> cd >> card_no >> card_psw;
+                if(id == 0 || cd == 0 || card_no.length() == 0 || card_psw.length() == 0)
+                    ret = 0;
+                else if(GObject::realItemAwardMgr.addAward(id, cd, card_no, card_psw))
+                    ret = 1;
+                else
+                    ret = 2;
+            }
+            break;
+        case 2:
+            {
+                UInt32 id = 0;
+                br >> id;
+                if(id == 0)
+                    ret = 0;
+                else if(GObject::realItemAwardMgr.delAward(id))
+                    ret = 1;
+                else
+                    ret = 2;
+            }
+            break;
     }
     st << ret << Stream::eos;
 
-	NETWORK()->SendMsgToClient(hdr.sessionID, st);
+    NETWORK()->SendMsgToClient(hdr.sessionID, st);
 }
 
 void AddClanAward(LoginMsgHdr& hdr, const void* data)
 {
     // 发送物品给指定帮派仓库
-	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
     CHKKEY();
     UInt8 ret = 0;
 
@@ -2842,7 +2869,7 @@ void AddClanAward(LoginMsgHdr& hdr, const void* data)
 void ManualOpenTj(LoginMsgHdr& hdr, const void* data)
 {
     //手动开启天劫
-	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
     CHKKEY();
 
     UInt16 level = 0;
@@ -2859,7 +2886,7 @@ void ManualOpenTj(LoginMsgHdr& hdr, const void* data)
 
 void SHStageOnOff(LoginMsgHdr& hdr, const void* data)
 {
-	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
     CHKKEY();
 
     struct OnOffData
@@ -2871,13 +2898,13 @@ void SHStageOnOff(LoginMsgHdr& hdr, const void* data)
     br >> onOff.begin >> onOff.end;
     onOff.sessionID = hdr.sessionID;
 
-	GameMsgHdr imh(0x1AC, WORKER_THREAD_WORLD, NULL, sizeof(onOff));
-	GLOBAL().PushMsg(imh, &onOff);
+    GameMsgHdr imh(0x1AC, WORKER_THREAD_WORLD, NULL, sizeof(onOff));
+    GLOBAL().PushMsg(imh, &onOff);
 }
 
 void QuerySHStageOnOff(LoginMsgHdr& hdr, const void* data)
 {
-	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
     CHKKEY();
     GObject::SHOnOffTime onOff = GObject::shStageMgr.getSHOnOffTime();
 

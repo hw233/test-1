@@ -7,6 +7,7 @@
 #include "Server/Cfg.h"
 #include "GObject/Package.h"
 #include "GObject/Var.h"
+#include "GObject/GVar.h"
 
 namespace GData
 {
@@ -38,8 +39,8 @@ void Store::add( UInt8 type, UInt32 itemId, UInt32 price )
     return;
 }
 
-void Store::addDiscountFromDB( UInt16 itemID, UInt8 discountType, UInt32 limitCount,
-        UInt32 beginTime, UInt32 endTime, UInt16 priceOriginal, UInt16 priceDiscount)
+void Store::addDiscountFromDB( UInt16 itemID, UInt8 discountType, UInt8 exType, UInt32 exValue,
+        UInt32 limitCount, UInt32 beginTime, UInt32 endTime, UInt16 priceOriginal, UInt16 priceDiscount)
 {
     // 从数据库读取折扣信息
     Discount discount;
@@ -50,6 +51,8 @@ void Store::addDiscountFromDB( UInt16 itemID, UInt8 discountType, UInt32 limitCo
     discount.endTime = endTime;
     discount.priceDiscount = priceDiscount;
     discount.priceOriginal = priceOriginal;
+    discount.exType = exType;
+    discount.exValue = exValue;
     _itemsDiscount[DISCOUNTEND - DISCOUNT].push_back(discount);
     ++ (_itemTypeCountDiscount[DISCOUNTEND - DISCOUNT][discount.discountType]);
 }
@@ -148,6 +151,8 @@ UInt8 Store::addSpecialDiscountFromBS(Discount discount)
     {
         return 1;
     }
+    GObject::GVAR.SetOverTime(GObject::GVAR_DISCOUNT_TYPE1 + discount.discountType - 4, discount.endTime, true);
+    GObject::GVAR.SetVar(GObject::GVAR_DISCOUNT_TYPE1 + discount.discountType - 4, discount.exType);
     _itemsDiscount[DISCOUNTEND - DISCOUNT].push_back(discount);
     ++ (_itemTypeCountDiscount[DISCOUNTEND - DISCOUNT][discount.discountType]);
     return 0;
@@ -176,6 +181,7 @@ UInt8 Store::clearSpecialDiscountFromBS(UInt8 type /* = 0 */)
                 ++ it;
             }
         }
+        GObject::GVAR.SetOverTime(GObject::GVAR_DISCOUNT_TYPE1 + type - 4, 0, true);
     }
     else
     {
@@ -191,6 +197,9 @@ UInt8 Store::clearSpecialDiscountFromBS(UInt8 type /* = 0 */)
                 ++ it;
             }
         }
+        GObject::GVAR.SetOverTime(GObject::GVAR_DISCOUNT_TYPE1, 0, true);
+        GObject::GVAR.SetOverTime(GObject::GVAR_DISCOUNT_TYPE2, 0, true);
+        GObject::GVAR.SetOverTime(GObject::GVAR_DISCOUNT_TYPE3, 0, true);
     }
     return result;
 }
@@ -347,7 +356,8 @@ void Store::makePacket()
 		for(std::vector<Discount>::iterator it = items.begin(); it != items.end(); ++ it)
 		{
 			_storePacketDiscount[i] << (*it).itemID << (*it).discountType << (*it).limitCount << \
-                (*it).beginTime << (*it).endTime << (*it).priceDiscount << (*it).priceOriginal;
+                (*it).beginTime << (*it).endTime << (*it).priceDiscount << (*it).priceOriginal << \
+                (*it).exType << (*it).exValue;
         }
 		_storePacketDiscount[i] << Stream::eos;
     }
@@ -406,8 +416,8 @@ void Store::clearSpecialDiscount()
         {
             if ((*it).discountType < 7)
             {
-                DB3().PushUpdateData("DELETE FROM `discount` \
-                        where `itemid` = %u and `type` = %u", \
+                DB3().PushUpdateData("DELETE FROM `discount`" \
+                        "where `itemid` = %u and `type` = %u", \
                         (*it).itemID, (*it).discountType);
                 it = items.erase(it);
             }
@@ -430,10 +440,10 @@ void Store::storeDiscount()
         std::vector<Discount>& items = _itemsDiscount[i];
 		for(std::vector<Discount>::iterator it = items.begin(); it != items.end(); ++ it)
 		{
-            DB3().PushUpdateData("INSERT INTO `discount` \
-                (`itemid`, `timeBegin`, `timeEnd`, `priceOriginal`, `priceDiscount`, `type`, `count`) \
-                VALUES (%u, %u, %u, %u, %u, %u, %u)",
-                (*it).itemID, (*it).beginTime, (*it).endTime, (*it).priceOriginal, (*it).priceDiscount, (*it).discountType, (*it).limitCount);
+            DB3().PushUpdateData("INSERT INTO `discount`" \
+                "(`itemid`, `exType`, `exValue`, `timeBegin`, `timeEnd`, `priceOriginal`, `priceDiscount`, `type`, `count`)"\
+                "VALUES (%u, %u, %u, %u, %u, %u, %u, %u, %u)",
+                (*it).itemID, (*it).exType, (*it).exValue, (*it).beginTime, (*it).endTime, (*it).priceOriginal, (*it).priceDiscount, (*it).discountType, (*it).limitCount);
         }
     }
 }
@@ -476,17 +486,11 @@ UInt16 Store::getDiscountLimit(UInt8 type)
 UInt8 Store::getDisTypeVarOffset(UInt8 type)
 {
     // 获取限购种类的var索引偏移量
-    // type：1,2,3为全服限购，不需要获得玩家变量
+    // type：
     //       4,5,6为活动限时限购
     //       7,8,9为普通三五八折限购
     switch (type)
     {
-        case 1:
-            return 0xfe;
-        case 2:
-            return 0xfe;
-        case 3:
-            return 0xfe;
         case 4:
             return GObject::VAR_DISCOUNT_SP_1 - GObject::VAR_DISCOUNT_1;
         case 5:
@@ -550,6 +554,36 @@ UInt32 Store::getBeginTimeByDiscountType(UInt8 type)
                     return (*it).beginTime;
         }
     }
+    return 0;
+}
+
+UInt8 Store::getExDiscount(UInt8 type, UInt32& exValue)
+{
+    // 返回是否是特殊的限时限购
+    for (UInt8 i = 0; i < DISCOUNTEND - DISCOUNT + 1; ++ i)
+    {
+        std::vector<Discount>& items = _itemsDiscount[i];
+        for (std::vector<Discount>::iterator it = items.begin(); it != items.end(); ++ it)
+        {
+            if ((*it).discountType == type)
+            {
+                exValue = (*it).exValue;
+                return (*it).exType;
+            }
+        }
+    }
+    return 0;
+}
+
+const Discount* Store::getDiscount(UInt8 type, UInt8 index)
+{
+    // TODO:
+    return NULL;
+}
+
+UInt8 Store::getDiscountItemsCount(UInt8 type)
+{
+    // TODO: 
     return 0;
 }
 

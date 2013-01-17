@@ -1003,9 +1003,12 @@ struct DBWBoss
     Int32 atk;
     Int32 matk;
 };
+
 struct DBDiscount
 {
     UInt16 itemID;
+    UInt8  exType;
+    UInt32  exValue;
     UInt32 beginTime;
     UInt32 endTime;
     UInt16 priceOriginal;
@@ -2353,14 +2356,16 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBDiscount)
-SPECIALDEF(7)
+SPECIALDEF(9)
 (
     UInt16, itemID,
+    UInt8,  exType,
+    UInt32,  exValue,
     UInt32, beginTime,
     UInt32, endTime,
     UInt16, priceOriginal,
     UInt16, priceDiscount,
-    UInt8, type,
+    UInt8,  type,
     UInt32, count
 )
 SPECIALEND()

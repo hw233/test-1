@@ -1407,7 +1407,8 @@ CREATE TABLE `wboss` (
 DROP TABLE IF EXISTS `discount`;
 CREATE TABLE `discount` (
       `itemid` int(10) unsigned NOT NULL,
-      `discount` tinyint(3) unsigned NOT NULL,
+      `exType` tinyint(3) unsigned NOT NULL,
+      `exValue` int(10) unsigned NOT NULL,
       `timeBegin` int(10) unsigned NOT NULL,
       `timeEnd` int(10) unsigned NOT NULL,
       `priceOriginal` int(10) unsigned NOT NULL,
