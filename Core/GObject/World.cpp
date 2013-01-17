@@ -144,6 +144,7 @@ bool World::_ssToolbarAct= false;
 bool World::_snowAct= false;
 bool World::_goldSnakeAct= false;
 bool World::_heroIslandAct= false;
+bool World::_dragonKingAct= false;
 bool World::_feastloginAct= false;
 UInt8 World::_towerloginAct= 0;
 bool World::_guoqing= false;

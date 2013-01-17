@@ -150,6 +150,8 @@ void WorldScript::init()
     def("setGoldSnakeAct", GObject::World::setGoldSnakeAct);
     def("getGoldSnakeAct", GObject::World::getGoldSnakeAct);
     def("setHeroIslandAct", GObject::World::setHeroIslandAct);
+    def("setDragonKingAct", GObject::World::setDragonKingAct);
+    def("getDragonKingAct", GObject::World::getDragonKingAct);
     
     def("setGuoqing", GObject::World::setGuoqing);
     def("getGuoqing", GObject::World::getGuoqing);

@@ -873,6 +873,12 @@ function onActivityCheck(tm)
           is_fashion_shop = false
       end
 
+      if tm >= actTime236_0 and tm < actTime236_1 then
+          setDragonKingAct(true)
+      else
+          setDragonKingAct(false)
+      end
+
       setShuoShuo(true);
   end
 
@@ -1106,6 +1112,9 @@ function initActTime(y, m, d)
   local  SerStartTm234_1 = { ['year'] = 2013, ['month'] = 1, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 时装法宝
   local  SerStartTm235 = { ['year'] = 2013, ['month'] = 1, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --大闹龙宫活动
+  local  SerStartTm236 = { ['year'] = 2013, ['month'] = 1, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm236_1 = { ['year'] = 2013, ['month'] = 1, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   --300-399越南版用了
   actTime0 = os.time(SerStartTm);
@@ -1466,6 +1475,9 @@ function initActTime(y, m, d)
 
   actTime235_0= os.time(SerStartTm235);
   actTime235_1= os.time(SerStartTm235) + 11 * 86400;
+
+  actTime236_0= os.time(SerStartTm236);
+  actTime236_1= os.time(SerStartTm236_1);
 
   onActivityCheck(os.time() + 30);
 

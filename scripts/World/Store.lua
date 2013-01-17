@@ -107,6 +107,9 @@ function loadStore()
 
         discount(store)
 
+        if getDragonKingAct() then
+            store:add(2, 9337, 10) --游龙令
+        end
         if isfashion_shop() then
             store:add(2, 1700, 599) --仙墨笔
             store:add(2, 1701, 599) --折翼扇
