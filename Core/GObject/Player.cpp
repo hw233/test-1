@@ -13103,6 +13103,8 @@ namespace GObject
             type = 3;
             subsoul = 10;
         }
+        if (soul < subsoul)
+            return;
 
         if (!type)
             return;
@@ -13141,6 +13143,8 @@ namespace GObject
             type = 3;
             subsoul = 10;
         }
+        if (soul < subsoul)
+            return;
 
         if (!type)
             return;
