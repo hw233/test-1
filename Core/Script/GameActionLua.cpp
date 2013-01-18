@@ -143,6 +143,8 @@ namespace Script
         lua_tinker::def(_L, "getKillMonsterAct", GObject::World::getKillMonsterAct);
         lua_tinker::def(_L, "getTgcEvent", GObject::World::getTgcEvent);
         lua_tinker::def(_L, "get9215Act", GObject::World::get9215Act);
+        lua_tinker::def(_L, "getSnowAct", GObject::World::getSnowAct);
+		lua_tinker::def(_L, "getCompassAct", GObject::World::getCompassAct);
 
         CLASS_DEF(GameActionLua, Print);
         lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);
@@ -699,6 +701,21 @@ namespace Script
 		snprintf(buffer, sizeof(buffer), "DayTask_%08d", taskId);
 		return Run<Table>(player, buffer, npcId);
 	}
+
+    Table GameActionLua::GetNewCountryBattleBuffs()
+    {
+        return Run<Table>(NULL, "getNewCountryBattleBuffs");
+    }
+
+    Table GameActionLua::GetNCBEffortIdValue()
+    {
+        return Run<Table>(NULL, "getNCBEffortIdValue");
+    }
+
+    Table GameActionLua::GetNewCountryBattleAward(UInt8 lvl)
+    {
+        return Call<Table>("getNewCountryBattleAward", lvl);
+    }
 
     Table GameActionLua::GetClanBattleBuffs()
     {
@@ -1297,6 +1314,11 @@ namespace Script
 		assert(player != NULL);
 		return Call<UInt8>("RunBlueDiamondAward", player, opt);
     }
+    UInt8 GameActionLua::RunConsumeAward(Player* player, UInt8 opt)
+    {
+		assert(player != NULL);
+		return Call<UInt8>("RunConsumeAward", player, opt);
+    }
     void GameActionLua::sendRNR(Player* player, UInt32 now, UInt32 date, UInt32 total)
     {
 		return Call<void>("sendRNR", player, now, date, total);
@@ -1421,6 +1443,12 @@ namespace Script
 		return Call<UInt8>("RunThanksGivingDayAward", player, opt);
 	}
 
+    bool GameActionLua::onGetFeastGiftAward(Player* player, UInt8 type)
+	{
+		assert(player != NULL);
+		return Call<bool>("onGetFeastGiftAward", player, type);
+	}
+
     UInt32 GameActionLua::getRandomNormalMonster(UInt8 id)
     {
         return Call<UInt32>("getRandomNormalMonster", id);
@@ -1455,11 +1483,21 @@ namespace Script
     {
         return Call<lua_tinker::table>("getStepAward", step);
     }
+    
+    UInt16 GameActionLua::getSpecialItem(UInt8 id, UInt8 index)
+    {
+        return Call<UInt16>("getSpecialItem", id, index);
+    }
 
     lua_tinker::table GameActionLua::getCopyFrontmapAward(UInt8 step, UInt16 localtion)
     {
         return Call<lua_tinker::table>("getCopyFrontmapAward", step, localtion);
     }
 
+    lua_tinker::table GameActionLua::getDreamerTreasure(UInt8 id, UInt8 index)
+    {
+        return Call<lua_tinker::table>("getDreamerTreasure", id, index);
+    }
+ 
 }
 

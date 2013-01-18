@@ -98,6 +98,12 @@ typedef std::multiset<QixiPair*, ScoreGreater> QixiPlayerSet;
 typedef QixiPlayerSet::iterator QixiPlayersIt;
 typedef std::map<Player*, QixiPlayersIt> QixiScoreMap;
 
+typedef QixiScore SnowScore;
+typedef QixiPair  SnowPair;
+typedef QixiPlayerSet SnowPlayerSet;
+typedef QixiPlayersIt SnowPlayersIt;
+typedef QixiScoreMap  SnowScoreMap;
+
 struct ValueSort
 {
     UInt32 sufferCnt;
@@ -120,6 +126,7 @@ public:
 public:
 	inline UInt32 ThisDay() { return _today; }
 	inline UInt32 Now() { return _now; }
+	inline bool isNewCountryBattle() { return !(_wday % 2); }
 
     inline static bool isFBVersion() { return cfg.fbVersion; }
     inline static bool isVTVersion() { return cfg.vtVersion; }
@@ -336,6 +343,32 @@ public:
     inline static bool getSSToolbarAct()
     { return _ssToolbarAct; }
 
+    inline static void setSnowAct(bool v)
+    { _snowAct= v; }
+    inline static bool getSnowAct()
+    { return _snowAct; }
+    inline static void setGoldSnakeAct(bool v)
+    { _goldSnakeAct= v; }
+    inline static bool getGoldSnakeAct()
+    { return _goldSnakeAct; }
+    inline static void setHeroIslandAct(bool v)
+    { _heroIslandAct= v; }
+    inline static bool getHeroIslandAct()
+    { return _heroIslandAct; }
+    inline static void setDragonKingAct(bool v)
+    { _dragonKingAct= v; }
+    inline static bool getDragonKingAct()
+    { return _dragonKingAct; }
+    inline static void setFeastLoginAct(bool v)
+    { _feastloginAct= v; }
+    inline static bool getFeastLoginAct()
+    { return _feastloginAct; }
+
+    inline static void setTowerLoginAct(UInt8 v)
+    { _towerloginAct= v; }
+    inline static UInt8 getTowerLoginAct()
+    { return _towerloginAct; }
+
     inline static void setGuoqing(bool v)
     { _guoqing = v; }
     inline static bool getGuoqing()
@@ -395,6 +428,11 @@ public:
     { _consume918 = v; }
     inline static bool getConsume918()
     { return _consume918; }
+    inline static void setConsumeAwardAct(bool v)
+    { _consumeawardact = v; }
+    inline static bool getConsumeAwardAct()
+    { return _consumeawardact; }
+ 
     inline static void setNeedRechargeRank(bool v)
     { _needrechargerank = v; }
     inline static bool getNeedRechargeRank()
@@ -549,7 +587,11 @@ public:
         }
         return true;
     }
-
+    inline static void setCompassAct(bool v)
+    { _compassact = v; }
+    inline static bool getCompassAct()
+    { return _compassact; }
+ 
 public:
 	inline static UInt8 getWeekDay()
 	{ return _wday; }
@@ -622,6 +664,12 @@ public:
     static bool _wansheng;
     static bool _11Act;
     static bool _ssToolbarAct;
+    static bool _snowAct;
+    static bool _goldSnakeAct;
+    static bool _heroIslandAct;
+    static bool _dragonKingAct;
+    static bool _feastloginAct;
+    static UInt8 _towerloginAct;
     static bool _guoqing;
     static bool _9215Act;
     static bool _enchant_gt11;
@@ -638,6 +686,7 @@ public:
     static bool _opentest;
     static bool _consumeactive;
     static bool _consume918;
+    static bool _consumeawardact;
     static bool _needrechargerank;
     static bool _needconsumerank;
     static bool _killMonsteract;
@@ -651,6 +700,7 @@ public:
     static bool _tgcevent;
     static stArenaExtra stArenaOld[2];
     static stArenaExtra stArena;
+    static bool _compassact;
 
 public:
     static RCSortType rechargeSort;
@@ -712,6 +762,13 @@ public:
     void SendGuoqingAward();
     void sendQixiScoreAward(Player* pl);
     void SendXiaoyaoAward();
+    void SendGoldSnakeAward();
+
+    void UpdateSnowScore(Player* pl, Player* lover);
+    void sendSnowPlayers(Player* pl);
+    void DivorceSnowPair(Player* pl);
+    void LoadSnowScore(Player* pl, Player* lover);
+    void SendSnowAward();
 
     void killMonsterAppend(Stream& st, UInt8 index);
     void killMonsterInit();
@@ -730,6 +787,8 @@ private:
 
     QixiScoreMap _qixiScoreMap;
     QixiPlayerSet _qixiPlayerSet;
+    SnowScoreMap _snowScoreMap;
+    SnowPlayerSet _snowPlayerSet;
 };
 
     void CreateNewDB(UInt32 mon = 0, UInt32 year = 2011);

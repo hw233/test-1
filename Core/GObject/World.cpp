@@ -141,6 +141,12 @@ bool World::_qixi= false;
 bool World::_wansheng= false;
 bool World::_11Act= false;
 bool World::_ssToolbarAct= false;
+bool World::_snowAct= false;
+bool World::_goldSnakeAct= false;
+bool World::_heroIslandAct= false;
+bool World::_dragonKingAct= false;
+bool World::_feastloginAct= false;
+UInt8 World::_towerloginAct= 0;
 bool World::_guoqing= false;
 bool World::_9215Act= false;
 bool World::_enchant_gt11 = false;
@@ -157,6 +163,7 @@ UInt32 World::_sosomapbegin = 0;
 bool World::_opentest;
 bool World::_consumeactive;
 bool World::_consume918 = false;
+bool World::_consumeawardact = false;
 RCSortType World::rechargeSort;
 RCSortType World::consumeSort;
 bool World::_needrechargerank = false;
@@ -173,6 +180,7 @@ bool   World::_townReward_10_15 = false;
 bool World::_loginAward = false;
 bool World::_bluediamonSuperman = false;
 bool World::_tgcevent = false;
+bool World::_compassact = false;
 /** 场外活动 **/
 stArenaExtra World::stArenaOld[2];
 stArenaExtra World::stArena;
@@ -248,6 +256,8 @@ bool bGuoqingEnd = false;
 bool bRechargeEnd = false;
 bool bConsumeEnd = false;
 bool bXiaoyaoEnd = false;
+bool bSnowEnd = false;
+bool bGoldSnakeEnd = false;
 
 bool enum_midnight(void * ptr, void* next)
 {
@@ -380,7 +390,49 @@ bool enum_midnight(void * ptr, void* next)
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 19) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 20) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 21) ||
-            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 22)
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 22) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 23) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 24) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 25) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 26) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 27) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 28)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 31)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 6)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 7)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 9)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 10)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 11)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 19)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 20)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 22)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 24)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 25)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 26)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 27)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 30)
+
             ))
     {
         if (pl->isOnline())
@@ -470,6 +522,14 @@ bool enum_qixi_score(void * ptr, void * data)
 
     return true;
 }
+bool enum_snow(void * ptr, void * data)
+{
+	Player * pl = static_cast<Player *>(ptr);
+	if(pl == NULL)
+		return true;
+    WORLD().sendSnowPlayers(pl);
+    return true;
+}
 
 bool enum_clan_midnight(void * ptr, void * data)
 {
@@ -505,6 +565,17 @@ bool enum_qixi_rank_list(void * ptr, void * data )
     WORLD().LoadQixiScore(player, lover);
     return true;
 }
+bool enum_snow_rank_list(void * ptr, void * data )
+{
+    Player* player = static_cast<Player*>(ptr);
+    if(player == NULL || !player->getSnowBind())
+        return true;
+
+    Player* lover = player->getSnowLover();
+    WORLD().LoadSnowScore(player, lover);
+    return true;
+}
+
 
 bool enum_extra_act_calc_total(Player* player, void* data)
 {
@@ -598,7 +669,7 @@ void World::makeActivityInfo(Stream &st)
 }
 void World::calWeekDay( World * world )
 {
-	time_t curtime1 = time(NULL) + 300;
+	time_t curtime1 = time(NULL) + 30;
 	struct tm *local = localtime(&curtime1);
 	_wday = static_cast<UInt8>(local->tm_wday);
 	if(_wday == 0)
@@ -931,6 +1002,8 @@ void World::World_Midnight_Check( World * world )
     bool bWansheng = getWansheng();
     bool bGuoqing = getGuoqing();
     bool bXiaoyao = get9215Act();
+    bool bSnowAct = getSnowAct();
+    bool bGoldSnakAct = getGoldSnakeAct();
     bool bRecharge = (getRechargeActive() || getRechargeActive3366()) && getNeedRechargeRank();
     bool bConsume = getConsumeActive() && getNeedConsumeRank();
     bool bPExpItems = getPExpItems();
@@ -959,6 +1032,8 @@ void World::World_Midnight_Check( World * world )
     bWanshengEnd = bWansheng && !getWansheng();
     bGuoqingEnd = bGuoqing && !getGuoqing();
     bXiaoyaoEnd = bXiaoyao && !get9215Act();
+    bSnowEnd = bSnowAct && !getSnowAct();
+    bGoldSnakeEnd = bGoldSnakAct && !getGoldSnakeAct();
     bRechargeEnd = bRecharge && !(getRechargeActive()||getRechargeActive3366());
     bConsumeEnd = bConsume && !getConsumeActive();
     bool bMonsterActEnd = bMonsterAct && !getKillMonsterAct();
@@ -999,7 +1074,48 @@ void World::World_Midnight_Check( World * world )
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 19) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 20) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 21) ||
-            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 22)
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 22) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 23) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 24) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 25) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 26) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 27) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 28)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 31)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 6)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 7)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 9)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 10)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 11)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 19)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 20)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 22)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 24)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 25)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 26)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 27)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 30)
             )
         bRechargeEnd = true;
 
@@ -1060,6 +1176,10 @@ void World::World_Midnight_Check( World * world )
     }
     if (bXiaoyaoEnd)
         world->SendXiaoyaoAward();
+    if (bSnowEnd)
+        world->SendSnowAward();
+    if (bGoldSnakeEnd)
+        world->SendGoldSnakeAward();
 
 	dungeonManager.enumerate(enum_dungeon_midnight, &curtime);
 	globalClans.enumerate(enum_clan_midnight, &curtime);
@@ -2119,6 +2239,32 @@ void World::SendXiaoyaoAward()
     selector._player->sendMailItem(4062, 4063, items, sizeof(items)/sizeof(items[0]), false);
 }
 
+struct SSelectGoldSnakeUsedMost : public Visitor<Player>
+{
+    Player* _player;
+    UInt32 _used;
+    SSelectGoldSnakeUsedMost() : _player(NULL), _used(0) {}
+    bool operator()(Player* player)
+    {
+        UInt32 used = player->GetVar(VAR_9215_USED); //使用与逍遥仙相同的var
+        if(_player == NULL || used > _used)
+        {
+            _player = player;
+            _used = used;
+        }
+        return true;
+    }
+};
+void World::SendGoldSnakeAward()
+{
+    SSelectGoldSnakeUsedMost selector;
+    globalPlayers.enumerate(selector);
+    if(selector._player == NULL)
+        return;
+    MailPackage::MailItem items[] = { {9315, 1} };
+    selector._player->sendMailItem(4064, 4065, items, sizeof(items)/sizeof(items[0]), false);
+}
+
 
 #ifndef _WIN32
 void World::udpLog(const char* str1, const char* str2, const char* str3, const char* str4,
@@ -2320,6 +2466,201 @@ void World::UpdateKillMonsterRank(Player* pl, UInt8 type, UInt8 count)
         killMonsterAppend(st, index);
         st << Stream::eos;
         NETWORK()->Broadcast(st);
+    }
+}
+/////////////////snow
+void World::LoadSnowScore(Player* pl, Player* lover)
+{
+    if(!pl->getSnowBind())
+        return;
+    if(lover->getSnowLover() != pl)
+    {
+        pl->resetSnow();
+        return;
+    }
+
+    SnowScoreMap::iterator it = _snowScoreMap.find(pl);
+    if(it == _snowScoreMap.end())
+    {
+        SnowPair* qp = new SnowPair();
+        qp->p1.lover = lover;
+        qp->p1.score = pl->getSnowScore();
+        qp->p2.lover = pl;
+        qp->p2.score = lover->getSnowScore();
+        SnowPlayersIt qpIt = _snowPlayerSet.insert(qp);
+        _snowScoreMap[pl] = qpIt;
+        _snowScoreMap[lover] = qpIt;
+    }
+}
+
+
+void World::UpdateSnowScore(Player* pl, Player* lover)
+{
+    if(!pl->getSnowBind())
+        return;
+    SnowScoreMap::iterator it = _snowScoreMap.find(pl);
+    UInt32 myPlace = 0;
+    if(it == _snowScoreMap.end())
+    {
+        SnowPair* qp = new SnowPair();
+        qp->p1.lover = lover;
+        qp->p1.score = pl->getSnowScore();
+        qp->p2.lover = pl;
+        qp->p2.score = lover->getSnowScore();
+        SnowPlayersIt qpIt = _snowPlayerSet.insert(qp);
+        _snowScoreMap[pl] = qpIt;
+        _snowScoreMap[lover] = qpIt;
+        myPlace = std::distance(_snowPlayerSet.begin(), qpIt) + 1;
+    }
+    else
+    {
+        SnowPlayersIt qpIt = it->second;
+        SnowPair* qp = *(qpIt);
+
+        _snowPlayerSet.erase(qpIt);
+        if(qp->p1.lover == lover)
+            qp->p1.score = pl->getSnowScore();
+        else if(qp->p2.lover == lover)
+            qp->p2.score = pl->getSnowScore();
+
+        SnowPlayersIt qpIt2 = _snowPlayerSet.insert(qp);
+        _snowScoreMap[pl] = qpIt2;
+        _snowScoreMap[lover] = qpIt2;
+        myPlace = std::distance(_snowPlayerSet.begin(), qpIt2) + 1;
+    }
+
+    if(0 != myPlace && myPlace < 4)
+    {
+        globalPlayers.enumerate(enum_snow, static_cast<void *>(NULL));
+    }
+    else
+    {
+        sendSnowPlayers(pl);
+        sendSnowPlayers(lover);
+    }
+}
+
+void World::sendSnowPlayers(Player* pl)
+{
+    UInt8 i = 0;
+    UInt32 myPlace = 0;
+    UInt32 myScore = 0;
+    SnowScoreMap::iterator it = _snowScoreMap.find(pl);
+    if(it != _snowScoreMap.end())
+    {
+        SnowPlayersIt qpIt = it->second;
+        myPlace = std::distance(_snowPlayerSet.begin(), qpIt) + 1;
+        SnowPair* qp = *qpIt;
+        myScore = qp->p1.score + qp->p2.score;
+    }
+    else
+    {
+        myScore = pl->getSnowScore();
+    }
+
+    Stream st(REP::ACTIVE);
+    st << static_cast<UInt8>(0x05) << static_cast<UInt8>(0x01) << static_cast<UInt8>(0x02);
+    st << myPlace << myScore;
+    size_t offset = st.size();
+
+    st << i;
+    for(SnowPlayersIt qpIt = _snowPlayerSet.begin(); i < 3 && qpIt != _snowPlayerSet.end(); ++ qpIt, ++ i)
+    {
+        SnowPair* qp = *qpIt;
+        st << qp->p1.lover->getName() << qp->p2.lover->getName() << static_cast<UInt32>(qp->p1.score + qp->p2.score);
+    }
+    st.data<UInt8>(offset) = i;
+    st << Stream::eos;
+
+    pl->send(st);
+}
+
+void World::DivorceSnowPair(Player* pl)
+{
+    SnowScoreMap::iterator it = _snowScoreMap.find(pl);
+    Player* lover1 = NULL;
+    Player* lover2 = NULL;
+    UInt32 myPlace = 0;
+    if(it == _snowScoreMap.end())
+    {
+        return;
+    }
+    else
+    {
+        SnowPlayersIt qpIt = it->second;
+        SnowPair* qp = *(qpIt);
+        myPlace = std::distance(_snowPlayerSet.begin(), qpIt) + 1;
+
+        _snowPlayerSet.erase(qpIt);
+        _snowScoreMap.erase(qp->p1.lover);
+        _snowScoreMap.erase(qp->p2.lover);
+        lover1 = qp->p1.lover;
+        lover2 = qp->p2.lover;
+        delete qp;
+    }
+
+    if(0 != myPlace && myPlace < 4)
+    {
+        globalPlayers.enumerate(enum_snow, static_cast<void *>(NULL));
+    }
+    else
+    {
+        sendSnowPlayers(lover1);
+        sendSnowPlayers(lover2);
+    }
+
+}
+
+void World::SendSnowAward()
+{
+    static MailPackage::MailItem s_item[][3] = {
+        {{515,15},{1325,15},{134,15}},
+        {{515,10},{1325,10},{134,10}},
+        {{515,8},{1325,8},{134,8}},
+        {{515,5},{1325,5},{134,5}},
+        {{514,10},{1325,3},{134,3}},
+        {{500,3},{503,3}}
+    };
+    static MailPackage::MailItem s_card[2] = {{9276,1},{9277,1}};
+    UInt32 pos = 0;
+
+  //  globalPlayers.enumerate(enum_snow_score, static_cast<void *>(NULL));
+    SYSMSG(title, 4114);
+    for(SnowPlayersIt qpIt = _snowPlayerSet.begin(); qpIt != _snowPlayerSet.end() && pos < 99; ++ qpIt, ++ pos)
+    {
+        if (pos >= 50)
+            break;
+        SnowPair* qp = *(qpIt);
+        Player* player[2];
+        player[0] = qp->p1.lover;
+        player[1] = qp->p2.lover;
+        for(int idx = 0; idx < 2; ++idx)
+        {
+            Player* pl = player[idx];
+            Player* lover = pl->getSnowLover();
+            SYSMSGV(content, 4115, lover->getName().c_str(), pos+1);
+            Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            if(mail)
+            {
+                int i = pos;
+                int count = 3;
+                if (i >= 3 && i <= 9) i = 3;
+                if (i >= 10 && i <= 19) i = 4;
+                if (i >= 20 && i <= 49)
+                {
+                    i = 5;
+                    count = 2;
+                }
+                mailPackageManager.push(mail->id, s_item[i], count, true);
+                if (i == 0)
+                {
+                    if (pl->IsMale())
+                        mailPackageManager.push(mail->id, &s_card[0], 1, false);
+                    else
+                        mailPackageManager.push(mail->id, &s_card[1], 1, false);
+                }
+            }
+        }
     }
 }
 

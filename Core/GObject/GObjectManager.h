@@ -107,6 +107,7 @@ namespace GObject
         static bool loadRNR();
         static bool loadSkillStrengthen();
         static bool loadQixi();
+        static bool loadSnow();
         static bool loadArenaExtraBoard();
         static bool loadCopyFrontWin();
 

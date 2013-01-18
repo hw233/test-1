@@ -107,6 +107,39 @@ function loadStore()
 
         discount(store)
 
+        if getDragonKingAct() then
+            store:add(2, 9337, 10) --游龙令
+        end
+        if isfashion_shop() then
+            store:add(2, 1700, 599) --仙墨笔
+            store:add(2, 1701, 599) --折翼扇
+            store:add(2, 1702, 599) --西方之焰
+            store:add(2, 1703, 599) --玫瑰情缘
+            store:add(2, 1709, 599) --圣诞萌萌的糖
+            store:add(2, 1710, 599) --圣诞老人的包袱
+        end
+        store:add(2, 1704, 599) --轩辕双剑
+        store:add(2, 1705, 599) --伏羲古琴
+
+        if is0111_0117() then
+            store:add(5,9279,1000)
+            store:add(2,9280,10)
+            store:add(2,9281,20)
+            store:add(2,9282,50)
+        end
+
+        if getSnowAct() then
+            store:add(2, 9275, 10)
+        end
+        if getGoldSnakeAct() then
+            store:add(2, 9314, 20)
+        end
+
+        if is1221_1227() then
+            store:add(2, 1709, 599) --圣诞萌萌的糖
+            store:add(2, 1710, 599) --圣诞老人的包袱
+        end
+
         if is1116_1122() then
             store:add(2, 9215, 10) --逍遥礼包
         end
@@ -126,7 +159,7 @@ function loadStore()
         store:add(2,494,20)
         store:add(2,495,50)
         end
-        store:add(2,1706,599)
+        --store:add(2,1706,599)
         --store:add(2,9163,10)
         -- store:add(2,1706,599)
         store:add(2,1325,50)
@@ -184,6 +217,7 @@ function loadStore()
             store:add(2,9179,30)
         end
 
+        --store:add(2,9285,10)
         store:add(2,9123,50)
         store:add(2,551,10)
         store:add(2,134,50)

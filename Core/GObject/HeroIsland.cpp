@@ -1707,6 +1707,7 @@ void HeroIsland::playerEnter(Player* player)
     player->send(st);
 
     player->OnHeroMemo(MC_ATHLETICS, MD_MASTER, 0, 0);
+    player->heroIslandUdpLog(1165, 1);
 }
 
 void HeroIsland::playerLeave(Player* player)
@@ -2115,7 +2116,7 @@ void HeroIsland::setAto(Player* player, UInt8 onoff)
     if (!player->hasFlag(Player::InHeroIsland))
         return;
 
-    if (player->getVipLevel() < 3)
+    if (!World::getHeroIslandAct() && player->getVipLevel() < 3)
         return;
 
     UInt8 spot = player->getHISpot();

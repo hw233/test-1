@@ -187,6 +187,7 @@ namespace GObject
         UInt8 moveEquipSpirit(Fighter*,Fighter*, ItemEquip*, UInt8, ItemEquip*, UInt8);
         UInt8 isCanMove(ItemEquip* fromEquip, ItemEquip* toEquip, UInt8 type);
         UInt8 moveUseMoney(ItemEquip* fromEquip, ItemEquip* toEquip, UInt8 type);
+        UInt8 moveEquipFashion(Fighter*,Fighter*, ItemEquip*, UInt8, ItemEquip*, UInt8);
 
         void setItemBind(UInt32 typeId);
 

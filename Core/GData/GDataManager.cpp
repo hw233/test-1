@@ -624,7 +624,14 @@ namespace GData
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
+            if(est.id == 0)
+                continue;
             ItemEquipSetType * iest = NULL;
+            if(est.id < 2000)
+                iest = new ItemEquipSetType(1 + (est.id - 1750)/8, est.name);
+            else
+                iest = new ItemEquipSetType(33 + (est.id - 2000)/8, est.name);
+            /*
             if(est.id - 1750 < 8)
             {
                 iest = new ItemEquipSetType(1, est.name);
@@ -635,9 +642,11 @@ namespace GData
                     continue;
                 iest = new ItemEquipSetType((est.id-2000)/8, est.name);
             }
+            */
 			for(int j = 0; j < 4; ++ j)
 			{
-				iest->attrExtra[j] = *attrExtraManager[est.attrId[j]];
+                if(est.attrId[j] != 0)
+				    iest->attrExtra[j] = *attrExtraManager[est.attrId[j]];
 			}
 			itemEquipSetTypeManager.add(iest);
 		}

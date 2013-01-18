@@ -82,9 +82,9 @@ void StrengthenMgr::LoadFromDB(DBStrengthenData& data)
     }
 }
 
-bool StrengthenMgr::CheckTimeOver()
+bool StrengthenMgr::CheckTimeOver(UInt32 now)
 {
-    UInt32 now = TimeUtil::Now();
+    //UInt32 now = TimeUtil::Now();
     if(now < _item.overTime)
         return false;
     UInt32 over = TimeUtil::SharpDayT(1 , now);
@@ -434,7 +434,7 @@ void StrengthenMgr::SendOpenChestsInfo(UInt8 boxId, UInt8 index)
                         return;
                     if(CanOpenGreenBox(0, time))
                     {
-                        if(_owner->GetPackage()->GetRestPackageSize() < 1)                                                                                                     
+                        if(_owner->GetPackage()->GetRestPackageSize() < 1)
                         {
                             _owner->sendMsgCode(0, 1011);
                             return;
@@ -465,7 +465,7 @@ void StrengthenMgr::SendOpenChestsInfo(UInt8 boxId, UInt8 index)
                         return;
                     if(CanOpenBlueBox(0, tael))
                     {
-                        if(_owner->GetPackage()->GetRestPackageSize() < 1)                                                                                                     
+                        if(_owner->GetPackage()->GetRestPackageSize() < 1)
                         {
                             _owner->sendMsgCode(0, 1011);
                             return;
@@ -496,7 +496,7 @@ void StrengthenMgr::SendOpenChestsInfo(UInt8 boxId, UInt8 index)
                         return;
                     if(CanOpenPurpleBox(0, coupon))
                     {
-                        if(_owner->GetPackage()->GetRestPackageSize() < 1)                                                                                                     
+                        if(_owner->GetPackage()->GetRestPackageSize() < 1)
                         {
                             _owner->sendMsgCode(0, 1011);
                             return;
@@ -529,7 +529,7 @@ void StrengthenMgr::SendOpenChestsInfo(UInt8 boxId, UInt8 index)
                         return;
                     if(CanOpenOrangeBox(0, gold))
                     {
-                        if(_owner->GetPackage()->GetRestPackageSize() < 1)                                                                                                     
+                        if(_owner->GetPackage()->GetRestPackageSize() < 1)
                         {
                             _owner->sendMsgCode(0, 1011);
                             return;
@@ -561,7 +561,7 @@ void StrengthenMgr::SendOpenChestsInfo(UInt8 boxId, UInt8 index)
                         return;
                     if(CanOpenGreenBox(1, time))
                     {
-                        if(_owner->GetPackage()->GetRestPackageSize() < 1)                                                                                                     
+                        if(_owner->GetPackage()->GetRestPackageSize() < 1)
                         {
                             _owner->sendMsgCode(0, 1011);
                             return;
@@ -592,7 +592,7 @@ void StrengthenMgr::SendOpenChestsInfo(UInt8 boxId, UInt8 index)
                         return;
                     if(CanOpenBlueBox(1, tael))
                     {
-                        if(_owner->GetPackage()->GetRestPackageSize() < 1)                                                                                                     
+                        if(_owner->GetPackage()->GetRestPackageSize() < 1)
                         {
                             _owner->sendMsgCode(0, 1011);
                             return;
@@ -623,7 +623,7 @@ void StrengthenMgr::SendOpenChestsInfo(UInt8 boxId, UInt8 index)
                         return;
                     if(CanOpenPurpleBox(1, coupon))
                     {
-                        if(_owner->GetPackage()->GetRestPackageSize() < 1)                                                                                                     
+                        if(_owner->GetPackage()->GetRestPackageSize() < 1)
                         {
                             _owner->sendMsgCode(0, 1011);
                             return;
@@ -656,7 +656,7 @@ void StrengthenMgr::SendOpenChestsInfo(UInt8 boxId, UInt8 index)
                         return;
                     if(CanOpenOrangeBox(1, gold))
                     {
-                        if(_owner->GetPackage()->GetRestPackageSize() < 1)                                                                                                     
+                        if(_owner->GetPackage()->GetRestPackageSize() < 1)
                         {
                             _owner->sendMsgCode(0, 1011);
                             return;

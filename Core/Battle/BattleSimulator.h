@@ -30,6 +30,8 @@ namespace Battle
 
         // 斗剑场
         BS_ATHLETICS1 = 0xFD01,
+        // 新阵营(蜀山论剑)
+        BS_NEWCOUNTRYBATTLE = 0xFD02,
         // 世界BOSS
         BS_WBOSS = 0xFC01
     };
@@ -244,6 +246,8 @@ private:
         e_unMarkMo = 62, // 解除墨之印记
         e_moAuraBuf1 = 63, // 凤舞
         e_damHPShield = 64, // 生命护盾
+        e_darkVigor = 65, // 暗劲
+        e_unDarkVigor = 66, // 解除暗劲
 
         e_MAX_STATE,
     };
@@ -432,6 +436,12 @@ private:
     void getSkillEffectExtraBlind(BattleFighter* bf, BattleFighter* target_bo, const GData::SkillBase* skill, UInt16& effect_state);
 
     bool doSkillStrengthenDeepBlind(BattleFighter* bf, BattleFighter* bo, GData::SkillStrengthenBase* ss, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
+
+
+
+    bool doDarkVigorAttack(BattleFighter* bf, float darkVigor, size_t& defCount, DefStatus* defList, size_t& scCount, StatusChange* scList);
+    float getSkillEffectExtraCounterDarkVigor(const GData::SkillBase* skill);
+    void doPassiveSkillOnCounter(BattleFighter* bf, BattleFighter* bo, size_t& defCount, DefStatus* defList, size_t& scCount, StatusChange* scList);
 
 private:
 	int _id, _winner, _turns;

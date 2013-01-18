@@ -1,5 +1,6 @@
 ﻿#include "Config.h"
 #include "CountryBattle.h"
+#include "NewCountryBattle.h"
 #include "GObject/Country.h"
 #include "Server/WorldServer.h"
 #include "Server/SysMsg.h"
@@ -7,6 +8,7 @@
 #include "Player.h"
 #include "Map.h"
 #include "Mail.h"
+#include "World.h"
 #include "Script/GameActionLua.h"
 #include "Common/Serialize.h"
 #include "Common/TimeUtil.h"
@@ -35,7 +37,11 @@ UInt32 CountryBattleData::getReward(UInt8 lvl, UInt32 curtime, UInt32 nextReward
 	else
 		duration = curtime + 60 - nextReward;
 	UInt8 plvl = player->GetLev();
-	if(plvl <= 90)
+    /*
+    UInt32 exp = 16 * ((plvl - 10) * ((plvl > 99 ? 99 : plvl) / 10) * 5 + 25);
+    player->AddExp(exp);
+    */
+    if(plvl <= 90)
 		player->AddExp(2 * (duration * ((plvl - 40) * 6 + 20)));
 	else if(plvl <= 100)
 		player->AddExp(2 * (duration * ((plvl - 90) * 22 + 320)));
@@ -92,6 +98,7 @@ inline void addAchievement(UInt32& achieve, UInt8 lvl, UInt8& killStreak1, UInt8
     // XXX: 阵营战时间减半后处理
     achieve *= 2;
 }
+
 void CountryBattle::LeaveGetAttainment(Player* p, CBPlayerData& data)
 {
     if(data.totalWin)
@@ -104,6 +111,7 @@ void CountryBattle::LeaveGetAttainment(Player* p, CBPlayerData& data)
      GameAction()->doAttainment(p, Script:: COUNTRY_BATTLE_KILL_STREAK, data.maxKillStreak);
 
 }
+
 void CountryBattle::process(UInt32 curtime)
 {
 	if(curtime >= _rewardTime)
@@ -333,6 +341,14 @@ void CountryBattle::prepare(UInt32 rt)
 	_rewardTime = 0;
 	_battleDuration[0].clear();
 	_battleDuration[1].clear();
+    _cbsdlist.clear();
+	for(UInt8 lvl = 0; lvl < 3; ++ lvl)
+	{
+		for(UInt8 side = 0; side < 2; ++ side)
+		{
+			_players[lvl][side].clear();
+		}
+	}
 	Stream st(REP::COUNTRY_WAR_PROCESS);
 	st << static_cast<UInt8>(2) << static_cast<UInt8>(0) << rt << Stream::eos;
 	broadcast(st);
@@ -548,11 +564,11 @@ bool CountryBattle::playerEnter( Player * player )
 	}
 #endif
 	UInt8 lvl, side;
-	int pos = findPlayer(player, lvl, side);
-	if(pos >= 0)
-		return true;
-	lvl = getJoinLevel(plvl);
-	CountryBattleData * data = new(std::nothrow) CountryBattleData;
+    int pos = findPlayer(player, lvl, side);
+    if(pos >= 0)
+        return true;
+    lvl = getJoinLevel(plvl);
+    CountryBattleData * data = new(std::nothrow) CountryBattleData;
 	if(data == NULL)
 		return false;
 	data->player = player;
@@ -908,7 +924,7 @@ void GlobalCountryBattle::prepare( UInt32 t )
 		_prepareTime = TimeUtil::SharpDay(0) + 19 * 60 * 60 + 45 * 60;
 	else
 		_prepareTime = t + 30;
-	if(_prepareTime + 30 * 60 < t)
+	if(_prepareTime + 45 * 60 < t)
 		_prepareTime += 24 * 60 * 60;
 	_startTime = _prepareTime + 15 * 60;
 	if(cfg.GMCheck)
@@ -925,26 +941,45 @@ void GlobalCountryBattle::prepare( UInt32 t )
 
 void GlobalCountryBattle::prepare2( UInt32 t )
 {
-    if (!_countryBattle) return;
+    if (WORLD().isNewCountryBattle())
+    {
+        if (!_NewcountryBattle) return;
+	    _NewcountryBattle->prepare(_startTime - t);
+    }
+    else
+    {
+        if (!_countryBattle) return;
+	    _countryBattle->prepare(_startTime - t);
+    }
 	_running = true;
-	_countryBattle->prepare(_startTime - t);
 }
 
 void GlobalCountryBattle::start( UInt32 t )
 {
-    if (!_countryBattle) return;
-	_countryBattle->start(_endTime - t);
+    if (WORLD().isNewCountryBattle())
+    {
+        if (!_NewcountryBattle) return;
+	    _NewcountryBattle->start(_endTime - t);
+    }
+    else
+    {
+        if (!_countryBattle) return;
+	    _countryBattle->start(_endTime - t);
+    }
 	_running = true;
 }
 
 void GlobalCountryBattle::end( )
 {
-    if (!_countryBattle) return;
-	_running = false;
-	UInt32 curtime = TimeUtil::Now();
-	_countryBattle->end(curtime);
+    if (!WORLD().isNewCountryBattle())
+    {
+        if (!_countryBattle) return;
+        UInt32 curtime = TimeUtil::Now();
+        _countryBattle->end(curtime);
+    }
     setStatus(2);
 
+	_running = false;
 	_prepareTime = 0;
 	_startTime = 0;
 	_endTime = 0;
@@ -952,9 +987,15 @@ void GlobalCountryBattle::end( )
 
 bool GlobalCountryBattle::process(UInt32 curtime)
 {
-    if (!_countryBattle)
+    if (WORLD().isNewCountryBattle() && !_NewcountryBattle)
     {
-        fprintf(stderr, "CountryBattle Init Error !\n");
+        ERROR_LOG("NewCountryBattle Init Error !");
+        Thread::sleep(1000);
+        return false;
+    }
+    if (!WORLD().isNewCountryBattle() && !_countryBattle)
+    {
+        ERROR_LOG("CountryBattle Init Error !");
         Thread::sleep(1000);
         return false;
     }
@@ -984,8 +1025,16 @@ bool GlobalCountryBattle::process(UInt32 curtime)
 				Player * player = *it;
 				if(player->getThreadId() != WORKER_THREAD_NEUTRAL)
 					continue;
-				player->moveTo(_countryBattle->getLocation(), true);
-				_countryBattle->playerEnter(player);
+                if (WORLD().isNewCountryBattle())
+                {
+                    player->moveTo(_NewcountryBattle->getLocation(), true);
+                    _NewcountryBattle->playerEnter(player);
+                }
+                else
+                {
+                    player->moveTo(_countryBattle->getLocation(), true);
+                    _countryBattle->playerEnter(player);
+                }
 			}
 		}
         setStatus(1);
@@ -994,7 +1043,14 @@ bool GlobalCountryBattle::process(UInt32 curtime)
 		{
 			if(curtime < _startTime - 5 * 60)
 				return false;
-			SYSMSG_BROADCASTV(241, 5);
+            if(WORLD().isNewCountryBattle())
+            {
+			    SYSMSG_BROADCASTV(239, 5);
+            }
+            else
+            {
+			    SYSMSG_BROADCASTV(241, 5);
+            }
 			_prepareTime = 2;
 		}
 		return false;
@@ -1002,26 +1058,42 @@ bool GlobalCountryBattle::process(UInt32 curtime)
 		{
 			if(curtime < _startTime - 10 * 60)
 				return false;
-			SYSMSG_BROADCASTV(241, 10);
+            if(WORLD().isNewCountryBattle())
+            {
+			    SYSMSG_BROADCASTV(239, 10);
+            }
+            else
+            {
+			    SYSMSG_BROADCASTV(241, 10);
+            }
 			_prepareTime = 3;
 		}
 		return false;
 	default:
 		{
-			SYSMSG_BROADCAST(240);
+            if(WORLD().isNewCountryBattle())
+            {
+			    SYSMSG_BROADCAST(238);
+            }
+            else
+            {
+			    SYSMSG_BROADCAST(240);
+            }
 			prepare2(curtime);
 			_prepareTime = 4;
 		}
 		return false;
 	}
 
+    if (WORLD().isNewCountryBattle())
+	    _NewcountryBattle->process(curtime); //不能用定时器去直接调用_NewcountryBattle->end()
 	if(curtime >= _endTime)
 	{
 		end();
 		return true;
 	}
-
-	_countryBattle->process(curtime);
+    if (!WORLD().isNewCountryBattle())
+	    _countryBattle->process(curtime);
 
 	return false;
 }
@@ -1038,6 +1110,8 @@ void GlobalCountryBattle::delAutoCB( Player * player )
 
 void GlobalCountryBattle::sendDaily(Player* player)
 {
+    if(WORLD().isNewCountryBattle())
+        return;
     Stream st(REP::DAILY_DATA);
     st << static_cast<UInt8>(9);
     st << static_cast<UInt8>(_status);
@@ -1048,4 +1122,32 @@ void GlobalCountryBattle::sendDaily(Player* player)
         NETWORK()->Broadcast(st);
 }
 
+void GlobalCountryBattle::sendForNewCB(Player * player)
+{   //玩家登录时调用
+    if(!WORLD().isNewCountryBattle())
+        return;
+    UInt32 curtime = TimeUtil::Now();
+    if(curtime >= _prepareTime && curtime < _startTime)
+    {
+        Stream st(REP::NEW_CAMPS_WAR_JOIN);
+        st << static_cast<UInt8>(0x05) << static_cast<UInt8>(0) << static_cast<UInt16>(_startTime - curtime) << Stream::eos;
+        player->send(st);
+        _NewcountryBattle->sendSelfInfo(player);
+    }
+    else if(curtime >= _startTime && curtime < _endTime)
+    {
+        Stream st(REP::NEW_CAMPS_WAR_JOIN);
+        st << static_cast<UInt8>(0x05) << static_cast<UInt8>(1) << static_cast<UInt16>(_endTime - curtime) << Stream::eos;
+        player->send(st);
+        _NewcountryBattle->sendSelfInfo(player);
+    }
+    else if(curtime < TimeUtil::SharpDay(0, _prepareTime))
+    {
+        Stream st(REP::NEW_CAMPS_WAR_JOIN);
+        st << static_cast<UInt8>(0x05) << static_cast<UInt8>(2) << static_cast<UInt16>(0) << Stream::eos;
+        player->send(st);
+    }
 }
+
+}
+

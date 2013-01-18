@@ -1427,6 +1427,11 @@ inline void addEquipSpiritAttr( GData::AttrExtra& ae, const ItemEquipSpiritAttr&
 
 inline void testEquipInSet(UInt32 * setId, UInt32 * setNum, UInt32 id)
 {
+    if (id < 2000)
+        id = 1 + (id - 1750) / 8;
+    else
+        id = 33 + (id - 2000) / 8;
+    /*
     if(id - 1750 < 8)
     {
         id = 1;
@@ -1439,6 +1444,7 @@ inline void testEquipInSet(UInt32 * setId, UInt32 * setNum, UInt32 id)
         id -= 2000;
         id /= 8;
     }
+    */
 
 	if(id == 0)
 		return;
@@ -1594,7 +1600,8 @@ void Fighter::rebuildEquipAttr()
 		int idx = setNum[i] / 2 - 1;
         while(idx >= 0)
         {
-            _attrExtraEquip += *iest->attrExtra[idx];
+            if(iest->attrExtra[idx])
+                _attrExtraEquip += *iest->attrExtra[idx];
             --idx;
         }
 		//_attrExtraEquip += *iest->attrExtra[idx];
@@ -3110,7 +3117,8 @@ void Fighter::delSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_ENTER ||
                         s->cond == GData::SKILL_ONTHERAPY ||
                         s->cond == GData::SKILL_ONSKILLDMG ||
-                        s->cond == GData::SKILL_ONOTHERDEAD
+                        s->cond == GData::SKILL_ONOTHERDEAD ||
+                        s->cond == GData::SKILL_ONCOUNTER
                         )
                 {
                     offPassiveSkill(s->getId(), s->cond, s->prob>=100.0f, writedb);
@@ -3148,7 +3156,8 @@ void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_ENTER ||
                         s->cond == GData::SKILL_ONTHERAPY ||
                         s->cond == GData::SKILL_ONSKILLDMG ||
-                        s->cond == GData::SKILL_ONOTHERDEAD
+                        s->cond == GData::SKILL_ONOTHERDEAD ||
+                        s->cond == GData::SKILL_ONCOUNTER
                         )
                 {
                     upPassiveSkill(s->getId(), s->cond, (s->prob >= 100.0f), writedb);
@@ -5046,6 +5055,10 @@ UInt16 Fighter::getPortrait()
             portrait = 1090;
         else if (getFashionTypeId() == 1708)
             portrait = 1091;
+        else if (getFashionTypeId() == 1709)
+            portrait = 1058;
+        else if (getFashionTypeId() == 1710)
+            portrait = 1092;
     }
 
     return portrait;

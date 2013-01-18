@@ -14,6 +14,7 @@
 #include "Common/Itoa.h"
 #include "ClanRankBattle.h"
 #include "ClanCopy.h"
+#include "NewCountryBattle.h"
 #include "TownDeamon.h"
 #include "Athletics.h"
 
@@ -95,19 +96,21 @@ bool Country::Init()
 		bossManager.getNextBoss();
 		bossManager.process(now);
         ClanRankBattleMgr::Instance().Init();
+        NewCountryBattle::Init();
 		AddTimer(30000, Country_Boss_Check);
-		AddTimer(5000, Country_Battle_Check, static_cast<void *>(NULL), (5 - (now % 5)) * 1000);
+        AddTimer(5000, Country_Battle_Check, static_cast<void *>(NULL), (5 - (now % 5)) * 1000);
 		AddTimer(5000, Hero_Island_Check, static_cast<void *>(NULL), (5 - (now % 5)) * 1000);
         AddTimer(1000, ClanRankBattleCheck);
         //townDeamonManager->process();
         //UInt32 tdChkPoint = TimeUtil::SharpDayT(0, now) + TOWNDEAMONENDTM;
-	    AddTimer(3600 * 1000, PhysicalCheckTimer, static_cast<void *>(NULL), (60 - now % 60) * 1000);
+        /** 提前2分钟 **/
+	    AddTimer(3600 * 1000, PhysicalCheckTimer, static_cast<void *>(NULL), (((3600 - now % 3600) + 58 * 60) % 3600) * 1000);
 
         AddTimer(1000, ClanCopyCheck);
 
         AddTimer(3600 * 24 * 7 * 1000, ClanCopyResetBegin, static_cast<void * >(NULL), 
                 (sweek - now) > 1800 ? (sweek - now - 1800) * 1000 : ((sweek - now) + 3600 * 24 * 7 - 1800) * 1000 );
-        AddTimer(3600 * 24 * 7 * 1000, ClanCopyReset, static_cast<void * >(NULL), (sweek - now) * 1000);
+        AddTimer(3600 * 24 * 7 * 1000, ClanCopyReset, static_cast<void * >(NULL), (sweek - now + 240) * 1000);
         AddTimer(3600 * 24 * 7 * 1000, ClanCopyResetEnd, static_cast<void * >(NULL), (sweek - now + 1800) * 1000);
         //AddTimer(4 * 60 * 1000, ClanCopyResetBegin, static_cast<void * >(NULL), 60 * 1000);
         //AddTimer(4 * 60 * 1000, ClanCopyReset, static_cast<void * >(NULL), 120 * 1000);
