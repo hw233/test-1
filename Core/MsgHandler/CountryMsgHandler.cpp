@@ -171,6 +171,7 @@ MSG_REG_2(GameMsgHdr, REQ::TIANJIE, OnTianjieReq);
 MSG_REG_2(GameMsgHdr, REQ::EXJOB, OnExJob);
 MSG_REG_2(GameMsgHdr, REQ::JOBHUNTER, OnJobHunter);
 MSG_REG_2(GameMsgHdr, REQ::AUTOJOBHUNTER, OnAutoJobHunter);
+MSG_REG_2(GameMsgHdr, REQ::DREAMER, OnDreamer);
 
 MSG_REG_2(GameMsgHdr, 0x1D0, OnDailyReq2);
 

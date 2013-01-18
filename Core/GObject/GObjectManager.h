@@ -133,6 +133,7 @@ namespace GObject
         static bool loadQQVipAward();
 
         static bool loadJobHunter();
+        static bool loadDreamer();
 
         static void setFFTypeChance(UInt32);
         static void setFFAttrChance(UInt32);

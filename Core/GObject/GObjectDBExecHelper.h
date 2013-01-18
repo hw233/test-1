@@ -1101,6 +1101,28 @@ struct DBStrengthenData
     std::string orangeBox;
 };
 
+struct DBDreamer
+{
+    UInt64 playerId;
+    UInt8 progress;
+    UInt8 level;
+    UInt8 maxX;
+    UInt8 maxY;
+    UInt8 maxGrid;
+    std::string mapInfo;
+    UInt8 posX;
+    UInt8 posY;
+    UInt8 earlyPosX;
+    UInt8 earlyPosY;
+    UInt8 timeConsume;
+    UInt8 remainTime;
+    UInt8 keysCount;
+    UInt8 eyesCount;
+    UInt8 eyeTime;
+    UInt8 eyeX;
+    UInt8 eyeY;
+};
+
 }
 
 namespace DB {
@@ -2503,6 +2525,30 @@ SPECIALDEF(5)
     UInt8, posPut,
     UInt32, itemId,
     UInt16, ratio
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBDreamer)
+SPECIALDEF(18)
+(
+    UInt64, playerId,
+    UInt8, progress,
+    UInt8, level,
+    UInt8, maxX,
+    UInt8, maxY,
+    UInt8, maxGrid,
+    std::string, mapInfo,
+    UInt8, posX,
+    UInt8, posY,
+    UInt8, earlyPosX,
+    UInt8, earlyPosY,
+    UInt8, timeConsume,
+    UInt8, remainTime,
+    UInt8, keysCount,
+    UInt8, eyesCount,
+    UInt8, eyeTime,
+    UInt8, eyeX,
+    UInt8, eyeY
 )
 SPECIALEND()
 

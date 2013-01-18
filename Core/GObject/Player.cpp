@@ -1160,6 +1160,9 @@ namespace GObject
 #endif
 #endif
 #endif // _WIN32
+#ifdef DREAMER_DEBUG
+        getDreamer();
+#endif
 	}
 
 #define WEBDOWNLOAD 255
@@ -1588,6 +1591,14 @@ namespace GObject
             snprintf (action, 64, "F_%d_%d", id, 10);
             udpLog("transform", action, "", "", "", "", "act", money4);
         }
+    }
+
+    void Player::dreamerUdpLog(UInt32 id, UInt32 type, UInt32 num /* = 1 */)
+    {
+        // 水晶梦境udp日志
+        char action[32] = "";
+        snprintf (action, 32, "F_%d_%d", id, type);
+        udpLog("dream", action, "", "", "", "", "act", num);
     }
 
     void Player::sendHalloweenOnlineAward(UInt32 now, bool _online)
@@ -14437,6 +14448,18 @@ namespace GObject
        _jobHunter->SendAutoInfo();
    }
 
+   void Player::setDreamer(UInt8 progress, UInt8 level, UInt8 maxX, UInt8 maxY, UInt8 maxGrid,
+           const std::string& mapInfo, UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY,
+           UInt8 timeConsume, UInt8 remainTime, UInt8 keysCount, 
+           UInt8 eyesCount, UInt8 eyeTime, UInt8 eyeX, UInt8 eyeY)
+   {
+       if (_dreamer)
+           return;
+       _dreamer = new Dreamer(this, progress, level, maxX, maxY, maxGrid, mapInfo,
+               posX, posY, earlyPosX, earlyPosY, timeConsume, remainTime, keysCount, 
+               eyesCount, eyeTime, eyeX, eyeY);
+   }
+
 
 EventTlzAuto::EventTlzAuto( Player * player, UInt32 interval, UInt32 count)
 	: EventBase(player, interval, count)
@@ -16390,6 +16413,27 @@ Dreamer* Player::getDreamer()
            _dreamer = new Dreamer(this);
        }
        return _dreamer;
+}
+
+void Player::setDreamerTime(UInt8 count)
+{
+    if (!_dreamer)
+        return;
+    _dreamer->SetTime(count);
+}
+
+void Player::setDreamerEye(UInt8 count)
+{
+    if (!_dreamer)
+        return;
+    _dreamer->SetEye(count);
+}
+
+void Player::setDreamerKey(UInt8 count)
+{
+    if (!_dreamer)
+        return;
+    _dreamer->SetKey(count);
 }
 
 void Player::sendSysUpdate()
