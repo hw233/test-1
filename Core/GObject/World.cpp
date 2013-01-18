@@ -143,6 +143,8 @@ bool World::_11Act= false;
 bool World::_ssToolbarAct= false;
 bool World::_snowAct= false;
 bool World::_goldSnakeAct= false;
+bool World::_heroIslandAct= false;
+bool World::_dragonKingAct= false;
 bool World::_feastloginAct= false;
 UInt8 World::_towerloginAct= 0;
 bool World::_guoqing= false;
@@ -161,6 +163,7 @@ UInt32 World::_sosomapbegin = 0;
 bool World::_opentest;
 bool World::_consumeactive;
 bool World::_consume918 = false;
+bool World::_consumeawardact = false;
 RCSortType World::rechargeSort;
 RCSortType World::consumeSort;
 bool World::_needrechargerank = false;
@@ -177,6 +180,7 @@ bool   World::_townReward_10_15 = false;
 bool World::_loginAward = false;
 bool World::_bluediamonSuperman = false;
 bool World::_tgcevent = false;
+bool World::_compassact = false;
 /** 场外活动 **/
 stArenaExtra World::stArenaOld[2];
 stArenaExtra World::stArena;
@@ -417,6 +421,17 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 17)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 18)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 19)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 20)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 22)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 24)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 25)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 26)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 27)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 30)
 
             ))
     {
@@ -1090,6 +1105,17 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 17)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 18)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 19)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 20)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 22)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 24)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 25)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 26)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 27)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 1, 30)
             )
         bRechargeEnd = true;
 

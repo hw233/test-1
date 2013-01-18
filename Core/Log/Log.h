@@ -97,7 +97,8 @@ enum PurchaseType
     Enum3366Gift                = 86,
     BUYJOYBUFF                  = 87, //购买心悦buff
     EnumFEASTGIFT               = 88, //圣诞-登录礼包人人有
-    DreamerConsume                = 89,
+    NEWCountryBattleSkill       = 89, //蜀山论剑购买技能(霸气怒气)
+    DreamerConsume              = 90,
     //繁体私有占150～200
 };
 

@@ -1485,6 +1485,14 @@ namespace GObject
         udpLog("countryBattle", action, "", "", "", "", "act");
     }
 
+    void Player::heroIslandUdpLog(UInt32 id, UInt8 type)
+    {
+        // 英雄岛相关日志
+        char action[16] = "";
+        snprintf (action, 16, "F_%d_%d", id, type);
+        udpLog("heroIsland", action, "", "", "", "", "act");
+    }
+
     void Player::secondSoulUdpLog(UInt32 id, UInt32 val /* = 0 */, UInt32 num /* = 1 */)
     {
         // 元神相关日志
@@ -10449,6 +10457,9 @@ namespace GObject
         case 15:
             getThanksGivingDay(opt);
             break;
+        case 16:
+            getConsumeAward();
+            break;
         }
     }
 
@@ -10781,6 +10792,47 @@ namespace GObject
             st << static_cast<UInt8>(12) << idx << Stream::eos;
             send(st);
         }
+    }
+    void Player::getConsumeAward()
+    {
+        static int s_items[2][8] ={
+            {515,507,509,503,1325,47,134,5026},
+            {515,507,509,503,1325,47,1528,5026}
+            };
+        if (!World::getConsumeAwardAct())
+            return;
+        if (!is3366AndBD())
+            return;
+        if (int(GetVar(VAR_CONSUME)/500) - GetVar(VAR_CONSUME_AWARD_COUNT) > 0)
+        {
+            UInt8 opt = 2; //1:普通用户 2:3366蓝钻
+           // if (atoi(getDomain()) == 11 && isBD())
+            UInt8 idx = GameAction()->RunConsumeAward(this, opt);
+            if (idx > 0)
+            {
+                AddVar(VAR_CONSUME_AWARD_COUNT, 1);
+                sendConsumeAwardInfo(idx);
+
+                char str[64] = {0};
+                sprintf(str, "F_10001_0118_%d", s_items[opt-1][idx-1]);
+                udpLog("huodong", str, "", "", "", "", "act");
+            }
+        }
+    }
+    void Player::sendConsumeAwardInfo(UInt8 idx)
+    {
+        if (!World::getConsumeAwardAct())
+            return;
+        if (!is3366AndBD())
+            return;
+        UInt8 opt = 2; //1:普通用户 2:3366蓝钻
+        //if (atoi(getDomain()) == 11 && isBD())
+        int v = int(GetVar(VAR_CONSUME)/500) - GetVar(VAR_CONSUME_AWARD_COUNT);
+        if (v < 0)
+            v = 0;
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(16) << opt << idx << v << Stream::eos;
+        send(st);
     }
 
     void Player::getThanksGivingDay(UInt8 opt)
@@ -12053,10 +12105,10 @@ namespace GObject
         SYSMSG(title, 2335);
         SYSMSG(content, 2336);
         GetMailBox()->newMail(NULL, 0x12, title, content);
-#endif
 
         MailPackage::MailItem item[5] = {{9161, 1}, {9162, 1}, {9164, 1}, {9165, 1}, {9166, 1}};
         sendMailItem(4028, 4028, item, 5);
+#endif
 #endif
     }
 
@@ -13019,7 +13071,7 @@ namespace GObject
 
     void Player::sendMDSoul(UInt8 type, UInt32 id)
     {
-        if (!World::getMayDay())
+        if (!World::getMayDay() && !World::getCompassAct())
             return;
         Stream st(REP::USESOUL);
         if (type == 0)
@@ -13037,7 +13089,7 @@ namespace GObject
 
     void Player::getMDItem()
     {
-        if (!World::getMayDay())
+        if (!World::getMayDay() && !World::getCompassAct())
             return;
 
         UInt32 soul = GetVar(VAR_MDSOUL);
@@ -13046,7 +13098,7 @@ namespace GObject
 
         UInt8 type = 0;
         UInt32 subsoul = 0;
-        if (soul >= 100)
+/*        if (soul >= 100)
         {
             type = 1;
             subsoul = 100;
@@ -13057,10 +13109,13 @@ namespace GObject
             subsoul = 20;
         }
         else if (soul >= 10)
+*/
         {
             type = 3;
             subsoul = 10;
         }
+        if (soul < subsoul)
+            return;
 
         if (!type)
             return;
@@ -13074,7 +13129,7 @@ namespace GObject
 
     void Player::useMDSoul()
     {
-        if (!World::getMayDay())
+        if (!World::getMayDay() && !World::getCompassAct())
             return;
 
         UInt32 soul = GetVar(VAR_MDSOUL);
@@ -13083,7 +13138,7 @@ namespace GObject
 
         UInt8 type = 0;
         UInt32 subsoul = 0;
-        if (soul >= 100)
+/*        if (soul >= 100)
         {
             type = 1;
             subsoul = 100;
@@ -13094,10 +13149,13 @@ namespace GObject
             subsoul = 20;
         }
         else if (soul >= 10)
+  */
         {
             type = 3;
             subsoul = 10;
         }
+        if (soul < subsoul)
+            return;
 
         if (!type)
             return;
@@ -13112,6 +13170,9 @@ namespace GObject
         }
 
         GetPackage()->AddItem(_mditem, 1, true);
+        char str[64] = {0};
+        sprintf(str, "F_10000_0118_%d", _mditem);
+        udpLog("huodong", str, "", "", "", "", "act");
 
         soul -= subsoul;
         SetVar(VAR_MDSOUL, soul);
@@ -13748,7 +13809,7 @@ namespace GObject
 
     void Player::consumeGold(UInt32 c)
     {
-        if (World::getConsumeActive())
+       if (World::getConsumeActive())
         {
             UInt32 total = GetVar(VAR_CONSUME);
             GameAction()->sendConsumeMails(this, total, total+c);
@@ -13812,6 +13873,10 @@ namespace GObject
 		    send((st));
 
             udpLog("consumeGold", "F_1103", "", "", "", "", "act", c);
+        }
+        if (World::getConsumeAwardAct())
+        {
+            sendConsumeAwardInfo(0);
         }
     }
 

@@ -1120,6 +1120,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendHappyInfo();
     pl->sendYBBufInfo(pl->GetVar(VAR_YBBUF), pl->GetVar(VAR_QQVIP_BUF));
     pl->sendAthlBufInfo();
+    pl->sendConsumeAwardInfo(0);
     luckyDraw.notifyDisplay(pl);
     if (World::getRechargeActive())
     {
@@ -2592,6 +2593,12 @@ void NewCountryBattleJoinReq( GameMsgHdr& hdr, const void * data )
         brd >> skillId;
         ncb->useSkill(player, skillId);
     }
+    else if(type == 4)
+    {
+        UInt8 kind = 0;
+        brd >> kind;
+        ncb->buySkill(player, kind);
+    }
 }
 
 void OnLanchChallengeReq( GameMsgHdr& hdr, LanchChallengeReq& lcr)
@@ -3633,6 +3640,7 @@ void OnPrivChatReq( GameMsgHdr& hdr, PrivChatReq& pcr )
 		rep.sex = 0;
 		rep.office = player->getTitle();
 		rep.guard = player->getPF();
+		rep.level = player->GetLev();
 		player->send(rep);
 	}
 	else
@@ -3643,6 +3651,7 @@ void OnPrivChatReq( GameMsgHdr& hdr, PrivChatReq& pcr )
 		rep.sex = player->IsMale() ? 0 : 1;
 		rep.office = player->getTitle();
 		rep.guard = player->getPF();
+		rep.level = player->GetLev();
 		pl->send(rep);
 	}
 }
@@ -5284,7 +5293,7 @@ void OnMDSoul( GameMsgHdr& hdr, UseMDSoul& req )
     if(!player->hasChecked())
          return;
 
-    if (World::getMayDay())
+    if (World::getMayDay() || World::getCompassAct())
     {
         if (req._type == 0)
             player->sendMDSoul(0);
