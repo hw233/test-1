@@ -4358,8 +4358,8 @@ namespace GObject
         else if (toEquip->GetCareer() != 4)
             return 11;
 
-        if (m_Owner->GetVar(VAR_EQUIP_MOVE_COUNT) >= 8)
-            return 9;
+//        if (m_Owner->GetVar(VAR_EQUIP_MOVE_COUNT) >= 8)
+//            return 9;
         res = isCanMove(fromEquip, toEquip, type);
         if (res > 0)
             return res;
