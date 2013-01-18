@@ -229,6 +229,13 @@ struct DBQixi
     UInt8 event;
     UInt32 score;
 };
+struct DBSnow
+{
+    UInt64 playerId;
+    UInt64 lover;
+    UInt8 bind;
+    UInt32 score;
+};
 
 struct DBArenaExtraBoard
 {
@@ -251,7 +258,20 @@ struct DBJobHunter
     UInt8 earlyPosX;
     UInt8 earlyPosY;
     UInt32 stepCount;
+    UInt8 slotVal1;
+    UInt8 slotVal2;
+    UInt8 slotVal3;
 };
+
+struct DBCopyFrontWin
+{
+    UInt64 playerId;
+    UInt8 posOrig;
+    UInt8 posPut;
+    UInt32 itemId;
+    UInt16 ratio;
+};
+
 
 struct DBFighterBuffData
 {
@@ -1284,6 +1304,16 @@ SPECIALDEF(6)
     UInt8, bind,
     UInt8, pos,
     UInt8, event,
+    UInt32, score
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBSnow)
+SPECIALDEF(4)
+    (
+    UInt64, playerId,
+    UInt64, lover,
+    UInt8, bind,
     UInt32, score
     )
 SPECIALEND()
@@ -2448,7 +2478,7 @@ SPECIALDEF(9)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBJobHunter)
-SPECIALDEF(9)
+SPECIALDEF(12)
 (
 	UInt64, playerId,
 	std::string, fighterList,
@@ -2458,10 +2488,23 @@ SPECIALDEF(9)
 	UInt8, posY,
 	UInt8, earlyPosX,
 	UInt8, earlyPosY,
-	UInt32, stepCount
+	UInt32, stepCount,
+    UInt8, slotVal1,
+    UInt8, slotVal2,
+    UInt8, slotVal3
 )
 SPECIALEND()
 
+SPECIALBEGIN(GObject::DBCopyFrontWin)
+SPECIALDEF(5)
+(
+    UInt64, playerId,
+    UInt8, posOrig,
+    UInt8, posPut,
+    UInt32, itemId,
+    UInt16, ratio
+)
+SPECIALEND()
 
 }
 

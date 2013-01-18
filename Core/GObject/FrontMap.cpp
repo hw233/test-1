@@ -21,11 +21,6 @@ UInt8 FrontMap::_activeCount = 0;
 
 void autoClear(Player* pl, bool complete = false, UInt8 id = 0, UInt8 spot = 0)
 {
-    if (pl->GetPackage()->GetRestPackageSize() == 0)
-    {
-        pl->sendMsgCode(0, 1011);
-        return;
-    }
     if (!pl)
         return;
 
@@ -209,6 +204,7 @@ void FrontMap::enter(Player* pl, UInt8 id)
     FastMutex::ScopedLock lk(_mutex);
 
     UInt8 ret = 1;
+    UInt32 cf_bind_flag = pl->GetVar(VAR_CF_BIND);
     std::vector<FrontMapData>& tmp = m_frts[pl->getId()][id];
     if (!tmp.size()) {
         if (PLAYER_DATA(pl, frontFreeCnt) < getFreeCount()) {
@@ -218,6 +214,8 @@ void FrontMap::enter(Player* pl, UInt8 id)
                     pl->getId(), id);
             ret = 0;
             pl->frontMapUdpLog(id, 1);
+            cf_bind_flag &= 0xF1;
+            pl->SetVar(VAR_CF_BIND, cf_bind_flag);
         } else if (PLAYER_DATA(pl, frontGoldCnt) < getGoldCount(pl->getVipLevel())) {
             UInt32 gold = getEnterGold(pl);
             if (pl->getGold() < gold) {
@@ -238,6 +236,9 @@ void FrontMap::enter(Player* pl, UInt8 id)
             ConsumeInfo ci(EnterFrontMap,0,0);
             pl->useGold(gold, &ci);
             pl->frontMapUdpLog(id, 3);
+            cf_bind_flag &= 0xF1;
+            cf_bind_flag |= 0x02;
+            pl->SetVar(VAR_CF_BIND, cf_bind_flag);
         } else {
             // XXX:
             return;
@@ -337,7 +338,8 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
     pl->OnHeroMemo(MC_SLAYER, MD_MASTER, 1, 0);
 
     std::vector<UInt16> loot;
-    if (pl->attackCopyNpc(fgtid, 0, id, World::_wday==7?2:1, tmp[spot].lootlvl, ato, &loot)) {
+    bool isFull = false;
+    if (pl->attackCopyNpc(fgtid, 0, id, World::_wday==7?2:1, isFull, tmp[spot].lootlvl, ato, &loot)) {
         ret = true;
         if (ato)
             pl->checkLastBattled();
@@ -415,12 +417,29 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
                     randNum = 10;
                 pl->GetPackage()->AddItem2(9209, randNum, true, true);
             }
+            if(World::getGoldSnakeAct())
+            {
+                UInt32 num = 0;
+                if(PLAYER_DATA(pl, frontFreeCnt) == getFreeCount() && PLAYER_DATA(pl, frontGoldCnt) > 0)
+                {
+                    if(3 <= PLAYER_DATA(pl, frontGoldCnt))
+                        num = 3;
+                    else if(2 == PLAYER_DATA(pl, frontGoldCnt))
+                        num = 2;
+                    else
+                        num = 1;
+                }
+                else
+                    num = 1;
+                pl->GetPackage()->Add(9314, num, true, false);
+            }
             if (GObject::Tianjie::instance().isTjOpened())
             { 
                 pl->GetPackage()->AddItem(9138, 1, false, false);
             }
 
             GameAction()->onFrontMapWin(pl, id, spot, tmp[spot].lootlvl);
+            pl->copyFrontWinAward(2);
             DB3().PushUpdateData("DELETE FROM `player_frontmap` WHERE `playerId` = %"I64_FMT"u AND `id` = %u", pl->getId(), id);
             if (ato)
                 autoClear(pl, complate);
@@ -480,14 +499,26 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
     }
     else
     {
-        if (ato)
+        if (isFull)
         {
             Stream st(REP::AUTO_FRONTMAP);
-            st << static_cast<UInt8>(2) << id << spot << Stream::eos;
+            st << static_cast<UInt8>(5) << Stream::eos;
             pl->send(st);
-
             autoClear(pl, complate);
             return 0;
+        }
+        else
+        {
+
+            if (ato)
+            {
+                Stream st(REP::AUTO_FRONTMAP);
+                st << static_cast<UInt8>(2) << id << spot << Stream::eos;
+                pl->send(st);
+
+                autoClear(pl, complate);
+                return 0;
+            }
         }
     }
 

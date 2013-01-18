@@ -40,8 +40,11 @@ using namespace DataCollector;
     40  facebook
     41  6waves
     42  113
+    43  pps
     60  kingnet(xy)
     61  union_xy
+    62  gamebase
+    63  pubgame
 #endif
 
 namespace GObject
@@ -64,12 +67,17 @@ public:
     bool login_sec(Player* player);
     bool create_sec(UserStruct const &nu, Player* player = NULL);
     bool protol_sec(Player* player, int cmd);
+    bool trade_sec(Player* saller, Player* buyer, UInt32 itemId, UInt32 itemCount, UInt32 price);
+    bool gold_sec(Player* player, UInt32 count, UInt32 changeType, bool isIncrease);
+    bool tael_sec(Player* player, UInt32 count, UInt32 changeType, bool isIncrease);
+    bool coupon_sec(Player* player, UInt32 count, UInt32 changeType, bool isIncrease);
     bool logout(Player* player);
     bool online(UInt32 num, UInt8 domain);
     bool consume(Player* player, UInt32 total, UInt32 c);
     bool fee(Player* player, UInt32 total, Int32 c);
     bool blue(Player* player);
     bool d3d6(Player* player);
+    UInt8 getDomain_sec(Player* player);
 
     void online();
 

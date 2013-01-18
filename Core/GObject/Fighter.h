@@ -39,6 +39,7 @@ namespace GObject
 #define FIGHTER_BUFF_RDIAMOND   0x0F //红钻变身卡
 #define FIGHTER_BUFF_BLUE       0x10 //蓝钻变身卡
 #define FIGHTER_BUFF_QQVIP      0x11 //QQ会员变身卡
+#define FIGHTER_BUFF_SANTA      0x12 //圣诞老人变身卡
 
 #define FIGHTER_BUFF_COUNT 0x20
 
@@ -312,6 +313,10 @@ public:
     inline std::vector<UInt16>& getPassiveSkillOnSkillDmg() { return _passkl[GData::SKILL_ONSKILLDMG-GData::SKILL_PASSSTART]; }
     // 五彩元石
     inline std::vector<UInt16>& getPassiveSkillOnOtherDead() { return _passkl[GData::SKILL_ONOTHERDEAD-GData::SKILL_PASSSTART]; }
+
+    // 反击后触发的技能
+    inline std::vector<UInt16>& getPassiveSkillOnCounter() { return _rpasskl[GData::SKILL_ONCOUNTER-GData::SKILL_PASSSTART]; }
+    inline std::vector<UInt16>& getPassiveSkillOnCounter100() { return _passkl[GData::SKILL_ONCOUNTER-GData::SKILL_PASSSTART]; }
 
     // 取得心法带出技能的ID表
     const std::vector<const GData::SkillBase*>& skillFromCitta(UInt16 citta);

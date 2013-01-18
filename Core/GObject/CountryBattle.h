@@ -2,6 +2,7 @@
 #define _COUNTRYBATTLE_H_
 
 #include "Common/Stream.h"
+#include "NewCountryBattle.h"
 #include "Map.h"
 
 namespace GObject
@@ -110,12 +111,13 @@ private:
 	std::map<Player *, CBPlayerData> _battleDuration[COUNTRY_NEUTRAL];
 	CBStatusDataList _cbsdlist;
 	Stream _lastReport;
+
 };
 
 class GlobalCountryBattle
 {
 public:
-	GlobalCountryBattle(): _running(false), _prepareTime(0), _startTime(0), _endTime(0), _countryBattle(NULL), _status(0) { }
+	GlobalCountryBattle(): _running(false), _prepareTime(0), _startTime(0), _endTime(0), _countryBattle(NULL), _NewcountryBattle(NULL), _status(0) { }
 	void prepare(UInt32);
 	void prepare2(UInt32);
 	bool process(UInt32);
@@ -126,15 +128,18 @@ public:
 	inline UInt32 getStartTime() { return _startTime; }
 	inline UInt32 getEndTime() { return _endTime; }
 	inline void setCountryBattle(CountryBattle * cb) { _countryBattle = cb; }
+	inline void setNewCountryBattle(NewCountryBattle * cb) { _NewcountryBattle = cb; }
 	void addAutoCB(Player *);
 	void delAutoCB(Player *);
-    void sendDaily(Player*);
+    void sendDaily(Player *);
+    void sendForNewCB(Player *);
     inline void setStatus(UInt8 status) { _status = status; sendDaily(NULL); }
 
 private:
 	bool _running;
 	UInt32 _prepareTime, _startTime, _endTime;
 	CountryBattle * _countryBattle;
+	NewCountryBattle * _NewcountryBattle;
 	std::set<Player *> _autoList;
     UInt8 _status;
 };

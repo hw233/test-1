@@ -304,7 +304,11 @@ namespace GObject
 
                 ClanRankBattleReport report;
                 int turns = 0;
+                player1->setHiAttrFlag(true);
+                player2->setHiAttrFlag(true);
                 bool fightRes = player1->challenge(player2, &report.reportid, &turns, false, 0, true, Battle::BS_COPY5, 0x03);
+                player1->setHiAttrFlag(false);
+                player2->setHiAttrFlag(false);
                 //player1->setBuffData(PLAYER_BUFF_ATTACKING, now + 2 * turns);
                 //player2->setBuffData(PLAYER_BUFF_ATTACKING, now + 2 * turns);
 

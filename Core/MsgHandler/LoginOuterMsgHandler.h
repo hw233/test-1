@@ -47,6 +47,7 @@
 
 #include "Memcached.h"
 #include "GObject/RechargeTmpl.h"
+#include "Version.h"
 
 #ifndef _WIN32
 //#include <libmemcached/memcached.h>
@@ -696,7 +697,6 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 			GObject::newPlayers.add(pl);
 			GObject::globalNamedPlayers.add(newname, pl);
             pl->setClientIp(clientIp);
-            pl->setSource(pf);
 			res = 0;
 
 			pl->SetSessionID(hdr.sessionID);
@@ -704,6 +704,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 			cl->SetPlayer(pl);
 
             pl->setDomain(nu._platform);
+            pl->setSource(pf);
             pl->setOpenId(nu._openid);
             pl->setOpenKey(nu._openkey);
             pl->setVia(nu._via);
@@ -777,6 +778,16 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 	NETWORK()->SendMsgToClient(conn.get(), rep);
 }
 
+bool callOpenApi(const std::string& param)
+{
+    if (!cfg.chargeUrl.length())
+        return true;
+    char curl[4096] = {0};
+    snprintf(curl, sizeof(curl), "%s%s", cfg.chargeUrl.c_str(), param.c_str());
+    TRACE_LOG("CHARGE URL: %s\n", curl);
+    return SERVER().do_http_request(curl, 20);
+}
+
 void onUserRecharge( LoginMsgHdr& hdr, const void * data )
 {
     BinaryReader br(data, hdr.msgHdr.bodyLen);
@@ -821,15 +832,20 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
     br>>money;
     UInt64 player_Id_tmp = player_Id;
 
+    UInt16 serverNo = 0;
+    br>>serverNo;
     if(cfg.merged)
     {
-        UInt16 serverNo = 0;
-        br>>serverNo;
         player_Id += (static_cast<UInt64>(serverNo) << 48);
     }
+
 #ifndef _WIN32
 #ifdef _FB
 #else
+    // XXX: 只要简体需要这个参数
+    std::string param;
+    br>>param;
+
     initMemcache();
     if (memc)
     {
@@ -851,6 +867,13 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
                 if (strncmp(token.c_str(), rtoken, token.length()) != 0)
                     ret = 2;
                 free(rtoken);
+
+                if (ret == 0 && !callOpenApi(param))
+                {
+                    err = "confirm error.";
+                    ret = 5;
+                }
+
                 break;
             }
             else
@@ -874,7 +897,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
             }
         }
 
-        if (err.length())
+        if (err.length() && ret != 1)
         {
             TRACE_LOG("key: %s, token: %s, ret: %u, rc: %u, err: %s", key, token.c_str(), ret, rc, err.c_str());
             uninitMemcache();
@@ -1309,8 +1332,8 @@ void BigLockUser(LoginMsgHdr& hdr,const void * data)
 
     UInt8 ret = 1;
     INFO_LOG("GMBIGLOCK: %s, %u", playerIds.c_str(), expireTime);
-    std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());
-    if (execu.get() != NULL && execu->isConnected())
+//    std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());
+//    if (execu.get() != NULL && execu->isConnected())
     {
         std::string playerId = GetNextSection(playerIds, ',');
         while (!playerId.empty())
@@ -1338,8 +1361,8 @@ void BigUnlockUser(LoginMsgHdr& hdr,const void * data)
 
     INFO_LOG("GMBIGUNLOCK: %s", playerIds.c_str());
     UInt8 ret = 1;
-    std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());
-    if (execu.get() != NULL && execu->isConnected())
+//    std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());
+//    if (execu.get() != NULL && execu->isConnected())
     {
         std::string playerId = GetNextSection(playerIds, ',');
         while (!playerId.empty())
@@ -1364,6 +1387,10 @@ void ForbidSale(LoginMsgHdr& hdr,const void * data)
     CHKKEY();
     br>>playerIds;
 
+    UInt16 serverNo = 0;
+    if(cfg.merged)
+        br >> serverNo;
+
     UInt8 ret = 1;
     //INFO_LOG("GMBIGLOCK: %s, %u", playerIds.c_str(), expireTime);
     std::string playerId = GetNextSection(playerIds, ',');
@@ -1374,7 +1401,7 @@ void ForbidSale(LoginMsgHdr& hdr,const void * data)
         setForbidSaleValue(pid, true);
 
         if(cfg.merged)
-            pid += (static_cast<UInt64>(cfg.serverNo) << 48);
+            pid += (static_cast<UInt64>(serverNo) << 48);
 	    GObject::Player * pl = GObject::globalPlayers[pid];
         if (NULL != pl)
             pl->setForbidSale(true);
@@ -1392,7 +1419,10 @@ void UnForbidSale(LoginMsgHdr& hdr,const void * data)
     std::string playerIds;
     CHKKEY();
     br>>playerIds;
-
+    UInt16 serverNo = 0;
+    if(cfg.merged)
+        br >> serverNo;
+ 
     UInt8 ret = 1;
     //INFO_LOG("GMBIGLOCK: %s, %u", playerIds.c_str(), expireTime);
     std::string playerId = GetNextSection(playerIds, ',');
@@ -1403,7 +1433,7 @@ void UnForbidSale(LoginMsgHdr& hdr,const void * data)
         setForbidSaleValue(pid, false);
 
         if(cfg.merged)
-            pid += (static_cast<UInt64>(cfg.serverNo) << 48);
+            pid += (static_cast<UInt64>(serverNo) << 48);
         GObject::Player * pl = GObject::globalPlayers[pid];
         if (NULL != pl)
             pl->setForbidSale(false);
@@ -1462,18 +1492,17 @@ void DeleteGold(LoginMsgHdr& hdr,const void * data)
     br>>playerIds;
     br>>gold;
 
+    UInt16 serverNo = 0;
+    if(cfg.merged)
+        br >> serverNo;
     UInt8 ret = 1;
     INFO_LOG("GMDELETEGOLD: %s, %u", playerIds.c_str(), gold);
     std::string playerId = GetNextSection(playerIds, ',');
     while (!playerId.empty())
     {
         UInt64 pid = atoll(playerId.c_str());
-        if(cfg.merged)
-        {
-            UInt16 serverNo = 0;
-            br >> serverNo;
+        if (cfg.merged)
             pid += (static_cast<UInt64>(serverNo) << 48);
-        }
         GObject::Player * pl = GObject::globalPlayers[pid];
         if (NULL != pl)
             pl->deleteGold(gold);
@@ -1492,19 +1521,18 @@ void addRechargeScore(LoginMsgHdr& hdr,const void * data)
     CHKKEY();
     br>>playerIds;
     br>>score;
-
+    UInt16 serverNo = 0;
+    if(cfg.merged)
+        br >> serverNo;
+ 
     UInt8 ret = 1;
     INFO_LOG("GMADDCHARGESCORE: %s, %u", playerIds.c_str(), score);
     std::string playerId = GetNextSection(playerIds, ',');
     while (!playerId.empty())
     {
         UInt64 pid = atoll(playerId.c_str());
-        if(cfg.merged)
-        {
-            UInt16 serverNo = 0;
-            br >> serverNo;
+        if (cfg.merged)
             pid += (static_cast<UInt64>(serverNo) << 48);
-        }
         GObject::Player * pl = GObject::globalPlayers[pid];
         if (NULL != pl)
         {
@@ -2546,6 +2574,27 @@ void SysDailog(LoginMsgHdr &hdr, const void * data)
 
 	GObject::globalPlayers.enumerate(player_enum, 0);
 }
+void SysUpdate(LoginMsgHdr &hdr, const void * data)
+{
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+    UInt8 show = 0;
+    br >> show;
+
+    Stream st(REP::SYSDAILOG);
+    st << static_cast<UInt8>(1);
+    st << static_cast<UInt8>(0);
+    st << show;
+    st << (char*)VERSION;
+    st << Stream::eos;
+	NETWORK()->Broadcast(st);
+
+    Stream st1(SPEP::SYSUPDATE);
+    st1 << static_cast<UInt8>(0) << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st1);
+
+}
+
 
 void PwdInfo(LoginMsgHdr &hdr, const void * data)
 {

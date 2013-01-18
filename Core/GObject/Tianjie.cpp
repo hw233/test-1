@@ -10,6 +10,9 @@
 #include "GData/NpcGroup.h"
 #include "MsgID.h"
 #include "GObject/WBossMgr.h"
+#include "Country.h"
+#include "MapCollection.h"
+
 namespace GObject
 {
 extern URandom GRND;
@@ -414,7 +417,7 @@ void Tianjie::OpenTj()
 
 bool Tianjie::Init()
 {
-    fix999Bug();
+//    fix999Bug();
     LoadLastPassed();
     LoadFromDB();
 
@@ -465,7 +468,7 @@ bool Tianjie::LoadFromDB()
 
     GData::DBTianjie* dbexp = NULL;
 	GData::DBTianjie dbexp0;
-    if(execu->Prepare("SELECT `id`, `is_opened`,`is_execute`,`is_finish`,`is_ok`,`level`,`rate`,UNIX_TIMESTAMP(opentime),`r1_killed`,`r2_donated`,`r3_copyid`,`r4_day`,`open_next`, `is_wait`,`is_manual`,`is_touch` FROM `tianjie`  where is_manual=1 order by level desc limit 1", dbexp0) != DB::DB_OK)
+    if(execu->Prepare("SELECT `id`, `is_opened`,`is_execute`,`is_finish`,`is_ok`,`level`,`rate`,UNIX_TIMESTAMP(opentime),`r1_killed`,`r2_donated`,`r3_copyid`,`r4_day`,`open_next`, `is_wait`,`is_manual`,`is_touch` FROM `tianjie`  where is_manual=1 or is_opened = 1 order by is_opened desc,level desc limit 1", dbexp0) != DB::DB_OK)
         return false;
     GData::DBTianjie dbexp1;
     if(execu1->Prepare("SELECT `id`, `is_opened`,`is_execute`,`is_finish`,`is_ok`,`level`,`rate`,UNIX_TIMESTAMP(opentime),`r1_killed`,`r2_donated`,`r3_copyid`,`r4_day`,`open_next`, `is_wait`,`is_manual`,`is_touch` FROM `tianjie` where level!=999 order by level desc limit 1", dbexp1) != DB::DB_OK)
@@ -510,6 +513,7 @@ bool Tianjie::LoadFromDB()
 		m_openTime = dbexp->opentime;
         m_isOpenNextTianjie = dbexp->open_next;
         m_isWait = dbexp->is_wait;
+        m_isManualOpening = dbexp->is_manual;
       
         //只有天劫打开了，才能插入数据到map
         initSortMap();
@@ -1142,6 +1146,7 @@ void Tianjie::process(UInt32 now)
     }
     else if (m_isAutoTouched && !m_isRankKeep) //在手动开启天劫过程中,有玩家触发最高级天劫
     {
+        m_isAutoTouched = false; //必须设置为false,否则将会循环所有天劫
         OpenTj();
     }
 }
@@ -1334,9 +1339,10 @@ void Tianjie::start1()
 
         for (size_t j = 0; j < 7; ++j) //刷怪
         {
-            int count = 10;
-		    while (addNpc(npcid) == false && count > 0)
-                count--;
+            addNpc(npcid);
+            //int count = 10;
+		    //while (addNpc(npcid) == false && count > 0)
+            //    count--;
         }
         //同一种怪,不同的id号
         int minNpcId = s_rate1MinNpcIds[m_tjTypeId][i];
@@ -1345,9 +1351,10 @@ void Tianjie::start1()
         {
             for (size_t j = 0; j < 7; ++j) //刷怪
             {
-                int count = 10;
-		        while (addNpc(minNpcId) == false && count > 0)
-                    count--;
+                addNpc(npcid); 
+              //  int count = 10;
+		      //  while (addNpc(minNpcId) == false && count > 0)
+              //      count--;
             }
             minNpcId++;
         }
@@ -1442,7 +1449,11 @@ void Tianjie::attack1(Player* pl, UInt16 loc, UInt32 npcid)
         setRatePercent();
         //增加积分
 		record1(pl, index);
-        broadEvent1();
+        if (m_eventCurrNumber % 10 == 0)
+        {
+            SYSMSG_BROADCASTV(5012, pl->getCountry(), pl->getName().c_str(), loc, npcid);
+            broadEvent1();
+        }
         broadEvent1(pl);
 
         //删除NPC
@@ -1454,11 +1465,11 @@ void Tianjie::attack1(Player* pl, UInt16 loc, UInt32 npcid)
         //天劫事件还在运行
 		if (m_isTjExecute)
 		{
-            int count = 5;
-		    while (addNpc(npcid) == false && count > 0)
-                count--;
+            addNpc(npcid);
+        //    int count = 5;
+		//    while (addNpc(npcid) == false && count > 0)
+        //        count--;
 		}
-        SYSMSG_BROADCASTV(5012, pl->getCountry(), pl->getName().c_str(), loc, npcid);
 	}
 }
 void Tianjie::record1(Player* pl, int npcIndex)
@@ -1642,7 +1653,7 @@ void Tianjie::donate2(Player* pl, UInt8 id)
 
         setRatePercent();
         s_count++;
-        if (s_count % 5 == 0)
+        if (s_count % 10 == 0)
             broadEvent2();
         broadEvent2(pl);
 
@@ -1810,8 +1821,6 @@ void Tianjie::attack3(Player* pl)
         int exp = TIANJIE_EXP(pl->GetLev()) * s_rate3ExpMulti;
         pl->addExpOrTjScore(exp, s_rate3NpcScore, true, true);
 
-        if (m_eventCurrNumber % 10 == 0)
-            SYSMSG_BROADCASTV(5034, pl->getCountry(), pl->getName().c_str(), m_tjTypeId, m_currTjRate, m_eventCurrNumber);
         //无限层数
         m_eventCurrNumber += 1;
         if (m_eventCurrNumber <= m_eventMaxNumber)
@@ -1821,8 +1830,12 @@ void Tianjie::attack3(Player* pl)
             DB1().PushUpdateData("update tianjie set r3_copyid=%d where level=%d", m_eventCurrNumber, m_currOpenedTjLevel);
         }
         isFinish();
-        broadEvent3();
         broadEvent3(pl);
+        if (m_eventCurrNumber % 10 == 0)
+        {
+            broadEvent3();
+            SYSMSG_BROADCASTV(5034,pl->getCountry(), pl->getName().c_str(), m_tjTypeId, m_currTjRate, m_eventCurrNumber);
+        }
     }
 }
 
@@ -2319,40 +2332,91 @@ bool Tianjie::addNpc(UInt32 npcid)
     Map::GetAllSpot(spots);
     if (!spots.size()) return false;
 
-    UInt16 spot = spots[GRND(spots.size())];
-    if (!spot) return false;
+    int count = 0;
+    while (++count <= 10)
+    {
+        UInt16 spot = spots[GRND(spots.size())];
+        if (!spot) 
+            continue;
 
-    if (m_currTjRate == 5)
-        spot = m_loc;
+        if (m_currTjRate == 5)
+            spot = m_loc;
 
-    //添加NPC
-    Map * p_map = Map::FromSpot(spot);
-    if (!p_map) return false;
+        //添加NPC
+        Map * p_map = Map::FromSpot(spot);
+        if (!p_map) 
+            continue;
+        if (p_map->GetObject(npcid) != NULL)
+            continue;
 
+        GObject::Country& cny = CURRENT_COUNTRY();
+        UInt8 spot_cny = GObject::mapCollection.getCountryFromSpot(spot);
+        if (spot_cny != cny.GetThreadID())
+        {
+            struct TianjieSpotNpc
+            {
+                UInt32 npcId;
+                UInt16 spot;
+            };
+
+            TianjieSpotNpc tjNpc = { npcid, spot };
+
+            GameMsgHdr hdr(0x326, spot_cny, NULL, sizeof(TianjieSpotNpc));
+            GLOBAL().PushMsg( hdr, &tjNpc);
+
+            return true;
+        }
+
+        addTianjieNpc(npcid, spot);
+        return true;
+    }
+    return false;
+}
+
+void Tianjie::addTianjieNpc(UInt32 npcId, UInt16 spot)
+{
+    Map * pmap = Map::FromSpot(spot);
     MOData mo;
-    mo.m_ID = npcid;
+    mo.m_ID = npcId;
     mo.m_Hide = false;
     mo.m_Spot = spot;
     mo.m_Type = 6;
     mo.m_ActionType = 0;
-    if (p_map->AddObject(mo))
+    if (pmap->AddObject(mo))
     {
-        p_map->Show(npcid, true, mo.m_Type);
-
-        m_locNpcMap.insert(make_pair(spot, npcid));
-
+        pmap->Show(npcId, true, mo.m_Type);
+        m_locNpcMap.insert(make_pair(spot, npcId));
         m_loc = spot;
-
         addNpcCount++ ;
-        printf("-------------------------------------------addnpc, id:%d, loc:%d, count:%d\n", npcid, spot, addNpcCount);
+        printf("---------------------------------------addnpc, id:%d, loc:%d, count:%d\n", npcId, spot, addNpcCount);
     }
-
-    return true;
 }
 
 void Tianjie::deleteNpc(UInt32 npcid, UInt16 loc)
 {
-    Map * p_map = Map::FromSpot(loc);
+    GObject::Country& cny = CURRENT_COUNTRY();
+    UInt8 spot_cny = GObject::mapCollection.getCountryFromSpot(loc);
+    if (spot_cny != cny.GetThreadID())
+    {
+        struct TianjieSpotNpc
+        {
+            UInt32 npcId;
+            UInt16 spot;
+        };
+
+        TianjieSpotNpc tjNpc = { npcid, loc };
+        GameMsgHdr hdr(0x327, spot_cny, NULL, sizeof(TianjieSpotNpc));
+        GLOBAL().PushMsg( hdr, &tjNpc);
+
+        return;
+    }
+
+    delTianjieNpc(npcid, loc);
+}
+
+void Tianjie::delTianjieNpc(UInt32 npcid, UInt16 spot)
+{
+    Map * p_map = Map::FromSpot(spot);
     if (!p_map) return;
     p_map->Hide(npcid, true);
 	p_map->DelObject(npcid);

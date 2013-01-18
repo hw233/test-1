@@ -41,11 +41,6 @@ void PlayerCopy::setCopyActiveCount(UInt8 c) { _activeCount = c; }
 
 void autoClear(Player* pl, bool complete = false, UInt8 id = 0, UInt8 floor = 0, UInt8 spot = 0)
 {
-    if (pl->GetPackage()->GetRestPackageSize() == 0)
-    {
-        pl->sendMsgCode(0, 1011);
-        return;
-    }
     if (!pl)
         return;
 
@@ -218,6 +213,7 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
 
     if (!copyCheckLevel(pl, id))
         return 1;
+    UInt32 cf_bind_flag = pl->GetVar(VAR_CF_BIND);
     //diamond privilege
     if(id == 0xff)
     {
@@ -225,12 +221,16 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
             if(pl->GetVar(VAR_DIAMOND_BLUE) < PRIVILEGE_COUNT) {
                 pl->AddVar(VAR_DIAMOND_BLUE, 1);
                 pl->copyUdpLog(id, 5);
+                cf_bind_flag &= 0xF2;
+                pl->SetVar(VAR_CF_BIND, cf_bind_flag);
                 return 0;
             }
         } else if(pl->isYD() && World::getYellowDiamondAct()) {
             if(pl->GetVar(VAR_DIAMOND_YELLOW) < PRIVILEGE_COUNT) {
                 pl->AddVar(VAR_DIAMOND_YELLOW, 1);
                 pl->copyUdpLog(id, 6);
+                cf_bind_flag &= 0xF2;
+                pl->SetVar(VAR_CF_BIND, cf_bind_flag);
                 return 0;
             }
         }
@@ -242,6 +242,8 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
         if(pl->isQQVIP() && World::getQQVipAct()){
             if(pl->GetVar(VAR_QQVIP_CNT) < PRIVILEGE_COUNT){
                 pl->AddVar(VAR_QQVIP_CNT, 1);
+                cf_bind_flag &= 0xF2;
+                pl->SetVar(VAR_CF_BIND, cf_bind_flag);
                 return 0;
             }
         }
@@ -254,6 +256,8 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
         DB1().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = %u, `copyGoldCnt` = %u WHERE `id` = %"I64_FMT"u",
                 PLAYER_DATA(pl, copyFreeCnt), PLAYER_DATA(pl, copyGoldCnt), pl->getId());
         pl->copyUdpLog(id, 1);
+        cf_bind_flag &= 0xF2;
+        pl->SetVar(VAR_CF_BIND, cf_bind_flag);
         return 0;
     } else if (PLAYER_DATA(pl, copyGoldCnt) < getGoldCount(pl->getVipLevel())) {
         UInt32 gold = getEnterGold(pl);
@@ -270,6 +274,9 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
                 PLAYER_DATA(pl, copyFreeCnt), PLAYER_DATA(pl, copyGoldCnt), pl->getId());
         lootlvl = PLAYER_DATA(pl, copyGoldCnt);
         pl->copyUdpLog(id, 3);
+        cf_bind_flag &= 0xF2;
+        cf_bind_flag |= 0x01;
+        pl->SetVar(VAR_CF_BIND, cf_bind_flag);
         return 0;
     } else {
         SYSMSG_SENDV(2000, pl);
@@ -401,7 +408,8 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
 
     pl->OnHeroMemo(MC_SLAYER, MD_ADVANCED, 0, 0);
     std::vector<UInt16> loot;
-    if (pl->attackCopyNpc(fgtid, 1, id, World::_wday==6?2:1, tcd.lootlvl, ato, &loot)) {
+    bool isFull = false;
+    if (pl->attackCopyNpc(fgtid, 1, id, World::_wday==6?2:1, isFull, tcd.lootlvl, ato, &loot)) {
         if (ato)
             pl->checkLastBattled();
         bool nextfloor = false;
@@ -476,11 +484,28 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                     randNum = 10;
                 pl->GetPackage()->AddItem2(9209, randNum, true, true);
             }
+            if(World::getGoldSnakeAct())
+            {
+                UInt32 num = 0;
+                if(PLAYER_DATA(pl, copyFreeCnt) == getFreeCount() && PLAYER_DATA(pl, copyGoldCnt) > 0)
+                {
+                    if(3 <= PLAYER_DATA(pl, copyGoldCnt))
+                        num = 3;
+                    else if(2 == PLAYER_DATA(pl, copyGoldCnt))
+                        num = 2;
+                    else
+                        num = 1;
+                }
+                else
+                    num = 1;
+                pl->GetPackage()->Add(9314, num, true, false);
+            }
             if (GObject::Tianjie::instance().isTjOpened())
             {
                 pl->GetPackage()->AddItem(9138, 1, false, false);
             }
             GameAction()->onCopyWin(pl, id, tcd.floor, tcd.spot, tcd.lootlvl);
+            pl->copyFrontWinAward(1);
 
             pl->OnHeroMemo(MC_SLAYER, MD_ADVANCED, 0, 2);
             if (!pl->GetShuoShuo()->getShuoShuo(id-1 + SS_COPY1))
@@ -552,15 +577,26 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                 tcd.floor, tcd.spot, pl->getId(), id);
         return 1;
     } else {
-        if (ato) {
+        if (isFull)
+        {
             Stream st(REP::AUTO_COPY);
-            st << static_cast<UInt8>(2) << id << tcd.floor << tcd.spot << Stream::eos;
+            st << static_cast<UInt8>(5) << Stream::eos;
             pl->send(st);
             autoClear(pl, complete, id, tcd.floor, tcd.spot);
-        } else {
-            Stream st(REP::COPY_INFO);
-            st << static_cast<UInt8>(2) << id << tcd.floor << tcd.spot << Stream::eos;
-            pl->send(st);
+            return 0;
+        }
+        else
+        {
+            if (ato) {
+                Stream st(REP::AUTO_COPY);
+                st << static_cast<UInt8>(2) << id << tcd.floor << tcd.spot << Stream::eos;
+                pl->send(st);
+                autoClear(pl, complete, id, tcd.floor, tcd.spot);
+            } else {
+                Stream st(REP::COPY_INFO);
+                st << static_cast<UInt8>(2) << id << tcd.floor << tcd.spot << Stream::eos;
+                pl->send(st);
+            }
         }
     }
     return 0;

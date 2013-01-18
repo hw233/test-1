@@ -263,6 +263,11 @@ namespace GObject
         VAR_GETACHIEVEMENT_CNT = 211, //玩家每日获得的荣誉总数
         VAR_GETPRESTIGE_CNT = 212, //玩家每日获得的声望总数
 
+        VAR_ITEM_9279_FAILED_COUNT = 213, // 锦云兜·壁礼包连续开启失败次数
+        VAR_ITEM_9280_FAILED_COUNT = 214, // 锦云兜·破礼包连续开启失败次数
+        VAR_ITEM_9281_FAILED_COUNT = 215, // 锦云兜·龙礼包连续开启失败次数
+        VAR_ITEM_9282_FAILED_COUNT = 216, // 锦云兜·墨礼包连续开启失败次数
+
         VAR_LOCAL_RANK = 240, //本服斗剑，当前排名
         VAR_LOCAL_MAXRANK = 241, //本服斗剑，最好排名
         VAR_LOCAL_PRESTIGE = 242, //本服斗剑，声望数
@@ -291,11 +296,37 @@ namespace GObject
         // 首充礼包
         VAR_FIRST_RECHARGE_VALUE = 286, //充值数
         VAR_FIRST_RECHARGE_STEP = 287, //已领阶段
+        VAR_CF_FLAG = 288, //是副本，还是阵图
+        VAR_CF_BIND = 289, //是否绑定，低1位表示副本，低2位表示阵图，数字1表示非绑定，数字0表示绑定，低5，6位为1，2的备份
+        VAR_GOOD_VOICE = 290, //是否领取蜀山好声音
+        VAR_3366GIFT = 291, //3366合作礼包
+        VAR_CF_INDEX = 292, //副本、阵图通关索引，从1开始
+        VAR_CF_LOCATION = 293, //副本、阵图据点索引
+        VAR_FEAST_LOGIN = 294, //节日套装人人拿
+        VAR_FEAST_GIFT = 295, //登录礼包人人有
+
+        //新阵营战临时代替udplog做统计使用
+        VAR_NCB_TOTALWIN = 296,     //蜀山论剑当天胜利场次
+        VAR_NCB_TOTALLOSE = 297,    //蜀山论剑当天失败场次
+        //注:使用298时清理数据库，之前使用过一次298
 
         //繁体版占用301-330
 
         //340简体版
         VAR_RECHARGE_SCORE = 340, //累计充值的积分
+        VAR_JOYVIP_BUFF_GOT     = 341, //心悦Buff
+        VAR_QQGAME_GIFT_1218 = 342,    //QQGame登录奖励 1218-1220
+        VAR_TOWER_LOGIN = 343,          // 楼一平台登录奖励
+        VAR_TOWER_LEVEL = 344,          // 楼一平台登录等级奖励
+        VAR_SNOW_AWARD     = 345,     //堆雪人奖励
+        VAR_HAS_MO_BATTLER = 346,       // 出战散仙里是否有墨家
+        VAR_ITEM_9316_FAILED_COUNT = 347, // 都率宝伞礼包连续开启失败次数
+        VAR_CONSUME_AWARD_COUNT = 348,   //消费抽奖已抽次数
+        // 361-370 占用 for suntao
+        VAR_DRAGONKING_STEP = 361,      //大闹龙宫当前移动到的格子
+        VAR_DRAGONKING_STEP4_COUNT = 362, //大闹龙宫移动到第4格子的次数
+        VAR_DRAGONKING_STEP5_COUNT = 363, //大闹龙宫移动到第5格子的次数
+        //越南版380-399
         VAR_MAX,
     };
 
@@ -539,6 +570,10 @@ namespace GObject
             REGISTER_VAR(VAR_CTS_TARGET_COUNT, CYCLE_NONE);
 
             REGISTER_VAR(VAR_ITEM_9178_FAILED_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_ITEM_9279_FAILED_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_ITEM_9280_FAILED_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_ITEM_9281_FAILED_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_ITEM_9282_FAILED_COUNT, CYCLE_NONE);
             REGISTER_VAR(VAR_USETAEL_CNT, CYCLE_DAY);
             REGISTER_VAR(VAR_USECOUPON_CNT, CYCLE_DAY);
             REGISTER_VAR(VAR_USEGOLD_CNT, CYCLE_DAY);
@@ -552,6 +587,9 @@ namespace GObject
             REGISTER_VAR(VAR_9215_USED, CYCLE_NONE);
             REGISTER_VAR(VAR_QQVIP_AWARD_COUNT, CYCLE_NONE);
             REGISTER_VAR(VAR_RECHARGE_SCORE, CYCLE_NONE);
+            REGISTER_VAR(VAR_JOYVIP_BUFF_GOT, CYCLE_DAY);
+            REGISTER_VAR(VAR_QQGAME_GIFT_1218, CYCLE_DAY);
+            REGISTER_VAR(VAR_SNOW_AWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_AWARD_SSTOOLBAR, CYCLE_NONE);
             REGISTER_VAR(VAR_EX_JOB_ENABLE, CYCLE_NONE);
             REGISTER_VAR(VAR_JOB_HUNTER_SPOT_ID, CYCLE_NONE);
@@ -567,6 +605,28 @@ namespace GObject
             REGISTER_VAR(VAR_ARENA_SUPPORT_WED, CYCLE_WEEK);
             REGISTER_VAR(VAR_FIRST_RECHARGE_VALUE, CYCLE_NONE);
             REGISTER_VAR(VAR_FIRST_RECHARGE_STEP, CYCLE_NONE);
+            REGISTER_VAR(VAR_CF_FLAG, CYCLE_NONE);
+            REGISTER_VAR(VAR_CF_BIND, CYCLE_NONE);
+            REGISTER_VAR(VAR_GOOD_VOICE, CYCLE_NONE);
+            REGISTER_VAR(VAR_3366GIFT, CYCLE_NONE);
+            REGISTER_VAR(VAR_CF_INDEX, CYCLE_NONE);
+            REGISTER_VAR(VAR_CF_LOCATION, CYCLE_NONE);
+            REGISTER_VAR(VAR_FEAST_LOGIN, CYCLE_NONE);
+            REGISTER_VAR(VAR_FEAST_GIFT, CYCLE_DAY);
+
+            REGISTER_VAR(VAR_NCB_TOTALWIN, CYCLE_DAY);
+            REGISTER_VAR(VAR_NCB_TOTALLOSE, CYCLE_DAY);
+
+            REGISTER_VAR(VAR_TOWER_LOGIN, CYCLE_DAY);
+            REGISTER_VAR(VAR_TOWER_LEVEL, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_HAS_MO_BATTLER, CYCLE_NONE);
+            REGISTER_VAR(VAR_ITEM_9316_FAILED_COUNT, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_DRAGONKING_STEP, CYCLE_NONE);
+            REGISTER_VAR(VAR_DRAGONKING_STEP4_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_DRAGONKING_STEP5_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_CONSUME_AWARD_COUNT, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

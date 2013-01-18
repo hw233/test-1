@@ -37,12 +37,13 @@
 #include "GObject/LuckyDraw.h"
 #include "GObject/ClanCopy.h"
 #include "GObject/SingleHeroStage.h"
-
+#include "GObject/NewCountryBattle.h"
 #include "GObject/Tianjie.h"
 #include "GObject/ClanCopy.h"
 
 #include "GObject/Tianjie.h"
 #include "Memcached.h"
+#include "Version.h"
 GMHandler gmHandler;
 
 GMHandler::GMHandler()
@@ -124,6 +125,7 @@ GMHandler::GMHandler()
 	Reg(3, "enchant", &GMHandler::OnEnchant);
 	Reg(3, "resetic", &GMHandler::OnResetIc);
 	Reg(3, "autocb", &GMHandler::OnAutoCB);
+	Reg(3, "newcb", &GMHandler::OnNewCountryBattle);
 	Reg(3, "autofb", &GMHandler::OnAutoFB);
 
 	Reg(3, "nextarena", &GMHandler::OnNextArena);
@@ -222,6 +224,8 @@ GMHandler::GMHandler()
     Reg(3, "fsale", &GMHandler::OnForbidSale);
     Reg(3, "unfsale", &GMHandler::OnUnForbidSale);
     Reg(3, "loginlimit", &GMHandler::OnSetLoginLimit);
+
+    Reg(3, "sysup", &GMHandler::OnSysUpdate);
 
 }
 
@@ -2799,13 +2803,17 @@ void GMHandler::OnNewRelation(GObject::Player* player, std::vector<std::string>&
 
     if(type == 5)
     {
+        /*
         std::string responderName("70603");
         if(args.size() >= 2)
             responderName = args[1];
         player->GetNewRelation()->challengeRequest(player, responderName);
+        */
+        player->copyFrontWinAward(1);
     }
     else if(type == 6)
     {
+        /*
         std::string senderName("70603");
         if(args.size() >= 2)
             senderName = args[1];
@@ -2813,6 +2821,8 @@ void GMHandler::OnNewRelation(GObject::Player* player, std::vector<std::string>&
         if(args.size() >= 3)
             accept = atoi(args[2].c_str());
         player->GetNewRelation()->challengeRespond(player, senderName, accept);
+        */
+        player->copyFrontWinAward(2);
     }
     else if(type == 7)
     {
@@ -3300,6 +3310,71 @@ void GMHandler::OnSetLoginLimit(GObject::Player *player, std::vector<std::string
     UInt8 pf = atoi(args[0].c_str());
     UInt32 v = atoi(args[1].c_str());
     setPlatformLogin(pf, v);
+}
+
+void GMHandler::OnNewCountryBattle(GObject::Player * player, std::vector<std::string>& args)
+{
+	if(args.size() <= 1)
+		return;
+    UInt16 loc = player->getLocation();
+    GObject::Map * map = GObject::Map::FromSpot(loc);
+    if(map == NULL)
+        return;
+    GObject::SpotData * sd = map->GetSpot(loc);
+    if(!sd || !sd->m_NewCountryBattle)
+        return;
+    NewCountryBattle * ncb = sd->m_NewCountryBattle;
+    NewCBPlayerData * ncbpData = ncb->findNCBData(player);
+    if(!ncbpData)
+        return;
+    switch(atoi(args[0].c_str()))
+    {
+    case 1:
+        {
+            UInt32 val = atoi(args[1].c_str());
+            ncbpData->setAchievementLevel(val);
+            ncbpData->addAngerDomineer(0, val);
+            ncbpData->addAngerDomineer(1, val);
+            ncb->sendSelfInfo(player, ncbpData);
+        }
+        break;
+    case 2:
+        {
+            UInt32 val = atoi(args[1].c_str());
+            ncbpData->totalAchievement -= val;
+            if(ncbpData->totalAchievement < 0)
+                ncbpData->totalAchievement = 0;
+            ncbpData->setAchievementLevel();
+            ncb->sendSelfInfo(player, ncbpData);
+        }
+        break;
+    default:
+        return;
+        break;
+    }
+}
+
+void GMHandler::OnSysUpdate(GObject::Player *player, std::vector<std::string>& args)
+{
+    UInt8 t = 0;
+    UInt8 show = 0;
+    std::string v = VERSION;
+    if (args.size() >= 1)
+        t = atoll(args[0].c_str());
+    if (args.size() >= 2)
+        show = atoll(args[1].c_str());
+    if (args.size() >= 3)
+       v = args[2]; 
+   //版本更新公告
+   Stream st(REP::SYSDAILOG);
+   st << static_cast<UInt8>(1);
+   st << static_cast<UInt8>(t);
+   st << static_cast<UInt8>(show);
+   st << v;
+   st << Stream::eos;
+   player->send(st);
+
+//    player->sendSysUpdate();
 }
 
 

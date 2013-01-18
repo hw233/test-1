@@ -2211,6 +2211,74 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             }
             break;
         }
+        //堆雪人
+        case 0x05:
+        {
+            if(!WORLD().getSnowAct())
+                break;
+            brd >> op;
+            switch(op)
+            {
+            case 0x01:
+                {
+                    UInt8 t = 0;
+                    brd >> t;
+                    if(t == 1)
+                        player->sendSnowInfo();
+                    else if(t == 2)
+                        WORLD().sendSnowPlayers(player);
+                }
+                break;
+            case 0x02:
+                {
+                    UInt8 t = 0;
+                    brd >> t;
+                    if(t == 0)
+                    {
+                        UInt64 pid = 0;
+                        brd >> pid;
+
+                        GObject::Player * pl = GObject::globalPlayers[pid];
+                        if(!pl)
+                            break;
+                        player->postSnowLover(pl);
+                    }
+                    else if(t == 1)
+                    {
+                        player->divorceSnowLover();
+                    }
+                }
+                break;
+            case 0x03: //堆雪人
+                {
+                    UInt32 num = 0;
+                    brd >> num;
+                    UInt8 res = player->useSnowItem(num);
+
+                    Stream st(REP::ACTIVE);
+                    st << static_cast<UInt8>(0x05) << static_cast<UInt8>(0x03);
+                    st << static_cast<UInt8>(res);
+                    st << Stream::eos;
+                    player->send(st);
+   
+                }
+                break;
+            case 0x04: //领取奖励
+                {
+                    UInt16 t = 0;
+                    brd >> t;
+                    UInt8 res = player->getSnowAward(t);
+                    Stream st(REP::ACTIVE);
+                    st << static_cast<UInt8>(0x05) << static_cast<UInt8>(0x04);
+                    st << static_cast<UInt8>(res);
+                    st << Stream::eos;
+                    player->send(st);
+                }
+                break;
+            }
+            break;
+
+        }
     }
 }
 

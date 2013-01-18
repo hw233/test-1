@@ -737,6 +737,7 @@ void OnDailyCheck( GameMsgHdr& hdr, const void * data )
     player->SetVar(VAR_JUNE_ITEM, 0);
     player->sendHappyInfo();
     player->SendNextdayTime( *(UInt32*)data );
+    player->GetStrengthenMgr()->CheckTimeOver( *(UInt32*)data );
 }
 
 void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
@@ -1131,7 +1132,7 @@ void OnCreateAward(GameMsgHdr& hdr, const void * data)
 {
     MSG_QUERY_PLAYER(player);
     player->GetPackage()->AddItem(18, 1, true);
-    player->GetPackage()->AddItem(449, 1, true); // XXX: 首充礼包
+    //player->GetPackage()->AddItem(449, 1, true); // XXX: 首充礼包
     player->getCoupon(888);
 #if defined(_FB) && defined(_FB_TEST)
     player->getGold(20000);
@@ -1763,13 +1764,66 @@ void OnAutoJobHunterStep( GameMsgHdr& hdr, const void * data)
     JobHunter * job_hunter = player->getJobHunter();
     if (!job_hunter)
     {
-#ifdef JOB_HUNTER_DEBUG
-        std::cout << "Wrong Timer." << std::endl;
-#endif
         return;
     }
     job_hunter->OnAutoCommand(0x10);
 }
+
+void OnAddTianjieNpc( GameMsgHdr& hdr, const void * data)
+{
+    struct TianjieSpotNpc
+    {
+        UInt32 npcId;
+        UInt16 spot;
+    };
+    TianjieSpotNpc* tjNpc = reinterpret_cast<TianjieSpotNpc*>(const_cast<void *>(data));
+    if(tjNpc)
+        GObject::Tianjie::instance().addTianjieNpc(tjNpc->npcId, tjNpc->spot);
+}
+
+void OnDelTianjieNpc( GameMsgHdr& hdr, const void * data)
+{
+    struct TianjieSpotNpc
+    {
+        UInt32 npcId;
+        UInt16 spot;
+    };
+    TianjieSpotNpc* tjNpc = reinterpret_cast<TianjieSpotNpc*>(const_cast<void *>(data));
+    if(tjNpc)
+        GObject::Tianjie::instance().delTianjieNpc(tjNpc->npcId, tjNpc->spot);
+}
+
+
+void OnDelMapObj( GameMsgHdr& hdr, const void * data)
+{
+    struct MapNpc
+    {
+        UInt16 loc;
+        UInt32 npcId;
+    };
+    MapNpc* mapNpc = reinterpret_cast<MapNpc*>(const_cast<void *>(data));
+    if(!mapNpc)
+        return;
+    Map * map = Map::FromSpot(mapNpc->loc);
+    if (!map)
+        return;
+    map->Hide(mapNpc->npcId);
+    map->DelObject(mapNpc->npcId);
+}
+
+void OnAddMapObj( GameMsgHdr& hdr, const void * data)
+{
+    MOData* mo = reinterpret_cast<MOData*>(const_cast<void *>(data));
+    if(!mo)
+        return;
+    Map * map = Map::FromSpot(mo->m_Spot);
+    if (!map)
+        return;
+
+    map->AddObject(*mo);
+    map->Show(mo->m_ID, true, mo->m_Type);
+}
+
 
 #endif // _COUNTRYINNERMSGHANDLER_H_
 
