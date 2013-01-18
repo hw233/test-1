@@ -382,6 +382,38 @@ function RunBirthdayAward(player)
     return j;
 end
 
+function RunConsumeAward(player, opt)
+    if player == nil then
+        return 0;
+    end
+    local package = player:GetPackage();
+	if package:GetRestPackageSize() < 1 then
+		player:sendMsgCode(2, 1011, 0);
+		return 0;
+	end
+    if opt > 2 then
+        return 0;
+    end
+    local items = {
+        [1] = {{515,3},{507,2},{509,2},{503,10},{1325,4},{47,3},{134,4},{5026,1}},
+        [2] = {{515,1},{507,1},{509,1},{503,1},{1325,1},{47,1},{134,1},{5026,1}}
+    };
+    local ch = {
+        [1] = {1852, 2593, 3333, 4444, 5926, 6667, 8148, 10000},
+        [2] = {750,1500,2250,4750,6750,7500,9700,10000}
+    };
+    local j = 0; 
+    local g = math.random(1, 10000)
+    for i = 1, #ch[opt] do
+        if g <= ch[opt][i] then
+            package:Add(items[opt][i][1], items[opt][i][2], true, true, 31);
+            j = i;
+            break
+        end
+    end
+    return j;
+end
+ 
 function RunBlueDiamondAward(player, opt)
     if player == nil then
         return 0;
@@ -406,7 +438,6 @@ function RunBlueDiamondAward(player, opt)
     local item_9190 = {{515,3},{507,2},{509,2},{503,10},{1325,4},{47,3},{134,4},{5026,1}}
     local item_9191 = {{515,3},{507,3},{509,3},{503,10},{1325,4},{47,3},{134,4},{5026,1}}
     local item_9217 = {{515,3},{507,2},{509,2},{503,10},{1325,4},{47,3},{134,4},{5026,1}}
-  --  local item_9284 = {{515,3},{507,2},{509,2},{503,10},{1325,4},{47,3},{134,4},{'ipad',1}}
     local item_9284 = {{507,2},{509,2},{503,10},{1325,4},{47,3},{134,4},{515,10},{'ipad',1}}
 
     local items = item_9190;

@@ -1726,36 +1726,6 @@ function ItemNormal_00000495(iid, num, bind, param)
     return num
 end
 
-function ItemNormal_00000496(iid, num, bind, param)
-    local player = GetPlayer()
-    local package = player:GetPackage();
-
-	local fgt = player:findFighter(param);
-	if fgt == nil then
-		return false;
-	end
-
-    fgt:addPExp(num*888)
-
-    local op = player:GetVar(90);
-    if op < 10000 then
-        local p = num * math.random(1,20);
-        if (op + p) > 10000 then
-            p = 10000 - op
-        end
-        player:AddVar(90, p)
-        player:sendMDSoul(0, 0)
-        if getMayDay() then
-            SendMsg(player, 0x35, msg_65..p..msg_66)
-            SendMsg(player, 0x1, msg_65..p..msg_66)
-        end
-    end
-    player:AddVar(93, num)
-
-    package:DelItemSendMsg(iid, player);
-    return num
-end
-
 function ItemNormal_00000497(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -1764,12 +1734,70 @@ function ItemNormal_00000497(iid, num, bind, param)
 	if fgt == nil then
 		return false;
 	end
-
-    fgt:addPExp(num*888)
+    if fgt:isPExpFull() then
+        player:sendMsgCode(2, 1069, 0);
+        return false
+    end
+    local pexp = fgt:getPExp()
+    local n = 0;
+    for i = 1, num do
+        n = n + 1
+        pexp = pexp + 888 
+        if pexp >= fgt:getPExpMax() then
+            break
+        end
+    end
+    if n ~= 0 then
+        fgt:addPExp(n * 888);
+    end
 
     local op = player:GetVar(90);
     if op < 10000 then
-        local p = num * math.random(8,12);
+        local p = n * math.random(5,15);
+        if (op + p) > 10000 then
+            p = 10000 - op
+        end
+        player:AddVar(90, p)
+        player:sendMDSoul(0, 0)
+        if getMayDay() or getCompassAct() then
+            SendMsg(player, 0x35, msg_65..p..msg_66)
+            SendMsg(player, 0x1, msg_65..p..msg_66)
+        end
+    end
+    player:AddVar(93, n)
+
+    package:DelItemSendMsg(iid, player);
+    return n
+end
+
+function ItemNormal_00000496(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+	local fgt = player:findFighter(param);
+	if fgt == nil then
+		return false;
+	end
+    if fgt:isPExpFull() then
+        player:sendMsgCode(2, 1069, 0);
+        return false
+    end
+    local pexp = fgt:getPExp()
+    local n = 0;
+    for i = 1, num do
+        n = n + 1
+        pexp = pexp + 888 
+        if pexp >= fgt:getPExpMax() then
+            break
+        end
+    end
+    if n ~= 0 then
+        fgt:addPExp(n * 888);
+    end
+
+    local op = player:GetVar(90);
+    if op < 10000 then
+        local p = n * math.random(8,12);
         if (op + p) > 10000 then
             p = 10000 - op
         end
@@ -1780,10 +1808,10 @@ function ItemNormal_00000497(iid, num, bind, param)
             SendMsg(player, 0x1, msg_65..p..msg_66)
         end
     end
-    player:AddVar(92, num)
+    player:AddVar(92, n)
 
     package:DelItemSendMsg(iid, player);
-    return num
+    return n
 end
 
 function ItemNormal_VIP(iid, num, bind, param)
@@ -2907,12 +2935,27 @@ function ItemNormal_00009000(iid, num, bind, param)
 	if fgt == nil then
 		return false;
 	end
+    if fgt:isPExpFull() then
+        player:sendMsgCode(2, 1069, 0);
+        return false
+    end
+    local pexp = fgt:getPExp()
+    local n = 0;
+    for i = 1, num do
+        n = n + 1
+        pexp = pexp + 20000 
+        if pexp >= fgt:getPExpMax() then
+            break
+        end
+    end
+    if n ~= 0 then
+        fgt:addPExp(n * 20000);
+    end
 
-    fgt:addPExp(num*20000)
-    player:AddVar(91, num)
+    player:AddVar(91, n)
 
     package:DelItemSendMsg(iid, player);
-    return num
+    return n
 end
 
 function ItemNormal_00009001(iid, num, bind, param)
@@ -5636,7 +5679,7 @@ function ItemNormal_00010050(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-    if package:GetRestPackageSize() < (5+(5*num*5)/99) then
+    if package:GetRestPackageSize() < (4+(4*num*5)/99) then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
@@ -5644,8 +5687,7 @@ function ItemNormal_00010050(iid, num, bind, param)
     package:Add(134, num*5, true, 0, 2);
     package:Add(1325, num*5, true, 0, 2);
     package:Add(515, num*5, true, 0, 2);
-    package:Add(503, num*5, true, 0, 2);
-    package:Add(1707, num*1, true, 0, 2);
+    package:Add(9177, num*2, true, 0, 2);
 
     package:DelItemSendMsg(iid, player);
     return num;
@@ -6550,6 +6592,64 @@ function ItemNormal_00010100(iid, num, bind, param)
     package:Add(503, num*2, true, false, 2);
     package:Add(134, num*2, true, false, 2);
     package:Add(1325, num*2, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010101(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (2+(2*num*1)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    package:Add(440, num*1, true, false, 2);
+    package:Add(51, num*1, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010102(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (11+(11*num*8)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    package:Add(56, num*10, true, false, 2);
+    package:Add(57, num*10, true, false, 2);
+    package:Add(508, num*10, true, false, 2);
+    package:Add(506, num*10, true, false, 2);
+    package:Add(15, num*10, true, false, 2);
+    package:Add(49, num*5, true, false, 2);
+    package:Add(50, num*5, true, false, 2);
+    package:Add(503, num*10, true, false, 2);
+    package:Add(509, num*5, true, false, 2);
+    package:Add(507, num*5, true, false, 2);
+    package:Add(549, num*2, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010103(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (3+(3*num*2)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    package:Add(48, num*2, true, false, 2);
+    package:Add(438, num*2, true, false, 2);
+    package:Add(439, num*2, true, false, 2);
 
     package:DelItemSendMsg(iid, player);
     return num;
@@ -9042,6 +9142,9 @@ local ItemNormal_Table = {
     [10098] = ItemNormal_00010098,
     [10099] = ItemNormal_00010099,
     [10100] = ItemNormal_00010100,
+    [10101] = ItemNormal_00010101,
+    [10102] = ItemNormal_00010102,
+    [10103] = ItemNormal_00010103,
 };
 
 function ItemNormalOther_00000441(iid, num, bind, other)

@@ -355,6 +355,10 @@ public:
     { _heroIslandAct= v; }
     inline static bool getHeroIslandAct()
     { return _heroIslandAct; }
+    inline static void setDragonKingAct(bool v)
+    { _dragonKingAct= v; }
+    inline static bool getDragonKingAct()
+    { return _dragonKingAct; }
     inline static void setFeastLoginAct(bool v)
     { _feastloginAct= v; }
     inline static bool getFeastLoginAct()
@@ -424,6 +428,11 @@ public:
     { _consume918 = v; }
     inline static bool getConsume918()
     { return _consume918; }
+    inline static void setConsumeAwardAct(bool v)
+    { _consumeawardact = v; }
+    inline static bool getConsumeAwardAct()
+    { return _consumeawardact; }
+ 
     inline static void setNeedRechargeRank(bool v)
     { _needrechargerank = v; }
     inline static bool getNeedRechargeRank()
@@ -578,7 +587,11 @@ public:
         }
         return true;
     }
-
+    inline static void setCompassAct(bool v)
+    { _compassact = v; }
+    inline static bool getCompassAct()
+    { return _compassact; }
+ 
 public:
 	inline static UInt8 getWeekDay()
 	{ return _wday; }
@@ -654,6 +667,7 @@ public:
     static bool _snowAct;
     static bool _goldSnakeAct;
     static bool _heroIslandAct;
+    static bool _dragonKingAct;
     static bool _feastloginAct;
     static UInt8 _towerloginAct;
     static bool _guoqing;
@@ -672,6 +686,7 @@ public:
     static bool _opentest;
     static bool _consumeactive;
     static bool _consume918;
+    static bool _consumeawardact;
     static bool _needrechargerank;
     static bool _needconsumerank;
     static bool _killMonsteract;
@@ -685,6 +700,7 @@ public:
     static bool _tgcevent;
     static stArenaExtra stArenaOld[2];
     static stArenaExtra stArena;
+    static bool _compassact;
 
 public:
     static RCSortType rechargeSort;
