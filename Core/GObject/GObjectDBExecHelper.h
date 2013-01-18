@@ -451,6 +451,7 @@ struct DBFighter2
     UInt16 peerless;        // 无双技能
     UInt16 talent;          // 天赋
     std::string trump;      // 法宝
+    std::string lingbao;    // 灵宝
     std::string acupoints;  // 穴道,打通次数
     std::string skill;      // 装备的技能
     std::string citta;      // 装备的心法
@@ -1122,6 +1123,28 @@ struct DBStrengthenData
     std::string orangeBox;
 };
 
+struct DBLingbaoAttr
+{
+    UInt32 id;
+    UInt8 tongling;
+    UInt8 lbcolor;
+    std::string types;
+    std::string values;
+    std::string skills;
+    std::string factors;
+};
+
+struct DBLingbaoSmelt
+{
+    UInt64 playerId;
+    UInt16 gujiId;
+    UInt16 itemId;
+    UInt8  bind;
+    UInt32 value;
+    UInt32 maxValue;
+};
+
+
 }
 
 namespace DB {
@@ -1569,7 +1592,7 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBFighter2)
-SPECIALDEF(55)
+SPECIALDEF(56)
 	(
 	UInt32, id,
 	UInt64, playerId,
@@ -1593,6 +1616,7 @@ SPECIALDEF(55)
     UInt16, peerless,
     UInt16, talent,
     std::string, trump,
+    std::string, lingbao,
     std::string, acupoints,
     std::string, skill,
     std::string, citta,
@@ -2549,6 +2573,32 @@ SPECIALDEF(16)
     UInt16, battlepoint
 )
 SPECIALEND()
+
+SPECIALBEGIN(GObject::DBLingbaoAttr)
+SPECIALDEF(7)
+(
+    UInt32, id,
+    UInt8, tongling,
+    UInt8, lbcolor,
+    std::string, types,
+    std::string, values,
+    std::string, skills,
+    std::string, factors
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBLingbaoSmelt)
+SPECIALDEF(6)
+(
+    UInt64, playerId,
+    UInt16, gujiId,
+    UInt16, itemId,
+    UInt8,  bind,
+    UInt32, value,
+    UInt32, maxValue
+)
+SPECIALEND()
+
 
 }
 

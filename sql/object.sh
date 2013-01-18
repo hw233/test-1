@@ -139,6 +139,8 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearid5121.sql # must be once 指定玩家非绑定的九龙神火改成绑定的
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearid5131.sql # must be once 指定玩家非绑定的九龙神火改成绑定的
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearid5141.sql # must be once 指定玩家非绑定的九龙神火改成绑定的
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130115_1.sql
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130118_1.sql
 
     #. clearshiyamen.sh
 }

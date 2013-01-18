@@ -1478,11 +1478,12 @@ void OnFighterEquipReq( GameMsgHdr& hdr, FighterEquipReq& fer )
 		return;
 	if(fer._part == 0)
 	{
-		static UInt8 p[13] = {0x1f, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x0a, 0x0b, 0x0c};
-		ItemEquip * e[13] = {fgt->getHalo(), fgt->getFashion(), fgt->getWeapon(), fgt->getArmor(0), fgt->getArmor(1),
+		static UInt8 p[16] = {0x1f, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x0a, 0x0b, 0x0c, 0x60, 0x61, 0x62};
+		ItemEquip * e[16] = {fgt->getHalo(), fgt->getFashion(), fgt->getWeapon(), fgt->getArmor(0), fgt->getArmor(1),
             fgt->getArmor(2), fgt->getArmor(3), fgt->getArmor(4), fgt->getAmulet(),
-            fgt->getRing(), fgt->getTrump(0), fgt->getTrump(1), fgt->getTrump(2)};
-		fgt->sendModification(13, p, e, false);
+            fgt->getRing(), fgt->getTrump(0), fgt->getTrump(1), fgt->getTrump(2),
+            fgt->getLingbao(0), fgt->getLingbao(1), fgt->getLingbao(2)};
+		fgt->sendModification(16, p, e, false);
 		return;
 	}
 
@@ -5703,18 +5704,28 @@ void OnEquipLingbaoReq( GameMsgHdr & hdr, const void * data )
             UInt32 equipId = 0;
             UInt8 protect = 0;
             UInt8 bind = 0;
+            std::vector<UInt16> values;
             br >> equipId >> protect >> bind;
-            res = pkg->Tongling(equipId, protect, bind);
+            res = pkg->Tongling(equipId, protect, bind, values);
+            UInt8 cnt = values.size();
+            st << res;
+            st << cnt;
+            for(UInt8 i = 0; i < cnt; ++ i)
+            {
+                st << values[i];
+            }
+            st << Stream::eos;
+            player->send(st);
         }
         break;
     case 2:
         {
             UInt16 gujiId = 0; // 古籍id
             UInt8 type = 0; // 是否使用高级空宝具
-            UInt8 bind1 = 0;
-            UInt8 bind2 = 0;
-            br >> gujiId >> bind1 >> type >> bind2;
-            res = pkg->OpenLingbaoSmelt(gujiId, bind1, type, bind2);
+            br >> gujiId >> type;
+            res = pkg->OpenLingbaoSmelt(gujiId, type);
+            st << res << Stream::eos;
+            player->send(st);
         }
         break;
     case 3:
@@ -5728,6 +5739,7 @@ void OnEquipLingbaoReq( GameMsgHdr & hdr, const void * data )
                 br >> itemId >> bind;
                 pkg->LingbaoSmelt(itemId, bind);
             }
+            pkg->sendLingbaoSmeltInfo();
         }
         break;
     case 4:
@@ -5739,14 +5751,13 @@ void OnEquipLingbaoReq( GameMsgHdr & hdr, const void * data )
         {
             pkg->sendLingbaoSmeltInfo();
         }
+        break;
     case 6:
         {
             pkg->FinishLBSmelt();
         }
         break;
     }
-    st << res;
-    player->send(st);
 }
 
 

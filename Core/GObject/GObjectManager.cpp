@@ -232,6 +232,11 @@ namespace GObject
             fprintf(stderr, "loadEquipmentsSpirit error!\n");
             std::abort();
         }
+		if(!loadLingbaoAttr())
+        {
+            fprintf(stderr, "loadLingbaoAttr error!\n");
+            std::abort();
+        }
         if(!loadFightersPCChance())
         {
             fprintf(stderr, "loadFightersPCChance error!\n");
@@ -260,6 +265,11 @@ namespace GObject
 		if(!loadAllPlayers())
         {
             fprintf(stderr, "loadAllPlayers error!\n");
+            std::abort();
+        }
+		if(!loadLingbaoSmelt())
+        {
+            fprintf(stderr, "loadLingbaoSmelt error!\n");
             std::abort();
         }
         //loadSecondSoul();
@@ -1802,7 +1812,7 @@ namespace GObject
         UInt8 lvl_max = 0;
 		DBFighter2 specfgtobj;
         //if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `fashion`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `acupoints`, `skill`, `citta`, `fighter`.`skills`, `cittas`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul`, `elixir`.`attack`,`elixir`.`defend`, `elixir`.`critical`, `elixir`.`pierce`, `elixir`.`evade`, `elixir`.`counter`, `elixir`.`tough`, `elixir`.`action`, `fighter`.`hideFashion` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
-		if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `halo`, `fashion`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `acupoints`, `skill`, `citta`, `fighter`.`skills`, `cittas`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul`, `elixir`.`attack`,`elixir`.`defend`, `elixir`.`critical`, `elixir`.`pierce`, `elixir`.`evade`, `elixir`.`counter`, `elixir`.`tough`, `elixir`.`action`,`fighter`.`hideFashion` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
+		if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `halo`, `fashion`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `lingbao`, `acupoints`, `skill`, `citta`, `fighter`.`skills`, `cittas`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul`, `elixir`.`attack`,`elixir`.`defend`, `elixir`.`critical`, `elixir`.`pierce`, `elixir`.`evade`, `elixir`.`counter`, `elixir`.`tough`, `elixir`.`action`,`fighter`.`hideFashion` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -1914,6 +1924,7 @@ namespace GObject
 			fgt2->setRing(fetchEquipment(specfgtobj.ring), false);
 			fgt2->setAmulet(fetchEquipment(specfgtobj.amulet), false);
             fgt2->setTrump(specfgtobj.trump, false);
+            fgt2->loadLingbao(specfgtobj.lingbao);
             fgt2->setPeerless(specfgtobj.peerless, false); // XXX: must after setTrump
             fgt2->setCittas(specfgtobj.cittas, false);
             fgt2->setUpCittas(specfgtobj.citta, false);
@@ -3960,6 +3971,7 @@ namespace GObject
             {
 				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getLingbaoAttrMax");
 				UInt32 size = std::min(3, table_temp.size());
+                UInt8 typeCnt = 0;
 				for(UInt32 i = 0; i < size; i ++)
 				{
 					lua_tinker::table table_temp2 = table_temp.get<lua_tinker::table>(i + 1);
@@ -3967,17 +3979,19 @@ namespace GObject
                     for(UInt32 j = 0; j < size2; ++ j)
                     {
                         lua_tinker::table table_temp3 = table_temp2.get<lua_tinker::table>(j + 1);
-                        UInt32 size3 = std::min(13, table_temp2.size()) - 1;
-                        UInt8 lv = table_temp2.get<UInt8>(1);
-                        stLbAttrMax lbAttrMax;
+                        UInt32 size3 = std::min(13, table_temp3.size()) - 1;
+                        UInt8 lv = table_temp3.get<UInt8>(1);
+                        stLbAttrMax& lbAttrMax = _lbAttrConf.lbAttrMax[lv];
+                        if(size3 > typeCnt)
+                            typeCnt = size3;
                         for(UInt32 k = 0; k < size3; ++ k)
                         {
-                            lbAttrMax.attrMax[i][k] = table_temp2.get<UInt8>(k+2);
-                            _lbAttrConf.attrType.push_back(k+1);
+                            lbAttrMax.attrMax[i][k] = table_temp3.get<float>(k+2);
                         }
-                        _lbAttrConf.lbAttrMax[lv] = lbAttrMax;
                     }
 				}
+                for(UInt8 type = 0; type < typeCnt; ++ type)
+                    _lbAttrConf.attrType.push_back(type+1);
             }
             {
 				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getLingbaoAttrNum");
@@ -4149,6 +4163,9 @@ namespace GObject
                 case Item_Halo:
                 case Item_Fashion:
                 case Item_Trump:
+                case Item_LBling:
+                case Item_LBwu:
+                case Item_LBxin:
                 {
                     ItemEquipData ied;
                     ied.enchant = dbe.enchant;
@@ -4194,6 +4211,14 @@ namespace GObject
                             equip = new ItemTrump(dbe.id, itype, ied);
                             if (equip && ied.enchant)
                                 ((ItemTrump*)equip)->fixSkills();
+                        }
+                        break;
+                    case Item_LBling:
+                    case Item_LBwu:
+                    case Item_LBxin:
+                        {
+                            ItemLingbaoAttr lbattr;
+                            equip = new ItemLingbao(dbe.id, itype, ied, lbattr);
                         }
                         break;
                     default:
@@ -5393,12 +5418,132 @@ namespace GObject
                     lbs->factor.push_back(::atof(tk[i].c_str()));
             }
             GData::lbSkillManager.add(lbs);
-            if(lbs->cond == GData::e_lb_cond_skill)
-                _lbAttrConf.skills[dblbs.lbtype][0][dblbs.level].push_back(dblbs.id);
-            else
-                _lbAttrConf.skills[dblbs.lbtype][1][dblbs.level].push_back(dblbs.id);
+            _lbAttrConf.skills[dblbs.lbtype][dblbs.level].push_back(dblbs.id);
 
 		}
+
+        return true;
+    }
+
+	bool GObjectManager::loadLingbaoAttr()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading lingbao attr:");
+        DBLingbaoAttr dblba;
+        if(execu->Prepare("SELECT `equipment`.`id`, `tongling`, `lbcolor`, `types`, `values`, `skills`, `factors` FROM `lingbaoattr` LEFT JOIN `equipment` ON `equipment`.`id` = `lingbaoattr`.`id`", dblba) != DB::DB_OK)
+            return false;
+
+        lc.reset(2000);
+        while(execu->Next() == DB::DB_OK)
+        {
+            lc.advance();
+            std::map<UInt32, ItemEquip *>::iterator it = equips.find(dblba.id);
+            if(it == equips.end())
+                continue;
+
+            ItemEquip * equip = it->second;
+            if(equip == NULL)
+                continue;
+            switch(equip->getClass())
+            {
+            case Item_LBling:
+            case Item_LBwu:
+            case Item_LBxin:
+                {
+                    ItemLingbao* lb = static_cast<ItemLingbao*>(equip);
+                    ItemLingbaoAttr& lba = lb->getLingbaoAttr();
+                    lba.tongling = dblba.tongling;
+                    lba.lbColor = dblba.lbcolor;
+                    {
+                        StringTokenizer tk(dblba.types, ",");
+                        if (tk.count())
+                        {
+                            for (size_t i = 0; i < tk.count(); ++i)
+                            {
+                                if(i > 3)
+                                    break;
+                                lba.type[i] = ::atoi(tk[i].c_str());
+                            }
+                        }
+                    }
+                    {
+                        StringTokenizer tk(dblba.values, ",");
+                        if (tk.count())
+                        {
+                            for (size_t i = 0; i < tk.count(); ++i)
+                            {
+                                if(i > 3)
+                                    break;
+                                lba.value[i] = ::atoi(tk[i].c_str());
+                            }
+                        }
+                    }
+                    {
+                        StringTokenizer tk(dblba.skills, ",");
+                        if (tk.count())
+                        {
+                            for (size_t i = 0; i < tk.count(); ++i)
+                            {
+                                if(i > 1)
+                                    break;
+                                lba.skill[i] = ::atoi(tk[i].c_str());
+                            }
+                        }
+                    }
+                    {
+                        StringTokenizer tk(dblba.factors, ",");
+                        if (tk.count())
+                        {
+                            for (size_t i = 0; i < tk.count(); ++i)
+                            {
+                                if(i > 1)
+                                    break;
+                                lba.factor[i] = ::atoi(tk[i].c_str());
+                            }
+                        }
+                    }
+				}
+				break;
+			default:
+				break;
+			}
+		}
+		lc.finalize();
+
+		return true;
+    }
+
+    bool GObjectManager::loadLingbaoSmelt()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading lingbao smelt:");
+        DBLingbaoSmelt dblbs;
+        if(execu->Prepare("SELECT `playerId`, `gujiId`, `itemId`, `bind`, `value`, `maxValue` FROM `lingbaosmelt`", dblbs) != DB::DB_OK)
+            return false;
+
+        lc.reset(2000);
+        while(execu->Next() == DB::DB_OK)
+        {
+            lc.advance();
+            LingbaoSmeltInfo lbSmeltInfo;
+
+			Player * pl = globalPlayers[dblbs.playerId];
+			if(pl == NULL)
+				continue;
+            lbSmeltInfo.gujiId = dblbs.gujiId;
+            lbSmeltInfo.itemId = dblbs.itemId;
+            lbSmeltInfo.bind = dblbs.bind;
+            lbSmeltInfo.value = dblbs.value;
+            lbSmeltInfo.maxValue = dblbs.maxValue;
+
+            Package* pkg = pl->GetPackage();
+            pkg->loadLingbaoSmeltInfo(lbSmeltInfo);
+        }
+        lc.finalize();
 
         return true;
     }

@@ -77,6 +77,7 @@ Fighter::Fighter(UInt32 id, Player * owner):
 	memset(_trump, 0, sizeof(_trump));
 	memset(_trumpSkill, 0, sizeof(_trumpSkill));
 	memset(_buffData, 0, FIGHTER_BUFF_COUNT * sizeof(UInt32));
+	memset(_lingbao, 0, sizeof(_lingbao));
     m_2ndSoul = NULL;
     _iswboss = false;
     _wbextatk = 0;
@@ -534,6 +535,16 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
             }
         }
     }
+    if(t >= 0x60 && t < 0x60 + getMaxLingbaos())
+    {
+        UInt32 lbs[TRUMP_UPMAX] = {0};
+        if (getAllLingbaoId(lbs)) {
+            std::string str;
+            if (value2string(lbs, getMaxLingbaos(), str)) {
+                DB2().PushUpdateData("UPDATE `fighter` SET `lingbao` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
+            }
+        }
+    }
 
 	switch(t)
 	{
@@ -788,6 +799,11 @@ void Fighter::sendModification( UInt8 n, UInt8 * t, ItemEquip ** v, bool writedb
             {
                 st << ied.maxTRank << ied.trumpExp;
             }
+            else if(equip->getClass() == Item_LBling || equip->getClass() == Item_LBwu || equip->getClass() == Item_LBxin)
+            {
+                ItemLingbaoAttr& lba = (static_cast<ItemLingbao*>(equip))->getLingbaoAttr();
+                lba.appendAttrToStream(st);
+            }
 			if(writedb)
 				updateToDB(t[i], equip->getId());
 		}
@@ -992,11 +1008,21 @@ ItemEquip* Fighter::setTrump( UInt32 trump, int idx, bool writedb )
 
 UInt32  Fighter:: getTrumpNum()
 {
-
     UInt32 num = 0;
      for (int i = 0; i < getMaxTrumps(); ++i)
      {
         if (_trump[i])
+            num ++ ;
+     }
+     return num;
+}
+
+UInt32  Fighter:: getLingbaoNum()
+{
+    UInt32 num = 0;
+     for (int i = 0; i < getMaxLingbaos(); ++i)
+     {
+        if (_lingbao[i])
             num ++ ;
      }
      return num;
@@ -1105,6 +1131,21 @@ int Fighter::getAllTrumpId( UInt32* trumps, int size )
     return getMaxTrumps();
 }
 
+int Fighter::getAllLingbaoId( UInt32* lingbaos, int size )
+{
+    if (!lingbaos|| !size)
+        return 0;
+
+    for (int i = 0; i < getMaxLingbaos(); ++i)
+    {
+        if (_lingbao[i])
+            lingbaos[i] = _lingbao[i]->getId();
+        else
+            lingbaos[i] = 0;
+    }
+    return getMaxLingbaos();
+}
+
 int Fighter::getAllTrumpTypeId( UInt32* trumps, int size )
 {
     if (!trumps || !size)
@@ -1118,6 +1159,21 @@ int Fighter::getAllTrumpTypeId( UInt32* trumps, int size )
             trumps[i] = 0;
     }
     return getMaxTrumps();
+}
+
+int Fighter::getAllLingbaoTypeId( UInt32* lingbaos, int size )
+{
+    if (!lingbaos || !size)
+        return 0;
+
+    for (int i = 0; i < getMaxLingbaos(); ++i)
+    {
+        if (_lingbao[i])
+            lingbaos[i] = _lingbao[i]->GetItemType().getId();
+        else
+            lingbaos[i] = 0;
+    }
+    return getMaxLingbaos();
 }
 
 void Fighter::setCurrentHP( UInt32 hp, bool writedb )
@@ -1260,6 +1316,60 @@ inline void addEquipAttr2( GData::AttrExtra& ae, UInt8 type, UInt16 value, UInt8
         ae.mreslvl += value/10;
 	}
 }
+
+inline void AddLingbaoAttr(GData::AttrExtra& ae, ItemLingbao* lb)
+{
+    if(!lb)
+        return;
+
+    ItemLingbaoAttr& lbattr = lb->getLingbaoAttr();
+    for(int i = 0; i < 4; ++ i)
+    {
+        if(lbattr.type[i] == 0)
+            continue;
+
+        switch(lbattr.type[i])
+        {
+        case 1:
+            ae.attack += lbattr.value[i];
+            break;
+        case 2:
+            ae.magatk += lbattr.value[i];
+            break;
+        case 3:
+            ae.defend += lbattr.value[i];
+            break;
+        case 4:
+            ae.magdef += lbattr.value[i];
+            break;
+        case 5:
+            ae.hp += lbattr.value[i];
+            break;
+        case 6:
+            ae.toughlvl += lbattr.value[i];
+            break;
+        case 7:
+            ae.action += lbattr.value[i];
+            break;
+        case 8:
+            ae.hitrlvl += lbattr.value[i];
+            break;
+        case 9:
+            ae.evdlvl += lbattr.value[i];
+            break;
+        case 10:
+            ae.crilvl += lbattr.value[i];
+            break;
+        case 11:
+            ae.pirlvl += lbattr.value[i];
+            break;
+        case 12:
+            ae.counterlvl += lbattr.value[i];
+            break;
+        }
+    }
+}
+
 
 inline void addTalentAttr( GData::AttrExtra& ae, UInt8 type, UInt16 value )
 {
@@ -1653,6 +1763,14 @@ void Fighter::rebuildEquipAttr()
         }
     }
 
+    for(int idx = 0; idx < getMaxLingbaos(); ++ idx)
+    {
+		ItemLingbao* lb = static_cast<ItemLingbao*>(getLingbao(idx));
+        if(!lb)
+            continue;
+        AddLingbaoAttr(_attrExtraEquip, lb);
+    }
+
     if (_owner)
     {
         // 帮派秘术对额外属性的加成
@@ -1754,6 +1872,23 @@ void Fighter::rebuildBattlePoint()
         const GData::Formation* form = GData::formationManager[_owner->getFormation()];
         if(form)
             _battlePoint += form->getBattlePoint();
+    }
+    for(int i = 0; i < getMaxLingbaos(); ++ i)
+    {
+		ItemLingbao* lb = static_cast<ItemLingbao*>(getLingbao(i));
+        if(!lb)
+            continue;
+        ItemLingbaoAttr& lba = lb->getLingbaoAttr();
+        if(lba.skill[0])
+        {
+            const GData::LBSkillBase* lbskill = GData::lbSkillManager[lba.skill[0]];
+            _battlePoint += lbskill->battlepoint * lba.factor[0];
+        }
+        if(lba.skill[1])
+        {
+            const GData::LBSkillBase* lbskill = GData::lbSkillManager[lba.skill[1]];
+            _battlePoint += lbskill->battlepoint * lba.factor[1];
+        }
     }
 }
 
@@ -2307,6 +2442,11 @@ UInt32 Fighter::getTrumpId( int idx )
     return (idx >= 0 && idx < getMaxTrumps() && _trump[idx]) ? _trump[idx]->getId() : 0;
 }
 
+UInt32 Fighter::getLingbaoId( int idx )
+{
+    return (idx >= 0 && idx < getMaxLingbaos() && _lingbao[idx]) ? _lingbao[idx]->getId() : 0;
+}
+
 void Fighter::getAllTrumps( Stream& st )
 {
     // XXX: append to armor
@@ -2314,6 +2454,16 @@ void Fighter::getAllTrumps( Stream& st )
     for (int i = 0; i < TRUMP_UPMAX; ++i)
     {
         st << getTrumpId(i);
+    }
+}
+
+void Fighter::getAllLingbaos( Stream& st )
+{
+    // XXX: append to armor
+    // st << static_cast<UInt8>(TRUMP_UPMAX);
+    for (int i = 0; i < TRUMP_UPMAX; ++i)
+    {
+        st << getLingbaoId(i);
     }
 }
 
@@ -5067,21 +5217,25 @@ UInt16 Fighter::getPortrait()
 
 ItemEquip* Fighter::setLingbao(UInt8 idx, ItemEquip* lb, bool writedb)
 {
-    if(!lb || idx >= e_lb_max)
+    if(idx >= e_lb_max)
         return NULL;
 
-    UInt8 subClass = lb->getClass();
-    if (subClass != Item_LBling || subClass != Item_LBwu || subClass != Item_LBxin)
-        return NULL;
-    UInt8 clsIdx = subClass - Item_LBling;
-    if(clsIdx != idx)
-        return NULL;
+    if(lb != NULL)
+    {
+        UInt8 subClass = lb->getClass();
+        if (subClass != Item_LBling && subClass != Item_LBwu && subClass != Item_LBxin)
+            return NULL;
+        UInt8 clsIdx = subClass - Item_LBling;
+        if(clsIdx != idx)
+            return NULL;
 
-    ItemLingbaoAttr& lba = (static_cast<ItemLingbao*>(lb))->getLingbaoAttr();
-    if(lba.tongling == 0)
-        return NULL;
+        ItemLingbaoAttr& lba = (static_cast<ItemLingbao*>(lb))->getLingbaoAttr();
+        if(lba.tongling == 0)
+            return NULL;
+    }
+
     ItemEquip* t = _lingbao[idx];
-    if(!t)
+    if(t != NULL)
     {
         ItemLingbaoAttr& lba = (static_cast<ItemLingbao*>(t))->getLingbaoAttr();
         if(lba.skill[0])
@@ -5090,15 +5244,19 @@ ItemEquip* Fighter::setLingbao(UInt8 idx, ItemEquip* lb, bool writedb)
             delLBSkill(t->getId());
     }
 
+    _lingbao[idx] = lb;
+    if(lb != NULL)
     {
-        _lingbao[idx] = lb;
+        ItemLingbaoAttr& lba = (static_cast<ItemLingbao*>(lb))->getLingbaoAttr();
         if(lba.skill[0])
             addLBSkill(lb->getId(), lba.skill[0], lba.factor[0]);
         if(lba.skill[1])
             addLBSkill(lb->getId(), lba.skill[1], lba.factor[1]);
     }
 
-    sendModification(0x50+idx, _lingbao[idx], writedb);
+    _attrDirty = true;
+    _bPDirty = true;
+    sendModification(0x60+idx, _lingbao[idx], writedb);
     return t;
 }
 

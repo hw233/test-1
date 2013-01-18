@@ -629,6 +629,7 @@ CREATE TABLE `fighter` (
   `peerless` mediumint(5) unsigned NOT NULL DEFAULT '0',
   `talent` mediumint(5) unsigned NOT NULL DEFAULT '0',
   `trump` varchar(255) NOT NULL,
+  `lingbao` varchar(255) NOT NULL DEFAULT '',
   `acupoints` varchar(255) NOT NULL,
   `skill` varchar(255) NOT NULL,
   `citta` varchar(255) NOT NULL,
@@ -1863,3 +1864,29 @@ CREATE TABLE `snow` (
     `score` int(10) unsigned NOT NULL,        
     PRIMARY KEY (`playerId`)                  
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `lingbaoattr`;
+CREATE TABLE `lingbaoattr` (                       
+    `id` int(10) unsigned NOT NULL,        
+    `tongling` tinyint(3) unsigned NOT NULL,      
+    `lbcolor` tinyint(3) unsigned NOT NULL,      
+    `types` varchar(256) NOT NULL DEFAULT '',
+    `values` varchar(256) NOT NULL DEFAULT '',
+    `skills` varchar(256) NOT NULL DEFAULT '',
+    `factors` varchar(256) NOT NULL DEFAULT '',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `lingbaosmelt`;
+CREATE TABLE `lingbaosmelt` (                       
+    `playerId` bigint(20) unsigned NOT NULL,  
+    `gujiId` smallint(4) unsigned NOT NULL,
+    `itemId` smallint(4) unsigned NOT NULL,
+    `bind` tinyint(3) unsigned NOT NULL,      
+    `value` int(10) unsigned NOT NULL,        
+    `maxValue` int(10) unsigned NOT NULL,        
+    PRIMARY KEY (`playerId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+

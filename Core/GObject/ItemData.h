@@ -116,7 +116,7 @@ namespace GObject
             {
                 UInt8 zero8 = 0;
                 UInt16 zero16 = 0;
-                st << zero8 << lbColor;
+                st << zero8 << lbColor << zero8;
                 st << zero16 << zero16 << zero16 << zero16;
             }
             else

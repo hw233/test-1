@@ -251,8 +251,8 @@ namespace GObject
 
         void enumerate(Visitor<ItemBase>& visitor);
 
-        UInt8 Tongling(UInt32 equipId, UInt8 protect, UInt8 bind);
-        UInt8 OpenLingbaoSmelt(UInt16 gujiId, UInt8 bind1, UInt8 type, UInt8 bind2);
+        UInt8 Tongling(UInt32 equipId, UInt8 protect, UInt8 bind, std::vector<UInt16>& values);
+        UInt8 OpenLingbaoSmelt(UInt16 gujiId, UInt8 type);
         UInt8 LingbaoSmelt(UInt32 itemId, UInt8 bind);
         UInt8 closeLingbaoSmelt();
         void sendLingbaoSmeltInfo();

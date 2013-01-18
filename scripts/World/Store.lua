@@ -195,6 +195,10 @@ function loadStore()
             store:add(2,9179,30)
         end
 
+        store:add(2,9307,50)
+        store:add(2,9308,50)
+        store:add(2,9309,50)
+        store:add(2,9310,50)
         --store:add(2,9285,10)
         store:add(2,9123,50)
         store:add(2,551,10)

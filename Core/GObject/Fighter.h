@@ -422,6 +422,15 @@ public:
     void getAllLingbaos(Stream& st);
     UInt32 getLingbaoNum();
 
+    inline std::vector<LBSkill>& getLBSkill() { return _lbSkill; }
+    ItemEquip* setLingbao( UInt8 idx , ItemEquip* lingbao, bool = true);
+    void loadLingbao(std::string& lb);
+    void loadLBSkill(LBSkill& lbSkill);
+    bool addLBSkill(UInt32 lbid, UInt16 skillid, UInt16 factor);
+    bool delLBSkill(UInt32 lbid);
+
+
+
 	UInt32 getMaxHP();
 
 	UInt32 regenHP(UInt32);
@@ -482,13 +491,6 @@ public:
 	inline void setDirty(bool d = true) { _attrDirty = d; _bPDirty = d; }
     bool hasTrumpType(UInt32 trumpid);
     bool canSetTrump(UInt8 idx, UInt32 trumpid);
-
-	ItemEquip ** setLingbao(std::string& lingbaos, bool = true);
-    ItemEquip* setLingbao( UInt32 lingbao, int idx, bool = true);
-    ItemEquip* setLingbao( ItemEquip* lingbao, int idx, bool = true);
-	void findLingbaoByTypeId(std::vector<ItemEquip*>& ret, UInt32 id);
-    bool hasLingbaoType(UInt32 trumpid);
-    bool canSetLingbao(UInt8 idx, UInt32 lingbaoid);
 
 
     void setAttrType1(UInt8 t);
@@ -823,14 +825,6 @@ public:
     void appendElixirAttr2(Stream& st);
     ElixirAttr& getElixirAttr() { return _elixirattr; }
 
-
-    inline std::vector<LBSkill>& getLBSkill() { return _lbSkill; }
-    ItemEquip* setLingbao(UInt8 idx, ItemEquip* lb, bool writedb = true);
-    void loadLingbao(std::string& lb);
-    void loadLBSkill(LBSkill& lbSkill);
-
-    bool addLBSkill(UInt32 lbid, UInt16 skillid, UInt16 factor);
-    bool delLBSkill(UInt32 lbid);
 
 private:
     ElixirAttr _elixirattr;

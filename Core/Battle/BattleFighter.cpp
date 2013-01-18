@@ -57,7 +57,7 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _skillUsedChangeAttrValue(0), _skillUsedChangeAttrLast(0), _skillUsedChangeAttr(0),
     _bleedRandom(0), _bleedRandomLast(0), _bleedAttackClass(1),_bleedBySkill(0), _bleedBySkillLast(0), _bleedBySkillClass(1),
     _hitChangeByPeerless(0),_counterChangeByPeerless(0),_bSingleAttackFlag(false),_bMainTargetDead(false),_nCurrentAttackIndex(0),
-    _darkVigor(0), _dvFactor(0), _darkVigorLast(0), _firstAction(true)
+    _darkVigor(0), _dvFactor(0), _darkVigorLast(0), _hpShieldSelf(0), _hpShieldSelf_last(0)
 {
     memset(_immuneLevel, 0, sizeof(_immuneLevel));
     memset(_immuneRound, 0, sizeof(_immuneRound));
@@ -414,24 +414,25 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         updateSkillStrengthen(passiveSkillOnCounter100[idx]);
     }
 
-    std::vector<LBSkill>& lbSkills =  _fighter->getLBSkill();
+    std::vector<GObject::LBSkill>& lbSkills =  _fighter->getLBSkill();
     cnt = lbSkills.size();
     for(idx = 0; idx < cnt; ++ idx)
     {
-        GData::LBSkillBase* base = GData::lbSkillManager[lbSkills[idx].skillid];
+        const GData::LBSkillBase* base = GData::lbSkillManager[lbSkills[idx].skillid];
         if(!base)
             continue;
         GData::LBSkillItem item;
         item.base = base;
         item.cd = base->cd;
+        item.prob = base->prob * lbSkills[idx].factor;
         item.ef_value = base->ef_value * lbSkills[idx].factor;
         switch(base->cond)
         {
         case GData::e_lb_cond_skill:
             _onSkillCond.push_back(item);
             break;
-        case GData::e_lb_cond_action:
-            _onActionCond.push_back(item);
+        case GData::e_lb_cond_action1:
+            _onActionCond1.push_back(item);
             break;
         case GData::e_lb_cond_dead:
             _onDeadCond.push_back(item);
@@ -441,6 +442,9 @@ void BattleFighter::setFighter( GObject::Fighter * f )
             break;
         case GData::e_lb_cond_state:
             _onStateCond.push_back(item);
+            break;
+        case GData::e_lb_cond_action2:
+            _onActionCond2.push_back(item);
             break;
         }
     }
@@ -770,6 +774,10 @@ float BattleFighter::calcTherapy(bool& isCritical, bool& first, const GData::Ski
             }
         }
     }
+
+    GData::LBSkillItem* item = getSkillCondItem(SKILL_ID(skill->getId()));
+    if(NULL != item)
+        return aura_factor * (getMagAttack() * skill->effect->hpP + skill->effect->addhp + skill->effect->hp + item->ef_value);
 
     return aura_factor * (getMagAttack() * skill->effect->hpP + skill->effect->addhp + skill->effect->hp);
 }
@@ -2176,21 +2184,27 @@ GData::LBSkillItem* BattleFighter::getSkillCondItem(UInt16 skillid)
     return item;
 }
 
-GData::LBSkillItem* BattleFighter::getActionCondItem(UInt32 action)
+GData::LBSkillItem* BattleFighter::getActionCondItem1()
 {
     GData::LBSkillItem* item = NULL;
-    if(!_firstAction)
-        return item;
-
-    _firstAction = false;
-    UInt8 cnt = _onActionCond.size();
+    UInt8 cnt = _onActionCond1.size();
     for(int i = 0; i < cnt; ++ i)
     {
-        if(getAction() > action)
-        {
-            item = &(_onActionCond[i]);
-            break;
-        }
+        item = &(_onActionCond1[i]);
+        break;
+    }
+
+    return item;
+}
+
+GData::LBSkillItem* BattleFighter::getActionCondItem2()
+{
+    GData::LBSkillItem* item = NULL;
+    UInt8 cnt = _onActionCond2.size();
+    for(int i = 0; i < cnt; ++ i)
+    {
+        item = &(_onActionCond2[i]);
+        break;
     }
 
     return item;
@@ -2224,10 +2238,13 @@ GData::LBSkillItem* BattleFighter::getBleedCondItem()
         break;
     }
 
-    if(item->base->prob * 100 > uRand(10000))
-        item->cd = item->base->cd;
-    else
-        item = NULL;
+    if(item && item->prob > 0.01f)
+    {
+        if(item->prob * 100 > uRand(10000))
+            item->cd = item->base->cd;
+        else
+            item = NULL;
+    }
     return item;
 }
 
@@ -2240,15 +2257,20 @@ GData::LBSkillItem* BattleFighter::getStateCondItem(UInt16 state)
     {
         if(_onStateCond[i].cd > 0)
             continue;
+        if(!(_onStateCond[i].base->cond2 & state))
+            continue;
 
         item = &(_onStateCond[i]);
         break;
     }
 
-    if(item->base->prob * 100 > uRand(10000))
-        item->cd = item->base->cd;
-    else
-        item = NULL;
+    if(item && item->prob > 0.01f)
+    {
+        if(item->prob * 100 > uRand(10000))
+            item->cd = item->base->cd;
+        else
+            item = NULL;
+    }
     return item;
 }
 
@@ -2270,6 +2292,21 @@ void BattleFighter::releaseLBSkillCD()
         if(item.cd > 0)
             -- item.cd;
     }
+}
+
+bool BattleFighter::releaseHpSieldSelf()
+{
+    if(_hpShieldSelf_last == 0)
+        return false;
+
+    -- _hpShieldSelf_last;
+    if(_hpShieldSelf_last == 0)
+    {
+        _hpShieldSelf = 0;
+        return true;
+    }
+
+    return false;
 }
 
 

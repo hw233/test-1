@@ -25,7 +25,9 @@
 #define LSL_ID          8000
 #define RSL_ID          8999
 #define LNORMAL1_ID     9000
-#define RNORMAL1_ID     11999
+#define RNORMAL1_ID     10999
+#define LBMIN_ID        11500
+#define LBMAX_ID        11999
 #define LOTHER_ID       12000
 #define ROTHER_ID       65535
 
@@ -56,6 +58,7 @@ enum ItemClass
     Item_LBwu,          // 灵宝-悟 14
     Item_LBxin,         // 灵宝-信 15
 	Item_Normal = 20,	//普通物品 20~29
+    Item_Normal27 = 27,
     Item_Normal28 = 28,
     Item_Normal29 = 29,
 	Item_Formula = 30,	//阵法 30~39
@@ -110,7 +113,7 @@ inline bool IsEquipId(UInt32 id) // XXX: 这个是流水号
 
 inline bool IsEquipTypeId(UInt32 id)
 {
-	return id >= LARM_ID && id <= RARM_ID;
+	return (id >= LARM_ID && id <= RARM_ID) || (id >=LBMIN_ID && id <= LBMAX_ID);
 }
 
 /** 新增11,12级宝石 **/
@@ -145,7 +148,7 @@ inline bool IsGemId(UInt32 id)
 
 inline bool IsEquip(UInt8 subClass)
 {
-	return subClass >= static_cast<UInt8>(Item_Weapon) && subClass <= static_cast<UInt8>(Item_Halo);
+	return subClass >= static_cast<UInt8>(Item_Weapon) && subClass <= static_cast<UInt8>(Item_LBxin);
 }
 
 inline bool IsWeapon(UInt8 subClass)
