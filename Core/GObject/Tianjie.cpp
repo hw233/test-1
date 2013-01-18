@@ -1146,6 +1146,7 @@ void Tianjie::process(UInt32 now)
     }
     else if (m_isAutoTouched && !m_isRankKeep) //在手动开启天劫过程中,有玩家触发最高级天劫
     {
+        m_isAutoTouched = false; //必须设置为false,否则将会循环所有天劫
         OpenTj();
     }
 }

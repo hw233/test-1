@@ -694,7 +694,6 @@ namespace GObject
 		UInt8 GetCountryThread();
 
         //玩家每日签到接口
-        void ActivitySignIn();
         void SendNextdayTime(UInt32 nextDay);
 
 		void Login();
@@ -892,6 +891,11 @@ namespace GObject
         inline bool is3366AndLevel4() const
         {
             return (_playerData.qqvipl >= 24 && _playerData.qqvipl <= 29);
+        }
+        inline bool is3366AndBD() const
+        {
+            return (_playerData.qqvipl >= 20 && _playerData.qqvipl <= 29 && 
+                    _playerData.qqvipl1 >= 11 && _playerData.qqvipl1 <= 19); 
         }
 
 		UInt32 getTotalRecharge()			{ return _playerData.totalRecharge; }
@@ -1747,6 +1751,7 @@ namespace GObject
         void qixiUdpLog(UInt32 id);
         void clanUdpLog(UInt32 id);
         void countryBattleUdpLog(UInt32 id, UInt8 country, std::string str = "");
+        void heroIslandUdpLog(UInt32 id, UInt8 type);
         void secondSoulUdpLog(UInt32 id, UInt32 val = 0, UInt32 num = 1);
         void wBossUdpLog(UInt32 id);
         void clanCopyUdpLog(UInt32 id, UInt32 val = 0, UInt32 num = 1);
@@ -1922,6 +1927,8 @@ namespace GObject
         void CheckCanAwardBirthday();
         void getAwardLogin(UInt8 opt);
         void getAwardBlueDiamond(UInt8 opt);
+        void getConsumeAward();
+        void sendConsumeAwardInfo(UInt8 idx);
         void getThanksGivingDay(UInt8 opt);
         void IDIPAddItem(UInt16 itemId, UInt16 num, bool bind = true);
         int IDIPBuy(UInt32 itemId, UInt32 num, UInt32 price, std::string& err, bool bind = true);

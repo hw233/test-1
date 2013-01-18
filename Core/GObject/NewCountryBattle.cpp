@@ -23,7 +23,12 @@ namespace GObject
 {
 
 //新阵营战的每场战斗时间
-const static UInt32 NCBATTLE_TIME = 30;
+const static UInt32 NCBATTLE_TIME = 45;
+//新阵营战每个玩家霸气怒气上限值
+const static UInt32 MAX_BANUQI = 200;
+
+#define COUNT_LOSEACHIEVE(a,b) (4 + (a + b) / 2)
+#define COUNT_WINACHIEVE(a,b,c,d) (4 + a + b + (c + d) * 2)
 
 NewCountryBattleSkill NewCountryBattle::m_skills[NEWCOUNTRYBATTLE_SKILL_NUM + 1];
 
@@ -86,20 +91,25 @@ bool NewCBPlayerData::canAddSkillFlag(UInt8 skillId)
     return true;
 }
 
-void NewCBPlayerData::addAngerDomineer(UInt8 flag, UInt8 value)
+bool NewCBPlayerData::addAngerDomineer(UInt8 flag, UInt8 value)
 {
     if(flag)
     {
+        if(anger >= MAX_BANUQI)
+            return false;
         anger += value;
-        if(anger > 50)
-            anger = 50;
+        if(anger > MAX_BANUQI)
+            anger = MAX_BANUQI;
     }
     else
     {
+        if(domineer >= MAX_BANUQI)
+            return false;
         domineer += value;
-        if(domineer > 50)
-            domineer = 50;
+        if(domineer > MAX_BANUQI)
+            domineer = MAX_BANUQI;
     }
+    return true;
 }
 
 void NewCBPlayerData::setAchievementLevel(UInt8 achieve)
@@ -252,13 +262,13 @@ void NewCountryBattle::playerLeave( Player * player )
     ncbpData->skillFlags = 0;
     ncbpData->setAchievementLevel();
     //m_ncbpData[player] = ncbpData;
-    if(curtime >= globalCountryBattle.getStartTime() && curtime < globalCountryBattle.getEndTime())
-        player->setBuffData(PLAYER_BUFF_NEW_CBATTLE, curtime + 5 * 60);
-
 	player->delFlag(Player::CountryBattle);
     player->clearHIAttr();
     player->autoRegenAll();
     sendSelfInfo(player);
+    if(curtime >= globalCountryBattle.getStartTime() && curtime < globalCountryBattle.getEndTime())
+        player->setBuffData(PLAYER_BUFF_NEW_CBATTLE, curtime + 5 * 60);
+
     if(ncbpData->totalWin)
     {
         UInt32 w = player->GetVar(VAR_COUNTRY_BATTLE_WIN);
@@ -305,6 +315,36 @@ void NewCountryBattle::skillTriggerEffort(NewCBPlayerData * ncbpData, UInt8 effo
         addAchievement(ncbpData->player, award);
         ncbpData->setAchievementLevel(award);
     }
+}
+
+void NewCountryBattle::buySkill(Player * player, UInt8 type)
+{
+    if(type != 0 && type != 1)
+        return;
+    NCBPlayerData::iterator iter = m_ncbpData.find(player);
+    if(iter == m_ncbpData.end())
+        return;
+    if(player->getGold() < 5)
+    {
+        player->sendMsgCode(0, 1104);
+        return;
+    }
+    NewCBPlayerData * ncbpData = iter->second;
+    if(!ncbpData) return;
+    if(!ncbpData->addAngerDomineer(type, 50))
+        return;
+    ConsumeInfo ci(NEWCountryBattleSkill, 0, 0);
+    player->useGold(5, &ci);
+    Stream st(REP::NEW_CAMPS_WAR_JOIN);
+    st << static_cast<UInt8>(0x08);
+    st << type;
+    if(type)
+        st << ncbpData->anger;
+    else
+        st << ncbpData->domineer;
+    st << Stream::eos;
+    player->send(st);
+    player->countryBattleUdpLog(1217, 2, Itoa(type));
 }
 
 void NewCountryBattle::checkAddExp(UInt32 curtime)
@@ -550,8 +590,6 @@ void NewCountryBattle::end()
         player->SetVar(VAR_NCB_TOTALLOSE, ncbpData->totallose);
         player->countryBattleUdpLog(1091, player->getCountry());
         player->countryBattleUdpLog(1217, 1, Itoa(ncbpData->totalWin)+","+Itoa(ncbpData->totallose)+","+Itoa(ncbpData->totalAchievement + count));
-        //player->countryBattleUdpLog(1217, 2, ncbpData->totallose);
-        //player->countryBattleUdpLog(1217, 3, ncbpData->totalAchievement + count);
     }
 	
     Stream st(REP::NEW_CAMPS_WAR_JOIN);
@@ -767,13 +805,17 @@ bool NewCountryBattle::isRunAway(NewCBPlayerData * ncbpData1, NewCBPlayerData * 
         player2->send(st);
        
         ncbpData2->currKillStreak ++;
+        ncbpData2->totalWin ++;
+        if(ncbpData2->currKillStreak > ncbpData2->maxKillStreak)
+            ncbpData2->maxKillStreak = ncbpData2->currKillStreak;
         kills2 = ncbpData2->currKillStreak > 10 ? 10 : ncbpData2->currKillStreak;
-        achieve = 8 + kills1 + kills2 + (achLvl1 + achLvl2) / 2;
+        achieve = COUNT_WINACHIEVE(kills1, kills2, achLvl1, achLvl2);
         ncbpData2->setAchievementLevel(achieve);
         ncbpData2->addAngerDomineer(0, 5);
         ncbpData2->skillFlags = 0;
         player2->clearHIAttr();
         addAchievement(player2, achieve);
+        completeEffort(ncbpData2, ncbpData1);
         return true;
     }
     if(ncbpData2->type == 1)
@@ -785,13 +827,17 @@ bool NewCountryBattle::isRunAway(NewCBPlayerData * ncbpData1, NewCBPlayerData * 
         player1->send(st);
         
         ncbpData1->currKillStreak ++;
+        ncbpData1->totalWin ++;
+        if(ncbpData1->currKillStreak > ncbpData1->maxKillStreak)
+            ncbpData1->maxKillStreak = ncbpData1->currKillStreak;
         kills1 = ncbpData1->currKillStreak > 10 ? 10 : ncbpData1->currKillStreak;
-        achieve = 8 + kills1 + kills2 + (achLvl1 + achLvl2) / 2;
+        achieve = COUNT_WINACHIEVE(kills1, kills2, achLvl1, achLvl2);
         ncbpData1->setAchievementLevel(achieve);
         ncbpData1->addAngerDomineer(0, 5);
         ncbpData1->skillFlags = 0;
         player1->clearHIAttr();
         addAchievement(player1, achieve);
+        completeEffort(ncbpData1, ncbpData2);
         return true;
     }
     return false;
@@ -840,7 +886,7 @@ void NewCountryBattle::handleBattle()
         UInt8 achLvl2 = ncbpData2->achLevel;
         UInt8 kills2 = ncbpData2->currKillStreak;
         UInt16 achieve = 0;
-        UInt16 loserAchieve = 4 + ((achLvl1 + achLvl2) / 2) / 2;
+        UInt16 loserAchieve = COUNT_LOSEACHIEVE(achLvl1, achLvl2);
 
         UInt32 thisDay = TimeUtil::SharpDay();
         UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA(player1, created));
@@ -876,7 +922,7 @@ void NewCountryBattle::handleBattle()
             ncbpData1->currKillStreak ++;
             ncbpData1->totalWin ++;
             kills1 = ncbpData1->currKillStreak > 10 ? 10 : ncbpData1->currKillStreak;
-            achieve = 8 + kills1 + kills2 + (achLvl1 + achLvl2) / 2;
+            achieve = COUNT_WINACHIEVE(kills1, kills2, achLvl1, achLvl2);
             ncbpData1->setAchievementLevel(achieve);
             if(ncbpData1->type != 1)
                 ncbpData1->type = 3;
@@ -946,7 +992,7 @@ void NewCountryBattle::handleBattle()
             ncbpData2->currKillStreak ++;
             ncbpData2->totalWin ++;
             kills2 = ncbpData2->currKillStreak > 10 ? 10 : ncbpData2->currKillStreak;
-            achieve = 8 + kills1 + kills2 + (achLvl1 + achLvl2) / 2;
+            achieve = COUNT_WINACHIEVE(kills1, kills2, achLvl1, achLvl2);
             ncbpData2->setAchievementLevel(achieve);
             if(ncbpData2->type != 1)
                 ncbpData2->type = 3;
@@ -1050,7 +1096,7 @@ void NewCountryBattle::completeEffort(NewCBPlayerData * ncbpData1, NewCBPlayerDa
             award = ncbpData1->updateEffortInfo(23);
         if(totalWin >= 20)
             award = ncbpData1->updateEffortInfo(26);
-        if(totalWin >= 30)
+        if(totalWin >= 25)
             award = ncbpData1->updateEffortInfo(29);
         if(award)
         {

@@ -731,6 +731,7 @@ void OnSellItemReq( GameMsgHdr& hdr, const void * buffer)
 
 	UInt16 offset = 2;
 	UInt32 price = 0;
+    UInt16 canDestroyNum = 0;
 	for (UInt16 i = 0; i < itemCount; ++i)
 	{
 		UInt32 itemId = *reinterpret_cast<const UInt32*>(data+offset);
@@ -745,13 +746,23 @@ void OnSellItemReq( GameMsgHdr& hdr, const void * buffer)
 		{
 			price += pl->GetPackage()->SellItem(itemId, itemNum, bindType);
 		}
+        if(World::canDestory(itemId))
+            ++canDestroyNum;
 	}
 	if(price > 0)
 	{
-		SYSMSG_SEND(116, pl);
-		SYSMSG_SEND(1016, pl);
         pl->getTael(price);
 	}
+    if(canDestroyNum > 0)
+    {
+		SYSMSG_SEND(116, pl);
+		SYSMSG_SEND(1016, pl);
+    }
+    else
+    {
+		SYSMSG_SEND(172, pl);
+		SYSMSG_SEND(1072, pl);
+    }
 }
 
 
@@ -769,6 +780,7 @@ void OnDestroyItemReq( GameMsgHdr& hdr, const void * buffer )
 		return;
 
 	UInt16 offset = 2;
+    UInt16 canDestroyNum = 0;
 	for (UInt16 i = 0; i < itemCount; ++i)
 	{
 		UInt32 itemId = *reinterpret_cast<const UInt32*>(data+offset);
@@ -776,9 +788,19 @@ void OnDestroyItemReq( GameMsgHdr& hdr, const void * buffer )
 		UInt16 itemNum = *reinterpret_cast<const UInt16*>(data+offset+4+1);
 		offset += 7;
         pl->addItem(itemId, itemNum, bindType);
+        if(World::canDestory(itemId))
+            ++canDestroyNum;
 	}
-	SYSMSG_SEND(115, pl);
-	SYSMSG_SEND(1015, pl);
+    if(canDestroyNum > 0)
+    {
+        SYSMSG_SEND(115, pl);
+        SYSMSG_SEND(1015, pl);
+    }
+    else
+    {
+        SYSMSG_SEND(171, pl);
+        SYSMSG_SEND(1071, pl);
+    }
 }
 
 void OnTripodReq( GameMsgHdr& hdr, const void* data )
@@ -1098,6 +1120,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendHappyInfo();
     pl->sendYBBufInfo(pl->GetVar(VAR_YBBUF), pl->GetVar(VAR_QQVIP_BUF));
     pl->sendAthlBufInfo();
+    pl->sendConsumeAwardInfo(0);
     luckyDraw.notifyDisplay(pl);
     if (World::getRechargeActive())
     {
@@ -2571,6 +2594,12 @@ void NewCountryBattleJoinReq( GameMsgHdr& hdr, const void * data )
         brd >> skillId;
         ncb->useSkill(player, skillId);
     }
+    else if(type == 4)
+    {
+        UInt8 kind = 0;
+        brd >> kind;
+        ncb->buySkill(player, kind);
+    }
 }
 
 void OnLanchChallengeReq( GameMsgHdr& hdr, LanchChallengeReq& lcr)
@@ -3460,7 +3489,8 @@ struct ChatRep
 	UInt8 office;
 	UInt8 guard;
 	std::string text;
-	MESSAGE_DEF7(REP::CHAT, UInt8, type, std::string, name, UInt8, cny, UInt8, sex, UInt8, office, UInt8, guard, std::string, text);
+    UInt8 level;
+	MESSAGE_DEF8(REP::CHAT, UInt8, type, std::string, name, UInt8, cny, UInt8, sex, UInt8, office, UInt8, guard, std::string, text, UInt8, level);
 };
 
 static bool inCountry(const Network::TcpConduit * conduit, UInt8 country)
@@ -3544,7 +3574,7 @@ void OnChatReq( GameMsgHdr& hdr, ChatReq& cr )
 	UInt8 office = player->getTitle(), guard = 0;
     guard = player->getPF();
 	st << cr._type << player->getName() << player->getCountry() << static_cast<UInt8>(player->IsMale() ? 0 : 1)
-		<< office << guard << cr._text << Stream::eos;
+        << office << guard << cr._text << player->GetLev() << Stream::eos;
 	switch(cr._type)
 	{
 	case 0xFF:
@@ -3611,6 +3641,7 @@ void OnPrivChatReq( GameMsgHdr& hdr, PrivChatReq& pcr )
 		rep.sex = 0;
 		rep.office = player->getTitle();
 		rep.guard = player->getPF();
+		rep.level = player->GetLev();
 		player->send(rep);
 	}
 	else
@@ -3621,6 +3652,7 @@ void OnPrivChatReq( GameMsgHdr& hdr, PrivChatReq& pcr )
 		rep.sex = player->IsMale() ? 0 : 1;
 		rep.office = player->getTitle();
 		rep.guard = player->getPF();
+		rep.level = player->GetLev();
 		pl->send(rep);
 	}
 }
@@ -5262,7 +5294,7 @@ void OnMDSoul( GameMsgHdr& hdr, UseMDSoul& req )
     if(!player->hasChecked())
          return;
 
-    if (World::getMayDay())
+    if (World::getMayDay() || World::getCompassAct())
     {
         if (req._type == 0)
             player->sendMDSoul(0);

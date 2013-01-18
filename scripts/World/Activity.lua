@@ -127,6 +127,16 @@ function is1221_1227()
     return is_1221_1227
 end
 
+is_0111_0117 = false
+function is0111_0117()
+    return is_0111_0117
+end
+
+is_fashion_shop = false
+function isfashion_shop()
+    return is_fashion_shop
+end
+
 function onActivityCheck(tm)
   local osmax = oldServersMax[serverName]
   if osmax ~= nil and serverNum <= osmax then
@@ -797,18 +807,21 @@ function onActivityCheck(tm)
       if tm >= actTime534 and tm < actTime534_1 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
+      elseif tm >= actTime539 and tm < actTime539_1 then
+          setRechargeActive(true, 16)
+          setNeedRechargeRank(true)
       else
           setRechargeActive(false, 16)
           setNeedRechargeRank(false)
       end
 
-      --if tm >= actTime535 and tm < actTime535_1 then
+      if tm >= actTime535 and tm < actTime535_1 then
           setGoodVoiceAct(true)
           setTgcEvent(true)
-      --else
-      --    setGoodVoiceAct(false)
-      --    setTgcEvent(false)
-      --end
+      else
+          setGoodVoiceAct(false)
+          setTgcEvent(false)
+      end
 
       -- if tm >= actTime536 and tm < actTime536_1 then
           set3366GiftAct(true)
@@ -838,8 +851,44 @@ function onActivityCheck(tm)
 
       if tm >= actTime538 and tm < actTime538_1 then
           setConsumeActive(true)
+      elseif tm >= actTime550 and tm < actTime550_1 then
+          setConsumeActive(true)
       else
           setConsumeActive(false)
+      end
+      if tm >= actTime550 and tm < actTime550_1 then
+          setConsumeAwardAct(true)
+      else
+          setConsumeAwardAct(false)
+      end
+      if tm >= actTime551 and tm < actTime551_1 then
+          setCompassAct(true)
+      else
+          setCompassAct(false)
+      end
+
+      if tm >= actTime232_0 and tm < actTime232_1 then
+          setFeastLoginAct(true)
+      else
+          setFeastLoginAct(false)
+      end
+
+      if tm >= actTime233_0 and tm < actTime233_1 then
+          is_0111_0117 = true
+      else
+          is_0111_0117 = false
+      end
+
+      if tm >= actTime235_0 and tm < actTime235_1 then
+          is_fashion_shop = true
+      else
+          is_fashion_shop = false
+      end
+
+      if tm >= actTime236_0 and tm < actTime236_1 then
+          setDragonKingAct(true)
+      else
+          setDragonKingAct(false)
       end
 
       setShuoShuo(true);
@@ -870,6 +919,12 @@ function onActivityCheck(tm)
       setGoldSnakeAct(true)
   else
       setGoldSnakeAct(false)
+  end
+
+  if tm >= actTime234_0 and tm < actTime234_1 then
+      setHeroIslandAct(true)
+  else
+      setHeroIslandAct(false)
   end
 
   setRC7Day(true)
@@ -913,7 +968,7 @@ function initActTime(y, m, d)
   -- 黄钻特权
   local  SerStartTm20= { ['year'] = 2012, ['month'] = 8, ['day'] = 24, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 游戏大厅特权
-  local  SerStartTm21= { ['year'] = 2012, ['month'] = 9, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm21= { ['year'] = 2013, ['month'] = 1, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   -- 充值返利（5/16-5/27）
   local  SerStartTm22= { ['year'] = 2012, ['month'] = 5, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1001,6 +1056,8 @@ function initActTime(y, m, d)
   local  SerStartTm537= { ['year'] = 2012, ['month'] = 12, ['day'] = 15, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 商城消耗返利
   local  SerStartTm538= { ['year'] = 2013, ['month'] = 1, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm539= { ['year'] = 2013, ['month'] = 1, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm550= { ['year'] = 2013, ['month'] = 1, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   -- 繁体版
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1059,7 +1116,18 @@ function initActTime(y, m, d)
   --金蛇迎新活动
   local  SerStartTm231 = { ['year'] = 2012, ['month'] = 12, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm231_1 = { ['year'] = 2013, ['month'] = 1, ['day'] = 6, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-
+  -- 登录礼包人人有(2013.1.9~2013.1.18)
+  local  SerStartTm232 = { ['year'] = 2013, ['month'] = 1, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 锦云兜商城
+  local  SerStartTm233 = { ['year'] = 2013, ['month'] = 1, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --英雄岛限时“自动战斗”活动
+  local  SerStartTm234 = { ['year'] = 2013, ['month'] = 1, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm234_1 = { ['year'] = 2013, ['month'] = 1, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 时装法宝
+  local  SerStartTm235 = { ['year'] = 2013, ['month'] = 1, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --大闹龙宫活动
+  local  SerStartTm236 = { ['year'] = 2013, ['month'] = 1, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm236_1 = { ['year'] = 2013, ['month'] = 1, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   --300-399越南版用了
   actTime0 = os.time(SerStartTm);
@@ -1132,7 +1200,7 @@ function initActTime(y, m, d)
   actTime44 = os.time(SerStartTm20) + 17 * 86400;
 
   actTime45 = os.time(SerStartTm21);
-  actTime46 = os.time(SerStartTm21) + 61 * 86400;
+  actTime46 = os.time(SerStartTm21) + 7 * 86400;
 
   actTime47 = os.time(SerStartTm22);
   actTime48 = os.time(SerStartTm22) + 12 * 86400;
@@ -1316,7 +1384,7 @@ function initActTime(y, m, d)
   actTime533_1 = os.time(SerStartTm533) + 5 * 86400;
 
   actTime534 = os.time(SerStartTm534);
-  actTime534_1 = os.time(SerStartTm534) + 32 * 86400;
+  actTime534_1 = os.time(SerStartTm534) + 42 * 86400;
 
   actTime535 = os.time(SerStartTm535);
   actTime535_1 = os.time(SerStartTm535) + 4 * 86400;
@@ -1330,6 +1398,14 @@ function initActTime(y, m, d)
   actTime538 = os.time(SerStartTm538);
   actTime538_1 = os.time(SerStartTm538) + 7 * 86400;
 
+  actTime539 = os.time(SerStartTm539);
+  actTime539_1 = os.time(SerStartTm539) + 11 * 86400;
+
+  actTime550 = os.time(SerStartTm550);
+  actTime550_1 = os.time(SerStartTm550) + 7 * 86400;
+
+  actTime551 = os.time(SerStartTm550);
+  actTime551_1 = os.time(SerStartTm550) + 3 * 86400;
   -- 繁体版
   actTime101 = os.time(SerStartTm101);
   actTime102 = os.time(SerStartTm101) + 8 * 86400;
@@ -1405,6 +1481,21 @@ function initActTime(y, m, d)
 
   actTime231_0= os.time(SerStartTm231);
   actTime231_1= os.time(SerStartTm231_1);
+
+  actTime232_0= os.time(SerStartTm232);
+  actTime232_1= os.time(SerStartTm232) + 10 * 86400;
+
+  actTime233_0= os.time(SerStartTm233);
+  actTime233_1= os.time(SerStartTm233) + 7 * 86400;
+
+  actTime234_0= os.time(SerStartTm234);
+  actTime234_1= os.time(SerStartTm234_1);
+
+  actTime235_0= os.time(SerStartTm235);
+  actTime235_1= os.time(SerStartTm235) + 11 * 86400;
+
+  actTime236_0= os.time(SerStartTm236);
+  actTime236_1= os.time(SerStartTm236_1);
 
   onActivityCheck(os.time() + 30);
 

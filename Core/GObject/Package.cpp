@@ -2113,13 +2113,14 @@ namespace GObject
         if(stfs.size()  == 0 )
             return 0;
 
-        ItemBase * item = FindItem(stfs[0].m_to, true);
+        UInt32 itemId = stfs[0].m_to;
+        ItemBase * item = FindItem(itemId, true);
         if( !item )
-            item = FindItem(stfs[0].m_to, false);
+            item = FindItem(itemId, false);
         if( !item ){
-            const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[stfs[0].m_to];
+            const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[itemId];
             if(itemType == NULL) return 0;
-            item = new(std::nothrow) ItemBase(stfs[0].m_to, itemType);
+            item = new(std::nothrow) ItemBase(itemId, itemType);
             if(item == NULL) return 0;
         }
         if( IsEquip(item->getClass()) ){ //合成的是法宝，叠加数为1
@@ -2171,11 +2172,12 @@ namespace GObject
                     b = false;
                 }
             }
-            Add( stfs[0].m_to, 1, b, false, FromFCMerge);
+            Add(itemId, 1, b, true, FromFCMerge);
 	    }
         Stream st(REP::PACK_USE);  //合成成功，供客户端更新数据
 		st << id << static_cast<UInt8>(4) << static_cast<UInt8>(1) << Stream::eos;
 		m_Owner->send(st);
+        ItemNotify(itemId, Mnum);
         return 1;
     }
 
@@ -4477,8 +4479,8 @@ namespace GObject
         else if (toEquip->GetCareer() != 4)
             return 11;
 
-        if (m_Owner->GetVar(VAR_EQUIP_MOVE_COUNT) >= 8)
-            return 9;
+//        if (m_Owner->GetVar(VAR_EQUIP_MOVE_COUNT) >= 8)
+//            return 9;
         res = isCanMove(fromEquip, toEquip, type);
         if (res > 0)
             return res;

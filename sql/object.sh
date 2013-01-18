@@ -112,9 +112,8 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20121228_1.sql # must be once for delete var total
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearconsume.sql # must be once for delete total consume
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/cleartotalrecharge.sql # must be once for delete recharge total
-
-    #fix bug
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearid50.sql # must be once 指定玩家非绑定的九龙神火改成绑定的
+<<<<<<< HEAD
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearid49.sql # must be once 指定玩家非绑定的九龙神火改成绑定的
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearid514.sql # must be once 指定玩家非绑定的九龙神火改成绑定的
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearid133.sql # must be once 指定玩家非绑定的九龙神火改成绑定的
@@ -141,6 +140,9 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearid5141.sql # must be once 指定玩家非绑定的九龙神火改成绑定的
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130115_1.sql
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130118_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearid295.sql # must be once 登录礼包人人有
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar_20130118.sql
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar199.sql        #清除强化装备的8次限制
 
     #. clearshiyamen.sh
 }
