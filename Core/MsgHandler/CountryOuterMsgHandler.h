@@ -5792,6 +5792,27 @@ void OnEquipLingbaoReq( GameMsgHdr & hdr, const void * data )
     }
 }
 
+void OnDreamer( GameMsgHdr & hdr, const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+
+    Dreamer * dreamer = player->getDreamer();
+    if (!dreamer)
+        return;
+
+    UInt8 type = 0;
+    br >> type;
+    UInt8 val  = 0xFF;
+    UInt8 val2 = 0xFF;
+    if (br.left())
+        br >> val;
+    if (br.left())
+        br >> val2;
+    dreamer->OnCommand(type, val, val2);
+}
+
+
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

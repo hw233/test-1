@@ -413,6 +413,12 @@ namespace GObject
             fprintf(stderr, "loadCopyFrontWin error!\n");
             std::abort();
         }
+        if(!loadDreamer())
+        {
+            fprintf(stderr, "loadDreamer error!\n");
+            std::abort();
+        }
+       
 
 		DB::gDataDBConnectionMgr->UnInit();
 	}
@@ -3632,49 +3638,48 @@ namespace GObject
 
                      lua_tinker::table t1 = table_tmp.get<lua_tinker::table>(j + 1);
                      UInt32  tSize = t1.size();
-                       // for (UInt32 i = 0 ; i < t; i++)
-                        for (UInt32 i = 0 ; i< tSize; i++ )
-                        {
-                            if(i == tSize - 1)
-                            {
-                               s.m_to = t1.get<UInt32>(i + 1);
-                            }
-                            else
-                            {
+                     for (UInt32 i = 0 ; i< tSize; i++ )
+                     {
+                         if(i == tSize - 1)
+                         {
+                             s.m_to = t1.get<UInt32>(i + 1);
+                         }
+                         else
+                         {
 
-                                lua_tinker::table c = t1.get<lua_tinker::table>(i + 1);
-                                UInt32  cSize = c.size();
-                                if(cSize == 2)
-                                {
-                                    stMergeS  ms;
-                                    ms.id = c.get<UInt32>(1);
-                                    std::vector<UInt32>& v = _mMergeStfsIndex[ms.id];
-                                    v.push_back(j);
+                             lua_tinker::table c = t1.get<lua_tinker::table>(i + 1);
+                             UInt32  cSize = c.size();
+                             if(cSize == 2)
+                             {
+                                 stMergeS  ms;
+                                 ms.id = c.get<UInt32>(1);
+                                 std::vector<UInt32>& v = _mMergeStfsIndex[ms.id];
+                                 v.push_back(j);
 
-                                    ms.num = c.get<UInt32>(2);
-                                    s.m_stfs.push_back(ms);
-                                }
-                                if(cSize == 3)
-                                {
-                                    UInt32  id1 = c.get<UInt32>(1);
-                                    UInt32  id2 = c.get<UInt32>(2);
-                                    UInt32  num = c.get<UInt32>(3);
-                                    if(id1 < id2)
-                                    {
-                                        for(;id1<= id2; id1++)
-                                        {
-                                            stMergeS ms;
-                                            std::vector<UInt32>& v = _mMergeStfsIndex[id1];
-                                            v.push_back(j);
-                                            ms.id = id1;
-                                            ms.num = num;
-                                            s.m_stfs.push_back(ms);
-                                        }
-                                    }
-                                }
-                            }
+                                 ms.num = c.get<UInt32>(2);
+                                 s.m_stfs.push_back(ms);
+                             }
+                             if(cSize == 3)
+                             {
+                                 UInt32  id1 = c.get<UInt32>(1);
+                                 UInt32  id2 = c.get<UInt32>(2);
+                                 UInt32  num = c.get<UInt32>(3);
+                                 if(id1 < id2)
+                                 {
+                                     for(;id1<= id2; id1++)
+                                     {
+                                         stMergeS ms;
+                                         std::vector<UInt32>& v = _mMergeStfsIndex[id1];
+                                         v.push_back(j);
+                                         ms.id = id1;
+                                         ms.num = num;
+                                         s.m_stfs.push_back(ms);
+                                     }
+                                 }
+                             }
+                         }
 
-                        }
+                     }
                       _vMergeStfs.push_back(s);
                  }
             }
@@ -5548,5 +5553,28 @@ namespace GObject
         return true;
     }
 
+    bool GObjectManager::loadDreamer()
+    {
+        // TODO: 读取水晶梦境有关数据
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading dreamer");
+        DBDreamer dbd;
+        if(execu->Prepare("SELECT `playerId`, `progress`, `level`, `maxX`, `maxY`, `maxGrid`, `mapInfo`, `posX`, `posY`, `earlyPosX`, `earlyPosY`, `timeConsume`, `remainTime`, `keys`, `eyes`, `eyeTime`, `eyeX`, `eyeY` FROM `dreamer` ORDER BY `playerId`", dbd) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+        Player * player = NULL;
+		while(execu->Next() == DB::DB_OK)
+        {
+            player = globalPlayers[dbd.playerId];
+            if (player)
+            {
+                player->setDreamer(dbd.progress, dbd.level, dbd.maxX, dbd.maxY, dbd.maxGrid, dbd.mapInfo, dbd.posX, dbd.posY, dbd.earlyPosX, dbd.earlyPosY, dbd.timeConsume, dbd.remainTime, dbd.keysCount, dbd.eyesCount, dbd.eyeTime, dbd.eyeX, dbd.eyeY);
+            }
+			lc.advance();
+        }
+        lc.finalize();
+        return true;
+    }
 }
 

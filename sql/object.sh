@@ -141,8 +141,9 @@ function update_object()
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130115_1.sql
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130118_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearid295.sql # must be once 登录礼包人人有
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar_20130118.sql
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar199.sql        #清除强化装备的8次限制
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar_20130118.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar199.sql        #清除强化装备的8次限制
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130114_1.sql
 
     #. clearshiyamen.sh
 }

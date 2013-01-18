@@ -31,6 +31,7 @@
 #include "SoulExpTable.h"
 #include "SoulSkillTable.h"
 #include "SkillStrengthen.h"
+#include "DreamerTable.h"
 
 namespace GData
 {
@@ -278,6 +279,12 @@ namespace GData
         if (!LoadClanStatue())
         {
             fprintf (stderr, "Load Clan Statue Error !\n");
+            std::abort();
+        }
+        
+        if (!LoadDreamer())
+        {
+            fprintf (stderr, "Load Dreamer Table Error !\n");
             std::abort();
         }
 
@@ -1815,6 +1822,33 @@ namespace GData
 
 		return true;
 	}
+
+    bool GDataManager::LoadDreamer()
+    {
+        // 读取水晶梦境配置
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBDreamer dbd;
+		if(execu->Prepare("SELECT `level`, `floor`, `maxX`, `maxY`, `gridCount`, `timeConsume`, `typeCount` FROM `dreamer_template` ORDER BY `level`,`floor`", dbd) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            DreamerLevelData dreamerLevelData(dbd.maxX, dbd.maxY, dbd.gridCount, dbd.timeConsume, dbd.typeCount);
+			if (dbd.level >= dreamerDataTable.size())
+			{
+				dreamerDataTable.resize(dbd.level + 1);
+			}
+            if (dbd.floor >= dreamerDataTable[dbd.level].size())
+            {
+                dreamerDataTable[dbd.level].resize(dbd.floor + 1);
+                dreamerDataTable[dbd.level].resize(dbd.floor + 1);
+            }
+            dreamerDataTable[dbd.level][dbd.floor] = dreamerLevelData;
+        }
+        return true;
+    }
 
 	bool GDataManager::LoadMoney()
 	{

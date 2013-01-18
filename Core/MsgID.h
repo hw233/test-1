@@ -41,6 +41,8 @@ namespace REQ
     const UInt8 JOBHUNTER           = 0x1E;
     /** 自动寻墨游戏 */
     const UInt8 AUTOJOBHUNTER       = 0X2A;
+    /** 水晶梦境协议 */
+    const UInt8 DREAMER             = 0x29;
     /**成就 */
     const UInt8 ACHIEVEMENT         = 0xF0;// 0x0C
     /**阵营选择 */
@@ -597,6 +599,8 @@ namespace REP
     const UInt8 JOBHUNTER           = 0x1E;
     /** 自动寻墨游戏 */
     const UInt8 AUTOJOBHUNTER       = 0X2A;
+    /** 水晶梦境协议 */
+    const UInt8 DREAMER             = 0x29;
 
     const UInt8 TRADE_LIST          = 0x80;// 0xC0
     const UInt8 TRADE_DATA          = 0x81;// 0xC1
