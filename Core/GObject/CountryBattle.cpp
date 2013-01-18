@@ -987,23 +987,17 @@ void GlobalCountryBattle::end( )
 
 bool GlobalCountryBattle::process(UInt32 curtime)
 {
-    if (WORLD().isNewCountryBattle())
+    if (WORLD().isNewCountryBattle() && !_NewcountryBattle)
     {
-        if (!_NewcountryBattle)
-        {
-            fprintf(stderr, "NewCountryBattle Init Error !\n");
-            Thread::sleep(1000);
-            return false;
-        }
+        ERROR_LOG("NewCountryBattle Init Error !");
+        Thread::sleep(1000);
+        return false;
     }
-    else
+    if (!WORLD().isNewCountryBattle() && !_countryBattle)
     {
-        if (!_countryBattle)
-        {
-            fprintf(stderr, "CountryBattle Init Error !\n");
-            Thread::sleep(1000);
-            return false;
-        }
+        ERROR_LOG("CountryBattle Init Error !");
+        Thread::sleep(1000);
+        return false;
     }
 
 	if(_prepareTime == 0)
