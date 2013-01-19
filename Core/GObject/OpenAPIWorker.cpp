@@ -79,20 +79,31 @@ namespace GObject
 #ifndef MAX_RET_LEN
 #define MAX_RET_LEN 1024
 #endif
-            const static char host[] = "http://openapi.tencentyun.com";
             ++ i;
+            GObject::Player * pl = GObject::globalPlayers[it->playerId];
+            if (!pl)
+            {
+                delete[] it->openId;
+                delete[] it->openKey;
+                delete[] it->pf;
+                continue;
+            }
+
+            const static char host[] = "http://openapi.tencentyun.com";
             char buffer[MAX_RET_LEN] = {0};
-            char url[MAX_RET_LEN] = "/v3/csec/punish_query";
+            char url[MAX_RET_LEN] = "";
+
+            if (it->type == 1002)
+                strncpy(url, "/v3/csec/punish_query", 22);
+            else if (it->type == 0)
+                strncpy(url, "/v3/user/is_login", 18);
+
             char res[MAX_RET_LEN] = "";
 
             if (!CheckOpenId(it->playerId, it->openId))
             {
-                GObject::Player * pl = GObject::globalPlayers[it->playerId];
-                if (NULL != pl)
-                {
-                    GameMsgHdr imh(0x332, pl->getThreadId(), pl, strlen(it->openId) + 1);
-                    GLOBAL().PushMsg(imh, it->openId);
-                }
+                GameMsgHdr imh(0x332, pl->getThreadId(), pl, strlen(it->openId) + 1);
+                GLOBAL().PushMsg(imh, it->openId);
             }
 
 
@@ -108,39 +119,58 @@ namespace GObject
 
 
             CURLcode curlRes = curl_easy_perform(curl);
+            Int32 ret = 0;
             if (CURLE_OK == curlRes)
             {
                 bool needForbid = false;
-                Int32 ret = ResultParse(buffer, &needForbid);
-                TRACE_LOG("[%u]%u:%u[%s] -> %d, result = %d", m_Worker, i, size, res, curlRes == CURLE_OK, ret);
+                char msg[MAX_RET_LEN] = "";
+                if (it->type == 1002)
+                    ret = PunishResultParse(buffer, &needForbid, msg);
+                else if (it->type == 0)
+                    ret = IsLoginResultParse(buffer, msg);
+
                 if (ret == 0)
                 {
-                    // 需要封杀交易功能
-                    if(needForbid)
+                    if (it->type == 1002)
                     {
-                        GObject::Player * pl = GObject::globalPlayers[it->playerId];
-                        if (NULL != pl)
+                        // 交易punish查询结果返回
+                        if(needForbid)
                         {
+                            // 需要封杀交易功能
                             GameMsgHdr imh(0x330, pl->getThreadId(), pl, 0);
                             GLOBAL().PushMsg(imh, NULL);
                         }
+                        else
+                        {
+                            // 不需要，简单记录一下
+                            GameMsgHdr imh(0x331, pl->getThreadId(), pl, sizeof(ret));
+                            GLOBAL().PushMsg(imh, &ret);
+                        }
+                    }
+                    else if(it->type == 0)
+                    {
+                        // is_login续期openkey正确,nothing to do.
                     }
                 }
                 else
                 {
-                    GObject::Player * pl = GObject::globalPlayers[it->playerId];
-                    if (NULL != pl)
+#define MAX_MSG_LEN 1024
+                    struct OpenAPIFailedInfo
                     {
-                        GameMsgHdr imh(0x331, pl->getThreadId(), pl, sizeof(ret));
-                        GLOBAL().PushMsg(imh, &ret);
-                    }
+                        UInt32 type;
+                        Int32  ret;
+                        char   msg[MAX_MSG_LEN];
+                    };
+                    OpenAPIFailedInfo faildInfo;
+                    faildInfo.type = it->type;
+                    faildInfo.ret  = ret;
+                    strncpy (faildInfo.msg, msg, strlen(msg));
+                    faildInfo.msg[MAX_MSG_LEN - 1] = '\0';
+                    GameMsgHdr imh(0x333, pl->getThreadId(), pl, sizeof(faildInfo));
+                    GLOBAL().PushMsg(imh, &faildInfo);
                 }
             }
-            else
-            {
-                TRACE_LOG("[%u]%u:%u[%s] -> %d", m_Worker, i, size, res, curlRes == CURLE_OK);
-                continue;
-            }
+            TRACE_LOG("[%u]%u:%u[%s] -> %s, result=%d.", m_Worker, i, size, res, curlRes == CURLE_OK?"OK":"FAIL", ret);
             delete[] it->openId;
             delete[] it->openKey;
             delete[] it->pf;
@@ -227,7 +257,6 @@ namespace GObject
 
     void OpenAPIWorker::SetUrlString(char* url, UInt64 playerId, UInt16 type, const char * openId, const char * openKey, const char * pf, const char * userIp)
     {
-
         std::ostringstream strGet;
         strGet << "GET&";
         strGet << UrlEncode(url);
@@ -243,8 +272,11 @@ namespace GObject
         sigKey << openKey;
         sigKey << "&pf=";
         sigKey << pf;
-        sigKey << "&type=";
-        sigKey << (UInt32) type;
+        if (type)
+        {
+            sigKey << "&type=";
+            sigKey << (UInt32) type;
+        }
         sigKey << "&userip=";
         sigKey << userIp;
         std::string sigValue;
@@ -261,11 +293,111 @@ namespace GObject
         sigKey << sigValue;
         strcat (url, "?");
         strncat(url, sigKey.str().c_str(), sigKey.str().size() + 1);
+    }
 
+    Int32 OpenAPIWorker::PunishResultParse(char* result, bool* needForbid, char* msg)
+    {
+        // 解析json的结果 (封交易)
+        #define JSON_ERR_CUSTOM -9527
+        #define JSON_ERR_CUSTOM2 -9528
+        #define JSON_ERR_CUSTOM3 -9529
+        #define JSON_ERR_CUSTOM4 -9530
+
+        json_t* obj = NULL;
+
+
+        enum json_error jerr;
+        if ((jerr = json_parse_document(&obj, result)) != JSON_OK)
+            return JSON_ERR_CUSTOM;
+
+        json_t* hdr = json_find_first_label(obj, "ret");
+        if (!hdr && !hdr->child && !hdr->text)
+            return JSON_ERR_CUSTOM2;
+
+        Int32 ret = atoi(hdr->child->text);
+        if (ret)
+        {
+
+            hdr =  json_find_first_label(obj, "msg");
+            if (!hdr && !hdr->child && !hdr->text)
+                return JSON_ERR_CUSTOM3;
+            UInt32 len = strlen(hdr->child->text);
+            strncpy (msg, hdr->child->text, len);
+            msg[len] = '\0';
+            return ret;
+        }
+
+        hdr =  json_find_first_label(obj, "punish");
+        if (!hdr && !hdr->child && !hdr->text)
+            return JSON_ERR_CUSTOM4;
+        ret = atoi(hdr->child->text);
+        *needForbid = ret==1? true:false;
+        return 0;
+        #undef JSON_ERR_CUSTOM
+        #undef JSON_ERR_CUSTOM2
+        #undef JSON_ERR_CUSTOM3
+        #undef JSON_ERR_CUSTOM4
+    }
+
+    Int32 OpenAPIWorker::IsLoginResultParse(char * result, char* msg)
+    {
+        // 解析json的结果 (openkey续期)
+        #define JSON_ERR_CUSTOM -9527
+        #define JSON_ERR_CUSTOM2 -9528
+        #define JSON_ERR_CUSTOM3 -9529
+        #define JSON_ERR_CUSTOM4 -9530
+
+        json_t* obj = NULL;
+
+
+        enum json_error jerr;
+        if ((jerr = json_parse_document(&obj, result)) != JSON_OK)
+            return JSON_ERR_CUSTOM;
+
+        json_t* hdr = json_find_first_label(obj, "ret");
+        if (!hdr && !hdr->child && !hdr->text)
+            return JSON_ERR_CUSTOM2;
+
+        Int32 ret = atoi(hdr->child->text);
+        if (ret)
+            return ret;
+
+        hdr =  json_find_first_label(obj, "msg");
+        if (!hdr && !hdr->child && !hdr->text)
+            return JSON_ERR_CUSTOM3;
+        ret = atoi(hdr->child->text);
+        UInt32 len = strlen(hdr->child->text);
+        strncpy (msg, hdr->child->text, len + 1);
+        msg[len] = '\0';
+        return 0;
+        #undef JSON_ERR_CUSTOM
+        #undef JSON_ERR_CUSTOM2
+        #undef JSON_ERR_CUSTOM3
+        #undef JSON_ERR_CUSTOM4
+    }
+
+    bool OpenAPIWorker::CheckOpenId(UInt64 playerId, char * openId)
+    {
+        // Memcached 校验playerID和openID
+        char buf[128];
+        snprintf(buf, 128, "oid_%"I64_FMT"u", playerId);
+        char openId2[256]={};
+        m_MCached.get(buf, strlen(buf), openId2, 255);
+        openId2[255] = '\0';
+        if (strncmp(openId, openId2, strlen(openId)) == 0)
+        {
+            return true;
+        }
+        else
+        {
+            strcpy(openId, openId2);
+            return false;
+        }
     }
 
     std::string OpenAPIWorker::UrlEncode(const char *in_str)
     {
+        // URL 编码
         int in_str_len = strlen(in_str);
         int out_str_len = 0;
         std::string out_str;
@@ -313,6 +445,7 @@ namespace GObject
 
     std::string OpenAPIWorker::Base64Encode(unsigned char const * byte_to_encode, unsigned int in_len)
     {
+        // Base64编码
         static const char base64_chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
         int i = 0;
         int j = 0;
@@ -359,59 +492,5 @@ namespace GObject
         //std::cout << ret << std::endl; // XXX: 为什么GDB在这里我无法输出ret的数据
         return ret;
     }
-
-    Int32 OpenAPIWorker::ResultParse(char* result, bool* needForbid)
-    {
-        // 解析json的结果
-#define JSON_ERR_CUSTOM -9527
-#define JSON_ERR_CUSTOM2 -9528
-#define JSON_ERR_CUSTOM3 -9529
-#define JSON_ERR_CUSTOM4 -9530
-
-        json_t* obj = NULL;
-
-
-        enum json_error jerr;
-        if ((jerr = json_parse_document(&obj, result)) != JSON_OK)
-            return JSON_ERR_CUSTOM;
-
-        json_t* hdr = json_find_first_label(obj, "ret");
-        if (!hdr && !hdr->child && !hdr->text)
-            return JSON_ERR_CUSTOM2;
-
-        Int32 ret = atoi(hdr->child->text);
-        if (ret)
-            return ret;
-
-        hdr =  json_find_first_label(obj, "punish");
-        if (!hdr && !hdr->child && !hdr->text)
-            return JSON_ERR_CUSTOM3;
-        ret = atoi(hdr->child->text);
-        *needForbid = ret==1? true:false;
-        return 0;
-#undef JSON_ERR_CUSTOM
-#undef JSON_ERR_CUSTOM2
-#undef JSON_ERR_CUSTOM3
-#undef JSON_ERR_CUSTOM4
-    }
-
-    bool OpenAPIWorker::CheckOpenId(UInt64 playerId, char * openId)
-    {
-        char buf[128];
-        snprintf(buf, 128, "oid_%"I64_FMT"u", playerId);
-        char openId2[256]={};
-        m_MCached.get(buf, strlen(buf), openId2, 255);
-        openId2[255] = '\0';
-        if (strncmp(openId, openId2, strlen(openId)) == 0)
-        {
-            return true;
-        }
-        else
-        {
-            strcpy(openId, openId2);
-            return false;
-        }
-    }
-
 }
 

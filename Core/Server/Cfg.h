@@ -99,6 +99,7 @@ public:
     bool dclog;
     bool secdclog;
     bool secdclogTest;
+    bool autoForbid;
 
 public:
 	inline void setTcpPort(UInt16 p) {tcpPort = p;}
@@ -143,6 +144,8 @@ public:
     inline void setDCLog(bool v) { dclog = v; }
     inline void setSecDCLog(bool v) { secdclog = v; }
     inline void setSecDCLogTest(bool v) { secdclogTest = v; }
+
+    inline void setAutoForbid(bool v) { autoForbid = v; }
 
 
 	inline void setVerifyTokenServer(const char* server, UInt16 port)

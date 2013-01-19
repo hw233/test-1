@@ -50,6 +50,7 @@
 #ifndef _VT
 #ifndef _WIN32
 #include "DCLogger.h"
+#include "OpenAPIWorker.h"
 #endif
 #endif
 #endif
@@ -76,6 +77,7 @@
 #include "RechargeTmpl.h"
 #include "GData/ExpTable.h"
 #include "Version.h"
+
 
 #define NTD_ONLINE_TIME (4*60*60)
 #ifndef _DEBUG
@@ -538,6 +540,28 @@ namespace GObject
     }
 
     bool EventAutoJobHunter::Accelerate(UInt32 times)
+    {
+		UInt32 count = m_Timer.GetLeftTimes();
+		if(times > count)
+		{
+			times = count;
+		}
+		count -= times;
+		m_Timer.SetLeftTimes(count);
+		return count == 0;
+    }
+
+    bool EventAutoRefreshOpenKey::Equal(UInt32 id, size_t playerid) const
+    {
+        return playerid == m_Player->getId();
+    }
+
+    void EventAutoRefreshOpenKey::Process(UInt32 leftCount)
+    {
+        OPENAPI().Push(m_Player->getId(), 0, m_Player->getOpenId(), m_Player->getOpenKey(), m_Player->getSource().c_str(), m_Player->getClientIp());
+    }
+
+    bool EventAutoRefreshOpenKey::Accelerate(UInt32 times)
     {
 		UInt32 count = m_Timer.GetLeftTimes();
 		if(times > count)
@@ -1157,6 +1181,14 @@ namespace GObject
 #ifndef _VT
         dclogger.login(this);
         dclogger.login_sec(this);
+
+        EventAutoRefreshOpenKey* event = new(std::nothrow) EventAutoRefreshOpenKey(this, 60 * 110, 24);
+        if (event)
+            PushTimerEvent(event);
+            
+
+        OPENAPI().Push(getId(), 0, getOpenId(), getOpenKey(), getSource().c_str(), getClientIp());
+        
 #endif
 #endif
 #endif // _WIN32
@@ -2075,6 +2107,9 @@ namespace GObject
             LoginMsgHdr hdr1(0x301, WORKER_THREAD_LOGIN, 0, this->GetSessionID(), sizeof(crackValue));
             GLOBAL().PushMsg(hdr1, &crackValue);
         }
+        GObject::EventBase * ev = GObject::eventWrapper.RemoveTimerEvent(this, EVENT_REFRESHOPENKEY, getId());
+        if (ev)
+            ev->release();
 	}
 
 	void Player::checkLastBattled()
@@ -13087,7 +13122,7 @@ namespace GObject
 
         UInt8 type = 0;
         UInt32 subsoul = 0;
-/*        if (soul >= 100)
+        /*if (soul >= 100)
         {
             type = 1;
             subsoul = 100;
@@ -13098,7 +13133,7 @@ namespace GObject
             subsoul = 20;
         }
         else if (soul >= 10)
-*/
+        */
         {
             type = 3;
             subsoul = 10;
@@ -13127,7 +13162,7 @@ namespace GObject
 
         UInt8 type = 0;
         UInt32 subsoul = 0;
-/*        if (soul >= 100)
+        /*if (soul >= 100)
         {
             type = 1;
             subsoul = 100;
@@ -13138,7 +13173,7 @@ namespace GObject
             subsoul = 20;
         }
         else if (soul >= 10)
-  */
+        */
         {
             type = 3;
             subsoul = 10;
@@ -14753,9 +14788,9 @@ void EventTlzAuto::notify(bool isBeginAuto)
             m_snow.score += score;
             AddPExp(99*num);
 
-//            sendSnowScoreAward();
-//            if (m_snow.bind && m_snow.lover != NULL)
-//                m_snow.lover->sendSnowScoreAward();
+            //sendSnowScoreAward();
+            //if (m_snow.bind && m_snow.lover != NULL)
+            //    m_snow.lover->sendSnowScoreAward();
             if (oldScore < 300 && m_snow.score >= 300)
             {
                 SYSMSG(title, 4112);
@@ -14777,6 +14812,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
         }
         return 1;
     }
+
     void Player::sendSnowScoreAward()
     {
         static  MailPackage::MailItem s_item[][3] = {
@@ -14790,8 +14826,8 @@ void EventTlzAuto::notify(bool isBeginAuto)
         static int s_itemCount[]= {1,2,2,2,3,3};
         static UInt32 s_score[] = {300, 900, 1800, 3000, 5100, 9900};
         UInt32 score = m_snow.score;
-  //      if (NULL != m_snow.lover && m_snow.bind)
-  //          score += m_snow.lover->getSnowScore();
+        //if (NULL != m_snow.lover && m_snow.bind)
+        //score += m_snow.lover->getSnowScore();
         UInt32 v =  GetVar(VAR_SNOW_AWARD) >> 8; //邮件是否已发的标志
         for (UInt8 i = 0; i < sizeof(s_score)/sizeof(s_score[0]); ++i)
         {

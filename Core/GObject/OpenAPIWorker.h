@@ -36,7 +36,8 @@ namespace GObject
 
             std::string UrlEncode(const char *in_str);
             std::string Base64Encode(unsigned char const * byte_to_encode, unsigned int in_len);
-            Int32 ResultParse(char* result, bool* needForbid);
+            Int32 PunishResultParse(char* result, bool* needForbid, char * msg);
+            Int32 IsLoginResultParse(char* result, char* msg);
             bool CheckOpenId(UInt64 playerId, char * openId);
 
             struct UrlParam
