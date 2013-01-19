@@ -4887,7 +4887,7 @@ function sendRechargeRankAward(player, pos)
     local s = os.time(t)
     local n = os.time()
 
-    if n >= s and n < (s + 86400 + 10*60) then
+    if n >= (s + 10 * 60) and n < (s + 86400 + 10*60) then
         sendRechargeRankAward_2013_01_19(player, pos)
     elseif n >= (s + 86400 + 10*60) and n < (s + 2*86400 + 10*60) then
         sendRechargeRankAward_2013_01_20(player, pos)
