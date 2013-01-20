@@ -1087,7 +1087,7 @@ function initActTime(y, m, d)
   -- 锦云兜商城
   local  SerStartTm233 = { ['year'] = 2013, ['month'] = 1, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --英雄岛限时“自动战斗”活动
-  local  SerStartTm234 = { ['year'] = 2013, ['month'] = 1, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm234 = { ['year'] = 2013, ['month'] = 1, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm234_1 = { ['year'] = 2013, ['month'] = 1, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
 
