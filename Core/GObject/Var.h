@@ -336,8 +336,7 @@ namespace GObject
 
         // 361-370 占用 for suntao
         VAR_DRAGONKING_STEP = 361,      //大闹龙宫当前移动到的格子
-        VAR_DRAGONKING_STEP4_COUNT = 362, //大闹龙宫移动到第4格子的次数
-        VAR_DRAGONKING_STEP5_COUNT = 363, //大闹龙宫移动到第5格子的次数
+        VAR_DRAGONKING_STEP4_COUNT = 362, //大闹龙宫从第4格移动到第5失败的次数
         //越南版380-399
         VAR_MAX,
     };
@@ -634,11 +633,10 @@ namespace GObject
 
             REGISTER_VAR(VAR_HAS_MO_BATTLER, CYCLE_NONE);
             REGISTER_VAR(VAR_ITEM_9316_FAILED_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_CONSUME_AWARD_COUNT, CYCLE_NONE);
 
             REGISTER_VAR(VAR_DRAGONKING_STEP, CYCLE_NONE);
             REGISTER_VAR(VAR_DRAGONKING_STEP4_COUNT, CYCLE_NONE);
-            REGISTER_VAR(VAR_DRAGONKING_STEP5_COUNT, CYCLE_NONE);
-            REGISTER_VAR(VAR_CONSUME_AWARD_COUNT, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

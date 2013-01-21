@@ -1498,6 +1498,17 @@ namespace Script
     {
         return Call<lua_tinker::table>("getDreamerTreasure", id, index);
     }
- 
+
+    Table GameActionLua::getDragonKingAward(UInt8 step)
+	{
+		return Call<Table>("getDragonKingAward", step);
+	}
+
+    bool GameActionLua::checkDragonKingCanSucceed(Player * player, UInt8 step)
+	{
+		assert(player != NULL);
+		return Call<bool>("checkDragonKingCanSucceed", player, step);
+	}
+
 }
 

@@ -2062,6 +2062,9 @@ namespace GObject
         void sendCopyFrontAllAward();
         UInt8 getCopyId();
         UInt8 getFrontmapId();
+
+        void getDragonKingInfo();
+        void postDragonKing(UInt8 count);
     private:
         UInt8 cf_posPut[5];//范围1-5
         UInt32 cf_itemId[5];

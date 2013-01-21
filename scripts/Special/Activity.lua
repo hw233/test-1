@@ -5880,3 +5880,70 @@ function getCopyFrontmapAward(step, localtion)
     end
 end
 
+function checkDragonKingCanSucceed(player, step)
+    if nil == player then
+        return false
+    end
+    if nil == step or step < 1 or step > 5 then
+        return false
+    end
+    local chances = {
+        [1] = 8000,
+        [2] = 5000,
+        [3] = 5000,
+        [4] = {500, 1000, 1500, 2500, 3000, 6500},
+        [5] = 10000,
+    }
+    local rand = math.random(1, 10000)
+    if step ~= 4 then
+        if rand <= chances[step] then
+            return true
+        end
+    else
+        local fail = player:GetVar(362) + 1
+        if fail > 6 then
+            fail = 6
+        end
+        if rand <= chances[step][fail] then
+            player:SetVar(362, 0)
+            return true
+        else
+            player:SetVar(362, fail)
+        end
+    end
+    return false
+end
+
+function getDragonKingAward(step)
+    local items = {
+        [1] = {{16, 1}, {29, 2}, {1328, 5}, {51, 1}, {48, 1}, {35, 2}, {548, 1}, {30, 1}},
+        [2] = {{15, 1}, {9283, 1}, {500, 1}, {57, 1}, {1412, 5}, {56, 1}, {135, 1}, {30, 1}},
+        [3] = {{33, 1}, {516, 1}, {501, 1}, {506, 1}, {508, 1}, {512, 1}, {513, 1}, {514, 1}, {517, 1}, {1411, 1}},
+        [4] = {{1325, 1}, {134, 1}, {551, 1}, {8000, 1}, {47, 1}, {515, 1}, {549, 1}, {50, 1}},
+        [5] = {{6134,1}},
+    }
+    local chances = {
+        [1] = {1400, 2800, 4200, 5600, 7000, 8400, 9800, 10000},
+        [2] = {1400, 2800, 4200, 5600, 7000, 8400, 9800, 10000},
+        [3] = {1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000},
+        [4] = {1250, 2500, 3750, 5000, 6250, 7500, 8750, 10000},
+        [5] = {10000},
+    }
+    if nil == step then
+        return {}
+    end
+    if step < 1 or step > 5 then
+        step = 1
+    end
+    if #items[step] ~= #chances[step] then
+        return {}
+    end
+    local r = math.random(1, 10000)
+    for i = 1, #chances[step] do
+        if r <= chances[step][i] then
+            return items[step][i]
+        end
+    end
+    return {}
+end
+

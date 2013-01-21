@@ -1824,6 +1824,13 @@ void OnAddMapObj( GameMsgHdr& hdr, const void * data)
     map->Show(mo->m_ID, true, mo->m_Type);
 }
 
+void OnPostDragonKing( GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+	const UInt8 count = *reinterpret_cast<const UInt8*>(data);
+    player->postDragonKing(count);
+}
+
 
 #endif // _COUNTRYINNERMSGHANDLER_H_
 

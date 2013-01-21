@@ -4379,12 +4379,12 @@ function ItemNormal_00009095(iid, num, bind, param)
         local r = math.random(1,isz)
         local item = items[r]
         for k,v in pairs(item) do
-            package:Add(v[1], v[2], true, 0, 2);
+            package:Add(v[1], v[2], bind, 0, 2);
         end
 
         local nr = math.random(1,100)
         if nr <= 10 then
-            package:Add(1646, 1, false, 0, 2);
+            package:Add(1646, 1, bind, 0, 2);
         end
 
         used = used + 1
@@ -7692,6 +7692,7 @@ local ItemNormal_Table = {
     [1350] = ItemNormal_citta,
     [1351] = ItemNormal_citta,
     [1352] = ItemNormal_citta,
+    [1353] = ItemNormal_citta,
 
     [1000] = ItemNormal_formation,
     [1001] = ItemNormal_formation,

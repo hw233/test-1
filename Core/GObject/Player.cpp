@@ -13163,12 +13163,26 @@ namespace GObject
 
         if (!type)
             return;
+        if (GetPackage()->IsFull())
+
+        {
+            sendMsgCode(0, 1011);
+            return;
+        }
 
         _mditem = GameAction()->onUseMDSoul(this, type);
         if (!_mditem)
             return;
 
         sendMDSoul(1, _mditem);
+
+        GetPackage()->AddItem(_mditem, 1, true, true);
+        char str[64] = {0};
+        sprintf(str, "F_10000_0118_%d", _mditem);
+        udpLog("huodong", str, "", "", "", "", "act");
+
+        soul -= subsoul;
+        SetVar(VAR_MDSOUL, soul);
     }
 
     void Player::useMDSoul()
@@ -13206,20 +13220,9 @@ namespace GObject
 
         if (!_mditem)
             return;
-
-        if (GetPackage()->IsFull())
-        {
-            sendMsgCode(0, 1011);
-            return;
-        }
-
-        GetPackage()->AddItem(_mditem, 1, true);
-        char str[64] = {0};
-        sprintf(str, "F_10000_0118_%d", _mditem);
-        udpLog("huodong", str, "", "", "", "", "act");
-
-        soul -= subsoul;
-        SetVar(VAR_MDSOUL, soul);
+ 
+	    m_Package->ItemNotify(_mditem, 1);
+ 
         sendMDSoul(0);
         _mditem = 0;
     }
@@ -16457,6 +16460,66 @@ void Player::sendSysUpdate()
    st << (char*)VERSION;
    st << Stream::eos;
    send(st);
+}
+
+void Player::getDragonKingInfo()
+{
+    if(!World::getDragonKingAct())
+        return;
+    Stream st(REP::ACTIVE);
+    st << static_cast<UInt8>(0x06);
+    st << static_cast<UInt8>(0x01);
+    st << static_cast<UInt8>(GetVar(VAR_DRAGONKING_STEP));
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::postDragonKing(UInt8 count)
+{
+    if (CURRENT_THREAD_ID() != getThreadId())
+    {
+        GameMsgHdr h(0x342,  getThreadId(), this, sizeof(count));
+        GLOBAL().PushMsg(h, &count);
+        return;
+    }
+    if (count == 0 || !World::getDragonKingAct())
+        return;
+#define ITEM_YLLING 9337   //游龙令
+    if (GetPackage()->GetItemAnyNum(ITEM_YLLING) < count)
+        return;
+    if (GetPackage()->GetRestPackageSize() < count)
+    {
+        sendMsgCode(0, 1011);
+        return;
+    }
+    GetPackage()->DelItemSendMsg(ITEM_YLLING, this);
+    GetPackage()->DelItemAny(ITEM_YLLING, count);
+    Stream st(REP::ACTIVE);
+    st << static_cast<UInt8>(0x06);
+    st << static_cast<UInt8>(0x02);
+    st << count;
+    UInt8 step = GetVar(VAR_DRAGONKING_STEP);
+    if(step == 0 || step > 5)
+        step = 1;
+    for(UInt8 i = 0; i < count; ++i)
+    {
+        Table award = GameAction()->getDragonKingAward(step);
+        if (GameAction()->checkDragonKingCanSucceed(this, step))
+            step = (step + 1) > 5 ? 1 : step + 1;
+        else
+            step = 1;
+        st << step;
+        UInt8 size = award.size();
+        st << static_cast<UInt8>(size / 2);
+        for(UInt8 j = 1; j <= size; j += 2)
+        {
+            st << award.get<UInt16>(j) << award.get<UInt8>(j+1);
+            GetPackage()->Add(award.get<UInt32>(j), award.get<UInt32>(j+1), false, true, FromQixi);
+        }
+    }
+    st << Stream::eos;
+    send(st);
+    SetVar(VAR_DRAGONKING_STEP, step);
 }
 
 } // namespace GObject
