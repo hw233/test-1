@@ -13143,12 +13143,26 @@ namespace GObject
 
         if (!type)
             return;
+        if (GetPackage()->IsFull())
+
+        {
+            sendMsgCode(0, 1011);
+            return;
+        }
 
         _mditem = GameAction()->onUseMDSoul(this, type);
         if (!_mditem)
             return;
 
         sendMDSoul(1, _mditem);
+
+        GetPackage()->AddItem(_mditem, 1, true, true);
+        char str[64] = {0};
+        sprintf(str, "F_10000_0118_%d", _mditem);
+        udpLog("huodong", str, "", "", "", "", "act");
+
+        soul -= subsoul;
+        SetVar(VAR_MDSOUL, soul);
     }
 
     void Player::useMDSoul()
@@ -13186,20 +13200,9 @@ namespace GObject
 
         if (!_mditem)
             return;
-
-        if (GetPackage()->IsFull())
-        {
-            sendMsgCode(0, 1011);
-            return;
-        }
-
-        GetPackage()->AddItem(_mditem, 1, true);
-        char str[64] = {0};
-        sprintf(str, "F_10000_0118_%d", _mditem);
-        udpLog("huodong", str, "", "", "", "", "act");
-
-        soul -= subsoul;
-        SetVar(VAR_MDSOUL, soul);
+ 
+	    m_Package->ItemNotify(_mditem, 1);
+ 
         sendMDSoul(0);
         _mditem = 0;
     }
