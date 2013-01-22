@@ -16411,10 +16411,16 @@ void Player::getDragonKingInfo()
 {
     if(!World::getDragonKingAct())
         return;
+    UInt8 step = GetVar(VAR_DRAGONKING_STEP);
+    if( step == 0 || step > 5)
+    {
+        step = 1;
+        SetVar(VAR_DRAGONKING_STEP, step);
+    }
     Stream st(REP::ACTIVE);
     st << static_cast<UInt8>(0x06);
     st << static_cast<UInt8>(0x01);
-    st << static_cast<UInt8>(GetVar(VAR_DRAGONKING_STEP));
+    st << step;
     st << Stream::eos;
     send(st);
 }
@@ -16438,7 +16444,6 @@ void Player::postDragonKing(UInt8 count)
         return;
     }
     GetPackage()->DelItemSendMsg(ITEM_YLLING, this);
-    GetPackage()->DelItemAny(ITEM_YLLING, count);
     Stream st(REP::ACTIVE);
     st << static_cast<UInt8>(0x06);
     st << static_cast<UInt8>(0x02);
@@ -16446,8 +16451,10 @@ void Player::postDragonKing(UInt8 count)
     UInt8 step = GetVar(VAR_DRAGONKING_STEP);
     if(step == 0 || step > 5)
         step = 1;
+    bool isBind = true;
     for(UInt8 i = 0; i < count; ++i)
     {
+        GetPackage()->DelItemAny(ITEM_YLLING, 1, &isBind);
         Table award = GameAction()->getDragonKingAward(step);
         if (GameAction()->checkDragonKingCanSucceed(this, step))
             step = (step + 1) > 5 ? 1 : step + 1;
@@ -16458,8 +16465,13 @@ void Player::postDragonKing(UInt8 count)
         st << static_cast<UInt8>(size / 2);
         for(UInt8 j = 1; j <= size; j += 2)
         {
-            st << award.get<UInt16>(j) << award.get<UInt8>(j+1);
-            GetPackage()->Add(award.get<UInt32>(j), award.get<UInt32>(j+1), false, true, FromQixi);
+            UInt16 itemId = award.get<UInt16>(j);
+            st << itemId << award.get<UInt8>(j+1);
+            GetPackage()->Add(itemId, award.get<UInt32>(j+1), isBind, true, FromQixi);
+            /*
+            if(itemId == 6134)
+                SYSMSG_BROADCASTV(295, getCountry(), getName().c_str(), itemId);
+            */
         }
     }
     st << Stream::eos;
