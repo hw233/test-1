@@ -7692,6 +7692,7 @@ local ItemNormal_Table = {
     [1350] = ItemNormal_citta,
     [1351] = ItemNormal_citta,
     [1352] = ItemNormal_citta,
+    [1353] = ItemNormal_citta,
 
     [1000] = ItemNormal_formation,
     [1001] = ItemNormal_formation,

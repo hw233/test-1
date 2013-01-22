@@ -344,6 +344,8 @@ namespace Script
         UInt8 RunThanksGivingDayAward(Player* player, UInt8 opt);
         bool onGetFeastGiftAward(Player* player, UInt8 type);
         bool onFirstRecharge(Player* player, UInt8 index);
+	    Table getDragonKingAward(UInt8 step);
+        bool checkDragonKingCanSucceed(Player * player, UInt8 step);
 
 	private:
 		Player* _player1;	//?ű???????Ϊ????1
