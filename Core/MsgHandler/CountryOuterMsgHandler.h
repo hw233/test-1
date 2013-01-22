@@ -3484,27 +3484,39 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                     player->consumeGold(price);
 					st << static_cast<UInt8>(0);
 
-                    if (lr._type == PURCHASE1 )
+                    if (lr._type == PURCHASE1 + 1 )
                     {
+                        bool flag = false;
                         UInt32 now = TimeUtil::Now();
                         if ((GVAR.GetVar(GVAR_DISCOUNT_TYPE1) == 1)
-                                && GVAR.GetVar(GVAR_DISCOUNT_BEGIN1) > now
-                                && GVAR.GetVar(GVAR_DISCOUNT_END1) < now)
+                                && GVAR.GetVar(GVAR_DISCOUNT_BEGIN1) < now
+                                && GVAR.GetVar(GVAR_DISCOUNT_END1) > now)
+                        {
                             player->AddVar(VAR_DISCOUNT_CONSUME1, price);
+                            flag = true;
+                        }
                         else
                             player->SetVar(VAR_DISCOUNT_CONSUME1, 0);
                         if ((GVAR.GetVar(GVAR_DISCOUNT_TYPE2) == 1)
-                                && GVAR.GetVar(GVAR_DISCOUNT_BEGIN2) > now
-                                && GVAR.GetVar(GVAR_DISCOUNT_END2) < now)
+                                && GVAR.GetVar(GVAR_DISCOUNT_BEGIN2) < now
+                                && GVAR.GetVar(GVAR_DISCOUNT_END2) > now)
+                        {
                             player->AddVar(VAR_DISCOUNT_CONSUME2, price);
+                            flag = true;
+                        }
                         else
                             player->SetVar(VAR_DISCOUNT_CONSUME2, 0);
                         if ((GVAR.GetVar(GVAR_DISCOUNT_TYPE3) == 1)
-                                && GVAR.GetVar(GVAR_DISCOUNT_BEGIN3) > now
-                                && GVAR.GetVar(GVAR_DISCOUNT_END3) < now)
+                                && GVAR.GetVar(GVAR_DISCOUNT_BEGIN3) < now
+                                && GVAR.GetVar(GVAR_DISCOUNT_END3) > now)
+                        {
                             player->AddVar(VAR_DISCOUNT_CONSUME3, price);
+                            flag = true;
+                        }
                         else
                             player->SetVar(VAR_DISCOUNT_CONSUME3, 0);
+                        if (flag)
+                            player->sendDiscountLimit();
                     }
 
                     //GameAction()->doAty(player, AtyBuy ,0,0);

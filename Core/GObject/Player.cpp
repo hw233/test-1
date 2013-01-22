@@ -7362,25 +7362,38 @@ namespace GObject
         AddVar(VAR_FIRST_RECHARGE_VALUE, r);
         sendFirstRecharge();
 
+        bool flag = false;
+
         UInt32 now = TimeUtil::Now();
         if ((GVAR.GetVar(GVAR_DISCOUNT_TYPE1) == 2)
-                && GVAR.GetVar(GVAR_DISCOUNT_BEGIN1) > now
-                && GVAR.GetVar(GVAR_DISCOUNT_END1) < now)
+                && GVAR.GetVar(GVAR_DISCOUNT_BEGIN1) < now
+                && GVAR.GetVar(GVAR_DISCOUNT_END1) > now)
+        {
             AddVar(VAR_DISCOUNT_RECHARGE1, r);
+            flag = true;
+        }
         else
             SetVar(VAR_DISCOUNT_RECHARGE1, 0);
         if ((GVAR.GetVar(GVAR_DISCOUNT_TYPE2) == 2)
-                && GVAR.GetVar(GVAR_DISCOUNT_BEGIN2) > now
-                && GVAR.GetVar(GVAR_DISCOUNT_END2) < now)
+                && GVAR.GetVar(GVAR_DISCOUNT_BEGIN2) < now
+                && GVAR.GetVar(GVAR_DISCOUNT_END2) > now)
+        {
             AddVar(VAR_DISCOUNT_RECHARGE2, r);
+            flag = true;
+        }
         else
             SetVar(VAR_DISCOUNT_RECHARGE2, 0);
         if ((GVAR.GetVar(GVAR_DISCOUNT_TYPE3) == 2)
-                && GVAR.GetVar(GVAR_DISCOUNT_BEGIN3) > now
-                && GVAR.GetVar(GVAR_DISCOUNT_END3) < now)
+                && GVAR.GetVar(GVAR_DISCOUNT_BEGIN3) < now
+                && GVAR.GetVar(GVAR_DISCOUNT_END3) > now)
+        {
             AddVar(VAR_DISCOUNT_RECHARGE3, r);
+            flag = true;
+        }
         else
             SetVar(VAR_DISCOUNT_RECHARGE3, 0);
+        if (flag)
+            sendDiscountLimit();
     }
 
     void Player::addRechargeNextRet(UInt32 r)
@@ -12479,7 +12492,7 @@ namespace GObject
                 case 1:
                     if (GetVar(VAR_DISCOUNT_EX1_TIME + type - 4) < now)
                     {
-                        SetVar(VAR_DISCOUNT_EX3_TIME + type - 4, time);
+                        SetVar(VAR_DISCOUNT_EX1_TIME + type - 4, time);
                         SetVar(VAR_DISCOUNT_CONSUME1 + type - 4, 0);
                     }
                     goldVal = GetVar(VAR_DISCOUNT_CONSUME1 + type - 4);
@@ -12487,7 +12500,7 @@ namespace GObject
                 case 2:
                     if (GetVar(VAR_DISCOUNT_EX1_TIME + type - 4) < now)
                     {
-                        SetVar(VAR_DISCOUNT_EX3_TIME + type - 4, time);
+                        SetVar(VAR_DISCOUNT_EX1_TIME + type - 4, time);
                         SetVar(VAR_DISCOUNT_RECHARGE1 + type - 4, 0);
                     }
                     goldVal = GetVar(VAR_DISCOUNT_RECHARGE1 + type - 4);

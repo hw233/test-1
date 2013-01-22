@@ -92,6 +92,8 @@ void Store::addNormalDiscount(UInt32 itemId, UInt32 discountNum, UInt32 num)
     UInt32 now = TimeUtil::Now() + 30;
     Discount discount;
     discount.itemID = itemId;
+    discount.exType = 0;
+    discount.exValue = 0;
     discount.discountType = type;
     discount.limitCount = discountNum + 4 / num;
     discount.beginTime = now;
@@ -104,7 +106,7 @@ void Store::addNormalDiscount(UInt32 itemId, UInt32 discountNum, UInt32 num)
 
 void Store::addSpecialDiscount()
 {
-    // FIXME: 优化lua动态载入特殊限购活动
+    // 优化lua动态载入特殊限购活动
     UInt32 now = TimeUtil::Now();
     lua_State* L = lua_open();
     luaL_openlibs(L);
@@ -120,17 +122,23 @@ void Store::addSpecialDiscount()
             Discount discount;
             discount.itemID = specialDiscount.get<UInt16>(1);
             discount.discountType = specialDiscount.get<UInt8>(2);
-            discount.limitCount = specialDiscount.get<UInt32>(3);
-            discount.beginTime = specialDiscount.get<UInt32>(4);
-            discount.endTime = specialDiscount.get<UInt32>(5);
-            discount.priceDiscount = specialDiscount.get<UInt16>(6);
-            discount.priceOriginal = specialDiscount.get<UInt16>(7);
+            discount.exType = specialDiscount.get<UInt8>(3);
+            discount.exValue = specialDiscount.get<UInt32>(4);
+            discount.limitCount = specialDiscount.get<UInt32>(5);
+            discount.beginTime = specialDiscount.get<UInt32>(6);
+            discount.endTime = specialDiscount.get<UInt32>(7);
+            discount.priceDiscount = specialDiscount.get<UInt16>(8);
+            discount.priceOriginal = specialDiscount.get<UInt16>(9);
             if (discount.endTime <= (now + 30))
             {
                 continue;
             }
             _itemsDiscount[DISCOUNTEND - DISCOUNT].push_back(discount);
             ++ (_itemTypeCountDiscount[DISCOUNTEND - DISCOUNT][discount.discountType]);
+            GObject::GVAR.SetOverTime(GObject::GVAR_DISCOUNT_TYPE1 + discount.discountType - 4, discount.endTime, true);
+            GObject::GVAR.SetVar(GObject::GVAR_DISCOUNT_TYPE1 + discount.discountType - 4, discount.exType);
+            GObject::GVAR.SetVar(GObject::GVAR_DISCOUNT_BEGIN1 + discount.discountType - 4, discount.beginTime);
+            GObject::GVAR.SetVar(GObject::GVAR_DISCOUNT_END1 + discount.discountType - 4, discount.endTime);
         }
     }
 
@@ -153,6 +161,8 @@ UInt8 Store::addSpecialDiscountFromBS(Discount discount)
     }
     GObject::GVAR.SetOverTime(GObject::GVAR_DISCOUNT_TYPE1 + discount.discountType - 4, discount.endTime, true);
     GObject::GVAR.SetVar(GObject::GVAR_DISCOUNT_TYPE1 + discount.discountType - 4, discount.exType);
+    GObject::GVAR.SetVar(GObject::GVAR_DISCOUNT_BEGIN1 + discount.discountType - 4, discount.beginTime);
+    GObject::GVAR.SetVar(GObject::GVAR_DISCOUNT_END1 + discount.discountType - 4, discount.endTime);
     _itemsDiscount[DISCOUNTEND - DISCOUNT].push_back(discount);
     ++ (_itemTypeCountDiscount[DISCOUNTEND - DISCOUNT][discount.discountType]);
     return 0;

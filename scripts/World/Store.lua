@@ -1,6 +1,6 @@
 
 -- 限时折扣
-testTm = { ['year'] = 2013, ['month'] = 1, ['day'] = 16, ['hour'] = 12, ['min'] = 0, ['sec'] = 0 };
+testTm = { ['year'] = 2013, ['month'] = 1, ['day'] = 22, ['hour'] = 12, ['min'] = 0, ['sec'] = 0 };
 
 local discount_items = {
     465,466,516,547,57,56,500,15,501,503,505,506,508,511,512,513,514,515,517,
@@ -10,6 +10,8 @@ local discount_items = {
 specialDiscount1 = {
     discount_items[1],
     4,
+    1,
+    100,
     8,
     os.time(testTm),
     os.time(testTm) + 86400,
@@ -19,6 +21,8 @@ specialDiscount1 = {
 specialDiscount2 = {
     discount_items[6],
     4,
+    1,
+    100,
     8,
     os.time(testTm),
     os.time(testTm) + 86400,
@@ -28,6 +32,8 @@ specialDiscount2 = {
 specialDiscount3 = {
     discount_items[6],
     5,
+    1,
+    100,
     27,
     os.time(testTm),
     os.time(testTm) + 86400,
@@ -37,6 +43,8 @@ specialDiscount3 = {
 specialDiscount4 = {
     discount_items[6],
     6,
+    2,
+    100,
     28,
     os.time(testTm),
     os.time(testTm) + 86400,
