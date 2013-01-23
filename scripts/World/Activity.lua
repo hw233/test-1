@@ -920,12 +920,13 @@ function onActivityCheck(tm)
   else
       setGoldSnakeAct(false)
   end
-
+  --[[
   if tm >= actTime234_0 and tm < actTime234_1 then
       setHeroIslandAct(true)
   else
       setHeroIslandAct(false)
   end
+  --]]
 
   setRC7Day(true)
   setCFriend(true);

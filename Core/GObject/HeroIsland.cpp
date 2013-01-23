@@ -1617,10 +1617,6 @@ void HeroIsland::playerInfo(Player* player)
     }
 
     st << in;
-    UInt8 ato = 1;
-    if (!World::getHeroIslandAct() && player->getVipLevel() < 3)
-        ato = 0;
-    st << ato;    //是否有自动身份,1有0无
     st << TimeUtil::Now();
     st << _startTime;
     st << _endTime;
