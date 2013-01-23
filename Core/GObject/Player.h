@@ -1133,8 +1133,10 @@ namespace GObject
         void sendConsumeInfo(bool rank = false);
         void getMDItem();
         void sendMDSoul(UInt8 type, UInt32 id = 0);
+        void setCompassItemCount(UInt8 count) {_mditemCount = count;};
         void sendJuneRechargeMails(UInt32 value);
         UInt32 _mditem;
+        UInt8  _mditemCount;
 
 		void autoRegenAll();
 		void regenAll(bool = false);
@@ -2065,6 +2067,9 @@ namespace GObject
 
         void getDragonKingInfo();
         void postDragonKing(UInt8 count);
+        void sendSnakeEggInfo();
+        void callSnakeEgg();
+        void getSnakeEggAward(UInt8 v);
     private:
         UInt8 cf_posPut[5];//范围1-5
         UInt32 cf_itemId[5];

@@ -181,6 +181,8 @@ bool World::_loginAward = false;
 bool World::_bluediamonSuperman = false;
 bool World::_tgcevent = false;
 bool World::_compassact = false;
+bool World::_callsnakeeggact = false;
+UInt8 World::_snakeeggawardact = 0;
 /** 场外活动 **/
 stArenaExtra World::stArenaOld[2];
 stArenaExtra World::stArena;

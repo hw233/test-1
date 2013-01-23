@@ -209,6 +209,8 @@ void WorldScript::init()
 	def("setTownReward_10_15", GObject::World::setTownReward_10_15);
 	def("setCompassAct", GObject::World::setCompassAct);
 	def("getCompassAct", GObject::World::getCompassAct);
+	def("setCallSnakeEggAct", GObject::World::setCallSnakeEggAct);
+	def("setSnakeEggAwardAct", GObject::World::setSnakeEggAwardAct);
 	
     def("setMergeAthAct", GObject::World::setMergeAthAct);
     def("getMergeAthAct", GObject::World::getMergeAthAct);

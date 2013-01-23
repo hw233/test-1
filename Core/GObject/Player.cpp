@@ -598,6 +598,7 @@ namespace GObject
         m_dpData = new DeamonPlayerData();
         m_csFlag = 0;
         _mditem = 0;
+        _mditemCount = 0;
         _qixiBinding = false;
 
         memset (m_domain, 0, sizeof(m_domain));
@@ -13109,7 +13110,6 @@ namespace GObject
         if (!type)
             return;
         if (GetPackage()->IsFull())
-
         {
             sendMsgCode(0, 1011);
             return;
@@ -13121,7 +13121,6 @@ namespace GObject
 
         sendMDSoul(1, _mditem);
 
-        GetPackage()->AddItem(_mditem, 1, true, true);
         char str[64] = {0};
         sprintf(str, "F_10000_0118_%d", _mditem);
         udpLog("huodong", str, "", "", "", "", "act");
@@ -13135,13 +13134,13 @@ namespace GObject
         if (!World::getMayDay() && !World::getCompassAct())
             return;
 
-        UInt32 soul = GetVar(VAR_MDSOUL);
+/*        UInt32 soul = GetVar(VAR_MDSOUL);
         if (!soul)
             return;
 
         UInt8 type = 0;
         UInt32 subsoul = 0;
-/*        if (soul >= 100)
+        if (soul >= 100)
         {
             type = 1;
             subsoul = 100;
@@ -13152,7 +13151,7 @@ namespace GObject
             subsoul = 20;
         }
         else if (soul >= 10)
-  */
+  
         {
             type = 3;
             subsoul = 10;
@@ -13162,14 +13161,15 @@ namespace GObject
 
         if (!type)
             return;
-
+*/
         if (!_mditem)
             return;
  
-	    m_Package->ItemNotify(_mditem, 1);
+	    m_Package->ItemNotify(_mditem, _mditemCount);
  
         sendMDSoul(0);
         _mditem = 0;
+        _mditemCount = 0;
     }
 
     void Player::svrSt(UInt8 type)
@@ -16465,6 +16465,54 @@ void Player::postDragonKing(UInt8 count)
     st << Stream::eos;
     send(st);
     SetVar(VAR_DRAGONKING_STEP, step);
+}
+void Player::sendSnakeEggInfo()
+{
+    Stream st(REP::ACTIVE);
+    st << static_cast<UInt8>(0x08) << static_cast<UInt8>(0x01);
+    UInt8 t = 0; //活动阶段
+    if (World::getCallSnakeEggAct())
+        t = 1;
+    else if (World::getSnakeEggAwardAct() >= 1 && World::getSnakeEggAwardAct() <= 7)
+        t = 2;
+    else if (World::getSnakeEggAwardAct() == 0xFF)
+        t = 3;
+    st << t;
+    st << static_cast<UInt8>(GetVar(VAR_CALLSNAKEEGG)) << static_cast<UInt8>(World::getSnakeEggAwardAct());
+    st << static_cast<UInt8>(GetVar(VAR_SNAKEEGG_AWARD));
+    st << Stream::eos;
+    send(st);
+ 
+}
+void Player::callSnakeEgg()
+{
+  if (!World::getCallSnakeEggAct() || GetVar(VAR_CALLSNAKEEGG) != 0 )
+      return;
+  SetVar(VAR_CALLSNAKEEGG, 1);
+  sendSnakeEggInfo();
+}
+void Player::getSnakeEggAward(UInt8 v)
+{
+    UInt8 day = World::getSnakeEggAwardAct();
+    if (!day || v > 7 || v > day)
+        return;
+    UInt8 var = GetVar(VAR_SNAKEEGG_AWARD); 
+    if (var & v) //已领取
+        return;
+    if (v < day || GetVar(VAR_CALLSNAKEEGG) == 0)
+    {
+        if (getGold() < 30)
+        {
+		    sendMsgCode(0, 1104);
+            return;
+        }
+        ConsumeInfo ci(SnakeSprintAct, 0, 0);
+        useGold(30, &ci);
+    }
+    getCoupon(100);
+    var |= v;
+    SetVar(VAR_SNAKEEGG_AWARD, var);
+    sendSnakeEggInfo();
 }
 
 } // namespace GObject

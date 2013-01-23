@@ -965,7 +965,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     TgcEvent(player, 1)
     _9215Act(player, lootlvl);
     _snowAct(player, lootlvl);
-    CompassAct(player, lootlvl);
+--    CompassAct(player, lootlvl);
 end
 
 function onFrontMapFloorWin(player, id, spot, lootlvl)
@@ -997,7 +997,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
     TgcEvent(player, 2)
     _9215Act(player, lootlvl);
     _snowAct(player, lootlvl);
-    CompassAct(player, lootlvl);
+--    CompassAct(player, lootlvl);
 end
 
 local vippack = {
@@ -1417,7 +1417,7 @@ function onUseMDSoul(player, _type)
     if _type == 0 or _type > 3 then
         return 0
     end
-
+    local package = player:GetPackage();
     local items = {
         {9000,47,509,507,515,509,507,515,},
         {503,514,506,508,517,512,501,513,},
@@ -1425,9 +1425,10 @@ function onUseMDSoul(player, _type)
 --        {497,496,15,56,57,511,500,518,},
     }
     local broad = {0,0,0,0,1,1,0,0}
+    local count = {1,1,2,1,2,2,1,2}
 
     if _type == 3 then
-        local prob = {2451,4902,5515,7966,8211,8365,9591,10000}
+        local prob = {2400,4800,5430,7830,8080,8240,9600,10000}
         local p = math.random(1,10000)
         local i = 1
         for n = 1,#prob do
@@ -1437,8 +1438,10 @@ function onUseMDSoul(player, _type)
             end
         end
         if broad[i] == 1 then
-            Broadcast(0x27, "御风雷之变化，".."[p:"..player:getCountry()..":"..player:getPName().."]成功显罗盘秘宝于世，获得了[4:"..items[_type][i].."]")
+            Broadcast(0x27, "御风雷之变化，".."[p:"..player:getCountry()..":"..player:getPName().."]成功显罗盘秘宝于世，获得了[4:"..items[_type][i].."]x"..count[i])
         end
+        package:Add(items[_type][i], count[i], true, true);
+        player:setCompassItemCount(count[i]);
         return items[_type][i]
     end
 

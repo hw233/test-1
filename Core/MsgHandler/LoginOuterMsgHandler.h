@@ -1404,7 +1404,12 @@ void ForbidSale(LoginMsgHdr& hdr,const void * data)
             pid += (static_cast<UInt64>(serverNo) << 48);
 	    GObject::Player * pl = GObject::globalPlayers[pid];
         if (NULL != pl)
+        {
             pl->setForbidSale(true);
+
+            GameMsgHdr hdr(0x352, pl->getThreadId(), pl, NULL);
+            GLOBAL().PushMsg(hdr, NULL);
+        }
         playerId = GetNextSection(playerIds, ',');
     }
     ret = 0;

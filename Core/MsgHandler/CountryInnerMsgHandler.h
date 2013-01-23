@@ -713,6 +713,12 @@ void OnSaleItemSearchReq( GameMsgHdr& hdr, const void * data )
 	SaleSearchReq * saleSearchReq = reinterpret_cast<SaleSearchReq *>(const_cast<void *>(data));
 	player->GetSale()->searchMySale(*saleSearchReq);
 }
+void OnSaleItemCancleAll( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	player->GetSale()->cancleAllItem();
+}
+
 
 void OnDailyCheck( GameMsgHdr& hdr, const void * data )
 {
