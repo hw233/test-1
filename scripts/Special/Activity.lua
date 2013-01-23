@@ -5897,15 +5897,12 @@ function checkDragonKingCanSucceed(player, step)
     local rand = math.random(1, 10000)
     if step ~= 4 then
         if rand <= chances[step] then
-            if step == 5 then
-                Broadcast(0x27, "恭喜玩家[p:"..player:getCountry()..":"..player:getPName().."]在水晶宫探宝时获得了[4:6134]x1，真是人品大爆发啊！");
-            end
             return true
         end
     else
         local fail = player:GetVar(362) + 1
-        if fail > 4 then
-            fail = 4
+        if fail > #chances[step] then
+            fail = #chances[step]
         end
         if rand <= chances[step][fail] then
             player:SetVar(362, 0)

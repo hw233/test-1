@@ -932,6 +932,8 @@ function onActivityCheck(tm)
 
   -- XXX: cancel auto heal
   setAutoHeal(true)
+  -- always heroIsland auto
+  setHeroIslandAct(true)
   setCopyFrontWinSwitch(true)
   loadStore();
 end

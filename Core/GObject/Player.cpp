@@ -16468,10 +16468,8 @@ void Player::postDragonKing(UInt8 count)
             UInt16 itemId = award.get<UInt16>(j);
             st << itemId << award.get<UInt8>(j+1);
             GetPackage()->Add(itemId, award.get<UInt32>(j+1), isBind, true, FromQixi);
-            /*
             if(itemId == 6134)
                 SYSMSG_BROADCASTV(295, getCountry(), getName().c_str(), itemId);
-            */
         }
     }
     st << Stream::eos;
