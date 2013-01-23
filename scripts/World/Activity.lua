@@ -934,18 +934,21 @@ function onActivityCheck(tm)
   else
       setGoldSnakeAct(false)
   end
-
+  --[[
   if tm >= actTime234_0 and tm < actTime234_1 then
       setHeroIslandAct(true)
   else
       setHeroIslandAct(false)
   end
+  --]]
 
   setRC7Day(true)
   setCFriend(true);
 
   -- XXX: cancel auto heal
   setAutoHeal(true)
+  -- always heroIsland auto
+  setHeroIslandAct(true)
   setCopyFrontWinSwitch(true)
   loadStore();
 end

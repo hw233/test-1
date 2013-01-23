@@ -5894,7 +5894,7 @@ function checkDragonKingCanSucceed(player, step)
         [1] = 8000,
         [2] = 5000,
         [3] = 5000,
-        [4] = {500, 1000, 1500, 2500, 3000, 6500},
+        [4] = {500, 1000, 6000, 9000},
         [5] = 10000,
     }
     local rand = math.random(1, 10000)
@@ -5904,8 +5904,8 @@ function checkDragonKingCanSucceed(player, step)
         end
     else
         local fail = player:GetVar(362) + 1
-        if fail > 6 then
-            fail = 6
+        if fail > #chances[step] then
+            fail = #chances[step]
         end
         if rand <= chances[step][fail] then
             player:SetVar(362, 0)
