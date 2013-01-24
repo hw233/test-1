@@ -324,8 +324,9 @@ namespace GObject
         VAR_CONSUME_AWARD_COUNT = 348,   //消费抽奖已抽次数
         // 361-370 占用 for suntao
         VAR_DRAGONKING_STEP = 361,      //大闹龙宫当前移动到的格子
-        VAR_DRAGONKING_STEP4_COUNT = 362, //大闹龙宫移动到第4格子的次数
-        VAR_DRAGONKING_STEP5_COUNT = 363, //大闹龙宫移动到第5格子的次数
+        VAR_DRAGONKING_STEP4_COUNT = 362, //大闹龙宫从第4格移动到第5失败的次数
+        VAR_CALLSNAKEEGG = 371,         //拜金蛇
+        VAR_SNAKEEGG_AWARD=372,         //领蛇蛋
         //越南版380-399
         VAR_MAX,
     };
@@ -622,11 +623,13 @@ namespace GObject
 
             REGISTER_VAR(VAR_HAS_MO_BATTLER, CYCLE_NONE);
             REGISTER_VAR(VAR_ITEM_9316_FAILED_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_CONSUME_AWARD_COUNT, CYCLE_NONE);
 
             REGISTER_VAR(VAR_DRAGONKING_STEP, CYCLE_NONE);
             REGISTER_VAR(VAR_DRAGONKING_STEP4_COUNT, CYCLE_NONE);
-            REGISTER_VAR(VAR_DRAGONKING_STEP5_COUNT, CYCLE_NONE);
-            REGISTER_VAR(VAR_CONSUME_AWARD_COUNT, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_CALLSNAKEEGG, CYCLE_NONE);
+            REGISTER_VAR(VAR_SNAKEEGG_AWARD, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

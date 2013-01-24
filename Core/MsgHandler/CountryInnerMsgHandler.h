@@ -713,6 +713,12 @@ void OnSaleItemSearchReq( GameMsgHdr& hdr, const void * data )
 	SaleSearchReq * saleSearchReq = reinterpret_cast<SaleSearchReq *>(const_cast<void *>(data));
 	player->GetSale()->searchMySale(*saleSearchReq);
 }
+void OnSaleItemCancleAll( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	player->GetSale()->cancleAllItem();
+}
+
 
 void OnDailyCheck( GameMsgHdr& hdr, const void * data )
 {
@@ -1822,6 +1828,13 @@ void OnAddMapObj( GameMsgHdr& hdr, const void * data)
 
     map->AddObject(*mo);
     map->Show(mo->m_ID, true, mo->m_Type);
+}
+
+void OnPostDragonKing( GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+	const UInt8 count = *reinterpret_cast<const UInt8*>(data);
+    player->postDragonKing(count);
 }
 
 

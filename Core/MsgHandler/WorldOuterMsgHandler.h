@@ -2208,6 +2208,8 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                     GLOBAL().PushMsg(hdr1, &pos);
                 }
                 break;
+            default:
+                break;
             }
             break;
         }
@@ -2275,10 +2277,56 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                     player->send(st);
                 }
                 break;
+            default:
+                break;
             }
             break;
-
         }
+        //大闹龙宫
+        case 0x06:
+        {
+            if(!World::getDragonKingAct())
+                return;
+            brd >> op;
+            switch(op)
+            {
+            case 0x01:  //获取龙宫信息
+                player->getDragonKingInfo();
+                break;
+            case 0x02:  //龙宫寻宝
+                {
+                    UInt8 count= 0;
+                    brd >> count;
+                    player->postDragonKing(count);
+                }
+                break;
+            default:
+                break;
+            }
+            break;
+        }
+        //拜灵蛇,领金蛋
+        case 0x08:
+        {
+            brd >> op;
+            switch (op)
+            {
+                case 0x01:
+                    player->sendSnakeEggInfo();
+                    break;
+                case 0x02:
+                    player->callSnakeEgg();
+                    break;
+                case 0x03:
+                    UInt8 day = 0;
+                    brd >> day;
+                    player->getSnakeEggAward(day);
+                    break;
+            }
+            break;
+        }
+        default:
+            break;
     }
 }
 

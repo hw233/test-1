@@ -3294,7 +3294,11 @@ void GMHandler::OnForbidSale(GObject::Player *player, std::vector<std::string>& 
 
     GObject::Player * pl = GObject::globalPlayers[playerId];
     if (NULL != pl)
+    {
         pl->setForbidSale(true);
+        GameMsgHdr hdr(0x352, pl->getThreadId(), pl, NULL);
+        GLOBAL().PushMsg(hdr, NULL);
+    }
 }
 
 void GMHandler::OnUnForbidSale(GObject::Player *player, std::vector<std::string>& args)

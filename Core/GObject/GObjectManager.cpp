@@ -164,7 +164,11 @@ namespace GObject
 		IDGenerator::gMailOidGenerator.Init(maxId);
 		execu->Extract("SELECT max(`id`) FROM `clan`", maxId);
 		IDGenerator::gClanOidGenerator.Init(maxId);
+        UInt32 maxItemId;
+		execu->Extract("SELECT max(`id`) FROM `item`", maxItemId);
 		execu->Extract("SELECT max(`id`) FROM `equipment`", maxId);
+        if(maxItemId > maxId)
+            maxId = maxItemId;
 		IDGenerator::gItemOidGenerator.Init(maxId);
 		execu->Extract("SELECT max(`tradeId`) FROM `trade`", maxId);
 		IDGenerator::gTradeOidGenerator.Init(maxId);
