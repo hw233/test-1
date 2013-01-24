@@ -2305,6 +2305,26 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             }
             break;
         }
+        //拜灵蛇,领金蛋
+        case 0x08:
+        {
+            brd >> op;
+            switch (op)
+            {
+                case 0x01:
+                    player->sendSnakeEggInfo();
+                    break;
+                case 0x02:
+                    player->callSnakeEgg();
+                    break;
+                case 0x03:
+                    UInt8 day = 0;
+                    brd >> day;
+                    player->getSnakeEggAward(day);
+                    break;
+            }
+            break;
+        }
         default:
             break;
     }

@@ -591,6 +591,14 @@ public:
     { _compassact = v; }
     inline static bool getCompassAct()
     { return _compassact; }
+    inline static void setCallSnakeEggAct(bool v)
+    { _callsnakeeggact = v; }
+    inline static bool getCallSnakeEggAct()
+    { return _callsnakeeggact; }
+    inline static void setSnakeEggAwardAct(UInt8 v)
+    { _snakeeggawardact = v; }
+    inline static UInt8 getSnakeEggAwardAct()
+    { return _snakeeggawardact; }
  
 public:
 	inline static UInt8 getWeekDay()
@@ -701,6 +709,8 @@ public:
     static stArenaExtra stArenaOld[2];
     static stArenaExtra stArena;
     static bool _compassact;
+    static bool _callsnakeeggact;
+    static UInt8 _snakeeggawardact;
 
 public:
     static RCSortType rechargeSort;

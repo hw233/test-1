@@ -1146,9 +1146,20 @@ namespace GObject
         void sendConsumeInfo(bool rank = false);
         void getMDItem();
         void sendMDSoul(UInt8 type, UInt32 id = 0);
-        void sendJuneRechargeMails(UInt32 value);
+        void appendCompassItem(UInt32 id,  UInt32 count)
+        {
+            MDItem item = {id,count};
+            _mditemVec.push_back(item);
+        }
         UInt32 _mditem;
+        struct MDItem
+        {
+            UInt32 id;
+            UInt32 count;
+        };
+        std::vector<MDItem> _mditemVec;
 
+        void sendJuneRechargeMails(UInt32 value);
 		void autoRegenAll();
 		void regenAll(bool = false);
         void setHPPercent(UInt8 p);
@@ -2078,6 +2089,9 @@ namespace GObject
 
         void getDragonKingInfo();
         void postDragonKing(UInt8 count);
+        void sendSnakeEggInfo();
+        void callSnakeEgg();
+        void getSnakeEggAward(UInt8 v);
     private:
         UInt8 cf_posPut[5];//范围1-5
         UInt32 cf_itemId[5];
