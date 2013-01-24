@@ -1133,11 +1133,20 @@ namespace GObject
         void sendConsumeInfo(bool rank = false);
         void getMDItem();
         void sendMDSoul(UInt8 type, UInt32 id = 0);
-        void setCompassItemCount(UInt8 count) {_mditemCount = count;};
-        void sendJuneRechargeMails(UInt32 value);
+        void appendCompassItem(UInt32 id,  UInt32 count)
+        {
+            MDItem item = {id,count};
+            _mditemVec.push_back(item);
+        }
         UInt32 _mditem;
-        UInt8  _mditemCount;
+        struct MDItem
+        {
+            UInt32 id;
+            UInt32 count;
+        };
+        std::vector<MDItem> _mditemVec;
 
+        void sendJuneRechargeMails(UInt32 value);
 		void autoRegenAll();
 		void regenAll(bool = false);
         void setHPPercent(UInt8 p);

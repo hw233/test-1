@@ -598,7 +598,6 @@ namespace GObject
         m_dpData = new DeamonPlayerData();
         m_csFlag = 0;
         _mditem = 0;
-        _mditemCount = 0;
         _qixiBinding = false;
 
         memset (m_domain, 0, sizeof(m_domain));
@@ -13127,6 +13126,7 @@ namespace GObject
         udpLog("huodong", str, "", "", "", "", "act");
 
         soul -= subsoul;
+        _mditem = 0;
         SetVar(VAR_MDSOUL, soul);
     }
 
@@ -13162,15 +13162,17 @@ namespace GObject
 
         if (!type)
             return;
-*/
+
         if (!_mditem)
             return;
- 
-	    m_Package->ItemNotify(_mditem, _mditemCount);
- 
+*/
+        for(std::vector<MDItem>::iterator it=_mditemVec.begin(); it != _mditemVec.end(); ++it)
+        {
+	        m_Package->ItemNotify(it->id, it->count);
+        }
         sendMDSoul(0);
-        _mditem = 0;
-        _mditemCount = 0;
+        _mditemVec.clear();
+    //    _mditem = 0;
     }
 
     void Player::svrSt(UInt8 type)

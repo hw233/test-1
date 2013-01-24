@@ -1441,7 +1441,7 @@ function onUseMDSoul(player, _type)
             Broadcast(0x27, "御风雷之变化，".."[p:"..player:getCountry()..":"..player:getPName().."]成功显罗盘秘宝于世，获得了[4:"..items[_type][i].."]x"..count[i])
         end
         package:Add(items[_type][i], count[i], true, true);
-        player:setCompassItemCount(count[i]);
+        player:appendCompassItem(items[_type][i], count[i]);
         return items[_type][i]
     end
 
@@ -5894,7 +5894,7 @@ function checkDragonKingCanSucceed(player, step)
         [1] = 8000,
         [2] = 5000,
         [3] = 5000,
-        [4] = {500, 1000, 6000, 9000},
+        [4] = {500, 1000, 1500, 2500, 3000, 6500},
         [5] = 10000,
     }
     local rand = math.random(1, 10000)
@@ -5904,8 +5904,8 @@ function checkDragonKingCanSucceed(player, step)
         end
     else
         local fail = player:GetVar(362) + 1
-        if fail > #chances[step] then
-            fail = #chances[step]
+        if fail > 6 then
+            fail = 6
         end
         if rand <= chances[step][fail] then
             player:SetVar(362, 0)
