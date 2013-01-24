@@ -19,6 +19,7 @@ namespace GObject
 	class SortWorker;
 #ifndef _WIN32
     class DCWorker;
+    class OpenAPIWorker;
 #endif
 }
 
@@ -47,6 +48,7 @@ public:
 	GObject::SortWorker& GetSort();
 #ifndef _WIN32
 	GObject::DCWorker& GetDC();
+    GObject::OpenAPIWorker& GetOpenAPI();
 #endif
 	DB::DBWorker& GetDB();
 	DB::DBWorker& GetDB1();
@@ -100,6 +102,7 @@ private:
 #ifndef _VT
 #ifndef _WIN32
 #define DC()			SERVER().GetDC()
+#define OPENAPI()       SERVER().GetOpenAPI()
 #endif
 #endif
 #endif
