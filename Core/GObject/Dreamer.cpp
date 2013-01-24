@@ -729,7 +729,7 @@ bool Dreamer::OnGetTreasure()
         UInt32 itemId = item.get<UInt32>(1);
         UInt32 itemCount = item.get<UInt32>(2);
         bool   bind = item.get<bool>(3);
-        _owner->GetPackage()->AddItem2(itemId, itemCount, true, bind, FromDreamer);
+        _owner->GetPackage()->Add(itemId, itemCount, bind, false, FromDreamer);
         st << static_cast<UInt16>(itemId);
         st << static_cast<UInt16>(itemCount);
     }
@@ -775,7 +775,7 @@ bool Dreamer::OnGetItem()
         UInt32 itemId = item.get<UInt32>(1);
         UInt32 itemCount = item.get<UInt32>(2);
         bool   bind = item.get<bool>(3);
-        _owner->GetPackage()->AddItem2(itemId, itemCount, true, bind, FromDreamer);
+        _owner->GetPackage()->Add(itemId, itemCount, bind, false, FromDreamer);
         st << static_cast<UInt16>(itemId);
         st << static_cast<UInt16>(itemCount);
     }
@@ -1045,14 +1045,14 @@ UInt8 Dreamer::CheckGridType(UInt8 type)
         {
             switch ((it->second).gridType & 0x000F)
             {
+                case GRID_ITEM      :
+                    return ((it->second).gridType & 0xFF00) >> 8;
                 case GRID_ARROW     :
                 case GRID_TIME      :
                 case GRID_EYE       :
-                    //return ((it->second).gridType & 0xFF00) >> 8;
                 case GRID_TREASURE  :
                 case GRID_WAVE      :
                 case GRID_KEY       :
-                case GRID_ITEM      :
                 case GRID_WHIRLWIND :
                 default:
                     return 1;
