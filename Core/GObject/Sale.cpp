@@ -8,6 +8,7 @@
 #include "MsgID.h"
 #include "DCLogger.h"
 #include "LBNameTmpl.h"
+#include "SaleMgr.h" 
 
 
 namespace GObject
@@ -434,6 +435,19 @@ void Sale::makeMailInfo(UInt32 id, Stream& st, UInt16& num)
     }
 
 	num = 1;
+}
+void Sale::cancleAllItem()
+{
+    SaleItemCancel item;
+	UInt16 i = 0;
+	std::map<UInt32, SaleSellRespData *>::iterator it = _sellItems.begin();
+	for (; i < 24 && it != _sellItems.end(); ++i, ++it)
+	{
+        item.status = 2;
+        item.id = it->first;
+        gSaleMgr.cancelSale(_owner, item.id = it->first); 
+	}
+	
 }
 
 }

@@ -965,7 +965,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     TgcEvent(player, 1)
     _9215Act(player, lootlvl);
     _snowAct(player, lootlvl);
-    CompassAct(player, lootlvl);
+--    CompassAct(player, lootlvl);
 end
 
 function onFrontMapFloorWin(player, id, spot, lootlvl)
@@ -997,7 +997,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
     TgcEvent(player, 2)
     _9215Act(player, lootlvl);
     _snowAct(player, lootlvl);
-    CompassAct(player, lootlvl);
+--    CompassAct(player, lootlvl);
 end
 
 local vippack = {
@@ -1417,7 +1417,7 @@ function onUseMDSoul(player, _type)
     if _type == 0 or _type > 3 then
         return 0
     end
-
+    local package = player:GetPackage();
     local items = {
         {9000,47,509,507,515,509,507,515,},
         {503,514,506,508,517,512,501,513,},
@@ -1425,9 +1425,10 @@ function onUseMDSoul(player, _type)
 --        {497,496,15,56,57,511,500,518,},
     }
     local broad = {0,0,0,0,1,1,0,0}
+    local count = {1,1,2,1,2,2,1,2}
 
     if _type == 3 then
-        local prob = {2451,4902,5515,7966,8211,8365,9591,10000}
+        local prob = {2400,4800,5430,7830,8080,8240,9600,10000}
         local p = math.random(1,10000)
         local i = 1
         for n = 1,#prob do
@@ -1437,8 +1438,10 @@ function onUseMDSoul(player, _type)
             end
         end
         if broad[i] == 1 then
-            Broadcast(0x27, "御风雷之变化，".."[p:"..player:getCountry()..":"..player:getPName().."]成功显罗盘秘宝于世，获得了[4:"..items[_type][i].."]")
+            Broadcast(0x27, "御风雷之变化，".."[p:"..player:getCountry()..":"..player:getPName().."]成功显罗盘秘宝于世，获得了[4:"..items[_type][i].."]x"..count[i])
         end
+        package:Add(items[_type][i], count[i], true, true);
+        player:appendCompassItem(items[_type][i], count[i]);
         return items[_type][i]
     end
 
@@ -4887,7 +4890,7 @@ function sendRechargeRankAward(player, pos)
     local s = os.time(t)
     local n = os.time()
 
-    if n >= s and n < (s + 86400 + 10*60) then
+    if n >= (s + 10 * 60) and n < (s + 86400 + 10*60) then
         sendRechargeRankAward_2013_01_19(player, pos)
     elseif n >= (s + 86400 + 10*60) and n < (s + 2*86400 + 10*60) then
         sendRechargeRankAward_2013_01_20(player, pos)
@@ -5878,5 +5881,72 @@ function getCopyFrontmapAward(step, localtion)
             return item;
         end
     end
+end
+
+function checkDragonKingCanSucceed(player, step)
+    if nil == player then
+        return false
+    end
+    if nil == step or step < 1 or step > 5 then
+        return false
+    end
+    local chances = {
+        [1] = 8000,
+        [2] = 5000,
+        [3] = 5000,
+        [4] = {500, 1000, 6000, 9000},
+        [5] = 10000,
+    }
+    local rand = math.random(1, 10000)
+    if step ~= 4 then
+        if rand <= chances[step] then
+            return true
+        end
+    else
+        local fail = player:GetVar(362) + 1
+        if fail > #chances[step] then
+            fail = #chances[step]
+        end
+        if rand <= chances[step][fail] then
+            player:SetVar(362, 0)
+            return true
+        else
+            player:SetVar(362, fail)
+        end
+    end
+    return false
+end
+
+function getDragonKingAward(step)
+    local items = {
+        [1] = {{16, 1}, {29, 2}, {1328, 5}, {51, 1}, {48, 1}, {35, 2}, {548, 1}, {30, 1}},
+        [2] = {{15, 1}, {9283, 1}, {500, 1}, {57, 1}, {1412, 5}, {56, 1}, {135, 1}, {30, 1}},
+        [3] = {{33, 1}, {516, 1}, {501, 1}, {506, 1}, {508, 1}, {512, 1}, {513, 1}, {514, 1}, {517, 1}, {1411, 1}},
+        [4] = {{1325, 1}, {134, 1}, {551, 1}, {8000, 1}, {47, 1}, {515, 1}, {549, 1}, {50, 1}},
+        [5] = {{6134,1}},
+    }
+    local chances = {
+        [1] = {1400, 2800, 4200, 5600, 7000, 8400, 9800, 10000},
+        [2] = {1400, 2800, 4200, 5600, 7000, 8400, 9800, 10000},
+        [3] = {1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000},
+        [4] = {1250, 2500, 3750, 5000, 6250, 7500, 8750, 10000},
+        [5] = {10000},
+    }
+    if nil == step then
+        return {}
+    end
+    if step < 1 or step > 5 then
+        step = 1
+    end
+    if #items[step] ~= #chances[step] then
+        return {}
+    end
+    local r = math.random(1, 10000)
+    for i = 1, #chances[step] do
+        if r <= chances[step][i] then
+            return items[step][i]
+        end
+    end
+    return {}
 end
 

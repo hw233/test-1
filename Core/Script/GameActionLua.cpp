@@ -285,6 +285,7 @@ namespace Script
         CLASS_DEF(Player, addFighterFromItem);
         CLASS_DEF(Player, hasFighter);
         CLASS_DEF(Player, fighterFromItem);
+        CLASS_DEF(Player, appendCompassItem);
 
         CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);
@@ -1223,7 +1224,7 @@ namespace Script
     {
         return Call<bool>(  "onRC7DayWill", pl, idx);
     }
-    UInt32 GameActionLua::onUseMDSoul(Player* pl, UInt8 type)
+    UInt32 GameActionLua::onUseMDSoul(Player* pl, UInt8 type )
     {
         return Call<UInt32>(  "onUseMDSoul", pl, type);
     }
@@ -1503,5 +1504,17 @@ namespace Script
     {
         return Call<lua_tinker::table>("getDreamerItem", id, index);
     }
+
+    Table GameActionLua::getDragonKingAward(UInt8 step)
+	{
+		return Call<Table>("getDragonKingAward", step);
+	}
+
+    bool GameActionLua::checkDragonKingCanSucceed(Player * player, UInt8 step)
+	{
+		assert(player != NULL);
+		return Call<bool>("checkDragonKingCanSucceed", player, step);
+	}
+
 }
 

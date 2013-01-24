@@ -145,6 +145,7 @@ public:
 
 	void makeMailInfo(UInt32 id, Stream& st, UInt16& num);
 
+    void cancleAllItem();
 public:
 	inline bool hasAccessSaleItem(UInt32 id)
 	{

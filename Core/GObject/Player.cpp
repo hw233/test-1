@@ -1213,7 +1213,8 @@ namespace GObject
                     if (channel == PF_XY_CH)
                     {
                         channel = atoi(source[2].c_str());
-                        const UInt32 XY_CHANNEL[] = {41, 47, 48, 49, 50, 51, 52, 53, 54, 56};
+                        //const UInt32 XY_CHANNEL[] = {41, 47, 48, 49, 50, 51, 52, 53, 54, 56};
+                        const UInt32 XY_CHANNEL[] = {8, 9, 15, 16, 17, 19};
                         for (UInt32 i = 0; i < (sizeof(XY_CHANNEL) / sizeof(UInt32)); ++ i)
                         {
                             if (XY_CHANNEL[i] == channel)
@@ -13120,12 +13121,25 @@ namespace GObject
 
         if (!type)
             return;
+        if (GetPackage()->IsFull())
+        {
+            sendMsgCode(0, 1011);
+            return;
+        }
 
         _mditem = GameAction()->onUseMDSoul(this, type);
         if (!_mditem)
             return;
 
         sendMDSoul(1, _mditem);
+
+        char str[64] = {0};
+        sprintf(str, "F_10000_0118_%d", _mditem);
+        udpLog("huodong", str, "", "", "", "", "act");
+
+        soul -= subsoul;
+        _mditem = 0;
+        SetVar(VAR_MDSOUL, soul);
     }
 
     void Player::useMDSoul()
@@ -13133,13 +13147,13 @@ namespace GObject
         if (!World::getMayDay() && !World::getCompassAct())
             return;
 
-        UInt32 soul = GetVar(VAR_MDSOUL);
+/*        UInt32 soul = GetVar(VAR_MDSOUL);
         if (!soul)
             return;
 
         UInt8 type = 0;
         UInt32 subsoul = 0;
-/*        if (soul >= 100)
+        if (soul >= 100)
         {
             type = 1;
             subsoul = 100;
@@ -13150,7 +13164,7 @@ namespace GObject
             subsoul = 20;
         }
         else if (soul >= 10)
-  */
+  
         {
             type = 3;
             subsoul = 10;
@@ -13163,22 +13177,14 @@ namespace GObject
 
         if (!_mditem)
             return;
-
-        if (GetPackage()->IsFull())
+*/
+        for(std::vector<MDItem>::iterator it=_mditemVec.begin(); it != _mditemVec.end(); ++it)
         {
-            sendMsgCode(0, 1011);
-            return;
+	        m_Package->ItemNotify(it->id, it->count);
         }
-
-        GetPackage()->AddItem(_mditem, 1, true);
-        char str[64] = {0};
-        sprintf(str, "F_10000_0118_%d", _mditem);
-        udpLog("huodong", str, "", "", "", "", "act");
-
-        soul -= subsoul;
-        SetVar(VAR_MDSOUL, soul);
         sendMDSoul(0);
-        _mditem = 0;
+        _mditemVec.clear();
+    //    _mditem = 0;
     }
 
     void Player::svrSt(UInt8 type)
@@ -16448,6 +16454,124 @@ void Player::sendSysUpdate()
    st << (char*)VERSION;
    st << Stream::eos;
    send(st);
+}
+
+void Player::getDragonKingInfo()
+{
+    if(!World::getDragonKingAct())
+        return;
+    UInt8 step = GetVar(VAR_DRAGONKING_STEP);
+    if( step == 0 || step > 5)
+    {
+        step = 1;
+        SetVar(VAR_DRAGONKING_STEP, step);
+    }
+    Stream st(REP::ACTIVE);
+    st << static_cast<UInt8>(0x06);
+    st << static_cast<UInt8>(0x01);
+    st << step;
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::postDragonKing(UInt8 count)
+{
+    if (CURRENT_THREAD_ID() != getThreadId())
+    {
+        GameMsgHdr h(0x342,  getThreadId(), this, sizeof(count));
+        GLOBAL().PushMsg(h, &count);
+        return;
+    }
+    if (count == 0 || !World::getDragonKingAct())
+        return;
+#define ITEM_YLLING 9337   //游龙令
+    if (GetPackage()->GetItemAnyNum(ITEM_YLLING) < count)
+        return;
+    if (GetPackage()->GetRestPackageSize() < count)
+    {
+        sendMsgCode(0, 1011);
+        return;
+    }
+    GetPackage()->DelItemSendMsg(ITEM_YLLING, this);
+    Stream st(REP::ACTIVE);
+    st << static_cast<UInt8>(0x06);
+    st << static_cast<UInt8>(0x02);
+    st << count;
+    UInt8 step = GetVar(VAR_DRAGONKING_STEP);
+    if(step == 0 || step > 5)
+        step = 1;
+    bool isBind = true;
+    for(UInt8 i = 0; i < count; ++i)
+    {
+        GetPackage()->DelItemAny(ITEM_YLLING, 1, &isBind);
+        Table award = GameAction()->getDragonKingAward(step);
+        if (GameAction()->checkDragonKingCanSucceed(this, step))
+            step = (step + 1) > 5 ? 1 : step + 1;
+        else
+            step = 1;
+        st << step;
+        UInt8 size = award.size();
+        st << static_cast<UInt8>(size / 2);
+        for(UInt8 j = 1; j <= size; j += 2)
+        {
+            UInt16 itemId = award.get<UInt16>(j);
+            st << itemId << award.get<UInt8>(j+1);
+            GetPackage()->Add(itemId, award.get<UInt32>(j+1), isBind, true, FromQixi);
+            if(itemId == 6134)
+                SYSMSG_BROADCASTV(295, getCountry(), getName().c_str(), itemId);
+        }
+    }
+    st << Stream::eos;
+    send(st);
+    SetVar(VAR_DRAGONKING_STEP, step);
+}
+void Player::sendSnakeEggInfo()
+{
+    Stream st(REP::ACTIVE);
+    st << static_cast<UInt8>(0x08) << static_cast<UInt8>(0x01);
+    UInt8 t = 0; //活动阶段
+    if (World::getCallSnakeEggAct())
+        t = 1;
+    else if (World::getSnakeEggAwardAct() >= 1 && World::getSnakeEggAwardAct() <= 7)
+        t = 2;
+    else if (World::getSnakeEggAwardAct() == 0xFF)
+        t = 3;
+    st << t;
+    st << static_cast<UInt8>(GetVar(VAR_CALLSNAKEEGG)) << static_cast<UInt8>(World::getSnakeEggAwardAct());
+    st << static_cast<UInt8>(GetVar(VAR_SNAKEEGG_AWARD));
+    st << Stream::eos;
+    send(st);
+ 
+}
+void Player::callSnakeEgg()
+{
+  if (!World::getCallSnakeEggAct() || GetVar(VAR_CALLSNAKEEGG) != 0 )
+      return;
+  SetVar(VAR_CALLSNAKEEGG, 1);
+  sendSnakeEggInfo();
+}
+void Player::getSnakeEggAward(UInt8 v)
+{
+    UInt8 day = World::getSnakeEggAwardAct();
+    if (!day || v > 7 || v > day)
+        return;
+    UInt8 var = GetVar(VAR_SNAKEEGG_AWARD); 
+    if (var & v) //已领取
+        return;
+    if (v < day || GetVar(VAR_CALLSNAKEEGG) == 0)
+    {
+        if (getGold() < 30)
+        {
+		    sendMsgCode(0, 1104);
+            return;
+        }
+        ConsumeInfo ci(SnakeSprintAct, 0, 0);
+        useGold(30, &ci);
+    }
+    getCoupon(100);
+    var |= v;
+    SetVar(VAR_SNAKEEGG_AWARD, var);
+    sendSnakeEggInfo();
 }
 
 } // namespace GObject

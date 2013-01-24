@@ -1017,11 +1017,30 @@ bool JobHunter::OnAttackMonster(UInt16 pos, bool isAuto)
                 UInt8 prob = _rnd(100);
                 if (prob < _spItemRate[i])
                 {
-                    if (_owner->GetPackage()->Add(lr.id, lr.count, true, true, FromNpc))
+                    if (_owner->GetPackage()->Add(lr.id, lr.count, false, true, FromJobHunter))
                     {
                         _owner->_lastLoot.push_back(lr);
                     }
                 }
+            }
+            const UInt32 bossLootBase = 10527;
+            const UInt32 bossLootBase2 = 10531;
+            const GData::LootItem * li = GData::lootTable[bossLootBase + _gameProgress];
+            std::vector<GData::LootResult> lr;
+            li->roll(lr, &_rnd);
+            for (size_t j = 0; j < lr.size(); ++j)
+            {
+                if (_owner->GetPackage()->Add(lr[j].id, lr[j].count, false, true, FromJobHunter))
+                    _owner->_lastLoot.push_back(lr[j]);
+            }
+
+            lr.clear();
+            li = GData::lootTable[bossLootBase2 + _gameProgress];
+            li->roll(lr, &_rnd);
+            for (size_t j = 0; j < lr.size(); ++j)
+            {
+                if (_owner->GetPackage()->Add(lr[j].id, lr[j].count, false, true, FromJobHunter))
+                    _owner->_lastLoot.push_back(lr[j]);
             }
         }
     }
@@ -1199,6 +1218,27 @@ bool JobHunter::OnFoundCave(bool isAuto)
         ng->getLoots(_owner, _owner->_lastExJobAward, 0, NULL, true);
         _owner->udpLog("jobHunter", "F_1162", "", "", "", "", "act");
 
+        const UInt32 bossLootBase = 10527;
+        const UInt32 bossLootBase2 = 10531;
+        const GData::LootItem * li = GData::lootTable[bossLootBase + _gameProgress];
+        std::vector<GData::LootResult> lr;
+        li->roll(lr, &_rnd);
+        for (size_t j = 0; j < lr.size(); ++j)
+        {
+            if (_owner->GetPackage()->Add(lr[j].id, lr[j].count, true, true, FromJobHunter))
+                _owner->_lastExJobAward.push_back(lr[j]);
+        }
+
+        lr.clear();
+        li = GData::lootTable[bossLootBase2 + _gameProgress];
+        li->roll(lr, &_rnd);
+        for (size_t j = 0; j < lr.size(); ++j)
+        {
+            if (_owner->GetPackage()->Add(lr[j].id, lr[j].count, true, true, FromJobHunter))
+                _owner->_lastExJobAward.push_back(lr[j]);
+        }
+
+
     }
     else
     {
@@ -1267,7 +1307,7 @@ bool JobHunter::OnFoundCave(bool isAuto)
             st2 << static_cast<UInt16>(itemId) << static_cast<UInt16>(itemCount);
             if (!isAuto)
                 _owner->lastExJobAwardPush(itemId, itemCount);
-            _owner->GetPackage()->Add(itemId, itemCount, true, isAuto? false:true, FromNpc);
+            _owner->GetPackage()->Add(itemId, itemCount, true, isAuto? false:true, FromJobHunter);
         }
     }
     else
