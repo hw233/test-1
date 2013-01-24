@@ -2338,12 +2338,13 @@ namespace GObject
 				respData->id = sale->_id;
 				respData->price = sale->_price;
 				respData->priceType = sale->_priceType;
-				if(sale->_item->getName().length() <= 21)
+                UInt32 size = sizeof(respData->itemName) - 1;
+				if(sale->_item->getName().length() <= size)
 					strcpy(respData->itemName, sale->_item->getName().c_str());
 				else
 				{
-					memcpy(respData->itemName, sale->_item->getName().c_str(), 21);
-					respData->itemName[21] = 0;
+					memcpy(respData->itemName, sale->_item->getName().c_str(), size);
+					respData->itemName[size] = 0;
 				}
 				pl->GetSale()->addSaleFromDB(respData);
 			}
@@ -4018,13 +4019,13 @@ namespace GObject
                     lua_tinker::table table_disChance = table_temp.get<lua_tinker::table>(2);
                     UInt32 sizeDis = std::min(11, table_dis.size());
                     UInt32 sizeDisChance = std::min(11, table_disChance.size());
-                    if(sizeDisChance == sizeDis)
+                    for(UInt32 i = 0; i < sizeDis; ++ i)
                     {
-                        for(UInt32 i = 0; i < sizeDis; ++ i)
-                        {
-                            _lbAttrConf.dis[i] = table_dis.get<UInt16>(i + 1);
-                            _lbAttrConf.disChance[i] = table_disChance.get<UInt16>(i + 1);
-                        }
+                        _lbAttrConf.dis[i] = table_dis.get<UInt16>(i + 1);
+                    }
+                    for(UInt32 j = 0; j < sizeDisChance; ++ j)
+                    {
+                        _lbAttrConf.disChance[j] = table_disChance.get<UInt16>(j + 1);
                     }
                 }
             }

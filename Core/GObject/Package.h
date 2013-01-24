@@ -151,6 +151,7 @@ namespace GObject
 		static ItemBase* BuildEquipFromDB(UInt32 id, bool bind = false);
 		void ItemNotify(UInt32 id, UInt16 num = 1);
 		bool MoveEquipFromPack(ItemEquip *);
+		void ItemNotifyEquip(ItemEquip*);
 
 	public:
 		UInt16 GetItemUsedGrids(UInt32 id, UInt16 num, bool bind = false);
@@ -253,11 +254,12 @@ namespace GObject
 
         UInt8 Tongling(UInt32 equipId, UInt8 protect, UInt8 bind, std::vector<UInt16>& values);
         UInt8 OpenLingbaoSmelt(UInt16 gujiId, UInt8 type);
-        UInt8 LingbaoSmelt(UInt32 itemId, UInt8 bind);
+        UInt8 LingbaoSmelt(UInt32 itemId, UInt16 cnt);
         UInt8 closeLingbaoSmelt();
         void sendLingbaoSmeltInfo();
         void loadLingbaoSmeltInfo(LingbaoSmeltInfo& info) { m_lbSmeltInfo = info; }
         void FinishLBSmelt();
+        void testLingbao(UInt32 itemId, UInt32* colorNums, UInt8 size, UInt32* skills, UInt8 size2);
 
 	private:
 		enum {ItemClassSize = Item_Weapon + 1};

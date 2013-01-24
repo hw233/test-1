@@ -23,6 +23,7 @@ namespace GData
 {
     struct SkillBase;
     struct SkillItem;
+    struct LBSkillItem;
 }
 
 namespace Battle

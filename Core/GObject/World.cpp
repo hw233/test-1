@@ -53,6 +53,7 @@
 #include "SingleHeroStage.h"
 #include "SHSYTmpl.h"
 #include "QixiTmpl.h"
+#include "LBNameTmpl.h"
 #include "MsgHandler/Memcached.h"
 #include "RechargeTmpl.h"
 #include "GVar.h"
@@ -1600,6 +1601,11 @@ bool World::Init()
     path = cfg.scriptPath + "qixitmpl.lua";
     qixiTmpl.setFilename(path.c_str());
     qixiTmpl.load();
+
+    path = cfg.scriptPath + "lbnametmpl.lua";
+    lbnameTmpl.setFilename(path.c_str());
+    lbnameTmpl.load();
+
     path = cfg.scriptPath + "RechargeTmpl.lua";
     GObject::RechargeTmpl::instance().setFilename(path.c_str());
     GObject::RechargeTmpl::instance().load();

@@ -425,9 +425,10 @@ public:
     inline std::vector<LBSkill>& getLBSkill() { return _lbSkill; }
     ItemEquip* setLingbao( UInt8 idx , ItemEquip* lingbao, bool = true);
     void loadLingbao(std::string& lb);
-    void loadLBSkill(LBSkill& lbSkill);
+    void loadLBSkill(std::string& lbSkill);
     bool addLBSkill(UInt32 lbid, UInt16 skillid, UInt16 factor);
     bool delLBSkill(UInt32 lbid);
+    void getAllLbSkills(Stream& st);
 
 
 

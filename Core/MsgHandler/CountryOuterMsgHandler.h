@@ -5764,12 +5764,17 @@ void OnEquipLingbaoReq( GameMsgHdr & hdr, const void * data )
         {
             UInt16 count = 0;
             br >> count;
+            UInt8 res = 0;
             for(int i = 0; i < count; ++ i)
             {
+                UInt16 cnt = 0;
+                br >> cnt;
                 UInt32 itemId = 0;
-                UInt8 bind = 0;
-                br >> itemId >> bind;
-                pkg->LingbaoSmelt(itemId, bind);
+                br >> itemId;
+                res = pkg->LingbaoSmelt(itemId, cnt);
+
+                if(res != 0)
+                    break;
             }
             pkg->sendLingbaoSmeltInfo();
         }

@@ -313,6 +313,7 @@ private:
     bool doSkillStatus2(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt);
     bool doSkillState(BattleFighter* bf, const GData::SkillBase* skill, BattleObject* bo, float factor, UInt8 poisonTimes, UInt32& dmg, std::vector<AttackAct>* atkAct2, std::vector<AttackAct>* atkAct);
     bool doStateMagRes(BattleFighter* bf, BattleFighter* target_bo, UInt16 state, const GData::SkillBase* skill, std::vector<AttackAct>* atkAct2, std::vector<AttackAct>* atkAct);
+    bool doStateMagRes2(BattleFighter* bf, BattleFighter* target_bo, UInt16 state);
 
     void getSkillTarget(BattleFighter* bf, const GData::SkillBase* skill, int& target_side, int& target_pos, int& cnt);
 
@@ -553,6 +554,7 @@ private:
     bool getItemLing_pr(BattleFighter* bf, GData::LBSkillItem* item);
 
     void getAtkList(BattleFighter* bf, BattleFighter* bo, const GData::LBSkillBase* lbskill, AtkList& atkList);
+    void makeDamage(BattleFighter* bo, UInt32& u);
 };
 
 }

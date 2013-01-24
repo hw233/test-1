@@ -116,6 +116,11 @@ inline bool IsEquipTypeId(UInt32 id)
 	return (id >= LARM_ID && id <= RARM_ID) || (id >=LBMIN_ID && id <= LBMAX_ID);
 }
 
+inline bool IsLingbaoTypeId(UInt32 id)
+{
+	return (id >=LBMIN_ID && id <= LBMAX_ID);
+}
+
 /** 新增11,12级宝石 **/
 inline bool IsGemId2(UInt32 id)
 {

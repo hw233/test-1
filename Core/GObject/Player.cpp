@@ -2755,6 +2755,7 @@ namespace GObject
 
 			_fighters.erase(it);
 			DB2().PushUpdateData("DELETE FROM `fighter` WHERE `id` = %u AND `playerId` = %"I64_FMT"u", id, getId());
+			DB2().PushUpdateData("DELETE FROM `second_soul` WHERE `fighterId` = %u AND `playerId` = %"I64_FMT"u", id, getId());
 
             if(fgt->getColor() >= 2) //删除散仙荣誉
                 GameAction()->doAttainment(this, 10107, fgt->getColor());
@@ -13659,6 +13660,7 @@ namespace GObject
                 fgt->getAllUpSkillAndLevel(st);
                 fgt->getAllPSkillAndLevel4Arena(st);
                 fgt->getAllSSAndLevel(st);
+                fgt->getAllLbSkills(st);
 
                 fgt->getAttrExtraEquip(st);
 

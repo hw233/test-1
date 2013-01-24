@@ -1873,22 +1873,11 @@ void Fighter::rebuildBattlePoint()
         if(form)
             _battlePoint += form->getBattlePoint();
     }
-    for(int i = 0; i < getMaxLingbaos(); ++ i)
+    UInt8 cnt = _lbSkill.size();
+    for(UInt8 i = 0; i < cnt; ++ i)
     {
-		ItemLingbao* lb = static_cast<ItemLingbao*>(getLingbao(i));
-        if(!lb)
-            continue;
-        ItemLingbaoAttr& lba = lb->getLingbaoAttr();
-        if(lba.skill[0])
-        {
-            const GData::LBSkillBase* lbskill = GData::lbSkillManager[lba.skill[0]];
-            _battlePoint += lbskill->battlepoint * lba.factor[0];
-        }
-        if(lba.skill[1])
-        {
-            const GData::LBSkillBase* lbskill = GData::lbSkillManager[lba.skill[1]];
-            _battlePoint += lbskill->battlepoint * lba.factor[1];
-        }
+        const GData::LBSkillBase* lbskill = GData::lbSkillManager[_lbSkill[i].skillid];
+        _battlePoint += lbskill->battlepoint * _lbSkill[i].factor;
     }
 }
 
@@ -2461,7 +2450,7 @@ void Fighter::getAllLingbaos( Stream& st )
 {
     // XXX: append to armor
     // st << static_cast<UInt8>(TRUMP_UPMAX);
-    for (int i = 0; i < TRUMP_UPMAX; ++i)
+    for (int i = 0; i < LINGBAO_UPMAX; ++i)
     {
         st << getLingbaoId(i);
     }
@@ -5252,6 +5241,8 @@ ItemEquip* Fighter::setLingbao(UInt8 idx, ItemEquip* lb, bool writedb)
             addLBSkill(lb->getId(), lba.skill[0], lba.factor[0]);
         if(lba.skill[1])
             addLBSkill(lb->getId(), lba.skill[1], lba.factor[1]);
+        if (lb)
+            lb->DoEquipBind(true);
     }
 
     _attrDirty = true;
@@ -5322,6 +5313,16 @@ bool Fighter::delLBSkill(UInt32 lbid)
     }
 
     return res;
+}
+
+void Fighter::getAllLbSkills(Stream& st)
+{
+    UInt8 cnt = _lbSkill.size();
+    st << cnt;
+    for(int i = 0; i < cnt; ++ i)
+    {
+        st << _lbSkill[i].skillid << _lbSkill[i].factor;
+    }
 }
 
 }

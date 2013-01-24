@@ -423,9 +423,9 @@ void BattleFighter::setFighter( GObject::Fighter * f )
             continue;
         GData::LBSkillItem item;
         item.base = base;
-        item.cd = base->cd;
-        item.prob = base->prob * lbSkills[idx].factor;
-        item.ef_value = base->ef_value * lbSkills[idx].factor;
+        item.cd = 0;
+        item.prob = base->prob * ((float)lbSkills[idx].factor/10000);
+        item.ef_value = base->ef_value * ((float)lbSkills[idx].factor/10000);
         switch(base->cond)
         {
         case GData::e_lb_cond_skill:
@@ -2181,6 +2181,13 @@ GData::LBSkillItem* BattleFighter::getSkillCondItem(UInt16 skillid)
         }
     }
 
+    if(item && item->prob > 0.01f)
+    {
+        if(item->prob > uRand(10000))
+            item->cd = item->base->cd;
+        else
+            item = NULL;
+    }
     return item;
 }
 
@@ -2194,6 +2201,13 @@ GData::LBSkillItem* BattleFighter::getActionCondItem1()
         break;
     }
 
+    if(item && item->prob > 0.01f)
+    {
+        if(item->prob > uRand(10000))
+            item->cd = item->base->cd;
+        else
+            item = NULL;
+    }
     return item;
 }
 
@@ -2207,6 +2221,13 @@ GData::LBSkillItem* BattleFighter::getActionCondItem2()
         break;
     }
 
+    if(item && item->prob > 0.01f)
+    {
+        if(item->prob > uRand(10000))
+            item->cd = item->base->cd;
+        else
+            item = NULL;
+    }
     return item;
 }
 
@@ -2221,6 +2242,13 @@ GData::LBSkillItem* BattleFighter::getDeadCondItem()
         break;
     }
 
+    if(item && item->prob > 0.01f)
+    {
+        if(item->prob > uRand(10000))
+            item->cd = item->base->cd;
+        else
+            item = NULL;
+    }
     return item;
 }
 
@@ -2240,7 +2268,7 @@ GData::LBSkillItem* BattleFighter::getBleedCondItem()
 
     if(item && item->prob > 0.01f)
     {
-        if(item->prob * 100 > uRand(10000))
+        if(item->prob > uRand(10000))
             item->cd = item->base->cd;
         else
             item = NULL;
@@ -2266,7 +2294,7 @@ GData::LBSkillItem* BattleFighter::getStateCondItem(UInt16 state)
 
     if(item && item->prob > 0.01f)
     {
-        if(item->prob * 100 > uRand(10000))
+        if(item->prob > uRand(10000))
             item->cd = item->base->cd;
         else
             item = NULL;

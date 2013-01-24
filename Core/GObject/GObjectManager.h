@@ -88,17 +88,15 @@ namespace GObject
         {
             int maxIdx = 9;
             UInt16 lastDisChance = 0;
-            UInt16 lastDis = 0;
-            for(int i = 0; i < 11; ++ i)
+            for(int i = 0; i < 9; ++ i)
             {
                 if(chance < disChance[i])
                 {
                     float fChance = ((float)(chance + 1 - lastDisChance)) / (disChance[i] - lastDisChance);
-                    float fDis = ((float)(lastDis) + (dis[i] - lastDis)*fChance) / dis[maxIdx];
+                    float fDis = ((float)(dis[i]) + (dis[i+1] - dis[i])*fChance) / dis[maxIdx];
                     return fDis;
                 }
                 lastDisChance = disChance[i];
-                lastDis = dis[i];
             }
             return 0;
         }
@@ -156,11 +154,12 @@ namespace GObject
             return 0;
         }
 
-        UInt8 getSmeltExp(UInt8 lv, UInt8 itemTypeIdx, UInt8* at, UInt16* av, UInt8 size)
+        UInt16 getSmeltExp(UInt8 lv, UInt8 itemTypeIdx, UInt8* at, UInt16* av, UInt8 size, UInt8 skillNum)
         {
             float colorP = 0;
             float lvFactor[8] = {1, 1.2, 1.4, 1.6, 0, 0, 0, 0};
             UInt8 lvIdx = (lv-70)/10;
+            UInt16 skillExp = 100;
             if(lvIdx > 3)
                 lvIdx = 3;
 
@@ -170,10 +169,10 @@ namespace GObject
                     colorP += ((float)(av[i])/getAttrMax(lv, itemTypeIdx, at[i]-1))*100;
             }
 
-            return colorP*lvFactor[lvIdx];
+            return colorP*lvFactor[lvIdx] + skillExp * skillNum;
         }
 
-        UInt8 getSmeltExp2(UInt8 lv, UInt8 itemTypeIdx, UInt8 color)
+        UInt16 getSmeltExp2(UInt8 lv, UInt8 itemTypeIdx, UInt8 color)
         {
             float lvFactor[8] = {1, 1.2, 1.4, 1.6, 0, 0, 0, 0};
             UInt8 lvIdx = (lv-70)/10;
