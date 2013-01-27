@@ -1405,9 +1405,9 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
         {
             BattleFighter * target_fighter = static_cast<BattleFighter *>(area_target_obj);
             // test counter by rolling dice
-            if(counter100 || target_fighter->calcCounter(bf, !bf->canBeCounter(), skill))
+            if(counter100 || target_fighter->calcCounter(bf, skill))
             {
-                if(counter100/* || target_fighter->calcHit(bf, NULL)*/)
+                if(counter100 || target_fighter->calcHit(bf, NULL))
                 {
                     doPassiveSkillOnCounter(target_fighter, bf);
 

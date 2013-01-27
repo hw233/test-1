@@ -841,9 +841,9 @@ bool BattleFighter::calcHit( BattleFighter * defender, const GData::SkillBase* s
 	return uRand(10000) < hitrate * 100;
 }
 
-bool BattleFighter::calcCounter(BattleFighter* attacker, bool ranged, const GData::SkillBase* skill)
+bool BattleFighter::calcCounter(BattleFighter* attacker, const GData::SkillBase* skill)
 {
-	return uRand(ranged ? 20000 : 10000) < getCounter(attacker, skill) * 100;
+	return uRand(10000) < getCounter(attacker, skill) * 100;
 }
 
 bool BattleFighter::canBeCounter()

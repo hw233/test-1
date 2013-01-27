@@ -214,7 +214,7 @@ public:
 	void postInit();
 	float calcAttack(bool& isCritical, BattleFighter* defender , float* pCf);
 	bool calcHit(BattleFighter * defender, const GData::SkillBase* skill);
-	bool calcCounter(BattleFighter* attacker, bool ranged = false, const GData::SkillBase* skill = NULL);
+	bool calcCounter(BattleFighter* attacker, const GData::SkillBase* skill = NULL);
 	bool canBeCounter();
 	bool calcPierce(BattleFighter* defender);
     float calcTherapy(bool& isCritical, bool& first, const GData::SkillBase* skill);

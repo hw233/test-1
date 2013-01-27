@@ -99,7 +99,7 @@ void NpcGroup::getLoots( GObject::Player * player, std::vector<LootResult>& il, 
             bool bind = false;
             if(IsGemId(lr[j].id) && !lootlvl && player->GetLev() <= 55)
                 bind = true;
-            if (player->GetPackage()->Add(lr[j].id, lr[j].count, bind | lr[j].bind, true, FromNpc))
+            if (player->GetPackage()->Add(lr[j].id, lr[j].count, bind || lr[j].bind, true, FromNpc))
             {
                 ++cnt;
                 il.push_back(lr[j]);
@@ -128,7 +128,7 @@ void NpcGroup::getLoots( GObject::Player * player, std::vector<LootResult>& il, 
         (*it)->roll(lr);
         for (size_t j = 0; j < lr.size(); ++j)
         {
-            if (player->GetPackage()->Add(lr[j].id, lr[j].count, bind | lr[j].bind, true, FromNpc))
+            if (player->GetPackage()->Add(lr[j].id, lr[j].count, bind || lr[j].bind, true, FromNpc))
             {
                 ++cnt;
                 il.push_back(lr[j]);
