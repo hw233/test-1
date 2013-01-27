@@ -62,7 +62,7 @@ public:
     bool needResetDiscount();
     void storeDiscount();
 	void sendList(UInt8 type, GObject::Player *);
-    UInt32 getPrice( UInt8 type, UInt16 itemId, UInt16 flag);
+    UInt32 getPrice( UInt8 type, UInt16 itemId, UInt16 flag, UInt8 index);
 	UInt32 getPrice(UInt8 type, UInt16 itemId);
 	UInt32 getPrice(UInt16 itemId);
 	void makePacket();

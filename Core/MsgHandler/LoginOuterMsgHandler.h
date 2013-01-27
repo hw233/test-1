@@ -2809,6 +2809,11 @@ void ClearDiscountFromBs(LoginMsgHdr& hdr, const void* data)
     GData::store.clearSpecialDiscountFromBS();
     GData::store.storeDiscount();
     GData::store.makePacket();
+
+    Stream st (SPEP::CLEARDISCOUNT);
+    st << static_cast<UInt8>(0);
+    st << Stream::eos;
+	NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
 void QueryRealAwardInfo(LoginMsgHdr& hdr, const void* data)

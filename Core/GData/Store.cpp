@@ -271,15 +271,16 @@ UInt32 Store::getPrice( UInt8 type, UInt16 itemId )
     return 0xFFFFFFFF;
 }
 
-UInt32 Store::getPrice( UInt8 type, UInt16 itemId, UInt16 flag)
+UInt32 Store::getPrice( UInt8 type, UInt16 itemId, UInt16 flag, UInt8 index)
 {
     // 获取限购商品的价格
+    UInt8 tmp = 0;
     if (type >=DISCOUNT && type <= DISCOUNTEND)
     {
         std::vector<Discount>& items = _itemsDiscount[type - DISCOUNT];
 		for(std::vector<Discount>::iterator it = items.begin(); it != items.end(); ++ it)
         {
-            if ((*it).itemID == itemId && (*it).discountType == flag)
+            if ((*it).itemID == itemId && (*it).discountType == flag && (tmp++ == index))
                 return (*it).priceDiscount;
         }
 

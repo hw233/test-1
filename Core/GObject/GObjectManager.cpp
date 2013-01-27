@@ -4826,8 +4826,7 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading Discount Data");
 		DBDiscount t;
-		if(execu->Prepare("SELECT `itemid`, `exType`, `exValue` `timeBegin`, `timeEnd`, `priceOriginal`, `priceDiscount`,\
-                    `type`, `count` FROM `discount`", t)!= DB::DB_OK)
+		if(execu->Prepare("SELECT `itemid`, `exType`, `exValue`, `timeBegin`, `timeEnd`, `priceOriginal`, `priceDiscount`, `type`, `count` FROM `discount`", t)!= DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)

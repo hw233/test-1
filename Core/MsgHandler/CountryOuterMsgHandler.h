@@ -3012,7 +3012,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
         lr._count = 1;
 	UInt32 price = 0;
     if (lr._type == 1)
-        price = GData::store.getPrice(lr._type, lr._itemId, lr._count); // XXX: when discount need one item id
+        price = GData::store.getPrice(lr._type, lr._itemId, lr._count, 0); // XXX: when discount need one item id
     else if(lr._type == 125) //蓝砖超人活动页
     {
         if(!World::getBDSuperman())
@@ -3085,7 +3085,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                 // 获取价格
                 price = 0;
                 for (UInt8 i = 0; i < c; ++i)
-                    price += GData::store.getPrice(1, items[i], discountType);
+                    price += GData::store.getPrice(1, items[i], discountType, i);
 
                 if(PLAYER_DATA(player, gold) < price)
                 {
