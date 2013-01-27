@@ -306,7 +306,15 @@ local treasureChance = {
 }
 
 
+local bigTreasure =
+{
+    [1] = 20004,
+    [2] = 20008,
+    [3] = 20012,
+    [4] = 20016,
+}
 
+--[[
 function getDreamerTreasure(id)
     -- 获得相应宝箱的道具
     local prob = math.random(1, 10000)
@@ -318,16 +326,38 @@ function getDreamerTreasure(id)
     end
     print ("getTreasure error.")
 end
+]]--
 
-function getDreamerItem(id,index)
-    -- 获得相应宝箱的道具
-    local prob = math.random(1, 10000)
-    local chanceTmp = chance[id][index]
-    for i = 1, #chanceTmp do
-        if prob <= chanceTmp[i] then
-            return item[id][index][i]
-        end
+function getDreamerTreasure(id)
+    if id == 0 then
+        return 0;
     end
-    print ("getItem error.")
+    if id > #bigTreasure then
+        return 0
+    end
+    return bigTreasure[id]
+end
+
+local ItemID =
+{
+    [1] = {20001, 20002, 20003},
+    [2] = {20005, 20006, 20007},
+    [3] = {20009, 20010, 20011},
+    [4] = {20013, 20014, 20015},
+
+}
+
+function getDreamerItem(progress,index)
+    -- 获得相应宝箱的道具
+    if progress == 0 then
+        return 0
+    end
+    if progress > #ItemID then
+        return 0
+    end
+    if index > #ItemID[progress] then
+        return 0
+    end
+    return ItemID[progress][index]
 end
 

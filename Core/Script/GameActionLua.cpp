@@ -1480,9 +1480,9 @@ namespace Script
         return Call<UInt32>("foundCave", id);
     }
 
-    lua_tinker::table GameActionLua::getStepAward(UInt32 step)
+    UInt32 GameActionLua::getStepAward(UInt8 progress, UInt32 step)
     {
-        return Call<lua_tinker::table>("getStepAward", step);
+        return Call<UInt32>("getStepAward", progress, step);
     }
     
     UInt16 GameActionLua::getSpecialItem(UInt8 id, UInt8 index)
@@ -1495,14 +1495,14 @@ namespace Script
         return Call<lua_tinker::table>("getCopyFrontmapAward", step, localtion);
     }
 
-    lua_tinker::table GameActionLua::getDreamerTreasure(UInt8 id)
+    UInt32 GameActionLua::getDreamerTreasure(UInt8 id)
     {
-        return Call<lua_tinker::table>("getDreamerTreasure", id);
+        return Call<UInt32>("getDreamerTreasure", id);
     }
  
-    lua_tinker::table GameActionLua::getDreamerItem(UInt8 id, UInt8 index)
+    UInt32 GameActionLua::getDreamerItem(UInt8 id, UInt8 index)
     {
-        return Call<lua_tinker::table>("getDreamerItem", id, index);
+        return Call<UInt32>("getDreamerItem", id, index);
     }
 
     Table GameActionLua::getDragonKingAward(UInt8 step)

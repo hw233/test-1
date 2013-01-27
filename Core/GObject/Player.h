@@ -357,6 +357,19 @@ namespace GObject
         UInt8 id;
     };
 
+    class EventAutoRefreshOpenKey : public EventBase
+    {
+    public:
+		EventAutoRefreshOpenKey(Player * player, UInt32 interval, UInt32 count)
+			: EventBase(player, interval, count)
+		{}
+
+        virtual UInt32 GetID() const { return EVENT_REFRESHOPENKEY; }
+        virtual bool Equal(UInt32 id, size_t playerid) const;
+        void Process(UInt32);
+		bool Accelerate(UInt32);
+    };
+
 
 	struct Lineup
 	{
@@ -1522,7 +1535,7 @@ namespace GObject
         UInt8 getSnowAward(UInt16 type);
         //推雪人end
         
-        void setForbidSale(bool b) {_isForbidSale = b;}
+        void setForbidSale(bool b, bool isAuto = false);
         bool getForbidSale() {return _isForbidSale;}
 	private:
 		Mutex _mutex;
@@ -1625,6 +1638,7 @@ namespace GObject
         std::vector<GData::LootResult> _lastKillMonsterAward;
         std::vector<GData::LootResult> _lastNew7DayTargetAward;
         std::vector<GData::LootResult> _lastExJobAward;
+        std::vector<GData::LootResult> _lastExJobStepAward;
 
     private:
 		UInt16 _lastDungeon;
@@ -1946,6 +1960,8 @@ namespace GObject
         int IDIPBuy(UInt32 itemId, UInt32 num, UInt32 price, std::string& err, bool bind = true);
         void lastExJobAwardPush(UInt16 itemId, UInt16 num);
         void checkLastExJobAward();
+        void lastExJobStepAwardPush(UInt16 itemId, UInt16 num);
+        void checkLastExJobStepAward();
         void lastQueqiaoAwardPush(UInt16 itemId, UInt16 num);
         void checkLastQueqiaoAward();
         void lastKillMonsterAwardPush(UInt16 itemId, UInt16 num);

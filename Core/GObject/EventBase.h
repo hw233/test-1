@@ -18,6 +18,7 @@ enum EventID
     EVENT_AUTOFRONTMAP = 9,
     EVENT_TLZAUTO = 10,
     EVENT_JOBHUNTER = 11,
+    EVENT_REFRESHOPENKEY = 12,
 };
 
 namespace GObject

@@ -1830,6 +1830,78 @@ void OnAddMapObj( GameMsgHdr& hdr, const void * data)
     map->Show(mo->m_ID, true, mo->m_Type);
 }
 
+void OnForbidSale( GameMsgHdr &hdr, const void *data)
+{
+	MSG_QUERY_PLAYER(player);
+    if (cfg.autoForbid)
+    {
+        if (cfg.merged)
+        {
+            setForbidSaleValue(player->getId()&0xFFFFFFFF, true);
+        }
+        else
+        {
+            setForbidSaleValue(player->getId(), true);
+        }
+        player->setForbidSale(true, true);
+    }
+    else
+    {
+        player->udpLog("svr_forbid_sale", "known", "", "", "", "", "act_tmp");
+    }
+}
+
+void OnForbidSaleQueryFail( GameMsgHdr &hdr, const void *data)
+{
+    MSG_QUERY_PLAYER(player);
+    const Int32 ret = *(reinterpret_cast<Int32*>(const_cast<void *>(data)));
+    char buf[16];
+    snprintf(buf, 16, "%d", ret);
+    player->udpLog("svr_forbid_sale", buf, "", "", "", "", "act_tmp");
+}
+
+void OnOpenIdInvalid( GameMsgHdr &hdr, const void *data)
+{
+	MSG_QUERY_PLAYER(player);
+    char* openId = reinterpret_cast<char*>(const_cast<void *>(data));
+    std::string invalidOpenId = player->getOpenId();
+    std::string validOpenId = openId;
+    player->setOpenId(validOpenId);
+    player->udpLog("invalid_openid", invalidOpenId.c_str(), openId, "", "", "", "act_tmp");
+}
+
+void OnOpenAPIFailed( GameMsgHdr &hdr, const void *data)
+{
+	MSG_QUERY_PLAYER(player);
+#define MAX_MSG_LEN 1024
+    struct OpenAPIFailedInfo
+    {
+        UInt32 type;
+        Int32  ret;
+        char   msg[MAX_MSG_LEN];
+    };
+	const OpenAPIFailedInfo * faildInfo = reinterpret_cast<const OpenAPIFailedInfo*>(const_cast<void *>(data));
+    char buf[32] = "";
+    switch (faildInfo->type)
+    {
+        case 0:
+            snprintf (buf, 32, "%s", "is_login");
+            break;
+        case 1002:
+            snprintf (buf, 32, "%s", "punish");
+            break;
+        default:
+            snprintf (buf, 32, "unknow_%d", faildInfo->type);
+            break;
+    }
+    char buf2[32] = "";
+    snprintf( buf2, 32, "%d", faildInfo->ret);
+    player->udpLog(buf, buf2, faildInfo->msg, "", "", "", "act_tmp");
+    if (faildInfo->ret == 1002)
+    {
+        player->selfKick();
+    }
+}
 void OnPostDragonKing( GameMsgHdr& hdr, const void * data)
 {
     MSG_QUERY_PLAYER(player);

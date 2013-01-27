@@ -2706,6 +2706,12 @@ UInt8 SwitchSecDC(UInt32 val)
     return 0;
 }
 
+UInt8 SwitchAutoForbid(UInt32 val)
+{
+    cfg.setAutoForbid(val? true:false);
+    return 0;
+}
+
 void GMCmd(LoginMsgHdr& hdr, const void* data)
 {
     // 接受后台传来的GM指令，返回0表示操作成功，非0为操作失败
@@ -2723,6 +2729,8 @@ void GMCmd(LoginMsgHdr& hdr, const void* data)
         case 0x01:
             result = SwitchSecDC(val);
             break;
+        case 0x02:
+            result = SwitchAutoForbid(val);
         default:
             break;
     }

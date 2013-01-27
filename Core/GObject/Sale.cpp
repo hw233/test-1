@@ -7,6 +7,7 @@
 #include "Mail.h"
 #include "MsgID.h"
 #include "DCLogger.h"
+#include "GObject/OpenAPIWorker.h"
 #include "LBNameTmpl.h"
 #include "SaleMgr.h" 
 
@@ -77,6 +78,7 @@ bool Sale::addSaleMailFromDB(UInt32 id, ItemBase * item, bool mailSend)
 
 void Sale::sellSaleReq(std::vector<SaleSellData>& sales)
 {
+    OPENAPI().Push(_owner->getId(), 1002, _owner->getOpenId(), _owner->getOpenKey(), _owner->getSource().c_str(), _owner->getClientIp());
 	std::size_t sz = sales.size();
 	UInt16 ItemCount[9] = {0};
 	if(sz == 0)

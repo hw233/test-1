@@ -75,7 +75,7 @@ project "JsonProxy.ASSS"
     configuration { "Debug", "vs*" }
         links { "eventd" }
     configuration { "Release", "vs*" }
-        links { "event", "event_pthreads", "dl", "pthread" }
+        links { "event", "event_pthreads", "dl", "pthread", "memcached" }
     configuration { "windows", "not vs*" }
         links { "event" }
     configuration "not vs*"
@@ -85,7 +85,7 @@ project "JsonProxy.ASSS"
     	buildoptions { "-pg" }
         linkoptions { "-pg" }
     configuration "not windows"
-        links { "event", "event_pthreads", "dl" }
+        links { "event", "event_pthreads", "dl", "memcached" }
     configuration "linux"
         defines { "LUA_USE_LINUX", "_JSON_PROXY_" }
         defines "LUA_USE_LINUX"
