@@ -3013,7 +3013,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
         lr._count = 1;
 	UInt32 price = 0;
     if (lr._type == 1)
-        price = GData::store.getPrice(lr._type, lr._itemId, lr._count); // XXX: when discount need one item id
+        price = GData::store.getPrice(lr._type, lr._itemId, lr._count, 0); // XXX: when discount need one item id
     else if(lr._type == 125) //蓝砖超人活动页
     {
         if(!World::getBDSuperman())
@@ -3042,13 +3042,28 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 		{
         case 1:
             {
-                // (JLT): 折扣商品的购买
+                // 折扣商品的购买
                 UInt8 discountType = lr._count;
                 UInt8 varoff = GData::store.getDisTypeVarOffset(discountType);
-                if (varoff == 0xfe)
+                UInt8 exType = 0;
+                UInt32 exValue = 0;
+
+                exType = GData::store.getExDiscount(discountType, exValue);
+
+                switch(exType)
                 {
-                    //TODO: 全服限购，只需要检查全服是否还有库存
+                    case 1:
+                        // 消费限购
+                        player->GetVar(VAR_DISCOUNT_CONSUME1 + discountType - 4);
+                        break;
+                    case 2:
+                        // 充值限购
+                        player->GetVar(VAR_DISCOUNT_RECHARGE1 + discountType - 4);
+                        break;
+                    default:
+                        break;
                 }
+
                 if (varoff == 0xff)
                     return;
 
@@ -3071,7 +3086,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                 // 获取价格
                 price = 0;
                 for (UInt8 i = 0; i < c; ++i)
-                    price += GData::store.getPrice(1, items[i], discountType);
+                    price += GData::store.getPrice(1, items[i], discountType, i);
 
                 if(PLAYER_DATA(player, gold) < price)
                 {
@@ -3469,6 +3484,41 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                     player->useGold(price,&ci);
                     player->consumeGold(price);
 					st << static_cast<UInt8>(0);
+
+                    if (lr._type == PURCHASE1 + 1 )
+                    {
+                        bool flag = false;
+                        UInt32 now = TimeUtil::Now();
+                        if ((GVAR.GetVar(GVAR_DISCOUNT_TYPE1) == 1)
+                                && GVAR.GetVar(GVAR_DISCOUNT_BEGIN1) < now
+                                && GVAR.GetVar(GVAR_DISCOUNT_END1) > now)
+                        {
+                            player->AddVar(VAR_DISCOUNT_CONSUME1, price);
+                            flag = true;
+                        }
+                        else
+                            player->SetVar(VAR_DISCOUNT_CONSUME1, 0);
+                        if ((GVAR.GetVar(GVAR_DISCOUNT_TYPE2) == 1)
+                                && GVAR.GetVar(GVAR_DISCOUNT_BEGIN2) < now
+                                && GVAR.GetVar(GVAR_DISCOUNT_END2) > now)
+                        {
+                            player->AddVar(VAR_DISCOUNT_CONSUME2, price);
+                            flag = true;
+                        }
+                        else
+                            player->SetVar(VAR_DISCOUNT_CONSUME2, 0);
+                        if ((GVAR.GetVar(GVAR_DISCOUNT_TYPE3) == 1)
+                                && GVAR.GetVar(GVAR_DISCOUNT_BEGIN3) < now
+                                && GVAR.GetVar(GVAR_DISCOUNT_END3) > now)
+                        {
+                            player->AddVar(VAR_DISCOUNT_CONSUME3, price);
+                            flag = true;
+                        }
+                        else
+                            player->SetVar(VAR_DISCOUNT_CONSUME3, 0);
+                        if (flag)
+                            player->sendDiscountLimit();
+                    }
 
                     //GameAction()->doAty(player, AtyBuy ,0,0);
                 }

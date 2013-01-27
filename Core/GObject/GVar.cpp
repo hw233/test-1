@@ -140,6 +140,17 @@ namespace GObject
        DB7().PushUpdateData("REPLACE INTO `gvar` (`id`, `data`, `over`) VALUES (%u, %u, %u)",
                id, m_Vars[id], m_OverTime[id]);
     }
+
+    bool GVarSystem::SetOverTime(UInt32 id, UInt32 overTime, bool force /* = false */)
+    {
+        if(id >= GVAR_MAX) 
+            return false;
+        if (!force  && m_OverTime[id] > overTime)
+            return false;
+        m_Vars[id] = 0;
+        UpdateDB(id);
+        return true;
+    }
 }
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */
