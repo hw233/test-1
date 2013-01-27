@@ -353,6 +353,7 @@ struct DBLootItem
 	UInt32 id;
 	std::string table;
 	UInt8 isPack;
+	UInt8 bind;
 };
 struct DBEUpgrade
 {
@@ -625,11 +626,12 @@ SPECIALDEF(3)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBLootItem)
-SPECIALDEF(3)
+SPECIALDEF(4)
 	(
 	UInt32, id,
 	std::string, table,
-	UInt8, isPack
+	UInt8, isPack,
+	UInt8, bind
 	)
 SPECIALEND()
 

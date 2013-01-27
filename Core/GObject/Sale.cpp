@@ -100,6 +100,14 @@ void Sale::sellSaleReq(std::vector<SaleSellData>& sales)
 					saleItems[i] = NULL;
 					continue;
 				}
+                if(saleItems[i]->getClass() == Item_LBling || saleItems[i]->getClass() == Item_LBwu || saleItems[i]->getClass() == Item_LBxin)
+                {
+                    if(!static_cast<ItemLingbao*>(saleItems[i])->isTongling())
+                    {
+                        saleItems[i] = NULL;
+                        continue;
+                    }
+                }
 			}
 			else
 			{

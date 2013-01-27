@@ -1875,7 +1875,9 @@ BattleFighter* BattleFighter::summonSelf(float factor, UInt8 last)
 {
     if(last == 0)
         return NULL;
-    BattleFighter* bf = new BattleFighter(*this);
+
+    BattleFighter * bf = new(std::nothrow) BattleFighter(_formula, _fighter);
+    //BattleFighter* bf = new BattleFighter(*this);
     if(!bf)
         return NULL;
 
@@ -1913,6 +1915,13 @@ void BattleFighter::clearSkill()
     _passiveSkillOnOtherDead.clear();
 
     _skillStrengthen.clear();
+
+    _onSkillCond.clear();
+    _onActionCond1.clear();
+    _onActionCond2.clear();
+    _onDeadCond.clear();
+    _onBleedCond.clear();
+    _onStateCond.clear();
 }
 
 void BattleFighter::setSummonFactor(float factor, UInt8 last)

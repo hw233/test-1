@@ -5878,8 +5878,10 @@ namespace GObject
 
         UInt32 id = IDGenerator::gItemOidGenerator.ID();
         ItemLingbao* equip = new ItemLingbao(id, itype, edata, lbattr);
+        bool bind = m_lbSmeltInfo.bind;
+        ITEM_BIND_CHECK(itype->bindType,bind);
         if(equip)
-            equip->SetBindStatus(m_lbSmeltInfo.bind);
+            equip->SetBindStatus(bind);
 
         ItemBase *& e = m_Items[id];
         if(e == NULL)

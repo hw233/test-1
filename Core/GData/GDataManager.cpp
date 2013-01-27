@@ -1730,12 +1730,13 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBLootItem dbli;
-		if(execu->Prepare("SELECT `id`, `itemId`, `isPack` FROM `loot`", dbli) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `itemId`, `isPack`, `bind` FROM `loot`", dbli) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
 			LootItem li;
 			li.isPack = dbli.isPack;
+			li.m_bind = dbli.bind > 0;
 			if(li.isPack == 1)
 			{
 				StringTokenizer tk(dbli.table, "|");
