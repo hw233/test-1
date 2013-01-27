@@ -7374,7 +7374,40 @@ namespace GObject
 
         AddVar(VAR_FIRST_RECHARGE_VALUE, r);
         sendFirstRecharge();
-	}
+
+        bool flag = false;
+
+        UInt32 now = TimeUtil::Now();
+        if ((GVAR.GetVar(GVAR_DISCOUNT_TYPE1) == 2)
+                && GVAR.GetVar(GVAR_DISCOUNT_BEGIN1) < now
+                && GVAR.GetVar(GVAR_DISCOUNT_END1) > now)
+        {
+            AddVar(VAR_DISCOUNT_RECHARGE1, r);
+            flag = true;
+        }
+        else
+            SetVar(VAR_DISCOUNT_RECHARGE1, 0);
+        if ((GVAR.GetVar(GVAR_DISCOUNT_TYPE2) == 2)
+                && GVAR.GetVar(GVAR_DISCOUNT_BEGIN2) < now
+                && GVAR.GetVar(GVAR_DISCOUNT_END2) > now)
+        {
+            AddVar(VAR_DISCOUNT_RECHARGE2, r);
+            flag = true;
+        }
+        else
+            SetVar(VAR_DISCOUNT_RECHARGE2, 0);
+        if ((GVAR.GetVar(GVAR_DISCOUNT_TYPE3) == 2)
+                && GVAR.GetVar(GVAR_DISCOUNT_BEGIN3) < now
+                && GVAR.GetVar(GVAR_DISCOUNT_END3) > now)
+        {
+            AddVar(VAR_DISCOUNT_RECHARGE3, r);
+            flag = true;
+        }
+        else
+            SetVar(VAR_DISCOUNT_RECHARGE3, 0);
+        if (flag)
+            sendDiscountLimit();
+    }
 
     void Player::addRechargeNextRet(UInt32 r)
     {
@@ -12412,97 +12445,130 @@ namespace GObject
     {
         // 发送给客户端的有关限购的相关数据
         Stream st(REP::STORE_DISLIMIT);
-        for (UInt8 i = 4; i < 7; ++i)
+        for (UInt8 type = 4; type < 7; ++type)
         {
             // 发送活动限购三栏的种类，时间和剩余数量
-            UInt8 type = i;
-            UInt32 max = 0;
-            UInt32 used = 0;
-            UInt32 time = 0;
-            UInt32 now = TimeUtil::Now();
-
-            // 如果活动限购已经结束或已经购买完毕，则发送时间和数量为0的
-            max = GData::store.getDiscountLimit(type);
+            UInt32 max = GData::store.getDiscountLimit(type);
             UInt8 offset = GData::store.getDisTypeVarOffset(type);
-            used = GetVar(GObject::VAR_DISCOUNT_1+offset);
+            UInt32 used = GetVar(GObject::VAR_DISCOUNT_1+offset);
 
-            if (offset == 0xfe)
-            {
-                // TODO: 全服限购的数量获取
-            }
             if (offset == 0xff)
             {
-                st << static_cast<UInt8>(0)
-                    << static_cast<UInt32>(0)
-                    << static_cast<UInt32>(0);
-                break;
+                st << static_cast<UInt8>(type);
+                st << static_cast<UInt8>(0);
+                st << static_cast<UInt32>(0);
+                st << static_cast<UInt32>(0);
+                st << static_cast<UInt32>(0);
+                continue;
             }
 
-            if (used >= max)
-            {
-                used = max;
-                SetVar(GObject::VAR_DISCOUNT_1+offset, used);
-            }
 
-            time = GetVar(GObject::VAR_DISCOUNT_SP_1_TIME + type - 4);
+            UInt32 time = GetVar(GObject::VAR_DISCOUNT_SP_1_TIME + type - 4);
+            UInt32 now  = TimeUtil::Now();
             if (time < now)
             {
+                // 还没购买过该限购
                 SetVar(GObject::VAR_DISCOUNT_1+offset, 0);
                 time = GData::store.getEndTimeByDiscountType(type);
                 SetVar(GObject::VAR_DISCOUNT_SP_1_TIME + type - 4, time);
                 used = 0;
             }
 
+            if (used >= max)
+            {
+                // 购买已经超过限购次数
+                used = max;
+                SetVar(GObject::VAR_DISCOUNT_1+offset, used);
+            }
 
-            UInt32 count = max - used;
+            UInt32 count = 0; // 限购剩余的购买次数
 
-
+            // 检查开始限购开始时间
             time = GData::store.getBeginTimeByDiscountType(type);
             if (time > now)
             {
                 // 活动限购还未开始
-                time = 0;
-                count = 0;
                 SetVar(GObject::VAR_DISCOUNT_SP_1_TIME + type - 4, 0);
-            }
-            else
-            {
-                time = GData::store.getEndTimeByDiscountType(type);
-                if (time < now)
-                {
-                    // 活动限购已经结束
-                    time = 0;
-                    count = 0;
-                    SetVar(GObject::VAR_DISCOUNT_SP_1_TIME + type - 4, 0);
-                }
-                else
-                    time -= now;
+                st << static_cast<UInt8>(type);
+                st << static_cast<UInt8>(0);
+                st << static_cast<UInt32>(0);
+                st << static_cast<UInt32>(0);
+                st << static_cast<UInt32>(0);
+                continue;
             }
 
-            st << static_cast<UInt8>(type)
-                << static_cast<UInt32>(time)
-                << static_cast<UInt32>(count);
+            // 检查结束时间
+            time = GData::store.getEndTimeByDiscountType(type);
+            if (time < now)
+            {
+                // 活动限购已经结束
+                SetVar(GObject::VAR_DISCOUNT_SP_1_TIME + type - 4, 0);
+                st << static_cast<UInt8>(type);
+                st << static_cast<UInt8>(0);
+                st << static_cast<UInt32>(0);
+                st << static_cast<UInt32>(0);
+                st << static_cast<UInt32>(0);
+                continue;
+            }
+
+            UInt8 exType = 0;
+            UInt32 exValue = 0;
+
+            exType = GData::store.getExDiscount(type, exValue);
+            UInt32 goldVal = 0;
+            switch(exType)
+            {
+                case 1:
+                    if (GetVar(VAR_DISCOUNT_EX1_TIME + type - 4) < now)
+                    {
+                        SetVar(VAR_DISCOUNT_EX1_TIME + type - 4, time);
+                        SetVar(VAR_DISCOUNT_CONSUME1 + type - 4, 0);
+                    }
+                    goldVal = GetVar(VAR_DISCOUNT_CONSUME1 + type - 4);
+                    break;
+                case 2:
+                    if (GetVar(VAR_DISCOUNT_EX1_TIME + type - 4) < now)
+                    {
+                        SetVar(VAR_DISCOUNT_EX1_TIME + type - 4, time);
+                        SetVar(VAR_DISCOUNT_RECHARGE1 + type - 4, 0);
+                    }
+                    goldVal = GetVar(VAR_DISCOUNT_RECHARGE1 + type - 4);
+                    break;
+                default:
+                    break;
+            }
+
+            if (exValue && exValue >= goldVal)
+                goldVal = exValue - goldVal;
+            else
+                goldVal = 0;
+
+            time -= now;    // 正在限购活动中, 计算剩余时间
+            count = max - used;
+
+            st << static_cast<UInt8>(type);
+            st << static_cast<UInt8>(exType);
+            st << static_cast<UInt32>(goldVal);
+            st << static_cast<UInt32>(time); // 限购剩余时间 （0表示没有限购或者还未开始）
+            st << static_cast<UInt32>(count);
         }
         st << Stream::eos;
         send(st);
 
         // 再发送一个完整的三五八折协议
         Stream st2(REP::STORE_DISLIMIT);
-        for (UInt8 i = 7; i < 10; ++i)
+        for (UInt8 type = 7; type < 10; ++type)
         {
-            UInt8 type = i;
             UInt8 offset = GData::store.getDisTypeVarOffset(type);
             UInt32 max = GData::store.getDiscountLimit(type);
-            if (offset == 0xfe)
-            {
-                // TODO: 全服限购的数量获取
-            }
             if (offset == 0xff)
             {
-                st2 << static_cast<UInt8>(0)
-                    << static_cast<UInt32>(0)
-                    << static_cast<UInt32>(0);
-                break;
+                st2 << static_cast<UInt8>(type);
+                st2 << static_cast<UInt8>(0);
+                st2 << static_cast<UInt32>(0);
+                st2 << static_cast<UInt32>(0);
+                st2 << static_cast<UInt32>(0);
+                continue;
             }
             UInt32 used = GetVar(GObject::VAR_DISCOUNT_1+offset);
             if (used >= max)
@@ -12519,9 +12585,11 @@ namespace GObject
             else
                 time -= now;
 
-            st2 << static_cast<UInt8>(type)
-                << static_cast<UInt32>(time)
-                << static_cast<UInt32>(count);
+            st2 << static_cast<UInt8>(type);
+            st2 << static_cast<UInt8>(0);
+            st2 << static_cast<UInt32>(0);
+            st2 << static_cast<UInt32>(time);
+            st2 << static_cast<UInt32>(count);
         }
         st2 << Stream::eos;
         send(st2);
