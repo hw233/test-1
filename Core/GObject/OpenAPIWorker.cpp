@@ -379,6 +379,7 @@ namespace GObject
     bool OpenAPIWorker::CheckOpenId(UInt64 playerId, char * openId)
     {
         // Memcached 校验playerID和openID
+        playerId = playerId & 0xFFFFFFFF;
         char buf[128];
         snprintf(buf, 128, "oid_%"I64_FMT"u", playerId);
         char openId2[256]={};
