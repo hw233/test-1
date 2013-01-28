@@ -7427,6 +7427,38 @@ function ItemNormal_00009349(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00009317(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < num then
+		player:sendMsgCode(2, 1011, 0);
+        return 0;
+    end
+
+    local item = {
+        {3000, 11500},
+        {6000, 11501},
+        {9000, 11502},
+        {9400, 11005},
+        {9800, 11013},
+        {9900, 11019},
+        {10000, 11022}
+    }
+
+    for i = 1,num do
+        local chance = math.random(1, 10000);
+        for j = 1, #item do
+            if chance <= item[j][1] then
+                package:Add(item[j][2], 1, bind, 0, 2);
+                break;
+            end
+        end
+    end
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
 
 function ItemNormal_Lingbao(iid, num, bind, param)
     local player = GetPlayer()
@@ -9104,6 +9136,7 @@ local ItemNormal_Table = {
     [9315] = ItemNormal_00009315,
     [9316] = ItemNormal_00009316,
 
+    [9317] = ItemNormal_00009317,
     [9349] = ItemNormal_00009349,
 
     -- 灵宝宝箱
