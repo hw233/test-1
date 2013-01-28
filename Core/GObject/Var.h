@@ -327,6 +327,8 @@ namespace GObject
         VAR_DRAGONKING_STEP4_COUNT = 362, //大闹龙宫从第4格移动到第5失败的次数
         VAR_CALLSNAKEEGG = 371,         //拜金蛇
         VAR_SNAKEEGG_AWARD=372,         //领蛇蛋
+        VAR_9344_USED=373,
+        VAR_9343_USED=374,
         //越南版380-399
         VAR_MAX,
     };
@@ -630,6 +632,8 @@ namespace GObject
 
             REGISTER_VAR(VAR_CALLSNAKEEGG, CYCLE_NONE);
             REGISTER_VAR(VAR_SNAKEEGG_AWARD, CYCLE_NONE);
+            REGISTER_VAR(VAR_9344_USED, CYCLE_NONE);
+            REGISTER_VAR(VAR_9343_USED, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

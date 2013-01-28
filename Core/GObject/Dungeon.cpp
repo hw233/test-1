@@ -550,6 +550,20 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
         { 
             player->GetPackage()->AddItem(9138, 1, false, false);
         }
+        if (World::getItem9344Act())
+        {
+            if(PLAYER_DATA(player, dungeonCnt) > getMaxCount())
+                player->GetPackage()->Add(9344, 2, true, false);
+            else
+                player->GetPackage()->Add(9344, 1, true, false);
+        }
+        if (World::getItem9343Act())
+        {
+            if(PLAYER_DATA(player, dungeonCnt) > getMaxCount())
+                player->GetPackage()->Add(9343, 2, true, false);
+            else
+                player->GetPackage()->Add(9343, 1, true, false);
+        }
         bool free = (PLAYER_DATA(player, dungeonCnt) <= getMaxCount());
 		GameAction()->onDungeonWin(player, _id, dpi.totalCount, free);
         if(PLAYER_DATA(player, dungeonCnt) > getMaxCount())
@@ -560,7 +574,6 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
         {
             player->dungeonUdpLog(_dungeon->levelReq, 2);
         }
-
 	}
 
 	if(noreport)
