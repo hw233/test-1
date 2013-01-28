@@ -5990,3 +5990,40 @@ function getDragonKingAward(step)
     return {}
 end
 
+function onGetNewYearGiveGiftAward(player, index, times)
+    if index == 0 or index > 10 then
+        return false
+    end
+
+    local items = {
+        {{15, 1}, {48, 1}, {517, 1}, {507, 1}, {547, 1}}, --2月3号
+        {{512, 1}, {548, 1}, {551, 1}, {33, 1}, {49, 1}, {513, 1}}, --2月9号
+        {{50, 1}, {134, 1}, {15, 1}, {499, 50}, {500, 1}, {57, 1}}, --2月10号
+        {{1325, 1}, {547, 1}, {548, 1}, {509, 1}, {56, 1}, {511, 1}}, --2月11号
+        {{516, 1}, {514, 1}, {1326, 1}, {551, 1}, {505, 1}}, --2月12号
+        {{50, 1}, {503, 1}, {33, 1}, {517, 1}, {548, 1}, {465, 1}}, --2月13号
+        {{440, 1}, {438, 1}, {439, 1}, {503, 1}, {133, 1}, {30, 1}}, --2月14号
+        {{501, 1}, {514, 1}, {33, 1}, {517, 1}, {548, 1}, {505, 1}}, --2月15号
+        {{516, 1}, {57, 1}, {551, 1}, {49, 1}, {15, 1}, {499, 30}}, --2月16号
+        {{499, 50}, {51, 1}, {15, 1}, {501, 1}, {512, 1}, {33, 1}}, --2月24号
+    }
+    local item = items[index]
+
+    local package = player:GetPackage()
+    if package:GetRestPackageSize() < #item * times then
+        player:sendMsgCode(2, 1011, 0)
+        return false
+    end
+
+    for k, v in pairs(item) do
+        if v[1] == 499 then
+            player:getCoupon(v[2] * times)
+        else
+            package:Add(v[1], v[2] * times, 1)
+        end
+    end
+
+    return true
+end
+
+

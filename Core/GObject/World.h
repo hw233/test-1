@@ -363,6 +363,10 @@ public:
     { _feastloginAct= v; }
     inline static bool getFeastLoginAct()
     { return _feastloginAct; }
+    inline static void setNewYearGiveGiftAct(bool v)
+    { _newYearGiveGiftAct= v; }
+    inline static bool getNewYearGiveGiftAct()
+    { return _newYearGiveGiftAct; }
 
     inline static void setTowerLoginAct(UInt8 v)
     { _towerloginAct= v; }
@@ -685,6 +689,7 @@ public:
     static bool _heroIslandAct;
     static bool _dragonKingAct;
     static bool _feastloginAct;
+    static bool _newYearGiveGiftAct;
     static UInt8 _towerloginAct;
     static bool _guoqing;
     static bool _9215Act;

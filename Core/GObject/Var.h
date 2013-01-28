@@ -322,6 +322,7 @@ namespace GObject
         VAR_HAS_MO_BATTLER = 346,       // 出战散仙里是否有墨家
         VAR_ITEM_9316_FAILED_COUNT = 347, // 都率宝伞礼包连续开启失败次数
         VAR_CONSUME_AWARD_COUNT = 348,   //消费抽奖已抽次数
+        VAR_NEW_YEAR_GIVE_GIFT = 349,   //迎新纳福，红包入袋(bit1~10依次代表对应的天数是否领取过奖励)
         // 361-370 占用 for suntao
         VAR_DRAGONKING_STEP = 361,      //大闹龙宫当前移动到的格子
         VAR_DRAGONKING_STEP4_COUNT = 362, //大闹龙宫从第4格移动到第5失败的次数
