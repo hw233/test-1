@@ -80,7 +80,6 @@ namespace GObject
                 ++i;
             }
         }
-        m_DCLog.clear();
     }
 
     void DCWorker::OnPause()
