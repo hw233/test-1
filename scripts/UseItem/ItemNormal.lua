@@ -1726,36 +1726,6 @@ function ItemNormal_00000495(iid, num, bind, param)
     return num
 end
 
-function ItemNormal_00000496(iid, num, bind, param)
-    local player = GetPlayer()
-    local package = player:GetPackage();
-
-	local fgt = player:findFighter(param);
-	if fgt == nil then
-		return false;
-	end
-
-    fgt:addPExp(num*888)
-
-    local op = player:GetVar(90);
-    if op < 10000 then
-        local p = num * math.random(1,20);
-        if (op + p) > 10000 then
-            p = 10000 - op
-        end
-        player:AddVar(90, p)
-        player:sendMDSoul(0, 0)
-        if getMayDay() then
-            SendMsg(player, 0x35, msg_65..p..msg_66)
-            SendMsg(player, 0x1, msg_65..p..msg_66)
-        end
-    end
-    player:AddVar(93, num)
-
-    package:DelItemSendMsg(iid, player);
-    return num
-end
-
 function ItemNormal_00000497(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -1764,12 +1734,70 @@ function ItemNormal_00000497(iid, num, bind, param)
 	if fgt == nil then
 		return false;
 	end
-
-    fgt:addPExp(num*888)
+    if fgt:isPExpFull() then
+        player:sendMsgCode(2, 1069, 0);
+        return false
+    end
+    local pexp = fgt:getPExp()
+    local n = 0;
+    for i = 1, num do
+        n = n + 1
+        pexp = pexp + 888 
+        if pexp >= fgt:getPExpMax() then
+            break
+        end
+    end
+    if n ~= 0 then
+        fgt:addPExp(n * 888);
+    end
 
     local op = player:GetVar(90);
     if op < 10000 then
-        local p = num * math.random(8,12);
+        local p = n * math.random(5,15);
+        if (op + p) > 10000 then
+            p = 10000 - op
+        end
+        player:AddVar(90, p)
+        player:sendMDSoul(0, 0)
+        if getMayDay() or getCompassAct() then
+            SendMsg(player, 0x35, msg_65..p..msg_66)
+            SendMsg(player, 0x1, msg_65..p..msg_66)
+        end
+    end
+    player:AddVar(93, n)
+
+    package:DelItemSendMsg(iid, player);
+    return n
+end
+
+function ItemNormal_00000496(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+	local fgt = player:findFighter(param);
+	if fgt == nil then
+		return false;
+	end
+    if fgt:isPExpFull() then
+        player:sendMsgCode(2, 1069, 0);
+        return false
+    end
+    local pexp = fgt:getPExp()
+    local n = 0;
+    for i = 1, num do
+        n = n + 1
+        pexp = pexp + 888 
+        if pexp >= fgt:getPExpMax() then
+            break
+        end
+    end
+    if n ~= 0 then
+        fgt:addPExp(n * 888);
+    end
+
+    local op = player:GetVar(90);
+    if op < 10000 then
+        local p = n * math.random(8,12);
         if (op + p) > 10000 then
             p = 10000 - op
         end
@@ -1780,10 +1808,10 @@ function ItemNormal_00000497(iid, num, bind, param)
             SendMsg(player, 0x1, msg_65..p..msg_66)
         end
     end
-    player:AddVar(92, num)
+    player:AddVar(92, n)
 
     package:DelItemSendMsg(iid, player);
-    return num
+    return n
 end
 
 function ItemNormal_VIP(iid, num, bind, param)
@@ -2907,12 +2935,27 @@ function ItemNormal_00009000(iid, num, bind, param)
 	if fgt == nil then
 		return false;
 	end
+    if fgt:isPExpFull() then
+        player:sendMsgCode(2, 1069, 0);
+        return false
+    end
+    local pexp = fgt:getPExp()
+    local n = 0;
+    for i = 1, num do
+        n = n + 1
+        pexp = pexp + 20000 
+        if pexp >= fgt:getPExpMax() then
+            break
+        end
+    end
+    if n ~= 0 then
+        fgt:addPExp(n * 20000);
+    end
 
-    fgt:addPExp(num*20000)
-    player:AddVar(91, num)
+    player:AddVar(91, n)
 
     package:DelItemSendMsg(iid, player);
-    return num
+    return n
 end
 
 function ItemNormal_00009001(iid, num, bind, param)
@@ -4336,12 +4379,12 @@ function ItemNormal_00009095(iid, num, bind, param)
         local r = math.random(1,isz)
         local item = items[r]
         for k,v in pairs(item) do
-            package:Add(v[1], v[2], true, 0, 2);
+            package:Add(v[1], v[2], bind, 0, 2);
         end
 
         local nr = math.random(1,100)
         if nr <= 10 then
-            package:Add(1646, 1, false, 0, 2);
+            package:Add(1646, 1, bind, 0, 2);
         end
 
         used = used + 1

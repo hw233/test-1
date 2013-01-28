@@ -864,6 +864,24 @@ function MayDay(player, lootlvl)
         package:AddItem(item[math.random(1,#item)], itemNum[lootlvl], true);
     end
 end
+function CompassAct(player, lootlvl)
+    if getCompassAct() then
+        if lootlvl > 3 then
+            lootlvl = 0
+        end
+
+        local itemNum = {
+            [0] = 1,
+            [1] = 1,
+            [2] = 2,
+            [3] = 3,
+        };
+
+        local package = player:GetPackage();
+        package:AddItem(497, itemNum[lootlvl], true);
+    end
+end
+
 
 function LuckyDrawBox(player, id)
     local items = {
@@ -947,6 +965,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     TgcEvent(player, 1)
     _9215Act(player, lootlvl);
     _snowAct(player, lootlvl);
+    CompassAct(player, lootlvl);
 end
 
 function onFrontMapFloorWin(player, id, spot, lootlvl)
@@ -978,6 +997,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
     TgcEvent(player, 2)
     _9215Act(player, lootlvl);
     _snowAct(player, lootlvl);
+    CompassAct(player, lootlvl);
 end
 
 local vippack = {
@@ -1401,11 +1421,13 @@ function onUseMDSoul(player, _type)
     local items = {
         {9000,47,509,507,515,509,507,515,},
         {503,514,506,508,517,512,501,513,},
-        {497,496,15,56,57,511,500,518,},
+        {1411,133,503,511,9000,9076,514,516}
+--        {497,496,15,56,57,511,500,518,},
     }
+    local broad = {0,0,0,0,1,1,0,0}
 
     if _type == 3 then
-        local prob = {500,1000,2500,4000,5500,7000,8500,10000}
+        local prob = {2451,4902,5515,7966,8211,8365,9591,10000}
         local p = math.random(1,10000)
         local i = 1
         for n = 1,#prob do
@@ -1414,7 +1436,9 @@ function onUseMDSoul(player, _type)
                 break
             end
         end
-
+        if broad[i] == 1 then
+            Broadcast(0x27, "御风雷之变化，".."[p:"..player:getCountry()..":"..player:getPName().."]成功显罗盘秘宝于世，获得了[4:"..items[_type][i].."]")
+        end
         return items[_type][i]
     end
 

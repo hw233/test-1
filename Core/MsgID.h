@@ -733,6 +733,7 @@ namespace SPEQ
     const UInt16 DELETEGOLD          = 0x139;// 删除仙石
     const UInt16 ADDRECHARGESCORE    = 0x140;// 增加充值的积分
     const UInt16 SYSUPDATE           = 0x141;// 系统更新公告
+    const UInt16 FB_SPECIFY_FIND     = 0x142;// FB-隆中网络查询
 }
 
 namespace SPEP
@@ -787,6 +788,7 @@ namespace SPEP
     const UInt16 DELETEGOLD          = 0x39;// 删除仙石
     const UInt16 ADDRECHARGESCORE    = 0x40;// 增加充值的积分
     const UInt16 SYSUPDATE           = 0x41;// 系统更新公告
+    const UInt16 FB_SPECIFY_FIND     = 0x42;// FB-隆中网络查询
 }
 
 namespace ARENAREQ

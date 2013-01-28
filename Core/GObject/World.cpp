@@ -163,6 +163,7 @@ UInt32 World::_sosomapbegin = 0;
 bool World::_opentest;
 bool World::_consumeactive;
 bool World::_consume918 = false;
+bool World::_consumeawardact = false;
 RCSortType World::rechargeSort;
 RCSortType World::consumeSort;
 bool World::_needrechargerank = false;
@@ -179,6 +180,7 @@ bool   World::_townReward_10_15 = false;
 bool World::_loginAward = false;
 bool World::_bluediamonSuperman = false;
 bool World::_tgcevent = false;
+bool World::_compassact = false;
 /** 场外活动 **/
 stArenaExtra World::stArenaOld[2];
 stArenaExtra World::stArena;

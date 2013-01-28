@@ -1120,6 +1120,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendHappyInfo();
     pl->sendYBBufInfo(pl->GetVar(VAR_YBBUF), pl->GetVar(VAR_QQVIP_BUF));
     pl->sendAthlBufInfo();
+    pl->sendConsumeAwardInfo(0);
     luckyDraw.notifyDisplay(pl);
     if (World::getRechargeActive())
     {
@@ -5292,7 +5293,7 @@ void OnMDSoul( GameMsgHdr& hdr, UseMDSoul& req )
     if(!player->hasChecked())
          return;
 
-    if (World::getMayDay())
+    if (World::getMayDay() || World::getCompassAct())
     {
         if (req._type == 0)
             player->sendMDSoul(0);
