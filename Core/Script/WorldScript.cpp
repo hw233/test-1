@@ -143,6 +143,7 @@ void WorldScript::init()
     def("get11Act", GObject::World::get11Act);
     def("setSSToolbarAct", GObject::World::setSSToolbarAct);
     def("setFeastLoginAct", GObject::World::setFeastLoginAct);
+    def("setNewYearGiveGiftAct", GObject::World::setNewYearGiveGiftAct);
     def("setTowerLoginAct", GObject::World::setTowerLoginAct);
     def("getSSToolbarAct", GObject::World::getSSToolbarAct);
     def("setSnowAct", GObject::World::setSnowAct);
@@ -211,7 +212,11 @@ void WorldScript::init()
 	def("getCompassAct", GObject::World::getCompassAct);
 	def("setCallSnakeEggAct", GObject::World::setCallSnakeEggAct);
 	def("setSnakeEggAwardAct", GObject::World::setSnakeEggAwardAct);
-	
+	def("setItem9344Act", GObject::World::setItem9344Act);
+	def("getItem9344Act", GObject::World::getItem9344Act);
+	def("setItem9343Act", GObject::World::setItem9343Act);
+	def("getItem9343Act", GObject::World::getItem9343Act);
+
     def("setMergeAthAct", GObject::World::setMergeAthAct);
     def("getMergeAthAct", GObject::World::getMergeAthAct);
     def("setFourCopAct", GObject::World::setFourCopAct);

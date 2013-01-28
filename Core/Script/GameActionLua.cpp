@@ -145,6 +145,8 @@ namespace Script
         lua_tinker::def(_L, "get9215Act", GObject::World::get9215Act);
         lua_tinker::def(_L, "getSnowAct", GObject::World::getSnowAct);
 		lua_tinker::def(_L, "getCompassAct", GObject::World::getCompassAct);
+		lua_tinker::def(_L, "getItem9344Act", GObject::World::getItem9344Act);
+		lua_tinker::def(_L, "getItem9343Act", GObject::World::getItem9343Act);
 
         CLASS_DEF(GameActionLua, Print);
         lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);
@@ -1516,5 +1518,10 @@ namespace Script
 		return Call<bool>("checkDragonKingCanSucceed", player, step);
 	}
 
+    bool GameActionLua::onGetNewYearGiveGiftAward(Player* player, UInt8 dayOrder, UInt8 times)
+    {
+		assert(player != NULL);
+		return Call<bool>("onGetNewYearGiveGiftAward", player, dayOrder, times);
+    }
 }
 

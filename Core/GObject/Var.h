@@ -322,6 +322,7 @@ namespace GObject
         VAR_HAS_MO_BATTLER = 346,       // 出战散仙里是否有墨家
         VAR_ITEM_9316_FAILED_COUNT = 347, // 都率宝伞礼包连续开启失败次数
         VAR_CONSUME_AWARD_COUNT = 348,   //消费抽奖已抽次数
+        VAR_NEW_YEAR_GIVE_GIFT = 349,   //迎新纳福，红包入袋(bit1~10依次代表对应的天数是否领取过奖励)
 
         // 351~360 占用 for JLT
         VAR_DISCOUNT_CONSUME1  = 351, // 消费限购的金额
@@ -339,6 +340,8 @@ namespace GObject
         VAR_DRAGONKING_STEP4_COUNT = 362, //大闹龙宫从第4格移动到第5失败的次数
         VAR_CALLSNAKEEGG = 371,         //拜金蛇
         VAR_SNAKEEGG_AWARD=372,         //领蛇蛋
+        VAR_9344_USED=373,
+        VAR_9343_USED=374,
         //越南版380-399
         VAR_MAX,
     };
@@ -642,6 +645,8 @@ namespace GObject
 
             REGISTER_VAR(VAR_CALLSNAKEEGG, CYCLE_NONE);
             REGISTER_VAR(VAR_SNAKEEGG_AWARD, CYCLE_NONE);
+            REGISTER_VAR(VAR_9344_USED, CYCLE_NONE);
+            REGISTER_VAR(VAR_9343_USED, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

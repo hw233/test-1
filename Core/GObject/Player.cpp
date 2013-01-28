@@ -16672,13 +16672,11 @@ void Player::sendSnakeEggInfo()
 {
     Stream st(REP::ACTIVE);
     st << static_cast<UInt8>(0x08) << static_cast<UInt8>(0x01);
-    UInt8 t = 0; //活动阶段
-    if (World::getCallSnakeEggAct())
-        t = 1;
-    else if (World::getSnakeEggAwardAct() >= 1 && World::getSnakeEggAwardAct() <= 7)
-        t = 2;
-    else if (World::getSnakeEggAwardAct() == 0xFF)
+    UInt8 t = World::getCallSnakeEggAct(); //0:非活动期间 1:拜年期 2:拜年-领奖等待期
+    if (World::getSnakeEggAwardAct() >= 1 && World::getSnakeEggAwardAct() <= 7)
         t = 3;
+    else if (World::getSnakeEggAwardAct() == 0xFF)
+        t = 4;
     st << t;
     st << static_cast<UInt8>(GetVar(VAR_CALLSNAKEEGG)) << static_cast<UInt8>(World::getSnakeEggAwardAct());
     st << static_cast<UInt8>(GetVar(VAR_SNAKEEGG_AWARD));
@@ -16699,7 +16697,7 @@ void Player::getSnakeEggAward(UInt8 v)
     if (!day || v > 7 || v > day)
         return;
     UInt8 var = GetVar(VAR_SNAKEEGG_AWARD); 
-    if (var & v) //已领取
+    if (var & (0x01<<(v-1))) //已领取
         return;
     if (v < day || GetVar(VAR_CALLSNAKEEGG) == 0)
     {
@@ -16712,9 +16710,161 @@ void Player::getSnakeEggAward(UInt8 v)
         useGold(30, &ci);
     }
     getCoupon(100);
-    var |= v;
+    var |= (0x01<<(v-1));
     SetVar(VAR_SNAKEEGG_AWARD, var);
     sendSnakeEggInfo();
+}
+
+void Player::getNewYearGiveGiftAward(UInt8 dayOrder, UInt16 result)
+{
+    if(dayOrder > 10)
+        return;
+
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(8);
+    //st << dayOrder;
+
+    UInt16 opt = GetVar(VAR_NEW_YEAR_GIVE_GIFT);
+    UInt16 offset = 1;
+    switch(dayOrder)
+    {
+        case 0:
+        break;
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+        case 8:
+        case 9:
+        case 10:
+        {
+            offset <<= (dayOrder - 1);
+            if((opt & offset) > 0)
+            {
+                sendMsgCode(0, 1018);
+                return;
+            }
+
+            UInt8 serverDay = 0;
+            bool isValid = false;
+            UInt32 now = TimeUtil::Now();
+            if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2013, 2, 3))
+            {
+            }
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 3))
+            {
+                serverDay = 1;
+                if(dayOrder <= serverDay)
+                    isValid = true;
+            }
+            else if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2013, 2, 9))
+            {
+            }
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 9))
+            {
+                serverDay = 2;
+                if(dayOrder <= serverDay)
+                    isValid = true;
+            }
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 10))
+            {
+                serverDay = 3;
+                if(dayOrder <= serverDay)
+                    isValid = true;
+            }
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 11))
+            {
+                serverDay = 4;
+                if(dayOrder <= serverDay)
+                    isValid = true;
+            }
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 12))
+            {
+                serverDay = 5;
+                if(dayOrder <= serverDay)
+                    isValid = true;
+            }
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 13))
+            {
+                serverDay = 6;
+                if(dayOrder <= serverDay)
+                    isValid = true;
+            }
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 14))
+            {
+                serverDay = 7;
+                if(dayOrder <= serverDay)
+                    isValid = true;
+            }
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 15))
+            {
+                serverDay = 8;
+                if(dayOrder <= serverDay)
+                    isValid = true;
+            }
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 16))
+            {
+                serverDay = 9;
+                if(dayOrder <= serverDay)
+                    isValid = true;
+            }
+            else if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2013, 2, 24))
+            {
+            }
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 24))
+            {
+                serverDay = 10;
+                if(dayOrder <= serverDay)
+                    isValid = true;
+            }
+            else
+            {
+            }
+
+            if(!isValid)
+            {
+                sendMsgCode(0, 1041);
+                return;
+            }
+
+            UInt8 times;
+            if(serverDay == dayOrder)
+                times = 2;
+            else
+            {
+                if(result == 1)
+                {
+                    if (getGold() < 30)
+                    {
+                        sendMsgCode(0, 1101);
+                        return;
+                    }
+                    ConsumeInfo ci(NewYearGetDouble,0,0);
+                    useGold(30, &ci);
+                    times = 2;
+                }
+                else
+                    times = 1;
+            }
+
+            bool bRet = GameAction()->onGetNewYearGiveGiftAward(this, dayOrder, times);
+            if(!bRet)
+                return;
+
+            opt |= offset;
+            SetVar(VAR_NEW_YEAR_GIVE_GIFT, opt);
+        }
+        break;
+
+        default:
+        break;
+    }
+    st << opt;
+    st << Stream::eos;
+    send(st);
 }
 
 } // namespace GObject

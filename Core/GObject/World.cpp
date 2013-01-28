@@ -147,6 +147,7 @@ bool World::_goldSnakeAct= false;
 bool World::_heroIslandAct= false;
 bool World::_dragonKingAct= false;
 bool World::_feastloginAct= false;
+bool World::_newYearGiveGiftAct= false;
 UInt8 World::_towerloginAct= 0;
 bool World::_guoqing= false;
 bool World::_9215Act= false;
@@ -182,8 +183,10 @@ bool World::_loginAward = false;
 bool World::_bluediamonSuperman = false;
 bool World::_tgcevent = false;
 bool World::_compassact = false;
-bool World::_callsnakeeggact = false;
+UInt8 World::_callsnakeeggact = 0;
 UInt8 World::_snakeeggawardact = 0;
+bool World::_item9344act = false;
+bool World::_item9343act = false;
 /** 场外活动 **/
 stArenaExtra World::stArenaOld[2];
 stArenaExtra World::stArena;
@@ -261,6 +264,8 @@ bool bConsumeEnd = false;
 bool bXiaoyaoEnd = false;
 bool bSnowEnd = false;
 bool bGoldSnakeEnd = false;
+bool bItem9344End = false;
+bool bItem9343End = false;
 
 bool enum_midnight(void * ptr, void* next)
 {
@@ -1011,6 +1016,8 @@ void World::World_Midnight_Check( World * world )
     bool bConsume = getConsumeActive() && getNeedConsumeRank();
     bool bPExpItems = getPExpItems();
     bool bMonsterAct = getKillMonsterAct();
+    bool bItem9344 = getItem9344Act();
+    bool bItem9343 = getItem9343Act();
 	world->_worldScript->onActivityCheck(curtime+300);
 
 	world->_today = TimeUtil::SharpDay(0, curtime+30);
@@ -1039,6 +1046,9 @@ void World::World_Midnight_Check( World * world )
     bGoldSnakeEnd = bGoldSnakAct && !getGoldSnakeAct();
     bRechargeEnd = bRecharge && !(getRechargeActive()||getRechargeActive3366());
     bConsumeEnd = bConsume && !getConsumeActive();
+    bItem9344End = bItem9344 && !getItem9344Act();
+    bItem9343End = bItem9343 && !getItem9343Act();
+
     bool bMonsterActEnd = bMonsterAct && !getKillMonsterAct();
     UInt32 nextday = curtime + 30;
 
@@ -1183,7 +1193,11 @@ void World::World_Midnight_Check( World * world )
         world->SendSnowAward();
     if (bGoldSnakeEnd)
         world->SendGoldSnakeAward();
-
+    if (bItem9344End)
+        world->SendItem9344Award();
+     if (bItem9343End)
+        world->SendItem9343Award();
+ 
 	dungeonManager.enumerate(enum_dungeon_midnight, &curtime);
 	globalClans.enumerate(enum_clan_midnight, &curtime);
 	clanManager.reConfigClanBattle();
@@ -2245,6 +2259,62 @@ void World::SendXiaoyaoAward()
         {9216, 1}
     };
     selector._player->sendMailItem(4062, 4063, items, sizeof(items)/sizeof(items[0]), false);
+}
+struct SSelectItem9344UsedMost : public Visitor<Player>
+{
+    Player* _player;
+    UInt32 _used;
+    SSelectItem9344UsedMost() : _player(NULL), _used(0) {}
+    bool operator()(Player* player)
+    {
+        UInt32 used = player->GetVar(VAR_9344_USED);
+        if(_player == NULL || used > _used)
+        {
+            _player = player;
+            _used = used;
+        }
+        return true;
+    }
+};
+void World::SendItem9344Award()
+{
+    SSelectItem9344UsedMost selector;
+    globalPlayers.enumerate(selector);
+    if(selector._player == NULL)
+        return;
+    MailPackage::MailItem items[] =
+    {
+        {9345, 1}
+    };
+    selector._player->sendMailItem(4120, 4121, items, sizeof(items)/sizeof(items[0]), false);
+}
+struct SSelectItem9343UsedMost : public Visitor<Player>
+{
+    Player* _player;
+    UInt32 _used;
+    SSelectItem9343UsedMost() : _player(NULL), _used(0) {}
+    bool operator()(Player* player)
+    {
+        UInt32 used = player->GetVar(VAR_9343_USED);
+        if(_player == NULL || used > _used)
+        {
+            _player = player;
+            _used = used;
+        }
+        return true;
+    }
+};
+void World::SendItem9343Award()
+{
+    SSelectItem9343UsedMost selector;
+    globalPlayers.enumerate(selector);
+    if(selector._player == NULL)
+        return;
+    MailPackage::MailItem items[] =
+    {
+        {9346, 1}
+    };
+    selector._player->sendMailItem(4122, 4123, items, sizeof(items)/sizeof(items[0]), false);
 }
 
 struct SSelectGoldSnakeUsedMost : public Visitor<Player>

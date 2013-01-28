@@ -100,6 +100,7 @@ enum PurchaseType
     NEWCountryBattleSkill       = 89, //蜀山论剑购买技能(霸气怒气)
     SnakeSprintAct              = 90, //蛇年春节活动
     DreamerConsume              = 91,
+    NewYearGetDouble            = 92, //迎新纳福，补领双倍
     //繁体私有占150～200
 };
 
