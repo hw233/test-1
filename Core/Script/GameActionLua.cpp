@@ -1511,5 +1511,10 @@ namespace Script
 		return Call<bool>("checkDragonKingCanSucceed", player, step);
 	}
 
+    bool GameActionLua::onGetNewYearGiveGiftAward(Player* player, UInt8 dayOrder, UInt8 times)
+    {
+		assert(player != NULL);
+		return Call<bool>("onGetNewYearGiveGiftAward", player, dayOrder, times);
+    }
 }
 
