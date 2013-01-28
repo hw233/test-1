@@ -331,7 +331,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
                     UInt32 i;
                     for (i = 0; i < st.count(); ++i)
                     {
-                        printf("atoi(st[i].c_str()):%d, getServerNo(ul._server):%lu\n", atoi(st[i].c_str()), getServerNo(ul._server));
+                        //printf("atoi(st[i].c_str()):%d, getServerNo(ul._server):%lu\n", atoi(st[i].c_str()), getServerNo(ul._server));
                         if(static_cast<UInt64>(atoi(st[i].c_str())) == getServerNo(ul._server))
                             break;
                     }
