@@ -55,6 +55,7 @@ namespace GObject
             char buf[128];
             snprintf(buf, 128, "%s:%d", cfg.IDQueryMemcached[i].ip.c_str(), cfg.IDQueryMemcached[i].port); 
             m_MCached.pushHost(buf);
+            m_inited = true;
         }
         return true;
     }
@@ -379,6 +380,8 @@ namespace GObject
     bool OpenAPIWorker::CheckOpenId(UInt64 playerId, char * openId)
     {
         // Memcached 校验playerID和openID
+        if (!m_inited)
+            return true;
         playerId = playerId & 0xFFFFFFFF;
         char buf[128];
         snprintf(buf, 128, "oid_%"I64_FMT"u", playerId);
