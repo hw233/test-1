@@ -1326,13 +1326,12 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                 }
             }
 
-            if(!colorStock)
+            if(!colorStock && !defend100)
             {
                 area_target->setEvad100(false);
                 appendDefStatus(e_damEvade, 0, area_target);
             }
-
-            if(defend100 || colorStock)
+            else
             {
                 appendDefStatus(e_damOut, 0, area_target);
                 if(!colorStock)

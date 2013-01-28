@@ -1881,6 +1881,7 @@ BattleFighter* BattleFighter::summonSelf(float factor, UInt8 last)
     if(!bf)
         return NULL;
 
+    bf->initStats(false);
     bf->clearSkill();
     bf->setSummonFactor(factor, last);
 
