@@ -6,15 +6,12 @@
 #include <libmemcached/memcached.h>
 
 #ifndef _WIN32
-MCached::MCached() : _memsvr(0)
+MCached::MCached()
 {
 }
 
 MCached::~MCached()
 {
-    if (_memsvr)
-        memcached_free(_memsvr);
-    _memsvr = 0;
 }
 
 bool MCached::init(const char* hosts)
@@ -37,18 +34,13 @@ bool MCached::pushHost(const char* hosts)
     if (!hosts || !strlen(hosts))
         return false;
 
-    if (!_memsvr)
-    {
-        _memsvr = memcached_create(NULL);
-        if (!_memsvr)
-            return false;
-    }
+    memcached_create(&_memsvr);
 
     memcached_return rc;
     memcached_server_st* servers = memcached_servers_parse(hosts);
     if (servers)
     {
-        rc = memcached_server_push(_memsvr, servers);
+        rc = memcached_server_push(&_memsvr, servers);
         memcached_server_free(servers);
         if (rc == MEMCACHED_SUCCESS)
         {
@@ -93,14 +85,14 @@ bool MCached::addHosts(const char* hosts)
 
 const char* MCached::get(const char* key, char* value, size_t size)
 {
-    if (!_memsvr || !key || !value || !size)
+    if (!key || !value || !size)
         return 0;
     return get(key, strlen(key), value, size);
 }
 
 const char* MCached::get(const char* key, size_t key_size, char* value, size_t size)
 {
-    if (!_memsvr || !key || !key_size || !value || !size)
+    if (!key || !key_size || !value || !size)
         return 0;
 
     size_t tlen = 0;
@@ -112,7 +104,7 @@ const char* MCached::get(const char* key, size_t key_size, char* value, size_t s
     while (retry)
     {
         --retry;
-        char* rval = memcached_get(_memsvr, key, key_size, &tlen, &flags, &rc);
+        char* rval = memcached_get(&_memsvr, key, key_size, &tlen, &flags, &rc);
         if (rc == MEMCACHED_SUCCESS && rval && tlen)
         {
             tlen = tlen > size ? tlen : size;
@@ -130,22 +122,22 @@ const char* MCached::get(const char* key, size_t key_size, char* value, size_t s
 
 bool MCached::set(const char* key, const char* value, int timeout)
 {
-    if (!_memsvr || !key || !value)
+    if (!key || !value)
         return 0;
     return set(key, strlen(key), value, strlen(value), timeout);
 }
 
 bool MCached::set(const char* key, size_t key_size, const char* value, size_t size, int timeout)
 {
-    if (!_memsvr || !key || !key_size || !value || !size)
+    if (!key || !key_size || !value || !size)
         return false;
 
-    memcached_return_t rc = memcached_set(_memsvr, key, key_size, value, size, timeout, 0);
+    memcached_return_t rc = memcached_set(&_memsvr, key, key_size, value, size, timeout, 0);
 
     int retry = 2;
     while (rc != MEMCACHED_SUCCESS && retry)
     {
-        rc = memcached_set(_memsvr, key, key_size, value, size, timeout, 0);
+        rc = memcached_set(&_memsvr, key, key_size, value, size, timeout, 0);
         --retry;
     }
 

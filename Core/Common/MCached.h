@@ -35,7 +35,7 @@ protected:
 
 private:
     std::vector<std::string> _hosts;
-    memcached_st* _memsvr;
+    memcached_st _memsvr;
 };
 
 #endif
