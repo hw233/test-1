@@ -668,7 +668,7 @@ namespace REP
     /** 天劫 **/
     const UInt8 TIANJIE             = 0x19;
     /** 活动 **/
-    const UInt8 ACTIVE              = 0X8B;
+    const UInt8 ACTIVE              = 0x8B;
 
     /** 单挑 **/
     const UInt8 SINGLE_HERO         = 0XA5;
