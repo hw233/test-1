@@ -12,7 +12,6 @@ static bool MemcachedSet(const char* key, size_t key_size, const char* value, si
 
 static bool initMemcache()
 {
-    bool hasServer = false;
     if (!memcinited)
     {
         memcached_return rc;
@@ -21,23 +20,22 @@ static bool initMemcache()
         size_t sz = cfg.tokenServer.size();
         for (size_t i = 0; i < sz; ++i)
         {
-            memcached_server_st list;
-            memcached_server_list_st servers = memcached_server_list_append(&list, cfg.tokenServer[i].ip.c_str(), cfg.tokenServer[i].port, &rc);
+            memcached_server_list_st servers = memcached_server_list_append(NULL, cfg.tokenServer[i].ip.c_str(), cfg.tokenServer[i].port, &rc);
             if (rc == MEMCACHED_SUCCESS)
             {
                 rc = memcached_server_push(&memc, servers);
-                hasServer = true;
+                memcached_server_list_free(servers);
                 memcinited = true;
             }
         }
     }
 
-    if (hasServer)
+    if (memcinited)
     {
         memc_version = (rand()*(rand()/132))%0x8FFFFFFF;
         TRACE_LOG("memc_version: %d", memc_version);
     }
-    return hasServer;
+    return memcinited;
 }
 
 __attribute__((destructor)) static void uninitMemcache()
