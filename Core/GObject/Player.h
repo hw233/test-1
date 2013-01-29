@@ -2123,6 +2123,9 @@ namespace GObject
         void sendFeastGiftAct();
         void getNewYearQQGameAward(UInt8 type);
         void sendNewYearQQGameAct();
+        void getNewYearQzoneContinueAward(UInt8 type);
+        void sendNewYearQzoneContinueAct();
+        void calcNewYearQzoneContinueDay(UInt32 time);
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

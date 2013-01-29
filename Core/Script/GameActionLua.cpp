@@ -1528,5 +1528,10 @@ namespace Script
 	{
 		return Call<bool>("onGetNewYearQQGameAward", player, type);
     }
+
+	bool GameActionLua::onGetNewYearQzoneContinueAward( Player* player, UInt8 type)
+	{
+		return Call<bool>("onGetNewYearQzoneContinueAward", player, type);
+    }
 }
 

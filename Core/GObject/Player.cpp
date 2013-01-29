@@ -932,6 +932,7 @@ namespace GObject
             }
 		}
 
+        calcNewYearQzoneContinueDay(curtime);
         continuousLogin(curtime);
         continuousLoginRF(curtime);
         sendYearRPInfo();
@@ -16915,6 +16916,68 @@ void Player::sendNewYearQQGameAct()
     st << Stream::eos;
     send(st);
 }
+
+void Player::getNewYearQzoneContinueAward(UInt8 type)
+{
+    if(type == 0 || type > 7)
+        return;
+    if(atoi(m_domain) != 1)
+        return;
+
+    UInt32 tmp = GetVar(VAR_NEWYEAR_QZONECONTINUE_ACT);
+    UInt16 isGet = static_cast<UInt16>(tmp & 0xFFFF);
+    if(isGet & (0x01 << (type - 1)))
+        return;
+    UInt8 continueDays = static_cast<UInt8>(tmp >> 16);
+    const static UInt8 needMinDay[] = {3, 5, 7, 10, 15, 21, 28};
+    if(continueDays < needMinDay[type - 1])
+        return;
+    bool bRet = GameAction()->onGetNewYearQQGameAward(this, type);
+    if(bRet)
+    {
+        tmp |= (0x01 << (type - 1));
+        SetVar(VAR_NEWYEAR_QZONECONTINUE_ACT, tmp);
+        sendNewYearQzoneContinueAct();
+    }
+}
+
+void Player::sendNewYearQzoneContinueAct()
+{
+    if(!World::getNewYearQzoneContinueAct())
+        return;
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(10);
+    UInt32 tmp = GetVar(VAR_NEWYEAR_QZONECONTINUE_ACT);
+    UInt8 continueDays = static_cast<UInt8>(tmp >> 16);
+    UInt16 isGet = static_cast<UInt16>(tmp & 0xFFFF);
+    st << continueDays;
+    st << isGet;
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::calcNewYearQzoneContinueDay(UInt32 now)
+{
+    if(!World::getNewYearQzoneContinueAct())
+        return;
+
+    UInt32 lasttime_sharp = TimeUtil::SharpDay(0, _playerData.lastOnline);
+    UInt32 now_sharp = TimeUtil::SharpDay(0, now);
+    if (lasttime_sharp >= now_sharp)
+        return;
+
+    UInt32 tmp = GetVar(VAR_NEWYEAR_QZONECONTINUE_ACT);
+    UInt32 continueDays = (tmp >> 16);
+    if(continueDays >= 0xFF)
+        continueDays = 0xFE;
+    if(now_sharp == lasttime_sharp + 1)
+        continueDays += 1;
+    else
+        continueDays = 0;
+    tmp = (continueDays << 16) + (tmp & 0xFFFF);
+    SetVar(VAR_NEWYEAR_QZONECONTINUE_ACT, tmp);
+}
+
 
 
 

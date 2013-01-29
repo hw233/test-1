@@ -714,3 +714,34 @@ function onGetNewYearQQGameAward(player, type)
     return true
 end
 
+local QzonecontinueAwards = {
+    [1] = {{56, 1},{57, 1}},
+    [2] = {{56, 2},{57, 2}},
+    [3] = {{56, 2},{57, 2},{134, 1}},
+    [4] = {{56, 2},{57, 2},{134, 2}},
+    [5] = {{56, 2},{57, 2},{134, 2},{30, 1}},
+    [6] = {{56, 2},{57, 2},{134, 2},{30, 2}},
+    [6] = {{56, 2},{57, 2},{134, 2},{30, 2},{9076,1}},
+}
+
+function onGetNewYearQQGameAward(player, type)
+    if player == nil then
+        return false
+    end
+
+    local award = QzonecontinueAwards[type]
+    if award == nil then
+        return false
+    end
+
+    local package = player:GetPackage()
+    if package:GetRestPackageSize() < #award then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    for i = 1, #awards do
+        package:Add(awards[i][1], awards[i][2], true, false, 2)
+    end
+    return true
+end
+

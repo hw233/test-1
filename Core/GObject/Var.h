@@ -344,7 +344,8 @@ namespace GObject
         VAR_9343_USED=374,
         //越南版380-399
         //400-420 for qiwy
-        VAR_NEWYEAR_QQGAME_ACT = 401,
+        VAR_NEWYEAR_QQGAME_ACT = 401, //蓝钻新年回馈活动
+        VAR_NEWYEAR_QZONECONTINUE_ACT = 402, //空间朋友连续登录奖励
 
         VAR_MAX,
     };
@@ -651,6 +652,7 @@ namespace GObject
             REGISTER_VAR(VAR_9344_USED, CYCLE_NONE);
             REGISTER_VAR(VAR_9343_USED, CYCLE_NONE);
             REGISTER_VAR(VAR_NEWYEAR_QQGAME_ACT, CYCLE_DAY);
+            REGISTER_VAR(VAR_NEWYEAR_QZONECONTINUE_ACT, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);
