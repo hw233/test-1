@@ -348,6 +348,7 @@ namespace Script
 	    Table getDragonKingAward(UInt8 step);
         bool checkDragonKingCanSucceed(Player * player, UInt8 step);
         bool onGetNewYearGiveGiftAward(Player* player, UInt8 dayOrder, UInt8 times);
+        bool onGetNewYearQQGameAward( Player* player, UInt8 type);
 
 	private:
 		Player* _player1;	//?ű???????Ϊ????1

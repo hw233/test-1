@@ -2121,6 +2121,8 @@ namespace GObject
         void sendTowerLoginAct();
         void getFeastGiftAward(UInt8 type);
         void sendFeastGiftAct();
+        void getNewYearQQGameAward(UInt8 type);
+        void sendNewYearQQGameAct();
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

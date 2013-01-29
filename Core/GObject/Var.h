@@ -343,6 +343,9 @@ namespace GObject
         VAR_9344_USED=373,
         VAR_9343_USED=374,
         //越南版380-399
+        //400-420 for qiwy
+        VAR_NEWYEAR_QQGAME_ACT = 401,
+
         VAR_MAX,
     };
 
@@ -647,6 +650,7 @@ namespace GObject
             REGISTER_VAR(VAR_SNAKEEGG_AWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_9344_USED, CYCLE_NONE);
             REGISTER_VAR(VAR_9343_USED, CYCLE_NONE);
+            REGISTER_VAR(VAR_NEWYEAR_QQGAME_ACT, CYCLE_DAY);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

@@ -1250,6 +1250,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendGoodVoiceInfo();
     pl->send3366GiftInfo();
     pl->sendFeastGiftAct();
+    pl->sendNewYearQQGameAct();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -1872,6 +1873,16 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
             br >> dayOrder;
             br >> result;
             player->getNewYearGiveGiftAward(dayOrder, result);
+        }
+        break;
+
+        case 9:
+        {
+            UInt8 type;
+            if(!World::getNewYearQQGameAct())
+                return;
+            br >> type;
+            player->getNewYearQQGameAward(type);
         }
         break;
 

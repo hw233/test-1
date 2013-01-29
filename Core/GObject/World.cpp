@@ -148,6 +148,7 @@ bool World::_heroIslandAct= false;
 bool World::_dragonKingAct= false;
 bool World::_feastloginAct= false;
 bool World::_newYearGiveGiftAct= false;
+bool World::_newYearQQGameAct= false;
 UInt8 World::_towerloginAct= 0;
 bool World::_guoqing= false;
 bool World::_9215Act= false;

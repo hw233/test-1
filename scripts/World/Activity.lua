@@ -906,6 +906,12 @@ function onActivityCheck(tm)
           setNewYearGiveGiftAct(false)
       end
 
+      if tm >= actTime238_0 and tm < actTime238_1 then
+          setNewYearQQGameAct(true)
+      else
+          setNewYearQQGameAct(false)
+      end
+
       if tm >= actTime2013_02_01 and tm < actTime2013_02_09 then
           setCallSnakeEggAct(1)
       elseif tm >= actTime2013_02_09 and tm < actTime2013_02_16 then
@@ -1192,6 +1198,9 @@ function initActTime(y, m, d)
   local  SerStartTm2013_02_12 = { ['year'] = 2013, ['month'] = 2, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 迎新纳福 红包入袋
   local  SerStartTm237 = { ['year'] = 2013, ['month'] = 2, ['day'] = 3, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 蓝钻新年回馈活动
+  local  SerStartTm238 = { ['year'] = 2013, ['month'] = 2, ['day'] = 4, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
 
   --300-399越南版用了
   actTime0 = os.time(SerStartTm);
@@ -1572,6 +1581,9 @@ function initActTime(y, m, d)
 
   actTime237_0= os.time(SerStartTm237);
   actTime237_1= os.time(SerStartTm237) + 22 * 86400;
+
+  actTime238_0= os.time(SerStartTm238);
+  actTime238_1= os.time(SerStartTm238) + 21 * 86400;
 
   actTime2013_02_01= os.time(SerStartTm2013_02_01);
   actTime2013_02_09= os.time(SerStartTm2013_02_09);

@@ -16867,5 +16867,56 @@ void Player::getNewYearGiveGiftAward(UInt8 dayOrder, UInt16 result)
     send(st);
 }
 
+void Player::getNewYearQQGameAward(UInt8 type)
+{
+    if(type == 0 || type > 2)
+        return;
+    if(atoi(m_domain) != 10)
+        return;
+    bool bRet;
+    UInt32 status = GetVar(VAR_NEWYEAR_QQGAME_ACT);
+
+    if(type == 1)
+    {
+        if(status & 0x01)
+            return;
+        bRet = GameAction()->onGetNewYearQQGameAward(this, 1);
+        if(bRet)
+        {
+            status |= 0x01;
+            SetVar(VAR_NEWYEAR_QQGAME_ACT, status);
+            sendNewYearQQGameAct();
+        }
+    }
+    else
+    {
+        if(status & 0x02)
+            return;
+        if(!isBD())
+            return;
+        bRet = GameAction()->onGetNewYearQQGameAward(this, 2);
+        if(bRet)
+        {
+            status |= 0x02;
+            SetVar(VAR_NEWYEAR_QQGAME_ACT, status);
+            sendNewYearQQGameAct();
+        }
+    }
+}
+
+void Player::sendNewYearQQGameAct()
+{
+    if(!World::getNewYearQQGameAct())
+        return;
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(9);
+    UInt8 opt = GetVar(VAR_NEWYEAR_QQGAME_ACT);
+    st << opt;
+    st << Stream::eos;
+    send(st);
+}
+
+
+
 } // namespace GObject
 
