@@ -110,7 +110,8 @@ namespace GObject
 
 
             SetUrlString (url, it->playerId, it->type, it->openId, it->openKey, it->pf, it->userIp);
-            sprintf (res, "%s%s", host, url);
+            snprintf (res, MAX_RET_LEN, "%s%s", host, url);
+            res[MAX_RET_LEN - 1] = '\0';
 
             int timeout = 1;
 
