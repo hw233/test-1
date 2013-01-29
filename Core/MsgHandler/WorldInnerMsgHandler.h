@@ -465,6 +465,14 @@ void OnCompleteDungeonAutoReq( GameMsgHdr& hdr, const void * data )
 	GLOBAL().PushMsg(hdr2, &ev);
 }
 
+void OnCancelJobHunterAutoReq( GameMsgHdr & hdr, const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+    GObject::EventBase * ev = GObject::eventWrapper.RemoveTimerEvent(player, EVENT_JOBHUNTER, player->getId());
+    if (ev)
+        ev->release();
+}
+
 void OnReloadLuaReq( GameMsgHdr& hdr, const void * data )
 {
 	UInt16 flag = *static_cast<const UInt16 *>(data);

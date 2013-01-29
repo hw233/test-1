@@ -88,6 +88,8 @@ MSG_REG_2(GameMsgHdr, 0x17B, OnAddClanBoxGM);
 MSG_REG_2(GameMsgHdr, 0x17C, OnTrainAccelerateReq);
 MSG_REG_2(GameMsgHdr, 0x17D, OnDoInstantPracticeAccReq);
 
+MSG_REG_2(GameMsgHdr, 0x17E, OnCancelJobHunterAutoReq);
+
 MSG_REG_2(GameMsgHdr, 0x180, OnCancelDungeonAutoReq);
 MSG_REG_2(GameMsgHdr, 0x181, OnCompleteDungeonAutoReq);
 
