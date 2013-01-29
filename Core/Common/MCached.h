@@ -34,6 +34,7 @@ protected:
     bool addHosts(const char* hosts);
 
 private:
+    bool _inited;
     std::vector<std::string> _hosts;
     memcached_st _memsvr;
 };

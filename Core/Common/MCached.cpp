@@ -6,7 +6,7 @@
 #include <libmemcached/memcached.h>
 
 #ifndef _WIN32
-MCached::MCached()
+MCached::MCached() : _inited(false)
 {
 }
 
@@ -16,7 +16,14 @@ MCached::~MCached()
 
 bool MCached::init(const char* hosts)
 {
-    return pushHost(hosts);
+    if (_inited)
+        return true;
+    if (memcached_create(&_memsvr))
+    {
+        _inited = true;
+        return pushHost(hosts);
+    }
+    return false;
 }
 
 bool MCached::init(const std::string& hosts)
@@ -34,14 +41,14 @@ bool MCached::pushHost(const char* hosts)
     if (!hosts || !strlen(hosts))
         return false;
 
-    memcached_create(&_memsvr);
+    if (!_inited)
+        return init(hosts);
 
-    memcached_return rc;
-    memcached_server_st* servers = memcached_servers_parse(hosts);
+    memcached_server_list_st servers = memcached_servers_parse(hosts);
     if (servers)
     {
-        rc = memcached_server_push(&_memsvr, servers);
-        memcached_server_free(servers);
+        memcached_return rc = memcached_server_push(&_memsvr, servers);
+        memcached_server_list_free(servers);
         if (rc == MEMCACHED_SUCCESS)
         {
             addHosts(hosts);
@@ -107,7 +114,7 @@ const char* MCached::get(const char* key, size_t key_size, char* value, size_t s
         char* rval = memcached_get(&_memsvr, key, key_size, &tlen, &flags, &rc);
         if (rc == MEMCACHED_SUCCESS && rval && tlen)
         {
-            tlen = tlen > size ? tlen : size;
+            tlen = tlen > size ? size : tlen;
             memcpy(value, rval, tlen);
             free(rval);
             break;
