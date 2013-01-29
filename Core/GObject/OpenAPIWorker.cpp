@@ -352,6 +352,7 @@ namespace GObject
         #define JSON_ERR_CUSTOM3 -9529
         #define JSON_ERR_CUSTOM4 -9530
 
+        TRACE_LOG("JSON RESULT: %s", result);
         json_t* obj = NULL;
 
 

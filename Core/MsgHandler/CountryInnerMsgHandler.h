@@ -1897,7 +1897,13 @@ void OnOpenAPIFailed( GameMsgHdr &hdr, const void *data)
     char buf2[32] = "";
     snprintf( buf2, 32, "%d", faildInfo->ret);
     player->udpLog(buf, buf2, faildInfo->msg, "", "", "", "act_tmp");
-    if (faildInfo->ret == 1002)
+    if (faildInfo->ret == 1002 
+            || faildInfo->ret == 1005
+            || faildInfo->ret == 1006
+            || faildInfo->ret == 1300
+            || faildInfo->ret == -2
+            || faildInfo->ret == -64
+            )
     {
         player->selfKick();
     }
