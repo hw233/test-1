@@ -67,6 +67,7 @@ namespace GObject
 
     void OpenAPIWorker::OnTimer()
     {
+        return;
         std::vector<UrlParam> list;
         {
             FastMutex::ScopedLock lk(m_Mutex);
@@ -193,6 +194,7 @@ namespace GObject
 
     void OpenAPIWorker::Push(UInt64 playerId, UInt16 type, const char * openId, const char * openKey, const char * pf, const char * userIp)
     {
+        return;
         const static int OPEN_ID_LEN  = 64;
         const static int OPEN_KEY_LEN = 128;
         const static int PF_LEN = 64;
