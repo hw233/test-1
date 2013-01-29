@@ -807,6 +807,9 @@ function onActivityCheck(tm)
       if tm >= actTime534 and tm < actTime534_1 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
+      elseif tm >= actTime539 and tm < actTime539_1 then
+          setRechargeActive(true, 16)
+          setNeedRechargeRank(true)
       else
           setRechargeActive(false, 16)
           setNeedRechargeRank(false)
@@ -1035,6 +1038,7 @@ function initActTime(y, m, d)
   local  SerStartTm537= { ['year'] = 2012, ['month'] = 12, ['day'] = 15, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 商城消耗返利
   local  SerStartTm538= { ['year'] = 2013, ['month'] = 1, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm539= { ['year'] = 2013, ['month'] = 1, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   -- 繁体版
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1371,6 +1375,9 @@ function initActTime(y, m, d)
 
   actTime538 = os.time(SerStartTm538);
   actTime538_1 = os.time(SerStartTm538) + 7 * 86400;
+
+  actTime539 = os.time(SerStartTm539);
+  actTime539_1 = os.time(SerStartTm539) + 11 * 86400;
 
   -- 繁体版
   actTime101 = os.time(SerStartTm101);
