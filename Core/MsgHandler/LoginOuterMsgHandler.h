@@ -52,8 +52,6 @@
 #ifndef _WIN32
 //#include <libmemcached/memcached.h>
 #include "GObject/DCLogger.h"
-
-//static memcached_st* memc = NULL;
 #endif
 
 bool getId(char buf[64], UInt8 type = 0);
@@ -847,7 +845,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
     br>>param;
 
     initMemcache();
-    if (memc)
+    if (memcinited)
     {
         size_t len = 0;
         size_t tlen = 0;
@@ -860,7 +858,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
         while (retry)
         {
             --retry;
-            char* rtoken = memcached_get(memc, key, len, &tlen, &flags, &rc);
+            char* rtoken = memcached_get(&memc, key, len, &tlen, &flags, &rc);
             if (rc == MEMCACHED_SUCCESS && rtoken && tlen)
             {
                 ret = 0;
@@ -890,7 +888,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
 
         if (rc == MEMCACHED_SUCCESS && !ret)
         {
-            rc = memcached_delete(memc, key, len, (time_t)0);
+            rc = memcached_delete(&memc, key, len, (time_t)0);
             if (rc == MEMCACHED_SUCCESS)
             {
                 //err += "delete key error.";
@@ -1055,7 +1053,7 @@ bool getId(char buf[64], UInt8 type)
     {
         UInt8 ret = 1;
         initMemcache();
-        if (!memc)
+        if (!memcinited)
             return false;
 
         size_t len = 0;
@@ -1072,7 +1070,7 @@ bool getId(char buf[64], UInt8 type)
         while (retry)
         {
             --retry;
-            char* rid = memcached_get(memc, key, len, &tlen, &flags, &rc);
+            char* rid = memcached_get(&memc, key, len, &tlen, &flags, &rc);
             if (rc == MEMCACHED_SUCCESS && rid && tlen)
             {
                 ret = 0;
@@ -2196,7 +2194,7 @@ void SetMoneyFromBs(LoginMsgHdr &hdr,const void * data)
         if (cfg.GMCheck)
         {
             initMemcache();
-            if (memc)
+            if (memcinited)
             {
                 size_t len = 0;
                 size_t tlen = 0;
@@ -2209,7 +2207,7 @@ void SetMoneyFromBs(LoginMsgHdr &hdr,const void * data)
                 while (retry)
                 {
                     --retry;
-                    char* rtoken = memcached_get(memc, key, len, &tlen, &flags, &rc);
+                    char* rtoken = memcached_get(&memc, key, len, &tlen, &flags, &rc);
                     if (rc == MEMCACHED_SUCCESS && rtoken)
                     {
                         ret = 0;
@@ -2228,7 +2226,7 @@ void SetMoneyFromBs(LoginMsgHdr &hdr,const void * data)
                     }
                 }
 
-                rc = memcached_delete(memc, key, len, (time_t)0);
+                rc = memcached_delete(&memc, key, len, (time_t)0);
                 if (rc == MEMCACHED_SUCCESS)
                 {
                     //err += "delete key error.";

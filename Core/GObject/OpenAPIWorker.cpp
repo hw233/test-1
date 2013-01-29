@@ -386,9 +386,9 @@ namespace GObject
         if (!m_inited)
             return true;
         playerId = playerId & 0xFFFFFFFF;
-        char buf[128];
+        char buf[128] = {0};
         snprintf(buf, 128, "oid_%"I64_FMT"u", playerId);
-        char openId2[256]={};
+        char openId2[256] = {0};
         m_MCached.get(buf, strlen(buf), openId2, 255);
         openId2[255] = '\0';
         if (strncmp(openId, openId2, strlen(openId)) == 0)

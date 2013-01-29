@@ -25,7 +25,7 @@ void OnCheckPackKey( LoginMsgHdr& hdr, const void * data )
     {
         memcached_return rc;
         initMemcache();
-        if (memc)
+        if (memcinited)
         {
             size_t tlen = 0;
             unsigned int flags = 0;
@@ -34,7 +34,7 @@ void OnCheckPackKey( LoginMsgHdr& hdr, const void * data )
             while (retry)
             {
                 --retry;
-                char* rtoken = memcached_get(memc, key->key, len, &tlen, &flags, &rc);
+                char* rtoken = memcached_get(&memc, key->key, len, &tlen, &flags, &rc);
                 if (rc == MEMCACHED_SUCCESS && rtoken && tlen)
                 {
                     ret = 0;
@@ -82,18 +82,18 @@ void OnCheckPackKey( LoginMsgHdr& hdr, const void * data )
             {
                 char id[32] = {0};
                 size_t vlen = snprintf(id, 32, "%"I64_FMT"u", key->player->getId());
-                memcached_return_t rc = memcached_set(memc, key->key, len, id, vlen, (time_t)(60), 0);
+                memcached_return_t rc = memcached_set(&memc, key->key, len, id, vlen, (time_t)(60), 0);
 
                 int retry = 2;
                 while (rc != MEMCACHED_SUCCESS && retry)
                 {
-                    rc = memcached_set(memc, key->key, len, id, vlen, (time_t)(30), 0);
+                    rc = memcached_set(&memc, key->key, len, id, vlen, (time_t)(30), 0);
                     --retry;
                 }
 
                 if (rc != MEMCACHED_SUCCESS)
                 {
-                    rc = memcached_delete(memc, key->key, len, (time_t)0);
+                    rc = memcached_delete(&memc, key->key, len, (time_t)0);
                 }
             }
         }
@@ -126,7 +126,7 @@ void OnSetCrackValue( LoginMsgHdr& hdr, const void * data )
 
     initMemcache();
     int v = 0;
-    if (memc)
+    if (memcinited)
     {
         size_t len = 0;
         char key[MEMCACHED_MAX_KEY] = {0};
