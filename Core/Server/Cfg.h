@@ -161,7 +161,6 @@ public:
         TokenServer ts;
         ts.ip = server;
         ts.port = port;
-        tokenServer.push_back(ts);
         IDQueryMemcached.push_back(ts);
     }
 
