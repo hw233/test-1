@@ -256,6 +256,7 @@ namespace GObject
         UInt8 OpenLingbaoSmelt(UInt16 gujiId, UInt8 type);
         UInt8 LingbaoSmelt(UInt32 itemId, UInt16 cnt);
         UInt8 closeLingbaoSmelt();
+        void QuitLBSmelt();
         void sendLingbaoSmeltInfo();
         void loadLingbaoSmeltInfo(LingbaoSmeltInfo& info) { m_lbSmeltInfo = info; }
         void FinishLBSmelt();

@@ -101,6 +101,75 @@ namespace GObject
             return 0;
         }
 
+        float getDisFactor2(UInt16 chance, UInt8 color)
+        {
+            int maxIdx = 9;
+            UInt16 lastDisChance = 0;
+            UInt8 colorIdx = color - 2;
+            if(colorIdx > 3)
+                colorIdx = 0;
+            float minDis = ((float)(colorVal[colorIdx]))/400;
+
+            float fChance = 0;
+            for(int i = 0; i < 9; ++ i)
+            {
+                if(chance < disChance[i])
+                {
+                    if(fChance < 0.00001f)
+                        fChance = ((float)(chance + 1 - lastDisChance)) / (disChance[i] - lastDisChance);
+                    float fDis = ((float)(dis[i]) + (dis[i+1] - dis[i])*fChance) / dis[maxIdx];
+                    if(fDis > minDis)
+                        return fDis;
+                }
+                lastDisChance = disChance[i];
+            }
+            return 0;
+        }
+
+        float getDisFactor3(UInt16 chance, float fChance)
+        {
+            int maxIdx = 9;
+            UInt16 lastDisChance = 0;
+            for(int i = 0; i < 9; ++ i)
+            {
+                if(chance < disChance[i])
+                {
+                    float fDis = ((float)(dis[i]) + (dis[i+1] - dis[i])*fChance) / dis[maxIdx];
+                    return fDis;
+                }
+                lastDisChance = disChance[i];
+            }
+            return 0;
+        }
+
+        float getDisFactor4(UInt16 chance, float fChance, UInt8 color)
+        {
+            int maxIdx = 9;
+            UInt16 lastDisChance = 0;
+            UInt8 colorIdx = color - 2;
+            if(colorIdx > 3)
+                colorIdx = 0;
+            float minDis = ((float)(colorVal[colorIdx]))/400;
+
+            for(int i = 0; i < 9; ++ i)
+            {
+                if(chance < disChance[i])
+                {
+                    float fDis = ((float)(dis[i]) + (dis[i+1] - dis[i])*fChance) / dis[maxIdx];
+                    if(fDis > minDis)
+                    {
+                        return fDis;
+                    }
+                    else
+                    {
+                        fChance *= 0.5;
+                    }
+                }
+                lastDisChance = disChance[i];
+            }
+            return 0;
+        }
+
         UInt8 getSkillsMaxCnt(UInt8 lbIdx, UInt8 lvl)
         {
             if(lbIdx > 3)
