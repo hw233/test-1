@@ -1010,7 +1010,6 @@ bool JobHunter::OnAttackMonster(UInt16 pos, bool isAuto)
 
         if (type == 12)
         {
-            /*
             for (UInt8 i = 1; i < SLOT_MAX; ++ i)
             {
                 struct GData::LootResult lr = {0, 1};
@@ -1024,7 +1023,6 @@ bool JobHunter::OnAttackMonster(UInt16 pos, bool isAuto)
                     }
                 }
             }
-            */
         }
     }
     else

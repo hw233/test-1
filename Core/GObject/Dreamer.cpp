@@ -153,6 +153,10 @@ void Dreamer::OnCommand(UInt8 command, UInt8 val, UInt8 val2)
                                 SendTimeOver();
                                 OnAbort();
                             }
+                            else
+                            {
+                                _owner->dreamerUdpLog(10000, 3 + _gameLevel + 4);
+                            }
                             return;
                         }
                         break;
@@ -571,6 +575,7 @@ void Dreamer::OnRequestStart(UInt8 progress)
     _isInGame = true;
     SendGameInfo();
     SendMapInfo();
+    _owner->dreamerUdpLog(10000, _gameProgress);
 }
 
 bool Dreamer::OnMove(UInt8 x, UInt8 y)
@@ -731,6 +736,7 @@ bool Dreamer::OnGetTreasure()
     st << Stream::eos;
 
     DB2().PushUpdateData("UPDATE `dreamer` SET `keys` = '%u' WHERE `playerId` = %"I64_FMT"u", _keysCount, _owner->getId());
+    _owner->dreamerUdpLog(10000, 9 + _gameLevel);
     return true;
 }
 
@@ -867,6 +873,7 @@ bool Dreamer::OnUseEye(UInt8 type)
             _eyesTime = 3;
             INDEX_TO_POS(it->first, _eyeX, _eyeY);
             DB2().PushUpdateData("UPDATE `dreamer` SET `eyes` = '%u', `eyeTime` = '%u', `eyeX` = '%u',`eyeY` = '%u' WHERE `playerId` = %"I64_FMT"u", _eyesCount, _eyesTime, _eyeX, _eyeY, _owner->getId());
+            _owner->dreamerUdpLog(10000, 9);
             return true;
         }
     }

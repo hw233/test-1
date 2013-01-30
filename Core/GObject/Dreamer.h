@@ -16,7 +16,7 @@ namespace GObject
 {
 
 #ifdef _DEBUG
-#define DREAMER_DEBUG
+//#define DREAMER_DEBUG
 #endif
 
 class Player;

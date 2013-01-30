@@ -1585,6 +1585,14 @@ namespace GObject
         }
     }
 
+    void Player::dreamerUdpLog(UInt32 id, UInt32 type, UInt32 num /* = 1 */)
+    {
+        // 水晶梦境udp日志
+        char action[32] = "";
+        snprintf (action, 32, "F_%d_%d", id, type);
+        udpLog("dream", action, "", "", "", "", "act", num);
+    }
+
     void Player::sendHalloweenOnlineAward(UInt32 now, bool _online)
     {
         _online = false; // XXX: fuck
