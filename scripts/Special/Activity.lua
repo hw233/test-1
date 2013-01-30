@@ -5067,6 +5067,286 @@ function sendRechargeRankAward_2013_02_01(player, pos)
     sendItemPackageMail(player, title, ctx, items[pos]);
 end
 
+function sendRechargeRankAward_2013_02_02(player, pos)
+    local items = {
+        {515,45,1},
+        {515,35,1},
+        {515,25,1},
+        {515,15,1},
+        {515,15,1},
+        {515,15,1},
+        {515,15,1},
+    }
+
+    if items[pos] == nil then
+        return
+    end
+
+    local title = string.format(msg_111, pos)
+    local ctx = string.format(msg_111, pos)
+    sendItemPackageMail(player, title, ctx, items[pos]);
+end
+
+function sendRechargeRankAward_2013_02_03(player, pos)
+    local items = {
+        {134,66,1},
+        {134,55,1},
+        {134,42,1},
+        {134,30,1},
+        {134,30,1},
+        {134,30,1},
+        {134,30,1},
+    }
+
+    if items[pos] == nil then
+        return
+    end
+
+    local title = string.format(msg_111, pos)
+    local ctx = string.format(msg_111, pos)
+    sendItemPackageMail(player, title, ctx, items[pos]);
+end
+
+function sendRechargeRankAward_2013_02_04(player, pos)
+    local items = {
+        {9022,20,1},
+        {9022,15,1},
+        {9022,10,1},
+        {9022,5,1},
+        {9022,5,1},
+        {9022,5,1},
+        {9022,5,1},
+    }
+
+    if items[pos] == nil then
+        return
+    end
+
+    local title = string.format(msg_111, pos)
+    local ctx = string.format(msg_111, pos)
+    sendItemPackageMail(player, title, ctx, items[pos]);
+end
+
+function sendRechargeRankAward_2013_02_05(player, pos)
+    local items = {
+        {9076,60,1},
+        {9076,45,1},
+        {9076,30,1},
+        {9076,15,1},
+        {9076,15,1},
+        {9076,15,1},
+        {9076,15,1},
+    }
+
+    if items[pos] == nil then
+        return
+    end
+
+    local title = string.format(msg_111, pos)
+    local ctx = string.format(msg_111, pos)
+    sendItemPackageMail(player, title, ctx, items[pos]);
+end
+
+function sendRechargeRankAward_2013_02_06(player, pos)
+    local items = {
+        {9076,30,1, 1325,30,1},
+        {9076,22,1, 1325,22,1},
+        {9076,16,1, 1325,16,1},
+        {9076,10,1, 1325,10,1},
+        {9076,10,1, 1325,10,1},
+        {9076,10,1, 1325,10,1},
+        {9076,10,1, 1325,10,1},
+    }
+
+    if items[pos] == nil then
+        return
+    end
+
+    local title = string.format(msg_111, pos)
+    local ctx = string.format(msg_111, pos)
+    sendItemPackageMail(player, title, ctx, items[pos]);
+end
+
+function sendRechargeRankAward_2013_02_07(player, pos)
+    local items = {
+        {509,35,1, 1325,35,1},
+        {509,28,1, 1325,28,1},
+        {509,20,1, 1325,20,1},
+        {509,10,1, 1325,10,1},
+        {509,10,1, 1325,10,1},
+        {509,10,1, 1325,10,1},
+        {509,10,1, 1325,10,1},
+    }
+
+    if items[pos] == nil then
+        return
+    end
+
+    local title = string.format(msg_111, pos)
+    local ctx = string.format(msg_111, pos)
+    sendItemPackageMail(player, title, ctx, items[pos]);
+end
+
+function sendRechargeRankAward_2013_02_08(player, pos)
+    local items = {
+        {515,35,1},
+        {515,28,1},
+        {515,20,1},
+        {515,15,1},
+        {515,15,1},
+        {515,15,1},
+        {515,15,1},
+    }
+
+    if items[pos] == nil then
+        return
+    end
+
+    local title = string.format(msg_111, pos)
+    local ctx = string.format(msg_111, pos)
+    sendItemPackageMail(player, title, ctx, items[pos]);
+end
+
+function sendRechargeRankAward_2013_02_16(player, pos)
+    local items = {
+        {134,20,1, 1325,20,1, 515,20,1},
+        {134,16,1, 1325,16,1, 515,8,1},
+        {134,12,1, 1325,12,1, 515,6,1},
+        {134,8,1, 1325,8,1, 515,5,1},
+        {134,8,1, 1325,8,1, 515,5,1},
+        {134,8,1, 1325,8,1, 515,5,1},
+        {134,8,1, 1325,8,1, 515,5,1},
+    }
+
+    if items[pos] == nil then
+        return
+    end
+
+    local title = string.format(msg_111, pos)
+    local ctx = string.format(msg_111, pos)
+    sendItemPackageMail(player, title, ctx, items[pos]);
+end
+
+function sendRechargeRankAward_2013_02_17(player, pos)
+    local items = {
+        {515,30,1, 1325,30,1},
+        {515,22,1, 1325,22,1},
+        {515,16,1, 1325,16,1},
+        {515,10,1, 1325,10,1},
+        {515,10,1, 1325,10,1},
+        {515,10,1, 1325,10,1},
+        {515,10,1, 1325,10,1},
+    }
+
+    if items[pos] == nil then
+        return
+    end
+
+    local title = string.format(msg_111, pos)
+    local ctx = string.format(msg_111, pos)
+    sendItemPackageMail(player, title, ctx, items[pos]);
+end
+
+function sendRechargeRankAward_2013_02_18(player, pos)
+    local items = {
+        {1325,66,1},
+        {1325,55,1},
+        {1325,42,1},
+        {1325,30,1},
+        {1325,30,1},
+        {1325,30,1},
+        {1325,30,1},
+    }
+
+    if items[pos] == nil then
+        return
+    end
+
+    local title = string.format(msg_111, pos)
+    local ctx = string.format(msg_111, pos)
+    sendItemPackageMail(player, title, ctx, items[pos]);
+end
+
+function sendRechargeRankAward_2013_02_19(player, pos)
+    local items = {
+        {515,45,1},
+        {515,35,1},
+        {515,25,1},
+        {515,15,1},
+        {515,15,1},
+        {515,15,1},
+        {515,15,1},
+    }
+
+    if items[pos] == nil then
+        return
+    end
+
+    local title = string.format(msg_111, pos)
+    local ctx = string.format(msg_111, pos)
+    sendItemPackageMail(player, title, ctx, items[pos]);
+end
+
+function sendRechargeRankAward_2013_02_20(player, pos)
+    local items = {
+        {134,66,1},
+        {134,55,1},
+        {134,42,1},
+        {134,30,1},
+        {134,30,1},
+        {134,30,1},
+        {134,30,1},
+    }
+
+    if items[pos] == nil then
+        return
+    end
+
+    local title = string.format(msg_111, pos)
+    local ctx = string.format(msg_111, pos)
+    sendItemPackageMail(player, title, ctx, items[pos]);
+end
+
+function sendRechargeRankAward_2013_02_21(player, pos)
+    local items = {
+        {9022,20,1},
+        {9022,15,1},
+        {9022,10,1},
+        {9022,5,1},
+        {9022,5,1},
+        {9022,5,1},
+        {9022,5,1},
+    }
+
+    if items[pos] == nil then
+        return
+    end
+
+    local title = string.format(msg_111, pos)
+    local ctx = string.format(msg_111, pos)
+    sendItemPackageMail(player, title, ctx, items[pos]);
+end
+
+function sendRechargeRankAward_2013_02_22(player, pos)
+    local items = {
+        {9076,60,1},
+        {9076,45,1},
+        {9076,30,1},
+        {9076,15,1},
+        {9076,15,1},
+        {9076,15,1},
+        {9076,15,1},
+    }
+
+    if items[pos] == nil then
+        return
+    end
+
+    local title = string.format(msg_111, pos)
+    local ctx = string.format(msg_111, pos)
+    sendItemPackageMail(player, title, ctx, items[pos]);
+end
+
 function sendRechargeRankAward(player, pos)
     -- 20130119~20130129
     local t = { ['year'] = 2013, ['month'] = 1, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -5122,20 +5402,7 @@ function sendRechargeRankAward(player, pos)
         sendRechargeRankAward_2013_02_07(player, pos)
     elseif n >= (s + 9*86400 + 10*60) and n < (s + 10*86400 + 10*60) then
         sendRechargeRankAward_2013_02_08(player, pos)
-    elseif n >= (s + 10*86400 + 10*60) and n < (s + 11*86400 + 10*60) then
-        sendRechargeRankAward_2013_02_09(player, pos)
-    elseif n >= (s + 11*86400 + 10*60) and n < (s + 12*86400 + 10*60) then
-        sendRechargeRankAward_2013_02_10(player, pos)
-    elseif n >= (s + 12*86400 + 10*60) and n < (s + 13*86400 + 10*60) then
-        sendRechargeRankAward_2013_02_11(player, pos)
-    elseif n >= (s + 13*86400 + 10*60) and n < (s + 14*86400 + 10*60) then
-        sendRechargeRankAward_2013_02_12(player, pos)
-    elseif n >= (s + 14*86400 + 10*60) and n < (s + 15*86400 + 10*60) then
-        sendRechargeRankAward_2013_02_13(player, pos)
-    elseif n >= (s + 15*86400 + 10*60) and n < (s + 16*86400 + 10*60) then
-        sendRechargeRankAward_2013_02_14(player, pos)
-    elseif n >= (s + 16*86400 + 10*60) and n < (s + 17*86400 + 10*60) then
-        sendRechargeRankAward_2013_02_15(player, pos)
+
     elseif n >= (s + 17*86400 + 10*60) and n < (s + 18*86400 + 10*60) then
         sendRechargeRankAward_2013_02_16(player, pos)
     elseif n >= (s + 18*86400 + 10*60) and n < (s + 19*86400 + 10*60) then
