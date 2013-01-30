@@ -499,22 +499,22 @@ function loadStore()
         -- 龙魂奇珍
         store:add(14,507,2000)
         store:add(14,509,2000)
-        -- 帮贡
-        store:add(15,5041,300000)
-        store:add(15,5051,300000)
         -- 龙魂灵宝
-        store:add(16,11588,7000)
-        store:add(16,11589,7000)
-        store:add(16,11590,7000)
-        store:add(16,11591,8000)
-        store:add(16,11592,8000)
-        store:add(16,11593,8000)
-        store:add(16,11594,9000)
-        store:add(16,11595,9000)
-        store:add(16,11596,9000)
-        store:add(16,11597,10000)
-        store:add(16,11598,10000)
-        store:add(16,11599,10000)
+        store:add(15,11588,7000)
+        store:add(15,11589,7000)
+        store:add(15,11590,7000)
+        store:add(15,11591,8000)
+        store:add(15,11592,8000)
+        store:add(15,11593,8000)
+        store:add(15,11594,9000)
+        store:add(15,11595,9000)
+        store:add(15,11596,9000)
+        store:add(15,11597,10000)
+        store:add(15,11598,10000)
+        store:add(15,11599,10000)
+        -- 帮贡
+        store:add(16,5041,300000)
+        store:add(16,5051,300000)
 
         --
 

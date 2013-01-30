@@ -411,6 +411,9 @@ namespace GObject
             return;
 		stLBAttrConf& lbAttrConf = GObjectManager::getLBAttrConf();
         UInt8 attrNum = lbAttrConf.getAttrNum(uRand(100));
+        if(color > 3)
+            attrNum = 4;
+
         std::vector<UInt8> allAttrType = lbAttrConf.attrType;
         UInt8 itemTypeIdx = subClass - Item_LBling;
         for(int i = 0; i < attrNum; ++ i)
@@ -419,11 +422,13 @@ namespace GObject
             UInt8 idx = uRand(size);
             lbattr.type[i] = allAttrType[idx];
             float fChance = ((float)(uRand(10000)))/10000;
+            UInt8 tmpcolor = 2 + lbAttrConf.getColor(lv, itemTypeIdx, lbattr.type, lbattr.value, attrNum);
+            if(tmpcolor >= color)
+                color = 2;
             lbattr.value[i] = lbAttrConf.getAttrMax(lv, itemTypeIdx, lbattr.type[i]-1) * lbAttrConf.getDisFactor4(uRand(10000), fChance, color) + 0.9999f;
             allAttrType.erase(allAttrType.begin() + idx);
             if(i + 1 == attrNum)
             {
-                UInt8 tmpcolor = 2 + lbAttrConf.getColor(lv, itemTypeIdx, lbattr.type, lbattr.value, attrNum);
                 if(tmpcolor  < color)
                 {
                     ++ attrNum;
