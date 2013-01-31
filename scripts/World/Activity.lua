@@ -918,6 +918,18 @@ function onActivityCheck(tm)
           setNewYearQzoneContinueAct(false)
       end
 
+      if tm >= actTime240_0 and tm < actTime240_1 then
+          setSaveGoldAct(true)
+      else
+          setSaveGoldAct(false)
+      end
+
+      if tm >= actTime241_0 and tm < actTime241_1 then
+          setQingren(true)
+      else
+          setQingren(false)
+      end
+
       if tm >= actTime2013_02_01 and tm < actTime2013_02_09 then
           setCallSnakeEggAct(1)
       elseif tm >= actTime2013_02_09 and tm < actTime2013_02_16 then
@@ -1208,6 +1220,12 @@ function initActTime(y, m, d)
   local  SerStartTm238 = { ['year'] = 2013, ['month'] = 2, ['day'] = 4, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 空间朋友连续登录奖励
   local  SerStartTm239 = { ['year'] = 2013, ['month'] = 2, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --金蛇献瑞,聚福兆祥活动
+  local  SerStartTm240 = { ['year'] = 2013, ['month'] = 2, ['day'] = 2, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm240_1 = { ['year'] = 2013, ['month'] = 2, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --情人节浪漫之旅
+  local  SerStartTm241 = { ['year'] = 2013, ['month'] = 2, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm241_1 = { ['year'] = 2013, ['month'] = 2, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
 
   --300-399越南版用了
@@ -1595,6 +1613,12 @@ function initActTime(y, m, d)
 
   actTime239_0= os.time(SerStartTm239);
   actTime239_1= os.time(SerStartTm239) + 28 * 86400;
+
+  actTime240_0= os.time(SerStartTm240);
+  actTime240_1= os.time(SerStartTm240_1);
+
+  actTime241_0= os.time(SerStartTm241);
+  actTime241_1= os.time(SerStartTm241_1);
 
   actTime2013_02_01= os.time(SerStartTm2013_02_01);
   actTime2013_02_09= os.time(SerStartTm2013_02_09);

@@ -2101,10 +2101,14 @@ namespace GObject
 
         void getDragonKingInfo();
         void postDragonKing(UInt8 count);
+        void getDragonKingInfoSnake();
+        void postDragonKingSnake(UInt8 count);
+        void saveGoldAct(UInt8 opt, UInt32 param);
+        void sendSaveGoldAct();
+
         void sendSnakeEggInfo();
         void callSnakeEgg();
         void getSnakeEggAward(UInt8 v);
-
         void getNewYearGiveGiftAward(UInt8 dayOrder, UInt8 result);
     private:
         UInt8 cf_posPut[5];//范围1-5

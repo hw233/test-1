@@ -31,6 +31,8 @@
 #define LOTHER_ID       12000
 #define ROTHER_ID       65535
 
+#define COUPON_ID       499
+
 enum ItemClass
 {
     // [00~19]  装备 [1500~4990]   1武器，2头，3胸，4肩，5腰，6腿，7项链，8戒指，10法宝，11时装

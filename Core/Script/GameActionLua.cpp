@@ -112,6 +112,7 @@ namespace Script
 		lua_tinker::def(_L, "getJuly", GObject::World::getJuly);
         lua_tinker::def(_L, "getQixi", GObject::World::getQixi);
         lua_tinker::def(_L, "getWansheng", GObject::World::getWansheng);
+        lua_tinker::def(_L, "getQingren", GObject::World::getQingren);
         lua_tinker::def(_L, "getGuoqing", GObject::World::getGuoqing);
 		lua_tinker::def(_L, "getYDMDAct", GObject::World::getYDMDAct);
 		lua_tinker::def(_L, "getWeekDay",	GObject::World::getWeekDay);
@@ -1516,6 +1517,27 @@ namespace Script
 	{
 		assert(player != NULL);
 		return Call<bool>("checkDragonKingCanSucceed", player, step);
+	}
+
+    Table GameActionLua::getDragonKingSnakeAward(UInt8 step)
+	{
+		return Call<Table>("getDragonKingSnakeAward", step);
+	}
+
+    bool GameActionLua::checkDragonKingSnakeCanSucceed(Player * player, UInt8 step)
+	{
+		assert(player != NULL);
+		return Call<bool>("checkDragonKingSnakeCanSucceed", player, step);
+	}
+
+    Table GameActionLua::getSaveGoldActAward(UInt32 gold)
+	{
+		return Call<Table>("getSaveGoldActAward", gold);
+	}
+
+    Table GameActionLua::getSaveGoldActExtraAward(UInt32 gold)
+	{
+		return Call<Table>("getSaveGoldActExtraAward", gold);
 	}
 
     bool GameActionLua::onGetNewYearGiveGiftAward(Player* player, UInt8 dayOrder, UInt8 times)

@@ -347,6 +347,10 @@ namespace Script
         bool onFirstRecharge(Player* player, UInt8 index);
 	    Table getDragonKingAward(UInt8 step);
         bool checkDragonKingCanSucceed(Player * player, UInt8 step);
+	    Table getDragonKingSnakeAward(UInt8 step);
+        bool checkDragonKingSnakeCanSucceed(Player * player, UInt8 step);
+        Table getSaveGoldActAward(UInt32 gold);
+        Table getSaveGoldActExtraAward(UInt32 gold);
         bool onGetNewYearGiveGiftAward(Player* player, UInt8 dayOrder, UInt8 times);
         bool onGetNewYearQQGameAward( Player* player, UInt8 type);
         bool onGetNewYearQzoneContinueAward( Player* player, UInt8 type);

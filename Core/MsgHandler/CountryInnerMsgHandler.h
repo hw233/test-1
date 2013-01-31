@@ -355,7 +355,7 @@ void OnAthleticsAwardReq(GameMsgHdr& hdr, const void * data)
 	struct GObject::AthleticsAward *awd = reinterpret_cast<struct GObject::AthleticsAward *>(const_cast<void *>(data));
     if(awd->itemId && awd->itemCount)
     {
-        if(awd->itemId == 499)
+        if(awd->itemId == COUPON_ID)
             player->getCoupon(awd->itemCount);
         else
             player->GetPackage()->AddItem(awd->itemId, awd->itemCount, 1, false, FromAthletAward);
@@ -394,7 +394,7 @@ void OnAthleticsAwardReq2(GameMsgHdr& hdr, const void * data)
     UInt16 count = awardId & 0xFFFF;
     if(itemId && count)
     {
-        if(itemId == 499)
+        if(itemId == COUPON_ID)
             player->getCoupon(count);
         else
             player->GetPackage()->AddItem(itemId, count, 1, false, FromAthletAward);
@@ -742,8 +742,10 @@ void OnDailyCheck( GameMsgHdr& hdr, const void * data )
     player->SetVar(VAR_JUNE_HAPPY, 0);
     player->SetVar(VAR_JUNE_ITEM, 0);
     player->sendHappyInfo();
-    player->SendNextdayTime( *(UInt32*)data );
-    player->GetStrengthenMgr()->CheckTimeOver( *(UInt32*)data );
+
+    UInt32 time = *(UInt32*)data;
+    player->SendNextdayTime(time);
+    player->GetStrengthenMgr()->CheckTimeOver(time);
 }
 
 void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
@@ -1909,6 +1911,25 @@ void OnPostDragonKing( GameMsgHdr& hdr, const void * data)
     player->postDragonKing(count);
 }
 
+void OnPostDragonKingSnake( GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+	const UInt8 count = *reinterpret_cast<const UInt8*>(data);
+    player->postDragonKingSnake(count);
+}
+
+void OnSaveGoldAct( GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    struct goldData
+    {
+        UInt8 opt;
+        UInt32 param;
+    };
+    goldData * gData = reinterpret_cast<goldData*>(const_cast<void *>(data));
+    if(gData)
+        player->saveGoldAct(gData->opt, gData->param);
+}
 
 #endif // _COUNTRYINNERMSGHANDLER_H_
 

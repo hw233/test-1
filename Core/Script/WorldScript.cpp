@@ -139,6 +139,8 @@ void WorldScript::init()
     def("getQixi", GObject::World::getQixi);
     def("setWansheng", GObject::World::setWansheng);
     def("getWansheng", GObject::World::getWansheng);
+    def("setQingren", GObject::World::setQingren);
+    def("getQingren", GObject::World::getQingren);
     def("set11Act", GObject::World::set11Act);
     def("get11Act", GObject::World::get11Act);
     def("setSSToolbarAct", GObject::World::setSSToolbarAct);
@@ -155,6 +157,7 @@ void WorldScript::init()
     def("setHeroIslandAct", GObject::World::setHeroIslandAct);
     def("setDragonKingAct", GObject::World::setDragonKingAct);
     def("getDragonKingAct", GObject::World::getDragonKingAct);
+    def("setSaveGoldAct", GObject::World::setSaveGoldAct);
     
     def("setGuoqing", GObject::World::setGuoqing);
     def("getGuoqing", GObject::World::getGuoqing);

@@ -140,12 +140,14 @@ bool World::_june1 = false;
 bool World::_july = false;
 bool World::_qixi= false;
 bool World::_wansheng= false;
+bool World::_qingren= false;
 bool World::_11Act= false;
 bool World::_ssToolbarAct= false;
 bool World::_snowAct= false;
 bool World::_goldSnakeAct= false;
 bool World::_heroIslandAct= false;
 bool World::_dragonKingAct= false;
+bool World::_saveGoldAct= false;
 bool World::_feastloginAct= false;
 bool World::_newYearGiveGiftAct= false;
 bool World::_newYearQQGameAct= false;
@@ -260,6 +262,7 @@ bool bJuneEnd = false;
 bool bPExpItemsEnd = false;
 bool bQixiEnd = false;
 bool bWanshengEnd = false;
+bool bQingrenEnd = false;
 bool bGuoqingEnd = false;
 bool bRechargeEnd = false;
 bool bConsumeEnd = false;
@@ -526,6 +529,19 @@ bool enum_midnight(void * ptr, void* next)
     if (TimeUtil::SharpDay(0, nextday) == TimeUtil::SharpDay(0, World::_levelawardend))
         pl->sendLevelAward();
 #endif
+
+    if (nextday >= TimeUtil::MkTime(2013, 2, 9))
+    {   //金蛇献瑞 聚福兆祥活动
+        struct goldData
+        {
+            UInt8 opt;
+            UInt32 param;
+        }gData;
+        gData.opt = 0;
+        gData.param = 0;
+        GameMsgHdr h(0x343,  pl->getThreadId(), pl, sizeof(gData));
+        GLOBAL().PushMsg(h, &gData);
+    }
 
 	return true;
 }
@@ -1029,6 +1045,7 @@ void World::World_Midnight_Check( World * world )
     bool bJune = getJune();
     bool bQixi = getQixi();
     bool bWansheng = getWansheng();
+    bool bQingren = getQingren();
     bool bGuoqing = getGuoqing();
     bool bXiaoyao = get9215Act();
     bool bSnowAct = getSnowAct();
@@ -1061,6 +1078,7 @@ void World::World_Midnight_Check( World * world )
     bPExpItemsEnd = bPExpItems && !getPExpItems();
     bQixiEnd = bQixi && !getQixi();
     bWanshengEnd = bWansheng && !getWansheng();
+    bQingrenEnd = bQingren && !getQingren();
     bGuoqingEnd = bGuoqing && !getGuoqing();
     bXiaoyaoEnd = bXiaoyao && !get9215Act();
     bSnowEnd = bSnowAct && !getSnowAct();
@@ -1214,7 +1232,7 @@ void World::World_Midnight_Check( World * world )
     if(bJuneEnd)
         world->SendLuckyDrawAward();
 #endif
-    if(bQixiEnd || bWanshengEnd)
+    if(bQixiEnd || bWanshengEnd || bQingrenEnd)
         world->SendQixiAward();
     if(bGuoqingEnd)
         world->SendGuoqingAward();
@@ -1690,7 +1708,7 @@ bool World::Init()
     if(getJune())
         globalPlayers.enumerate(enum_lucky_draw_rank_list, static_cast<void *>(NULL));
 #endif
-    if(getQixi() || getWansheng())
+    if(getQixi() || getWansheng() || getQingren())
         globalPlayers.enumerate(enum_qixi_rank_list, static_cast<void *>(NULL));
 
 	UInt32 now = TimeUtil::Now(), sday = TimeUtil::SharpDay(1) - 10;

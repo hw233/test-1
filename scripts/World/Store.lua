@@ -115,6 +115,10 @@ function loadStore()
 
         discount(store)
 
+        if getQingren() then    --蜀山之恋
+            store:add(2, 9355,10)
+        end
+
         if getItem9343Act() then
             store:add(2, 9343, 20) --龙宫秘宝
         end
