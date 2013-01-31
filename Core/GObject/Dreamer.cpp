@@ -156,7 +156,7 @@ void Dreamer::OnCommand(UInt8 command, UInt8 val, UInt8 val2)
                             }
                             else
                             {
-                                _owner->dreamerUdpLog(10000, 3 + _gameLevel + 4);
+                                _owner->dreamerUdpLog(10000, 3 + _gameLevel);
                             }
                             return;
                         }

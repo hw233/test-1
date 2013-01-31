@@ -405,12 +405,15 @@ namespace GObject
 		}
     }
 
-    static void getRandomLBAttr(UInt8 lv, UInt8 subClass, ItemLingbaoAttr& lbattr)
+    static void getRandomLBAttr(UInt8 lv, UInt8 subClass, UInt8 color, ItemLingbaoAttr& lbattr)
     {
         if(subClass != Item_LBling && subClass != Item_LBwu && subClass != Item_LBxin)
             return;
 		stLBAttrConf& lbAttrConf = GObjectManager::getLBAttrConf();
         UInt8 attrNum = lbAttrConf.getAttrNum(uRand(100));
+        if(color > 3)
+            attrNum = 4;
+
         std::vector<UInt8> allAttrType = lbAttrConf.attrType;
         UInt8 itemTypeIdx = subClass - Item_LBling;
         for(int i = 0; i < attrNum; ++ i)
@@ -418,10 +421,33 @@ namespace GObject
             UInt8 size = allAttrType.size();
             UInt8 idx = uRand(size);
             lbattr.type[i] = allAttrType[idx];
-            lbattr.value[i] = lbAttrConf.getAttrMax(lv, itemTypeIdx, lbattr.type[i]-1) * lbAttrConf.getDisFactor(uRand(10000));
+            float fChance = ((float)(uRand(10000)))/10000;
+            UInt8 tmpcolor = 2 + lbAttrConf.getColor(lv, itemTypeIdx, lbattr.type, lbattr.value, attrNum);
+            if(tmpcolor >= color)
+                color = 2;
+            lbattr.value[i] = lbAttrConf.getAttrMax(lv, itemTypeIdx, lbattr.type[i]-1) * lbAttrConf.getDisFactor4(uRand(10000), fChance, color) + 0.9999f;
             allAttrType.erase(allAttrType.begin() + idx);
+            if(i + 1 == attrNum)
+            {
+                if(tmpcolor  < color)
+                {
+                    ++ attrNum;
+                    if(attrNum == 5)
+                    {
+                        -- attrNum;
+                        break;
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
         }
         lbattr.lbColor = 2 + lbAttrConf.getColor(lv, itemTypeIdx, lbattr.type, lbattr.value, attrNum);
+        // 以防精确度问题，导致颜色略微偏低
+        //if(lbattr.lbColor < color)
+        //    lbattr.lbColor = color;
         if(lbattr.lbColor == 5)
         {
             UInt8 skillSwitch = lbAttrConf.getSkillSwitch(uRand(100));
@@ -1067,7 +1093,7 @@ namespace GObject
                 case Item_LBxin:
                     {
                         ItemLingbaoAttr lbattr;
-                        getRandomLBAttr(lv, itype->subClass, lbattr);
+                        getRandomLBAttr(lv, itype->subClass, itype->quality, lbattr);
                         equip = new ItemLingbao(id, itype, edata, lbattr);
                         lingbao = true;
                         switch(lbattr.lbColor)
@@ -5819,7 +5845,10 @@ namespace GObject
             m_lbSmeltInfo.value += value;
 
             if(m_lbSmeltInfo.value >= m_lbSmeltInfo.maxValue)
+            {
+                ++ useCnt;
                 break;
+            }
         }
 
 		if (IsEquipId(itemId))
@@ -5871,7 +5900,7 @@ namespace GObject
 
         {
             UInt8 minAttrNum = item->quality > 3 ? 3 : 1;
-            float colorP = ((float)(guji->quality > 4 ? 90 : 70))/100;
+            UInt8 color = guji->quality;
             stLBAttrConf& lbAttrConf = GObjectManager::getLBAttrConf();
             UInt8 attrNum = lbAttrConf.getAttrNum(uRand(100));
             if(attrNum < minAttrNum)
@@ -5903,8 +5932,8 @@ namespace GObject
 
                 lbattr.type[0] = allAttrType[idx];
                 UInt16 chance = uRand(10000);
-                chance = chance + ((10000 - chance) * colorP);
-                float disFactor = lbAttrConf.getDisFactor(chance);
+                float fChance = ((float)(uRand(10000)))/10000;
+                float disFactor = lbAttrConf.getDisFactor4(chance, fChance, color);
                 lbattr.value[0] = lbAttrConf.getAttrMax(lv, itemTypeIdx, lbattr.type[0]-1) * disFactor;
                 allAttrType.erase(allAttrType.begin() + idx);
             }
@@ -5913,7 +5942,8 @@ namespace GObject
                 UInt8 size = allAttrType.size();
                 UInt8 idx = uRand(size);
                 lbattr.type[i] = allAttrType[idx];
-                float disFactor = lbAttrConf.getDisFactor(uRand(10000));
+                float fChance = ((float)(uRand(10000)))/10000;
+                float disFactor = lbAttrConf.getDisFactor3(uRand(10000), fChance);
                 lbattr.value[i] = lbAttrConf.getAttrMax(lv, itemTypeIdx, lbattr.type[i]-1) * disFactor;
                 allAttrType.erase(allAttrType.begin() + idx);
             }
@@ -6017,6 +6047,46 @@ namespace GObject
         closeLingbaoSmelt();
     }
 
+    void Package::QuitLBSmelt()
+    {
+        if(m_lbSmeltInfo.gujiId == 0 || m_lbSmeltInfo.itemId == 0)
+            return;
+
+        std::vector<MailPackage::MailItem> mitem;
+        {
+            MailPackage::MailItem item = {m_lbSmeltInfo.itemId, 1};
+            mitem.push_back(item);
+        }
+        {
+            MailPackage::MailItem item = {m_lbSmeltInfo.gujiId, 1};
+            mitem.push_back(item);
+        }
+
+        UInt16 smeltItem[4] = {9338, 9340, 9341, 9342};
+        UInt16 smeltExp[4] = {1000, 200, 50, 10};
+
+        UInt32 value = m_lbSmeltInfo.value;
+        for(int i = 0; i < 4; ++ i)
+        {
+            UInt32 cnt = value / smeltExp[i];
+            if(cnt > 0)
+            {
+                MailPackage::MailItem item = {smeltItem[i], cnt};
+                mitem.push_back(item);
+            }
+            value = value % smeltExp[i];
+        }
+
+        SYSMSG(title, 4124);
+        SYSMSG(content, 4124);
+
+        MailItemsInfo itemsInfo(&(mitem[0]), LingbaoFuling, mitem.size());
+        Mail * pmail = m_Owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+        mailPackageManager.push(pmail->id, &(mitem[0]), mitem.size(), true);
+
+        closeLingbaoSmelt();
+    }
+
     UInt8 Package::closeLingbaoSmelt()
     {
         memset(&m_lbSmeltInfo, 0, sizeof(m_lbSmeltInfo));
@@ -6056,7 +6126,7 @@ namespace GObject
         case Item_LBxin:
             {
                 ItemLingbaoAttr lbattr;
-                getRandomLBAttr(lv, subClass, lbattr);
+                getRandomLBAttr(lv, subClass, itype->quality, lbattr);
                 UInt8 colorIdx = lbattr.lbColor - 2;
                 ++ colorNums[colorIdx];
 

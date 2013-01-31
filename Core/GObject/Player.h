@@ -2105,7 +2105,7 @@ namespace GObject
         void callSnakeEgg();
         void getSnakeEggAward(UInt8 v);
 
-        void getNewYearGiveGiftAward(UInt8 dayOrder, UInt16 result);
+        void getNewYearGiveGiftAward(UInt8 dayOrder, UInt8 result);
     private:
         UInt8 cf_posPut[5];//范围1-5
         UInt32 cf_itemId[5];
@@ -2121,6 +2121,11 @@ namespace GObject
         void sendTowerLoginAct();
         void getFeastGiftAward(UInt8 type);
         void sendFeastGiftAct();
+        void getNewYearQQGameAward(UInt8 type);
+        void sendNewYearQQGameAct();
+        void getNewYearQzoneContinueAward(UInt8 type);
+        void sendNewYearQzoneContinueAct();
+        void calcNewYearQzoneContinueDay(UInt32 time);
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

@@ -148,6 +148,7 @@ enum MailItemType
     NEWJOBHIRE,
     BuChangMo,
     NewCountryBattleAward,
+    LingbaoFuling,
 };
 enum ItemFrom
 {

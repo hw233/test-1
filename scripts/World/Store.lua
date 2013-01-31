@@ -232,10 +232,12 @@ function loadStore()
             store:add(2,9179,30)
         end
 
+        -- 奇珍
 		store:add(2,9338,50)
-		store:add(2,9349,10)
+		--store:add(2,9349,10)
 		store:add(2,9310,30)
 		store:add(2,9308,10)
+		store:add(2,9307,1)
         store:add(2,9285,10)
         store:add(2,9123,50)
         store:add(2,551,10)
@@ -280,6 +282,7 @@ function loadStore()
         store:add(2,514,10)
         store:add(2,515,80)
         store:add(2,517,10)
+        -- 宝石
         store:add(3,5005,100)
         store:add(3,5015,100)
         store:add(3,5025,100)
@@ -310,6 +313,7 @@ function loadStore()
         store:add(3,5123,20)
         store:add(3,5133,15)
         store:add(3,5143,20)
+        -- 礼券
         store:add(4,57,10)
         store:add(4,511,5)
         store:add(4,56,10)
@@ -334,6 +338,8 @@ function loadStore()
             store:add(5,492,1000)
         end
         store:add(4,5143,20)
+
+        -- 银币
 		store:add(5,9307,200)
 		store:add(5,9309,500)
         store:add(5,550,1000)
@@ -361,6 +367,9 @@ function loadStore()
         store:add(5,5121,500)
         store:add(5,5131,400)
         store:add(5,5141,500)
+
+        -- 荣誉
+        store:add(6,9340,1000)
         store:add(6,1504,3000)
         store:add(6,1522,10000)
         store:add(6,74,12000)
@@ -376,6 +385,9 @@ function loadStore()
         store:add(6,508,1000)
         store:add(6,507,2000)
         store:add(6,509,2000)
+
+        -- 声望
+        store:add(7,9340,1000)
         store:add(7,1511,6000)
         store:add(7,1520,15000)
         store:add(7,73,18000)
@@ -430,19 +442,23 @@ function loadStore()
         store:add(7,2634,6000)
         store:add(7,2636,6000)
         store:add(7,2637,6000)
+
+        -- 除魔印
         store:addExchange(8,519,526,2)
         store:addExchange(8,520,527,2)
         store:addExchange(8,521,528,2)
         store:addExchange(8,522,529,2)
         store:addExchange(8,523,530,2)
         store:addExchange(8,524,531,2)
-	store:addExchange(8,525,532,2)
+        store:addExchange(8,525,532,2)
         store:addExchange(8,527,526,10)
         store:addExchange(8,528,527,10)
         store:addExchange(8,529,528,10)
         store:addExchange(8,530,529,10)
         store:addExchange(8,531,530,10)
         store:addExchange(8,532,531,10)
+
+        -- 龙魂元神
         store:add(11,9232,9000)
         store:add(11,9233,9000)
         store:add(11,9234,9000)
@@ -459,6 +475,7 @@ function loadStore()
         store:add(11,9047,9000)
         store:add(11,9048,9000)
         store:add(11,9049,9000)
+        -- 龙魂法宝
         store:add(12,1535,20000)
         store:add(12,1640,10000)
         store:add(12,1641,10000)
@@ -466,6 +483,7 @@ function loadStore()
         store:add(12,1643,10000)
         store:add(12,1644,10000)
         store:add(12,1645,10000)
+        -- 龙魂心法
         store:add(13,1293,3000)
         store:add(13,1294,3000)
         store:add(13,1295,3000)
@@ -478,10 +496,27 @@ function loadStore()
         store:add(13,1302,6000)
         store:add(13,1303,6000)
         store:add(13,1304,6000)
+        -- 龙魂奇珍
         store:add(14,507,2000)
         store:add(14,509,2000)
-        store:add(15,5041,300)
-        store:add(15,5051,300)
+        -- 龙魂灵宝
+        store:add(15,11588,7000)
+        store:add(15,11589,7000)
+        store:add(15,11590,7000)
+        store:add(15,11591,8000)
+        store:add(15,11592,8000)
+        store:add(15,11593,8000)
+        store:add(15,11594,9000)
+        store:add(15,11595,9000)
+        store:add(15,11596,9000)
+        store:add(15,11597,10000)
+        store:add(15,11598,10000)
+        store:add(15,11599,10000)
+        -- 帮贡
+        store:add(16,5041,300000)
+        store:add(16,5051,300000)
+
+        --
 
     --end
 

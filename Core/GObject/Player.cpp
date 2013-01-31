@@ -932,6 +932,7 @@ namespace GObject
             }
 		}
 
+        calcNewYearQzoneContinueDay(curtime);
         continuousLogin(curtime);
         continuousLoginRF(curtime);
         sendYearRPInfo();
@@ -16715,7 +16716,7 @@ void Player::getSnakeEggAward(UInt8 v)
     sendSnakeEggInfo();
 }
 
-void Player::getNewYearGiveGiftAward(UInt8 dayOrder, UInt16 result)
+void Player::getNewYearGiveGiftAward(UInt8 dayOrder, UInt8 result)
 {
     if(dayOrder > 10)
         return;
@@ -16748,103 +16749,101 @@ void Player::getNewYearGiveGiftAward(UInt8 dayOrder, UInt16 result)
                 return;
             }
 
+            UInt8 validMaxDay = 0;
             UInt8 serverDay = 0;
-            bool isValid = false;
             UInt32 now = TimeUtil::Now();
             if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2013, 2, 3))
             {
             }
             else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 3))
             {
+                validMaxDay = 1;
                 serverDay = 1;
-                if(dayOrder <= serverDay)
-                    isValid = true;
             }
             else if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2013, 2, 9))
             {
+                validMaxDay = 1;
             }
             else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 9))
             {
+                validMaxDay = 2;
                 serverDay = 2;
-                if(dayOrder <= serverDay)
-                    isValid = true;
             }
             else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 10))
             {
+                validMaxDay = 3;
                 serverDay = 3;
-                if(dayOrder <= serverDay)
-                    isValid = true;
             }
             else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 11))
             {
+                validMaxDay = 4;
                 serverDay = 4;
-                if(dayOrder <= serverDay)
-                    isValid = true;
             }
             else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 12))
             {
+                validMaxDay = 5;
                 serverDay = 5;
-                if(dayOrder <= serverDay)
-                    isValid = true;
             }
             else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 13))
             {
+                validMaxDay = 6;
                 serverDay = 6;
-                if(dayOrder <= serverDay)
-                    isValid = true;
             }
             else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 14))
             {
+                validMaxDay = 7;
                 serverDay = 7;
-                if(dayOrder <= serverDay)
-                    isValid = true;
             }
             else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 15))
             {
+                validMaxDay = 8;
                 serverDay = 8;
-                if(dayOrder <= serverDay)
-                    isValid = true;
             }
             else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 16))
             {
+                validMaxDay = 9;
                 serverDay = 9;
-                if(dayOrder <= serverDay)
-                    isValid = true;
             }
             else if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2013, 2, 24))
             {
+                validMaxDay = 9;
             }
             else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 24))
             {
+                validMaxDay = 10;
                 serverDay = 10;
-                if(dayOrder <= serverDay)
-                    isValid = true;
             }
             else
             {
+                validMaxDay = 10;
             }
 
-            if(!isValid)
+            if(dayOrder > validMaxDay)
             {
                 sendMsgCode(0, 1041);
                 return;
             }
 
             UInt8 times;
+            UInt8 recharge = false;
             if(serverDay == dayOrder)
                 times = 2;
             else
             {
-                if(result == 1)
+                if(result == 0)
+                {
+                    sendMsgCode(0, 1042);
+                    return;
+                }
+                else if(result == 1)
                 {
                     if (getGold() < 30)
                     {
-                        sendMsgCode(0, 1101);
+                        sendMsgCode(0, 1104);
                         return;
                     }
-                    ConsumeInfo ci(NewYearGetDouble,0,0);
-                    useGold(30, &ci);
                     times = 2;
+                    recharge = true;
                 }
                 else
                     times = 1;
@@ -16853,7 +16852,11 @@ void Player::getNewYearGiveGiftAward(UInt8 dayOrder, UInt16 result)
             bool bRet = GameAction()->onGetNewYearGiveGiftAward(this, dayOrder, times);
             if(!bRet)
                 return;
-
+            if(recharge)
+            {
+                ConsumeInfo ci(NewYearGetDouble,0,0);
+                useGold(30, &ci);
+            }
             opt |= offset;
             SetVar(VAR_NEW_YEAR_GIVE_GIFT, opt);
         }
@@ -16866,6 +16869,129 @@ void Player::getNewYearGiveGiftAward(UInt8 dayOrder, UInt16 result)
     st << Stream::eos;
     send(st);
 }
+
+void Player::getNewYearQQGameAward(UInt8 type)
+{
+    if(type == 0 || type > 2)
+        return;
+    if(atoi(m_domain) != 10)
+        return;
+    bool bRet;
+    UInt32 status = GetVar(VAR_NEWYEAR_QQGAME_ACT);
+
+    if(type == 1)
+    {
+        if(status & 0x01)
+            return;
+        bRet = GameAction()->onGetNewYearQQGameAward(this, 1);
+        if(bRet)
+        {
+            status |= 0x01;
+            SetVar(VAR_NEWYEAR_QQGAME_ACT, status);
+            sendNewYearQQGameAct();
+        }
+    }
+    else
+    {
+        if(status & 0x02)
+            return;
+        if(!isBD())
+            return;
+        bRet = GameAction()->onGetNewYearQQGameAward(this, 2);
+        if(bRet)
+        {
+            status |= 0x02;
+            SetVar(VAR_NEWYEAR_QQGAME_ACT, status);
+            sendNewYearQQGameAct();
+        }
+    }
+}
+
+void Player::sendNewYearQQGameAct()
+{
+    if(!World::getNewYearQQGameAct())
+        return;
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(9);
+    UInt8 opt = GetVar(VAR_NEWYEAR_QQGAME_ACT);
+    st << opt;
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::getNewYearQzoneContinueAward(UInt8 type)
+{
+    if(type == 0 || type > 7)
+        return;
+    if(atoi(m_domain) != 1 && atoi(m_domain) != 2)
+        return;
+
+    UInt32 tmp = GetVar(VAR_NEWYEAR_QZONECONTINUE_ACT);
+    UInt16 isGet = static_cast<UInt16>(tmp & 0xFFFF);
+    if(isGet & (0x01 << (type - 1)))
+        return;
+    UInt8 continueDays = static_cast<UInt8>(tmp >> 16);
+    const static UInt8 needMinDay[] = {3, 5, 7, 10, 15, 21, 28};
+    if(continueDays < needMinDay[type - 1])
+        return;
+    bool bRet = GameAction()->onGetNewYearQQGameAward(this, type);
+    if(bRet)
+    {
+        tmp |= (0x01 << (type - 1));
+        SetVar(VAR_NEWYEAR_QZONECONTINUE_ACT, tmp);
+        sendNewYearQzoneContinueAct();
+    }
+}
+
+void Player::sendNewYearQzoneContinueAct()
+{
+    if(!World::getNewYearQzoneContinueAct())
+        return;
+    if(atoi(m_domain) != 1 && atoi(m_domain) != 2)
+        return;
+
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(10);
+    UInt32 tmp = GetVar(VAR_NEWYEAR_QZONECONTINUE_ACT);
+    UInt8 continueDays = static_cast<UInt8>(tmp >> 16);
+    UInt16 isGet = static_cast<UInt16>(tmp & 0xFFFF);
+    st << continueDays;
+    st << isGet;
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::calcNewYearQzoneContinueDay(UInt32 now)
+{
+    if(!World::getNewYearQzoneContinueAct())
+        return;
+    if(atoi(m_domain) != 1 && atoi(m_domain) != 2)
+        return;
+
+    UInt32 lasttime = GetVar(VAR_NEWYEAR_QZONECONTINUE_LASTTIME);
+    if(lasttime == 0)
+    {
+    }
+    else
+    {
+        UInt32 lasttime_sharp = TimeUtil::SharpDay(0, lasttime);
+        UInt32 now_sharp = TimeUtil::SharpDay(0, now);
+        if(lasttime_sharp >= now_sharp)
+            return;
+    }
+
+    SetVar(VAR_NEWYEAR_QZONECONTINUE_LASTTIME, now);
+    UInt32 tmp = GetVar(VAR_NEWYEAR_QZONECONTINUE_ACT);
+    UInt32 continueDays = (tmp >> 16);
+    if(continueDays >= 0xFF)
+        continueDays = 0xFE;
+    continueDays += 1;
+    tmp = (continueDays << 16) + (tmp & 0xFFFF);
+    SetVar(VAR_NEWYEAR_QZONECONTINUE_ACT, tmp);
+}
+
+
+
 
 } // namespace GObject
 
