@@ -699,12 +699,12 @@ function onGetNewYearQQGameAward(player, type)
     end
 
     local awardOrder = (actOrder - 1) * 2  + type;
-    local award = QQGameawards[awardOrder]
-    if award == nil then
+    local awards = QQGameawards[awardOrder]
+    if awards == nil then
         return false
     end
     local package = player:GetPackage()
-    if package:GetRestPackageSize() < #award then
+    if package:GetRestPackageSize() < #awards then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
@@ -724,7 +724,7 @@ local QzonecontinueAwards = {
     [6] = {{56, 2},{57, 2},{134, 2},{30, 2},{9076,1}},
 }
 
-function onGetNewYearQQGameAward(player, type)
+function onGetNewYearQzoneContinueAward(player, type)
     if player == nil then
         return false
     end

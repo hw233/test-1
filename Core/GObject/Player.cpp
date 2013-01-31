@@ -16934,7 +16934,7 @@ void Player::getNewYearQzoneContinueAward(UInt8 type)
     const static UInt8 needMinDay[] = {3, 5, 7, 10, 15, 21, 28};
     if(continueDays < needMinDay[type - 1])
         return;
-    bool bRet = GameAction()->onGetNewYearQQGameAward(this, type);
+    bool bRet = GameAction()->onGetNewYearQzoneContinueAward(this, type);
     if(bRet)
     {
         tmp |= (0x01 << (type - 1));
