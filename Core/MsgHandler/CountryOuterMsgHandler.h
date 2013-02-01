@@ -5380,14 +5380,18 @@ void OnMDSoul( GameMsgHdr& hdr, UseMDSoul& req )
     if(!player->hasChecked())
          return;
 
-    if (World::getMayDay() || World::getCompassAct())
+//    if (World::getMayDay() || World::getCompassAct())
     {
         if (req._type == 0)
             player->sendMDSoul(0);
         else if (req._type == 1)
-            player->getMDItem();
+            player->getMDItem(1);
         else if (req._type == 2)
-            player->useMDSoul();
+            player->useMDSoul(1);
+        else if (req._type == 3)
+            player->getMDItem(2);
+        else if (req._type == 4)
+            player->useMDSoul(2);
     }
 }
 

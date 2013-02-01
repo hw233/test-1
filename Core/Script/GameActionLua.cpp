@@ -148,6 +148,8 @@ namespace Script
 		lua_tinker::def(_L, "getCompassAct", GObject::World::getCompassAct);
 		lua_tinker::def(_L, "getItem9344Act", GObject::World::getItem9344Act);
 		lua_tinker::def(_L, "getItem9343Act", GObject::World::getItem9343Act);
+		lua_tinker::def(_L, "getAutoBattleAct", GObject::World::getAutoBattleAct);
+		lua_tinker::def(_L, "getSnakeSpringEquipAct", GObject::World::setSnakeSpringEquipAct);
 
         CLASS_DEF(GameActionLua, Print);
         lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);
@@ -1227,9 +1229,9 @@ namespace Script
     {
         return Call<bool>(  "onRC7DayWill", pl, idx);
     }
-    UInt32 GameActionLua::onUseMDSoul(Player* pl, UInt8 type )
+    UInt32 GameActionLua::onUseMDSoul(Player* pl, UInt8 type, UInt8 v )
     {
-        return Call<UInt32>(  "onUseMDSoul", pl, type);
+        return Call<UInt32>(  "onUseMDSoul", pl, type, v);
     }
     bool GameActionLua::onTurnOnRC7Day(Player* pl, UInt32 total, UInt32 offset)
     {

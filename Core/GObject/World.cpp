@@ -191,6 +191,8 @@ UInt8 World::_callsnakeeggact = 0;
 UInt8 World::_snakeeggawardact = 0;
 bool World::_item9344act = false;
 bool World::_item9343act = false;
+bool World::_autobattleact = false;
+UInt8 World::_snakespringequipact = 0;
 /** 场外活动 **/
 stArenaExtra World::stArenaOld[2];
 stArenaExtra World::stArena;

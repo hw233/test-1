@@ -1100,6 +1100,8 @@ namespace GObject
         //QQGame登录奖励
         sendQQGameGift1218();
         sendFeastLoginAct();
+        //蛇年春节套装
+        sendSnakeSpringEquipMail();
 
         char buf[64] = {0};
         snprintf(buf, sizeof(buf), "%"I64_FMT"u", _id);
@@ -3610,6 +3612,8 @@ namespace GObject
         {
             count = 60 * 240;
         }
+        if (World::getAutoBattleAct())
+            count = 60*216;
 
 		UInt32 timeDur = count * eachBattle;
 
@@ -13213,8 +13217,8 @@ namespace GObject
 
     void Player::sendMDSoul(UInt8 type, UInt32 id)
     {
-        if (!World::getMayDay() && !World::getCompassAct())
-            return;
+ //       if (!World::getMayDay() && !World::getCompassAct())
+ //           return;
         Stream st(REP::USESOUL);
         if (type == 0)
         {
@@ -13229,10 +13233,10 @@ namespace GObject
         send(st);
     }
 
-    void Player::getMDItem()
+    void Player::getMDItem(UInt8 v)
     {
-        if (!World::getMayDay() && !World::getCompassAct())
-            return;
+//        if (!World::getMayDay() && !World::getCompassAct())
+//            return;
 
         UInt32 soul = GetVar(VAR_MDSOUL);
         if (!soul)
@@ -13267,25 +13271,24 @@ namespace GObject
             return;
         }
 
-        _mditem = GameAction()->onUseMDSoul(this, type);
-        if (!_mditem)
+        UInt32 itemId  = GameAction()->onUseMDSoul(this, type, v);
+        if (!itemId)
             return;
 
-        sendMDSoul(1, _mditem);
+        sendMDSoul(1, itemId);
 
         char str[64] = {0};
-        sprintf(str, "F_10000_0118_%d", _mditem);
+        sprintf(str, "F_10000_0118_%d", itemId);
         udpLog("huodong", str, "", "", "", "", "act");
 
         soul -= subsoul;
-        _mditem = 0;
         SetVar(VAR_MDSOUL, soul);
     }
 
-    void Player::useMDSoul()
+    void Player::useMDSoul(UInt8 v)
     {
-        if (!World::getMayDay() && !World::getCompassAct())
-            return;
+//        if (!World::getMayDay() && !World::getCompassAct())
+//            return;
 
 /*        UInt32 soul = GetVar(VAR_MDSOUL);
         if (!soul)
@@ -13319,13 +13322,15 @@ namespace GObject
         if (!_mditem)
             return;
 */
-        for(std::vector<MDItem>::iterator it=_mditemVec.begin(); it != _mditemVec.end(); ++it)
+        std::vector<MDItem>* itemVec = &_mditemVec1;
+        if (v == 2)
+            itemVec = &_mditemVec2;
+        for(std::vector<MDItem>::iterator it=itemVec->begin(); it != itemVec->end(); ++it)
         {
 	        m_Package->ItemNotify(it->id, it->count);
         }
         sendMDSoul(0);
-        _mditemVec.clear();
-    //    _mditem = 0;
+        itemVec->clear();
     }
 
     void Player::svrSt(UInt8 type)
@@ -16806,6 +16811,24 @@ void Player::getNewYearGiveGiftAward(UInt8 dayOrder, UInt8 result)
     st << opt;
     st << Stream::eos;
     send(st);
+}
+void Player::sendSnakeSpringEquipMail()
+{
+    if(GetLev() < 40)
+        return;
+    static MailPackage::MailItem s_item[2] = {{1762, 1}, {1764, 1}};
+    UInt8 act = World::getSnakeSpringEquipAct();
+    UInt32 v = GetVar(VAR_SNAKE_SPRING_EQUIP_GOT);
+    if (1 == act && ((v&0x01)==0)) //春节套装 item=1762
+    {
+        sendMailItem(4126, 4127, &s_item[0], 1);
+        SetVar(VAR_SNAKE_SPRING_EQUIP_GOT, v|=0x01);
+    }
+    if (2 == act && ((v&0x02)==0))
+    {
+        sendMailItem(4128, 4129, &s_item[1], 1);
+        SetVar(VAR_SNAKE_SPRING_EQUIP_GOT, v|=0x02);
+    }
 }
 
 void Player::getNewYearQQGameAward(UInt8 type)

@@ -2038,12 +2038,7 @@ function ItemNormal_000000111(iid, num, bind, param)
 	return num;
 end
 
-local date0208 = { ['year'] = 2013, ['month'] = 2, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
-local date0217 = { ['year'] = 2013, ['month'] = 2, ['day'] = 17, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
-local tm0208 = os.time(date0208);
-local tm0217 = os.time(date0217);
 function ItemNormal_00000055(iid, num, bind, param)
-  local now = os.time();
   local player = GetPlayer()
   local package = player:GetPackage();
   player:setBuffData(6, 0, true)
@@ -2051,7 +2046,7 @@ function ItemNormal_00000055(iid, num, bind, param)
   player:setBuffData(11, 0, true)
   player:setBuffData(24, 0, true)
   
-  if now >= tm0208 and now < tm0217 and ItemNormal_AddBuff(player, 5, 3600, num, 216*3600) then
+  if  getAutoBattleAct() and ItemNormal_AddBuff(player, 5, 3600, num, 216*3600) then
       package:DelItemSendMsg(55, player);
   elseif ItemNormal_AddBuff(player, 5, 3600, num, 356400) then
       package:DelItemSendMsg(55, player);
@@ -2062,8 +2057,6 @@ function ItemNormal_00000055(iid, num, bind, param)
 end
 
 function ItemNormal_00000056(iid, num, bind, param)
-  local now = os.time();
-
   local player = GetPlayer()
   local package = player:GetPackage();
   player:setBuffData(5, 0, true)
@@ -2071,7 +2064,7 @@ function ItemNormal_00000056(iid, num, bind, param)
   player:setBuffData(11, 0, true)
   player:setBuffData(24, 0, true)
  
-  if now >= tm0208 and now < tm0217 and ItemNormal_AddBuff(player, 6, 3600, num, 216*3600) then
+  if getAutoBattleAct() and ItemNormal_AddBuff(player, 6, 3600, num, 216*3600) then
       package:DelItemSendMsg(56, player);
   elseif ItemNormal_AddBuff(player, 6, 3600, num, 356400) then
   	  package:DelItemSendMsg(56, player);
