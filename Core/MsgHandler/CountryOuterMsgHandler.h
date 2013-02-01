@@ -1251,6 +1251,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->send3366GiftInfo();
     pl->sendFeastGiftAct();
     pl->sendNewYearQQGameAct();
+    pl->calcNewYearQzoneContinueDay(now);
     pl->sendNewYearQzoneContinueAct();
 }
 
