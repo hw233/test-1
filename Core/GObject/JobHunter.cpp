@@ -1398,7 +1398,7 @@ void JobHunter::OnLeaveGame(UInt16 spotId)
 void JobHunter::OnAutoStart()
 {
     // 开始自动战斗
-    if (_owner->getVipLevel() < 4)
+    if (!World::getAutoBattleAct() && _owner->getVipLevel() < 4)
     {
         return;
     }

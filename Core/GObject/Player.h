@@ -1144,12 +1144,15 @@ namespace GObject
 		bool makeFighterInfo(Stream&, UInt32);
         void sendRechargeInfo(bool rank = false);
         void sendConsumeInfo(bool rank = false);
-        void getMDItem();
+        void getMDItem(UInt8 v=1);
         void sendMDSoul(UInt8 type, UInt32 id = 0);
-        void appendCompassItem(UInt32 id,  UInt32 count)
+        void appendCompassItem(UInt32 id,  UInt32 count, UInt8 v)
         {
             MDItem item = {id,count};
-            _mditemVec.push_back(item);
+            if (1 == v)
+                _mditemVec1.push_back(item);
+            else if (2 == v)
+                _mditemVec2.push_back(item);
         }
         UInt32 _mditem;
         struct MDItem
@@ -1157,7 +1160,8 @@ namespace GObject
             UInt32 id;
             UInt32 count;
         };
-        std::vector<MDItem> _mditemVec;
+        std::vector<MDItem> _mditemVec1;
+        std::vector<MDItem> _mditemVec2;
 
         void sendJuneRechargeMails(UInt32 value);
 		void autoRegenAll();
@@ -1623,7 +1627,7 @@ namespace GObject
         void sendTokenInfo();
         void sendDiscountLimit();
 
-        void useMDSoul();
+        void useMDSoul(UInt8 v=1);
         void svrSt(UInt8);
 
     public:
@@ -2101,9 +2105,15 @@ namespace GObject
 
         void getDragonKingInfo();
         void postDragonKing(UInt8 count);
+        void getDragonKingInfoSnake();
+        void postDragonKingSnake(UInt8 count);
+        void saveGoldAct(UInt8 opt, UInt32 param);
+        void sendSaveGoldAct();
+
         void sendSnakeEggInfo();
         void callSnakeEgg();
         void getSnakeEggAward(UInt8 v);
+        void sendSnakeSpringEquipMail(); 
 
         void getNewYearGiveGiftAward(UInt8 dayOrder, UInt8 result);
     private:

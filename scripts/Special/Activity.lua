@@ -240,6 +240,7 @@ function onDungeonWin(player, id, count, free)
     June(player, 0);
     Qixi(player, 0);
     Wansheng(player, lootlvl);
+    Qingren(player, 0);
     if free == true then
         FallActivity(player, 1)
         Guoqing(player, 0);
@@ -980,6 +981,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     June(player, lootlvl);
     Qixi(player, lootlvl);
     Wansheng(player, lootlvl);
+    Qingren(player, lootlvl);
     Guoqing(player, lootlvl);
     LuckyDrawBox(player, id)
     ExJob(player, id, lootlvl)
@@ -1021,6 +1023,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
     June(player, lootlvl);
     Qixi(player, lootlvl);
     Wansheng(player, lootlvl);
+    Qingren(player, lootlvl);
     Guoqing(player, lootlvl);
     if lootlvl == 0 then
         FallActivity(player, 1)
@@ -1453,35 +1456,53 @@ function onRC7DayWill(player, idx)
     end
 end
 
-function onUseMDSoul(player, _type)
-    if _type == 0 or _type > 3 then
+function onUseMDSoul(player, _type, _v)
+    if _type == 0 or _type > 3  or _v > 2 then
         return 0
     end
     local package = player:GetPackage();
-    local items = {
+    local items1 = {
         {9000,47,509,507,515,509,507,515,},
         {503,514,506,508,517,512,501,513,},
         {1411,133,503,511,9000,9076,514,516}
---        {497,496,15,56,57,511,500,518,},
     }
-    local broad = {0,0,0,0,1,1,0,0}
-    local count = {1,1,2,1,2,2,1,2}
+    local items2 = {
+        {9000,47,509,507,515,509,507,515,},
+        {503,514,506,508,517,512,501,513,},
+        {1411,133,503,511,9000,9076,514,516}
+    }
+    local items = items1;
+    if _v == 2 then
+        items = items2;
+    end
+
+    local broad = {
+        [1] = {0,0,0,0,1,1,0,0},
+        [2] = {0,0,0,0,1,1,0,0}
+    };
+    local count = {
+        [1] = {1,1,2,1,2,2,1,2},
+        [2] = {2,2,2,2,3,3,1,3}
+    };
 
     if _type == 3 then
-        local prob = {2400,4800,5430,7830,8080,8240,9600,10000}
+        local prob = {
+            [1] = {2400,4800,5430,7830,8080,8240,9600,10000},
+            [2] = {2125,4250,4950,7075,7435,7565,9690,10000}
+        };
         local p = math.random(1,10000)
         local i = 1
-        for n = 1,#prob do
-            if p <= prob[n] then
+        for n = 1,#prob[_v] do
+            if p <= prob[_v][n] then
                 i = n
                 break
             end
         end
-        if broad[i] == 1 then
-            Broadcast(0x27, "御风雷之变化，".."[p:"..player:getCountry()..":"..player:getPName().."]成功显罗盘秘宝于世，获得了[4:"..items[_type][i].."]x"..count[i])
+        if broad[_v][i] == 1 then
+            Broadcast(0x27, "御风雷之变化，".."[p:"..player:getCountry()..":"..player:getPName().."]成功显罗盘秘宝于世，获得了[4:"..items[_type][i].."]x"..count[_v][i])
         end
-        package:Add(items[_type][i], count[i], true, true);
-        player:appendCompassItem(items[_type][i], count[i]);
+        package:Add(items[_type][i], count[_v][i], true, true);
+        player:appendCompassItem(items[_type][i], count[_v][i],_v);
         return items[_type][i]
     end
 
@@ -6019,6 +6040,42 @@ function onRoamingWansheng(player, pos)
     return pos2;
 end
 
+-- 1:聊天 2:牵手 3:危机 4:蜀山之恋 5:名胜 6:心动 7:宝箱
+function onRoamingQingRen(player, pos)
+    local roamPlace = {
+     -- 1  2  3  4  5  6  7  8
+        2, 3, 5, 1, 3, 2, 2, 6,
+        5, 1, 4, 2, 6, 3, 5, 2,
+        3, 2, 5, 6, 3, 2, 1, 7
+    }
+
+    local eventItem = {
+        {{502, 2, 10}, {510, 1, 10}, {29, 10, 10}},
+        {{56, 1, 20}, {500, 1, 20}, {57, 1, 20}},
+        {{511, 2, 20}, {512, 1, 30}, {517, 1, 30}},
+        {{9355, 1, 10}, {9355, 1, 10}, {9355, 1, 10}},
+        {{503, 1, 30}, {514, 1, 30}, {501, 1, 30}},
+        {{516, 1, 40}, {509, 1, 40}, {507, 1, 40}},
+        {{515, 1, 50}, {134, 1, 50}, {1325, 1, 50}},
+    }
+
+    step = math.random(1, 3)
+    pos2 = pos + step
+    if pos2 > 24 then
+        pos2 = pos2 - 24
+    end
+
+    local package = player:GetPackage()
+    i = roamPlace[pos2]
+    j = math.random(1, 3)
+
+    package:Add(eventItem[i][j][1], eventItem[i][j][2], true, true, 32)
+    player:lastQueqiaoAwardPush(eventItem[i][j][1], eventItem[i][j][2]);
+    player:postRoamResult(pos2, j, eventItem[i][j][3]);
+
+    return pos2;
+end
+
 
 
 function Qixi(player, lootlvl)
@@ -6034,6 +6091,14 @@ function Wansheng(player, lootlvl)
         -- 糖果
         local package = player:GetPackage();
         package:AddItem(9194, 1, true, 0, 10);
+    end
+end
+
+function Qingren(player, lootlvl)
+    if getQingren() then
+        -- 蜀山之恋
+        local package = player:GetPackage();
+        package:AddItem(9355, 1, true, 0, 10);
     end
 end
 
@@ -6428,6 +6493,7 @@ function getCopyFrontmapAward(step, localtion)
     end
 end
 
+--大闹龙宫
 function checkDragonKingCanSucceed(player, step)
     if nil == player then
         return false
@@ -6493,6 +6559,133 @@ function getDragonKingAward(step)
         end
     end
     return {}
+end
+
+--大闹龙宫之金蛇起舞
+function checkDragonKingSnakeCanSucceed(player, step)
+    if nil == player then
+        return false
+    end
+    if nil == step or step < 1 or step > 5 then
+        return false
+    end
+    local chances = {
+        [1] = 8000,
+        [2] = 5000,
+        [3] = 5000,
+        [4] = {500, 1000, 6000, 9000},
+        [5] = 10000,
+    }
+    local rand = math.random(1, 10000)
+    if step ~= 4 then
+        if rand <= chances[step] then
+            return true
+        end
+    else
+        local fail = player:GetVar(368) + 1
+        if fail > #chances[step] then
+            fail = #chances[step]
+        end
+        if rand <= chances[step][fail] then
+            player:SetVar(368, 0)
+            return true
+        else
+            player:SetVar(368, fail)
+        end
+    end
+    return false
+end
+
+function getDragonKingSnakeAward(step)
+    local items = {
+        [1] = {{16, 1}, {29, 2}, {1328, 5}, {51, 1}, {48, 1}, {35, 2}, {548, 1}, {30, 1}},
+        [2] = {{15, 1}, {9283, 1}, {500, 1}, {57, 1}, {1412, 5}, {56, 1}, {135, 1}, {30, 1}},
+        [3] = {{33, 1}, {516, 1}, {501, 1}, {506, 1}, {508, 1}, {512, 1}, {513, 1}, {514, 1}, {517, 1}, {1411, 1}},
+        [4] = {{1325, 1}, {134, 1}, {551, 1}, {8000, 1}, {47, 1}, {515, 1}, {549, 1}, {50, 1}},
+        [5] = {{6135,1}},
+    }
+    local chances = {
+        [1] = {1400, 2800, 4200, 5600, 7000, 8400, 9800, 10000},
+        [2] = {1400, 2800, 4200, 5600, 7000, 8400, 9800, 10000},
+        [3] = {1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000},
+        [4] = {1250, 2500, 3750, 5000, 6250, 7500, 8750, 10000},
+        [5] = {10000},
+    }
+    if nil == step then
+        return {}
+    end
+    if step < 1 or step > 5 then
+        step = 1
+    end
+    if #items[step] ~= #chances[step] then
+        return {}
+    end
+    local r = math.random(1, 10000)
+    for i = 1, #chances[step] do
+        if r <= chances[step][i] then
+            return items[step][i]
+        end
+    end
+    return {}
+end
+
+function getSaveGoldActAward(gold)
+    if nil == gold then
+        gold = 1
+    end
+    if nil == times then
+        times = 1
+    end
+    local awards = {
+        [1] = {{511, 1}, {548, 1}, {57, 1}, {29, 10}, {502, 1}, {48, 1}},
+        [2] = {{56, 1}, {15, 1}, {499, 20}, {33, 1}, {547, 1}, {500, 1}},
+        [3] = {{503, 1}, {501, 1}, {50, 1}, {551, 1}, {514, 1}, {499, 30}},
+        [4] = {{515, 1}, {47, 1}, {1325, 1}, {516, 1}, {499, 50}, {8000, 1}},
+        [5] = {{509, 2}, {134, 2}, {1325, 2}, {515, 2}, {507, 2}, {499, 80}},
+        [6] = {{1325, 3}, {134, 3}, {515, 3}, {509, 3}, {507, 3}, {499, 100}},
+        [7] = {{515, 5}, {1325, 5}, {134, 5}, {509, 5}, {507, 5}, {499, 150}},
+    }
+    local golds = {1000, 10000, 30000, 50000, 80000, 100000}
+    local idx = 0
+    local num = #golds
+    for i = 1, num do
+        if gold < golds[i] then
+            idx = i
+            break
+        end
+    end
+    if gold >= golds[num] then
+        idx = num + 1
+    end
+    if idx <= 0 or idx > #awards then
+        idx = 1
+    end
+    return awards[idx]
+end
+
+function getSaveGoldActExtraAward(gold)
+    local extraAwards = {
+        [1] = {{5023, 1},{5003, 1}},
+        [2] = {{1325, 1}, {1411, 1}},
+        [3] = {{134, 1}, {515, 1}},
+        [4] = {{134, 3}, {515, 3}},
+        [5] = {{1700, 1}, {8555, 1}},
+        [6] = {{1700, 1}, {8555, 3}},
+        [7] = {{1700, 1}, {8555, 5}},
+    }
+    local golds = {1000, 10000, 30000, 50000, 80000, 100000}
+    local idx = 0
+    local num = #golds
+    for i = 1, num do
+        if gold < golds[i] then
+            idx = i
+            break
+        end
+    end
+    if gold >= golds[num] then
+        idx = num + 1
+    end
+    return extraAwards[idx]
 end
 
 function onGetNewYearGiveGiftAward(player, index, times)

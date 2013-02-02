@@ -115,6 +115,10 @@ function loadStore()
 
         discount(store)
 
+        if getQingren() then    --蜀山之恋
+            store:add(2, 9355,10)
+        end
+
         if getItem9343Act() then
             store:add(2, 9343, 20) --龙宫秘宝
         end
@@ -124,6 +128,10 @@ function loadStore()
  
         if getDragonKingAct() then
             store:add(2, 9337, 10) --游龙令
+        end
+        if is2013_0201_0228() then
+            store:add(2, 1711, 599) --爆竹
+            store:add(2, 1712, 599) --莲花灯
         end
         if isfashion_shop() then
             store:add(2, 1700, 599) --仙墨笔
