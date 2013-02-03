@@ -3395,6 +3395,8 @@ void GMHandler::OnSysUpdate(GObject::Player *player, std::vector<std::string>& a
 
 void GMHandler::OnSaveGoldAct(GObject::Player *player, std::vector<std::string>& args)
 {
+	if (args.size() < 1)
+		return ;
     switch(atoi(args[0].c_str()))
     {
     case 1:
