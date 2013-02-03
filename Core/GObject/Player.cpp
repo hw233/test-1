@@ -16535,7 +16535,7 @@ void Player::getNewYearGiveGiftAward(UInt8 dayOrder, UInt16 result)
 
     Stream st(REP::COUNTRY_ACT);
     st << static_cast<UInt8>(8);
-    st << dayOrder;
+    //st << dayOrder;
 
     UInt16 opt = GetVar(VAR_NEW_YEAR_GIVE_GIFT);
     UInt16 offset = 1;
