@@ -2100,6 +2100,7 @@ namespace GObject
 #ifdef _FB
 #else
         dclogger.logout(this);
+        PopTimerEvent(this, EVENT_REFRESHOPENKEY, getId());
 #endif
 #endif // _WIN32
         heroIsland.playerOffline(this);
@@ -2122,9 +2123,6 @@ namespace GObject
             LoginMsgHdr hdr1(0x301, WORKER_THREAD_LOGIN, 0, this->GetSessionID(), sizeof(crackValue));
             GLOBAL().PushMsg(hdr1, &crackValue);
         }
-        GObject::EventBase * ev = GObject::eventWrapper.RemoveTimerEvent(this, EVENT_REFRESHOPENKEY, getId());
-        if (ev)
-            ev->release();
 	}
 
 	void Player::checkLastBattled()
