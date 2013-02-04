@@ -16716,7 +16716,7 @@ void Player::getSnakeEggAward(UInt8 v)
     sendSnakeEggInfo();
 }
 
-void Player::getNewYearGiveGiftAward(UInt8 dayOrder, UInt16 result)
+void Player::getNewYearGiveGiftAward(UInt8 dayOrder, UInt8 result)
 {
     if(dayOrder > 10)
         return;
@@ -16749,103 +16749,101 @@ void Player::getNewYearGiveGiftAward(UInt8 dayOrder, UInt16 result)
                 return;
             }
 
+            UInt8 validMaxDay = 0;
             UInt8 serverDay = 0;
-            bool isValid = false;
             UInt32 now = TimeUtil::Now();
             if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2013, 2, 3))
             {
             }
             else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 3))
             {
+                validMaxDay = 1;
                 serverDay = 1;
-                if(dayOrder <= serverDay)
-                    isValid = true;
             }
             else if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2013, 2, 9))
             {
+                validMaxDay = 1;
             }
             else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 9))
             {
+                validMaxDay = 2;
                 serverDay = 2;
-                if(dayOrder <= serverDay)
-                    isValid = true;
             }
             else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 10))
             {
+                validMaxDay = 3;
                 serverDay = 3;
-                if(dayOrder <= serverDay)
-                    isValid = true;
             }
             else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 11))
             {
+                validMaxDay = 4;
                 serverDay = 4;
-                if(dayOrder <= serverDay)
-                    isValid = true;
             }
             else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 12))
             {
+                validMaxDay = 5;
                 serverDay = 5;
-                if(dayOrder <= serverDay)
-                    isValid = true;
             }
             else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 13))
             {
+                validMaxDay = 6;
                 serverDay = 6;
-                if(dayOrder <= serverDay)
-                    isValid = true;
             }
             else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 14))
             {
+                validMaxDay = 7;
                 serverDay = 7;
-                if(dayOrder <= serverDay)
-                    isValid = true;
             }
             else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 15))
             {
+                validMaxDay = 8;
                 serverDay = 8;
-                if(dayOrder <= serverDay)
-                    isValid = true;
             }
             else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 16))
             {
+                validMaxDay = 9;
                 serverDay = 9;
-                if(dayOrder <= serverDay)
-                    isValid = true;
             }
             else if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2013, 2, 24))
             {
+                validMaxDay = 9;
             }
             else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 24))
             {
+                validMaxDay = 10;
                 serverDay = 10;
-                if(dayOrder <= serverDay)
-                    isValid = true;
             }
             else
             {
+                validMaxDay = 10;
             }
 
-            if(!isValid)
+            if(dayOrder > validMaxDay)
             {
                 sendMsgCode(0, 1041);
                 return;
             }
 
             UInt8 times;
+            UInt8 recharge = false;
             if(serverDay == dayOrder)
                 times = 2;
             else
             {
-                if(result == 1)
+                if(result == 0)
+                {
+                    sendMsgCode(0, 1042);
+                    return;
+                }
+                else if(result == 1)
                 {
                     if (getGold() < 30)
                     {
                         sendMsgCode(0, 1101);
                         return;
                     }
-                    ConsumeInfo ci(NewYearGetDouble,0,0);
-                    useGold(30, &ci);
                     times = 2;
+                    recharge = true;
                 }
                 else
                     times = 1;
@@ -16854,7 +16852,11 @@ void Player::getNewYearGiveGiftAward(UInt8 dayOrder, UInt16 result)
             bool bRet = GameAction()->onGetNewYearGiveGiftAward(this, dayOrder, times);
             if(!bRet)
                 return;
-
+            if(recharge)
+            {
+                ConsumeInfo ci(NewYearGetDouble,0,0);
+                useGold(30, &ci);
+            }
             opt |= offset;
             SetVar(VAR_NEW_YEAR_GIVE_GIFT, opt);
         }
@@ -16973,7 +16975,7 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
     if(now_sharp == lasttime_sharp + 1)
         continueDays += 1;
     else
-        continueDays = 0;
+        continueDays = 1;
     tmp = (continueDays << 16) + (tmp & 0xFFFF);
     SetVar(VAR_NEWYEAR_QZONECONTINUE_ACT, tmp);
 }

@@ -1870,7 +1870,7 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
             if(!World::getNewYearGiveGiftAct())
                 return;
             UInt8 dayOrder;
-            UInt16 result;
+            UInt8 result;
             br >> dayOrder;
             br >> result;
             player->getNewYearGiveGiftAward(dayOrder, result);
