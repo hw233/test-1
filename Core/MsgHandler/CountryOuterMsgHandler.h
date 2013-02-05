@@ -1761,13 +1761,13 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
     UInt8 opt = 0;
     br >> opt;
 
-    if(!player->hasChecked())
-        return;
     switch(opt)
     {
         /** 周岁红包送不停 **/
         case 1:
         {
+            if(!player->hasChecked())
+                return;
 	        if(!World::getYearActive())
 		        return;
             UInt8 opt2 = 0;
@@ -1784,6 +1784,8 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
         break;
         case 2:
         {
+            if(!player->hasChecked())
+                return;
             if(!World::getKillMonsterAct())
                 return;
             UInt8 type = 0;
@@ -1802,6 +1804,8 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
 
         case 3:
         {
+            if(!player->hasChecked())
+                return;
             UInt8 step;
             UInt8 type;
             UInt8 career;
@@ -1818,6 +1822,8 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
             UInt8 copy_or_front;
             UInt8 index;
 
+            if(!player->hasChecked())
+                return;
             if(!World::getCopyFrontWinSwitch())
                 return;
             br >> type;
@@ -1838,6 +1844,8 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
 
         case 5:
         {
+            if(!player->hasChecked())
+                return;
             UInt8 type;
             if(!World::getGoodVoiceAct())
                 return;
@@ -1848,6 +1856,8 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
 
         case 6:
         {
+            if(!player->hasChecked())
+                return;
             UInt8 type;
             if(!World::get3366GiftAct())
                 return;
@@ -1858,6 +1868,8 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
 
         case 7:
         {
+            if(!player->hasChecked())
+                return;
             UInt8 type;
             if(!World::getFeastLoginAct())
                 return;
