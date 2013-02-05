@@ -269,7 +269,7 @@ UInt32 BattleSimulator::clearLastBattle(UInt8 side, bool isLast)
 
     if(!isLast)
     {
-        for(Int8 fgtlist_idx = 0; fgtlist_idx < 2; fgtlist_idx++)
+        for(Int8 fgtlist_idx = 0; fgtlist_idx < 2; ++fgtlist_idx)
         {
             std::vector<BattleFighter*>& fgtlist = _fgtlist[fgtlist_idx];
             size_t c = fgtlist.size();
@@ -5313,6 +5313,8 @@ UInt32 BattleSimulator::doAttack( int pos )
         mainTarget->setShieldObj(NULL);
 
     rcnt += releaseCD(bf);
+
+    _activeFgt = NULL;
     return rcnt;
 }
 
