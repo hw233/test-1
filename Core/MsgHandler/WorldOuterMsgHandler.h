@@ -2155,8 +2155,10 @@ void GmHandlerFromBs(LoginMsgHdr &hdr,const void * data)
 void OnQixiReq(GameMsgHdr& hdr, const void * data)
 {
 	MSG_QUERY_PLAYER(player);
+    /*
 	if(!player->hasChecked())
 		return;
+    */
 	BinaryReader brd(data, hdr.msgHdr.bodyLen);
 	UInt8 op;
     UInt8 type;

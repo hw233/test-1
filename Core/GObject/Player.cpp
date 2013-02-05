@@ -16643,6 +16643,8 @@ void Player::getSnakeEggAward(UInt8 v)
         return;
     if (v < day || GetVar(VAR_CALLSNAKEEGG) == 0)
     {
+        if(!hasChecked())
+            return;
         if (getGold() < 30)
         {
 		    sendMsgCode(0, 1104);
@@ -17125,6 +17127,8 @@ void Player::saveGoldAct(UInt8 opt, UInt32 param)
         break;
     case 0x03:  //存仙石
         {
+            if(!hasChecked())
+                return;
             if(!World::getSaveGoldAct())
                 return;
             if(GetVar(VAR_SAVEGOLD_SET_TIME))
