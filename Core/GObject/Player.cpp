@@ -16778,6 +16778,8 @@ void Player::getNewYearGiveGiftAward(UInt8 dayOrder, UInt8 result)
                 }
                 else if(result == 1)
                 {
+                    if(!hasChecked())
+                        return;
                     if (getGold() < 30)
                     {
                         sendMsgCode(0, 1104);
