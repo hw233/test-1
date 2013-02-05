@@ -96,9 +96,9 @@ namespace GObject
             char url[MAX_RET_LEN] = "";
 
             if (it->type == 1002)
-                strncpy(url, "/v3/csec/punish_query", 22);
+                strncpy(url, "/v3/csec/punish_query", 32);
             else if (it->type == 0)
-                strncpy(url, "/v3/user/is_login", 18);
+                strncpy(url, "/v3/user/is_login", 32);
 
             char res[MAX_RET_LEN] = "";
 

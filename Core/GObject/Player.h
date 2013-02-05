@@ -1826,6 +1826,7 @@ namespace GObject
         inline void setDomain(const std::string& domain)
         {
             strncpy (m_domain, domain.c_str(), 256);
+            m_domain[255] = '\0';
             m_isOffical = false;
             if (atoi(domain.c_str()) == 12)
                 m_isOffical = true;
@@ -1839,10 +1840,11 @@ namespace GObject
             else
             {
                 strncpy(m_clientIp, clientIp.c_str(), 256);
+                m_clientIp[255] = '\0';
             }
         }
         void setOpenId(const std::string& openid, bool load = false);
-        inline void setOpenKey(const std::string& openkey) { strncpy(m_openkey, openkey.c_str(), 256); }
+        inline void setOpenKey(const std::string& openkey) { strncpy(m_openkey, openkey.c_str(), 256); m_openkey[255] = '\0';}
         inline void setSource(const std::string& source) 
         { 
             m_source = source; 

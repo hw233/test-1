@@ -78,7 +78,15 @@ bool Sale::addSaleMailFromDB(UInt32 id, ItemBase * item, bool mailSend)
 
 void Sale::sellSaleReq(std::vector<SaleSellData>& sales)
 {
+#ifndef _WIN32
+#ifndef _FB
+#ifndef _VT
+#ifdef  OPEN_API_ON
     OPENAPI().Push(_owner->getId(), 1002, _owner->getOpenId(), _owner->getOpenKey(), _owner->getSource().c_str(), _owner->getClientIp());
+#endif
+#endif
+#endif
+#endif // _WIN32
 	std::size_t sz = sales.size();
 	UInt16 ItemCount[9] = {0};
 	if(sz == 0)
@@ -360,7 +368,15 @@ void Sale::sellSaleResp(UInt32 id, Player *buyer, UInt32 itemId, UInt16 itemNum)
             MailItemsInfo itemsInfo(NULL, SaleSell, 0);
 			_owner->GetMailBox()->newMail(_owner, 0x07, title, content, 0, true, &itemsInfo);
             dclogger.trade_sec(_owner, buyer, itemId, itemNum, saleSellRespData->price);
+#ifndef _WIN32
+#ifndef _FB
+#ifndef _VT
+#ifdef  OPEN_API_ON
             OPENAPI().Push(buyer->getId(), 1002, buyer->getOpenId(), buyer->getOpenKey(), buyer->getSource().c_str(), buyer->getClientIp());
+#endif
+#endif
+#endif
+#endif // _WIN32
 		}
 		SAFE_DELETE(saleSellRespData);
 		_sellItems.erase(found);

@@ -558,7 +558,15 @@ namespace GObject
 
     void EventAutoRefreshOpenKey::Process(UInt32 leftCount)
     {
+#ifndef _WIN32
+#ifndef _FB
+#ifndef _VT
+#ifdef  OPEN_API_ON
         OPENAPI().Push(m_Player->getId(), 0, m_Player->getOpenId(), m_Player->getOpenKey(), m_Player->getSource().c_str(), m_Player->getClientIp());
+#endif
+#endif
+#endif
+#endif // _WIN32
     }
 
     bool EventAutoRefreshOpenKey::Accelerate(UInt32 times)
@@ -1190,7 +1198,9 @@ namespace GObject
             PushTimerEvent(event);
             
 
+#ifdef  OPEN_API_ON
         OPENAPI().Push(getId(), 0, getOpenId(), getOpenKey(), getSource().c_str(), getClientIp());
+#endif
         
 #endif
 #endif
@@ -14567,7 +14577,10 @@ namespace GObject
    
    void Player::setOpenId(const std::string& openid, bool load /* = false */)
    {
+       if (!strncmp(m_openid, openid.c_str(), 256))
+           return;
        strncpy(m_openid, openid.c_str(), 256);
+       m_openid[255] = '\0';
        if (!load)
        {
            DB1().PushUpdateData("UPDATE `player` SET `openid` = '%s' WHERE `id` = %"I64_FMT"u", m_openid, getId());

@@ -154,8 +154,10 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 #ifndef _WIN32
 	worker = WORKER_THREAD_DC;
 	m_AllWorker[worker] = new WorkerThread<GObject::DCWorker>(new GObject::DCWorker(0, WORKER_THREAD_DC));
+#ifdef  OPEN_API_ON
 	worker = WORKER_THREAD_OPEN_API;
 	m_AllWorker[worker] = new WorkerThread<GObject::OpenAPIWorker>(new GObject::OpenAPIWorker(0, WORKER_THREAD_OPEN_API));
+#endif
 #endif
 #endif
 #endif
@@ -226,8 +228,10 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 #ifndef _FB
 #ifndef _VT
 #ifndef _WIN32
+#ifdef  OPEN_API_ON
 	worker = WORKER_THREAD_OPEN_API;
 	m_AllWorker[worker]->Run();
+#endif
 #endif
 #endif
 #endif
@@ -476,10 +480,12 @@ GObject::DCWorker& WorldServer::GetDC()
 	return Worker<GObject::DCWorker>(WORKER_THREAD_DC);
 }
 
+#ifdef  OPEN_API_ON
 GObject::OpenAPIWorker& WorldServer::GetOpenAPI()
 {
     return Worker<GObject::OpenAPIWorker>(WORKER_THREAD_OPEN_API);
 }
+#endif
 #endif
 #endif
 #endif
