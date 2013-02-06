@@ -5900,6 +5900,7 @@ namespace GObject
 
         {
             UInt8 minAttrNum = item->quality > 3 ? 3 : 1;
+            UInt8 color2 = item->quality;
             UInt8 color = guji->quality;
             stLBAttrConf& lbAttrConf = GObjectManager::getLBAttrConf();
             UInt8 attrNum = lbAttrConf.getAttrNum(uRand(100));
@@ -5942,8 +5943,11 @@ namespace GObject
                 UInt8 size = allAttrType.size();
                 UInt8 idx = uRand(size);
                 lbattr.type[i] = allAttrType[idx];
+                UInt16 chance = uRand(10000);
                 float fChance = ((float)(uRand(10000)))/10000;
-                float disFactor = lbAttrConf.getDisFactor3(uRand(10000), fChance);
+                float disFactor = lbAttrConf.getDisFactor4(chance, fChance, color2);
+                color2 = 2;
+                //float disFactor = lbAttrConf.getDisFactor3(uRand(10000), fChance);
                 lbattr.value[i] = lbAttrConf.getAttrMax(lv, itemTypeIdx, lbattr.type[i]-1) * disFactor;
                 allAttrType.erase(allAttrType.begin() + idx);
             }
