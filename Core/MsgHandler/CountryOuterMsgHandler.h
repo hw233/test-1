@@ -3400,10 +3400,11 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                 }
             }
             break;
-        case PURCHASE3:
-        case PURCHASE3+1:
-        case PURCHASE3+2:
-        case PURCHASE3+3:
+        case PURCHASE3:  // 龙魂元神
+        case PURCHASE3+1:// 龙魂法宝
+        case PURCHASE3+2:// 龙魂心法
+        case PURCHASE3+3:// 龙魂奇珍
+        case PURCHASE3+5:// 龙魂灵宝
             {
                 UInt32 arena = player->GetVar(VAR_MONEY_ARENA);
                 if (arena < price)
@@ -5865,7 +5866,7 @@ void OnEquipLingbaoReq( GameMsgHdr & hdr, const void * data )
         break;
     case 4:
         {
-            pkg->closeLingbaoSmelt();
+            pkg->QuitLBSmelt();
         }
         break;
     case 5:

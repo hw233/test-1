@@ -1883,7 +1883,12 @@ BattleFighter* BattleFighter::summonSelf(float factor, UInt8 last)
 
     bf->initStats(false);
     bf->clearSkill();
-    bf->setSummonFactor(factor, last);
+
+    UInt32 aura = 0;
+    if(isHide())
+        aura = 100;
+
+    bf->setSummonFactor(aura, factor, last);
 
     return bf;
 }
@@ -1901,6 +1906,7 @@ void BattleFighter::clearSkill()
     _passiveSkillEnter100.clear();
     _passiveSkillDead100.clear();
     _passiveSkillAftNAtk100.clear();
+    _passiveSkillOnCounter100.clear();
 
     _passiveSkillPreAtk.clear();
     _passiveSkillAftAtk.clear();
@@ -1910,6 +1916,7 @@ void BattleFighter::clearSkill()
     _passiveSkillEnter.clear();
     _passiveSkillDead.clear();
     _passiveSkillAftNAtk.clear();
+    _passiveSkillOnCounter.clear();
 
     _passiveSkillOnTherapy.clear();
     _passiveSkillOnSkillDmg.clear();
@@ -1925,7 +1932,7 @@ void BattleFighter::clearSkill()
     _onStateCond.clear();
 }
 
-void BattleFighter::setSummonFactor(float factor, UInt8 last)
+void BattleFighter::setSummonFactor(UInt32 aura, float factor, UInt8 last)
 {
     if(last == 0)
         return; 
@@ -1934,10 +1941,7 @@ void BattleFighter::setSummonFactor(float factor, UInt8 last)
     _maxhp = _maxhp * factor;
     _hp = _maxhp;
 
-    if(!isHide())
-        _aura = 0;
-    else
-        _aura = 100;
+    _aura = aura;
 
     _peerlessSkill.base = GData::skillManager[49509];
 

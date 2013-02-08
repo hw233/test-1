@@ -129,8 +129,8 @@ public:
 	inline float getSoul() { return _soul; }
 	inline float getAura() { return (_aura > 0 ? _aura : 0); }
 	inline float getAuraMax() { return (_auraMax > 0 ? _auraMax : 0); }
-	inline float getAttack() {float ret = _attack + _attackAdd + _attackAdd2 + _atkAddSpecial + _atkDecSpecial + _moAttackAdd; return (ret > 0 ? ret : 0);}
-	inline float getMagAttack() {float ret = _magatk + _magAtkAdd + _magAtkAdd2 + _magAtkAddSpecial + _magAtkDecSpecial + _moMagAtkAdd; return (ret > 0 ? ret : 0);}
+	inline float getAttack() {float ret = _attack + _attackAdd + _attackAdd2 + _atkAddSpecial + _atkDecSpecial + _moAttackAdd; return  ret;}
+	inline float getMagAttack() {float ret = _magatk + _magAtkAdd + _magAtkAdd2 + _magAtkAddSpecial + _magAtkDecSpecial + _moMagAtkAdd; return ret;}
 	inline float getDefend() {float ret = _defend + _defAdd + _defAdd2; return (ret > 0 ? ret : 0);}
 	inline float getMagDefend() {float ret = _magdef + _magDefAdd + _magDefAdd2; return (ret > 0 ? ret : 0);}
 	float getHitrate(BattleFighter* defgt);
@@ -716,7 +716,7 @@ public:
 
     BattleFighter* summonSelf(float factor, UInt8 last);
     void clearSkill();
-    void setSummonFactor(float factor, UInt8 last);
+    void setSummonFactor(UInt32 aura, float factor, UInt8 last);
     bool releaseSummon();
     inline void setMoAuraBuf(UInt8 value, UInt8 last) { if(last == 0) return; _moAuraBuf = value; _moAuraBufLast = last; }
     inline void resetMoAuraBuf() { _moAuraBuf = 0; _moAuraBufLast = 0; }
