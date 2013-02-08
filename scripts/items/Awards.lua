@@ -729,13 +729,13 @@ function onGetNewYearQQGameAward(player, type)
         return false
     end
 
-    local award = QzonecontinueAwards[type]
-    if award == nil then
+    local awards = QzonecontinueAwards[type]
+    if awards == nil then
         return false
     end
 
     local package = player:GetPackage()
-    if package:GetRestPackageSize() < #award then
+    if package:GetRestPackageSize() < #awards then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
