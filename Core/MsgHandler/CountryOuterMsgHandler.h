@@ -3404,7 +3404,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
         case PURCHASE3+1:// 龙魂法宝
         case PURCHASE3+2:// 龙魂心法
         case PURCHASE3+3:// 龙魂奇珍
-        case PURCHASE3+5:// 龙魂灵宝
+        case PURCHASE3+4:// 龙魂灵宝
             {
                 UInt32 arena = player->GetVar(VAR_MONEY_ARENA);
                 if (arena < price)
