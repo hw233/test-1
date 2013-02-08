@@ -16923,7 +16923,7 @@ void Player::getNewYearQzoneContinueAward(UInt8 type)
 {
     if(type == 0 || type > 7)
         return;
-    if(atoi(m_domain) != 1)
+    if(atoi(m_domain) != 1 && atoi(m_domain) != 2)
         return;
 
     UInt32 tmp = GetVar(VAR_NEWYEAR_QZONECONTINUE_ACT);
@@ -16947,6 +16947,9 @@ void Player::sendNewYearQzoneContinueAct()
 {
     if(!World::getNewYearQzoneContinueAct())
         return;
+    if(atoi(m_domain) != 1 && atoi(m_domain) != 2)
+        return;
+
     Stream st(REP::COUNTRY_ACT);
     st << static_cast<UInt8>(10);
     UInt32 tmp = GetVar(VAR_NEWYEAR_QZONECONTINUE_ACT);
@@ -16962,20 +16965,27 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
 {
     if(!World::getNewYearQzoneContinueAct())
         return;
-
-    UInt32 lasttime_sharp = TimeUtil::SharpDay(0, _playerData.lastOnline);
-    UInt32 now_sharp = TimeUtil::SharpDay(0, now);
-    if (lasttime_sharp >= now_sharp)
+    if(atoi(m_domain) != 1 && atoi(m_domain) != 2)
         return;
 
+    UInt32 lasttime = GetVar(VAR_NEWYEAR_QZONECONTINUE_LASTTIME);
+    if(lasttime == 0)
+    {
+    }
+    else
+    {
+        UInt32 lasttime_sharp = TimeUtil::SharpDay(0, lasttime);
+        UInt32 now_sharp = TimeUtil::SharpDay(0, now);
+        if(lasttime_sharp >= now_sharp)
+            return;
+    }
+
+    SetVar(VAR_NEWYEAR_QZONECONTINUE_LASTTIME, now);
     UInt32 tmp = GetVar(VAR_NEWYEAR_QZONECONTINUE_ACT);
     UInt32 continueDays = (tmp >> 16);
     if(continueDays >= 0xFF)
         continueDays = 0xFE;
-    if(now_sharp == lasttime_sharp + 1)
-        continueDays += 1;
-    else
-        continueDays = 1;
+    continueDays += 1;
     tmp = (continueDays << 16) + (tmp & 0xFFFF);
     SetVar(VAR_NEWYEAR_QZONECONTINUE_ACT, tmp);
 }
