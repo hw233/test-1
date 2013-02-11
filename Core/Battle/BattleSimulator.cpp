@@ -1326,13 +1326,12 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                 }
             }
 
-            if(!colorStock)
+            if(!colorStock && !defend100)
             {
                 area_target->setEvad100(false);
                 appendDefStatus(e_damEvade, 0, area_target);
             }
-
-            if(defend100 || colorStock)
+            else
             {
                 appendDefStatus(e_damOut, 0, area_target);
                 if(!colorStock)
@@ -1405,9 +1404,9 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
         {
             BattleFighter * target_fighter = static_cast<BattleFighter *>(area_target_obj);
             // test counter by rolling dice
-            if(counter100 || target_fighter->calcCounter(bf, !bf->canBeCounter(), skill))
+            if(counter100 || target_fighter->calcCounter(bf, skill))
             {
-                if(counter100/* || target_fighter->calcHit(bf, NULL)*/)
+                if(counter100 || target_fighter->calcHit(bf, NULL))
                 {
                     doPassiveSkillOnCounter(target_fighter, bf);
 

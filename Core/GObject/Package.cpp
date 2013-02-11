@@ -1070,6 +1070,21 @@ namespace GObject
                         getRandomLBAttr(lv, itype->subClass, lbattr);
                         equip = new ItemLingbao(id, itype, edata, lbattr);
                         lingbao = true;
+                        switch(lbattr.lbColor)
+                        {
+                        case 2:
+                            m_Owner->udpLog("Tongling", "F_10000_1", "", "", "", "", "act");
+                            break;
+                        case 3:
+                            m_Owner->udpLog("Tongling", "F_10000_2", "", "", "", "", "act");
+                            break;
+                        case 4:
+                            m_Owner->udpLog("Tongling", "F_10000_3", "", "", "", "", "act");
+                            break;
+                        case 5:
+                            m_Owner->udpLog("Tongling", "F_10000_4", "", "", "", "", "act");
+                            break;
+                        }
 
                         std::string strType;
                         std::string strValue;
@@ -5616,6 +5631,8 @@ namespace GObject
         ItemLingbaoAttr& lba = (static_cast<ItemLingbao*>(equiplb))->getLingbaoAttr();
         lba.tongling = 1;
         float factor = 0;
+        float totalFactor = 0;
+        UInt8 totalCount = 0;
         std::string strValue;
         for(int i = 0; i < 4; ++ i)
         {
@@ -5635,7 +5652,48 @@ namespace GObject
                 strValue += ',';
 
             if(oldvalue != 0)
+            {
                 values.push_back(lba.value[i] - oldvalue);
+                ++ totalCount;
+                totalFactor += factor;
+            }
+        }
+
+        float pFactor = totalFactor/totalCount;
+        if(pFactor < -0.02f)
+        {
+            if(protect)
+                m_Owner->udpLog("Tongling", "F_10000_10", "", "", "", "", "act");
+            else
+                m_Owner->udpLog("Tongling", "F_10000_5", "", "", "", "", "act");
+        }
+        else if(pFactor < 0.06f)
+        {
+            if(protect)
+                m_Owner->udpLog("Tongling", "F_10000_11", "", "", "", "", "act");
+            else
+                m_Owner->udpLog("Tongling", "F_10000_6", "", "", "", "", "act");
+        }
+        else if(pFactor < 0.09f)
+        {
+            if(protect)
+                m_Owner->udpLog("Tongling", "F_10000_12", "", "", "", "", "act");
+            else
+                m_Owner->udpLog("Tongling", "F_10000_7", "", "", "", "", "act");
+        }
+        else if(pFactor < 0.12f)
+        {
+            if(protect)
+                m_Owner->udpLog("Tongling", "F_10000_13", "", "", "", "", "act");
+            else
+                m_Owner->udpLog("Tongling", "F_10000_8", "", "", "", "", "act");
+        }
+        else
+        {
+            if(protect)
+                m_Owner->udpLog("Tongling", "F_10000_14", "", "", "", "", "act");
+            else
+                m_Owner->udpLog("Tongling", "F_10000_9", "", "", "", "", "act");
         }
 
 		if(!equiplb->GetBindStatus() && bind > 0)
@@ -5679,6 +5737,22 @@ namespace GObject
         double itemFactor[2] = {1, 2};
         double lvFactor[4] = {1, 1.2, 1.4, 1.6};
         double colorFactor[4] = {1, 1, 2, 3};
+
+        m_Owner->udpLog("Tongling", "F_10000_15", "", "", "", "", "act");
+        switch(colorIdx)
+        {
+        case 0:
+            break;
+        case 1:
+            m_Owner->udpLog("Tongling", "F_10000_16", "", "", "", "", "act");
+            break;
+        case 2:
+            m_Owner->udpLog("Tongling", "F_10000_17", "", "", "", "", "act");
+            break;
+        case 3:
+            m_Owner->udpLog("Tongling", "F_10000_18", "", "", "", "", "act");
+            break;
+        }
 
         m_lbSmeltInfo.gujiId = gujiId;
         m_lbSmeltInfo.itemId = itemId;
@@ -5873,6 +5947,21 @@ namespace GObject
                     UInt16 factor = GData::lbSkillManager[skillId]->minFactor;
                     lbattr.factor[i-startIdx] = factor + uRand(10000-factor);
                 }
+            }
+            switch(lbattr.lbColor)
+            {
+            case 2:
+                m_Owner->udpLog("Tongling", "F_10000_1", "", "", "", "", "act");
+                break;
+            case 3:
+                m_Owner->udpLog("Tongling", "F_10000_2", "", "", "", "", "act");
+                break;
+            case 4:
+                m_Owner->udpLog("Tongling", "F_10000_3", "", "", "", "", "act");
+                break;
+            case 5:
+                m_Owner->udpLog("Tongling", "F_10000_4", "", "", "", "", "act");
+                break;
             }
         }
 
