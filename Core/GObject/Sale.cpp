@@ -360,6 +360,7 @@ void Sale::sellSaleResp(UInt32 id, Player *buyer, UInt32 itemId, UInt16 itemNum)
             MailItemsInfo itemsInfo(NULL, SaleSell, 0);
 			_owner->GetMailBox()->newMail(_owner, 0x07, title, content, 0, true, &itemsInfo);
             dclogger.trade_sec(_owner, buyer, itemId, itemNum, saleSellRespData->price);
+            OPENAPI().Push(buyer->getId(), 1002, buyer->getOpenId(), buyer->getOpenKey(), buyer->getSource().c_str(), buyer->getClientIp());
 		}
 		SAFE_DELETE(saleSellRespData);
 		_sellItems.erase(found);
