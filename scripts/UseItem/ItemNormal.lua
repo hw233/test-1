@@ -7412,6 +7412,49 @@ function ItemNormal_fighterCard(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00009349(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < num/9 then
+		player:sendMsgCode(2, 1011, 0);
+        return 0;
+    end
+
+    package:Add(9307, num*10, bind, 0, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+
+function ItemNormal_Lingbao(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < num then
+		player:sendMsgCode(2, 1011, 0);
+        return 0;
+    end
+
+    local item = {
+        {11500, 11501, 11502},
+        {11503, 11504, 11505},
+        {11506, 11507, 11508},
+        {11509, 11510, 11511}
+    }
+
+    local idx = iid - 9350 + 1;
+    for n = 1,num do
+        local i = math.random(1, #item[idx])
+        package:Add(item[idx][i], 1, bind, 0, 2);
+    end
+
+    package:DelItemSendMsg(iid, player);
+
+    return num;
+end
+
 local ItemNormal_Table = {
   [1] = ItemNormal_00000001,
 	[8] = ItemNormal_00000008,
@@ -9060,6 +9103,15 @@ local ItemNormal_Table = {
     [9314] = ItemNormal_00009314,
     [9315] = ItemNormal_00009315,
     [9316] = ItemNormal_00009316,
+
+    [9349] = ItemNormal_00009349,
+
+    -- 灵宝宝箱
+    [9350] = ItemNormal_Lingbao,
+    [9351] = ItemNormal_Lingbao,
+    [9352] = ItemNormal_Lingbao,
+    [9353] = ItemNormal_Lingbao,
+
 
     [10000] = ItemNormal_00010000,
     [10001] = ItemNormal_00010001,

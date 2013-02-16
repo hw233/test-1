@@ -31,17 +31,17 @@ void LootItem::roll( GObject::Player * player ) const
     {
         if (!lr[n].id)
             continue;
-        player->GetPackage()->Add(lr[n].id, lr[n].count, false, false, FromNpc);
+        player->GetPackage()->Add(lr[n].id, lr[n].count, lr[n].bind, false, FromNpc);
     }
 }
 
-void LootItem::roll(std::vector<LootResult>& lr, URandom * ur) const
+void LootItem::roll(std::vector<LootResult>& lr, URandom * ur, bool bind) const
 {
 	if(ur == NULL)
 	{
 		ur = &static_cast<BaseThread *>(Thread::current())->uRandom;
 	}
-	LootResult r = {0, 0};
+	LootResult r;
 	if(isPack == 1)
 	{
 		size_t cnt = items.size();
@@ -55,7 +55,7 @@ void LootItem::roll(std::vector<LootResult>& lr, URandom * ur) const
 				if(li != NULL)
 				{
                     std::vector<LootResult> lr1;
-					li->roll(lr1, ur);
+					li->roll(lr1, ur, bind || m_bind);
 					if(!ld.counts.empty() && lr1.size())
 					{
 						UInt32 countR = (*ur)(10000);
@@ -65,7 +65,9 @@ void LootItem::roll(std::vector<LootResult>& lr, URandom * ur) const
 							if(ld.counts[j].chance > countR)
 							{
                                 for (size_t k = 0; k < lr1.size(); ++k)
+                                {
                                     lr1[k].count = ld.counts[j].count;
+                                }
 								break;
 							}
 							countR -= ld.counts[j].chance;
@@ -93,6 +95,7 @@ void LootItem::roll(std::vector<LootResult>& lr, URandom * ur) const
                 for (size_t l = 0; l < lcnt; ++l)
                 {
                     r.id = ld.counts[l].count;
+                    r.bind = bind || m_bind;
                     r.count = 1;
                     lr.push_back(r);
                 }
@@ -103,6 +106,7 @@ void LootItem::roll(std::vector<LootResult>& lr, URandom * ur) const
         return;
     }
 	r.id = items[(*ur)(items.size())].id;
+    r.bind = bind || m_bind;
 	r.count = 1;
     lr.push_back(r);
 	return;

@@ -1017,7 +1017,8 @@ bool JobHunter::OnAttackMonster(UInt16 pos, bool isAuto)
         {
             for (UInt8 i = 1; i < SLOT_MAX; ++ i)
             {
-                struct GData::LootResult lr = {0, 1};
+                struct GData::LootResult lr;
+                lr.count = 1;
                 lr.id = GameAction()->getSpecialItem(_gameProgress, i);
                 UInt8 prob = _rnd(100);
                 if (prob < _spItemRate[i])
@@ -1035,7 +1036,7 @@ bool JobHunter::OnAttackMonster(UInt16 pos, bool isAuto)
             li->roll(lr, &_rnd);
             for (size_t j = 0; j < lr.size(); ++j)
             {
-                if (_owner->GetPackage()->Add(lr[j].id, lr[j].count, false, true, FromJobHunter))
+                if (_owner->GetPackage()->Add(lr[j].id, lr[j].count, lr[j].bind, true, FromJobHunter))
                     _owner->_lastLoot.push_back(lr[j]);
             }
 
@@ -1044,7 +1045,7 @@ bool JobHunter::OnAttackMonster(UInt16 pos, bool isAuto)
             li->roll(lr, &_rnd);
             for (size_t j = 0; j < lr.size(); ++j)
             {
-                if (_owner->GetPackage()->Add(lr[j].id, lr[j].count, false, true, FromJobHunter))
+                if (_owner->GetPackage()->Add(lr[j].id, lr[j].count, lr[j].bind, true, FromJobHunter))
                     _owner->_lastLoot.push_back(lr[j]);
             }
         }

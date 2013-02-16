@@ -8915,7 +8915,7 @@ namespace GObject
 		Stream st(REP::ATTACK_NPC);
 		bool isWin = bsim.getWinner() == 1;
 		UInt8 sz = 0;
-		GData::LootResult lt = {0, 0};
+		GData::LootResult lt;
 		UInt16 couponCount = 0;
 		if(isWin)
 		{
@@ -10944,7 +10944,9 @@ namespace GObject
             if(0 == (itemId = GameAction()->RunHappyAward(this, opt)))
                 return;
 
-            GData::LootResult lt = {itemId, 1};
+            GData::LootResult lt;
+            lt.id = itemId;
+            lt.count = 1;
             _lastLoot.push_back(lt);
             SetVar(VAR_JUNE_HAPPY, happy - 20);
         }
@@ -11014,25 +11016,33 @@ namespace GObject
 
     void Player::lastLootPush(UInt16 itemId, UInt16 num)
     {
-        GData::LootResult lt = {itemId, num};
+        GData::LootResult lt;
+        lt.id = itemId;
+        lt.count = num;
         _lastLoot.push_back(lt);
     }
 
     void Player::RegisterAward(UInt16 itemId, UInt16 num)
     {
-        GData::LootResult lt = {itemId, num};
+        GData::LootResult lt;
+        lt.id = itemId;
+        lt.count = num;
         _RegisterAward.push_back(lt);
     }
 
     void Player::BirthdayAward(UInt16 itemId, UInt16 num)
     {
-        GData::LootResult lt = {itemId, num};
+        GData::LootResult lt;
+        lt.id = itemId;
+        lt.count = num;
         _BirthdayAward.push_back(lt);
     }
 
     void Player::lastQueqiaoAwardPush(UInt16 itemId, UInt16 num)
     {
-        GData::LootResult lt = {itemId, num};
+        GData::LootResult lt;
+        lt.id = itemId;
+        lt.count = num;
         _lastQueqiaoAward.push_back(lt);
     }
 
@@ -11254,13 +11264,17 @@ namespace GObject
 
     void Player::lastKillMonsterAwardPush(UInt16 itemId, UInt16 num)
     {
-        GData::LootResult lt = {itemId, num};
+        GData::LootResult lt;
+        lt.id = itemId;
+        lt.count = num;
         _lastKillMonsterAward.push_back(lt);
     }
 
     void Player::lastExJobAwardPush(UInt16 itemId, UInt16 num)
     {
-        GData::LootResult lt = {itemId, num};
+        GData::LootResult lt;
+        lt.id = itemId;
+        lt.count = num;
         _lastExJobAward.push_back(lt);
     }
 
@@ -11292,7 +11306,9 @@ namespace GObject
 
     void Player::lastNew7DayTargetAwardPush(UInt16 itemId, UInt16 num)
     {
-        GData::LootResult lt = {itemId, num};
+        GData::LootResult lt;
+        lt.id = itemId;
+        lt.count = num;
         _lastNew7DayTargetAward.push_back(lt);
     }
 
