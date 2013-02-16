@@ -286,9 +286,11 @@ local stepAwardID =
 
 function getStepAward(progress, step)
     if progress == 0 then
+        print ("error1")
         return 0
     end
     if progress > #stepAwardID then
+        print ("error2")
         return 0
     end
     local index = 0
@@ -297,6 +299,7 @@ function getStepAward(progress, step)
             return stepAwardID[progress][i]
         end
     end
+    print ("error3")
     return 0
 end
 

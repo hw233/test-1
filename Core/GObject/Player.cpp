@@ -11290,7 +11290,9 @@ namespace GObject
 
     void Player::lastExJobStepAwardPush(UInt16 itemId, UInt16 num)
     {
-        GData::LootResult lt = {itemId, num};
+        GData::LootResult lt;
+        lt.id = itemId;
+        lt.count = num;
         _lastExJobStepAward.push_back(lt);
     }
 

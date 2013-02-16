@@ -1029,6 +1029,7 @@ bool JobHunter::OnAttackMonster(UInt16 pos, bool isAuto)
                     }
                 }
             }
+            /*
             const UInt32 bossLootBase = 10527;
             const UInt32 bossLootBase2 = 10531;
             const GData::LootItem * li = GData::lootTable[bossLootBase + _gameProgress];
@@ -1048,6 +1049,7 @@ bool JobHunter::OnAttackMonster(UInt16 pos, bool isAuto)
                 if (_owner->GetPackage()->Add(lr[j].id, lr[j].count, lr[j].bind, true, FromJobHunter))
                     _owner->_lastLoot.push_back(lr[j]);
             }
+            */
         }
     }
     else
@@ -1224,6 +1226,7 @@ bool JobHunter::OnFoundCave(bool isAuto)
         ng->getLoots(_owner, _owner->_lastExJobAward, 0, NULL, true);
         _owner->udpLog("jobHunter", "F_1162", "", "", "", "", "act");
 
+        /*
         const UInt32 bossLootBase = 10527;
         const UInt32 bossLootBase2 = 10531;
         const GData::LootItem * li = GData::lootTable[bossLootBase + _gameProgress];
@@ -1243,6 +1246,7 @@ bool JobHunter::OnFoundCave(bool isAuto)
             if (_owner->GetPackage()->Add(lr[j].id, lr[j].count, true, true, FromJobHunter))
                 _owner->_lastExJobAward.push_back(lr[j]);
         }
+        */
 
 
     }
@@ -1322,7 +1326,8 @@ bool JobHunter::OnFoundCave(bool isAuto)
         if(npcIt2 != GData::npcGroups.end())
         {
             _owner->checkLastExJobStepAward();
-            npcIt2->second->getLoots(_owner, _owner->_lastExJobStepAward, 0, NULL);
+            GData::NpcGroup * ng2 = npcIt2->second;
+            ng2->getLoots(_owner, _owner->_lastExJobStepAward, 0, NULL);
 
             UInt8 sz = _owner->_lastExJobStepAward.size();
             st2 << sz;
