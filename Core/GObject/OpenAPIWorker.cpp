@@ -87,6 +87,7 @@ namespace GObject
                 delete[] it->openId;
                 delete[] it->openKey;
                 delete[] it->pf;
+                delete[] it->userIp;
                 continue;
             }
 
@@ -175,6 +176,7 @@ namespace GObject
             delete[] it->openId;
             delete[] it->openKey;
             delete[] it->pf;
+            delete[] it->userIp;
 #undef MAX_RET_LEN
         }
     }
