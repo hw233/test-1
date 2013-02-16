@@ -11274,6 +11274,22 @@ namespace GObject
         _lastExJobAward.clear();
     }
 
+    void Player::lastExJobStepAwardPush(UInt16 itemId, UInt16 num)
+    {
+        GData::LootResult lt = {itemId, num};
+        _lastExJobStepAward.push_back(lt);
+    }
+
+    void Player::checkLastExJobStepAward()
+    {
+        std::vector<GData::LootResult>::iterator it;
+        for(it = _lastExJobStepAward.begin(); it != _lastExJobStepAward.end(); ++ it)
+        {
+            m_Package->ItemNotify(it->id, it->count);
+        }
+        _lastExJobStepAward.clear();
+    }
+
     void Player::lastNew7DayTargetAwardPush(UInt16 itemId, UInt16 num)
     {
         GData::LootResult lt = {itemId, num};

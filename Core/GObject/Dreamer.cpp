@@ -8,6 +8,7 @@
 #include "Country.h"
 #include "Script/GameActionLua.h"
 #include "GData/DreamerTable.h"
+#include "GData/NpcGroup.h"
 
 #include <math.h>
 
@@ -716,23 +717,32 @@ bool Dreamer::OnGetTreasure()
         return false;
     }
     --_keysCount;
-    Table rewards = GameAction()->getDreamerTreasure(_gameProgress);
+
     Stream st;
     st.init(REP::DREAMER);
     st << static_cast<UInt8>(1);
-    UInt8 count = rewards.size();
-    st << static_cast<UInt8>(count);
-    for (UInt8 i = 0; i < count; ++i)
+
+    UInt32 rewardsID = GameAction()->getDreamerTreasure(_gameProgress);
+    GData::NpcGroups::iterator npcIt2 = GData::npcGroups.find(rewardsID);
+    if(npcIt2 != GData::npcGroups.end())
     {
-        Table item = rewards.get<Table>(i + 1);
-        if (item.size() < 3) return false;
-        UInt32 itemId = item.get<UInt32>(1);
-        UInt32 itemCount = item.get<UInt32>(2);
-        bool   bind = item.get<bool>(3);
-        _owner->GetPackage()->Add(itemId, itemCount, bind, false, FromDreamer);
-        st << static_cast<UInt16>(itemId);
-        st << static_cast<UInt16>(itemCount);
+        _owner->checkLastExJobStepAward();
+        npcIt2->second->forceGetLoots(_owner, _owner->_lastExJobStepAward, 0, NULL);
+
+        UInt8 sz = _owner->_lastExJobStepAward.size();
+        st << sz;
+        for(UInt8 i = 0; i < sz; ++ i)
+        {
+            st << static_cast<UInt16>(_owner->_lastExJobStepAward[i].id);
+            st << static_cast<UInt16>(_owner->_lastExJobStepAward[i].count);
+        }
+        _owner->_lastExJobStepAward.clear();
     }
+    else
+    {
+        st << static_cast<UInt8>(0);
+    }
+
     st << Stream::eos;
 
     DB2().PushUpdateData("UPDATE `dreamer` SET `keys` = '%u' WHERE `playerId` = %"I64_FMT"u", _keysCount, _owner->getId());
@@ -762,23 +772,32 @@ bool Dreamer::OnGetItem()
         TRACE_LOG("Dream: item error.");
         return false;
     }
-    Table rewards = GameAction()->getDreamerItem(_gameProgress, index);
     Stream st;
     st.init(REP::DREAMER);
     st << static_cast<UInt8>(14);
-    UInt8 count = rewards.size();
-    st << static_cast<UInt8>(count);
-    for (UInt8 i = 0; i < count; ++i)
+
+    UInt32 rewardsID = GameAction()->getDreamerItem(_gameProgress, index);
+
+    GData::NpcGroups::iterator npcIt2 = GData::npcGroups.find(rewardsID);
+    if(npcIt2 != GData::npcGroups.end())
     {
-        Table item = rewards.get<Table>(i + 1);
-        if (item.size() < 3) return false;
-        UInt32 itemId = item.get<UInt32>(1);
-        UInt32 itemCount = item.get<UInt32>(2);
-        bool   bind = item.get<bool>(3);
-        _owner->GetPackage()->Add(itemId, itemCount, bind, false, FromDreamer);
-        st << static_cast<UInt16>(itemId);
-        st << static_cast<UInt16>(itemCount);
+        _owner->checkLastExJobStepAward();
+        npcIt2->second->forceGetLoots(_owner, _owner->_lastExJobStepAward, 0, NULL);
+
+        UInt8 sz = _owner->_lastExJobStepAward.size();
+        st << sz;
+        for(UInt8 i = 0; i < sz; ++ i)
+        {
+            st << static_cast<UInt16>(_owner->_lastExJobStepAward[i].id);
+            st << static_cast<UInt16>(_owner->_lastExJobStepAward[i].count);
+        }
+        _owner->_lastExJobStepAward.clear();
     }
+    else
+    {
+        st << static_cast<UInt8>(0);
+    }
+
     st << Stream::eos;
 
     MapInfo::iterator it = _mapInfo.find(POS_TO_INDEX(_posX, _posY));

@@ -1625,6 +1625,7 @@ namespace GObject
         std::vector<GData::LootResult> _lastKillMonsterAward;
         std::vector<GData::LootResult> _lastNew7DayTargetAward;
         std::vector<GData::LootResult> _lastExJobAward;
+        std::vector<GData::LootResult> _lastExJobStepAward;
 
     private:
 		UInt16 _lastDungeon;
@@ -1946,6 +1947,8 @@ namespace GObject
         int IDIPBuy(UInt32 itemId, UInt32 num, UInt32 price, std::string& err, bool bind = true);
         void lastExJobAwardPush(UInt16 itemId, UInt16 num);
         void checkLastExJobAward();
+        void lastExJobStepAwardPush(UInt16 itemId, UInt16 num);
+        void checkLastExJobStepAward();
         void lastQueqiaoAwardPush(UInt16 itemId, UInt16 num);
         void checkLastQueqiaoAward();
         void lastKillMonsterAwardPush(UInt16 itemId, UInt16 num);
