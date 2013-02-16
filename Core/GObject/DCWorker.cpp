@@ -44,16 +44,19 @@ namespace GObject
 
     void DCWorker::OnTimer()
     {
-        FastMutex::ScopedLock lk(m_Mutex);
-        if (!m_DCLog.empty())
+        std::vector<LogMsg> log;
         {
-            size_t size = m_DCLog.size();
-            size_t sz = size;
+            FastMutex::ScopedLock lk(m_Mutex);
+            log.swap(m_DCLog);
+        }
+        if (!log.empty())
+        {
+            size_t size = log.size();
             size_t i = 0;
             while (i < size)
             {
-                const char* msg = m_DCLog[i].logString;
-                const char logType = m_DCLog[i].logType;
+                const char* msg = log[i].logString;
+                const char logType = log[i].logType;
                 bool r = false;
 #ifndef _DEBUG
                 if (msg)
@@ -65,12 +68,12 @@ namespace GObject
 #endif
                 if (msg && logType != LT_SECDATA)
                 {
-                    TRACE_LOG("[%u]%u:%u-[%s] -> %d", m_Worker, sz, size, msg, r ? 1 : 0);
+                    TRACE_LOG("[%u]%u:%u-[%s] -> %d", m_Worker, i, size, msg, r ? 1 : 0);
                     TRACE_LOG("logType = %u", (UInt32)logType);
                 }
                 if (logType == LT_SECDATA && cfg.secdclogTest && cfg.isTestPlatform)
                 {
-                    TRACE_LOG("[%u]%u:%u-[%s] -> %d", m_Worker, sz, size, msg, r ? 1 : 0);
+                    TRACE_LOG("[%u]%u:%u-[%s] -> %d", m_Worker, i, size, msg, r ? 1 : 0);
                 }
 
                 delete[] msg;

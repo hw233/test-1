@@ -20,6 +20,7 @@ enum
 	WORKER_THREAD_SORT,				//≈≈–Ú
 #ifndef _WIN32
 	WORKER_THREAD_DC,				//
+    WORKER_THREAD_OPEN_API,               //
 #endif
 	WORKER_THREAD_DB,				//7  DB
 	WORKER_THREAD_DB1,				//8  DB1 player,trade
