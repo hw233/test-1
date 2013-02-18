@@ -1124,6 +1124,11 @@ namespace Script
 		return Call<bool>("getHeroMemoAward", player, idx, soul);
 	}
 
+    void GameActionLua::flushHeroMemoAward(Player* player, UInt8 idx)
+    {
+        return Call<void>("flushHeroMemoAward", player, idx);
+    }
+
 	bool GameActionLua::getShuoShuoAward(Player* player, UInt8 idx)
 	{
 		return Call<bool>("getShuoShuoAward", player, idx);

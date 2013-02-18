@@ -17,6 +17,7 @@
 #include "NewCountryBattle.h"
 #include "TownDeamon.h"
 #include "Athletics.h"
+#include "HeroMemo.h"
 
 namespace GObject
 {
@@ -83,17 +84,28 @@ void Country::ClanCopyResetEnd(void *)
     ClanCopyMgr::Instance().ResetEnd();
 }
 
+inline bool heromemo_enum(Player * p, int)
+{
+    if (!GVAR.GetVar(GVAR_HEROMEM_CUT))
+    {
+        if (!p)
+            return true;
+        p->GetHeroMemo()->flushAward();
+    }
+    return true;
+}
+
 bool Country::Init()
 {
-	//GameActionLua
-	std::string path = cfg.scriptPath + "main.lua";
-	m_GameActionLua = new Script::GameActionLua(TID(), path.c_str());
-	path = cfg.scriptPath + "formula/main.lua";
-	m_BattleFormula = new Script::BattleFormula(path.c_str());
-	if(TID() == WORKER_THREAD_NEUTRAL)
-	{
-		UInt32 now = TimeUtil::Now(), sweek = TimeUtil::SharpWeek(1);
-		bossManager.getNextBoss();
+    //GameActionLua
+    std::string path = cfg.scriptPath + "main.lua";
+    m_GameActionLua = new Script::GameActionLua(TID(), path.c_str());
+    path = cfg.scriptPath + "formula/main.lua";
+    m_BattleFormula = new Script::BattleFormula(path.c_str());
+    if(TID() == WORKER_THREAD_NEUTRAL)
+    {
+        UInt32 now = TimeUtil::Now(), sweek = TimeUtil::SharpWeek(1);
+        bossManager.getNextBoss();
 		bossManager.process(now);
         ClanRankBattleMgr::Instance().Init();
         NewCountryBattle::Init();
@@ -115,6 +127,8 @@ bool Country::Init()
         //AddTimer(4 * 60 * 1000, ClanCopyResetBegin, static_cast<void * >(NULL), 60 * 1000);
         //AddTimer(4 * 60 * 1000, ClanCopyReset, static_cast<void * >(NULL), 120 * 1000);
         //AddTimer(4 * 60 * 1000, ClanCopyResetEnd, static_cast<void * >(NULL), 180 * 1000);
+        globalPlayers.enumerate(heromemo_enum, m_ThreadID);
+        GVAR.SetVar(GVAR_HEROMEM_CUT, 1);
 	}
 
 	return true;
