@@ -13,8 +13,10 @@ namespace GData
 
 struct LootResult
 {
+    LootResult(): id(0), count(0), bind(false) {}
 	UInt16 id;
 	UInt16 count;
+    bool bind;
 };
 
 struct LootItem
@@ -33,8 +35,9 @@ struct LootItem
 	};
 	std::vector<LootData> items;
 	UInt8 isPack;
+    bool m_bind;
 
-	void roll(std::vector<LootResult>& lt, URandom * = NULL) const;
+	void roll(std::vector<LootResult>& lt, URandom * = NULL, bool bind = false) const;
 	void roll(GObject::Player *) const;
 };
 

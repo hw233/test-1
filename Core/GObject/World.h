@@ -371,6 +371,18 @@ public:
     { _feastloginAct= v; }
     inline static bool getFeastLoginAct()
     { return _feastloginAct; }
+    inline static void setNewYearGiveGiftAct(bool v)
+    { _newYearGiveGiftAct= v; }
+    inline static bool getNewYearGiveGiftAct()
+    { return _newYearGiveGiftAct; }
+    inline static void setNewYearQQGameAct(bool v)
+    { _newYearQQGameAct= v; }
+    inline static bool getNewYearQQGameAct()
+    { return _newYearQQGameAct; }
+    inline static void setNewYearQzoneContinueAct(bool v)
+    { _newYearQzoneContinueAct= v; }
+    inline static bool getNewYearQzoneContinueAct()
+    { return _newYearQzoneContinueAct; }
 
     inline static void setTowerLoginAct(UInt8 v)
     { _towerloginAct= v; }
@@ -599,6 +611,22 @@ public:
     { _compassact = v; }
     inline static bool getCompassAct()
     { return _compassact; }
+    inline static void setCallSnakeEggAct(UInt8 v)
+    { _callsnakeeggact = v; }
+    inline static UInt8 getCallSnakeEggAct()
+    { return _callsnakeeggact; }
+    inline static void setSnakeEggAwardAct(UInt8 v)
+    { _snakeeggawardact = v; }
+    inline static UInt8 getSnakeEggAwardAct()
+    { return _snakeeggawardact; }
+     inline static void setItem9344Act(bool v)
+    { _item9344act = v; }
+    inline static bool getItem9344Act()
+    { return _item9344act; }
+    inline static void setItem9343Act(bool v)
+    { _item9343act = v; }
+    inline static bool getItem9343Act()
+    { return _item9343act; }
  
 public:
 	inline static UInt8 getWeekDay()
@@ -679,6 +707,9 @@ public:
     static bool _dragonKingAct;
     static bool _saveGoldAct;
     static bool _feastloginAct;
+    static bool _newYearGiveGiftAct;
+    static bool _newYearQQGameAct;
+    static bool _newYearQzoneContinueAct;
     static UInt8 _towerloginAct;
     static bool _guoqing;
     static bool _9215Act;
@@ -711,6 +742,10 @@ public:
     static stArenaExtra stArenaOld[2];
     static stArenaExtra stArena;
     static bool _compassact;
+    static UInt8 _callsnakeeggact;
+    static UInt8 _snakeeggawardact;
+    static bool _item9344act;
+    static bool _item9343act;
 
 public:
     static RCSortType rechargeSort;
@@ -773,6 +808,8 @@ public:
     void sendQixiScoreAward(Player* pl);
     void SendXiaoyaoAward();
     void SendGoldSnakeAward();
+    void SendItem9344Award();
+    void SendItem9343Award();
 
     void UpdateSnowScore(Player* pl, Player* lover);
     void sendSnowPlayers(Player* pl);

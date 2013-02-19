@@ -52,8 +52,6 @@
 #ifndef _WIN32
 //#include <libmemcached/memcached.h>
 #include "GObject/DCLogger.h"
-
-//static memcached_st* memc = NULL;
 #endif
 
 bool getId(char buf[64], UInt8 type = 0);
@@ -243,7 +241,8 @@ inline UInt8 doLogin(Network::GameClient * cl, UInt64 pid, UInt32 hsid, GObject:
 	player->SetSessionID(hsid);
 	cl->SetPlayer(player);
 
-    player->setForbidSale(checkForbidSale(player->getId()));
+    std::string fsaleTime;
+    player->setForbidSale(checkForbidSale(player->getId(), fsaleTime));
 	return res;
 }
 
@@ -847,7 +846,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
     br>>param;
 
     initMemcache();
-    if (memc)
+    if (memcinited)
     {
         size_t len = 0;
         size_t tlen = 0;
@@ -860,7 +859,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
         while (retry)
         {
             --retry;
-            char* rtoken = memcached_get(memc, key, len, &tlen, &flags, &rc);
+            char* rtoken = memcached_get(&memc, key, len, &tlen, &flags, &rc);
             if (rc == MEMCACHED_SUCCESS && rtoken && tlen)
             {
                 ret = 0;
@@ -890,7 +889,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
 
         if (rc == MEMCACHED_SUCCESS && !ret)
         {
-            rc = memcached_delete(memc, key, len, (time_t)0);
+            rc = memcached_delete(&memc, key, len, (time_t)0);
             if (rc == MEMCACHED_SUCCESS)
             {
                 //err += "delete key error.";
@@ -1055,7 +1054,7 @@ bool getId(char buf[64], UInt8 type)
     {
         UInt8 ret = 1;
         initMemcache();
-        if (!memc)
+        if (!memcinited)
             return false;
 
         size_t len = 0;
@@ -1072,7 +1071,7 @@ bool getId(char buf[64], UInt8 type)
         while (retry)
         {
             --retry;
-            char* rid = memcached_get(memc, key, len, &tlen, &flags, &rc);
+            char* rid = memcached_get(&memc, key, len, &tlen, &flags, &rc);
             if (rc == MEMCACHED_SUCCESS && rid && tlen)
             {
                 ret = 0;
@@ -1404,7 +1403,12 @@ void ForbidSale(LoginMsgHdr& hdr,const void * data)
             pid += (static_cast<UInt64>(serverNo) << 48);
 	    GObject::Player * pl = GObject::globalPlayers[pid];
         if (NULL != pl)
+        {
             pl->setForbidSale(true);
+
+            GameMsgHdr hdr(0x352, pl->getThreadId(), pl, NULL);
+            GLOBAL().PushMsg(hdr, NULL);
+        }
         playerId = GetNextSection(playerIds, ',');
     }
     ret = 0;
@@ -1450,15 +1454,16 @@ void QueryLockUser(LoginMsgHdr& hdr,const void * data)
 {
     BinaryReader br(data,hdr.msgHdr.bodyLen);
     UInt64 pid = 0;
+    std::string fsaleTime;
     CHKKEY();
     br>>pid;
 
     pid = pid & 0xFFFFFFFFFF;
     UInt8 isLockLogin = IsBigLock(pid);
-    UInt8 isForbidSale = checkForbidSale(pid);
+    UInt8 isForbidSale = checkForbidSale(pid, fsaleTime);
         
     Stream st(SPEP::QUERYLOCKUSER);
-    st << isLockLogin << isForbidSale << Stream::eos;
+    st << isLockLogin << isForbidSale << fsaleTime << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
@@ -2191,7 +2196,7 @@ void SetMoneyFromBs(LoginMsgHdr &hdr,const void * data)
         if (cfg.GMCheck)
         {
             initMemcache();
-            if (memc)
+            if (memcinited)
             {
                 size_t len = 0;
                 size_t tlen = 0;
@@ -2204,7 +2209,7 @@ void SetMoneyFromBs(LoginMsgHdr &hdr,const void * data)
                 while (retry)
                 {
                     --retry;
-                    char* rtoken = memcached_get(memc, key, len, &tlen, &flags, &rc);
+                    char* rtoken = memcached_get(&memc, key, len, &tlen, &flags, &rc);
                     if (rc == MEMCACHED_SUCCESS && rtoken)
                     {
                         ret = 0;
@@ -2223,7 +2228,7 @@ void SetMoneyFromBs(LoginMsgHdr &hdr,const void * data)
                     }
                 }
 
-                rc = memcached_delete(memc, key, len, (time_t)0);
+                rc = memcached_delete(&memc, key, len, (time_t)0);
                 if (rc == MEMCACHED_SUCCESS)
                 {
                     //err += "delete key error.";
@@ -2701,6 +2706,12 @@ UInt8 SwitchSecDC(UInt32 val)
     return 0;
 }
 
+UInt8 SwitchAutoForbid(UInt32 val)
+{
+    cfg.setAutoForbid(val? true:false);
+    return 0;
+}
+
 void GMCmd(LoginMsgHdr& hdr, const void* data)
 {
     // 接受后台传来的GM指令，返回0表示操作成功，非0为操作失败
@@ -2718,6 +2729,8 @@ void GMCmd(LoginMsgHdr& hdr, const void* data)
         case 0x01:
             result = SwitchSecDC(val);
             break;
+        case 0x02:
+            result = SwitchAutoForbid(val);
         default:
             break;
     }
@@ -2736,6 +2749,8 @@ void AddDiscountFromBs(LoginMsgHdr& hdr, const void* data)
     CHKKEY();
     GData::Discount discount;
     br >> discount.discountType;
+    br >> discount.exType;
+    br >> discount.exValue;
     br >> discount.beginTime;
     br >> discount.endTime;
     GData::store.clearSpecialDiscountFromBS(discount.discountType);
@@ -2764,39 +2779,69 @@ void AddDiscountFromBs(LoginMsgHdr& hdr, const void* data)
 
 void QueryDiscountFromBs(LoginMsgHdr& hdr, const void* data)
 {
-    // TODO: GM查询限时限购活动
+    // GM查询限时限购活动
 	BinaryReader br(data,hdr.msgHdr.bodyLen);
     CHKKEY();
+    Stream st (SPEP::QUERYDISCOUNT);
     for (UInt8 type = 4; type < 7; ++type)
     {
-        Stream st (SPEP::QUERYDISCOUNT);
-        st << type;
+        UInt8 i = 0;
+        const GData::Discount* discount = GData::store.getDiscount(type, i++);
+        if (discount)
+        {
+            st << type;
+            st << discount->discountType;
+            st << discount->exType;
+            st << discount->exValue;
+            st << discount->beginTime;
+            st << discount->endTime;
+
+
+        }
+        else
+            continue;
+        st << GData::store.getDiscountItemsCount(type);
+        while(discount)
+        {
+            st << discount->itemID;            // UInt16
+            st << discount->limitCount;        // UInt32
+            st << discount->priceOriginal;     // UInt16
+            st << discount->priceDiscount;     // UInt16
+            discount = GData::store.getDiscount(type, i++);
+        }
     }
+    st << Stream::eos;
+	NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
 void ClearDiscountFromBs(LoginMsgHdr& hdr, const void* data)
 {
     // GM清空限时限购活动
-	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
     CHKKEY();
     GData::store.clearSpecialDiscountFromBS();
     GData::store.storeDiscount();
     GData::store.makePacket();
+
+    Stream st (SPEP::CLEARDISCOUNT);
+    st << static_cast<UInt8>(0);
+    st << Stream::eos;
+	NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
 void QueryRealAwardInfo(LoginMsgHdr& hdr, const void* data)
 {
-	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
     CHKKEY();
     Stream st(SPEP::REALAWARDINFO);
     GObject::realItemAwardMgr.getInfo(st);
     st << Stream::eos;
-	NETWORK()->SendMsgToClient(hdr.sessionID, st);
+    NETWORK()->SendMsgToClient(hdr.sessionID, st);
 }
 
 void AddRealAward(LoginMsgHdr& hdr, const void* data)
 {
-	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
     CHKKEY();
 
     UInt8 type = 0;
@@ -2807,43 +2852,43 @@ void AddRealAward(LoginMsgHdr& hdr, const void* data)
     st << type;
     switch(type)
     {
-    case 1:
-        {
-            UInt32 id = 0;
-            UInt32 cd = 0;
-            std::string card_no;
-            std::string card_psw;
-            br >> id >> cd >> card_no >> card_psw;
-            if(id == 0 || cd == 0 || card_no.length() == 0 || card_psw.length() == 0)
-                ret = 0;
-            else if(GObject::realItemAwardMgr.addAward(id, cd, card_no, card_psw))
-                ret = 1;
-            else
-                ret = 2;
-        }
-        break;
-    case 2:
-        {
-            UInt32 id = 0;
-            br >> id;
-            if(id == 0)
-                ret = 0;
-            else if(GObject::realItemAwardMgr.delAward(id))
-                ret = 1;
-            else
-                ret = 2;
-        }
-        break;
+        case 1:
+            {
+                UInt32 id = 0;
+                UInt32 cd = 0;
+                std::string card_no;
+                std::string card_psw;
+                br >> id >> cd >> card_no >> card_psw;
+                if(id == 0 || cd == 0 || card_no.length() == 0 || card_psw.length() == 0)
+                    ret = 0;
+                else if(GObject::realItemAwardMgr.addAward(id, cd, card_no, card_psw))
+                    ret = 1;
+                else
+                    ret = 2;
+            }
+            break;
+        case 2:
+            {
+                UInt32 id = 0;
+                br >> id;
+                if(id == 0)
+                    ret = 0;
+                else if(GObject::realItemAwardMgr.delAward(id))
+                    ret = 1;
+                else
+                    ret = 2;
+            }
+            break;
     }
     st << ret << Stream::eos;
 
-	NETWORK()->SendMsgToClient(hdr.sessionID, st);
+    NETWORK()->SendMsgToClient(hdr.sessionID, st);
 }
 
 void AddClanAward(LoginMsgHdr& hdr, const void* data)
 {
     // 发送物品给指定帮派仓库
-	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
     CHKKEY();
     UInt8 ret = 0;
 
@@ -2886,7 +2931,7 @@ void AddClanAward(LoginMsgHdr& hdr, const void* data)
 void ManualOpenTj(LoginMsgHdr& hdr, const void* data)
 {
     //手动开启天劫
-	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
     CHKKEY();
 
     UInt16 level = 0;
@@ -2903,7 +2948,7 @@ void ManualOpenTj(LoginMsgHdr& hdr, const void* data)
 
 void SHStageOnOff(LoginMsgHdr& hdr, const void* data)
 {
-	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
     CHKKEY();
 
     struct OnOffData
@@ -2915,13 +2960,13 @@ void SHStageOnOff(LoginMsgHdr& hdr, const void* data)
     br >> onOff.begin >> onOff.end;
     onOff.sessionID = hdr.sessionID;
 
-	GameMsgHdr imh(0x1AC, WORKER_THREAD_WORLD, NULL, sizeof(onOff));
-	GLOBAL().PushMsg(imh, &onOff);
+    GameMsgHdr imh(0x1AC, WORKER_THREAD_WORLD, NULL, sizeof(onOff));
+    GLOBAL().PushMsg(imh, &onOff);
 }
 
 void QuerySHStageOnOff(LoginMsgHdr& hdr, const void* data)
 {
-	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
     CHKKEY();
     GObject::SHOnOffTime onOff = GObject::shStageMgr.getSHOnOffTime();
 

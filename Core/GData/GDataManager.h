@@ -61,6 +61,7 @@ namespace GData
 		static bool LoadSkillStrengthens();
         static bool LoadSkillStrengthenExp();
         static bool LoadSkillStrengthenProb();
+        static bool LoadDreamer();
 
         static void clearUdpItem();
         static void addUdpItem(UInt32 id);

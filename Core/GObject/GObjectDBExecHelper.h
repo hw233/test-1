@@ -70,6 +70,27 @@ struct DBClanAssistant
 	std::string assistants;
 };
 
+struct DBLBSkill
+{
+    UInt16 id;
+    std::string name;
+    UInt8 lbtype;
+    UInt8 level;
+    UInt8 target;
+    float  prob;
+    UInt16 cond;
+    UInt16 cond2;
+    UInt8 area;
+    std::string factor;
+    Int16 last;
+    UInt16 cd;
+
+    UInt16 ef_type;             
+    UInt16 minFactor;          
+    UInt16 ef_value;           
+    UInt16 battlepoint;
+};
+
 }
 
 namespace GObject
@@ -430,6 +451,7 @@ struct DBFighter2
     UInt16 peerless;        // 无双技能
     UInt16 talent;          // 天赋
     std::string trump;      // 法宝
+    std::string lingbao;    // 灵宝
     std::string acupoints;  // 穴道,打通次数
     std::string skill;      // 装备的技能
     std::string citta;      // 装备的心法
@@ -1013,16 +1035,20 @@ struct DBWBoss
     Int32 atk;
     Int32 matk;
 };
+
 struct DBDiscount
 {
-    UInt16 itemID;
+    UInt32 itemID;
+    UInt8  exType;
+    UInt32 exValue;
     UInt32 beginTime;
     UInt32 endTime;
-    UInt16 priceOriginal;
-    UInt16 priceDiscount;
+    UInt32 priceOriginal;
+    UInt32 priceDiscount;
     UInt8 type;
     UInt32 count;
 };
+
 struct DBLuckyLog
 {
     std::string name;
@@ -1099,6 +1125,50 @@ struct DBStrengthenData
     std::string blueBox;
     std::string purpleBox;
     std::string orangeBox;
+};
+
+struct DBLingbaoAttr
+{
+    UInt32 id;
+    UInt8 tongling;
+    UInt8 lbcolor;
+    std::string types;
+    std::string values;
+    std::string skills;
+    std::string factors;
+};
+
+struct DBLingbaoSmelt
+{
+    UInt64 playerId;
+    UInt16 gujiId;
+    UInt16 itemId;
+    UInt8  bind;
+    UInt32 value;
+    UInt32 maxValue;
+};
+
+
+struct DBDreamer
+{
+    UInt64 playerId;
+    UInt8 progress;
+    UInt8 level;
+    UInt8 maxX;
+    UInt8 maxY;
+    UInt8 maxGrid;
+    std::string mapInfo;
+    UInt8 posX;
+    UInt8 posY;
+    UInt8 earlyPosX;
+    UInt8 earlyPosY;
+    UInt8 timeConsume;
+    UInt8 remainTime;
+    UInt8 keysCount;
+    UInt8 eyesCount;
+    UInt8 eyeTime;
+    UInt8 eyeX;
+    UInt8 eyeY;
 };
 
 }
@@ -1548,7 +1618,7 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBFighter2)
-SPECIALDEF(55)
+SPECIALDEF(56)
 	(
 	UInt32, id,
 	UInt64, playerId,
@@ -1572,6 +1642,7 @@ SPECIALDEF(55)
     UInt16, peerless,
     UInt16, talent,
     std::string, trump,
+    std::string, lingbao,
     std::string, acupoints,
     std::string, skill,
     std::string, citta,
@@ -2373,14 +2444,16 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBDiscount)
-SPECIALDEF(7)
+SPECIALDEF(9)
 (
-    UInt16, itemID,
+    UInt32, itemID,
+    UInt8,  exType,
+    UInt32,  exValue,
     UInt32, beginTime,
     UInt32, endTime,
-    UInt16, priceOriginal,
-    UInt16, priceDiscount,
-    UInt8, type,
+    UInt32, priceOriginal,
+    UInt32, priceDiscount,
+    UInt8,  type,
     UInt32, count
 )
 SPECIALEND()
@@ -2503,6 +2576,79 @@ SPECIALDEF(5)
     UInt8, posPut,
     UInt32, itemId,
     UInt16, ratio
+)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBLBSkill)
+SPECIALDEF(16)
+(
+    UInt16, id,
+    std::string, name,
+    UInt8, lbtype,
+    UInt8, level,
+    UInt8, target,
+    float,  prob,
+    UInt16, cond,
+    UInt16, cond2,
+    UInt8, area,
+    std::string, factor,
+    Int16, last,
+    UInt16, cd,
+
+    UInt16, ef_type,
+    UInt16, minFactor,
+    UInt16, ef_value,
+    UInt16, battlepoint
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBLingbaoAttr)
+SPECIALDEF(7)
+(
+    UInt32, id,
+    UInt8, tongling,
+    UInt8, lbcolor,
+    std::string, types,
+    std::string, values,
+    std::string, skills,
+    std::string, factors
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBLingbaoSmelt)
+SPECIALDEF(6)
+(
+    UInt64, playerId,
+    UInt16, gujiId,
+    UInt16, itemId,
+    UInt8,  bind,
+    UInt32, value,
+    UInt32, maxValue
+)
+SPECIALEND()
+
+
+SPECIALBEGIN(GObject::DBDreamer)
+SPECIALDEF(18)
+(
+    UInt64, playerId,
+    UInt8, progress,
+    UInt8, level,
+    UInt8, maxX,
+    UInt8, maxY,
+    UInt8, maxGrid,
+    std::string, mapInfo,
+    UInt8, posX,
+    UInt8, posY,
+    UInt8, earlyPosX,
+    UInt8, earlyPosY,
+    UInt8, timeConsume,
+    UInt8, remainTime,
+    UInt8, keysCount,
+    UInt8, eyesCount,
+    UInt8, eyeTime,
+    UInt8, eyeX,
+    UInt8, eyeY
 )
 SPECIALEND()
 

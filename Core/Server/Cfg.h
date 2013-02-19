@@ -54,6 +54,7 @@ public:
         UInt16 port;
     };
     std::vector<TokenServer> tokenServer;
+    std::vector<TokenServer> IDQueryMemcached;
 
 	UInt16 openYear;
 	UInt8 openMonth, openDay;
@@ -98,6 +99,7 @@ public:
     bool dclog;
     bool secdclog;
     bool secdclogTest;
+    bool autoForbid;
 
 public:
 	inline void setTcpPort(UInt16 p) {tcpPort = p;}
@@ -143,6 +145,8 @@ public:
     inline void setSecDCLog(bool v) { secdclog = v; }
     inline void setSecDCLogTest(bool v) { secdclogTest = v; }
 
+    inline void setAutoForbid(bool v) { autoForbid = v; }
+
 
 	inline void setVerifyTokenServer(const char* server, UInt16 port)
     {
@@ -150,6 +154,14 @@ public:
         ts.ip = server;
         ts.port = port;
         tokenServer.push_back(ts);
+    }
+
+    inline void setIDQueryMemcachedServer(const char* server, UInt16 port)
+    {
+        TokenServer ts;
+        ts.ip = server;
+        ts.port = port;
+        IDQueryMemcached.push_back(ts);
     }
 
 	bool isAdminIPAllowed(UInt32);

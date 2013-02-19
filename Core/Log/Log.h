@@ -98,6 +98,9 @@ enum PurchaseType
     BUYJOYBUFF                  = 87, //购买心悦buff
     EnumFEASTGIFT               = 88, //圣诞-登录礼包人人有
     NEWCountryBattleSkill       = 89, //蜀山论剑购买技能(霸气怒气)
+    SnakeSprintAct              = 90, //蛇年春节活动
+    DreamerConsume              = 91,
+    NewYearGetDouble            = 92, //迎新纳福，补领双倍
     //繁体私有占150～200
 };
 
@@ -145,6 +148,7 @@ enum MailItemType
     NEWJOBHIRE,
     BuChangMo,
     NewCountryBattleAward,
+    LingbaoFuling,
 };
 enum ItemFrom
 {
@@ -186,9 +190,9 @@ enum ItemFrom
     FromNewRC7DayTarget = 36, //七日目标
     FromDailyStrengthen = 37, //变强秘宝
     FromJobHunter = 38, // 寻墨游戏
-
     //80 ~ 100，繁体占用
     FromDreamer = 39, // 水晶梦境
+    FromFuling = 40, // 灵宝附灵
 };
 
 enum ItemTo
@@ -218,6 +222,7 @@ enum ItemTo
     ToQixi = 150, //(类似)七夕
     ToDeleteMail = 151, //删除邮件
     ToDeleteTrade = 152, //删除交易
+    ToLingbao = 153, // 附灵
 };
 
 struct IncommingInfo

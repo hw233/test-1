@@ -171,6 +171,9 @@ MSG_REG_2(GameMsgHdr, REQ::TIANJIE, OnTianjieReq);
 MSG_REG_2(GameMsgHdr, REQ::EXJOB, OnExJob);
 MSG_REG_2(GameMsgHdr, REQ::JOBHUNTER, OnJobHunter);
 MSG_REG_2(GameMsgHdr, REQ::AUTOJOBHUNTER, OnAutoJobHunter);
+MSG_REG_2(GameMsgHdr, REQ::DREAMER, OnDreamer);
+
+MSG_REG_2(GameMsgHdr, REQ::EQ_LINGBAO, OnEquipLingbaoReq);
 
 MSG_REG_2(GameMsgHdr, 0x1D0, OnDailyReq2);
 
@@ -342,4 +345,10 @@ MSG_REG_2(GameMsgHdr, 0x327, OnDelTianjieNpc);
 MSG_REG_2(GameMsgHdr, 0x328, OnDelMapObj);
 MSG_REG_2(GameMsgHdr, 0x329, OnAddMapObj);
 
+MSG_REG_2(GameMsgHdr, 0x330, OnForbidSale);
+MSG_REG_2(GameMsgHdr, 0x331, OnForbidSaleQueryFail);
+MSG_REG_2(GameMsgHdr, 0x332, OnOpenIdInvalid);
+MSG_REG_2(GameMsgHdr, 0x333, OnOpenAPIFailed);
+
+MSG_REG_2(GameMsgHdr, 0x352, OnSaleItemCancleAll);
 MSG_HANDLER_END()

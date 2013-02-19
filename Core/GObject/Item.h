@@ -254,6 +254,21 @@ namespace GObject
 		    : ItemTrump(id, itemEquipType, itemEquipData)
 		{ }
     };
+
+    class ItemLingbao : public ItemEquip
+    {
+    public:
+		ItemLingbao(UInt32 id, const GData::ItemBaseType* itemEquipType, ItemEquipData& itemEquipData, ItemLingbaoAttr& lbAttr)
+		    : ItemEquip(id, itemEquipType, itemEquipData), m_lbAttr(lbAttr)
+		{}
+
+        inline UInt8 getLbColor() { return m_lbAttr.lbColor; }
+        inline bool isTongling() { return (m_lbAttr.tongling != 0); }
+        ItemLingbaoAttr& getLingbaoAttr() { return m_lbAttr; }
+
+    private:
+        ItemLingbaoAttr m_lbAttr;
+    };
 }
 
 #endif

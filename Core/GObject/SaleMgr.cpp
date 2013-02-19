@@ -9,12 +9,15 @@
 #include "MsgHandler/MsgTypes.h"
 #include "Common/Itoa.h"
 #include "MsgID.h"
+#include "LBNameTmpl.h"
 
 namespace GObject
 {
 
 SaleMgr gSaleMgr;
-static const UInt8 ReqCvt[] = { 0xFF, 1, 2, 3, 12, 16, 21, 34, 51, 60};
+static const UInt8 ReqCvt[] = { 0xFF, 1, 2, 3, 12, 16, 21, 34, 51, 60, 63};
+#define MAX_SALE_REQ  11
+#define MAX_TYPE_IDX  66
 
 SaleMgr::SaleMgr()
 {
@@ -46,10 +49,13 @@ void SaleMgr::addRowSale(SaleData * sale)
 	UInt8 quality = sale->_item->getQuality();
 	UInt32 typeId = sale->_item->GetItemType().getId();
     UInt8 career = sale->_item->GetCareer();
+    std::vector<UInt8> attrId;
+
+    getLBColor_AttrId(sale->_item, quality, attrId);
 
     UInt8 pIdx = 0;
     UInt8 stIdx = StatIndex(subClass, typeId, pIdx);
-    if(stIdx > 62)
+    if(stIdx > MAX_TYPE_IDX)
     {
         stIdx = 1;
         pIdx = 1;
@@ -62,16 +68,21 @@ void SaleMgr::addRowSale(SaleData * sale)
 	std::vector<SaleData *>& sales = _saleRow[stIdx][typeId];
 	sales.push_back(sale);
 	std::sort(sales.begin(), sales.end(), SaleRowSorter);
-	++ _itemStat[career][stIdx][quality];
-	++ _itemStat[career][stIdx][0];
-	++ _itemStat[career][0][quality];
-	++ _itemStat[career][0][0];
-    if(career != 0)
+
+    UInt8 attrCnt = attrId.size();
+    for(UInt8 idx = 0; idx < attrCnt; ++ idx)
     {
-        ++ _itemStat[0][stIdx][quality];
-        ++ _itemStat[0][stIdx][0];
-        ++ _itemStat[0][0][quality];
-        ++ _itemStat[0][0][0];
+        ++ _itemStat[career][stIdx][quality][attrId[idx]];
+        ++ _itemStat[career][stIdx][0][attrId[idx]];
+        ++ _itemStat[career][0][quality][attrId[idx]];
+        ++ _itemStat[career][0][0][attrId[idx]];
+        if(career != 0)
+        {
+            ++ _itemStat[0][stIdx][quality][attrId[idx]];
+            ++ _itemStat[0][stIdx][0][attrId[idx]];
+            ++ _itemStat[0][0][quality][attrId[idx]];
+            ++ _itemStat[0][0][0][attrId[idx]];
+        }
     }
 
 	if (pIdx != stIdx && pIdx != 0)
@@ -79,12 +90,17 @@ void SaleMgr::addRowSale(SaleData * sale)
 		std::vector<SaleData *>& sales = _saleRow[pIdx][typeId];
 		sales.push_back(sale);
 		std::sort(sales.begin(), sales.end(), SaleRowSorter);
-		++ _itemStat[career][pIdx][quality];
-		++ _itemStat[career][pIdx][0];
-        if(career != 0)
+
+        UInt8 attrCnt = attrId.size();
+        for(UInt8 idx = 0; idx < attrCnt; ++ idx)
         {
-            ++ _itemStat[0][pIdx][quality];
-            ++ _itemStat[0][pIdx][0];
+            ++ _itemStat[career][pIdx][quality][attrId[idx]];
+            ++ _itemStat[career][pIdx][0][attrId[idx]];
+            if(career != 0)
+            {
+                ++ _itemStat[0][pIdx][quality][attrId[idx]];
+                ++ _itemStat[0][pIdx][0][attrId[idx]];
+            }
         }
 	}
 }
@@ -95,10 +111,13 @@ void SaleMgr::delRowSale(SaleData * sale)
 	UInt8 quality = sale->_item->getQuality();
 	UInt32 typeId = sale->_item->GetItemType().getId();
     UInt8 career = sale->_item->GetCareer();
+    std::vector<UInt8> attrId;
+
+    getLBColor_AttrId(sale->_item, quality, attrId);
 
     UInt8 pIdx = 0;
     UInt8 stIdx = StatIndex(subClass, typeId, pIdx);
-    if(stIdx > 62)
+    if(stIdx > MAX_TYPE_IDX)
     {
         stIdx = 1;
         pIdx = 1;
@@ -113,24 +132,28 @@ void SaleMgr::delRowSale(SaleData * sale)
 	if (found != sales.end())
 		sales.erase(found);
 
-	UInt32& cnt1 = _itemStat[career][stIdx][quality];
-	if (cnt1 > 0) -- cnt1;
-	UInt32& cnt2 = _itemStat[career][stIdx][0];
-	if (cnt2 > 0) -- cnt2;
-	UInt32& cnt3 = _itemStat[career][0][quality];
-	if (cnt3 > 0) -- cnt3;
-	UInt32& cnt4 = _itemStat[career][0][0];
-	if (cnt4 > 0) -- cnt4;
-    if(career != 0)
+    UInt8 attrCnt = attrId.size();
+    for(UInt8 idx = 0; idx < attrCnt; ++ idx)
     {
-        UInt32& cnt1 = _itemStat[0][stIdx][quality];
+        UInt32& cnt1 = _itemStat[career][stIdx][quality][attrId[idx]];
         if (cnt1 > 0) -- cnt1;
-        UInt32& cnt2 = _itemStat[0][stIdx][0];
+        UInt32& cnt2 = _itemStat[career][stIdx][0][attrId[idx]];
         if (cnt2 > 0) -- cnt2;
-        UInt32& cnt3 = _itemStat[0][0][quality];
+        UInt32& cnt3 = _itemStat[career][0][quality][attrId[idx]];
         if (cnt3 > 0) -- cnt3;
-        UInt32& cnt4 = _itemStat[0][0][0];
+        UInt32& cnt4 = _itemStat[career][0][0][attrId[idx]];
         if (cnt4 > 0) -- cnt4;
+        if(career != 0)
+        {
+            UInt32& cnt1 = _itemStat[0][stIdx][quality][attrId[idx]];
+            if (cnt1 > 0) -- cnt1;
+            UInt32& cnt2 = _itemStat[0][stIdx][0][attrId[idx]];
+            if (cnt2 > 0) -- cnt2;
+            UInt32& cnt3 = _itemStat[0][0][quality][attrId[idx]];
+            if (cnt3 > 0) -- cnt3;
+            UInt32& cnt4 = _itemStat[0][0][0][attrId[idx]];
+            if (cnt4 > 0) -- cnt4;
+        }
     }
 
 	if (pIdx != stIdx && pIdx != 0)
@@ -139,16 +162,21 @@ void SaleMgr::delRowSale(SaleData * sale)
 		std::vector<SaleData *>::iterator found = std::find(sales.begin(), sales.end(), sale);
 		if (found != sales.end())
 			sales.erase(found);
-		UInt32& cnt5 = _itemStat[career][pIdx][quality];
-		if (cnt5 > 0) -- cnt5;
-		UInt32& cnt6 = _itemStat[career][pIdx][0];
-		if (cnt6 > 0) -- cnt6;
-        if(career != 0)
+
+        UInt8 attrCnt = attrId.size();
+        for(UInt8 idx = 0; idx < attrCnt; ++ idx)
         {
-            UInt32& cnt5 = _itemStat[0][pIdx][quality];
+            UInt32& cnt5 = _itemStat[career][pIdx][quality][attrId[idx]];
             if (cnt5 > 0) -- cnt5;
-            UInt32& cnt6 = _itemStat[0][pIdx][0];
+            UInt32& cnt6 = _itemStat[career][pIdx][0][attrId[idx]];
             if (cnt6 > 0) -- cnt6;
+            if(career != 0)
+            {
+                UInt32& cnt5 = _itemStat[0][pIdx][quality][attrId[idx]];
+                if (cnt5 > 0) -- cnt5;
+                UInt32& cnt6 = _itemStat[0][pIdx][0][attrId[idx]];
+                if (cnt6 > 0) -- cnt6;
+            }
         }
 	}
 }
@@ -212,7 +240,17 @@ void SaleMgr::sellSale(Player * player, SalePut * salePuts, UInt8 count)
 		saleSellRespDatas[i].id = sale->_id;
 		saleSellRespDatas[i].priceType = sale->_priceType;
 		saleSellRespDatas[i].price = sale->_price;
-		const std::string& itemName = sale->_item->getName();
+        std::string itemName;
+        ItemBase* item = sale->_item;
+        if(item->getClass() == Item_LBling || item->getClass() == Item_LBwu || item->getClass() == Item_LBxin)
+        {
+            ItemLingbao* lb = static_cast<ItemLingbao*>(item);
+            lbnameTmpl.getLBName(itemName, lb);
+        }
+        else
+        {
+            itemName = sale->_item->getName();
+        }
 		memcpy(saleSellRespDatas[i].itemName, itemName.c_str(), std::min(sizeof(saleSellRespDatas[i].itemName)-1, itemName.length()));
 		DB4().PushUpdateData("INSERT INTO `sale` VALUES (%u,  %"I64_FMT"u, %d, %u, %d, %u, %u, %u)", sale->_id, sale->_owner->getId(), sale->_status, sale->_time, sale->_priceType, sale->_price, sale->_item->getId(), sale->_item->Count());
         UInt8 idx = sale->_owner->getVipLevel();
@@ -355,7 +393,7 @@ void SaleMgr::cancelSale(Player * player, UInt32 id)
 	GLOBAL().PushMsg(hdr, &saleItemCancel);
 }
 
-void SaleMgr::requestSaleList(Player * player, UInt16 start, UInt16 count, std::string& name, UInt8 req, UInt8 color, UInt8 career, UInt8 eqType)
+void SaleMgr::requestSaleList(Player * player, UInt16 start, UInt16 count, std::string& name, UInt8 req, UInt8 color, UInt8 career, UInt8 attrId, UInt8 eqType)
 {
 	//搜索
 	if (!name.empty())
@@ -371,9 +409,11 @@ void SaleMgr::requestSaleList(Player * player, UInt16 start, UInt16 count, std::
 #endif
 		return;
 	}
-	if (req > 10 || career >= e_cls_max || color > 6 || eqType > 16)
+	if (req > MAX_SALE_REQ || career >= e_cls_max || color > 6 || eqType > 16)
 		return;
-	if (req == 10)
+    if(req != 10)
+        attrId = 0;
+	if (req == MAX_SALE_REQ)
 	{
 		searchPlayerSale(player, player, start, count);
 	}
@@ -382,14 +422,14 @@ void SaleMgr::requestSaleList(Player * player, UInt16 start, UInt16 count, std::
 		if (ReqCvt[req] != 0xFF)
 		{
 			//请求单个列表
-			if (req > 2 && req < 10)
+			if (req > 2 && req < MAX_SALE_REQ)
                 req = ReqCvt[req] + eqType;
             else if(req < 3)
                 req = ReqCvt[req];
             else
                 req = ReqCvt[0];
 
-			UInt16 sz = static_cast<UInt16>(saleRowStat(req, color, career));
+			UInt16 sz = static_cast<UInt16>(saleRowStat(req, color, career, attrId));
 			UInt16 end = start + count;
 			if (end > sz)
 				end = sz;
@@ -401,8 +441,8 @@ void SaleMgr::requestSaleList(Player * player, UInt16 start, UInt16 count, std::
 			UInt16 readCount = 0;
 			Stream st(REP::SALE_LIST);
 			st << start << static_cast<UInt16>(0) << sz;
-			if (shiftSingleSaleList(req, color, career, start, offset1, offset2))
-				readCount = appendSingleSaleList(player, st, req, career, color, count, offset1, offset2);
+			if (shiftSingleSaleList(req, color, career, attrId, start, offset1, offset2))
+				readCount = appendSingleSaleList(player, st, req, career, color, attrId, count, offset1, offset2);
 			st.data<UInt16>(6) = readCount;
 			st << Stream::eos;
 			player->send(st);
@@ -410,7 +450,7 @@ void SaleMgr::requestSaleList(Player * player, UInt16 start, UInt16 count, std::
 		else
 		{
 			//请求全部列表
-			UInt16 sz = static_cast<UInt16>(saleRowStat(0, color, career));
+			UInt16 sz = static_cast<UInt16>(saleRowStat(0, color, career, attrId));
 			UInt16 end = start + count;
 			if (end > sz)
 				end = sz;
@@ -423,8 +463,8 @@ void SaleMgr::requestSaleList(Player * player, UInt16 start, UInt16 count, std::
 			UInt16 readCount = 0;
 			Stream st(REP::SALE_LIST);
 			st << start << static_cast<UInt16>(0) << sz;
-			if (shiftTotalSaleList(color, career, start, type, filter1Offset, filter0Offset))
-				readCount = appendTotalSaleList(player, st, type, career, color, count, filter1Offset, filter0Offset);
+			if (shiftTotalSaleList(color, career, attrId, start, type, filter1Offset, filter0Offset))
+				readCount = appendTotalSaleList(player, st, type, career, color, attrId, count, filter1Offset, filter0Offset);
 			st.data<UInt16>(6) = readCount;
 			st << Stream::eos;
 			player->send(st);
@@ -432,7 +472,7 @@ void SaleMgr::requestSaleList(Player * player, UInt16 start, UInt16 count, std::
 	}
 }
 
-UInt16 SaleMgr::appendSingleSaleList(Player * player, Stream& st, UInt8 type, UInt8 career, UInt8 quality, UInt16 count, UInt16 offset1, UInt16 offset2)
+UInt16 SaleMgr::appendSingleSaleList(Player * player, Stream& st, UInt8 type, UInt8 career, UInt8 quality, UInt8 attrId, UInt16 count, UInt16 offset1, UInt16 offset2)
 {
 	UInt16 readCount = 0;
 	SaleRowType::iterator offsetIter1 = _saleRow[type].begin();
@@ -448,9 +488,11 @@ UInt16 SaleMgr::appendSingleSaleList(Player * player, Stream& st, UInt8 type, UI
 				SaleData * sale = sales[offsetIter2];
 				if (sale == NULL)
 					continue;
-				if (quality != 0 && sale->_item->getQuality() != quality)
+                if (quality != 0 && !isQuality(sale->_item, quality))
 					continue;
                 if(career != 0 && sale->_item->GetCareer() != career)
+                    continue;
+                if(attrId != 0 && !hasAttrId(sale->_item, attrId))
                     continue;
 
 				st << sale->_id;
@@ -477,12 +519,12 @@ UInt16 SaleMgr::appendSingleSaleList(Player * player, Stream& st, UInt8 type, UI
 }
 
 
-UInt16 SaleMgr::appendTotalSaleList(Player * player, Stream& st, UInt8 type, UInt8 career, UInt8 quality, UInt16 count, UInt16 filter1Offset, UInt16 filter0Offset)
+UInt16 SaleMgr::appendTotalSaleList(Player * player, Stream& st, UInt8 type, UInt8 career, UInt8 quality, UInt8 attrId, UInt16 count, UInt16 filter1Offset, UInt16 filter0Offset)
 {
 	UInt16 readCount = 0;
-	for (; type <= 9; ++type)
+	for (; type < MAX_SALE_REQ; ++type)
 	{
-		readCount += appendSingleSaleList(player, st, ReqCvt[type], career, quality, count-readCount, filter1Offset, filter0Offset);
+		readCount += appendSingleSaleList(player, st, ReqCvt[type], career, quality, attrId, count-readCount, filter1Offset, filter0Offset);
 		if (readCount >= count)
 			break;
 		filter1Offset = filter0Offset = 0;
@@ -490,128 +532,71 @@ UInt16 SaleMgr::appendTotalSaleList(Player * player, Stream& st, UInt8 type, UIn
 	return readCount;
 }
 
-bool SaleMgr::shiftSingleSaleList(UInt8 type, UInt8 quality, UInt8 career, UInt16 start, UInt16& offset1, UInt16& offset2)
+bool SaleMgr::shiftSingleSaleList(UInt8 type, UInt8 quality, UInt8 career, UInt8 attrId, UInt16 start, UInt16& offset1, UInt16& offset2)
 {
-	if (start >= _itemStat[career][type][quality])
+	if (start >= _itemStat[career][type][quality][attrId])
 		return false;
 	UInt16 first = 0, second = 0;
 	UInt16 count = 0;
 	offset1 = offset2 = 0;
 	SaleRowType::iterator it = _saleRow[type].begin();
-	for (; it != _saleRow[type].end(); ++ it, ++ offset1)
-	{
-		std::vector<SaleData *>& sales = it->second;
-		if (sales.empty())
-			continue;
-        if (quality != 0 && career != 0)
+    if(quality == 0 && career == 0 && attrId == 0)
+    {
+        for (; it != _saleRow[type].end(); ++ it, ++ offset1)
         {
-			// 指定颜色,职业
-			for (offset2 = 0; offset2 < sales.size(); ++ offset2)
-			{
-                if (sales[offset2]->_item->getQuality() == quality && sales[offset2]->_item->GetCareer() == career)
-				{
-					++ count;
-					if (count > start)
-						return true;
-				}
-			}
+            std::vector<SaleData *>& sales = it->second;
+            if (sales.empty())
+                continue;
+            second += sales.size();
+            if (start >= first && start < second)
+            {
+                offset2 = start - first;
+                return true;
+            }
+            else
+            {
+                first += sales.size();
+            }
         }
-        else if (quality != 0)
-		{
-			// 指定颜色
-			for (offset2 = 0; offset2 < sales.size(); ++ offset2)
-			{
-				if (sales[offset2]->_item->getQuality() == quality)
-				{
-					++ count;
-					if (count > start)
-						return true;
-				}
-			}
-		}
-        else if(career != 0)
+    }
+    else
+    {
+        for (; it != _saleRow[type].end(); ++ it, ++ offset1)
         {
-			// 指定职业
-			for (offset2 = 0; offset2 < sales.size(); ++ offset2)
-			{
-                if (sales[offset2]->_item->GetCareer() == career)
-				{
-					++ count;
-					if (count > start)
-						return true;
-				}
-			}
+            std::vector<SaleData *>& sales = it->second;
+            if (sales.empty())
+                continue;
+            for (offset2 = 0; offset2 < sales.size(); ++ offset2)
+            {
+                if (quality != 0 && !isQuality(sales[offset2]->_item, quality))
+                    continue;
+                if(career != 0 && sales[offset2]->_item->GetCareer() != career)
+                    continue;
+                if(attrId != 0 && !hasAttrId(sales[offset2]->_item, attrId))
+                    continue;
+                ++ count;
+                if (count > start)
+                    return true;
+            }
         }
-		else
-		{
-			//任何颜色,职业
-			second += sales.size();
-			if (start >= first && start < second)
-			{
-				offset2 = start - first;
-				return true;
-			}
-			else
-				first += sales.size();
-		}
 	}
 	return false;
 }
 
 
-bool SaleMgr::shiftSingleSaleList2(UInt8 type, UInt8 quality, UInt8 career, UInt16& offset, UInt16& offset1, UInt16& offset2)
+bool SaleMgr::shiftSingleSaleList2(UInt8 type, UInt8 quality, UInt8 career, UInt8 attrId, UInt16& offset, UInt16& offset1, UInt16& offset2)
 {
 	UInt16 first = 0, second = 0;
 	UInt16 count = 0;
 	offset1 = offset2 = 0;
 	SaleRowType::iterator it = _saleRow[type].begin();
-	for (; it != _saleRow[type].end(); ++ it, ++ offset1)
-	{
-		std::vector<SaleData *>& sales = it->second;
-		if (sales.empty())
-			continue;
-        if(quality != 0 && career != 0)
+    if(quality == 0 && career == 0 && attrId == 0)
+    {
+        for (; it != _saleRow[type].end(); ++ it, ++ offset1)
         {
-			//指定颜色,职业
-			for (offset2 = 0; offset2 < sales.size(); ++ offset2)
-			{
-                if (sales[offset2]->_item->getQuality() == quality && sales[offset2]->_item->GetCareer() == career)
-                {
-                    ++ count;
-                    if (count > offset)
-                        return true;
-                }
-			}
-		}
-        else if(quality != 0)
-        {
-			//指定颜色
-			for (offset2 = 0; offset2 < sales.size(); ++ offset2)
-			{
-                if (sales[offset2]->_item->getQuality() == quality)
-                {
-                    ++ count;
-                    if (count > offset)
-                        return true;
-                }
-			}
-        }
-        else if(career != 0)
-        {
-			//指定职业
-			for (offset2 = 0; offset2 < sales.size(); ++ offset2)
-			{
-                if (sales[offset2]->_item->GetCareer() == career)
-                {
-                    ++ count;
-                    if (count > offset)
-                        return true;
-                }
-			}
-        }
-		else
-		{
-			//任何颜色,职业
+            std::vector<SaleData *>& sales = it->second;
+            if (sales.empty())
+                continue;
 			second += sales.size();
 			if (offset >= first && offset < second)
 			{
@@ -619,23 +604,47 @@ bool SaleMgr::shiftSingleSaleList2(UInt8 type, UInt8 quality, UInt8 career, UInt
 				return true;
 			}
 			else
+            {
 				first += sales.size();
-		}
-	}
-	if (quality != 0)
-		offset = offset - count;
-	else
+            }
+        }
 		offset = offset - first;
+    }
+    else
+    {
+        for (; it != _saleRow[type].end(); ++ it, ++ offset1)
+        {
+            std::vector<SaleData *>& sales = it->second;
+            if (sales.empty())
+                continue;
+			//指定颜色,职业
+			for (offset2 = 0; offset2 < sales.size(); ++ offset2)
+			{
+                if (quality != 0 && !isQuality(sales[offset2]->_item, quality))
+                    continue;
+                if(career != 0 && sales[offset2]->_item->GetCareer() != career)
+                    continue;
+                if(!hasAttrId(sales[offset2]->_item, attrId))
+                    continue;
+                ++ count;
+                if (count > offset)
+                    return true;
+			}
+		}
+
+		offset = offset - count;
+	}
+
 	return false;
 }
 
-bool SaleMgr::shiftTotalSaleList(UInt8 quality, UInt8 career, UInt16 offset, UInt8& type, UInt16& filter1Offset, UInt16& filter0Offset)
+bool SaleMgr::shiftTotalSaleList(UInt8 quality, UInt8 career, UInt8 attrId, UInt16 offset, UInt8& type, UInt16& filter1Offset, UInt16& filter0Offset)
 {
-	if (offset > _itemStat[career][0][quality])
+	if (offset > _itemStat[career][0][quality][attrId])
 		return false;
-	for (type = 1; type <= 9; ++type)
+	for (type = 1; type < MAX_SALE_REQ; ++type)
 	{
-		if (shiftSingleSaleList2(ReqCvt[type], quality, career, offset, filter1Offset, filter0Offset))
+		if (shiftSingleSaleList2(ReqCvt[type], quality, career, attrId, offset, filter1Offset, filter0Offset))
 			return true;
 	}
 	return false;
@@ -837,9 +846,10 @@ UInt8 SaleMgr::StatIndex(UInt8 type, UInt32 typeId, UInt8& parent)
     // 闪避45 暴击46 破击47 身法48 坚韧49 法抗50
     // 魂51 52攻击 53防御 54暴击 55破击 56身法 57坚韧 58毁灭 59生命
     // 元神60 61元神技能 62元神
+    // 灵宝63 64灵 65悟 66信
     //                     0   1   2   3   4   5   6   7   8   9
     static UInt8 cvt[] = { 1,  4,  5,  6,  7,  8,  9,  10, 11, 1, // 0
-                           16, 16, 20, 1,  1,  1,  1,  1,  1,  1, // 1
+                           16, 16, 20, 64, 65, 66, 1,  1,  1,  1, // 1
                            1,  1,  1,  1,  1,  1,  1,  1,  1,  19,// 2
                            21, 21, 21, 21, 21, 21, 21, 21, 21, 21,// 3
                            12, 12, 12, 12, 12, 12, 12, 12, 12, 12,// 4
@@ -872,6 +882,10 @@ UInt8 SaleMgr::StatIndex(UInt8 type, UInt32 typeId, UInt8& parent)
     else if(res > 60 && res < 63)
     {
         parent = 60;
+    }
+    else if(res > 63 && res < 67)
+    { 
+        parent = 63;
     }
 
     switch(res)
@@ -937,7 +951,7 @@ UInt8 SaleMgr::Index(UInt8 type, UInt32 typeId)
 {
     UInt8 parent = 0;
     UInt8 stIdx = StatIndex(type, typeId, parent);
-    if(stIdx > 62)
+    if(stIdx > MAX_TYPE_IDX)
     {
         stIdx = 1;
         parent = 1;
@@ -945,5 +959,62 @@ UInt8 SaleMgr::Index(UInt8 type, UInt32 typeId)
 
     return stIdx;
 }
+
+void SaleMgr::getLBColor_AttrId(ItemBase* item, UInt8& quality, std::vector<UInt8>& attrId)
+{
+    attrId.push_back(0);
+	UInt8 subClass = item->getClass();
+    if(subClass == Item_LBling || subClass == Item_LBwu || subClass == Item_LBxin)
+    {
+        ItemLingbao* lb = static_cast<ItemLingbao*>(item);
+        if(lb && lb->isTongling())
+        {
+            ItemLingbaoAttr& lba = lb->getLingbaoAttr();
+            quality = lba.lbColor;
+            for(int i = 0; i < 4; ++ i)
+            {
+                if(lba.type[i] == 0)
+                    continue;
+                attrId.push_back(lba.type[i]);
+            }
+        }
+    }
+}
+
+bool SaleMgr::hasAttrId(ItemBase* item, UInt8 attrId)
+{
+	UInt8 subClass = item->getClass();
+    if(subClass == Item_LBling || subClass == Item_LBwu || subClass == Item_LBxin)
+    {
+        ItemLingbao* lb = static_cast<ItemLingbao*>(item);
+        if(lb && lb->isTongling())
+        {
+            ItemLingbaoAttr& lba = lb->getLingbaoAttr();
+            for(int i = 0; i < 4; ++ i)
+            {
+                if(lba.type[i] == attrId)
+                    return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+bool SaleMgr::isQuality(ItemBase* item, UInt8 quality)
+{
+	UInt8 subClass = item->getClass();
+    if(subClass == Item_LBling || subClass == Item_LBwu || subClass == Item_LBxin)
+    {
+        ItemLingbao* lb = static_cast<ItemLingbao*>(item);
+        if(lb)
+        {
+            ItemLingbaoAttr& lba = lb->getLingbaoAttr();
+            return (quality == lba.lbColor);
+        }
+    }
+    return (item->getQuality() == quality);
+}
+
 
 }

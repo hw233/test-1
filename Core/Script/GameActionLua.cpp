@@ -146,6 +146,8 @@ namespace Script
         lua_tinker::def(_L, "get9215Act", GObject::World::get9215Act);
         lua_tinker::def(_L, "getSnowAct", GObject::World::getSnowAct);
 		lua_tinker::def(_L, "getCompassAct", GObject::World::getCompassAct);
+		lua_tinker::def(_L, "getItem9344Act", GObject::World::getItem9344Act);
+		lua_tinker::def(_L, "getItem9343Act", GObject::World::getItem9343Act);
 
         CLASS_DEF(GameActionLua, Print);
         lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);
@@ -286,6 +288,7 @@ namespace Script
         CLASS_DEF(Player, addFighterFromItem);
         CLASS_DEF(Player, hasFighter);
         CLASS_DEF(Player, fighterFromItem);
+        CLASS_DEF(Player, appendCompassItem);
 
         CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);
@@ -1224,7 +1227,7 @@ namespace Script
     {
         return Call<bool>(  "onRC7DayWill", pl, idx);
     }
-    UInt32 GameActionLua::onUseMDSoul(Player* pl, UInt8 type)
+    UInt32 GameActionLua::onUseMDSoul(Player* pl, UInt8 type )
     {
         return Call<UInt32>(  "onUseMDSoul", pl, type);
     }
@@ -1480,9 +1483,9 @@ namespace Script
         return Call<UInt32>("foundCave", id);
     }
 
-    lua_tinker::table GameActionLua::getStepAward(UInt32 step)
+    UInt32 GameActionLua::getStepAward(UInt8 progress, UInt32 step)
     {
-        return Call<lua_tinker::table>("getStepAward", step);
+        return Call<UInt32>("getStepAward", progress, step);
     }
     
     UInt16 GameActionLua::getSpecialItem(UInt8 id, UInt8 index)
@@ -1495,9 +1498,14 @@ namespace Script
         return Call<lua_tinker::table>("getCopyFrontmapAward", step, localtion);
     }
 
-    lua_tinker::table GameActionLua::getDreamerTreasure(UInt8 id, UInt8 index)
+    UInt32 GameActionLua::getDreamerTreasure(UInt8 id)
     {
-        return Call<lua_tinker::table>("getDreamerTreasure", id, index);
+        return Call<UInt32>("getDreamerTreasure", id);
+    }
+ 
+    UInt32 GameActionLua::getDreamerItem(UInt8 id, UInt8 index)
+    {
+        return Call<UInt32>("getDreamerItem", id, index);
     }
 
     Table GameActionLua::getDragonKingAward(UInt8 step)
@@ -1532,5 +1540,20 @@ namespace Script
 		return Call<Table>("getSaveGoldActExtraAward", gold);
 	}
 
+    bool GameActionLua::onGetNewYearGiveGiftAward(Player* player, UInt8 dayOrder, UInt8 times)
+    {
+		assert(player != NULL);
+		return Call<bool>("onGetNewYearGiveGiftAward", player, dayOrder, times);
+    }
+
+	bool GameActionLua::onGetNewYearQQGameAward( Player* player, UInt8 type)
+	{
+		return Call<bool>("onGetNewYearQQGameAward", player, type);
+    }
+
+	bool GameActionLua::onGetNewYearQzoneContinueAward( Player* player, UInt8 type)
+	{
+		return Call<bool>("onGetNewYearQzoneContinueAward", player, type);
+    }
 }
 

@@ -30,7 +30,7 @@ struct SaleSellRespData
 	UInt32 id;
 	UInt8 priceType;
 	UInt32 price;
-	char itemName[22];
+	char itemName[32];
 
 	SaleSellRespData()
 	{
@@ -145,6 +145,7 @@ public:
 
 	void makeMailInfo(UInt32 id, Stream& st, UInt16& num);
 
+    void cancleAllItem();
 public:
 	inline bool hasAccessSaleItem(UInt32 id)
 	{

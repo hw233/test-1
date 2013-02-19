@@ -50,6 +50,7 @@
 #ifndef _VT
 #ifndef _WIN32
 #include "DCLogger.h"
+#include "OpenAPIWorker.h"
 #endif
 #endif
 #endif
@@ -76,6 +77,7 @@
 #include "RechargeTmpl.h"
 #include "GData/ExpTable.h"
 #include "Version.h"
+
 
 #define NTD_ONLINE_TIME (4*60*60)
 #ifndef _DEBUG
@@ -549,6 +551,28 @@ namespace GObject
 		return count == 0;
     }
 
+    bool EventAutoRefreshOpenKey::Equal(UInt32 id, size_t playerid) const
+    {
+        return playerid == m_Player->getId();
+    }
+
+    void EventAutoRefreshOpenKey::Process(UInt32 leftCount)
+    {
+        OPENAPI().Push(m_Player->getId(), 0, m_Player->getOpenId(), m_Player->getOpenKey(), m_Player->getSource().c_str(), m_Player->getClientIp());
+    }
+
+    bool EventAutoRefreshOpenKey::Accelerate(UInt32 times)
+    {
+		UInt32 count = m_Timer.GetLeftTimes();
+		if(times > count)
+		{
+			times = count;
+		}
+		count -= times;
+		m_Timer.SetLeftTimes(count);
+		return count == 0;
+    }
+
 	void Lineup::updateId()
 	{
 		if(fighter != NULL) fid = fighter->getId(); else fid = 0;
@@ -908,6 +932,7 @@ namespace GObject
             }
 		}
 
+        calcNewYearQzoneContinueDay(curtime);
         continuousLogin(curtime);
         continuousLoginRF(curtime);
         sendYearRPInfo();
@@ -1157,9 +1182,20 @@ namespace GObject
 #ifndef _VT
         dclogger.login(this);
         dclogger.login_sec(this);
+
+        EventAutoRefreshOpenKey* event = new(std::nothrow) EventAutoRefreshOpenKey(this, 60 * 110, 24);
+        if (event)
+            PushTimerEvent(event);
+            
+
+        OPENAPI().Push(getId(), 0, getOpenId(), getOpenKey(), getSource().c_str(), getClientIp());
+        
 #endif
 #endif
 #endif // _WIN32
+#ifdef DREAMER_DEBUG
+        getDreamer();
+#endif
 	}
 
 #define WEBDOWNLOAD 255
@@ -1589,6 +1625,14 @@ namespace GObject
             snprintf (action, 64, "F_%d_%d", id, 10);
             udpLog("transform", action, "", "", "", "", "act", money4);
         }
+    }
+
+    void Player::dreamerUdpLog(UInt32 id, UInt32 type, UInt32 num /* = 1 */)
+    {
+        // 水晶梦境udp日志
+        char action[32] = "";
+        snprintf (action, 32, "F_%d_%d", id, type);
+        udpLog("dream", action, "", "", "", "", "act", num);
     }
 
     void Player::sendHalloweenOnlineAward(UInt32 now, bool _online)
@@ -2076,6 +2120,9 @@ namespace GObject
             LoginMsgHdr hdr1(0x301, WORKER_THREAD_LOGIN, 0, this->GetSessionID(), sizeof(crackValue));
             GLOBAL().PushMsg(hdr1, &crackValue);
         }
+        GObject::EventBase * ev = GObject::eventWrapper.RemoveTimerEvent(this, EVENT_REFRESHOPENKEY, getId());
+        if (ev)
+            ev->release();
 	}
 
 	void Player::checkLastBattled()
@@ -2745,6 +2792,7 @@ namespace GObject
 
 			_fighters.erase(it);
 			DB2().PushUpdateData("DELETE FROM `fighter` WHERE `id` = %u AND `playerId` = %"I64_FMT"u", id, getId());
+			DB2().PushUpdateData("DELETE FROM `second_soul` WHERE `fighterId` = %u AND `playerId` = %"I64_FMT"u", id, getId());
 
             if(fgt->getColor() >= 2) //删除散仙荣誉
                 GameAction()->doAttainment(this, 10107, fgt->getColor());
@@ -7362,7 +7410,40 @@ namespace GObject
 
         AddVar(VAR_FIRST_RECHARGE_VALUE, r);
         sendFirstRecharge();
-	}
+
+        bool flag = false;
+
+        UInt32 now = TimeUtil::Now();
+        if ((GVAR.GetVar(GVAR_DISCOUNT_TYPE1) == 2)
+                && GVAR.GetVar(GVAR_DISCOUNT_BEGIN1) < now
+                && GVAR.GetVar(GVAR_DISCOUNT_END1) > now)
+        {
+            AddVar(VAR_DISCOUNT_RECHARGE1, r);
+            flag = true;
+        }
+        else
+            SetVar(VAR_DISCOUNT_RECHARGE1, 0);
+        if ((GVAR.GetVar(GVAR_DISCOUNT_TYPE2) == 2)
+                && GVAR.GetVar(GVAR_DISCOUNT_BEGIN2) < now
+                && GVAR.GetVar(GVAR_DISCOUNT_END2) > now)
+        {
+            AddVar(VAR_DISCOUNT_RECHARGE2, r);
+            flag = true;
+        }
+        else
+            SetVar(VAR_DISCOUNT_RECHARGE2, 0);
+        if ((GVAR.GetVar(GVAR_DISCOUNT_TYPE3) == 2)
+                && GVAR.GetVar(GVAR_DISCOUNT_BEGIN3) < now
+                && GVAR.GetVar(GVAR_DISCOUNT_END3) > now)
+        {
+            AddVar(VAR_DISCOUNT_RECHARGE3, r);
+            flag = true;
+        }
+        else
+            SetVar(VAR_DISCOUNT_RECHARGE3, 0);
+        if (flag)
+            sendDiscountLimit();
+    }
 
     void Player::addRechargeNextRet(UInt32 r)
     {
@@ -8870,7 +8951,7 @@ namespace GObject
 		Stream st(REP::ATTACK_NPC);
 		bool isWin = bsim.getWinner() == 1;
 		UInt8 sz = 0;
-		GData::LootResult lt = {0, 0};
+		GData::LootResult lt;
 		UInt16 couponCount = 0;
 		if(isWin)
 		{
@@ -10899,7 +10980,9 @@ namespace GObject
             if(0 == (itemId = GameAction()->RunHappyAward(this, opt)))
                 return;
 
-            GData::LootResult lt = {itemId, 1};
+            GData::LootResult lt;
+            lt.id = itemId;
+            lt.count = 1;
             _lastLoot.push_back(lt);
             SetVar(VAR_JUNE_HAPPY, happy - 20);
         }
@@ -10969,25 +11052,33 @@ namespace GObject
 
     void Player::lastLootPush(UInt16 itemId, UInt16 num)
     {
-        GData::LootResult lt = {itemId, num};
+        GData::LootResult lt;
+        lt.id = itemId;
+        lt.count = num;
         _lastLoot.push_back(lt);
     }
 
     void Player::RegisterAward(UInt16 itemId, UInt16 num)
     {
-        GData::LootResult lt = {itemId, num};
+        GData::LootResult lt;
+        lt.id = itemId;
+        lt.count = num;
         _RegisterAward.push_back(lt);
     }
 
     void Player::BirthdayAward(UInt16 itemId, UInt16 num)
     {
-        GData::LootResult lt = {itemId, num};
+        GData::LootResult lt;
+        lt.id = itemId;
+        lt.count = num;
         _BirthdayAward.push_back(lt);
     }
 
     void Player::lastQueqiaoAwardPush(UInt16 itemId, UInt16 num)
     {
-        GData::LootResult lt = {itemId, num};
+        GData::LootResult lt;
+        lt.id = itemId;
+        lt.count = num;
         _lastQueqiaoAward.push_back(lt);
     }
 
@@ -11209,13 +11300,17 @@ namespace GObject
 
     void Player::lastKillMonsterAwardPush(UInt16 itemId, UInt16 num)
     {
-        GData::LootResult lt = {itemId, num};
+        GData::LootResult lt;
+        lt.id = itemId;
+        lt.count = num;
         _lastKillMonsterAward.push_back(lt);
     }
 
     void Player::lastExJobAwardPush(UInt16 itemId, UInt16 num)
     {
-        GData::LootResult lt = {itemId, num};
+        GData::LootResult lt;
+        lt.id = itemId;
+        lt.count = num;
         _lastExJobAward.push_back(lt);
     }
 
@@ -11229,9 +11324,29 @@ namespace GObject
         _lastExJobAward.clear();
     }
 
+    void Player::lastExJobStepAwardPush(UInt16 itemId, UInt16 num)
+    {
+        GData::LootResult lt;
+        lt.id = itemId;
+        lt.count = num;
+        _lastExJobStepAward.push_back(lt);
+    }
+
+    void Player::checkLastExJobStepAward()
+    {
+        std::vector<GData::LootResult>::iterator it;
+        for(it = _lastExJobStepAward.begin(); it != _lastExJobStepAward.end(); ++ it)
+        {
+            m_Package->ItemNotify(it->id, it->count);
+        }
+        _lastExJobStepAward.clear();
+    }
+
     void Player::lastNew7DayTargetAwardPush(UInt16 itemId, UInt16 num)
     {
-        GData::LootResult lt = {itemId, num};
+        GData::LootResult lt;
+        lt.id = itemId;
+        lt.count = num;
         _lastNew7DayTargetAward.push_back(lt);
     }
 
@@ -12384,97 +12499,130 @@ namespace GObject
     {
         // 发送给客户端的有关限购的相关数据
         Stream st(REP::STORE_DISLIMIT);
-        for (UInt8 i = 4; i < 7; ++i)
+        for (UInt8 type = 4; type < 7; ++type)
         {
             // 发送活动限购三栏的种类，时间和剩余数量
-            UInt8 type = i;
-            UInt32 max = 0;
-            UInt32 used = 0;
-            UInt32 time = 0;
-            UInt32 now = TimeUtil::Now();
-
-            // 如果活动限购已经结束或已经购买完毕，则发送时间和数量为0的
-            max = GData::store.getDiscountLimit(type);
+            UInt32 max = GData::store.getDiscountLimit(type);
             UInt8 offset = GData::store.getDisTypeVarOffset(type);
-            used = GetVar(GObject::VAR_DISCOUNT_1+offset);
+            UInt32 used = GetVar(GObject::VAR_DISCOUNT_1+offset);
 
-            if (offset == 0xfe)
-            {
-                // TODO: 全服限购的数量获取
-            }
             if (offset == 0xff)
             {
-                st << static_cast<UInt8>(0)
-                    << static_cast<UInt32>(0)
-                    << static_cast<UInt32>(0);
-                break;
+                st << static_cast<UInt8>(type);
+                st << static_cast<UInt8>(0);
+                st << static_cast<UInt32>(0);
+                st << static_cast<UInt32>(0);
+                st << static_cast<UInt32>(0);
+                continue;
             }
 
-            if (used >= max)
-            {
-                used = max;
-                SetVar(GObject::VAR_DISCOUNT_1+offset, used);
-            }
 
-            time = GetVar(GObject::VAR_DISCOUNT_SP_1_TIME + type - 4);
+            UInt32 time = GetVar(GObject::VAR_DISCOUNT_SP_1_TIME + type - 4);
+            UInt32 now  = TimeUtil::Now();
             if (time < now)
             {
+                // 还没购买过该限购
                 SetVar(GObject::VAR_DISCOUNT_1+offset, 0);
                 time = GData::store.getEndTimeByDiscountType(type);
                 SetVar(GObject::VAR_DISCOUNT_SP_1_TIME + type - 4, time);
                 used = 0;
             }
 
+            if (used >= max)
+            {
+                // 购买已经超过限购次数
+                used = max;
+                SetVar(GObject::VAR_DISCOUNT_1+offset, used);
+            }
 
-            UInt32 count = max - used;
+            UInt32 count = 0; // 限购剩余的购买次数
 
-
+            // 检查开始限购开始时间
             time = GData::store.getBeginTimeByDiscountType(type);
             if (time > now)
             {
                 // 活动限购还未开始
-                time = 0;
-                count = 0;
                 SetVar(GObject::VAR_DISCOUNT_SP_1_TIME + type - 4, 0);
-            }
-            else
-            {
-                time = GData::store.getEndTimeByDiscountType(type);
-                if (time < now)
-                {
-                    // 活动限购已经结束
-                    time = 0;
-                    count = 0;
-                    SetVar(GObject::VAR_DISCOUNT_SP_1_TIME + type - 4, 0);
-                }
-                else
-                    time -= now;
+                st << static_cast<UInt8>(type);
+                st << static_cast<UInt8>(0);
+                st << static_cast<UInt32>(0);
+                st << static_cast<UInt32>(0);
+                st << static_cast<UInt32>(0);
+                continue;
             }
 
-            st << static_cast<UInt8>(type)
-                << static_cast<UInt32>(time)
-                << static_cast<UInt32>(count);
+            // 检查结束时间
+            time = GData::store.getEndTimeByDiscountType(type);
+            if (time < now)
+            {
+                // 活动限购已经结束
+                SetVar(GObject::VAR_DISCOUNT_SP_1_TIME + type - 4, 0);
+                st << static_cast<UInt8>(type);
+                st << static_cast<UInt8>(0);
+                st << static_cast<UInt32>(0);
+                st << static_cast<UInt32>(0);
+                st << static_cast<UInt32>(0);
+                continue;
+            }
+
+            UInt8 exType = 0;
+            UInt32 exValue = 0;
+
+            exType = GData::store.getExDiscount(type, exValue);
+            UInt32 goldVal = 0;
+            switch(exType)
+            {
+                case 1:
+                    if (GetVar(VAR_DISCOUNT_EX1_TIME + type - 4) < now)
+                    {
+                        SetVar(VAR_DISCOUNT_EX1_TIME + type - 4, time);
+                        SetVar(VAR_DISCOUNT_CONSUME1 + type - 4, 0);
+                    }
+                    goldVal = GetVar(VAR_DISCOUNT_CONSUME1 + type - 4);
+                    break;
+                case 2:
+                    if (GetVar(VAR_DISCOUNT_EX1_TIME + type - 4) < now)
+                    {
+                        SetVar(VAR_DISCOUNT_EX1_TIME + type - 4, time);
+                        SetVar(VAR_DISCOUNT_RECHARGE1 + type - 4, 0);
+                    }
+                    goldVal = GetVar(VAR_DISCOUNT_RECHARGE1 + type - 4);
+                    break;
+                default:
+                    break;
+            }
+
+            if (exValue && exValue >= goldVal)
+                goldVal = exValue - goldVal;
+            else
+                goldVal = 0;
+
+            time -= now;    // 正在限购活动中, 计算剩余时间
+            count = max - used;
+
+            st << static_cast<UInt8>(type);
+            st << static_cast<UInt8>(exType);
+            st << static_cast<UInt32>(goldVal);
+            st << static_cast<UInt32>(time); // 限购剩余时间 （0表示没有限购或者还未开始）
+            st << static_cast<UInt32>(count);
         }
         st << Stream::eos;
         send(st);
 
         // 再发送一个完整的三五八折协议
         Stream st2(REP::STORE_DISLIMIT);
-        for (UInt8 i = 7; i < 10; ++i)
+        for (UInt8 type = 7; type < 10; ++type)
         {
-            UInt8 type = i;
             UInt8 offset = GData::store.getDisTypeVarOffset(type);
             UInt32 max = GData::store.getDiscountLimit(type);
-            if (offset == 0xfe)
-            {
-                // TODO: 全服限购的数量获取
-            }
             if (offset == 0xff)
             {
-                st2 << static_cast<UInt8>(0)
-                    << static_cast<UInt32>(0)
-                    << static_cast<UInt32>(0);
-                break;
+                st2 << static_cast<UInt8>(type);
+                st2 << static_cast<UInt8>(0);
+                st2 << static_cast<UInt32>(0);
+                st2 << static_cast<UInt32>(0);
+                st2 << static_cast<UInt32>(0);
+                continue;
             }
             UInt32 used = GetVar(GObject::VAR_DISCOUNT_1+offset);
             if (used >= max)
@@ -12491,9 +12639,11 @@ namespace GObject
             else
                 time -= now;
 
-            st2 << static_cast<UInt8>(type)
-                << static_cast<UInt32>(time)
-                << static_cast<UInt32>(count);
+            st2 << static_cast<UInt8>(type);
+            st2 << static_cast<UInt8>(0);
+            st2 << static_cast<UInt32>(0);
+            st2 << static_cast<UInt32>(time);
+            st2 << static_cast<UInt32>(count);
         }
         st2 << Stream::eos;
         send(st2);
@@ -13088,7 +13238,7 @@ namespace GObject
 
         UInt8 type = 0;
         UInt32 subsoul = 0;
-/*        if (soul >= 100)
+        /*if (soul >= 100)
         {
             type = 1;
             subsoul = 100;
@@ -13099,7 +13249,7 @@ namespace GObject
             subsoul = 20;
         }
         else if (soul >= 10)
-*/
+        */
         {
             type = 3;
             subsoul = 10;
@@ -13110,7 +13260,6 @@ namespace GObject
         if (!type)
             return;
         if (GetPackage()->IsFull())
-
         {
             sendMsgCode(0, 1011);
             return;
@@ -13122,12 +13271,12 @@ namespace GObject
 
         sendMDSoul(1, _mditem);
 
-        GetPackage()->AddItem(_mditem, 1, true, true);
         char str[64] = {0};
         sprintf(str, "F_10000_0118_%d", _mditem);
         udpLog("huodong", str, "", "", "", "", "act");
 
         soul -= subsoul;
+        _mditem = 0;
         SetVar(VAR_MDSOUL, soul);
     }
 
@@ -13136,13 +13285,14 @@ namespace GObject
         if (!World::getMayDay() && !World::getCompassAct())
             return;
 
-        UInt32 soul = GetVar(VAR_MDSOUL);
+/*        UInt32 soul = GetVar(VAR_MDSOUL);
         if (!soul)
             return;
 
         UInt8 type = 0;
         UInt32 subsoul = 0;
-/*        if (soul >= 100)
+        if (soul >= 100)
+        if (soul >= 100)
         {
             type = 1;
             subsoul = 100;
@@ -13153,7 +13303,7 @@ namespace GObject
             subsoul = 20;
         }
         else if (soul >= 10)
-  */
+  
         {
             type = 3;
             subsoul = 10;
@@ -13166,11 +13316,14 @@ namespace GObject
 
         if (!_mditem)
             return;
- 
-	    m_Package->ItemNotify(_mditem, 1);
- 
+*/
+        for(std::vector<MDItem>::iterator it=_mditemVec.begin(); it != _mditemVec.end(); ++it)
+        {
+	        m_Package->ItemNotify(it->id, it->count);
+        }
         sendMDSoul(0);
-        _mditem = 0;
+        _mditemVec.clear();
+    //    _mditem = 0;
     }
 
     void Player::svrSt(UInt8 type)
@@ -13652,6 +13805,7 @@ namespace GObject
                 fgt->getAllUpSkillAndLevel(st);
                 fgt->getAllPSkillAndLevel4Arena(st);
                 fgt->getAllSSAndLevel(st);
+                fgt->getAllLbSkills(st);
 
                 fgt->getAttrExtraEquip(st);
 
@@ -14441,6 +14595,18 @@ namespace GObject
        _jobHunter->SendAutoInfo();
    }
 
+   void Player::setDreamer(UInt8 progress, UInt8 level, UInt8 maxX, UInt8 maxY, UInt8 maxGrid,
+           const std::string& mapInfo, UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY,
+           UInt8 timeConsume, UInt8 remainTime, UInt8 keysCount, 
+           UInt8 eyesCount, UInt8 eyeTime, UInt8 eyeX, UInt8 eyeY)
+   {
+       if (_dreamer)
+           return;
+       _dreamer = new Dreamer(this, progress, level, maxX, maxY, maxGrid, mapInfo,
+               posX, posY, earlyPosX, earlyPosY, timeConsume, remainTime, keysCount, 
+               eyesCount, eyeTime, eyeX, eyeY);
+   }
+
 
 EventTlzAuto::EventTlzAuto( Player * player, UInt32 interval, UInt32 count)
 	: EventBase(player, interval, count)
@@ -14760,9 +14926,9 @@ void EventTlzAuto::notify(bool isBeginAuto)
             m_snow.score += score;
             AddPExp(99*num);
 
-//            sendSnowScoreAward();
-//            if (m_snow.bind && m_snow.lover != NULL)
-//                m_snow.lover->sendSnowScoreAward();
+            //sendSnowScoreAward();
+            //if (m_snow.bind && m_snow.lover != NULL)
+            //    m_snow.lover->sendSnowScoreAward();
             if (oldScore < 300 && m_snow.score >= 300)
             {
                 SYSMSG(title, 4112);
@@ -14784,6 +14950,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
         }
         return 1;
     }
+
     void Player::sendSnowScoreAward()
     {
         static  MailPackage::MailItem s_item[][3] = {
@@ -14797,8 +14964,8 @@ void EventTlzAuto::notify(bool isBeginAuto)
         static int s_itemCount[]= {1,2,2,2,3,3};
         static UInt32 s_score[] = {300, 900, 1800, 3000, 5100, 9900};
         UInt32 score = m_snow.score;
-  //      if (NULL != m_snow.lover && m_snow.bind)
-  //          score += m_snow.lover->getSnowScore();
+        //if (NULL != m_snow.lover && m_snow.bind)
+        //score += m_snow.lover->getSnowScore();
         UInt32 v =  GetVar(VAR_SNOW_AWARD) >> 8; //邮件是否已发的标志
         for (UInt8 i = 0; i < sizeof(s_score)/sizeof(s_score[0]); ++i)
         {
@@ -14845,8 +15012,8 @@ void EventTlzAuto::notify(bool isBeginAuto)
             return 3;
 
         UInt32 score = m_snow.score;
-       // if (m_snow.lover != NULL && m_snow.bind)
-       //     score += m_snow.lover->getSnowScore();
+        // if (m_snow.lover != NULL && m_snow.bind)
+        //     score += m_snow.lover->getSnowScore();
         
         UInt32 needScore = 0;
         MailPackage::MailItem* pItems = NULL;
@@ -14905,12 +15072,16 @@ void EventTlzAuto::notify(bool isBeginAuto)
         return 0;
     }
 
+    void  Player::setForbidSale(bool b, bool isAuto /* = false */)
+    {
+        _isForbidSale = b;
+        if (isAuto)
+        {
+            // 服务器自助查询OpenAPI封杀交易，udp上报一下
+            udpLog("svr_forbid_sale", "success", "", "", "", "", "act_tmp");
+        }
+    }
 
-    ///////////////////////////////////////////////
-    // 帮派副本相关
-
-    // 帮派副本相关
-    ///////////////////////////////////////////////
     void Player::postKillMonsterRoamResult(UInt32 pos, UInt8 curType, UInt8 curCount, UInt8 tips)
     {
         struct _Roam
@@ -16399,6 +16570,27 @@ Dreamer* Player::getDreamer()
        return _dreamer;
 }
 
+void Player::setDreamerTime(UInt8 count)
+{
+    if (!_dreamer)
+        return;
+    _dreamer->SetTime(count);
+}
+
+void Player::setDreamerEye(UInt8 count)
+{
+    if (!_dreamer)
+        return;
+    _dreamer->SetEye(count);
+}
+
+void Player::setDreamerKey(UInt8 count)
+{
+    if (!_dreamer)
+        return;
+    _dreamer->SetKey(count);
+}
+
 void Player::sendSysUpdate()
 {
    //版本更新公告
@@ -16409,6 +16601,329 @@ void Player::sendSysUpdate()
    st << (char*)VERSION;
    st << Stream::eos;
    send(st);
+}
+
+void Player::sendSnakeEggInfo()
+{
+    Stream st(REP::ACTIVE);
+    st << static_cast<UInt8>(0x08) << static_cast<UInt8>(0x01);
+    UInt8 t = World::getCallSnakeEggAct(); //0:非活动期间 1:拜年期 2:拜年-领奖等待期
+    if (World::getSnakeEggAwardAct() >= 1 && World::getSnakeEggAwardAct() <= 7)
+        t = 3;
+    else if (World::getSnakeEggAwardAct() == 0xFF)
+        t = 4;
+    st << t;
+    st << static_cast<UInt8>(GetVar(VAR_CALLSNAKEEGG)) << static_cast<UInt8>(World::getSnakeEggAwardAct());
+    st << static_cast<UInt8>(GetVar(VAR_SNAKEEGG_AWARD));
+    st << Stream::eos;
+    send(st);
+ 
+}
+
+void Player::callSnakeEgg()
+{
+  if (!World::getCallSnakeEggAct() || GetVar(VAR_CALLSNAKEEGG) != 0 )
+      return;
+  SetVar(VAR_CALLSNAKEEGG, 1);
+  sendSnakeEggInfo();
+}
+
+void Player::getSnakeEggAward(UInt8 v)
+{
+    UInt8 day = World::getSnakeEggAwardAct();
+    if (!day || v > 7 || v > day)
+        return;
+    UInt8 var = GetVar(VAR_SNAKEEGG_AWARD); 
+    if (var & (0x01<<(v-1))) //已领取
+        return;
+    if (v < day || GetVar(VAR_CALLSNAKEEGG) == 0)
+    {
+        if (getGold() < 30)
+        {
+		    sendMsgCode(0, 1104);
+            return;
+        }
+        ConsumeInfo ci(SnakeSprintAct, 0, 0);
+        useGold(30, &ci);
+    }
+    getCoupon(100);
+    var |= (0x01<<(v-1));
+    SetVar(VAR_SNAKEEGG_AWARD, var);
+    sendSnakeEggInfo();
+}
+
+void Player::getNewYearGiveGiftAward(UInt8 dayOrder, UInt8 result)
+{
+    if(dayOrder > 10)
+        return;
+
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(8);
+    //st << dayOrder;
+
+    UInt16 opt = GetVar(VAR_NEW_YEAR_GIVE_GIFT);
+    UInt16 offset = 1;
+    switch(dayOrder)
+    {
+        case 0:
+        break;
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+        case 8:
+        case 9:
+        case 10:
+        {
+            offset <<= (dayOrder - 1);
+            if((opt & offset) > 0)
+            {
+                sendMsgCode(0, 1018);
+                return;
+            }
+
+            UInt8 validMaxDay = 0;
+            UInt8 serverDay = 0;
+            UInt32 now = TimeUtil::Now();
+            if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2013, 2, 3))
+            {
+            }
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 3))
+            {
+                validMaxDay = 1;
+                serverDay = 1;
+            }
+            else if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2013, 2, 9))
+            {
+                validMaxDay = 1;
+            }
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 9))
+            {
+                validMaxDay = 2;
+                serverDay = 2;
+            }
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 10))
+            {
+                validMaxDay = 3;
+                serverDay = 3;
+            }
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 11))
+            {
+                validMaxDay = 4;
+                serverDay = 4;
+            }
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 12))
+            {
+                validMaxDay = 5;
+                serverDay = 5;
+            }
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 13))
+            {
+                validMaxDay = 6;
+                serverDay = 6;
+            }
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 14))
+            {
+                validMaxDay = 7;
+                serverDay = 7;
+            }
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 15))
+            {
+                validMaxDay = 8;
+                serverDay = 8;
+            }
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 16))
+            {
+                validMaxDay = 9;
+                serverDay = 9;
+            }
+            else if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2013, 2, 24))
+            {
+                validMaxDay = 9;
+            }
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 24))
+            {
+                validMaxDay = 10;
+                serverDay = 10;
+            }
+            else
+            {
+                validMaxDay = 10;
+            }
+
+            if(dayOrder > validMaxDay)
+            {
+                sendMsgCode(0, 1041);
+                return;
+            }
+
+            UInt8 times;
+            UInt8 recharge = false;
+            if(serverDay == dayOrder)
+                times = 2;
+            else
+            {
+                if(result == 0)
+                {
+                    sendMsgCode(0, 1042);
+                    return;
+                }
+                else if(result == 1)
+                {
+                    if (getGold() < 30)
+                    {
+                        sendMsgCode(0, 1104);
+                        return;
+                    }
+                    times = 2;
+                    recharge = true;
+                }
+                else
+                    times = 1;
+            }
+
+            bool bRet = GameAction()->onGetNewYearGiveGiftAward(this, dayOrder, times);
+            if(!bRet)
+                return;
+            if(recharge)
+            {
+                ConsumeInfo ci(NewYearGetDouble,0,0);
+                useGold(30, &ci);
+            }
+            opt |= offset;
+            SetVar(VAR_NEW_YEAR_GIVE_GIFT, opt);
+        }
+        break;
+
+        default:
+        break;
+    }
+    st << opt;
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::getNewYearQQGameAward(UInt8 type)
+{
+    if(type == 0 || type > 2)
+        return;
+    if(atoi(m_domain) != 10)
+        return;
+    bool bRet;
+    UInt32 status = GetVar(VAR_NEWYEAR_QQGAME_ACT);
+
+    if(type == 1)
+    {
+        if(status & 0x01)
+            return;
+        bRet = GameAction()->onGetNewYearQQGameAward(this, 1);
+        if(bRet)
+        {
+            status |= 0x01;
+            SetVar(VAR_NEWYEAR_QQGAME_ACT, status);
+            sendNewYearQQGameAct();
+        }
+    }
+    else
+    {
+        if(status & 0x02)
+            return;
+        if(!isBD())
+            return;
+        bRet = GameAction()->onGetNewYearQQGameAward(this, 2);
+        if(bRet)
+        {
+            status |= 0x02;
+            SetVar(VAR_NEWYEAR_QQGAME_ACT, status);
+            sendNewYearQQGameAct();
+        }
+    }
+}
+
+void Player::sendNewYearQQGameAct()
+{
+    if(!World::getNewYearQQGameAct())
+        return;
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(9);
+    UInt8 opt = GetVar(VAR_NEWYEAR_QQGAME_ACT);
+    st << opt;
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::getNewYearQzoneContinueAward(UInt8 type)
+{
+    if(type == 0 || type > 7)
+        return;
+    if(atoi(m_domain) != 1 && atoi(m_domain) != 2)
+        return;
+
+    UInt32 tmp = GetVar(VAR_NEWYEAR_QZONECONTINUE_ACT);
+    UInt16 isGet = static_cast<UInt16>(tmp & 0xFFFF);
+    if(isGet & (0x01 << (type - 1)))
+        return;
+    UInt8 continueDays = static_cast<UInt8>(tmp >> 16);
+    const static UInt8 needMinDay[] = {3, 5, 7, 10, 15, 21, 28};
+    if(continueDays < needMinDay[type - 1])
+        return;
+    bool bRet = GameAction()->onGetNewYearQQGameAward(this, type);
+    if(bRet)
+    {
+        tmp |= (0x01 << (type - 1));
+        SetVar(VAR_NEWYEAR_QZONECONTINUE_ACT, tmp);
+        sendNewYearQzoneContinueAct();
+    }
+}
+
+void Player::sendNewYearQzoneContinueAct()
+{
+    if(!World::getNewYearQzoneContinueAct())
+        return;
+    if(atoi(m_domain) != 1 && atoi(m_domain) != 2)
+        return;
+
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(10);
+    UInt32 tmp = GetVar(VAR_NEWYEAR_QZONECONTINUE_ACT);
+    UInt8 continueDays = static_cast<UInt8>(tmp >> 16);
+    UInt16 isGet = static_cast<UInt16>(tmp & 0xFFFF);
+    st << continueDays;
+    st << isGet;
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::calcNewYearQzoneContinueDay(UInt32 now)
+{
+    if(!World::getNewYearQzoneContinueAct())
+        return;
+    if(atoi(m_domain) != 1 && atoi(m_domain) != 2)
+        return;
+
+    UInt32 lasttime = GetVar(VAR_NEWYEAR_QZONECONTINUE_LASTTIME);
+    if(lasttime == 0)
+    {
+    }
+    else
+    {
+        UInt32 lasttime_sharp = TimeUtil::SharpDay(0, lasttime);
+        UInt32 now_sharp = TimeUtil::SharpDay(0, now);
+        if(lasttime_sharp >= now_sharp)
+            return;
+    }
+
+    SetVar(VAR_NEWYEAR_QZONECONTINUE_LASTTIME, now);
+    UInt32 tmp = GetVar(VAR_NEWYEAR_QZONECONTINUE_ACT);
+    UInt32 continueDays = (tmp >> 16);
+    if(continueDays >= 0xFF)
+        continueDays = 0xFE;
+    continueDays += 1;
+    tmp = (continueDays << 16) + (tmp & 0xFFFF);
+    SetVar(VAR_NEWYEAR_QZONECONTINUE_ACT, tmp);
 }
 
 //大闹龙宫

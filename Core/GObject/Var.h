@@ -322,6 +322,19 @@ namespace GObject
         VAR_HAS_MO_BATTLER = 346,       // 出战散仙里是否有墨家
         VAR_ITEM_9316_FAILED_COUNT = 347, // 都率宝伞礼包连续开启失败次数
         VAR_CONSUME_AWARD_COUNT = 348,   //消费抽奖已抽次数
+        VAR_NEW_YEAR_GIVE_GIFT = 349,   //迎新纳福，红包入袋(bit1~10依次代表对应的天数是否领取过奖励)
+
+        // 351~360 占用 for JLT
+        VAR_DISCOUNT_CONSUME1  = 351, // 消费限购的金额
+        VAR_DISCOUNT_CONSUME2  = 352, // 消费限购的金额
+        VAR_DISCOUNT_CONSUME3  = 353, // 消费限购的金额
+        VAR_DISCOUNT_RECHARGE1 = 354, // 充值限购的金额
+        VAR_DISCOUNT_RECHARGE2 = 355, // 充值限购的金额
+        VAR_DISCOUNT_RECHARGE3 = 356, // 充值限购的金额
+        VAR_DISCOUNT_EX1_TIME  = 357, // 限购栏一过期时间
+        VAR_DISCOUNT_EX2_TIME  = 358, // 限购栏二过期时间
+        VAR_DISCOUNT_EX3_TIME  = 359, // 限购栏三过期时间
+
         // 361-370 占用 for suntao
         VAR_DRAGONKING_STEP = 361,      //大闹龙宫当前移动到的格子
         VAR_DRAGONKING_STEP4_COUNT = 362, //大闹龙宫从第4格移动到第5失败的次数
@@ -331,7 +344,17 @@ namespace GObject
         VAR_SAVEGOLD_ISGET = 366,   //金蛇献瑞,聚福兆祥活动中玩家当日是否领取
         VAR_DRAGONKINGSNAKE_STEP = 367,      //大闹龙宫之金蛇起舞当前移动到的格子
         VAR_DRAGONKINGSNAKE_STEP4_COUNT = 368, //大闹龙宫之金蛇起舞从第4格移动到第5失败的次数
+        
+        VAR_CALLSNAKEEGG = 371,         //拜金蛇
+        VAR_SNAKEEGG_AWARD=372,         //领蛇蛋
+        VAR_9344_USED=373,
+        VAR_9343_USED=374,
         //越南版380-399
+        //400-420 for qiwy
+        VAR_NEWYEAR_QQGAME_ACT = 401, //蓝钻新年回馈活动
+        VAR_NEWYEAR_QZONECONTINUE_ACT = 402, //空间朋友连续登录奖励
+        VAR_NEWYEAR_QZONECONTINUE_LASTTIME = 403, //空间朋友连续登录奖励
+
         VAR_MAX,
     };
 
@@ -637,6 +660,14 @@ namespace GObject
             REGISTER_VAR(VAR_SAVEGOLD_ISGET, CYCLE_DAY);
             REGISTER_VAR(VAR_DRAGONKINGSNAKE_STEP, CYCLE_NONE);
             REGISTER_VAR(VAR_DRAGONKINGSNAKE_STEP4_COUNT, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_CALLSNAKEEGG, CYCLE_NONE);
+            REGISTER_VAR(VAR_SNAKEEGG_AWARD, CYCLE_NONE);
+            REGISTER_VAR(VAR_9344_USED, CYCLE_NONE);
+            REGISTER_VAR(VAR_9343_USED, CYCLE_NONE);
+            REGISTER_VAR(VAR_NEWYEAR_QQGAME_ACT, CYCLE_DAY);
+            REGISTER_VAR(VAR_NEWYEAR_QZONECONTINUE_ACT, CYCLE_NONE);
+            REGISTER_VAR(VAR_NEWYEAR_QZONECONTINUE_LASTTIME, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

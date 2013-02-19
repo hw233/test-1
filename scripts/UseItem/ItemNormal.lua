@@ -2038,34 +2038,48 @@ function ItemNormal_000000111(iid, num, bind, param)
 	return num;
 end
 
+local date0208 = { ['year'] = 2013, ['month'] = 2, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+local date0217 = { ['year'] = 2013, ['month'] = 2, ['day'] = 17, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+local tm0208 = os.time(date0208);
+local tm0217 = os.time(date0217);
 function ItemNormal_00000055(iid, num, bind, param)
+  local now = os.time();
   local player = GetPlayer()
   local package = player:GetPackage();
   player:setBuffData(6, 0, true)
   player:setBuffData(10, 0, true)
   player:setBuffData(11, 0, true)
   player:setBuffData(24, 0, true)
-  if ItemNormal_AddBuff(player, 5, 3600, num, 356400) then
-  	package:DelItemSendMsg(55, player);
-	return num;
+  
+  if now >= tm0208 and now < tm0217 and ItemNormal_AddBuff(player, 5, 3600, num, 216*3600) then
+      package:DelItemSendMsg(55, player);
+  elseif ItemNormal_AddBuff(player, 5, 3600, num, 356400) then
+      package:DelItemSendMsg(55, player);
   else
 	return false;
   end
+  return num;
 end
 
 function ItemNormal_00000056(iid, num, bind, param)
+  local now = os.time();
+
   local player = GetPlayer()
   local package = player:GetPackage();
   player:setBuffData(5, 0, true)
   player:setBuffData(10, 0, true)
   player:setBuffData(11, 0, true)
   player:setBuffData(24, 0, true)
-  if ItemNormal_AddBuff(player, 6, 3600, num, 356400) then
-  	package:DelItemSendMsg(56, player);
-	return num;
+ 
+  if now >= tm0208 and now < tm0217 and ItemNormal_AddBuff(player, 6, 3600, num, 216*3600) then
+      package:DelItemSendMsg(56, player);
+  elseif ItemNormal_AddBuff(player, 6, 3600, num, 356400) then
+  	  package:DelItemSendMsg(56, player);
   else
 	return false;
   end
+
+  return num;
 end
 
 function ItemNormal_00000057(iid, num, bind, param)
@@ -7352,14 +7366,65 @@ function ItemNormal_00009316(iid, num, bind, param)
     package:DelItemSendMsg(iid, player);
     return used;
 end
-
-function ItemNormal_00009347(iid, num, bind, param)
+function ItemNormal_00009343(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
-    player:setTitle(iid-9347+51, 0)
+
+    if package:GetRestPackageSize() < 2 then
+		player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    local items = {
+        [9343] = {547,507,551,509,514,515,500,49,503,517,1325,134,512},
+        [9344] = {503,9088,512,33,15,514,501,513,1325,134,507,509,515,551}
+    };
+    local chance = {
+        [9343] = {746,886,2004,2144,3262,3402,4520,6757,7316,8434,8658,8882,10000},
+        [9344] = {520,1561,2602,3643,5725,6766,7460,8154,8362,8570,8700,8830,8960,10000}
+    };
+    local broad = {
+        [9343] = {0,1,0,1,0,1,0,0,0,0,1,1,0},
+        [9344] = {0,0,0,0,0,0,0,0,1,1,1,1,1,1}
+    };
+    local total = 0;
+    for x=1,num do
+        local i = math.random(1, 10000)
+        for n = 1, #items[iid] do
+            if i <= chance[iid][n] then
+                package:Add(items[iid][n], 1, bind, 0, 2);
+                if broad[iid][n] == 1 then
+                    Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."] "..msg_122.."[4:"..iid.."],"..msg_123.."[4:"..items[iid][n].."]")
+                end
+                break
+            end
+        end
+        total = total +1;
+    end
+    if iid == 9344 then
+        player:AddVar(373, total);
+    elseif iid==9343 then
+        player:AddVar(374, total);
+    end
+    package:DelItemSendMsg(iid, player)
+    return total
+end
+
+function ItemNormal_00009345(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    player:setTitle(49, 0)
     package:DelItemSendMsg(iid, player);
     return num;
 end
+
+function ItemNormal_00009346(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    player:setTitle(iid-9346+50, 0)
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
 
 function ItemNormal_fighterCard(iid, num, bind, param)
     local player = GetPlayer()
@@ -7417,6 +7482,81 @@ function ItemNormal_fighterCard(iid, num, bind, param)
     end
 
     package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00009349(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < num/9 then
+		player:sendMsgCode(2, 1011, 0);
+        return 0;
+    end
+
+    package:Add(9307, num*10, bind, 0, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00009317(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < num then
+		player:sendMsgCode(2, 1011, 0);
+        return 0;
+    end
+
+    local item = {
+        {3000, 11500},
+        {6000, 11501},
+        {9000, 11502},
+        {9400, 11005},
+        {9800, 11013},
+        {9900, 11019},
+        {10000, 11022}
+    }
+
+    for i = 1,num do
+        local chance = math.random(1, 10000);
+        for j = 1, #item do
+            if chance <= item[j][1] then
+                package:Add(item[j][2], 1, bind, 0, 2);
+                break;
+            end
+        end
+    end
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_Lingbao(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < num then
+		player:sendMsgCode(2, 1011, 0);
+        return 0;
+    end
+
+    local item = {
+        {11500, 11501, 11502},
+        {11503, 11504, 11505},
+        {11506, 11507, 11508},
+        {11509, 11510, 11511}
+    }
+
+    local idx = iid - 9350 + 1;
+    for n = 1,num do
+        local i = math.random(1, #item[idx])
+        package:Add(item[idx][i], 1, bind, 0, 2);
+    end
+
+    package:DelItemSendMsg(iid, player);
+
     return num;
 end
 
@@ -9014,8 +9154,8 @@ local ItemNormal_Table = {
     [9215] = ItemNormal_00009215,
     [9216] = ItemNormal_00009216,
     [9218] = ItemNormal_00009160,
-    [9230] = ItemNormal_00009230,
     [9228] = ItemNormal_00009228,
+    [9230] = ItemNormal_00009230,
 
     [9237] = ItemNormal_fighterCard,
     [9238] = ItemNormal_fighterCard,
@@ -9069,9 +9209,22 @@ local ItemNormal_Table = {
     [9314] = ItemNormal_00009314,
     [9315] = ItemNormal_00009315,
     [9316] = ItemNormal_00009316,
+    [9317] = ItemNormal_00009317,
 
-    [9347] = ItemNormal_00009347,
-    [9348] = ItemNormal_00009347,
+    [9343] = ItemNormal_00009343,
+    [9344] = ItemNormal_00009343,
+    [9345] = ItemNormal_00009345,
+    [9346] = ItemNormal_00009346,
+    [9347] = ItemNormal_00009346,
+    [9348] = ItemNormal_00009346,
+    [9349] = ItemNormal_00009349,
+
+    -- 灵宝宝箱
+    [9350] = ItemNormal_Lingbao,
+    [9351] = ItemNormal_Lingbao,
+    [9352] = ItemNormal_Lingbao,
+    [9353] = ItemNormal_Lingbao,
+
 
     [10000] = ItemNormal_00010000,
     [10001] = ItemNormal_00010001,

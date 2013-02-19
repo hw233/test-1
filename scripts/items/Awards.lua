@@ -433,10 +433,10 @@ function RunBlueDiamondAward(player, opt)
     local date_0 = os.time(date_9190_0);
     local date_1 = os.time(date_9190_1);
 
-    local chance = {1852, 2593, 3333, 4444, 5926, 6667, 8148, 10000}
+    local chance = {785,2833,4881,5823,7202,7987,9366,10000}
     local chance_1 = {1428, 1428*2, 1428*3, 1428*4, 1428*5, 1428*6, 10000, 10000}
-    local item_9190 = {{515,3},{507,2},{509,2},{503,10},{1325,4},{47,3},{134,4},{5026,1}}
-    local item_9191 = {{515,3},{507,3},{509,3},{503,10},{1325,4},{47,3},{134,4},{5026,1}}
+    local item_9190 = {{515,1},{507,1},{509,1},{503,5},{1325,2},{47,2},{134,2},{5026,1}}
+    local item_9191 = {{515,1},{507,1},{509,1},{503,5},{1325,2},{47,2},{134,2},{5026,1}}
     local item_9217 = {{515,3},{507,2},{509,2},{503,10},{1325,4},{47,3},{134,4},{5026,1}}
     local item_9284 = {{507,2},{509,2},{503,10},{1325,4},{47,3},{134,4},{515,10},{'ipad',1}}
 
@@ -488,7 +488,7 @@ function RunBlueDiamondAward(player, opt)
     if opt == 1 then
         player:AddVar(VAR_BLUE_AWARD_COUNT, 1);
         count = player:GetVar(VAR_BLUE_AWARD_COUNT);
-        if count == 5 then
+        if count == 12 then
             package:Add(1707, 1, true, 0, 31);
         end
     elseif opt == 2 then
@@ -661,6 +661,86 @@ function onGetFeastGiftAward(player, type)
     end
     for i = 1, #awards[type] do
         package:Add(awards[type][i][1], awards[type][i][2], true, false, 0)
+    end
+    return true
+end
+
+local tmp1 = { ['year'] = 2013, ['month'] = 2, ['day'] = 4, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+local time1 = os.time(tmp1)
+local tmp2 = { ['year'] = 2013, ['month'] = 2, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+local time2 = os.time(tmp2)
+local tmp3 = { ['year'] = 2013, ['month'] = 2, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+local time3 = os.time(tmp3)
+local QQGameawards = {
+    [1] = {{51, 1},{1327, 1},{56, 1},{57, 1}},
+    [2] = {{49, 1},{1326, 1},{56, 1},{57, 1}},
+    [3] = {{15, 1},{1327, 1},{56, 1},{57, 1}},
+    [4] = {{15, 1},{1326, 1},{56, 1},{57, 1}},
+    [5] = {{48, 1},{1327, 1},{56, 1},{57, 1}},
+    [6] = {{50, 1},{1326, 1},{56, 1},{57, 1}},
+}
+
+function onGetNewYearQQGameAward(player, type)
+    if player == nil then
+        return false
+    end
+    if type == 0 or type > 2 then
+        return false
+    end
+
+    local curTime = os.time();
+    local actOrder
+    if curTime >= time1 and curTime < time2 then
+        actOrder = 1
+    elseif curTime >= time2 and curTime < time3 then
+        actOrder = 2
+    else
+        actOrder = 3
+    end
+
+    local awardOrder = (actOrder - 1) * 2  + type;
+    local award = QQGameawards[awardOrder]
+    if award == nil then
+        return false
+    end
+    local package = player:GetPackage()
+    if package:GetRestPackageSize() < #award then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    for i = 1, #awards do
+        package:Add(awards[i][1], awards[i][2], true, false, 2)
+    end
+    return true
+end
+
+local QzonecontinueAwards = {
+    [1] = {{56, 1},{57, 1}},
+    [2] = {{56, 2},{57, 2}},
+    [3] = {{56, 2},{57, 2},{134, 1}},
+    [4] = {{56, 2},{57, 2},{134, 2}},
+    [5] = {{56, 2},{57, 2},{134, 2},{30, 1}},
+    [6] = {{56, 2},{57, 2},{134, 2},{30, 2}},
+    [6] = {{56, 2},{57, 2},{134, 2},{30, 2},{9076,1}},
+}
+
+function onGetNewYearQQGameAward(player, type)
+    if player == nil then
+        return false
+    end
+
+    local awards = QzonecontinueAwards[type]
+    if awards == nil then
+        return false
+    end
+
+    local package = player:GetPackage()
+    if package:GetRestPackageSize() < #awards then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    for i = 1, #awards do
+        package:Add(awards[i][1], awards[i][2], true, false, 2)
     end
     return true
 end

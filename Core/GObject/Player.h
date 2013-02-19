@@ -357,6 +357,19 @@ namespace GObject
         UInt8 id;
     };
 
+    class EventAutoRefreshOpenKey : public EventBase
+    {
+    public:
+		EventAutoRefreshOpenKey(Player * player, UInt32 interval, UInt32 count)
+			: EventBase(player, interval, count)
+		{}
+
+        virtual UInt32 GetID() const { return EVENT_REFRESHOPENKEY; }
+        virtual bool Equal(UInt32 id, size_t playerid) const;
+        void Process(UInt32);
+		bool Accelerate(UInt32);
+    };
+
 
 	struct Lineup
 	{
@@ -1133,9 +1146,20 @@ namespace GObject
         void sendConsumeInfo(bool rank = false);
         void getMDItem();
         void sendMDSoul(UInt8 type, UInt32 id = 0);
-        void sendJuneRechargeMails(UInt32 value);
+        void appendCompassItem(UInt32 id,  UInt32 count)
+        {
+            MDItem item = {id,count};
+            _mditemVec.push_back(item);
+        }
         UInt32 _mditem;
+        struct MDItem
+        {
+            UInt32 id;
+            UInt32 count;
+        };
+        std::vector<MDItem> _mditemVec;
 
+        void sendJuneRechargeMails(UInt32 value);
 		void autoRegenAll();
 		void regenAll(bool = false);
         void setHPPercent(UInt8 p);
@@ -1511,7 +1535,7 @@ namespace GObject
         UInt8 getSnowAward(UInt16 type);
         //推雪人end
         
-        void setForbidSale(bool b) {_isForbidSale = b;}
+        void setForbidSale(bool b, bool isAuto = false);
         bool getForbidSale() {return _isForbidSale;}
 	private:
 		Mutex _mutex;
@@ -1614,6 +1638,7 @@ namespace GObject
         std::vector<GData::LootResult> _lastKillMonsterAward;
         std::vector<GData::LootResult> _lastNew7DayTargetAward;
         std::vector<GData::LootResult> _lastExJobAward;
+        std::vector<GData::LootResult> _lastExJobStepAward;
 
     private:
 		UInt16 _lastDungeon;
@@ -1759,6 +1784,7 @@ namespace GObject
         void storeUdpLog(UInt32 id, UInt32 type, UInt32 itemId, UInt32 num = 1);
         void newRC7DayUdpLog(UInt32 id, UInt32 type = 0, UInt32 num  = 1);
         void transformUdpLog(UInt32 id, UInt32 type, UInt32 money1, UInt32 money2, UInt32 money3, UInt32 money4, UInt8 val1);
+        void dreamerUdpLog(UInt32 id, UInt32 type, UInt32 num = 1);
         void guideUdp(UInt8 type, std::string& p1, std::string& p2);
         void moneyLog(int type, int gold, int coupon = 0, int tael = 0, int achievement = 0, int prestige = 0);
         void actUdp(UInt8 type, std::string& p1, std::string& p2);
@@ -1934,6 +1960,8 @@ namespace GObject
         int IDIPBuy(UInt32 itemId, UInt32 num, UInt32 price, std::string& err, bool bind = true);
         void lastExJobAwardPush(UInt16 itemId, UInt16 num);
         void checkLastExJobAward();
+        void lastExJobStepAwardPush(UInt16 itemId, UInt16 num);
+        void checkLastExJobStepAward();
         void lastQueqiaoAwardPush(UInt16 itemId, UInt16 num);
         void checkLastQueqiaoAward();
         void lastKillMonsterAwardPush(UInt16 itemId, UInt16 num);
@@ -2045,6 +2073,14 @@ namespace GObject
     public:
         Dreamer * getDreamer();
         void sendSysUpdate();
+        void setDreamer(UInt8 progress, UInt8 level, UInt8 maxX, UInt8 maxY, UInt8 maxGrid,
+                const std::string& mapInfo, UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY,
+                UInt8 timeConsume, UInt8 remainTime, UInt8 keysCount, 
+                UInt8 eyesCount, UInt8 eyeTime, UInt8 eyeX, UInt8 eyeY);
+
+        void setDreamerTime(UInt8 count);
+        void setDreamerKey(UInt8 count);
+        void setDreamerEye(UInt8 count);
     private:
         Dreamer * _dreamer;
 
@@ -2067,8 +2103,13 @@ namespace GObject
         void postDragonKing(UInt8 count);
         void getDragonKingInfoSnake();
         void postDragonKingSnake(UInt8 count);
-        void saveGoldAct(UInt8 opt, UInt32 param = 0);
+        void saveGoldAct(UInt8 opt, UInt32 param);
         void sendSaveGoldAct();
+
+        void sendSnakeEggInfo();
+        void callSnakeEgg();
+        void getSnakeEggAward(UInt8 v);
+        void getNewYearGiveGiftAward(UInt8 dayOrder, UInt8 result);
     private:
         UInt8 cf_posPut[5];//范围1-5
         UInt32 cf_itemId[5];
@@ -2084,6 +2125,11 @@ namespace GObject
         void sendTowerLoginAct();
         void getFeastGiftAward(UInt8 type);
         void sendFeastGiftAct();
+        void getNewYearQQGameAward(UInt8 type);
+        void sendNewYearQQGameAct();
+        void getNewYearQzoneContinueAward(UInt8 type);
+        void sendNewYearQzoneContinueAct();
+        void calcNewYearQzoneContinueDay(UInt32 time);
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n
