@@ -237,7 +237,7 @@ void ActivityMgr::ActivitySignIn()
         for(UInt32 i = 0; i < size; ++i)
         {
             lua_tinker::table a = award.get<lua_tinker::table>(i + 1);
-            if(499 == a.get<UInt32>(1))  //礼券
+            if(COUPON_ID == a.get<UInt32>(1))  //礼券
                 _owner->getCoupon(a.get<UInt32>(2));
             else
                 _owner->GetPackage()->Add(a.get<UInt32>(1), a.get<UInt32>(2), true, false, FromDailyActivity);

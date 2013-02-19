@@ -102,7 +102,9 @@ private:
 #ifndef _VT
 #ifndef _WIN32
 #define DC()			SERVER().GetDC()
+#ifdef  OPEN_API_ON
 #define OPENAPI()       SERVER().GetOpenAPI()
+#endif
 #endif
 #endif
 #endif

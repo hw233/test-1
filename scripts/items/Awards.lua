@@ -675,7 +675,7 @@ local QQGameawards = {
     [1] = {{51, 1},{1327, 1},{56, 1},{57, 1}},
     [2] = {{49, 1},{1326, 1},{56, 1},{57, 1}},
     [3] = {{15, 1},{1327, 1},{56, 1},{57, 1}},
-    [4] = {{15, 1},{1326, 1},{56, 1},{57, 1}},
+    [4] = {{15, 2},{1326, 1},{56, 1},{57, 1}},
     [5] = {{48, 1},{1327, 1},{56, 1},{57, 1}},
     [6] = {{50, 1},{1326, 1},{56, 1},{57, 1}},
 }
@@ -699,12 +699,12 @@ function onGetNewYearQQGameAward(player, type)
     end
 
     local awardOrder = (actOrder - 1) * 2  + type;
-    local award = QQGameawards[awardOrder]
-    if award == nil then
+    local awards = QQGameawards[awardOrder]
+    if awards == nil then
         return false
     end
     local package = player:GetPackage()
-    if package:GetRestPackageSize() < #award then
+    if package:GetRestPackageSize() < #awards then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
@@ -721,21 +721,21 @@ local QzonecontinueAwards = {
     [4] = {{56, 2},{57, 2},{134, 2}},
     [5] = {{56, 2},{57, 2},{134, 2},{30, 1}},
     [6] = {{56, 2},{57, 2},{134, 2},{30, 2}},
-    [6] = {{56, 2},{57, 2},{134, 2},{30, 2},{9076,1}},
+    [7] = {{56, 2},{57, 2},{134, 2},{30, 2},{9076,1}},
 }
 
-function onGetNewYearQQGameAward(player, type)
+function onGetNewYearQzoneContinueAward(player, type)
     if player == nil then
         return false
     end
 
-    local award = QzonecontinueAwards[type]
-    if award == nil then
+    local awards = QzonecontinueAwards[type]
+    if awards == nil then
         return false
     end
 
     local package = player:GetPackage()
-    if package:GetRestPackageSize() < #award then
+    if package:GetRestPackageSize() < #awards then
         player:sendMsgCode(2, 1011, 0);
         return false
     end

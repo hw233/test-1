@@ -226,18 +226,20 @@ GMHandler::GMHandler()
 
     Reg(3, "biglock", &GMHandler::OnBigLock);
     Reg(3, "bigunlock", &GMHandler::OnBigUnLock);
-    Reg(3, "strong", &GMHandler::OnStrengthen);
+    Reg(2, "strong", &GMHandler::OnStrengthen);
    
     Reg(3, "fsale", &GMHandler::OnForbidSale);
     Reg(3, "unfsale", &GMHandler::OnUnForbidSale);
     Reg(3, "loginlimit", &GMHandler::OnSetLoginLimit);
 
     Reg(3, "sysup", &GMHandler::OnSysUpdate);
+    Reg(2, "gold", &GMHandler::OnSaveGoldAct);
 
     Reg(3, "drtm", &GMHandler::OnDreamerTimeSet);
     Reg(3, "drkey", &GMHandler::OnDreamerKeySet);
     Reg(3, "dreye", &GMHandler::OnDreamerEyeSet);
 
+    Reg(3, "act", &GMHandler::OnSomeAct);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -3392,6 +3394,32 @@ void GMHandler::OnSysUpdate(GObject::Player *player, std::vector<std::string>& a
 //    player->sendSysUpdate();
 }
 
+void GMHandler::OnSaveGoldAct(GObject::Player *player, std::vector<std::string>& args)
+{
+	if (args.size() < 1)
+		return ;
+    switch(atoi(args[0].c_str()))
+    {
+    case 1:
+        player->SetVar(VAR_SAVEGOLD_ISGET, 0);
+        break;
+    case 2:
+        {
+            player->SetVarNow(VAR_SAVEGOLD_ISGET, 0, 0);
+            player->SetVarNow(VAR_SAVEGOLD_GET_STATUS, 0, 0);
+        }
+        break;
+    case 3:
+        {
+            UInt32 gold = atoi(args[1].c_str());
+            player->SetVar(VAR_SAVEGOLD_COUNT, gold);
+            player->SetVar(VAR_SAVEGOLD_SET_TIME, TimeUtil::Now() - 7*86400-10);
+        }
+        break;
+    }
+    player->sendSaveGoldAct();
+}
+
 void GMHandler::OnLingbao(GObject::Player * player, std::vector<std::string>& args)
 {
 	if (args.size() < 1)
@@ -3636,3 +3664,20 @@ void GMHandler::OnDreamerEyeSet(GObject::Player *player, std::vector<std::string
     UInt8 count = atoi(args[0].c_str());
     player->setDreamerEye(count);
 }
+
+void GMHandler::OnSomeAct(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return;
+    UInt8 type = atoi(args[0].c_str());
+    if(type == 1)
+    {
+        if(args.size() < 2)
+            return;
+        UInt32 day = atoi(args[1].c_str());
+        UInt32 now = TimeUtil::MkTime(2013, 1, 31) + 86400 * day;
+        player->calcNewYearQzoneContinueDay(now);
+        player->sendNewYearQzoneContinueAct();
+    }
+}
+

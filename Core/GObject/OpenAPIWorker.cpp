@@ -67,7 +67,6 @@ namespace GObject
 
     void OpenAPIWorker::OnTimer()
     {
-        return;
         std::vector<UrlParam> list;
         {
             FastMutex::ScopedLock lk(m_Mutex);
@@ -97,9 +96,9 @@ namespace GObject
             char url[MAX_RET_LEN] = "";
 
             if (it->type == 1002)
-                strncpy(url, "/v3/csec/punish_query", 22);
+                strncpy(url, "/v3/csec/punish_query", 32);
             else if (it->type == 0)
-                strncpy(url, "/v3/user/is_login", 18);
+                strncpy(url, "/v3/user/is_login", 32);
 
             char res[MAX_RET_LEN] = "";
 
@@ -194,7 +193,6 @@ namespace GObject
 
     void OpenAPIWorker::Push(UInt64 playerId, UInt16 type, const char * openId, const char * openKey, const char * pf, const char * userIp)
     {
-        return;
         const static int OPEN_ID_LEN  = 64;
         const static int OPEN_KEY_LEN = 128;
         const static int PF_LEN = 64;
@@ -309,6 +307,7 @@ namespace GObject
         #define JSON_ERR_CUSTOM3 -9529
         #define JSON_ERR_CUSTOM4 -9530
 
+        TRACE_LOG("JSON RESULT: %s", result);
         json_t* obj = NULL;
 
 
@@ -317,7 +316,7 @@ namespace GObject
             return JSON_ERR_CUSTOM;
 
         json_t* hdr = json_find_first_label(obj, "ret");
-        if (!hdr && !hdr->child && !hdr->text)
+        if (!hdr || !hdr->child || !hdr->text || !hdr->child->text)
             return JSON_ERR_CUSTOM2;
 
         Int32 ret = atoi(hdr->child->text);
@@ -325,7 +324,7 @@ namespace GObject
         {
 
             hdr =  json_find_first_label(obj, "msg");
-            if (!hdr && !hdr->child && !hdr->text)
+            if (!hdr || !hdr->child || !hdr->text || !hdr->child->text)
                 return JSON_ERR_CUSTOM3;
             UInt32 len = strlen(hdr->child->text);
             strncpy (msg, hdr->child->text, len);
@@ -334,7 +333,7 @@ namespace GObject
         }
 
         hdr =  json_find_first_label(obj, "punish");
-        if (!hdr && !hdr->child && !hdr->text)
+        if (!hdr || !hdr->child || !hdr->text || !hdr->child->text)
             return JSON_ERR_CUSTOM4;
         ret = atoi(hdr->child->text);
         *needForbid = ret==1? true:false;
@@ -353,6 +352,7 @@ namespace GObject
         #define JSON_ERR_CUSTOM3 -9529
         #define JSON_ERR_CUSTOM4 -9530
 
+        TRACE_LOG("JSON RESULT: %s", result);
         json_t* obj = NULL;
 
 
@@ -361,7 +361,7 @@ namespace GObject
             return JSON_ERR_CUSTOM;
 
         json_t* hdr = json_find_first_label(obj, "ret");
-        if (!hdr && !hdr->child && !hdr->text)
+        if (!hdr || !hdr->child || !hdr->text)
             return JSON_ERR_CUSTOM2;
 
         Int32 ret = atoi(hdr->child->text);
@@ -369,7 +369,7 @@ namespace GObject
             return ret;
 
         hdr =  json_find_first_label(obj, "msg");
-        if (!hdr && !hdr->child && !hdr->text)
+        if (!hdr || !hdr->child || !hdr->text)
             return JSON_ERR_CUSTOM3;
         ret = atoi(hdr->child->text);
         UInt32 len = strlen(hdr->child->text);

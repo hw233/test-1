@@ -112,6 +112,7 @@ namespace Script
 		lua_tinker::def(_L, "getJuly", GObject::World::getJuly);
         lua_tinker::def(_L, "getQixi", GObject::World::getQixi);
         lua_tinker::def(_L, "getWansheng", GObject::World::getWansheng);
+        lua_tinker::def(_L, "getQingren", GObject::World::getQingren);
         lua_tinker::def(_L, "getGuoqing", GObject::World::getGuoqing);
 		lua_tinker::def(_L, "getYDMDAct", GObject::World::getYDMDAct);
 		lua_tinker::def(_L, "getWeekDay",	GObject::World::getWeekDay);
@@ -147,6 +148,8 @@ namespace Script
 		lua_tinker::def(_L, "getCompassAct", GObject::World::getCompassAct);
 		lua_tinker::def(_L, "getItem9344Act", GObject::World::getItem9344Act);
 		lua_tinker::def(_L, "getItem9343Act", GObject::World::getItem9343Act);
+		lua_tinker::def(_L, "getAutoBattleAct", GObject::World::getAutoBattleAct);
+		lua_tinker::def(_L, "getSnakeSpringEquipAct", GObject::World::setSnakeSpringEquipAct);
 
         CLASS_DEF(GameActionLua, Print);
         lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);
@@ -1226,9 +1229,9 @@ namespace Script
     {
         return Call<bool>(  "onRC7DayWill", pl, idx);
     }
-    UInt32 GameActionLua::onUseMDSoul(Player* pl, UInt8 type )
+    UInt32 GameActionLua::onUseMDSoul(Player* pl, UInt8 type, UInt8 v )
     {
-        return Call<UInt32>(  "onUseMDSoul", pl, type);
+        return Call<UInt32>(  "onUseMDSoul", pl, type, v);
     }
     bool GameActionLua::onTurnOnRC7Day(Player* pl, UInt32 total, UInt32 offset)
     {
@@ -1516,6 +1519,27 @@ namespace Script
 	{
 		assert(player != NULL);
 		return Call<bool>("checkDragonKingCanSucceed", player, step);
+	}
+
+    Table GameActionLua::getDragonKingSnakeAward(UInt8 step)
+	{
+		return Call<Table>("getDragonKingSnakeAward", step);
+	}
+
+    bool GameActionLua::checkDragonKingSnakeCanSucceed(Player * player, UInt8 step)
+	{
+		assert(player != NULL);
+		return Call<bool>("checkDragonKingSnakeCanSucceed", player, step);
+	}
+
+    Table GameActionLua::getSaveGoldActAward(UInt32 gold)
+	{
+		return Call<Table>("getSaveGoldActAward", gold);
+	}
+
+    Table GameActionLua::getSaveGoldActExtraAward(UInt32 gold)
+	{
+		return Call<Table>("getSaveGoldActExtraAward", gold);
 	}
 
     bool GameActionLua::onGetNewYearGiveGiftAward(Player* player, UInt8 dayOrder, UInt8 times)

@@ -332,6 +332,15 @@ public:
     { _wansheng= v; }
     inline static bool getWansheng()
     { return _wansheng; }
+    inline static void setQingren(bool v)
+    { _qingren= v; }
+    inline static bool getQingren()
+    { return _qingren; }
+    inline static void setSpecialBookAct(bool v)
+    { _specialbook= v; }
+    inline static bool getSpecialBookAct()
+    { return _specialbook; }
+
 
     inline static void set11Act(bool v)
     { _11Act= v; }
@@ -359,6 +368,10 @@ public:
     { _dragonKingAct= v; }
     inline static bool getDragonKingAct()
     { return _dragonKingAct; }
+    inline static void setSaveGoldAct(bool v)
+    { _saveGoldAct= v; }
+    inline static bool getSaveGoldAct()
+    { return _saveGoldAct; }
     inline static void setFeastLoginAct(bool v)
     { _feastloginAct= v; }
     inline static bool getFeastLoginAct()
@@ -619,6 +632,14 @@ public:
     { _item9343act = v; }
     inline static bool getItem9343Act()
     { return _item9343act; }
+    inline static void setAutoBattleAct(bool v)
+    { _autobattleact = v; }
+    inline static bool getAutoBattleAct()
+    { return _autobattleact; }
+     inline static void setSnakeSpringEquipAct(UInt8 v)
+    { _snakespringequipact = v; }
+    inline static UInt8 getSnakeSpringEquipAct()
+    { return _snakespringequipact; }
  
 public:
 	inline static UInt8 getWeekDay()
@@ -690,12 +711,15 @@ public:
     static bool _july;
     static bool _qixi;
     static bool _wansheng;
+    static bool _qingren;
+    static bool _specialbook;
     static bool _11Act;
     static bool _ssToolbarAct;
     static bool _snowAct;
     static bool _goldSnakeAct;
     static bool _heroIslandAct;
     static bool _dragonKingAct;
+    static bool _saveGoldAct;
     static bool _feastloginAct;
     static bool _newYearGiveGiftAct;
     static bool _newYearQQGameAct;
@@ -736,6 +760,8 @@ public:
     static UInt8 _snakeeggawardact;
     static bool _item9344act;
     static bool _item9343act;
+    static bool _autobattleact;
+    static UInt8 _snakespringequipact;
 
 public:
     static RCSortType rechargeSort;

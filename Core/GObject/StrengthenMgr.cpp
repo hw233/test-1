@@ -440,7 +440,7 @@ void StrengthenMgr::SendOpenChestsInfo(UInt8 boxId, UInt8 index)
                             return;
                         }
                         lua_tinker::table item = GameAction()->openGreenBoxStrong();
-                        if(499 == item.get<UInt32>(1))
+                        if(COUPON_ID == item.get<UInt32>(1))
                             _owner->getCoupon(item.get<UInt32>(2));
                         else
                             _owner->GetPackage()->Add(item.get<UInt32>(1), item.get<UInt32>(2), true, false, FromDailyStrengthen);
@@ -471,7 +471,7 @@ void StrengthenMgr::SendOpenChestsInfo(UInt8 boxId, UInt8 index)
                             return;
                         }
                         lua_tinker::table item = GameAction()->openBlueBoxStrong();
-                        if(499 == item.get<UInt32>(1))
+                        if(COUPON_ID == item.get<UInt32>(1))
                             _owner->getCoupon(item.get<UInt32>(2));
                         else
                             _owner->GetPackage()->Add(item.get<UInt32>(1), item.get<UInt32>(2), true, false, FromDailyStrengthen);
@@ -502,7 +502,7 @@ void StrengthenMgr::SendOpenChestsInfo(UInt8 boxId, UInt8 index)
                             return;
                         }
                         lua_tinker::table item = GameAction()->openPurpleBoxStrong();
-                        if(499 == item.get<UInt32>(1))
+                        if(COUPON_ID == item.get<UInt32>(1))
                             _owner->getCoupon(item.get<UInt32>(2));
                         else
                             _owner->GetPackage()->Add(item.get<UInt32>(1), item.get<UInt32>(2), true, false, FromDailyStrengthen);
@@ -535,7 +535,7 @@ void StrengthenMgr::SendOpenChestsInfo(UInt8 boxId, UInt8 index)
                             return;
                         }
                         lua_tinker::table item = GameAction()->openOrangeBoxStrong();
-                        if(499 == item.get<UInt32>(1))
+                        if(COUPON_ID == item.get<UInt32>(1))
                             _owner->getCoupon(item.get<UInt32>(2));
                         else
                             _owner->GetPackage()->Add(item.get<UInt32>(1), item.get<UInt32>(2), true, false, FromDailyStrengthen);
@@ -567,7 +567,7 @@ void StrengthenMgr::SendOpenChestsInfo(UInt8 boxId, UInt8 index)
                             return;
                         }
                         lua_tinker::table item = GameAction()->openGreenBoxStrong();
-                        if(499 == item.get<UInt32>(1))
+                        if(COUPON_ID == item.get<UInt32>(1))
                             _owner->getCoupon(item.get<UInt32>(2));
                         else
                             _owner->GetPackage()->Add(item.get<UInt32>(1), item.get<UInt32>(2), true, false, FromDailyStrengthen);
@@ -598,7 +598,7 @@ void StrengthenMgr::SendOpenChestsInfo(UInt8 boxId, UInt8 index)
                             return;
                         }
                         lua_tinker::table item = GameAction()->openBlueBoxStrong();
-                        if(499 == item.get<UInt32>(1))
+                        if(COUPON_ID == item.get<UInt32>(1))
                             _owner->getCoupon(item.get<UInt32>(2));
                         else
                             _owner->GetPackage()->Add(item.get<UInt32>(1), item.get<UInt32>(2), true, false, FromDailyStrengthen);
@@ -629,7 +629,7 @@ void StrengthenMgr::SendOpenChestsInfo(UInt8 boxId, UInt8 index)
                             return;
                         }
                         lua_tinker::table item = GameAction()->openPurpleBoxStrong();
-                        if(499 == item.get<UInt32>(1))
+                        if(COUPON_ID == item.get<UInt32>(1))
                             _owner->getCoupon(item.get<UInt32>(2));
                         else
                             _owner->GetPackage()->Add(item.get<UInt32>(1), item.get<UInt32>(2), true, false, FromDailyStrengthen);
@@ -662,7 +662,7 @@ void StrengthenMgr::SendOpenChestsInfo(UInt8 boxId, UInt8 index)
                             return;
                         }
                         lua_tinker::table item = GameAction()->openOrangeBoxStrong();
-                        if(499 == item.get<UInt32>(1))
+                        if(COUPON_ID == item.get<UInt32>(1))
                             _owner->getCoupon(item.get<UInt32>(2));
                         else
                             _owner->GetPackage()->Add(item.get<UInt32>(1), item.get<UInt32>(2), true, false, FromDailyStrengthen);

@@ -139,6 +139,10 @@ void WorldScript::init()
     def("getQixi", GObject::World::getQixi);
     def("setWansheng", GObject::World::setWansheng);
     def("getWansheng", GObject::World::getWansheng);
+    def("setQingren", GObject::World::setQingren);
+    def("getQingren", GObject::World::getQingren);
+    def("setSpecialBookAct", GObject::World::setSpecialBookAct);
+    def("getSpecialBookAct", GObject::World::getSpecialBookAct);
     def("set11Act", GObject::World::set11Act);
     def("get11Act", GObject::World::get11Act);
     def("setSSToolbarAct", GObject::World::setSSToolbarAct);
@@ -155,6 +159,7 @@ void WorldScript::init()
     def("setHeroIslandAct", GObject::World::setHeroIslandAct);
     def("setDragonKingAct", GObject::World::setDragonKingAct);
     def("getDragonKingAct", GObject::World::getDragonKingAct);
+    def("setSaveGoldAct", GObject::World::setSaveGoldAct);
     
     def("setGuoqing", GObject::World::setGuoqing);
     def("getGuoqing", GObject::World::getGuoqing);
@@ -218,6 +223,8 @@ void WorldScript::init()
 	def("getItem9344Act", GObject::World::getItem9344Act);
 	def("setItem9343Act", GObject::World::setItem9343Act);
 	def("getItem9343Act", GObject::World::getItem9343Act);
+	def("setAutoBattleAct", GObject::World::setAutoBattleAct);
+	def("setSnakeSpringEquipAct", GObject::World::setSnakeSpringEquipAct);
 
     def("setMergeAthAct", GObject::World::setMergeAthAct);
     def("getMergeAthAct", GObject::World::getMergeAthAct);
