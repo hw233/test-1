@@ -488,6 +488,8 @@ private:
     float _atkreduce3, _magatkreduce3, _pudu_debuf;
     UInt8 _atkreduce3_last, _magatkreduce3_last, _pudu_debuf_last;
 
+    float _deep_confuse_dmg_extra;
+    UInt8 _deep_confuse_last;
     float _deep_forget_dmg_extra;
     UInt8 _deep_forget_last;
     float _deep_stun_dmg_extra;
@@ -515,10 +517,16 @@ private:
 
 
     UInt32 _aura_bleed;
+    float _aura_present;
+    UInt8 _aura_present_cd;
     UInt8 _aura_dec_cd, _aura_bleed_last;
     UInt32 _stun_bleed;
+    float _stun_present;
+    UInt8 _stun_present_cd;
     UInt8 _stun_cd, _stun_bleed_last;
     UInt32 _confuse_bleed;
+    float _confuse_present;
+    UInt8 _confuse_present_cd;
     UInt8 _confuse_cd, _confuse_bleed_last;
 
     UInt16 _colorStock;
@@ -651,6 +659,9 @@ public:
     inline UInt8& getDeepStunLast() { return _deep_stun_last; }
     inline float getDeepStunDmgExtra() { return _deep_stun_dmg_extra; }
     inline void setDeepStunDmgExtra(float v, UInt8 l) { _deep_stun_dmg_extra = v; _deep_stun_last = l; }
+    inline UInt8& getDeepConfuseLast() { return _deep_confuse_last; }
+    inline float getDeepConfuseDmgExtra() { return _deep_confuse_dmg_extra; }
+    inline void setDeepConfuseDmgExtra(float v, UInt8 l) { _deep_confuse_dmg_extra = v; _deep_confuse_last = l; }
 
 //    inline UInt8& getTherapyDecLast() { return _therapy_dec_last; }
 //    inline float getTherapyDec() { return _therapy_dec; }
@@ -681,19 +692,28 @@ public:
 
 
     inline UInt8& getAuraDecCD() { return _aura_dec_cd; }
+    inline float getAuraPrecent() { return _aura_present; }
     inline UInt8& getAuraBleedLast() { return _aura_bleed_last; }
     inline float getAuraBleed() { return _aura_bleed; }
     inline void setAuraBleed(float value, UInt8 last, UInt8 cd) { _aura_bleed = value; _aura_bleed_last = last; _aura_dec_cd = cd; }
+    inline void setAuraPresent(float v, UInt8 cd) { _aura_present = v; _aura_present_cd = cd; }
+    inline UInt8 getAruaPresentCD() { return _aura_present_cd; }
 
     inline UInt8& getStunCD() { return _stun_cd; }
+    inline float getStunPresent() { return _stun_present; }
     inline UInt8& getStunBleedLast() { return _stun_bleed_last; }
     inline float getStunBleed() { return _stun_bleed; }
     inline void setStunBleed(float value, UInt8 last, UInt8 cd) { _stun_bleed = value; _stun_bleed_last = last; _stun_cd = cd; }
+    inline void setStunPresent(float v, UInt8 cd) { _stun_present = v; _stun_present_cd = cd; }
+    inline UInt8 getStunPresentCD() { return _stun_present_cd; }
 
     inline UInt8& getConfuceCD() { return _confuse_cd; }
+    inline float getConfucePresent() { return _confuse_present; }
     inline UInt8& getConfuceBleedLast() { return _confuse_bleed_last; }
     inline float getConfuceBleed() { return _confuse_bleed; }
     inline void setConfuceBleed(float value, UInt8 last, UInt8 cd) { _confuse_bleed = value; _confuse_bleed_last = last; _confuse_cd = cd; }
+    inline void setConfusePresent(float v, UInt8 cd) { _confuse_present = v; _confuse_present_cd = cd; }
+    inline UInt8 getConfucePresentCD() { return _confuse_present_cd; }
 
 
     inline UInt16 getImmune2() { return _immune2; }

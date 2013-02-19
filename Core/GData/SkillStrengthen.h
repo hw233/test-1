@@ -35,6 +35,8 @@ enum
     ON_ATTACK = 18 ,     // 攻击时
     ON_SUMMON = 19,     // 召唤时
     ON_HIDE = 20,       // 隐身时
+    ON_BLEED = 21,     // 流血时
+    ON_CONFUSE = 22,   // 混乱时
 };
 
 enum

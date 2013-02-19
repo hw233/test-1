@@ -261,6 +261,8 @@ private:
         e_xin = 69, // 信
         e_hpShieldSelf = 70, // 护盾
         e_unHpShieldSelf = 71, // 解除护盾
+        e_deepConfuse = 72,    // 深度混乱
+        e_unDeepConfuse = 73,  // 解除深度混乱
 
         e_MAX_STATE,
     };
@@ -555,6 +557,10 @@ private:
 
     void getAtkList(BattleFighter* bf, const GData::LBSkillBase* lbskill, AtkList& atkList);
     void makeDamage(BattleFighter* bo, UInt32& u);
+
+    bool doAuraPresent(BattleFighter* bf);
+    bool doConfusePresent(BattleFighter* bf);
+    bool doStunPresent(BattleFighter* bf);
 };
 
 }
