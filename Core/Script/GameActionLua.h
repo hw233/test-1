@@ -346,6 +346,10 @@ namespace Script
         bool onFirstRecharge(Player* player, UInt8 index);
 	    Table getDragonKingAward(UInt8 step);
         bool checkDragonKingCanSucceed(Player * player, UInt8 step);
+	    Table getDragonKingSnakeAward(UInt8 step);
+        bool checkDragonKingSnakeCanSucceed(Player * player, UInt8 step);
+        Table getSaveGoldActAward(UInt32 gold);
+        Table getSaveGoldActExtraAward(UInt32 gold);
 
 	private:
 		Player* _player1;	//?ű???????Ϊ????1

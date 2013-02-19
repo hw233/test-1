@@ -2165,8 +2165,9 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
     {
         case 0x01:  // 七夕
         case 0x03:  // 万圣节
+        case 0x09:  // 情人节浪漫之旅
         {
-            if(!WORLD().getQixi() && !WORLD().getWansheng())
+            if(!WORLD().getQixi() && !WORLD().getWansheng() && !WORLD().getQingren())
                 break;
             brd >> op;
             switch(op)
@@ -2285,8 +2286,10 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         //大闹龙宫
         case 0x06:
         {
+            /*
             if(!World::getDragonKingAct())
                 return;
+            */
             brd >> op;
             switch(op)
             {
@@ -2298,6 +2301,44 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                     UInt8 count= 0;
                     brd >> count;
                     player->postDragonKing(count);
+                }
+                break;
+            default:
+                break;
+            }
+            break;
+        }
+        //金蛇献瑞 聚福兆祥
+        case 0x07:
+        {
+            brd >> op;
+            UInt32 param = 0;
+            brd >> param;
+            struct goldData
+            {
+                UInt8 opt;
+                UInt32 param;
+            }data;
+            data.opt = op;
+            data.param = param;
+            GameMsgHdr h(0x343,  player->getThreadId(), player, sizeof(data));
+            GLOBAL().PushMsg(h, &data);
+            break;
+        }
+        //大闹龙宫之金蛇起舞
+        case 0x0A:
+        {
+            brd >> op;
+            switch(op)
+            {
+            case 0x01:  //获取龙宫信息
+                player->getDragonKingInfoSnake();
+                break;
+            case 0x02:  //龙宫寻宝
+                {
+                    UInt8 count= 0;
+                    brd >> count;
+                    player->postDragonKingSnake(count);
                 }
                 break;
             default:

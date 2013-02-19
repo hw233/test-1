@@ -107,6 +107,10 @@ function loadStore()
 
         discount(store)
 
+        if getQingren() then    --蜀山之恋
+            store:add(2, 9355,10)
+        end
+
         if getDragonKingAct() then
             store:add(2, 9337, 10) --游龙令
         end

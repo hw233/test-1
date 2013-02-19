@@ -891,6 +891,18 @@ function onActivityCheck(tm)
           setDragonKingAct(false)
       end
 
+      if tm >= actTime237_0 and tm < actTime237_1 then
+          setSaveGoldAct(true)
+      else
+          setSaveGoldAct(false)
+      end
+
+      if tm >= actTime238_0 and tm < actTime238_1 then
+          setQingren(true)
+      else
+          setQingren(false)
+      end
+
       setShuoShuo(true);
   end
 
@@ -1131,6 +1143,12 @@ function initActTime(y, m, d)
   --大闹龙宫活动
   local  SerStartTm236 = { ['year'] = 2013, ['month'] = 1, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm236_1 = { ['year'] = 2013, ['month'] = 1, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --金蛇献瑞,聚福兆祥活动
+  local  SerStartTm237 = { ['year'] = 2013, ['month'] = 2, ['day'] = 2, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm237_1 = { ['year'] = 2013, ['month'] = 2, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --情人节浪漫之旅
+  local  SerStartTm238 = { ['year'] = 2013, ['month'] = 2, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm238_1 = { ['year'] = 2013, ['month'] = 2, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   --300-399越南版用了
   actTime0 = os.time(SerStartTm);
@@ -1499,6 +1517,12 @@ function initActTime(y, m, d)
 
   actTime236_0= os.time(SerStartTm236);
   actTime236_1= os.time(SerStartTm236_1);
+
+  actTime237_0= os.time(SerStartTm237);
+  actTime237_1= os.time(SerStartTm237_1);
+
+  actTime238_0= os.time(SerStartTm238);
+  actTime238_1= os.time(SerStartTm238_1);
 
   onActivityCheck(os.time() + 30);
 

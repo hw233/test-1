@@ -325,6 +325,12 @@ namespace GObject
         // 361-370 占用 for suntao
         VAR_DRAGONKING_STEP = 361,      //大闹龙宫当前移动到的格子
         VAR_DRAGONKING_STEP4_COUNT = 362, //大闹龙宫从第4格移动到第5失败的次数
+        VAR_SAVEGOLD_COUNT = 363,   //金蛇献瑞,聚福兆祥活动中玩家存仙石数量
+        VAR_SAVEGOLD_SET_TIME = 364,    //金蛇献瑞,聚福兆祥活动中玩家设置的结算时间
+        VAR_SAVEGOLD_GET_STATUS = 365,    //金蛇献瑞,聚福兆祥活动中玩家领取自己仙石的状态,低10位
+        VAR_SAVEGOLD_ISGET = 366,   //金蛇献瑞,聚福兆祥活动中玩家当日是否领取
+        VAR_DRAGONKINGSNAKE_STEP = 367,      //大闹龙宫之金蛇起舞当前移动到的格子
+        VAR_DRAGONKINGSNAKE_STEP4_COUNT = 368, //大闹龙宫之金蛇起舞从第4格移动到第5失败的次数
         //越南版380-399
         VAR_MAX,
     };
@@ -625,6 +631,12 @@ namespace GObject
 
             REGISTER_VAR(VAR_DRAGONKING_STEP, CYCLE_NONE);
             REGISTER_VAR(VAR_DRAGONKING_STEP4_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_SAVEGOLD_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_SAVEGOLD_SET_TIME, CYCLE_NONE);
+            REGISTER_VAR(VAR_SAVEGOLD_GET_STATUS, CYCLE_NONE);
+            REGISTER_VAR(VAR_SAVEGOLD_ISGET, CYCLE_DAY);
+            REGISTER_VAR(VAR_DRAGONKINGSNAKE_STEP, CYCLE_NONE);
+            REGISTER_VAR(VAR_DRAGONKINGSNAKE_STEP4_COUNT, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

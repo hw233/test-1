@@ -2065,6 +2065,10 @@ namespace GObject
 
         void getDragonKingInfo();
         void postDragonKing(UInt8 count);
+        void getDragonKingInfoSnake();
+        void postDragonKingSnake(UInt8 count);
+        void saveGoldAct(UInt8 opt, UInt32 param = 0);
+        void sendSaveGoldAct();
     private:
         UInt8 cf_posPut[5];//范围1-5
         UInt32 cf_itemId[5];
