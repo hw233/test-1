@@ -1889,7 +1889,7 @@ namespace GObject
 					ret = false;
 				else if (UInt16 n = GameAction()->RunItemNormalUse(m_Owner, id, param, num, bind > 0))
 				{
-                    UInt8 rn = n<num?n:num;
+                    UInt16 rn = n<num?n:num;
 					DelItem2(item, rn);
 					AddItemHistoriesLog(id, rn);
                     ret = true;
@@ -1901,7 +1901,7 @@ namespace GObject
 					ret = false;
 				else if (UInt16 n = GameAction()->RunItemNormalUse(m_Owner, id, param, num, false))
 				{
-                    UInt8 rn = n<num?n:num;
+                    UInt16 rn = n<num?n:num;
                     ItemBase * item = FindItem(id, true);
                     if (!item)
                         item = FindItem(id, false);
@@ -1975,7 +1975,7 @@ namespace GObject
                     ret = false;
                 else if (UInt16 n = GameAction()->RunItemNormalUseOther(m_Owner, id, other, num, bind > 0))
                 {
-                    UInt8 rn = n<num?n:num;
+                    UInt16 rn = n<num?n:num;
                     DelItem2(item, rn);
                     AddItemHistoriesLog(id, rn);
                     ret = true;
@@ -1987,7 +1987,7 @@ namespace GObject
                     ret = false;
                 else if (UInt16 n = GameAction()->RunItemNormalUseOther(m_Owner, id, other, num, false))
                 {
-                    UInt8 rn = n<num?n:num;
+                    UInt16 rn = n<num?n:num;
                     ItemBase * item = FindItem(id, true);
                     if (!item)
                         item = FindItem(id, false);
