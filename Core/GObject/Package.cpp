@@ -5975,6 +5975,7 @@ namespace GObject
                 UInt16 chance = uRand(10000);
                 float fChance = ((float)(uRand(10000)))/10000;
                 float disFactor = lbAttrConf.getDisFactor4(chance, fChance, color2);
+                // item color only define one attr to it`s color
                 color2 = 2;
                 //float disFactor = lbAttrConf.getDisFactor3(uRand(10000), fChance);
                 lbattr.value[i] = lbAttrConf.getAttrMax(lv, itemTypeIdx, lbattr.type[i]-1) * disFactor + 0.9999f;
