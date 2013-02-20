@@ -1204,7 +1204,6 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
 
                     dmg = dmg > 0 ? dmg : 1;
                 }
-
             }
             if(area_target->getMagAtkReduce3Last() > 0)
             {
