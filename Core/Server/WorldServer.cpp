@@ -86,7 +86,7 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
     GObject::GVarSystem::Init();
 	cfg.load(scriptStr);
 	globalSysMsg.load();
-//	Battle::battleReport.init();
+    //	Battle::battleReport.init();
 
 #ifndef _WIN32
 #ifdef _FB

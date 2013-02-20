@@ -51,6 +51,33 @@ function getHeroMemoAward(player, idx, soul)
     return false
 end
 
+function flushHeroMemoAward(player, idx)
+    -- 自动将所有的奖励全部发送完（因为功能下线了）
+    --local max = #maxSoul
+    local max = 8
+    local package = player:GetPackage();
+
+    if idx == 0 or idx > max then
+        return false
+    end
+
+    local table_item = {}
+    local v = point2Award[maxSoul[idx]]
+    local sz = #v
+    for n = 1,sz,2 do
+        if v[n] == Money["Coupon"] then
+            table.insert(table_item,0xA000)
+            table.insert(table_item,v[n+1])
+            table.insert(table_item,1)
+        else
+            table.insert(table_item,v[n])
+            table.insert(table_item,v[n+1])
+            table.insert(table_item,1)
+        end
+    end
+    player:GetMailBox():newItemPackageMail("剑侠秘籍"..(idx*10).."剑魂奖励", "剑侠秘籍"..(idx*10).."剑魂奖励，请点击“接受物品”按钮领取奖励。", table_item);
+end
+
 function getHeroMemoMaxSoul()
     return maxSoul
 end

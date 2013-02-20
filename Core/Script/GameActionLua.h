@@ -206,6 +206,7 @@ namespace Script
         bool onMayDay1(Player* player);
 		void onAttackBoss(Player* player);
 		bool getHeroMemoAward(Player* player, UInt8 idx, UInt32 soul);
+        void flushHeroMemoAward(Player* player, UInt8 idx);
 		bool getShuoShuoAward(Player* player, UInt8 idx);
 		bool onPurchase(Player* player, UInt32 id, UInt8 count);
 		void exchangeExtraReward(Player* player, UInt32 id);
