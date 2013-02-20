@@ -3,6 +3,7 @@ source conf.sh
 function update_object()
 {
     echo "update_object"
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/cleargm.sql  # XXX: 清除所有GM权限，请一直保留
     #mysql -h$H -u$U -p$P -P$PT -D$DBO < updates/Object_20110918_1.sql
     #mysql -h$H -u$U -p$P -P$PT -D$DBO < updates/Object_20110913_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20111010_2.sql
@@ -147,7 +148,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130116_2.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130124_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar_20130118.sql
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar199.sql        #清除强化装备的8次限制
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar199.sql          #清除强化装备的8次限制
 
     #. clearshiyamen.sh
 }
