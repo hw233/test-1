@@ -107,6 +107,13 @@ function loadStore()
 
         discount(store)
 
+        if getItem9343Act() then
+            store:add(2, 9343, 20) --龙宫秘宝
+        end
+        if getItem9344Act() then
+            store:add(2, 9344, 20) --福禄袋
+        end
+ 
         if getDragonKingAct() then
             store:add(2, 9337, 10) --游龙令
         end

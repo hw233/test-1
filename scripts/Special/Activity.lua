@@ -882,6 +882,42 @@ function CompassAct(player, lootlvl)
     end
 end
 
+function Item9344Act(player, lootlvl)
+    if getItem9344Act() then
+        if lootlvl > 3 then
+            lootlvl = 0
+        end
+
+        local itemNum = {
+            [0] = 1,
+            [1] = 1,
+            [2] = 2,
+            [3] = 3,
+        };
+
+        local package = player:GetPackage();
+        package:AddItem(9344, itemNum[lootlvl], true);
+    end
+end
+function Item9343Act(player, lootlvl)
+    if getItem9343Act() then
+        if lootlvl > 3 then
+            lootlvl = 0
+        end
+
+        local itemNum = {
+            [0] = 1,
+            [1] = 1,
+            [2] = 2,
+            [3] = 3,
+        };
+
+        local package = player:GetPackage();
+        package:AddItem(9343, itemNum[lootlvl], true);
+    end
+end
+
+
 
 function LuckyDrawBox(player, id)
     local items = {
@@ -966,6 +1002,8 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     _9215Act(player, lootlvl);
     _snowAct(player, lootlvl);
 --    CompassAct(player, lootlvl);
+    Item9344Act(player, lootlvl);
+    Item9343Act(player, lootlvl);
 end
 
 function onFrontMapFloorWin(player, id, spot, lootlvl)
@@ -998,6 +1036,8 @@ function onFrontMapWin(player, id, spot, lootlvl)
     _9215Act(player, lootlvl);
     _snowAct(player, lootlvl);
 --    CompassAct(player, lootlvl);
+    Item9344Act(player, lootlvl);
+    Item9343Act(player, lootlvl);
 end
 
 local vippack = {

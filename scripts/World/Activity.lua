@@ -907,19 +907,31 @@ function onActivityCheck(tm)
       end
 
       if tm >= actTime2013_02_01 and tm < actTime2013_02_09 then
-          setCallSnakeEggAct(true)
+          setCallSnakeEggAct(1)
+      elseif tm >= actTime2013_02_09 and tm < actTime2013_02_16 then
+          setCallSnakeEggAct(2)
       else
-          setCallSnakeEggAct(false)
+          setCallSnakeEggAct(0)
       end
-      if tm >= actTime2013_02_15 and tm < actTime2013_02_22 then
-          local n = (tm-actTime2013_02_15) / 86400 + 1;
+      if tm >= actTime2013_02_16 and tm < actTime2013_02_23 then
+          local n = (tm-actTime2013_02_16) / 86400 + 1;
           setSnakeEggAwardAct(n)
-      elseif tm >= actTime2013_02_22 and tm <actTime2013_02_29 then
+      elseif tm >= actTime2013_02_23 and tm <actTime2013_02_29 then
           setSnakeEggAwardAct(0xFF);
       else
           setSnakeEggAwardAct(0)
       end
 
+      if tm >= actTime2013_01_29 and tm < actTime2013_02_05 then
+          setItem9344Act(true)
+      else
+          setItem9344Act(false)
+      end
+      if tm >= actTime2013_02_05 and tm < actTime2013_02_12 then
+          setItem9343Act(true)
+      else
+          setItem9343Act(false)
+      end
 
       setShuoShuo(true);
   end
@@ -1171,9 +1183,13 @@ function initActTime(y, m, d)
   --拜金蛇,领蛇蛋
   local  SerStartTm2013_02_01 = { ['year'] = 2013, ['month'] = 2, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm2013_02_09 = { ['year'] = 2013, ['month'] = 2, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTm2013_02_15 = { ['year'] = 2013, ['month'] = 2, ['day'] =15, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTm2013_02_22 = { ['year'] = 2013, ['month'] = 2, ['day'] =22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm2013_02_16 = { ['year'] = 2013, ['month'] = 2, ['day'] =16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm2013_02_23 = { ['year'] = 2013, ['month'] = 2, ['day'] =23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm2013_02_29 = { ['year'] = 2013, ['month'] = 2, ['day'] =29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --春节掉落活动
+  local  SerStartTm2013_01_29 = { ['year'] = 2013, ['month'] = 1, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm2013_02_05 = { ['year'] = 2013, ['month'] = 2, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm2013_02_12 = { ['year'] = 2013, ['month'] = 2, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 迎新纳福 红包入袋
   local  SerStartTm237 = { ['year'] = 2013, ['month'] = 2, ['day'] = 3, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
@@ -1559,9 +1575,13 @@ function initActTime(y, m, d)
 
   actTime2013_02_01= os.time(SerStartTm2013_02_01);
   actTime2013_02_09= os.time(SerStartTm2013_02_09);
-  actTime2013_02_15= os.time(SerStartTm2013_02_15);
-  actTime2013_02_22= os.time(SerStartTm2013_02_22);
+  actTime2013_02_16= os.time(SerStartTm2013_02_16);
+  actTime2013_02_23= os.time(SerStartTm2013_02_23);
   actTime2013_02_29= os.time(SerStartTm2013_02_29);
+
+  actTime2013_01_29= os.time(SerStartTm2013_01_29);
+  actTime2013_02_05= os.time(SerStartTm2013_02_05);
+  actTime2013_02_12= os.time(SerStartTm2013_02_12);
 
   onActivityCheck(os.time() + 30);
 

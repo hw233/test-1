@@ -16483,13 +16483,11 @@ void Player::sendSnakeEggInfo()
 {
     Stream st(REP::ACTIVE);
     st << static_cast<UInt8>(0x08) << static_cast<UInt8>(0x01);
-    UInt8 t = 0; //活动阶段
-    if (World::getCallSnakeEggAct())
-        t = 1;
-    else if (World::getSnakeEggAwardAct() >= 1 && World::getSnakeEggAwardAct() <= 7)
-        t = 2;
-    else if (World::getSnakeEggAwardAct() == 0xFF)
+    UInt8 t = World::getCallSnakeEggAct(); //0:非活动期间 1:拜年期 2:拜年-领奖等待期
+    if (World::getSnakeEggAwardAct() >= 1 && World::getSnakeEggAwardAct() <= 7)
         t = 3;
+    else if (World::getSnakeEggAwardAct() == 0xFF)
+        t = 4;
     st << t;
     st << static_cast<UInt8>(GetVar(VAR_CALLSNAKEEGG)) << static_cast<UInt8>(World::getSnakeEggAwardAct());
     st << static_cast<UInt8>(GetVar(VAR_SNAKEEGG_AWARD));
@@ -16510,7 +16508,7 @@ void Player::getSnakeEggAward(UInt8 v)
     if (!day || v > 7 || v > day)
         return;
     UInt8 var = GetVar(VAR_SNAKEEGG_AWARD); 
-    if (var & v) //已领取
+    if (var & (0x01<<(v-1))) //已领取
         return;
     if (v < day || GetVar(VAR_CALLSNAKEEGG) == 0)
     {
@@ -16523,7 +16521,7 @@ void Player::getSnakeEggAward(UInt8 v)
         useGold(30, &ci);
     }
     getCoupon(100);
-    var |= v;
+    var |= (0x01<<(v-1));
     SetVar(VAR_SNAKEEGG_AWARD, var);
     sendSnakeEggInfo();
 }
