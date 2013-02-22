@@ -1515,7 +1515,6 @@ namespace Script
         return Call<UInt32>("getDreamerItem", id, index);
     }
 
-    /*
     Table GameActionLua::getDragonKingAward(UInt8 step, UInt8 flag)
 	{
 		return Call<Table>("getDragonKingAward", step, flag);
@@ -1526,7 +1525,7 @@ namespace Script
 		assert(player != NULL);
 		return Call<bool>("checkDragonKingCanSucceed", player, step, flag);
 	}
-    */
+    /*
     Table GameActionLua::getDragonKingAward(UInt8 step)
 	{
 		return Call<Table>("getDragonKingAward", step);
@@ -1559,6 +1558,7 @@ namespace Script
 		assert(player != NULL);
 		return Call<bool>("checkDragonKingTMCanSucceed", player, step);
 	}
+    */
 
     Table GameActionLua::getSaveGoldActAward(UInt32 gold)
 	{

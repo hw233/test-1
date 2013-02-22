@@ -2288,6 +2288,8 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         }
         //大闹龙宫,大闹龙宫之金蛇起舞,大闹龙宫之天芒神梭
         case 0x06:
+        case 0x0A:
+        case 0x0B:
         {
             /*
             if(!World::getDragonKingAct())
@@ -2348,6 +2350,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             }
             break;
         }
+        /*
         //大闹龙宫之金蛇起舞
         case 0x0A:
         {
@@ -2388,6 +2391,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                 break;
             }
         }
+        */
         default:
             break;
     }
