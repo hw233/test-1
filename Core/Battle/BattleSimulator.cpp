@@ -2707,7 +2707,8 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
         }
 
         int nChangeAuraNum = -1*bf->getAura() + bf->getAuraLeft(); // 因为天赋术，hero无双之后会留一点灵力
-        setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAura, nChangeAuraNum, 0, false);
+        //setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAura, nChangeAuraNum, 0, false);
+        setStatusChange_Aura2(bf, bf->getSide(), bf->getPos(), NULL, nChangeAuraNum, 0, false);
 
         appendToPacket(bf->getSide(), bf->getPos(), bf->getPos() + 25, 2, skill->getId(), false, false);
 
@@ -3689,7 +3690,8 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
     if (skill && skill->cond == GData::SKILL_PEERLESS)
     {
         int nChangeAuraNum = -1*bf->getAura() + bf->getAuraLeft(); // 因为天赋术，hero无双之后会留一点灵力
-        setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAura, nChangeAuraNum, 0, false);
+        //setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAura, nChangeAuraNum, 0, false);
+        setStatusChange_Aura2(bf, bf->getSide(), bf->getPos(), NULL, nChangeAuraNum, 0, false);
     }
 
     if(ss && bf->getHP() != 0)
@@ -7266,6 +7268,22 @@ void BattleSimulator::setStatusChange_Aura(BattleFighter * bf, UInt8 side, UInt8
     appendStatusChange(e_stAura, value2, skillId, bfgt);
 }
 
+void BattleSimulator::setStatusChange_Aura2(BattleFighter * bf, UInt8 side, UInt8 pos, const GData::SkillBase* skill, float value, UInt16 last, bool active )
+{
+    BattleObject * bo = getObject(side, pos);
+    BattleFighter * bfgt = static_cast<BattleFighter *>(bo);
+    UInt16 skillId = 0;
+    if(skill)
+    {
+        skillId = skill->getId();
+        if(skill->cond == GData::SKILL_BEATKED && bf != bfgt)
+            ++last;
+    }
+
+    bfgt->AddAura(value);
+    UInt32 value2 = static_cast<UInt32>(bfgt->getAura());
+    appendStatusChange(e_stAura, value2, skillId, bfgt);
+}
 
 void BattleSimulator::setStatusChange_Tough(BattleFighter * bf, UInt8 side, UInt8 pos, const GData::SkillBase* skill, float value, UInt16 last, bool active )
 {

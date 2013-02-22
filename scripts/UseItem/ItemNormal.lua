@@ -1533,23 +1533,30 @@ function ItemNormal_00000481(iid, num, bind, param)
     local broad = {0,1,0,1,1,1,0,0,1,0,1,0,0,}
     local item = 0
 
-    local k = 1
-    local rand = math.random(10000)
-    for n = 1,#prob do
-        if rand <= prob[n] then
-            item = items[n]
-            k = n
-            break;
+    local sucNum = 0
+    for tmp = 1,num do
+        local k = 1
+        local rand = math.random(10000)
+        for n = 1,#prob do
+            if rand <= prob[n] then
+                item = items[n]
+                k = n
+                break;
+            end
         end
-    end
 
-    if item == 0 then
-        return false
-    end
+        if item == 0 then
+            if sucNum > 0 then
+                package:DelItemSendMsg(481, player);
+            end
+            return sucNum
+        end
 
-    package:AddItem(item, nums[k], 1, 0, 2)
-    if broad[k] == 1 then
-        Broadcast(0x27, msg_68.."[p:"..player:getCountry()..":"..player:getPName().."]"..msg_60.."[4:481]，"..msg_61.."[4:"..item.."]x"..nums[k])
+        package:AddItem(item, nums[k], 1, 0, 2)
+        if broad[k] == 1 then
+            Broadcast(0x27, msg_68.."[p:"..player:getCountry()..":"..player:getPName().."]"..msg_60.."[4:481]，"..msg_61.."[4:"..item.."]x"..nums[k])
+        end
+        sucNum= sucNum + 1
     end
     package:DelItemSendMsg(481, player);
     return num
@@ -1574,65 +1581,81 @@ function ItemNormal_00000482(iid, num, bind, param)
     local item = 0
 
     local k = 1
-    local rand = math.random(10000)
-    for n = 1,#prob do
-        if rand <= prob[n] then
-            item = items[n]
-            k = n
-            break;
+    
+    local sucNum = 0
+    for tmp=1,num do
+        local rand = math.random(10000)
+        for n = 1,#prob do
+            if rand <= prob[n] then
+                item = items[n]
+                k = n
+                break;
+            end
         end
-    end
 
-    if item == 0 then
-        return false
-    end
+        if item == 0 then
+            if sucNum > 0 then
+                package:DelItemSendMsg(iid, player)
+            end
+            return sucNum
+        end
 
-    if package:GetRestPackageSize() < nums[k] then
-        player:sendMsgCode(2, 1011, 0)
-        return false
-    end
+        if package:GetRestPackageSize() < nums[k] then
+            player:sendMsgCode(2, 1011, 0)
+            if sucNum > 0 then
+                package:DelItemSendMsg(iid, player)
+            end
+            return sucNum
+        end
 
-    if item == 60000 then
-        package:AddItem(trumpfrag[iid][math.random(1,#trumpfrag[iid])], 1, 1, 0, 2)
-    elseif item == 60001 then
-          local trump = getRandTrump(player:GetLev())
-          if trump == 0 then
-              return false
-          end
-          package:Add(trump, 1, 1, 0, 2)
-    elseif item == 60002 then
-        local equip = getRandOEquip(player:GetLev())
-        package:AddEquip(equip, 1, false)
-    else 
-        package:AddItem(item, nums[k], 1, 0, 2)
+        if item == 60000 then
+            package:AddItem(trumpfrag[iid][math.random(1,#trumpfrag[iid])], 1, 1, 0, 2)
+        elseif item == 60001 then
+            local trump = getRandTrump(player:GetLev())
+            if trump == 0 then
+            if sucNum > 0 then
+                package:DelItemSendMsg(iid, player)
+            end
+                return sucNum
+            end
+            package:Add(trump, 1, 1, 0, 2)
+        elseif item == 60002 then
+            local equip = getRandOEquip(player:GetLev())
+            package:AddEquip(equip, 1, false)
+        else 
+            package:AddItem(item, nums[k], 1, 0, 2)
+        end
+        sucNum = sucNum + 1
     end
 
     package:DelItemSendMsg(iid, player)
-    return num
+    return sucNum
 end
 
 function ItemNormal_00000492(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-	if package:GetRestPackageSize() < 2 then
-		player:sendMsgCode(2, 1011, 0);
-		return false;
-	end
+    if package:GetRestPackageSize() < (2 + 6 * num / 99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false;
+    end
 
     local items = {{502,1},{504,1},{0,1},{510,1},{55,2}}
 
-    local i = math.random(1, #items)
-    local t = math.random(1,100)
+    for tmp = 1,num do
+        local i = math.random(1, #items)
+        local t = math.random(1,100)
 
-    if i == 3 then
-        local gems = {5002,5012,5022,5032,5042,5052,5062,5072,5082,5092,5102,5112,5122,5132,5142,};
-        package:AddItem(gems[math.random(1,#gems)], 1, bind, 0, 2);
-    else
-        package:AddItem(items[i][1], items[i][2], bind, 0, 2);
-    end
-    if t <= 20 then
-        package:AddItem(6037, 1, bind, 0, 2);
+        if i == 3 then
+            local gems = {5002,5012,5022,5032,5042,5052,5062,5072,5082,5092,5102,5112,5122,5132,5142,};
+            package:AddItem(gems[math.random(1,#gems)], 1, bind, 0, 2);
+        else
+            package:AddItem(items[i][1], items[i][2], bind, 0, 2);
+        end
+        if t <= 20 then
+            package:AddItem(6037, 1, bind, 0, 2);
+        end
     end
 
     package:DelItemSendMsg(iid, player);
@@ -1643,19 +1666,21 @@ function ItemNormal_00000493(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-	if package:GetRestPackageSize() < 2 then
+	if package:GetRestPackageSize() < (2 + 7 * num / 99) then
 		player:sendMsgCode(2, 1011, 0);
 		return false;
 	end
 
     local items = {{56,1},{57,1},{511,2},{466,1},{500,1},{15,1}}
 
-    local i = math.random(1, #items)
-    local t = math.random(1,100)
+    for tmp = 1,num do
+        local i = math.random(1, #items)
+        local t = math.random(1,100)
 
-    package:AddItem(items[i][1], items[i][2], bind, 0, 2);
-    if t <= 20 then
-        package:AddItem(6034, 1, bind, 0, 2);
+        package:AddItem(items[i][1], items[i][2], bind, 0, 2);
+        if t <= 20 then
+            package:AddItem(6034, 1, bind, 0, 2);
+        end
     end
 
     package:DelItemSendMsg(iid, player);
@@ -1666,19 +1691,21 @@ function ItemNormal_00000494(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-	if package:GetRestPackageSize() < 2 then
-		player:sendMsgCode(2, 1011, 0);
-		return false;
+    if package:GetRestPackageSize() < (2 + 8*num/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false;
 	end
 
-    local items = {{503,1},{514,2},{512,2},{466,2},{508,2},{506,2},{517,2}}
+        local items = {{503,1},{514,2},{512,2},{466,2},{508,2},{506,2},{517,2}}
 
-    local i = math.random(1, #items)
-    local t = math.random(1,100)
+    for tmp = 1,num do
+        local i = math.random(1, #items)
+        local t = math.random(1,100)
 
-    package:AddItem(items[i][1], items[i][2], bind, 0, 2);
-    if t <= 20 then
-        package:AddItem(6038, 1, bind, 0, 2);
+        package:AddItem(items[i][1], items[i][2], bind, 0, 2);
+        if t <= 20 then
+            package:AddItem(6038, 1, bind, 0, 2);
+        end
     end
 
     package:DelItemSendMsg(iid, player);
@@ -1689,7 +1716,7 @@ function ItemNormal_00000495(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-	if package:GetRestPackageSize() < 2 then
+    if package:GetRestPackageSize() < (2 + 2*num/99) then
 		player:sendMsgCode(2, 1011, 0);
 		return false;
 	end
@@ -1697,22 +1724,24 @@ function ItemNormal_00000495(iid, num, bind, param)
     local items = {{515,1},{47,1},{501,4},{513,4},{33,5},{8000,4},{466,5}}
     local prob = {741,1112,3334,4815,6667,8148,10000,}
 
-    local p = math.random(1, 10000)
-    local i = 1
-    for n = 1, #prob do
-        if p <= prob[n] then
-            i = n
-            break
+    for tmp = 1,num do
+        local p = math.random(1, 10000)
+        local i = 1
+        for n = 1, #prob do
+            if p <= prob[n] then
+                i = n
+                break
+            end
         end
-    end
 
-    local item = items[i]
-    package:AddItem(item[1], item[2], bind, 0, 2);
+        local item = items[i]
+        package:AddItem(item[1], item[2], bind, 0, 2);
 
-    local t = math.random(1,100)
-    if t <= 20 then
-        local items = {6035,6036}
-        package:AddItem(items[math.random(1,#items)], 1, bind, 0, 2);
+        local t = math.random(1,100)
+        if t <= 20 then
+            local items = {6035,6036}
+            package:AddItem(items[math.random(1,#items)], 1, bind, 0, 2);
+        end
     end
 
     package:DelItemSendMsg(iid, player);
@@ -3022,35 +3051,35 @@ function ItemNormal_00009001(iid, num, bind, param)
 
     local factor = 1
     now = os.time()
+    if now < doubleend then
+        factor = 2
+    end
+    if package:GetRestPackageSize() < (3*factor + num * 3 * factor / 99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false;
+    end
+
     if now >= start then
-        if now < doubleend then
-            factor = 2
-        end
+        for i=1,num do
+            local item = items[id]
 
-        if package:GetRestPackageSize() < (3*factor) then
-            player:sendMsgCode(2, 1011, 0);
-            return false;
-        end
-
-        local item = items[id]
-
-        for k,v in pairs(item) do
-            if v[1] == 30000 then
-                local gem = {5005, 5015, 5025, 5035, 5045}
-                local g = math.random(1, #gem)
-                package:AddItem(gem[g], v[2], true, 0, 2)
-                if factor == 2 then
-                    g = math.random(1, #gem)
+            for k,v in pairs(item) do
+                if v[1] == 30000 then
+                    local gem = {5005, 5015, 5025, 5035, 5045}
+                    local g = math.random(1, #gem)
                     package:AddItem(gem[g], v[2], true, 0, 2)
+                    if factor == 2 then
+                        g = math.random(1, #gem)
+                        package:AddItem(gem[g], v[2], true, 0, 2)
+                    end
+                elseif v[1] == 60000 then
+                    player:getCoupon(v[2]*factor)
+                else
+                    package:Add(v[1], v[2]*factor, true, 0, 2)
                 end
-            elseif v[1] == 60000 then
-                player:getCoupon(v[2]*factor)
-            else
-                package:Add(v[1], v[2]*factor, true, 0, 2)
             end
+            package:DelItemSendMsg(iid, player);
         end
-
-        package:DelItemSendMsg(iid, player);
         return num
     else
         SendMsg(player, 0x35, msg_59);
@@ -3198,24 +3227,24 @@ function ItemNormal_00009067(iid, num, bind, param)
     local _40 = {2400,2401,2402,2403,2404,2405,2406,2407,2408,2409,2410,2411,2412,2413,2414,2415,2416,2417,2418,2419,2420,2421,2422,2423,}
     local _50 = {2545,2546,2547,2548,2549,2550,2553,2554,2555,2556,2557,2558,2561,2562,2563,2564,2565,2566,}
 
-    if package:GetRestPackageSize() < 1 then
+    if package:GetRestPackageSize() < 1*num then
         player:sendMsgCode(2, 1011, 0);
         return false;
     end
 
-    local r = math.random(1, 100)
+    for i=1,num do
+        local r = math.random(1, 100)
 
-    local item = 0
-    if r >= 67 then
-        item = _50[math.random(1,#_50)]
-        package:Add(item, 1, true, 0, 2)
-        Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."] "..msg_60.."[4:9067]，"..msg_61.."[4:"..item.."]")
-    else
-        item = _40[math.random(1,#_40)]
-        package:Add(item, 1, true, 0, 2)
+        local item = 0
+        if r >= 67 then
+            item = _50[math.random(1,#_50)]
+            package:Add(item, 1, true, 0, 2)
+            Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."] "..msg_60.."[4:9067]，"..msg_61.."[4:"..item.."]")
+        else
+            item = _40[math.random(1,#_40)]
+            package:Add(item, 1, true, 0, 2)
+        end
     end
-
-
     package:DelItemSendMsg(iid, player);
     return num;
 end
@@ -3470,7 +3499,7 @@ end
 function ItemNormal_00000067(iid, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
-	if package:GetRestPackageSize() < 20 then		
+	if package:GetRestPackageSize() < (20 + num * 20 / 99) then		
 		player:sendMsgCode(2, 1011, 0);
 		return false;
 	end
@@ -3481,47 +3510,46 @@ function ItemNormal_00000067(iid, num, bind, param)
 	end
     local cls = fgt:getClass()
 
+    for i = 1, num do
+        -- 太乙精金
+        package:AddItem(503, 5, true, 0, 2);
+        -- 五行精金
+        package:AddItem(515, 1, true, 0, 2);
+        -- 高级挂机加速符
+        package:AddItem(56, 12, true, 0, 2);
+        -- 修炼加速符
+        package:AddItem(57, 12, true, 0, 2);
+        -- 五级暴击石
+        package:AddItem(5115, 1, true, 0, 2);
+        -- 精致拆卸石
+        package:AddItem(505, 1, true, 0, 2);
+        -- 宝石保护符
+        package:AddItem(513, 3, true, 0, 2);
+        -- 初级打孔石
+        package:AddItem(510, 2, true, 0, 2);
+        -- 中级打孔石
+        package:AddItem(511, 2, true, 0, 2);
+        -- 高级打孔石
+        package:AddItem(512, 2, true, 0, 2);
+        -- 兜率精金
+        package:AddItem(47, 1, true, 0, 2);
+        -- 九龙神火
+        package:AddItem(50, 1, true, 0, 2);
+        -- 凝神易经丹
+        package:AddItem(509, 2, true, 0, 2);
+        -- 补髓益元丹
+        package:AddItem(507, 2, true, 0, 2);
+        -- 银票
+        package:AddItem(15, 5, true, 0, 2);
+        -- 洗练符
+        package:AddItem(500, 5, true, 0, 2);
+        -- 洗练符保护符
+        package:AddItem(501, 2, true, 0, 2);
+        -- 银票
+        package:AddItem(15, 10, true, 0, 2);
 
-    -- 太乙精金
-    package:AddItem(503, 5, true, 0, 2);
-    -- 五行精金
-    package:AddItem(515, 1, true, 0, 2);
-    -- 高级挂机加速符
-    package:AddItem(56, 12, true, 0, 2);
-    -- 修炼加速符
-    package:AddItem(57, 12, true, 0, 2);
-    -- 五级暴击石
-    package:AddItem(5115, 1, true, 0, 2);
-    -- 精致拆卸石
-    package:AddItem(505, 1, true, 0, 2);
-    -- 宝石保护符
-    package:AddItem(513, 3, true, 0, 2);
-    -- 初级打孔石
-    package:AddItem(510, 2, true, 0, 2);
-    -- 中级打孔石
-    package:AddItem(511, 2, true, 0, 2);
-    -- 高级打孔石
-    package:AddItem(512, 2, true, 0, 2);
-    -- 兜率精金
-    package:AddItem(47, 1, true, 0, 2);
-    -- 九龙神火
-    package:AddItem(50, 1, true, 0, 2);
-    -- 凝神易经丹
-    package:AddItem(509, 2, true, 0, 2);
-    -- 补髓益元丹
-    package:AddItem(507, 2, true, 0, 2);
-    -- 银票
-    package:AddItem(15, 5, true, 0, 2);
-    -- 洗练符
-    package:AddItem(500, 5, true, 0, 2);
-    -- 洗练符保护符
-    package:AddItem(501, 2, true, 0, 2);
-    -- 银票
-    package:AddItem(15, 10, true, 0, 2);
-
-    local Equip30 = {2393, 2385, 2377}
-    local Equip50 = {2545, 2553, 2561}
-    for k = 1, num do
+        local Equip30 = {2393, 2385, 2377}
+        local Equip50 = {2545, 2553, 2561}
         -- 30紫头
         package:AddEquip(Equip30[cls], 1);
         -- 50橙头
@@ -4052,22 +4080,24 @@ function ItemNormal_00009031(iid, num, bind, param)
             factor = 2
         end
 
-        if package:GetRestPackageSize() < 3 then
+        if package:GetRestPackageSize() < (3 + 3*num/99) then
             player:sendMsgCode(2, 1011, 0);
             return false;
         end
 
         local item = items[id]
 
-        for k,v in pairs(item) do
-            if v[1] == 60000 then
-                player:getCoupon(v[2]*factor)
-            else
-                package:Add(v[1], v[2]*factor, true, 0, 2)
+        for i=1,num do
+            for k,v in pairs(item) do
+                if v[1] == 60000 then
+                    player:getCoupon(v[2]*factor)
+                else
+                    package:Add(v[1], v[2]*factor, true, 0, 2)
+                end
             end
-        end
 
-        package:DelItemSendMsg(iid, player);
+            package:DelItemSendMsg(iid, player);
+        end
         return num
     else
         SendMsg(player, 0x35, msg_59);
@@ -4104,7 +4134,7 @@ function ItemNormal_00009053(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-    if package:GetRestPackageSize() < 2 then
+    if package:GetRestPackageSize() < num + 2*num/99 then
 		player:sendMsgCode(2, 1011, 0);
         return false
     end
@@ -4116,60 +4146,62 @@ function ItemNormal_00009053(iid, num, bind, param)
     local item = 0
 
     local k = 1
-    local rand = math.random(1,10000)
-    for n = 1,#prob do
-        if rand <= prob[n] then
-            item = items[n]
-            k = n
-            break;
+    for i = 1,num do
+        local rand = math.random(1,10000)
+        for n = 1,#prob do
+            if rand <= prob[n] then
+                item = items[n]
+                k = n
+                break;
+            end
         end
-    end
 
-    if item == 0 then
-        return false
-    end
+        if item == 0 then
+            return false
+        end
 
-    if item == 15 then
-        package:AddItem(item, 2, 1, 0, 2)
-        if broad[k] == 1 then
-            Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_98.."[4:"..iid.."]"..msg_99.."[4:"..item.."]x2");
+        if item == 15 then
+            package:AddItem(item, 2, 1, 0, 2)
+            if broad[k] == 1 then
+                Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_98.."[4:"..iid.."]"..msg_99.."[4:"..item.."]x2");
+            end
+        else
+            package:AddItem(item, 1, 1, 0, 2)
+            if broad[k] == 1 then
+                Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_98.."[4:"..iid.."]"..msg_99.."[4:"..item.."]x1");
+            end
         end
-    else
-        package:AddItem(item, 1, 1, 0, 2)
-        if broad[k] == 1 then
-            Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_98.."[4:"..iid.."]"..msg_99.."[4:"..item.."]x1");
-        end
-    end
 
-    item = 0
-    if iid == 9053 then
-        rand = math.random(1,100)
-        if rand <= 30 then
-            item = 2856
+        item = 0
+        if iid == 9053 then
+            rand = math.random(1,100)
+            if rand <= 30 then
+                item = 2856
+            end
+        elseif iid == 9054 then
+            rand = math.random(1,100)
+            if rand <= 25 then
+                item = 2857
+            end
+        elseif iid == 9055 then
+            rand = math.random(1,100)
+            if rand <= 10 then
+                item = 2858
+            end
+        elseif iid == 9056 then
+            rand = math.random(1,100)
+            if rand <= 20 then
+                item = 2859
+            end
+        else
         end
-    elseif iid == 9054 then
-        rand = math.random(1,100)
-        if rand <= 25 then
-            item = 2857
-        end
-    elseif iid == 9055 then
-        rand = math.random(1,100)
-        if rand <= 10 then
-            item = 2858
-        end
-    elseif iid == 9056 then
-        rand = math.random(1,100)
-        if rand <= 20 then
-            item = 2859
-        end
-    else
-    end
 
-    if item > 0 then
-        package:Add(item, 1, 1, 0, 2)
-        --Broadcast(0x1, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_98.."[4:8]"..msg_99.."[4:"..item.."]x1");
-    end
+        if item > 0 then
+            package:Add(item, 1, 1, 0, 2)
+            --Broadcast(0x1, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_98.."[4:8]"..msg_99.."[4:"..item.."]x1");
+        end
 
+    end
     return num;
 end
 
@@ -4191,7 +4223,7 @@ function ItemNormal_00009058(iid, num, bind, param)
 
     local idx = iid - 9057;
     local packageSize = {13, 11, 9, 7, 5, 4, 2, 2, 2};
-    if package:GetRestPackageSize() < packageSize[idx] then
+    if package:GetRestPackageSize() < (packageSize[idx] + packageSize[idx]*num/99) then
 		player:sendMsgCode(2, 1011, 0);
         return false
     end
@@ -4199,15 +4231,17 @@ function ItemNormal_00009058(iid, num, bind, param)
     package:DelItemSendMsg(iid, player);
 
     local items = all_items[idx];
-    for i = 1, #items do
-        if items[i][1] == 9017 then
-            for j = 1, items[i][2] do
-                local elixir = {9017, 9018, 9019, 9020, 9021, 9022}
-                p = math.random(1, #elixir)
-                package:AddItem(elixir[p], 1, 1, 0, 2)
+    for tmp = 1, num do
+        for i = 1, #items do
+            if items[i][1] == 9017 then
+                for j = 1, items[i][2] do
+                    local elixir = {9017, 9018, 9019, 9020, 9021, 9022}
+                    p = math.random(1, #elixir)
+                    package:AddItem(elixir[p], 1, 1, 0, 2)
+                end
+            else
+                package:AddItem(items[i][1], items[i][2], 1, 0, 2)
             end
-        else
-            package:AddItem(items[i][1], items[i][2], 1, 0, 2)
         end
     end
 
@@ -4439,7 +4473,7 @@ function ItemNormal_00009099(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-    if package:GetRestPackageSize() < num*16 then
+    if package:GetRestPackageSize() < num*16/99 then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
@@ -4523,7 +4557,7 @@ function ItemNormal_00009120(iid, num, bind, param)
         return false
     end
 
-    package:AddItem(33, 50, 1, 0, 2)
+    package:AddItem(33, 50*num, 1, 0, 2)
     package:DelItemSendMsg(iid, player)
 
     return num
@@ -7028,45 +7062,49 @@ function ItemNormal_00009192(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-    if package:GetRestPackageSize() < 3 then
+    if package:GetRestPackageSize() < 3 + 3*num/99 then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
 
-    package:Add(134, 1, true, 0, 2);
-    package:Add(1325, 1, true, 0, 2);
+    for tmp=1,num do
+        package:Add(134, 1, true, 0, 2);
+        package:Add(1325, 1, true, 0, 2);
 
-    local prob = {2000, 4000, 6000, 8000, 10000}
-    local items = {{9017,1}, {9018,1}, {9019,1}, {9020,1}, {9021,1}}
-    local p = math.random(1, 10000)
-    local i = 1
-    for n = 1, #prob do
-        if p <= prob[n] then
-            i = n
-            package:Add(items[i][1], items[i][2], true, 0, 2);
-            break
+        local prob = {2000, 4000, 6000, 8000, 10000}
+        local items = {{9017,1}, {9018,1}, {9019,1}, {9020,1}, {9021,1}}
+        local p = math.random(1, 10000)
+        local i = 1
+        for n = 1, #prob do
+            if p <= prob[n] then
+                i = n
+                package:Add(items[i][1], items[i][2], true, 0, 2);
+                break
+            end
         end
+        Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."] "..msg_60.."[4:9192]，"..msg_61.."[4:134]x1、[4:1325]x1、[4:"..items[i][1].."]x1")
     end
-    Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."] "..msg_60.."[4:9192]，"..msg_61.."[4:134]x1、[4:1325]x1、[4:"..items[i][1].."]x1")
 
     package:DelItemSendMsg(iid, player);
-    return 1;
+    return num;
 end
 
 function ItemNormal_00009193(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-    if package:GetRestPackageSize() < 1 then
+    if package:GetRestPackageSize() < (((num > 4) and 4) or num) then
         player:sendMsgCode(2, 1011, 0);
         return false;
     end
 
-    local item = {502,510,504,55}
-    local i = math.random(1,#item)
+    for tmp=1,num do
+        local item = {502,510,504,55}
+        local i = math.random(1,#item)
 
-    package:AddItem(item[i], 1, true, false)
-    player:getTael(500*num)  
+        package:AddItem(item[i], 1, true, false)
+        player:getTael(500)  
+    end
     package:DelItemSendMsg(iid, player);
     return num;
 end
@@ -7270,11 +7308,13 @@ function ItemNormal_00009311(iid, num, bind, param)
         [9312] = {{1326, 2}, {30, 1}, {509, 1}, {500, 2}, {9076, 1}},
     }
     local chance = { 3000, 6000, 7000, 9000, 10000}
-    local r = math.random(1, 10000)
-    for i = 1, #chance do
-        if r <= chance[i] then
-            package:Add(items[iid][i][1], items[iid][i][2], 1, 0, 2);
-            break
+    for tmp=1,num do
+        local r = math.random(1, 10000)
+        for i = 1, #chance do
+            if r <= chance[i] then
+                package:Add(items[iid][i][1], items[iid][i][2], 1, 0, 2);
+                break
+            end
         end
     end
     package:DelItemSendMsg(iid, player)
@@ -7287,6 +7327,7 @@ function ItemNormal_00009314(iid, num, bind, param)
     local items = { 503, 9088, 512, 33, 15, 514, 501, 513, 1325, 134, 507, 509, 515, 551 }
     local chance = { 510, 1510, 2510, 3530, 5330, 6230, 7080, 7930, 8180, 8430, 8630, 8830, 9000, 10000 }
     local used = 0
+
     for n = 1, num do
         if package:GetRestPackageSize() < 1 then
             if used ~= 0 then
