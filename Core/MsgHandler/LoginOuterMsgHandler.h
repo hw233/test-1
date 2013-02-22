@@ -48,7 +48,6 @@
 #include "Memcached.h"
 #include "GObject/RechargeTmpl.h"
 #include "Version.h"
-#include "GObject/GVar.h"
 
 #ifndef _WIN32
 //#include <libmemcached/memcached.h>
@@ -757,6 +756,14 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 
             pl->SetVar(GObject::VAR_RP_VALUE, nu._rp);
             pl->setTitle(0, 0);
+
+#ifndef _FB
+#ifndef _VT
+#ifndef _WIN32
+            GObject::dclogger.create_success_sec(pl);
+#endif
+#endif
+#endif
         }
 	}
 
@@ -2732,6 +2739,16 @@ void GMCmd(LoginMsgHdr& hdr, const void* data)
             break;
         case 0x02:
             result = SwitchAutoForbid(val);
+        case 0x03:
+            {
+                UInt32 endTime = 0;
+                UInt32 flag = 0;
+                br >> endTime >> flag;
+                GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_BEGIN, val);
+                GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_END, endTime);
+                GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_ACTION, flag);
+                result = 0;
+            }
         default:
             break;
     }

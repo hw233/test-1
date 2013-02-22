@@ -6536,6 +6536,7 @@ function getCopyFrontmapAward(step, localtion)
     end
 end
 
+--[[
 --大闹龙宫
 function checkDragonKingCanSucceed(player, step)
     if nil == player then
@@ -6739,12 +6740,12 @@ function getDragonKingTMAward(step)
     end
     return {}
 end
+--]]
 
 --flag == 1,2,3
 --1:大闹龙宫
 --2:大闹龙宫之金蛇起舞
 --3:大闹龙宫之天芒神梭
---[[
 function checkDragonKingCanSucceed(player, step, flag)
     if nil == player or nil == flag then
         return false
@@ -6794,9 +6795,9 @@ function getDragonKingAward(step, flag)
         [3] = {{33, 1}, {516, 1}, {501, 1}, {506, 1}, {508, 1}, {512, 1}, {513, 1}, {514, 1}, {517, 1}, {1411, 1}},
         [4] = {{1325, 1}, {134, 1}, {551, 1}, {8000, 1}, {47, 1}, {515, 1}, {549, 1}, {50, 1}},
         [5] = {
-            [1] = {6134,1},
-            [2] = {6135,1},
-            [3] = {136,1},
+            [1] = {{6134,1}},
+            [2] = {{6135,1}},
+            [3] = {{136,1}},
         },
     }
     local chances = {
@@ -6817,9 +6818,6 @@ function getDragonKingAward(step, flag)
             return {}
         end
     end
-    if #items[step] ~= #chances[step] then
-        return {}
-    end
     local r = math.random(1, 10000)
     for i = 1, #chances[step] do
         if r <= chances[step][i] then
@@ -6831,7 +6829,6 @@ function getDragonKingAward(step, flag)
     end
     return {}
 end
---]]
 
 function getSaveGoldActAward(gold)
     if nil == gold then

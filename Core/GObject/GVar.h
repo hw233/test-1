@@ -53,8 +53,9 @@ namespace GObject
         GVAR_DISCOUNT_END3 = 24, // 当前限购栏三结束时间
 
         GVAR_HEROMEM_CUT = 25,  // 剑侠秘籍去除标志（用于更新时发送老玩家补偿的）
-        GVAR_DRAGONKING_BEGIN = 26, //大闹龙宫活动开始时间
-        GVAR_DRAGONKING_END = 27, //大闹龙宫活动结束时间
+        GVAR_DRAGONKING_ACTION = 26, //大闹龙宫活动标志
+        GVAR_DRAGONKING_BEGIN = 27, //大闹龙宫活动开始时间
+        GVAR_DRAGONKING_END = 28, //大闹龙宫活动结束时间
 
         GVAR_MAX,
     };
