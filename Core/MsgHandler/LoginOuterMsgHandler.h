@@ -756,6 +756,14 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 
             pl->SetVar(GObject::VAR_RP_VALUE, nu._rp);
             pl->setTitle(0, 0);
+
+#ifndef _FB
+#ifndef _VT
+#ifndef _WIN32
+            GObject::dclogger.create_success_sec(pl);
+#endif
+#endif
+#endif
         }
 	}
 

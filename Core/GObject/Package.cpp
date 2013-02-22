@@ -5928,8 +5928,10 @@ namespace GObject
         stLBAttrConf& lbAttrConf = GObjectManager::getLBAttrConf();
         UInt8 attrNum = lbAttrConf.getAttrNum(uRand(100));
         UInt16 subClass = itype->subClass;
+        bool fSpecial = true;
         if(!FinishLBSmeltSpecial(itype, lbattr, attrNum))
         {
+            fSpecial = false;
             UInt8 minAttrNum = item->quality > 3 ? 3 : 1;
             UInt8 color2 = item->quality;
             UInt8 color = guji->quality;
@@ -6020,12 +6022,18 @@ namespace GObject
             break;
         case 3:
             m_Owner->udpLog("Tongling", "F_10000_2", "", "", "", "", "act");
+            m_Owner->udpLog("Tongling", "F_10000_19", "", "", "", "", "act");
             break;
         case 4:
             m_Owner->udpLog("Tongling", "F_10000_3", "", "", "", "", "act");
+            m_Owner->udpLog("Tongling", "F_10000_20", "", "", "", "", "act");
             break;
         case 5:
             m_Owner->udpLog("Tongling", "F_10000_4", "", "", "", "", "act");
+            if(fSpecial)
+                m_Owner->udpLog("Tongling", "F_10000_22", "", "", "", "", "act");
+            else
+                m_Owner->udpLog("Tongling", "F_10000_21", "", "", "", "", "act");
             break;
         }
 
@@ -6080,6 +6088,10 @@ namespace GObject
         OnAddEquipAndCheckAttainment(itype, FromFuling);
 
         closeLingbaoSmelt();
+
+		Stream st(REP::EQ_LINGBAO);
+		st << static_cast<UInt8>(6) << id << Stream::eos;
+		m_Owner->send(st);
     }
 
     void Package::QuitLBSmelt()

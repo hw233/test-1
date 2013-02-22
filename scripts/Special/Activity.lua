@@ -3766,6 +3766,28 @@ function sendRechargeMails(player, ototal, ntotal)
     elseif n >= (s + 23*86400) and n < (s + 24*86400) then
         sendRechargeMails_2013_02_22(player, ototal, ntotal)
     end
+
+    -- 20130223~20130301
+    local t = { ['year'] = 2013, ['month'] = 2, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local s = os.time(t)
+    local n = os.time() + 11
+
+    if n >= s and n < (s + 1*86400) then
+        sendRechargeMails_2013_02_16(player, ototal, ntotal)
+    elseif n >= (s + 1*86400) and n < (s + 2*86400) then
+        sendRechargeMails_2013_02_17(player, ototal, ntotal)
+    elseif n >= (s + 2*86400) and n < (s + 3*86400) then
+        sendRechargeMails_2013_02_18(player, ototal, ntotal)
+    elseif n >= (s + 3*86400) and n < (s + 4*86400) then
+        sendRechargeMails_2013_02_19(player, ototal, ntotal)
+    elseif n >= (s + 4*86400) and n < (s + 5*86400) then
+        sendRechargeMails_2013_02_20(player, ototal, ntotal)
+    elseif n >= (s + 5*86400) and n < (s + 6*86400) then
+        sendRechargeMails_2013_02_21(player, ototal, ntotal)
+    elseif n >= (s + 6*86400) and n < (s + 7*86400) then
+        sendRechargeMails_2013_02_22(player, ototal, ntotal)
+    end
+
 end
 
 function sendRechargeRankAward_2012_10_16(player, pos)
@@ -5477,6 +5499,27 @@ function sendRechargeRankAward(player, pos)
     elseif n >= (s + 22*86400 + 10*60) and n < (s + 23*86400 + 10*60) then
         sendRechargeRankAward_2013_02_21(player, pos)
     elseif n >= (s + 23*86400 + 10*60) and n < (s + 24*86400 + 10*60) then
+        sendRechargeRankAward_2013_02_22(player, pos)
+    end
+
+    -- 20130223~20130301
+    local t = { ['year'] = 2013, ['month'] = 2, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local s = os.time(t)
+    local n = os.time()
+
+    if n >= (s + 10 * 60) and n < (s + 86400 + 10*60) then
+        sendRechargeRankAward_2013_02_16(player, pos)
+    elseif n >= (s + 86400 + 10*60) and n < (s + 2*86400 + 10*60) then
+        sendRechargeRankAward_2013_02_17(player, pos)
+    elseif n >= (s + 2*86400 + 10*60) and n < (s + 3*86400 + 10*60) then
+        sendRechargeRankAward_2013_02_18(player, pos)
+    elseif n >= (s + 3*86400 + 10*60) and n < (s + 4*86400 + 10*60) then
+        sendRechargeRankAward_2013_02_19(player, pos)
+    elseif n >= (s + 4*86400 + 10*60) and n < (s + 5*86400 + 10*60) then
+        sendRechargeRankAward_2013_02_20(player, pos)
+    elseif n >= (s + 5*86400 + 10*60) and n < (s + 6*86400 + 10*60) then
+        sendRechargeRankAward_2013_02_21(player, pos)
+    elseif n >= (s + 6*86400 + 10*60) and n < (s + 7*86400 + 10*60) then
         sendRechargeRankAward_2013_02_22(player, pos)
     end
 end
