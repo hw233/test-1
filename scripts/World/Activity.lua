@@ -813,6 +813,12 @@ function onActivityCheck(tm)
       elseif tm >= actTime560 and tm < actTime560_1 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
+      elseif tm >= actTime561 and tm < actTime561_1 then
+          setRechargeActive(true, 16)
+          setNeedRechargeRank(false)
+      elseif tm >= actTime562 and tm < actTime562_1 then
+          setRechargeActive(true, 16)
+          setNeedRechargeRank(true)
       else
           setRechargeActive(false, 16)
           setNeedRechargeRank(false)
@@ -1087,6 +1093,8 @@ function initActTime(y, m, d)
   local  SerStartTm550= { ['year'] = 2013, ['month'] = 1, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 充值排行
   local  SerStartTm560= { ['year'] = 2013, ['month'] = 1, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm561= { ['year'] = 2013, ['month'] = 2, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm562= { ['year'] = 2013, ['month'] = 2, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --风雷罗盘
   local  SerStartTm551= { ['year'] = 2013, ['month'] = 1, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm551_1= { ['year'] = 2013, ['month'] = 3, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1448,7 +1456,13 @@ function initActTime(y, m, d)
   actTime551_1 = os.time(SerStartTm551_1) ;
 
   actTime560 = os.time(SerStartTm560);
-  actTime560_1 = os.time(SerStartTm560) + 24 * 86400;
+  actTime560_1 = os.time(SerStartTm560) + 10 * 86400;
+
+  actTime561 = os.time(SerStartTm561);
+  actTime561_1 = os.time(SerStartTm561) + 7 * 86400;
+
+  actTime562 = os.time(SerStartTm562);
+  actTime562_1 = os.time(SerStartTm562) + 7 * 86400;
   -- 繁体版
   actTime101 = os.time(SerStartTm101);
   actTime102 = os.time(SerStartTm101) + 8 * 86400;

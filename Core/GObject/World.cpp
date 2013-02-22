@@ -1150,7 +1150,6 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 2, 8)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 2, 9)
 
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 2, 16)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 2, 17)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 2, 18)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 2, 19)
