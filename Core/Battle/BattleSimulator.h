@@ -336,6 +336,9 @@ private:
     typedef void (Battle::BattleSimulator::*setStatusFunc)(BattleFighter * bf, UInt8 side, UInt8 pos, const GData::SkillBase* skill, float value, UInt16 last, bool active);
     typedef void (Battle::BattleSimulator::*setStatusFunc2)(BattleFighter* bf, UInt8 side, UInt8 pos, UInt16 skillId, float value, UInt16 last, bool active);
 
+    // 不可被抵抗
+    void setStatusChange_Aura2(BattleFighter * bf, UInt8 side, UInt8 pos, const GData::SkillBase* skill, float value, UInt16 last, bool active);
+    // 可被抵抗
     void setStatusChange_Aura(BattleFighter * bf, UInt8 side, UInt8 pos, const GData::SkillBase* skill, float value, UInt16 last, bool active);
     void setStatusChange_Atk(BattleFighter * bf, UInt8 side, UInt8 pos, const GData::SkillBase* skill, float value, UInt16 last, bool active);
     void setStatusChange_Def(BattleFighter * bf, UInt8 side, UInt8 pos, const GData::SkillBase* skill, float value, UInt16 last, bool active);
