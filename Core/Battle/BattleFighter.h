@@ -7,6 +7,7 @@
 #include "BattleObject.h"
 #include "GData/SkillTable.h"
 #include "GData/SkillStrengthen.h"
+#include "GData/LBSkillTable.h"
 
 namespace Script
 {
@@ -22,6 +23,7 @@ namespace GData
 {
     struct SkillBase;
     struct SkillItem;
+    struct LBSkillItem;
 }
 
 namespace Battle
@@ -786,6 +788,29 @@ public:
     bool releaseDarkVigor();
     const GData::SkillBase* getPassiveSkillOnCounter100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnCounter(bool noPossibleTarget = false);
+
+private:
+    std::vector<GData::LBSkillItem> _onSkillCond;
+    std::vector<GData::LBSkillItem> _onActionCond1;
+    std::vector<GData::LBSkillItem> _onActionCond2;
+    std::vector<GData::LBSkillItem> _onDeadCond;
+    std::vector<GData::LBSkillItem> _onBleedCond;
+    std::vector<GData::LBSkillItem> _onStateCond;
+    float _hpShieldSelf;
+    UInt8 _hpShieldSelf_last;
+public:
+    GData::LBSkillItem* getSkillCondItem(UInt16 skillid);
+    GData::LBSkillItem* getActionCondItem1();
+    GData::LBSkillItem* getActionCondItem2();
+    GData::LBSkillItem* getDeadCondItem();
+    GData::LBSkillItem* getBleedCondItem();
+    GData::LBSkillItem* getStateCondItem(UInt16 state);
+    void releaseLBSkillCD();
+
+    float getHpShieldSelf() { return _hpShieldSelf; }
+    void setHpShieldSelf(float v, UInt8 l) { _hpShieldSelf = v; _hpShieldSelf_last = l; }
+    bool releaseHpSieldSelf();
+
 
 public:
 	enum StatusFlag

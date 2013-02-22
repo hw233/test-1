@@ -58,6 +58,8 @@ namespace GObject
         void strTrump(std::string& str);
         void strSS(std::string& str);
         void strCitta(std::string& str);
+        void strLbs(std::string& str);
+        void loadLbSkill(std::string& str);
 
         template <typename T>
         bool value2string(T* values, int size, std::string& str)
@@ -116,6 +118,7 @@ namespace GObject
         UInt16 _trump[TRUMP_UPMAX];
 
         std::map<UInt16, UInt16> _ss;
+        std::vector<LBSkill> _lbSkill;
 
         GData::AttrExtra _attrExtraEquip;
         ElixirAttr _elixirattr;

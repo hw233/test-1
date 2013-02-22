@@ -1,6 +1,6 @@
 
 -- 限时折扣
-testTm = { ['year'] = 2012, ['month'] = 8, ['day'] = 14, ['hour'] = 12, ['min'] = 0, ['sec'] = 0 };
+testTm = { ['year'] = 2013, ['month'] = 1, ['day'] = 22, ['hour'] = 12, ['min'] = 0, ['sec'] = 0 };
 
 local discount_items = {
     465,466,516,547,57,56,500,15,501,503,505,506,508,511,512,513,514,515,517,
@@ -10,6 +10,8 @@ local discount_items = {
 specialDiscount1 = {
     discount_items[1],
     4,
+    1,
+    100,
     8,
     os.time(testTm),
     os.time(testTm) + 86400,
@@ -19,6 +21,8 @@ specialDiscount1 = {
 specialDiscount2 = {
     discount_items[6],
     4,
+    1,
+    100,
     8,
     os.time(testTm),
     os.time(testTm) + 86400,
@@ -28,6 +32,8 @@ specialDiscount2 = {
 specialDiscount3 = {
     discount_items[6],
     5,
+    1,
+    100,
     27,
     os.time(testTm),
     os.time(testTm) + 86400,
@@ -37,6 +43,8 @@ specialDiscount3 = {
 specialDiscount4 = {
     discount_items[6],
     6,
+    2,
+    100,
     28,
     os.time(testTm),
     os.time(testTm) + 86400,
@@ -217,7 +225,9 @@ function loadStore()
             store:add(2,9179,30)
         end
 
-        --store:add(2,9285,10)
+		store:add(2,9308,10)
+		store:add(2,9310,30)
+        store:add(2,9285,10)
         store:add(2,9123,50)
         store:add(2,551,10)
         store:add(2,134,50)
@@ -291,6 +301,8 @@ function loadStore()
         store:add(3,5123,20)
         store:add(3,5133,15)
         store:add(3,5143,20)
+		store:add(4,9307,200)
+		store:add(4,9309,500)
         store:add(4,57,10)
         store:add(4,511,5)
         store:add(4,56,10)

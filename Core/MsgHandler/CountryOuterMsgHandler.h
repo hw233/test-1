@@ -1501,11 +1501,12 @@ void OnFighterEquipReq( GameMsgHdr& hdr, FighterEquipReq& fer )
 		return;
 	if(fer._part == 0)
 	{
-		static UInt8 p[13] = {0x1f, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x0a, 0x0b, 0x0c};
-		ItemEquip * e[13] = {fgt->getHalo(), fgt->getFashion(), fgt->getWeapon(), fgt->getArmor(0), fgt->getArmor(1),
+		static UInt8 p[16] = {0x1f, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x0a, 0x0b, 0x0c, 0x60, 0x61, 0x62};
+		ItemEquip * e[16] = {fgt->getHalo(), fgt->getFashion(), fgt->getWeapon(), fgt->getArmor(0), fgt->getArmor(1),
             fgt->getArmor(2), fgt->getArmor(3), fgt->getArmor(4), fgt->getAmulet(),
-            fgt->getRing(), fgt->getTrump(0), fgt->getTrump(1), fgt->getTrump(2)};
-		fgt->sendModification(13, p, e, false);
+            fgt->getRing(), fgt->getTrump(0), fgt->getTrump(1), fgt->getTrump(2),
+            fgt->getLingbao(0), fgt->getLingbao(1), fgt->getLingbao(2)};
+		fgt->sendModification(16, p, e, false);
 		return;
 	}
 
@@ -3012,7 +3013,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
         lr._count = 1;
 	UInt32 price = 0;
     if (lr._type == 1)
-        price = GData::store.getPrice(lr._type, lr._itemId, lr._count); // XXX: when discount need one item id
+        price = GData::store.getPrice(lr._type, lr._itemId, lr._count, 0); // XXX: when discount need one item id
     else if(lr._type == 125) //蓝砖超人活动页
     {
         if(!World::getBDSuperman())
@@ -3041,13 +3042,28 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 		{
         case 1:
             {
-                // (JLT): 折扣商品的购买
+                // 折扣商品的购买
                 UInt8 discountType = lr._count;
                 UInt8 varoff = GData::store.getDisTypeVarOffset(discountType);
-                if (varoff == 0xfe)
+                UInt8 exType = 0;
+                UInt32 exValue = 0;
+
+                exType = GData::store.getExDiscount(discountType, exValue);
+
+                switch(exType)
                 {
-                    //TODO: 全服限购，只需要检查全服是否还有库存
+                    case 1:
+                        // 消费限购
+                        player->GetVar(VAR_DISCOUNT_CONSUME1 + discountType - 4);
+                        break;
+                    case 2:
+                        // 充值限购
+                        player->GetVar(VAR_DISCOUNT_RECHARGE1 + discountType - 4);
+                        break;
+                    default:
+                        break;
                 }
+
                 if (varoff == 0xff)
                     return;
 
@@ -3070,7 +3086,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                 // 获取价格
                 price = 0;
                 for (UInt8 i = 0; i < c; ++i)
-                    price += GData::store.getPrice(1, items[i], discountType);
+                    price += GData::store.getPrice(1, items[i], discountType, i);
 
                 if(PLAYER_DATA(player, gold) < price)
                 {
@@ -3468,6 +3484,41 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                     player->useGold(price,&ci);
                     player->consumeGold(price);
 					st << static_cast<UInt8>(0);
+
+                    if (lr._type == PURCHASE1 + 1 )
+                    {
+                        bool flag = false;
+                        UInt32 now = TimeUtil::Now();
+                        if ((GVAR.GetVar(GVAR_DISCOUNT_TYPE1) == 1)
+                                && GVAR.GetVar(GVAR_DISCOUNT_BEGIN1) < now
+                                && GVAR.GetVar(GVAR_DISCOUNT_END1) > now)
+                        {
+                            player->AddVar(VAR_DISCOUNT_CONSUME1, price);
+                            flag = true;
+                        }
+                        else
+                            player->SetVar(VAR_DISCOUNT_CONSUME1, 0);
+                        if ((GVAR.GetVar(GVAR_DISCOUNT_TYPE2) == 1)
+                                && GVAR.GetVar(GVAR_DISCOUNT_BEGIN2) < now
+                                && GVAR.GetVar(GVAR_DISCOUNT_END2) > now)
+                        {
+                            player->AddVar(VAR_DISCOUNT_CONSUME2, price);
+                            flag = true;
+                        }
+                        else
+                            player->SetVar(VAR_DISCOUNT_CONSUME2, 0);
+                        if ((GVAR.GetVar(GVAR_DISCOUNT_TYPE3) == 1)
+                                && GVAR.GetVar(GVAR_DISCOUNT_BEGIN3) < now
+                                && GVAR.GetVar(GVAR_DISCOUNT_END3) > now)
+                        {
+                            player->AddVar(VAR_DISCOUNT_CONSUME3, price);
+                            flag = true;
+                        }
+                        else
+                            player->SetVar(VAR_DISCOUNT_CONSUME3, 0);
+                        if (flag)
+                            player->sendDiscountLimit();
+                    }
 
                     //GameAction()->doAty(player, AtyBuy ,0,0);
                 }
@@ -5713,6 +5764,109 @@ void OnAutoJobHunter( GameMsgHdr & hdr, const void * data )
     br >> type;
     jobHunter->OnAutoCommand(type);
 }
+
+void OnEquipLingbaoReq( GameMsgHdr & hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	if(!player->hasChecked())
+		return;
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 opt = 0;
+    br >> opt;
+
+	Package * pkg = player->GetPackage();
+
+    UInt8 res = 0;
+    Stream st(REP::EQ_LINGBAO);
+    st << opt;
+    switch(opt)
+    {
+    case 1:
+        {
+            UInt32 equipId = 0;
+            UInt8 protect = 0;
+            UInt8 bind = 0;
+            std::vector<UInt16> values;
+            br >> equipId >> protect >> bind;
+            res = pkg->Tongling(equipId, protect, bind, values);
+            UInt8 cnt = values.size();
+            st << res;
+            st << cnt;
+            for(UInt8 i = 0; i < cnt; ++ i)
+            {
+                st << values[i];
+            }
+            st << Stream::eos;
+            player->send(st);
+        }
+        break;
+    case 2:
+        {
+            UInt16 gujiId = 0; // 古籍id
+            UInt8 type = 0; // 是否使用高级空宝具
+            br >> gujiId >> type;
+            res = pkg->OpenLingbaoSmelt(gujiId, type);
+            st << res << Stream::eos;
+            player->send(st);
+        }
+        break;
+    case 3:
+        {
+            UInt16 count = 0;
+            br >> count;
+            UInt8 res = 0;
+            for(int i = 0; i < count; ++ i)
+            {
+                UInt16 cnt = 0;
+                br >> cnt;
+                UInt32 itemId = 0;
+                br >> itemId;
+                res = pkg->LingbaoSmelt(itemId, cnt);
+
+                if(res != 0)
+                    break;
+            }
+            pkg->sendLingbaoSmeltInfo();
+        }
+        break;
+    case 4:
+        {
+            pkg->closeLingbaoSmelt();
+        }
+        break;
+    case 5:
+        {
+            pkg->sendLingbaoSmeltInfo();
+        }
+        break;
+    case 6:
+        {
+            pkg->FinishLBSmelt();
+        }
+        break;
+    }
+}
+
+void OnDreamer( GameMsgHdr & hdr, const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+
+    Dreamer * dreamer = player->getDreamer();
+    if (!dreamer)
+        return;
+
+    UInt8 type = 0;
+    br >> type;
+    UInt8 val  = 0xFF;
+    UInt8 val2 = 0xFF;
+    if (br.left())
+        br >> val;
+    if (br.left())
+        br >> val2;
+    dreamer->OnCommand(type, val, val2);
+}
+
 
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_

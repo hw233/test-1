@@ -488,6 +488,17 @@ struct DBRechargeItem
     int    num;
 };
 
+struct DBDreamer
+{
+    UInt8 level;
+    UInt8 floor;
+    UInt8 maxX;
+    UInt8 maxY;
+    UInt8 gridCount;
+    UInt8 timeConsume;
+    std::string typeCount;
+};
+
 }
 
 
@@ -1052,6 +1063,20 @@ SPECIALDEF(3)
     int, num
 	)
 SPECIALEND()
+
+SPECIALBEGIN (GData::DBDreamer)
+SPECIALDEF(7)
+	(
+    UInt8, level,
+    UInt8, floor,
+    UInt8, maxX,
+    UInt8, maxY,
+    UInt8, gridCount,
+    UInt8, timeConsume,
+    std::string, typeCount
+	)
+SPECIALEND()
+
 
 }
 

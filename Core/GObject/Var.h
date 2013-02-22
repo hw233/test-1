@@ -322,6 +322,18 @@ namespace GObject
         VAR_HAS_MO_BATTLER = 346,       // 出战散仙里是否有墨家
         VAR_ITEM_9316_FAILED_COUNT = 347, // 都率宝伞礼包连续开启失败次数
         VAR_CONSUME_AWARD_COUNT = 348,   //消费抽奖已抽次数
+
+        // 351~360 占用 for JLT
+        VAR_DISCOUNT_CONSUME1  = 351, // 消费限购的金额
+        VAR_DISCOUNT_CONSUME2  = 352, // 消费限购的金额
+        VAR_DISCOUNT_CONSUME3  = 353, // 消费限购的金额
+        VAR_DISCOUNT_RECHARGE1 = 354, // 充值限购的金额
+        VAR_DISCOUNT_RECHARGE2 = 355, // 充值限购的金额
+        VAR_DISCOUNT_RECHARGE3 = 356, // 充值限购的金额
+        VAR_DISCOUNT_EX1_TIME  = 357, // 限购栏一过期时间
+        VAR_DISCOUNT_EX2_TIME  = 358, // 限购栏二过期时间
+        VAR_DISCOUNT_EX3_TIME  = 359, // 限购栏三过期时间
+
         // 361-370 占用 for suntao
         VAR_DRAGONKING_STEP = 361,      //大闹龙宫当前移动到的格子
         VAR_DRAGONKING_STEP4_COUNT = 362, //大闹龙宫从第4格移动到第5失败的次数

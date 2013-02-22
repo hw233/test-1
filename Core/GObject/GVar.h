@@ -39,6 +39,19 @@ namespace GObject
         GVAR_ARENA_EXT_PROCESS = 13,
         GVAR_TJ_TOWN_999_BUG = 14,  //999级天劫关闭时,导致未过天劫但过了锁妖塔等级,领取法宝的BUG
         GVAR_JOB_MO_PEXP = 15,  // 墨修为补偿
+
+        GVAR_DISCOUNT_TYPE1 = 16, // 当前限购栏类型(0 普通 1 消费 2 充值)
+        GVAR_DISCOUNT_TYPE2 = 17, // 当前限购栏类型(0 普通 1 消费 2 充值)
+        GVAR_DISCOUNT_TYPE3 = 18, // 当前限购栏类型(0 普通 1 消费 2 充值)
+
+        GVAR_DISCOUNT_BEGIN1 = 19, // 当前限购栏一开始时间
+        GVAR_DISCOUNT_BEGIN2 = 20, // 当前限购栏二开始时间
+        GVAR_DISCOUNT_BEGIN3 = 21, // 当前限购栏三开始时间
+
+        GVAR_DISCOUNT_END1 = 22, // 当前限购栏一结束时间
+        GVAR_DISCOUNT_END2 = 23, // 当前限购栏二结束时间
+        GVAR_DISCOUNT_END3 = 24, // 当前限购栏三结束时间
+
         GVAR_MAX,
     };
 
@@ -69,6 +82,18 @@ namespace GObject
             GREGISTER_VAR(GVAR_ARENA_EXT_PROCESS, GCYCLE_DAY);
             GREGISTER_VAR(GVAR_TJ_TOWN_999_BUG, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_JOB_MO_PEXP, GCYCLE_NONE);
+
+            GREGISTER_VAR(GVAR_DISCOUNT_TYPE1, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_DISCOUNT_TYPE2, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_DISCOUNT_TYPE3, GCYCLE_NONE);
+
+            GREGISTER_VAR(GVAR_DISCOUNT_BEGIN1, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_DISCOUNT_BEGIN2, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_DISCOUNT_BEGIN3, GCYCLE_NONE);
+
+            GREGISTER_VAR(GVAR_DISCOUNT_BEGIN1, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_DISCOUNT_BEGIN2, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_DISCOUNT_BEGIN3, GCYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);
@@ -76,6 +101,7 @@ namespace GObject
         void AddVar(UInt32 id, UInt32 data, UInt32 now = 0);
         void LoadVar(UInt32 id, UInt32 data, UInt32 overTime);
         void SetOffset(UInt32 offset){ m_Offset = offset; }
+        bool SetOverTime(UInt32 id, UInt32 overTime, bool force = false);
 
     private:
         UInt32 GetType(UInt32 id) const;

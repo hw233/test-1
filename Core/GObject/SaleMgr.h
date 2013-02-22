@@ -41,18 +41,18 @@ public:
 	void addSaleItem(Player *, UInt32, UInt32);
 	void cancelSale(Player *, UInt32);
 
-	void requestSaleList(Player *, UInt16, UInt16, std::string&, UInt8, UInt8, UInt8, UInt8);
+	void requestSaleList(Player *, UInt16, UInt16, std::string&, UInt8, UInt8, UInt8, UInt8, UInt8);
 
 	void searchPlayerSale(Player *, Player *, UInt16, UInt16);
 	void searchPlayerSaleResp(Player *, Player *, UInt16, UInt16, UInt32 *, UInt16);
 	void searchSaleByItemName(Player *, std::string&, UInt16, UInt16);
 
 protected:
-	bool shiftSingleSaleList(UInt8, UInt8, UInt8, UInt16, UInt16&, UInt16&);
-	bool shiftSingleSaleList2(UInt8, UInt8, UInt8, UInt16&, UInt16&, UInt16&);
-	bool shiftTotalSaleList(UInt8, UInt8, UInt16, UInt8&, UInt16&, UInt16&);
-	UInt16 appendSingleSaleList(Player *, Stream&, UInt8, UInt8, UInt8,  UInt16, UInt16, UInt16);
-	UInt16 appendTotalSaleList(Player *, Stream&, UInt8, UInt8, UInt8, UInt16, UInt16, UInt16);
+    bool shiftSingleSaleList(UInt8, UInt8, UInt8, UInt8, UInt16, UInt16&, UInt16&);
+	bool shiftSingleSaleList2(UInt8, UInt8, UInt8, UInt8, UInt16&, UInt16&, UInt16&);
+	bool shiftTotalSaleList(UInt8, UInt8, UInt8 attrId, UInt16, UInt8&, UInt16&, UInt16&);
+	UInt16 appendSingleSaleList(Player *, Stream&, UInt8, UInt8, UInt8, UInt8, UInt16, UInt16, UInt16);
+	UInt16 appendTotalSaleList(Player *, Stream&, UInt8, UInt8, UInt8, UInt8, UInt16, UInt16, UInt16);
 
 public:
 	void update(UInt32);
@@ -94,13 +94,17 @@ protected:
 
 	UInt8 StatIndex(UInt8 type, UInt32 typeId, UInt8& parent);
 
-	inline UInt32 saleRowStat(UInt8 type, UInt8 color, UInt8 career)
+	inline UInt32 saleRowStat(UInt8 type, UInt8 color, UInt8 career, UInt8 attrId)
 	{
-		return _itemStat[career][type][color];
+		return _itemStat[career][type][color][attrId];
 	}
 
 	void addRowSale(SaleData *);
 	void delRowSale(SaleData *);
+
+    void getLBColor_AttrId(ItemBase* item, UInt8& quality, std::vector<UInt8>& attrId);
+    bool hasAttrId(ItemBase* item, UInt8 attrId);
+    bool isQuality(ItemBase* item, UInt8 quality);
 
 
 private:
@@ -114,7 +118,7 @@ private:
 
 	SalePosType _salePos;
 	SaleCheckType _saleCheck[3];
-	SaleRowType _saleRow[63];	//普通1 强化2 (0 : reversed)
+	SaleRowType _saleRow[67];	//普通1 强化2 (0 : reversed)
                                 //装备3 武器4 头盔5 胸甲6 肩甲7 腰带8 腿甲9 项链10 戒指11
                                 //心法12 增益心法13 技能心法14, 技能碎片15
                                 //法宝16 被动法宝17 无双法宝18, 法宝碎片19，光环法宝20
@@ -122,7 +126,8 @@ private:
                                 //宝石34 力量35 敏捷36 智力37 耐力38 意志39 生命40 攻击41 防御42 命中43 反击44 闪避45 暴击46 破击47 身法48 坚韧49 法抗50
                                 //魂51 52攻击 53防御 54暴击 55破击 56身法 57坚韧 58毁灭 59生命
                                 //元神60 61元神技能 62元神
-	UInt32 _itemStat[5][63][7];	//分类(全部0 儒1释2道3墨4) (全部0 普通1 强化2 装备3.. 心法12.. 法宝16.. 阵法21.. 宝石34.. 魂51. 元神60) 0全部 1白色2绿色3蓝色4紫色5橙色6暗金
+                                //灵宝63 64灵 65悟 66信
+	UInt32 _itemStat[5][67][7][13];	//分类(全部0 儒1释2道3墨4) (全部0 普通1 强化2 装备3.. 心法12.. 法宝16.. 阵法21.. 宝石34.. 魂51. 元神60) (0全部 1白色2绿色3蓝色4紫色5橙色6暗金) (全部0 物攻1,法攻2,物防3,法防4,生命5,坚韧6,身法7,命中值8,闪避值9,暴击值10,破击值11,反击12)
 };
 
 extern SaleMgr gSaleMgr;

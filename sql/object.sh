@@ -113,8 +113,38 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearconsume.sql # must be once for delete total consume
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/cleartotalrecharge.sql # must be once for delete recharge total
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearid50.sql # must be once 指定玩家非绑定的九龙神火改成绑定的
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearid49.sql # must be once 指定玩家非绑定的九龙神火改成绑定的
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearid514.sql # must be once 指定玩家非绑定的九龙神火改成绑定的
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearid133.sql # must be once 指定玩家非绑定的九龙神火改成绑定的
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearid511.sql # must be once 指定玩家非绑定的九龙神火改成绑定的
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearid1327.sql # must be once 指定玩家非绑定的九龙神火改成绑定的
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearid1326.sql # must be once 指定玩家非绑定的九龙神火改成绑定的
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearid507.sql # must be once 指定玩家非绑定的九龙神火改成绑定的
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearid509.sql # must be once 指定玩家非绑定的九龙神火改成绑定的
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearid400.sql # must be once 指定玩家非绑定的九龙神火改成绑定的
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearid5001.sql # must be once 指定玩家非绑定的九龙神火改成绑定的
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearid5011.sql # must be once 指定玩家非绑定的九龙神火改成绑定的
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearid5021.sql # must be once 指定玩家非绑定的九龙神火改成绑定的
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearid5031.sql # must be once 指定玩家非绑定的九龙神火改成绑定的
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearid5041.sql # must be once 指定玩家非绑定的九龙神火改成绑定的
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearid5051.sql # must be once 指定玩家非绑定的九龙神火改成绑定的
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearid5061.sql # must be once 指定玩家非绑定的九龙神火改成绑定的
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearid5071.sql # must be once 指定玩家非绑定的九龙神火改成绑定的
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearid5081.sql # must be once 指定玩家非绑定的九龙神火改成绑定的
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearid5091.sql # must be once 指定玩家非绑定的九龙神火改成绑定的
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearid5101.sql # must be once 指定玩家非绑定的九龙神火改成绑定的
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearid5111.sql # must be once 指定玩家非绑定的九龙神火改成绑定的
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearid5121.sql # must be once 指定玩家非绑定的九龙神火改成绑定的
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearid5131.sql # must be once 指定玩家非绑定的九龙神火改成绑定的
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearid5141.sql # must be once 指定玩家非绑定的九龙神火改成绑定的
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130115_1.sql
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130118_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearid295.sql # must be once 登录礼包人人有
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar_20130118.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar_20130118.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar199.sql        #清除强化装备的8次限制
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130114_1.sql
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130124_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar_20130118.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar199.sql        #清除强化装备的8次限制
 
     #. clearshiyamen.sh

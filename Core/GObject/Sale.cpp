@@ -8,6 +8,7 @@
 #include "MsgID.h"
 #include "DCLogger.h"
 #include "GObject/OpenAPIWorker.h"
+#include "LBNameTmpl.h"
 #include "SaleMgr.h" 
 
 
@@ -180,7 +181,8 @@ void Sale::sellSaleReqNotify(SaleSellRespData * data, UInt8 count)
 		saleSellRespData->id = data[i].id;
 		saleSellRespData->priceType = data[i].priceType;
 		saleSellRespData->price = data[i].price;
-		memcpy(saleSellRespData->itemName, data[i].itemName, 21);
+        UInt32 size = sizeof(saleSellRespData->itemName) - 1;
+		memcpy(saleSellRespData->itemName, data[i].itemName, size);
 		_sellItems[data[i].id] = saleSellRespData;
 	}
 
@@ -242,7 +244,19 @@ void Sale::buySellResp(SaleItemBuy& saleItemBuy)
 		}
 		mailItem = new SaleMailItem(saleItemBuy.item, true);
 		SYSMSG(title, 307);
-		SYSMSGV(content, 308, saleItemBuy.item->getName().c_str());
+
+        std::string name;
+        ItemBase* item = saleItemBuy.item;
+        if(item->getClass() == Item_LBling || item->getClass() == Item_LBwu || item->getClass() == Item_LBxin)
+        {
+            ItemLingbao* lb = static_cast<ItemLingbao*>(item);
+            lbnameTmpl.getLBName(name, lb);
+        }
+        else
+        {
+            name = saleItemBuy.item->getName();
+        }
+		SYSMSGV(content, 308, name.c_str());
 		MailPackage::MailItem mitem[1] = {{static_cast<UInt16>(saleItemBuy.item->getId()), static_cast<UInt32>(saleItemBuy.item->Count())}};
 		MailItemsInfo itemsInfo(mitem, SaleBuy, 1);
 		_owner->GetMailBox()->newMail(NULL, 0x06, title, content, saleItemBuy.id, true, &itemsInfo);
@@ -284,7 +298,18 @@ void Sale::cancelSellResp(SaleItemCancel& saleItemCancel)
 	{
 		//È¡Ïû
 		SYSMSG(title, 309);
-		SYSMSGV(content, 310, saleItemCancel.item->getName().c_str());
+        std::string name;
+        ItemBase* item = saleItemCancel.item;
+        if(item->getClass() == Item_LBling || item->getClass() == Item_LBwu || item->getClass() == Item_LBxin)
+        {
+            ItemLingbao* lb = static_cast<ItemLingbao*>(item);
+            lbnameTmpl.getLBName(name, lb);
+        }
+        else
+        {
+            name = saleItemCancel.item->getName();
+        }
+		SYSMSGV(content, 310, name.c_str());
 		MailPackage::MailItem mitem[1] = {{static_cast<UInt16>(mailItem->item->GetItemType().getId()), static_cast<UInt32>(mailItem->item->Count())}};
 		MailItemsInfo itemsInfo(mitem, SaleCancel, 1);
 		_owner->GetMailBox()->newMail(_owner, 0x06, title, content, saleItemCancel.id, true, &itemsInfo);
@@ -403,7 +428,14 @@ void Sale::makeMailInfo(UInt32 id, Stream& st, UInt16& num)
 		return ;
 	}
 	ItemBase * item = found->second->item;
-	st << static_cast<UInt16>(item->GetItemType().getId()) << item->Count();
+    st << static_cast<UInt16>(item->GetItemType().getId()) << item->Count();
+
+    if(item->getClass() == Item_LBling || item->getClass() == Item_LBwu || item->getClass() == Item_LBxin)
+    {
+        ItemLingbaoAttr& lba = (static_cast<ItemLingbao*>(item))->getLingbaoAttr();
+        lba.appendAttrToStream(st);
+    }
+
 	num = 1;
 }
 void Sale::cancleAllItem()

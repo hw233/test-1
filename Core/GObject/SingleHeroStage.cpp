@@ -108,6 +108,7 @@ struct DBSHFighter
     std::string citta;
     std::string trump;
     std::string skillstrengthen;
+    std::string lbskill;
 };
 
 struct DBSHFighterAttrExtra 
@@ -295,7 +296,7 @@ SPECIALDEF(7)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBSHFighter)
-SPECIALDEF(10)
+SPECIALDEF(11)
 (
     UInt32, id,
 	UInt64, playerId,
@@ -306,7 +307,8 @@ SPECIALDEF(10)
     float, capacity,
     std::string, citta,
     std::string, trump,
-    std::string, skillstrengthen
+    std::string, skillstrengthen,
+    std::string, lbskill
 )
 SPECIALEND()
 
@@ -3636,7 +3638,7 @@ namespace GObject
 
 
         DBSHFighter shFighter;
-		if(execu->Prepare("SELECT `id`, `playerId`, `type`, `level`, `soulMax`, `potential`, `capacity`, `citta`, `trump`, `skillstrengthen`  FROM `sh_fighter` ORDER BY `playerId`", shFighter) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `playerId`, `type`, `level`, `soulMax`, `potential`, `capacity`, `citta`, `trump`, `skillstrengthen`, `lbskill`  FROM `sh_fighter` ORDER BY `playerId`", shFighter) != DB::DB_OK)
 			return true;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -3661,6 +3663,7 @@ namespace GObject
             sfgt->setUpCittas(shFighter.citta);
             sfgt->setUpTrumps(shFighter.trump);
             sfgt->setUpSS(shFighter.skillstrengthen);
+            sfgt->loadLbSkill(shFighter.lbskill);
             if(shFighter.type == e_sh_gp_sl)
                 m_singlFgt[pl] = sfgt;
             if(shFighter.type == e_sh_gp_sy)

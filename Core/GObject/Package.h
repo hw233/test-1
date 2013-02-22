@@ -20,10 +20,10 @@ namespace GObject
     UInt16 getRandOEquip(UInt8 lvl);
     UInt16 getRandPEquip(UInt8 lvl);
     UInt32 getRandGem(UInt8 lev);
-#define ITEM_ENCHANT_L1 502   //Ã´““’ÊΩ
-#define ITEM_ENCHANT_L2 503   //Ã´““æ´Ω
-#define TRUMP_ENCHANT_L1 514   //ŒÂ––æ´”¢
-#define TRUMP_ENCHANT_L2 515  //ŒÂ––æ´ª™
+#define ITEM_ENCHANT_L1 502   //√å¬´√í√í√ï√¶¬Ω√∞
+#define ITEM_ENCHANT_L2 503   //√å¬´√í√í¬æ¬´¬Ω√∞
+#define TRUMP_ENCHANT_L1 514   //√é√•√ê√ê¬æ¬´√ì¬¢
+#define TRUMP_ENCHANT_L2 515  //√é√•√ê√ê¬æ¬´¬ª¬™
 
 #define ARENA_BET_ITEM1    9081
 #define ARENA_BET_ITEM2    9082
@@ -68,6 +68,28 @@ namespace GObject
 			return lv1 > lv2;
 		}
 	};
+
+    struct LingbaoSmeltInfo
+    {
+        UInt16 gujiId;
+        UInt16 itemId;
+        UInt32 value;
+        UInt32 maxValue;
+        UInt8 bind;
+
+        LingbaoSmeltInfo() : gujiId(0), itemId(0), value(0), maxValue(0), bind(0) {}
+
+		const LingbaoSmeltInfo& operator= (LingbaoSmeltInfo& info)
+        {
+            gujiId = info.gujiId;
+            itemId = info.itemId;
+            value = info.value;
+            maxValue = info.maxValue;
+            bind = info.bind;
+
+            return *this;
+        }
+    };
 
 	class Package
 	{
@@ -129,6 +151,7 @@ namespace GObject
 		static ItemBase* BuildEquipFromDB(UInt32 id, bool bind = false);
 		void ItemNotify(UInt32 id, UInt16 num = 1);
 		bool MoveEquipFromPack(ItemEquip *);
+		void ItemNotifyEquip(ItemEquip*);
 
 	public:
 		UInt16 GetItemUsedGrids(UInt32 id, UInt16 num, bool bind = false);
@@ -144,7 +167,7 @@ namespace GObject
 		void SendItemData(ItemBase *);
 
 	public:
-		// Ã˙Ω≥
+		// √å√∫¬Ω¬≥
 		UInt8 Enchant(UInt16 fighterId, UInt32 itemId, UInt8 type, UInt16 count, UInt8 level, UInt16& success, UInt16& failed/*, bool protect*/);
         void  enchantUdpLog(ItemEquip * equip, UInt8 level);
         void  OnFailEnchAttainment( UInt32 f);
@@ -180,7 +203,7 @@ namespace GObject
         const GData::ItemBaseType*  CheckBeforeEquipUpgrade(UInt32 typeId);
         UInt8 EquipUpgrade( UInt16 fighterId, UInt32 itemId , UInt32* pNewID, UInt16* pFgtId);
 
-        //◊∞±∏ Ù–‘◊™“∆
+        //√ó¬∞¬±¬∏√ä√¥√ê√î√ó¬™√í√Ü
         UInt8 EquipMove( UInt16 ffighterId, UInt16 tfighterId,UInt32 fromItemId, UInt32 toItemId, UInt8 type);
         UInt8 moveEquipEnchant(Fighter*,Fighter*, ItemEquip*, UInt8, ItemEquip*, UInt8);
         UInt8 moveEquipGem(Fighter*,Fighter*, ItemEquip*, UInt8, ItemEquip*, UInt8);
@@ -228,6 +251,16 @@ namespace GObject
         static void GenSpirit2(ItemEquip* equip);
 
         void enumerate(Visitor<ItemBase>& visitor);
+
+        UInt8 Tongling(UInt32 equipId, UInt8 protect, UInt8 bind, std::vector<UInt16>& values);
+        UInt8 OpenLingbaoSmelt(UInt16 gujiId, UInt8 type);
+        UInt8 LingbaoSmelt(UInt32 itemId, UInt16 cnt);
+        UInt8 closeLingbaoSmelt();
+        void sendLingbaoSmeltInfo();
+        void loadLingbaoSmeltInfo(LingbaoSmeltInfo& info) { m_lbSmeltInfo = info; }
+        void FinishLBSmelt();
+        void testLingbao(UInt32 itemId, UInt32* colorNums, UInt8 size, UInt32* skills, UInt8 size2);
+
 	private:
 		enum {ItemClassSize = Item_Weapon + 1};
 
@@ -237,6 +270,8 @@ namespace GObject
 		UInt8 _lastActivateLv;
 		UInt8 _lastActivateQ;
 		UInt8 _lastActivateCount;
+
+        LingbaoSmeltInfo m_lbSmeltInfo; // ÁÅµÂÆùÈôÑÁÅµÂÄº
 	};
 
 }

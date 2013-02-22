@@ -22,7 +22,9 @@ function update_data()
     #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20120903_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20121019_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20121023_1.sql
-    mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20121119_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20121119_1.sql
+    mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20130110_1.sql
+    mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20121221_1.sql
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from loot; source loot;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from map_object; source mapobject;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from item_template; source itemtemplate;";
@@ -63,6 +65,8 @@ function update_data()
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from clan_copy_template; source clancopytemplate;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from clan_copy_monster_template; source clancopymonstertemplate;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from clan_statue_template; source clanstatuetemplate;";
+    mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from lbskills; source lbskills;";
+    mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from dreamer_template; source dreamer_template;";
 }
 
 update_data

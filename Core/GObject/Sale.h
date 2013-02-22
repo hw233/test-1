@@ -30,7 +30,7 @@ struct SaleSellRespData
 	UInt32 id;
 	UInt8 priceType;
 	UInt32 price;
-	char itemName[22];
+	char itemName[32];
 
 	SaleSellRespData()
 	{

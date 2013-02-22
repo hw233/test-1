@@ -79,26 +79,6 @@ bool JobHunter::FighterList2String(std::string& str)
     return true;
 }
 
-bool JobHunter::MapInfo2String(std::string& str)
-{
-    // 获得需要保存的地图信息字符串
-    char buf[1024] = {0};
-    char* pbuf = buf;
-    char * pend = &buf[sizeof(buf)-1];
-    for (MapInfo::iterator it = _mapInfo.begin(); it != _mapInfo.end(); ++ it)
-    {
-        pbuf += snprintf(pbuf, pend - pbuf, "%u", POS_TO_INDEX((it->second).posX,(it->second).posY));
-        pbuf += snprintf(pbuf, pend - pbuf, ",");
-        pbuf += snprintf(pbuf, pend - pbuf, "%u", (it->second).neighbCount);
-        pbuf += snprintf(pbuf, pend - pbuf, ",");
-        pbuf += snprintf(pbuf, pend - pbuf, "%u", (it->second).gridType);
-        pbuf += snprintf(pbuf, pend - pbuf, "|");
-    }
-    if (pbuf != buf)
-        str = buf;
-    return true;
-}
-
 void JobHunter::LoadFighterList(const std::string& list)
 {
     // 加载玩家的待招列表
@@ -279,7 +259,6 @@ void JobHunter::OnRequestStart(UInt8 index)
 
 void JobHunter::OnUpdateSlot(bool isAuto)
 {
-    return;
     // 老虎机转动
     if (!_gameProgress)
         return;
@@ -1031,7 +1010,6 @@ bool JobHunter::OnAttackMonster(UInt16 pos, bool isAuto)
 
         if (type == 12)
         {
-            /*
             for (UInt8 i = 1; i < SLOT_MAX; ++ i)
             {
                 struct GData::LootResult lr = {0, 1};
@@ -1039,13 +1017,31 @@ bool JobHunter::OnAttackMonster(UInt16 pos, bool isAuto)
                 UInt8 prob = _rnd(100);
                 if (prob < _spItemRate[i])
                 {
-                    if (_owner->GetPackage()->Add(lr.id, lr.count, true, true, FromNpc))
+                    if (_owner->GetPackage()->Add(lr.id, lr.count, false, true, FromJobHunter))
                     {
                         _owner->_lastLoot.push_back(lr);
                     }
                 }
             }
-            */
+            const UInt32 bossLootBase = 10527;
+            const UInt32 bossLootBase2 = 10531;
+            const GData::LootItem * li = GData::lootTable[bossLootBase + _gameProgress];
+            std::vector<GData::LootResult> lr;
+            li->roll(lr, &_rnd);
+            for (size_t j = 0; j < lr.size(); ++j)
+            {
+                if (_owner->GetPackage()->Add(lr[j].id, lr[j].count, false, true, FromJobHunter))
+                    _owner->_lastLoot.push_back(lr[j]);
+            }
+
+            lr.clear();
+            li = GData::lootTable[bossLootBase2 + _gameProgress];
+            li->roll(lr, &_rnd);
+            for (size_t j = 0; j < lr.size(); ++j)
+            {
+                if (_owner->GetPackage()->Add(lr[j].id, lr[j].count, false, true, FromJobHunter))
+                    _owner->_lastLoot.push_back(lr[j]);
+            }
         }
     }
     else
@@ -1222,6 +1218,27 @@ bool JobHunter::OnFoundCave(bool isAuto)
         ng->getLoots(_owner, _owner->_lastExJobAward, 0, NULL, true);
         _owner->udpLog("jobHunter", "F_1162", "", "", "", "", "act");
 
+        const UInt32 bossLootBase = 10527;
+        const UInt32 bossLootBase2 = 10531;
+        const GData::LootItem * li = GData::lootTable[bossLootBase + _gameProgress];
+        std::vector<GData::LootResult> lr;
+        li->roll(lr, &_rnd);
+        for (size_t j = 0; j < lr.size(); ++j)
+        {
+            if (_owner->GetPackage()->Add(lr[j].id, lr[j].count, true, true, FromJobHunter))
+                _owner->_lastExJobAward.push_back(lr[j]);
+        }
+
+        lr.clear();
+        li = GData::lootTable[bossLootBase2 + _gameProgress];
+        li->roll(lr, &_rnd);
+        for (size_t j = 0; j < lr.size(); ++j)
+        {
+            if (_owner->GetPackage()->Add(lr[j].id, lr[j].count, true, true, FromJobHunter))
+                _owner->_lastExJobAward.push_back(lr[j]);
+        }
+
+
     }
     else
     {
@@ -1290,7 +1307,7 @@ bool JobHunter::OnFoundCave(bool isAuto)
             st2 << static_cast<UInt16>(itemId) << static_cast<UInt16>(itemCount);
             if (!isAuto)
                 _owner->lastExJobAwardPush(itemId, itemCount);
-            _owner->GetPackage()->Add(itemId, itemCount, true, isAuto? false:true, FromNpc);
+            _owner->GetPackage()->Add(itemId, itemCount, true, isAuto? false:true, FromJobHunter);
         }
     }
     else
