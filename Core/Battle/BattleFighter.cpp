@@ -35,6 +35,7 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
 	_maxhpAdd2(0), _maxActionAdd2(0), _fakeDeadTimes(0),
     _atkreduce3(0), _magatkreduce3(0), _pudu_debuf(0),
     _atkreduce3_last(0), _magatkreduce3_last(0), _pudu_debuf_last(0),
+    _deep_confuse_dmg_extra(0), _deep_confuse_last(0),
     _deep_forget_dmg_extra(0), _deep_forget_last(0), _deep_stun_dmg_extra(0), _deep_stun_last(0),
     //_therapy_dec(0), _therapy_dec_last(0),_therapy_add(0),_therapy_add_last(0),
     _therapy_buff(0), _therapy_buff_last(0),
@@ -42,9 +43,9 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _bleed1(0), _bleed2(0), _bleed3(0),
     _bleed1_last(0), _bleed2_last(0), _bleed3_last(0),
     _immune2(0), _def_dec(0), _def_dec_last(0), _def_dec_times(0),
-    _aura_bleed(0), _aura_dec_cd(0), _aura_bleed_last(0),
-    _stun_bleed(0), _stun_cd(0), _stun_bleed_last(0),
-    _confuse_bleed(0), _confuse_cd(0), _confuse_bleed_last(0),
+    _aura_bleed(0), _aura_present(0), _aura_present_cd(0), _aura_dec_cd(0), _aura_bleed_last(0),
+    _stun_bleed(0), _stun_present(0), _stun_present_cd(0), _stun_cd(0), _stun_bleed_last(0),
+    _confuse_bleed(0), _confuse_present(0), _confuse_present_cd(0), _confuse_cd(0), _confuse_bleed_last(0),
     _colorStock(0), _colorStockTimes(0), _colorStockLast(0),
     _summon(false), _summonLast(0), _moAuraBuf(0), _moAuraBufLast(0), _moEvade100(false), _moEvade100Last(0),
     _hideBuf(false), _hideBufLast(0), _markMo(false), _markMoLast(0),
@@ -386,6 +387,7 @@ void BattleFighter::setFighter( GObject::Fighter * f )
 
     std::vector<UInt16>& passiveSkillOnCounter = _fighter->getPassiveSkillOnCounter();
     std::vector<UInt16>& passiveSkillOnCounter100 = _fighter->getPassiveSkillOnCounter100();
+    std::vector<UInt16>& passiveSkillOnAttackBleed100 = _fighter->getPassiveSkillOnAttackBleed100();
     cnt = passiveSkillOnCounter.size();
     _passiveSkillOnCounter.clear();
     rateExtent = 0;
@@ -412,6 +414,19 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         _passiveSkillOnCounter100.insert(_passiveSkillOnCounter100.end(), skillItem);
 
         updateSkillStrengthen(passiveSkillOnCounter100[idx]);
+    }
+
+    cnt = passiveSkillOnAttackBleed100.size();
+    _passiveSkillOnAttackBleed100.clear();
+    for(idx = 0; idx < cnt; idx++)
+    {
+        GData::SkillItem skillItem;
+        skillItem.base = GData::skillManager[passiveSkillOnAttackBleed100[idx]];
+        skillItem.cd = 0;
+        skillItem.rateExtent = 0;
+        _passiveSkillOnAttackBleed100.insert(_passiveSkillOnAttackBleed100.end(), skillItem);
+
+        updateSkillStrengthen(passiveSkillOnAttackBleed100[idx]);
     }
 
     std::vector<GObject::LBSkill>& lbSkills =  _fighter->getLBSkill();
@@ -1189,6 +1204,11 @@ const GData::SkillBase* BattleFighter::getPassiveSkillOnCounter100(size_t& idx, 
     return getPassiveSkill100(_passiveSkillOnCounter100, idx, noPossibleTarget);
 }
 
+const GData::SkillBase* BattleFighter::getPassiveSkillOnAttackBleed100(size_t& idx, bool noPossibleTarget)
+{
+    return getPassiveSkill100(_passiveSkillOnAttackBleed100, idx, noPossibleTarget);
+}
+
 const GData::SkillBase* BattleFighter::getPassiveSkill(std::vector<GData::SkillItem>& passiveSkill, bool noPossibleTarget)
 {
     size_t cnt = passiveSkill.size();
@@ -1263,6 +1283,12 @@ const GData::SkillBase* BattleFighter::getPassiveSkillAftNAtk(bool noPossibleTar
 const GData::SkillBase* BattleFighter::getPassiveSkillOnCounter(bool noPossibleTarget)
 {
     return getPassiveSkill(_passiveSkillOnCounter, noPossibleTarget);
+}
+
+const GData::SkillBase* BattleFighter::getPassiveSkillOnAttackBleed(bool noPossibleTarget)
+{
+    //return getPassiveSkill( _passiveSkillOnAttackBleed, noPossibleTarget);
+    return NULL;
 }
 
 void BattleFighter::releaseSkillCD(std::vector<GData::SkillItem>& skill, int cd)
@@ -1907,6 +1933,7 @@ void BattleFighter::clearSkill()
     _passiveSkillDead100.clear();
     _passiveSkillAftNAtk100.clear();
     _passiveSkillOnCounter100.clear();
+    _passiveSkillOnAttackBleed100.clear();
 
     _passiveSkillPreAtk.clear();
     _passiveSkillAftAtk.clear();

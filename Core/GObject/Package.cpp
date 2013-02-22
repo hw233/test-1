@@ -1889,7 +1889,7 @@ namespace GObject
 					ret = false;
 				else if (UInt16 n = GameAction()->RunItemNormalUse(m_Owner, id, param, num, bind > 0))
 				{
-                    UInt8 rn = n<num?n:num;
+                    UInt16 rn = n<num?n:num;
 					DelItem2(item, rn);
 					AddItemHistoriesLog(id, rn);
                     ret = true;
@@ -1901,7 +1901,7 @@ namespace GObject
 					ret = false;
 				else if (UInt16 n = GameAction()->RunItemNormalUse(m_Owner, id, param, num, false))
 				{
-                    UInt8 rn = n<num?n:num;
+                    UInt16 rn = n<num?n:num;
                     ItemBase * item = FindItem(id, true);
                     if (!item)
                         item = FindItem(id, false);
@@ -1975,7 +1975,7 @@ namespace GObject
                     ret = false;
                 else if (UInt16 n = GameAction()->RunItemNormalUseOther(m_Owner, id, other, num, bind > 0))
                 {
-                    UInt8 rn = n<num?n:num;
+                    UInt16 rn = n<num?n:num;
                     DelItem2(item, rn);
                     AddItemHistoriesLog(id, rn);
                     ret = true;
@@ -1987,7 +1987,7 @@ namespace GObject
                     ret = false;
                 else if (UInt16 n = GameAction()->RunItemNormalUseOther(m_Owner, id, other, num, false))
                 {
-                    UInt8 rn = n<num?n:num;
+                    UInt16 rn = n<num?n:num;
                     ItemBase * item = FindItem(id, true);
                     if (!item)
                         item = FindItem(id, false);
@@ -5885,7 +5885,7 @@ namespace GObject
             UInt16 chance = uRand(10000);
             float fChance = ((float)(uRand(10000)))/10000;
             float disFactor = lbAttrConf.getDisFactor4(chance, fChance, 5);
-            lbattr.value[i] = lbAttrConf.getAttrMax(guji->reqLev, itype->subClass-Item_LBling, lbattr.type[i]-1) * disFactor;
+            lbattr.value[i] = lbAttrConf.getAttrMax(guji->reqLev, itype->subClass-Item_LBling, lbattr.type[i]-1) * disFactor + 0.9999f;
             allAttrType.erase(allAttrType.begin() + idx);
         }
         return true;
@@ -5928,8 +5928,10 @@ namespace GObject
         stLBAttrConf& lbAttrConf = GObjectManager::getLBAttrConf();
         UInt8 attrNum = lbAttrConf.getAttrNum(uRand(100));
         UInt16 subClass = itype->subClass;
+        bool fSpecial = true;
         if(!FinishLBSmeltSpecial(itype, lbattr, attrNum))
         {
+            fSpecial = false;
             UInt8 minAttrNum = item->quality > 3 ? 3 : 1;
             UInt8 color2 = item->quality;
             UInt8 color = guji->quality;
@@ -5964,7 +5966,7 @@ namespace GObject
                 UInt16 chance = uRand(10000);
                 float fChance = ((float)(uRand(10000)))/10000;
                 float disFactor = lbAttrConf.getDisFactor4(chance, fChance, color);
-                lbattr.value[0] = lbAttrConf.getAttrMax(lv, itemTypeIdx, lbattr.type[0]-1) * disFactor;
+                lbattr.value[0] = lbAttrConf.getAttrMax(lv, itemTypeIdx, lbattr.type[0]-1) * disFactor + 0.9999f;
                 allAttrType.erase(allAttrType.begin() + idx);
             }
             for(int i = 1; i < attrNum; ++ i)
@@ -5975,9 +5977,10 @@ namespace GObject
                 UInt16 chance = uRand(10000);
                 float fChance = ((float)(uRand(10000)))/10000;
                 float disFactor = lbAttrConf.getDisFactor4(chance, fChance, color2);
+                // item color only define one attr to it`s color
                 color2 = 2;
                 //float disFactor = lbAttrConf.getDisFactor3(uRand(10000), fChance);
-                lbattr.value[i] = lbAttrConf.getAttrMax(lv, itemTypeIdx, lbattr.type[i]-1) * disFactor;
+                lbattr.value[i] = lbAttrConf.getAttrMax(lv, itemTypeIdx, lbattr.type[i]-1) * disFactor + 0.9999f;
                 allAttrType.erase(allAttrType.begin() + idx);
             }
         }
@@ -6019,12 +6022,18 @@ namespace GObject
             break;
         case 3:
             m_Owner->udpLog("Tongling", "F_10000_2", "", "", "", "", "act");
+            m_Owner->udpLog("Tongling", "F_10000_19", "", "", "", "", "act");
             break;
         case 4:
             m_Owner->udpLog("Tongling", "F_10000_3", "", "", "", "", "act");
+            m_Owner->udpLog("Tongling", "F_10000_20", "", "", "", "", "act");
             break;
         case 5:
             m_Owner->udpLog("Tongling", "F_10000_4", "", "", "", "", "act");
+            if(fSpecial)
+                m_Owner->udpLog("Tongling", "F_10000_22", "", "", "", "", "act");
+            else
+                m_Owner->udpLog("Tongling", "F_10000_21", "", "", "", "", "act");
             break;
         }
 
@@ -6079,6 +6088,10 @@ namespace GObject
         OnAddEquipAndCheckAttainment(itype, FromFuling);
 
         closeLingbaoSmelt();
+
+		Stream st(REP::EQ_LINGBAO);
+		st << static_cast<UInt8>(6) << id << Stream::eos;
+		m_Owner->send(st);
     }
 
     void Package::QuitLBSmelt()

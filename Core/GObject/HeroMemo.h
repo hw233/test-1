@@ -82,6 +82,8 @@ public:
     void sendHeroMemoInfo();
     void getAward(UInt8 idx);
 
+    void flushAward();
+
     void updateToDB();
     void loadFromDB(const char* awards, const char* memos);
 

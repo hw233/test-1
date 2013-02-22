@@ -48,6 +48,7 @@
 #include "Memcached.h"
 #include "GObject/RechargeTmpl.h"
 #include "Version.h"
+#include "GObject/GVar.h"
 
 #ifndef _WIN32
 //#include <libmemcached/memcached.h>

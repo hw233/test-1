@@ -916,7 +916,11 @@ void ClanCopy::spotCombat(UInt8 spotId)
                     bsim.setPortrait(1, (*monsterIt)->npcList[0].fighter->favor);
                 for(size_t i = 0; i < c; ++ i)
                 {
-                    bsim.newFighter(1, (*monsterIt)->npcList[i].pos, (*monsterIt)->npcList[i].fighter);
+                    if ((*monsterIt)->npcList[i].fighter->getCurrentHP())
+                    {
+                        Battle::BattleFighter * bf = bsim.newFighter(1, (*monsterIt)->npcList[i].pos, (*monsterIt)->npcList[i].fighter);
+                        bf->setHP((*monsterIt)->npcList[i].fighter->getCurrentHP());
+                    }
                 }
 
                 playerIt->player->addHIAttr(_spotAttrs[spotId]);
