@@ -66,6 +66,7 @@ public:
     bool login(Player* player);
     bool login_sec(Player* player);
     bool create_sec(UserStruct const &nu, Player* player = NULL);
+    bool create_success_sec(Player * player);
     bool protol_sec(Player* player, int cmd);
     bool trade_sec(Player* saller, Player* buyer, UInt32 itemId, UInt32 itemCount, UInt32 price);
     bool gold_sec(Player* player, UInt32 count, UInt32 changeType, bool isIncrease);
