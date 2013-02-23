@@ -7432,6 +7432,7 @@ namespace GObject
                 && GVAR.GetVar(GVAR_DISCOUNT_BEGIN1) < now
                 && GVAR.GetVar(GVAR_DISCOUNT_END1) > now)
         {
+            SetVar(VAR_DISCOUNT_EX1_TIME, GVAR.GetVar(GVAR_DISCOUNT_BEGIN1));
             AddVar(VAR_DISCOUNT_RECHARGE1, r);
             flag = true;
         }
@@ -7441,6 +7442,7 @@ namespace GObject
                 && GVAR.GetVar(GVAR_DISCOUNT_BEGIN2) < now
                 && GVAR.GetVar(GVAR_DISCOUNT_END2) > now)
         {
+            SetVar(VAR_DISCOUNT_EX2_TIME, GVAR.GetVar(GVAR_DISCOUNT_BEGIN2));
             AddVar(VAR_DISCOUNT_RECHARGE2, r);
             flag = true;
         }
@@ -7450,6 +7452,7 @@ namespace GObject
                 && GVAR.GetVar(GVAR_DISCOUNT_BEGIN3) < now
                 && GVAR.GetVar(GVAR_DISCOUNT_END3) > now)
         {
+            SetVar(VAR_DISCOUNT_EX3_TIME, GVAR.GetVar(GVAR_DISCOUNT_BEGIN3));
             AddVar(VAR_DISCOUNT_RECHARGE3, r);
             flag = true;
         }
