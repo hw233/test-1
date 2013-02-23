@@ -3686,26 +3686,6 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
         }
     }
 
-    // 对流血状态造成额外伤害
-    if (skill && skill->cond == GData::SKILL_ONATKBLEED)
-    {
-        if(bf->getSide() != target_side)
-        {
-            if(0 == skill->area)
-            {
-                BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, target_pos));
-                if(bo != NULL && bo->getHP() != 0 && bo->isChar() && bo->getBleedRandomLast())
-                {
-                    std::vector<AttackAct> atkAct2;
-                    atkAct2.clear();
-                    UInt32 dmg = 0;
-                    doSkillState(bf, skill, bo, 1, 0, dmg, &atkAct2, atkAct);
-                    doSkillAtk2(false, &atkAct2);
-                }
-            }
-        }
-    }
-
     if (skill && skill->cond == GData::SKILL_PEERLESS)
     {
         int nChangeAuraNum = -1*bf->getAura() + bf->getAuraLeft(); // 因为天赋术，hero无双之后会留一点灵力
@@ -5085,7 +5065,7 @@ UInt32 BattleSimulator::doAttack( int pos )
                 atkAct.clear();
             }
 
-            while(NULL != (passiveSkill = bf->getPassiveSkillOnAttackBleed(idx, noPossibleTarget)))
+            while(NULL != (passiveSkill = bf->getPassiveSkillOnAttackBleed100(idx, noPossibleTarget)))
             {
                 if(passiveSkill->target == GData::e_battle_target_otherside && bo && bo->getHP() && 
                         (bo->getBleedRandomLast() || bf->getBleedBySkillLast() || //bf->getBleedBySkillClass() || bo->getBleedAttackClass() || 
