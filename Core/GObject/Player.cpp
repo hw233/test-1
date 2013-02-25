@@ -17291,25 +17291,25 @@ void Player::transferPexpBuffer2Var()
         SetVar(VAR_PEXP_HOOK_INDEX, ENUM_ADVANCED_HOOK);
         setBuffData(PLAYER_BUFF_ADVANCED_HOOK, 0);
     }
-    else if((left = getBuffLeft(PLAYER_BUFF_TRAINP3, tm)) > 0)
+    if((left = getBuffLeft(PLAYER_BUFF_TRAINP3, tm)) > 0)
     {
         AddVar(VAR_TRAINP3, left);
         SetVar(VAR_PEXP_HOOK_INDEX, ENUM_TRAINP3);
         setBuffData(PLAYER_BUFF_TRAINP3, 0);
     }
-    else if((left = getBuffLeft(PLAYER_BUFF_TRAINP4, tm)) > 0)
+    if((left = getBuffLeft(PLAYER_BUFF_TRAINP4, tm)) > 0)
     {
         AddVar(VAR_TRAINP4, left);
         SetVar(VAR_PEXP_HOOK_INDEX, ENUM_TRAINP4);
         setBuffData(PLAYER_BUFF_TRAINP4, 0);
     }
-    else if((left = getBuffLeft(PLAYER_BUFF_TRAINP2, tm)) > 0)
+    if((left = getBuffLeft(PLAYER_BUFF_TRAINP2, tm)) > 0)
     {
         AddVar(VAR_TRAINP2, left);
         SetVar(VAR_PEXP_HOOK_INDEX, ENUM_TRAINP2);
         setBuffData(PLAYER_BUFF_TRAINP2, 0);
     }
-    else if((left = getBuffLeft(PLAYER_BUFF_TRAINP1, tm))> 0)
+    if((left = getBuffLeft(PLAYER_BUFF_TRAINP1, tm))> 0)
     {
         AddVar(VAR_TRAINP1, left);
         SetVar(VAR_PEXP_HOOK_INDEX, ENUM_TRAINP1);

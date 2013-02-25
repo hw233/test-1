@@ -2071,15 +2071,17 @@ end
 function ItemNormal_00000055(iid, num, bind, param)
   local player = GetPlayer()
   local package = player:GetPackage();
-  player:setBuffData(6, 0, true)
-  player:setBuffData(10, 0, true)
-  player:setBuffData(11, 0, true)
-  player:setBuffData(24, 0, true)
+  -- player:setBuffData(6, 0, true)
+  -- player:setBuffData(10, 0, true)
+  -- player:setBuffData(11, 0, true)
+  -- player:setBuffData(24, 0, true)
   
   if  getAutoBattleAct() and ItemNormal_AddBuff(player, 5, 3600, num, 216*3600) then
       package:DelItemSendMsg(55, player);
+      SetVar(409, 5)
   elseif ItemNormal_AddBuff(player, 5, 3600, num, 356400) then
       package:DelItemSendMsg(55, player);
+      SetVar(409, 5)
   else
 	return false;
   end
@@ -2089,15 +2091,17 @@ end
 function ItemNormal_00000056(iid, num, bind, param)
   local player = GetPlayer()
   local package = player:GetPackage();
-  player:setBuffData(5, 0, true)
-  player:setBuffData(10, 0, true)
-  player:setBuffData(11, 0, true)
-  player:setBuffData(24, 0, true)
+  -- player:setBuffData(5, 0, true)
+  -- player:setBuffData(10, 0, true)
+  -- player:setBuffData(11, 0, true)
+  -- player:setBuffData(24, 0, true)
  
   if getAutoBattleAct() and ItemNormal_AddBuff(player, 6, 3600, num, 216*3600) then
       package:DelItemSendMsg(56, player);
+      SetVar(409, 4)
   elseif ItemNormal_AddBuff(player, 6, 3600, num, 356400) then
   	  package:DelItemSendMsg(56, player);
+      SetVar(409, 4)
   else
 	return false;
   end
@@ -4368,12 +4372,13 @@ end
 function ItemNormal_00009092(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
-    player:setBuffData(5, 0, true)
-    player:setBuffData(6, 0, true)
-    player:setBuffData(11, 0, true)
-    player:setBuffData(0x18, 0, true)
+    -- player:setBuffData(5, 0, true)
+    -- player:setBuffData(6, 0, true)
+    -- player:setBuffData(11, 0, true)
+    -- player:setBuffData(0x18, 0, true)
     if ItemNormal_AddBuff(player, 10, 3600, num, 356400) then
         package:DelItemSendMsg(iid, player);
+        SetVar(409, 2)
         return num;
     else
         return false;
@@ -4695,10 +4700,10 @@ end
 function ItemNormal_00009126(iid, num, bind, param)
   local player = GetPlayer()
   local package = player:GetPackage();
-  player:setBuffData(5, 0, true)
-  player:setBuffData(6, 0, true)
-  player:setBuffData(10, 0, true)
-  player:setBuffData(11, 0, true)
+  -- player:setBuffData(5, 0, true)
+  -- player:setBuffData(6, 0, true)
+  -- player:setBuffData(10, 0, true)
+  -- player:setBuffData(11, 0, true)
   local duringTime
   if iid == 9126 then
       duringTime = 3600 * 100
@@ -4713,6 +4718,7 @@ function ItemNormal_00009126(iid, num, bind, param)
   end
   if ItemNormal_AddBuff(player, 0x18, duringTime, num, 31536000) then
   	package:DelItemSendMsg(iid, player);
+      SetVar(409, 1)
 	return num;
   else
 	return false;
