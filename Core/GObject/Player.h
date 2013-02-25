@@ -2107,12 +2107,6 @@ namespace GObject
 
         void getDragonKingInfo();
         void postDragonKing(UInt8 count);
-        /*
-        void getDragonKingInfoSnake();
-        void postDragonKingSnake(UInt8 count);
-        void getDragonKingInfoTianMang();
-        void postDragonKingTianMang(UInt8 count);
-        */
         void saveGoldAct(UInt8 opt, UInt32 param);
         void sendSaveGoldAct();
 

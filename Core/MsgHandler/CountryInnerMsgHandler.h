@@ -1910,27 +1910,14 @@ void OnOpenAPIFailed( GameMsgHdr &hdr, const void *data)
         player->selfKick();
     }
 }
+
 void OnPostDragonKing( GameMsgHdr& hdr, const void * data)
 {
     MSG_QUERY_PLAYER(player);
 	const UInt8 count = *reinterpret_cast<const UInt8*>(data);
     player->postDragonKing(count);
 }
-/*
-void OnPostDragonKingSnake( GameMsgHdr& hdr, const void * data)
-{
-    MSG_QUERY_PLAYER(player);
-	const UInt8 count = *reinterpret_cast<const UInt8*>(data);
-    player->postDragonKingSnake(count);
-}
 
-void OnPostDragonKingTianMang( GameMsgHdr& hdr, const void * data)
-{
-    MSG_QUERY_PLAYER(player);
-	const UInt8 count = *reinterpret_cast<const UInt8*>(data);
-    player->postDragonKingTianMang(count);
-}
-*/
 void OnSaveGoldAct( GameMsgHdr& hdr, const void * data)
 {
     MSG_QUERY_PLAYER(player);
