@@ -357,6 +357,11 @@ namespace GObject
         VAR_NEWYEAR_QQGAME_ACT = 401, //蓝钻新年回馈活动
         VAR_NEWYEAR_QZONECONTINUE_ACT = 402, //空间朋友连续登录奖励
         VAR_NEWYEAR_QZONECONTINUE_LASTTIME = 403, //空间朋友连续登录奖励
+        VAR_ADVANCED_HOOK = 404, //修为加速
+        VAR_TRAINP3 = 405, //修为加速
+        VAR_TRAINP4 = 406, //修为加速
+        VAR_TRAINP2 = 407, //修为加速
+        VAR_TRAINP1 = 408, //修为加速
 
         VAR_MAX,
     };
@@ -674,6 +679,11 @@ namespace GObject
             REGISTER_VAR(VAR_NEWYEAR_QQGAME_ACT, CYCLE_DAY);
             REGISTER_VAR(VAR_NEWYEAR_QZONECONTINUE_ACT, CYCLE_NONE);
             REGISTER_VAR(VAR_NEWYEAR_QZONECONTINUE_LASTTIME, CYCLE_NONE);
+            REGISTER_VAR(VAR_ADVANCED_HOOK, CYCLE_NONE);
+            REGISTER_VAR(VAR_TRAINP3, CYCLE_NONE);
+            REGISTER_VAR(VAR_TRAINP4, CYCLE_NONE);
+            REGISTER_VAR(VAR_TRAINP2, CYCLE_NONE);
+            REGISTER_VAR(VAR_TRAINP1, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

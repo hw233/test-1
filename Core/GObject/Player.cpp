@@ -133,7 +133,13 @@ namespace GObject
 
 	float EventAutoBattle::calcExpEach(UInt32 now)
 	{
+#if 0
         return 8.0f * _npcGroup->getExp();
+#else
+        UInt8 plvl = m_Player->GetLev();
+        UInt64 exp = (plvl - 10) * ((plvl > 99 ? 99 : plvl) / 10) * 5 + 25;
+        return static_cast<float>(exp);
+#endif
 	}
 
 	void EventAutoBattle::Process(UInt32)
@@ -155,7 +161,13 @@ namespace GObject
 			m_Player->AddExp(static_cast<UInt32>(exp));
 		else
 			m_Player->pendExp(static_cast<UInt32>(exp));
+#if 0
 		_npcGroup->getLoots(m_Player);
+#else
+        if(uRand(1000) < 74)
+            m_Player->GetPackage()->AddItem(518, 1, true, false);
+            //m_Package->AddItem(9359, 1, true, false);
+#endif
 		notify();
 		updateDB(false);
 	}
@@ -2271,8 +2283,45 @@ namespace GObject
         _playerData.lastTjEventScore = 0;
         _playerData.lastTjTotalScore = 0;
     }
+
+    UInt32 bufferId2VarId(UInt32 idx)
+    {
+        UInt32 varId;
+        if(idx == PLAYER_BUFF_ADVANCED_HOOK)
+            varId = VAR_ADVANCED_HOOK;
+        else if(idx == PLAYER_BUFF_TRAINP3)
+            varId = VAR_TRAINP3;
+        else if(idx == PLAYER_BUFF_TRAINP4)
+            varId = VAR_TRAINP4;
+        else if(idx == PLAYER_BUFF_TRAINP2)
+            varId = VAR_TRAINP2;
+        else if(idx == PLAYER_BUFF_TRAINP1)
+            varId = VAR_TRAINP1;
+        else
+            varId = 0;
+
+        return varId;
+    }
+
+    /*
+     * id = PLAYER_BUFF_ADVANCED_HOOK,
+     *      PLAYER_BUFF_TRAINP3,
+     *      PLAYER_BUFF_TRAINP4,
+     *      PLAYER_BUFF_TRAINP2,
+     *      PLAYER_BUFF_TRAINP1
+     *  时，请确保data值是正确的
+     *  data是getBuffLeft加对应的GetVar值
+     */
 	void Player::setBuffData(UInt8 id, UInt32 data, bool writedb)
 	{
+        UInt32 varId = bufferId2VarId(id);
+        if(varId > 0)
+        {
+            SetVar(varId, data);
+            sendModification(0x40 + id, data, false);
+            return;
+        }
+
 		UInt32 now = TimeUtil::Now();
 		if(id == PLAYER_BUFF_ATTACKING && data >= now)
 		{
@@ -2288,6 +2337,7 @@ namespace GObject
                     _playerData.battlecdtm = now + 2;
             }
 		}
+
 		if(id >= PLAYER_BUFF_COUNT || _buffData[id] == data)
 			return;
 		_buffData[id] = data;
@@ -2297,6 +2347,14 @@ namespace GObject
 
 	void Player::addBuffData(UInt8 id, UInt32 data)
 	{
+        UInt32 varId = bufferId2VarId(id);
+        if(varId > 0)
+        {
+            AddVar(varId, data);
+            sendModification(0x40 + id, getBuffData(id, TimeUtil::Now()), false);
+            return;
+        }
+
 		if(id >= PLAYER_BUFF_COUNT || data == 0)
 			return;
 		UInt32 now = TimeUtil::Now();
@@ -2308,10 +2366,25 @@ namespace GObject
 		sendModification(0x40 + id, _buffData[id]);
 	}
 
+    /*
+     * id = PLAYER_BUFF_ADVANCED_HOOK,
+     *      PLAYER_BUFF_TRAINP3,
+     *      PLAYER_BUFF_TRAINP4,
+     *      PLAYER_BUFF_TRAINP2,
+     *      PLAYER_BUFF_TRAINP1
+     *  时，getBuffData是剩余时间
+     */
 	UInt32 Player::getBuffData( UInt8 idx, UInt32 tm )
 	{
+        UInt32 varId = bufferId2VarId(idx);
+        if(varId > 0)
+        {
+            return getBuffLeft(idx, TimeUtil::Now());
+        }
+
 		if(idx > PLAYER_BUFF_COUNT)
 			return 0;
+
 		if(idx != PLAYER_BUFF_AUTOHEAL &&
                 idx != PLAYER_BUFF_HOLY &&
                 idx != PLAYER_BUFF_AUTOCOPY &&
@@ -2330,9 +2403,30 @@ namespace GObject
 
 	UInt32 Player::getBuffLeft( UInt8 idx, UInt32 tm )
 	{
+        UInt32 varId = bufferId2VarId(idx);
+        if(varId > 0)
+        {
+            if(_buffData[idx] == 0)
+            {
+            }
+            else if(_buffData[idx] <= tm)
+            {
+                _buffData[idx] = 0;
+                updateDB(0x40 + idx, 0);
+            }
+            else
+            {
+                AddVar(varId, _buffData[idx] - tm);
+                _buffData[idx] = 0;
+                updateDB(0x40 + idx, 0);
+            }
+            return GetVar(varId);
+        }
+
 		UInt32 buff = getBuffData( idx, tm );
 		if(buff == 0)
 			return 0;
+
 		if(buff <= tm)
 		{
 			setBuffData( idx, 0 );
@@ -3598,6 +3692,7 @@ namespace GObject
 		if(it == GData::npcGroups.end())
 			return false;
 		GData::NpcGroup * ng = it->second;
+#if 0
 		if(GetLev() < ng->getLevel())
 		{
 			sendMsgCode(0, 1151);
@@ -3605,6 +3700,7 @@ namespace GObject
 		}
         if (ng->getType())
             return false;
+#endif
 		const UInt32 eachBattle = 60;
 		UInt32 count = 60 * 8;
 

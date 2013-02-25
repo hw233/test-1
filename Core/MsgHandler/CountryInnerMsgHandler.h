@@ -767,11 +767,11 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
 	if(p > 0)
 	{
 		hasP2 = true;
-		UInt32 left = p - now;
+		UInt32 left = p;
 		if(left >= duration)
 		{
 			exp *= 1.8f;
-			player->setBuffData(PLAYER_BUFF_TRAINP3, p - duration);
+			player->setBuffData(PLAYER_BUFF_TRAINP3, left - duration);
 		}
 		else
 		{
@@ -784,12 +784,12 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
 	p = player->getBuffData(PLAYER_BUFF_TRAINP4, now);
 	if(p > 0)
 	{
-		UInt32 left = p - now;
+		UInt32 left = p;
 		if(left >= duration)
 		{
 			if(!hasP2)
 				exp *= 1.5f;
-			player->setBuffData(PLAYER_BUFF_TRAINP4, p - duration);
+			player->setBuffData(PLAYER_BUFF_TRAINP4, left - duration);
 		}
 		else
 		{
@@ -804,12 +804,12 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
 	p = player->getBuffData(PLAYER_BUFF_TRAINP2, now);
 	if(p > 0)
 	{
-		UInt32 left = p - now;
+		UInt32 left = p;
 		if(left >= duration)
 		{
 			if(!hasP2)
 				exp *= 1.6f; // XXX: 1.5f
-			player->setBuffData(PLAYER_BUFF_TRAINP2, p - duration);
+			player->setBuffData(PLAYER_BUFF_TRAINP2, left - duration);
 		}
 		else
 		{
@@ -824,12 +824,12 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
 	p = player->getBuffData(PLAYER_BUFF_TRAINP1, now);
 	if(p > 0)
 	{
-		UInt32 left = p - now;
+		UInt32 left = p;
 		if(left >= duration)
 		{
 			if(!hasP2)
 				exp *= 1.3f; // XXX: 1.2f
-			player->setBuffData(PLAYER_BUFF_TRAINP1, p - duration);
+			player->setBuffData(PLAYER_BUFF_TRAINP1, left - duration);
 		}
 		else
 		{
@@ -842,12 +842,12 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
 	if(p > 0)
 	{
         exp = ecs->exp; /** 重置 **/
-		UInt32 left = p - now;
+		UInt32 left = p;
         /** 随身经验加速符还有效 **/
 		if(left > duration)
 		{
             exp *= 1.6f;
-			player->setBuffData(PLAYER_BUFF_ADVANCED_HOOK, p - duration);
+			player->setBuffData(PLAYER_BUFF_ADVANCED_HOOK, left - duration);
 		}
 		else
 		{
