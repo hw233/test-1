@@ -1253,6 +1253,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendNewYearQQGameAct();
     pl->calcNewYearQzoneContinueDay(now);
     pl->sendNewYearQzoneContinueAct();
+    pl->transferPexpBuffer2Var();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )

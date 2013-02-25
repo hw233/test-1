@@ -362,6 +362,7 @@ namespace GObject
         VAR_TRAINP4 = 406, //修为加速
         VAR_TRAINP2 = 407, //修为加速
         VAR_TRAINP1 = 408, //修为加速
+        VAR_PEXP_HOOK_INDEX = 409, //1:ADVANCED_HOOK, 2:TRAINP3, 3:TRAINP4, 4:TRAINP2, 5:TRAINP1
 
         VAR_MAX,
     };

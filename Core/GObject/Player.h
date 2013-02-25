@@ -165,6 +165,15 @@ namespace GObject
 #define PF_XY 171
 #define PF_XY_CH 10040
 
+    enum PEXP_HOOK_INFEX
+    {
+        ENUM_ADVANCED_HOOK,
+        ENUM_TRAINP3,
+        ENUM_TRAINP4,
+        ENUM_TRAINP2,
+        ENUM_TRAINP1
+    };
+
 	class Map;
 	class Player;
 	class ItemBase;
@@ -2136,6 +2145,7 @@ namespace GObject
         void getNewYearQzoneContinueAward(UInt8 type);
         void sendNewYearQzoneContinueAct();
         void calcNewYearQzoneContinueDay(UInt32 time);
+        void transferPexpBuffer2Var();
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n
