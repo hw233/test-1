@@ -934,6 +934,12 @@ function onActivityCheck(tm)
           setQingren(false)
       end
 
+      if tm >= actTime242_0 and tm < actTime242_1 then
+          setSpecialBookAct(true)
+      else
+          setSpecialBookAct(false)
+      end
+
       if tm >= actTime2013_02_01 and tm < actTime2013_02_09 then
           setCallSnakeEggAct(1)
       elseif tm >= actTime2013_02_09 and tm < actTime2013_02_16 then
@@ -1246,7 +1252,9 @@ function initActTime(y, m, d)
   --情人节浪漫之旅
   local  SerStartTm241 = { ['year'] = 2013, ['month'] = 2, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm241_1 = { ['year'] = 2013, ['month'] = 2, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-
+  --特殊古籍活动
+  local  SerStartTm242 = { ['year'] = 2013, ['month'] = 2, ['day'] = 20, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm242_1 = { ['year'] = 2013, ['month'] = 2, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   --300-399越南版用了
   actTime0 = os.time(SerStartTm);
@@ -1639,6 +1647,9 @@ function initActTime(y, m, d)
 
   actTime241_0= os.time(SerStartTm241);
   actTime241_1= os.time(SerStartTm241_1);
+
+  actTime242_0= os.time(SerStartTm242);
+  actTime242_1= os.time(SerStartTm242_1);
 
   actTime2013_01_29= os.time(SerStartTm2013_01_29);
   actTime2013_02_01= os.time(SerStartTm2013_02_01);

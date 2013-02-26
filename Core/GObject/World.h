@@ -336,6 +336,11 @@ public:
     { _qingren= v; }
     inline static bool getQingren()
     { return _qingren; }
+    inline static void setSpecialBookAct(bool v)
+    { _specialbook= v; }
+    inline static bool getSpecialBookAct()
+    { return _specialbook; }
+
 
     inline static void set11Act(bool v)
     { _11Act= v; }
@@ -707,6 +712,7 @@ public:
     static bool _qixi;
     static bool _wansheng;
     static bool _qingren;
+    static bool _specialbook;
     static bool _11Act;
     static bool _ssToolbarAct;
     static bool _snowAct;
