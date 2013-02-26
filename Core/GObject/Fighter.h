@@ -914,7 +914,7 @@ private:
 
 public:
     bool isPet() { return m_isPet; }
-    bool isOnBattle { return m_onBattle; }
+    bool isOnBattle() { return m_onBattle; }
     void setOnBattle(bool flag) { m_onBattle = flag; }
 };
 class GlobalFighters
