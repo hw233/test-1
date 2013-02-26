@@ -1249,29 +1249,8 @@ namespace GObject
             if (platform == OFFICAL && strstr(m_via.c_str(), "webdownload"))
                 platform = WEBDOWNLOAD;
 
-            if (platform == PF_UNION)
-            {
-                StringTokenizer source(m_source, "-");
-                if (source.count() >= 3)
-                {
-                    UInt32 channel = atoi(source[1].c_str());
-                    if (channel == PF_XY_CH)
-                    {
-                        channel = atoi(source[2].c_str());
-                        //const UInt32 XY_CHANNEL[] = {41, 47, 48, 49, 50, 51, 52, 53, 54, 56};
-                        const UInt32 XY_CHANNEL[] = {8, 9, 15, 16, 17, 19};
-                        for (UInt32 i = 0; i < (sizeof(XY_CHANNEL) / sizeof(UInt32)); ++ i)
-                        {
-                            if (XY_CHANNEL[i] == channel)
-                            {
-                                platform = PF_XY;
-                                break;
-                            }
-                        }
-                    }
-                }
-                    
-            }
+            if (isXY())
+                platform = PF_XY;
 
             udpLog(platform, str1, str2, str3, str4, str5, str6, type, count);
         }
