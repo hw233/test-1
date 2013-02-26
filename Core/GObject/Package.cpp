@@ -5885,7 +5885,7 @@ namespace GObject
             UInt16 chance = uRand(10000);
             float fChance = ((float)(uRand(10000)))/10000;
             float disFactor = lbAttrConf.getDisFactor4(chance, fChance, 5);
-            lbattr.value[i] = lbAttrConf.getAttrMax(guji->reqLev, itype->subClass-Item_LBling, lbattr.type[i]-1) * disFactor;
+            lbattr.value[i] = lbAttrConf.getAttrMax(guji->reqLev, itype->subClass-Item_LBling, lbattr.type[i]-1) * disFactor + 0.9999f;
             allAttrType.erase(allAttrType.begin() + idx);
         }
         return true;
@@ -5964,7 +5964,7 @@ namespace GObject
                 UInt16 chance = uRand(10000);
                 float fChance = ((float)(uRand(10000)))/10000;
                 float disFactor = lbAttrConf.getDisFactor4(chance, fChance, color);
-                lbattr.value[0] = lbAttrConf.getAttrMax(lv, itemTypeIdx, lbattr.type[0]-1) * disFactor;
+                lbattr.value[0] = lbAttrConf.getAttrMax(lv, itemTypeIdx, lbattr.type[0]-1) * disFactor + 0.9999f;
                 allAttrType.erase(allAttrType.begin() + idx);
             }
             for(int i = 1; i < attrNum; ++ i)
@@ -5977,7 +5977,7 @@ namespace GObject
                 float disFactor = lbAttrConf.getDisFactor4(chance, fChance, color2);
                 color2 = 2;
                 //float disFactor = lbAttrConf.getDisFactor3(uRand(10000), fChance);
-                lbattr.value[i] = lbAttrConf.getAttrMax(lv, itemTypeIdx, lbattr.type[i]-1) * disFactor;
+                lbattr.value[i] = lbAttrConf.getAttrMax(lv, itemTypeIdx, lbattr.type[i]-1) * disFactor + 0.9999f;
                 allAttrType.erase(allAttrType.begin() + idx);
             }
         }
