@@ -678,8 +678,10 @@ void Dreamer::OnAbort()
     _eyesTime = 0;
     _eyeX = _eyeY = 0;
     DB2().PushUpdateData("UPDATE `dreamer` SET `progress` = '%u', `level` = '%u', `maxX` = '%u',  `maxY` = '%u', `maxGrid` = '%u', `mapInfo` = '',"\
-            "`posX` = %u, `posY` = %u, `earlyPosX` = %u, `earlyPosY` = %u, `remainTime` = %u  WHERE `playerId` = %"I64_FMT"u", 
-            _gameProgress, _gameLevel, _maxX, _maxY, _maxGrid, _posX, _posY, _earlyPosX, _earlyPosY, _remainTime, _owner->getId());
+            "`posX` = %u, `posY` = %u, `earlyPosX` = %u, `earlyPosY` = %u, `remainTime` = %u, `keys` = '%u',"\
+            "`eyes` = '%u', `eyeTime` = '%u', `eyeX` = '%u', `eyeY` = '%u' WHERE `playerId` = %"I64_FMT"u", 
+            _gameProgress, _gameLevel, _maxX, _maxY, _maxGrid, _posX, _posY, _earlyPosX, _earlyPosY, _remainTime, _keysCount, 
+            _eyesCount, _eyesTime, _eyeX, _eyeY, _owner->getId());
     SendGameInfo();
 }
 
