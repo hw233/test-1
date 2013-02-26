@@ -193,6 +193,7 @@ void WorldScript::init()
 	def("setConsumeTime", GObject::World::setConsumeTime);
 	def("setTgcEvent", GObject::World::setTgcEvent);
 	def("getTgcEvent", GObject::World::getTgcEvent);
+	def("setWeiboAct", GObject::World::setWeiboAct);
 	def("Broadcast", SysBroadcast);
 	def("GetStore", GetStore);
 	def("GetTitleList", GetTitleList);

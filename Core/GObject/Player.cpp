@@ -10904,6 +10904,48 @@ namespace GObject
             }
         }
     }
+    void Player::getWeiboAward(UInt8 opt, std::string key)
+    {
+        if (GetPackage()->GetRestPackageSize() < 2)
+        {
+            sendMsgCode(0, 1011);
+            return;
+        }
+        UInt8 v = GetVar(VAR_WEIBO_AWARD_GOT);
+        if (1 == opt)//微信
+        {
+            if (key != "27036")
+            {
+                sendMsgCode(0, 1043);
+                return;
+            }
+            if ((v&0x01) == 0)
+            {
+                getCoupon(20);
+                m_Package->Add(503,1,true);
+                m_Package->Add(514,1,true);
+                v |= 0x01;
+                SetVar(VAR_WEIBO_AWARD_GOT, v);
+            }
+        }
+        if (2 == opt) //微博
+        {
+            if((v&0x02) == 0)
+            {
+                getCoupon(10);
+                m_Package->Add(134,1,true);
+                v |= 0x02;
+                SetVar(VAR_WEIBO_AWARD_GOT, v);
+            }
+        }
+        sendWeiboAwardInfo();
+    }
+    void Player::sendWeiboAwardInfo()
+    {
+        Stream st(REP::ACTIVITY_REWARD);
+        st << static_cast<UInt8>(13) << static_cast<UInt8>(GetVar(VAR_WEIBO_AWARD_GOT)) << Stream::eos;
+        send(st);
+    }
     void Player::sendConsumeAwardInfo(UInt8 idx)
     {
         if (!World::getConsumeAwardAct())

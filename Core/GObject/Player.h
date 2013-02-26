@@ -1961,6 +1961,8 @@ namespace GObject
         void getAwardBlueDiamond(UInt8 opt);
         void getConsumeAward();
         void sendConsumeAwardInfo(UInt8 idx);
+        void getWeiboAward(UInt8 opt, std::string key);
+        void sendWeiboAwardInfo();
         void getThanksGivingDay(UInt8 opt);
         void IDIPAddItem(UInt16 itemId, UInt16 num, bool bind = true);
         int IDIPBuy(UInt32 itemId, UInt32 num, UInt32 price, std::string& err, bool bind = true);
