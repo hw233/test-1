@@ -782,6 +782,7 @@ public:
     bool releaseMoMagAtkReduce();
 
     inline float getBleedMo() { return _bleedMo; }
+    inline UInt16 getBleedMoLast() { return _bleedMoLast; }
     inline void setBleedMo(float value, UInt8 last) { if(last == 0) return; _bleedMo = value; _bleedMoLast = last; }
     inline void resetBleedMo() { _bleedMo = 0; _bleedMoLast = 0; }
     bool releaseBleedMo();
@@ -798,6 +799,7 @@ public:
 private:
     std::vector<GData::SkillItem> _passiveSkillOnCounter;
     std::vector<GData::SkillItem> _passiveSkillOnCounter100;
+    std::vector<GData::SkillItem> _passiveSkillOnAttackBleed100;
     float _darkVigor, _dvFactor;
     UInt8 _darkVigorLast;
 public:
@@ -807,7 +809,9 @@ public:
     void addDarkVigor(float value);
     bool releaseDarkVigor();
     const GData::SkillBase* getPassiveSkillOnCounter100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnAttackBleed100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnCounter(bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnAttackBleed(bool noPossibleTarget = false);
 
 private:
     std::vector<GData::LBSkillItem> _onSkillCond;

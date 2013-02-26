@@ -240,6 +240,7 @@ GMHandler::GMHandler()
     Reg(3, "dreye", &GMHandler::OnDreamerEyeSet);
 
     Reg(3, "act", &GMHandler::OnSomeAct);
+    Reg(3, "king", &GMHandler::OnDragonKingAct);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -3679,5 +3680,21 @@ void GMHandler::OnSomeAct(GObject::Player *player, std::vector<std::string>& arg
         player->calcNewYearQzoneContinueDay(now);
         player->sendNewYearQzoneContinueAct();
     }
+}
+
+void GMHandler::OnDragonKingAct(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 3)
+        return;
+    UInt32 begin = atoi(args[0].c_str());
+    UInt32 end = atoi(args[1].c_str());
+    UInt32 type = atoi(args[2].c_str());
+    GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_BEGIN, begin);
+    GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_END, end);
+    GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_ACTION, type);
+    /*
+    UInt32 type = atoi(args[0].c_str());
+    GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_ACTION, type);
+    */
 }
 

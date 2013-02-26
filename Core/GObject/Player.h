@@ -1851,22 +1851,18 @@ namespace GObject
 
             if (atoi(m_domain) == PF_UNION)
             {
-                static const UInt32 XY_CHANNEL[] = {41, 47, 48, 49, 50, 51, 52, 53, 54, 56};
-                for (UInt32 i = 0; i < (sizeof(XY_CHANNEL) / sizeof(UInt32)); ++ i)
+                static const char *XY_CHANNEL = "union-10040-";
+                if (strcasestr(m_source.c_str(), XY_CHANNEL))
                 {
-                    char buf[16];
-                    snprintf (buf, 16, "-%d", XY_CHANNEL[i]);
-                    if (strstr(m_source.c_str(), buf))
-                    {
-                        m_isXY = true;
-                        return;
-                    }
-                    else
-                    {
-                        m_isXY = false;
-                    }
+                    m_isXY = true;
+                }
+                else
+                {
+                    m_isXY = false;
                 }
             }
+            else
+                m_isXY = false;
         }
         inline void setVia(const std::string& via) { m_via = via; }
         inline void setInvited(const std::string& inv) { m_invited = inv; }
@@ -2109,10 +2105,6 @@ namespace GObject
 
         void getDragonKingInfo();
         void postDragonKing(UInt8 count);
-        void getDragonKingInfoSnake();
-        void postDragonKingSnake(UInt8 count);
-        void getDragonKingInfoTianMang();
-        void postDragonKingTianMang(UInt8 count);
         void saveGoldAct(UInt8 opt, UInt32 param);
         void sendSaveGoldAct();
 

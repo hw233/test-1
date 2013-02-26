@@ -1249,29 +1249,8 @@ namespace GObject
             if (platform == OFFICAL && strstr(m_via.c_str(), "webdownload"))
                 platform = WEBDOWNLOAD;
 
-            if (platform == PF_UNION)
-            {
-                StringTokenizer source(m_source, "-");
-                if (source.count() >= 3)
-                {
-                    UInt32 channel = atoi(source[1].c_str());
-                    if (channel == PF_XY_CH)
-                    {
-                        channel = atoi(source[2].c_str());
-                        //const UInt32 XY_CHANNEL[] = {41, 47, 48, 49, 50, 51, 52, 53, 54, 56};
-                        const UInt32 XY_CHANNEL[] = {8, 9, 15, 16, 17, 19};
-                        for (UInt32 i = 0; i < (sizeof(XY_CHANNEL) / sizeof(UInt32)); ++ i)
-                        {
-                            if (XY_CHANNEL[i] == channel)
-                            {
-                                platform = PF_XY;
-                                break;
-                            }
-                        }
-                    }
-                }
-                    
-            }
+            if (isXY())
+                platform = PF_XY;
 
             udpLog(platform, str1, str2, str3, str4, str5, str6, type, count);
         }
@@ -7432,6 +7411,7 @@ namespace GObject
                 && GVAR.GetVar(GVAR_DISCOUNT_BEGIN1) < now
                 && GVAR.GetVar(GVAR_DISCOUNT_END1) > now)
         {
+            SetVar(VAR_DISCOUNT_EX1_TIME, GVAR.GetVar(GVAR_DISCOUNT_END1));
             AddVar(VAR_DISCOUNT_RECHARGE1, r);
             flag = true;
         }
@@ -7441,6 +7421,7 @@ namespace GObject
                 && GVAR.GetVar(GVAR_DISCOUNT_BEGIN2) < now
                 && GVAR.GetVar(GVAR_DISCOUNT_END2) > now)
         {
+            SetVar(VAR_DISCOUNT_EX2_TIME, GVAR.GetVar(GVAR_DISCOUNT_END2));
             AddVar(VAR_DISCOUNT_RECHARGE2, r);
             flag = true;
         }
@@ -7450,6 +7431,7 @@ namespace GObject
                 && GVAR.GetVar(GVAR_DISCOUNT_BEGIN3) < now
                 && GVAR.GetVar(GVAR_DISCOUNT_END3) > now)
         {
+            SetVar(VAR_DISCOUNT_EX3_TIME, GVAR.GetVar(GVAR_DISCOUNT_END3));
             AddVar(VAR_DISCOUNT_RECHARGE3, r);
             flag = true;
         }
@@ -17008,219 +16990,6 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
     SetVar(VAR_NEWYEAR_QZONECONTINUE_ACT, tmp);
 }
 
-//大闹龙宫
-void Player::getDragonKingInfo()
-{
-    /*
-    if(!World::getDragonKingAct())
-        return;
-    */
-    UInt8 step = GetVar(VAR_DRAGONKING_STEP);
-    if( step == 0 || step > 5)
-    {
-        step = 1;
-        SetVar(VAR_DRAGONKING_STEP, step);
-    }
-    Stream st(REP::ACTIVE);
-    st << static_cast<UInt8>(0x06);
-    st << static_cast<UInt8>(0x01);
-    st << step;
-    st << Stream::eos;
-    send(st);
-}
-
-void Player::postDragonKing(UInt8 count)
-{
-    if (CURRENT_THREAD_ID() != getThreadId())
-    {
-        GameMsgHdr h(0x342,  getThreadId(), this, sizeof(count));
-        GLOBAL().PushMsg(h, &count);
-        return;
-    }
-    /*
-    if (count == 0 || !World::getDragonKingAct())
-        return;
-    */
-    if ( count == 0 ) return;
-#define ITEM_YLLING 9337   //游龙令
-    if (GetPackage()->GetItemAnyNum(ITEM_YLLING) < count)
-        return;
-    if (GetPackage()->GetRestPackageSize() < count)
-    {
-        sendMsgCode(0, 1011);
-        return;
-    }
-    GetPackage()->DelItemSendMsg(ITEM_YLLING, this);
-    Stream st(REP::ACTIVE);
-    st << static_cast<UInt8>(0x06);
-    st << static_cast<UInt8>(0x02);
-    st << count;
-    UInt8 step = GetVar(VAR_DRAGONKING_STEP);
-    if(step == 0 || step > 5)
-        step = 1;
-    bool isBind = true;
-    for(UInt8 i = 0; i < count; ++i)
-    {
-        GetPackage()->DelItemAny(ITEM_YLLING, 1, &isBind);
-        Table award = GameAction()->getDragonKingAward(step);
-        if (GameAction()->checkDragonKingCanSucceed(this, step))
-            step = (step + 1) > 5 ? 1 : step + 1;
-        else
-            step = 1;
-        st << step;
-        UInt8 size = award.size();
-        st << static_cast<UInt8>(size / 2);
-        for(UInt8 j = 1; j <= size; j += 2)
-        {
-            UInt16 itemId = award.get<UInt16>(j);
-            st << itemId << award.get<UInt8>(j+1);
-            GetPackage()->Add(itemId, award.get<UInt32>(j+1), isBind, true, FromQixi);
-            if(itemId == 6134)
-                SYSMSG_BROADCASTV(295, getCountry(), getName().c_str(), itemId);
-        }
-    }
-    st << Stream::eos;
-    send(st);
-    SetVar(VAR_DRAGONKING_STEP, step);
-}
-
-//大闹龙宫之金蛇起舞
-void Player::getDragonKingInfoSnake()
-{
-    UInt8 step = GetVar(VAR_DRAGONKINGSNAKE_STEP);
-    if( step == 0 || step > 5)
-    {
-        step = 1;
-        SetVar(VAR_DRAGONKINGSNAKE_STEP, step);
-    }
-    Stream st(REP::ACTIVE);
-    st << static_cast<UInt8>(0x0A);
-    st << static_cast<UInt8>(0x01);
-    st << step;
-    st << Stream::eos;
-    send(st);
-}
-
-void Player::postDragonKingSnake(UInt8 count)
-{
-    if (CURRENT_THREAD_ID() != getThreadId())
-    {
-        GameMsgHdr h(0x344,  getThreadId(), this, sizeof(count));
-        GLOBAL().PushMsg(h, &count);
-        return;
-    }
-    if (count == 0)
-        return;
-#define ITEM_JSLING 9354   //金蛇令
-    if (GetPackage()->GetItemAnyNum(ITEM_JSLING) < count)
-        return;
-    if (GetPackage()->GetRestPackageSize() < count)
-    {
-        sendMsgCode(0, 1011);
-        return;
-    }
-    GetPackage()->DelItemSendMsg(ITEM_JSLING, this);
-    Stream st(REP::ACTIVE);
-    st << static_cast<UInt8>(0x0A);
-    st << static_cast<UInt8>(0x02);
-    st << count;
-    UInt8 step = GetVar(VAR_DRAGONKINGSNAKE_STEP);
-    if(step == 0 || step > 5)
-        step = 1;
-    bool isBind = true;
-    for(UInt8 i = 0; i < count; ++i)
-    {
-        GetPackage()->DelItemAny(ITEM_JSLING, 1, &isBind);
-        Table award = GameAction()->getDragonKingSnakeAward(step);
-        if (GameAction()->checkDragonKingSnakeCanSucceed(this, step))
-            step = (step + 1) > 5 ? 1 : step + 1;
-        else
-            step = 1;
-        st << step;
-        UInt8 size = award.size();
-        st << static_cast<UInt8>(size / 2);
-        for(UInt8 j = 1; j <= size; j += 2)
-        {
-            UInt16 itemId = award.get<UInt16>(j);
-            st << itemId << award.get<UInt8>(j+1);
-            GetPackage()->Add(itemId, award.get<UInt32>(j+1), isBind, true, FromQixi);
-            if(itemId == 6135)
-                SYSMSG_BROADCASTV(295, getCountry(), getName().c_str(), itemId);
-        }
-    }
-    st << Stream::eos;
-    send(st);
-    SetVar(VAR_DRAGONKINGSNAKE_STEP, step);
-}
-
-//大闹龙宫之天芒神梭
-void Player::getDragonKingInfoTianMang()
-{
-    UInt8 step = GetVar(VAR_TIANMANG_STEP);
-    if( step == 0 || step > 5)
-    {
-        step = 1;
-        SetVar(VAR_TIANMANG_STEP, step);
-    }
-    Stream st(REP::ACTIVE);
-    st << static_cast<UInt8>(0x0B);
-    st << static_cast<UInt8>(0x01);
-    st << step;
-    st << Stream::eos;
-    send(st);
-}
-
-void Player::postDragonKingTianMang(UInt8 count)
-{
-    if (CURRENT_THREAD_ID() != getThreadId())
-    {
-        GameMsgHdr h(0x345,  getThreadId(), this, sizeof(count));
-        GLOBAL().PushMsg(h, &count);
-        return;
-    }
-    if (count == 0)
-        return;
-#define ITEM_TMLING 9358   //天芒令
-    if (GetPackage()->GetItemAnyNum(ITEM_TMLING) < count)
-        return;
-    if (GetPackage()->GetRestPackageSize() < count)
-    {
-        sendMsgCode(0, 1011);
-        return;
-    }
-    GetPackage()->DelItemSendMsg(ITEM_TMLING, this);
-    Stream st(REP::ACTIVE);
-    st << static_cast<UInt8>(0x0B);
-    st << static_cast<UInt8>(0x02);
-    st << count;
-    UInt8 step = GetVar(VAR_TIANMANG_STEP);
-    if(step == 0 || step > 5)
-        step = 1;
-    bool isBind = true;
-    for(UInt8 i = 0; i < count; ++i)
-    {
-        GetPackage()->DelItemAny(ITEM_TMLING, 1, &isBind);
-        Table award = GameAction()->getDragonKingTMAward(step);
-        if (GameAction()->checkDragonKingTMCanSucceed(this, step))
-            step = (step + 1) > 5 ? 1 : step + 1;
-        else
-            step = 1;
-        st << step;
-        UInt8 size = award.size();
-        st << static_cast<UInt8>(size / 2);
-        for(UInt8 j = 1; j <= size; j += 2)
-        {
-            UInt16 itemId = award.get<UInt16>(j);
-            st << itemId << award.get<UInt8>(j+1);
-            GetPackage()->Add(itemId, award.get<UInt32>(j+1), isBind, true, FromQixi);
-            if(itemId == 136)
-                SYSMSG_BROADCASTV(295, getCountry(), getName().c_str(), itemId);
-        }
-    }
-    st << Stream::eos;
-    send(st);
-    SetVar(VAR_TIANMANG_STEP, step);
-}
 
 /*
  *flag == 1,2,3
@@ -17228,10 +16997,16 @@ void Player::postDragonKingTianMang(UInt8 count)
  *2:大闹龙宫之金蛇起舞
  *3:大闹龙宫之天芒神梭
 */
-/*
 void Player::getDragonKingInfo()
 {
     UInt8 flag = GVAR.GetVar(GVAR_DRAGONKING_ACTION);
+    if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END))
+    {
+        GVAR.SetVar(GVAR_DRAGONKING_ACTION, 0);
+        GVAR.SetVar(GVAR_DRAGONKING_BEGIN, 0);
+        GVAR.SetVar(GVAR_DRAGONKING_END, 0);
+        return;
+    }
     Stream st(REP::ACTIVE);
     UInt8 step = 0;
     if(1 == flag)
@@ -17266,24 +17041,35 @@ void Player::postDragonKing(UInt8 count)
         GLOBAL().PushMsg(h, &count);
         return;
     }
+    if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END))
+    {
+        GVAR.SetVar(GVAR_DRAGONKING_ACTION, 0);
+        GVAR.SetVar(GVAR_DRAGONKING_BEGIN, 0);
+        GVAR.SetVar(GVAR_DRAGONKING_END, 0);
+        return;
+    }
     if (count == 0) return;
     UInt8 flag = GVAR.GetVar(GVAR_DRAGONKING_ACTION);
     UInt32 XBLing = 0; //寻宝令id
     UInt8 type = 0;
+    UInt8 step = 0;
     if(1 == flag)
     {
         XBLing = 9337;
         type = 0x06;
+        step = GetVar(VAR_DRAGONKING_STEP);
     }
     else if(2 == flag)
     {
         XBLing = 9354;
         type = 0x0A;
+        step = GetVar(VAR_DRAGONKINGSNAKE_STEP);
     }
     else if(3 == flag)
     {
         XBLing = 9358;
         type = 0x0B;
+        step = GetVar(VAR_TIANMANG_STEP);
     }
     else
         return;
@@ -17297,7 +17083,6 @@ void Player::postDragonKing(UInt8 count)
     GetPackage()->DelItemSendMsg(XBLing, this);
     Stream st(REP::ACTIVE);
     st << type << static_cast<UInt8>(0x02) << count;
-    UInt8 step = GetVar(VAR_DRAGONKING_STEP);
     if(step == 0 || step > 5)
         step = 1;
     bool isBind = true;
@@ -17331,7 +17116,7 @@ void Player::postDragonKing(UInt8 count)
     else if(3 == flag)
         SetVar(VAR_TIANMANG_STEP, step);
 }
-*/
+
 //金蛇献瑞 聚福兆祥
 void Player::saveGoldAct(UInt8 opt, UInt32 param)
 {
