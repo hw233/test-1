@@ -70,24 +70,23 @@ bool DCLogger::reg(Player* player)
     msg << "&appid=";
     msg << appid;
     msg << "&userip=";
-    msg << player->getClientAddress();
+    msg << player->getClientIp();
     msg << "&svrip=";
     msg << cfg.serverIp;
     msg << "&time=";
     msg << time(NULL);
-    msg << "&domain=";
-    msg << player->getDomain();
     msg << "&worldid=";
     msg << cfg.serverNum;
-    msg << "&optype=3&actionid=2";
     msg << "&opuid=";
     msg << player->getId();
     msg << "&opopenid=";
     msg << player->getOpenId();
-    msg << "&key=";
-    msg << player->getOpenKey();
-    msg << "&source=";
+    msg << "&pf=";
     msg << player->getSource();
+    msg << "&openkey=";
+    msg << player->getOpenKey();
+    msg << "&pfkey=";
+    msg << player->getPfKey();
     msg << "&touid=&toopenid=&level=&itemid=&itemtype=&itemcnt=&modifyexp=&totalexp=&modifycoin=&totalcoin=&modifyfee=&totalfee=&onlinetime=&keycheckret=&safebuf=&remark=&user_num=";
 
 #ifndef _FB
@@ -928,6 +927,50 @@ UInt8 DCLogger::getDomain_sec(Player* player)
         return PF_XY;
     }
     return atoi(player->getDomain());
+}
+
+bool DCLogger::reg_union(Player* player)
+{
+    // 游戏联盟注册上报
+    if (!cfg.dclog)
+        return true;
+    if (!cfg.unionPlatform)
+        return true;
+    std::ostringstream msg;
+
+    msg << "version=";
+    msg << version;
+    msg << "&appid=";
+    msg << appid;
+    msg << "&userip=";
+    msg << player->getClientAddress();
+    msg << "&svrip=";
+    msg << cfg.serverIp;
+    msg << "&time=";
+    msg << time(NULL);
+    msg << "&domain=";
+    msg << player->getDomain();
+    msg << "&worldid=";
+    msg << cfg.serverNum;
+    msg << "&optype=3&actionid=2";
+    msg << "&opuid=";
+    msg << player->getId();
+    msg << "&opopenid=";
+    msg << player->getOpenId();
+    msg << "&key=";
+    msg << player->getOpenKey();
+    msg << "&source=";
+    msg << player->getSource();
+    msg << "&touid=&toopenid=&level=&itemid=&itemtype=&itemcnt=&modifyexp=&totalexp=&modifycoin=&totalcoin=&modifyfee=&totalfee=&onlinetime=&keycheckret=&safebuf=&remark=&user_num=";
+
+#ifndef _FB
+#ifndef _VT
+#ifndef _WIN32
+    DC().Push(msg.str().c_str(), msg.str().length(), UNION_DC_TYPE);
+#endif
+#endif
+#endif
+    return true;
 }
 
 DCLogger dclogger;

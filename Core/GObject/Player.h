@@ -1820,6 +1820,7 @@ namespace GObject
         std::string m_source;
         std::string m_via;
         std::string m_invited;
+        std::string m_pfkey;
         bool m_isOffical;
         bool m_isXY;
     public:
@@ -1851,7 +1852,7 @@ namespace GObject
 
             if (atoi(m_domain) == PF_UNION)
             {
-                static const UInt32 XY_CHANNEL[] = {41, 47, 48, 49, 50, 51, 52, 53, 54, 56};
+                static const UInt32 XY_CHANNEL[] = {8, 9, 15, 16, 17, 19};
                 for (UInt32 i = 0; i < (sizeof(XY_CHANNEL) / sizeof(UInt32)); ++ i)
                 {
                     char buf[16];
@@ -1870,12 +1871,14 @@ namespace GObject
         }
         inline void setVia(const std::string& via) { m_via = via; }
         inline void setInvited(const std::string& inv) { m_invited = inv; }
+        inline void setPfKey(const std::string& pfkey) { m_pfkey = pfkey; }
         inline const char* getDomain() const { return m_domain; }
         inline const char* getOpenId() const { return m_openid; }
         inline const char* getOpenKey() const { return m_openkey; }
         inline const std::string& getSource() const { return m_source; }
         inline const std::string& getVia() const { return m_via; }
         inline const std::string& getInvited() const { return m_invited; }
+        inline const std::string& getPfKey() const { return m_pfkey;}
         inline bool isOffical() const { return m_isOffical; }
         inline bool isXY() const { return m_isXY; }
         inline const char* getClientIp() const { return m_clientIp; }
