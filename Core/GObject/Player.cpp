@@ -1270,29 +1270,8 @@ namespace GObject
             if (platform == OFFICAL && strstr(m_via.c_str(), "webdownload"))
                 platform = WEBDOWNLOAD;
 
-            if (platform == PF_UNION)
-            {
-                StringTokenizer source(m_source, "-");
-                if (source.count() >= 3)
-                {
-                    UInt32 channel = atoi(source[1].c_str());
-                    if (channel == PF_XY_CH)
-                    {
-                        channel = atoi(source[2].c_str());
-                        //const UInt32 XY_CHANNEL[] = {41, 47, 48, 49, 50, 51, 52, 53, 54, 56};
-                        const UInt32 XY_CHANNEL[] = {8, 9, 15, 16, 17, 19};
-                        for (UInt32 i = 0; i < (sizeof(XY_CHANNEL) / sizeof(UInt32)); ++ i)
-                        {
-                            if (XY_CHANNEL[i] == channel)
-                            {
-                                platform = PF_XY;
-                                break;
-                            }
-                        }
-                    }
-                }
-                    
-            }
+            if (isXY())
+                platform = PF_XY;
 
             udpLog(platform, str1, str2, str3, str4, str5, str6, type, count);
         }
@@ -10969,6 +10948,48 @@ namespace GObject
                 udpLog("huodong", str, "", "", "", "", "act");
             }
         }
+    }
+    void Player::getWeiboAward(UInt8 opt, std::string key)
+    {
+        if (GetPackage()->GetRestPackageSize() < 2)
+        {
+            sendMsgCode(0, 1011);
+            return;
+        }
+        UInt8 v = GetVar(VAR_WEIBO_AWARD_GOT);
+        if (1 == opt)//微信
+        {
+            if (key != "27036")
+            {
+                sendMsgCode(0, 1043);
+                return;
+            }
+            if ((v&0x01) == 0)
+            {
+                getCoupon(20);
+                m_Package->Add(503,1,true);
+                m_Package->Add(514,1,true);
+                v |= 0x01;
+                SetVar(VAR_WEIBO_AWARD_GOT, v);
+            }
+        }
+        if (2 == opt) //微博
+        {
+            if((v&0x02) == 0)
+            {
+                getCoupon(10);
+                m_Package->Add(134,1,true);
+                v |= 0x02;
+                SetVar(VAR_WEIBO_AWARD_GOT, v);
+            }
+        }
+        sendWeiboAwardInfo();
+    }
+    void Player::sendWeiboAwardInfo()
+    {
+        Stream st(REP::ACTIVITY_REWARD);
+        st << static_cast<UInt8>(13) << static_cast<UInt8>(GetVar(VAR_WEIBO_AWARD_GOT)) << Stream::eos;
+        send(st);
     }
     void Player::sendConsumeAwardInfo(UInt8 idx)
     {

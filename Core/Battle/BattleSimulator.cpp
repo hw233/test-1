@@ -2473,11 +2473,12 @@ bool BattleSimulator::doStateMagRes(BattleFighter* bf, BattleFighter* target_bo,
     bool fres = rate > _rnd(10000);
     if(!fres)
         fres = getItemXin_MagRes(target_bo, state);
+    else
+        appendDefStatus(e_Res, 0, target_bo);
 
     if(fres)
     {
         idx = 0;
-        appendDefStatus(e_Res, 0, target_bo);
 
         if(atkAct)
         {
@@ -2521,6 +2522,8 @@ bool BattleSimulator::doStateMagRes2(BattleFighter* bf, BattleFighter* target_bo
     bool fres = rate > _rnd(10000);
     if(!fres)
         fres = getItemXin_MagRes(target_bo, state);
+    else
+        appendDefStatus(e_Res, 0, target_bo);
 
     if(fres)
         return true;
@@ -9530,7 +9533,7 @@ void BattleSimulator::doItemLingWu_State(BattleFighter* bf, BattleFighter* bo, f
         }
         break;
     case GObject::e_cls_ru:
-        if(!doStateMagRes2(bf, bo, GData::e_state_dec_aura))
+        if(!doStateMagRes2(bf, bo, GData::e_state_confuse))
         {
             if(bo == _activeFgt)
                 bo->setConfuseRound(last + 1);
@@ -9541,9 +9544,9 @@ void BattleSimulator::doItemLingWu_State(BattleFighter* bf, BattleFighter* bo, f
         }
         break;
     case GObject::e_cls_mo:
-        if(!doStateMagRes2(bf, bo, GData::e_state_dec_aura))
+        if(!doStateMagRes2(bf, bo, GData::e_state_blind))
         {
-            bo->setBlind(-0.75f, last);
+            bo->setBlind(0.75f, last);
             appendDefStatus(e_blind, 0, bo);
         }
         break;

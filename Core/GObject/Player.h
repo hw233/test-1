@@ -1858,22 +1858,18 @@ namespace GObject
 
             if (atoi(m_domain) == PF_UNION)
             {
-                static const UInt32 XY_CHANNEL[] = {41, 47, 48, 49, 50, 51, 52, 53, 54, 56};
-                for (UInt32 i = 0; i < (sizeof(XY_CHANNEL) / sizeof(UInt32)); ++ i)
+                static const char *XY_CHANNEL = "union-10040-";
+                if (strcasestr(m_source.c_str(), XY_CHANNEL))
                 {
-                    char buf[16];
-                    snprintf (buf, 16, "-%d", XY_CHANNEL[i]);
-                    if (strstr(m_source.c_str(), buf))
-                    {
-                        m_isXY = true;
-                        return;
-                    }
-                    else
-                    {
-                        m_isXY = false;
-                    }
+                    m_isXY = true;
+                }
+                else
+                {
+                    m_isXY = false;
                 }
             }
+            else
+                m_isXY = false;
         }
         inline void setVia(const std::string& via) { m_via = via; }
         inline void setInvited(const std::string& inv) { m_invited = inv; }
@@ -1968,6 +1964,8 @@ namespace GObject
         void getAwardBlueDiamond(UInt8 opt);
         void getConsumeAward();
         void sendConsumeAwardInfo(UInt8 idx);
+        void getWeiboAward(UInt8 opt, std::string key);
+        void sendWeiboAwardInfo();
         void getThanksGivingDay(UInt8 opt);
         void IDIPAddItem(UInt16 itemId, UInt16 num, bool bind = true);
         int IDIPBuy(UInt32 itemId, UInt32 num, UInt32 price, std::string& err, bool bind = true);
