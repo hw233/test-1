@@ -23,6 +23,7 @@ HeroMemo::~HeroMemo()
 
 void HeroMemo::setMemo(UInt8 chapter, UInt8 diff, UInt8 group, UInt8 item, UInt8 value)
 {
+    return; // XXX: 功能下线了
     if (!value)
         return;
     if (chapter > MC_MAX || diff > MD_MAX)
@@ -65,6 +66,7 @@ void HeroMemo::setMemo(UInt8 chapter, UInt8 diff, UInt8 group, UInt8 item, UInt8
 
 UInt8 HeroMemo::getMemo(UInt8 chapter, UInt8 diff, UInt8 group, UInt8 item)
 {
+    return 0; // XXX: 功能下线了
     if (chapter > MC_MAX || diff > MD_MAX ||
             group > m_memos[chapter][diff].size() ||
             item > m_memos[chapter][diff][group].size())
@@ -74,6 +76,7 @@ UInt8 HeroMemo::getMemo(UInt8 chapter, UInt8 diff, UInt8 group, UInt8 item)
 
 void HeroMemo::sendHeroMemoInfo()
 {
+    //return; // XXX: 功能下线了
     Stream st(REP::HEROMEMO);
     st << static_cast<UInt8>(0);
     st << static_cast<UInt8>(MC_MAX);
@@ -105,6 +108,7 @@ void HeroMemo::sendHeroMemoInfo()
 
 void HeroMemo::getAward(UInt8 idx)
 {
+    return; // XXX: 功能下线了
     if (!idx)
         return;
     if (idx > m_awards.size())
@@ -123,6 +127,17 @@ void HeroMemo::getAward(UInt8 idx)
         m_owner->send(st);
 
         updateToDB();
+    }
+}
+
+void HeroMemo::flushAward()
+{
+    // 功能下线，把未完成的都补发完
+    for (std::vector<UInt8>::iterator it = m_awards.begin(); it != m_awards.end(); ++ it)
+    {
+        if (*it == 2)
+            continue;
+        GameAction()->flushHeroMemoAward(m_owner, it - m_awards.begin() + 1);
     }
 }
 
@@ -201,6 +216,7 @@ void HeroMemo::loadFromDB(const char* awards, const char* memos)
 
 void HeroMemo::updateToDB()
 {
+    return; // XXX: 功能下线了
     std::string awards;
     std::string memos;
 
@@ -241,11 +257,13 @@ void HeroMemo::updateToDB()
 
 void HeroMemo::addMaxSoul(UInt16 soul)
 {
+    return; // XXX: 功能下线了
     m_maxSoul.push_back(soul);
 }
 
 bool HeroMemo::testCanGetAward(Player* player, UInt8 idx)
 {
+    return true; // XXX: 功能下线了
     if (!player || !idx)
         return false;
 

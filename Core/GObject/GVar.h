@@ -52,6 +52,8 @@ namespace GObject
         GVAR_DISCOUNT_END2 = 23, // 当前限购栏二结束时间
         GVAR_DISCOUNT_END3 = 24, // 当前限购栏三结束时间
 
+        GVAR_HEROMEM_CUT = 25,  // 剑侠秘籍去除标志（用于更新时发送老玩家补偿的）
+
         GVAR_MAX,
     };
 
@@ -91,9 +93,11 @@ namespace GObject
             GREGISTER_VAR(GVAR_DISCOUNT_BEGIN2, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_DISCOUNT_BEGIN3, GCYCLE_NONE);
 
-            GREGISTER_VAR(GVAR_DISCOUNT_BEGIN1, GCYCLE_NONE);
-            GREGISTER_VAR(GVAR_DISCOUNT_BEGIN2, GCYCLE_NONE);
-            GREGISTER_VAR(GVAR_DISCOUNT_BEGIN3, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_DISCOUNT_END1, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_DISCOUNT_END2, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_DISCOUNT_END3, GCYCLE_NONE);
+
+            GREGISTER_VAR(GVAR_HEROMEM_CUT, GCYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);
