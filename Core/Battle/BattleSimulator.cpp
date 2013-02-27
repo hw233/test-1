@@ -126,6 +126,7 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, cons
         skillEffectExtraTable[GData::e_eft_selfside_dao_dmgreduce] = &BattleSimulator::doSkillEffectExtra_SelfSideDaoDmgReduce;
         skillEffectExtraTable[GData::e_eft_selfside_ru_shi_magatk] = &BattleSimulator::doSkillEffectExtra_SelfSideRuShiMagAtk;
         skillEffectExtraTable[GData::e_eft_selfside_buf_aura] = &BattleSimulator::doSkillEffectExtra_SelfSideBufAura;
+        skillEffectExtraTable[GData::e_eft_hp_shield] = &BattleSimulator::doSkillEffectExtra_HpShield;
     }
 }
 
@@ -217,6 +218,7 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, GObj
         skillEffectExtraTable[GData::e_eft_selfside_dao_dmgreduce] = &BattleSimulator::doSkillEffectExtra_SelfSideDaoDmgReduce;
         skillEffectExtraTable[GData::e_eft_selfside_ru_shi_magatk] = &BattleSimulator::doSkillEffectExtra_SelfSideRuShiMagAtk;
         skillEffectExtraTable[GData::e_eft_selfside_buf_aura] = &BattleSimulator::doSkillEffectExtra_SelfSideBufAura;
+        skillEffectExtraTable[GData::e_eft_hp_shield] = &BattleSimulator::doSkillEffectExtra_HpShield;
     }
 }
 
@@ -533,7 +535,7 @@ void BattleSimulator::start(UInt8 prevWin, bool checkEnh)
         int pos = findFirstAttacker();
 
         act_count += doAttack(pos);
-       //  _attackRound ++ ;
+        //_attackRound ++ ;
 #ifdef _DEBUG
         char path[1024], path2[1024];
         sprintf(path, "%s0/0", cfg.reportPath.c_str());
@@ -549,6 +551,9 @@ void BattleSimulator::start(UInt8 prevWin, bool checkEnh)
             fwrite(szBuf, 1, strlen(szBuf), f);
             fclose(f);
         }
+        
+        act_count += tryPetEnter(0, e_reiatsu_round);
+        act_count += tryPetEnter(1, e_reiatsu_round);
 #endif
     }
     if(_winner == 0)
@@ -557,7 +562,7 @@ void BattleSimulator::start(UInt8 prevWin, bool checkEnh)
     _packet << static_cast<UInt8>(_winner);
     _packet.data<UInt32>(cnt_pos) = act_count;
     _packet << Stream::eos;
-//    printf("Winner is: %d,  actions: %d\n", _winner, act_count);
+    //printf("Winner is: %d,  actions: %d\n", _winner, act_count);
 #ifdef _DEBUG
     char path[1024], path2[1024];
     sprintf(path, "%s0/0", cfg.reportPath.c_str());
@@ -597,8 +602,8 @@ void  BattleSimulator::SendAttainMsgToPlayer( GObject::Player* player, UInt32 id
 void BattleSimulator::CheckAttain()
 {
 
-  // for(UInt8 i = 0; i < 2; i++)
-  //only  attacker
+    //for(UInt8 i = 0; i < 2; i++)
+    //only  attacker
         if(_player[0])
         {
             UInt32 max = _maxEvade[0];
@@ -976,7 +981,7 @@ UInt32 BattleSimulator::doXinmoAttack(BattleFighter * bf, BattleObject* bo)
             area_target->setDefend100(false);
         }
 
-//            printf("%u:%u hits %u:%u, but missed!\n", 1-side, from_pos, side, pos);
+        //printf("%u:%u hits %u:%u, but missed!\n", 1-side, from_pos, side, pos);
     }
 
     return dmg;
@@ -2613,6 +2618,120 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
         cnt = 1;
         target_pos = getPossibleTarget(bf->getSide(), bf->getPos());
     }
+    else if ( GData::e_battle_target_otherside_max == skill->target )
+    {
+        UInt8 excepts[25] = {0};
+        size_t exceptCnt = 0;
+        UInt8 side = bf->getSide()?0:1;
+        for (int i = 0; i < 25; ++i)
+        {
+            BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
+            if(!bo)  // 雪人
+                continue;
+
+            if(bo->getAura() > 99 || bo->getId() == 5679)
+            {
+                excepts[exceptCnt] = i;
+                ++ exceptCnt;
+            }
+        }
+        BattleFighter* bo = getMaxHpFighter(bf->getSide()?0:1, excepts, exceptCnt);
+        if(NULL == bo)
+        {
+            return;
+        }
+        else
+        {
+            target_pos = bo->getPos();
+            cnt = 1;
+        }
+    }
+    else if ( GData::e_battle_target_otherside_min == skill->target )
+    {
+        UInt8 excepts[25] = {0};
+        size_t exceptCnt = 0;
+        UInt8 side = bf->getSide()?0:1;
+        for (int i = 0; i < 25; ++i)
+        {
+            BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
+            if(!bo)  // 雪人
+                continue;
+
+            if(bo->getAura() > 99 || bo->getId() == 5679)
+            {
+                excepts[exceptCnt] = i;
+                ++ exceptCnt;
+            }
+        }
+        BattleFighter* bo = getMinHpFighter(bf->getSide()?0:1, excepts, exceptCnt);
+        if(NULL == bo)
+        {
+            return;
+        }
+        else
+        {
+            target_pos = bo->getPos();
+            cnt = 1;
+        }
+    }
+    else if ( GData::e_battle_target_selfside_max == skill->target )
+    {
+        UInt8 excepts[25] = {0};
+        size_t exceptCnt = 1;
+        excepts[0] = bf->getPos();
+        UInt8 side = bf->getSide();
+        for (int i = 0; i < 25; ++i)
+        {
+            BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
+            if(!bo)  // 雪人
+                continue;
+
+            if(bo->getAura() > 99 || bo->getId() == 5679)
+            {
+                excepts[exceptCnt] = i;
+                ++ exceptCnt;
+            }
+        }
+        BattleFighter* bo = getMaxHpFighter(bf->getSide(), excepts, exceptCnt);
+        if(NULL == bo)
+        {
+            return;
+        }
+        else
+        {
+            target_pos = bo->getPos();
+            cnt = 1;
+        }
+    }
+    else if ( GData::e_battle_target_selfside_min == skill->target )
+    {
+        UInt8 excepts[25] = {0};
+        size_t exceptCnt = 1;
+        excepts[0] = bf->getPos();
+        UInt8 side = bf->getSide();
+        for (int i = 0; i < 25; ++i)
+        {
+            BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
+            if(!bo)  // 雪人
+                continue;
+
+            if(bo->getAura() > 99 || bo->getId() == 5679)
+            {
+                excepts[exceptCnt] = i;
+                ++ exceptCnt;
+            }
+        }
+        BattleFighter* bo = getMaxHpFighter(bf->getSide(), excepts, exceptCnt);
+        if(NULL == bo)
+        {
+            return;
+        }
+        else
+        {
+            target_pos = bo->getPos();
+            cnt = 1;
+        }
+    }
     else
     {
         target_pos = bf->getPos();
@@ -2620,7 +2739,7 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
     }
 }
 
-bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt, std::vector<AttackAct>* atkAct, UInt32 skillParam)
+bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt, std::vector<AttackAct>* atkAct, UInt32 skillParam, UInt8* launchPeerLess /* = NULL */)
 {
     if(NULL == skill || target_pos < 0 || bf == NULL)
         return false;
@@ -2903,6 +3022,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
     if(skill->effect->hp > 0 || skill->effect->addhp > 0 || skill->effect->hpP > 0.001)
     {
         UInt32 rhp = bf->calcTherapy(cs, first, skill);
+        UInt32 maxRhp = bf->calcMaxTherapy(first, skill);
         UInt32 hpr_first = 0;
         // 释、普渡慈航
         if(SKILL_ID(skill->getId()) == 18)
@@ -2983,12 +3103,13 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
         }
         else if(0 == skill->area)
         {
+            // 暂时假定只有单体技能能按照百分比回血
             BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, target_pos));
             if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
                 return false;
 
             float deFactor = calcTherapyFactor(bo);
-            UInt32 hpr = bo->regenHP(rhp * deFactor, skill->cond == GData::SKILL_ACTIVE);
+            UInt32 hpr = bo->regenHP(rhp * deFactor, skill->cond == GData::SKILL_ACTIVE, skill->effect->hppec, maxRhp);
             if(hpr != 0)
             {
                 hpr_first = hpr;
@@ -3202,6 +3323,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
         }
     }
 
+    // 伤害技能
     if(skill->effect->state & GData::e_state_poison || skill->effect->damage || skill->effect->damageP || skill->effect->adddam
             || skill->effect->magdam || skill->effect->magdamP || skill->effect->addmag
             || skill->effect->crrdam || skill->effect->crrdamP || skill->effect->addcrr)
@@ -3318,6 +3440,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 dmg += attackOnce(bf, first, cs, pr, skill, getObject(target_side, ap[k].pos), factor*ap[k].factor);
 
         }
+        // 单体技能
         else if(0 == skill->area)
         {
             size_t hitcnt = 1 + getSkillEffectExtraHitCnt(bf, static_cast<BattleFighter*>(getObject(target_side, target_pos)), skill);
@@ -3354,6 +3477,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 bf->setMainTargetDeadFlag(true);
             }
         }
+        // 群体技能
         else if(1 == skill->area)
         {
             int i = 0;
@@ -3695,6 +3819,8 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
         int nChangeAuraNum = -1*bf->getAura() + bf->getAuraLeft(); // 因为天赋术，hero无双之后会留一点灵力
         //setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAura, nChangeAuraNum, 0, false);
         setStatusChange_Aura2(bf, bf->getSide(), bf->getPos(), NULL, nChangeAuraNum, 0, false);
+        if (launchPeerLess)
+            *launchPeerLess = 1;
     }
 
     if(ss && bf->getHP() != 0)
@@ -4727,6 +4853,11 @@ UInt32 BattleSimulator::doAttack( int pos )
     insertFighterStatus(bf);
     _activeFgt = bf;
 
+    UInt8 side = bf->getSide();
+    UInt8 reiatsuType = 0;
+    UInt8 reiatsuType2 = 0;
+    UInt8 launchPeerLess = 0;
+
     BattleFighter* mainTarget = NULL;
     do {
         rcnt += doDeBufAttack(bf);
@@ -4773,7 +4904,10 @@ UInt32 BattleSimulator::doAttack( int pos )
             std::vector<AttackAct> atkAct;
             atkAct.clear();
             if(doNormalAttack(bf, otherside, target_pos, &atkAct))
+            {
                 ++ rcnt;
+                reiatsuType = e_reiatsu_normal_attack;
+            }
 
             size_t actCnt = atkAct.size();
             for(size_t idx = 0; idx < actCnt; idx++)
@@ -4799,7 +4933,10 @@ UInt32 BattleSimulator::doAttack( int pos )
             std::vector<AttackAct> atkAct;
             atkAct.clear();
             if(doNormalAttack(bf, otherside, target_pos, &atkAct))
+            {
                 ++ rcnt;
+                reiatsuType = e_reiatsu_normal_attack;
+            }
 
             size_t actCnt = atkAct.size();
             for(size_t idx = 0; idx < actCnt; idx++)
@@ -4810,6 +4947,7 @@ UInt32 BattleSimulator::doAttack( int pos )
                     ++ rcnt;
             }
             atkAct.clear();
+
 
             break;
         }
@@ -4914,8 +5052,14 @@ UInt32 BattleSimulator::doAttack( int pos )
 
                 std::vector<AttackAct> atkAct;
                 atkAct.clear();
-                if(doSkillAttack(bf, skill, otherside, target_pos, cnt, &atkAct))
+                if(doSkillAttack(bf, skill, otherside, target_pos, cnt, &atkAct, 0, &launchPeerLess))
+                {
                     ++ rcnt;
+                    if (launchPeerLess)
+                        reiatsuType = e_reiatsu_peerless;
+                    else
+                        reiatsuType = e_reiatsu_skill_attack;
+                }
 
 
                 // 攻击完毕，把临时增加的命中反击清除
@@ -4949,7 +5093,10 @@ UInt32 BattleSimulator::doAttack( int pos )
                 std::vector<AttackAct> atkAct;
                 atkAct.clear();
                 if(doNormalAttack(bf, otherside, target_pos, &atkAct))
+                {
                     ++ rcnt;
+                    reiatsuType2 = e_reiatsu_skill_attack;
+                }
 
                 size_t actCnt = atkAct.size();
                 for(size_t idx = 0; idx < actCnt; idx++)
@@ -5417,6 +5564,9 @@ UInt32 BattleSimulator::doAttack( int pos )
 #endif
     }
     while(false);
+
+    rcnt += tryPetEnter(side, reiatsuType);
+    rcnt += tryPetEnter(side, reiatsuType2);
 
     if(mainTarget)
         mainTarget->setShieldObj(NULL);
@@ -6051,6 +6201,14 @@ BattleFighter * BattleSimulator::newFighter( UInt8 side, UInt8 pos, GObject::Fig
     return bf;
 }
 
+BattleFighter * BattleSimulator::newPet( UInt8 side, UInt8 pos, GObject::Fighter * fgt)
+{
+    // 加载仙宠
+    BattleFighter * bf = new(std::nothrow) Battle::BattleFighter(_formula, fgt, side, pos);
+    setPetObject(side, bf);
+    return bf;
+}
+
 void BattleSimulator::setStatusChange( UInt8 side, UInt8 pos, int cnt, UInt16 skillId, UInt8 type, UInt32 value, bool active )
 {
     for(UInt8 i = pos; i < pos + cnt; ++ i)
@@ -6608,6 +6766,80 @@ BattleFighter * BattleSimulator::getRandomFighter( UInt8 side, UInt8 * excepts, 
     if(posSize == 0)
         return NULL;
     return static_cast<BattleFighter *>(getObject(side, posList[_rnd(posSize)]));
+}
+
+BattleFighter * BattleSimulator::getMaxHpFighter( UInt8 side, UInt8 * excepts, size_t exceptCount )
+{
+    // 获取血量最高的散仙
+    UInt32 maxHp = 0;
+    std::vector<UInt8> posList;
+    for(UInt8 i = 0; i < 25; ++ i)
+    {
+        BattleObject * bo = getObject(side, i);
+        if(bo == NULL || bo->getHP() == 0)
+            continue;
+        bool except = false;
+        for(size_t j = 0; j < exceptCount; ++ j)
+        {
+            if(excepts[j] == i)
+            {
+                except = true;
+                break;
+            }
+        }
+        if(except)
+            continue;
+        if (bo->getHP() > maxHp)
+        {
+            maxHp = bo->getHP();
+            posList.clear();
+            posList.push_back(i);
+        }
+        else if (bo->getHP() == maxHp)
+        {
+            posList.push_back(i);
+        }
+    }
+    if(posList.empty())
+        return NULL;
+    return static_cast<BattleFighter *>(getObject(side, posList[_rnd(posList.size())]));
+}
+
+BattleFighter * BattleSimulator::getMinHpFighter( UInt8 side, UInt8 * excepts, size_t exceptCount )
+{
+    // 获取血量最少的散仙
+    UInt32 minHp = 0;
+    std::vector<UInt8> posList;
+    for(UInt8 i = 0; i < 25; ++ i)
+    {
+        BattleObject * bo = getObject(side, i);
+        if(bo == NULL || bo->getHP() == 0)
+            continue;
+        bool except = false;
+        for(size_t j = 0; j < exceptCount; ++ j)
+        {
+            if(excepts[j] == i)
+            {
+                except = true;
+                break;
+            }
+        }
+        if(except)
+            continue;
+        if (!minHp || bo->getHP() < minHp)
+        {
+            minHp = bo->getHP();
+            posList.clear();
+            posList.push_back(i);
+        }
+        else if (bo->getHP() == minHp)
+        {
+            posList.push_back(i);
+        }
+    }
+    if(posList.empty())
+        return NULL;
+    return static_cast<BattleFighter *>(getObject(side, posList[_rnd(posList.size())]));
 }
 
 UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
@@ -7825,7 +8057,7 @@ void BattleSimulator::SetSpecialAttrChange(BattleFighter* bf, const GData::Skill
     UInt16 skillId = 0;
     if(skill)
         skillId = skill->getId();
-   // sc.type = eType;
+    //sc.type = eType;
     switch(eType)
     {
         case e_ss_Atk:
@@ -7982,8 +8214,8 @@ bool BattleSimulator::AddYuanCiState_SkillStrengthen(BattleFighter* pFighter, Ba
     if(!ef)
         return false;
     // 上状态，判断免疫、抵抗（反弹，反弹不能被反弹），出战报数据
-   // std::vector<AttackAct> atkAct2;
- //   atkAct2.clear();
+    //std::vector<AttackAct> atkAct2;
+    //atkAct2.clear();
     UInt8 nState = 2;  // 混乱
     if(nAttackCount == 3)
         nState = 8;   // 沉默
@@ -9095,6 +9327,19 @@ void BattleSimulator::doSkillEffectExtra_SelfSideBufAura(BattleFighter* bf, int 
     }
 }
 
+void BattleSimulator::doSkillEffectExtra_HpShield(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
+{
+    // 增加hp百分比的护盾
+    BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, target_pos));
+    if(!bo)
+        return;
+    float hp = bf->getMaxHP() * (skill->effect->efv[eftIdx] / 10000);
+    if (hp < 1.0f)
+        return;
+    bo->setPetShieldHP(hp);
+    appendDefStatus(e_petShield, 0, bo);
+}
+
 void BattleSimulator::doSkillEffectExtraAbsorb(BattleFighter* bf, UInt32 dmg, const GData::SkillBase* skill)
 {
     if(!skill || !skill->effect)
@@ -9847,6 +10092,28 @@ void BattleSimulator::makeDamage(BattleFighter* bo, UInt32& u)
         }
     }
 
+    float petShieldHp = bo->getPetShieldHP();
+    if (petShieldHp > 0)
+    {
+        if (u > petShieldHp)
+        {
+            u -= petShieldHp;
+            petShieldHp = 0;
+        }
+        else
+        {
+            petShieldHp -= u;
+            u = 0;
+        }
+        
+        if(shieldHp < 1.0f)
+        {
+            shieldHp = 0;
+            appendDefStatus(e_unPetShield, 0, bo);
+        }
+        bo->setPetShieldHP(shieldHp);
+    }
+
     if(u > 0)
         bo->makeDamage(u);
 }
@@ -9920,6 +10187,82 @@ bool BattleSimulator::doStunPresent(BattleFighter* bf)
     }
 
     return true;
+}
+
+UInt32 BattleSimulator::tryPetEnter(UInt8 side, UInt8 reiatsuType)
+{
+    // 仙宠尝试上场（根据增加后的灵压判定是否上场）
+    UInt8 val = 0;
+    switch (reiatsuType)
+    {
+        case e_reiatsu_normal_attack:
+            val = 1;
+            break;
+        case e_reiatsu_skill_attack:
+            val = 2;
+            break;
+        case e_reiatsu_peerless:
+            val = 5;
+            break;
+        case e_reiatsu_round:
+            val = 5;
+        default:
+            break;
+    }
+    if (addReiatsu(side, val))
+    {
+        return doPetEnter(side);
+    }
+    return 0;
+}
+
+UInt32 BattleSimulator::doPetEnter(UInt8 side)
+{
+    // 仙宠入场
+    if (side < 0 || side >= 2)
+        return 0;
+    UInt32 pos = upPetObject(side);
+    if (pos >= 25)
+        return 0;
+
+    UInt32 rcnt = 0;
+
+    BattleObject * bo = _objs[side][pos];
+    if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
+        return 0;
+    BattleFighter* bf = static_cast<BattleFighter *>(bo);
+
+    if(bf->getPassiveSkillOnTherapy())
+        _onTherapy.push_back(bf);
+    if(bf->getPassiveSkillOnSkillDmg())
+        _onSkillDmg.push_back(bf);
+    if(bf->getPassiveSkillOnOtherDead())
+        _onOtherDead.push_back(bf);
+
+    const GData::SkillBase* passiveSkill = NULL;
+    size_t skillIdx = 0;
+    while(NULL != (passiveSkill = bf->getPassiveSkillEnter100(skillIdx)))
+    {
+        int target_side, target_pos, cnt;
+        getSkillTarget(bf, passiveSkill, target_side, target_pos, cnt);
+        UInt32 res = doSkillAttackAftEnter(bf, passiveSkill, target_side, target_pos, cnt);
+        if(rcnt == 0 && res != 0)
+            rcnt = 1;
+    }
+
+    if(NULL != (passiveSkill = bf->getPassiveSkillEnter()))
+    {
+        int target_side, target_pos, cnt;
+        getSkillTarget(bf, passiveSkill, target_side, target_pos, cnt);
+        UInt32 res = doSkillAttackAftEnter(bf, passiveSkill, target_side, target_pos, cnt);
+        if(rcnt == 0 && res != 0)
+            rcnt = 1;
+    }
+
+    if(rcnt != 0)
+        appendToPacket(0, -1, -1, 0, 0, false, false);
+
+    return rcnt;
 }
 
 }

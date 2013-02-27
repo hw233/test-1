@@ -69,6 +69,11 @@ enum
     e_cls_shi = 2,
     e_cls_dao = 3,
     e_cls_mo = 4,
+    
+    e_cls_pet_lingchong = 5,
+    e_cls_pet_zhenling = 6,
+    e_cls_pet_jiguan = 7,
+    e_cls_pet_zunzhe = 8,
 
     e_cls_max
 };
@@ -517,6 +522,7 @@ public:
 
     void getAllSSAndLevel(Stream& st);
 
+
 public:
 	inline const GData::AttrExtra * getAttrExtraEquip() { checkDirty(); return &_attrExtraEquip; }
 	inline UInt16 getExtraStrength() { checkDirty(); return _attrExtraEquip.strength; }
@@ -573,6 +579,9 @@ public:
     inline void setAttrExtraEquip(const GData::AttrExtra& other){ _attrExtraEquip += other; }
     inline void resetAttrExtraEquip(){setDirty(true); _attrExtraEquip.reset();}
     inline void resetAttrExtraEquip2(){setDirty(false); _attrExtraEquip.reset();}
+
+    UInt8 getToggleReiatsu();        // 返回出场所需灵压
+    UInt8 getTargetPos();            // 返回备胎该出场的目标位置
 
 public:
 	inline Int16 getBaseStrength()
@@ -789,6 +798,7 @@ protected:
 
     //是否隐藏时装
     bool _hideFashion;
+
 public:
 	float getSoulPracticeAddOn();
 	float getSoulPracticeFactor();

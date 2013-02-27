@@ -176,6 +176,8 @@ struct DBSkillEffect
     std::string eft;    // 附加特效类型
     std::string efl;    // 附加特效类型持续回合
     std::string efv;    // 附加特效类型值
+    float hppec;        // 最大生命值伤害百分比
+    float maxhpdampec;  // 最大生命值伤害百分比最大值（最高攻击力的百分比）
 };
 
 struct DBTalent
@@ -787,7 +789,7 @@ SPECIALDEF(11)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBSkillEffect)
-SPECIALDEF(33)
+SPECIALDEF(35)
     (
         UInt16, id,
         UInt16, state,
@@ -821,7 +823,9 @@ SPECIALDEF(33)
         float, magatkreduce,
         std::string, eft,
         std::string, efl,
-        std::string, efv
+        std::string, efv,
+        float, hppec,
+        float, maxhpdampec
     )
 SPECIALEND()
 

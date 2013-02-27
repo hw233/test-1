@@ -52,7 +52,8 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _blind(0), _blind_last(0), _deep_blind_dmg_extra(0), _deep_blind_last(0),
 	_moAttackAdd(0), _moMagAtkAdd(0), _moAtkReduce(0), _moMagAtkReduce(0),
 	_moAttackAddCD(0), _moMagAtkAddCD(0), _moAtkReduceCD(0), _moMagAtkReduceCD(0),
-    _bleedMo(0), _bleedMoLast(0), _summoner(NULL), _unSummonAura(0), _shieldHP(0), _shieldHPLast(0),
+    _bleedMo(0), _bleedMoLast(0), _summoner(NULL), _unSummonAura(0), 
+    _shieldHP(0), _shieldHPLast(0), _petShieldHP(0), 
     _atkAddSpecial(0), _atkSpecialLast(0), _magAtkAddSpecial(0), _magAtkSpecialLast(0), 
     _atkDecSpecial(0), _atkDecSpecialLast(0), _magAtkDecSpecial(0), _magAtkDecSpecialLast(0),
     _skillUsedChangeAttrValue(0), _skillUsedChangeAttrLast(0), _skillUsedChangeAttr(0),
@@ -797,6 +798,18 @@ float BattleFighter::calcTherapy(bool& isCritical, bool& first, const GData::Ski
     return aura_factor * (getMagAttack() * skill->effect->hpP + skill->effect->addhp + skill->effect->hp);
 }
 
+float BattleFighter::calcMaxTherapy(const GData::SkillBase* skill)
+{
+    // 回血量的最高值，和施放者的攻击力有关
+    if(!skill)
+        return 0;
+
+    if(skill->effect == NULL)
+        return 0;
+
+    return getMagAttack() * skill->effect->maxhpdampec;
+}
+
 float BattleFighter::calcPoison(const GData::SkillBase* skill, BattleFighter* defender, bool cs)
 {
     if(!skill)
@@ -910,10 +923,14 @@ void BattleFighter::initStats(bool checkEnh)
 	}
 }
 
-UInt32 BattleFighter::regenHP( UInt32 u, bool weak )
+UInt32 BattleFighter::regenHP( UInt32 u, bool weak /* = false */, float hppec /* = 0 */, float maxRhp /* = 0 */)
 {
     if(_weakRound > 0 && weak)
         u /= 2;
+    u += getMaxHP() * hppec;
+
+    if (maxRhp > 0)
+        u = u > maxRhp? maxRhp:u;
 
 	UInt32 oldhp = _hp;
 	if(oldhp >= getMaxHP())

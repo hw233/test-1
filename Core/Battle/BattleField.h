@@ -20,8 +20,19 @@ namespace GObject
 namespace Battle
 {
 
+const int MAX_REIATSU = 100;
+
+enum ReiatsuType
+{
+    e_reiatsu_normal_attack = 1,
+    e_reiatsu_skill_attack = 2,
+    e_reiatsu_peerless = 3,
+    e_reiatsu_round = 4,
+};
+
 class BattleField
 {
+
 public:
 	BattleField();
 	~BattleField();
@@ -30,6 +41,10 @@ public:
 	void setObject(int, int, BattleObject *, UInt8 = 0);
 	void setObjectXY(int, int, int, BattleObject *, bool = false, UInt8 = 0, UInt8 = 0);
 	void setFormation(int, UInt32);
+    void setPetObject(int, BattleObject *, UInt8 = 0);
+
+    UInt32 upPetObject(int, bool = true);
+    bool addReiatsu(int, int);
 
 	BattleObject * operator()(int, int);
 	BattleObject * getObjectXY(int, int, int);
@@ -59,6 +74,7 @@ public:
             _objs[side][idx] = NULL;
         }
     }
+
 protected:
 	bool anyObjectInRow(int, int);
 	void updateStats(int);
@@ -66,7 +82,11 @@ protected:
 
 protected:
 	BattleObject * _objs[2][25];
+    BattleObject * _backupObjs[2];
 	UInt8 _isBody[2][25];
+    UInt8 _reiatsu[2];          // 战场中双方的灵压(这单词是网上搜的，就是灵压的意思)
+    UInt8 _toggleReiatsu[2];    // 后备军团上场所需的灵压（仙宠上场）
+    UInt8 _backupTargetPos[2];  // 备胎上场时的位置
 	const GData::Formation * _formation[2];
 };
 

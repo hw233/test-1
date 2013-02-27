@@ -1341,6 +1341,7 @@ namespace GObject
 		void sendFriendList(UInt8, UInt8, UInt8);
 
 		void PutFighters(Battle::BattleSimulator&, int side, bool fullhp = false);
+        void PutPets (Battle::BattleSimulator&, int side, bool init = true);
 
 		inline void setNextTavernUpdate(UInt32 n) { _nextTavernUpdate = n; }
         void resetShiMen();

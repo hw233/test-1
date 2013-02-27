@@ -3782,6 +3782,49 @@ namespace GObject
 		bsim.setPortrait(side, _fighters.empty() ? 0 : _fighters.begin()->second->getId());
 	}
 
+	void Player::PutPets( Battle::BattleSimulator& bsim, int side, bool init /* = true */)
+    {
+        // TODO: 战斗模拟器中加载宠物
+        /*
+		for(int i = 0; i < 5; ++ i)
+		{
+			Lineup& lup = getLineup(i);
+			if(lup.fid != 0 && lup.fighter == NULL)
+			{
+				std::map<UInt32, Fighter *>::iterator it = _fighters.find(lup.fid);
+				if(it == _fighters.end())
+				{
+					lup.fid = 0;
+					lup.fighter = NULL;
+					lup.pos = 0;
+				}
+				else
+				{
+					lup.fighter = it->second;
+					lup.updateId();
+				}
+			}
+			if(lup.fighter != NULL)
+			{
+				Battle::BattleFighter * bf = bsim.newFighter(side, lup.pos, lup.fighter);
+				bf->setHP(fullhp ? 0 : lup.fighter->getCurrentHP());
+                if (lup.fighter->getClass() == 4)
+                    OnShuoShuo(SS_MO_BATTLE);
+			}
+			else if(i == 0 && !_fighters.empty())
+			{
+				lup.fighter = _fighters.begin()->second;
+				lup.updateId();
+				lup.pos = 12;
+				Battle::BattleFighter * bf = bsim.newFighter(side, lup.pos, lup.fighter);
+				bf->setHP(fullhp ? 0 : lup.fighter->getCurrentHP());
+				storeFighters();
+			}
+		}
+		bsim.setPortrait(side, _fighters.empty() ? 0 : _fighters.begin()->second->getId());
+        */
+    }
+
 	Fighter * Player::takeFighter( UInt32 id, bool writedb )
 	{
 		if(id > GREAT_FIGHTER_MAX || (writedb && id < 10))

@@ -207,7 +207,7 @@ public:
 
 	inline UInt32 getLostHP() { Int64 tmp = _maxhp + _maxhpAdd + _maxhpAdd2; UInt32 mhp = (tmp > 0 ? tmp : 0); if(mhp > _hp) return mhp - _hp; return 0; }
 
-	UInt32 regenHP(UInt32 u, bool weak = false);
+	UInt32 regenHP(UInt32 u, bool weak = false, float hppec = 0, float maxRhp);
 
 	void updateAllAttr();
 	void initStats(bool);
@@ -218,6 +218,7 @@ public:
 	bool canBeCounter();
 	bool calcPierce(BattleFighter* defender);
     float calcTherapy(bool& isCritical, bool& first, const GData::SkillBase* skill);
+    float calcMaxTherapy(const GData::SkillBase* skill);
     float calcMagAttack(bool& isCritical, BattleFighter* defender, float* pCf);
     float calcPoison(const GData::SkillBase* skill, BattleFighter* defender, bool cs);
     void calcSkillAttack(bool& isCritical, BattleFighter* defender, float& atk, float& magatk, float* pCf);
@@ -554,6 +555,9 @@ private:
 
     float _shieldHP;
     UInt8 _shieldHPLast;
+
+    float _petShieldHP;         // 仙宠给散仙上的护盾HP
+
     // cotton add for skillstrengthen
 public:
     inline float getAtkAddSpecial(){ return _atkAddSpecial; }
@@ -835,6 +839,8 @@ public:
     void setHpShieldSelf(float v, UInt8 l) { _hpShieldSelf = v; _hpShieldSelf_last = l; }
     bool releaseHpSieldSelf();
 
+    inline float& getPetShieldHP() { return _petShieldHP; }
+    inline void setPetShieldHP(float value) { _petShieldHP = value; }
 
 public:
 	enum StatusFlag

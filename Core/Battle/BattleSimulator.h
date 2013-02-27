@@ -53,6 +53,7 @@ public:
 	void getFighterHP(UInt8, GObject::Fighter **, UInt8 *, UInt32 * hp, UInt32 = 0);
 	inline void setPortrait(UInt8 side, UInt16 por) { _portrait[side] = por; }
 	BattleFighter * newFighter(UInt8 side, UInt8 pos, GObject::Fighter *);
+    BattleFighter * newPet(UInt8 side, UInt8 pos, GObject::Fighter *);
 	inline void setFormula(Script::BattleFormula * formula) { _formula = formula; }
 
     void putTeams(const std::string& name, UInt8 level, UInt16 portrait, UInt8 side);
@@ -263,6 +264,8 @@ private:
         e_unHpShieldSelf = 71, // 解除护盾
         e_deepConfuse = 72,    // 深度混乱
         e_unDeepConfuse = 73,  // 解除深度混乱
+        e_petShield = 74,       // 仙宠的护盾 
+        e_unPetShield = 75,     // 解除仙宠的护盾
 
         e_MAX_STATE,
     };
@@ -305,8 +308,10 @@ private:
 	void setStatusChange2(BattleFighter* bf, UInt8 side, UInt8 pos, int cnt, UInt16 skillId, UInt8 type, float value, UInt16 last, bool active);
 	void onDamage(BattleObject * bo, bool active, std::vector<AttackAct>* atkAct = NULL);
 	BattleFighter * getRandomFighter(UInt8 side, UInt8 * excepts, size_t exceptCount);
+	BattleFighter * getMaxHpFighter(UInt8 side, UInt8 * excepts, size_t exceptCount);
+	BattleFighter * getMinHpFighter(UInt8 side, UInt8 * excepts, size_t exceptCount);
     bool doNormalAttack(BattleFighter* bf, int otherside, int target_pos, std::vector<AttackAct>* atkAct = NULL);
-    bool doSkillAttack(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt, std::vector<AttackAct>* atkAct = NULL, UInt32 skillParam = 0);
+    bool doSkillAttack(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt, std::vector<AttackAct>* atkAct = NULL, UInt32 skillParam = 0, UInt8* launchPeerLess = NULL);
     BattleFighter* getTherapyTarget(BattleFighter* bf);
     BattleFighter* getTherapyTarget2(BattleFighter* bf, UInt8 * excepts, size_t exceptCount);
     BattleFighter* getTherapyTarget3(BattleFighter* bf, UInt8 * excepts, size_t exceptCount);
@@ -332,6 +337,7 @@ private:
     void  InitAttainRecord();
     void  CheckAttain();
     void  SendAttainMsgToPlayer( GObject::Player* player, UInt32 id, UInt32 param);
+
 
     typedef void (Battle::BattleSimulator::*setStatusFunc)(BattleFighter * bf, UInt8 side, UInt8 pos, const GData::SkillBase* skill, float value, UInt16 last, bool active);
     typedef void (Battle::BattleSimulator::*setStatusFunc2)(BattleFighter* bf, UInt8 side, UInt8 pos, UInt16 skillId, float value, UInt16 last, bool active);
@@ -415,8 +421,8 @@ private:
     // 计算治疗因子
     float calcTherapyFactor(BattleFighter* bo);
     float calcTherapyBuff(BattleFighter* bo);  // 这个是加治疗、减治疗和虚弱三种效果相互覆盖的结果，这个治疗状态不可驱散
-//    float calcTherapyDebuf(BattleFighter* bo, DefStatus* defList, size_t& defCount);
-//    float calcTherapyAddBuff(BattleFighter* bo, DefStatus* defList, size_t& defCount);
+    //float calcTherapyDebuf(BattleFighter* bo, DefStatus* defList, size_t& defCount);
+    //float calcTherapyAddBuff(BattleFighter* bo, DefStatus* defList, size_t& defCount);
     float calcAuraDebuf(BattleFighter* bo);
     void calcAuraAdd(BattleFighter* bf, BattleFighter* bo, const GData::SkillBase* skill, float& bfAuraAdd, float& boAuraAdd);
     float getSkillEffectExtraHideAura(BattleFighter* bf, BattleFighter* bo, const GData::SkillBase* skill);
@@ -444,6 +450,7 @@ private:
     void doSkillEffectExtra_SelfSideDaoDmgReduce(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_SelfSideRuShiMagAtk(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_SelfSideBufAura(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
+    void doSkillEffectExtra_HpShield(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
 
 
     void doSkillEffectExtraAbsorb(BattleFighter* bf, UInt32 dmg, const GData::SkillBase* skill);
@@ -564,6 +571,9 @@ private:
     bool doAuraPresent(BattleFighter* bf);
     bool doConfusePresent(BattleFighter* bf);
     bool doStunPresent(BattleFighter* bf);
+
+    UInt32  tryPetEnter(UInt8 side, UInt8 reiatsuType); // 仙宠尝试上场（根据增加后的灵压判定是否上场）
+    UInt32  doPetEnter(UInt8 side);                     // 仙宠闪亮上场
 };
 
 }

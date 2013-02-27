@@ -10,6 +10,9 @@ BattleField::BattleField()
 	memset(_objs, 0, sizeof(_objs));
 	memset(_isBody, 0, sizeof(_isBody));
 	memset(_formation, 0, sizeof(_formation));
+    memset(_backupObjs, 0, sizeof(_backupObjs));
+    memset(_reiatsu, 0, sizeof(_reiatsu));
+    memset(_toggleReiatsu, 0, sizeof(_toggleReiatsu));
 }
 
 BattleField::~BattleField()
@@ -68,6 +71,53 @@ void BattleField::setObjectXY( int side, int x, int y, BattleObject * obj, bool 
 		setObject(side, x + y * 5, obj, isBodyX + isBodyY * 5 + 1);
 	else
 		setObject(side, x + y * 5, obj, 0);
+}
+
+void BattleField::setPetObject( int side, BattleObject * obj, UInt8 isBody)
+{
+    // 放置仙宠
+    if (side < 0 || side >= 2)
+        return;
+	if(_backupObjs[side] != NULL)
+	{
+        delete _backupObjs[side];
+	}
+    _backupObjs[side] = obj;
+    if(!isBody && obj->getClass() == BattleObject::Char)
+    {
+        BattleFighter * bfgt = static_cast<BattleFighter *> (obj);
+        GObject::Fighter * fgt = bfgt->getFighter();
+        if (fgt->getClass() >= GObject::e_cls_pet_lingchong && fgt->getClass() <= GObject::e_cls_pet_zunzhe)
+        {
+            // 出场所需的灵压
+            _toggleReiatsu[side] = fgt->getToggleReiatsu();
+            _backupTargetPos[side] = fgt->getTargetPos();
+        }
+    }
+}
+
+UInt32 BattleField::upPetObject(int side, bool isReplace /* = true */)
+{
+    // 上场候补选手（如果上场位置有人，则直接顶掉）
+    if (side < 0 || side >= 2)
+        return 0xff;
+    if (_backupObjs[side] == NULL)
+        return 0xff;
+    setObject(side, _backupTargetPos[side], _backupObjs[side]);
+    _backupObjs[side] = NULL;
+    return _backupTargetPos[side];
+}
+
+bool BattleField::addReiatsu(int side, int value)
+{
+    // 增加场上灵压，返回值表示是否需要仙宠出场
+    if (side < 0 || side >= 2)
+        return false;
+    if (_reiatsu[side] + value > MAX_REIATSU)
+        _reiatsu[side] = MAX_REIATSU;
+    else
+        _reiatsu[side] += value;
+    return _reiatsu[side] >= _toggleReiatsu[side] ? true:false;
 }
 
 BattleObject * BattleField::operator()( int side, int idx )
@@ -204,8 +254,12 @@ void BattleField::clear()
 		for(int j = 0; j < 25; ++ j)
 			if(_objs[i][j] && !_isBody[i][j])
 				delete _objs[i][j];
+    for (int i = 0; i < 2; ++i)
+        if (_backupObjs[i])
+            delete _backupObjs[i];
 	memset(_objs, 0, sizeof(_objs));
 	memset(_formation, 0, sizeof(_formation));
+    memset(_backupObjs, 0, sizeof(_backupObjs));
 }
 
 void BattleField::reset()

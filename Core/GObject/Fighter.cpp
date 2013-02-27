@@ -4325,6 +4325,18 @@ void Fighter::broadcastForge(UInt8 lock)
     }
 }
 
+UInt8 Fighter::getToggleReiatsu()
+{
+    // TODO: 返回出场所需灵压（仅对仙宠有效）
+    return 0;
+}
+
+UInt8 Fighter::getTargetPos()
+{
+    // TODO: 返回备胎上场时的位置
+    return 0;
+}
+
 float Fighter::getSoulPracticeAddOn()
 {
     if(!m_2ndSoul)
