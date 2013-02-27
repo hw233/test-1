@@ -1015,6 +1015,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 			clan->broadcastMemberInfo(pl);
 	}
 	{
+        pl->transferPexpBuffer2Var();
 		Stream st;
 		pl->makePlayerInfo(st);
 		conn->send(&st[0], st.size());
@@ -1253,7 +1254,6 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendNewYearQQGameAct();
     pl->calcNewYearQzoneContinueDay(now);
     pl->sendNewYearQzoneContinueAct();
-    pl->transferPexpBuffer2Var();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )

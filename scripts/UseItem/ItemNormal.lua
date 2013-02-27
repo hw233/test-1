@@ -157,6 +157,23 @@ function getRandTrump(lvl)
 end
 
 function ItemNormal_AddBuff(obj, idx, num, count, max_num)
+  if idx == 5 or idx == 6 or idx == 10 or idx == 11 or idx == 24 then
+      -- 11、24也是高级加速
+      if idx == 11 or idx == 24 then
+          idx = 6
+      end
+      local left = obj:getBuffData(idx);
+      if left > max_num then
+          return false
+      end
+      left = left + num * count
+      if left >= max_num then
+          left = max_num
+      end
+      obj:setBuffData(idx, left, true)
+      return true
+  end
+
   local now = os.time()
   local num2 = obj:getBuffData(idx);
   if num2 > now then
@@ -2078,10 +2095,8 @@ function ItemNormal_00000055(iid, num, bind, param)
   
   if  getAutoBattleAct() and ItemNormal_AddBuff(player, 5, 3600, num, 216*3600) then
       package:DelItemSendMsg(55, player);
-      SetVar(409, 5)
   elseif ItemNormal_AddBuff(player, 5, 3600, num, 356400) then
       package:DelItemSendMsg(55, player);
-      SetVar(409, 5)
   else
 	return false;
   end
@@ -2098,10 +2113,8 @@ function ItemNormal_00000056(iid, num, bind, param)
  
   if getAutoBattleAct() and ItemNormal_AddBuff(player, 6, 3600, num, 216*3600) then
       package:DelItemSendMsg(56, player);
-      SetVar(409, 4)
   elseif ItemNormal_AddBuff(player, 6, 3600, num, 356400) then
   	  package:DelItemSendMsg(56, player);
-      SetVar(409, 4)
   else
 	return false;
   end
@@ -4378,7 +4391,6 @@ function ItemNormal_00009092(iid, num, bind, param)
     -- player:setBuffData(0x18, 0, true)
     if ItemNormal_AddBuff(player, 10, 3600, num, 356400) then
         package:DelItemSendMsg(iid, player);
-        SetVar(409, 2)
         return num;
     else
         return false;
@@ -4718,7 +4730,6 @@ function ItemNormal_00009126(iid, num, bind, param)
   end
   if ItemNormal_AddBuff(player, 0x18, duringTime, num, 31536000) then
   	package:DelItemSendMsg(iid, player);
-      SetVar(409, 1)
 	return num;
   else
 	return false;

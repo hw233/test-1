@@ -147,33 +147,24 @@ namespace GObject
 		UInt32 now = TimeUtil::Now();
 		float exp = calcExpEach(now);
         UInt32 curHookIndex = m_Player->GetVar(VAR_PEXP_HOOK_INDEX);
-        if(curHookIndex == ENUM_ADVANCED_HOOK)
+        if(curHookIndex == ENUM_TRAINP1)
         {
-            if(m_Player->GetVar(VAR_ADVANCED_HOOK))
+            if(m_Player->getBuffLeft(PLAYER_BUFF_TRAINP1))
+                exp *= 1.2f;
+        }
+        else if(curHookIndex == ENUM_TRAINP2)
+        {
+            if(m_Player->getBuffLeft(PLAYER_BUFF_TRAINP2))
                 exp *= 1.5f;
         }
         else if(curHookIndex == ENUM_TRAINP3)
         {
-            if(m_Player->GetVar(VAR_TRAINP3))
+            if(m_Player->getBuffLeft(PLAYER_BUFF_TRAINP3))
                 exp *= 1.8f;
         }
-        else if(curHookIndex == ENUM_TRAINP4)
-        {
-            if(m_Player->GetVar(VAR_TRAINP4))
-                exp *= 1.5f;
-        }
-        else if(curHookIndex == ENUM_TRAINP2)
-        {
-            if(m_Player->GetVar(VAR_TRAINP2))
-                exp *= 1.5f;
-        }
-        else if(curHookIndex == ENUM_TRAINP1)
-        {
-            if(m_Player->GetVar(VAR_TRAINP1))
-                exp *= 1.2f;
-        }
-
+#if 0
 		_npcGroup->monsterKilled(m_Player);
+#endif
 		if(m_Player->isOnline())
 			m_Player->AddExp(static_cast<UInt32>(exp));
 		else
@@ -2300,8 +2291,18 @@ namespace GObject
         _playerData.lastTjEventScore = 0;
         _playerData.lastTjTotalScore = 0;
     }
-	void Player::setBuffData(UInt8 id, UInt32 data, bool writedb)
+	void Player::setBuffData(UInt8 id, UInt32 data, bool writedb, bool useOld)
 	{
+        /** 加速符 **/
+        if(buffIdRelatePExpHook(id) && !useOld)
+        {
+            if(_buffData[id] == data)
+                return;
+            _buffData[id] = data;
+            if(writedb)
+                sendModification(0x40 + id, data, writedb);
+            return;
+        }
 		UInt32 now = TimeUtil::Now();
 		if(id == PLAYER_BUFF_ATTACKING && data >= now)
 		{
@@ -2324,8 +2325,17 @@ namespace GObject
 			sendModification(0x40 + id, data, writedb);
 	}
 
-	void Player::addBuffData(UInt8 id, UInt32 data)
+	void Player::addBuffData(UInt8 id, UInt32 data, bool useOld)
 	{
+        /** 加速符 **/
+        if(buffIdRelatePExpHook(id) && !useOld)
+        {
+            if(data == 0)
+                return;
+            _buffData[id] += data;
+            sendModification(0x40 + id, _buffData[id]);
+            return;
+        }
 		if(id >= PLAYER_BUFF_COUNT || data == 0)
 			return;
 		UInt32 now = TimeUtil::Now();
@@ -2337,8 +2347,13 @@ namespace GObject
 		sendModification(0x40 + id, _buffData[id]);
 	}
 
-	UInt32 Player::getBuffData( UInt8 idx, UInt32 tm )
+	UInt32 Player::getBuffData( UInt8 idx, UInt32 tm, bool useOld )
 	{
+        /** 加速符 **/
+        if(buffIdRelatePExpHook(idx) && !useOld)
+        {
+		    return _buffData[idx];
+        }
 		if(idx > PLAYER_BUFF_COUNT)
 			return 0;
 		if(idx != PLAYER_BUFF_AUTOHEAL &&
@@ -2357,8 +2372,13 @@ namespace GObject
 		return _buffData[idx];
 	}
 
-	UInt32 Player::getBuffLeft( UInt8 idx, UInt32 tm )
+	UInt32 Player::getBuffLeft( UInt8 idx, UInt32 tm, bool useOld)
 	{
+        /** 加速符 **/
+        if(buffIdRelatePExpHook(idx), !useOld)
+        {
+		    return _buffData[idx];
+        }
 		UInt32 buff = getBuffData( idx, tm );
 		if(buff == 0)
 			return 0;
@@ -3014,7 +3034,25 @@ namespace GObject
 			}
 			else
 			{
-				if(_buffData[i] > curtime)
+                if(buffIdRelatePExpLow(i))
+                {
+					buffid[c] = i + 0x40;
+					buffleft[c] = _buffData[i];
+                    ++c;
+                }
+                else if(buffIdRelatePExpHigh(i))
+                {
+					buffid[c] = i + 0x40;
+					buffleft[c] = _buffData[i];
+                    ++c;
+                }
+                else if(buffIdRelatePExpQitian(i))
+                {
+					buffid[c] = i + 0x40;
+					buffleft[c] = _buffData[i];
+                    ++c;
+                }
+                else if(_buffData[i] > curtime)
 				{
 					buffid[c] = i + 0x40;
 					buffleft[c] = _buffData[i] - curtime;
@@ -4209,11 +4247,18 @@ namespace GObject
 			Stream st(REP::USER_INFO_CHANGE);
 			if(t > 0x40)
 			{
-				UInt32 tm = TimeUtil::Now();
-				if(v > tm)
-					st << t << static_cast<UInt32>(v - tm) << Stream::eos;
-				else
-					st << t << static_cast<UInt32>(0) << Stream::eos;
+                if(buffIdRelatePExpHook(t - 0x40))
+                {
+                    st << t << v << Stream::eos;
+                }
+                else
+                {
+                    UInt32 tm = TimeUtil::Now();
+                    if(v > tm)
+                        st << t << static_cast<UInt32>(v - tm) << Stream::eos;
+                    else
+                        st << t << static_cast<UInt32>(0) << Stream::eos;
+                }
 			}
 			else
 				st << t << v << Stream::eos;
@@ -17284,37 +17329,58 @@ void Player::transferPexpBuffer2Var()
 {
     UInt32 tm = TimeUtil::Now();
     UInt32 left;
-
-    if((left = getBuffLeft(PLAYER_BUFF_ADVANCED_HOOK, tm)) > 0)
+    UInt32 total;
+    if(GetVar(VAR_PEXP_HOOK_NEW_SOLUTION))
+        return;
+    /** 初级**/
+    total = 0;
+    if((left = getBuffLeft(PLAYER_BUFF_TRAINP1, tm, true))> 0)
     {
-        AddVar(VAR_ADVANCED_HOOK, left);
-        SetVar(VAR_PEXP_HOOK_INDEX, ENUM_ADVANCED_HOOK);
-        setBuffData(PLAYER_BUFF_ADVANCED_HOOK, 0);
-    }
-    if((left = getBuffLeft(PLAYER_BUFF_TRAINP3, tm)) > 0)
+        total += left;
+        setBuffData(PLAYER_BUFF_TRAINP1, 0, true);
+    };
+    if(total > 0)
     {
-        AddVar(VAR_TRAINP3, left);
-        SetVar(VAR_PEXP_HOOK_INDEX, ENUM_TRAINP3);
-        setBuffData(PLAYER_BUFF_TRAINP3, 0);
-    }
-    if((left = getBuffLeft(PLAYER_BUFF_TRAINP4, tm)) > 0)
-    {
-        AddVar(VAR_TRAINP4, left);
-        SetVar(VAR_PEXP_HOOK_INDEX, ENUM_TRAINP4);
-        setBuffData(PLAYER_BUFF_TRAINP4, 0);
-    }
-    if((left = getBuffLeft(PLAYER_BUFF_TRAINP2, tm)) > 0)
-    {
-        AddVar(VAR_TRAINP2, left);
-        SetVar(VAR_PEXP_HOOK_INDEX, ENUM_TRAINP2);
-        setBuffData(PLAYER_BUFF_TRAINP2, 0);
-    }
-    if((left = getBuffLeft(PLAYER_BUFF_TRAINP1, tm))> 0)
-    {
-        AddVar(VAR_TRAINP1, left);
+        setBuffData(PLAYER_BUFF_TRAINP1, total);
         SetVar(VAR_PEXP_HOOK_INDEX, ENUM_TRAINP1);
-        setBuffData(PLAYER_BUFF_TRAINP1, 0);
     }
+
+    /** 高级 **/
+    total = 0;
+    if((left = getBuffLeft(PLAYER_BUFF_TRAINP2, tm, true)) > 0)
+    {
+        total += left;
+        setBuffData(PLAYER_BUFF_TRAINP2, 0, true);
+    }
+    if((left = getBuffLeft(PLAYER_BUFF_TRAINP4, tm, true)) > 0)
+    {
+        total += left;
+        setBuffData(PLAYER_BUFF_TRAINP4, 0, true);
+    }
+    if((left = getBuffLeft(PLAYER_BUFF_ADVANCED_HOOK, tm, true)) > 0)
+    {
+        total += left;
+        setBuffData(PLAYER_BUFF_ADVANCED_HOOK, 0, true);
+    }
+    if(total > 0)
+    {
+        setBuffData(PLAYER_BUFF_TRAINP2, total);
+        SetVar(VAR_PEXP_HOOK_INDEX, ENUM_TRAINP2);
+    }
+
+    /** 齐天 **/
+    total = 0;
+    if((left = getBuffLeft(PLAYER_BUFF_TRAINP3, tm, true)) > 0)
+    {
+        total += left;
+        setBuffData(PLAYER_BUFF_TRAINP3, 0, true);
+    }
+    if(total > 0)
+    {
+        setBuffData(PLAYER_BUFF_TRAINP3, 0);
+        SetVar(VAR_PEXP_HOOK_INDEX, ENUM_TRAINP3);
+    }
+    SetVar(VAR_PEXP_HOOK_NEW_SOLUTION, 1);
 }
 
 } // namespace GObject

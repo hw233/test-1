@@ -167,11 +167,9 @@ namespace GObject
 
     enum PEXP_HOOK_INFEX
     {
-        ENUM_ADVANCED_HOOK,
-        ENUM_TRAINP3,
-        ENUM_TRAINP4,
-        ENUM_TRAINP2,
-        ENUM_TRAINP1
+        ENUM_TRAINP1 = 1,  /** 初级经验加速符*1.2,加速(*1.3) **/
+        ENUM_TRAINP2,      /** 高级经验加速符*1.5,加速(*1.6);2.ENUM_TRAINP4:*1.5,加速(*1.5);3.ENUM_ADVANCED_HOOK:超值挂机加速符(100小时),*1.5,加速(*1.6) **/
+        ENUM_TRAINP3       /** 齐天经验加速符,*1.8,加速(*1.8) **/
     };
 
 	class Map;
@@ -934,10 +932,10 @@ namespace GObject
         void initHeroMemo();
         void initShuoShuo();
 
-		UInt32 getBuffData(UInt8 idx, UInt32 tm = TimeUtil::Now());
-		UInt32 getBuffLeft(UInt8 idx, UInt32 tm = TimeUtil::Now());
-		void setBuffData(UInt8, UInt32, bool = true);
-		void addBuffData(UInt8, UInt32);
+		UInt32 getBuffData(UInt8 idx, UInt32 tm = TimeUtil::Now(), bool useOld = false);
+		UInt32 getBuffLeft(UInt8 idx, UInt32 tm = TimeUtil::Now(), bool useOld = false);
+		void setBuffData(UInt8, UInt32, bool = true, bool useOld = false);
+		void addBuffData(UInt8, UInt32, bool useOld = false);
 		void testBattlePunish();
 
 
@@ -2146,6 +2144,11 @@ namespace GObject
         void sendNewYearQzoneContinueAct();
         void calcNewYearQzoneContinueDay(UInt32 time);
         void transferPexpBuffer2Var();
+
+        inline bool buffIdRelatePExpHook(UInt8 id) { return id == 5 || id == 6 || id == 10 || id == 11 || id == 24; }
+        inline bool buffIdRelatePExpLow(UInt8 id) { return id == 5; }
+        inline bool buffIdRelatePExpHigh(UInt8 id) { return id == 6 || id == 11 || id == 24; }
+        inline bool buffIdRelatePExpQitian(UInt8 id) { return id == 10; }
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n
