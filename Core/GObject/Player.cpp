@@ -191,17 +191,18 @@ namespace GObject
         UInt8 iccnt = Player::getMaxIcCount(vipLevel) - m_Player->getIcCount();
         if (Player::getMaxIcCount(vipLevel) < m_Player->getIcCount())
             iccnt = Player::getMaxIcCount(vipLevel);
+        UInt8 curType = static_cast<UInt8>(m_Player->GetVar(VAR_PEXP_HOOK_NEW_SOLUTION));
 		if(cnt > 0)
 		{
 			if(_npcGroup == NULL)
 				return;
 			UInt32 t = TimeUtil::Now();
 			if(t > _finalEnd) t = 0; else t = _finalEnd - t;
-			st << _npcGroup->getId() << static_cast<UInt8>(1) << cnt << t << iccnt << Stream::eos;
+			st << _npcGroup->getId() << static_cast<UInt8>(1) << cnt << t << iccnt << curType << Stream::eos;
 		}
 		else
 		{
-			st << static_cast<UInt32>(0) << static_cast<UInt8>(0) << static_cast<UInt16>(0) << static_cast<UInt32>(0) << iccnt << Stream::eos;
+			st << static_cast<UInt32>(0) << static_cast<UInt8>(0) << static_cast<UInt16>(0) << static_cast<UInt32>(0) << iccnt << curType << Stream::eos;
 			m_Player->delFlag(Player::Training);
 		}
 		m_Player->send(st);
@@ -3654,7 +3655,7 @@ namespace GObject
 		return res;
 	}
 
-	bool Player::autoBattle( UInt32 npcId )
+	bool Player::autoBattle( UInt32 npcId, UInt8 type)
 	{
         if (GetPackage()->GetRestPackageSize() == 0)
         {
@@ -3664,6 +3665,8 @@ namespace GObject
 		GData::NpcGroups::iterator it = GData::npcGroups.find(npcId);
 		if(it == GData::npcGroups.end())
 			return false;
+        if(type > 3)
+            return false;
 		GData::NpcGroup * ng = it->second;
 #if 0
 		if(GetLev() < ng->getLevel())
@@ -3697,12 +3700,12 @@ namespace GObject
 		UInt32 final = TimeUtil::Now() + timeDur;
 		EventAutoBattle* event = new(std::nothrow) EventAutoBattle(this, eachBattle, count, ng, final);
 		if (event == NULL) return false;
+        SetVar(VAR_PEXP_HOOK_INDEX, type);
 		cancelAutoBattle();
 		PushTimerEvent(event);
 		addFlag(Training);
 		event->notify();
 		event->updateDB(true);
-
         OnHeroMemo(MC_FIGHTER, MD_STARTED, 0, 0);
         GameAction()->doStrong(this, SthTaskHook, 0,0);
 		return true;

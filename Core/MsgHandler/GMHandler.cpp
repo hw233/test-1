@@ -3682,10 +3682,11 @@ void GMHandler::OnSomeAct(GObject::Player *player, std::vector<std::string>& arg
     }
     else if(type == 2)
     {
-        if(args.size() < 2)
+        if(args.size() < 3)
             return;
         UInt32 npcId = atoi(args[1].c_str());
-        player->autoBattle(npcId);
+        UInt32 type = atoi(args[2].c_str());
+        player->autoBattle(npcId, type);
     }
 }
 

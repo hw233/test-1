@@ -358,7 +358,7 @@ namespace GObject
         VAR_NEWYEAR_QZONECONTINUE_ACT = 402, //空间朋友连续登录奖励
         VAR_NEWYEAR_QZONECONTINUE_LASTTIME = 403, //空间朋友连续登录奖励
         VAR_PEXP_HOOK_INDEX = 404, //1:TRAINP1(初级),2:TRAINP2(高级，包括TRAINP4、ADVANCED_HOOK(超值)),3:TRAINP3
-        VAR_PEXP_HOOK_NEW_SOLUTION = 406, //加速符是否采用新方案(0:老方案, 1:新方案)
+        VAR_PEXP_HOOK_NEW_SOLUTION = 405, //加速符是否采用新方案(0:老方案, 1:新方案)
 
         VAR_MAX,
     };
