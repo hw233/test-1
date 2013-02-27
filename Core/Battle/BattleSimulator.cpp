@@ -1191,6 +1191,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
             if(area_target->hasFlag(BattleFighter::IsMirror))
             {
                 dmg = area_target->getHP();
+                dmgFlag = true;
             }
             else
             {
@@ -1241,9 +1242,9 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                 makeDamage(area_target, dmg3);
             }
             if (magdmgFlag)
-                appendDefStatus(e_damNormal, dmg, area_target, e_damagePhysic);
-            if (dmgFlag)
                 appendDefStatus(e_damNormal, magdmg, area_target, e_damageMagic);
+            if (dmgFlag)
+                appendDefStatus(e_damNormal, dmg, area_target, e_damagePhysic);
             //appendDefStatus(e_damNormal, dmg3, area_target);
             //printf("%u:%u %s %u:%u, made %u damage, hp left: %u\n", 1-side, from_pos, cs2 ? "CRITICALs" : "hits", side, pos, dmg, area_target->getHP());
             // killed the target fighter
@@ -5916,6 +5917,8 @@ void BattleSimulator::appendToPacket(UInt8 from_side, UInt8 from_pos, UInt8 targ
         sprintf(szBuf, "defList[%lu].damage=%d\r\n", i, _defList[i].damage);
         fwrite(szBuf, 1, strlen(szBuf), f);
         sprintf(szBuf, "defList[%lu].leftHP=%d\r\n", i, _defList[i].leftHP);
+        fwrite(szBuf, 1, strlen(szBuf), f);
+        sprintf(szBuf, "defList[%lu].damageType=%d\r\n", i, _defList[i].damageType);
         fwrite(szBuf, 1, strlen(szBuf), f);
         if(_defList[i].damType == e_damAbsorb)
         {
