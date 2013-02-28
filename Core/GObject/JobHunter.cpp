@@ -1060,9 +1060,8 @@ bool JobHunter::OnAttackMonster(UInt16 pos, bool isAuto)
         ++ type;
         _isInAuto = false;
         _isAutoLose = true;
-        GObject::EventBase * ev = GObject::eventWrapper.RemoveTimerEvent(_owner, EVENT_JOBHUNTER, _owner->getId());
-        if (ev)
-            ev->release();
+        GameMsgHdr hdr1(0x17E, WORKER_THREAD_WORLD, _owner, 0);
+        GLOBAL().PushMsg(hdr1, NULL);
         SendMapInfo();
     }
 
@@ -1257,9 +1256,8 @@ bool JobHunter::OnFoundCave(bool isAuto)
         _posY = _earlyPosY;
         _isInAuto = false;
         _isAutoLose = true;
-        GObject::EventBase * ev = GObject::eventWrapper.RemoveTimerEvent(_owner, EVENT_JOBHUNTER, _owner->getId());
-        if (ev)
-            ev->release();
+        GameMsgHdr hdr1(0x17E, WORKER_THREAD_WORLD, _owner, 0);
+        GLOBAL().PushMsg(hdr1, NULL);
         SendMapInfo();
 
     }
@@ -1474,9 +1472,8 @@ void JobHunter::OnAutoStep()
     if (CheckEnd())
     {
         OnAbort(true);
-        GObject::EventBase * ev = GObject::eventWrapper.RemoveTimerEvent(_owner, EVENT_JOBHUNTER, _owner->getId());
-        if (ev)
-            ev->release();
+        GameMsgHdr hdr1(0x17E, WORKER_THREAD_WORLD, _owner, 0);
+        GLOBAL().PushMsg(hdr1, NULL);
         Stream st(REP::AUTOJOBHUNTER);
         st << static_cast<UInt8>(4);
         st << Stream::eos;
@@ -1490,9 +1487,8 @@ void JobHunter::OnAutoStep()
 void JobHunter::OnAutoStop()
 {
     // 停止自动战斗
-	GObject::EventBase * ev = GObject::eventWrapper.RemoveTimerEvent(_owner, EVENT_JOBHUNTER, _owner->getId());
-	if(ev != NULL)
-        ev->release();
+    GameMsgHdr hdr1(0x17E, WORKER_THREAD_WORLD, _owner, 0);
+    GLOBAL().PushMsg(hdr1, NULL);
     if (_isInAuto)
     {
         Stream st(REP::AUTOJOBHUNTER);
@@ -1522,9 +1518,8 @@ void JobHunter::OnAutoFinish()
         if (!_isInAuto)
             break;
     }
-    GObject::EventBase * ev = GObject::eventWrapper.RemoveTimerEvent(_owner, EVENT_JOBHUNTER, _owner->getId());
-    if (ev)
-        ev->release();
+    GameMsgHdr hdr1(0x17E, WORKER_THREAD_WORLD, _owner, 0);
+    GLOBAL().PushMsg(hdr1, NULL);
 }
 
 UInt16 JobHunter::GetPossibleGrid()

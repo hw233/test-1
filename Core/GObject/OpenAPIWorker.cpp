@@ -67,6 +67,7 @@ namespace GObject
 
     void OpenAPIWorker::OnTimer()
     {
+        return;
         std::vector<UrlParam> list;
         {
             FastMutex::ScopedLock lk(m_Mutex);
@@ -110,7 +111,8 @@ namespace GObject
 
 
             SetUrlString (url, it->playerId, it->type, it->openId, it->openKey, it->pf, it->userIp);
-            sprintf (res, "%s%s", host, url);
+            snprintf (res, MAX_RET_LEN, "%s%s", host, url);
+            res[MAX_RET_LEN - 1] = '\0';
 
             int timeout = 1;
 
@@ -192,6 +194,7 @@ namespace GObject
 
     void OpenAPIWorker::Push(UInt64 playerId, UInt16 type, const char * openId, const char * openKey, const char * pf, const char * userIp)
     {
+        return;
         const static int OPEN_ID_LEN  = 64;
         const static int OPEN_KEY_LEN = 128;
         const static int PF_LEN = 64;
@@ -385,9 +388,9 @@ namespace GObject
         if (!m_inited)
             return true;
         playerId = playerId & 0xFFFFFFFF;
-        char buf[128];
+        char buf[128] = {0};
         snprintf(buf, 128, "oid_%"I64_FMT"u", playerId);
-        char openId2[256]={};
+        char openId2[256] = {0};
         m_MCached.get(buf, strlen(buf), openId2, 255);
         openId2[255] = '\0';
         if (strncmp(openId, openId2, strlen(openId)) == 0)

@@ -7409,14 +7409,14 @@ function ItemNormal_00009345(iid, num, bind, param)
     package:DelItemSendMsg(iid, player);
     return num;
 end
+
 function ItemNormal_00009346(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
-    player:setTitle(50, 0)
+    player:setTitle(iid-9346+50, 0)
     package:DelItemSendMsg(iid, player);
     return num;
 end
-
 
 
 function ItemNormal_fighterCard(iid, num, bind, param)
@@ -7593,7 +7593,6 @@ local ItemNormal_Table = {
     [402] = ItemNormal_00000402,
     [403] = ItemNormal_00000403,
     [401] = ItemNormal_00000401,
-    [9306] = ItemNormal_00009306,
     [438] = ItemNormal_00000438,
     [439] = ItemNormal_00000439,
 	[30] = ItemNormal_00000030,
@@ -7853,6 +7852,7 @@ local ItemNormal_Table = {
     [1351] = ItemNormal_citta,
     [1352] = ItemNormal_citta,
     [1353] = ItemNormal_citta,
+    [1354] = ItemNormal_citta,
 
     [1000] = ItemNormal_formation,
     [1001] = ItemNormal_formation,
@@ -9147,12 +9147,8 @@ local ItemNormal_Table = {
     [9215] = ItemNormal_00009215,
     [9216] = ItemNormal_00009216,
     [9218] = ItemNormal_00009160,
-    [9230] = ItemNormal_00009230,
     [9228] = ItemNormal_00009228,
-    [9343] = ItemNormal_00009343,
-    [9344] = ItemNormal_00009343,
-    [9345] = ItemNormal_00009345,
-    [9346] = ItemNormal_00009346,
+    [9230] = ItemNormal_00009230,
 
     [9237] = ItemNormal_fighterCard,
     [9238] = ItemNormal_fighterCard,
@@ -9200,13 +9196,20 @@ local ItemNormal_Table = {
     [9282] = ItemNormal_00009279,
     [9283] = ItemNormal_00000400,
 
+    [9306] = ItemNormal_00009306,
     [9311] = ItemNormal_00009311,
     [9312] = ItemNormal_00009311,
     [9314] = ItemNormal_00009314,
     [9315] = ItemNormal_00009315,
     [9316] = ItemNormal_00009316,
-
     [9317] = ItemNormal_00009317,
+
+    [9343] = ItemNormal_00009343,
+    [9344] = ItemNormal_00009343,
+    [9345] = ItemNormal_00009345,
+    [9346] = ItemNormal_00009346,
+    [9347] = ItemNormal_00009346,
+    [9348] = ItemNormal_00009346,
     [9349] = ItemNormal_00009349,
 
     -- 灵宝宝箱

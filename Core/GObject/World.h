@@ -332,6 +332,10 @@ public:
     { _wansheng= v; }
     inline static bool getWansheng()
     { return _wansheng; }
+    inline static void setQingren(bool v)
+    { _qingren= v; }
+    inline static bool getQingren()
+    { return _qingren; }
 
     inline static void set11Act(bool v)
     { _11Act= v; }
@@ -359,6 +363,10 @@ public:
     { _dragonKingAct= v; }
     inline static bool getDragonKingAct()
     { return _dragonKingAct; }
+    inline static void setSaveGoldAct(bool v)
+    { _saveGoldAct= v; }
+    inline static bool getSaveGoldAct()
+    { return _saveGoldAct; }
     inline static void setFeastLoginAct(bool v)
     { _feastloginAct= v; }
     inline static bool getFeastLoginAct()
@@ -367,6 +375,14 @@ public:
     { _newYearGiveGiftAct= v; }
     inline static bool getNewYearGiveGiftAct()
     { return _newYearGiveGiftAct; }
+    inline static void setNewYearQQGameAct(bool v)
+    { _newYearQQGameAct= v; }
+    inline static bool getNewYearQQGameAct()
+    { return _newYearQQGameAct; }
+    inline static void setNewYearQzoneContinueAct(bool v)
+    { _newYearQzoneContinueAct= v; }
+    inline static bool getNewYearQzoneContinueAct()
+    { return _newYearQzoneContinueAct; }
 
     inline static void setTowerLoginAct(UInt8 v)
     { _towerloginAct= v; }
@@ -690,14 +706,18 @@ public:
     static bool _july;
     static bool _qixi;
     static bool _wansheng;
+    static bool _qingren;
     static bool _11Act;
     static bool _ssToolbarAct;
     static bool _snowAct;
     static bool _goldSnakeAct;
     static bool _heroIslandAct;
     static bool _dragonKingAct;
+    static bool _saveGoldAct;
     static bool _feastloginAct;
     static bool _newYearGiveGiftAct;
+    static bool _newYearQQGameAct;
+    static bool _newYearQzoneContinueAct;
     static UInt8 _towerloginAct;
     static bool _guoqing;
     static bool _9215Act;

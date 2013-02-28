@@ -1250,6 +1250,9 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendGoodVoiceInfo();
     pl->send3366GiftInfo();
     pl->sendFeastGiftAct();
+    pl->sendNewYearQQGameAct();
+    pl->calcNewYearQzoneContinueDay(now);
+    pl->sendNewYearQzoneContinueAct();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -1868,10 +1871,30 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
             if(!World::getNewYearGiveGiftAct())
                 return;
             UInt8 dayOrder;
-            UInt16 result;
+            UInt8 result;
             br >> dayOrder;
             br >> result;
             player->getNewYearGiveGiftAward(dayOrder, result);
+        }
+        break;
+
+        case 9:
+        {
+            UInt8 type;
+            if(!World::getNewYearQQGameAct())
+                return;
+            br >> type;
+            player->getNewYearQQGameAward(type);
+        }
+        break;
+
+        case 10:
+        {
+            UInt8 type;
+            if(!World::getNewYearQzoneContinueAct())
+                return;
+            br >> type;
+            player->getNewYearQzoneContinueAward(type);
         }
         break;
 
@@ -3378,10 +3401,11 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                 }
             }
             break;
-        case PURCHASE3:
-        case PURCHASE3+1:
-        case PURCHASE3+2:
-        case PURCHASE3+3:
+        case PURCHASE3:  // 龙魂元神
+        case PURCHASE3+1:// 龙魂法宝
+        case PURCHASE3+2:// 龙魂心法
+        case PURCHASE3+3:// 龙魂奇珍
+        case PURCHASE3+4:// 龙魂灵宝
             {
                 UInt32 arena = player->GetVar(VAR_MONEY_ARENA);
                 if (arena < price)
@@ -5847,7 +5871,7 @@ void OnEquipLingbaoReq( GameMsgHdr & hdr, const void * data )
         break;
     case 4:
         {
-            pkg->closeLingbaoSmelt();
+            pkg->QuitLBSmelt();
         }
         break;
     case 5:

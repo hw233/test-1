@@ -665,3 +665,83 @@ function onGetFeastGiftAward(player, type)
     return true
 end
 
+local tmp1 = { ['year'] = 2013, ['month'] = 2, ['day'] = 4, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+local time1 = os.time(tmp1)
+local tmp2 = { ['year'] = 2013, ['month'] = 2, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+local time2 = os.time(tmp2)
+local tmp3 = { ['year'] = 2013, ['month'] = 2, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+local time3 = os.time(tmp3)
+local QQGameawards = {
+    [1] = {{51, 1},{1327, 1},{56, 1},{57, 1}},
+    [2] = {{49, 1},{1326, 1},{56, 1},{57, 1}},
+    [3] = {{15, 1},{1327, 1},{56, 1},{57, 1}},
+    [4] = {{15, 2},{1326, 1},{56, 1},{57, 1}},
+    [5] = {{48, 1},{1327, 1},{56, 1},{57, 1}},
+    [6] = {{50, 1},{1326, 1},{56, 1},{57, 1}},
+}
+
+function onGetNewYearQQGameAward(player, type)
+    if player == nil then
+        return false
+    end
+    if type == 0 or type > 2 then
+        return false
+    end
+
+    local curTime = os.time();
+    local actOrder
+    if curTime >= time1 and curTime < time2 then
+        actOrder = 1
+    elseif curTime >= time2 and curTime < time3 then
+        actOrder = 2
+    else
+        actOrder = 3
+    end
+
+    local awardOrder = (actOrder - 1) * 2  + type;
+    local awards = QQGameawards[awardOrder]
+    if awards == nil then
+        return false
+    end
+    local package = player:GetPackage()
+    if package:GetRestPackageSize() < #awards then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    for i = 1, #awards do
+        package:Add(awards[i][1], awards[i][2], true, false, 2)
+    end
+    return true
+end
+
+local QzonecontinueAwards = {
+    [1] = {{56, 1},{57, 1}},
+    [2] = {{56, 2},{57, 2}},
+    [3] = {{56, 2},{57, 2},{134, 1}},
+    [4] = {{56, 2},{57, 2},{134, 2}},
+    [5] = {{56, 2},{57, 2},{134, 2},{30, 1}},
+    [6] = {{56, 2},{57, 2},{134, 2},{30, 2}},
+    [7] = {{56, 2},{57, 2},{134, 2},{30, 2},{9076,1}},
+}
+
+function onGetNewYearQzoneContinueAward(player, type)
+    if player == nil then
+        return false
+    end
+
+    local awards = QzonecontinueAwards[type]
+    if awards == nil then
+        return false
+    end
+
+    local package = player:GetPackage()
+    if package:GetRestPackageSize() < #awards then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    for i = 1, #awards do
+        package:Add(awards[i][1], awards[i][2], true, false, 2)
+    end
+    return true
+end
+

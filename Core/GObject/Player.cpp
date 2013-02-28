@@ -932,6 +932,7 @@ namespace GObject
             }
 		}
 
+        //calcNewYearQzoneContinueDay(curtime);
         continuousLogin(curtime);
         continuousLoginRF(curtime);
         sendYearRPInfo();
@@ -14678,9 +14679,12 @@ void EventTlzAuto::notify(bool isBeginAuto)
 
     void Player::divorceQixi()
     {
+        /*
         if(!m_qixi.bind)
             return;
+        */
         Player* pl = m_qixi.lover;
+        if(!pl) return;
         m_qixi.lover = NULL;
         m_qixi.bind = 0;
 
@@ -16604,10 +16608,354 @@ void Player::sendSysUpdate()
    send(st);
 }
 
+void Player::sendSnakeEggInfo()
+{
+    Stream st(REP::ACTIVE);
+    st << static_cast<UInt8>(0x08) << static_cast<UInt8>(0x01);
+    UInt8 t = World::getCallSnakeEggAct(); //0:非活动期间 1:拜年期 2:拜年-领奖等待期
+    if (World::getSnakeEggAwardAct() >= 1 && World::getSnakeEggAwardAct() <= 7)
+        t = 3;
+    else if (World::getSnakeEggAwardAct() == 0xFF)
+        t = 4;
+    st << t;
+    st << static_cast<UInt8>(GetVar(VAR_CALLSNAKEEGG)) << static_cast<UInt8>(World::getSnakeEggAwardAct());
+    st << static_cast<UInt8>(GetVar(VAR_SNAKEEGG_AWARD));
+    st << Stream::eos;
+    send(st);
+ 
+}
+
+void Player::callSnakeEgg()
+{
+  if (!World::getCallSnakeEggAct() || GetVar(VAR_CALLSNAKEEGG) != 0 )
+      return;
+  SetVar(VAR_CALLSNAKEEGG, 1);
+  sendSnakeEggInfo();
+}
+
+void Player::getSnakeEggAward(UInt8 v)
+{
+    UInt8 day = World::getSnakeEggAwardAct();
+    if (!day || v > 7 || v > day)
+        return;
+    UInt8 var = GetVar(VAR_SNAKEEGG_AWARD); 
+    if (var & (0x01<<(v-1))) //已领取
+        return;
+    if (v < day || GetVar(VAR_CALLSNAKEEGG) == 0)
+    {
+        if (getGold() < 30)
+        {
+		    sendMsgCode(0, 1104);
+            return;
+        }
+        ConsumeInfo ci(SnakeSprintAct, 0, 0);
+        useGold(30, &ci);
+    }
+    getCoupon(100);
+    var |= (0x01<<(v-1));
+    SetVar(VAR_SNAKEEGG_AWARD, var);
+    sendSnakeEggInfo();
+}
+
+void Player::getNewYearGiveGiftAward(UInt8 dayOrder, UInt8 result)
+{
+    if(dayOrder > 10)
+        return;
+
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(8);
+    //st << dayOrder;
+
+    UInt16 opt = GetVar(VAR_NEW_YEAR_GIVE_GIFT);
+    UInt16 offset = 1;
+    switch(dayOrder)
+    {
+        case 0:
+        break;
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+        case 8:
+        case 9:
+        case 10:
+        {
+            offset <<= (dayOrder - 1);
+            if((opt & offset) > 0)
+            {
+                sendMsgCode(0, 1018);
+                return;
+            }
+
+            UInt8 validMaxDay = 0;
+            UInt8 serverDay = 0;
+            UInt32 now = TimeUtil::Now();
+            if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2013, 2, 3))
+            {
+            }
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 3))
+            {
+                validMaxDay = 1;
+                serverDay = 1;
+            }
+            else if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2013, 2, 9))
+            {
+                validMaxDay = 1;
+            }
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 9))
+            {
+                validMaxDay = 2;
+                serverDay = 2;
+            }
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 10))
+            {
+                validMaxDay = 3;
+                serverDay = 3;
+            }
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 11))
+            {
+                validMaxDay = 4;
+                serverDay = 4;
+            }
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 12))
+            {
+                validMaxDay = 5;
+                serverDay = 5;
+            }
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 13))
+            {
+                validMaxDay = 6;
+                serverDay = 6;
+            }
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 14))
+            {
+                validMaxDay = 7;
+                serverDay = 7;
+            }
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 15))
+            {
+                validMaxDay = 8;
+                serverDay = 8;
+            }
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 16))
+            {
+                validMaxDay = 9;
+                serverDay = 9;
+            }
+            else if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2013, 2, 24))
+            {
+                validMaxDay = 9;
+            }
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 24))
+            {
+                validMaxDay = 10;
+                serverDay = 10;
+            }
+            else
+            {
+                validMaxDay = 10;
+            }
+
+            if(dayOrder > validMaxDay)
+            {
+                sendMsgCode(0, 1041);
+                return;
+            }
+
+            UInt8 times;
+            UInt8 recharge = false;
+            if(serverDay == dayOrder)
+                times = 2;
+            else
+            {
+                if(result == 0)
+                {
+                    sendMsgCode(0, 1042);
+                    return;
+                }
+                else if(result == 1)
+                {
+                    if (getGold() < 30)
+                    {
+                        sendMsgCode(0, 1104);
+                        return;
+                    }
+                    times = 2;
+                    recharge = true;
+                }
+                else
+                    times = 1;
+            }
+
+            bool bRet = GameAction()->onGetNewYearGiveGiftAward(this, dayOrder, times);
+            if(!bRet)
+                return;
+            if(recharge)
+            {
+                ConsumeInfo ci(NewYearGetDouble,0,0);
+                useGold(30, &ci);
+            }
+            opt |= offset;
+            SetVar(VAR_NEW_YEAR_GIVE_GIFT, opt);
+        }
+        break;
+
+        default:
+        break;
+    }
+    st << opt;
+    st << Stream::eos;
+    send(st);
+}
+void Player::sendSnakeSpringEquipMail()
+{
+    if(GetLev() < 40)
+        return;
+    static MailPackage::MailItem s_item[2] = {{1762, 1}, {1764, 1}};
+    UInt8 act = World::getSnakeSpringEquipAct();
+    UInt32 v = GetVar(VAR_SNAKE_SPRING_EQUIP_GOT);
+    if (1 == act && ((v&0x01)==0)) //春节套装 item=1762
+    {
+        sendMailItem(4124, 4125, &s_item[0], 1);
+        SetVar(VAR_SNAKE_SPRING_EQUIP_GOT, v|=0x01);
+    }
+    if (2 == act && ((v&0x02)==0))
+    {
+        sendMailItem(4126, 4127, &s_item[1], 1);
+        SetVar(VAR_SNAKE_SPRING_EQUIP_GOT, v|=0x02);
+    }
+}
+
+void Player::getNewYearQQGameAward(UInt8 type)
+{
+    if(type == 0 || type > 2)
+        return;
+    if(atoi(m_domain) != 10)
+        return;
+    bool bRet;
+    UInt32 status = GetVar(VAR_NEWYEAR_QQGAME_ACT);
+
+    if(type == 1)
+    {
+        if(status & 0x01)
+            return;
+        bRet = GameAction()->onGetNewYearQQGameAward(this, 1);
+        if(bRet)
+        {
+            status |= 0x01;
+            SetVar(VAR_NEWYEAR_QQGAME_ACT, status);
+            sendNewYearQQGameAct();
+        }
+    }
+    else
+    {
+        if(status & 0x02)
+            return;
+        if(!isBD())
+            return;
+        bRet = GameAction()->onGetNewYearQQGameAward(this, 2);
+        if(bRet)
+        {
+            status |= 0x02;
+            SetVar(VAR_NEWYEAR_QQGAME_ACT, status);
+            sendNewYearQQGameAct();
+        }
+    }
+}
+
+void Player::sendNewYearQQGameAct()
+{
+    if(!World::getNewYearQQGameAct())
+        return;
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(9);
+    UInt8 opt = GetVar(VAR_NEWYEAR_QQGAME_ACT);
+    st << opt;
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::getNewYearQzoneContinueAward(UInt8 type)
+{
+    if(type == 0 || type > 7)
+        return;
+    if(atoi(m_domain) != 1 && atoi(m_domain) != 2)
+        return;
+
+    UInt32 tmp = GetVar(VAR_NEWYEAR_QZONECONTINUE_ACT);
+    UInt16 isGet = static_cast<UInt16>(tmp & 0xFFFF);
+    if(isGet & (0x01 << (type - 1)))
+        return;
+    UInt8 continueDays = static_cast<UInt8>(tmp >> 16);
+    const static UInt8 needMinDay[] = {3, 5, 7, 10, 15, 21, 28};
+    if(continueDays < needMinDay[type - 1])
+        return;
+    bool bRet = GameAction()->onGetNewYearQzoneContinueAward(this, type);
+    if(bRet)
+    {
+        tmp |= (0x01 << (type - 1));
+        SetVar(VAR_NEWYEAR_QZONECONTINUE_ACT, tmp);
+        sendNewYearQzoneContinueAct();
+    }
+}
+
+void Player::sendNewYearQzoneContinueAct()
+{
+    if(!World::getNewYearQzoneContinueAct())
+        return;
+    if(atoi(m_domain) != 1 && atoi(m_domain) != 2)
+        return;
+
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(10);
+    UInt32 tmp = GetVar(VAR_NEWYEAR_QZONECONTINUE_ACT);
+    UInt8 continueDays = static_cast<UInt8>(tmp >> 16);
+    UInt16 isGet = static_cast<UInt16>(tmp & 0xFFFF);
+    st << continueDays;
+    st << isGet;
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::calcNewYearQzoneContinueDay(UInt32 now)
+{
+    if(!World::getNewYearQzoneContinueAct())
+        return;
+    if(atoi(m_domain) != 1 && atoi(m_domain) != 2)
+        return;
+
+    UInt32 lasttime = GetVar(VAR_NEWYEAR_QZONECONTINUE_LASTTIME);
+    if(lasttime == 0)
+    {
+    }
+    else
+    {
+        UInt32 lasttime_sharp = TimeUtil::SharpDay(0, lasttime);
+        UInt32 now_sharp = TimeUtil::SharpDay(0, now);
+        if(lasttime_sharp >= now_sharp)
+            return;
+    }
+
+    SetVar(VAR_NEWYEAR_QZONECONTINUE_LASTTIME, now);
+    UInt32 tmp = GetVar(VAR_NEWYEAR_QZONECONTINUE_ACT);
+    UInt32 continueDays = (tmp >> 16);
+    if(continueDays >= 0xFF)
+        continueDays = 0xFE;
+    continueDays += 1;
+    tmp = (continueDays << 16) + (tmp & 0xFFFF);
+    SetVar(VAR_NEWYEAR_QZONECONTINUE_ACT, tmp);
+}
+
+//大闹龙宫
 void Player::getDragonKingInfo()
 {
+    /*
     if(!World::getDragonKingAct())
         return;
+    */
     UInt8 step = GetVar(VAR_DRAGONKING_STEP);
     if( step == 0 || step > 5)
     {
@@ -16630,8 +16978,11 @@ void Player::postDragonKing(UInt8 count)
         GLOBAL().PushMsg(h, &count);
         return;
     }
+    /*
     if (count == 0 || !World::getDragonKingAct())
         return;
+    */
+    if ( count == 0 ) return;
 #define ITEM_YLLING 9337   //游龙令
     if (GetPackage()->GetItemAnyNum(ITEM_YLLING) < count)
         return;
@@ -16673,221 +17024,241 @@ void Player::postDragonKing(UInt8 count)
     send(st);
     SetVar(VAR_DRAGONKING_STEP, step);
 }
-void Player::sendSnakeEggInfo()
+
+//大闹龙宫之金蛇起舞
+void Player::getDragonKingInfoSnake()
 {
+    UInt8 step = GetVar(VAR_DRAGONKINGSNAKE_STEP);
+    if( step == 0 || step > 5)
+    {
+        step = 1;
+        SetVar(VAR_DRAGONKINGSNAKE_STEP, step);
+    }
     Stream st(REP::ACTIVE);
-    st << static_cast<UInt8>(0x08) << static_cast<UInt8>(0x01);
-    UInt8 t = World::getCallSnakeEggAct(); //0:非活动期间 1:拜年期 2:拜年-领奖等待期
-    if (World::getSnakeEggAwardAct() >= 1 && World::getSnakeEggAwardAct() <= 7)
-        t = 3;
-    else if (World::getSnakeEggAwardAct() == 0xFF)
-        t = 4;
-    st << t;
-    st << static_cast<UInt8>(GetVar(VAR_CALLSNAKEEGG)) << static_cast<UInt8>(World::getSnakeEggAwardAct());
-    st << static_cast<UInt8>(GetVar(VAR_SNAKEEGG_AWARD));
+    st << static_cast<UInt8>(0x0A);
+    st << static_cast<UInt8>(0x01);
+    st << step;
     st << Stream::eos;
     send(st);
- 
 }
-void Player::callSnakeEgg()
+
+void Player::postDragonKingSnake(UInt8 count)
 {
-  if (!World::getCallSnakeEggAct() || GetVar(VAR_CALLSNAKEEGG) != 0 )
-      return;
-  SetVar(VAR_CALLSNAKEEGG, 1);
-  sendSnakeEggInfo();
-}
-void Player::getSnakeEggAward(UInt8 v)
-{
-    UInt8 day = World::getSnakeEggAwardAct();
-    if (!day || v > 7 || v > day)
-        return;
-    UInt8 var = GetVar(VAR_SNAKEEGG_AWARD); 
-    if (var & (0x01<<(v-1))) //已领取
-        return;
-    if (v < day || GetVar(VAR_CALLSNAKEEGG) == 0)
+    if (CURRENT_THREAD_ID() != getThreadId())
     {
-        if (getGold() < 30)
-        {
-		    sendMsgCode(0, 1104);
-            return;
-        }
-        ConsumeInfo ci(SnakeSprintAct, 0, 0);
-        useGold(30, &ci);
+        GameMsgHdr h(0x344,  getThreadId(), this, sizeof(count));
+        GLOBAL().PushMsg(h, &count);
+        return;
     }
-    getCoupon(100);
-    var |= (0x01<<(v-1));
-    SetVar(VAR_SNAKEEGG_AWARD, var);
-    sendSnakeEggInfo();
+    if (count == 0)
+        return;
+#define ITEM_JSLING 9354   //金蛇令
+    if (GetPackage()->GetItemAnyNum(ITEM_JSLING) < count)
+        return;
+    if (GetPackage()->GetRestPackageSize() < count)
+    {
+        sendMsgCode(0, 1011);
+        return;
+    }
+    GetPackage()->DelItemSendMsg(ITEM_JSLING, this);
+    Stream st(REP::ACTIVE);
+    st << static_cast<UInt8>(0x0A);
+    st << static_cast<UInt8>(0x02);
+    st << count;
+    UInt8 step = GetVar(VAR_DRAGONKINGSNAKE_STEP);
+    if(step == 0 || step > 5)
+        step = 1;
+    bool isBind = true;
+    for(UInt8 i = 0; i < count; ++i)
+    {
+        GetPackage()->DelItemAny(ITEM_JSLING, 1, &isBind);
+        Table award = GameAction()->getDragonKingSnakeAward(step);
+        if (GameAction()->checkDragonKingSnakeCanSucceed(this, step))
+            step = (step + 1) > 5 ? 1 : step + 1;
+        else
+            step = 1;
+        st << step;
+        UInt8 size = award.size();
+        st << static_cast<UInt8>(size / 2);
+        for(UInt8 j = 1; j <= size; j += 2)
+        {
+            UInt16 itemId = award.get<UInt16>(j);
+            st << itemId << award.get<UInt8>(j+1);
+            GetPackage()->Add(itemId, award.get<UInt32>(j+1), isBind, true, FromQixi);
+            if(itemId == 6135)
+                SYSMSG_BROADCASTV(295, getCountry(), getName().c_str(), itemId);
+        }
+    }
+    st << Stream::eos;
+    send(st);
+    SetVar(VAR_DRAGONKINGSNAKE_STEP, step);
 }
 
-void Player::getNewYearGiveGiftAward(UInt8 dayOrder, UInt16 result)
+//金蛇献瑞 聚福兆祥
+void Player::saveGoldAct(UInt8 opt, UInt32 param)
 {
-    if(dayOrder > 10)
-        return;
-
-    Stream st(REP::COUNTRY_ACT);
-    st << static_cast<UInt8>(8);
-    //st << dayOrder;
-
-    UInt16 opt = GetVar(VAR_NEW_YEAR_GIVE_GIFT);
-    UInt16 offset = 1;
-    switch(dayOrder)
+#define GATHER_TIME 7 * 86400
+#define ALL_TIMES 10
+    switch(opt)
     {
-        case 0:
+    case 0x01:  //查看信息
+        sendSaveGoldAct();
         break;
-        case 1:
-        case 2:
-        case 3:
-        case 4:
-        case 5:
-        case 6:
-        case 7:
-        case 8:
-        case 9:
-        case 10:
+    case 0x02:  //是否结算
         {
-            offset <<= (dayOrder - 1);
-            if((opt & offset) > 0)
-            {
-                sendMsgCode(0, 1018);
+            if(!World::getSaveGoldAct())
                 return;
-            }
-
-            UInt8 serverDay = 0;
-            bool isValid = false;
-            UInt32 now = TimeUtil::Now();
-            if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2013, 2, 3))
+            if(param)
             {
-            }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 3))
-            {
-                serverDay = 1;
-                if(dayOrder <= serverDay)
-                    isValid = true;
-            }
-            else if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2013, 2, 9))
-            {
-            }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 9))
-            {
-                serverDay = 2;
-                if(dayOrder <= serverDay)
-                    isValid = true;
-            }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 10))
-            {
-                serverDay = 3;
-                if(dayOrder <= serverDay)
-                    isValid = true;
-            }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 11))
-            {
-                serverDay = 4;
-                if(dayOrder <= serverDay)
-                    isValid = true;
-            }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 12))
-            {
-                serverDay = 5;
-                if(dayOrder <= serverDay)
-                    isValid = true;
-            }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 13))
-            {
-                serverDay = 6;
-                if(dayOrder <= serverDay)
-                    isValid = true;
-            }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 14))
-            {
-                serverDay = 7;
-                if(dayOrder <= serverDay)
-                    isValid = true;
-            }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 15))
-            {
-                serverDay = 8;
-                if(dayOrder <= serverDay)
-                    isValid = true;
-            }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 16))
-            {
-                serverDay = 9;
-                if(dayOrder <= serverDay)
-                    isValid = true;
-            }
-            else if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2013, 2, 24))
-            {
-            }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 24))
-            {
-                serverDay = 10;
-                if(dayOrder <= serverDay)
-                    isValid = true;
+                if(GetVar(VAR_SAVEGOLD_SET_TIME))
+                    return;
+                SetVar(VAR_SAVEGOLD_SET_TIME, TimeUtil::Now());
             }
             else
             {
+                if(!GetVar(VAR_SAVEGOLD_SET_TIME))
+                    return;
+                SetVar(VAR_SAVEGOLD_SET_TIME, 0);
             }
-
-            if(!isValid)
-            {
-                sendMsgCode(0, 1041);
+            sendSaveGoldAct();
+        }
+        break;
+    case 0x03:  //存仙石
+        {
+            if(!World::getSaveGoldAct())
                 return;
-            }
-
-            UInt8 times;
-            if(serverDay == dayOrder)
-                times = 2;
-            else
+            if(GetVar(VAR_SAVEGOLD_SET_TIME))
+                return;
+            if(getGold() < param)
+                return;
+            if(!param || param % ALL_TIMES)
+                return;
+            AddVar(VAR_SAVEGOLD_COUNT, param);
+		    useGold(param);
+            sendSaveGoldAct();
+            TRACE_LOG("此次存仙石数量playerId_num:SaveGoldAction_%"I64_FMT"u_%u", getId(), param);
+        }
+        break;
+    case 0x04:  //领取福囊
+        {
+            UInt32 setTime = GetVar(VAR_SAVEGOLD_SET_TIME);
+            if(!setTime) return;
+            if(setTime + GATHER_TIME > TimeUtil::Now())
+                return;
+            if(GetVar(VAR_SAVEGOLD_ISGET))
+                return;
+            UInt32 status = GetVar(VAR_SAVEGOLD_GET_STATUS);
+            UInt8 cnt = 0;
+            for(UInt8 i = 0; i < ALL_TIMES; ++i)
             {
-                if(result == 1)
+                if(status & (1 << i))
+                    cnt ++;
+            }
+            if(cnt >= ALL_TIMES)
+                return;
+            UInt32 gold = GetVar(VAR_SAVEGOLD_COUNT);
+            Table awards = GameAction()->getSaveGoldActAward(gold);
+            UInt8 size = awards.size() + 1;
+            MailPackage::MailItem * mitem = new MailPackage::MailItem[size];
+            for(UInt8 i = 0; i < size; ++i)
+            {
+                if(i == size - 1)
                 {
-                    if (getGold() < 30)
-                    {
-                        sendMsgCode(0, 1101);
-                        return;
-                    }
-                    ConsumeInfo ci(NewYearGetDouble,0,0);
-                    useGold(30, &ci);
-                    times = 2;
+                    mitem[i].id = MailPackage::Gold;
+                    mitem[i].count = gold / ALL_TIMES;
                 }
                 else
-                    times = 1;
+                {
+                    Table item = awards.get<Table>(i+1);
+                    if(item.size() < 2) continue;
+                    UInt16 itemId = item.get<UInt16>(1);
+                    mitem[i].id = itemId == COUPON_ID ? MailPackage::Coupon : itemId;
+                    mitem[i].count = item.get<UInt32>(2);
+                }
             }
-
-            bool bRet = GameAction()->onGetNewYearGiveGiftAward(this, dayOrder, times);
-            if(!bRet)
-                return;
-
-            opt |= offset;
-            SetVar(VAR_NEW_YEAR_GIVE_GIFT, opt);
+            SYSMSGV(title, 296);
+            SYSMSGV(content, 297, cnt+1, ALL_TIMES);
+            MailItemsInfo itemsInfo(mitem, Activity, size);
+            Mail * pmail = GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+            if(pmail != NULL)
+                mailPackageManager.push(pmail->id, mitem, size, true);
+            delete [] mitem;
+            mitem = NULL;
+            if(cnt + 1 == ALL_TIMES)
+            {
+                Table extraAwards = GameAction()->getSaveGoldActExtraAward(gold);
+                UInt8 size = extraAwards.size();
+                MailPackage::MailItem * mitem = new MailPackage::MailItem[size];
+                for(UInt8 i = 0; i < size; ++i)
+                {
+                    Table item = extraAwards.get<Table>(i+1);
+                    if(item.size() < 2) continue;
+                    UInt16 itemId = item.get<UInt16>(1);
+                    mitem[i].id = itemId == COUPON_ID ? MailPackage::Coupon : itemId;
+                    mitem[i].count = item.get<UInt32>(2);
+                }
+                SYSMSGV(title, 298);
+                SYSMSGV(content, 299, ALL_TIMES);
+                MailItemsInfo itemsInfo(mitem, Activity, size);
+                Mail * pmail = GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+                if(pmail != NULL)
+                    mailPackageManager.push(pmail->id, mitem, size, true);
+                delete [] mitem;
+                mitem = NULL;
+            }
+            SetVar(VAR_SAVEGOLD_GET_STATUS, status | (1 << cnt));
+            SetVar(VAR_SAVEGOLD_ISGET, 1);
+            sendSaveGoldAct();
         }
         break;
-
-        default:
+    default:    //零点自动结算
+        {
+            if(getCreated() >= TimeUtil::MkTime(2013, 2, 9))
+                return;
+            if(!GetVar(VAR_SAVEGOLD_SET_TIME))
+                SetVar(VAR_SAVEGOLD_SET_TIME, TimeUtil::Now());
+            if(isOnline())
+                sendSaveGoldAct();
+        }
         break;
     }
-    st << opt;
+}
+
+void Player::sendSaveGoldAct()
+{
+    Stream st(REP::ACTIVE);
+    st << static_cast<UInt8>(0x07);
+    st << static_cast<UInt8>(0x01);
+    st << GetVar(VAR_SAVEGOLD_COUNT);
+    UInt32 curTime = TimeUtil::Now();
+    UInt32 setTime = GetVar(VAR_SAVEGOLD_SET_TIME);
+    if(setTime > curTime)
+        setTime = curTime;
+    int time = -1;
+    if(setTime)
+    {
+        time = GATHER_TIME + setTime - curTime;
+        if(time < 0)
+            time = 0;
+    }
+    st << time;
+    if(time == 0)
+    {
+        UInt32 status = GetVar(VAR_SAVEGOLD_GET_STATUS);
+        UInt8 cnt = 0;
+        for(UInt8 i = 0; i < ALL_TIMES; ++i)
+        {
+            if(status & (1 << i))
+                cnt ++;
+        }
+        if(cnt >= ALL_TIMES)
+            st << static_cast<UInt8>(1);
+        else
+            st << static_cast<UInt8>(GetVarNow(VAR_SAVEGOLD_ISGET, curTime + 30));
+        st << status;
+    }
     st << Stream::eos;
     send(st);
-}
-void Player::sendSnakeSpringEquipMail()
-{
-    if(GetLev() < 40)
-        return;
-    static MailPackage::MailItem s_item[2] = {{1762, 1}, {1764, 1}};
-    UInt8 act = World::getSnakeSpringEquipAct();
-    UInt32 v = GetVar(VAR_SNAKE_SPRING_EQUIP_GOT);
-    if (1 == act && ((v&0x01)==0)) //春节套装 item=1762
-    {
-        sendMailItem(4124, 4125, &s_item[0], 1);
-        SetVar(VAR_SNAKE_SPRING_EQUIP_GOT, v|=0x01);
-    }
-    if (2 == act && ((v&0x02)==0))
-    {
-        sendMailItem(4126, 4127, &s_item[1], 1);
-        SetVar(VAR_SNAKE_SPRING_EQUIP_GOT, v|=0x02);
-    }
 }
 
 } // namespace GObject

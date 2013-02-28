@@ -55,6 +55,7 @@ namespace GObject
     {
         UInt8 lvIdx = (lv - MIN_LEVEL)/LEVEL_UNIT;
         if(lvIdx > MAX_LEVELS || attrId > MAX_ATTR_ID)
+            return;
 
         _attrPrefix[lvIdx][attrId] = str;
     }

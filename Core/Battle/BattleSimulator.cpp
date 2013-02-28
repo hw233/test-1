@@ -1224,8 +1224,8 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
             if(dmg3 > 0)
             {
                 makeDamage(area_target, dmg3);
-                appendDefStatus(e_damNormal, dmg3, area_target);
             }
+            appendDefStatus(e_damNormal, dmg3, area_target);
 //            printf("%u:%u %s %u:%u, made %u damage, hp left: %u\n", 1-side, from_pos, cs2 ? "CRITICALs" : "hits", side, pos, dmg, area_target->getHP());
             // killed the target fighter
 
@@ -6285,10 +6285,7 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
 
         if(_winner == 0)
         {
-            int target_pos = getPossibleTarget(bo->getSide(), bo->getPos());
-            int otherside = bo->getSide() == 0 ? 1 : 0;
-            BattleFighter* bo2 = static_cast<BattleFighter*>(getObject(otherside, target_pos));
-            doItemWuSkillAttack(static_cast<BattleFighter*>(bo), bo2);
+            doItemWuSkillAttack(static_cast<BattleFighter*>(bo));
         }
 
         if(!fSummonOrMirror)
@@ -9237,6 +9234,8 @@ void BattleSimulator::appendStatusChange(StatusType type, UInt32 value, UInt16 s
 
 void BattleSimulator::doItemLingSkillAttack(BattleFighter* bf, BattleFighter* bo)
 {
+    if(!bf || !bo)
+        return;
     GData::LBSkillItem* item = GetActionCondSkillItem1(bf, bo);
     if(!item || !item->base)
         return;
@@ -9266,8 +9265,10 @@ void BattleSimulator::doItemLingSkillAttack(BattleFighter* bf, BattleFighter* bo
     }
 }
 
-void BattleSimulator::doItemWuSkillAttack(BattleFighter* bf, BattleFighter* bo)
+void BattleSimulator::doItemWuSkillAttack(BattleFighter* bf)
 {
+    if(!bf)
+        return;
     GData::LBSkillItem* item = bf->getDeadCondItem();
     if(!item || !item->base)
         return;
@@ -9275,28 +9276,28 @@ void BattleSimulator::doItemWuSkillAttack(BattleFighter* bf, BattleFighter* bo)
     appendDefStatus(e_wu, 0, bf);
 
     AtkList atkList;
-    getAtkList(bf, bo, item->base, atkList);
+    getAtkList(bf, item->base, atkList);
 
     size_t cnt = atkList.size();
     for(size_t i = 0; i < cnt; ++ i)
     {
-        BattleFighter* bo2 = atkList[i].bf;
+        BattleFighter* bo = atkList[i].bf;
         float factor = atkList[i].factor;
         switch(item->base->ef_type)
         {
         case GData::e_lbef_dmg:
             {
-                doItemWu_Dmg(bf, bo2, item->ef_value * factor, item->base->last);
+                doItemWu_Dmg(bf, bo, item->ef_value * factor, item->base->last);
             }
             break;
         case GData::e_lbef_state:
             {
-                doItemLingWu_State(bf, bo2, item->ef_value, item->base->last);
+                doItemLingWu_State(bf, bo, item->ef_value, item->base->last);
             }
             break;
         case GData::e_lbef_hpshield:
             {
-                doItemWu_HPShield(bf, bo2, item->ef_value, item->base->last);
+                doItemWu_HPShield(bf, bo, item->ef_value, item->base->last);
             }
             break;
         }
@@ -9427,6 +9428,8 @@ void BattleSimulator::doItemWu_HPShield(BattleFighter* bf, BattleFighter* bo, fl
 
 float BattleSimulator::getItemXin_BleedDec(BattleFighter* bf, GData::LBSkillItem* item)
 {
+    if(!bf)
+        return 0;
     if(!item || !item->base)
         return 0;
 
@@ -9440,6 +9443,8 @@ float BattleSimulator::getItemXin_BleedDec(BattleFighter* bf, GData::LBSkillItem
 
 bool  BattleSimulator::getItemXin_MagRes(BattleFighter* bf, UInt16 state)
 {
+    if(!bf)
+        return false;
     GData::LBSkillItem* item = bf->getStateCondItem(state);
     if(!item || !item->base)
         return false;
@@ -9451,6 +9456,8 @@ bool  BattleSimulator::getItemXin_MagRes(BattleFighter* bf, UInt16 state)
 
 bool  BattleSimulator::getItemXin_BleedOut(BattleFighter* bf, GData::LBSkillItem* item)
 {
+    if(!bf)
+        return false;
     if(!item || !item->base)
         return false;
 
@@ -9465,6 +9472,8 @@ bool  BattleSimulator::getItemXin_BleedOut(BattleFighter* bf, GData::LBSkillItem
 
 bool BattleSimulator::getItemLing_cs(BattleFighter* bf, GData::LBSkillItem* item)
 {
+    if(!bf)
+        return false;
     if(!item || !item->base)
         return false;
 
@@ -9478,6 +9487,8 @@ bool BattleSimulator::getItemLing_cs(BattleFighter* bf, GData::LBSkillItem* item
 
 bool BattleSimulator::getItemLing_pr(BattleFighter* bf, GData::LBSkillItem* item)
 {
+    if(!bf)
+        return false;
     if(!item || !item->base)
         return false;
 
@@ -9488,7 +9499,7 @@ bool BattleSimulator::getItemLing_pr(BattleFighter* bf, GData::LBSkillItem* item
     return true;
 }
 
-void BattleSimulator::getAtkList(BattleFighter* bf, BattleFighter* bo, const GData::LBSkillBase* lbskill, AtkList& atkList)
+void BattleSimulator::getAtkList(BattleFighter* bf, const GData::LBSkillBase* lbskill, AtkList& atkList)
 {
     GData::Area* area = NULL;
     area = &(GData::areaList[lbskill->area]);
@@ -9496,7 +9507,7 @@ void BattleSimulator::getAtkList(BattleFighter* bf, BattleFighter* bo, const GDa
     int side = bf->getSide();
     if(lbskill->target == 1)
     {
-        side = bo->getSide();
+        side = 1 - side;
     }
 
     switch(lbskill->area)
@@ -9504,6 +9515,10 @@ void BattleSimulator::getAtkList(BattleFighter* bf, BattleFighter* bo, const GDa
     case 0:
         if(lbskill->target == 1)
         {
+            int target_pos = getPossibleTarget(bf->getSide(), bf->getPos());
+            BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, target_pos));
+            if(!bo)
+                break;
             AtkFactor atkFactor;
             atkFactor.bf = bo;
             atkFactor.factor = 1;
@@ -9515,12 +9530,12 @@ void BattleSimulator::getAtkList(BattleFighter* bf, BattleFighter* bo, const GDa
             int i = 0;
             for(int pos = 0; pos < 25; ++ pos)
             {
-                BattleFighter* bo2 = static_cast<BattleFighter*>(getObject(side, pos));
-                if(!bo2 || bo2->getHP() == 0)
+                BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, pos));
+                if(!bo || bo->getHP() == 0)
                     continue;
                 ++ i;
                 AtkFactor atkFactor;
-                atkFactor.bf = bo2;
+                atkFactor.bf = bo;
                 atkFactor.factor = lbskill->factor[i];
                 atkList.push_back(atkFactor);
             }
@@ -9533,14 +9548,14 @@ void BattleSimulator::getAtkList(BattleFighter* bf, BattleFighter* bo, const GDa
             excepts[0] = bf->getPos();
             for(int i = 0; i < 2; ++ i)
             {
-                BattleFighter* bo2 = getRandomFighter(bf->getSide(), excepts, exceptCnt);
-                if(!bo2)
+                BattleFighter* bo = getRandomFighter(bf->getSide(), excepts, exceptCnt);
+                if(!bo)
                     break;
                 AtkFactor atkFactor;
-                atkFactor.bf = bo2;
+                atkFactor.bf = bo;
                 atkFactor.factor = 1;
                 atkList.push_back(atkFactor);
-                excepts[exceptCnt] = bo2->getPos();
+                excepts[exceptCnt] = bo->getPos();
                 ++ exceptCnt;
             }
         }
@@ -9552,14 +9567,14 @@ void BattleSimulator::getAtkList(BattleFighter* bf, BattleFighter* bo, const GDa
             excepts[0] = bf->getPos();
             for(int i = 0; i < 3; ++ i)
             {
-                BattleFighter* bo2 = getRandomFighter(bf->getSide(), excepts, exceptCnt);
-                if(!bo2)
+                BattleFighter* bo = getRandomFighter(bf->getSide(), excepts, exceptCnt);
+                if(!bo)
                     break;
                 AtkFactor atkFactor;
-                atkFactor.bf = bo2;
+                atkFactor.bf = bo;
                 atkFactor.factor = 1;
                 atkList.push_back(atkFactor);
-                excepts[exceptCnt] = bo2->getPos();
+                excepts[exceptCnt] = bo->getPos();
                 ++ exceptCnt;
             }
         }
@@ -9571,14 +9586,14 @@ void BattleSimulator::getAtkList(BattleFighter* bf, BattleFighter* bo, const GDa
             excepts[0] = bf->getPos();
             for(int i = 0; i < 4; ++ i)
             {
-                BattleFighter* bo2 = getRandomFighter(bf->getSide(), excepts, exceptCnt);
-                if(!bo2)
+                BattleFighter* bo = getRandomFighter(bf->getSide(), excepts, exceptCnt);
+                if(!bo)
                     break;
                 AtkFactor atkFactor;
-                atkFactor.bf = bo2;
+                atkFactor.bf = bo;
                 atkFactor.factor = 1;
                 atkList.push_back(atkFactor);
-                excepts[exceptCnt] = bo2->getPos();
+                excepts[exceptCnt] = bo->getPos();
                 ++ exceptCnt;
             }
         }
@@ -9586,6 +9601,10 @@ void BattleSimulator::getAtkList(BattleFighter* bf, BattleFighter* bo, const GDa
     default:
         if(area->getCount() > 0)
         {
+            int target_pos = getPossibleTarget(bf->getSide(), bf->getPos());
+            BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, target_pos));
+            if(!bo)
+                break;
             int x_ = bo->getPos() % 5;
             int y_ = bo->getPos() / 5;
             int cnt = area->getCount();

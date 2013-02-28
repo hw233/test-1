@@ -535,7 +535,7 @@ private:
     GData::LBSkillItem* GetActionCondSkillItem1(BattleFighter* bf, BattleFighter* bo);
 
     void doItemLingSkillAttack(BattleFighter* bf, BattleFighter* bo);
-    void doItemWuSkillAttack(BattleFighter* bf, BattleFighter* bo);
+    void doItemWuSkillAttack(BattleFighter* bf);
 
     void doItemLing_DefAdd(BattleFighter* bf, BattleFighter* bo, float value, UInt8 last);
     void doItemLing_DefDec(BattleFighter* bf, BattleFighter* bo, float value, UInt8 last);
@@ -553,7 +553,7 @@ private:
     bool getItemLing_cs(BattleFighter* bf, GData::LBSkillItem* item);
     bool getItemLing_pr(BattleFighter* bf, GData::LBSkillItem* item);
 
-    void getAtkList(BattleFighter* bf, BattleFighter* bo, const GData::LBSkillBase* lbskill, AtkList& atkList);
+    void getAtkList(BattleFighter* bf, const GData::LBSkillBase* lbskill, AtkList& atkList);
     void makeDamage(BattleFighter* bo, UInt32& u);
 };
 
