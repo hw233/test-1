@@ -1453,35 +1453,53 @@ function onRC7DayWill(player, idx)
     end
 end
 
-function onUseMDSoul(player, _type)
-    if _type == 0 or _type > 3 then
+function onUseMDSoul(player, _type, _v)
+    if _type == 0 or _type > 3  or _v > 2 then
         return 0
     end
     local package = player:GetPackage();
-    local items = {
+    local items1 = {
         {9000,47,509,507,515,509,507,515,},
         {503,514,506,508,517,512,501,513,},
         {1411,133,503,511,9000,9076,514,516}
---        {497,496,15,56,57,511,500,518,},
     }
-    local broad = {0,0,0,0,1,1,0,0}
-    local count = {1,1,2,1,2,2,1,2}
+    local items2 = {
+        {9000,47,509,507,515,509,507,515,},
+        {503,514,506,508,517,512,501,513,},
+        {1411,133,503,511,9000,9076,514,516}
+    }
+    local items = items1;
+    if _v == 2 then
+        items = items2;
+    end
+
+    local broad = {
+        [1] = {0,0,0,0,1,1,0,0},
+        [2] = {0,0,0,0,1,1,0,0}
+    };
+    local count = {
+        [1] = {1,1,2,1,2,2,1,2},
+        [2] = {2,2,2,2,3,3,1,3}
+    };
 
     if _type == 3 then
-        local prob = {2400,4800,5430,7830,8080,8240,9600,10000}
+        local prob = {
+            [1] = {2400,4800,5430,7830,8080,8240,9600,10000},
+            [2] = {2125,4250,4950,7075,7435,7565,9690,10000}
+        };
         local p = math.random(1,10000)
         local i = 1
-        for n = 1,#prob do
-            if p <= prob[n] then
+        for n = 1,#prob[_v] do
+            if p <= prob[_v][n] then
                 i = n
                 break
             end
         end
-        if broad[i] == 1 then
-            Broadcast(0x27, "御风雷之变化，".."[p:"..player:getCountry()..":"..player:getPName().."]成功显罗盘秘宝于世，获得了[4:"..items[_type][i].."]x"..count[i])
+        if broad[_v][i] == 1 then
+            Broadcast(0x27, "御风雷之变化，".."[p:"..player:getCountry()..":"..player:getPName().."]成功显罗盘秘宝于世，获得了[4:"..items[_type][i].."]x"..count[_v][i])
         end
-        package:Add(items[_type][i], count[i], true, true);
-        player:appendCompassItem(items[_type][i], count[i]);
+        package:Add(items[_type][i], count[_v][i], true, true);
+        player:appendCompassItem(items[_type][i], count[_v][i],_v);
         return items[_type][i]
     end
 

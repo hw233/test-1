@@ -611,6 +611,14 @@ public:
     { _item9343act = v; }
     inline static bool getItem9343Act()
     { return _item9343act; }
+    inline static void setAutoBattleAct(bool v)
+    { _autobattleact = v; }
+    inline static bool getAutoBattleAct()
+    { return _autobattleact; }
+     inline static void setSnakeSpringEquipAct(UInt8 v)
+    { _snakespringequipact = v; }
+    inline static UInt8 getSnakeSpringEquipAct()
+    { return _snakespringequipact; }
  
 public:
 	inline static UInt8 getWeekDay()
@@ -726,6 +734,8 @@ public:
     static UInt8 _snakeeggawardact;
     static bool _item9344act;
     static bool _item9343act;
+    static bool _autobattleact;
+    static UInt8 _snakespringequipact;
 
 public:
     static RCSortType rechargeSort;

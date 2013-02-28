@@ -136,6 +136,10 @@ is_fashion_shop = false
 function isfashion_shop()
     return is_fashion_shop
 end
+is_2013_0201_0228 = false
+function is2013_0201_0228()
+    return is_2013_0201_0228
+end
 
 function onActivityCheck(tm)
   local osmax = oldServersMax[serverName]
@@ -932,7 +936,23 @@ function onActivityCheck(tm)
       else
           setItem9343Act(false)
       end
-
+      if tm >= actTime2013_02_06 and tm < actTime2013_02_17 then
+          setAutoBattleAct(true)
+      else
+          setAutoBattleAct(false)
+      end
+      if tm >= actTime2013_02_01 and tm < actTime2013_02_12 then
+          setSnakeSpringEquipAct(1)
+      elseif tm >= actTime2013_02_12 and tm < actTime2013_02_19 then
+          setSnakeSpringEquipAct(2)
+      else
+          setSnakeSpringEquipAct(0)
+      end
+      if tm >= actTime2013_02_01 and tm < actTime2013_02_29 then
+          is_2013_0201_0228 = true;
+      else
+          is_2013_0201_0228 =false;
+      end
       setShuoShuo(true);
   end
 
@@ -1573,15 +1593,17 @@ function initActTime(y, m, d)
   actTime237_0= os.time(SerStartTm237);
   actTime237_1= os.time(SerStartTm237) + 22 * 86400;
 
+  actTime2013_01_29= os.time(SerStartTm2013_01_29);
   actTime2013_02_01= os.time(SerStartTm2013_02_01);
+  actTime2013_02_05= os.time(SerStartTm2013_02_05);
+  actTime2013_02_06= os.time(SerStartTm2013_02_05)+86400;
   actTime2013_02_09= os.time(SerStartTm2013_02_09);
+  actTime2013_02_12= os.time(SerStartTm2013_02_12);
   actTime2013_02_16= os.time(SerStartTm2013_02_16);
+  actTime2013_02_17= os.time(SerStartTm2013_02_16)+86400;
+  actTime2013_02_19= os.time(SerStartTm2013_02_16)+3*86400;
   actTime2013_02_23= os.time(SerStartTm2013_02_23);
   actTime2013_02_29= os.time(SerStartTm2013_02_29);
-
-  actTime2013_01_29= os.time(SerStartTm2013_01_29);
-  actTime2013_02_05= os.time(SerStartTm2013_02_05);
-  actTime2013_02_12= os.time(SerStartTm2013_02_12);
 
   onActivityCheck(os.time() + 30);
 

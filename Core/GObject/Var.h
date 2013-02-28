@@ -342,6 +342,7 @@ namespace GObject
         VAR_SNAKEEGG_AWARD=372,         //领蛇蛋
         VAR_9344_USED=373,
         VAR_9343_USED=374,
+        VAR_SNAKE_SPRING_EQUIP_GOT=375,
         //越南版380-399
         VAR_MAX,
     };
@@ -647,6 +648,7 @@ namespace GObject
             REGISTER_VAR(VAR_SNAKEEGG_AWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_9344_USED, CYCLE_NONE);
             REGISTER_VAR(VAR_9343_USED, CYCLE_NONE);
+            REGISTER_VAR(VAR_SNAKE_SPRING_EQUIP_GOT, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

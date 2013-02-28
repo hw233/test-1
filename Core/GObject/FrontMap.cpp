@@ -677,7 +677,7 @@ void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool in
                     return;
                 }
 
-                if (!World::getNewYear() && !pl->isYD() && !pl->isBD() && !pl->isQQVIP())
+                if (!World::getAutoBattleAct() && !World::getNewYear() && !pl->isYD() && !pl->isBD() && !pl->isQQVIP())
                 {
                     if (pl->getVipLevel() < 7)
                         return;

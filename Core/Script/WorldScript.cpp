@@ -216,6 +216,8 @@ void WorldScript::init()
 	def("getItem9344Act", GObject::World::getItem9344Act);
 	def("setItem9343Act", GObject::World::setItem9343Act);
 	def("getItem9343Act", GObject::World::getItem9343Act);
+	def("setAutoBattleAct", GObject::World::setAutoBattleAct);
+	def("setSnakeSpringEquipAct", GObject::World::setSnakeSpringEquipAct);
 
     def("setMergeAthAct", GObject::World::setMergeAthAct);
     def("getMergeAthAct", GObject::World::getMergeAthAct);
