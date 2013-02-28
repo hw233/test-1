@@ -16819,12 +16819,12 @@ void Player::sendSnakeSpringEquipMail()
     UInt32 v = GetVar(VAR_SNAKE_SPRING_EQUIP_GOT);
     if (1 == act && ((v&0x01)==0)) //春节套装 item=1762
     {
-        sendMailItem(4124, 4125, &s_item[0], 1);
+        sendMailItem(4126, 4127, &s_item[0], 1);
         SetVar(VAR_SNAKE_SPRING_EQUIP_GOT, v|=0x01);
     }
     if (2 == act && ((v&0x02)==0))
     {
-        sendMailItem(4126, 4127, &s_item[1], 1);
+        sendMailItem(4128, 4129, &s_item[1], 1);
         SetVar(VAR_SNAKE_SPRING_EQUIP_GOT, v|=0x02);
     }
 }
