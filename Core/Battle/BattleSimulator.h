@@ -125,6 +125,7 @@ private:
             damType = 0;
             damType2 = 0;
             damage = 0;
+            damageType = 0;
             leftHP = 0;
             rhp = 0;
             rLeftHP = 0;
@@ -135,6 +136,7 @@ private:
 		UInt8 pos;
 		UInt8 damType;
 		UInt8 damType2;
+        UInt8 damageType;  // 如果是伤害技能，则用户客户端表示其伤害类型
 		UInt32 damage;
 		UInt32 leftHP;
         UInt32 rhp;
@@ -268,6 +270,15 @@ private:
         e_unPetShield = 75,     // 解除仙宠的护盾
 
         e_MAX_STATE,
+    };
+
+    enum DamageType
+    {
+        e_damageNone    = 0,
+        e_damagePhysic  = 1,    // 物理伤害
+        e_damageMagic   = 2,    // 法术伤害
+        e_damageTrue    = 3,    // 真实伤害
+        e_damagePoison  = 4,    // 毒伤害
     };
 
     enum SpecialStatus
@@ -539,7 +550,7 @@ private:
 
     std::vector<DefStatus> _defList;
     std::vector<StatusChange> _scList;
-    void appendDefStatus(StateType type, UInt32 value, BattleFighter* bf);
+    void appendDefStatus(StateType type, UInt32 value, BattleFighter* bf, DamageType damageType = e_damageNone);
     void appendStatusChange(StatusType type, UInt32 value, UInt16 skillId, BattleFighter* bf);
 
 private:

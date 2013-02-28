@@ -1121,6 +1121,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendYBBufInfo(pl->GetVar(VAR_YBBUF), pl->GetVar(VAR_QQVIP_BUF));
     pl->sendAthlBufInfo();
     pl->sendConsumeAwardInfo(0);
+    pl->sendWeiboAwardInfo();
     luckyDraw.notifyDisplay(pl);
     if (World::getRechargeActive())
     {
@@ -4762,27 +4763,39 @@ void OnActivityReward(  GameMsgHdr& hdr, const void * data)
     switch(type )
     {
         case 3:
-            if (World::getRechargeActive())
-                player->sendRechargeInfo();
+            {
+                if (World::getRechargeActive())
+                    player->sendRechargeInfo();
+            }
             break;
         case 4:
-            if (!World::getRechargeActive())
-                return;
-            UInt32 itemId = 0;
-            brd >> itemId;
-            int n = -1;
-            UInt8 res = GObject::RechargeTmpl::instance().getItem(player, itemId, n);
-            Stream st(REP::ACTIVITY_REWARD);
-            st << static_cast<UInt8>(11);
-            st << res;
-            if ( 0 == res)
             {
-                st << player->GetVar(VAR_RECHARGE_SCORE) << itemId << n;
+                if (!World::getRechargeActive())
+                    return;
+                UInt32 itemId = 0;
+                brd >> itemId;
+                int n = -1;
+                UInt8 res = GObject::RechargeTmpl::instance().getItem(player, itemId, n);
+                Stream st(REP::ACTIVITY_REWARD);
+                st << static_cast<UInt8>(11);
+                st << res;
+                if ( 0 == res)
+                {
+                    st << player->GetVar(VAR_RECHARGE_SCORE) << itemId << n;
+                }
+                st << Stream::eos;
+                player->send(st);
             }
-            st << Stream::eos;
-            player->send(st);
             break;
-
+        case 5:
+            {
+                UInt8 opt = 0;
+                std::string key;
+                brd >> opt;
+                brd >> key;
+                player->getWeiboAward(opt, key);
+            }
+            break;
     }
  
 }
