@@ -5681,7 +5681,7 @@ namespace GObject
             {
                 values.push_back(lba.value[i] - oldvalue);
                 ++ totalCount;
-                totalFactor += factor;
+                totalFactor += factor - 1.0f;
             }
         }
 
