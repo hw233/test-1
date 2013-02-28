@@ -173,8 +173,7 @@ namespace GObject
 		_npcGroup->getLoots(m_Player);
 #else
         if(uRand(1000) < 74)
-            m_Player->GetPackage()->AddItem(518, 1, true, false);
-            //m_Package->AddItem(9359, 1, true, false);
+            m_Player->GetPackage()->AddItem(9359, 1, true, false);
 #endif
 		notify();
 		updateDB(false);
@@ -194,11 +193,13 @@ namespace GObject
         UInt8 curType = static_cast<UInt8>(m_Player->GetVar(VAR_PEXP_HOOK_NEW_SOLUTION));
 		if(cnt > 0)
 		{
+#if 0
 			if(_npcGroup == NULL)
 				return;
+#endif
 			UInt32 t = TimeUtil::Now();
 			if(t > _finalEnd) t = 0; else t = _finalEnd - t;
-			st << _npcGroup->getId() << static_cast<UInt8>(1) << cnt << t << iccnt << curType << Stream::eos;
+			st << /*_npcGroup->getId()*/static_cast<UInt32>(0) << static_cast<UInt8>(1) << cnt << t << iccnt << curType << Stream::eos;
 		}
 		else
 		{
@@ -227,7 +228,7 @@ namespace GObject
 		m_Timer.SetLeftTimes(newCnt);
 		ecs.exp = calcExpEach(TimeUtil::Now()) * cnt;
 		ecs.count = cnt;
-		ecs.ng = _npcGroup;
+		ecs.ng = NULL;//_npcGroup;
 		GameMsgHdr hdr(0x274, m_Player->getThreadId(), m_Player, sizeof(ExpGainInstantCompleteStruct));
 		GLOBAL().PushMsg(hdr, &ecs);
 		_finalEnd -= ecs.duration;
@@ -242,7 +243,7 @@ namespace GObject
 		if(count > 0)
 		{
 			if(isNew)
-				DB3().PushUpdateData("REPLACE INTO `auto_battle`(`playerId`, `npcId`, `count`, `interval`) VALUES(%"I64_FMT"u, %u, %u, %u)", m_Player->getId(), _npcGroup->getId(), count, m_Timer.GetInterval());
+				DB3().PushUpdateData("REPLACE INTO `auto_battle`(`playerId`, `npcId`, `count`, `interval`) VALUES(%"I64_FMT"u, %u, %u, %u)", m_Player->getId(), /*_npcGroup->getId()*/0, count, m_Timer.GetInterval());
 			else
 				DB3().PushUpdateData("UPDATE `auto_battle` SET `count` = %u WHERE `playerId` = %"I64_FMT"u", count, m_Player->getId());
 		}
@@ -3641,13 +3642,11 @@ namespace GObject
             sendMsgCode(0, 1011);
             return false;
         }
+#if 0
 		GData::NpcGroups::iterator it = GData::npcGroups.find(npcId);
 		if(it == GData::npcGroups.end())
 			return false;
-        if(type > 3)
-            return false;
 		GData::NpcGroup * ng = it->second;
-#if 0
 		if(GetLev() < ng->getLevel())
 		{
 			sendMsgCode(0, 1151);
@@ -3656,6 +3655,8 @@ namespace GObject
         if (ng->getType())
             return false;
 #endif
+        if(type > 3)
+            return false;
 		const UInt32 eachBattle = 60;
 		UInt32 count = 60 * 8;
 
@@ -3677,7 +3678,7 @@ namespace GObject
 		UInt32 timeDur = count * eachBattle;
 
 		UInt32 final = TimeUtil::Now() + timeDur;
-		EventAutoBattle* event = new(std::nothrow) EventAutoBattle(this, eachBattle, count, ng, final);
+		EventAutoBattle* event = new(std::nothrow) EventAutoBattle(this, eachBattle, count, /*ng*/NULL, final);
 		if (event == NULL) return false;
         SetVar(VAR_PEXP_HOOK_INDEX, type);
 		cancelAutoBattle();

@@ -819,7 +819,9 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
     }
 
 	player->AddExp(static_cast<UInt32>(exp));
+#if 0
 	ecs->ng->monsterKilled(player, ecs->count);
+#endif
 }
 
 void OnAutoCopyAttack( GameMsgHdr& hdr, const void * data )
