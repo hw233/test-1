@@ -40,8 +40,8 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     //_therapy_dec(0), _therapy_dec_last(0),_therapy_add(0),_therapy_add_last(0),
     _therapy_buff(0), _therapy_buff_last(0),
     _aura_dec(0), _aura_dec_last(0),
-    _bleed1(0), _bleed2(0), _bleed3(0),
-    _bleed1_last(0), _bleed2_last(0), _bleed3_last(0),
+    _bleed1(0), _bleed2(0), _bleed3(0), _self_bleed(0),
+    _bleed1_last(0), _bleed2_last(0), _bleed3_last(0), _self_bleed_last(0),
     _immune2(0), _def_dec(0), _def_dec_last(0), _def_dec_times(0),
     _aura_bleed(0), _aura_present(0), _aura_present_cd(0), _aura_dec_cd(0), _aura_bleed_last(0),
     _stun_bleed(0), _stun_present(0), _stun_present_cd(0), _stun_cd(0), _stun_bleed_last(0),
@@ -52,8 +52,11 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _blind(0), _blind_last(0), _deep_blind_dmg_extra(0), _deep_blind_last(0),
 	_moAttackAdd(0), _moMagAtkAdd(0), _moAtkReduce(0), _moMagAtkReduce(0),
 	_moAttackAddCD(0), _moMagAtkAddCD(0), _moAtkReduceCD(0), _moMagAtkReduceCD(0),
+	_petAttackAdd(0), _petMagAtkAdd(0), _petAtkReduce(0), _petMagAtkReduce(0),
+	_petAttackAddCD(0), _petMagAtkAddCD(0), _petAtkReduceCD(0), _petMagAtkReduceCD(0),
     _bleedMo(0), _bleedMoLast(0), _summoner(NULL), _unSummonAura(0), 
     _shieldHP(0), _shieldHPLast(0), _petShieldHP(0), 
+    _petProtect100(false), _petProtect100Last(0), _petMark(false),
     _atkAddSpecial(0), _atkSpecialLast(0), _magAtkAddSpecial(0), _magAtkSpecialLast(0), 
     _atkDecSpecial(0), _atkDecSpecialLast(0), _magAtkDecSpecial(0), _magAtkDecSpecialLast(0),
     _skillUsedChangeAttrValue(0), _skillUsedChangeAttrLast(0), _skillUsedChangeAttr(0),
@@ -119,6 +122,7 @@ void BattleFighter::setFighter( GObject::Fighter * f )
     std::vector<UInt16>& passiveSkillOnTherapy = _fighter->getPassiveSkillOnTherapy();
     std::vector<UInt16>& passiveSkillOnSkillDmg = _fighter->getPassiveSkillOnSkillDmg();
     std::vector<UInt16>& passiveSkillOnOtherDead = _fighter->getPassiveSkillOnOtherDead();
+    std::vector<UInt16>& passiveSkillOnPetProtect = _fighter->getPassiveSkillOnPetProtect();
 
     cnt = passiveSkillPrvAtk100Id.size();
     _passiveSkillPrvAtk100.clear();
@@ -386,9 +390,23 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         updateSkillStrengthen(passiveSkillOnOtherDead[idx]);
     }
 
+    cnt = passiveSkillOnPetProtect.size();
+    _passiveSkillOnPetProtect.clear();
+    for(idx = 0; idx < cnt; idx++)
+    {
+        GData::SkillItem skillItem;
+        skillItem.base = GData::skillManager[passiveSkillOnPetProtect[idx]];
+        skillItem.cd = 0;
+        skillItem.rateExtent = 0;
+        _passiveSkillOnOtherDead.insert(_passiveSkillOnPetProtect.end(), skillItem);
+
+        updateSkillStrengthen(passiveSkillOnPetProtect[idx]);
+    }
+
     std::vector<UInt16>& passiveSkillOnCounter = _fighter->getPassiveSkillOnCounter();
     std::vector<UInt16>& passiveSkillOnCounter100 = _fighter->getPassiveSkillOnCounter100();
     std::vector<UInt16>& passiveSkillOnAttackBleed100 = _fighter->getPassiveSkillOnAttackBleed100();
+    std::vector<UInt16>& passiveSkillOnAtkDmg100 = _fighter->getPassiveSkillOnAtkDmg100();
     cnt = passiveSkillOnCounter.size();
     _passiveSkillOnCounter.clear();
     rateExtent = 0;
@@ -428,6 +446,19 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         _passiveSkillOnAttackBleed100.insert(_passiveSkillOnAttackBleed100.end(), skillItem);
 
         updateSkillStrengthen(passiveSkillOnAttackBleed100[idx]);
+    }
+
+    cnt = passiveSkillOnAtkDmg100.size();
+    _passiveSkillOnAtkDmg100.clear();
+    for (idx = 0; idx < cnt; idx ++)
+    {
+        GData::SkillItem skillItem;
+        skillItem.base = GData::skillManager[passiveSkillOnAtkDmg100[idx]];
+        skillItem.cd = 0;
+        skillItem.rateExtent = 0;
+        _passiveSkillOnAtkDmg100.insert(_passiveSkillOnAtkDmg100.end(), skillItem);
+
+        updateSkillStrengthen(passiveSkillOnAtkDmg100[idx]);
     }
 
     std::vector<GObject::LBSkill>& lbSkills =  _fighter->getLBSkill();
@@ -1226,6 +1257,11 @@ const GData::SkillBase* BattleFighter::getPassiveSkillOnAttackBleed100(size_t& i
     return getPassiveSkill100(_passiveSkillOnAttackBleed100, idx, noPossibleTarget);
 }
 
+const GData::SkillBase* BattleFighter::getPassiveSkillOnAtkDmg100(size_t& idx, bool noPossibleTarget)
+{
+    return getPassiveSkill100(_passiveSkillOnAtkDmg100, idx, noPossibleTarget);
+}
+
 const GData::SkillBase* BattleFighter::getPassiveSkill(std::vector<GData::SkillItem>& passiveSkill, bool noPossibleTarget)
 {
     size_t cnt = passiveSkill.size();
@@ -1308,6 +1344,11 @@ const GData::SkillBase* BattleFighter::getPassiveSkillOnAttackBleed(bool noPossi
     return NULL;
 }
 
+const GData::SkillBase* BattleFighter::getPassiveSkillOnPetProtect(bool noPossibleTarget)
+{
+    return getPassiveSkill(_passiveSkillOnPetProtect, noPossibleTarget);
+}
+
 void BattleFighter::releaseSkillCD(std::vector<GData::SkillItem>& skill, int cd)
 {
     size_t cnt = skill.size();
@@ -1363,6 +1404,13 @@ const GData::SkillBase* BattleFighter::getPassiveSkillOnOtherDead()
     size_t idx = 0;
 
     return getPassiveSkill100(_passiveSkillOnOtherDead, idx);
+}
+
+const GData::SkillBase* BattleFighter::getPassiveSkillOnPetProtect100()
+{
+    size_t idx = 0;
+    
+    return getPassiveSkill100( _passiveSkillOnPetProtect100, idx);
 }
 
 float BattleFighter::getHitrate(BattleFighter* defgt)
@@ -1951,6 +1999,7 @@ void BattleFighter::clearSkill()
     _passiveSkillAftNAtk100.clear();
     _passiveSkillOnCounter100.clear();
     _passiveSkillOnAttackBleed100.clear();
+    _passiveSkillOnAtkDmg100.clear();
 
     _passiveSkillPreAtk.clear();
     _passiveSkillAftAtk.clear();
@@ -2153,6 +2202,58 @@ bool BattleFighter::releaseMoMagAtkReduce()
     if(_moMagAtkReduceCD == 0)
     {
         _moMagAtkReduce = 0.0f;
+        return true;
+    }
+    return false;
+}
+
+bool BattleFighter::releasePetAttackAdd()
+{
+    if(_petAttackAddCD == 0 || _petAttackAdd < 0.001)
+        return false;
+    -- _petAttackAddCD;
+    if(_petAttackAddCD == 0)
+    {
+        _petAttackAdd = 0.0f;
+        return true;
+    }
+    return false;
+}
+
+bool BattleFighter::releasePetMagAtkAdd()
+{
+    if(_petMagAtkAddCD == 0 || _petMagAtkAdd < 0.001)
+        return false;
+    -- _petMagAtkAddCD;
+    if(_petMagAtkAddCD == 0)
+    {
+        _petMagAtkAdd = 0.0f;
+        return true;
+    }
+    return false;
+}
+
+bool BattleFighter::releasePetAtkReduce()
+{
+    if(_petAtkReduceCD == 0 || _petAtkReduce < 0.001)
+        return false;
+    -- _petAtkReduceCD;
+    if(_petAtkReduceCD == 0)
+    {
+        _petAtkReduce = 0.0f;
+        return true;
+    }
+    return false;
+}
+
+bool BattleFighter::releasePetMagAtkReduce()
+{
+    if(_petMagAtkReduceCD == 0 || _petMagAtkReduce < 0.001)
+        return false;
+    -- _petMagAtkReduceCD;
+    if(_petMagAtkReduceCD == 0)
+    {
+        _petMagAtkReduce = 0.0f;
         return true;
     }
     return false;
@@ -2387,6 +2488,21 @@ bool BattleFighter::releaseHpSieldSelf()
 
     -- _hpShieldSelf_last;
     if(_hpShieldSelf_last == 0)
+    {
+        _hpShieldSelf = 0;
+        return true;
+    }
+
+    return false;
+}
+
+bool BattleFighter::releasePetProtect100()
+{
+    if(_petProtect100Last == 0)
+        return false;
+
+    -- _petProtect100Last;
+    if(_petProtect100Last == 0)
     {
         _hpShieldSelf = 0;
         return true;

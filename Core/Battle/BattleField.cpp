@@ -130,8 +130,19 @@ BattleObject * BattleField::getObjectXY( int side, int x, int y )
 	return (*this)(side, x + y * 5);
 }
 
+int BattleField::getSpecificTarget(int side, bool(f(BattleObject* bo)))
+{
+    for (int i = 0; i < 25; ++i)
+    {
+        if (_objs[side][i] && f(_objs[side][i]))
+            return i;
+    }
+	return -1;
+}
+
 int BattleField::getPossibleTarget( int side, int idx )
 {
+    //overload in Simulator
 	static int select_table[5][5] = {
 		{0 , 1 , 2 , 3 , 4},
 		{1 , 0 , 2 , 3 , 4},

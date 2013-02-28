@@ -49,7 +49,8 @@ public:
 	BattleObject * operator()(int, int);
 	BattleObject * getObjectXY(int, int, int);
 	int getDistance(int, int, int, int);
-	int getPossibleTarget(int, int); // return -1 for no found target
+    int getSpecificTarget(int side, bool(f(BattleObject* bo)));
+	int getPossibleTarget(int, int); // return -1 for no found target, overload in Simulator
 	void updateDistance();
 	void updateDistance(int, int);
 	void getFormationPositions(int, std::vector<UInt8>&);

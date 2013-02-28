@@ -268,6 +268,8 @@ private:
         e_unDeepConfuse = 73,  // 解除深度混乱
         e_petShield = 74,       // 仙宠的护盾 
         e_unPetShield = 75,     // 解除仙宠的护盾
+        e_selfBleed = 76,       // 自己流血 （自焚）
+        e_unSelfBleed = 76,     // 自己流血结束 （自焚烧完了）
 
         e_MAX_STATE,
     };
@@ -302,7 +304,7 @@ private:
 	void insertFighterStatus(BattleFighter* bf);
 	void insertFighterStatus2Current(BattleFighter* bf);
 	void removeFighterStatus(BattleFighter* bf);
-	UInt32 attackOnce(BattleFighter * bf, bool& first, bool& cs, bool& pr, const GData::SkillBase* skill, BattleObject * bo, float factor, int counter_deny = -1, AttackPoint * counter_deny_list = NULL, std::vector<AttackAct>* atkAct = NULL);
+	UInt32 attackOnce(BattleFighter * bf, bool& first, bool& cs, bool& pr, const GData::SkillBase* skill, BattleObject * bo, float factor, int counter_deny = -1, AttackPoint * counter_deny_list = NULL, std::vector<AttackAct>* atkAct = NULL, bool canProtect = false);
 
     UInt32 doXinmoAttack(BattleFighter * bf, BattleObject* bo);
 
@@ -321,8 +323,10 @@ private:
 	BattleFighter * getRandomFighter(UInt8 side, UInt8 * excepts, size_t exceptCount);
 	BattleFighter * getMaxHpFighter(UInt8 side, UInt8 * excepts, size_t exceptCount);
 	BattleFighter * getMinHpFighter(UInt8 side, UInt8 * excepts, size_t exceptCount);
-    bool doNormalAttack(BattleFighter* bf, int otherside, int target_pos, std::vector<AttackAct>* atkAct = NULL);
-    bool doSkillAttack(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt, std::vector<AttackAct>* atkAct = NULL, UInt32 skillParam = 0, UInt8* launchPeerLess = NULL);
+	BattleFighter * getMaxAtkFighter(UInt8 side, UInt8 * excepts, size_t exceptCount);
+	BattleFighter * getMinAtkFighter(UInt8 side, UInt8 * excepts, size_t exceptCount);
+    bool doNormalAttack(BattleFighter* bf, int otherside, int target_pos, std::vector<AttackAct>* atkAct = NULL, float factor = 1, bool canProtect = false);
+    bool doSkillAttack(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt, std::vector<AttackAct>* atkAct = NULL, UInt32 skillParam = 0, UInt8* launchPeerLess = NULL, bool canProtect = false);
     BattleFighter* getTherapyTarget(BattleFighter* bf);
     BattleFighter* getTherapyTarget2(BattleFighter* bf, UInt8 * excepts, size_t exceptCount);
     BattleFighter* getTherapyTarget3(BattleFighter* bf, UInt8 * excepts, size_t exceptCount);
@@ -462,6 +466,14 @@ private:
     void doSkillEffectExtra_SelfSideRuShiMagAtk(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_SelfSideBufAura(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_HpShield(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
+    void doSkillEffectExtra_SelfBleed(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
+    void doSkillEffectExtra_RandomShield(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
+    void doSkillEffectExtra_SelfAttack(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
+    void doSkillEffectExtra_RandomTargetAttack(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
+    void doSkillEffectExtra_MarkPet(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
+    void doSkillEffectExtra_AtkPetMarkAura(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
+    void doSkillEffectExtra_AtkPetMarkDmg(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
+    void doSkillEffectExtra_ProtectPet100(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
 
 
     void doSkillEffectExtraAbsorb(BattleFighter* bf, UInt32 dmg, const GData::SkillBase* skill);
@@ -499,6 +511,7 @@ private:
 	std::vector<BattleFighter*> _onTherapy;
 	std::vector<BattleFighter*> _onSkillDmg;
 	std::vector<BattleFighter*> _onOtherDead;
+    std::vector<BattleFighter*> _onPetProtect;
     UInt8 _cur_round_except[25];
     UInt8 _except_count;
 
@@ -577,14 +590,30 @@ private:
     bool getItemLing_pr(BattleFighter* bf, GData::LBSkillItem* item);
 
     void getAtkList(BattleFighter* bf, const GData::LBSkillBase* lbskill, AtkList& atkList);
+    void getAtkList(BattleFighter* bf, const GData::SkillBase* skill, AtkList& atkList, Int8 offset = 0);
     void makeDamage(BattleFighter* bo, UInt32& u);
 
     bool doAuraPresent(BattleFighter* bf);
     bool doConfusePresent(BattleFighter* bf);
     bool doStunPresent(BattleFighter* bf);
 
+private:
+    // 和仙宠有关的
     UInt32  tryPetEnter(UInt8 side, UInt8 reiatsuType); // 仙宠尝试上场（根据增加后的灵压判定是否上场）
     UInt32  doPetEnter(UInt8 side);                     // 仙宠闪亮上场
+
+    bool    tryProtectDamage(BattleFighter* bf, float& phyAtk, float& magatk, float factor);
+    bool    do100ProtectDamage(BattleFighter* bf, BattleFighter* pet, float& phyAtk, float& magAtk, float factor);
+    bool    doProtectDamage(BattleFighter* bf, BattleFighter* pet, float& phyAtk, float& magAtk, float factor);
+    bool    protectDamage(BattleFighter* bf, BattleFighter* pet, float& phyAtk, float& magAtk, float factor);
+
+private:
+    int     getPossibleTarget(int, int, BattleFighter* bf = NULL); // return -1 for no found target
+
+    static  bool hasPetMarked(BattleObject* bo);
+    static  bool isPet(BattleObject* bo);
+
+private:
 };
 
 }

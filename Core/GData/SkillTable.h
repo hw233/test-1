@@ -36,6 +36,8 @@ enum
     /*12*/ SKILL_ONOTHERDEAD,
     /*13*/ SKILL_ONCOUNTER,
     /*14*/ SKILL_ONATKBLEED,
+    /*15*/ SKILL_ONATKDMG,
+    /*16*/ SKILL_ONPETPROTECT,
     SKILL_PASSIVES
 };
 
@@ -53,6 +55,7 @@ enum
     e_battle_target_otherside_min = 4,
     e_battle_target_selfside_max = 5,
     e_battle_target_selfside_min = 6,
+    e_battle_target_selfside_atk_max = 7,
 };
 
 
@@ -75,6 +78,14 @@ enum
     e_eft_hide_aura = 14, // (墨印或潜行时)敌方被攻击时不增加灵气
     e_eft_counter_hate = 15, // 反击后的仇恨值
     e_eft_hp_shield = 16,       // 释放自己生命值百分比的护盾
+    e_eft_self_bleed = 17,           // 给自己加点燃效果（自焚？）
+    e_eft_random_shield = 18,        // 随机释放护盾
+    e_eft_self_attack = 19,        // 附加自己百分比攻击力
+    e_eft_random_target_attack = 20,    // 随机选择人加攻击力
+    e_eft_mark_pet  = 21,               // 神兽印记
+    e_eft_atk_pet_mark_aura = 22,       // 攻击带神兽印记的涨自身灵气
+    e_eft_atk_pet_mark_extra_dmg = 23,  // 攻击带神兽印记的造成额外攻击
+    e_eft_protect_pet_100 = 24,         // 宠物100%保护目标
 
     e_eft_max
 };
