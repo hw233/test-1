@@ -241,7 +241,8 @@ inline UInt8 doLogin(Network::GameClient * cl, UInt64 pid, UInt32 hsid, GObject:
 	player->SetSessionID(hsid);
 	cl->SetPlayer(player);
 
-    player->setForbidSale(checkForbidSale(player->getId()));
+    std::string fsaleTime;
+    player->setForbidSale(checkForbidSale(player->getId(), fsaleTime));
 	return res;
 }
 
@@ -1453,15 +1454,16 @@ void QueryLockUser(LoginMsgHdr& hdr,const void * data)
 {
     BinaryReader br(data,hdr.msgHdr.bodyLen);
     UInt64 pid = 0;
+    std::string fsaleTime;
     CHKKEY();
     br>>pid;
 
     pid = pid & 0xFFFFFFFFFF;
     UInt8 isLockLogin = IsBigLock(pid);
-    UInt8 isForbidSale = checkForbidSale(pid);
+    UInt8 isForbidSale = checkForbidSale(pid, fsaleTime);
         
     Stream st(SPEP::QUERYLOCKUSER);
-    st << isLockLogin << isForbidSale << Stream::eos;
+    st << isLockLogin << isForbidSale << fsaleTime << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 

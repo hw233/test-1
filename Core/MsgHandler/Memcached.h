@@ -2,6 +2,7 @@
 #ifndef _WIN32
 
 #include <libmemcached/memcached.h>
+#include "Common/TimeUtil.h"
 extern bool memcinited;
 extern memcached_st memc;
 extern int memc_version;
@@ -114,30 +115,37 @@ static void setForbidSaleValue(const UInt64 playerId, bool isForbid)
     initMemcache();
     if (memcinited)
     {
-        char value[2] = {'0'};
+        char value[32] = {'0'};
         char key[MEMCACHED_MAX_KEY] = {0};
         size_t len = snprintf(key, sizeof(key), "asss_globallock_%"I64_FMT"u", playerId);
-        size_t vlen = 1;
         if (isForbid) value[0] = '1';
+        sprintf(&value[1],"%d", TimeUtil::Now());
+
+        size_t vlen = strlen(value);
 
         MemcachedSet(key, len, value, vlen, 0);
     }
 }
 
-static bool checkForbidSale(const UInt64 playerId)
+static bool checkForbidSale(const UInt64 playerId, std::string& t)
 {
     (void)checkForbidSale;
     initMemcache();
-    char value[2] = {0};
+    char value[32] = {0};
     char key[MEMCACHED_MAX_KEY] = {0};
     UInt64 pid = playerId & 0xFFFFFFFFFF;
     size_t len = snprintf(key, sizeof(key), "asss_globallock_%"I64_FMT"u", pid);
 
     if (memcinited)
         MemcachedGet(key, len, value, sizeof(value));
+    if (len > 1)
+    {
+        t = &(value[1]);
+    }
 
     return value[0] == '1';
 }
+
 static bool checkCrack(std::string& platform, std::string& ip, UInt64 id)
 {
     (void)checkCrack;
