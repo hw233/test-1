@@ -239,6 +239,7 @@ GMHandler::GMHandler()
     Reg(3, "drkey", &GMHandler::OnDreamerKeySet);
     Reg(3, "dreye", &GMHandler::OnDreamerEyeSet);
 
+    Reg(3, "act", &GMHandler::OnSomeAct);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -3662,5 +3663,21 @@ void GMHandler::OnDreamerEyeSet(GObject::Player *player, std::vector<std::string
         return;
     UInt8 count = atoi(args[0].c_str());
     player->setDreamerEye(count);
+}
+
+void GMHandler::OnSomeAct(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return;
+    UInt8 type = atoi(args[0].c_str());
+    if(type == 1)
+    {
+        if(args.size() < 2)
+            return;
+        UInt32 day = atoi(args[1].c_str());
+        UInt32 now = TimeUtil::MkTime(2013, 1, 31) + 86400 * day;
+        player->calcNewYearQzoneContinueDay(now);
+        player->sendNewYearQzoneContinueAct();
+    }
 }
 

@@ -932,7 +932,7 @@ namespace GObject
             }
 		}
 
-        calcNewYearQzoneContinueDay(curtime);
+        //calcNewYearQzoneContinueDay(curtime);
         continuousLogin(curtime);
         continuousLoginRF(curtime);
         sendYearRPInfo();

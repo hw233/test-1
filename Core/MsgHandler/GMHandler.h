@@ -181,6 +181,7 @@ private:
     void OnDreamerTimeSet(GObject::Player *player, std::vector<std::string>& args);
     void OnDreamerKeySet(GObject::Player *player, std::vector<std::string>& args);
     void OnDreamerEyeSet(GObject::Player *player, std::vector<std::string>& args);
+    void OnSomeAct(GObject::Player *player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;
