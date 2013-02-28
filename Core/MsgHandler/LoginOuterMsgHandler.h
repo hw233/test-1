@@ -2750,10 +2750,16 @@ void GMCmd(LoginMsgHdr& hdr, const void* data)
                 UInt32 endTime = 0;
                 UInt32 flag = 0;
                 br >> endTime >> flag;
-                GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_BEGIN, val);
-                GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_END, endTime);
-                GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_ACTION, flag);
-                result = 0;
+                //大闹龙宫的flag暂时只为1,2,3
+                if(endTime <= val || flag > 3)
+                    result = 1;
+                else
+                {
+                    GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_BEGIN, val);
+                    GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_END, endTime);
+                    GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_ACTION, flag);
+                    result = 0;
+                }
             }
         default:
             break;

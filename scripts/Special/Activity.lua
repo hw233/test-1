@@ -3693,80 +3693,6 @@ function sendRechargeMails_2013_02_22(player, ototal, ntotal)
 end
 
 function sendRechargeMails(player, ototal, ntotal)
-    -- 20130119~20130129
-    local t = { ['year'] = 2013, ['month'] = 1, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-    local s = os.time(t)
-    local n = os.time() + 11
-
-    if n >= s and n < (s + 1*86400) then
-        sendRechargeMails_2013_01_19(player, ototal, ntotal)
-    elseif n >= (s + 1*86400) and n < (s + 2*86400) then
-        sendRechargeMails_2013_01_20(player, ototal, ntotal)
-    elseif n >= (s + 2*86400) and n < (s + 3*86400) then
-        sendRechargeMails_2013_01_21(player, ototal, ntotal)
-    elseif n >= (s + 3*86400) and n < (s + 4*86400) then
-        sendRechargeMails_2013_01_22(player, ototal, ntotal)
-    elseif n >= (s + 4*86400) and n < (s + 5*86400) then
-        sendRechargeMails_2013_01_23(player, ototal, ntotal)
-    elseif n >= (s + 5*86400) and n < (s + 6*86400) then
-        sendRechargeMails_2013_01_24(player, ototal, ntotal)
-    elseif n >= (s + 6*86400) and n < (s + 7*86400) then
-        sendRechargeMails_2013_01_25(player, ototal, ntotal)
-    elseif n >= (s + 7*86400) and n < (s + 8*86400) then
-        sendRechargeMails_2013_01_26(player, ototal, ntotal)
-    elseif n >= (s + 8*86400) and n < (s + 9*86400) then
-        sendRechargeMails_2013_01_27(player, ototal, ntotal)
-    elseif n >= (s + 9*86400) and n < (s + 10*86400) then
-        sendRechargeMails_2013_01_28(player, ototal, ntotal)
-    elseif n >= (s + 10*86400) and n < (s + 11*86400) then
-        sendRechargeMails_2013_01_29(player, ototal, ntotal)
-    end
-
-    -- 20130130~20130222
-    local t = { ['year'] = 2013, ['month'] = 1, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-    local s = os.time(t)
-    local n = os.time() + 11
-
-    if n >= s and n < (s + 1*86400) then
-        sendRechargeMails_2013_01_30(player, ototal, ntotal)
-    elseif n >= (s + 1*86400) and n < (s + 2*86400) then
-        sendRechargeMails_2013_01_31(player, ototal, ntotal)
-    elseif n >= (s + 2*86400) and n < (s + 3*86400) then
-        sendRechargeMails_2013_02_01(player, ototal, ntotal)
-    elseif n >= (s + 3*86400) and n < (s + 4*86400) then
-        sendRechargeMails_2013_02_02(player, ototal, ntotal)
-    elseif n >= (s + 4*86400) and n < (s + 5*86400) then
-        sendRechargeMails_2013_02_03(player, ototal, ntotal)
-    elseif n >= (s + 5*86400) and n < (s + 6*86400) then
-        sendRechargeMails_2013_02_04(player, ototal, ntotal)
-    elseif n >= (s + 6*86400) and n < (s + 7*86400) then
-        sendRechargeMails_2013_02_05(player, ototal, ntotal)
-    elseif n >= (s + 7*86400) and n < (s + 8*86400) then
-        sendRechargeMails_2013_02_06(player, ototal, ntotal)
-    elseif n >= (s + 8*86400) and n < (s + 9*86400) then
-        sendRechargeMails_2013_02_07(player, ototal, ntotal)
-    elseif n >= (s + 9*86400) and n < (s + 10*86400) then
-        sendRechargeMails_2013_02_08(player, ototal, ntotal)
-
-    elseif n >= (s + 10*86400) and n < (s + 17*86400) then
-        sendRechargeMails_2013_02_09_15(player, ototal, ntotal)
-
-    elseif n >= (s + 17*86400) and n < (s + 18*86400) then
-        sendRechargeMails_2013_02_16(player, ototal, ntotal)
-    elseif n >= (s + 18*86400) and n < (s + 19*86400) then
-        sendRechargeMails_2013_02_17(player, ototal, ntotal)
-    elseif n >= (s + 19*86400) and n < (s + 20*86400) then
-        sendRechargeMails_2013_02_18(player, ototal, ntotal)
-    elseif n >= (s + 20*86400) and n < (s + 21*86400) then
-        sendRechargeMails_2013_02_19(player, ototal, ntotal)
-    elseif n >= (s + 21*86400) and n < (s + 22*86400) then
-        sendRechargeMails_2013_02_20(player, ototal, ntotal)
-    elseif n >= (s + 22*86400) and n < (s + 23*86400) then
-        sendRechargeMails_2013_02_21(player, ototal, ntotal)
-    elseif n >= (s + 23*86400) and n < (s + 24*86400) then
-        sendRechargeMails_2013_02_22(player, ototal, ntotal)
-    end
-
     -- 20130223~20130301
     local t = { ['year'] = 2013, ['month'] = 2, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local s = os.time(t)
@@ -3788,6 +3714,25 @@ function sendRechargeMails(player, ototal, ntotal)
         sendRechargeMails_2013_02_22(player, ototal, ntotal)
     end
 
+    local t = { ['year'] = 2013, ['month'] = 3, ['day'] = 2, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local s = os.time(t)
+    local n = os.time() + 11
+
+    if n >= s and n < (s + 1*86400) then
+        sendRechargeMails_2013_02_16(player, ototal, ntotal)
+    elseif n >= (s + 1*86400) and n < (s + 2*86400) then
+        sendRechargeMails_2013_02_17(player, ototal, ntotal)
+    elseif n >= (s + 2*86400) and n < (s + 3*86400) then
+        sendRechargeMails_2013_02_18(player, ototal, ntotal)
+    elseif n >= (s + 3*86400) and n < (s + 4*86400) then
+        sendRechargeMails_2013_02_19(player, ototal, ntotal)
+    elseif n >= (s + 4*86400) and n < (s + 5*86400) then
+        sendRechargeMails_2013_02_20(player, ototal, ntotal)
+    elseif n >= (s + 5*86400) and n < (s + 6*86400) then
+        sendRechargeMails_2013_02_21(player, ototal, ntotal)
+    elseif n >= (s + 6*86400) and n < (s + 7*86400) then
+        sendRechargeMails_2013_02_22(player, ototal, ntotal)
+    end
 end
 
 function sendRechargeRankAward_2012_10_16(player, pos)
@@ -5431,79 +5376,29 @@ function sendRechargeRankAward_2013_02_22(player, pos)
 end
 
 function sendRechargeRankAward(player, pos)
-    -- 20130119~20130129
-    local t = { ['year'] = 2013, ['month'] = 1, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    -- 20130223~20130301
+    local t = { ['year'] = 2013, ['month'] = 2, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local s = os.time(t)
     local n = os.time()
 
     if n >= (s + 10 * 60) and n < (s + 86400 + 10*60) then
-        sendRechargeRankAward_2013_01_19(player, pos)
-    elseif n >= (s + 86400 + 10*60) and n < (s + 2*86400 + 10*60) then
-        sendRechargeRankAward_2013_01_20(player, pos)
-    elseif n >= (s + 2*86400 + 10*60) and n < (s + 3*86400 + 10*60) then
-        sendRechargeRankAward_2013_01_21(player, pos)
-    elseif n >= (s + 3*86400 + 10*60) and n < (s + 4*86400 + 10*60) then
-        sendRechargeRankAward_2013_01_22(player, pos)
-    elseif n >= (s + 4*86400 + 10*60) and n < (s + 5*86400 + 10*60) then
-        sendRechargeRankAward_2013_01_23(player, pos)
-    elseif n >= (s + 5*86400 + 10*60) and n < (s + 6*86400 + 10*60) then
-        sendRechargeRankAward_2013_01_24(player, pos)
-    elseif n >= (s + 6*86400 + 10*60) and n < (s + 7*86400 + 10*60) then
-        sendRechargeRankAward_2013_01_25(player, pos)
-    elseif n >= (s + 7*86400 + 10*60) and n < (s + 8*86400 + 10*60) then
-        sendRechargeRankAward_2013_01_26(player, pos)
-    elseif n >= (s + 8*86400 + 10*60) and n < (s + 9*86400 + 10*60) then
-        sendRechargeRankAward_2013_01_27(player, pos)
-    elseif n >= (s + 9*86400 + 10*60) and n < (s + 10*86400 + 10*60) then
-        sendRechargeRankAward_2013_01_28(player, pos)
-    elseif n >= (s + 10*86400 + 10*60) and n < (s + 11*86400 + 10*60) then
-        sendRechargeRankAward_2013_01_29(player, pos)
-    end
-
-    -- 20130130~20130222
-    local t = { ['year'] = 2013, ['month'] = 1, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-    local s = os.time(t)
-    local n = os.time()
-
-    if n >= (s + 10 * 60) and n < (s + 86400 + 10*60) then
-        sendRechargeRankAward_2013_01_30(player, pos)
-    elseif n >= (s + 86400 + 10*60) and n < (s + 2*86400 + 10*60) then
-        sendRechargeRankAward_2013_01_31(player, pos)
-    elseif n >= (s + 2*86400 + 10*60) and n < (s + 3*86400 + 10*60) then
-        sendRechargeRankAward_2013_02_01(player, pos)
-    elseif n >= (s + 3*86400 + 10*60) and n < (s + 4*86400 + 10*60) then
-        sendRechargeRankAward_2013_02_02(player, pos)
-    elseif n >= (s + 4*86400 + 10*60) and n < (s + 5*86400 + 10*60) then
-        sendRechargeRankAward_2013_02_03(player, pos)
-    elseif n >= (s + 5*86400 + 10*60) and n < (s + 6*86400 + 10*60) then
-        sendRechargeRankAward_2013_02_04(player, pos)
-    elseif n >= (s + 6*86400 + 10*60) and n < (s + 7*86400 + 10*60) then
-        sendRechargeRankAward_2013_02_05(player, pos)
-    elseif n >= (s + 7*86400 + 10*60) and n < (s + 8*86400 + 10*60) then
-        sendRechargeRankAward_2013_02_06(player, pos)
-    elseif n >= (s + 8*86400 + 10*60) and n < (s + 9*86400 + 10*60) then
-        sendRechargeRankAward_2013_02_07(player, pos)
-    elseif n >= (s + 9*86400 + 10*60) and n < (s + 10*86400 + 10*60) then
-        sendRechargeRankAward_2013_02_08(player, pos)
-
-    elseif n >= (s + 17*86400 + 10*60) and n < (s + 18*86400 + 10*60) then
         sendRechargeRankAward_2013_02_16(player, pos)
-    elseif n >= (s + 18*86400 + 10*60) and n < (s + 19*86400 + 10*60) then
+    elseif n >= (s + 86400 + 10*60) and n < (s + 2*86400 + 10*60) then
         sendRechargeRankAward_2013_02_17(player, pos)
-    elseif n >= (s + 19*86400 + 10*60) and n < (s + 20*86400 + 10*60) then
+    elseif n >= (s + 2*86400 + 10*60) and n < (s + 3*86400 + 10*60) then
         sendRechargeRankAward_2013_02_18(player, pos)
-    elseif n >= (s + 20*86400 + 10*60) and n < (s + 21*86400 + 10*60) then
+    elseif n >= (s + 3*86400 + 10*60) and n < (s + 4*86400 + 10*60) then
         sendRechargeRankAward_2013_02_19(player, pos)
-    elseif n >= (s + 21*86400 + 10*60) and n < (s + 22*86400 + 10*60) then
+    elseif n >= (s + 4*86400 + 10*60) and n < (s + 5*86400 + 10*60) then
         sendRechargeRankAward_2013_02_20(player, pos)
-    elseif n >= (s + 22*86400 + 10*60) and n < (s + 23*86400 + 10*60) then
+    elseif n >= (s + 5*86400 + 10*60) and n < (s + 6*86400 + 10*60) then
         sendRechargeRankAward_2013_02_21(player, pos)
-    elseif n >= (s + 23*86400 + 10*60) and n < (s + 24*86400 + 10*60) then
+    elseif n >= (s + 6*86400 + 10*60) and n < (s + 7*86400 + 10*60) then
         sendRechargeRankAward_2013_02_22(player, pos)
     end
 
-    -- 20130223~20130301
-    local t = { ['year'] = 2013, ['month'] = 2, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    -- 20130302-20130308
+    local t = { ['year'] = 2013, ['month'] = 3, ['day'] = 2, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local s = os.time(t)
     local n = os.time()
 
@@ -6536,211 +6431,6 @@ function getCopyFrontmapAward(step, localtion)
     end
 end
 
---[[
---大闹龙宫
-function checkDragonKingCanSucceed(player, step)
-    if nil == player then
-        return false
-    end
-    if nil == step or step < 1 or step > 5 then
-        return false
-    end
-    local chances = {
-        [1] = 8000,
-        [2] = 5000,
-        [3] = 5000,
-        [4] = {500, 1000, 6000, 9000},
-        [5] = 10000,
-    }
-    local rand = math.random(1, 10000)
-    if step ~= 4 then
-        if rand <= chances[step] then
-            return true
-        end
-    else
-        local fail = player:GetVar(362) + 1
-        if fail > #chances[step] then
-            fail = #chances[step]
-        end
-        if rand <= chances[step][fail] then
-            player:SetVar(362, 0)
-            return true
-        else
-            player:SetVar(362, fail)
-        end
-    end
-    return false
-end
-
-function getDragonKingAward(step)
-    local items = {
-        [1] = {{16, 1}, {29, 2}, {1328, 5}, {51, 1}, {48, 1}, {35, 2}, {548, 1}, {30, 1}},
-        [2] = {{15, 1}, {9283, 1}, {500, 1}, {57, 1}, {1412, 5}, {56, 1}, {135, 1}, {30, 1}},
-        [3] = {{33, 1}, {516, 1}, {501, 1}, {506, 1}, {508, 1}, {512, 1}, {513, 1}, {514, 1}, {517, 1}, {1411, 1}},
-        [4] = {{1325, 1}, {134, 1}, {551, 1}, {8000, 1}, {47, 1}, {515, 1}, {549, 1}, {50, 1}},
-        [5] = {{6134,1}},
-    }
-    local chances = {
-        [1] = {1400, 2800, 4200, 5600, 7000, 8400, 9800, 10000},
-        [2] = {1400, 2800, 4200, 5600, 7000, 8400, 9800, 10000},
-        [3] = {1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000},
-        [4] = {1250, 2500, 3750, 5000, 6250, 7500, 8750, 10000},
-        [5] = {10000},
-    }
-    if nil == step then
-        return {}
-    end
-    if step < 1 or step > 5 then
-        step = 1
-    end
-    if #items[step] ~= #chances[step] then
-        return {}
-    end
-    local r = math.random(1, 10000)
-    for i = 1, #chances[step] do
-        if r <= chances[step][i] then
-            return items[step][i]
-        end
-    end
-    return {}
-end
-
---大闹龙宫之金蛇起舞
-function checkDragonKingSnakeCanSucceed(player, step)
-    if nil == player then
-        return false
-    end
-    if nil == step or step < 1 or step > 5 then
-        return false
-    end
-    local chances = {
-        [1] = 8000,
-        [2] = 5000,
-        [3] = 5000,
-        [4] = {500, 1000, 6000, 9000},
-        [5] = 10000,
-    }
-    local rand = math.random(1, 10000)
-    if step ~= 4 then
-        if rand <= chances[step] then
-            return true
-        end
-    else
-        local fail = player:GetVar(368) + 1
-        if fail > #chances[step] then
-            fail = #chances[step]
-        end
-        if rand <= chances[step][fail] then
-            player:SetVar(368, 0)
-            return true
-        else
-            player:SetVar(368, fail)
-        end
-    end
-    return false
-end
-
-function getDragonKingSnakeAward(step)
-    local items = {
-        [1] = {{16, 1}, {29, 2}, {1328, 5}, {51, 1}, {48, 1}, {35, 2}, {548, 1}, {30, 1}},
-        [2] = {{15, 1}, {9283, 1}, {500, 1}, {57, 1}, {1412, 5}, {56, 1}, {135, 1}, {30, 1}},
-        [3] = {{33, 1}, {516, 1}, {501, 1}, {506, 1}, {508, 1}, {512, 1}, {513, 1}, {514, 1}, {517, 1}, {1411, 1}},
-        [4] = {{1325, 1}, {134, 1}, {551, 1}, {8000, 1}, {47, 1}, {515, 1}, {549, 1}, {50, 1}},
-        [5] = {{6135,1}},
-    }
-    local chances = {
-        [1] = {1400, 2800, 4200, 5600, 7000, 8400, 9800, 10000},
-        [2] = {1400, 2800, 4200, 5600, 7000, 8400, 9800, 10000},
-        [3] = {1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000},
-        [4] = {1250, 2500, 3750, 5000, 6250, 7500, 8750, 10000},
-        [5] = {10000},
-    }
-    if nil == step then
-        return {}
-    end
-    if step < 1 or step > 5 then
-        step = 1
-    end
-    if #items[step] ~= #chances[step] then
-        return {}
-    end
-    local r = math.random(1, 10000)
-    for i = 1, #chances[step] do
-        if r <= chances[step][i] then
-            return items[step][i]
-        end
-    end
-    return {}
-end
-
---大闹龙宫之
-function checkDragonKingTMCanSucceed(player, step)
-    if nil == player then
-        return false
-    end
-    if nil == step or step < 1 or step > 5 then
-        return false
-    end
-    local chances = {
-        [1] = 8000,
-        [2] = 5000,
-        [3] = 5000,
-        [4] = {500, 1000, 6000, 9000},
-        [5] = 10000,
-    }
-    local rand = math.random(1, 10000)
-    if step ~= 4 then
-        if rand <= chances[step] then
-            return true
-        end
-    else
-        local fail = player:GetVar(370) + 1
-        if fail > #chances[step] then
-            fail = #chances[step]
-        end
-        if rand <= chances[step][fail] then
-            player:SetVar(370, 0)
-            return true
-        else
-            player:SetVar(370, fail)
-        end
-    end
-    return false
-end
-
-function getDragonKingTMAward(step)
-    local items = {
-        [1] = {{16, 1}, {29, 2}, {1328, 5}, {51, 1}, {48, 1}, {35, 2}, {548, 1}, {30, 1}},
-        [2] = {{15, 1}, {9283, 1}, {500, 1}, {57, 1}, {1412, 5}, {56, 1}, {135, 1}, {30, 1}},
-        [3] = {{33, 1}, {516, 1}, {501, 1}, {506, 1}, {508, 1}, {512, 1}, {513, 1}, {514, 1}, {517, 1}, {1411, 1}},
-        [4] = {{1325, 1}, {134, 1}, {551, 1}, {8000, 1}, {47, 1}, {515, 1}, {549, 1}, {50, 1}},
-        [5] = {{136,1}},
-    }
-    local chances = {
-        [1] = {1400, 2800, 4200, 5600, 7000, 8400, 9800, 10000},
-        [2] = {1400, 2800, 4200, 5600, 7000, 8400, 9800, 10000},
-        [3] = {1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000},
-        [4] = {1250, 2500, 3750, 5000, 6250, 7500, 8750, 10000},
-        [5] = {10000},
-    }
-    if nil == step then
-        return {}
-    end
-    if step < 1 or step > 5 then
-        step = 1
-    end
-    if #items[step] ~= #chances[step] then
-        return {}
-    end
-    local r = math.random(1, 10000)
-    for i = 1, #chances[step] do
-        if r <= chances[step][i] then
-            return items[step][i]
-        end
-    end
-    return {}
-end
---]]
 
 --flag == 1,2,3
 --1:大闹龙宫

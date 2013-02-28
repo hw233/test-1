@@ -187,6 +187,7 @@ bool   World::_townReward_10_15 = false;
 bool World::_loginAward = false;
 bool World::_bluediamonSuperman = false;
 bool World::_tgcevent = false;
+bool World::_weiboact = false;
 bool World::_compassact = false;
 UInt8 World::_callsnakeeggact = 0;
 UInt8 World::_snakeeggawardact = 0;
@@ -474,6 +475,13 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 2, 28)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 1)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 6)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 7)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 9)
 
             ))
     {
@@ -1204,6 +1212,13 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 2, 28)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 1)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 6)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 7)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 9)
             )
         bRechargeEnd = true;
 

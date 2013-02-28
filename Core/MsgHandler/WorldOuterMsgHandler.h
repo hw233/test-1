@@ -2291,10 +2291,6 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         case 0x0A:
         case 0x0B:
         {
-            /*
-            if(!World::getDragonKingAct())
-                return;
-            */
             brd >> op;
             switch(op)
             {
@@ -2350,48 +2346,6 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             }
             break;
         }
-        /*
-        //大闹龙宫之金蛇起舞
-        case 0x0A:
-        {
-            brd >> op;
-            switch(op)
-            {
-            case 0x01:  //获取龙宫信息
-                player->getDragonKingInfoSnake();
-                break;
-            case 0x02:  //龙宫寻宝
-                {
-                    UInt8 count= 0;
-                    brd >> count;
-                    player->postDragonKingSnake(count);
-                }
-                break;
-            default:
-                break;
-            }
-        }
-        //大闹龙宫之
-        case 0x0B:
-        {
-            brd >> op;
-            switch(op)
-            {
-            case 0x01:  //获取龙宫信息
-                player->getDragonKingInfoTianMang();
-                break;
-            case 0x02:  //龙宫寻宝
-                {
-                    UInt8 count= 0;
-                    brd >> count;
-                    player->postDragonKingTianMang(count);
-                }
-                break;
-            default:
-                break;
-            }
-        }
-        */
         default:
             break;
     }
