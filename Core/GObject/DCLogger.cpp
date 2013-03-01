@@ -65,30 +65,28 @@ bool DCLogger::reg(Player* player)
         return true;
     std::ostringstream msg;
 
-    msg << "version=";
-    msg << version;
     msg << "&appid=";
     msg << appid;
     msg << "&userip=";
-    msg << player->getClientIp();
+    msg << player->getClientAddress();
     msg << "&svrip=";
     msg << cfg.serverIp;
     msg << "&time=";
     msg << time(NULL);
+    msg << "&domain=";
+    msg << player->getDomain();
     msg << "&worldid=";
     msg << cfg.serverNum;
+    msg << "&optype=3&actionid=2";
     msg << "&opuid=";
     msg << player->getId();
     msg << "&opopenid=";
     msg << player->getOpenId();
-    msg << "&pf=";
-    msg << player->getSource();
-    msg << "&openkey=";
+    msg << "&key=";
     msg << player->getOpenKey();
-    msg << "&pfkey=";
-    msg << player->getPfKey();
+    msg << "&source=";
+    msg << player->getSource();
     msg << "&touid=&toopenid=&level=&itemid=&itemtype=&itemcnt=&modifyexp=&totalexp=&modifycoin=&totalcoin=&modifyfee=&totalfee=&onlinetime=&keycheckret=&safebuf=&remark=&user_num=";
-
 #ifndef _FB
 #ifndef _VT
 #ifndef _WIN32
@@ -938,30 +936,28 @@ bool DCLogger::reg_union(Player* player)
         return true;
     std::ostringstream msg;
 
-    msg << "version=";
-    msg << version;
-    msg << "&appid=";
+    msg << "appid=";
     msg << appid;
+    msg << "&version=";
+    msg << version;
     msg << "&userip=";
-    msg << player->getClientAddress();
+    msg << inet_addr(player->getClientIp());
     msg << "&svrip=";
     msg << cfg.serverIp;
     msg << "&time=";
     msg << time(NULL);
-    msg << "&domain=";
-    msg << player->getDomain();
     msg << "&worldid=";
     msg << cfg.serverNum;
-    msg << "&optype=3&actionid=2";
     msg << "&opuid=";
     msg << player->getId();
     msg << "&opopenid=";
     msg << player->getOpenId();
-    msg << "&key=";
-    msg << player->getOpenKey();
-    msg << "&source=";
+    msg << "&pf=";
     msg << player->getSource();
-    msg << "&touid=&toopenid=&level=&itemid=&itemtype=&itemcnt=&modifyexp=&totalexp=&modifycoin=&totalcoin=&modifyfee=&totalfee=&onlinetime=&keycheckret=&safebuf=&remark=&user_num=";
+    msg << "&openkey=";
+    msg << player->getOpenKey();
+    msg << "&pfkey=";
+    msg << player->getPfKey();
 
 #ifndef _FB
 #ifndef _VT
