@@ -141,6 +141,7 @@ bool World::_july = false;
 bool World::_qixi= false;
 bool World::_wansheng= false;
 bool World::_qingren= false;
+bool World::_specialbook= false;
 bool World::_11Act= false;
 bool World::_ssToolbarAct= false;
 bool World::_snowAct= false;
@@ -466,6 +467,13 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 2, 21)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 2, 22)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 2, 23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 2, 24)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 2, 25)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 2, 26)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 2, 27)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 2, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 2)
 
             ))
     {
@@ -1189,6 +1197,13 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 2, 21)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 2, 22)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 2, 23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 2, 24)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 2, 25)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 2, 26)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 2, 27)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 2, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 2)
             )
         bRechargeEnd = true;
 

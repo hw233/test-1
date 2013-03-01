@@ -1124,6 +1124,11 @@ namespace Script
 		return Call<bool>("getHeroMemoAward", player, idx, soul);
 	}
 
+    void GameActionLua::flushHeroMemoAward(Player* player, UInt8 idx)
+    {
+        return Call<void>("flushHeroMemoAward", player, idx);
+    }
+
 	bool GameActionLua::getShuoShuoAward(Player* player, UInt8 idx)
 	{
 		return Call<bool>("getShuoShuoAward", player, idx);
@@ -1510,6 +1515,18 @@ namespace Script
         return Call<UInt32>("getDreamerItem", id, index);
     }
 
+    /*
+    Table GameActionLua::getDragonKingAward(UInt8 step, UInt8 flag)
+	{
+		return Call<Table>("getDragonKingAward", step, flag);
+	}
+
+    bool GameActionLua::checkDragonKingCanSucceed(Player * player, UInt8 step, UInt8 flag)
+	{
+		assert(player != NULL);
+		return Call<bool>("checkDragonKingCanSucceed", player, step, flag);
+	}
+    */
     Table GameActionLua::getDragonKingAward(UInt8 step)
 	{
 		return Call<Table>("getDragonKingAward", step);
@@ -1530,6 +1547,17 @@ namespace Script
 	{
 		assert(player != NULL);
 		return Call<bool>("checkDragonKingSnakeCanSucceed", player, step);
+	}
+
+    Table GameActionLua::getDragonKingTMAward(UInt8 step)
+	{
+		return Call<Table>("getDragonKingTMAward", step);
+	}
+
+    bool GameActionLua::checkDragonKingTMCanSucceed(Player * player, UInt8 step)
+	{
+		assert(player != NULL);
+		return Call<bool>("checkDragonKingTMCanSucceed", player, step);
 	}
 
     Table GameActionLua::getSaveGoldActAward(UInt32 gold)

@@ -344,6 +344,8 @@ namespace GObject
         VAR_SAVEGOLD_ISGET = 366,   //金蛇献瑞,聚福兆祥活动中玩家当日是否领取
         VAR_DRAGONKINGSNAKE_STEP = 367,      //大闹龙宫之金蛇起舞当前移动到的格子
         VAR_DRAGONKINGSNAKE_STEP4_COUNT = 368, //大闹龙宫之金蛇起舞从第4格移动到第5失败的次数
+        VAR_TIANMANG_STEP = 369,      //大闹龙宫之天芒神梭当前移动到的格子
+        VAR_TIANMANG_STEP4_COUNT = 370, //大闹龙宫之天芒神梭从第4格移动到第5失败的次数
         
         VAR_CALLSNAKEEGG = 371,         //拜金蛇
         VAR_SNAKEEGG_AWARD=372,         //领蛇蛋
@@ -661,6 +663,8 @@ namespace GObject
             REGISTER_VAR(VAR_SAVEGOLD_ISGET, CYCLE_DAY);
             REGISTER_VAR(VAR_DRAGONKINGSNAKE_STEP, CYCLE_NONE);
             REGISTER_VAR(VAR_DRAGONKINGSNAKE_STEP4_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_TIANMANG_STEP, CYCLE_NONE);
+            REGISTER_VAR(VAR_TIANMANG_STEP4_COUNT, CYCLE_NONE);
 
             REGISTER_VAR(VAR_CALLSNAKEEGG, CYCLE_NONE);
             REGISTER_VAR(VAR_SNAKEEGG_AWARD, CYCLE_NONE);

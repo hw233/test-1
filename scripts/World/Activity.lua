@@ -823,6 +823,9 @@ function onActivityCheck(tm)
       elseif tm >= actTime562 and tm < actTime562_1 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
+      elseif tm >= actTime563 and tm < actTime563_1 then
+          setRechargeActive(true, 16)
+          setNeedRechargeRank(true)
       else
           setRechargeActive(false, 16)
           setNeedRechargeRank(false)
@@ -932,6 +935,12 @@ function onActivityCheck(tm)
           setQingren(true)
       else
           setQingren(false)
+      end
+
+      if tm >= actTime242_0 and tm < actTime242_1 then
+          setSpecialBookAct(true)
+      else
+          setSpecialBookAct(false)
       end
 
       if tm >= actTime2013_02_01 and tm < actTime2013_02_09 then
@@ -1151,6 +1160,7 @@ function initActTime(y, m, d)
   local  SerStartTm560= { ['year'] = 2013, ['month'] = 1, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm561= { ['year'] = 2013, ['month'] = 2, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm562= { ['year'] = 2013, ['month'] = 2, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm563= { ['year'] = 2013, ['month'] = 2, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --风雷罗盘
   local  SerStartTm551= { ['year'] = 2013, ['month'] = 1, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm551_1= { ['year'] = 2013, ['month'] = 3, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1246,7 +1256,9 @@ function initActTime(y, m, d)
   --情人节浪漫之旅
   local  SerStartTm241 = { ['year'] = 2013, ['month'] = 2, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm241_1 = { ['year'] = 2013, ['month'] = 2, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-
+  --特殊古籍活动
+  local  SerStartTm242 = { ['year'] = 2013, ['month'] = 2, ['day'] = 20, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm242_1 = { ['year'] = 2013, ['month'] = 2, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   --300-399越南版用了
   actTime0 = os.time(SerStartTm);
@@ -1534,6 +1546,9 @@ function initActTime(y, m, d)
 
   actTime562 = os.time(SerStartTm562);
   actTime562_1 = os.time(SerStartTm562) + 7 * 86400;
+
+  actTime563 = os.time(SerStartTm563);
+  actTime563_1 = os.time(SerStartTm563) + 7 * 86400;
   -- 繁体版
   actTime101 = os.time(SerStartTm101);
   actTime102 = os.time(SerStartTm101) + 8 * 86400;
@@ -1639,6 +1654,9 @@ function initActTime(y, m, d)
 
   actTime241_0= os.time(SerStartTm241);
   actTime241_1= os.time(SerStartTm241_1);
+
+  actTime242_0= os.time(SerStartTm242);
+  actTime242_1= os.time(SerStartTm242_1);
 
   actTime2013_01_29= os.time(SerStartTm2013_01_29);
   actTime2013_02_01= os.time(SerStartTm2013_02_01);

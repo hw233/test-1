@@ -115,6 +115,13 @@ function loadStore()
 
         discount(store)
 
+        if getSpecialBookAct() then  --特殊古籍活动
+            store:add(2, 11113, 50)
+            store:add(2, 11114, 60)
+            store:add(2, 11115, 70)
+            store:add(2, 11116, 80)
+        end
+
         if getQingren() then    --蜀山之恋
             store:add(2, 9355,10)
         end

@@ -141,6 +141,8 @@ void WorldScript::init()
     def("getWansheng", GObject::World::getWansheng);
     def("setQingren", GObject::World::setQingren);
     def("getQingren", GObject::World::getQingren);
+    def("setSpecialBookAct", GObject::World::setSpecialBookAct);
+    def("getSpecialBookAct", GObject::World::getSpecialBookAct);
     def("set11Act", GObject::World::set11Act);
     def("get11Act", GObject::World::get11Act);
     def("setSSToolbarAct", GObject::World::setSSToolbarAct);
