@@ -435,7 +435,7 @@ function RunBlueDiamondAward(player, opt)
 
     local chance = {785,2833,4881,5823,7202,7987,9366,10000}
     local chance_1 = {1428, 1428*2, 1428*3, 1428*4, 1428*5, 1428*6, 10000, 10000}
-    local item_9190 = {{515,1},{507,1},{509,1},{503,5},{1325,2},{47,2},{134,2},{5026,1}}
+    local item_9190 = {{515,3},{507,2},{509,2},{503,10},{1325,4},{47,3},{134,4},{5026,1}}
     local item_9191 = {{515,1},{507,1},{509,1},{503,5},{1325,2},{47,2},{134,2},{5026,1}}
     local item_9217 = {{515,3},{507,2},{509,2},{503,10},{1325,4},{47,3},{134,4},{5026,1}}
     local item_9284 = {{507,2},{509,2},{503,10},{1325,4},{47,3},{134,4},{515,10},{'ipad',1}}
@@ -488,8 +488,10 @@ function RunBlueDiamondAward(player, opt)
     if opt == 1 then
         player:AddVar(VAR_BLUE_AWARD_COUNT, 1);
         count = player:GetVar(VAR_BLUE_AWARD_COUNT);
-        if count == 12 then
+        if count == 9 then
             package:Add(1707, 1, true, 0, 31);
+            package:Add(515, 10, true, 0, 31); 
+            package:Add(509, 5, true, 0, 31); 
         end
     elseif opt == 2 then
         player:AddVar(VAR_YELLOW_AWARD_COUNT, 1);
