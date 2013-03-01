@@ -3610,7 +3610,8 @@ bool Fighter::CanDelCitta(UInt16 citta)
     //儒1202:三昧真火 释1203:乾元指 道1206:御剑术
     //墨1333,1334,1336,1340,1341,1342
     UInt16 cId = CITTA_ID(citta);
-    UInt16 cittaIds[] = { 3, 4, 7, 134, 135, 137, 141, 142, 143 };
+    //UInt16 cittaIds[] = { 3, 4, 7, 134, 135, 137, 141, 142, 143 };
+    UInt16 cittaIds[] = { 3, 4, 7, 141, 142, 143 };
     for(UInt16 i = 0; i < sizeof(cittaIds) / sizeof(cittaIds[0]); ++i)
     {
         if(cId == cittaIds[i])
@@ -3633,11 +3634,15 @@ bool Fighter::delCitta( UInt16 citta, bool writedb )
     if (*it != citta)
         return false;
 
-    offCitta(citta, true, true, writedb);
+    UInt16 cittaId = CITTA_ID(citta); 
+    bool isMoDefaultCitta = (cittaId == 134 || cittaId == 135 || cittaId == 137);
+    if (!isMoDefaultCitta)
+    {
+        offCitta(citta, true, true, writedb);
 
-    *it = 0;
-    _cittas.erase(it);
-
+        *it = 0;
+        _cittas.erase(it);
+    }
     {
         const GData::CittaBase* cb = GData::cittaManager[citta];
         const GData::CittaBase* yacb = cb;
@@ -3663,19 +3668,72 @@ bool Fighter::delCitta( UInt16 citta, bool writedb )
                 exp = exp % 10000;
                 rCount3 = static_cast<UInt16>(exp / 100);
             }
-            SYSMSG(title, 2105);
-            SYSMSGV(content, 2106, getLevel(), getColor(), getName().c_str(), yacb->type, yacb->getName().c_str(), lvl);
+            UInt16 tId = 2010;
+            UInt16 cId = 2011;
+            if (!cb->effect->skill.empty())
+            {
+                tId = 2012;
+                cId = 2013;
+                if (isMoDefaultCitta)
+                {
+                    tId = 2014;
+                    cId = 2015;
+                }
+            }
+            SYSMSG(title, tId);
+            SYSMSGV(content, cId, getLevel(), getColor(), getName().c_str(), yacb->type, yacb->getName().c_str(), lvl);
             MailPackage::MailItem mitem[4] = {{static_cast<UInt16>(CITTA_ITEMID(citta)), 1}, {31, rCount1}, {30, rCount2}, {29, rCount3}};
             MailItemsInfo itemsInfo(mitem, DismissCitta, 4);
             GObject::Mail * pmail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
-            if(pmail)
+            if(pmail && !isMoDefaultCitta)
                 GObject::mailPackageManager.push(pmail->id, mitem, 4, true);
+            ////////////////////
+            //返回技能符文熔炼符60%
+            UInt16 skillid = 0;
+            if (!cb->effect->skill.empty())
+                skillid = cb->effect->skill[0]->getId();
+            UInt32 sid = SKILL_ID(skillid);
+            std::map<UInt16, SStrengthen>::iterator i = m_ss.find(sid);
+            if (i != m_ss.end())
+            {
+                SStrengthen& ss = i->second;
+                UInt16 ssCount1 = 0;
+                UInt16 ssCount2 = 0;
+                UInt16 ssCount3 = 0;
+                UInt16 ssCount4 = 0;
+                UInt32 ssExp = 0;
+                for (UInt8 lvl = 0; lvl < ss.lvl; ++lvl)
+                {
+                    ssExp += GData::GDataManager::getMaxStrengthenVal(sid, lvl);
+                }
+                ssExp += ss.curVal;
+                ssExp *= 0.6;
+                if(ssExp){
+                    ssCount1 = static_cast<UInt16>(ssExp / 1000);
+                    ssExp = ssExp % 1000;
+                    ssCount2 = static_cast<UInt16>(ssExp / 200);
+                    ssExp = ssExp % 200;
+                    ssCount3 = static_cast<UInt16>(ssExp / 50);
+                    ssExp = ssExp % 50;
+                    ssCount4 = static_cast<UInt16>(ssExp / 10);
+                    MailPackage::MailItem ssmitem[4] = {{1325,ssCount1}, {1326, ssCount2}, {1327, ssCount3}, {1328, ssCount4}};
+                    GObject::mailPackageManager.push(pmail->id, ssmitem, 4, true);
+
+                }
+                ss.maxVal = 0;
+                ss.curVal = 0;
+                ss.lvl = 0;
+                ss.maxLvl = 0;
+                SSUpdate2DB(skillid,ss);
+            }
+            //////////////////////
         }
     }
 
     _attrDirty = true;
     _bPDirty = true;
-    sendModification(0x2d, citta, 2/*1add,2del,3mod*/, writedb);
+    if (!isMoDefaultCitta)
+        sendModification(0x2d, citta, 2/*1add,2del,3mod*/, writedb);
 
     //散功成就
     GameAction()->doAttainment(_owner, 10081, 0);
@@ -4906,9 +4964,9 @@ void Fighter::SSOpen(UInt16 id)
         else
         {
             _owner->skillStrengthenLog(1, 0);
-            _owner->sendMsgCode(0, 1024);
         }
     }
+
     else
     {
         UInt32 prob = GData::GDataManager::getSkillStrengthenProb(sid, i->second.maxLvl);
