@@ -146,21 +146,34 @@ namespace GObject
 	{
 		UInt32 now = TimeUtil::Now();
 		float exp = calcExpEach(now);
+        UInt32 tmp;
         UInt32 curHookIndex = m_Player->GetVar(VAR_EXP_HOOK_INDEX);
         if(curHookIndex == ENUM_TRAINP1)
         {
-            if(m_Player->GetVar(VAR_TRAINP1))
+            tmp = m_Player->GetVar(VAR_TRAINP1);
+            if(tmp > 0)
+            {
                 exp *= 1.2f;
+                m_Player->SetVar(VAR_TRAINP1, tmp - 1);
+            }
         }
         else if(curHookIndex == ENUM_TRAINP2)
         {
-            if(m_Player->GetVar(VAR_TRAINP2))
+            tmp = m_Player->GetVar(VAR_TRAINP2);
+            if(tmp > 0)
+            {
                 exp *= 1.5f;
+                m_Player->SetVar(VAR_TRAINP2, tmp - 1);
+            }
         }
         else if(curHookIndex == ENUM_TRAINP3)
         {
-            if(m_Player->GetVar(VAR_TRAINP3))
+            tmp = m_Player->GetVar(VAR_TRAINP3);
+            if(tmp > 0)
+            {
                 exp *= 1.8f;
+                m_Player->SetVar(VAR_TRAINP3, tmp - 1);
+            }
         }
 #if 0
 		_npcGroup->monsterKilled(m_Player);
