@@ -4411,13 +4411,13 @@ function ItemNormal_00009092(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-    if package:GetRestPackageSize() < num*2/99 then
+    if package:GetRestPackageSize() < (2+num*2/99) then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
 
-    package:Add(9360, num, true, 0, 2);
-    package:Add(9361, num, true, 0, 2);
+    package:Add(9360, num, bind, 0, 2);
+    package:Add(9361, num, bind, 0, 2);
 
     package:DelItemSendMsg(iid, player);
     return num;
@@ -4781,7 +4781,7 @@ function ItemNormal_00009126(iid, num, bind, param)
         player:sendMsgCode(2, 1011, 0);
         return false
     end
-    package:Add(56, totalCnt, true, 0, 2);
+    package:Add(56, totalCnt, bind, 0, 2);
     package:DelItemSendMsg(iid, player);
     return num
 end

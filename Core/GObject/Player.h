@@ -938,10 +938,6 @@ namespace GObject
 		void addBuffData(UInt8, UInt32);
 		void testBattlePunish();
         void sendExpHook(UInt8 id, UInt32 data);
-		UInt32 getBuffDataExp(UInt8 idx, UInt32 tm = TimeUtil::Now());
-		UInt32 getBuffLeftExp(UInt8 idx, UInt32 tm = TimeUtil::Now());
-		void setBuffDataExp(UInt8, UInt32, bool = true );
-		void addBuffDataExp(UInt8, UInt32);
 
         UInt32 GetVar(UInt32 id);
         Int32 GetVarS(Int32 id);
@@ -2147,10 +2143,7 @@ namespace GObject
         void calcNewYearQzoneContinueDay(UInt32 time);
         void transferExpBuffer2Var();
 
-        inline bool relateExpHook(UInt8 id) { return id == 5 || id == 6 || id == 10/* || id == 11 || id == 24*/; }
-        inline bool relateExpHookLow(UInt8 id) { return id == 5; }
-        inline bool relateExpHookHigh(UInt8 id) { return id == 6/* || id == 11 || id == 24*/; }
-        inline bool relateExpHookQitian(UInt8 id) { return id == 10; }
+        inline bool relateExpHook(UInt8 id) { return id == PLAYER_BUFF_TRAINP1 || id == PLAYER_BUFF_TRAINP2 || id == PLAYER_BUFF_TRAINP3/* || id == PLAYER_BUFF_TRAINP4 || id == PLAYER_BUFF_ADVANCED_HOOK*/; }
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

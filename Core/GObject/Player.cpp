@@ -2319,16 +2319,6 @@ namespace GObject
 			sendModification(0x40 + id, data, writedb);
 	}
 
-	void Player::setBuffDataExp(UInt8 id, UInt32 data, bool writedb)
-	{
-        if(!relateExpHook(id))
-            return;
-        UInt32 varId = bufferId2VarId(id);
-        if(varId == 0)
-            return;
-        SetVar(varId, data);
-    }
-
 	void Player::addBuffData(UInt8 id, UInt32 data)
 	{
 		if(id >= PLAYER_BUFF_COUNT || data == 0)
@@ -2341,17 +2331,6 @@ namespace GObject
 			_buffData[id] = olddata + data;
 		sendModification(0x40 + id, _buffData[id]);
 	}
-
-	void Player::addBuffDataExp(UInt8 id, UInt32 data)
-	{
-        if(!relateExpHook(id))
-            return;
-        if(data == 0)
-            return;
-        UInt32 varId = bufferId2VarId(id);
-        if(varId > 0)
-            AddVar(varId, data);
-    }
 
 	UInt32 Player::getBuffData( UInt8 idx, UInt32 tm )
 	{
@@ -2373,17 +2352,6 @@ namespace GObject
 		return _buffData[idx];
 	}
 
-	UInt32 Player::getBuffDataExp( UInt8 idx, UInt32 tm )
-	{
-        if(!relateExpHook(idx))
-            return 0;
-        UInt32 varId = bufferId2VarId(idx);
-        if(varId > 0)
-            return GetVar(varId);
-        else
-            return 0;
-    }
-
 	UInt32 Player::getBuffLeft( UInt8 idx, UInt32 tm )
 	{
 		UInt32 buff = getBuffData( idx, tm );
@@ -2395,11 +2363,6 @@ namespace GObject
 			return 0;
 		}
 		return buff - tm;
-	}
-
-	UInt32 Player::getBuffLeftExp( UInt8 idx, UInt32 tm )
-	{
-        return getBuffDataExp(idx, tm);
 	}
 
     UInt32 Player::GetVar(UInt32 id)
