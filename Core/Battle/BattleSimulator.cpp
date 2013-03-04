@@ -7706,16 +7706,6 @@ bool BattleSimulator::doSkillStrengthen_AttackFriend(BattleFighter* bf, const GD
             return false;
 
         dmg *= ef->value/100;
-        switch (eType)
-        {
-            case e_damNormal:
-            case e_damEvade:
-            case e_damOut:
-                break;
-            default:
-                TRACE_LOG("Impossibale eType.");
-
-        }
         appendDefStatus(eType, dmg, fighter, e_damagePhysic); // 这里应该都是普通物理攻击吧
         if (eType == e_damNormal)
         {
@@ -9851,7 +9841,7 @@ void BattleSimulator::makeDamage(BattleFighter* bo, UInt32& u)
 {
     if(!bo)
         return;
-    float shieldHp = bo->getHpShieldSelf();
+    float& shieldHp = bo->getHpShieldSelf();
     if(shieldHp > 0)
     {
         if(u > shieldHp)

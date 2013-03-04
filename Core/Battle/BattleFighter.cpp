@@ -1890,8 +1890,8 @@ bool BattleFighter::makeShieldDamage(UInt32& u)
     }
     else
     {
-        u = 0;
         shieldHP -= u;
+        u = 0;
     }
 
     return true;
