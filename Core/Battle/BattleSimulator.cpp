@@ -1452,6 +1452,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                     dmg2 *= static_cast<float>(950 + _rnd(100)) / 1000;
 
                     dmg2 = dmg2 > 0 ? dmg2 : 1;
+                    UInt32 dmg3 = dmg2;
 
                     makeDamage(bf, dmg2);
                     if(bf->getMagAtkReduce3Last() > 0)
@@ -1473,7 +1474,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                         _defList[0].damType2 |= 0x40;
                     if(pr2)
                         _defList[0].damType2 |= 0x20;
-                    _defList[0].counterDmg = dmg2;
+                    _defList[0].counterDmg = dmg3;
                     // killed the fighter
                     if(bf->getHP() == 0)
                     {
