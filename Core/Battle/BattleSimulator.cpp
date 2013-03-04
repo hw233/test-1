@@ -1240,11 +1240,12 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
             if(dmg3 > 0)
             {
                 makeDamage(area_target, dmg3);
+                if (magdmgFlag)
+                    appendDefStatus(e_damNormal, magdmg, area_target, e_damageMagic);
+                if (dmgFlag)
+                    appendDefStatus(e_damNormal, dmg, area_target, e_damagePhysic);
             }
-            if (magdmgFlag)
-                appendDefStatus(e_damNormal, magdmg, area_target, e_damageMagic);
-            if (dmgFlag)
-                appendDefStatus(e_damNormal, dmg, area_target, e_damagePhysic);
+
             //appendDefStatus(e_damNormal, dmg3, area_target);
             //printf("%u:%u %s %u:%u, made %u damage, hp left: %u\n", 1-side, from_pos, cs2 ? "CRITICALs" : "hits", side, pos, dmg, area_target->getHP());
             // killed the target fighter
@@ -9859,6 +9860,10 @@ void BattleSimulator::makeDamage(BattleFighter* bo, UInt32& u)
         {
             bo->setHpShieldSelf(0, 0);
             appendDefStatus(e_unHpShieldSelf, 0, bo);
+        }
+        else
+        {
+            appendDefStatus(e_hpShieldSelf, shieldHp, bo);
         }
     }
 
