@@ -187,6 +187,7 @@ bool   World::_townReward_10_15 = false;
 bool World::_loginAward = false;
 bool World::_bluediamonSuperman = false;
 bool World::_tgcevent = false;
+bool World::_weiboact = false;
 bool World::_compassact = false;
 UInt8 World::_callsnakeeggact = 0;
 UInt8 World::_snakeeggawardact = 0;

@@ -509,6 +509,11 @@ public:
     inline static bool getTgcEvent()
     { return _tgcevent; }
 
+    inline static void setWeiboAct(bool v)
+    { _weiboact = v; }
+    inline static bool getWeiboAct()
+    { return _weiboact; }
+
     inline static void setArenaHeroId(UInt8 pos, UInt8 heroId)
     {
         if(pos < 5 && stArena.heroId[pos] != heroId)
@@ -753,6 +758,7 @@ public:
     static bool _loginAward;
     static bool _bluediamonSuperman;
     static bool _tgcevent;
+    static bool _weiboact;
     static stArenaExtra stArenaOld[2];
     static stArenaExtra stArena;
     static bool _compassact;
