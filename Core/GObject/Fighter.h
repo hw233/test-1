@@ -903,6 +903,18 @@ public:
 
 	struct Offset { Int8 x, y; };
 	std::vector<Offset> extraPos;
+
+    // 仙宠
+private:
+     bool m_isPet;      //
+     bool m_onBattle;   // 出战
+     UInt8 m_petLv1;    // 品阶 (第一品阶为50级，之后每一品阶等价10级)
+     UInt8 m_petLv2;    // 重天 (每十重天升一品阶)
+
+public:
+    bool isPet() { return m_isPet; }
+    bool isOnBattle { return m_onBattle; }
+    void setOnBattle(bool flag) { m_onBattle = flag; }
 };
 class GlobalFighters
 {
