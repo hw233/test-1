@@ -289,7 +289,10 @@ public:
     const GData::SkillBase* getPassiveSkillEnter(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillDead(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillAftNAtk(bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnAtkDmg(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnPetProtect(bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnPetAtk(bool noPossibleTarget = false);
+
     void releaseSkillCD(int cd);
     void releaseSkillCD(std::vector<GData::SkillItem>& skill, int cd);
 
@@ -569,7 +572,11 @@ private:
     bool  _petProtect100;
     UInt8 _petProtect100Last;
 
+    float  _petAtk100;
+    UInt8 _petAtk100Last;
+
     bool  _petMark;
+
 
     // cotton add for skillstrengthen
 public:
@@ -840,6 +847,7 @@ private:
     std::vector<GData::SkillItem> _passiveSkillOnCounter;
     std::vector<GData::SkillItem> _passiveSkillOnCounter100;
     std::vector<GData::SkillItem> _passiveSkillOnAttackBleed100;
+    std::vector<GData::SkillItem> _passiveSkillOnAtkDmg;
     std::vector<GData::SkillItem> _passiveSkillOnAtkDmg100;
     float _darkVigor, _dvFactor;
     UInt8 _darkVigorLast;
@@ -872,19 +880,24 @@ public:
     GData::LBSkillItem* getStateCondItem(UInt16 state);
     void releaseLBSkillCD();
 
-    float getHpShieldSelf() { return _hpShieldSelf; }
+    float& getHpShieldSelf() { return _hpShieldSelf; }
     void setHpShieldSelf(float v, UInt8 l) { _hpShieldSelf = v; _hpShieldSelf_last = l; }
     bool releaseHpSieldSelf();
 
     inline float& getPetShieldHP() { return _petShieldHP; }
     inline void setPetShieldHP(float value) { _petShieldHP = value; }
 
-    inline bool isPetProtect100() { return _petProtect100; }
+    inline bool getPetProtect100() { return _petProtect100; }
     inline void setPetProtect100(bool v, UInt8 l) { _petProtect100 = v; _petProtect100Last = l; }
     bool releasePetProtect100();
 
     inline void setPetMark(bool v) { _petMark = v; }
     inline bool isPetMark() { return _petMark; }
+
+    inline float getPetAtk100() { return _petAtk100; }
+    inline bool getPetAtk100Last() { return _petAtk100Last;}
+    inline void setPetAtk100(float v, UInt8 l) { _petAtk100 = v; _petAtk100Last = l; }
+    bool releasePetAtk100();
 
 public:
 	enum StatusFlag

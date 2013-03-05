@@ -1556,7 +1556,8 @@ CREATE TABLE IF NOT EXISTS `clan_copy_log` (
     `logTime` bigint(20) unsigned NOT NULL,
     `logType` smallint(6) NOT NULL,
     `playerName` varchar(255) NOT NULL,
-    `logVal` bigint(20) unsigned NOT NULL
+    `logVal` bigint(20) unsigned NOT NULL,
+    INDEX (`clanId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `reportid`;

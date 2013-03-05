@@ -474,6 +474,7 @@ private:
     void doSkillEffectExtra_AtkPetMarkAura(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_AtkPetMarkDmg(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_ProtectPet100(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
+    void doSkillEffectExtra_PetAtk100(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
 
 
     void doSkillEffectExtraAbsorb(BattleFighter* bf, UInt32 dmg, const GData::SkillBase* skill);
@@ -512,6 +513,8 @@ private:
 	std::vector<BattleFighter*> _onSkillDmg;
 	std::vector<BattleFighter*> _onOtherDead;
     std::vector<BattleFighter*> _onPetProtect;
+    std::vector<BattleFighter*> _onPetAtk;
+
     UInt8 _cur_round_except[25];
     UInt8 _except_count;
 
@@ -607,6 +610,10 @@ private:
     bool    doProtectDamage(BattleFighter* bf, BattleFighter* pet, float& phyAtk, float& magAtk, float factor);
     bool    protectDamage(BattleFighter* bf, BattleFighter* pet, float& phyAtk, float& magAtk, float factor);
 
+    bool    tryAttackWithPet(BattleFighter* bf, float& phyAtk, float& magatk, float factor);
+    bool    do100AttackWithPet(BattleFighter* bf, BattleFighter* pet, float& phyAtk, float& magAtk, float factor);
+    bool    doAttackWithPet(BattleFighter* bf, BattleFighter* pet, float& phyAtk, float& magAtk, float factor);
+    bool    attackWithPet(BattleFighter* bf, BattleFighter* pet, float& phyAtk, float& magAtk, float factor);
 private:
     int     getPossibleTarget(int, int, BattleFighter* bf = NULL); // return -1 for no found target
 
