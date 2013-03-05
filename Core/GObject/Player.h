@@ -1278,6 +1278,10 @@ namespace GObject
         void getYearRPPackage();
         void getYearRPReward();
         /////
+        //帮派qq群
+        UInt8 toQQGroup(bool isJoin);
+        bool isInQQGroup() {return _inQQGroup;}
+        void setInQQGroup (bool v) {_inQQGroup = v;}
 	public:
 		UInt16   GetFreePackageSize();
 		bool     ExtendPackageSize();
@@ -1619,6 +1623,7 @@ namespace GObject
 #endif
 
         UInt64 _invitedBy;
+        bool _inQQGroup;
     public:
         void setInvitedBy(UInt64 id, bool writedb = true);
         inline UInt64 getInvitedBy() { return _invitedBy; }

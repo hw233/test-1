@@ -353,6 +353,7 @@ CREATE TABLE `clan_player` (
   `lastFavorTime4` smallint(5) unsigned NOT NULL,
   `signupRankBattleTime` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '报名帮会排名战时间',
   `rankBattleField` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '帮会排名战战役',  
+  `inQQGroup` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`playerId`),
   KEY `id` (`id`),
   KEY `playerId` (`playerId`)
@@ -1096,6 +1097,7 @@ CREATE TABLE `clan` (
   `battleScore` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '帮会排名战分数',
   `dailyBattleScore` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '帮会战日积分',
   `battleRanking` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '上周帮会战排名', 
+  `qqOpenid` varchar(36) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;

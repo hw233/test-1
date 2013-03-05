@@ -420,7 +420,10 @@ public:
      */
     void GetWeal(Player* player);
     void GetItems(Player* player);
-
+    void sendQQOpenid(Player* player);
+    void setQQOpenid(Player* player,std::string openid); 
+    void offQQOpenid(Player* player); 
+    void setQQOpenid(std::string openid) {m_qqOpenid = openid;};
 
 public:
 	inline bool alive() { return !_deleted; }
@@ -636,6 +639,8 @@ private:
 
     UInt32 _funds;          // 帮派资金
 	UInt64 _watchman;       // 帮派修炼地护法
+
+    std::string m_qqOpenid;
 
 	Mutex _mutex;
 };
