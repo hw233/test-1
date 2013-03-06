@@ -765,55 +765,55 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
     UInt32 p;
     if(curHookIndex == ENUM_TRAINP1)
     {
-        p = player->getBuffLeft(PLAYER_BUFF_TRAINP1);
+        p = player->GetVar(VAR_TRAINP1);
         if(p > 0)
         {
             UInt32 left = p;
             if(left >= duration)
             {
                 exp = exp * 1.3f;
-                player->setBuffData(PLAYER_BUFF_TRAINP1, left - duration);
+                player->SetVar(VAR_TRAINP1, left - duration);
             }
             else
             {
                 exp = exp + exp * left / duration * 0.3f;
-                player->setBuffData(PLAYER_BUFF_TRAINP1, 0);
+                player->SetVar(VAR_TRAINP1, 0);
             }
         }
     }
     else if(curHookIndex == ENUM_TRAINP2)
     {
-        p = player->getBuffLeft(PLAYER_BUFF_TRAINP2);
+        p = player->GetVar(VAR_TRAINP2);
         if(p > 0)
         {
             UInt32 left = p;
             if(left >= duration)
             {
                 exp *= exp * 1.6f;
-                player->setBuffData(PLAYER_BUFF_TRAINP2, left - duration);
+                player->SetVar(VAR_TRAINP2, left - duration);
             }
             else
             {
                 exp = exp + exp * left / duration * 0.6f;
-                player->setBuffData(PLAYER_BUFF_TRAINP2, 0);
+                player->SetVar(VAR_TRAINP2, 0);
             }
         }
     }
     else if(curHookIndex == ENUM_TRAINP3)
     {
-        p = player->getBuffLeft(PLAYER_BUFF_TRAINP3);
+        p = player->GetVar(VAR_TRAINP3);
         if(p > 0)
         {
             UInt32 left = p;
             if(left >= duration)
             {
                 exp = exp * 1.8f;
-                player->setBuffData(PLAYER_BUFF_TRAINP3, left - duration);
+                player->SetVar(VAR_TRAINP3, left - duration);
             }
             else
             {
                 exp = exp + exp * left / duration * 0.8f;
-                player->setBuffData(PLAYER_BUFF_TRAINP3, 0);
+                player->SetVar(PLAYER_BUFF_TRAINP3, 0);
             }
         }
     }

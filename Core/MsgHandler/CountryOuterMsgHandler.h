@@ -1016,7 +1016,6 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 			clan->broadcastMemberInfo(pl);
 	}
 	{
-        pl->transferPexpBuffer2Var();
 		Stream st;
 		pl->makePlayerInfo(st);
 		conn->send(&st[0], st.size());

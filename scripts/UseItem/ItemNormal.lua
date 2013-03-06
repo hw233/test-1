@@ -2069,12 +2069,12 @@ function ItemNormal_000000111(iid, num, bind, param)
 end
 
 function ItemNormal_00000055(iid, num, bind, param)
-  local player = GetPlayer()
+  --[[local player = GetPlayer()
   local package = player:GetPackage();
-  -- player:setBuffData(6, 0, true)
-  -- player:setBuffData(10, 0, true)
-  -- player:setBuffData(11, 0, true)
-  -- player:setBuffData(24, 0, true)
+  player:setBuffData(6, 0, true)
+  player:setBuffData(10, 0, true)
+  player:setBuffData(11, 0, true)
+  player:setBuffData(24, 0, true)
   
   if  getAutoBattleAct() and ItemNormal_AddBuff(player, 5, 3600, num, 216*3600) then
       package:DelItemSendMsg(55, player);
@@ -2083,16 +2083,28 @@ function ItemNormal_00000055(iid, num, bind, param)
   else
 	return false;
   end
-  return num;
+  return num;]]
+  local player = GetPlayer()
+  local num2 = player:GetVar(405)
+  local max_num = 3596400
+  if num2 >= max_num then
+      return false
+  end
+  num2 = num2 + num * 3600
+  if num2 >= max_num then
+    num2 = max_num
+  end
+  player:SetVar(405, num2)
+  return num
 end
 
 function ItemNormal_00000056(iid, num, bind, param)
-  local player = GetPlayer()
+  --[[local player = GetPlayer()
   local package = player:GetPackage();
-  -- player:setBuffData(5, 0, true)
-  -- player:setBuffData(10, 0, true)
-  -- player:setBuffData(11, 0, true)
-  -- player:setBuffData(24, 0, true)
+  player:setBuffData(5, 0, true)
+  player:setBuffData(10, 0, true)
+  player:setBuffData(11, 0, true)
+  player:setBuffData(24, 0, true)
  
   if getAutoBattleAct() and ItemNormal_AddBuff(player, 6, 3600, num, 216*3600) then
       package:DelItemSendMsg(56, player);
@@ -2102,7 +2114,19 @@ function ItemNormal_00000056(iid, num, bind, param)
 	return false;
   end
 
-  return num;
+  return num;]]
+  local player = GetPlayer()
+  local num2 = player:GetVar(406)
+  local max_num = 3596400
+  if num2 >= max_num then
+      return false
+  end
+  num2 = num2 + num * 3600
+  if num2 >= max_num then
+    num2 = max_num
+  end
+  player:SetVar(406, num2)
+  return num
 end
 
 function ItemNormal_00000057(iid, num, bind, param)
@@ -7781,16 +7805,19 @@ function ItemNormal_Lingbao(iid, num, bind, param)
     return num;
 end
 
--- to do
 function ItemNormal_00009360(iid, num, bind, param)
-    local player = GetPlayer()
-    local package = player:GetPackage();
-    if ItemNormal_AddBuff(player, 10, 3600, num, 356400) then
-        package:DelItemSendMsg(iid, player);
-        return num;
-    else
-        return false;
-    end
+  local player = GetPlayer()
+  local num2 = player:GetVar(407)
+  local max_num = 3596400
+  if num2 >= max_num then
+      return false
+  end
+  num2 = num2 + num * 3600
+  if num2 >= max_num then
+    num2 = max_num
+  end
+  player:SetVar(407, num2)
+  return num
 end
 
 function ItemNormal_00009361(iid, num, bind, param)

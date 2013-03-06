@@ -149,17 +149,17 @@ namespace GObject
         UInt32 curHookIndex = m_Player->GetVar(VAR_EXP_HOOK_INDEX);
         if(curHookIndex == ENUM_TRAINP1)
         {
-            if(m_Player->getBuffLeft(PLAYER_BUFF_TRAINP1))
+            if(m_Player->GetVar(VAR_TRAINP1))
                 exp *= 1.2f;
         }
         else if(curHookIndex == ENUM_TRAINP2)
         {
-            if(m_Player->getBuffLeft(PLAYER_BUFF_TRAINP2))
+            if(m_Player->GetVar(VAR_TRAINP2))
                 exp *= 1.5f;
         }
         else if(curHookIndex == ENUM_TRAINP3)
         {
-            if(m_Player->getBuffLeft(PLAYER_BUFF_TRAINP3))
+            if(m_Player->GetVar(VAR_TRAINP3))
                 exp *= 1.8f;
         }
 #if 0
@@ -190,7 +190,7 @@ namespace GObject
         UInt8 iccnt = Player::getMaxIcCount(vipLevel) - m_Player->getIcCount();
         if (Player::getMaxIcCount(vipLevel) < m_Player->getIcCount())
             iccnt = Player::getMaxIcCount(vipLevel);
-        UInt8 curType = static_cast<UInt8>(m_Player->GetVar(VAR_EXP_HOOK_NEW_SOLUTION));
+        UInt8 curType = static_cast<UInt8>(m_Player->GetVar(VAR_EXP_HOOK_INDEX));
 		if(cnt > 0)
 		{
 #if 0
@@ -2272,18 +2272,30 @@ namespace GObject
         _playerData.lastTjEventScore = 0;
         _playerData.lastTjTotalScore = 0;
     }
-	void Player::setBuffData(UInt8 id, UInt32 data, bool writedb, bool useOld)
+
+    UInt32 bufferId2VarId(UInt8 id)
+    {
+        if(id == PLAYER_BUFF_TRAINP1)
+            return VAR_TRAINP1;
+        else if(id == PLAYER_BUFF_TRAINP2/* || id == PLAYER_BUFF_TRAINP4 || id == PLAYER_BUFF_ADVANCED_HOOK*/)
+            return VAR_TRAINP2;
+        else if(id == PLAYER_BUFF_TRAINP3)
+            return VAR_TRAINP3;
+        else
+            return 0;
+    }
+
+	void Player::setBuffDataExp(UInt8 id, UInt32 data, bool writedb)
 	{
-        /** 加速符 **/
-        if(buffIdRelatePExpHook(id) && !useOld)
-        {
-            if(_buffData[id] == data)
-                return;
-            _buffData[id] = data;
-            if(writedb)
-                sendModification(0x40 + id, data, writedb);
+        if(!relateExpHook(id))
             return;
-        }
+        UInt32 varId = bufferId2VarId(id);
+        if(varId > 0)
+            SetVar(varId, data);
+    }
+
+	void Player::setBuffData(UInt8 id, UInt32 data, bool writedb)
+	{
 		UInt32 now = TimeUtil::Now();
 		if(id == PLAYER_BUFF_ATTACKING && data >= now)
 		{
@@ -2306,17 +2318,8 @@ namespace GObject
 			sendModification(0x40 + id, data, writedb);
 	}
 
-	void Player::addBuffData(UInt8 id, UInt32 data, bool useOld)
+	void Player::addBuffData(UInt8 id, UInt32 data)
 	{
-        /** 加速符 **/
-        if(buffIdRelatePExpHook(id) && !useOld)
-        {
-            if(data == 0)
-                return;
-            _buffData[id] += data;
-            sendModification(0x40 + id, _buffData[id]);
-            return;
-        }
 		if(id >= PLAYER_BUFF_COUNT || data == 0)
 			return;
 		UInt32 now = TimeUtil::Now();
@@ -2328,13 +2331,17 @@ namespace GObject
 		sendModification(0x40 + id, _buffData[id]);
 	}
 
-	UInt32 Player::getBuffData( UInt8 idx, UInt32 tm, bool useOld )
+	void Player::addBuffDataExp(UInt8 id, UInt32 data)
 	{
-        /** 加速符 **/
-        if(buffIdRelatePExpHook(idx) && !useOld)
-        {
-		    return _buffData[idx];
-        }
+        if(!relateExpHook(id))
+            return;
+        UInt32 varId = bufferId2VarId(id);
+        if(varId > 0)
+            AddVar(varId, data);
+    }
+
+	UInt32 Player::getBuffData( UInt8 idx, UInt32 tm )
+	{
 		if(idx > PLAYER_BUFF_COUNT)
 			return 0;
 		if(idx != PLAYER_BUFF_AUTOHEAL &&
@@ -2353,13 +2360,19 @@ namespace GObject
 		return _buffData[idx];
 	}
 
-	UInt32 Player::getBuffLeft( UInt8 idx, UInt32 tm, bool useOld)
+	UInt32 Player::getBuffDataExp( UInt8 idx, UInt32 tm )
 	{
-        /** 加速符 **/
-        if(buffIdRelatePExpHook(idx), !useOld)
-        {
-		    return _buffData[idx];
-        }
+        if(!relateExpHook(idx))
+            return 0;
+        UInt32 varId = bufferId2VarId(idx);
+        if(varId > 0)
+            return GetVar(varId);
+        else
+            return 0;
+    }
+
+	UInt32 Player::getBuffLeft( UInt8 idx, UInt32 tm )
+	{
 		UInt32 buff = getBuffData( idx, tm );
 		if(buff == 0)
 			return 0;
@@ -2369,6 +2382,11 @@ namespace GObject
 			return 0;
 		}
 		return buff - tm;
+	}
+
+	UInt32 Player::getBuffLeftExp( UInt8 idx, UInt32 tm )
+	{
+        return getBuffDataExp(idx, tm);
 	}
 
     UInt32 Player::GetVar(UInt32 id)
@@ -3015,22 +3033,16 @@ namespace GObject
 			}
 			else
 			{
-                if(buffIdRelatePExpLow(i))
+                if(relateExpHook(i))
                 {
+                    UInt32 varId = bufferId2VarId(i);
+                    if(varId == 0)
+                        continue;
+                    UInt32 varData = GetVar(varId);
+                    if(varData == 0)
+                        continue;
 					buffid[c] = i + 0x40;
-					buffleft[c] = _buffData[i];
-                    ++c;
-                }
-                else if(buffIdRelatePExpHigh(i))
-                {
-					buffid[c] = i + 0x40;
-					buffleft[c] = _buffData[i];
-                    ++c;
-                }
-                else if(buffIdRelatePExpQitian(i))
-                {
-					buffid[c] = i + 0x40;
-					buffleft[c] = _buffData[i];
+					buffleft[c] = varData;
                     ++c;
                 }
                 else if(_buffData[i] > curtime)
@@ -3381,6 +3393,7 @@ namespace GObject
             if (ng->getLevel() <= GetLev() || (ng->getLevel() > GetLev() && (ng->getLevel() - GetLev()) < 10))
             {
                 UInt32 exp = 0;
+#if 0
                 if(getBuffData(PLAYER_BUFF_TRAINP3, now))
                     exp = ng->getExp() * 18 / 10;
                 else if(getBuffData(PLAYER_BUFF_TRAINP4, now))
@@ -3391,7 +3404,9 @@ namespace GObject
                     exp = ng->getExp() * 13 / 10;
                 else
                     exp  = ng->getExp();
-
+#else
+                    exp  = ng->getExp();
+#endif
                 if (isOffical())
                     exp -= (exp/10);
                 if((this->getPlatform() == 10 && World::getQQGameAct()) || (this->getPlatform() == 11 && World::get3366PrivilegeAct()) || ((getPlatform() == 1 || getPlatform() == 2) && World::getQzonePYPrivilegeAct()))
@@ -4234,7 +4249,7 @@ namespace GObject
 			Stream st(REP::USER_INFO_CHANGE);
 			if(t > 0x40)
 			{
-                if(buffIdRelatePExpHook(t - 0x40))
+                if(relateExpHook(t - 0x40))
                 {
                     st << t << v << Stream::eos;
                 }
@@ -17354,62 +17369,59 @@ void Player::sendSaveGoldAct()
     send(st);
 }
 
-void Player::transferPexpBuffer2Var()
+void Player::transferExpBuffer2Var()
 {
     UInt32 tm = TimeUtil::Now();
     UInt32 left;
     UInt32 total;
-    if(GetVar(VAR_EXP_HOOK_NEW_SOLUTION))
-        return;
     /** 初级**/
     total = 0;
-    if((left = getBuffLeft(PLAYER_BUFF_TRAINP1, tm, true))> 0)
+    if((left = getBuffLeft(PLAYER_BUFF_TRAINP1, tm))> 0)
     {
         total += left;
-        setBuffData(PLAYER_BUFF_TRAINP1, 0, true);
+        setBuffData(PLAYER_BUFF_TRAINP1, 0);
     };
     if(total > 0)
     {
-        setBuffData(PLAYER_BUFF_TRAINP1, total);
+        SetVar(VAR_TRAINP1, total);
         SetVar(VAR_EXP_HOOK_INDEX, ENUM_TRAINP1);
     }
 
     /** 高级 **/
     total = 0;
-    if((left = getBuffLeft(PLAYER_BUFF_TRAINP2, tm, true)) > 0)
+    if((left = getBuffLeft(PLAYER_BUFF_TRAINP2, tm)) > 0)
     {
         total += left;
-        setBuffData(PLAYER_BUFF_TRAINP2, 0, true);
+        setBuffData(PLAYER_BUFF_TRAINP2, 0);
     }
-    if((left = getBuffLeft(PLAYER_BUFF_TRAINP4, tm, true)) > 0)
+    if((left = getBuffLeft(PLAYER_BUFF_TRAINP4, tm)) > 0)
     {
         total += left;
-        setBuffData(PLAYER_BUFF_TRAINP4, 0, true);
+        setBuffData(PLAYER_BUFF_TRAINP4, 0);
     }
-    if((left = getBuffLeft(PLAYER_BUFF_ADVANCED_HOOK, tm, true)) > 0)
+    if((left = getBuffLeft(PLAYER_BUFF_ADVANCED_HOOK, tm)) > 0)
     {
         total += left;
-        setBuffData(PLAYER_BUFF_ADVANCED_HOOK, 0, true);
+        setBuffData(PLAYER_BUFF_ADVANCED_HOOK, 0);
     }
     if(total > 0)
     {
-        setBuffData(PLAYER_BUFF_TRAINP2, total);
+        SetVar(VAR_TRAINP2, total);
         SetVar(VAR_EXP_HOOK_INDEX, ENUM_TRAINP2);
     }
 
     /** 齐天 **/
     total = 0;
-    if((left = getBuffLeft(PLAYER_BUFF_TRAINP3, tm, true)) > 0)
+    if((left = getBuffLeft(PLAYER_BUFF_TRAINP3, tm)) > 0)
     {
         total += left;
-        setBuffData(PLAYER_BUFF_TRAINP3, 0, true);
+        //setBuffData(PLAYER_BUFF_TRAINP3);保留
     }
     if(total > 0)
     {
-        setBuffData(PLAYER_BUFF_TRAINP3, 0);
+        SetVar(VAR_TRAINP3, 0);
         SetVar(VAR_EXP_HOOK_INDEX, ENUM_TRAINP3);
     }
-    SetVar(VAR_EXP_HOOK_NEW_SOLUTION, 1);
 }
 
 } // namespace GObject

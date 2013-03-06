@@ -932,12 +932,15 @@ namespace GObject
         void initHeroMemo();
         void initShuoShuo();
 
-		UInt32 getBuffData(UInt8 idx, UInt32 tm = TimeUtil::Now(), bool useOld = false);
-		UInt32 getBuffLeft(UInt8 idx, UInt32 tm = TimeUtil::Now(), bool useOld = false);
-		void setBuffData(UInt8, UInt32, bool = true, bool useOld = false);
-		void addBuffData(UInt8, UInt32, bool useOld = false);
+		UInt32 getBuffData(UInt8 idx, UInt32 tm = TimeUtil::Now());
+		UInt32 getBuffLeft(UInt8 idx, UInt32 tm = TimeUtil::Now());
+		void setBuffData(UInt8, UInt32, bool = true);
+		void addBuffData(UInt8, UInt32);
 		void testBattlePunish();
-
+		UInt32 getBuffDataExp(UInt8 idx, UInt32 tm = TimeUtil::Now());
+		UInt32 getBuffLeftExp(UInt8 idx, UInt32 tm = TimeUtil::Now());
+		void setBuffDataExp(UInt8, UInt32, bool = true );
+		void addBuffDataExp(UInt8, UInt32);
 
         UInt32 GetVar(UInt32 id);
         Int32 GetVarS(Int32 id);
@@ -2141,12 +2144,12 @@ namespace GObject
         void getNewYearQzoneContinueAward(UInt8 type);
         void sendNewYearQzoneContinueAct();
         void calcNewYearQzoneContinueDay(UInt32 time);
-        void transferPexpBuffer2Var();
+        void transferExpBuffer2Var();
 
-        inline bool buffIdRelatePExpHook(UInt8 id) { return id == 5 || id == 6 || id == 10 || id == 11 || id == 24; }
-        inline bool buffIdRelatePExpLow(UInt8 id) { return id == 5; }
-        inline bool buffIdRelatePExpHigh(UInt8 id) { return id == 6 || id == 11 || id == 24; }
-        inline bool buffIdRelatePExpQitian(UInt8 id) { return id == 10; }
+        inline bool relateExpHook(UInt8 id) { return id == 5 || id == 6 || id == 10/* || id == 11 || id == 24*/; }
+        inline bool relateExpHookLow(UInt8 id) { return id == 5; }
+        inline bool relateExpHookHigh(UInt8 id) { return id == 6/* || id == 11 || id == 24*/; }
+        inline bool relateExpHookQitian(UInt8 id) { return id == 10; }
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n
