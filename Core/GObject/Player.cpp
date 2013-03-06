@@ -3699,6 +3699,7 @@ namespace GObject
 
 		UInt32 timeDur = count * eachBattle;
 		UInt32 final = TimeUtil::Now() + timeDur;
+#if 0
         GObject::EventWrapper::iterator it = GObject::eventWrapper.FindTimerEvent(this, EVENT_AUTOBATTLE, 0);
         if(it != GObject::eventWrapper.end())
         {
@@ -3710,7 +3711,7 @@ namespace GObject
                 final = eventAuto->getFinalEnd();
             }
         }
-
+#endif
 		EventAutoBattle* event = new(std::nothrow) EventAutoBattle(this, eachBattle, count, /*ng*/NULL, final);
 		if (event == NULL) return false;
         SetVar(VAR_EXP_HOOK_INDEX, type);
