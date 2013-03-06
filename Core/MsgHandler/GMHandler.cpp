@@ -3688,6 +3688,8 @@ void GMHandler::OnSomeAct(GObject::Player *player, std::vector<std::string>& arg
         UInt32 type = atoi(args[2].c_str());
         player->autoBattle(npcId, type);
     }
+    else if(type == 3)
+        player->instantAutoBattle();
 }
 
 void GMHandler::OnDragonKingAct(GObject::Player *player, std::vector<std::string>& args)

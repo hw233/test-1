@@ -157,23 +157,6 @@ function getRandTrump(lvl)
 end
 
 function ItemNormal_AddBuff(obj, idx, num, count, max_num)
-  if idx == 5 or idx == 6 or idx == 10 or idx == 11 or idx == 24 then
-      -- 11、24也是高级加速
-      if idx == 11 or idx == 24 then
-          idx = 6
-      end
-      local left = obj:getBuffData(idx);
-      if left > max_num then
-          return false
-      end
-      left = left + num * count
-      if left >= max_num then
-          left = max_num
-      end
-      obj:setBuffData(idx, left, true)
-      return true
-  end
-
   local now = os.time()
   local num2 = obj:getBuffData(idx);
   if num2 > now then
@@ -4383,18 +4366,31 @@ function ItemNormal_00009089(iid, num, bind, param)
 end
 
 function ItemNormal_00009092(iid, num, bind, param)
-    local player = GetPlayer()
+    --[[local player = GetPlayer()
     local package = player:GetPackage();
-    -- player:setBuffData(5, 0, true)
-    -- player:setBuffData(6, 0, true)
-    -- player:setBuffData(11, 0, true)
-    -- player:setBuffData(0x18, 0, true)
+    player:setBuffData(5, 0, true)
+    player:setBuffData(6, 0, true)
+    player:setBuffData(11, 0, true)
+    player:setBuffData(0x18, 0, true)
     if ItemNormal_AddBuff(player, 10, 3600, num, 356400) then
         package:DelItemSendMsg(iid, player);
         return num;
     else
         return false;
+    end]]
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < num*2/99 then
+        player:sendMsgCode(2, 1011, 0);
+        return false
     end
+
+    package:Add(9360, num, true, 0, 2);
+    package:Add(9361, num, true, 0, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
 end
 
 function ItemNormal_00009093(iid, num, bind, param)
@@ -4710,12 +4706,12 @@ function ItemNormal_00009132(iid, num, bind, param)
 end
 
 function ItemNormal_00009126(iid, num, bind, param)
-  local player = GetPlayer()
+  --[[local player = GetPlayer()
   local package = player:GetPackage();
-  -- player:setBuffData(5, 0, true)
-  -- player:setBuffData(6, 0, true)
-  -- player:setBuffData(10, 0, true)
-  -- player:setBuffData(11, 0, true)
+  player:setBuffData(5, 0, true)
+  player:setBuffData(6, 0, true)
+  player:setBuffData(10, 0, true)
+  player:setBuffData(11, 0, true)
   local duringTime
   if iid == 9126 then
       duringTime = 3600 * 100
@@ -4733,7 +4729,31 @@ function ItemNormal_00009126(iid, num, bind, param)
 	return num;
   else
 	return false;
-  end
+  end]]
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    local perCnt;
+
+    if iid == 9126 then
+        perCnt = 100
+    elseif iid == 9141 then
+        perCnt = 8
+    elseif iid == 9142 then
+        perCnt = 16
+    elseif iid == 9143 then
+        perCnt = 24
+    else
+        return false
+    end
+
+    local totalCnt = perCnt * num
+    if package:GetRestPackageSize() < (1+totalCnt/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    package:Add(56, totalCnt, true, 0, 2);
+    package:DelItemSendMsg(iid, player);
+    return num
 end
 
 function ItemNormal_00009133(iid, num, bind, param)
@@ -7761,6 +7781,29 @@ function ItemNormal_Lingbao(iid, num, bind, param)
     return num;
 end
 
+-- to do
+function ItemNormal_00009360(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    if ItemNormal_AddBuff(player, 10, 3600, num, 356400) then
+        package:DelItemSendMsg(iid, player);
+        return num;
+    else
+        return false;
+    end
+end
+
+function ItemNormal_00009361(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    if ItemNormal_AddBuff(player, 10, 3600, num, 356400) then
+        package:DelItemSendMsg(iid, player);
+        return num;
+    else
+        return false;
+    end
+end
+
 local ItemNormal_Table = {
   [1] = ItemNormal_00000001,
 	[8] = ItemNormal_00000008,
@@ -9426,6 +9469,8 @@ local ItemNormal_Table = {
     [9352] = ItemNormal_Lingbao,
     [9353] = ItemNormal_Lingbao,
 
+    [9360] = ItemNormal_00009360,
+    [9361] = ItemNormal_00009361,
 
     [10000] = ItemNormal_00010000,
     [10001] = ItemNormal_00010001,
