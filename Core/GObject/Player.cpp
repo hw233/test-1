@@ -2285,13 +2285,14 @@ namespace GObject
             return 0;
     }
 
-	void Player::setBuffDataExp(UInt8 id, UInt32 data, bool writedb)
+	void Player::sendExpHook(UInt8 id, UInt32 data)
 	{
-        if(!relateExpHook(id))
-            return;
-        UInt32 varId = bufferId2VarId(id);
-        if(varId > 0)
-            SetVar(varId, data);
+        if(_isOnline)
+        {
+            Stream st(REP::USER_INFO_CHANGE);
+            st << id << data << Stream::eos;
+            send(st);
+        }
     }
 
 	void Player::setBuffData(UInt8 id, UInt32 data, bool writedb)
@@ -2318,6 +2319,16 @@ namespace GObject
 			sendModification(0x40 + id, data, writedb);
 	}
 
+	void Player::setBuffDataExp(UInt8 id, UInt32 data, bool writedb)
+	{
+        if(!relateExpHook(id))
+            return;
+        UInt32 varId = bufferId2VarId(id);
+        if(varId == 0)
+            return;
+        SetVar(varId, data);
+    }
+
 	void Player::addBuffData(UInt8 id, UInt32 data)
 	{
 		if(id >= PLAYER_BUFF_COUNT || data == 0)
@@ -2334,6 +2345,8 @@ namespace GObject
 	void Player::addBuffDataExp(UInt8 id, UInt32 data)
 	{
         if(!relateExpHook(id))
+            return;
+        if(data == 0)
             return;
         UInt32 varId = bufferId2VarId(id);
         if(varId > 0)
@@ -4249,18 +4262,11 @@ namespace GObject
 			Stream st(REP::USER_INFO_CHANGE);
 			if(t > 0x40)
 			{
-                if(relateExpHook(t - 0x40))
-                {
-                    st << t << v << Stream::eos;
-                }
+                UInt32 tm = TimeUtil::Now();
+                if(v > tm)
+                    st << t << static_cast<UInt32>(v - tm) << Stream::eos;
                 else
-                {
-                    UInt32 tm = TimeUtil::Now();
-                    if(v > tm)
-                        st << t << static_cast<UInt32>(v - tm) << Stream::eos;
-                    else
-                        st << t << static_cast<UInt32>(0) << Stream::eos;
-                }
+                    st << t << static_cast<UInt32>(0) << Stream::eos;
 			}
 			else
 				st << t << v << Stream::eos;

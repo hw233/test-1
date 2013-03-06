@@ -228,6 +228,7 @@ namespace Script
 		CLASS_DEF(Player, findFighter);
 		CLASS_DEF(Player, getBuffData);
 		CLASS_DEF(Player, setBuffData);
+		CLASS_DEF(Player, sendExpHook);
 		CLASS_DEF(Player, moveTo);
 		CLASS_DEF(Player, moveToHome);
 		CLASS_DEF(Player, moveToNeutralHome);

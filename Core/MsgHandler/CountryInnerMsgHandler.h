@@ -771,14 +771,16 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
             UInt32 left = p;
             if(left >= duration)
             {
+                left -= duration;
                 exp = exp * 1.3f;
-                player->SetVar(VAR_TRAINP1, left - duration);
             }
             else
             {
                 exp = exp + exp * left / duration * 0.3f;
-                player->SetVar(VAR_TRAINP1, 0);
+                left = 0;
             }
+            player->SetVar(VAR_TRAINP1, left);
+            player->sendExpHook(0x40 + PLAYER_BUFF_TRAINP1, left);
         }
     }
     else if(curHookIndex == ENUM_TRAINP2)
@@ -789,14 +791,16 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
             UInt32 left = p;
             if(left >= duration)
             {
-                exp *= exp * 1.6f;
-                player->SetVar(VAR_TRAINP2, left - duration);
+                exp = exp * 1.6f;
+                left -= duration;
             }
             else
             {
                 exp = exp + exp * left / duration * 0.6f;
-                player->SetVar(VAR_TRAINP2, 0);
+                left = 0;
             }
+            player->SetVar(VAR_TRAINP2, left);
+            player->sendExpHook(0x40 + PLAYER_BUFF_TRAINP2, left);
         }
     }
     else if(curHookIndex == ENUM_TRAINP3)
@@ -808,13 +812,15 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
             if(left >= duration)
             {
                 exp = exp * 1.8f;
-                player->SetVar(VAR_TRAINP3, left - duration);
+                left -= duration;
             }
             else
             {
                 exp = exp + exp * left / duration * 0.8f;
-                player->SetVar(PLAYER_BUFF_TRAINP3, 0);
+                left = 0;
             }
+            player->SetVar(VAR_TRAINP3, left);
+            player->sendExpHook(0x40 + PLAYER_BUFF_TRAINP3, left);
         }
     }
 

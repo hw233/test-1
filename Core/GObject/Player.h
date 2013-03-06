@@ -937,6 +937,7 @@ namespace GObject
 		void setBuffData(UInt8, UInt32, bool = true);
 		void addBuffData(UInt8, UInt32);
 		void testBattlePunish();
+        void sendExpHook(UInt8 id, UInt32 data);
 		UInt32 getBuffDataExp(UInt8 idx, UInt32 tm = TimeUtil::Now());
 		UInt32 getBuffLeftExp(UInt8 idx, UInt32 tm = TimeUtil::Now());
 		void setBuffDataExp(UInt8, UInt32, bool = true );
