@@ -309,6 +309,9 @@ public:
     // 取得死亡后概率100%触发技能
     inline std::vector<UInt16>& getPassiveSkillDead100() { return _passkl[GData::SKILL_DEAD-GData::SKILL_PASSSTART]; }
     // 取得队友被攻击时100%触发技能
+    inline std::vector<UInt16>& getPassiveSkillOnPetProtect100() { return _passkl[GData::SKILL_ONPETPROTECT-GData::SKILL_PASSSTART]; }
+    // 取得收到任意伤害时100%触发技能
+    inline std::vector<UInt16>& getPassiveSkillOnGetDmg100() { return _passkl[GData::SKILL_ONGETDMG-GData::SKILL_PASSSTART]; }
 
     // 根据索引返回被动技能容器(为什么要拆成两部分？跪了……）
     inline const std::vector<UInt16>& getPassiveSkillByIndex2(UInt16 index) { return _rpasskl[index];}
@@ -329,7 +332,9 @@ public:
     // 取得死亡后概率触发技能
     inline std::vector<UInt16>& getPassiveSkillDead() { return _rpasskl[GData::SKILL_DEAD-GData::SKILL_PASSSTART]; }
     // 取得队友被攻击时概率触发技能
-    inline std::vector<UInt16>& getPassiveSkillOnPetProtect() { return _rpasskl[GData::SKILL_ONPETPROTECT-GData::SKILL_ONPETPROTECT]; }
+    inline std::vector<UInt16>& getPassiveSkillOnPetProtect() { return _rpasskl[GData::SKILL_ONPETPROTECT-GData::SKILL_PASSSTART]; }
+    // 取得收到任意伤害时概率触发技能
+    inline std::vector<UInt16>& getPassiveSkillOnGetDmg() { return _rpasskl[GData::SKILL_ONGETDMG-GData::SKILL_PASSSTART]; }
 
 
     // 神农宝鼎

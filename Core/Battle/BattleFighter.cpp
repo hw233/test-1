@@ -408,6 +408,9 @@ void BattleFighter::setFighter( GObject::Fighter * f )
     std::vector<UInt16>& passiveSkillOnAttackBleed100 = _fighter->getPassiveSkillOnAttackBleed100();
     std::vector<UInt16>& passiveSkillOnAtkDmg = _fighter->getPassiveSkillOnAtkDmg();
     std::vector<UInt16>& passiveSkillOnAtkDmg100 = _fighter->getPassiveSkillOnAtkDmg100();
+    std::vector<UInt16>& passiveSkillOnGetDmg = _fighter->getPassiveSkillOnGetDmg();
+    std::vector<UInt16>& passiveSkillOnGetDmg100 = _fighter->getPassiveSkillOnGetDmg100();
+
     cnt = passiveSkillOnCounter.size();
     _passiveSkillOnCounter.clear();
     rateExtent = 0;
@@ -473,6 +476,32 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         _passiveSkillOnAtkDmg100.insert(_passiveSkillOnAtkDmg100.end(), skillItem);
 
         updateSkillStrengthen(passiveSkillOnAtkDmg100[idx]);
+    }
+
+    cnt = passiveSkillOnGetDmg100.size();
+    _passiveSkillOnGetDmg100.clear();
+    for (idx = 0; idx < cnt; idx ++)
+    {
+        GData::SkillItem skillItem;
+        skillItem.base = GData::skillManager[passiveSkillOnGetDmg100[idx]];
+        skillItem.cd = 0;
+        skillItem.rateExtent = 0;
+        _passiveSkillOnGetDmg100.insert(_passiveSkillOnGetDmg100.end(), skillItem);
+
+        updateSkillStrengthen(passiveSkillOnGetDmg100[idx]);
+    }
+
+    cnt = passiveSkillOnGetDmg.size();
+    _passiveSkillOnGetDmg.clear();
+    for (idx = 0; idx < cnt; idx ++)
+    {
+        GData::SkillItem skillItem;
+        skillItem.base = GData::skillManager[passiveSkillOnGetDmg[idx]];
+        skillItem.cd = 0;
+        skillItem.rateExtent = 0;
+        _passiveSkillOnGetDmg.insert(_passiveSkillOnGetDmg.end(), skillItem);
+
+        updateSkillStrengthen(passiveSkillOnGetDmg[idx]);
     }
 
     std::vector<GObject::LBSkill>& lbSkills =  _fighter->getLBSkill();
@@ -1276,6 +1305,11 @@ const GData::SkillBase* BattleFighter::getPassiveSkillOnAtkDmg100(size_t& idx, b
     return getPassiveSkill100(_passiveSkillOnAtkDmg100, idx, noPossibleTarget);
 }
 
+const GData::SkillBase* BattleFighter::getPassiveSkillOnGetDmg100(size_t& idx, bool noPossibleTarget)
+{
+    return getPassiveSkill100(_passiveSkillOnGetDmg100, idx, noPossibleTarget);
+}
+
 const GData::SkillBase* BattleFighter::getPassiveSkill(std::vector<GData::SkillItem>& passiveSkill, bool noPossibleTarget)
 {
     size_t cnt = passiveSkill.size();
@@ -1366,6 +1400,11 @@ const GData::SkillBase* BattleFighter::getPassiveSkillOnAtkDmg(bool noPossibleTa
 const GData::SkillBase* BattleFighter::getPassiveSkillOnPetProtect(bool noPossibleTarget)
 {
     return getPassiveSkill(_passiveSkillOnPetProtect, noPossibleTarget);
+}
+
+const GData::SkillBase* BattleFighter::getPassiveSkillOnGetDmg(bool noPossibleTarget)
+{
+    return getPassiveSkill( _passiveSkillOnGetDmg, noPossibleTarget);
 }
 
 void BattleFighter::releaseSkillCD(std::vector<GData::SkillItem>& skill, int cd)
@@ -2019,6 +2058,7 @@ void BattleFighter::clearSkill()
     _passiveSkillOnCounter100.clear();
     _passiveSkillOnAttackBleed100.clear();
     _passiveSkillOnAtkDmg100.clear();
+    _passiveSkillOnGetDmg100.clear();
 
     _passiveSkillPreAtk.clear();
     _passiveSkillAftAtk.clear();
@@ -2029,6 +2069,7 @@ void BattleFighter::clearSkill()
     _passiveSkillDead.clear();
     _passiveSkillAftNAtk.clear();
     _passiveSkillOnCounter.clear();
+    _passiveSkillOnGetDmg.clear();
 
     _passiveSkillOnTherapy.clear();
     _passiveSkillOnSkillDmg.clear();

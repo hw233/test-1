@@ -8996,38 +8996,28 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
         if(bf->getHP() == 0)
             break;
 
+        // 自己点燃自己百分比流血
         UInt8& selflast = bf->getSelfBleedLast();
         if(selflast != 0)
         {
-            GData::LBSkillItem* item = bf->getBleedCondItem();
-            float factor = 1 - getItemXin_BleedDec(bf, item);
-            bool bleedout = getItemXin_BleedOut(bf, item);
-            if(bleedout)
-            {
-                bf->setSelfBleed(0, 0);
-                appendDefStatus(e_unSelfBleed, 0, bf, e_damageTrue);
-            }
+            UInt32 dmg = static_cast<UInt32>(bf->getMaxHP()) * 0.01;
+            makeDamage(bf, dmg);
+            -- last3;
+            if(last3 == 0)
+                appendDefStatus(e_unSelfBleed, dmg, bf, e_damageTrue);
             else
-            {
-                UInt32 dmg = static_cast<UInt32>(bf->getSelfBleed()) * factor;
-                makeDamage(bf, dmg);
-                -- last3;
-                if(last3 == 0)
-                    appendDefStatus(e_unSelfBleed, dmg, bf, e_damageTrue);
-                else
-                    appendDefStatus(e_selfBleed, dmg, bf, e_damageTrue);
+                appendDefStatus(e_selfBleed, dmg, bf, e_damageTrue);
 
-                if(bf->getHP() == 0)
-                {
-                    onDead(true, bf);
-                }
-                else if(_winner == 0)
-                {
-                    onDamage(bf, false);
-                }
-                if(selflast == 0)
-                    bf->setSelfBleed(0, 0);
+            if(bf->getHP() == 0)
+            {
+                onDead(true, bf);
             }
+            else if(_winner == 0)
+            {
+                onDamage(bf, false);
+            }
+            if(selflast == 0)
+                bf->setSelfBleed(0, 0);
         }
 
         UInt8& ablast = bf->getAuraBleedLast();
@@ -9646,11 +9636,13 @@ void BattleSimulator::doSkillEffectExtra_HpShield(BattleFighter* bf, int target_
     BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, target_pos));
     if(!bo)
         return;
+    if (!bo->isChar())
+        return;
     float hp = bf->getMaxHP() * (skill->effect->efv[eftIdx] / 10000);
     if (hp < 1.0f)
         return;
-    bo->setPetShieldHP(hp);
-    appendDefStatus(e_petShield, 0, bo);
+    bo->addHpShieldSelf(hp, skill->effect->efl[eftIdx]);
+    appendDefStatus(e_hpShieldSelf, hp, bo);
 }
 
 void BattleSimulator::doSkillEffectExtra_SelfBleed(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
@@ -9659,27 +9651,25 @@ void BattleSimulator::doSkillEffectExtra_SelfBleed(BattleFighter* bf, int target
     BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, target_pos));
     if(!bo)
         return;
-    // XXX: 自焚的具体数值
+    // 自焚的具体数值
     bo->setSelfBleed(skill->effect->efv[eftIdx], skill->effect->efl[eftIdx]);
     appendDefStatus(e_selfBleed, 0, bo);
 }
 
 void BattleSimulator::doSkillEffectExtra_RandomShield(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
 {
-    // TODO: 随机选择上护盾
+    // 随机选择上护盾
     UInt8 myPos = bf->getPos();
     BattleFighter* bo = getRandomFighter(bf->getSide(), &myPos, 1);
     if(!bo)
         return;
     if (!bo->isChar())
         return;
-    //float hp = bf->getMaxHP() * (skill->effect->efv[eftIdx] / 10000);
-    /*
+    float hp = bf->getMaxHP() * (skill->effect->efv[eftIdx] / 10000);
     if (hp < 1.0f)
         return;
-    bo->setPetShieldHP(hp);
-    appendDefStatus(e_petShield, 0, bo);
-    */
+    bo->addHpShieldSelf(hp, skill->effect->efl[eftIdx]);
+    appendDefStatus(e_hpShieldSelf, hp, bo);
 }
 
 void BattleSimulator::doSkillEffectExtra_SelfAttack(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
@@ -10280,7 +10270,7 @@ void BattleSimulator::doItemWu_Dmg(BattleFighter* bf, BattleFighter* bo, float v
 void BattleSimulator::doItemWu_HPShield(BattleFighter* bf, BattleFighter* bo, float value, UInt8 last)
 {
     float hp = bf->getMaxHP() * (value / 10000);
-    bo->setHpShieldSelf(hp, last);
+    bo->addHpShieldSelf(hp, last);
 
     appendDefStatus(e_hpShieldSelf, hp, bo);
 }
@@ -10662,11 +10652,11 @@ void BattleSimulator::getAtkList(BattleFighter* bf, const GData::SkillBase* skil
     }
 }
 
-void BattleSimulator::makeDamage(BattleFighter* bo, UInt32& u)
+void BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u)
 {
-    if(!bo)
+    if(!bf)
         return;
-    float& shieldHp = bo->getHpShieldSelf();
+    float& shieldHp = bf->getHpShieldSelf();
     if(shieldHp > 0)
     {
         if(u > shieldHp)
@@ -10682,16 +10672,16 @@ void BattleSimulator::makeDamage(BattleFighter* bo, UInt32& u)
 
         if(shieldHp < 1.0f)
         {
-            bo->setHpShieldSelf(0, 0);
-            appendDefStatus(e_unHpShieldSelf, 0, bo);
+            bf->setHpShieldSelf(0, 0);
+            appendDefStatus(e_unHpShieldSelf, 0, bf);
         }
         else
         {
-            appendDefStatus(e_hpShieldSelf, shieldHp, bo);
+            appendDefStatus(e_hpShieldSelf, shieldHp, bf);
         }
     }
 
-    float petShieldHp = bo->getPetShieldHP();
+    float petShieldHp = bf->getPetShieldHP();
     if (petShieldHp > 0)
     {
         if (u > petShieldHp)
@@ -10708,13 +10698,24 @@ void BattleSimulator::makeDamage(BattleFighter* bo, UInt32& u)
         if(shieldHp < 1.0f)
         {
             shieldHp = 0;
-            appendDefStatus(e_unPetShield, 0, bo);
+            appendDefStatus(e_unPetShield, 0, bf);
         }
-        bo->setPetShieldHP(shieldHp);
+        bf->setPetShieldHP(shieldHp);
     }
 
     if(u > 0)
-        bo->makeDamage(u);
+    {
+        const GData::SkillBase* passiveSkill = NULL;
+        while(NULL != (passiveSkill = bf->getPassiveSkillOnGetDmg()))
+        {
+            // XXX: 写死给自己上技能
+            int target_side, target_pos, cnt;
+            getSkillTarget(bf, passiveSkill, target_side, target_pos, cnt);
+            doSkillAttack(bf, passiveSkill, target_side, target_pos, cnt, NULL);
+
+        }
+        bf->makeDamage(u);
+    }
 }
 
 bool BattleSimulator::doAuraPresent(BattleFighter* bf)
