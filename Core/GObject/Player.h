@@ -1223,7 +1223,7 @@ namespace GObject
 		void pushAutoBattle(UInt32, UInt16, UInt16);
         //void advancedHookExp();
 		void pushAutoDungeon(UInt32, UInt32, UInt8);
-		void cancelAutoBattle();
+		void cancelAutoBattle(bool needNotify = true);
 		void cancelAutoBattleNotify();
 		void instantAutoBattle();
 		void cancelAutoDungeon();

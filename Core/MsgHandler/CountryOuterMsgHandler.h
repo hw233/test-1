@@ -2909,6 +2909,7 @@ void OnCancelAutoBattleReq( GameMsgHdr& hdr, CancelAutoBattleReq& )
 	MSG_QUERY_PLAYER(player);
 	GameMsgHdr hdr2(0x179, WORKER_THREAD_WORLD, player, 0);
 	GLOBAL().PushMsg(hdr2, 0);
+    player->cancelAutoBattleNotify();
 }
 
 void OnInstantAutoBattleReq( GameMsgHdr& hdr, InstantAutoBattleReq& )

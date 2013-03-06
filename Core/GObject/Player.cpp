@@ -146,7 +146,7 @@ namespace GObject
 	{
 		UInt32 now = TimeUtil::Now();
 		float exp = calcExpEach(now);
-        UInt32 curHookIndex = m_Player->GetVar(VAR_PEXP_HOOK_INDEX);
+        UInt32 curHookIndex = m_Player->GetVar(VAR_EXP_HOOK_INDEX);
         if(curHookIndex == ENUM_TRAINP1)
         {
             if(m_Player->getBuffLeft(PLAYER_BUFF_TRAINP1))
@@ -190,7 +190,7 @@ namespace GObject
         UInt8 iccnt = Player::getMaxIcCount(vipLevel) - m_Player->getIcCount();
         if (Player::getMaxIcCount(vipLevel) < m_Player->getIcCount())
             iccnt = Player::getMaxIcCount(vipLevel);
-        UInt8 curType = static_cast<UInt8>(m_Player->GetVar(VAR_PEXP_HOOK_NEW_SOLUTION));
+        UInt8 curType = static_cast<UInt8>(m_Player->GetVar(VAR_EXP_HOOK_NEW_SOLUTION));
 		if(cnt > 0)
 		{
 #if 0
@@ -3680,12 +3680,12 @@ namespace GObject
 		UInt32 final = TimeUtil::Now() + timeDur;
 		EventAutoBattle* event = new(std::nothrow) EventAutoBattle(this, eachBattle, count, /*ng*/NULL, final);
 		if (event == NULL) return false;
-        SetVar(VAR_PEXP_HOOK_INDEX, type);
-		cancelAutoBattle();
-		PushTimerEvent(event);
+        SetVar(VAR_EXP_HOOK_INDEX, type);
+		cancelAutoBattle(false);
 		addFlag(Training);
 		event->notify();
 		event->updateDB(true);
+		PushTimerEvent(event);
         OnHeroMemo(MC_FIGHTER, MD_STARTED, 0, 0);
         GameAction()->doStrong(this, SthTaskHook, 0,0);
 		return true;
@@ -3693,16 +3693,18 @@ namespace GObject
 
 	void Player::pushAutoBattle(UInt32 npcId, UInt16 count, UInt16 interval)
 	{
-		if(npcId == 0 || count == 0 || interval == 0)
+		if(/*npcId == 0 || */count == 0 || interval == 0)
 			return;
         if (count > 1440 && GetLev() < 45) // XXX: 45级以下不允许挂机240小时
             return;
+#if 0
 		GData::NpcGroups::iterator it = GData::npcGroups.find(npcId);
 		if(it == GData::npcGroups.end())
 			return;
 		GData::NpcGroup * ng = it->second;
+#endif
 		UInt32 final = TimeUtil::Now() + interval * count;
-		EventAutoBattle* event = new(std::nothrow) EventAutoBattle(this, interval, count, ng, final);
+		EventAutoBattle* event = new(std::nothrow) EventAutoBattle(this, interval, count, /*ng*/NULL, final);
 		if (event == NULL) return;
 		PushTimerEvent(event);
 		addFlag(Training);
@@ -3716,10 +3718,12 @@ namespace GObject
 		dg->pushChallenge(this, exp, won > 0);
 	}
 
-	void Player::cancelAutoBattle()
+	void Player::cancelAutoBattle(bool needNotify)
 	{
 		GameMsgHdr hdr2(0x179, WORKER_THREAD_WORLD, this, 0);
 		GLOBAL().PushMsg(hdr2, 0);
+        if(needNotify)
+            cancelAutoBattleNotify();
 	}
 
 	void Player::cancelAutoBattleNotify()
@@ -17355,7 +17359,7 @@ void Player::transferPexpBuffer2Var()
     UInt32 tm = TimeUtil::Now();
     UInt32 left;
     UInt32 total;
-    if(GetVar(VAR_PEXP_HOOK_NEW_SOLUTION))
+    if(GetVar(VAR_EXP_HOOK_NEW_SOLUTION))
         return;
     /** 初级**/
     total = 0;
@@ -17367,7 +17371,7 @@ void Player::transferPexpBuffer2Var()
     if(total > 0)
     {
         setBuffData(PLAYER_BUFF_TRAINP1, total);
-        SetVar(VAR_PEXP_HOOK_INDEX, ENUM_TRAINP1);
+        SetVar(VAR_EXP_HOOK_INDEX, ENUM_TRAINP1);
     }
 
     /** 高级 **/
@@ -17390,7 +17394,7 @@ void Player::transferPexpBuffer2Var()
     if(total > 0)
     {
         setBuffData(PLAYER_BUFF_TRAINP2, total);
-        SetVar(VAR_PEXP_HOOK_INDEX, ENUM_TRAINP2);
+        SetVar(VAR_EXP_HOOK_INDEX, ENUM_TRAINP2);
     }
 
     /** 齐天 **/
@@ -17403,9 +17407,9 @@ void Player::transferPexpBuffer2Var()
     if(total > 0)
     {
         setBuffData(PLAYER_BUFF_TRAINP3, 0);
-        SetVar(VAR_PEXP_HOOK_INDEX, ENUM_TRAINP3);
+        SetVar(VAR_EXP_HOOK_INDEX, ENUM_TRAINP3);
     }
-    SetVar(VAR_PEXP_HOOK_NEW_SOLUTION, 1);
+    SetVar(VAR_EXP_HOOK_NEW_SOLUTION, 1);
 }
 
 } // namespace GObject
