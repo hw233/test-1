@@ -323,6 +323,7 @@ namespace GObject
         VAR_ITEM_9316_FAILED_COUNT = 347, // 都率宝伞礼包连续开启失败次数
         VAR_CONSUME_AWARD_COUNT = 348,   //消费抽奖已抽次数
         VAR_NEW_YEAR_GIVE_GIFT = 349,   //迎新纳福，红包入袋(bit1~10依次代表对应的天数是否领取过奖励)
+        //350仙宠占用 suntao
 
         // 351~360 占用 for JLT
         VAR_DISCOUNT_CONSUME1  = 351, // 消费限购的金额
@@ -353,6 +354,8 @@ namespace GObject
         VAR_9343_USED=374,
         VAR_SNAKE_SPRING_EQUIP_GOT=375,
         VAR_WEIBO_AWARD_GOT=376,
+        //377仙宠占用 suntao
+
         //越南版380-399
         //400-420 for qiwy
         VAR_NEWYEAR_QQGAME_ACT = 401, //蓝钻新年回馈活动
@@ -362,6 +365,11 @@ namespace GObject
         VAR_TRAINP1 = 405,
         VAR_TRAINP2 = 406,
         VAR_TRAINP3 = 407,
+
+        //421-430 for suntao
+        VAR_HUNYUAN_STEP = 421, //大闹龙宫之混元剑诀
+        VAR_HUNYUAN_STEP4_COUNT = 422, //大闹龙宫之混元剑诀从第4格移动到第5失败的次数
+
         VAR_MAX,
     };
 
@@ -669,6 +677,8 @@ namespace GObject
             REGISTER_VAR(VAR_DRAGONKINGSNAKE_STEP4_COUNT, CYCLE_NONE);
             REGISTER_VAR(VAR_TIANMANG_STEP, CYCLE_NONE);
             REGISTER_VAR(VAR_TIANMANG_STEP4_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_HUNYUAN_STEP, CYCLE_NONE);
+            REGISTER_VAR(VAR_HUNYUAN_STEP4_COUNT, CYCLE_NONE);
 
             REGISTER_VAR(VAR_CALLSNAKEEGG, CYCLE_NONE);
             REGISTER_VAR(VAR_SNAKEEGG_AWARD, CYCLE_NONE);
