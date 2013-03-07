@@ -831,7 +831,7 @@ public:
     GData::LBSkillItem* getStateCondItem(UInt16 state);
     void releaseLBSkillCD();
 
-    float getHpShieldSelf() { return _hpShieldSelf; }
+    float& getHpShieldSelf() { return _hpShieldSelf; }
     void setHpShieldSelf(float v, UInt8 l) { _hpShieldSelf = v; _hpShieldSelf_last = l; }
     bool releaseHpSieldSelf();
 

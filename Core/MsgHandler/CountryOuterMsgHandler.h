@@ -1254,6 +1254,11 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendNewYearQQGameAct();
     pl->calcNewYearQzoneContinueDay(now);
     pl->sendNewYearQzoneContinueAct();
+    if (pl->getClan() != NULL)
+    {
+        pl->getClan()->sendQQOpenid(pl);
+    }
+
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )

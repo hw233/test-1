@@ -6,11 +6,14 @@
 #include "Common/Mutex.h"
 #include "Common/AtomicVal.h"
 #include "dcapi_cpp.h"
+#include <curl/curl.h>
 
 using namespace DataCollector;
 
 namespace GObject
 {
+
+const char UNION_DC_TYPE = 100;
 
 class DCWorker
     : public WorkerRunner<>
@@ -32,6 +35,9 @@ protected:
 	std::string GetLogName();
 
 private:
+    UInt32 UnionLoggerResultParse(char* result, char* msg);
+
+private:
     struct LogMsg
     {
         const char * logString;
@@ -42,8 +48,11 @@ private:
 	UInt8 m_Worker;
     AtomicVal<UInt32> m_Limit;
 	std::vector<LogMsg> m_DCLog;
+    std::vector<LogMsg> m_UnionLog;
     CLogger* m_logger;
     bool m_inited;
+
+    CURL* curl;
 };
 
 }

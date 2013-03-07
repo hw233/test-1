@@ -345,18 +345,21 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 
         std::string clientIp;
         std::string pf;
+        std::string pfkey;
+        StringTokenizer st(ul._para, ":");
+        switch (st.count())
         {
-            StringTokenizer st(ul._para, ":");
-            if(st.count() >= 2)
-            {
-                clientIp = st[0].c_str();
+            case 3:
+                pfkey = st[2].c_str();
+            case 2:
                 pf = st[1].c_str();
-            }
-            else if (st.count() == 1)
-            {
+            case 1:
                 clientIp = st[0].c_str();
-            }
+                break;
+            default:
+                break;
         }
+
         if (4 == res)
         {
             //UInt8 platform = atoi(player->getDomain());
@@ -393,6 +396,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             player->setVia(ul._via);
             player->setClientIp(clientIp);
             player->setSource(pf);
+            player->setPfKey(pfkey);
 #ifdef _FB
             PLAYER_DATA(player, wallow) = 0;
 #endif
@@ -548,18 +552,19 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 
     std::string clientIp;
     std::string pf;
+    std::string pfkey;
+    StringTokenizer st(nu._para, ":");
+    switch (st.count())
     {
-        StringTokenizer st(nu._para, ":");
-        if(st.count() >= 2)
-        {
-            clientIp = st[0].c_str();
-            us._clientIp = clientIp;
+        case 3:
+            pfkey = st[2].c_str();
+        case 2:
             pf = st[1].c_str();
-        }
-        else if (st.count() == 1)
-        {
+        case 1:
             clientIp = st[0].c_str();
-        }
+            break;
+        default:
+            break;
     }
 
     if (cfg.GMCheck && checkCrack(us._platform, clientIp, hdr.playerID))
@@ -704,6 +709,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 
             pl->setDomain(nu._platform);
             pl->setSource(pf);
+            pl->setPfKey(pfkey);
             pl->setOpenId(nu._openid);
             pl->setOpenKey(nu._openkey);
             pl->setVia(nu._via);

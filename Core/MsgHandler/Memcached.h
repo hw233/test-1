@@ -41,6 +41,11 @@ static bool initMemcache()
 
 __attribute__((destructor)) static void uninitMemcache()
 {
+    if (memcinited)
+    {
+        memcinited = false;
+        memcached_servers_reset(&memc);
+    }
 }
 
 const char* MemcachedGet(const char* key, size_t key_size, char* value, size_t size)

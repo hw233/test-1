@@ -354,6 +354,8 @@ namespace GObject
         VAR_9343_USED=374,
         VAR_SNAKE_SPRING_EQUIP_GOT=375,
         VAR_WEIBO_AWARD_GOT=376,
+        //377仙宠占用 suntao
+
         //越南版380-399
         //400-420 for qiwy
         VAR_NEWYEAR_QQGAME_ACT = 401, //蓝钻新年回馈活动
