@@ -23,7 +23,4 @@ function Monster_00005018(num)
 	if task:HasAcceptedTask(58) then
 		task:AddTaskStep2(58,1,num);
 	end
-	if task:HasAcceptedTask(129) then
-		task:AddTaskStep2(129,1,num);
-	end
 end

@@ -2084,6 +2084,10 @@ namespace GObject
         int addr = inet_addr(m_clientIp);
 		DBLOG1().PushUpdateData("update login_states set logout_time=%u where server_id=%u and player_id=%"I64_FMT"u and login_time=%u", curtime, addr?addr:cfg.serverLogId, _id, _playerData.lastOnline);
 		DB1().PushUpdateData("UPDATE `player` SET `lastOnline` = %u, `nextReward` = '%u|%u|%u|%u' WHERE `id` = %"I64_FMT"u", curtime, _playerData.rewardStep, _playerData.nextRewardItem, _playerData.nextRewardCount, _playerData.nextRewardTime, _id);
+        if(_isOnline && !hasFlag(Training))
+        {
+            autoBattle(0, 0);
+        }
         _isOnline = false;
 
 		if(!nobroadcast)
@@ -3655,7 +3659,9 @@ namespace GObject
 
 	bool Player::autoBattle( UInt32 npcId, UInt8 type)
 	{
-        if(type > 3 && type != 0xFF)
+        if(type > 3)
+            return false;
+        if(GetLev() < 30)
             return false;
 #if 0
 		GData::NpcGroups::iterator it = GData::npcGroups.find(npcId);
@@ -17401,7 +17407,8 @@ void Player::transferExpBuffer2Var()
     if(total > 0)
     {
         SetVar(VAR_TRAINP1, total);
-        SetVar(VAR_EXP_HOOK_INDEX, ENUM_TRAINP1);
+        if(hasFlag(Training))
+            SetVar(VAR_EXP_HOOK_INDEX, ENUM_TRAINP1);
     }
 
     /** 高级 **/
@@ -17424,7 +17431,8 @@ void Player::transferExpBuffer2Var()
     if(total > 0)
     {
         SetVar(VAR_TRAINP2, total);
-        SetVar(VAR_EXP_HOOK_INDEX, ENUM_TRAINP2);
+        if(hasFlag(Training))
+            SetVar(VAR_EXP_HOOK_INDEX, ENUM_TRAINP2);
     }
 
     /** 齐天 **/
@@ -17437,7 +17445,8 @@ void Player::transferExpBuffer2Var()
     if(total > 0)
     {
         SetVar(VAR_TRAINP3, total);
-        SetVar(VAR_EXP_HOOK_INDEX, ENUM_TRAINP3);
+        if(hasFlag(Training))
+            SetVar(VAR_EXP_HOOK_INDEX, ENUM_TRAINP3);
     }
 }
 
