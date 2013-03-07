@@ -6565,6 +6565,7 @@ function checkDragonKingCanSucceed(player, step, flag)
             [1] = 362,
             [2] = 368,
             [3] = 370,
+            [4] = 422,
         }
         local var = flags[flag]
         if var == nil then
@@ -6593,6 +6594,7 @@ function getDragonKingAward(step, flag)
             [1] = {{6134,1}},
             [2] = {{6135,1}},
             [3] = {{136,1}},
+            [4] = {{6136,1}},
         },
     }
     local chances = {

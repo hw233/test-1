@@ -17024,6 +17024,11 @@ void Player::getDragonKingInfo()
         st << static_cast<UInt8>(0x0B);
         step = GetVar(VAR_TIANMANG_STEP);
     }
+    else if(4 == flag)
+    {
+        st << static_cast<UInt8>(0x0D);
+        step = GetVar(VAR_HUNYUAN_STEP);
+    }
     else
         return;
     if( step == 0 || step > 5)
@@ -17071,6 +17076,12 @@ void Player::postDragonKing(UInt8 count)
         type = 0x0B;
         step = GetVar(VAR_TIANMANG_STEP);
     }
+    else if(4 == flag)
+    {
+        XBLing = 9364;
+        type = 0x0D;
+        step = GetVar(VAR_HUNYUAN_STEP);
+    }
     else
         return;
     if (GetPackage()->GetItemAnyNum(XBLing) < count)
@@ -17102,8 +17113,8 @@ void Player::postDragonKing(UInt8 count)
             UInt16 itemId = award.get<UInt16>(j);
             st << itemId << award.get<UInt8>(j+1);
             GetPackage()->Add(itemId, award.get<UInt32>(j+1), isBind, true, FromQixi);
-            //6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片
-            if(itemId == 6134 || itemId == 6135 || itemId == 136)
+            //6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页
+            if(itemId == 6134 || itemId == 6135 || itemId == 136 || itemId == 6136)
                 SYSMSG_BROADCASTV(295, getCountry(), getName().c_str(), itemId);
         }
     }

@@ -2744,8 +2744,8 @@ void GMCmd(LoginMsgHdr& hdr, const void* data)
                 UInt32 endTime = 0;
                 UInt32 flag = 0;
                 br >> endTime >> flag;
-                //大闹龙宫的flag暂时只为1,2,3
-                if(endTime <= val || flag > 3)
+                //大闹龙宫的flag暂时只为1,2,3,4
+                if(endTime <= val || flag > 4)
                     result = 1;
                 else
                 {

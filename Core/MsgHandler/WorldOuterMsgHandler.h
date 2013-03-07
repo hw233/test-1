@@ -2286,10 +2286,11 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             }
             break;
         }
-        //大闹龙宫,大闹龙宫之金蛇起舞,大闹龙宫之天芒神梭
+        //大闹龙宫,大闹龙宫之金蛇起舞,大闹龙宫之天芒神梭,之混元剑诀
         case 0x06:
         case 0x0A:
         case 0x0B:
+        case 0x0D:
         {
             brd >> op;
             switch(op)
