@@ -126,6 +126,7 @@ namespace GObject
 #define PLAYER_BUFF_ATHL7           0x57
 #define PLAYER_BUFF_ATHL8           0x58
 #define PLAYER_BUFF_ATHL9           0x59
+#define PLAYER_BUFF_QI_TIAN_CHU_MO  0x5B   //齐天除魔
 
 #define PLAYER_BUFF_DISPLAY_MAX		0x5F
 #define PLAYER_BUFF_COUNT			0x5F
@@ -164,6 +165,13 @@ namespace GObject
 #define PF_UNION 17
 #define PF_XY 171
 #define PF_XY_CH 10040
+
+    enum PEXP_HOOK_INFEX
+    {
+        ENUM_TRAINP1 = 1,  /** 初级经验加速符*1.2,加速(*1.3) **/
+        ENUM_TRAINP2,      /** 高级经验加速符*1.5,加速(*1.6);2.ENUM_TRAINP4:*1.5,加速(*1.5);3.ENUM_ADVANCED_HOOK:超值挂机加速符(100小时),*1.5,加速(*1.6) **/
+        ENUM_TRAINP3       /** 齐天经验加速符,*1.8,加速(*1.8) **/
+    };
 
 	class Map;
 	class Player;
@@ -222,6 +230,7 @@ namespace GObject
 		bool instantComplete();
 
 		void updateDB(bool);
+		UInt32 getFinalEnd() const { return _finalEnd; };
 
 	private:
 		float calcExpEach(UInt32);
@@ -930,7 +939,7 @@ namespace GObject
 		void setBuffData(UInt8, UInt32, bool = true);
 		void addBuffData(UInt8, UInt32);
 		void testBattlePunish();
-
+        void sendExpHook(UInt8 id, UInt32 data);
 
         UInt32 GetVar(UInt32 id);
         Int32 GetVarS(Int32 id);
@@ -1212,11 +1221,11 @@ namespace GObject
         inline bool isAutoCopyFailed() { return m_autoCopyFailed; }
         inline void resetAutoCopyFailed() { m_autoCopyFailed = false; }
         inline void setCopyFailed() { m_autoCopyFailed = true; }
-		bool autoBattle(UInt32);
+		bool autoBattle(UInt32, UInt8);
 		void pushAutoBattle(UInt32, UInt16, UInt16);
         //void advancedHookExp();
 		void pushAutoDungeon(UInt32, UInt32, UInt8);
-		void cancelAutoBattle();
+		void cancelAutoBattle(bool needNotify = true);
 		void cancelAutoBattleNotify();
 		void instantAutoBattle();
 		void cancelAutoDungeon();
@@ -2142,6 +2151,9 @@ namespace GObject
         void getNewYearQzoneContinueAward(UInt8 type);
         void sendNewYearQzoneContinueAct();
         void calcNewYearQzoneContinueDay(UInt32 time);
+        void transferExpBuffer2Var();
+
+        inline bool relateExpHook(UInt8 id) { return id == PLAYER_BUFF_TRAINP1 || id == PLAYER_BUFF_TRAINP2 || id == PLAYER_BUFF_TRAINP3/* || id == PLAYER_BUFF_TRAINP4 || id == PLAYER_BUFF_ADVANCED_HOOK*/; }
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

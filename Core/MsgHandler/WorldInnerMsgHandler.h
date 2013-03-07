@@ -417,8 +417,8 @@ void OnDoCancelAutoBattleReq( GameMsgHdr& hdr, const void * data )
 	if(ev == NULL)
 		return;
 	ev->release();
-	GameMsgHdr hdr2(0x279, player->getThreadId(), player, 0);
-	GLOBAL().PushMsg(hdr2, NULL);
+	//GameMsgHdr hdr2(0x279, player->getThreadId(), player, 0);
+	//GLOBAL().PushMsg(hdr2, NULL);
 }
 
 void OnTrainAccelerateReq( GameMsgHdr& hdr, const void * data )

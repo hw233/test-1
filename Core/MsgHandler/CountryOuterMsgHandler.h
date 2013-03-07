@@ -335,7 +335,8 @@ struct AttackNpcReq
 struct AutoBattleReq
 {
 	UInt32 _npcId;
-	MESSAGE_DEF1(REQ::TASK_HOOK, UInt32, _npcId);
+	UInt8 _type;
+	MESSAGE_DEF2(REQ::TASK_HOOK, UInt32, _npcId, UInt8, _type);
 };
 
 struct CancelAutoBattleReq
@@ -2904,7 +2905,7 @@ void OnAttackNpcReq( GameMsgHdr& hdr, AttackNpcReq& anr )
 void OnAutoBattleReq( GameMsgHdr& hdr, AutoBattleReq& abr )
 {
 	MSG_QUERY_PLAYER(player);
-	player->autoBattle(abr._npcId);
+	player->autoBattle(abr._npcId, abr._type);
 }
 
 void OnCancelAutoBattleReq( GameMsgHdr& hdr, CancelAutoBattleReq& )
@@ -2912,6 +2913,7 @@ void OnCancelAutoBattleReq( GameMsgHdr& hdr, CancelAutoBattleReq& )
 	MSG_QUERY_PLAYER(player);
 	GameMsgHdr hdr2(0x179, WORKER_THREAD_WORLD, player, 0);
 	GLOBAL().PushMsg(hdr2, 0);
+    player->cancelAutoBattleNotify();
 }
 
 void OnInstantAutoBattleReq( GameMsgHdr& hdr, InstantAutoBattleReq& )
