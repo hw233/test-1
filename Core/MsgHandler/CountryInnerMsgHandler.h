@@ -1138,6 +1138,7 @@ void OnCreateAward(GameMsgHdr& hdr, const void * data)
 #ifdef _FB
 #else
     dclogger.reg(player);
+    dclogger.reg_union(player);
 #endif
 #endif //_WIN32
 }
@@ -1870,6 +1871,9 @@ void OnOpenAPIFailed( GameMsgHdr &hdr, const void *data)
             break;
         case 1002:
             snprintf (buf, 32, "%s", "punish");
+            break;
+        case 3333:
+            snprintf (buf, 32, "%s", "union_reg");
             break;
         default:
             snprintf (buf, 32, "unknow_%d", faildInfo->type);

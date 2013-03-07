@@ -99,6 +99,7 @@ public:
     bool dclog;
     bool secdclog;
     bool secdclogTest;
+    bool unionPlatform;
     bool autoForbid;
 
 public:
@@ -144,6 +145,7 @@ public:
     inline void setDCLog(bool v) { dclog = v; }
     inline void setSecDCLog(bool v) { secdclog = v; }
     inline void setSecDCLogTest(bool v) { secdclogTest = v; }
+    inline void setUnionPlatform(bool v) { unionPlatform = v; }
 
     inline void setAutoForbid(bool v) { autoForbid = v; }
 

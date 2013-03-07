@@ -1240,11 +1240,12 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
             if(dmg3 > 0)
             {
                 makeDamage(area_target, dmg3);
+                if (magdmgFlag)
+                    appendDefStatus(e_damNormal, magdmg, area_target, e_damageMagic);
+                if (dmgFlag)
+                    appendDefStatus(e_damNormal, dmg, area_target, e_damagePhysic);
             }
-            if (magdmgFlag)
-                appendDefStatus(e_damNormal, magdmg, area_target, e_damageMagic);
-            if (dmgFlag)
-                appendDefStatus(e_damNormal, dmg, area_target, e_damagePhysic);
+
             //appendDefStatus(e_damNormal, dmg3, area_target);
             //printf("%u:%u %s %u:%u, made %u damage, hp left: %u\n", 1-side, from_pos, cs2 ? "CRITICALs" : "hits", side, pos, dmg, area_target->getHP());
             // killed the target fighter
@@ -1451,6 +1452,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                     dmg2 *= static_cast<float>(950 + _rnd(100)) / 1000;
 
                     dmg2 = dmg2 > 0 ? dmg2 : 1;
+                    UInt32 dmg3 = dmg2;
 
                     makeDamage(bf, dmg2);
                     if(bf->getMagAtkReduce3Last() > 0)
@@ -1472,7 +1474,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                         _defList[0].damType2 |= 0x40;
                     if(pr2)
                         _defList[0].damType2 |= 0x20;
-                    _defList[0].counterDmg = dmg2;
+                    _defList[0].counterDmg = dmg3;
                     // killed the fighter
                     if(bf->getHP() == 0)
                     {
@@ -7706,16 +7708,6 @@ bool BattleSimulator::doSkillStrengthen_AttackFriend(BattleFighter* bf, const GD
             return false;
 
         dmg *= ef->value/100;
-        switch (eType)
-        {
-            case e_damNormal:
-            case e_damEvade:
-            case e_damOut:
-                break;
-            default:
-                TRACE_LOG("Impossibale eType.");
-
-        }
         appendDefStatus(eType, dmg, fighter, e_damagePhysic); // 这里应该都是普通物理攻击吧
         if (eType == e_damNormal)
         {
@@ -9851,7 +9843,7 @@ void BattleSimulator::makeDamage(BattleFighter* bo, UInt32& u)
 {
     if(!bo)
         return;
-    float shieldHp = bo->getHpShieldSelf();
+    float& shieldHp = bo->getHpShieldSelf();
     if(shieldHp > 0)
     {
         if(u > shieldHp)
@@ -9869,6 +9861,10 @@ void BattleSimulator::makeDamage(BattleFighter* bo, UInt32& u)
         {
             bo->setHpShieldSelf(0, 0);
             appendDefStatus(e_unHpShieldSelf, 0, bo);
+        }
+        else
+        {
+            appendDefStatus(e_hpShieldSelf, shieldHp, bo);
         }
     }
 

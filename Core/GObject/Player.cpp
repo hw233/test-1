@@ -688,6 +688,8 @@ namespace GObject
         memset(cf_itemId, 0, sizeof(cf_itemId));
         memset(cf_ratio, 0 ,sizeof(cf_ratio));
         _hiattrFlag = false;
+
+        _inQQGroup = false;
 	}
 
 
@@ -17424,6 +17426,21 @@ void Player::transferExpBuffer2Var()
         SetVar(VAR_TRAINP3, 0);
         SetVar(VAR_EXP_HOOK_INDEX, ENUM_TRAINP3);
     }
+}
+
+//////////////////////////////////////////////////////
+UInt8 Player::toQQGroup(bool isJoin)
+{
+    if (getClan() == NULL)
+        return 1;
+    if (_inQQGroup != isJoin)
+    {
+        _inQQGroup = isJoin;
+	    DB1().PushUpdateData("UPDATE `clan_player` SET `inQQGroup` = %u WHERE `playerId` = %"I64_FMT"u", _inQQGroup, getId());
+
+        getClan()->sendQQOpenid(this);
+    }
+    return 0;
 }
 
 } // namespace GObject

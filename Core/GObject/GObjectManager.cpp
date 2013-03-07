@@ -3068,7 +3068,7 @@ namespace GObject
         // ??????Ϣ
 		LoadingCounter lc("Loading clans:");
 		DBClan cl;
-		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `funds`, `foundTime`, `founder`, `leader`, `watchman`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle`, `battleScore`, `dailyBattleScore` `battleRanking` FROM `clan`", cl) != DB::DB_OK)
+		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `funds`, `foundTime`, `founder`, `leader`, `watchman`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle`, `battleScore`, `dailyBattleScore`, `battleRanking`,`qqOpenid` FROM `clan`", cl) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		Clan * clan = NULL;
@@ -3111,7 +3111,8 @@ namespace GObject
 				clanBattle->setBattleTime(cl.battleTime);
 				clanBattle->setNextBattleTime(cl.nextBattleTime);
 				globalClans.add(cl.id, clan);
-			}
+                clan->setQQOpenid(cl.qqOpenid);
+		}
 			else
 			{
 				clanBattle = clanManager.getRobBattleClan();
@@ -3139,7 +3140,7 @@ namespace GObject
         // ??????Ա
 		lc.prepare("Loading clan players:");
 		DBClanPlayer cp;
-		if (execu->Prepare("SELECT `id`, `playerId`, `joinTime`, `proffer`, `cls`, `enterCount`, `thisDay`, `petFriendness1`, `petFriendness2`, `petFriendness3`, `petFriendness4`, `favorCount1`, `favorCount2`, `favorCount3`, `favorCount4`, `lastFavorTime1`, `lastFavorTime2`, `lastFavorTime3`, `lastFavorTime4`, `signupRankBattleTime`, `rankBattleField` FROM `clan_player` ORDER BY `id`, `proffer` DESC, `joinTime` ASC", cp) != DB::DB_OK)
+		if (execu->Prepare("SELECT `id`, `playerId`, `joinTime`, `proffer`, `cls`, `enterCount`, `thisDay`, `petFriendness1`, `petFriendness2`, `petFriendness3`, `petFriendness4`, `favorCount1`, `favorCount2`, `favorCount3`, `favorCount4`, `lastFavorTime1`, `lastFavorTime2`, `lastFavorTime3`, `lastFavorTime4`, `signupRankBattleTime`, `rankBattleField`,`inQQGroup` FROM `clan_player` ORDER BY `id`, `proffer` DESC, `joinTime` ASC", cp) != DB::DB_OK)
 			return false;
 		UInt32 lastId = 0xFFFFFFFF;
 		lc.reset(1000);
@@ -3210,6 +3211,8 @@ namespace GObject
 			}
 			else
 				delete cm;
+
+            pl->setInQQGroup(cp.inQQGroup);
 		}
 		lc.finalize();
 		globalClans.enumerate(cacheClan, 0);

@@ -61,6 +61,7 @@ MSG_REG_2(GameMsgHdr, REQ::ACTIVE, OnQixiReq);
 MSG_REG_2(GameMsgHdr, REQ::TOWN_DEAMON, OnTownDeamonReq);
 
 MSG_REG_2(GameMsgHdr, REQ::SINGLE_HERO, OnSingleHeroReq);
+MSG_REG_2(GameMsgHdr, REQ::CLAN_QQ, OnClanQQ);
 
 MSG_REG_2(ArenaMsgHdr, 0x101, OnArenaConnected);
 MSG_REG_2(ArenaMsgHdr, 0x102, OnPlayerEntered);
