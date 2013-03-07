@@ -13113,7 +13113,83 @@ namespace GObject
 
         sendYearRPInfo();
     }
+    void Player::sendFishUserInfo()
+    {
+        UInt8 today = (TimeUtil::SharpDay(0, TimeUtil::Now()) - TimeUtil::SharpDay(0, getCreated())) / DAY_SECS + 1;
+        if (today > 7)
+            return;
+        UInt32 rpValue = GetVar(VAR_RP_VALUE);
+        if (rpValue != 4)
+            return;
+        UInt32 v = GetVar(VAR_FISHUSER_AWARD);
+        Stream st(REP::RC7DAY);
+        st << static_cast<UInt8>(9);
+        st << static_cast<UInt8>(today);
+        st << static_cast<UInt8>(v);
+        st << Stream::eos;
+        send(st);
+    }
+    void Player::getFishUserPackage()
+    {
+        if (GetLev() < 45)
+            return;
+        UInt32 rpValue = GetVar(VAR_RP_VALUE);
+        if (rpValue != 4)
+            return;
 
+        if (TimeUtil::SharpDay(0, TimeUtil::Now()) - TimeUtil::SharpDay(0, getCreated()) > 6 * DAY_SECS)
+            return;
+
+        UInt32 v = GetVar(VAR_FISHUSER_AWARD);
+        if ((v&0x80) == 0)
+        {
+            if (GetPackage()->GetRestPackageSize() < 3)
+            {
+                sendMsgCode(0, 1011);
+            }
+            else
+            {
+                GetPackage()->Add(1277,1,true);
+                GetPackage()->Add(30,1,true);
+                GetPackage()->Add(1325,5,true);
+                v |= 0x80;
+                SetVar(VAR_FISHUSER_AWARD, v);
+            }
+        }
+        sendFishUserInfo();
+    } 
+    void Player::getFishUserAward()
+    {
+        static const MailPackage::MailItem s_items[][3] = {
+            {{15,5},{1604,1},{56,2}},
+            {{15,5},{503,10},{56,5}},
+            {{15,5},{514,10},{56,5}},
+            {{15,5},{515,3},{56,5}},
+            {{15,5},{1610,1},{56,5}},
+            {{15,5},{509,5},{56,10}},
+            {{15,5},{226,1},{56,10}}
+        };
+        UInt8 today = (TimeUtil::SharpDay(0, TimeUtil::Now()) - TimeUtil::SharpDay(0, getCreated())) / DAY_SECS + 1;
+        if (today > 7 || today == 0)
+            return;
+        UInt8 v = GetVar(VAR_FISHUSER_AWARD);
+        if ((v&(0x01<<(today-1))) == 0)
+        {
+            if (GetPackage()->GetRestPackageSize() < 3)
+            {
+                sendMsgCode(0, 1011);
+                return;
+            }
+            getCoupon(50);
+            for (UInt8 i = 0; i < 3; ++i)
+            {
+                GetPackage()->Add(s_items[today-1][i].id, s_items[today-1][i].count, true);
+            }
+            v |= (0x01<<(today-1));
+            SetVar(VAR_FISHUSER_AWARD, v); 
+        }
+        sendFishUserInfo();
+    }
     void Player::getContinuousReward(UInt8 type, UInt8 idx)
     {
         if (!World::getRC7Day())
@@ -17399,6 +17475,93 @@ void Player::sendSaveGoldAct()
             st << static_cast<UInt8>(GetVarNow(VAR_SAVEGOLD_ISGET, curTime + 30));
         st << status;
     }
+    st << Stream::eos;
+    send(st);
+}
+void Player::buyTownTjItem(const UInt32 itemId)
+{
+    static const UInt32 s_items[] = {1653,1654,1655,1532,1533,1534};
+    int opt = -1;
+    for (UInt8 i = 0; i < sizeof(s_items)/sizeof(s_items[0]); ++i)
+    {
+        if (itemId == s_items[i])
+        {
+            opt = i;
+            break;
+        }
+    }
+    if (opt < 0)
+        return;
+    int flag = GetVar(VAR_TJ_TOWN_ITEM_GOT);
+    if (flag & (1 << opt))//已领取
+    {
+        std::vector<ItemEquip*> items;
+        std::vector<ItemEquip*> fgtItems;
+        GetPackage()->FindEquipByTypeId(items, itemId, true);
+        if (!items.empty()) 
+        {
+            sendMsgCode(0, 1044);
+            return;
+        }
+        for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++it)
+        {
+            fgtItems.clear();
+            Fighter* fgt = it->second;
+            fgt->findTrumpByTypeId(fgtItems, itemId);
+            if (!fgtItems.empty())
+            {
+                sendMsgCode(0, 1044);
+                return;
+            }
+        }
+        if (getGold() < 100)
+        {
+            sendMsgCode(0, 1104); 
+            return;
+        }
+        if (GetPackage()->GetRestPackageSize() == 0)
+        {
+            sendMsgCode(0, 1011); 
+            return;
+        }
+        ConsumeInfo ci(BuyTownTjTrump,0,0);
+		useGold(100,&ci);
+        GetPackage()->Add(itemId,1,true);
+        sendTownTjItemInfo();
+    }
+}
+void Player::sendTownTjItemInfo()
+{
+    static const UInt32 s_items[] = {1653,1654,1655,1532,1533,1534};
+    UInt8 flag = GetVar(VAR_TJ_TOWN_ITEM_GOT);
+    std::vector<ItemEquip*> items;
+    std::vector<ItemEquip*> fgtItems;
+    for (UInt8 i = 0; i < sizeof(s_items)/sizeof(s_items[0]); ++i) 
+    {
+        if (flag&(1<<i))
+        {
+            items.clear();
+            GetPackage()->FindEquipByTypeId(items,s_items[i], true);
+            if (!items.empty())
+            {
+                flag &= ~(1<<i);
+                continue;
+            }
+            for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++it)
+            {
+                fgtItems.clear();
+                Fighter* fgt = it->second;
+                fgt->findTrumpByTypeId(fgtItems, s_items[i]);
+                if (!fgtItems.empty())
+                {
+                    flag &= ~(1<<i);
+                    continue;
+                }
+            }
+        }
+    }
+    Stream st(REP::ACTIVE);
+    st << static_cast<UInt8>(0x0C) << static_cast<UInt8>(0x01) << static_cast<UInt8>(flag);
     st << Stream::eos;
     send(st);
 }

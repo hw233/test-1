@@ -1291,6 +1291,10 @@ namespace GObject
         UInt8 toQQGroup(bool isJoin);
         bool isInQQGroup() {return _inQQGroup;}
         void setInQQGroup (bool v) {_inQQGroup = v;}
+        //捕鱼大亨用户
+        void sendFishUserInfo();
+        void getFishUserPackage();
+        void getFishUserAward();
 	public:
 		UInt16   GetFreePackageSize();
 		bool     ExtendPackageSize();
@@ -2131,6 +2135,9 @@ namespace GObject
         void sendSnakeSpringEquipMail(); 
 
         void getNewYearGiveGiftAward(UInt8 dayOrder, UInt8 result);
+        
+        void buyTownTjItem(const UInt32 itemId);
+        void sendTownTjItemInfo();
     private:
         UInt8 cf_posPut[5];//范围1-5
         UInt32 cf_itemId[5];

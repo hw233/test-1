@@ -1245,6 +1245,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         GLOBAL().PushMsg(hdr, NULL);
     }
     pl->sendYearRPInfo();
+    pl->sendFishUserInfo();
     //if(World::getYearActive())
     //    pl->sendYearActInfo();
     pl->sendFirstRecharge(true);
@@ -5446,7 +5447,7 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
     UInt8 op = 0;
     br >> op;
 
-    if (op !=6 && op !=7 )
+    if (op  < 6 )
         return;
 
     switch(op)
@@ -5474,6 +5475,12 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
             break;
         case 7:
             player->getYearRPReward();
+            break;
+        case 8:
+            player->getFishUserAward();
+            break;
+        case 9:
+            player->getFishUserPackage();
             break;
 
         default:

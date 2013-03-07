@@ -7807,6 +7807,16 @@ function ItemNormal_00009349(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_NameCard(iid, num, bind, param)
+    if iid < 9900 or iid >= 10000 then
+        return false
+    end
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    player:setTitle(iid-9900+54, 0)
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
 function ItemNormal_00009317(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -9565,6 +9575,7 @@ local ItemNormal_Table = {
 
     [9360] = ItemNormal_00009360,
     [9361] = ItemNormal_00009361,
+    [9900] = ItemNormal_NameCard,
 
     [10000] = ItemNormal_00010000,
     [10001] = ItemNormal_00010001,

@@ -125,7 +125,7 @@ struct NewUserStruct
     std::string _openkey;
     std::string _via;
     std::string _invited;
-    UInt8 _rp;
+    UInt8 _rp; //1:回流免费用户 2:回流vip1-vip4用户 3:回流vip5+用户
     std::string _para;
     MESSAGE_DEF12(REQ::CREATE_ROLE, std::string, _name, UInt8, _class, UInt8, _level, UInt8, _level1, UInt8, _isYear,
             std::string, _platform, std::string, _openid, std::string, _openkey, std::string, _via, std::string, _invited, UInt8, _rp, std::string, _para);
@@ -762,6 +762,10 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 
             pl->SetVar(GObject::VAR_RP_VALUE, nu._rp);
             pl->setTitle(0, 0);
+            if (nu._via == "sscq_byhd") //捕鱼达人用户
+            {
+                pl->SetVar(GObject::VAR_RP_VALUE, 4);
+            }
 
 #ifndef _FB
 #ifndef _VT

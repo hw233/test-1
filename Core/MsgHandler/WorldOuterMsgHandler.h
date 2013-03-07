@@ -2386,6 +2386,21 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             }
             break;
         }
+        case 0x0C:
+        {
+            brd >> op;
+            switch (op)
+            {
+                case 0x01:
+                    player->sendTownTjItemInfo();
+                    break;
+                case 0x02:
+                    UInt32 itemId = 0;
+                    brd >> itemId;
+                    player->buyTownTjItem(itemId);
+                    break;
+            }
+        }
         default:
             break;
     }
