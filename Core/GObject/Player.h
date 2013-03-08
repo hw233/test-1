@@ -1934,6 +1934,8 @@ namespace GObject
         void checkLastQueqiaoAward();
         void lastKillMonsterAwardPush(UInt16 itemId, UInt16 num);
         void lastNew7DayTargetAwardPush(UInt16 itemId, UInt16 num);
+        void checkLastCFTicketsAward();
+        void lastCFTicketsAward(UInt16, UInt16);
         void checkLastKillMonsterAward();
         void checkLastNew7DayTargetAward();
         void sendNewRC7DayInfo(UInt8 type = 0);

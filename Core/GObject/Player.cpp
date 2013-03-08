@@ -3927,6 +3927,9 @@ namespace GObject
 				DB1().PushUpdateData("REPLACE INTO `friend` (`id`, `type`, `friendId`) VALUES (%"I64_FMT"u, 3, %"I64_FMT"u)", getId(), pl->getId());
 		}
 		_friends[3].insert(pl);
+        //更新密友信息
+        if(notify && isOnline())
+            GetCFriend()->updateRecordData();
 	}
 	void Player::delFriend( Player * pl )
 	{
@@ -7042,7 +7045,7 @@ namespace GObject
             }
         }
 
-        for (UInt8 j = 0; j < sizeof(cfs)/sizeof(UInt8); ++j)
+        for (UInt8 j = 0; j < sizeof(cfs)/sizeof(UInt32); ++j)
         {
             for (UInt8 i = 0; i < sizeof(cf_nums)/sizeof(UInt8); ++i)
             {
@@ -10993,6 +10996,33 @@ namespace GObject
             m_Package->ItemNotify(it->id, it->count);
         }
         _lastQueqiaoAward.clear();
+    }
+
+    void Player::checkLastCFTicketsAward()
+    {
+        Stream st(REP::CFRIEND);
+        st << static_cast<UInt8>(4);
+        st << getName() << getCountry();
+        st << static_cast<UInt8>(_lastCFTicketsAward.size());
+        std::vector<GData::LootResult>::iterator it;
+        for(it = _lastCFTicketsAward.begin(); it != _lastCFTicketsAward.end(); ++ it)
+        {
+            if(it->id == COUPON_ID)
+                checkLastBattled();
+            else if(it->id != 0)
+                GetPackage()->ItemNotify(it->id, it->count);
+            st << static_cast<UInt16>(it->id);
+            st << static_cast<UInt8>(it->count);
+        }
+        _lastCFTicketsAward.clear();
+        st << Stream::eos;
+        NETWORK()->Broadcast(st);
+    }
+
+    void Player::lastCFTicketsAward(UInt16 itemId, UInt16 num)
+    {
+        GData::LootResult lt = {itemId, num};
+        _lastCFTicketsAward.push_back(lt);
     }
 
     void Player::sendHappyInfo(UInt16 itemId)

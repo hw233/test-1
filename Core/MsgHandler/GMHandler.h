@@ -172,6 +172,8 @@ private:
     void OnIdipBuy(GObject::Player* player, std::vector<std::string>& arge);
     void OnStrengthen(GObject::Player *player, std::vector<std::string>& args);
     void OnNewCountryBattle(GObject::Player *player, std::vector<std::string>& args);
+    void OnCFriend(GObject::Player *player, std::vector<std::string>& args);
+    void OnShuoShuo(GObject::Player *player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;

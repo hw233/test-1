@@ -83,6 +83,13 @@ public:
     void reset(bool = true);
     void resetMin();
 
+    //For GM
+    void clearAllForGM()
+    {
+        for(UInt8 i = 0; i < m_ss.size(); ++ i)
+            m_ss[i] = 0;
+        updateToDB();
+    }
 private:
     Player* m_owner;
     std::vector<UInt8> m_ss; // 0-未达 1-已达 2-已领取

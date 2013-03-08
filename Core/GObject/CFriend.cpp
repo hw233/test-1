@@ -28,22 +28,13 @@ void CFriend::loadFromDB(const char* cf)
 
     StringTokenizer cfriend(cf, ",");
     UInt32 count = cfriend.count();
-    m_cf.resize(count > CF_MAX ? count : CF_MAX);
-    for (UInt8 i = 0; i < count; ++i)
+    m_cf.resize(CF_MAX);
+    for (UInt8 i = 0; i < count && i < CF_MAX; ++i)
         m_cf[i] = atoi(cfriend[i].c_str());
     bool toDB = false;
-    /*
-    if (count < MIN_ITEM)
-    {
-        m_cf.resize(MIN_ITEM, 0);
-        count = MIN_ITEM;
-        toDB = true;
-    }
-    */
-
     if (!m_owner->GetVar(VAR_INVITES))
     {
-        for (UInt8 i = CF_INV3; i < count && i <= CF_INV30; ++i)
+        for (UInt8 i = CF_INV3; i <= CF_INV30; ++i)
             m_cf[i] = 0;
         toDB = true;
     }
@@ -56,7 +47,7 @@ void CFriend::loadFromDB(const char* cf)
     if (toDB)
         updateToDB();
 
-    m_maxIdx = count > CF_MAX ? count : CF_MAX;
+    m_maxIdx = CF_MAX;
 }
 
 void CFriend::updateToDB()
@@ -91,16 +82,9 @@ void CFriend::setCFriend(UInt8 idx, UInt8 status)
 {
     if (!World::getCFriend())
         return;
+    if (idx >= CF_MAX)
+        return;
     bool w = false;
-    /*
-    if (m_cf.size() < MIN_ITEM)
-    {
-        m_cf.resize(MIN_ITEM, 0);
-        m_maxIdx = MIN_ITEM;
-        w = true;
-    }
-    */
-
     if (idx >= m_maxIdx)
     {
         m_maxIdx = idx+1;
@@ -135,14 +119,14 @@ bool CFriend::getAward(UInt8 idx)
         return false;
     if (idx > m_cf.size())
         return false;
-    if (m_cf[idx-1] != 1)
+    if (m_cf[idx] != 1)
         return false;
 
     if (GameAction()->onGetCFriendAward(m_owner, idx))
     {
-        m_cf[idx-1] = 2;
+        m_cf[idx] = 2;
         updateToDB();
-        updateCFriend(idx-1);
+        updateCFriend(idx);
         updateRecordData();
 
         if(idx >= CF_INV3 && idx <= CF_INV30)
@@ -156,7 +140,7 @@ void CFriend::updateCFriend(UInt8 idx)
 {
     Stream st(REP::CFRIEND);
     st << static_cast<UInt8>(0);
-    st << static_cast<UInt8>(idx+1);
+    st << static_cast<UInt8>(idx);
     st << m_cf[idx];
     st << Stream::eos;
     m_owner->send(st);
@@ -182,13 +166,14 @@ void CFriend::updateRecordData()
     st << static_cast<UInt16>(m_owner->GetVar(VAR_INVITES));
     st << static_cast<UInt16>(m_owner->GetVar(VAR_INVITEDSUCCESS));
     st << static_cast<UInt16>(m_owner->GetVar(VAR_CFRIENDTICKETS));
+    st << static_cast<UInt16>(m_owner->getCFrendsNum());
     st << Stream::eos;
     m_owner->send(st);
 }
 
 void CFriend::setCFriendNum(UInt8 num)
 {
-    if(num == 0 || num > 3)
+    if(num == 0)
         return;
     UInt32 invited = m_owner->GetVar(VAR_INVITES);
     if(invited + num >= 30)
@@ -203,10 +188,8 @@ void CFriend::setCFriendNum(UInt8 num)
 
 void CFriend::reset(bool online)
 {
-    /*
-    if (m_cf.size() < MIN_ITEM)
-        m_cf.resize(MIN_ITEM, 0);
-    */
+    if (m_cf.size() < CF_MAX)
+        m_cf.resize(CF_MAX, 0);
     for (UInt8 i = CF_RECALL; i <= CF_INV30; ++i)
     {
         m_cf[i] = 0;
@@ -227,7 +210,7 @@ void CFriend::reset(bool online)
 
 void CFriend::recallFriend()
 {
-    if (!getCFriend(CF_RECALL))
+    if (getCFriend(CF_RECALL) != 2)
     {
         m_cf[CF_RECALL] = 1;
         if (!getAward(CF_RECALL))
@@ -237,7 +220,7 @@ void CFriend::recallFriend()
 
 void CFriend::giveLift()
 {
-    if (!getCFriend(CF_GIVELIFT))
+    if (getCFriend(CF_GIVELIFT) != 2)
     {
         m_cf[CF_GIVELIFT] = 1;
         if (!getAward(CF_GIVELIFT))
@@ -247,7 +230,7 @@ void CFriend::giveLift()
 
 void CFriend::getLift()
 {
-    if (!getCFriend(CF_GETLIFE))
+    if (getCFriend(CF_GETLIFE) != 2)
     {
         m_cf[CF_GETLIFE] = 1;
         if (!getAward(CF_GETLIFE))
@@ -269,23 +252,8 @@ void CFriend::useTickets(UInt8 type)
         updateRecordData();
     }
     else
-    {
-        std::vector<GData::LootResult>::iterator it;
-        for(it = m_owner->_lastCFTicketsAward.begin(); it != m_owner->_lastCFTicketsAward.end(); ++ it)
-        {
-            if(it->id == COUPON_ID)
-                m_owner->getCoupon(it->count);
-            else
-                m_owner->GetPackage()->ItemNotify(it->id, it->count);
-        }
-        m_owner->_lastCFTicketsAward.clear();
-    }
-}
+        m_owner->checkLastCFTicketsAward();
 
-void CFriend::lastCFTicketsAward(UInt16 itemId, UInt16 num)
-{
-    GData::LootResult lt = {itemId, num};
-    m_owner->_lastCFTicketsAward.push_back(lt);
 }
 
 void CFriend::setCFriendSuccess(UInt8 num)

@@ -1,7 +1,7 @@
 
 local items = {
     {}, --{{15,5,1}},
-    {}, --{{9010,1,1},},
+    --{}, --{{9010,1,1},},
     {}, --{{56,2,1}, {15,2,1}},
     {}, --{{56,2,1}, {15,2,1}},
     {}, --{{56,5,1}, {15,5,1}, {1600,1,1}},
@@ -46,7 +46,7 @@ local items = {
 };
 
 local CFtickets = {
-    0, 1, 1, 1, 1, 1, 1, --召回,赠送,领取,邀请好友
+    1, 1, 1, 1, 1, 1,   --召回,赠送,领取,邀请好友
     1, 2, 3, 4, 5, 6,   --密友等级达到45级
     1, 2, 3, 4, 5, 6,   --密友等级达到50级
     1, 2, 3, 4, 5, 6,   --密友等级达到60级
@@ -86,15 +86,27 @@ function onUseTickets(player)
     end
     local var = player:GetVar(300)
     if var <= 0 then
+        player:sendMsgCode(2, 1110, 0)
         return 0
+    end
+    local items = { {502, 1}, {510, 1}, {499, 10}, {503, 1}, {57, 1}, {56, 1}, {15, 1} }
+    local chance = {2700, 5400, 6000, 6400, 7600, 8800, 10000}
+    if not isFBVersion() then    --10QB奖励
+        for i = 33, 40 do
+            if player:hasRealItemAward(i) then
+                player:getRealItemAward(i)
+                Broadcast(0x27, "恭喜玩家[p:"..player:getCountry()..":"..player:getPName().."]使用抽奖券抽得了10QB,真是人品大爆发啊！还在等什么？邀请好友来蜀山传奇即可获得抽奖券抽取Q币！")
+                player:SetVar(300, var - 1)
+                player:lastCFTicketsAward(0, 10)
+                return  #items + 1
+            end
+        end
     end
     local package = player:GetPackage()
     if package:GetRestPackageSize() < 1 then
         player:sendMsgCode(2, 1011, 0)
         return 0
     end
-    local items = { {502, 1}, {510, 1}, {499, 10}, {503, 1}, {57, 1}, {56, 1}, {15, 1} }    --10QB奖励忽略
-    local chance = {2700, 5400, 6000, 6400, 7600, 8800, 10000}
     local r = math.random(1, 10000)
     local tmp = 0
     for i = 1, #chance do
@@ -103,11 +115,13 @@ function onUseTickets(player)
             break
         end
     end
-    if items[tmp][1] ~= 499 then
+    if items[tmp][1] == 499 then
+        player:pendCoupon(items[tmp][2])
+    else
         package:Add(items[tmp][1], items[tmp][2], true, true, 40)
     end
     player:SetVar(300, var - 1)
-    player:GetCFriend():lastCFTicketsAward(items[tmp][1], items[tmp][2])
+    player:lastCFTicketsAward(items[tmp][1], items[tmp][2])
     return tmp
 end
 

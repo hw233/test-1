@@ -186,6 +186,7 @@ namespace Script
 		CLASS_DEF(Player, getGold4LuckDraw);
 		CLASS_DEF(Player, getCoupon);
 		CLASS_DEF(Player, useCoupon);
+		CLASS_DEF(Player, pendCoupon);
 		CLASS_DEF(Player, getTael);
 		CLASS_DEF(Player, useTael);
 		CLASS_DEF(Player, getCoin);
@@ -280,6 +281,7 @@ namespace Script
         CLASS_DEF(Player, lastQueqiaoAwardPush);
         CLASS_DEF(Player, lastKillMonsterAwardPush);
         CLASS_DEF(Player, lastNew7DayTargetAwardPush);
+		CLASS_DEF(Player, lastCFTicketsAward);
         CLASS_DEF(Player, luaUdpLog);
         CLASS_DEF(Player, addFighterFromItem);
         CLASS_DEF(Player, hasFighter);

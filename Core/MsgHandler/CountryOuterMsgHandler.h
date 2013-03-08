@@ -5155,7 +5155,6 @@ void OnGetCFriendAward( GameMsgHdr& hdr, GetCFriendAward& req )
          return;
     CFriend * cFriend = player->GetCFriend();
     if(!cFriend) return;
-    printf("OnGetCFriendAward:flag[%u],idx[%u]\n",req._flag,req._idx);
     if (req._flag == 0)
         cFriend->getAward(req._idx);
     else if (req._flag == 1)
