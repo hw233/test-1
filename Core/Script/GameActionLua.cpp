@@ -112,6 +112,7 @@ namespace Script
 		lua_tinker::def(_L, "getJuly", GObject::World::getJuly);
         lua_tinker::def(_L, "getQixi", GObject::World::getQixi);
         lua_tinker::def(_L, "getWansheng", GObject::World::getWansheng);
+        lua_tinker::def(_L, "getQingren", GObject::World::getQingren);
         lua_tinker::def(_L, "getGuoqing", GObject::World::getGuoqing);
 		lua_tinker::def(_L, "getYDMDAct", GObject::World::getYDMDAct);
 		lua_tinker::def(_L, "getWeekDay",	GObject::World::getWeekDay);
@@ -144,6 +145,11 @@ namespace Script
         lua_tinker::def(_L, "getTgcEvent", GObject::World::getTgcEvent);
         lua_tinker::def(_L, "get9215Act", GObject::World::get9215Act);
         lua_tinker::def(_L, "getSnowAct", GObject::World::getSnowAct);
+		lua_tinker::def(_L, "getCompassAct", GObject::World::getCompassAct);
+		lua_tinker::def(_L, "getItem9344Act", GObject::World::getItem9344Act);
+		lua_tinker::def(_L, "getItem9343Act", GObject::World::getItem9343Act);
+		lua_tinker::def(_L, "getAutoBattleAct", GObject::World::getAutoBattleAct);
+		lua_tinker::def(_L, "getSnakeSpringEquipAct", GObject::World::setSnakeSpringEquipAct);
 
         CLASS_DEF(GameActionLua, Print);
         lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);
@@ -223,6 +229,7 @@ namespace Script
 		CLASS_DEF(Player, findFighter);
 		CLASS_DEF(Player, getBuffData);
 		CLASS_DEF(Player, setBuffData);
+		CLASS_DEF(Player, sendExpHook);
 		CLASS_DEF(Player, moveTo);
 		CLASS_DEF(Player, moveToHome);
 		CLASS_DEF(Player, moveToNeutralHome);
@@ -286,6 +293,7 @@ namespace Script
         CLASS_DEF(Player, addFighterFromItem);
         CLASS_DEF(Player, hasFighter);
         CLASS_DEF(Player, fighterFromItem);
+        CLASS_DEF(Player, appendCompassItem);
 
         CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);
@@ -1124,6 +1132,11 @@ namespace Script
 		return Call<bool>("getHeroMemoAward", player, idx, soul);
 	}
 
+    void GameActionLua::flushHeroMemoAward(Player* player, UInt8 idx)
+    {
+        return Call<void>("flushHeroMemoAward", player, idx);
+    }
+
 	bool GameActionLua::getShuoShuoAward(Player* player, UInt8 idx)
 	{
 		return Call<bool>("getShuoShuoAward", player, idx);
@@ -1229,9 +1242,9 @@ namespace Script
     {
         return Call<bool>(  "onRC7DayWill", pl, idx);
     }
-    UInt32 GameActionLua::onUseMDSoul(Player* pl, UInt8 type)
+    UInt32 GameActionLua::onUseMDSoul(Player* pl, UInt8 type, UInt8 v )
     {
-        return Call<UInt32>(  "onUseMDSoul", pl, type);
+        return Call<UInt32>(  "onUseMDSoul", pl, type, v);
     }
     bool GameActionLua::onTurnOnRC7Day(Player* pl, UInt32 total, UInt32 offset)
     {
@@ -1319,6 +1332,11 @@ namespace Script
     {
 		assert(player != NULL);
 		return Call<UInt8>("RunBlueDiamondAward", player, opt);
+    }
+    UInt8 GameActionLua::RunConsumeAward(Player* player, UInt8 opt)
+    {
+		assert(player != NULL);
+		return Call<UInt8>("RunConsumeAward", player, opt);
     }
     void GameActionLua::sendRNR(Player* player, UInt32 now, UInt32 date, UInt32 total)
     {
@@ -1480,9 +1498,9 @@ namespace Script
         return Call<UInt32>("foundCave", id);
     }
 
-    lua_tinker::table GameActionLua::getStepAward(UInt32 step)
+    UInt32 GameActionLua::getStepAward(UInt8 progress, UInt32 step)
     {
-        return Call<lua_tinker::table>("getStepAward", step);
+        return Call<UInt32>("getStepAward", progress, step);
     }
     
     UInt16 GameActionLua::getSpecialItem(UInt8 id, UInt8 index)
@@ -1495,10 +1513,51 @@ namespace Script
         return Call<lua_tinker::table>("getCopyFrontmapAward", step, localtion);
     }
 
-    lua_tinker::table GameActionLua::getDreamerTreasure(UInt8 id, UInt8 index)
+    UInt32 GameActionLua::getDreamerTreasure(UInt8 id)
     {
-        return Call<lua_tinker::table>("getDreamerTreasure", id, index);
+        return Call<UInt32>("getDreamerTreasure", id);
     }
  
+    UInt32 GameActionLua::getDreamerItem(UInt8 id, UInt8 index)
+    {
+        return Call<UInt32>("getDreamerItem", id, index);
+    }
+
+    Table GameActionLua::getDragonKingAward(UInt8 step, UInt8 flag)
+	{
+		return Call<Table>("getDragonKingAward", step, flag);
+	}
+
+    bool GameActionLua::checkDragonKingCanSucceed(Player * player, UInt8 step, UInt8 flag)
+	{
+		assert(player != NULL);
+		return Call<bool>("checkDragonKingCanSucceed", player, step, flag);
+	}
+
+    Table GameActionLua::getSaveGoldActAward(UInt32 gold)
+	{
+		return Call<Table>("getSaveGoldActAward", gold);
+	}
+
+    Table GameActionLua::getSaveGoldActExtraAward(UInt32 gold)
+	{
+		return Call<Table>("getSaveGoldActExtraAward", gold);
+	}
+
+    bool GameActionLua::onGetNewYearGiveGiftAward(Player* player, UInt8 dayOrder, UInt8 times)
+    {
+		assert(player != NULL);
+		return Call<bool>("onGetNewYearGiveGiftAward", player, dayOrder, times);
+    }
+
+	bool GameActionLua::onGetNewYearQQGameAward( Player* player, UInt8 type)
+	{
+		return Call<bool>("onGetNewYearQQGameAward", player, type);
+    }
+
+	bool GameActionLua::onGetNewYearQzoneContinueAward( Player* player, UInt8 type)
+	{
+		return Call<bool>("onGetNewYearQzoneContinueAward", player, type);
+    }
 }
 

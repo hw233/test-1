@@ -133,7 +133,6 @@ static const UInt32 s_tjBoss[][2] = {
 {7049, 7050},  //89
 {7051, 7052},  //99
 {7053, 7054},  //109
-{7053, 7054},  //119
 {7075, 7076},  //119
 {7075, 7076},  //129
 {7075, 7076},  //139
@@ -149,8 +148,8 @@ static const UInt32 s_tjTotalBoxId[] = {9127, 9128, 9129, 9130};
 static const UInt32 s_tjEventRewardId = 9131;
 static const UInt32 s_tjTotalRewardId = 9132;
                                        //59, 69,  79,  89,  99,  109, 119, 129, 139, 149, 999
-static const UInt32 s_tjWeaponId[] =   {1650,1651,1652,1529,1530,1531,1532,1533,1534,1535,1347};
-static const UInt32 s_tjNameCardId[] = {9154,9155,9156,9157,9158,9159,9160,9161,9162,9163,9228};
+static const UInt32 s_tjWeaponId[] =   {1650,1651,1652,1529,1530,1531,1532,1533,1534,1535,1355};
+static const UInt32 s_tjNameCardId[] = {9154,9155,9156,9157,9158,9159,9160,9161,9162,9163,9900};
 static  MailPackage::MailItem s_eventItem[2]= {{30,10}, {509,1}};
 #define TJ_START_TIME_HOUR 19 
 #define TJ_START_TIME_MIN  45
@@ -1012,7 +1011,7 @@ void Tianjie::setRatePercent()
         if (3 == m_currTjRate) msgId = 5031;
         if (percent < 100)
         {
-            if (m_currOpenedTjLevel == 999)
+            if (msgId == 5069)
             {
                 SYSMSG_BROADCASTV(msgId, percent);
             }
@@ -1485,9 +1484,13 @@ bool Tianjie::isFinish()
 	    m_isFinish = true;
         DB1().PushUpdateData("update tianjie set is_finish=%d where level=%d", 1, m_currOpenedTjLevel);
 
+        if (4 == m_currTjRate)
+            return m_isFinish;
+
         int msgId = 5013;
+        if (1 == m_currTjRate) msgId = m_currOpenedTjLevel==999 ? 5075:5013;
         if (2 == m_currTjRate) msgId = m_currOpenedTjLevel==999 ? 5070:5022;
-        if (3 == m_currTjRate) msgId = 5032;
+        if (3 == m_currTjRate) msgId = m_currOpenedTjLevel==999 ? 5077:5032;
         if (msgId == 5022)
         {
             SYSMSG_BROADCASTV(msgId, m_tjTypeId, m_currTjRate, m_tjTypeId, m_currTjRate);
@@ -1515,8 +1518,14 @@ void Tianjie::close1()
     m_locNpcMap.clear();
     memset(m_rate1KilledCount, 0, sizeof(m_rate1KilledCount));
 
-    if (m_isNetOk)
+    if (m_isNetOk && m_currOpenedTjLevel != 999)
+    {
         SYSMSG_BROADCASTV(5014);
+    }
+    else if (m_isNetOk)
+    {
+        SYSMSG_BROADCASTV(5076);
+    }
 }
 void Tianjie::randomTask1Data(int roleLev,short& npcId, UInt8& color, int& exp)
 {
@@ -1843,8 +1852,15 @@ void Tianjie::close3()
 {
     printf("----------------------close3()\n");
 
-    if (m_isNetOk)
+    if (m_isNetOk && m_currOpenedTjLevel != 999)
+    {
         SYSMSG_BROADCASTV(5033, m_tjTypeId, m_currTjRate);
+    }
+    else if (m_isNetOk)
+    {
+        SYSMSG_BROADCASTV(5078, m_tjTypeId, m_currTjRate,m_tjTypeId, m_currTjRate);
+
+    }
 }
 
 bool Tianjie::attackTlz(Player* pl, UInt16 level)
@@ -2294,8 +2310,8 @@ void Tianjie::closeBoss()
 
         NETWORK()->Broadcast(st);
     }
-    if (m_currOpenedTjLevel == 999)
-        SYSMSG_BROADCASTV(5074);
+//    if (m_currOpenedTjLevel == 999)
+//        SYSMSG_BROADCASTV(5074);
 
     broadEvent4(NULL, 0);
 }

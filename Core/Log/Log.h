@@ -98,6 +98,10 @@ enum PurchaseType
     BUYJOYBUFF                  = 87, //购买心悦buff
     EnumFEASTGIFT               = 88, //圣诞-登录礼包人人有
     NEWCountryBattleSkill       = 89, //蜀山论剑购买技能(霸气怒气)
+    SnakeSprintAct              = 90, //蛇年春节活动
+    DreamerConsume              = 91,
+    NewYearGetDouble            = 92, //迎新纳福，补领双倍
+    BuyTownTjTrump              = 93, //购买天劫法宝
     //繁体私有占150～200
 };
 
@@ -145,6 +149,7 @@ enum MailItemType
     NEWJOBHIRE,
     BuChangMo,
     NewCountryBattleAward,
+    LingbaoFuling,
 };
 enum ItemFrom
 {
@@ -186,37 +191,40 @@ enum ItemFrom
     FromNewRC7DayTarget = 36, //七日目标
     FromDailyStrengthen = 37, //变强秘宝
     FromJobHunter = 38, // 寻墨游戏
-    FromDreamer = 39, // 水晶梦境
-    FromCFriend = 40, //好友邀请
-
     //80 ~ 100，繁体占用
+    FromDreamer = 39, // 水晶梦境
+    FromFuling = 40, // 灵宝附灵
+    FromCFriend = 41, //好友邀请
 };
 
 enum ItemTo
 {
-	ToTrade = 128,
-	ToSale,
-	ToSplit,
-	ToDelete,
-	ToSellNpc,
-	ToExchange,
-	ToExchangeSet,
-	ToDesdroy, // ToTripod
-	ToDetachGemDesdroy,
-	ToUse,
-	ToClanDonate,
-	ToGemMgerge,
-	ToActivateAttr,
-	ToGemAttach,
-	ToTrainFighter,
-	ToTrumpUpgrade,
-    ToEquipUpgrade,
-    ToForgeFighter,
-    ToSecondSoul,
-    ToArenaBet,
-    ToSkillStrengthenOpen,
-	ToSkillStrengthenUpgrade,
-    ToQixi,
+	ToTrade = 128, //交换
+	ToSale = 129, //寄售
+	ToSplit = 130, //分解
+	ToDelete = 131, //删除
+	ToSellNpc = 132, //卖出NPC
+	ToExchange = 133, //置换
+	ToExchangeSet = 134, //套装置换
+	ToDesdroy = 135, //九疑鼎
+	ToDetachGemDesdroy = 136, //拆宝石
+	ToUse = 137, //使用
+	ToClanDonate = 138, //帮派捐献
+	ToGemMgerge = 139, //宝石合成
+	ToActivateAttr = 140, //激活属性
+	ToGemAttach = 141, //宝石镶嵌
+	ToTrainFighter = 142, //洗将
+	ToTrumpUpgrade = 143, //法宝熔炼
+    ToEquipUpgrade = 144, //装备炼化
+    ToForgeFighter = 145, //天赋洗练
+    ToSecondSoul = 146, //元神强化
+    ToArenaBet = 147, //(仙界)投注
+    ToSkillStrengthenOpen = 148, //增强技能打开
+	ToSkillStrengthenUpgrade = 149, //增强技能升级
+    ToQixi = 150, //(类似)七夕
+    ToDeleteMail = 151, //删除邮件
+    ToDeleteTrade = 152, //删除交易
+    ToLingbao = 153, // 附灵
 };
 
 struct IncommingInfo

@@ -41,6 +41,7 @@
 #include "GObject/NewCountryBattle.h"
 #include "GObject/Tianjie.h"
 #include "GObject/ClanCopy.h"
+#include "Common/Itoa.h"
 
 #include "GObject/Tianjie.h"
 #include "Memcached.h"
@@ -90,6 +91,12 @@ GMHandler::GMHandler()
 	Reg(3, "super", &GMHandler::OnSuper);
 	Reg(3, "spawn", &GMHandler::OnSpawn);
 	Reg(3, "unspawn", &GMHandler::OnUnspawn);
+    Reg(3, "lb", &GMHandler::OnLingbao);
+    Reg(3, "lbskill", &GMHandler::OnLingbaoSkill);
+    Reg(3, "lbs", &GMHandler::OnLingbaos);
+    Reg(3, "testlb", &GMHandler::testLingbao);
+
+
 
 	Reg(3, "playerwallow", &GMHandler::OnPlayerWallow);
 	Reg(3, "wallow", &GMHandler::OnWallow);
@@ -220,7 +227,7 @@ GMHandler::GMHandler()
 
     Reg(3, "biglock", &GMHandler::OnBigLock);
     Reg(3, "bigunlock", &GMHandler::OnBigUnLock);
-    Reg(3, "strong", &GMHandler::OnStrengthen);
+    Reg(2, "strong", &GMHandler::OnStrengthen);
    
     Reg(3, "fsale", &GMHandler::OnForbidSale);
     Reg(3, "unfsale", &GMHandler::OnUnForbidSale);
@@ -229,7 +236,14 @@ GMHandler::GMHandler()
     Reg(3, "sysup", &GMHandler::OnSysUpdate);
     Reg(2, "cfriend", &GMHandler::OnCFriend);
     Reg(2, "shuo", &GMHandler::OnShuoShuo);
+    Reg(2, "gold", &GMHandler::OnSaveGoldAct);
 
+    Reg(3, "drtm", &GMHandler::OnDreamerTimeSet);
+    Reg(3, "drkey", &GMHandler::OnDreamerKeySet);
+    Reg(3, "dreye", &GMHandler::OnDreamerEyeSet);
+
+    Reg(3, "act", &GMHandler::OnSomeAct);
+    Reg(3, "king", &GMHandler::OnDragonKingAct);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -3291,7 +3305,11 @@ void GMHandler::OnForbidSale(GObject::Player *player, std::vector<std::string>& 
 
     GObject::Player * pl = GObject::globalPlayers[playerId];
     if (NULL != pl)
+    {
         pl->setForbidSale(true);
+        GameMsgHdr hdr(0x352, pl->getThreadId(), pl, NULL);
+        GLOBAL().PushMsg(hdr, NULL);
+    }
 }
 
 void GMHandler::OnUnForbidSale(GObject::Player *player, std::vector<std::string>& args)
@@ -3430,4 +3448,315 @@ void GMHandler::OnShuoShuo(GObject::Player *player, std::vector<std::string>& ar
     sShuo->sendShuoShuo();
 }
 
+void GMHandler::OnSaveGoldAct(GObject::Player *player, std::vector<std::string>& args)
+{
+	if (args.size() < 1)
+		return ;
+    switch(atoi(args[0].c_str()))
+    {
+    case 1:
+        player->SetVar(VAR_SAVEGOLD_ISGET, 0);
+        break;
+    case 2:
+        {
+            player->SetVarNow(VAR_SAVEGOLD_ISGET, 0, 0);
+            player->SetVarNow(VAR_SAVEGOLD_GET_STATUS, 0, 0);
+        }
+        break;
+    case 3:
+        {
+            UInt32 gold = atoi(args[1].c_str());
+            player->SetVar(VAR_SAVEGOLD_COUNT, gold);
+            player->SetVar(VAR_SAVEGOLD_SET_TIME, TimeUtil::Now() - 7*86400-10);
+        }
+        break;
+    }
+    player->sendSaveGoldAct();
+}
+
+void GMHandler::OnLingbao(GObject::Player * player, std::vector<std::string>& args)
+{
+	if (args.size() < 1)
+		return ;
+	for(size_t i = 0; i < args.size(); ++ i)
+	{
+		UInt32 itemId = atoi(args[i].c_str());
+		if(IsEquipTypeId(itemId))
+		{
+            GObject::Package * package = player->GetPackage();
+			ItemEquip* equip = static_cast<ItemEquip*>(package->AddEquip(itemId));
+            ItemClass ic = equip->getClass();
+            switch(ic)
+            {
+            case Item_LBling:
+            case Item_LBwu:
+            case Item_LBxin:
+                {
+                    UInt8 attrNum = 4;
+                    ItemLingbaoAttr& lbattr = (static_cast<ItemLingbao*>(equip))->getLingbaoAttr();
+                    UInt8 lv = equip->getReqLev();
+                    stLBAttrConf& lbAttrConf = GObjectManager::getLBAttrConf();
+                    std::vector<UInt8> allAttrType = lbAttrConf.attrType;
+                    UInt8 itemTypeIdx = ic - Item_LBling;
+                    for(int i = 0; i < attrNum; ++ i)
+                    {
+                        UInt8 size = allAttrType.size();
+                        UInt8 idx = uRand(size);
+                        lbattr.type[i] = allAttrType[idx];
+                        lbattr.value[i] = lbAttrConf.getAttrMax(lv, itemTypeIdx, lbattr.type[i]-1) * lbAttrConf.getDisFactor(9999);
+                        allAttrType.erase(allAttrType.begin() + idx);
+                    }
+                    lbattr.lbColor = 2 + lbAttrConf.getColor(lv, itemTypeIdx, lbattr.type, lbattr.value, attrNum);
+                    if(lbattr.lbColor == 5)
+                    {
+                        for(int i = 0; i < 2; ++ i)
+                        {
+                            UInt16 lbIdx = 0;
+                            if(i > 0)
+                                lbIdx = ic - Item_LBling + 1;
+                            UInt8 maxCnt = lbAttrConf.getSkillsMaxCnt(lbIdx, lv);
+                            UInt16 skillId = lbAttrConf.getSkill(lbIdx, lv, uRand(maxCnt));
+                            lbattr.skill[i] = skillId;
+                            UInt16 factor = GData::lbSkillManager[skillId]->minFactor;
+                            lbattr.factor[i] = factor + uRand(10000-factor);
+                        }
+                    }
+
+                    std::string strType;
+                    std::string strValue;
+                    std::string strSkill;
+                    std::string strFactor;
+                    for(int i = 0; i < 4; ++ i)
+                    {
+                        strType += Itoa(lbattr.type[i], 10);
+                        strValue += Itoa(lbattr.value[i], 10);
+
+                        if(i < 3)
+                        {
+                            strType += ',';
+                            strValue += ',';
+                        }
+                        if(i < 2)
+                        {
+                            strSkill += Itoa(lbattr.skill[i], 10);
+                            strFactor += Itoa(lbattr.factor[i], 10);
+
+                            if(i < 1)
+                            {
+                                strSkill += ',';
+                                strFactor += ',';
+                            }
+                        }
+                    }
+
+                    DB4().PushUpdateData("REPLACE INTO `lingbaoattr`(`id`, `tongling`, `lbcolor`, `types`, `values`, `skills`, `factors`) VALUES(%u, %d, %d, '%s', '%s', '%s', '%s')", equip->getId(), lbattr.tongling, lbattr.lbColor, strType.c_str(), strValue.c_str(), strSkill.c_str(), strFactor.c_str());
+                }
+                break;
+            default:
+                break;
+            }
+		}
+	}
+}
+
+
+void GMHandler::OnLingbaoSkill(GObject::Player * player, std::vector<std::string>& args)
+{
+	if (args.size() < 1)
+		return ;
+	for(size_t i = 0; i < args.size(); ++ i)
+	{
+		UInt32 itemId = atoi(args[i].c_str());
+        ++ i;
+        UInt16 skill1 = atoi(args[i].c_str()); 
+        ++ i;
+        UInt16 skill2 = atoi(args[i].c_str()); 
+		if(IsEquipTypeId(itemId))
+		{
+            GObject::Package * package = player->GetPackage();
+			ItemEquip* equip = static_cast<ItemEquip*>(package->AddEquip(itemId));
+            ItemClass ic = equip->getClass();
+            switch(ic)
+            {
+            case Item_LBling:
+            case Item_LBwu:
+            case Item_LBxin:
+                {
+                    UInt8 attrNum = 4;
+                    ItemLingbaoAttr& lbattr = (static_cast<ItemLingbao*>(equip))->getLingbaoAttr();
+                    UInt8 lv = equip->getReqLev();
+                    stLBAttrConf& lbAttrConf = GObjectManager::getLBAttrConf();
+                    std::vector<UInt8> allAttrType = lbAttrConf.attrType;
+                    UInt8 itemTypeIdx = ic - Item_LBling;
+                    for(int i = 0; i < attrNum; ++ i)
+                    {
+                        UInt8 size = allAttrType.size();
+                        UInt8 idx = uRand(size);
+                        lbattr.type[i] = allAttrType[idx];
+                        lbattr.value[i] = lbAttrConf.getAttrMax(lv, itemTypeIdx, lbattr.type[i]-1) * lbAttrConf.getDisFactor(9999);
+                        allAttrType.erase(allAttrType.begin() + idx);
+                    }
+                    lbattr.lbColor = 2 + lbAttrConf.getColor(lv, itemTypeIdx, lbattr.type, lbattr.value, attrNum);
+                    if(lbattr.lbColor == 5)
+                    {
+                        for(int i = 0; i < 2; ++ i)
+                        {
+                            UInt16 lbIdx = 0;
+                            if(i > 0)
+                                lbIdx = ic - Item_LBling + 1;
+                            if(i == 0)
+                                lbattr.skill[i] = skill1;
+                            else
+                                lbattr.skill[i] = skill2;
+                            const GData::LBSkillBase* skillBase = GData::lbSkillManager[lbattr.skill[i]];
+                            if(!skillBase)
+                            {
+                                lbattr.skill[i] = 0;
+                                continue;
+                            }
+                            UInt16 factor = skillBase->minFactor;
+                            lbattr.factor[i] = factor + uRand(10000-factor);
+                        }
+                    }
+
+                    std::string strType;
+                    std::string strValue;
+                    std::string strSkill;
+                    std::string strFactor;
+                    for(int i = 0; i < 4; ++ i)
+                    {
+                        strType += Itoa(lbattr.type[i], 10);
+                        strValue += Itoa(lbattr.value[i], 10);
+
+                        if(i < 3)
+                        {
+                            strType += ',';
+                            strValue += ',';
+                        }
+                        if(i < 2)
+                        {
+                            strSkill += Itoa(lbattr.skill[i], 10);
+                            strFactor += Itoa(lbattr.factor[i], 10);
+
+                            if(i < 1)
+                            {
+                                strSkill += ',';
+                                strFactor += ',';
+                            }
+                        }
+                    }
+
+                    DB4().PushUpdateData("REPLACE INTO `lingbaoattr`(`id`, `tongling`, `lbcolor`, `types`, `values`, `skills`, `factors`) VALUES(%u, %d, %d, '%s', '%s', '%s', '%s')", equip->getId(), lbattr.tongling, lbattr.lbColor, strType.c_str(), strValue.c_str(), strSkill.c_str(), strFactor.c_str());
+                }
+                break;
+            default:
+                break;
+            }
+		}
+	}
+}
+
+void GMHandler::OnLingbaos(GObject::Player * player, std::vector<std::string>& args)
+{
+	if (args.size() < 1)
+		return ;
+    UInt32 itemId = atoi(args[0].c_str());
+    UInt32 cnt = atoi(args[1].c_str());
+	for(size_t i = 0; i < cnt; ++ i)
+	{
+		if(IsEquipTypeId(itemId))
+		{
+            GObject::Package * package = player->GetPackage();
+			package->AddEquip(itemId);
+        }
+	}
+}
+
+void GMHandler::testLingbao(GObject::Player * player, std::vector<std::string>& args)
+{
+	if (args.size() < 1)
+		return ;
+    UInt32 itemId = atoi(args[0].c_str());
+    UInt32 cnt = atoi(args[1].c_str());
+    UInt32 colors[4] = {0};
+    UInt32 skills[2] = {0};
+	for(size_t i = 0; i < cnt; ++ i)
+	{
+		if(IsEquipTypeId(itemId))
+		{
+            GObject::Package * package = player->GetPackage();
+			package->testLingbao(itemId, colors, 4, skills, 2);
+        }
+	}
+
+	SYSMSG_SENDV(4116, player, itemId, cnt, colors[0], colors[1], colors[2], colors[3], skills[0], skills[1]);
+}
+
+
+
+void GMHandler::OnDreamerTimeSet(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return;
+    UInt8 count = atoi(args[0].c_str());
+    player->setDreamerTime(count);
+}
+
+void GMHandler::OnDreamerKeySet(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return;
+    UInt8 count = atoi(args[0].c_str());
+    player->setDreamerKey(count);
+}
+
+void GMHandler::OnDreamerEyeSet(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return;
+    UInt8 count = atoi(args[0].c_str());
+    player->setDreamerEye(count);
+}
+
+void GMHandler::OnSomeAct(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return;
+    UInt8 type = atoi(args[0].c_str());
+    if(type == 1)
+    {
+        if(args.size() < 2)
+            return;
+        UInt32 day = atoi(args[1].c_str());
+        UInt32 now = TimeUtil::MkTime(2013, 1, 31) + 86400 * day;
+        player->calcNewYearQzoneContinueDay(now);
+        player->sendNewYearQzoneContinueAct();
+    }
+    else if(type == 2)
+    {
+        if(args.size() < 3)
+            return;
+        UInt32 npcId = atoi(args[1].c_str());
+        UInt32 type = atoi(args[2].c_str());
+        player->autoBattle(npcId, type);
+    }
+    else if(type == 3)
+        player->instantAutoBattle();
+}
+
+void GMHandler::OnDragonKingAct(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 3)
+        return;
+    UInt32 begin = atoi(args[0].c_str());
+    UInt32 end = atoi(args[1].c_str());
+    UInt32 type = atoi(args[2].c_str());
+    GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_BEGIN, begin);
+    GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_END, end);
+    GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_ACTION, type);
+    /*
+    UInt32 type = atoi(args[0].c_str());
+    GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_ACTION, type);
+    */
+}
 

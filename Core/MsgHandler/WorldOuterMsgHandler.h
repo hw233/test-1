@@ -188,8 +188,9 @@ struct SaleListReq
 //	UInt8  _sort;
 	UInt8  _color;
     UInt8  _career;
+    UInt8  _attrId;
 	UInt8  _eqType;
-	MESSAGE_DEF7(REQ::SALE_LIST, UInt16, _start, UInt16, _count, std::string, _name, UInt8, _req, UInt8, _color, UInt8, _career, UInt8, _eqType);
+	MESSAGE_DEF8(REQ::SALE_LIST, UInt16, _start, UInt16, _count, std::string, _name, UInt8, _req, UInt8, _color, UInt8, _career, UInt8, _attrId, UInt8, _eqType);
 };
 
 struct SaleBuyAndCancelReq
@@ -812,6 +813,45 @@ void OnClanPackageReq( GameMsgHdr& hdr, const void * data )
     }
     //TODO
 }
+void OnClanQQ( GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+	GObject::Clan * clan = player->getClan();
+	if (clan == NULL) return;
+
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    br >> type;
+    switch(type)
+    {
+        //请求帮派QQ群Openid
+    case 0x01:
+        clan->sendQQOpenid(player);
+        break;
+        //绑定qq群
+    case 0x02:
+        {
+            std::string qqOpenid;
+            br >> qqOpenid;
+            clan->setQQOpenid(player,qqOpenid);
+            break;
+        }
+        //请求帮派qq群列表
+    case 0x03:
+        break;
+        //加入qq群
+    case 0x04:
+        player->toQQGroup(true);
+        break;
+    case 0x05:
+        player->toQQGroup(false);
+        break;
+    case 0x06:
+        clan->offQQOpenid(player);
+
+    }
+}
+
 
 void OnItemHistoryReq( GameMsgHdr& hdr, ClanItemHistoryReq& req)
 {
@@ -1225,7 +1265,7 @@ void OnBattleReportReq2( GameMsgHdr& hdr, BattleReportReq2& brr)
 void OnSaleListReq( GameMsgHdr& hdr, SaleListReq& req )
 {
 	MSG_QUERY_PLAYER(player);
-	GObject::gSaleMgr.requestSaleList(player, req._start, req._count, req._name, req._req, req._color, req._career, req._eqType);
+	GObject::gSaleMgr.requestSaleList(player, req._start, req._count, req._name, req._req, req._color, req._career, req._attrId, req._eqType);
 }
 
 void OnSaleBuyAndCancelReq( GameMsgHdr& hdr, SaleBuyAndCancelReq& req )
@@ -2154,8 +2194,10 @@ void GmHandlerFromBs(LoginMsgHdr &hdr,const void * data)
 void OnQixiReq(GameMsgHdr& hdr, const void * data)
 {
 	MSG_QUERY_PLAYER(player);
+    /*
 	if(!player->hasChecked())
 		return;
+    */
 	BinaryReader brd(data, hdr.msgHdr.bodyLen);
 	UInt8 op;
     UInt8 type;
@@ -2165,8 +2207,9 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
     {
         case 0x01:  // 七夕
         case 0x03:  // 万圣节
+        case 0x09:  // 情人节浪漫之旅
         {
-            if(!WORLD().getQixi() && !WORLD().getWansheng())
+            if(!WORLD().getQixi() && !WORLD().getWansheng() && !WORLD().getQingren())
                 break;
             brd >> op;
             switch(op)
@@ -2207,6 +2250,8 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                     GameMsgHdr hdr1(0x254, player->getThreadId(), player, sizeof(pos));
                     GLOBAL().PushMsg(hdr1, &pos);
                 }
+                break;
+            default:
                 break;
             }
             break;
@@ -2275,10 +2320,89 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                     player->send(st);
                 }
                 break;
+            default:
+                break;
             }
             break;
-
         }
+        //大闹龙宫,大闹龙宫之金蛇起舞,大闹龙宫之天芒神梭,之混元剑诀
+        case 0x06:
+        case 0x0A:
+        case 0x0B:
+        case 0x0D:
+        {
+            brd >> op;
+            switch(op)
+            {
+            case 0x01:  //获取龙宫信息
+                player->getDragonKingInfo();
+                break;
+            case 0x02:  //龙宫寻宝
+                {
+                    UInt8 count= 0;
+                    brd >> count;
+                    player->postDragonKing(count);
+                }
+                break;
+            default:
+                break;
+            }
+            break;
+        }
+        //金蛇献瑞 聚福兆祥
+        case 0x07:
+        {
+            brd >> op;
+            UInt32 param = 0;
+            brd >> param;
+            struct goldData
+            {
+                UInt8 opt;
+                UInt32 param;
+            }data;
+            data.opt = op;
+            data.param = param;
+            GameMsgHdr h(0x343,  player->getThreadId(), player, sizeof(data));
+            GLOBAL().PushMsg(h, &data);
+            break;
+        }
+        //拜灵蛇,领金蛋
+        case 0x08:
+        {
+            brd >> op;
+            switch (op)
+            {
+                case 0x01:
+                    player->sendSnakeEggInfo();
+                    break;
+                case 0x02:
+                    player->callSnakeEgg();
+                    break;
+                case 0x03:
+                    UInt8 day = 0;
+                    brd >> day;
+                    player->getSnakeEggAward(day);
+                    break;
+            }
+            break;
+        }
+        case 0x0C:
+        {
+            brd >> op;
+            switch (op)
+            {
+                case 0x01:
+                    player->sendTownTjItemInfo();
+                    break;
+                case 0x02:
+                    UInt32 itemId = 0;
+                    brd >> itemId;
+                    player->buyTownTjItem(itemId);
+                    break;
+            }
+        }
+        default:
+            break;
     }
 }
 

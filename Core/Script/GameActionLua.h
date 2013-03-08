@@ -206,6 +206,7 @@ namespace Script
         bool onMayDay1(Player* player);
 		void onAttackBoss(Player* player);
 		bool getHeroMemoAward(Player* player, UInt8 idx, UInt32 soul);
+        void flushHeroMemoAward(Player* player, UInt8 idx);
 		bool getShuoShuoAward(Player* player, UInt8 idx);
 		bool onPurchase(Player* player, UInt32 id, UInt8 count);
 		void exchangeExtraReward(Player* player, UInt32 id);
@@ -243,7 +244,7 @@ namespace Script
         UInt16 onCLLoginRewardRF(Player* player, UInt8 cts, UInt8 type);
         void onCL3DayReward(Player* player);
         bool onRC7DayWill(Player* player, UInt8 idx);
-        UInt32 onUseMDSoul(Player* player, UInt8 type);
+        UInt32 onUseMDSoul(Player* player, UInt8 type, UInt8 v);
         bool onTurnOnRC7Day(Player* player, UInt32 total, UInt32 offset);
         bool onTurnOnRF7Day(Player* player, UInt32 total, UInt32 offset);
         lua_tinker::table luckyDraw(Player* player, UInt8 id, UInt8 num);
@@ -261,6 +262,7 @@ namespace Script
         bool  RunNewRC7DayRechargeAward(Player* player, UInt8 val, UInt32 totalRecharge);
         UInt8 RunNewRC7DayTargetAward(Player* player);
         UInt8 RunBlueDiamondAward(Player* player, UInt8 opt);
+        UInt8 RunConsumeAward(Player* player, UInt8 opt);
         void sendRNR(Player* player, UInt32 now, UInt32 date, UInt32 total);
         void sendRechargeMails(Player* player, UInt32 ototal, UInt32 ntotal);
         void sendRechargeRankAward(Player* player, Int32 pos);
@@ -278,10 +280,11 @@ namespace Script
         UInt32 calcGridType(UInt8 prob);
         lua_tinker::table getTreasure(UInt8 id);
         UInt32 foundCave(UInt8 id);
-        lua_tinker::table getStepAward(UInt32 step);
+        UInt32 getStepAward(UInt8 progress, UInt32 step);
         UInt16 getSpecialItem(UInt8 id, UInt8 index);
         lua_tinker::table getCopyFrontmapAward(UInt8 step, UInt16 localtion);
-        lua_tinker::table getDreamerTreasure(UInt8 id, UInt8 index);
+        UInt32 getDreamerTreasure(UInt8 id);
+        UInt32 getDreamerItem(UInt8 id, UInt8 index);
 
     public:
 
@@ -344,6 +347,13 @@ namespace Script
         UInt8 RunThanksGivingDayAward(Player* player, UInt8 opt);
         bool onGetFeastGiftAward(Player* player, UInt8 type);
         bool onFirstRecharge(Player* player, UInt8 index);
+	    Table getDragonKingAward(UInt8 step, UInt8 flag);
+        bool checkDragonKingCanSucceed(Player * player, UInt8 step, UInt8 flag);
+        Table getSaveGoldActAward(UInt32 gold);
+        Table getSaveGoldActExtraAward(UInt32 gold);
+        bool onGetNewYearGiveGiftAward(Player* player, UInt8 dayOrder, UInt8 times);
+        bool onGetNewYearQQGameAward( Player* player, UInt8 type);
+        bool onGetNewYearQzoneContinueAward( Player* player, UInt8 type);
 
 	private:
 		Player* _player1;	//?ű???????Ϊ????1

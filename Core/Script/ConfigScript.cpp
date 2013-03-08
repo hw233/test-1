@@ -37,6 +37,7 @@ ConfigScript::ConfigScript( Cfg * cfg )
 	class_def<Cfg>("setLoginLimit", &Cfg::setLoginLimit);
 	class_def<Cfg>("setLoginMax", &Cfg::setLoginMax);
 	class_def<Cfg>("setVerifyTokenServer", &Cfg::setVerifyTokenServer);
+    class_def<Cfg>("setIDQueryMemcachedServer", &Cfg::setIDQueryMemcachedServer);
 	class_def<Cfg>("setOnlineLimit", &Cfg::setOnlineLimit);
 	class_def<Cfg>("setStateUrl", &Cfg::setStateUrl);
 	class_def<Cfg>("setChargeUrl", &Cfg::setChargeUrl);
@@ -47,6 +48,8 @@ ConfigScript::ConfigScript( Cfg * cfg )
 	class_def<Cfg>("setDCLog", &Cfg::setDCLog);
     class_def<Cfg>("setSecDCLog", &Cfg::setSecDCLog);
     class_def<Cfg>("setSecDCLogTest", &Cfg::setSecDCLogTest);   // 安全上报内测区调试用
+    class_def<Cfg>("setUnionPlatform", &Cfg::setUnionPlatform);
+    class_def<Cfg>("setAutoForbid", &Cfg::setAutoForbid);       // 设置自动封交易功能
 	set("cfg", cfg);
 }
 

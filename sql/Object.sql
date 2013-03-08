@@ -353,6 +353,7 @@ CREATE TABLE `clan_player` (
   `lastFavorTime4` smallint(5) unsigned NOT NULL,
   `signupRankBattleTime` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '报名帮会排名战时间',
   `rankBattleField` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '帮会排名战战役',  
+  `inQQGroup` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`playerId`),
   KEY `id` (`id`),
   KEY `playerId` (`playerId`)
@@ -629,6 +630,7 @@ CREATE TABLE `fighter` (
   `peerless` mediumint(5) unsigned NOT NULL DEFAULT '0',
   `talent` mediumint(5) unsigned NOT NULL DEFAULT '0',
   `trump` varchar(255) NOT NULL,
+  `lingbao` varchar(255) NOT NULL DEFAULT '',
   `acupoints` varchar(255) NOT NULL,
   `skill` varchar(255) NOT NULL,
   `citta` varchar(255) NOT NULL,
@@ -1095,6 +1097,7 @@ CREATE TABLE `clan` (
   `battleScore` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '帮会排名战分数',
   `dailyBattleScore` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '帮会战日积分',
   `battleRanking` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '上周帮会战排名', 
+  `qqOpenid` varchar(36) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1407,7 +1410,8 @@ CREATE TABLE `wboss` (
 DROP TABLE IF EXISTS `discount`;
 CREATE TABLE `discount` (
       `itemid` int(10) unsigned NOT NULL,
-      `discount` tinyint(3) unsigned NOT NULL,
+      `exType` tinyint(3) unsigned NOT NULL,
+      `exValue` int(10) unsigned NOT NULL,
       `timeBegin` int(10) unsigned NOT NULL,
       `timeEnd` int(10) unsigned NOT NULL,
       `priceOriginal` int(10) unsigned NOT NULL,
@@ -1554,7 +1558,8 @@ CREATE TABLE IF NOT EXISTS `clan_copy_log` (
     `logTime` bigint(20) unsigned NOT NULL,
     `logType` smallint(6) NOT NULL,
     `playerName` varchar(255) NOT NULL,
-    `logVal` bigint(20) unsigned NOT NULL
+    `logVal` bigint(20) unsigned NOT NULL,
+    INDEX (`clanId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `reportid`;
@@ -1863,3 +1868,50 @@ CREATE TABLE `snow` (
     `score` int(10) unsigned NOT NULL,        
     PRIMARY KEY (`playerId`)                  
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `lingbaoattr`;
+CREATE TABLE `lingbaoattr` (                       
+    `id` int(10) unsigned NOT NULL,        
+    `tongling` tinyint(3) unsigned NOT NULL,      
+    `lbcolor` tinyint(3) unsigned NOT NULL,      
+    `types` varchar(256) NOT NULL DEFAULT '',
+    `values` varchar(256) NOT NULL DEFAULT '',
+    `skills` varchar(256) NOT NULL DEFAULT '',
+    `factors` varchar(256) NOT NULL DEFAULT '',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `lingbaosmelt`;
+CREATE TABLE `lingbaosmelt` (                       
+    `playerId` bigint(20) unsigned NOT NULL,  
+    `gujiId` smallint(4) unsigned NOT NULL,
+    `itemId` smallint(4) unsigned NOT NULL,
+    `bind` tinyint(3) unsigned NOT NULL,      
+    `value` int(10) unsigned NOT NULL,        
+    `maxValue` int(10) unsigned NOT NULL,        
+    PRIMARY KEY (`playerId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE IF NOT EXISTS `dreamer` (                       
+    `playerId` bigint(20) unsigned NOT NULL,  
+    `progress` tinyint(3) unsigned NOT NULL,      
+    `level` tinyint(3) unsigned NOT NULL,      
+    `maxX` tinyint(3) unsigned NOT NULL,      
+    `maxY` tinyint(3) unsigned NOT NULL,      
+    `maxGrid` tinyint(3) unsigned NOT NULL,      
+    `mapInfo` varchar(1024) NOT NULL DEFAULT '' COMMENT '水晶梦境地图信息',
+    `posX` tinyint(3) unsigned NOT NULL,      
+    `posY` tinyint(3) unsigned NOT NULL,      
+    `earlyPosX` tinyint(3) unsigned NOT NULL,      
+    `earlyPosY` tinyint(3) unsigned NOT NULL,      
+    `timeConsume` tinyint(3) unsigned NOT NULL,      
+    `remainTime` tinyint(3) unsigned NOT NULL,      
+    `keys` tinyint(3) unsigned NOT NULL,      
+    `eyes` tinyint(3) unsigned NOT NULL,      
+    `eyeTime` tinyint(3) unsigned NOT NULL,      
+    `eyeX` tinyint(3) unsigned NOT NULL,      
+    `eyeY` tinyint(3) unsigned NOT NULL,      
+    PRIMARY KEY (`playerId`)                  
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+

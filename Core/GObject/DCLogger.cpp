@@ -65,8 +65,6 @@ bool DCLogger::reg(Player* player)
         return true;
     std::ostringstream msg;
 
-    msg << "version=";
-    msg << version;
     msg << "&appid=";
     msg << appid;
     msg << "&userip=";
@@ -89,7 +87,6 @@ bool DCLogger::reg(Player* player)
     msg << "&source=";
     msg << player->getSource();
     msg << "&touid=&toopenid=&level=&itemid=&itemtype=&itemcnt=&modifyexp=&totalexp=&modifycoin=&totalcoin=&modifyfee=&totalfee=&onlinetime=&keycheckret=&safebuf=&remark=&user_num=";
-
 #ifndef _FB
 #ifndef _VT
 #ifndef _WIN32
@@ -284,6 +281,65 @@ bool DCLogger::create_sec(UserStruct const &nu, Player* player /* = NULL */)
     return true;
 }
 
+bool DCLogger::create_success_sec(Player * player)
+{
+    // 文档6.14字段 创建角色
+    if (!cfg.secdclog)
+        return true;
+    if (!cfg.dclog)
+        return true;
+
+    std::ostringstream msg;
+
+    msg << "APPV=";
+    msg << version;
+    msg << "&MSGV=";
+    msg << msgVersion;
+    msg << "&VER=";
+    msg << ver;
+    msg << "&APPID=";
+    msg << appid;
+    msg << "&OID=";
+    msg << player->getOpenId();
+    msg << "&WID=";
+    msg << cfg.serverNum;
+    msg << "&UIP=";
+    msg << player->getClientIp();
+    msg << "&OKY=";
+    msg << player->getOpenKey();
+    msg << "&SIP=";
+    char serverIp[20];
+    in_addr iaddr;
+    iaddr.s_addr = cfg.serverIp;
+    strcpy(serverIp, inet_ntoa(iaddr));
+    msg << serverIp;
+    msg << "&MTM=";
+    msg << TimeUtil::GetTick() / 1000;
+    msg << "&DOM=";
+    msg << static_cast<UInt16> (getDomain_sec(player));
+    msg << "&MLV=0";
+    msg << "&AID=14";
+
+    msg << "&RNA=" << player->getName();
+    msg << "&RID=" << player->getId();
+    msg << "&RTN=2";
+    msg << "&RTI=" << "job";
+    msg << "&RTP=" << static_cast<UInt32>(player->GetClass());
+    msg << "&RTI=" << "country";
+    msg << "&RTP=" << static_cast<UInt32>(2);
+    msg << "&RLV=" << static_cast<UInt32>(1);
+    msg << "&RCH=";
+
+#ifndef _FB
+#ifndef _VT
+#ifndef _WIN32
+    DC().Push(msg.str().c_str(), msg.str().length(), LT_SECDATA);
+#endif
+#endif
+#endif
+    return true;
+}
+
 bool DCLogger::protol_sec(Player* player, int cmd)
 {
     if (!cfg.secdclog)
@@ -378,37 +434,38 @@ bool DCLogger::trade_sec(Player* saller, Player* buyer, UInt32 itemId, UInt32 it
     msg << "&RIDA=";                // 卖方ID
     msg << saller->getId();
 
-    msg << "&ITN=1";                // 卖方道具种类(现在必定为1)
+    msg << "&ITNA=1";               // 卖方道具种类(现在必定为1)
 
-    msg << "&IID=";                 // 卖方道具ID
+    msg << "&ITDA=";                 // 卖方道具ID
     msg << itemId;
-    msg << "&ICT=";                 // 卖方道具数量
+    msg << "&ICA=";                 // 卖方道具数量
     msg << itemCount;
 
-    msg << "&GTN=0";                // 卖方支付的货币
-    //msg << "&GID=";
-    //msg << "&GOD=";
-
-    msg << "&CTN=0";                // 卖方支付的货币
-    //msg << "&CTI=";
-    //msg << "&CAS=";
+    msg << "&CTNA=1";
+    msg << "&CTDA=gold";
+    msg << "&CCA=";
+    msg << 0;
+    msg << "&CBTA=";
+    msg << saller->getGold();
 
     msg << "&OIDB=";
     msg << buyer->getOpenId();
     msg << "&RIDB=";
     msg << buyer->getId();
+    msg << "&UIPB=";
+    msg << buyer->getClientIp();
 
-    msg << "&ITN=0";
-    //msg << "&IID=";
-    //msg << "&ICT=";
+    msg << "&ITNB=0";
+    msg << "&ITDB=0";
+    msg << "&ICB=0";
 
-    msg << "&GTN=0";
-    //msg << "&GID=";
-    //msg << "&GOD=";
-    msg << "&CTN=1";
-    msg << "&CTI=gold";
-    msg << "&CAS=";
+    msg << "&CTNB=1";
+    msg << "&CTDB=gold";
+    msg << "&CCB=";
     msg << price;
+    msg << "&CBTB=";
+    msg << buyer->getGold() + price;
+
 #ifndef _FB
 #ifndef _VT
 #ifndef _WIN32
@@ -868,6 +925,48 @@ UInt8 DCLogger::getDomain_sec(Player* player)
         return PF_XY;
     }
     return atoi(player->getDomain());
+}
+
+bool DCLogger::reg_union(Player* player)
+{
+    // 游戏联盟注册上报
+    if (!cfg.dclog)
+        return true;
+    if (!cfg.unionPlatform)
+        return true;
+    std::ostringstream msg;
+
+    msg << "appid=";
+    msg << appid;
+    msg << "&version=";
+    msg << version;
+    msg << "&userip=";
+    msg << inet_addr(player->getClientIp());
+    msg << "&svrip=";
+    msg << cfg.serverIp;
+    msg << "&time=";
+    msg << time(NULL);
+    msg << "&worldid=";
+    msg << cfg.serverNum;
+    msg << "&opuid=";
+    msg << player->getId();
+    msg << "&opopenid=";
+    msg << player->getOpenId();
+    msg << "&pf=";
+    msg << player->getSource();
+    msg << "&openkey=";
+    msg << player->getOpenKey();
+    msg << "&pfkey=";
+    msg << player->getPfKey();
+
+#ifndef _FB
+#ifndef _VT
+#ifndef _WIN32
+    DC().Push(msg.str().c_str(), msg.str().length(), UNION_DC_TYPE);
+#endif
+#endif
+#endif
+    return true;
 }
 
 DCLogger dclogger;

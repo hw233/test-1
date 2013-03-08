@@ -332,6 +332,15 @@ public:
     { _wansheng= v; }
     inline static bool getWansheng()
     { return _wansheng; }
+    inline static void setQingren(bool v)
+    { _qingren= v; }
+    inline static bool getQingren()
+    { return _qingren; }
+    inline static void setSpecialBookAct(bool v)
+    { _specialbook= v; }
+    inline static bool getSpecialBookAct()
+    { return _specialbook; }
+
 
     inline static void set11Act(bool v)
     { _11Act= v; }
@@ -355,10 +364,30 @@ public:
     { _heroIslandAct= v; }
     inline static bool getHeroIslandAct()
     { return _heroIslandAct; }
+    inline static void setDragonKingAct(bool v)
+    { _dragonKingAct= v; }
+    inline static bool getDragonKingAct()
+    { return _dragonKingAct; }
+    inline static void setSaveGoldAct(bool v)
+    { _saveGoldAct= v; }
+    inline static bool getSaveGoldAct()
+    { return _saveGoldAct; }
     inline static void setFeastLoginAct(bool v)
     { _feastloginAct= v; }
     inline static bool getFeastLoginAct()
     { return _feastloginAct; }
+    inline static void setNewYearGiveGiftAct(bool v)
+    { _newYearGiveGiftAct= v; }
+    inline static bool getNewYearGiveGiftAct()
+    { return _newYearGiveGiftAct; }
+    inline static void setNewYearQQGameAct(bool v)
+    { _newYearQQGameAct= v; }
+    inline static bool getNewYearQQGameAct()
+    { return _newYearQQGameAct; }
+    inline static void setNewYearQzoneContinueAct(bool v)
+    { _newYearQzoneContinueAct= v; }
+    inline static bool getNewYearQzoneContinueAct()
+    { return _newYearQzoneContinueAct; }
 
     inline static void setTowerLoginAct(UInt8 v)
     { _towerloginAct= v; }
@@ -424,6 +453,11 @@ public:
     { _consume918 = v; }
     inline static bool getConsume918()
     { return _consume918; }
+    inline static void setConsumeAwardAct(bool v)
+    { _consumeawardact = v; }
+    inline static bool getConsumeAwardAct()
+    { return _consumeawardact; }
+ 
     inline static void setNeedRechargeRank(bool v)
     { _needrechargerank = v; }
     inline static bool getNeedRechargeRank()
@@ -474,6 +508,11 @@ public:
     { _tgcevent = v; }
     inline static bool getTgcEvent()
     { return _tgcevent; }
+
+    inline static void setWeiboAct(bool v)
+    { _weiboact = v; }
+    inline static bool getWeiboAct()
+    { return _weiboact; }
 
     inline static void setArenaHeroId(UInt8 pos, UInt8 heroId)
     {
@@ -578,7 +617,35 @@ public:
         }
         return true;
     }
-
+    inline static void setCompassAct(bool v)
+    { _compassact = v; }
+    inline static bool getCompassAct()
+    { return _compassact; }
+    inline static void setCallSnakeEggAct(UInt8 v)
+    { _callsnakeeggact = v; }
+    inline static UInt8 getCallSnakeEggAct()
+    { return _callsnakeeggact; }
+    inline static void setSnakeEggAwardAct(UInt8 v)
+    { _snakeeggawardact = v; }
+    inline static UInt8 getSnakeEggAwardAct()
+    { return _snakeeggawardact; }
+     inline static void setItem9344Act(bool v)
+    { _item9344act = v; }
+    inline static bool getItem9344Act()
+    { return _item9344act; }
+    inline static void setItem9343Act(bool v)
+    { _item9343act = v; }
+    inline static bool getItem9343Act()
+    { return _item9343act; }
+    inline static void setAutoBattleAct(bool v)
+    { _autobattleact = v; }
+    inline static bool getAutoBattleAct()
+    { return _autobattleact; }
+     inline static void setSnakeSpringEquipAct(UInt8 v)
+    { _snakespringequipact = v; }
+    inline static UInt8 getSnakeSpringEquipAct()
+    { return _snakespringequipact; }
+ 
 public:
 	inline static UInt8 getWeekDay()
 	{ return _wday; }
@@ -649,12 +716,19 @@ public:
     static bool _july;
     static bool _qixi;
     static bool _wansheng;
+    static bool _qingren;
+    static bool _specialbook;
     static bool _11Act;
     static bool _ssToolbarAct;
     static bool _snowAct;
     static bool _goldSnakeAct;
     static bool _heroIslandAct;
+    static bool _dragonKingAct;
+    static bool _saveGoldAct;
     static bool _feastloginAct;
+    static bool _newYearGiveGiftAct;
+    static bool _newYearQQGameAct;
+    static bool _newYearQzoneContinueAct;
     static UInt8 _towerloginAct;
     static bool _guoqing;
     static bool _9215Act;
@@ -672,6 +746,7 @@ public:
     static bool _opentest;
     static bool _consumeactive;
     static bool _consume918;
+    static bool _consumeawardact;
     static bool _needrechargerank;
     static bool _needconsumerank;
     static bool _killMonsteract;
@@ -683,8 +758,16 @@ public:
     static bool _loginAward;
     static bool _bluediamonSuperman;
     static bool _tgcevent;
+    static bool _weiboact;
     static stArenaExtra stArenaOld[2];
     static stArenaExtra stArena;
+    static bool _compassact;
+    static UInt8 _callsnakeeggact;
+    static UInt8 _snakeeggawardact;
+    static bool _item9344act;
+    static bool _item9343act;
+    static bool _autobattleact;
+    static UInt8 _snakespringequipact;
 
 public:
     static RCSortType rechargeSort;
@@ -747,6 +830,8 @@ public:
     void sendQixiScoreAward(Player* pl);
     void SendXiaoyaoAward();
     void SendGoldSnakeAward();
+    void SendItem9344Award();
+    void SendItem9343Award();
 
     void UpdateSnowScore(Player* pl, Player* lover);
     void sendSnowPlayers(Player* pl);

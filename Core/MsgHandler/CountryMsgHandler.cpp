@@ -171,6 +171,9 @@ MSG_REG_2(GameMsgHdr, REQ::TIANJIE, OnTianjieReq);
 MSG_REG_2(GameMsgHdr, REQ::EXJOB, OnExJob);
 MSG_REG_2(GameMsgHdr, REQ::JOBHUNTER, OnJobHunter);
 MSG_REG_2(GameMsgHdr, REQ::AUTOJOBHUNTER, OnAutoJobHunter);
+MSG_REG_2(GameMsgHdr, REQ::DREAMER, OnDreamer);
+
+MSG_REG_2(GameMsgHdr, REQ::EQ_LINGBAO, OnEquipLingbaoReq);
 
 MSG_REG_2(GameMsgHdr, 0x1D0, OnDailyReq2);
 
@@ -224,7 +227,7 @@ MSG_REG_2(GameMsgHdr, 0x276, OnAutoCopyAttack);
 MSG_REG_2(GameMsgHdr, 0x277, OnPlayerTimeTick);
 MSG_REG_2(GameMsgHdr, 0x278, OnAutoFrontMapAttack);
 
-MSG_REG_2(GameMsgHdr, 0x279, OnCancelAutoBattleNotifyReq);
+//MSG_REG_2(GameMsgHdr, 0x279, OnCancelAutoBattleNotifyReq);
 
 MSG_REG_2(GameMsgHdr, 0x280, OnCancelDungeonAutoNotifyReq);
 MSG_REG_2(GameMsgHdr, 0x281, OnCompleteDungeonAutoNotifyReq);
@@ -289,6 +292,8 @@ MSG_REG_2(GameMsgHdr, 0x235, OnAwardAthleticsMartial);
 
 MSG_REG_2(GameMsgHdr, 0x340, OnTownDeamonlBeAttack);
 MSG_REG_2(GameMsgHdr, 0x341, OnCFriendAthleticsRank);
+MSG_REG_2(GameMsgHdr, 0x342, OnPostDragonKing);
+MSG_REG_2(GameMsgHdr, 0x343, OnSaveGoldAct);
 
 MSG_REG_2(GameMsgHdr, 0x236, OnAwardHIPrestige);
 MSG_REG_2(GameMsgHdr, 0x237, OnSendShusanLoveTitleCard);
@@ -340,4 +345,10 @@ MSG_REG_2(GameMsgHdr, 0x327, OnDelTianjieNpc);
 MSG_REG_2(GameMsgHdr, 0x328, OnDelMapObj);
 MSG_REG_2(GameMsgHdr, 0x329, OnAddMapObj);
 
+MSG_REG_2(GameMsgHdr, 0x330, OnForbidSale);
+MSG_REG_2(GameMsgHdr, 0x331, OnForbidSaleQueryFail);
+MSG_REG_2(GameMsgHdr, 0x332, OnOpenIdInvalid);
+MSG_REG_2(GameMsgHdr, 0x333, OnOpenAPIFailed);
+
+MSG_REG_2(GameMsgHdr, 0x352, OnSaleItemCancleAll);
 MSG_HANDLER_END()

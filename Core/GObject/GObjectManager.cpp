@@ -65,6 +65,7 @@
 #include "GVar.h"
 #include "Server/SysMsg.h"
 #include "SingleHeroStage.h" 
+#include "GData/LBSkillTable.h"
 
 namespace GObject
 {
@@ -147,6 +148,8 @@ namespace GObject
     std::vector<std::vector<UInt32>> GObjectManager::_soulEnchantChance;
     std::vector<UInt32> GObjectManager::_decSoulStateExp;
 
+    stLBAttrConf GObjectManager::_lbAttrConf;
+
     GObjectManager:: vMergeStfs    GObjectManager:: _vMergeStfs;
     std::map <UInt32,  std::vector<UInt32> >   GObjectManager:: _mMergeStfsIndex;
     //std::map <UInt32, UInt32>  GObjectManager::_EUpgradeIdMap;
@@ -161,7 +164,11 @@ namespace GObject
 		IDGenerator::gMailOidGenerator.Init(maxId);
 		execu->Extract("SELECT max(`id`) FROM `clan`", maxId);
 		IDGenerator::gClanOidGenerator.Init(maxId);
+        UInt32 maxItemId;
+		execu->Extract("SELECT max(`id`) FROM `item`", maxItemId);
 		execu->Extract("SELECT max(`id`) FROM `equipment`", maxId);
+        if(maxItemId > maxId)
+            maxId = maxItemId;
 		IDGenerator::gItemOidGenerator.Init(maxId);
 		execu->Extract("SELECT max(`tradeId`) FROM `trade`", maxId);
 		IDGenerator::gTradeOidGenerator.Init(maxId);
@@ -194,6 +201,11 @@ namespace GObject
             fprintf(stderr, "loadEquipForge error!\n");
             std::abort();
         }
+        if(!loadLBSkill())
+        {
+            fprintf(stderr, "loadLBSkill error!\n");
+            std::abort();
+        }
 		if(!loadMapData())
         {
             fprintf(stderr, "loadMapData error!\n");
@@ -201,7 +213,7 @@ namespace GObject
         }
         if(!loadAttrFactor())
         {
-            fprintf(stderr, "loadMapData error!\n");
+            fprintf(stderr, "loadAttrFactor error!\n");
             std::abort();
         }
         if(!loadCopy())
@@ -222,6 +234,11 @@ namespace GObject
 		if(!loadEquipmentsSpirit())
         {
             fprintf(stderr, "loadEquipmentsSpirit error!\n");
+            std::abort();
+        }
+		if(!loadLingbaoAttr())
+        {
+            fprintf(stderr, "loadLingbaoAttr error!\n");
             std::abort();
         }
         if(!loadFightersPCChance())
@@ -252,6 +269,11 @@ namespace GObject
 		if(!loadAllPlayers())
         {
             fprintf(stderr, "loadAllPlayers error!\n");
+            std::abort();
+        }
+		if(!loadLingbaoSmelt())
+        {
+            fprintf(stderr, "loadLingbaoSmelt error!\n");
             std::abort();
         }
         //loadSecondSoul();
@@ -395,6 +417,12 @@ namespace GObject
             fprintf(stderr, "loadCopyFrontWin error!\n");
             std::abort();
         }
+        if(!loadDreamer())
+        {
+            fprintf(stderr, "loadDreamer error!\n");
+            std::abort();
+        }
+       
 
 		DB::gDataDBConnectionMgr->UnInit();
 	}
@@ -1123,6 +1151,8 @@ namespace GObject
             //p->sendOldRC7DayAward();
         //if (!GVAR.GetVar( GVAR_JOB_MO_PEXP))
             //buchangMo(p);
+        if (!GVAR.GetVar(GVAR_EXP_HOOK_NEW) && p)
+            p->transferExpBuffer2Var();
 		return true;
 	}
 
@@ -1794,7 +1824,7 @@ namespace GObject
         UInt8 lvl_max = 0;
 		DBFighter2 specfgtobj;
         //if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `fashion`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `acupoints`, `skill`, `citta`, `fighter`.`skills`, `cittas`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul`, `elixir`.`attack`,`elixir`.`defend`, `elixir`.`critical`, `elixir`.`pierce`, `elixir`.`evade`, `elixir`.`counter`, `elixir`.`tough`, `elixir`.`action`, `fighter`.`hideFashion` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
-		if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `halo`, `fashion`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `acupoints`, `skill`, `citta`, `fighter`.`skills`, `cittas`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul`, `elixir`.`attack`,`elixir`.`defend`, `elixir`.`critical`, `elixir`.`pierce`, `elixir`.`evade`, `elixir`.`counter`, `elixir`.`tough`, `elixir`.`action`,`fighter`.`hideFashion` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
+		if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `halo`, `fashion`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `lingbao`, `acupoints`, `skill`, `citta`, `fighter`.`skills`, `cittas`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul`, `elixir`.`attack`,`elixir`.`defend`, `elixir`.`critical`, `elixir`.`pierce`, `elixir`.`evade`, `elixir`.`counter`, `elixir`.`tough`, `elixir`.`action`,`fighter`.`hideFashion` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -1906,6 +1936,7 @@ namespace GObject
 			fgt2->setRing(fetchEquipment(specfgtobj.ring), false);
 			fgt2->setAmulet(fetchEquipment(specfgtobj.amulet), false);
             fgt2->setTrump(specfgtobj.trump, false);
+            fgt2->loadLingbao(specfgtobj.lingbao);
             fgt2->setPeerless(specfgtobj.peerless, false); // XXX: must after setTrump
             fgt2->setCittas(specfgtobj.cittas, false);
             fgt2->setUpCittas(specfgtobj.citta, false);
@@ -2313,12 +2344,13 @@ namespace GObject
 				respData->id = sale->_id;
 				respData->price = sale->_price;
 				respData->priceType = sale->_priceType;
-				if(sale->_item->getName().length() <= 21)
+                UInt32 size = sizeof(respData->itemName) - 1;
+				if(sale->_item->getName().length() <= size)
 					strcpy(respData->itemName, sale->_item->getName().c_str());
 				else
 				{
-					memcpy(respData->itemName, sale->_item->getName().c_str(), 21);
-					respData->itemName[21] = 0;
+					memcpy(respData->itemName, sale->_item->getName().c_str(), size);
+					respData->itemName[size] = 0;
 				}
 				pl->GetSale()->addSaleFromDB(respData);
 			}
@@ -2490,7 +2522,7 @@ namespace GObject
         //GVAR.SetVar(GVAR_1530BUCHANG, 1);
         GVAR.SetVar(GVAR_OLDRC7DAYBUCHANG, 1);
         GVAR.SetVar(GVAR_JOB_MO_PEXP, 1);
-
+        GVAR.SetVar(GVAR_EXP_HOOK_NEW, 1);
 		return true;
 	}
 
@@ -3036,7 +3068,7 @@ namespace GObject
         // ??????Ϣ
 		LoadingCounter lc("Loading clans:");
 		DBClan cl;
-		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `funds`, `foundTime`, `founder`, `leader`, `watchman`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle`, `battleScore`, `dailyBattleScore` `battleRanking` FROM `clan`", cl) != DB::DB_OK)
+		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `funds`, `foundTime`, `founder`, `leader`, `watchman`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle`, `battleScore`, `dailyBattleScore`, `battleRanking`,`qqOpenid` FROM `clan`", cl) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		Clan * clan = NULL;
@@ -3079,7 +3111,8 @@ namespace GObject
 				clanBattle->setBattleTime(cl.battleTime);
 				clanBattle->setNextBattleTime(cl.nextBattleTime);
 				globalClans.add(cl.id, clan);
-			}
+                clan->setQQOpenid(cl.qqOpenid);
+		}
 			else
 			{
 				clanBattle = clanManager.getRobBattleClan();
@@ -3107,7 +3140,7 @@ namespace GObject
         // ??????Ա
 		lc.prepare("Loading clan players:");
 		DBClanPlayer cp;
-		if (execu->Prepare("SELECT `id`, `playerId`, `joinTime`, `proffer`, `cls`, `enterCount`, `thisDay`, `petFriendness1`, `petFriendness2`, `petFriendness3`, `petFriendness4`, `favorCount1`, `favorCount2`, `favorCount3`, `favorCount4`, `lastFavorTime1`, `lastFavorTime2`, `lastFavorTime3`, `lastFavorTime4`, `signupRankBattleTime`, `rankBattleField` FROM `clan_player` ORDER BY `id`, `proffer` DESC, `joinTime` ASC", cp) != DB::DB_OK)
+		if (execu->Prepare("SELECT `id`, `playerId`, `joinTime`, `proffer`, `cls`, `enterCount`, `thisDay`, `petFriendness1`, `petFriendness2`, `petFriendness3`, `petFriendness4`, `favorCount1`, `favorCount2`, `favorCount3`, `favorCount4`, `lastFavorTime1`, `lastFavorTime2`, `lastFavorTime3`, `lastFavorTime4`, `signupRankBattleTime`, `rankBattleField`,`inQQGroup` FROM `clan_player` ORDER BY `id`, `proffer` DESC, `joinTime` ASC", cp) != DB::DB_OK)
 			return false;
 		UInt32 lastId = 0xFFFFFFFF;
 		lc.reset(1000);
@@ -3178,6 +3211,8 @@ namespace GObject
 			}
 			else
 				delete cm;
+
+            pl->setInQQGroup(cp.inQQGroup);
 		}
 		lc.finalize();
 		globalClans.enumerate(cacheClan, 0);
@@ -3613,49 +3648,48 @@ namespace GObject
 
                      lua_tinker::table t1 = table_tmp.get<lua_tinker::table>(j + 1);
                      UInt32  tSize = t1.size();
-                       // for (UInt32 i = 0 ; i < t; i++)
-                        for (UInt32 i = 0 ; i< tSize; i++ )
-                        {
-                            if(i == tSize - 1)
-                            {
-                               s.m_to = t1.get<UInt32>(i + 1);
-                            }
-                            else
-                            {
+                     for (UInt32 i = 0 ; i< tSize; i++ )
+                     {
+                         if(i == tSize - 1)
+                         {
+                             s.m_to = t1.get<UInt32>(i + 1);
+                         }
+                         else
+                         {
 
-                                lua_tinker::table c = t1.get<lua_tinker::table>(i + 1);
-                                UInt32  cSize = c.size();
-                                if(cSize == 2)
-                                {
-                                    stMergeS  ms;
-                                    ms.id = c.get<UInt32>(1);
-                                    std::vector<UInt32>& v = _mMergeStfsIndex[ms.id];
-                                    v.push_back(j);
+                             lua_tinker::table c = t1.get<lua_tinker::table>(i + 1);
+                             UInt32  cSize = c.size();
+                             if(cSize == 2)
+                             {
+                                 stMergeS  ms;
+                                 ms.id = c.get<UInt32>(1);
+                                 std::vector<UInt32>& v = _mMergeStfsIndex[ms.id];
+                                 v.push_back(j);
 
-                                    ms.num = c.get<UInt32>(2);
-                                    s.m_stfs.push_back(ms);
-                                }
-                                if(cSize == 3)
-                                {
-                                    UInt32  id1 = c.get<UInt32>(1);
-                                    UInt32  id2 = c.get<UInt32>(2);
-                                    UInt32  num = c.get<UInt32>(3);
-                                    if(id1 < id2)
-                                    {
-                                        for(;id1<= id2; id1++)
-                                        {
-                                            stMergeS ms;
-                                            std::vector<UInt32>& v = _mMergeStfsIndex[id1];
-                                            v.push_back(j);
-                                            ms.id = id1;
-                                            ms.num = num;
-                                            s.m_stfs.push_back(ms);
-                                        }
-                                    }
-                                }
-                            }
+                                 ms.num = c.get<UInt32>(2);
+                                 s.m_stfs.push_back(ms);
+                             }
+                             if(cSize == 3)
+                             {
+                                 UInt32  id1 = c.get<UInt32>(1);
+                                 UInt32  id2 = c.get<UInt32>(2);
+                                 UInt32  num = c.get<UInt32>(3);
+                                 if(id1 < id2)
+                                 {
+                                     for(;id1<= id2; id1++)
+                                     {
+                                         stMergeS ms;
+                                         std::vector<UInt32>& v = _mMergeStfsIndex[id1];
+                                         v.push_back(j);
+                                         ms.id = id1;
+                                         ms.num = num;
+                                         s.m_stfs.push_back(ms);
+                                     }
+                                 }
+                             }
+                         }
 
-                        }
+                     }
                       _vMergeStfs.push_back(s);
                  }
             }
@@ -3947,6 +3981,71 @@ namespace GObject
 					_socket_chance[j] =  table_temp.get<UInt32>(j + 1);
 				}
             }
+
+            // 灵宝
+            {
+				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getLingbaoAttrMax");
+				UInt32 size = std::min(3, table_temp.size());
+                UInt8 typeCnt = 0;
+				for(UInt32 i = 0; i < size; i ++)
+				{
+					lua_tinker::table table_temp2 = table_temp.get<lua_tinker::table>(i + 1);
+                    UInt32 size2 = table_temp2.size();
+                    for(UInt32 j = 0; j < size2; ++ j)
+                    {
+                        lua_tinker::table table_temp3 = table_temp2.get<lua_tinker::table>(j + 1);
+                        UInt32 size3 = std::min(13, table_temp3.size()) - 1;
+                        UInt8 lv = table_temp3.get<UInt8>(1);
+                        stLbAttrMax& lbAttrMax = _lbAttrConf.lbAttrMax[lv];
+                        if(size3 > typeCnt)
+                            typeCnt = size3;
+                        for(UInt32 k = 0; k < size3; ++ k)
+                        {
+                            lbAttrMax.attrMax[i][k] = table_temp3.get<float>(k+2);
+                        }
+                    }
+				}
+                for(UInt8 type = 0; type < typeCnt; ++ type)
+                    _lbAttrConf.attrType.push_back(type+1);
+            }
+            {
+				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getLingbaoAttrNum");
+				UInt32 size = std::min(7, table_temp.size());
+                for(UInt32 i = 0; i < size; ++ i)
+                {
+                    if(i < 4)
+                        _lbAttrConf.attrNumChance[i] = table_temp.get<UInt16>(i + 1);
+                    else
+                        _lbAttrConf.skillSwitchChance[i-4] = table_temp.get<UInt16>(i + 1);
+                }
+            }
+            {
+				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getLingbaoAttrDis");
+				UInt32 size = std::min(2, table_temp.size());
+                if(size == 2)
+                {
+                    lua_tinker::table table_dis = table_temp.get<lua_tinker::table>(1);
+                    lua_tinker::table table_disChance = table_temp.get<lua_tinker::table>(2);
+                    UInt32 sizeDis = std::min(11, table_dis.size());
+                    UInt32 sizeDisChance = std::min(11, table_disChance.size());
+                    for(UInt32 i = 0; i < sizeDis; ++ i)
+                    {
+                        _lbAttrConf.dis[i] = table_dis.get<UInt16>(i + 1);
+                    }
+                    for(UInt32 j = 0; j < sizeDisChance; ++ j)
+                    {
+                        _lbAttrConf.disChance[j] = table_disChance.get<UInt16>(j + 1);
+                    }
+                }
+            }
+            {
+				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getLingbaoColor");
+				UInt32 size = std::min(4, table_temp.size());
+                for(UInt32 i = 0; i < size; ++ i)
+                {
+                    _lbAttrConf.colorVal[i] = table_temp.get<UInt16>(i + 1);
+                }
+            }
         }
         lua_close(L);
         return true;
@@ -4079,6 +4178,9 @@ namespace GObject
                 case Item_Halo:
                 case Item_Fashion:
                 case Item_Trump:
+                case Item_LBling:
+                case Item_LBwu:
+                case Item_LBxin:
                 {
                     ItemEquipData ied;
                     ied.enchant = dbe.enchant;
@@ -4124,6 +4226,14 @@ namespace GObject
                             equip = new ItemTrump(dbe.id, itype, ied);
                             if (equip && ied.enchant)
                                 ((ItemTrump*)equip)->fixSkills();
+                        }
+                        break;
+                    case Item_LBling:
+                    case Item_LBwu:
+                    case Item_LBxin:
+                        {
+                            ItemLingbaoAttr lbattr;
+                            equip = new ItemLingbao(dbe.id, itype, ied, lbattr);
                         }
                         break;
                     default:
@@ -4826,14 +4936,13 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading Discount Data");
 		DBDiscount t;
-		if(execu->Prepare("SELECT `itemid`, `timeBegin`, `timeEnd`, `priceOriginal`, `priceDiscount`,\
-                    `type`, `count` FROM `discount`", t)!= DB::DB_OK)
+		if(execu->Prepare("SELECT `itemid`, `exType`, `exValue`, `timeBegin`, `timeEnd`, `priceOriginal`, `priceDiscount`, `type`, `count` FROM `discount`", t)!= DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
-            GData::store.addDiscountFromDB(t.itemID, t.type, t.count, t.beginTime, t.endTime, t.priceOriginal, t.priceDiscount);
+            GData::store.addDiscountFromDB(t.itemID, t.type, t.exType, t.exValue, t.count, t.beginTime, t.endTime, t.priceOriginal, t.priceDiscount);
         }
         lc.finalize();
         return true;
@@ -5278,6 +5387,200 @@ namespace GObject
                     World::stArenaOld[type].rank[i] = j + 1;
                 }
             }
+        }
+        lc.finalize();
+        return true;
+    }
+
+    bool GObjectManager::loadLBSkill()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+		// load  lbskill
+        GData::DBLBSkill dblbs;
+		if(execu->Prepare("SELECT `id`, `name`, `lbtype`, `level`, `target`, `prob`, `cond`, `cond2`, `area`, `factor`, `last`, `cd`, `eftype`, `minfactor`, `efvalue`, `battlepoint` FROM `lbskills`", dblbs) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            GData::LBSkillBase* lbs = new GData::LBSkillBase(dblbs.id, dblbs.name);
+            if (!lbs)
+                return false;
+
+            if(dblbs.lbtype > 3)
+                dblbs.lbtype = 0;
+            lbs->lbtype = dblbs.lbtype;
+            lbs->level = dblbs.level;
+            lbs->target = dblbs.target;
+            lbs->prob = dblbs.prob;
+            lbs->cond = dblbs.cond;
+            lbs->cond2 = dblbs.cond2;
+            lbs->area = dblbs.area;
+            lbs->last = dblbs.last;
+            lbs->cd = dblbs.cd;
+
+            lbs->ef_type = dblbs.ef_type;
+            lbs->minFactor = dblbs.minFactor;
+            lbs->ef_value = dblbs.ef_value;
+            lbs->battlepoint = dblbs.battlepoint;
+
+            StringTokenizer tk(dblbs.factor, ",");
+            if (tk.count())
+            {
+                for (size_t i = 0; i < tk.count(); ++i)
+                    lbs->factor.push_back(::atof(tk[i].c_str()));
+            }
+            GData::lbSkillManager.add(lbs);
+            _lbAttrConf.skills[dblbs.lbtype][dblbs.level].push_back(dblbs.id);
+
+		}
+
+        return true;
+    }
+
+	bool GObjectManager::loadLingbaoAttr()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading lingbao attr:");
+        DBLingbaoAttr dblba;
+        if(execu->Prepare("SELECT `equipment`.`id`, `tongling`, `lbcolor`, `types`, `values`, `skills`, `factors` FROM `lingbaoattr` LEFT JOIN `equipment` ON `equipment`.`id` = `lingbaoattr`.`id`", dblba) != DB::DB_OK)
+            return false;
+
+        lc.reset(2000);
+        while(execu->Next() == DB::DB_OK)
+        {
+            lc.advance();
+            std::map<UInt32, ItemEquip *>::iterator it = equips.find(dblba.id);
+            if(it == equips.end())
+                continue;
+
+            ItemEquip * equip = it->second;
+            if(equip == NULL)
+                continue;
+            switch(equip->getClass())
+            {
+            case Item_LBling:
+            case Item_LBwu:
+            case Item_LBxin:
+                {
+                    ItemLingbao* lb = static_cast<ItemLingbao*>(equip);
+                    ItemLingbaoAttr& lba = lb->getLingbaoAttr();
+                    lba.tongling = dblba.tongling;
+                    lba.lbColor = dblba.lbcolor;
+                    {
+                        StringTokenizer tk(dblba.types, ",");
+                        if (tk.count())
+                        {
+                            for (size_t i = 0; i < tk.count(); ++i)
+                            {
+                                if(i > 3)
+                                    break;
+                                lba.type[i] = ::atoi(tk[i].c_str());
+                            }
+                        }
+                    }
+                    {
+                        StringTokenizer tk(dblba.values, ",");
+                        if (tk.count())
+                        {
+                            for (size_t i = 0; i < tk.count(); ++i)
+                            {
+                                if(i > 3)
+                                    break;
+                                lba.value[i] = ::atoi(tk[i].c_str());
+                            }
+                        }
+                    }
+                    {
+                        StringTokenizer tk(dblba.skills, ",");
+                        if (tk.count())
+                        {
+                            for (size_t i = 0; i < tk.count(); ++i)
+                            {
+                                if(i > 1)
+                                    break;
+                                lba.skill[i] = ::atoi(tk[i].c_str());
+                            }
+                        }
+                    }
+                    {
+                        StringTokenizer tk(dblba.factors, ",");
+                        if (tk.count())
+                        {
+                            for (size_t i = 0; i < tk.count(); ++i)
+                            {
+                                if(i > 1)
+                                    break;
+                                lba.factor[i] = ::atoi(tk[i].c_str());
+                            }
+                        }
+                    }
+				}
+				break;
+			default:
+				break;
+			}
+		}
+		lc.finalize();
+
+		return true;
+    }
+
+    bool GObjectManager::loadLingbaoSmelt()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading lingbao smelt:");
+        DBLingbaoSmelt dblbs;
+        if(execu->Prepare("SELECT `playerId`, `gujiId`, `itemId`, `bind`, `value`, `maxValue` FROM `lingbaosmelt`", dblbs) != DB::DB_OK)
+            return false;
+
+        lc.reset(2000);
+        while(execu->Next() == DB::DB_OK)
+        {
+            lc.advance();
+            LingbaoSmeltInfo lbSmeltInfo;
+
+			Player * pl = globalPlayers[dblbs.playerId];
+			if(pl == NULL)
+				continue;
+            lbSmeltInfo.gujiId = dblbs.gujiId;
+            lbSmeltInfo.itemId = dblbs.itemId;
+            lbSmeltInfo.bind = dblbs.bind;
+            lbSmeltInfo.value = dblbs.value;
+            lbSmeltInfo.maxValue = dblbs.maxValue;
+
+            Package* pkg = pl->GetPackage();
+            pkg->loadLingbaoSmeltInfo(lbSmeltInfo);
+        }
+        lc.finalize();
+
+        return true;
+    }
+
+    bool GObjectManager::loadDreamer()
+    {
+        // TODO: 读取水晶梦境有关数据
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading dreamer");
+        DBDreamer dbd;
+        if(execu->Prepare("SELECT `playerId`, `progress`, `level`, `maxX`, `maxY`, `maxGrid`, `mapInfo`, `posX`, `posY`, `earlyPosX`, `earlyPosY`, `timeConsume`, `remainTime`, `keys`, `eyes`, `eyeTime`, `eyeX`, `eyeY` FROM `dreamer` ORDER BY `playerId`", dbd) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+        Player * player = NULL;
+		while(execu->Next() == DB::DB_OK)
+        {
+            player = globalPlayers[dbd.playerId];
+            if (player)
+            {
+                player->setDreamer(dbd.progress, dbd.level, dbd.maxX, dbd.maxY, dbd.maxGrid, dbd.mapInfo, dbd.posX, dbd.posY, dbd.earlyPosX, dbd.earlyPosY, dbd.timeConsume, dbd.remainTime, dbd.keysCount, dbd.eyesCount, dbd.eyeTime, dbd.eyeX, dbd.eyeY);
+            }
+			lc.advance();
         }
         lc.finalize();
         return true;

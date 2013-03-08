@@ -252,6 +252,7 @@ function foundCave(id)
     return math.random(123,159)
 end
 
+--[[
 function getStepAward(step)
     for i = 1, #stepAward do
         if i >= step then
@@ -259,6 +260,47 @@ function getStepAward(step)
         end
     end
     return stepAward[#stepAward]
+end
+]]--
+
+local stepCount = 
+{
+    1,3,5,10,20
+}
+local stepAwardID =
+{
+    [1] = {
+        20017, 20018, 20019, 20020, 20021,
+    },
+    [2] = {
+        20022, 20023, 20024, 20025, 20026,
+    },
+    [3] = {
+        20027, 20028, 20029, 20030, 20031,
+    },
+    [4] = {
+        20032, 20033, 20034, 20035, 20036,
+    },
+
+}
+
+function getStepAward(progress, step)
+    if progress == 0 then
+        print ("error1")
+        return 0
+    end
+    if progress > #stepAwardID then
+        print ("error2")
+        return 0
+    end
+    local index = 0
+    for i = 1,#stepCount do
+        if stepCount[i] >= step then
+            return stepAwardID[progress][i]
+        end
+    end
+    print ("error3")
+    return 0
 end
 
 function getSpecialItem(id, index)

@@ -28,6 +28,7 @@
 #include "GVar.h"
 #include "GObjectDBExecHelper.h"
 #include "GData/SoulExpTable.h"
+#include "GData/LBSkillTable.h"
 
 namespace GObject
 {
@@ -76,6 +77,7 @@ Fighter::Fighter(UInt32 id, Player * owner):
 	memset(_trump, 0, sizeof(_trump));
 	memset(_trumpSkill, 0, sizeof(_trumpSkill));
 	memset(_buffData, 0, FIGHTER_BUFF_COUNT * sizeof(UInt32));
+	memset(_lingbao, 0, sizeof(_lingbao));
     m_2ndSoul = NULL;
     _iswboss = false;
     _wbextatk = 0;
@@ -533,6 +535,16 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
             }
         }
     }
+    if(t >= 0x60 && t < 0x60 + getMaxLingbaos())
+    {
+        UInt32 lbs[TRUMP_UPMAX] = {0};
+        if (getAllLingbaoId(lbs)) {
+            std::string str;
+            if (value2string(lbs, getMaxLingbaos(), str)) {
+                DB2().PushUpdateData("UPDATE `fighter` SET `lingbao` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
+            }
+        }
+    }
 
 	switch(t)
 	{
@@ -787,6 +799,11 @@ void Fighter::sendModification( UInt8 n, UInt8 * t, ItemEquip ** v, bool writedb
             {
                 st << ied.maxTRank << ied.trumpExp;
             }
+            else if(equip->getClass() == Item_LBling || equip->getClass() == Item_LBwu || equip->getClass() == Item_LBxin)
+            {
+                ItemLingbaoAttr& lba = (static_cast<ItemLingbao*>(equip))->getLingbaoAttr();
+                lba.appendAttrToStream(st);
+            }
 			if(writedb)
 				updateToDB(t[i], equip->getId());
 		}
@@ -991,11 +1008,21 @@ ItemEquip* Fighter::setTrump( UInt32 trump, int idx, bool writedb )
 
 UInt32  Fighter:: getTrumpNum()
 {
-
     UInt32 num = 0;
      for (int i = 0; i < getMaxTrumps(); ++i)
      {
         if (_trump[i])
+            num ++ ;
+     }
+     return num;
+}
+
+UInt32  Fighter:: getLingbaoNum()
+{
+    UInt32 num = 0;
+     for (int i = 0; i < getMaxLingbaos(); ++i)
+     {
+        if (_lingbao[i])
             num ++ ;
      }
      return num;
@@ -1104,6 +1131,21 @@ int Fighter::getAllTrumpId( UInt32* trumps, int size )
     return getMaxTrumps();
 }
 
+int Fighter::getAllLingbaoId( UInt32* lingbaos, int size )
+{
+    if (!lingbaos|| !size)
+        return 0;
+
+    for (int i = 0; i < getMaxLingbaos(); ++i)
+    {
+        if (_lingbao[i])
+            lingbaos[i] = _lingbao[i]->getId();
+        else
+            lingbaos[i] = 0;
+    }
+    return getMaxLingbaos();
+}
+
 int Fighter::getAllTrumpTypeId( UInt32* trumps, int size )
 {
     if (!trumps || !size)
@@ -1117,6 +1159,21 @@ int Fighter::getAllTrumpTypeId( UInt32* trumps, int size )
             trumps[i] = 0;
     }
     return getMaxTrumps();
+}
+
+int Fighter::getAllLingbaoTypeId( UInt32* lingbaos, int size )
+{
+    if (!lingbaos || !size)
+        return 0;
+
+    for (int i = 0; i < getMaxLingbaos(); ++i)
+    {
+        if (_lingbao[i])
+            lingbaos[i] = _lingbao[i]->GetItemType().getId();
+        else
+            lingbaos[i] = 0;
+    }
+    return getMaxLingbaos();
 }
 
 void Fighter::setCurrentHP( UInt32 hp, bool writedb )
@@ -1259,6 +1316,60 @@ inline void addEquipAttr2( GData::AttrExtra& ae, UInt8 type, UInt16 value, UInt8
         ae.mreslvl += value/10;
 	}
 }
+
+inline void AddLingbaoAttr(GData::AttrExtra& ae, ItemLingbao* lb)
+{
+    if(!lb)
+        return;
+
+    ItemLingbaoAttr& lbattr = lb->getLingbaoAttr();
+    for(int i = 0; i < 4; ++ i)
+    {
+        if(lbattr.type[i] == 0)
+            continue;
+
+        switch(lbattr.type[i])
+        {
+        case 1:
+            ae.attack += lbattr.value[i];
+            break;
+        case 2:
+            ae.magatk += lbattr.value[i];
+            break;
+        case 3:
+            ae.defend += lbattr.value[i];
+            break;
+        case 4:
+            ae.magdef += lbattr.value[i];
+            break;
+        case 5:
+            ae.hp += lbattr.value[i];
+            break;
+        case 6:
+            ae.toughlvl += lbattr.value[i];
+            break;
+        case 7:
+            ae.action += lbattr.value[i];
+            break;
+        case 8:
+            ae.hitrlvl += lbattr.value[i];
+            break;
+        case 9:
+            ae.evdlvl += lbattr.value[i];
+            break;
+        case 10:
+            ae.crilvl += lbattr.value[i];
+            break;
+        case 11:
+            ae.pirlvl += lbattr.value[i];
+            break;
+        case 12:
+            ae.counterlvl += lbattr.value[i];
+            break;
+        }
+    }
+}
+
 
 inline void addTalentAttr( GData::AttrExtra& ae, UInt8 type, UInt16 value )
 {
@@ -1652,6 +1763,14 @@ void Fighter::rebuildEquipAttr()
         }
     }
 
+    for(int idx = 0; idx < getMaxLingbaos(); ++ idx)
+    {
+		ItemLingbao* lb = static_cast<ItemLingbao*>(getLingbao(idx));
+        if(!lb)
+            continue;
+        AddLingbaoAttr(_attrExtraEquip, lb);
+    }
+
     if (_owner)
     {
         // 帮派秘术对额外属性的加成
@@ -1753,6 +1872,12 @@ void Fighter::rebuildBattlePoint()
         const GData::Formation* form = GData::formationManager[_owner->getFormation()];
         if(form)
             _battlePoint += form->getBattlePoint();
+    }
+    UInt8 cnt = _lbSkill.size();
+    for(UInt8 i = 0; i < cnt; ++ i)
+    {
+        const GData::LBSkillBase* lbskill = GData::lbSkillManager[_lbSkill[i].skillid];
+        _battlePoint += lbskill->battlepoint * (((float)(_lbSkill[i].factor))/10000);
     }
 }
 
@@ -2306,6 +2431,11 @@ UInt32 Fighter::getTrumpId( int idx )
     return (idx >= 0 && idx < getMaxTrumps() && _trump[idx]) ? _trump[idx]->getId() : 0;
 }
 
+UInt32 Fighter::getLingbaoId( int idx )
+{
+    return (idx >= 0 && idx < getMaxLingbaos() && _lingbao[idx]) ? _lingbao[idx]->getId() : 0;
+}
+
 void Fighter::getAllTrumps( Stream& st )
 {
     // XXX: append to armor
@@ -2313,6 +2443,16 @@ void Fighter::getAllTrumps( Stream& st )
     for (int i = 0; i < TRUMP_UPMAX; ++i)
     {
         st << getTrumpId(i);
+    }
+}
+
+void Fighter::getAllLingbaos( Stream& st )
+{
+    // XXX: append to armor
+    // st << static_cast<UInt8>(TRUMP_UPMAX);
+    for (int i = 0; i < LINGBAO_UPMAX; ++i)
+    {
+        st << getLingbaoId(i);
     }
 }
 
@@ -3118,7 +3258,8 @@ void Fighter::delSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_ONTHERAPY ||
                         s->cond == GData::SKILL_ONSKILLDMG ||
                         s->cond == GData::SKILL_ONOTHERDEAD ||
-                        s->cond == GData::SKILL_ONCOUNTER
+                        s->cond == GData::SKILL_ONCOUNTER ||
+                        s->cond == GData::SKILL_ONATKBLEED
                         )
                 {
                     offPassiveSkill(s->getId(), s->cond, s->prob>=100.0f, writedb);
@@ -3157,7 +3298,8 @@ void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_ONTHERAPY ||
                         s->cond == GData::SKILL_ONSKILLDMG ||
                         s->cond == GData::SKILL_ONOTHERDEAD ||
-                        s->cond == GData::SKILL_ONCOUNTER
+                        s->cond == GData::SKILL_ONCOUNTER ||
+                        s->cond == GData::SKILL_ONATKBLEED
                         )
                 {
                     upPassiveSkill(s->getId(), s->cond, (s->prob >= 100.0f), writedb);
@@ -3470,7 +3612,8 @@ bool Fighter::CanDelCitta(UInt16 citta)
     //儒1202:三昧真火 释1203:乾元指 道1206:御剑术
     //墨1333,1334,1336,1340,1341,1342
     UInt16 cId = CITTA_ID(citta);
-    UInt16 cittaIds[] = { 3, 4, 7, 134, 135, 137, 141, 142, 143 };
+    //UInt16 cittaIds[] = { 3, 4, 7, 134, 135, 137, 141, 142, 143 };
+    UInt16 cittaIds[] = { 3, 4, 7, 141, 142, 143 };
     for(UInt16 i = 0; i < sizeof(cittaIds) / sizeof(cittaIds[0]); ++i)
     {
         if(cId == cittaIds[i])
@@ -3493,11 +3636,15 @@ bool Fighter::delCitta( UInt16 citta, bool writedb )
     if (*it != citta)
         return false;
 
-    offCitta(citta, true, true, writedb);
+    UInt16 cittaId = CITTA_ID(citta); 
+    bool isMoDefaultCitta = (cittaId == 134 || cittaId == 135 || cittaId == 137);
+    if (!isMoDefaultCitta)
+    {
+        offCitta(citta, true, true, writedb);
 
-    *it = 0;
-    _cittas.erase(it);
-
+        *it = 0;
+        _cittas.erase(it);
+    }
     {
         const GData::CittaBase* cb = GData::cittaManager[citta];
         const GData::CittaBase* yacb = cb;
@@ -3523,19 +3670,72 @@ bool Fighter::delCitta( UInt16 citta, bool writedb )
                 exp = exp % 10000;
                 rCount3 = static_cast<UInt16>(exp / 100);
             }
-            SYSMSG(title, 2105);
-            SYSMSGV(content, 2106, getLevel(), getColor(), getName().c_str(), yacb->type, yacb->getName().c_str(), lvl);
+            UInt16 tId = 2010;
+            UInt16 cId = 2011;
+            if (!cb->effect->skill.empty())
+            {
+                tId = 2012;
+                cId = 2013;
+                if (isMoDefaultCitta)
+                {
+                    tId = 2014;
+                    cId = 2015;
+                }
+            }
+            SYSMSG(title, tId);
+            SYSMSGV(content, cId, getLevel(), getColor(), getName().c_str(), yacb->type, yacb->getName().c_str(), lvl);
             MailPackage::MailItem mitem[4] = {{static_cast<UInt16>(CITTA_ITEMID(citta)), 1}, {31, rCount1}, {30, rCount2}, {29, rCount3}};
             MailItemsInfo itemsInfo(mitem, DismissCitta, 4);
             GObject::Mail * pmail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
-            if(pmail)
+            if(pmail && !isMoDefaultCitta)
                 GObject::mailPackageManager.push(pmail->id, mitem, 4, true);
+            ////////////////////
+            //返回技能符文熔炼符60%
+            UInt16 skillid = 0;
+            if (!cb->effect->skill.empty())
+                skillid = cb->effect->skill[0]->getId();
+            UInt32 sid = SKILL_ID(skillid);
+            std::map<UInt16, SStrengthen>::iterator i = m_ss.find(sid);
+            if (i != m_ss.end())
+            {
+                SStrengthen& ss = i->second;
+                UInt16 ssCount1 = 0;
+                UInt16 ssCount2 = 0;
+                UInt16 ssCount3 = 0;
+                UInt16 ssCount4 = 0;
+                UInt32 ssExp = 0;
+                for (UInt8 lvl = 0; lvl < ss.lvl; ++lvl)
+                {
+                    ssExp += GData::GDataManager::getMaxStrengthenVal(sid, lvl);
+                }
+                ssExp += ss.curVal;
+                ssExp *= 0.6;
+                if(ssExp){
+                    ssCount1 = static_cast<UInt16>(ssExp / 1000);
+                    ssExp = ssExp % 1000;
+                    ssCount2 = static_cast<UInt16>(ssExp / 200);
+                    ssExp = ssExp % 200;
+                    ssCount3 = static_cast<UInt16>(ssExp / 50);
+                    ssExp = ssExp % 50;
+                    ssCount4 = static_cast<UInt16>(ssExp / 10);
+                    MailPackage::MailItem ssmitem[4] = {{1325,ssCount1}, {1326, ssCount2}, {1327, ssCount3}, {1328, ssCount4}};
+                    GObject::mailPackageManager.push(pmail->id, ssmitem, 4, true);
+
+                }
+                ss.maxVal = 0;
+                ss.curVal = 0;
+                ss.lvl = 0;
+                ss.maxLvl = 0;
+                SSUpdate2DB(skillid,ss);
+            }
+            //////////////////////
         }
     }
 
     _attrDirty = true;
     _bPDirty = true;
-    sendModification(0x2d, citta, 2/*1add,2del,3mod*/, writedb);
+    if (!isMoDefaultCitta)
+        sendModification(0x2d, citta, 2/*1add,2del,3mod*/, writedb);
 
     //散功成就
     GameAction()->doAttainment(_owner, 10081, 0);
@@ -4766,9 +4966,9 @@ void Fighter::SSOpen(UInt16 id)
         else
         {
             _owner->skillStrengthenLog(1, 0);
-            _owner->sendMsgCode(0, 1024);
         }
     }
+
     else
     {
         UInt32 prob = GData::GDataManager::getSkillStrengthenProb(sid, i->second.maxLvl);
@@ -5059,11 +5259,136 @@ UInt16 Fighter::getPortrait()
             portrait = 1058;
         else if (getFashionTypeId() == 1710)
             portrait = 1092;
+        else if(getFashionTypeId() == 1711)
+            portrait = 1093;
+        else if(getFashionTypeId() == 1712)
+            portrait = 1094;
+ 
     }
 
     return portrait;
 }
 
+ItemEquip* Fighter::setLingbao(UInt8 idx, ItemEquip* lb, bool writedb)
+{
+    if(idx >= e_lb_max)
+        return NULL;
+
+    if(lb != NULL)
+    {
+        UInt8 subClass = lb->getClass();
+        if (subClass != Item_LBling && subClass != Item_LBwu && subClass != Item_LBxin)
+            return NULL;
+        UInt8 clsIdx = subClass - Item_LBling;
+        if(clsIdx != idx)
+            return NULL;
+
+        ItemLingbaoAttr& lba = (static_cast<ItemLingbao*>(lb))->getLingbaoAttr();
+        if(lba.tongling == 0)
+            return NULL;
+    }
+
+    ItemEquip* t = _lingbao[idx];
+    if(t != NULL)
+    {
+        ItemLingbaoAttr& lba = (static_cast<ItemLingbao*>(t))->getLingbaoAttr();
+        if(lba.skill[0])
+            delLBSkill(t->getId());
+        if(lba.skill[1])
+            delLBSkill(t->getId());
+    }
+
+    _lingbao[idx] = lb;
+    if(lb != NULL)
+    {
+        ItemLingbaoAttr& lba = (static_cast<ItemLingbao*>(lb))->getLingbaoAttr();
+        if(lba.skill[0])
+            addLBSkill(lb->getId(), lba.skill[0], lba.factor[0]);
+        if(lba.skill[1])
+            addLBSkill(lb->getId(), lba.skill[1], lba.factor[1]);
+        if (lb)
+            lb->DoEquipBind(true);
+    }
+
+    _attrDirty = true;
+    _bPDirty = true;
+    sendModification(0x60+idx, _lingbao[idx], writedb);
+    return t;
+}
+
+void Fighter::loadLingbao(std::string& lbs)
+{
+    if (!lbs.length())
+        return;
+
+    StringTokenizer tk(lbs, ",");
+    for (size_t i = 0; i < tk.count() && static_cast<int>(i) < getMaxLingbaos(); ++i)
+    {
+        UInt32 lb = ::atoi(tk[i].c_str());
+        if (lb)
+        {
+            ItemEquip* t = 0;
+            t = GObjectManager::fetchEquipment(lb);
+            setLingbao(i, t, false);
+        }
+    }
+}
+
+bool Fighter::addLBSkill(UInt32 lbid, UInt16 skillid, UInt16 factor)
+{
+    if(skillid == 0 || factor == 0)
+        return false;
+
+    UInt8 cnt = _lbSkill.size();
+    for(int i = 0; i < cnt; ++ i)
+    {
+        if(_lbSkill[i].lbid == lbid)
+            break;
+        const GData::LBSkillBase* dstSkill = GData::lbSkillManager[_lbSkill[i].skillid];
+        const GData::LBSkillBase* srcSkill = GData::lbSkillManager[skillid];
+        if(dstSkill->cond != GData::e_lb_cond_skill || srcSkill->cond != GData::e_lb_cond_skill || dstSkill->cond2 != srcSkill->cond2)
+            continue;
+        float f = ((float)factor)/10000;
+        float f2 = ((float)(_lbSkill[i].factor))/10000;
+        if(f*srcSkill->ef_value > f2*dstSkill->ef_value)
+        {
+            _lbSkill.erase(_lbSkill.begin() + i);
+            break;
+        }
+    }
+
+    LBSkill lbs = {lbid, skillid, factor};
+    _lbSkill.push_back(lbs);
+
+    return true;
+}
+
+bool Fighter::delLBSkill(UInt32 lbid)
+{
+    bool res = false;
+    UInt8 cnt = _lbSkill.size();
+    for(int i = 0; i < cnt; ++ i)
+    {
+        if(_lbSkill[i].lbid == lbid)
+        {
+            _lbSkill.erase(_lbSkill.begin() + i);
+            res = true;
+            break;
+        }
+    }
+
+    return res;
+}
+
+void Fighter::getAllLbSkills(Stream& st)
+{
+    UInt8 cnt = _lbSkill.size();
+    st << cnt;
+    for(int i = 0; i < cnt; ++ i)
+    {
+        st << _lbSkill[i].skillid << _lbSkill[i].factor;
+    }
+}
 
 }
 

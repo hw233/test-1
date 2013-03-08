@@ -353,6 +353,7 @@ struct DBLootItem
 	UInt32 id;
 	std::string table;
 	UInt8 isPack;
+	UInt8 bind;
 };
 struct DBEUpgrade
 {
@@ -488,6 +489,17 @@ struct DBRechargeItem
     int    num;
 };
 
+struct DBDreamer
+{
+    UInt8 level;
+    UInt8 floor;
+    UInt8 maxX;
+    UInt8 maxY;
+    UInt8 gridCount;
+    UInt8 timeConsume;
+    std::string typeCount;
+};
+
 }
 
 
@@ -614,11 +626,12 @@ SPECIALDEF(3)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBLootItem)
-SPECIALDEF(3)
+SPECIALDEF(4)
 	(
 	UInt32, id,
 	std::string, table,
-	UInt8, isPack
+	UInt8, isPack,
+	UInt8, bind
 	)
 SPECIALEND()
 
@@ -1052,6 +1065,20 @@ SPECIALDEF(3)
     int, num
 	)
 SPECIALEND()
+
+SPECIALBEGIN (GData::DBDreamer)
+SPECIALDEF(7)
+	(
+    UInt8, level,
+    UInt8, floor,
+    UInt8, maxX,
+    UInt8, maxY,
+    UInt8, gridCount,
+    UInt8, timeConsume,
+    std::string, typeCount
+	)
+SPECIALEND()
+
 
 }
 

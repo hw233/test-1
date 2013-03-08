@@ -713,6 +713,12 @@ void OnSaleItemSearchReq( GameMsgHdr& hdr, const void * data )
 	SaleSearchReq * saleSearchReq = reinterpret_cast<SaleSearchReq *>(const_cast<void *>(data));
 	player->GetSale()->searchMySale(*saleSearchReq);
 }
+void OnSaleItemCancleAll( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	player->GetSale()->cancleAllItem();
+}
+
 
 void OnDailyCheck( GameMsgHdr& hdr, const void * data )
 {
@@ -736,8 +742,10 @@ void OnDailyCheck( GameMsgHdr& hdr, const void * data )
     player->SetVar(VAR_JUNE_HAPPY, 0);
     player->SetVar(VAR_JUNE_ITEM, 0);
     player->sendHappyInfo();
-    player->SendNextdayTime( *(UInt32*)data );
-    player->GetStrengthenMgr()->CheckTimeOver( *(UInt32*)data );
+
+    UInt32 time = *(UInt32*)data;
+    player->SendNextdayTime(time);
+    player->GetStrengthenMgr()->CheckTimeOver(time);
 }
 
 void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
@@ -753,102 +761,81 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
 	const ExpGainInstantCompleteStruct * ecs = reinterpret_cast<const ExpGainInstantCompleteStruct *>(data);
 	float exp = ecs->exp;
 	UInt32 duration = ecs->duration;
-	UInt32 now = TimeUtil::Now();
-	bool hasP2;
-	UInt32 p = player->getBuffData(PLAYER_BUFF_TRAINP3, now);
-	if(p > 0)
-	{
-		hasP2 = true;
-		UInt32 left = p - now;
-		if(left >= duration)
-		{
-			exp *= 1.8f;
-			player->setBuffData(PLAYER_BUFF_TRAINP3, p - duration);
-		}
-		else
-		{
-			exp = exp + exp * left * 8 / duration / 10;
-			player->setBuffData(PLAYER_BUFF_TRAINP3, 0);
-		}
-	}
-	else
-		hasP2 = false;
-	p = player->getBuffData(PLAYER_BUFF_TRAINP4, now);
-	if(p > 0)
-	{
-		UInt32 left = p - now;
-		if(left >= duration)
-		{
-			if(!hasP2)
-				exp *= 1.5f;
-			player->setBuffData(PLAYER_BUFF_TRAINP4, p - duration);
-		}
-		else
-		{
-			if(!hasP2)
-				exp = exp + exp * left  / duration / 2;
-			player->setBuffData(PLAYER_BUFF_TRAINP4, 0);
-		}
-		hasP2 = true;
-	}
-	else
-		hasP2 = false;
-	p = player->getBuffData(PLAYER_BUFF_TRAINP2, now);
-	if(p > 0)
-	{
-		UInt32 left = p - now;
-		if(left >= duration)
-		{
-			if(!hasP2)
-				exp *= 1.6f; // XXX: 1.5f
-			player->setBuffData(PLAYER_BUFF_TRAINP2, p - duration);
-		}
-		else
-		{
-			if(!hasP2)
-				exp = exp + exp * left / duration / 2;
-			player->setBuffData(PLAYER_BUFF_TRAINP2, 0);
-		}
-		hasP2 = true;
-	}
-	else
-		hasP2 = false;
-	p = player->getBuffData(PLAYER_BUFF_TRAINP1, now);
-	if(p > 0)
-	{
-		UInt32 left = p - now;
-		if(left >= duration)
-		{
-			if(!hasP2)
-				exp *= 1.3f; // XXX: 1.2f
-			player->setBuffData(PLAYER_BUFF_TRAINP1, p - duration);
-		}
-		else
-		{
-			if(!hasP2)
-				exp = exp + exp * left * 3 / duration / 10;
-			player->setBuffData(PLAYER_BUFF_TRAINP1, 0);
-		}
-	}
-	p = player->getBuffData(PLAYER_BUFF_ADVANCED_HOOK, now);
-	if(p > 0)
-	{
-        exp = ecs->exp; /** 重置 **/
-		UInt32 left = p - now;
-        /** 随身经验加速符还有效 **/
-		if(left > duration)
-		{
-            exp *= 1.6f;
-			player->setBuffData(PLAYER_BUFF_ADVANCED_HOOK, p - duration);
-		}
-		else
-		{
-		    exp = exp + exp * left * 3/ duration / 5;
-			player->setBuffData(PLAYER_BUFF_ADVANCED_HOOK, 0);
-		}
-	}
-	player->AddExp(static_cast<UInt32>(exp));
+    UInt32 curHookIndex = player->GetVar(VAR_EXP_HOOK_INDEX);
+    UInt32 p;
+    if(curHookIndex == ENUM_TRAINP1)
+    {
+        p = player->GetVar(VAR_TRAINP1);
+        if(p > 0)
+        {
+            UInt32 left = p;
+            if(left >= duration)
+            {
+                left -= duration;
+                exp = exp * 1.3f;
+            }
+            else
+            {
+                exp = exp + exp * left / duration * 0.3f;
+                left = 0;
+            }
+            player->SetVar(VAR_TRAINP1, left);
+            player->sendExpHook(0x40 + PLAYER_BUFF_TRAINP1, left);
+        }
+    }
+    else if(curHookIndex == ENUM_TRAINP2)
+    {
+        p = player->GetVar(VAR_TRAINP2);
+        if(p > 0)
+        {
+            UInt32 left = p;
+            if(left >= duration)
+            {
+                exp = exp * 1.6f;
+                left -= duration;
+            }
+            else
+            {
+                exp = exp + exp * left / duration * 0.6f;
+                left = 0;
+            }
+            player->SetVar(VAR_TRAINP2, left);
+            player->sendExpHook(0x40 + PLAYER_BUFF_TRAINP2, left);
+        }
+    }
+    else if(curHookIndex == ENUM_TRAINP3)
+    {
+        p = player->GetVar(VAR_TRAINP3);
+        if(p > 0)
+        {
+            UInt32 left = p;
+            if(left >= duration)
+            {
+                exp = exp * 1.8f;
+                left -= duration;
+            }
+            else
+            {
+                exp = exp + exp * left / duration * 0.8f;
+                left = 0;
+            }
+            player->SetVar(VAR_TRAINP3, left);
+            player->sendExpHook(0x40 + PLAYER_BUFF_TRAINP3, left);
+        }
+    }
+
+	player->AddExp(static_cast<UInt64>(exp));
+#if 0
 	ecs->ng->monsterKilled(player, ecs->count);
+#else
+    UInt32 itemCount = 0;
+    for(UInt32 i = 0; i < ecs->count; i++)
+    {
+        if(uRand(10000) < 74)
+            ++itemCount;
+    }
+    player->GetPackage()->Add(9359, itemCount, true, false);
+#endif
 }
 
 void OnAutoCopyAttack( GameMsgHdr& hdr, const void * data )
@@ -1151,6 +1138,7 @@ void OnCreateAward(GameMsgHdr& hdr, const void * data)
 #ifdef _FB
 #else
     dclogger.reg(player);
+    dclogger.reg_union(player);
 #endif
 #endif //_WIN32
 }
@@ -1828,6 +1816,108 @@ void OnCFriendAthleticsRank( GameMsgHdr& hdr, const void * data)
 {
     MSG_QUERY_PLAYER(player);
     player->OnCFriendAthleticsRank();
+}
+
+void OnForbidSale( GameMsgHdr &hdr, const void *data)
+{
+	MSG_QUERY_PLAYER(player);
+    if (cfg.autoForbid)
+    {
+        if (cfg.merged)
+        {
+            setForbidSaleValue(player->getId()&0xFFFFFFFF, true);
+        }
+        else
+        {
+            setForbidSaleValue(player->getId(), true);
+        }
+        player->setForbidSale(true, true);
+    }
+    else
+    {
+        player->udpLog("svr_forbid_sale", "known", "", "", "", "", "act_tmp");
+    }
+}
+
+void OnForbidSaleQueryFail( GameMsgHdr &hdr, const void *data)
+{
+    MSG_QUERY_PLAYER(player);
+    const Int32 ret = *(reinterpret_cast<Int32*>(const_cast<void *>(data)));
+    char buf[16];
+    snprintf(buf, 16, "%d", ret);
+    player->udpLog("svr_forbid_sale", buf, "", "", "", "", "act_tmp");
+}
+
+void OnOpenIdInvalid( GameMsgHdr &hdr, const void *data)
+{
+	MSG_QUERY_PLAYER(player);
+    char* openId = reinterpret_cast<char*>(const_cast<void *>(data));
+    std::string invalidOpenId = player->getOpenId();
+    std::string validOpenId = openId;
+    player->setOpenId(validOpenId);
+    player->udpLog("invalid_openid", invalidOpenId.c_str(), openId, "", "", "", "act_tmp");
+}
+
+void OnOpenAPIFailed( GameMsgHdr &hdr, const void *data)
+{
+	MSG_QUERY_PLAYER(player);
+#define MAX_MSG_LEN 1024
+    struct OpenAPIFailedInfo
+    {
+        UInt32 type;
+        Int32  ret;
+        char   msg[MAX_MSG_LEN];
+    };
+	const OpenAPIFailedInfo * faildInfo = reinterpret_cast<const OpenAPIFailedInfo*>(const_cast<void *>(data));
+    char buf[32] = "";
+    switch (faildInfo->type)
+    {
+        case 0:
+            snprintf (buf, 32, "%s", "is_login");
+            break;
+        case 1002:
+            snprintf (buf, 32, "%s", "punish");
+            break;
+        case 3333:
+            snprintf (buf, 32, "%s", "union_reg");
+            break;
+        default:
+            snprintf (buf, 32, "unknow_%d", faildInfo->type);
+            break;
+    }
+    char buf2[32] = "";
+    snprintf( buf2, 32, "%d", faildInfo->ret);
+    player->udpLog(buf, buf2, faildInfo->msg, "", "", "", "act_tmp");
+    if (faildInfo->ret == 1002 
+            || faildInfo->ret == 1005
+            || faildInfo->ret == 1006
+            || faildInfo->ret == 1300
+            || faildInfo->ret == -2
+            || faildInfo->ret == -64
+            )
+    {
+        player->selfKick();
+    }
+}
+
+void OnPostDragonKing( GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+	const UInt8 count = *reinterpret_cast<const UInt8*>(data);
+    player->postDragonKing(count);
+}
+
+void OnSaveGoldAct( GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    struct goldData
+    {
+        UInt8 opt;
+        UInt32 param;
+    };
+    goldData * gData = reinterpret_cast<goldData*>(const_cast<void *>(data));
+    if(gData)
+        player->saveGoldAct(gData->opt, gData->param);
 }
 
 #endif // _COUNTRYINNERMSGHANDLER_H_

@@ -2127,14 +2127,28 @@ void HeroIsland::setAto(Player* player, UInt8 onoff)
 
     if (onoff == 1 && !pd->ato)
     {
-        UInt32 goldUse = GData::moneyNeed[GData::AUTOHI].gold;
-        if (player->getGold() < goldUse)
+        if(World::getHeroIslandAct())
         {
-            player->sendMsgCode(0, 1104);
-            return;
+            UInt32 taelUse = GData::moneyNeed[GData::AUTOHI].tael;
+            if (player->getTael() < taelUse)
+            {
+                player->sendMsgCode(0, 1100);
+                return;
+            }
+            ConsumeInfo ci(HeroIslandAuto,0,0);
+            player->useTael(taelUse, &ci);
         }
-        ConsumeInfo ci(HeroIslandAuto,0,0);
-        player->useGold(goldUse, &ci);
+        else
+        {
+            UInt32 goldUse = GData::moneyNeed[GData::AUTOHI].gold;
+            if (player->getGold() < goldUse)
+            {
+                player->sendMsgCode(0, 1104);
+                return;
+            }
+            ConsumeInfo ci(HeroIslandAuto,0,0);
+            player->useGold(goldUse, &ci);
+        }
     }
 
     if (onoff > 2)

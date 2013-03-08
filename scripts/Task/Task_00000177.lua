@@ -8,6 +8,22 @@ function Task_Accept_00000177()
 	if task:HasAcceptedTask(177) or task:HasCompletedTask(177) or task:HasSubmitedTask(177) then
 		return false;
 	end
+	local state = GetPlayerData(6);
+	if state == 0 then
+		if not task:HasSubmitedTask(171) then
+			return false;
+		end
+	end
+	if state == 1 then
+		if not task:HasSubmitedTask(171) then
+			return false;
+		end
+	end
+	if state == 2 then
+		if not task:HasSubmitedTask(171) then
+			return false;
+		end
+	end
 	return true;
 end
 
@@ -23,6 +39,22 @@ function Task_Can_Accept_00000177()
 	end
 	if task:HasAcceptedTask(177) or task:HasCompletedTask(177) or task:HasSubmitedTask(177) then
 		return false;
+	end
+	local state = GetPlayerData(6);
+	if state == 0 then
+		if not task:HasSubmitedTask(171) then
+			return false;
+		end
+	end
+	if state == 1 then
+		if not task:HasSubmitedTask(171) then
+			return false;
+		end
+	end
+	if state == 2 then
+		if not task:HasSubmitedTask(171) then
+			return false;
+		end
 	end
 	return true;
 end
@@ -50,20 +82,20 @@ function Task_00000177(npcId)
 		action.m_ActionID = 177
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = task_msg_001899;
+		action.m_ActionMsg = task_msg_002062;
 	elseif task:GetTaskSubmitNpc(177) == npcId then
 		if Task_Submit_00000177() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 177
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = task_msg_001900;
+			action.m_ActionMsg = task_msg_002063;
 		elseif task:HasAcceptedTask(177) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 177
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = task_msg_001901;
+			action.m_ActionMsg = task_msg_002064;
 		end
 	end
 	return action;
@@ -77,8 +109,8 @@ function Task_00000177_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = task_msg_001902;
-	action.m_ActionMsg = task_msg_001903;
+	action.m_NpcMsg = task_msg_002065;
+	action.m_ActionMsg = task_msg_002066;
 	return action;
 end
 
@@ -87,7 +119,7 @@ function Task_00000177_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = task_msg_001904;
+	action.m_NpcMsg = task_msg_002067;
 	action.m_ActionMsg = "";
 	return action;
 end

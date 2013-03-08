@@ -35,6 +35,7 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
 	_maxhpAdd2(0), _maxActionAdd2(0), _fakeDeadTimes(0),
     _atkreduce3(0), _magatkreduce3(0), _pudu_debuf(0),
     _atkreduce3_last(0), _magatkreduce3_last(0), _pudu_debuf_last(0),
+    _deep_confuse_dmg_extra(0), _deep_confuse_last(0),
     _deep_forget_dmg_extra(0), _deep_forget_last(0), _deep_stun_dmg_extra(0), _deep_stun_last(0),
     //_therapy_dec(0), _therapy_dec_last(0),_therapy_add(0),_therapy_add_last(0),
     _therapy_buff(0), _therapy_buff_last(0),
@@ -42,9 +43,9 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _bleed1(0), _bleed2(0), _bleed3(0),
     _bleed1_last(0), _bleed2_last(0), _bleed3_last(0),
     _immune2(0), _def_dec(0), _def_dec_last(0), _def_dec_times(0),
-    _aura_bleed(0), _aura_dec_cd(0), _aura_bleed_last(0),
-    _stun_bleed(0), _stun_cd(0), _stun_bleed_last(0),
-    _confuse_bleed(0), _confuse_cd(0), _confuse_bleed_last(0),
+    _aura_bleed(0), _aura_present(0), _aura_present_cd(0), _aura_dec_cd(0), _aura_bleed_last(0),
+    _stun_bleed(0), _stun_present(0), _stun_present_cd(0), _stun_cd(0), _stun_bleed_last(0),
+    _confuse_bleed(0), _confuse_present(0), _confuse_present_cd(0), _confuse_cd(0), _confuse_bleed_last(0),
     _colorStock(0), _colorStockTimes(0), _colorStockLast(0),
     _summon(false), _summonLast(0), _moAuraBuf(0), _moAuraBufLast(0), _moEvade100(false), _moEvade100Last(0),
     _hideBuf(false), _hideBufLast(0), _markMo(false), _markMoLast(0),
@@ -57,7 +58,7 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _skillUsedChangeAttrValue(0), _skillUsedChangeAttrLast(0), _skillUsedChangeAttr(0),
     _bleedRandom(0), _bleedRandomLast(0), _bleedAttackClass(1),_bleedBySkill(0), _bleedBySkillLast(0), _bleedBySkillClass(1),
     _hitChangeByPeerless(0),_counterChangeByPeerless(0),_bSingleAttackFlag(false),_bMainTargetDead(false),_nCurrentAttackIndex(0),
-    _darkVigor(0), _dvFactor(0), _darkVigorLast(0)
+    _darkVigor(0), _dvFactor(0), _darkVigorLast(0), _hpShieldSelf(0), _hpShieldSelf_last(0)
 {
     memset(_immuneLevel, 0, sizeof(_immuneLevel));
     memset(_immuneRound, 0, sizeof(_immuneRound));
@@ -386,6 +387,7 @@ void BattleFighter::setFighter( GObject::Fighter * f )
 
     std::vector<UInt16>& passiveSkillOnCounter = _fighter->getPassiveSkillOnCounter();
     std::vector<UInt16>& passiveSkillOnCounter100 = _fighter->getPassiveSkillOnCounter100();
+    std::vector<UInt16>& passiveSkillOnAttackBleed100 = _fighter->getPassiveSkillOnAttackBleed100();
     cnt = passiveSkillOnCounter.size();
     _passiveSkillOnCounter.clear();
     rateExtent = 0;
@@ -412,6 +414,54 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         _passiveSkillOnCounter100.insert(_passiveSkillOnCounter100.end(), skillItem);
 
         updateSkillStrengthen(passiveSkillOnCounter100[idx]);
+    }
+
+    cnt = passiveSkillOnAttackBleed100.size();
+    _passiveSkillOnAttackBleed100.clear();
+    for(idx = 0; idx < cnt; idx++)
+    {
+        GData::SkillItem skillItem;
+        skillItem.base = GData::skillManager[passiveSkillOnAttackBleed100[idx]];
+        skillItem.cd = 0;
+        skillItem.rateExtent = 0;
+        _passiveSkillOnAttackBleed100.insert(_passiveSkillOnAttackBleed100.end(), skillItem);
+
+        updateSkillStrengthen(passiveSkillOnAttackBleed100[idx]);
+    }
+
+    std::vector<GObject::LBSkill>& lbSkills =  _fighter->getLBSkill();
+    cnt = lbSkills.size();
+    for(idx = 0; idx < cnt; ++ idx)
+    {
+        const GData::LBSkillBase* base = GData::lbSkillManager[lbSkills[idx].skillid];
+        if(!base)
+            continue;
+        GData::LBSkillItem item;
+        item.base = base;
+        item.cd = 0;
+        item.prob = base->prob * ((float)lbSkills[idx].factor/10000);
+        item.ef_value = base->ef_value * ((float)lbSkills[idx].factor/10000);
+        switch(base->cond)
+        {
+        case GData::e_lb_cond_skill:
+            _onSkillCond.push_back(item);
+            break;
+        case GData::e_lb_cond_action1:
+            _onActionCond1.push_back(item);
+            break;
+        case GData::e_lb_cond_dead:
+            _onDeadCond.push_back(item);
+            break;
+        case GData::e_lb_cond_bleed:
+            _onBleedCond.push_back(item);
+            break;
+        case GData::e_lb_cond_state:
+            _onStateCond.push_back(item);
+            break;
+        case GData::e_lb_cond_action2:
+            _onActionCond2.push_back(item);
+            break;
+        }
     }
 }
 
@@ -740,6 +790,10 @@ float BattleFighter::calcTherapy(bool& isCritical, bool& first, const GData::Ski
         }
     }
 
+    GData::LBSkillItem* item = getSkillCondItem(SKILL_ID(skill->getId()));
+    if(NULL != item)
+        return aura_factor * (getMagAttack() * skill->effect->hpP + skill->effect->addhp + skill->effect->hp + item->ef_value);
+
     return aura_factor * (getMagAttack() * skill->effect->hpP + skill->effect->addhp + skill->effect->hp);
 }
 
@@ -802,9 +856,9 @@ bool BattleFighter::calcHit( BattleFighter * defender, const GData::SkillBase* s
 	return uRand(10000) < hitrate * 100;
 }
 
-bool BattleFighter::calcCounter(BattleFighter* attacker, bool ranged, const GData::SkillBase* skill)
+bool BattleFighter::calcCounter(BattleFighter* attacker, const GData::SkillBase* skill)
 {
-	return uRand(ranged ? 20000 : 10000) < getCounter(attacker, skill) * 100;
+	return uRand(10000) < getCounter(attacker, skill) * 100;
 }
 
 bool BattleFighter::canBeCounter()
@@ -1150,6 +1204,11 @@ const GData::SkillBase* BattleFighter::getPassiveSkillOnCounter100(size_t& idx, 
     return getPassiveSkill100(_passiveSkillOnCounter100, idx, noPossibleTarget);
 }
 
+const GData::SkillBase* BattleFighter::getPassiveSkillOnAttackBleed100(size_t& idx, bool noPossibleTarget)
+{
+    return getPassiveSkill100(_passiveSkillOnAttackBleed100, idx, noPossibleTarget);
+}
+
 const GData::SkillBase* BattleFighter::getPassiveSkill(std::vector<GData::SkillItem>& passiveSkill, bool noPossibleTarget)
 {
     size_t cnt = passiveSkill.size();
@@ -1226,6 +1285,12 @@ const GData::SkillBase* BattleFighter::getPassiveSkillOnCounter(bool noPossibleT
     return getPassiveSkill(_passiveSkillOnCounter, noPossibleTarget);
 }
 
+const GData::SkillBase* BattleFighter::getPassiveSkillOnAttackBleed(bool noPossibleTarget)
+{
+    //return getPassiveSkill( _passiveSkillOnAttackBleed, noPossibleTarget);
+    return NULL;
+}
+
 void BattleFighter::releaseSkillCD(std::vector<GData::SkillItem>& skill, int cd)
 {
     size_t cnt = skill.size();
@@ -1261,6 +1326,7 @@ void BattleFighter::releaseSkillCD(int cd)
     releaseSkillCD(_passiveSkillEnter, cd);
     releaseSkillCD(_passiveSkillDead, cd);
     releaseSkillCD(_passiveSkillAftNAtk, cd);
+    releaseLBSkillCD();
 }
 
 const GData::SkillBase* BattleFighter::getPassiveSkillOnTherapy()
@@ -1824,8 +1890,8 @@ bool BattleFighter::makeShieldDamage(UInt32& u)
     }
     else
     {
-        u = 0;
         shieldHP -= u;
+        u = 0;
     }
 
     return true;
@@ -1835,12 +1901,20 @@ BattleFighter* BattleFighter::summonSelf(float factor, UInt8 last)
 {
     if(last == 0)
         return NULL;
-    BattleFighter* bf = new BattleFighter(*this);
+
+    BattleFighter * bf = new(std::nothrow) BattleFighter(_formula, _fighter);
+    //BattleFighter* bf = new BattleFighter(*this);
     if(!bf)
         return NULL;
 
+    bf->initStats(false);
     bf->clearSkill();
-    bf->setSummonFactor(factor, last);
+
+    UInt32 aura = 0;
+    if(isHide())
+        aura = 100;
+
+    bf->setSummonFactor(aura, factor, last);
 
     return bf;
 }
@@ -1858,6 +1932,8 @@ void BattleFighter::clearSkill()
     _passiveSkillEnter100.clear();
     _passiveSkillDead100.clear();
     _passiveSkillAftNAtk100.clear();
+    _passiveSkillOnCounter100.clear();
+    _passiveSkillOnAttackBleed100.clear();
 
     _passiveSkillPreAtk.clear();
     _passiveSkillAftAtk.clear();
@@ -1867,15 +1943,23 @@ void BattleFighter::clearSkill()
     _passiveSkillEnter.clear();
     _passiveSkillDead.clear();
     _passiveSkillAftNAtk.clear();
+    _passiveSkillOnCounter.clear();
 
     _passiveSkillOnTherapy.clear();
     _passiveSkillOnSkillDmg.clear();
     _passiveSkillOnOtherDead.clear();
 
     _skillStrengthen.clear();
+
+    _onSkillCond.clear();
+    _onActionCond1.clear();
+    _onActionCond2.clear();
+    _onDeadCond.clear();
+    _onBleedCond.clear();
+    _onStateCond.clear();
 }
 
-void BattleFighter::setSummonFactor(float factor, UInt8 last)
+void BattleFighter::setSummonFactor(UInt32 aura, float factor, UInt8 last)
 {
     if(last == 0)
         return; 
@@ -1884,10 +1968,7 @@ void BattleFighter::setSummonFactor(float factor, UInt8 last)
     _maxhp = _maxhp * factor;
     _hp = _maxhp;
 
-    if(!isHide())
-        _aura = 0;
-    else
-        _aura = 100;
+    _aura = aura;
 
     _peerlessSkill.base = GData::skillManager[49509];
 
@@ -2124,5 +2205,178 @@ bool BattleFighter::releaseDarkVigor()
 
     return false;
 }
+
+GData::LBSkillItem* BattleFighter::getSkillCondItem(UInt16 skillid)
+{
+    GData::LBSkillItem* item = NULL;
+    if(skillid == 0)
+        return item;
+
+    UInt8 cnt = _onSkillCond.size();
+    for(int i = 0; i < cnt; ++ i)
+    {
+        if(_onSkillCond[i].base->cond2 == skillid)
+        {
+            item = &(_onSkillCond[i]);
+            break;
+        }
+    }
+
+    if(item && item->prob > 0.01f)
+    {
+        if(item->prob > uRand(10000))
+            item->cd = item->base->cd;
+        else
+            item = NULL;
+    }
+    return item;
+}
+
+GData::LBSkillItem* BattleFighter::getActionCondItem1()
+{
+    GData::LBSkillItem* item = NULL;
+    UInt8 cnt = _onActionCond1.size();
+    for(int i = 0; i < cnt; ++ i)
+    {
+        item = &(_onActionCond1[i]);
+        break;
+    }
+
+    if(item && item->prob > 0.01f)
+    {
+        if(item->prob > uRand(10000))
+            item->cd = item->base->cd;
+        else
+            item = NULL;
+    }
+    return item;
+}
+
+GData::LBSkillItem* BattleFighter::getActionCondItem2()
+{
+    GData::LBSkillItem* item = NULL;
+    UInt8 cnt = _onActionCond2.size();
+    for(int i = 0; i < cnt; ++ i)
+    {
+        item = &(_onActionCond2[i]);
+        break;
+    }
+
+    if(item && item->prob > 0.01f)
+    {
+        if(item->prob > uRand(10000))
+            item->cd = item->base->cd;
+        else
+            item = NULL;
+    }
+    return item;
+}
+
+GData::LBSkillItem* BattleFighter::getDeadCondItem()
+{
+    GData::LBSkillItem* item = NULL;
+
+    UInt8 cnt = _onDeadCond.size();
+    for(int i = 0; i < cnt; ++ i)
+    {
+        item = &(_onDeadCond[i]);
+        break;
+    }
+
+    if(item && item->prob > 0.01f)
+    {
+        if(item->prob > uRand(10000))
+            item->cd = item->base->cd;
+        else
+            item = NULL;
+    }
+    return item;
+}
+
+GData::LBSkillItem* BattleFighter::getBleedCondItem()
+{
+    GData::LBSkillItem* item = NULL;
+
+    UInt8 cnt = _onBleedCond.size();
+    for(int i = 0; i < cnt; ++ i)
+    {
+        if(_onBleedCond[i].cd > 0)
+            continue;
+
+        item = &(_onBleedCond[i]);
+        break;
+    }
+
+    if(item && item->prob > 0.01f)
+    {
+        if(item->prob > uRand(10000))
+            item->cd = item->base->cd;
+        else
+            item = NULL;
+    }
+    return item;
+}
+
+GData::LBSkillItem* BattleFighter::getStateCondItem(UInt16 state)
+{
+    GData::LBSkillItem* item = NULL;
+
+    UInt8 cnt = _onStateCond.size();
+    for(int i = 0; i < cnt; ++ i)
+    {
+        if(_onStateCond[i].cd > 0)
+            continue;
+        if(!(_onStateCond[i].base->cond2 & state))
+            continue;
+
+        item = &(_onStateCond[i]);
+        break;
+    }
+
+    if(item && item->prob > 0.01f)
+    {
+        if(item->prob > uRand(10000))
+            item->cd = item->base->cd;
+        else
+            item = NULL;
+    }
+    return item;
+}
+
+void BattleFighter::releaseLBSkillCD()
+{
+    UInt8 cnt = _onBleedCond.size();
+    UInt8 idx = 0;
+    for(idx = 0; idx < cnt; ++ idx)
+    {
+        GData::LBSkillItem& item = _onBleedCond[idx];
+        if(item.cd > 0)
+            -- item.cd;
+    }
+
+    cnt = _onStateCond.size();
+    for(idx = 0; idx < cnt; ++ idx)
+    {
+        GData::LBSkillItem& item = _onStateCond[idx];
+        if(item.cd > 0)
+            -- item.cd;
+    }
+}
+
+bool BattleFighter::releaseHpSieldSelf()
+{
+    if(_hpShieldSelf_last == 0)
+        return false;
+
+    -- _hpShieldSelf_last;
+    if(_hpShieldSelf_last == 0)
+    {
+        _hpShieldSelf = 0;
+        return true;
+    }
+
+    return false;
+}
+
 
 }

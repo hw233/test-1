@@ -31,10 +31,12 @@ namespace GObject
         _potential = fgt->getPotential();
         _capacity = fgt->getCapacity();
         UInt16 peerless = fgt->getPeerlessLevel();
+        std::vector<LBSkill>& lbskill = fgt->getLBSkill();
 
         std::vector<UInt16> skills;
         fgt->getUpSkillAndLevel(skills);
         UInt8 cnt = skills.size();
+        _lbSkill = lbskill;
 
         UInt8 idx = 0;
         for(idx = 0; idx < CITTA_UPMAX; ++ idx)
@@ -221,11 +223,13 @@ namespace GObject
             std::string strcitta;
             std::string strtrump;
             std::string strss;
+            std::string strlbs;
             strCitta(strcitta);
             strTrump(strtrump);
             strSS(strss);
+            strLbs(strlbs);
 
-            DB1().PushUpdateData("REPLACE INTO `sh_fighter`(`id`, `playerId`, `potential`, `capacity`, `type`, `level`, `soulMax`, `citta`, `trump`, `skillstrengthen`) VALUES(%u, %"I64_FMT"u, %u.%02u, %u.%02u, %u, %u, %u, \'%s\', \'%s\', \'%s\')", getId(), _player->getId(), p / 100, p % 100, c / 100, c % 100, _type, _fgt->getLevel(), _soulMax,  strcitta.c_str(), strtrump.c_str(), strss.c_str());
+            DB1().PushUpdateData("REPLACE INTO `sh_fighter`(`id`, `playerId`, `potential`, `capacity`, `type`, `level`, `soulMax`, `citta`, `trump`, `skillstrengthen`, `lbskill`) VALUES(%u, %"I64_FMT"u, %u.%02u, %u.%02u, %u, %u, %u, \'%s\', \'%s\', \'%s\', \'%s\')", getId(), _player->getId(), p / 100, p % 100, c / 100, c % 100, _type, _fgt->getLevel(), _soulMax,  strcitta.c_str(), strtrump.c_str(), strss.c_str(), strlbs.c_str());
         }
 
         {
@@ -273,6 +277,40 @@ namespace GObject
             str += ",";
             str += Itoa(it->second);
         }
+    }
+
+    void SingleHeroFighter::strLbs(std::string& str)
+    {
+        UInt8 cnt = _lbSkill.size();
+        if(cnt > 0) 
+        {
+            str += Itoa(_lbSkill[0].skillid, 10);
+            str += ',';
+            str += Itoa(_lbSkill[0].factor, 10);
+        }
+        for(UInt8 i = 1; i < cnt; ++ i)
+        {
+            str += '|';
+            str += Itoa(_lbSkill[i].skillid, 10);
+            str += ',';
+            str += Itoa(_lbSkill[i].factor, 10);
+        }
+    }
+
+    void SingleHeroFighter::loadLbSkill(std::string& str)
+    {
+        StringTokenizer skills(str, "|");
+        for (UInt8 i = 0; i < skills.count(); ++i)
+        {
+            StringTokenizer lbs(skills[i], ",");
+            LBSkill lbskill;
+            lbskill.lbid = 0;
+            lbskill.skillid = atoi(lbs[0].c_str());
+            lbskill.factor = atoi(lbs[1].c_str());
+            _lbSkill.push_back(lbskill);
+        }
+        std::vector<LBSkill>& lbskill = _fgt->getLBSkill();
+        lbskill = _lbSkill;
     }
 
     void SingleHeroFighter::strTrump(std::string& str)

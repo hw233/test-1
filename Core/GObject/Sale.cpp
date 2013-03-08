@@ -7,6 +7,9 @@
 #include "Mail.h"
 #include "MsgID.h"
 #include "DCLogger.h"
+#include "GObject/OpenAPIWorker.h"
+#include "LBNameTmpl.h"
+#include "SaleMgr.h" 
 
 
 namespace GObject
@@ -75,6 +78,15 @@ bool Sale::addSaleMailFromDB(UInt32 id, ItemBase * item, bool mailSend)
 
 void Sale::sellSaleReq(std::vector<SaleSellData>& sales)
 {
+#ifndef _WIN32
+#ifndef _FB
+#ifndef _VT
+#ifdef  OPEN_API_ON
+    OPENAPI().Push(_owner->getId(), 1002, _owner->getOpenId(), _owner->getOpenKey(), _owner->getSource().c_str(), _owner->getClientIp());
+#endif
+#endif
+#endif
+#endif // _WIN32
 	std::size_t sz = sales.size();
 	UInt16 ItemCount[9] = {0};
 	if(sz == 0)
@@ -98,6 +110,14 @@ void Sale::sellSaleReq(std::vector<SaleSellData>& sales)
 					saleItems[i] = NULL;
 					continue;
 				}
+                if(saleItems[i]->getClass() == Item_LBling || saleItems[i]->getClass() == Item_LBwu || saleItems[i]->getClass() == Item_LBxin)
+                {
+                    if(!static_cast<ItemLingbao*>(saleItems[i])->isTongling())
+                    {
+                        saleItems[i] = NULL;
+                        continue;
+                    }
+                }
 			}
 			else
 			{
@@ -177,7 +197,8 @@ void Sale::sellSaleReqNotify(SaleSellRespData * data, UInt8 count)
 		saleSellRespData->id = data[i].id;
 		saleSellRespData->priceType = data[i].priceType;
 		saleSellRespData->price = data[i].price;
-		memcpy(saleSellRespData->itemName, data[i].itemName, 21);
+        UInt32 size = sizeof(saleSellRespData->itemName) - 1;
+		memcpy(saleSellRespData->itemName, data[i].itemName, size);
 		_sellItems[data[i].id] = saleSellRespData;
 	}
 
@@ -239,7 +260,19 @@ void Sale::buySellResp(SaleItemBuy& saleItemBuy)
 		}
 		mailItem = new SaleMailItem(saleItemBuy.item, true);
 		SYSMSG(title, 307);
-		SYSMSGV(content, 308, saleItemBuy.item->getName().c_str());
+
+        std::string name;
+        ItemBase* item = saleItemBuy.item;
+        if(item->getClass() == Item_LBling || item->getClass() == Item_LBwu || item->getClass() == Item_LBxin)
+        {
+            ItemLingbao* lb = static_cast<ItemLingbao*>(item);
+            lbnameTmpl.getLBName(name, lb);
+        }
+        else
+        {
+            name = saleItemBuy.item->getName();
+        }
+		SYSMSGV(content, 308, name.c_str());
 		MailPackage::MailItem mitem[1] = {{static_cast<UInt16>(saleItemBuy.item->getId()), static_cast<UInt32>(saleItemBuy.item->Count())}};
 		MailItemsInfo itemsInfo(mitem, SaleBuy, 1);
 		_owner->GetMailBox()->newMail(NULL, 0x06, title, content, saleItemBuy.id, true, &itemsInfo);
@@ -281,7 +314,18 @@ void Sale::cancelSellResp(SaleItemCancel& saleItemCancel)
 	{
 		//È¡Ïû
 		SYSMSG(title, 309);
-		SYSMSGV(content, 310, saleItemCancel.item->getName().c_str());
+        std::string name;
+        ItemBase* item = saleItemCancel.item;
+        if(item->getClass() == Item_LBling || item->getClass() == Item_LBwu || item->getClass() == Item_LBxin)
+        {
+            ItemLingbao* lb = static_cast<ItemLingbao*>(item);
+            lbnameTmpl.getLBName(name, lb);
+        }
+        else
+        {
+            name = saleItemCancel.item->getName();
+        }
+		SYSMSGV(content, 310, name.c_str());
 		MailPackage::MailItem mitem[1] = {{static_cast<UInt16>(mailItem->item->GetItemType().getId()), static_cast<UInt32>(mailItem->item->Count())}};
 		MailItemsInfo itemsInfo(mitem, SaleCancel, 1);
 		_owner->GetMailBox()->newMail(_owner, 0x06, title, content, saleItemCancel.id, true, &itemsInfo);
@@ -315,6 +359,7 @@ void Sale::sellSaleResp(UInt32 id, Player *buyer, UInt32 itemId, UInt16 itemNum)
 		}
 		else
 		{
+            dclogger.trade_sec(_owner, buyer, itemId, itemNum, saleSellRespData->price);
             IncommingInfo ii(InFromSale, itemId, itemNum);
 			_owner->getGold(saleSellRespData->price, &ii);
             _owner->tradeUdpLog(1081, 0, saleSellRespData->price);
@@ -323,7 +368,15 @@ void Sale::sellSaleResp(UInt32 id, Player *buyer, UInt32 itemId, UInt16 itemNum)
 			SYSMSGV(content, 314, saleSellRespData->itemName, buyer->getNameNoSuffix(buyer->getName()), saleSellRespData->price);
             MailItemsInfo itemsInfo(NULL, SaleSell, 0);
 			_owner->GetMailBox()->newMail(_owner, 0x07, title, content, 0, true, &itemsInfo);
-            dclogger.trade_sec(_owner, buyer, itemId, itemNum, saleSellRespData->price);
+#ifndef _WIN32
+#ifndef _FB
+#ifndef _VT
+#ifdef  OPEN_API_ON
+            OPENAPI().Push(buyer->getId(), 1002, buyer->getOpenId(), buyer->getOpenKey(), buyer->getSource().c_str(), buyer->getClientIp());
+#endif
+#endif
+#endif
+#endif // _WIN32
 		}
 		SAFE_DELETE(saleSellRespData);
 		_sellItems.erase(found);
@@ -382,7 +435,7 @@ void Sale::delSaleMailItems(UInt32 id)
 	{
 		DB4().PushUpdateData("DELETE FROM `equipment` WHERE `id` = %u", item->getId());
 		if(item->getQuality() >= 4)
-			DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, _owner->getId(), item->GetItemType().getId(), item->getId(), ToDelete, TimeUtil::Now());
+			DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, _owner->getId(), item->GetItemType().getId(), item->getId(), ToDeleteMail, TimeUtil::Now());
 	}
 	SAFE_DELETE(item);
 	SAFE_DELETE(found->second);
@@ -400,8 +453,28 @@ void Sale::makeMailInfo(UInt32 id, Stream& st, UInt16& num)
 		return ;
 	}
 	ItemBase * item = found->second->item;
-	st << static_cast<UInt16>(item->GetItemType().getId()) << item->Count();
+    st << static_cast<UInt16>(item->GetItemType().getId()) << item->Count();
+
+    if(item->getClass() == Item_LBling || item->getClass() == Item_LBwu || item->getClass() == Item_LBxin)
+    {
+        ItemLingbaoAttr& lba = (static_cast<ItemLingbao*>(item))->getLingbaoAttr();
+        lba.appendAttrToStream(st);
+    }
+
 	num = 1;
+}
+void Sale::cancleAllItem()
+{
+    SaleItemCancel item;
+	UInt16 i = 0;
+	std::map<UInt32, SaleSellRespData *>::iterator it = _sellItems.begin();
+	for (; i < 24 && it != _sellItems.end(); ++i, ++it)
+	{
+        item.status = 2;
+        item.id = it->first;
+        gSaleMgr.cancelSale(_owner, item.id = it->first); 
+	}
+	
 }
 
 }

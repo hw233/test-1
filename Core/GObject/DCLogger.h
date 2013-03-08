@@ -66,6 +66,7 @@ public:
     bool login(Player* player);
     bool login_sec(Player* player);
     bool create_sec(UserStruct const &nu, Player* player = NULL);
+    bool create_success_sec(Player * player);
     bool protol_sec(Player* player, int cmd);
     bool trade_sec(Player* saller, Player* buyer, UInt32 itemId, UInt32 itemCount, UInt32 price);
     bool gold_sec(Player* player, UInt32 count, UInt32 changeType, bool isIncrease);
@@ -77,6 +78,9 @@ public:
     bool fee(Player* player, UInt32 total, Int32 c);
     bool blue(Player* player);
     bool d3d6(Player* player);
+
+    bool reg_union(Player* player);
+
     UInt8 getDomain_sec(Player* player);
 
     void online();

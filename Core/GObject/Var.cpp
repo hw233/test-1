@@ -46,7 +46,7 @@ namespace GObject
             return;
 #endif
         UInt32 oldVal = m_Vars[id];
-       // m_Vars[id] = data;
+        // m_Vars[id] = data;
         bool bUpdateDB = CheckReset(id , now);
         m_Vars[id] = data;
         bUpdateDB = bUpdateDB || (oldVal != m_Vars[id]);
@@ -148,8 +148,8 @@ namespace GObject
 
     void VarSystem::UpdateDB(UInt32 id)
     {
-       DB7().PushUpdateData("REPLACE INTO `var` (`playerId`, `id`, `data`, `over`) VALUES (%"I64_FMT"u, %u, %u, %u)"
-               ,m_PlayerID, id, m_Vars[id], m_OverTime[id]);
+        DB7().PushUpdateData("REPLACE INTO `var` (`playerId`, `id`, `data`, `over`) VALUES (%"I64_FMT"u, %u, %u, %u)"
+                ,m_PlayerID, id, m_Vars[id], m_OverTime[id]);
     }
 }
 

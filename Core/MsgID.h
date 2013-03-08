@@ -41,6 +41,8 @@ namespace REQ
     const UInt8 JOBHUNTER           = 0x1E;
     /** 自动寻墨游戏 */
     const UInt8 AUTOJOBHUNTER       = 0X2A;
+    /** 水晶梦境协议 */
+    const UInt8 DREAMER             = 0x29;
     /**成就 */
     const UInt8 ACHIEVEMENT         = 0xF0;// 0x0C
     /**阵营选择 */
@@ -231,6 +233,8 @@ namespace REQ
     const UInt8 CLAN_PACKAGE        = 0x6B;// 0x6B
     /**帮会仓库记录 */
     const UInt8 CLAN_PACKAGE_RECORD = 0x6C;
+    /**帮派QQ群 */
+    const UInt8 CLAN_QQ =             0x6D;
     /**请求宗族奖励物品 */
     const UInt8 CLANREWARD          = 0x9C;
     /**领取宗族奖励 */
@@ -373,6 +377,8 @@ namespace REQ
     const UInt8 EQ_ACTIVATE         = 0xBB;
     /**装备属性转移 */
     const UInt8 EQ_MOVE             = 0xBC;
+    /**灵宝通灵*/
+    const UInt8 EQ_LINGBAO          = 0xBD;
 
     // const UInt8 GETBOX              = 0xD4;
     // const UInt8 BLOCKBOSS           = 0xD5;
@@ -399,7 +405,7 @@ namespace REQ
     /** 天劫 **/
     const UInt8 TIANJIE             = 0x19;
     /** 活动 **/
-    const UInt8 ACTIVE              = 0X8B;
+    const UInt8 ACTIVE              = 0x8B;
 
     /** 单挑 **/
     const UInt8 SINGLE_HERO         = 0XA5;
@@ -476,6 +482,7 @@ namespace REP
     const UInt8 EQ_SPIRIT           = 0xBA;
     const UInt8 EQ_ACTIVATE         = 0xBB;
     const UInt8 EQ_MOVE             = 0xBC;
+    const UInt8 EQ_LINGBAO          = 0xBD;
 
     const UInt8 CITY_INSIDE_MOVE    = 0xA0;// 0x51
     const UInt8 MAP_TRANSPORT       = 0xA1;// 0x52
@@ -542,6 +549,7 @@ namespace REP
     const UInt8 CLAN_BUILD          = 0x6A;// 0x9B
     const UInt8 CLAN_PACKAGE        = 0x6B;//
     const UInt8 CLAN_PACKAGE_RECORD = 0x6C;
+    const UInt8 CLAN_QQ =             0x6D;
 
     const UInt8 HERO_ISLAND         = 0x97;
     const UInt8 CLANREWARD          = 0x9C;
@@ -594,6 +602,8 @@ namespace REP
     const UInt8 JOBHUNTER           = 0x1E;
     /** 自动寻墨游戏 */
     const UInt8 AUTOJOBHUNTER       = 0X2A;
+    /** 水晶梦境协议 */
+    const UInt8 DREAMER             = 0x29;
 
     const UInt8 TRADE_LIST          = 0x80;// 0xC0
     const UInt8 TRADE_DATA          = 0x81;// 0xC1
@@ -668,7 +678,7 @@ namespace REP
     /** 天劫 **/
     const UInt8 TIANJIE             = 0x19;
     /** 活动 **/
-    const UInt8 ACTIVE              = 0X8B;
+    const UInt8 ACTIVE              = 0x8B;
 
     /** 单挑 **/
     const UInt8 SINGLE_HERO         = 0XA5;
@@ -733,6 +743,7 @@ namespace SPEQ
     const UInt16 DELETEGOLD          = 0x139;// 删除仙石
     const UInt16 ADDRECHARGESCORE    = 0x140;// 增加充值的积分
     const UInt16 SYSUPDATE           = 0x141;// 系统更新公告
+    const UInt16 FB_SPECIFY_FIND     = 0x142;// FB-隆中网络查询
 }
 
 namespace SPEP
@@ -787,6 +798,7 @@ namespace SPEP
     const UInt16 DELETEGOLD          = 0x39;// 删除仙石
     const UInt16 ADDRECHARGESCORE    = 0x40;// 增加充值的积分
     const UInt16 SYSUPDATE           = 0x41;// 系统更新公告
+    const UInt16 FB_SPECIFY_FIND     = 0x42;// FB-隆中网络查询
 }
 
 namespace ARENAREQ

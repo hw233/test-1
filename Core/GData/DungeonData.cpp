@@ -75,7 +75,7 @@ void DungeonLevel::getLoot( GObject::Player * player, UInt32 specialItem, UInt8 
                     lr[j].count = 1;
                     replace = false;
                     specialItem = 0;
-                    player->GetPackage()->Add(lr[j].id, lr[j].count, true, true, FromDungeon);//only use for weekday Saturday activity
+                    player->GetPackage()->Add(lr[j].id, lr[j].count, lr[j].bind, true, FromDungeon);//only use for weekday Saturday activity
                     player->_lastLoot.push_back(lr[j]);
                     lr[j].id = 0;
                 }
@@ -90,7 +90,7 @@ void DungeonLevel::getLoot( GObject::Player * player, UInt32 specialItem, UInt8 
                     continue;
                 }
             }
-            player->GetPackage()->Add(lr[j].id, lr[j].count, lr[j].id > 5000 && ibt->bindType > 0, true, FromDungeon);
+            player->GetPackage()->Add(lr[j].id, lr[j].count, lr[j].bind, true, FromDungeon);
             player->_lastLoot.push_back(lr[j]);
         }
 #endif

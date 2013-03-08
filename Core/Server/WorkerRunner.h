@@ -213,20 +213,33 @@ protected:
 
 	inline void Destroy()
 	{
+        UInt32 count = 0;
+
 		for(typename std::map<struct event *, TimerEvent *>::iterator it = _events.begin(); it != _events.end(); ++ it)
 		{
+            do {
+                m_Log->OutTrace("[%u]%u:event_free.\n", TID(), ++count);
+            }while (0);
 			event_free(it->first);
 			delete it->second;
 		}
 		_events.clear();
+
+        count = 0;
 		if(_event_base == NULL)
 		{
+            do {
+                m_Log->OutTrace("[%u]:event_base_free.\n", TID());
+            } while (0);
 			event_base_free(_event_base);
 			_event_base = NULL;
 		}
 		if(m_MsgHandler != NULL)
 		{
 			m_MsgHandler->DeregisterAllMsg();
+            do {
+                m_Log->OutTrace("[%u]:delete m_MsgHandler.\n", TID());
+            } while (0);
 			delete m_MsgHandler;
 			m_MsgHandler = NULL;
 		}

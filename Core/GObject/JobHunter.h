@@ -193,7 +193,6 @@ class JobHunter
 
     private:
         bool FighterList2String(std::string& str);
-        bool MapInfo2String(std::string& str);
 
     private:
 

@@ -50,8 +50,18 @@ namespace GObject
 #define TRUMP_UPMAX 3
 #define TRUMP_INIT 1 // 法宝最初只能装1个,由VIP等级控制装备个数
 #define ACUPOINTS_MAX 15
+#define LINGBAO_UPMAX 3
 
 #define PEERLESS_UPMAX 1
+
+enum
+{
+    e_lb_ling = 0,
+    e_lb_wu = 1,
+    e_lb_xin = 2,
+
+    e_lb_max
+};
 
 enum
 {
@@ -79,6 +89,13 @@ struct SoulItemExp
     UInt16 itemId;
     UInt8 res;
     Int16 exp;
+};
+
+struct LBSkill
+{
+    UInt32 lbid;
+    UInt16 skillid;
+    UInt16 factor;
 };
 
 struct ElixirAttr
@@ -317,6 +334,7 @@ public:
     // 反击后触发的技能
     inline std::vector<UInt16>& getPassiveSkillOnCounter() { return _rpasskl[GData::SKILL_ONCOUNTER-GData::SKILL_PASSSTART]; }
     inline std::vector<UInt16>& getPassiveSkillOnCounter100() { return _passkl[GData::SKILL_ONCOUNTER-GData::SKILL_PASSSTART]; }
+    inline std::vector<UInt16>& getPassiveSkillOnAttackBleed100() { return _passkl[GData::SKILL_ONATKBLEED-GData::SKILL_PASSSTART]; }
 
     // 取得心法带出技能的ID表
     const std::vector<const GData::SkillBase*>& skillFromCitta(UInt16 citta);
@@ -394,8 +412,27 @@ public:
     int getAllTrumpId(UInt32* trumps, int size = TRUMP_UPMAX);
     int getAllTrumpTypeId(UInt32* ids, int size = TRUMP_UPMAX);
     void getAllTrumps(Stream& st);
-
     UInt32 getTrumpNum();
+
+	inline ItemEquip * getLingbao(int idx) { return (idx >= 0 && idx < getMaxLingbaos()) ? _lingbao[idx] : 0; }
+    inline void * getLingbaoAddr() { return _lingbao;}
+    inline UInt8 getMaxLingbaos() { return e_lb_max; }
+    UInt32 getLingbaoId(int idx);
+    int getAllLingbaoId(UInt32* lingbaos, int size = e_lb_max);
+    int getAllLingbaoTypeId(UInt32* ids, int size = e_lb_max);
+    void getAllLingbaos(Stream& st);
+    UInt32 getLingbaoNum();
+
+    inline std::vector<LBSkill>& getLBSkill() { return _lbSkill; }
+    ItemEquip* setLingbao( UInt8 idx , ItemEquip* lingbao, bool = true);
+    void loadLingbao(std::string& lb);
+    void loadLBSkill(std::string& lbSkill);
+    bool addLBSkill(UInt32 lbid, UInt16 skillid, UInt16 factor);
+    bool delLBSkill(UInt32 lbid);
+    void getAllLbSkills(Stream& st);
+
+
+
 	UInt32 getMaxHP();
 
 	UInt32 regenHP(UInt32);
@@ -456,6 +493,7 @@ public:
 	inline void setDirty(bool d = true) { _attrDirty = d; _bPDirty = d; }
     bool hasTrumpType(UInt32 trumpid);
     bool canSetTrump(UInt8 idx, UInt32 trumpid);
+
 
     void setAttrType1(UInt8 t);
     void setAttrValue1(UInt16 v);
@@ -637,6 +675,7 @@ public:
 
 	void addAttr( ItemEquip * );
 	void addTrumpAttr( ItemEquip* );
+	void addLingbaoAttr( ItemEquip* );
     void addAttr( const GData::CittaEffect* ce );
     void    CheckEquipEnchantAttainment(UInt8 e);
     bool  IsEquipEnchantLev(UInt8 e);
@@ -710,13 +749,16 @@ protected:
     std::vector<UInt16> _rpasskl[GData::SKILL_PASSIVES-GData::SKILL_PASSSTART];
     std::vector<UInt16> _passkl[GData::SKILL_PASSIVES-GData::SKILL_PASSSTART]; // 100%触发技能
 
+    std::vector<LBSkill> _lbSkill;
+
 	ItemHalo* _halo;
 	ItemFashion* _fashion;
 	ItemWeapon * _weapon;
 	ItemArmor * _armor[5];
 	ItemEquip * _ring;
 	ItemEquip * _amulet;
-	ItemEquip * _trump[TRUMP_UPMAX];// 法宝
+	ItemEquip * _trump[TRUMP_UPMAX];    // 法宝
+	ItemEquip * _lingbao[e_lb_max];// 灵宝
 
 	bool _attrDirty;
 	UInt32 _maxHP;
@@ -784,6 +826,8 @@ public:
     void appendElixirAttr(Stream& st);
     void appendElixirAttr2(Stream& st);
     ElixirAttr& getElixirAttr() { return _elixirattr; }
+
+
 private:
     ElixirAttr _elixirattr;
 
@@ -859,6 +903,19 @@ public:
 
 	struct Offset { Int8 x, y; };
 	std::vector<Offset> extraPos;
+
+    // 仙宠
+private:
+     bool m_isPet;      // 
+     bool m_onBattle;   // 出战
+     // 仙宠的真实等级 _level = 50 + (m_petLv1 - 1 * 10)+m_petLv2
+     UInt8 m_petLv1;    // 品阶 (第一品阶为50级，之后每一品阶等价10级)
+     UInt8 m_petLv2;    // 重天 (每十重天升一品阶)
+
+public:
+    bool isPet() { return m_isPet; }
+    bool isOnBattle() { return m_onBattle; }
+    void setOnBattle(bool flag) { m_onBattle = flag; }
 };
 class GlobalFighters
 {

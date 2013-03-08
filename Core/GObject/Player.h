@@ -126,6 +126,7 @@ namespace GObject
 #define PLAYER_BUFF_ATHL7           0x57
 #define PLAYER_BUFF_ATHL8           0x58
 #define PLAYER_BUFF_ATHL9           0x59
+#define PLAYER_BUFF_QI_TIAN_CHU_MO  0x5B   //齐天除魔
 
 #define PLAYER_BUFF_DISPLAY_MAX		0x5F
 #define PLAYER_BUFF_COUNT			0x5F
@@ -164,6 +165,13 @@ namespace GObject
 #define PF_UNION 17
 #define PF_XY 171
 #define PF_XY_CH 10040
+
+    enum PEXP_HOOK_INFEX
+    {
+        ENUM_TRAINP1 = 1,  /** 初级经验加速符*1.2,加速(*1.3) **/
+        ENUM_TRAINP2,      /** 高级经验加速符*1.5,加速(*1.6);2.ENUM_TRAINP4:*1.5,加速(*1.5);3.ENUM_ADVANCED_HOOK:超值挂机加速符(100小时),*1.5,加速(*1.6) **/
+        ENUM_TRAINP3       /** 齐天经验加速符,*1.8,加速(*1.8) **/
+    };
 
 	class Map;
 	class Player;
@@ -222,6 +230,7 @@ namespace GObject
 		bool instantComplete();
 
 		void updateDB(bool);
+		UInt32 getFinalEnd() const { return _finalEnd; };
 
 	private:
 		float calcExpEach(UInt32);
@@ -355,6 +364,19 @@ namespace GObject
 
     private:
         UInt8 id;
+    };
+
+    class EventAutoRefreshOpenKey : public EventBase
+    {
+    public:
+		EventAutoRefreshOpenKey(Player * player, UInt32 interval, UInt32 count)
+			: EventBase(player, interval, count)
+		{}
+
+        virtual UInt32 GetID() const { return EVENT_REFRESHOPENKEY; }
+        virtual bool Equal(UInt32 id, size_t playerid) const;
+        void Process(UInt32);
+		bool Accelerate(UInt32);
     };
 
 
@@ -892,6 +914,11 @@ namespace GObject
         {
             return (_playerData.qqvipl >= 24 && _playerData.qqvipl <= 29);
         }
+        inline bool is3366AndBD() const
+        {
+            return (_playerData.qqvipl >= 20 && _playerData.qqvipl <= 29 && 
+                    _playerData.qqvipl1 >= 11 && _playerData.qqvipl1 <= 19); 
+        }
 
 		UInt32 getTotalRecharge()			{ return _playerData.totalRecharge; }
 		void addTotalRecharge(UInt32);
@@ -912,7 +939,7 @@ namespace GObject
 		void setBuffData(UInt8, UInt32, bool = true);
 		void addBuffData(UInt8, UInt32);
 		void testBattlePunish();
-
+        void sendExpHook(UInt8 id, UInt32 data);
 
         UInt32 GetVar(UInt32 id);
         Int32 GetVarS(Int32 id);
@@ -1126,11 +1153,26 @@ namespace GObject
 		bool makeFighterInfo(Stream&, UInt32);
         void sendRechargeInfo(bool rank = false);
         void sendConsumeInfo(bool rank = false);
-        void getMDItem();
+        void getMDItem(UInt8 v=1);
         void sendMDSoul(UInt8 type, UInt32 id = 0);
-        void sendJuneRechargeMails(UInt32 value);
+        void appendCompassItem(UInt32 id,  UInt32 count, UInt8 v)
+        {
+            MDItem item = {id,count};
+            if (1 == v)
+                _mditemVec1.push_back(item);
+            else if (2 == v)
+                _mditemVec2.push_back(item);
+        }
         UInt32 _mditem;
+        struct MDItem
+        {
+            UInt32 id;
+            UInt32 count;
+        };
+        std::vector<MDItem> _mditemVec1;
+        std::vector<MDItem> _mditemVec2;
 
+        void sendJuneRechargeMails(UInt32 value);
 		void autoRegenAll();
 		void regenAll(bool = false);
         void setHPPercent(UInt8 p);
@@ -1179,11 +1221,11 @@ namespace GObject
         inline bool isAutoCopyFailed() { return m_autoCopyFailed; }
         inline void resetAutoCopyFailed() { m_autoCopyFailed = false; }
         inline void setCopyFailed() { m_autoCopyFailed = true; }
-		bool autoBattle(UInt32);
+		bool autoBattle(UInt32, UInt8);
 		void pushAutoBattle(UInt32, UInt16, UInt16);
         //void advancedHookExp();
 		void pushAutoDungeon(UInt32, UInt32, UInt8);
-		void cancelAutoBattle();
+		void cancelAutoBattle(bool needNotify = true);
 		void cancelAutoBattleNotify();
 		void instantAutoBattle();
 		void cancelAutoDungeon();
@@ -1245,6 +1287,14 @@ namespace GObject
         void getYearRPPackage();
         void getYearRPReward();
         /////
+        //帮派qq群
+        UInt8 toQQGroup(bool isJoin);
+        bool isInQQGroup() {return _inQQGroup;}
+        void setInQQGroup (bool v) {_inQQGroup = v;}
+        //捕鱼大亨用户
+        void sendFishUserInfo();
+        void getFishUserPackage();
+        void getFishUserAward();
 	public:
 		UInt16   GetFreePackageSize();
 		bool     ExtendPackageSize();
@@ -1508,7 +1558,7 @@ namespace GObject
         UInt8 getSnowAward(UInt16 type);
         //推雪人end
         
-        void setForbidSale(bool b) {_isForbidSale = b;}
+        void setForbidSale(bool b, bool isAuto = false);
         bool getForbidSale() {return _isForbidSale;}
 	private:
 		Mutex _mutex;
@@ -1588,6 +1638,7 @@ namespace GObject
 #endif
 
         UInt64 _invitedBy;
+        bool _inQQGroup;
     public:
         void setInvitedBy(UInt64 id, bool writedb = true);
         inline UInt64 getInvitedBy() { return _invitedBy; }
@@ -1596,7 +1647,7 @@ namespace GObject
         void sendTokenInfo();
         void sendDiscountLimit();
 
-        void useMDSoul();
+        void useMDSoul(UInt8 v=1);
         void svrSt(UInt8);
 
     public:
@@ -1612,6 +1663,7 @@ namespace GObject
         std::vector<GData::LootResult> _lastNew7DayTargetAward;
         std::vector<GData::LootResult> _lastExJobAward;
         std::vector<GData::LootResult> _lastCFTicketsAward;
+        std::vector<GData::LootResult> _lastExJobStepAward;
 
     private:
 		UInt16 _lastDungeon;
@@ -1757,6 +1809,7 @@ namespace GObject
         void storeUdpLog(UInt32 id, UInt32 type, UInt32 itemId, UInt32 num = 1);
         void newRC7DayUdpLog(UInt32 id, UInt32 type = 0, UInt32 num  = 1);
         void transformUdpLog(UInt32 id, UInt32 type, UInt32 money1, UInt32 money2, UInt32 money3, UInt32 money4, UInt8 val1);
+        void dreamerUdpLog(UInt32 id, UInt32 type, UInt32 num = 1);
         void guideUdp(UInt8 type, std::string& p1, std::string& p2);
         void moneyLog(int type, int gold, int coupon = 0, int tael = 0, int achievement = 0, int prestige = 0);
         void actUdp(UInt8 type, std::string& p1, std::string& p2);
@@ -1788,12 +1841,14 @@ namespace GObject
         std::string m_source;
         std::string m_via;
         std::string m_invited;
+        std::string m_pfkey;
         bool m_isOffical;
         bool m_isXY;
     public:
         inline void setDomain(const std::string& domain)
         {
             strncpy (m_domain, domain.c_str(), 256);
+            m_domain[255] = '\0';
             m_isOffical = false;
             if (atoi(domain.c_str()) == 12)
                 m_isOffical = true;
@@ -1807,41 +1862,40 @@ namespace GObject
             else
             {
                 strncpy(m_clientIp, clientIp.c_str(), 256);
+                m_clientIp[255] = '\0';
             }
         }
         void setOpenId(const std::string& openid, bool load = false);
-        inline void setOpenKey(const std::string& openkey) { strncpy(m_openkey, openkey.c_str(), 256); }
+        inline void setOpenKey(const std::string& openkey) { strncpy(m_openkey, openkey.c_str(), 256); m_openkey[255] = '\0';}
         inline void setSource(const std::string& source) 
         { 
             m_source = source; 
 
             if (atoi(m_domain) == PF_UNION)
             {
-                static const UInt32 XY_CHANNEL[] = {41, 47, 48, 49, 50, 51, 52, 53, 54, 56};
-                for (UInt32 i = 0; i < (sizeof(XY_CHANNEL) / sizeof(UInt32)); ++ i)
+                static const char *XY_CHANNEL = "union-10040-";
+                if (strcasestr(m_source.c_str(), XY_CHANNEL))
                 {
-                    char buf[16];
-                    snprintf (buf, 16, "-%d", XY_CHANNEL[i]);
-                    if (strstr(m_source.c_str(), buf))
-                    {
-                        m_isXY = true;
-                        return;
-                    }
-                    else
-                    {
-                        m_isXY = false;
-                    }
+                    m_isXY = true;
+                }
+                else
+                {
+                    m_isXY = false;
                 }
             }
+            else
+                m_isXY = false;
         }
         inline void setVia(const std::string& via) { m_via = via; }
         inline void setInvited(const std::string& inv) { m_invited = inv; }
+        inline void setPfKey(const std::string& pfkey) { m_pfkey = pfkey; }
         inline const char* getDomain() const { return m_domain; }
         inline const char* getOpenId() const { return m_openid; }
         inline const char* getOpenKey() const { return m_openkey; }
         inline const std::string& getSource() const { return m_source; }
         inline const std::string& getVia() const { return m_via; }
         inline const std::string& getInvited() const { return m_invited; }
+        inline const std::string& getPfKey() const { return m_pfkey;}
         inline bool isOffical() const { return m_isOffical; }
         inline bool isXY() const { return m_isXY; }
         inline const char* getClientIp() const { return m_clientIp; }
@@ -1925,11 +1979,17 @@ namespace GObject
         void CheckCanAwardBirthday();
         void getAwardLogin(UInt8 opt);
         void getAwardBlueDiamond(UInt8 opt);
+        void getConsumeAward();
+        void sendConsumeAwardInfo(UInt8 idx);
+        void getWeiboAward(UInt8 opt, std::string key);
+        void sendWeiboAwardInfo();
         void getThanksGivingDay(UInt8 opt);
         void IDIPAddItem(UInt16 itemId, UInt16 num, bool bind = true);
         int IDIPBuy(UInt32 itemId, UInt32 num, UInt32 price, std::string& err, bool bind = true);
         void lastExJobAwardPush(UInt16 itemId, UInt16 num);
         void checkLastExJobAward();
+        void lastExJobStepAwardPush(UInt16 itemId, UInt16 num);
+        void checkLastExJobStepAward();
         void lastQueqiaoAwardPush(UInt16 itemId, UInt16 num);
         void checkLastQueqiaoAward();
         void lastKillMonsterAwardPush(UInt16 itemId, UInt16 num);
@@ -2043,6 +2103,14 @@ namespace GObject
     public:
         Dreamer * getDreamer();
         void sendSysUpdate();
+        void setDreamer(UInt8 progress, UInt8 level, UInt8 maxX, UInt8 maxY, UInt8 maxGrid,
+                const std::string& mapInfo, UInt8 posX, UInt8 posY, UInt8 earlyPosX, UInt8 earlyPosY,
+                UInt8 timeConsume, UInt8 remainTime, UInt8 keysCount, 
+                UInt8 eyesCount, UInt8 eyeTime, UInt8 eyeX, UInt8 eyeY);
+
+        void setDreamerTime(UInt8 count);
+        void setDreamerKey(UInt8 count);
+        void setDreamerEye(UInt8 count);
     private:
         Dreamer * _dreamer;
 
@@ -2060,6 +2128,21 @@ namespace GObject
         void sendCopyFrontAllAward();
         UInt8 getCopyId();
         UInt8 getFrontmapId();
+
+        void getDragonKingInfo();
+        void postDragonKing(UInt8 count);
+        void saveGoldAct(UInt8 opt, UInt32 param);
+        void sendSaveGoldAct();
+
+        void sendSnakeEggInfo();
+        void callSnakeEgg();
+        void getSnakeEggAward(UInt8 v);
+        void sendSnakeSpringEquipMail(); 
+
+        void getNewYearGiveGiftAward(UInt8 dayOrder, UInt8 result);
+        
+        void buyTownTjItem(const UInt32 itemId);
+        void sendTownTjItemInfo();
     private:
         UInt8 cf_posPut[5];//范围1-5
         UInt32 cf_itemId[5];
@@ -2075,6 +2158,14 @@ namespace GObject
         void sendTowerLoginAct();
         void getFeastGiftAward(UInt8 type);
         void sendFeastGiftAct();
+        void getNewYearQQGameAward(UInt8 type);
+        void sendNewYearQQGameAct();
+        void getNewYearQzoneContinueAward(UInt8 type);
+        void sendNewYearQzoneContinueAct();
+        void calcNewYearQzoneContinueDay(UInt32 time);
+        void transferExpBuffer2Var();
+
+        inline bool relateExpHook(UInt8 id) { return id == PLAYER_BUFF_TRAINP1 || id == PLAYER_BUFF_TRAINP2 || id == PLAYER_BUFF_TRAINP3/* || id == PLAYER_BUFF_TRAINP4 || id == PLAYER_BUFF_ADVANCED_HOOK*/; }
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

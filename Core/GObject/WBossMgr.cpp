@@ -27,7 +27,9 @@ const float WBOSS_ATK_FACTOR = .5f;
 const UInt8 WBOSS_BASE_LVL = 20;
 const UInt32 WBOSS_MIN_HP = 20000000;
 const UInt32 WBOSS_MAX_HP = 350000000;
+const Int32 WBOSS_MAX_ATK= 100000;
 const float WBOSS_MAX_ASC_HP_FACTOR = 1.40f;
+const float WBOSS_MAX_ASC_ATK_FACTOR = 1.40f;
 
 #if 1
 #define AWARD_AREA1 3
@@ -689,11 +691,22 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
         nflist[0].fighter->setBaseHP(ohp);
         nflist[0].fighter->setWBoss(true);
 
-        extatk = (WBOSS_BASE_TIME/(float)m_last - 1.f) * WBOSS_ATK_FACTOR * (atk + baseatk);
-        nflist[0].fighter->setExtraAttack(extatk + atk);
+        float atk_factor = (WBOSS_BASE_TIME/(float)m_last - 1.f) * WBOSS_ATK_FACTOR;
+        if(atk_factor > WBOSS_MAX_ASC_ATK_FACTOR)
+            atk_factor = WBOSS_MAX_ASC_ATK_FACTOR;
+        extatk = atk_factor * (atk + baseatk) + atk;
+        if(extatk > WBOSS_MAX_ATK)
+            extatk = WBOSS_MAX_ATK;
+        else if(extatk < 0)
+            extatk = 0;
+        nflist[0].fighter->setExtraAttack(extatk);
 
-        extmagatk = (WBOSS_BASE_TIME/(float)m_last - 1.f) * WBOSS_ATK_FACTOR * (matk + basematk);
-        nflist[0].fighter->setExtraMagAttack(extmagatk + matk);
+        extmagatk = atk_factor * (matk + basematk) + matk;
+        if(extmagatk > WBOSS_MAX_ATK)
+            extmagatk = WBOSS_MAX_ATK;
+        else if(extmagatk < 0)
+            extmagatk = 0;
+        nflist[0].fighter->setExtraMagAttack(extmagatk);
 
         TRACE_LOG("BOSS: hp: %u, base attack: %u, extra attack: %d, magattack: %u, extra magattack: %d",
                 nflist[0].fighter->getBaseHP(), nflist[0].fighter->getBaseAttack(),

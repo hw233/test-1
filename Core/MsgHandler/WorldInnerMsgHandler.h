@@ -417,8 +417,8 @@ void OnDoCancelAutoBattleReq( GameMsgHdr& hdr, const void * data )
 	if(ev == NULL)
 		return;
 	ev->release();
-	GameMsgHdr hdr2(0x279, player->getThreadId(), player, 0);
-	GLOBAL().PushMsg(hdr2, NULL);
+	//GameMsgHdr hdr2(0x279, player->getThreadId(), player, 0);
+	//GLOBAL().PushMsg(hdr2, NULL);
 }
 
 void OnTrainAccelerateReq( GameMsgHdr& hdr, const void * data )
@@ -463,6 +463,14 @@ void OnCompleteDungeonAutoReq( GameMsgHdr& hdr, const void * data )
 		return;
 	GameMsgHdr hdr2(0x281, player->getThreadId(), player, sizeof(GObject::EventBase *));
 	GLOBAL().PushMsg(hdr2, &ev);
+}
+
+void OnCancelJobHunterAutoReq( GameMsgHdr & hdr, const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+    GObject::EventBase * ev = GObject::eventWrapper.RemoveTimerEvent(player, EVENT_JOBHUNTER, player->getId());
+    if (ev)
+        ev->release();
 }
 
 void OnReloadLuaReq( GameMsgHdr& hdr, const void * data )
@@ -1115,17 +1123,22 @@ void OnSHEnter( GameMsgHdr& hdr, const void* data )
 }
 
 
-inline bool enterArena(GObject::Player* p, void * param)
+inline bool enterArena(GObject::Player* p, UInt32* cnt)
 {
     if(!p)
         return true;
+    if(*cnt > 100)
+        return false;
+
+    ++(*cnt);
     GObject::arena.enterArena(p);
     return true;
 }
 
 void OnEnterArena( GameMsgHdr& hdr, const void* data )
 {
-    GObject::globalPlayers.enumerate(enterArena, static_cast<void*>(NULL));
+    UInt32 cnt = 0;
+    GObject::globalPlayers.enumerate(enterArena, &cnt);
 }
 
 void OnSHStageOnOff( GameMsgHdr& hdr, const void* data )
