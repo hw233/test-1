@@ -3565,7 +3565,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
 
         }
         //仙宠、两次单体攻击，两次伤害则眩晕
-        else if(SKILL_ID(skill->getId()) == 27)
+        else if(SKILL_ID(skill->getId()) == 44)
         {
             UInt32 dmg1 = 0;
             UInt32 dmg2 = 0;
