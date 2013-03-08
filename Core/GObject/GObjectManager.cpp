@@ -1151,8 +1151,8 @@ namespace GObject
             //p->sendOldRC7DayAward();
         //if (!GVAR.GetVar( GVAR_JOB_MO_PEXP))
             //buchangMo(p);
-        if (!GVAR.GetVar(GVAR_EXP_HOOK_NEW) && p)
-            p->transferExpBuffer2Var();
+        //if (!GVAR.GetVar(GVAR_EXP_HOOK_NEW) && p)
+        //    p->transferExpBuffer2Var();
 		return true;
 	}
 
@@ -2522,7 +2522,7 @@ namespace GObject
         //GVAR.SetVar(GVAR_1530BUCHANG, 1);
         GVAR.SetVar(GVAR_OLDRC7DAYBUCHANG, 1);
         GVAR.SetVar(GVAR_JOB_MO_PEXP, 1);
-        GVAR.SetVar(GVAR_EXP_HOOK_NEW, 1);
+        //GVAR.SetVar(GVAR_EXP_HOOK_NEW, 1);
 		return true;
 	}
 
