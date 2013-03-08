@@ -17308,6 +17308,8 @@ void Player::postDragonKing(UInt8 count)
         SetVar(VAR_DRAGONKINGSNAKE_STEP, step);
     else if(3 == flag)
         SetVar(VAR_TIANMANG_STEP, step);
+    else if(4 == flag)
+        SetVar(VAR_HUNYUAN_STEP, step);
 }
 
 //金蛇献瑞 聚福兆祥
