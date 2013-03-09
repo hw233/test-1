@@ -599,7 +599,7 @@ namespace GObject
 #ifndef _WIN32
 		m_ulog(NULL),
 #endif
-		m_isOffical(false), m_isXY(false), m_sysDailog(false), m_hasTripod(false), _jobHunter(NULL), _dreamer(NULL)
+		m_isOffical(false), m_isXY(false), m_sysDailog(false), m_hasTripod(false), _jobHunter(NULL), _dreamer(NULL), _onBattlePet(NULL)
 	{
         m_ClanBattleStatus = 1;
         m_ClanBattleScore = 0;
@@ -17264,6 +17264,291 @@ void Player::sendSaveGoldAct()
     st << Stream::eos;
     send(st);
 }
+
+//仙宠
+	FairyPet * Player::findFairyPet( UInt32 id )
+	{
+		std::map<UInt32, FairyPet *>::iterator it = _fairyPets.find(id);
+		if(it == _fairyPets.end())
+			return NULL;
+		return it->second;
+	}
+
+    bool Player::hasCanHirePet( UInt32 id )
+    {
+        std::vector<UInt32>::iterator it = std::find(_playerData.canHirePet.begin(), _playerData.canHirePet.end(), id);
+        return it != _playerData.canHirePet.end();
+    }
+
+    bool Player::delCanHirePet( UInt32 id )
+    {
+        bool isDel = false;
+        std::vector<UInt32>::iterator it = _playerData.canHirePet.begin();
+        for(; it != _playerData.canHirePet.end(); ++ it)
+        {
+            if(*it == id)
+            {
+                _playerData.canHirePet.erase(it);
+                isDel = true;
+                break;
+            }
+        }
+        if(isDel)
+            writeCanHiretPet();
+        return isDel;
+    }
+
+	void Player::writeCanHiretPet()
+	{
+        std::string petStr = "";
+        UInt8 size = getCanHirePetNum();
+        for(UInt8 i = 0; i < size; ++ i)
+        {
+            petStr += Itoa(_playerData.canHirePet[i]);
+            if(i < size - 1)
+                petStr += ",";
+        }
+        DB1().PushUpdateData("UPDATE `player` SET `canHirePet` = '%s' WHERE id = %"I64_FMT"u", petStr.c_str(), getId());
+    }
+
+	bool Player::isFairyPetFull() const
+	{
+		size_t size = _fairyPets.size();
+        return size >= 6;
+	}
+
+    UInt32 Player::setFairypetBattle( UInt32 id )
+    {
+        FairyPet * pet = findFairyPet(id);
+        if(!pet) return 0;
+        if(_onBattlePet == pet) //表明取消出战
+        {
+            pet = NULL;
+            id = 0;
+        }
+        setFairypetBattle(pet);
+        return id;
+	}
+
+    void Player::setFairypetBattle(FairyPet * pet, bool writedb)
+    {
+        if(_onBattlePet == pet)
+            return;
+        if(_onBattlePet && writedb)
+        {
+            _onBattlePet->setOnBattle(false);
+            _onBattlePet->UpdateToDB();
+        }
+        if(pet && writedb)
+        {
+            pet->setOnBattle(true);
+            pet->UpdateToDB();
+        }
+        _onBattlePet = pet;
+    }
+
+    void Player::addFairyPet(FairyPet * pet, bool writedb, bool load )
+    {
+        if(!pet) return;
+        _fairyPets.insert(std::make_pair(pet->getId(), pet));
+
+        if(writedb)
+        {
+            pet->UpdateToDB();
+			UInt32 p = static_cast<UInt32>((pet->getPotential()+0.005) * 100);
+			UInt32 c = static_cast<UInt32>((pet->getCapacity()+0.05) * 100);
+			DB2().PushUpdateData("INSERT INTO `fighter` (`id`, `playerId`, `potential`, `capacity`, `level`, `experience`)\
+                    VALUES(%u, %"I64_FMT"u, %u.%02u, %u.%02u, %u, %u)",
+                    pet->getId(), getId(), p / 100, p % 100, c / 100, c % 100, pet->getLevel(), pet->getExp());
+
+        }
+    }
+
+    //招募仙宠
+	UInt8 Player::hireFairyPet( UInt32 id )
+    {
+		if(id > GREAT_FIGHTER_MAX)
+			return 1;
+        /*
+        if(!hasCanHirePet(id))
+            return 1;
+        */
+		if(findFairyPet(id) || hasFighter(id))
+			return 2;
+        if(isFairyPetFull())
+            return 3;
+		FairyPet * pet = static_cast<FairyPet *>(globalFighters[id]);
+		if(pet == NULL)
+			return 1;
+		FairyPet * pet2 = pet->clone(this);
+		addFairyPet(pet2, true);
+        delCanHirePet(id);
+        return 0;
+    }
+
+    //放生转化仙宠
+	UInt8 Player::convertFairyPet( UInt32 id, UInt8 isHas)
+    {
+        UInt8 color = 0;
+        if(isHas)
+        {
+            FairyPet * pet = findFairyPet(id);
+            if(pet == NULL)
+                return 1;
+            if(pet->isOnBattle() || pet == _onBattlePet)
+                return 2;
+            color = pet->getColor();
+            std::map<UInt32, FairyPet *>::iterator it = _fairyPets.find(id);
+            _fairyPets.erase(it);
+            pet->UpdateToDB(true);
+            delete pet;
+			DB2().PushUpdateData("DELETE FROM `fighter` WHERE `id` = %u AND `playerId` = %"I64_FMT"u", id, getId());
+        }
+        else
+        {
+            if(!hasCanHirePet(id))
+                return 1;
+            delCanHirePet(id);
+		    FairyPet * pet = static_cast<FairyPet *>(globalFighters[id]);
+            if(pet == NULL)
+                return 1;
+            color = pet->getColor();
+        }
+        Table values = GameAction()->getConvertPetValue(color);
+        UInt32 longYuan = values.get<UInt32>("longyuan");
+        UInt32 fengSui = values.get<UInt32>("fengsui");
+        UInt32 like = values.get<UInt32>("like");
+
+        AddVar(VAR_FAIRYPET_LONGYUAN, longYuan);
+        AddVar(VAR_FAIRYPET_FENGSUI, fengSui);
+        AddVar(VAR_FAIRYPET_LIKEABILITY, like);
+        return 0;
+    }
+
+	void Player::sendFairyPetList()
+    {
+        Stream st(REP::FAIRY_PET);
+        st << static_cast<UInt8>(0x03) << static_cast<UInt8>(0x01);
+        st << static_cast<UInt32>(_onBattlePet ? _onBattlePet->getId() : 0);
+        st << static_cast<UInt8>(_fairyPets.size());
+		std::map<UInt32, FairyPet *>::iterator it = _fairyPets.begin();
+		while(it != _fairyPets.end())
+        {
+            st << it->first;
+            st << it->second->getPetLev();
+            st << it->second->getPetBone();
+            ++ it;
+        }
+        st << Stream::eos;
+        send(st);
+    }
+
+    void Player::getFariyPetSpaceInfo()
+    {
+        UInt8 step = GetVar(VAR_FAIRYPET_STEP);
+        if(step < 1 || step > 5)
+            step = 1;
+        Stream st(REP::FAIRY_PET);
+        st << static_cast<UInt8>(0x02) << static_cast<UInt8>(0x01);
+        UInt8 size = getCanHirePetNum();
+        st << step << size;
+        for(UInt8 i = 0; i < size; ++ i)
+            st << _playerData.canHirePet[i];
+        st << Stream::eos;
+        send(st);
+    }
+
+    void Player::sendFairyPetResource()
+    {
+        Stream st(REP::FAIRY_PET);
+        st << static_cast<UInt8>(0x03) << static_cast<UInt8>(0x02);
+        st << GetVar(VAR_FAIRYPET_LONGYUAN);
+        st << GetVar(VAR_FAIRYPET_FENGSUI);
+        st << GetVar(VAR_FAIRYPET_XIANYUAN);
+        st << static_cast<UInt8>(GetVar(VAR_FAIRYPET_LIKEABILITY));
+        st << Stream::eos;
+        send(st);
+    }
+
+    //寻宠
+    void Player::seekFairyPet(UInt8 count, UInt8 isConvert)
+    {
+        if(count == 0) return;
+        /*
+        if(getCanHirePetNum())
+            return;
+        */
+        static UInt32 cost[] = {0xFFFFFFFF, 80, 120, 240, 600, 1800};
+        UInt32 xianYuan = GetVar(VAR_FAIRYPET_XIANYUAN);
+        UInt8 step = GetVar(VAR_FAIRYPET_STEP);
+        if(step < 1 || step > 5)
+            step = 1;
+        UInt32 longYuan = 0, fengSui = 0;
+        UInt32 greenId = 0, blueId = 0;
+        UInt8 like = 0;
+        UInt32 convert1 = 0, convert2 = 0;
+        std::string petStr = "";
+        Stream st(REP::FAIRY_PET);
+        st << static_cast<UInt8>(0x02) << static_cast<UInt8>(0x02);
+	    size_t pos = st.size();
+        UInt8 num = 0;
+        st << num;
+        for(UInt8 i = 0; i < count; ++ i)
+        {
+            if(xianYuan < cost[step])
+                break;
+            ++ num;
+            xianYuan -= cost[step];
+            Table values = GameAction()->onSeekFairypetAwardAndSucceed(step, isConvert);
+            longYuan += values.get<UInt32>("longyuan");
+            fengSui += values.get<UInt32>("fengsui");
+            like += values.get<UInt8>("like");
+            greenId = values.get<UInt32>("greenId");
+            if(greenId)
+            {
+                petStr += Itoa(greenId);
+                if(i < count - 1)
+                    petStr += ",";
+                if(!isConvert)
+                    PLAYER_DATA(this, canHirePet).push_back(greenId);
+            }
+            blueId = values.get<UInt32>("blueId");
+            if(blueId)
+            {
+                petStr += Itoa(blueId);
+                if(i < count - 1)
+                    petStr += ",";
+                if(!isConvert)
+                    PLAYER_DATA(this, canHirePet).push_back(blueId);
+            }
+            if(isConvert)   //是否放生仙宠
+            {
+                convert1 += values.get<UInt32>("convert1");
+                convert2 += values.get<UInt32>("convert2");
+            }
+            if(values.get<bool>("succeed"))
+                step = (step + 1) > 5 ? 1 : step + 1;
+            else
+                step = 1;
+            st << step;
+        }
+        if(num == 0)
+            return;
+        st << longYuan << fengSui << like;
+        st << xianYuan << isConvert;
+        st << petStr.c_str();
+		st.data<UInt8>(pos) = num;
+        st << Stream::eos;
+        send(st);
+        AddVar(VAR_FAIRYPET_LONGYUAN, longYuan + convert1);
+        AddVar(VAR_FAIRYPET_FENGSUI, fengSui + convert2);
+        AddVar(VAR_FAIRYPET_LIKEABILITY, like);
+        SetVar(VAR_FAIRYPET_STEP, step);
+        SetVar(VAR_FAIRYPET_XIANYUAN, xianYuan);
+        if(!isConvert && !petStr.empty())   //不放生仙宠
+            writeCanHiretPet();
+    }
+
 
 } // namespace GObject
 

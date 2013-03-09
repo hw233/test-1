@@ -240,7 +240,8 @@ GMHandler::GMHandler()
     Reg(3, "dreye", &GMHandler::OnDreamerEyeSet);
 
     Reg(3, "act", &GMHandler::OnSomeAct);
-    Reg(3, "king", &GMHandler::OnDragonKingAct);
+    Reg(2, "king", &GMHandler::OnDragonKingAct);
+    Reg(2, "pet", &GMHandler::OnFairyPetGM);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -3696,5 +3697,29 @@ void GMHandler::OnDragonKingAct(GObject::Player *player, std::vector<std::string
     UInt32 type = atoi(args[0].c_str());
     GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_ACTION, type);
     */
+}
+
+void GMHandler::OnFairyPetGM(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 2)
+        return;
+    UInt8 type = atoi(args[0].c_str());
+    UInt32 val = atoi(args[1].c_str());
+    switch(type)
+    {
+        case 1:
+            player->hireFairyPet(val);
+            player->sendFairyPetList();
+            break;
+        case 2:
+            player->AddVar(VAR_FAIRYPET_LONGYUAN, val);
+            player->AddVar(VAR_FAIRYPET_FENGSUI, val);
+            player->AddVar(VAR_FAIRYPET_XIANYUAN, val);
+            player->AddVar(VAR_FAIRYPET_LIKEABILITY, 1);
+            player->sendFairyPetResource();
+            break;
+        case 3:
+            break;
+    }
 }
 

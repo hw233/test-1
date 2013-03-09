@@ -32,6 +32,7 @@
 #include "SoulSkillTable.h"
 #include "SkillStrengthen.h"
 #include "DreamerTable.h"
+#include "FairyPetTable.h"
 
 namespace GData
 {
@@ -285,6 +286,24 @@ namespace GData
         if (!LoadDreamer())
         {
             fprintf (stderr, "Load Dreamer Table Error !\n");
+            std::abort();
+        }
+
+        if (!LoadPetPinJie())
+        {
+            fprintf (stderr, "Load PetPinJie Table Error !\n");
+            std::abort();
+        }
+
+        if (!LoadPetGenGu())
+        {
+            fprintf (stderr, "Load PetGenGu Table Error !\n");
+            std::abort();
+        }
+
+        if (!LoadPetLingYa())
+        {
+            fprintf (stderr, "Load PetLingYa Table Error !\n");
             std::abort();
         }
 
@@ -1847,6 +1866,72 @@ namespace GData
                 dreamerDataTable[dbd.level].resize(dbd.floor + 1);
             }
             dreamerDataTable[dbd.level][dbd.floor] = dreamerLevelData;
+        }
+        return true;
+    }
+
+    bool GDataManager::LoadPetPinJie()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBPinJie dbpj;
+		if(execu->Prepare("SELECT `id`, `name`, `consume`, `prob` FROM `pet_pinjie`", dbpj) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            Pet::PinjieData pd;
+            pd.lev = dbpj.id;
+            pd.name = dbpj.name;
+            pd.consume = dbpj.consume;
+            pd.prob = dbpj.prob;
+            pet.setLevTable(pd);
+        }
+        return true;
+    }
+
+    bool GDataManager::LoadPetGenGu()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBGenGu dbgg;
+		if(execu->Prepare("SELECT `id`, `name`, `limit`, `baseProb`, `failBack`, `consume1`, `consume2`, `growRate` FROM `pet_gengu`", dbgg) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            Pet::GenguData ggd;
+            ggd.id = dbgg.id;
+            ggd.name = dbgg.name;
+            ggd.limit = dbgg.limit;
+            ggd.baseProb = dbgg.baseProb;
+            ggd.failBack = dbgg.failBack;
+            ggd.consume1 = dbgg.consume1;
+            ggd.consume2 = dbgg.consume2;
+            ggd.growRate = dbgg.growRate;
+            pet.setBoneTable(ggd);
+        }
+        return true;
+    }
+
+    bool GDataManager::LoadPetLingYa()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBLingYa dbly;
+		if(execu->Prepare("SELECT `id`, `color`, `lingya` FROM `pet_pressure`", dbly) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            Pet::LingyaData lyd;
+            lyd.petId = dbly.id;
+            lyd.color = dbly.color;
+            lyd.lingya = dbly.lingya;
+            pet.setLingyaTable(lyd);
         }
         return true;
     }

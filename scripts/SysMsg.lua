@@ -981,5 +981,10 @@ sysMsg:set(4129, 0, "蜀山传奇祝天下有情人终成眷属～请点击“�
 sysMsg:set(4130, 0, "剑侠秘籍XXX")
 sysMsg:set(4131, 0, "剑侠秘籍XXXXXXXXXXXXXXX")
 
+sysMsg:set(4132, 0x35, "进阶成功！")
+sysMsg:set(4133, 0x35, "进阶失败！")
+sysMsg:set(4134, 0x35, "突破成功！")
+sysMsg:set(4135, 0x35, "突破失败！")
+sysMsg:set(4136, 0x35, "出现暴击，运行周天重数+%u！")
 
 

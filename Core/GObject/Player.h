@@ -24,6 +24,7 @@
 #include "StrengthenMgr.h"
 #include "JobHunter.h"
 #include "Dreamer.h"
+#include "FairyPet.h"
 
 
 namespace Battle
@@ -587,6 +588,7 @@ namespace GObject
         bool isHHBlue;
         std::string nameNoSuffix;     //(合服)不带后缀的用户名
         std::map<UInt8, UInt32> titleAll;      //玩家所有的称号id
+        std::vector<UInt32> canHirePet;     //玩家未招募的仙宠
     };
 
 	class Player:
@@ -1730,8 +1732,6 @@ namespace GObject
         inline UInt32 getWorldBossHp() const { return _worldBossHp; }
 
     public:
-
-    public:
         void payPractice(UInt8 place, UInt16 slot, UInt8 type, UInt8 priceType, UInt8 time, UInt8 prot);
         void addPracticeFighter(UInt32* fighters, size_t size);
 
@@ -2136,6 +2136,28 @@ namespace GObject
         void getNewYearQzoneContinueAward(UInt8 type);
         void sendNewYearQzoneContinueAct();
         void calcNewYearQzoneContinueDay(UInt32 time);
+
+    private:    //仙宠
+		std::map<UInt32, FairyPet *> _fairyPets;
+        FairyPet * _onBattlePet;
+    public:
+        FairyPet * getBattlePet() { return _onBattlePet; }
+        UInt8 getCanHirePetNum() { return _playerData.canHirePet.size();}
+	    FairyPet * findFairyPet(UInt32);
+        bool hasCanHirePet(UInt32);
+        bool delCanHirePet(UInt32);
+        void writeCanHiretPet();
+	    bool isFairyPetFull() const;
+        UInt32 setFairypetBattle(UInt32);
+        void setFairypetBattle(FairyPet *, bool = true);
+	    UInt8 hireFairyPet(UInt32);
+	    UInt8 convertFairyPet(UInt32, UInt8);
+	    void sendFairyPetList();
+        void sendFairyPetResource();
+        void addFairyPet(FairyPet *, bool = true, bool = false);
+        void seekFairyPet(UInt8, UInt8);
+        void getFariyPetSpaceInfo();
+
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

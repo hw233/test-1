@@ -320,6 +320,7 @@ namespace Script
 		CLASS_DEF(Fighter, getElixirAttrByOffset);
 		CLASS_DEF(Fighter, changeSecondSoulXinxiu);
 		CLASS_DEF(Fighter, get2ndSounSoulMax);
+		CLASS_DEF(Fighter, isPet);
 
 		//????
 		CLASS_ADD(TaskMgr);
@@ -1551,5 +1552,26 @@ namespace Script
 	{
 		return Call<bool>("onGetNewYearQzoneContinueAward", player, type);
     }
+
+	Table GameActionLua::onSeekFairypetAwardAndSucceed(UInt8 step, UInt8 isConvert)
+	{
+		return Call<Table>("onSeekFairypetAwardAndSucceed", step, isConvert);
+    }
+
+	UInt8 GameActionLua::getPetColorFromId(UInt32 petId)
+	{
+		return Call<UInt8>("getPetColorFromId", petId);
+    }
+
+	Table GameActionLua::getConvertPetValue(UInt8 color)
+	{
+		return Call<Table>("getConvertPetValue", color);
+    }
+
+	UInt32 GameActionLua::exchangPurplePet( Player* player )
+	{
+		return Call<UInt32>("exchangPurplePet", player);
+    }
+
 }
 

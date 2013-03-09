@@ -192,6 +192,7 @@ struct DBPlayerData
     std::string formations;
     std::string atohicfg;
     std::string openid;
+    std::string canHirePet;
 };
 
 struct DBHoneyFall
@@ -1171,6 +1172,21 @@ struct DBDreamer
     UInt8 eyeY;
 };
 
+struct DBFairyPetData
+{
+    UInt32 id;
+    UInt64 playerId;
+    UInt8 onBattle;
+    UInt16 petLev;
+    UInt16 petBone;
+    UInt16 pinjieBless;
+    UInt32 genguBless;
+    UInt16 chong;
+    UInt32 overTime;
+    UInt16 xiaozhou;
+    UInt16 dazhou;
+};
+
 }
 
 namespace DB {
@@ -1245,7 +1261,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPlayerData)
-SPECIALDEF(57)
+SPECIALDEF(58)
 	(
 	UInt64, id,
 	std::string, pdata.name,
@@ -1303,7 +1319,8 @@ SPECIALDEF(57)
     UInt32, pdata.dungeonEnd,
 	UInt32, pdata.created,
 	UInt32, pdata.lockExpireTime,
-    std::string, openid
+    std::string, openid,
+    std::string, canHirePet
     )
 SPECIALEND()
 
@@ -2649,6 +2666,23 @@ SPECIALDEF(18)
     UInt8, eyeTime,
     UInt8, eyeX,
     UInt8, eyeY
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBFairyPetData)
+SPECIALDEF(11)
+(
+    UInt32, id,
+    UInt64, playerId,
+    UInt8, onBattle,
+    UInt16, petLev,
+    UInt16, petBone,
+    UInt16, pinjieBless,
+    UInt32, genguBless,
+    UInt16, chong,
+    UInt32, overTime,
+    UInt16, xiaozhou,
+    UInt16, dazhou
 )
 SPECIALEND()
 

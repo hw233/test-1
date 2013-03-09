@@ -69,6 +69,10 @@ enum
     e_cls_shi = 2,
     e_cls_dao = 3,
     e_cls_mo = 4,
+    e_cls_qinglong = 5,
+    e_cls_baihu = 6,
+    e_cls_zhuque = 7,
+    e_cls_xuanwu = 8,
 
     e_cls_max
 };
@@ -905,16 +909,8 @@ public:
 	std::vector<Offset> extraPos;
 
     // 仙宠
-private:
-     bool m_isPet;      //
-     bool m_onBattle;   // 出战
-     UInt8 m_petLv1;    // 品阶 (第一品阶为50级，之后每一品阶等价10级)
-     UInt8 m_petLv2;    // 重天 (每十重天升一品阶)
-
 public:
-    bool isPet() { return m_isPet; }
-    bool isOnBattle { return m_onBattle; }
-    void setOnBattle(bool flag) { m_onBattle = flag; }
+    inline bool isPet() { return getClass() >= e_cls_qinglong && getClass() <= e_cls_xuanwu; }
 };
 class GlobalFighters
 {

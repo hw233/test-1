@@ -305,10 +305,11 @@ namespace GObject
         VAR_FEAST_LOGIN = 294, //节日套装人人拿
         VAR_FEAST_GIFT = 295, //登录礼包人人有
 
-        //新阵营战临时代替udplog做统计使用
-        VAR_NCB_TOTALWIN = 296,     //蜀山论剑当天胜利场次
-        VAR_NCB_TOTALLOSE = 297,    //蜀山论剑当天失败场次
-        //注:使用298时清理数据库，之前使用过一次298
+        VAR_FAIRYPET_LONGYUAN = 296,   //仙宠龙元数值
+        VAR_FAIRYPET_FENGSUI = 297,  //仙宠凤髓数值
+        VAR_FAIRYPET_XIANYUAN = 298, //仙宠空间仙缘数值
+        VAR_FAIRYPET_STEP = 299, //仙宠空间当前寻宠步数
+        VAR_FAIRYPET_LIKEABILITY = 300, //仙宠空间仙宠好感度数值(紫色)
 
         //繁体版占用301-330
 
@@ -645,8 +646,11 @@ namespace GObject
             REGISTER_VAR(VAR_FEAST_LOGIN, CYCLE_NONE);
             REGISTER_VAR(VAR_FEAST_GIFT, CYCLE_DAY);
 
-            REGISTER_VAR(VAR_NCB_TOTALWIN, CYCLE_DAY);
-            REGISTER_VAR(VAR_NCB_TOTALLOSE, CYCLE_DAY);
+            REGISTER_VAR(VAR_FAIRYPET_LONGYUAN, CYCLE_NONE);
+            REGISTER_VAR(VAR_FAIRYPET_FENGSUI, CYCLE_NONE);
+            REGISTER_VAR(VAR_FAIRYPET_STEP, CYCLE_NONE);
+            REGISTER_VAR(VAR_FAIRYPET_LIKEABILITY, CYCLE_NONE);
+            REGISTER_VAR(VAR_FAIRYPET_XIANYUAN, CYCLE_NONE);
 
             REGISTER_VAR(VAR_TOWER_LOGIN, CYCLE_DAY);
             REGISTER_VAR(VAR_TOWER_LEVEL, CYCLE_NONE);
