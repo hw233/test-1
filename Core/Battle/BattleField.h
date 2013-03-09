@@ -45,6 +45,7 @@ public:
 
     UInt32 upPetObject(int, bool = true);
     bool addReiatsu(int, int);
+    int getReiatsu(int side);
 
 	BattleObject * operator()(int, int);
 	BattleObject * getObjectXY(int, int, int);

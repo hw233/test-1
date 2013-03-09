@@ -269,7 +269,8 @@ private:
         e_petShield = 74,       // 仙宠的护盾 
         e_unPetShield = 75,     // 解除仙宠的护盾
         e_selfBleed = 76,       // 自己流血 （自焚）
-        e_unSelfBleed = 76,     // 自己流血结束 （自焚烧完了）
+        e_unSelfBleed = 77,     // 自己流血结束 （自焚烧完了）
+        e_petAppear = 78,
 
         e_MAX_STATE,
     };

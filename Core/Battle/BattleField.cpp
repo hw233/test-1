@@ -113,11 +113,18 @@ bool BattleField::addReiatsu(int side, int value)
     // 增加场上灵压，返回值表示是否需要仙宠出场
     if (side < 0 || side >= 2)
         return false;
-    if (_reiatsu[side] + value > MAX_REIATSU)
-        _reiatsu[side] = MAX_REIATSU;
+    if (_reiatsu[side] + value > _toggleReiatsu[side])
+        _reiatsu[side] = _toggleReiatsu[side];
     else
         _reiatsu[side] += value;
     return _reiatsu[side] >= _toggleReiatsu[side] ? true:false;
+}
+
+int BattleField::getReiatsu(int side)
+{
+    if (side < 0 || side >= 2)
+        return 0;
+    return _reiatsu[side];
 }
 
 BattleObject * BattleField::operator()( int side, int idx )

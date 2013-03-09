@@ -349,7 +349,7 @@ public:
     inline std::vector<UInt16>& getPassiveSkillOnCounter100() { return _passkl[GData::SKILL_ONCOUNTER-GData::SKILL_PASSSTART]; }
     inline std::vector<UInt16>& getPassiveSkillOnAttackBleed100() { return _passkl[GData::SKILL_ONATKBLEED-GData::SKILL_PASSSTART]; }
 
-    inline std::vector<UInt16>& getPassiveSkillOnAtkDmg() {return _rpasskl[GData::SKILL_ONATKDMG-GData::SKILL_PASSIVES]; }
+    inline std::vector<UInt16>& getPassiveSkillOnAtkDmg() {return _rpasskl[GData::SKILL_ONATKDMG-GData::SKILL_PASSSTART]; }
     inline std::vector<UInt16>& getPassiveSkillOnAtkDmg100() { return _passkl[GData::SKILL_ONATKDMG - GData::SKILL_PASSSTART]; }
 
     // 取得心法带出技能的ID表

@@ -570,9 +570,9 @@ void BattleSimulator::start(UInt8 prevWin, bool checkEnh)
             fclose(f);
         }
         
+#endif
         act_count += tryPetEnter(0, e_reiatsu_round);
         act_count += tryPetEnter(1, e_reiatsu_round);
-#endif
     }
     if(_winner == 0)
         _winner = testWinner2();
