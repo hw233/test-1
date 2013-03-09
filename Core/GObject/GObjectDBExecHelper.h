@@ -599,6 +599,7 @@ struct DBClan
     UInt32 battleScore;
     UInt32 dailyBattleScore;
     UInt32 battleRanking;
+    std::string qqOpenid;
 };
 
 struct DBClanRepo
@@ -622,6 +623,7 @@ struct DBClanPlayer
 	UInt32 lastFavorTime[4];
     UInt32 signupRankBattleTime;
     UInt32 rankBattleField;
+    UInt8  inQQGroup;
 };
 
 struct DBClanItem
@@ -1811,7 +1813,7 @@ SPECIALDEF(3)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBClan)
-SPECIALDEF(29)
+SPECIALDEF(30)
 (
 	UInt32, id,
 	std::string, name,
@@ -1841,7 +1843,8 @@ SPECIALDEF(29)
 	UInt8,  hasBattle,
     UInt32, battleScore,
     UInt32, dailyBattleScore,
-    UInt32, battleRanking
+    UInt32, battleRanking,
+    std::string, qqOpenid
 )
 SPECIALEND()
 
@@ -1869,7 +1872,7 @@ SPECIALEND()
 
 
 SPECIALBEGIN(GObject::DBClanPlayer)
-SPECIALDEF(21)
+SPECIALDEF(22)
 (
 	UInt32, id,
 	UInt64, playerId,
@@ -1891,7 +1894,8 @@ SPECIALDEF(21)
 	UInt32, lastFavorTime[2],
 	UInt32, lastFavorTime[3],
     UInt32, signupRankBattleTime,
-    UInt32, rankBattleField
+    UInt32, rankBattleField,
+    UInt8,  inQQGroup
 )
 SPECIALEND()
 

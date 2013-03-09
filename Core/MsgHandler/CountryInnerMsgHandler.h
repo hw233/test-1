@@ -761,102 +761,81 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
 	const ExpGainInstantCompleteStruct * ecs = reinterpret_cast<const ExpGainInstantCompleteStruct *>(data);
 	float exp = ecs->exp;
 	UInt32 duration = ecs->duration;
-	UInt32 now = TimeUtil::Now();
-	bool hasP2;
-	UInt32 p = player->getBuffData(PLAYER_BUFF_TRAINP3, now);
-	if(p > 0)
-	{
-		hasP2 = true;
-		UInt32 left = p - now;
-		if(left >= duration)
-		{
-			exp *= 1.8f;
-			player->setBuffData(PLAYER_BUFF_TRAINP3, p - duration);
-		}
-		else
-		{
-			exp = exp + exp * left * 8 / duration / 10;
-			player->setBuffData(PLAYER_BUFF_TRAINP3, 0);
-		}
-	}
-	else
-		hasP2 = false;
-	p = player->getBuffData(PLAYER_BUFF_TRAINP4, now);
-	if(p > 0)
-	{
-		UInt32 left = p - now;
-		if(left >= duration)
-		{
-			if(!hasP2)
-				exp *= 1.5f;
-			player->setBuffData(PLAYER_BUFF_TRAINP4, p - duration);
-		}
-		else
-		{
-			if(!hasP2)
-				exp = exp + exp * left  / duration / 2;
-			player->setBuffData(PLAYER_BUFF_TRAINP4, 0);
-		}
-		hasP2 = true;
-	}
-	else
-		hasP2 = false;
-	p = player->getBuffData(PLAYER_BUFF_TRAINP2, now);
-	if(p > 0)
-	{
-		UInt32 left = p - now;
-		if(left >= duration)
-		{
-			if(!hasP2)
-				exp *= 1.6f; // XXX: 1.5f
-			player->setBuffData(PLAYER_BUFF_TRAINP2, p - duration);
-		}
-		else
-		{
-			if(!hasP2)
-				exp = exp + exp * left / duration / 2;
-			player->setBuffData(PLAYER_BUFF_TRAINP2, 0);
-		}
-		hasP2 = true;
-	}
-	else
-		hasP2 = false;
-	p = player->getBuffData(PLAYER_BUFF_TRAINP1, now);
-	if(p > 0)
-	{
-		UInt32 left = p - now;
-		if(left >= duration)
-		{
-			if(!hasP2)
-				exp *= 1.3f; // XXX: 1.2f
-			player->setBuffData(PLAYER_BUFF_TRAINP1, p - duration);
-		}
-		else
-		{
-			if(!hasP2)
-				exp = exp + exp * left * 3 / duration / 10;
-			player->setBuffData(PLAYER_BUFF_TRAINP1, 0);
-		}
-	}
-	p = player->getBuffData(PLAYER_BUFF_ADVANCED_HOOK, now);
-	if(p > 0)
-	{
-        exp = ecs->exp; /** 重置 **/
-		UInt32 left = p - now;
-        /** 随身经验加速符还有效 **/
-		if(left > duration)
-		{
-            exp *= 1.6f;
-			player->setBuffData(PLAYER_BUFF_ADVANCED_HOOK, p - duration);
-		}
-		else
-		{
-		    exp = exp + exp * left * 3/ duration / 5;
-			player->setBuffData(PLAYER_BUFF_ADVANCED_HOOK, 0);
-		}
-	}
-	player->AddExp(static_cast<UInt32>(exp));
+    UInt32 curHookIndex = player->GetVar(VAR_EXP_HOOK_INDEX);
+    UInt32 p;
+    if(curHookIndex == ENUM_TRAINP1)
+    {
+        p = player->GetVar(VAR_TRAINP1);
+        if(p > 0)
+        {
+            UInt32 left = p;
+            if(left >= duration)
+            {
+                left -= duration;
+                exp = exp * 1.3f;
+            }
+            else
+            {
+                exp = exp + exp * left / duration * 0.3f;
+                left = 0;
+            }
+            player->SetVar(VAR_TRAINP1, left);
+            player->sendExpHook(0x40 + PLAYER_BUFF_TRAINP1, left);
+        }
+    }
+    else if(curHookIndex == ENUM_TRAINP2)
+    {
+        p = player->GetVar(VAR_TRAINP2);
+        if(p > 0)
+        {
+            UInt32 left = p;
+            if(left >= duration)
+            {
+                exp = exp * 1.6f;
+                left -= duration;
+            }
+            else
+            {
+                exp = exp + exp * left / duration * 0.6f;
+                left = 0;
+            }
+            player->SetVar(VAR_TRAINP2, left);
+            player->sendExpHook(0x40 + PLAYER_BUFF_TRAINP2, left);
+        }
+    }
+    else if(curHookIndex == ENUM_TRAINP3)
+    {
+        p = player->GetVar(VAR_TRAINP3);
+        if(p > 0)
+        {
+            UInt32 left = p;
+            if(left >= duration)
+            {
+                exp = exp * 1.8f;
+                left -= duration;
+            }
+            else
+            {
+                exp = exp + exp * left / duration * 0.8f;
+                left = 0;
+            }
+            player->SetVar(VAR_TRAINP3, left);
+            player->sendExpHook(0x40 + PLAYER_BUFF_TRAINP3, left);
+        }
+    }
+
+	player->AddExp(static_cast<UInt64>(exp));
+#if 0
 	ecs->ng->monsterKilled(player, ecs->count);
+#else
+    UInt32 itemCount = 0;
+    for(UInt32 i = 0; i < ecs->count; i++)
+    {
+        if(uRand(10000) < 74)
+            ++itemCount;
+    }
+    player->GetPackage()->Add(9359, itemCount, true, false);
+#endif
 }
 
 void OnAutoCopyAttack( GameMsgHdr& hdr, const void * data )
@@ -1159,6 +1138,7 @@ void OnCreateAward(GameMsgHdr& hdr, const void * data)
 #ifdef _FB
 #else
     dclogger.reg(player);
+    dclogger.reg_union(player);
 #endif
 #endif //_WIN32
 }
@@ -1891,6 +1871,9 @@ void OnOpenAPIFailed( GameMsgHdr &hdr, const void *data)
             break;
         case 1002:
             snprintf (buf, 32, "%s", "punish");
+            break;
+        case 3333:
+            snprintf (buf, 32, "%s", "union_reg");
             break;
         default:
             snprintf (buf, 32, "unknow_%d", faildInfo->type);

@@ -986,6 +986,12 @@ function onActivityCheck(tm)
       else
           is_2013_0201_0228 =false;
       end
+      if tm >= actTime2013_02_22 and tm < actTime2013_04_01 then
+          setWeiboAct(true)
+      else
+          setWeiboAct(false)
+      end
+ 
       setShuoShuo(true);
   end
 
@@ -1244,6 +1250,9 @@ function initActTime(y, m, d)
   local  SerStartTm2013_01_29 = { ['year'] = 2013, ['month'] = 1, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm2013_02_05 = { ['year'] = 2013, ['month'] = 2, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm2013_02_12 = { ['year'] = 2013, ['month'] = 2, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --微信微博领奖
+  local  SerStartTm2013_02_22 = { ['year'] = 2013, ['month'] = 2, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm2013_04_01 = { ['year'] = 2013, ['month'] = 4, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 迎新纳福 红包入袋
   local  SerStartTm237 = { ['year'] = 2013, ['month'] = 2, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 蓝钻新年回馈活动
@@ -1548,7 +1557,7 @@ function initActTime(y, m, d)
   actTime562_1 = os.time(SerStartTm562) + 7 * 86400;
 
   actTime563 = os.time(SerStartTm563);
-  actTime563_1 = os.time(SerStartTm563) + 7 * 86400;
+  actTime563_1 = os.time(SerStartTm563) + 22 * 86400;
   -- 繁体版
   actTime101 = os.time(SerStartTm101);
   actTime102 = os.time(SerStartTm101) + 8 * 86400;
@@ -1669,6 +1678,8 @@ function initActTime(y, m, d)
   actTime2013_02_19= os.time(SerStartTm2013_02_16)+3*86400;
   actTime2013_02_23= os.time(SerStartTm2013_02_23);
   actTime2013_02_29= os.time(SerStartTm2013_02_29);
+  actTime2013_02_22= os.time(SerStartTm2013_02_22);
+  actTime2013_04_01= os.time(SerStartTm2013_04_01);
 
   onActivityCheck(os.time() + 30);
 

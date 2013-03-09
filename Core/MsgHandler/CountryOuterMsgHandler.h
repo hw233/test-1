@@ -335,7 +335,8 @@ struct AttackNpcReq
 struct AutoBattleReq
 {
 	UInt32 _npcId;
-	MESSAGE_DEF1(REQ::TASK_HOOK, UInt32, _npcId);
+	UInt8 _type;
+	MESSAGE_DEF2(REQ::TASK_HOOK, UInt32, _npcId, UInt8, _type);
 };
 
 struct CancelAutoBattleReq
@@ -1121,6 +1122,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendYBBufInfo(pl->GetVar(VAR_YBBUF), pl->GetVar(VAR_QQVIP_BUF));
     pl->sendAthlBufInfo();
     pl->sendConsumeAwardInfo(0);
+    pl->sendWeiboAwardInfo();
     luckyDraw.notifyDisplay(pl);
     if (World::getRechargeActive())
     {
@@ -1243,6 +1245,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         GLOBAL().PushMsg(hdr, NULL);
     }
     pl->sendYearRPInfo();
+    pl->sendFishUserInfo();
     //if(World::getYearActive())
     //    pl->sendYearActInfo();
     pl->sendFirstRecharge(true);
@@ -1254,6 +1257,11 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->calcNewYearQzoneContinueDay(now);
     pl->sendNewYearQzoneContinueAct();
     pl->sendFairyPetResource(); //仙宠资源
+    if (pl->getClan() != NULL)
+    {
+        pl->getClan()->sendQQOpenid(pl);
+    }
+
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -2899,7 +2907,7 @@ void OnAttackNpcReq( GameMsgHdr& hdr, AttackNpcReq& anr )
 void OnAutoBattleReq( GameMsgHdr& hdr, AutoBattleReq& abr )
 {
 	MSG_QUERY_PLAYER(player);
-	player->autoBattle(abr._npcId);
+	player->autoBattle(abr._npcId, abr._type);
 }
 
 void OnCancelAutoBattleReq( GameMsgHdr& hdr, CancelAutoBattleReq& )
@@ -2907,6 +2915,7 @@ void OnCancelAutoBattleReq( GameMsgHdr& hdr, CancelAutoBattleReq& )
 	MSG_QUERY_PLAYER(player);
 	GameMsgHdr hdr2(0x179, WORKER_THREAD_WORLD, player, 0);
 	GLOBAL().PushMsg(hdr2, 0);
+    player->cancelAutoBattleNotify();
 }
 
 void OnInstantAutoBattleReq( GameMsgHdr& hdr, InstantAutoBattleReq& )
@@ -4763,27 +4772,39 @@ void OnActivityReward(  GameMsgHdr& hdr, const void * data)
     switch(type )
     {
         case 3:
-            if (World::getRechargeActive())
-                player->sendRechargeInfo();
+            {
+                if (World::getRechargeActive())
+                    player->sendRechargeInfo();
+            }
             break;
         case 4:
-            if (!World::getRechargeActive())
-                return;
-            UInt32 itemId = 0;
-            brd >> itemId;
-            int n = -1;
-            UInt8 res = GObject::RechargeTmpl::instance().getItem(player, itemId, n);
-            Stream st(REP::ACTIVITY_REWARD);
-            st << static_cast<UInt8>(11);
-            st << res;
-            if ( 0 == res)
             {
-                st << player->GetVar(VAR_RECHARGE_SCORE) << itemId << n;
+                if (!World::getRechargeActive())
+                    return;
+                UInt32 itemId = 0;
+                brd >> itemId;
+                int n = -1;
+                UInt8 res = GObject::RechargeTmpl::instance().getItem(player, itemId, n);
+                Stream st(REP::ACTIVITY_REWARD);
+                st << static_cast<UInt8>(11);
+                st << res;
+                if ( 0 == res)
+                {
+                    st << player->GetVar(VAR_RECHARGE_SCORE) << itemId << n;
+                }
+                st << Stream::eos;
+                player->send(st);
             }
-            st << Stream::eos;
-            player->send(st);
             break;
-
+        case 5:
+            {
+                UInt8 opt = 0;
+                std::string key;
+                brd >> opt;
+                brd >> key;
+                player->getWeiboAward(opt, key);
+            }
+            break;
     }
  
 }
@@ -5427,7 +5448,7 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
     UInt8 op = 0;
     br >> op;
 
-    if (op !=6 && op !=7 )
+    if (op  < 6 )
         return;
 
     switch(op)
@@ -5455,6 +5476,12 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
             break;
         case 7:
             player->getYearRPReward();
+            break;
+        case 8:
+            player->getFishUserAward();
+            break;
+        case 9:
+            player->getFishUserPackage();
             break;
 
         default:

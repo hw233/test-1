@@ -233,6 +233,8 @@ namespace REQ
     const UInt8 CLAN_PACKAGE        = 0x6B;// 0x6B
     /**帮会仓库记录 */
     const UInt8 CLAN_PACKAGE_RECORD = 0x6C;
+    /**帮派QQ群 */
+    const UInt8 CLAN_QQ =             0x6D;
     /**请求宗族奖励物品 */
     const UInt8 CLANREWARD          = 0x9C;
     /**领取宗族奖励 */
@@ -550,6 +552,7 @@ namespace REP
     const UInt8 CLAN_BUILD          = 0x6A;// 0x9B
     const UInt8 CLAN_PACKAGE        = 0x6B;//
     const UInt8 CLAN_PACKAGE_RECORD = 0x6C;
+    const UInt8 CLAN_QQ =             0x6D;
 
     const UInt8 HERO_ISLAND         = 0x97;
     const UInt8 CLANREWARD          = 0x9C;

@@ -435,6 +435,7 @@ bool Clan::join( Player * player, UInt8 jt, UInt16 si, UInt32 ptype, UInt32 p, U
 	{
 		sendInfo(player);
 		listMembers(player);
+        sendQQOpenid(player);
 	}
 	SysMsgItem * sysMsgItem = globalSysMsg[460];
 	if (sysMsgItem != NULL)
@@ -1327,7 +1328,7 @@ void Clan::sendInfo( Player * player )
         <<  static_cast<UInt8>((pd.ctFinishCount << 4) | player->getClanTaskMax()) << static_cast<UInt32>(getConstruction())
         << getClanFunds() << member->proffer << static_cast<UInt8>(place-1)
         << _name << (owner == NULL ? "" : owner->getName()) << getFounderName() <<(watchman == NULL ? "" : watchman->getName())
-        << _contact << _announce << _purpose;
+        << _contact << _announce << _purpose << static_cast<UInt32>(getId());
 	st << Stream::eos;
 	player->send(st);
 }
@@ -4157,7 +4158,64 @@ UInt8   Clan::getCopyPlayerSnap(Player *player)
     }
     return 0;
 }
+////////////////////////////////////////
+//帮派QQ群
+void Clan::setQQOpenid(Player* player,std::string openid)
+{
+    if (player->getId() != getLeaderId())
+        return;
+    if (openid != m_qqOpenid)
+    {
+        m_qqOpenid = openid;
+        player->toQQGroup(true);
 
+        //通知在线的所有成员
+        class NotifyQQVisitor : public Visitor<ClanMember>
+        {
+            public:
+                bool operator() (ClanMember * member)
+                {
+                    if (member->player->isOnline())
+                        member->player->getClan()->sendQQOpenid(member->player);
+                    return true;
+                }
+        };
+        NotifyQQVisitor visitor;
+        VisitMembers(visitor);
+
+        DB5().PushUpdateData("UPDATE `clan` SET `qqOpenid`='%s' WHERE `id`='%u'", m_qqOpenid.c_str(), _id);
+   }
+}
+void Clan::offQQOpenid(Player* player)
+{
+    if (player->getId() != getLeaderId())
+        return;
+
+    m_qqOpenid = "";
+    DB5().PushUpdateData("UPDATE `clan` SET `qqOpenid`=NULL WHERE `id`='%u'", _id);
+    //所有成员都退出Q群
+    class OffQQVisitor : public Visitor<ClanMember>
+    {
+        public:
+            bool operator() (ClanMember * member)
+            {
+                member->player->toQQGroup(false);
+                return true;
+            }
+    };
+
+    OffQQVisitor visitor;
+    VisitMembers(visitor);
+}
+void Clan::sendQQOpenid(Player* player)
+{
+    Stream st (REP::CLAN_QQ);
+    st << static_cast<UInt8>(0x01);
+    st << m_qqOpenid;
+    st << static_cast<UInt8>(player->isInQQGroup());
+    st << Stream::eos;
+    player->send(st);
+}
 // 帮派副本
 //////////////////////////////////////////
 

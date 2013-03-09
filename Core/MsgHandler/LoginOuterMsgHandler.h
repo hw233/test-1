@@ -125,7 +125,7 @@ struct NewUserStruct
     std::string _openkey;
     std::string _via;
     std::string _invited;
-    UInt8 _rp;
+    UInt8 _rp; //1:回流免费用户 2:回流vip1-vip4用户 3:回流vip5+用户
     std::string _para;
     MESSAGE_DEF12(REQ::CREATE_ROLE, std::string, _name, UInt8, _class, UInt8, _level, UInt8, _level1, UInt8, _isYear,
             std::string, _platform, std::string, _openid, std::string, _openkey, std::string, _via, std::string, _invited, UInt8, _rp, std::string, _para);
@@ -345,18 +345,21 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 
         std::string clientIp;
         std::string pf;
+        std::string pfkey;
+        StringTokenizer st(ul._para, ":");
+        switch (st.count())
         {
-            StringTokenizer st(ul._para, ":");
-            if(st.count() >= 2)
-            {
-                clientIp = st[0].c_str();
+            case 3:
+                pfkey = st[2].c_str();
+            case 2:
                 pf = st[1].c_str();
-            }
-            else if (st.count() == 1)
-            {
+            case 1:
                 clientIp = st[0].c_str();
-            }
+                break;
+            default:
+                break;
         }
+
         if (4 == res)
         {
             //UInt8 platform = atoi(player->getDomain());
@@ -393,6 +396,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             player->setVia(ul._via);
             player->setClientIp(clientIp);
             player->setSource(pf);
+            player->setPfKey(pfkey);
 #ifdef _FB
             PLAYER_DATA(player, wallow) = 0;
 #endif
@@ -548,18 +552,19 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 
     std::string clientIp;
     std::string pf;
+    std::string pfkey;
+    StringTokenizer st(nu._para, ":");
+    switch (st.count())
     {
-        StringTokenizer st(nu._para, ":");
-        if(st.count() >= 2)
-        {
-            clientIp = st[0].c_str();
-            us._clientIp = clientIp;
+        case 3:
+            pfkey = st[2].c_str();
+        case 2:
             pf = st[1].c_str();
-        }
-        else if (st.count() == 1)
-        {
+        case 1:
             clientIp = st[0].c_str();
-        }
+            break;
+        default:
+            break;
     }
 
     if (cfg.GMCheck && checkCrack(us._platform, clientIp, hdr.playerID))
@@ -704,6 +709,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 
             pl->setDomain(nu._platform);
             pl->setSource(pf);
+            pl->setPfKey(pfkey);
             pl->setOpenId(nu._openid);
             pl->setOpenKey(nu._openkey);
             pl->setVia(nu._via);
@@ -756,6 +762,10 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 
             pl->SetVar(GObject::VAR_RP_VALUE, nu._rp);
             pl->setTitle(0, 0);
+            if (nu._via == "sscq_byhd") //捕鱼达人用户
+            {
+                pl->SetVar(GObject::VAR_RP_VALUE, 4);
+            }
 
 #ifndef _FB
 #ifndef _VT
@@ -2744,8 +2754,8 @@ void GMCmd(LoginMsgHdr& hdr, const void* data)
                 UInt32 endTime = 0;
                 UInt32 flag = 0;
                 br >> endTime >> flag;
-                //大闹龙宫的flag暂时只为1,2,3
-                if(endTime <= val || flag > 3)
+                //大闹龙宫的flag暂时只为1,2,3,4
+                if(endTime < val || flag > 4)
                     result = 1;
                 else
                 {

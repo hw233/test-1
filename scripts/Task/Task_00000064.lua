@@ -8,6 +8,22 @@ function Task_Accept_00000064()
 	if task:HasAcceptedTask(64) or task:HasCompletedTask(64) or task:HasSubmitedTask(64) then
 		return false;
 	end
+	local state = GetPlayerData(6);
+	if state == 0 then
+		if not task:HasSubmitedTask(129) then
+			return false;
+		end
+	end
+	if state == 1 then
+		if not task:HasSubmitedTask(129) then
+			return false;
+		end
+	end
+	if state == 2 then
+		if not task:HasSubmitedTask(129) then
+			return false;
+		end
+	end
 	return true;
 end
 
@@ -23,6 +39,22 @@ function Task_Can_Accept_00000064()
 	end
 	if task:HasAcceptedTask(64) or task:HasCompletedTask(64) or task:HasSubmitedTask(64) then
 		return false;
+	end
+	local state = GetPlayerData(6);
+	if state == 0 then
+		if not task:HasSubmitedTask(129) then
+			return false;
+		end
+	end
+	if state == 1 then
+		if not task:HasSubmitedTask(129) then
+			return false;
+		end
+	end
+	if state == 2 then
+		if not task:HasSubmitedTask(129) then
+			return false;
+		end
 	end
 	return true;
 end
@@ -50,20 +82,20 @@ function Task_00000064(npcId)
 		action.m_ActionID = 64
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = task_msg_002070;
+		action.m_ActionMsg = task_msg_002146;
 	elseif task:GetTaskSubmitNpc(64) == npcId then
 		if Task_Submit_00000064() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 64
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = task_msg_002071;
+			action.m_ActionMsg = task_msg_002147;
 		elseif task:HasAcceptedTask(64) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 64
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = task_msg_002072;
+			action.m_ActionMsg = task_msg_002148;
 		end
 	end
 	return action;
@@ -77,8 +109,8 @@ function Task_00000064_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = task_msg_002073..GetPlayerName(GetPlayer())..task_msg_002074;
-	action.m_ActionMsg = task_msg_002075;
+	action.m_NpcMsg = task_msg_002149..GetPlayerName(GetPlayer())..task_msg_002150;
+	action.m_ActionMsg = task_msg_002151;
 	return action;
 end
 
@@ -87,7 +119,7 @@ function Task_00000064_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = task_msg_002076;
+	action.m_NpcMsg = task_msg_002152;
 	action.m_ActionMsg = "";
 	return action;
 end
