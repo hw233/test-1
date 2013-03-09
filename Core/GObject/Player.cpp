@@ -186,7 +186,7 @@ namespace GObject
 		_npcGroup->getLoots(m_Player);
 #else
         if(uRand(10000) < 74)
-            m_Player->GetPackage()->AddItem(9359, 1, true, false);
+            m_Player->GetPackage()->Add(9359, 1, true, false);
 #endif
 		notify();
 		updateDB(false);
@@ -3769,6 +3769,7 @@ namespace GObject
         if(GetFreePackageSize() < 1)
         {
             sendMsgCode(2, 1011);
+            return;
         }
 		if(_playerData.icCount > getMaxIcCount(_vipLevel))
             _playerData.icCount = 0;

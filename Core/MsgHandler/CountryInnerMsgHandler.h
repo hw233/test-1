@@ -834,7 +834,7 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
         if(uRand(10000) < 74)
             ++itemCount;
     }
-    player->GetPackage()->AddItem(9359, itemCount, true, false);
+    player->GetPackage()->Add(9359, itemCount, true, false);
 #endif
 }
 

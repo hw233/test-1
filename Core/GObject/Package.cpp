@@ -3482,6 +3482,8 @@ namespace GObject
 
 	UInt8 Package::Split( UInt32 itemId, std::vector<SplitItemOut>& splitOut, /*bool protect,*/ bool silence )
 	{
+        if(itemId == 9359)
+            return SplitItem(itemId, splitOut, silence);
         UInt8 res = 1;
 		if (!IsEquipId(itemId)) return 2;
 		ItemBase * item = FindItem(itemId);
@@ -3634,6 +3636,111 @@ namespace GObject
             DelEquip2(static_cast<ItemEquip *>(item), ToSplit);
 
         res &= (spirit?0:1);
+		return res;
+	}
+
+	UInt8 Package::SplitItem( UInt32 itemId, std::vector<SplitItemOut>& splitOut, /*bool protect,*/ bool silence )
+	{
+        UInt8 res = 1;
+		ItemBase * item = FindItem(itemId, true);
+        if(item == NULL)
+            item = FindItem(itemId, false);
+		if(item == NULL || item->getQuality() < 2 || item->getReqLev() < 1)
+			return 2;
+
+        UInt8 itemTypeNumMayOut = 2;
+
+		if((m_Size + itemTypeNumMayOut) > (m_Owner->getPacksize() + 50))
+        {
+            m_Owner->sendMsgCode(0, 1011);
+            return 2;
+        }
+
+		UInt8 q = item->getQuality() - 2;
+		bool isBound = item->GetBindStatus();
+        UInt32 chance_low = GObjectManager::getSplitChance(q, 0);  // split_chance[q][lv][0];
+		UInt32 chance_high = GObjectManager::getSplitChance(q, 1);  // split_chance[q][lv][1];
+		UInt8 got = 0;
+#if 0
+		if(protect)
+		{
+			if(uRand(chance_low + chance_high) < chance_low)
+				got = 1;
+			else
+				got = 2;
+		}
+		else
+#endif
+        const GData::ItemBaseType& t = item->GetItemType();
+        UInt32 itemOutId = 0;
+        UInt32 count = 0;
+        GameAction()->doStrong(this->m_Owner, SthSplit, 0,0);
+		{
+
+			UInt32 r = uRand(100);
+			if(r < chance_low)
+				got = 1;
+			else
+			{
+				r -= chance_low;
+				if(r < chance_high)
+					got = 2;
+			}
+
+			r = uRand(100);
+            if(q < 3)
+            {
+                UInt32 chance_team_matieral = GObjectManager::getTeamMatieralChance(q);
+                if(r < chance_team_matieral)
+                {
+                    itemOutId = GObjectManager::getTeamMatieralItemFromSplit(q);
+                    count = 1;
+                }
+            }
+            else
+            {
+                UInt32 typeId = t.getId();
+                if(r < GObjectManager::getOrangeTeamMatieralChance(typeId, 0))
+                    count = 1;
+                else if(r < GObjectManager::getOrangeTeamMatieralChance(typeId, 1))
+                    count = 2;
+                else if(r < GObjectManager::getOrangeTeamMatieralChance(typeId, 2))
+                    count = 3;
+
+                if(count)
+                    itemOutId = GObjectManager::getOrangeTeamMatieralItemFromSplit(typeId);
+            }
+		}
+
+        if(itemOutId != 0 && count != 0)
+        {
+            if(item != NULL)
+                DelItem2(item, 1, ToSplit);
+            AddItem(itemOutId, count, isBound, silence, FromSplit);
+
+            item = NULL;
+            pushBackSplitItem( m_Owner, splitOut, itemOutId, count );
+            res = 0;
+        }
+
+		if(got)
+		{
+			UInt32 itemOutId = ITEM_ENCHANT_L1 + got - 1;
+            UInt32 count = 1;
+            if(item != NULL)
+                DelItem2(item, 1, ToSplit);
+
+            item = NULL;
+			AddItem(itemOutId, count, isBound, silence, FromSplit);
+
+            pushBackSplitItem( m_Owner, splitOut, itemOutId, count );
+            res = 0;
+		}
+
+        if(item != NULL)
+            DelItem2(item, 1, ToSplit);
+
+        res &= 1;
 		return res;
 	}
 
