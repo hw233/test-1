@@ -305,10 +305,11 @@ namespace GObject
         VAR_FEAST_LOGIN = 294, //节日套装人人拿
         VAR_FEAST_GIFT = 295, //登录礼包人人有
 
-        //新阵营战临时代替udplog做统计使用
-        VAR_NCB_TOTALWIN = 296,     //蜀山论剑当天胜利场次
-        VAR_NCB_TOTALLOSE = 297,    //蜀山论剑当天失败场次
-        //注:使用298时清理数据库，之前使用过一次298
+        VAR_FAIRYPET_LONGYUAN = 296,   //仙宠龙元数值
+        VAR_FAIRYPET_FENGSUI = 297,  //仙宠凤髓数值
+        VAR_FAIRYPET_XIANYUAN = 298, //仙宠空间仙缘数值
+        VAR_FAIRYPET_STEP = 299, //仙宠空间当前寻宠步数
+        VAR_FAIRYPET_LIKEABILITY = 300, //仙宠空间仙宠好感度数值(紫色)
 
         //繁体版占用301-330
 
@@ -323,6 +324,7 @@ namespace GObject
         VAR_ITEM_9316_FAILED_COUNT = 347, // 都率宝伞礼包连续开启失败次数
         VAR_CONSUME_AWARD_COUNT = 348,   //消费抽奖已抽次数
         VAR_NEW_YEAR_GIVE_GIFT = 349,   //迎新纳福，红包入袋(bit1~10依次代表对应的天数是否领取过奖励)
+        //350仙宠占用 suntao
 
         // 351~360 占用 for JLT
         VAR_DISCOUNT_CONSUME1  = 351, // 消费限购的金额
@@ -353,11 +355,21 @@ namespace GObject
         VAR_9343_USED=374,
         VAR_SNAKE_SPRING_EQUIP_GOT=375,
         VAR_WEIBO_AWARD_GOT=376,
+        //377仙宠占用 suntao
+        VAR_FISHUSER_AWARD=377,            //捕鱼大亨用户领奖标志 
         //越南版380-399
         //400-420 for qiwy
         VAR_NEWYEAR_QQGAME_ACT = 401, //蓝钻新年回馈活动
         VAR_NEWYEAR_QZONECONTINUE_ACT = 402, //空间朋友连续登录奖励
         VAR_NEWYEAR_QZONECONTINUE_LASTTIME = 403, //空间朋友连续登录奖励
+        VAR_EXP_HOOK_INDEX = 404, //1:TRAINP1(初级),2:TRAINP2(高级，包括TRAINP4、ADVANCED_HOOK(超值)),3:TRAINP3(齐天)
+        VAR_TRAINP1 = 405,
+        VAR_TRAINP2 = 406,
+        VAR_TRAINP3 = 407,
+
+        //421-430 for suntao
+        VAR_HUNYUAN_STEP = 421, //大闹龙宫之混元剑诀
+        VAR_HUNYUAN_STEP4_COUNT = 422, //大闹龙宫之混元剑诀从第4格移动到第5失败的次数
 
         VAR_MAX,
     };
@@ -646,8 +658,11 @@ namespace GObject
             REGISTER_VAR(VAR_FEAST_LOGIN, CYCLE_NONE);
             REGISTER_VAR(VAR_FEAST_GIFT, CYCLE_DAY);
 
-            REGISTER_VAR(VAR_NCB_TOTALWIN, CYCLE_DAY);
-            REGISTER_VAR(VAR_NCB_TOTALLOSE, CYCLE_DAY);
+            REGISTER_VAR(VAR_FAIRYPET_LONGYUAN, CYCLE_NONE);
+            REGISTER_VAR(VAR_FAIRYPET_FENGSUI, CYCLE_NONE);
+            REGISTER_VAR(VAR_FAIRYPET_STEP, CYCLE_NONE);
+            REGISTER_VAR(VAR_FAIRYPET_LIKEABILITY, CYCLE_NONE);
+            REGISTER_VAR(VAR_FAIRYPET_XIANYUAN, CYCLE_NONE);
 
             REGISTER_VAR(VAR_TOWER_LOGIN, CYCLE_DAY);
             REGISTER_VAR(VAR_TOWER_LEVEL, CYCLE_NONE);
@@ -666,6 +681,8 @@ namespace GObject
             REGISTER_VAR(VAR_DRAGONKINGSNAKE_STEP4_COUNT, CYCLE_NONE);
             REGISTER_VAR(VAR_TIANMANG_STEP, CYCLE_NONE);
             REGISTER_VAR(VAR_TIANMANG_STEP4_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_HUNYUAN_STEP, CYCLE_NONE);
+            REGISTER_VAR(VAR_HUNYUAN_STEP4_COUNT, CYCLE_NONE);
 
             REGISTER_VAR(VAR_CALLSNAKEEGG, CYCLE_NONE);
             REGISTER_VAR(VAR_SNAKEEGG_AWARD, CYCLE_NONE);
@@ -673,9 +690,14 @@ namespace GObject
             REGISTER_VAR(VAR_9343_USED, CYCLE_NONE);
             REGISTER_VAR(VAR_SNAKE_SPRING_EQUIP_GOT, CYCLE_NONE);
             REGISTER_VAR(VAR_WEIBO_AWARD_GOT, CYCLE_NONE);
+            REGISTER_VAR(VAR_FISHUSER_AWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_NEWYEAR_QQGAME_ACT, CYCLE_DAY);
             REGISTER_VAR(VAR_NEWYEAR_QZONECONTINUE_ACT, CYCLE_NONE);
             REGISTER_VAR(VAR_NEWYEAR_QZONECONTINUE_LASTTIME, CYCLE_NONE);
+            REGISTER_VAR(VAR_EXP_HOOK_INDEX, CYCLE_NONE);
+            REGISTER_VAR(VAR_TRAINP1, CYCLE_NONE);
+            REGISTER_VAR(VAR_TRAINP2, CYCLE_NONE);
+            REGISTER_VAR(VAR_TRAINP3, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

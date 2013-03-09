@@ -183,6 +183,7 @@ private:
     void OnDreamerEyeSet(GObject::Player *player, std::vector<std::string>& args);
     void OnSomeAct(GObject::Player *player, std::vector<std::string>& args);
     void OnDragonKingAct(GObject::Player *player, std::vector<std::string>& args);
+    void OnFairyPetGM(GObject::Player *player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;

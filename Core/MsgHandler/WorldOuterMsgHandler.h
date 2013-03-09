@@ -813,6 +813,45 @@ void OnClanPackageReq( GameMsgHdr& hdr, const void * data )
     }
     //TODO
 }
+void OnClanQQ( GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+	GObject::Clan * clan = player->getClan();
+	if (clan == NULL) return;
+
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    br >> type;
+    switch(type)
+    {
+        //请求帮派QQ群Openid
+    case 0x01:
+        clan->sendQQOpenid(player);
+        break;
+        //绑定qq群
+    case 0x02:
+        {
+            std::string qqOpenid;
+            br >> qqOpenid;
+            clan->setQQOpenid(player,qqOpenid);
+            break;
+        }
+        //请求帮派qq群列表
+    case 0x03:
+        break;
+        //加入qq群
+    case 0x04:
+        player->toQQGroup(true);
+        break;
+    case 0x05:
+        player->toQQGroup(false);
+        break;
+    case 0x06:
+        clan->offQQOpenid(player);
+
+    }
+}
+
 
 void OnItemHistoryReq( GameMsgHdr& hdr, ClanItemHistoryReq& req)
 {
@@ -2286,10 +2325,11 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             }
             break;
         }
-        //大闹龙宫,大闹龙宫之金蛇起舞,大闹龙宫之天芒神梭
+        //大闹龙宫,大闹龙宫之金蛇起舞,大闹龙宫之天芒神梭,之混元剑诀
         case 0x06:
         case 0x0A:
         case 0x0B:
+        case 0x0D:
         {
             brd >> op;
             switch(op)
@@ -2345,6 +2385,21 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                     break;
             }
             break;
+        }
+        case 0x0C:
+        {
+            brd >> op;
+            switch (op)
+            {
+                case 0x01:
+                    player->sendTownTjItemInfo();
+                    break;
+                case 0x02:
+                    UInt32 itemId = 0;
+                    brd >> itemId;
+                    player->buyTownTjItem(itemId);
+                    break;
+            }
         }
         default:
             break;

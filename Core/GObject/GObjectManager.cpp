@@ -66,6 +66,8 @@
 #include "Server/SysMsg.h"
 #include "SingleHeroStage.h" 
 #include "GData/LBSkillTable.h"
+#include "GData/FairyPetTable.h"
+#include "FairyPet.h"
 
 namespace GObject
 {
@@ -671,7 +673,11 @@ namespace GObject
 		{
 			lc.advance();
 			UInt32 id = dbfgt.id;
-			GObject::Fighter * fgt = new GObject::Fighter(id, NULL);
+			GObject::Fighter * fgt = NULL;
+            if(dbfgt.cls >= e_cls_qinglong && dbfgt.cls <= e_cls_xuanwu)
+			    fgt = new GObject::FairyPet(id, NULL);
+            else
+			    fgt = new GObject::Fighter(id, NULL);
 			fgt->setName(dbfgt.name);
 			fgt->setClass(dbfgt.cls);
 			fgt->setLevel(dbfgt.lvl);
@@ -706,6 +712,12 @@ namespace GObject
 			fgt->pierce = dbfgt.pierce;
 			fgt->counter = dbfgt.counter;
 			fgt->magres = dbfgt.magres;
+            GData::Pet::LingyaData * lyd = GData::pet.getLingyaTable(id);
+            if(lyd != NULL)
+            {
+                fgt->setColor(lyd->color);
+                static_cast<FairyPet *>(fgt)->setPetLingya(lyd->lingya);
+            }
 
 			StringTokenizer tokenizer(dbfgt.extraPos, "|");
 			for(size_t j = 0; j < tokenizer.count(); ++ j)
@@ -1151,6 +1163,8 @@ namespace GObject
             //p->sendOldRC7DayAward();
         //if (!GVAR.GetVar( GVAR_JOB_MO_PEXP))
             //buchangMo(p);
+        //if (!GVAR.GetVar(GVAR_EXP_HOOK_NEW) && p)
+        //    p->transferExpBuffer2Var();
 		return true;
 	}
 
@@ -1381,7 +1395,7 @@ namespace GObject
 		LoadingCounter lc("Loading players:");
 		// load players
 		DBPlayerData dbpd;
-		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `prestige`, `status`, `country`, `title`, `titleAll`, `archievement`, `attainment`, `qqvipl`, `qqvipyear`, `qqawardgot`, `qqawardEnd`, `ydGemId`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `mounts`, `icCount`, `piccount`, `nextpicreset`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `fshimen`, `yamen`, `fyamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `copyUpdate`, `frontFreeCnt`, `frontGoldCnt`, `frontUpdate`, `formations`, `atohicfg`, `gmLevel`, `wallow`, `dungeonCnt`, `dungeonEnd`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime`, `openid` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
+		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `prestige`, `status`, `country`, `title`, `titleAll`, `archievement`, `attainment`, `qqvipl`, `qqvipyear`, `qqawardgot`, `qqawardEnd`, `ydGemId`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `mounts`, `icCount`, `piccount`, `nextpicreset`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `fshimen`, `yamen`, `fyamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `copyUpdate`, `frontFreeCnt`, `frontGoldCnt`, `frontUpdate`, `formations`, `atohicfg`, `gmLevel`, `wallow`, `dungeonCnt`, `dungeonEnd`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime`, `openid`, `canHirePet` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
             return false;
 
 		lc.reset(200);
@@ -1706,6 +1720,16 @@ namespace GObject
             if(!pl->hasTitle(dbpd.pdata.title))
                 pl->fixOldVertionTitle(dbpd.pdata.title);
             pl->setOpenId(dbpd.openid, true);
+
+            if (dbpd.canHirePet.length())
+            {
+				StringTokenizer tk(dbpd.canHirePet, ",");
+				size_t count = tk.count();
+                for(size_t idx = 0; idx < count; ++ idx)
+			    {
+                    PLAYER_DATA(pl, canHirePet).push_back(atoi(tk[idx].c_str()));
+                }
+            }
 		}
 		lc.finalize();
 
@@ -1947,7 +1971,10 @@ namespace GObject
             fgt2->setAttrType3(specfgtobj.attrType3);
             fgt2->setAttrValue3(specfgtobj.attrValue3);
             fgt2->setHideFashion(specfgtobj.hideFashion,false);
-			pl->addFighter(fgt2, false, true);
+            if(fgt2->isPet())
+                pl->addFairyPet(static_cast<FairyPet *>(fgt2), false, true);
+            else
+			    pl->addFighter(fgt2, false, true);
             if (specfgtobj.level > lvl_max)
                 lvl_max = specfgtobj.level;
 
@@ -2513,6 +2540,32 @@ namespace GObject
 		}
 		lc.finalize();
 
+		lc.prepare("Loading fairyPet data:");
+		last_id = 0xFFFFFFFFFFFFFFFFull;
+		pl = NULL;
+		DBFairyPetData fpetdb;
+		if(execu->Prepare("SELECT `id`, `playerId`, `onBattle`, `petLev`, `petBone`, `pinjieBless`, `genguBless`, `chong`, `overTime`, `xiaozhou`, `dazhou` FROM `fairyPet` ORDER BY `playerId`", fpetdb) != DB::DB_OK)
+			return false;
+		lc.reset(200);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(fpetdb.playerId != last_id)
+			{
+				last_id = fpetdb.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+			FairyPet * pet = static_cast<FairyPet *>(pl->findFairyPet(fpetdb.id));
+			if(pet != NULL)
+            {
+                pet->LoadFromDB(fpetdb);
+                if(fpetdb.onBattle)
+                    pl->setFairypetBattle(pet, false);
+            }
+		}
+		lc.finalize();
 		/////////////////////////////////
 
 		globalPlayers.enumerate(player_load, 0);
@@ -2520,7 +2573,7 @@ namespace GObject
         //GVAR.SetVar(GVAR_1530BUCHANG, 1);
         GVAR.SetVar(GVAR_OLDRC7DAYBUCHANG, 1);
         GVAR.SetVar(GVAR_JOB_MO_PEXP, 1);
-
+        //GVAR.SetVar(GVAR_EXP_HOOK_NEW, 1);
 		return true;
 	}
 
@@ -3066,7 +3119,7 @@ namespace GObject
         // ??????Ϣ
 		LoadingCounter lc("Loading clans:");
 		DBClan cl;
-		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `funds`, `foundTime`, `founder`, `leader`, `watchman`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle`, `battleScore`, `dailyBattleScore` `battleRanking` FROM `clan`", cl) != DB::DB_OK)
+		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `funds`, `foundTime`, `founder`, `leader`, `watchman`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle`, `battleScore`, `dailyBattleScore`, `battleRanking`,`qqOpenid` FROM `clan`", cl) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		Clan * clan = NULL;
@@ -3109,7 +3162,8 @@ namespace GObject
 				clanBattle->setBattleTime(cl.battleTime);
 				clanBattle->setNextBattleTime(cl.nextBattleTime);
 				globalClans.add(cl.id, clan);
-			}
+                clan->setQQOpenid(cl.qqOpenid);
+		}
 			else
 			{
 				clanBattle = clanManager.getRobBattleClan();
@@ -3137,7 +3191,7 @@ namespace GObject
         // ??????Ա
 		lc.prepare("Loading clan players:");
 		DBClanPlayer cp;
-		if (execu->Prepare("SELECT `id`, `playerId`, `joinTime`, `proffer`, `cls`, `enterCount`, `thisDay`, `petFriendness1`, `petFriendness2`, `petFriendness3`, `petFriendness4`, `favorCount1`, `favorCount2`, `favorCount3`, `favorCount4`, `lastFavorTime1`, `lastFavorTime2`, `lastFavorTime3`, `lastFavorTime4`, `signupRankBattleTime`, `rankBattleField` FROM `clan_player` ORDER BY `id`, `proffer` DESC, `joinTime` ASC", cp) != DB::DB_OK)
+		if (execu->Prepare("SELECT `id`, `playerId`, `joinTime`, `proffer`, `cls`, `enterCount`, `thisDay`, `petFriendness1`, `petFriendness2`, `petFriendness3`, `petFriendness4`, `favorCount1`, `favorCount2`, `favorCount3`, `favorCount4`, `lastFavorTime1`, `lastFavorTime2`, `lastFavorTime3`, `lastFavorTime4`, `signupRankBattleTime`, `rankBattleField`,`inQQGroup` FROM `clan_player` ORDER BY `id`, `proffer` DESC, `joinTime` ASC", cp) != DB::DB_OK)
 			return false;
 		UInt32 lastId = 0xFFFFFFFF;
 		lc.reset(1000);
@@ -3208,6 +3262,8 @@ namespace GObject
 			}
 			else
 				delete cm;
+
+            pl->setInQQGroup(cp.inQQGroup);
 		}
 		lc.finalize();
 		globalClans.enumerate(cacheClan, 0);

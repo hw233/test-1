@@ -192,6 +192,7 @@ struct DBPlayerData
     std::string formations;
     std::string atohicfg;
     std::string openid;
+    std::string canHirePet;
 };
 
 struct DBHoneyFall
@@ -598,6 +599,7 @@ struct DBClan
     UInt32 battleScore;
     UInt32 dailyBattleScore;
     UInt32 battleRanking;
+    std::string qqOpenid;
 };
 
 struct DBClanRepo
@@ -621,6 +623,7 @@ struct DBClanPlayer
 	UInt32 lastFavorTime[4];
     UInt32 signupRankBattleTime;
     UInt32 rankBattleField;
+    UInt8  inQQGroup;
 };
 
 struct DBClanItem
@@ -1171,6 +1174,21 @@ struct DBDreamer
     UInt8 eyeY;
 };
 
+struct DBFairyPetData
+{
+    UInt32 id;
+    UInt64 playerId;
+    UInt8 onBattle;
+    UInt16 petLev;
+    UInt16 petBone;
+    UInt16 pinjieBless;
+    UInt32 genguBless;
+    UInt16 chong;
+    UInt32 overTime;
+    UInt16 xiaozhou;
+    UInt16 dazhou;
+};
+
 }
 
 namespace DB {
@@ -1245,7 +1263,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPlayerData)
-SPECIALDEF(57)
+SPECIALDEF(58)
 	(
 	UInt64, id,
 	std::string, pdata.name,
@@ -1303,7 +1321,8 @@ SPECIALDEF(57)
     UInt32, pdata.dungeonEnd,
 	UInt32, pdata.created,
 	UInt32, pdata.lockExpireTime,
-    std::string, openid
+    std::string, openid,
+    std::string, canHirePet
     )
 SPECIALEND()
 
@@ -1794,7 +1813,7 @@ SPECIALDEF(3)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBClan)
-SPECIALDEF(29)
+SPECIALDEF(30)
 (
 	UInt32, id,
 	std::string, name,
@@ -1824,7 +1843,8 @@ SPECIALDEF(29)
 	UInt8,  hasBattle,
     UInt32, battleScore,
     UInt32, dailyBattleScore,
-    UInt32, battleRanking
+    UInt32, battleRanking,
+    std::string, qqOpenid
 )
 SPECIALEND()
 
@@ -1852,7 +1872,7 @@ SPECIALEND()
 
 
 SPECIALBEGIN(GObject::DBClanPlayer)
-SPECIALDEF(21)
+SPECIALDEF(22)
 (
 	UInt32, id,
 	UInt64, playerId,
@@ -1874,7 +1894,8 @@ SPECIALDEF(21)
 	UInt32, lastFavorTime[2],
 	UInt32, lastFavorTime[3],
     UInt32, signupRankBattleTime,
-    UInt32, rankBattleField
+    UInt32, rankBattleField,
+    UInt8,  inQQGroup
 )
 SPECIALEND()
 
@@ -2649,6 +2670,23 @@ SPECIALDEF(18)
     UInt8, eyeTime,
     UInt8, eyeX,
     UInt8, eyeY
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBFairyPetData)
+SPECIALDEF(11)
+(
+    UInt32, id,
+    UInt64, playerId,
+    UInt8, onBattle,
+    UInt16, petLev,
+    UInt16, petBone,
+    UInt16, pinjieBless,
+    UInt32, genguBless,
+    UInt16, chong,
+    UInt32, overTime,
+    UInt16, xiaozhou,
+    UInt16, dazhou
 )
 SPECIALEND()
 

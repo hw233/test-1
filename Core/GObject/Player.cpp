@@ -133,29 +133,73 @@ namespace GObject
 
 	float EventAutoBattle::calcExpEach(UInt32 now)
 	{
+#if 0
         return 8.0f * _npcGroup->getExp();
+#else
+        UInt8 plvl = m_Player->GetLev();
+        UInt64 exp = (plvl - 10) * ((plvl > 99 ? 99 : plvl) / 10) * 5 + 25;
+        return static_cast<float>(exp);
+#endif
 	}
 
 	void EventAutoBattle::Process(UInt32)
 	{
 		UInt32 now = TimeUtil::Now();
 		float exp = calcExpEach(now);
-        if(m_Player->getBuffData(PLAYER_BUFF_ADVANCED_HOOK, now))
-            exp *= 1.5f;
-        else if(m_Player->getBuffData(PLAYER_BUFF_TRAINP3, now))
-            exp *= 1.8f;
-        else if(m_Player->getBuffData(PLAYER_BUFF_TRAINP4, now))
-            exp *= 1.5f;
-        else if(m_Player->getBuffData(PLAYER_BUFF_TRAINP2, now))
-            exp *= 1.5f;
-        else if(m_Player->getBuffData(PLAYER_BUFF_TRAINP1, now))
-            exp *= 1.2f;
+        UInt32 tmp;
+        UInt32 curHookIndex = m_Player->GetVar(VAR_EXP_HOOK_INDEX);
+        if(curHookIndex == ENUM_TRAINP1)
+        {
+            tmp = m_Player->GetVar(VAR_TRAINP1);
+            if(tmp > 0)
+            {
+                exp *= 1.2f;
+                if(tmp > 60)
+                    tmp -= 60;
+                else
+                    tmp = 0;
+                m_Player->SetVar(VAR_TRAINP1, tmp);
+            }
+        }
+        else if(curHookIndex == ENUM_TRAINP2)
+        {
+            tmp = m_Player->GetVar(VAR_TRAINP2);
+            if(tmp > 0)
+            {
+                exp *= 1.5f;
+                if(tmp > 60)
+                    tmp -= 60;
+                else
+                    tmp = 0;
+                m_Player->SetVar(VAR_TRAINP2, tmp);
+            }
+        }
+        else if(curHookIndex == ENUM_TRAINP3)
+        {
+            tmp = m_Player->GetVar(VAR_TRAINP3);
+            if(tmp > 0)
+            {
+                exp *= 1.8f;
+                if(tmp > 60)
+                    tmp -= 60;
+                else
+                    tmp = 0;
+                m_Player->SetVar(VAR_TRAINP3, tmp);
+            }
+        }
+#if 0
 		_npcGroup->monsterKilled(m_Player);
+#endif
 		if(m_Player->isOnline())
 			m_Player->AddExp(static_cast<UInt32>(exp));
 		else
 			m_Player->pendExp(static_cast<UInt32>(exp));
+#if 0
 		_npcGroup->getLoots(m_Player);
+#else
+        if(uRand(10000) < 74)
+            m_Player->GetPackage()->Add(9359, 1, true, false);
+#endif
 		notify();
 		updateDB(false);
 	}
@@ -171,17 +215,20 @@ namespace GObject
         UInt8 iccnt = Player::getMaxIcCount(vipLevel) - m_Player->getIcCount();
         if (Player::getMaxIcCount(vipLevel) < m_Player->getIcCount())
             iccnt = Player::getMaxIcCount(vipLevel);
+        UInt8 curType = static_cast<UInt8>(m_Player->GetVar(VAR_EXP_HOOK_INDEX));
 		if(cnt > 0)
 		{
+#if 0
 			if(_npcGroup == NULL)
 				return;
+#endif
 			UInt32 t = TimeUtil::Now();
 			if(t > _finalEnd) t = 0; else t = _finalEnd - t;
-			st << _npcGroup->getId() << static_cast<UInt8>(1) << cnt << t << iccnt << Stream::eos;
+			st << /*_npcGroup->getId()*/static_cast<UInt32>(0) << static_cast<UInt8>(1) << cnt << t << iccnt << curType << Stream::eos;
 		}
 		else
 		{
-			st << static_cast<UInt32>(0) << static_cast<UInt8>(0) << static_cast<UInt16>(0) << static_cast<UInt32>(0) << iccnt << Stream::eos;
+			st << static_cast<UInt32>(0) << static_cast<UInt8>(0) << static_cast<UInt16>(0) << static_cast<UInt32>(0) << iccnt << curType << Stream::eos;
 			m_Player->delFlag(Player::Training);
 		}
 		m_Player->send(st);
@@ -206,7 +253,7 @@ namespace GObject
 		m_Timer.SetLeftTimes(newCnt);
 		ecs.exp = calcExpEach(TimeUtil::Now()) * cnt;
 		ecs.count = cnt;
-		ecs.ng = _npcGroup;
+		ecs.ng = NULL;//_npcGroup;
 		GameMsgHdr hdr(0x274, m_Player->getThreadId(), m_Player, sizeof(ExpGainInstantCompleteStruct));
 		GLOBAL().PushMsg(hdr, &ecs);
 		_finalEnd -= ecs.duration;
@@ -221,7 +268,7 @@ namespace GObject
 		if(count > 0)
 		{
 			if(isNew)
-				DB3().PushUpdateData("REPLACE INTO `auto_battle`(`playerId`, `npcId`, `count`, `interval`) VALUES(%"I64_FMT"u, %u, %u, %u)", m_Player->getId(), _npcGroup->getId(), count, m_Timer.GetInterval());
+				DB3().PushUpdateData("REPLACE INTO `auto_battle`(`playerId`, `npcId`, `count`, `interval`) VALUES(%"I64_FMT"u, %u, %u, %u)", m_Player->getId(), /*_npcGroup->getId()*/0, count, m_Timer.GetInterval());
 			else
 				DB3().PushUpdateData("UPDATE `auto_battle` SET `count` = %u WHERE `playerId` = %"I64_FMT"u", count, m_Player->getId());
 		}
@@ -599,7 +646,7 @@ namespace GObject
 #ifndef _WIN32
 		m_ulog(NULL),
 #endif
-		m_isOffical(false), m_isXY(false), m_sysDailog(false), m_hasTripod(false), _jobHunter(NULL), _dreamer(NULL)
+		m_isOffical(false), m_isXY(false), m_sysDailog(false), m_hasTripod(false), _jobHunter(NULL), _dreamer(NULL), _onBattlePet(NULL)
 	{
         m_ClanBattleStatus = 1;
         m_ClanBattleScore = 0;
@@ -653,6 +700,8 @@ namespace GObject
         memset(cf_itemId, 0, sizeof(cf_itemId));
         memset(cf_ratio, 0 ,sizeof(cf_ratio));
         _hiattrFlag = false;
+
+        _inQQGroup = false;
 	}
 
 
@@ -2035,6 +2084,10 @@ namespace GObject
         int addr = inet_addr(m_clientIp);
 		DBLOG1().PushUpdateData("update login_states set logout_time=%u where server_id=%u and player_id=%"I64_FMT"u and login_time=%u", curtime, addr?addr:cfg.serverLogId, _id, _playerData.lastOnline);
 		DB1().PushUpdateData("UPDATE `player` SET `lastOnline` = %u, `nextReward` = '%u|%u|%u|%u' WHERE `id` = %"I64_FMT"u", curtime, _playerData.rewardStep, _playerData.nextRewardItem, _playerData.nextRewardCount, _playerData.nextRewardTime, _id);
+        if(_isOnline && !hasFlag(Training))
+        {
+            autoBattle(0, 0);
+        }
         _isOnline = false;
 
 		if(!nobroadcast)
@@ -2250,6 +2303,29 @@ namespace GObject
         _playerData.lastTjEventScore = 0;
         _playerData.lastTjTotalScore = 0;
     }
+
+    UInt32 bufferId2VarId(UInt8 id)
+    {
+        if(id == PLAYER_BUFF_TRAINP1)
+            return VAR_TRAINP1;
+        else if(id == PLAYER_BUFF_TRAINP2/* || id == PLAYER_BUFF_TRAINP4 || id == PLAYER_BUFF_ADVANCED_HOOK*/)
+            return VAR_TRAINP2;
+        else if(id == PLAYER_BUFF_TRAINP3)
+            return VAR_TRAINP3;
+        else
+            return 0;
+    }
+
+	void Player::sendExpHook(UInt8 id, UInt32 data)
+	{
+        if(_isOnline)
+        {
+            Stream st(REP::USER_INFO_CHANGE);
+            st << id << data << Stream::eos;
+            send(st);
+        }
+    }
+
 	void Player::setBuffData(UInt8 id, UInt32 data, bool writedb)
 	{
 		UInt32 now = TimeUtil::Now();
@@ -2964,7 +3040,19 @@ namespace GObject
 			}
 			else
 			{
-				if(_buffData[i] > curtime)
+                if(relateExpHook(i))
+                {
+                    UInt32 varId = bufferId2VarId(i);
+                    if(varId == 0)
+                        continue;
+                    UInt32 varData = GetVar(varId);
+                    if(varData == 0)
+                        continue;
+					buffid[c] = i + 0x40;
+					buffleft[c] = varData;
+                    ++c;
+                }
+                else if(_buffData[i] > curtime)
 				{
 					buffid[c] = i + 0x40;
 					buffleft[c] = _buffData[i] - curtime;
@@ -3312,6 +3400,7 @@ namespace GObject
             if (ng->getLevel() <= GetLev() || (ng->getLevel() > GetLev() && (ng->getLevel() - GetLev()) < 10))
             {
                 UInt32 exp = 0;
+#if 0
                 if(getBuffData(PLAYER_BUFF_TRAINP3, now))
                     exp = ng->getExp() * 18 / 10;
                 else if(getBuffData(PLAYER_BUFF_TRAINP4, now))
@@ -3322,7 +3411,9 @@ namespace GObject
                     exp = ng->getExp() * 13 / 10;
                 else
                     exp  = ng->getExp();
-
+#else
+                    exp  = ng->getExp();
+#endif
                 if (isOffical())
                     exp -= (exp/10);
                 if((this->getPlatform() == 10 && World::getQQGameAct()) || (this->getPlatform() == 11 && World::get3366PrivilegeAct()) || ((getPlatform() == 1 || getPlatform() == 2) && World::getQzonePYPrivilegeAct()))
@@ -3518,7 +3609,7 @@ namespace GObject
 			_lastNg = ng;
 
             UInt32 exp = expfactor * ng->getExp();
-            if(getBuffData(PLAYER_BUFF_TRAINP3, now))
+            if(getBuffData(PLAYER_BUFF_QI_TIAN_CHU_MO, now))
                 exp *= (18.f/10.f);
             pendExp(exp);
 
@@ -3566,13 +3657,13 @@ namespace GObject
 		return res;
 	}
 
-	bool Player::autoBattle( UInt32 npcId )
+	bool Player::autoBattle( UInt32 npcId, UInt8 type)
 	{
-        if (GetPackage()->GetRestPackageSize() == 0)
-        {
-            sendMsgCode(0, 1011);
+        if(type > 3)
             return false;
-        }
+        if(GetLev() < 30)
+            return false;
+#if 0
 		GData::NpcGroups::iterator it = GData::npcGroups.find(npcId);
 		if(it == GData::npcGroups.end())
 			return false;
@@ -3584,6 +3675,16 @@ namespace GObject
 		}
         if (ng->getType())
             return false;
+#else
+        SpotData * spotData = GetMapSpot();
+        if (!spotData || spotData->m_Type != 9)
+            return false;
+#endif
+        if (GetPackage()->GetRestPackageSize() == 0)
+        {
+            sendMsgCode(0, 1011);
+            return false;
+        }
 		const UInt32 eachBattle = 60;
 		UInt32 count = 60 * 8;
 
@@ -3603,49 +3704,47 @@ namespace GObject
             count = 60*216;
 
 		UInt32 timeDur = count * eachBattle;
-
 		UInt32 final = TimeUtil::Now() + timeDur;
-		EventAutoBattle* event = new(std::nothrow) EventAutoBattle(this, eachBattle, count, ng, final);
+#if 0
+        GObject::EventWrapper::iterator it = GObject::eventWrapper.FindTimerEvent(this, EVENT_AUTOBATTLE, 0);
+        if(it != GObject::eventWrapper.end())
+        {
+            GObject::EventBase *event = it->second;
+            if(event)
+            {
+                count = event->GetTimer().GetLeftTimes();
+                GObject::EventAutoBattle *eventAuto = static_cast<GObject::EventAutoBattle *>(event);
+                final = eventAuto->getFinalEnd();
+            }
+        }
+#endif
+		EventAutoBattle* event = new(std::nothrow) EventAutoBattle(this, eachBattle, count, /*ng*/NULL, final);
 		if (event == NULL) return false;
-		cancelAutoBattle();
-		PushTimerEvent(event);
+        SetVar(VAR_EXP_HOOK_INDEX, type);
+		cancelAutoBattle(false);
 		addFlag(Training);
 		event->notify();
 		event->updateDB(true);
-
+		PushTimerEvent(event);
         OnHeroMemo(MC_FIGHTER, MD_STARTED, 0, 0);
         GameAction()->doStrong(this, SthTaskHook, 0,0);
 		return true;
 	}
-#if 0
-    /** 随身加速服功能 **/
-    void Player::advancedHookExp()
-	{
-        if(getBuffData(PLAYER_BUFF_ADVANCED_HOOK, TimeUtil::Now()) == 0)
-            return;
-        if(!isOnline())
-            return;
-        UInt8 lvl = GetLev();
-        UInt8 lvl2 = lvl;
-        lvl = lvl > 99 ? 99 : lvl;
-        UInt32 extraExp = (lvl2 - 10) * (lvl / 10) * 5 + 25;
-        extraExp = extraExp * 3 / 2;
-        AddExp(extraExp);
-		return;
-	}
-#endif
+
 	void Player::pushAutoBattle(UInt32 npcId, UInt16 count, UInt16 interval)
 	{
-		if(npcId == 0 || count == 0 || interval == 0)
+		if(/*npcId == 0 || */count == 0 || interval == 0)
 			return;
         if (count > 1440 && GetLev() < 45) // XXX: 45级以下不允许挂机240小时
             return;
+#if 0
 		GData::NpcGroups::iterator it = GData::npcGroups.find(npcId);
 		if(it == GData::npcGroups.end())
 			return;
 		GData::NpcGroup * ng = it->second;
+#endif
 		UInt32 final = TimeUtil::Now() + interval * count;
-		EventAutoBattle* event = new(std::nothrow) EventAutoBattle(this, interval, count, ng, final);
+		EventAutoBattle* event = new(std::nothrow) EventAutoBattle(this, interval, count, /*ng*/NULL, final);
 		if (event == NULL) return;
 		PushTimerEvent(event);
 		addFlag(Training);
@@ -3659,10 +3758,12 @@ namespace GObject
 		dg->pushChallenge(this, exp, won > 0);
 	}
 
-	void Player::cancelAutoBattle()
+	void Player::cancelAutoBattle(bool needNotify)
 	{
 		GameMsgHdr hdr2(0x179, WORKER_THREAD_WORLD, this, 0);
 		GLOBAL().PushMsg(hdr2, 0);
+        if(needNotify)
+            cancelAutoBattleNotify();
 	}
 
 	void Player::cancelAutoBattleNotify()
@@ -3686,6 +3787,11 @@ namespace GObject
 
 	void Player::instantAutoBattle()
 	{
+        if(GetFreePackageSize() < 1)
+        {
+            sendMsgCode(2, 1011);
+            return;
+        }
 		if(_playerData.icCount > getMaxIcCount(_vipLevel))
             _playerData.icCount = 0;
 		if(_playerData.icCount >= getMaxIcCount(_vipLevel) || !hasFlag(Training) || getGoldOrCoupon() < 10)
@@ -4216,11 +4322,11 @@ namespace GObject
 			Stream st(REP::USER_INFO_CHANGE);
 			if(t > 0x40)
 			{
-				UInt32 tm = TimeUtil::Now();
-				if(v > tm)
-					st << t << static_cast<UInt32>(v - tm) << Stream::eos;
-				else
-					st << t << static_cast<UInt32>(0) << Stream::eos;
+                UInt32 tm = TimeUtil::Now();
+                if(v > tm)
+                    st << t << static_cast<UInt32>(v - tm) << Stream::eos;
+                else
+                    st << t << static_cast<UInt32>(0) << Stream::eos;
 			}
 			else
 				st << t << v << Stream::eos;
@@ -13050,7 +13156,83 @@ namespace GObject
 
         sendYearRPInfo();
     }
+    void Player::sendFishUserInfo()
+    {
+        UInt8 today = (TimeUtil::SharpDay(0, TimeUtil::Now()) - TimeUtil::SharpDay(0, getCreated())) / DAY_SECS + 1;
+        if (today > 7)
+            return;
+        UInt32 rpValue = GetVar(VAR_RP_VALUE);
+        if (rpValue != 4)
+            return;
+        UInt32 v = GetVar(VAR_FISHUSER_AWARD);
+        Stream st(REP::RC7DAY);
+        st << static_cast<UInt8>(9);
+        st << static_cast<UInt8>(today);
+        st << static_cast<UInt8>(v);
+        st << Stream::eos;
+        send(st);
+    }
+    void Player::getFishUserPackage()
+    {
+        if (GetLev() < 45)
+            return;
+        UInt32 rpValue = GetVar(VAR_RP_VALUE);
+        if (rpValue != 4)
+            return;
 
+        if (TimeUtil::SharpDay(0, TimeUtil::Now()) - TimeUtil::SharpDay(0, getCreated()) > 6 * DAY_SECS)
+            return;
+
+        UInt32 v = GetVar(VAR_FISHUSER_AWARD);
+        if ((v&0x80) == 0)
+        {
+            if (GetPackage()->GetRestPackageSize() < 3)
+            {
+                sendMsgCode(0, 1011);
+            }
+            else
+            {
+                GetPackage()->Add(1277,1,true);
+                GetPackage()->Add(30,1,true);
+                GetPackage()->Add(1325,5,true);
+                v |= 0x80;
+                SetVar(VAR_FISHUSER_AWARD, v);
+            }
+        }
+        sendFishUserInfo();
+    } 
+    void Player::getFishUserAward()
+    {
+        static const MailPackage::MailItem s_items[][3] = {
+            {{15,5},{1604,1},{56,2}},
+            {{15,5},{503,10},{56,5}},
+            {{15,5},{514,10},{56,5}},
+            {{15,5},{515,3},{56,5}},
+            {{15,5},{1610,1},{56,5}},
+            {{15,5},{509,5},{56,10}},
+            {{15,5},{226,1},{56,10}}
+        };
+        UInt8 today = (TimeUtil::SharpDay(0, TimeUtil::Now()) - TimeUtil::SharpDay(0, getCreated())) / DAY_SECS + 1;
+        if (today > 7 || today == 0)
+            return;
+        UInt8 v = GetVar(VAR_FISHUSER_AWARD);
+        if ((v&(0x01<<(today-1))) == 0)
+        {
+            if (GetPackage()->GetRestPackageSize() < 3)
+            {
+                sendMsgCode(0, 1011);
+                return;
+            }
+            getCoupon(50);
+            for (UInt8 i = 0; i < 3; ++i)
+            {
+                GetPackage()->Add(s_items[today-1][i].id, s_items[today-1][i].count, true);
+            }
+            v |= (0x01<<(today-1));
+            SetVar(VAR_FISHUSER_AWARD, v); 
+        }
+        sendFishUserInfo();
+    }
     void Player::getContinuousReward(UInt8 type, UInt8 idx)
     {
         if (!World::getRC7Day())
@@ -17067,6 +17249,11 @@ void Player::getDragonKingInfo()
         st << static_cast<UInt8>(0x0B);
         step = GetVar(VAR_TIANMANG_STEP);
     }
+    else if(4 == flag)
+    {
+        st << static_cast<UInt8>(0x0D);
+        step = GetVar(VAR_HUNYUAN_STEP);
+    }
     else
         return;
     if( step == 0 || step > 5)
@@ -17114,6 +17301,12 @@ void Player::postDragonKing(UInt8 count)
         type = 0x0B;
         step = GetVar(VAR_TIANMANG_STEP);
     }
+    else if(4 == flag)
+    {
+        XBLing = 9364;
+        type = 0x0D;
+        step = GetVar(VAR_HUNYUAN_STEP);
+    }
     else
         return;
     if (GetPackage()->GetItemAnyNum(XBLing) < count)
@@ -17145,8 +17338,8 @@ void Player::postDragonKing(UInt8 count)
             UInt16 itemId = award.get<UInt16>(j);
             st << itemId << award.get<UInt8>(j+1);
             GetPackage()->Add(itemId, award.get<UInt32>(j+1), isBind, true, FromQixi);
-            //6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片
-            if(itemId == 6134 || itemId == 6135 || itemId == 136)
+            //6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页
+            if(itemId == 6134 || itemId == 6135 || itemId == 136 || itemId == 6136)
                 SYSMSG_BROADCASTV(295, getCountry(), getName().c_str(), itemId);
         }
     }
@@ -17158,6 +17351,8 @@ void Player::postDragonKing(UInt8 count)
         SetVar(VAR_DRAGONKINGSNAKE_STEP, step);
     else if(3 == flag)
         SetVar(VAR_TIANMANG_STEP, step);
+    else if(4 == flag)
+        SetVar(VAR_HUNYUAN_STEP, step);
 }
 
 //金蛇献瑞 聚福兆祥
@@ -17328,6 +17523,451 @@ void Player::sendSaveGoldAct()
     st << Stream::eos;
     send(st);
 }
+void Player::buyTownTjItem(const UInt32 itemId)
+{
+    static const UInt32 s_items[] = {1653,1654,1655,1532,1533,1534};
+    int opt = -1;
+    for (UInt8 i = 0; i < sizeof(s_items)/sizeof(s_items[0]); ++i)
+    {
+        if (itemId == s_items[i])
+        {
+            opt = i;
+            break;
+        }
+    }
+    if (opt < 0)
+        return;
+    int flag = GetVar(VAR_TJ_TOWN_ITEM_GOT);
+    if (flag & (1 << opt))//已领取
+    {
+        std::vector<ItemEquip*> items;
+        std::vector<ItemEquip*> fgtItems;
+        GetPackage()->FindEquipByTypeId(items, itemId, true);
+        if (!items.empty()) 
+        {
+            sendMsgCode(0, 1044);
+            return;
+        }
+        for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++it)
+        {
+            fgtItems.clear();
+            Fighter* fgt = it->second;
+            fgt->findTrumpByTypeId(fgtItems, itemId);
+            if (!fgtItems.empty())
+            {
+                sendMsgCode(0, 1044);
+                return;
+            }
+        }
+        if (getGold() < 100)
+        {
+            sendMsgCode(0, 1104); 
+            return;
+        }
+        if (GetPackage()->GetRestPackageSize() == 0)
+        {
+            sendMsgCode(0, 1011); 
+            return;
+        }
+        ConsumeInfo ci(BuyTownTjTrump,0,0);
+		useGold(100,&ci);
+        GetPackage()->Add(itemId,1,true);
+        sendTownTjItemInfo();
+    }
+}
+void Player::sendTownTjItemInfo()
+{
+    static const UInt32 s_items[] = {1653,1654,1655,1532,1533,1534};
+    UInt8 flag = GetVar(VAR_TJ_TOWN_ITEM_GOT);
+    std::vector<ItemEquip*> items;
+    std::vector<ItemEquip*> fgtItems;
+    for (UInt8 i = 0; i < sizeof(s_items)/sizeof(s_items[0]); ++i) 
+    {
+        if (flag&(1<<i))
+        {
+            items.clear();
+            GetPackage()->FindEquipByTypeId(items,s_items[i], true);
+            if (!items.empty())
+            {
+                flag &= ~(1<<i);
+                continue;
+            }
+            for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++it)
+            {
+                fgtItems.clear();
+                Fighter* fgt = it->second;
+                fgt->findTrumpByTypeId(fgtItems, s_items[i]);
+                if (!fgtItems.empty())
+                {
+                    flag &= ~(1<<i);
+                    continue;
+                }
+            }
+        }
+    }
+    Stream st(REP::ACTIVE);
+    st << static_cast<UInt8>(0x0C) << static_cast<UInt8>(0x01) << static_cast<UInt8>(flag);
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::transferExpBuffer2Var()
+{
+    UInt32 tm = TimeUtil::Now();
+    UInt32 left;
+    UInt32 total;
+    /** 初级**/
+    total = 0;
+    if((left = getBuffLeft(PLAYER_BUFF_TRAINP1, tm))> 0)
+    {
+        total += left;
+        setBuffData(PLAYER_BUFF_TRAINP1, 0);
+    };
+    if(total > 0)
+    {
+        SetVar(VAR_TRAINP1, total);
+        if(hasFlag(Training))
+            SetVar(VAR_EXP_HOOK_INDEX, ENUM_TRAINP1);
+    }
+
+    /** 高级 **/
+    total = 0;
+    if((left = getBuffLeft(PLAYER_BUFF_TRAINP2, tm)) > 0)
+    {
+        total += left;
+        setBuffData(PLAYER_BUFF_TRAINP2, 0);
+    }
+    if((left = getBuffLeft(PLAYER_BUFF_TRAINP4, tm)) > 0)
+    {
+        total += left;
+        setBuffData(PLAYER_BUFF_TRAINP4, 0);
+    }
+    if((left = getBuffLeft(PLAYER_BUFF_ADVANCED_HOOK, tm)) > 0)
+    {
+        total += left;
+        setBuffData(PLAYER_BUFF_ADVANCED_HOOK, 0);
+    }
+    if(total > 0)
+    {
+        SetVar(VAR_TRAINP2, total);
+        if(hasFlag(Training))
+            SetVar(VAR_EXP_HOOK_INDEX, ENUM_TRAINP2);
+    }
+
+    /** 齐天 **/
+    total = 0;
+    if((left = getBuffLeft(PLAYER_BUFF_TRAINP3, tm)) > 0)
+    {
+        total += left;
+        setBuffData(PLAYER_BUFF_QI_TIAN_CHU_MO, tm + left);
+    }
+    if(total > 0)
+    {
+        SetVar(VAR_TRAINP3, total);
+        if(hasFlag(Training))
+            SetVar(VAR_EXP_HOOK_INDEX, ENUM_TRAINP3);
+    }
+}
+
+//////////////////////////////////////////////////////
+UInt8 Player::toQQGroup(bool isJoin)
+{
+    if (getClan() == NULL)
+        return 1;
+    if (_inQQGroup != isJoin)
+    {
+        _inQQGroup = isJoin;
+	    DB1().PushUpdateData("UPDATE `clan_player` SET `inQQGroup` = %u WHERE `playerId` = %"I64_FMT"u", _inQQGroup, getId());
+
+        getClan()->sendQQOpenid(this);
+    }
+    return 0;
+}
+
+//仙宠
+	FairyPet * Player::findFairyPet( UInt32 id )
+	{
+		std::map<UInt32, FairyPet *>::iterator it = _fairyPets.find(id);
+		if(it == _fairyPets.end())
+			return NULL;
+		return it->second;
+	}
+
+    bool Player::hasCanHirePet( UInt32 id )
+    {
+        std::vector<UInt32>::iterator it = std::find(_playerData.canHirePet.begin(), _playerData.canHirePet.end(), id);
+        return it != _playerData.canHirePet.end();
+    }
+
+    bool Player::delCanHirePet( UInt32 id )
+    {
+        bool isDel = false;
+        std::vector<UInt32>::iterator it = _playerData.canHirePet.begin();
+        for(; it != _playerData.canHirePet.end(); ++ it)
+        {
+            if(*it == id)
+            {
+                _playerData.canHirePet.erase(it);
+                isDel = true;
+                break;
+            }
+        }
+        if(isDel)
+            writeCanHiretPet();
+        return isDel;
+    }
+
+	void Player::writeCanHiretPet()
+	{
+        std::string petStr = "";
+        UInt8 size = getCanHirePetNum();
+        for(UInt8 i = 0; i < size; ++ i)
+        {
+            petStr += Itoa(_playerData.canHirePet[i]);
+            if(i < size - 1)
+                petStr += ",";
+        }
+        DB1().PushUpdateData("UPDATE `player` SET `canHirePet` = '%s' WHERE id = %"I64_FMT"u", petStr.c_str(), getId());
+    }
+
+	bool Player::isFairyPetFull() const
+	{
+		size_t size = _fairyPets.size();
+        return size >= 6;
+	}
+
+    UInt32 Player::setFairypetBattle( UInt32 id )
+    {
+        FairyPet * pet = findFairyPet(id);
+        if(!pet) return 0;
+        if(_onBattlePet == pet) //表明取消出战
+        {
+            pet = NULL;
+            id = 0;
+        }
+        setFairypetBattle(pet);
+        return id;
+	}
+
+    void Player::setFairypetBattle(FairyPet * pet, bool writedb)
+    {
+        if(_onBattlePet == pet)
+            return;
+        if(_onBattlePet && writedb)
+        {
+            _onBattlePet->setOnBattle(false);
+            _onBattlePet->UpdateToDB();
+        }
+        if(pet && writedb)
+        {
+            pet->setOnBattle(true);
+            pet->UpdateToDB();
+        }
+        _onBattlePet = pet;
+    }
+
+    void Player::addFairyPet(FairyPet * pet, bool writedb, bool load )
+    {
+        if(!pet) return;
+        _fairyPets.insert(std::make_pair(pet->getId(), pet));
+
+        if(writedb)
+        {
+            pet->UpdateToDB();
+			UInt32 p = static_cast<UInt32>((pet->getPotential()+0.005) * 100);
+			UInt32 c = static_cast<UInt32>((pet->getCapacity()+0.05) * 100);
+			DB2().PushUpdateData("INSERT INTO `fighter` (`id`, `playerId`, `potential`, `capacity`, `level`, `experience`)\
+                    VALUES(%u, %"I64_FMT"u, %u.%02u, %u.%02u, %u, %u)",
+                    pet->getId(), getId(), p / 100, p % 100, c / 100, c % 100, pet->getLevel(), pet->getExp());
+
+        }
+    }
+
+    //招募仙宠
+	UInt8 Player::hireFairyPet( UInt32 id )
+    {
+		if(id > GREAT_FIGHTER_MAX)
+			return 1;
+        /*
+        if(!hasCanHirePet(id))
+            return 1;
+        */
+		if(findFairyPet(id) || hasFighter(id))
+			return 2;
+        if(isFairyPetFull())
+            return 3;
+		FairyPet * pet = static_cast<FairyPet *>(globalFighters[id]);
+		if(pet == NULL)
+			return 1;
+		FairyPet * pet2 = pet->clone(this);
+		addFairyPet(pet2, true);
+        delCanHirePet(id);
+        return 0;
+    }
+
+    //放生转化仙宠
+	UInt8 Player::convertFairyPet( UInt32 id, UInt8 isHas)
+    {
+        UInt8 color = 0;
+        if(isHas)
+        {
+            FairyPet * pet = findFairyPet(id);
+            if(pet == NULL)
+                return 1;
+            if(pet->isOnBattle() || pet == _onBattlePet)
+                return 2;
+            color = pet->getColor();
+            std::map<UInt32, FairyPet *>::iterator it = _fairyPets.find(id);
+            _fairyPets.erase(it);
+            pet->UpdateToDB(true);
+            delete pet;
+			DB2().PushUpdateData("DELETE FROM `fighter` WHERE `id` = %u AND `playerId` = %"I64_FMT"u", id, getId());
+        }
+        else
+        {
+            if(!hasCanHirePet(id))
+                return 1;
+            delCanHirePet(id);
+		    FairyPet * pet = static_cast<FairyPet *>(globalFighters[id]);
+            if(pet == NULL)
+                return 1;
+            color = pet->getColor();
+        }
+        Table values = GameAction()->getConvertPetValue(color);
+        UInt32 longYuan = values.get<UInt32>("longyuan");
+        UInt32 fengSui = values.get<UInt32>("fengsui");
+        UInt32 like = values.get<UInt32>("like");
+
+        AddVar(VAR_FAIRYPET_LONGYUAN, longYuan);
+        AddVar(VAR_FAIRYPET_FENGSUI, fengSui);
+        AddVar(VAR_FAIRYPET_LIKEABILITY, like);
+        return 0;
+    }
+
+	void Player::sendFairyPetList()
+    {
+        Stream st(REP::FAIRY_PET);
+        st << static_cast<UInt8>(0x03) << static_cast<UInt8>(0x01);
+        st << static_cast<UInt32>(_onBattlePet ? _onBattlePet->getId() : 0);
+        st << static_cast<UInt8>(_fairyPets.size());
+		std::map<UInt32, FairyPet *>::iterator it = _fairyPets.begin();
+		while(it != _fairyPets.end())
+        {
+            st << it->first;
+            st << it->second->getPetLev();
+            st << it->second->getPetBone();
+            ++ it;
+        }
+        st << Stream::eos;
+        send(st);
+    }
+
+    void Player::getFariyPetSpaceInfo()
+    {
+        UInt8 step = GetVar(VAR_FAIRYPET_STEP);
+        if(step < 1 || step > 5)
+            step = 1;
+        Stream st(REP::FAIRY_PET);
+        st << static_cast<UInt8>(0x02) << static_cast<UInt8>(0x01);
+        UInt8 size = getCanHirePetNum();
+        st << step << size;
+        for(UInt8 i = 0; i < size; ++ i)
+            st << _playerData.canHirePet[i];
+        st << Stream::eos;
+        send(st);
+    }
+
+    void Player::sendFairyPetResource()
+    {
+        Stream st(REP::FAIRY_PET);
+        st << static_cast<UInt8>(0x03) << static_cast<UInt8>(0x02);
+        st << GetVar(VAR_FAIRYPET_LONGYUAN);
+        st << GetVar(VAR_FAIRYPET_FENGSUI);
+        st << GetVar(VAR_FAIRYPET_XIANYUAN);
+        st << static_cast<UInt8>(GetVar(VAR_FAIRYPET_LIKEABILITY));
+        st << Stream::eos;
+        send(st);
+    }
+
+    //寻宠
+    void Player::seekFairyPet(UInt8 count, UInt8 isConvert)
+    {
+        if(count == 0) return;
+        /*
+        if(getCanHirePetNum())
+            return;
+        */
+        static UInt32 cost[] = {0xFFFFFFFF, 80, 120, 240, 600, 1800};
+        UInt32 xianYuan = GetVar(VAR_FAIRYPET_XIANYUAN);
+        UInt8 step = GetVar(VAR_FAIRYPET_STEP);
+        if(step < 1 || step > 5)
+            step = 1;
+        UInt32 longYuan = 0, fengSui = 0;
+        UInt32 greenId = 0, blueId = 0;
+        UInt8 like = 0;
+        UInt32 convert1 = 0, convert2 = 0;
+        std::string petStr = "";
+        Stream st(REP::FAIRY_PET);
+        st << static_cast<UInt8>(0x02) << static_cast<UInt8>(0x02);
+	    size_t pos = st.size();
+        UInt8 num = 0;
+        st << num;
+        for(UInt8 i = 0; i < count; ++ i)
+        {
+            if(xianYuan < cost[step])
+                break;
+            ++ num;
+            xianYuan -= cost[step];
+            Table values = GameAction()->onSeekFairypetAwardAndSucceed(step, isConvert);
+            longYuan += values.get<UInt32>("longyuan");
+            fengSui += values.get<UInt32>("fengsui");
+            like += values.get<UInt8>("like");
+            greenId = values.get<UInt32>("greenId");
+            if(greenId)
+            {
+                petStr += Itoa(greenId);
+                if(i < count - 1)
+                    petStr += ",";
+                if(!isConvert)
+                    PLAYER_DATA(this, canHirePet).push_back(greenId);
+            }
+            blueId = values.get<UInt32>("blueId");
+            if(blueId)
+            {
+                petStr += Itoa(blueId);
+                if(i < count - 1)
+                    petStr += ",";
+                if(!isConvert)
+                    PLAYER_DATA(this, canHirePet).push_back(blueId);
+            }
+            if(isConvert)   //是否放生仙宠
+            {
+                convert1 += values.get<UInt32>("convert1");
+                convert2 += values.get<UInt32>("convert2");
+            }
+            if(values.get<bool>("succeed"))
+                step = (step + 1) > 5 ? 1 : step + 1;
+            else
+                step = 1;
+            st << step;
+        }
+        if(num == 0)
+            return;
+        st << longYuan << fengSui << like;
+        st << xianYuan << isConvert;
+        st << petStr.c_str();
+		st.data<UInt8>(pos) = num;
+        st << Stream::eos;
+        send(st);
+        AddVar(VAR_FAIRYPET_LONGYUAN, longYuan + convert1);
+        AddVar(VAR_FAIRYPET_FENGSUI, fengSui + convert2);
+        AddVar(VAR_FAIRYPET_LIKEABILITY, like);
+        SetVar(VAR_FAIRYPET_STEP, step);
+        SetVar(VAR_FAIRYPET_XIANYUAN, xianYuan);
+        if(!isConvert && !petStr.empty())   //不放生仙宠
+            writeCanHiretPet();
+    }
+
 
 } // namespace GObject
 

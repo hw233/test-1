@@ -172,6 +172,7 @@ MSG_REG_2(GameMsgHdr, REQ::EXJOB, OnExJob);
 MSG_REG_2(GameMsgHdr, REQ::JOBHUNTER, OnJobHunter);
 MSG_REG_2(GameMsgHdr, REQ::AUTOJOBHUNTER, OnAutoJobHunter);
 MSG_REG_2(GameMsgHdr, REQ::DREAMER, OnDreamer);
+MSG_REG_2(GameMsgHdr, REQ::FAIRY_PET, OnFairyPet);
 
 MSG_REG_2(GameMsgHdr, REQ::EQ_LINGBAO, OnEquipLingbaoReq);
 
@@ -227,7 +228,7 @@ MSG_REG_2(GameMsgHdr, 0x276, OnAutoCopyAttack);
 MSG_REG_2(GameMsgHdr, 0x277, OnPlayerTimeTick);
 MSG_REG_2(GameMsgHdr, 0x278, OnAutoFrontMapAttack);
 
-MSG_REG_2(GameMsgHdr, 0x279, OnCancelAutoBattleNotifyReq);
+//MSG_REG_2(GameMsgHdr, 0x279, OnCancelAutoBattleNotifyReq);
 
 MSG_REG_2(GameMsgHdr, 0x280, OnCancelDungeonAutoNotifyReq);
 MSG_REG_2(GameMsgHdr, 0x281, OnCompleteDungeonAutoNotifyReq);

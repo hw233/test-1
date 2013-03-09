@@ -1,10 +1,10 @@
 --任务的接受条件
 function Task_Accept_00000053()
-	if GetPlayerData(6) ~= 1 then
+	if GetPlayerData(6) ~= 0 then
 		return false;
 	end
 	local player = GetPlayer();
-	if player:GetLev() < 35 then
+	if player:GetLev() < 500 then
 		return false;
 	end
 	local task =  player:GetTaskMgr();
@@ -24,10 +24,10 @@ end
 function Task_Can_Accept_00000053()
 	local player = GetPlayer();
 	local task =  player:GetTaskMgr();
-	if GetPlayerData(6) ~= 1 then
+	if GetPlayerData(6) ~= 0 then
 		return false;
 	end
-	if player:GetLev() < 35 then
+	if player:GetLev() < 500 then
 		return false;
 	end
 	if task:HasAcceptedTask(53) or task:HasCompletedTask(53) or task:HasSubmitedTask(53) then
@@ -62,20 +62,20 @@ function Task_00000053(npcId)
 		action.m_ActionID = 53
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = task_msg_000603;
+		action.m_ActionMsg = task_msg_002121;
 	elseif task:GetTaskSubmitNpc(53) == npcId then
 		if Task_Submit_00000053() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 53
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = task_msg_000604;
+			action.m_ActionMsg = task_msg_002122;
 		elseif task:HasAcceptedTask(53) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 53
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = task_msg_000605;
+			action.m_ActionMsg = task_msg_002123;
 		end
 	end
 	return action;
@@ -89,8 +89,8 @@ function Task_00000053_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = task_msg_000606;
-	action.m_ActionMsg = task_msg_000607;
+	action.m_NpcMsg = task_msg_002124;
+	action.m_ActionMsg = task_msg_002125;
 	return action;
 end
 
@@ -99,7 +99,7 @@ function Task_00000053_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = task_msg_000608;
+	action.m_NpcMsg = task_msg_002126;
 	action.m_ActionMsg = "";
 	return action;
 end

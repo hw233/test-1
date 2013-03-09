@@ -101,6 +101,7 @@ enum PurchaseType
     SnakeSprintAct              = 90, //蛇年春节活动
     DreamerConsume              = 91,
     NewYearGetDouble            = 92, //迎新纳福，补领双倍
+    BuyTownTjTrump              = 93, //购买天劫法宝
     //繁体私有占150～200
 };
 

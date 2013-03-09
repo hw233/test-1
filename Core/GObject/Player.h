@@ -24,6 +24,7 @@
 #include "StrengthenMgr.h"
 #include "JobHunter.h"
 #include "Dreamer.h"
+#include "FairyPet.h"
 
 
 namespace Battle
@@ -126,6 +127,7 @@ namespace GObject
 #define PLAYER_BUFF_ATHL7           0x57
 #define PLAYER_BUFF_ATHL8           0x58
 #define PLAYER_BUFF_ATHL9           0x59
+#define PLAYER_BUFF_QI_TIAN_CHU_MO  0x5B   //齐天除魔
 
 #define PLAYER_BUFF_DISPLAY_MAX		0x5F
 #define PLAYER_BUFF_COUNT			0x5F
@@ -164,6 +166,13 @@ namespace GObject
 #define PF_UNION 17
 #define PF_XY 171
 #define PF_XY_CH 10040
+
+    enum PEXP_HOOK_INFEX
+    {
+        ENUM_TRAINP1 = 1,  /** 初级经验加速符*1.2,加速(*1.3) **/
+        ENUM_TRAINP2,      /** 高级经验加速符*1.5,加速(*1.6);2.ENUM_TRAINP4:*1.5,加速(*1.5);3.ENUM_ADVANCED_HOOK:超值挂机加速符(100小时),*1.5,加速(*1.6) **/
+        ENUM_TRAINP3       /** 齐天经验加速符,*1.8,加速(*1.8) **/
+    };
 
 	class Map;
 	class Player;
@@ -222,6 +231,7 @@ namespace GObject
 		bool instantComplete();
 
 		void updateDB(bool);
+		UInt32 getFinalEnd() const { return _finalEnd; };
 
 	private:
 		float calcExpEach(UInt32);
@@ -587,6 +597,7 @@ namespace GObject
         bool isHHBlue;
         std::string nameNoSuffix;     //(合服)不带后缀的用户名
         std::map<UInt8, UInt32> titleAll;      //玩家所有的称号id
+        std::vector<UInt32> canHirePet;     //玩家未招募的仙宠
     };
 
 	class Player:
@@ -930,7 +941,7 @@ namespace GObject
 		void setBuffData(UInt8, UInt32, bool = true);
 		void addBuffData(UInt8, UInt32);
 		void testBattlePunish();
-
+        void sendExpHook(UInt8 id, UInt32 data);
 
         UInt32 GetVar(UInt32 id);
         Int32 GetVarS(Int32 id);
@@ -1212,11 +1223,11 @@ namespace GObject
         inline bool isAutoCopyFailed() { return m_autoCopyFailed; }
         inline void resetAutoCopyFailed() { m_autoCopyFailed = false; }
         inline void setCopyFailed() { m_autoCopyFailed = true; }
-		bool autoBattle(UInt32);
+		bool autoBattle(UInt32, UInt8);
 		void pushAutoBattle(UInt32, UInt16, UInt16);
         //void advancedHookExp();
 		void pushAutoDungeon(UInt32, UInt32, UInt8);
-		void cancelAutoBattle();
+		void cancelAutoBattle(bool needNotify = true);
 		void cancelAutoBattleNotify();
 		void instantAutoBattle();
 		void cancelAutoDungeon();
@@ -1278,6 +1289,14 @@ namespace GObject
         void getYearRPPackage();
         void getYearRPReward();
         /////
+        //帮派qq群
+        UInt8 toQQGroup(bool isJoin);
+        bool isInQQGroup() {return _inQQGroup;}
+        void setInQQGroup (bool v) {_inQQGroup = v;}
+        //捕鱼大亨用户
+        void sendFishUserInfo();
+        void getFishUserPackage();
+        void getFishUserAward();
 	public:
 		UInt16   GetFreePackageSize();
 		bool     ExtendPackageSize();
@@ -1620,6 +1639,7 @@ namespace GObject
 #endif
 
         UInt64 _invitedBy;
+        bool _inQQGroup;
     public:
         void setInvitedBy(UInt64 id, bool writedb = true);
         inline UInt64 getInvitedBy() { return _invitedBy; }
@@ -1729,8 +1749,6 @@ namespace GObject
         inline void pendWorldBossHp(UInt32 hp) { _worldBossHp += hp; }
         inline void resetWorldBossHp() { _worldBossHp = 0; }
         inline UInt32 getWorldBossHp() const { return _worldBossHp; }
-
-    public:
 
     public:
         void payPractice(UInt8 place, UInt16 slot, UInt8 type, UInt8 priceType, UInt8 time, UInt8 prot);
@@ -2118,6 +2136,9 @@ namespace GObject
         void sendSnakeSpringEquipMail(); 
 
         void getNewYearGiveGiftAward(UInt8 dayOrder, UInt8 result);
+        
+        void buyTownTjItem(const UInt32 itemId);
+        void sendTownTjItemInfo();
     private:
         UInt8 cf_posPut[5];//范围1-5
         UInt32 cf_itemId[5];
@@ -2138,6 +2159,31 @@ namespace GObject
         void getNewYearQzoneContinueAward(UInt8 type);
         void sendNewYearQzoneContinueAct();
         void calcNewYearQzoneContinueDay(UInt32 time);
+        void transferExpBuffer2Var();
+
+        inline bool relateExpHook(UInt8 id) { return id == PLAYER_BUFF_TRAINP1 || id == PLAYER_BUFF_TRAINP2 || id == PLAYER_BUFF_TRAINP3/* || id == PLAYER_BUFF_TRAINP4 || id == PLAYER_BUFF_ADVANCED_HOOK*/; }
+
+    private:    //仙宠
+		std::map<UInt32, FairyPet *> _fairyPets;
+        FairyPet * _onBattlePet;
+    public:
+        FairyPet * getBattlePet() { return _onBattlePet; }
+        UInt8 getCanHirePetNum() { return _playerData.canHirePet.size();}
+	    FairyPet * findFairyPet(UInt32);
+        bool hasCanHirePet(UInt32);
+        bool delCanHirePet(UInt32);
+        void writeCanHiretPet();
+	    bool isFairyPetFull() const;
+        UInt32 setFairypetBattle(UInt32);
+        void setFairypetBattle(FairyPet *, bool = true);
+	    UInt8 hireFairyPet(UInt32);
+	    UInt8 convertFairyPet(UInt32, UInt8);
+	    void sendFairyPetList();
+        void sendFairyPetResource();
+        void addFairyPet(FairyPet *, bool = true, bool = false);
+        void seekFairyPet(UInt8, UInt8);
+        void getFariyPetSpaceInfo();
+
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

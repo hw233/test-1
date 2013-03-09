@@ -502,8 +502,34 @@ struct DBDreamer
     std::string typeCount;
 };
 
-}
+struct DBPinJie
+{
+    UInt16 id;
+    std::string name;
+    UInt32 consume;
+    UInt16 prob;
+};
 
+struct DBGenGu
+{
+    UInt16 id;
+    std::string name;
+    UInt8 limit;
+    UInt16 baseProb;
+    UInt8 failBack;
+    UInt32 consume1;
+    UInt32 consume2;
+    float growRate;
+};
+
+struct DBLingYa
+{
+    UInt32 id;
+    UInt8 color;
+    UInt8 lingya;
+};
+
+}
 
 namespace DB {
 
@@ -1080,6 +1106,39 @@ SPECIALDEF(7)
     UInt8, gridCount,
     UInt8, timeConsume,
     std::string, typeCount
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBPinJie)
+SPECIALDEF(4)
+	(
+    UInt16, id,
+    std::string, name,
+    UInt32, consume,
+    UInt16, prob
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBGenGu)
+SPECIALDEF(8)
+	(
+    UInt16, id,
+    std::string, name,
+    UInt8, limit,
+    UInt16, baseProb,
+    UInt8, failBack,
+    UInt32, consume1,
+    UInt32, consume2,
+    float, growRate
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBLingYa)
+SPECIALDEF(3)
+	(
+    UInt32, id,
+    UInt8, color,
+    UInt8, lingya
 	)
 SPECIALEND()
 

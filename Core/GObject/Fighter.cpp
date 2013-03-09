@@ -1250,7 +1250,8 @@ UInt32 Fighter::getMaxHP()
 void Fighter::setPotential( float p, bool writedb )
 {
 	_potential = p;
-	_color = getColor2(p);
+    if(!isPet())
+	    _color = getColor2(p);
 	if(_owner != NULL)
 	{
 		if(writedb)
@@ -4043,36 +4044,36 @@ void Fighter::sendMaxSoul()
 
 void Fighter::setAttrType1(UInt8 t)
 {
-    _attrType1 = t;
+    _attrType1 = isPet() ? 0 : t;
 }
 
 void Fighter::setAttrValue1(UInt16 v)
 {
-    _attrValue1 = v;
+    _attrValue1 = isPet() ? 0 : v;
 }
 
 void Fighter::setAttrType2(UInt8 t, bool force)
 {
     if ((_potential + 0.005f >= 1.2f) || force)
-        _attrType2 = t;
+        _attrType2 = isPet() ? 0 : t;
 }
 
 void Fighter::setAttrValue2(UInt16 v, bool force)
 {
     if ((_potential + 0.005f >= 1.2f) || force)
-        _attrValue2 = v;
+        _attrValue2 = isPet() ? 0 : v;
 }
 
 void Fighter::setAttrType3(UInt8 t, bool force)
 {
     if ((_potential + 0.005f >= 1.5f && _capacity >= 7.0) || force)
-        _attrType3 = t;
+        _attrType3 = isPet() ? 0 : t;
 }
 
 void Fighter::setAttrValue3(UInt16 v, bool force)
 {
     if ((_potential + 0.005f >= 1.5f && _capacity >= 7.0) || force)
-        _attrValue3 = v;
+        _attrValue3 = isPet() ? 0 : v;
 }
 
 UInt8 Fighter::getAttrType1(bool notify)
@@ -4182,8 +4183,8 @@ UInt8 Fighter::forge(UInt8 which, UInt8 lock, bool initmain)
                 if (!value)
                     return 1;
 
-                _attrType2 = type;
-                _attrValue2 = value; // XXX: /10000
+                _attrType2 = isPet() ? 0 : type;
+                _attrValue2 = isPet() ? 0 : value; // XXX: /10000
 
                 return 0;
             }
@@ -4204,8 +4205,8 @@ UInt8 Fighter::forge(UInt8 which, UInt8 lock, bool initmain)
                 if (!value)
                     return 1;
 
-                _attrType3 = type;
-                _attrValue3 = value; // XXX: /10000
+                _attrType3 = isPet() ? 0 : type;
+                _attrValue3 = isPet() ? 0 : value; // XXX: /10000
 
                 return 0;
             }

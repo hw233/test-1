@@ -62,6 +62,9 @@ namespace GData
         static bool LoadSkillStrengthenExp();
         static bool LoadSkillStrengthenProb();
         static bool LoadDreamer();
+        static bool LoadPetPinJie();
+        static bool LoadPetGenGu();
+        static bool LoadPetLingYa();
 
         static void clearUdpItem();
         static void addUdpItem(UInt32 id);

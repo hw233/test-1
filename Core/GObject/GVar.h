@@ -57,6 +57,8 @@ namespace GObject
         GVAR_DRAGONKING_BEGIN = 27, //大闹龙宫活动开始时间
         GVAR_DRAGONKING_END = 28, //大闹龙宫活动结束时间
 
+        GVAR_EXP_HOOK_NEW = 29, //挂机经验从旧方案向新方案转变
+
         GVAR_MAX,
     };
 
@@ -103,6 +105,8 @@ namespace GObject
             GREGISTER_VAR(GVAR_HEROMEM_CUT, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_DRAGONKING_BEGIN, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_DRAGONKING_END, GCYCLE_NONE);
+
+            GREGISTER_VAR(GVAR_EXP_HOOK_NEW, GCYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

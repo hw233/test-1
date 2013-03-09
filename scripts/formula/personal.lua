@@ -3,27 +3,27 @@
 
 -- 属性成长不分主副将
 --           儒    释     道     墨
-str_factor = {4,   5,     7,     8}  -- 力量
-phy_factor = {8,   9,     10,    8}  -- 耐力
-agi_factor = {5,   4,     7,     6}  -- 敏捷
-int_factor = {8,   7,     4,     4}  -- 智力
-wil_factor = {5,   9,     5,     4}  -- 意志
+str_factor = {4,   5,     7,     8,0,0,0,0}  -- 力量
+phy_factor = {8,   9,     10,    8,0,0,0,0}  -- 耐力
+agi_factor = {5,   4,     7,     6,0,0,0,0}  -- 敏捷
+int_factor = {8,   7,     4,     4,0,0,0,0}  -- 智力
+wil_factor = {5,   9,     5,     4,0,0,0,0}  -- 意志
 
-hp_factor     = { 0,   0,   0, 0}  -- 生命
-atk_factor    = { 0,   0,   0, 0}  -- 物功
-def_factor    = { 0,   0,   0, 0}  -- 物防
-magatk_factor = { 0,   0,   0, 0}  -- 法功
-magdef_factor = { 0,   0,   0, 0}  -- 法防
+hp_factor     = { 0,   0,   0, 0,100,100,150,150}  -- 生命
+atk_factor    = { 0,   0,   0, 0,15,30,12,20}  -- 物功
+def_factor    = { 0,   0,   0, 0,30,15,20,12}  -- 物防
+magatk_factor = { 0,   0,   0, 0,5,5,6,30}  -- 法功
+magdef_factor = { 0,   0,   0, 0,5,5,30,6}  -- 法防
 
-tough_factor       = { 0,  0,  0, 0}  -- 坚韧
-action_factor      = {11, 12, 10, 12}  -- 身法
-hitrate_factor     = { 1,  1,  1, 1}  -- 命中
-evade_factor       = { 0,  0,  0, 0}  -- 闪避
-critical_factor    = { 0,  0,  0, 0}  -- 暴击
-criticaldmg_factor = { 0,  0,  0, 0}  -- 暴击伤害
-pierce_factor      = { 0,  0,  0, 0}  -- 破击
-counter_factor     = { 0,  0,  0, 0}  -- 反击
-magres_factor      = { 0,  0,  0, 0}  -- 法术抵抗
+tough_factor       = { 0,  0,  0, 0,0,0,0,0}  -- 坚韧
+action_factor      = {11, 12, 10, 12,0,0,0,0}  -- 身法
+hitrate_factor     = { 1,  1,  1, 1,0,0,0,0}  -- 命中
+evade_factor       = { 0,  0,  0, 0,0,0,0,0}  -- 闪避
+critical_factor    = { 0,  0,  0, 0,0,0,0,0}  -- 暴击
+criticaldmg_factor = { 0,  0,  0, 0,0,0,0,0}  -- 暴击伤害
+pierce_factor      = { 0,  0,  0, 0,0,0,0,0}  -- 破击
+counter_factor     = { 0,  0,  0, 0,0,0,0,0}  -- 反击
+magres_factor      = { 0,  0,  0, 0,0,0,0,0}  -- 法术抵抗
 
 str_atk_factor = 1.0            -- 力量影响的物理攻击系数
 int_atk_factor = 1.0            -- 智力影响的法术攻击系数
