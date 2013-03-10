@@ -154,7 +154,11 @@ namespace GObject
             if(tmp > 0)
             {
                 exp *= 1.2f;
-                m_Player->SetVar(VAR_TRAINP1, tmp - 1);
+                if(tmp > 60)
+                    tmp -= 60;
+                else
+                    tmp = 0;
+                m_Player->SetVar(VAR_TRAINP1, tmp);
             }
         }
         else if(curHookIndex == ENUM_TRAINP2)
@@ -163,7 +167,11 @@ namespace GObject
             if(tmp > 0)
             {
                 exp *= 1.5f;
-                m_Player->SetVar(VAR_TRAINP2, tmp - 1);
+                if(tmp > 60)
+                    tmp -= 60;
+                else
+                    tmp = 0;
+                m_Player->SetVar(VAR_TRAINP2, tmp);
             }
         }
         else if(curHookIndex == ENUM_TRAINP3)
@@ -172,7 +180,11 @@ namespace GObject
             if(tmp > 0)
             {
                 exp *= 1.8f;
-                m_Player->SetVar(VAR_TRAINP3, tmp - 1);
+                if(tmp > 60)
+                    tmp -= 60;
+                else
+                    tmp = 0;
+                m_Player->SetVar(VAR_TRAINP3, tmp);
             }
         }
 #if 0
@@ -17423,7 +17435,7 @@ void Player::transferExpBuffer2Var()
     }
     if(total > 0)
     {
-        SetVar(VAR_TRAINP3, 0);
+        SetVar(VAR_TRAINP3, total);
         SetVar(VAR_EXP_HOOK_INDEX, ENUM_TRAINP3);
     }
 }
