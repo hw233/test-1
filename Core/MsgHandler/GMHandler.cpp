@@ -3729,6 +3729,7 @@ void GMHandler::OnFairyPetGM(GObject::Player *player, std::vector<std::string>& 
             player->sendFairyPetResource();
             break;
         case 3:
+            player->setFairypetBattle(val);
             break;
     }
 }

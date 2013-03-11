@@ -188,6 +188,7 @@ private:
         e_stHitRate,
         e_stAtkReduce,
         e_stMagAtkReduce,
+        e_stReiastu = 100,
         MAX_STATUS,
     };
 
@@ -548,6 +549,7 @@ private:
     float   _maxCSFactor[2]; //暴击比例
     UInt32  _attackRound; //攻击回合
     bool  _firstPLDmg[2]; //第一回合打出无双技能
+    UInt8   _getDamageSkillCount[2]; // 每回合受伤触发技能的最大数目
     /*
     bool    _evade3OK[2]; //达成次数
     bool    _evade9ok[2]; //达成次数
@@ -569,6 +571,7 @@ private:
     std::vector<StatusChange> _scList;
     void appendDefStatus(StateType type, UInt32 value, BattleFighter* bf, DamageType damageType = e_damageNone);
     void appendStatusChange(StatusType type, UInt32 value, UInt16 skillId, BattleFighter* bf);
+    void appendReiatsuChange(int side);
 
 private:
     GData::LBSkillItem* GetActionCondSkillItem2(BattleFighter* bf, BattleFighter* bo);

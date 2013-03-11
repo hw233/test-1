@@ -1648,7 +1648,7 @@ void OnFighterDismissReq( GameMsgHdr& hdr, FighterDismissReq& fdr )
 
     UInt64 exp = 0;
 
-    if(fgt->getClass() == 4)
+    if(fgt->getClass() == e_cls_mo)
     {
         exp = fgt->getExp() > GData::expTable.getLevelMin(70) ? fgt->getExp() - GData::expTable.getLevelMin(70) : 0;
         exp /= 2;

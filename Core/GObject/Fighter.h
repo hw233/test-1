@@ -150,9 +150,9 @@ public:
     //Fighter(const Fighter& fighter);
 	~Fighter();
 
-	Fighter * clone(Player * owner);
-	Fighter * cloneWithEquip(Player * owner);
-    Fighter * cloneWithOutDirty(Player * player);
+	virtual Fighter * clone(Player * owner);
+	virtual Fighter * cloneWithEquip(Player * owner);
+    virtual Fighter * cloneWithOutDirty(Player * player);
 
 	inline UInt32 getId() { return _id; }
 	inline Player * getOwner() { return _owner; }

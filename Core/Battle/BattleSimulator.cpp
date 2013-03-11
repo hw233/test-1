@@ -344,6 +344,7 @@ void  BattleSimulator::InitAttainRecord()
 
          _attackRound = 0;
          _firstPLDmg[0] = false;
+         _getDamageSkillCount[i] = 0;
        /* _skillDmg300[i] = false;
         _skillDmg1k[i] = false;
         _skillDmg5k[i] = false;
@@ -573,6 +574,8 @@ void BattleSimulator::start(UInt8 prevWin, bool checkEnh)
 #endif
         act_count += tryPetEnter(0, e_reiatsu_round);
         act_count += tryPetEnter(1, e_reiatsu_round);
+        _getDamageSkillCount[0] = 0;
+        _getDamageSkillCount[1] = 0;
     }
     if(_winner == 0)
         _winner = testWinner2();
@@ -1234,8 +1237,6 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                 float def;
                 float magdef;
                 float toughFactor = pr2 ? area_target->getTough(bf) : 1.0f;
-                UInt32 dmg = 0;
-                UInt32 magdmg = 0;
 
                 if (bf->getSide() != area_target->getSide())
                     tryAttackWithPet(bf, atk, magatk, factor);
@@ -3524,8 +3525,8 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 }
             }
         }
-        //仙宠、十字攻击，两次伤害则混乱（先选取主目标横排攻击，再选取剩下的主目标纵排攻击）
-        else if(SKILL_ID(skill->getId()) == 27)
+        //仙宠、十字攻击，两次伤害则混乱（先选取主目标横排攻击，再选取剩下的主目标纵排攻击）(火龙地狱)
+        else if(SKILL_ID(skill->getId()) == 53)
         {
             AtkList atklist;
             getAtkList(bf, skill, atklist);
@@ -3564,7 +3565,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             }
 
         }
-        //仙宠、两次单体攻击，两次伤害则眩晕
+        //仙宠、两次单体攻击，两次伤害则眩晕 (天崩地裂)
         else if(SKILL_ID(skill->getId()) == 44)
         {
             UInt32 dmg1 = 0;
@@ -10709,6 +10710,9 @@ void BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u)
         while(NULL != (passiveSkill = bf->getPassiveSkillOnGetDmg()))
         {
             // XXX: 写死给自己上技能
+            if (_getDamageSkillCount[bf->getSide()] >= 3)
+                break;
+            ++_getDamageSkillCount[bf->getSide()];
             int target_side, target_pos, cnt;
             getSkillTarget(bf, passiveSkill, target_side, target_pos, cnt);
             doSkillAttack(bf, passiveSkill, target_side, target_pos, cnt, NULL);
@@ -10809,6 +10813,8 @@ UInt32 BattleSimulator::tryPetEnter(UInt8 side, UInt8 reiatsuType)
         default:
             break;
     }
+
+    appendReiatsuChange(side);
     if (addReiatsu(side, val))
     {
         return doPetEnter(side);
@@ -10866,6 +10872,8 @@ UInt32 BattleSimulator::doPetEnter(UInt8 side)
     if(rcnt != 0)
         appendToPacket(0, -1, -1, 0, 0, false, false);
 
+    appendDefStatus(e_Summon, bf->getId(), bf);
+    appendToPacket(bf->getSide(), bf->getPos(), bf->getPos(), 5, 0, false, false);
     return rcnt;
 }
 
@@ -11079,6 +11087,12 @@ bool BattleSimulator::attackWithPet(BattleFighter* bf, BattleFighter* pet, float
     magAtk += pet->getMagAttack() * bf->getPetAtk100();
 
     return true;
+}
+
+void BattleSimulator::appendReiatsuChange(int side)
+{
+    if (_backupObjs[side])
+        appendStatusChange(e_stReiastu, getReiatsu(side) ,0 , static_cast<BattleFighter*>(_backupObjs[side]));
 }
 
 }

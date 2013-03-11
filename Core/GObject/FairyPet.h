@@ -28,7 +28,7 @@ public:
     void LoadFromDB(DBFairyPetData&);
     void UpdateToDB(bool = false);
     bool checkTimeOver();
-    FairyPet * clone(Player *);
+    virtual FairyPet * clone(Player *);
     inline bool isOnBattle() { return _onBattle; }
     inline void setOnBattle(bool flag) { _onBattle = flag; }
     void upgradeLev();
@@ -40,7 +40,23 @@ public:
     inline UInt8 getPetLev() { return _petLev; }
     inline UInt8 getPetBone() { return _petBone; }
     inline UInt8 getPetLingya() { return _lingya; }
+
     inline void setPetLingya(UInt8 ly) { _lingya = ly; }
+    inline UInt8 getTargetPos()
+    {
+        switch (getClass())
+        {
+            case e_cls_qinglong:
+                return 24;
+            case e_cls_xuanwu:
+                return 4;
+            case e_cls_zhuque:
+                return 0;
+            case e_cls_baihu:
+                return 20;
+        }
+        return 0;
+    }
 private:
     inline UInt8 getChongNum() { return _chong; }
     inline UInt16 getPinjieBless() { return _pinjieBless; }

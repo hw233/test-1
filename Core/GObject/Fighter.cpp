@@ -2913,7 +2913,7 @@ void Fighter::setSkills( std::string& skills, bool writedb )
     }
 
     bool up = false;
-    if (_id >= 999)
+    if (_id >= 999 || isPet())
         up = true;
 
     const GData::SkillBase* s  = 0;

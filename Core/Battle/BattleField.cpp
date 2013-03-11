@@ -1,6 +1,7 @@
 #include "Config.h"
 #include "GObject/Country.h"
 #include "BattleField.h"
+#include "GObject/FairyPet.h"
 
 namespace Battle
 {
@@ -86,11 +87,11 @@ void BattleField::setPetObject( int side, BattleObject * obj, UInt8 isBody)
     if(!isBody && obj->getClass() == BattleObject::Char)
     {
         BattleFighter * bfgt = static_cast<BattleFighter *> (obj);
-        GObject::Fighter * fgt = bfgt->getFighter();
-        if (fgt->getClass() >= GObject::e_cls_pet_lingchong && fgt->getClass() <= GObject::e_cls_pet_zunzhe)
+        GObject::FairyPet * fgt = static_cast<GObject::FairyPet *>(bfgt->getFighter());
+        if (fgt->getClass() >= GObject::e_cls_qinglong && fgt->getClass() <= GObject::e_cls_xuanwu)
         {
             // 出场所需的灵压
-            _toggleReiatsu[side] = fgt->getToggleReiatsu();
+            _toggleReiatsu[side] = fgt->getPetLingya();
             _backupTargetPos[side] = fgt->getTargetPos();
         }
     }
@@ -117,6 +118,9 @@ bool BattleField::addReiatsu(int side, int value)
         _reiatsu[side] = _toggleReiatsu[side];
     else
         _reiatsu[side] += value;
+#ifdef _DEBUG
+    printf ("addValue = %d, reiastu[%d] = %d, maxReiastu[%d] = %d\n", value, side, _reiatsu[side], side, _toggleReiatsu[side]);
+#endif
     return _reiatsu[side] >= _toggleReiatsu[side] ? true:false;
 }
 
@@ -124,6 +128,9 @@ int BattleField::getReiatsu(int side)
 {
     if (side < 0 || side >= 2)
         return 0;
+#ifdef _DEBUG
+    printf ("reiastu[%d] = %d, maxReiastu[%d] = %d\n", side, _reiatsu[side], side, _toggleReiatsu[side]);
+#endif
     return _reiatsu[side];
 }
 
