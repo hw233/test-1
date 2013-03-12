@@ -5952,7 +5952,6 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
 	MSG_QUERY_PLAYER(player);
     BinaryReader brd(data, hdr.msgHdr.bodyLen);
 
-
     UInt8 type = 0;
     UInt8 opt = 0;
     brd >> type >> opt;
@@ -6032,10 +6031,8 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
                         break;
                     case 0x05:
                         {
-                            /*
                             if(player->getCanHirePetNum())
                                 return;
-                            */
                             UInt32 petId = GameAction()->exchangPurplePet(player);
                             Stream st(REP::FAIRY_PET);
                             st << type << opt << petId;

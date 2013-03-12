@@ -17723,7 +17723,7 @@ UInt8 Player::toQQGroup(bool isJoin)
         _onBattlePet = pet;
     }
 
-    void Player::addFairyPet(FairyPet * pet, bool writedb, bool load )
+    void Player::addFairyPet(FairyPet * pet, bool writedb)
     {
         if(!pet) return;
         _fairyPets.insert(std::make_pair(pet->getId(), pet));
@@ -17736,7 +17736,7 @@ UInt8 Player::toQQGroup(bool isJoin)
 			DB2().PushUpdateData("INSERT INTO `fighter` (`id`, `playerId`, `potential`, `capacity`, `level`, `experience`)\
                     VALUES(%u, %"I64_FMT"u, %u.%02u, %u.%02u, %u, %u)",
                     pet->getId(), getId(), p / 100, p % 100, c / 100, c % 100, pet->getLevel(), pet->getExp());
-
+            pet->updateToDBPetSkill();
         }
     }
 
@@ -17776,8 +17776,8 @@ UInt8 Player::toQQGroup(bool isJoin)
             color = pet->getColor();
             std::map<UInt32, FairyPet *>::iterator it = _fairyPets.find(id);
             _fairyPets.erase(it);
-            pet->UpdateToDB(true);
             delete pet;
+            DB2().PushUpdateData("DELETE FROM `fairyPet` WHERE id = %u AND `playerId` = %"I64_FMT"u", id, getId());
 			DB2().PushUpdateData("DELETE FROM `fighter` WHERE `id` = %u AND `playerId` = %"I64_FMT"u", id, getId());
         }
         else
@@ -17850,10 +17850,8 @@ UInt8 Player::toQQGroup(bool isJoin)
     void Player::seekFairyPet(UInt8 count, UInt8 isConvert)
     {
         if(count == 0) return;
-        /*
         if(getCanHirePetNum())
             return;
-        */
         static UInt32 cost[] = {0xFFFFFFFF, 80, 120, 240, 600, 1800};
         UInt32 xianYuan = GetVar(VAR_FAIRYPET_XIANYUAN);
         UInt8 step = GetVar(VAR_FAIRYPET_STEP);

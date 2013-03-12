@@ -4,6 +4,8 @@ CREATE TABLE `pet_pinjie` (
     `name` varchar(255) NOT NULL DEFAULT '',
     `consume` int(10) unsigned NOT NULL DEFAULT 0,
     `prob` int(10) unsigned NOT NULL DEFAULT 0,
+    `skillLev` varchar(255) NOT NULL DEFAULT '',
+    `bless` varchar(255) NOT NULL DEFAULT '',
     PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
@@ -25,6 +27,8 @@ CREATE TABLE `pet_pressure` (
     `id` int(10) unsigned NOT NULL DEFAULT 0,
     `color` tinyint(3) unsigned NOT NULL DEFAULT 0,
     `lingya` tinyint(3) unsigned NOT NULL DEFAULT 0,
+    `initBone` smallint(6) unsigned NOT NULL DEFAULT 0,
+    `finalBone` smallint(6) unsigned NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 

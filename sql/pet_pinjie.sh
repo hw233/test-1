@@ -22,7 +22,7 @@ function pet_pinjie()
         BEGIN {
             print "INSERT INTO `pet_pinjie` VALUES";
         } {
-            printf("(%d,\x27%s\x27,%d,%d)",$1,$2,$3,$4);
+            printf("(%d,\x27%s\x27,%d,%d,\x27%s\x27,\x27%s\x27)",$1,$2,$3,$4,$5,$6);
             if (NR <= ENVIRON["lines"]-1)
                 printf(",");
             else if (NR >= ENVIRON["lines"])

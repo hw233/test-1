@@ -1,4 +1,5 @@
 #include "FairyPetTable.h"
+#include "Common/StringTokenizer.h"
 
 
 namespace GData
@@ -6,8 +7,30 @@ namespace GData
 
 Pet pet;
 
-void Pet::setLevTable(Pet::PinjieData& pd)
+void Pet::setLevTable(DBPinJie& dbpj)
 {
+    PinjieData pd;
+    StringTokenizer tk(dbpj.bless, "|");
+    UInt8 cnt = tk.count();
+    for(UInt8 idx = 0; idx < cnt; ++idx)
+    {
+        stBless stb;
+        StringTokenizer ntk(tk[idx].c_str(), ",");
+        stb.times = atoi(ntk[0].c_str());
+        stb.prob = atoi(ntk[1].c_str());
+        pd.bless.push_back(stb);
+    }
+    StringTokenizer tk1(dbpj.skillLev, ",");
+    cnt = tk1.count();
+    for(UInt8 idx = 0; idx < cnt && idx < 4; ++idx)
+    {
+        pd.skillLev[idx] = atoi(tk1[idx].c_str());
+    }
+    pd.lev = dbpj.id;
+    pd.name = dbpj.name;
+    pd.consume = dbpj.consume;
+    pd.prob = dbpj.prob;
+
     _levData.insert(std::make_pair(pd.lev, pd));
 }
 
@@ -45,4 +68,19 @@ Pet::LingyaData * Pet::getLingyaTable(UInt32 id)
     return NULL;
 }
 
+UInt16 Pet::getPinjieBless(UInt16 id, UInt16 v)
+{
+    PinjieData * pjd = getLevTable(id);
+    if(!pjd)
+        return 0;
+    UInt8 size = pjd->bless.size();
+    if(!size)
+        return 0;
+    for(UInt8 i = size - 1; i >= 0; -- i)
+    {
+        if(pjd->bless[i].times <= v)
+            return pjd->bless[i].prob;
+    }
+    return 0;
+}
 }

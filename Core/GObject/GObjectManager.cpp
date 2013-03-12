@@ -714,9 +714,11 @@ namespace GObject
 			fgt->magres = dbfgt.magres;
             GData::Pet::LingyaData * lyd = GData::pet.getLingyaTable(id);
             if(lyd != NULL)
-            {
+            {   //仙宠
                 fgt->setColor(lyd->color);
                 static_cast<FairyPet *>(fgt)->setPetLingya(lyd->lingya);
+                static_cast<FairyPet *>(fgt)->setPetBone(lyd->initBone);
+                static_cast<FairyPet *>(fgt)->LoadInitSkills(dbfgt.skill);
             }
 
 			StringTokenizer tokenizer(dbfgt.extraPos, "|");
@@ -1972,7 +1974,7 @@ namespace GObject
             fgt2->setAttrValue3(specfgtobj.attrValue3);
             fgt2->setHideFashion(specfgtobj.hideFashion,false);
             if(fgt2->isPet())
-                pl->addFairyPet(static_cast<FairyPet *>(fgt2), false, true);
+                pl->addFairyPet(static_cast<FairyPet *>(fgt2), false);
             else
 			    pl->addFighter(fgt2, false, true);
             if (specfgtobj.level > lvl_max)

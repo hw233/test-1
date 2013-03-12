@@ -2,6 +2,8 @@
 #define  _FAIRYPET_H
 
 
+#define INIT_SKILL_UPMAX 4
+
 class Stream;
 namespace GObject
 {
@@ -17,18 +19,20 @@ private:
     UInt16 _petBone;     //根骨的阶段 (每阶段分为0:下品、1:中品、2:上品)
     bool _onBattle;   // 出战
     UInt16 _chong;   //根骨升级的重数
-    UInt16 _pinjieBless;    //品阶升级失败时获得祝福值
+    UInt16 _pinjieBless;    //品阶升级失败的次数
     UInt32 _genguBless;     //突破时大小周天增加的祝福值
     UInt8 _lingya;      //仙宠灵压
     UInt32 _overTime;
     UInt16 _xiaozhou;
     UInt16 _dazhou;
+    UInt16 _initskl[INIT_SKILL_UPMAX];
 public:
     FairyPet(UInt32, Player *);
     void LoadFromDB(DBFairyPetData&);
-    void UpdateToDB(bool = false);
+    void LoadInitSkills(std::string&);
+    void UpdateToDB();
     bool checkTimeOver();
-    FairyPet * clone(Player *);
+    virtual FairyPet * clone(Player *);
     inline bool isOnBattle() { return _onBattle; }
     inline void setOnBattle(bool flag) { _onBattle = flag; }
     void upgradeLev();
@@ -37,22 +41,24 @@ public:
     void useZhoutian(UInt8);
     void sendPinjieInfo();
     void sendGenguInfo();
+    inline void setPetBone(UInt16 v) { _petBone = v; }
     inline UInt8 getPetLev() { return _petLev; }
     inline UInt8 getPetBone() { return _petBone; }
     inline UInt8 getPetLingya() { return _lingya; }
     inline void setPetLingya(UInt8 ly) { _lingya = ly; }
 private:
     inline UInt8 getChongNum() { return _chong; }
-    inline UInt16 getPinjieBless() { return _pinjieBless; }
     inline UInt32 getGenguBless() { return _genguBless; }
     inline UInt16 getXiaozhou() { return _xiaozhou; }
     inline UInt16 getDazhou() { return _dazhou; }
+    UInt16 getPinjieBless();
     void addChongNum(int);
     void addGenguBless(int);
-    void addPinjieBless(int);
+    void addPinjieBless(UInt16);
     inline void setXiaozhou(UInt16 v) { _xiaozhou = v; }
     inline void setDazhou(UInt16 v) { _dazhou = v; }
     void boneUp();
+    void levUp();
     bool canLevUp();
     bool canBoneUp();
     void reset(UInt8 type);

@@ -22,7 +22,7 @@ function pet_pressure()
         BEGIN {
             print "INSERT INTO `pet_pressure` VALUES";
         } {
-            printf("(%d,%d,%d)",$1,$2,$3);
+            printf("(%d,%d,%d,%d,%d)",$1,$2,$3,$4,$5);
             if (NR <= ENVIRON["lines"]-1)
                 printf(",");
             else if (NR >= ENVIRON["lines"])

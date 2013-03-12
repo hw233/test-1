@@ -83,8 +83,8 @@ function onSeekFairypetAwardAndSucceed(step, isConvert)
         [1] = 0,
         [2] = 1667,
         [3] = 417,
-        [4] = {167, 1001},
-        [5] = 334,
+        [4] = {1000, 1834},
+        [5] = 3000,
     }
     local result =  --返回结果
     {
@@ -114,14 +114,14 @@ function onSeekFairypetAwardAndSucceed(step, isConvert)
         result.blueId = bluePet[math.random(1, #bluePet)]
         if isConvert > 0 then
             result.convert1 = converts[1][1]
-            result.convert2 = converts[2][2]
+            result.convert2 = converts[1][2]
         end
     end
     if 4 == step then
         if r <= petProb[step][1] then
             result.like = 1
         end
-        if r <= petProb[step][2] then
+        if r > petProb[step][1] and r <= petProb[step][2] then
             result.blueId = bluePet[math.random(1, #bluePet)]
         end
     end

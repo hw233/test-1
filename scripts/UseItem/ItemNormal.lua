@@ -7906,6 +7906,13 @@ function ItemNormal_00009361(iid, num, bind, param)
     end
 end
 
+--使用仙缘石
+function ItemNormal_00009371(iid, num, bind, param)
+    local player = GetPlayer()
+    player:AddVar(298, num * 200);
+    return num
+end
+
 local ItemNormal_Table = {
   [1] = ItemNormal_00000001,
 	[8] = ItemNormal_00000008,
@@ -9575,6 +9582,7 @@ local ItemNormal_Table = {
 
     [9360] = ItemNormal_00009360,
     [9361] = ItemNormal_00009361,
+    [9371] = ItemNormal_00009371,
     [9900] = ItemNormal_NameCard,
 
     [10000] = ItemNormal_00010000,

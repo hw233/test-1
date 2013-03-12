@@ -324,7 +324,6 @@ namespace GObject
         VAR_ITEM_9316_FAILED_COUNT = 347, // 都率宝伞礼包连续开启失败次数
         VAR_CONSUME_AWARD_COUNT = 348,   //消费抽奖已抽次数
         VAR_NEW_YEAR_GIVE_GIFT = 349,   //迎新纳福，红包入袋(bit1~10依次代表对应的天数是否领取过奖励)
-        //350仙宠占用 suntao
 
         // 351~360 占用 for JLT
         VAR_DISCOUNT_CONSUME1  = 351, // 消费限购的金额
@@ -355,7 +354,6 @@ namespace GObject
         VAR_9343_USED=374,
         VAR_SNAKE_SPRING_EQUIP_GOT=375,
         VAR_WEIBO_AWARD_GOT=376,
-        //377仙宠占用 suntao
         VAR_FISHUSER_AWARD=377,            //捕鱼大亨用户领奖标志 
         //越南版380-399
         //400-420 for qiwy

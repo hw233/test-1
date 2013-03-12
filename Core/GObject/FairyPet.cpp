@@ -2,8 +2,9 @@
 #include "GObjectDBExecHelper.h"
 #include "GData/FairyPetTable.h"
 #include "Common/URandom.h"
+#include "Common/Itoa.h"
+#include "Common/StringTokenizer.h"
 #include "Server/SysMsg.h"
-//#include "Country.h"
 #include "Fighter.h"
 #include "MsgID.h"
 #include "FairyPet.h"
@@ -22,8 +23,8 @@ namespace GObject
         _lingya = 0;
         _xiaozhou = 0;
         _dazhou = 0;
-        //_overTime = 0;
-        _overTime = TimeUtil::SharpDayT(1);
+        _overTime = 0;
+        memset(_initskl, 0, sizeof(_initskl));
     }
 
     void FairyPet::LoadFromDB(DBFairyPetData& data)
@@ -40,12 +41,20 @@ namespace GObject
     }
 
 
-    void FairyPet::UpdateToDB(bool isDel)
+    void FairyPet::LoadInitSkills(std::string& skills)
     {
-        if(isDel)
-            DB2().PushUpdateData("DELETE FROM `fairyPet` WHERE id = %u AND `playerId` = %"I64_FMT"u", getId(), _owner->getId());
-        else
-            DB2().PushUpdateData("REPLACE INTO `fairyPet` (`id`, `playerId`, `onBattle`, `petLev`, `petBone`, `pinjieBless`, `genguBless`, `chong`, `overTime`, `xiaozhou`, `dazhou`) VALUES (%u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u)", 
+        StringTokenizer tk(skills, ",");
+        if(tk.count() > INIT_SKILL_UPMAX)
+            return;
+        for(UInt8 i = 0; i < tk.count(); ++ i)
+        {
+            _initskl[i] = atoi(tk[i].c_str());
+        }
+    }
+
+    void FairyPet::UpdateToDB()
+    {
+        DB2().PushUpdateData("REPLACE INTO `fairyPet` (`id`, `playerId`, `onBattle`, `petLev`, `petBone`, `pinjieBless`, `genguBless`, `chong`, `overTime`, `xiaozhou`, `dazhou`) VALUES (%u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", 
             getId(), _owner->getId(), _onBattle, _petLev, _petBone, _pinjieBless, _genguBless, _chong, _overTime, _xiaozhou, _dazhou);
     }
 
@@ -94,6 +103,31 @@ namespace GObject
         setPotential(ggd->growRate);
     }
 
+    void FairyPet::levUp()
+    {
+        ++ _petLev;
+        setLevel(_petLev);
+        updateToDB(2, _petLev);
+        //触发初始技能升级
+        if(_petLev % 10 == 8 || _petLev % 10 == 9)
+        {
+            GData::Pet::PinjieData * pjd = GData::pet.getLevTable(_petLev);
+            if(!pjd) return;
+            std::string skills = "";
+            for(UInt8 i = 0; i < INIT_SKILL_UPMAX; ++ i)
+            {
+                UInt8 lev = pjd->skillLev[i];
+                if(_initskl[i] == 0 || lev <= 0 || lev > 9)
+                    continue;
+                skills += Itoa(_initskl[i]+lev-1);
+                if(i < INIT_SKILL_UPMAX - 1)
+                    skills += ",";
+            }
+            setSkills(skills, false);
+            updateToDBPetSkill();
+        }
+    }
+
     void FairyPet::addChongNum(int num)
     {
         if(_chong + num <= 0)
@@ -110,12 +144,14 @@ namespace GObject
             _genguBless += prob;
     }
 
-    void FairyPet::addPinjieBless(int prob)
+    void FairyPet::addPinjieBless(UInt16 times)
     {
-        if(_pinjieBless + prob <= 0)
-            reset(1);
-        else
-            _pinjieBless += prob;
+        _pinjieBless += times;
+    }
+
+    UInt16 FairyPet::getPinjieBless()
+    {
+        return GData::pet.getPinjieBless(getPetLev(), _pinjieBless);
     }
 
     bool FairyPet::canLevUp()
@@ -128,12 +164,20 @@ namespace GObject
 
     bool FairyPet::canBoneUp()
     {
-        UInt8 color = getColor();
+        GData::Pet::LingyaData * lyd = GData::pet.getLingyaTable(getId());
+        if(lyd != NULL)
+            return getPetBone() < lyd->finalBone;
+        return false;
+        /*
         if(0 == color)  //绿色仙宠
             return getPetBone() < 22;
-        if(1 == color)  //蓝色仙宠
+        else if(1 == color)  //蓝色仙宠
             return getPetBone() < 42;
-        return true;
+        else if(2 == color)  //紫色仙宠
+            return getPetBone() < 62;
+        else if(3 == color)  //橙色仙宠
+            return getPetBone() < 82;
+        */
     }
 
     void FairyPet::upgradeLev()
@@ -149,15 +193,15 @@ namespace GObject
         _owner->SetVar(VAR_FAIRYPET_LONGYUAN, longYuan - pjd->consume);
         if(GRND(10000) <= pjd->prob + getPinjieBless())
         {   //成功
-            ++_petLev; 
+            levUp();
             reset(1);
             setLevel(getPetLev());
-			SYSMSG_SENDV(4132, _owner);
             updateToDB(2, getLevel());
+			SYSMSG_SENDV(4132, _owner);
         }
         else
         { //失败
-            addPinjieBless(100);
+            addPinjieBless(1);
 			SYSMSG_SENDV(4133, _owner);
         }
         sendPinjieInfo();
@@ -184,7 +228,7 @@ namespace GObject
             _owner->SetVar(VAR_FAIRYPET_LONGYUAN, longYuan - pjd->consume);
             if(GRND(10000) <= pjd->prob + getPinjieBless())
             {   //成功
-                ++ _petLev; 
+                levUp();
                 reset(1);
                 setLevel(getPetLev());
                 isSucc = 1;
@@ -193,13 +237,13 @@ namespace GObject
             }
             else
             {   //失败
-                addPinjieBless(100);
+                addPinjieBless(1);
             }
         }
         UpdateToDB();
         Stream st(REP::FAIRY_PET);
         st << static_cast<UInt8>(0x01) << static_cast<UInt8>(0x03);
-        st << isSucc << num;
+        st << getId() << isSucc << num;
         st << Stream::eos;
         _owner->send(st);
     }

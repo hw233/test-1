@@ -1876,17 +1876,12 @@ namespace GData
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
         DBPinJie dbpj;
-		if(execu->Prepare("SELECT `id`, `name`, `consume`, `prob` FROM `pet_pinjie`", dbpj) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `name`, `consume`, `prob`, `skillLev`, `bless` FROM `pet_pinjie`", dbpj) != DB::DB_OK)
 			return false;
 
 		while(execu->Next() == DB::DB_OK)
 		{
-            Pet::PinjieData pd;
-            pd.lev = dbpj.id;
-            pd.name = dbpj.name;
-            pd.consume = dbpj.consume;
-            pd.prob = dbpj.prob;
-            pet.setLevTable(pd);
+            pet.setLevTable(dbpj);
         }
         return true;
     }
@@ -1922,7 +1917,7 @@ namespace GData
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
         DBLingYa dbly;
-		if(execu->Prepare("SELECT `id`, `color`, `lingya` FROM `pet_pressure`", dbly) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `color`, `lingya`, `initBone`, `finalBone` FROM `pet_pressure`", dbly) != DB::DB_OK)
 			return false;
 
 		while(execu->Next() == DB::DB_OK)
@@ -1931,6 +1926,8 @@ namespace GData
             lyd.petId = dbly.id;
             lyd.color = dbly.color;
             lyd.lingya = dbly.lingya;
+            lyd.initBone = dbly.initBone;
+            lyd.finalBone = dbly.finalBone;
             pet.setLingyaTable(lyd);
         }
         return true;

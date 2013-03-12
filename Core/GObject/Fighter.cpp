@@ -2152,6 +2152,65 @@ bool Fighter::learnSkill(UInt16 skill)
 }
 #endif
 
+void Fighter::updateToDBPetSkill()
+{
+    if (!isPet()) return;
+    std::string str1, str2, str3, str4;
+    value2string(&_skills[0], _skills.size(), str1); //主动
+    value2string(&_peerless[0], _peerless.size(), str2); //无双
+    UInt8 count = GData::SKILL_PASSIVES - GData::SKILL_PASSSTART;
+    bool flag = false;
+    for(UInt8 i = 0; i < count; ++ i)
+    {
+
+        std::string tempstr;
+        value2string(&_passkl[i][0], _passkl[i].size(), tempstr); //100%触发技能
+        if(!tempstr.empty())
+        {
+            if (i != 0 && flag)
+                str3 += ",";
+            str3 += tempstr;
+            flag = true;
+        }
+    }
+    flag = false;
+    for(UInt8 i = 0; i < count; ++ i)
+    {
+        std::string tempstr;
+        value2string(&(_rpasskl[i][0]), _rpasskl[i].size(), tempstr); //概率触发
+        if(!tempstr.empty())
+        {
+            if (i != 0 && flag)
+                str4 += ",";
+            str4 += tempstr;
+            flag = true;
+        }
+    }
+
+    std::string skills = "";
+    if(!str1.empty())
+    {
+        skills += str1;
+        if(!str2.empty() || !str3.empty() || !str4.empty())
+            skills += ",";
+    }
+    if(!str2.empty())
+    {
+        skills += str2;
+        if(!str3.empty() || !str4.empty())
+            skills += ",";
+    }
+    if(!str3.empty())
+    {
+        skills += str3;
+        if(!str4.empty())
+            skills += ",";
+    }
+    if(!str4.empty())
+        skills += str4;
+    DB2().PushUpdateData("UPDATE `fighter` SET `skill` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", skills.c_str(), getId(), _owner->getId());
+}
+
 bool Fighter::skillLevelUp( UInt16 skill, UInt8 lv )
 {
     int idx = hasSkill(skill);
@@ -2165,9 +2224,9 @@ bool Fighter::skillLevelUp( UInt16 skill, UInt8 lv )
 
     idx = isSkillUp(skill);
     if (idx >= 0)
-        upSkill(SKILLANDLEVEL(skill, lv), idx);
+        upSkill(SKILLANDLEVEL(skill, lv), idx, false);
 
-    if (addNewSkill(SKILLANDLEVEL(skill, lv)))
+    if (addNewSkill(SKILLANDLEVEL(SKILL_ID(skill), lv)), false)
     {
         if(_owner != NULL && _owner->isOnline())
         {
@@ -2913,7 +2972,7 @@ void Fighter::setSkills( std::string& skills, bool writedb )
     }
 
     bool up = false;
-    if (_id >= 999)
+    if (_id >= 999 || isPet())
         up = true;
 
     const GData::SkillBase* s  = 0;
@@ -3750,6 +3809,34 @@ UInt8 Fighter::getUpCittasNum()
     {
         if (_citta[i])
             ++c;
+    }
+    return c;
+}
+
+UInt8 Fighter::getPassklNum()
+{
+    UInt8 c = 0;
+    for(UInt8 i = 0; i < GData::SKILL_PASSIVES - GData::SKILL_PASSSTART; ++ i)
+    {   //被动
+        for(UInt8 j = 0; j < _passkl[i].size(); ++ j)
+        {
+            if (_passkl[i][j])
+                ++c;
+        }
+    }
+    return c;
+}
+
+UInt8 Fighter::getRpassklNum()
+{
+    UInt8 c = 0;
+    for(UInt8 i = 0; i < GData::SKILL_PASSIVES - GData::SKILL_PASSSTART; ++ i)
+    {   //被动
+        for(UInt8 j = 0; j < _rpasskl[i].size(); ++ j)
+        {
+            if (_rpasskl[i][j])
+                ++c;
+        }
     }
     return c;
 }

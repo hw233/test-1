@@ -241,6 +241,7 @@ function onDungeonWin(player, id, count, free)
     Qixi(player, 0);
     Wansheng(player, lootlvl);
     Qingren(player, 0);
+    fairyPetLoot(player, 0);
     if free == true then
         FallActivity(player, 1)
         Guoqing(player, 0);
@@ -982,6 +983,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     Qixi(player, lootlvl);
     Wansheng(player, lootlvl);
     Qingren(player, lootlvl);
+    fairyPetLoot(player, lootlvl);
     Guoqing(player, lootlvl);
     LuckyDrawBox(player, id)
     ExJob(player, id, lootlvl)
@@ -1025,6 +1027,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
     Wansheng(player, lootlvl);
     Qingren(player, lootlvl);
     Guoqing(player, lootlvl);
+    fairyPetLoot(player, lootlvl);
     if lootlvl == 0 then
         FallActivity(player, 1)
     else
@@ -6313,6 +6316,12 @@ function Qingren(player, lootlvl)
         local package = player:GetPackage();
         package:AddItem(9355, 1, true, 0, 10);
     end
+end
+
+--仙宠掉落
+function fairyPetLoot(player, lootlvl)
+    local package = player:GetPackage();
+    package:AddItem(9371, 1, true, 0, 10);
 end
 
 -- 万圣节套装

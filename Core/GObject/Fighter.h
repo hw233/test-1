@@ -150,16 +150,18 @@ public:
     //Fighter(const Fighter& fighter);
 	~Fighter();
 
-	Fighter * clone(Player * owner);
-	Fighter * cloneWithEquip(Player * owner);
-    Fighter * cloneWithOutDirty(Player * player);
+	virtual Fighter * clone(Player * owner);
+	virtual Fighter * cloneWithEquip(Player * owner);
+    virtual Fighter * cloneWithOutDirty(Player * player);
 
 	inline UInt32 getId() { return _id; }
 	inline Player * getOwner() { return _owner; }
 	inline void setOwner(Player * p) { _owner = p; }
 
 	inline void setName(const std::string& s) {_name = s;}
-	inline void setClass(UInt8 c) {_class = c;}
+
+	inline void setClass(UInt8 c) { _class = c; }
+
     inline void setSex(UInt8 s) {_sex = s;}
 	inline void setLevel(UInt8 l, bool boss = false) { _level = l; if (boss) worldBoss.setLevel(l); }
 	inline void setExp(UInt64 e) {_exp = e;}
@@ -911,6 +913,9 @@ public:
     // 仙宠
 public:
     inline bool isPet() { return getClass() >= e_cls_qinglong && getClass() <= e_cls_xuanwu; }
+    UInt8 getPassklNum();
+    UInt8 getRpassklNum();
+    void updateToDBPetSkill();
 };
 class GlobalFighters
 {

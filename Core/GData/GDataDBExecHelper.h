@@ -506,6 +506,8 @@ struct DBPinJie
     std::string name;
     UInt32 consume;
     UInt16 prob;
+    std::string skillLev;
+    std::string bless;
 };
 
 struct DBGenGu
@@ -525,6 +527,8 @@ struct DBLingYa
     UInt32 id;
     UInt8 color;
     UInt8 lingya;
+    UInt16 initBone;
+    UInt16 finalBone;
 };
 
 }
@@ -1106,12 +1110,14 @@ SPECIALDEF(7)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBPinJie)
-SPECIALDEF(4)
+SPECIALDEF(6)
 	(
     UInt16, id,
     std::string, name,
     UInt32, consume,
-    UInt16, prob
+    UInt16, prob,
+    std::string, skillLev,
+    std::string, bless
 	)
 SPECIALEND()
 
@@ -1130,11 +1136,13 @@ SPECIALDEF(8)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBLingYa)
-SPECIALDEF(3)
+SPECIALDEF(5)
 	(
     UInt32, id,
     UInt8, color,
-    UInt8, lingya
+    UInt8, lingya,
+    UInt16, initBone,
+    UInt16, finalBone
 	)
 SPECIALEND()
 

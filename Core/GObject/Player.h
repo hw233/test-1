@@ -2179,7 +2179,7 @@ namespace GObject
 	    UInt8 convertFairyPet(UInt32, UInt8);
 	    void sendFairyPetList();
         void sendFairyPetResource();
-        void addFairyPet(FairyPet *, bool = true, bool = false);
+        void addFairyPet(FairyPet *, bool = true);
         void seekFairyPet(UInt8, UInt8);
         void getFariyPetSpaceInfo();
 
