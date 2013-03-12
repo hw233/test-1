@@ -328,7 +328,7 @@ namespace GObject
             if(isLucky)
             {
                 chong = 2;
-		        SYSMSG_SENDV(4144, _owner, chong);
+		        SYSMSG_SENDV(4132, _owner, chong);
             }
             else
                 chong = 1;
@@ -355,7 +355,7 @@ namespace GObject
             if(isLucky)
             {
                 chong = 6;
-		        SYSMSG_SENDV(4144, _owner, chong);
+		        SYSMSG_SENDV(4132, _owner, chong);
             }
             else
                 chong = 3;

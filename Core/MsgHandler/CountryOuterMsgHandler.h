@@ -1347,8 +1347,6 @@ void OnStatusChangeReq( GameMsgHdr& hdr, StatusChangeReq& scr )
 				player->sendMsgCode(0, 2001, player->getBuffData(PLAYER_BUFF_PKLOCK) - TimeUtil::Now());
 				return;
 			}
-			//SYSMSG_SEND(146, player);
-			//SYSMSG_SEND(1046, player);
 			GObject::Map * map = GObject::Map::FromSpot(PLAYER_DATA(player, location));
 			if(map != NULL)
 				map->changebyStatus(player);
@@ -6025,7 +6023,8 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
                             UInt8 res = player->convertFairyPet(petId, isHas);
                             Stream st(REP::FAIRY_PET);
                             st << type << opt;
-                            st << res << petId << Stream::eos;
+                            st << res << petId;
+                            st << isHas << Stream::eos;
                             player->send(st);
                         }
                         break;
