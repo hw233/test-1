@@ -295,6 +295,7 @@ namespace Script
         CLASS_DEF(Player, getXianyuanLua);
         CLASS_DEF(Player, setCanHirePet);
         CLASS_DEF(Player, hireFairyPet);
+        CLASS_DEF(Player, writeCanHiretPet);
 
         CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);

@@ -151,7 +151,7 @@ namespace GObject
     }
 
     UInt16 FairyPet::getPinjieBless()
-    {
+    {   //获得的失败加成概率
         return GData::pet.getPinjieBless(getPetLev(), _pinjieBless);
     }
 
@@ -270,11 +270,12 @@ namespace GObject
         }
         else
         {   //失败
-            addChongNum(0 - (getChongNum()+1)/2);
+            UInt16 sub = (getChongNum()+ 1) / 2;
+            addChongNum(0 - sub);
             if(getChongNum() < ggd->limit)
                 reset(2);
             else
-                addGenguBless(-500);
+                addGenguBless(0 - 100*sub);
             _owner->sendMsgCode(0, 4003);
         }
         sendGenguInfo();

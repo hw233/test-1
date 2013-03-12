@@ -6555,10 +6555,10 @@ function Qingren(player, lootlvl)
     end
 end
 
---仙宠掉落
+--仙宠仙缘石掉落
 function fairyPetLoot(player, lootlvl)
     local package = player:GetPackage();
-    package:AddItem(9371, 5, true, 0, 10);
+    package:AddItem(9371, 1, true, 0, 10);
 end
 
 -- 万圣节套装
