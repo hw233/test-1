@@ -475,6 +475,8 @@ CREATE TABLE `skill_effect` (
   `eft` varchar(255) NOT NULL DEFAULT '',
   `efl` varchar(255) NOT NULL DEFAULT '',
   `efv` varchar(255) NOT NULL DEFAULT '',
+  `hppec` float(10,4) NOT NULL DEFAULT '0.0000',
+  `maxhpdampec` float(10,4) NOT NULL DEFAULT '0.0000',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 

@@ -1890,6 +1890,8 @@ Fighter * Fighter::clone(Player * player)
 		fgt->_level = 1;
 		fgt->_exp = 0;
 	}
+    fgt->auraMax = auraMax;
+    fgt->peerless = peerless;
 	fgt->_owner = player;
 	fgt->_halo = NULL;
 	fgt->_fashion = NULL;
@@ -3319,7 +3321,10 @@ void Fighter::delSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_ONSKILLDMG ||
                         s->cond == GData::SKILL_ONOTHERDEAD ||
                         s->cond == GData::SKILL_ONCOUNTER ||
-                        s->cond == GData::SKILL_ONATKBLEED
+                        s->cond == GData::SKILL_ONATKBLEED ||
+                        s->cond == GData::SKILL_ONATKDMG ||
+                        s->cond == GData::SKILL_ONPETPROTECT ||
+                        s->cond == GData::SKILL_ONGETDMG 
                         )
                 {
                     offPassiveSkill(s->getId(), s->cond, s->prob>=100.0f, writedb);
@@ -3359,7 +3364,10 @@ void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_ONSKILLDMG ||
                         s->cond == GData::SKILL_ONOTHERDEAD ||
                         s->cond == GData::SKILL_ONCOUNTER ||
-                        s->cond == GData::SKILL_ONATKBLEED
+                        s->cond == GData::SKILL_ONATKBLEED ||
+                        s->cond == GData::SKILL_ONATKDMG ||
+                        s->cond == GData::SKILL_ONPETPROTECT ||
+                        s->cond == GData::SKILL_ONGETDMG 
                         )
                 {
                     upPassiveSkill(s->getId(), s->cond, (s->prob >= 100.0f), writedb);
@@ -4411,6 +4419,18 @@ void Fighter::broadcastForge(UInt8 lock)
         fprintf(stderr, "%u, %u, %u, %u, %u, %u\n", _attrType1, _attrValue1,  _attrType2, _attrValue2,  _attrType3, _attrValue3);
         SYSMSG_BROADCASTV(2330, _owner->getCountry(), _owner->getName().c_str(), getColor(), getName().c_str());
     }
+}
+
+UInt8 Fighter::getToggleReiatsu()
+{
+    // TODO: 返回出场所需灵压（仅对仙宠有效）
+    return 0;
+}
+
+UInt8 Fighter::getTargetPos()
+{
+    // TODO: 返回备胎上场时的位置
+    return 0;
 }
 
 float Fighter::getSoulPracticeAddOn()

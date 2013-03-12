@@ -45,7 +45,85 @@ public:
     inline UInt8 getPetLev() { return _petLev; }
     inline UInt8 getPetBone() { return _petBone; }
     inline UInt8 getPetLingya() { return _lingya; }
+
     inline void setPetLingya(UInt8 ly) { _lingya = ly; }
+    inline UInt8 getTargetPos()
+    {
+        switch (getClass())
+        {
+            case e_cls_qinglong:
+                return 24;
+            case e_cls_xuanwu:
+                return 4;
+            case e_cls_zhuque:
+                return 0;
+            case e_cls_baihu:
+                return 20;
+        }
+        return 0;
+    }
+
+    /*
+    const PeerlessSkillID[e_cls_max] = 
+    {
+        0,
+        0,
+        0,
+        0,
+        0,
+        ,
+        ,
+        ,
+        ,
+        ,
+    };
+    inline UInt16 getPeerless() 
+    { 
+        switch (getClass())
+        {
+            case e_cls_qinglong:
+                return 24;
+            case e_cls_xuanwu:
+                return 4;
+            case e_cls_zhuque:
+                return 0;
+            case e_cls_baihu:
+                return 20;
+        }
+        return 0;
+    }
+    inline UInt16 getPeerlessLevel()
+    { 
+        switch (getClass())
+        {
+            case e_cls_qinglong:
+                return 24;
+            case e_cls_xuanwu:
+                return 4;
+            case e_cls_zhuque:
+                return 0;
+            case e_cls_baihu:
+                return 20;
+        }
+        return 0;
+    }
+    inline UInt16 getPeerlessAndLevel()
+    { 
+        switch (getClass())
+        {
+            case e_cls_qinglong:
+                return 24;
+            case e_cls_xuanwu:
+                return 4;
+            case e_cls_zhuque:
+                return 0;
+            case e_cls_baihu:
+                return 20;
+        }
+        return 0;
+    }
+    */
+
 private:
     inline UInt8 getChongNum() { return _chong; }
     inline UInt32 getGenguBless() { return _genguBless; }
