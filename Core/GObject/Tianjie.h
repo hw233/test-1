@@ -226,6 +226,7 @@ namespace GObject
         int m_nextTjLevel;
 
         FastMutex _opMutex;
+        FastMutex _opMutex1;
 
         //最后一次渡过的天劫
         int m_lastPassedLevel;
