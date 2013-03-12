@@ -7927,9 +7927,8 @@ end
 function ItemNormal_00009371(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
-    player:AddVar(298, num * 200);
     package:DelItemSendMsg(iid, player);
-    SendMsg(player, 0x35, "获得仙缘" .. num*200 .. "！")
+    player:getXianyuanLua(num * 200);
     return num
 end
 

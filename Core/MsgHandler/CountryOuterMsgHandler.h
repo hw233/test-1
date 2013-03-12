@@ -6041,7 +6041,7 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
                             player->send(st);
                             if(petId)
                             {
-                                PLAYER_DATA(player, canHirePet).push_back(petId);
+                                player->setCanHirePet(petId);
                                 player->writeCanHiretPet();
                             }
                         }
@@ -6072,6 +6072,9 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
                         break;
                 }
             }
+            break;
+        case 0x04:  //仙宠免费领取
+            player->getPetByLevelUp(opt);
             break;
         default:
             break;
