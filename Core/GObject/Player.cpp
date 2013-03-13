@@ -17980,7 +17980,7 @@ UInt8 Player::toQQGroup(bool isJoin)
         {
             if(isGet & (1 << 0))
                 return;
-            static UInt32  petId[] = { 501, 510, 507 };
+            static UInt32 petId[] = { 501, 510, 507 };
             setCanHirePet(petId[idx]);
             UInt8 res = hireFairyPet(petId[idx]);
             Stream st(REP::FAIRY_PET);
@@ -18001,6 +18001,7 @@ UInt8 Player::toQQGroup(bool isJoin)
             IncommingInfo ii2(FengsuiFromUseItem, 0, 0);
             getFengsui(16000, &ii2);
             SetVar(VAR_FAIRYPET_ISGET_PET, isGet | (1 << 1));
+            sendFairyPetResource();
         }
     }
 
