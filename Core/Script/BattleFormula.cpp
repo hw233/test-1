@@ -71,6 +71,7 @@ void BattleFormula::init()
 	class_def<GObject::Fighter>("getExtraCounter", &GObject::Fighter::getExtraCounter);
 	class_def<GObject::Fighter>("getExtraMagRes", &GObject::Fighter::getExtraMagRes);
 	class_def<GObject::Fighter>("isNpc", &GObject::Fighter::isNpc);
+	class_def<GObject::Fighter>("isPet", &GObject::Fighter::isPet);
 	class_def<GObject::Fighter>("isMale", &GObject::Fighter::isMale);
 	class_def<GObject::Fighter>("isBoy", &GObject::Fighter::isBoy);
 	class_def<GObject::Fighter>("getSex", &GObject::Fighter::getSex);
@@ -158,6 +159,7 @@ void BattleFormula::init()
 	class_def<Battle::BattleFighter>("getExtraCounter", &Battle::BattleFighter::getExtraCounter);
 	class_def<Battle::BattleFighter>("getExtraMagRes", &Battle::BattleFighter::getExtraMagRes);
 	class_def<Battle::BattleFighter>("isNpc", &Battle::BattleFighter::isNpc);
+	class_def<Battle::BattleFighter>("isPet", &Battle::BattleFighter::isPet);
 	class_def<Battle::BattleFighter>("isMale", &Battle::BattleFighter::isMale);
 	class_def<Battle::BattleFighter>("isBoy", &Battle::BattleFighter::isBoy);
 	class_def<Battle::BattleFighter>("getSex", &Battle::BattleFighter::getSex);

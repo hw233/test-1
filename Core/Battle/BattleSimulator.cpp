@@ -1325,11 +1325,11 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                     float maxExDmg = 0;
                     if (atk && atk > magatk)
                     {
-                        maxExDmg = atk * skill->effect->hppec;
+                        maxExDmg = atk * skill->effect->maxhpdampec;
                     }
                     else if (magatk && magatk > atk)
                     {
-                        maxExDmg = magatk * skill->effect->hppec;
+                        maxExDmg = magatk * skill->effect->maxhpdampec;
                     }
                     if (maxExDmg > 0)
                         exDmg = exDmg > maxExDmg? maxExDmg:exDmg;
@@ -4111,7 +4111,7 @@ bool BattleSimulator::doSkillStatus2(BattleFighter* bf, const GData::SkillBase* 
     if(skill->effect->auraP || skill->effect->aura)
     {
         float rate = skill->prob * 100;
-        if(rate > _rnd(10000))
+        if(rate > _rnd(10000) || (skill->cond != GData::SKILL_ACTIVE && skill->cond != GData::SKILL_PEERLESS))
         {
             float value = bo->_aura * skill->effect->auraP + skill->effect->aura;
             if(value > 0 && bf->getSide() != target_side)
@@ -9730,7 +9730,7 @@ void BattleSimulator::doSkillEffectExtra_RandomShield(BattleFighter* bf, int tar
         return;
     if (!bo->isChar())
         return;
-    float hp = bf->getMaxHP() * (skill->effect->efv[eftIdx] / 10000);
+    float hp = bf->getMaxHP() * (skill->effect->efv[eftIdx]);
     if (hp < 1.0f)
         return;
     bo->addHpShieldSelf(hp, skill->effect->efl[eftIdx]);
@@ -10798,6 +10798,7 @@ void BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u)
             int target_side, target_pos, cnt;
             getSkillTarget(bf, passiveSkill, target_side, target_pos, cnt);
             //doSkillAttack(bf, passiveSkill, target_side, target_pos, cnt, NULL);
+            appendDefStatus(e_skill, passiveSkill->getId(), bf);
             doSkillStatus2(bf, passiveSkill, target_side, target_pos, cnt);
 
         }
