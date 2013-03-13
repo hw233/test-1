@@ -1096,7 +1096,7 @@ UInt8 BattleFighter::getClassAndSex()
 
     // 仙宠在战报中的职业ID为5
     if ((clsnsex >> 4) >= GObject::e_cls_qinglong) 
-        clsnsex = (clsnsex & 0x0f) | GObject::e_cls_qinglong;
+        clsnsex = (clsnsex & 0x0f) | (GObject::e_cls_qinglong << 4);
 
     return clsnsex;
 }

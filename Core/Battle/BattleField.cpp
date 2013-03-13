@@ -93,6 +93,7 @@ void BattleField::setPetObject( int side, BattleObject * obj, UInt8 isBody)
             // 出场所需的灵压
             _toggleReiatsu[side] = fgt->getPetLingya();
             _backupTargetPos[side] = fgt->getTargetPos();
+            _reiatsu[side] = 0;
         }
     }
 }
@@ -106,7 +107,6 @@ UInt32 BattleField::upPetObject(UInt8 side, bool isReplace /* = true */)
         return 0xff;
     _backupObjs[side]->setPos(_backupTargetPos[side]);
     setObject(side, _backupTargetPos[side], _backupObjs[side]);
-    _backupObjs[side] = NULL;
     return _backupTargetPos[side];
 }
 

@@ -188,7 +188,8 @@ private:
         e_stHitRate,
         e_stAtkReduce,
         e_stMagAtkReduce,
-        e_stReiastu = 100,
+        e_stMaxReiastu = 100,
+        e_stReiastu = 101,
         MAX_STATUS,
     };
 

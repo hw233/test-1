@@ -582,6 +582,11 @@ void BattleSimulator::start(UInt8 prevWin, bool checkEnh)
             oldAttackRount = _attackRound;
             act_count += tryPetEnter(0, e_reiatsu_round);
             act_count += tryPetEnter(1, e_reiatsu_round);
+            if(_defList.size() > 0 || _scList.size() > 0)
+            {
+                appendToPacket(0, -1, -1, 0, 0, false, false);
+                ++ act_count;
+            }
             _getDamageSkillCount[0] = 0;
             _getDamageSkillCount[1] = 0;
         }
@@ -5786,6 +5791,12 @@ UInt32 BattleSimulator::doAttack( int pos )
     }
     while(false);
 
+    if(mainTarget)
+        mainTarget->setShieldObj(NULL);
+
+    rcnt += releaseCD(bf);
+    _activeFgt = NULL;
+
     if (reiatsuType)
     {
         rcnt += tryPetEnter(side, reiatsuType, reiatsuType2?true:false);
@@ -5793,11 +5804,6 @@ UInt32 BattleSimulator::doAttack( int pos )
     if (reiatsuType2)
         rcnt += tryPetEnter(side, reiatsuType2);
 
-    if(mainTarget)
-        mainTarget->setShieldObj(NULL);
-
-    rcnt += releaseCD(bf);
-    _activeFgt = NULL;
     return rcnt;
 }
 
@@ -9753,6 +9759,7 @@ void BattleSimulator::doSkillEffectExtra_SelfAttack(BattleFighter* bf, int targe
         UInt32 value = static_cast<UInt32>(bf2->getAttack());
         appendStatusChange(e_stAtk, value, skillId, bf2);
     }
+    else
     {
         bf2->setPetMagAtkAdd(atkadd, last);
         UInt16 skillId = skill != NULL ? skill->getId() : 0;
@@ -10158,7 +10165,7 @@ void BattleSimulator::appendStatusChangeForReiastu(StatusType type, UInt32 value
     BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, target_pos));
     if(!bo)
         return;
-    appendStatusChange(e_stReiastu, value,0, bo);
+    appendStatusChange(type, value,0, bo);
 }
 
 void BattleSimulator::doItemLingSkillAttack(BattleFighter* bf, BattleFighter* bo)
@@ -10920,6 +10927,7 @@ UInt32 BattleSimulator::doPetEnter(UInt8 side)
     UInt32 pos = upPetObject(side);
     if (pos >= 25)
     {
+        _backupObjs[side] = NULL;
 #ifdef _DEBUG
         //printf("doPetEnter pos error, pos = %d\n", pos);
 #endif
@@ -10931,6 +10939,7 @@ UInt32 BattleSimulator::doPetEnter(UInt8 side)
     BattleObject * bo = _objs[side][pos];
     if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
     {
+        _backupObjs[side] = NULL;
 #ifdef _DEBUG
         //printf("doPetEnter bo error.\n");
 #endif
@@ -10941,6 +10950,7 @@ UInt32 BattleSimulator::doPetEnter(UInt8 side)
     appendReiatsuChange(side);
     appendDefStatus(e_petAppear, bf->getId(), bf);
     insertFighterStatus(bf);
+    _backupObjs[side] = NULL;
 
     if(bf->getPassiveSkillOnTherapy())
         _onTherapy.push_back(bf);
@@ -11252,8 +11262,11 @@ bool BattleSimulator::attackWithPet(BattleFighter* bf, BattleFighter* pet, float
 
 void BattleSimulator::appendMaxReiatsu()
 {
-        appendStatusChangeForReiastu(e_stReiastu, getToggleReiatsu(0) ,0 , 0);
-        appendStatusChangeForReiastu(e_stReiastu, getToggleReiatsu(1) ,0 , 1);
+        appendStatusChangeForReiastu(e_stMaxReiastu, getToggleReiatsu(0) ,0 , 0);
+        appendStatusChangeForReiastu(e_stMaxReiastu, getToggleReiatsu(1) ,0 , 1);
+
+        appendStatusChangeForReiastu(e_stReiastu, getReiatsu(0) ,0 , 0);
+        appendStatusChangeForReiastu(e_stReiastu, getReiatsu(1) ,0 , 1);
 }
 
 void BattleSimulator::appendReiatsuChange(int side)

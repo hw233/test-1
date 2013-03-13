@@ -153,7 +153,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130304_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130304_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130225_1.sql          #帮派QQ群
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130315_1.sql
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130315_1.sql # must be once 有删除操作
 
     #. clearshiyamen.sh
 }

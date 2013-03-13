@@ -4,7 +4,7 @@ H=192.168.88.250
 U=kingxin
 P=kingxin
 PT=3306
-DBL=log_jlt
+DBL=log_6666
 OPTIONS="Yes/No/Exit"
 IFS=/
 
