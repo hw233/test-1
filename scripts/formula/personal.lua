@@ -311,13 +311,6 @@ function calcHP( fgt )
   local cls = fgt:getClass()
   local lvl = fgt:getLevelInLua() - 1
   local pot = fgt:getPotential()
-  if fgt:isPet() then
-      print('hp')
-      print(cls)
-      print(lvl)
-      print(pot)
-      print(hp + pot * hp_factor[cls] * lvl + phy_hp_factor * calcPhysique(fgt) * (1 + fgt:getExtraHPPercent()) + fgt:getExtraHP())
-  end
   return (hp + pot * hp_factor[cls] * lvl + phy_hp_factor * calcPhysique(fgt)) * (1 + fgt:getExtraHPPercent()) + fgt:getExtraHP()
 end
 
@@ -407,11 +400,6 @@ function calcAttack( fgt )
   local cls = fgt:getClass()
   local lvl = fgt:getLevelInLua() - 1
   local pot = fgt:getPotential()
-  if fgt:isPet() then
-      print('atk')
-      print(((atk + pot * atk_factor[cls] * lvl + str_atk_factor * calcStrength(fgt)) * (1 + fgt:getExtraAttackPercent()) + fgt:getExtraAttack()))
-  end
-
   return ((atk + pot * atk_factor[cls] * lvl + str_atk_factor * calcStrength(fgt)) * (1 + fgt:getExtraAttackPercent()) + fgt:getExtraAttack())
 end
 
@@ -426,11 +414,6 @@ function calcMagAttack( fgt )
   local cls = fgt:getClass()
   local lvl = fgt:getLevelInLua() - 1
   local pot = fgt:getPotential()
-  if fgt:isPet() then
-      print('magatk')
-      print(((magatk + pot * magatk_factor[cls] * lvl + int_atk_factor * calcIntelligence(fgt)) * (1 + fgt:getExtraMagAttackPercent()) + fgt:getExtraMagAttack()))
-  end
-
   return ((magatk + pot * magatk_factor[cls] * lvl + int_atk_factor * calcIntelligence(fgt)) * (1 + fgt:getExtraMagAttackPercent()) + fgt:getExtraMagAttack())
 end
 
@@ -445,10 +428,6 @@ function calcDefend( fgt )
   local cls = fgt:getClass()
   local lvl = fgt:getLevelInLua() - 1
   local pot = fgt:getPotential()
-  if fgt:isPet() then
-      print('def')
-      print((def + pot * def_factor[cls] * lvl + agi_def_factor * calcAgility(fgt)) * (1 + fgt:getExtraDefendPercent()) + fgt:getExtraDefend())
-  end
   return (def + pot * def_factor[cls] * lvl + agi_def_factor * calcAgility(fgt)) * (1 + fgt:getExtraDefendPercent()) + fgt:getExtraDefend()
 end
 
@@ -463,10 +442,6 @@ function calcMagDefend( fgt )
   local cls = fgt:getClass()
   local lvl = fgt:getLevelInLua() - 1
   local pot = fgt:getPotential()
-  if fgt:isPet() then
-      print('magdef')
-      print((def + pot * magdef_factor[cls] * lvl + wil_def_factor * calcWill(fgt)) * (1 + fgt:getExtraMagDefendPercent()) + fgt:getExtraMagDefend())
-  end
   return (def + pot * magdef_factor[cls] * lvl + wil_def_factor * calcWill(fgt)) * (1 + fgt:getExtraMagDefendPercent()) + fgt:getExtraMagDefend()
 end
 
