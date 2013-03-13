@@ -123,6 +123,10 @@ function onSeekFairypetAwardAndSucceed(step, isConvert)
         end
         if r > petProb[step][1] and r <= petProb[step][2] then
             result.blueId = bluePet[math.random(1, #bluePet)]
+            if isConvert > 0 then
+                result.convert1 = converts[1][1]
+                result.convert2 = converts[1][2]
+            end
         end
     end
     if 5 == step and r <= petProb[step] then
