@@ -54,7 +54,7 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
 	_moAttackAddCD(0), _moMagAtkAddCD(0), _moAtkReduceCD(0), _moMagAtkReduceCD(0),
 	_petAttackAdd(0), _petMagAtkAdd(0), _petAtkReduce(0), _petMagAtkReduce(0),
 	_petAttackAddCD(0), _petMagAtkAddCD(0), _petAtkReduceCD(0), _petMagAtkReduceCD(0),
-    _petExAtk(0), _petExAtkEnable(false),
+    _petExAtk(0), _petExAtkEnable(false), _petExAtkId(0),
     _bleedMo(0), _bleedMoLast(0), _summoner(NULL), _unSummonAura(0), 
     _shieldHP(0), _shieldHPLast(0), _petShieldHP(0), 
     _petProtect100(false), _petProtect100Last(0), _petAtk100(0), _petAtk100Last(0), _petMark(false),
@@ -461,7 +461,8 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         GData::SkillItem skillItem;
         skillItem.base = GData::skillManager[passiveSkillOnAtkDmg[idx]];
         skillItem.cd = 0;
-        skillItem.rateExtent = 0;
+        rateExtent += skillItem.base->prob * 100;
+        skillItem.rateExtent = rateExtent;
         _passiveSkillOnAtkDmg.insert(_passiveSkillOnAtkDmg.end(), skillItem);
 
         updateSkillStrengthen(passiveSkillOnAtkDmg[idx]);

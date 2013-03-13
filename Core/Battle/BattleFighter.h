@@ -42,6 +42,7 @@ public:
 	inline UInt32 getId() { return _fighter->getId(); }
 	inline UInt8 getClass() { return _fighter->getClass(); }
 	inline UInt8 getLevel() { return _fighter->getLevel(); }
+	inline UInt8 getLevelInLua() { return _fighter->getLevelInLua(); }
 	inline UInt8 getColor() { return _fighter->getColor(); }
 	inline float getPotential() { return _fighter->getPotential(); }
     inline UInt32 getBuffData( UInt8 idx, UInt32 now ) { return _fighter->getBuffData(idx, now); }
@@ -566,6 +567,8 @@ private:
 	UInt8 _petAttackAddCD, _petMagAtkAddCD, _petAtkReduceCD, _petMagAtkReduceCD;
     float _petExAtk;
     bool  _petExAtkEnable;
+    UInt16 _petExAtkId;
+
     float _bleedMo;
     UInt8 _bleedMoLast;
     BattleFighter* _summoner;
@@ -830,10 +833,11 @@ public:
     inline float getPetAtkReduce() { return _petAtkReduce; }
     inline float getPetMagAtkReduce() { return _petMagAtkReduce; }
 
-    inline void setPetExAtk(float v) { _petExAtk = v;}
+    inline void setPetExAtk(float v, UInt16 skillId) { _petExAtk = v; _petExAtkId = skillId;}
     inline float getPetExAtk() { return _petExAtk; }
     inline void setPetExAtkEnable(bool v) { _petExAtkEnable = v;}
     inline bool getPetExAtkEnable() { return _petExAtkEnable; }
+    inline UInt16 getPetExAtkId() { return _petExAtkId; }
 
     bool releasePetAttackAdd();
     bool releasePetMagAtkAdd();

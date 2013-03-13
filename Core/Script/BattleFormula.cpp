@@ -30,6 +30,7 @@ void BattleFormula::init()
 	class_def<GObject::Fighter>("getId", &GObject::Fighter::getId);
 	class_def<GObject::Fighter>("getClass", &GObject::Fighter::getClass);
 	class_def<GObject::Fighter>("getLevel", &GObject::Fighter::getLevel);
+    class_def<GObject::Fighter>("getLevelInLua", &GObject::Fighter::getLevelInLua);
 	class_def<GObject::Fighter>("getColor", &GObject::Fighter::getColor);
 	class_def<GObject::Fighter>("getPotential", &GObject::Fighter::getPotential);
 	class_def<GObject::Fighter>("getCapacity", &GObject::Fighter::getCapacity);
@@ -117,6 +118,7 @@ void BattleFormula::init()
 	class_def<Battle::BattleFighter>("getId", &Battle::BattleFighter::getId);
 	class_def<Battle::BattleFighter>("getClass", &Battle::BattleFighter::getClass);
 	class_def<Battle::BattleFighter>("getLevel", &Battle::BattleFighter::getLevel);
+    class_def<Battle::BattleFighter>("getLevelInLua", &Battle::BattleFighter::getLevelInLua);
 	class_def<Battle::BattleFighter>("getColor", &Battle::BattleFighter::getColor);
 	class_def<Battle::BattleFighter>("getPotential", &Battle::BattleFighter::getPotential);
 	class_def<Battle::BattleFighter>("getExtraStrength", &Battle::BattleFighter::getExtraStrength);
