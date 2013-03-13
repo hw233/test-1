@@ -14,6 +14,7 @@
 namespace GObject
 {
     extern URandom GRND;
+#define PROB_BASE 10000
 
     FairyPet::FairyPet(UInt32 id, Player * owner): Fighter(id, owner),
         _petLev(50), _petBone(0), _onBattle(false)
@@ -195,7 +196,7 @@ namespace GObject
             return;
         ConsumeInfo ci(PinjieUpForPet, 0, 0);
         _owner->useLongyuan(pjd->consume, &ci);
-        if(GRND(10000) <= pjd->prob + getPinjieBless())
+        if(GRND(PROB_BASE) <= pjd->prob + getPinjieBless())
         {   //成功
             levUp();
             reset(1);
@@ -207,7 +208,10 @@ namespace GObject
         else
         { //失败
             addPinjieBless(1);
-            _owner->sendMsgCode(0, 4001);
+            if(getPetLev() % 10 == 9)
+                _owner->sendMsgCode(0, 4003);
+            else
+                _owner->sendMsgCode(0, 4001);
             UInt8 value = getPetLev() % 10 + 10;
             _owner->fairyPetUdpLog(10000, value > 10 ? value : 20);
         }
@@ -233,7 +237,7 @@ namespace GObject
                 break;
             ++ num;
             used += pjd->consume;
-            if(GRND(10000) <= pjd->prob + getPinjieBless())
+            if(GRND(PROB_BASE) <= pjd->prob + getPinjieBless())
             {   //成功
                 levUp();
                 reset(1);
@@ -268,7 +272,7 @@ namespace GObject
         if(!ggd) return;
         if(getChongNum() < ggd->limit)
             return;
-        if(GRND(10000) <= ggd->baseProb + getGenguBless())
+        if(GRND(PROB_BASE) <= ggd->baseProb + getGenguBless())
         {   //成功
             reset(2);
             reset(3);
@@ -315,9 +319,11 @@ namespace GObject
 #define FREE_LIMIT 7
         GData::Pet::GenguData * ggd = GData::pet.getBoneTable(getPetBone());
         if(!ggd) return;
+        if(getGenguBless() + ggd->baseProb >= PROB_BASE)
+            return;
         UInt32 fengSui = _owner->GetVar(VAR_FAIRYPET_FENGSUI);
         UInt8 chong = 0;
-        bool isLucky = GRND(10000) <= 100 ? true : false;
+        bool isLucky = GRND(PROB_BASE) <= 100 ? true : false;
         if(!type)
         {
             if(fengSui < ggd->consume1)

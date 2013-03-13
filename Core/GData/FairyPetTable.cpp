@@ -83,4 +83,13 @@ UInt16 Pet::getPinjieBless(UInt16 id, UInt16 v)
     }
     return 0;
 }
+
+float Pet::getPetPotential(UInt16 id)
+{
+    GenguData * ggd = getBoneTable(id);
+    if(!ggd)
+        return 1.0f;
+    return ggd->growRate;
+}
+
 }

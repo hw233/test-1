@@ -55,6 +55,7 @@ public:
     GenguData * getBoneTable(UInt16);
     LingyaData * getLingyaTable(UInt32);
     UInt16 getPinjieBless(UInt16, UInt16);
+    float getPetPotential(UInt16);
 private:
     std::map<UInt16, PinjieData> _levData;
     std::map<UInt16, GenguData> _boneData;
