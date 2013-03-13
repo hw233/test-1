@@ -185,7 +185,7 @@ namespace GObject
 #if 0
 		_npcGroup->getLoots(m_Player);
 #else
-        if(uRand(1000) < 74)
+        if(uRand(10000) < 74)
             m_Player->GetPackage()->AddItem(9359, 1, true, false);
 #endif
 		notify();
@@ -3591,7 +3591,7 @@ namespace GObject
 			_lastNg = ng;
 
             UInt32 exp = expfactor * ng->getExp();
-            if(getBuffData(PLAYER_BUFF_TRAINP3, now))
+            if(getBuffData(PLAYER_BUFF_QI_TIAN_CHU_MO, now))
                 exp *= (18.f/10.f);
             pendExp(exp);
 
@@ -3641,11 +3641,8 @@ namespace GObject
 
 	bool Player::autoBattle( UInt32 npcId, UInt8 type)
 	{
-        if (GetPackage()->GetRestPackageSize() == 0)
-        {
-            sendMsgCode(0, 1011);
+        if(type > 3 && type != 0xFF)
             return false;
-        }
 #if 0
 		GData::NpcGroups::iterator it = GData::npcGroups.find(npcId);
 		if(it == GData::npcGroups.end())
@@ -3658,9 +3655,16 @@ namespace GObject
 		}
         if (ng->getType())
             return false;
-#endif
-        if(type > 3)
+#else
+        SpotData * spotData = GetMapSpot();
+        if (!spotData || spotData->m_Type != 9)
             return false;
+#endif
+        if (GetPackage()->GetRestPackageSize() == 0)
+        {
+            sendMsgCode(0, 1011);
+            return false;
+        }
 		const UInt32 eachBattle = 60;
 		UInt32 count = 60 * 8;
 
@@ -3680,8 +3684,19 @@ namespace GObject
             count = 60*216;
 
 		UInt32 timeDur = count * eachBattle;
-
 		UInt32 final = TimeUtil::Now() + timeDur;
+        GObject::EventWrapper::iterator it = GObject::eventWrapper.FindTimerEvent(this, EVENT_AUTOBATTLE, 0);
+        if(it != GObject::eventWrapper.end())
+        {
+            GObject::EventBase *event = it->second;
+            if(event)
+            {
+                count = event->GetTimer().GetLeftTimes();
+                GObject::EventAutoBattle *eventAuto = static_cast<GObject::EventAutoBattle *>(event);
+                final = eventAuto->getFinalEnd();
+            }
+        }
+
 		EventAutoBattle* event = new(std::nothrow) EventAutoBattle(this, eachBattle, count, /*ng*/NULL, final);
 		if (event == NULL) return false;
         SetVar(VAR_EXP_HOOK_INDEX, type);
@@ -3751,6 +3766,10 @@ namespace GObject
 
 	void Player::instantAutoBattle()
 	{
+        if(GetFreePackageSize() < 1)
+        {
+            sendMsgCode(2, 1011);
+        }
 		if(_playerData.icCount > getMaxIcCount(_vipLevel))
             _playerData.icCount = 0;
 		if(_playerData.icCount >= getMaxIcCount(_vipLevel) || !hasFlag(Training) || getGoldOrCoupon() < 10)
@@ -17397,7 +17416,7 @@ void Player::transferExpBuffer2Var()
     if((left = getBuffLeft(PLAYER_BUFF_TRAINP3, tm)) > 0)
     {
         total += left;
-        //setBuffData(PLAYER_BUFF_TRAINP3);保留
+        setBuffData(PLAYER_BUFF_QI_TIAN_CHU_MO, left);
     }
     if(total > 0)
     {

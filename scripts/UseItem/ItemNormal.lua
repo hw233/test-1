@@ -7832,7 +7832,7 @@ end
 function ItemNormal_00009361(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
-    if ItemNormal_AddBuff(player, 10, 3600, num, 356400) then
+    if ItemNormal_AddBuff(player, 0x5B, 3600, num, 356400) then
         package:DelItemSendMsg(iid, player);
         return num;
     else

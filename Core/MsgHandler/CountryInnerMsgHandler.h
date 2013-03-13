@@ -827,6 +827,14 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
 	player->AddExp(static_cast<UInt64>(exp));
 #if 0
 	ecs->ng->monsterKilled(player, ecs->count);
+#else
+    UInt32 itemCount = 0;
+    for(UInt32 i = 0; i < ecs->count; i++)
+    {
+        if(uRand(10000) < 74)
+            ++itemCount;
+    }
+    player->GetPackage()->AddItem(9359, itemCount, true, false);
 #endif
 }
 

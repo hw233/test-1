@@ -126,6 +126,7 @@ namespace GObject
 #define PLAYER_BUFF_ATHL7           0x57
 #define PLAYER_BUFF_ATHL8           0x58
 #define PLAYER_BUFF_ATHL9           0x59
+#define PLAYER_BUFF_QI_TIAN_CHU_MO  0x5B   //齐天除魔
 
 #define PLAYER_BUFF_DISPLAY_MAX		0x5F
 #define PLAYER_BUFF_COUNT			0x5F
@@ -229,6 +230,7 @@ namespace GObject
 		bool instantComplete();
 
 		void updateDB(bool);
+		UInt32 getFinalEnd() const { return _finalEnd; };
 
 	private:
 		float calcExpEach(UInt32);

@@ -183,7 +183,7 @@ void Dungeon::takeLoot( Player * player, DungeonPlayerInfo& dpi, UInt32& exp )
         return;
 
     exp = dm->exp;
-    if(player->getBuffData(PLAYER_BUFF_TRAINP3))
+    if(player->getBuffData(PLAYER_BUFF_QI_TIAN_CHU_MO))
         exp *= (18.f/10.f);
 
 	player->pendExp(exp);
