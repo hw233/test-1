@@ -7930,15 +7930,20 @@ function ItemNormal_00009366(iid, num, bind, param)
     if player:GetLev() < 50 then
         return 0
     end
-    local package = player:GetPackage();
-    package:DelItemSendMsg(iid, player);
+    local package = player:GetPackage()
+    local count = 0
     for i = 1, num do
         local id = bluePet[math.random(1, #bluePet)]
-        player:setCanHirePet(id)
-        player:writeCanHiretPet()
-        player:hireFairyPet(id)
+        local res = player:getPetByPetEgg(id)
+        if res == 3 then  --仙宠已满
+            break
+        end
+        count = count + 1
     end
-    return num
+    if count > 0 then
+        package:DelItemSendMsg(iid, player)
+    end
+    return count
 end
 
 --使用仙缘石

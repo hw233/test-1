@@ -293,9 +293,7 @@ namespace Script
         CLASS_DEF(Player, fighterFromItem);
         CLASS_DEF(Player, appendCompassItem);
         CLASS_DEF(Player, getXianyuanLua);
-        CLASS_DEF(Player, setCanHirePet);
-        CLASS_DEF(Player, hireFairyPet);
-        CLASS_DEF(Player, writeCanHiretPet);
+        CLASS_DEF(Player, getPetByPetEgg);
 
         CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);

@@ -3718,6 +3718,7 @@ void GMHandler::OnFairyPetGM(GObject::Player *player, std::vector<std::string>& 
     switch(type)
     {
         case 1:
+            player->setCanHirePet(val);
             player->hireFairyPet(val);
             player->sendFairyPetList();
             break;
