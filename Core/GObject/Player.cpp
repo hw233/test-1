@@ -17167,12 +17167,12 @@ void Player::sendQZoneQQGameAct(UInt8 domainType)
 {
     if(!World::getQZoneQQGameAct())
         return;
-    if(domainType != 1)
+    if(domainType == 1)
     {
         if(atoi(m_domain) != 1)
             return;
     }
-    else if(domainType != 2)
+    else if(domainType == 2)
     {
         if(atoi(m_domain) != 10)
             return;
@@ -17181,6 +17181,7 @@ void Player::sendQZoneQQGameAct(UInt8 domainType)
         return;
     Stream st(REP::COUNTRY_ACT);
     st << static_cast<UInt8>(0x0C);
+    st << domainType;
     UInt8 opt = GetVar(VAR_QZONE_QQGAME_ACT);
     if(domainType == 1)
         opt = opt & 0x3;
@@ -17751,7 +17752,7 @@ void Player::getQQGameOnlineAward()
         return;
     if(GetVar(VAR_ONLINE_AWARD) > 0)
         return;
-    if(GetVar(VAR_ONLINE_TOTAL_TIME) < 3600)
+    if(getQQGameOnlineTotalTime() < 3600)
         return;
     if (GetPackage()->GetRestPackageSize() < 4)
     {
@@ -17799,18 +17800,23 @@ UInt32 Player::getQQGameOnlineTotalTime()
 {
     UInt32 now = TimeUtil::Now();
     UInt32 today = TimeUtil::SharpDayT( 0 , now);
-    UInt32 lastOnline = _playerData.lastOnline;
+    UInt32 lastOnline = _playerData.lastOnline; //考虑了是前几天登录的情况
     UInt32 curTime;
-    if(lastOnline <= today + 19*3600 || lastOnline >= today + 21*3600)
+    if(now <= today + 19*3600)
         curTime = 0;
+    else if(now <= today + 21*3600)
+    {
+        if(lastOnline <= (today + 19*3600))
+            curTime = now - (today + 19*3600);
+        else
+            curTime = now - lastOnline;
+    }
     else
     {
-       if(now < lastOnline)
-           curTime = 0;
-       else if(now < today + 21*3600)
-           curTime = now - lastOnline;
-       else
-           curTime = today + 21*3600 - lastOnline;
+        if(lastOnline <= (today + 19*3600))
+            curTime = 3600;
+        else
+            curTime = (today + 21*3600) > lastOnline ? ((today + 21*3600) - lastOnline) : 0;
     }
     return GetVar(VAR_ONLINE_TOTAL_TIME) + curTime;
 }
