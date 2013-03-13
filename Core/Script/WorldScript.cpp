@@ -253,6 +253,8 @@ void WorldScript::init()
     def("setBDSuperman", GObject::World::setBDSuperman);
     //def("setInterval", GObject::ClanCopy::setInterval);
     //def("setStartTick", GObject::ClanCopy::setStartTick);
+    def("setQQGameOnlineAwardAct", GObject::World::setQQGameOnlineAwardAct);
+    def("setQZoneQQGameAct", GObject::World::setQZoneQQGameAct);
 }
 
 void WorldScript::postInit()

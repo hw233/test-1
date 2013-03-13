@@ -991,6 +991,18 @@ function onActivityCheck(tm)
       else
           setWeiboAct(false)
       end
+
+      if tm >= actTime243_0 and tm < actTime243_1 then
+          setQQGameOnlineAwardAct(true)
+      else
+          setQQGameOnlineAwardAct(false)
+      end
+
+      if tm >= actTime244_0 and tm < actTime244_1 then
+          setQZoneQQGameAct(true)
+      else
+          setQZoneQQGameAct(false)
+      end
  
       setShuoShuo(true);
   end
@@ -1268,6 +1280,10 @@ function initActTime(y, m, d)
   --特殊古籍活动
   local  SerStartTm242 = { ['year'] = 2013, ['month'] = 3, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm242_1 = { ['year'] = 2013, ['month'] = 3, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --大厅累积在线奖励
+  local  SerStartTm243 = { ['year'] = 2013, ['month'] = 3, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --空间黄钻、大厅蓝钻礼包
+  local  SerStartTm244 = { ['year'] = 2013, ['month'] = 3, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   --300-399越南版用了
   actTime0 = os.time(SerStartTm);
@@ -1666,6 +1682,12 @@ function initActTime(y, m, d)
 
   actTime242_0= os.time(SerStartTm242);
   actTime242_1= os.time(SerStartTm242_1);
+
+  actTime243_0= os.time(SerStartTm243);
+  actTime243_1= os.time(SerStartTm243) + 3 * 86400;
+
+  actTime244_0= os.time(SerStartTm244);
+  actTime244_1= os.time(SerStartTm244) + 7 * 86400;
 
   actTime2013_01_29= os.time(SerStartTm2013_01_29);
   actTime2013_02_01= os.time(SerStartTm2013_02_01);

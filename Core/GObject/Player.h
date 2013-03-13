@@ -2156,6 +2156,8 @@ namespace GObject
         void sendFeastGiftAct();
         void getNewYearQQGameAward(UInt8 type);
         void sendNewYearQQGameAct();
+        void getQZoneQQGameAward(UInt8 domainType, UInt8 type);
+        void sendQZoneQQGameAct(UInt8 domainType);
         void getNewYearQzoneContinueAward(UInt8 type);
         void sendNewYearQzoneContinueAct();
         void calcNewYearQzoneContinueDay(UInt32 time);
@@ -2196,6 +2198,10 @@ namespace GObject
 	    UInt32 useFengsui( UInt32 a, ConsumeInfo * ci );
 	    UInt32 useLongyuan( UInt32 a, ConsumeInfo * ci );
 
+        void getQQGameOnlineAward();
+        void sendQQGameOnlineAward();
+        void setQQGameOnlineTotalTime();
+        UInt32 getQQGameOnlineTotalTime();
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n
