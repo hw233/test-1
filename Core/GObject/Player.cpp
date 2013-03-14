@@ -17760,7 +17760,7 @@ UInt8 Player::toQQGroup(bool isJoin)
         // 仙宠相关日志
         char action[16] = "";
         snprintf (action, 16, "F_%d_%d", id, type);
-        udpLog("fairyPet", action, "", "", "", "", "act");
+        udpLog("FairyPet", action, "", "", "", "", "act");
     }
 
 	FairyPet * Player::findFairyPet( UInt32 id )
@@ -18128,10 +18128,25 @@ UInt8 Player::toQQGroup(bool isJoin)
         return res;
     }
 
-    UInt32 Player::getXianyuanLua(UInt32 c)
+    void Player::getLongyuanLua(UInt32 c)
+    {
+        IncommingInfo ii(LongyuanFromUseItem, 0, 0);
+        getLongyuan(c, &ii);
+        sendFairyPetResource();
+    }
+
+    void Player::getFengsuiLua(UInt32 c)
+    {
+        IncommingInfo ii(FengsuiFromUseItem, 0, 0);
+        getFengsui(c, &ii);
+        sendFairyPetResource();
+    }
+
+    void Player::getXianyuanLua(UInt32 c)
     {
         IncommingInfo ii(XianyuanFromUseItem, 0, 0);
-        return getXianyuan(c, &ii);
+        getXianyuan(c, &ii);
+        sendFairyPetResource();
     }
 
     UInt32 Player::getXianyuan( UInt32 c, IncommingInfo* ii)
@@ -18143,10 +18158,11 @@ UInt8 Player::toQQGroup(bool isJoin)
 		SYSMSG_SENDV(161, this, c);
 		SYSMSG_SENDV(1061, this, c);
         SetVar(VAR_FAIRYPET_XIANYUAN, xianyuan);
-
+        /*
         Stream st(REP::USER_INFO_CHANGE);
         st << static_cast<UInt8>(0x18) << xianyuan << Stream::eos;
         send(st);
+        */
 
         if(ii && ii->incommingType != 0)
         {
