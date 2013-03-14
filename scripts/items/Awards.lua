@@ -425,8 +425,8 @@ function RunBlueDiamondAward(player, opt)
 	end
     local date_9190_0 = { ['year'] = 2012, ['month'] = 12, ['day'] = 24, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
     local date_9190_1 = { ['year'] = 2013, ['month'] = 1, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
-    local date_9191_0 = { ['year'] = 2012, ['month'] = 12, ['day'] = 24, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
-    local date_9191_1 = { ['year'] = 2013, ['month'] = 1, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+    local date_9191_0 = { ['year'] = 2013, ['month'] = 3, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+    local date_9191_1 = { ['year'] = 2013, ['month'] = 3, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
     local date_9217_0 = { ['year'] = 2012, ['month'] = 11, ['day'] = 20, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
     local date_9217_1 = { ['year'] = 2012, ['month'] = 11, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
     

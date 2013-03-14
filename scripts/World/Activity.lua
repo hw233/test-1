@@ -1003,6 +1003,20 @@ function onActivityCheck(tm)
       else
           setQZoneQQGameAct(false)
       end
+      if tm >= actTime2013_03_15 and tm < (actTime2013_03_15+86400) then
+          setPetEggAct(true)
+      elseif tm >= (actTime2013_03_15+8*86400) and tm < (actTime2013_03_15+9*86400) then
+          setPetEggAct(true)
+      elseif tm >= (actTime2013_03_15+16*86400) and tm < (actTime2013_03_15+17*86400) then
+          setPetEggAct(true)
+      else
+          setPetEggAct(false)
+      end
+      if tm >= actTime2013_03_15 and tm < (actTime2013_03_15+10*86400) then
+          setLongyuanAct(true)
+      else
+          setLongyuanAct(false)
+      end
  
       setShuoShuo(true);
   end
@@ -1265,6 +1279,9 @@ function initActTime(y, m, d)
   --微信微博领奖
   local  SerStartTm2013_02_22 = { ['year'] = 2013, ['month'] = 2, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm2013_04_01 = { ['year'] = 2013, ['month'] = 4, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --灵宠活动
+  local  SerStartTm2013_03_15 = { ['year'] = 2013, ['month'] = 3, ['day'] = 15, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
   -- 迎新纳福 红包入袋
   local  SerStartTm237 = { ['year'] = 2013, ['month'] = 2, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 蓝钻新年回馈活动
@@ -1701,6 +1718,8 @@ function initActTime(y, m, d)
   actTime2013_02_23= os.time(SerStartTm2013_02_23);
   actTime2013_02_29= os.time(SerStartTm2013_02_29);
   actTime2013_02_22= os.time(SerStartTm2013_02_22);
+  actTime2013_03_14= os.time(SerStartTm2013_03_15)-86400;
+  actTime2013_03_15= os.time(SerStartTm2013_03_15);
   actTime2013_04_01= os.time(SerStartTm2013_04_01);
 
   onActivityCheck(os.time() + 30);
