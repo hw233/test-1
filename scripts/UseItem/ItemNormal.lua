@@ -7923,6 +7923,20 @@ function ItemNormal_00009361(iid, num, bind, param)
     end
 end
 
+function ItemNormal_00009365(iid, num, bind, param)
+    local player = GetPlayer()
+    if player:GetLev() < 50 then
+        return 0
+    end
+    local package = player:GetPackage();
+    package:DelItemSendMsg(iid, player);
+    for k = 1, num do
+        player:getLongyuanLua(math.random(1000, 10000));
+        player:getFengsuiLua(math.random(1000, 10000));
+    end
+    return num
+end
+
 --使用灵宠蛋
 function ItemNormal_00009366(iid, num, bind, param)
     local player = GetPlayer()
@@ -9647,6 +9661,7 @@ local ItemNormal_Table = {
 
     [9360] = ItemNormal_00009360,
     [9361] = ItemNormal_00009361,
+    [9365] = ItemNormal_00009365,
     [9366] = ItemNormal_00009366,
     [9367] = ItemNormal_00009367,
     [9368] = ItemNormal_00009367,
