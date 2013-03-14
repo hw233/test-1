@@ -98,18 +98,6 @@ void BattleField::setPetObject( int side, BattleObject * obj, UInt8 isBody)
     }
 }
 
-UInt32 BattleField::upPetObject(UInt8 side, bool isReplace /* = true */)
-{
-    // 上场候补选手（如果上场位置有人，则直接顶掉）
-    if (side < 0 || side >= 2)
-        return 0xff;
-    if (_backupObjs[side] == NULL)
-        return 0xff;
-    _backupObjs[side]->setPos(_backupTargetPos[side]);
-    setObject(side, _backupTargetPos[side], _backupObjs[side]);
-    return _backupTargetPos[side];
-}
-
 bool BattleField::addReiatsu(int side, int value)
 {
     // 增加场上灵压，返回值表示是否需要仙宠出场

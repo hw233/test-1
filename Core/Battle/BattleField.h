@@ -43,7 +43,6 @@ public:
 	void setFormation(int, UInt32);
     void setPetObject(int, BattleObject *, UInt8 = 0);
 
-    UInt32 upPetObject(UInt8, bool = true);
     bool addReiatsu(int, int);
     int getReiatsu(int side);
     inline int getToggleReiatsu(int side) 
