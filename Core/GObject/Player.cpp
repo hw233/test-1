@@ -17681,6 +17681,77 @@ void Player::sendTownTjItemInfo()
     send(st);
 }
 
+void Player::getLongyuanAct(UInt8 idx, UInt8 flag/*0:领取 1:结缘*/)
+{
+    static UInt32 s_lev[] = {60,70,80,90,100,110};
+    static UInt32 s_longyuan[] = {50000,100000,200000,300000,400000,500000};
+    static UInt32 s_fengsui[] = {10000,20000,40000,60000,80000,100000};
+    static UInt32 s_gold[] = {200,1000,2000,5000,10000,20000};
+    if (!World::getLongyuanAct())
+        return;
+    if (idx > 5)
+        return;
+    UInt32 v = GetVar(VAR_LONGYUAN_GOT);
+    UInt8 res = 0;
+    if (GetLev() >= s_lev[idx])
+    {
+        UInt8 i = idx*2 + flag; //每2位存一个等级的标志 第1位:领取 第2位:结缘
+        if (v&(0x01<<i))
+        {
+            res = 1; //已领取
+        }
+        else
+        {
+            if (flag == 1)
+            {
+                if (getGold() < s_gold[idx])
+                {
+                    sendMsgCode(0, 1104); 
+                    return;
+                }
+                ConsumeInfo ci(LongYuanAct,0,0);
+                useGold(s_gold[idx],&ci);
+           }
+           IncommingInfo ii1(LongYuanAct, 0, 0);
+           getLongyuan(s_longyuan[idx], &ii1);
+           IncommingInfo ii2(LongYuanAct, 0, 0);
+           getFengsui(s_fengsui[idx], &ii2);
+           sendFairyPetResource();
+
+           v |= (0x01<<i);
+           SetVar(VAR_LONGYUAN_GOT, v);
+           sendLongyuanActInfo();
+        }
+    }
+    else
+    {
+        res = 3;
+    }
+}
+void Player::sendLongyuanActInfo()
+{
+    static UInt32 s_lev[] = {60,70,80,90,100,110};
+    UInt8 total = 0;
+    UInt8 i = 0;
+    for (i = 0; i < sizeof(s_lev)/sizeof(s_lev[0]); ++i)
+    {
+        if (GetLev() < s_lev[i])
+            break;
+        total += 1;
+    }
+    Stream st(REP::ACTIVE);
+    st << static_cast<UInt8>(0x0E) << static_cast<UInt8>(0x01);
+    st << static_cast<UInt8>(total);
+    UInt32 v = GetVar(VAR_LONGYUAN_GOT);
+    for (i = 0; i < total; ++i)
+    {
+        UInt8 flag = 0;
+        flag = (v>>(i*2))&0x03;
+        st << flag;
+    }
+    st << Stream::eos;
+    send(st);
+}
 void Player::transferExpBuffer2Var()
 {
     UInt32 tm = TimeUtil::Now();

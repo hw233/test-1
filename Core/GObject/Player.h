@@ -2139,6 +2139,9 @@ namespace GObject
         
         void buyTownTjItem(const UInt32 itemId);
         void sendTownTjItemInfo();
+        
+        void getLongyuanAct(UInt8 idx, UInt8 flag);
+        void sendLongyuanActInfo();
     private:
         UInt8 cf_posPut[5];//范围1-5
         UInt32 cf_itemId[5];

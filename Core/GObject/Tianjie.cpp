@@ -1068,6 +1068,15 @@ void Tianjie::process(UInt32 now)
         m_scoreSortMap.clear();
 
         broadTianjiePassed();
+        m_tjTypeId = 0;
+        for (size_t i = 0; i < sizeof(s_tjRoleLevel)/sizeof(s_tjRoleLevel[0]); ++i)
+    	{
+    		if (s_tjRoleLevel[i] == m_currOpenedTjLevel)
+            {
+                m_tjTypeId = i;
+                break;
+            }
+        }
     }
     if (m_isTjOpened)
     {

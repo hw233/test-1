@@ -105,6 +105,7 @@ enum PurchaseType
     YouliForPet                 = 94, //游历仙宠消耗仙缘
     PinjieUpForPet              = 95, //仙宠品阶升级消耗龙元
     GenguUpForPet               = 96, //仙宠根骨升级消耗凤髓
+    LongYuanAct                 = 97, //龙元结缘
     //繁体私有占150～200
 };
 

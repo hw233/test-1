@@ -2400,6 +2400,25 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                     player->buyTownTjItem(itemId);
                     break;
             }
+            break;
+        }
+        case 0x0E:
+        {
+            brd >> op;
+            switch (op)
+            {
+                case 0x01:
+                    player->sendLongyuanActInfo();
+                    break;
+                case 0x02:
+                    UInt8 idx = 0;
+                    UInt8 flag = 0;
+                    brd >> idx;
+                    brd >> flag;
+                    player->getLongyuanAct(idx, flag);
+                    break;
+            }
+            break;
         }
         default:
             break;
