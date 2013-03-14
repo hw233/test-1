@@ -17883,6 +17883,14 @@ UInt8 Player::toQQGroup(bool isJoin)
 		FairyPet * pet2 = pet->clone(this);
 		addFairyPet(pet2, true);
         delCanHirePet(id);
+        if(_fairyPets.size() == 1)  //第一个仙宠自动出战
+        {
+            setFairypetBattle(pet2, true);
+            Stream st(REP::FAIRY_PET);
+            st << static_cast<UInt8>(0x03) << static_cast<UInt8>(0x03);
+            st << id << Stream::eos;
+            send(st);
+        }
         return 0;
     }
 
