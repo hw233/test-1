@@ -18023,6 +18023,7 @@ UInt8 Player::toQQGroup(bool isJoin)
             st << it->first;
             st << it->second->getPetLev();
             st << it->second->getPetBone();
+            st << it->second->getChongNum();
             ++ it;
         }
         st << Stream::eos;
