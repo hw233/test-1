@@ -2086,8 +2086,7 @@ namespace GObject
 		DB1().PushUpdateData("UPDATE `player` SET `lastOnline` = %u, `nextReward` = '%u|%u|%u|%u' WHERE `id` = %"I64_FMT"u", curtime, _playerData.rewardStep, _playerData.nextRewardItem, _playerData.nextRewardCount, _playerData.nextRewardTime, _id);
         if(_isOnline && !hasFlag(Training))
         {
-            if(cfg.GMCheck)
-                autoBattle(0, 0);
+            autoBattle(0, 0);
         }
         _isOnline = false;
 
@@ -17685,9 +17684,9 @@ void Player::sendTownTjItemInfo()
 void Player::getLongyuanAct(UInt8 idx, UInt8 flag/*0:领取 1:结缘*/)
 {
     static UInt32 s_lev[] = {60,70,80,90,100,110};
-    static UInt32 s_longyuan[] = {50000,100000,200000,300000,400000,500000};
-    static UInt32 s_fengsui[] = {10000,20000,40000,60000,80000,100000};
-    static UInt32 s_gold[] = {200,1000,2000,5000,10000,20000};
+    static UInt32 s_longyuan[] = {50000,150000,300000,450000,500000,600000};
+    static UInt32 s_fengsui[] = {10000,50000,100000,200000,500000,1000000};
+    static UInt32 s_gold[] = {50,200,500,1000,3000,5000};
     if (!World::getLongyuanAct())
         return;
     if (idx > 5)
