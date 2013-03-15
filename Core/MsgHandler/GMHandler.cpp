@@ -3308,6 +3308,12 @@ void GMHandler::OnForbidSale(GObject::Player *player, std::vector<std::string>& 
         GameMsgHdr hdr(0x352, pl->getThreadId(), pl, NULL);
         GLOBAL().PushMsg(hdr, NULL);
     }
+
+    std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());
+    if (execu.get() != NULL && execu->isConnected())
+    {
+        execu->Execute2("REPLACE into `fsale_player` values(%"I64_FMT"u,%d,1)", playerId, TimeUtil::Now());
+    }
 }
 
 void GMHandler::OnUnForbidSale(GObject::Player *player, std::vector<std::string>& args)
@@ -3320,6 +3326,11 @@ void GMHandler::OnUnForbidSale(GObject::Player *player, std::vector<std::string>
     GObject::Player * pl = GObject::globalPlayers[playerId];
     if (NULL != pl)
         pl->setForbidSale(false);
+    std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());
+    if (execu.get() != NULL && execu->isConnected())
+    {
+        execu->Execute2("REPLACE into `fsale_player` values(%"I64_FMT"u,%d,0)", playerId, TimeUtil::Now());
+    }
 }
 
 void GMHandler::OnSetLoginLimit(GObject::Player *player, std::vector<std::string>& args)
