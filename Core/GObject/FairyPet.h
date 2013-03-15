@@ -45,6 +45,7 @@ public:
     inline UInt8 getPetLev() { return _petLev; }
     inline UInt8 getPetBone() { return _petBone; }
     inline UInt8 getPetLingya() { return _lingya; }
+    inline UInt8 getChongNum() { return _chong; }
 
     inline void setPetLingya(UInt8 ly) { _lingya = ly; }
     inline UInt8 getTargetPos()
@@ -125,7 +126,6 @@ public:
     */
 
 private:
-    inline UInt8 getChongNum() { return _chong; }
     inline UInt32 getGenguBless() { return _genguBless; }
     inline UInt16 getXiaozhou() { return _xiaozhou; }
     inline UInt16 getDazhou() { return _dazhou; }
