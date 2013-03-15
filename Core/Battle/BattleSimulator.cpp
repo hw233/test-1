@@ -1566,7 +1566,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                         appendStatusChange(e_stAtkReduce, value, 0, bf);
                     }
 
-                    appendDefStatus(e_damNormal, 0, bf);
+                    appendDefStatus(e_damNormal, 0, target_fighter);
                     size_t idx = _defList.size() - 1;
                     _defList[idx].damType2 |= 0x80;
                     if(cs2)
