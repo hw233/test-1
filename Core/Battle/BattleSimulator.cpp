@@ -532,7 +532,7 @@ void BattleSimulator::start(UInt8 prevWin, bool checkEnh)
             }
         }
         if (_backupObjs[i])
-            static_cast<BattleFighter *>(_backupObjs[i])->initStats(checkEnh);
+            static_cast<BattleFighter *>(_backupObjs[i])->initStats(false);
 
     }
 
@@ -5803,6 +5803,12 @@ UInt32 BattleSimulator::doAttack( int pos )
     }
     if (reiatsuType2)
         rcnt += tryPetEnter(side, reiatsuType2);
+
+    if(_defList.size() > 0 || _scList.size() > 0)
+    {
+        appendToPacket(0, -1, -1, 5, 0, false, false);
+        ++ rcnt;
+    }
 
     return rcnt;
 }
@@ -11273,6 +11279,24 @@ void BattleSimulator::appendReiatsuChange(int side)
 {
     if (_backupObjs[side])
         appendStatusChangeForReiastu(e_stReiastu, getReiatsu(side) ,0 , side);
+}
+
+UInt32 BattleSimulator::upPetObject(UInt8 side, bool isReplace /* = true */)
+{
+    // 上场候补选手（如果上场位置有人，则直接顶掉）
+    if (side < 0 || side >= 2)
+        return 0xff;
+    if (_backupObjs[side] == NULL)
+        return 0xff;
+    int pos = _backupTargetPos[side];
+    BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, pos));
+    if(bo != NULL && bo->getHP() > 0)
+        removeFighterStatus(bo);
+
+    _backupObjs[side]->setPos(_backupTargetPos[side]);
+    setObject(side, pos, _backupObjs[side]);
+
+    return pos;
 }
 
 }
