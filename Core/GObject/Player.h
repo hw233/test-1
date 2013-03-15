@@ -2193,7 +2193,9 @@ namespace GObject
         void getPetByLevelUp(UInt8);
         UInt8 getPetByPetEgg(UInt32);
 
-        UInt32 getXianyuanLua(UInt32);
+        void getXianyuanLua(UInt32);
+        void getLongyuanLua(UInt32);
+        void getFengsuiLua(UInt32);
         UInt32 getXianyuan( UInt32 c, IncommingInfo* ii = NULL);
         UInt32 getFengsui( UInt32 c, IncommingInfo* ii);
         UInt32 getLongyuan( UInt32 c, IncommingInfo* ii);

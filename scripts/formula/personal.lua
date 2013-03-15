@@ -16,7 +16,7 @@ magatk_factor = { 0,   0,   0, 0,30,15,20,12}  -- 法功
 magdef_factor = { 0,   0,   0, 0,10,10,40,12}  -- 法防
 
 tough_factor       = { 0,  0,  0, 0,0,0,0,0}  -- 坚韧
-action_factor      = {11, 12, 10, 12,0,0,0,0}  -- 身法
+action_factor      = {11, 12, 10, 12,12,12,12,12}  -- 身法
 hitrate_factor     = { 1,  1,  1, 1,0,0,0,0}  -- 命中
 evade_factor       = { 0,  0,  0, 0,0,0,0,0}  -- 闪避
 critical_factor    = { 0,  0,  0, 0,0,0,0,0}  -- 暴击

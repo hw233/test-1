@@ -326,8 +326,6 @@ namespace GObject
         bool isLucky = GRND(PROB_BASE) <= 100 ? true : false;
         if(!type)
         {
-            if(fengSui < ggd->consume1)
-                return;
             UInt32 xiaoZhou = getXiaozhou();
             if(xiaoZhou / 10 >= FREE_LIMIT && !(xiaoZhou % 10)) 
             {
@@ -335,6 +333,8 @@ namespace GObject
             }
             else
             {
+                if(fengSui < ggd->consume1)
+                    return;
                 ConsumeInfo ci(GenguUpForPet, 0, 0);
                 _owner->useFengsui(ggd->consume1, &ci);
                 xiaoZhou = (xiaoZhou / 10 + 1) * 10 + xiaoZhou % 10;
@@ -353,8 +353,6 @@ namespace GObject
         }
         else
         {
-            if(fengSui < ggd->consume2)
-                return;
             UInt32 daZhou = getDazhou();
             if(daZhou / 10 >= FREE_LIMIT && !(daZhou % 10))
             {
@@ -362,6 +360,8 @@ namespace GObject
             }
             else
             {
+                if(fengSui < ggd->consume2)
+                    return;
                 ConsumeInfo ci(GenguUpForPet, 0, 0);
                 _owner->useFengsui(ggd->consume2, &ci);
                 daZhou = (daZhou / 10 + 1) * 10 + daZhou % 10;
