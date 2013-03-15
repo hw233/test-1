@@ -2401,6 +2401,8 @@ void Tianjie::addTianjieNpc(UInt32 npcId, UInt16 spot)
     if (pmap->AddObject(mo))
     {
         pmap->Show(npcId, true, mo.m_Type);
+	
+        FastMutex::ScopedLock lk(_opMutex1);
         m_locNpcMap.insert(make_pair(spot, npcId));
         m_loc = spot;
         addNpcCount++ ;
