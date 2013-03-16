@@ -425,8 +425,8 @@ function RunBlueDiamondAward(player, opt)
 	end
     local date_9190_0 = { ['year'] = 2012, ['month'] = 12, ['day'] = 24, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
     local date_9190_1 = { ['year'] = 2013, ['month'] = 1, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
-    local date_9191_0 = { ['year'] = 2012, ['month'] = 12, ['day'] = 24, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
-    local date_9191_1 = { ['year'] = 2013, ['month'] = 1, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+    local date_9191_0 = { ['year'] = 2013, ['month'] = 3, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+    local date_9191_1 = { ['year'] = 2013, ['month'] = 3, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
     local date_9217_0 = { ['year'] = 2012, ['month'] = 11, ['day'] = 20, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
     local date_9217_1 = { ['year'] = 2012, ['month'] = 11, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
     
@@ -436,7 +436,7 @@ function RunBlueDiamondAward(player, opt)
     local chance = {785,2833,4881,5823,7202,7987,9366,10000}
     local chance_1 = {1428, 1428*2, 1428*3, 1428*4, 1428*5, 1428*6, 10000, 10000}
     local item_9190 = {{515,3},{507,2},{509,2},{503,10},{1325,4},{47,3},{134,4},{5026,1}}
-    local item_9191 = {{515,1},{507,1},{509,1},{503,5},{1325,2},{47,2},{134,2},{5026,1}}
+    local item_9191 = {{515,3},{507,2},{509,2},{503,10},{1325,4},{47,3},{134,4},{5026,1}}
     local item_9217 = {{515,3},{507,2},{509,2},{503,10},{1325,4},{47,3},{134,4},{5026,1}}
     local item_9284 = {{507,2},{509,2},{503,10},{1325,4},{47,3},{134,4},{515,10},{'ipad',1}}
 
@@ -712,6 +712,29 @@ function onGetNewYearQQGameAward(player, type)
     end
     for i = 1, #awards do
         package:Add(awards[i][1], awards[i][2], true, false, 2)
+    end
+    return true
+end
+
+function onGetQZoneQQGameAward(player, type)
+    if player == nil then
+        return false
+    end
+    if type == 0 or type > 2 then
+        return false
+    end
+    local awards = {
+        [1] = {{48, 1},{1327, 1},{56, 1},{57, 1}},
+        [2] = {{50, 1},{1326, 1},{56, 1},{57, 1}}
+    }
+    local award = awards[type]
+    local package = player:GetPackage()
+    if package:GetRestPackageSize() < #award then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    for i = 1, #award do
+        package:Add(award[i][1], award[i][2], true, false, 2)
     end
     return true
 end

@@ -6988,6 +6988,23 @@ function ItemNormal_00010114(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00010115(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (4+(4*num*2)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    package:Add(56, num*2, true, false, 2);
+    package:Add(57, num*2, true, false, 2);
+    package:Add(48, num*1, true, false, 2);
+    package:Add(50, num*1, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
 function ItemNormal_QixiLoveCard(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -7904,6 +7921,75 @@ function ItemNormal_00009361(iid, num, bind, param)
     else
         return false;
     end
+end
+
+function ItemNormal_00009365(iid, num, bind, param)
+    local player = GetPlayer()
+    if player:GetLev() < 50 then
+        return 0
+    end
+    local package = player:GetPackage();
+    package:DelItemSendMsg(iid, player);
+    for k = 1, num do
+        player:getLongyuanLua(math.random(1000, 10000));
+        player:getFengsuiLua(math.random(1000, 10000));
+    end
+    return num
+end
+
+--使用灵宠蛋
+function ItemNormal_00009366(iid, num, bind, param)
+    local player = GetPlayer()
+    if player:GetLev() < 50 then
+        return 0
+    end
+    local package = player:GetPackage()
+    local count = 0
+    for i = 1, num do
+        local id = bluePet[math.random(1, #bluePet)]
+        local res = player:getPetByPetEgg(id)
+        if res == 3 then  --仙宠已满
+            break
+        end
+        count = count + 1
+    end
+    if count > 0 then
+        package:DelItemSendMsg(iid, player)
+    end
+    return count
+end
+
+function ItemNormal_00009367(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    package:DelItemSendMsg(iid, player);
+    if 9367 == iid then
+        player:getLongyuanLua(num * 1000);
+    else
+        player:getLongyuanLua(num * 100000);
+    end
+    return num
+end
+
+function ItemNormal_00009369(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    package:DelItemSendMsg(iid, player);
+    if 9369 == iid then
+        player:getFengsuiLua(num * 1000);
+    else
+        player:getFengsuiLua(num * 100000);
+    end
+    return num
+end
+
+--使用仙缘石
+function ItemNormal_00009371(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    package:DelItemSendMsg(iid, player);
+    player:getXianyuanLua(num * 200);
+    return num
 end
 
 local ItemNormal_Table = {
@@ -9575,6 +9661,13 @@ local ItemNormal_Table = {
 
     [9360] = ItemNormal_00009360,
     [9361] = ItemNormal_00009361,
+    [9365] = ItemNormal_00009365,
+    [9366] = ItemNormal_00009366,
+    [9367] = ItemNormal_00009367,
+    [9368] = ItemNormal_00009367,
+    [9369] = ItemNormal_00009369,
+    [9370] = ItemNormal_00009369,
+    [9371] = ItemNormal_00009371,
     [9900] = ItemNormal_NameCard,
 
     [10000] = ItemNormal_00010000,
@@ -9692,6 +9785,7 @@ local ItemNormal_Table = {
     [10112] = ItemNormal_00010112,
     [10113] = ItemNormal_00010113,
     [10114] = ItemNormal_00010114,
+    [10115] = ItemNormal_00010115,
 };
 
 function ItemNormalOther_00000441(iid, num, bind, other)

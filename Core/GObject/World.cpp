@@ -152,6 +152,7 @@ bool World::_saveGoldAct= false;
 bool World::_feastloginAct= false;
 bool World::_newYearGiveGiftAct= false;
 bool World::_newYearQQGameAct= false;
+bool World::_QZoneQQGameAct= false;
 bool World::_newYearQzoneContinueAct= false;
 UInt8 World::_towerloginAct= 0;
 bool World::_guoqing= false;
@@ -188,6 +189,9 @@ bool World::_loginAward = false;
 bool World::_bluediamonSuperman = false;
 bool World::_tgcevent = false;
 bool World::_weiboact = false;
+bool World::_qqgameonlineawardact = false;
+bool World::_peteggact = false;
+bool World::_longyuanact = false;
 bool World::_compassact = false;
 UInt8 World::_callsnakeeggact = 0;
 UInt8 World::_snakeeggawardact = 0;
@@ -490,6 +494,13 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 15)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 16)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 19)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 20)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 22)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 24)
 
             ))
     {
@@ -1235,6 +1246,13 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 15)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 16)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 19)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 20)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 22)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 24)
             )
         bRechargeEnd = true;
 

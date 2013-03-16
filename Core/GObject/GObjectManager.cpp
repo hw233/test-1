@@ -66,6 +66,8 @@
 #include "Server/SysMsg.h"
 #include "SingleHeroStage.h" 
 #include "GData/LBSkillTable.h"
+#include "GData/FairyPetTable.h"
+#include "FairyPet.h"
 
 namespace GObject
 {
@@ -671,7 +673,11 @@ namespace GObject
 		{
 			lc.advance();
 			UInt32 id = dbfgt.id;
-			GObject::Fighter * fgt = new GObject::Fighter(id, NULL);
+			GObject::Fighter * fgt = NULL;
+            if(dbfgt.cls >= e_cls_qinglong && dbfgt.cls <= e_cls_xuanwu)
+			    fgt = new GObject::FairyPet(id, NULL);
+            else
+			    fgt = new GObject::Fighter(id, NULL);
 			fgt->setName(dbfgt.name);
 			fgt->setClass(dbfgt.cls);
 			fgt->setLevel(dbfgt.lvl);
@@ -706,6 +712,15 @@ namespace GObject
 			fgt->pierce = dbfgt.pierce;
 			fgt->counter = dbfgt.counter;
 			fgt->magres = dbfgt.magres;
+            GData::Pet::LingyaData * lyd = GData::pet.getLingyaTable(id);
+            if(lyd != NULL)
+            {   //仙宠
+                fgt->setColor(lyd->color);
+                fgt->setPotential(GData::pet.getPetPotential(lyd->initBone), false);
+                static_cast<FairyPet *>(fgt)->setPetLingya(lyd->lingya);
+                static_cast<FairyPet *>(fgt)->setPetBone(lyd->initBone);
+                static_cast<FairyPet *>(fgt)->LoadInitSkills(dbfgt.skill);
+            }
 
 			StringTokenizer tokenizer(dbfgt.extraPos, "|");
 			for(size_t j = 0; j < tokenizer.count(); ++ j)
@@ -1383,7 +1398,7 @@ namespace GObject
 		LoadingCounter lc("Loading players:");
 		// load players
 		DBPlayerData dbpd;
-		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `prestige`, `status`, `country`, `title`, `titleAll`, `archievement`, `attainment`, `qqvipl`, `qqvipyear`, `qqawardgot`, `qqawardEnd`, `ydGemId`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `mounts`, `icCount`, `piccount`, `nextpicreset`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `fshimen`, `yamen`, `fyamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `copyUpdate`, `frontFreeCnt`, `frontGoldCnt`, `frontUpdate`, `formations`, `atohicfg`, `gmLevel`, `wallow`, `dungeonCnt`, `dungeonEnd`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime`, `openid` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
+		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `prestige`, `status`, `country`, `title`, `titleAll`, `archievement`, `attainment`, `qqvipl`, `qqvipyear`, `qqawardgot`, `qqawardEnd`, `ydGemId`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `mounts`, `icCount`, `piccount`, `nextpicreset`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `fshimen`, `yamen`, `fyamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `copyUpdate`, `frontFreeCnt`, `frontGoldCnt`, `frontUpdate`, `formations`, `atohicfg`, `gmLevel`, `wallow`, `dungeonCnt`, `dungeonEnd`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime`, `openid`, `canHirePet` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
             return false;
 
 		lc.reset(200);
@@ -1708,6 +1723,16 @@ namespace GObject
             if(!pl->hasTitle(dbpd.pdata.title))
                 pl->fixOldVertionTitle(dbpd.pdata.title);
             pl->setOpenId(dbpd.openid, true);
+
+            if (dbpd.canHirePet.length())
+            {
+				StringTokenizer tk(dbpd.canHirePet, ",");
+				size_t count = tk.count();
+                for(size_t idx = 0; idx < count; ++ idx)
+			    {
+                    PLAYER_DATA(pl, canHirePet).push_back(atoi(tk[idx].c_str()));
+                }
+            }
 		}
 		lc.finalize();
 
@@ -1940,8 +1965,10 @@ namespace GObject
             fgt2->setPeerless(specfgtobj.peerless, false); // XXX: must after setTrump
             fgt2->setCittas(specfgtobj.cittas, false);
             fgt2->setUpCittas(specfgtobj.citta, false);
-            //fgt2->setSkills(specfgtobj.skills, false);
-            fgt2->setUpSkills(specfgtobj.skill, false);
+            if (fgt2->isPet())
+                fgt2->setSkills(specfgtobj.skill, false);
+            else
+                fgt2->setUpSkills(specfgtobj.skill, false);
             fgt2->setAttrType1(specfgtobj.attrType1);
             fgt2->setAttrValue1(specfgtobj.attrValue1);
             fgt2->setAttrType2(specfgtobj.attrType2);
@@ -1949,7 +1976,10 @@ namespace GObject
             fgt2->setAttrType3(specfgtobj.attrType3);
             fgt2->setAttrValue3(specfgtobj.attrValue3);
             fgt2->setHideFashion(specfgtobj.hideFashion,false);
-			pl->addFighter(fgt2, false, true);
+            if(fgt2->isPet())
+                pl->addFairyPet(static_cast<FairyPet *>(fgt2), false);
+            else
+			    pl->addFighter(fgt2, false, true);
             if (specfgtobj.level > lvl_max)
                 lvl_max = specfgtobj.level;
 
@@ -2515,6 +2545,32 @@ namespace GObject
 		}
 		lc.finalize();
 
+		lc.prepare("Loading fairyPet data:");
+		last_id = 0xFFFFFFFFFFFFFFFFull;
+		pl = NULL;
+		DBFairyPetData fpetdb;
+		if(execu->Prepare("SELECT `id`, `playerId`, `onBattle`, `petLev`, `petBone`, `pinjieBless`, `genguBless`, `chong`, `overTime`, `xiaozhou`, `dazhou` FROM `fairyPet` ORDER BY `playerId`", fpetdb) != DB::DB_OK)
+			return false;
+		lc.reset(200);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(fpetdb.playerId != last_id)
+			{
+				last_id = fpetdb.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+			FairyPet * pet = static_cast<FairyPet *>(pl->findFairyPet(fpetdb.id));
+			if(pet != NULL)
+            {
+                pet->LoadFromDB(fpetdb);
+                if(fpetdb.onBattle)
+                    pl->setFairypetBattle(pet, false);
+            }
+		}
+		lc.finalize();
 		/////////////////////////////////
 
 		globalPlayers.enumerate(player_load, 0);

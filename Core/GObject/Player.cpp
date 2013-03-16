@@ -646,7 +646,7 @@ namespace GObject
 #ifndef _WIN32
 		m_ulog(NULL),
 #endif
-		m_isOffical(false), m_isXY(false), m_sysDailog(false), m_hasTripod(false), _jobHunter(NULL), _dreamer(NULL)
+		m_isOffical(false), m_isXY(false), m_sysDailog(false), m_hasTripod(false), _jobHunter(NULL), _dreamer(NULL), _onBattlePet(NULL)
 	{
         m_ClanBattleStatus = 1;
         m_ClanBattleScore = 0;
@@ -2080,7 +2080,7 @@ namespace GObject
 		{
 			_onlineDuration = _onlineDuration + curtime - _playerData.lastOnline;
 		}
-
+        setQQGameOnlineTotalTime();
         int addr = inet_addr(m_clientIp);
 		DBLOG1().PushUpdateData("update login_states set logout_time=%u where server_id=%u and player_id=%"I64_FMT"u and login_time=%u", curtime, addr?addr:cfg.serverLogId, _id, _playerData.lastOnline);
 		DB1().PushUpdateData("UPDATE `player` SET `lastOnline` = %u, `nextReward` = '%u|%u|%u|%u' WHERE `id` = %"I64_FMT"u", curtime, _playerData.rewardStep, _playerData.nextRewardItem, _playerData.nextRewardCount, _playerData.nextRewardTime, _id);
@@ -3865,7 +3865,18 @@ namespace GObject
 			}
 		}
 		bsim.setPortrait(side, _fighters.empty() ? 0 : _fighters.begin()->second->getId());
+        PutPets(bsim, side);
 	}
+
+	void Player::PutPets( Battle::BattleSimulator& bsim, int side, bool init /* = true */)
+    {
+        // 战斗模拟器中加载宠物
+        if (_onBattlePet)
+        {
+            Battle::BattleFighter * bf = bsim.newPet(side, 0, _onBattlePet);
+            bf->setHP(_onBattlePet->getMaxHP());
+        }
+    }
 
 	Fighter * Player::takeFighter( UInt32 id, bool writedb )
 	{
@@ -4685,7 +4696,6 @@ namespace GObject
 #endif
         }
         SYSMSG_SENDV(152, this, c);
-        //SYSMSG_SENDV(1060, this, attacker->getCountry(), attacker->getName().c_str(), c);
         sendModification(3, _playerData.tael);
     }
 
@@ -17160,6 +17170,109 @@ void Player::getNewYearQQGameAward(UInt8 type)
     }
 }
 
+void Player::getQZoneQQGameAward(UInt8 domainType, UInt8 type)
+{
+    if(domainType == 1)
+    {
+        if(atoi(m_domain) != 1 && atoi(m_domain) != 2)
+            return;
+        if(type == 0 || type > 2)
+            return;
+        bool bRet;
+        UInt32 status = GetVar(VAR_QZONE_QQGAME_ACT);
+        if(type == 1)
+        {
+            if(status & 0x01)
+                return;
+            bRet = GameAction()->onGetQZoneQQGameAward(this, 1);
+            if(bRet)
+            {
+                status |= 0x01;
+                SetVar(VAR_QZONE_QQGAME_ACT, status);
+                sendQZoneQQGameAct(domainType);
+            }
+        }
+        else
+        {
+            if(status & 0x02)
+                return;
+            if(!isYD())
+                return;
+            bRet = GameAction()->onGetQZoneQQGameAward(this, 2);
+            if(bRet)
+            {
+                status |= 0x02;
+                SetVar(VAR_QZONE_QQGAME_ACT, status);
+                sendQZoneQQGameAct(domainType);
+            }
+        }
+    }
+    else if(domainType == 2)
+    {
+        if(atoi(m_domain) != 10)
+            return;
+        if(type == 0 || type > 2)
+            return;
+        bool bRet;
+        UInt32 status = GetVar(VAR_QZONE_QQGAME_ACT);
+        if(type == 1)
+        {
+            if(status & 0x04)
+                return;
+            bRet = GameAction()->onGetQZoneQQGameAward(this, 1);
+            if(bRet)
+            {
+                status |= 0x04;
+                SetVar(VAR_QZONE_QQGAME_ACT, status);
+                sendQZoneQQGameAct(domainType);
+            }
+        }
+        else
+        {
+            if(status & 0x08)
+                return;
+            if(!isBD())
+                return;
+            bRet = GameAction()->onGetQZoneQQGameAward(this, 2);
+            if(bRet)
+            {
+                status |= 0x08;
+                SetVar(VAR_QZONE_QQGAME_ACT, status);
+                sendQZoneQQGameAct(domainType);
+            }
+        }
+    }
+}
+
+void Player::sendQZoneQQGameAct(UInt8 domainType)
+{
+    if(!World::getQZoneQQGameAct())
+        return;
+    if(domainType == 1)
+    {
+        if(atoi(m_domain) != 1 && atoi(m_domain) != 2)
+            return;
+    }
+    else if(domainType == 2)
+    {
+        if(atoi(m_domain) != 10)
+            return;
+    }
+    else
+        return;
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(0x0C);
+    st << domainType;
+    UInt8 opt = GetVar(VAR_QZONE_QQGAME_ACT);
+    if(domainType == 1)
+        opt = opt & 0x3;
+    else
+        opt = (opt >> 2) & 0x03;
+    st << opt;
+    st << Stream::eos;
+    send(st);
+}
+
 void Player::sendNewYearQQGameAct()
 {
     if(!World::getNewYearQQGameAct())
@@ -17639,6 +17752,77 @@ void Player::sendTownTjItemInfo()
     send(st);
 }
 
+void Player::getLongyuanAct(UInt8 idx, UInt8 flag/*0:领取 1:结缘*/)
+{
+    static UInt32 s_lev[] = {60,70,80,90,100,110};
+    static UInt32 s_longyuan[] = {50000,150000,300000,450000,500000,600000};
+    static UInt32 s_fengsui[] = {10000,50000,100000,200000,500000,1000000};
+    static UInt32 s_gold[] = {50,200,500,1000,3000,5000};
+    if (!World::getLongyuanAct())
+        return;
+    if (idx > 5)
+        return;
+    UInt32 v = GetVar(VAR_LONGYUAN_GOT);
+    UInt8 res = 0;
+    if (GetLev() >= s_lev[idx])
+    {
+        UInt8 i = idx*2 + flag; //每2位存一个等级的标志 第1位:领取 第2位:结缘
+        if (v&(0x01<<i))
+        {
+            res = 1; //已领取
+        }
+        else
+        {
+            if (flag == 1)
+            {
+                if (getGold() < s_gold[idx])
+                {
+                    sendMsgCode(0, 1104); 
+                    return;
+                }
+                ConsumeInfo ci(LongYuanAct,0,0);
+                useGold(s_gold[idx],&ci);
+           }
+           IncommingInfo ii1(LongYuanAct, 0, 0);
+           getLongyuan(s_longyuan[idx], &ii1);
+           IncommingInfo ii2(LongYuanAct, 0, 0);
+           getFengsui(s_fengsui[idx], &ii2);
+           sendFairyPetResource();
+
+           v |= (0x01<<i);
+           SetVar(VAR_LONGYUAN_GOT, v);
+           sendLongyuanActInfo();
+        }
+    }
+    else
+    {
+        res = 3;
+    }
+}
+void Player::sendLongyuanActInfo()
+{
+    static UInt32 s_lev[] = {60,70,80,90,100,110};
+    UInt8 total = 0;
+    UInt8 i = 0;
+    for (i = 0; i < sizeof(s_lev)/sizeof(s_lev[0]); ++i)
+    {
+        if (GetLev() < s_lev[i])
+            break;
+        total += 1;
+    }
+    Stream st(REP::ACTIVE);
+    st << static_cast<UInt8>(0x0E) << static_cast<UInt8>(0x01);
+    st << static_cast<UInt8>(total);
+    UInt32 v = GetVar(VAR_LONGYUAN_GOT);
+    for (i = 0; i < total; ++i)
+    {
+        UInt8 flag = 0;
+        flag = (v>>(i*2))&0x03;
+        st << flag;
+    }
+    st << Stream::eos;
+    send(st);
+}
 void Player::transferExpBuffer2Var()
 {
     UInt32 tm = TimeUtil::Now();
@@ -17712,5 +17896,618 @@ UInt8 Player::toQQGroup(bool isJoin)
     return 0;
 }
 
+    //仙宠
+    void Player::fairyPetUdpLog(UInt32 id, UInt8 type)
+    {
+        // 仙宠相关日志
+        char action[16] = "";
+        snprintf (action, 16, "F_%d_%d", id, type);
+        udpLog("FairyPet", action, "", "", "", "", "act");
+    }
+
+	FairyPet * Player::findFairyPet( UInt32 id )
+	{
+		std::map<UInt32, FairyPet *>::iterator it = _fairyPets.find(id);
+		if(it == _fairyPets.end())
+			return NULL;
+		return it->second;
+	}
+
+    bool Player::hasCanHirePet( UInt32 id )
+    {
+        std::vector<UInt32>::iterator it = std::find(_playerData.canHirePet.begin(), _playerData.canHirePet.end(), id);
+        return it != _playerData.canHirePet.end();
+    }
+
+    bool Player::delCanHirePet( UInt32 id )
+    {
+        bool isDel = false;
+        std::vector<UInt32>::iterator it = _playerData.canHirePet.begin();
+        for(; it != _playerData.canHirePet.end(); ++ it)
+        {
+            if(*it == id)
+            {
+                _playerData.canHirePet.erase(it);
+                isDel = true;
+                break;
+            }
+        }
+        if(isDel)
+            writeCanHiretPet();
+        return isDel;
+    }
+
+	void Player::writeCanHiretPet()
+	{
+        std::string petStr = "";
+        UInt8 size = getCanHirePetNum();
+        for(UInt8 i = 0; i < size; ++ i)
+        {
+            petStr += Itoa(_playerData.canHirePet[i]);
+            if(i < size - 1)
+                petStr += ",";
+        }
+        DB1().PushUpdateData("UPDATE `player` SET `canHirePet` = '%s' WHERE id = %"I64_FMT"u", petStr.c_str(), getId());
+    }
+
+	bool Player::isFairyPetFull() const
+	{
+		size_t size = _fairyPets.size();
+        return size >= 6;
+	}
+
+    void Player::setCanHirePet(UInt32 id)
+    {
+        PLAYER_DATA(this, canHirePet).push_back(id);
+    }
+
+    UInt32 Player::setFairypetBattle( UInt32 id )
+    {
+        FairyPet * pet = findFairyPet(id);
+        if(!pet) return 0;
+        if(_onBattlePet == pet) //表明取消出战
+        {
+            pet = NULL;
+            id = 0;
+        }
+        setFairypetBattle(pet);
+        return id;
+	}
+
+    void Player::setFairypetBattle(FairyPet * pet, bool writedb)
+    {
+        if(_onBattlePet == pet)
+            return;
+        if(_onBattlePet && writedb)
+        {
+            _onBattlePet->setOnBattle(false);
+            _onBattlePet->UpdateToDB();
+        }
+        if(pet && writedb)
+        {
+            pet->setOnBattle(true);
+            pet->UpdateToDB();
+        }
+        _onBattlePet = pet;
+    }
+
+    void Player::addFairyPet(FairyPet * pet, bool writedb)
+    {
+        if(!pet) return;
+        _fairyPets.insert(std::make_pair(pet->getId(), pet));
+
+        if(writedb)
+        {
+            pet->UpdateToDB();
+			UInt32 p = static_cast<UInt32>((pet->getPotential()+0.005) * 100);
+			UInt32 c = static_cast<UInt32>((pet->getCapacity()+0.05) * 100);
+			DB2().PushUpdateData("INSERT INTO `fighter` (`id`, `playerId`, `potential`, `capacity`, `level`, `experience`)\
+                    VALUES(%u, %"I64_FMT"u, %u.%02u, %u.%02u, %u, %u)",
+                    pet->getId(), getId(), p / 100, p % 100, c / 100, c % 100, pet->getLevel(), pet->getExp());
+            pet->updateToDBPetSkill();
+        }
+    }
+
+    //招募仙宠
+	UInt8 Player::hireFairyPet( UInt32 id )
+    {
+		if(id > GREAT_FIGHTER_MAX)
+			return 1;
+        if(!hasCanHirePet(id))
+            return 1;
+        if(isFairyPetFull())
+            return 3;
+		if(findFairyPet(id) || hasFighter(id))
+			return 2;
+		FairyPet * pet = static_cast<FairyPet *>(globalFighters[id]);
+		if(pet == NULL)
+			return 1;
+		FairyPet * pet2 = pet->clone(this);
+		addFairyPet(pet2, true);
+        delCanHirePet(id);
+        if(_fairyPets.size() == 1)  //第一个仙宠自动出战
+        {
+            setFairypetBattle(pet2, true);
+            Stream st(REP::FAIRY_PET);
+            st << static_cast<UInt8>(0x03) << static_cast<UInt8>(0x03);
+            st << id << Stream::eos;
+            send(st);
+        }
+        return 0;
+    }
+
+    //放生转化仙宠
+	UInt8 Player::convertFairyPet( UInt32 id, UInt8 isHas)
+    {
+        UInt8 color = 0;
+        if(isHas)
+        {
+            FairyPet * pet = findFairyPet(id);
+            if(pet == NULL)
+                return 1;
+            if(pet->isOnBattle() || pet == _onBattlePet)
+                return 2;
+            color = pet->getColor();
+            std::map<UInt32, FairyPet *>::iterator it = _fairyPets.find(id);
+            _fairyPets.erase(it);
+            delete pet;
+            DB2().PushUpdateData("DELETE FROM `fairyPet` WHERE id = %u AND `playerId` = %"I64_FMT"u", id, getId());
+			DB2().PushUpdateData("DELETE FROM `fighter` WHERE `id` = %u AND `playerId` = %"I64_FMT"u", id, getId());
+        }
+        else
+        {
+            if(!hasCanHirePet(id))
+                return 1;
+            delCanHirePet(id);
+		    FairyPet * pet = static_cast<FairyPet *>(globalFighters[id]);
+            if(pet == NULL)
+                return 1;
+            color = pet->getColor();
+        }
+        Table values = GameAction()->getConvertPetValue(color);
+        UInt32 longYuan = values.get<UInt32>("longyuan");
+        UInt32 fengSui = values.get<UInt32>("fengsui");
+        UInt32 like = values.get<UInt32>("like");
+
+        IncommingInfo ii1(LongyuanFromYouli, 0, 0);
+        getLongyuan(longYuan, &ii1);
+        IncommingInfo ii2(FengsuiFromYouli, 0, 0);
+        getFengsui(fengSui, &ii2);
+        AddVar(VAR_FAIRYPET_LIKEABILITY, like);
+        if(like)
+        {
+            SYSMSG_SENDV(146, this, like);
+            SYSMSG_SENDV(1046, this, like);
+        }
+        return 0;
+    }
+
+	void Player::sendFairyPetList()
+    {
+        Stream st(REP::FAIRY_PET);
+        st << static_cast<UInt8>(0x03) << static_cast<UInt8>(0x01);
+        st << static_cast<UInt32>(_onBattlePet ? _onBattlePet->getId() : 0);
+        st << static_cast<UInt8>(_fairyPets.size());
+		std::map<UInt32, FairyPet *>::iterator it = _fairyPets.begin();
+		while(it != _fairyPets.end())
+        {
+            st << it->first;
+            st << it->second->getPetLev();
+            st << it->second->getPetBone();
+            st << it->second->getChongNum();
+            ++ it;
+        }
+        st << Stream::eos;
+        send(st);
+    }
+
+    void Player::getFariyPetSpaceInfo()
+    {
+        UInt8 step = GetVar(VAR_FAIRYPET_STEP);
+        if(step < 1 || step > 5)
+            step = 1;
+        Stream st(REP::FAIRY_PET);
+        st << static_cast<UInt8>(0x02) << static_cast<UInt8>(0x01);
+        UInt8 size = getCanHirePetNum();
+        st << step << size;
+        for(UInt8 i = 0; i < size; ++ i)
+            st << _playerData.canHirePet[i];
+        st << Stream::eos;
+        send(st);
+    }
+
+    void Player::sendFairyPetResource()
+    {
+        Stream st(REP::FAIRY_PET);
+        st << static_cast<UInt8>(0x03) << static_cast<UInt8>(0x02);
+        st << static_cast<UInt8>(GetVar(VAR_FAIRYPET_ISGET_PET));
+        st << GetVar(VAR_FAIRYPET_LONGYUAN);
+        st << GetVar(VAR_FAIRYPET_FENGSUI);
+        st << GetVar(VAR_FAIRYPET_XIANYUAN);
+        st << static_cast<UInt8>(GetVar(VAR_FAIRYPET_LIKEABILITY));
+        st << Stream::eos;
+        send(st);
+    }
+
+    //寻宠
+    void Player::seekFairyPet(UInt8 count, UInt8 isConvert)
+    {
+        if(count == 0) return;
+        if(getCanHirePetNum())
+            return;
+        static UInt32 cost[] = {0xFFFFFFFF, 16, 24, 48, 120, 360};  //游历消耗仙缘
+        UInt32 xianYuan = GetVar(VAR_FAIRYPET_XIANYUAN);
+        UInt8 step = GetVar(VAR_FAIRYPET_STEP);
+        if(step < 1 || step > 5)
+            step = 1;
+        UInt32 longYuan = 0, fengSui = 0;
+        UInt32 greenId = 0, blueId = 0;
+        UInt8 like = 0;
+        UInt32 convert1 = 0, convert2 = 0;
+        UInt32 used = 0;
+        std::string petStr = "";
+        Stream st(REP::FAIRY_PET);
+        st << static_cast<UInt8>(0x02) << static_cast<UInt8>(0x02);
+	    size_t pos = st.size();
+        UInt8 num = 0;
+        st << num;
+        for(UInt8 i = 0; i < count; ++ i)
+        {
+            if(xianYuan < cost[step] + used)
+                break;
+            fairyPetUdpLog(10000, 21);
+            ++ num;
+            used += cost[step];
+            Table values = GameAction()->onSeekFairypetAwardAndSucceed(step, isConvert);
+            longYuan += values.get<UInt32>("longyuan");
+            fengSui += values.get<UInt32>("fengsui");
+            like += values.get<UInt8>("like");
+            greenId = values.get<UInt32>("greenId");
+            if(greenId)
+            {
+                petStr += Itoa(greenId);
+                if(i < count - 1)
+                    petStr += ",";
+                if(!isConvert)
+                    setCanHirePet(greenId);
+            }
+            blueId = values.get<UInt32>("blueId");
+            if(blueId)
+            {
+                petStr += Itoa(blueId);
+                if(i < count - 1)
+                    petStr += ",";
+                if(!isConvert)
+                    setCanHirePet(blueId);
+            }
+            if(isConvert)   //是否放生仙宠 0:否,1:是
+            {
+                convert1 += values.get<UInt32>("convert1");
+                convert2 += values.get<UInt32>("convert2");
+            }
+            if(values.get<bool>("succeed"))
+                step = (step + 1) > 5 ? 1 : step + 1;
+            else
+                step = 1;
+            st << step;
+        }
+        if(num == 0)
+            return;
+        st << longYuan << fengSui << like;
+        st << static_cast<UInt32>(xianYuan - used) << isConvert;
+        st << petStr.c_str();
+		st.data<UInt8>(pos) = num;
+        st << Stream::eos;
+        send(st);
+
+        IncommingInfo ii1(LongyuanFromYouli, 0, 0);
+        getLongyuan(longYuan, &ii1);
+        IncommingInfo ii2(FengsuiFromYouli, 0, 0);
+        getFengsui(fengSui, &ii2);
+        if(isConvert)   //放生仙宠
+        {
+            IncommingInfo ii1(LongyuanFromConvert, 0, 0);
+            getLongyuan(convert1, &ii1);
+            IncommingInfo ii2(FengsuiFromConvert, 0, 0);
+            getFengsui(convert2, &ii2);
+        }
+        ConsumeInfo ci(YouliForPet, 0, 0);
+        useXianyuan(used, &ci);
+        if(!isConvert && !petStr.empty())   //不放生仙宠
+            writeCanHiretPet();
+        AddVar(VAR_FAIRYPET_LIKEABILITY, like);
+        SetVar(VAR_FAIRYPET_STEP, step);
+        if(like)
+        {
+            SYSMSG_SENDV(146, this, like);
+            SYSMSG_SENDV(1046, this, like);
+        }
+    }
+
+    //仙宠免费领取(>=50级)
+    void Player::getPetByLevelUp(UInt8 idx)
+    {
+        if(idx > 3 || GetLev() < 50)
+            return;
+        UInt32 isGet = GetVar(VAR_FAIRYPET_ISGET_PET);
+        if(idx < 3)
+        {
+            if(isGet & (1 << 0))
+                return;
+            static UInt32 petId[] = { 501, 510, 507 };
+            setCanHirePet(petId[idx]);
+            UInt8 res = hireFairyPet(petId[idx]);
+            Stream st(REP::FAIRY_PET);
+            st << static_cast<UInt8>(0x04);
+            st << static_cast<UInt32>(res == 0 ? petId[idx] : 0);
+            st << Stream::eos;
+            send(st);
+            if(res)
+                delCanHirePet(petId[idx]);
+            SetVar(VAR_FAIRYPET_ISGET_PET, isGet | (1 << 0));
+        }
+        else
+        {
+            if(isGet & (1 << 1))
+                return;
+            IncommingInfo ii1(LongyuanFromUseItem, 0, 0);
+            getLongyuan(16000, &ii1);
+            IncommingInfo ii2(FengsuiFromUseItem, 0, 0);
+            getFengsui(16000, &ii2);
+            SetVar(VAR_FAIRYPET_ISGET_PET, isGet | (1 << 1));
+            sendFairyPetResource();
+        }
+    }
+
+    //使用仙宠蛋获得蓝色仙宠
+    UInt8 Player::getPetByPetEgg(UInt32 id)
+    {
+        setCanHirePet(id);
+        UInt8 res = hireFairyPet(id);
+        if(res == 2) //已有相同的仙宠
+            sendMsgCode(0, 4004);
+        else
+        {
+            Stream st(REP::FAIRY_PET);
+            st << static_cast<UInt8>(0x02) << static_cast<UInt8>(0x03);
+            st << res << id;
+            st << Stream::eos;
+            send(st);
+            if(res != 0)
+                delCanHirePet(id);
+        }
+        return res;
+    }
+
+    void Player::getLongyuanLua(UInt32 c)
+    {
+        IncommingInfo ii(LongyuanFromUseItem, 0, 0);
+        getLongyuan(c, &ii);
+        sendFairyPetResource();
+    }
+
+    void Player::getFengsuiLua(UInt32 c)
+    {
+        IncommingInfo ii(FengsuiFromUseItem, 0, 0);
+        getFengsui(c, &ii);
+        sendFairyPetResource();
+    }
+
+    void Player::getXianyuanLua(UInt32 c)
+    {
+        IncommingInfo ii(XianyuanFromUseItem, 0, 0);
+        getXianyuan(c, &ii);
+        sendFairyPetResource();
+    }
+
+    UInt32 Player::getXianyuan( UInt32 c, IncommingInfo* ii)
+    {
+        UInt32 xianyuan = GetVar(VAR_FAIRYPET_XIANYUAN);
+		if(c == 0)
+			return xianyuan;
+		xianyuan += c;
+		SYSMSG_SENDV(161, this, c);
+		SYSMSG_SENDV(1061, this, c);
+        SetVar(VAR_FAIRYPET_XIANYUAN, xianyuan);
+        /*
+        Stream st(REP::USER_INFO_CHANGE);
+        st << static_cast<UInt8>(0x18) << xianyuan << Stream::eos;
+        send(st);
+        */
+
+        if(ii && ii->incommingType != 0)
+        {
+            DBLOG1().PushUpdateData("insert into consume_pet (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+                cfg.serverLogId, getId(), ii->incommingType, ii->itemId, ii->itemNum, c, TimeUtil::Now());
+        }
+
+        return xianyuan;
+	}
+
+	UInt32 Player::useXianyuan( UInt32 a, ConsumeInfo * ci )
+	{
+        UInt32 xianyuan = GetVar(VAR_FAIRYPET_XIANYUAN);
+        if(a == 0 || xianyuan == 0)
+            return xianyuan;
+        if(xianyuan < a)
+            xianyuan = 0;
+        else
+        {
+            xianyuan -= a;
+            if(ci != NULL)
+            {
+                DBLOG1().PushUpdateData("insert into consume_pet (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+                cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, a, TimeUtil::Now());
+            }
+        }
+        SYSMSG_SENDV(148, this, a);
+        SYSMSG_SENDV(1048, this, a);
+        SetVar(VAR_FAIRYPET_XIANYUAN, xianyuan);
+
+        return xianyuan;
+    }
+
+    UInt32 Player::getLongyuan( UInt32 c, IncommingInfo* ii)
+    {
+        UInt32 longyuan = GetVar(VAR_FAIRYPET_LONGYUAN);
+		if(c == 0)
+			return longyuan;
+		longyuan += c;
+		SYSMSG_SENDV(159, this, c);
+		SYSMSG_SENDV(1059, this, c);
+        SetVar(VAR_FAIRYPET_LONGYUAN, longyuan);
+
+        if(ii && ii->incommingType != 0)
+        {
+            DBLOG1().PushUpdateData("insert into consume_pet (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+                cfg.serverLogId, getId(), ii->incommingType, ii->itemId, ii->itemNum, c, TimeUtil::Now());
+        }
+
+        return longyuan;
+	}
+
+	UInt32 Player::useLongyuan( UInt32 a, ConsumeInfo * ci )
+	{
+        UInt32 longyuan = GetVar(VAR_FAIRYPET_LONGYUAN);
+        if(a == 0 || longyuan == 0)
+            return longyuan;
+        if(longyuan < a)
+            longyuan = 0;
+        else
+        {
+            longyuan -= a;
+            if(ci != NULL)
+            {
+                DBLOG1().PushUpdateData("insert into consume_pet (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+                cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, a, TimeUtil::Now());
+            }
+        }
+        SYSMSG_SENDV(158, this, a);
+        SYSMSG_SENDV(1058, this, a);
+        SetVar(VAR_FAIRYPET_LONGYUAN, longyuan);
+
+        return longyuan;
+    }
+
+    UInt32 Player::getFengsui( UInt32 c, IncommingInfo* ii)
+    {
+        UInt32 fengsui = GetVar(VAR_FAIRYPET_FENGSUI);
+		if(c == 0)
+			return fengsui;
+		fengsui += c;
+		SYSMSG_SENDV(160, this, c);
+		SYSMSG_SENDV(1060, this, c);
+        SetVar(VAR_FAIRYPET_FENGSUI, fengsui);
+
+        if(ii && ii->incommingType != 0)
+        {
+            DBLOG1().PushUpdateData("insert into consume_pet (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+                cfg.serverLogId, getId(), ii->incommingType, ii->itemId, ii->itemNum, c, TimeUtil::Now());
+        }
+
+        return fengsui;
+	}
+
+	UInt32 Player::useFengsui( UInt32 a, ConsumeInfo * ci )
+	{
+        UInt32 fengsui = GetVar(VAR_FAIRYPET_FENGSUI);
+        if(a == 0 || fengsui == 0)
+            return fengsui;
+        if(fengsui < a)
+            fengsui = 0;
+        else
+        {
+            fengsui -= a;
+            if(ci != NULL)
+            {
+                DBLOG1().PushUpdateData("insert into consume_pet (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+                cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, a, TimeUtil::Now());
+            }
+        }
+        SYSMSG_SENDV(157, this, a);
+        SYSMSG_SENDV(1057, this, a);
+        SetVar(VAR_FAIRYPET_FENGSUI, fengsui);
+
+        return fengsui;
+    }
+
+void Player::getQQGameOnlineAward()
+{
+    if(!World::getQQGameOnlineAwardAct())
+        return;
+    if(atoi(getDomain()) != 10)
+        return;
+    if(GetVar(VAR_ONLINE_AWARD) > 0)
+        return;
+    if(getQQGameOnlineTotalTime() < 3600)
+        return;
+    if (GetPackage()->GetRestPackageSize() < 4)
+    {
+        sendMsgCode(0, 1011);
+        return;
+    }
+    SetVar(VAR_ONLINE_AWARD, 1);
+    GetPackage()->Add(134, 1, true, false);
+    GetPackage()->Add(1325, 1, true, false);
+    GetPackage()->Add(15, 1, true, false);
+    GetPackage()->Add(500, 1, true, false);
+    sendQQGameOnlineAward();
+}
+
+void Player::sendQQGameOnlineAward()
+{
+    if(!World::getQQGameOnlineAwardAct())
+        return;
+    if(atoi(getDomain()) != 10)
+        return;
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(0x0B);
+    st << static_cast<UInt8>(GetVar(VAR_ONLINE_AWARD));
+    UInt16 totalTime = getQQGameOnlineTotalTime();
+    UInt16 leftTime;
+    if(totalTime >= 3600)
+        leftTime = 0;
+    else
+        leftTime = 3600 - totalTime;
+    st << leftTime;
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::setQQGameOnlineTotalTime()
+{
+    if(!World::getQQGameOnlineAwardAct())
+        return;
+    if(atoi(getDomain()) != 10)
+        return;
+    SetVar(VAR_ONLINE_TOTAL_TIME, getQQGameOnlineTotalTime());
+}
+
+UInt32 Player::getQQGameOnlineTotalTime()
+{
+    UInt32 now = TimeUtil::Now();
+    UInt32 today = TimeUtil::SharpDayT( 0 , now);
+    UInt32 lastOnline = _playerData.lastOnline; //考虑了是前几天登录的情况
+    UInt32 curTime;
+    if(now <= today + 19*3600)
+        curTime = 0;
+    else if(now <= today + 21*3600)
+    {
+        if(lastOnline <= (today + 19*3600))
+            curTime = now - (today + 19*3600);
+        else
+            curTime = now - lastOnline;
+    }
+    else
+    {
+        if(lastOnline <= (today + 19*3600))
+            curTime = 3600;
+        else
+            curTime = (today + 21*3600) > lastOnline ? ((today + 21*3600) - lastOnline) : 0;
+    }
+    return GetVar(VAR_ONLINE_TOTAL_TIME) + curTime;
+}
+
 } // namespace GObject
+
 

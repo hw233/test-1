@@ -1,6 +1,7 @@
 #include "Config.h"
 #include "GObject/Country.h"
 #include "BattleField.h"
+#include "GObject/FairyPet.h"
 
 namespace Battle
 {
@@ -10,6 +11,9 @@ BattleField::BattleField()
 	memset(_objs, 0, sizeof(_objs));
 	memset(_isBody, 0, sizeof(_isBody));
 	memset(_formation, 0, sizeof(_formation));
+    memset(_backupObjs, 0, sizeof(_backupObjs));
+    memset(_reiatsu, 0, sizeof(_reiatsu));
+    memset(_toggleReiatsu, 0, sizeof(_toggleReiatsu));
 }
 
 BattleField::~BattleField()
@@ -70,6 +74,57 @@ void BattleField::setObjectXY( int side, int x, int y, BattleObject * obj, bool 
 		setObject(side, x + y * 5, obj, 0);
 }
 
+void BattleField::setPetObject( int side, BattleObject * obj, UInt8 isBody)
+{
+    // 放置仙宠
+    if (side < 0 || side >= 2)
+        return;
+	if(_backupObjs[side] != NULL)
+	{
+        delete _backupObjs[side];
+	}
+    _backupObjs[side] = obj;
+    if(!isBody && obj->getClass() == BattleObject::Char)
+    {
+        BattleFighter * bfgt = static_cast<BattleFighter *> (obj);
+        GObject::FairyPet * fgt = static_cast<GObject::FairyPet *>(bfgt->getFighter());
+        if (fgt->getClass() >= GObject::e_cls_qinglong && fgt->getClass() <= GObject::e_cls_xuanwu)
+        {
+            // 出场所需的灵压
+            _toggleReiatsu[side] = fgt->getPetLingya();
+            _backupTargetPos[side] = fgt->getTargetPos();
+            _reiatsu[side] = 0;
+        }
+    }
+}
+
+bool BattleField::addReiatsu(int side, int value)
+{
+    // 增加场上灵压，返回值表示是否需要仙宠出场
+    if (side < 0 || side >= 2)
+        return false;
+    if (_reiatsu[side] == _toggleReiatsu[side])
+        return false;
+    if (_reiatsu[side] + value > _toggleReiatsu[side])
+        _reiatsu[side] = _toggleReiatsu[side];
+    else
+        _reiatsu[side] += value;
+#ifdef _DEBUG
+    //printf ("addValue = %d, reiastu[%d] = %d, maxReiastu[%d] = %d\n", value, side, _reiatsu[side], side, _toggleReiatsu[side]);
+#endif
+    return _reiatsu[side] >= _toggleReiatsu[side] ? true:false;
+}
+
+int BattleField::getReiatsu(int side)
+{
+    if (side < 0 || side >= 2)
+        return 0;
+#ifdef _DEBUG
+    //printf ("reiastu[%d] = %d, maxReiastu[%d] = %d\n", side, _reiatsu[side], side, _toggleReiatsu[side]);
+#endif
+    return _reiatsu[side];
+}
+
 BattleObject * BattleField::operator()( int side, int idx )
 {
 	return _objs[side][idx];
@@ -80,8 +135,19 @@ BattleObject * BattleField::getObjectXY( int side, int x, int y )
 	return (*this)(side, x + y * 5);
 }
 
+int BattleField::getSpecificTarget(int side, bool(*f)(BattleObject* bo))
+{
+    for (int i = 0; i < 25; ++i)
+    {
+        if (_objs[side][i] && f(_objs[side][i]))
+            return i;
+    }
+	return -1;
+}
+
 int BattleField::getPossibleTarget( int side, int idx )
 {
+    //overload in Simulator
 	static int select_table[5][5] = {
 		{0 , 1 , 2 , 3 , 4},
 		{1 , 0 , 2 , 3 , 4},
@@ -204,8 +270,12 @@ void BattleField::clear()
 		for(int j = 0; j < 25; ++ j)
 			if(_objs[i][j] && !_isBody[i][j])
 				delete _objs[i][j];
+    for (int i = 0; i < 2; ++i)
+        if (_backupObjs[i])
+            delete _backupObjs[i];
 	memset(_objs, 0, sizeof(_objs));
 	memset(_formation, 0, sizeof(_formation));
+    memset(_backupObjs, 0, sizeof(_backupObjs));
 }
 
 void BattleField::reset()
@@ -222,6 +292,7 @@ void BattleField::reset()
 void BattleField::updateStats( int side )
 {
 	for(int i = 0; i < 2; ++ i)
+    {
 		for(int j = 0; j < 25; ++ j)
 			if(_objs[i][j] && _objs[i][j]->getClass() == BattleObject::Char)
 			{
@@ -229,6 +300,10 @@ void BattleField::updateStats( int side )
 				bf->setFormationEffect(NULL);
 				bf->updateAllAttr();
 			}
+        BattleFighter * bf = static_cast<BattleFighter *>(_backupObjs[i]);
+        if (bf)
+            bf->updateAllAttr();
+    }
 }
 
 void BattleField::updateStats( int side, int pos )

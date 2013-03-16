@@ -1,28 +1,28 @@
 
 #!/bin/bash
 
-F=skilleffect.txt
+F=pet_pinjie.txt
 if [ "$1" != "" ]
 then
     F=$1
 fi
 
-function skilleffect()
+function pet_pinjie()
 {
-# 11,"302,2,3|303,1",0,40,"3,4"
     f=$1
-    d=skilleffect
-    sed -i /id/d $f
+    d=pet_pinjie
     sed -i /ID/d $f
+    sed -i /id/d $f
+    sed -i /^$/d $f
     sed -i /REF/d $f
     sed -i s/\"//g $f
     export lines=`wc -l $f | awk '{print $1}'`
     echo "Generating file $d, total lines $l"
     awk '
         BEGIN {
-            print "INSERT INTO `skill_effect` VALUES";
+            print "INSERT INTO `pet_pinjie` VALUES";
         } {
-            printf("(%d,%d,%d,%d,\x27%s\x27,%f,\x27%s\x27,%f,\x27%s\x27,%f,\x27%s\x27,%f,\x27%s\x27,\x27%s\x27,\x27%s\x27,\x27%s\x27,\x27%s\x27,\x27%s\x27,\x27%s\x27,\x27%s\x27,%f,\x27%s\x27,%f,%f,%f,%f,%f,%f,%f,%f,\x27%s\x27,\x27%s\x27,\x27%s\x27,%f,%f)",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33,$34,$35);
+            printf("(%d,\x27%s\x27,%d,%d,\x27%s\x27,\x27%s\x27)",$1,$2,$3,$4,$5,$6);
             if (NR <= ENVIRON["lines"]-1)
                 printf(",");
             else if (NR >= ENVIRON["lines"])
@@ -51,7 +51,7 @@ function iconv2utf8()
 
 if [ -f $F  ]
 then
-    skilleffect $F
+    pet_pinjie $F
 else
     echo "File $F is not exists"
 fi

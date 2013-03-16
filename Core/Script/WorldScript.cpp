@@ -194,6 +194,8 @@ void WorldScript::init()
 	def("setTgcEvent", GObject::World::setTgcEvent);
 	def("getTgcEvent", GObject::World::getTgcEvent);
 	def("setWeiboAct", GObject::World::setWeiboAct);
+	def("setPetEggAct", GObject::World::setPetEggAct);
+	def("setLongyuanAct", GObject::World::setLongyuanAct);
 	def("Broadcast", SysBroadcast);
 	def("GetStore", GetStore);
 	def("GetTitleList", GetTitleList);
@@ -253,6 +255,8 @@ void WorldScript::init()
     def("setBDSuperman", GObject::World::setBDSuperman);
     //def("setInterval", GObject::ClanCopy::setInterval);
     //def("setStartTick", GObject::ClanCopy::setStartTick);
+    def("setQQGameOnlineAwardAct", GObject::World::setQQGameOnlineAwardAct);
+    def("setQZoneQQGameAct", GObject::World::setQZoneQQGameAct);
 }
 
 void WorldScript::postInit()

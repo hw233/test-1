@@ -69,6 +69,10 @@ enum
     e_cls_shi = 2,
     e_cls_dao = 3,
     e_cls_mo = 4,
+    e_cls_qinglong = 5,
+    e_cls_baihu = 6,
+    e_cls_zhuque = 7,
+    e_cls_xuanwu = 8,
 
     e_cls_max
 };
@@ -146,16 +150,18 @@ public:
     //Fighter(const Fighter& fighter);
 	~Fighter();
 
-	Fighter * clone(Player * owner);
-	Fighter * cloneWithEquip(Player * owner);
-    Fighter * cloneWithOutDirty(Player * player);
+	virtual Fighter * clone(Player * owner);
+	virtual Fighter * cloneWithEquip(Player * owner);
+    virtual Fighter * cloneWithOutDirty(Player * player);
 
 	inline UInt32 getId() { return _id; }
 	inline Player * getOwner() { return _owner; }
 	inline void setOwner(Player * p) { _owner = p; }
 
 	inline void setName(const std::string& s) {_name = s;}
-	inline void setClass(UInt8 c) {_class = c;}
+
+	inline void setClass(UInt8 c) { _class = c; }
+
     inline void setSex(UInt8 s) {_sex = s;}
 	inline void setLevel(UInt8 l, bool boss = false) { _level = l; if (boss) worldBoss.setLevel(l); }
 	inline void setExp(UInt64 e) {_exp = e;}
@@ -177,6 +183,7 @@ public:
     inline bool isWBoss() { return _iswboss; }
     inline void setWBoss(bool v) { _iswboss = v; }
 	inline UInt8 getLevel() {return _level;}
+    inline UInt8 getLevelInLua() { if (isPet() && _level >= 50) return _level - 49;  return _level;}
 	inline UInt64 getExp() {return _exp;}
 	inline UInt32 getPExp() {return _pexp;}
 	inline UInt32 getPExpMax() {return _pexpMax;}
@@ -303,6 +310,10 @@ public:
     inline std::vector<UInt16>& getPassiveSkillEnter100() { return _passkl[GData::SKILL_ENTER-GData::SKILL_PASSSTART]; }
     // 取得死亡后概率100%触发技能
     inline std::vector<UInt16>& getPassiveSkillDead100() { return _passkl[GData::SKILL_DEAD-GData::SKILL_PASSSTART]; }
+    // 取得队友被攻击时100%触发技能
+    inline std::vector<UInt16>& getPassiveSkillOnPetProtect100() { return _passkl[GData::SKILL_ONPETPROTECT-GData::SKILL_PASSSTART]; }
+    // 取得收到任意伤害时100%触发技能
+    inline std::vector<UInt16>& getPassiveSkillOnGetDmg100() { return _passkl[GData::SKILL_ONGETDMG-GData::SKILL_PASSSTART]; }
 
     // 根据索引返回被动技能容器(为什么要拆成两部分？跪了……）
     inline const std::vector<UInt16>& getPassiveSkillByIndex2(UInt16 index) { return _rpasskl[index];}
@@ -322,6 +333,10 @@ public:
     inline std::vector<UInt16>& getPassiveSkillEnter() { return _rpasskl[GData::SKILL_ENTER-GData::SKILL_PASSSTART]; }
     // 取得死亡后概率触发技能
     inline std::vector<UInt16>& getPassiveSkillDead() { return _rpasskl[GData::SKILL_DEAD-GData::SKILL_PASSSTART]; }
+    // 取得队友被攻击时概率触发技能
+    inline std::vector<UInt16>& getPassiveSkillOnPetProtect() { return _rpasskl[GData::SKILL_ONPETPROTECT-GData::SKILL_PASSSTART]; }
+    // 取得收到任意伤害时概率触发技能
+    inline std::vector<UInt16>& getPassiveSkillOnGetDmg() { return _rpasskl[GData::SKILL_ONGETDMG-GData::SKILL_PASSSTART]; }
 
 
     // 神农宝鼎
@@ -335,6 +350,9 @@ public:
     inline std::vector<UInt16>& getPassiveSkillOnCounter() { return _rpasskl[GData::SKILL_ONCOUNTER-GData::SKILL_PASSSTART]; }
     inline std::vector<UInt16>& getPassiveSkillOnCounter100() { return _passkl[GData::SKILL_ONCOUNTER-GData::SKILL_PASSSTART]; }
     inline std::vector<UInt16>& getPassiveSkillOnAttackBleed100() { return _passkl[GData::SKILL_ONATKBLEED-GData::SKILL_PASSSTART]; }
+
+    inline std::vector<UInt16>& getPassiveSkillOnAtkDmg() {return _rpasskl[GData::SKILL_ONATKDMG-GData::SKILL_PASSSTART]; }
+    inline std::vector<UInt16>& getPassiveSkillOnAtkDmg100() { return _passkl[GData::SKILL_ONATKDMG - GData::SKILL_PASSSTART]; }
 
     // 取得心法带出技能的ID表
     const std::vector<const GData::SkillBase*>& skillFromCitta(UInt16 citta);
@@ -517,6 +535,7 @@ public:
 
     void getAllSSAndLevel(Stream& st);
 
+
 public:
 	inline const GData::AttrExtra * getAttrExtraEquip() { checkDirty(); return &_attrExtraEquip; }
 	inline UInt16 getExtraStrength() { checkDirty(); return _attrExtraEquip.strength; }
@@ -573,6 +592,9 @@ public:
     inline void setAttrExtraEquip(const GData::AttrExtra& other){ _attrExtraEquip += other; }
     inline void resetAttrExtraEquip(){setDirty(true); _attrExtraEquip.reset();}
     inline void resetAttrExtraEquip2(){setDirty(false); _attrExtraEquip.reset();}
+
+    UInt8 getToggleReiatsu();        // 返回出场所需灵压
+    UInt8 getTargetPos();            // 返回备胎该出场的目标位置
 
 public:
 	inline Int16 getBaseStrength()
@@ -789,6 +811,7 @@ protected:
 
     //是否隐藏时装
     bool _hideFashion;
+
 public:
 	float getSoulPracticeAddOn();
 	float getSoulPracticeFactor();
@@ -905,17 +928,12 @@ public:
 	std::vector<Offset> extraPos;
 
     // 仙宠
-private:
-     bool m_isPet;      // 
-     bool m_onBattle;   // 出战
-     // 仙宠的真实等级 _level = 50 + (m_petLv1 - 1 * 10)+m_petLv2
-     UInt8 m_petLv1;    // 品阶 (第一品阶为50级，之后每一品阶等价10级)
-     UInt8 m_petLv2;    // 重天 (每十重天升一品阶)
 
 public:
-    bool isPet() { return m_isPet; }
-    bool isOnBattle() { return m_onBattle; }
-    void setOnBattle(bool flag) { m_onBattle = flag; }
+    inline bool isPet() { return getClass() >= e_cls_qinglong && getClass() <= e_cls_xuanwu; }
+    UInt8 getPassklNum();
+    UInt8 getRpassklNum();
+    void updateToDBPetSkill();
 };
 class GlobalFighters
 {

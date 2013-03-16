@@ -24,6 +24,7 @@
 #include "StrengthenMgr.h"
 #include "JobHunter.h"
 #include "Dreamer.h"
+#include "FairyPet.h"
 
 
 namespace Battle
@@ -596,6 +597,7 @@ namespace GObject
         bool isHHBlue;
         std::string nameNoSuffix;     //(合服)不带后缀的用户名
         std::map<UInt8, UInt32> titleAll;      //玩家所有的称号id
+        std::vector<UInt32> canHirePet;     //玩家未招募的仙宠
     };
 
 	class Player:
@@ -1360,6 +1362,7 @@ namespace GObject
 		void sendFriendList(UInt8, UInt8, UInt8);
 
 		void PutFighters(Battle::BattleSimulator&, int side, bool fullhp = false);
+        void PutPets (Battle::BattleSimulator&, int side, bool init = true);
 
 		inline void setNextTavernUpdate(UInt32 n) { _nextTavernUpdate = n; }
         void resetShiMen();
@@ -1749,8 +1752,6 @@ namespace GObject
         inline void pendWorldBossHp(UInt32 hp) { _worldBossHp += hp; }
         inline void resetWorldBossHp() { _worldBossHp = 0; }
         inline UInt32 getWorldBossHp() const { return _worldBossHp; }
-
-    public:
 
     public:
         void payPractice(UInt8 place, UInt16 slot, UInt8 type, UInt8 priceType, UInt8 time, UInt8 prot);
@@ -2143,6 +2144,9 @@ namespace GObject
         
         void buyTownTjItem(const UInt32 itemId);
         void sendTownTjItemInfo();
+        
+        void getLongyuanAct(UInt8 idx, UInt8 flag);
+        void sendLongyuanActInfo();
     private:
         UInt8 cf_posPut[5];//范围1-5
         UInt32 cf_itemId[5];
@@ -2160,12 +2164,54 @@ namespace GObject
         void sendFeastGiftAct();
         void getNewYearQQGameAward(UInt8 type);
         void sendNewYearQQGameAct();
+        void getQZoneQQGameAward(UInt8 domainType, UInt8 type);
+        void sendQZoneQQGameAct(UInt8 domainType);
         void getNewYearQzoneContinueAward(UInt8 type);
         void sendNewYearQzoneContinueAct();
         void calcNewYearQzoneContinueDay(UInt32 time);
         void transferExpBuffer2Var();
 
         inline bool relateExpHook(UInt8 id) { return id == PLAYER_BUFF_TRAINP1 || id == PLAYER_BUFF_TRAINP2 || id == PLAYER_BUFF_TRAINP3/* || id == PLAYER_BUFF_TRAINP4 || id == PLAYER_BUFF_ADVANCED_HOOK*/; }
+
+    private:    //仙宠
+		std::map<UInt32, FairyPet *> _fairyPets;
+        FairyPet * _onBattlePet;
+    public:
+        void fairyPetUdpLog(UInt32 id, UInt8 type);
+        inline FairyPet * getBattlePet() { return _onBattlePet; }
+        inline UInt8 getCanHirePetNum() { return _playerData.canHirePet.size();}
+        void setCanHirePet(UInt32 id);
+	    FairyPet * findFairyPet(UInt32);
+        bool hasCanHirePet(UInt32);
+        bool delCanHirePet(UInt32);
+        void writeCanHiretPet();
+	    bool isFairyPetFull() const;
+        UInt32 setFairypetBattle(UInt32);
+        void setFairypetBattle(FairyPet *, bool = true);
+	    UInt8 hireFairyPet(UInt32);
+	    UInt8 convertFairyPet(UInt32, UInt8);
+	    void sendFairyPetList();
+        void sendFairyPetResource();
+        void addFairyPet(FairyPet *, bool = true);
+        void seekFairyPet(UInt8, UInt8);
+        void getFariyPetSpaceInfo();
+        void getPetByLevelUp(UInt8);
+        UInt8 getPetByPetEgg(UInt32);
+
+        void getXianyuanLua(UInt32);
+        void getLongyuanLua(UInt32);
+        void getFengsuiLua(UInt32);
+        UInt32 getXianyuan( UInt32 c, IncommingInfo* ii = NULL);
+        UInt32 getFengsui( UInt32 c, IncommingInfo* ii);
+        UInt32 getLongyuan( UInt32 c, IncommingInfo* ii);
+	    UInt32 useXianyuan( UInt32 a, ConsumeInfo * ci );
+	    UInt32 useFengsui( UInt32 a, ConsumeInfo * ci );
+	    UInt32 useLongyuan( UInt32 a, ConsumeInfo * ci );
+
+        void getQQGameOnlineAward();
+        void sendQQGameOnlineAward();
+        void setQQGameOnlineTotalTime();
+        UInt32 getQQGameOnlineTotalTime();
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

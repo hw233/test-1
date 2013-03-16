@@ -305,10 +305,11 @@ namespace GObject
         VAR_FEAST_LOGIN = 294, //节日套装人人拿
         VAR_FEAST_GIFT = 295, //登录礼包人人有
 
-        //新阵营战临时代替udplog做统计使用
-        VAR_NCB_TOTALWIN = 296,     //蜀山论剑当天胜利场次
-        VAR_NCB_TOTALLOSE = 297,    //蜀山论剑当天失败场次
-        //注:使用298时清理数据库，之前使用过一次298
+        VAR_FAIRYPET_LONGYUAN = 296,   //仙宠龙元数值
+        VAR_FAIRYPET_FENGSUI = 297,  //仙宠凤髓数值
+        VAR_FAIRYPET_XIANYUAN = 298, //仙宠空间仙缘数值
+        VAR_FAIRYPET_STEP = 299, //仙宠空间当前寻宠步数
+        VAR_FAIRYPET_LIKEABILITY = 300, //仙宠空间仙宠好感度数值(紫色)
 
         VAR_INVITEDSUCCESS = 299, //邀请成功的好友人数
         VAR_CFRIENDTICKETS = 300, //好友邀请的抽奖券
@@ -326,7 +327,7 @@ namespace GObject
         VAR_ITEM_9316_FAILED_COUNT = 347, // 都率宝伞礼包连续开启失败次数
         VAR_CONSUME_AWARD_COUNT = 348,   //消费抽奖已抽次数
         VAR_NEW_YEAR_GIVE_GIFT = 349,   //迎新纳福，红包入袋(bit1~10依次代表对应的天数是否领取过奖励)
-        //350仙宠占用 suntao
+        VAR_FAIRYPET_ISGET_PET = 350,   //50级以上玩家是免费否领取过仙宠
 
         // 351~360 占用 for JLT
         VAR_DISCOUNT_CONSUME1  = 351, // 消费限购的金额
@@ -357,7 +358,6 @@ namespace GObject
         VAR_9343_USED=374,
         VAR_SNAKE_SPRING_EQUIP_GOT=375,
         VAR_WEIBO_AWARD_GOT=376,
-        //377仙宠占用 suntao
         VAR_FISHUSER_AWARD=377,            //捕鱼大亨用户领奖标志 
         //越南版380-399
         //400-420 for qiwy
@@ -368,10 +368,15 @@ namespace GObject
         VAR_TRAINP1 = 405,
         VAR_TRAINP2 = 406,
         VAR_TRAINP3 = 407,
+        VAR_ONLINE_TOTAL_TIME = 408, //累计在线时间
+        VAR_ONLINE_AWARD = 409, //累计在线奖励是否领取
+        VAR_QZONE_QQGAME_ACT = 410, //空间黄钻(bit1表示普通，bit2表示会员)、大厅蓝钻礼包(bit3表示普通，bit4表示会员)
 
         //421-430 for suntao
         VAR_HUNYUAN_STEP = 421, //大闹龙宫之混元剑诀
         VAR_HUNYUAN_STEP4_COUNT = 422, //大闹龙宫之混元剑诀从第4格移动到第5失败的次数
+        //431-440 for yijian
+        VAR_LONGYUAN_GOT = 431,  //龙元风髓领取标志
 
         VAR_MAX,
     };
@@ -660,8 +665,12 @@ namespace GObject
             REGISTER_VAR(VAR_FEAST_LOGIN, CYCLE_NONE);
             REGISTER_VAR(VAR_FEAST_GIFT, CYCLE_DAY);
 
-            REGISTER_VAR(VAR_NCB_TOTALWIN, CYCLE_DAY);
-            REGISTER_VAR(VAR_NCB_TOTALLOSE, CYCLE_DAY);
+            REGISTER_VAR(VAR_FAIRYPET_LONGYUAN, CYCLE_NONE);
+            REGISTER_VAR(VAR_FAIRYPET_FENGSUI, CYCLE_NONE);
+            REGISTER_VAR(VAR_FAIRYPET_XIANYUAN, CYCLE_NONE);
+            REGISTER_VAR(VAR_FAIRYPET_STEP, CYCLE_NONE);
+            REGISTER_VAR(VAR_FAIRYPET_LIKEABILITY, CYCLE_NONE);
+            REGISTER_VAR(VAR_FAIRYPET_ISGET_PET, CYCLE_NONE);
 
             REGISTER_VAR(VAR_INVITEDSUCCESS, CYCLE_MONTH);
             REGISTER_VAR(VAR_CFRIENDTICKETS, CYCLE_NONE);
@@ -686,6 +695,8 @@ namespace GObject
             REGISTER_VAR(VAR_HUNYUAN_STEP, CYCLE_NONE);
             REGISTER_VAR(VAR_HUNYUAN_STEP4_COUNT, CYCLE_NONE);
 
+            REGISTER_VAR(VAR_LONGYUAN_GOT, CYCLE_NONE);
+
             REGISTER_VAR(VAR_CALLSNAKEEGG, CYCLE_NONE);
             REGISTER_VAR(VAR_SNAKEEGG_AWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_9344_USED, CYCLE_NONE);
@@ -700,6 +711,9 @@ namespace GObject
             REGISTER_VAR(VAR_TRAINP1, CYCLE_NONE);
             REGISTER_VAR(VAR_TRAINP2, CYCLE_NONE);
             REGISTER_VAR(VAR_TRAINP3, CYCLE_NONE);
+            REGISTER_VAR(VAR_ONLINE_TOTAL_TIME, CYCLE_DAY);
+            REGISTER_VAR(VAR_ONLINE_AWARD, CYCLE_DAY);
+            REGISTER_VAR(VAR_QZONE_QQGAME_ACT, CYCLE_DAY);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

@@ -991,6 +991,32 @@ function onActivityCheck(tm)
       else
           setWeiboAct(false)
       end
+
+      if tm >= actTime243_0 and tm < actTime243_1 then
+          setQQGameOnlineAwardAct(true)
+      else
+          setQQGameOnlineAwardAct(false)
+      end
+
+      if tm >= actTime244_0 and tm < actTime244_1 then
+          setQZoneQQGameAct(true)
+      else
+          setQZoneQQGameAct(false)
+      end
+      if tm >= actTime2013_03_15 and tm < (actTime2013_03_15+86400) then
+          setPetEggAct(true)
+      elseif tm >= (actTime2013_03_15+8*86400) and tm < (actTime2013_03_15+9*86400) then
+          setPetEggAct(true)
+      elseif tm >= (actTime2013_03_15+16*86400) and tm < (actTime2013_03_15+17*86400) then
+          setPetEggAct(true)
+      else
+          setPetEggAct(false)
+      end
+      if tm >= actTime2013_03_15 and tm < (actTime2013_03_15+10*86400) then
+          setLongyuanAct(true)
+      else
+          setLongyuanAct(false)
+      end
  
       setShuoShuo(true);
   end
@@ -1253,6 +1279,9 @@ function initActTime(y, m, d)
   --微信微博领奖
   local  SerStartTm2013_02_22 = { ['year'] = 2013, ['month'] = 2, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm2013_04_01 = { ['year'] = 2013, ['month'] = 4, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --灵宠活动
+  local  SerStartTm2013_03_15 = { ['year'] = 2013, ['month'] = 3, ['day'] = 15, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
   -- 迎新纳福 红包入袋
   local  SerStartTm237 = { ['year'] = 2013, ['month'] = 2, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 蓝钻新年回馈活动
@@ -1266,8 +1295,12 @@ function initActTime(y, m, d)
   local  SerStartTm241 = { ['year'] = 2013, ['month'] = 2, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm241_1 = { ['year'] = 2013, ['month'] = 2, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --特殊古籍活动
-  local  SerStartTm242 = { ['year'] = 2013, ['month'] = 2, ['day'] = 20, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTm242_1 = { ['year'] = 2013, ['month'] = 2, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm242 = { ['year'] = 2013, ['month'] = 3, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm242_1 = { ['year'] = 2013, ['month'] = 3, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --大厅累积在线奖励
+  local  SerStartTm243 = { ['year'] = 2013, ['month'] = 3, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --空间黄钻、大厅蓝钻礼包
+  local  SerStartTm244 = { ['year'] = 2013, ['month'] = 3, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   --300-399越南版用了
   actTime0 = os.time(SerStartTm);
@@ -1557,7 +1590,7 @@ function initActTime(y, m, d)
   actTime562_1 = os.time(SerStartTm562) + 7 * 86400;
 
   actTime563 = os.time(SerStartTm563);
-  actTime563_1 = os.time(SerStartTm563) + 22 * 86400;
+  actTime563_1 = os.time(SerStartTm563) + 29 * 86400;
   -- 繁体版
   actTime101 = os.time(SerStartTm101);
   actTime102 = os.time(SerStartTm101) + 8 * 86400;
@@ -1667,6 +1700,12 @@ function initActTime(y, m, d)
   actTime242_0= os.time(SerStartTm242);
   actTime242_1= os.time(SerStartTm242_1);
 
+  actTime243_0= os.time(SerStartTm243);
+  actTime243_1= os.time(SerStartTm243) + 3 * 86400;
+
+  actTime244_0= os.time(SerStartTm244);
+  actTime244_1= os.time(SerStartTm244) + 7 * 86400;
+
   actTime2013_01_29= os.time(SerStartTm2013_01_29);
   actTime2013_02_01= os.time(SerStartTm2013_02_01);
   actTime2013_02_05= os.time(SerStartTm2013_02_05);
@@ -1679,6 +1718,8 @@ function initActTime(y, m, d)
   actTime2013_02_23= os.time(SerStartTm2013_02_23);
   actTime2013_02_29= os.time(SerStartTm2013_02_29);
   actTime2013_02_22= os.time(SerStartTm2013_02_22);
+  actTime2013_03_14= os.time(SerStartTm2013_03_15)-86400;
+  actTime2013_03_15= os.time(SerStartTm2013_03_15);
   actTime2013_04_01= os.time(SerStartTm2013_04_01);
 
   onActivityCheck(os.time() + 30);

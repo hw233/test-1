@@ -353,7 +353,13 @@ namespace Script
         Table getSaveGoldActExtraAward(UInt32 gold);
         bool onGetNewYearGiveGiftAward(Player* player, UInt8 dayOrder, UInt8 times);
         bool onGetNewYearQQGameAward( Player* player, UInt8 type);
+        bool onGetQZoneQQGameAward( Player* player, UInt8 type);
         bool onGetNewYearQzoneContinueAward( Player* player, UInt8 type);
+        //仙宠
+	    Table onSeekFairypetAwardAndSucceed(UInt8 step, UInt8 isConvert);
+	    UInt8 getPetColorFromId(UInt32 petId);
+	    Table getConvertPetValue(UInt8 color);
+	    UInt32 exchangPurplePet( Player* player );
 
 	private:
 		Player* _player1;	//?ű???????Ϊ????1

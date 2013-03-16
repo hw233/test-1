@@ -1256,11 +1256,14 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendNewYearQQGameAct();
     pl->calcNewYearQzoneContinueDay(now);
     pl->sendNewYearQzoneContinueAct();
+    pl->sendFairyPetResource(); //仙宠资源
+    pl->sendFairyPetList(); //仙宠列表
     if (pl->getClan() != NULL)
     {
         pl->getClan()->sendQQOpenid(pl);
     }
-
+    pl->sendQZoneQQGameAct(1);
+    pl->sendQZoneQQGameAct(2);
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -1346,8 +1349,6 @@ void OnStatusChangeReq( GameMsgHdr& hdr, StatusChangeReq& scr )
 				player->sendMsgCode(0, 2001, player->getBuffData(PLAYER_BUFF_PKLOCK) - TimeUtil::Now());
 				return;
 			}
-			//SYSMSG_SEND(146, player);
-			//SYSMSG_SEND(1046, player);
 			GObject::Map * map = GObject::Map::FromSpot(PLAYER_DATA(player, location));
 			if(map != NULL)
 				map->changebyStatus(player);
@@ -1647,7 +1648,7 @@ void OnFighterDismissReq( GameMsgHdr& hdr, FighterDismissReq& fdr )
 
     UInt64 exp = 0;
 
-    if(fgt->getClass() == 4)
+    if(fgt->getClass() == e_cls_mo)
     {
         exp = fgt->getExp() > GData::expTable.getLevelMin(70) ? fgt->getExp() - GData::expTable.getLevelMin(70) : 0;
         exp /= 2;
@@ -1905,6 +1906,29 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
                 return;
             br >> type;
             player->getNewYearQQGameAward(type);
+        }
+        break;
+
+        case 0x0B:
+        {
+            UInt8 type;
+            br >> type;
+            if(type == 0)
+                player->sendQQGameOnlineAward();
+            else if(type == 1)
+                player->getQQGameOnlineAward();
+        }
+        break;
+
+        case 0x0C:
+        {
+            if(!World::getQZoneQQGameAct())
+                return;
+            UInt8 domainType;
+            UInt8 type;
+            br >> domainType;
+            br >> type;
+            player->getQZoneQQGameAward(domainType,type);
         }
         break;
 
@@ -5956,6 +5980,143 @@ void OnDreamer( GameMsgHdr & hdr, const void * data)
     if (br.left())
         br >> val2;
     dreamer->OnCommand(type, val, val2);
+}
+
+void OnFairyPet( GameMsgHdr & hdr, const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+
+    if(player->GetLev() < 50)
+        return;
+    UInt8 type = 0;
+    UInt8 opt = 0;
+    brd >> type >> opt;
+    switch(type)
+    {
+        case 0x01:  //仙宠成长
+            {
+                UInt32 petId = 0;
+                brd >> petId;
+                FairyPet * pet = player->findFairyPet(petId);
+                if(!pet) return;
+                pet->checkTimeOver();
+                switch(opt)
+                {
+                    case 0x00:
+                        pet->sendPinjieInfo();
+                        break;
+                    case 0x01:
+                        pet->sendGenguInfo();
+                        break;
+                    case 0x02:
+                        pet->upgradeLev();
+                        break;
+                    case 0x03:
+                        pet->upgradeLevAuto();
+                        break;
+                    case 0x04:
+                        {
+                            UInt8 flag = 0;
+                            brd >> flag;
+                            pet->useZhoutian(flag);
+                        }
+                        break;
+                    case 0x05:
+                        pet->upgradeBone();
+                        break;
+                }
+            }
+            break;
+        case 0x02:  //仙宠空间
+            {
+                switch(opt)
+                {
+                    case 0x01:
+                        player->getFariyPetSpaceInfo();
+                        break;
+                    case 0x02:
+                        {
+                            UInt8 count = 0;
+                            UInt8 isConvert = 0;
+                            brd >> count >> isConvert;
+                            player->seekFairyPet(count, isConvert);
+                        }
+                        break;
+                    case 0x03:
+                        {
+                            UInt32 petId = 0;
+                            brd >> petId;
+                            UInt8 res = player->hireFairyPet(petId);
+                            Stream st(REP::FAIRY_PET);
+                            st << type << opt;
+                            st << res << petId << Stream::eos;
+                            player->send(st);
+                        }
+                        break;
+                    case 0x04:
+                        {
+                            UInt32 petId = 0;
+                            UInt8 isHas = 0;
+                            brd >> petId >> isHas;
+                            UInt8 res = player->convertFairyPet(petId, isHas);
+                            Stream st(REP::FAIRY_PET);
+                            st << type << opt;
+                            st << res << petId;
+                            st << isHas << Stream::eos;
+                            player->send(st);
+                        }
+                        break;
+                    case 0x05:
+                        {
+                            if(player->getCanHirePetNum())
+                                return;
+                            UInt32 petId = GameAction()->exchangPurplePet(player);
+                            Stream st(REP::FAIRY_PET);
+                            st << type << opt << petId;
+                            st << static_cast<UInt8>(player->GetVar(VAR_FAIRYPET_LIKEABILITY));
+                            st << Stream::eos;
+                            player->send(st);
+                            if(petId)
+                            {
+                                player->setCanHirePet(petId);
+                                player->writeCanHiretPet();
+                            }
+                        }
+                        break;
+                }
+            }
+            break;
+        case 0x03:  //仙宠列表
+            {
+                switch(opt)
+                {
+                    case 0x01:
+                        player->sendFairyPetList();
+                        break;
+                    case 0x02:
+                        player->sendFairyPetResource();
+                        break;
+                    case 0x03:
+                        {
+                            UInt32 petId = 0;
+                            brd >> petId;
+                            UInt32 id = player->setFairypetBattle(petId);
+                            Stream st(REP::FAIRY_PET);
+                            st << type << opt;
+                            st << id << Stream::eos;
+                            player->send(st);
+                        }
+                        break;
+                }
+            }
+            break;
+        case 0x04:  //仙宠免费领取
+            player->getPetByLevelUp(opt);
+            break;
+        default:
+            break;
+    }
 }
 
 

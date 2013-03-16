@@ -915,6 +915,7 @@ CREATE TABLE `player` (
   `newGuild` bigint(20) unsigned NOT NULL DEFAULT '0',
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `openid` varchar(1024) NOT NULL DEFAULT '',
+  `canHirePet` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `name` (`name`),
   KEY `mainFighter` (`mainFighter`)
@@ -1913,5 +1914,21 @@ CREATE TABLE IF NOT EXISTS `dreamer` (
     `eyeX` tinyint(3) unsigned NOT NULL,      
     `eyeY` tinyint(3) unsigned NOT NULL,      
     PRIMARY KEY (`playerId`)                  
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `fairyPet`;
+CREATE TABLE `fairyPet` (
+    `id` int(10) unsigned NOT NULL,
+    `playerId` bigint(20) unsigned NOT NULL,
+    `petLev` smallint(6) unsigned NOT NULL,
+    `petBone` smallint(6) unsigned NOT NULL,
+    `pinjieBless` smallint(6) unsigned NOT NULL,
+    `genguBless` int(10) unsigned NOT NULL,
+    `chong` smallint(6) unsigned NOT NULL,
+    `onBattle` tinyint(3) unsigned NOT NULL,
+    `overTime` int(10) unsigned NOT NULL,
+    `xiaozhou` smallint(6) unsigned NOT NULL,
+    `dazhou` smallint(6) unsigned NOT NULL,
+    PRIMARY KEY (`id`, `playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

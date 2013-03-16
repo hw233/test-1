@@ -389,6 +389,9 @@ namespace REQ
     /** 战报数据 */
     const UInt8 FIGHT_REPORT2       = 0x0F;
 
+    /** 仙宠系统 */
+    const UInt8 FAIRY_PET           = 0xA8;
+
     /** 锁妖塔 */
     const UInt8 TOWN_DEAMON         = 0xA9;
 
@@ -663,6 +666,9 @@ namespace REP
     const UInt8 FIGHT_REPORT2       = 0x0F;
     /** 系统弹窗公告 */
     const UInt8 SYSDAILOG           = 0x0E;
+
+    /** 仙宠系统 */
+    const UInt8 FAIRY_PET           = 0xA8;
 
     /** 锁妖塔 */
     const UInt8 TOWN_DEAMON         = 0xA9;

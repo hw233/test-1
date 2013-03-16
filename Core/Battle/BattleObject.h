@@ -15,7 +15,7 @@ public:
 		Water = 255
 	};
 public:
-	BattleObject(Class c, UInt8 s, UInt8 p): _cls(c), _hp(0), _side(s), _pos(p), _hide(false), _shieldObj(NULL) {}
+	BattleObject(Class c, UInt8 s, UInt8 p): _cls(c), _hp(0), _side(s), _pos(p), _hide(false), _shieldObj(NULL), _protectObj(NULL), _protectProb(0) {}
 
 	inline void setSideAndPos(UInt8 s, UInt8 p) { _side = s; _pos = p; }
 
@@ -37,11 +37,21 @@ public:
 	inline bool isChar() { return _cls == Char; }
 
 	inline UInt8 getSide() { return _side; }
+    inline void setPos (UInt8 pos) 
+    { 
+        if (pos >= 0 && pos < 25)
+            _pos = pos;
+    }
+
 	inline UInt8 getPos() { return _pos; }
     inline bool isHide() { return _hide; }
     inline void setHide(bool hide) { _hide = hide; }
     inline void setShieldObj(BattleObject* obj) { if(_shieldObj != obj) _shieldObj = obj; }
     inline BattleObject* getShieldObj() { return _shieldObj; }
+
+    inline void setProtectObj(BattleObject* obj) { if (_protectObj != obj) _protectObj = obj; }
+    inline BattleObject* getProtectObj() { return _protectObj; }
+    inline UInt16   getProtectProb()    { if (_protectObj) return _protectProb; }
 
 protected:
 	Class _cls;
@@ -49,6 +59,8 @@ protected:
 	UInt8 _side, _pos;
     bool _hide;
     BattleObject* _shieldObj;
+    BattleObject* _protectObj;
+    UInt16 _protectProb;
 };
 
 }

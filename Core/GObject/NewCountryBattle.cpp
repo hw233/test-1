@@ -586,8 +586,6 @@ void NewCountryBattle::end()
         playerLeave(player);
         sendEndAwardInfo(player, items);
 
-        player->SetVar(VAR_NCB_TOTALWIN, ncbpData->totalWin);
-        player->SetVar(VAR_NCB_TOTALLOSE, ncbpData->totallose);
         player->countryBattleUdpLog(1091, player->getCountry());
         player->countryBattleUdpLog(1217, 1, Itoa(ncbpData->totalWin)+","+Itoa(ncbpData->totallose)+","+Itoa(ncbpData->totalAchievement + count));
     }

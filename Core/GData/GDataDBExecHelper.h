@@ -176,6 +176,8 @@ struct DBSkillEffect
     std::string eft;    // 附加特效类型
     std::string efl;    // 附加特效类型持续回合
     std::string efv;    // 附加特效类型值
+    float hppec;        // 最大生命值伤害百分比
+    float maxhpdampec;  // 最大生命值伤害百分比最大值（最高攻击力的百分比）
 };
 
 struct DBTalent
@@ -500,8 +502,38 @@ struct DBDreamer
     std::string typeCount;
 };
 
-}
+struct DBPinJie
+{
+    UInt16 id;
+    std::string name;
+    UInt32 consume;
+    UInt16 prob;
+    std::string skillLev;
+    std::string bless;
+};
 
+struct DBGenGu
+{
+    UInt16 id;
+    std::string name;
+    UInt8 limit;
+    UInt16 baseProb;
+    UInt8 failBack;
+    UInt32 consume1;
+    UInt32 consume2;
+    float growRate;
+};
+
+struct DBLingYa
+{
+    UInt32 id;
+    UInt8 color;
+    UInt8 lingya;
+    UInt16 initBone;
+    UInt16 finalBone;
+};
+
+}
 
 namespace DB {
 
@@ -787,7 +819,7 @@ SPECIALDEF(11)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBSkillEffect)
-SPECIALDEF(33)
+SPECIALDEF(35)
     (
         UInt16, id,
         UInt16, state,
@@ -821,7 +853,9 @@ SPECIALDEF(33)
         float, magatkreduce,
         std::string, eft,
         std::string, efl,
-        std::string, efv
+        std::string, efv,
+        float, hppec,
+        float, maxhpdampec
     )
 SPECIALEND()
 
@@ -1076,6 +1110,43 @@ SPECIALDEF(7)
     UInt8, gridCount,
     UInt8, timeConsume,
     std::string, typeCount
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBPinJie)
+SPECIALDEF(6)
+	(
+    UInt16, id,
+    std::string, name,
+    UInt32, consume,
+    UInt16, prob,
+    std::string, skillLev,
+    std::string, bless
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBGenGu)
+SPECIALDEF(8)
+	(
+    UInt16, id,
+    std::string, name,
+    UInt8, limit,
+    UInt16, baseProb,
+    UInt8, failBack,
+    UInt32, consume1,
+    UInt32, consume2,
+    float, growRate
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBLingYa)
+SPECIALDEF(5)
+	(
+    UInt32, id,
+    UInt8, color,
+    UInt8, lingya,
+    UInt16, initBone,
+    UInt16, finalBone
 	)
 SPECIALEND()
 

@@ -384,6 +384,10 @@ public:
     { _newYearQQGameAct= v; }
     inline static bool getNewYearQQGameAct()
     { return _newYearQQGameAct; }
+    inline static void setQZoneQQGameAct(bool v)
+    { _QZoneQQGameAct= v; }
+    inline static bool getQZoneQQGameAct()
+    { return _QZoneQQGameAct; }
     inline static void setNewYearQzoneContinueAct(bool v)
     { _newYearQzoneContinueAct= v; }
     inline static bool getNewYearQzoneContinueAct()
@@ -513,6 +517,19 @@ public:
     { _weiboact = v; }
     inline static bool getWeiboAct()
     { return _weiboact; }
+    inline static void setPetEggAct(bool v)
+    { _peteggact = v; }
+    inline static bool getPetEggAct()
+    { return _peteggact; }
+    inline static void setLongyuanAct(bool v)
+    { _longyuanact = v; }
+    inline static bool getLongyuanAct()
+    { return _longyuanact; }
+
+    inline static void setQQGameOnlineAwardAct(bool v)
+    { _qqgameonlineawardact = v; }
+    inline static bool getQQGameOnlineAwardAct()
+    { return _qqgameonlineawardact; }
 
     inline static void setArenaHeroId(UInt8 pos, UInt8 heroId)
     {
@@ -728,6 +745,7 @@ public:
     static bool _feastloginAct;
     static bool _newYearGiveGiftAct;
     static bool _newYearQQGameAct;
+    static bool _QZoneQQGameAct;
     static bool _newYearQzoneContinueAct;
     static UInt8 _towerloginAct;
     static bool _guoqing;
@@ -759,6 +777,9 @@ public:
     static bool _bluediamonSuperman;
     static bool _tgcevent;
     static bool _weiboact;
+    static bool _qqgameonlineawardact;
+    static bool _peteggact;
+    static bool _longyuanact;
     static stArenaExtra stArenaOld[2];
     static stArenaExtra stArena;
     static bool _compassact;

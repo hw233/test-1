@@ -1250,7 +1250,8 @@ UInt32 Fighter::getMaxHP()
 void Fighter::setPotential( float p, bool writedb )
 {
 	_potential = p;
-	_color = getColor2(p);
+    if(!isPet())
+	    _color = getColor2(p);
 	if(_owner != NULL)
 	{
 		if(writedb)
@@ -1889,6 +1890,8 @@ Fighter * Fighter::clone(Player * player)
 		fgt->_level = 1;
 		fgt->_exp = 0;
 	}
+    fgt->auraMax = auraMax;
+    fgt->peerless = peerless;
 	fgt->_owner = player;
 	fgt->_halo = NULL;
 	fgt->_fashion = NULL;
@@ -2151,6 +2154,65 @@ bool Fighter::learnSkill(UInt16 skill)
 }
 #endif
 
+void Fighter::updateToDBPetSkill()
+{
+    if (!isPet()) return;
+    std::string str1, str2, str3, str4;
+    value2string(&_skills[0], _skills.size(), str1); //主动
+    value2string(&_peerless[0], _peerless.size(), str2); //无双
+    UInt8 count = GData::SKILL_PASSIVES - GData::SKILL_PASSSTART;
+    bool flag = false;
+    for(UInt8 i = 0; i < count; ++ i)
+    {
+
+        std::string tempstr;
+        value2string(&_passkl[i][0], _passkl[i].size(), tempstr); //100%触发技能
+        if(!tempstr.empty())
+        {
+            if (i != 0 && flag)
+                str3 += ",";
+            str3 += tempstr;
+            flag = true;
+        }
+    }
+    flag = false;
+    for(UInt8 i = 0; i < count; ++ i)
+    {
+        std::string tempstr;
+        value2string(&(_rpasskl[i][0]), _rpasskl[i].size(), tempstr); //概率触发
+        if(!tempstr.empty())
+        {
+            if (i != 0 && flag)
+                str4 += ",";
+            str4 += tempstr;
+            flag = true;
+        }
+    }
+
+    std::string skills = "";
+    if(!str1.empty())
+    {
+        skills += str1;
+        if(!str2.empty() || !str3.empty() || !str4.empty())
+            skills += ",";
+    }
+    if(!str2.empty())
+    {
+        skills += str2;
+        if(!str3.empty() || !str4.empty())
+            skills += ",";
+    }
+    if(!str3.empty())
+    {
+        skills += str3;
+        if(!str4.empty())
+            skills += ",";
+    }
+    if(!str4.empty())
+        skills += str4;
+    DB2().PushUpdateData("UPDATE `fighter` SET `skill` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", skills.c_str(), getId(), _owner->getId());
+}
+
 bool Fighter::skillLevelUp( UInt16 skill, UInt8 lv )
 {
     int idx = hasSkill(skill);
@@ -2164,9 +2226,9 @@ bool Fighter::skillLevelUp( UInt16 skill, UInt8 lv )
 
     idx = isSkillUp(skill);
     if (idx >= 0)
-        upSkill(SKILLANDLEVEL(skill, lv), idx);
+        upSkill(SKILLANDLEVEL(skill, lv), idx, false);
 
-    if (addNewSkill(SKILLANDLEVEL(skill, lv)))
+    if (addNewSkill(SKILLANDLEVEL(SKILL_ID(skill), lv)), false)
     {
         if(_owner != NULL && _owner->isOnline())
         {
@@ -2377,7 +2439,10 @@ bool Fighter::addNewPeerless( UInt16 pl, bool writedb, bool up )
                 op = 3;
         }
         else
+        {
+            upPeerless(pl, false);
             return false;
+        }
     }
     else
     {
@@ -2912,7 +2977,7 @@ void Fighter::setSkills( std::string& skills, bool writedb )
     }
 
     bool up = false;
-    if (_id >= 999)
+    if (_id >= 999 || isPet())
         up = true;
 
     const GData::SkillBase* s  = 0;
@@ -3259,7 +3324,10 @@ void Fighter::delSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_ONSKILLDMG ||
                         s->cond == GData::SKILL_ONOTHERDEAD ||
                         s->cond == GData::SKILL_ONCOUNTER ||
-                        s->cond == GData::SKILL_ONATKBLEED
+                        s->cond == GData::SKILL_ONATKBLEED ||
+                        s->cond == GData::SKILL_ONATKDMG ||
+                        s->cond == GData::SKILL_ONPETPROTECT ||
+                        s->cond == GData::SKILL_ONGETDMG 
                         )
                 {
                     offPassiveSkill(s->getId(), s->cond, s->prob>=100.0f, writedb);
@@ -3299,7 +3367,10 @@ void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_ONSKILLDMG ||
                         s->cond == GData::SKILL_ONOTHERDEAD ||
                         s->cond == GData::SKILL_ONCOUNTER ||
-                        s->cond == GData::SKILL_ONATKBLEED
+                        s->cond == GData::SKILL_ONATKBLEED ||
+                        s->cond == GData::SKILL_ONATKDMG ||
+                        s->cond == GData::SKILL_ONPETPROTECT ||
+                        s->cond == GData::SKILL_ONGETDMG 
                         )
                 {
                     upPassiveSkill(s->getId(), s->cond, (s->prob >= 100.0f), writedb);
@@ -3753,6 +3824,34 @@ UInt8 Fighter::getUpCittasNum()
     return c;
 }
 
+UInt8 Fighter::getPassklNum()
+{
+    UInt8 c = 0;
+    for(UInt8 i = 0; i < GData::SKILL_PASSIVES - GData::SKILL_PASSSTART; ++ i)
+    {   //被动
+        for(UInt8 j = 0; j < _passkl[i].size(); ++ j)
+        {
+            if (_passkl[i][j])
+                ++c;
+        }
+    }
+    return c;
+}
+
+UInt8 Fighter::getRpassklNum()
+{
+    UInt8 c = 0;
+    for(UInt8 i = 0; i < GData::SKILL_PASSIVES - GData::SKILL_PASSSTART; ++ i)
+    {   //被动
+        for(UInt8 j = 0; j < _rpasskl[i].size(); ++ j)
+        {
+            if (_rpasskl[i][j])
+                ++c;
+        }
+    }
+    return c;
+}
+
 float Fighter::getPracticeInc()
 {
     float ret = Script::BattleFormula::getCurrent()->calcPracticeInc(this);
@@ -4043,40 +4142,42 @@ void Fighter::sendMaxSoul()
 
 void Fighter::setAttrType1(UInt8 t)
 {
-    _attrType1 = t;
+    _attrType1 = isPet() ? 0 : t;
 }
 
 void Fighter::setAttrValue1(UInt16 v)
 {
-    _attrValue1 = v;
+    _attrValue1 = isPet() ? 0 : v;
 }
 
 void Fighter::setAttrType2(UInt8 t, bool force)
 {
     if ((_potential + 0.005f >= 1.2f) || force)
-        _attrType2 = t;
+        _attrType2 = isPet() ? 0 : t;
 }
 
 void Fighter::setAttrValue2(UInt16 v, bool force)
 {
     if ((_potential + 0.005f >= 1.2f) || force)
-        _attrValue2 = v;
+        _attrValue2 = isPet() ? 0 : v;
 }
 
 void Fighter::setAttrType3(UInt8 t, bool force)
 {
     if ((_potential + 0.005f >= 1.5f && _capacity >= 7.0) || force)
-        _attrType3 = t;
+        _attrType3 = isPet() ? 0 : t;
 }
 
 void Fighter::setAttrValue3(UInt16 v, bool force)
 {
     if ((_potential + 0.005f >= 1.5f && _capacity >= 7.0) || force)
-        _attrValue3 = v;
+        _attrValue3 = isPet() ? 0 : v;
 }
 
 UInt8 Fighter::getAttrType1(bool notify)
 {
+    if(isPet())
+        return 0;
     UInt8 ret = 1;
     if (!_attrType1)
         ret = forge(1, 0, true);
@@ -4087,6 +4188,8 @@ UInt8 Fighter::getAttrType1(bool notify)
 
 UInt16 Fighter::getAttrValue1(bool notify)
 {
+    if(isPet())
+        return 0;
     UInt8 ret = 1;
     if (!_attrType1)
         ret = forge(1, 0, true);
@@ -4097,6 +4200,8 @@ UInt16 Fighter::getAttrValue1(bool notify)
 
 UInt8 Fighter::getAttrType2(bool notify)
 {
+    if(isPet())
+        return 0;
     UInt8 ret = 1;
     if (_potential + 0.005f >= 1.2f && !_attrType2)
         ret = forge(2, 0, true);
@@ -4107,6 +4212,8 @@ UInt8 Fighter::getAttrType2(bool notify)
 
 UInt16 Fighter::getAttrValue2(bool notify)
 {
+    if(isPet())
+        return 0;
     UInt8 ret = 1;
     if (_potential + 0.005f >= 1.2f && !_attrType2)
         ret = forge(2, 0, true);
@@ -4117,6 +4224,8 @@ UInt16 Fighter::getAttrValue2(bool notify)
 
 UInt8 Fighter::getAttrType3(bool notify)
 {
+    if(isPet())
+        return 0;
     UInt8 ret = 1;
     if (_potential + 0.005f >= 1.5f && _capacity >= 7.0 && !_attrType3)
         ret = forge(3, 0, true);
@@ -4127,6 +4236,8 @@ UInt8 Fighter::getAttrType3(bool notify)
 
 UInt16 Fighter::getAttrValue3(bool notify)
 {
+    if(isPet())
+        return 0;
     UInt8 ret = 1;
     if (_potential + 0.005f >= 1.5f && _capacity >= 7.0 && !_attrType3)
         ret = forge(3, 0, true);
@@ -4182,8 +4293,8 @@ UInt8 Fighter::forge(UInt8 which, UInt8 lock, bool initmain)
                 if (!value)
                     return 1;
 
-                _attrType2 = type;
-                _attrValue2 = value; // XXX: /10000
+                _attrType2 = isPet() ? 0 : type;
+                _attrValue2 = isPet() ? 0 : value; // XXX: /10000
 
                 return 0;
             }
@@ -4204,8 +4315,8 @@ UInt8 Fighter::forge(UInt8 which, UInt8 lock, bool initmain)
                 if (!value)
                     return 1;
 
-                _attrType3 = type;
-                _attrValue3 = value; // XXX: /10000
+                _attrType3 = isPet() ? 0 : type;
+                _attrValue3 = isPet() ? 0 : value; // XXX: /10000
 
                 return 0;
             }
@@ -4323,6 +4434,18 @@ void Fighter::broadcastForge(UInt8 lock)
         fprintf(stderr, "%u, %u, %u, %u, %u, %u\n", _attrType1, _attrValue1,  _attrType2, _attrValue2,  _attrType3, _attrValue3);
         SYSMSG_BROADCASTV(2330, _owner->getCountry(), _owner->getName().c_str(), getColor(), getName().c_str());
     }
+}
+
+UInt8 Fighter::getToggleReiatsu()
+{
+    // TODO: 返回出场所需灵压（仅对仙宠有效）
+    return 0;
+}
+
+UInt8 Fighter::getTargetPos()
+{
+    // TODO: 返回备胎上场时的位置
+    return 0;
 }
 
 float Fighter::getSoulPracticeAddOn()

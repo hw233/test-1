@@ -766,6 +766,11 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             {
                 pl->SetVar(GObject::VAR_RP_VALUE, 4);
             }
+            if (GObject::World::getPetEggAct())
+            {
+                GObject::MailPackage::MailItem item = {9366,1};
+                pl->sendMailItem(4140, 4141, &item, 1, true);
+            }
 
 #ifndef _FB
 #ifndef _VT
@@ -1410,6 +1415,7 @@ void ForbidSale(LoginMsgHdr& hdr,const void * data)
 
     UInt8 ret = 1;
     //INFO_LOG("GMBIGLOCK: %s, %u", playerIds.c_str(), expireTime);
+    std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());
     std::string playerId = GetNextSection(playerIds, ',');
     while (!playerId.empty())
     {
@@ -1428,6 +1434,12 @@ void ForbidSale(LoginMsgHdr& hdr,const void * data)
             GLOBAL().PushMsg(hdr, NULL);
         }
         playerId = GetNextSection(playerIds, ',');
+
+        if (execu.get() != NULL && execu->isConnected())
+        {
+            execu->Execute2("REPLACE into `fsale_player` values(%"I64_FMT"u,%d,1)", pid, TimeUtil::Now());
+        }
+ 
     }
     ret = 0;
     Stream st(SPEP::FORBIDSALE);
@@ -1447,6 +1459,7 @@ void UnForbidSale(LoginMsgHdr& hdr,const void * data)
  
     UInt8 ret = 1;
     //INFO_LOG("GMBIGLOCK: %s, %u", playerIds.c_str(), expireTime);
+    std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());
     std::string playerId = GetNextSection(playerIds, ',');
     while (!playerId.empty())
     {
@@ -1461,6 +1474,13 @@ void UnForbidSale(LoginMsgHdr& hdr,const void * data)
             pl->setForbidSale(false);
         
         playerId = GetNextSection(playerIds, ',');
+
+        if (execu.get() != NULL && execu->isConnected())
+        {
+            execu->Execute2("REPLACE into `fsale_player` values(%"I64_FMT"u,%d,0)", pid, TimeUtil::Now());
+        }
+ 
+
     }
     ret = 0;
     Stream st(SPEP::UNFORBIDSALE);

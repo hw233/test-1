@@ -30,6 +30,7 @@ void BattleFormula::init()
 	class_def<GObject::Fighter>("getId", &GObject::Fighter::getId);
 	class_def<GObject::Fighter>("getClass", &GObject::Fighter::getClass);
 	class_def<GObject::Fighter>("getLevel", &GObject::Fighter::getLevel);
+    class_def<GObject::Fighter>("getLevelInLua", &GObject::Fighter::getLevelInLua);
 	class_def<GObject::Fighter>("getColor", &GObject::Fighter::getColor);
 	class_def<GObject::Fighter>("getPotential", &GObject::Fighter::getPotential);
 	class_def<GObject::Fighter>("getCapacity", &GObject::Fighter::getCapacity);
@@ -70,6 +71,7 @@ void BattleFormula::init()
 	class_def<GObject::Fighter>("getExtraCounter", &GObject::Fighter::getExtraCounter);
 	class_def<GObject::Fighter>("getExtraMagRes", &GObject::Fighter::getExtraMagRes);
 	class_def<GObject::Fighter>("isNpc", &GObject::Fighter::isNpc);
+	class_def<GObject::Fighter>("isPet", &GObject::Fighter::isPet);
 	class_def<GObject::Fighter>("isMale", &GObject::Fighter::isMale);
 	class_def<GObject::Fighter>("isBoy", &GObject::Fighter::isBoy);
 	class_def<GObject::Fighter>("getSex", &GObject::Fighter::getSex);
@@ -117,6 +119,7 @@ void BattleFormula::init()
 	class_def<Battle::BattleFighter>("getId", &Battle::BattleFighter::getId);
 	class_def<Battle::BattleFighter>("getClass", &Battle::BattleFighter::getClass);
 	class_def<Battle::BattleFighter>("getLevel", &Battle::BattleFighter::getLevel);
+    class_def<Battle::BattleFighter>("getLevelInLua", &Battle::BattleFighter::getLevelInLua);
 	class_def<Battle::BattleFighter>("getColor", &Battle::BattleFighter::getColor);
 	class_def<Battle::BattleFighter>("getPotential", &Battle::BattleFighter::getPotential);
 	class_def<Battle::BattleFighter>("getExtraStrength", &Battle::BattleFighter::getExtraStrength);
@@ -156,6 +159,7 @@ void BattleFormula::init()
 	class_def<Battle::BattleFighter>("getExtraCounter", &Battle::BattleFighter::getExtraCounter);
 	class_def<Battle::BattleFighter>("getExtraMagRes", &Battle::BattleFighter::getExtraMagRes);
 	class_def<Battle::BattleFighter>("isNpc", &Battle::BattleFighter::isNpc);
+	class_def<Battle::BattleFighter>("isPet", &Battle::BattleFighter::isPet);
 	class_def<Battle::BattleFighter>("isMale", &Battle::BattleFighter::isMale);
 	class_def<Battle::BattleFighter>("isBoy", &Battle::BattleFighter::isBoy);
 	class_def<Battle::BattleFighter>("getSex", &Battle::BattleFighter::getSex);

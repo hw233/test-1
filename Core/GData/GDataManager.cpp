@@ -32,6 +32,7 @@
 #include "SoulSkillTable.h"
 #include "SkillStrengthen.h"
 #include "DreamerTable.h"
+#include "FairyPetTable.h"
 
 namespace GData
 {
@@ -285,6 +286,24 @@ namespace GData
         if (!LoadDreamer())
         {
             fprintf (stderr, "Load Dreamer Table Error !\n");
+            std::abort();
+        }
+
+        if (!LoadPetPinJie())
+        {
+            fprintf (stderr, "Load PetPinJie Table Error !\n");
+            std::abort();
+        }
+
+        if (!LoadPetGenGu())
+        {
+            fprintf (stderr, "Load PetGenGu Table Error !\n");
+            std::abort();
+        }
+
+        if (!LoadPetLingYa())
+        {
+            fprintf (stderr, "Load PetLingYa Table Error !\n");
             std::abort();
         }
 
@@ -1177,7 +1196,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBSkillEffect effs;
-		if(execu->Prepare("SELECT `id`, `state`, `immune`, `disperse`, `damage`, `adddam`, `magdam`, `addmag`, `crrdam`, `addcrr`, `hp`, `addhp`, `absorb`, `thorn`, `inj2hp`, `aura`, `atk`, `def`, `magatk`, `magdef`, `tough`, `action`, `hitrate`, `evade`, `critical`, `pierce`, `counter`, `magres`, `atkreduce`, `magatkreduce`, `eft`, `efl`, `efv` FROM `skill_effect`", effs) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `state`, `immune`, `disperse`, `damage`, `adddam`, `magdam`, `addmag`, `crrdam`, `addcrr`, `hp`, `addhp`, `absorb`, `thorn`, `inj2hp`, `aura`, `atk`, `def`, `magatk`, `magdef`, `tough`, `action`, `hitrate`, `evade`, `critical`, `pierce`, `counter`, `magres`, `atkreduce`, `magatkreduce`, `eft`, `efl`, `efv`, `hppec`, `maxhpdampec` FROM `skill_effect`", effs) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -1237,6 +1256,8 @@ namespace GData
                         ef->efv.push_back(::atof(tk[i].c_str()));
                 }
             }
+            ef->hppec = effs.hppec;
+            ef->maxhpdampec = effs.maxhpdampec;
             skillEffectManager.add(ef);
         }
         return true;
@@ -1847,6 +1868,69 @@ namespace GData
                 dreamerDataTable[dbd.level].resize(dbd.floor + 1);
             }
             dreamerDataTable[dbd.level][dbd.floor] = dreamerLevelData;
+        }
+        return true;
+    }
+
+    bool GDataManager::LoadPetPinJie()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBPinJie dbpj;
+		if(execu->Prepare("SELECT `id`, `name`, `consume`, `prob`, `skillLev`, `bless` FROM `pet_pinjie`", dbpj) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            pet.setLevTable(dbpj);
+        }
+        return true;
+    }
+
+    bool GDataManager::LoadPetGenGu()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBGenGu dbgg;
+		if(execu->Prepare("SELECT `id`, `name`, `limit`, `baseProb`, `failBack`, `consume1`, `consume2`, `growRate` FROM `pet_gengu`", dbgg) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            Pet::GenguData ggd;
+            ggd.id = dbgg.id;
+            ggd.name = dbgg.name;
+            ggd.limit = dbgg.limit;
+            ggd.baseProb = dbgg.baseProb;
+            ggd.failBack = dbgg.failBack;
+            ggd.consume1 = dbgg.consume1;
+            ggd.consume2 = dbgg.consume2;
+            ggd.growRate = dbgg.growRate;
+            pet.setBoneTable(ggd);
+        }
+        return true;
+    }
+
+    bool GDataManager::LoadPetLingYa()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBLingYa dbly;
+		if(execu->Prepare("SELECT `id`, `color`, `lingya`, `initBone`, `finalBone` FROM `pet_pressure`", dbly) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            Pet::LingyaData lyd;
+            lyd.petId = dbly.id;
+            lyd.color = dbly.color;
+            lyd.lingya = dbly.lingya;
+            lyd.initBone = dbly.initBone;
+            lyd.finalBone = dbly.finalBone;
+            pet.setLingyaTable(lyd);
         }
         return true;
     }

@@ -1068,6 +1068,15 @@ void Tianjie::process(UInt32 now)
         m_scoreSortMap.clear();
 
         broadTianjiePassed();
+        m_tjTypeId = 0;
+        for (size_t i = 0; i < sizeof(s_tjRoleLevel)/sizeof(s_tjRoleLevel[0]); ++i)
+    	{
+    		if (s_tjRoleLevel[i] == m_currOpenedTjLevel)
+            {
+                m_tjTypeId = i;
+                break;
+            }
+        }
     }
     if (m_isTjOpened)
     {
@@ -2401,6 +2410,8 @@ void Tianjie::addTianjieNpc(UInt32 npcId, UInt16 spot)
     if (pmap->AddObject(mo))
     {
         pmap->Show(npcId, true, mo.m_Type);
+	
+        FastMutex::ScopedLock lk(_opMutex1);
         m_locNpcMap.insert(make_pair(spot, npcId));
         m_loc = spot;
         addNpcCount++ ;
