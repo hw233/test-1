@@ -210,6 +210,8 @@ void CFriend::reset(bool online)
 
 void CFriend::recallFriend()
 {
+    if (m_cf.size() < CF_MAX)
+        m_cf.resize(CF_MAX, 0);
     if (getCFriend(CF_RECALL) != 2)
     {
         m_cf[CF_RECALL] = 1;
@@ -220,6 +222,8 @@ void CFriend::recallFriend()
 
 void CFriend::giveLift()
 {
+    if (m_cf.size() < CF_MAX)
+        m_cf.resize(CF_MAX, 0);
     if (getCFriend(CF_GIVELIFT) != 2)
     {
         m_cf[CF_GIVELIFT] = 1;
@@ -230,6 +234,8 @@ void CFriend::giveLift()
 
 void CFriend::getLift()
 {
+    if (m_cf.size() < CF_MAX)
+        m_cf.resize(CF_MAX, 0);
     if (getCFriend(CF_GETLIFE) != 2)
     {
         m_cf[CF_GETLIFE] = 1;
