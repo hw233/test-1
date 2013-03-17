@@ -54,6 +54,7 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
 	_moAttackAddCD(0), _moMagAtkAddCD(0), _moAtkReduceCD(0), _moMagAtkReduceCD(0),
 	_petAttackAdd(0), _petMagAtkAdd(0), _petAtkReduce(0), _petMagAtkReduce(0),
 	_petAttackAddCD(0), _petMagAtkAddCD(0), _petAtkReduceCD(0), _petMagAtkReduceCD(0),
+    _petExAtk(0), _petExAtkEnable(false),
     _bleedMo(0), _bleedMoLast(0), _summoner(NULL), _unSummonAura(0), 
     _shieldHP(0), _shieldHPLast(0), _petShieldHP(0), 
     _petProtect100(false), _petProtect100Last(0), _petAtk100(0), _petAtk100Last(0), _petMark(false),
@@ -397,8 +398,9 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         GData::SkillItem skillItem;
         skillItem.base = GData::skillManager[passiveSkillOnPetProtect[idx]];
         skillItem.cd = 0;
-        skillItem.rateExtent = 0;
-        _passiveSkillOnOtherDead.insert(_passiveSkillOnPetProtect.end(), skillItem);
+        rateExtent += skillItem.base->prob * 100;
+        skillItem.rateExtent = rateExtent;
+        _passiveSkillOnPetProtect.insert(_passiveSkillOnPetProtect.end(), skillItem);
 
         updateSkillStrengthen(passiveSkillOnPetProtect[idx]);
     }
@@ -498,7 +500,8 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         GData::SkillItem skillItem;
         skillItem.base = GData::skillManager[passiveSkillOnGetDmg[idx]];
         skillItem.cd = 0;
-        skillItem.rateExtent = 0;
+        rateExtent += skillItem.base->prob * 100;
+        skillItem.rateExtent = rateExtent;
         _passiveSkillOnGetDmg.insert(_passiveSkillOnGetDmg.end(), skillItem);
 
         updateSkillStrengthen(passiveSkillOnGetDmg[idx]);
@@ -1345,6 +1348,28 @@ const GData::SkillBase* BattleFighter::getPassiveSkill(std::vector<GData::SkillI
     return resSkillBase;
 }
 
+const GData::SkillBase* BattleFighter::getPassiveSkillForce(std::vector<GData::SkillItem>& passiveSkill, bool noPossibleTarget)
+{
+    size_t cnt = passiveSkill.size();
+    if(cnt < 1)
+        return NULL;
+    const GData::SkillBase* resSkillBase = NULL;
+
+    for(size_t idx = 0; idx < cnt; ++idx)
+    {
+        if(passiveSkill[idx].base == NULL)
+            continue;
+        if(passiveSkill[idx].base->effect == NULL)
+            continue;
+        if(noPossibleTarget && passiveSkill[idx].base->target == GData::e_battle_target_otherside)
+            continue;
+        resSkillBase = passiveSkill[idx].base;
+        break;
+    }
+
+    return resSkillBase;
+}
+
 const GData::SkillBase* BattleFighter::getPassiveSkillPreAtk(bool noPossibleTarget)
 {
     return getPassiveSkill(_passiveSkillPreAtk, noPossibleTarget);
@@ -1396,6 +1421,11 @@ const GData::SkillBase* BattleFighter::getPassiveSkillOnAttackBleed(bool noPossi
     return NULL;
 }
 
+const GData::SkillBase* BattleFighter::getPassiveSkillOnAtkDmgForce(bool noPossibleTarget)
+{
+    return getPassiveSkillForce(_passiveSkillOnAtkDmg, noPossibleTarget);
+}
+
 const GData::SkillBase* BattleFighter::getPassiveSkillOnAtkDmg(bool noPossibleTarget)
 {
     return getPassiveSkill(_passiveSkillOnAtkDmg, noPossibleTarget);
@@ -1404,6 +1434,11 @@ const GData::SkillBase* BattleFighter::getPassiveSkillOnAtkDmg(bool noPossibleTa
 const GData::SkillBase* BattleFighter::getPassiveSkillOnPetProtect(bool noPossibleTarget)
 {
     return getPassiveSkill(_passiveSkillOnPetProtect, noPossibleTarget);
+}
+
+const GData::SkillBase* BattleFighter::getPassiveSkillOnPetProtectForce(bool noPossibleTarget)
+{
+    return getPassiveSkillForce(_passiveSkillOnPetProtect, noPossibleTarget);
 }
 
 const GData::SkillBase* BattleFighter::getPassiveSkillOnGetDmg(bool noPossibleTarget)

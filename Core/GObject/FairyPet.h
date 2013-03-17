@@ -57,6 +57,68 @@ public:
         }
         return 0;
     }
+
+    /*
+    const PeerlessSkillID[e_cls_max] = 
+    {
+        0,
+        0,
+        0,
+        0,
+        0,
+        ,
+        ,
+        ,
+        ,
+        ,
+    };
+    inline UInt16 getPeerless() 
+    { 
+        switch (getClass())
+        {
+            case e_cls_qinglong:
+                return 24;
+            case e_cls_xuanwu:
+                return 4;
+            case e_cls_zhuque:
+                return 0;
+            case e_cls_baihu:
+                return 20;
+        }
+        return 0;
+    }
+    inline UInt16 getPeerlessLevel()
+    { 
+        switch (getClass())
+        {
+            case e_cls_qinglong:
+                return 24;
+            case e_cls_xuanwu:
+                return 4;
+            case e_cls_zhuque:
+                return 0;
+            case e_cls_baihu:
+                return 20;
+        }
+        return 0;
+    }
+    inline UInt16 getPeerlessAndLevel()
+    { 
+        switch (getClass())
+        {
+            case e_cls_qinglong:
+                return 24;
+            case e_cls_xuanwu:
+                return 4;
+            case e_cls_zhuque:
+                return 0;
+            case e_cls_baihu:
+                return 20;
+        }
+        return 0;
+    }
+    */
+
 private:
     inline UInt8 getChongNum() { return _chong; }
     inline UInt16 getPinjieBless() { return _pinjieBless; }

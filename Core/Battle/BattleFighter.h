@@ -130,7 +130,7 @@ public:
 	inline float getSoul() { return _soul; }
 	inline float getAura() { return (_aura > 0 ? _aura : 0); }
 	inline float getAuraMax() { return (_auraMax > 0 ? _auraMax : 0); }
-	inline float getAttack() {float ret = _attack + _attackAdd + _attackAdd2 + _atkAddSpecial + _atkDecSpecial + _moAttackAdd + _petAttackAdd; return  ret;}
+	inline float getAttack() {float ret = _attack + _attackAdd + _attackAdd2 + _atkAddSpecial + _atkDecSpecial + _moAttackAdd + _petAttackAdd + (_petExAtkEnable?_petExAtk:0); return  ret;}
 	inline float getMagAttack() {float ret = _magatk + _magAtkAdd + _magAtkAdd2 + _magAtkAddSpecial + _magAtkDecSpecial + _moMagAtkAdd + _petMagAtkAdd; return ret;}
 	inline float getDefend() {float ret = _defend + _defAdd + _defAdd2; return (ret > 0 ? ret : 0);}
 	inline float getMagDefend() {float ret = _magdef + _magDefAdd + _magDefAdd2; return (ret > 0 ? ret : 0);}
@@ -291,7 +291,9 @@ public:
     const GData::SkillBase* getPassiveSkillDead(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillAftNAtk(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnAtkDmg(bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnAtkDmgForce(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnPetProtect(bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnPetProtectForce(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnPetAtk(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnGetDmg(bool noPossibleTarget = false);
 
@@ -305,6 +307,7 @@ public:
     const GData::SkillBase* getPassiveSkillOnPetProtect100();
 
     const GData::SkillBase* getPassiveSkill(std::vector<GData::SkillItem>& passiveSkill, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillForce(std::vector<GData::SkillItem>& passiveSkill, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkill100(std::vector<GData::SkillItem>& passiveSkill100, size_t& idx, bool noPossibleTarget = false);
 
     GData::SkillStrengthenBase* getSkillStrengthen(UInt16 skillId);
@@ -561,6 +564,8 @@ private:
 	UInt8 _moAttackAddCD, _moMagAtkAddCD, _moAtkReduceCD, _moMagAtkReduceCD;
 	float _petAttackAdd, _petMagAtkAdd, _petAtkReduce, _petMagAtkReduce;
 	UInt8 _petAttackAddCD, _petMagAtkAddCD, _petAtkReduceCD, _petMagAtkReduceCD;
+    float _petExAtk;
+    bool  _petExAtkEnable;
     float _bleedMo;
     UInt8 _bleedMoLast;
     BattleFighter* _summoner;
@@ -824,6 +829,11 @@ public:
     inline float getPetMagAtkAdd() { return _petMagAtkAdd; }
     inline float getPetAtkReduce() { return _petAtkReduce; }
     inline float getPetMagAtkReduce() { return _petMagAtkReduce; }
+
+    inline void setPetExAtk(float v) { _petExAtk = v;}
+    inline float getPetExAtk() { return _petExAtk; }
+    inline void setPetExAtkEnable(bool v) { _petExAtkEnable = v;}
+    inline bool getPetExAtkEnable() { return _petExAtkEnable; }
 
     bool releasePetAttackAdd();
     bool releasePetMagAtkAdd();

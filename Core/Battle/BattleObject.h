@@ -37,6 +37,12 @@ public:
 	inline bool isChar() { return _cls == Char; }
 
 	inline UInt8 getSide() { return _side; }
+    inline void setPos (UInt8 pos) 
+    { 
+        if (pos >= 0 && pos < 25)
+            _pos = pos;
+    }
+
 	inline UInt8 getPos() { return _pos; }
     inline bool isHide() { return _hide; }
     inline void setHide(bool hide) { _hide = hide; }

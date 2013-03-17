@@ -43,14 +43,20 @@ public:
 	void setFormation(int, UInt32);
     void setPetObject(int, BattleObject *, UInt8 = 0);
 
-    UInt32 upPetObject(int, bool = true);
+    UInt32 upPetObject(UInt8, bool = true);
     bool addReiatsu(int, int);
     int getReiatsu(int side);
+    inline int getToggleReiatsu(int side) 
+    {
+        if (side < 0 || side >= 2)
+            return 0;
+        return _toggleReiatsu[side];
+    }
 
 	BattleObject * operator()(int, int);
 	BattleObject * getObjectXY(int, int, int);
 	int getDistance(int, int, int, int);
-    int getSpecificTarget(int side, bool(f(BattleObject* bo)));
+    int getSpecificTarget(int side, bool(*f)(BattleObject* bo));
 	int getPossibleTarget(int, int); // return -1 for no found target, overload in Simulator
 	void updateDistance();
 	void updateDistance(int, int);

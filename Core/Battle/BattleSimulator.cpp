@@ -531,6 +531,9 @@ void BattleSimulator::start(UInt8 prevWin, bool checkEnh)
                 ++ cnt[i];
             }
         }
+        if (_backupObjs[i])
+            static_cast<BattleFighter *>(_backupObjs[i])->initStats(checkEnh);
+
     }
 
     // after insert fighter status to _fgtlist[0] set the _cur_fgtlist_idx to 0
@@ -3566,7 +3569,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
 
         }
         //仙宠、两次单体攻击，两次伤害则眩晕 (天崩地裂)
-        else if(SKILL_ID(skill->getId()) == 44)
+        else if(SKILL_ID(skill->getId()) == 48)
         {
             UInt32 dmg1 = 0;
             UInt32 dmg2 = 0;
@@ -4309,7 +4312,8 @@ bool BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GD
             return false;
 
         float rate = skill->prob * 100;
-        if(rate > _rnd(10000))
+        //可能是受伤害触发的被动技能，概率已经在受伤害时计算过，这里100%生效
+        if((skill->cond == GData::SKILL_ONGETDMG) || rate > _rnd(10000))
         {
             float value = bo->_aura * skill->effect->auraP + skill->effect->aura;
             if(value > 0 && bf->getSide() != target_side)
@@ -4852,8 +4856,9 @@ UInt32 BattleSimulator::FightersEnter(UInt8 prevWin)
         }
     }
 
-    if(rcnt != 0)
-        appendToPacket(0, -1, -1, 0, 0, false, false);
+    //if(rcnt != 0)
+    appendMaxReiatsu();
+    appendToPacket(0, -1, -1, 0, 0, false, false);
 
     return rcnt;
 }
@@ -4891,6 +4896,14 @@ UInt32 BattleSimulator::doSkillAttackAftEnter(BattleFighter* bf, const GData::Sk
                 bo->setDefend100(true);
                 bf->setDefend100CD(skill->cd + 1);
                 bf->setDefend100BaseCD(skill->cd + 1);
+            }
+            else if(skill->effect->hp > 0 || skill->effect->addhp > 0 || skill->effect->hpP > 0.001)
+            {
+                doSkillAttack(bf, skill, target_side, target_pos, 1);
+            }
+            else if ((skill->effect->atk > 0 || skill->effect->atkP > 0) && bf->isPet())
+            {
+                bf->setPetExAtk(bf->_attack * skill->effect->atkP + skill->effect->atk);
             }
             else
             {
@@ -4936,6 +4949,7 @@ UInt32 BattleSimulator::doSkillAttackAftEnter(BattleFighter* bf, const GData::Sk
 
         rcnt = 1;
     } while(false);
+    doSkillEffectExtraAttack(bf, target_side, target_pos, skill);
 
     return rcnt;
 }
@@ -5392,7 +5406,7 @@ UInt32 BattleSimulator::doAttack( int pos )
             while(NULL != (passiveSkill = bf->getPassiveSkillOnAttackBleed100(idx, noPossibleTarget)))
             {
                 if(passiveSkill->target == GData::e_battle_target_otherside && bo && bo->getHP() && 
-                        (bo->getBleedRandomLast() || bf->getBleedBySkillLast() || //bf->getBleedBySkillClass() || bo->getBleedAttackClass() || 
+                        (bo->getBleedRandomLast() || bo->getBleedBySkillLast() || //bo->getBleedBySkillClass() || bo->getBleedAttackClass() || 
                          bo->getBleed1Last() || bo->getBleed2Last() || bo ->getBleed3Last() || bo->getAuraBleedLast() || bo->getStunBleedLast() || bo->getConfuceBleedLast() ||
                          bo->getBleedMoLast() || bo->getSelfBleedLast()))
                 {
@@ -5737,8 +5751,11 @@ UInt32 BattleSimulator::doAttack( int pos )
     }
     while(false);
 
-    rcnt += tryPetEnter(side, reiatsuType);
-    rcnt += tryPetEnter(side, reiatsuType2);
+    if (reiatsuType || reiatsuType2)
+    {
+        rcnt += tryPetEnter(side, reiatsuType, true);
+        rcnt += tryPetEnter(side, reiatsuType2);
+    }
 
     if(mainTarget)
         mainTarget->setShieldObj(NULL);
@@ -9423,6 +9440,8 @@ UInt32 BattleSimulator::getSkillEffectExtraHitCnt(BattleFighter* bf, BattleFight
                 appendDefStatus(e_unMarkMo, 0, bo);
             }
         }
+        else if (eft[i] == GData::e_eft_atk_pet_mark_extra_dmg && bo->isPetMark())
+            hitCnt += efv[i];
     }
 
     return hitCnt;
@@ -9639,7 +9658,7 @@ void BattleSimulator::doSkillEffectExtra_HpShield(BattleFighter* bf, int target_
         return;
     if (!bo->isChar())
         return;
-    float hp = bf->getMaxHP() * (skill->effect->efv[eftIdx] / 10000);
+    float hp = bf->getMaxHP() * (skill->effect->efv[eftIdx]);
     if (hp < 1.0f)
         return;
     bo->addHpShieldSelf(hp, skill->effect->efl[eftIdx]);
@@ -9715,7 +9734,7 @@ void BattleSimulator::doSkillEffectExtra_MarkPet(BattleFighter* bf, int target_s
 {
     // 上神兽印记
     BattleObject * bo = getObject(target_side, target_pos);
-    if (!bo->isChar())
+    if (!bo || !bo->isChar())
         return;
     BattleFighter* bf2 = static_cast<BattleFighter*>(bo);
     bf2->setPetMark(true);
@@ -9736,6 +9755,8 @@ void BattleSimulator::doSkillEffectExtra_AtkPetMarkAura(BattleFighter* bf, int t
 
 void BattleSimulator::doSkillEffectExtra_AtkPetMarkDmg(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
 {
+    // Nothing to do.
+    /*
     // 造成额外伤害
 
     BattleObject * bo = getObject(target_side, target_pos);
@@ -9747,6 +9768,7 @@ void BattleSimulator::doSkillEffectExtra_AtkPetMarkDmg(BattleFighter* bf, int ta
     bool cs    = false;
     bool pr    = false;
     attackOnce(bf, first, cs, pr, NULL, area_target, skill->effect->efv[eftIdx], 1);
+    */
 }
 
 void BattleSimulator::doSkillEffectExtra_ProtectPet100(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
@@ -10072,6 +10094,17 @@ void BattleSimulator::appendStatusChange(StatusType type, UInt32 value, UInt16 s
 {
     StatusChange sc;
     sc.pos = getSidePos(bf);
+    sc.type = type;
+    sc.data = value;
+    sc.statusId = skillId;
+
+    _scList.push_back(sc);
+}
+
+void BattleSimulator::appendStatusChangeForReiastu(StatusType type, UInt32 value, UInt16 skillId, UInt8 side)
+{
+    StatusChange sc;
+    sc.pos = side * 25 + getPossibleTarget(side, 0);
     sc.type = type;
     sc.data = value;
     sc.statusId = skillId;
@@ -10709,7 +10742,7 @@ void BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u)
         const GData::SkillBase* passiveSkill = NULL;
         while(NULL != (passiveSkill = bf->getPassiveSkillOnGetDmg()))
         {
-            // XXX: 写死给自己上技能
+            // XXX: 写死是被动技能
             if (_getDamageSkillCount[bf->getSide()] >= 3)
                 break;
             ++_getDamageSkillCount[bf->getSide()];
@@ -10793,7 +10826,7 @@ bool BattleSimulator::doStunPresent(BattleFighter* bf)
     return true;
 }
 
-UInt32 BattleSimulator::tryPetEnter(UInt8 side, UInt8 reiatsuType)
+UInt32 BattleSimulator::tryPetEnter(UInt8 side, UInt8 reiatsuType, bool slience /* = false */)
 {
     // 仙宠尝试上场（根据增加后的灵压判定是否上场）
     UInt8 val = 0;
@@ -10814,7 +10847,8 @@ UInt32 BattleSimulator::tryPetEnter(UInt8 side, UInt8 reiatsuType)
             break;
     }
 
-    appendReiatsuChange(side);
+    if (!slience)
+        appendReiatsuChange(side);
     if (addReiatsu(side, val))
     {
         return doPetEnter(side);
@@ -10826,16 +10860,31 @@ UInt32 BattleSimulator::doPetEnter(UInt8 side)
 {
     // 仙宠入场
     if (side < 0 || side >= 2)
+    {
+#ifdef _DEBUG
+        //printf("doPetEnter side error\n");
+#endif
         return 0;
+    }
     UInt32 pos = upPetObject(side);
     if (pos >= 25)
+    {
+#ifdef _DEBUG
+        //printf("doPetEnter pos error, pos = %d\n", pos);
+#endif
         return 0;
+    }
 
     UInt32 rcnt = 0;
 
     BattleObject * bo = _objs[side][pos];
     if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
+    {
+#ifdef _DEBUG
+        //printf("doPetEnter bo error.\n");
+#endif
         return 0;
+    }
     BattleFighter* bf = static_cast<BattleFighter *>(bo);
 
     if(bf->getPassiveSkillOnTherapy())
@@ -10844,9 +10893,9 @@ UInt32 BattleSimulator::doPetEnter(UInt8 side)
         _onSkillDmg.push_back(bf);
     if(bf->getPassiveSkillOnOtherDead())
         _onOtherDead.push_back(bf);
-    if(bf->getPassiveSkillOnPetProtect())
+    if(bf->getPassiveSkillOnPetProtectForce())
         _onPetProtect.push_back(bf);
-    if(bf->getPassiveSkillOnAtkDmg())
+    if(bf->getPassiveSkillOnAtkDmgForce())
         _onPetAtk.push_back(bf);
 
     const GData::SkillBase* passiveSkill = NULL;
@@ -10869,20 +10918,21 @@ UInt32 BattleSimulator::doPetEnter(UInt8 side)
             rcnt = 1;
     }
 
-    if(rcnt != 0)
-        appendToPacket(0, -1, -1, 0, 0, false, false);
-
-    appendDefStatus(e_Summon, bf->getId(), bf);
+    appendDefStatus(e_petAppear, bf->getId(), bf);
     appendToPacket(bf->getSide(), bf->getPos(), bf->getPos(), 5, 0, false, false);
+    insertFighterStatus(bf);
     return rcnt;
 }
 
 bool BattleSimulator::tryProtectDamage(BattleFighter* bf, float& phyAtk, float& magAtk, float factor)
 {
     // 宠物保护主目标吸收一半伤害，当然，也可能保护完两个都挂了
-    if (int tidx = getSpecificTarget(bf->getSide(), BattleSimulator::isPet) >= 0)
+    int tidx = -1;
+    if ((tidx = getSpecificTarget(bf->getSide(), BattleSimulator::isPet)) >= 0)
     {
-        BattleFighter * pet = static_cast<BattleFighter *> ((*this)(bf->getSide(), tidx));
+        BattleFighter * pet = static_cast<BattleFighter *> (_objs[bf->getSide()][tidx]);
+        if (!pet)
+            return false;
         if (bf->getPetProtect100())
             return do100ProtectDamage(bf, pet, phyAtk, magAtk, factor);
         else
@@ -11017,13 +11067,19 @@ bool BattleSimulator::isPet(BattleObject* bo)
 
 int BattleSimulator::getPossibleTarget( int side, int idx , BattleFighter * bf /* = NULL */)
 {
-    //正常的仙宠会优先寻找有神兽印记的目标
-    if (bf && bf->isPet() &&  
-            !bf->getStunRound() && !bf->getConfuseRound() && ! bf->getForgetRound())
+    //正常的仙宠会优先寻找有神兽印记的目标，并且临时增加攻击力
+    if (bf && bf->isPet())
     {
-        int tidx = getSpecificTarget(side, hasPetMarked);
-        if (tidx >= 0)
-            return tidx;
+        if( !bf->getStunRound() && !bf->getConfuseRound() && ! bf->getForgetRound())
+        {
+            int tidx = getSpecificTarget(side, hasPetMarked);
+            if (tidx >= 0)
+            {
+                bf->setPetExAtkEnable(true);
+                return tidx;
+            }
+        }
+        bf->setPetExAtkEnable(false);
     }
     return static_cast<BattleField *>(this)->getPossibleTarget(side, idx);
 }
@@ -11031,7 +11087,8 @@ int BattleSimulator::getPossibleTarget( int side, int idx , BattleFighter * bf /
 bool BattleSimulator::tryAttackWithPet(BattleFighter* bf, float& phyAtk, float& magAtk, float factor)
 {
     // 宠物合击
-    if (int tidx = getSpecificTarget(bf->getSide(), BattleSimulator::isPet) >= 0)
+    int tidx = 0;
+    if ((tidx = getSpecificTarget(bf->getSide(), BattleSimulator::isPet)) >= 0)
     {
         BattleFighter * pet = static_cast<BattleFighter *> ((*this)(bf->getSide(), tidx));
         if (bf->getPetAtk100Last())
@@ -11089,10 +11146,16 @@ bool BattleSimulator::attackWithPet(BattleFighter* bf, BattleFighter* pet, float
     return true;
 }
 
+void BattleSimulator::appendMaxReiatsu()
+{
+        appendStatusChangeForReiastu(e_stReiastu, getToggleReiatsu(0) ,0 , 0);
+        appendStatusChangeForReiastu(e_stReiastu, getToggleReiatsu(1) ,0 , 1);
+}
+
 void BattleSimulator::appendReiatsuChange(int side)
 {
     if (_backupObjs[side])
-        appendStatusChange(e_stReiastu, getReiatsu(side) ,0 , static_cast<BattleFighter*>(_backupObjs[side]));
+        appendStatusChangeForReiastu(e_stReiastu, getReiatsu(side) ,0 , side);
 }
 
 }

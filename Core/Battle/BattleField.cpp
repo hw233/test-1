@@ -97,13 +97,14 @@ void BattleField::setPetObject( int side, BattleObject * obj, UInt8 isBody)
     }
 }
 
-UInt32 BattleField::upPetObject(int side, bool isReplace /* = true */)
+UInt32 BattleField::upPetObject(UInt8 side, bool isReplace /* = true */)
 {
     // 上场候补选手（如果上场位置有人，则直接顶掉）
     if (side < 0 || side >= 2)
         return 0xff;
     if (_backupObjs[side] == NULL)
         return 0xff;
+    _backupObjs[side]->setPos(_backupTargetPos[side]);
     setObject(side, _backupTargetPos[side], _backupObjs[side]);
     _backupObjs[side] = NULL;
     return _backupTargetPos[side];
@@ -119,7 +120,7 @@ bool BattleField::addReiatsu(int side, int value)
     else
         _reiatsu[side] += value;
 #ifdef _DEBUG
-    printf ("addValue = %d, reiastu[%d] = %d, maxReiastu[%d] = %d\n", value, side, _reiatsu[side], side, _toggleReiatsu[side]);
+    //printf ("addValue = %d, reiastu[%d] = %d, maxReiastu[%d] = %d\n", value, side, _reiatsu[side], side, _toggleReiatsu[side]);
 #endif
     return _reiatsu[side] >= _toggleReiatsu[side] ? true:false;
 }
@@ -129,7 +130,7 @@ int BattleField::getReiatsu(int side)
     if (side < 0 || side >= 2)
         return 0;
 #ifdef _DEBUG
-    printf ("reiastu[%d] = %d, maxReiastu[%d] = %d\n", side, _reiatsu[side], side, _toggleReiatsu[side]);
+    //printf ("reiastu[%d] = %d, maxReiastu[%d] = %d\n", side, _reiatsu[side], side, _toggleReiatsu[side]);
 #endif
     return _reiatsu[side];
 }
@@ -144,7 +145,7 @@ BattleObject * BattleField::getObjectXY( int side, int x, int y )
 	return (*this)(side, x + y * 5);
 }
 
-int BattleField::getSpecificTarget(int side, bool(f(BattleObject* bo)))
+int BattleField::getSpecificTarget(int side, bool(*f)(BattleObject* bo))
 {
     for (int i = 0; i < 25; ++i)
     {
@@ -301,6 +302,7 @@ void BattleField::reset()
 void BattleField::updateStats( int side )
 {
 	for(int i = 0; i < 2; ++ i)
+    {
 		for(int j = 0; j < 25; ++ j)
 			if(_objs[i][j] && _objs[i][j]->getClass() == BattleObject::Char)
 			{
@@ -308,6 +310,10 @@ void BattleField::updateStats( int side )
 				bf->setFormationEffect(NULL);
 				bf->updateAllAttr();
 			}
+        BattleFighter * bf = static_cast<BattleFighter *>(_backupObjs[i]);
+        if (bf)
+            bf->updateAllAttr();
+    }
 }
 
 void BattleField::updateStats( int side, int pos )

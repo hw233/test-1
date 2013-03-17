@@ -572,6 +572,8 @@ private:
     void appendDefStatus(StateType type, UInt32 value, BattleFighter* bf, DamageType damageType = e_damageNone);
     void appendStatusChange(StatusType type, UInt32 value, UInt16 skillId, BattleFighter* bf);
     void appendReiatsuChange(int side);
+    void appendStatusChangeForReiastu(StatusType type, UInt32 value, UInt16 skillId, UInt8 side);
+    void appendMaxReiatsu();
 
 private:
     GData::LBSkillItem* GetActionCondSkillItem2(BattleFighter* bf, BattleFighter* bo);
@@ -606,7 +608,7 @@ private:
 
 private:
     // 和仙宠有关的
-    UInt32  tryPetEnter(UInt8 side, UInt8 reiatsuType); // 仙宠尝试上场（根据增加后的灵压判定是否上场）
+    UInt32  tryPetEnter(UInt8 side, UInt8 reiatsuType, bool slience = false); // 仙宠尝试上场（根据增加后的灵压判定是否上场）
     UInt32  doPetEnter(UInt8 side);                     // 仙宠闪亮上场
 
     bool    tryProtectDamage(BattleFighter* bf, float& phyAtk, float& magatk, float factor);

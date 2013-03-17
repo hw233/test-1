@@ -1890,6 +1890,8 @@ Fighter * Fighter::clone(Player * player)
 		fgt->_level = 1;
 		fgt->_exp = 0;
 	}
+    fgt->auraMax = auraMax;
+    fgt->peerless = peerless;
 	fgt->_owner = player;
 	fgt->_halo = NULL;
 	fgt->_fashion = NULL;
@@ -3260,7 +3262,10 @@ void Fighter::delSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_ONSKILLDMG ||
                         s->cond == GData::SKILL_ONOTHERDEAD ||
                         s->cond == GData::SKILL_ONCOUNTER ||
-                        s->cond == GData::SKILL_ONATKBLEED
+                        s->cond == GData::SKILL_ONATKBLEED ||
+                        s->cond == GData::SKILL_ONATKDMG ||
+                        s->cond == GData::SKILL_ONPETPROTECT ||
+                        s->cond == GData::SKILL_ONGETDMG 
                         )
                 {
                     offPassiveSkill(s->getId(), s->cond, s->prob>=100.0f, writedb);
@@ -3300,7 +3305,10 @@ void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_ONSKILLDMG ||
                         s->cond == GData::SKILL_ONOTHERDEAD ||
                         s->cond == GData::SKILL_ONCOUNTER ||
-                        s->cond == GData::SKILL_ONATKBLEED
+                        s->cond == GData::SKILL_ONATKBLEED ||
+                        s->cond == GData::SKILL_ONATKDMG ||
+                        s->cond == GData::SKILL_ONPETPROTECT ||
+                        s->cond == GData::SKILL_ONGETDMG 
                         )
                 {
                     upPassiveSkill(s->getId(), s->cond, (s->prob >= 100.0f), writedb);

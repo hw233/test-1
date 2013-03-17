@@ -3870,10 +3870,12 @@ namespace GObject
 
 	void Player::PutPets( Battle::BattleSimulator& bsim, int side, bool init /* = true */)
     {
-        // TODO: 战斗模拟器中加载宠物
+        // 战斗模拟器中加载宠物
         if (_onBattlePet)
-            //Battle::BattleFighter * bf = bsim.newPet(side, 0, _onBattlePet);
-            bsim.newPet(side, 0, _onBattlePet);
+        {
+            Battle::BattleFighter * bf = bsim.newPet(side, 0, _onBattlePet);
+            bf->setHP(_onBattlePet->getMaxHP());
+        }
     }
 
 	Fighter * Player::takeFighter( UInt32 id, bool writedb )
