@@ -10963,7 +10963,14 @@ UInt32 BattleSimulator::doPetEnter(UInt8 side)
         rcnt += doSkillAttackAftEnter(bf, passiveSkill, target_side, target_pos, cnt);
     }
 
-    appendToPacket(bf->getSide(), bf->getPos(), bf->getPos(), 5, 0, false, false);
+    int side = 0;
+    int pos = -1;
+    if(_activeFgt)
+    {
+        side = _activeFgt->getSide();
+        pos = _activeFgt->getPos();
+    }
+    appendToPacket(side, pos, pos, 5, 0, false, false);
     return rcnt + 1;
 }
 
