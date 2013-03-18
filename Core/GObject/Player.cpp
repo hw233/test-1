@@ -17775,7 +17775,13 @@ void Player::sendQQGameOnlineAward()
     Stream st(REP::COUNTRY_ACT);
     st << static_cast<UInt8>(0x0B);
     st << static_cast<UInt8>(GetVar(VAR_ONLINE_AWARD));
-    st << static_cast<UInt16>(getQQGameOnlineTotalTime());
+    UInt16 totalTime = getQQGameOnlineTotalTime();
+    UInt16 leftTime;
+    if(totalTime >= 3600)
+        leftTime = 0;
+    else
+        leftTime = 3600 - totalTime;
+    st << leftTime;
     st << Stream::eos;
     send(st);
 }
