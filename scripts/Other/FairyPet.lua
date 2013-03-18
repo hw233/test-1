@@ -28,8 +28,8 @@ local converts = {
 }
 
 local greenPet = {501, 504, 507, 510}   --绿色仙宠id
-local bluePet = {502, 505, 508, 511}    --蓝色仙宠id
 local purplePet = {503, 506, 509, 512}  --紫色仙宠id
+bluePet = {502, 505, 508, 511}          --蓝色仙宠id  【注:设置为全局变量】
 
 function exchangPurplePet(player)
     if nil == player then

@@ -7925,7 +7925,6 @@ end
 
 --使用灵宠蛋
 function ItemNormal_00009366(iid, num, bind, param)
-    local bluePet = {502, 505, 508, 511}    --蓝色仙宠id
     local player = GetPlayer()
     if player:GetLev() < 50 then
         return 0
