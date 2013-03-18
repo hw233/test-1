@@ -109,8 +109,9 @@ namespace GObject
         ++ _petLev;
         setLevel(_petLev);
         updateToDB(2, _petLev);
+        UInt8 value = _petLev % 10;
         //触发初始技能升级
-        if(_petLev % 10 == 8 || _petLev % 10 == 9)
+        if(value == 8 || value == 9)
         {
             GData::Pet::PinjieData * pjd = GData::pet.getLevTable(_petLev);
             if(!pjd) return;
@@ -127,6 +128,7 @@ namespace GObject
             setSkills(skills, false);
             updateToDBPetSkill();
         }
+        _owner->fairyPetUdpLog(10000, value ? value : 10);
     }
 
     void FairyPet::addChongNum(int num)
@@ -157,7 +159,7 @@ namespace GObject
 
     bool FairyPet::canLevUp()
     {
-        UInt8 limit = _owner->getMainFighter()->getLevel() / 10 * 10 + 9;
+        UInt16 limit = _owner->getMainFighter()->getLevel() / 10 * 10 + 9;
         if(limit > getPetLev())
             return true;
         return false;
@@ -199,12 +201,15 @@ namespace GObject
             reset(1);
             setLevel(getPetLev());
             updateToDB(2, getLevel());
-            _owner->sendMsgCode(0, 4000);
+            if(getPetLev() % 10)
+                _owner->sendMsgCode(0, 4000);
         }
         else
         { //失败
             addPinjieBless(1);
             _owner->sendMsgCode(0, 4001);
+            UInt8 value = getPetLev() % 10 + 10;
+            _owner->fairyPetUdpLog(10000, value > 10 ? value : 20);
         }
         sendPinjieInfo();
         UpdateToDB();
@@ -240,6 +245,8 @@ namespace GObject
             else
             {   //失败
                 addPinjieBless(1);
+                UInt8 value = getPetLev() % 10 + 10;
+                _owner->fairyPetUdpLog(10000, value > 10 ? value : 20);
             }
         }
         ConsumeInfo ci(PinjieUpForPet, 0, 0);
@@ -266,7 +273,7 @@ namespace GObject
             reset(2);
             reset(3);
             boneUp();
-            _owner->sendMsgCode(0, 4002);
+            //_owner->sendMsgCode(0, 4002);
         }
         else
         {   //失败

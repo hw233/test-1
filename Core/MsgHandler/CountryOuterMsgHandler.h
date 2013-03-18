@@ -1257,6 +1257,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->calcNewYearQzoneContinueDay(now);
     pl->sendNewYearQzoneContinueAct();
     pl->sendFairyPetResource(); //仙宠资源
+    pl->sendFairyPetList(); //仙宠列表
     if (pl->getClan() != NULL)
     {
         pl->getClan()->sendQQOpenid(pl);
@@ -5950,6 +5951,8 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
 	MSG_QUERY_PLAYER(player);
     BinaryReader brd(data, hdr.msgHdr.bodyLen);
 
+    if(player->GetLev() < 50)
+        return;
     UInt8 type = 0;
     UInt8 opt = 0;
     brd >> type >> opt;

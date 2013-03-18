@@ -1130,7 +1130,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                         if (area_target->isPetMark() && bf->isPet()  && passiveSkill->effect)
                         {
                             appendDefStatus(e_skill, passiveSkill->getId(), bf);
-                            factor += passiveSkill->effect->crrdam;
+                            factor += passiveSkill->effect->atkP;
                         }
                     }
                 }
