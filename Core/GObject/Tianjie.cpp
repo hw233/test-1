@@ -521,6 +521,8 @@ bool Tianjie::LoadFromDB()
             m_nextTjLevel = m_currOpenedTjLevel+10;
         if (m_isTjOpened)
             m_isRankKeep = true;
+        else
+            m_manualTjLevel = 0;  //设为0,不然不能再手动开天劫了
 
         std::string s_r1_killed = dbexp->r1_killed;
         std::string s_r2_donated = dbexp->r2_donated;
