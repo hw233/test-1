@@ -3646,14 +3646,17 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 bool pr2 = false;
                 if(idx < skill->factor.size())
                     factor = skill->factor[idx];
+                int count_deny = 0;
+                if (skill->cond == GData::SKILL_ENTER)
+                    count_deny = -1;
                 if(idx == 0)
                 {
-                    dmg2 = attackOnce(bf, first, cs2, pr2, skill, getObject(target_side, target_pos), factor, 0, NULL, atkAct, canProtect);
+                    dmg2 = attackOnce(bf, first, cs2, pr2, skill, getObject(target_side, target_pos), factor, count_deny, NULL, atkAct, canProtect);
                     cs = cs2;
                     pr = pr2;
                 }
                 else
-                    dmg2 = attackOnce(bf, first, cs2, pr2, skill, getObject(target_side, target_pos), factor, 0, NULL, NULL, canProtect);
+                    dmg2 = attackOnce(bf, first, cs2, pr2, skill, getObject(target_side, target_pos), factor, count_deny, NULL, NULL, canProtect);
 
                 dmg += dmg2;
                 doSkillEffectExtraAbsorb(bf, dmg2, skill);
