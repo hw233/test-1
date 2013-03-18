@@ -2167,6 +2167,7 @@ namespace GObject
 		std::map<UInt32, FairyPet *> _fairyPets;
         FairyPet * _onBattlePet;
     public:
+        void fairyPetUdpLog(UInt32 id, UInt8 type);
         inline FairyPet * getBattlePet() { return _onBattlePet; }
         inline UInt8 getCanHirePetNum() { return _playerData.canHirePet.size();}
         void setCanHirePet(UInt32 id);
@@ -2185,6 +2186,7 @@ namespace GObject
         void seekFairyPet(UInt8, UInt8);
         void getFariyPetSpaceInfo();
         void getPetByLevelUp(UInt8);
+        UInt8 getPetByPetEgg(UInt32);
 
         UInt32 getXianyuanLua(UInt32);
         UInt32 getXianyuan( UInt32 c, IncommingInfo* ii = NULL);

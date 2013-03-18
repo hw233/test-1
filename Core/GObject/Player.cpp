@@ -17651,7 +17651,15 @@ UInt8 Player::toQQGroup(bool isJoin)
     return 0;
 }
 
-//仙宠
+    //仙宠
+    void Player::fairyPetUdpLog(UInt32 id, UInt8 type)
+    {
+        // 仙宠相关日志
+        char action[16] = "";
+        snprintf (action, 16, "F_%d_%d", id, type);
+        udpLog("fairyPet", action, "", "", "", "", "act");
+    }
+
 	FairyPet * Player::findFairyPet( UInt32 id )
 	{
 		std::map<UInt32, FairyPet *>::iterator it = _fairyPets.find(id);
@@ -17760,14 +17768,12 @@ UInt8 Player::toQQGroup(bool isJoin)
     {
 		if(id > GREAT_FIGHTER_MAX)
 			return 1;
-        /*
         if(!hasCanHirePet(id))
             return 1;
-        */
-		if(findFairyPet(id) || hasFighter(id))
-			return 2;
         if(isFairyPetFull())
             return 3;
+		if(findFairyPet(id) || hasFighter(id))
+			return 2;
 		FairyPet * pet = static_cast<FairyPet *>(globalFighters[id]);
 		if(pet == NULL)
 			return 1;
@@ -17815,6 +17821,11 @@ UInt8 Player::toQQGroup(bool isJoin)
         IncommingInfo ii2(FengsuiFromYouli, 0, 0);
         getFengsui(fengSui, &ii2);
         AddVar(VAR_FAIRYPET_LIKEABILITY, like);
+        if(like)
+        {
+            SYSMSG_SENDV(146, this, like);
+            SYSMSG_SENDV(1046, this, like);
+        }
         return 0;
     }
 
@@ -17890,6 +17901,7 @@ UInt8 Player::toQQGroup(bool isJoin)
         {
             if(xianYuan < cost[step] + used)
                 break;
+            fairyPetUdpLog(10000, 21);
             ++ num;
             used += cost[step];
             Table values = GameAction()->onSeekFairypetAwardAndSucceed(step, isConvert);
@@ -17976,6 +17988,26 @@ UInt8 Player::toQQGroup(bool isJoin)
         if(res)
             delCanHirePet(petId[idx]);
         SetVar(VAR_FAIRYPET_ISGET_PET, 1);
+    }
+
+    //使用仙宠蛋获得蓝色仙宠
+    UInt8 Player::getPetByPetEgg(UInt32 id)
+    {
+        setCanHirePet(id);
+        UInt8 res = hireFairyPet(id);
+        if(res == 2) //已有相同的仙宠
+            sendMsgCode(0, 4004);
+        else
+        {
+            Stream st(REP::FAIRY_PET);
+            st << static_cast<UInt8>(0x02) << static_cast<UInt8>(0x03);
+            st << res << id;
+            st << Stream::eos;
+            send(st);
+            if(res != 0)
+                delCanHirePet(id);
+        }
+        return res;
     }
 
     UInt32 Player::getXianyuanLua(UInt32 c)

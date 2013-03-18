@@ -9694,8 +9694,7 @@ void BattleSimulator::doSkillEffectExtra_SelfSideBufAura(BattleFighter* bf, int 
 void BattleSimulator::doSkillEffectExtra_HpShield(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
 {
     // 增加hp百分比的护盾
-    UInt8 myPos = bf->getPos();
-    BattleFighter* bo = static_cast<BattleFighter*>(getRandomFighter(bf->getSide(), &myPos, 1));
+    BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, target_pos));
     if(!bo)
         return;
     if (!bo->isChar())
@@ -9822,7 +9821,8 @@ void BattleSimulator::doSkillEffectExtra_ProtectPet100(BattleFighter* bf, int ta
     if (!bo->isChar())
         return;
     BattleFighter * area_target = static_cast<BattleFighter *>(bo);
-    area_target->setPetProtect100(skill->effect->efv[eftIdx], skill->effect->efl[eftIdx]);
+    //area_target->setPetProtect100(skill->effect->efv[eftIdx], skill->effect->efl[eftIdx]);
+    area_target->setPetProtect100(true, 0);
     appendDefStatus(e_petProtect100, 0, area_target);
 }
 
@@ -10787,13 +10787,14 @@ void BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u)
         const GData::SkillBase* passiveSkill = NULL;
         while(NULL != (passiveSkill = bf->getPassiveSkillOnGetDmg()))
         {
-            // XXX: 写死是被动技能
+            // XXX: 写死是被动增益技能
             if (_getDamageSkillCount[bf->getSide()] >= 3)
                 break;
             ++_getDamageSkillCount[bf->getSide()];
             int target_side, target_pos, cnt;
             getSkillTarget(bf, passiveSkill, target_side, target_pos, cnt);
-            doSkillAttack(bf, passiveSkill, target_side, target_pos, cnt, NULL);
+            //doSkillAttack(bf, passiveSkill, target_side, target_pos, cnt, NULL);
+            doSkillStatus2(bf, passiveSkill, target_side, target_pos, cnt);
 
         }
         bf->makeDamage(u);
@@ -10933,6 +10934,7 @@ UInt32 BattleSimulator::doPetEnter(UInt8 side)
     }
     BattleFighter* bf = static_cast<BattleFighter *>(bo);
     appendDefStatus(e_petAppear, bf->getId(), bf);
+    insertFighterStatus(bf);
 
     if(bf->getPassiveSkillOnTherapy())
         _onTherapy.push_back(bf);
@@ -10961,8 +10963,16 @@ UInt32 BattleSimulator::doPetEnter(UInt8 side)
         rcnt += doSkillAttackAftEnter(bf, passiveSkill, target_side, target_pos, cnt);
     }
 
-    appendToPacket(bf->getSide(), bf->getPos(), bf->getPos(), 5, 0, false, false);
-    insertFighterStatus(bf);
+    {
+        int side = 0;
+        int pos = -1;
+        if(_activeFgt)
+        {
+            side = _activeFgt->getSide();
+            pos = _activeFgt->getPos();
+        }
+        appendToPacket(side, pos, pos, 5, 0, false, false);
+    }
     return rcnt + 1;
 }
 
@@ -11005,7 +11015,7 @@ bool BattleSimulator::do100ProtectDamage(BattleFighter* bf, BattleFighter* pet, 
     // 宠物100%保护主目标吸收一半伤害
     bf->setPetProtect100(false, 0);
     appendDefStatus(e_unPetProtect100, 0, bf);
-    const GData::SkillBase* pskill = pet->getPassiveSkillOnPetProtect100();
+    const GData::SkillBase* pskill = pet->getPassiveSkillOnPetProtectForce();
     if(!pskill || !pskill->effect)
         return false;
     const std::vector<UInt16>& eft = pskill->effect->eft;
@@ -11099,6 +11109,14 @@ bool BattleSimulator::protectDamage(BattleFighter* bf, BattleFighter* pet, float
             appendDefStatus(e_damNormal, magdmg, pet, e_damageMagic);
         if (dmgFlag)
             appendDefStatus(e_damNormal, dmg, pet, e_damagePhysic);
+        if(pet->getHP() == 0)
+        {
+            onDead(false, pet);
+        }
+        else if(_winner == 0)
+        {
+            onDamage(pet, true, NULL);
+        }
     }
 
     return true;
@@ -11134,11 +11152,14 @@ int BattleSimulator::getPossibleTarget( int side, int idx , BattleFighter * bf /
     {
         if( !bf->getStunRound() && !bf->getConfuseRound() && ! bf->getForgetRound())
         {
-            int tidx = getSpecificTarget(side, hasPetMarked);
+            int tidx = getSpecificTarget((side == 0 ? 1 : 0), hasPetMarked);
             if (tidx >= 0)
             {
-                bf->setPetExAtkEnable(true);
-                appendDefStatus(e_skill, bf->getPetExAtkId(), bf);
+                if(!bf->getPetExAtkId())
+                {
+                    bf->setPetExAtkEnable(true);
+                    appendDefStatus(e_skill, bf->getPetExAtkId(), bf);
+                }
                 return tidx;
             }
         }
