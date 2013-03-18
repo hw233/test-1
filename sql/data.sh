@@ -26,7 +26,7 @@ function update_data()
     #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20130110_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20121221_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20130127_1.sql
-    #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20130227_1.sql
+    mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20130227_1.sql
     mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20130315_1.sql
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from loot; source loot;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from map_object; source mapobject;";

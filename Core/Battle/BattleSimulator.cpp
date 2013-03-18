@@ -10930,6 +10930,7 @@ UInt32 BattleSimulator::doPetEnter(UInt8 side)
     }
     BattleFighter* bf = static_cast<BattleFighter *>(bo);
     appendDefStatus(e_petAppear, bf->getId(), bf);
+    insertFighterStatus(bf);
 
     if(bf->getPassiveSkillOnTherapy())
         _onTherapy.push_back(bf);
@@ -10959,7 +10960,6 @@ UInt32 BattleSimulator::doPetEnter(UInt8 side)
     }
 
     appendToPacket(bf->getSide(), bf->getPos(), bf->getPos(), 5, 0, false, false);
-    insertFighterStatus(bf);
     return rcnt + 1;
 }
 
@@ -11096,6 +11096,14 @@ bool BattleSimulator::protectDamage(BattleFighter* bf, BattleFighter* pet, float
             appendDefStatus(e_damNormal, magdmg, pet, e_damageMagic);
         if (dmgFlag)
             appendDefStatus(e_damNormal, dmg, pet, e_damagePhysic);
+        if(pet->getHP() == 0)
+        {
+            onDead(false, pet);
+        }
+        else if(_winner == 0)
+        {
+            onDamage(pet, true, NULL);
+        }
     }
 
     return true;
@@ -11131,11 +11139,14 @@ int BattleSimulator::getPossibleTarget( int side, int idx , BattleFighter * bf /
     {
         if( !bf->getStunRound() && !bf->getConfuseRound() && ! bf->getForgetRound())
         {
-            int tidx = getSpecificTarget(side, hasPetMarked);
+            int tidx = getSpecificTarget((side == 0 ? 1 : 0), hasPetMarked);
             if (tidx >= 0)
             {
-                bf->setPetExAtkEnable(true);
-                appendDefStatus(e_skill, bf->getPetExAtkId(), bf);
+                if(!bf->getPetExAtkId())
+                {
+                    bf->setPetExAtkEnable(true);
+                    appendDefStatus(e_skill, bf->getPetExAtkId(), bf);
+                }
                 return tidx;
             }
         }
