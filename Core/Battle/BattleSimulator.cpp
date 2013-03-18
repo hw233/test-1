@@ -3646,14 +3646,17 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 bool pr2 = false;
                 if(idx < skill->factor.size())
                     factor = skill->factor[idx];
+                int count_deny = 0;
+                if (skill->cond == GData::SKILL_ENTER)
+                    count_deny = -1;
                 if(idx == 0)
                 {
-                    dmg2 = attackOnce(bf, first, cs2, pr2, skill, getObject(target_side, target_pos), factor, 0, NULL, atkAct, canProtect);
+                    dmg2 = attackOnce(bf, first, cs2, pr2, skill, getObject(target_side, target_pos), factor, count_deny, NULL, atkAct, canProtect);
                     cs = cs2;
                     pr = pr2;
                 }
                 else
-                    dmg2 = attackOnce(bf, first, cs2, pr2, skill, getObject(target_side, target_pos), factor, 0, NULL, NULL, canProtect);
+                    dmg2 = attackOnce(bf, first, cs2, pr2, skill, getObject(target_side, target_pos), factor, count_deny, NULL, NULL, canProtect);
 
                 dmg += dmg2;
                 doSkillEffectExtraAbsorb(bf, dmg2, skill);
@@ -9691,8 +9694,7 @@ void BattleSimulator::doSkillEffectExtra_SelfSideBufAura(BattleFighter* bf, int 
 void BattleSimulator::doSkillEffectExtra_HpShield(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
 {
     // 增加hp百分比的护盾
-    UInt8 myPos = bf->getPos();
-    BattleFighter* bo = static_cast<BattleFighter*>(getRandomFighter(bf->getSide(), &myPos, 1));
+    BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, target_pos));
     if(!bo)
         return;
     if (!bo->isChar())
@@ -9819,7 +9821,8 @@ void BattleSimulator::doSkillEffectExtra_ProtectPet100(BattleFighter* bf, int ta
     if (!bo->isChar())
         return;
     BattleFighter * area_target = static_cast<BattleFighter *>(bo);
-    area_target->setPetProtect100(skill->effect->efv[eftIdx], skill->effect->efl[eftIdx]);
+    //area_target->setPetProtect100(skill->effect->efv[eftIdx], skill->effect->efl[eftIdx]);
+    area_target->setPetProtect100(true, 0);
     appendDefStatus(e_petProtect100, 0, area_target);
 }
 
@@ -10784,13 +10787,14 @@ void BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u)
         const GData::SkillBase* passiveSkill = NULL;
         while(NULL != (passiveSkill = bf->getPassiveSkillOnGetDmg()))
         {
-            // XXX: 写死是被动技能
+            // XXX: 写死是被动增益技能
             if (_getDamageSkillCount[bf->getSide()] >= 3)
                 break;
             ++_getDamageSkillCount[bf->getSide()];
             int target_side, target_pos, cnt;
             getSkillTarget(bf, passiveSkill, target_side, target_pos, cnt);
-            doSkillAttack(bf, passiveSkill, target_side, target_pos, cnt, NULL);
+            //doSkillAttack(bf, passiveSkill, target_side, target_pos, cnt, NULL);
+            doSkillStatus2(bf, passiveSkill, target_side, target_pos, cnt);
 
         }
         bf->makeDamage(u);
@@ -11002,7 +11006,7 @@ bool BattleSimulator::do100ProtectDamage(BattleFighter* bf, BattleFighter* pet, 
     // 宠物100%保护主目标吸收一半伤害
     bf->setPetProtect100(false, 0);
     appendDefStatus(e_unPetProtect100, 0, bf);
-    const GData::SkillBase* pskill = pet->getPassiveSkillOnPetProtect100();
+    const GData::SkillBase* pskill = pet->getPassiveSkillOnPetProtectForce();
     if(!pskill || !pskill->effect)
         return false;
     const std::vector<UInt16>& eft = pskill->effect->eft;
