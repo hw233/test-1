@@ -2765,7 +2765,7 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
                 ++ exceptCnt;
             }
         }
-        BattleFighter* bo = getMinHpFighter(bf->getSide()?0:1, excepts, exceptCnt);
+        BattleFighter* bo = getMinHpFighter(side, excepts, exceptCnt);
         if(NULL == bo)
         {
             return;
@@ -5787,11 +5787,12 @@ UInt32 BattleSimulator::doAttack( int pos )
     }
     while(false);
 
-    if (reiatsuType || reiatsuType2)
+    if (reiatsuType)
     {
-        rcnt += tryPetEnter(side, reiatsuType, true);
-        rcnt += tryPetEnter(side, reiatsuType2);
+        rcnt += tryPetEnter(side, reiatsuType, reiatsuType2?true:false);
     }
+    if (reiatsuType2)
+        rcnt += tryPetEnter(side, reiatsuType2);
 
     if(mainTarget)
         mainTarget->setShieldObj(NULL);
@@ -11021,6 +11022,19 @@ bool BattleSimulator::do100ProtectDamage(BattleFighter* bf, BattleFighter* pet, 
         {
             factor *= efv[i];
         }
+    }
+    {
+    const GData::SkillBase* pskill = pet->getPassiveSkillOnPetProtectForce();
+    if(!pskill || !pskill->effect)
+        return false;
+    const std::vector<UInt16>& eft = pskill->effect->eft;
+    const std::vector<float>& efv = pskill->effect->efv;
+
+    size_t cnt = eft.size();
+    if(cnt != efv.size())
+        return false;
+
+    appendDefStatus(e_skill, pskill->getId(), pet);
     }
     return protectDamage(bf, pet, phyAtk, magAtk, factor);
 }
