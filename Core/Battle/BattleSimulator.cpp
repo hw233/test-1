@@ -7502,6 +7502,9 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
             setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAction, 0, 0, false);
     }
 
+    if (isPet(bf))
+        bf->setPetExAtkEnable(false);
+
     if(_defList.size() > 0 || _scList.size() > 0)
     {
         appendToPacket(bf->getSide(), bf->getPos(), bf->getPos() + 25, 5, 0, false, false);
@@ -9710,7 +9713,8 @@ void BattleSimulator::doSkillEffectExtra_HpShield(BattleFighter* bf, int target_
 void BattleSimulator::doSkillEffectExtra_SelfBleed(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
 {
     // 自己流血（自焚）
-    BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, target_pos));
+    //BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, target_pos));
+    BattleFighter* bo = bf;
     if(!bo)
         return;
     // 自焚的具体数值
