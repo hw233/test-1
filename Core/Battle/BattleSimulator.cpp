@@ -1566,12 +1566,14 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                         appendStatusChange(e_stAtkReduce, value, 0, bf);
                     }
 
-                    _defList[0].damType2 |= 0x80;
+                    appendDefStatus(e_damNormal, 0, target_fighter);
+                    size_t idx = _defList.size() - 1;
+                    _defList[idx].damType2 |= 0x80;
                     if(cs2)
-                        _defList[0].damType2 |= 0x40;
+                        _defList[idx].damType2 |= 0x40;
                     if(pr2)
-                        _defList[0].damType2 |= 0x20;
-                    _defList[0].counterDmg = dmg3;
+                        _defList[idx].damType2 |= 0x20;
+                    _defList[idx].counterDmg = dmg3;
                     // killed the fighter
                     if(bf->getHP() == 0)
                     {
@@ -1581,7 +1583,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                     {
                         onDamage(bf, false);
                     }
-                    _defList[0].counterLeft = bf->getHP();
+                    _defList[idx].counterLeft = bf->getHP();
                 }
 #if 0
                 else
@@ -3690,7 +3692,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 int idx = std::min(abs(fsize-1), i);
                 if(fsize > 0)
                     factor = skill->factor[idx];
-                dmg += attackOnce(bf, first, cs, pr, skill, getObject(target_side, pos), factor, 0, NULL, NULL, canProtect);
+                dmg += attackOnce(bf, first, cs, pr, skill, getObject(target_side, pos), factor, -1, NULL, NULL, canProtect);
                 doSkillEffectExtraAbsorb(bf, dmg, skill);
                 ++i;
             }
