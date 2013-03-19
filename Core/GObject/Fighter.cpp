@@ -1831,6 +1831,32 @@ UInt16 Fighter::calcSkillBattlePoint(UInt16 skillId, UInt8 type)
     return 0;
 }
 
+void Fighter::calcLingbaoBattlePoint()
+{
+    for(int idx = 0; idx < getMaxLingbaos(); ++ idx)
+    {
+        UInt32 bp = 0;
+		ItemLingbao* lb = static_cast<ItemLingbao*>(getLingbao(idx));
+        if(!lb)
+            continue;
+        ItemLingbaoAttr& lbattr = lb->getLingbaoAttr();
+        bp = Script::BattleFormula::getCurrent()->calcLingbaoBattlePoint(&lbattr);
+        for (UInt8 i = 0; i < 2; ++i)
+        {
+            if (lbattr.skill[i])
+            {
+                const GData::LBSkillBase* lbskill = GData::lbSkillManager[lbattr.skill[i]];
+                bp += lbskill->battlepoint * (((float)(lbattr.factor[i]))/10000);
+            }
+        }
+        if (bp != lbattr.battlePoint)
+        {
+            lbattr.battlePoint = bp;
+            DB4().PushUpdateData("UPDATE `lingbaoattr` SET `battlepoint`='%u' WHERE `id`=%u", bp, lb->getId());
+        }
+    }
+}
+
 void Fighter::rebuildSkillBattlePoint()
 {
     _skillBP = 0;
@@ -1880,6 +1906,8 @@ void Fighter::rebuildBattlePoint()
         const GData::LBSkillBase* lbskill = GData::lbSkillManager[_lbSkill[i].skillid];
         _battlePoint += lbskill->battlepoint * (((float)(_lbSkill[i].factor))/10000);
     }
+
+    calcLingbaoBattlePoint();
 }
 
 Fighter * Fighter::clone(Player * player)

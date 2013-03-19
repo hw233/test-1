@@ -1914,5 +1914,11 @@ void OnSaveGoldAct( GameMsgHdr& hdr, const void * data)
         player->saveGoldAct(gData->opt, gData->param);
 }
 
+void OnCalcLBBattlePoint( GameMsgHdr &hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    player->calcLingbaoBattlePoint();
+}
+
 #endif // _COUNTRYINNERMSGHANDLER_H_
 

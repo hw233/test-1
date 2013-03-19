@@ -2076,6 +2076,7 @@ namespace GObject
         void getKillMonsterAward();
 
         UInt32 getBattlePoint();
+        void calcLingbaoBattlePoint();
         void verifyFighter();
 #ifdef _FB
     public:

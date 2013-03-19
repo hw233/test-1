@@ -7,6 +7,7 @@
 #include "GObject/World.h"
 #include "Server/OidGenerator.h"
 #include "GObject/SortWorker.h"
+#include "GObject/ItemData.h"
 
 namespace Script
 {
@@ -198,6 +199,10 @@ void BattleFormula::init()
 	class_def<GObject::SecondSoul>("getPracticeLevel", &GObject::SecondSoul::getPracticeLevel);
 	class_def<GObject::SecondSoul>("getStateLevel", &GObject::SecondSoul::getStateLevel);
 	class_def<GObject::SecondSoul>("getXinxiu", &GObject::SecondSoul::getXinxiu);
+
+    class_add<GObject::ItemLingbaoAttr>("ItemLingbaoAttr");
+    class_def<GObject::ItemLingbaoAttr>("getType", &GObject::ItemLingbaoAttr::getType);
+    class_def<GObject::ItemLingbaoAttr>("getValue", &GObject::ItemLingbaoAttr::getValue);
 }
 
 void BattleFormula::postInit()
@@ -579,6 +584,11 @@ float BattleFormula::calcClanTechAddon(UInt16 id, UInt8 lvl)
 UInt32 BattleFormula::calcTaskAward( UInt8 type, UInt8 color, UInt8 lvl )
 {
 	return call<UInt32>("GetTaskAwardFactor", type, color, lvl);
+}
+
+UInt32 BattleFormula::calcLingbaoBattlePoint(const GObject::ItemLingbaoAttr *lbatr)
+{
+    return call<UInt32>("calcLingbaoBattlePoint", lbatr);
 }
 
 BattleFormula * BattleFormula::getCurrent()

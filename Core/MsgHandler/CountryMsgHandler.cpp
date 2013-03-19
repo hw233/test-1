@@ -351,4 +351,6 @@ MSG_REG_2(GameMsgHdr, 0x332, OnOpenIdInvalid);
 MSG_REG_2(GameMsgHdr, 0x333, OnOpenAPIFailed);
 
 MSG_REG_2(GameMsgHdr, 0x352, OnSaleItemCancleAll);
+
+MSG_REG_2(GameMsgHdr, 0x353, OnCalcLBBattlePoint);
 MSG_HANDLER_END()

@@ -26,6 +26,21 @@ struct LeaderboardClanCopy
     UInt64 time;
 };
 
+struct LeaderboardLingbao
+{
+    UInt64 id;
+    std::string name;
+    UInt32 itemId;
+    UInt8 tongling;
+    UInt8 lbcolor;
+    std::string types;
+    std::string values;
+    std::string skills;
+    std::string factors;
+    UInt32 battlePoint;
+
+};
+
 struct RankingInfoList
 {
     UInt64 id;
@@ -65,6 +80,29 @@ struct ClanBattleRankingInfoList
     UInt32 value; //帮派积分 
 };
 
+struct LingbaoInfoList
+{
+    UInt64 id;
+    std::string  name;
+    UInt8  pf;
+    UInt32   battlePoint;
+    UInt32 itemId;
+    UInt8  tongling;
+    UInt8  lbcolor;
+    UInt8  type[4];
+    UInt16  value[4];
+    UInt16  skill[2];
+    UInt16  factor[2];
+    LingbaoInfoList()
+        : battlePoint(0), itemId(0), tongling(0), lbcolor(0)
+    {
+        memset(type, 0, sizeof(type));
+        memset(value, 0, sizeof(value));
+        memset(skill, 0, sizeof(skill));
+        memset(factor, 0, sizeof(factor));
+    }
+};
+
 
 class Leaderboard
 {
@@ -83,6 +121,7 @@ public:
     std::vector<TownRankingInfoList>& getTownList() {return _town;};
     std::vector<ClanCopyRankingInfoList>& getClanCopyList() {return _clanCopyInfo;};
     std::vector<ClanBattleRankingInfoList>& getClanBattleList() {return _clanBattleInfo;};
+    std::vector<LingbaoInfoList>& getLingbaoList() { return _lingbaoInfoList; }
 
     const std::vector<LeaderboardTowndown>& getTowndown()
     {
@@ -116,6 +155,7 @@ private:
 	Stream _achievementStream;
 	Stream _clanStream;
 	Stream _clanCopyStream;
+    Stream _lingbaoStream;
     Stream _battleStream;
 	UInt32 _id;
 	UInt8 _maxLevel;
@@ -128,6 +168,7 @@ private:
 	std::map<UInt64, UInt16> _achievementRankCountry[2];
 	std::map<UInt32, UInt16> _clanRankWorld;
 	std::map<UInt32, UInt16> _clanRankCountry[2];
+    std::map<UInt64, int> _lingbaoRank;
     std::vector<UInt64> _levelRankWorld10;  //世界等级前十名
     std::multimap<int, Player*, std::greater<int> > _battleRankWorld;
     std::multimap<UInt64, Player*, std::greater<UInt64> > _expRankWorld;
@@ -142,6 +183,7 @@ private:
     std::vector<TownRankingInfoList> _town;
     std::vector<ClanCopyRankingInfoList> _clanCopyInfo;
     std::vector<ClanBattleRankingInfoList> _clanBattleInfo;
+    std::vector<LingbaoInfoList> _lingbaoInfoList;
 
     AtomicVal<bool> m_sorting;
 

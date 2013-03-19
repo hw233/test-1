@@ -14,6 +14,7 @@
 #include "ClanRankBattle.h"
 #include "Common/Itoa.h"
 #include "DaysRank.h"
+#include "Common/StringTokenizer.h"
 
 namespace GObject
 {
@@ -87,7 +88,48 @@ SPECIALDEF(4)
     UInt64, time
 )
 SPECIALEND()
+
+SPECIALBEGIN(GObject::LeaderboardLingbao)
+SPECIALDEF(10)
+(
+    UInt64, id,
+    std::string, name,
+    UInt32, itemId,
+    UInt8, tongling,
+    UInt8, lbcolor,
+    std::string, types,
+    std::string, values,
+    std::string, skills,
+    std::string, factors,
+    UInt32, battlePoint
+)
+SPECIALEND()
+
+/*
+SPECIALBEGIN(GObject::LingbaoInfoList)
+SPECIALDEF(16)
+(
+    std::string, name,
+    UInt32,  battlePoint,
+    UInt8, tongling,
+    UInt8, lbcolor,
+    UInt8, type1,
+    UInt8, type2,
+    UInt8, type3,
+    UInt8, type4,
+    UInt16, value1,
+    UInt16, value2,
+    UInt16, value3,
+    UInt16, value4,
+    UInt16, skill1,
+    UInt16, skill2,
+    UInt16, factor1,
+    UInt16, factor2,
+)
+SPECIALEND()
+*/
 }
+
 
 namespace GObject
 {
@@ -128,6 +170,26 @@ void buildPacket2(Stream& st, UInt8 t, UInt32 id, std::vector<LeaderboardItem2>&
             st << item.name << pl->getPF() << item.lvl << item.country << item.value << item.clan;
         else
             st << item.name << item.pf << item.lvl << item.country << item.value << item.clan;
+	}
+	st << Stream::eos;
+}
+
+void buildPacketForLingbao(Stream& st, UInt8 t, UInt32 id, std::vector<LingbaoInfoList>& list, bool merge = true)
+{
+	UInt8 c = static_cast<UInt8>(list.size());
+	st.init(REP::SORT_LIST);
+	st << t << id << c;
+	for(UInt8 i = 0; i < c; ++ i)
+	{
+		LingbaoInfoList& item = list[i];
+		if(merge)
+			Player::patchMergedName(item.id, item.name);
+        st << item.name << item.pf << item.battlePoint << static_cast<UInt16>(item.itemId) << item.tongling << item.lbcolor;
+        for (UInt8 i = 0; i < 4; ++i)
+        {
+            st << item.type[i] << item.value[i];
+        }
+        st << item.skill[0] << item.factor[0] << item.skill[1] << item.factor[1];
 	}
 	st << Stream::eos;
 }
@@ -419,6 +481,78 @@ void Leaderboard::doUpdate()
 	    buildPacket(_clanCopyStream, 5, 0, blist);
     }
 
+    std::vector<LeaderboardLingbao> blist5;
+	execu->ExtractData("select p.id, p.name, e.itemId, l.tongling, l.lbcolor, l.types, l.values, l.skills, l.factors, l.battlepoint from player p, fighter f, equipment e, lingbaoattr l "
+            "where p.id=f.playerId and e.id = l.id and (f.lingbao REGEXP concat(',',l.id, '$') or f.lingbao REGEXP concat('^', l.id, ','))  order by l.battlepoint DESC limit 100;", blist5);
+    {
+        FastMutex::ScopedLock lk(_cmutex);
+         _lingbaoInfoList.clear(); 
+	    blist.resize(100);
+        if (blist5.size() < 100)
+            blist.resize(blist5.size());
+        _lingbaoRank.clear();
+        for (UInt32 i = 0; i < blist5.size(); ++i)
+        {
+            LingbaoInfoList r;
+            r.id = blist5[i].id;
+            Player * pl = GObject::globalPlayers[r.id];
+            if(NULL == pl)
+                continue;
+            r.pf = pl->getPF();
+            r.name = blist5[i].name;
+            r.itemId = blist5[i].itemId;
+            r.tongling = blist5[i].tongling;
+            r.lbcolor = blist5[i].lbcolor;
+            StringTokenizer tk(blist5[i].types, ",");
+            if (tk.count())
+            {
+                for (size_t i = 0; i < tk.count(); ++i)
+                {
+                    if(i > 3)
+                        break;
+                    r.type[i] = ::atoi(tk[i].c_str());
+                }
+            }
+            StringTokenizer tk2(blist5[i].values, ",");
+            if (tk2.count())
+            {
+                for (size_t i = 0; i < tk2.count(); ++i)
+                {
+                    if(i > 3)
+                        break;
+                    r.value[i] = ::atoi(tk2[i].c_str());
+                }
+            }
+            StringTokenizer tk3(blist5[i].skills, ",");
+            if (tk3.count())
+            {
+                for (size_t i = 0; i < tk3.count(); ++i)
+                {
+                    if(i > 1)
+                        break;
+                    r.skill[i] = ::atoi(tk3[i].c_str());
+                }
+            }
+            StringTokenizer tk4(blist5[i].factors, ",");
+            if (tk4.count())
+            {
+                for (size_t i = 0; i < tk4.count(); ++i)
+                {
+                    if(i > 1)
+                        break;
+                    r.factor[i] = ::atoi(tk4[i].c_str());
+                }
+            }
+
+            r.battlePoint = blist5[i].battlePoint;
+
+            _lingbaoInfoList.push_back(r);
+
+            _lingbaoRank[r.id] = i+1;
+        }
+	    buildPacketForLingbao(_lingbaoStream, 6, _id, _lingbaoInfoList);
+    }
+
 	std::vector<UInt64> ilist;
 	size_t cnt;
 
@@ -674,6 +808,9 @@ bool Leaderboard::getPacket( UInt8 t, Stream*& st, Player* pl)
         st = &_clanCopyStream;
         makeRankStream(st, t, pl);
         break;
+    case 6:
+        st = &_lingbaoStream;
+        makeRankStream(st, t, pl);
 	default:
 		return false;
 	}
@@ -805,6 +942,12 @@ int Leaderboard::getMyRank(Player* pl, UInt8 type)
                    rank = iter->second;
            }
            break;
+        case 6:
+            iter = _lingbaoRank.find(pl->getId());
+            if (_lingbaoRank.end() != iter)
+                rank = iter->second;
+            break;
+
       
         default:
             break;

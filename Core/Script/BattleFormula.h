@@ -8,6 +8,7 @@ namespace GObject
 {
 	class Fighter;
     class SecondSoul;
+    class ItemLingbaoAttr;
 }
 
 namespace Battle
@@ -117,6 +118,8 @@ public:
     float calcClanTechAddon(UInt16 id, UInt8 lvl);
 	lua_tinker::table getFactor(UInt8, UInt8, UInt8);
     UInt32 calcTaskAward(UInt8, UInt8, UInt8);
+
+    UInt32 calcLingbaoBattlePoint(const GObject::ItemLingbaoAttr *lbatr);
 
 	inline SkillData& skillData(UInt16 c, UInt16 s, UInt8 level)
 	{

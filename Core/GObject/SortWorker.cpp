@@ -9,7 +9,11 @@
 namespace GObject
 {
     SortWorker::SortWorker(UInt8 type, UInt8 worker) :
+#ifndef _DEBUG
         WorkerRunner<>(60*60*1000), m_Type(type), m_Worker(worker)
+#else
+        WorkerRunner<>(60*1000), m_Type(type), m_Worker(worker)
+#endif
     {}
 
     SortWorker::~SortWorker()

@@ -15452,6 +15452,25 @@ void EventTlzAuto::notify(bool isBeginAuto)
         return bp;
     }
 
+    void Player::calcLingbaoBattlePoint()
+    {
+        if(CURRENT_THREAD_ID() == getThreadId())
+        {
+            for(int j = 0; j < 5; ++ j)
+            {
+                Fighter* fighter = _playerData.lineup[j].fighter;
+                if(fighter)
+                    fighter->calcLingbaoBattlePoint();
+            }
+        }
+        else
+        {
+            GameMsgHdr hdr(0x353, getThreadId(), this, 0);
+            GLOBAL().PushMsg(hdr, NULL);
+        }
+
+    }
+
     void Player::verifyFighter()
     {
         Fighter* mfgt = NULL;
