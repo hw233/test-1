@@ -97,6 +97,7 @@ public:
 	inline bool isNpc() { return _fighter->isNpc(); }
 	inline bool isBoy() { return _fighter->isBoy(); }
 	inline bool isMale() { return _fighter->isMale(); }
+    inline bool isPet()     { return _fighter->isPet(); }
 	inline UInt8 getSex() { return _fighter->getSex(); }
 	inline Int16 getBaseStrength() { return _fighter->getBaseStrength(); }
 	inline Int16 getBasePhysique() { return _fighter->getBasePhysique(); }
@@ -129,8 +130,8 @@ public:
 	inline float getSoul() { return _soul; }
 	inline float getAura() { return (_aura > 0 ? _aura : 0); }
 	inline float getAuraMax() { return (_auraMax > 0 ? _auraMax : 0); }
-	inline float getAttack() {float ret = _attack + _attackAdd + _attackAdd2 + _atkAddSpecial + _atkDecSpecial + _moAttackAdd; return  ret;}
-	inline float getMagAttack() {float ret = _magatk + _magAtkAdd + _magAtkAdd2 + _magAtkAddSpecial + _magAtkDecSpecial + _moMagAtkAdd; return ret;}
+	inline float getAttack() {float ret = _attack + _attackAdd + _attackAdd2 + _atkAddSpecial + _atkDecSpecial + _moAttackAdd + _petAttackAdd + (_petExAtkEnable?_petExAtk:0); return  ret;}
+	inline float getMagAttack() {float ret = _magatk + _magAtkAdd + _magAtkAdd2 + _magAtkAddSpecial + _magAtkDecSpecial + _moMagAtkAdd + _petMagAtkAdd; return ret;}
 	inline float getDefend() {float ret = _defend + _defAdd + _defAdd2; return (ret > 0 ? ret : 0);}
 	inline float getMagDefend() {float ret = _magdef + _magDefAdd + _magDefAdd2; return (ret > 0 ? ret : 0);}
 	float getHitrate(BattleFighter* defgt);
@@ -207,7 +208,7 @@ public:
 
 	inline UInt32 getLostHP() { Int64 tmp = _maxhp + _maxhpAdd + _maxhpAdd2; UInt32 mhp = (tmp > 0 ? tmp : 0); if(mhp > _hp) return mhp - _hp; return 0; }
 
-	UInt32 regenHP(UInt32 u, bool weak = false);
+	UInt32 regenHP(UInt32 u, bool weak = false, float hppec = 0, float maxRhp = 0);
 
 	void updateAllAttr();
 	void initStats(bool);
@@ -218,6 +219,7 @@ public:
 	bool canBeCounter();
 	bool calcPierce(BattleFighter* defender);
     float calcTherapy(bool& isCritical, bool& first, const GData::SkillBase* skill);
+    float calcMaxTherapy(const GData::SkillBase* skill);
     float calcMagAttack(bool& isCritical, BattleFighter* defender, float* pCf);
     float calcPoison(const GData::SkillBase* skill, BattleFighter* defender, bool cs);
     void calcSkillAttack(bool& isCritical, BattleFighter* defender, float& atk, float& magatk, float* pCf);
@@ -277,6 +279,8 @@ public:
     const GData::SkillBase* getPassiveSkillEnter100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillDead100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillAftNAtk100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnAtkDmg100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnGetDmg100(size_t& idx, bool noPossibleTarget = false);
 
     const GData::SkillBase* getPassiveSkillPreAtk(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillAftAtk(bool noPossibleTarget = false);
@@ -286,6 +290,13 @@ public:
     const GData::SkillBase* getPassiveSkillEnter(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillDead(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillAftNAtk(bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnAtkDmg(bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnAtkDmgForce(bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnPetProtect(bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnPetProtectForce(bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnPetAtk(bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnGetDmg(bool noPossibleTarget = false);
+
     void releaseSkillCD(int cd);
     void releaseSkillCD(std::vector<GData::SkillItem>& skill, int cd);
 
@@ -293,8 +304,10 @@ public:
     const GData::SkillBase* getPassiveSkillOnTherapy();
     const GData::SkillBase* getPassiveSkillOnSkillDmg();
     const GData::SkillBase* getPassiveSkillOnOtherDead();
+    const GData::SkillBase* getPassiveSkillOnPetProtect100();
 
     const GData::SkillBase* getPassiveSkill(std::vector<GData::SkillItem>& passiveSkill, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillForce(std::vector<GData::SkillItem>& passiveSkill, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkill100(std::vector<GData::SkillItem>& passiveSkill100, size_t& idx, bool noPossibleTarget = false);
 
     GData::SkillStrengthenBase* getSkillStrengthen(UInt16 skillId);
@@ -445,6 +458,7 @@ private:
     std::vector<GData::SkillItem> _passiveSkillEnter100;
     std::vector<GData::SkillItem> _passiveSkillDead100;
     std::vector<GData::SkillItem> _passiveSkillAftNAtk100;
+    std::vector<GData::SkillItem> _passiveSkillOnPetProtect100;
 
     std::vector<GData::SkillItem> _passiveSkillPreAtk;
     std::vector<GData::SkillItem> _passiveSkillAftAtk;
@@ -454,6 +468,7 @@ private:
     std::vector<GData::SkillItem> _passiveSkillEnter;
     std::vector<GData::SkillItem> _passiveSkillDead;
     std::vector<GData::SkillItem> _passiveSkillAftNAtk;
+    std::vector<GData::SkillItem> _passiveSkillOnPetProtect;
 
     std::vector<GData::SkillItem> _passiveSkillOnTherapy;
     std::vector<GData::SkillItem> _passiveSkillOnSkillDmg;
@@ -507,8 +522,8 @@ private:
     float _aura_dec;
     UInt8 _aura_dec_last;
 
-    float _bleed1, _bleed2, _bleed3;
-    UInt8 _bleed1_last, _bleed2_last, _bleed3_last;
+    float _bleed1, _bleed2, _bleed3, _self_bleed;
+    UInt8 _bleed1_last, _bleed2_last, _bleed3_last, _self_bleed_last;
     UInt16 _immune2;
 
     float _def_dec;
@@ -547,6 +562,10 @@ private:
     UInt8 _deep_blind_last;
 	float _moAttackAdd, _moMagAtkAdd, _moAtkReduce, _moMagAtkReduce;
 	UInt8 _moAttackAddCD, _moMagAtkAddCD, _moAtkReduceCD, _moMagAtkReduceCD;
+	float _petAttackAdd, _petMagAtkAdd, _petAtkReduce, _petMagAtkReduce;
+	UInt8 _petAttackAddCD, _petMagAtkAddCD, _petAtkReduceCD, _petMagAtkReduceCD;
+    float _petExAtk;
+    bool  _petExAtkEnable;
     float _bleedMo;
     UInt8 _bleedMoLast;
     BattleFighter* _summoner;
@@ -554,6 +573,18 @@ private:
 
     float _shieldHP;
     UInt8 _shieldHPLast;
+
+    float _petShieldHP;         // 仙宠给散仙上的护盾HP
+
+    bool  _petProtect100;
+    UInt8 _petProtect100Last;
+
+    float  _petAtk100;
+    UInt8 _petAtk100Last;
+
+    bool  _petMark;
+
+
     // cotton add for skillstrengthen
 public:
     inline float getAtkAddSpecial(){ return _atkAddSpecial; }
@@ -690,6 +721,9 @@ public:
     inline float getBleed3() { return _bleed3; }
     inline void setBleed3(float value, UInt8 last) { _bleed3 = value; _bleed3_last = last; }
 
+    inline UInt8& getSelfBleedLast() { return _self_bleed_last; }
+    inline float getSelfBleed() { return _self_bleed; }
+    inline void setSelfBleed(float value, UInt8 last) { _self_bleed = value; _self_bleed_last = last; }
 
     inline UInt8& getAuraDecCD() { return _aura_dec_cd; }
     inline float getAuraPrecent() { return _aura_present; }
@@ -781,6 +815,31 @@ public:
     bool releaseMoAtkReduce();
     bool releaseMoMagAtkReduce();
 
+    inline void setPetAttackAdd(float value, UInt8 last) { if(last == 0) return; _petAttackAdd = value; _petAttackAddCD = last; }
+    inline void setPetMagAtkAdd(float value, UInt8 last) { if(last == 0) return; _petMagAtkAdd = value; _petMagAtkAddCD = last; }
+    inline void setPetAtkReduce(float value, UInt8 last) { if(last == 0) return; _petAtkReduce = value; _petAtkReduceCD = last; }
+    inline void setPetMagAtkReduce(float value, UInt8 last) { if(last == 0) return; _petMagAtkReduce = value; _petMagAtkReduceCD = last; }
+
+    inline void resetPetAttackAdd() { _petAttackAdd = 0; _petAttackAddCD = 0; }
+    inline void resetPetMagAtkAdd() { _petMagAtkAdd = 0; _petMagAtkAddCD = 0; }
+    inline void resetPetAtkReduce() { _petAtkReduce = 0; _petAtkReduceCD = 0; }
+    inline void resetPetMagAtkReduce() { _petMagAtkReduce = 0; _petMagAtkReduceCD = 0; }
+
+    inline float getPetAttackAdd() { return _petAttackAdd; }
+    inline float getPetMagAtkAdd() { return _petMagAtkAdd; }
+    inline float getPetAtkReduce() { return _petAtkReduce; }
+    inline float getPetMagAtkReduce() { return _petMagAtkReduce; }
+
+    inline void setPetExAtk(float v) { _petExAtk = v;}
+    inline float getPetExAtk() { return _petExAtk; }
+    inline void setPetExAtkEnable(bool v) { _petExAtkEnable = v;}
+    inline bool getPetExAtkEnable() { return _petExAtkEnable; }
+
+    bool releasePetAttackAdd();
+    bool releasePetMagAtkAdd();
+    bool releasePetAtkReduce();
+    bool releasePetMagAtkReduce();
+
     inline float getBleedMo() { return _bleedMo; }
     inline UInt16 getBleedMoLast() { return _bleedMoLast; }
     inline void setBleedMo(float value, UInt8 last) { if(last == 0) return; _bleedMo = value; _bleedMoLast = last; }
@@ -800,6 +859,10 @@ private:
     std::vector<GData::SkillItem> _passiveSkillOnCounter;
     std::vector<GData::SkillItem> _passiveSkillOnCounter100;
     std::vector<GData::SkillItem> _passiveSkillOnAttackBleed100;
+    std::vector<GData::SkillItem> _passiveSkillOnAtkDmg;
+    std::vector<GData::SkillItem> _passiveSkillOnAtkDmg100;
+    std::vector<GData::SkillItem> _passiveSkillOnGetDmg100;
+    std::vector<GData::SkillItem> _passiveSkillOnGetDmg;
     float _darkVigor, _dvFactor;
     UInt8 _darkVigorLast;
 public:
@@ -833,8 +896,23 @@ public:
 
     float& getHpShieldSelf() { return _hpShieldSelf; }
     void setHpShieldSelf(float v, UInt8 l) { _hpShieldSelf = v; _hpShieldSelf_last = l; }
+    void addHpShieldSelf(float v, UInt8 l) { _hpShieldSelf = v; _hpShieldSelf_last = l; }
     bool releaseHpSieldSelf();
 
+    inline float& getPetShieldHP() { return _petShieldHP; }
+    inline void setPetShieldHP(float value) { _petShieldHP = value; }
+
+    inline bool getPetProtect100() { return _petProtect100; }
+    inline void setPetProtect100(bool v, UInt8 l) { _petProtect100 = v; _petProtect100Last = l; }
+    bool releasePetProtect100();
+
+    inline void setPetMark(bool v) { _petMark = v; }
+    inline bool isPetMark() { return _petMark; }
+
+    inline float getPetAtk100() { return _petAtk100; }
+    inline bool getPetAtk100Last() { return _petAtk100Last;}
+    inline void setPetAtk100(float v, UInt8 l) { _petAtk100 = v; _petAtk100Last = l; }
+    bool releasePetAtk100();
 
 public:
 	enum StatusFlag

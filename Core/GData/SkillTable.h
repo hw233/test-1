@@ -36,6 +36,9 @@ enum
     /*12*/ SKILL_ONOTHERDEAD,
     /*13*/ SKILL_ONCOUNTER,
     /*14*/ SKILL_ONATKBLEED,
+    /*15*/ SKILL_ONATKDMG,
+    /*16*/ SKILL_ONPETPROTECT,
+    /*17*/ SKILL_ONGETDMG,
     SKILL_PASSIVES
 };
 
@@ -48,7 +51,12 @@ enum
 {
     e_battle_target_selfside  = 0,
     e_battle_target_otherside = 1,
-    e_battle_target_self      = 2
+    e_battle_target_self      = 2,
+    e_battle_target_otherside_max = 3,
+    e_battle_target_otherside_min = 4,
+    e_battle_target_selfside_max = 5,
+    e_battle_target_selfside_min = 6,
+    e_battle_target_selfside_atk_max = 7,
 };
 
 
@@ -70,6 +78,16 @@ enum
     e_eft_selfside_absorb = 13, // 给队友吸血
     e_eft_hide_aura = 14, // (墨印或潜行时)敌方被攻击时不增加灵气
     e_eft_counter_hate = 15, // 反击后的仇恨值
+    e_eft_hp_shield = 16,       // 释放自己生命值百分比的护盾
+    e_eft_self_bleed = 17,           // 给自己加点燃效果（自焚？）
+    e_eft_random_shield = 18,        // 随机释放护盾
+    e_eft_self_attack = 19,        // 附加自己百分比攻击力
+    e_eft_random_target_attack = 20,    // 随机选择人加攻击力
+    e_eft_mark_pet  = 21,               // 神兽印记
+    e_eft_atk_pet_mark_aura = 22,       // 攻击带神兽印记的涨自身灵气
+    e_eft_atk_pet_mark_extra_dmg = 23,  // 攻击带神兽印记的造成额外攻击
+    e_eft_protect_pet_100 = 24,         // 宠物100%保护目标
+    e_eft_pet_atk_100 = 25,             // 宠物100%帮目标合击
 
     e_eft_max
 };
@@ -101,7 +119,7 @@ struct SkillEffect : public ObjectBaseNT<UInt16>
         hp(0), hpP(0), addhp(0), absorb(0), absorbP(0), thorn(0), thornP(0),inj2hp(0), inj2hpP(0),
         aura(0), auraP(0), atk(0), atkP(0), def(0), defP(0), magatk(0),
         magatkP(0), magdef(0), magdefP(0), tough(0), action(0), actionP(0), hitrate(0), evade(0),
-        critical(0), pierce(0), counter(0), magres(0), atkreduce(0), magatkreduce(0) {}
+        critical(0), pierce(0), counter(0), magres(0), atkreduce(0), magatkreduce(0), hppec(0), maxhpdampec(0) {}
     ~SkillEffect() {}
 
     UInt16 state; // 状态: 0-无状态 1-中毒，2-混乱，4-晕眩(无法攻击)，8-无法使用技能, 16-反伤, 32-虚弱, 64-降灵气 有等级之分
@@ -146,6 +164,8 @@ struct SkillEffect : public ObjectBaseNT<UInt16>
     float magres; // 法术抵抗[+/-]
     float atkreduce; // 物理伤害减免
     float magatkreduce; // 法术伤害减免
+    float hppec;        // 最大生命值伤害百分比
+    float maxhpdampec;  // 最大生命值伤害百分比最大值（最高攻击力的百分比）
 
     // 技能附加特效类型:
     std::vector<UInt16> eft;
@@ -162,7 +182,9 @@ struct SkillBase : public ObjectBaseT<UInt16>
 
     UInt8 color;               // 技能颜色 1-白色 2-绿色 3-蓝色 4-紫色 5-橙色
     UInt8 target;              // 作用对象: 0-友方,1-敌方,2-自己(对友方和自己加,对敌方减)
-                               // 触发条件: SKILL_ACTIVE     - 主动
+                               //           3-敌方血量最高 4-敌方血量最低
+                               //           5-我方血量最高 6-我方血量最低
+    UInt16 cond;               // 触发条件: SKILL_ACTIVE     - 主动
                                //           SKILL_PEERLESS   - 无双技能,当灵气>=100释放
                                //           SKILL_PREATK     - 攻击前被动触发(回血技能,无概率)
                                //           SKILL_AFTATK     - 攻击后被动触发(有概率)
@@ -174,7 +196,6 @@ struct SkillBase : public ObjectBaseT<UInt16>
                                //           SKILL_DEAD       - 死亡后触发
                                //           SKILL_ONCOUNTER  - 反击后触发
                                //           SKILL_ONATKBLEED - 攻击流血对象触发
-    UInt16 cond;               //           
     float prob;                // 主动状态触发概率 或 被动触发概率
     UInt8 area;                // 伤害范围: 0-单体,1-全体,2-横排,3-竖列,4-十字,5-V字,6-T字
     std::vector<float> factor; // 伤害倍率: 如, 横排伤害 1,0.3,0.5,1,0 距离攻击目标为0的伤害系数是1,距离为2的伤害系数为0.5

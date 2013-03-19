@@ -3865,7 +3865,18 @@ namespace GObject
 			}
 		}
 		bsim.setPortrait(side, _fighters.empty() ? 0 : _fighters.begin()->second->getId());
+        PutPets(bsim, side);
 	}
+
+	void Player::PutPets( Battle::BattleSimulator& bsim, int side, bool init /* = true */)
+    {
+        // 战斗模拟器中加载宠物
+        if (_onBattlePet)
+        {
+            Battle::BattleFighter * bf = bsim.newPet(side, 0, _onBattlePet);
+            bf->setHP(_onBattlePet->getMaxHP());
+        }
+    }
 
 	Fighter * Player::takeFighter( UInt32 id, bool writedb )
 	{

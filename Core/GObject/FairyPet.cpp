@@ -54,7 +54,10 @@ namespace GObject
 
     void FairyPet::UpdateToDB()
     {
-        DB2().PushUpdateData("REPLACE INTO `fairyPet` (`id`, `playerId`, `onBattle`, `petLev`, `petBone`, `pinjieBless`, `genguBless`, `chong`, `overTime`, `xiaozhou`, `dazhou`) VALUES (%u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", 
+        if(isDel)
+            DB2().PushUpdateData("DELETE FROM `fairyPet` WHERE id = %u AND `playerId` = %"I64_FMT"u", getId(), _owner->getId());
+        else
+            DB2().PushUpdateData("REPLACE INTO `fairyPet` (`id`, `playerId`, `onBattle`, `petLev`, `petBone`, `pinjieBless`, `genguBless`, `chong`, `overTime`, `xiaozhou`, `dazhou`) VALUES (%u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", 
             getId(), _owner->getId(), _onBattle, _petLev, _petBone, _pinjieBless, _genguBless, _chong, _overTime, _xiaozhou, _dazhou);
     }
 
