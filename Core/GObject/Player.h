@@ -2139,6 +2139,9 @@ namespace GObject
         
         void buyTownTjItem(const UInt32 itemId);
         void sendTownTjItemInfo();
+        
+        void getLongyuanAct(UInt8 idx, UInt8 flag);
+        void sendLongyuanActInfo();
     private:
         UInt8 cf_posPut[5];//范围1-5
         UInt32 cf_itemId[5];
@@ -2190,7 +2193,9 @@ namespace GObject
         void getPetByLevelUp(UInt8);
         UInt8 getPetByPetEgg(UInt32);
 
-        UInt32 getXianyuanLua(UInt32);
+        void getXianyuanLua(UInt32);
+        void getLongyuanLua(UInt32);
+        void getFengsuiLua(UInt32);
         UInt32 getXianyuan( UInt32 c, IncommingInfo* ii = NULL);
         UInt32 getFengsui( UInt32 c, IncommingInfo* ii);
         UInt32 getLongyuan( UInt32 c, IncommingInfo* ii);

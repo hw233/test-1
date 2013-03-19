@@ -372,6 +372,8 @@ namespace GObject
         //421-430 for suntao
         VAR_HUNYUAN_STEP = 421, //大闹龙宫之混元剑诀
         VAR_HUNYUAN_STEP4_COUNT = 422, //大闹龙宫之混元剑诀从第4格移动到第5失败的次数
+        //431-440 for yijian
+        VAR_LONGYUAN_GOT = 431,  //龙元风髓领取标志
 
         VAR_MAX,
     };
@@ -686,6 +688,8 @@ namespace GObject
             REGISTER_VAR(VAR_TIANMANG_STEP4_COUNT, CYCLE_NONE);
             REGISTER_VAR(VAR_HUNYUAN_STEP, CYCLE_NONE);
             REGISTER_VAR(VAR_HUNYUAN_STEP4_COUNT, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_LONGYUAN_GOT, CYCLE_NONE);
 
             REGISTER_VAR(VAR_CALLSNAKEEGG, CYCLE_NONE);
             REGISTER_VAR(VAR_SNAKEEGG_AWARD, CYCLE_NONE);

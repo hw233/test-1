@@ -17688,6 +17688,77 @@ void Player::sendTownTjItemInfo()
     send(st);
 }
 
+void Player::getLongyuanAct(UInt8 idx, UInt8 flag/*0:领取 1:结缘*/)
+{
+    static UInt32 s_lev[] = {60,70,80,90,100,110};
+    static UInt32 s_longyuan[] = {50000,150000,300000,450000,500000,600000};
+    static UInt32 s_fengsui[] = {10000,50000,100000,200000,500000,1000000};
+    static UInt32 s_gold[] = {50,200,500,1000,3000,5000};
+    if (!World::getLongyuanAct())
+        return;
+    if (idx > 5)
+        return;
+    UInt32 v = GetVar(VAR_LONGYUAN_GOT);
+    UInt8 res = 0;
+    if (GetLev() >= s_lev[idx])
+    {
+        UInt8 i = idx*2 + flag; //每2位存一个等级的标志 第1位:领取 第2位:结缘
+        if (v&(0x01<<i))
+        {
+            res = 1; //已领取
+        }
+        else
+        {
+            if (flag == 1)
+            {
+                if (getGold() < s_gold[idx])
+                {
+                    sendMsgCode(0, 1104); 
+                    return;
+                }
+                ConsumeInfo ci(LongYuanAct,0,0);
+                useGold(s_gold[idx],&ci);
+           }
+           IncommingInfo ii1(LongYuanAct, 0, 0);
+           getLongyuan(s_longyuan[idx], &ii1);
+           IncommingInfo ii2(LongYuanAct, 0, 0);
+           getFengsui(s_fengsui[idx], &ii2);
+           sendFairyPetResource();
+
+           v |= (0x01<<i);
+           SetVar(VAR_LONGYUAN_GOT, v);
+           sendLongyuanActInfo();
+        }
+    }
+    else
+    {
+        res = 3;
+    }
+}
+void Player::sendLongyuanActInfo()
+{
+    static UInt32 s_lev[] = {60,70,80,90,100,110};
+    UInt8 total = 0;
+    UInt8 i = 0;
+    for (i = 0; i < sizeof(s_lev)/sizeof(s_lev[0]); ++i)
+    {
+        if (GetLev() < s_lev[i])
+            break;
+        total += 1;
+    }
+    Stream st(REP::ACTIVE);
+    st << static_cast<UInt8>(0x0E) << static_cast<UInt8>(0x01);
+    st << static_cast<UInt8>(total);
+    UInt32 v = GetVar(VAR_LONGYUAN_GOT);
+    for (i = 0; i < total; ++i)
+    {
+        UInt8 flag = 0;
+        flag = (v>>(i*2))&0x03;
+        st << flag;
+    }
+    st << Stream::eos;
+    send(st);
+}
 void Player::transferExpBuffer2Var()
 {
     UInt32 tm = TimeUtil::Now();
@@ -17767,7 +17838,7 @@ UInt8 Player::toQQGroup(bool isJoin)
         // 仙宠相关日志
         char action[16] = "";
         snprintf (action, 16, "F_%d_%d", id, type);
-        udpLog("fairyPet", action, "", "", "", "", "act");
+        udpLog("FairyPet", action, "", "", "", "", "act");
     }
 
 	FairyPet * Player::findFairyPet( UInt32 id )
@@ -17890,6 +17961,14 @@ UInt8 Player::toQQGroup(bool isJoin)
 		FairyPet * pet2 = pet->clone(this);
 		addFairyPet(pet2, true);
         delCanHirePet(id);
+        if(_fairyPets.size() == 1)  //第一个仙宠自动出战
+        {
+            setFairypetBattle(pet2, true);
+            Stream st(REP::FAIRY_PET);
+            st << static_cast<UInt8>(0x03) << static_cast<UInt8>(0x03);
+            st << id << Stream::eos;
+            send(st);
+        }
         return 0;
     }
 
@@ -18135,10 +18214,25 @@ UInt8 Player::toQQGroup(bool isJoin)
         return res;
     }
 
-    UInt32 Player::getXianyuanLua(UInt32 c)
+    void Player::getLongyuanLua(UInt32 c)
+    {
+        IncommingInfo ii(LongyuanFromUseItem, 0, 0);
+        getLongyuan(c, &ii);
+        sendFairyPetResource();
+    }
+
+    void Player::getFengsuiLua(UInt32 c)
+    {
+        IncommingInfo ii(FengsuiFromUseItem, 0, 0);
+        getFengsui(c, &ii);
+        sendFairyPetResource();
+    }
+
+    void Player::getXianyuanLua(UInt32 c)
     {
         IncommingInfo ii(XianyuanFromUseItem, 0, 0);
-        return getXianyuan(c, &ii);
+        getXianyuan(c, &ii);
+        sendFairyPetResource();
     }
 
     UInt32 Player::getXianyuan( UInt32 c, IncommingInfo* ii)
@@ -18150,10 +18244,11 @@ UInt8 Player::toQQGroup(bool isJoin)
 		SYSMSG_SENDV(161, this, c);
 		SYSMSG_SENDV(1061, this, c);
         SetVar(VAR_FAIRYPET_XIANYUAN, xianyuan);
-
+        /*
         Stream st(REP::USER_INFO_CHANGE);
         st << static_cast<UInt8>(0x18) << xianyuan << Stream::eos;
         send(st);
+        */
 
         if(ii && ii->incommingType != 0)
         {

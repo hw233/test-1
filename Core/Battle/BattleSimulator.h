@@ -632,6 +632,7 @@ private:
 
     static  bool hasPetMarked(BattleObject* bo);
     static  bool isPet(BattleObject* bo);
+    UInt32 upPetObject(UInt8, bool = true);
 
 private:
 };

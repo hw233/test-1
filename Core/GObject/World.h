@@ -517,6 +517,14 @@ public:
     { _weiboact = v; }
     inline static bool getWeiboAct()
     { return _weiboact; }
+    inline static void setPetEggAct(bool v)
+    { _peteggact = v; }
+    inline static bool getPetEggAct()
+    { return _peteggact; }
+    inline static void setLongyuanAct(bool v)
+    { _longyuanact = v; }
+    inline static bool getLongyuanAct()
+    { return _longyuanact; }
 
     inline static void setQQGameOnlineAwardAct(bool v)
     { _qqgameonlineawardact = v; }
@@ -770,6 +778,8 @@ public:
     static bool _tgcevent;
     static bool _weiboact;
     static bool _qqgameonlineawardact;
+    static bool _peteggact;
+    static bool _longyuanact;
     static stArenaExtra stArenaOld[2];
     static stArenaExtra stArena;
     static bool _compassact;
