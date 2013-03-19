@@ -7450,6 +7450,13 @@ namespace GObject
 			addStatus(TopupRewarded);
 		}
 
+        Stream stream(REQ::STATE);
+        stream<<static_cast<UInt8>(0x19);
+        stream<<r;
+    //    stream<<_playerData.totalRecharge;
+        stream<<Stream::eos;
+        send(stream);
+
 		sendVIPMails(oldVipLevel + 1, _vipLevel);
         addRC7DayRecharge(r);
         addRF7DayRecharge(r);
