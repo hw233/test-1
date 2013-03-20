@@ -1242,6 +1242,7 @@ namespace GObject
 #ifndef _VT
         dclogger.login(this);
         dclogger.login_sec(this);
+        dclogger.checkOpenId(this);
 
         EventAutoRefreshOpenKey* event = new(std::nothrow) EventAutoRefreshOpenKey(this, 60 * 110, 24);
         if (event)

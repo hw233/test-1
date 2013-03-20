@@ -1850,6 +1850,18 @@ void OnOpenIdInvalid( GameMsgHdr &hdr, const void *data)
     std::string validOpenId = openId;
     player->setOpenId(validOpenId);
     player->udpLog("invalid_openid", invalidOpenId.c_str(), openId, "", "", "", "act_tmp");
+    if (cfg.autoKick)
+    {
+        //player->selfKick(); // 这行代码完全没效果
+        GameMsgHdr imh(0x200, player->getThreadId(), player, 0);
+        GLOBAL().PushMsg(imh, NULL);
+#ifndef _WIN32
+#ifdef _FB
+#else
+        GObject::dclogger.decDomainOnlineNum(atoi(player->getDomain()));
+#endif
+#endif // _WIN32
+    }
 }
 
 void OnOpenAPIFailed( GameMsgHdr &hdr, const void *data)

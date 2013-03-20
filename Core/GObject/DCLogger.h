@@ -81,6 +81,8 @@ public:
 
     bool reg_union(Player* player);
 
+    bool checkOpenId(Player * player);
+
     UInt8 getDomain_sec(Player* player);
 
     void online();
