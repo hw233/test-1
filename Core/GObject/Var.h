@@ -311,9 +311,6 @@ namespace GObject
         VAR_FAIRYPET_STEP = 299, //仙宠空间当前寻宠步数
         VAR_FAIRYPET_LIKEABILITY = 300, //仙宠空间仙宠好感度数值(紫色)
 
-        VAR_INVITEDSUCCESS = 299, //邀请成功的好友人数
-        VAR_CFRIENDTICKETS = 300, //好友邀请的抽奖券
-
         //繁体版占用301-330
 
         //340简体版
@@ -375,6 +372,9 @@ namespace GObject
         //421-430 for suntao
         VAR_HUNYUAN_STEP = 421, //大闹龙宫之混元剑诀
         VAR_HUNYUAN_STEP4_COUNT = 422, //大闹龙宫之混元剑诀从第4格移动到第5失败的次数
+        VAR_INVITEDSUCCESS = 423, //邀请成功的好友人数
+        VAR_CFRIENDTICKETS = 424, //好友邀请的抽奖券
+
         //431-440 for yijian
         VAR_LONGYUAN_GOT = 431,  //龙元风髓领取标志
 
