@@ -88,6 +88,14 @@ void ChatItem::post( UInt8 type, UInt64 pid, UInt32 id, Player * player )
 			return;
 		}
 		break;
+	case 0x06:
+		break;
+	case 0x07:
+		{
+			FastMutex::ScopedLock lk(_petMutex);
+			addFairyPet(player, id);
+			return;
+		}
 	case 0x11:
 		{
 			FastMutex::ScopedLock lk(_itemMutex);
@@ -106,6 +114,22 @@ void ChatItem::post( UInt8 type, UInt64 pid, UInt32 id, Player * player )
 			FIndex fi = {pid, id};
 			std::map<FIndex, ChatItemData>::iterator it = _fighterData.find(fi);
 			if(it == _fighterData.end())
+			{
+				return;
+			}
+			it->second.lastAccess = TimeUtil::Now();
+			player->send(it->second.st);
+			return;
+		}
+		break;
+	case 0x16:
+		break;
+	case 0x17:
+		{
+			FastMutex::ScopedLock lk(_petMutex);
+			FIndex fi = {pid, id};
+			std::map<FIndex, ChatItemData>::iterator it = _fairyPetData.find(fi);
+			if(it == _fairyPetData.end())
 			{
 				return;
 			}
@@ -142,6 +166,36 @@ void ChatItem::purge( UInt32 curtime )
 				++ it;
 		}
 	}
+
+	{
+		FastMutex::ScopedLock lk(_petMutex);
+		std::map<FIndex, ChatItemData>::iterator it = _fairyPetData.begin();
+		while(it != _fairyPetData.end())
+		{
+			if(curtime > it->second.lastAccess + 3600 * 3)
+				_fairyPetData.erase(it ++);
+			else
+				++ it;
+		}
+	}
+}
+
+UInt32 ChatItem::addFairyPet( Player * player, UInt32 id )
+{
+	FairyPet * pet = player->findFairyPet(id);
+	if(pet == NULL)
+		return 0;
+
+	FIndex fi = {player->getId(), id};
+	ChatItemData& cid = _fairyPetData[fi];
+	cid.st.init(REP::FLAUNT_GOOD);
+	cid.st << static_cast<UInt8>(0x07) << static_cast<UInt8>(player->IsMale() ? 0 : 1)
+        << player->getCountry() << player->getName();
+    cid.st << id << pet->getPetLev() << pet->getPetBone();
+	cid.st << Stream::eos;
+	cid.lastAccess = TimeUtil::Now();
+
+	return id;
 }
 
 }

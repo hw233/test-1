@@ -7005,6 +7005,25 @@ function ItemNormal_00010115(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00010116(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (6+(6*num*3)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    package:Add(56, num*5, true, false, 2);
+    package:Add(57, num*5, true, false, 2);
+    package:Add(15, num*2, true, false, 2);
+    package:Add(51, num*1, true, false, 2);
+    package:Add(48, num*1, true, false, 2);
+    package:Add(49, num*1, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
 function ItemNormal_QixiLoveCard(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -9786,6 +9805,7 @@ local ItemNormal_Table = {
     [10113] = ItemNormal_00010113,
     [10114] = ItemNormal_00010114,
     [10115] = ItemNormal_00010115,
+    [10116] = ItemNormal_00010116,
 };
 
 function ItemNormalOther_00000441(iid, num, bind, other)
