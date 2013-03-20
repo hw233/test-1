@@ -585,7 +585,6 @@ void BattleSimulator::start(UInt8 prevWin, bool checkEnh)
             _getDamageSkillCount[0] = 0;
             _getDamageSkillCount[1] = 0;
         }
-        _activeFgt = NULL;
     }
     if(_winner == 0)
         _winner = testWinner2();
@@ -5798,7 +5797,7 @@ UInt32 BattleSimulator::doAttack( int pos )
         mainTarget->setShieldObj(NULL);
 
     rcnt += releaseCD(bf);
-
+    _activeFgt = NULL;
     return rcnt;
 }
 
@@ -10898,13 +10897,12 @@ UInt32 BattleSimulator::tryPetEnter(UInt8 side, UInt8 reiatsuType, bool slience 
             break;
     }
 
-    if (!slience)
-        appendReiatsuChange(side);
     if (addReiatsu(side, val))
     {
-        appendReiatsuChange(side);
         return doPetEnter(side);
     }
+    if (!slience)
+        appendReiatsuChange(side);
     return 0;
 }
 
@@ -10938,6 +10936,8 @@ UInt32 BattleSimulator::doPetEnter(UInt8 side)
         return 0;
     }
     BattleFighter* bf = static_cast<BattleFighter *>(bo);
+    _activeFgt = bf;
+    appendReiatsuChange(side);
     appendDefStatus(e_petAppear, bf->getId(), bf);
     insertFighterStatus(bf);
 
@@ -10968,17 +10968,13 @@ UInt32 BattleSimulator::doPetEnter(UInt8 side)
         rcnt += doSkillAttackAftEnter(bf, passiveSkill, target_side, target_pos, cnt);
     }
 
+    if(_defList.size() > 0 || _scList.size() > 0)
     {
-        int side = 0;
-        int pos = -1;
-        if(_activeFgt)
-        {
-            side = _activeFgt->getSide();
-            pos = _activeFgt->getPos();
-        }
-        appendToPacket(side, pos, pos, 5, 0, false, false);
+        appendToPacket(bf->getSide(), bf->getPos(), bf->getPos() + 25, 5, 0, false, false);
+        ++ rcnt;
     }
-    return rcnt + 1;
+    _activeFgt = NULL;
+    return rcnt;
 }
 
 bool BattleSimulator::tryProtectDamage(BattleFighter* bf, float& phyAtk, float& magAtk, float factor)

@@ -1473,6 +1473,11 @@ void BattleFighter::releaseSkillCD(int cd)
     releaseSkillCD(_passiveSkillEnter100, cd);
     releaseSkillCD(_passiveSkillDead100, cd);
     releaseSkillCD(_passiveSkillAftNAtk100, cd);
+    releaseSkillCD(_passiveSkillOnCounter100, cd);
+    releaseSkillCD(_passiveSkillOnAttackBleed100, cd);
+    releaseSkillCD(_passiveSkillOnAtkDmg100, cd);
+    releaseSkillCD(_passiveSkillOnPetProtect100, cd);
+    releaseSkillCD(_passiveSkillOnGetDmg100, cd);
 
     releaseSkillCD(_passiveSkillPreAtk, cd);
     releaseSkillCD(_passiveSkillAftAtk, cd);
@@ -1482,6 +1487,12 @@ void BattleFighter::releaseSkillCD(int cd)
     releaseSkillCD(_passiveSkillEnter, cd);
     releaseSkillCD(_passiveSkillDead, cd);
     releaseSkillCD(_passiveSkillAftNAtk, cd);
+    releaseSkillCD(_passiveSkillOnTherapy, cd);
+    releaseSkillCD(_passiveSkillOnSkillDmg, cd);
+    releaseSkillCD(_passiveSkillOnCounter, cd);
+    releaseSkillCD(_passiveSkillOnAtkDmg, cd);
+    releaseSkillCD(_passiveSkillOnPetProtect, cd);
+    releaseSkillCD(_passiveSkillOnGetDmg, cd);
     releaseLBSkillCD();
 }
 

@@ -310,6 +310,11 @@ function calcHP( fgt )
   end
   local cls = fgt:getClass()
   local lvl = fgt:getLevelInLua() - 1
+  print('')
+  print(cls)
+  print(lvl)
+  print((hp + hp_factor[cls] * lvl + phy_hp_factor * calcPhysique(fgt)) * (1 + fgt:getExtraHPPercent()) + fgt:getExtraHP())
+  print('')
   return (hp + hp_factor[cls] * lvl + phy_hp_factor * calcPhysique(fgt)) * (1 + fgt:getExtraHPPercent()) + fgt:getExtraHP()
 end
 
