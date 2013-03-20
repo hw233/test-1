@@ -567,6 +567,7 @@ bool enum_midnight(void * ptr, void* next)
         pl->sendLevelAward();
 #endif
 
+    /*
     if (nextday >= TimeUtil::MkTime(2013, 2, 9))
     {   //金蛇献瑞 聚福兆祥活动
         struct goldData
@@ -579,6 +580,7 @@ bool enum_midnight(void * ptr, void* next)
         GameMsgHdr h(0x343,  pl->getThreadId(), pl, sizeof(gData));
         GLOBAL().PushMsg(h, &gData);
     }
+    */
 
 	return true;
 }

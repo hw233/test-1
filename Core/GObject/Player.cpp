@@ -62,6 +62,7 @@
 #include "GData/ClanSkillTable.h"
 #include "GData/ClanStatueTable.h"
 #include "GData/ExpTable.h"
+#include "GData/FairyPetTable.h"
 #include "Common/StringTokenizer.h"
 #include "TownDeamon.h"
 #include "ArenaBattle.h"
@@ -17866,6 +17867,14 @@ UInt8 Player::toQQGroup(bool isJoin)
         return isDel;
     }
 
+    void Player::delFairyPet(UInt32 id)
+    {
+        std::map<UInt32, FairyPet *>::iterator it = _fairyPets.find(id);
+        _fairyPets.erase(it);
+        DB2().PushUpdateData("DELETE FROM `fairyPet` WHERE id = %u AND `playerId` = %"I64_FMT"u", id, getId());
+	    DB2().PushUpdateData("DELETE FROM `fighter` WHERE `id` = %u AND `playerId` = %"I64_FMT"u", id, getId());
+    }
+
 	void Player::writeCanHiretPet()
 	{
         std::string petStr = "";
@@ -17954,6 +17963,9 @@ UInt8 Player::toQQGroup(bool isJoin)
 		FairyPet * pet2 = pet->clone(this);
 		addFairyPet(pet2, true);
         delCanHirePet(id);
+        if(pet2->getColor() > 1)
+            SYSMSG_BROADCASTV(4133, getCountry(), getName().c_str(), pet2->getColor(), pet2->getName().c_str());
+		SYSMSG_SENDV(4134, this, pet2->getColor(), pet2->getName().c_str());
         if(_fairyPets.size() == 1)  //第一个仙宠自动出战
         {
             setFairypetBattle(pet2, true);
@@ -17977,11 +17989,8 @@ UInt8 Player::toQQGroup(bool isJoin)
             if(pet->isOnBattle() || pet == _onBattlePet)
                 return 2;
             color = pet->getColor();
-            std::map<UInt32, FairyPet *>::iterator it = _fairyPets.find(id);
-            _fairyPets.erase(it);
+            delFairyPet(id);
             delete pet;
-            DB2().PushUpdateData("DELETE FROM `fairyPet` WHERE id = %u AND `playerId` = %"I64_FMT"u", id, getId());
-			DB2().PushUpdateData("DELETE FROM `fighter` WHERE `id` = %u AND `playerId` = %"I64_FMT"u", id, getId());
         }
         else
         {
@@ -18206,6 +18215,31 @@ UInt8 Player::toQQGroup(bool isJoin)
                 delCanHirePet(id);
         }
         return res;
+    }
+
+    UInt8 Player::transferPet(UInt32 petId1, UInt32 petId2)
+    {
+        FairyPet * pet1 = findFairyPet(petId1);
+        FairyPet * pet2 = findFairyPet(petId2);
+        if(!pet1 || !pet2 || pet1 == pet2)
+            return 1;
+        if(pet1->isOnBattle() || pet2->isOnBattle())
+            return 1;
+        if(pet1->getColor() > pet2->getColor())
+            return 1;
+        UInt16 lev = std::max(pet1->getPetLev(), pet2->getPetLev());
+        UInt16 bone = std::max(pet1->getPetBone(), pet2->getPetBone());
+        pet2->setPetLev(lev);
+        pet2->setPetBone(bone);
+        pet2->UpdateToDB();
+        pet2->setPotential(GData::pet.getPetPotential(bone));
+        pet2->setLevel(lev);
+        pet2->updateToDB(2, lev);
+        pet2->initSkillUp();
+
+        delFairyPet(petId1);
+        delete pet1;
+        return 0;
     }
 
     void Player::getLongyuanLua(UInt32 c)

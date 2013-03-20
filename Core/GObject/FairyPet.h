@@ -33,21 +33,23 @@ public:
     void UpdateToDB();
     bool checkTimeOver();
     virtual FairyPet * clone(Player *);
-    inline bool isOnBattle() { return _onBattle; }
-    inline void setOnBattle(bool flag) { _onBattle = flag; }
+    inline bool isOnBattle()            { return _onBattle; }
+    inline void setOnBattle(bool flag)  { _onBattle = flag; }
     void upgradeLev();
     void upgradeLevAuto();
     void upgradeBone();
     void useZhoutian(UInt8);
     void sendPinjieInfo();
     void sendGenguInfo();
-    inline void setPetBone(UInt16 v) { _petBone = v; }
-    inline UInt8 getPetLev() { return _petLev; }
-    inline UInt8 getPetBone() { return _petBone; }
-    inline UInt8 getPetLingya() { return _lingya; }
-    inline UInt8 getChongNum() { return _chong; }
+    void initSkillUp();
+    inline void setPetBone(UInt16 v)    { _petBone = v; }
+    inline void setPetLev(UInt16 v)     { _petLev = v; }
+    inline UInt8 getPetLev()            { return _petLev; }
+    inline UInt8 getPetBone()           { return _petBone; }
+    inline UInt8 getPetLingya()         { return _lingya; }
+    inline UInt8 getChongNum()          { return _chong; }
 
-    inline void setPetLingya(UInt8 ly) { _lingya = ly; }
+    inline void setPetLingya(UInt8 ly)  { _lingya = ly; }
     inline UInt8 getTargetPos()
     {
         switch (getClass())
@@ -126,15 +128,15 @@ public:
     */
 
 private:
-    inline UInt32 getGenguBless() { return _genguBless; }
-    inline UInt16 getXiaozhou() { return _xiaozhou; }
-    inline UInt16 getDazhou() { return _dazhou; }
+    inline UInt32 getGenguBless()       { return _genguBless; }
+    inline UInt16 getXiaozhou()         { return _xiaozhou; }
+    inline UInt16 getDazhou()           { return _dazhou; }
     UInt16 getPinjieBless();
     void addChongNum(int);
     void addGenguBless(int);
     void addPinjieBless(UInt16);
-    inline void setXiaozhou(UInt16 v) { _xiaozhou = v; }
-    inline void setDazhou(UInt16 v) { _dazhou = v; }
+    inline void setXiaozhou(UInt16 v)   { _xiaozhou = v; }
+    inline void setDazhou(UInt16 v)     { _dazhou = v; }
     void boneUp();
     void levUp();
     bool canLevUp();

@@ -15,6 +15,7 @@ namespace GObject
 {
     extern URandom GRND;
 #define PROB_BASE 10000
+#define GET_REMAINDER(val)  val % 10
 
     FairyPet::FairyPet(UInt32 id, Player * owner): Fighter(id, owner),
         _petLev(50), _petBone(0), _onBattle(false)
@@ -99,10 +100,9 @@ namespace GObject
     void FairyPet::boneUp()
     {
         ++ _petBone;
-        if(_petBone % 10 > 2)
+        if(GET_REMAINDER(_petBone) > 2)
             _petBone = (_petBone / 10 + 1) * 10;
-        GData::Pet::GenguData * ggd = GData::pet.getBoneTable(_petBone);
-        setPotential(ggd->growRate);
+        setPotential(GData::pet.getPetPotential(_petBone));
     }
 
     void FairyPet::levUp()
@@ -110,9 +110,15 @@ namespace GObject
         ++ _petLev;
         setLevel(_petLev);
         updateToDB(2, _petLev);
-        UInt8 value = _petLev % 10;
+        initSkillUp();
+        _owner->fairyPetUdpLog(10000, GET_REMAINDER(_petLev) ? GET_REMAINDER(_petLev) : 10);
+    }
+
+    void FairyPet::initSkillUp()
+    {
         //触发初始技能升级
-        if(value == 8 || value == 9)
+        UInt8 value = GET_REMAINDER(getPetLev());
+        if(value  == 8 || value == 9)
         {
             GData::Pet::PinjieData * pjd = GData::pet.getLevTable(_petLev);
             if(!pjd) return;
@@ -129,7 +135,6 @@ namespace GObject
             setSkills(skills, false);
             updateToDBPetSkill();
         }
-        _owner->fairyPetUdpLog(10000, value ? value : 10);
     }
 
     void FairyPet::addChongNum(int num)
@@ -202,17 +207,17 @@ namespace GObject
             reset(1);
             setLevel(getPetLev());
             updateToDB(2, getLevel());
-            if(getPetLev() % 10)
+            if(GET_REMAINDER(getPetLev()))
                 _owner->sendMsgCode(0, 4000);
         }
         else
         { //失败
             addPinjieBless(1);
-            if(getPetLev() % 10 == 9)
+            if(GET_REMAINDER(getPetLev()) == 9)
                 _owner->sendMsgCode(0, 4003);
             else
                 _owner->sendMsgCode(0, 4001);
-            UInt8 value = getPetLev() % 10 + 10;
+            UInt8 value = GET_REMAINDER(getPetLev()) + 10;
             _owner->fairyPetUdpLog(10000, value > 10 ? value : 20);
         }
         sendPinjieInfo();
@@ -242,14 +247,14 @@ namespace GObject
                 levUp();
                 reset(1);
                 setLevel(getPetLev());
-                isSucc = 1;
                 updateToDB(2, getLevel());
+                isSucc = 1;
                 break;
             }
             else
             {   //失败
                 addPinjieBless(1);
-                UInt8 value = getPetLev() % 10 + 10;
+                UInt8 value = GET_REMAINDER(getPetLev()) + 10;
                 _owner->fairyPetUdpLog(10000, value > 10 ? value : 20);
             }
         }
@@ -278,6 +283,8 @@ namespace GObject
             reset(3);
             boneUp();
             //_owner->sendMsgCode(0, 4002);
+            if(GET_REMAINDER(getPetBone()) == 2 && getColor() > 1)
+                SYSMSG_BROADCASTV(4135, _owner->getCountry(), _owner->getName().c_str(), getColor(), getName().c_str(), getPetBone());
         }
         else
         {   //失败
@@ -327,7 +334,7 @@ namespace GObject
         if(!type)
         {
             UInt32 xiaoZhou = getXiaozhou();
-            if(xiaoZhou / 10 >= FREE_LIMIT && !(xiaoZhou % 10)) 
+            if(xiaoZhou / 10 >= FREE_LIMIT && !GET_REMAINDER(xiaoZhou))
             {
                 xiaoZhou = (xiaoZhou / 10 + 1) * 10 + 1;
             }
@@ -337,7 +344,7 @@ namespace GObject
                     return;
                 ConsumeInfo ci(GenguUpForPet, 0, 0);
                 _owner->useFengsui(ggd->consume1, &ci);
-                xiaoZhou = (xiaoZhou / 10 + 1) * 10 + xiaoZhou % 10;
+                xiaoZhou = (xiaoZhou / 10 + 1) * 10 + GET_REMAINDER(xiaoZhou);
             }
             if(isLucky)
             {
@@ -354,7 +361,7 @@ namespace GObject
         else
         {
             UInt32 daZhou = getDazhou();
-            if(daZhou / 10 >= FREE_LIMIT && !(daZhou % 10))
+            if(daZhou / 10 >= FREE_LIMIT && !GET_REMAINDER(daZhou))
             {
                 daZhou = (daZhou / 10 + 1) * 10 + 1;
             }
@@ -364,7 +371,7 @@ namespace GObject
                     return;
                 ConsumeInfo ci(GenguUpForPet, 0, 0);
                 _owner->useFengsui(ggd->consume2, &ci);
-                daZhou = (daZhou / 10 + 1) * 10 + daZhou % 10;
+                daZhou = (daZhou / 10 + 1) * 10 + GET_REMAINDER(daZhou);
             }
             if(isLucky)
             {
