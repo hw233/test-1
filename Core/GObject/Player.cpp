@@ -4264,7 +4264,7 @@ namespace GObject
 		else
 			cnt = end - start;
 		Stream st(REP::FRIEND_LIST);
-		st << static_cast<UInt8>(type) << start << cnt << sz;
+		st << static_cast<UInt8>(type) << static_cast<UInt8>(GetVar(VAR_HAS_VOTE)?1:0) << start << cnt << sz;
         if (sz && cnt)
         {
             std::set<Player *>::iterator it = _friends[type].begin();
@@ -4282,6 +4282,22 @@ namespace GObject
 		send(st);
 	}
 
+    void Player::vote(Player* other)
+    {
+        if (GetVar(VAR_HAS_VOTE))
+        {
+            return;
+        }
+        SetVar(VAR_HAS_VOTE, 1);
+        GameMsgHdr hdr(0x360, other->getThreadId(), other, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+        sendMsgCode(0, 1509);
+    }
+
+    void Player::beVoted()
+    {
+        AddVar(VAR_POPULARITY, 1);
+    }
 
 	void Player::sendModification( UInt8 t, UInt32 v, bool updateToDB )
 	{

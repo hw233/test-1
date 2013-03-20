@@ -4152,6 +4152,8 @@ void OnFriendOpReq( GameMsgHdr& hdr, FriendOpReq& fr )
         player->delCFriend(pl);
         pl->delCFriend(player);
         break;
+    case 9:
+        player->vote(pl);
 	}
 }
 

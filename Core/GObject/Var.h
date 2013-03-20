@@ -375,6 +375,10 @@ namespace GObject
         //431-440 for yijian
         VAR_LONGYUAN_GOT = 431,  //龙元风髓领取标志
 
+        // 441-442 for JLT
+        VAR_HAS_VOTE = 441,     // 本周是否投票过
+        VAR_POPULARITY = 442,   // 本周人气
+
         VAR_MAX,
     };
 
@@ -708,6 +712,9 @@ namespace GObject
             REGISTER_VAR(VAR_ONLINE_TOTAL_TIME, CYCLE_DAY);
             REGISTER_VAR(VAR_ONLINE_AWARD, CYCLE_DAY);
             REGISTER_VAR(VAR_QZONE_QQGAME_ACT, CYCLE_DAY);
+
+            REGISTER_VAR(VAR_HAS_VOTE, CYCLE_WEEK);
+            REGISTER_VAR(VAR_POPULARITY, CYCLE_WEEK);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

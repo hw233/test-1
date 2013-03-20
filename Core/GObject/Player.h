@@ -1359,6 +1359,9 @@ namespace GObject
 
 		void sendFriendList(UInt8, UInt8, UInt8);
 
+        void vote(Player *other);
+        void beVoted();
+
 		void PutFighters(Battle::BattleSimulator&, int side, bool fullhp = false);
         void PutPets (Battle::BattleSimulator&, int side, bool init = true);
 

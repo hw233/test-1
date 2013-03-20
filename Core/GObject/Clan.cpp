@@ -3577,7 +3577,7 @@ void Clan::sendClanList(Player *player, UInt8 type, UInt8 start, UInt8 cnt)
     else
         cnt = end - start;
     Stream st(REP::FRIEND_LIST);
-    st << static_cast<UInt8>(type) << start << cnt << sz;
+    st << static_cast<UInt8>(type) << static_cast<UInt8>(player->GetVar(VAR_HAS_VOTE)?1:0)<< start << cnt << sz;
     if (sz && cnt)
     {
         Members::iterator it = _members.begin();
