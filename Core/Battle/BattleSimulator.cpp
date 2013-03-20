@@ -4111,7 +4111,7 @@ bool BattleSimulator::doSkillStatus2(BattleFighter* bf, const GData::SkillBase* 
     if(skill->effect->auraP || skill->effect->aura)
     {
         float rate = skill->prob * 100;
-        if(rate > _rnd(10000))
+        if(rate > _rnd(10000) || (skill->cond != GData::SKILL_ACTIVE && skill->cond != GData::SKILL_PEERLESS))
         {
             float value = bo->_aura * skill->effect->auraP + skill->effect->aura;
             if(value > 0 && bf->getSide() != target_side)
