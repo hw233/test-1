@@ -17973,21 +17973,35 @@ UInt8 Player::toQQGroup(bool isJoin)
     //仙宠免费领取(>=50级)
     void Player::getPetByLevelUp(UInt8 idx)
     {
-        if(idx > 2 || GetLev() < 50)
+        if(idx > 3 || GetLev() < 50)
             return;
         UInt32 isGet = GetVar(VAR_FAIRYPET_ISGET_PET);
-        if(isGet) return;
-        static UInt32  petId[] = { 501, 510, 507 };
-        setCanHirePet(petId[idx]);
-        UInt8 res = hireFairyPet(petId[idx]);
-        Stream st(REP::FAIRY_PET);
-        st << static_cast<UInt8>(0x04);
-        st << static_cast<UInt32>(res == 0 ? petId[idx] : 0);
-        st << Stream::eos;
-        send(st);
-        if(res)
-            delCanHirePet(petId[idx]);
-        SetVar(VAR_FAIRYPET_ISGET_PET, 1);
+        if(idx < 3)
+        {
+            if(isGet & (1 << 0))
+                return;
+            static UInt32  petId[] = { 501, 510, 507 };
+            setCanHirePet(petId[idx]);
+            UInt8 res = hireFairyPet(petId[idx]);
+            Stream st(REP::FAIRY_PET);
+            st << static_cast<UInt8>(0x04);
+            st << static_cast<UInt32>(res == 0 ? petId[idx] : 0);
+            st << Stream::eos;
+            send(st);
+            if(res)
+                delCanHirePet(petId[idx]);
+            SetVar(VAR_FAIRYPET_ISGET_PET, isGet | (1 << 0));
+        }
+        else
+        {
+            if(isGet & (1 << 1))
+                return;
+            IncommingInfo ii1(LongyuanFromUseItem, 0, 0);
+            getLongyuan(16000, &ii1);
+            IncommingInfo ii2(FengsuiFromUseItem, 0, 0);
+            getFengsui(16000, &ii2);
+            SetVar(VAR_FAIRYPET_ISGET_PET, isGet | (1 << 1));
+        }
     }
 
     //使用仙宠蛋获得蓝色仙宠

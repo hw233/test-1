@@ -716,6 +716,7 @@ namespace GObject
             if(lyd != NULL)
             {   //仙宠
                 fgt->setColor(lyd->color);
+                fgt->setPotential(GData::pet.getPetPotential(lyd->initBone), false);
                 static_cast<FairyPet *>(fgt)->setPetLingya(lyd->lingya);
                 static_cast<FairyPet *>(fgt)->setPetBone(lyd->initBone);
                 static_cast<FairyPet *>(fgt)->LoadInitSkills(dbfgt.skill);

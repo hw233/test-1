@@ -3732,6 +3732,9 @@ void GMHandler::OnFairyPetGM(GObject::Player *player, std::vector<std::string>& 
         case 3:
             player->setFairypetBattle(val);
             break;
+        case 4:
+            player->getPetByLevelUp(3);
+            break;
     }
 }
 
