@@ -17431,7 +17431,7 @@ void Player::transferExpBuffer2Var()
     if((left = getBuffLeft(PLAYER_BUFF_TRAINP3, tm)) > 0)
     {
         total += left;
-        setBuffData(PLAYER_BUFF_QI_TIAN_CHU_MO, left);
+        setBuffData(PLAYER_BUFF_QI_TIAN_CHU_MO, tm + left);
     }
     if(total > 0)
     {
