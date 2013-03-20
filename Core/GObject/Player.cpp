@@ -17093,7 +17093,7 @@ void Player::getQZoneQQGameAward(UInt8 domainType, UInt8 type)
 {
     if(domainType == 1)
     {
-        if(atoi(m_domain) != 1)
+        if(atoi(m_domain) != 1 && atoi(m_domain) != 2)
             return;
         if(type == 0 || type > 2)
             return;
@@ -17169,7 +17169,7 @@ void Player::sendQZoneQQGameAct(UInt8 domainType)
         return;
     if(domainType == 1)
     {
-        if(atoi(m_domain) != 1)
+        if(atoi(m_domain) != 1 && atoi(m_domain) != 2)
             return;
     }
     else if(domainType == 2)
