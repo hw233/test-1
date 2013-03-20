@@ -71,6 +71,7 @@ namespace GObject
         {
             FastMutex::ScopedLock lk(m_Mutex);
             log.swap(m_DCLog);
+
             unionLog.swap(m_UnionLog);
         }
         if (!log.empty())
