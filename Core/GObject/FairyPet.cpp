@@ -15,7 +15,7 @@ namespace GObject
 {
     extern URandom GRND;
 #define PROB_BASE 10000
-#define GET_REMAINDER(val)  val % 10
+#define GET_REMAINDER(val)  (val % 10)
 
     FairyPet::FairyPet(UInt32 id, Player * owner): Fighter(id, owner),
         _petLev(50), _petBone(0), _onBattle(false)
