@@ -39,6 +39,7 @@ static float enc_factor[] = {0, 0.05f, 0.10f, 0.16f, 0.23f, 0.31f, 0.40f, 0.51f,
 #define SOUL_EXP_ITEM 8000
 #define SOUL_SKILL_DEFAULT_ITEM 8565
 
+
 Fighter& getGreatFighter(UInt32 id)
 {
 	static Fighter null(0, NULL);
@@ -361,7 +362,7 @@ UInt32 Fighter::getRingId()
 	return _ring ? _ring->getId() : 0;
 }
 
-bool Fighter::addExp( UInt64 e )
+bool Fighter::addExp( UInt64 e, UInt32 extraExp )
 {
 	if(e == 0 || _level >= LEVEL_MAX)
 		return false;
@@ -386,9 +387,23 @@ bool Fighter::addExp( UInt64 e )
             GameMsgHdr hdr(0x1F0, WORKER_THREAD_WORLD, _owner, sizeof(LevelChange));
             GLOBAL().PushMsg(hdr, &data);
         }
-		SYSMSG_SENDV(100, _owner, e);
+        if(extraExp > 0)
+        {
+            SYSMSG_SENDV(6000, _owner, e, extraExp);
+        }
+        else
+        {
+            SYSMSG_SENDV(100, _owner, e);
+        }
 	}
-	SYSMSG_SENDV(1000, _owner, _color, getName().c_str(), e);
+    if(extraExp > 0)
+    {
+        SYSMSG_SENDV(6001, _owner, _color, getName().c_str(), e, extraExp);
+    }
+    else
+    {
+        SYSMSG_SENDV(1000, _owner, _color, getName().c_str(), e);
+    }
 	if(r)
 	{
 		_bPDirty = true;
@@ -415,7 +430,7 @@ bool Fighter::addExp( UInt64 e )
 	return r;
 }
 
-bool Fighter::addPExp( Int32 e, bool writedb, bool force )
+bool Fighter::addPExp( Int32 e, bool writedb, bool force, UInt32 extraPExp )
 {
     if (e < 0)
     {
@@ -440,8 +455,16 @@ bool Fighter::addPExp( Int32 e, bool writedb, bool force )
     }
     else
     {
-        SYSMSG_SENDV(2004, _owner, _color, getName().c_str(), e);
-        SYSMSG_SENDV(2005, _owner, _color, getName().c_str(), e);
+        if(extraPExp > 0)
+        {
+            SYSMSG_SENDV(6002, _owner, _color, getName().c_str(), e, extraPExp);
+            SYSMSG_SENDV(6003, _owner, _color, getName().c_str(), e, extraPExp);
+        }
+        else
+        {
+            SYSMSG_SENDV(2004, _owner, _color, getName().c_str(), e);
+            SYSMSG_SENDV(2005, _owner, _color, getName().c_str(), e);
+        }
     }
 
     if (_pexp >= 5000 && _owner)
@@ -3850,6 +3873,17 @@ UInt8 Fighter::getRpassklNum()
         }
     }
     return c;
+}
+
+
+float Fighter::getPExpNoBuf()
+{
+    return Script::BattleFormula::getCurrent()->calcPExpNoBuf(this);
+}
+
+float Fighter::getBasePExpEach()
+{
+    return Script::BattleFormula::getCurrent()->calcBasePExp(this);
 }
 
 float Fighter::getPracticeInc()
