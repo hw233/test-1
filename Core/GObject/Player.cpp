@@ -12357,6 +12357,11 @@ namespace GObject
 #endif
     }
 
+    void Player::sendPopularityRandAward(int popularity)
+    {
+        // TODO: 发送称号卡
+    }
+
     void Player::sendKillMonsterRankAward(UInt8 index, Int32 pos)
     {
         if (index > 3 || !pos || pos > 1)

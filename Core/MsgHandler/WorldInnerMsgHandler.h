@@ -900,6 +900,21 @@ void SendConsumeRank(Stream& st)
     st << Stream::eos;
 }
 
+void SendPopularitRank(Stream& st)
+{
+    using namespace GObject;
+	st.init(REP::SORT_LIST);
+    size_t c = World::popularitySort.size();
+	st << static_cast<UInt8>(7) << static_cast<UInt32>(0) << c;
+    for (RCSortType::iterator i = World::popularitySort.begin(), e = World::popularitySort.end(); i != e; ++i)
+    {
+        Player* player = i->player;
+        if (player)
+            st << player->getName() << player->getPF() << player->GetLev() << player->getCountry() << i->total << player->getClan();
+
+    }
+}
+
 void OnConsumeRank ( GameMsgHdr& hdr,  const void* data )
 {
     using namespace GObject;

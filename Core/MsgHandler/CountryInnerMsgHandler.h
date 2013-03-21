@@ -1927,5 +1927,12 @@ void OnBeVoted( GameMsgHdr &hdr, const void * data)
     player->beVoted();
 }
 
+void OnSendPopularityAward(GameMsgHdr &hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    player->sendPopularityRandAward(*(int*)data);
+}
+
 #endif // _COUNTRYINNERMSGHANDLER_H_
+
 

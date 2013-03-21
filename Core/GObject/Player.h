@@ -776,6 +776,7 @@ namespace GObject
         void sendRechargeRankAward(int pos);
         void sendConsumeRankAward(int pos);
         void sendKillMonsterRankAward(UInt8 index, Int32 pos);
+        void sendPopularityRandAward(int popularity);
         UInt32 getEventState(UInt32 type);
 
 	public:

@@ -793,6 +793,7 @@ public:
 public:
     static RCSortType rechargeSort;
     static RCSortType consumeSort;
+    static RCSortType popularitySort;
     static void initRCRank();
 
     static RCSortType killMonsterSort[4];
@@ -829,6 +830,7 @@ private:
     static void ArenaExtraActTimer(void *);
     static void ClanCopyCheck(void *);
     static void ClanStatueCheck(void *);
+    static void SendPopulatorRankAward(void*);
     //static void advancedHookTimer(void *para);
 
 public:

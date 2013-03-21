@@ -634,7 +634,7 @@ function calcLingbaoBattlePoint(lbatr)
         elseif atrType == 2 then
             bp = bp + lbatr:getValue(i) * bp_factor_magatk;
         elseif atrType == 3 then
-            bp = bp + lbatr:gejValue(i) * bp_factor_def;
+            bp = bp + lbatr:getValue(i) * bp_factor_def;
         elseif atrType == 4 then
             bp = bp + lbatr:getValue(i) * bp_factor_magdef;
         elseif atrType == 5 then

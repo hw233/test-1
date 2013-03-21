@@ -5621,7 +5621,7 @@ namespace GObject
 
     bool GObjectManager::loadDreamer()
     {
-        // TODO: 读取水晶梦境有关数据
+        // 读取水晶梦境有关数据
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading dreamer");

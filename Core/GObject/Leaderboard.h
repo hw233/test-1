@@ -122,6 +122,7 @@ public:
     std::vector<ClanCopyRankingInfoList>& getClanCopyList() {return _clanCopyInfo;};
     std::vector<ClanBattleRankingInfoList>& getClanBattleList() {return _clanBattleInfo;};
     std::vector<LingbaoInfoList>& getLingbaoList() { return _lingbaoInfoList; }
+    std::vector<RankingInfoList>* getPopularityList() { return &_popularityList; }
 
     const std::vector<LeaderboardTowndown>& getTowndown()
     {
@@ -168,7 +169,6 @@ private:
 	std::map<UInt64, UInt16> _achievementRankCountry[2];
 	std::map<UInt32, UInt16> _clanRankWorld;
 	std::map<UInt32, UInt16> _clanRankCountry[2];
-    std::map<UInt64, int> _lingbaoRank;
     std::vector<UInt64> _levelRankWorld10;  //世界等级前十名
     std::multimap<int, Player*, std::greater<int> > _battleRankWorld;
     std::multimap<UInt64, Player*, std::greater<UInt64> > _expRankWorld;
@@ -184,6 +184,7 @@ private:
     std::vector<ClanCopyRankingInfoList> _clanCopyInfo;
     std::vector<ClanBattleRankingInfoList> _clanBattleInfo;
     std::vector<LingbaoInfoList> _lingbaoInfoList;
+    std::vector<RankingInfoList> _popularityList;
 
     AtomicVal<bool> m_sorting;
 
@@ -192,6 +193,8 @@ private:
     std::map<UInt64, int> _playerClanRank;
     std::map<UInt64, int> _playerBattleRank;
     std::map<UInt64, int> _playerClanCopyRank;
+    std::map<UInt64, int> _lingbaoRank;
+    std::map<UInt64, int> _playerPopularityRank;
     FastMutex _opMutex;
 };
 

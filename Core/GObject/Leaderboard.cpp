@@ -105,29 +105,6 @@ SPECIALDEF(10)
 )
 SPECIALEND()
 
-/*
-SPECIALBEGIN(GObject::LingbaoInfoList)
-SPECIALDEF(16)
-(
-    std::string, name,
-    UInt32,  battlePoint,
-    UInt8, tongling,
-    UInt8, lbcolor,
-    UInt8, type1,
-    UInt8, type2,
-    UInt8, type3,
-    UInt8, type4,
-    UInt16, value1,
-    UInt16, value2,
-    UInt16, value3,
-    UInt16, value4,
-    UInt16, skill1,
-    UInt16, skill2,
-    UInt16, factor1,
-    UInt16, factor2,
-)
-SPECIALEND()
-*/
 }
 
 
@@ -553,6 +530,34 @@ void Leaderboard::doUpdate()
 	    buildPacketForLingbao(_lingbaoStream, 6, _id, _lingbaoInfoList);
     }
 
+    /*
+    execu->ExtractData("SELECT `player`.`id`, `player`.`name`, `fighter`.`level`, `player`.`country`, `var`.`data`, `clan`.`name` FROM "
+            "(`player` CROSS JOIN `fighter` ON `player`.`id` = `fighter`.`playerId` AND `fighter`.`id` < 10) "
+            "LEFT JOIN (`var`, `clan_player`, `clan`) ON `player`.`id` = `clan_player`.`playerId` AND `clan_player`.`id` = `clan`.`id` "
+            "where `var`.`id` =  442 AND `var`.`over` <= NOW() ORDER BY `var`.`data` DESC LIMIT 0, 100;", blist);
+    {
+        FastMutex::ScopedLock lk(_cmutex);
+        Player* curPlayer = globalPlayers[blist[c].id];
+        if(curPlayer && curPlayer->getClan())
+        {
+            curPlayer->patchMergedName(curPlayer->getClan()->getFounder(), blist[c].clan);
+        }
+        if (curPlayer == NULL)
+            continue;
+        RankingInfoList r;
+        r.id = curPlayer->getId();
+        r.name = curPlayer->getName();
+        r.country = curPlayer->getCountry();
+        r.clanName = curPlayer->getClanName();
+        r.roleLevel = curPlayer->GetLev();
+        r.value = blist[c].value;
+        _playerPopularityRank.push_back(r);
+
+        //_playerLevelRank[curPlayer->getId()] = c+1;
+    }
+    */
+   
+
 	std::vector<UInt64> ilist;
 	size_t cnt;
 
@@ -780,6 +785,7 @@ bool Leaderboard::hasUpdate( UInt32 id )
 
 bool Leaderboard::getPacket( UInt8 t, Stream*& st, Player* pl)
 {
+    // XXX: t == 7 的情况不在此处获得排行榜数据，因为是实时更新的前八名数据
     if (isSorting())
         return false;
 
@@ -810,7 +816,8 @@ bool Leaderboard::getPacket( UInt8 t, Stream*& st, Player* pl)
         break;
     case 6:
         st = &_lingbaoStream;
-        makeRankStream(st, t, pl);
+        //makeRankStream(st, t, pl);
+        break;
 	default:
 		return false;
 	}
