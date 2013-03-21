@@ -75,7 +75,7 @@ function onGetCFriendAward(player, idx)
         package:Add(v[1], v[2], v[3], false, 40)
     end  
     if CFtickets[idx] ~= nil and CFtickets[idx] ~= 0 then
-        player:AddVar(300, CFtickets[idx])
+        player:AddVar(424, CFtickets[idx])
     end
     return true 
 end
@@ -84,7 +84,7 @@ function onUseTickets(player)
     if nil == player then
         return 0
     end
-    local var = player:GetVar(300)
+    local var = player:GetVar(424)
     if var <= 0 then
         player:sendMsgCode(2, 1110, 0)
         return 0
@@ -96,7 +96,7 @@ function onUseTickets(player)
             if player:hasRealItemAward(i) then
                 player:getRealItemAward(i)
                 Broadcast(0x27, "恭喜玩家[p:"..player:getCountry()..":"..player:getPName().."]使用抽奖券抽得了10QB,真是人品大爆发啊！还在等什么？邀请好友来蜀山传奇即可获得抽奖券抽取Q币！")
-                player:SetVar(300, var - 1)
+                player:SetVar(424, var - 1)
                 player:lastCFTicketsAward(0, 10)
                 return  #items + 1
             end
@@ -120,7 +120,7 @@ function onUseTickets(player)
     else
         package:Add(items[tmp][1], items[tmp][2], true, true, 40)
     end
-    player:SetVar(300, var - 1)
+    player:SetVar(424, var - 1)
     player:lastCFTicketsAward(items[tmp][1], items[tmp][2])
     return tmp
 end

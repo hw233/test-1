@@ -81,7 +81,7 @@ function getShuoShuoAward(player, idx)
     end
     --]]
     if SStickets[idx] ~= nil and SStickets[idx] ~= 0 then
-        player:AddVar(300, SStickets[idx])
+        player:AddVar(424, SStickets[idx])
     end
     return true 
 end
