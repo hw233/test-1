@@ -976,7 +976,7 @@ namespace GObject
         UInt8 GetColor() const;
         UInt8 getPortraitAndColor() const;
 		UInt64 GetExp() const;
-		void AddExp(UInt64, UInt8 = 0);
+		void AddExp(UInt64, UInt8 mlvl = 0, UInt32 extraExp = 0);
 		void AddPExp(UInt32);
 		void AddPExpBy(Player*,UInt32);
 		void AddItemBy(Player*,UInt16,UInt16,bool);
@@ -989,6 +989,10 @@ namespace GObject
         UInt32 getBattleCurrentHp(); 
 
         bool isCopyPassed(UInt8 copyid);
+        bool inVipPrivilegeTime();
+        bool SetVipPrivilege();
+        void doVipPrivilege(UInt8 idx);
+        void sendVipPrivilege();
 
     private:
         GData::AttrExtra _hiattr;
@@ -1018,6 +1022,8 @@ namespace GObject
         UInt32 useGold4LuckDraw(UInt32 c);
         UInt32 getGold4LuckDraw();
 		bool holdGold(UInt32 c, UInt8, ConsumeInfo * ci = NULL);
+		UInt32 getGoldInLua();
+		UInt32 useGoldInLua(UInt32 c, UInt32 pt);
 
 		UInt32 getGoldOrCoupon();
 		UInt32 useGoldOrCoupon(UInt32,ConsumeInfo * ci=NULL);//return gold
@@ -2040,7 +2046,7 @@ namespace GObject
         inline void setAtoHICfg(const std::string& cfg) { m_hicfg = cfg; }
         inline const std::string& getAtoHICfg() const { return m_hicfg; }
     public:
-        static  UInt8 getMaxIcCount(UInt8 vipLevel);
+        UInt8 getMaxIcCount(UInt8 vipLevel);
     private:
         std::string m_hicfg;
 

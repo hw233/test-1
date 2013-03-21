@@ -5920,18 +5920,15 @@ namespace GObject
         if(!item)
             return 2;
 
+        const GData::ItemBaseType& ibt = item->GetItemType();
+        UInt16 subClass = ibt.subClass;
+        if((Item_LBling > subClass || Item_LBxin < subClass) && Item_Normal27 != subClass )
+            return 2;
+
         UInt8 res = 0;
         UInt16 useCnt = 0;
         for(; useCnt < cnt; ++ useCnt)
         {
-            const GData::ItemBaseType& ibt = item->GetItemType();
-            UInt16 subClass = ibt.subClass;
-            if((Item_LBling > subClass || Item_LBxin < subClass) && Item_Normal27 != subClass )
-            {
-                res = 2;
-                break;
-            }
-
             UInt32 value = 0;
             value = ibt.trumpExp;
             if(subClass >= Item_LBling && subClass <= Item_LBxin)
