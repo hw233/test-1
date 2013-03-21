@@ -380,6 +380,9 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
 
         int nVipLevel = pl->getVipLevel();
         UInt32 nCount = _maxCount + _extraCount[nVipLevel];
+        // 限时vip特权
+        if(nCount < 6 && pl->inVipPrivilegeTime())
+            nCount = 6;
 
         if (data->fighters.size() >= nCount)
         {

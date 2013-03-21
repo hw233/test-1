@@ -64,6 +64,7 @@ void DungeonLevel::getLoot( GObject::Player * player, UInt32 specialItem, UInt8 
 #else
         std::vector<LootResult> lr;
         (*it)->roll(lr);
+        bool curBind;
         for (size_t j = 0; j < lr.size(); ++j)
         {
             const ItemBaseType * ibt = itemBaseTypeManager[lr[j].id];
@@ -75,7 +76,11 @@ void DungeonLevel::getLoot( GObject::Player * player, UInt32 specialItem, UInt8 
                     lr[j].count = 1;
                     replace = false;
                     specialItem = 0;
-                    player->GetPackage()->Add(lr[j].id, lr[j].count, lr[j].bind, true, FromDungeon);//only use for weekday Saturday activity
+                    if(GDataManager::getNeedBindLevel30CFD(lr[j].id))
+                        curBind = true;
+                    else
+                        curBind = false;
+                    player->GetPackage()->Add(lr[j].id, lr[j].count, curBind || lr[j].bind, true, FromDungeon);//only use for weekday Saturday activity
                     player->_lastLoot.push_back(lr[j]);
                     lr[j].id = 0;
                 }
@@ -90,7 +95,11 @@ void DungeonLevel::getLoot( GObject::Player * player, UInt32 specialItem, UInt8 
                     continue;
                 }
             }
-            player->GetPackage()->Add(lr[j].id, lr[j].count, lr[j].bind, true, FromDungeon);
+            if(GDataManager::getNeedBindLevel30CFD(lr[j].id))
+                curBind = true;
+            else
+                curBind = false;
+            player->GetPackage()->Add(lr[j].id, lr[j].count, curBind || lr[j].bind, true, FromDungeon);
             player->_lastLoot.push_back(lr[j]);
         }
 #endif

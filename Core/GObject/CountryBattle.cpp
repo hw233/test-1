@@ -223,7 +223,7 @@ void CountryBattle::process(UInt32 curtime)
 				rotate(curtime + turns * 2, lvl, 0, pos1, achieve, 2);
 
 				UInt32 viplvl = cbd2->player->getVipLevel();
-				if(viplvl >= 4)
+				if(viplvl >= 4 || cbd1->player->inVipPrivilegeTime())
 				{
 					rotate(curtime + turns * 2, lvl, 1, pos2, loserAchieve, 1);
 					cbd2->killStreak = 0;
@@ -287,7 +287,7 @@ void CountryBattle::process(UInt32 curtime)
 				rotate(curtime + turns * 2, lvl, 1, pos2, achieve, 2);
 
 				UInt32 viplvl = cbd1->player->getVipLevel();
-				if(viplvl >= 4)
+				if(viplvl >= 4 || cbd1->player->inVipPrivilegeTime())
 				{
 					rotate(curtime + turns * 2, lvl, 0, pos1, loserAchieve, 1);
 					cbd1->killStreak = 0;

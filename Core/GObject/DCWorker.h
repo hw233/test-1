@@ -5,6 +5,7 @@
 #include "Server/WorkerThread.h"
 #include "Common/Mutex.h"
 #include "Common/AtomicVal.h"
+#include "Common/MCached.h"
 #include "dcapi_cpp.h"
 #include <curl/curl.h>
 
@@ -36,6 +37,8 @@ protected:
 
 private:
     UInt32 UnionLoggerResultParse(char* result, char* msg);
+    bool CheckOpenId(UInt64 playerId, char * openId);
+    void PushCheckOpenId();
 
 private:
     struct LogMsg
@@ -44,6 +47,7 @@ private:
         char logType;
     };
 	FastMutex m_Mutex;
+    MCached m_MCached;
 	UInt8 m_Type;
 	UInt8 m_Worker;
     AtomicVal<UInt32> m_Limit;

@@ -2698,7 +2698,7 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
                 if(!bo)  // 雪人
                     continue;
 
-                if(bo->getId() == 5679)
+                if(bo->getAura() > 99 || bo->getId() == 5679 || bo->isPet())
                 {
                     excepts[exceptCnt] = i;
                     ++ exceptCnt;
@@ -2709,8 +2709,26 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
         BattleFighter* bo = getRandomFighter(bf->getSide(), excepts, exceptCnt);
         if(NULL == bo)
         {
-            target_pos = bf->getPos();
-            target_side = bf->getSide();
+            int tidx = getSpecificTarget(bf->getSide(), BattleSimulator::isPet);
+            if (tidx > 0)
+            {
+                BattleFighter *pet = static_cast<BattleFighter *> (_objs[bf->getSide()][tidx]);
+                if (pet && pet->getAura() < 100)
+                {
+                    target_pos = pet->getPos();
+                    target_side = pet->getSide();
+                }
+                else
+                {
+                    target_pos = bf->getPos();
+                    target_side = bf->getSide();
+                }
+            }
+            else
+            {
+                target_pos = bf->getPos();
+                target_side = bf->getSide();
+            }
             cnt = 1;
         }
         else
@@ -3176,6 +3194,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             int cnt = 3;
             UInt8 excepts[25] = {0};
             size_t exceptCnt = 0;
+            bool isFirst = true;
             do
             {
                 if(bo != NULL && bo->getHP() != 0 && bo->isChar())
@@ -3195,7 +3214,8 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                     }
                 }
 
-                bo = getTherapyTarget2(bf, excepts, exceptCnt);
+                bo = getTherapyTarget2(bf, excepts, exceptCnt, isFirst);
+                isFirst = false;
 
             }while(--cnt);
         }
@@ -4734,6 +4754,16 @@ BattleFighter* BattleSimulator::getTherapyTarget(BattleFighter* bf)
     for(UInt8 i = 0; i < 25; ++ i)
     {
         BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
+        if(bo == NULL || bo->getHP() == 0 || bo->hasFlag(BattleFighter::IsMirror) || bo->isSummon() || bo->isPet())
+            continue;
+        if(bo->getHP() < (bo->getMaxHP() >> 1))
+        {
+            return bo;
+        }
+    }
+    for(UInt8 i = 0; i < 25; ++ i)
+    {
+        BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
         if(bo == NULL || bo->getHP() == 0 || bo->hasFlag(BattleFighter::IsMirror) || bo->isSummon())
             continue;
         if(bo->getHP() < (bo->getMaxHP() >> 1))
@@ -4745,7 +4775,7 @@ BattleFighter* BattleSimulator::getTherapyTarget(BattleFighter* bf)
     return NULL;
 }
 
-BattleFighter* BattleSimulator::getTherapyTarget2(BattleFighter* bf, UInt8 * excepts, size_t exceptCount)
+BattleFighter* BattleSimulator::getTherapyTarget2(BattleFighter* bf, UInt8 * excepts, size_t exceptCount, bool isFirst /* = false */)
 {
     UInt8 side = bf->getSide();
     BattleFighter* bo = NULL;
@@ -4755,7 +4785,7 @@ BattleFighter* BattleSimulator::getTherapyTarget2(BattleFighter* bf, UInt8 * exc
     for(UInt8 i = 0; i < 25; ++ i)
     {
         bo = static_cast<BattleFighter*>(getObject(side, i));
-        if(bo == NULL || bo->getHP() == 0 || bo->hasFlag(BattleFighter::IsMirror))
+        if(bo == NULL || bo->getHP() == 0 || bo->hasFlag(BattleFighter::IsMirror) || (isFirst && bo->isPet()))
             continue;
         if(bo->isSummon())
         {
@@ -11208,6 +11238,8 @@ bool BattleSimulator::tryAttackWithPet(BattleFighter* bf, float& phyAtk, float& 
     if ((tidx = getSpecificTarget(bf->getSide(), BattleSimulator::isPet)) >= 0)
     {
         BattleFighter * pet = static_cast<BattleFighter *> ((*this)(bf->getSide(), tidx));
+        if (pet == bf)
+            return false;
         if (bf->getPetAtk100Last())
             return do100AttackWithPet(bf, pet, phyAtk, magAtk, factor);
         else

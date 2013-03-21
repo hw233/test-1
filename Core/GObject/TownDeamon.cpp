@@ -394,7 +394,7 @@ void TownDeamon::cancelDeamon(Player* pl)
         quitDeamon(pl, pl);
     }
 
-    st << Stream::eos;
+    st << res << Stream::eos;
     pl->send(st);
 }
 

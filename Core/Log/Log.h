@@ -106,6 +106,7 @@ enum PurchaseType
     PinjieUpForPet              = 95, //仙宠品阶升级消耗龙元
     GenguUpForPet               = 96, //仙宠根骨升级消耗凤髓
     LongYuanAct                 = 97, //龙元结缘
+    VipPrivilege                = 98, //Vip特权
     //繁体私有占150～200
 };
 
@@ -205,6 +206,7 @@ enum ItemFrom
     //80 ~ 100，繁体占用
     FromDreamer = 39, // 水晶梦境
     FromFuling = 40, // 灵宝附灵
+    FromVipPrivilege = 41, // 限时vip 
 };
 
 enum ItemTo
