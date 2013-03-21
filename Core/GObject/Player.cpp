@@ -2087,7 +2087,8 @@ namespace GObject
 		DB1().PushUpdateData("UPDATE `player` SET `lastOnline` = %u, `nextReward` = '%u|%u|%u|%u' WHERE `id` = %"I64_FMT"u", curtime, _playerData.rewardStep, _playerData.nextRewardItem, _playerData.nextRewardCount, _playerData.nextRewardTime, _id);
         if(_isOnline && !hasFlag(Training))
         {
-            autoBattle(0, 0);
+            if(cfg.GMCheck)
+                autoBattle(0, 0);
         }
         _isOnline = false;
 
