@@ -1132,14 +1132,14 @@ void GlobalCountryBattle::sendForNewCB(Player * player)
         Stream st(REP::NEW_CAMPS_WAR_JOIN);
         st << static_cast<UInt8>(0x05) << static_cast<UInt8>(0) << static_cast<UInt16>(_startTime - curtime) << Stream::eos;
         player->send(st);
-        _NewcountryBattle->sendSelfInfo(player);
+        //_NewcountryBattle->sendSelfInfo(player);
     }
     else if(curtime >= _startTime && curtime < _endTime)
     {
         Stream st(REP::NEW_CAMPS_WAR_JOIN);
         st << static_cast<UInt8>(0x05) << static_cast<UInt8>(1) << static_cast<UInt16>(_endTime - curtime) << Stream::eos;
         player->send(st);
-        _NewcountryBattle->sendSelfInfo(player);
+        //_NewcountryBattle->sendSelfInfo(player);
     }
     else if(curtime < TimeUtil::SharpDay(0, _prepareTime))
     {
