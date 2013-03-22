@@ -62,6 +62,7 @@
 #include "GData/ClanSkillTable.h"
 #include "GData/ClanStatueTable.h"
 #include "GData/ExpTable.h"
+#include "GData/FairyPetTable.h"
 #include "Common/StringTokenizer.h"
 #include "TownDeamon.h"
 #include "ArenaBattle.h"
@@ -128,6 +129,9 @@ namespace GObject
         if (World::getICAct())
             return MaxICCount[5];
 		UInt8 maxCount = MaxICCount[vipLevel];
+        // 限时vip特权
+        if(maxCount < 16 && inVipPrivilegeTime())
+            maxCount = 16;
 		return maxCount;
 	}
 
@@ -146,6 +150,7 @@ namespace GObject
 	{
 		UInt32 now = TimeUtil::Now();
 		float exp = calcExpEach(now);
+        float factor = 1.0f;
         UInt32 tmp;
         UInt32 curHookIndex = m_Player->GetVar(VAR_EXP_HOOK_INDEX);
         if(curHookIndex == ENUM_TRAINP1)
@@ -153,7 +158,7 @@ namespace GObject
             tmp = m_Player->GetVar(VAR_TRAINP1);
             if(tmp > 0)
             {
-                exp *= 1.2f;
+                factor = 1.2f;
                 if(tmp > 60)
                     tmp -= 60;
                 else
@@ -166,7 +171,7 @@ namespace GObject
             tmp = m_Player->GetVar(VAR_TRAINP2);
             if(tmp > 0)
             {
-                exp *= 1.5f;
+                factor = 1.5f;
                 if(tmp > 60)
                     tmp -= 60;
                 else
@@ -179,7 +184,7 @@ namespace GObject
             tmp = m_Player->GetVar(VAR_TRAINP3);
             if(tmp > 0)
             {
-                exp *= 1.8f;
+                factor = 1.8f;
                 if(tmp > 60)
                     tmp -= 60;
                 else
@@ -187,13 +192,21 @@ namespace GObject
                 m_Player->SetVar(VAR_TRAINP3, tmp);
             }
         }
+
+        UInt32 extraExp = 0;
+        // 限时vip特权
+        if(m_Player->inVipPrivilegeTime())
+        {
+            factor += 0.2f;
+            extraExp = static_cast<UInt32>(exp * 0.2f);
+        }
 #if 0
 		_npcGroup->monsterKilled(m_Player);
 #endif
 		if(m_Player->isOnline())
-			m_Player->AddExp(static_cast<UInt32>(exp));
+			m_Player->AddExp(static_cast<UInt32>(exp * factor), 0, extraExp);
 		else
-			m_Player->pendExp(static_cast<UInt32>(exp));
+			m_Player->pendExp(static_cast<UInt32>(exp * factor));
 #if 0
 		_npcGroup->getLoots(m_Player);
 #else
@@ -212,9 +225,9 @@ namespace GObject
 		UInt16 cnt = static_cast<UInt16>(m_Timer.GetLeftTimes());
 
 		UInt32 vipLevel = m_Player->getVipLevel();
-        UInt8 iccnt = Player::getMaxIcCount(vipLevel) - m_Player->getIcCount();
-        if (Player::getMaxIcCount(vipLevel) < m_Player->getIcCount())
-            iccnt = Player::getMaxIcCount(vipLevel);
+        UInt8 iccnt = m_Player->getMaxIcCount(vipLevel) - m_Player->getIcCount();
+        if (m_Player->getMaxIcCount(vipLevel) < m_Player->getIcCount())
+            iccnt = m_Player->getMaxIcCount(vipLevel);
         UInt8 curType = static_cast<UInt8>(m_Player->GetVar(VAR_EXP_HOOK_INDEX));
 		if(cnt > 0)
 		{
@@ -2086,7 +2099,8 @@ namespace GObject
 		DB1().PushUpdateData("UPDATE `player` SET `lastOnline` = %u, `nextReward` = '%u|%u|%u|%u' WHERE `id` = %"I64_FMT"u", curtime, _playerData.rewardStep, _playerData.nextRewardItem, _playerData.nextRewardCount, _playerData.nextRewardTime, _id);
         if(_isOnline && !hasFlag(Training))
         {
-            autoBattle(0, 0);
+            if(cfg.GMCheck)
+                autoBattle(0, 0);
         }
         _isOnline = false;
 
@@ -3769,9 +3783,9 @@ namespace GObject
 	void Player::cancelAutoBattleNotify()
 	{
 		Stream st(REP::TASK_RESPONSE_HOOK);
-        UInt8 cnt = Player::getMaxIcCount(getVipLevel()) - getIcCount();
-        if (Player::getMaxIcCount(getVipLevel()) < getIcCount())
-            cnt = Player::getMaxIcCount(getVipLevel());
+        UInt8 cnt = getMaxIcCount(getVipLevel()) - getIcCount();
+        if (getMaxIcCount(getVipLevel()) < getIcCount())
+            cnt = getMaxIcCount(getVipLevel());
 		st << static_cast<UInt32>(0) << static_cast<UInt8>(0) << static_cast<UInt16>(0) << static_cast<UInt32>(0) << cnt << Stream::eos;
 		send(st);
 		DB3().PushUpdateData("DELETE FROM `auto_battle` WHERE `playerId` = %"I64_FMT"u", _id);
@@ -4453,6 +4467,17 @@ namespace GObject
     }
 
     UInt32 Player::getGold4LuckDraw()
+    {
+        return getGold();
+    }
+
+    UInt32 Player::useGoldInLua(UInt32 c, UInt32 pt)
+    {
+		ConsumeInfo ci(pt,0,0);
+		return useGold(c, &ci);
+    }
+
+    UInt32 Player::getGoldInLua()
     {
         return getGold();
     }
@@ -5571,7 +5596,7 @@ namespace GObject
             m_Package->AddItem(item, num, bind, true);
     }
 
-	void Player::AddExp(UInt64 exp, UInt8 mlvl)
+	void Player::AddExp(UInt64 exp, UInt8 mlvl, UInt32 extraExp)
     {
     	if(exp == 0)
 			return;
@@ -5586,6 +5611,7 @@ namespace GObject
 			if(onlineDuration >= 5 * 60 * 60)
 			{
 				exp = 0;
+                extraExp = 0;
 				SYSMSG_SENDV(184, this);
 				SYSMSG_SENDV(1084, this);
 				return;
@@ -5593,14 +5619,16 @@ namespace GObject
 			else if(onlineDuration >= 3 * 60 * 60)
 			{
 				exp /= 2;
+                extraExp /= 2;
 				SYSMSG_SENDV(181, this);
-				SYSMSG_SENDV(1081, this); }
+				SYSMSG_SENDV(1081, this);
+            }
 		}
 		for(int i = 0; i < 5; ++ i)
 		{
 			GObject::Fighter * fgt = getLineup(i).fighter;
 			if(fgt != NULL)
-				fgt->addExp(exp);
+				fgt->addExp(exp, extraExp);
 		}
         //是否开启天劫
         GObject::Tianjie::instance().isOpenTj(this);
@@ -7466,6 +7494,13 @@ namespace GObject
 			addStatus(TopupRewarded);
 		}
 
+        Stream stream(REQ::STATE);
+        stream<<static_cast<UInt8>(0x19);
+        stream<<r;
+    //    stream<<_playerData.totalRecharge;
+        stream<<Stream::eos;
+        send(stream);
+
 		sendVIPMails(oldVipLevel + 1, _vipLevel);
         addRC7DayRecharge(r);
         addRF7DayRecharge(r);
@@ -7966,9 +8001,9 @@ namespace GObject
             _playerData.clanTaskId = getClanTask();
         }
 
-        UInt8 iccnt = Player::getMaxIcCount(vipLevel) - getIcCount();
-        if (Player::getMaxIcCount(vipLevel) < getIcCount())
-            iccnt = Player::getMaxIcCount(vipLevel);
+        UInt8 iccnt = getMaxIcCount(vipLevel) - getIcCount();
+        if (getMaxIcCount(vipLevel) < getIcCount())
+            iccnt = getMaxIcCount(vipLevel);
         st << iccnt << static_cast<UInt8>(getShiMenMax() >= _playerData.smFinishCount ? getShiMenMax() - _playerData.smFinishCount : 0) << getShiMenMax() << static_cast<UInt8>(getYaMenMax() >= _playerData.ymFinishCount ? getYaMenMax() - _playerData.ymFinishCount : 0) << getYaMenMax() << static_cast<UInt8>(getClanTaskMax() > _playerData.ctFinishCount ? getClanTaskMax() - _playerData.ctFinishCount : 0);
         st << calcNextBookStoreUpdate(curtime) << calcNextTavernUpdate(curtime);
 		//bossManager.buildInfo(st);
@@ -9608,14 +9643,14 @@ namespace GObject
 
     float Player::getPracticeBufFactor()
     {
+        float factor = 0.0f;
         if(getBuffData(PLAYER_BUFF_ADVANCED_P_HOOK, TimeUtil::Now()))
         {
-            return 0.2f;
+            factor = 0.2f;
         }
-
-        if(getBuffData(PLAYER_BUFF_PRACTICE1, TimeUtil::Now()))
+        else if(getBuffData(PLAYER_BUFF_PRACTICE1, TimeUtil::Now()))
         {
-            return 0.5f;
+            factor = 0.5f;
         }
 #if 0
         if(getBuffData(PLAYER_BUFF_PRACTICE2, TimeUtil::Now()))
@@ -9623,12 +9658,16 @@ namespace GObject
             return 0.5f;
         }
 #else
-        if(getBuffData(PLAYER_BUFF_PROTECT, TimeUtil::Now()))
+        else if(getBuffData(PLAYER_BUFF_PROTECT, TimeUtil::Now()))
         {
-            return 0.2f;
+            factor = 0.2f;
         }
 #endif
-        return 0.0f;
+        // 限时vip特权
+        if(inVipPrivilegeTime())
+            factor += 0.2f;
+
+        return factor;
     }
 
     float Player::getPracticeIncByDiamond()
@@ -9771,7 +9810,11 @@ namespace GObject
                 Fighter* fgt = findFighter(pfexp->fids[i]);
                 if(fgt && pfexp->counts[i])
                 {
-                    fgt->addPExp(fgt->getPracticeInc() * pfexp->counts[i]);
+                    UInt32 extraPExp = 0;
+                    UInt32 pExp = fgt->getPracticeInc() * pfexp->counts[i];
+                    if(inVipPrivilegeTime())
+                        extraPExp = fgt->getBasePExpEach() * pfexp->counts[i] * 0.2f;
+                    fgt->addPExp(pExp, true, false, extraPExp);
                 }
             }
 
@@ -9823,7 +9866,11 @@ namespace GObject
                 Fighter* fgt = findFighter(pfexp->fids[i]);
                 if(fgt && pfexp->counts[i])
                 {
-                    fgt->addPExp(fgt->getPracticeInc() * pfexp->counts[i]);
+                    UInt32 extraPExp = 0;
+                    UInt32 pExp = fgt->getPracticeInc() * pfexp->counts[i];
+                    if(inVipPrivilegeTime())
+                        extraPExp = fgt->getBasePExpEach() * pfexp->counts[i] * 0.2f;
+                    fgt->addPExp(pExp, true, false, extraPExp);
                 }
             }
         }
@@ -12591,7 +12638,10 @@ namespace GObject
             {
                 GObject::Fighter * fgt = getLineup(i).fighter;
                 if(fgt != NULL)
-                    fgt->addPExp(pexp*fgt->getPracticeInc()*0.8f, true);
+                {
+                    UInt32 pExp = pexp*fgt->getPExpNoBuf()*0.8f;
+                    fgt->addPExp(pExp);
+                }
             }
             SetVar(VAR_OFFLINE_PEXP, 0);
         }
@@ -17906,6 +17956,14 @@ UInt8 Player::toQQGroup(bool isJoin)
         return isDel;
     }
 
+    void Player::delFairyPet(UInt32 id)
+    {
+        std::map<UInt32, FairyPet *>::iterator it = _fairyPets.find(id);
+        _fairyPets.erase(it);
+        DB2().PushUpdateData("DELETE FROM `fairyPet` WHERE id = %u AND `playerId` = %"I64_FMT"u", id, getId());
+	    DB2().PushUpdateData("DELETE FROM `fighter` WHERE `id` = %u AND `playerId` = %"I64_FMT"u", id, getId());
+    }
+
 	void Player::writeCanHiretPet()
 	{
         std::string petStr = "";
@@ -17994,6 +18052,9 @@ UInt8 Player::toQQGroup(bool isJoin)
 		FairyPet * pet2 = pet->clone(this);
 		addFairyPet(pet2, true);
         delCanHirePet(id);
+        if(pet2->getColor() > 1)
+            SYSMSG_BROADCASTV(4133, getCountry(), getName().c_str(), pet2->getColor(), pet2->getName().c_str());
+		SYSMSG_SENDV(4134, this, pet2->getColor(), pet2->getName().c_str());
         if(_fairyPets.size() == 1)  //第一个仙宠自动出战
         {
             setFairypetBattle(pet2, true);
@@ -18017,11 +18078,8 @@ UInt8 Player::toQQGroup(bool isJoin)
             if(pet->isOnBattle() || pet == _onBattlePet)
                 return 2;
             color = pet->getColor();
-            std::map<UInt32, FairyPet *>::iterator it = _fairyPets.find(id);
-            _fairyPets.erase(it);
+            delFairyPet(id);
             delete pet;
-            DB2().PushUpdateData("DELETE FROM `fairyPet` WHERE id = %u AND `playerId` = %"I64_FMT"u", id, getId());
-			DB2().PushUpdateData("DELETE FROM `fighter` WHERE `id` = %u AND `playerId` = %"I64_FMT"u", id, getId());
         }
         else
         {
@@ -18246,6 +18304,31 @@ UInt8 Player::toQQGroup(bool isJoin)
                 delCanHirePet(id);
         }
         return res;
+    }
+
+    UInt8 Player::transferPet(UInt32 petId1, UInt32 petId2)
+    {
+        FairyPet * pet1 = findFairyPet(petId1);
+        FairyPet * pet2 = findFairyPet(petId2);
+        if(!pet1 || !pet2 || pet1 == pet2)
+            return 1;
+        if(pet1->isOnBattle() || pet2->isOnBattle())
+            return 1;
+        if(pet1->getColor() > pet2->getColor())
+            return 1;
+        UInt16 lev = std::max(pet1->getPetLev(), pet2->getPetLev());
+        UInt16 bone = std::max(pet1->getPetBone(), pet2->getPetBone());
+        pet2->setPetLev(lev);
+        pet2->setPetBone(bone);
+        pet2->UpdateToDB();
+        pet2->setPotential(GData::pet.getPetPotential(bone));
+        pet2->setLevel(lev);
+        pet2->updateToDB(2, lev);
+        pet2->initSkillUp();
+
+        delFairyPet(petId1);
+        delete pet1;
+        return 0;
     }
 
     void Player::getLongyuanLua(UInt32 c)
@@ -18475,6 +18558,125 @@ UInt32 Player::getQQGameOnlineTotalTime()
             curTime = (today + 21*3600) > lastOnline ? ((today + 21*3600) - lastOnline) : 0;
     }
     return GetVar(VAR_ONLINE_TOTAL_TIME) + curTime;
+}
+
+bool Player::inVipPrivilegeTime()
+{
+    UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME);
+    UInt32 now = TimeUtil::Now();
+    bool ret = true;
+    if(validate <= now)
+    {
+        ret = false;
+    }
+
+    return ret;
+}
+
+bool Player::SetVipPrivilege()
+{
+    UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME);
+    bool ret = false;
+    if(validate == 0)
+    {
+        UInt32 now = TimeUtil::Now();
+        SetVar(VAR_VIP_PRIVILEGE_TIME, now + 168*3600);
+        ret = true;
+        ConsumeInfo ci(VipPrivilege, 0, 0);
+        useGold(100, &ci);
+    }
+
+    return ret;
+}
+
+
+#define VIP_PRIVILEGE_DAYLYAWARD(data) (0x01&data)
+#define VIP_PRIVILEGE_LIMITBUY1(data)  (0x02&data)
+#define VIP_PRIVILEGE_LIMITBUY2(data)  (0x04&data)
+#define VIP_PRIVILEGE_LIMITBUY3(data)  (0x08&data)
+
+#define SET_VIP_PRIVILEGE_DAYLYAWARD(data, v) (data|=(v&0x01))
+#define SET_VIP_PRIVILEGE_LIMITBUY1(data, v)  (data|=((v<<1)&0x02))
+#define SET_VIP_PRIVILEGE_LIMITBUY2(data, v)  (data|=((v<<2)&0x04))
+#define SET_VIP_PRIVILEGE_LIMITBUY3(data, v)  (data|=((v<<3)&0x08))
+#define SET_VIP_PRIVILEGE_OPEN(data, v)       (data|=((v<<4)&0x10))
+#define SET_VIP_PRIVILEGE_DAYTH(data, v)      (data|=((v<<5)&0xE0))
+
+void Player::doVipPrivilege(UInt8 idx)
+{
+    return;
+    UInt8 data = GetVar(VAR_VIP_PRIVILEGE_DATA);
+    switch(idx)
+    {
+    case 1:
+        if(VIP_PRIVILEGE_DAYLYAWARD(data))
+            return;
+        SET_VIP_PRIVILEGE_DAYLYAWARD(data, 1);
+        break;
+    case 2:
+        if(VIP_PRIVILEGE_LIMITBUY1(data))
+            return;
+        SET_VIP_PRIVILEGE_LIMITBUY1(data, 1);
+        break;
+    case 3:
+        if(VIP_PRIVILEGE_LIMITBUY2(data))
+            return;
+        SET_VIP_PRIVILEGE_LIMITBUY2(data, 1);
+        break;
+    case 4:
+        if(VIP_PRIVILEGE_LIMITBUY3(data))
+            return;
+        SET_VIP_PRIVILEGE_LIMITBUY3(data, 1);
+        break;
+    case 5:
+        if (getGold() < 100)
+            return;
+        SetVipPrivilege();
+        break;
+    }
+
+    if(idx > 0 && idx < 5)
+    {
+        if(inVipPrivilegeTime())
+        {
+            UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME);
+            UInt32 now = TimeUtil::Now();
+            UInt8 dayth = (TimeUtil::SharpDayT(0, now) + 168*3600 - TimeUtil::SharpDayT(0, validate))/86400 + 1;
+            if(!GameAction()->RunVipPrivilegeAward(this, idx, dayth))
+                return;
+            SetVar(VAR_VIP_PRIVILEGE_DATA, data);
+        }
+        else
+        {
+            return;
+        }
+    }
+
+
+    sendVipPrivilege();
+}
+
+void Player::sendVipPrivilege()
+{
+    UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME);
+    UInt8 data = GetVar(VAR_VIP_PRIVILEGE_DATA);
+    UInt32 now = TimeUtil::Now();
+    UInt8 dayth = (TimeUtil::SharpDayT(0, now) + 168*3600 - TimeUtil::SharpDayT(0, validate))/86400;
+    if(dayth > 7)
+        dayth = 7;
+    UInt32 timeLeft = 0;
+    if(validate > now)
+        timeLeft = validate - now;
+    if(validate != 0)
+        SET_VIP_PRIVILEGE_OPEN(data, 1);
+    else
+        SET_VIP_PRIVILEGE_OPEN(data, 0);
+
+    SET_VIP_PRIVILEGE_DAYTH(data, dayth);
+    Stream st(REP::RC7DAY);
+    st << static_cast<UInt8>(10) << timeLeft << data;
+    st << Stream::eos;
+    send(st);
 }
 
 } // namespace GObject

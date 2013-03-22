@@ -679,7 +679,8 @@ void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool in
 
                 if (!World::getAutoBattleAct() && !World::getNewYear() && !pl->isYD() && !pl->isBD() && !pl->isQQVIP())
                 {
-                    if (pl->getVipLevel() < 7)
+                    // 限时vip特权
+                    if (pl->getVipLevel() < 7 && !pl->inVipPrivilegeTime())
                         return;
                 }
 

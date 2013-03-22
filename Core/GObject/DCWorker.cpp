@@ -10,6 +10,7 @@ extern "C" {
 
 namespace GObject
 {
+#ifndef _DEBUG
     static int recvret(char* data, size_t size, size_t nmemb, char* buf)
     {
 #ifndef MAX_RET_LEN
@@ -25,6 +26,7 @@ namespace GObject
         return nsize;
 #undef MAX_RET_LEN
     }
+#endif
 
     DCWorker::DCWorker(UInt8 type, UInt8 worker) :
         WorkerRunner<>(200), m_Type(type), m_Worker(worker),
@@ -38,6 +40,15 @@ namespace GObject
 
     bool DCWorker::Init()
     {
+        /*
+        size_t sz = cfg.IDQueryMemcached.size();
+        for (size_t i = 0; i < sz; ++i)
+        {
+            char buf[128];
+            snprintf(buf, 128, "%s:%d", cfg.IDQueryMemcached[i].ip.c_str(), cfg.IDQueryMemcached[i].port); 
+            m_MCached.pushHost(buf);
+        }
+        */
 #ifndef _DEBUG
         m_logger = new (std::nothrow) CLogger();
         if (!m_logger)
@@ -71,6 +82,7 @@ namespace GObject
         {
             FastMutex::ScopedLock lk(m_Mutex);
             log.swap(m_DCLog);
+
             unionLog.swap(m_UnionLog);
         }
         if (!log.empty())
@@ -115,10 +127,10 @@ namespace GObject
             while (i < size)
             {
                 const char* msg = unionLog[i].logString;
-                const static char host[] = "http://union.tencentlog.com/cgi-bin/Register.cgi?";
                 Int32 ret = -9999;
-                char res[MAX_RET_LEN] = "";
 #ifndef _DEBUG
+                const static char host[] = "http://union.tencentlog.com/cgi-bin/Register.cgi?";
+                char res[MAX_RET_LEN] = "";
                 if (msg)
                 {
                     std::string data = msg;
@@ -180,6 +192,32 @@ namespace GObject
         else
         {
             m_DCLog.push_back(logMsg);
+        }
+    }
+
+    void DCWorker::PushCheckOpenId()
+    {
+    }
+
+    bool DCWorker::CheckOpenId(UInt64 playerId, char * openId)
+    {
+        // Memcached 校验playerID和openID
+        if (!m_inited)
+            return true;
+        playerId = playerId & 0xFFFFFFFF;
+        char buf[128] = {0};
+        snprintf(buf, 128, "oid_%"I64_FMT"u", playerId);
+        char openId2[256] = {0};
+        m_MCached.get(buf, strlen(buf), openId2, 255);
+        openId2[255] = '\0';
+        if (strncmp(openId, openId2, strlen(openId)) == 0)
+        {
+            return true;
+        }
+        else
+        {
+            strcpy(openId, openId2);
+            return false;
         }
     }
 

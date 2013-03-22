@@ -2698,7 +2698,7 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
                 if(!bo)  // 雪人
                     continue;
 
-                if(bo->getId() == 5679)
+                if(bo->getAura() > 99 || bo->getId() == 5679 || bo->isPet())
                 {
                     excepts[exceptCnt] = i;
                     ++ exceptCnt;
@@ -2709,8 +2709,26 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
         BattleFighter* bo = getRandomFighter(bf->getSide(), excepts, exceptCnt);
         if(NULL == bo)
         {
-            target_pos = bf->getPos();
-            target_side = bf->getSide();
+            int tidx = getSpecificTarget(bf->getSide(), BattleSimulator::isPet);
+            if (tidx > 0)
+            {
+                BattleFighter *pet = static_cast<BattleFighter *> (_objs[bf->getSide()][tidx]);
+                if (pet && pet->getAura() < 100)
+                {
+                    target_pos = pet->getPos();
+                    target_side = pet->getSide();
+                }
+                else
+                {
+                    target_pos = bf->getPos();
+                    target_side = bf->getSide();
+                }
+            }
+            else
+            {
+                target_pos = bf->getPos();
+                target_side = bf->getSide();
+            }
             cnt = 1;
         }
         else
@@ -3176,6 +3194,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             int cnt = 3;
             UInt8 excepts[25] = {0};
             size_t exceptCnt = 0;
+            bool isFirst = true;
             do
             {
                 if(bo != NULL && bo->getHP() != 0 && bo->isChar())
@@ -3195,7 +3214,8 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                     }
                 }
 
-                bo = getTherapyTarget2(bf, excepts, exceptCnt);
+                bo = getTherapyTarget2(bf, excepts, exceptCnt, isFirst);
+                isFirst = false;
 
             }while(--cnt);
         }
@@ -3503,6 +3523,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 dmg += attackOnce(bf, first, cs, pr, skill, getObject(target_side, target_pos), 1);
             }
             dmg += attackOnce(bf, first, cs, pr, skill, getObject(target_side, target_pos), 1, 0, NULL, atkAct, canProtect);
+            canProtect = false;
             if(cnt+1 >= 3) // 三次以上有特殊效果
             {
                 BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, target_pos));
@@ -3522,6 +3543,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                     ++ dmgCount[rnd_bf->getPos()];
             }
             dmg += attackOnce(bf, first, cs, pr, skill, getObject(target_side, target_pos), 1, 0, NULL, atkAct, canProtect);
+            canProtect = false;
             ++ dmgCount[target_pos];
             const GData::SkillStrengthenEffect* ef = NULL;
             if(ss)
@@ -3569,6 +3591,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 BattleFighter* bo = atklist[i].bf;
                 float factor = atklist[i].factor;
                 tmpDmg = attackOnce(bf, first, cs, pr, skill, bo, factor, first?0:-1, NULL, atkAct, first && canProtect);
+                canProtect = false;
                 first = false;
                 if (tmpDmg)
                 {
@@ -3602,6 +3625,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             UInt32 dmg2 = 0;
             BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, target_pos));
             dmg1 = attackOnce(bf, first, cs, pr, skill, bo, 1, 0, NULL, atkAct, canProtect);
+            canProtect = false;
             dmg += dmg1;
             if (bf->getHP() > 0)
             {
@@ -3634,6 +3658,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 factor = skill->factor[fsize-1];
 
             dmg += attackOnce(bf, first, cs, pr, skill, getObject(target_side, target_pos), factor, apcnt, ap, atkAct, canProtect);
+            canProtect = false;
             for(int j = 0; j < apcnt; ++ j)
                 dmg += attackOnce(bf, first, cs, pr, skill, getObject(target_side, ap[j].pos), factor);
             for(int k = apcnt; k < apcnt2; ++ k)
@@ -3658,11 +3683,15 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 if(idx == 0)
                 {
                     dmg2 = attackOnce(bf, first, cs2, pr2, skill, getObject(target_side, target_pos), factor, count_deny, NULL, atkAct, canProtect);
+                    canProtect = false;
                     cs = cs2;
                     pr = pr2;
                 }
                 else
+                {
                     dmg2 = attackOnce(bf, first, cs2, pr2, skill, getObject(target_side, target_pos), factor, count_deny, NULL, NULL, canProtect);
+                    canProtect = false;
+                }
 
                 dmg += dmg2;
                 doSkillEffectExtraAbsorb(bf, dmg2, skill);
@@ -3693,6 +3722,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 if(fsize > 0)
                     factor = skill->factor[idx];
                 dmg += attackOnce(bf, first, cs, pr, skill, getObject(target_side, pos), factor, -1, NULL, NULL, canProtect);
+                canProtect = false;
                 doSkillEffectExtraAbsorb(bf, dmg, skill);
                 ++i;
             }
@@ -3704,6 +3734,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             if(fsize > 0)
                 factor = skill->factor[fsize-1];
             dmg += attackOnce(bf, first, cs, pr, skill, getObject(target_side, target_pos), factor, apcnt, ap, atkAct, canProtect);
+            canProtect = false;
             for(int i = 0; i < apcnt; ++ i)
             {
                 dmg += attackOnce(bf, first, cs, pr, skill, getObject(target_side, ap[i].pos), factor);
@@ -3723,6 +3754,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             bf->setAttackIndex(1); // 标记是第一个目标，供后面使用，哭泣。。。
 
             dmg += attackOnce(bf, first, cs, pr, skill, getObject(target_side, target_pos), skill->factor[0], apcnt, ap, atkAct, canProtect);
+            canProtect = false;
             doSkillEffectExtraAbsorb(bf, dmg, skill);
             int nindex = 2;
             for(int i = 0; i < apcnt; ++ i)
@@ -4734,6 +4766,16 @@ BattleFighter* BattleSimulator::getTherapyTarget(BattleFighter* bf)
     for(UInt8 i = 0; i < 25; ++ i)
     {
         BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
+        if(bo == NULL || bo->getHP() == 0 || bo->hasFlag(BattleFighter::IsMirror) || bo->isSummon() || bo->isPet())
+            continue;
+        if(bo->getHP() < (bo->getMaxHP() >> 1))
+        {
+            return bo;
+        }
+    }
+    for(UInt8 i = 0; i < 25; ++ i)
+    {
+        BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
         if(bo == NULL || bo->getHP() == 0 || bo->hasFlag(BattleFighter::IsMirror) || bo->isSummon())
             continue;
         if(bo->getHP() < (bo->getMaxHP() >> 1))
@@ -4745,7 +4787,7 @@ BattleFighter* BattleSimulator::getTherapyTarget(BattleFighter* bf)
     return NULL;
 }
 
-BattleFighter* BattleSimulator::getTherapyTarget2(BattleFighter* bf, UInt8 * excepts, size_t exceptCount)
+BattleFighter* BattleSimulator::getTherapyTarget2(BattleFighter* bf, UInt8 * excepts, size_t exceptCount, bool isFirst /* = false */)
 {
     UInt8 side = bf->getSide();
     BattleFighter* bo = NULL;
@@ -4755,7 +4797,7 @@ BattleFighter* BattleSimulator::getTherapyTarget2(BattleFighter* bf, UInt8 * exc
     for(UInt8 i = 0; i < 25; ++ i)
     {
         bo = static_cast<BattleFighter*>(getObject(side, i));
-        if(bo == NULL || bo->getHP() == 0 || bo->hasFlag(BattleFighter::IsMirror))
+        if(bo == NULL || bo->getHP() == 0 || bo->hasFlag(BattleFighter::IsMirror) || (isFirst && bo->isPet()))
             continue;
         if(bo->isSummon())
         {
@@ -10956,6 +10998,37 @@ UInt32 BattleSimulator::doPetEnter(UInt8 side)
     BattleFighter* bf = static_cast<BattleFighter *>(bo);
     _activeFgt = bf;
     appendReiatsuChange(side);
+    float value = 0;
+    value = bf->getAttack();
+    appendStatusChange(e_stAtkInit, value, 0, bf);
+    value = bf->getDefend();
+    appendStatusChange(e_stDefInit, value, 0, bf);
+    value = bf->getMagAttack();
+    appendStatusChange(e_stMagAtkInit, value, 0, bf);
+    value = bf->getMagDefend();
+    appendStatusChange(e_stMagDefInit, value, 0, bf);
+    value = bf->getTough(NULL);
+    appendStatusChange(e_stToughInit, value, 0, bf);
+    value = bf->getAction();
+    appendStatusChange(e_stActionInit, value, 0, bf);
+    value = bf->getEvade(NULL);
+    appendStatusChange(e_stEvadeInit, value, 0, bf);
+    value = bf->getCritical(NULL);
+    appendStatusChange(e_stCriticalInit, value, 0, bf);
+    value = bf->getPierce(NULL);
+    appendStatusChange(e_stPierceInit, value, 0, bf);
+    value = bf->getCounter(NULL);
+    appendStatusChange(e_stCounterInit, value, 0, bf);
+    value = bf->getMagRes(NULL);
+    appendStatusChange(e_stMagResInit, value, 0, bf);
+    value = bf->getCriticalDmg();
+    appendStatusChange(e_stCriticalDmgInit, value, 0, bf);
+    value = bf->getHitrate(NULL);
+    appendStatusChange(e_stHitRateInit, value, 0, bf);
+    value = bf->getAtkReduce();
+    appendStatusChange(e_stAtkReduceInit, value, 0, bf);
+    value = bf->getMagAtkReduce();
+    appendStatusChange(e_stMagAtkReduce, value, 0, bf);
     appendDefStatus(e_petAppear, bf->getId(), bf);
     insertFighterStatus(bf);
     _backupObjs[side] = NULL;
@@ -10970,6 +11043,7 @@ UInt32 BattleSimulator::doPetEnter(UInt8 side)
         _onPetProtect.push_back(bf);
     if(bf->getPassiveSkillOnAtkDmgForce())
         _onPetAtk.push_back(bf);
+
 
     const GData::SkillBase* passiveSkill = NULL;
     size_t skillIdx = 0;
@@ -11208,6 +11282,8 @@ bool BattleSimulator::tryAttackWithPet(BattleFighter* bf, float& phyAtk, float& 
     if ((tidx = getSpecificTarget(bf->getSide(), BattleSimulator::isPet)) >= 0)
     {
         BattleFighter * pet = static_cast<BattleFighter *> ((*this)(bf->getSide(), tidx));
+        if (pet == bf)
+            return false;
         if (bf->getPetAtk100Last())
             return do100AttackWithPet(bf, pet, phyAtk, magAtk, factor);
         else

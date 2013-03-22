@@ -115,6 +115,8 @@ public:
 
 	float calcDamage(float, float, float, float, float);
     float calcPracticeInc(GObject::Fighter *);
+    float calcBasePExp(GObject::Fighter *);
+    float calcPExpNoBuf(GObject::Fighter *);
     float calcClanTechAddon(UInt16 id, UInt8 lvl);
 	lua_tinker::table getFactor(UInt8, UInt8, UInt8);
     UInt32 calcTaskAward(UInt8, UInt8, UInt8);

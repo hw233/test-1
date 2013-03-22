@@ -454,8 +454,8 @@ public:
 	UInt32 getMaxHP();
 
 	UInt32 regenHP(UInt32);
-	bool addExp(UInt64);
-	bool addPExp(Int32, bool = true, bool = false);
+	bool addExp(UInt64, UInt32 = 0);
+	bool addPExp(Int32, bool = true, bool = false, UInt32 = 0);
 
 	void sendModification(UInt8 t, UInt64 v);
 	void sendMaxSoul();
@@ -691,6 +691,8 @@ public:
     float getPracticeIncByQQVip();
     float getClanTechAddon(int place);
     float getPracticeInc();
+    float getBasePExpEach();
+    float getPExpNoBuf();
     // TODO:
     UInt16 getPracticePlace();
     bool isGoldPractice() { return false; }
