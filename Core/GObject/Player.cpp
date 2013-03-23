@@ -2080,7 +2080,7 @@ namespace GObject
 		{
 			_onlineDuration = _onlineDuration + curtime - _playerData.lastOnline;
 		}
-
+        setQQGameOnlineTotalTime();
         int addr = inet_addr(m_clientIp);
 		DBLOG1().PushUpdateData("update login_states set logout_time=%u where server_id=%u and player_id=%"I64_FMT"u and login_time=%u", curtime, addr?addr:cfg.serverLogId, _id, _playerData.lastOnline);
 		DB1().PushUpdateData("UPDATE `player` SET `lastOnline` = %u, `nextReward` = '%u|%u|%u|%u' WHERE `id` = %"I64_FMT"u", curtime, _playerData.rewardStep, _playerData.nextRewardItem, _playerData.nextRewardCount, _playerData.nextRewardTime, _id);
@@ -17641,5 +17641,72 @@ UInt8 Player::toQQGroup(bool isJoin)
     return 0;
 }
 
+void Player::getQQGameOnlineAward()
+{
+    if(!World::getQQGameOnlineAwardAct())
+        return;
+    if(atoi(getDomain()) != 10)
+        return;
+    if(GetVar(VAR_ONLINE_AWARD) > 0)
+        return;
+    if(GetVar(VAR_ONLINE_TOTAL_TIME) < 3600)
+        return;
+    if (GetPackage()->GetRestPackageSize() < 4)
+    {
+        sendMsgCode(0, 1011);
+        return;
+    }
+    SetVar(VAR_ONLINE_AWARD, 1);
+    GetPackage()->Add(134, 1, true, false);
+    GetPackage()->Add(1325, 1, true, false);
+    GetPackage()->Add(15, 1, true, false);
+    GetPackage()->Add(500, 1, true, false);
+    sendQQGameOnlineAward();
+}
+
+void Player::sendQQGameOnlineAward()
+{
+    if(!World::getQQGameOnlineAwardAct())
+        return;
+    if(atoi(getDomain()) != 10)
+        return;
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(0x0B);
+    st << static_cast<UInt8>(GetVar(VAR_ONLINE_AWARD));
+    st << static_cast<UInt16>(getQQGameOnlineTotalTime());
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::setQQGameOnlineTotalTime()
+{
+    if(!World::getQQGameOnlineAwardAct())
+        return;
+    if(atoi(getDomain()) != 10)
+        return;
+    SetVar(VAR_ONLINE_TOTAL_TIME, getQQGameOnlineTotalTime());
+}
+
+UInt32 Player::getQQGameOnlineTotalTime()
+{
+    UInt32 now = TimeUtil::Now();
+    UInt32 today = TimeUtil::SharpDayT( 0 , now);
+    UInt32 lastOnline = _playerData.lastOnline;
+    UInt32 curTime;
+    if(lastOnline <= today + 19*3600 || lastOnline >= today + 21*3600)
+        curTime = 0;
+    else
+    {
+       if(now < lastOnline)
+           curTime = 0;
+       else if(now < today + 21*3600)
+           curTime = now - lastOnline;
+       else
+           curTime = today + 21*3600 - lastOnline;
+    }
+    return GetVar(VAR_ONLINE_TOTAL_TIME) + curTime;
+}
+
 } // namespace GObject
+
 

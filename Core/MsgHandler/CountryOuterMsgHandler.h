@@ -1908,6 +1908,17 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
         }
         break;
 
+        case 0x0B:
+        {
+            UInt8 type;
+            br >> type;
+            if(type == 0)
+                player->sendQQGameOnlineAward();
+            else if(type == 1)
+                player->getQQGameOnlineAward();
+        }
+        break;
+
         case 10:
         {
             UInt8 type;

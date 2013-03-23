@@ -365,6 +365,8 @@ namespace GObject
         VAR_TRAINP1 = 405,
         VAR_TRAINP2 = 406,
         VAR_TRAINP3 = 407,
+        VAR_ONLINE_TOTAL_TIME = 408, //累计在线时间
+        VAR_ONLINE_AWARD = 409, //累计在线奖励是否领取
 
         //421-430 for suntao
         VAR_HUNYUAN_STEP = 421, //大闹龙宫之混元剑诀
@@ -694,6 +696,8 @@ namespace GObject
             REGISTER_VAR(VAR_TRAINP1, CYCLE_NONE);
             REGISTER_VAR(VAR_TRAINP2, CYCLE_NONE);
             REGISTER_VAR(VAR_TRAINP3, CYCLE_NONE);
+            REGISTER_VAR(VAR_ONLINE_TOTAL_TIME, CYCLE_DAY);
+            REGISTER_VAR(VAR_ONLINE_AWARD, CYCLE_DAY);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

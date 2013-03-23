@@ -514,6 +514,11 @@ public:
     inline static bool getWeiboAct()
     { return _weiboact; }
 
+    inline static void setQQGameOnlineAwardAct(bool v)
+    { _qqgameonlineawardact = v; }
+    inline static bool getQQGameOnlineAwardAct()
+    { return _qqgameonlineawardact; }
+
     inline static void setArenaHeroId(UInt8 pos, UInt8 heroId)
     {
         if(pos < 5 && stArena.heroId[pos] != heroId)
@@ -759,6 +764,7 @@ public:
     static bool _bluediamonSuperman;
     static bool _tgcevent;
     static bool _weiboact;
+    static bool _qqgameonlineawardact;
     static stArenaExtra stArenaOld[2];
     static stArenaExtra stArena;
     static bool _compassact;
