@@ -9738,6 +9738,7 @@ void BattleSimulator::doSkillEffectExtra_MarkPet(BattleFighter* bf, int target_s
         return;
     BattleFighter* bf2 = static_cast<BattleFighter*>(bo);
     bf2->setPetMark(true);
+    appendDefStatus(e_petMark, 0, bf2);
 }
 
 void BattleSimulator::doSkillEffectExtra_AtkPetMarkAura(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
@@ -9779,6 +9780,7 @@ void BattleSimulator::doSkillEffectExtra_ProtectPet100(BattleFighter* bf, int ta
         return;
     BattleFighter * area_target = static_cast<BattleFighter *>(bo);
     area_target->setPetProtect100(skill->effect->efv[eftIdx], skill->effect->efl[eftIdx]);
+    appendDefStatus(e_petProtect100, 0, area_target);
 }
 
 void BattleSimulator::doSkillEffectExtra_PetAtk100(BattleFighter* bf,  int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
@@ -9789,6 +9791,7 @@ void BattleSimulator::doSkillEffectExtra_PetAtk100(BattleFighter* bf,  int targe
         return;
     BattleFighter * area_target = static_cast<BattleFighter *>(bo);
     area_target->setPetAtk100(skill->effect->efv[eftIdx], skill->effect->efl[eftIdx]);
+    appendDefStatus(e_petAtk100, 0, area_target);
 }
 
 void BattleSimulator::doSkillEffectExtraAbsorb(BattleFighter* bf, UInt32 dmg, const GData::SkillBase* skill)
@@ -10960,6 +10963,7 @@ bool BattleSimulator::do100ProtectDamage(BattleFighter* bf, BattleFighter* pet, 
 {
     // 宠物100%保护主目标吸收一半伤害
     bf->setPetProtect100(false, 0);
+    appendDefStatus(e_unPetProtect100, 0, bf);
     return protectDamage(bf, pet, phyAtk, magAtk, factor);
 }
 
@@ -11118,6 +11122,7 @@ bool BattleSimulator::do100AttackWithPet(BattleFighter* bf, BattleFighter* pet, 
 {
     // 宠物100%合击
     bf->setPetAtk100(false, 0);
+    appendDefStatus(e_unPetAtk100, 0, bf);
     return attackWithPet(bf, pet, phyAtk, magAtk, factor);
 }
 

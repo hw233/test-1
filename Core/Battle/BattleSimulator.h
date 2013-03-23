@@ -272,6 +272,12 @@ private:
         e_selfBleed = 76,       // 自己流血 （自焚）
         e_unSelfBleed = 77,     // 自己流血结束 （自焚烧完了）
         e_petAppear = 78,
+        e_petMark = 79,         // 神兽印记
+        e_unPetMark = 80,         // 神兽印记
+        e_petAtk100 = 81,       // 100%合击标志
+        e_unPetAtk100 = 82,       // 100%合击标志
+        e_petProtect100 = 83,   // 100%援护标志
+        e_unPetProtect100 = 84,   // 100%援护标志
 
         e_MAX_STATE,
     };
