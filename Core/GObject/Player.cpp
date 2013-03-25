@@ -18548,6 +18548,7 @@ bool Player::SetVipPrivilege()
 #define VIP_PRIVILEGE_LIMITBUY1(data)  (0x02&data)
 #define VIP_PRIVILEGE_LIMITBUY2(data)  (0x04&data)
 #define VIP_PRIVILEGE_LIMITBUY3(data)  (0x08&data)
+#define VIP_PRIVILEGE_TIMEOUT(data)  (0x0100&data)
 
 #define SET_VIP_PRIVILEGE_DAYLYAWARD(data, v) (data|=(v&0x01))
 #define SET_VIP_PRIVILEGE_LIMITBUY1(data, v)  (data|=((v<<1)&0x02))
@@ -18555,11 +18556,11 @@ bool Player::SetVipPrivilege()
 #define SET_VIP_PRIVILEGE_LIMITBUY3(data, v)  (data|=((v<<3)&0x08))
 #define SET_VIP_PRIVILEGE_OPEN(data, v)       (data|=((v<<4)&0x10))
 #define SET_VIP_PRIVILEGE_DAYTH(data, v)      (data|=((v<<5)&0xE0))
+#define SET_VIP_PRIVILEGE_TIMEOUT(data, v)    (data|=((v<<8)&0x0100))
 
 void Player::doVipPrivilege(UInt8 idx)
 {
-    return;
-    UInt8 data = GetVar(VAR_VIP_PRIVILEGE_DATA);
+    UInt32 data = GetVar(VAR_VIP_PRIVILEGE_DATA);
     switch(idx)
     {
     case 1:
@@ -18583,6 +18584,9 @@ void Player::doVipPrivilege(UInt8 idx)
         SET_VIP_PRIVILEGE_LIMITBUY3(data, 1);
         break;
     case 5:
+        if(!in7DayFromCreated())
+            return;
+
         if (getGold() < 100)
             return;
         SetVipPrivilege();
@@ -18613,24 +18617,55 @@ void Player::doVipPrivilege(UInt8 idx)
 void Player::sendVipPrivilege()
 {
     UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME);
-    UInt8 data = GetVar(VAR_VIP_PRIVILEGE_DATA);
+    UInt32 data = GetVar(VAR_VIP_PRIVILEGE_DATA);
     UInt32 now = TimeUtil::Now();
     UInt8 dayth = (TimeUtil::SharpDayT(0, now) + 168*3600 - TimeUtil::SharpDayT(0, validate))/86400;
     if(dayth > 7)
         dayth = 7;
     UInt32 timeLeft = 0;
+    UInt8 timeOut = 0;
     if(validate > now)
         timeLeft = validate - now;
     if(validate != 0)
+    {
         SET_VIP_PRIVILEGE_OPEN(data, 1);
+        if(timeLeft == 0 && VIP_PRIVILEGE_TIMEOUT(data) == 0)
+        {
+            SET_VIP_PRIVILEGE_TIMEOUT(data, 1);
+            timeOut = 1;
+            SetVar(VAR_VIP_PRIVILEGE_DATA, data);
+        }
+    }
     else
+    {
         SET_VIP_PRIVILEGE_OPEN(data, 0);
+    }
 
     SET_VIP_PRIVILEGE_DAYTH(data, dayth);
     Stream st(REP::RC7DAY);
-    st << static_cast<UInt8>(10) << timeLeft << data;
+    st << static_cast<UInt8>(10) << timeLeft << static_cast<UInt8>(data) << timeOut;
     st << Stream::eos;
     send(st);
+}
+
+bool Player::in7DayFromCreated()
+{
+    UInt32 now = TimeUtil::Now();
+    UInt32 now_sharp = TimeUtil::SharpDay(0, now);
+    UInt32 created_sharp = TimeUtil::SharpDay(0, getCreated());
+    if (created_sharp > now_sharp)
+        return false; // 创建时间错误（穿越了）
+
+    if (now_sharp - created_sharp > 7 * 24*60*60)
+        return false; // 玩家注册时间超过7日，无法参与活动
+
+#define CREATE_OFFSET(c, n) (((n) - (c)) / (24*60*60))
+    UInt32 off = CREATE_OFFSET(created_sharp, now_sharp);
+#undef CREATE_OFFSET
+    if (off >= 7)
+        return false; // 玩家注册时间超过7日，无法参与活动
+
+    return true;
 }
 
 } // namespace GObject
