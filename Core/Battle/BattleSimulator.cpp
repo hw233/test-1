@@ -577,7 +577,7 @@ void BattleSimulator::start(UInt8 prevWin, bool checkEnh)
         }
         
 #endif
-        if (oldAttackRount != _attackRound)
+        if (oldAttackRount != _attackRound && _winner == 0)
         {
             oldAttackRount = _attackRound;
             act_count += tryPetEnter(0, e_reiatsu_round);
@@ -720,6 +720,8 @@ void BattleSimulator::insertFighterStatus2Current( BattleFighter* bf )
         }
     }
     cur_fgtlist.insert(cur_fgtlist.end(), bf);
+    if(_winner != 0)
+        _winner = testWinner();
 }
 void BattleSimulator::insertFighterStatus( BattleFighter* bf )
 {
@@ -738,6 +740,8 @@ void BattleSimulator::insertFighterStatus( BattleFighter* bf )
         }
     }
     next_fgtlist.insert(next_fgtlist.end(), bf);
+    if(_winner != 0)
+        _winner = testWinner();
 }
 
 void BattleSimulator::removeFighterStatus( BattleFighter* bf )
@@ -2715,7 +2719,7 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
             int tidx = getSpecificTarget(bf->getSide(), BattleSimulator::isPet);
             if (tidx > 0)
             {
-                BattleFighter *pet = static_cast<BattleFighter *> (_objs[bf->getSide()][tidx]);
+                BattleFighter *pet = static_cast<BattleFighter *> (getObject(bf->getSide(), tidx));
                 if (pet && pet->getAura() < 100)
                 {
                     target_pos = pet->getPos();
@@ -9632,12 +9636,6 @@ void BattleSimulator::doSkillEffectExtra_HideSummon(BattleFighter* bf, int targe
     setObject(side, pos, newf);
     insertFighterStatus2Current(newf);
 
-    {
-        appendDefStatus(e_Summon, newf->getPortrait(), newf);
-        UInt32 value = static_cast<UInt32>(newf->getAura());
-        appendStatusChange(e_stAura, value, 0, newf);
-    }
-
     GData::SkillStrengthenBase* ss = bf->getSkillStrengthen(SKILL_ID(skill->getId()));
     const GData::SkillStrengthenEffect* ef = NULL;
     if(ss)
@@ -9645,6 +9643,13 @@ void BattleSimulator::doSkillEffectExtra_HideSummon(BattleFighter* bf, int targe
     if(ef)
     {
         newf->setUnSummonAura(bf, ef->value);
+    }
+
+    {
+        appendDefStatus(e_Summon, newf->getPortrait(), newf);
+        UInt32 value = static_cast<UInt32>(newf->getAura());
+        appendStatusChange(e_stAura, value, 0, newf);
+        appendInitDefStatus(newf);
     }
 }
 
@@ -10989,7 +10994,7 @@ UInt32 BattleSimulator::doPetEnter(UInt8 side)
 
     UInt32 rcnt = 0;
 
-    BattleObject * bo = _objs[side][pos];
+    BattleObject * bo = getObject(side, pos);
     if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
     {
         _backupObjs[side] = NULL;
@@ -11001,38 +11006,7 @@ UInt32 BattleSimulator::doPetEnter(UInt8 side)
     BattleFighter* bf = static_cast<BattleFighter *>(bo);
     _activeFgt = bf;
     appendReiatsuChange(side);
-    float value = 0;
-    value = bf->getAttack();
-    appendStatusChange(e_stAtkInit, value, 0, bf);
-    value = bf->getDefend();
-    appendStatusChange(e_stDefInit, value, 0, bf);
-    value = bf->getMagAttack();
-    appendStatusChange(e_stMagAtkInit, value, 0, bf);
-    value = bf->getMagDefend();
-    appendStatusChange(e_stMagDefInit, value, 0, bf);
-    value = bf->getTough(NULL);
-    appendStatusChange(e_stToughInit, value, 0, bf);
-    value = bf->getAction();
-    appendStatusChange(e_stActionInit, value, 0, bf);
-    value = bf->getEvade(NULL);
-    appendStatusChange(e_stEvadeInit, value, 0, bf);
-    value = bf->getCritical(NULL);
-    appendStatusChange(e_stCriticalInit, value, 0, bf);
-    value = bf->getPierce(NULL);
-    appendStatusChange(e_stPierceInit, value, 0, bf);
-    value = bf->getCounter(NULL);
-    appendStatusChange(e_stCounterInit, value, 0, bf);
-    value = bf->getMagRes(NULL);
-    appendStatusChange(e_stMagResInit, value, 0, bf);
-    value = bf->getCriticalDmg();
-    appendStatusChange(e_stCriticalDmgInit, value, 0, bf);
-    value = bf->getHitrate(NULL);
-    appendStatusChange(e_stHitRateInit, value, 0, bf);
-    value = bf->getAtkReduce();
-    appendStatusChange(e_stAtkReduceInit, value, 0, bf);
-    value = bf->getMagAtkReduce();
-    appendStatusChange(e_stMagAtkReduce, value, 0, bf);
-    appendDefStatus(e_petAppear, bf->getId(), bf);
+    appendInitDefStatus(bf);
     insertFighterStatus(bf);
     _backupObjs[side] = NULL;
 
@@ -11079,7 +11053,7 @@ bool BattleSimulator::tryProtectDamage(BattleFighter* bf, float& phyAtk, float& 
     int tidx = -1;
     if ((tidx = getSpecificTarget(bf->getSide(), BattleSimulator::isPet)) >= 0)
     {
-        BattleFighter * pet = static_cast<BattleFighter *> (_objs[bf->getSide()][tidx]);
+        BattleFighter * pet = static_cast<BattleFighter *> (getObject(bf->getSide(), tidx));
         if (!pet)
             return false;
         if (pet == bf)
@@ -11378,6 +11352,42 @@ UInt32 BattleSimulator::upPetObject(UInt8 side, bool isReplace /* = true */)
     setObject(side, pos, _backupObjs[side]);
 
     return pos;
+}
+
+void BattleSimulator::appendInitDefStatus(BattleFighter* bf)
+{
+    float value = 0;
+    value = bf->getAttack();
+    appendStatusChange(e_stAtkInit, value, 0, bf);
+    value = bf->getDefend();
+    appendStatusChange(e_stDefInit, value, 0, bf);
+    value = bf->getMagAttack();
+    appendStatusChange(e_stMagAtkInit, value, 0, bf);
+    value = bf->getMagDefend();
+    appendStatusChange(e_stMagDefInit, value, 0, bf);
+    value = bf->getTough(NULL);
+    appendStatusChange(e_stToughInit, value, 0, bf);
+    value = bf->getAction();
+    appendStatusChange(e_stActionInit, value, 0, bf);
+    value = bf->getEvade(NULL);
+    appendStatusChange(e_stEvadeInit, value, 0, bf);
+    value = bf->getCritical(NULL);
+    appendStatusChange(e_stCriticalInit, value, 0, bf);
+    value = bf->getPierce(NULL);
+    appendStatusChange(e_stPierceInit, value, 0, bf);
+    value = bf->getCounter(NULL);
+    appendStatusChange(e_stCounterInit, value, 0, bf);
+    value = bf->getMagRes(NULL);
+    appendStatusChange(e_stMagResInit, value, 0, bf);
+    value = bf->getCriticalDmg();
+    appendStatusChange(e_stCriticalDmgInit, value, 0, bf);
+    value = bf->getHitrate(NULL);
+    appendStatusChange(e_stHitRateInit, value, 0, bf);
+    value = bf->getAtkReduce();
+    appendStatusChange(e_stAtkReduceInit, value, 0, bf);
+    value = bf->getMagAtkReduce();
+    appendStatusChange(e_stMagAtkReduce, value, 0, bf);
+    appendDefStatus(e_petAppear, bf->getId(), bf);
 }
 
 }
