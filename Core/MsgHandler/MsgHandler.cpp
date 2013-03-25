@@ -37,7 +37,7 @@ bool MsgHandler::ProcessMsg()
 	{
 		hdr = msgQueue.Pop();
 		assert( hdr->cmdID < MAX_MSG_NUM );
-        if(hdr->cmdID <= 0xFF) // outer msg
+        if(hdr->cmdID <= 0xFF && hdr->desWorkerID <= WORKER_THREAD_NEUTRAL) // outer msg
         {
 			GameMsgHdr * ihdr = reinterpret_cast<GameMsgHdr *>(hdr);
             if(ihdr->player != NULL)

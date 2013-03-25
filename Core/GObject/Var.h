@@ -347,10 +347,10 @@ namespace GObject
         VAR_SAVEGOLD_SET_TIME = 364,    //金蛇献瑞,聚福兆祥活动中玩家设置的结算时间
         VAR_SAVEGOLD_GET_STATUS = 365,    //金蛇献瑞,聚福兆祥活动中玩家领取自己仙石的状态,低10位
         VAR_SAVEGOLD_ISGET = 366,   //金蛇献瑞,聚福兆祥活动中玩家当日是否领取
-        VAR_DRAGONKINGSNAKE_STEP = 367,      //大闹龙宫之金蛇起舞当前移动到的格子
-        VAR_DRAGONKINGSNAKE_STEP4_COUNT = 368, //大闹龙宫之金蛇起舞从第4格移动到第5失败的次数
-        VAR_TIANMANG_STEP = 369,      //大闹龙宫之天芒神梭当前移动到的格子
-        VAR_TIANMANG_STEP4_COUNT = 370, //大闹龙宫之天芒神梭从第4格移动到第5失败的次数
+        //VAR_DRAGONKINGSNAKE_STEP = 367,      //大闹龙宫之金蛇起舞当前移动到的格子
+        //VAR_DRAGONKINGSNAKE_STEP4_COUNT = 368, //大闹龙宫之金蛇起舞从第4格移动到第5失败的次数
+        //VAR_TIANMANG_STEP = 369,      //大闹龙宫之天芒神梭当前移动到的格子
+        //VAR_TIANMANG_STEP4_COUNT = 370, //大闹龙宫之天芒神梭从第4格移动到第5失败的次数
         
         VAR_CALLSNAKEEGG = 371,         //拜金蛇
         VAR_SNAKEEGG_AWARD=372,         //领蛇蛋
@@ -373,8 +373,8 @@ namespace GObject
         VAR_QZONE_QQGAME_ACT = 410, //空间黄钻(bit1表示普通，bit2表示会员)、大厅蓝钻礼包(bit3表示普通，bit4表示会员)
 
         //421-430 for suntao
-        VAR_HUNYUAN_STEP = 421, //大闹龙宫之混元剑诀
-        VAR_HUNYUAN_STEP4_COUNT = 422, //大闹龙宫之混元剑诀从第4格移动到第5失败的次数
+        //VAR_HUNYUAN_STEP = 421, //大闹龙宫之混元剑诀
+        //VAR_HUNYUAN_STEP4_COUNT = 422, //大闹龙宫之混元剑诀从第4格移动到第5失败的次数
         VAR_INVITEDSUCCESS = 423, //邀请成功的好友人数
         VAR_CFRIENDTICKETS = 424, //好友邀请的抽奖券
 
@@ -694,12 +694,14 @@ namespace GObject
             REGISTER_VAR(VAR_SAVEGOLD_SET_TIME, CYCLE_NONE);
             REGISTER_VAR(VAR_SAVEGOLD_GET_STATUS, CYCLE_NONE);
             REGISTER_VAR(VAR_SAVEGOLD_ISGET, CYCLE_DAY);
+            /*
             REGISTER_VAR(VAR_DRAGONKINGSNAKE_STEP, CYCLE_NONE);
             REGISTER_VAR(VAR_DRAGONKINGSNAKE_STEP4_COUNT, CYCLE_NONE);
             REGISTER_VAR(VAR_TIANMANG_STEP, CYCLE_NONE);
             REGISTER_VAR(VAR_TIANMANG_STEP4_COUNT, CYCLE_NONE);
             REGISTER_VAR(VAR_HUNYUAN_STEP, CYCLE_NONE);
             REGISTER_VAR(VAR_HUNYUAN_STEP4_COUNT, CYCLE_NONE);
+            */
 
             REGISTER_VAR(VAR_LONGYUAN_GOT, CYCLE_NONE);
 

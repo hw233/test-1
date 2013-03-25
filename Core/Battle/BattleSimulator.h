@@ -188,6 +188,21 @@ private:
         e_stHitRate,
         e_stAtkReduce,
         e_stMagAtkReduce,
+        e_stAtkInit = 51,
+        e_stDefInit,
+        e_stMagAtkInit,
+        e_stMagDefInit,
+        e_stToughInit,
+        e_stActionInit,
+        e_stEvadeInit,
+        e_stCriticalInit,
+        e_stPierceInit,
+        e_stCounterInit,
+        e_stMagResInit,
+        e_stCriticalDmgInit,
+        e_stHitRateInit,
+        e_stAtkReduceInit,
+        e_stMagAtkReduceInit,
         e_stMaxReiastu = 100,
         e_stReiastu = 101,
         MAX_STATUS,
@@ -557,6 +572,7 @@ private:
     UInt32  _attackRound; //攻击回合
     bool  _firstPLDmg[2]; //第一回合打出无双技能
     UInt8   _getDamageSkillCount[2]; // 每回合受伤触发技能的最大数目
+
     /*
     bool    _evade3OK[2]; //达成次数
     bool    _evade9ok[2]; //达成次数
@@ -612,6 +628,7 @@ private:
     bool doAuraPresent(BattleFighter* bf);
     bool doConfusePresent(BattleFighter* bf);
     bool doStunPresent(BattleFighter* bf);
+    void appendInitDefStatus(BattleFighter* bf);
 
 private:
     // 和仙宠有关的
