@@ -12,7 +12,7 @@ namespace GObject
 #ifndef _DEBUG
         WorkerRunner<>(60*60*1000), m_Type(type), m_Worker(worker)
 #else
-        WorkerRunner<>(60*1000), m_Type(type), m_Worker(worker)
+        WorkerRunner<>(5*60*1000), m_Type(type), m_Worker(worker)
 #endif
     {}
 

@@ -85,7 +85,8 @@ struct LingbaoInfoList
     UInt64 id;
     std::string  name;
     UInt8  pf;
-    UInt32   battlePoint;
+    UInt8  country;
+    UInt32 battlePoint;
     UInt32 itemId;
     UInt8  tongling;
     UInt8  lbcolor;
@@ -94,7 +95,7 @@ struct LingbaoInfoList
     UInt16  skill[2];
     UInt16  factor[2];
     LingbaoInfoList()
-        : battlePoint(0), itemId(0), tongling(0), lbcolor(0)
+        :id(0), pf(0), country(0), battlePoint(0), itemId(0), tongling(0), lbcolor(0)
     {
         memset(type, 0, sizeof(type));
         memset(value, 0, sizeof(value));
@@ -150,6 +151,7 @@ public:
 private:
 	void doUpdate();
     void makeRankStream(Stream*& st, UInt8 type, Player* pl);
+    void makeRankAndValueStream(Stream*& st, UInt8 type, Player* pl, UInt32 value);
 
 	Stream _levelStream;
 	Stream _moneyStream;

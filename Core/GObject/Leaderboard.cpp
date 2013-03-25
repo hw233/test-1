@@ -155,13 +155,13 @@ void buildPacketForLingbao(Stream& st, UInt8 t, UInt32 id, std::vector<LingbaoIn
 {
 	UInt8 c = static_cast<UInt8>(list.size());
 	st.init(REP::SORT_LIST);
-	st << t << id << c;
+	st << t << id << static_cast<UInt32>(0) << c;
 	for(UInt8 i = 0; i < c; ++ i)
 	{
 		LingbaoInfoList& item = list[i];
 		if(merge)
 			Player::patchMergedName(item.id, item.name);
-        st << item.name << item.pf << item.battlePoint << static_cast<UInt16>(item.itemId) << item.tongling << item.lbcolor;
+        st << item.name << item.pf << item.country << item.battlePoint << static_cast<UInt16>(item.itemId) << item.tongling << item.lbcolor;
         for (UInt8 i = 0; i < 4; ++i)
         {
             st << item.type[i] << item.value[i];
@@ -460,7 +460,7 @@ void Leaderboard::doUpdate()
 
     std::vector<LeaderboardLingbao> blist5;
 	execu->ExtractData("select p.id, p.name, e.itemId, l.tongling, l.lbcolor, l.types, l.values, l.skills, l.factors, l.battlepoint from player p, fighter f, equipment e, lingbaoattr l "
-            "where p.id=f.playerId and e.id = l.id and (f.lingbao REGEXP concat(',',l.id, '$') or f.lingbao REGEXP concat('^', l.id, ','))  order by l.battlepoint DESC limit 100;", blist5);
+            "where p.id=f.playerId and e.id = l.id and (f.lingbao REGEXP concat(',',l.id, '$') or f.lingbao REGEXP concat('^', l.id, ','))  order by l.battlepoint DESC limit 0, 100;", blist5);
     {
         FastMutex::ScopedLock lk(_cmutex);
          _lingbaoInfoList.clear(); 
@@ -476,6 +476,7 @@ void Leaderboard::doUpdate()
             if(NULL == pl)
                 continue;
             r.pf = pl->getPF();
+            r.country = pl->getCountry();
             r.name = blist5[i].name;
             r.itemId = blist5[i].itemId;
             r.tongling = blist5[i].tongling;
@@ -525,7 +526,8 @@ void Leaderboard::doUpdate()
 
             _lingbaoInfoList.push_back(r);
 
-            _lingbaoRank[r.id] = i+1;
+            if (_lingbaoRank[r.id] && (_lingbaoRank[r.id] > static_cast<int>(i+1)))
+                _lingbaoRank[r.id] = i+1;
         }
 	    buildPacketForLingbao(_lingbaoStream, 6, _id, _lingbaoInfoList);
     }
@@ -816,7 +818,7 @@ bool Leaderboard::getPacket( UInt8 t, Stream*& st, Player* pl)
         break;
     case 6:
         st = &_lingbaoStream;
-        //makeRankStream(st, t, pl);
+        makeRankAndValueStream(st, t, pl, pl->getMaxLingbaoBattlePoint());
         break;
 	default:
 		return false;
@@ -965,6 +967,19 @@ void Leaderboard::makeRankStream(Stream*& st, UInt8 type, Player* pl)
 {
     int rank = getMyRank(pl, type);
     st->pop_front(9); //将type,rank总共5个字节删除
+    st->prepend((UInt8*)&rank, 4); //头先插入自己的排行
+    st->prepend((UInt8*)&type, 1);    //最后插入类型
+    UInt16 len = st->size();
+    UInt8 buf[4] = {0, 0, 0xFF, REP::SORT_LIST};
+    memcpy(buf, &len, 2);
+    st->prepend(buf, 4);
+}
+
+void Leaderboard::makeRankAndValueStream(Stream*& st, UInt8 type, Player* pl, UInt32 value)
+{
+    int rank = getMyRank(pl, type);
+    st->pop_front(13); //将type,rank总共5个字节删除
+    st->prepend((UInt8*)&value, 4); // 先插入数据（比如宝具的战斗力）
     st->prepend((UInt8*)&rank, 4); //头先插入自己的排行
     st->prepend((UInt8*)&type, 1);    //最后插入类型
     UInt16 len = st->size();

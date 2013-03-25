@@ -133,6 +133,8 @@ MSG_REG_2(GameMsgHdr, 0x1C4, OnSendConsumeRank);
 
 MSG_REG_2(GameMsgHdr, 0x1C5, OnGetQgameGiftAward);
 
+MSG_REG_2(GameMsgHdr, 0x1C6, OnSendPopularityRank);
+
 MSG_REG_2(GameMsgHdr, 0x1D0, OnSendClanMemberList);
 
 MSG_REG_2(GameMsgHdr, 0x1EC, OnDaysRankMsg);

@@ -1854,8 +1854,9 @@ UInt16 Fighter::calcSkillBattlePoint(UInt16 skillId, UInt8 type)
     return 0;
 }
 
-void Fighter::calcLingbaoBattlePoint()
+UInt32 Fighter::calcLingbaoBattlePoint()
 {
+    UInt32 value = 0;
     for(int idx = 0; idx < getMaxLingbaos(); ++ idx)
     {
         UInt32 bp = 0;
@@ -1877,7 +1878,9 @@ void Fighter::calcLingbaoBattlePoint()
             lbattr.battlePoint = bp;
             DB4().PushUpdateData("UPDATE `lingbaoattr` SET `battlepoint`='%u' WHERE `id`=%u", bp, lb->getId());
         }
+        value = value > bp ? value:bp;
     }
+    return value;
 }
 
 void Fighter::rebuildSkillBattlePoint()

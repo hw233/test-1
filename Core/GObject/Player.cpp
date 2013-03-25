@@ -659,7 +659,7 @@ namespace GObject
 #ifndef _WIN32
 		m_ulog(NULL),
 #endif
-		m_isOffical(false), m_isXY(false), m_sysDailog(false), m_hasTripod(false), _jobHunter(NULL), _dreamer(NULL), _onBattlePet(NULL)
+		m_isOffical(false), m_isXY(false), m_sysDailog(false), m_hasTripod(false), _maxLingbaoBattlePoint(0),  _jobHunter(NULL), _dreamer(NULL), _onBattlePet(NULL)
 	{
         m_ClanBattleStatus = 1;
         m_ClanBattleScore = 0;
@@ -15506,6 +15506,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
                 if(fighter)
                     bp += fighter->getBattlePoint();
             }
+            calcLingbaoBattlePoint();
         }
         else
         {
@@ -15527,11 +15528,16 @@ void EventTlzAuto::notify(bool isBeginAuto)
     {
         if(CURRENT_THREAD_ID() == getThreadId())
         {
+            UInt32 value = 0;
+            _maxLingbaoBattlePoint = 0;
             for(int j = 0; j < 5; ++ j)
             {
                 Fighter* fighter = _playerData.lineup[j].fighter;
                 if(fighter)
-                    fighter->calcLingbaoBattlePoint();
+                {
+                    value = fighter->calcLingbaoBattlePoint();
+                    _maxLingbaoBattlePoint = value > _maxLingbaoBattlePoint? value:_maxLingbaoBattlePoint;
+                }
             }
         }
         else
@@ -15540,6 +15546,17 @@ void EventTlzAuto::notify(bool isBeginAuto)
             GLOBAL().PushMsg(hdr, NULL);
         }
 
+    }
+
+    void Player::setMaxLingbaoBattlePoint(UInt32 value)
+    {
+        _maxLingbaoBattlePoint = value;
+    }
+
+
+    UInt32 Player::getMaxLingbaoBattlePoint()
+    {
+        return _maxLingbaoBattlePoint;
     }
 
     void Player::verifyFighter()

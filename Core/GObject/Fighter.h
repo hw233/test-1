@@ -894,7 +894,7 @@ public:
 
     UInt16 calcSkillBattlePoint(UInt16 skillId, UInt8 type);
 
-    void calcLingbaoBattlePoint();
+    UInt32 calcLingbaoBattlePoint();
 private:
     std::map<UInt16, SStrengthen> m_ss;
 

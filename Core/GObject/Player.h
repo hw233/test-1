@@ -2087,7 +2087,13 @@ namespace GObject
 
         UInt32 getBattlePoint();
         void calcLingbaoBattlePoint();
+        void setMaxLingbaoBattlePoint(UInt32 value);
+        UInt32 getMaxLingbaoBattlePoint();
         void verifyFighter();
+
+    private:
+        UInt32 _maxLingbaoBattlePoint;
+
 #ifdef _FB
     public:
         void sendLevelAward();

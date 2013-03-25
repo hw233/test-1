@@ -1199,6 +1199,8 @@ void OnLeaderboardReq( GameMsgHdr& hdr, LeaderboardReq& lr )
     //if(GObject::leaderboard.hasUpdate(lr._id) && GObject::leaderboard.getPacket(lr._type, st, player))
     if (lr._type == 7)
     {
+        GameMsgHdr hdr(0x1C6, WORKER_THREAD_WORLD, player, 0);
+        GLOBAL().PushMsg(hdr, NULL);
     }
     else
     {
@@ -1209,8 +1211,16 @@ void OnLeaderboardReq( GameMsgHdr& hdr, LeaderboardReq& lr )
         }
         else
         {
-            UInt8 failed_packet[9] = {0x05, 0x00, 0xFF, REP::SORT_LIST, lr._type, 0x00, 0x00, 0x00, 0x00};
-            player->send(failed_packet, 9);
+            if (lr._type != 6)
+            {
+                UInt8 failed_packet[9] = {0x05, 0x00, 0xFF, REP::SORT_LIST, lr._type, 0x00, 0x00, 0x00, 0x00};
+                player->send(failed_packet, 9);
+            }
+            else
+            {
+                UInt8 failed_packet[14] = {0x05, 0x00, 0xFF, REP::SORT_LIST, lr._type, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+                player->send(failed_packet, 14);
+            }
         }
     }
 }
