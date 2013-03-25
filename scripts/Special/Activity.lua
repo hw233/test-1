@@ -7248,25 +7248,15 @@ function checkDragonKingCanSucceed(player, step, flag)
             return true
         end
     else
-        local flags = {
-            [1] = 362,
-            [2] = 368,
-            [3] = 370,
-            [4] = 422,
-        }
-        local var = flags[flag]
-        if var == nil then
-            return false
-        end
-        local fail = player:GetVar(var) + 1
+        local fail = player:GetVar(362) + 1
         if fail > #chances[step] then
             fail = #chances[step]
         end
         if rand <= chances[step][fail] then
-            player:SetVar(var, 0)
+            player:SetVar(362, 0)
             return true
         end
-        player:SetVar(var, fail)
+        player:SetVar(362, fail)
     end
     return false
 end
@@ -7282,6 +7272,7 @@ function getDragonKingAward(step, flag)
             [2] = {{6135,1}},
             [3] = {{136,1}},
             [4] = {{6136,1}},
+            [5] = {{1357,1}},
         },
     }
     local chances = {

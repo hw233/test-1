@@ -17352,33 +17352,27 @@ void Player::getDragonKingInfo()
         GVAR.SetVar(GVAR_DRAGONKING_END, 0);
         return;
     }
-    Stream st(REP::ACTIVE);
-    UInt8 step = 0;
-    if(1 == flag)
-    {
-        st << static_cast<UInt8>(0x06);
-        step = GetVar(VAR_DRAGONKING_STEP);
-    }
-    else if(2 == flag)
-    {
-        st << static_cast<UInt8>(0x0A);
-        step = GetVar(VAR_DRAGONKINGSNAKE_STEP);
-    }
-    else if(3 == flag)
-    {
-        st << static_cast<UInt8>(0x0B);
-        step = GetVar(VAR_TIANMANG_STEP);
-    }
-    else if(4 == flag)
-    {
-        st << static_cast<UInt8>(0x0D);
-        step = GetVar(VAR_HUNYUAN_STEP);
-    }
+    UInt8 type = 0;
+    if(YOULONG == flag)
+        type = 0x06;
+    else if(JINSHE == flag)
+        type = 0x0A;
+    else if(TIANMANG == flag)
+        type = 0x0B;
+    else if(HUNYUAN == flag)
+        type = 0x0D;
+    else if(XINGCHEN == flag)
+        type = 0xA1;
     else
+    {
+        sendMsgCode(0, 1090);
         return;
+    }
+    UInt8 step = GetVar(VAR_DRAGONKING_STEP);
     if( step == 0 || step > 5)
         step = 1;
-    st << static_cast<UInt8>(0x01);
+    Stream st(REP::ACTIVE);
+    st << type << static_cast<UInt8>(0x01);
     st << step << Stream::eos;
     send(st);
 }
@@ -17402,33 +17396,36 @@ void Player::postDragonKing(UInt8 count)
     UInt8 flag = GVAR.GetVar(GVAR_DRAGONKING_ACTION);
     UInt32 XBLing = 0; //寻宝令id
     UInt8 type = 0;
-    UInt8 step = 0;
-    if(1 == flag)
+    if(YOULONG == flag)
     {
         XBLing = 9337;
         type = 0x06;
-        step = GetVar(VAR_DRAGONKING_STEP);
     }
-    else if(2 == flag)
+    else if(JINSHE == flag)
     {
         XBLing = 9354;
         type = 0x0A;
-        step = GetVar(VAR_DRAGONKINGSNAKE_STEP);
     }
-    else if(3 == flag)
+    else if(TIANMANG == flag)
     {
         XBLing = 9358;
         type = 0x0B;
-        step = GetVar(VAR_TIANMANG_STEP);
     }
-    else if(4 == flag)
+    else if(HUNYUAN == flag)
     {
         XBLing = 9364;
         type = 0x0D;
-        step = GetVar(VAR_HUNYUAN_STEP);
+    }
+    else if(XINGCHEN == flag)
+    {
+        XBLing = 9372;
+        type = 0xA1;
     }
     else
+    {
+        sendMsgCode(0, 1090);
         return;
+    }
     if (GetPackage()->GetItemAnyNum(XBLing) < count)
         return;
     if (GetPackage()->GetRestPackageSize() < count)
@@ -17439,6 +17436,7 @@ void Player::postDragonKing(UInt8 count)
     GetPackage()->DelItemSendMsg(XBLing, this);
     Stream st(REP::ACTIVE);
     st << type << static_cast<UInt8>(0x02) << count;
+    UInt8 step = GetVar(VAR_DRAGONKING_STEP);
     if(step == 0 || step > 5)
         step = 1;
     bool isBind = true;
@@ -17459,20 +17457,13 @@ void Player::postDragonKing(UInt8 count)
             st << itemId << award.get<UInt8>(j+1);
             GetPackage()->Add(itemId, award.get<UInt32>(j+1), isBind, true, FromQixi);
             //6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页
-            if(itemId == 6134 || itemId == 6135 || itemId == 136 || itemId == 6136)
+            if(itemId == 6134 || itemId == 6135 || itemId == 136 || itemId == 6136 || itemId == 1357)
                 SYSMSG_BROADCASTV(295, getCountry(), getName().c_str(), itemId);
         }
     }
     st << Stream::eos;
     send(st);
-    if(1 == flag)
-        SetVar(VAR_DRAGONKING_STEP, step);
-    else if(2 == flag)
-        SetVar(VAR_DRAGONKINGSNAKE_STEP, step);
-    else if(3 == flag)
-        SetVar(VAR_TIANMANG_STEP, step);
-    else if(4 == flag)
-        SetVar(VAR_HUNYUAN_STEP, step);
+    SetVar(VAR_DRAGONKING_STEP, step);
 }
 
 //金蛇献瑞 聚福兆祥
@@ -17916,9 +17907,12 @@ UInt8 Player::toQQGroup(bool isJoin)
         return isDel;
     }
 
-    void Player::delFairyPet(UInt32 id)
-    {
+    void Player::delFairyPet(UInt32 id, UInt8 delete_type)
+    {   //delete_type=>>0:放生 1:传承
         std::map<UInt32, FairyPet *>::iterator it = _fairyPets.find(id);
+        DBLOG1().PushUpdateData("insert into pet_histories (server_id,player_id,pet_id,pet_name,delete_type,pet_pinjie,pet_gengu,delete_time) values(%u,%"I64_FMT"u,%u,'%s',%u,%u,%u,%u)",
+            cfg.serverLogId, getId(), id, it->second->getName().c_str(), delete_type, it->second->getPetLev(), it->second->getPetBone(), TimeUtil::Now());
+
         _fairyPets.erase(it);
         DB2().PushUpdateData("DELETE FROM `fairyPet` WHERE id = %u AND `playerId` = %"I64_FMT"u", id, getId());
 	    DB2().PushUpdateData("DELETE FROM `fighter` WHERE `id` = %u AND `playerId` = %"I64_FMT"u", id, getId());
@@ -18286,7 +18280,7 @@ UInt8 Player::toQQGroup(bool isJoin)
         pet2->updateToDB(2, lev);
         pet2->initSkillUp();
 
-        delFairyPet(petId1);
+        delFairyPet(petId1, 1);
         delete pet1;
         return 0;
     }

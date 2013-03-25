@@ -3706,18 +3706,14 @@ void GMHandler::OnSomeAct(GObject::Player *player, std::vector<std::string>& arg
 
 void GMHandler::OnDragonKingAct(GObject::Player *player, std::vector<std::string>& args)
 {
-    if (args.size() < 3)
+    if (args.size() < 1)
         return;
-    UInt32 begin = atoi(args[0].c_str());
-    UInt32 end = atoi(args[1].c_str());
-    UInt32 type = atoi(args[2].c_str());
-    GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_BEGIN, begin);
-    GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_END, end);
-    GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_ACTION, type);
-    /*
     UInt32 type = atoi(args[0].c_str());
+    if(type >= GObject::DRAGONKING_MAX)
+        type = 1;
     GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_ACTION, type);
-    */
+    GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_BEGIN, TimeUtil::Now());
+    GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_END, TimeUtil::Now() + 3600);
 }
 
 void GMHandler::OnFairyPetGM(GObject::Player *player, std::vector<std::string>& args)
