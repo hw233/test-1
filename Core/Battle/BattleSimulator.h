@@ -628,6 +628,7 @@ private:
     bool doAuraPresent(BattleFighter* bf);
     bool doConfusePresent(BattleFighter* bf);
     bool doStunPresent(BattleFighter* bf);
+    void appendInitDefStatus(BattleFighter* bf);
 
 private:
     // 和仙宠有关的
