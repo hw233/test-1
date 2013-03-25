@@ -176,7 +176,7 @@ namespace GObject
 
     enum DRAGONKING_type    //大闹龙宫活动标志类型
     {
-        SHUTDOWN    = 0,    //关闭
+        DRAGONKING_CLOSE = 0,    //关闭
         YOULONG     = 1,    //龙神秘典
         JINSHE      = 2,    //金蛇宝鉴
         TIANMANG    = 3,    //天芒神梭

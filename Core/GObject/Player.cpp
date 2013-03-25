@@ -17342,9 +17342,12 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
  *2:大闹龙宫之金蛇起舞
  *3:大闹龙宫之天芒神梭
 */
+static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F };
+static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372 };
+//6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页
+static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357 };
 void Player::getDragonKingInfo()
 {
-    UInt8 flag = GVAR.GetVar(GVAR_DRAGONKING_ACTION);
     if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END))
     {
         GVAR.SetVar(GVAR_DRAGONKING_ACTION, 0);
@@ -17352,18 +17355,8 @@ void Player::getDragonKingInfo()
         GVAR.SetVar(GVAR_DRAGONKING_END, 0);
         return;
     }
-    UInt8 type = 0;
-    if(YOULONG == flag)
-        type = 0x06;
-    else if(JINSHE == flag)
-        type = 0x0A;
-    else if(TIANMANG == flag)
-        type = 0x0B;
-    else if(HUNYUAN == flag)
-        type = 0x0D;
-    else if(XINGCHEN == flag)
-        type = 0xA1;
-    else
+    UInt8 flag = GVAR.GetVar(GVAR_DRAGONKING_ACTION);
+    if (flag <= DRAGONKING_CLOSE || flag >= DRAGONKING_MAX)
     {
         sendMsgCode(0, 1090);
         return;
@@ -17372,7 +17365,7 @@ void Player::getDragonKingInfo()
     if( step == 0 || step > 5)
         step = 1;
     Stream st(REP::ACTIVE);
-    st << type << static_cast<UInt8>(0x01);
+    st << Dragon_type[flag] << static_cast<UInt8>(0x01);
     st << step << Stream::eos;
     send(st);
 }
@@ -17394,38 +17387,12 @@ void Player::postDragonKing(UInt8 count)
     }
     if (count == 0) return;
     UInt8 flag = GVAR.GetVar(GVAR_DRAGONKING_ACTION);
-    UInt32 XBLing = 0; //寻宝令id
-    UInt8 type = 0;
-    if(YOULONG == flag)
-    {
-        XBLing = 9337;
-        type = 0x06;
-    }
-    else if(JINSHE == flag)
-    {
-        XBLing = 9354;
-        type = 0x0A;
-    }
-    else if(TIANMANG == flag)
-    {
-        XBLing = 9358;
-        type = 0x0B;
-    }
-    else if(HUNYUAN == flag)
-    {
-        XBLing = 9364;
-        type = 0x0D;
-    }
-    else if(XINGCHEN == flag)
-    {
-        XBLing = 9372;
-        type = 0xA1;
-    }
-    else
+    if (flag <= DRAGONKING_CLOSE || flag >= DRAGONKING_MAX)
     {
         sendMsgCode(0, 1090);
         return;
     }
+    UInt32 XBLing = Dragon_Ling[flag];
     if (GetPackage()->GetItemAnyNum(XBLing) < count)
         return;
     if (GetPackage()->GetRestPackageSize() < count)
@@ -17435,7 +17402,7 @@ void Player::postDragonKing(UInt8 count)
     }
     GetPackage()->DelItemSendMsg(XBLing, this);
     Stream st(REP::ACTIVE);
-    st << type << static_cast<UInt8>(0x02) << count;
+    st << Dragon_type[flag] << static_cast<UInt8>(0x02) << count;
     UInt8 step = GetVar(VAR_DRAGONKING_STEP);
     if(step == 0 || step > 5)
         step = 1;
@@ -17456,8 +17423,7 @@ void Player::postDragonKing(UInt8 count)
             UInt16 itemId = award.get<UInt16>(j);
             st << itemId << award.get<UInt8>(j+1);
             GetPackage()->Add(itemId, award.get<UInt32>(j+1), isBind, true, FromQixi);
-            //6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页
-            if(itemId == 6134 || itemId == 6135 || itemId == 136 || itemId == 6136 || itemId == 1357)
+            if (itemId == Dragon_Broadcast[flag])
                 SYSMSG_BROADCASTV(295, getCountry(), getName().c_str(), itemId);
         }
     }
