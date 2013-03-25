@@ -463,4 +463,21 @@ CREATE TABLE IF NOT EXISTS `consume_pet` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE IF NOT EXISTS `pet_histories` (
+  `server_id` int(10) unsigned NOT NULL,
+  `player_id` bigint(20) unsigned NOT NULL,
+  `pet_id` int(10) unsigned NOT NULL,
+  `pet_name` varchar(255) NOT NULL,
+  `delete_type` tinyint(10) unsigned NOT NULL,
+  `pet_pinjie` smallint(10) unsigned NOT NULL,
+  `pet_gengu` smallint(10) unsigned NOT NULL,
+  `delete_time` int(10) unsigned NOT NULL,
+  INDEX server_player (`server_id`, `player_id`),
+  INDEX server_player_pet (`server_id`, `player_id`, `pet_id`),
+  INDEX server_player_type (`server_id`, `player_id`, `delete_type`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
 -- Dump completed

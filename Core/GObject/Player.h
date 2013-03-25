@@ -174,6 +174,18 @@ namespace GObject
         ENUM_TRAINP3       /** 齐天经验加速符,*1.8,加速(*1.8) **/
     };
 
+    enum DRAGONKING_type    //大闹龙宫活动标志类型
+    {
+        DRAGONKING_CLOSE = 0,    //关闭
+        YOULONG     = 1,    //龙神秘典
+        JINSHE      = 2,    //金蛇宝鉴
+        TIANMANG    = 3,    //天芒神梭
+        HUNYUAN     = 4,    //混元剑诀
+        XINGCHEN    = 5,    //遁天星辰诀
+
+        DRAGONKING_MAX,
+    };
+
 	class Map;
 	class Player;
 	class ItemBase;
@@ -1507,6 +1519,7 @@ namespace GObject
         void sendRechargeMails(UInt8, UInt8, UInt8);
 		void checkIcExpire(bool = true);
 		void sendBlockBossMail(UInt8, UInt8);
+        bool in7DayFromCreated();
 
     private:
         bool _isJumpingMap;
@@ -2196,7 +2209,7 @@ namespace GObject
 	    FairyPet * findFairyPet(UInt32);
         bool hasCanHirePet(UInt32);
         bool delCanHirePet(UInt32);
-        void delFairyPet(UInt32);
+        void delFairyPet(UInt32, UInt8 = 0);
         void writeCanHiretPet();
 	    bool isFairyPetFull() const;
         UInt32 setFairypetBattle(UInt32);
