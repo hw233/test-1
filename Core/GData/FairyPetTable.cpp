@@ -76,7 +76,7 @@ UInt16 Pet::getPinjieBless(UInt16 id, UInt16 v)
     UInt8 size = pjd->bless.size();
     if(!size)
         return 0;
-    for(UInt8 i = size - 1; i >= 0; -- i)
+    for(int i = size - 1; i >= 0; -- i)
     {
         if(pjd->bless[i].times <= v)
             return pjd->bless[i].prob;

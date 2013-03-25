@@ -51,6 +51,32 @@ function calcPracticeInc( fgt )
     return ((prabase+fgt:getAcuPraAdd()+soulPracticeAdd) * (1 + (capacity - 5) * capfactor + placeadd + clantechaddon + buffactor + soulPracticeFactor + diamondFactor))
 end
 
+function calcBasePExp(fgt)
+    if fgt == nil then
+        return 0;
+    end
+
+    soulPracticeAdd = fgt:getSoulPracticeAddOn()
+    return (prabase+fgt:getAcuPraAdd()+soulPracticeAdd)
+end
+
+function calcPExpNoBuf(fgt)
+    if fgt == nil then
+        return 0;
+    end
+
+    clantechaddon = fgt:getClanTechAddon(place)
+    capacity = fgt:getCapacity()
+    if capacity < 5 then
+        capacity = 5
+    end
+
+    soulPracticeAdd = fgt:getSoulPracticeAddOn()
+    soulPracticeFactor = fgt:getSoulPracticeFactor()
+
+    return ((prabase+fgt:getAcuPraAdd()+soulPracticeAdd) * (1 + (capacity - 5) * capfactor + clantechaddon + soulPracticeFactor))
+end
+
 function GetPlaceAddons()
     return addons;
 end

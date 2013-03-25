@@ -37,7 +37,19 @@ bool MsgHandler::ProcessMsg()
 	{
 		hdr = msgQueue.Pop();
 		assert( hdr->cmdID < MAX_MSG_NUM );
-		if(hdr->cmdID >= MIN_INNER_CHECK_MSG) // Throttler to check thread id
+        if(hdr->cmdID <= 0xFF && hdr->desWorkerID <= WORKER_THREAD_NEUTRAL) // outer msg
+        {
+			GameMsgHdr * ihdr = reinterpret_cast<GameMsgHdr *>(hdr);
+            if(ihdr->player != NULL)
+            {
+                if(ihdr->player->isJumpingMap())
+                {
+                    delete[] (char *)hdr;
+                    continue;
+                }
+            }
+        }
+        else if(hdr->cmdID >= MIN_INNER_CHECK_MSG) // Throttler to check thread id
 		{
 			GameMsgHdr * ihdr = reinterpret_cast<GameMsgHdr *>(hdr);
 			if(ihdr->player != NULL)     // Push msg to follow players' thread if the player is just switched to another thread

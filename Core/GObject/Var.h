@@ -3,6 +3,7 @@
 #define _VAR_H_
 
 #include "Common/TimeUtil.h"
+#include "Common/Mutex.h"
 
 namespace GObject
 {
@@ -286,6 +287,8 @@ namespace GObject
         // 270-280 占用 for zhgc
         VAR_ACT_LOGIN_AWARD     = 270, // 节日每日登陆奖励普通
         VAR_ACT_LOGIN_AWARD_VIP = 271, // 节日每日登陆奖励VIP
+        VAR_VIP_PRIVILEGE_TIME  = 272, // VIP特权剩余时间
+        VAR_VIP_PRIVILEGE_DATA  = 273, // VIP特权数据
 
         // 281-290 占用 fro qiwy
         VAR_ARENA_SUPPORT = 281, //场外活动，支持的序列id
@@ -646,6 +649,9 @@ namespace GObject
             REGISTER_VAR(VAR_EQUIP_MOVE_COUNT, CYCLE_NONE);
             REGISTER_VAR(VAR_ACT_LOGIN_AWARD, CYCLE_DAY);
             REGISTER_VAR(VAR_ACT_LOGIN_AWARD_VIP, CYCLE_DAY);
+            REGISTER_VAR(VAR_VIP_PRIVILEGE_TIME, CYCLE_NONE);
+            REGISTER_VAR(VAR_VIP_PRIVILEGE_DATA, CYCLE_DAY);
+
             REGISTER_VAR(VAR_ARENA_SUPPORT, CYCLE_DAY);
             //REGISTER_VAR(VAR_ARENA_SUFFERED, CYCLE_DAY);
             //REGISTER_VAR(VAR_ARENA_LASTTIME, CYCLE_DAY);
@@ -727,6 +733,7 @@ namespace GObject
         UInt32 m_Vars[VAR_MAX];
         UInt32 m_OverTime[VAR_MAX];
         UInt32 m_Offset;
+        FastMutex _mutex;
 
         static UInt32 m_VarTypes[VAR_MAX];
     };

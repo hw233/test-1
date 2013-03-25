@@ -571,6 +571,16 @@ float BattleFormula::calcPracticeInc( GObject::Fighter * fgt )
 	return call<float>("calcPracticeInc", fgt);
 }
 
+float BattleFormula::calcBasePExp( GObject::Fighter * fgt )
+{
+	return call<float>("calcBasePExp", fgt);
+}
+
+float BattleFormula::calcPExpNoBuf( GObject::Fighter * fgt )
+{
+	return call<float>("calcPExpNoBuf", fgt);
+}
+
 float BattleFormula::calcClanTechAddon(UInt16 id, UInt8 lvl)
 {
     return call<float>("calcClanTechAddon", id, lvl);

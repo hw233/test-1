@@ -100,6 +100,13 @@ namespace GData
         static UInt8 GetOnlineAwardCount();
         static UInt32 getMaxStrengthenVal(UInt16 id, UInt8 clvl);
         static UInt32 getSkillStrengthenProb(UInt16 id, UInt8 clvl);
+        static inline UInt32 getNeedBindLevel30CFD(UInt32 id) /** 30级副本、阵图、决战之地掉落的7种物品绑定 **/
+        {
+            if((id >= 1600 && id <= 1602) || (id >= 1213 && id <= 1214) || (id >= 1220 && id <= 1221))
+                return true;
+            else
+                return false;
+        };
 
 	public:
 		static TaskTypeList				 m_TaskTypeList;
