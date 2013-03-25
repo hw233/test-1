@@ -18659,9 +18659,7 @@ bool Player::in7DayFromCreated()
     if (now_sharp - created_sharp > 7 * 24*60*60)
         return false; // 玩家注册时间超过7日，无法参与活动
 
-#define CREATE_OFFSET(c, n) (((n) - (c)) / (24*60*60))
     UInt32 off = CREATE_OFFSET(created_sharp, now_sharp);
-#undef CREATE_OFFSET
     if (off >= 7)
         return false; // 玩家注册时间超过7日，无法参与活动
 
