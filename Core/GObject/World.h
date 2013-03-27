@@ -638,6 +638,12 @@ public:
     { _compassact = v; }
     inline static bool getCompassAct()
     { return _compassact; }
+
+   inline static void setFoolBao(bool v)
+   { _foolbao = v; }
+    inline static bool getFoolBao()
+    { return _foolbao; } 
+
     inline static void setCallSnakeEggAct(UInt8 v)
     { _callsnakeeggact = v; }
     inline static UInt8 getCallSnakeEggAct()
@@ -783,6 +789,7 @@ public:
     static stArenaExtra stArenaOld[2];
     static stArenaExtra stArena;
     static bool _compassact;
+    static bool _foolbao;
     static UInt8 _callsnakeeggact;
     static UInt8 _snakeeggawardact;
     static bool _item9344act;
@@ -855,6 +862,7 @@ public:
     void SendGoldSnakeAward();
     void SendItem9344Award();
     void SendItem9343Award();
+    void SendFoolBaoAward();
 
     void UpdateSnowScore(Player* pl, Player* lover);
     void sendSnowPlayers(Player* pl);

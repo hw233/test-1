@@ -602,7 +602,8 @@ namespace GObject
 		if(itemType == NULL) return NULL;
 		ITEM_BIND_CHECK(itemType->bindType,bind);
 		ItemBase * item = FindItem(typeId, bind);
-        
+
+
 		if (item != NULL)
 		{
 			bool ret = TryAddItem(item, num);

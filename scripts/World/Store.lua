@@ -138,6 +138,10 @@ function loadStore()
         if getDragonKingAct() then
             store:add(2, 9337, 10) --游龙令
         end
+        if  getFoolBao() then
+            store:add(2,9375,20)
+        end
+
         if is2013_0201_0228() then
             store:add(2, 1711, 599) --爆竹
             store:add(2, 1712, 599) --莲花灯

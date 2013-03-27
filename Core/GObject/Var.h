@@ -382,6 +382,7 @@ namespace GObject
         VAR_HAS_VOTE = 441,                 // 本日是否投票过
         VAR_POPULARITY = 442,               // 本周人气
 
+        VAR_FOOLBAO_USED = 450,  //愚人宝箱使用数
         VAR_MAX,
     };
 
