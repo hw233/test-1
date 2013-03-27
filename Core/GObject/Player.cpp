@@ -18576,7 +18576,6 @@ void Player::doVipPrivilege(UInt8 idx)
         }
     }
 
-
     sendVipPrivilege();
 }
 

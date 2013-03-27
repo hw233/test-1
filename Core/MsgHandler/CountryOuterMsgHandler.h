@@ -1264,6 +1264,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     }
     pl->sendQZoneQQGameAct(1);
     pl->sendQZoneQQGameAct(2);
+    pl->sendVipPrivilege();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
