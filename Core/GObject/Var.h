@@ -378,6 +378,7 @@ namespace GObject
         //431-440 for yijian
         VAR_LONGYUAN_GOT = 431,  //龙元风髓领取标志
         VAR_FOOLBAO_USED = 450,  //愚人宝箱使用数
+        VAR_HHBAWARD_GOT = 451 , //豪华蓝钻领取
         VAR_MAX,
     };
 
@@ -688,6 +689,9 @@ namespace GObject
             REGISTER_VAR(VAR_SAVEGOLD_SET_TIME, CYCLE_NONE);
             REGISTER_VAR(VAR_SAVEGOLD_GET_STATUS, CYCLE_NONE);
             REGISTER_VAR(VAR_SAVEGOLD_ISGET, CYCLE_DAY);
+
+
+            REGISTER_VAR(VAR_HHBAWARD_GOT, CYCLE_DAY);
             /*
             REGISTER_VAR(VAR_DRAGONKINGSNAKE_STEP, CYCLE_NONE);
             REGISTER_VAR(VAR_DRAGONKINGSNAKE_STEP4_COUNT, CYCLE_NONE);

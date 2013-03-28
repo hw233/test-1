@@ -8027,49 +8027,47 @@ end
 
 function ItemNormal_00009375(iid, num, bind, param)
     local player = GetPlayer();
+        local itemNumber = 0 ;
         local package = player:GetPackage();
 	    if num  <= package:GetRestPackageSize() then
             package:DelItemSendMsg(9375, player);
             for k = 1, num do
                 local rand = math.random(1,10000);
                 if rand <= 510 then
-                    package:AddItem(503,1,1,0,2);
+                    itemNumber = 503;
                 elseif rand <= 1510 then
-                    package:AddItem(9088,1,1,0,2);
-            Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."打开了愚公宝箱，幸运的获得了".."[4:".."9088".."]x1")
+                    itemNumber = 9088;
                 elseif rand <= 2510 then
-                    package:AddItem(512,1,1,0,2);
+                    itemNumber = 512;
                 elseif rand <= 3530 then
-                    package:AddItem(33,1,1,0,2);
+                    itemNumber = 33;
                 elseif rand <= 5330 then
-                    package:AddItem(15,1,1,0,2);
+                    itemNumber = 15;
                 elseif rand <= 6230 then
-                    package:AddItem(9371,1,1,0,2);
+                    itemNumber = 9371;
                 elseif rand <= 7080 then
-                    package:AddItem(501,1,1,0,2);
+                    itemNumber = 501;
                 elseif rand <= 7930 then
-                    package:AddItem(513,1,1,0,2);
+                    itemNumber = 513;
                 elseif rand <= 8180 then
-                    package:AddItem(1325,1,1,0,2);
-            Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."打开了愚公宝箱，幸运的获得了".."[4:".."1325".."]x1")
+                    itemNumber = 1325;
                 elseif rand <= 8430 then
-                    package:AddItem(134,1,1,0,2);
-            Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."打开了愚公宝箱，幸运的获得了".."[4:".."134".."]x1")
+                    itemNumber = 134;
                 elseif rand <= 8630 then
-                    package:AddItem(507,1,1,0,2);
-            Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."打开了愚公宝箱，幸运的获得了".."[4:".."507".."]x1")
+                    itemNumber = 507;
                 elseif rand <= 8830 then
-                    package:AddItem(509,1,1,0,2);
-            Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."打开了愚公宝箱，幸运的获得了".."[4:".."509".."]x1")
+                    itemNumber = 509;
                 elseif rand <= 9000 then
-                    package:AddItem(515,1,1,0,2);
-            Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."打开了愚公宝箱，幸运的获得了".."[4:".."515".."]x1")
+                    itemNumber = 515;
                 elseif rand <= 10000 then
-                    package:AddItem(551,1,1,0,2);
-            Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."打开了愚公宝箱，幸运的获得了".."[4:".."551".."]x1")
+                    itemNumber = 551;
                  end
+            package:AddItem(itemNumber,1,1,0,2);
+            if getFoolBao() and ( rand > 7930 or itemNumber == 9088 ) then  
+            Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."打开了愚公宝箱，幸运的获得了".."[4:"..itemNumber.."]x1")
+             end    
+        end
             player:AddVar(450, num)
-            end
 		   return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
