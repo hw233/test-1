@@ -171,7 +171,7 @@ public:
     void bossAppear(UInt8 lvl, bool force = false);
 
     inline UInt32 getAppearTime() const { return _appearTime; }
-    bool needAutoBattle(UInt16 npcId);
+    bool needAutoBattle(UInt16 spotId);
 
 private:
     UInt32 _prepareTime;
