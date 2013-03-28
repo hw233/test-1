@@ -760,9 +760,17 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
 	};
 	const ExpGainInstantCompleteStruct * ecs = reinterpret_cast<const ExpGainInstantCompleteStruct *>(data);
 	float exp = ecs->exp;
+    float extraFactor = 0;
 	UInt32 duration = ecs->duration;
     UInt32 curHookIndex = player->GetVar(VAR_EXP_HOOK_INDEX);
     UInt32 p;
+    UInt32 extraExp = 0;
+
+    if(player->inVipPrivilegeTime())
+    {
+        extraFactor = 0.2f;
+        extraExp = static_cast<UInt32>(exp * 0.2f);
+    }
     if(curHookIndex == ENUM_TRAINP1)
     {
         p = player->GetVar(VAR_TRAINP1);
@@ -772,11 +780,11 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
             if(left >= duration)
             {
                 left -= duration;
-                exp = exp * 1.3f;
+                exp *= (extraFactor + 1.3f);
             }
             else
             {
-                exp = exp + exp * left / duration * 0.3f;
+                exp = exp* (1 + 0.3f * left / duration + extraFactor);
                 left = 0;
             }
             player->SetVar(VAR_TRAINP1, left);
@@ -791,12 +799,12 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
             UInt32 left = p;
             if(left >= duration)
             {
-                exp = exp * 1.6f;
+                exp *= (1.6f + extraFactor);
                 left -= duration;
             }
             else
             {
-                exp = exp + exp * left / duration * 0.6f;
+                exp = exp * (1 + 0.6f * left / duration + extraFactor);
                 left = 0;
             }
             player->SetVar(VAR_TRAINP2, left);
@@ -811,20 +819,24 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
             UInt32 left = p;
             if(left >= duration)
             {
-                exp = exp * 1.8f;
+                exp *= (1.8f + extraFactor);
                 left -= duration;
             }
             else
             {
-                exp = exp + exp * left / duration * 0.8f;
+                exp = exp * (1 + 0.8f * left / duration + extraFactor);
                 left = 0;
             }
             player->SetVar(VAR_TRAINP3, left);
             player->sendExpHook(0x40 + PLAYER_BUFF_TRAINP3, left);
         }
     }
+    else
+    {
+        exp *= 1 + extraFactor;
+    }
 
-	player->AddExp(static_cast<UInt64>(exp));
+	player->AddExp(static_cast<UInt64>(exp), 0, extraExp);
 #if 0
 	ecs->ng->monsterKilled(player, ecs->count);
 #else

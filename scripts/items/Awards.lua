@@ -770,3 +770,86 @@ function onGetNewYearQzoneContinueAward(player, type)
     return true
 end
 
+function RunVipPrivilegeAward(player, idx, dayth)
+    if player == nil then
+        return false;
+    end
+
+    if idx == 0 or idx > 4 or dayth == 0 or dayth > 8 then
+        return false;
+    end
+
+    local package = player:GetPackage();
+    local dayliawards = {{499,20},{49, 1}, {50, 1}} -- 每日登陆奖励
+    local limitbuy = {
+        [1] = { -- 第一天
+            {500, 2, 10}, -- 限购1
+            {503, 2, 28}, -- 限购2
+            {5065, 1, 160}, -- 限购3
+        },
+        [2] = { -- 第二天
+            {500, 4, 20}, -- 限购1
+            {503, 3, 42}, -- 限购2
+            {5115, 1, 160}, -- 限购3
+        },
+        [3] = { -- 第三天
+            {500, 6, 30}, -- 限购1
+            {503, 4, 56}, -- 限购2
+            {5125, 1, 160}, -- 限购3
+        },
+        [4] = { -- 第四天
+            {500, 8, 40}, -- 限购1
+            {503, 5, 70}, -- 限购2
+            {5105, 1, 160}, -- 限购3
+        },
+        [5] = { -- 第五天
+            {500, 10, 50}, -- 限购1
+            {503, 6, 84}, -- 限购2
+            {5095, 1, 160}, -- 限购3
+        },
+        [6] = { -- 第六天
+            {500, 12, 60}, -- 限购1
+            {503, 7, 98}, -- 限购2
+            {5085, 1, 160}, -- 限购3
+        },
+        [7] = { -- 第七天
+            {500, 14, 70}, -- 限购1
+            {503, 8, 112}, -- 限购2
+            {5145, 1, 160}, -- 限购3
+        },
+		[8] = { -- 第八天
+            {500, 16, 80}, -- 限购1
+            {503, 9, 126}, -- 限购2
+            {5025, 2, 160}, -- 限购3
+        },
+    };
+
+    local num = 1;
+    if idx == 1 then
+        num = num + 1;
+    end
+    if package:GetRestPackageSize() < num then
+        player:sendMsgCode(2, 1011, 0);
+        return false;
+    end
+
+    if idx == 1 then
+        for count = 1, #dayliawards do
+            if dayliawards[count][1] == 499 then
+                player:getCoupon(dayliawards[count][2])
+            else
+                package:Add(dayliawards[count][1], dayliawards[count][2], true, 0, 41);
+            end
+        end
+    else
+        idx = idx - 1;
+        if player:getGoldInLua() < limitbuy[dayth][idx][3] then
+            return false;
+        end
+        player:useGoldInLua(limitbuy[dayth][idx][3]);
+        package:Add(limitbuy[dayth][idx][1], limitbuy[dayth][idx][2], true, 0, 41);
+    end
+
+    return true;
+end
+

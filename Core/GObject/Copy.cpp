@@ -833,7 +833,8 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool 
 
                 if (!World::getAutoBattleAct() && !World::getNewYear() && !pl->isYD() && !pl->isBD() && !pl->isQQVIP())
                 {
-                    if (pl->getVipLevel() < 6)
+                    // 限时vip特权
+                    if (pl->getVipLevel() < 6 && !pl->inVipPrivilegeTime())
                         return;
                 }
 
