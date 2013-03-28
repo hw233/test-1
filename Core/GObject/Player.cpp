@@ -18503,7 +18503,11 @@ bool Player::SetVipPrivilege()
     if(validate == 0)
     {
         UInt32 now = TimeUtil::Now();
-        SetVar(VAR_VIP_PRIVILEGE_TIME, now + 168*3600);
+        UInt32 validate = now + 168*3600;
+        // 保持最低位为0
+        if(validate & 0x1)
+            validate = validate + 1;
+        SetVar(VAR_VIP_PRIVILEGE_TIME, validate);
         ret = true;
         ConsumeInfo ci(VipPrivilege, 0, 0);
         useGold(100, &ci);
@@ -18517,7 +18521,7 @@ bool Player::SetVipPrivilege()
 #define VIP_PRIVILEGE_LIMITBUY1(data)  (0x02&data)
 #define VIP_PRIVILEGE_LIMITBUY2(data)  (0x04&data)
 #define VIP_PRIVILEGE_LIMITBUY3(data)  (0x08&data)
-#define VIP_PRIVILEGE_TIMEOUT(data)  (0x0100&data)
+#define VIP_PRIVILEGE_TIMEOUT(data)  (0x1&data)
 
 #define SET_VIP_PRIVILEGE_DAYLYAWARD(data, v) (data|=(v&0x01))
 #define SET_VIP_PRIVILEGE_LIMITBUY1(data, v)  (data|=((v<<1)&0x02))
@@ -18525,7 +18529,7 @@ bool Player::SetVipPrivilege()
 #define SET_VIP_PRIVILEGE_LIMITBUY3(data, v)  (data|=((v<<3)&0x08))
 #define SET_VIP_PRIVILEGE_OPEN(data, v)       (data|=((v<<4)&0x10))
 #define SET_VIP_PRIVILEGE_DAYTH(data, v)      (data|=((v<<5)&0xE0))
-#define SET_VIP_PRIVILEGE_TIMEOUT(data, v)    (data|=((v<<8)&0x0100))
+#define SET_VIP_PRIVILEGE_TIMEOUT(data, v)    (data|=((v)&0x1))
 
 void Player::doVipPrivilege(UInt8 idx)
 {
@@ -18579,7 +18583,6 @@ void Player::doVipPrivilege(UInt8 idx)
         }
     }
 
-
     sendVipPrivilege();
 }
 
@@ -18598,11 +18601,11 @@ void Player::sendVipPrivilege()
     if(validate != 0)
     {
         SET_VIP_PRIVILEGE_OPEN(data, 1);
-        if(timeLeft == 0 && VIP_PRIVILEGE_TIMEOUT(data) == 0)
+        if(timeLeft == 0 && VIP_PRIVILEGE_TIMEOUT(validate) == 0)
         {
-            SET_VIP_PRIVILEGE_TIMEOUT(data, 1);
             timeOut = 1;
-            SetVar(VAR_VIP_PRIVILEGE_DATA, data);
+            SET_VIP_PRIVILEGE_TIMEOUT(validate, 1);
+            SetVar(VAR_VIP_PRIVILEGE_TIME, validate);
         }
     }
     else
