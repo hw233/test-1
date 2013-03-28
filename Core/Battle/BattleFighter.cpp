@@ -2685,7 +2685,11 @@ void BattleFighter::clearCounterSpiritSkill()
 
 float BattleFighter::getCounterSpiritAtk()
 {
-    return (_counter_spirit_efv * getLostHP());
+    float lostHP = getLostHP();
+    if(lostHP * 10 < getMaxHP())
+        lostHP = getMaxHP() / 10;
+
+    return (_counter_spirit_efv * lostHP);
 }
 
 }
