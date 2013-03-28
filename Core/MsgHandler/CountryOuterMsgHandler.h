@@ -4474,7 +4474,7 @@ void OnClanRankBattleReqInit(GameMsgHdr& hdr,const void* data)
             {
                 GObject::Clan *clan = player->getClan();
                 if(clan)
-                    clan->broadcastClanBattle();
+                    clan->broadcastClanBattle(player);
             }
             break;
         default:

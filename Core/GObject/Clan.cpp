@@ -4217,19 +4217,24 @@ void Clan::sendQQOpenid(Player* player)
     player->send(st);
 }
 
-void Clan::sendClanBattle(Player *player)
+void Clan::sendClanBattle(Player *player, Player *caller)
 {
     Stream st(REP::CLAN_RANKBATTLE_REPINIT);
     st << static_cast<UInt8>(0x08);
-    st << player->getName();
+    st << caller->getName();
     st << Stream::eos;
     player->send(st);
 }
 
-void Clan::broadcastClanBattle()
+void Clan::broadcastClanBattle(Player *caller)
 {
+    UInt32 now = TimeUtil::Now();
+    UInt32 startTime = TimeUtil::SharpDayT(0, now) + RANK_BATTLE_SIGNUP_BEGINTIME;
+    UInt32 endTime = startTime + RANK_BATTLE_SIGNUP_TIME;
+    if(now < startTime || now > endTime)
+        return;
     Mutex::ScopedLock lk(_mutex);
-#define CLAN_BATTLE_LOCATION 1811
+//#define CLAN_BATTLE_LOCATION 1811
 	ClanMember *mem = NULL;
     Clan::Members::iterator offset;
 	for(offset = _members.begin(); offset != _members.end(); ++offset)
@@ -4237,13 +4242,13 @@ void Clan::broadcastClanBattle()
         mem = *offset;
         if(!mem)
             continue;
-        if(!mem->player)
+        if(!mem->player || mem->player == caller)
             continue;
         if(!mem->player->isOnline())
             continue;
-        if(mem->player->getLocation() == CLAN_BATTLE_LOCATION)
-            continue;
-        sendClanBattle(mem->player);
+        //if(mem->player->getLocation() == CLAN_BATTLE_LOCATION)
+        //    continue;
+        sendClanBattle(mem->player, caller);
 	}
 }
 // 帮派副本
