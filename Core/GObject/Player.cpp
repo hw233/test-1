@@ -14104,19 +14104,19 @@ namespace GObject
         if(_onBattlePet)
         {
             st << static_cast<UInt16>(_onBattlePet->getId());
-            st << fgt->getLevel() << fgt->getPotential() << fgt->getCapacity();
-            st << fgt->getMaxSoul() << fgt->getPeerlessAndLevel();
-            fgt->getAllUpSkillAndLevel(st);
-            fgt->getAllPSkillAndLevel4Arena(st);
-            fgt->getAllSSAndLevel(st);
-            fgt->getAllLbSkills(st);
+            st << _onBattlePet->getLevel() << _onBattlePet->getPotential() << _onBattlePet->getCapacity();
+            st << _onBattlePet->getMaxSoul() << _onBattlePet->getPeerlessAndLevel();
+            _onBattlePet->getAllUpSkillAndLevel(st);
+            _onBattlePet->getAllPSkillAndLevel4Arena(st);
+            _onBattlePet->getAllSSAndLevel(st);
+            _onBattlePet->getAllLbSkills(st);
 
-            fgt->getAttrExtraEquip(st);
+            _onBattlePet->getAttrExtraEquip(st);
 
-            st << fgt->getSoulExtraAura();
-            st << fgt->getSoulAuraLeft();
-            st << fgt->getPortrait();
-            fgt->appendElixirAttr2(st);
+            st << _onBattlePet->getSoulExtraAura();
+            st << _onBattlePet->getSoulAuraLeft();
+            st << _onBattlePet->getPortrait();
+            _onBattlePet->appendElixirAttr2(st);
         }
         else
         {
