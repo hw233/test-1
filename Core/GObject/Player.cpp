@@ -659,7 +659,7 @@ namespace GObject
 #ifndef _WIN32
 		m_ulog(NULL),
 #endif
-		m_isOffical(false), m_isXY(false), m_sysDailog(false), m_hasTripod(false), _maxLingbaoBattlePoint(0),  _jobHunter(NULL), _dreamer(NULL), _onBattlePet(NULL)
+		m_isOffical(false), m_isXY(false), m_XinYue(0), m_sysDailog(false), m_hasTripod(false), _maxLingbaoBattlePoint(0), _jobHunter(NULL), _dreamer(NULL), _onBattlePet(NULL)
 	{
         m_ClanBattleStatus = 1;
         m_ClanBattleScore = 0;
@@ -1283,11 +1283,11 @@ namespace GObject
             char buf[1024] = {0};
             char* pbuf = &buf[0];
             if (cfg.isTestPlatform)
-                pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u|%u|%u|%u|%u||%u||%u||%u|1|",
-                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId(), GetLev(), _playerData.gold, _playerData.coupon, _playerData.tael, getVipLevel(), _clan? _clan->getId() : 0, _playerData.qqvipl, cfg.serverNum, platform);
+                pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u|%u|%u|%u|%u|%u|%u||%u||%u|1|",
+                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId(), GetLev(), _playerData.gold, _playerData.coupon, _playerData.tael, getVipLevel(), _clan? _clan->getId() : 0, getXinYue(), _playerData.qqvipl, cfg.serverNum, platform);
             else
-                pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u|%u|%u|%u|%u||%u||%u||%u|",
-                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId(), GetLev(), _playerData.gold, _playerData.coupon, _playerData.tael, getVipLevel(), _clan? _clan->getId() : 0, _playerData.qqvipl, cfg.serverNum, platform);
+                pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u|%u|%u|%u|%u|%u|%u||%u||%u|",
+                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId(), GetLev(), _playerData.gold, _playerData.coupon, _playerData.tael, getVipLevel(), _clan? _clan->getId() : 0, getXinYue(), _playerData.qqvipl, cfg.serverNum, platform);
 
             m_ulog->SetUserMsg(buf);
             if (platform != WEBDOWNLOAD)
@@ -18562,7 +18562,11 @@ bool Player::SetVipPrivilege()
     if(validate == 0)
     {
         UInt32 now = TimeUtil::Now();
-        SetVar(VAR_VIP_PRIVILEGE_TIME, now + 168*3600);
+        UInt32 validate = now + 168*3600;
+        // 保持最低位为0
+        if(validate & 0x1)
+            validate = validate + 1;
+        SetVar(VAR_VIP_PRIVILEGE_TIME, validate);
         ret = true;
         ConsumeInfo ci(VipPrivilege, 0, 0);
         useGold(100, &ci);
@@ -18576,7 +18580,7 @@ bool Player::SetVipPrivilege()
 #define VIP_PRIVILEGE_LIMITBUY1(data)  (0x02&data)
 #define VIP_PRIVILEGE_LIMITBUY2(data)  (0x04&data)
 #define VIP_PRIVILEGE_LIMITBUY3(data)  (0x08&data)
-#define VIP_PRIVILEGE_TIMEOUT(data)  (0x0100&data)
+#define VIP_PRIVILEGE_TIMEOUT(data)  (0x1&data)
 
 #define SET_VIP_PRIVILEGE_DAYLYAWARD(data, v) (data|=(v&0x01))
 #define SET_VIP_PRIVILEGE_LIMITBUY1(data, v)  (data|=((v<<1)&0x02))
@@ -18584,7 +18588,7 @@ bool Player::SetVipPrivilege()
 #define SET_VIP_PRIVILEGE_LIMITBUY3(data, v)  (data|=((v<<3)&0x08))
 #define SET_VIP_PRIVILEGE_OPEN(data, v)       (data|=((v<<4)&0x10))
 #define SET_VIP_PRIVILEGE_DAYTH(data, v)      (data|=((v<<5)&0xE0))
-#define SET_VIP_PRIVILEGE_TIMEOUT(data, v)    (data|=((v<<8)&0x0100))
+#define SET_VIP_PRIVILEGE_TIMEOUT(data, v)    (data|=((v)&0x1))
 
 void Player::doVipPrivilege(UInt8 idx)
 {
@@ -18638,7 +18642,6 @@ void Player::doVipPrivilege(UInt8 idx)
         }
     }
 
-
     sendVipPrivilege();
 }
 
@@ -18657,11 +18660,11 @@ void Player::sendVipPrivilege()
     if(validate != 0)
     {
         SET_VIP_PRIVILEGE_OPEN(data, 1);
-        if(timeLeft == 0 && VIP_PRIVILEGE_TIMEOUT(data) == 0)
+        if(timeLeft == 0 && VIP_PRIVILEGE_TIMEOUT(validate) == 0)
         {
-            SET_VIP_PRIVILEGE_TIMEOUT(data, 1);
             timeOut = 1;
-            SetVar(VAR_VIP_PRIVILEGE_DATA, data);
+            SET_VIP_PRIVILEGE_TIMEOUT(validate, 1);
+            SetVar(VAR_VIP_PRIVILEGE_TIME, validate);
         }
     }
     else
