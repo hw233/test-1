@@ -377,6 +377,11 @@ namespace GObject
         //VAR_HUNYUAN_STEP4_COUNT = 422, //大闹龙宫之混元剑诀从第4格移动到第5失败的次数
         //431-440 for yijian
         VAR_LONGYUAN_GOT = 431,  //龙元风髓领取标志
+
+        // 441-442 for JLT
+        VAR_HAS_VOTE = 441,                 // 本日是否投票过
+        VAR_POPULARITY = 442,               // 本周人气
+
         VAR_FOOLBAO_USED = 450,  //愚人宝箱使用数
         VAR_RP7_TREASURE = 432,  //回流服务器聚宝盆, 1-8位:是否购买的标志为 9-16,17-24,25-32位第1-3个聚宝盆的已领取次数
         VAR_RP7_TREASURE_TODAY_GOT=433, //第1-3位:各个聚宝盆今天是否已领取
@@ -733,6 +738,11 @@ namespace GObject
             REGISTER_VAR(VAR_ONLINE_TOTAL_TIME, CYCLE_DAY);
             REGISTER_VAR(VAR_ONLINE_AWARD, CYCLE_DAY);
             REGISTER_VAR(VAR_QZONE_QQGAME_ACT, CYCLE_DAY);
+
+            REGISTER_VAR(VAR_HAS_VOTE, CYCLE_DAY);
+            REGISTER_VAR(VAR_POPULARITY, CYCLE_WEEK);
+
+            REGISTER_VAR(VAR_FOOLBAO_USED, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

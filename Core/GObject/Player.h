@@ -789,6 +789,7 @@ namespace GObject
         void sendRechargeRankAward(int pos);
         void sendConsumeRankAward(int pos);
         void sendKillMonsterRankAward(UInt8 index, Int32 pos);
+        void sendPopularityRandAward(int popularity);
         UInt32 getEventState(UInt32 type);
 
 	public:
@@ -1383,6 +1384,9 @@ namespace GObject
         void OnCFriendLvlUp(Player*, UInt8);
 
 		void sendFriendList(UInt8, UInt8, UInt8);
+
+        void vote(Player *other);
+        void beVoted();
 
 		void PutFighters(Battle::BattleSimulator&, int side, bool fullhp = false);
         void PutPets (Battle::BattleSimulator&, int side, bool init = true);
@@ -2106,7 +2110,14 @@ namespace GObject
         void getKillMonsterAward();
 
         UInt32 getBattlePoint();
+        void calcLingbaoBattlePoint();
+        void setMaxLingbaoBattlePoint(UInt32 value);
+        UInt32 getMaxLingbaoBattlePoint();
         void verifyFighter();
+
+    private:
+        UInt32 _maxLingbaoBattlePoint;
+
 #ifdef _FB
     public:
         void sendLevelAward();

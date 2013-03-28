@@ -5502,7 +5502,7 @@ namespace GObject
 
         LoadingCounter lc("Loading lingbao attr:");
         DBLingbaoAttr dblba;
-        if(execu->Prepare("SELECT `equipment`.`id`, `tongling`, `lbcolor`, `types`, `values`, `skills`, `factors` FROM `lingbaoattr` LEFT JOIN `equipment` ON `equipment`.`id` = `lingbaoattr`.`id`", dblba) != DB::DB_OK)
+        if(execu->Prepare("SELECT `equipment`.`id`, `tongling`, `lbcolor`, `types`, `values`, `skills`, `factors`, `battlepoint` FROM `lingbaoattr` LEFT JOIN `equipment` ON `equipment`.`id` = `lingbaoattr`.`id`", dblba) != DB::DB_OK)
             return false;
 
         lc.reset(2000);
@@ -5526,6 +5526,7 @@ namespace GObject
                     ItemLingbaoAttr& lba = lb->getLingbaoAttr();
                     lba.tongling = dblba.tongling;
                     lba.lbColor = dblba.lbcolor;
+                    lba.battlePoint = dblba.battlePoint;
                     {
                         StringTokenizer tk(dblba.types, ",");
                         if (tk.count())
@@ -5620,7 +5621,7 @@ namespace GObject
 
     bool GObjectManager::loadDreamer()
     {
-        // TODO: 读取水晶梦境有关数据
+        // 读取水晶梦境有关数据
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading dreamer");

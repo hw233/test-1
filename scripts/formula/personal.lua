@@ -624,6 +624,40 @@ function calcSkillBattlePoint(c, l, t, s)
     return bp;
 end
 
+function calcLingbaoBattlePoint(lbatr)
+    -- 计算宝具的战斗力
+    local bp = 0
+    for i = 0, 3 do
+        local atrType = lbatr:getType(i)
+        if atrType == 1 then
+            bp = bp + lbatr:getValue(i) * bp_factor_atk;
+        elseif atrType == 2 then
+            bp = bp + lbatr:getValue(i) * bp_factor_magatk;
+        elseif atrType == 3 then
+            bp = bp + lbatr:getValue(i) * bp_factor_def;
+        elseif atrType == 4 then
+            bp = bp + lbatr:getValue(i) * bp_factor_magdef;
+        elseif atrType == 5 then
+            bp = bp + lbatr:getValue(i) * bp_factor_hp;
+        elseif atrType == 6 then
+            bp = bp + lbatr:getValue(i) * bp_factor_toughl;
+        elseif atrType == 7 then
+            bp = bp + lbatr:getValue(i) * bp_factor_action;
+        elseif atrType == 8 then
+            bp = bp + lbatr:getValue(i) * bp_factor_hitrl;
+        elseif atrType == 9 then
+            bp = bp + lbatr:getValue(i) * bp_factor_evadl;
+        elseif atrType == 10 then
+            bp = bp + lbatr:getValue(i) * bp_factor_crtl;
+        elseif atrType == 11 then
+            bp = bp + lbatr:getValue(i) * bp_factor_pirl;
+        elseif atrType == 12 then
+            bp = bp + lbatr:getValue(i) * bp_factor_counterl;
+        end
+    end
+    return bp
+end
+
 function calcBattlePoint_old( fgt )
   if fgt == nil then
     return 0

@@ -663,7 +663,7 @@ namespace GObject
 #ifndef _WIN32
 		m_ulog(NULL),
 #endif
-		m_isOffical(false), m_isXY(false), m_XinYue(0), m_sysDailog(false), m_hasTripod(false), _jobHunter(NULL), _dreamer(NULL), _onBattlePet(NULL)
+		m_isOffical(false), m_isXY(false), m_XinYue(0), m_sysDailog(false), m_hasTripod(false), _maxLingbaoBattlePoint(0), _jobHunter(NULL), _dreamer(NULL), _onBattlePet(NULL)
 	{
         m_ClanBattleStatus = 1;
         m_ClanBattleScore = 0;
@@ -4290,7 +4290,7 @@ namespace GObject
 		else
 			cnt = end - start;
 		Stream st(REP::FRIEND_LIST);
-		st << static_cast<UInt8>(type) << start << cnt << sz;
+		st << static_cast<UInt8>(type) << static_cast<UInt8>(GetVar(VAR_HAS_VOTE)?1:0) << start << cnt << sz;
         if (sz && cnt)
         {
             std::set<Player *>::iterator it = _friends[type].begin();
@@ -4308,6 +4308,27 @@ namespace GObject
 		send(st);
 	}
 
+    void Player::vote(Player* other)
+    {
+        if (GetVar(VAR_HAS_VOTE))
+        {
+            return;
+        }
+        SetVar(VAR_HAS_VOTE, 1);
+        GameMsgHdr hdr(0x360, other->getThreadId(), other, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+        sendMsgCode(0, 1509);
+        //GameMsgHdr hdr2(0x1C6, WORKER_THREAD_WORLD, this, 0);
+        //GLOBAL().PushMsg(hdr2, NULL);
+    }
+
+    void Player::beVoted()
+    {
+        AddVar(VAR_POPULARITY, 1);
+        UInt32 total = GetVar(VAR_POPULARITY);
+        GameMsgHdr hdr(0x1C7, WORKER_THREAD_WORLD, this, sizeof(total));
+        GLOBAL().PushMsg(hdr, &total);
+    }
 
 	void Player::sendModification( UInt8 t, UInt32 v, bool updateToDB )
 	{
@@ -12414,6 +12435,11 @@ namespace GObject
 #endif
     }
 
+    void Player::sendPopularityRandAward(int popularity)
+    {
+        // TODO: 发送称号卡
+    }
+
     void Player::sendKillMonsterRankAward(UInt8 index, Int32 pos)
     {
         if (index > 3 || !pos || pos > 1)
@@ -15586,6 +15612,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
                 if(fighter)
                     bp += fighter->getBattlePoint();
             }
+            calcLingbaoBattlePoint();
         }
         else
         {
@@ -15601,6 +15628,41 @@ void EventTlzAuto::notify(bool isBeginAuto)
         }
 
         return bp;
+    }
+
+    void Player::calcLingbaoBattlePoint()
+    {
+        if(CURRENT_THREAD_ID() == getThreadId())
+        {
+            UInt32 value = 0;
+            _maxLingbaoBattlePoint = 0;
+            for(int j = 0; j < 5; ++ j)
+            {
+                Fighter* fighter = _playerData.lineup[j].fighter;
+                if(fighter)
+                {
+                    value = fighter->calcLingbaoBattlePoint();
+                    _maxLingbaoBattlePoint = value > _maxLingbaoBattlePoint? value:_maxLingbaoBattlePoint;
+                }
+            }
+        }
+        else
+        {
+            GameMsgHdr hdr(0x353, getThreadId(), this, 0);
+            GLOBAL().PushMsg(hdr, NULL);
+        }
+
+    }
+
+    void Player::setMaxLingbaoBattlePoint(UInt32 value)
+    {
+        _maxLingbaoBattlePoint = value;
+    }
+
+
+    UInt32 Player::getMaxLingbaoBattlePoint()
+    {
+        return _maxLingbaoBattlePoint;
     }
 
     void Player::verifyFighter()
