@@ -377,7 +377,7 @@ namespace GObject
         //VAR_HUNYUAN_STEP4_COUNT = 422, //大闹龙宫之混元剑诀从第4格移动到第5失败的次数
         //431-440 for yijian
         VAR_LONGYUAN_GOT = 431,  //龙元风髓领取标志
-
+        VAR_FOOLBAO_USED = 450,  //愚人宝箱使用数
         VAR_MAX,
     };
 
