@@ -25,6 +25,11 @@ namespace GObject
     //帮会战技能列表
     const static UInt32 RANK_BATTLE_SKILL_NUM = 12;
 
+    //帮会排名战报名开始时间
+    const static UInt32 RANK_BATTLE_SIGNUP_BEGINTIME = 20 * 60 * 60;
+    //帮会排名战报名持续时间
+    const static UInt32 RANK_BATTLE_SIGNUP_TIME = 40 * 60;
+
     /**
      *@brief 排名战帮会信息
      */

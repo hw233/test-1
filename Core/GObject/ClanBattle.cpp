@@ -2597,6 +2597,8 @@ void ClanCityBattle::closingBattlerAward(UInt8 succ)
 		{
 			player = awardIter->second->player;
 			UInt64 exp = static_cast<UInt64>(2 * 200 * awardExpSum[player->getClan()->getId()] * (awardSize - row + 1) / (awardSize * (awardSize + 1)));
+            if (cfg.rpServer && player->GetLev() < 70)
+                exp *= 2;
 			GameMsgHdr hdr(0x203, player->getThreadId(), player, sizeof(UInt64));
 			GLOBAL().PushMsg(hdr, &exp);
 			SYSMSG_SENDV(446, player, exp);
@@ -4029,6 +4031,8 @@ void ClanRobBattle::calcBattleExp()
 		if (cbp->grabAchieve != 0)
 		{
 			UInt64 exp = static_cast<UInt64>(cbp->grabAchieve * player->GetLev() / 100 * 5);
+            if (cfg.rpServer && player->GetLev() < 70)
+                exp *= 2;
 			GameMsgHdr hdr(0x203, player->getThreadId(), player, sizeof(UInt64));
 			GLOBAL().PushMsg(hdr, &exp);
 			SYSMSG_SENDV(446, player, exp);
