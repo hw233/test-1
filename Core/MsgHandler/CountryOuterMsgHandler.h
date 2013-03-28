@@ -4469,6 +4469,13 @@ void OnClanRankBattleReqInit(GameMsgHdr& hdr,const void* data)
                 ClanRankBattleMgr::Instance().Signout(player);
             }
             break;
+        case 8:
+            {
+                GObject::Clan *clan = player->getClan();
+                if(clan)
+                    clan->broadcastClanBattle();
+            }
+            break;
         default:
             break;
     }

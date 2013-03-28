@@ -4216,6 +4216,36 @@ void Clan::sendQQOpenid(Player* player)
     st << Stream::eos;
     player->send(st);
 }
+
+void Clan::sendClanBattle(Player *player)
+{
+    Stream st(REP::CLAN_RANKBATTLE_REPINIT);
+    st << static_cast<UInt8>(0x08);
+    st << player->getName();
+    st << Stream::eos;
+    player->send(st);
+}
+
+void Clan::broadcastClanBattle()
+{
+    Mutex::ScopedLock lk(_mutex);
+#define CLAN_BATTLE_LOCATION 1811
+	ClanMember *mem = NULL;
+    Clan::Members::iterator offset;
+	for(offset = _members.begin(); offset != _members.end(); ++offset)
+	{
+        mem = *offset;
+        if(!mem)
+            continue;
+        if(!mem->player)
+            continue;
+        if(!mem->player->isOnline())
+            continue;
+        if(mem->player->getLocation() == CLAN_BATTLE_LOCATION)
+            continue;
+        sendClanBattle(mem->player);
+	}
+}
 // 帮派副本
 //////////////////////////////////////////
 

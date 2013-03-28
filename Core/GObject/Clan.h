@@ -424,6 +424,8 @@ public:
     void setQQOpenid(Player* player,std::string openid); 
     void offQQOpenid(Player* player); 
     void setQQOpenid(std::string openid) {m_qqOpenid = openid;};
+    void sendClanBattle(Player *player);
+    void broadcastClanBattle();
 
 public:
 	inline bool alive() { return !_deleted; }
