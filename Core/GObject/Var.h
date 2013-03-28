@@ -735,6 +735,7 @@ namespace GObject
             REGISTER_VAR(VAR_POPULARITY, CYCLE_WEEK);
 
             REGISTER_VAR(VAR_FOOLBAO_USED, CYCLE_NONE);
+            REGISTER_VAR(VAR_HHBAWARD_GOT, CYCLE_DAY);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);
