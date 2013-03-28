@@ -458,6 +458,7 @@ void Leaderboard::doUpdate()
 	    buildPacket(_clanCopyStream, 5, 0, blist);
     }
 
+    /*
     std::vector<LeaderboardLingbao> blist5;
 	execu->ExtractData("select p.id, p.name, e.itemId, l.tongling, l.lbcolor, l.types, l.values, l.skills, l.factors, l.battlepoint from player p, fighter f, equipment e, lingbaoattr l "
             "where p.id=f.playerId and e.id = l.id and (f.lingbao REGEXP concat(',',l.id, '$') or f.lingbao REGEXP concat('^', l.id, ',') or f.lingbao REGEXP concat(',', l.id, ',')) order by l.battlepoint DESC limit 0, 100;", blist5);
@@ -531,6 +532,7 @@ void Leaderboard::doUpdate()
         }
 	    buildPacketForLingbao(_lingbaoStream, 6, _id, _lingbaoInfoList);
     }
+    */
 
 
 	std::vector<UInt64> ilist;
