@@ -21,7 +21,7 @@ enum
 #ifndef _WIN32
 	WORKER_THREAD_DC,				//
 #ifdef OPEN_API_ON
-    WORKER_THREAD_OPEN_API,               //
+    WORKER_THREAD_OPEN_API,         //
 #endif
 #endif
 	WORKER_THREAD_DB,				//7  DB
