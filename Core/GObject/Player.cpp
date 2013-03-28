@@ -659,7 +659,7 @@ namespace GObject
 #ifndef _WIN32
 		m_ulog(NULL),
 #endif
-		m_isOffical(false), m_isXY(false), m_sysDailog(false), m_hasTripod(false), _jobHunter(NULL), _dreamer(NULL), _onBattlePet(NULL)
+		m_isOffical(false), m_isXY(false), m_XinYue(0), m_sysDailog(false), m_hasTripod(false), _jobHunter(NULL), _dreamer(NULL), _onBattlePet(NULL)
 	{
         m_ClanBattleStatus = 1;
         m_ClanBattleScore = 0;
@@ -1283,11 +1283,11 @@ namespace GObject
             char buf[1024] = {0};
             char* pbuf = &buf[0];
             if (cfg.isTestPlatform)
-                pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u|%u|%u|%u|%u||%u||%u||%u|1|",
-                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId(), GetLev(), _playerData.gold, _playerData.coupon, _playerData.tael, getVipLevel(), _clan? _clan->getId() : 0, _playerData.qqvipl, cfg.serverNum, platform);
+                pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u|%u|%u|%u|%u|%u|%u||%u||%u|1|",
+                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId(), GetLev(), _playerData.gold, _playerData.coupon, _playerData.tael, getVipLevel(), _clan? _clan->getId() : 0, getXinYue(), _playerData.qqvipl, cfg.serverNum, platform);
             else
-                pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u|%u|%u|%u|%u||%u||%u||%u|",
-                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId(), GetLev(), _playerData.gold, _playerData.coupon, _playerData.tael, getVipLevel(), _clan? _clan->getId() : 0, _playerData.qqvipl, cfg.serverNum, platform);
+                pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u|%u|%u|%u|%u|%u|%u||%u||%u|",
+                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId(), GetLev(), _playerData.gold, _playerData.coupon, _playerData.tael, getVipLevel(), _clan? _clan->getId() : 0, getXinYue(), _playerData.qqvipl, cfg.serverNum, platform);
 
             m_ulog->SetUserMsg(buf);
             if (platform != WEBDOWNLOAD)
