@@ -184,6 +184,7 @@ private:
     void OnSomeAct(GObject::Player *player, std::vector<std::string>& args);
     void OnDragonKingAct(GObject::Player *player, std::vector<std::string>& args);
     void OnFairyPetGM(GObject::Player *player, std::vector<std::string>& args);
+    void OnFoolsDayGM(GObject::Player *player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;

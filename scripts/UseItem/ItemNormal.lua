@@ -1487,11 +1487,13 @@ function ItemNormal_00000480(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
+    --[[
     local date = os.date("%m%d", os.time())
     if date ~= "0401" then
         SendMsg(player, 0x35, msg_64);
         return false
     end
+    --]]
 
 	local fgt = player:findFighter(param);
 	if fgt == nil then
@@ -9755,6 +9757,12 @@ local ItemNormal_Table = {
     [9373] = ItemNormal_00009366,
     [9374] = ItemNormal_00009366,
     [9900] = ItemNormal_NameCard,
+    [9901] = ItemNormal_NameCard,
+    [9902] = ItemNormal_NameCard,
+    [9903] = ItemNormal_NameCard,
+    [9904] = ItemNormal_NameCard,
+    [9905] = ItemNormal_NameCard,
+    [9906] = ItemNormal_NameCard,
 
     [10000] = ItemNormal_00010000,
     [10001] = ItemNormal_00010001,

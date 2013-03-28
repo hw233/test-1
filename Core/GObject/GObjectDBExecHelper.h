@@ -1139,6 +1139,7 @@ struct DBLingbaoAttr
     std::string values;
     std::string skills;
     std::string factors;
+    UInt32 battlePoint;
 };
 
 struct DBLingbaoSmelt
@@ -2624,7 +2625,7 @@ SPECIALDEF(16)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBLingbaoAttr)
-SPECIALDEF(7)
+SPECIALDEF(8)
 (
     UInt32, id,
     UInt8, tongling,
@@ -2632,7 +2633,8 @@ SPECIALDEF(7)
     std::string, types,
     std::string, values,
     std::string, skills,
-    std::string, factors
+    std::string, factors,
+    UInt32, battlePoint
 )
 SPECIALEND()
 

@@ -26,6 +26,21 @@ struct LeaderboardClanCopy
     UInt64 time;
 };
 
+struct LeaderboardLingbao
+{
+    UInt64 id;
+    std::string name;
+    UInt32 itemId;
+    UInt8 tongling;
+    UInt8 lbcolor;
+    std::string types;
+    std::string values;
+    std::string skills;
+    std::string factors;
+    UInt32 battlePoint;
+
+};
+
 struct RankingInfoList
 {
     UInt64 id;
@@ -65,6 +80,30 @@ struct ClanBattleRankingInfoList
     UInt32 value; //帮派积分 
 };
 
+struct LingbaoInfoList
+{
+    UInt64 id;
+    std::string  name;
+    UInt8  pf;
+    UInt8  country;
+    UInt32 battlePoint;
+    UInt32 itemId;
+    UInt8  tongling;
+    UInt8  lbcolor;
+    UInt8  type[4];
+    UInt16  value[4];
+    UInt16  skill[2];
+    UInt16  factor[2];
+    LingbaoInfoList()
+        :id(0), pf(0), country(0), battlePoint(0), itemId(0), tongling(0), lbcolor(0)
+    {
+        memset(type, 0, sizeof(type));
+        memset(value, 0, sizeof(value));
+        memset(skill, 0, sizeof(skill));
+        memset(factor, 0, sizeof(factor));
+    }
+};
+
 
 class Leaderboard
 {
@@ -83,6 +122,8 @@ public:
     std::vector<TownRankingInfoList>& getTownList() {return _town;};
     std::vector<ClanCopyRankingInfoList>& getClanCopyList() {return _clanCopyInfo;};
     std::vector<ClanBattleRankingInfoList>& getClanBattleList() {return _clanBattleInfo;};
+    std::vector<LingbaoInfoList>& getLingbaoList() { return _lingbaoInfoList; }
+    std::vector<RankingInfoList>* getPopularityList() { return &_popularityList; }
 
     const std::vector<LeaderboardTowndown>& getTowndown()
     {
@@ -110,12 +151,14 @@ public:
 private:
 	void doUpdate();
     void makeRankStream(Stream*& st, UInt8 type, Player* pl);
+    void makeRankAndValueStream(Stream*& st, UInt8 type, Player* pl, UInt32 value);
 
 	Stream _levelStream;
 	Stream _moneyStream;
 	Stream _achievementStream;
 	Stream _clanStream;
 	Stream _clanCopyStream;
+    Stream _lingbaoStream;
     Stream _battleStream;
 	UInt32 _id;
 	UInt8 _maxLevel;
@@ -142,6 +185,8 @@ private:
     std::vector<TownRankingInfoList> _town;
     std::vector<ClanCopyRankingInfoList> _clanCopyInfo;
     std::vector<ClanBattleRankingInfoList> _clanBattleInfo;
+    std::vector<LingbaoInfoList> _lingbaoInfoList;
+    std::vector<RankingInfoList> _popularityList;
 
     AtomicVal<bool> m_sorting;
 
@@ -150,6 +195,8 @@ private:
     std::map<UInt64, int> _playerClanRank;
     std::map<UInt64, int> _playerBattleRank;
     std::map<UInt64, int> _playerClanCopyRank;
+    std::map<UInt64, int> _lingbaoRank;
+    std::map<UInt64, int> _playerPopularityRank;
     FastMutex _opMutex;
 };
 
