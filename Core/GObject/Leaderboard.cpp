@@ -96,7 +96,7 @@ SPECIALDEF(10)
     std::string, name,
     UInt32, itemId,
     UInt8, tongling,
-    UInt8, lbcolor,
+    UInt8, lbColor,
     std::string, types,
     std::string, values,
     std::string, skills,
@@ -151,6 +151,7 @@ void buildPacket2(Stream& st, UInt8 t, UInt32 id, std::vector<LeaderboardItem2>&
 	st << Stream::eos;
 }
 
+/*
 void buildPacketForLingbao(Stream& st, UInt8 t, UInt32 id, std::vector<LingbaoInfoList>& list, bool merge = true)
 {
 	UInt8 c = static_cast<UInt8>(list.size());
@@ -161,12 +162,43 @@ void buildPacketForLingbao(Stream& st, UInt8 t, UInt32 id, std::vector<LingbaoIn
 		LingbaoInfoList& item = list[i];
 		if(merge)
 			Player::patchMergedName(item.id, item.name);
-        st << item.name << item.pf << item.country << item.battlePoint << static_cast<UInt16>(item.itemId) << item.tongling << item.lbcolor;
+        st << item.name << item.pf << item.country << item.battlePoint << static_cast<UInt16>(item.itemId) << item.tongling << item.lbColor;
         for (UInt8 i = 0; i < 4; ++i)
         {
             st << item.type[i] << item.value[i];
         }
         st << item.skill[0] << item.factor[0] << item.skill[1] << item.factor[1];
+	}
+	st << Stream::eos;
+}
+*/
+
+void Leaderboard::buildPacketForLingbao(Stream& st, UInt8 t, bool merge /* = true */)
+{
+    // TODO:
+    _lingbaoRank.clear();
+
+	UInt8 c = static_cast<UInt8>(_lingbaoInfoSet.size());
+	st.init(REP::SORT_LIST);
+	st << t << static_cast<UInt32>(0) << static_cast<UInt32>(0) << c;
+	//for(UInt8 i = 0; i < c; ++ i)
+    UInt32 i = 0;
+    for (LingbaoInfoSet::iterator it = _lingbaoInfoSet.begin(); it != _lingbaoInfoSet.end(); ++ it)
+	{
+		const LingbaoInfoList& item = *it;
+        if ((_lingbaoRank[item.id] == 0) || (_lingbaoRank[item.id] > static_cast<int>(i+1)))
+            _lingbaoRank[item.id] = i+1;
+
+        std::string name = item.name;
+		if(merge)
+			GObject::Player::patchMergedName(item.id, name);
+        st << name << item.pf << item.country << item.battlePoint << static_cast<UInt16>(item.itemId) << item.tongling << item.lbColor;
+        for (UInt8 j = 0; j < 4; ++j)
+        {
+            st << item.type[j] << item.value[j];
+        }
+        st << item.skill[0] << item.factor[0] << item.skill[1] << item.factor[1];
+        ++ i;
 	}
 	st << Stream::eos;
 }
@@ -457,13 +489,14 @@ void Leaderboard::doUpdate()
         }
 	    buildPacket(_clanCopyStream, 5, 0, blist);
     }
+    /*
 
     std::vector<LeaderboardLingbao> blist5;
 	execu->ExtractData("select p.id, p.name, e.itemId, l.tongling, l.lbcolor, l.types, l.values, l.skills, l.factors, l.battlepoint from player p, fighter f, equipment e, lingbaoattr l "
             "where p.id=f.playerId and e.id = l.id and (f.lingbao REGEXP concat(',',l.id, '$') or f.lingbao REGEXP concat('^', l.id, ',') or f.lingbao REGEXP concat(',', l.id, ',')) order by l.battlepoint DESC limit 0, 100;", blist5);
     {
         FastMutex::ScopedLock lk(_cmutex);
-         _lingbaoInfoList.clear(); 
+         _lingbaoInfoSet.clear(); 
 	    blist.resize(100);
         if (blist5.size() < 100)
             blist.resize(blist5.size());
@@ -480,7 +513,7 @@ void Leaderboard::doUpdate()
             r.name = blist5[i].name;
             r.itemId = blist5[i].itemId;
             r.tongling = blist5[i].tongling;
-            r.lbcolor = blist5[i].lbcolor;
+            r.lbColor = blist5[i].lbColor;
             StringTokenizer tk(blist5[i].types, ",");
             if (tk.count())
             {
@@ -524,13 +557,14 @@ void Leaderboard::doUpdate()
 
             r.battlePoint = blist5[i].battlePoint;
 
-            _lingbaoInfoList.push_back(r);
+            _lingbaoInfoSet.push_back(r);
 
             if ((_lingbaoRank[r.id] == 0) || (_lingbaoRank[r.id] > static_cast<int>(i+1)))
                 _lingbaoRank[r.id] = i+1;
         }
-	    buildPacketForLingbao(_lingbaoStream, 6, _id, _lingbaoInfoList);
+	    buildPacketForLingbao(_lingbaoStream, 6, _id, _lingbaoInfoSet);
     }
+*/
 
 
 	std::vector<UInt64> ilist;
@@ -994,6 +1028,11 @@ void Leaderboard::makeRankAndValueStream(Stream*& st, UInt8 type, Player* pl, UI
     UInt8 buf[4] = {0, 0, 0xFF, REP::SORT_LIST};
     memcpy(buf, &len, 2);
     st->prepend(buf, 4);
+}
+
+void Leaderboard::pushLingbaoInfo(LingbaoInfoList lingbaoInfo)
+{
+    _lingbaoInfoSet.insert(lingbaoInfo);
 }
 
 }
