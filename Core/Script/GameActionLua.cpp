@@ -1592,5 +1592,16 @@ namespace Script
     {
 		return Call<bool>("RunVipPrivilegeAward", player, idx, dayth);
     }
+
+    bool GameActionLua::checkAnswerInFoolsDay(UInt8 qid, char answer)
+    {
+		return Call<bool>("checkAnswerInFoolsDay", qid, answer);
+    }
+
+    void GameActionLua::getAwardInFoolsDay(Player* player, UInt8 idx)
+    {
+		assert(player != NULL);
+		Call<void>("getAwardInFoolsDay", player, idx);
+    }
 }
 

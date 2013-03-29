@@ -242,6 +242,7 @@ GMHandler::GMHandler()
     Reg(3, "act", &GMHandler::OnSomeAct);
     Reg(2, "king", &GMHandler::OnDragonKingAct);
     Reg(2, "pet", &GMHandler::OnFairyPetGM);
+    Reg(2, "fool", &GMHandler::OnFoolsDayGM);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -3739,6 +3740,16 @@ void GMHandler::OnFairyPetGM(GObject::Player *player, std::vector<std::string>& 
         case 3:
             player->setFairypetBattle(val);
             break;
+        case 4:
+            player->AddVar(VAR_FAIRYPET_LIKEABILITY, val);
+            player->sendFairyPetResource();
+            break;
     }
+}
+
+void GMHandler::OnFoolsDayGM(GObject::Player *player, std::vector<std::string>& args)
+{
+    player->SetVar(VAR_FOOLS_DAY, 0);
+    player->SetVar(VAR_FOOLS_DAY_INFO, 0);
 }
 

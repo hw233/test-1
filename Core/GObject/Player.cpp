@@ -1039,8 +1039,10 @@ namespace GObject
             GameAction()->onNewYear(this);
         if (World::getValentineDay())
             GameAction()->onValentineDay(this);
+        /*
         if (World::getFoolsDay())
             GameAction()->onFoolsDay(this);
+        */
         if (World::getMayDay())
             GameAction()->onMayDay(this);
         if (World::getMayDay1())
@@ -2186,6 +2188,8 @@ namespace GObject
             LoginMsgHdr hdr1(0x301, WORKER_THREAD_LOGIN, 0, this->GetSessionID(), sizeof(crackValue));
             GLOBAL().PushMsg(hdr1, &crackValue);
         }
+        //愚公移山活动
+        setLogoutInFoolsDay();
 	}
 
 	void Player::checkLastBattled()
@@ -10083,8 +10087,7 @@ namespace GObject
                     qqvipl = _playerData.qqvipl % 10;
                 }
             }
-
-            st << qqvipl << _playerData.qqvipyear << static_cast<UInt8>((_playerData.qqawardgot>>flag) & 0x03);
+            st << qqvipl << _playerData.qqvipyear << static_cast<UInt8>(((_playerData.qqawardgot>>flag)|(GetVar(VAR_HHBAWARD_GOT) << 3))& 0x0B);
             UInt8 maxCnt = GObjectManager::getYDMaxCount();
             if(flag == 8)
                 st << static_cast<UInt8>(maxCnt - 1);
@@ -10130,7 +10133,6 @@ namespace GObject
     UInt8 Player::rcvYellowDiamondAward(UInt8 type, UInt8 d3d6)
     {
         checkQQAward();
-
         UInt8 nRes = 0;
         Stream st(REP::YD_AWARD_RCV);
 
@@ -10138,7 +10140,7 @@ namespace GObject
         if (domain == 11 && _playerData.qqvipl >= 20 && _playerData.qqvipl < 40 && d3d6 == 1)
         {
             UInt8 qqvipl = _playerData.qqvipl % 10;
-            if (!qqvipl)
+           if (!qqvipl)
                 return 0;
 
             UInt32 award = GetVar(VAR_AWARD_3366);
@@ -10294,11 +10296,26 @@ namespace GObject
                     sendMsgCode(2, 1011);
                 }
             }
-
-            if(nRes)
+            
+            else if(type == 3 &&_playerData.isHHBlue &&!GetVar(VAR_HHBAWARD_GOT))
             {
-                DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardgot, getId());
+                if(GetPackage()->GetRestPackageSize() > 0)
+                {
+                    nRes = 5;
+                    SetVar(VAR_HHBAWARD_GOT, 1);
+
+                    GetPackage()->AddItem2(503,1, true, true);
+                }
+                else
+                {
+                    sendMsgCode(2, 1011);
+                }
             }
+
+        }
+        if(nRes && nRes != 5)
+        {
+            DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardgot, getId());
         }
 
         st << nRes << Stream::eos;
@@ -17511,7 +17528,8 @@ static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372 };
 static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357 };
 void Player::getDragonKingInfo()
 {
-    if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END))
+    if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)
+            && GVAR.GetVar(GVAR_DRAGONKING_ACTION) != DRAGONKING_CLOSE)
     {
         GVAR.SetVar(GVAR_DRAGONKING_ACTION, 0);
         GVAR.SetVar(GVAR_DRAGONKING_BEGIN, 0);
@@ -17519,7 +17537,8 @@ void Player::getDragonKingInfo()
         return;
     }
     UInt8 flag = GVAR.GetVar(GVAR_DRAGONKING_ACTION);
-    if (flag <= DRAGONKING_CLOSE || flag >= DRAGONKING_MAX)
+    if (flag <= DRAGONKING_CLOSE || flag >= DRAGONKING_MAX
+            || flag+1 > sizeof(Dragon_type)/sizeof(UInt8))
     {
         sendMsgCode(0, 1090);
         return;
@@ -17541,7 +17560,8 @@ void Player::postDragonKing(UInt8 count)
         GLOBAL().PushMsg(h, &count);
         return;
     }
-    if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END) && GVAR.GetVar(GVAR_DRAGONKING_ACTION) != DRAGONKING_CLOSE)
+    if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)
+            && GVAR.GetVar(GVAR_DRAGONKING_ACTION) != DRAGONKING_CLOSE)
     {
         GVAR.SetVar(GVAR_DRAGONKING_ACTION, 0);
         GVAR.SetVar(GVAR_DRAGONKING_BEGIN, 0);
@@ -17550,7 +17570,8 @@ void Player::postDragonKing(UInt8 count)
     }
     if (count == 0) return;
     UInt8 flag = GVAR.GetVar(GVAR_DRAGONKING_ACTION);
-    if (flag <= DRAGONKING_CLOSE || flag >= DRAGONKING_MAX)
+    if (flag <= DRAGONKING_CLOSE || flag >= DRAGONKING_MAX
+           || flag+1 > sizeof(Dragon_type)/sizeof(UInt8))
     {
         sendMsgCode(0, 1090);
         return;
@@ -18234,7 +18255,7 @@ UInt8 Player::toQQGroup(bool isJoin)
         st << GetVar(VAR_FAIRYPET_LONGYUAN);
         st << GetVar(VAR_FAIRYPET_FENGSUI);
         st << GetVar(VAR_FAIRYPET_XIANYUAN);
-        st << static_cast<UInt8>(GetVar(VAR_FAIRYPET_LIKEABILITY));
+        st << static_cast<UInt16>(GetVar(VAR_FAIRYPET_LIKEABILITY));
         st << Stream::eos;
         send(st);
     }
@@ -19090,6 +19111,217 @@ bool Player::in7DayFromCreated()
         return false; // 玩家注册时间超过7日，无法参与活动
 
     return true;
+}
+
+#define QUESTIONID_MAX 30
+#define SET_BIT(X,Y) (X | (1<<Y))
+#define CLR_BIT(X,Y) (X & ~(1<<Y))
+#define CLR_BIT_8(X,Y) (X & ~(0xFF<<(Y*8)))
+#define SET_BIT_8(X,Y,V) (CLR_BIT_8(X,Y) | V<<(Y*8))
+#define GET_BIT_8(X,Y) ((X >> (Y*8)) & 0xFF)
+void Player::sendFoolsDayInfo()
+{
+    UInt32 info = GetVar(VAR_FOOLS_DAY_INFO);
+    UInt32 value = GetVar(VAR_FOOLS_DAY);
+    UInt32 qtime = GetVar(VAR_FOOLS_DAY_TIME);
+    UInt8 qid = GET_BIT_8(value, 0);
+    UInt8 right = 0;
+    bool isFail = false;
+    if((info & (1<<0)) == 1)
+        isFail = true;
+    if((info & (1<<0)) == 0 && qid)
+    {
+        if(!GET_BIT_8(value, 3) && qtime + 15 < TimeUtil::Now())
+            isFail = true;
+        else    //有离线标志
+        {
+            qtime = TimeUtil::Now();
+            SetVar(VAR_FOOLS_DAY_TIME, qtime);
+        }
+    }
+    for(UInt8 i = 1; i <= QUESTIONID_MAX; ++ i)
+    {
+        if(info & (1<<i))
+            ++ right;
+    }
+    if(!isFail && qid == 0 && right < QUESTIONID_MAX && GET_BIT_8(value, 1) == 0)
+    {   //分配新题目
+        UInt8 index = uRand(QUESTIONID_MAX-right);
+        UInt8 j = 0;
+        for(UInt8 i = 1; i <= QUESTIONID_MAX; ++ i)
+        {
+            if((info & (1<<i)) == 0)
+            {
+                if(j == index)
+                {
+                    qid = i;
+                    break;
+                }
+                ++ j;
+            }
+        }
+        SetVar(VAR_FOOLS_DAY, SET_BIT_8(value, 0, qid));
+        qtime = TimeUtil::Now();
+        SetVar(VAR_FOOLS_DAY_TIME, qtime);
+        if(right == 0)
+            foolsDayUdpLog(7);
+    }
+    Stream st(REP::ACTIVE);
+    st << static_cast<UInt8>(0x10) << static_cast<UInt8>(0x01);
+    st << right << static_cast<UInt8>(GET_BIT_8(value, 1));
+    st << static_cast<UInt8>(GET_BIT_8(value, 2));
+    st << static_cast<UInt8>(isFail ? 1 : 0) << qid << qtime;
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::submitAnswerInFoolsDay(UInt8 id, char answer)
+{
+    UInt32 info = GetVar(VAR_FOOLS_DAY_INFO);
+    UInt32 value = GetVar(VAR_FOOLS_DAY);
+    if(GET_BIT_8(value, 1))
+        return;
+    UInt32 qtime = GetVar(VAR_FOOLS_DAY_TIME);
+    if(info == 0 && value == 0 && qtime == 0)
+    {   //零点重置
+        sendFoolsDayInfo();
+        return;
+    }
+    UInt8 qid = GET_BIT_8(value, 0);
+    bool isRight = true;
+    if((info & 0x01) == 1)
+        isRight = false;
+    if(id != qid || qtime + 15 < TimeUtil::Now())
+        isRight = false;
+    if(isRight)
+        isRight = GameAction()->checkAnswerInFoolsDay(id, answer);
+    value = CLR_BIT_8(value, 3);    //清除离线标志
+    if(isRight) //答对
+    {
+        SetVar(VAR_FOOLS_DAY, CLR_BIT_8(value, 0));
+        info = SET_BIT(info, id);
+        SetVar(VAR_FOOLS_DAY_INFO, CLR_BIT(info, 0));
+        SYSMSG_SENDV(4148, this);
+    }
+    else        //答错
+    {
+        SetVar(VAR_FOOLS_DAY, SET_BIT_8(value, 0, id));
+        SetVar(VAR_FOOLS_DAY_INFO, SET_BIT(info, 0));
+        if(qtime + 15 < TimeUtil::Now())
+        {
+            SYSMSG_SENDV(4150, this);
+        }
+        else
+        {
+            SYSMSG_SENDV(4149, this);
+        }
+    }
+    sendFoolsDayInfo();
+}
+
+void Player::getAwardInFoolsDay()
+{
+    UInt32 value = GetVar(VAR_FOOLS_DAY);
+    if(GET_BIT_8(value, 1))
+        return;
+    UInt8 right = 0;
+    UInt32 info = GetVar(VAR_FOOLS_DAY_INFO);
+    for(UInt8 i = 1; i <= QUESTIONID_MAX; ++ i)
+    {
+        if(info & (1<<i))
+            ++ right;
+    }
+    if(right < 5)
+        return;
+    if (GetPackage()->GetRestPackageSize() < right / 5)
+    {
+        sendMsgCode(2, 1011, 0);
+        return;
+    }
+    GameAction()->getAwardInFoolsDay(this, right / 5);
+    SetVar(VAR_FOOLS_DAY, SET_BIT_8(value, 1, right/5 * 5));
+    sendFoolsDayInfo();
+    foolsDayUdpLog(right / 5);
+}
+
+void Player::buyResurrectionCard()
+{
+    if(!hasChecked())
+        return;
+    UInt32 value = GetVar(VAR_FOOLS_DAY);
+    if(GET_BIT_8(value, 1))
+        return;
+    if(GET_BIT_8(value, 0) == 0)
+        return;
+    UInt8 cnt = GET_BIT_8(value, 2) + 1;
+    if(cnt * 10 > getGold())
+    {
+        sendMsgCode(0, 1104);
+        return;
+    }
+    ConsumeInfo ci(FoolsDayAnswerAct, 0, 0);
+    useGold(cnt*10, &ci);
+
+    UInt32 info = GetVar(VAR_FOOLS_DAY_INFO);
+    info = SET_BIT(info, GET_BIT_8(value, 0));
+    SetVar(VAR_FOOLS_DAY_INFO, CLR_BIT(info, 0));
+    value = SET_BIT_8(value, 2, cnt);
+    value = CLR_BIT_8(value, 3);    //清除离线标志
+    SetVar(VAR_FOOLS_DAY, CLR_BIT_8(value, 0));
+    sendFoolsDayInfo();
+}
+
+void Player::setLogoutInFoolsDay()
+{
+    if (World::getFoolsDay())
+    {
+        UInt32 info = GetVar(VAR_FOOLS_DAY_INFO);
+        if(info == 0 || (info & (1<<0)) == 1)
+            return;
+        UInt32 qtime = GetVar(VAR_FOOLS_DAY_TIME);
+        if(qtime == 0)
+            return;
+        UInt32 value = GetVar(VAR_FOOLS_DAY);
+        if(qtime + 10 < TimeUtil::Now())
+        {
+            SetVar(VAR_FOOLS_DAY, CLR_BIT_8(value, 3));
+            return;
+        }
+        SetVar(VAR_FOOLS_DAY, SET_BIT_8(value, 3, 1));
+    }
+}
+
+void Player::checkAnswerActInFoolsDay()
+{
+    UInt32 info = GetVar(VAR_FOOLS_DAY_INFO);
+    UInt32 value = GetVar(VAR_FOOLS_DAY);
+    UInt8 type = 0, right = 0;
+    if(GET_BIT_8(value, 1))
+        type = 1;
+    else
+    {
+        for(UInt8 i = 1; i <= QUESTIONID_MAX; ++ i)
+        {
+            if(info & (1<<i))
+                ++ right;
+        }
+        if(right == 0 && (info & (1<<0)) == 0)
+            type = 3;
+        else
+            type = 2;
+    }
+    Stream st(REP::ACTIVE);
+    st << static_cast<UInt8>(0x10) << static_cast<UInt8>(0x00);
+    st << type << Stream::eos;
+    send(st);
+}
+
+void Player::foolsDayUdpLog(UInt8 type)
+{
+    // 愚公移山相关日志
+    char action[16] = "";
+    snprintf (action, 16, "F_10000_0327_%d", type);
+    udpLog("FoolsDay", action, "", "", "", "", "act");
 }
 
 } // namespace GObject
