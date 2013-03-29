@@ -1023,7 +1023,18 @@ function onActivityCheck(tm)
       else
           setLongyuanAct(false)
       end
- 
+      if isRPServer() then
+          if getRechargeActive() == false then
+              if tm >= getOpenTime() and tm < (getOpenTime()+7*86400) then
+                  setRechargeActive(true, 16)
+                  setNeedRechargeRank(true)
+              else
+                  setRechargeActive(false, 16)
+                  setNeedRechargeRank(false)
+              end
+          end
+      end
+
       setShuoShuo(true);
   end
 

@@ -192,7 +192,7 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
 
     UInt16 ret = 0x0100;
     bool res = bsim.getWinner() == 1;
-
+ 
     if (sz && final)
     {
         UInt32 oldHP = _hp[0];
@@ -221,7 +221,7 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
                 UInt32 exp = ((float)damage / nflist[0].fighter->getMaxHP()) * _ng->getExp() * expfactor;
                 if (exp < 1000)
                     exp = 1000;
-                pl->pendExp(exp);
+               pl->pendExp(exp);
                 if (!(sendflag % 8))
                     sendDmg(damage);
 
