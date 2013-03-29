@@ -177,6 +177,7 @@ RCSortType World::consumeSort;
 bool World::_needrechargerank = false;
 bool World::_needconsumerank = false;
 bool World::_killMonsteract = 0;
+RCSortType World::rechargeRP7Sort;
 #ifndef _WIN32
 CUserLogger* World::ulog = NULL;
 #endif
@@ -509,7 +510,7 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 30)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 31)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 1)
-
+         || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
             ))
     {
         if (pl->isOnline())
@@ -1273,6 +1274,11 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 1)
             )
         bRechargeEnd = true;
+    if (cfg.rpServer)
+    {
+        if (TimeUtil::SharpDay(0, nextday) <= getOpenTime()+7*86400)
+            bRechargeEnd = true;
+    }
 
     if (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 24) ||
         TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 11, 25) ||
@@ -2531,8 +2537,29 @@ inline bool player_enum_rc(GObject::Player * p, int)
     }
     return true;
 }
+inline bool player_enum_rp7rc(GObject::Player * p, int)
+{
+    UInt32 opTime = TimeUtil::MkTime(cfg.openYear, cfg.openMonth, cfg.openDay);
+    UInt32 total = 0;
+    if(TimeUtil::SharpDay(0) < opTime + 7 * 86400 )
+        total = p->getTotalRecharge();
+    else if (TimeUtil::SharpDay(0) < opTime + 30 * 86400)
+        total = p->GetVar(VAR_RP7_RECHARGE);
+    else
+        return false;
+    if (total)
+    {
+        RCSort s;
+        s.player = p;
+        s.total = total;
+        World::rechargeRP7Sort.insert(s);
+    }
+    return true;
+}
+
 
 static bool init = false;
+static bool initRP7 = false;
 void World::initRCRank()
 {
     if (init)
@@ -2540,6 +2567,17 @@ void World::initRCRank()
     GObject::globalPlayers.enumerate(player_enum_rc, 0);
     init = true;
 }
+void World::initRP7RCRank()
+{
+    if (initRP7)
+        return;
+    if (!cfg.rpServer)
+        return;
+ 
+    GObject::globalPlayers.enumerate(player_enum_rp7rc, 0);
+    initRP7 = true;
+}
+
 
 inline bool player_enum_killmonster(GObject::Player * p, int)
 {
@@ -2883,6 +2921,48 @@ void World::SendSnowAward()
         }
     }
 }
+void World::SendRechargeRP7RankAward()
+{
+    static UInt32 s_couponCount[] = {2000,1000,500,200,200,200,200,200,200,200};
+    if (!cfg.rpServer)
+        return;
+ 
+    World::initRP7RCRank();
+    int pos = 0;
+    for (RCSortType::iterator i = World::rechargeRP7Sort.begin(), e = World::rechargeRP7Sort.end(); i != e; ++i)
+    {
+        ++pos;
+
+        if(pos > 10) break;
+
+        Player* player = i->player;
+        if (!player)
+            continue;
+        SYSMSG(title, 4910);
+        SYSMSGV(content, 4911, pos);
+
+        Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        if(mail)
+        {
+            MailPackage::MailItem item = {0xA000,s_couponCount[pos-1]};
+            mailPackageManager.push(mail->id, &item, 1, true);
+            if (1 == pos)
+            {
+                MailPackage::MailItem card = {9901,1};
+                mailPackageManager.push(mail->id, &card, 1, true);
+            }
+        }
+          
+/*        char id[1024] = {0};
+        char ctx[1024] = {0};
+        snprintf(id, sizeof(id), "F_10000_1213_%u_%d", cfg.serverNum, pos);
+        snprintf(ctx, sizeof(ctx), "%"I64_FMT"u_%s_%u", player->getId(), player->getPName(), i->total);
+        World::udpLog(id, ctx, "", "", "", "", "act");
+  */
+    }
+//    World::rechargeRP7Sort.clear();
+}
+
 
 }
 

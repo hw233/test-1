@@ -150,6 +150,8 @@ namespace Script
 		lua_tinker::def(_L, "getItem9343Act", GObject::World::getItem9343Act);
 		lua_tinker::def(_L, "getAutoBattleAct", GObject::World::getAutoBattleAct);
 		lua_tinker::def(_L, "getSnakeSpringEquipAct", GObject::World::setSnakeSpringEquipAct);
+		lua_tinker::def(_L, "getOpenTime", GObject::World::getOpenTime);
+		lua_tinker::def(_L, "isRPServer", GObject::World::isRPServer);
 
         CLASS_DEF(GameActionLua, Print);
         lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);

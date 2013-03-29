@@ -9688,6 +9688,12 @@ local ItemNormal_Table = {
     [9370] = ItemNormal_00009369,
     [9371] = ItemNormal_00009371,
     [9900] = ItemNormal_NameCard,
+    [9901] = ItemNormal_NameCard,
+    [9902] = ItemNormal_NameCard,
+    [9903] = ItemNormal_NameCard,
+    [9904] = ItemNormal_NameCard,
+    [9905] = ItemNormal_NameCard,
+    [9906] = ItemNormal_NameCard,
 
     [10000] = ItemNormal_00010000,
     [10001] = ItemNormal_00010001,

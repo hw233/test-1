@@ -360,6 +360,8 @@ void NewCountryBattle::checkAddExp(UInt32 curtime)
         {
             UInt8 plvl = player->GetLev();
             UInt32 exp = 16 * ((plvl - 10) * ((plvl > 99 ? 99 : plvl) / 10) * 5 + 25);
+            if (cfg.rpServer && player->GetLev() < 70)
+                exp *= 2;
             player->AddExp(exp);
         }
         ++ iter;

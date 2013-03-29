@@ -235,6 +235,9 @@ void WorldScript::init()
     def("getFourCopAct", GObject::World::getFourCopAct);
     def("commitArenaForceOnce", GObject::World::commitArenaForceOnce);
 
+	def("getOpenTime", GObject::World::getOpenTime);
+	def("isRPServer", GObject::World::isRPServer);
+
 	class_add<GData::Store>("Store");
 	class_def<GData::Store>("clear", &GData::Store::clear);
     class_def<GData::Store>("clearNormalDiscount", &GData::Store::clearNormalDiscount);

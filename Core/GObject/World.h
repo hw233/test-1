@@ -5,6 +5,7 @@
 #include "Server/WorkerThread.h"
 #include "Common/Stream.h"
 #include "Server/Cfg.h"
+#include "Common/TimeUtil.h"
 #ifndef _WIN32
 #include "kingnet_analyzer.h"
 #endif
@@ -662,6 +663,13 @@ public:
     { _snakespringequipact = v; }
     inline static UInt8 getSnakeSpringEquipAct()
     { return _snakespringequipact; }
+    inline static UInt32 getOpenTime()
+    {
+        UInt32 opTime = TimeUtil::MkTime(cfg.openYear, cfg.openMonth, cfg.openDay);
+        return opTime;
+    }
+    inline static bool isRPServer()
+    {return cfg.rpServer;}
  
 public:
 	inline static UInt8 getWeekDay()
@@ -794,8 +802,10 @@ public:
     static RCSortType rechargeSort;
     static RCSortType consumeSort;
     static void initRCRank();
+    static void initRP7RCRank();
 
     static RCSortType killMonsterSort[4];
+    static RCSortType rechargeRP7Sort;
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }
@@ -864,6 +874,7 @@ public:
     void killMonsterInit();
     void UpdateKillMonsterRank(Player* pl, UInt8 Type, UInt8 count);
 
+    static void SendRechargeRP7RankAward();
 private:
 	void testUpdate();
 	Script::WorldScript * _worldScript;
