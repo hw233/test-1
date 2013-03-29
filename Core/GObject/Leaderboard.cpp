@@ -176,6 +176,7 @@ void buildPacketForLingbao(Stream& st, UInt8 t, UInt32 id, std::vector<LingbaoIn
 void Leaderboard::buildPacketForLingbao(Stream& st, UInt8 t, bool merge /* = true */)
 {
     // TODO:
+    FastMutex::ScopedLock lk(_lbMutex);
     _lingbaoRank.clear();
 
 	UInt8 c = static_cast<UInt8>(_lingbaoInfoSet.size());
@@ -785,6 +786,7 @@ void Leaderboard::doUpdate()
 	}
 
     buildBattlePacket();
+    buildPacketForLingbao(_lingbaoStream, 6);
 }
 
 bool Leaderboard::hasUpdate( UInt32 id )
@@ -1032,6 +1034,7 @@ void Leaderboard::makeRankAndValueStream(Stream*& st, UInt8 type, Player* pl, UI
 
 void Leaderboard::pushLingbaoInfo(LingbaoInfoList lingbaoInfo)
 {
+    FastMutex::ScopedLock lk(_lbMutex);
     _lingbaoInfoSet.insert(lingbaoInfo);
 }
 

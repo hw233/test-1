@@ -200,6 +200,7 @@ private:
     std::vector<ClanCopyRankingInfoList> _clanCopyInfo;
     std::vector<ClanBattleRankingInfoList> _clanBattleInfo;
     LingbaoInfoSet _lingbaoInfoSet;
+    FastMutex _lbMutex;
     std::vector<RankingInfoList> _popularityList;
 
     AtomicVal<bool> m_sorting;
