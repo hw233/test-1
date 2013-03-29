@@ -489,7 +489,7 @@ namespace GObject
 		static const UInt16 INIT_PACK_SIZE = 150;
 		PlayerData()
 			: gold(0), coupon(0), tael(0), coin(0), prestige(0), status(0), country(0),
-			title(0), achievement(0), attainment(0) , qqvipl(0), qqvipyear(0), qqawardgot(0), qqawardEnd(0), ydGemId(0), location(0), inCity(false), lastOnline(0),
+			title(0), achievement(0), attainment(0) , qqvipl(0), qqvipyear(0),qqawardgot(0), qqawardEnd(0), ydGemId(0), location(0), inCity(false), lastOnline(0),
 			newGuild(0), packSize(INIT_PACK_SIZE), mounts(0), gmLevel(0), icCount(0), nextIcReset(0),picCount(0) , nextPIcReset(0),
 			formation(0), totalRecharge(0), lastExp(0), lastResource(0),
 			rewardStep(0), nextRewardItem(0), nextRewardCount(0), nextRewardTime(0),
@@ -2244,6 +2244,15 @@ namespace GObject
 	    UInt32 useXianyuan( UInt32 a, ConsumeInfo * ci );
 	    UInt32 useFengsui( UInt32 a, ConsumeInfo * ci );
 	    UInt32 useLongyuan( UInt32 a, ConsumeInfo * ci );
+
+    public:     //活动相关
+        void checkAnswerActInFoolsDay();
+        void sendFoolsDayInfo();
+        void submitAnswerInFoolsDay(UInt8, char);
+        void getAwardInFoolsDay();
+        void buyResurrectionCard();
+        void foolsDayUdpLog(UInt8);
+        void setLogoutInFoolsDay();
 
         void getQQGameOnlineAward();
         void sendQQGameOnlineAward();

@@ -564,7 +564,7 @@ void Leaderboard::doUpdate()
         }
 	    buildPacketForLingbao(_lingbaoStream, 6, _id, _lingbaoInfoSet);
     }
-*/
+    */
 
 
 	std::vector<UInt64> ilist;
