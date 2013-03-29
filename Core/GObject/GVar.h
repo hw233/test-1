@@ -59,7 +59,11 @@ namespace GObject
 
         GVAR_EXP_HOOK_NEW = 29, //挂机经验从旧方案向新方案转变
 
-        GVAR_HAS_CLAC_LB_BP = 30, // 是否计算过灵宝的战斗力
+        GVAR_TREASURE_ACTION = 30, //聚宝盆活动标志
+        GVAR_TREASURE_BEGIN = 31, //聚宝盆活动开始时间
+        GVAR_TREASURE_END = 32, //聚宝盆活动结束时间
+
+        GVAR_HAS_CLAC_LB_BP = 33, // 是否计算过灵宝的战斗力
 
         GVAR_MAX,
     };
@@ -109,6 +113,9 @@ namespace GObject
             GREGISTER_VAR(GVAR_DRAGONKING_END, GCYCLE_NONE);
 
             GREGISTER_VAR(GVAR_EXP_HOOK_NEW, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_TREASURE_ACTION, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_TREASURE_BEGIN, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_TREASURE_END, GCYCLE_NONE);
 
             GREGISTER_VAR(GVAR_HAS_CLAC_LB_BP, GCYCLE_NONE);
         }

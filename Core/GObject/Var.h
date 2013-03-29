@@ -383,6 +383,15 @@ namespace GObject
         VAR_POPULARITY = 442,               // 本周人气
 
         VAR_FOOLBAO_USED = 450,  //愚人宝箱使用数
+        VAR_RP7_TREASURE = 432,  //回流服务器聚宝盆, 1-8位:是否购买的标志为 9-16,17-24,25-32位第1-3个聚宝盆的已领取次数
+        VAR_RP7_TREASURE_TODAY_GOT=433, //第1-3位:各个聚宝盆今天是否已领取
+        VAR_RP7_TREASURE1_GETTIME=434, //第1个聚宝盆的领取时间
+        VAR_RP7_TREASURE2_GETTIME=435, //第2个聚宝盆的领取时间
+        VAR_RP7_TREASURE3_GETTIME=436, //第3个聚宝盆的领取时间
+        VAR_RP7_SIGN=437,              //注册签到
+        VAR_RP7_SIGN_PACKAGE=438,      //连续签到礼包
+        VAR_RP7_RECHARGE=439,      //开服7天充值金额
+
         VAR_MAX,
     };
 
@@ -703,6 +712,14 @@ namespace GObject
             */
 
             REGISTER_VAR(VAR_LONGYUAN_GOT, CYCLE_NONE);
+            REGISTER_VAR(VAR_RP7_TREASURE, CYCLE_NONE);
+            REGISTER_VAR(VAR_RP7_TREASURE_TODAY_GOT, CYCLE_DAY);
+            REGISTER_VAR(VAR_RP7_TREASURE1_GETTIME, CYCLE_NONE);
+            REGISTER_VAR(VAR_RP7_TREASURE2_GETTIME, CYCLE_NONE);
+            REGISTER_VAR(VAR_RP7_TREASURE3_GETTIME, CYCLE_NONE);
+            REGISTER_VAR(VAR_RP7_SIGN, CYCLE_NONE);
+            REGISTER_VAR(VAR_RP7_SIGN_PACKAGE, CYCLE_NONE);
+            REGISTER_VAR(VAR_RP7_RECHARGE, CYCLE_NONE);
 
             REGISTER_VAR(VAR_CALLSNAKEEGG, CYCLE_NONE);
             REGISTER_VAR(VAR_SNAKEEGG_AWARD, CYCLE_NONE);
