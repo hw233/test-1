@@ -176,6 +176,7 @@ MSG_REG_2(GameMsgHdr, REQ::FAIRY_PET, OnFairyPet);
 
 MSG_REG_2(GameMsgHdr, REQ::EQ_LINGBAO, OnEquipLingbaoReq);
 
+MSG_REG_2(GameMsgHdr, REQ::RP_SERVER, OnRPServerReq);
 MSG_REG_2(GameMsgHdr, 0x1D0, OnDailyReq2);
 
 MSG_REG_2(GameMsgHdr, 0x1EE, OnReLoadLuaReq);
@@ -294,6 +295,7 @@ MSG_REG_2(GameMsgHdr, 0x235, OnAwardAthleticsMartial);
 MSG_REG_2(GameMsgHdr, 0x340, OnTownDeamonlBeAttack);
 MSG_REG_2(GameMsgHdr, 0x342, OnPostDragonKing);
 MSG_REG_2(GameMsgHdr, 0x343, OnSaveGoldAct);
+MSG_REG_2(GameMsgHdr, 0x344, OnFoolsDayAct);
 
 MSG_REG_2(GameMsgHdr, 0x236, OnAwardHIPrestige);
 MSG_REG_2(GameMsgHdr, 0x237, OnSendShusanLoveTitleCard);
@@ -351,4 +353,8 @@ MSG_REG_2(GameMsgHdr, 0x332, OnOpenIdInvalid);
 MSG_REG_2(GameMsgHdr, 0x333, OnOpenAPIFailed);
 
 MSG_REG_2(GameMsgHdr, 0x352, OnSaleItemCancleAll);
+
+MSG_REG_2(GameMsgHdr, 0x353, OnCalcLBBattlePoint);
+MSG_REG_2(GameMsgHdr, 0x360, OnBeVoted);
+MSG_REG_2(GameMsgHdr, 0x361, OnSendPopularityAward);
 MSG_HANDLER_END()

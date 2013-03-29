@@ -90,7 +90,7 @@ namespace GObject
         VAR_GOLD_TOKEN = 55, //金代币 先天灵石
         VAR_TAEL_TOKEN = 56, //银代币 盘古灵石
         VAR_COIN_TOKEN = 57, //铜代币 轩辕灵石
-        VAR_FOOLS_DAY = 58, //愚人节礼包是否领取
+        VAR_FOOLS_DAY = 58, //愚人节礼包是否领取  愚公移山(byte0失败题目id,byte1领取奖励的题目数,byte2购买复活卡次数)
         VAR_CBWHITEPACK = 59, //阵营战白色情人节礼包
 
         VAR_ATYITEM_1 = 60, //活跃度星期一奖励
@@ -347,10 +347,6 @@ namespace GObject
         VAR_SAVEGOLD_SET_TIME = 364,    //金蛇献瑞,聚福兆祥活动中玩家设置的结算时间
         VAR_SAVEGOLD_GET_STATUS = 365,    //金蛇献瑞,聚福兆祥活动中玩家领取自己仙石的状态,低10位
         VAR_SAVEGOLD_ISGET = 366,   //金蛇献瑞,聚福兆祥活动中玩家当日是否领取
-        //VAR_DRAGONKINGSNAKE_STEP = 367,      //大闹龙宫之金蛇起舞当前移动到的格子
-        //VAR_DRAGONKINGSNAKE_STEP4_COUNT = 368, //大闹龙宫之金蛇起舞从第4格移动到第5失败的次数
-        //VAR_TIANMANG_STEP = 369,      //大闹龙宫之天芒神梭当前移动到的格子
-        //VAR_TIANMANG_STEP4_COUNT = 370, //大闹龙宫之天芒神梭从第4格移动到第5失败的次数
         
         VAR_CALLSNAKEEGG = 371,         //拜金蛇
         VAR_SNAKEEGG_AWARD=372,         //领蛇蛋
@@ -373,11 +369,27 @@ namespace GObject
         VAR_QZONE_QQGAME_ACT = 410, //空间黄钻(bit1表示普通，bit2表示会员)、大厅蓝钻礼包(bit3表示普通，bit4表示会员)
 
         //421-430 for suntao
-        //VAR_HUNYUAN_STEP = 421, //大闹龙宫之混元剑诀
-        //VAR_HUNYUAN_STEP4_COUNT = 422, //大闹龙宫之混元剑诀从第4格移动到第5失败的次数
+        VAR_FOOLS_DAY_INFO  = 421,  //愚公移山答题信息(0位表示失败,1-30位表示题目id及是否答对)
+        VAR_FOOLS_DAY_TIME  = 422,  //愚公移山答题开始时间
         //431-440 for yijian
         VAR_LONGYUAN_GOT = 431,  //龙元风髓领取标志
+
+
+        VAR_RP7_TREASURE = 432,  //回流服务器聚宝盆, 1-8位:是否购买的标志为 9-16,17-24,25-32位第1-3个聚宝盆的已领取次数
+        VAR_RP7_TREASURE_TODAY_GOT=433, //第1-3位:各个聚宝盆今天是否已领取
+        VAR_RP7_TREASURE1_GETTIME=434, //第1个聚宝盆的领取时间
+        VAR_RP7_TREASURE2_GETTIME=435, //第2个聚宝盆的领取时间
+        VAR_RP7_TREASURE3_GETTIME=436, //第3个聚宝盆的领取时间
+        VAR_RP7_SIGN=437,              //注册签到
+        VAR_RP7_SIGN_PACKAGE=438,      //连续签到礼包
+        VAR_RP7_RECHARGE=439,      //开服7天充值金额
+
+        // 441-442 for JLT
+        VAR_HAS_VOTE = 441,                 // 本日是否投票过
+        VAR_POPULARITY = 442,               // 本周人气
+
         VAR_FOOLBAO_USED = 450,  //愚人宝箱使用数
+        VAR_HHBAWARD_GOT = 451 , //豪华蓝钻领取
         VAR_MAX,
     };
 
@@ -688,16 +700,17 @@ namespace GObject
             REGISTER_VAR(VAR_SAVEGOLD_SET_TIME, CYCLE_NONE);
             REGISTER_VAR(VAR_SAVEGOLD_GET_STATUS, CYCLE_NONE);
             REGISTER_VAR(VAR_SAVEGOLD_ISGET, CYCLE_DAY);
-            /*
-            REGISTER_VAR(VAR_DRAGONKINGSNAKE_STEP, CYCLE_NONE);
-            REGISTER_VAR(VAR_DRAGONKINGSNAKE_STEP4_COUNT, CYCLE_NONE);
-            REGISTER_VAR(VAR_TIANMANG_STEP, CYCLE_NONE);
-            REGISTER_VAR(VAR_TIANMANG_STEP4_COUNT, CYCLE_NONE);
-            REGISTER_VAR(VAR_HUNYUAN_STEP, CYCLE_NONE);
-            REGISTER_VAR(VAR_HUNYUAN_STEP4_COUNT, CYCLE_NONE);
-            */
 
+            REGISTER_VAR(VAR_HHBAWARD_GOT, CYCLE_DAY);
             REGISTER_VAR(VAR_LONGYUAN_GOT, CYCLE_NONE);
+            REGISTER_VAR(VAR_RP7_TREASURE, CYCLE_NONE);
+            REGISTER_VAR(VAR_RP7_TREASURE_TODAY_GOT, CYCLE_DAY);
+            REGISTER_VAR(VAR_RP7_TREASURE1_GETTIME, CYCLE_NONE);
+            REGISTER_VAR(VAR_RP7_TREASURE2_GETTIME, CYCLE_NONE);
+            REGISTER_VAR(VAR_RP7_TREASURE3_GETTIME, CYCLE_NONE);
+            REGISTER_VAR(VAR_RP7_SIGN, CYCLE_NONE);
+            REGISTER_VAR(VAR_RP7_SIGN_PACKAGE, CYCLE_NONE);
+            REGISTER_VAR(VAR_RP7_RECHARGE, CYCLE_NONE);
 
             REGISTER_VAR(VAR_CALLSNAKEEGG, CYCLE_NONE);
             REGISTER_VAR(VAR_SNAKEEGG_AWARD, CYCLE_NONE);
@@ -716,6 +729,14 @@ namespace GObject
             REGISTER_VAR(VAR_ONLINE_TOTAL_TIME, CYCLE_DAY);
             REGISTER_VAR(VAR_ONLINE_AWARD, CYCLE_DAY);
             REGISTER_VAR(VAR_QZONE_QQGAME_ACT, CYCLE_DAY);
+
+            REGISTER_VAR(VAR_FOOLS_DAY_INFO, CYCLE_DAY);
+            REGISTER_VAR(VAR_FOOLS_DAY_TIME, CYCLE_DAY);
+            REGISTER_VAR(VAR_HAS_VOTE, CYCLE_DAY);
+            REGISTER_VAR(VAR_POPULARITY, CYCLE_WEEK);
+
+            REGISTER_VAR(VAR_FOOLBAO_USED, CYCLE_NONE);
+            REGISTER_VAR(VAR_HHBAWARD_GOT, CYCLE_DAY);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

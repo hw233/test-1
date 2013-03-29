@@ -128,6 +128,7 @@ namespace GObject
 #define PLAYER_BUFF_ATHL8           0x58
 #define PLAYER_BUFF_ATHL9           0x59
 #define PLAYER_BUFF_QI_TIAN_CHU_MO  0x5B   //齐天除魔
+#define PLAYER_BUFF_EXPDOUBLE       0x5C    //回流服务器 经验双倍
 
 #define PLAYER_BUFF_DISPLAY_MAX		0x5F
 #define PLAYER_BUFF_COUNT			0x5F
@@ -173,7 +174,6 @@ namespace GObject
         ENUM_TRAINP2,      /** 高级经验加速符*1.5,加速(*1.6);2.ENUM_TRAINP4:*1.5,加速(*1.5);3.ENUM_ADVANCED_HOOK:超值挂机加速符(100小时),*1.5,加速(*1.6) **/
         ENUM_TRAINP3       /** 齐天经验加速符,*1.8,加速(*1.8) **/
     };
-
     enum DRAGONKING_type    //大闹龙宫活动标志类型
     {
         DRAGONKING_CLOSE = 0,    //关闭
@@ -182,6 +182,7 @@ namespace GObject
         TIANMANG    = 3,    //天芒神梭
         HUNYUAN     = 4,    //混元剑诀
         XINGCHEN    = 5,    //遁天星辰诀
+        TREASURE    = 10,   //聚宝盆
 
         DRAGONKING_MAX,
     };
@@ -488,7 +489,7 @@ namespace GObject
 		static const UInt16 INIT_PACK_SIZE = 150;
 		PlayerData()
 			: gold(0), coupon(0), tael(0), coin(0), prestige(0), status(0), country(0),
-			title(0), achievement(0), attainment(0) , qqvipl(0), qqvipyear(0), qqawardgot(0), qqawardEnd(0), ydGemId(0), location(0), inCity(false), lastOnline(0),
+			title(0), achievement(0), attainment(0) , qqvipl(0), qqvipyear(0),qqawardgot(0), qqawardEnd(0), ydGemId(0), location(0), inCity(false), lastOnline(0),
 			newGuild(0), packSize(INIT_PACK_SIZE), mounts(0), gmLevel(0), icCount(0), nextIcReset(0),picCount(0) , nextPIcReset(0),
 			formation(0), totalRecharge(0), lastExp(0), lastResource(0),
 			rewardStep(0), nextRewardItem(0), nextRewardCount(0), nextRewardTime(0),
@@ -788,6 +789,7 @@ namespace GObject
         void sendRechargeRankAward(int pos);
         void sendConsumeRankAward(int pos);
         void sendKillMonsterRankAward(UInt8 index, Int32 pos);
+        void sendPopularityRandAward(int popularity);
         UInt32 getEventState(UInt32 type);
 
 	public:
@@ -1294,6 +1296,12 @@ namespace GObject
         void getTjTask2Data(Stream& st);
         void getTjTask3Data(Stream& st);
         void addExpOrTjScore(int exp, int score, bool isEventScore = true, bool isEndScore = false);
+        UInt32 isDoubleExp(UInt32& exp)
+        {
+            if (cfg.rpServer && GetLev() < 70)
+                exp *= 2;
+            return exp;
+        }
 
         void clearTjTaskData();
 
@@ -1376,6 +1384,9 @@ namespace GObject
         void OnCFriendLvlUp(Player*, UInt8);
 
 		void sendFriendList(UInt8, UInt8, UInt8);
+
+        void vote(Player *other);
+        void beVoted();
 
 		void PutFighters(Battle::BattleSimulator&, int side, bool fullhp = false);
         void PutPets (Battle::BattleSimulator&, int side, bool init = true);
@@ -2098,7 +2109,14 @@ namespace GObject
         void getKillMonsterAward();
 
         UInt32 getBattlePoint();
+        void calcLingbaoBattlePoint();
+        void setMaxLingbaoBattlePoint(UInt32 value);
+        UInt32 getMaxLingbaoBattlePoint();
         void verifyFighter();
+
+    private:
+        UInt32 _maxLingbaoBattlePoint;
+
 #ifdef _FB
     public:
         void sendLevelAward();
@@ -2227,10 +2245,25 @@ namespace GObject
 	    UInt32 useFengsui( UInt32 a, ConsumeInfo * ci );
 	    UInt32 useLongyuan( UInt32 a, ConsumeInfo * ci );
 
+    public:     //活动相关
+        void checkAnswerActInFoolsDay();
+        void sendFoolsDayInfo();
+        void submitAnswerInFoolsDay(UInt8, char);
+        void getAwardInFoolsDay();
+        void buyResurrectionCard();
+        void foolsDayUdpLog(UInt8);
+        void setLogoutInFoolsDay();
+
         void getQQGameOnlineAward();
         void sendQQGameOnlineAward();
         void setQQGameOnlineTotalTime();
         UInt32 getQQGameOnlineTotalTime();
+        void sendRP7TreasureInfo(bool isLogin=false);
+        void buyRP7Treasure(UInt8 idx);
+        void getRP7TreasureAward(UInt8 idx);
+        void sendRP7SignInfo();
+        void RP7Sign(UInt8 idx);
+        void getRP7SignPackage(UInt8 idx);
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

@@ -192,7 +192,7 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
 
     UInt16 ret = 0x0100;
     bool res = bsim.getWinner() == 1;
-
+ 
     if (sz && final)
     {
         UInt32 oldHP = _hp[0];
@@ -221,7 +221,7 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
                 UInt32 exp = ((float)damage / nflist[0].fighter->getMaxHP()) * _ng->getExp() * expfactor;
                 if (exp < 1000)
                     exp = 1000;
-                pl->pendExp(exp);
+               pl->pendExp(exp);
                 if (!(sendflag % 8))
                     sendDmg(damage);
 
@@ -1333,6 +1333,17 @@ void WBossMgr::sendBossInfo(Player* pl)
         pl->send(st1);
     else
         NETWORK()->Broadcast(st1);
+}
+
+bool WBossMgr::needAutoBattle(UInt16 spotId)
+{
+    //static UInt32 bossNpcId[] = {5466,5467,5468,5469,5162,5473,5474,5475,5103,5470,5471,5472,5168,5476,5477,5478,5127,5479,5480,5481,5197,5482,5483,5484,5164,5485,5486,5487,5509,5510,5511,5512,5513,5514};
+    if(m_boss && !m_boss->isDisappered())
+    {
+        if(spotId == m_boss->getLoc())
+            return false;
+    }
+    return true;
 }
 
 WBossMgr worldBoss;

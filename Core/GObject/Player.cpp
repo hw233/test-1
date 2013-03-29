@@ -203,6 +203,8 @@ namespace GObject
 #if 0
 		_npcGroup->monsterKilled(m_Player);
 #endif
+        if (cfg.rpServer && m_Player->GetLev() < 70)
+            exp *= 2;
 		if(m_Player->isOnline())
 			m_Player->AddExp(static_cast<UInt32>(exp * factor), 0, extraExp);
 		else
@@ -267,6 +269,8 @@ namespace GObject
 		ecs.exp = calcExpEach(TimeUtil::Now()) * cnt;
 		ecs.count = cnt;
 		ecs.ng = NULL;//_npcGroup;
+        if (cfg.rpServer && m_Player->GetLev() < 70)
+            ecs.exp *= 2;
 		GameMsgHdr hdr(0x274, m_Player->getThreadId(), m_Player, sizeof(ExpGainInstantCompleteStruct));
 		GLOBAL().PushMsg(hdr, &ecs);
 		_finalEnd -= ecs.duration;
@@ -659,7 +663,7 @@ namespace GObject
 #ifndef _WIN32
 		m_ulog(NULL),
 #endif
-		m_isOffical(false), m_isXY(false), m_XinYue(0), m_sysDailog(false), m_hasTripod(false), _jobHunter(NULL), _dreamer(NULL), _onBattlePet(NULL)
+		m_isOffical(false), m_isXY(false), m_XinYue(0), m_sysDailog(false), m_hasTripod(false), _maxLingbaoBattlePoint(0), _jobHunter(NULL), _dreamer(NULL), _onBattlePet(NULL)
 	{
         m_ClanBattleStatus = 1;
         m_ClanBattleScore = 0;
@@ -1035,8 +1039,10 @@ namespace GObject
             GameAction()->onNewYear(this);
         if (World::getValentineDay())
             GameAction()->onValentineDay(this);
+        /*
         if (World::getFoolsDay())
             GameAction()->onFoolsDay(this);
+        */
         if (World::getMayDay())
             GameAction()->onMayDay(this);
         if (World::getMayDay1())
@@ -2100,8 +2106,11 @@ namespace GObject
 		DB1().PushUpdateData("UPDATE `player` SET `lastOnline` = %u, `nextReward` = '%u|%u|%u|%u' WHERE `id` = %"I64_FMT"u", curtime, _playerData.rewardStep, _playerData.nextRewardItem, _playerData.nextRewardCount, _playerData.nextRewardTime, _id);
         if(_isOnline && !hasFlag(Training))
         {
-            if(cfg.GMCheck)
-                autoBattle(0, 0);
+            //if(cfg.GMCheck)
+             {
+                 if(worldBoss.needAutoBattle(_playerData.location))
+                    autoBattle(0, 0);
+             }
         }
         _isOnline = false;
 
@@ -2180,6 +2189,8 @@ namespace GObject
             LoginMsgHdr hdr1(0x301, WORKER_THREAD_LOGIN, 0, this->GetSessionID(), sizeof(crackValue));
             GLOBAL().PushMsg(hdr1, &crackValue);
         }
+        //愚公移山活动
+        setLogoutInFoolsDay();
 	}
 
 	void Player::checkLastBattled()
@@ -3042,6 +3053,9 @@ namespace GObject
 		UInt8 c = 0;
 		UInt8 buffid[PLAYER_BUFF_COUNT];
 		UInt32 buffleft[PLAYER_BUFF_COUNT];
+        if (cfg.rpServer && GetLev() < 70)
+            setBuffData(PLAYER_BUFF_EXPDOUBLE, curtime+99*3600, false);
+ 
 		for(UInt8 i = 0; i < PLAYER_BUFF_COUNT; ++ i)
 		{
 			if(i == 0)
@@ -3456,6 +3470,8 @@ namespace GObject
                     }
                     exp += extraExp;
                 }
+                if (cfg.rpServer && GetLev() < 70)
+                    exp *= 2;
                 pendExp(exp);
                 ng->getLoots(this, _lastLoot);
             }
@@ -4279,7 +4295,7 @@ namespace GObject
 		else
 			cnt = end - start;
 		Stream st(REP::FRIEND_LIST);
-		st << static_cast<UInt8>(type) << start << cnt << sz;
+		st << static_cast<UInt8>(type) << static_cast<UInt8>(GetVar(VAR_HAS_VOTE)?1:0) << start << cnt << sz;
         if (sz && cnt)
         {
             std::set<Player *>::iterator it = _friends[type].begin();
@@ -4297,6 +4313,27 @@ namespace GObject
 		send(st);
 	}
 
+    void Player::vote(Player* other)
+    {
+        if (GetVar(VAR_HAS_VOTE))
+        {
+            return;
+        }
+        SetVar(VAR_HAS_VOTE, 1);
+        GameMsgHdr hdr(0x360, other->getThreadId(), other, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+        sendMsgCode(0, 1509);
+        //GameMsgHdr hdr2(0x1C6, WORKER_THREAD_WORLD, this, 0);
+        //GLOBAL().PushMsg(hdr2, NULL);
+    }
+
+    void Player::beVoted()
+    {
+        AddVar(VAR_POPULARITY, 1);
+        UInt32 total = GetVar(VAR_POPULARITY);
+        GameMsgHdr hdr(0x1C7, WORKER_THREAD_WORLD, this, sizeof(total));
+        GLOBAL().PushMsg(hdr, &total);
+    }
 
 	void Player::sendModification( UInt8 t, UInt32 v, bool updateToDB )
 	{
@@ -4348,6 +4385,10 @@ namespace GObject
 		}
 		if(field != NULL)
 			DB1().PushUpdateData("UPDATE `player` SET `%s` = %u WHERE `id` = %"I64_FMT"u", field, v, _id);
+        if (cfg.rpServer && t == 7 && TimeUtil::Now() < World::getOpenTime() + 7 * 86400)
+        {
+            SetVar(VAR_RP7_RECHARGE, v);
+        }
     }
 
 	UInt32 Player::getGold( UInt32 c, IncommingInfo* ii)
@@ -5618,6 +5659,8 @@ namespace GObject
         //是否开启天劫
         GObject::Tianjie::instance().isOpenTj(this);
         sendLevelPack(GetLev()); // XXX:
+        if (cfg.rpServer && GetLev()>=70)
+            setBuffData(PLAYER_BUFF_EXPDOUBLE,0);
 	}
 
     void Player::addHIAttr(const GData::AttrExtra& attr)
@@ -7490,6 +7533,11 @@ namespace GObject
         addRC7DayRecharge(r);
         addRF7DayRecharge(r);
         addRechargeNextRet(r);
+        if (cfg.rpServer)
+        {
+            GameMsgHdr hdr(0x1CA, WORKER_THREAD_WORLD, this, sizeof(_playerData.totalRecharge));
+            GLOBAL().PushMsg(hdr, &_playerData.totalRecharge);
+        }
         
         if (World::getRechargeActive())
         {
@@ -8372,6 +8420,7 @@ namespace GObject
 
 	void Player::pendExp( UInt32 exp, bool leaveCity )
 	{
+        isDoubleExp(exp);
 		_playerData.lastExp += exp;
 		if(leaveCity)
 			_playerData.lastExp |= 0x80000000;
@@ -9799,6 +9848,7 @@ namespace GObject
                     UInt32 pExp = fgt->getPracticeInc() * pfexp->counts[i];
                     if(inVipPrivilegeTime())
                         extraPExp = fgt->getBasePExpEach() * pfexp->counts[i] * 0.2f;
+                    isDoubleExp(pExp);
                     fgt->addPExp(pExp, true, false, extraPExp);
                 }
             }
@@ -9855,6 +9905,7 @@ namespace GObject
                     UInt32 pExp = fgt->getPracticeInc() * pfexp->counts[i];
                     if(inVipPrivilegeTime())
                         extraPExp = fgt->getBasePExpEach() * pfexp->counts[i] * 0.2f;
+                    isDoubleExp(pExp);
                     fgt->addPExp(pExp, true, false, extraPExp);
                 }
             }
@@ -10037,8 +10088,7 @@ namespace GObject
                     qqvipl = _playerData.qqvipl % 10;
                 }
             }
-
-            st << qqvipl << _playerData.qqvipyear << static_cast<UInt8>((_playerData.qqawardgot>>flag) & 0x03);
+            st << qqvipl << _playerData.qqvipyear << static_cast<UInt8>(((_playerData.qqawardgot>>flag)|(GetVar(VAR_HHBAWARD_GOT) << 3))& 0x0B);
             UInt8 maxCnt = GObjectManager::getYDMaxCount();
             if(flag == 8)
                 st << static_cast<UInt8>(maxCnt - 1);
@@ -10084,7 +10134,6 @@ namespace GObject
     UInt8 Player::rcvYellowDiamondAward(UInt8 type, UInt8 d3d6)
     {
         checkQQAward();
-
         UInt8 nRes = 0;
         Stream st(REP::YD_AWARD_RCV);
 
@@ -10092,7 +10141,7 @@ namespace GObject
         if (domain == 11 && _playerData.qqvipl >= 20 && _playerData.qqvipl < 40 && d3d6 == 1)
         {
             UInt8 qqvipl = _playerData.qqvipl % 10;
-            if (!qqvipl)
+           if (!qqvipl)
                 return 0;
 
             UInt32 award = GetVar(VAR_AWARD_3366);
@@ -10248,11 +10297,26 @@ namespace GObject
                     sendMsgCode(2, 1011);
                 }
             }
-
-            if(nRes)
+            
+            else if(type == 3 &&_playerData.isHHBlue &&!GetVar(VAR_HHBAWARD_GOT))
             {
-                DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardgot, getId());
+                if(GetPackage()->GetRestPackageSize() > 0)
+                {
+                    nRes = 5;
+                    SetVar(VAR_HHBAWARD_GOT, 1);
+
+                    GetPackage()->AddItem2(503,1, true, true);
+                }
+                else
+                {
+                    sendMsgCode(2, 1011);
+                }
             }
+
+        }
+        if(nRes && nRes != 5)
+        {
+            DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardgot, getId());
         }
 
         st << nRes << Stream::eos;
@@ -12389,6 +12453,11 @@ namespace GObject
 #endif
     }
 
+    void Player::sendPopularityRandAward(int popularity)
+    {
+        // TODO: 发送称号卡
+    }
+
     void Player::sendKillMonsterRankAward(UInt8 index, Int32 pos)
     {
         if (index > 3 || !pos || pos > 1)
@@ -13094,17 +13163,28 @@ namespace GObject
         st << Stream::eos;
         send(st);
     }
-    const int g_rpCoupon = 365;
+    const int g_rpCoupon[3] = {365,365,365};
+    const int g_rpServerCoupon[3] = {88,188,365};
     const int g_rp1Items[][2] = {
     {15, 20}, {510, 10}, {56, 10}, {57, 10}, {502, 100},
-    {514, 10}, {508, 10}, {506, 10},{1700, 1} };
+    {514, 10}, {508, 10}, {506, 10},{1700, 1},{0,0}};
     const int g_rp2Items[][2] = {
     {15, 30}, {56, 20}, {57, 20}, {502, 100}, {503,20},
-    {515, 10}, {508, 10}, {506, 10},{1700, 1} };
+    {515, 10}, {508, 10}, {506, 10},{1700, 1},{0,0}};
     const int g_rp3Items[][2] = {
     {15, 50}, {515, 20}, {509, 20}, {507, 20},
-    {1700, 1}, {1701, 1}, {1704, 1}, {1705,1} };
+    {1700, 1}, {1701, 1}, {1704, 1}, {1705,1},{0,0}};
     const int g_rpRewardItems[][2] = {{15,1},{502,2},{509,1}};
+
+    const int g_rpServer1Items[][2] = {
+    {15, 20}, {510, 10}, {56, 10}, {57, 10}, {502, 100},
+    {514, 10}, {508, 10}, {506, 10},{0,0}};
+    const int g_rpServer2Items[][2] = {
+    {15, 30}, {56, 20}, {57, 20}, {502, 100}, {503,20},
+    {508, 10}, {506, 10},{1700, 1},{0,0}};
+    const int g_rpServer3Items[][2] = {
+    {15, 50}, {515, 20}, {509, 20}, {507, 20},{1325,20},
+    {134,20}, {1700, 1}, {1701, 1}, {0,0}};
 
     void Player::getYearRPPackage()
     {
@@ -13122,24 +13202,58 @@ namespace GObject
                 send(st);
                 return;
             }
-            getCoupon(g_rpCoupon);
+            const int (*pItems)[2];
             if (1 == packageType)
             {
-                for (int i = 0; i < 9; ++i)
-                    GetPackage()->Add(g_rp1Items[i][0], g_rp1Items[i][1], true);
+                if (cfg.rpServer)
+                {
+                    getCoupon(g_rpServerCoupon[0]);
+                    pItems = g_rpServer1Items;
+                }
+                else
+                {
+                    getCoupon(g_rpCoupon[0]);
+                    pItems = g_rp1Items;
+                }
+                for (UInt8 i = 0; pItems[i][0] != 0; ++i)
+                    GetPackage()->Add(pItems[i][0], pItems[i][1], true);
 
                 udpLog("rpPacket", "F_1100_1", "", "", "", "", "act");
             }
             else if (2 == packageType)
             {
-                for (int i = 0; i < 9; ++i)
-                    GetPackage()->Add(g_rp2Items[i][0], g_rp2Items[i][1], true);
+                if (cfg.rpServer)
+                {
+                    getCoupon(g_rpServerCoupon[1]);
+                    pItems = g_rpServer2Items;
+                }
+                else
+                {
+                    getCoupon(g_rpCoupon[1]);
+                    pItems = g_rp2Items;
+
+                }
+                for (UInt8 i = 0; pItems[i][0] != 0; ++i)
+                    GetPackage()->Add(pItems[i][0], pItems[i][1], true);
+
                 udpLog("rpPacket", "F_1100_2", "", "", "", "", "act");
             }
             else if (3 == packageType)
             {
-                for (int i = 0; i < 8; ++i)
-                    GetPackage()->Add(g_rp3Items[i][0], g_rp3Items[i][1], true);
+                if (cfg.rpServer)
+                {
+                    getCoupon(g_rpServerCoupon[2]);
+                    pItems = g_rpServer3Items;
+                }
+                else
+                {
+                    getCoupon(g_rpCoupon[2]);
+                    pItems = g_rp3Items;
+
+                }
+                for (UInt8 i = 0; pItems[i][0] != 0; ++i)
+                    GetPackage()->Add(pItems[i][0], pItems[i][1], true);
+
                 udpLog("rpPacket", "F_1100_3", "", "", "", "", "act");
             }
             rpValue += (0xFF+1);
@@ -13624,6 +13738,11 @@ namespace GObject
         {
             st << GetVar(VAR_INRF7DAY) << Stream::eos;
         }
+        else if (type == 4)
+        {
+            st << World::getOpenTime() << Stream::eos;
+        }
+ 
         send(st);
     }
 
@@ -15486,6 +15605,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
                 if(fighter)
                     bp += fighter->getBattlePoint();
             }
+            calcLingbaoBattlePoint();
         }
         else
         {
@@ -15501,6 +15621,41 @@ void EventTlzAuto::notify(bool isBeginAuto)
         }
 
         return bp;
+    }
+
+    void Player::calcLingbaoBattlePoint()
+    {
+        if(CURRENT_THREAD_ID() == getThreadId())
+        {
+            UInt32 value = 0;
+            _maxLingbaoBattlePoint = 0;
+            for(int j = 0; j < 5; ++ j)
+            {
+                Fighter* fighter = _playerData.lineup[j].fighter;
+                if(fighter)
+                {
+                    value = fighter->calcLingbaoBattlePoint();
+                    _maxLingbaoBattlePoint = value > _maxLingbaoBattlePoint? value:_maxLingbaoBattlePoint;
+                }
+            }
+        }
+        else
+        {
+            GameMsgHdr hdr(0x353, getThreadId(), this, 0);
+            GLOBAL().PushMsg(hdr, NULL);
+        }
+
+    }
+
+    void Player::setMaxLingbaoBattlePoint(UInt32 value)
+    {
+        _maxLingbaoBattlePoint = value;
+    }
+
+
+    UInt32 Player::getMaxLingbaoBattlePoint()
+    {
+        return _maxLingbaoBattlePoint;
     }
 
     void Player::verifyFighter()
@@ -17349,7 +17504,8 @@ static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372 };
 static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357 };
 void Player::getDragonKingInfo()
 {
-    if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END))
+    if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)
+            && GVAR.GetVar(GVAR_DRAGONKING_ACTION) != DRAGONKING_CLOSE)
     {
         GVAR.SetVar(GVAR_DRAGONKING_ACTION, 0);
         GVAR.SetVar(GVAR_DRAGONKING_BEGIN, 0);
@@ -17357,7 +17513,8 @@ void Player::getDragonKingInfo()
         return;
     }
     UInt8 flag = GVAR.GetVar(GVAR_DRAGONKING_ACTION);
-    if (flag <= DRAGONKING_CLOSE || flag >= DRAGONKING_MAX)
+    if (flag <= DRAGONKING_CLOSE || flag >= DRAGONKING_MAX
+            || flag+1 > sizeof(Dragon_type)/sizeof(UInt8))
     {
         sendMsgCode(0, 1090);
         return;
@@ -17379,7 +17536,8 @@ void Player::postDragonKing(UInt8 count)
         GLOBAL().PushMsg(h, &count);
         return;
     }
-    if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END) && GVAR.GetVar(GVAR_DRAGONKING_ACTION) != DRAGONKING_CLOSE)
+    if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)
+            && GVAR.GetVar(GVAR_DRAGONKING_ACTION) != DRAGONKING_CLOSE)
     {
         GVAR.SetVar(GVAR_DRAGONKING_ACTION, 0);
         GVAR.SetVar(GVAR_DRAGONKING_BEGIN, 0);
@@ -17388,7 +17546,8 @@ void Player::postDragonKing(UInt8 count)
     }
     if (count == 0) return;
     UInt8 flag = GVAR.GetVar(GVAR_DRAGONKING_ACTION);
-    if (flag <= DRAGONKING_CLOSE || flag >= DRAGONKING_MAX)
+    if (flag <= DRAGONKING_CLOSE || flag >= DRAGONKING_MAX
+           || flag+1 > sizeof(Dragon_type)/sizeof(UInt8))
     {
         sendMsgCode(0, 1090);
         return;
@@ -18072,7 +18231,7 @@ UInt8 Player::toQQGroup(bool isJoin)
         st << GetVar(VAR_FAIRYPET_LONGYUAN);
         st << GetVar(VAR_FAIRYPET_FENGSUI);
         st << GetVar(VAR_FAIRYPET_XIANYUAN);
-        st << static_cast<UInt8>(GetVar(VAR_FAIRYPET_LIKEABILITY));
+        st << static_cast<UInt16>(GetVar(VAR_FAIRYPET_LIKEABILITY));
         st << Stream::eos;
         send(st);
     }
@@ -18480,6 +18639,300 @@ UInt32 Player::getQQGameOnlineTotalTime()
     }
     return GetVar(VAR_ONLINE_TOTAL_TIME) + curTime;
 }
+void Player::sendRP7TreasureInfo(bool isLogin)
+{
+    bool isFinish = false;
+    UInt8 totalGot = 0;
+    UInt32 b = GVAR.GetVar(GVAR_TREASURE_BEGIN);
+    UInt32 n = GVAR.GetVar(GVAR_TREASURE_END);
+    if (cfg.rpServer && b ==0)
+    {
+        b = World::getOpenTime();
+        n = b+7*86400;
+    }
+    Stream st(REP::RP_SERVER);
+    st << static_cast<UInt8>(0x02) <<static_cast<UInt8>(0x01);
+    st << b << n;
+    UInt8 v = GetVar(VAR_RP7_TREASURE);
+    UInt8 c = 0;
+    st << v;
+    for (UInt8 i = 0; i < 6; i++)
+    {
+        if (v&(1<<i))
+        {
+            UInt32 tm = GetVar(VAR_RP7_TREASURE1_GETTIME+c);
+            UInt8 count =10-(GetVar(VAR_RP7_TREASURE)>>(c*8+8));
+            UInt8 got = (GetVar(VAR_RP7_TREASURE_TODAY_GOT)&(1<<c))?1:0;
+            c++;
+            st << i << tm << count <<got;
+            totalGot += 10-count;
+        }
+    }
+    st << Stream::eos;
+    if (isLogin)
+    {
+        if (c >0 && totalGot==c*10)
+            isFinish = true;
+        if (cfg.rpServer)
+        {
+            UInt32 opTime = TimeUtil::MkTime(cfg.openYear, cfg.openMonth, cfg.openDay);
+            if(TimeUtil::SharpDay(0) >= opTime + 7 * 86400  && c == 0)
+                isFinish = true;
+        }
+        else
+        {
+            UInt32 now = TimeUtil::Now();
+            if (c == 0 && (now < b || now > n))
+                isFinish = true;
+        }
+    }
+    if (!isFinish)
+       send(st);
+}
+
+void Player::buyRP7Treasure(UInt8 idx)
+{
+    static UInt32 s_gold[] = {1000,10000,30000,50000,80000,120000};
+    if (idx > 5)
+        return;
+ 
+    UInt8 res = 0;
+    UInt32 opTime = TimeUtil::MkTime(cfg.openYear, cfg.openMonth, cfg.openDay);
+    if((TimeUtil::SharpDay(0) >= opTime + 7 * 86400 && cfg.rpServer) ||
+       (TimeUtil::Now()<GVAR.GetVar(GVAR_TREASURE_BEGIN) || TimeUtil::Now()>GVAR.GetVar(GVAR_TREASURE_END))
+      )
+        res = 4;
+    UInt8 v = GetVar(VAR_RP7_TREASURE); 
+    if (v&(1<<idx))
+    {
+        res = 1;
+    }
+    else if (res == 0)
+    {
+        UInt8 c = 0;
+        UInt32 var = VAR_RP7_TREASURE1_GETTIME;
+        for (UInt8 i = 0; i < 6; i++)
+        {
+            if (v&(1<<i)) 
+            {
+                c++;
+                if (idx > i)
+                    var += 1;
+            }
+        }
+        if ( c >= 3)
+        {
+            res = 2;
+        }
+        else
+        {
+     		if (getGold() < s_gold[idx])
+            {
+                res = 3;
+                sendMsgCode(0,1104);
+                return;
+            }
+            else
+            {
+            	ConsumeInfo ci(RP7Treasure,0,0);
+        	    useGold(s_gold[idx],&ci);
+                v |= (1<<idx);
+                SetVar(VAR_RP7_TREASURE, v);
+
+                UInt32 tm = TimeUtil::SharpDay(0)+10*86400;
+                //需要重新排列3个var的数值
+                if (var == VAR_RP7_TREASURE1_GETTIME)
+                {
+                    SetVar(VAR_RP7_TREASURE1_GETTIME+2, GetVar(VAR_RP7_TREASURE1_GETTIME+1)); 
+                    SetVar(VAR_RP7_TREASURE1_GETTIME+1, GetVar(VAR_RP7_TREASURE1_GETTIME));
+                }
+                else if ( var == (VAR_RP7_TREASURE1_GETTIME+1))
+                {
+                    SetVar(VAR_RP7_TREASURE1_GETTIME+2, GetVar(VAR_RP7_TREASURE1_GETTIME+1));
+                }
+                SetVar(var,tm);  
+            }
+        }
+    }
+    Stream st(REP::RP_SERVER);
+    st << static_cast<UInt8>(0x02) << static_cast<UInt8>(0x02) << res;
+    st << Stream::eos;
+    send(st);
+    if (res == 0)
+        sendRP7TreasureInfo();
+}
+
+void Player::getRP7TreasureAward(UInt8 idx)
+{
+    static UInt32 s_gold[] = {1000,10000,30000,50000,80000,120000};
+    static MailPackage::MailItem s_item[][8] = {
+        {{0xB000,100},{57,1},{56,1},{29,10},{15,1},{48,1}},
+        {{0xB000,1000},{0xA000,20},{509,1},{507,1},{516,1},{547,1}},
+        {{0xB000,3000},{0xA000,50},{503,1},{47,1},{500,1},{501,1}},
+        {{0xB000,5000},{0xA000,80},{509,2},{503,2},{515,2},{507,2}},
+        {{0xB000,8000},{0xA000,100},{1325,3},{134,3},{509,3},{507,3}},
+        {{0xB000,12000},{0xA000,150},{1325,5},{134,5},{509,5},{507,5}},
+    };
+    if (idx > 5)
+        return;
+ 
+    UInt8 res = 0;
+    UInt8 v = GetVar(VAR_RP7_TREASURE); 
+    if (v&(1<<idx))
+    {
+        UInt8 c = 0;
+        for (UInt8 i = 0; i < 6; i++)
+        {
+            if (v&(1<<i)) 
+                c++;
+            if (idx == i)
+                break;
+        }
+        UInt8 count = GetVar(VAR_RP7_TREASURE)>>(c*8);
+        if (count >= 10)
+            res = 2;
+        else if (GetVar(VAR_RP7_TREASURE_TODAY_GOT)&(1<<(c-1)))
+            res = 1;
+        else if (TimeUtil::Now() < GetVar(VAR_RP7_TREASURE1_GETTIME+c-1))
+            res = 3;
+        else
+        {
+            SYSMSG(title,4912);
+            SYSMSGV(content,4913,s_gold[idx],count+1);
+			Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            if (mail)
+            {
+                UInt8 t = GetVar(VAR_RP7_TREASURE_TODAY_GOT);
+                SetVar(VAR_RP7_TREASURE_TODAY_GOT, t|=(1<<(c-1)));
+                count++;
+                UInt32 v1 = GetVar(VAR_RP7_TREASURE);
+                v1 &= ~(0xFF<<(c*8));
+                v1 += (count<<(c*8));
+                SetVar(VAR_RP7_TREASURE, v1);
+                mailPackageManager.push(mail->id, s_item[idx], 8, true);
+            }
+        }
+    }
+    Stream st(REP::RP_SERVER);
+    st << static_cast<UInt8>(0x02) << static_cast<UInt8>(0x03) << res;
+    st << Stream::eos;
+    send(st);
+    sendRP7TreasureInfo();
+}
+
+void Player::sendRP7SignInfo()
+{
+    if (!cfg.rpServer)
+        return;
+ 
+    UInt32 now_sharp = TimeUtil::SharpDay(0);
+    UInt32 created_sharp = TimeUtil::SharpDay(0, getCreated());
+    if (now_sharp < created_sharp)
+        return;
+    UInt8 day = (now_sharp-created_sharp)/86400 + 1;
+    if (day > 30)
+        return;
+    UInt32 v = GetVar(VAR_RP7_SIGN);
+    UInt8 p = GetVar(VAR_RP7_SIGN_PACKAGE); 
+    Stream st(REP::RP_SERVER);
+    st << static_cast<UInt8>(0x03) << static_cast<UInt8>(0x01);
+    st << day << v << p;
+    st << Stream::eos;
+    send(st);
+}
+void Player::RP7Sign(UInt8 idx)
+{
+    static UInt32 s_item[][3] = {
+        {15,56,57},
+        {15,51,48},
+        {500,512},
+        {48,50,466}
+    };
+    if (!cfg.rpServer)
+        return;
+ 
+    UInt32 now_sharp = TimeUtil::SharpDay(0);
+    UInt32 created_sharp = TimeUtil::SharpDay(0, getCreated());
+    if (now_sharp < created_sharp)
+        return;
+    UInt8 day = (now_sharp-created_sharp)/86400 + 1;
+    if (day > 30 || idx > day)
+        return;
+    UInt32 v = GetVar(VAR_RP7_SIGN); 
+    if (v&(1<<(idx-1)))
+        return;
+    if (GetPackage()->GetRestPackageSize() < 3)
+    {
+        sendMsgCode(0, 1011);
+        return;
+    }
+    if (idx < day)
+    {
+        if (getGold() < 10)
+        {
+            sendMsgCode(0, 1104);
+            return;
+        }
+       	ConsumeInfo ci(RP7Treasure,0,0);
+        useGold(10,&ci);
+    }
+    UInt8 i = 0;
+    if (idx >= 4 && idx <=7)
+        i = 1;
+    else if (idx >= 8 && idx <= 15)
+        i = 2;
+    else if (idx > 15) 
+    {
+        getCoupon(10);
+        i = 3;
+    }
+    for (UInt8 j = 0; j < sizeof(s_item[i])/sizeof(s_item[i][0]); ++j)
+        GetPackage()->Add(s_item[i][j], 1, true);
+    v |= (1<<(idx-1));
+    SetVar(VAR_RP7_SIGN, v);
+    sendRP7SignInfo();
+    
+}
+void Player::getRP7SignPackage(UInt8 idx)
+{
+    static UInt8 s_needDays[] = {3,7,15,28};
+    if(idx > 3)
+        return;
+    if (!cfg.rpServer)
+        return;
+ 
+    UInt8 v = GetVar(VAR_RP7_SIGN_PACKAGE); 
+    if (v&(1<<(idx)))
+        return;
+    if (GetPackage()->GetRestPackageSize() < 3)
+    {
+        sendMsgCode(0, 1011);
+        return;
+    }
+    UInt32 s = GetVar(VAR_RP7_SIGN);
+    UInt8 count = 0;
+    for (UInt8 i = 0; i < 32; ++i)
+    {
+        if (s&(1<<i))
+            count++;
+    }
+    if (count < s_needDays[idx])
+        return;
+
+    if (0 == idx)
+        GetPackage()->Add(15, 5, true);   
+    else if (1 == idx)
+        GetPackage()->Add(516, 5, true); 
+    else if (2 == idx)
+    {
+        GetPackage()->Add(1646, 1, true); 
+    }
+    else if (3 == idx)
+        GetPackage()->Add(1700, 1, true);
+    v |= 1<<(idx);
+    SetVar(VAR_RP7_SIGN_PACKAGE, v);
+    sendRP7SignInfo();
+}
 
 bool Player::inVipPrivilegeTime()
 {
@@ -18634,6 +19087,217 @@ bool Player::in7DayFromCreated()
         return false; // 玩家注册时间超过7日，无法参与活动
 
     return true;
+}
+
+#define QUESTIONID_MAX 30
+#define SET_BIT(X,Y) (X | (1<<Y))
+#define CLR_BIT(X,Y) (X & ~(1<<Y))
+#define CLR_BIT_8(X,Y) (X & ~(0xFF<<(Y*8)))
+#define SET_BIT_8(X,Y,V) (CLR_BIT_8(X,Y) | V<<(Y*8))
+#define GET_BIT_8(X,Y) ((X >> (Y*8)) & 0xFF)
+void Player::sendFoolsDayInfo()
+{
+    UInt32 info = GetVar(VAR_FOOLS_DAY_INFO);
+    UInt32 value = GetVar(VAR_FOOLS_DAY);
+    UInt32 qtime = GetVar(VAR_FOOLS_DAY_TIME);
+    UInt8 qid = GET_BIT_8(value, 0);
+    UInt8 right = 0;
+    bool isFail = false;
+    if((info & (1<<0)) == 1)
+        isFail = true;
+    if((info & (1<<0)) == 0 && qid)
+    {
+        if(!GET_BIT_8(value, 3) && qtime + 15 < TimeUtil::Now())
+            isFail = true;
+        else    //有离线标志
+        {
+            qtime = TimeUtil::Now();
+            SetVar(VAR_FOOLS_DAY_TIME, qtime);
+        }
+    }
+    for(UInt8 i = 1; i <= QUESTIONID_MAX; ++ i)
+    {
+        if(info & (1<<i))
+            ++ right;
+    }
+    if(!isFail && qid == 0 && right < QUESTIONID_MAX && GET_BIT_8(value, 1) == 0)
+    {   //分配新题目
+        UInt8 index = uRand(QUESTIONID_MAX-right);
+        UInt8 j = 0;
+        for(UInt8 i = 1; i <= QUESTIONID_MAX; ++ i)
+        {
+            if((info & (1<<i)) == 0)
+            {
+                if(j == index)
+                {
+                    qid = i;
+                    break;
+                }
+                ++ j;
+            }
+        }
+        SetVar(VAR_FOOLS_DAY, SET_BIT_8(value, 0, qid));
+        qtime = TimeUtil::Now();
+        SetVar(VAR_FOOLS_DAY_TIME, qtime);
+        if(right == 0)
+            foolsDayUdpLog(7);
+    }
+    Stream st(REP::ACTIVE);
+    st << static_cast<UInt8>(0x10) << static_cast<UInt8>(0x01);
+    st << right << static_cast<UInt8>(GET_BIT_8(value, 1));
+    st << static_cast<UInt8>(GET_BIT_8(value, 2));
+    st << static_cast<UInt8>(isFail ? 1 : 0) << qid << qtime;
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::submitAnswerInFoolsDay(UInt8 id, char answer)
+{
+    UInt32 info = GetVar(VAR_FOOLS_DAY_INFO);
+    UInt32 value = GetVar(VAR_FOOLS_DAY);
+    if(GET_BIT_8(value, 1))
+        return;
+    UInt32 qtime = GetVar(VAR_FOOLS_DAY_TIME);
+    if(info == 0 && value == 0 && qtime == 0)
+    {   //零点重置
+        sendFoolsDayInfo();
+        return;
+    }
+    UInt8 qid = GET_BIT_8(value, 0);
+    bool isRight = true;
+    if((info & 0x01) == 1)
+        isRight = false;
+    if(id != qid || qtime + 15 < TimeUtil::Now())
+        isRight = false;
+    if(isRight)
+        isRight = GameAction()->checkAnswerInFoolsDay(id, answer);
+    value = CLR_BIT_8(value, 3);    //清除离线标志
+    if(isRight) //答对
+    {
+        SetVar(VAR_FOOLS_DAY, CLR_BIT_8(value, 0));
+        info = SET_BIT(info, id);
+        SetVar(VAR_FOOLS_DAY_INFO, CLR_BIT(info, 0));
+        SYSMSG_SENDV(4148, this);
+    }
+    else        //答错
+    {
+        SetVar(VAR_FOOLS_DAY, SET_BIT_8(value, 0, id));
+        SetVar(VAR_FOOLS_DAY_INFO, SET_BIT(info, 0));
+        if(qtime + 15 < TimeUtil::Now())
+        {
+            SYSMSG_SENDV(4150, this);
+        }
+        else
+        {
+            SYSMSG_SENDV(4149, this);
+        }
+    }
+    sendFoolsDayInfo();
+}
+
+void Player::getAwardInFoolsDay()
+{
+    UInt32 value = GetVar(VAR_FOOLS_DAY);
+    if(GET_BIT_8(value, 1))
+        return;
+    UInt8 right = 0;
+    UInt32 info = GetVar(VAR_FOOLS_DAY_INFO);
+    for(UInt8 i = 1; i <= QUESTIONID_MAX; ++ i)
+    {
+        if(info & (1<<i))
+            ++ right;
+    }
+    if(right < 5)
+        return;
+    if (GetPackage()->GetRestPackageSize() < right / 5)
+    {
+        sendMsgCode(2, 1011, 0);
+        return;
+    }
+    GameAction()->getAwardInFoolsDay(this, right / 5);
+    SetVar(VAR_FOOLS_DAY, SET_BIT_8(value, 1, right/5 * 5));
+    sendFoolsDayInfo();
+    foolsDayUdpLog(right / 5);
+}
+
+void Player::buyResurrectionCard()
+{
+    if(!hasChecked())
+        return;
+    UInt32 value = GetVar(VAR_FOOLS_DAY);
+    if(GET_BIT_8(value, 1))
+        return;
+    if(GET_BIT_8(value, 0) == 0)
+        return;
+    UInt8 cnt = GET_BIT_8(value, 2) + 1;
+    if(cnt * 10 > getGold())
+    {
+        sendMsgCode(0, 1104);
+        return;
+    }
+    ConsumeInfo ci(FoolsDayAnswerAct, 0, 0);
+    useGold(cnt*10, &ci);
+
+    UInt32 info = GetVar(VAR_FOOLS_DAY_INFO);
+    info = SET_BIT(info, GET_BIT_8(value, 0));
+    SetVar(VAR_FOOLS_DAY_INFO, CLR_BIT(info, 0));
+    value = SET_BIT_8(value, 2, cnt);
+    value = CLR_BIT_8(value, 3);    //清除离线标志
+    SetVar(VAR_FOOLS_DAY, CLR_BIT_8(value, 0));
+    sendFoolsDayInfo();
+}
+
+void Player::setLogoutInFoolsDay()
+{
+    if (World::getFoolsDay())
+    {
+        UInt32 info = GetVar(VAR_FOOLS_DAY_INFO);
+        if(info == 0 || (info & (1<<0)) == 1)
+            return;
+        UInt32 qtime = GetVar(VAR_FOOLS_DAY_TIME);
+        if(qtime == 0)
+            return;
+        UInt32 value = GetVar(VAR_FOOLS_DAY);
+        if(qtime + 10 < TimeUtil::Now())
+        {
+            SetVar(VAR_FOOLS_DAY, CLR_BIT_8(value, 3));
+            return;
+        }
+        SetVar(VAR_FOOLS_DAY, SET_BIT_8(value, 3, 1));
+    }
+}
+
+void Player::checkAnswerActInFoolsDay()
+{
+    UInt32 info = GetVar(VAR_FOOLS_DAY_INFO);
+    UInt32 value = GetVar(VAR_FOOLS_DAY);
+    UInt8 type = 0, right = 0;
+    if(GET_BIT_8(value, 1))
+        type = 1;
+    else
+    {
+        for(UInt8 i = 1; i <= QUESTIONID_MAX; ++ i)
+        {
+            if(info & (1<<i))
+                ++ right;
+        }
+        if(right == 0 && (info & (1<<0)) == 0)
+            type = 3;
+        else
+            type = 2;
+    }
+    Stream st(REP::ACTIVE);
+    st << static_cast<UInt8>(0x10) << static_cast<UInt8>(0x00);
+    st << type << Stream::eos;
+    send(st);
+}
+
+void Player::foolsDayUdpLog(UInt8 type)
+{
+    // 愚公移山相关日志
+    char action[16] = "";
+    snprintf (action, 16, "F_10000_0327_%d", type);
+    udpLog("FoolsDay", action, "", "", "", "", "act");
 }
 
 } // namespace GObject
