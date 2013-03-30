@@ -1264,6 +1264,15 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     }
     pl->sendQZoneQQGameAct(1);
     pl->sendQZoneQQGameAct(2);
+    pl->sendVipPrivilege();
+    pl->svrSt(4);
+    pl->sendRP7TreasureInfo(true);
+    if (cfg.rpServer)
+    {
+        pl->sendRP7SignInfo();
+        GameMsgHdr hdr(0x1CB, WORKER_THREAD_WORLD, pl, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+    }
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -4150,6 +4159,8 @@ void OnFriendOpReq( GameMsgHdr& hdr, FriendOpReq& fr )
         player->delCFriend(pl);
         pl->delCFriend(player);
         break;
+    case 9:
+        player->vote(pl);
 	}
 }
 
@@ -4467,6 +4478,13 @@ void OnClanRankBattleReqInit(GameMsgHdr& hdr,const void* data)
         case 2: //取消报名
             {
                 ClanRankBattleMgr::Instance().Signout(player);
+            }
+            break;
+        case 8:
+            {
+                GObject::Clan *clan = player->getClan();
+                if(clan)
+                    clan->broadcastClanBattle(player);
             }
             break;
         default:
@@ -6127,7 +6145,69 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
     }
 }
 
+void OnRPServerReq( GameMsgHdr & hdr, const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
 
+    UInt8 op = 0;
+    brd >> op;
+    switch(op)
+    {
+        //开服7天排行榜
+        case 0x01:
+            {
+                UInt8 type = 0;
+                brd >> type;
+                if (1 == type)//充值排行
+                {
+                    GameMsgHdr hdr(0x1CB, WORKER_THREAD_WORLD, player, 0);
+                    GLOBAL().PushMsg(hdr, NULL);
+                }
+            }
+            break;
+            //聚宝盆
+        case 0x02:
+            {
+                UInt8 type = 0;
+                brd >> type;
+                if (1 == type)
+                {
+                    player->sendRP7TreasureInfo();
+                }
+                else
+                {
+                    UInt8 idx = 0;
+                    brd >> idx;
+                    if (2 == type)
+                        player->buyRP7Treasure(idx);
+                    else if (3 == type)
+                        player->getRP7TreasureAward(idx);
+                }
+            }
+            //注册30日签到
+        case 0x03:
+            {
+                UInt8 type = 0;
+                brd >> type;
+                if (1 == type)
+                    player->sendRP7SignInfo();
+                else
+                {
+                    UInt8 idx = 0;
+                    brd >> idx;
+                    if (2 ==type)
+                        player->RP7Sign(idx);
+                    else if (3 == type)
+                        player->getRP7SignPackage(idx);
+                }
+            }
+            break;
+        default:
+            break;
+    }
+}
+ 
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

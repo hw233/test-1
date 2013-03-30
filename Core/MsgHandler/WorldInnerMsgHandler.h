@@ -1000,6 +1000,99 @@ void OnSendConsumeRank ( GameMsgHdr& hdr,  const void* data )
     }
 }
 
+void SendPopularityRank(Stream &st, Player* player)
+{
+    using namespace GObject;
+    st.init(REP::SORT_LIST);
+    size_t c = World::popularitySort.size();
+	st << static_cast<UInt8>(7) << static_cast<UInt32>(0) << static_cast<UInt32>(player->GetVar(VAR_POPULARITY)) << static_cast<UInt8>(c);
+    for (RCSortType::iterator i = World::popularitySort.begin(), e = World::popularitySort.end(); i != e; ++i)
+    {
+        Player* pl = i->player;
+        if (pl)
+        {
+            st << pl->getName() << pl->getPF() << pl->GetLev() << pl->getCountry() << i->total << pl->getClanName();
+        }
+
+    }
+    st << Stream::eos;
+    player->send(st);
+}
+
+
+inline bool popularityChanged(GObject::Player* p, void * data)
+{
+    if (p == NULL)
+        return true;
+    Stream st;
+    SendPopularityRank(st, p);
+    return true;
+}
+
+void OnPopularityRank ( GameMsgHdr& hdr, const void * data)
+{
+    // 更新人气排名
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    UInt32 total = *((UInt32*)data);
+    if (!total)
+        return;
+
+    bool inrank = false;
+    UInt32 oldrank = 0;
+    for (RCSortType::iterator i = World::popularitySort.begin(), e = World::popularitySort.end(); i != e; ++i)
+    {
+        ++oldrank;
+        if (i->player == player)
+        {
+            if (oldrank <= CNT)
+                inrank = true;
+            World::popularitySort.erase(i);
+            break;
+        }
+    }
+
+    RCSort s;
+    s.player = player;
+    s.total = total;
+    World::popularitySort.insert(s);
+
+    UInt32 rank = 0;
+    UInt32 myrank = 0;
+    bool stop = false;
+    for (RCSortType::iterator i = World::popularitySort.begin(), e = World::popularitySort.end(); i != e; ++i)
+    {
+        if (!stop)
+            ++myrank;
+
+        if (i->player == player)
+            stop = true;
+
+        ++rank;
+
+        Stream st(REP::ACT);
+        st << static_cast<UInt8>(2) << static_cast<UInt8>(1) << static_cast<UInt8>(2) << i->total << static_cast<UInt8>(rank) << Stream::eos;
+    }
+
+    if (oldrank <= CNT || (!inrank && myrank <= CNT))
+    {
+        Stream st;
+        SendPopularityRank(st, player);
+        //NETWORK()->Broadcast(st);
+    }
+    globalPlayers.enumerate(popularityChanged, static_cast<void *>(NULL));
+}
+
+void OnSendPopularityRank(GameMsgHdr& hdr, const void*data)
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+    World::initRCRank();
+    Stream st(REP::SORT_LIST);
+    SendPopularityRank(st, player);
+}
+
 void OnGetQgameGiftAward( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);
@@ -1182,6 +1275,88 @@ void OnSendClanMemberList( GameMsgHdr& hdr, const void* data )
     if(clan != NULL)
         clan->sendClanList(player, cmlr->_type, cmlr->_start, cmlr->_count);
 }
+#define CNT10 10
+
+void OnRechargeRP7Rank ( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+    if (!cfg.rpServer)
+        return;
+    if (TimeUtil::Now() > World::getOpenTime()+7*86400)
+        return;
+ 
+    UInt32 total = *((UInt32*)data);
+    if (!total)
+        return;
+
+    bool inrank = false;
+    UInt32 oldrank = 0;
+    for (RCSortType::iterator i = World::rechargeRP7Sort.begin(), e = World::rechargeRP7Sort.end(); i != e; ++i)
+    {
+        ++oldrank;
+        if (i->player == player)
+        {
+            if (oldrank <= CNT10)
+                inrank = true;
+            World::rechargeRP7Sort.erase(i);
+            break;
+        }
+    }
+
+    RCSort s;
+    s.player = player;
+    s.total = total;
+    World::rechargeRP7Sort.insert(s);
+
+    GameMsgHdr hdr1(0x1CB, WORKER_THREAD_WORLD, player, 0);
+    GLOBAL().PushMsg(hdr1, NULL);
+}
+void SendRechargeRP7Rank(GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    if (!cfg.rpServer)
+        return;
+    if (TimeUtil::Now() > World::getOpenTime()+30*86400)
+        return;
+ 
+    World::initRP7RCRank();
+
+    MSG_QUERY_PLAYER(player);    
+
+    UInt8 cnt = World::rechargeRP7Sort.size();
+    if (cnt > CNT10)
+        cnt = CNT10;
+    UInt32 myRecharge = player->getTotalRecharge();
+    if (TimeUtil::Now() > World::getOpenTime()+7*86400)
+        myRecharge = player->GetVar(VAR_RP7_RECHARGE);
+    UInt32 myrank = 0;
+    if (myRecharge > 0)
+    {
+        for (RCSortType::iterator i = World::rechargeRP7Sort.begin(), e = World::rechargeRP7Sort.end(); i != e; ++i)
+        {
+            ++myrank;
+            if (i->player == player)
+                break;
+        }
+    }
+    Stream st(REP::RP_SERVER);
+    st << static_cast<UInt8>(1) << static_cast<UInt8>(1);
+    st << myRecharge << myrank << cnt;
+
+    UInt32 c = 0;
+    for (RCSortType::iterator i = World::rechargeRP7Sort.begin(), e = World::rechargeRP7Sort.end(); i != e; ++i)
+    {
+        st << i->player->getName();
+        st << i->total;
+        ++c;
+        if (c >= CNT10)
+            break;
+    }
+    st << Stream::eos;
+    player->send(st);
+}
+
 
 
 #endif // _WORLDINNERMSGHANDLER_H_

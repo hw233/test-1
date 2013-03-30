@@ -1197,17 +1197,34 @@ void OnLeaderboardReq( GameMsgHdr& hdr, LeaderboardReq& lr )
 	MSG_QUERY_PLAYER(player);
 	Stream * st;
     //if(GObject::leaderboard.hasUpdate(lr._id) && GObject::leaderboard.getPacket(lr._type, st, player))
-	if (GObject::leaderboard.getPacket(lr._type, st, player))
+    if (lr._type == 7)
     {
-        if (!GObject::leaderboard.isSorting())
-            player->send(*st);
-	}
-	else
-	{
-		UInt8 failed_packet[9] = {0x05, 0x00, 0xFF, REP::SORT_LIST, lr._type, 0x00, 0x00, 0x00, 0x00};
-		player->send(failed_packet, 9);
-	}
+        GameMsgHdr hdr(0x1C6, WORKER_THREAD_WORLD, player, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+    }
+    else
+    {
+        if (GObject::leaderboard.getPacket(lr._type, st, player))
+        {
+            if (!GObject::leaderboard.isSorting())
+                player->send(*st);
+        }
+        else
+        {
+            if (lr._type != 6)
+            {
+                UInt8 failed_packet[9] = {0x05, 0x00, 0xFF, REP::SORT_LIST, lr._type, 0x00, 0x00, 0x00, 0x00};
+                player->send(failed_packet, 9);
+            }
+            else
+            {
+                UInt8 failed_packet[14] = {0x05, 0x00, 0xFF, REP::SORT_LIST, lr._type, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+                player->send(failed_packet, 14);
+            }
+        }
+    }
 }
+
 
 void OnOwnLeaderboardReq( GameMsgHdr& hdr, OwnLeaderboardReq& olr )
 {

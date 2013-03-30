@@ -203,6 +203,8 @@ namespace GObject
 #if 0
 		_npcGroup->monsterKilled(m_Player);
 #endif
+        if (cfg.rpServer && m_Player->GetLev() < 70)
+            exp *= 2;
 		if(m_Player->isOnline())
 			m_Player->AddExp(static_cast<UInt32>(exp * factor), 0, extraExp);
 		else
@@ -267,6 +269,8 @@ namespace GObject
 		ecs.exp = calcExpEach(TimeUtil::Now()) * cnt;
 		ecs.count = cnt;
 		ecs.ng = NULL;//_npcGroup;
+        if (cfg.rpServer && m_Player->GetLev() < 70)
+            ecs.exp *= 2;
 		GameMsgHdr hdr(0x274, m_Player->getThreadId(), m_Player, sizeof(ExpGainInstantCompleteStruct));
 		GLOBAL().PushMsg(hdr, &ecs);
 		_finalEnd -= ecs.duration;
@@ -659,7 +663,7 @@ namespace GObject
 #ifndef _WIN32
 		m_ulog(NULL),
 #endif
-		m_isOffical(false), m_isXY(false), m_sysDailog(false), m_hasTripod(false), _jobHunter(NULL), _dreamer(NULL), _onBattlePet(NULL)
+		m_isOffical(false), m_isXY(false), m_XinYue(0), m_sysDailog(false), m_hasTripod(false), _maxLingbaoBattlePoint(0), _jobHunter(NULL), _dreamer(NULL), _onBattlePet(NULL)
 	{
         m_ClanBattleStatus = 1;
         m_ClanBattleScore = 0;
@@ -1285,11 +1289,11 @@ namespace GObject
             char buf[1024] = {0};
             char* pbuf = &buf[0];
             if (cfg.isTestPlatform)
-                pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u|%u|%u|%u|%u||%u||%u||%u|1|",
-                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId(), GetLev(), _playerData.gold, _playerData.coupon, _playerData.tael, getVipLevel(), _clan? _clan->getId() : 0, _playerData.qqvipl, cfg.serverNum, platform);
+                pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u|%u|%u|%u|%u|%u|%u||%u||%u|1|",
+                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId(), GetLev(), _playerData.gold, _playerData.coupon, _playerData.tael, getVipLevel(), _clan? _clan->getId() : 0, getXinYue(), _playerData.qqvipl, cfg.serverNum, platform);
             else
-                pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u|%u|%u|%u|%u||%u||%u||%u|",
-                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId(), GetLev(), _playerData.gold, _playerData.coupon, _playerData.tael, getVipLevel(), _clan? _clan->getId() : 0, _playerData.qqvipl, cfg.serverNum, platform);
+                pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u|%u|%u|%u|%u|%u|%u||%u||%u|",
+                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId(), GetLev(), _playerData.gold, _playerData.coupon, _playerData.tael, getVipLevel(), _clan? _clan->getId() : 0, getXinYue(), _playerData.qqvipl, cfg.serverNum, platform);
 
             m_ulog->SetUserMsg(buf);
             if (platform != WEBDOWNLOAD)
@@ -2101,8 +2105,11 @@ namespace GObject
 		DB1().PushUpdateData("UPDATE `player` SET `lastOnline` = %u, `nextReward` = '%u|%u|%u|%u' WHERE `id` = %"I64_FMT"u", curtime, _playerData.rewardStep, _playerData.nextRewardItem, _playerData.nextRewardCount, _playerData.nextRewardTime, _id);
         if(_isOnline && !hasFlag(Training))
         {
-            if(cfg.GMCheck)
-                autoBattle(0, 0);
+            //if(cfg.GMCheck)
+             {
+                 if(worldBoss.needAutoBattle(_playerData.location))
+                    autoBattle(0, 0);
+             }
         }
         _isOnline = false;
 
@@ -3045,6 +3052,9 @@ namespace GObject
 		UInt8 c = 0;
 		UInt8 buffid[PLAYER_BUFF_COUNT];
 		UInt32 buffleft[PLAYER_BUFF_COUNT];
+        if (cfg.rpServer && GetLev() < 70)
+            setBuffData(PLAYER_BUFF_EXPDOUBLE, curtime+99*3600, false);
+ 
 		for(UInt8 i = 0; i < PLAYER_BUFF_COUNT; ++ i)
 		{
 			if(i == 0)
@@ -3459,6 +3469,8 @@ namespace GObject
                     }
                     exp += extraExp;
                 }
+                if (cfg.rpServer && GetLev() < 70)
+                    exp *= 2;
                 pendExp(exp);
                 ng->getLoots(this, _lastLoot);
             }
@@ -4282,7 +4294,7 @@ namespace GObject
 		else
 			cnt = end - start;
 		Stream st(REP::FRIEND_LIST);
-		st << static_cast<UInt8>(type) << start << cnt << sz;
+		st << static_cast<UInt8>(type) << static_cast<UInt8>(GetVar(VAR_HAS_VOTE)?1:0) << start << cnt << sz;
         if (sz && cnt)
         {
             std::set<Player *>::iterator it = _friends[type].begin();
@@ -4300,6 +4312,27 @@ namespace GObject
 		send(st);
 	}
 
+    void Player::vote(Player* other)
+    {
+        if (GetVar(VAR_HAS_VOTE))
+        {
+            return;
+        }
+        SetVar(VAR_HAS_VOTE, 1);
+        GameMsgHdr hdr(0x360, other->getThreadId(), other, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+        sendMsgCode(0, 1509);
+        //GameMsgHdr hdr2(0x1C6, WORKER_THREAD_WORLD, this, 0);
+        //GLOBAL().PushMsg(hdr2, NULL);
+    }
+
+    void Player::beVoted()
+    {
+        AddVar(VAR_POPULARITY, 1);
+        UInt32 total = GetVar(VAR_POPULARITY);
+        GameMsgHdr hdr(0x1C7, WORKER_THREAD_WORLD, this, sizeof(total));
+        GLOBAL().PushMsg(hdr, &total);
+    }
 
 	void Player::sendModification( UInt8 t, UInt32 v, bool updateToDB )
 	{
@@ -4351,6 +4384,10 @@ namespace GObject
 		}
 		if(field != NULL)
 			DB1().PushUpdateData("UPDATE `player` SET `%s` = %u WHERE `id` = %"I64_FMT"u", field, v, _id);
+        if (cfg.rpServer && t == 7 && TimeUtil::Now() < World::getOpenTime() + 7 * 86400)
+        {
+            SetVar(VAR_RP7_RECHARGE, v);
+        }
     }
 
 	UInt32 Player::getGold( UInt32 c, IncommingInfo* ii)
@@ -5621,6 +5658,8 @@ namespace GObject
         //是否开启天劫
         GObject::Tianjie::instance().isOpenTj(this);
         sendLevelPack(GetLev()); // XXX:
+        if (cfg.rpServer && GetLev()>=70)
+            setBuffData(PLAYER_BUFF_EXPDOUBLE,0);
 	}
 
     void Player::addHIAttr(const GData::AttrExtra& attr)
@@ -7493,6 +7532,11 @@ namespace GObject
         addRC7DayRecharge(r);
         addRF7DayRecharge(r);
         addRechargeNextRet(r);
+        if (cfg.rpServer)
+        {
+            GameMsgHdr hdr(0x1CA, WORKER_THREAD_WORLD, this, sizeof(_playerData.totalRecharge));
+            GLOBAL().PushMsg(hdr, &_playerData.totalRecharge);
+        }
         
         if (World::getRechargeActive())
         {
@@ -8375,6 +8419,7 @@ namespace GObject
 
 	void Player::pendExp( UInt32 exp, bool leaveCity )
 	{
+        isDoubleExp(exp);
 		_playerData.lastExp += exp;
 		if(leaveCity)
 			_playerData.lastExp |= 0x80000000;
@@ -9802,6 +9847,7 @@ namespace GObject
                     UInt32 pExp = fgt->getPracticeInc() * pfexp->counts[i];
                     if(inVipPrivilegeTime())
                         extraPExp = fgt->getBasePExpEach() * pfexp->counts[i] * 0.2f;
+                    isDoubleExp(pExp);
                     fgt->addPExp(pExp, true, false, extraPExp);
                 }
             }
@@ -9858,6 +9904,7 @@ namespace GObject
                     UInt32 pExp = fgt->getPracticeInc() * pfexp->counts[i];
                     if(inVipPrivilegeTime())
                         extraPExp = fgt->getBasePExpEach() * pfexp->counts[i] * 0.2f;
+                    isDoubleExp(pExp);
                     fgt->addPExp(pExp, true, false, extraPExp);
                 }
             }
@@ -12392,6 +12439,11 @@ namespace GObject
 #endif
     }
 
+    void Player::sendPopularityRandAward(int popularity)
+    {
+        // TODO: 发送称号卡
+    }
+
     void Player::sendKillMonsterRankAward(UInt8 index, Int32 pos)
     {
         if (index > 3 || !pos || pos > 1)
@@ -13097,17 +13149,28 @@ namespace GObject
         st << Stream::eos;
         send(st);
     }
-    const int g_rpCoupon = 365;
+    const int g_rpCoupon[3] = {365,365,365};
+    const int g_rpServerCoupon[3] = {88,188,365};
     const int g_rp1Items[][2] = {
     {15, 20}, {510, 10}, {56, 10}, {57, 10}, {502, 100},
-    {514, 10}, {508, 10}, {506, 10},{1700, 1} };
+    {514, 10}, {508, 10}, {506, 10},{1700, 1},{0,0}};
     const int g_rp2Items[][2] = {
     {15, 30}, {56, 20}, {57, 20}, {502, 100}, {503,20},
-    {515, 10}, {508, 10}, {506, 10},{1700, 1} };
+    {515, 10}, {508, 10}, {506, 10},{1700, 1},{0,0}};
     const int g_rp3Items[][2] = {
     {15, 50}, {515, 20}, {509, 20}, {507, 20},
-    {1700, 1}, {1701, 1}, {1704, 1}, {1705,1} };
+    {1700, 1}, {1701, 1}, {1704, 1}, {1705,1},{0,0}};
     const int g_rpRewardItems[][2] = {{15,1},{502,2},{509,1}};
+
+    const int g_rpServer1Items[][2] = {
+    {15, 20}, {510, 10}, {56, 10}, {57, 10}, {502, 100},
+    {514, 10}, {508, 10}, {506, 10},{0,0}};
+    const int g_rpServer2Items[][2] = {
+    {15, 30}, {56, 20}, {57, 20}, {502, 100}, {503,20},
+    {508, 10}, {506, 10},{1700, 1},{0,0}};
+    const int g_rpServer3Items[][2] = {
+    {15, 50}, {515, 20}, {509, 20}, {507, 20},{1325,20},
+    {134,20}, {1700, 1}, {1701, 1}, {0,0}};
 
     void Player::getYearRPPackage()
     {
@@ -13125,24 +13188,58 @@ namespace GObject
                 send(st);
                 return;
             }
-            getCoupon(g_rpCoupon);
+            const int (*pItems)[2];
             if (1 == packageType)
             {
-                for (int i = 0; i < 9; ++i)
-                    GetPackage()->Add(g_rp1Items[i][0], g_rp1Items[i][1], true);
+                if (cfg.rpServer)
+                {
+                    getCoupon(g_rpServerCoupon[0]);
+                    pItems = g_rpServer1Items;
+                }
+                else
+                {
+                    getCoupon(g_rpCoupon[0]);
+                    pItems = g_rp1Items;
+                }
+                for (UInt8 i = 0; pItems[i][0] != 0; ++i)
+                    GetPackage()->Add(pItems[i][0], pItems[i][1], true);
 
                 udpLog("rpPacket", "F_1100_1", "", "", "", "", "act");
             }
             else if (2 == packageType)
             {
-                for (int i = 0; i < 9; ++i)
-                    GetPackage()->Add(g_rp2Items[i][0], g_rp2Items[i][1], true);
+                if (cfg.rpServer)
+                {
+                    getCoupon(g_rpServerCoupon[1]);
+                    pItems = g_rpServer2Items;
+                }
+                else
+                {
+                    getCoupon(g_rpCoupon[1]);
+                    pItems = g_rp2Items;
+
+                }
+                for (UInt8 i = 0; pItems[i][0] != 0; ++i)
+                    GetPackage()->Add(pItems[i][0], pItems[i][1], true);
+
                 udpLog("rpPacket", "F_1100_2", "", "", "", "", "act");
             }
             else if (3 == packageType)
             {
-                for (int i = 0; i < 8; ++i)
-                    GetPackage()->Add(g_rp3Items[i][0], g_rp3Items[i][1], true);
+                if (cfg.rpServer)
+                {
+                    getCoupon(g_rpServerCoupon[2]);
+                    pItems = g_rpServer3Items;
+                }
+                else
+                {
+                    getCoupon(g_rpCoupon[2]);
+                    pItems = g_rp3Items;
+
+                }
+                for (UInt8 i = 0; pItems[i][0] != 0; ++i)
+                    GetPackage()->Add(pItems[i][0], pItems[i][1], true);
+
                 udpLog("rpPacket", "F_1100_3", "", "", "", "", "act");
             }
             rpValue += (0xFF+1);
@@ -13627,6 +13724,11 @@ namespace GObject
         {
             st << GetVar(VAR_INRF7DAY) << Stream::eos;
         }
+        else if (type == 4)
+        {
+            st << World::getOpenTime() << Stream::eos;
+        }
+ 
         send(st);
     }
 
@@ -15489,6 +15591,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
                 if(fighter)
                     bp += fighter->getBattlePoint();
             }
+            calcLingbaoBattlePoint();
         }
         else
         {
@@ -15504,6 +15607,41 @@ void EventTlzAuto::notify(bool isBeginAuto)
         }
 
         return bp;
+    }
+
+    void Player::calcLingbaoBattlePoint()
+    {
+        if(CURRENT_THREAD_ID() == getThreadId())
+        {
+            UInt32 value = 0;
+            _maxLingbaoBattlePoint = 0;
+            for(int j = 0; j < 5; ++ j)
+            {
+                Fighter* fighter = _playerData.lineup[j].fighter;
+                if(fighter)
+                {
+                    value = fighter->calcLingbaoBattlePoint();
+                    _maxLingbaoBattlePoint = value > _maxLingbaoBattlePoint? value:_maxLingbaoBattlePoint;
+                }
+            }
+        }
+        else
+        {
+            GameMsgHdr hdr(0x353, getThreadId(), this, 0);
+            GLOBAL().PushMsg(hdr, NULL);
+        }
+
+    }
+
+    void Player::setMaxLingbaoBattlePoint(UInt32 value)
+    {
+        _maxLingbaoBattlePoint = value;
+    }
+
+
+    UInt32 Player::getMaxLingbaoBattlePoint()
+    {
+        return _maxLingbaoBattlePoint;
     }
 
     void Player::verifyFighter()
@@ -18483,6 +18621,300 @@ UInt32 Player::getQQGameOnlineTotalTime()
     }
     return GetVar(VAR_ONLINE_TOTAL_TIME) + curTime;
 }
+void Player::sendRP7TreasureInfo(bool isLogin)
+{
+    bool isFinish = false;
+    UInt8 totalGot = 0;
+    UInt32 b = GVAR.GetVar(GVAR_TREASURE_BEGIN);
+    UInt32 n = GVAR.GetVar(GVAR_TREASURE_END);
+    if (cfg.rpServer && b ==0)
+    {
+        b = World::getOpenTime();
+        n = b+7*86400;
+    }
+    Stream st(REP::RP_SERVER);
+    st << static_cast<UInt8>(0x02) <<static_cast<UInt8>(0x01);
+    st << b << n;
+    UInt8 v = GetVar(VAR_RP7_TREASURE);
+    UInt8 c = 0;
+    st << v;
+    for (UInt8 i = 0; i < 6; i++)
+    {
+        if (v&(1<<i))
+        {
+            UInt32 tm = GetVar(VAR_RP7_TREASURE1_GETTIME+c);
+            UInt8 count =10-(GetVar(VAR_RP7_TREASURE)>>(c*8+8));
+            UInt8 got = (GetVar(VAR_RP7_TREASURE_TODAY_GOT)&(1<<c))?1:0;
+            c++;
+            st << i << tm << count <<got;
+            totalGot += 10-count;
+        }
+    }
+    st << Stream::eos;
+    if (isLogin)
+    {
+        if (c >0 && totalGot==c*10)
+            isFinish = true;
+        if (cfg.rpServer)
+        {
+            UInt32 opTime = TimeUtil::MkTime(cfg.openYear, cfg.openMonth, cfg.openDay);
+            if(TimeUtil::SharpDay(0) >= opTime + 7 * 86400  && c == 0)
+                isFinish = true;
+        }
+        else
+        {
+            UInt32 now = TimeUtil::Now();
+            if (c == 0 && (now < b || now > n))
+                isFinish = true;
+        }
+    }
+    if (!isFinish)
+       send(st);
+}
+
+void Player::buyRP7Treasure(UInt8 idx)
+{
+    static UInt32 s_gold[] = {1000,10000,30000,50000,80000,120000};
+    if (idx > 5)
+        return;
+ 
+    UInt8 res = 0;
+    UInt32 opTime = TimeUtil::MkTime(cfg.openYear, cfg.openMonth, cfg.openDay);
+    if((TimeUtil::SharpDay(0) >= opTime + 7 * 86400 && cfg.rpServer) ||
+       (TimeUtil::Now()<GVAR.GetVar(GVAR_TREASURE_BEGIN) || TimeUtil::Now()>GVAR.GetVar(GVAR_TREASURE_END))
+      )
+        res = 4;
+    UInt8 v = GetVar(VAR_RP7_TREASURE); 
+    if (v&(1<<idx))
+    {
+        res = 1;
+    }
+    else if (res == 0)
+    {
+        UInt8 c = 0;
+        UInt32 var = VAR_RP7_TREASURE1_GETTIME;
+        for (UInt8 i = 0; i < 6; i++)
+        {
+            if (v&(1<<i)) 
+            {
+                c++;
+                if (idx > i)
+                    var += 1;
+            }
+        }
+        if ( c >= 3)
+        {
+            res = 2;
+        }
+        else
+        {
+     		if (getGold() < s_gold[idx])
+            {
+                res = 3;
+                sendMsgCode(0,1104);
+                return;
+            }
+            else
+            {
+            	ConsumeInfo ci(RP7Treasure,0,0);
+        	    useGold(s_gold[idx],&ci);
+                v |= (1<<idx);
+                SetVar(VAR_RP7_TREASURE, v);
+
+                UInt32 tm = TimeUtil::SharpDay(0)+10*86400;
+                //需要重新排列3个var的数值
+                if (var == VAR_RP7_TREASURE1_GETTIME)
+                {
+                    SetVar(VAR_RP7_TREASURE1_GETTIME+2, GetVar(VAR_RP7_TREASURE1_GETTIME+1)); 
+                    SetVar(VAR_RP7_TREASURE1_GETTIME+1, GetVar(VAR_RP7_TREASURE1_GETTIME));
+                }
+                else if ( var == (VAR_RP7_TREASURE1_GETTIME+1))
+                {
+                    SetVar(VAR_RP7_TREASURE1_GETTIME+2, GetVar(VAR_RP7_TREASURE1_GETTIME+1));
+                }
+                SetVar(var,tm);  
+            }
+        }
+    }
+    Stream st(REP::RP_SERVER);
+    st << static_cast<UInt8>(0x02) << static_cast<UInt8>(0x02) << res;
+    st << Stream::eos;
+    send(st);
+    if (res == 0)
+        sendRP7TreasureInfo();
+}
+
+void Player::getRP7TreasureAward(UInt8 idx)
+{
+    static UInt32 s_gold[] = {1000,10000,30000,50000,80000,120000};
+    static MailPackage::MailItem s_item[][8] = {
+        {{0xB000,100},{57,1},{56,1},{29,10},{15,1},{48,1}},
+        {{0xB000,1000},{0xA000,20},{509,1},{507,1},{516,1},{547,1}},
+        {{0xB000,3000},{0xA000,50},{503,1},{47,1},{500,1},{501,1}},
+        {{0xB000,5000},{0xA000,80},{509,2},{503,2},{515,2},{507,2}},
+        {{0xB000,8000},{0xA000,100},{1325,3},{134,3},{509,3},{507,3}},
+        {{0xB000,12000},{0xA000,150},{1325,5},{134,5},{509,5},{507,5}},
+    };
+    if (idx > 5)
+        return;
+ 
+    UInt8 res = 0;
+    UInt8 v = GetVar(VAR_RP7_TREASURE); 
+    if (v&(1<<idx))
+    {
+        UInt8 c = 0;
+        for (UInt8 i = 0; i < 6; i++)
+        {
+            if (v&(1<<i)) 
+                c++;
+            if (idx == i)
+                break;
+        }
+        UInt8 count = GetVar(VAR_RP7_TREASURE)>>(c*8);
+        if (count >= 10)
+            res = 2;
+        else if (GetVar(VAR_RP7_TREASURE_TODAY_GOT)&(1<<(c-1)))
+            res = 1;
+        else if (TimeUtil::Now() < GetVar(VAR_RP7_TREASURE1_GETTIME+c-1))
+            res = 3;
+        else
+        {
+            SYSMSG(title,4912);
+            SYSMSGV(content,4913,s_gold[idx],count+1);
+			Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            if (mail)
+            {
+                UInt8 t = GetVar(VAR_RP7_TREASURE_TODAY_GOT);
+                SetVar(VAR_RP7_TREASURE_TODAY_GOT, t|=(1<<(c-1)));
+                count++;
+                UInt32 v1 = GetVar(VAR_RP7_TREASURE);
+                v1 &= ~(0xFF<<(c*8));
+                v1 += (count<<(c*8));
+                SetVar(VAR_RP7_TREASURE, v1);
+                mailPackageManager.push(mail->id, s_item[idx], 8, true);
+            }
+        }
+    }
+    Stream st(REP::RP_SERVER);
+    st << static_cast<UInt8>(0x02) << static_cast<UInt8>(0x03) << res;
+    st << Stream::eos;
+    send(st);
+    sendRP7TreasureInfo();
+}
+
+void Player::sendRP7SignInfo()
+{
+    if (!cfg.rpServer)
+        return;
+ 
+    UInt32 now_sharp = TimeUtil::SharpDay(0);
+    UInt32 created_sharp = TimeUtil::SharpDay(0, getCreated());
+    if (now_sharp < created_sharp)
+        return;
+    UInt8 day = (now_sharp-created_sharp)/86400 + 1;
+    if (day > 30)
+        return;
+    UInt32 v = GetVar(VAR_RP7_SIGN);
+    UInt8 p = GetVar(VAR_RP7_SIGN_PACKAGE); 
+    Stream st(REP::RP_SERVER);
+    st << static_cast<UInt8>(0x03) << static_cast<UInt8>(0x01);
+    st << day << v << p;
+    st << Stream::eos;
+    send(st);
+}
+void Player::RP7Sign(UInt8 idx)
+{
+    static UInt32 s_item[][3] = {
+        {15,56,57},
+        {15,51,48},
+        {500,512},
+        {48,50,466}
+    };
+    if (!cfg.rpServer)
+        return;
+ 
+    UInt32 now_sharp = TimeUtil::SharpDay(0);
+    UInt32 created_sharp = TimeUtil::SharpDay(0, getCreated());
+    if (now_sharp < created_sharp)
+        return;
+    UInt8 day = (now_sharp-created_sharp)/86400 + 1;
+    if (day > 30 || idx > day)
+        return;
+    UInt32 v = GetVar(VAR_RP7_SIGN); 
+    if (v&(1<<(idx-1)))
+        return;
+    if (GetPackage()->GetRestPackageSize() < 3)
+    {
+        sendMsgCode(0, 1011);
+        return;
+    }
+    if (idx < day)
+    {
+        if (getGold() < 10)
+        {
+            sendMsgCode(0, 1104);
+            return;
+        }
+       	ConsumeInfo ci(RP7Treasure,0,0);
+        useGold(10,&ci);
+    }
+    UInt8 i = 0;
+    if (idx >= 4 && idx <=7)
+        i = 1;
+    else if (idx >= 8 && idx <= 15)
+        i = 2;
+    else if (idx > 15) 
+    {
+        getCoupon(10);
+        i = 3;
+    }
+    for (UInt8 j = 0; j < sizeof(s_item[i])/sizeof(s_item[i][0]); ++j)
+        GetPackage()->Add(s_item[i][j], 1, true);
+    v |= (1<<(idx-1));
+    SetVar(VAR_RP7_SIGN, v);
+    sendRP7SignInfo();
+    
+}
+void Player::getRP7SignPackage(UInt8 idx)
+{
+    static UInt8 s_needDays[] = {3,7,15,28};
+    if(idx > 3)
+        return;
+    if (!cfg.rpServer)
+        return;
+ 
+    UInt8 v = GetVar(VAR_RP7_SIGN_PACKAGE); 
+    if (v&(1<<(idx)))
+        return;
+    if (GetPackage()->GetRestPackageSize() < 3)
+    {
+        sendMsgCode(0, 1011);
+        return;
+    }
+    UInt32 s = GetVar(VAR_RP7_SIGN);
+    UInt8 count = 0;
+    for (UInt8 i = 0; i < 32; ++i)
+    {
+        if (s&(1<<i))
+            count++;
+    }
+    if (count < s_needDays[idx])
+        return;
+
+    if (0 == idx)
+        GetPackage()->Add(15, 5, true);   
+    else if (1 == idx)
+        GetPackage()->Add(516, 5, true); 
+    else if (2 == idx)
+    {
+        GetPackage()->Add(1646, 1, true); 
+    }
+    else if (3 == idx)
+        GetPackage()->Add(1700, 1, true);
+    v |= 1<<(idx);
+    SetVar(VAR_RP7_SIGN_PACKAGE, v);
+    sendRP7SignInfo();
+}
 
 bool Player::inVipPrivilegeTime()
 {
@@ -18504,7 +18936,11 @@ bool Player::SetVipPrivilege()
     if(validate == 0)
     {
         UInt32 now = TimeUtil::Now();
-        SetVar(VAR_VIP_PRIVILEGE_TIME, now + 168*3600);
+        UInt32 validate = now + 168*3600;
+        // 保持最低位为0
+        if(validate & 0x1)
+            validate = validate + 1;
+        SetVar(VAR_VIP_PRIVILEGE_TIME, validate);
         ret = true;
         ConsumeInfo ci(VipPrivilege, 0, 0);
         useGold(100, &ci);
@@ -18518,7 +18954,7 @@ bool Player::SetVipPrivilege()
 #define VIP_PRIVILEGE_LIMITBUY1(data)  (0x02&data)
 #define VIP_PRIVILEGE_LIMITBUY2(data)  (0x04&data)
 #define VIP_PRIVILEGE_LIMITBUY3(data)  (0x08&data)
-#define VIP_PRIVILEGE_TIMEOUT(data)  (0x0100&data)
+#define VIP_PRIVILEGE_TIMEOUT(data)  (0x1&data)
 
 #define SET_VIP_PRIVILEGE_DAYLYAWARD(data, v) (data|=(v&0x01))
 #define SET_VIP_PRIVILEGE_LIMITBUY1(data, v)  (data|=((v<<1)&0x02))
@@ -18526,7 +18962,7 @@ bool Player::SetVipPrivilege()
 #define SET_VIP_PRIVILEGE_LIMITBUY3(data, v)  (data|=((v<<3)&0x08))
 #define SET_VIP_PRIVILEGE_OPEN(data, v)       (data|=((v<<4)&0x10))
 #define SET_VIP_PRIVILEGE_DAYTH(data, v)      (data|=((v<<5)&0xE0))
-#define SET_VIP_PRIVILEGE_TIMEOUT(data, v)    (data|=((v<<8)&0x0100))
+#define SET_VIP_PRIVILEGE_TIMEOUT(data, v)    (data|=((v)&0x1))
 
 void Player::doVipPrivilege(UInt8 idx)
 {
@@ -18580,7 +19016,6 @@ void Player::doVipPrivilege(UInt8 idx)
         }
     }
 
-
     sendVipPrivilege();
 }
 
@@ -18599,11 +19034,11 @@ void Player::sendVipPrivilege()
     if(validate != 0)
     {
         SET_VIP_PRIVILEGE_OPEN(data, 1);
-        if(timeLeft == 0 && VIP_PRIVILEGE_TIMEOUT(data) == 0)
+        if(timeLeft == 0 && VIP_PRIVILEGE_TIMEOUT(validate) == 0)
         {
-            SET_VIP_PRIVILEGE_TIMEOUT(data, 1);
             timeOut = 1;
-            SetVar(VAR_VIP_PRIVILEGE_DATA, data);
+            SET_VIP_PRIVILEGE_TIMEOUT(validate, 1);
+            SetVar(VAR_VIP_PRIVILEGE_TIME, validate);
         }
     }
     else

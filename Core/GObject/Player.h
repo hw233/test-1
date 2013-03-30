@@ -128,6 +128,7 @@ namespace GObject
 #define PLAYER_BUFF_ATHL8           0x58
 #define PLAYER_BUFF_ATHL9           0x59
 #define PLAYER_BUFF_QI_TIAN_CHU_MO  0x5B   //齐天除魔
+#define PLAYER_BUFF_EXPDOUBLE       0x5C    //回流服务器 经验双倍
 
 #define PLAYER_BUFF_DISPLAY_MAX		0x5F
 #define PLAYER_BUFF_COUNT			0x5F
@@ -173,7 +174,6 @@ namespace GObject
         ENUM_TRAINP2,      /** 高级经验加速符*1.5,加速(*1.6);2.ENUM_TRAINP4:*1.5,加速(*1.5);3.ENUM_ADVANCED_HOOK:超值挂机加速符(100小时),*1.5,加速(*1.6) **/
         ENUM_TRAINP3       /** 齐天经验加速符,*1.8,加速(*1.8) **/
     };
-
     enum DRAGONKING_type    //大闹龙宫活动标志类型
     {
         DRAGONKING_CLOSE = 0,    //关闭
@@ -182,6 +182,7 @@ namespace GObject
         TIANMANG    = 3,    //天芒神梭
         HUNYUAN     = 4,    //混元剑诀
         XINGCHEN    = 5,    //遁天星辰诀
+        TREASURE    = 10,   //聚宝盆
 
         DRAGONKING_MAX,
     };
@@ -788,6 +789,7 @@ namespace GObject
         void sendRechargeRankAward(int pos);
         void sendConsumeRankAward(int pos);
         void sendKillMonsterRankAward(UInt8 index, Int32 pos);
+        void sendPopularityRandAward(int popularity);
         UInt32 getEventState(UInt32 type);
 
 	public:
@@ -1294,6 +1296,12 @@ namespace GObject
         void getTjTask2Data(Stream& st);
         void getTjTask3Data(Stream& st);
         void addExpOrTjScore(int exp, int score, bool isEventScore = true, bool isEndScore = false);
+        UInt32 isDoubleExp(UInt32& exp)
+        {
+            if (cfg.rpServer && GetLev() < 70)
+                exp *= 2;
+            return exp;
+        }
 
         void clearTjTaskData();
 
@@ -1376,6 +1384,9 @@ namespace GObject
         void OnCFriendLvlUp(Player*, UInt8);
 
 		void sendFriendList(UInt8, UInt8, UInt8);
+
+        void vote(Player *other);
+        void beVoted();
 
 		void PutFighters(Battle::BattleSimulator&, int side, bool fullhp = false);
         void PutPets (Battle::BattleSimulator&, int side, bool init = true);
@@ -1861,6 +1872,7 @@ namespace GObject
         std::string m_pfkey;
         bool m_isOffical;
         bool m_isXY;
+        UInt8 m_XinYue;
     public:
         inline void setDomain(const std::string& domain)
         {
@@ -1915,6 +1927,8 @@ namespace GObject
         inline const std::string& getPfKey() const { return m_pfkey;}
         inline bool isOffical() const { return m_isOffical; }
         inline bool isXY() const { return m_isXY; }
+        inline void setXinYue(UInt8 v) { m_XinYue = v; }
+        inline UInt8 getXinYue() const { return m_XinYue; }
         inline const char* getClientIp() const { return m_clientIp; }
 
         inline UInt8 getPlatform() const { return atoi(m_domain); }
@@ -2095,7 +2109,14 @@ namespace GObject
         void getKillMonsterAward();
 
         UInt32 getBattlePoint();
+        void calcLingbaoBattlePoint();
+        void setMaxLingbaoBattlePoint(UInt32 value);
+        UInt32 getMaxLingbaoBattlePoint();
         void verifyFighter();
+
+    private:
+        UInt32 _maxLingbaoBattlePoint;
+
 #ifdef _FB
     public:
         void sendLevelAward();
@@ -2237,6 +2258,12 @@ namespace GObject
         void sendQQGameOnlineAward();
         void setQQGameOnlineTotalTime();
         UInt32 getQQGameOnlineTotalTime();
+        void sendRP7TreasureInfo(bool isLogin=false);
+        void buyRP7Treasure(UInt8 idx);
+        void getRP7TreasureAward(UInt8 idx);
+        void sendRP7SignInfo();
+        void RP7Sign(UInt8 idx);
+        void getRP7SignPackage(UInt8 idx);
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

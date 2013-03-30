@@ -228,12 +228,17 @@ void WorldScript::init()
 	def("getItem9343Act", GObject::World::getItem9343Act);
 	def("setAutoBattleAct", GObject::World::setAutoBattleAct);
 	def("setSnakeSpringEquipAct", GObject::World::setSnakeSpringEquipAct);
+    def("setFoolBao",GObject::World::setFoolBao);
+    def("getFoolBao",GObject::World::getFoolBao);
 
     def("setMergeAthAct", GObject::World::setMergeAthAct);
     def("getMergeAthAct", GObject::World::getMergeAthAct);
     def("setFourCopAct", GObject::World::setFourCopAct);
     def("getFourCopAct", GObject::World::getFourCopAct);
     def("commitArenaForceOnce", GObject::World::commitArenaForceOnce);
+
+	def("getOpenTime", GObject::World::getOpenTime);
+	def("isRPServer", GObject::World::isRPServer);
 
 	class_add<GData::Store>("Store");
 	class_def<GData::Store>("clear", &GData::Store::clear);

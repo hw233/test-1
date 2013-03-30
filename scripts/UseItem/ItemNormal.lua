@@ -3126,6 +3126,13 @@ function ItemNormal_00009007(iid, num, bind, param)
     package:DelItemSendMsg(iid, player);
     return num;
 end
+function ItemNormal_00009902(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    player:setTitle(56, 0)
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
 
 function ItemNormal_00009010(iid, num, bind, param)
     local player = GetPlayer()
@@ -8020,6 +8027,57 @@ function ItemNormal_00009371(iid, num, bind, param)
     return num
 end
 
+function ItemNormal_00009375(iid, num, bind, param)
+    local player = GetPlayer();
+        local package = player:GetPackage();
+	    if num  <= package:GetRestPackageSize() then
+            package:DelItemSendMsg(9375, player);
+            for k = 1, num do
+                local rand = math.random(1,10000);
+                if rand <= 510 then
+                    package:AddItem(503,1,1,0,2);
+                elseif rand <= 1510 then
+                    package:AddItem(9088,1,1,0,2);
+            Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."打开了愚公宝箱，幸运的获得了".."[4:".."9088".."]x1")
+                elseif rand <= 2510 then
+                    package:AddItem(512,1,1,0,2);
+                elseif rand <= 3530 then
+                    package:AddItem(33,1,1,0,2);
+                elseif rand <= 5330 then
+                    package:AddItem(15,1,1,0,2);
+                elseif rand <= 6230 then
+                    package:AddItem(9371,1,1,0,2);
+                elseif rand <= 7080 then
+                    package:AddItem(501,1,1,0,2);
+                elseif rand <= 7930 then
+                    package:AddItem(513,1,1,0,2);
+                elseif rand <= 8180 then
+                    package:AddItem(1325,1,1,0,2);
+            Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."打开了愚公宝箱，幸运的获得了".."[4:".."1325".."]x1")
+                elseif rand <= 8430 then
+                    package:AddItem(134,1,1,0,2);
+            Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."打开了愚公宝箱，幸运的获得了".."[4:".."134".."]x1")
+                elseif rand <= 8630 then
+                    package:AddItem(507,1,1,0,2);
+            Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."打开了愚公宝箱，幸运的获得了".."[4:".."507".."]x1")
+                elseif rand <= 8830 then
+                    package:AddItem(509,1,1,0,2);
+            Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."打开了愚公宝箱，幸运的获得了".."[4:".."509".."]x1")
+                elseif rand <= 9000 then
+                    package:AddItem(515,1,1,0,2);
+            Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."打开了愚公宝箱，幸运的获得了".."[4:".."515".."]x1")
+                elseif rand <= 10000 then
+                    package:AddItem(551,1,1,0,2);
+            Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."打开了愚公宝箱，幸运的获得了".."[4:".."551".."]x1")
+                 end
+            player:AddVar(450, num)
+            end
+		   return num;
+		end
+		player:sendMsgCode(2, 1011, 0);
+		return false;
+end
+
 local ItemNormal_Table = {
   [1] = ItemNormal_00000001,
 	[8] = ItemNormal_00000008,
@@ -9433,7 +9491,7 @@ local ItemNormal_Table = {
     [9007] = ItemNormal_00009007,
     [9008] = ItemNormal_00009007,
     [9009] = ItemNormal_00009007,
-
+    [9902] = ItemNormal_00009902,
     [9010] = ItemNormal_00009010,
 
     [9017] = ItemNormal_00009017,
@@ -9697,9 +9755,16 @@ local ItemNormal_Table = {
     [9369] = ItemNormal_00009369,
     [9370] = ItemNormal_00009369,
     [9371] = ItemNormal_00009371,
+    [9375] = ItemNormal_00009375,
     [9373] = ItemNormal_00009366,
     [9374] = ItemNormal_00009366,
     [9900] = ItemNormal_NameCard,
+    [9901] = ItemNormal_NameCard,
+    [9902] = ItemNormal_NameCard,
+    [9903] = ItemNormal_NameCard,
+    [9904] = ItemNormal_NameCard,
+    [9905] = ItemNormal_NameCard,
+    [9906] = ItemNormal_NameCard,
 
     [10000] = ItemNormal_00010000,
     [10001] = ItemNormal_00010001,

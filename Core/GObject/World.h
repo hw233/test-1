@@ -5,6 +5,7 @@
 #include "Server/WorkerThread.h"
 #include "Common/Stream.h"
 #include "Server/Cfg.h"
+#include "Common/TimeUtil.h"
 #ifndef _WIN32
 #include "kingnet_analyzer.h"
 #endif
@@ -638,6 +639,12 @@ public:
     { _compassact = v; }
     inline static bool getCompassAct()
     { return _compassact; }
+
+   inline static void setFoolBao(bool v)
+   { _foolbao = v; }
+    inline static bool getFoolBao()
+    { return _foolbao; } 
+
     inline static void setCallSnakeEggAct(UInt8 v)
     { _callsnakeeggact = v; }
     inline static UInt8 getCallSnakeEggAct()
@@ -662,6 +669,13 @@ public:
     { _snakespringequipact = v; }
     inline static UInt8 getSnakeSpringEquipAct()
     { return _snakespringequipact; }
+    inline static UInt32 getOpenTime()
+    {
+        UInt32 opTime = TimeUtil::MkTime(cfg.openYear, cfg.openMonth, cfg.openDay);
+        return opTime;
+    }
+    inline static bool isRPServer()
+    {return cfg.rpServer;}
  
 public:
 	inline static UInt8 getWeekDay()
@@ -783,6 +797,7 @@ public:
     static stArenaExtra stArenaOld[2];
     static stArenaExtra stArena;
     static bool _compassact;
+    static bool _foolbao;
     static UInt8 _callsnakeeggact;
     static UInt8 _snakeeggawardact;
     static bool _item9344act;
@@ -793,9 +808,12 @@ public:
 public:
     static RCSortType rechargeSort;
     static RCSortType consumeSort;
+    static RCSortType popularitySort;
     static void initRCRank();
+    static void initRP7RCRank();
 
     static RCSortType killMonsterSort[4];
+    static RCSortType rechargeRP7Sort;
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }
@@ -829,6 +847,7 @@ private:
     static void ArenaExtraActTimer(void *);
     static void ClanCopyCheck(void *);
     static void ClanStatueCheck(void *);
+    static void SendPopulatorRankAward(void*);
     //static void advancedHookTimer(void *para);
 
 public:
@@ -853,6 +872,7 @@ public:
     void SendGoldSnakeAward();
     void SendItem9344Award();
     void SendItem9343Award();
+    void SendFoolBaoAward();
 
     void UpdateSnowScore(Player* pl, Player* lover);
     void sendSnowPlayers(Player* pl);
@@ -864,6 +884,7 @@ public:
     void killMonsterInit();
     void UpdateKillMonsterRank(Player* pl, UInt8 Type, UInt8 count);
 
+    static void SendRechargeRP7RankAward();
 private:
 	void testUpdate();
 	Script::WorldScript * _worldScript;
