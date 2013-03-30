@@ -6082,7 +6082,7 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
                             UInt32 petId = GameAction()->exchangPurplePet(player);
                             Stream st(REP::FAIRY_PET);
                             st << type << opt << petId;
-                            st << static_cast<UInt8>(player->GetVar(VAR_FAIRYPET_LIKEABILITY));
+                            st << static_cast<UInt16>(player->GetVar(VAR_FAIRYPET_LIKEABILITY));
                             st << Stream::eos;
                             player->send(st);
                             if(petId)

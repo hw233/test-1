@@ -2216,19 +2216,19 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             {
             case 0x01:
                 {
-                    UInt8 type = 0;
-                    brd >> type;
-                    if(type == 1)
+                    UInt8 form = 0;
+                    brd >> form;
+                    if(form == 1)
                         player->sendQixiInfo();
-                    else if(type == 2)
+                    else if(form == 2)
                         WORLD().sendQixiPlayers(player);
                 }
                 break;
             case 0x02:
                 {
-                    UInt8 type = 0;
-                    brd >> type;
-                    if(type == 0)
+                    UInt8 form = 0;
+                    brd >> form;
+                    if(form == 0)
                     {
                         UInt64 pid = 0;
                         brd >> pid;
@@ -2238,7 +2238,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                             break;
                         player->postQixiEyes(pl);
                     }
-                    else if(type == 1)
+                    else if(form == 1)
                     {
                         player->divorceQixi();
                     }
@@ -2340,7 +2340,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                 break;
             case 0x02:  //龙宫寻宝
                 {
-                    UInt8 count= 0;
+                    UInt8 count = 0;
                     brd >> count;
                     player->postDragonKing(count);
                 }
@@ -2419,6 +2419,24 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                     player->getLongyuanAct(idx, flag);
                     break;
             }
+            break;
+        }
+        case 0x10:
+        {
+            if (!World::getFoolsDay())
+                return;
+            brd >> op;
+            struct foolsData
+            {
+                UInt8 type;
+                UInt8 id;
+                char answer;
+            }fdata;
+            fdata.type = op;
+            brd >> fdata.id;
+            brd >> fdata.answer;
+            GameMsgHdr h(0x344,  player->getThreadId(), player, sizeof(fdata));
+            GLOBAL().PushMsg(h, &fdata);
             break;
         }
         default:

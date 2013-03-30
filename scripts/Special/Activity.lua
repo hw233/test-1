@@ -216,9 +216,11 @@ function onLevelup(player, olev, nlev)
     if getValentineDay() then
         onValentineDay(player)
     end
+    --[[
     if getFoolsDay() then
         onFoolsDay(player)
     end
+    --]]
     if getMayDay() then
         onMayDay(player)
     end
@@ -7400,4 +7402,54 @@ function onGetNewYearGiveGiftAward(player, index, times)
     return true
 end
 
+
+function checkAnswerInFoolsDay(qid, answer)
+    local answers = {
+        ["0330"] = { 65, 65, 65, 66, 65, 67, 66, 65, 65, 68,
+                     65, 66, 68, 68, 67, 65, 66, 68, 68, 68,
+                     66, 65, 65, 65, 67, 67, 68, 67, 68, 65,
+        },
+        ["0331"] = { 67, 65, 65, 65, 66, 68, 68, 66, 65, 68,
+                     68, 68, 68, 68, 66, 65, 65, 67, 67, 67,
+                     68, 65, 65, 65, 65, 66, 67, 66, 68, 65,
+        },
+        ["0401"] = { 68, 67, 65, 68, 65, 65, 65, 67, 65, 66,
+                     65, 68, 65, 68, 66, 66, 67, 67, 67, 66,
+                     68, 68, 65, 68, 65, 66, 67, 67, 65, 65,
+        },
+    }
+    if nil == qid or nil == answer then
+        return false
+    end
+    local date = os.date("%m%d", os.time())
+    if nil == answers[date] or nil == answers[date][qid] then
+        return false
+    end
+    if answers[date][qid] ~= answer then
+        return false
+    end
+    return true
+end
+
+function getAwardInFoolsDay(player, idx)
+    local items = {
+        ["0330"] = { {56, 1}, {516, 1}, {503, 1}, {1325, 1}, {1528, 1}, {515, 1} },
+        ["0331"] = { {508, 1}, {516, 1}, {503, 1}, {1325, 1}, {1528, 1}, {515, 1} },
+        ["0401"] = { {506, 1}, {516, 1}, {503, 1}, {9338, 1}, {509, 1}, {515, 1} },
+    }
+    if nil == player or nil == idx then
+        return
+    end
+    local date = os.date("%m%d", os.time())
+    if nil == items[date] then
+        return
+    end
+    if idx == 0 or idx > #items[date] then
+        return
+    end
+    for k = 1, idx do
+        local item = items[date][k]
+        player:GetPackage():Add(item[1], item[2], true, false, 32)
+    end
+end
 

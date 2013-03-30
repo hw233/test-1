@@ -2224,6 +2224,15 @@ namespace GObject
 	    UInt32 useFengsui( UInt32 a, ConsumeInfo * ci );
 	    UInt32 useLongyuan( UInt32 a, ConsumeInfo * ci );
 
+    public:     //活动相关
+        void checkAnswerActInFoolsDay();
+        void sendFoolsDayInfo();
+        void submitAnswerInFoolsDay(UInt8, char);
+        void getAwardInFoolsDay();
+        void buyResurrectionCard();
+        void foolsDayUdpLog(UInt8);
+        void setLogoutInFoolsDay();
+
         void getQQGameOnlineAward();
         void sendQQGameOnlineAward();
         void setQQGameOnlineTotalTime();

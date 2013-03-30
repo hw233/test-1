@@ -107,6 +107,7 @@ enum PurchaseType
     GenguUpForPet               = 96, //仙宠根骨升级消耗凤髓
     LongYuanAct                 = 97, //龙元结缘
     VipPrivilege                = 98, //Vip特权
+    FoolsDayAnswerAct           = 99, //愚公移山答题活动
     //繁体私有占150～200
 };
 

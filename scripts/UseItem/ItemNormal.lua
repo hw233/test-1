@@ -1487,11 +1487,13 @@ function ItemNormal_00000480(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
+    --[[
     local date = os.date("%m%d", os.time())
     if date ~= "0401" then
         SendMsg(player, 0x35, msg_64);
         return false
     end
+    --]]
 
 	local fgt = player:findFighter(param);
 	if fgt == nil then
