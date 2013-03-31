@@ -19212,6 +19212,8 @@ void Player::getAwardInFoolsDay()
 
 void Player::buyResurrectionCard()
 {
+    if(!hasChecked())
+        return;
     UInt32 value = GetVar(VAR_FOOLS_DAY);
     if(GET_BIT_8(value, 1))
         return;

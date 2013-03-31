@@ -5477,9 +5477,6 @@ void OnSvrSt( GameMsgHdr& hdr, SvrSt& req )
 void OnRC7Day( GameMsgHdr& hdr, const void* data )
 {
 	MSG_QUERY_PLAYER(player);
-    if(!player->hasChecked())
-         return;
-
     // XXX: 不使用老版本新注册七日活动
     //return; // XXX: 不使用老版本新注册七日活动
 
@@ -5489,6 +5486,8 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
 
     if (op  < 6 )
         return;
+    if(op != 10 && !player->hasChecked())
+         return;
 
     switch(op)
     {
@@ -5526,6 +5525,8 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
             {
                 UInt8 idx = 0;
                 br >> idx;
+                if(idx != 0 && !player->hasChecked())
+                    return;
                 player->doVipPrivilege(idx);
             }
             break;
