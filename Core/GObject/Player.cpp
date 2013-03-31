@@ -19153,6 +19153,11 @@ void Player::submitAnswerInFoolsDay(UInt8 id, char answer)
     if(GET_BIT_8(value, 1))
         return;
     UInt32 qtime = GetVar(VAR_FOOLS_DAY_TIME);
+    if(info == 0 && value == 0 && qtime == 0)
+    {   //零点重置
+        sendFoolsDayInfo();
+        return;
+    }
     UInt8 qid = GET_BIT_8(value, 0);
     bool isRight = true;
     if((info & 0x01) == 1)
