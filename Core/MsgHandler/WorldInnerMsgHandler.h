@@ -1000,12 +1000,16 @@ void OnSendConsumeRank ( GameMsgHdr& hdr,  const void* data )
     }
 }
 
+#define PT_CNT 8
 void SendPopularityRank(Stream &st, Player* player)
 {
     using namespace GObject;
     st.init(REP::SORT_LIST);
-    size_t c = World::popularitySort.size();
-	st << static_cast<UInt8>(7) << static_cast<UInt32>(0) << static_cast<UInt32>(player->GetVar(VAR_POPULARITY)) << static_cast<UInt8>(c);
+    size_t cnt = World::popularitySort.size();
+    if (cnt > PT_CNT)
+        cnt = PT_CNT;
+	st << static_cast<UInt8>(7) << static_cast<UInt32>(0) << static_cast<UInt32>(player->GetVar(VAR_POPULARITY)) << static_cast<UInt8>(cnt);
+    UInt32 c = 0;
     for (RCSortType::iterator i = World::popularitySort.begin(), e = World::popularitySort.end(); i != e; ++i)
     {
         Player* pl = i->player;
@@ -1014,6 +1018,9 @@ void SendPopularityRank(Stream &st, Player* player)
             st << pl->getName() << pl->getPF() << pl->GetLev() << pl->getCountry() << i->total << pl->getClanName();
         }
 
+        ++c;
+        if (c >= PT_CNT)
+            break;
     }
     st << Stream::eos;
     player->send(st);
@@ -1046,7 +1053,7 @@ void OnPopularityRank ( GameMsgHdr& hdr, const void * data)
         ++oldrank;
         if (i->player == player)
         {
-            if (oldrank <= CNT)
+            if (oldrank <= PT_CNT)
                 inrank = true;
             World::popularitySort.erase(i);
             break;
@@ -1075,13 +1082,11 @@ void OnPopularityRank ( GameMsgHdr& hdr, const void * data)
         st << static_cast<UInt8>(2) << static_cast<UInt8>(1) << static_cast<UInt8>(2) << i->total << static_cast<UInt8>(rank) << Stream::eos;
     }
 
-    if (oldrank <= CNT || (!inrank && myrank <= CNT))
+    if (oldrank <= PT_CNT || (!inrank && myrank <= PT_CNT))
     {
         Stream st;
         SendPopularityRank(st, player);
-        //NETWORK()->Broadcast(st);
     }
-    globalPlayers.enumerate(popularityChanged, static_cast<void *>(NULL));
 }
 
 void OnSendPopularityRank(GameMsgHdr& hdr, const void*data)

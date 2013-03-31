@@ -17575,7 +17575,8 @@ static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372 };
 static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357 };
 void Player::getDragonKingInfo()
 {
-    if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END))
+    if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)
+            && GVAR.GetVar(GVAR_DRAGONKING_ACTION) != DRAGONKING_CLOSE)
     {
         GVAR.SetVar(GVAR_DRAGONKING_ACTION, 0);
         GVAR.SetVar(GVAR_DRAGONKING_BEGIN, 0);
@@ -17583,7 +17584,8 @@ void Player::getDragonKingInfo()
         return;
     }
     UInt8 flag = GVAR.GetVar(GVAR_DRAGONKING_ACTION);
-    if (flag <= DRAGONKING_CLOSE || flag >= DRAGONKING_MAX)
+    if (flag <= DRAGONKING_CLOSE || flag >= DRAGONKING_MAX
+            || flag > sizeof(Dragon_type)/sizeof(UInt8)-1)
     {
         sendMsgCode(0, 1090);
         return;
@@ -17605,7 +17607,8 @@ void Player::postDragonKing(UInt8 count)
         GLOBAL().PushMsg(h, &count);
         return;
     }
-    if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END) && GVAR.GetVar(GVAR_DRAGONKING_ACTION) != DRAGONKING_CLOSE)
+    if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)
+            && GVAR.GetVar(GVAR_DRAGONKING_ACTION) != DRAGONKING_CLOSE)
     {
         GVAR.SetVar(GVAR_DRAGONKING_ACTION, 0);
         GVAR.SetVar(GVAR_DRAGONKING_BEGIN, 0);
@@ -17614,7 +17617,8 @@ void Player::postDragonKing(UInt8 count)
     }
     if (count == 0) return;
     UInt8 flag = GVAR.GetVar(GVAR_DRAGONKING_ACTION);
-    if (flag <= DRAGONKING_CLOSE || flag >= DRAGONKING_MAX)
+    if (flag <= DRAGONKING_CLOSE || flag >= DRAGONKING_MAX
+           || flag > sizeof(Dragon_type)/sizeof(UInt8)-1)
     {
         sendMsgCode(0, 1090);
         return;
@@ -18793,6 +18797,9 @@ void Player::buyRP7Treasure(UInt8 idx)
         }
         else
         {
+            if(!hasChecked())
+                return;
+ 
      		if (getGold() < s_gold[idx])
             {
                 res = 3;
@@ -18935,6 +18942,9 @@ void Player::RP7Sign(UInt8 idx)
     }
     if (idx < day)
     {
+        if(!hasChecked())
+            return;
+ 
         if (getGold() < 10)
         {
             sendMsgCode(0, 1104);
@@ -19174,8 +19184,11 @@ void Player::sendFoolsDayInfo()
         isFail = true;
     if((info & (1<<0)) == 0 && qid)
     {
-        if(!GET_BIT_8(value, 3) && qtime + 15 < TimeUtil::Now())
-            isFail = true;
+        if(!GET_BIT_8(value, 3))
+        {
+            if (qtime + 15 < TimeUtil::Now())
+                isFail = true;
+        }
         else    //有离线标志
         {
             qtime = TimeUtil::Now();
