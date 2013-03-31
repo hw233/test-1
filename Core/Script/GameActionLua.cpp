@@ -151,6 +151,8 @@ namespace Script
 		lua_tinker::def(_L, "getAutoBattleAct", GObject::World::getAutoBattleAct);
 		lua_tinker::def(_L, "getSnakeSpringEquipAct", GObject::World::setSnakeSpringEquipAct);
 		lua_tinker::def(_L, "getFoolBao", GObject::World::getFoolBao);
+		lua_tinker::def(_L, "getOpenTime", GObject::World::getOpenTime);
+		lua_tinker::def(_L, "isRPServer", GObject::World::isRPServer);
 
         CLASS_DEF(GameActionLua, Print);
         lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);
@@ -1596,6 +1598,17 @@ namespace Script
     bool GameActionLua::RunVipPrivilegeAward(Player* player, UInt8 idx, UInt8 dayth)
     {
 		return Call<bool>("RunVipPrivilegeAward", player, idx, dayth);
+    }
+
+    bool GameActionLua::checkAnswerInFoolsDay(UInt8 qid, char answer)
+    {
+		return Call<bool>("checkAnswerInFoolsDay", qid, answer);
+    }
+
+    void GameActionLua::getAwardInFoolsDay(Player* player, UInt8 idx)
+    {
+		assert(player != NULL);
+		Call<void>("getAwardInFoolsDay", player, idx);
     }
 }
 

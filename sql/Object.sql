@@ -1879,6 +1879,7 @@ CREATE TABLE `lingbaoattr` (
     `values` varchar(256) NOT NULL DEFAULT '',
     `skills` varchar(256) NOT NULL DEFAULT '',
     `factors` varchar(256) NOT NULL DEFAULT '',
+    `battlepoint` int (10) unsigned NOT NULL DEFAULT '0',
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

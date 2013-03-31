@@ -505,8 +505,11 @@ function RunBlueDiamondAward(player, opt)
     elseif opt == 3 then
         player:AddVar(VAR_QQVIP_AWARD_COUNT, 1);
         count = player:GetVar(VAR_QQVIP_AWARD_COUNT);
-        if count == 5 then
-             package:Add(1708, 1, true, 0, 31);
+        if count == 12 then
+            package:Add(9076, 5, true, 0, 31); 
+            package:Add(515, 5, true, 0, 31); 
+            package:Add(507, 5, true, 0, 31); 
+            package:Add(509, 5, true, 0, 31); 
         end
     end
 

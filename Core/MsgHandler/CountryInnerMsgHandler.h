@@ -1868,18 +1868,6 @@ void OnOpenIdInvalid( GameMsgHdr &hdr, const void *data)
     std::string validOpenId = openId;
     player->setOpenId(validOpenId);
     player->udpLog("invalid_openid", invalidOpenId.c_str(), openId, "", "", "", "act_tmp");
-    if (cfg.autoKick)
-    {
-        //player->selfKick(); // 这行代码完全没效果
-        GameMsgHdr imh(0x200, player->getThreadId(), player, 0);
-        GLOBAL().PushMsg(imh, NULL);
-#ifndef _WIN32
-#ifdef _FB
-#else
-        GObject::dclogger.decDomainOnlineNum(atoi(player->getDomain()));
-#endif
-#endif // _WIN32
-    }
 }
 
 void OnOpenAPIFailed( GameMsgHdr &hdr, const void *data)
@@ -1944,5 +1932,57 @@ void OnSaveGoldAct( GameMsgHdr& hdr, const void * data)
         player->saveGoldAct(gData->opt, gData->param);
 }
 
+void OnFoolsDayAct( GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    struct foolsData
+    {
+        UInt8 type;
+        UInt8 id;
+        char answer;
+    };
+    foolsData * fdata = reinterpret_cast<foolsData*>(const_cast<void *>(data));
+    if(fdata)
+    {
+        switch(fdata->type)
+        {
+            case 0x00:
+                player->checkAnswerActInFoolsDay();
+                break;
+            case 0x01:
+                player->sendFoolsDayInfo();
+                break;
+            case 0x02:
+                player->submitAnswerInFoolsDay(fdata->id, fdata->answer);
+                break;
+            case 0x03:
+                player->getAwardInFoolsDay();
+                break;
+            case 0x04:
+                player->buyResurrectionCard();
+                break;
+        }
+    }
+}
+
+void OnCalcLBBattlePoint( GameMsgHdr &hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    player->calcLingbaoBattlePoint();
+}
+
+void OnBeVoted( GameMsgHdr &hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    player->beVoted();
+}
+
+void OnSendPopularityAward(GameMsgHdr &hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    player->sendPopularityRandAward(*(int*)data);
+}
+
 #endif // _COUNTRYINNERMSGHANDLER_H_
+
 

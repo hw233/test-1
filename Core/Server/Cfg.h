@@ -101,7 +101,7 @@ public:
     bool secdclogTest;
     bool unionPlatform;
     bool autoForbid;
-    bool autoKick;
+    bool rpServer;
 
 public:
 	inline void setTcpPort(UInt16 p) {tcpPort = p;}
@@ -147,9 +147,9 @@ public:
     inline void setSecDCLog(bool v) { secdclog = v; }
     inline void setSecDCLogTest(bool v) { secdclogTest = v; }
     inline void setUnionPlatform(bool v) { unionPlatform = v; }
+	inline void setRPServer(bool v) {rpServer  = v; }
 
     inline void setAutoForbid(bool v) { autoForbid = v; }
-    inline void setAutoKick(bool v) { autoKick = v; }
 
 
 	inline void setVerifyTokenServer(const char* server, UInt16 port)

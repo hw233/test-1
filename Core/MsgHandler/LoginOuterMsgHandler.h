@@ -346,9 +346,12 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
         std::string clientIp;
         std::string pf;
         std::string pfkey;
+        std::string xinyue;
         StringTokenizer st(ul._para, ":");
         switch (st.count())
         {
+            case 4:
+                xinyue = st[3];
             case 3:
                 pfkey = st[2].c_str();
             case 2:
@@ -397,6 +400,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             player->setClientIp(clientIp);
             player->setSource(pf);
             player->setPfKey(pfkey);
+            player->setXinYue(atoi(xinyue.c_str()));
 #ifdef _FB
             PLAYER_DATA(player, wallow) = 0;
 #endif
@@ -553,9 +557,12 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
     std::string clientIp;
     std::string pf;
     std::string pfkey;
+    std::string xinyue;
     StringTokenizer st(nu._para, ":");
     switch (st.count())
     {
+        case 4:
+            xinyue = st[3];
         case 3:
             pfkey = st[2].c_str();
         case 2:
@@ -713,6 +720,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->setOpenId(nu._openid);
             pl->setOpenKey(nu._openkey);
             pl->setVia(nu._via);
+            pl->setXinYue(atoi(xinyue.c_str()));
             if(cfg.merged)
             {
                 UInt64 inviterId = (pl->getId() & 0xffff000000000000) + atoll(nu._invited.c_str());
@@ -2776,27 +2784,36 @@ void GMCmd(LoginMsgHdr& hdr, const void* data)
             break;
         case 0x02:
             result = SwitchAutoForbid(val);
+            break;
         case 0x03:
             {
                 UInt32 endTime = 0;
                 UInt32 flag = 0;
                 br >> endTime >> flag;
                 //大闹龙宫的flag暂时只为1,2,3,4,5
+                //10:聚宝盆
                 if(endTime < val || flag >= GObject::DRAGONKING_MAX)
                     result = 1;
                 else
                 {
-                    if(flag != GObject::GVAR.GetVar(GObject::GVAR_DRAGONKING_ACTION))
+                    if(flag != GObject::GVAR.GetVar(GObject::GVAR_DRAGONKING_ACTION) && flag != 10)
 	                    GObject::globalPlayers.enumerate(player_enum_2, 0);
-                    GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_BEGIN, val);
-                    GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_END, endTime);
-                    GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_ACTION, flag);
+                    if (flag != 10)
+                    {
+                        GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_BEGIN, val);
+                        GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_END, endTime);
+                        GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_ACTION, flag);
+                    }
+                    else
+                    {
+                        GObject::GVAR.SetVar(GObject::GVAR_TREASURE_BEGIN, val);
+                        GObject::GVAR.SetVar(GObject::GVAR_TREASURE_END, endTime); 
+                        GObject::GVAR.SetVar(GObject::GVAR_TREASURE_ACTION, flag);   
+                    }
                     result = 0;
                 }
             }
-        case 0x04:
-            cfg.setAutoKick(val == 1? true:false);
-            result = 0;
+            break;
         default:
             break;
     }

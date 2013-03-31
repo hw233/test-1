@@ -245,6 +245,7 @@ GMHandler::GMHandler()
     Reg(3, "act", &GMHandler::OnSomeAct);
     Reg(2, "king", &GMHandler::OnDragonKingAct);
     Reg(2, "pet", &GMHandler::OnFairyPetGM);
+    Reg(2, "fool", &GMHandler::OnFoolsDayGM);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -3561,7 +3562,7 @@ void GMHandler::OnLingbao(GObject::Player * player, std::vector<std::string>& ar
                         }
                     }
 
-                    DB4().PushUpdateData("REPLACE INTO `lingbaoattr`(`id`, `tongling`, `lbcolor`, `types`, `values`, `skills`, `factors`) VALUES(%u, %d, %d, '%s', '%s', '%s', '%s')", equip->getId(), lbattr.tongling, lbattr.lbColor, strType.c_str(), strValue.c_str(), strSkill.c_str(), strFactor.c_str());
+                    DB4().PushUpdateData("REPLACE INTO `lingbaoattr`(`id`, `tongling`, `lbcolor`, `types`, `values`, `skills`, `factors`, `battlepoint`) VALUES(%u, %d, %d, '%s', '%s', '%s', '%s', '%u')", equip->getId(), lbattr.tongling, lbattr.lbColor, strType.c_str(), strValue.c_str(), strSkill.c_str(), strFactor.c_str(), lbattr.battlePoint);
                 }
                 break;
             default:
@@ -3658,7 +3659,7 @@ void GMHandler::OnLingbaoSkill(GObject::Player * player, std::vector<std::string
                         }
                     }
 
-                    DB4().PushUpdateData("REPLACE INTO `lingbaoattr`(`id`, `tongling`, `lbcolor`, `types`, `values`, `skills`, `factors`) VALUES(%u, %d, %d, '%s', '%s', '%s', '%s')", equip->getId(), lbattr.tongling, lbattr.lbColor, strType.c_str(), strValue.c_str(), strSkill.c_str(), strFactor.c_str());
+                    DB4().PushUpdateData("REPLACE INTO `lingbaoattr`(`id`, `tongling`, `lbcolor`, `types`, `values`, `skills`, `factors`, `battlepoint`) VALUES(%u, %d, %d, '%s', '%s', '%s', '%s', '%u')", equip->getId(), lbattr.tongling, lbattr.lbColor, strType.c_str(), strValue.c_str(), strSkill.c_str(), strFactor.c_str(), lbattr.battlePoint);
                 }
                 break;
             default:
@@ -3791,6 +3792,16 @@ void GMHandler::OnFairyPetGM(GObject::Player *player, std::vector<std::string>& 
         case 3:
             player->setFairypetBattle(val);
             break;
+        case 4:
+            player->AddVar(VAR_FAIRYPET_LIKEABILITY, val);
+            player->sendFairyPetResource();
+            break;
     }
+}
+
+void GMHandler::OnFoolsDayGM(GObject::Player *player, std::vector<std::string>& args)
+{
+    player->SetVar(VAR_FOOLS_DAY, 0);
+    player->SetVar(VAR_FOOLS_DAY_INFO, 0);
 }
 
