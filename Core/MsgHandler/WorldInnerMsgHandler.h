@@ -1075,6 +1075,7 @@ void OnPopularityRank ( GameMsgHdr& hdr, const void * data)
         st << static_cast<UInt8>(2) << static_cast<UInt8>(1) << static_cast<UInt8>(2) << i->total << static_cast<UInt8>(rank) << Stream::eos;
     }
 
+    /*
     if (oldrank <= CNT || (!inrank && myrank <= CNT))
     {
         Stream st;
@@ -1082,6 +1083,7 @@ void OnPopularityRank ( GameMsgHdr& hdr, const void * data)
         //NETWORK()->Broadcast(st);
     }
     globalPlayers.enumerate(popularityChanged, static_cast<void *>(NULL));
+    */
 }
 
 void OnSendPopularityRank(GameMsgHdr& hdr, const void*data)
