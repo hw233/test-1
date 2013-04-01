@@ -14099,6 +14099,31 @@ namespace GObject
         st.data<UInt8>(offset) = c;
     }
 
+    void Player::appendPetOnBattle( Stream& st)
+    {
+        if(_onBattlePet)
+        {
+            st << static_cast<UInt16>(_onBattlePet->getId());
+            st << fgt->getLevel() << fgt->getPotential() << fgt->getCapacity();
+            st << fgt->getMaxSoul() << fgt->getPeerlessAndLevel();
+            fgt->getAllUpSkillAndLevel(st);
+            fgt->getAllPSkillAndLevel4Arena(st);
+            fgt->getAllSSAndLevel(st);
+            fgt->getAllLbSkills(st);
+
+            fgt->getAttrExtraEquip(st);
+
+            st << fgt->getSoulExtraAura();
+            st << fgt->getSoulAuraLeft();
+            st << fgt->getPortrait();
+            fgt->appendElixirAttr2(st);
+        }
+        else
+        {
+            st << static_cast<UInt16>(0);
+        }
+    }
+
     void Player::SendNextdayTime(UInt32 nextDay)
     {
         Stream st(REP::SVRST);
