@@ -1006,7 +1006,8 @@ void SendPopularityRank(Stream &st, Player* player)
     using namespace GObject;
     st.init(REP::SORT_LIST);
     size_t c = World::popularitySort.size();
-	st << static_cast<UInt8>(7) << static_cast<UInt32>(0) << static_cast<UInt32>(player->GetVar(VAR_POPULARITY)) << static_cast<UInt8>(c);
+	st << static_cast<UInt8>(7) << static_cast<UInt32>(0) << static_cast<UInt32>(player->GetVar(VAR_POPULARITY)) << static_cast<UInt8>(c >= CNT2? CNT2:c);
+    UInt32 j = 0;
     for (RCSortType::iterator i = World::popularitySort.begin(), e = World::popularitySort.end(); i != e; ++i)
     {
         Player* pl = i->player;
@@ -1014,7 +1015,7 @@ void SendPopularityRank(Stream &st, Player* player)
         {
             st << pl->getName() << pl->getPF() << pl->GetLev() << pl->getCountry() << i->total << pl->getClanName();
         }
-        if (c >= CNT2)
+        if (++j >= CNT2)
             break;
 
     }
