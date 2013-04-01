@@ -17538,7 +17538,7 @@ void Player::getDragonKingInfo()
     }
     UInt8 flag = GVAR.GetVar(GVAR_DRAGONKING_ACTION);
     if (flag <= DRAGONKING_CLOSE || flag >= DRAGONKING_MAX
-            || flag+1 > sizeof(Dragon_type)/sizeof(UInt8))
+            || flag > sizeof(Dragon_type)/sizeof(UInt8)-1)
     {
         sendMsgCode(0, 1090);
         return;
@@ -17571,7 +17571,7 @@ void Player::postDragonKing(UInt8 count)
     if (count == 0) return;
     UInt8 flag = GVAR.GetVar(GVAR_DRAGONKING_ACTION);
     if (flag <= DRAGONKING_CLOSE || flag >= DRAGONKING_MAX
-           || flag+1 > sizeof(Dragon_type)/sizeof(UInt8))
+           || flag > sizeof(Dragon_type)/sizeof(UInt8)-1)
     {
         sendMsgCode(0, 1090);
         return;
@@ -19131,8 +19131,11 @@ void Player::sendFoolsDayInfo()
         isFail = true;
     if((info & (1<<0)) == 0 && qid)
     {
-        if(!GET_BIT_8(value, 3) && qtime + 15 < TimeUtil::Now())
-            isFail = true;
+        if(!GET_BIT_8(value, 3))
+        {
+            if (qtime + 15 < TimeUtil::Now())
+                isFail = true;
+        }
         else    //有离线标志
         {
             qtime = TimeUtil::Now();
