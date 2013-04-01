@@ -346,9 +346,12 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
         std::string clientIp;
         std::string pf;
         std::string pfkey;
+        std::string xinyue;
         StringTokenizer st(ul._para, ":");
         switch (st.count())
         {
+            case 4:
+                xinyue = st[3];
             case 3:
                 pfkey = st[2].c_str();
             case 2:
@@ -397,6 +400,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             player->setClientIp(clientIp);
             player->setSource(pf);
             player->setPfKey(pfkey);
+            player->setXinYue(atoi(xinyue.c_str()));
 #ifdef _FB
             PLAYER_DATA(player, wallow) = 0;
 #endif
@@ -553,9 +557,12 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
     std::string clientIp;
     std::string pf;
     std::string pfkey;
+    std::string xinyue;
     StringTokenizer st(nu._para, ":");
     switch (st.count())
     {
+        case 4:
+            xinyue = st[3];
         case 3:
             pfkey = st[2].c_str();
         case 2:
@@ -713,6 +720,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->setOpenId(nu._openid);
             pl->setOpenKey(nu._openkey);
             pl->setVia(nu._via);
+            pl->setXinYue(atoi(xinyue.c_str()));
             if(cfg.merged)
             {
                 UInt64 inviterId = (pl->getId() & 0xffff000000000000) + atoll(nu._invited.c_str());

@@ -1861,6 +1861,7 @@ namespace GObject
         std::string m_pfkey;
         bool m_isOffical;
         bool m_isXY;
+        UInt8 m_XinYue;
     public:
         inline void setDomain(const std::string& domain)
         {
@@ -1915,6 +1916,8 @@ namespace GObject
         inline const std::string& getPfKey() const { return m_pfkey;}
         inline bool isOffical() const { return m_isOffical; }
         inline bool isXY() const { return m_isXY; }
+        inline void setXinYue(UInt8 v) { m_XinYue = v; }
+        inline UInt8 getXinYue() const { return m_XinYue; }
         inline const char* getClientIp() const { return m_clientIp; }
 
         inline UInt8 getPlatform() const { return atoi(m_domain); }
