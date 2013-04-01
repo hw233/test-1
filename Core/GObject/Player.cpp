@@ -10087,8 +10087,7 @@ namespace GObject
                     qqvipl = _playerData.qqvipl % 10;
                 }
             }
-
-            st << qqvipl << _playerData.qqvipyear << static_cast<UInt8>((_playerData.qqawardgot>>flag) & 0x03);
+            st << qqvipl << _playerData.qqvipyear << static_cast<UInt8>(((_playerData.qqawardgot>>flag)|(GetVar(VAR_HHBAWARD_GOT) << 3))& 0x0B);
             UInt8 maxCnt = GObjectManager::getYDMaxCount();
             if(flag == 8)
                 st << static_cast<UInt8>(maxCnt - 1);
@@ -10134,7 +10133,6 @@ namespace GObject
     UInt8 Player::rcvYellowDiamondAward(UInt8 type, UInt8 d3d6)
     {
         checkQQAward();
-
         UInt8 nRes = 0;
         Stream st(REP::YD_AWARD_RCV);
 
@@ -10142,7 +10140,7 @@ namespace GObject
         if (domain == 11 && _playerData.qqvipl >= 20 && _playerData.qqvipl < 40 && d3d6 == 1)
         {
             UInt8 qqvipl = _playerData.qqvipl % 10;
-            if (!qqvipl)
+           if (!qqvipl)
                 return 0;
 
             UInt32 award = GetVar(VAR_AWARD_3366);
@@ -10298,11 +10296,26 @@ namespace GObject
                     sendMsgCode(2, 1011);
                 }
             }
-
-            if(nRes)
+            
+            else if(type == 3 &&_playerData.isHHBlue &&!GetVar(VAR_HHBAWARD_GOT))
             {
-                DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardgot, getId());
+                if(GetPackage()->GetRestPackageSize() > 0)
+                {
+                    nRes = 5;
+                    SetVar(VAR_HHBAWARD_GOT, 1);
+
+                    GetPackage()->AddItem2(503,1, true, true);
+                }
+                else
+                {
+                    sendMsgCode(2, 1011);
+                }
             }
+
+        }
+        if(nRes && nRes != 5)
+        {
+            DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardgot, getId());
         }
 
         st << nRes << Stream::eos;

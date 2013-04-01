@@ -378,7 +378,6 @@ namespace GObject
         VAR_HAS_VOTE = 441,                 // 本日是否投票过
         VAR_POPULARITY = 442,               // 本周人气
 
-        VAR_FOOLBAO_USED = 450,  //愚人宝箱使用数
         VAR_RP7_TREASURE = 432,  //回流服务器聚宝盆, 1-8位:是否购买的标志为 9-16,17-24,25-32位第1-3个聚宝盆的已领取次数
         VAR_RP7_TREASURE_TODAY_GOT=433, //第1-3位:各个聚宝盆今天是否已领取
         VAR_RP7_TREASURE1_GETTIME=434, //第1个聚宝盆的领取时间
@@ -388,6 +387,8 @@ namespace GObject
         VAR_RP7_SIGN_PACKAGE=438,      //连续签到礼包
         VAR_RP7_RECHARGE=439,      //开服7天充值金额
 
+        VAR_FOOLBAO_USED = 450,  //愚人宝箱使用数
+        VAR_HHBAWARD_GOT = 451 , //豪华蓝钻领取
         VAR_MAX,
     };
 
@@ -698,6 +699,20 @@ namespace GObject
             REGISTER_VAR(VAR_SAVEGOLD_SET_TIME, CYCLE_NONE);
             REGISTER_VAR(VAR_SAVEGOLD_GET_STATUS, CYCLE_NONE);
             REGISTER_VAR(VAR_SAVEGOLD_ISGET, CYCLE_DAY);
+<<<<<<< HEAD
+
+
+            REGISTER_VAR(VAR_HHBAWARD_GOT, CYCLE_DAY);
+            /*
+            REGISTER_VAR(VAR_DRAGONKINGSNAKE_STEP, CYCLE_NONE);
+            REGISTER_VAR(VAR_DRAGONKINGSNAKE_STEP4_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_TIANMANG_STEP, CYCLE_NONE);
+            REGISTER_VAR(VAR_TIANMANG_STEP4_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_HUNYUAN_STEP, CYCLE_NONE);
+            REGISTER_VAR(VAR_HUNYUAN_STEP4_COUNT, CYCLE_NONE);
+            */
+=======
+>>>>>>> d7c1700ac58ae3e028147a9ea9bda1b7628471ec
 
             REGISTER_VAR(VAR_LONGYUAN_GOT, CYCLE_NONE);
             REGISTER_VAR(VAR_RP7_TREASURE, CYCLE_NONE);
