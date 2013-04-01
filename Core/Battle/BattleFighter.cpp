@@ -1005,11 +1005,12 @@ UInt32 BattleFighter::regenHP( UInt32 u, bool weak /* = false */, float hppec /*
 {
     if(_weakRound > 0 && weak)
         u /= 2;
-    u += getMaxHP() * hppec;
+    UInt32 tmp = getMaxHP() * hppec;
 
     if (maxRhp > 0)
-        u = u > maxRhp? maxRhp:u;
+        tmp = tmp > maxRhp? maxRhp:tmp;
 
+    u += tmp;
 	UInt32 oldhp = _hp;
 	if(oldhp >= getMaxHP())
 	{
