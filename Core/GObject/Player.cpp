@@ -19154,7 +19154,7 @@ void Player::submitAnswerInFoolsDay(UInt8 id, char answer)
         SetVar(VAR_FOOLS_DAY, CLR_BIT_8(value, 0));
         info = SET_BIT(info, id);
         SetVar(VAR_FOOLS_DAY_INFO, CLR_BIT(info, 0));
-        SYSMSG_SENDV(4142, this);
+        SYSMSG_SENDV(4148, this);
     }
     else        //答错
     {
@@ -19162,11 +19162,11 @@ void Player::submitAnswerInFoolsDay(UInt8 id, char answer)
         SetVar(VAR_FOOLS_DAY_INFO, SET_BIT(info, 0));
         if(qtime + 15 < TimeUtil::Now())
         {
-            SYSMSG_SENDV(4144, this);
+            SYSMSG_SENDV(4150, this);
         }
         else
         {
-            SYSMSG_SENDV(4143, this);
+            SYSMSG_SENDV(4149, this);
         }
     }
     sendFoolsDayInfo();
@@ -19230,9 +19230,14 @@ void Player::setLogoutInFoolsDay()
         if(info == 0 || (info & (1<<0)) == 1)
             return;
         UInt32 qtime = GetVar(VAR_FOOLS_DAY_TIME);
-        if(qtime == 0 || qtime + 10 < TimeUtil::Now())
+        if(qtime == 0)
             return;
         UInt32 value = GetVar(VAR_FOOLS_DAY);
+        if(qtime + 10 < TimeUtil::Now())
+        {
+            SetVar(VAR_FOOLS_DAY, CLR_BIT_8(value, 3));
+            return;
+        }
         SetVar(VAR_FOOLS_DAY, SET_BIT_8(value, 3, 1));
     }
 }
