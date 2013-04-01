@@ -175,11 +175,11 @@ void buildPacketForLingbao(Stream& st, UInt8 t, UInt32 id, std::vector<LingbaoIn
 
 void Leaderboard::buildPacketForLingbao(Stream& st, UInt8 t, bool merge /* = true */)
 {
-    // TODO:
     FastMutex::ScopedLock lk(_lbMutex);
     _lingbaoRank.clear();
 
 	UInt8 c = static_cast<UInt8>(_lingbaoInfoSet.size());
+    TRACE_LOG("_lingbaoInfoSet.size() : %u.", static_cast<UInt32>(c));
 	st.init(REP::SORT_LIST);
 	st << t << static_cast<UInt32>(0) << static_cast<UInt32>(0) << c;
 	//for(UInt8 i = 0; i < c; ++ i)

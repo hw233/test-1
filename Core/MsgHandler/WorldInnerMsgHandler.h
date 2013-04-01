@@ -1000,6 +1000,7 @@ void OnSendConsumeRank ( GameMsgHdr& hdr,  const void* data )
     }
 }
 
+#define CNT2 8
 void SendPopularityRank(Stream &st, Player* player)
 {
     using namespace GObject;
@@ -1013,6 +1014,8 @@ void SendPopularityRank(Stream &st, Player* player)
         {
             st << pl->getName() << pl->getPF() << pl->GetLev() << pl->getCountry() << i->total << pl->getClanName();
         }
+        if (c >= CNT2)
+            break;
 
     }
     st << Stream::eos;
@@ -1071,8 +1074,8 @@ void OnPopularityRank ( GameMsgHdr& hdr, const void * data)
 
         ++rank;
 
-        Stream st(REP::ACT);
-        st << static_cast<UInt8>(2) << static_cast<UInt8>(1) << static_cast<UInt8>(2) << i->total << static_cast<UInt8>(rank) << Stream::eos;
+        //Stream st(REP::ACT);
+        //st << static_cast<UInt8>(2) << static_cast<UInt8>(1) << static_cast<UInt8>(2) << i->total << static_cast<UInt8>(rank) << Stream::eos;
     }
 
     /*
