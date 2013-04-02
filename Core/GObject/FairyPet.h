@@ -44,12 +44,21 @@ public:
     void initSkillUp();
     inline void setPetBone(UInt16 v)    { _petBone = v; }
     inline void setPetLev(UInt16 v)     { _petLev = v; }
-    inline UInt8 getPetLev()            { return _petLev; }
+    inline void setXiaozhou(UInt16 v)   { _xiaozhou = v; }
+    inline void setDazhou(UInt16 v)     { _dazhou = v; }
+    inline void setPetLingya(UInt8 ly)  { _lingya = ly; }
+    inline void setChongNum(UInt16 v)   { _chong = v;; }
+    inline void setGenguBless(UInt16 v) { _genguBless = v; }
+    inline void setPinjieBless1(UInt16 v) { _pinjieBless = v; }
     inline UInt8 getPetBone()           { return _petBone; }
+    inline UInt8 getPetLev()            { return _petLev; }
+    inline UInt16 getXiaozhou()         { return _xiaozhou; }
+    inline UInt16 getDazhou()           { return _dazhou; }
     inline UInt8 getPetLingya()         { return _lingya; }
     inline UInt8 getChongNum()          { return _chong; }
+    inline UInt32 getGenguBless()       { return _genguBless; }
+    inline UInt16 getPinjieBless1()     { return _pinjieBless; }
 
-    inline void setPetLingya(UInt8 ly)  { _lingya = ly; }
     inline UInt8 getTargetPos()
     {
         switch (getClass())
@@ -66,77 +75,11 @@ public:
         return 0;
     }
 
-    /*
-    const PeerlessSkillID[e_cls_max] = 
-    {
-        0,
-        0,
-        0,
-        0,
-        0,
-        ,
-        ,
-        ,
-        ,
-        ,
-    };
-    inline UInt16 getPeerless() 
-    { 
-        switch (getClass())
-        {
-            case e_cls_qinglong:
-                return 24;
-            case e_cls_xuanwu:
-                return 4;
-            case e_cls_zhuque:
-                return 0;
-            case e_cls_baihu:
-                return 20;
-        }
-        return 0;
-    }
-    inline UInt16 getPeerlessLevel()
-    { 
-        switch (getClass())
-        {
-            case e_cls_qinglong:
-                return 24;
-            case e_cls_xuanwu:
-                return 4;
-            case e_cls_zhuque:
-                return 0;
-            case e_cls_baihu:
-                return 20;
-        }
-        return 0;
-    }
-    inline UInt16 getPeerlessAndLevel()
-    { 
-        switch (getClass())
-        {
-            case e_cls_qinglong:
-                return 24;
-            case e_cls_xuanwu:
-                return 4;
-            case e_cls_zhuque:
-                return 0;
-            case e_cls_baihu:
-                return 20;
-        }
-        return 0;
-    }
-    */
-
 private:
-    inline UInt32 getGenguBless()       { return _genguBless; }
-    inline UInt16 getXiaozhou()         { return _xiaozhou; }
-    inline UInt16 getDazhou()           { return _dazhou; }
     UInt16 getPinjieBless();
     void addChongNum(int);
     void addGenguBless(int);
     void addPinjieBless(UInt16);
-    inline void setXiaozhou(UInt16 v)   { _xiaozhou = v; }
-    inline void setDazhou(UInt16 v)     { _dazhou = v; }
     void boneUp();
     void levUp();
     bool canLevUp();

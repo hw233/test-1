@@ -2790,16 +2790,16 @@ void GMCmd(LoginMsgHdr& hdr, const void* data)
                 UInt32 endTime = 0;
                 UInt32 flag = 0;
                 br >> endTime >> flag;
-                //大闹龙宫的flag暂时只为1,2,3,4,5
+                //大闹龙宫的flag暂时只为1,2,3,4,5,6
                 //10:聚宝盆
                 if(endTime < val || flag >= GObject::DRAGONKING_MAX)
                     result = 1;
                 else
                 {
-                    if(flag != GObject::GVAR.GetVar(GObject::GVAR_DRAGONKING_ACTION) && flag != 10)
-	                    GObject::globalPlayers.enumerate(player_enum_2, 0);
                     if (flag != 10)
                     {
+                        if(flag != GObject::GVAR.GetVar(GObject::GVAR_DRAGONKING_ACTION))
+                            GObject::globalPlayers.enumerate(player_enum_2, 0);
                         GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_BEGIN, val);
                         GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_END, endTime);
                         GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_ACTION, flag);
