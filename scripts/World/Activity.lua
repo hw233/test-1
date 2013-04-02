@@ -826,6 +826,9 @@ function onActivityCheck(tm)
       elseif tm >= actTime563 and tm < actTime563_1 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
+      elseif tm >= actTime2013_04_09 and tm < actTime2013_04_09+5*86400 then
+          setRechargeActive(true, 16)
+          setNeedRechargeRank(true)
       else
           setRechargeActive(false, 16)
           setNeedRechargeRank(false)
@@ -1754,6 +1757,7 @@ function initActTime(y, m, d)
   actTime2013_04_03= os.time(SerStartTm2013_04_01)+86400*2;
   actTime2013_04_12= os.time(SerStartTm2013_04_01)+86400*11;
   actTime2013_04_27= os.time(SerStartTm2013_04_01)+86400*26;
+  actTime2013_04_09= os.time(SerStartTm2013_04_01)+86400*8;
 
   onActivityCheck(os.time() + 30);
 
