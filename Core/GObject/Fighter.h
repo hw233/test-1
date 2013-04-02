@@ -183,6 +183,7 @@ public:
     inline bool isWBoss() { return _iswboss; }
     inline void setWBoss(bool v) { _iswboss = v; }
 	inline UInt8 getLevel() {return _level;}
+    inline UInt8 getLevelInLua() { if (isPet() && _level > 50) return _level - 50; }
 	inline UInt64 getExp() {return _exp;}
 	inline UInt32 getPExp() {return _pexp;}
 	inline UInt32 getPExpMax() {return _pexpMax;}

@@ -2698,11 +2698,13 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
         if(NULL == bo)
         {
             target_pos = bf->getPos();
+            target_side = bf->getSide();
             cnt = 1;
         }
         else
         {
             target_pos = bo->getPos();
+            target_side = bo->getSide();
             cnt = 1;
         }
     }
@@ -2728,7 +2730,7 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
                 ++ exceptCnt;
             }
         }
-        BattleFighter* bo = getMaxHpFighter(bf->getSide()?0:1, excepts, exceptCnt);
+        BattleFighter* bo = getMaxHpFighter(side, excepts, exceptCnt);
         if(NULL == bo)
         {
             return;
@@ -2736,6 +2738,7 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
         else
         {
             target_pos = bo->getPos();
+            target_side = bo->getSide();
             cnt = 1;
         }
     }
@@ -2764,6 +2767,7 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
         else
         {
             target_pos = bo->getPos();
+            target_side = bo->getSide();
             cnt = 1;
         }
     }
@@ -2793,6 +2797,7 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
         else
         {
             target_pos = bo->getPos();
+            target_side = bo->getSide();
             cnt = 1;
         }
     }
@@ -2822,6 +2827,7 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
         else
         {
             target_pos = bo->getPos();
+            target_side = bo->getSide();
             cnt = 1;
         }
     }
@@ -2851,12 +2857,14 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
         else
         {
             target_pos = bo->getPos();
+            target_side = bo->getSide();
             cnt = 1;
         }
     }
     else
     {
         target_pos = bf->getPos();
+        target_side = bf->getSide();
         cnt = 1;
     }
 }

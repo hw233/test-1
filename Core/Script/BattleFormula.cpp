@@ -117,6 +117,7 @@ void BattleFormula::init()
 	class_def<Battle::BattleFighter>("getId", &Battle::BattleFighter::getId);
 	class_def<Battle::BattleFighter>("getClass", &Battle::BattleFighter::getClass);
 	class_def<Battle::BattleFighter>("getLevel", &Battle::BattleFighter::getLevel);
+    class_def<Battle::BattleFighter>("getLevelInLua", &Battle::BattleFighter::getLevelInLua);
 	class_def<Battle::BattleFighter>("getColor", &Battle::BattleFighter::getColor);
 	class_def<Battle::BattleFighter>("getPotential", &Battle::BattleFighter::getPotential);
 	class_def<Battle::BattleFighter>("getExtraStrength", &Battle::BattleFighter::getExtraStrength);
