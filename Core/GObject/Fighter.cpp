@@ -1938,20 +1938,22 @@ void Fighter::rebuildSkillBattlePoint()
 void Fighter::rebuildBattlePoint()
 {
 	_battlePoint = Script::BattleFormula::getCurrent()->calcBattlePoint(this);
-    if(_owner)
+    if(!isPet())
     {
-        const GData::Formation* form = GData::formationManager[_owner->getFormation()];
-        if(form)
-            _battlePoint += form->getBattlePoint();
+        if(_owner)
+        {
+            const GData::Formation* form = GData::formationManager[_owner->getFormation()];
+            if(form)
+                _battlePoint += form->getBattlePoint();
+        }
+        UInt8 cnt = _lbSkill.size();
+        for(UInt8 i = 0; i < cnt; ++ i)
+        {
+            const GData::LBSkillBase* lbskill = GData::lbSkillManager[_lbSkill[i].skillid];
+            _battlePoint += lbskill->battlepoint * (((float)(_lbSkill[i].factor))/10000);
+        }
+        calcLingbaoBattlePoint();
     }
-    UInt8 cnt = _lbSkill.size();
-    for(UInt8 i = 0; i < cnt; ++ i)
-    {
-        const GData::LBSkillBase* lbskill = GData::lbSkillManager[_lbSkill[i].skillid];
-        _battlePoint += lbskill->battlepoint * (((float)(_lbSkill[i].factor))/10000);
-    }
-
-    calcLingbaoBattlePoint();
 }
 
 Fighter * Fighter::clone(Player * player)
