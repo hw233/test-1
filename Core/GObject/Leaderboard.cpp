@@ -176,6 +176,7 @@ void buildPacketForLingbao(Stream& st, UInt8 t, UInt32 id, std::vector<LingbaoIn
 void Leaderboard::buildPacketForLingbao(Stream& st, UInt8 t, bool merge /* = true */)
 {
     FastMutex::ScopedLock lk(_lbMutex);
+    st.clear();
     _lingbaoRank.clear();
 
 	UInt8 c = static_cast<UInt8>(_lingbaoInfoSet.size());
@@ -799,6 +800,7 @@ bool Leaderboard::getPacket( UInt8 t, Stream*& st, Player* pl)
     // XXX: t == 7 的情况不在此处获得排行榜数据，因为是实时更新的前八名数据
     if (isSorting())
         return false;
+    FastMutex::ScopedLock lk(_opMutex);
 
 	switch(t)
 	{
@@ -949,12 +951,13 @@ void Leaderboard::newDrawingGame(UInt32 nextday)
 
 }
 
-int Leaderboard::getMyRank(Player* pl, UInt8 type)
+int Leaderboard::getMyRank(Player* pl, UInt8 type , bool setLock)
 {
     int rank = 0;
     if (NULL == pl)
         return 0;
-    FastMutex::ScopedLock lk(_opMutex);
+    if( setLock == true )
+        FastMutex::ScopedLock lk(_opMutex);
 
     std::map<UInt64, int>::iterator iter;
     Clan* cl = pl->getClan(); 
@@ -1009,7 +1012,7 @@ int Leaderboard::getMyRank(Player* pl, UInt8 type)
 }
 void Leaderboard::makeRankStream(Stream*& st, UInt8 type, Player* pl)
 {
-    int rank = getMyRank(pl, type);
+    int rank = getMyRank(pl, type,false);
     st->pop_front(9); //将type,rank总共5个字节删除
     st->prepend((UInt8*)&rank, 4); //头先插入自己的排行
     st->prepend((UInt8*)&type, 1);    //最后插入类型
@@ -1021,7 +1024,7 @@ void Leaderboard::makeRankStream(Stream*& st, UInt8 type, Player* pl)
 
 void Leaderboard::makeRankAndValueStream(Stream*& st, UInt8 type, Player* pl, UInt32 value)
 {
-    int rank = getMyRank(pl, type);
+    int rank = getMyRank(pl, type,false);
     st->pop_front(13); //将type,rank总共5个字节删除
     st->prepend((UInt8*)&value, 4); // 先插入数据（比如宝具的战斗力）
     st->prepend((UInt8*)&rank, 4); //头先插入自己的排行

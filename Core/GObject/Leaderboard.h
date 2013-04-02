@@ -159,7 +159,7 @@ public:
     bool isSorting() const { return m_sorting; }
     void buildBattlePacket();
     void buildPacketForLingbao(Stream& st, UInt8 t, bool merge = true);
-    int getMyRank(Player* pl, UInt8 type);
+    int getMyRank(Player* pl, UInt8 type , bool setLock = true);
 
     void pushLingbaoInfo(LingbaoInfoList lingbaoInfo);
 private:
