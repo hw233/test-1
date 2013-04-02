@@ -2439,7 +2439,10 @@ bool Fighter::addNewPeerless( UInt16 pl, bool writedb, bool up )
                 op = 3;
         }
         else
+        {
+            upPeerless(pl, false);
             return false;
+        }
     }
     else
     {

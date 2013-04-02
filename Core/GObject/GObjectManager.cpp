@@ -1964,8 +1964,10 @@ namespace GObject
             fgt2->setPeerless(specfgtobj.peerless, false); // XXX: must after setTrump
             fgt2->setCittas(specfgtobj.cittas, false);
             fgt2->setUpCittas(specfgtobj.citta, false);
-            //fgt2->setSkills(specfgtobj.skills, false);
-            fgt2->setUpSkills(specfgtobj.skill, false);
+            if (fgt2->isPet())
+                fgt2->setSkills(specfgtobj.skill, false);
+            else
+                fgt2->setUpSkills(specfgtobj.skill, false);
             fgt2->setAttrType1(specfgtobj.attrType1);
             fgt2->setAttrValue1(specfgtobj.attrValue1);
             fgt2->setAttrType2(specfgtobj.attrType2);

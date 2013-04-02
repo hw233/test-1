@@ -461,7 +461,8 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         GData::SkillItem skillItem;
         skillItem.base = GData::skillManager[passiveSkillOnAtkDmg[idx]];
         skillItem.cd = 0;
-        skillItem.rateExtent = 0;
+        rateExtent += skillItem.base->prob * 100;
+        skillItem.rateExtent = rateExtent;
         _passiveSkillOnAtkDmg.insert(_passiveSkillOnAtkDmg.end(), skillItem);
 
         updateSkillStrengthen(passiveSkillOnAtkDmg[idx]);

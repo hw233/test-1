@@ -552,6 +552,8 @@ void BattleSimulator::start(UInt8 prevWin, bool checkEnh)
     UInt32 act_count = 0;
     _winner = testWinner();
     act_count += FightersEnter(prevWin);
+
+    UInt32 oldAttackRount = _attackRound;
     while(_winner == 0 && act_count < _fake_turns)
     {
         int pos = findFirstAttacker();
@@ -575,10 +577,15 @@ void BattleSimulator::start(UInt8 prevWin, bool checkEnh)
         }
         
 #endif
-        act_count += tryPetEnter(0, e_reiatsu_round);
-        act_count += tryPetEnter(1, e_reiatsu_round);
-        _getDamageSkillCount[0] = 0;
-        _getDamageSkillCount[1] = 0;
+        if (oldAttackRount != _attackRound)
+        {
+            oldAttackRount = _attackRound;
+            act_count += tryPetEnter(0, e_reiatsu_round);
+            act_count += tryPetEnter(1, e_reiatsu_round);
+            _getDamageSkillCount[0] = 0;
+            _getDamageSkillCount[1] = 0;
+        }
+        _activeFgt = NULL;
     }
     if(_winner == 0)
         _winner = testWinner2();
@@ -2679,7 +2686,7 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
                 if(!bo)  // 雪人
                     continue;
 
-                if(bo->getAura() > 99 || bo->getId() == 5679)
+                if(bo->getId() == 5679)
                 {
                     excepts[exceptCnt] = i;
                     ++ exceptCnt;
@@ -2715,7 +2722,7 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
             if(!bo)  // 雪人
                 continue;
 
-            if(bo->getAura() > 99 || bo->getId() == 5679)
+            if(bo->getId() == 5679)
             {
                 excepts[exceptCnt] = i;
                 ++ exceptCnt;
@@ -2743,7 +2750,7 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
             if(!bo)  // 雪人
                 continue;
 
-            if(bo->getAura() > 99 || bo->getId() == 5679)
+            if(bo->getId() == 5679)
             {
                 excepts[exceptCnt] = i;
                 ++ exceptCnt;
@@ -2772,7 +2779,7 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
             if(!bo)  // 雪人
                 continue;
 
-            if(bo->getAura() > 99 || bo->getId() == 5679)
+            if(bo->getId() == 5679)
             {
                 excepts[exceptCnt] = i;
                 ++ exceptCnt;
@@ -2801,7 +2808,7 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
             if(!bo)  // 雪人
                 continue;
 
-            if(bo->getAura() > 99 || bo->getId() == 5679)
+            if(bo->getId() == 5679)
             {
                 excepts[exceptCnt] = i;
                 ++ exceptCnt;
@@ -2830,7 +2837,7 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
             if(!bo)  // 雪人
                 continue;
 
-            if(bo->getAura() > 99 || bo->getId() == 5679)
+            if(bo->getId() == 5679)
             {
                 excepts[exceptCnt] = i;
                 ++ exceptCnt;
@@ -4899,11 +4906,19 @@ UInt32 BattleSimulator::doSkillAttackAftEnter(BattleFighter* bf, const GData::Sk
             }
             else if(skill->effect->hp > 0 || skill->effect->addhp > 0 || skill->effect->hpP > 0.001)
             {
-                doSkillAttack(bf, skill, target_side, target_pos, 1);
+                if (doSkillAttack(bf, skill, target_side, target_pos, 1))
+                    ++ rcnt;
             }
             else if ((skill->effect->atk > 0 || skill->effect->atkP > 0) && bf->isPet())
             {
                 bf->setPetExAtk(bf->_attack * skill->effect->atkP + skill->effect->atk, skill->getId());
+            }
+            else if(skill->effect->state & GData::e_state_poison || skill->effect->damage || skill->effect->damageP || skill->effect->adddam
+                    || skill->effect->magdam || skill->effect->magdamP || skill->effect->addmag
+                    || skill->effect->crrdam || skill->effect->crrdamP || skill->effect->addcrr)
+            {
+                if (doSkillAttack(bf, skill, target_side, target_pos, 1))
+                    ++ rcnt;
             }
             else
             {
@@ -4912,7 +4927,6 @@ UInt32 BattleSimulator::doSkillAttackAftEnter(BattleFighter* bf, const GData::Sk
 
             appendDefStatus(e_damNormal, 0, bo);
 
-            rcnt = 1;
             break;
         }
 
@@ -4947,7 +4961,6 @@ UInt32 BattleSimulator::doSkillAttackAftEnter(BattleFighter* bf, const GData::Sk
             appendDefStatus(e_damNormal, 0, bo);
         }
 
-        rcnt = 1;
     } while(false);
     doSkillEffectExtraAttack(bf, target_side, target_pos, skill);
 
@@ -5762,7 +5775,6 @@ UInt32 BattleSimulator::doAttack( int pos )
 
     rcnt += releaseCD(bf);
 
-    _activeFgt = NULL;
     return rcnt;
 }
 
@@ -6639,6 +6651,12 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
             fSummonOrMirror = true;
             break;
         }
+        if(static_cast<BattleFighter*>(bo)->isPet())
+        {
+            fSummonOrMirror = true;
+            break;
+        }
+    
         if(static_cast<BattleFighter*>(bo)->isSummon())
         {
             BattleFighter* summoner = static_cast<BattleFighter*>(bo)->getSummoner();
@@ -7140,13 +7158,13 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
 
     if (bf->releasePetAttackAdd())
     {
-        UInt32 value = static_cast<UInt32>(bf->getPetAttackAdd());
+        UInt32 value = static_cast<UInt32>(bf->getAttack());
         appendStatusChange(e_stAtk, value, 0, bf);
     }
 
     if (bf->releasePetMagAtkAdd())
     {
-        UInt32 value = static_cast<UInt32>(bf->getPetMagAtkAdd());
+        UInt32 value = static_cast<UInt32>(bf->getMagAttack());
         appendStatusChange(e_stMagAtk, value, 0, bf);
     }
 
@@ -9696,22 +9714,21 @@ void BattleSimulator::doSkillEffectExtra_RandomShield(BattleFighter* bf, int tar
 void BattleSimulator::doSkillEffectExtra_SelfAttack(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
 {
     // 附加自己百分比的攻击力到指定人身上
-
-    UInt16 last = skill->effect->efl[eftIdx] + (bf == _activeFgt ? 1 : 0);
-    float atkadd = bf->_attack * skill->effect->efv[eftIdx];
-    float magatkadd = bf->_magatk * skill->effect->efv[eftIdx];
+    UInt16 last = skill->effect->efl[eftIdx];
+    float atkadd = (bf->_magatk) * (skill->effect->efv[eftIdx]);
     BattleObject * bo = getObject(target_side, target_pos);
     if (!bo->isChar())
         return;
     BattleFighter* bf2 = static_cast<BattleFighter*>(bo);
-    bf2->setPetAttackAdd(atkadd, last);
-    bf2->setPetMagAtkAdd(magatkadd, last);
+    if (bf2->getClass() == e_cls_dao || bf2->getClass() == e_cls_mo)
     {
+        bf2->setPetAttackAdd(atkadd, last);
         UInt16 skillId = skill != NULL ? skill->getId() : 0;
         UInt32 value = static_cast<UInt32>(bf2->getAttack());
         appendStatusChange(e_stAtk, value, skillId, bf2);
     }
     {
+        bf2->setPetMagAtkAdd(atkadd, last);
         UInt16 skillId = skill != NULL ? skill->getId() : 0;
         UInt32 value = static_cast<UInt32>(bf2->getMagAttack());
         appendStatusChange(e_stMagAtk, value, skillId, bf2);
@@ -9727,8 +9744,8 @@ void BattleSimulator::doSkillEffectExtra_RandomTargetAttack(BattleFighter* bf, i
         return;
     if (!bo->isChar())
         return;
-    setStatusChange_Atk(bf, bo->getSide(), bo->getPos(), skill, skill->effect->efl[eftIdx], skill->effect->efv[eftIdx], true);
-    setStatusChange_MagAtk(bf, bo->getSide(), bo->getPos(), skill, skill->effect->efl[eftIdx], skill->effect->efv[eftIdx], true);
+    setStatusChange_Atk(bf, bo->getSide(), bo->getPos(), skill, bo->_attack * skill->effect->efv[eftIdx], skill->effect->efl[eftIdx], true);
+    setStatusChange_MagAtk(bf, bo->getSide(), bo->getPos(), skill, bo->_magatk * skill->effect->efv[eftIdx], skill->effect->efl[eftIdx], true);
 }
 
 void BattleSimulator::doSkillEffectExtra_MarkPet(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
@@ -10854,6 +10871,7 @@ UInt32 BattleSimulator::tryPetEnter(UInt8 side, UInt8 reiatsuType, bool slience 
         appendReiatsuChange(side);
     if (addReiatsu(side, val))
     {
+        appendReiatsuChange(side);
         return doPetEnter(side);
     }
     return 0;
@@ -10908,23 +10926,19 @@ UInt32 BattleSimulator::doPetEnter(UInt8 side)
     {
         int target_side, target_pos, cnt;
         getSkillTarget(bf, passiveSkill, target_side, target_pos, cnt);
-        UInt32 res = doSkillAttackAftEnter(bf, passiveSkill, target_side, target_pos, cnt);
-        if(rcnt == 0 && res != 0)
-            rcnt = 1;
+        rcnt += doSkillAttackAftEnter(bf, passiveSkill, target_side, target_pos, cnt);
     }
 
     if(NULL != (passiveSkill = bf->getPassiveSkillEnter()))
     {
         int target_side, target_pos, cnt;
         getSkillTarget(bf, passiveSkill, target_side, target_pos, cnt);
-        UInt32 res = doSkillAttackAftEnter(bf, passiveSkill, target_side, target_pos, cnt);
-        if(rcnt == 0 && res != 0)
-            rcnt = 1;
+        rcnt += doSkillAttackAftEnter(bf, passiveSkill, target_side, target_pos, cnt);
     }
 
     appendToPacket(bf->getSide(), bf->getPos(), bf->getPos(), 5, 0, false, false);
     insertFighterStatus(bf);
-    return rcnt;
+    return rcnt + 1;
 }
 
 bool BattleSimulator::tryProtectDamage(BattleFighter* bf, float& phyAtk, float& magAtk, float factor)
@@ -10935,6 +10949,8 @@ bool BattleSimulator::tryProtectDamage(BattleFighter* bf, float& phyAtk, float& 
     {
         BattleFighter * pet = static_cast<BattleFighter *> (_objs[bf->getSide()][tidx]);
         if (!pet)
+            return false;
+        if (pet == bf)
             return false;
         if (bf->getPetProtect100())
             return do100ProtectDamage(bf, pet, phyAtk, magAtk, factor);
@@ -11141,6 +11157,10 @@ bool BattleSimulator::do100AttackWithPet(BattleFighter* bf, BattleFighter* pet, 
     // 宠物100%合击
     bf->setPetAtk100(false, 0);
     appendDefStatus(e_unPetAtk100, 0, bf);
+    const GData::SkillBase* pskill = pet->getPassiveSkillOnAtkDmgForce();
+    if(!pskill)
+        return false;
+    appendDefStatus(e_skill, pskill->getId(), pet);
     return attackWithPet(bf, pet, phyAtk, magAtk, factor);
 }
 
