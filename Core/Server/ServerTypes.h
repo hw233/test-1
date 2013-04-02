@@ -1,7 +1,7 @@
 #ifndef _SERVERTYPES_H_
 #define _SERVERTYPES_H_
 
-#define OPEN_API_ON
+//#define OPEN_API_ON
 
 struct ServerInfor
 {

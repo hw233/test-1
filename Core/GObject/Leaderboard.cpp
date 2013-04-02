@@ -179,13 +179,15 @@ void Leaderboard::buildPacketForLingbao(Stream& st, UInt8 t, bool merge /* = tru
     st.clear();
     _lingbaoRank.clear();
 
-	UInt8 c = static_cast<UInt8>(_lingbaoInfoSet.size());
+	UInt32 c = static_cast<UInt8>(_lingbaoInfoSet.size());
     TRACE_LOG("_lingbaoInfoSet.size() : %u.", static_cast<UInt32>(c));
 	st.init(REP::SORT_LIST);
-	st << t << static_cast<UInt32>(0) << static_cast<UInt32>(0) << c;
+    if(c > 100)
+        c = 100;
+	st << t << static_cast<UInt32>(0) << static_cast<UInt32>(0) << static_cast<UInt8>(c);
 	//for(UInt8 i = 0; i < c; ++ i)
     UInt32 i = 0;
-    for (LingbaoInfoSet::iterator it = _lingbaoInfoSet.begin(); it != _lingbaoInfoSet.end(); ++ it)
+    for (LingbaoInfoSet::iterator it = _lingbaoInfoSet.begin(); it != _lingbaoInfoSet.end() && i < c; ++ it)
 	{
 		const LingbaoInfoList& item = *it;
         if ((_lingbaoRank[item.id] == 0) || (_lingbaoRank[item.id] > static_cast<int>(i+1)))

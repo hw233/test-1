@@ -78,14 +78,14 @@ namespace GObject
     {
         std::vector<LogMsg> log;
         std::vector<LogMsg> unionLog;
-        std::vector<OpenIdMsg> openIdLog;
+        //std::vector<OpenIdMsg> openIdLog;
         {
             FastMutex::ScopedLock lk(m_Mutex);
             log.swap(m_DCLog);
 
             unionLog.swap(m_UnionLog);
 
-            openIdLog.swap(m_Openid);
+            //openIdLog.swap(m_Openid);
         }
         if (!log.empty())
         {
@@ -158,6 +158,7 @@ namespace GObject
                 ++i;
             }
         }
+        /*
         if (!openIdLog.empty())
         {
             size_t size = openIdLog.size();
@@ -197,6 +198,7 @@ namespace GObject
                 ++i;
             }
         }
+        */
     }
 
     void DCWorker::OnPause()
