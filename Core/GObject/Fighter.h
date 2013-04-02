@@ -893,6 +893,8 @@ public:
     void PeerlessSSNotify(UInt16 id);
 
     UInt16 calcSkillBattlePoint(UInt16 skillId, UInt8 type);
+
+    UInt32 calcLingbaoBattlePoint();
 private:
     std::map<UInt16, SStrengthen> m_ss;
 

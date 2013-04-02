@@ -5565,7 +5565,7 @@ UInt32 BattleSimulator::doAttack( int pos )
 
             while(NULL != (passiveSkill = bf->getPassiveSkillOnAttackBleed100(idx, noPossibleTarget)))
             {
-                if(passiveSkill->target == GData::e_battle_target_otherside && bo && bo->getHP() && 
+                if(passiveSkill->target == GData::e_battle_target_otherside && bo && bo->getHP() &&  (bo->getSide() != bf->getSide()) &&
                         (bo->getBleedRandomLast() || bo->getBleedBySkillLast() || //bo->getBleedBySkillClass() || bo->getBleedAttackClass() || 
                          bo->getBleed1Last() || bo->getBleed2Last() || bo ->getBleed3Last() || bo->getAuraBleedLast() || bo->getStunBleedLast() || bo->getConfuceBleedLast() ||
                          bo->getBleedMoLast() || bo->getSelfBleedLast()))

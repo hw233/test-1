@@ -1581,6 +1581,7 @@ void OnArenaEnterCommit( GameMsgHdr& hdr, const void* data )
         Stream st(ARENAREQ::ENTER, 0xEF);
         st << player->getId() << player->getName() << static_cast<UInt8>(player->getTitle());
         player->appendLineup2(st);
+        player->appendPetOnBattle(st);
         st << Stream::eos;
         NETWORK()->SendToArena(st);
     }
@@ -1589,6 +1590,7 @@ void OnArenaEnterCommit( GameMsgHdr& hdr, const void* data )
         Stream st(ARENAREQ::COMMIT_LINEUP, 0xEF);
         st << player->getId();
         player->appendLineup2(st);
+        player->appendPetOnBattle(st);
         st << Stream::eos;
         NETWORK()->SendToArena(st);
     }
@@ -1926,5 +1928,57 @@ void OnSaveGoldAct( GameMsgHdr& hdr, const void * data)
         player->saveGoldAct(gData->opt, gData->param);
 }
 
+void OnFoolsDayAct( GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    struct foolsData
+    {
+        UInt8 type;
+        UInt8 id;
+        char answer;
+    };
+    foolsData * fdata = reinterpret_cast<foolsData*>(const_cast<void *>(data));
+    if(fdata)
+    {
+        switch(fdata->type)
+        {
+            case 0x00:
+                player->checkAnswerActInFoolsDay();
+                break;
+            case 0x01:
+                player->sendFoolsDayInfo();
+                break;
+            case 0x02:
+                player->submitAnswerInFoolsDay(fdata->id, fdata->answer);
+                break;
+            case 0x03:
+                player->getAwardInFoolsDay();
+                break;
+            case 0x04:
+                player->buyResurrectionCard();
+                break;
+        }
+    }
+}
+
+void OnCalcLBBattlePoint( GameMsgHdr &hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    player->calcLingbaoBattlePoint();
+}
+
+void OnBeVoted( GameMsgHdr &hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    player->beVoted();
+}
+
+void OnSendPopularityAward(GameMsgHdr &hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    player->sendPopularityRandAward(*(int*)data);
+}
+
 #endif // _COUNTRYINNERMSGHANDLER_H_
+
 
