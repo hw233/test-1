@@ -7923,6 +7923,24 @@ function ItemNormal_00009361(iid, num, bind, param)
     end
 end
 
+--使用灵宠蛋
+function ItemNormal_00009366(iid, num, bind, param)
+    local bluePet = {502, 505, 508, 511}    --蓝色仙宠id
+    local player = GetPlayer()
+    if player:GetLev() < 50 then
+        return 0
+    end
+    local package = player:GetPackage();
+    package:DelItemSendMsg(iid, player);
+    for i = 1, num do
+        local id = bluePet[math.random(1, #bluePet)]
+        player:setCanHirePet(id)
+        player:writeCanHiretPet()
+        player:hireFairyPet(id)
+    end
+    return num
+end
+
 --使用仙缘石
 function ItemNormal_00009371(iid, num, bind, param)
     local player = GetPlayer()
@@ -9601,6 +9619,7 @@ local ItemNormal_Table = {
 
     [9360] = ItemNormal_00009360,
     [9361] = ItemNormal_00009361,
+    [9366] = ItemNormal_00009366,
     [9371] = ItemNormal_00009371,
     [9900] = ItemNormal_NameCard,
 

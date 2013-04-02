@@ -17870,7 +17870,7 @@ UInt8 Player::toQQGroup(bool isJoin)
         if(count == 0) return;
         if(getCanHirePetNum())
             return;
-        static UInt32 cost[] = {0xFFFFFFFF, 80, 120, 240, 600, 1800};
+        static UInt32 cost[] = {0xFFFFFFFF, 16, 24, 48, 120, 360};  //游历消耗仙缘
         UInt32 xianYuan = GetVar(VAR_FAIRYPET_XIANYUAN);
         UInt8 step = GetVar(VAR_FAIRYPET_STEP);
         if(step < 1 || step > 5)
@@ -17914,7 +17914,7 @@ UInt8 Player::toQQGroup(bool isJoin)
                 if(!isConvert)
                     setCanHirePet(blueId);
             }
-            if(isConvert)   //是否放生仙宠
+            if(isConvert)   //是否放生仙宠 0:否,1:是
             {
                 convert1 += values.get<UInt32>("convert1");
                 convert2 += values.get<UInt32>("convert2");
@@ -17938,19 +17938,24 @@ UInt8 Player::toQQGroup(bool isJoin)
         getLongyuan(longYuan, &ii1);
         IncommingInfo ii2(FengsuiFromYouli, 0, 0);
         getFengsui(fengSui, &ii2);
-        if(!isConvert)   //不放生仙宠
+        if(isConvert)   //放生仙宠
         {
             IncommingInfo ii1(LongyuanFromConvert, 0, 0);
             getLongyuan(convert1, &ii1);
             IncommingInfo ii2(FengsuiFromConvert, 0, 0);
             getFengsui(convert2, &ii2);
-            if(!petStr.empty())
-                writeCanHiretPet();
         }
-        AddVar(VAR_FAIRYPET_LIKEABILITY, like);
-        SetVar(VAR_FAIRYPET_STEP, step);
         ConsumeInfo ci(YouliForPet, 0, 0);
         useXianyuan(used, &ci);
+        if(!isConvert && !petStr.empty())   //不放生仙宠
+            writeCanHiretPet();
+        AddVar(VAR_FAIRYPET_LIKEABILITY, like);
+        SetVar(VAR_FAIRYPET_STEP, step);
+        if(like)
+        {
+            SYSMSG_SENDV(146, this, like);
+            SYSMSG_SENDV(1046, this, like);
+        }
     }
 
     //仙宠免费领取(>=50级)
@@ -17985,8 +17990,8 @@ UInt8 Player::toQQGroup(bool isJoin)
 		if(c == 0)
 			return xianyuan;
 		xianyuan += c;
-		SYSMSG_SENDV(4136, this, c);
-		SYSMSG_SENDV(4137, this, c);
+		SYSMSG_SENDV(161, this, c);
+		SYSMSG_SENDV(1061, this, c);
         SetVar(VAR_FAIRYPET_XIANYUAN, xianyuan);
 
         Stream st(REP::USER_INFO_CHANGE);
@@ -17995,7 +18000,7 @@ UInt8 Player::toQQGroup(bool isJoin)
 
         if(ii && ii->incommingType != 0)
         {
-            DBLOG1().PushUpdateData("insert into consume_arena (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+            DBLOG1().PushUpdateData("insert into consume_pet (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
                 cfg.serverLogId, getId(), ii->incommingType, ii->itemId, ii->itemNum, c, TimeUtil::Now());
         }
 
@@ -18014,12 +18019,12 @@ UInt8 Player::toQQGroup(bool isJoin)
             xianyuan -= a;
             if(ci != NULL)
             {
-                DBLOG1().PushUpdateData("insert into consume_arena (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+                DBLOG1().PushUpdateData("insert into consume_pet (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
                 cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, a, TimeUtil::Now());
             }
         }
-        SYSMSG_SENDV(4142, this, a);
-        SYSMSG_SENDV(4143, this, a);
+        SYSMSG_SENDV(148, this, a);
+        SYSMSG_SENDV(1048, this, a);
         SetVar(VAR_FAIRYPET_XIANYUAN, xianyuan);
 
         return xianyuan;
@@ -18031,13 +18036,13 @@ UInt8 Player::toQQGroup(bool isJoin)
 		if(c == 0)
 			return longyuan;
 		longyuan += c;
-		SYSMSG_SENDV(4132, this, c);
-		SYSMSG_SENDV(4133, this, c);
+		SYSMSG_SENDV(159, this, c);
+		SYSMSG_SENDV(1059, this, c);
         SetVar(VAR_FAIRYPET_LONGYUAN, longyuan);
 
         if(ii && ii->incommingType != 0)
         {
-            DBLOG1().PushUpdateData("insert into consume_arena (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+            DBLOG1().PushUpdateData("insert into consume_pet (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
                 cfg.serverLogId, getId(), ii->incommingType, ii->itemId, ii->itemNum, c, TimeUtil::Now());
         }
 
@@ -18056,12 +18061,12 @@ UInt8 Player::toQQGroup(bool isJoin)
             longyuan -= a;
             if(ci != NULL)
             {
-                DBLOG1().PushUpdateData("insert into consume_arena (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+                DBLOG1().PushUpdateData("insert into consume_pet (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
                 cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, a, TimeUtil::Now());
             }
         }
-        SYSMSG_SENDV(4138, this, a);
-        SYSMSG_SENDV(4139, this, a);
+        SYSMSG_SENDV(158, this, a);
+        SYSMSG_SENDV(1058, this, a);
         SetVar(VAR_FAIRYPET_LONGYUAN, longyuan);
 
         return longyuan;
@@ -18073,13 +18078,13 @@ UInt8 Player::toQQGroup(bool isJoin)
 		if(c == 0)
 			return fengsui;
 		fengsui += c;
-		SYSMSG_SENDV(4134, this, c);
-		SYSMSG_SENDV(4135, this, c);
+		SYSMSG_SENDV(160, this, c);
+		SYSMSG_SENDV(1060, this, c);
         SetVar(VAR_FAIRYPET_FENGSUI, fengsui);
 
         if(ii && ii->incommingType != 0)
         {
-            DBLOG1().PushUpdateData("insert into consume_arena (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+            DBLOG1().PushUpdateData("insert into consume_pet (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
                 cfg.serverLogId, getId(), ii->incommingType, ii->itemId, ii->itemNum, c, TimeUtil::Now());
         }
 
@@ -18098,12 +18103,12 @@ UInt8 Player::toQQGroup(bool isJoin)
             fengsui -= a;
             if(ci != NULL)
             {
-                DBLOG1().PushUpdateData("insert into consume_arena (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+                DBLOG1().PushUpdateData("insert into consume_pet (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
                 cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, a, TimeUtil::Now());
             }
         }
-        SYSMSG_SENDV(4140, this, a);
-        SYSMSG_SENDV(4141, this, a);
+        SYSMSG_SENDV(157, this, a);
+        SYSMSG_SENDV(1057, this, a);
         SetVar(VAR_FAIRYPET_FENGSUI, fengsui);
 
         return fengsui;
