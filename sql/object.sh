@@ -156,6 +156,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130315_1.sql # must be once 有删除操作
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130319_1.sql 
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130326_1.sql # must be once 有删除操作
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearbluediamond.sql  #开蓝黄钻活动需要打开 
 
     #. clearshiyamen.sh
 }

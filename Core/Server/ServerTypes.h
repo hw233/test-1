@@ -1,6 +1,8 @@
 #ifndef _SERVERTYPES_H_
 #define _SERVERTYPES_H_
 
+//#define OPEN_API_ON
+
 struct ServerInfor
 {
 	std::string m_Ip;		//服务器绑定的IP

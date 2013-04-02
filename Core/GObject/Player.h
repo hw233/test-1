@@ -523,6 +523,7 @@ namespace GObject
             lastTjEventScore = 0;
             lastTjTotalScore = 0;
             isHHBlue = false;
+            isHHYellow = false;
         }
 
 
@@ -608,6 +609,7 @@ namespace GObject
         int   lastTjTotalScore;      //天劫活动积分
 
         bool isHHBlue;
+        bool isHHYellow;
         std::string nameNoSuffix;     //(合服)不带后缀的用户名
         std::map<UInt8, UInt32> titleAll;      //玩家所有的称号id
         std::vector<UInt32> canHirePet;     //玩家未招募的仙宠
@@ -856,6 +858,11 @@ namespace GObject
                 _playerData.qqvipl -= 40;
                 _playerData.isHHBlue = true; // XXX: 豪华蓝钻
             }
+            if (_playerData.qqvipl >= 60 && _playerData.qqvipl < 70)
+            {
+                _playerData.qqvipl -= 60;
+                _playerData.isHHYellow = true; // XXX: 豪华黄钻
+            }
         }
         inline void setQQVipl1(UInt8 lvl)
         {
@@ -870,6 +877,11 @@ namespace GObject
                  if (_playerData.qqvipl >= 30 && _playerData.qqvipl < 40)
                      _playerData.isHHBlue = true;
             }
+            else if (lvl >= 61 && lvl < 70)
+            {
+                 _playerData.qqvipl1 -= 60;
+                 _playerData.isHHYellow = true;
+            }
         }
         inline UInt8 getQQVipl() { return _playerData.qqvipl; }
         inline UInt8 getQQVipl1() { return _playerData.qqvipl1; }
@@ -878,7 +890,12 @@ namespace GObject
         inline UInt8 getPF()
         {
             if (_playerData.qqvipl >= 1 && _playerData.qqvipl <= 9)
-                return (2<<4)|_playerData.qqvipl;
+            {
+                if (_playerData.isHHYellow)
+                    return (6<<4)|_playerData.qqvipl;
+                else
+                    return (2<<4)|_playerData.qqvipl;
+            }
             if (_playerData.qqvipl >= 10 && _playerData.qqvipl <= 19)
             {
                 if (_playerData.isHHBlue)
@@ -907,6 +924,7 @@ namespace GObject
         //      30-39 Q+等级,另qqvipl1为会员等级(现归属QQ会员)
         //      40-49 QQ会员等级
         //      50-60 豪华蓝钻(需要转换成蓝钻)
+        //      61-70 豪华黄钻(需要转换成黄钻)
         inline bool isYD() const
         {
             //return (_playerData.qqvipl >= 1 && _playerData.qqvipl <= 9) || (_playerData.qqvipl >= 30 && _playerData.qqvipl <= 39);

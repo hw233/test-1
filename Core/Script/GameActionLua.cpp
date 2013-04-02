@@ -120,7 +120,6 @@ namespace Script
 		lua_tinker::def(_L, "getRandOEquip",	GObject::getRandOEquip);
 		lua_tinker::def(_L, "getRandPEquip",	GObject::getRandPEquip);
         lua_tinker::def(_L, "getRandGem" ,      GObject::getRandGem);
-		lua_tinker::def(_L, "getChingMing", GObject::World::getChingMing);
 		lua_tinker::def(_L, "getGemMergeAct", GObject::World::getGemMergeAct);
 		lua_tinker::def(_L, "getEnchantGt11", GObject::World::getEnchantGt11);
         lua_tinker::def(_L, "getBlueDiamondAct", GObject::World::getBlueDiamondAct);

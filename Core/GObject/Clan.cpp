@@ -4230,7 +4230,7 @@ void Clan::broadcastClanBattle(Player *caller)
 {
     UInt32 now = TimeUtil::Now();
     UInt32 startTime = TimeUtil::SharpDayT(0, now) + RANK_BATTLE_SIGNUP_BEGINTIME;
-    UInt32 endTime = startTime + RANK_BATTLE_SIGNUP_TIME;
+    UInt32 endTime = startTime + RANK_BATTLE_SIGNUP_TIME + FULL_BATTLE_TIME * BATTLE_NUM_PER_DAY;
     if(now < startTime || now > endTime)
         return;
     Mutex::ScopedLock lk(_mutex);
