@@ -308,6 +308,7 @@ void Athletics::beAttack(Player * atker, UInt16 formation, UInt16 portrait, Line
 			bf->setHP(0);
 		}
 	}
+    atker->PutPets(bsim, 0);
 	_owner->PutFighters( bsim, 1, true );
 	bsim.start();
 	bool res = bsim.getWinner() == 1;
@@ -622,6 +623,7 @@ void Athletics::beAttackMartial(Player * atker, UInt16 formation, UInt16 portrai
 			bf->setHP(0);
 		}
 	}
+    atker->PutPets(bsim, 0);
 	_owner->PutFighters( bsim, 1, true );
 	bsim.start();
 	bool res = bsim.getWinner() == 1;

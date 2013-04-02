@@ -88,6 +88,7 @@ enum
     e_eft_atk_pet_mark_extra_dmg = 23,  // 攻击带神兽印记的造成额外攻击
     e_eft_protect_pet_100 = 24,         // 宠物100%保护目标
     e_eft_pet_atk_100 = 25,             // 宠物100%帮目标合击
+    e_eft_pet_protect_reduce = 26,      // 宠物援护免伤
 
     e_eft_max
 };

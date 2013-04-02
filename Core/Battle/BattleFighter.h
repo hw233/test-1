@@ -566,6 +566,8 @@ private:
 	UInt8 _petAttackAddCD, _petMagAtkAddCD, _petAtkReduceCD, _petMagAtkReduceCD;
     float _petExAtk;
     bool  _petExAtkEnable;
+    UInt16 _petExAtkId;
+
     float _bleedMo;
     UInt8 _bleedMoLast;
     BattleFighter* _summoner;
@@ -830,10 +832,11 @@ public:
     inline float getPetAtkReduce() { return _petAtkReduce; }
     inline float getPetMagAtkReduce() { return _petMagAtkReduce; }
 
-    inline void setPetExAtk(float v) { _petExAtk = v;}
+    inline void setPetExAtk(float v, UInt16 skillId) { _petExAtk = v; _petExAtkId = skillId;}
     inline float getPetExAtk() { return _petExAtk; }
     inline void setPetExAtkEnable(bool v) { _petExAtkEnable = v;}
     inline bool getPetExAtkEnable() { return _petExAtkEnable; }
+    inline UInt16 getPetExAtkId() { return _petExAtkId; }
 
     bool releasePetAttackAdd();
     bool releasePetMagAtkAdd();

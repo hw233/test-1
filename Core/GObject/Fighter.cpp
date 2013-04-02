@@ -4173,6 +4173,8 @@ void Fighter::setAttrValue3(UInt16 v, bool force)
 
 UInt8 Fighter::getAttrType1(bool notify)
 {
+    if(isPet())
+        return 0;
     UInt8 ret = 1;
     if (!_attrType1)
         ret = forge(1, 0, true);
@@ -4183,6 +4185,8 @@ UInt8 Fighter::getAttrType1(bool notify)
 
 UInt16 Fighter::getAttrValue1(bool notify)
 {
+    if(isPet())
+        return 0;
     UInt8 ret = 1;
     if (!_attrType1)
         ret = forge(1, 0, true);
@@ -4193,6 +4197,8 @@ UInt16 Fighter::getAttrValue1(bool notify)
 
 UInt8 Fighter::getAttrType2(bool notify)
 {
+    if(isPet())
+        return 0;
     UInt8 ret = 1;
     if (_potential + 0.005f >= 1.2f && !_attrType2)
         ret = forge(2, 0, true);
@@ -4203,6 +4209,8 @@ UInt8 Fighter::getAttrType2(bool notify)
 
 UInt16 Fighter::getAttrValue2(bool notify)
 {
+    if(isPet())
+        return 0;
     UInt8 ret = 1;
     if (_potential + 0.005f >= 1.2f && !_attrType2)
         ret = forge(2, 0, true);
@@ -4213,6 +4221,8 @@ UInt16 Fighter::getAttrValue2(bool notify)
 
 UInt8 Fighter::getAttrType3(bool notify)
 {
+    if(isPet())
+        return 0;
     UInt8 ret = 1;
     if (_potential + 0.005f >= 1.5f && _capacity >= 7.0 && !_attrType3)
         ret = forge(3, 0, true);
@@ -4223,6 +4233,8 @@ UInt8 Fighter::getAttrType3(bool notify)
 
 UInt16 Fighter::getAttrValue3(bool notify)
 {
+    if(isPet())
+        return 0;
     UInt8 ret = 1;
     if (_potential + 0.005f >= 1.5f && _capacity >= 7.0 && !_attrType3)
         ret = forge(3, 0, true);
