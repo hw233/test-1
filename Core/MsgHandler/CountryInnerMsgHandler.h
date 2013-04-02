@@ -735,7 +735,7 @@ void OnDailyCheck( GameMsgHdr& hdr, const void * data )
     */
     if (World::_blueactiveday)
         player->onBlueactiveday();
-    player->GetShuoShuo()->reset();
+    player->GetShuoShuo()->reset(player->isOnline());
     player->GetCFriend()->reset(player->isOnline());
     player->sendSSDTInfo();
     player->send11DailyInfo();
