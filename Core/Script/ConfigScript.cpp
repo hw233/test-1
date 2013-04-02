@@ -50,6 +50,7 @@ ConfigScript::ConfigScript( Cfg * cfg )
     class_def<Cfg>("setSecDCLogTest", &Cfg::setSecDCLogTest);   // 安全上报内测区调试用
     class_def<Cfg>("setUnionPlatform", &Cfg::setUnionPlatform);
     class_def<Cfg>("setAutoForbid", &Cfg::setAutoForbid);       // 设置自动封交易功能
+    class_def<Cfg>("setAutoKick", &Cfg::setAutoKick);           // 设置openid校验自动踢人功能
 	class_def<Cfg>("setRPServer", &Cfg::setRPServer);
 	set("cfg", cfg);
 }

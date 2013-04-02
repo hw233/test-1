@@ -321,7 +321,11 @@ void WorldServer::Shutdown()
 	//关闭所有工作线程
 	for (worker = 0; worker < MAX_THREAD_NUM; worker++)
 	{
+#ifdef OPEN_API_ON
+		if(worker < WORKER_THREAD_DB && worker != WORKER_THREAD_OPEN_API)
+#else
 		if(worker < WORKER_THREAD_DB)
+#endif
 			m_AllWorker[worker]->Shutdown();
 	}
 
@@ -337,6 +341,9 @@ void WorldServer::Shutdown()
 	m_AllWorker[WORKER_THREAD_DB8]->Shutdown();
 	m_AllWorker[WORKER_THREAD_DB_LOG]->Shutdown();
 	m_AllWorker[WORKER_THREAD_DB_LOG1]->Shutdown();
+#ifdef OPEN_API_ON
+    m_AllWorker[WORKER_THREAD_OPEN_API]->Shutdown();
+#endif
 }
 
 #define MAX_RET_LEN 1024
