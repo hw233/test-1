@@ -15,16 +15,6 @@
 namespace GObject
 {
 
-    //战斗准备时间
-    const static UInt32 PREPARE_TIME = 5 * 60;
-    //实际战斗时间
-    const static UInt32 BATTLE_TIME = 7 * 60;
-    //完整战斗时间
-    const static UInt32 FULL_BATTLE_TIME = PREPARE_TIME + BATTLE_TIME;
-    //每天战斗次数
-    const static UInt32 BATTLE_NUM_PER_DAY = 5;
-
-
     //每个战场的分数
     const static UInt32 BATTLE_FIELD_SCORE[] = {3, 5, 6, 7, 8, 10};
     //胜利方额外积分
