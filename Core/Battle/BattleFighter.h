@@ -928,6 +928,7 @@ public:
     float _counter_spirit_efv;
     std::vector<float> _counter_spirit_factor;
     UInt16 _counter_spirit_skillid;
+    UInt8 _counter_spirit_skill_cd;
 
     inline UInt8 getCounterSpiritTimes() { return _counter_spirit_times; }
     void addCounterSpiritBuf(float atk, float magatk, float def, float magdef, UInt8 last);

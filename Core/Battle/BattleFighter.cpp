@@ -64,7 +64,7 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _bleedRandom(0), _bleedRandomLast(0), _bleedAttackClass(1),_bleedBySkill(0), _bleedBySkillLast(0), _bleedBySkillClass(1),
     _hitChangeByPeerless(0),_counterChangeByPeerless(0),_bSingleAttackFlag(false),_bMainTargetDead(false),_nCurrentAttackIndex(0),
     _darkVigor(0), _dvFactor(0), _darkVigorLast(0), _hpShieldSelf(0), _hpShieldSelf_last(0),
-    _counter_spirit_atk_add(0), _counter_spirit_magatk_add(0), _counter_spirit_def_add(0), _counter_spirit_magdef_add(0), _counter_spirit_times(0), _counter_spirit_last(0), _counter_spirit_efv(0), _counter_spirit_skillid(0)
+    _counter_spirit_atk_add(0), _counter_spirit_magatk_add(0), _counter_spirit_def_add(0), _counter_spirit_magdef_add(0), _counter_spirit_times(0), _counter_spirit_last(0), _counter_spirit_efv(0), _counter_spirit_skillid(0), _counter_spirit_skill_cd(0)
 {
     memset(_immuneLevel, 0, sizeof(_immuneLevel));
     memset(_immuneRound, 0, sizeof(_immuneRound));
@@ -2640,7 +2640,7 @@ bool BattleFighter::releasePetAtk100()
 
 void BattleFighter::addCounterSpiritBuf(float atk, float magatk, float def, float magdef, UInt8 last)
 {
-    if(_counter_spirit_times < 5)
+    if(_counter_spirit_times < 3)
     {
         ++ _counter_spirit_times;
         _counter_spirit_atk_add += atk;
@@ -2655,25 +2655,33 @@ void BattleFighter::addCounterSpiritBuf(float atk, float magatk, float def, floa
 
 bool BattleFighter::releaseCounterSpirit()
 {
+    if(_counter_spirit_skill_cd != 0)
+        --_counter_spirit_skill_cd;
+
     if(_counter_spirit_last == 0)
         return false;
 
     -- _counter_spirit_last;
-    if(_counter_spirit_last == 0)
-    {
-        _counter_spirit_times = 0;
-        _counter_spirit_atk_add = 0;
-        _counter_spirit_def_add = 0;
-    }
+    if(_counter_spirit_last != 0)
+        return false;
 
+    _counter_spirit_times = 0;
+    _counter_spirit_atk_add = 0;
+    _counter_spirit_magatk_add = 0;
+    _counter_spirit_def_add = 0;
+    _counter_spirit_magdef_add = 0;
     return true;
 }
 
 void BattleFighter::setCounterSpiritSkill(UInt16 skillid, float efv, const std::vector<float>& factor)
 {
-    _counter_spirit_efv = efv;
-    _counter_spirit_factor = factor;
-    _counter_spirit_skillid = skillid;
+    if(_counter_spirit_skill_cd == 0)
+    {
+        _counter_spirit_efv = efv;
+        _counter_spirit_factor = factor;
+        _counter_spirit_skillid = skillid;
+        ++ _counter_spirit_skill_cd;
+    }
 }
 
 void BattleFighter::clearCounterSpiritSkill()

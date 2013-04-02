@@ -15629,6 +15629,8 @@ void EventTlzAuto::notify(bool isBeginAuto)
                 if(fighter)
                     bp += fighter->getBattlePoint();
             }
+            if(_onBattlePet)
+                bp += _onBattlePet->getBattlePoint();
             calcLingbaoBattlePoint();
         }
         else
@@ -15642,6 +15644,8 @@ void EventTlzAuto::notify(bool isBeginAuto)
                 if(fighter)
                     bp += fighter->getBattlePoint_Dirty();
             }
+            if(_onBattlePet)
+                bp += _onBattlePet->getBattlePoint_Dirty();
         }
 
         return bp;

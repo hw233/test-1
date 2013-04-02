@@ -294,8 +294,8 @@ private:
         e_unPetProtect100 = 82,   // 100%援护标志
         e_petAtk100 = 83,       // 100%合击标志
         e_unPetAtk100 = 84,       // 100%合击标志
-        e_counterSpirit = 84,     // 反击士气
-        e_unCounterSpirit = 85,   // 解除反击士气
+        e_counterSpirit = 85,     // 反击士气
+        e_unCounterSpirit = 86,   // 解除反击士气
 
         e_MAX_STATE,
     };

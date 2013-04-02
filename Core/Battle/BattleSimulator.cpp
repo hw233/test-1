@@ -971,7 +971,7 @@ UInt32 BattleSimulator::doSpiritAttack(BattleFighter * bf, BattleFighter* bo, fl
     {
         pr2 = bf->calcPierce(bo);
         float rate = bf->getCritical(bo);
-        if(uRand(10000) < (rate > 0 ? rate : 0) * 100);
+        if(uRand(10000) < (rate > 0 ? rate : 0) * 100)
         {
             float factor = bf->getCriticalDmg() - bo->getTough(bf);
             if(factor < 1)
@@ -988,8 +988,9 @@ UInt32 BattleSimulator::doSpiritAttack(BattleFighter * bf, BattleFighter* bo, fl
         dmg *= static_cast<float>(950 + _rnd(100)) / 1000;
         dmg = dmg > 0 ? dmg : 1;
 
+        UInt32 dmg2 = dmg;
         makeDamage(bo, dmg);
-        appendDefStatus(e_damNormal, dmg, bo, e_damagePhysic);
+        appendDefStatus(e_damNormal, dmg2, bo, e_damagePhysic);
         // killed the target fighter
         if(bo->getHP() == 0)
         {
@@ -1002,13 +1003,12 @@ UInt32 BattleSimulator::doSpiritAttack(BattleFighter * bf, BattleFighter* bo, fl
     }
     else
     {
-        if(enterEvade)
+        if(!defend100)
         {
             appendDefStatus(e_damEvade, 0, bo);
             bo->setEvad100(false);
         }
-
-        if(defend100)
+        else
         {
             appendDefStatus(e_damOut, 0, bo);
             bo->setDefend100(false);
@@ -5933,7 +5933,7 @@ UInt32 BattleSimulator::doAttack( int pos )
 
         UInt8 times = mainTarget->getCounterSpiritTimes();
         float atk = mainTarget->getCounterSpiritAtk();
-        if(times >= 5 && atk > 0.001f)
+        if(times >= 3 && atk > 0.001f)
         {
             _activeFgt = mainTarget;
             std::vector<float>& factors = mainTarget->getCounterSpiritFactor();
@@ -5945,7 +5945,7 @@ UInt32 BattleSimulator::doAttack( int pos )
             for(int i = 0; i < 25; ++ i)
             {
                 BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
-                if(!bo)
+                if(!bo || bo->getHP() == 0)
                     continue;
                 float factor = 1.0f;
                 if(fsize > 0)
@@ -7352,6 +7352,14 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
     if(bf->releaseCounterSpirit())
     {
         appendDefStatus(e_unCounterSpirit, 0, bf);
+        UInt32 value = static_cast<UInt32>(bf->getAttack());
+        appendStatusChange(e_stAtk, value, 0, bf);
+        value = static_cast<UInt32>(bf->getMagAttack());
+        appendStatusChange(e_stMagAtk, value, 0, bf);
+        value = static_cast<UInt32>(bf->getDefend());
+        appendStatusChange(e_stDef, value, 0, bf);
+        value = static_cast<UInt32>(bf->getMagDefend());
+        appendStatusChange(e_stMagDef, value, 0, bf);
     }
 
     if (bf->releasePetAttackAdd())
@@ -10253,8 +10261,8 @@ void BattleSimulator::doSkillEffectExtraCounter(BattleFighter* bf, BattleFighter
             value = static_cast<UInt32>(bf->getDefend());
             appendStatusChange(e_stDef, value, skillId, bf);
             value = static_cast<UInt32>(bf->getMagDefend());
-            appendStatusChange(e_stDef, value, skillId, bf);
-            if(times >= 5)
+            appendStatusChange(e_stMagDef, value, skillId, bf);
+            if(times >= 3)
                 bf->setCounterSpiritSkill(skill->getId(), efv[i], skill->factor);
         }
     }
