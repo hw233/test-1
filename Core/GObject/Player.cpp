@@ -18725,6 +18725,9 @@ void Player::buyRP7Treasure(UInt8 idx)
         }
         else
         {
+            if(!hasChecked())
+                return;
+ 
      		if (getGold() < s_gold[idx])
             {
                 res = 3;
@@ -18867,6 +18870,9 @@ void Player::RP7Sign(UInt8 idx)
     }
     if (idx < day)
     {
+        if(!hasChecked())
+            return;
+ 
         if (getGold() < 10)
         {
             sendMsgCode(0, 1104);
