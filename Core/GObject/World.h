@@ -384,6 +384,10 @@ public:
     { _newYearQQGameAct= v; }
     inline static bool getNewYearQQGameAct()
     { return _newYearQQGameAct; }
+    inline static void setQZoneQQGameAct(bool v)
+    { _QZoneQQGameAct= v; }
+    inline static bool getQZoneQQGameAct()
+    { return _QZoneQQGameAct; }
     inline static void setNewYearQzoneContinueAct(bool v)
     { _newYearQzoneContinueAct= v; }
     inline static bool getNewYearQzoneContinueAct()
@@ -733,6 +737,7 @@ public:
     static bool _feastloginAct;
     static bool _newYearGiveGiftAct;
     static bool _newYearQQGameAct;
+    static bool _QZoneQQGameAct;
     static bool _newYearQzoneContinueAct;
     static UInt8 _towerloginAct;
     static bool _guoqing;

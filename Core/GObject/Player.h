@@ -2155,6 +2155,8 @@ namespace GObject
         void sendFeastGiftAct();
         void getNewYearQQGameAward(UInt8 type);
         void sendNewYearQQGameAct();
+        void getQZoneQQGameAward(UInt8 domainType, UInt8 type);
+        void sendQZoneQQGameAct(UInt8 domainType);
         void getNewYearQzoneContinueAward(UInt8 type);
         void sendNewYearQzoneContinueAct();
         void calcNewYearQzoneContinueDay(UInt32 time);

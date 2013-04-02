@@ -152,6 +152,7 @@ bool World::_saveGoldAct= false;
 bool World::_feastloginAct= false;
 bool World::_newYearGiveGiftAct= false;
 bool World::_newYearQQGameAct= false;
+bool World::_QZoneQQGameAct= false;
 bool World::_newYearQzoneContinueAct= false;
 UInt8 World::_towerloginAct= 0;
 bool World::_guoqing= false;

@@ -367,6 +367,7 @@ namespace GObject
         VAR_TRAINP3 = 407,
         VAR_ONLINE_TOTAL_TIME = 408, //累计在线时间
         VAR_ONLINE_AWARD = 409, //累计在线奖励是否领取
+        VAR_QZONE_QQGAME_ACT = 410, //空间黄钻(bit1表示普通，bit2表示会员)、大厅蓝钻礼包(bit3表示普通，bit4表示会员)
 
         //421-430 for suntao
         VAR_HUNYUAN_STEP = 421, //大闹龙宫之混元剑诀
@@ -698,6 +699,7 @@ namespace GObject
             REGISTER_VAR(VAR_TRAINP3, CYCLE_NONE);
             REGISTER_VAR(VAR_ONLINE_TOTAL_TIME, CYCLE_DAY);
             REGISTER_VAR(VAR_ONLINE_AWARD, CYCLE_DAY);
+            REGISTER_VAR(VAR_QZONE_QQGAME_ACT, CYCLE_DAY);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

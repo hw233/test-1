@@ -1260,7 +1260,8 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     {
         pl->getClan()->sendQQOpenid(pl);
     }
-
+    pl->sendQZoneQQGameAct(1);
+    pl->sendQZoneQQGameAct(2);
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -1916,6 +1917,18 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
                 player->sendQQGameOnlineAward();
             else if(type == 1)
                 player->getQQGameOnlineAward();
+        }
+        break;
+
+        case 0x0C:
+        {
+            if(!World::getQZoneQQGameAct())
+                return;
+            UInt8 domainType;
+            UInt8 type;
+            br >> domainType;
+            br >> type;
+            player->getQZoneQQGameAward(domainType,type);
         }
         break;
 

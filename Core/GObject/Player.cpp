@@ -17089,6 +17089,108 @@ void Player::getNewYearQQGameAward(UInt8 type)
     }
 }
 
+void Player::getQZoneQQGameAward(UInt8 domainType, UInt8 type)
+{
+    if(domainType == 1)
+    {
+        if(atoi(m_domain) != 1)
+            return;
+        if(type == 0 || type > 2)
+            return;
+        bool bRet;
+        UInt32 status = GetVar(VAR_QZONE_QQGAME_ACT);
+        if(type == 1)
+        {
+            if(status & 0x01)
+                return;
+            bRet = GameAction()->onGetQZoneQQGameAward(this, 1);
+            if(bRet)
+            {
+                status |= 0x01;
+                SetVar(VAR_QZONE_QQGAME_ACT, status);
+                sendQZoneQQGameAct(domainType);
+            }
+        }
+        else
+        {
+            if(status & 0x02)
+                return;
+            if(!isYD())
+                return;
+            bRet = GameAction()->onGetQZoneQQGameAward(this, 2);
+            if(bRet)
+            {
+                status |= 0x02;
+                SetVar(VAR_QZONE_QQGAME_ACT, status);
+                sendQZoneQQGameAct(domainType);
+            }
+        }
+    }
+    else if(domainType == 2)
+    {
+        if(atoi(m_domain) != 10)
+            return;
+        if(type == 0 || type > 2)
+            return;
+        bool bRet;
+        UInt32 status = GetVar(VAR_QZONE_QQGAME_ACT);
+        if(type == 1)
+        {
+            if(status & 0x04)
+                return;
+            bRet = GameAction()->onGetQZoneQQGameAward(this, 1);
+            if(bRet)
+            {
+                status |= 0x04;
+                SetVar(VAR_QZONE_QQGAME_ACT, status);
+                sendQZoneQQGameAct(domainType);
+            }
+        }
+        else
+        {
+            if(status & 0x08)
+                return;
+            if(!isBD())
+                return;
+            bRet = GameAction()->onGetQZoneQQGameAward(this, 2);
+            if(bRet)
+            {
+                status |= 0x08;
+                SetVar(VAR_QZONE_QQGAME_ACT, status);
+                sendQZoneQQGameAct(domainType);
+            }
+        }
+    }
+}
+
+void Player::sendQZoneQQGameAct(UInt8 domainType)
+{
+    if(!World::getQZoneQQGameAct())
+        return;
+    if(domainType != 1)
+    {
+        if(atoi(m_domain) != 1)
+            return;
+    }
+    else if(domainType != 2)
+    {
+        if(atoi(m_domain) != 10)
+            return;
+    }
+    else
+        return;
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(0x0C);
+    UInt8 opt = GetVar(VAR_QZONE_QQGAME_ACT);
+    if(domainType == 1)
+        opt = opt & 0x3;
+    else
+        opt = (opt >> 2) & 0x03;
+    st << opt;
+    st << Stream::eos;
+    send(st);
+}
+
 void Player::sendNewYearQQGameAct()
 {
     if(!World::getNewYearQQGameAct())
