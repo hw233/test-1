@@ -5,6 +5,7 @@
 #include "Common/Itoa.h"
 #include "Common/StringTokenizer.h"
 #include "Server/SysMsg.h"
+#include "Log/Log.h"
 #include "Fighter.h"
 #include "MsgID.h"
 #include "FairyPet.h"
@@ -190,19 +191,20 @@ namespace GObject
         UInt32 longYuan = _owner->GetVar(VAR_FAIRYPET_LONGYUAN);
         if(longYuan < pjd->consume)
             return;
-        _owner->SetVar(VAR_FAIRYPET_LONGYUAN, longYuan - pjd->consume);
+        ConsumeInfo ci(PinjieUpForPet, 0, 0);
+        _owner->useLongyuan(pjd->consume, &ci);
         if(GRND(10000) <= pjd->prob + getPinjieBless())
         {   //成功
             levUp();
             reset(1);
             setLevel(getPetLev());
             updateToDB(2, getLevel());
-			SYSMSG_SENDV(4132, _owner);
+            _owner->sendMsgCode(0, 4000);
         }
         else
         { //失败
             addPinjieBless(1);
-			SYSMSG_SENDV(4133, _owner);
+            _owner->sendMsgCode(0, 4001);
         }
         sendPinjieInfo();
         UpdateToDB();
@@ -219,13 +221,13 @@ namespace GObject
         if(longYuan < pjd->consume)
             return;
         UInt8 num = 0, isSucc = 0;
+        UInt32 used = 0;
         while(true)
         {
-            longYuan = _owner->GetVar(VAR_FAIRYPET_LONGYUAN);
-            if(longYuan < pjd->consume)
+            if(longYuan < pjd->consume + used)
                 break;
             ++ num;
-            _owner->SetVar(VAR_FAIRYPET_LONGYUAN, longYuan - pjd->consume);
+            used += pjd->consume;
             if(GRND(10000) <= pjd->prob + getPinjieBless())
             {   //成功
                 levUp();
@@ -240,6 +242,8 @@ namespace GObject
                 addPinjieBless(1);
             }
         }
+        ConsumeInfo ci(PinjieUpForPet, 0, 0);
+        _owner->useLongyuan(used, &ci);
         UpdateToDB();
         Stream st(REP::FAIRY_PET);
         st << static_cast<UInt8>(0x01) << static_cast<UInt8>(0x03);
@@ -262,16 +266,16 @@ namespace GObject
             reset(2);
             reset(3);
             boneUp();
-			SYSMSG_SENDV(4134, _owner);
+            _owner->sendMsgCode(0, 4002);
         }
         else
         {   //失败
-            addChongNum(-5);
+            addChongNum(0 - (getChongNum()+1)/2);
             if(getChongNum() < ggd->limit)
                 reset(2);
             else
                 addGenguBless(-500);
-			SYSMSG_SENDV(4135, _owner);
+            _owner->sendMsgCode(0, 4003);
         }
         sendGenguInfo();
         UpdateToDB();
@@ -317,13 +321,14 @@ namespace GObject
             }
             else
             {
-                _owner->SetVar(VAR_FAIRYPET_FENGSUI, fengSui - ggd->consume1);
+                ConsumeInfo ci(GenguUpForPet, 0, 0);
+                _owner->useFengsui(ggd->consume1, &ci);
                 xiaoZhou = (xiaoZhou / 10 + 1) * 10 + xiaoZhou % 10;
             }
             if(isLucky)
             {
                 chong = 2;
-		        SYSMSG_SENDV(4136, _owner, chong);
+		        SYSMSG_SENDV(4144, _owner, chong);
             }
             else
                 chong = 1;
@@ -343,13 +348,14 @@ namespace GObject
             }
             else
             {
-                _owner->SetVar(VAR_FAIRYPET_FENGSUI, fengSui - ggd->consume2);
+                ConsumeInfo ci(GenguUpForPet, 0, 0);
+                _owner->useFengsui(ggd->consume2, &ci);
                 daZhou = (daZhou / 10 + 1) * 10 + daZhou % 10;
             }
             if(isLucky)
             {
                 chong = 6;
-		        SYSMSG_SENDV(4136, _owner, chong);
+		        SYSMSG_SENDV(4144, _owner, chong);
             }
             else
                 chong = 3;
@@ -371,7 +377,7 @@ namespace GObject
         st << static_cast<UInt8>(0x01) << static_cast<UInt8>(0x00);
         st << getId();
         st << _owner->GetVar(VAR_FAIRYPET_LONGYUAN);
-        st << getPetLev() << getPinjieBless();
+        st << getPetLev() << _pinjieBless;
         st << Stream::eos;
         _owner->send(st);
     }

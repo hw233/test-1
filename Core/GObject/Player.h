@@ -2167,8 +2167,9 @@ namespace GObject
 		std::map<UInt32, FairyPet *> _fairyPets;
         FairyPet * _onBattlePet;
     public:
-        FairyPet * getBattlePet() { return _onBattlePet; }
-        UInt8 getCanHirePetNum() { return _playerData.canHirePet.size();}
+        inline FairyPet * getBattlePet() { return _onBattlePet; }
+        inline UInt8 getCanHirePetNum() { return _playerData.canHirePet.size();}
+        void setCanHirePet(UInt32 id);
 	    FairyPet * findFairyPet(UInt32);
         bool hasCanHirePet(UInt32);
         bool delCanHirePet(UInt32);
@@ -2183,6 +2184,15 @@ namespace GObject
         void addFairyPet(FairyPet *, bool = true);
         void seekFairyPet(UInt8, UInt8);
         void getFariyPetSpaceInfo();
+        void getPetByLevelUp(UInt8);
+
+        UInt32 getXianyuanLua(UInt32);
+        UInt32 getXianyuan( UInt32 c, IncommingInfo* ii = NULL);
+        UInt32 getFengsui( UInt32 c, IncommingInfo* ii);
+        UInt32 getLongyuan( UInt32 c, IncommingInfo* ii);
+	    UInt32 useXianyuan( UInt32 a, ConsumeInfo * ci );
+	    UInt32 useFengsui( UInt32 a, ConsumeInfo * ci );
+	    UInt32 useLongyuan( UInt32 a, ConsumeInfo * ci );
 
 	};
 

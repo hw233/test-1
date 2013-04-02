@@ -102,12 +102,22 @@ enum PurchaseType
     DreamerConsume              = 91,
     NewYearGetDouble            = 92, //迎新纳福，补领双倍
     BuyTownTjTrump              = 93, //购买天劫法宝
+    YouliForPet                 = 94, //游历仙宠消耗仙缘
+    PinjieUpForPet              = 95, //仙宠品阶升级消耗龙元
+    GenguUpForPet               = 96, //仙宠根骨升级消耗凤髓
     //繁体私有占150～200
 };
 
 enum IncomingType
 {
-    InFromSale = 128,
+    InFromSale                  = 128,
+    XianyuanFromUseItem         = 129, //使用物品仙缘石
+    LongyuanFromYouli           = 130, //游历获得龙元
+    LongyuanFromConvert         = 131, //放生获得龙元
+    LongyuanFromUseItem         = 132, //使用物品获得龙元
+    FengsuiFromYouli            = 133, //游历获得凤髓
+    FengsuiFromConvert          = 134, //放生获得凤髓
+    FengsuiFromUseItem          = 135, //使用物品获得凤髓
 };
 
 enum MoneyType
