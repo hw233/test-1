@@ -1120,13 +1120,19 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
 
             if (bf && !bf->getStunRound() && !bf->getConfuseRound() && ! bf->getForgetRound())
             {
+                // XXX: 现在只做仙宠攻击有标记的散仙加成
                 const GData::SkillBase* passiveSkill = NULL;
                 size_t idx = 0;
-                while (NULL != (passiveSkill = bf->getPassiveSkillOnAtkDmg100(idx)))
+                if (area_target->isPetMark())
                 {
-                    // XXX: 现在只做仙宠攻击有标记的散仙加成
-                    if (area_target->isPetMark() && bf->isPet()  && passiveSkill->effect)
-                        factor += passiveSkill->effect->crrdam;
+                    while (NULL != (passiveSkill = bf->getPassiveSkillOnAtkDmg100(idx)))
+                    {
+                        if (area_target->isPetMark() && bf->isPet()  && passiveSkill->effect)
+                        {
+                            appendDefStatus(e_skill, passiveSkill->getId(), bf);
+                            factor += passiveSkill->effect->crrdam;
+                        }
+                    }
                 }
             }
 
@@ -4915,7 +4921,10 @@ UInt32 BattleSimulator::doSkillAttackAftEnter(BattleFighter* bf, const GData::Sk
             else if(skill->effect->hp > 0 || skill->effect->addhp > 0 || skill->effect->hpP > 0.001)
             {
                 if (doSkillAttack(bf, skill, target_side, target_pos, 1))
+                {
                     ++ rcnt;
+                    return rcnt;
+                }
             }
             else if ((skill->effect->atk > 0 || skill->effect->atkP > 0) && bf->isPet())
             {
@@ -4926,7 +4935,10 @@ UInt32 BattleSimulator::doSkillAttackAftEnter(BattleFighter* bf, const GData::Sk
                     || skill->effect->crrdam || skill->effect->crrdamP || skill->effect->addcrr)
             {
                 if (doSkillAttack(bf, skill, target_side, target_pos, 1))
+                {
                     ++ rcnt;
+                    return rcnt;
+                }
             }
             else
             {
@@ -9760,7 +9772,7 @@ void BattleSimulator::doSkillEffectExtra_MarkPet(BattleFighter* bf, int target_s
 {
     // 上神兽印记
     BattleObject * bo = getObject(target_side, target_pos);
-    if (!bo || !bo->isChar())
+    if (!bo || !bo->isChar() || !bo->getHP())
         return;
     BattleFighter* bf2 = static_cast<BattleFighter*>(bo);
     bf2->setPetMark(true);
@@ -9777,6 +9789,8 @@ void BattleSimulator::doSkillEffectExtra_AtkPetMarkAura(BattleFighter* bf, int t
     if (bf->isPet() && bf2->isPetMark())
     {
         bf->AddAura(skill->effect->efv[eftIdx]);
+        UInt32 value2 = static_cast<UInt32>(bf->getAura());
+        appendStatusChange(e_stAura, value2, 0, bf);
     }
 }
 

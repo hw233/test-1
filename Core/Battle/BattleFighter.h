@@ -42,6 +42,7 @@ public:
 	inline UInt32 getId() { return _fighter->getId(); }
 	inline UInt8 getClass() { return _fighter->getClass(); }
 	inline UInt8 getLevel() { return _fighter->getLevel(); }
+	inline UInt8 getLevelInLua() { return _fighter->getLevelInLua(); }
 	inline UInt8 getColor() { return _fighter->getColor(); }
 	inline float getPotential() { return _fighter->getPotential(); }
     inline UInt32 getBuffData( UInt8 idx, UInt32 now ) { return _fighter->getBuffData(idx, now); }

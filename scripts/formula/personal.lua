@@ -239,7 +239,7 @@ function calcStrength( fgt )
   end
   local cls = fgt:getClass()
   local pot = fgt:getPotential()
-  local lvl = fgt:getLevel() - 1
+  local lvl = fgt:getLevelInLua() - 1
   return (str + pot * str_factor[cls] * lvl) * (1 + fgt:getExtraStrengthPercent()) + fgt:getExtraStrength()
 end
 
@@ -253,7 +253,7 @@ function calcPhysique( fgt )
   end
   local cls = fgt:getClass()
   local pot = fgt:getPotential()
-  local lvl = fgt:getLevel() - 1
+  local lvl = fgt:getLevelInLua() - 1
   return (phy + pot * phy_factor[cls] * lvl) * (1 + fgt:getExtraPhysiquePercent()) + fgt:getExtraPhysique()
 end
 
@@ -267,7 +267,7 @@ function calcAgility( fgt )
   end
   local cls = fgt:getClass()
   local pot = fgt:getPotential()
-  local lvl = fgt:getLevel() - 1
+  local lvl = fgt:getLevelInLua() - 1
   return (agi + pot * agi_factor[cls] * lvl) * (1 + fgt:getExtraAgilityPercent()) + fgt:getExtraAgility()
 end
 
@@ -281,7 +281,7 @@ function calcIntelligence( fgt )
   end
   local cls = fgt:getClass()
   local pot = fgt:getPotential()
-  local lvl = fgt:getLevel() - 1
+  local lvl = fgt:getLevelInLua() - 1
   return (int + pot * int_factor[cls] * lvl) * (1 + fgt:getExtraIntelligencePercent()) + fgt:getExtraIntelligence()
 end
 
@@ -295,7 +295,7 @@ function calcWill( fgt )
   end
   local cls = fgt:getClass()
   local pot = fgt:getPotential()
-  local lvl = fgt:getLevel() - 1
+  local lvl = fgt:getLevelInLua() - 1
   return (wil + pot * wil_factor[cls] * lvl) * (1 + fgt:getExtraWillPercent()) + fgt:getExtraWill()
 end
 
@@ -309,7 +309,7 @@ function calcHP( fgt )
       return hp * (1 + fgt:getExtraHPPercent()) + fgt:getExtraHP()
   end
   local cls = fgt:getClass()
-  local lvl = fgt:getLevel() - 1
+  local lvl = fgt:getLevelInLua() - 1
   return (hp + hp_factor[cls] * lvl + phy_hp_factor * calcPhysique(fgt)) * (1 + fgt:getExtraHPPercent()) + fgt:getExtraHP()
 end
 
@@ -322,7 +322,7 @@ function calcAction( fgt )
       return act + fgt:getExtraAction()
   end
   local cls = fgt:getClass()
-  local lvl = fgt:getLevel() - 1
+  local lvl = fgt:getLevelInLua() - 1
   return (act + action_factor[cls] * lvl) * (1 + fgt:getExtraActionPercent()) + fgt:getExtraAction();
 end
 
@@ -366,7 +366,7 @@ function calcHitRateLevel( fgt )
     end
     local hrate = fgt:getExtraHitrateLevel()
     local cls = fgt:getClass()
-    local lvl = fgt:getLevel() - 1
+    local lvl = fgt:getLevelInLua() - 1
     return hrate + hitrate_factor[cls] * lvl
 end
 
@@ -397,7 +397,7 @@ function calcAttack( fgt )
       return atk * (1 + fgt:getExtraAttackPercent()) + fgt:getExtraAttack()
   end
   local cls = fgt:getClass()
-  local lvl = fgt:getLevel() - 1
+  local lvl = fgt:getLevelInLua() - 1
   return ((atk + atk_factor[cls] * lvl + str_atk_factor * calcStrength(fgt)) * (1 + fgt:getExtraAttackPercent()) + fgt:getExtraAttack())
 end
 
@@ -410,7 +410,7 @@ function calcMagAttack( fgt )
       return magatk * (1 + fgt:getExtraMagAttackPercent()) + fgt:getExtraMagAttack()
   end
   local cls = fgt:getClass()
-  local lvl = fgt:getLevel() - 1
+  local lvl = fgt:getLevelInLua() - 1
   return ((magatk + magatk_factor[cls] * lvl + int_atk_factor * calcIntelligence(fgt)) * (1 + fgt:getExtraMagAttackPercent()) + fgt:getExtraMagAttack())
 end
 
@@ -423,7 +423,7 @@ function calcDefend( fgt )
       return def * (1 + fgt:getExtraDefendPercent()) + fgt:getExtraDefend()
   end
   local cls = fgt:getClass()
-  local lvl = fgt:getLevel() - 1
+  local lvl = fgt:getLevelInLua() - 1
   return (def + def_factor[cls] * lvl + agi_def_factor * calcAgility(fgt)) * (1 + fgt:getExtraDefendPercent()) + fgt:getExtraDefend()
 end
 
@@ -436,7 +436,7 @@ function calcMagDefend( fgt )
       return def * (1 + fgt:getExtraMagDefendPercent()) + fgt:getExtraMagDefend()
   end
   local cls = fgt:getClass()
-  local lvl = fgt:getLevel() - 1
+  local lvl = fgt:getLevelInLua() - 1
   return (def + magdef_factor[cls] * lvl + wil_def_factor * calcWill(fgt)) * (1 + fgt:getExtraMagDefendPercent()) + fgt:getExtraMagDefend()
 end
 
@@ -679,7 +679,7 @@ end
 --    return 0
 --  end
 --  if fgt:isNpc() then
---    local lvl = fgt:getLevel() - 1
+--    local lvl = fgt:getLevelInLua() - 1
 --    if lvl >= 70 then
 --      local cls = 1
 --      local atk = fgt:getBaseAttack()
