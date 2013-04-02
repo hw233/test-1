@@ -460,7 +460,7 @@ void Leaderboard::doUpdate()
 
     std::vector<LeaderboardLingbao> blist5;
 	execu->ExtractData("select p.id, p.name, e.itemId, l.tongling, l.lbcolor, l.types, l.values, l.skills, l.factors, l.battlepoint from player p, fighter f, equipment e, lingbaoattr l "
-            "where p.id=f.playerId and e.id = l.id and (f.lingbao REGEXP concat(',',l.id, '$') or f.lingbao REGEXP concat('^', l.id, ','))  order by l.battlepoint DESC limit 0, 100;", blist5);
+            "where p.id=f.playerId and e.id = l.id and (f.lingbao REGEXP concat(',',l.id, '$') or f.lingbao REGEXP concat('^', l.id, ',') or f.lingbao REGEXP concat(',', l.id, ',')) order by l.battlepoint DESC limit 0, 100;", blist5);
     {
         FastMutex::ScopedLock lk(_cmutex);
          _lingbaoInfoList.clear(); 
@@ -526,39 +526,12 @@ void Leaderboard::doUpdate()
 
             _lingbaoInfoList.push_back(r);
 
-            if (_lingbaoRank[r.id] && (_lingbaoRank[r.id] > static_cast<int>(i+1)))
+            if ((_lingbaoRank[r.id] == 0) || (_lingbaoRank[r.id] > static_cast<int>(i+1)))
                 _lingbaoRank[r.id] = i+1;
         }
 	    buildPacketForLingbao(_lingbaoStream, 6, _id, _lingbaoInfoList);
     }
 
-    /*
-    execu->ExtractData("SELECT `player`.`id`, `player`.`name`, `fighter`.`level`, `player`.`country`, `var`.`data`, `clan`.`name` FROM "
-            "(`player` CROSS JOIN `fighter` ON `player`.`id` = `fighter`.`playerId` AND `fighter`.`id` < 10) "
-            "LEFT JOIN (`var`, `clan_player`, `clan`) ON `player`.`id` = `clan_player`.`playerId` AND `clan_player`.`id` = `clan`.`id` "
-            "where `var`.`id` =  442 AND `var`.`over` <= NOW() ORDER BY `var`.`data` DESC LIMIT 0, 100;", blist);
-    {
-        FastMutex::ScopedLock lk(_cmutex);
-        Player* curPlayer = globalPlayers[blist[c].id];
-        if(curPlayer && curPlayer->getClan())
-        {
-            curPlayer->patchMergedName(curPlayer->getClan()->getFounder(), blist[c].clan);
-        }
-        if (curPlayer == NULL)
-            continue;
-        RankingInfoList r;
-        r.id = curPlayer->getId();
-        r.name = curPlayer->getName();
-        r.country = curPlayer->getCountry();
-        r.clanName = curPlayer->getClanName();
-        r.roleLevel = curPlayer->GetLev();
-        r.value = blist[c].value;
-        _playerPopularityRank.push_back(r);
-
-        //_playerLevelRank[curPlayer->getId()] = c+1;
-    }
-    */
-   
 
 	std::vector<UInt64> ilist;
 	size_t cnt;

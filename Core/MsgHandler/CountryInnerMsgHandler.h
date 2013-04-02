@@ -1935,7 +1935,6 @@ void OnCalcLBBattlePoint( GameMsgHdr &hdr, const void * data)
 void OnBeVoted( GameMsgHdr &hdr, const void * data)
 {
     MSG_QUERY_PLAYER(player);
-	//GObject::Player * player = *reinterpret_cast<GObject::Player **>(const_cast<void *>(data));
     player->beVoted();
 }
 

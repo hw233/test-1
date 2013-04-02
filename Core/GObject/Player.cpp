@@ -4306,11 +4306,16 @@ namespace GObject
         GameMsgHdr hdr(0x360, other->getThreadId(), other, 0);
         GLOBAL().PushMsg(hdr, NULL);
         sendMsgCode(0, 1509);
+        //GameMsgHdr hdr2(0x1C6, WORKER_THREAD_WORLD, this, 0);
+        //GLOBAL().PushMsg(hdr2, NULL);
     }
 
     void Player::beVoted()
     {
         AddVar(VAR_POPULARITY, 1);
+        UInt32 total = GetVar(VAR_POPULARITY);
+        GameMsgHdr hdr(0x1C7, WORKER_THREAD_WORLD, this, sizeof(total));
+        GLOBAL().PushMsg(hdr, &total);
     }
 
 	void Player::sendModification( UInt8 t, UInt32 v, bool updateToDB )

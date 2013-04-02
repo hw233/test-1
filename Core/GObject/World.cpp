@@ -1057,7 +1057,6 @@ void SendConsumeRankAward()
 void World::SendPopulatorRankAward(void*)
 {
     World::initRCRank();
-    int pos = 0;
     RCSortType::iterator i = World::popularitySort.begin();
     if (i == World::popularitySort.end())
         return;
@@ -1066,15 +1065,16 @@ void World::SendPopulatorRankAward(void*)
     if (!player)
         return;
 
-    GameMsgHdr hdr(0x361, player->getThreadId(), player, sizeof(pos));
-    GLOBAL().PushMsg(hdr, &pos);
-
-    //SYSMSG_BROADCASTV(4033, player->getCountry(), player->getPName(), i->total);
 
     char id[1024] = {0};
     char ctx[1024] = {0};
     snprintf(id, sizeof(id), "F_10000_pop_%u_%d", cfg.serverNum, i->total);
     snprintf(ctx, sizeof(ctx), "%"I64_FMT"u_%s_%u", player->getId(), player->getPName(), i->total);
+    player->setTitle(201, 7 * 3600 * 24);
+    SYSMSGV(title, 4145, TimeUtil::Month(), TimeUtil::MonthDay());
+    SYSMSGV(content, 4146, TimeUtil::Month(), TimeUtil::MonthDay(), i->total);
+    player->GetMailBox()->newMail(NULL, 0x01, title, content);
+    SYSMSG_BROADCASTV(4147, player->getCountry(), player->getPName());
     World::udpLog(id, ctx, "", "", "", "", "act");
     World::popularitySort.clear();
 }
@@ -1850,7 +1850,7 @@ bool World::Init()
     UInt32 QQGameGiftPoint = TimeUtil::SharpDayT(0, now) + 20*3600;
     AddTimer(86400 * 1000, SendQQGameGift, static_cast<void *>(NULL), (QQGameGiftPoint >= now ? QQGameGiftPoint - now : 86400 + QQGameGiftPoint - now) * 1000);
     UInt32 sweek = TimeUtil::SharpWeek(1);
-    AddTimer(3600 * 24 * 7 * 1000, SendPopulatorRankAward, static_cast<void * >(NULL), (sweek - now - 300) * 1000);
+    AddTimer(3600 * 24 * 7 * 1000, SendPopulatorRankAward, static_cast<void * >(NULL), (sweek - now - 10) * 1000);
     
     return true;
 }
