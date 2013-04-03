@@ -28,7 +28,7 @@ void CFriend::loadFromDB(const char* cf)
 
     StringTokenizer cfriend(cf, ",");
     UInt32 count = cfriend.count();
-    m_cf.resize(CF_MAX);
+    m_cf.resize(CF_MAX, 0);
     for (UInt8 i = 0; i < count && i < CF_MAX; ++i)
         m_cf[i] = atoi(cfriend[i].c_str());
     bool toDB = false;
