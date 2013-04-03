@@ -357,13 +357,11 @@ bool enum_midnight(void * ptr, void* next)
     if (pl->isOnline() && World::_wday == 7)
         GData::store.sendList(1, pl);
 
-    /*
     if (!pl->isOnline())
     {
         pl->GetShuoShuo()->reset(false);
         pl->GetCFriend()->reset(false);
     }
-    */
 
     if (TimeUtil::SharpDay(0, nextday) >= TimeUtil::SharpDay(0, World::_rechargenextretstart)+13*24*60*60 &&
             TimeUtil::SharpDay(0, nextday) < TimeUtil::SharpDay(0, World::_rechargenextretend)+13*24*60*60+2*24*60*60)

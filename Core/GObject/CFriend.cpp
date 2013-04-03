@@ -212,36 +212,45 @@ void CFriend::recallFriend()
 {
     if (m_cf.size() < CF_MAX)
         m_cf.resize(CF_MAX, 0);
+    setCFriendSafe(CF_RECALL);
+    /*
     if (getCFriend(CF_RECALL) != 2)
     {
         m_cf[CF_RECALL] = 1;
         if (!getAward(CF_RECALL))
             m_cf[CF_RECALL] = 0;
     }
+    */
 }
 
 void CFriend::giveLift()
 {
     if (m_cf.size() < CF_MAX)
         m_cf.resize(CF_MAX, 0);
+    setCFriendSafe(CF_GIVELIFT);
+    /*
     if (getCFriend(CF_GIVELIFT) != 2)
     {
         m_cf[CF_GIVELIFT] = 1;
         if (!getAward(CF_GIVELIFT))
             m_cf[CF_GIVELIFT] = 0;
     }
+    */
 }
 
 void CFriend::getLift()
 {
     if (m_cf.size() < CF_MAX)
         m_cf.resize(CF_MAX, 0);
+    setCFriendSafe(CF_GETLIFE);
+    /*
     if (getCFriend(CF_GETLIFE) != 2)
     {
         m_cf[CF_GETLIFE] = 1;
         if (!getAward(CF_GETLIFE))
             m_cf[CF_GETLIFE] = 0;
     }
+    */
 }
 
 void CFriend::useTickets(UInt8 type)
