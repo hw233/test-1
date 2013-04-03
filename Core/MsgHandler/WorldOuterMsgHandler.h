@@ -1195,7 +1195,7 @@ void OnStoreListReq( GameMsgHdr& hdr, StoreListReq& lr )
 void OnLeaderboardReq( GameMsgHdr& hdr, LeaderboardReq& lr )
 {
 	MSG_QUERY_PLAYER(player);
-	Stream * st;
+	Stream  st;
     //if(GObject::leaderboard.hasUpdate(lr._id) && GObject::leaderboard.getPacket(lr._type, st, player))
     if (lr._type == 7)
     {
@@ -1207,7 +1207,7 @@ void OnLeaderboardReq( GameMsgHdr& hdr, LeaderboardReq& lr )
         if (GObject::leaderboard.getPacket(lr._type, st, player))
         {
             if (!GObject::leaderboard.isSorting())
-                player->send(*st);
+                player->send(st);
         }
         else
         {

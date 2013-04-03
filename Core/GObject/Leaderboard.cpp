@@ -794,7 +794,7 @@ bool Leaderboard::hasUpdate( UInt32 id )
 	return _id != id;
 }
 
-bool Leaderboard::getPacket( UInt8 t, Stream*& st, Player* pl)
+bool Leaderboard::getPacket( UInt8 t, Stream& st, Player* pl)
 {
     // XXX: t == 7 的情况不在此处获得排行榜数据，因为是实时更新的前八名数据
     if (isSorting())
@@ -803,31 +803,31 @@ bool Leaderboard::getPacket( UInt8 t, Stream*& st, Player* pl)
 	switch(t)
 	{
 	case 0:
-		st = &_levelStream;
-        makeRankStream(st, t, pl);
+		st = _levelStream;
+        makeRankStream(&st, t, pl);
 		break;
 	case 1:
-		st = &_moneyStream;
-        makeRankStream(st, t, pl);
+		st = _moneyStream;
+        makeRankStream(&st, t, pl);
 		break;
 	case 2:
-		st = &_achievementStream;
+		st = _achievementStream;
 		break;
 	case 3:
-		st = &_clanStream;
-        makeRankStream(st, t, pl);
+		st = _clanStream;
+        makeRankStream(&st, t, pl);
 		break;
     case 4:
-        st = &_battleStream;
-        makeRankStream(st, t, pl);
+        st = _battleStream;
+        makeRankStream(&st, t, pl);
         break;
     case 5:
-        st = &_clanCopyStream;
-        makeRankStream(st, t, pl);
+        st = _clanCopyStream;
+        makeRankStream(&st, t, pl);
         break;
     case 6:
-        st = &_lingbaoStream;
-        makeRankAndValueStream(st, t, pl, pl->getMaxLingbaoBattlePoint());
+        st = _lingbaoStream;
+        makeRankAndValueStream(&st, t, pl, pl->getMaxLingbaoBattlePoint());
         break;
 	default:
 		return false;
@@ -1008,7 +1008,7 @@ int Leaderboard::getMyRank(Player* pl, UInt8 type , bool setLock)
     }
     return rank;   
 }
-void Leaderboard::makeRankStream(Stream*& st, UInt8 type, Player* pl)
+void Leaderboard::makeRankStream(Stream* st, UInt8 type, Player* pl)
 {
     int rank = getMyRank(pl, type,false);
     st->pop_front(9); //将type,rank总共5个字节删除
@@ -1020,7 +1020,7 @@ void Leaderboard::makeRankStream(Stream*& st, UInt8 type, Player* pl)
     st->prepend(buf, 4);
 }
 
-void Leaderboard::makeRankAndValueStream(Stream*& st, UInt8 type, Player* pl, UInt32 value)
+void Leaderboard::makeRankAndValueStream(Stream* st, UInt8 type, Player* pl, UInt32 value)
 {
     int rank = getMyRank(pl, type,false);
     st->pop_front(13); //将type,rank总共5个字节删除
