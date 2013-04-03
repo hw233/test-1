@@ -2034,6 +2034,7 @@ void Fighter::rebuildBattlePoint()
             const GData::LBSkillBase* lbskill = GData::lbSkillManager[_lbSkill[i].skillid];
             _battlePoint += lbskill->battlepoint * (((float)(_lbSkill[i].factor))/10000);
         }
+        calcLingbaoBattlePoint();
     }
 }
 
@@ -5597,7 +5598,6 @@ ItemEquip* Fighter::setLingbao(UInt8 idx, ItemEquip* lb, bool writedb)
             addLBSkill(lb->getId(), lba.skill[1], lba.factor[1]);
         if (lb)
             lb->DoEquipBind(true);
-        pushLingbaoInfo(lb);
     }
 
     _attrDirty = true;
