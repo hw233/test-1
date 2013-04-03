@@ -147,7 +147,7 @@ public:
     void end() { m_sorting = false; }
     bool isSorting() const { return m_sorting; }
     void buildBattlePacket();
-    int getMyRank(Player* pl, UInt8 type);
+    int getMyRank(Player* pl, UInt8 type ,bool setLock = true);
 private:
 	void doUpdate();
     void makeRankStream(Stream*& st, UInt8 type, Player* pl);
