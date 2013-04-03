@@ -11243,7 +11243,7 @@ bool BattleSimulator::do100ProtectDamage(BattleFighter* bf, BattleFighter* pet, 
     {
         if(eft[i] == GData::e_eft_pet_protect_reduce)
         {
-            factor *= efv[i];
+            factor *= (1 - efv[i]);
         }
     }
     {
@@ -11282,7 +11282,7 @@ bool BattleSimulator::doProtectDamage(BattleFighter* bf, BattleFighter* pet, flo
         {
             if(eft[i] == GData::e_eft_pet_protect_reduce)
             {
-                factor *= efv[i];
+                factor *= (1.0f - efv[i]);
             }
         }
         return protectDamage(bf, pet, phyAtk, magAtk, factor);
