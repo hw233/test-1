@@ -242,8 +242,9 @@ inline UInt8 doLogin(Network::GameClient * cl, UInt64 pid, UInt32 hsid, GObject:
 	cl->SetPlayer(player);
 
     std::string fsaleTime;
-    std::string foverTime;
-    player->setForbidSale(checkForbidSale(player->getId(), fsaleTime,foverTime));
+    player->setForbidSale(checkForbidSale(player->getId(), fsaleTime));
+//    std::string foverTime;
+//    player->setForbidSale(checkForbidSale(player->getId(), fsaleTime,foverTime));
 	return res;
 }
 
@@ -1414,10 +1415,10 @@ void BigUnlockUser(LoginMsgHdr& hdr,const void * data)
 void ForbidSale(LoginMsgHdr& hdr,const void * data)
 {
     BinaryReader br(data,hdr.msgHdr.bodyLen);
-    UInt32 tm = 0;
+    //UInt32 tm = 0;
     std::string playerIds;
     CHKKEY();
-    br >> tm;
+//    br >> tm;
     br>>playerIds;
 
     UInt16 serverNo = 0;
@@ -1432,7 +1433,8 @@ void ForbidSale(LoginMsgHdr& hdr,const void * data)
     {
         UInt64 pid = atoll(playerId.c_str());
         pid = pid & 0xFFFFFFFFFF;
-        setForbidSaleValue(pid, true,tm);
+        setForbidSaleValue(pid, true);
+//        setForbidSaleValue(pid, true,tm);
 
         if(cfg.merged)
             pid += (static_cast<UInt64>(serverNo) << 48);
@@ -1510,10 +1512,12 @@ void QueryLockUser(LoginMsgHdr& hdr,const void * data)
 
     pid = pid & 0xFFFFFFFFFF;
     UInt8 isLockLogin = IsBigLock(pid);
-    UInt8 isForbidSale = checkForbidSale(pid, fsaleTime,foverTime);
+    UInt8 isForbidSale = checkForbidSale(pid, fsaleTime);
+//    UInt8 isForbidSale = checkForbidSale(pid, fsaleTime,foverTime);
         
     Stream st(SPEP::QUERYLOCKUSER);
-    st << isLockLogin << isForbidSale << fsaleTime<< foverTime << Stream::eos;
+    st << isLockLogin << isForbidSale << fsaleTime << Stream::eos;
+//    st << isLockLogin << isForbidSale << fsaleTime<< foverTime << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 

@@ -1327,7 +1327,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
             }
             else
             {
-                float def;
+               float def;
                 float magdef;
                 float toughFactor = pr2 ? area_target->getTough(bf) : 1.0f;
 

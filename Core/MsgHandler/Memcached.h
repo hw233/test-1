@@ -114,7 +114,8 @@ static void setCrackValue(const char* ip, int v)
     }
 }
 
-static void setForbidSaleValue(const UInt64 playerId, bool isForbid, UInt32 fTime = 9999999)
+static void setForbidSaleValue(const UInt64 playerId, bool isForbid)
+//static void setForbidSaleValue(const UInt64 playerId, bool isForbid, UInt32 fTime = 9999999)
 {
     (void)setForbidSaleValue;
     initMemcache();
@@ -124,23 +125,26 @@ static void setForbidSaleValue(const UInt64 playerId, bool isForbid, UInt32 fTim
         char key[MEMCACHED_MAX_KEY] = {0};
         size_t len = snprintf(key, sizeof(key), "asss_globallock_%"I64_FMT"u", playerId);
         if (isForbid) value[0] = '1';
-        {
+        sprintf(&value[1],"%d", TimeUtil::Now());
+/*        {
             if(fTime != 9999999)
             sprintf(&value[1],"%d_%d", TimeUtil::Now(),TimeUtil::Now()+fTime);
             else
             sprintf(&value[1],"%d", TimeUtil::Now());
         }
+        */
         size_t vlen = strlen(value);
 
         MemcachedSet(key, len, value, vlen, 0);
     }
 }
 
-static bool checkForbidSale(const UInt64 playerId, std::string& fsale, std::string& over)
+static bool checkForbidSale(const UInt64 playerId, std::string& t)
+//static bool checkForbidSale(const UInt64 playerId, std::string& fsale, std::string& over)
 {
     (void)checkForbidSale;
     initMemcache();
-    std::string t;
+//    std::string t;
     char value[32] = {0};
     char key[MEMCACHED_MAX_KEY] = {0};
     UInt64 pid = playerId & 0xFFFFFFFFFF;
@@ -152,6 +156,8 @@ static bool checkForbidSale(const UInt64 playerId, std::string& fsale, std::stri
     {
         t = &(value[1]);
     }
+    return value[0] == '1';
+/*    
     if(value[0]=='0' || value[0] == 0 )
     {
         over = "0";
@@ -172,6 +178,7 @@ static bool checkForbidSale(const UInt64 playerId, std::string& fsale, std::stri
         return false;
     }
     return true;
+    */
 }
 
 static bool checkCrack(std::string& platform, std::string& ip, UInt64 id)

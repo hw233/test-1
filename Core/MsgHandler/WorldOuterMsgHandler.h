@@ -2216,8 +2216,8 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
 		return;
     */
 	BinaryReader brd(data, hdr.msgHdr.bodyLen);
-	UInt8 op;
-    UInt8 type;
+	UInt8 op = 0;
+    UInt8 type = 0;
 
     brd >> type;
     switch(type)
