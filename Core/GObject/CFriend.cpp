@@ -80,8 +80,10 @@ void CFriend::setCFriendSafe(UInt8 idx)
 
 void CFriend::setCFriend(UInt8 idx, UInt8 status)
 {
+    /*
     if (!World::getCFriend())
         return;
+    */
     if (idx >= CF_MAX)
         return;
     bool w = false;

@@ -7319,7 +7319,7 @@ namespace GObject
         {
             if (gAthleticsRank.getAthleticsRank(*it) <= 200)
                 ++cf_AthRank[1];
-            else if (gAthleticsRank.getAthleticsRank(*it) <= 500)
+            if (gAthleticsRank.getAthleticsRank(*it) <= 500)
                 ++cf_AthRank[0];
         }
 
