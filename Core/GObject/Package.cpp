@@ -1688,6 +1688,7 @@ namespace GObject
             case 0x61:
             case 0x62:
                 old = fgt->setLingbao(part-0x60, static_cast<GObject::ItemLingbao*>(item));
+                fgt->eraseLingbaoInfo(old);
                 break;
             default:
                 return false;
@@ -1741,6 +1742,7 @@ namespace GObject
             case 0x61:
             case 0x62:
                 old = fgt->setLingbao(part-0x60, static_cast<GObject::ItemLingbao*>(NULL));
+                fgt->eraseLingbaoInfo(old);
                 break;
             default:
                 return false;

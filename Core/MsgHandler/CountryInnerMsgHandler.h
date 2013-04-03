@@ -1832,27 +1832,6 @@ void OnCFriendAthleticsRank( GameMsgHdr& hdr, const void * data)
     player->OnCFriendAthleticsRank();
 }
 
-void OnForbidSale( GameMsgHdr &hdr, const void *data)
-{
-	MSG_QUERY_PLAYER(player);
-    if (cfg.autoForbid)
-    {
-        if (cfg.merged)
-        {
-            setForbidSaleValue(player->getId()&0xFFFFFFFF, true);
-        }
-        else
-        {
-            setForbidSaleValue(player->getId(), true);
-        }
-        player->setForbidSale(true, true);
-    }
-    else
-    {
-        player->udpLog("svr_forbid_sale", "known", "", "", "", "", "act_tmp");
-    }
-}
-
 void OnForbidSaleQueryFail( GameMsgHdr &hdr, const void *data)
 {
     MSG_QUERY_PLAYER(player);

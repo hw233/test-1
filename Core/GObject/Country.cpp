@@ -135,8 +135,8 @@ bool Country::Init()
         //AddTimer(4 * 60 * 1000, ClanCopyReset, static_cast<void * >(NULL), 120 * 1000);
         //AddTimer(4 * 60 * 1000, ClanCopyResetEnd, static_cast<void * >(NULL), 180 * 1000);
         //globalPlayers.enumerate(heromemo_enum, m_ThreadID);
-        if (!GVAR.GetVar(GVAR_HAS_CLAC_LB_BP))
-            globalPlayers.enumerate(lingbaobp_enum, m_ThreadID);
+        //if (!GVAR.GetVar(GVAR_HAS_CLAC_LB_BP))
+        //    globalPlayers.enumerate(lingbaobp_enum, m_ThreadID);
         GVAR.SetVar(GVAR_HEROMEM_CUT, 1);
         GVAR.SetVar(GVAR_HAS_CLAC_LB_BP, 1);
 	}

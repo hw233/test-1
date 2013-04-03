@@ -240,7 +240,7 @@ namespace GObject
 
     void DCWorker::PushCheckOpenId(UInt64 playerId, const char * openId, UInt32 len)
     {
-        return;
+        /*
         if (!openId)
             return;
 
@@ -260,9 +260,10 @@ namespace GObject
             FastMutex::ScopedLock lk(m_Mutex);
             m_Openid.push_back(openMsg);
         }
-
+        */
     }
 
+    /*
     bool DCWorker::CheckOpenId(UInt64 playerId, char * openId)
     {
         // Memcached 校验playerID和openID
@@ -284,6 +285,7 @@ namespace GObject
             return false;
         }
     }
+    */
 
     UInt32 DCWorker::UnionLoggerResultParse(char* result, char* msg)
     {

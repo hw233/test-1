@@ -1901,6 +1901,88 @@ UInt32 Fighter::calcLingbaoBattlePoint()
     return value;
 }
 
+void Fighter::pushLingbaoInfo(ItemEquip* equip)
+{
+    if(!equip)
+        return;
+
+    ItemLingbao* lb = static_cast<ItemLingbao*>(equip);
+    UInt32 bp = 0;
+    LingbaoInfoList lingbao;
+    lingbao.id = _owner->getId();
+    lingbao.name = _owner->getName();
+    lingbao.pf = _owner->getPF();
+
+    ItemLingbaoAttr& lbattr = lb->getLingbaoAttr();
+    bp = Script::BattleFormula::getCurrent()->calcLingbaoBattlePoint(&lbattr);
+    lingbao.equipId = lb->getId();
+    lingbao.itemId = lb->GetTypeId();
+    lingbao.tongling = lbattr.tongling;
+    lingbao.lbColor = lbattr.lbColor;
+    for (UInt8 i = 0; i < 4; ++i)
+    {
+        lingbao.type[i] = lbattr.type[i];
+        lingbao.value[i] = lbattr.value[i];
+    }
+    for (UInt8 i = 0; i < 2; ++i)
+    {
+        if (lbattr.skill[i])
+        {
+            const GData::LBSkillBase* lbskill = GData::lbSkillManager[lbattr.skill[i]];
+            bp += lbskill->battlepoint * (((float)(lbattr.factor[i]))/10000);
+            lingbao.skill[i] = lbattr.skill[i];
+            lingbao.factor[i] = lbattr.factor[i];
+        }
+    }
+    if (bp != lbattr.battlePoint)
+    {
+        lbattr.battlePoint = bp;
+    }
+    lingbao.battlePoint = lbattr.battlePoint;
+    leaderboard.pushLingbaoInfo(lingbao);
+}
+
+void Fighter::eraseLingbaoInfo(ItemEquip* equip)
+{
+    if(!equip)
+        return;
+
+    ItemLingbao* lb = static_cast<ItemLingbao*>(equip);
+    UInt32 bp = 0;
+    LingbaoInfoList lingbao;
+    lingbao.id = _owner->getId();
+    lingbao.name = _owner->getName();
+    lingbao.pf = _owner->getPF();
+
+    ItemLingbaoAttr& lbattr = lb->getLingbaoAttr();
+    bp = Script::BattleFormula::getCurrent()->calcLingbaoBattlePoint(&lbattr);
+    lingbao.equipId = lb->getId();
+    lingbao.itemId = lb->GetTypeId();
+    lingbao.tongling = lbattr.tongling;
+    lingbao.lbColor = lbattr.lbColor;
+    for (UInt8 i = 0; i < 4; ++i)
+    {
+        lingbao.type[i] = lbattr.type[i];
+        lingbao.value[i] = lbattr.value[i];
+    }
+    for (UInt8 i = 0; i < 2; ++i)
+    {
+        if (lbattr.skill[i])
+        {
+            const GData::LBSkillBase* lbskill = GData::lbSkillManager[lbattr.skill[i]];
+            bp += lbskill->battlepoint * (((float)(lbattr.factor[i]))/10000);
+            lingbao.skill[i] = lbattr.skill[i];
+            lingbao.factor[i] = lbattr.factor[i];
+        }
+    }
+    if (bp != lbattr.battlePoint)
+    {
+        lbattr.battlePoint = bp;
+    }
+    lingbao.battlePoint = lbattr.battlePoint;
+    leaderboard.eraseLingbaoInfo(lingbao);
+}
+
 void Fighter::rebuildSkillBattlePoint()
 {
     _skillBP = 0;
@@ -1952,7 +2034,6 @@ void Fighter::rebuildBattlePoint()
             const GData::LBSkillBase* lbskill = GData::lbSkillManager[_lbSkill[i].skillid];
             _battlePoint += lbskill->battlepoint * (((float)(_lbSkill[i].factor))/10000);
         }
-        calcLingbaoBattlePoint();
     }
 }
 
@@ -5516,6 +5597,7 @@ ItemEquip* Fighter::setLingbao(UInt8 idx, ItemEquip* lb, bool writedb)
             addLBSkill(lb->getId(), lba.skill[1], lba.factor[1]);
         if (lb)
             lb->DoEquipBind(true);
+        pushLingbaoInfo(lb);
     }
 
     _attrDirty = true;

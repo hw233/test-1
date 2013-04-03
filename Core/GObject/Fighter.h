@@ -895,6 +895,8 @@ public:
     UInt16 calcSkillBattlePoint(UInt16 skillId, UInt8 type);
 
     UInt32 calcLingbaoBattlePoint();
+    void eraseLingbaoInfo(ItemEquip* eqiup);
+    void pushLingbaoInfo(ItemEquip* equip);
 private:
     std::map<UInt16, SStrengthen> m_ss;
 

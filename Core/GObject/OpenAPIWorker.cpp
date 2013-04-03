@@ -142,8 +142,8 @@ namespace GObject
                         if(needForbid)
                         {
                             // 需要封杀交易功能
-                            GameMsgHdr imh(0x330, pl->getThreadId(), pl, 0);
-                            GLOBAL().PushMsg(imh, NULL);
+                            LoginMsgHdr hdr1(0x330, WORKER_THREAD_LOGIN, 0, pl->GetSessionID(), sizeof(pl));
+                            GLOBAL().PushMsg(hdr1, &pl);
                         }
                         else
                         {

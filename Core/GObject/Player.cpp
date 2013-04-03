@@ -15703,7 +15703,6 @@ void EventTlzAuto::notify(bool isBeginAuto)
             }
             if(_onBattlePet)
                 bp += _onBattlePet->getBattlePoint();
-            calcLingbaoBattlePoint();
         }
         else
         {
