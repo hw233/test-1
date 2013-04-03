@@ -193,10 +193,7 @@ void Leaderboard::buildPacketForLingbao(Stream& st, UInt8 t, bool merge /* = tru
         if ((_lingbaoRank[item.id] == 0) || (_lingbaoRank[item.id] > static_cast<int>(i+1)))
             _lingbaoRank[item.id] = i+1;
 
-        std::string name = item.name;
-		if(merge)
-			GObject::Player::patchMergedName(item.id, name);
-        st << name << item.pf << item.country << item.battlePoint << static_cast<UInt16>(item.itemId) << item.tongling << item.lbColor;
+        st << item.name << item.pf << item.country << item.battlePoint << static_cast<UInt16>(item.itemId) << item.tongling << item.lbColor;
         for (UInt8 j = 0; j < 4; ++j)
         {
             st << item.type[j] << item.value[j];
