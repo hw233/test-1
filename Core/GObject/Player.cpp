@@ -10045,7 +10045,7 @@ namespace GObject
             Stream st(REP::YD_INFO);
 
             UInt8 qqvipl = _playerData.qqvipl % 10;
-            st << qqvipl << _playerData.qqvipyear << static_cast<UInt8>(GetVar(VAR_AWARD_3366));
+            st << qqvipl << _playerData.qqvipyear << static_cast<UInt8>(GetVar(VAR_AWARD_3366|(GetVar(VAR_HHBAWARD_GOT) << 3)));
             UInt8 maxCnt = GObjectManager::getD3D6MaxCount();
             st << maxCnt;
             st << static_cast<UInt8>(1);
@@ -10180,6 +10180,20 @@ namespace GObject
         Stream st(REP::YD_AWARD_RCV);
 
         UInt8 domain = atoi(m_domain);
+            if(type == 3 &&_playerData.isHHBlue &&!GetVar(VAR_HHBAWARD_GOT))
+             {
+                if(GetPackage()->GetRestPackageSize() > 0)
+                {
+                    nRes = 5;
+                    SetVar(VAR_HHBAWARD_GOT, 1);
+
+                    GetPackage()->AddItem2(503,1, true, true);
+                }
+                else
+                {
+                    sendMsgCode(2, 1011);
+                }
+             }
         if (domain == 11 && _playerData.qqvipl >= 20 && _playerData.qqvipl < 40 && d3d6 == 1)
         {
             UInt8 qqvipl = _playerData.qqvipl % 10;
@@ -10340,20 +10354,6 @@ namespace GObject
                 }
             }
             
-            else if(type == 3 &&_playerData.isHHBlue &&!GetVar(VAR_HHBAWARD_GOT))
-            {
-                if(GetPackage()->GetRestPackageSize() > 0)
-                {
-                    nRes = 5;
-                    SetVar(VAR_HHBAWARD_GOT, 1);
-
-                    GetPackage()->AddItem2(503,1, true, true);
-                }
-                else
-                {
-                    sendMsgCode(2, 1011);
-                }
-            }
 
         }
         if(nRes && nRes != 5)
