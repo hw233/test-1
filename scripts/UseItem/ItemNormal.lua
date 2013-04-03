@@ -3130,14 +3130,6 @@ function ItemNormal_00009007(iid, num, bind, param)
     package:DelItemSendMsg(iid, player);
     return num;
 end
-function ItemNormal_00009902(iid, num, bind, param)
-    local player = GetPlayer()
-    local package = player:GetPackage();
-    player:setTitle(56, 0)
-    package:DelItemSendMsg(iid, player);
-    return num;
-end
-
 function ItemNormal_00009010(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -9537,7 +9529,6 @@ local ItemNormal_Table = {
     [9007] = ItemNormal_00009007,
     [9008] = ItemNormal_00009007,
     [9009] = ItemNormal_00009007,
-    [9902] = ItemNormal_00009902,
     [9010] = ItemNormal_00009010,
 
     [9017] = ItemNormal_00009017,

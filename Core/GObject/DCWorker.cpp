@@ -240,6 +240,7 @@ namespace GObject
 
     void DCWorker::PushCheckOpenId(UInt64 playerId, const char * openId, UInt32 len)
     {
+        return;
         if (!openId)
             return;
 
