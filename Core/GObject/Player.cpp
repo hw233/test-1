@@ -18496,8 +18496,6 @@ UInt8 Player::toQQGroup(bool isJoin)
             return 1;
         if(pet1->getColor() > pet2->getColor())
             return 1;
-        //UInt16 lev = std::max(pet1->getPetLev(), pet2->getPetLev());
-        //UInt16 bone = std::max(pet1->getPetBone(), pet2->getPetBone());
         UInt16 lev = 0, pBless = 0, bone = 0;
         UInt16 gBless = 0, dazhou = 0, xiaozhou = 0, chong = 0;
         if(pet1->getPetLev() > pet2->getPetLev())
