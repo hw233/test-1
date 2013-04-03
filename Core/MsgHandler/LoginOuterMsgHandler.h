@@ -1415,7 +1415,7 @@ void BigUnlockUser(LoginMsgHdr& hdr,const void * data)
 void ForbidSale(LoginMsgHdr& hdr,const void * data)
 {
     BinaryReader br(data,hdr.msgHdr.bodyLen);
-    UInt32 tm = 0;
+    //UInt32 tm = 0;
     std::string playerIds;
     CHKKEY();
 //    br >> tm;
