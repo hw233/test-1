@@ -1260,6 +1260,7 @@ namespace GObject
 #ifndef _VT
         dclogger.login(this);
         dclogger.login_sec(this);
+        dclogger.checkOpenId(this);
 
         EventAutoRefreshOpenKey* event = new(std::nothrow) EventAutoRefreshOpenKey(this, 60 * 110, 24);
         if (event)
@@ -4116,6 +4117,9 @@ namespace GObject
 				DB1().PushUpdateData("REPLACE INTO `friend` (`id`, `type`, `friendId`) VALUES (%"I64_FMT"u, 3, %"I64_FMT"u)", getId(), pl->getId());
 		}
 		_friends[3].insert(pl);
+        //更新密友信息
+        if(notify && isOnline())
+            GetCFriend()->updateRecordData();
 	}
 	void Player::delFriend( Player * pl )
 	{
@@ -4322,8 +4326,8 @@ namespace GObject
         GameMsgHdr hdr(0x360, other->getThreadId(), other, 0);
         GLOBAL().PushMsg(hdr, NULL);
         sendMsgCode(0, 1509);
-        //GameMsgHdr hdr2(0x1C6, WORKER_THREAD_WORLD, this, 0);
-        //GLOBAL().PushMsg(hdr2, NULL);
+        GameMsgHdr hdr2(0x1C6, WORKER_THREAD_WORLD, this, 0);
+        GLOBAL().PushMsg(hdr2, NULL);
     }
 
     void Player::beVoted()
@@ -7271,7 +7275,7 @@ namespace GObject
             }
         }
 
-        for (UInt8 j = 0; j < sizeof(cfs)/sizeof(UInt8); ++j)
+        for (UInt8 j = 0; j < sizeof(cfs)/sizeof(UInt32); ++j)
         {
             for (UInt8 i = 0; i < sizeof(cf_nums)/sizeof(UInt8); ++i)
             {
@@ -7289,6 +7293,45 @@ namespace GObject
         if (!_hasCFriend(player))
             return;
         setCFriends();
+    }
+
+    void Player::OnCFriendAthleticsRank()
+    {
+        if(CURRENT_THREAD_ID() != getThreadId())
+        {
+            GameMsgHdr hdr(0x341, getThreadId(), this, 0);
+            GLOBAL().PushMsg(hdr, NULL);
+        }
+        else
+        {
+            for (std::set<Player *>::iterator it = _friends[3].begin(); it != _friends[3].end(); ++it)
+            {
+                (*it)->setCFriendByRank();
+            }
+        }
+    }
+
+    void Player::setCFriendByRank()
+    {
+        UInt16 cf_AthRank[2] = {0}; //斗剑排名:500名,200名
+        static UInt8 cf_AthRank_nums[] = {1, 2, 5, 10};
+        for (std::set<Player *>::iterator it = _friends[3].begin(); it != _friends[3].end(); ++it)
+        {
+            if (gAthleticsRank.getAthleticsRank(*it) <= 200)
+                ++cf_AthRank[1];
+            else if (gAthleticsRank.getAthleticsRank(*it) <= 500)
+                ++cf_AthRank[0];
+        }
+
+        for (UInt8 j = 0; j < sizeof(cf_AthRank)/sizeof(UInt16); ++j)
+        {
+            for (UInt8 i = 0; i < sizeof(cf_AthRank_nums)/sizeof(UInt8); ++i)
+            {
+                if (cf_AthRank[j] < cf_AthRank_nums[i])
+                    break;
+                GetCFriend()->setCFriendSafe(CF_RANK500_1+4*j+i);
+            }
+        }
     }
 
 	void Player::checkLevUp(UInt8 oLev, UInt8 nLev)
@@ -11091,7 +11134,7 @@ namespace GObject
     {
         static int s_items[2][8] ={
             {515,507,509,503,1325,47,134,5026},
-            {515,507,509,503,1325,47,1528,5026}
+            {515,507,509,503,1325,47,134,5026}
             };
         if (!World::getConsumeAwardAct())
             return;
@@ -11355,6 +11398,35 @@ namespace GObject
             m_Package->ItemNotify(it->id, it->count);
         }
         _lastQueqiaoAward.clear();
+    }
+
+    void Player::checkLastCFTicketsAward()
+    {
+        Stream st(REP::CFRIEND);
+        st << static_cast<UInt8>(4);
+        st << getName() << getCountry();
+        st << static_cast<UInt8>(_lastCFTicketsAward.size());
+        std::vector<GData::LootResult>::iterator it;
+        for(it = _lastCFTicketsAward.begin(); it != _lastCFTicketsAward.end(); ++ it)
+        {
+            if(it->id == COUPON_ID)
+                checkLastBattled();
+            else if(it->id != 0)
+                GetPackage()->ItemNotify(it->id, it->count);
+            st << static_cast<UInt16>(it->id);
+            st << static_cast<UInt8>(it->count);
+        }
+        _lastCFTicketsAward.clear();
+        st << Stream::eos;
+        NETWORK()->Broadcast(st);
+    }
+
+    void Player::lastCFTicketsAward(UInt16 itemId, UInt16 num)
+    {
+        GData::LootResult lt;
+        lt.id = itemId;
+        lt.count = num;
+        _lastCFTicketsAward.push_back(lt);
     }
 
     void Player::sendHappyInfo(UInt16 itemId)
@@ -14218,6 +14290,31 @@ namespace GObject
         st.data<UInt8>(offset) = c;
     }
 
+    void Player::appendPetOnBattle( Stream& st)
+    {
+        if(_onBattlePet)
+        {
+            st << static_cast<UInt16>(_onBattlePet->getId());
+            st << _onBattlePet->getLevel() << _onBattlePet->getPotential() << _onBattlePet->getCapacity();
+            st << _onBattlePet->getMaxSoul() << _onBattlePet->getPeerlessAndLevel();
+            _onBattlePet->getAllUpSkillAndLevel(st);
+            _onBattlePet->getAllPSkillAndLevel4Arena(st);
+            _onBattlePet->getAllSSAndLevel(st);
+            _onBattlePet->getAllLbSkills(st);
+
+            _onBattlePet->getAttrExtraEquip(st);
+
+            st << _onBattlePet->getSoulExtraAura();
+            st << _onBattlePet->getSoulAuraLeft();
+            st << _onBattlePet->getPortrait();
+            _onBattlePet->appendElixirAttr2(st);
+        }
+        else
+        {
+            st << static_cast<UInt16>(0);
+        }
+    }
+
     void Player::SendNextdayTime(UInt32 nextDay)
     {
         Stream st(REP::SVRST);
@@ -15604,6 +15701,8 @@ void EventTlzAuto::notify(bool isBeginAuto)
                 if(fighter)
                     bp += fighter->getBattlePoint();
             }
+            if(_onBattlePet)
+                bp += _onBattlePet->getBattlePoint();
             calcLingbaoBattlePoint();
         }
         else
@@ -15617,6 +15716,8 @@ void EventTlzAuto::notify(bool isBeginAuto)
                 if(fighter)
                     bp += fighter->getBattlePoint_Dirty();
             }
+            if(_onBattlePet)
+                bp += _onBattlePet->getBattlePoint_Dirty();
         }
 
         return bp;
@@ -17497,10 +17598,10 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
  *2:大闹龙宫之金蛇起舞
  *3:大闹龙宫之天芒神梭
 */
-static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F };
-static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372 };
+static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11 };
+static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379 };
 //6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页
-static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357 };
+static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137 };
 void Player::getDragonKingInfo()
 {
     if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)
@@ -18395,10 +18496,54 @@ UInt8 Player::toQQGroup(bool isJoin)
             return 1;
         if(pet1->getColor() > pet2->getColor())
             return 1;
-        UInt16 lev = std::max(pet1->getPetLev(), pet2->getPetLev());
-        UInt16 bone = std::max(pet1->getPetBone(), pet2->getPetBone());
+        UInt16 lev = 0, pBless = 0, bone = 0;
+        UInt16 gBless = 0, dazhou = 0, xiaozhou = 0, chong = 0;
+        if(pet1->getPetLev() > pet2->getPetLev())
+        {
+            lev = pet1->getPetLev();
+            pBless = pet1->getPinjieBless1();
+        }
+        else if(pet1->getPetLev() < pet2->getPetLev())
+        {
+            lev = pet2->getPetLev();
+            pBless = pet2->getPinjieBless1();
+        }
+        else
+        {
+            lev = std::max(pet1->getPetLev(), pet2->getPetLev());
+            pBless = std::max(pet1->getPinjieBless1(), pet2->getPinjieBless1());
+        }
+        if(pet1->getPetBone() > pet2->getPetBone())
+        {
+            bone     = pet1->getPetBone();
+            gBless   = pet1->getGenguBless();
+            dazhou   = pet1->getDazhou();
+            xiaozhou = pet1->getXiaozhou();
+            chong    = pet1->getChongNum();
+        }
+        else if(pet1->getPetBone() < pet2->getPetBone())
+        {
+            bone     = pet2->getPetBone();
+            gBless   = pet2->getGenguBless();
+            dazhou   = pet2->getDazhou();
+            xiaozhou = pet2->getXiaozhou();
+            chong    = pet2->getChongNum();
+        }
+        else
+        {
+            bone     = std::max(pet1->getPetBone(), pet2->getPetBone());
+            gBless   = std::max(pet1->getGenguBless(), pet2->getGenguBless());
+            dazhou   = std::max(pet1->getDazhou(), pet2->getDazhou());
+            xiaozhou = std::max(pet1->getXiaozhou(), pet2->getXiaozhou());
+            chong    = std::max(pet1->getChongNum(), pet2->getChongNum());
+        }
         pet2->setPetLev(lev);
         pet2->setPetBone(bone);
+        pet2->setPinjieBless1(pBless);
+        pet2->setGenguBless(gBless);
+        pet2->setDazhou(dazhou);
+        pet2->setXiaozhou(xiaozhou);
+        pet2->setChongNum(chong);
         pet2->UpdateToDB();
         pet2->setPotential(GData::pet.getPetPotential(bone));
         pet2->setLevel(lev);
@@ -18407,6 +18552,8 @@ UInt8 Player::toQQGroup(bool isJoin)
 
         delFairyPet(petId1, 1);
         delete pet1;
+        pet2->sendPinjieInfo();
+        pet2->sendGenguInfo();
         return 0;
     }
 

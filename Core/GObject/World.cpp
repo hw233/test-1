@@ -357,11 +357,13 @@ bool enum_midnight(void * ptr, void* next)
     if (pl->isOnline() && World::_wday == 7)
         GData::store.sendList(1, pl);
 
+    /*
     if (!pl->isOnline())
     {
         pl->GetShuoShuo()->reset(false);
         pl->GetCFriend()->reset(false);
     }
+    */
 
     if (TimeUtil::SharpDay(0, nextday) >= TimeUtil::SharpDay(0, World::_rechargenextretstart)+13*24*60*60 &&
             TimeUtil::SharpDay(0, nextday) < TimeUtil::SharpDay(0, World::_rechargenextretend)+13*24*60*60+2*24*60*60)
@@ -521,6 +523,11 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 7)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 8)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 9)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 10)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 11)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 14)
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
     {
@@ -1320,6 +1327,11 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 7)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 8)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 9)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 10)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 11)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 14)
             )
         bRechargeEnd = true;
     if (cfg.rpServer)

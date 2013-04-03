@@ -1472,6 +1472,8 @@ void AthleticsRank::notifyAthletcisOver(Player * atker, Player * defer, UInt32 i
                 }
             }
 		}
+        if(atkerRankPos <= 500)
+            atker->OnCFriendAthleticsRank();
 
 		++ data->winstreak;
         ++ deferdata->befailstreak;

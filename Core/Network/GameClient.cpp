@@ -267,8 +267,8 @@ void GameClient::onRecv( int cmd, int len, void * buf )
 	{
 		if(pl != NULL)
 		{
-			GameMsgHdr hdr( cmd, thrd, pl, len );
-			GLOBAL().PushMsg( hdr,  buf );
+            GameMsgHdr hdr( cmd, thrd, pl, len );
+            GLOBAL().PushMsg( hdr,  buf );
 		}
 	}
 }

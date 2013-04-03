@@ -120,7 +120,6 @@ namespace Script
 		lua_tinker::def(_L, "getRandOEquip",	GObject::getRandOEquip);
 		lua_tinker::def(_L, "getRandPEquip",	GObject::getRandPEquip);
         lua_tinker::def(_L, "getRandGem" ,      GObject::getRandGem);
-		lua_tinker::def(_L, "getChingMing", GObject::World::getChingMing);
 		lua_tinker::def(_L, "getGemMergeAct", GObject::World::getGemMergeAct);
 		lua_tinker::def(_L, "getEnchantGt11", GObject::World::getEnchantGt11);
         lua_tinker::def(_L, "getBlueDiamondAct", GObject::World::getBlueDiamondAct);
@@ -197,6 +196,7 @@ namespace Script
 		CLASS_DEF(Player, getGoldInLua);
 		CLASS_DEF(Player, getCoupon);
 		CLASS_DEF(Player, useCoupon);
+		CLASS_DEF(Player, pendCoupon);
 		CLASS_DEF(Player, getTael);
 		CLASS_DEF(Player, useTael);
 		CLASS_DEF(Player, getCoin);
@@ -292,6 +292,7 @@ namespace Script
         CLASS_DEF(Player, lastQueqiaoAwardPush);
         CLASS_DEF(Player, lastKillMonsterAwardPush);
         CLASS_DEF(Player, lastNew7DayTargetAwardPush);
+		CLASS_DEF(Player, lastCFTicketsAward);
         CLASS_DEF(Player, luaUdpLog);
         CLASS_DEF(Player, addFighterFromItem);
         CLASS_DEF(Player, hasFighter);
@@ -1013,6 +1014,11 @@ namespace Script
 	bool GameActionLua::onGetCFriendAward( Player* player, UInt8 idx )
 	{
 		return Call<bool>("onGetCFriendAward", player, idx);
+	}
+
+	UInt8 GameActionLua::onUseTickets( Player* player)
+	{
+		return Call<UInt8>("onUseTickets", player);
 	}
 
 	bool GameActionLua::testTakePack( Player* player, UInt8 type, UInt8 freq )

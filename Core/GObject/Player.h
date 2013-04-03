@@ -182,6 +182,7 @@ namespace GObject
         TIANMANG    = 3,    //天芒神梭
         HUNYUAN     = 4,    //混元剑诀
         XINGCHEN    = 5,    //遁天星辰诀
+        WUDUN       = 6,    //五遁神斧
         TREASURE    = 10,   //聚宝盆
 
         DRAGONKING_MAX,
@@ -523,6 +524,7 @@ namespace GObject
             lastTjEventScore = 0;
             lastTjTotalScore = 0;
             isHHBlue = false;
+            isHHYellow = false;
         }
 
 
@@ -608,6 +610,7 @@ namespace GObject
         int   lastTjTotalScore;      //天劫活动积分
 
         bool isHHBlue;
+        bool isHHYellow;
         std::string nameNoSuffix;     //(合服)不带后缀的用户名
         std::map<UInt8, UInt32> titleAll;      //玩家所有的称号id
         std::vector<UInt32> canHirePet;     //玩家未招募的仙宠
@@ -856,6 +859,11 @@ namespace GObject
                 _playerData.qqvipl -= 40;
                 _playerData.isHHBlue = true; // XXX: 豪华蓝钻
             }
+            if (_playerData.qqvipl >= 60 && _playerData.qqvipl < 70)
+            {
+                _playerData.qqvipl -= 60;
+                _playerData.isHHYellow = true; // XXX: 豪华黄钻
+            }
         }
         inline void setQQVipl1(UInt8 lvl)
         {
@@ -870,6 +878,11 @@ namespace GObject
                  if (_playerData.qqvipl >= 30 && _playerData.qqvipl < 40)
                      _playerData.isHHBlue = true;
             }
+            else if (lvl >= 61 && lvl < 70)
+            {
+                 _playerData.qqvipl1 -= 60;
+                 _playerData.isHHYellow = true;
+            }
         }
         inline UInt8 getQQVipl() { return _playerData.qqvipl; }
         inline UInt8 getQQVipl1() { return _playerData.qqvipl1; }
@@ -878,7 +891,12 @@ namespace GObject
         inline UInt8 getPF()
         {
             if (_playerData.qqvipl >= 1 && _playerData.qqvipl <= 9)
-                return (2<<4)|_playerData.qqvipl;
+            {
+                if (_playerData.isHHYellow)
+                    return (6<<4)|_playerData.qqvipl;
+                else
+                    return (2<<4)|_playerData.qqvipl;
+            }
             if (_playerData.qqvipl >= 10 && _playerData.qqvipl <= 19)
             {
                 if (_playerData.isHHBlue)
@@ -907,6 +925,7 @@ namespace GObject
         //      30-39 Q+等级,另qqvipl1为会员等级(现归属QQ会员)
         //      40-49 QQ会员等级
         //      50-60 豪华蓝钻(需要转换成蓝钻)
+        //      61-70 豪华黄钻(需要转换成黄钻)
         inline bool isYD() const
         {
             //return (_playerData.qqvipl >= 1 && _playerData.qqvipl <= 9) || (_playerData.qqvipl >= 30 && _playerData.qqvipl <= 39);
@@ -1382,6 +1401,8 @@ namespace GObject
 		bool testCanAddCFriend(Player *);
         void tellCFriendLvlUp(UInt8);
         void OnCFriendLvlUp(Player*, UInt8);
+        void OnCFriendAthleticsRank();
+        void setCFriendByRank();
 
 		void sendFriendList(UInt8, UInt8, UInt8);
 
@@ -1693,6 +1714,7 @@ namespace GObject
         std::vector<GData::LootResult> _lastKillMonsterAward;
         std::vector<GData::LootResult> _lastNew7DayTargetAward;
         std::vector<GData::LootResult> _lastExJobAward;
+        std::vector<GData::LootResult> _lastCFTicketsAward;
         std::vector<GData::LootResult> _lastExJobStepAward;
 
     private:
@@ -2025,6 +2047,8 @@ namespace GObject
         void checkLastQueqiaoAward();
         void lastKillMonsterAwardPush(UInt16 itemId, UInt16 num);
         void lastNew7DayTargetAwardPush(UInt16 itemId, UInt16 num);
+        void checkLastCFTicketsAward();
+        void lastCFTicketsAward(UInt16, UInt16);
         void checkLastKillMonsterAward();
         void checkLastNew7DayTargetAward();
         void sendNewRC7DayInfo(UInt8 type = 0);
@@ -2099,6 +2123,7 @@ namespace GObject
         void sendRechargeNextRetInfo(UInt32 now);
         bool inArenaCommitCD();
         void appendLineup2( Stream& st);
+        void appendPetOnBattle( Stream& st);
     private:
         std::vector<RNR> rechargs;
         UInt32 m_arenaCommitCD;

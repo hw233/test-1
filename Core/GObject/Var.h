@@ -118,7 +118,7 @@ namespace GObject
         VAR_CL3DAY = 86, // 七天连接三天登陆奖励
         VAR_RC7DAYRECHARGE = 87, // 创建角色后前七天充值总额
         VAR_RC7DAYWILL = 88, // 创建角色后前七天充值奖励领取（许愿类型 << 8 | 点亮龙珠数量）
-        VAR_INVITES = 89, // 邀请好友的次数
+        VAR_INVITES = 89, // 邀请好友的人数
         VAR_MDSOUL = 90, // 五一活动灵气值
         VAR_MDSOUL_CNT1 = 91, // 五一活动风雷宝珠使用次数 9000
         VAR_MDSOUL_CNT2 = 92, // 雷之石 497
@@ -140,7 +140,7 @@ namespace GObject
         VAR_NETVDPACK = 106, // 网络情人节礼包是否发放
         VAR_LASTATHRANK = 107, // 昨天结算前的斗剑排名
         VAR_SHUOSHUO = 108, // 今天领取过说说奖励次数
-        VAR_INVITED = 109, // 今天领取过邀请好友奖励次数
+        VAR_INVITED = 109, // 今天领取过邀请好友奖励次数    //停用[suntao:2013-1-15]
 
         VAR_JUNE = 110,      // 六月礼包是否发放
         VAR_JUNE_EQUIP = 111, // 六月节日套装是否发放
@@ -327,7 +327,7 @@ namespace GObject
         VAR_ITEM_9316_FAILED_COUNT = 347, // 都率宝伞礼包连续开启失败次数
         VAR_CONSUME_AWARD_COUNT = 348,   //消费抽奖已抽次数
         VAR_NEW_YEAR_GIVE_GIFT = 349,   //迎新纳福，红包入袋(bit1~10依次代表对应的天数是否领取过奖励)
-        VAR_FAIRYPET_ISGET_PET = 350,   //50级以上玩家是免费否领取过仙宠
+        VAR_FAIRYPET_ISGET_PET = 350,   //50级以上玩家是否免费领取过仙宠
 
         // 351~360 占用 for JLT
         VAR_DISCOUNT_CONSUME1  = 351, // 消费限购的金额
@@ -371,12 +371,12 @@ namespace GObject
         //421-430 for suntao
         VAR_FOOLS_DAY_INFO  = 421,  //愚公移山答题信息(0位表示失败,1-30位表示题目id及是否答对)
         VAR_FOOLS_DAY_TIME  = 422,  //愚公移山答题开始时间
+        VAR_INVITEDSUCCESS = 423, //邀请成功的好友人数
+        VAR_CFRIENDTICKETS = 424, //好友邀请的抽奖券
+
         //431-440 for yijian
         VAR_LONGYUAN_GOT = 431,  //龙元风髓领取标志
 
-        // 441-442 for JLT
-        VAR_HAS_VOTE = 441,                 // 本日是否投票过
-        VAR_POPULARITY = 442,               // 本周人气
 
         VAR_RP7_TREASURE = 432,  //回流服务器聚宝盆, 1-8位:是否购买的标志为 9-16,17-24,25-32位第1-3个聚宝盆的已领取次数
         VAR_RP7_TREASURE_TODAY_GOT=433, //第1-3位:各个聚宝盆今天是否已领取
@@ -386,6 +386,10 @@ namespace GObject
         VAR_RP7_SIGN=437,              //注册签到
         VAR_RP7_SIGN_PACKAGE=438,      //连续签到礼包
         VAR_RP7_RECHARGE=439,      //开服7天充值金额
+
+        // 441-442 for JLT
+        VAR_HAS_VOTE = 441,                 // 本日是否投票过
+        VAR_POPULARITY = 442,               // 本周人气
 
         VAR_FOOLBAO_USED = 450,  //愚人宝箱使用数
         VAR_HHBAWARD_GOT = 451 , //豪华蓝钻领取
@@ -685,6 +689,9 @@ namespace GObject
             REGISTER_VAR(VAR_FAIRYPET_STEP, CYCLE_NONE);
             REGISTER_VAR(VAR_FAIRYPET_LIKEABILITY, CYCLE_NONE);
             REGISTER_VAR(VAR_FAIRYPET_ISGET_PET, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_INVITEDSUCCESS, CYCLE_MONTH);
+            REGISTER_VAR(VAR_CFRIENDTICKETS, CYCLE_NONE);
 
             REGISTER_VAR(VAR_TOWER_LOGIN, CYCLE_DAY);
             REGISTER_VAR(VAR_TOWER_LEVEL, CYCLE_NONE);

@@ -1,6 +1,7 @@
 
 #include "ShuoShuo.h"
 #include "Player.h"
+#include "CFriend.h"
 #include "Country.h"
 #include "Common/StringTokenizer.h"
 #include "Script/GameActionLua.h"
@@ -118,6 +119,7 @@ void ShuoShuo::getAward(UInt8 idx)
         m_ss[idx-1] = 2;
         updateToDB();
         updateShuoShuo(idx-1);
+        m_owner->GetCFriend()->updateRecordData();
 
         if (!m_owner->GetVar(VAR_SHUOSHUO))
         {

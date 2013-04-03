@@ -735,8 +735,8 @@ void OnDailyCheck( GameMsgHdr& hdr, const void * data )
     */
     if (World::_blueactiveday)
         player->onBlueactiveday();
-    player->GetShuoShuo()->reset();
-    player->GetCFriend()->reset();
+    player->GetShuoShuo()->reset(player->isOnline());
+    player->GetCFriend()->reset(player->isOnline());
     player->sendSSDTInfo();
     player->send11DailyInfo();
     player->SetVar(VAR_JUNE_HAPPY, 0);
@@ -1581,6 +1581,7 @@ void OnArenaEnterCommit( GameMsgHdr& hdr, const void* data )
         Stream st(ARENAREQ::ENTER, 0xEF);
         st << player->getId() << player->getName() << static_cast<UInt8>(player->getTitle());
         player->appendLineup2(st);
+        player->appendPetOnBattle(st);
         st << Stream::eos;
         NETWORK()->SendToArena(st);
     }
@@ -1589,6 +1590,7 @@ void OnArenaEnterCommit( GameMsgHdr& hdr, const void* data )
         Stream st(ARENAREQ::COMMIT_LINEUP, 0xEF);
         st << player->getId();
         player->appendLineup2(st);
+        player->appendPetOnBattle(st);
         st << Stream::eos;
         NETWORK()->SendToArena(st);
     }
@@ -1824,6 +1826,12 @@ void OnAddMapObj( GameMsgHdr& hdr, const void * data)
     map->Show(mo->m_ID, true, mo->m_Type);
 }
 
+void OnCFriendAthleticsRank( GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    player->OnCFriendAthleticsRank();
+}
+
 void OnForbidSale( GameMsgHdr &hdr, const void *data)
 {
 	MSG_QUERY_PLAYER(player);
@@ -1862,6 +1870,18 @@ void OnOpenIdInvalid( GameMsgHdr &hdr, const void *data)
     std::string validOpenId = openId;
     player->setOpenId(validOpenId);
     player->udpLog("invalid_openid", invalidOpenId.c_str(), openId, "", "", "", "act_tmp");
+    if (cfg.autoKick)
+    {
+        //player->selfKick(); // 这行代码完全没效果
+        GameMsgHdr imh(0x200, player->getThreadId(), player, 0);
+        GLOBAL().PushMsg(imh, NULL);
+#ifndef _WIN32
+#ifdef _FB
+#else
+        GObject::dclogger.decDomainOnlineNum(atoi(player->getDomain()));
+#endif
+#endif // _WIN32
+    }
 }
 
 void OnOpenAPIFailed( GameMsgHdr &hdr, const void *data)

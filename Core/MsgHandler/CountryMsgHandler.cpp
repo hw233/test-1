@@ -293,6 +293,7 @@ MSG_REG_2(GameMsgHdr, 0x234, OnAthleticsMartialBeAttack);
 MSG_REG_2(GameMsgHdr, 0x235, OnAwardAthleticsMartial);
 
 MSG_REG_2(GameMsgHdr, 0x340, OnTownDeamonlBeAttack);
+MSG_REG_2(GameMsgHdr, 0x341, OnCFriendAthleticsRank);
 MSG_REG_2(GameMsgHdr, 0x342, OnPostDragonKing);
 MSG_REG_2(GameMsgHdr, 0x343, OnSaveGoldAct);
 MSG_REG_2(GameMsgHdr, 0x344, OnFoolsDayAct);
@@ -357,4 +358,6 @@ MSG_REG_2(GameMsgHdr, 0x352, OnSaleItemCancleAll);
 MSG_REG_2(GameMsgHdr, 0x353, OnCalcLBBattlePoint);
 MSG_REG_2(GameMsgHdr, 0x360, OnBeVoted);
 MSG_REG_2(GameMsgHdr, 0x361, OnSendPopularityAward);
+//0x365-380繁体占用
+
 MSG_HANDLER_END()

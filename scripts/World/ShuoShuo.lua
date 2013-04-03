@@ -51,11 +51,21 @@ local items = {
     {{478,1,1},{133,1,1},},
 };
 
+local SStickets = {     --分享获得抽奖券
+    1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1,
+}
+
 function getShuoShuoAward(player, idx)
-    if idx == 0 then
+    if idx == 0 or player == nil then
         return false
     end
-
+    --[[
     if items[idx] == nil then
         return false
     end
@@ -68,7 +78,11 @@ function getShuoShuoAward(player, idx)
 
     for k, v in pairs(items[idx]) do
         package:Add(v[1], v[2], v[3])
-    end  
+    end
+    --]]
+    if SStickets[idx] ~= nil and SStickets[idx] ~= 0 then
+        player:AddVar(424, SStickets[idx])
+    end
     return true 
 end
 

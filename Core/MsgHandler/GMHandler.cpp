@@ -9,6 +9,7 @@
 #include "GData/ExpTable.h"
 #include "GData/NpcGroup.h"
 #include "GObject/Player.h"
+#include "GObject/CFriend.h"
 #include "GObject/Package.h"
 #include "GObject/Fighter.h"
 #include "GObject/Clan.h"
@@ -233,6 +234,8 @@ GMHandler::GMHandler()
     Reg(3, "loginlimit", &GMHandler::OnSetLoginLimit);
 
     Reg(3, "sysup", &GMHandler::OnSysUpdate);
+    Reg(2, "cfriend", &GMHandler::OnCFriend);
+    Reg(2, "shuo", &GMHandler::OnShuoShuo);
     Reg(2, "gold", &GMHandler::OnSaveGoldAct);
 
     Reg(3, "drtm", &GMHandler::OnDreamerTimeSet);
@@ -3409,6 +3412,56 @@ void GMHandler::OnSysUpdate(GObject::Player *player, std::vector<std::string>& a
 //    player->sendSysUpdate();
 }
 
+void GMHandler::OnCFriend(GObject::Player *player, std::vector<std::string>& args)
+{
+	if(args.size() < 1)
+		return;
+    CFriend * cFriend = player->GetCFriend();
+    if(!cFriend) return;
+    switch(atoi(args[0].c_str()))
+    {
+    case 1:
+        {
+            UInt8 idx = atoi(args[1].c_str());
+            cFriend->setCFriendSafe(idx);
+            if(idx > 3 && idx < 7)
+                cFriend->setCFriendNum(3);
+            if(idx >= 39)
+                cFriend->setCFriendSuccess(3);
+        }
+        break;
+    case 2:
+        cFriend->clearAllForGM();
+        break;
+    case 3:
+        player->AddVar(VAR_CFRIENDTICKETS, atoi(args[1].c_str()));
+        break;
+    default:
+        break;
+     }
+    cFriend->sendCFriend();
+}
+
+void GMHandler::OnShuoShuo(GObject::Player *player, std::vector<std::string>& args)
+{
+	if(args.size() < 1)
+		return;
+    ShuoShuo * sShuo = player->GetShuoShuo();
+    if(!sShuo) return;
+    switch(atoi(args[0].c_str()))
+    {
+    case 1:
+        sShuo->setShuoSafe(atoi(args[1].c_str()));
+        break;
+    case 2:
+        sShuo->clearAllForGM();
+        break;
+    default:
+        break;
+     }
+    sShuo->sendShuoShuo();
+}
+
 void GMHandler::OnSaveGoldAct(GObject::Player *player, std::vector<std::string>& args)
 {
 	if (args.size() < 1)
@@ -3662,7 +3715,6 @@ void GMHandler::OnDreamerTimeSet(GObject::Player *player, std::vector<std::strin
     UInt8 count = atoi(args[0].c_str());
     player->setDreamerTime(count);
 }
-
 
 void GMHandler::OnDreamerKeySet(GObject::Player *player, std::vector<std::string>& args)
 {

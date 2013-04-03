@@ -213,6 +213,7 @@ namespace Script
 		void onLevelup(Player* player, UInt8 olev, UInt8 nlev);
 		void onInvitedBy(Player* player);
 		bool onGetCFriendAward(Player* player, UInt8 idx);
+	    UInt8 onUseTickets( Player* player);
 		void onGetVipPack(Player* player, UInt8 type);
 		bool testTakePack(Player* player, UInt8 type, UInt8 freq);
 		bool testTakePackSize(Player* player, UInt8 type);

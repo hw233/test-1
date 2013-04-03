@@ -209,6 +209,7 @@ enum ItemFrom
     FromDreamer = 39, // 水晶梦境
     FromFuling = 40, // 灵宝附灵
     FromVipPrivilege = 41, // 限时vip 
+    FromCFriend = 42, //好友邀请
 };
 
 enum ItemTo
