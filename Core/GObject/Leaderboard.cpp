@@ -176,7 +176,6 @@ void buildPacketForLingbao(Stream& st, UInt8 t, UInt32 id, std::vector<LingbaoIn
 void Leaderboard::buildPacketForLingbao(Stream& st, UInt8 t, bool merge /* = true */)
 {
     FastMutex::ScopedLock lk(_lbMutex);
-    st.clear();
     _lingbaoRank.clear();
 
 	UInt32 c = static_cast<UInt8>(_lingbaoInfoSet.size());
