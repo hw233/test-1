@@ -875,7 +875,7 @@ namespace GObject
             else if (lvl >= 50 && lvl < 60)
             {
                  _playerData.qqvipl1 -= 40;
-                 if (_playerData.qqvipl >= 30 && _playerData.qqvipl < 40)
+                 if (_playerData.qqvipl >= 20 && _playerData.qqvipl < 40)
                      _playerData.isHHBlue = true;
             }
             else if (lvl >= 61 && lvl < 70)
