@@ -111,7 +111,7 @@ public:
 	Leaderboard(): _id(0), _maxLevel(100), m_sorting(false) {}
 	void update();
 	bool hasUpdate(UInt32);
-	bool getPacket(UInt8, Stream*&, Player* pl=NULL);
+	bool getPacket(UInt8, Stream&, Player* pl=NULL);
 	void sendOwnRank(Player *, UInt32);
     void newDrawingGame(UInt32 nextday); //新人冲级赛
 	inline UInt8 getMaxLevel() { return _maxLevel; }
@@ -164,8 +164,8 @@ public:
     void pushLingbaoInfo(LingbaoInfoList lingbaoInfo);
 private:
 	void doUpdate();
-    void makeRankStream(Stream*& st, UInt8 type, Player* pl);
-    void makeRankAndValueStream(Stream*& st, UInt8 type, Player* pl, UInt32 value);
+    void makeRankStream(Stream* st, UInt8 type, Player* pl);
+    void makeRankAndValueStream(Stream* st, UInt8 type, Player* pl, UInt32 value);
 
 	Stream _levelStream;
 	Stream _moneyStream;

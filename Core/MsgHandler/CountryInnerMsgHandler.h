@@ -735,8 +735,8 @@ void OnDailyCheck( GameMsgHdr& hdr, const void * data )
     */
     if (World::_blueactiveday)
         player->onBlueactiveday();
-    player->GetShuoShuo()->reset(player->isOnline());
-    player->GetCFriend()->reset(player->isOnline());
+    player->GetShuoShuo()->reset();
+    player->GetCFriend()->reset();
     player->sendSSDTInfo();
     player->send11DailyInfo();
     player->SetVar(VAR_JUNE_HAPPY, 0);
