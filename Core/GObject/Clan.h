@@ -630,6 +630,8 @@ private:
     UInt16 _copyMaxLevel;
     UInt32 _copyMaxTime;
 
+    UInt32 _lastCallTime;
+
     std::list<ClanCopyLog> _copyLog;
     std::map<Player *, UInt8> _copySpotSnap;
 
