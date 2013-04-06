@@ -57,6 +57,7 @@ namespace GObject
 
     void FairyPet::UpdateToDB()
     {
+        _overTime = _overTime ? _overTime : TimeUtil::SharpDayT(1);
         DB2().PushUpdateData("REPLACE INTO `fairyPet` (`id`, `playerId`, `onBattle`, `petLev`, `petBone`, `pinjieBless`, `genguBless`, `chong`, `overTime`, `xiaozhou`, `dazhou`) VALUES (%u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", 
                 getId(), _owner->getId(), _onBattle, _petLev, _petBone, _pinjieBless, _genguBless, _chong, _overTime, _xiaozhou, _dazhou);
     }

@@ -248,10 +248,12 @@ function onDungeonWin(player, id, count, free)
         FoolBaoLoot(player,0);
         FallActivity(player, 1)
         Guoqing(player, 0);
+        ChingMingDay(player, 0)
     else
         FoolBaoLoot(player,2);
         FallActivity(player, 2)
         Guoqing(player, 3);
+        ChingMingDay(player, 2)
     end
     if getKillMonsterAct() then
         local package = player:GetPackage();
@@ -1287,15 +1289,15 @@ function ChingMingDay(player, lootlvl)
         return
     end
 
-    if lootlvl > 3 then
+    if lootlvl == nil or lootlvl > 3 then
         lootlvl = 0
     end
 
     local itemNum = {
             [0] = 1,
-            [1] = 2,
-            [2] = 4,
-            [3] = 6,
+            [1] = 1,
+            [2] = 2,
+            [3] = 3,
         };
     local package = player:GetPackage();
     package:AddItem(481, itemNum[lootlvl], true);
@@ -7586,6 +7588,7 @@ function getDragonKingAward(step, flag)
             [3] = {{136,1}},
             [4] = {{6136,1}},
             [5] = {{1357,1}},
+            [6] = {{137,1}},
         },
     }
     local chances = {
@@ -7744,8 +7747,8 @@ end
 
 function getAwardInFoolsDay(player, idx)
     local items = {
-        ["0330"] = { {56, 1}, {516, 1}, {503, 1}, {1325, 1}, {1528, 1}, {515, 1} },
-        ["0331"] = { {508, 1}, {516, 1}, {503, 1}, {1325, 1}, {1528, 1}, {515, 1} },
+        ["0330"] = { {56, 1}, {516, 1}, {503, 1}, {1325, 1}, {134, 1}, {515, 1} },
+        ["0331"] = { {508, 1}, {516, 1}, {503, 1}, {1325, 1}, {134, 1}, {515, 1} },
         ["0401"] = { {506, 1}, {516, 1}, {503, 1}, {9338, 1}, {509, 1}, {515, 1} },
     }
     if nil == player or nil == idx then
