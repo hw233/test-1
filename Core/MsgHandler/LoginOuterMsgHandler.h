@@ -2813,6 +2813,9 @@ void GMCmd(LoginMsgHdr& hdr, const void* data)
                     result = 0;
                 }
             }
+        case 0x04:
+            cfg.setAutoKick(val == 1? true:false);
+            result = 0;
             break;
         default:
             break;

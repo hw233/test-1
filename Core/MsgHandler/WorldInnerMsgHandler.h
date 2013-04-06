@@ -1078,8 +1078,8 @@ void OnPopularityRank ( GameMsgHdr& hdr, const void * data)
 
         ++rank;
 
-        Stream st(REP::ACT);
-        st << static_cast<UInt8>(2) << static_cast<UInt8>(1) << static_cast<UInt8>(2) << i->total << static_cast<UInt8>(rank) << Stream::eos;
+        //Stream st(REP::ACT);
+        //st << static_cast<UInt8>(2) << static_cast<UInt8>(1) << static_cast<UInt8>(2) << i->total << static_cast<UInt8>(rank) << Stream::eos;
     }
 
     if (oldrank <= PT_CNT || (!inrank && myrank <= PT_CNT))
@@ -1087,6 +1087,7 @@ void OnPopularityRank ( GameMsgHdr& hdr, const void * data)
         Stream st;
         SendPopularityRank(st, player);
     }
+    //globalPlayers.enumerate(popularityChanged, static_cast<void *>(NULL));
 }
 
 void OnSendPopularityRank(GameMsgHdr& hdr, const void*data)

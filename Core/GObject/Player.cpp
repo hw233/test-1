@@ -1260,6 +1260,7 @@ namespace GObject
 #ifndef _VT
         dclogger.login(this);
         dclogger.login_sec(this);
+        dclogger.checkOpenId(this);
 
         EventAutoRefreshOpenKey* event = new(std::nothrow) EventAutoRefreshOpenKey(this, 60 * 110, 24);
         if (event)
@@ -4322,8 +4323,8 @@ namespace GObject
         GameMsgHdr hdr(0x360, other->getThreadId(), other, 0);
         GLOBAL().PushMsg(hdr, NULL);
         sendMsgCode(0, 1509);
-        //GameMsgHdr hdr2(0x1C6, WORKER_THREAD_WORLD, this, 0);
-        //GLOBAL().PushMsg(hdr2, NULL);
+        GameMsgHdr hdr2(0x1C6, WORKER_THREAD_WORLD, this, 0);
+        GLOBAL().PushMsg(hdr2, NULL);
     }
 
     void Player::beVoted()
