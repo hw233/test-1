@@ -2,7 +2,6 @@
 #include "Config.h"
 #include "DCWorker.h"
 #include "Server/Cfg.h"
-#include "Player.h"
 
 
 extern "C" {
@@ -41,6 +40,7 @@ namespace GObject
 
     bool DCWorker::Init()
     {
+        /*
         size_t sz = cfg.IDQueryMemcached.size();
         for (size_t i = 0; i < sz; ++i)
         {
@@ -48,6 +48,7 @@ namespace GObject
             snprintf(buf, 128, "%s:%d", cfg.IDQueryMemcached[i].ip.c_str(), cfg.IDQueryMemcached[i].port); 
             m_MCached.pushHost(buf);
         }
+        */
 #ifndef _DEBUG
         m_logger = new (std::nothrow) CLogger();
         if (!m_logger)
@@ -63,9 +64,9 @@ namespace GObject
         {
             TRACE_LOG("Init DCLogger SUCCESS");
         }
+        m_inited = true;
         curl = curl_easy_init();
 #endif
-        m_inited = true;
         return true;
     }
 
@@ -78,14 +79,11 @@ namespace GObject
     {
         std::vector<LogMsg> log;
         std::vector<LogMsg> unionLog;
-        std::vector<OpenIdMsg> openIdLog;
         {
             FastMutex::ScopedLock lk(m_Mutex);
             log.swap(m_DCLog);
 
             unionLog.swap(m_UnionLog);
-
-            openIdLog.swap(m_Openid);
         }
         if (!log.empty())
         {
@@ -158,45 +156,6 @@ namespace GObject
                 ++i;
             }
         }
-        if (!openIdLog.empty())
-        {
-            size_t size = openIdLog.size();
-            size_t i = 0;
-            while (i < size)
-            {
-                char* msg = openIdLog[i].openId;
-                UInt64 playerId = openIdLog[i].playerId;
-                bool r = false;
-                GObject::Player * pl = GObject::globalPlayers[playerId];
-                if (!pl)
-                {
-                    delete[] msg;
-                    ++i;
-                    continue;
-                }
-//#ifndef _DEBUG
-                if (msg)
-                {
-                    std::string data = msg;
-                    if (CheckOpenId(playerId, msg))
-                    {
-                        r = true;
-                    }
-                    else
-                    {
-                        // 非法OpenId
-                        r = false;
-                        GameMsgHdr imh(0x332, pl->getThreadId(), pl, strlen(msg) + 1);
-                        GLOBAL().PushMsg(imh, msg);
-                    }
-                }
-//#endif
-                TRACE_LOG("[%u]%u:%u:PlayerId: %"I64_FMT"u, OpenId: %s] -> %d", m_Worker, i, size, playerId, msg, r ? 1 : 0);
-
-                delete[] msg;
-                ++i;
-            }
-        }
     }
 
     void DCWorker::OnPause()
@@ -236,28 +195,8 @@ namespace GObject
         }
     }
 
-    void DCWorker::PushCheckOpenId(UInt64 playerId, const char * openId, UInt32 len)
+    void DCWorker::PushCheckOpenId()
     {
-        if (!openId)
-            return;
-
-        char *p = new(std::nothrow) char[len+1];
-        if (p == NULL)
-            return;
-        memcpy(p, openId, len);
-        p[len] = '\0';
-
-        OpenIdMsg openMsg;
-        openMsg.openId = p;
-        openMsg.playerId = playerId;
-
-        ++m_Limit;
-
-        {
-            FastMutex::ScopedLock lk(m_Mutex);
-            m_Openid.push_back(openMsg);
-        }
-
     }
 
     bool DCWorker::CheckOpenId(UInt64 playerId, char * openId)

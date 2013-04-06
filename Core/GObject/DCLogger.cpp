@@ -969,24 +969,6 @@ bool DCLogger::reg_union(Player* player)
     return true;
 }
 
-bool DCLogger::checkOpenId(Player * player)
-{
-    if (!cfg.dclog)
-        return true;
-    std::ostringstream msg;
-
-    msg << player->getOpenId();
-
-#ifndef _FB
-#ifndef _VT
-#ifndef _WIN32
-    DC().PushCheckOpenId(player->getId(), msg.str().c_str(), msg.str().length());
-#endif
-#endif
-#endif
-    return true;
-}
-
 DCLogger dclogger;
 
 } // namespace GObject
