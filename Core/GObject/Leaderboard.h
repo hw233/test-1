@@ -32,13 +32,12 @@ struct LeaderboardLingbao
     std::string name;
     UInt32 itemId;
     UInt8 tongling;
-    UInt8 lbcolor;
+    UInt8 lbColor;
     std::string types;
     std::string values;
     std::string skills;
     std::string factors;
     UInt32 battlePoint;
-
 };
 
 struct RankingInfoList
@@ -83,19 +82,20 @@ struct ClanBattleRankingInfoList
 struct LingbaoInfoList
 {
     UInt64 id;
+    UInt32 equipId;
     std::string  name;
     UInt8  pf;
     UInt8  country;
     UInt32 battlePoint;
     UInt32 itemId;
     UInt8  tongling;
-    UInt8  lbcolor;
+    UInt8  lbColor;
     UInt8  type[4];
     UInt16  value[4];
     UInt16  skill[2];
     UInt16  factor[2];
     LingbaoInfoList()
-        :id(0), pf(0), country(0), battlePoint(0), itemId(0), tongling(0), lbcolor(0)
+        :id(0), equipId(0), pf(0), country(0), battlePoint(0), itemId(0), tongling(0), lbColor(0)
     {
         memset(type, 0, sizeof(type));
         memset(value, 0, sizeof(value));
@@ -116,13 +116,24 @@ public:
     void newDrawingGame(UInt32 nextday); //新人冲级赛
 	inline UInt8 getMaxLevel() { return _maxLevel; }
 
+    struct bpGreater
+    {
+        bool operator() (const LingbaoInfoList& first, const LingbaoInfoList& second)
+        {
+            if (first.battlePoint != second.battlePoint)
+                return first.battlePoint > second.battlePoint;
+            return first.equipId != second.equipId;
+        }
+    };
+    typedef std::set<LingbaoInfoList, bpGreater> LingbaoInfoSet;
+
     std::vector<RankingInfoList>* getLevelList() {return &_level;};
     std::vector<RankingInfoList>* getAthleticsList() {return &_athletics;};
     std::vector<RankingInfoList>* getAchievementList() {return &_achievement;};
     std::vector<TownRankingInfoList>& getTownList() {return _town;};
     std::vector<ClanCopyRankingInfoList>& getClanCopyList() {return _clanCopyInfo;};
     std::vector<ClanBattleRankingInfoList>& getClanBattleList() {return _clanBattleInfo;};
-    std::vector<LingbaoInfoList>& getLingbaoList() { return _lingbaoInfoList; }
+    LingbaoInfoSet& getLingbaoSet() { return _lingbaoInfoSet; }
     std::vector<RankingInfoList>* getPopularityList() { return &_popularityList; }
 
     const std::vector<LeaderboardTowndown>& getTowndown()
@@ -147,7 +158,10 @@ public:
     void end() { m_sorting = false; }
     bool isSorting() const { return m_sorting; }
     void buildBattlePacket();
-    int getMyRank(Player* pl, UInt8 type);
+    void buildPacketForLingbao(Stream& st, UInt8 t, bool merge = true);
+    int getMyRank(Player* pl, UInt8 type , bool setLock = true);
+
+    void pushLingbaoInfo(LingbaoInfoList lingbaoInfo);
 private:
 	void doUpdate();
     void makeRankStream(Stream*& st, UInt8 type, Player* pl);
@@ -185,7 +199,8 @@ private:
     std::vector<TownRankingInfoList> _town;
     std::vector<ClanCopyRankingInfoList> _clanCopyInfo;
     std::vector<ClanBattleRankingInfoList> _clanBattleInfo;
-    std::vector<LingbaoInfoList> _lingbaoInfoList;
+    LingbaoInfoSet _lingbaoInfoSet;
+    FastMutex _lbMutex;
     std::vector<RankingInfoList> _popularityList;
 
     AtomicVal<bool> m_sorting;

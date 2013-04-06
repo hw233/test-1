@@ -377,9 +377,6 @@ namespace GObject
         //431-440 for yijian
         VAR_LONGYUAN_GOT = 431,  //龙元风髓领取标志
 
-        // 441-442 for JLT
-        VAR_HAS_VOTE = 441,                 // 本日是否投票过
-        VAR_POPULARITY = 442,               // 本周人气
 
         VAR_RP7_TREASURE = 432,  //回流服务器聚宝盆, 1-8位:是否购买的标志为 9-16,17-24,25-32位第1-3个聚宝盆的已领取次数
         VAR_RP7_TREASURE_TODAY_GOT=433, //第1-3位:各个聚宝盆今天是否已领取
@@ -389,6 +386,10 @@ namespace GObject
         VAR_RP7_SIGN=437,              //注册签到
         VAR_RP7_SIGN_PACKAGE=438,      //连续签到礼包
         VAR_RP7_RECHARGE=439,      //开服7天充值金额
+
+        // 441-442 for JLT
+        VAR_HAS_VOTE = 441,                 // 本日是否投票过
+        VAR_POPULARITY = 442,               // 本周人气
 
         VAR_FOOLBAO_USED = 450,  //愚人宝箱使用数
         VAR_HHBAWARD_GOT = 451 , //豪华蓝钻领取

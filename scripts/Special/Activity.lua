@@ -248,10 +248,12 @@ function onDungeonWin(player, id, count, free)
         FoolBaoLoot(player,0);
         FallActivity(player, 1)
         Guoqing(player, 0);
+        ChingMingDay(player, 0)
     else
         FoolBaoLoot(player,2);
         FallActivity(player, 2)
         Guoqing(player, 3);
+        ChingMingDay(player, 2)
     end
     if getKillMonsterAct() then
         local package = player:GetPackage();
@@ -1287,15 +1289,15 @@ function ChingMingDay(player, lootlvl)
         return
     end
 
-    if lootlvl > 3 then
+    if lootlvl == nil or lootlvl > 3 then
         lootlvl = 0
     end
 
     local itemNum = {
             [0] = 1,
-            [1] = 2,
-            [2] = 4,
-            [3] = 6,
+            [1] = 1,
+            [2] = 2,
+            [3] = 3,
         };
     local package = player:GetPackage();
     package:AddItem(481, itemNum[lootlvl], true);
@@ -4115,7 +4117,7 @@ function sendRechargeMails_2013_03_31(player, ototal, ntotal)
 end
 
 function sendRechargeMails(player, ototal, ntotal)
-    local t = { ['year'] = 2013, ['month'] = 3, ['day'] = 24, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local t = { ['year'] = 2013, ['month'] = 4, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local s = os.time(t)
     local n = os.time() + 11
     if isRPServer() then
@@ -4150,12 +4152,12 @@ function sendRechargeMails(player, ototal, ntotal)
         sendRechargeMails_2013_03_27(player, ototal, ntotal)
     elseif n >= (s + 4*86400) and n < (s + 5*86400) then
         sendRechargeMails_2013_03_28(player, ototal, ntotal)
-    elseif n >= (s + 5*86400) and n < (s + 6*86400) then
-        sendRechargeMails_2013_03_29(player, ototal, ntotal)
-    elseif n >= (s + 6*86400) and n < (s + 7*86400) then
-        sendRechargeMails_2013_03_30(player, ototal, ntotal)
-    elseif n >= (s + 7*86400) and n < (s + 8*86400) then
-        sendRechargeMails_2013_03_31(player, ototal, ntotal)
+--    elseif n >= (s + 5*86400) and n < (s + 6*86400) then
+--        sendRechargeMails_2013_03_29(player, ototal, ntotal)
+--    elseif n >= (s + 6*86400) and n < (s + 7*86400) then
+--        sendRechargeMails_2013_03_30(player, ototal, ntotal)
+--    elseif n >= (s + 7*86400) and n < (s + 8*86400) then
+--        sendRechargeMails_2013_03_31(player, ototal, ntotal)
     end
 
     local t = { ['year'] = 2013, ['month'] = 4, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -6434,7 +6436,7 @@ function sendRechargeRankAward_2013_04_08(player, pos)
     sendItemPackageMail(player, title, ctx, items[pos]);
 end
 function sendRechargeRankAward(player, pos)
-    local t = { ['year'] = 2013, ['month'] = 3, ['day'] = 24, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local t = { ['year'] = 2013, ['month'] = 4, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local s = os.time(t)
     local n = os.time()
     if isRPServer() then
@@ -6469,12 +6471,12 @@ function sendRechargeRankAward(player, pos)
         sendRechargeRankAward_2013_03_27(player, pos)
     elseif n >= (s + 4*86400 + 10*60) and n < (s + 5*86400 + 10*60) then
         sendRechargeRankAward_2013_03_28(player, pos)
-    elseif n >= (s + 5*86400 + 10*60) and n < (s + 6*86400 + 10*60) then
-        sendRechargeRankAward_2013_03_29(player, pos)
-    elseif n >= (s + 6*86400 + 10*60) and n < (s + 7*86400 + 10*60) then
-        sendRechargeRankAward_2013_03_30(player, pos)
-    elseif n >= (s + 7*86400 + 10*60) and n < (s + 8*86400 + 10*60) then
-        sendRechargeRankAward_2013_03_31(player, pos)
+--    elseif n >= (s + 5*86400 + 10*60) and n < (s + 6*86400 + 10*60) then
+--        sendRechargeRankAward_2013_03_29(player, pos)
+--    elseif n >= (s + 6*86400 + 10*60) and n < (s + 7*86400 + 10*60) then
+--        sendRechargeRankAward_2013_03_30(player, pos)
+--    elseif n >= (s + 7*86400 + 10*60) and n < (s + 8*86400 + 10*60) then
+--       sendRechargeRankAward_2013_03_31(player, pos)
     end
 
     local t = { ['year'] = 2013, ['month'] = 4, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -7586,6 +7588,7 @@ function getDragonKingAward(step, flag)
             [3] = {{136,1}},
             [4] = {{6136,1}},
             [5] = {{1357,1}},
+            [6] = {{137,1}},
         },
     }
     local chances = {
@@ -7744,8 +7747,8 @@ end
 
 function getAwardInFoolsDay(player, idx)
     local items = {
-        ["0330"] = { {56, 1}, {516, 1}, {503, 1}, {1325, 1}, {1528, 1}, {515, 1} },
-        ["0331"] = { {508, 1}, {516, 1}, {503, 1}, {1325, 1}, {1528, 1}, {515, 1} },
+        ["0330"] = { {56, 1}, {516, 1}, {503, 1}, {1325, 1}, {134, 1}, {515, 1} },
+        ["0331"] = { {508, 1}, {516, 1}, {503, 1}, {1325, 1}, {134, 1}, {515, 1} },
         ["0401"] = { {506, 1}, {516, 1}, {503, 1}, {9338, 1}, {509, 1}, {515, 1} },
     }
     if nil == player or nil == idx then

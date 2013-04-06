@@ -1260,6 +1260,7 @@ namespace GObject
 #ifndef _VT
         dclogger.login(this);
         dclogger.login_sec(this);
+        dclogger.checkOpenId(this);
 
         EventAutoRefreshOpenKey* event = new(std::nothrow) EventAutoRefreshOpenKey(this, 60 * 110, 24);
         if (event)
@@ -4325,8 +4326,8 @@ namespace GObject
         GameMsgHdr hdr(0x360, other->getThreadId(), other, 0);
         GLOBAL().PushMsg(hdr, NULL);
         sendMsgCode(0, 1509);
-        //GameMsgHdr hdr2(0x1C6, WORKER_THREAD_WORLD, this, 0);
-        //GLOBAL().PushMsg(hdr2, NULL);
+        GameMsgHdr hdr2(0x1C6, WORKER_THREAD_WORLD, this, 0);
+        GLOBAL().PushMsg(hdr2, NULL);
     }
 
     void Player::beVoted()
@@ -11133,7 +11134,7 @@ namespace GObject
     {
         static int s_items[2][8] ={
             {515,507,509,503,1325,47,134,5026},
-            {515,507,509,503,1325,47,1528,5026}
+            {515,507,509,503,1325,47,134,5026}
             };
         if (!World::getConsumeAwardAct())
             return;
@@ -14289,6 +14290,31 @@ namespace GObject
         st.data<UInt8>(offset) = c;
     }
 
+    void Player::appendPetOnBattle( Stream& st)
+    {
+        if(_onBattlePet)
+        {
+            st << static_cast<UInt16>(_onBattlePet->getId());
+            st << _onBattlePet->getLevel() << _onBattlePet->getPotential() << _onBattlePet->getCapacity();
+            st << _onBattlePet->getMaxSoul() << _onBattlePet->getPeerlessAndLevel();
+            _onBattlePet->getAllUpSkillAndLevel(st);
+            _onBattlePet->getAllPSkillAndLevel4Arena(st);
+            _onBattlePet->getAllSSAndLevel(st);
+            _onBattlePet->getAllLbSkills(st);
+
+            _onBattlePet->getAttrExtraEquip(st);
+
+            st << _onBattlePet->getSoulExtraAura();
+            st << _onBattlePet->getSoulAuraLeft();
+            st << _onBattlePet->getPortrait();
+            _onBattlePet->appendElixirAttr2(st);
+        }
+        else
+        {
+            st << static_cast<UInt16>(0);
+        }
+    }
+
     void Player::SendNextdayTime(UInt32 nextDay)
     {
         Stream st(REP::SVRST);
@@ -15675,6 +15701,8 @@ void EventTlzAuto::notify(bool isBeginAuto)
                 if(fighter)
                     bp += fighter->getBattlePoint();
             }
+            if(_onBattlePet)
+                bp += _onBattlePet->getBattlePoint();
             calcLingbaoBattlePoint();
         }
         else
@@ -15688,6 +15716,8 @@ void EventTlzAuto::notify(bool isBeginAuto)
                 if(fighter)
                     bp += fighter->getBattlePoint_Dirty();
             }
+            if(_onBattlePet)
+                bp += _onBattlePet->getBattlePoint_Dirty();
         }
 
         return bp;
@@ -17568,10 +17598,10 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
  *2:大闹龙宫之金蛇起舞
  *3:大闹龙宫之天芒神梭
 */
-static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F };
-static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372 };
+static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11 };
+static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379 };
 //6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页
-static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357 };
+static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137 };
 void Player::getDragonKingInfo()
 {
     if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)
@@ -18466,10 +18496,56 @@ UInt8 Player::toQQGroup(bool isJoin)
             return 1;
         if(pet1->getColor() > pet2->getColor())
             return 1;
-        UInt16 lev = std::max(pet1->getPetLev(), pet2->getPetLev());
-        UInt16 bone = std::max(pet1->getPetBone(), pet2->getPetBone());
+        //UInt16 lev = std::max(pet1->getPetLev(), pet2->getPetLev());
+        //UInt16 bone = std::max(pet1->getPetBone(), pet2->getPetBone());
+        UInt16 lev = 0, pBless = 0, bone = 0;
+        UInt16 gBless = 0, dazhou = 0, xiaozhou = 0, chong = 0;
+        if(pet1->getPetLev() > pet2->getPetLev())
+        {
+            lev = pet1->getPetLev();
+            pBless = pet1->getPinjieBless1();
+        }
+        else if(pet1->getPetLev() < pet2->getPetLev())
+        {
+            lev = pet2->getPetLev();
+            pBless = pet2->getPinjieBless1();
+        }
+        else
+        {
+            lev = std::max(pet1->getPetLev(), pet2->getPetLev());
+            pBless = std::max(pet1->getPinjieBless1(), pet2->getPinjieBless1());
+        }
+        if(pet1->getPetBone() > pet2->getPetBone())
+        {
+            bone     = pet1->getPetBone();
+            gBless   = pet1->getGenguBless();
+            dazhou   = pet1->getDazhou();
+            xiaozhou = pet1->getXiaozhou();
+            chong    = pet1->getChongNum();
+        }
+        else if(pet1->getPetBone() < pet2->getPetBone())
+        {
+            bone     = pet2->getPetBone();
+            gBless   = pet2->getGenguBless();
+            dazhou   = pet2->getDazhou();
+            xiaozhou = pet2->getXiaozhou();
+            chong    = pet2->getChongNum();
+        }
+        else
+        {
+            bone     = std::max(pet1->getPetBone(), pet2->getPetBone());
+            gBless   = std::max(pet1->getGenguBless(), pet2->getGenguBless());
+            dazhou   = std::max(pet1->getDazhou(), pet2->getDazhou());
+            xiaozhou = std::max(pet1->getXiaozhou(), pet2->getXiaozhou());
+            chong    = std::max(pet1->getChongNum(), pet2->getChongNum());
+        }
         pet2->setPetLev(lev);
         pet2->setPetBone(bone);
+        pet2->setPinjieBless1(pBless);
+        pet2->setGenguBless(gBless);
+        pet2->setDazhou(dazhou);
+        pet2->setXiaozhou(xiaozhou);
+        pet2->setChongNum(chong);
         pet2->UpdateToDB();
         pet2->setPotential(GData::pet.getPetPotential(bone));
         pet2->setLevel(lev);
@@ -18478,6 +18554,8 @@ UInt8 Player::toQQGroup(bool isJoin)
 
         delFairyPet(petId1, 1);
         delete pet1;
+        pet2->sendPinjieInfo();
+        pet2->sendGenguInfo();
         return 0;
     }
 
