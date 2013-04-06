@@ -182,6 +182,7 @@ namespace GObject
         TIANMANG    = 3,    //天芒神梭
         HUNYUAN     = 4,    //混元剑诀
         XINGCHEN    = 5,    //遁天星辰诀
+        WUDUN       = 6,    //五遁神斧
         TREASURE    = 10,   //聚宝盆
 
         DRAGONKING_MAX,
