@@ -826,6 +826,9 @@ function onActivityCheck(tm)
       elseif tm >= actTime563 and tm < actTime563_1 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
+      elseif tm >= actTime2013_04_09 and tm < actTime2013_04_09+5*86400 then
+          setRechargeActive(true, 16)
+          setNeedRechargeRank(true)
       else
           setRechargeActive(false, 16)
           setNeedRechargeRank(false)
@@ -1014,6 +1017,12 @@ function onActivityCheck(tm)
       elseif tm >= (actTime2013_03_15+8*86400) and tm < (actTime2013_03_15+9*86400) then
           setPetEggAct(true)
       elseif tm >= (actTime2013_03_15+16*86400) and tm < (actTime2013_03_15+17*86400) then
+          setPetEggAct(true)
+      elseif tm >= (actTime2013_04_03) and tm < (actTime2013_04_03+86400) then
+          setPetEggAct(true)
+      elseif tm >= (actTime2013_04_12) and tm < (actTime2013_04_12+86400) then
+          setPetEggAct(true)
+      elseif tm >= (actTime2013_04_27) and tm < (actTime2013_04_27+86400) then
           setPetEggAct(true)
       else
           setPetEggAct(false)
@@ -1745,6 +1754,10 @@ function initActTime(y, m, d)
   actTime2013_03_14= os.time(SerStartTm2013_03_15)-86400;
   actTime2013_03_15= os.time(SerStartTm2013_03_15);
   actTime2013_04_01= os.time(SerStartTm2013_04_01);
+  actTime2013_04_03= os.time(SerStartTm2013_04_01)+86400*2;
+  actTime2013_04_12= os.time(SerStartTm2013_04_01)+86400*11;
+  actTime2013_04_27= os.time(SerStartTm2013_04_01)+86400*26;
+  actTime2013_04_09= os.time(SerStartTm2013_04_01)+86400*8;
 
   onActivityCheck(os.time() + 30);
 
