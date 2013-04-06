@@ -1581,6 +1581,7 @@ void OnArenaEnterCommit( GameMsgHdr& hdr, const void* data )
         Stream st(ARENAREQ::ENTER, 0xEF);
         st << player->getId() << player->getName() << static_cast<UInt8>(player->getTitle());
         player->appendLineup2(st);
+        player->appendPetOnBattle(st);
         st << Stream::eos;
         NETWORK()->SendToArena(st);
     }
@@ -1589,6 +1590,7 @@ void OnArenaEnterCommit( GameMsgHdr& hdr, const void* data )
         Stream st(ARENAREQ::COMMIT_LINEUP, 0xEF);
         st << player->getId();
         player->appendLineup2(st);
+        player->appendPetOnBattle(st);
         st << Stream::eos;
         NETWORK()->SendToArena(st);
     }

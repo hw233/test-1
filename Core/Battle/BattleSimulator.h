@@ -294,6 +294,8 @@ private:
         e_unPetProtect100 = 82,   // 100%援护标志
         e_petAtk100 = 83,       // 100%合击标志
         e_unPetAtk100 = 84,       // 100%合击标志
+        e_counterSpirit = 85,     // 反击士气
+        e_unCounterSpirit = 86,   // 解除反击士气
 
         e_MAX_STATE,
     };
@@ -514,7 +516,7 @@ private:
 
 
     bool doDarkVigorAttack(BattleFighter* bf, float darkVigor);
-    float getSkillEffectExtraCounterDarkVigor(const GData::SkillBase* skill);
+    void doSkillEffectExtraCounter(BattleFighter* bf, BattleFighter* bo, const GData::SkillBase* skill);
     void doPassiveSkillOnCounter(BattleFighter* bf, BattleFighter* bo);
 
 private:
@@ -650,8 +652,7 @@ private:
     static  bool hasPetMarked(BattleObject* bo);
     static  bool isPet(BattleObject* bo);
     UInt32 upPetObject(UInt8, bool = true);
-
-private:
+    UInt32 doSpiritAttack(BattleFighter * bf, BattleFighter* bo, float atk, bool& pr, bool& cs, bool& first);
 };
 
 }

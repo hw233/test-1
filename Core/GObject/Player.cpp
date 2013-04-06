@@ -14219,6 +14219,31 @@ namespace GObject
         st.data<UInt8>(offset) = c;
     }
 
+    void Player::appendPetOnBattle( Stream& st)
+    {
+        if(_onBattlePet)
+        {
+            st << static_cast<UInt16>(_onBattlePet->getId());
+            st << _onBattlePet->getLevel() << _onBattlePet->getPotential() << _onBattlePet->getCapacity();
+            st << _onBattlePet->getMaxSoul() << _onBattlePet->getPeerlessAndLevel();
+            _onBattlePet->getAllUpSkillAndLevel(st);
+            _onBattlePet->getAllPSkillAndLevel4Arena(st);
+            _onBattlePet->getAllSSAndLevel(st);
+            _onBattlePet->getAllLbSkills(st);
+
+            _onBattlePet->getAttrExtraEquip(st);
+
+            st << _onBattlePet->getSoulExtraAura();
+            st << _onBattlePet->getSoulAuraLeft();
+            st << _onBattlePet->getPortrait();
+            _onBattlePet->appendElixirAttr2(st);
+        }
+        else
+        {
+            st << static_cast<UInt16>(0);
+        }
+    }
+
     void Player::SendNextdayTime(UInt32 nextDay)
     {
         Stream st(REP::SVRST);
@@ -15605,6 +15630,8 @@ void EventTlzAuto::notify(bool isBeginAuto)
                 if(fighter)
                     bp += fighter->getBattlePoint();
             }
+            if(_onBattlePet)
+                bp += _onBattlePet->getBattlePoint();
             calcLingbaoBattlePoint();
         }
         else
@@ -15618,6 +15645,8 @@ void EventTlzAuto::notify(bool isBeginAuto)
                 if(fighter)
                     bp += fighter->getBattlePoint_Dirty();
             }
+            if(_onBattlePet)
+                bp += _onBattlePet->getBattlePoint_Dirty();
         }
 
         return bp;
