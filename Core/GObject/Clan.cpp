@@ -280,6 +280,8 @@ Clan::Clan( UInt32 id, const std::string& name, UInt32 ft, UInt8 lvl ) :
     _copyLevelUpdateTime = 0;
     _copyMaxLevel = 0;
     _copyMaxTime = 0;
+
+    _lastCallTime = 0;
 }
 
 Clan::~Clan()
@@ -4229,6 +4231,9 @@ void Clan::sendClanBattle(Player *player, Player *caller)
 void Clan::broadcastClanBattle(Player *caller)
 {
     UInt32 now = TimeUtil::Now();
+    if(now < _lastCallTime + 30)
+        return;
+    _lastCallTime = now;
     UInt32 startTime = TimeUtil::SharpDayT(0, now) + RANK_BATTLE_SIGNUP_BEGINTIME;
     UInt32 endTime = startTime + RANK_BATTLE_SIGNUP_TIME + FULL_BATTLE_TIME * BATTLE_NUM_PER_DAY;
     if(now < startTime || now > endTime)
