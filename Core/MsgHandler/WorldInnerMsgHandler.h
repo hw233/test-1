@@ -1363,6 +1363,14 @@ void SendRechargeRP7Rank(GameMsgHdr& hdr,  const void* data )
     player->send(st);
 }
 
+void OnSaleItemCancle( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	GObject::SaleCancelNotify * saleCancelNotify = reinterpret_cast<GObject::SaleCancelNotify*>(const_cast<void *>(data));
+
+    for(int i = 0; i < saleCancelNotify->count; ++ i)
+        GObject::gSaleMgr.cancelSale(player, saleCancelNotify->ids[i]);
+}
 
 
 #endif // _WORLDINNERMSGHANDLER_H_

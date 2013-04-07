@@ -1495,6 +1495,7 @@ namespace GObject
 
 		void sendFriendActList();
 
+        std::string& getOriginName(std::string& name);
 		std::string& fixName(std::string& name);
         void patchDeleteDotS(std::string& name);
 		inline void patchMergedName() { patchMergedName(_id, _playerData.name); }

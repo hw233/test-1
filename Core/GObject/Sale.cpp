@@ -465,16 +465,18 @@ void Sale::makeMailInfo(UInt32 id, Stream& st, UInt16& num)
 }
 void Sale::cancleAllItem()
 {
+	SaleCancelNotify saleCancelNotify;
     SaleItemCancel item;
 	UInt16 i = 0;
 	std::map<UInt32, SaleSellRespData *>::iterator it = _sellItems.begin();
 	for (; i < 24 && it != _sellItems.end(); ++i, ++it)
-	{
-        item.status = 2;
-        item.id = it->first;
-        gSaleMgr.cancelSale(_owner, item.id = it->first); 
-	}
-	
+    {
+        saleCancelNotify.ids[i] = it->first;
+    }
+
+    saleCancelNotify.count = i;
+	GameMsgHdr hdr(0x1B4, WORKER_THREAD_WORLD, _owner, sizeof(SaleCancelNotify));
+	GLOBAL().PushMsg(hdr, &saleCancelNotify);
 }
 
 }
