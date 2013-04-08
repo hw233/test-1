@@ -4318,13 +4318,26 @@ namespace GObject
 
     void Player::vote(Player* other)
     {
+        if(GetLev() < 45)
+        {
+            sendMsgCode(0, 1510);
+            return;
+        }
+
         if (GetVar(VAR_HAS_VOTE))
         {
             return;
         }
         SetVar(VAR_HAS_VOTE, 1);
-        GameMsgHdr hdr(0x360, other->getThreadId(), other, 0);
-        GLOBAL().PushMsg(hdr, NULL);
+        if(other->getThreadId() == getThreadId())
+        {
+            other->beVoted();
+        }
+        else
+        {
+            GameMsgHdr hdr(0x360, other->getThreadId(), other, 0);
+            GLOBAL().PushMsg(hdr, NULL);
+        }
         sendMsgCode(0, 1509);
         GameMsgHdr hdr2(0x1C6, WORKER_THREAD_WORLD, this, 0);
         GLOBAL().PushMsg(hdr2, NULL);
