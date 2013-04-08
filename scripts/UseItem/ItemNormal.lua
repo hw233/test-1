@@ -7784,7 +7784,7 @@ function ItemNormal_00009343(iid, num, bind, param)
         for n = 1, #items[iid] do
             if i <= chance[iid][n] then
                 package:Add(items[iid][n], 1, bind, 0, 2);
-                if broad[iid][n] == 1 then
+                if broad[iid][n] == 1 and (iid == 9344 and getItem9344Act() or iid == 9343 and getItem9343Act()) then
                     Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."] "..msg_122.."[4:"..iid.."],"..msg_123.."[4:"..items[iid][n].."]")
                 end
                 break
