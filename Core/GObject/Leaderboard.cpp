@@ -1044,9 +1044,11 @@ void Leaderboard::pushLingbaoInfo(LingbaoInfoList lingbaoInfo)
 void Leaderboard::eraseLingbaoInfo(LingbaoInfoList lingbaoInfo)
 {
     FastMutex::ScopedLock lk(_lbMutex);
+    /*
     LingbaoInfoSet::iterator it = _lingbaoInfoSet.find(lingbaoInfo);
     if(it != _lingbaoInfoSet.end())
-        _lingbaoInfoSet.erase(it);
+    */
+    _lingbaoInfoSet.erase(lingbaoInfo);
 }
 
 }
