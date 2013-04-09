@@ -44,7 +44,8 @@ __attribute__((destructor)) static void uninitMemcache()
     if (memcinited)
     {
         memcinited = false;
-        memcached_servers_reset(&memc);
+        memcached_free(&memc);
+        //memcached_servers_reset(&memc);
     }
 }
 
