@@ -367,6 +367,7 @@ namespace GObject
         VAR_ONLINE_TOTAL_TIME = 408, //累计在线时间
         VAR_ONLINE_AWARD = 409, //累计在线奖励是否领取
         VAR_QZONE_QQGAME_ACT = 410, //空间黄钻(bit1表示普通，bit2表示会员)、大厅蓝钻礼包(bit3表示普通，bit4表示会员)
+        VAR_LAST_HOOK_TYPE = 411, //最后挂机类型
 
         //421-430 for suntao
         VAR_FOOLS_DAY_INFO  = 421,  //愚公移山答题信息(0位表示失败,1-30位表示题目id及是否答对)
@@ -743,6 +744,7 @@ namespace GObject
 
             REGISTER_VAR(VAR_FOOLBAO_USED, CYCLE_NONE);
             REGISTER_VAR(VAR_HHBAWARD_GOT, CYCLE_DAY);
+            REGISTER_VAR(VAR_LAST_HOOK_TYPE, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);
