@@ -3765,8 +3765,7 @@ namespace GObject
 		EventAutoBattle* event = new(std::nothrow) EventAutoBattle(this, eachBattle, count, /*ng*/NULL, final);
 		if (event == NULL) return false;
         SetVar(VAR_EXP_HOOK_INDEX, type);
-        if(type > 0)
-            m_lastHookType = type;
+        m_lastHookType = type;
 		cancelAutoBattle(false);
 		addFlag(Training);
 		event->notify();
