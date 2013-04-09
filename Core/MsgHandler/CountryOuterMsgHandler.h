@@ -4453,6 +4453,7 @@ void OnClanRankBattleReqInit(GameMsgHdr& hdr,const void* data)
 	if(CURRENT_THREAD_ID() != WORKER_THREAD_NEUTRAL)
     {
         hdr.msgHdr.desWorkerID = WORKER_THREAD_NEUTRAL;
+        hdr.msgHdr.cmdID = 0x1F3;
         GLOBAL().PushMsg(hdr, (void*)data);
         return;
     }
@@ -4570,6 +4571,7 @@ void OnClanRankBattleSortList(GameMsgHdr& hdr, const void* data)
 	if(CURRENT_THREAD_ID() != WORKER_THREAD_NEUTRAL)
     {
         hdr.msgHdr.desWorkerID = WORKER_THREAD_NEUTRAL;
+        hdr.msgHdr.cmdID = 0x1F4;
         GLOBAL().PushMsg(hdr, (void*)data);
         return;
     }
