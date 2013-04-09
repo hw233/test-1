@@ -122,7 +122,7 @@ public:
         {
             if (first.battlePoint != second.battlePoint)
                 return first.battlePoint > second.battlePoint;
-            return first.equipId != second.equipId;
+            return first.equipId < second.equipId;
         }
     };
     typedef std::set<LingbaoInfoList, bpGreater> LingbaoInfoSet;
