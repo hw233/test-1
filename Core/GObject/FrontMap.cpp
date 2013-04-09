@@ -67,6 +67,9 @@ UInt32 FrontMap::getEnterGold(Player* pl)
     UInt8 vipl = pl->getVipLevel();
     if(vipl > 3)
         vipl = 3;
+    UInt8 divider = 1;
+    if(World::getHalfGold())
+        divider = 2;
     UInt32 extraVipGold[4][3] = {
         {20, 20, 20},
         { 0, 20, 20},
@@ -74,7 +77,7 @@ UInt32 FrontMap::getEnterGold(Player* pl)
         { 0,  0,  0},
     };
 
-    return GData::moneyNeed[GData::FRONTMAP_ENTER1+PLAYER_DATA(pl, frontGoldCnt)].gold + extraVipGold[vipl][PLAYER_DATA(pl, frontGoldCnt)];
+    return (GData::moneyNeed[GData::FRONTMAP_ENTER1+PLAYER_DATA(pl, frontGoldCnt)].gold + extraVipGold[vipl][PLAYER_DATA(pl, frontGoldCnt)])/divider;
 }
 
 void FrontMap::sendInfo(Player* pl, UInt8 id, bool needspot, bool force)

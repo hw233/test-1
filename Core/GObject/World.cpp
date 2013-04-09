@@ -140,6 +140,7 @@ bool World::_june1 = false;
 bool World::_july = false;
 bool World::_qixi= false;
 bool World::_foolbao = false;
+bool World::_halfgold = false;
 bool World::_wansheng= false;
 bool World::_qingren= false;
 bool World::_specialbook= false;
@@ -279,6 +280,7 @@ bool bRechargeEnd = false;
 bool bConsumeEnd = false;
 bool bXiaoyaoEnd = false;
 bool bFoolBaoEnd =  false;
+bool bHalfGoldEnd = false;
 bool bSnowEnd = false;
 bool bGoldSnakeEnd = false;
 bool bItem9344End = false;
@@ -1132,6 +1134,7 @@ void World::World_Midnight_Check( World * world )
     bool bValentineDay = getValentineDay();
     bool bMayDay = getMayDay();
     bool bfoolbao = getFoolBao();
+    bool bhalfgold = getHalfGold();
     bool bJune = getJune();
     bool bQixi = getQixi();
     bool bWansheng = getWansheng();
@@ -1168,6 +1171,8 @@ void World::World_Midnight_Check( World * world )
     //愚公宝箱是否结束
     bFoolBaoEnd =  bfoolbao && !getFoolBao(); 
    // 
+    bHalfGoldEnd = bhalfgold && !getHalfGold();
+
     bPExpItemsEnd = bPExpItems && !getPExpItems();
     bQixiEnd = bQixi && !getQixi();
     bWanshengEnd = bWansheng && !getWansheng();

@@ -84,6 +84,9 @@ UInt8 PlayerCopy::getGoldCount(UInt8 vipl)
 UInt32 PlayerCopy::getEnterGold(Player* pl)
 {
     UInt8 vipl = pl->getVipLevel();
+    UInt8 divider = 1;
+    if(World::getHalfGold())
+        divider = 2;
     if(vipl > 3)
         vipl = 3;
     UInt32 extraVipGold[4][3] = {
@@ -93,7 +96,7 @@ UInt32 PlayerCopy::getEnterGold(Player* pl)
         { 0,  0,  0},
     };
 
-    return GData::moneyNeed[GData::COPY_ENTER1+PLAYER_DATA(pl, copyGoldCnt)].gold + extraVipGold[vipl][PLAYER_DATA(pl, copyGoldCnt)];
+    return (GData::moneyNeed[GData::COPY_ENTER1+PLAYER_DATA(pl, copyGoldCnt)].gold + extraVipGold[vipl][PLAYER_DATA(pl, copyGoldCnt)])/divider;
 }
 
 void PlayerCopy::sendInfo(Player* pl, UInt8 id)

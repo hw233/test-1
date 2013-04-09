@@ -645,6 +645,11 @@ public:
     inline static bool getFoolBao()
     { return _foolbao; } 
 
+   inline static void setHalfGold(bool v)
+   { _halfgold = v; }
+    inline static bool getHalfGold()
+    { return _halfgold; } 
+
     inline static void setCallSnakeEggAct(UInt8 v)
     { _callsnakeeggact = v; }
     inline static UInt8 getCallSnakeEggAct()
@@ -798,6 +803,7 @@ public:
     static stArenaExtra stArena;
     static bool _compassact;
     static bool _foolbao;
+    static bool _halfgold;
     static UInt8 _callsnakeeggact;
     static UInt8 _snakeeggawardact;
     static bool _item9344act;
