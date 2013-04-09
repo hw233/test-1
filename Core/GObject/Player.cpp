@@ -719,6 +719,7 @@ namespace GObject
         _hiattrFlag = false;
 
         _inQQGroup = false;
+        m_lastHookType = 0;
 	}
 
 
@@ -2108,8 +2109,20 @@ namespace GObject
         {
             //if(cfg.GMCheck)
              {
+                 /** 如果boss正在该据点，退出不自动挂机 **/
                  if(worldBoss.needAutoBattle(_playerData.location))
-                    autoBattle(0, 0);
+                 {
+                     UInt8 hookType;
+                     if(m_lastHookType == ENUM_TRAINP1 && GetVar(VAR_TRAINP1) > 0)
+                         hookType = 1;
+                     else if(m_lastHookType == ENUM_TRAINP2 && GetVar(VAR_TRAINP2) > 0)
+                         hookType = 2;
+                     else if(m_lastHookType == ENUM_TRAINP3 && GetVar(VAR_TRAINP3) > 0)
+                         hookType = 3;
+                     else
+                         hookType = 0;
+                     autoBattle(0, hookType);
+                 }
              }
         }
         _isOnline = false;
@@ -3752,6 +3765,8 @@ namespace GObject
 		EventAutoBattle* event = new(std::nothrow) EventAutoBattle(this, eachBattle, count, /*ng*/NULL, final);
 		if (event == NULL) return false;
         SetVar(VAR_EXP_HOOK_INDEX, type);
+        if(type > 0)
+            m_lastHookType = type;
 		cancelAutoBattle(false);
 		addFlag(Training);
 		event->notify();

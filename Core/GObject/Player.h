@@ -2233,6 +2233,7 @@ namespace GObject
         void transferExpBuffer2Var();
 
         inline bool relateExpHook(UInt8 id) { return id == PLAYER_BUFF_TRAINP1 || id == PLAYER_BUFF_TRAINP2 || id == PLAYER_BUFF_TRAINP3/* || id == PLAYER_BUFF_TRAINP4 || id == PLAYER_BUFF_ADVANCED_HOOK*/; }
+        UInt8 m_lastHookType;
 
     private:    //仙宠
 		std::map<UInt32, FairyPet *> _fairyPets;
