@@ -1153,8 +1153,9 @@ void WBossMgr::fixBossName(UInt16 id, Fighter* fighter, UInt8 idx)
         if (!first)
             return;
         SYSMSG(pre, 2353);
-        std::string name = first->getName() + pre;
-        fighter->setName(name);
+        std::string tmp;
+        std::string name = first->getOriginName(tmp) + pre;
+        fighter->setName(first->fixName(name));
     }
 }
 

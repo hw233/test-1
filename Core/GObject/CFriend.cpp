@@ -28,7 +28,7 @@ void CFriend::loadFromDB(const char* cf)
 
     StringTokenizer cfriend(cf, ",");
     UInt32 count = cfriend.count();
-    m_cf.resize(CF_MAX);
+    m_cf.resize(CF_MAX, 0);
     for (UInt8 i = 0; i < count && i < CF_MAX; ++i)
         m_cf[i] = atoi(cfriend[i].c_str());
     bool toDB = false;
@@ -87,7 +87,7 @@ void CFriend::setCFriend(UInt8 idx, UInt8 status)
     bool w = false;
     if (idx >= m_maxIdx)
     {
-        m_maxIdx = idx+1;
+        m_maxIdx = CF_MAX;
         w = true;
     }
 
@@ -178,9 +178,9 @@ void CFriend::setCFriendNum(UInt8 num)
     UInt32 invited = m_owner->GetVar(VAR_INVITES);
     if(invited + num >= 30)
         setCFriendSafe(CF_INV30);
-    else if(invited + num >= 15)
+    if(invited + num >= 15)
         setCFriendSafe(CF_INV15);
-    else if(invited + num >= 3)
+    if(invited + num >= 3)
         setCFriendSafe(CF_INV3);
     m_owner->AddVar(VAR_INVITES, num);
     updateRecordData();
@@ -278,11 +278,11 @@ void CFriend::setCFriendSuccess(UInt8 num)
     UInt32 var = m_owner->GetVar(VAR_INVITEDSUCCESS);
     if(var + num >= 20)
         setCFriendSafe(CF_INVITED20);
-    else if(var + num >= 10)
+    if(var + num >= 10)
         setCFriendSafe(CF_INVITED10);
-    else if(var + num >= 5)
+    if(var + num >= 5)
         setCFriendSafe(CF_INVITED5);
-    else if(var + num >= 2)
+    if(var + num >= 2)
         setCFriendSafe(CF_INVITED2);
     m_owner->AddVar(VAR_INVITEDSUCCESS, num);
     updateRecordData();

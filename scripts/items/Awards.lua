@@ -429,40 +429,27 @@ function RunBlueDiamondAward(player, opt)
     local date_9191_1 = { ['year'] = 2013, ['month'] = 3, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
     local date_9217_0 = { ['year'] = 2012, ['month'] = 11, ['day'] = 20, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
     local date_9217_1 = { ['year'] = 2012, ['month'] = 11, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
-    
     local date_0 = os.time(date_9190_0);
     local date_1 = os.time(date_9190_1);
 
-    local chance = {785,2833,4881,5823,7202,7987,9366,10000}
-    local chance_1 = {1428, 1428*2, 1428*3, 1428*4, 1428*5, 1428*6, 10000, 10000}
-    local item_9190 = {{515,3},{507,2},{509,2},{503,10},{1325,4},{47,3},{134,4},{5026,1}}
-    local item_9191 = {{515,3},{507,2},{509,2},{503,10},{1325,4},{47,3},{134,4},{5026,1}}
-    local item_9217 = {{515,3},{507,2},{509,2},{503,10},{1325,4},{47,3},{134,4},{5026,1}}
-    local item_9284 = {{507,2},{509,2},{503,10},{1325,4},{47,3},{134,4},{515,10},{'ipad',1}}
-
-    local items = item_9190;
-    local itemId = 9190;
-    local ch = chance;
-
-    if opt == 2 then
-        itemId = 9191;
-        items = item_9191;
-        date_0 = os.time(date_9191_0);
-        date_1 = os.time(date_9191_1);
-    elseif opt == 3 then
-        itemId = 9217;
-        items = item_9217;
-        date_0 = os.time(date_9217_0);
-        date_1 = os.time(date_9217_1);
-    elseif opt == 4 then
-        itemId = 9284;
-        items = item_9284;
-        ch = chance_1;
-    end
---    now = os.time()
---    if now < date_0 or now >= date_1 then
---        return 0;
---    end
+    --1:蓝钻 2:黄钻 3:QQ会员 4:红钻
+    local chance = {
+        [1] = {785,2833,4881,5823,7202,7987,9366,10000},
+        [2] = {1050,2265,3480,4695,6220,7745,9270,10000},
+        [3] = {785,2833,4881,5823,7202,7987,9366,10000},
+        [4] = {1428, 1428*2, 1428*3, 1428*4, 1428*5, 1428*6, 10000, 10000},
+    };
+    local item = {
+        [1] = {{515,3},{507,2},{509,2},{503,10},{1325,4},{47,3},{134,4},{5026,1}},
+        [2] = {{515,3},{507,2},{509,2},{503,10},{1325,4},{47,3},{134,4},{5026,1}},
+        [3] = {{515,3},{507,2},{509,2},{503,10},{1325,4},{47,3},{134,4},{5026,1}},
+        [4] = {{507,2},{509,2},{503,10},{1325,4},{47,3},{134,4},{515,10},{'ipad',1}},
+    };
+    local item_id = {9190, 9191, 9217, 9284};
+    
+    local items = item[opt];
+    local itemId = item_id[opt];
+    local ch = chance[opt];
 
     if  not package:DelItem(itemId, 1, true) then
         if  not package:DelItem(itemId, 1, false) then
@@ -480,6 +467,12 @@ function RunBlueDiamondAward(player, opt)
             break
         end
     end
+    local extraAward_9191 = {
+        [2] = {{9191,1}},
+        [5] = {{50,2}, {9371,5}, {548,10}},
+        [8] = {{509,5}, {507,5}, {500,5}},
+        [12]= {{9076,5},{503,5},{515,5}},
+    };
 
     local VAR_BLUE_AWARD_COUNT = 196;
     local VAR_YELLOW_AWARD_COUNT = 197;
@@ -496,11 +489,11 @@ function RunBlueDiamondAward(player, opt)
     elseif opt == 2 then
         player:AddVar(VAR_YELLOW_AWARD_COUNT, 1);
         count = player:GetVar(VAR_YELLOW_AWARD_COUNT);
-        if count == 12 then
-            package:Add(9076, 5, true, 0, 31); 
-            package:Add(515, 5, true, 0, 31); 
-            package:Add(507, 5, true, 0, 31); 
-            package:Add(509, 5, true, 0, 31); 
+        local extarAward = extraAward_9191[count];
+        if extarAward then
+            for i=1,#extarAward do
+                package:Add(extarAward[i][1], extarAward[i][2], true, 0, 31);
+            end
         end
     elseif opt == 3 then
         player:AddVar(VAR_QQVIP_AWARD_COUNT, 1);
@@ -849,7 +842,7 @@ function RunVipPrivilegeAward(player, idx, dayth)
         if player:getGoldInLua() < limitbuy[dayth][idx][3] then
             return false;
         end
-        player:useGoldInLua(limitbuy[dayth][idx][3]);
+        player:useGoldInLua(limitbuy[dayth][idx][3], 98);
         package:Add(limitbuy[dayth][idx][1], limitbuy[dayth][idx][2], true, 0, 41);
     end
 

@@ -1832,27 +1832,6 @@ void OnCFriendAthleticsRank( GameMsgHdr& hdr, const void * data)
     player->OnCFriendAthleticsRank();
 }
 
-void OnForbidSale( GameMsgHdr &hdr, const void *data)
-{
-	MSG_QUERY_PLAYER(player);
-    if (cfg.autoForbid)
-    {
-        if (cfg.merged)
-        {
-            setForbidSaleValue(player->getId()&0xFFFFFFFF, true);
-        }
-        else
-        {
-            setForbidSaleValue(player->getId(), true);
-        }
-        player->setForbidSale(true, true);
-    }
-    else
-    {
-        player->udpLog("svr_forbid_sale", "known", "", "", "", "", "act_tmp");
-    }
-}
-
 void OnForbidSaleQueryFail( GameMsgHdr &hdr, const void *data)
 {
     MSG_QUERY_PLAYER(player);
@@ -1995,6 +1974,57 @@ void OnSendPopularityAward(GameMsgHdr &hdr, const void * data)
 {
     MSG_QUERY_PLAYER(player);
     player->sendPopularityRandAward(*(int*)data);
+}
+
+void OnClanRankBattleReqInitInner(GameMsgHdr& hdr,const void* data)
+{
+    MSG_QUERY_PLAYER(player);
+
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    brd >> type;
+
+    switch(type)
+    {
+        case 0: //请求帮会战状态信息
+            {
+                ClanRankBattleMgr::Instance().SendInitStatus(player);
+            }
+            break;
+        case 1: //报名进入战斗
+            {
+                UInt8 field = 0;
+                brd >> field;
+                ClanRankBattleMgr::Instance().Signup(player, field);
+            }
+            break;
+        case 2: //取消报名
+            {
+                ClanRankBattleMgr::Instance().Signout(player);
+            }
+            break;
+        case 8:
+            {
+                GObject::Clan *clan = player->getClan();
+                if(clan)
+                    clan->broadcastClanBattle(player);
+            }
+            break;
+        default:
+            break;
+    }
+}
+
+void OnClanRankBattleSortListInner(GameMsgHdr& hdr, const void* data)
+{
+    MSG_QUERY_PLAYER(player);
+
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt16 startId = 0;
+    UInt8 count = 0;
+    brd >> startId >> count;
+
+    ClanRankBattleMgr::Instance().SendSortList(player, startId, count);
 }
 
 #endif // _COUNTRYINNERMSGHANDLER_H_

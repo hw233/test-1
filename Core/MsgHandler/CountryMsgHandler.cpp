@@ -187,6 +187,9 @@ MSG_REG_2(GameMsgHdr, 0x1F1, PlayerLeave);
 MSG_REG_2(GameMsgHdr, 0x1F2, OnBroadcast);
 
 
+MSG_REG_2(GameMsgHdr, 0x1F3, OnClanRankBattleReqInitInner);
+MSG_REG_2(GameMsgHdr, 0x1F4, OnClanRankBattleSortListInner);
+
 
 MSG_REG_2(GameMsgHdr, 0x200, PlayerLogout);
 MSG_REG_2(GameMsgHdr, 0x201, PlayerLogin);
@@ -348,7 +351,6 @@ MSG_REG_2(GameMsgHdr, 0x327, OnDelTianjieNpc);
 MSG_REG_2(GameMsgHdr, 0x328, OnDelMapObj);
 MSG_REG_2(GameMsgHdr, 0x329, OnAddMapObj);
 
-MSG_REG_2(GameMsgHdr, 0x330, OnForbidSale);
 MSG_REG_2(GameMsgHdr, 0x331, OnForbidSaleQueryFail);
 MSG_REG_2(GameMsgHdr, 0x332, OnOpenIdInvalid);
 MSG_REG_2(GameMsgHdr, 0x333, OnOpenAPIFailed);
@@ -358,6 +360,7 @@ MSG_REG_2(GameMsgHdr, 0x352, OnSaleItemCancleAll);
 MSG_REG_2(GameMsgHdr, 0x353, OnCalcLBBattlePoint);
 MSG_REG_2(GameMsgHdr, 0x360, OnBeVoted);
 MSG_REG_2(GameMsgHdr, 0x361, OnSendPopularityAward);
+
 //0x365-380繁体占用
 
 MSG_HANDLER_END()

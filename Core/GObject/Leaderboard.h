@@ -122,7 +122,7 @@ public:
         {
             if (first.battlePoint != second.battlePoint)
                 return first.battlePoint > second.battlePoint;
-            return first.equipId != second.equipId;
+            return first.equipId < second.equipId;
         }
     };
     typedef std::set<LingbaoInfoList, bpGreater> LingbaoInfoSet;
@@ -160,6 +160,7 @@ public:
     int getMyRank(Player* pl, UInt8 type , bool setLock = true);
 
     void pushLingbaoInfo(LingbaoInfoList lingbaoInfo);
+    void eraseLingbaoInfo(LingbaoInfoList lingbaoInfo);
 private:
 	void doUpdate();
     void makeRankStream(Stream* st, UInt8 type, Player* pl);

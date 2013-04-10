@@ -69,5 +69,6 @@ MSG_REG_2(LoginMsgHdr,SPEQ::SYSUPDATE, SysUpdate);
 
 MSG_REG_2(LoginMsgHdr, 0x300, OnCheckPackKey);
 MSG_REG_2(LoginMsgHdr, 0x301, OnSetCrackValue);
+MSG_REG_2(LoginMsgHdr, 0x330, OnForbidSale);
 
 MSG_HANDLER_END()

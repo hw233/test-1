@@ -143,4 +143,26 @@ void OnSetCrackValue( LoginMsgHdr& hdr, const void * data )
     }         
 }
 
+void OnForbidSale( LoginMsgHdr&hdr, const void *data)
+{
+    GObject::Player* pl = (GObject::Player*)(data);
+    if (cfg.autoForbid)
+    {
+        if (cfg.merged)
+        {
+            setForbidSaleValue(pl->getId()&0xFFFFFFFF, true);
+        }
+        else
+        {
+            setForbidSaleValue(pl->getId(), true);
+        }
+        pl->setForbidSale(true, true);
+    }
+    else
+    {
+        pl->udpLog("svr_forbid_sale", "known", "", "", "", "", "act_tmp");
+    }
+}
+
+
 #endif // _LOGININNERMSGHANDLER_H_
