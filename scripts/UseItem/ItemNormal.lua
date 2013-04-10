@@ -8116,6 +8116,51 @@ function ItemNormal_00009375(iid, num, bind, param)
 		return false;
 end
 
+function ItemNormal_00009382(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage()
+    local items = { 15,9088,512,33,9371,551,501,513,503,1325,134,507,,509,515 }
+    local chance = { 1500,1500,900,900,900,900,800,800,600,300,300,200,200,200 }
+    local board = { 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1 }
+    local used = 0
+
+    for n = 1, num do
+        if package:GetRestPackageSize() < 1 then
+            if used ~= 0 then
+                package:DelItemSendMsg(iid, player)
+            end
+            player:sendMsgCode(2, 1011, 0)
+            player:AddVar(452, used)
+            return used
+        end
+        local rand = math.random(1,10000)
+        local g = 0
+        local _chance = 0;
+        for i = 1, #chance do
+            _chance+=chance[i]
+            if rand <=_chance then
+                g = i
+                break
+            end
+        end
+        package:Add(items[g], 1, true, false, 2)
+        if board[g] then
+            Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."打开了幸运礼包，幸运的获得了".."[4:"..items[g].."]x1")
+        end
+        local rand_card = math.random(1,100);
+        if rand_card <= 30 then
+           local  rand_card_num = math.random(1,5)
+           Player:AddVar(452+rand_card_num,1);
+        end
+
+        package:DelItemSendMsg(iid, player)
+        used = used + 1
+    end
+
+    player:AddVar(452, used)
+    return used
+end
+
 local ItemNormal_Table = {
   [1] = ItemNormal_00000001,
 	[8] = ItemNormal_00000008,
@@ -9795,6 +9840,7 @@ local ItemNormal_Table = {
     [9375] = ItemNormal_00009375,
     [9373] = ItemNormal_00009366,
     [9374] = ItemNormal_00009366,
+    [9382] = ItemNormal_00009382,
     [9900] = ItemNormal_NameCard,
     [9901] = ItemNormal_NameCard,
     [9902] = ItemNormal_NameCard,

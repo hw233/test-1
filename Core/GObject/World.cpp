@@ -141,6 +141,7 @@ bool World::_july = false;
 bool World::_qixi= false;
 bool World::_foolbao = false;
 bool World::_halfgold = false;
+bool World::_surnamelegend = false;
 bool World::_wansheng= false;
 bool World::_qingren= false;
 bool World::_specialbook= false;
@@ -177,6 +178,7 @@ bool World::_consumeawardact = false;
 RCSortType World::rechargeSort;
 RCSortType World::consumeSort;
 RCSortType World::popularitySort;
+RCSortType World::LuckyBagSort;
 bool World::_needrechargerank = false;
 bool World::_needconsumerank = false;
 bool World::_killMonsteract = 0;
@@ -281,6 +283,7 @@ bool bConsumeEnd = false;
 bool bXiaoyaoEnd = false;
 bool bFoolBaoEnd =  false;
 bool bHalfGoldEnd = false;
+bool bSurnameLegendEnd = false;
 bool bSnowEnd = false;
 bool bGoldSnakeEnd = false;
 bool bItem9344End = false;
@@ -1135,6 +1138,7 @@ void World::World_Midnight_Check( World * world )
     bool bMayDay = getMayDay();
     bool bfoolbao = getFoolBao();
     bool bhalfgold = getHalfGold();
+    bool bsurnamelegend = getSurnameLegend();
     bool bJune = getJune();
     bool bQixi = getQixi();
     bool bWansheng = getWansheng();
@@ -1172,6 +1176,8 @@ void World::World_Midnight_Check( World * world )
     bFoolBaoEnd =  bfoolbao && !getFoolBao(); 
    // 
     bHalfGoldEnd = bhalfgold && !getHalfGold();
+    //蜀山传奇掉落活动是否结束
+    bSurnameLegendEnd = bsurnamelegend && !getSurnameLegend();
 
     bPExpItemsEnd = bPExpItems && !getPExpItems();
     bQixiEnd = bQixi && !getQixi();
@@ -1402,6 +1408,8 @@ void World::World_Midnight_Check( World * world )
         world->SendXiaoyaoAward();
     if(bFoolBaoEnd)
         world->SendFoolBaoAward();
+    if(bSurnameLegendEnd)
+        world->SendSurnameLegendAward();
     if (bSnowEnd)
         world->SendSnowAward();
     if (bGoldSnakeEnd)
@@ -2491,6 +2499,36 @@ void World::SendFoolBaoAward()
     };
     selector._player->sendMailItem(4142, 4143, items, sizeof(items)/sizeof(items[0]), false);
 }
+
+struct SSelectSurnameLegendUsedMost : public Visitor<Player>
+{
+    Player* _player;
+    UInt32 _used;
+    SSelectSurnameLegendUsedMost(): _player(NULL), _used(0) {}
+    bool operator()(Player* player)
+    {
+        UInt32 used = player->GetVar(VAR_SURNAMELEGEND_USED);
+        if(_player == NULL || used > _used)
+        {
+            _player = player;
+            _used = used;
+        }
+        return true;
+    }
+};
+void World::SendSurnameLegendAward()
+{
+     SSelectSurnameLegendUsedMost  selector;
+    globalPlayers.enumerate(selector);
+    if(selector._player == NULL)
+        return;
+    MailPackage::MailItem items[] =
+    {
+        {9902, 1}
+    };
+    selector._player->sendMailItem(4151, 4152, items, sizeof(items)/sizeof(items[0]), false);
+}
+
 void World::SendXiaoyaoAward()
 {
     SSelectXiaoyaoUsedMost selector;
@@ -2642,6 +2680,23 @@ inline bool player_enum_rc(GObject::Player * p, int)
     }
     return true;
 }
+inline bool player_enum_used(GObject::Player * p, int)
+{
+    //using namespace GObject;
+    if (World::getSurnameLegend())
+    {
+        UInt32 total;
+         total = p->GetVar(VAR_SURNAMELEGEND_USED);
+        if (total)
+        {
+            RCSort s;
+            s.player = p;
+            s.total = total;
+            World::LuckyBagSort.insert(s);
+        }
+    }
+    return true;
+}
 inline bool player_enum_rp7rc(GObject::Player * p, int)
 {
     UInt32 opTime = TimeUtil::MkTime(cfg.openYear, cfg.openMonth, cfg.openDay);
@@ -2665,12 +2720,21 @@ inline bool player_enum_rp7rc(GObject::Player * p, int)
 
 static bool init = false;
 static bool initRP7 = false;
+static bool initBag = false;
 void World::initRCRank()
 {
     if (init)
         return;
     GObject::globalPlayers.enumerate(player_enum_rc, 0);
     init = true;
+}
+
+void World::initLuckyBagRank()
+{
+    if (initBag)
+       return;
+    GObject::globalPlayers.enumerate(player_enum_rc, 0);
+    initBag = true;
 }
 void World::initRP7RCRank()
 {

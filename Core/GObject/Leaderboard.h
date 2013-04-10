@@ -135,7 +135,6 @@ public:
     std::vector<ClanBattleRankingInfoList>& getClanBattleList() {return _clanBattleInfo;};
     LingbaoInfoSet& getLingbaoSet() { return _lingbaoInfoSet; }
     std::vector<RankingInfoList>* getPopularityList() { return &_popularityList; }
-
     const std::vector<LeaderboardTowndown>& getTowndown()
     {
         FastMutex::ScopedLock lk(_tmutex);
@@ -153,7 +152,6 @@ public:
         FastMutex::ScopedLock lk(_lmutex);
         return _level;
     };
-
     void begin() { m_sorting = true; }
     void end() { m_sorting = false; }
     bool isSorting() const { return m_sorting; }

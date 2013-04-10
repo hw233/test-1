@@ -7792,6 +7792,7 @@ namespace GObject
         }
     }
 
+
     void Player::sendRechargeInfo(bool rank)
     {
         if (!World::getRechargeActive() && !World::getRechargeActive3366())
@@ -7813,7 +7814,6 @@ namespace GObject
             GLOBAL().PushMsg(hdr, &total);
         }
     }
-
     void Player::sendConsumeInfo(bool rank)
     {
         if (!World::getConsumeActive())

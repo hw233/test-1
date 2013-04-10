@@ -644,6 +644,11 @@ public:
    { _foolbao = v; }
     inline static bool getFoolBao()
     { return _foolbao; } 
+   
+    inline static void setSurnameLegend(bool v)
+   { _surnamelegend = v; }
+    inline static bool getSurnameLegend()
+    { return _surnamelegend; } 
 
    inline static void setHalfGold(bool v)
    { _halfgold = v; }
@@ -804,6 +809,7 @@ public:
     static bool _compassact;
     static bool _foolbao;
     static bool _halfgold;
+    static bool _surnamelegend;
     static UInt8 _callsnakeeggact;
     static UInt8 _snakeeggawardact;
     static bool _item9344act;
@@ -815,8 +821,10 @@ public:
     static RCSortType rechargeSort;
     static RCSortType consumeSort;
     static RCSortType popularitySort;
+    static RCSortType LuckyBagSort;
     static void initRCRank();
     static void initRP7RCRank();
+    static void initLuckyBagRank();
 
     static RCSortType killMonsterSort[4];
     static RCSortType rechargeRP7Sort;
@@ -879,7 +887,7 @@ public:
     void SendItem9344Award();
     void SendItem9343Award();
     void SendFoolBaoAward();
-
+    void SendSurnameLegendAward();
     void UpdateSnowScore(Player* pl, Player* lover);
     void sendSnowPlayers(Player* pl);
     void DivorceSnowPair(Player* pl);

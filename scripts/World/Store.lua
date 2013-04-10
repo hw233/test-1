@@ -139,7 +139,11 @@ function loadStore()
             store:add(2, 9337, 10) --游龙令
         end
         if  getFoolBao() then
-            store:add(2,9375,20)
+            store:add(2 ,9375 ,20)
+        end
+        
+        if getSurnameLegend() then
+            store:add(2 , 9375 , 20)
         end
 
         if is2013_0201_0228() then

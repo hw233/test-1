@@ -1948,6 +1948,12 @@ namespace GObject
 		Stream st(REP::PACK_USE);
 		st << id << static_cast<UInt8>(1) << static_cast<UInt8>(ret ? 1 : 0) << Stream::eos;
 		m_Owner->send(st);
+        if(World::getSurnameLegend() && id == 9375)
+        {
+            UInt32 LuckbagNum = m_Owner->GetVar(VAR_SURNAMELEGEND_USED);
+            GameMsgHdr hdr(0x1C8, WORKER_THREAD_WORLD, m_Owner, sizeof(LuckbagNum));
+             GLOBAL().PushMsg(hdr, &LuckbagNum);
+        }
 		return ret;
 	}
 
