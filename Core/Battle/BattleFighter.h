@@ -131,10 +131,10 @@ public:
 	inline float getSoul() { return _soul; }
 	inline float getAura() { return (_aura > 0 ? _aura : 0); }
 	inline float getAuraMax() { return (_auraMax > 0 ? _auraMax : 0); }
-	inline float getAttack() {float ret = _attack + _attackAdd + _attackAdd2 + _atkAddSpecial + _atkDecSpecial + _moAttackAdd + _petAttackAdd + (_petExAtkEnable?_petExAtk:0); return  ret;}
-	inline float getMagAttack() {float ret = _magatk + _magAtkAdd + _magAtkAdd2 + _magAtkAddSpecial + _magAtkDecSpecial + _moMagAtkAdd + _petMagAtkAdd; return ret;}
-	inline float getDefend() {float ret = _defend + _defAdd + _defAdd2; return (ret > 0 ? ret : 0);}
-	inline float getMagDefend() {float ret = _magdef + _magDefAdd + _magDefAdd2; return (ret > 0 ? ret : 0);}
+	inline float getAttack() {float ret = _attack + _attackAdd + _attackAdd2 + _atkAddSpecial + _atkDecSpecial + _moAttackAdd + _petAttackAdd + (_petExAtkEnable?_petExAtk:0) + _counter_spirit_atk_add; return  ret;}
+	inline float getMagAttack() {float ret = _magatk + _magAtkAdd + _magAtkAdd2 + _magAtkAddSpecial + _magAtkDecSpecial + _moMagAtkAdd + _petMagAtkAdd + _counter_spirit_magatk_add; return ret;}
+	inline float getDefend() {float ret = _defend + _defAdd + _defAdd2 + _counter_spirit_def_add; return (ret > 0 ? ret : 0);}
+	inline float getMagDefend() {float ret = _magdef + _magDefAdd + _magDefAdd2 + _counter_spirit_magdef_add; return (ret > 0 ? ret : 0);}
 	float getHitrate(BattleFighter* defgt);
 	float getEvade(BattleFighter* defgt);
 	float getCritical(BattleFighter* defgt);
@@ -917,6 +917,26 @@ public:
     inline bool getPetAtk100Last() { return _petAtk100Last;}
     inline void setPetAtk100(float v, UInt8 l) { _petAtk100 = v; _petAtk100Last = l; }
     bool releasePetAtk100();
+
+public:
+    float _counter_spirit_atk_add;
+    float _counter_spirit_magatk_add;
+    float _counter_spirit_def_add;
+    float _counter_spirit_magdef_add;
+    UInt8 _counter_spirit_times;
+    UInt8 _counter_spirit_last;
+    float _counter_spirit_efv;
+    std::vector<float> _counter_spirit_factor;
+    UInt16 _counter_spirit_skillid;
+
+    inline UInt8 getCounterSpiritTimes() { return _counter_spirit_times; }
+    void addCounterSpiritBuf(float atk, float magatk, float def, float magdef, UInt8 last);
+    void setCounterSpiritSkill(UInt16 skillid, float efv, const std::vector<float>& factor);
+    void clearCounterSpiritSkill();
+    float getCounterSpiritAtk();
+    UInt16 getCounterSpiritSkillId() { return _counter_spirit_skillid; }
+    std::vector<float>& getCounterSpiritFactor() { return _counter_spirit_factor; }
+    bool releaseCounterSpirit();
 
 public:
 	enum StatusFlag

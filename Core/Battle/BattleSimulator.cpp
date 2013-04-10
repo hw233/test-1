@@ -955,6 +955,75 @@ float BattleSimulator::testLink( BattleFighter *& bf, UInt16& skillId )
 }
 #endif
 
+UInt32 BattleSimulator::doSpiritAttack(BattleFighter * bf, BattleFighter* bo, float atk, bool& pr, bool& cs, bool& first)
+{
+    if(!bf || !bo || bf->getHP() == 0 || bo->getHP() == 0)
+        return 0;
+
+    UInt32 dmg = 0;
+    UInt8 target_stun = bo->getStunRound();
+    bool enterEvade = bo->getEvad100();
+    bool defend100 = bo->getDefend100();
+
+    bool pr2 = false;
+    bool cs2 = false;
+    if(!defend100 && (target_stun > 0 || (!enterEvade && bf->calcHit(bo, NULL))))
+    {
+        pr2 = bf->calcPierce(bo);
+        float rate = bf->getCritical(bo);
+        if(uRand(10000) < (rate > 0 ? rate : 0) * 100);
+        {
+            float factor = bf->getCriticalDmg() - bo->getTough(bf);
+            if(factor < 1)
+                factor = 1;
+            atk = atk * factor;
+            cs2 = true;
+        }
+
+        float def;
+        float toughFactor = pr2 ? bo->getTough(bf) : 1.0f;
+        def = bo->getDefend();
+        float atkreduce = bo->getAtkReduce();
+        dmg = _formula->calcDamage(atk, def, bf->getLevel(), toughFactor, atkreduce);
+        dmg *= static_cast<float>(950 + _rnd(100)) / 1000;
+        dmg = dmg > 0 ? dmg : 1;
+
+        makeDamage(bo, dmg);
+        appendDefStatus(e_damNormal, dmg, bo, e_damagePhysic);
+        // killed the target fighter
+        if(bo->getHP() == 0)
+        {
+            onDead(false, bo);
+        }
+        else if(_winner == 0)
+        {
+            onDamage(bo, true, NULL);
+        }
+    }
+    else
+    {
+        if(enterEvade)
+        {
+            appendDefStatus(e_damEvade, 0, bo);
+            bo->setEvad100(false);
+        }
+
+        if(defend100)
+        {
+            appendDefStatus(e_damOut, 0, bo);
+            bo->setDefend100(false);
+        }
+    }
+    if(first)
+    {
+        pr = pr2;
+        cs = cs2;
+        first = false;
+    }
+
+    return dmg;
+}
+
 UInt32 BattleSimulator::doXinmoAttack(BattleFighter * bf, BattleObject* bo)
 {
     if(!bf || !bo || bf->getHP() == 0 || bo->getHP() == 0)
@@ -1729,25 +1798,25 @@ void BattleSimulator::doPassiveSkillOnCounter(BattleFighter* bf, BattleFighter* 
         return;
 
     const GData::SkillBase* passiveSkill = bf->getPassiveSkillOnCounter();
-    if(!passiveSkill)
+    if(passiveSkill)
     {
-        size_t idx = 0;
-        while(!passiveSkill)
+        appendDefStatus(e_skill, passiveSkill->getId(), bf);
+        doSkillEffectExtraCounter(bf, bo, passiveSkill);
+    }
+
+    size_t idx = 0;
+    while(!passiveSkill)
+    {
+        size_t oidx = idx;
+        passiveSkill = bf->getPassiveSkillOnCounter100(idx);
+        if (oidx == idx)
+            break;
+        if(passiveSkill)
         {
-            size_t oidx = idx;
-            passiveSkill = bf->getPassiveSkillOnCounter100(idx);
-            if (oidx == idx)
-                break;
+            appendDefStatus(e_skill, passiveSkill->getId(), bf);
+            doSkillEffectExtraCounter(bf, bo, passiveSkill);
         }
     }
-    if(!passiveSkill)
-        return;
-
-    appendDefStatus(e_skill, passiveSkill->getId(), bf);
-
-    float value = getSkillEffectExtraCounterDarkVigor(passiveSkill);
-    bo->setDarkVigor(value, passiveSkill->last);
-    appendDefStatus(e_darkVigor, 0, bo);
 }
 
 UInt32 BattleSimulator::doPoisonAttack(BattleFighter* bf, bool cs, const GData::SkillBase* skill, BattleFighter* area_target, float factor, std::vector<AttackAct>* atkAct)
@@ -5842,9 +5911,6 @@ UInt32 BattleSimulator::doAttack( int pos )
     }
     while(false);
 
-    if(mainTarget)
-        mainTarget->setShieldObj(NULL);
-
     rcnt += releaseCD(bf);
     _activeFgt = NULL;
 
@@ -5859,6 +5925,47 @@ UInt32 BattleSimulator::doAttack( int pos )
     {
         appendToPacket(0, -1, -1, 5, 0, false, false);
         ++ rcnt;
+    }
+
+    if(mainTarget)
+    {
+        mainTarget->setShieldObj(NULL);
+
+        UInt8 times = mainTarget->getCounterSpiritTimes();
+        float atk = mainTarget->getCounterSpiritAtk();
+        if(times >= 5 && atk > 0.001f)
+        {
+            _activeFgt = mainTarget;
+            std::vector<float>& factors = mainTarget->getCounterSpiritFactor();
+            int fsize = factors.size();
+            int side = 1 - mainTarget->getSide();
+            bool cs = false;
+            bool pr = false;
+            bool first = true;
+            for(int i = 0; i < 25; ++ i)
+            {
+                BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
+                if(!bo)
+                    continue;
+                float factor = 1.0f;
+                if(fsize > 0)
+                {
+                    if(i >= fsize)
+                        factor = factors[fsize-1];
+                    else
+                        factor = factors[i];
+                }
+                doSpiritAttack(mainTarget, bo, atk * factor, pr, cs, first);
+            }
+            if(_defList.size() > 0 || _scList.size() > 0)
+            {
+                UInt16 skillid = mainTarget->getCounterSpiritSkillId();
+                appendToPacket( mainTarget->getSide(), mainTarget->getPos(), 0, 2, skillid, cs, pr);
+                ++ rcnt;
+            }
+            mainTarget->clearCounterSpiritSkill();
+            _activeFgt = NULL;
+        }
     }
 
     return rcnt;
@@ -7241,6 +7348,11 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
 
     bf->releaseSkillCD(1);
     bf->releaseMoEvade100();
+
+    if(bf->releaseCounterSpirit())
+    {
+        appendDefStatus(e_unCounterSpirit, 0, bf);
+    }
 
     if (bf->releasePetAttackAdd())
     {
@@ -10106,25 +10218,48 @@ void BattleSimulator::doShieldHPAttack(BattleFighter* bo, UInt32& dmg)
     }
 }
 
-float BattleSimulator::getSkillEffectExtraCounterDarkVigor(const GData::SkillBase* skill)
+void BattleSimulator::doSkillEffectExtraCounter(BattleFighter* bf, BattleFighter* bo, const GData::SkillBase* skill)
 {
     if(!skill || !skill->effect)
-        return 0;
+        return;
     const std::vector<UInt16>& eft = skill->effect->eft;
     const std::vector<float>& efv = skill->effect->efv;
 
     size_t cnt = eft.size();
     if(cnt != efv.size())
-        return 0;
+        return;
     for(size_t i = 0; i < cnt; ++ i)
     {
         if(eft[i] == GData::e_eft_counter_hate)
         {
-            return efv[i];
+            bo->setDarkVigor(efv[i], skill->last);
+            appendDefStatus(e_darkVigor, 0, bo);
+        }
+        else if(eft[i] == GData::e_eft_counter_spirit)
+        {
+            float atkadd = bf->_attack * skill->effect->atkP + skill->effect->atk;
+            float defadd = bf->_defend * skill->effect->defP + skill->effect->def;
+            float magatkadd = bf->_magatk * skill->effect->magatkP + skill->effect->magatk;
+            float magdefadd = bf->_magdef * skill->effect->magdefP + skill->effect->magdef;
+            bf->addCounterSpiritBuf(atkadd, magatkadd, defadd, magdefadd, skill->last);
+
+            UInt8 times = bf->getCounterSpiritTimes();
+            appendDefStatus(e_counterSpirit, times, bf);
+            UInt16 skillId = skill->getId();
+            UInt32 value = static_cast<UInt32>(bf->getAttack());
+            appendStatusChange(e_stAtk, value, skillId, bf);
+            value = static_cast<UInt32>(bf->getMagAttack());
+            appendStatusChange(e_stMagAtk, value, skillId, bf);
+            value = static_cast<UInt32>(bf->getDefend());
+            appendStatusChange(e_stDef, value, skillId, bf);
+            value = static_cast<UInt32>(bf->getMagDefend());
+            appendStatusChange(e_stDef, value, skillId, bf);
+            if(times >= 5)
+                bf->setCounterSpiritSkill(skill->getId(), efv[i], skill->factor);
         }
     }
 
-    return 0;
+    return;
 }
 
 bool BattleSimulator::doDarkVigorAttack(BattleFighter* bf, float darkVigor)

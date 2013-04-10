@@ -63,7 +63,8 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _skillUsedChangeAttrValue(0), _skillUsedChangeAttrLast(0), _skillUsedChangeAttr(0),
     _bleedRandom(0), _bleedRandomLast(0), _bleedAttackClass(1),_bleedBySkill(0), _bleedBySkillLast(0), _bleedBySkillClass(1),
     _hitChangeByPeerless(0),_counterChangeByPeerless(0),_bSingleAttackFlag(false),_bMainTargetDead(false),_nCurrentAttackIndex(0),
-    _darkVigor(0), _dvFactor(0), _darkVigorLast(0), _hpShieldSelf(0), _hpShieldSelf_last(0)
+    _darkVigor(0), _dvFactor(0), _darkVigorLast(0), _hpShieldSelf(0), _hpShieldSelf_last(0),
+    _counter_spirit_atk_add(0), _counter_spirit_magatk_add(0), _counter_spirit_def_add(0), _counter_spirit_magdef_add(0), _counter_spirit_times(0), _counter_spirit_last(0), _counter_spirit_efv(0), _counter_spirit_skillid(0)
 {
     memset(_immuneLevel, 0, sizeof(_immuneLevel));
     memset(_immuneRound, 0, sizeof(_immuneRound));
@@ -2637,5 +2638,54 @@ bool BattleFighter::releasePetAtk100()
     return false;
 }
 
+void BattleFighter::addCounterSpiritBuf(float atk, float magatk, float def, float magdef, UInt8 last)
+{
+    if(_counter_spirit_times < 5)
+    {
+        ++ _counter_spirit_times;
+        _counter_spirit_atk_add += atk;
+        _counter_spirit_magatk_add += magatk;
+        _counter_spirit_def_add += def;
+        _counter_spirit_magdef_add += magdef;
+    }
+    _counter_spirit_last = last;
+
+    return;
+}
+
+bool BattleFighter::releaseCounterSpirit()
+{
+    if(_counter_spirit_last == 0)
+        return false;
+
+    -- _counter_spirit_last;
+    if(_counter_spirit_last == 0)
+    {
+        _counter_spirit_times = 0;
+        _counter_spirit_atk_add = 0;
+        _counter_spirit_def_add = 0;
+    }
+
+    return true;
+}
+
+void BattleFighter::setCounterSpiritSkill(UInt16 skillid, float efv, const std::vector<float>& factor)
+{
+    _counter_spirit_efv = efv;
+    _counter_spirit_factor = factor;
+    _counter_spirit_skillid = skillid;
+}
+
+void BattleFighter::clearCounterSpiritSkill()
+{
+    _counter_spirit_efv = 0.0f;
+    _counter_spirit_factor.clear();
+    _counter_spirit_skillid = 0;
+}
+
+float BattleFighter::getCounterSpiritAtk()
+{
+    return (_counter_spirit_efv * getLostHP());
+}
 
 }
