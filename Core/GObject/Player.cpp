@@ -2108,8 +2108,23 @@ namespace GObject
         {
             //if(cfg.GMCheck)
              {
+                 /** 如果boss正在该据点，退出不自动挂机 **/
                  if(worldBoss.needAutoBattle(_playerData.location))
-                    autoBattle(0, 0);
+                 {
+                     UInt8 hookType = GetVar(VAR_LAST_HOOK_TYPE);
+                     if(hookType == ENUM_TRAINP1 && GetVar(VAR_TRAINP1) > 0)
+                     {
+                     }
+                     else if(hookType == ENUM_TRAINP2 && GetVar(VAR_TRAINP2) > 0)
+                     {
+                     }
+                     else if(hookType == ENUM_TRAINP3 && GetVar(VAR_TRAINP3) > 0)
+                     {
+                     }
+                     else
+                         hookType = 0;
+                     autoBattle(0, hookType);
+                 }
              }
         }
         _isOnline = false;
@@ -3749,9 +3764,26 @@ namespace GObject
             }
         }
 #endif
+        if(!hasFlag(Training) && type == 0)
+        {
+             UInt8 hookType = GetVar(VAR_LAST_HOOK_TYPE);
+             if(hookType == ENUM_TRAINP1 && GetVar(VAR_TRAINP1) > 0)
+             {
+             }
+             else if(hookType == ENUM_TRAINP2 && GetVar(VAR_TRAINP2) > 0)
+             {
+             }
+             else if(hookType == ENUM_TRAINP3 && GetVar(VAR_TRAINP3) > 0)
+             {
+             }
+             else
+                 hookType = 0;
+             type = hookType;
+        }
 		EventAutoBattle* event = new(std::nothrow) EventAutoBattle(this, eachBattle, count, /*ng*/NULL, final);
 		if (event == NULL) return false;
         SetVar(VAR_EXP_HOOK_INDEX, type);
+        SetVar(VAR_LAST_HOOK_TYPE, type);
 		cancelAutoBattle(false);
 		addFlag(Training);
 		event->notify();
@@ -4318,13 +4350,26 @@ namespace GObject
 
     void Player::vote(Player* other)
     {
+        if(GetLev() < 45)
+        {
+            sendMsgCode(0, 1510);
+            return;
+        }
+
         if (GetVar(VAR_HAS_VOTE))
         {
             return;
         }
         SetVar(VAR_HAS_VOTE, 1);
-        GameMsgHdr hdr(0x360, other->getThreadId(), other, 0);
-        GLOBAL().PushMsg(hdr, NULL);
+        if(other->getThreadId() == getThreadId())
+        {
+            other->beVoted();
+        }
+        else
+        {
+            GameMsgHdr hdr(0x360, other->getThreadId(), other, 0);
+            GLOBAL().PushMsg(hdr, NULL);
+        }
         sendMsgCode(0, 1509);
         GameMsgHdr hdr2(0x1C6, WORKER_THREAD_WORLD, this, 0);
         GLOBAL().PushMsg(hdr2, NULL);
@@ -7317,9 +7362,9 @@ namespace GObject
         static UInt8 cf_AthRank_nums[] = {1, 2, 5, 10};
         for (std::set<Player *>::iterator it = _friends[3].begin(); it != _friends[3].end(); ++it)
         {
-            if (gAthleticsRank.getAthleticsRank(*it) <= 200)
+            if (gAthleticsRank.getAthleticsRankLocal(*it) <= 200)
                 ++cf_AthRank[1];
-            else if (gAthleticsRank.getAthleticsRank(*it) <= 500)
+            if (gAthleticsRank.getAthleticsRankLocal(*it) <= 500)
                 ++cf_AthRank[0];
         }
 
@@ -8791,6 +8836,27 @@ namespace GObject
         name.resize(len+1);
         _playerData.nameNoSuffix = name;
         return _playerData.nameNoSuffix.c_str();
+    }
+
+    std::string& Player::getOriginName(std::string& name)
+    {
+        if(cfg.merged)
+		{
+			name = _playerData.name;
+            size_t idx = name.size() - 1;
+            for(; idx > 0; -- idx)
+            {
+                if(static_cast<UInt8>(name[idx]) >= 32)
+                    break;
+            }
+            name.resize(idx+1);
+        }
+        else
+        {
+            name = _playerData.name;
+        }
+
+        return name;
     }
 
 	void Player::sendYDVIPMails( UInt8 l, UInt8 h )
@@ -15703,7 +15769,6 @@ void EventTlzAuto::notify(bool isBeginAuto)
             }
             if(_onBattlePet)
                 bp += _onBattlePet->getBattlePoint();
-            calcLingbaoBattlePoint();
         }
         else
         {

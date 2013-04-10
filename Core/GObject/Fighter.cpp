@@ -1857,6 +1857,9 @@ UInt16 Fighter::calcSkillBattlePoint(UInt16 skillId, UInt8 type)
 
 UInt32 Fighter::calcLingbaoBattlePoint()
 {
+    if(!_owner)
+        return 0;
+
     LingbaoInfoList lingbao;
     lingbao.id = _owner->getId();
     lingbao.name = _owner->getName();
@@ -1898,7 +1901,98 @@ UInt32 Fighter::calcLingbaoBattlePoint()
         leaderboard.pushLingbaoInfo(lingbao);
         value = value > bp ? value:bp;
     }
+
+    UInt32 maxlbBp = _owner->getMaxLingbaoBattlePoint();
+    if(value > maxlbBp)
+        _owner->setMaxLingbaoBattlePoint(value);
+
     return value;
+}
+
+void Fighter::pushLingbaoInfo(ItemEquip* equip)
+{
+    if(!equip || !_owner)
+        return;
+
+    ItemLingbao* lb = static_cast<ItemLingbao*>(equip);
+    UInt32 bp = 0;
+    LingbaoInfoList lingbao;
+    lingbao.id = _owner->getId();
+    lingbao.name = _owner->getName();
+    lingbao.pf = _owner->getPF();
+
+    ItemLingbaoAttr& lbattr = lb->getLingbaoAttr();
+    bp = Script::BattleFormula::getCurrent()->calcLingbaoBattlePoint(&lbattr);
+    lingbao.equipId = lb->getId();
+    lingbao.itemId = lb->GetTypeId();
+    lingbao.tongling = lbattr.tongling;
+    lingbao.lbColor = lbattr.lbColor;
+    for (UInt8 i = 0; i < 4; ++i)
+    {
+        lingbao.type[i] = lbattr.type[i];
+        lingbao.value[i] = lbattr.value[i];
+    }
+    for (UInt8 i = 0; i < 2; ++i)
+    {
+        if (lbattr.skill[i])
+        {
+            const GData::LBSkillBase* lbskill = GData::lbSkillManager[lbattr.skill[i]];
+            bp += lbskill->battlepoint * (((float)(lbattr.factor[i]))/10000);
+            lingbao.skill[i] = lbattr.skill[i];
+            lingbao.factor[i] = lbattr.factor[i];
+        }
+    }
+    if (bp != lbattr.battlePoint)
+    {
+        lbattr.battlePoint = bp;
+    }
+    lingbao.battlePoint = lbattr.battlePoint;
+    leaderboard.pushLingbaoInfo(lingbao);
+
+    UInt32 maxlbBp = _owner->getMaxLingbaoBattlePoint();
+    if(bp> maxlbBp)
+        _owner->setMaxLingbaoBattlePoint(bp);
+}
+
+void Fighter::eraseLingbaoInfo(ItemEquip* equip)
+{
+    if(!equip)
+        return;
+
+    ItemLingbao* lb = static_cast<ItemLingbao*>(equip);
+    UInt32 bp = 0;
+    LingbaoInfoList lingbao;
+    lingbao.id = _owner->getId();
+    lingbao.name = _owner->getName();
+    lingbao.pf = _owner->getPF();
+
+    ItemLingbaoAttr& lbattr = lb->getLingbaoAttr();
+    bp = Script::BattleFormula::getCurrent()->calcLingbaoBattlePoint(&lbattr);
+    lingbao.equipId = lb->getId();
+    lingbao.itemId = lb->GetTypeId();
+    lingbao.tongling = lbattr.tongling;
+    lingbao.lbColor = lbattr.lbColor;
+    for (UInt8 i = 0; i < 4; ++i)
+    {
+        lingbao.type[i] = lbattr.type[i];
+        lingbao.value[i] = lbattr.value[i];
+    }
+    for (UInt8 i = 0; i < 2; ++i)
+    {
+        if (lbattr.skill[i])
+        {
+            const GData::LBSkillBase* lbskill = GData::lbSkillManager[lbattr.skill[i]];
+            bp += lbskill->battlepoint * (((float)(lbattr.factor[i]))/10000);
+            lingbao.skill[i] = lbattr.skill[i];
+            lingbao.factor[i] = lbattr.factor[i];
+        }
+    }
+    if (bp != lbattr.battlePoint)
+    {
+        lbattr.battlePoint = bp;
+    }
+    lingbao.battlePoint = lbattr.battlePoint;
+    leaderboard.eraseLingbaoInfo(lingbao);
 }
 
 void Fighter::rebuildSkillBattlePoint()
@@ -3831,9 +3925,14 @@ bool Fighter::delCitta( UInt16 citta, bool writedb )
             SYSMSGV(content, cId, getLevel(), getColor(), getName().c_str(), yacb->type, yacb->getName().c_str(), lvl);
             MailPackage::MailItem mitem[4] = {{static_cast<UInt16>(CITTA_ITEMID(citta)), 1}, {31, rCount1}, {30, rCount2}, {29, rCount3}};
             MailItemsInfo itemsInfo(mitem, DismissCitta, 4);
-            GObject::Mail * pmail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
-            if(pmail && !isMoDefaultCitta)
+
+            GObject::Mail * pmail = NULL;
+            if(!isMoDefaultCitta)
+            {
+                pmail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
                 GObject::mailPackageManager.push(pmail->id, mitem, 4, true);
+            }
+
             ////////////////////
             //返回技能符文熔炼符60%
             UInt16 skillid = 0;
@@ -3864,8 +3963,9 @@ bool Fighter::delCitta( UInt16 citta, bool writedb )
                     ssExp = ssExp % 50;
                     ssCount4 = static_cast<UInt16>(ssExp / 10);
                     MailPackage::MailItem ssmitem[4] = {{1325,ssCount1}, {1326, ssCount2}, {1327, ssCount3}, {1328, ssCount4}};
+                    if(!pmail)
+                        pmail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
                     GObject::mailPackageManager.push(pmail->id, ssmitem, 4, true);
-
                 }
                 ss.maxVal = 0;
                 ss.curVal = 0;

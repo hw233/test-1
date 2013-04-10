@@ -106,6 +106,17 @@ struct SaleSearchResp
 	}
 };
 
+struct SaleCancelNotify 
+{
+    UInt8 count;
+	UInt32 ids[24];
+
+	SaleCancelNotify()
+	{
+		memset(this, 0x00, sizeof(SaleCancelNotify));
+	}
+};
+
 struct SaleMailItem
 {
 	ItemBase * item;

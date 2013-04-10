@@ -176,7 +176,6 @@ void buildPacketForLingbao(Stream& st, UInt8 t, UInt32 id, std::vector<LingbaoIn
 void Leaderboard::buildPacketForLingbao(Stream& st, UInt8 t, bool merge /* = true */)
 {
     FastMutex::ScopedLock lk(_lbMutex);
-    st.clear();
     _lingbaoRank.clear();
 
 	UInt32 c = static_cast<UInt8>(_lingbaoInfoSet.size());
@@ -187,18 +186,21 @@ void Leaderboard::buildPacketForLingbao(Stream& st, UInt8 t, bool merge /* = tru
 	st << t << static_cast<UInt32>(0) << static_cast<UInt32>(0) << static_cast<UInt8>(c);
 	//for(UInt8 i = 0; i < c; ++ i)
     UInt32 i = 0;
-    for (LingbaoInfoSet::iterator it = _lingbaoInfoSet.begin(); it != _lingbaoInfoSet.end() && i < c; ++ it)
+    for (LingbaoInfoSet::iterator it = _lingbaoInfoSet.begin(); it != _lingbaoInfoSet.end(); ++ it)
 	{
 		const LingbaoInfoList& item = *it;
         if ((_lingbaoRank[item.id] == 0) || (_lingbaoRank[item.id] > static_cast<int>(i+1)))
             _lingbaoRank[item.id] = i+1;
 
-        st << item.name << item.pf << item.country << item.battlePoint << static_cast<UInt16>(item.itemId) << item.tongling << item.lbColor;
-        for (UInt8 j = 0; j < 4; ++j)
+        if(i < c)
         {
-            st << item.type[j] << item.value[j];
+            st << item.name << item.pf << item.country << item.battlePoint << static_cast<UInt16>(item.itemId) << item.tongling << item.lbColor;
+            for (UInt8 j = 0; j < 4; ++j)
+            {
+                st << item.type[j] << item.value[j];
+            }
+            st << item.skill[0] << item.factor[0] << item.skill[1] << item.factor[1];
         }
-        st << item.skill[0] << item.factor[0] << item.skill[1] << item.factor[1];
         ++ i;
 	}
 	st << Stream::eos;
@@ -803,30 +805,30 @@ bool Leaderboard::getPacket( UInt8 t, Stream& st, Player* pl)
 	switch(t)
 	{
 	case 0:
-		st = _levelStream;
+		st << std::vector<UInt8>(_levelStream) << Stream::eos;
         makeRankStream(&st, t, pl);
 		break;
 	case 1:
-		st = _moneyStream;
+		st << std::vector<UInt8>(_moneyStream) << Stream::eos;
         makeRankStream(&st, t, pl);
 		break;
 	case 2:
-		st = _achievementStream;
+		st << std::vector<UInt8>(_achievementStream) << Stream::eos;
 		break;
 	case 3:
-		st = _clanStream;
+		st << std::vector<UInt8>(_clanStream) << Stream::eos;
         makeRankStream(&st, t, pl);
 		break;
     case 4:
-        st = _battleStream;
+        st << std::vector<UInt8>(_battleStream) << Stream::eos;
         makeRankStream(&st, t, pl);
         break;
     case 5:
-        st = _clanCopyStream;
+        st << std::vector<UInt8>(_clanCopyStream) << Stream::eos;
         makeRankStream(&st, t, pl);
         break;
     case 6:
-        st = _lingbaoStream;
+        st << std::vector<UInt8>(_lingbaoStream) << Stream::eos;
         makeRankAndValueStream(&st, t, pl, pl->getMaxLingbaoBattlePoint());
         break;
 	default:
@@ -1037,6 +1039,16 @@ void Leaderboard::pushLingbaoInfo(LingbaoInfoList lingbaoInfo)
 {
     FastMutex::ScopedLock lk(_lbMutex);
     _lingbaoInfoSet.insert(lingbaoInfo);
+}
+
+void Leaderboard::eraseLingbaoInfo(LingbaoInfoList lingbaoInfo)
+{
+    FastMutex::ScopedLock lk(_lbMutex);
+    /*
+    LingbaoInfoSet::iterator it = _lingbaoInfoSet.find(lingbaoInfo);
+    if(it != _lingbaoInfoSet.end())
+    */
+    _lingbaoInfoSet.erase(lingbaoInfo);
 }
 
 }

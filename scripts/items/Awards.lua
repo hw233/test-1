@@ -842,7 +842,7 @@ function RunVipPrivilegeAward(player, idx, dayth)
         if player:getGoldInLua() < limitbuy[dayth][idx][3] then
             return false;
         end
-        player:useGoldInLua(limitbuy[dayth][idx][3]);
+        player:useGoldInLua(limitbuy[dayth][idx][3], 98);
         package:Add(limitbuy[dayth][idx][1], limitbuy[dayth][idx][2], true, 0, 41);
     end
 
