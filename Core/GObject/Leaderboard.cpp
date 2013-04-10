@@ -178,7 +178,7 @@ void Leaderboard::buildPacketForLingbao(Stream& st, UInt8 t, bool merge /* = tru
     FastMutex::ScopedLock lk(_lbMutex);
     _lingbaoRank.clear();
 
-	UInt32 c = static_cast<UInt8>(_lingbaoInfoSet.size());
+	UInt32 c = static_cast<UInt32>(_lingbaoInfoSet.size());
     TRACE_LOG("_lingbaoInfoSet.size() : %u.", static_cast<UInt32>(c));
 	st.init(REP::SORT_LIST);
     if(c > 100)
