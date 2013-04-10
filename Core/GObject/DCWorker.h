@@ -27,6 +27,7 @@ public:
 	UInt8 TID() const { return m_Worker; }
     void Push(const char* msg, size_t len, const char logType = LT_NORMAL);
     void PushCheckOpenId(UInt64 playerId, const char* openId, UInt32 len);
+    bool CheckRPOpenid(char* openid);
 
 protected:
 	bool Init();

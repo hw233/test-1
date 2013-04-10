@@ -2033,6 +2033,7 @@ namespace GObject
         void CheckCanAwardBirthday();
         void getAwardLogin(UInt8 opt);
         void getAwardBlueDiamond(UInt8 opt);
+        void getDiamondInfo(UInt8 opt);
         void getConsumeAward();
         void sendConsumeAwardInfo(UInt8 idx);
         void getWeiboAward(UInt8 opt, std::string key);

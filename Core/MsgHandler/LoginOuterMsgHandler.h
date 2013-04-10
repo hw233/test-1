@@ -591,6 +591,15 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
         conn->pendClose();
         return;
     }
+    if (cfg.rpServer && GObject::dclogger.checkRPOpenid((char*)us._openid.c_str()))
+    {
+        UserLogonRepStruct rep;
+        rep._result = 7;
+        GObject::dclogger.create_sec(us);
+        NETWORK()->SendMsgToClient(conn.get(), rep);
+        conn->pendClose();
+        return;
+    }
 
     if (cfg.enableLoginLimit && SERVER().GetTcpService()->getOnlineNum() > cfg.loginLimit)
     {
