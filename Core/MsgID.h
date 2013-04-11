@@ -754,6 +754,8 @@ namespace SPEQ
     const UInt16 ADDRECHARGESCORE    = 0x140;// 增加充值的积分
     const UInt16 SYSUPDATE           = 0x141;// 系统更新公告
     const UInt16 FB_SPECIFY_FIND     = 0x142;// FB-隆中网络查询
+    const UInt16 ACTIVITYONOFF       = 0x143;// 后台操作活动开关
+    const UInt16 QUERYACTIVITYONOFF  = 0x144;// 后台查询活动开启状态
 }
 
 namespace SPEP
@@ -809,6 +811,8 @@ namespace SPEP
     const UInt16 ADDRECHARGESCORE    = 0x40;// 增加充值的积分
     const UInt16 SYSUPDATE           = 0x41;// 系统更新公告
     const UInt16 FB_SPECIFY_FIND     = 0x42;// FB-隆中网络查询
+    const UInt16 ACTIVITYONOFF       = 0x43;// 后台操作活动开关
+    const UInt16 QUERYACTIVITYONOFF  = 0x44;// 后台查询活动开启状态
 }
 
 namespace ARENAREQ

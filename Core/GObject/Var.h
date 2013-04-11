@@ -269,6 +269,10 @@ namespace GObject
         VAR_ITEM_9281_FAILED_COUNT = 215, // 锦云兜·龙礼包连续开启失败次数
         VAR_ITEM_9282_FAILED_COUNT = 216, // 锦云兜·墨礼包连续开启失败次数
 
+        /*
+         * 【注:此段var(217--239)貌似未被占用】
+         */
+
         VAR_LOCAL_RANK = 240, //本服斗剑，当前排名
         VAR_LOCAL_MAXRANK = 241, //本服斗剑，最好排名
         VAR_LOCAL_PRESTIGE = 242, //本服斗剑，声望数
@@ -347,6 +351,11 @@ namespace GObject
         VAR_SAVEGOLD_SET_TIME = 364,    //金蛇献瑞,聚福兆祥活动中玩家设置的结算时间
         VAR_SAVEGOLD_GET_STATUS = 365,    //金蛇献瑞,聚福兆祥活动中玩家领取自己仙石的状态,低10位
         VAR_SAVEGOLD_ISGET = 366,   //金蛇献瑞,聚福兆祥活动中玩家当日是否领取
+
+        VAR_LUCKYSTAR_IS_CONSUME     = 367, //幸运星:是否消费过
+        VAR_LUCKYSTAR_GET_STATUS     = 368, //幸运星:玩家领取和购买的状态(低12bit,0-3蓝 4-7紫 8-11橙)
+        VAR_LUCKYSTAR_RECHARGE_TOTAL = 369, //幸运星:玩家充值仙石总数
+        VAR_LUCKYSTAR_LOGIN_TIME     = 370, //幸运星:活动期间玩家第一次登录时间
         
         VAR_CALLSNAKEEGG = 371,         //拜金蛇
         VAR_SNAKEEGG_AWARD=372,         //领蛇蛋
@@ -355,6 +364,7 @@ namespace GObject
         VAR_SNAKE_SPRING_EQUIP_GOT=375,
         VAR_WEIBO_AWARD_GOT=376,
         VAR_FISHUSER_AWARD=377,            //捕鱼大亨用户领奖标志 
+
         //越南版380-399
         //400-420 for qiwy
         VAR_NEWYEAR_QQGAME_ACT = 401, //蓝钻新年回馈活动
@@ -706,6 +716,11 @@ namespace GObject
             REGISTER_VAR(VAR_SAVEGOLD_SET_TIME, CYCLE_NONE);
             REGISTER_VAR(VAR_SAVEGOLD_GET_STATUS, CYCLE_NONE);
             REGISTER_VAR(VAR_SAVEGOLD_ISGET, CYCLE_DAY);
+
+            REGISTER_VAR(VAR_LUCKYSTAR_IS_CONSUME, CYCLE_NONE);
+            REGISTER_VAR(VAR_LUCKYSTAR_GET_STATUS, CYCLE_NONE);
+            REGISTER_VAR(VAR_LUCKYSTAR_RECHARGE_TOTAL, CYCLE_NONE);
+            REGISTER_VAR(VAR_LUCKYSTAR_LOGIN_TIME, CYCLE_NONE);
 
             REGISTER_VAR(VAR_HHBAWARD_GOT, CYCLE_DAY);
             REGISTER_VAR(VAR_LONGYUAN_GOT, CYCLE_NONE);

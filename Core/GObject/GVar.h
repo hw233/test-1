@@ -65,6 +65,9 @@ namespace GObject
 
         GVAR_HAS_CLAC_LB_BP = 33, // 是否计算过灵宝的战斗力
 
+        GVAR_LUCKYSTAR_BEGIN = 36, //幸运星活动开始时间
+        GVAR_LUCKYSTAR_END   = 37, //幸运星活动结束时间
+
         GVAR_MAX,
     };
 
@@ -118,6 +121,8 @@ namespace GObject
             GREGISTER_VAR(GVAR_TREASURE_END, GCYCLE_NONE);
 
             GREGISTER_VAR(GVAR_HAS_CLAC_LB_BP, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_LUCKYSTAR_BEGIN, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_LUCKYSTAR_END, GCYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

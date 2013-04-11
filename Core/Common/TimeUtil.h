@@ -221,12 +221,9 @@ public:
         switch(mon)
         {
             case 2:
-                {
-                    if(leapYear)
-                        return 29;
-                    return 28;
-                }
-                break;
+                if(leapYear)
+                    return 29;
+                return 28;
             case 1:
             case 3:
             case 5:
@@ -235,13 +232,11 @@ public:
             case 10:
             case 12:
                 return 31;
-                break;
             case 4:
             case 6:
             case 9:
             case 11:
                 return 30;
-                break;
             default:
                 return 30;
                 break;

@@ -2457,6 +2457,22 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             GLOBAL().PushMsg(h, &fdata);
             break;
         }
+        case 0x12:
+        {
+            if (!player->getLuckyStarAct())
+                return;
+            brd >> op;
+            struct starData
+            {
+                UInt8 type;
+                UInt8 idx;
+            }sdata;
+            sdata.type = op;
+            brd >> sdata.idx;
+            GameMsgHdr h(0x345,  player->getThreadId(), player, sizeof(sdata));
+            GLOBAL().PushMsg(h, &sdata);
+            break;
+        }
         default:
             break;
     }

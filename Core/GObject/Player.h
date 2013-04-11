@@ -1023,7 +1023,7 @@ namespace GObject
 
         bool isCopyPassed(UInt8 copyid);
         bool inVipPrivilegeTime();
-        bool SetVipPrivilege();
+        bool SetVipPrivilege(bool = true);
         void doVipPrivilege(UInt8 idx);
         void sendVipPrivilege();
 
@@ -2279,6 +2279,12 @@ namespace GObject
         void buyResurrectionCard();
         void foolsDayUdpLog(UInt8);
         void setLogoutInFoolsDay();
+
+        bool getLuckyStarAct();
+        void setLuckyStarCondition();
+        void sendLuckyStarInfo(UInt8);
+        void getLuckyStarItem(UInt8);
+        void LuckyStarActUdpLog(UInt8);
 
         void getQQGameOnlineAward();
         void sendQQGameOnlineAward();

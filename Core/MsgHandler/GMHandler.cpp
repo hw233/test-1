@@ -246,6 +246,7 @@ GMHandler::GMHandler()
     Reg(2, "king", &GMHandler::OnDragonKingAct);
     Reg(2, "pet", &GMHandler::OnFairyPetGM);
     Reg(2, "fool", &GMHandler::OnFoolsDayGM);
+    Reg(2, "star", &GMHandler::OnLuckyStarGM);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -3805,5 +3806,25 @@ void GMHandler::OnFoolsDayGM(GObject::Player *player, std::vector<std::string>& 
 {
     player->SetVar(VAR_FOOLS_DAY, 0);
     player->SetVar(VAR_FOOLS_DAY_INFO, 0);
+}
+
+void GMHandler::OnLuckyStarGM(GObject::Player *player, std::vector<std::string>& args)
+{
+    UInt8 type = atoi(args[0].c_str());
+    switch(type)
+    {
+        case 1:
+            GVAR.SetVar(GVAR_LUCKYSTAR_BEGIN, TimeUtil::Now());
+            GVAR.SetVar(GVAR_LUCKYSTAR_END, TimeUtil::Now()+86400*2);
+            break;
+        case 2:
+            player->SetVar(VAR_LUCKYSTAR_GET_STATUS, 0);
+            player->sendLuckyStarInfo(2);
+            break;
+        case 3:
+            GVAR.SetVar(GVAR_LUCKYSTAR_BEGIN, 0);
+            GVAR.SetVar(GVAR_LUCKYSTAR_END, 0);
+            break;
+    }
 }
 
