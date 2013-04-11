@@ -1363,6 +1363,21 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
             }
             else if(_winner == 0)
             {
+                onDamage(area_target, !(side == bf->getSide()));
+
+                if(NULL != skill && skill->effect != NULL && skill->effect->state & GData::e_state_poison)
+                {
+                    float rate = skill->prob * 100;
+                    if((skill->cond != GData::SKILL_ACTIVE && skill->cond != GData::SKILL_PEERLESS) || rate > _rnd(10000))
+                    {
+                        // poison
+                        poison = true;
+                    }
+                }
+            }
+
+            if(area_target->getHP() != 0)
+            {
                 const GData::SkillStrengthenEffect* ef = NULL;
                 if(cs2 && ss)
                     ef = ss->getEffect(GData::ON_CRITICAL, GData::TYPE_BLEED);
@@ -1388,18 +1403,6 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                         appendDefStatus(e_BleedMo, 0, area_target);
                         area_target->setBleedMo(ef->value/100*(dmg + magdmg), ef->last);
                         break;
-                    }
-                }
-
-                onDamage(area_target, !(side == bf->getSide()));
-
-                if(NULL != skill && skill->effect != NULL && skill->effect->state & GData::e_state_poison)
-                {
-                    float rate = skill->prob * 100;
-                    if((skill->cond != GData::SKILL_ACTIVE && skill->cond != GData::SKILL_PEERLESS) || rate > _rnd(10000))
-                    {
-                        // poison
-                        poison = true;
                     }
                 }
             }

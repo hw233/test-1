@@ -1503,6 +1503,7 @@ namespace GObject
         void sendRechargeMails(UInt8, UInt8, UInt8);
 		void checkIcExpire(bool = true);
 		void sendBlockBossMail(UInt8, UInt8);
+        bool in7DayFromCreated();
 
     private:
         bool _isJumpingMap;
