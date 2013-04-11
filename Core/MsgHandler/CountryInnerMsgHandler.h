@@ -768,8 +768,8 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
 
     if(player->inVipPrivilegeTime())
     {
-        extraFactor = 0.2f;
-        extraExp = static_cast<UInt32>(exp * 0.2f);
+        extraFactor = 1.0f;
+        extraExp = static_cast<UInt32>(exp * 1.0f);
     }
     if(curHookIndex == ENUM_TRAINP1)
     {
