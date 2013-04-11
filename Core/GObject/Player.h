@@ -168,6 +168,8 @@ namespace GObject
 #define PF_XY 171
 #define PF_XY_CH 10040
 
+#define SYS_DIALOG_ALL_PLATFORM 0
+
     enum PEXP_HOOK_INFEX
     {
         ENUM_TRAINP1 = 1,  /** 初级经验加速符*1.2,加速(*1.3) **/
@@ -1959,8 +1961,11 @@ namespace GObject
     public:
         inline void setSysDailog(bool v) { m_sysDailog = v; }
         inline bool getSysDailog() { return m_sysDailog; }
+        inline void setSysDailogPlatform(UInt8 v) { m_sysDailogPlatform = v; }
+        inline UInt8 getSysDailogPlatform() { return m_sysDailogPlatform; }
     private:
         bool m_sysDailog;
+        bool m_sysDailogPlatform;
 
     public:
         void sendTripodInfo();

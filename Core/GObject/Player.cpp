@@ -719,6 +719,7 @@ namespace GObject
         _hiattrFlag = false;
 
         _inQQGroup = false;
+        m_sysDailogPlatform = SYS_DIALOG_ALL_PLATFORM;
 	}
 
 
