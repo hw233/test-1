@@ -2710,11 +2710,19 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
         if(NULL == bo)
         {
             int tidx = getSpecificTarget(bf->getSide(), BattleSimulator::isPet);
-            BattleFighter *pet = static_cast<BattleFighter *> (_objs[bf->getSide()][tidx]);
-            if (pet && pet->getAura() < 100)
+            if (tidx > 0)
             {
-                target_pos = pet->getPos();
-                target_side = pet->getSide();
+                BattleFighter *pet = static_cast<BattleFighter *> (_objs[bf->getSide()][tidx]);
+                if (pet && pet->getAura() < 100)
+                {
+                    target_pos = pet->getPos();
+                    target_side = pet->getSide();
+                }
+                else
+                {
+                    target_pos = bf->getPos();
+                    target_side = bf->getSide();
+                }
             }
             else
             {
