@@ -987,6 +987,10 @@ bool DCLogger::checkOpenId(Player * player)
     return true;
 }
 
+bool DCLogger::checkRPOpenid(char* openid)
+{
+    return DC().CheckRPOpenid(openid);
+}
 DCLogger dclogger;
 
 } // namespace GObject
