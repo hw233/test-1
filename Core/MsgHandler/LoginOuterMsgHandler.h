@@ -3058,6 +3058,24 @@ void SHStageOnOff(LoginMsgHdr& hdr, const void* data)
     GLOBAL().PushMsg(imh, &onOff);
 }
 
+void SurnameLegendOnOff(LoginMsgHdr& hdr, const void* data)
+{
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+
+    struct OnOffData
+    {
+        UInt32 begin;
+        UInt32 end;
+        int	sessionID;
+    } onOff = {0};
+    br >> onOff.begin >> onOff.end;
+    onOff.sessionID = hdr.sessionID;
+
+    GameMsgHdr imh(0x1AD, WORKER_THREAD_WORLD, NULL, sizeof(onOff));
+    GLOBAL().PushMsg(imh, &onOff);
+}
+
 void QuerySHStageOnOff(LoginMsgHdr& hdr, const void* data)
 {
     BinaryReader br(data,hdr.msgHdr.bodyLen);
@@ -3066,6 +3084,17 @@ void QuerySHStageOnOff(LoginMsgHdr& hdr, const void* data)
 
     Stream st(SPEP::QUERYSHSTAGEONOFF);
     st << onOff._timeBegin << onOff._timeEnd << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID, st);
+}
+void QuerySurnameLegendOnOff(LoginMsgHdr& hdr, const void* data)
+{
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+    UInt32 begin = GObject::GVAR.GetVar(GObject::GVAR_SURNAMELEGEND_BEGIN);
+    UInt32 end = GObject::GVAR.GetVar(GObject::GVAR_SURNAMELEGEND_END);
+
+    Stream st(SPEP::QUERYSURNAMELEGENDONOFF);
+    st << begin << end << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID, st);
 }
 

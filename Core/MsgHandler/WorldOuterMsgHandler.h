@@ -2457,6 +2457,16 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             GLOBAL().PushMsg(h, &fdata);
             break;
         }
+        case 0x13:
+        {
+            if (!World::getSurnameLegend())
+                return;
+            brd >> op;
+            UInt8 type = op;
+            GameMsgHdr h(0x345,  player->getThreadId(), player, sizeof(type));
+            GLOBAL().PushMsg(h, &type);
+            break;
+        }
         default:
             break;
     }

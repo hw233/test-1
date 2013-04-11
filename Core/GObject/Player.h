@@ -751,6 +751,7 @@ namespace GObject
         void sendRF7DayInfo(UInt32 now = TimeUtil::Now());
         void setContinuousRFAward(UInt32 no);
         void sendFourCopAct();
+        void sendLuckybagInfo();
 		void Reconnect();
 
 		void Logout(bool = false);	//???????߲???
@@ -1609,6 +1610,7 @@ namespace GObject
         UInt8 useSnowItem(UInt32 num);
         void sendSnowScoreAward();
         UInt8 getSnowAward(UInt16 type);
+        
         //推雪人end
         
         void setForbidSale(bool b, bool isAuto = false);
@@ -2208,6 +2210,7 @@ namespace GObject
         
         void getLongyuanAct(UInt8 idx, UInt8 flag);
         void sendLongyuanActInfo();
+        void sendLuckyBagInfo();
     private:
         UInt8 cf_posPut[5];//范围1-5
         UInt32 cf_itemId[5];
@@ -2279,7 +2282,7 @@ namespace GObject
         void buyResurrectionCard();
         void foolsDayUdpLog(UInt8);
         void setLogoutInFoolsDay();
-
+        void LuckyBagRank();
         void getQQGameOnlineAward();
         void sendQQGameOnlineAward();
         void setQQGameOnlineTotalTime();

@@ -246,6 +246,7 @@ GMHandler::GMHandler()
     Reg(2, "king", &GMHandler::OnDragonKingAct);
     Reg(2, "pet", &GMHandler::OnFairyPetGM);
     Reg(2, "fool", &GMHandler::OnFoolsDayGM);
+    Reg(2, "acttm", &GMHandler::OnSurnameleg);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -852,7 +853,7 @@ void GMHandler::OnReLoadLua( std::vector<std::string>& args )
 	}
 	if(world)
 	{
-		GameMsgHdr hdr4(0x1EE, WORKER_THREAD_WORLD, NULL, sizeof(UInt32));
+		GameMsgHdr hdr4(0x1EE, WORKER_THREAD_WORLD, NULL, sizeof(UInt16));
 		GLOBAL().PushMsg(hdr4, &reloadFlag);
 	}
 	else if(country)
@@ -3797,6 +3798,27 @@ void GMHandler::OnFairyPetGM(GObject::Player *player, std::vector<std::string>& 
         case 4:
             player->AddVar(VAR_FAIRYPET_LIKEABILITY, val);
             player->sendFairyPetResource();
+            break;
+    }
+}
+
+void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& args)
+{
+    UInt8 type = atoi(args[0].c_str());
+     UInt16 reloadFlag = 0x00FF;
+     GameMsgHdr hdr4(0x1EE, WORKER_THREAD_WORLD, NULL, sizeof(UInt16));
+    switch(type)
+    {
+        case 1:
+            GVAR.SetVar(GVAR_SURNAMELEGEND_BEGIN, TimeUtil::Now());
+            GVAR.SetVar(GVAR_SURNAMELEGEND_END, TimeUtil::Now() + 300);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            player->LuckyBagRank();
+            break;
+        case 2:
+            GVAR.SetVar(GVAR_SURNAMELEGEND_BEGIN, 0);
+            GVAR.SetVar(GVAR_SURNAMELEGEND_END, 0);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             break;
     }
 }

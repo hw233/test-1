@@ -304,6 +304,8 @@ namespace Script
         CLASS_DEF(Player, getFengsuiLua);
         CLASS_DEF(Player, getLongyuanLua);
         CLASS_DEF(Player, getPetByPetEgg);
+        CLASS_DEF(Player, sendLuckyBagInfo);
+		CLASS_DEF(Player, LuckyBagRank);
 
         CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);
@@ -1610,6 +1612,11 @@ namespace Script
     {
 		assert(player != NULL);
 		Call<void>("getAwardInFoolsDay", player, idx);
+    }
+    void GameActionLua::GetLuckyBagAward(Player * player)
+    {
+        assert(player != NULL);
+        Call<void>("GetLuckyBagAward",player);
     }
 }
 

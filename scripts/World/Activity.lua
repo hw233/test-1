@@ -897,13 +897,13 @@ function onActivityCheck(tm)
       else
           setHalfGold(false)
       end
-      
+
       if tm >= actTime556 and tm < actTime556_1 then
           setSurnameLegend(true)
       else
           setSurnameLegend(false)
       end
-
+      
       if tm >= actTime232_0 and tm < actTime232_1 then
           setFeastLoginAct(true)
       else
@@ -1239,14 +1239,14 @@ function initActTime(y, m, d)
   local  SerStartTm553= { ['year'] = 2013, ['month'] = 3, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm553_1= { ['year'] = 2013, ['month'] = 4, ['day'] = 6, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   
-  --消费减半活动
-  local  SerStartTm555= { ['year'] = 2013, ['month'] = 3, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTm555_1= { ['year'] = 2013, ['month'] = 4, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --周末活动
+  local  SerStartTm555= { ['year'] = 2013, ['month'] = 4, ['day'] = 13, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm555_1= { ['year'] = 2013, ['month'] = 4, ['day'] = 15, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
  
-  -- 蜀山传奇掉落活动
-  local  SerStartTm556= { ['year'] = 2013, ['month'] = 3, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTm556_1= { ['year'] = 2013, ['month'] = 4, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
- 
+    --蜀山传奇掉落活动
+  local  SerStartTm556= { ['year'] = 2013, ['month'] = 4, ['day'] = 13, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm556_1= { ['year'] = 2013, ['month'] = 4, ['day'] = 20, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    
   -- 繁体版
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm102 = { ['year'] = 2012, ['month'] = 6, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1635,10 +1635,10 @@ function initActTime(y, m, d)
 
   actTime555 = os.time(SerStartTm555);
   actTime555_1 = os.time(SerStartTm555_1) ;
-
+  
   actTime556 = os.time(SerStartTm556);
   actTime556_1 = os.time(SerStartTm556_1) ;
-  
+
   actTime560 = os.time(SerStartTm560);
   actTime560_1 = os.time(SerStartTm560) + 10 * 86400;
 

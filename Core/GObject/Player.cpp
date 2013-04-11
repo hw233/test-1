@@ -11186,6 +11186,7 @@ namespace GObject
 
     void Player::getAwardBlueDiamond(UInt8 opt)
     {
+        std::cout<<opt<<std::endl;
         if(opt >= 1) //抽奖
         {
             UInt8 idx = 0;
@@ -18084,6 +18085,19 @@ void Player::sendLongyuanActInfo()
     st << Stream::eos;
     send(st);
 }
+void Player::sendLuckyBagInfo()
+{
+    if(!World::getSurnameLegend())
+        return ;
+    Stream st(REP::ACTIVE);
+    st << static_cast<UInt8>(0x13) << static_cast<UInt8>(0x00);
+    for (UInt8 i = 0; i < 5; ++i)
+    {
+        st <<static_cast<UInt16>(GetVar(VAR_CARD_1+i));
+    }
+    st << Stream::eos;
+    send(st);
+}
 void Player::transferExpBuffer2Var()
 {
     UInt32 tm = TimeUtil::Now();
@@ -19519,7 +19533,15 @@ void Player::foolsDayUdpLog(UInt8 type)
     snprintf (action, 16, "F_10000_0327_%d", type);
     udpLog("FoolsDay", action, "", "", "", "", "act");
 }
-
+    void Player::LuckyBagRank()
+    {
+        if(World::getSurnameLegend())
+        {
+            UInt32 LuckbagNum = GetVar(VAR_SURNAMELEGEND_USED);
+            GameMsgHdr hdr(0x1C8, WORKER_THREAD_WORLD, this, sizeof(LuckbagNum));
+             GLOBAL().PushMsg(hdr, &LuckbagNum);
+        }
+    }
 } // namespace GObject
 
 

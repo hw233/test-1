@@ -6,6 +6,7 @@
 #include "Common/Stream.h"
 #include "Server/Cfg.h"
 #include "Common/TimeUtil.h"
+#include "GObject/GVar.h"
 #ifndef _WIN32
 #include "kingnet_analyzer.h"
 #endif
@@ -644,11 +645,29 @@ public:
    { _foolbao = v; }
     inline static bool getFoolBao()
     { return _foolbao; } 
+    
+   inline static void setSurnameLegend(bool v)
+   { 
+   /*     UInt32 begin =GVAR.GetVar(GVAR_SURNAMELEGEND_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_SURNAMELEGEND_END);
+        UInt32 now = TimeUtil::Now();
+      if( now >= begin && now <= end)
+          return ;
+     */  _surnamelegend = v;
+   }
    
-    inline static void setSurnameLegend(bool v)
-   { _surnamelegend = v; }
-    inline static bool getSurnameLegend()
-    { return _surnamelegend; } 
+    inline static bool getSurnameLegend(UInt32 time = 0)
+    { 
+     /*   UInt32 begin =GVAR.GetVar(GVAR_SURNAMELEGEND_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_SURNAMELEGEND_END);
+        UInt32 now = TimeUtil::Now()+ time;
+       if( now >= begin && now <= end)
+            _surnamelegend = true;
+       else if(begin>0 && end > 0)
+            _surnamelegend = false;
+       */
+        return _surnamelegend ;
+    } 
 
    inline static void setHalfGold(bool v)
    { _halfgold = v; }
@@ -808,8 +827,8 @@ public:
     static stArenaExtra stArena;
     static bool _compassact;
     static bool _foolbao;
-    static bool _halfgold;
     static bool _surnamelegend;
+    static bool _halfgold;
     static UInt8 _callsnakeeggact;
     static UInt8 _snakeeggawardact;
     static bool _item9344act;
@@ -824,7 +843,6 @@ public:
     static RCSortType LuckyBagSort;
     static void initRCRank();
     static void initRP7RCRank();
-    static void initLuckyBagRank();
 
     static RCSortType killMonsterSort[4];
     static RCSortType rechargeRP7Sort;

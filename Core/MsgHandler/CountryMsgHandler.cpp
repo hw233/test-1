@@ -300,6 +300,7 @@ MSG_REG_2(GameMsgHdr, 0x341, OnCFriendAthleticsRank);
 MSG_REG_2(GameMsgHdr, 0x342, OnPostDragonKing);
 MSG_REG_2(GameMsgHdr, 0x343, OnSaveGoldAct);
 MSG_REG_2(GameMsgHdr, 0x344, OnFoolsDayAct);
+MSG_REG_2(GameMsgHdr, 0x345, OnSurnameLegendAct);
 
 MSG_REG_2(GameMsgHdr, 0x236, OnAwardHIPrestige);
 MSG_REG_2(GameMsgHdr, 0x237, OnSendShusanLoveTitleCard);

@@ -1963,7 +1963,24 @@ void OnCalcLBBattlePoint( GameMsgHdr &hdr, const void * data)
     MSG_QUERY_PLAYER(player);
     player->calcLingbaoBattlePoint();
 }
-
+void OnSurnameLegendAct( GameMsgHdr &hdr, const void * data  )
+{
+    MSG_QUERY_PLAYER(player);
+    if(player==NULL)
+        return ;
+    UInt8 type = *(reinterpret_cast<UInt8 *>(const_cast<void *>(data)));
+   switch(type)
+   {
+    case 0x00:
+        player->sendLuckyBagInfo();
+        break;
+    case 0x03:
+          //player->GetLuckyBagAward();
+          GameAction()->GetLuckyBagAward(player);
+          break;
+   }
+    
+}
 void OnBeVoted( GameMsgHdr &hdr, const void * data)
 {
     MSG_QUERY_PLAYER(player);

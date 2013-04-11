@@ -932,7 +932,7 @@ void OnLuckyBagRank ( GameMsgHdr& hdr,  const void* data )
     bool stop = false;
     for (RCSortType::iterator i = World::LuckyBagSort.begin(), e = World::LuckyBagSort.end(); i != e; ++i)
     {
-        if (!stop)
+       if (!stop)
             ++myrank;
 
         if (i->player == player)
@@ -1050,6 +1050,28 @@ void OnSendRechargeRank ( GameMsgHdr& hdr,  const void* data )
     }
 }
 
+void OnSendLuckyBagRank ( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+    World::initRCRank();
+    Stream st;
+    SendLuckyBagRank(st);
+    player->send(st);
+
+    UInt32 rank = 0;
+    for (RCSortType::iterator i = World::LuckyBagSort.begin(), e = World::LuckyBagSort.end(); i != e; ++i)
+    {
+        ++rank;
+        if (i->player == player)
+        {
+            Stream st(REP::ACT);
+            st << static_cast<UInt8>(2) << static_cast<UInt8>(4) << static_cast<UInt8>(2) << i->total << static_cast<UInt8>(rank) << Stream::eos;
+            player->send(st);
+            break;
+        }
+    }
+}
 void OnSendConsumeRank ( GameMsgHdr& hdr,  const void* data )
 {
     using namespace GObject;
@@ -1330,6 +1352,23 @@ void OnSHStageOnOff( GameMsgHdr& hdr, const void* data )
     NETWORK()->SendMsgToClient(onOff.sessionID, st);
 }
 
+void OnSurnameLegendOnOff( GameMsgHdr& hdr, const void* data )
+{
+    struct OnOffData
+    {
+        UInt32 begin;
+        UInt32 end;
+        int	sessionID;
+    } onOff = {0};
+
+    onOff = *reinterpret_cast<OnOffData*>(const_cast<void*>(data));
+    GObject::GVAR.SetVar(GObject::GVAR_SURNAMELEGEND_BEGIN, onOff.begin);
+    GObject::GVAR.SetVar(GObject::GVAR_SURNAMELEGEND_END,onOff.end);
+
+    Stream st(SPEP::SURNAMELEGENDONOFF);
+    st << static_cast<UInt8>(1) << Stream::eos;
+    NETWORK()->SendMsgToClient(onOff.sessionID, st);
+}
 void OnDaysRankMsg( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);

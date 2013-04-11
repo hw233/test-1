@@ -1137,8 +1137,8 @@ void World::World_Midnight_Check( World * world )
     bool bValentineDay = getValentineDay();
     bool bMayDay = getMayDay();
     bool bfoolbao = getFoolBao();
-    bool bhalfgold = getHalfGold();
     bool bsurnamelegend = getSurnameLegend();
+    bool bhalfgold = getHalfGold();
     bool bJune = getJune();
     bool bQixi = getQixi();
     bool bWansheng = getWansheng();
@@ -1827,7 +1827,6 @@ bool World::Init()
 	GObjectManager::delayLoad();
 	GObjectManager::LoadPracticeData();
 	GObjectManager::LoadTripodData();
-
 	std::string path = cfg.scriptPath + "World/main.lua";
 	_worldScript = new Script::WorldScript(path.c_str());
 	path = cfg.scriptPath + "formula/main.lua";
@@ -2524,7 +2523,7 @@ void World::SendSurnameLegendAward()
         return;
     MailPackage::MailItem items[] =
     {
-        {9902, 1}
+        {9904, 1}
     };
     selector._player->sendMailItem(4151, 4152, items, sizeof(items)/sizeof(items[0]), false);
 }
@@ -2678,22 +2677,13 @@ inline bool player_enum_rc(GObject::Player * p, int)
         s.total = popularity;
         World::popularitySort.insert(s);
     }
-    return true;
-}
-inline bool player_enum_used(GObject::Player * p, int)
-{
-    //using namespace GObject;
-    if (World::getSurnameLegend())
+    UInt32 used = p->GetVar(VAR_SURNAMELEGEND_USED);
+    if (used)
     {
-        UInt32 total;
-         total = p->GetVar(VAR_SURNAMELEGEND_USED);
-        if (total)
-        {
-            RCSort s;
-            s.player = p;
-            s.total = total;
-            World::LuckyBagSort.insert(s);
-        }
+        RCSort s;
+        s.player = p;
+        s.total = used;
+        World::LuckyBagSort.insert(s);
     }
     return true;
 }
@@ -2720,7 +2710,6 @@ inline bool player_enum_rp7rc(GObject::Player * p, int)
 
 static bool init = false;
 static bool initRP7 = false;
-static bool initBag = false;
 void World::initRCRank()
 {
     if (init)
@@ -2729,13 +2718,6 @@ void World::initRCRank()
     init = true;
 }
 
-void World::initLuckyBagRank()
-{
-    if (initBag)
-       return;
-    GObject::globalPlayers.enumerate(player_enum_rc, 0);
-    initBag = true;
-}
 void World::initRP7RCRank()
 {
     if (initRP7)
@@ -3041,7 +3023,6 @@ void World::DivorceSnowPair(Player* pl)
 void World::SendSnowAward()
 {
     static MailPackage::MailItem s_item[][3] = {
-        {{515,15},{1325,15},{134,15}},
         {{515,10},{1325,10},{134,10}},
         {{515,8},{1325,8},{134,8}},
         {{515,5},{1325,5},{134,5}},

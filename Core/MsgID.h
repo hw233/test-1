@@ -754,6 +754,9 @@ namespace SPEQ
     const UInt16 ADDRECHARGESCORE    = 0x140;// 增加充值的积分
     const UInt16 SYSUPDATE           = 0x141;// 系统更新公告
     const UInt16 FB_SPECIFY_FIND     = 0x142;// FB-隆中网络查询
+    const UInt16 SURNAMELEGENDONOFF       = 0x143;//蜀山传奇掉落活动开关
+    const UInt16 QUERYSURNAMELEGENDONOFF   = 0x144; // 查询职业第一
+
 }
 
 namespace SPEP
@@ -809,6 +812,8 @@ namespace SPEP
     const UInt16 ADDRECHARGESCORE    = 0x40;// 增加充值的积分
     const UInt16 SYSUPDATE           = 0x41;// 系统更新公告
     const UInt16 FB_SPECIFY_FIND     = 0x42;// FB-隆中网络查询
+    const UInt16 SURNAMELEGENDONOFF  = 0x43;//蜀山传奇掉落活动开关
+    const UInt16 QUERYSURNAMELEGENDONOFF = 0x44;//查询蜀山传奇掉落活动
 }
 
 namespace ARENAREQ

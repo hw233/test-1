@@ -7130,7 +7130,11 @@ end
 --仙宠仙缘石掉落
 function fairyPetLoot(player, lootlvl)
     local package = player:GetPackage();
-    package:AddItem(9371, 1, true, 0, 10);
+    local num = 1;
+    if getHalfGold() then
+        num = 2;
+    end
+    package:AddItem(9371, num, true, 0, 10);
 end
 
 --愚公宝箱掉落
@@ -7162,11 +7166,11 @@ function SurnameLegendLoot(player,lootlvl)
     local itemNum = {
             [0] = 1,
             [1] = 1,
-            [2] = 2,
-            [3] = 3,
+            [2] = 1,
+            [3] = 1,
         };
     local package = player:GetPackage();
-    package:AddItem(9375, itemNum[lootlvl], true,0,10);
+    package:AddItem(9382, itemNum[lootlvl], true,0,10);
 end
 
 -- 万圣节套装
@@ -7788,4 +7792,25 @@ function getAwardInFoolsDay(player, idx)
         player:GetPackage():Add(item[1], item[2], true, false, 32)
     end
 end
-
+function GetLuckyBagAward(player)
+    local items = {
+       { 9367,5} , {9369,5},{ 503,5},{515,1},{134,1},{1325,2} 
+    } 
+    for i = 1 , 5  do
+        local num = player:GetVar(452+i);
+        if num < 1 then
+            return false;
+        end
+    end
+    for i= 1, 5 do
+        local num = player:GetVar(452+i);
+        player:SetVar(452+i,num-1);
+    end
+    for i = 1,#items do
+        local item = items[i];
+        player:GetPackage():Add(item[1],item[2],true,false,32);
+    end
+    player:sendLuckyBagInfo();
+        Broadcast(0x27, "恭喜玩家[p:"..player:getCountry()..":"..player:getPName().."]".."在\"峨眉天下秀\"活动中人品爆发，集齐所有卡牌，成功领取超级大奖")
+    return true
+end
