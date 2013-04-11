@@ -1028,6 +1028,9 @@ namespace GObject
         bool SetVipPrivilege();
         void doVipPrivilege(UInt8 idx);
         void sendVipPrivilege();
+        void sendVipPrivilegeMail(UInt8 lv);
+        bool SetVipPrivilege_1();
+        bool SetVipPrivilege_2();
 
     private:
         GData::AttrExtra _hiattr;

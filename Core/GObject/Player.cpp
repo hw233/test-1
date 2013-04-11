@@ -197,8 +197,8 @@ namespace GObject
         // 限时vip特权
         if(m_Player->inVipPrivilegeTime())
         {
-            factor += 0.2f;
-            extraExp = static_cast<UInt32>(exp * 0.2f);
+            factor += 1.0f;
+            extraExp = static_cast<UInt32>(exp * 1.0f);
         }
 #if 0
 		_npcGroup->monsterKilled(m_Player);
@@ -7457,6 +7457,8 @@ namespace GObject
 
         if (nLev == 40 || nLev == 50 || nLev == 60 || nLev == 70 || nLev == 80 || nLev == 90 || nLev == 100)
             OnShuoShuo(nLev/10-4 + SS_40);
+
+        sendVipPrivilegeMail(nLev);
 	}
 
     void Player::sendFormationList()
@@ -9808,7 +9810,7 @@ namespace GObject
 #endif
         // 限时vip特权
         if(inVipPrivilegeTime())
-            factor += 0.2f;
+            factor += 1.0f;
 
         return factor;
     }
@@ -9956,7 +9958,7 @@ namespace GObject
                     UInt32 extraPExp = 0;
                     UInt32 pExp = fgt->getPracticeInc() * pfexp->counts[i];
                     if(inVipPrivilegeTime())
-                        extraPExp = fgt->getBasePExpEach() * pfexp->counts[i] * 0.2f;
+                        extraPExp = fgt->getBasePExpEach() * pfexp->counts[i] * 1.0f;
                     isDoubleExp(pExp);
                     fgt->addPExp(pExp, true, false, extraPExp);
                 }
@@ -10013,7 +10015,7 @@ namespace GObject
                     UInt32 extraPExp = 0;
                     UInt32 pExp = fgt->getPracticeInc() * pfexp->counts[i];
                     if(inVipPrivilegeTime())
-                        extraPExp = fgt->getBasePExpEach() * pfexp->counts[i] * 0.2f;
+                        extraPExp = fgt->getBasePExpEach() * pfexp->counts[i] * 1.0f;
                     isDoubleExp(pExp);
                     fgt->addPExp(pExp, true, false, extraPExp);
                 }
@@ -19190,10 +19192,14 @@ bool Player::SetVipPrivilege()
     if(validate == 0)
     {
         UInt32 now = TimeUtil::Now();
-        UInt32 validate = now + 168*3600;
+        UInt32 validate = now + 7*86400;
         // 保持最低位为0
         if(validate & 0x1)
             validate = validate + 1;
+        // 保持第2位为1, 
+        // validate&0x2 为false表示限时vip为2天
+        // validate&0x2 为true表示限时vip为7天
+        validate |= 0x2;
         SetVar(VAR_VIP_PRIVILEGE_TIME, validate);
         ret = true;
         ConsumeInfo ci(VipPrivilege, 0, 0);
@@ -19203,12 +19209,60 @@ bool Player::SetVipPrivilege()
     return ret;
 }
 
+bool Player::SetVipPrivilege_1()
+{
+    UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME);
+    bool ret = false;
+    if(validate == 0)
+    {
+        UInt32 now = TimeUtil::Now();
+        UInt32 validate = now + 2*86400;
+        // 保持最低位为0
+        if(validate & 0x1)
+            validate = validate + 1;
+        // 保持第2位为0, 
+        // validate&0x2 为false表示限时vip为2天
+        // validate&0x2 为true表示限时vip为7天
+        if(validate & 0x2)
+            validate = validate + 0x2;
+        SetVar(VAR_VIP_PRIVILEGE_TIME, validate);
+        ret = true;
+        ConsumeInfo ci(VipPrivilege, 0, 0);
+        useGold(30, &ci);
+    }
+
+    return ret;
+}
+
+bool Player::SetVipPrivilege_2()
+{
+    UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME);
+    bool ret = false;
+    if(validate > 0 && (0 == (validate & 0x2)))
+    {
+        validate += 5*86400;
+        // 保持最低位为0
+        if(validate & 0x1)
+            validate = validate + 1;
+        // 保持第2位为1, 
+        // validate&0x2 为false表示限时vip为2天
+        // validate&0x2 为true表示限时vip为7天
+        validate |= 0x2;
+        SetVar(VAR_VIP_PRIVILEGE_TIME, validate);
+        ret = true;
+        ConsumeInfo ci(VipPrivilege, 0, 0);
+        useGold(70, &ci);
+    }
+
+    return ret;
+}
 
 #define VIP_PRIVILEGE_DAYLYAWARD(data) (0x01&data)
 #define VIP_PRIVILEGE_LIMITBUY1(data)  (0x02&data)
 #define VIP_PRIVILEGE_LIMITBUY2(data)  (0x04&data)
 #define VIP_PRIVILEGE_LIMITBUY3(data)  (0x08&data)
 #define VIP_PRIVILEGE_TIMEOUT(data)  (0x1&data)
+#define VIP_PRIVILEGE_7DAY(data)  (0x2&data)
 
 #define SET_VIP_PRIVILEGE_DAYLYAWARD(data, v) (data|=(v&0x01))
 #define SET_VIP_PRIVILEGE_LIMITBUY1(data, v)  (data|=((v<<1)&0x02))
@@ -19247,9 +19301,16 @@ void Player::doVipPrivilege(UInt8 idx)
         if(!in7DayFromCreated())
             return;
 
-        if (getGold() < 100)
+        if (getGold() < 30)
             return;
-        SetVipPrivilege();
+        SetVipPrivilege_1();
+        break;
+    case 6:
+        if(!inVipPrivilegeTime())
+            return;
+        if (getGold() < 70)
+            return;
+        SetVipPrivilege_2();
         break;
     }
 
@@ -19259,7 +19320,11 @@ void Player::doVipPrivilege(UInt8 idx)
         {
             UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME);
             UInt32 now = TimeUtil::Now();
-            UInt8 dayth = (TimeUtil::SharpDayT(0, now) + 168*3600 - TimeUtil::SharpDayT(0, validate))/86400 + 1;
+            UInt8 dayth = 0;
+            if(VIP_PRIVILEGE_7DAY(validate))
+                dayth = (TimeUtil::SharpDayT(0, now) + 7*86400 - TimeUtil::SharpDayT(0, validate))/86400 + 1;
+            else
+                dayth = (TimeUtil::SharpDayT(0, now) + 2*86400 - TimeUtil::SharpDayT(0, validate))/86400 + 1;
             if(!GameAction()->RunVipPrivilegeAward(this, idx, dayth))
                 return;
             SetVar(VAR_VIP_PRIVILEGE_DATA, data);
@@ -19273,16 +19338,34 @@ void Player::doVipPrivilege(UInt8 idx)
     sendVipPrivilege();
 }
 
+void Player::sendVipPrivilegeMail(UInt8 lv)
+{
+    if(lv != 32 || !in7DayFromCreated())
+        return;
+
+    UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME);
+    if(validate == 0)
+    {
+        SYSMSG(title, 4914);
+        SYSMSGV(content, 4915, lv);
+        GetMailBox()->newMail(NULL, 0x12, title, content);
+    }
+}
+
 void Player::sendVipPrivilege()
 {
     UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME);
     UInt32 data = GetVar(VAR_VIP_PRIVILEGE_DATA);
     UInt32 now = TimeUtil::Now();
-    UInt8 dayth = (TimeUtil::SharpDayT(0, now) + 168*3600 - TimeUtil::SharpDayT(0, validate))/86400;
+    UInt8 dayth = 0;
+    if(VIP_PRIVILEGE_7DAY(validate))
+        dayth = (TimeUtil::SharpDayT(0, now) + 7*86400 - TimeUtil::SharpDayT(0, validate))/86400;
+    else
+        dayth = (TimeUtil::SharpDayT(0, now) + 2*86400 - TimeUtil::SharpDayT(0, validate))/86400;
     if(dayth > 7)
         dayth = 7;
     UInt32 timeLeft = 0;
-    UInt8 timeOut = 0;
+    UInt8 extra = 0;
     if(validate > now)
         timeLeft = validate - now;
     if(validate != 0)
@@ -19290,10 +19373,13 @@ void Player::sendVipPrivilege()
         SET_VIP_PRIVILEGE_OPEN(data, 1);
         if(timeLeft == 0 && VIP_PRIVILEGE_TIMEOUT(validate) == 0)
         {
-            timeOut = 1;
+            extra = 0x1;
             SET_VIP_PRIVILEGE_TIMEOUT(validate, 1);
             SetVar(VAR_VIP_PRIVILEGE_TIME, validate);
         }
+
+        if(VIP_PRIVILEGE_7DAY(validate))
+            extra |= 0x2;
     }
     else
     {
@@ -19302,7 +19388,7 @@ void Player::sendVipPrivilege()
 
     SET_VIP_PRIVILEGE_DAYTH(data, dayth);
     Stream st(REP::RC7DAY);
-    st << static_cast<UInt8>(10) << timeLeft << static_cast<UInt8>(data) << timeOut;
+    st << static_cast<UInt8>(10) << timeLeft << static_cast<UInt8>(data) << extra;
     st << Stream::eos;
     send(st);
 }
