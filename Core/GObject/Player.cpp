@@ -11206,7 +11206,6 @@ namespace GObject
 
     void Player::getAwardBlueDiamond(UInt8 opt)
     {
-        std::cout<<opt<<std::endl;
         if(opt >= 1) //抽奖
         {
             UInt8 idx = 0;
