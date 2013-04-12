@@ -1026,6 +1026,9 @@ namespace GObject
         bool SetVipPrivilege(bool = true);
         void doVipPrivilege(UInt8 idx);
         void sendVipPrivilege();
+        void sendVipPrivilegeMail(UInt8 lv);
+        bool SetVipPrivilege_1();
+        bool SetVipPrivilege_2();
 
     private:
         GData::AttrExtra _hiattr;
@@ -2033,6 +2036,7 @@ namespace GObject
         void CheckCanAwardBirthday();
         void getAwardLogin(UInt8 opt);
         void getAwardBlueDiamond(UInt8 opt);
+        void getDiamondInfo(UInt8 opt);
         void getConsumeAward();
         void sendConsumeAwardInfo(UInt8 idx);
         void getWeiboAward(UInt8 opt, std::string key);

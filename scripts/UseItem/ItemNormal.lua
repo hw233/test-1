@@ -7073,6 +7073,63 @@ function ItemNormal_00010118(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00010120(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (6+(6*num*99)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    package:Add(9371, num*50, true, false, 2);
+    package:Add(500, num*50, true, false, 2);
+    package:Add(501, num*20, true, false, 2);
+    package:Add(503, num*20, true, false, 2);
+    package:Add(515, num*10, true, false, 2);
+    package:Add(548, num*99, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010121(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (8+(8*num*20)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    package:Add(15, num*20, true, false, 2);
+    package:Add(57, num*20, true, false, 2);
+    package:Add(56, num*20, true, false, 2);
+    package:Add(9371, num*20, true, false, 2);
+    package:Add(503, num*10, true, false, 2);
+    package:Add(50, num*5, true, false, 2);
+    package:Add(49, num*5, true, false, 2);
+    package:Add(48, num*5, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010122(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (4+(4*num*5)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    package:Add(15, num*5, true, false, 2);
+    package:Add(57, num*5, true, false, 2);
+    package:Add(56, num*5, true, false, 2);
+    package:Add(502, num*5, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
 function ItemNormal_00010123(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -9984,6 +10041,9 @@ local ItemNormal_Table = {
     [10116] = ItemNormal_00010116,
     [10117] = ItemNormal_00010117,
     [10118] = ItemNormal_00010118,
+    [10120] = ItemNormal_00010120,
+    [10121] = ItemNormal_00010121,
+    [10122] = ItemNormal_00010122,
     [10123] = ItemNormal_00010123,
     [10124] = ItemNormal_00010124,
     [10125] = ItemNormal_00010125,

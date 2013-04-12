@@ -4,6 +4,7 @@
 #include <libmemcached/memcached.h>
 #include "Common/StringTokenizer.h"
 #include "Common/TimeUtil.h"
+#include <string>
 extern bool memcinited;
 extern memcached_st memc;
 extern int memc_version;
@@ -44,7 +45,8 @@ __attribute__((destructor)) static void uninitMemcache()
     if (memcinited)
     {
         memcinited = false;
-        memcached_servers_reset(&memc);
+        memcached_free(&memc);
+        //memcached_servers_reset(&memc);
     }
 }
 
@@ -306,6 +308,20 @@ static void initPlatformLogin()
         g_platform_login_number[i] = atoi(value);
     }
 }
+static bool isRPOpenid(const std::string openid)
+{
+    (void)isRPOpenid;
+    initMemcache();
+    char value[32] = {0};
+    char key[64] = {0};
+    size_t len = snprintf(key, sizeof(key), "asss_rp_%s", openid.c_str());;
+
+    if (memcinited)
+        MemcachedGet(openid.c_str(), len, value, sizeof(value));
+
+    return value[0] == '1';
+}
+
 
 #endif // _WIN32
 

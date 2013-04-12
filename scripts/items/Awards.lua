@@ -429,40 +429,27 @@ function RunBlueDiamondAward(player, opt)
     local date_9191_1 = { ['year'] = 2013, ['month'] = 3, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
     local date_9217_0 = { ['year'] = 2012, ['month'] = 11, ['day'] = 20, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
     local date_9217_1 = { ['year'] = 2012, ['month'] = 11, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
-    
     local date_0 = os.time(date_9190_0);
     local date_1 = os.time(date_9190_1);
 
-    local chance = {785,2833,4881,5823,7202,7987,9366,10000}
-    local chance_1 = {1428, 1428*2, 1428*3, 1428*4, 1428*5, 1428*6, 10000, 10000}
-    local item_9190 = {{515,3},{507,2},{509,2},{503,10},{1325,4},{47,3},{134,4},{5026,1}}
-    local item_9191 = {{515,3},{507,2},{509,2},{503,10},{1325,4},{47,3},{134,4},{5026,1}}
-    local item_9217 = {{515,3},{507,2},{509,2},{503,10},{1325,4},{47,3},{134,4},{5026,1}}
-    local item_9284 = {{507,2},{509,2},{503,10},{1325,4},{47,3},{134,4},{515,10},{'ipad',1}}
-
-    local items = item_9190;
-    local itemId = 9190;
-    local ch = chance;
-
-    if opt == 2 then
-        itemId = 9191;
-        items = item_9191;
-        date_0 = os.time(date_9191_0);
-        date_1 = os.time(date_9191_1);
-    elseif opt == 3 then
-        itemId = 9217;
-        items = item_9217;
-        date_0 = os.time(date_9217_0);
-        date_1 = os.time(date_9217_1);
-    elseif opt == 4 then
-        itemId = 9284;
-        items = item_9284;
-        ch = chance_1;
-    end
---    now = os.time()
---    if now < date_0 or now >= date_1 then
---        return 0;
---    end
+    --1:蓝钻 2:黄钻 3:QQ会员 4:红钻
+    local chance = {
+        [1] = {785,2833,4881,5823,7202,7987,9366,10000},
+        [2] = {1050,2265,3480,4695,6220,7745,9270,10000},
+        [3] = {785,2833,4881,5823,7202,7987,9366,10000},
+        [4] = {1428, 1428*2, 1428*3, 1428*4, 1428*5, 1428*6, 10000, 10000},
+    };
+    local item = {
+        [1] = {{515,3},{507,2},{509,2},{503,10},{1325,4},{47,3},{134,4},{5026,1}},
+        [2] = {{515,3},{9338,4},{134,4},{1325,4},{507,2},{509,2},{47,3},{5006,1}},
+        [3] = {{515,3},{507,2},{509,2},{503,10},{1325,4},{47,3},{134,4},{5026,1}},
+        [4] = {{507,2},{509,2},{503,10},{1325,4},{47,3},{134,4},{515,10},{'ipad',1}},
+    };
+    local item_id = {9190, 9191, 9217, 9284};
+    
+    local items = item[opt];
+    local itemId = item_id[opt];
+    local ch = chance[opt];
 
     if  not package:DelItem(itemId, 1, true) then
         if  not package:DelItem(itemId, 1, false) then
@@ -480,6 +467,12 @@ function RunBlueDiamondAward(player, opt)
             break
         end
     end
+    local extraAward_9191 = {
+        [2] = {9191,1,1},
+        [5] = {50,2,1, 9371,5,1, 548,10,1},
+        [8] = {509,5,1, 507,5,1, 500,5,1},
+        [12]= {9076,5,1, 503,5,1, 515,5,1},
+    };
 
     local VAR_BLUE_AWARD_COUNT = 196;
     local VAR_YELLOW_AWARD_COUNT = 197;
@@ -496,11 +489,11 @@ function RunBlueDiamondAward(player, opt)
     elseif opt == 2 then
         player:AddVar(VAR_YELLOW_AWARD_COUNT, 1);
         count = player:GetVar(VAR_YELLOW_AWARD_COUNT);
-        if count == 12 then
-            package:Add(9076, 5, true, 0, 31); 
-            package:Add(515, 5, true, 0, 31); 
-            package:Add(507, 5, true, 0, 31); 
-            package:Add(509, 5, true, 0, 31); 
+        local extarAward = extraAward_9191[count];
+        if extarAward then
+            local title = string.format(msg_130)
+            local ctx = string.format(msg_131, count)
+            player:GetMailBox():newItemPackageMail(title, ctx, extarAward);
         end
     elseif opt == 3 then
         player:AddVar(VAR_QQVIP_AWARD_COUNT, 1);
@@ -786,42 +779,42 @@ function RunVipPrivilegeAward(player, idx, dayth)
     local dayliawards = {{499,20},{49, 1}, {50, 1}} -- 每日登陆奖励
     local limitbuy = {
         [1] = { -- 第一天
-            {500, 2, 10}, -- 限购1
+            {514, 2, 10}, -- 限购1
             {503, 2, 28}, -- 限购2
             {5065, 1, 160}, -- 限购3
         },
         [2] = { -- 第二天
-            {500, 4, 20}, -- 限购1
+            {514, 4, 20}, -- 限购1
             {503, 3, 42}, -- 限购2
             {5115, 1, 160}, -- 限购3
         },
         [3] = { -- 第三天
-            {500, 6, 30}, -- 限购1
+            {514, 6, 30}, -- 限购1
             {503, 4, 56}, -- 限购2
             {5125, 1, 160}, -- 限购3
         },
         [4] = { -- 第四天
-            {500, 8, 40}, -- 限购1
+            {514, 8, 40}, -- 限购1
             {503, 5, 70}, -- 限购2
             {5105, 1, 160}, -- 限购3
         },
         [5] = { -- 第五天
-            {500, 10, 50}, -- 限购1
+            {514, 10, 50}, -- 限购1
             {503, 6, 84}, -- 限购2
             {5095, 1, 160}, -- 限购3
         },
         [6] = { -- 第六天
-            {500, 12, 60}, -- 限购1
+            {514, 12, 60}, -- 限购1
             {503, 7, 98}, -- 限购2
             {5085, 1, 160}, -- 限购3
         },
         [7] = { -- 第七天
-            {500, 14, 70}, -- 限购1
+            {514, 14, 70}, -- 限购1
             {503, 8, 112}, -- 限购2
             {5145, 1, 160}, -- 限购3
         },
 		[8] = { -- 第八天
-            {500, 16, 80}, -- 限购1
+            {514, 16, 80}, -- 限购1
             {503, 9, 126}, -- 限购2
             {5025, 2, 160}, -- 限购3
         },
