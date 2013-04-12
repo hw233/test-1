@@ -1590,9 +1590,9 @@ namespace Script
 		return Call<UInt8>("getPetColorFromId", petId);
     }
 
-	Table GameActionLua::getConvertPetValue(UInt8 color)
+	Table GameActionLua::getConvertPetValue(UInt32 petId)
 	{
-		return Call<Table>("getConvertPetValue", color);
+		return Call<Table>("getConvertPetValue", petId);
     }
 
 	UInt32 GameActionLua::exchangPurplePet( Player* player )

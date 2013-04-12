@@ -3131,8 +3131,8 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
     UInt8 ret = 0;
     if(type == 1 && begin <= end)
     {   //充值幸运星活动
-        GObject::GVAR.SetVar(GObject::GVAR_LUCKYSTAR_END, begin);
-        GObject::GVAR.SetVar(GObject::GVAR_LUCKYSTAR_BEGIN, end);
+        GObject::GVAR.SetVar(GObject::GVAR_LUCKYSTAR_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_LUCKYSTAR_END, end);
         GObject::globalPlayers.enumerate(player_enum_2, 2);
         ret = 1;
     }
@@ -3160,8 +3160,8 @@ void QueryOneActivityOnOff(LoginMsgHdr& hdr, const void* data)
     UInt32 begin = 0, end = 0;
     if(type == 1)
     {
-        begin = GObject::GVAR.GetVar(GObject::GVAR_LUCKYSTAR_END);
-        end = GObject::GVAR.GetVar(GObject::GVAR_LUCKYSTAR_BEGIN);
+        begin = GObject::GVAR.GetVar(GObject::GVAR_LUCKYSTAR_BEGIN);
+        end = GObject::GVAR.GetVar(GObject::GVAR_LUCKYSTAR_END);
     }
     else if (type == 2)
     {

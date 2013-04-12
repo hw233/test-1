@@ -359,7 +359,7 @@ namespace Script
         //仙宠
 	    Table onSeekFairypetAwardAndSucceed(UInt8 step, UInt8 isConvert);
 	    UInt8 getPetColorFromId(UInt32 petId);
-	    Table getConvertPetValue(UInt8 color);
+	    Table getConvertPetValue(UInt32 petId);
 	    UInt32 exchangPurplePet( Player* player );
         bool checkAnswerInFoolsDay(UInt8 qid, char answer);
         void getAwardInFoolsDay(Player* player, UInt8 idx);

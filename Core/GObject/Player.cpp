@@ -18363,7 +18363,6 @@ UInt8 Player::toQQGroup(bool isJoin)
     //放生转化仙宠
 	UInt8 Player::convertFairyPet( UInt32 id, UInt8 isHas)
     {
-        UInt8 color = 0;
         if(isHas)
         {
             FairyPet * pet = findFairyPet(id);
@@ -18371,7 +18370,6 @@ UInt8 Player::toQQGroup(bool isJoin)
                 return 1;
             if(pet->isOnBattle() || pet == _onBattlePet)
                 return 2;
-            color = pet->getColor();
             delFairyPet(id);
             delete pet;
         }
@@ -18383,9 +18381,8 @@ UInt8 Player::toQQGroup(bool isJoin)
 		    FairyPet * pet = static_cast<FairyPet *>(globalFighters[id]);
             if(pet == NULL)
                 return 1;
-            color = pet->getColor();
         }
-        Table values = GameAction()->getConvertPetValue(color);
+        Table values = GameAction()->getConvertPetValue(id);
         UInt32 longYuan = values.get<UInt32>("longyuan");
         UInt32 fengSui = values.get<UInt32>("fengsui");
         UInt32 like = values.get<UInt32>("like");
@@ -19697,7 +19694,8 @@ void Player::sendLuckyStarInfo(UInt8 opt)
 {
     if(!getLuckyStarAct())
     {
-        sendMsgCode(0, 1090);
+        if(opt != 1)
+            sendMsgCode(0, 1090);
         return;
     }
     Stream st(REP::ACTIVE);
