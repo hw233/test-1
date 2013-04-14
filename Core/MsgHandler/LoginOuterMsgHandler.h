@@ -591,7 +591,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
         conn->pendClose();
         return;
     }
-    if (cfg.rpServer && GObject::dclogger.checkRPOpenid((char*)us._openid.c_str()))
+    if (cfg.rpServer && !GObject::dclogger.checkRPOpenid((char*)us._openid.c_str()))
     {
         UserLogonRepStruct rep;
         rep._result = 7;
