@@ -883,6 +883,12 @@ function onActivityCheck(tm)
           setCompassAct(false)
       end
 
+      if tm >= actTime553 and tm < actTime553_1 then
+          setFoolBao(true)
+      else
+          setFoolBao(false)
+      end
+
       if tm >= actTime232_0 and tm < actTime232_1 then
           setFeastLoginAct(true)
       else
@@ -1197,6 +1203,10 @@ function initActTime(y, m, d)
   local  SerStartTm551= { ['year'] = 2013, ['month'] = 1, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm551_1= { ['year'] = 2013, ['month'] = 3, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
+--愚公宝箱
+  local  SerStartTm553= { ['year'] = 2013, ['month'] = 3, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm553_1= { ['year'] = 2013, ['month'] = 4, ['day'] = 6, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  
   -- 繁体版
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm102 = { ['year'] = 2012, ['month'] = 6, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1579,6 +1589,9 @@ function initActTime(y, m, d)
 
   actTime551 = os.time(SerStartTm551);
   actTime551_1 = os.time(SerStartTm551_1) ;
+
+  actTime553 = os.time(SerStartTm553);
+  actTime553_1 = os.time(SerStartTm553_1) ;
 
   actTime560 = os.time(SerStartTm560);
   actTime560_1 = os.time(SerStartTm560) + 10 * 86400;

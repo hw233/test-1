@@ -139,6 +139,7 @@ bool World::_june = false;
 bool World::_june1 = false;
 bool World::_july = false;
 bool World::_qixi= false;
+bool World::_foolbao = false;
 bool World::_wansheng= false;
 bool World::_qingren= false;
 bool World::_specialbook= false;
@@ -275,6 +276,7 @@ bool bGuoqingEnd = false;
 bool bRechargeEnd = false;
 bool bConsumeEnd = false;
 bool bXiaoyaoEnd = false;
+bool bFoolBaoEnd =  false;
 bool bSnowEnd = false;
 bool bGoldSnakeEnd = false;
 bool bItem9344End = false;
@@ -1089,6 +1091,7 @@ void World::World_Midnight_Check( World * world )
     bool bSingleDay = getSingleDay();
     bool bValentineDay = getValentineDay();
     bool bMayDay = getMayDay();
+    bool bfoolbao = getFoolBao();
     bool bJune = getJune();
     bool bQixi = getQixi();
     bool bWansheng = getWansheng();
@@ -1122,6 +1125,9 @@ void World::World_Midnight_Check( World * world )
     bMayDayEnd = bMayDay && !getMayDay();
     // 六一活动是否结束
     bJuneEnd = bJune && !getJune();
+    //愚公宝箱是否结束
+    bFoolBaoEnd =  bfoolbao && !getFoolBao(); 
+   // 
     bPExpItemsEnd = bPExpItems && !getPExpItems();
     bQixiEnd = bQixi && !getQixi();
     bWanshengEnd = bWansheng && !getWansheng();
@@ -1331,6 +1337,8 @@ void World::World_Midnight_Check( World * world )
     }
     if (bXiaoyaoEnd)
         world->SendXiaoyaoAward();
+    if(bFoolBaoEnd)
+        world->SendFoolBaoAward();
     if (bSnowEnd)
         world->SendSnowAward();
     if (bGoldSnakeEnd)
@@ -2390,6 +2398,34 @@ struct SSelectXiaoyaoUsedMost : public Visitor<Player>
         return true;
     }
 };
+struct SSelectFoolBaoUsedMost : public Visitor<Player>
+{
+    Player* _player;
+    UInt32 _used;
+    SSelectFoolBaoUsedMost() : _player(NULL), _used(0) {}
+    bool operator()(Player* player)
+    {
+        UInt32 used = player->GetVar(VAR_FOOLBAO_USED);
+        if(_player == NULL || used > _used)
+        {
+            _player = player;
+            _used = used;
+        }
+        return true;
+    }
+};
+void World::SendFoolBaoAward()
+{
+    SSelectFoolBaoUsedMost selector;
+    globalPlayers.enumerate(selector);
+    if(selector._player == NULL)
+        return;
+    MailPackage::MailItem items[] =
+    {
+        {9902, 1}
+    };
+    selector._player->sendMailItem(4142, 4143, items, sizeof(items)/sizeof(items[0]), false);
+}
 void World::SendXiaoyaoAward()
 {
     SSelectXiaoyaoUsedMost selector;
@@ -2402,6 +2438,7 @@ void World::SendXiaoyaoAward()
     };
     selector._player->sendMailItem(4062, 4063, items, sizeof(items)/sizeof(items[0]), false);
 }
+
 struct SSelectItem9344UsedMost : public Visitor<Player>
 {
     Player* _player;
