@@ -7993,3 +7993,50 @@ function getAwardInFoolsDay(player, idx)
     end
 end
 
+function getLuckyStarAward(player, idx)
+    local items = {
+        {{514, 5}, {503, 10}, {508, 5}},
+        {{"vip", 1}},   --vip限时特权
+        {{79, 1}},
+        {{9082, 10}},
+        {{501, 10}, {513, 10}, {8000, 50}},
+        {{5035, 1}},
+        {{5025, 1}},
+        {{5005, 1}},
+        {{1703, 1}},
+        {{72, 1}},
+        {{9177, 1}},
+        {{9374, 1}},
+    }
+    if nil == player or nil == idx or idx > #items or idx <= 0 then
+        return false
+    end
+    local golds = {0, 99, 99, 20, 0, 59, 59, 59, 0, 568, 268, 999}
+    local recharge = { 100, 500, 1000 }
+    if player:GetVar(369) < recharge[math.floor((idx-1)/4)+1] then
+        SendMsg(player, 0x35, "充值仙石未达到对应额度，不能领取或购买！")
+        return false
+    end
+    if player:getGoldInLua() < golds[idx] then
+        player:sendMsgCode(0, 1104)
+        return false
+    end
+    if player:GetFreePackageSize() < #items[idx] then
+        player:sendMsgCode(2, 1011)
+        return false
+    end
+    if items[idx][1][1] == "vip" then
+        if player:SetVipPrivilege() == false then
+            player:sendMsgCode(0, 1091)
+            return false
+        end
+        player:sendVipPrivilege(true)
+    else
+        for _, val in pairs(items[idx]) do
+            player:GetPackage():Add(val[1], val[2], true, false, 43)
+        end
+    end
+    player:useGoldInLua(golds[idx], 101)
+    return true
+end
+

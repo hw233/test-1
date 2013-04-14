@@ -1273,6 +1273,9 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         GameMsgHdr hdr(0x1CB, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr, NULL);
     }
+    //充值幸运星活动
+    pl->setLuckyStarCondition();
+    pl->sendLuckyStarInfo(1);
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )

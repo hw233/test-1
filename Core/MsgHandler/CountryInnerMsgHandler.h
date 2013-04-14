@@ -1958,6 +1958,29 @@ void OnFoolsDayAct( GameMsgHdr& hdr, const void * data)
     }
 }
 
+void OnLuckyStarAct( GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    struct starData
+    {
+        UInt8 type;
+        UInt8 idx;
+    };
+    starData * sdata = reinterpret_cast<starData*>(const_cast<void *>(data));
+    if(sdata)
+    {
+        switch(sdata->type)
+        {
+            case 0x01:
+                player->sendLuckyStarInfo(2);
+                break;
+            case 0x02:
+                player->getLuckyStarItem(sdata->idx);
+                break;
+        }
+    }
+}
+
 void OnCalcLBBattlePoint( GameMsgHdr &hdr, const void * data)
 {
     MSG_QUERY_PLAYER(player);

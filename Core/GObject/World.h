@@ -6,6 +6,7 @@
 #include "Common/Stream.h"
 #include "Server/Cfg.h"
 #include "Common/TimeUtil.h"
+#include "GVar.h"
 #ifndef _WIN32
 #include "kingnet_analyzer.h"
 #endif
@@ -532,6 +533,13 @@ public:
     inline static bool getQQGameOnlineAwardAct()
     { return _qqgameonlineawardact; }
 
+    inline static bool getLuckyStarAct()
+    {
+        UInt32 now = TimeUtil::Now();
+        UInt32 btime = GVAR.GetVar(GVAR_LUCKYSTAR_BEGIN);
+        UInt32 etime = GVAR.GetVar(GVAR_LUCKYSTAR_END);
+        return btime <= now && now <= etime;
+    }
     inline static void setArenaHeroId(UInt8 pos, UInt8 heroId)
     {
         if(pos < 5 && stArena.heroId[pos] != heroId)

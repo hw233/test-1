@@ -4515,6 +4515,9 @@ namespace GObject
 #endif // _WIN32
         if(ci && ci->purchaseType != TrainFighter)
             AddVar(VAR_USEGOLD_CNT, c);
+        if(!GetVar(VAR_LUCKYSTAR_IS_CONSUME))
+            SetVar(VAR_LUCKYSTAR_IS_CONSUME, 1);
+        setLuckyStarCondition();
         return _playerData.gold;
 	}
 
@@ -4601,6 +4604,10 @@ namespace GObject
 				SYSMSG_SENDV(150, this, c);
 				SYSMSG_SENDV(1050, this, c);
                 _isHoding = false;
+
+                if(!GetVar(VAR_LUCKYSTAR_IS_CONSUME))
+                    SetVar(VAR_LUCKYSTAR_IS_CONSUME, 1);
+                setLuckyStarCondition();
 			}
 			break;
 		case 2:
@@ -7597,6 +7604,13 @@ namespace GObject
 	{
 		if(r == 0)
 			return;
+        setLuckyStarCondition();
+        if(getLuckyStarAct())
+        {
+            AddVar(VAR_LUCKYSTAR_RECHARGE_TOTAL, r);
+            sendLuckyStarInfo(2);
+        }
+
 		UInt32 oldVipLevel = _vipLevel;
 		_playerData.totalRecharge += r;
 		recalcVipLevel();
@@ -7728,6 +7742,7 @@ namespace GObject
             SetVar(VAR_DISCOUNT_RECHARGE3, 0);
         if (flag)
             sendDiscountLimit();
+
     }
 
     void Player::addRechargeNextRet(UInt32 r)
@@ -19201,8 +19216,6 @@ bool Player::SetVipPrivilege()
         validate |= 0x2;
         SetVar(VAR_VIP_PRIVILEGE_TIME, validate);
         ret = true;
-        ConsumeInfo ci(VipPrivilege, 0, 0);
-        useGold(100, &ci);
     }
 
     return ret;
@@ -19351,7 +19364,7 @@ void Player::sendVipPrivilegeMail(UInt8 lv)
     }
 }
 
-void Player::sendVipPrivilege()
+void Player::sendVipPrivilege(bool isLStar)
 {
     UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME);
     UInt32 data = GetVar(VAR_VIP_PRIVILEGE_DATA);
@@ -19385,6 +19398,8 @@ void Player::sendVipPrivilege()
         SET_VIP_PRIVILEGE_OPEN(data, 0);
     }
 
+    if(isLStar)
+        extra |= 0x4;
     SET_VIP_PRIVILEGE_DAYTH(data, dayth);
     Stream st(REP::RC7DAY);
     st << static_cast<UInt8>(10) << timeLeft << static_cast<UInt8>(data) << extra;
@@ -19411,11 +19426,12 @@ bool Player::in7DayFromCreated()
 }
 
 #define QUESTIONID_MAX 30
-#define SET_BIT(X,Y) (X | (1<<Y))
-#define CLR_BIT(X,Y) (X & ~(1<<Y))
-#define CLR_BIT_8(X,Y) (X & ~(0xFF<<(Y*8)))
+#define SET_BIT(X,Y)     (X | (1<<Y))
+#define GET_BIT(X,Y)     (X & (1<<Y))
+#define CLR_BIT(X,Y)     (X & ~(1<<Y))
+#define CLR_BIT_8(X,Y)   (X & ~(0xFF<<(Y*8)))
 #define SET_BIT_8(X,Y,V) (CLR_BIT_8(X,Y) | V<<(Y*8))
-#define GET_BIT_8(X,Y) ((X >> (Y*8)) & 0xFF)
+#define GET_BIT_8(X,Y)   ((X >> (Y*8)) & 0xFF)
 void Player::sendFoolsDayInfo()
 {
     UInt32 info = GetVar(VAR_FOOLS_DAY_INFO);
@@ -19622,6 +19638,101 @@ void Player::foolsDayUdpLog(UInt8 type)
     char action[16] = "";
     snprintf (action, 16, "F_10000_0327_%d", type);
     udpLog("FoolsDay", action, "", "", "", "", "act");
+}
+
+//充值幸运星活动
+void Player::LuckyStarActUdpLog(UInt8 type)
+{
+    char action[16] = "";
+    snprintf (action, 16, "F_10000_%d", type);
+    udpLog("LuckStar", action, "", "", "", "", "act");
+}
+
+bool Player::getLuckyStarAct()
+{
+    UInt32 ltime = GetVar(VAR_LUCKYSTAR_LOGIN_TIME);
+    if(ltime == 0)
+        return false;
+    if(!GetVar(VAR_LUCKYSTAR_IS_CONSUME))
+        return false;
+    ltime = TimeUtil::SharpDayT(0, ltime);
+    UInt32 ntime = TimeUtil::Now();
+    return ntime >= ltime && ntime <= ltime + 7*86400;
+}
+
+void Player::setLuckyStarCondition()
+{
+    if(!World::getLuckyStarAct())
+        return;
+    UInt32 now_sharp = TimeUtil::SharpDay(0);
+    UInt32 created_sharp = TimeUtil::SharpDay(0, getCreated());
+    if (created_sharp > now_sharp || now_sharp - created_sharp < 7 * 86400)
+        return;
+
+    if(GetVar(VAR_LUCKYSTAR_LOGIN_TIME))
+        return;
+    if(!getTotalRecharge() && GetVar(VAR_LUCKYSTAR_IS_CONSUME))
+    {
+        SetVar(VAR_LUCKYSTAR_LOGIN_TIME, TimeUtil::Now());
+        LuckyStarActUdpLog(1);
+    }
+    sendLuckyStarInfo(1);
+}
+
+void Player::sendLuckyStarInfo(UInt8 opt)
+{
+    if(!getLuckyStarAct())
+    {
+        sendMsgCode(0, 1090);
+        return;
+    }
+    Stream st(REP::ACTIVE);
+    st << static_cast<UInt8>(0x12);
+    switch(opt)
+    {
+        case 1:
+            {
+                UInt32 ltime = GetVar(VAR_LUCKYSTAR_LOGIN_TIME);
+                if(!ltime)
+                    return;
+                st << static_cast<UInt8>(0x00) << ltime;
+            }
+            break;
+        case 2:
+            st << static_cast<UInt8>(0x01) << GetVar(VAR_LUCKYSTAR_RECHARGE_TOTAL);
+            st << static_cast<UInt16>(GetVar(VAR_LUCKYSTAR_GET_STATUS));
+            break;
+        default:
+            return;
+    }
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::getLuckyStarItem(UInt8 idx)
+{
+    if(!getLuckyStarAct() || idx >= 12)
+    {
+        sendMsgCode(0, 1090);
+        return;
+    }
+    if (!hasChecked())
+        return;
+    UInt32 value = GetVar(VAR_LUCKYSTAR_GET_STATUS);
+    if(GET_BIT(value, idx))
+        return;
+    if(GameAction()->getLuckyStarAward(this, idx+1))
+    {
+        value = SET_BIT(value, idx);
+        SetVar(VAR_LUCKYSTAR_GET_STATUS, value);
+        if(idx == 0)
+            LuckyStarActUdpLog(2);
+        if(idx == 4)
+            LuckyStarActUdpLog(3);
+        if(idx == 7)
+            LuckyStarActUdpLog(4);
+    }
+    sendLuckyStarInfo(2);
 }
 
 } // namespace GObject

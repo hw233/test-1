@@ -2793,10 +2793,26 @@ UInt8 SwitchAutoForbid(UInt32 val)
     return 0;
 }
 
-inline bool player_enum_2(GObject::Player* pl, int value)
+inline bool player_enum_2(GObject::Player* pl, int type)
 {
-    pl->SetVar(GObject::VAR_DRAGONKING_STEP, value);
-    pl->SetVar(GObject::VAR_DRAGONKING_STEP4_COUNT, value);
+    switch(type)
+    {
+        case 1:
+            pl->SetVar(GObject::VAR_DRAGONKING_STEP, 0);
+            pl->SetVar(GObject::VAR_DRAGONKING_STEP4_COUNT, 0);
+            break;
+        case 2:
+            {
+                UInt32 btime = GObject::GVAR.GetVar(GObject::GVAR_LUCKYSTAR_BEGIN);
+                UInt32 etime = GObject::GVAR.GetVar(GObject::GVAR_LUCKYSTAR_END);
+                UInt32 ltime = pl->GetVar(GObject::VAR_LUCKYSTAR_LOGIN_TIME);
+                if(ltime && (ltime < btime || ltime > etime))
+                    pl->SetVar(GObject::VAR_LUCKYSTAR_LOGIN_TIME, 0);
+            }
+            break;
+        default:
+            return false;
+    }
     return true;
 }
 
@@ -2834,7 +2850,7 @@ void GMCmd(LoginMsgHdr& hdr, const void* data)
                     if (flag != 10)
                     {
                         if(flag != GObject::GVAR.GetVar(GObject::GVAR_DRAGONKING_ACTION))
-                            GObject::globalPlayers.enumerate(player_enum_2, 0);
+                            GObject::globalPlayers.enumerate(player_enum_2, 1);
                         GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_BEGIN, val);
                         GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_END, endTime);
                         GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_ACTION, flag);
@@ -3093,6 +3109,54 @@ void QuerySHStageOnOff(LoginMsgHdr& hdr, const void* data)
 
     Stream st(SPEP::QUERYSHSTAGEONOFF);
     st << onOff._timeBegin << onOff._timeEnd << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID, st);
+}
+
+void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
+{
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    CHKKEY();
+
+    UInt32 begin = 0, end = 0;
+    UInt8 type = 0;
+    br >> type >> begin >> end;
+    UInt8 ret = 0;
+    if(type == 1)
+    {   //充值幸运星活动
+        GObject::GVAR.SetVar(GObject::GVAR_LUCKYSTAR_END, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_LUCKYSTAR_BEGIN, end);
+        GObject::globalPlayers.enumerate(player_enum_2, 2);
+        ret = 1;
+    }
+    else if (type == 2)
+    {
+    }
+
+    Stream st(SPEP::ACTIVITYONOFF);
+    st << ret << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID, st);
+}
+
+void QueryOneActivityOnOff(LoginMsgHdr& hdr, const void* data)
+{
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+
+    UInt8 type = 0;
+    br >> type;
+
+    UInt32 begin = 0, end = 0;
+    if(type == 1)
+    {
+        begin = GObject::GVAR.GetVar(GObject::GVAR_LUCKYSTAR_END);
+        end = GObject::GVAR.GetVar(GObject::GVAR_LUCKYSTAR_BEGIN);
+    }
+    else if (type == 2)
+    {
+    }
+
+    Stream st(SPEP::QUERYACTIVITYONOFF);
+    st << type << begin << end << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID, st);
 }
 

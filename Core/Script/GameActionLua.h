@@ -363,6 +363,7 @@ namespace Script
 	    UInt32 exchangPurplePet( Player* player );
         bool checkAnswerInFoolsDay(UInt8 qid, char answer);
         void getAwardInFoolsDay(Player* player, UInt8 idx);
+        bool getLuckyStarAward(Player* player, UInt8 idx);
 
 	private:
 		Player* _player1;	//?ű???????Ϊ????1
