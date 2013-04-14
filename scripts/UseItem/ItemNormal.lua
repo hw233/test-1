@@ -7963,7 +7963,7 @@ function ItemNormal_00009365(iid, num, bind, param)
     return num
 end
 
---使用灵宠蛋
+--使用绿蓝紫色灵宠蛋
 function ItemNormal_00009366(iid, num, bind, param)
     local player = GetPlayer()
     if player:GetLev() < 50 then
@@ -7972,7 +7972,14 @@ function ItemNormal_00009366(iid, num, bind, param)
     local package = player:GetPackage()
     local count = 0
     for i = 1, num do
-        local id = bluePet[math.random(1, #bluePet)]
+        local id = 0
+        if iid == 9366 then
+            id = bluePet[math.random(1, #bluePet)]
+        elseif iid == 9373 then
+            id = greenPet[math.random(1, #greenPet)]
+        elseif iid == 9374 then
+            id = purplePet[math.random(1, #purplePet)]
+        end
         local res = player:getPetByPetEgg(id)
         if res == 3 then  --仙宠已满
             break
@@ -8371,6 +8378,7 @@ local ItemNormal_Table = {
     [1354] = ItemNormal_citta,
     [1355] = ItemNormal_citta,
     [1356] = ItemNormal_citta,
+    [1357] = ItemNormal_citta,
 
     [1000] = ItemNormal_formation,
     [1001] = ItemNormal_formation,
@@ -9746,6 +9754,8 @@ local ItemNormal_Table = {
     [9370] = ItemNormal_00009369,
     [9371] = ItemNormal_00009371,
     [9375] = ItemNormal_00009375,
+    [9373] = ItemNormal_00009366,
+    [9374] = ItemNormal_00009366,
     [9900] = ItemNormal_NameCard,
 
     [10000] = ItemNormal_00010000,
