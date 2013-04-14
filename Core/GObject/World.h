@@ -686,10 +686,10 @@ public:
     void RankLuckyDraw(Player* player, bool notify = true);
     void SendLuckyDrawList(Player* player);
     void SendLuckyDrawAward();
-
 public:
 	static void calWeekDay( World * world );
-
+    inline static void setSysDailogPlatform(UInt8 v) { m_sysDailogPlatform = v; }
+    inline static UInt8 getSysDailogPlatform() { return m_sysDailogPlatform; }
 public:
     static UInt32 _moneyLogged;
     static MoneyIn _moneyIn[7][2];
@@ -804,7 +804,7 @@ public:
     static bool _item9343act;
     static bool _autobattleact;
     static UInt8 _snakespringequipact;
-
+    static UInt8 m_sysDailogPlatform;
 public:
     static RCSortType rechargeSort;
     static RCSortType consumeSort;
@@ -814,7 +814,6 @@ public:
 
     static RCSortType killMonsterSort[4];
     static RCSortType rechargeRP7Sort;
-
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }
 	void OnTimer();
@@ -849,7 +848,6 @@ private:
     static void ClanStatueCheck(void *);
     static void SendPopulatorRankAward(void*);
     //static void advancedHookTimer(void *para);
-
 public:
 	static void ReCalcWeekDay( World * );
 

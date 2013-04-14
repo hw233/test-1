@@ -2715,21 +2715,23 @@ void GMHandler::OnGetHeroMemoAward(GObject::Player* player, std::vector<std::str
     player->GetHeroMemo()->getAward(idx);
 }
 
-inline bool player_enum(GObject::Player* p, void* para)
+inline bool player_enum(GObject::Player* p, int)
 {
-    UInt8 platfrom = *reinterpret_cast<UInt8 *>(para);
     if (!p->isOnline())
     {
         p->setSysDailog(true);
-        p->setSysDailogPlatform(platfrom);
     }
     else
     {
-        if(platfrom == SYS_DIALOG_ALL_PLATFORM || platfrom == atoi(p->getDomain()))
+        if(World::getSysDailogPlatform() == SYS_DIALOG_ALL_PLATFORM || World::getSysDailogPlatform() == atoi(p->getDomain()))
         {
             Stream st(REP::SYSDAILOG);
             st << Stream::eos;
             p->send(st);
+        }
+        else
+        {
+            p->setSysDailog(true);
         }
     }
     return true;
@@ -2740,7 +2742,8 @@ void GMHandler::OnSysDailog(GObject::Player* player, std::vector<std::string>& a
     if (!args.size())
         return;
     UInt8 platform = atoi(args[0].c_str());
-    GObject::globalPlayers.enumerate(player_enum, &platform);
+    World::setSysDailogPlatform(platform);
+    GObject::globalPlayers.enumerate(player_enum, 0);
 }
 void GMHandler::OnRegenAll(GObject::Player* player, std::vector<std::string>& args)
 {

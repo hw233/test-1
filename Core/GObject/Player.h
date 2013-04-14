@@ -1964,11 +1964,8 @@ namespace GObject
     public:
         inline void setSysDailog(bool v) { m_sysDailog = v; }
         inline bool getSysDailog() { return m_sysDailog; }
-        inline void setSysDailogPlatform(UInt8 v) { m_sysDailogPlatform = v; }
-        inline UInt8 getSysDailogPlatform() { return m_sysDailogPlatform; }
     private:
         bool m_sysDailog;
-        bool m_sysDailogPlatform;
 
     public:
         void sendTripodInfo();
