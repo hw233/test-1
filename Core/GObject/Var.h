@@ -410,6 +410,9 @@ namespace GObject
         VAR_CARD_3 = 455,
         VAR_CARD_4 = 456,
         VAR_CARD_5 = 457,
+
+        //繁体版占用470-499
+
         VAR_MAX,
     };
 
