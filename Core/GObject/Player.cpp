@@ -197,8 +197,8 @@ namespace GObject
         // 限时vip特权
         if(m_Player->inVipPrivilegeTime())
         {
-            factor += 0.2f;
-            extraExp = static_cast<UInt32>(exp * 0.2f);
+            factor += 1.0f;
+            extraExp = static_cast<UInt32>(exp * 1.0f);
         }
 #if 0
 		_npcGroup->monsterKilled(m_Player);
@@ -4515,6 +4515,9 @@ namespace GObject
 #endif // _WIN32
         if(ci && ci->purchaseType != TrainFighter)
             AddVar(VAR_USEGOLD_CNT, c);
+        if(!GetVar(VAR_LUCKYSTAR_IS_CONSUME))
+            SetVar(VAR_LUCKYSTAR_IS_CONSUME, 1);
+        setLuckyStarCondition();
         return _playerData.gold;
 	}
 
@@ -4601,6 +4604,10 @@ namespace GObject
 				SYSMSG_SENDV(150, this, c);
 				SYSMSG_SENDV(1050, this, c);
                 _isHoding = false;
+
+                if(!GetVar(VAR_LUCKYSTAR_IS_CONSUME))
+                    SetVar(VAR_LUCKYSTAR_IS_CONSUME, 1);
+                setLuckyStarCondition();
 			}
 			break;
 		case 2:
@@ -7456,6 +7463,8 @@ namespace GObject
 
         if (nLev == 40 || nLev == 50 || nLev == 60 || nLev == 70 || nLev == 80 || nLev == 90 || nLev == 100)
             OnShuoShuo(nLev/10-4 + SS_40);
+
+        sendVipPrivilegeMail(nLev);
 	}
 
     void Player::sendFormationList()
@@ -7595,6 +7604,13 @@ namespace GObject
 	{
 		if(r == 0)
 			return;
+        setLuckyStarCondition();
+        if(getLuckyStarAct())
+        {
+            AddVar(VAR_LUCKYSTAR_RECHARGE_TOTAL, r);
+            sendLuckyStarInfo(2);
+        }
+
 		UInt32 oldVipLevel = _vipLevel;
 		_playerData.totalRecharge += r;
 		recalcVipLevel();
@@ -7726,6 +7742,7 @@ namespace GObject
             SetVar(VAR_DISCOUNT_RECHARGE3, 0);
         if (flag)
             sendDiscountLimit();
+
     }
 
     void Player::addRechargeNextRet(UInt32 r)
@@ -7837,6 +7854,7 @@ namespace GObject
         }
     }
 
+
     void Player::sendRechargeInfo(bool rank)
     {
         if (!World::getRechargeActive() && !World::getRechargeActive3366())
@@ -7858,7 +7876,6 @@ namespace GObject
             GLOBAL().PushMsg(hdr, &total);
         }
     }
-
     void Player::sendConsumeInfo(bool rank)
     {
         if (!World::getConsumeActive())
@@ -9807,7 +9824,7 @@ namespace GObject
 #endif
         // 限时vip特权
         if(inVipPrivilegeTime())
-            factor += 0.2f;
+            factor += 1.0f;
 
         return factor;
     }
@@ -9955,7 +9972,7 @@ namespace GObject
                     UInt32 extraPExp = 0;
                     UInt32 pExp = fgt->getPracticeInc() * pfexp->counts[i];
                     if(inVipPrivilegeTime())
-                        extraPExp = fgt->getBasePExpEach() * pfexp->counts[i] * 0.2f;
+                        extraPExp = fgt->getBasePExpEach() * pfexp->counts[i] * 1.0f;
                     isDoubleExp(pExp);
                     fgt->addPExp(pExp, true, false, extraPExp);
                 }
@@ -10012,7 +10029,7 @@ namespace GObject
                     UInt32 extraPExp = 0;
                     UInt32 pExp = fgt->getPracticeInc() * pfexp->counts[i];
                     if(inVipPrivilegeTime())
-                        extraPExp = fgt->getBasePExpEach() * pfexp->counts[i] * 0.2f;
+                        extraPExp = fgt->getBasePExpEach() * pfexp->counts[i] * 1.0f;
                     isDoubleExp(pExp);
                     fgt->addPExp(pExp, true, false, extraPExp);
                 }
@@ -11189,6 +11206,7 @@ namespace GObject
 
     void Player::getAwardBlueDiamond(UInt8 opt)
     {
+        std::cout<<opt<<std::endl;
         if(opt >= 1) //抽奖
         {
             UInt8 idx = 0;
@@ -18102,6 +18120,19 @@ void Player::sendLongyuanActInfo()
     st << Stream::eos;
     send(st);
 }
+void Player::sendLuckyBagInfo()
+{
+    if(!World::getSurnameLegend())
+        return ;
+    Stream st(REP::ACTIVE);
+    st << static_cast<UInt8>(0x13) << static_cast<UInt8>(0x00);
+    for (UInt8 i = 0; i < 5; ++i)
+    {
+        st <<static_cast<UInt16>(GetVar(VAR_CARD_1+i));
+    }
+    st << Stream::eos;
+    send(st);
+}
 void Player::transferExpBuffer2Var()
 {
     UInt32 tm = TimeUtil::Now();
@@ -18332,7 +18363,6 @@ UInt8 Player::toQQGroup(bool isJoin)
     //放生转化仙宠
 	UInt8 Player::convertFairyPet( UInt32 id, UInt8 isHas)
     {
-        UInt8 color = 0;
         if(isHas)
         {
             FairyPet * pet = findFairyPet(id);
@@ -18340,7 +18370,6 @@ UInt8 Player::toQQGroup(bool isJoin)
                 return 1;
             if(pet->isOnBattle() || pet == _onBattlePet)
                 return 2;
-            color = pet->getColor();
             delFairyPet(id);
             delete pet;
         }
@@ -18352,9 +18381,8 @@ UInt8 Player::toQQGroup(bool isJoin)
 		    FairyPet * pet = static_cast<FairyPet *>(globalFighters[id]);
             if(pet == NULL)
                 return 1;
-            color = pet->getColor();
         }
-        Table values = GameAction()->getConvertPetValue(color);
+        Table values = GameAction()->getConvertPetValue(id);
         UInt32 longYuan = values.get<UInt32>("longyuan");
         UInt32 fengSui = values.get<UInt32>("fengsui");
         UInt32 like = values.get<UInt32>("like");
@@ -19211,25 +19239,75 @@ bool Player::SetVipPrivilege()
     if(validate == 0)
     {
         UInt32 now = TimeUtil::Now();
-        UInt32 validate = now + 168*3600;
+        UInt32 validate = now + 7*86400;
         // 保持最低位为0
         if(validate & 0x1)
             validate = validate + 1;
+        // 保持第2位为1, 
+        // validate&0x2 为false表示限时vip为2天
+        // validate&0x2 为true表示限时vip为7天
+        validate |= 0x2;
         SetVar(VAR_VIP_PRIVILEGE_TIME, validate);
         ret = true;
-        ConsumeInfo ci(VipPrivilege, 0, 0);
-        useGold(100, &ci);
     }
 
     return ret;
 }
 
+bool Player::SetVipPrivilege_1()
+{
+    UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME);
+    bool ret = false;
+    if(validate == 0)
+    {
+        UInt32 now = TimeUtil::Now();
+        UInt32 validate = now + 2*86400;
+        // 保持最低位为0
+        if(validate & 0x1)
+            validate = validate + 1;
+        // 保持第2位为0, 
+        // validate&0x2 为false表示限时vip为2天
+        // validate&0x2 为true表示限时vip为7天
+        if(validate & 0x2)
+            validate = validate + 0x2;
+        SetVar(VAR_VIP_PRIVILEGE_TIME, validate);
+        ret = true;
+        ConsumeInfo ci(VipPrivilege, 0, 0);
+        useGold(30, &ci);
+    }
+
+    return ret;
+}
+
+bool Player::SetVipPrivilege_2()
+{
+    UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME);
+    bool ret = false;
+    if(validate > 0 && (0 == (validate & 0x2)))
+    {
+        validate += 5*86400;
+        // 保持最低位为0
+        if(validate & 0x1)
+            validate = validate + 1;
+        // 保持第2位为1, 
+        // validate&0x2 为false表示限时vip为2天
+        // validate&0x2 为true表示限时vip为7天
+        validate |= 0x2;
+        SetVar(VAR_VIP_PRIVILEGE_TIME, validate);
+        ret = true;
+        ConsumeInfo ci(VipPrivilege, 0, 0);
+        useGold(70, &ci);
+    }
+
+    return ret;
+}
 
 #define VIP_PRIVILEGE_DAYLYAWARD(data) (0x01&data)
 #define VIP_PRIVILEGE_LIMITBUY1(data)  (0x02&data)
 #define VIP_PRIVILEGE_LIMITBUY2(data)  (0x04&data)
 #define VIP_PRIVILEGE_LIMITBUY3(data)  (0x08&data)
 #define VIP_PRIVILEGE_TIMEOUT(data)  (0x1&data)
+#define VIP_PRIVILEGE_7DAY(data)  (0x2&data)
 
 #define SET_VIP_PRIVILEGE_DAYLYAWARD(data, v) (data|=(v&0x01))
 #define SET_VIP_PRIVILEGE_LIMITBUY1(data, v)  (data|=((v<<1)&0x02))
@@ -19268,9 +19346,16 @@ void Player::doVipPrivilege(UInt8 idx)
         if(!in7DayFromCreated())
             return;
 
-        if (getGold() < 100)
+        if (getGold() < 30)
             return;
-        SetVipPrivilege();
+        SetVipPrivilege_1();
+        break;
+    case 6:
+        if(!inVipPrivilegeTime())
+            return;
+        if (getGold() < 70)
+            return;
+        SetVipPrivilege_2();
         break;
     }
 
@@ -19280,7 +19365,11 @@ void Player::doVipPrivilege(UInt8 idx)
         {
             UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME);
             UInt32 now = TimeUtil::Now();
-            UInt8 dayth = (TimeUtil::SharpDayT(0, now) + 168*3600 - TimeUtil::SharpDayT(0, validate))/86400 + 1;
+            UInt8 dayth = 0;
+            if(VIP_PRIVILEGE_7DAY(validate))
+                dayth = (TimeUtil::SharpDayT(0, now) + 7*86400 - TimeUtil::SharpDayT(0, validate))/86400 + 1;
+            else
+                dayth = (TimeUtil::SharpDayT(0, now) + 2*86400 - TimeUtil::SharpDayT(0, validate))/86400 + 1;
             if(!GameAction()->RunVipPrivilegeAward(this, idx, dayth))
                 return;
             SetVar(VAR_VIP_PRIVILEGE_DATA, data);
@@ -19294,16 +19383,34 @@ void Player::doVipPrivilege(UInt8 idx)
     sendVipPrivilege();
 }
 
-void Player::sendVipPrivilege()
+void Player::sendVipPrivilegeMail(UInt8 lv)
+{
+    if(lv != 32 || !in7DayFromCreated())
+        return;
+
+    UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME);
+    if(validate == 0)
+    {
+        SYSMSG(title, 4914);
+        SYSMSGV(content, 4915, lv);
+        GetMailBox()->newMail(NULL, 0x12, title, content);
+    }
+}
+
+void Player::sendVipPrivilege(bool isLStar)
 {
     UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME);
     UInt32 data = GetVar(VAR_VIP_PRIVILEGE_DATA);
     UInt32 now = TimeUtil::Now();
-    UInt8 dayth = (TimeUtil::SharpDayT(0, now) + 168*3600 - TimeUtil::SharpDayT(0, validate))/86400;
+    UInt8 dayth = 0;
+    if(VIP_PRIVILEGE_7DAY(validate))
+        dayth = (TimeUtil::SharpDayT(0, now) + 7*86400 - TimeUtil::SharpDayT(0, validate))/86400;
+    else
+        dayth = (TimeUtil::SharpDayT(0, now) + 2*86400 - TimeUtil::SharpDayT(0, validate))/86400;
     if(dayth > 7)
         dayth = 7;
     UInt32 timeLeft = 0;
-    UInt8 timeOut = 0;
+    UInt8 extra = 0;
     if(validate > now)
         timeLeft = validate - now;
     if(validate != 0)
@@ -19311,19 +19418,24 @@ void Player::sendVipPrivilege()
         SET_VIP_PRIVILEGE_OPEN(data, 1);
         if(timeLeft == 0 && VIP_PRIVILEGE_TIMEOUT(validate) == 0)
         {
-            timeOut = 1;
+            extra = 0x1;
             SET_VIP_PRIVILEGE_TIMEOUT(validate, 1);
             SetVar(VAR_VIP_PRIVILEGE_TIME, validate);
         }
+
+        if(VIP_PRIVILEGE_7DAY(validate))
+            extra |= 0x2;
     }
     else
     {
         SET_VIP_PRIVILEGE_OPEN(data, 0);
     }
 
+    if(isLStar)
+        extra |= 0x4;
     SET_VIP_PRIVILEGE_DAYTH(data, dayth);
     Stream st(REP::RC7DAY);
-    st << static_cast<UInt8>(10) << timeLeft << static_cast<UInt8>(data) << timeOut;
+    st << static_cast<UInt8>(10) << timeLeft << static_cast<UInt8>(data) << extra;
     st << Stream::eos;
     send(st);
 }
@@ -19347,11 +19459,12 @@ bool Player::in7DayFromCreated()
 }
 
 #define QUESTIONID_MAX 30
-#define SET_BIT(X,Y) (X | (1<<Y))
-#define CLR_BIT(X,Y) (X & ~(1<<Y))
-#define CLR_BIT_8(X,Y) (X & ~(0xFF<<(Y*8)))
+#define SET_BIT(X,Y)     (X | (1<<Y))
+#define GET_BIT(X,Y)     (X & (1<<Y))
+#define CLR_BIT(X,Y)     (X & ~(1<<Y))
+#define CLR_BIT_8(X,Y)   (X & ~(0xFF<<(Y*8)))
 #define SET_BIT_8(X,Y,V) (CLR_BIT_8(X,Y) | V<<(Y*8))
-#define GET_BIT_8(X,Y) ((X >> (Y*8)) & 0xFF)
+#define GET_BIT_8(X,Y)   ((X >> (Y*8)) & 0xFF)
 void Player::sendFoolsDayInfo()
 {
     UInt32 info = GetVar(VAR_FOOLS_DAY_INFO);
@@ -19560,6 +19673,111 @@ void Player::foolsDayUdpLog(UInt8 type)
     udpLog("FoolsDay", action, "", "", "", "", "act");
 }
 
+//充值幸运星活动
+void Player::LuckyStarActUdpLog(UInt8 type)
+{
+    char action[16] = "";
+    snprintf (action, 16, "F_10000_%d", type);
+    udpLog("LuckStar", action, "", "", "", "", "act");
+}
+
+bool Player::getLuckyStarAct()
+{
+    UInt32 ltime = GetVar(VAR_LUCKYSTAR_LOGIN_TIME);
+    if(ltime == 0)
+        return false;
+    if(!GetVar(VAR_LUCKYSTAR_IS_CONSUME))
+        return false;
+    ltime = TimeUtil::SharpDayT(0, ltime);
+    UInt32 ntime = TimeUtil::Now();
+    return ntime >= ltime && ntime <= ltime + 7*86400;
+}
+
+void Player::setLuckyStarCondition()
+{
+    if(!World::getLuckyStarAct())
+        return;
+    UInt32 now_sharp = TimeUtil::SharpDay(0);
+    UInt32 created_sharp = TimeUtil::SharpDay(0, getCreated());
+    if (created_sharp > now_sharp || now_sharp - created_sharp < 7 * 86400)
+        return;
+
+    if(GetVar(VAR_LUCKYSTAR_LOGIN_TIME))
+        return;
+    if(!getTotalRecharge() && GetVar(VAR_LUCKYSTAR_IS_CONSUME))
+    {
+        SetVar(VAR_LUCKYSTAR_LOGIN_TIME, TimeUtil::Now());
+        LuckyStarActUdpLog(1);
+    }
+    sendLuckyStarInfo(1);
+}
+
+void Player::sendLuckyStarInfo(UInt8 opt)
+{
+    if(!getLuckyStarAct())
+    {
+        if(opt != 1)
+            sendMsgCode(0, 1090);
+        return;
+    }
+    Stream st(REP::ACTIVE);
+    st << static_cast<UInt8>(0x12);
+    switch(opt)
+    {
+        case 1:
+            {
+                UInt32 ltime = GetVar(VAR_LUCKYSTAR_LOGIN_TIME);
+                if(!ltime)
+                    return;
+                st << static_cast<UInt8>(0x00) << ltime;
+            }
+            break;
+        case 2:
+            st << static_cast<UInt8>(0x01) << GetVar(VAR_LUCKYSTAR_RECHARGE_TOTAL);
+            st << static_cast<UInt16>(GetVar(VAR_LUCKYSTAR_GET_STATUS));
+            break;
+        default:
+            return;
+    }
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::getLuckyStarItem(UInt8 idx)
+{
+    if(!getLuckyStarAct() || idx >= 12)
+    {
+        sendMsgCode(0, 1090);
+        return;
+    }
+    if (!hasChecked())
+        return;
+    UInt32 value = GetVar(VAR_LUCKYSTAR_GET_STATUS);
+    if(GET_BIT(value, idx))
+        return;
+    if(GameAction()->getLuckyStarAward(this, idx+1))
+    {
+        value = SET_BIT(value, idx);
+        SetVar(VAR_LUCKYSTAR_GET_STATUS, value);
+        if(idx == 0)
+            LuckyStarActUdpLog(2);
+        if(idx == 4)
+            LuckyStarActUdpLog(3);
+        if(idx == 8)
+            LuckyStarActUdpLog(4);
+    }
+    sendLuckyStarInfo(2);
+}
+
+    void Player::LuckyBagRank()
+    {
+        if(World::getSurnameLegend())
+        {
+            UInt32 LuckbagNum = GetVar(VAR_SURNAMELEGEND_USED);
+            GameMsgHdr hdr(0x1C8, WORKER_THREAD_WORLD, this, sizeof(LuckbagNum));
+             GLOBAL().PushMsg(hdr, &LuckbagNum);
+        }
+    }
 } // namespace GObject
 
 

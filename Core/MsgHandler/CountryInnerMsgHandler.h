@@ -768,8 +768,8 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
 
     if(player->inVipPrivilegeTime())
     {
-        extraFactor = 0.2f;
-        extraExp = static_cast<UInt32>(exp * 0.2f);
+        extraFactor = 1.0f;
+        extraExp = static_cast<UInt32>(exp * 1.0f);
     }
     if(curHookIndex == ENUM_TRAINP1)
     {
@@ -1958,12 +1958,52 @@ void OnFoolsDayAct( GameMsgHdr& hdr, const void * data)
     }
 }
 
+void OnLuckyStarAct( GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    struct starData
+    {
+        UInt8 type;
+        UInt8 idx;
+    };
+    starData * sdata = reinterpret_cast<starData*>(const_cast<void *>(data));
+    if(sdata)
+    {
+        switch(sdata->type)
+        {
+            case 0x01:
+                player->sendLuckyStarInfo(2);
+                break;
+            case 0x02:
+                player->getLuckyStarItem(sdata->idx);
+                break;
+        }
+    }
+}
+
 void OnCalcLBBattlePoint( GameMsgHdr &hdr, const void * data)
 {
     MSG_QUERY_PLAYER(player);
     player->calcLingbaoBattlePoint();
 }
-
+void OnSurnameLegendAct( GameMsgHdr &hdr, const void * data  )
+{
+    MSG_QUERY_PLAYER(player);
+    if(player==NULL)
+        return ;
+    UInt8 type = *(reinterpret_cast<UInt8 *>(const_cast<void *>(data)));
+   switch(type)
+   {
+    case 0x00:
+        player->sendLuckyBagInfo();
+        break;
+    case 0x03:
+          //player->GetLuckyBagAward();
+          GameAction()->GetLuckyBagAward(player);
+          break;
+   }
+    
+}
 void OnBeVoted( GameMsgHdr &hdr, const void * data)
 {
     MSG_QUERY_PLAYER(player);

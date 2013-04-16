@@ -6,6 +6,7 @@
 #include "Common/Stream.h"
 #include "Server/Cfg.h"
 #include "Common/TimeUtil.h"
+#include "GObject/GVar.h"
 #ifndef _WIN32
 #include "kingnet_analyzer.h"
 #endif
@@ -532,6 +533,13 @@ public:
     inline static bool getQQGameOnlineAwardAct()
     { return _qqgameonlineawardact; }
 
+    inline static bool getLuckyStarAct()
+    {
+        UInt32 now = TimeUtil::Now();
+        UInt32 btime = GVAR.GetVar(GVAR_LUCKYSTAR_BEGIN);
+        UInt32 etime = GVAR.GetVar(GVAR_LUCKYSTAR_END);
+        return btime <= now && now <= etime;
+    }
     inline static void setArenaHeroId(UInt8 pos, UInt8 heroId)
     {
         if(pos < 5 && stArena.heroId[pos] != heroId)
@@ -644,6 +652,34 @@ public:
    { _foolbao = v; }
     inline static bool getFoolBao()
     { return _foolbao; } 
+    
+   inline static void setSurnameLegend(bool v)
+   { 
+   /*     UInt32 begin =GVAR.GetVar(GVAR_SURNAMELEGEND_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_SURNAMELEGEND_END);
+        UInt32 now = TimeUtil::Now();
+      if( now >= begin && now <= end)
+          return ;
+     */  _surnamelegend = v;
+   }
+   
+    inline static bool getSurnameLegend(UInt32 time = 0)
+    { 
+     /*   UInt32 begin =GVAR.GetVar(GVAR_SURNAMELEGEND_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_SURNAMELEGEND_END);
+        UInt32 now = TimeUtil::Now()+ time;
+       if( now >= begin && now <= end)
+            _surnamelegend = true;
+       else if(begin>0 && end > 0)
+            _surnamelegend = false;
+       */
+        return _surnamelegend ;
+    } 
+
+   inline static void setHalfGold(bool v)
+   { _halfgold = v; }
+    inline static bool getHalfGold()
+    { return _halfgold; } 
 
     inline static void setCallSnakeEggAct(UInt8 v)
     { _callsnakeeggact = v; }
@@ -686,10 +722,10 @@ public:
     void RankLuckyDraw(Player* player, bool notify = true);
     void SendLuckyDrawList(Player* player);
     void SendLuckyDrawAward();
-
 public:
 	static void calWeekDay( World * world );
-
+    inline static void setSysDailogPlatform(UInt8 v) { m_sysDailogPlatform = v; }
+    inline static UInt8 getSysDailogPlatform() { return m_sysDailogPlatform; }
 public:
     static UInt32 _moneyLogged;
     static MoneyIn _moneyIn[7][2];
@@ -798,23 +834,25 @@ public:
     static stArenaExtra stArena;
     static bool _compassact;
     static bool _foolbao;
+    static bool _surnamelegend;
+    static bool _halfgold;
     static UInt8 _callsnakeeggact;
     static UInt8 _snakeeggawardact;
     static bool _item9344act;
     static bool _item9343act;
     static bool _autobattleact;
     static UInt8 _snakespringequipact;
-
+    static UInt8 m_sysDailogPlatform;
 public:
     static RCSortType rechargeSort;
     static RCSortType consumeSort;
     static RCSortType popularitySort;
+    static RCSortType LuckyBagSort;
     static void initRCRank();
     static void initRP7RCRank();
 
     static RCSortType killMonsterSort[4];
     static RCSortType rechargeRP7Sort;
-
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }
 	void OnTimer();
@@ -849,7 +887,6 @@ private:
     static void ClanStatueCheck(void *);
     static void SendPopulatorRankAward(void*);
     //static void advancedHookTimer(void *para);
-
 public:
 	static void ReCalcWeekDay( World * );
 
@@ -873,7 +910,7 @@ public:
     void SendItem9344Award();
     void SendItem9343Award();
     void SendFoolBaoAward();
-
+    void SendSurnameLegendAward();
     void UpdateSnowScore(Player* pl, Player* lover);
     void sendSnowPlayers(Player* pl);
     void DivorceSnowPair(Player* pl);

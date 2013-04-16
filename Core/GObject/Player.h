@@ -168,6 +168,8 @@ namespace GObject
 #define PF_XY 171
 #define PF_XY_CH 10040
 
+#define SYS_DIALOG_ALL_PLATFORM 0
+
     enum PEXP_HOOK_INFEX
     {
         ENUM_TRAINP1 = 1,  /** 初级经验加速符*1.2,加速(*1.3) **/
@@ -751,6 +753,7 @@ namespace GObject
         void sendRF7DayInfo(UInt32 now = TimeUtil::Now());
         void setContinuousRFAward(UInt32 no);
         void sendFourCopAct();
+        void sendLuckybagInfo();
 		void Reconnect();
 
 		void Logout(bool = false);	//???????߲???
@@ -1025,7 +1028,10 @@ namespace GObject
         bool inVipPrivilegeTime();
         bool SetVipPrivilege();
         void doVipPrivilege(UInt8 idx);
-        void sendVipPrivilege();
+        void sendVipPrivilege(bool = false);
+        void sendVipPrivilegeMail(UInt8 lv);
+        bool SetVipPrivilege_1();
+        bool SetVipPrivilege_2();
 
     private:
         GData::AttrExtra _hiattr;
@@ -1609,6 +1615,7 @@ namespace GObject
         UInt8 useSnowItem(UInt32 num);
         void sendSnowScoreAward();
         UInt8 getSnowAward(UInt16 type);
+        
         //推雪人end
         
         void setForbidSale(bool b, bool isAuto = false);
@@ -2209,6 +2216,7 @@ namespace GObject
         
         void getLongyuanAct(UInt8 idx, UInt8 flag);
         void sendLongyuanActInfo();
+        void sendLuckyBagInfo();
     private:
         UInt8 cf_posPut[5];//范围1-5
         UInt32 cf_itemId[5];
@@ -2281,6 +2289,13 @@ namespace GObject
         void foolsDayUdpLog(UInt8);
         void setLogoutInFoolsDay();
 
+        bool getLuckyStarAct();
+        void setLuckyStarCondition();
+        void sendLuckyStarInfo(UInt8);
+        void getLuckyStarItem(UInt8);
+        void LuckyStarActUdpLog(UInt8);
+
+        void LuckyBagRank();
         void getQQGameOnlineAward();
         void sendQQGameOnlineAward();
         void setQQGameOnlineTotalTime();

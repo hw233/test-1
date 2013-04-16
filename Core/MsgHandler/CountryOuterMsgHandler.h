@@ -1202,7 +1202,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         }
     }
 
-    if (pl->getSysDailog())
+    if (pl->getSysDailog() && (World::getSysDailogPlatform() == SYS_DIALOG_ALL_PLATFORM || World::getSysDailogPlatform() == atoi(pl->getDomain())))
     {
         Stream st(REP::SYSDAILOG);
         st << Stream::eos;
@@ -1244,6 +1244,11 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         GameMsgHdr hdr(0x1C4, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr, NULL);
     }
+    
+    {
+        GameMsgHdr hdr(0x1C9, WORKER_THREAD_WORLD, pl, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+    }
     pl->sendYearRPInfo();
     pl->sendFishUserInfo();
     //if(World::getYearActive())
@@ -1273,6 +1278,9 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         GameMsgHdr hdr(0x1CB, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr, NULL);
     }
+    //充值幸运星活动
+    pl->setLuckyStarCondition();
+    pl->sendLuckyStarInfo(1);
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )

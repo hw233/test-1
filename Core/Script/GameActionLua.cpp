@@ -150,6 +150,8 @@ namespace Script
 		lua_tinker::def(_L, "getAutoBattleAct", GObject::World::getAutoBattleAct);
 		lua_tinker::def(_L, "getSnakeSpringEquipAct", GObject::World::setSnakeSpringEquipAct);
 		lua_tinker::def(_L, "getFoolBao", GObject::World::getFoolBao);
+		lua_tinker::def(_L, "getHalfGold", GObject::World::getHalfGold);
+		lua_tinker::def(_L, "getSurnameLegend", GObject::World::getSurnameLegend);
 		lua_tinker::def(_L, "getOpenTime", GObject::World::getOpenTime);
 		lua_tinker::def(_L, "isRPServer", GObject::World::isRPServer);
 
@@ -302,6 +304,10 @@ namespace Script
         CLASS_DEF(Player, getFengsuiLua);
         CLASS_DEF(Player, getLongyuanLua);
         CLASS_DEF(Player, getPetByPetEgg);
+        CLASS_DEF(Player, SetVipPrivilege);
+        CLASS_DEF(Player, sendVipPrivilege);
+        CLASS_DEF(Player, sendLuckyBagInfo);
+		CLASS_DEF(Player, LuckyBagRank);
 
         CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);
@@ -1584,9 +1590,9 @@ namespace Script
 		return Call<UInt8>("getPetColorFromId", petId);
     }
 
-	Table GameActionLua::getConvertPetValue(UInt8 color)
+	Table GameActionLua::getConvertPetValue(UInt32 petId)
 	{
-		return Call<Table>("getConvertPetValue", color);
+		return Call<Table>("getConvertPetValue", petId);
     }
 
 	UInt32 GameActionLua::exchangPurplePet( Player* player )
@@ -1608,6 +1614,17 @@ namespace Script
     {
 		assert(player != NULL);
 		Call<void>("getAwardInFoolsDay", player, idx);
+    }
+
+    bool GameActionLua::getLuckyStarAward(Player* player, UInt8 idx)
+    {
+		assert(player != NULL);
+		return Call<bool>("getLuckyStarAward", player, idx);
+    }
+    void GameActionLua::GetLuckyBagAward(Player * player)
+    {
+        assert(player != NULL);
+        Call<void>("GetLuckyBagAward",player);
     }
 }
 

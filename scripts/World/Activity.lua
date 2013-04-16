@@ -829,6 +829,9 @@ function onActivityCheck(tm)
       elseif tm >= actTime2013_04_09 and tm < actTime2013_04_09+5*86400 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
+      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+7*86400 then
+          setRechargeActive(true, 16)
+          setNeedRechargeRank(true)
       else
           setRechargeActive(false, 16)
           setNeedRechargeRank(false)
@@ -891,7 +894,19 @@ function onActivityCheck(tm)
       else
           setFoolBao(false)
       end
+      
+      if tm >= actTime555 and tm < actTime555_1 then
+          setHalfGold(true)
+      else
+          setHalfGold(false)
+      end
 
+      if tm >= actTime556 and tm < actTime556_1 then
+          setSurnameLegend(true)
+      else
+          setSurnameLegend(false)
+      end
+      
       if tm >= actTime232_0 and tm < actTime232_1 then
           setFeastLoginAct(true)
       else
@@ -1227,6 +1242,14 @@ function initActTime(y, m, d)
   local  SerStartTm553= { ['year'] = 2013, ['month'] = 3, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm553_1= { ['year'] = 2013, ['month'] = 4, ['day'] = 6, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   
+  --周末活动
+  local  SerStartTm555= { ['year'] = 2013, ['month'] = 4, ['day'] = 13, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm555_1= { ['year'] = 2013, ['month'] = 4, ['day'] = 15, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+ 
+    --蜀山传奇掉落活动
+  local  SerStartTm556= { ['year'] = 2013, ['month'] = 4, ['day'] = 13, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm556_1= { ['year'] = 2013, ['month'] = 4, ['day'] = 20, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    
   -- 繁体版
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm102 = { ['year'] = 2012, ['month'] = 6, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1325,12 +1348,14 @@ function initActTime(y, m, d)
   local  SerStartTm241 = { ['year'] = 2013, ['month'] = 2, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm241_1 = { ['year'] = 2013, ['month'] = 2, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --特殊古籍活动
-  local  SerStartTm242 = { ['year'] = 2013, ['month'] = 3, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTm242_1 = { ['year'] = 2013, ['month'] = 4, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm242 = { ['year'] = 2013, ['month'] = 4, ['day'] = 13, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm242_1 = { ['year'] = 2013, ['month'] = 4, ['day'] = 15, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --大厅累积在线奖励
   local  SerStartTm243 = { ['year'] = 2013, ['month'] = 3, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --空间黄钻、大厅蓝钻礼包
   local  SerStartTm244 = { ['year'] = 2013, ['month'] = 3, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
+  local  SerStartTm2013_04_14 = { ['year'] = 2013, ['month'] = 4, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   --300-399越南版用了
   actTime0 = os.time(SerStartTm);
@@ -1613,6 +1638,12 @@ function initActTime(y, m, d)
   actTime553 = os.time(SerStartTm553);
   actTime553_1 = os.time(SerStartTm553_1) ;
 
+  actTime555 = os.time(SerStartTm555);
+  actTime555_1 = os.time(SerStartTm555_1) ;
+  
+  actTime556 = os.time(SerStartTm556);
+  actTime556_1 = os.time(SerStartTm556_1) ;
+
   actTime560 = os.time(SerStartTm560);
   actTime560_1 = os.time(SerStartTm560) + 10 * 86400;
 
@@ -1758,6 +1789,7 @@ function initActTime(y, m, d)
   actTime2013_04_12= os.time(SerStartTm2013_04_01)+86400*11;
   actTime2013_04_27= os.time(SerStartTm2013_04_01)+86400*26;
   actTime2013_04_09= os.time(SerStartTm2013_04_01)+86400*8;
+  actTime2013_04_14= os.time(SerStartTm2013_04_14)
 
   onActivityCheck(os.time() + 30);
 

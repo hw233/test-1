@@ -246,11 +246,13 @@ function onDungeonWin(player, id, count, free)
     fairyPetLoot(player, 0);
     if free == true then
         FoolBaoLoot(player,0);
+        SurnameLegendLoot(player,0);
         FallActivity(player, 1)
         Guoqing(player, 0);
         ChingMingDay(player, 0)
     else
         FoolBaoLoot(player,2);
+        SurnameLegendLoot(player,0);
         FallActivity(player, 2)
         Guoqing(player, 3);
         ChingMingDay(player, 2)
@@ -991,6 +993,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     Qingren(player, lootlvl);
     fairyPetLoot(player, lootlvl);
     FoolBaoLoot(player,lootlvl);
+    SurnameLegendLoot(player,lootlvl);
     Guoqing(player, lootlvl);
     LuckyDrawBox(player, id)
     ExJob(player, id, lootlvl)
@@ -1036,6 +1039,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
     Guoqing(player, lootlvl);
     fairyPetLoot(player, lootlvl);
     FoolBaoLoot(player,lootlvl);
+    SurnameLegendLoot(player,0);
     if lootlvl == 0 then
         FallActivity(player, 1)
     else
@@ -4116,10 +4120,105 @@ function sendRechargeMails_2013_03_31(player, ototal, ntotal)
     _sendRechargeMails(player, ototal, ntotal, lvls, items)
 end
 
+function sendRechargeMails_2013_04_14(player, ototal, ntotal)
+    local lvls = {
+        10,99,499,999,5999,
+    }
+    local items = {
+        {500,5,1},
+        {503,5,1},
+        {516,2,1, 517,2,1},
+        {509,2,1},
+        {500,50,1},
+    }
+    _sendRechargeMails(player, ototal, ntotal, lvls, items)
+end
+
+function sendRechargeMails_2013_04_15(player, ototal, ntotal)
+    local lvls = {
+        10,99,599,999,5999,
+    }
+    local items = {
+        {1325,1,1},
+        {503,5,1},
+        {551,3,1},
+        {134,5,1},
+        {1325,15,1},
+    }
+    _sendRechargeMails(player, ototal, ntotal, lvls, items)
+end
+
+function sendRechargeMails_2013_04_16(player, ototal, ntotal)
+    local lvls = {
+        10,99,499,999,5999,
+    }
+    local items = {
+        {134,1,1},
+        {503,5,1},
+        {516,2,1, 507,1,1},
+        {9076,3,1},
+        {134,15,1},
+    }
+    _sendRechargeMails(player, ototal, ntotal, lvls, items)
+end
+
+function sendRechargeMails_2013_04_17(player, ototal, ntotal)
+    local lvls = {
+        10,99,599,999,5999,
+    }
+    local items = {
+        {516,1,1},
+        {515,1,1},
+        {503,2,1},
+        {509,2,1, 507,2,1},
+        {516,20,1},
+    }
+    _sendRechargeMails(player, ototal, ntotal, lvls, items)
+end
+
+function sendRechargeMails_2013_04_18(player, ototal, ntotal)
+    local lvls = {
+        10,99,499,999,5999,
+    }
+    local items = {
+        {9338,1,1},
+        {515,1,1},
+        {516,2,1, 507,1,1},
+        {1325,5,1},
+        {9338,15,1},
+    }
+    _sendRechargeMails(player, ototal, ntotal, lvls, items)
+end
+
+function sendRechargeMails_2013_04_19(player, ototal, ntotal)
+    local lvls = {
+        10,99,499,999,5999,
+    }
+    local items = {
+        {9371,3,1},
+        {515,1,1},
+        {509,1,1, 507,1,1},
+        {515,3,1},
+        {9371,60,1},
+    }
+    _sendRechargeMails(player, ototal, ntotal, lvls, items)
+end
+
+function sendRechargeMails_2013_04_20(player, ototal, ntotal)
+    local lvls = {
+        10,99,599,999,5999,
+    }
+    local items = {
+        {516,1,1},
+        {515,1,1},
+        {516,2,1, 517,2,1},
+        {509,2,1},
+        {516,20,1},
+    }
+    _sendRechargeMails(player, ototal, ntotal, lvls, items)
+end
+
 function sendRechargeMails(player, ototal, ntotal)
-    local t = { ['year'] = 2013, ['month'] = 4, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-    local s = os.time(t)
-    local n = os.time() + 11
     if isRPServer() then
         local s_rp = getOpenTime();
         if n >= s_rp and n < (s_rp + 1*86400) then
@@ -4142,25 +4241,7 @@ function sendRechargeMails(player, ototal, ntotal)
         end
     end
 
-    if n >= s and n < (s + 1*86400) then
-        sendRechargeMails_2013_03_24(player, ototal, ntotal)
-    elseif n >= (s + 1*86400) and n < (s + 2*86400) then
-        sendRechargeMails_2013_03_25(player, ototal, ntotal)
-    elseif n >= (s + 2*86400) and n < (s + 3*86400) then
-        sendRechargeMails_2013_03_26(player, ototal, ntotal)
-    elseif n >= (s + 3*86400) and n < (s + 4*86400) then
-        sendRechargeMails_2013_03_27(player, ototal, ntotal)
-    elseif n >= (s + 4*86400) and n < (s + 5*86400) then
-        sendRechargeMails_2013_03_28(player, ototal, ntotal)
---    elseif n >= (s + 5*86400) and n < (s + 6*86400) then
---        sendRechargeMails_2013_03_29(player, ototal, ntotal)
---    elseif n >= (s + 6*86400) and n < (s + 7*86400) then
---        sendRechargeMails_2013_03_30(player, ototal, ntotal)
---    elseif n >= (s + 7*86400) and n < (s + 8*86400) then
---        sendRechargeMails_2013_03_31(player, ototal, ntotal)
-    end
-
-    local t = { ['year'] = 2013, ['month'] = 4, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local t = { ['year'] = 2013, ['month'] = 4, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local s = os.time(t)
     local n = os.time() + 11
 
@@ -4174,12 +4255,26 @@ function sendRechargeMails(player, ototal, ntotal)
         sendRechargeMails_2013_03_27(player, ototal, ntotal)
     elseif n >= (s + 4*86400) and n < (s + 5*86400) then
         sendRechargeMails_2013_03_28(player, ototal, ntotal)
+    end
+
+    local t = { ['year'] = 2013, ['month'] = 4, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local s = os.time(t)
+    local n = os.time() + 11
+
+    if n >= s and n < (s + 1*86400) then
+        sendRechargeMails_2013_04_14(player, ototal, ntotal)
+    elseif n >= (s + 1*86400) and n < (s + 2*86400) then
+        sendRechargeMails_2013_04_15(player, ototal, ntotal)
+    elseif n >= (s + 2*86400) and n < (s + 3*86400) then
+        sendRechargeMails_2013_04_16(player, ototal, ntotal)
+    elseif n >= (s + 3*86400) and n < (s + 4*86400) then
+        sendRechargeMails_2013_04_17(player, ototal, ntotal)
+    elseif n >= (s + 4*86400) and n < (s + 5*86400) then
+        sendRechargeMails_2013_04_18(player, ototal, ntotal)
     elseif n >= (s + 5*86400) and n < (s + 6*86400) then
-        sendRechargeMails_2013_03_29(player, ototal, ntotal)
+        sendRechargeMails_2013_04_19(player, ototal, ntotal)
     elseif n >= (s + 6*86400) and n < (s + 7*86400) then
-        sendRechargeMails_2013_03_30(player, ototal, ntotal)
-    elseif n >= (s + 7*86400) and n < (s + 8*86400) then
-        sendRechargeMails_2013_03_31(player, ototal, ntotal)
+        sendRechargeMails_2013_04_20(player, ototal, ntotal)
     end
 end
 
@@ -6435,10 +6530,148 @@ function sendRechargeRankAward_2013_04_08(player, pos)
     local ctx = string.format(msg_111, pos)
     sendItemPackageMail(player, title, ctx, items[pos]);
 end
+
+function sendRechargeRankAward_2013_04_14(player, pos)
+    local items = {
+        {500,99,1, 501,99,1},
+        {500,77,1, 501,77,1},
+        {500,55,1, 501,55,1},
+        {500,33,1, 501,33,1},
+        {500,33,1, 501,33,1},
+        {500,33,1, 501,33,1},
+        {500,33,1, 501,33,1},
+    }
+
+    if items[pos] == nil then
+        return
+    end
+
+    local title = string.format(msg_111, pos)
+    local ctx = string.format(msg_111, pos)
+    sendItemPackageMail(player, title, ctx, items[pos]);
+end
+
+function sendRechargeRankAward_2013_04_15(player, pos)
+    local items = {
+        {503,180,1},
+        {503,150,1},
+        {503,120,1},
+        {503,90,1},
+        {503,90,1},
+        {503,90,1},
+        {503,90,1},
+    }
+
+    if items[pos] == nil then
+        return
+    end
+
+    local title = string.format(msg_111, pos)
+    local ctx = string.format(msg_111, pos)
+    sendItemPackageMail(player, title, ctx, items[pos]);
+end
+
+function sendRechargeRankAward_2013_04_16(player, pos)
+    local items = {
+        {9371,245,1},
+        {9371,215,1},
+        {9371,185,1},
+        {9371,125,1},
+        {9371,125,1},
+        {9371,125,1},
+        {9371,125,1},
+    }
+
+    if items[pos] == nil then
+        return
+    end
+
+    local title = string.format(msg_111, pos)
+    local ctx = string.format(msg_111, pos)
+    sendItemPackageMail(player, title, ctx, items[pos]);
+end
+
+function sendRechargeRankAward_2013_04_17(player, pos)
+    local items = {
+        {1325,66,1},
+        {1325,55,1},
+        {1325,44,1},
+        {1325,33,1},
+        {1325,33,1},
+        {1325,33,1},
+        {1325,33,1},
+    }
+
+    if items[pos] == nil then
+        return
+    end
+
+    local title = string.format(msg_111, pos)
+    local ctx = string.format(msg_111, pos)
+    sendItemPackageMail(player, title, ctx, items[pos]);
+end
+
+function sendRechargeRankAward_2013_04_18(player, pos)
+    local items = {
+        {515,45,1},
+        {515,35,1},
+        {515,25,1},
+        {515,15,1},
+        {515,15,1},
+        {515,15,1},
+        {515,15,1},
+    }
+
+    if items[pos] == nil then
+        return
+    end
+
+    local title = string.format(msg_111, pos)
+    local ctx = string.format(msg_111, pos)
+    sendItemPackageMail(player, title, ctx, items[pos]);
+end
+
+function sendRechargeRankAward_2013_04_19(player, pos)
+    local items = {
+        {9022,20,1},
+        {9022,15,1},
+        {9022,10,1},
+        {9022,5,1},
+        {9022,5,1},
+        {9022,5,1},
+        {9022,5,1},
+    }
+
+    if items[pos] == nil then
+        return
+    end
+
+    local title = string.format(msg_111, pos)
+    local ctx = string.format(msg_111, pos)
+    sendItemPackageMail(player, title, ctx, items[pos]);
+end
+
+function sendRechargeRankAward_2013_04_20(player, pos)
+    local items = {
+        {516,60,1},
+        {516,45,1},
+        {516,30,1},
+        {516,15,1},
+        {516,15,1},
+        {516,15,1},
+        {516,15,1},
+    }
+
+    if items[pos] == nil then
+        return
+    end
+
+    local title = string.format(msg_111, pos)
+    local ctx = string.format(msg_111, pos)
+    sendItemPackageMail(player, title, ctx, items[pos]);
+end
+
 function sendRechargeRankAward(player, pos)
-    local t = { ['year'] = 2013, ['month'] = 4, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-    local s = os.time(t)
-    local n = os.time()
     if isRPServer() then
         local s_rp = getOpenTime();
         if (n >= s_rp+600) and n < (s_rp + 1*86400+600) then
@@ -6461,25 +6694,7 @@ function sendRechargeRankAward(player, pos)
         end
     end
 
-    if n >= (s + 10 * 60) and n < (s + 86400 + 10*60) then
-        sendRechargeRankAward_2013_03_24(player, pos)
-    elseif n >= (s + 86400 + 10*60) and n < (s + 2*86400 + 10*60) then
-        sendRechargeRankAward_2013_03_25(player, pos)
-    elseif n >= (s + 2*86400 + 10*60) and n < (s + 3*86400 + 10*60) then
-        sendRechargeRankAward_2013_03_26(player, pos)
-    elseif n >= (s + 3*86400 + 10*60) and n < (s + 4*86400 + 10*60) then
-        sendRechargeRankAward_2013_03_27(player, pos)
-    elseif n >= (s + 4*86400 + 10*60) and n < (s + 5*86400 + 10*60) then
-        sendRechargeRankAward_2013_03_28(player, pos)
---    elseif n >= (s + 5*86400 + 10*60) and n < (s + 6*86400 + 10*60) then
---        sendRechargeRankAward_2013_03_29(player, pos)
---    elseif n >= (s + 6*86400 + 10*60) and n < (s + 7*86400 + 10*60) then
---        sendRechargeRankAward_2013_03_30(player, pos)
---    elseif n >= (s + 7*86400 + 10*60) and n < (s + 8*86400 + 10*60) then
---       sendRechargeRankAward_2013_03_31(player, pos)
-    end
-
-    local t = { ['year'] = 2013, ['month'] = 4, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local t = { ['year'] = 2013, ['month'] = 4, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local s = os.time(t)
     local n = os.time()
 
@@ -6493,13 +6708,28 @@ function sendRechargeRankAward(player, pos)
         sendRechargeRankAward_2013_03_27(player, pos)
     elseif n >= (s + 4*86400 + 10*60) and n < (s + 5*86400 + 10*60) then
         sendRechargeRankAward_2013_03_28(player, pos)
-    elseif n >= (s + 5*86400 + 10*60) and n < (s + 6*86400 + 10*60) then
-        sendRechargeRankAward_2013_03_29(player, pos)
-    elseif n >= (s + 6*86400 + 10*60) and n < (s + 7*86400 + 10*60) then
-        sendRechargeRankAward_2013_03_30(player, pos)
-    elseif n >= (s + 7*86400 + 10*60) and n < (s + 8*86400 + 10*60) then
-        sendRechargeRankAward_2013_04_08(player, pos)
     end
+
+    local t = { ['year'] = 2013, ['month'] = 4, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local s = os.time(t)
+    local n = os.time()
+
+    if n >= (s + 10 * 60) and n < (s + 86400 + 10*60) then
+        sendRechargeRankAward_2013_04_14(player, pos)
+    elseif n >= (s + 86400 + 10*60) and n < (s + 2*86400 + 10*60) then
+        sendRechargeRankAward_2013_04_15(player, pos)
+    elseif n >= (s + 2*86400 + 10*60) and n < (s + 3*86400 + 10*60) then
+        sendRechargeRankAward_2013_04_16(player, pos)
+    elseif n >= (s + 3*86400 + 10*60) and n < (s + 4*86400 + 10*60) then
+        sendRechargeRankAward_2013_04_17(player, pos)
+    elseif n >= (s + 4*86400 + 10*60) and n < (s + 5*86400 + 10*60) then
+        sendRechargeRankAward_2013_04_18(player, pos)
+    elseif n >= (s + 5*86400 + 10*60) and n < (s + 6*86400 + 10*60) then
+        sendRechargeRankAward_2013_04_19(player, pos)
+    elseif n >= (s + 6*86400 + 10*60) and n < (s + 7*86400 + 10*60) then
+        sendRechargeRankAward_2013_04_20(player, pos)
+    end
+
 end
 
 function sendConsumeRankAward_2012_10_19(player, pos)
@@ -7126,7 +7356,11 @@ end
 --仙宠仙缘石掉落
 function fairyPetLoot(player, lootlvl)
     local package = player:GetPackage();
-    package:AddItem(9371, 1, true, 0, 10);
+    local num = 1;
+    if getHalfGold() then
+        num = 2;
+    end
+    package:AddItem(9371, num, true, 0, 10);
 end
 
 --愚公宝箱掉落
@@ -7145,6 +7379,24 @@ function FoolBaoLoot(player,lootlvl)
         };
     local package = player:GetPackage();
     package:AddItem(9375, itemNum[lootlvl], true,0,10);
+end
+
+--蜀山传奇掉落活动
+function SurnameLegendLoot(player,lootlvl)
+   if not getSurnameLegend() then
+             return
+   end
+    if lootlvl > 3 then
+        lootlvl = 0
+    end
+    local itemNum = {
+            [0] = 1,
+            [1] = 1,
+            [2] = 1,
+            [3] = 1,
+        };
+    local package = player:GetPackage();
+    package:AddItem(9382, itemNum[lootlvl], true,0,10);
 end
 
 -- 万圣节套装
@@ -7767,3 +8019,72 @@ function getAwardInFoolsDay(player, idx)
     end
 end
 
+function getLuckyStarAward(player, idx)
+    local items = {
+        {{514, 5}, {503, 10}, {508, 5}},
+        {{"vip", 1}},   --vip限时特权
+        {{79, 1}},
+        {{9082, 10}},
+        {{501, 10}, {513, 10}, {8000, 50}},
+        {{5035, 1}},
+        {{5025, 1}},
+        {{5005, 1}},
+        {{1703, 1}},
+        {{72, 1}},
+        {{9177, 1}},
+        {{9374, 1}},
+    }
+    if nil == player or nil == idx or idx > #items or idx <= 0 then
+        return false
+    end
+    local golds = {0, 99, 99, 20, 0, 59, 59, 59, 0, 568, 268, 999}
+    local recharge = { 100, 500, 1000 }
+    if player:GetVar(369) < recharge[math.floor((idx-1)/4)+1] then
+        SendMsg(player, 0x35, "充值仙石未达到对应额度，不能领取或购买！")
+        return false
+    end
+    if player:getGoldInLua() < golds[idx] then
+        player:sendMsgCode(0, 1104)
+        return false
+    end
+    if player:GetFreePackageSize() < #items[idx] then
+        player:sendMsgCode(2, 1011)
+        return false
+    end
+    if items[idx][1][1] == "vip" then
+        if player:SetVipPrivilege() == false then
+            player:sendMsgCode(0, 1091)
+            return false
+        end
+        player:sendVipPrivilege(true)
+    else
+        for _, val in pairs(items[idx]) do
+            player:GetPackage():Add(val[1], val[2], true, false, 43)
+        end
+    end
+    player:useGoldInLua(golds[idx], 101)
+    return true
+end
+
+function GetLuckyBagAward(player)
+    local items = {
+       { 9367,5} , {9369,5},{ 503,5},{515,1},{134,1},{1325,2} 
+    } 
+    for i = 1 , 5  do
+        local num = player:GetVar(452+i);
+        if num < 1 then
+            return false;
+        end
+    end
+    for i= 1, 5 do
+        local num = player:GetVar(452+i);
+        player:SetVar(452+i,num-1);
+    end
+    for i = 1,#items do
+        local item = items[i];
+        player:GetPackage():Add(item[1],item[2],true,false,32);
+    end
+    player:sendLuckyBagInfo();
+        Broadcast(0x27, "恭喜玩家[p:"..player:getCountry()..":"..player:getPName().."]".."在\"峨眉天下秀\"活动中人品爆发，集齐所有卡牌，成功领取超级大奖")
+    return true
+end

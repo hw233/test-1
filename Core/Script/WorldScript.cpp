@@ -230,6 +230,11 @@ void WorldScript::init()
 	def("setSnakeSpringEquipAct", GObject::World::setSnakeSpringEquipAct);
     def("setFoolBao",GObject::World::setFoolBao);
     def("getFoolBao",GObject::World::getFoolBao);
+    def("setHalfGold",GObject::World::setHalfGold);
+    def("getHalfGold",GObject::World::getHalfGold);
+
+    def("setSurnameLegend",GObject::World::setSurnameLegend);
+    def("getSurnameLegend",GObject::World::getSurnameLegend);
 
     def("setMergeAthAct", GObject::World::setMergeAthAct);
     def("getMergeAthAct", GObject::World::getMergeAthAct);

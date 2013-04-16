@@ -109,6 +109,7 @@ enum PurchaseType
     VipPrivilege                = 98, //Vip特权
     FoolsDayAnswerAct           = 99, //愚公移山答题活动
     RP7Treasure                 = 100, //回流服务器聚宝盆
+    LuckyStarAct                = 101, //充值幸运星活动
     //繁体私有占150～200
 };
 
@@ -211,6 +212,7 @@ enum ItemFrom
     FromFuling = 40, // 灵宝附灵
     FromVipPrivilege = 41, // 限时vip 
     FromCFriend = 42, //好友邀请
+    FromLuckyStar = 43, //充值幸运星
 };
 
 enum ItemTo

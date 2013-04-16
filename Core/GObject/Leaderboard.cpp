@@ -277,7 +277,6 @@ void Leaderboard::doUpdate()
 	if (execu.get() == NULL || !execu->isConnected()) return;
 
 	++ _id;
-
 	std::vector<LeaderboardItem> blist;
 
 	std::vector<LeaderboardItem2> blist2;
