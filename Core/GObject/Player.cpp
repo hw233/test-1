@@ -18928,7 +18928,7 @@ void Player::buyRP7Treasure(UInt8 idx)
     UInt8 res = 0;
     UInt32 opTime = TimeUtil::MkTime(cfg.openYear, cfg.openMonth, cfg.openDay);
     if((TimeUtil::SharpDay(0) >= opTime + 7 * 86400 && cfg.rpServer) ||
-       (TimeUtil::Now()<GVAR.GetVar(GVAR_TREASURE_BEGIN) || TimeUtil::Now()>GVAR.GetVar(GVAR_TREASURE_END))
+       ((TimeUtil::Now()<GVAR.GetVar(GVAR_TREASURE_BEGIN) || TimeUtil::Now()>GVAR.GetVar(GVAR_TREASURE_END)) && !cfg.rpServer)
       )
         res = 4;
     UInt8 v = GetVar(VAR_RP7_TREASURE); 
