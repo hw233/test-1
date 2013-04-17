@@ -4220,6 +4220,7 @@ end
 
 function sendRechargeMails(player, ototal, ntotal)
     if isRPServer() then
+        local n = os.time() + 11
         local s_rp = getOpenTime();
         if n >= s_rp and n < (s_rp + 1*86400) then
             sendRPRechargeMails_1(player, ototal, ntotal)
@@ -6674,6 +6675,7 @@ end
 function sendRechargeRankAward(player, pos)
     if isRPServer() then
         local s_rp = getOpenTime();
+        local n = os.time()
         if (n >= s_rp+600) and n < (s_rp + 1*86400+600) then
             sendRPRechargeRankAward_1(player, pos)
         elseif n >= (s_rp+1*86400+600) and n < (s_rp + 2*86400+600) then
