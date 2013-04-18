@@ -17026,20 +17026,27 @@ void Player::get3366GiftAward(UInt8 type)
             sendMsgCode(0, 1011);
             return;
         }
-        if(getGold() < 368)
+        if(getGold() < 79/*368*/)
         {
             sendMsgCode(0, 1104);
             return;
         }
 		ConsumeInfo ci(Enum3366Gift,0,0);
-		useGold(368,&ci);
+		useGold(79/*368*/,&ci);
         AddVar(VAR_3366GIFT, 1);
+        /*
         m_Package->Add(500, 2, true);
         m_Package->Add(501, 2, true);
         m_Package->Add(1325, 2, true);
         m_Package->Add(516, 2, true);
         m_Package->Add(134, 2, true);
         m_Package->Add(515, 2, true);
+        */
+        static UInt32 itemId[] = {9371, 9338, 9141, 503, 500, 501};
+        for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); ++ i)
+        {
+            GetPackage()->Add(itemId[i], 1, true);
+        }
         send3366GiftInfo();
     }
 }
@@ -19753,7 +19760,7 @@ void Player::getLuckyStarItem(UInt8 idx)
         {
             UInt32 LuckbagNum = GetVar(VAR_SURNAMELEGEND_USED);
             GameMsgHdr hdr(0x1C8, WORKER_THREAD_WORLD, this, sizeof(LuckbagNum));
-             GLOBAL().PushMsg(hdr, &LuckbagNum);
+            GLOBAL().PushMsg(hdr, &LuckbagNum);
         }
     }
 } // namespace GObject

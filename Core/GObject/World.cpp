@@ -1209,7 +1209,7 @@ void World::World_Midnight_Check( World * world )
    // 
     bHalfGoldEnd = bhalfgold && !getHalfGold();
     //蜀山传奇掉落活动是否结束
-    bSurnameLegendEnd = bsurnamelegend && !getSurnameLegend();
+    bSurnameLegendEnd = bsurnamelegend && !getSurnameLegend(300);
 
     bPExpItemsEnd = bPExpItems && !getPExpItems();
     bQixiEnd = bQixi && !getQixi();
