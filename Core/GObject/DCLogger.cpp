@@ -987,7 +987,7 @@ bool DCLogger::checkOpenId(Player * player)
     return true;
 }
 
-bool DCLogger::checkRPOpenid(char* openid)
+UInt8 DCLogger::checkRPOpenid(char* openid)
 {
     return DC().CheckRPOpenid(openid);
 }
