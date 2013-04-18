@@ -967,7 +967,8 @@ CREATE TABLE `sale` (
   `price` int(10) NOT NULL DEFAULT '0',
   `itemId` int(10) NOT NULL,
   `itemNum` int(10) NOT NULL,
-  PRIMARY KEY (`saleId`)
+  PRIMARY KEY (`saleId`),
+  INDEX (`ownerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

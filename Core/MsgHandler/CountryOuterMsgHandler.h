@@ -1696,6 +1696,8 @@ void OnFighterDismissReq( GameMsgHdr& hdr, FighterDismissReq& fdr )
 		}
 	}
     fgt->delAllCitta();
+    //此处只剩下法宝符文未散功了！！
+    fgt->SSDismissAll(true);
 	delete fgt;
 	rep._fgtid = fdr._fgtid;
 	rep._result = 0;
@@ -5727,17 +5729,13 @@ void OnSkillStrengthen( GameMsgHdr& hdr, const void* data)
     Fighter* fgt = pl->findFighter(fighterid);
     if (!fgt)
         return;
+    UInt16 skillid = 0;
+    br >> skillid;
     if (type == 1)
-    {
-        UInt16 skillid = 0;
-        br >> skillid;
         fgt->SSOpen(skillid);
-    }
     else if (type == 2)
     {
-        UInt16 skillid = 0;
         UInt16 num = 0;
-        br >> skillid;
         br >> num;
 
         for (UInt16 i = 0; i < num; ++i)
@@ -5753,6 +5751,8 @@ void OnSkillStrengthen( GameMsgHdr& hdr, const void* data)
                 break;
         }
     }
+    else if (type == 3)
+        fgt->SSDismiss(skillid);
 }
 
 void OnMakeStrong( GameMsgHdr& hdr, const void * data )

@@ -143,12 +143,16 @@ function onSeekFairypetAwardAndSucceed(step, isConvert)
     return result
 end
 
-function getConvertPetValue(color)
+function getConvertPetValue(petId)
     local result = {
         ["longyuan"] = 0,
         ["fengsui"] = 0,
         ["like"] = 0,
     }
+    if nil == petId then
+        return result
+    end
+    local color = getPetColorFromId(petId)
     if nil == color or nil == converts[color] then
         return result
     end

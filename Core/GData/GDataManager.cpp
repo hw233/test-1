@@ -1367,7 +1367,7 @@ namespace GData
             citta->effect = cittaEffectManager[ct.effectid];
             cittaManager.add(citta);
             if (citta->effect)
-                makeSkill2Item(citta->effect->skill, ct.id/100+1200-1);
+                makeSkill2Item(citta->effect->skill, CITTA_TO_ITEMID(ct.id));
         }
         return true;
     }
