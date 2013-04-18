@@ -3762,7 +3762,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 }
                 else
                 {
-                    dmg2 = attackOnce(bf, first, cs2, pr2, skill, getObject(target_side, target_pos), factor, count_deny, NULL, NULL, canProtect);
+                    dmg2 = attackOnce(bf, first, cs2, pr2, skill, getObject(target_side, target_pos), factor, -1, NULL, NULL, canProtect);
                     canProtect = false;
                 }
 
@@ -5939,9 +5939,10 @@ UInt32 BattleSimulator::doAttack( int pos )
             bool cs = false;
             bool pr = false;
             bool first = true;
-            for(int i = 0; i < 25; ++ i)
+            int i = 0;
+            for(int pos = 0; pos < 25; ++ pos)
             {
-                BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
+                BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, pos));
                 if(!bo || bo->getHP() == 0)
                     continue;
                 float factor = 1.0f;
@@ -5953,6 +5954,7 @@ UInt32 BattleSimulator::doAttack( int pos )
                         factor = factors[i];
                 }
                 doSpiritAttack(mainTarget, bo, atk * factor, pr, cs, first);
+                ++ i;
             }
             if(_defList.size() > 0 || _scList.size() > 0)
             {
