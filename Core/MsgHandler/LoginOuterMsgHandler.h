@@ -591,7 +591,8 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
         conn->pendClose();
         return;
     }
-    if (cfg.rpServer && !GObject::dclogger.checkRPOpenid((char*)us._openid.c_str()))
+    UInt8 rpFlag = 0;
+    if (cfg.GMCheck && cfg.rpServer && 0 == (rpFlag=GObject::dclogger.checkRPOpenid((char*)us._openid.c_str())))
     {
         UserLogonRepStruct rep;
         rep._result = 7;
@@ -790,6 +791,8 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
                 GObject::MailPackage::MailItem item = {9366,1};
                 pl->sendMailItem(4140, 4141, &item, 1, true);
             }
+            if (cfg.rpServer && rpFlag > 0)
+                pl->SetVar(GObject::VAR_RP_VALUE, rpFlag);
 
 #ifndef _FB
 #ifndef _VT
@@ -3131,8 +3134,8 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
     UInt8 ret = 0;
     if(type == 1 && begin <= end)
     {   //充值幸运星活动
-        GObject::GVAR.SetVar(GObject::GVAR_LUCKYSTAR_END, begin);
-        GObject::GVAR.SetVar(GObject::GVAR_LUCKYSTAR_BEGIN, end);
+        GObject::GVAR.SetVar(GObject::GVAR_LUCKYSTAR_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_LUCKYSTAR_END, end);
         GObject::globalPlayers.enumerate(player_enum_2, 2);
         ret = 1;
     }
@@ -3160,8 +3163,8 @@ void QueryOneActivityOnOff(LoginMsgHdr& hdr, const void* data)
     UInt32 begin = 0, end = 0;
     if(type == 1)
     {
-        begin = GObject::GVAR.GetVar(GObject::GVAR_LUCKYSTAR_END);
-        end = GObject::GVAR.GetVar(GObject::GVAR_LUCKYSTAR_BEGIN);
+        begin = GObject::GVAR.GetVar(GObject::GVAR_LUCKYSTAR_BEGIN);
+        end = GObject::GVAR.GetVar(GObject::GVAR_LUCKYSTAR_END);
     }
     else if (type == 2)
     {

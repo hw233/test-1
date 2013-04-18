@@ -4700,6 +4700,13 @@ namespace GObject
         }
         if(type & 0x08)
         {
+            if(fIed.trumpExp <= tIed.trumpExp)
+                return 14;
+        }
+        if(type & 0x10)
+        {
+            if(fIed.enchant <= tIed.enchant && fIed.trumpExp <= tIed.trumpExp)
+                return 14;
         }
         return 0;
     }
@@ -4917,8 +4924,10 @@ namespace GObject
         sprintf(str, "F_1158_%03d00%03d", fromEquip->getReqLev(),  toEquip->getReqLev());
         m_Owner->udpLog("move", str, "", "", "", "", "act");
 
+        UInt8 init = 0x20;
         if(fromEquip->getClass() == Item_Trump)
         {
+            init = 0x0a;
             tIed.enchant = fIed.enchant;
             fIed.enchant = 0;
         }
@@ -4947,7 +4956,14 @@ namespace GObject
         if(fFgt != NULL)
         {
             fFgt->setDirty();
-            fFgt->sendModification(0x20 + fPos, fromEquip, false);
+            fFgt->sendModification(init + fPos, fromEquip, false);
+            if(fromEquip->getClass() == Item_Trump)
+            {
+                GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(fromEquip->getAttrExtra());
+                ((ItemTrump*)fromEquip)->enchant(fIed.enchant, attr);
+                if (fFgt && attr)
+                    fFgt->addSkillsFromCT(attr->skills, true);
+            }
         }
         else
             SendSingleEquipData(fromEquip);
@@ -4955,7 +4971,14 @@ namespace GObject
         if(tFgt != NULL)
         {
             tFgt->setDirty();
-            tFgt->sendModification(0x20 + tPos, toEquip, false);
+            tFgt->sendModification(init + tPos, toEquip, false);
+            if(toEquip->getClass() == Item_Trump)
+            {
+                GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(toEquip->getAttrExtra());
+                ((ItemTrump*)toEquip)->enchant(tIed.enchant, attr);
+                if (tFgt && attr)
+                    tFgt->addSkillsFromCT(attr->skills, true);
+            }
         }
         else
             SendSingleEquipData(toEquip);

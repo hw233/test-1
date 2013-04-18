@@ -20,7 +20,6 @@
 #include "Script/GameActionLua.h"
 #include "Script/BattleFormula.h"
 #include "GData/FighterProb.h"
-#include "GObject/Mail.h"
 #include "HeroMemo.h"
 #include "AttainMgr.h"
 #include "GData/SpiritAttrTable.h"
@@ -3842,7 +3841,7 @@ void Fighter::delAllCitta( bool writedb )
     std::vector<UInt16> cittas = _cittas;
     for (size_t i = 0; i < cittas.size(); ++i)
     {
-        delCitta(cittas[i], writedb);
+        delCitta(cittas[i], writedb, true);
     }
 }
 
@@ -3861,7 +3860,7 @@ bool Fighter::CanDelCitta(UInt16 citta)
     return true;
 }
 
-bool Fighter::delCitta( UInt16 citta, bool writedb )
+bool Fighter::delCitta( UInt16 citta, bool writedb, bool delSS )
 {
     int idx = hasCitta(citta);
     if (idx < 0)
@@ -3915,65 +3914,25 @@ bool Fighter::delCitta( UInt16 citta, bool writedb )
             {
                 tId = 2012;
                 cId = 2013;
-                if (isMoDefaultCitta)
-                {
-                    tId = 2014;
-                    cId = 2015;
-                }
             }
             SYSMSG(title, tId);
             SYSMSGV(content, cId, getLevel(), getColor(), getName().c_str(), yacb->type, yacb->getName().c_str(), lvl);
-            MailPackage::MailItem mitem[4] = {{static_cast<UInt16>(CITTA_ITEMID(citta)), 1}, {31, rCount1}, {30, rCount2}, {29, rCount3}};
+            MailPackage::MailItem mitem[4] = {{static_cast<UInt16>(CITTA_TO_ITEMID(citta)), 1}, {31, rCount1}, {30, rCount2}, {29, rCount3}};
             MailItemsInfo itemsInfo(mitem, DismissCitta, 4);
 
             GObject::Mail * pmail = NULL;
             if(!isMoDefaultCitta)
             {
                 pmail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
-                GObject::mailPackageManager.push(pmail->id, mitem, 4, true);
+                if(pmail)
+                    GObject::mailPackageManager.push(pmail->id, mitem, 4, true);
             }
 
-            ////////////////////
-            //返回技能符文熔炼符60%
+            //返回技能符文熔炼诀60%
             UInt16 skillid = 0;
             if (!cb->effect->skill.empty())
                 skillid = cb->effect->skill[0]->getId();
-            UInt32 sid = SKILL_ID(skillid);
-            std::map<UInt16, SStrengthen>::iterator i = m_ss.find(sid);
-            if (i != m_ss.end())
-            {
-                SStrengthen& ss = i->second;
-                UInt16 ssCount1 = 0;
-                UInt16 ssCount2 = 0;
-                UInt16 ssCount3 = 0;
-                UInt16 ssCount4 = 0;
-                UInt32 ssExp = 0;
-                for (UInt8 lvl = 0; lvl < ss.lvl; ++lvl)
-                {
-                    ssExp += GData::GDataManager::getMaxStrengthenVal(sid, lvl);
-                }
-                ssExp += ss.curVal;
-                ssExp *= 0.6;
-                if(ssExp){
-                    ssCount1 = static_cast<UInt16>(ssExp / 1000);
-                    ssExp = ssExp % 1000;
-                    ssCount2 = static_cast<UInt16>(ssExp / 200);
-                    ssExp = ssExp % 200;
-                    ssCount3 = static_cast<UInt16>(ssExp / 50);
-                    ssExp = ssExp % 50;
-                    ssCount4 = static_cast<UInt16>(ssExp / 10);
-                    MailPackage::MailItem ssmitem[4] = {{1325,ssCount1}, {1326, ssCount2}, {1327, ssCount3}, {1328, ssCount4}};
-                    if(!pmail)
-                        pmail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
-                    GObject::mailPackageManager.push(pmail->id, ssmitem, 4, true);
-                }
-                ss.maxVal = 0;
-                ss.curVal = 0;
-                ss.lvl = 0;
-                ss.maxLvl = 0;
-                SSUpdate2DB(skillid,ss);
-            }
-            //////////////////////
+            SSDismiss(skillid, delSS, pmail);
         }
     }
 
@@ -5398,6 +5357,67 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, UInt16 itemNum, bool bind)
     SSUpdate2DB(id, ss);
     _owner->sendMsgCode(0, 1025);
     return ret;
+}
+
+void Fighter::SSDismiss(UInt16 skillid, bool isDel, Mail * mail)
+{
+    //技能符文散功 返回技能符文熔炼诀60%
+    UInt32 sid = SKILL_ID(skillid);
+    std::map<UInt16, SStrengthen>::iterator it = m_ss.find(sid);
+    if (it == m_ss.end())
+        return;
+    SStrengthen& ss = it->second;
+    UInt32 ssExp = 0;
+    for (UInt8 lvl = 0; lvl < ss.lvl; ++lvl)
+    {
+        ssExp += GData::GDataManager::getMaxStrengthenVal(sid, lvl);
+    }
+    ssExp += ss.curVal;
+    ssExp *= 0.6;
+    if(ssExp < 10)
+        return;
+    UInt16 ssCount1 = static_cast<UInt16>(ssExp / 1000);
+    ssExp = ssExp % 1000;
+    UInt16 ssCount2 = static_cast<UInt16>(ssExp / 200);
+    ssExp = ssExp % 200;
+    UInt16 ssCount3 = static_cast<UInt16>(ssExp / 50);
+    ssExp = ssExp % 50;
+    UInt16 ssCount4 = static_cast<UInt16>(ssExp / 10);
+
+    MailPackage::MailItem ssmitem[4] = {{1325, ssCount1}, {1326, ssCount2}, {1327, ssCount3}, {1328, ssCount4}};
+    if(!mail)
+    {
+        const GData::SkillBase* skill = GData::skillManager[skillid];
+        if (!skill) return;
+        StringTokenizer sk(skill->getName(), "LV");
+        SYSMSG(title, 2014);
+        SYSMSGV(content, 2015, getLevel(), getColor(), getName().c_str(), sk[0].c_str());
+        MailItemsInfo itemsInfo(ssmitem, DismissCitta, 4);
+        mail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+    }
+    if(mail)
+        mailPackageManager.push(mail->id, ssmitem, 4, true);
+    ss.lvl = 0;
+    ss.curVal = 0;
+    ss.maxVal = GData::GDataManager::getMaxStrengthenVal(sid, ss.lvl);
+    if(!isDel)
+        SSUpdate2DB(skillid, ss);
+}
+
+void Fighter::SSDismissAll(bool isDel)
+{
+    std::map<UInt16, SStrengthen>::iterator it = m_ss.begin();
+    while(it != m_ss.end())
+    {
+        SSDismiss(SKILLANDLEVEL(it->first, 1), isDel);
+        if(isDel)
+        {
+            SSDeleteDB(it->first);
+            m_ss.erase(it++);
+        }
+        else
+            ++ it;
+    }
 }
 
 void Fighter::SSErase(UInt16 id)
