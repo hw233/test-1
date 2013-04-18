@@ -1970,7 +1970,8 @@ void OnEnchantReq( GameMsgHdr& hdr, EnchantReq& er )
 	Stream st(REP::EQ_TO_STRONG);
     UInt16 success = 0;
     UInt16 failed = 0;
-	st << player->GetPackage()->Enchant(er._fighterId, er._itemid, er._type, er._count, er._level, success, failed/*, er._protect > 0*/) << er._fighterId << er._itemid;
+    UInt16 bless = 0;
+	st << player->GetPackage()->Enchant(er._fighterId, er._itemid, er._type, er._count, er._level, success, failed, bless/*, er._protect > 0*/) << er._fighterId << er._itemid<<bless;
 
     if(er._count != 0)
         st << success << failed;
