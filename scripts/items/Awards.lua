@@ -475,6 +475,12 @@ function RunBlueDiamondAward(player, opt)
         [8] = {509,5,1, 507,5,1, 500,5,1},
         [12]= {9076,5,1, 503,5,1, 515,5,1},
     };
+    local extraAward_9191_blue = {
+        [2] = {9190,1,1},
+        [5] = {50,2,1, 9371,5,1, 548,10,1},
+        [8] = {509,5,1, 507,5,1, 500,5,1},
+        [12]= {9076,5,1, 503,5,1, 515,5,1},
+    };
 
     local VAR_BLUE_AWARD_COUNT = 196;
     local VAR_YELLOW_AWARD_COUNT = 197;
@@ -488,7 +494,7 @@ function RunBlueDiamondAward(player, opt)
             package:Add(515, 10, true, 0, 31); 
             package:Add(509, 5, true, 0, 31); 
         end]]--
-        local extarAward = extraAward_9191[count];
+        local extarAward = extraAward_9191_blue[count];
         if extarAward then
             local title = string.format(msg_132)
             local ctx = string.format(msg_133, count)
