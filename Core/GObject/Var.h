@@ -404,6 +404,12 @@ namespace GObject
 
         VAR_FOOLBAO_USED = 450,  //愚人宝箱使用数
         VAR_HHBAWARD_GOT = 451 , //豪华蓝钻领取
+        VAR_SURNAMELEGEND_USED = 452, //蜀山传奇幸运礼包使用数
+        VAR_CARD_1 = 453,       //卡片活动  集齐五张获大奖
+        VAR_CARD_2 = 454,
+        VAR_CARD_3 = 455,
+        VAR_CARD_4 = 456,
+        VAR_CARD_5 = 457,
         VAR_MAX,
     };
 
@@ -756,6 +762,12 @@ namespace GObject
             REGISTER_VAR(VAR_FOOLS_DAY_TIME, CYCLE_DAY);
             REGISTER_VAR(VAR_HAS_VOTE, CYCLE_DAY);
             REGISTER_VAR(VAR_POPULARITY, CYCLE_WEEK);
+            REGISTER_VAR(VAR_SURNAMELEGEND_USED, CYCLE_NONE);
+            REGISTER_VAR(VAR_CARD_1, CYCLE_NONE);
+            REGISTER_VAR(VAR_CARD_2, CYCLE_NONE);
+            REGISTER_VAR(VAR_CARD_3, CYCLE_NONE);
+            REGISTER_VAR(VAR_CARD_4, CYCLE_NONE);
+            REGISTER_VAR(VAR_CARD_5, CYCLE_NONE);
 
             REGISTER_VAR(VAR_FOOLBAO_USED, CYCLE_NONE);
             REGISTER_VAR(VAR_HHBAWARD_GOT, CYCLE_DAY);

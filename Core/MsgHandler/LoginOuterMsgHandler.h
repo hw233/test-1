@@ -2807,6 +2807,14 @@ inline bool player_enum_2(GObject::Player* pl, int type)
                     pl->SetVar(GObject::VAR_LUCKYSTAR_LOGIN_TIME, 0);
             }
             break;
+        case 3:
+            {
+                for(UInt32 i = 0; i < 6; ++ i)
+                {
+                    pl->SetVar(GObject::VAR_SURNAMELEGEND_USED+i, 0);
+                }
+            }
+            break;
         default:
             return false;
     }
@@ -3118,15 +3126,19 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
     UInt8 type = 0;
     br >> type >> begin >> end;
     UInt8 ret = 0;
-    if(type == 1)
+    if(type == 1 && begin <= end)
     {   //充值幸运星活动
         GObject::GVAR.SetVar(GObject::GVAR_LUCKYSTAR_END, begin);
         GObject::GVAR.SetVar(GObject::GVAR_LUCKYSTAR_BEGIN, end);
         GObject::globalPlayers.enumerate(player_enum_2, 2);
         ret = 1;
     }
-    else if (type == 2)
+    else if (type == 2 && begin <= end)
     {
+        GObject::GVAR.SetVar(GObject::GVAR_SURNAMELEGEND_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_SURNAMELEGEND_END, end);
+        GObject::globalPlayers.enumerate(player_enum_2, 3);
+        ret = 1;
     }
 
     Stream st(SPEP::ACTIVITYONOFF);
@@ -3150,6 +3162,8 @@ void QueryOneActivityOnOff(LoginMsgHdr& hdr, const void* data)
     }
     else if (type == 2)
     {
+        begin = GObject::GVAR.GetVar(GObject::GVAR_SURNAMELEGEND_BEGIN);
+        end = GObject::GVAR.GetVar(GObject::GVAR_SURNAMELEGEND_END);
     }
 
     Stream st(SPEP::QUERYACTIVITYONOFF);

@@ -140,6 +140,8 @@ bool World::_june1 = false;
 bool World::_july = false;
 bool World::_qixi= false;
 bool World::_foolbao = false;
+bool World::_halfgold = false;
+bool World::_surnamelegend = false;
 bool World::_wansheng= false;
 bool World::_qingren= false;
 bool World::_specialbook= false;
@@ -176,6 +178,7 @@ bool World::_consumeawardact = false;
 RCSortType World::rechargeSort;
 RCSortType World::consumeSort;
 RCSortType World::popularitySort;
+RCSortType World::LuckyBagSort;
 bool World::_needrechargerank = false;
 bool World::_needconsumerank = false;
 bool World::_killMonsteract = 0;
@@ -279,6 +282,8 @@ bool bRechargeEnd = false;
 bool bConsumeEnd = false;
 bool bXiaoyaoEnd = false;
 bool bFoolBaoEnd =  false;
+bool bHalfGoldEnd = false;
+bool bSurnameLegendEnd = false;
 bool bSnowEnd = false;
 bool bGoldSnakeEnd = false;
 bool bItem9344End = false;
@@ -1077,6 +1082,30 @@ void SendConsumeRankAward()
     }
 }
 
+void World::SendSurnameLegendAward()
+{
+    if(bSurnameLegendEnd)
+    {
+        World::initRCRank();
+        int pos = 0;
+        for (RCSortType::iterator i = World::LuckyBagSort.begin(), e = World::LuckyBagSort.end(); i != e; ++i)
+        {
+            ++pos;
+
+            if(pos > 1) break;
+
+            Player* player = i->player;
+            if (!player)
+                continue;
+            MailPackage::MailItem items[] =
+            {
+                {9904, 1}
+            };
+            player->sendMailItem(4151, 4152, items, sizeof(items)/sizeof(items[0]), false);
+        }
+        World::LuckyBagSort.clear();
+    }
+}
 void World::SendPopulatorRankAward(void*)
 {
     World::initRCRank();
@@ -1139,6 +1168,8 @@ void World::World_Midnight_Check( World * world )
     bool bValentineDay = getValentineDay();
     bool bMayDay = getMayDay();
     bool bfoolbao = getFoolBao();
+    bool bsurnamelegend = getSurnameLegend();
+    bool bhalfgold = getHalfGold();
     bool bJune = getJune();
     bool bQixi = getQixi();
     bool bWansheng = getWansheng();
@@ -1175,6 +1206,10 @@ void World::World_Midnight_Check( World * world )
     //愚公宝箱是否结束
     bFoolBaoEnd =  bfoolbao && !getFoolBao(); 
    // 
+    bHalfGoldEnd = bhalfgold && !getHalfGold();
+    //蜀山传奇掉落活动是否结束
+    bSurnameLegendEnd = bsurnamelegend && !getSurnameLegend();
+
     bPExpItemsEnd = bPExpItems && !getPExpItems();
     bQixiEnd = bQixi && !getQixi();
     bWanshengEnd = bWansheng && !getWansheng();
@@ -1411,6 +1446,8 @@ void World::World_Midnight_Check( World * world )
         world->SendXiaoyaoAward();
     if(bFoolBaoEnd)
         world->SendFoolBaoAward();
+    if(bSurnameLegendEnd)
+        world->SendSurnameLegendAward();
     if (bSnowEnd)
         world->SendSnowAward();
     if (bGoldSnakeEnd)
@@ -1828,7 +1865,6 @@ bool World::Init()
 	GObjectManager::delayLoad();
 	GObjectManager::LoadPracticeData();
 	GObjectManager::LoadTripodData();
-
 	std::string path = cfg.scriptPath + "World/main.lua";
 	_worldScript = new Script::WorldScript(path.c_str());
 	path = cfg.scriptPath + "formula/main.lua";
@@ -2500,6 +2536,36 @@ void World::SendFoolBaoAward()
     };
     selector._player->sendMailItem(4142, 4143, items, sizeof(items)/sizeof(items[0]), false);
 }
+
+/*struct SSelectSurnameLegendUsedMost : public Visitor<Player>
+{
+    Player* _player;
+    UInt32 _used;
+    SSelectSurnameLegendUsedMost(): _player(NULL), _used(0) {}
+    bool operator()(Player* player)
+    {
+        UInt32 used = player->GetVar(VAR_SURNAMELEGEND_USED);
+        if(_player == NULL || used > _used)
+        {
+            _player = player;
+            _used = used;
+        }
+        return true;
+    }
+};
+void World::SendSurnameLegendAward()
+{
+     SSelectSurnameLegendUsedMost  selector;
+    globalPlayers.enumerate(selector);
+    if(selector._player == NULL)
+        return;
+    MailPackage::MailItem items[] =
+    {
+        {9904, 1}
+    };
+    selector._player->sendMailItem(4151, 4152, items, sizeof(items)/sizeof(items[0]), false);
+}
+*/
 void World::SendXiaoyaoAward()
 {
     SSelectXiaoyaoUsedMost selector;
@@ -2649,6 +2715,14 @@ inline bool player_enum_rc(GObject::Player * p, int)
         s.total = popularity;
         World::popularitySort.insert(s);
     }
+    UInt32 used = p->GetVar(VAR_SURNAMELEGEND_USED);
+    if (used)
+    {
+        RCSort s;
+        s.player = p;
+        s.total = used;
+        World::LuckyBagSort.insert(s);
+    }
     return true;
 }
 inline bool player_enum_rp7rc(GObject::Player * p, int)
@@ -2681,6 +2755,7 @@ void World::initRCRank()
     GObject::globalPlayers.enumerate(player_enum_rc, 0);
     init = true;
 }
+
 void World::initRP7RCRank()
 {
     if (initRP7)
@@ -2986,7 +3061,6 @@ void World::DivorceSnowPair(Player* pl)
 void World::SendSnowAward()
 {
     static MailPackage::MailItem s_item[][3] = {
-        {{515,15},{1325,15},{134,15}},
         {{515,10},{1325,10},{134,10}},
         {{515,8},{1325,8},{134,8}},
         {{515,5},{1325,5},{134,5}},

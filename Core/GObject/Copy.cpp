@@ -93,7 +93,7 @@ UInt32 PlayerCopy::getEnterGold(Player* pl)
         { 0,  0,  0},
     };
 
-    return GData::moneyNeed[GData::COPY_ENTER1+PLAYER_DATA(pl, copyGoldCnt)].gold + extraVipGold[vipl][PLAYER_DATA(pl, copyGoldCnt)];
+    return (GData::moneyNeed[GData::COPY_ENTER1+PLAYER_DATA(pl, copyGoldCnt)].gold + extraVipGold[vipl][PLAYER_DATA(pl, copyGoldCnt)]);
 }
 
 void PlayerCopy::sendInfo(Player* pl, UInt8 id)

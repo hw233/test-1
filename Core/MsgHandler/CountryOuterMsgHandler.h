@@ -1245,6 +1245,11 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         GameMsgHdr hdr(0x1C4, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr, NULL);
     }
+    
+    {
+        GameMsgHdr hdr(0x1C9, WORKER_THREAD_WORLD, pl, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+    }
     pl->sendYearRPInfo();
     pl->sendFishUserInfo();
     //if(World::getYearActive())

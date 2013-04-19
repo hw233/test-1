@@ -8235,8 +8235,46 @@ function ItemNormal_00009375(iid, num, bind, param)
 		return false;
 end
 
+function ItemNormal_00009382(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage()
+    local items = {  15,  9088,512, 33,  9371,551, 501, 513, 503, 1325,134, 507, 509, 515 }
+    local chance = { 1500,3000,3900,4800,5700,6600,7400,8200,8800,9100,9400,9600,9800,10000 }
+    local card_num = 0;
+    if package:GetRestPackageSize() < num then
+        player:sendMsgCode(2, 1011, 0)
+        return 0; 
+    end
+    package:DelItemSendMsg(9382, player)
+    for n = 1, num do
+        local rand = math.random(1,10000)
+        local g = 0
+        for i = 1, #chance do
+            if rand <=chance[i] then
+                g = i
+                break
+            end
+        end
+        package:Add(items[g], 1, true, false, 2)
+        local rand_card = math.random(1,100);
+        if rand_card <= 30 then
+           local  rand_card_num = math.random(1,5)
+           rand_card_num = rand_card_num +452;
+           player:AddVar(rand_card_num , 1);
+           card_num = card_num +1;
+        end
+    end
+    if card_num~=0 then
+    SendMsg(player, 0x35, "获得卡牌 x"..card_num);
+    end
+    player:AddVar(452, num)
+    player:sendLuckyBagInfo()
+    player:LuckyBagRank();
+    return num;
+end
+
 local ItemNormal_Table = {
-  [1] = ItemNormal_00000001,
+    [1] = ItemNormal_00000001,
 	[8] = ItemNormal_00000008,
 	[9] = ItemNormal_00000009,
 	[10] = ItemNormal_00000010,
@@ -9911,9 +9949,10 @@ local ItemNormal_Table = {
     [9369] = ItemNormal_00009369,
     [9370] = ItemNormal_00009369,
     [9371] = ItemNormal_00009371,
-    [9375] = ItemNormal_00009375,
+    [9375] = ItemNormal_00009375,  -- to 
     [9373] = ItemNormal_00009366,
     [9374] = ItemNormal_00009366,
+    [9382] = ItemNormal_00009382,
     [9900] = ItemNormal_NameCard,
     [9901] = ItemNormal_NameCard,
     [9902] = ItemNormal_NameCard,

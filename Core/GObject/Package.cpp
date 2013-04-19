@@ -1952,7 +1952,6 @@ namespace GObject
 		m_Owner->send(st);
 		return ret;
 	}
-
     bool Package::UseItemOther(UInt32 id, UInt16 num, std::string& name, UInt8 bind)
     {
 		if(!m_Owner->hasChecked())

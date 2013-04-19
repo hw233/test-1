@@ -246,11 +246,13 @@ function onDungeonWin(player, id, count, free)
     fairyPetLoot(player, 0);
     if free == true then
         FoolBaoLoot(player,0);
+        SurnameLegendLoot(player,0);
         FallActivity(player, 1)
         Guoqing(player, 0);
         ChingMingDay(player, 0)
     else
         FoolBaoLoot(player,2);
+        SurnameLegendLoot(player,0);
         FallActivity(player, 2)
         Guoqing(player, 3);
         ChingMingDay(player, 2)
@@ -991,6 +993,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     Qingren(player, lootlvl);
     fairyPetLoot(player, lootlvl);
     FoolBaoLoot(player,lootlvl);
+    SurnameLegendLoot(player,lootlvl);
     Guoqing(player, lootlvl);
     LuckyDrawBox(player, id)
     ExJob(player, id, lootlvl)
@@ -1036,6 +1039,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
     Guoqing(player, lootlvl);
     fairyPetLoot(player, lootlvl);
     FoolBaoLoot(player,lootlvl);
+    SurnameLegendLoot(player,0);
     if lootlvl == 0 then
         FallActivity(player, 1)
     else
@@ -7352,7 +7356,11 @@ end
 --仙宠仙缘石掉落
 function fairyPetLoot(player, lootlvl)
     local package = player:GetPackage();
-    package:AddItem(9371, 1, true, 0, 10);
+    local num = 1;
+    if getHalfGold() then
+        num = 2;
+    end
+    package:AddItem(9371, num, true, 0, 10);
 end
 
 --愚公宝箱掉落
@@ -7371,6 +7379,24 @@ function FoolBaoLoot(player,lootlvl)
         };
     local package = player:GetPackage();
     package:AddItem(9375, itemNum[lootlvl], true,0,10);
+end
+
+--蜀山传奇掉落活动
+function SurnameLegendLoot(player,lootlvl)
+   if not getSurnameLegend() then
+             return
+   end
+    if lootlvl > 3 then
+        lootlvl = 0
+    end
+    local itemNum = {
+            [0] = 1,
+            [1] = 1,
+            [2] = 1,
+            [3] = 1,
+        };
+    local package = player:GetPackage();
+    package:AddItem(9382, itemNum[lootlvl], true,0,10);
 end
 
 -- 万圣节套装
@@ -8040,3 +8066,25 @@ function getLuckyStarAward(player, idx)
     return true
 end
 
+function GetLuckyBagAward(player)
+    local items = {
+       { 9367,5} , {9369,5},{ 503,5},{515,1},{134,1},{1325,2} 
+    } 
+    for i = 1 , 5  do
+        local num = player:GetVar(452+i);
+        if num < 1 then
+            return false;
+        end
+    end
+    for i= 1, 5 do
+        local num = player:GetVar(452+i);
+        player:SetVar(452+i,num-1);
+    end
+    for i = 1,#items do
+        local item = items[i];
+        player:GetPackage():Add(item[1],item[2],true,false,32);
+    end
+    player:sendLuckyBagInfo();
+        Broadcast(0x27, "恭喜玩家[p:"..player:getCountry()..":"..player:getPName().."]".."在\"峨眉天下秀\"活动中人品爆发，集齐所有卡牌，成功领取超级大奖")
+    return true
+end

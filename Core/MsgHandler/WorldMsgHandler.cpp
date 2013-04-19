@@ -136,6 +136,8 @@ MSG_REG_2(GameMsgHdr, 0x1C5, OnGetQgameGiftAward);
 
 MSG_REG_2(GameMsgHdr, 0x1C6, OnSendPopularityRank);
 MSG_REG_2(GameMsgHdr, 0x1C7, OnPopularityRank);
+MSG_REG_2(GameMsgHdr, 0x1C8, OnLuckyBagRank);
+MSG_REG_2(GameMsgHdr, 0x1C9, OnSendLuckyBagRank);
 
 MSG_REG_2(GameMsgHdr, 0x1CA, OnRechargeRP7Rank);
 MSG_REG_2(GameMsgHdr, 0x1CB, SendRechargeRP7Rank);
