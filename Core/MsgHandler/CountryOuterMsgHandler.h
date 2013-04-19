@@ -1202,13 +1202,12 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         }
     }
 
-    if (pl->getSysDailog() && (pl->getSysDailogPlatform() == SYS_DIALOG_ALL_PLATFORM || pl->getSysDailogPlatform() == atoi(pl->getDomain())))
+    if (pl->getSysDailog() && (World::getSysDailogPlatform() == SYS_DIALOG_ALL_PLATFORM || World::getSysDailogPlatform() == atoi(pl->getDomain())))
     {
         Stream st(REP::SYSDAILOG);
         st << Stream::eos;
         pl->send(st);
         pl->setSysDailog(false);
-        pl->setSysDailogPlatform(SYS_DIALOG_ALL_PLATFORM);
     }
 
     {

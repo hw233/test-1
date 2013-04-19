@@ -2624,21 +2624,23 @@ void GetMoneyFromBs(LoginMsgHdr &hdr, const void * data)
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
-inline bool player_enum(GObject::Player* p, void* para)
+inline bool player_enum(GObject::Player* p, int)
 {
-    UInt8 platfrom = *reinterpret_cast<UInt8 *>(para);
     if (!p->isOnline())
     {
         p->setSysDailog(true);
-        p->setSysDailogPlatform(platfrom);
     }
     else
     {
-        if(platfrom == SYS_DIALOG_ALL_PLATFORM || platfrom == atoi(p->getDomain()))
+        if(GObject::World::getSysDailogPlatform() == SYS_DIALOG_ALL_PLATFORM || GObject::World::getSysDailogPlatform() == atoi(p->getDomain()))
         {
             Stream st(REP::SYSDAILOG);
             st << Stream::eos;
             p->send(st);
+        }
+        else
+        {
+            p->setSysDailog(true);
         }
     }
     return true;
@@ -2655,7 +2657,8 @@ void SysDailog(LoginMsgHdr &hdr, const void * data)
     st << Stream::eos;
 	NETWORK()->Broadcast(st);
 #endif
-	GObject::globalPlayers.enumerate(player_enum, &platform);
+    GObject::World::setSysDailogPlatform(platform);
+	GObject::globalPlayers.enumerate(player_enum, 0);
 }
 void SysUpdate(LoginMsgHdr &hdr, const void * data)
 {
