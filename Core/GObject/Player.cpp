@@ -19093,6 +19093,7 @@ void Player::getRP7TreasureAward(UInt8 idx)
 
                mailPackageManager.push(mail->id, pItem, 8, true);
             }
+            udpLog("huodong", "F_10000_0417_1", "", "", "", "", "act", gold/10);
         }
     }
     Stream st(REP::RP_SERVER);
