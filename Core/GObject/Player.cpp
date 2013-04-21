@@ -18998,8 +18998,9 @@ void Player::buyRP7Treasure(UInt8 idx)
             }
             else
             {
-            	ConsumeInfo ci(RP7Treasure,0,0);
-        	    useGold(gold,&ci);
+            	//ConsumeInfo ci(RP7Treasure,0,0);
+        	    //useGold(gold,&ci);
+                useGold(gold);
                 v |= (1<<idx);
                 SetVar(VAR_RP7_TREASURE, v);
 
@@ -19015,6 +19016,7 @@ void Player::buyRP7Treasure(UInt8 idx)
                     SetVar(VAR_RP7_TREASURE1_GETTIME+2, GetVar(VAR_RP7_TREASURE1_GETTIME+1));
                 }
                 SetVar(var,tm);  
+                udpLog("huodong", "F_10000_0417_1", "", "", "", "", "act", gold);
             }
         }
     }
@@ -19093,7 +19095,7 @@ void Player::getRP7TreasureAward(UInt8 idx)
 
                mailPackageManager.push(mail->id, pItem, 8, true);
             }
-            udpLog("huodong", "F_10000_0417_1", "", "", "", "", "act", gold/10);
+            udpLog("huodong", "F_10000_0417_2", "", "", "", "", "act", gold/10);
         }
     }
     Stream st(REP::RP_SERVER);
