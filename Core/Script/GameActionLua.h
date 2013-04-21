@@ -284,6 +284,7 @@ namespace Script
         lua_tinker::table getCopyFrontmapAward(UInt8 step, UInt16 localtion);
         UInt32 getDreamerTreasure(UInt8 id);
         UInt32 getDreamerItem(UInt8 id, UInt8 index);
+        bool RunVipPrivilegeAward(Player* player, UInt8 idx, UInt8 dayth);
 
     public:
 

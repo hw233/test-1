@@ -89,6 +89,7 @@ namespace GObject
         else
             now += m_Offset;
 
+        FastMutex::ScopedLock lk(_mutex);
         if(now < m_OverTime[id]) return false;
 
         UInt32 oldtime = m_OverTime[id];

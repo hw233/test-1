@@ -190,6 +190,8 @@ namespace Script
 		CLASS_DEF(Player, useGold);
 		CLASS_DEF(Player, useGold4LuckDraw);
 		CLASS_DEF(Player, getGold4LuckDraw);
+		CLASS_DEF(Player, useGoldInLua);
+		CLASS_DEF(Player, getGoldInLua);
 		CLASS_DEF(Player, getCoupon);
 		CLASS_DEF(Player, useCoupon);
 		CLASS_DEF(Player, getTael);
@@ -1583,5 +1585,9 @@ namespace Script
 		return Call<UInt32>("exchangPurplePet", player);
     }
 
+    bool GameActionLua::RunVipPrivilegeAward(Player* player, UInt8 idx, UInt8 dayth)
+    {
+		return Call<bool>("RunVipPrivilegeAward", player, idx, dayth);
+    }
 }
 

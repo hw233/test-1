@@ -5506,6 +5506,13 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
         case 9:
             player->getFishUserPackage();
             break;
+        case 10:
+            {
+                UInt8 idx = 0;
+                br >> idx;
+                player->doVipPrivilege(idx);
+            }
+            break;
 
         default:
             break;
