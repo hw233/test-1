@@ -501,6 +501,14 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 22)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 23)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 24)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 25)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 26)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 27)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 31)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 1)
 
             ))
     {
@@ -567,6 +575,7 @@ bool enum_midnight(void * ptr, void* next)
         pl->sendLevelAward();
 #endif
 
+    /*
     if (nextday >= TimeUtil::MkTime(2013, 2, 9))
     {   //金蛇献瑞 聚福兆祥活动
         struct goldData
@@ -579,6 +588,7 @@ bool enum_midnight(void * ptr, void* next)
         GameMsgHdr h(0x343,  pl->getThreadId(), pl, sizeof(gData));
         GLOBAL().PushMsg(h, &gData);
     }
+    */
 
 	return true;
 }
@@ -1253,6 +1263,14 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 22)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 23)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 24)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 25)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 26)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 27)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 3, 31)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 1)
             )
         bRechargeEnd = true;
 

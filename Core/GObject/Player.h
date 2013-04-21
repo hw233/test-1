@@ -2185,6 +2185,7 @@ namespace GObject
 	    FairyPet * findFairyPet(UInt32);
         bool hasCanHirePet(UInt32);
         bool delCanHirePet(UInt32);
+        void delFairyPet(UInt32);
         void writeCanHiretPet();
 	    bool isFairyPetFull() const;
         UInt32 setFairypetBattle(UInt32);
@@ -2198,6 +2199,7 @@ namespace GObject
         void getFariyPetSpaceInfo();
         void getPetByLevelUp(UInt8);
         UInt8 getPetByPetEgg(UInt32);
+        UInt8 transferPet(UInt32, UInt32);
 
         void getXianyuanLua(UInt32);
         void getLongyuanLua(UInt32);

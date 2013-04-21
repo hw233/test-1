@@ -1360,8 +1360,6 @@ void OnStatusChangeReq( GameMsgHdr& hdr, StatusChangeReq& scr )
 		if(v == 1)
 		{
 			player->setBuffData(PLAYER_BUFF_PKLOCK, TimeUtil::Now() + 20 * 60);
-			//SYSMSG_SEND(145, player);
-			//SYSMSG_SEND(1045, player);
 			GObject::Map * map = GObject::Map::FromSpot(PLAYER_DATA(player, location));
 			if(map != NULL)
 				map->changebyStatus(player);
@@ -6020,6 +6018,19 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
                     case 0x05:
                         pet->upgradeBone();
                         break;
+                    case 0x06:
+                        {
+                            UInt32 petId2 = 0;
+                            brd >> petId2;
+                            UInt8 res = player->transferPet(petId, petId2);
+                            Stream st(REP::FAIRY_PET);
+                            st << type << opt;
+                            if(res == 0)
+                                st << petId << petId2;
+                            st << Stream::eos;
+                            player->send(st);
+                        }
+                        break;
                 }
             }
             break;
@@ -6051,6 +6062,8 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
                         break;
                     case 0x04:
                         {
+                            if(!player->hasChecked())
+                                return;
                             UInt32 petId = 0;
                             UInt8 isHas = 0;
                             brd >> petId >> isHas;
