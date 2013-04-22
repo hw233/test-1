@@ -648,36 +648,39 @@ public:
     inline static bool getCompassAct()
     { return _compassact; }
 
-   inline static void setFoolBao(bool v)
-   { _foolbao = v; }
+    inline static void setFoolBao(bool v)
+    { _foolbao = v; }
     inline static bool getFoolBao()
     { return _foolbao; } 
     
-   inline static void setSurnameLegend(bool v)
-   { 
-   /*     UInt32 begin =GVAR.GetVar(GVAR_SURNAMELEGEND_BEGIN);
+    inline static void setSurnameLegend(bool v)
+    {
+        /*
+        UInt32 begin = GVAR.GetVar(GVAR_SURNAMELEGEND_BEGIN);
         UInt32 end = GVAR.GetVar(GVAR_SURNAMELEGEND_END);
         UInt32 now = TimeUtil::Now();
-      if( now >= begin && now <= end)
-          return ;
-     */  _surnamelegend = v;
-   }
+        if( now >= begin && now <= end)
+            return;
+        */
+        _surnamelegend = v;
+    }
    
     inline static bool getSurnameLegend(UInt32 time = 0)
-    { 
-     /*   UInt32 begin =GVAR.GetVar(GVAR_SURNAMELEGEND_BEGIN);
+    {
+        /*
+        UInt32 begin = GVAR.GetVar(GVAR_SURNAMELEGEND_BEGIN);
         UInt32 end = GVAR.GetVar(GVAR_SURNAMELEGEND_END);
-        UInt32 now = TimeUtil::Now()+ time;
-       if( now >= begin && now <= end)
+        UInt32 now = TimeUtil::Now() + time;
+        if( now >= begin && now <= end)
             _surnamelegend = true;
-       else if(begin>0 && end > 0)
+        else
             _surnamelegend = false;
-       */
-        return _surnamelegend ;
+        */
+        return _surnamelegend;
     } 
 
-   inline static void setHalfGold(bool v)
-   { _halfgold = v; }
+    inline static void setHalfGold(bool v)
+    { _halfgold = v; }
     inline static bool getHalfGold()
     { return _halfgold; } 
 

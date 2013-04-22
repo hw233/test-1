@@ -592,7 +592,8 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
         conn->pendClose();
         return;
     }
-    if (cfg.rpServer && !GObject::dclogger.checkRPOpenid((char*)us._openid.c_str()))
+    UInt8 rpFlag = 0;
+    if (cfg.GMCheck && cfg.rpServer && 0 == (rpFlag=GObject::dclogger.checkRPOpenid((char*)us._openid.c_str())))
     {
         UserLogonRepStruct rep;
         rep._result = 7;
@@ -786,11 +787,15 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             {
                 pl->SetVar(GObject::VAR_RP_VALUE, 4);
             }
+            if (nu._via == "sscq_dlhd") //摩天大楼用户
+                pl->SetVar(GObject::VAR_RP_VALUE, 5);
             if (GObject::World::getPetEggAct())
             {
                 GObject::MailPackage::MailItem item = {9366,1};
                 pl->sendMailItem(4140, 4141, &item, 1, true);
             }
+            if (cfg.rpServer && rpFlag > 0)
+                pl->SetVar(GObject::VAR_RP_VALUE, rpFlag);
 
 #ifndef _FB
 #ifndef _VT

@@ -829,7 +829,7 @@ function onActivityCheck(tm)
       elseif tm >= actTime2013_04_09 and tm < actTime2013_04_09+5*86400 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
-      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+7*86400 then
+      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+14*86400 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
       else
@@ -845,11 +845,11 @@ function onActivityCheck(tm)
           setTgcEvent(false)
       end
 
-      -- if tm >= actTime536 and tm < actTime536_1 then
+      if tm >= actTime536 and tm < actTime536_1 then
           set3366GiftAct(true)
-      -- else
-      --    set3366GiftAct(false)
-      -- end
+      else
+          set3366GiftAct(false)
+      end
 
       if tm >= actTime537 and tm < actTime537_1 then
           setConsumeActive(true)
@@ -1223,7 +1223,7 @@ function initActTime(y, m, d)
   -- 蜀山好声音合作
   local  SerStartTm535= { ['year'] = 2012, ['month'] = 12, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 3366合作礼包
-  local  SerStartTm536= { ['year'] = 2012, ['month'] = 12, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm536= { ['year'] = 2013, ['month'] = 4, ['day'] = 24, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm537= { ['year'] = 2012, ['month'] = 12, ['day'] = 15, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 商城消耗返利
   local  SerStartTm538= { ['year'] = 2013, ['month'] = 1, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1618,7 +1618,7 @@ function initActTime(y, m, d)
   actTime535_1 = os.time(SerStartTm535) + 4 * 86400;
 
   actTime536 = os.time(SerStartTm536);
-  actTime536_1 = os.time(SerStartTm536) + 1 * 86400;
+  actTime536_1 = os.time(SerStartTm536) + 7 * 86400;
 
   actTime537 = os.time(SerStartTm537);
   actTime537_1 = os.time(SerStartTm537) + 7 * 86400;

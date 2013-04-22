@@ -540,6 +540,13 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 19)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 20)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 22)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 24)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 25)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 26)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 27)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 28)
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
     {
@@ -1210,7 +1217,7 @@ void World::World_Midnight_Check( World * world )
    // 
     bHalfGoldEnd = bhalfgold && !getHalfGold();
     //蜀山传奇掉落活动是否结束
-    bSurnameLegendEnd = bsurnamelegend && !getSurnameLegend();
+    bSurnameLegendEnd = bsurnamelegend && !getSurnameLegend(300);
 
     bPExpItemsEnd = bPExpItems && !getPExpItems();
     bQixiEnd = bQixi && !getQixi();
@@ -1381,6 +1388,13 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 19)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 20)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 22)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 24)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 25)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 26)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 27)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 28)
             )
         bRechargeEnd = true;
     if (cfg.rpServer)

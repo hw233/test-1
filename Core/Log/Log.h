@@ -166,6 +166,7 @@ enum MailItemType
     BuChangMo,
     NewCountryBattleAward,
     LingbaoFuling,
+    TreasureAct,
 };
 enum ItemFrom
 {

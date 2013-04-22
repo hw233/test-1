@@ -1698,6 +1698,8 @@ void OnFighterDismissReq( GameMsgHdr& hdr, FighterDismissReq& fdr )
 		}
 	}
     fgt->delAllCitta();
+    //此处只剩下法宝符文未散功了！！
+    fgt->SSDismissAll(true);
 	delete fgt;
 	rep._fgtid = fdr._fgtid;
 	rep._result = 0;
@@ -1972,7 +1974,8 @@ void OnEnchantReq( GameMsgHdr& hdr, EnchantReq& er )
 	Stream st(REP::EQ_TO_STRONG);
     UInt16 success = 0;
     UInt16 failed = 0;
-	st << player->GetPackage()->Enchant(er._fighterId, er._itemid, er._type, er._count, er._level, success, failed/*, er._protect > 0*/) << er._fighterId << er._itemid;
+    UInt16 bless = 0;
+	st << player->GetPackage()->Enchant(er._fighterId, er._itemid, er._type, er._count, er._level, success, failed, bless/*, er._protect > 0*/) << er._fighterId << er._itemid<<bless;
 
     if(er._count != 0)
         st << success << failed;
@@ -5562,6 +5565,12 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
                 player->doVipPrivilege(idx);
             }
             break;
+        case 11:
+            player->getFishUserAward();
+            break;
+        case 12:
+            player->getFishUserPackage();
+            break;
 
         default:
             break;
@@ -5736,17 +5745,13 @@ void OnSkillStrengthen( GameMsgHdr& hdr, const void* data)
     Fighter* fgt = pl->findFighter(fighterid);
     if (!fgt)
         return;
+    UInt16 skillid = 0;
+    br >> skillid;
     if (type == 1)
-    {
-        UInt16 skillid = 0;
-        br >> skillid;
         fgt->SSOpen(skillid);
-    }
     else if (type == 2)
     {
-        UInt16 skillid = 0;
         UInt16 num = 0;
-        br >> skillid;
         br >> num;
 
         for (UInt16 i = 0; i < num; ++i)
@@ -5762,6 +5767,8 @@ void OnSkillStrengthen( GameMsgHdr& hdr, const void* data)
                 break;
         }
     }
+    else if (type == 3)
+        fgt->SSDismiss(skillid);
 }
 
 void OnMakeStrong( GameMsgHdr& hdr, const void * data )

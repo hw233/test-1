@@ -12,6 +12,7 @@
 #include "GData/SkillTable.h"
 #include "GData/CittaTable.h"
 #include "GObject/WBossMgr.h"
+#include "GObject/Mail.h"
 #include "SecondSoul.h"
 #include "ShuoShuo.h"
 
@@ -44,7 +45,6 @@ namespace GObject
 #define FIGHTER_BUFF_COUNT 0x20
 
 #define SKILL_UPMAX 3 // 技能最初就能装备3个
-#define CITTA_LEVEL_MAX 100
 #define CITTA_UPMAX 9
 #define CITTA_INIT 5 // 心法最初只能装2个,由穴道控制装备个数
 #define TRUMP_UPMAX 3
@@ -374,7 +374,7 @@ public:
     // 删除所有心法
     void delAllCitta( bool = true);
     // 删除一个心法
-    bool delCitta(UInt16 citta, bool = true);
+    bool delCitta(UInt16 citta, bool = true, bool = false);
     //是否可以删除某个心法
     bool CanDelCitta(UInt16 citta);
     // 是否学会了此心法
@@ -881,6 +881,8 @@ public:
     SStrengthen* SSGetInfo(UInt16 skillid);
     void SSOpen(UInt16 id);
     UInt8 SSUpgrade(UInt16 id, UInt32 itemId, UInt16 itemNum, bool bind = false);
+    void SSDismiss(UInt16, bool = false, Mail * = NULL);
+    void SSDismissAll(bool = false);
     void SSErase(UInt16 id);
     void SSUpdate2DB(UInt16 id, SStrengthen& ss);
     void SSDeleteDB(UInt16 id);

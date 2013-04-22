@@ -642,10 +642,10 @@ private:
     bool    doProtectDamage(BattleFighter* bf, BattleFighter* pet, float& phyAtk, float& magAtk, float factor);
     bool    protectDamage(BattleFighter* bf, BattleFighter* pet, float& phyAtk, float& magAtk, float factor);
 
-    bool    tryAttackWithPet(BattleFighter* bf, float& phyAtk, float& magatk, float factor);
-    bool    do100AttackWithPet(BattleFighter* bf, BattleFighter* pet, float& phyAtk, float& magAtk, float factor);
-    bool    doAttackWithPet(BattleFighter* bf, BattleFighter* pet, float& phyAtk, float& magAtk, float factor);
-    bool    attackWithPet(BattleFighter* bf, BattleFighter* pet, float& phyAtk, float& magAtk, float factor);
+    bool    tryAttackWithPet(BattleFighter* bf);
+    bool    do100AttackWithPet(BattleFighter* bf, BattleFighter* pet);
+    bool    doAttackWithPet(BattleFighter* bf, BattleFighter* pet);
+    bool    attackWithPet(BattleFighter* bf, BattleFighter* pet);
 private:
     int     getPossibleTarget(int, int, BattleFighter* bf = NULL); // return -1 for no found target
 
