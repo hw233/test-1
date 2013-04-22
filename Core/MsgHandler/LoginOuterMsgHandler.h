@@ -1448,26 +1448,26 @@ void ForbidSale(LoginMsgHdr& hdr,const void * data)
     {
         UInt64 pid = atoll(playerId.c_str());
         pid = pid & 0xFFFFFFFFFF;
-        setForbidSaleValue(pid, true);
+        string str;
+        if (!checkForbidSale(pid,str))
+        {
+            setForbidSaleValue(pid, true);
 //        setForbidSaleValue(pid, true,tm);
 
-        if(cfg.merged)
-            pid += (static_cast<UInt64>(serverNo) << 48);
-	    GObject::Player * pl = GObject::globalPlayers[pid];
-        if (NULL != pl)
-        {
-            pl->setForbidSale(true);
-
-            GameMsgHdr hdr(0x352, pl->getThreadId(), pl, NULL);
-            GLOBAL().PushMsg(hdr, NULL);
+            if(cfg.merged)
+                pid += (static_cast<UInt64>(serverNo) << 48);
+    	    GObject::Player * pl = GObject::globalPlayers[pid];
+            if (NULL != pl)
+            {
+                pl->setForbidSale(true);
+    
+                GameMsgHdr hdr(0x352, pl->getThreadId(), pl, NULL);
+                GLOBAL().PushMsg(hdr, NULL);
+            }
+            if (execu.get() != NULL && execu->isConnected())
+                execu->Execute2("REPLACE into `fsale_player` values(%"I64_FMT"u,%d,1)", pid, TimeUtil::Now());
         }
         playerId = GetNextSection(playerIds, ',');
-
-        if (execu.get() != NULL && execu->isConnected())
-        {
-            execu->Execute2("REPLACE into `fsale_player` values(%"I64_FMT"u,%d,1)", pid, TimeUtil::Now());
-        }
- 
     }
     ret = 0;
     Stream st(SPEP::FORBIDSALE);
