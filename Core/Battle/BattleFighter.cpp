@@ -629,6 +629,12 @@ inline void addAttrExtra( GData::AttrExtra& ae, const GData::AttrExtra * ext )
 		return;
 	ae += *ext;
 }
+inline void factorAttrExtra( GData::AttrExtra& ae, const GObject::AttrFactor * ef )
+{
+	if(ef == NULL)
+		return;
+	ae *= (*ef);
+}
 
 void BattleFighter::updateBuffExtras()
 {
@@ -652,8 +658,7 @@ void BattleFighter::updateBuffExtras()
         if (ae)
             addAttrExtra(_attrExtra, ae);
     }
-
-	if(ext > 0)
+    if(ext > 0)
 	{
 		float extAttr = 0.05f * ext;
 		_attrExtra.strengthP += extAttr;
@@ -999,6 +1004,20 @@ void BattleFighter::initStats(bool checkEnh)
 		updateAllAttr();
 		if(_hp == 0)
 			_hp = _maxhp;
+
+        //末日之战的buff
+        if(_fighter && _fighter->getOwner() && _fighter->getOwner()->hasHiAfFlag())
+        {
+            const GObject::AttrFactor* af = _fighter->getOwner()->getHIAf();
+            if (af)
+            {
+                _attack *= af->attack;
+                _magatk *= af->magatk;
+                if (af->hp > 1.0)
+                    _maxhp *= af->hp;
+                _hp *= af->hp;
+            }
+        }
 	}
 }
 

@@ -189,6 +189,11 @@ private:
     void OnSurnameleg(GObject::Player *player, std::vector<std::string>& args);
     void OnFoolsDayGM(GObject::Player *player, std::vector<std::string>& args);
     void OnLuckyStarGM(GObject::Player *player, std::vector<std::string>& args);
+    void OnClanBoss(GObject::Player *player, std::vector<std::string>& args);
+    void OnClanBossPick(GObject::Player *player, std::vector<std::string>& args);
+    void OnClanBossEmpower(GObject::Player *player, std::vector<std::string>& args);
+    void OnClanBossSetEm(GObject::Player *player, std::vector<std::string>& args);
+    void OnClanBossOpen(GObject::Player *player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;

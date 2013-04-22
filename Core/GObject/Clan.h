@@ -7,6 +7,7 @@
 #include "GObjectManager.h"
 #include "ClanDynamicMsg.h"
 #include "Server/ServerTypes.h"
+#include "Server/WorldServer.h"
 #include "Common/BinaryReader.h"
 
 class SysMsgItem;
@@ -564,6 +565,51 @@ public:
 	void broadcast(SysMsgItem *);
     void broadcastCopyInfo();
 
+    void setXianyun(UInt32 num) {_xianyun = num;}
+    UInt32 getXianyun() {return _xianyun;}
+    void addXianyun(int num) 
+    {
+        if (0 == num)
+            return;
+        if (num < 0 && (num+_xianyun) < 0)
+            _xianyun = 0;
+        else
+            _xianyun += num;
+	    DB5().PushUpdateData("UPDATE `clan` SET `xianyun` = %u WHERE `id` = %u", _xianyun, _id);
+    }
+    UInt8 getUrge(UInt8 t)
+    {
+        if (t >= 3)
+            return 0;
+        return _urge[t];
+    }
+    void setUrge(UInt8 t, UInt8 n)
+    {
+        if (t < 3)
+            _urge[t] = n;
+    }
+    void clearUrge()
+    {
+        memset(_urge, 0, sizeof(_urge));
+    }
+    void addUrge(UInt8 t, UInt8 n)
+    {
+        if (t < 3)
+            _urge[t] += n;
+    }
+    UInt32 getGongxian() {return _gongxian;}
+    UInt32 addGongxian(int num)    {
+        _gongxian += num;
+	    DB5().PushUpdateData("UPDATE `clan` SET `gongxian` = %u WHERE `id` = %u", _gongxian, _id);
+        return _gongxian;
+    }
+    void setGongxian(UInt32 num, bool toDB=false)
+    {
+        _gongxian = num;
+        if (toDB)
+            DB5().PushUpdateData("UPDATE `clan` SET `gongxian` = %u WHERE `id` = %u", _gongxian, _id);
+    }
+
 public:
 	ClanMember * getClanMember(Player *);
 	bool existClanMember(Player *);
@@ -647,6 +693,10 @@ private:
     std::string m_qqOpenid;
 
 	Mutex _mutex;
+
+    UInt32 _xianyun;
+    UInt32 _gongxian;
+    UInt8 _urge[3];
 };
 
 typedef GGlobalObjectManagerT<Clan, UInt32> GlobalClans;

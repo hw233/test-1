@@ -41,6 +41,7 @@
 #include "GObject/NewCountryBattle.h"
 #include "GObject/Tianjie.h"
 #include "GObject/ClanCopy.h"
+#include "GObject/ClanBoss.h"
 #include "Common/Itoa.h"
 
 #include "GObject/Tianjie.h"
@@ -248,6 +249,12 @@ GMHandler::GMHandler()
     Reg(2, "fool", &GMHandler::OnFoolsDayGM);
     Reg(2, "star", &GMHandler::OnLuckyStarGM);
     Reg(2, "acttm", &GMHandler::OnSurnameleg);
+
+    Reg(3, "opencb", &GMHandler::OnClanBossOpen);
+    Reg(3, "cb", &GMHandler::OnClanBoss);
+    Reg(3, "pick", &GMHandler::OnClanBossPick);
+    Reg(3, "empower", &GMHandler::OnClanBossEmpower);
+    Reg(3, "setem", &GMHandler::OnClanBossSetEm);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -3869,4 +3876,35 @@ void GMHandler::OnLuckyStarGM(GObject::Player *player, std::vector<std::string>&
             break;
     }
 }
+void GMHandler::OnClanBossOpen(GObject::Player *player, std::vector<std::string>& args)
+{
+    GObject::ClanBoss::instance().start();
+}
+
+void GMHandler::OnClanBoss(GObject::Player *player, std::vector<std::string>& args)
+{
+	if(args.size() < 1)
+		return;
+    int bossMaxHp = atoi(args[0].c_str());
+    GObject::ClanBoss::instance().setBossHp(bossMaxHp);
+}
+void GMHandler::OnClanBossPick(GObject::Player *player, std::vector<std::string>& args)
+{
+}
+void GMHandler::OnClanBossEmpower(GObject::Player *player, std::vector<std::string>& args)
+{
+	if(args.size() < 2)
+		return;
+    UInt8 t = atoi(args[0].c_str());
+    UInt32 em = atoi(args[1].c_str());
+    GObject::ClanBoss::instance().addEmpower(t, em);
+}
+void GMHandler::OnClanBossSetEm(GObject::Player *player, std::vector<std::string>& args)
+{
+    if(args.size() < 1)
+        return;
+    UInt8 t = atoi(args[0].c_str()); 
+    GObject::ClanBoss::instance().setPowerType(t);
+}
+
 

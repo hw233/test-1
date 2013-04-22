@@ -63,6 +63,7 @@
 #include "GObject/Tianjie.h"
 #include "Memcached.h"
 #include "GObject/RechargeTmpl.h"
+#include "GObject/ClanBoss.h"
 
 struct NullReq
 {
@@ -1224,6 +1225,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     }
     {
         GObject::Tianjie::instance().getTianjieData(pl, true);
+        GObject::ClanBoss::instance().sendStatus(pl, 0);
         if (World::getConsume918())
         {
             Stream st(REP::DAILY_DATA);
@@ -2929,6 +2931,12 @@ void OnAttackNpcReq( GameMsgHdr& hdr, AttackNpcReq& anr )
 		player->sendMsgCode(0, 1408);
 		return;
 	}
+    if (anr._npcId == 5515)
+    {
+        GameMsgHdr hdr2(0x1D1, WORKER_THREAD_WORLD, player, 0);
+	    GLOBAL().PushMsg(hdr2, 0);
+        return;
+    }
 
 	if (GObject::Tianjie::instance().isTjNpc(anr._npcId, loc))
 	{
@@ -2995,6 +3003,7 @@ void OnBattleEndReq( GameMsgHdr& hdr, BattleEndReq& req )
     }
 
     player->addLastTjScore();
+    player->addLastGongxian();
 
 	player->checkLastBattled();
 
@@ -4966,6 +4975,7 @@ void OnTianjieReq( GameMsgHdr& hdr, const void* data)
 {
     GObject::Tianjie::instance().onTianjieReq(hdr, data);
 }
+
 
 void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
 {

@@ -68,6 +68,7 @@
 #include "GData/LBSkillTable.h"
 #include "GData/FairyPetTable.h"
 #include "FairyPet.h"
+#include "GObject/ClanBoss.h"
 
 namespace GObject
 {
@@ -3124,7 +3125,7 @@ namespace GObject
         // ??????Ϣ
 		LoadingCounter lc("Loading clans:");
 		DBClan cl;
-		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `funds`, `foundTime`, `founder`, `leader`, `watchman`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle`, `battleScore`, `dailyBattleScore`, `battleRanking`,`qqOpenid` FROM `clan`", cl) != DB::DB_OK)
+		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `funds`, `foundTime`, `founder`, `leader`, `watchman`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle`, `battleScore`, `dailyBattleScore`, `battleRanking`,`qqOpenid`,`xianyun`,`gongxian` FROM `clan`", cl) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		Clan * clan = NULL;
@@ -3168,6 +3169,10 @@ namespace GObject
 				clanBattle->setNextBattleTime(cl.nextBattleTime);
 				globalClans.add(cl.id, clan);
                 clan->setQQOpenid(cl.qqOpenid);
+                clan->setXianyun(cl.xianyun);
+                clan->setGongxian(cl.gongxian);
+                if (cl.gongxian > 0)
+                    GObject::ClanBoss::instance().insertToGxSort(clan, 0, cl.gongxian);
 		}
 			else
 			{

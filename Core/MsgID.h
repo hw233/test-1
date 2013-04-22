@@ -414,6 +414,8 @@ namespace REQ
 
     /** 单挑 **/
     const UInt8 SINGLE_HERO         = 0XA5;
+    /** 末日之战 **/
+    const UInt8 CLANBOSS            = 0xF8;
 }
 
 namespace REP
@@ -658,6 +660,8 @@ namespace REP
     const UInt8 GETBOX              = 0xF7;// 0xD4
     const UInt8 BLOCKBOSS           = 0xF9;// 0xD5
 
+    const UInt8 CLANBOSS           = 0xF8;// 0xD5
+
     const UInt8 CLAN_RANKBATTLE_REPINIT = 0x59;  //非战斗时信息返回
     const UInt8 CLAN_RANKBATTLE_REP     = 0x5A;  //战斗时信息返回
     const UInt8 CLAN_RANKBATTLE_SORTLIST = 0x5B; //帮会战排名列表
@@ -756,6 +760,7 @@ namespace SPEQ
     const UInt16 FB_SPECIFY_FIND     = 0x142;// FB-隆中网络查询
     const UInt16 ACTIVITYONOFF       = 0x143;// 后台操作活动开关
     const UInt16 QUERYACTIVITYONOFF  = 0x144;// 后台查询活动开启状态
+    const UInt16 OPENCB              = 0x145;// 开启末日之战
 }
 
 namespace SPEP
@@ -813,6 +818,7 @@ namespace SPEP
     const UInt16 FB_SPECIFY_FIND     = 0x42;// FB-隆中网络查询
     const UInt16 ACTIVITYONOFF       = 0x43;// 后台操作活动开关
     const UInt16 QUERYACTIVITYONOFF  = 0x44;// 后台查询活动开启状态
+    const UInt16 OPENCB              = 0x45;// 开启末日之战
 }
 
 namespace ARENAREQ

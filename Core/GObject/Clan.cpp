@@ -282,6 +282,9 @@ Clan::Clan( UInt32 id, const std::string& name, UInt32 ft, UInt8 lvl ) :
     _copyMaxTime = 0;
 
     _lastCallTime = 0;
+    _xianyun = 0;
+    _gongxian = 0;
+    memset(_urge, 0, sizeof(_urge));
 }
 
 Clan::~Clan()

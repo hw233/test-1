@@ -48,6 +48,7 @@
 #include "Memcached.h"
 #include "GObject/RechargeTmpl.h"
 #include "Version.h"
+#include "GObject/ClanBoss.h"
 
 #ifndef _WIN32
 //#include <libmemcached/memcached.h>
@@ -1611,6 +1612,21 @@ void addRechargeScore(LoginMsgHdr& hdr,const void * data)
     }
     ret = 0;
     Stream st(SPEP::ADDRECHARGESCORE);
+    st << ret << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+void OpenCb(LoginMsgHdr &hdr,const void * data)
+{
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+ 
+    UInt8 ret = 0;
+    INFO_LOG("OPENCB");
+    if (GObject::ClanBoss::instance().isOpening())
+        ret = 1;
+    else
+        GObject::ClanBoss::instance().start();
+    Stream st(SPEP::OPENCB);
     st << ret << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }

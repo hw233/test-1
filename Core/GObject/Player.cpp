@@ -78,6 +78,7 @@
 #include "RechargeTmpl.h"
 #include "GData/ExpTable.h"
 #include "Version.h"
+#include "GObject/ClanBoss.h"
 
 
 #define NTD_ONLINE_TIME (4*60*60)
@@ -717,6 +718,7 @@ namespace GObject
         memset(cf_itemId, 0, sizeof(cf_itemId));
         memset(cf_ratio, 0 ,sizeof(cf_ratio));
         _hiattrFlag = false;
+        _hiafFlag = false;
 
         _inQQGroup = false;
 	}
@@ -2343,6 +2345,24 @@ namespace GObject
         }
         _playerData.lastTjEventScore = 0;
         _playerData.lastTjTotalScore = 0;
+    }
+    void Player::addLastGongxian()
+    {
+        if (!GObject::ClanBoss::instance().isOpening())
+        {
+            _playerData.lastGongxian = 0;
+            return;
+        }
+        if (_playerData.lastGongxian > 0)
+        {
+            SYSMSG_SENDV(173, this, _playerData.lastGongxian);
+            SYSMSG_SENDV(174, this, _playerData.lastGongxian);
+        }
+        _playerData.lastGongxian = 0;
+    }
+    void Player::pendLastGongxian(int num)
+    {
+        _playerData.lastGongxian += num;
     }
 
     UInt32 bufferId2VarId(UInt8 id)
@@ -5732,6 +5752,27 @@ namespace GObject
     void Player::clearHIAttr()
     {
         _hiattr.reset();
+		for(int i = 0; i < 5; ++ i)
+		{
+			GObject::Fighter * fgt = getLineup(i).fighter;
+			if(fgt != NULL)
+				fgt->setDirty();
+        }
+    }
+    void Player::setHIAf(const GObject::AttrFactor& af)
+    {
+        _hiaf = af;
+		for(int i = 0; i < 5; ++ i)
+		{
+			GObject::Fighter * fgt = getLineup(i).fighter;
+			if(fgt != NULL)
+				fgt->setDirty();
+        }
+    }
+
+    void Player::clearHIAf()
+    {
+        memset(&_hiaf, 0, sizeof(_hiaf));
 		for(int i = 0; i < 5; ++ i)
 		{
 			GObject::Fighter * fgt = getLineup(i).fighter;

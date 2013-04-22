@@ -1100,6 +1100,8 @@ CREATE TABLE `clan` (
   `dailyBattleScore` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '帮会战日积分',
   `battleRanking` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '上周帮会战排名', 
   `qqOpenid` varchar(36) DEFAULT NULL,
+  `xianyun` int(10) unsigned NOT NULL DEFAULT '0',
+  `gongxian` int(10) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;

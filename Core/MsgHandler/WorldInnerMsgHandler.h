@@ -31,6 +31,7 @@
 #include "GObject/SingleHeroStage.h"
 #include "GObject/SHSYTmpl.h"
 #include "GObject/DaysRank.h"
+#include "GObject/ClanBoss.h"
 
 void OnPushTimerEvent( GameMsgHdr& hdr, const void * data )
 {
@@ -1467,5 +1468,14 @@ void OnSaleItemCancle( GameMsgHdr& hdr, const void * data )
         GObject::gSaleMgr.cancelSale(player, saleCancelNotify->ids[i]);
 }
 
+void OnClanBossReq( GameMsgHdr& hdr, const void* data)
+{
+    GObject::ClanBoss::instance().onClanBossReq(hdr, data);
+}
+void OnAttackClanBoss(GameMsgHdr& hdr, const void* data)
+{
+    MSG_QUERY_PLAYER(player);
+    GObject::ClanBoss::instance().attack(player);
+}
 
 #endif // _WORLDINNERMSGHANDLER_H_

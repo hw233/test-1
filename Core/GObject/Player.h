@@ -8,6 +8,7 @@
 #include "GVar.h"
 #include "GData/LootTable.h"
 #include "GData/AttrExtra.h"
+#include "GObject/AttrFactor.h"
 
 #include "Common/AtomicVal.h"
 #include "Common/Stream.h"
@@ -129,6 +130,7 @@ namespace GObject
 #define PLAYER_BUFF_ATHL9           0x59
 #define PLAYER_BUFF_QI_TIAN_CHU_MO  0x5B   //齐天除魔
 #define PLAYER_BUFF_EXPDOUBLE       0x5C    //回流服务器 经验双倍
+#define PLAYER_BUFF_CLANBOSS_CD     0x5D
 
 #define PLAYER_BUFF_DISPLAY_MAX		0x5F
 #define PLAYER_BUFF_COUNT			0x5F
@@ -527,6 +529,7 @@ namespace GObject
             lastTjTotalScore = 0;
             isHHBlue = false;
             isHHYellow = false;
+            lastGongxian = 0;
         }
 
 
@@ -610,6 +613,7 @@ namespace GObject
         int   tjExp1[3];         //经验  
         int   lastTjEventScore;      //天劫事件积分
         int   lastTjTotalScore;      //天劫活动积分
+        int   lastGongxian;      //末日之战贡献
 
         bool isHHBlue;
         bool isHHYellow;
@@ -770,6 +774,8 @@ namespace GObject
 
 		void checkLastBattled();
         void addLastTjScore();
+        void addLastGongxian();
+        void pendLastGongxian(int num);
 		void checkHPLoss();
 		void checkDeath();
 
@@ -1036,12 +1042,20 @@ namespace GObject
     private:
         GData::AttrExtra _hiattr;
         bool _hiattrFlag;
+        GObject::AttrFactor _hiaf;
+        bool _hiafFlag;
     public:
         inline void setHiAttrFlag(bool v) { _hiattrFlag = v; }
         inline bool hasHiAttrFlag() { return _hiattrFlag; }
         void addHIAttr(const GData::AttrExtra&);
         void clearHIAttr();
         inline const GData::AttrExtra* getHIAttr() const { return &_hiattr; }
+
+        inline void setHiAfFlag(bool v) { _hiafFlag = v; }
+        inline bool hasHiAfFlag() { return _hiafFlag; }
+        void setHIAf(const GObject::AttrFactor&);
+        void clearHIAf();
+        inline const GObject::AttrFactor* getHIAf() const { return &_hiaf; }
 
 		void pendTael(UInt32);
 		void pendCoupon(UInt32);

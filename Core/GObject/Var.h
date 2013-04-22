@@ -411,6 +411,8 @@ namespace GObject
         VAR_CARD_4 = 456,
         VAR_CARD_5 = 457,
 
+        VAR_CLANBOSS_GONGXIAN= 460, //末日之战贡献
+
         //繁体版占用470-499
 
         VAR_MAX,
@@ -775,6 +777,8 @@ namespace GObject
             REGISTER_VAR(VAR_FOOLBAO_USED, CYCLE_NONE);
             REGISTER_VAR(VAR_HHBAWARD_GOT, CYCLE_DAY);
             REGISTER_VAR(VAR_LAST_HOOK_TYPE, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_CLANBOSS_GONGXIAN, CYCLE_DAY);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

@@ -110,6 +110,7 @@ enum PurchaseType
     FoolsDayAnswerAct           = 99, //愚公移山答题活动
     RP7Treasure                 = 100, //回流服务器聚宝盆
     LuckyStarAct                = 101, //充值幸运星活动
+    ClanBossAct                 = 102, //末日之战
     //繁体私有占150～200
 };
 

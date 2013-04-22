@@ -157,6 +157,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130403_1.sql # must be once 有删除操作
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130408_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar199.sql        #清除强化装备的8次限制
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130422_1.sql   #末日之战帮派增加xianyun和gongxian
 
     #. clearshiyamen.sh
 }

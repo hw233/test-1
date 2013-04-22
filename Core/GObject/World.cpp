@@ -57,6 +57,7 @@
 #include "MsgHandler/Memcached.h"
 #include "RechargeTmpl.h"
 #include "GVar.h"
+#include "ClanBoss.h"
 
 static const UInt32 DAYSRANKTM = 23 * 3600+50*60;
 
@@ -1543,6 +1544,11 @@ void World::DaysRank_Refresh(void*)
 {
 	GObject::DaysRank::instance().process();
 }
+void World::ClanBoss_Refresh(void*)
+{
+	GObject::ClanBoss::instance().refresh();
+}
+
 void World::SendQQGameGift(void*)
 {
     UInt32 now = TimeUtil::Now();
@@ -1861,6 +1867,8 @@ bool World::Init()
 	GObject::Tianjie::instance().Init();
 	AddTimer(5 * 1000, Tianjie_Refresh, static_cast<void*>(NULL));
 	GObject::DaysRank::instance().Init(); 
+    GObject::ClanBoss::instance().init();
+	AddTimer(1000, ClanBoss_Refresh, static_cast<void*>(NULL));
 	//AddTimer(60 * 1000, DaysRank_Refresh, static_cast<void*>(NULL)); //调试用
 
 	GObjectManager::delayLoad();

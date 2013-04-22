@@ -600,6 +600,8 @@ struct DBClan
     UInt32 dailyBattleScore;
     UInt32 battleRanking;
     std::string qqOpenid;
+    UInt32 xianyun;
+    UInt32 gongxian;
 };
 
 struct DBClanRepo
@@ -1814,7 +1816,7 @@ SPECIALDEF(3)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBClan)
-SPECIALDEF(30)
+SPECIALDEF(32)
 (
 	UInt32, id,
 	std::string, name,
@@ -1845,7 +1847,9 @@ SPECIALDEF(30)
     UInt32, battleScore,
     UInt32, dailyBattleScore,
     UInt32, battleRanking,
-    std::string, qqOpenid
+    std::string, qqOpenid,
+    UInt32, xianyun,
+    UInt32, gongxian
 )
 SPECIALEND()
 
