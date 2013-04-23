@@ -1042,8 +1042,9 @@ namespace GObject
     private:
         GData::AttrExtra _hiattr;
         bool _hiattrFlag;
-        GObject::AttrFactor _hiaf;
-        bool _hiafFlag;
+        bool _cbHPflag;
+        //GData::AttrExtra _hiaf;
+        //bool _hiafFlag;
     public:
         inline void setHiAttrFlag(bool v) { _hiattrFlag = v; }
         inline bool hasHiAttrFlag() { return _hiattrFlag; }
@@ -1051,12 +1052,14 @@ namespace GObject
         void clearHIAttr();
         inline const GData::AttrExtra* getHIAttr() const { return &_hiattr; }
 
-        inline void setHiAfFlag(bool v) { _hiafFlag = v; }
+        inline void setCBHPFlag(bool b) {_cbHPflag = b;}
+        inline bool getCBHPFlag() {return _cbHPflag;}
+        /*inline void setHiAfFlag(bool v) { _hiafFlag = v; }
         inline bool hasHiAfFlag() { return _hiafFlag; }
-        void setHIAf(const GObject::AttrFactor&);
+        void setHIAf(const GObject::AttrExtra&);
         void clearHIAf();
-        inline const GObject::AttrFactor* getHIAf() const { return &_hiaf; }
-
+        inline const GObject::AttrExtra* getHIAf() const { return &_hiaf; }
+        */
 		void pendTael(UInt32);
 		void pendCoupon(UInt32);
 		void pendCoin(UInt32);

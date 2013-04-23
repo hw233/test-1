@@ -717,8 +717,9 @@ namespace GObject
         memset(cf_posPut, 0, sizeof(cf_posPut));
         memset(cf_itemId, 0, sizeof(cf_itemId));
         memset(cf_ratio, 0 ,sizeof(cf_ratio));
-        _hiattrFlag = false;
-        _hiafFlag = false;
+        //_hiattrFlag = false;
+        //_hiafFlag = false;
+        _cbHPflag = false;
 
         _inQQGroup = false;
 	}
@@ -3316,7 +3317,7 @@ namespace GObject
 	{
 		checkLastBattled();
 		other->checkLastBattled();
-		Battle::BattleSimulator bsim(applyhp ? _playerData.location : scene, this, other);
+		Battle::BattleSimulator bsim(applyhp && scene != Battle::BS_CLANBOSSBATTLE ? _playerData.location : scene, this, other);
 		PutFighters( bsim, 0 );
 		other->PutFighters( bsim, 1 );
 		bsim.start();
@@ -5759,7 +5760,7 @@ namespace GObject
 				fgt->setDirty();
         }
     }
-    void Player::setHIAf(const GObject::AttrFactor& af)
+   /* void Player::setHIAf(const GObject::AttrExtra& af)
     {
         _hiaf = af;
 		for(int i = 0; i < 5; ++ i)
@@ -5780,7 +5781,7 @@ namespace GObject
 				fgt->setDirty();
         }
     }
-
+    */
 	void Player::setLevelAndExp( UInt8 l, UInt64 e )
 	{
 		for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)

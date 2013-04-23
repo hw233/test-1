@@ -218,8 +218,6 @@ void ClanBoss::refresh()
         {
             ++it;
             pickComplete(pl, NULL, true);
-
-            //printf("-------------refresh:pick:%d\n", pl->getId());
         }
         else
             ++it;
@@ -238,7 +236,6 @@ void ClanBoss::refresh()
                 {
                     ++iter;
                     EmpowerComplete(pl, i, NULL, true);
-                    //printf("-------------refresh:Empower:%d\n", pl->getId());
                 }
                 else
                     ++iter;
@@ -452,14 +449,13 @@ void ClanBoss::sendClanPickerStream(Player* pl, UInt64 clanId)
     Clan* cl = globalClans[clanId];
     if (NULL != cl)
     {
+       Stream st(REP::CLANBOSS);
+       st << static_cast<UInt8>(5);
+ 
         UInt32 now = TimeUtil::Now();
         map<Clan*, set<Player*> >::iterator it = _membersClan[2].find(cl);
         if (it != _membersClan[2].end())
         {
- 
-            Stream st(REP::CLANBOSS);
-            st << static_cast<UInt8>(5);
-            
             UInt8 count = it->second.size();
             st << count;
             for (set<Player*>::iterator iter=it->second.begin(); iter!=it->second.end(); ++iter)
@@ -475,9 +471,11 @@ void ClanBoss::sendClanPickerStream(Player* pl, UInt64 clanId)
                 else
                     st << static_cast<UInt8>(0);
             }
-            st << Stream::eos;
-            pl->send(st);
         }
+        else
+            st << static_cast<UInt8>(0);
+        st << Stream::eos;
+        pl->send(st);
     }
 }
 void ClanBoss::sendEmpowerStream(Player* pl, UInt8 t)
@@ -499,7 +497,6 @@ void ClanBoss::sendEmpowerStream(Player* pl, UInt8 t)
     st << Stream::eos;
     if (NULL != pl)
         pl->send(st);
-    //printf("-----------------------t:%d, emPlayers:%d, clanCount:%d\n", t, _emPlayers[t], clanCount);
 }
 void ClanBoss::sendClanEmpowerStream(Player* pl, UInt8 t, UInt64 clanId)
 {
@@ -722,8 +719,6 @@ void ClanBoss::addBoss()
 
         _ng = it->second;
         std::vector<GData::NpcFData>& nflist = _ng->getList();
-     //   broadBossAppear(s_tjBoss[m_bossIndex][1], m_loc);
-     //   SYSMSG_BROADCASTV(553, s_tjBoss[m_bossIndex][1]);
 
         Int32 extatk = 0;
         Int32 extmagatk = 0;
@@ -766,61 +761,53 @@ void ClanBoss::caclPlayerBuff(Player* pl, bool isAttackBoss)
     if (NULL == cl)
         return;
     UInt32 now = TimeUtil::Now();
-    AttrFactor af;
-    af.strength=af.physique=af.agility=af.intelligence=af.will=af.soul=af.aura=af.auraMax=af.attack=af.magatk=af.defend=af.magdef=af.hp=af.tough=af.action=af.hitrate=af.evade=af.critical=af.criticaldmg=af.pierce=af.counter=af.magres=1;
+    GData::AttrExtra af;
+//    af.strength=af.physique=af.agility=af.intelligence=af.will=af.soul=af.aura=af.auraMax=af.attack=af.magatk=af.defend=af.magdef=af.hp=af.tough=af.action=af.hitrate=af.evade=af.critical=af.criticaldmg=af.pierce=af.counter=af.magres=1;
     //鼓舞buff
-    af.hp = 1+0.01*cl->getUrge(0);
-    af.attack = 1+0.01*cl->getUrge(1);
-    af.magatk = 1+0.01*cl->getUrge(1);
-    af.action = 1+0.01*cl->getUrge(2);
+    af.hpP = 0.01*cl->getUrge(0);
+    af.attackP = 0.01*cl->getUrge(1);
+    af.magatkP = 0.01*cl->getUrge(1);
+    af.actionP = 0.01*cl->getUrge(2);
     //战斗指挥
     ClanSkills* skills = getClanSkills(cl);
     if (NULL != skills)
     {
         if (skills->buffEffect[2] > now)
         {
-            af.attack *= 1.5;
-            af.magatk *= 1.5;
+            af.attackP += 0.5;
+            af.magatkP += 0.5;
         }
         if (skills->buffEffect[4] > now && isAttackBoss && 2 == m_bossStatus)
         {
-            af.attack *= 3;
-            af.magatk *= 3;
-        }
-    }
-    //深渊之力
-    if (1 == m_bossStatus)
-    {
-        if (m_powerType == 2 && isAttackBoss)
-        {
-            af.attack *= 0.5;
-            af.magatk *= 0.5;
-        }
-        if (m_powerType == 3)
-        {
-            af.hp *= 0.1;
-        }
-        if (m_powerType == 1)
-        {
-            af.attack *= 2;
-            af.magatk *= 2;
+            af.attackP += 2;
+            af.magatkP += 2;
         }
     }
     //狂暴
     if (!isAttackBoss && isCrazy(pl))
     {
-        af.attack *= 2;
-        af.magatk *= 2;
+        af.attackP += 1;
+        af.magatkP += 1;
     }
     //深渊劫阵
-    af.attack *= (100-_minutes);
-    af.magatk *= (100-_minutes);
-    af.attack /= 100;
-    af.magatk /= 100;
+    af.attackP -= (float)(_minutes)/100;
+    af.magatkP -= (float)(_minutes)/100;
+     //深渊之力
+    if (1 == m_bossStatus)
+    {
+        if (m_powerType == 2 && isAttackBoss)
+        {
+            af.attackP -= (0.5+af.attackP/2);
+            af.magatkP -= (0.5+af.magatkP/2);
+        }
+        if (m_powerType == 3)
+        {
+            pl->setCBHPFlag(true);
+        }
+    }
     
-    pl->setHiAfFlag(true);
-    pl->setHIAf(af);
-    printf("-----------------------hp:%f, attack: %f, powerType:%d\n",af.hp, af.attack, m_powerType);
+    pl->setHiAttrFlag(true);
+    pl->addHIAttr(af);
 }
 bool ClanBoss::attack(Player* pl)
 {
@@ -853,7 +840,7 @@ bool ClanBoss::attack(Player* pl)
         return false;
 
     _ng = it->second;
-    Battle::BattleSimulator bsim(Battle::BS_WBOSS, pl, _ng->getName(), _ng->getLevel(), false);
+    Battle::BattleSimulator bsim(Battle::BS_CLANBOSSBATTLE, pl, _ng->getName(), _ng->getLevel(), false);
     pl->PutFighters(bsim, 0);
     _ng->putFighters(bsim);
 
@@ -907,6 +894,10 @@ bool ClanBoss::attack(Player* pl)
     caclPlayerBuff(pl, true);
 
     bsim.start();
+    pl->setHiAttrFlag(false);
+    pl->clearHIAttr();
+    pl->setCBHPFlag(false);
+
     Stream& packet = bsim.getPacket();
     if(packet.size() <= 8)
         return false;
@@ -925,7 +916,6 @@ bool ClanBoss::attack(Player* pl)
 //        if(*thisHp != 0xFFFFFFFF && *thisHp != nHP)
         if (*thisHp != nHP)
             *thisHp = nHP;
-        printf("---------------oldhp:%d, newhp:%d, hp:%d\n", oldHP, nHP, oldHP-nHP);
        // if(oldHP != 0xFFFFFFFF)
         {
         //    if(oldHP == 0)
@@ -945,7 +935,6 @@ bool ClanBoss::attack(Player* pl)
                 else
                     gx = ((float)damage / maxHp) * g_bossGongxian;
                 addGongXian(pl,pl->getClan(), gx, true);
-               // printf("---------------attack, %d/%d, gx:%d\n", damage, maxHp, gx);
 
                /* AttackInfo info(pl, damage);
                 AtkInfoType::iterator i = m_atkinfo.begin();
@@ -978,7 +967,6 @@ bool ClanBoss::attack(Player* pl)
                 }
                 if (!cfg.GMCheck || !(sendflag % 8))
                     notify();
-                //printf("-----------------thisPercent:%d, oldPercent:%d\n", *thisPercent, oldPercent);
                 if (m_bossStatus == 2 && oldPercent<100 && *thisPercent/10 < oldPercent/10)
                 {
                     SYSMSGV(str, 4205, *thisPercent);
@@ -1024,9 +1012,6 @@ bool ClanBoss::attack(Player* pl)
     st << Stream::eos;
     pl->send(st);
     bsim.applyFighterHP(0, pl);
-
-    pl->setHiAfFlag(false);
-    pl->clearHIAf();
 
     return res;
 
@@ -1098,14 +1083,21 @@ void ClanBoss::pickXianyun(Player* pl, UInt64 other)
                 notFound = false;
                 caclPlayerBuff(pl);
                 caclPlayerBuff(plOther);
-                bool res = pl->challenge(plOther);
+                bool res = pl->challenge(plOther,NULL,NULL,true,0,false,Battle::BS_CLANBOSSBATTLE,0x01);
+                pl->setHiAttrFlag(false);
+                pl->clearHIAttr();
+                pl->setCBHPFlag(false);
+                plOther->setHiAttrFlag(false);
+                plOther->clearHIAttr();
+                plOther->setCBHPFlag(false);
                 if (res)
                     pickComplete(plOther, pl, false, false);  
                 else  //进入狂暴
                 {
                     crazy = toBeCrazy(pl);
                     _playerStatus[pl] = 3; 
-                    pl->setBuffData(PLAYER_BUFF_CLANBOSS_CD, now+g_buffTime);
+                    if (!crazy)
+                        pl->setBuffData(PLAYER_BUFF_CLANBOSS_CD, now+g_buffTime);
                     membersAction(cl, pl, false, 0);
                     membersAction(cl, pl, true, 3);
                     broadClanStatus(cl);
@@ -1149,8 +1141,8 @@ void ClanBoss::pickXianyun(Player* pl, UInt64 other)
     sendPickStream(pl);
     broadClanStatus(cl);
     sendMyStatus(pl);
-
-    //printf("-------------pickXianyun:%d\n", pl->getId());
+    SYSMSGV(str, 4231, pl->getName().c_str());
+    sendClanBossMsg(str,NULL, cl);
 }
 void ClanBoss::pickComplete(Player* pl, Player* other, bool timeFinish, bool stopBySelf)
 {
@@ -1196,6 +1188,8 @@ void ClanBoss::pickComplete(Player* pl, Player* other, bool timeFinish, bool sto
             pl->setBuffData(PLAYER_BUFF_CLANBOSS_CD, TimeUtil::Now());
         else
             pl->setBuffData(PLAYER_BUFF_CLANBOSS_CD, TimeUtil::Now()+g_buffTime);
+        SYSMSGV(str, 4235, pl->getName().c_str(), other->getClan()->getName().c_str());
+        sendClanBossMsg(str,NULL, cl);
     }
     cl->addXianyun(num);
     SYSMSG_SENDV(175, pl, g_usedXianyun);
@@ -1215,9 +1209,9 @@ void ClanBoss::pickComplete(Player* pl, Player* other, bool timeFinish, bool sto
     broadClanStatus(cl);
     broadClanInfo(cl, pl);
     sendMyStatus(pl);
-
-//    if (!timeFinish)
-//        printf("-------------pickComplete:%d, num:%d\n", pl->getId(), num);
+    SYSMSGV(str, 4233, pl->getName().c_str(), num);
+    sendClanBossMsg(str,NULL, cl);
+ 
 }
 
 void ClanBoss::Empowerment(Player* pl, UInt8 t, UInt64 other)
@@ -1260,10 +1254,7 @@ void ClanBoss::Empowerment(Player* pl, UInt8 t, UInt64 other)
         pl->sendMsgCode(0, 1124);
         return;
     }
-    cl->addXianyun(-1*g_usedXianyun);
-    SYSMSG_SENDV(177, pl, g_usedXianyun);
-    SYSMSG_SENDV(178, pl, g_usedXianyun);
- 
+
     bool crazy = false;
     if (0 != other)
     {
@@ -1286,14 +1277,27 @@ void ClanBoss::Empowerment(Player* pl, UInt8 t, UInt64 other)
                     notFount = false;
                     caclPlayerBuff(pl);
                     caclPlayerBuff(plOther);
-                    bool res = pl->challenge(plOther);
+                    bool res = pl->challenge(plOther,NULL,NULL,true,0,false,Battle::BS_CLANBOSSBATTLE,0x01);
+                    pl->setHiAttrFlag(false);
+                    pl->clearHIAttr();
+                    pl->setCBHPFlag(false);
+                    plOther->setHiAttrFlag(false);
+                    plOther->clearHIAttr();
+                    plOther->setCBHPFlag(false);
                     if (res)
+                    {
+                        cl->addXianyun(-1*g_usedXianyun);
+                        SYSMSG_SENDV(177, pl, g_usedXianyun);
+                        SYSMSG_SENDV(178, pl, g_usedXianyun);
+ 
                         EmpowerComplete(plOther, t, pl, false, false);  
+                    }
                     else  //进入狂暴
                     {
                         crazy = toBeCrazy(pl);
                         _playerStatus[pl] = 3;
-                        pl->setBuffData(PLAYER_BUFF_CLANBOSS_CD, now+g_buffTime);
+                        if (!crazy)
+                            pl->setBuffData(PLAYER_BUFF_CLANBOSS_CD, now+g_buffTime);
                         membersAction(cl, pl, false, 0);
                         membersAction(cl, pl, true, 3);
                         broadClanStatus(cl);
@@ -1311,6 +1315,10 @@ void ClanBoss::Empowerment(Player* pl, UInt8 t, UInt64 other)
     }
     else
     {
+        cl->addXianyun(-1*g_usedXianyun);
+        SYSMSG_SENDV(177, pl, g_usedXianyun);
+        SYSMSG_SENDV(178, pl, g_usedXianyun);
+ 
         if (isCrazy(pl))
         {
             pl->sendMsgCode(0, 1121);
@@ -1336,6 +1344,10 @@ void ClanBoss::Empowerment(Player* pl, UInt8 t, UInt64 other)
     broadClanStatus(cl);
     broadClanInfo(cl);
     sendMyStatus(pl);
+
+    SYSMSGV(str, 4230, pl->getName().c_str(),t+1);
+    sendClanBossMsg(str,NULL, cl);
+ 
     return;
 }
 void ClanBoss::EmpowerComplete(Player* pl, UInt8 t, Player* other, bool timeFinish, bool stopBySelf)
@@ -1394,6 +1406,9 @@ void ClanBoss::EmpowerComplete(Player* pl, UInt8 t, Player* other, bool timeFini
         {
             pl->setBuffData(PLAYER_BUFF_CLANBOSS_CD, TimeUtil::Now()+g_buffTime);
         }
+
+        SYSMSGV(str, 4234, pl->getName().c_str(), other->getClan()->getName().c_str());
+        sendClanBossMsg(str,NULL, cl);
     }
  
     addGongXian(pl, cl, gongxian);
@@ -1426,6 +1441,9 @@ void ClanBoss::EmpowerComplete(Player* pl, UInt8 t, Player* other, bool timeFini
         EmpowerRelease(pl, (t+1));
     }
     sendEmpowerPercentStream(NULL);
+    SYSMSGV(str, 4232, pl->getName().c_str(),t+1);
+    sendClanBossMsg(str,NULL, cl);
+ 
     return;
 }
 void ClanBoss::addGongXian(Player* pl, Clan* cl, UInt32 num, bool pend)
@@ -1550,7 +1568,7 @@ void ClanBoss::Change2PowerStatus()
 {
     _statusChanged = true;
     m_power = m_maxPower;
-    m_powerType = uRand(6);
+    m_powerType = uRand(6)+1;
     _powerPercent = 100;
     m_bossStatus = 1;
 
@@ -1625,7 +1643,8 @@ void ClanBoss::UseClanSkill(Player* pl, UInt8 t)
     if (NULL == cl || t >= 5)
         return;
     UInt8 res = 0;
-    if (pl != getLeader(cl))
+    //if (pl != getLeader(cl))
+    if (!cl->hasClanAuthority(pl, 2))
         res = 1;
     else
     {

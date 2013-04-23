@@ -32,6 +32,8 @@ namespace Battle
         BS_ATHLETICS1 = 0xFD01,
         // 新阵营(蜀山论剑)
         BS_NEWCOUNTRYBATTLE = 0xFD02,
+        //末日之战
+        BS_CLANBOSSBATTLE = 0xFD03,
         // 世界BOSS
         BS_WBOSS = 0xFC01
     };

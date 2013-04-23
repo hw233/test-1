@@ -588,6 +588,7 @@ void BattleFighter::updateAllAttr()
 	{
 		_hp = getMaxHP();
 	}
+
 }
 
 void BattleFighter::setAttrExtra(UInt8 klass, UInt8 career, UInt8 level)
@@ -658,6 +659,19 @@ void BattleFighter::updateBuffExtras()
         if (ae)
             addAttrExtra(_attrExtra, ae);
     }
+/*    if(_fighter && _fighter->getOwner() && _fighter->getOwner()->hasHiAfFlag())
+    {
+        const GObject::AttrExtra* af = _fighter->getOwner()->getHIAf();
+        if (af)
+        {
+            _attrExtra.attackP += af->attackP;
+            _attrExtra.magatkP += af->magatkP;
+            if (af->hp > 0)
+                _attrExtra.hpP += af->hpP;
+            _attrExtra.actionP += af->actionP;
+        }
+    }
+*/
     if(ext > 0)
 	{
 		float extAttr = 0.05f * ext;
@@ -1004,19 +1018,10 @@ void BattleFighter::initStats(bool checkEnh)
 		updateAllAttr();
 		if(_hp == 0)
 			_hp = _maxhp;
-
-        //末日之战的buff
-        if(_fighter && _fighter->getOwner() && _fighter->getOwner()->hasHiAfFlag())
+ 
+        if(_fighter && _fighter->getOwner() && _fighter->getOwner()->getCBHPFlag())
         {
-            const GObject::AttrFactor* af = _fighter->getOwner()->getHIAf();
-            if (af)
-            {
-                _attack *= af->attack;
-                _magatk *= af->magatk;
-                if (af->hp > 1.0)
-                    _maxhp *= af->hp;
-                _hp *= af->hp;
-            }
+            _hp *= 0.1;
         }
 	}
 }
