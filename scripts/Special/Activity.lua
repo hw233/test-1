@@ -8077,8 +8077,9 @@ function onGetNewYearGiveGiftAward(player, index, times)
 end
 
 
-function checkAnswerInFoolsDay(qid, answer)
+function getAnswerInFoolsDay(qid, answer)
     local answers = {
+        --[[
         ["0330"] = { 65, 65, 65, 66, 65, 67, 66, 65, 65, 68,
                      65, 66, 68, 68, 67, 65, 66, 68, 68, 68,
                      66, 65, 65, 65, 67, 67, 68, 67, 68, 65,
@@ -8091,25 +8092,40 @@ function checkAnswerInFoolsDay(qid, answer)
                      65, 68, 65, 68, 66, 66, 67, 67, 67, 66,
                      68, 68, 65, 68, 65, 66, 67, 67, 65, 65,
         },
+        --]]
+        ["0429"] = { 65, 65, 66, 65, 67, 67, 68, 67, 65, 65,
+                     66, 66, 66, 68, 66, 65, 65, 65, 65, 66,
+                     66, 65, 66, 67, 67, 67, 67, 68, 68, 66,
+        },
+        ["0430"] = { 66, 68, 68, 66, 65, 67, 65, 65, 66, 67,
+                     67, 66, 68, 68, 65, 65, 65, 65, 65, 66,
+                     66, 66, 67, 68, 68, 68, 68, 65, 68, 68,
+        },
+        ["0501"] = { 68, 65, 65, 65, 67, 67, 66, 67, 68, 67,
+                     67, 66, 65, 66, 65, 65, 65, 65, 65, 67,
+                     67, 67, 67, 68, 68, 68, 68, 65, 68, 66,
+        },
     }
-    if nil == qid or nil == answer then
-        return false
+    if nil == qid then
+        return 0
     end
     local date = os.date("%m%d", os.time())
     if nil == answers[date] or nil == answers[date][qid] then
-        return false
+        return 0
     end
-    if answers[date][qid] ~= answer then
-        return false
-    end
-    return true
+    return answers[date][qid]
 end
 
 function getAwardInFoolsDay(player, idx)
     local items = {
+        --[[
         ["0330"] = { {56, 1}, {516, 1}, {503, 1}, {1325, 1}, {134, 1}, {515, 1} },
         ["0331"] = { {508, 1}, {516, 1}, {503, 1}, {1325, 1}, {134, 1}, {515, 1} },
         ["0401"] = { {506, 1}, {516, 1}, {503, 1}, {9338, 1}, {509, 1}, {515, 1} },
+        --]]
+        ["0429"] = { {500, 1}, {516, 1}, {503, 1}, {1325, 1}, {515, 1}, {507, 2} },
+        ["0430"] = { {508, 1}, {501, 1}, {503, 1}, {1325, 1}, {134, 1}, {515, 2} },
+        ["0501"] = { {506, 1}, {547, 1}, {503, 1}, {9338, 1}, {515, 1}, {509, 2} },
     }
     if nil == player or nil == idx then
         return
@@ -8193,6 +8209,6 @@ function GetLuckyBagAward(player)
         player:GetPackage():Add(item[1],item[2],true,false,32);
     end
     player:sendLuckyBagInfo();
-        Broadcast(0x27, "恭喜玩家[p:"..player:getCountry()..":"..player:getPName().."]".."在\"峨眉天下秀\"活动中人品爆发，集齐所有卡牌，成功领取超级大奖")
+    Broadcast(0x27, "恭喜玩家[p:"..player:getCountry()..":"..player:getPName().."]".."在\"峨眉天下秀\"活动中人品爆发，集齐所有卡牌，成功领取超级大奖")
     return true
 end

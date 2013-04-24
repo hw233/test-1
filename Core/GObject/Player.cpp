@@ -17100,14 +17100,17 @@ void Player::sendQQGameGift1218()
 
 void Player::sendFeastLoginAct()
 {
-    if(GetLev() < 40 || GetVar(VAR_FEAST_LOGIN) > 0 || !World::getFeastLoginAct())
+    if(GetLev() < 40 || GetVar(VAR_FEAST_LOGIN) > 0 || !World::getMayDayLoginAct()) /*!World::getFeastLoginAct()*/
         return;
-    SYSMSGV(title, 4102);
-    SYSMSGV(content, 4103);
+    //SYSMSGV(title, 4102);
+    //SYSMSGV(content, 4103);
+    SYSMSGV(title, 4098);
+    SYSMSGV(content, 4099);
     Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
     if(mail)
     {
-        MailPackage::MailItem mitem = {1759,1};
+        //MailPackage::MailItem mitem = {1759,1};
+        MailPackage::MailItem mitem = {1763,1};
         mailPackageManager.push(mail->id, &mitem, 1, true);
     }
     SetVar(VAR_FEAST_LOGIN, 1);
@@ -19477,7 +19480,7 @@ bool Player::in7DayFromCreated()
 #define CLR_BIT_8(X,Y)   (X & ~(0xFF<<(Y*8)))
 #define SET_BIT_8(X,Y,V) (CLR_BIT_8(X,Y) | V<<(Y*8))
 #define GET_BIT_8(X,Y)   ((X >> (Y*8)) & 0xFF)
-void Player::sendFoolsDayInfo()
+void Player::sendFoolsDayInfo(UInt8 answer)
 {
     UInt32 info = GetVar(VAR_FOOLS_DAY_INFO);
     UInt32 value = GetVar(VAR_FOOLS_DAY);
@@ -19532,6 +19535,7 @@ void Player::sendFoolsDayInfo()
     st << right << static_cast<UInt8>(GET_BIT_8(value, 1));
     st << static_cast<UInt8>(GET_BIT_8(value, 2));
     st << static_cast<UInt8>(isFail ? 1 : 0) << qid << qtime;
+    st << answer;
     st << Stream::eos;
     send(st);
 }
@@ -19555,7 +19559,10 @@ void Player::submitAnswerInFoolsDay(UInt8 id, char answer)
     if(id != qid || qtime + 15 < TimeUtil::Now())
         isRight = false;
     if(isRight)
-        isRight = GameAction()->checkAnswerInFoolsDay(id, answer);
+    {
+        UInt8 ans = GameAction()->getAnswerInFoolsDay(id);
+        isRight = ans == answer;
+    }
     value = CLR_BIT_8(value, 3);    //清除离线标志
     if(isRight) //答对
     {
@@ -19612,9 +19619,11 @@ void Player::buyResurrectionCard()
     UInt32 value = GetVar(VAR_FOOLS_DAY);
     if(GET_BIT_8(value, 1))
         return;
-    if(GET_BIT_8(value, 0) == 0)
+    UInt8 qid = GET_BIT_8(value, 0);
+    if(qid == 0)
         return;
     UInt8 cnt = GET_BIT_8(value, 2) + 1;
+    cnt = cnt > 5 ? 5 : cnt;
     if(cnt * 10 > getGold())
     {
         sendMsgCode(0, 1104);
@@ -19624,12 +19633,17 @@ void Player::buyResurrectionCard()
     useGold(cnt*10, &ci);
 
     UInt32 info = GetVar(VAR_FOOLS_DAY_INFO);
-    info = SET_BIT(info, GET_BIT_8(value, 0));
+    //info = SET_BIT(info, GET_BIT_8(value, 0));
     SetVar(VAR_FOOLS_DAY_INFO, CLR_BIT(info, 0));
     value = SET_BIT_8(value, 2, cnt);
-    value = CLR_BIT_8(value, 3);    //清除离线标志
-    SetVar(VAR_FOOLS_DAY, CLR_BIT_8(value, 0));
-    sendFoolsDayInfo();
+    //value = CLR_BIT_8(value, 3);    //清除离线标志
+    //SetVar(VAR_FOOLS_DAY, CLR_BIT_8(value, 0));
+    value = SET_BIT_8(value, 3, 1);    //类似有离线标志
+    SetVar(VAR_FOOLS_DAY, value);
+    UInt8 answer = GameAction()->getAnswerInFoolsDay(qid);
+    sendFoolsDayInfo(answer);
+    if(cnt == 1)
+        foolsDayUdpLog(8);
 }
 
 void Player::setLogoutInFoolsDay()
@@ -19681,8 +19695,9 @@ void Player::foolsDayUdpLog(UInt8 type)
 {
     // 愚公移山相关日志
     char action[16] = "";
-    snprintf (action, 16, "F_10000_0327_%d", type);
-    udpLog("FoolsDay", action, "", "", "", "", "act");
+    //snprintf (action, 16, "F_10000_0327_%d", type);
+    snprintf (action, 16, "F_10000_0418_%d", type);
+    udpLog("huodong", action, "", "", "", "", "act");
 }
 
 //充值幸运星活动

@@ -90,7 +90,7 @@ namespace GObject
         VAR_GOLD_TOKEN = 55, //金代币 先天灵石
         VAR_TAEL_TOKEN = 56, //银代币 盘古灵石
         VAR_COIN_TOKEN = 57, //铜代币 轩辕灵石
-        VAR_FOOLS_DAY = 58, //愚人节礼包是否领取  愚公移山(byte0失败题目id,byte1领取奖励的题目数,byte2购买复活卡次数)
+        VAR_FOOLS_DAY = 58, //愚人节礼包是否领取  愚公移山(byte0失败题目id,byte1领取奖励的题目数,byte2购买复活卡次数,byte3玩家离线标志)
         VAR_CBWHITEPACK = 59, //阵营战白色情人节礼包
 
         VAR_ATYITEM_1 = 60, //活跃度星期一奖励
