@@ -11007,6 +11007,7 @@ UInt32 BattleSimulator::doPetEnter(UInt8 side)
     _activeFgt = bf;
     appendReiatsuChange(side);
     appendInitDefStatus(bf);
+    appendDefStatus(e_petAppear, bf->getId(), bf);
     insertFighterStatus(bf);
     _backupObjs[side] = NULL;
 
@@ -11387,7 +11388,6 @@ void BattleSimulator::appendInitDefStatus(BattleFighter* bf)
     appendStatusChange(e_stAtkReduceInit, value, 0, bf);
     value = bf->getMagAtkReduce();
     appendStatusChange(e_stMagAtkReduce, value, 0, bf);
-    appendDefStatus(e_petAppear, bf->getId(), bf);
 }
 
 }
