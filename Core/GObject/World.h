@@ -394,6 +394,10 @@ public:
     { _newYearQzoneContinueAct= v; }
     inline static bool getNewYearQzoneContinueAct()
     { return _newYearQzoneContinueAct; }
+    inline static void setMayDayLoginAct(bool v)
+    { _maydayloginAct= v; }
+    inline static bool getMayDayLoginAct()
+    { return _maydayloginAct; }
 
     inline static void setTowerLoginAct(UInt8 v)
     { _towerloginAct= v; }
@@ -655,19 +659,16 @@ public:
     
     inline static void setSurnameLegend(bool v)
     {
-        /*
         UInt32 begin = GVAR.GetVar(GVAR_SURNAMELEGEND_BEGIN);
         UInt32 end = GVAR.GetVar(GVAR_SURNAMELEGEND_END);
         UInt32 now = TimeUtil::Now();
         if( now >= begin && now <= end)
             return;
-        */
         _surnamelegend = v;
     }
    
     inline static bool getSurnameLegend(UInt32 time = 0)
     {
-        /*
         UInt32 begin = GVAR.GetVar(GVAR_SURNAMELEGEND_BEGIN);
         UInt32 end = GVAR.GetVar(GVAR_SURNAMELEGEND_END);
         UInt32 now = TimeUtil::Now() + time;
@@ -675,7 +676,6 @@ public:
             _surnamelegend = true;
         else
             _surnamelegend = false;
-        */
         return _surnamelegend;
     } 
 
@@ -800,6 +800,7 @@ public:
     static bool _newYearQQGameAct;
     static bool _QZoneQQGameAct;
     static bool _newYearQzoneContinueAct;
+    static bool _maydayloginAct;
     static UInt8 _towerloginAct;
     static bool _guoqing;
     static bool _9215Act;

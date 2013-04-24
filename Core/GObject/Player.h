@@ -2299,7 +2299,7 @@ namespace GObject
 
     public:     //活动相关
         void checkAnswerActInFoolsDay();
-        void sendFoolsDayInfo();
+        void sendFoolsDayInfo(UInt8 = 0);
         void submitAnswerInFoolsDay(UInt8, char);
         void getAwardInFoolsDay();
         void buyResurrectionCard();

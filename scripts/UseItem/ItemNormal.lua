@@ -7217,6 +7217,79 @@ function ItemNormal_00010126(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00010127(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (4+(4*num*3)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    package:Add(9371, num*3, true, false, 2);
+    package:Add(509, num*3, true, false, 2);
+    package:Add(507, num*3, true, false, 2);
+    package:Add(134, num*3, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010128(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    local day = 1
+    if 10128 == iid then
+        day = 1
+    elseif 10129 == iid then
+        day = 2
+    elseif 10130 == iid then
+        day = 3
+    elseif 10131 == iid then
+        day = 4
+    end
+    local date = { ['year'] = 2013, ['month'] = 5, ['day'] = day, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+    local start = os.time(date)
+    local doubleend = start + 86400
+
+    local factor = 1
+    local now = os.time()
+    if now >= start then
+        if now < doubleend then
+            factor = 2
+        end
+
+        if package:GetRestPackageSize() < (num*3+(num*3*factor)/99) then
+            player:sendMsgCode(2, 1011, 0);
+            return false;
+        end
+
+        if 10128 == iid then
+            package:AddItem(509, num*1*factor, true, 0, 2);
+            package:AddItem(15, num*1*factor, true, 0, 2);
+            player:getCoupon(num*10*factor)
+        elseif 10129 == iid then
+            package:AddItem(507, num*1*factor, true, 0, 2);
+            package:AddItem(503, num*1*factor, true, 0, 2);
+            player:getCoupon(num*10*factor)
+        elseif 10130 == iid then
+            package:AddItem(134, num*1*factor, true, 0, 2);
+            package:AddItem(57, num*1*factor, true, 0, 2);
+            package:AddItem(15, num*1*factor, true, 0, 2);
+        elseif 10131 == iid then
+            package:AddItem(515, num*1*factor, true, 0, 2);
+            package:AddItem(511, num*2*factor, true, 0, 2);
+            package:AddItem(56, num*1*factor, true, 0, 2);
+        end
+
+        package:DelItemSendMsg(iid, player);
+        return num
+    else
+        SendMsg(player, 0x35, msg_59);
+    end
+    return false
+end
+
 function ItemNormal_QixiLoveCard(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -10112,6 +10185,11 @@ local ItemNormal_Table = {
     [10124] = ItemNormal_00010124,
     [10125] = ItemNormal_00010125,
     [10126] = ItemNormal_00010126,
+    [10127] = ItemNormal_00010127,
+    [10128] = ItemNormal_00010128,
+    [10129] = ItemNormal_00010128,
+    [10130] = ItemNormal_00010128,
+    [10131] = ItemNormal_00010128,
 };
 
 function ItemNormalOther_00000441(iid, num, bind, other)

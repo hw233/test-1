@@ -161,6 +161,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar199.sql        #清除强化装备的8次限制
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130422_1.sql   #末日之战帮派增加xianyun和gongxian
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130419_1.sql   #清除3366蓝砖礼包购买次数
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130429_1.sql   #清除节日套装人人拿(var294)
 
     #. clearshiyamen.sh
 }

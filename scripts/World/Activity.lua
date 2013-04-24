@@ -1027,6 +1027,13 @@ function onActivityCheck(tm)
       else
           setQZoneQQGameAct(false)
       end
+
+      if tm >= actTime245_0 and tm < actTime245_1 then
+          setMayDayLoginAct(true)
+      else
+          setMayDayLoginAct(false)
+      end
+
       if tm >= actTime2013_03_15 and tm < (actTime2013_03_15+86400) then
           setPetEggAct(true)
       elseif tm >= (actTime2013_03_15+8*86400) and tm < (actTime2013_03_15+9*86400) then
@@ -1125,7 +1132,7 @@ function initActTime(y, m, d)
   -- 充值返利（3/23-3/31）
   local  SerStartTm13= { ['year'] = 2012, ['month'] = 3, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 愚人节活动（2012 3/29-4/1,2013 3/30-4/1）
-  local  SerStartTm14= { ['year'] = 2013, ['month'] = 3, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm14= { ['year'] = 2013, ['month'] = 4, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 清明节
   local  SerStartTm15= { ['year'] = 2013, ['month'] = 4, ['day'] = 4, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm16= { ['year'] = 2012, ['month'] = 4, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1354,6 +1361,8 @@ function initActTime(y, m, d)
   local  SerStartTm243 = { ['year'] = 2013, ['month'] = 3, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --空间黄钻、大厅蓝钻礼包
   local  SerStartTm244 = { ['year'] = 2013, ['month'] = 3, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 五一活动(节日套装)
+  local  SerStartTm245 = { ['year'] = 2013, ['month'] = 4, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm2013_04_14 = { ['year'] = 2013, ['month'] = 4, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
@@ -1769,6 +1778,9 @@ function initActTime(y, m, d)
 
   actTime244_0= os.time(SerStartTm244);
   actTime244_1= os.time(SerStartTm244) + 7 * 86400;
+
+  actTime245_0= os.time(SerStartTm245)
+  actTime245_1= os.time(SerStartTm245) + 7*86400;
 
   actTime2013_01_29= os.time(SerStartTm2013_01_29);
   actTime2013_02_01= os.time(SerStartTm2013_02_01);
