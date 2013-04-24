@@ -2750,6 +2750,13 @@ UInt8 SwitchAutoForbid(UInt32 val)
     return 0;
 }
 
+inline bool player_enum_2(GObject::Player* pl, int value)
+{
+    pl->SetVar(GObject::VAR_DRAGONKING_STEP, value);
+    pl->SetVar(GObject::VAR_DRAGONKING_STEP4_COUNT, value);
+    return true;
+}
+
 void GMCmd(LoginMsgHdr& hdr, const void* data)
 {
     // 接受后台传来的GM指令，返回0表示操作成功，非0为操作失败
@@ -2774,11 +2781,13 @@ void GMCmd(LoginMsgHdr& hdr, const void* data)
                 UInt32 endTime = 0;
                 UInt32 flag = 0;
                 br >> endTime >> flag;
-                //大闹龙宫的flag暂时只为1,2,3,4
-                if(endTime < val || flag > 4)
+                //大闹龙宫的flag暂时只为1,2,3,4,5
+                if(endTime < val || flag >= GObject::DRAGONKING_MAX)
                     result = 1;
                 else
                 {
+                    if(flag != GObject::GVAR.GetVar(GObject::GVAR_DRAGONKING_ACTION))
+	                    GObject::globalPlayers.enumerate(player_enum_2, 0);
                     GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_BEGIN, val);
                     GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_END, endTime);
                     GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_ACTION, flag);

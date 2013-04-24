@@ -17343,9 +17343,12 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
  *2:大闹龙宫之金蛇起舞
  *3:大闹龙宫之天芒神梭
 */
+static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F };
+static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372 };
+//6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页
+static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357 };
 void Player::getDragonKingInfo()
 {
-    UInt8 flag = GVAR.GetVar(GVAR_DRAGONKING_ACTION);
     if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END))
     {
         GVAR.SetVar(GVAR_DRAGONKING_ACTION, 0);
@@ -17353,33 +17356,17 @@ void Player::getDragonKingInfo()
         GVAR.SetVar(GVAR_DRAGONKING_END, 0);
         return;
     }
-    Stream st(REP::ACTIVE);
-    UInt8 step = 0;
-    if(1 == flag)
+    UInt8 flag = GVAR.GetVar(GVAR_DRAGONKING_ACTION);
+    if (flag <= DRAGONKING_CLOSE || flag >= DRAGONKING_MAX)
     {
-        st << static_cast<UInt8>(0x06);
-        step = GetVar(VAR_DRAGONKING_STEP);
-    }
-    else if(2 == flag)
-    {
-        st << static_cast<UInt8>(0x0A);
-        step = GetVar(VAR_DRAGONKINGSNAKE_STEP);
-    }
-    else if(3 == flag)
-    {
-        st << static_cast<UInt8>(0x0B);
-        step = GetVar(VAR_TIANMANG_STEP);
-    }
-    else if(4 == flag)
-    {
-        st << static_cast<UInt8>(0x0D);
-        step = GetVar(VAR_HUNYUAN_STEP);
-    }
-    else
+        sendMsgCode(0, 1090);
         return;
+    }
+    UInt8 step = GetVar(VAR_DRAGONKING_STEP);
     if( step == 0 || step > 5)
         step = 1;
-    st << static_cast<UInt8>(0x01);
+    Stream st(REP::ACTIVE);
+    st << Dragon_type[flag] << static_cast<UInt8>(0x01);
     st << step << Stream::eos;
     send(st);
 }
@@ -17392,7 +17379,7 @@ void Player::postDragonKing(UInt8 count)
         GLOBAL().PushMsg(h, &count);
         return;
     }
-    if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END))
+    if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END) && GVAR.GetVar(GVAR_DRAGONKING_ACTION) != DRAGONKING_CLOSE)
     {
         GVAR.SetVar(GVAR_DRAGONKING_ACTION, 0);
         GVAR.SetVar(GVAR_DRAGONKING_BEGIN, 0);
@@ -17401,35 +17388,12 @@ void Player::postDragonKing(UInt8 count)
     }
     if (count == 0) return;
     UInt8 flag = GVAR.GetVar(GVAR_DRAGONKING_ACTION);
-    UInt32 XBLing = 0; //寻宝令id
-    UInt8 type = 0;
-    UInt8 step = 0;
-    if(1 == flag)
+    if (flag <= DRAGONKING_CLOSE || flag >= DRAGONKING_MAX)
     {
-        XBLing = 9337;
-        type = 0x06;
-        step = GetVar(VAR_DRAGONKING_STEP);
-    }
-    else if(2 == flag)
-    {
-        XBLing = 9354;
-        type = 0x0A;
-        step = GetVar(VAR_DRAGONKINGSNAKE_STEP);
-    }
-    else if(3 == flag)
-    {
-        XBLing = 9358;
-        type = 0x0B;
-        step = GetVar(VAR_TIANMANG_STEP);
-    }
-    else if(4 == flag)
-    {
-        XBLing = 9364;
-        type = 0x0D;
-        step = GetVar(VAR_HUNYUAN_STEP);
-    }
-    else
+        sendMsgCode(0, 1090);
         return;
+    }
+    UInt32 XBLing = Dragon_Ling[flag];
     if (GetPackage()->GetItemAnyNum(XBLing) < count)
         return;
     if (GetPackage()->GetRestPackageSize() < count)
@@ -17439,7 +17403,8 @@ void Player::postDragonKing(UInt8 count)
     }
     GetPackage()->DelItemSendMsg(XBLing, this);
     Stream st(REP::ACTIVE);
-    st << type << static_cast<UInt8>(0x02) << count;
+    st << Dragon_type[flag] << static_cast<UInt8>(0x02) << count;
+    UInt8 step = GetVar(VAR_DRAGONKING_STEP);
     if(step == 0 || step > 5)
         step = 1;
     bool isBind = true;
@@ -17459,21 +17424,13 @@ void Player::postDragonKing(UInt8 count)
             UInt16 itemId = award.get<UInt16>(j);
             st << itemId << award.get<UInt8>(j+1);
             GetPackage()->Add(itemId, award.get<UInt32>(j+1), isBind, true, FromQixi);
-            //6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页
-            if(itemId == 6134 || itemId == 6135 || itemId == 136 || itemId == 6136)
+            if (itemId == Dragon_Broadcast[flag])
                 SYSMSG_BROADCASTV(295, getCountry(), getName().c_str(), itemId);
         }
     }
     st << Stream::eos;
     send(st);
-    if(1 == flag)
-        SetVar(VAR_DRAGONKING_STEP, step);
-    else if(2 == flag)
-        SetVar(VAR_DRAGONKINGSNAKE_STEP, step);
-    else if(3 == flag)
-        SetVar(VAR_TIANMANG_STEP, step);
-    else if(4 == flag)
-        SetVar(VAR_HUNYUAN_STEP, step);
+    SetVar(VAR_DRAGONKING_STEP, step);
 }
 
 //金蛇献瑞 聚福兆祥
@@ -17917,9 +17874,12 @@ UInt8 Player::toQQGroup(bool isJoin)
         return isDel;
     }
 
-    void Player::delFairyPet(UInt32 id)
-    {
+    void Player::delFairyPet(UInt32 id, UInt8 delete_type)
+    {   //delete_type=>>0:放生 1:传承
         std::map<UInt32, FairyPet *>::iterator it = _fairyPets.find(id);
+        DBLOG1().PushUpdateData("insert into pet_histories (server_id,player_id,pet_id,pet_name,delete_type,pet_pinjie,pet_gengu,delete_time) values(%u,%"I64_FMT"u,%u,'%s',%u,%u,%u,%u)",
+            cfg.serverLogId, getId(), id, it->second->getName().c_str(), delete_type, it->second->getPetLev(), it->second->getPetBone(), TimeUtil::Now());
+
         _fairyPets.erase(it);
         DB2().PushUpdateData("DELETE FROM `fairyPet` WHERE id = %u AND `playerId` = %"I64_FMT"u", id, getId());
 	    DB2().PushUpdateData("DELETE FROM `fighter` WHERE `id` = %u AND `playerId` = %"I64_FMT"u", id, getId());
@@ -18287,7 +18247,7 @@ UInt8 Player::toQQGroup(bool isJoin)
         pet2->updateToDB(2, lev);
         pet2->initSkillUp();
 
-        delFairyPet(petId1);
+        delFairyPet(petId1, 1);
         delete pet1;
         return 0;
     }
@@ -18555,6 +18515,7 @@ bool Player::SetVipPrivilege()
 #define VIP_PRIVILEGE_LIMITBUY1(data)  (0x02&data)
 #define VIP_PRIVILEGE_LIMITBUY2(data)  (0x04&data)
 #define VIP_PRIVILEGE_LIMITBUY3(data)  (0x08&data)
+#define VIP_PRIVILEGE_TIMEOUT(data)  (0x0100&data)
 
 #define SET_VIP_PRIVILEGE_DAYLYAWARD(data, v) (data|=(v&0x01))
 #define SET_VIP_PRIVILEGE_LIMITBUY1(data, v)  (data|=((v<<1)&0x02))
@@ -18562,11 +18523,11 @@ bool Player::SetVipPrivilege()
 #define SET_VIP_PRIVILEGE_LIMITBUY3(data, v)  (data|=((v<<3)&0x08))
 #define SET_VIP_PRIVILEGE_OPEN(data, v)       (data|=((v<<4)&0x10))
 #define SET_VIP_PRIVILEGE_DAYTH(data, v)      (data|=((v<<5)&0xE0))
+#define SET_VIP_PRIVILEGE_TIMEOUT(data, v)    (data|=((v<<8)&0x0100))
 
 void Player::doVipPrivilege(UInt8 idx)
 {
-    return;
-    UInt8 data = GetVar(VAR_VIP_PRIVILEGE_DATA);
+    UInt32 data = GetVar(VAR_VIP_PRIVILEGE_DATA);
     switch(idx)
     {
     case 1:
@@ -18590,6 +18551,9 @@ void Player::doVipPrivilege(UInt8 idx)
         SET_VIP_PRIVILEGE_LIMITBUY3(data, 1);
         break;
     case 5:
+        if(!in7DayFromCreated())
+            return;
+
         if (getGold() < 100)
             return;
         SetVipPrivilege();
@@ -18620,24 +18584,53 @@ void Player::doVipPrivilege(UInt8 idx)
 void Player::sendVipPrivilege()
 {
     UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME);
-    UInt8 data = GetVar(VAR_VIP_PRIVILEGE_DATA);
+    UInt32 data = GetVar(VAR_VIP_PRIVILEGE_DATA);
     UInt32 now = TimeUtil::Now();
     UInt8 dayth = (TimeUtil::SharpDayT(0, now) + 168*3600 - TimeUtil::SharpDayT(0, validate))/86400;
     if(dayth > 7)
         dayth = 7;
     UInt32 timeLeft = 0;
+    UInt8 timeOut = 0;
     if(validate > now)
         timeLeft = validate - now;
     if(validate != 0)
+    {
         SET_VIP_PRIVILEGE_OPEN(data, 1);
+        if(timeLeft == 0 && VIP_PRIVILEGE_TIMEOUT(data) == 0)
+        {
+            SET_VIP_PRIVILEGE_TIMEOUT(data, 1);
+            timeOut = 1;
+            SetVar(VAR_VIP_PRIVILEGE_DATA, data);
+        }
+    }
     else
+    {
         SET_VIP_PRIVILEGE_OPEN(data, 0);
+    }
 
     SET_VIP_PRIVILEGE_DAYTH(data, dayth);
     Stream st(REP::RC7DAY);
-    st << static_cast<UInt8>(10) << timeLeft << data;
+    st << static_cast<UInt8>(10) << timeLeft << static_cast<UInt8>(data) << timeOut;
     st << Stream::eos;
     send(st);
+}
+
+bool Player::in7DayFromCreated()
+{
+    UInt32 now = TimeUtil::Now();
+    UInt32 now_sharp = TimeUtil::SharpDay(0, now);
+    UInt32 created_sharp = TimeUtil::SharpDay(0, getCreated());
+    if (created_sharp > now_sharp)
+        return false; // 创建时间错误（穿越了）
+
+    if (now_sharp - created_sharp > 7 * 24*60*60)
+        return false; // 玩家注册时间超过7日，无法参与活动
+
+    UInt32 off = CREATE_OFFSET(created_sharp, now_sharp);
+    if (off >= 7)
+        return false; // 玩家注册时间超过7日，无法参与活动
+
+    return true;
 }
 
 } // namespace GObject
