@@ -2014,7 +2014,7 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
                 else if(fdmg > 0 && bf->getSide() != target_side)
                 {
                     UInt16 immune = bo->getImmune();
-                    if((skill->effect->state & immune) && SKILL_LEVEL(skill->getId()) <= bo->getImmuneLevel(GData::e_state_dmgback))
+                    if((GData::e_state_dmgback & immune) && SKILL_LEVEL(skill->getId()) <= bo->getImmuneLevel(GData::e_state_dmgback))
                     {
                         appendDefStatus(e_Immune, 0, bo);
                     }

@@ -143,7 +143,7 @@ namespace GObject
                     puts(res);
                     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, recvret);
                     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
-                    curl_easy_setopt(curl, CURLOPT_TIMEOUT, 1);
+                    curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10);
                     CURLcode curlRes = curl_easy_perform(curl);
                     if (CURLE_OK == curlRes)
                     {
