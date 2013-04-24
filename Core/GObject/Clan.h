@@ -139,6 +139,7 @@ struct ClanItemHistory
         CLANBATTLE = 0, //帮会战奖励
         ALLOCATED = 1,  //分配获得
         DRAWWEAL = 2,   //领取福利
+        CLANBOSS = 3,   //末日之战
     };
 
     ClanItemHistory(UInt8 type, UInt32 time, UInt64 playerid, const std::string& itemstr)

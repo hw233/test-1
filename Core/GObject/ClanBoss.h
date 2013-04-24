@@ -139,6 +139,7 @@ namespace GObject
         UInt32 _setBossHp;
 
         bool _canOpened;
+        bool _isBossDead;
         UInt32 m_openTime;
         UInt32 _hp;
         UInt32 m_bossMaxHp;

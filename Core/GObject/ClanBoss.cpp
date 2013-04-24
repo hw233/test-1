@@ -13,6 +13,7 @@
 #include "GObject/WBossMgr.h"
 #include "Country.h"
 #include "MapCollection.h" 
+#include <sstream>
 
 namespace GObject
 {
@@ -25,17 +26,18 @@ const UInt8 g_rankSize = 3;
 static const int CLANBOSS_CHANGE_TIME = 10*60;    //boss状态改变时间
 static const int CLANBOSS_PROCESS_TIME = 60*60;   //boss持续时间
 const UInt8 g_buffTime = 30;
+const UInt8 g_extraBuffTime = 10;
 const UInt16 g_pickMaxPos = 25; //采集位
 const UInt8  g_pickNum    = 60; //采集的仙蕴精华
-const UInt8  g_pickGongxian = 50; //采集贡献
+const UInt8  g_pickGongxian = 30; //采集贡献
 const UInt16 g_emMaxPos = 25;
-const UInt32 g_bossGongxian= 50000;
-const UInt32 g_powerGongxian = 25000;
-const UInt32 g_empowerFull = 2000; //充满是2000点  
+const UInt32 g_bossGongxian= 100000;
+const UInt32 g_powerGongxian = 10000;
+const UInt32 g_empowerFull = 1000; //充满是1000点  
 const UInt32 g_empowerNum  = 10;   //每次充10点能量
 const UInt32 g_usedXianyun = 10;
-const UInt32 g_gongxian   = 50;
-const UInt32 g_gongxian2   = 150;
+const UInt32 g_gongxian   = 30;
+const UInt32 g_gongxian2   = 90;
 
 const UInt16 g_bossNpcId = 5515;
 const UInt16 g_bossSpot = 12806;
@@ -59,6 +61,7 @@ void ClanBoss::clear()
     _pickPlayers = 0;
     _statusChanged = false;
     _canOpened = false;
+    _isBossDead = false;
 
     for (UInt8 i = 0; i < 6; ++i)
         _emClan[i].clear();
@@ -800,6 +803,10 @@ void ClanBoss::caclPlayerBuff(Player* pl, bool isAttackBoss)
     //深渊劫阵
     af.attackP -= (float)(_minutes)/100;
     af.magatkP -= (float)(_minutes)/100;
+    af.defendP -= (float)(_minutes)/100;
+    af.magdefP -= (float)(_minutes)/100;
+    af.hpP     -= (float)(_minutes)/100;
+
      //深渊之力
     if (1 == m_bossStatus)
     {
@@ -828,6 +835,8 @@ bool ClanBoss::attack(Player* pl)
     ++sendflag;
 
     if (!pl ) return false;
+    if (NULL == pl->getClan())
+        return false;
     UInt32 now = TimeUtil::Now();
     UInt32 buffLeft = pl->getBuffData(PLAYER_BUFF_CLANBOSS_CD, now);
     if(buffLeft > now)
@@ -1105,7 +1114,7 @@ void ClanBoss::pickXianyun(Player* pl, UInt64 other)
                     crazy = toBeCrazy(pl);
                     _playerStatus[pl] = 3; 
                     if (!crazy)
-                        pl->setBuffData(PLAYER_BUFF_CLANBOSS_CD, now+g_buffTime);
+                        pl->setBuffData(PLAYER_BUFF_CLANBOSS_CD, now+g_buffTime+g_extraBuffTime);
                     membersAction(cl, pl, false, 0);
                     membersAction(cl, pl, true, 3);
                     broadClanStatus(cl);
@@ -1133,7 +1142,7 @@ void ClanBoss::pickXianyun(Player* pl, UInt64 other)
             return;
         }
     }
-    pl->setBuffData(PLAYER_BUFF_CLANBOSS_CD, now+g_buffTime);
+    pl->setBuffData(PLAYER_BUFF_CLANBOSS_CD, now+g_buffTime+g_extraBuffTime);
     _pickPlayer.insert(pl);
     _pickPlayers++;
 
@@ -1305,7 +1314,7 @@ void ClanBoss::Empowerment(Player* pl, UInt8 t, UInt64 other)
                         crazy = toBeCrazy(pl);
                         _playerStatus[pl] = 3;
                         if (!crazy)
-                            pl->setBuffData(PLAYER_BUFF_CLANBOSS_CD, now+g_buffTime);
+                            pl->setBuffData(PLAYER_BUFF_CLANBOSS_CD, now+g_buffTime+g_extraBuffTime);
                         membersAction(cl, pl, false, 0);
                         membersAction(cl, pl, true, 3);
                         broadClanStatus(cl);
@@ -1333,7 +1342,7 @@ void ClanBoss::Empowerment(Player* pl, UInt8 t, UInt64 other)
             return;
         }
     }
-    pl->setBuffData(PLAYER_BUFF_CLANBOSS_CD, now+g_buffTime);
+    pl->setBuffData(PLAYER_BUFF_CLANBOSS_CD, now+g_buffTime+g_extraBuffTime);
     
     it->second.insert(pl);
     _emPlayers[t]++;
@@ -1610,6 +1619,7 @@ void ClanBoss::Change2PowerStatus()
 }
 void ClanBoss::BossDead(Player* pl)
 {
+    _isBossDead = true;
     close();
 }
 void ClanBoss::Urge(Player* pl, UInt8 t)
@@ -1626,6 +1636,10 @@ void ClanBoss::Urge(Player* pl, UInt8 t)
         res = 1;
     else
     {
+        if (!pl->hasChecked())
+        {
+            return;
+        }
         if (pl->getGold() < 30)
         {
             pl->sendMsgCode(0, 1104);
@@ -1865,12 +1879,13 @@ void ClanBoss::reward()
     class RewardVisitor : public Visitor<ClanMember>
     {
         public:
-            RewardVisitor(UInt32 gx, UInt8 rank=0, string title="", string content="")
+            RewardVisitor(UInt32 gx, UInt8 rank=0, string title="", string content="",bool bossDead=false)
             {
                 _gx = gx;
                 _rank = rank;
                 _title = title;
                 _content= content;
+                _bossDead = bossDead;
             }
 
             bool operator()(ClanMember* member)
@@ -1897,6 +1912,12 @@ void ClanBoss::reward()
                     }
                 }
                 member->player->SetVar(VAR_CLANBOSS_GONGXIAN, 0);
+                if (_bossDead)
+                {
+                    MailPackage::MailItem item[1] = {{134, 5}};
+                    member->player->sendMailItem(4224, 4225, item, 1);
+                }
+ 
                 return true;
             }
         private:
@@ -1904,6 +1925,7 @@ void ClanBoss::reward()
             UInt8 _rank;
             string _title;
             string _content;
+            bool _bossDead;
     };
  
     string names[g_rankRewardSize];
@@ -1915,6 +1937,10 @@ void ClanBoss::reward()
         {
             it->second->AddItem(s_rankItems[rankCount].id, s_rankItems[rankCount].count);
             names[rankCount] = it->second->getName();
+
+            std::ostringstream itemstream;
+            itemstream << s_rankItems[rankCount].id << "," << s_rankItems[rankCount].count << ";";
+            it->second->AddItemHistory(ClanItemHistory::CLANBOSS, TimeUtil::Now(), 0, itemstream.str());
         }
         UInt32 score = it->first;
         for (UInt8 i = 0; i < sizeof(s_score)/sizeof(s_score[0]); ++i)
@@ -1922,13 +1948,16 @@ void ClanBoss::reward()
             if (score >= s_score[i])
             {
                 it->second->AddItem(s_items[i].id, s_items[i].count);
+                std::ostringstream itemstream;
+                itemstream << s_items[i].id << "," << s_items[i].count << ";";
+                it->second->AddItemHistory(ClanItemHistory::CLANBOSS, TimeUtil::Now(), 0, itemstream.str());
                 break;
             }
         }
         rankCount++;
         SYSMSG(title, 4220);
         SYSMSGV(content, 4221, rankCount, it->first);
-        RewardVisitor visitor(it->first, rankCount, title, content);
+        RewardVisitor visitor(it->first, rankCount, title, content, _isBossDead);
         it->second->VisitMembers(visitor);
         
         it->second->setGongxian(0, true);
