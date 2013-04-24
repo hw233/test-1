@@ -1200,8 +1200,8 @@ void ClanBoss::pickComplete(Player* pl, Player* other, bool timeFinish, bool sto
         sendClanBossMsg(str,NULL, cl);
     }
     cl->addXianyun(num);
-    SYSMSG_SENDV(175, pl, g_usedXianyun);
-    SYSMSG_SENDV(176, pl, g_usedXianyun);
+    SYSMSG_SENDV(175, pl,  num);
+    SYSMSG_SENDV(176, pl, num);
  
     addGongXian(pl, cl, gx);
     _pickPlayer.erase(it);
