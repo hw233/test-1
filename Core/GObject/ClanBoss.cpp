@@ -110,7 +110,9 @@ void ClanBoss::sendStatus(Player* pl, UInt8 t)
         pl->send(st);
     else
         NETWORK()->Broadcast(st);
+        
 }
+
 
 void ClanBoss::process(UInt32 now)
 {
@@ -1165,7 +1167,7 @@ void ClanBoss::pickComplete(Player* pl, Player* other, bool timeFinish, bool sto
 
     UInt8 res = 0;
     UInt8 num = g_pickNum;
-    UInt8 gx = 10;
+    UInt8 gx = g_pickGongxian;
     if (hasClanSkills(cl, 0))
     {
         num *= 2;
