@@ -829,7 +829,7 @@ function onActivityCheck(tm)
       elseif tm >= actTime2013_04_09 and tm < actTime2013_04_09+5*86400 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
-      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+14*86400 then
+      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+21*86400 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
       else
@@ -1322,7 +1322,7 @@ function initActTime(y, m, d)
   local  SerStartTm234 = { ['year'] = 2013, ['month'] = 1, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm234_1 = { ['year'] = 2013, ['month'] = 1, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 时装法宝
-  local  SerStartTm235 = { ['year'] = 2013, ['month'] = 1, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm235 = { ['year'] = 2013, ['month'] = 4, ['day'] = 26, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --大闹龙宫活动
   local  SerStartTm236 = { ['year'] = 2013, ['month'] = 1, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm236_1 = { ['year'] = 2013, ['month'] = 1, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1750,7 +1750,7 @@ function initActTime(y, m, d)
   actTime234_1= os.time(SerStartTm234_1);
 
   actTime235_0= os.time(SerStartTm235);
-  actTime235_1= os.time(SerStartTm235) + 11 * 86400;
+  actTime235_1= os.time(SerStartTm235) + 7 * 86400;
 
   actTime236_0= os.time(SerStartTm236);
   actTime236_1= os.time(SerStartTm236_1);
