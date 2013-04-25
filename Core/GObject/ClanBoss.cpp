@@ -198,13 +198,13 @@ void ClanBoss::close()
 
 void ClanBoss::refresh()
 {
-//    process(TimeUtil::Now());
     if (_needRestart && _lastHp > 0)
     {
         _canOpened = true;
         start();
         return;
     }
+    process(TimeUtil::Now());
     if (!m_isOpening)
         return;
     _seconds++;
