@@ -27,17 +27,17 @@ static const int CLANBOSS_CHANGE_TIME = 10*60;    //boss状态改变时间
 static const int CLANBOSS_PROCESS_TIME = 60*60;   //boss持续时间
 const UInt8 g_buffTime = 30;
 const UInt8 g_extraBuffTime = 10;
-const UInt16 g_pickMaxPos = 25; //采集位
+const UInt16 g_pickMaxPos = 20; //采集位
 const UInt8  g_pickNum    = 60; //采集的仙蕴精华
-const UInt8  g_pickGongxian = 30; //采集贡献
-const UInt16 g_emMaxPos = 25;
+const UInt8  g_pickGongxian = 15; //采集贡献
+const UInt16 g_emMaxPos = 20;
 const UInt32 g_bossGongxian= 100000;
 const UInt32 g_powerGongxian = 10000;
 const UInt32 g_empowerFull = 1000; //充满是1000点  
 const UInt32 g_empowerNum  = 10;   //每次充10点能量
 const UInt32 g_usedXianyun = 10;
-const UInt32 g_gongxian   = 30;
-const UInt32 g_gongxian2   = 90;
+const UInt32 g_gongxian   = 15;
+const UInt32 g_gongxian2   = 45;
 
 const UInt16 g_bossNpcId = 5515;
 const UInt16 g_bossSpot = 12806;
@@ -696,6 +696,8 @@ UInt8 ClanBoss::getMyStatus(Player* pl, UInt8& buffTime)
     UInt32 buffLeft = pl->getBuffData(PLAYER_BUFF_CLANBOSS_CD, now);
     if (buffLeft >= now)
         buffTime = buffLeft - now;
+    else
+        _playerStatus[pl] = 0;
 
     return _playerStatus[pl];
 }
@@ -1027,10 +1029,10 @@ bool ClanBoss::attack(Player* pl)
     }
     else
     {
-        _playerStatus[pl] = 3;
-        if (!toBeCrazy(pl))
-            pl->setBuffData(PLAYER_BUFF_CLANBOSS_CD, now + g_buffTime);
- 
+       // _playerStatus[pl] = 3;
+       // if (!toBeCrazy(pl))
+       //     pl->setBuffData(PLAYER_BUFF_CLANBOSS_CD, now + g_buffTime);
+       toBeCrazy(pl);
         membersAction(pl->getClan(), pl, true, 3);
         membersAction(pl->getClan(), pl, false, 0);
        // sendMyClanInfo(pl);
@@ -1058,9 +1060,11 @@ bool ClanBoss::attack(Player* pl)
 
 bool ClanBoss::toBeCrazy(Player* pl)
 {
-    if (m_powerType != 1)
-        return false;
+//    if (m_powerType != 1)
+//        return false;
     _crazyPlayer[pl] = TimeUtil::Now() + 30;
+    pl->setBuffData(PLAYER_BUFF_CLANBOSS_CD, TimeUtil::Now());
+    _playerStatus[pl] = 3;
     return true;
 }
 bool ClanBoss::isCrazy(Player* pl)
@@ -1130,13 +1134,16 @@ void ClanBoss::pickXianyun(Player* pl, UInt64 other)
                 plOther->clearHIAttr();
                 plOther->setCBHPFlag(false);
                 if (res)
+                {
+                    _crazyPlayer[pl] = 0;
                     pickComplete(plOther, pl, false, false);  
+                }
                 else  //进入狂暴
                 {
                     crazy = toBeCrazy(pl);
-                    _playerStatus[pl] = 3; 
-                    if (!crazy)
-                        pl->setBuffData(PLAYER_BUFF_CLANBOSS_CD, now+g_buffTime+g_extraBuffTime);
+                   // _playerStatus[pl] = 3; 
+                   // if (!crazy)
+                   //     pl->setBuffData(PLAYER_BUFF_CLANBOSS_CD, now+g_buffTime+g_extraBuffTime);
                     membersAction(cl, pl, false, 0);
                     membersAction(cl, pl, true, 3);
                     broadClanStatus(cl);
@@ -1221,14 +1228,20 @@ void ClanBoss::pickComplete(Player* pl, Player* other, bool timeFinish, bool sto
         num /= 2;
         gx /= 2;
         membersAction(cl, pl, true, 3);
-        _playerStatus[pl] = 3;
+        //_playerStatus[pl] = 3;
 
-        if (toBeCrazy(pl)) //清掉他的Buff,让他狂暴
-            pl->setBuffData(PLAYER_BUFF_CLANBOSS_CD, TimeUtil::Now());
-        else
-            pl->setBuffData(PLAYER_BUFF_CLANBOSS_CD, TimeUtil::Now()+g_buffTime);
+        toBeCrazy(pl);
+       // if (toBeCrazy(pl)) //清掉他的Buff,让他狂暴
+       //     pl->setBuffData(PLAYER_BUFF_CLANBOSS_CD, TimeUtil::Now());
+       // else
+       //     pl->setBuffData(PLAYER_BUFF_CLANBOSS_CD, TimeUtil::Now()+g_buffTime);
         SYSMSGV(str, 4235, pl->getName().c_str(), other->getClan()->getName().c_str());
         sendClanBossMsg(str,NULL, cl);
+    }
+    if (m_powerType == 1 && NULL == other)
+    {
+        toBeCrazy(pl);
+        pl->setBuffData(PLAYER_BUFF_CLANBOSS_CD, TimeUtil::Now());
     }
     cl->addXianyun(num);
     SYSMSG_SENDV(175, pl,  num);
@@ -1325,6 +1338,7 @@ void ClanBoss::Empowerment(Player* pl, UInt8 t, UInt64 other)
                     plOther->setCBHPFlag(false);
                     if (res)
                     {
+                        _crazyPlayer[pl] = 0;
                         cl->addXianyun(-1*g_usedXianyun);
                         SYSMSG_SENDV(177, pl, g_usedXianyun);
                         SYSMSG_SENDV(178, pl, g_usedXianyun);
@@ -1334,9 +1348,9 @@ void ClanBoss::Empowerment(Player* pl, UInt8 t, UInt64 other)
                     else  //进入狂暴
                     {
                         crazy = toBeCrazy(pl);
-                        _playerStatus[pl] = 3;
-                        if (!crazy)
-                            pl->setBuffData(PLAYER_BUFF_CLANBOSS_CD, now+g_buffTime+g_extraBuffTime);
+                      //  _playerStatus[pl] = 3;
+                      //  if (!crazy)
+                      //      pl->setBuffData(PLAYER_BUFF_CLANBOSS_CD, now+g_buffTime+g_extraBuffTime);
                         membersAction(cl, pl, false, 0);
                         membersAction(cl, pl, true, 3);
                         broadClanStatus(cl);
@@ -1438,18 +1452,23 @@ void ClanBoss::EmpowerComplete(Player* pl, UInt8 t, Player* other, bool timeFini
         num /= 2;
         gongxian /= 2;
         membersAction(cl, pl, true, 3);
-        _playerStatus[pl] = 3;
-        if (toBeCrazy(pl)) //清掉他的Buff,让他狂暴
+        //_playerStatus[pl] = 3;
+        /*if (toBeCrazy(pl)) //清掉他的Buff,让他狂暴
             pl->setBuffData(PLAYER_BUFF_CLANBOSS_CD, TimeUtil::Now());
         else
         {
             pl->setBuffData(PLAYER_BUFF_CLANBOSS_CD, TimeUtil::Now()+g_buffTime);
-        }
+        }*/
+        toBeCrazy(pl);
 
         SYSMSGV(str, 4234, pl->getName().c_str(), other->getClan()->getName().c_str());
         sendClanBossMsg(str,NULL, cl);
     }
- 
+    if (m_powerType == 1 && NULL == other)
+    {
+        toBeCrazy(pl);
+        //pl->setBuffData(PLAYER_BUFF_CLANBOSS_CD, TimeUtil::Now());
+    }
     addGongXian(pl, cl, gongxian);
     _empower[t] += num;
 
@@ -1894,11 +1913,15 @@ void ClanBoss::sendClanBossMsg(char* str, Player* pl, Clan* cl)
 const UInt8 g_rankRewardSize = 3;
 void ClanBoss::reward()
 {
-    static MailPackage::MailItem s_rankItems[g_rankRewardSize] = {{134,150},{134,100},{134,50}};
-    static MailPackage::MailItem s_items[4] = {{134,50},{134,30},{134,20},{134,10}};
+    static MailPackage::MailItem s_rankItems[g_rankRewardSize] = {{134,150},{134,80},{134,50}};
+    static MailPackage::MailItem s_items[4] = {{1325,10},{1325,6},{1325,3},{1325,1}};
     static UInt32  s_score[4] = {10000, 5000, 1000, 1};
-    static MailPackage::MailItem s_items2[6] = {{1325,20},{1325,15},{1325,10},{1325,5},{1325,2},{1325,1}};
+    static MailPackage::MailItem s_items2[6] = {{1325,10},{1325,8},{1325,6},{1325,4},{1325,2},{1325,1}};
     static UInt32  s_score2[6] = {3000,2000,1000,500,100,1};
+    static MailPackage::MailItem s_items3[] = {{134,50},{134,30},{134,20},{134,10}};
+    static UInt32  s_score3[] = {999,4999,9999,15000};
+
+
     class RewardVisitor : public Visitor<ClanMember>
     {
         public:
@@ -1954,10 +1977,13 @@ void ClanBoss::reward()
     string names[g_rankRewardSize];
     TSortMap::iterator it = _gxSort.begin();
     UInt8 rankCount = 0;
+    UInt32 maxScore = 0;
     for (; it != _gxSort.end(); ++it)
     {
         if (rankCount < g_rankRewardSize)
         {
+            if (rankCount == 0)
+                maxScore = it->first;
             it->second->AddItem(s_rankItems[rankCount].id, s_rankItems[rankCount].count);
             names[rankCount] = it->second->getName();
 
@@ -1977,9 +2003,20 @@ void ClanBoss::reward()
                 break;
             }
         }
+        for (UInt8 i = 0; i < sizeof(s_score3)/sizeof(s_score3[0]) && rankCount > 0; ++i)
+        {
+            if (maxScore-score <= s_score3[i])
+            {
+                it->second->AddItem(s_items3[i].id, s_items3[i].count);
+                std::ostringstream itemstream;
+                itemstream << s_items3[i].id << "," << s_items3[i].count << ";";
+                it->second->AddItemHistory(ClanItemHistory::CLANBOSS, TimeUtil::Now(), 0, itemstream.str());
+                break;
+            }
+        }
         rankCount++;
         SYSMSG(title, 4220);
-        SYSMSGV(content, 4221, rankCount, it->first);
+        SYSMSGV(content, 4221, rankCount, it->first, maxScore-it->first);
         RewardVisitor visitor(it->first, rankCount, title, content, _isBossDead);
         it->second->VisitMembers(visitor);
         
