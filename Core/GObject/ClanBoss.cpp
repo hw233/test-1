@@ -62,6 +62,8 @@ void ClanBoss::clear()
     _statusChanged = false;
     _canOpened = false;
     _isBossDead = false;
+    _needRestart = false;
+    _lastHp = 0;
 
     for (UInt8 i = 0; i < 6; ++i)
         _emClan[i].clear();
@@ -189,12 +191,20 @@ void ClanBoss::close()
     if (!p_map) return;
     p_map->Hide(g_bossNpcId, true);
 	p_map->DelObject(g_bossNpcId);
+
+    DB1().PushUpdateData("update boss set level=0,hp=0 where id=%d", g_bossNpcId);
 }
 
 
 void ClanBoss::refresh()
 {
 //    process(TimeUtil::Now());
+    if (_needRestart && _lastHp > 0)
+    {
+        _canOpened = true;
+        start();
+        return;
+    }
     if (!m_isOpening)
         return;
     _seconds++;
@@ -763,6 +773,14 @@ void ClanBoss::addBoss()
         m_maxPower = ohp * WBOSS_POWER_FACTOR;
         m_power = m_maxPower;
     }
+    if (_needRestart && _lastHp>0)
+    {
+        _hp = _lastHp;
+        _bossPercent = (double)_hp/m_bossMaxHp*100;
+        _needRestart = false;
+        _lastHp = 0;
+    }
+    DB1().PushUpdateData("replace into boss(id,level,pos,hp) values(%d,1,%d,%u)", g_bossNpcId, g_bossSpot, _hp);
 }
 void ClanBoss::caclPlayerBuff(Player* pl, bool isAttackBoss)
 {
@@ -983,7 +1001,11 @@ bool ClanBoss::attack(Player* pl)
                         BossDead(pl);
                 }
                 if (!cfg.GMCheck || !(sendflag % 6))
+                {
                     notify();
+                    if (newPercent)
+                        DB1().PushUpdateData("update boss set hp=%u where id=%d", _hp, g_bossNpcId);
+                }
                 if (m_bossStatus == 2 && oldPercent<100 && *thisPercent/10 < oldPercent/10)
                 {
                     SYSMSGV(str, 4205, *thisPercent);
@@ -1583,6 +1605,7 @@ void ClanBoss::EmpowerRelease(Player* pl,UInt8 t)
             _bossPercent -= percent;
             _hp -= m_bossMaxHp/100*percent;
             notify();
+            DB1().PushUpdateData("update boss set hp=%u where id=%d", _hp, g_bossNpcId);
         }
     }
 }

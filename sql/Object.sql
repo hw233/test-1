@@ -1102,6 +1102,7 @@ CREATE TABLE `clan` (
   `qqOpenid` varchar(36) DEFAULT NULL,
   `xianyun` int(10) unsigned NOT NULL DEFAULT '0',
   `gongxian` int(10) unsigned NOT NULL DEFAULT '0',
+  `urge` int(10) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;

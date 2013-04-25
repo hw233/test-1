@@ -49,6 +49,7 @@ namespace GObject
 		bool LoadFromDB();
         void setCanOpened(bool v) {_canOpened = v;};
         bool getCanOpened() {return _canOpened;}
+        void setNeedRestart(bool b, UInt32 hp) {_needRestart=b;  _lastHp=hp;}
        
         void onClanBossReq(GameMsgHdr&, const void*);
         void makePlayerInfo(Player* pl);
@@ -68,7 +69,7 @@ namespace GObject
             if (t <= 5)
             {
                 _empower[t] += em;
-                if (_empower[t] >= 4000)
+                if (_empower[t] >= 1000)
                 {
                     _empower[t] = 0;
                     EmpowerRelease(NULL, (t+1));
@@ -140,6 +141,9 @@ namespace GObject
 
         bool _canOpened;
         bool _isBossDead;
+        bool _needRestart;  //玩的时候down机了,需要接着进度继续 
+        UInt32 _lastHp;     //down机前的boss血量
+
         UInt32 m_openTime;
         UInt32 _hp;
         UInt32 m_bossMaxHp;
