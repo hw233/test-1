@@ -3330,7 +3330,7 @@ namespace GObject
         {
             send(st);
         }
-        else
+        else if (scene != Battle::BS_CLANBOSSBATTLE)
         {
             if (res)
             {
@@ -3347,7 +3347,7 @@ namespace GObject
             st.data<UInt8>(4) = static_cast<UInt8>(res ? 0 : 1);
             other->send(st);
         }
-        else
+        else if (scene != Battle::BS_CLANBOSSBATTLE)
         {
             if (res)
             {
