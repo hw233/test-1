@@ -239,7 +239,7 @@ int  Tianjie::manualOpenTj(int level, bool force)
         execu->Execute2("delete from tianjie where level = %d", level);
     }
 	GData::DBTianjie dbexp;
-    if(execu->Prepare("SELECT `id`, `is_opened`,`is_execute`,`is_finish`,`is_ok`,`level`,`rate`,UNIX_TIMESTAMP(opentime),`r1_killed`,`r2_donated`,`r3_copyid`,`r4_day`,`open_next`, `is_wait`,`is_manual`,`is_touch` FROM `tianjie` order by level desc", dbexp) != DB::DB_OK)
+    if(execu->Prepare("SELECT `id`, `is_opened`,`is_execute`,`is_finish`,`is_ok`,`level`,`rate`,UNIX_TIMESTAMP(opentime),`r1_killed`,`r2_donated`,`r3_copyid`,`r4_day`,`open_next`, `is_wait`,`is_manual`,`is_touch` FROM `tianjie` where `level` !=999 order by level desc", dbexp) != DB::DB_OK)
 		return 99;
 
     int maxLevel = 0;
