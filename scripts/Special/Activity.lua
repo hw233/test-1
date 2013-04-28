@@ -7602,7 +7602,7 @@ function SurnameLegendLoot(player,lootlvl)
             [3] = 1,
         };
     local package = player:GetPackage();
-    package:AddItem(9382, itemNum[lootlvl], true,0,10);
+    package:AddItem(9383, itemNum[lootlvl], true,0,10);
 end
 
 -- 万圣节套装
@@ -8307,6 +8307,6 @@ function GetLuckyBagAward(player)
         player:GetPackage():Add(item[1],item[2],true,false,32);
     end
     player:sendLuckyBagInfo();
-    Broadcast(0x27, "恭喜玩家[p:"..player:getCountry()..":"..player:getPName().."]".."在\"峨眉天下秀\"活动中人品爆发，集齐所有卡牌，成功领取超级大奖")
+    Broadcast(0x27, "恭喜玩家[p:"..player:getCountry()..":"..player:getPName().."]".."在\"为雅安祈福\"活动中人品爆发，集齐所有卡牌，成功领取超级大奖")
     return true
 end

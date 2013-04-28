@@ -113,6 +113,7 @@ enum PurchaseType
     ClanBossAct1                = 102, //末日之战鼓舞生命
     ClanBossAct2                = 103, //末日之战鼓舞攻击
     ClanBossAct3                = 104, //末日之战鼓舞身法
+    LevelUpAward                = 105, //付费获得升级奖励
     //繁体私有占150～200
 };
 
@@ -217,6 +218,7 @@ enum ItemFrom
     FromVipPrivilege = 41, // 限时vip 
     FromCFriend = 42, //好友邀请
     FromLuckyStar = 43, //充值幸运星
+    FromLevelAward = 44, //等级奖励
 };
 
 enum ItemTo

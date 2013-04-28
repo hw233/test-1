@@ -1283,6 +1283,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     //充值幸运星活动
     pl->setLuckyStarCondition();
     pl->sendLuckyStarInfo(1);
+    pl->getLevelAwardInfo();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -1948,6 +1949,21 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
             br >> domainType;
             br >> type;
             player->getQZoneQQGameAward(domainType,type);
+        }
+        break;
+
+        case 0x0D:
+        {
+            UInt8 type = 0;
+            br >> type;
+            if(type == 1)
+                player->sendNuwaInfo();
+            else if(type == 2)
+            {
+                UInt8 idx = 0;
+                br >> idx;
+                player->setNuwaSignet(idx);
+            }
         }
         break;
 

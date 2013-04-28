@@ -1605,6 +1605,10 @@ namespace Script
 		return Call<bool>("RunVipPrivilegeAward", player, idx, dayth);
     }
 
+    bool GameActionLua::RunLevelAward(Player* player,UInt8 opt)
+    {
+		return Call<bool>("RunLevelAward", player,opt);
+    }
     UInt8 GameActionLua::getAnswerInFoolsDay(UInt8 qid)
     {
 		return Call<UInt8>("getAnswerInFoolsDay", qid);
