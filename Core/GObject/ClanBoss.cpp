@@ -25,19 +25,20 @@ const UInt8 g_rankSize = 3;
 static const int CLANBOSS_CHANGE_TIME = 10*60;    //boss状态改变时间
 static const int CLANBOSS_PROCESS_TIME = 60*60;   //boss持续时间
 const UInt8 g_buffTime = 30;
-const UInt16 g_pickMaxPos = 50;
-const UInt8 g_pickNum    = 60;
-const UInt8 g_pickGongxian = 20;
-const UInt16 g_emMaxPos = 50;
-const UInt16 g_bossNpcId = 5515;
-const UInt16 g_bossSpot = 12806;
-const UInt32 g_bossGongxian= 500000;
-const UInt32 g_powerGongxian = 100000;
-const UInt32 g_empowerFull = 4000; //充满是1000点  
+const UInt16 g_pickMaxPos = 25; //采集位
+const UInt8  g_pickNum    = 60; //采集的仙蕴精华
+const UInt8  g_pickGongxian = 50; //采集贡献
+const UInt16 g_emMaxPos = 25;
+const UInt32 g_bossGongxian= 50000;
+const UInt32 g_powerGongxian = 25000;
+const UInt32 g_empowerFull = 2000; //充满是2000点  
 const UInt32 g_empowerNum  = 10;   //每次充10点能量
 const UInt32 g_usedXianyun = 10;
-const UInt32 g_gongxian   = 20;
-const UInt32 g_gongxian2   = 60;
+const UInt32 g_gongxian   = 50;
+const UInt32 g_gongxian2   = 150;
+
+const UInt16 g_bossNpcId = 5515;
+const UInt16 g_bossSpot = 12806;
 
 ClanBoss::ClanBoss()
 {
@@ -57,6 +58,7 @@ void ClanBoss::clear()
     _pickPlayer.clear();
     _pickPlayers = 0;
     _statusChanged = false;
+    _canOpened = false;
 
     for (UInt8 i = 0; i < 6; ++i)
         _emClan[i].clear();
@@ -70,15 +72,17 @@ void ClanBoss::clear()
 }
 void ClanBoss::init()
 {
-    UInt32 day7 = TimeUtil::SharpWeek(7);
-    UInt32 now = TimeUtil::Now();
-    UInt32 startTime = day7+ CLANBOSS_START_TIME_HOUR*3600+CLANBOSS_START_TIME_MIN*60;
+    int now = TimeUtil::Now();
+    UInt8 week = TimeUtil::GetWeekDay(now);
+    int day7 = TimeUtil::SharpDayT() + (7-week)*86400;
+    int startTime = day7+ CLANBOSS_START_TIME_HOUR*3600+CLANBOSS_START_TIME_MIN*60;
     if (day7 >= now || now < startTime)
     {
         m_openTime = startTime;
     }
     else if (now-startTime < CLANBOSS_PROCESS_TIME) //14-15点之间down机了
     {
+        m_openTime = startTime;
         start();
     }
     else //下个礼拜再开
@@ -88,6 +92,8 @@ void ClanBoss::init()
 }
 void ClanBoss::sendStatus(Player* pl, UInt8 t)
 {
+    if (!_canOpened)
+        return;
     if (t != 2)
         t = m_isOpening;
     UInt32 tm = 0;
@@ -150,7 +156,7 @@ void ClanBoss::process(UInt32 now)
 
 void ClanBoss::start()
 {
-    if (m_isOpening)
+    if (m_isOpening || !_canOpened)
         return;
     m_notifyRate = 5;
     m_openTime = TimeUtil::Now();
@@ -161,7 +167,7 @@ void ClanBoss::start()
     Change2HPStatus();
     sendStatus(NULL, 1);
     notify();
-    SYSMSG_BROADCASTV(4211);
+    SYSMSG_BROADCASTV(4212);
 }
 void ClanBoss::close()
 {
@@ -183,6 +189,7 @@ void ClanBoss::close()
 
 void ClanBoss::refresh()
 {
+//    process(TimeUtil::Now());
     if (!m_isOpening)
         return;
     _seconds++;
@@ -664,7 +671,6 @@ UInt8 ClanBoss::getMembers(Clan* cl, UInt8 t)
 }
 UInt8 ClanBoss::getMyStatus(Player* pl, UInt8& buffTime)
 {
-    UInt8 res = 0;
     buffTime = 0;
     UInt32 now = TimeUtil::Now();
     if (isCrazy(pl))
@@ -696,7 +702,7 @@ void ClanBoss::addBoss()
     const float WBOSS_ATK_FACTOR = 0.5f;
     const Int32 WBOSS_MIN_HP = 20000000;
     const Int32 WBOSS_MAX_HP = 350000000;
-    const float WBOSS_MAX_ASC_HP_FACTOR = 1.40f;
+    //const float WBOSS_MAX_ASC_HP_FACTOR = 1.40f;
     const float WBOSS_HP_FACTOR = 7.8;
     const float WBOSS_POWER_FACTOR = 3.0;
 
@@ -734,7 +740,7 @@ void ClanBoss::addBoss()
         Int32 basematk = nflist[0].fighter->getBaseMagAttack();
         lastTime = worldBoss.getLastTime(0);
 
-        if (ohp < WBOSS_MIN_HP)
+        if (ohp == 0)
             ohp = WBOSS_MIN_HP;
         else if (ohp > WBOSS_MAX_HP)
             ohp = WBOSS_MAX_HP;
@@ -816,7 +822,7 @@ bool ClanBoss::attack(Player* pl)
         pl->sendMsgCode(0, 1126); 
         return false;
     }
-   static UInt32 sendflag = 7;
+   static UInt32 sendflag = 5;
     ++sendflag;
 
     if (!pl ) return false;
@@ -965,7 +971,7 @@ bool ClanBoss::attack(Player* pl)
                     else
                         BossDead(pl);
                 }
-                if (!cfg.GMCheck || !(sendflag % 8))
+                if (!cfg.GMCheck || !(sendflag % 6))
                     notify();
                 if (m_bossStatus == 2 && oldPercent<100 && *thisPercent/10 < oldPercent/10)
                 {
@@ -1448,8 +1454,13 @@ void ClanBoss::EmpowerComplete(Player* pl, UInt8 t, Player* other, bool timeFini
 }
 void ClanBoss::addGongXian(Player* pl, Clan* cl, UInt32 num, bool pend)
 {
+    static const UInt32 s_plGx[] = {1,100,500,1000,2000,3000,5000,10000};
+    static const UInt32 s_clGx[] = {1,1000,5000,10000,20000,50000};
     if (NULL == pl || NULL == cl || 0 == num)
         return;
+    UInt32 plOldGx = pl->GetVar(VAR_CLANBOSS_GONGXIAN);
+    UInt32 clOldGx = cl->getGongxian();
+       
     pl->AddVar(VAR_CLANBOSS_GONGXIAN, num);
     UInt32 gx = cl->addGongxian(num);
     if (gx-num < 5000 && gx >= 5000)
@@ -1462,6 +1473,26 @@ void ClanBoss::addGongXian(Player* pl, Clan* cl, UInt32 num, bool pend)
     pl->pendLastGongxian(num);
     if (!pend)
         pl->addLastGongxian();
+    for (UInt8 i = 0; i < sizeof(s_plGx)/sizeof(s_plGx[0]); ++i)
+    {
+        if (plOldGx < s_plGx[i] && (plOldGx+num) >= s_plGx[i])
+        {
+            char str[32] = {0};
+            sprintf(str, "F_10000_%d", i+1);
+            pl->udpLog("EndWar", str, "", "", "", "", "act");
+            break;
+        }
+    }
+    for (UInt8 i = 0; i < sizeof(s_clGx)/sizeof(s_clGx[0]); ++i)
+    {
+        if (clOldGx < s_clGx[i] && (clOldGx+num) >= s_clGx[i])
+        {
+            char str[32] = {0};
+            sprintf(str, "F_10000_1%d", i);
+            pl->udpLog("EndWar", str, "", "", "", "", "act");
+            break;
+        }
+    }
 }
 void ClanBoss::insertToGxSort(Clan* cl, UInt32 oldGx, UInt32 newGx, bool needBroad)
 {
@@ -1598,7 +1629,7 @@ void ClanBoss::Urge(Player* pl, UInt8 t)
             pl->sendMsgCode(0, 1104);
             return;
         }
-        ConsumeInfo ci(ClanBossAct,0,0);
+        ConsumeInfo ci(ClanBossAct1+t,0,0);
         pl->useGold(30, &ci);
         cl->addUrge(t, 1);
 
@@ -1644,7 +1675,7 @@ void ClanBoss::UseClanSkill(Player* pl, UInt8 t)
         return;
     UInt8 res = 0;
     //if (pl != getLeader(cl))
-    if (!cl->hasClanAuthority(pl, 2))
+    if (!cl->hasClanAuthority(pl, 7))
         res = 1;
     else
     {
@@ -1873,6 +1904,7 @@ void ClanBoss::reward()
             string _content;
     };
  
+    string names[g_rankRewardSize];
     TSortMap::iterator it = _gxSort.begin();
     UInt8 rankCount = 0;
     for (; it != _gxSort.end(); ++it)
@@ -1880,6 +1912,7 @@ void ClanBoss::reward()
         if (rankCount < g_rankRewardSize)
         {
             it->second->AddItem(s_rankItems[rankCount].id, s_rankItems[rankCount].count);
+            names[rankCount] = it->second->getName();
         }
         UInt32 score = it->first;
         for (UInt8 i = 0; i < sizeof(s_score)/sizeof(s_score[0]); ++i)
@@ -1900,6 +1933,7 @@ void ClanBoss::reward()
         it->second->clearUrge();
     }
     _gxSort.clear();
+    SYSMSG_BROADCASTV(4213, names[0].c_str(), names[1].c_str(),names[2].c_str());
 }
 
 void ClanBoss::broadClanStatus(Clan* cl)

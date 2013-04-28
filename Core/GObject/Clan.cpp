@@ -32,6 +32,7 @@
 #include "GObject/AthleticsRank.h"
 #include <mysql.h>
 #include <sstream>
+#include "GObject/ClanBoss.h"
 
 namespace GObject
 {
@@ -3978,7 +3979,8 @@ void   Clan::sendClanCopyInfo(Player * player, UInt8 val)
     st << static_cast<UInt8>(getOnlineMembersCount());
 
     st << static_cast<UInt16>(_techs->getLev(CLAN_TECH_STATUE));     // 神像科技等级
-    st << static_cast<UInt16>(_techs->getLev(CLAN_TECH_COPY_LEVEL)); // 副本科技等级
+//    st << static_cast<UInt16>(_techs->getLev(CLAN_TECH_COPY_LEVEL)); // 副本科技等级
+    st << static_cast<UInt16>(getXianyun()); //仙蕴精华 
     st << static_cast<UInt16>(_techs->getLev(CLAN_TECH_COPY_ROB));    // 掠夺科技等级
 
     st << static_cast<UInt16>(getStatueLevel());
@@ -4078,6 +4080,13 @@ void   Clan::addCopyLevel()
         {
             GVAR.SetVar(GVAR_CLANCOPYPASS, _copyLevel);
 			SYSMSG_BROADCASTV(805, _name.c_str(), _copyLevel);
+        }
+        if (_copyMaxLevel >= 10 && !GObject::ClanBoss::instance().getCanOpened())
+        {
+            GObject::ClanBoss::instance().setCanOpened(true);
+            GObject::ClanBoss::instance().init();
+            GObject::ClanBoss::instance().sendStatus(NULL);
+            SYSMSG_BROADCASTV(4211);
         }
     }
 }

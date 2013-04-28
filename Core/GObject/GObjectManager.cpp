@@ -3609,6 +3609,8 @@ namespace GObject
             }
             if(clan == NULL) continue;
             clan->LoadCopy(cc.level, cc.levelUpdateTime, cc.maxLevel, cc.maxLevelTime);
+            if (cc.maxLevel >= 10)
+                GObject::ClanBoss::instance().setCanOpened(true);
         }
         lc.finalize();
         

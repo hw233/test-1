@@ -3878,6 +3878,7 @@ void GMHandler::OnLuckyStarGM(GObject::Player *player, std::vector<std::string>&
 }
 void GMHandler::OnClanBossOpen(GObject::Player *player, std::vector<std::string>& args)
 {
+    GObject::ClanBoss::instance().setCanOpened(true);
     GObject::ClanBoss::instance().start();
 }
 

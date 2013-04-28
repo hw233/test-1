@@ -1630,7 +1630,10 @@ void OpenCb(LoginMsgHdr &hdr,const void * data)
     if (GObject::ClanBoss::instance().isOpening())
         ret = 1;
     else
+    {
+        GObject::ClanBoss::instance().setCanOpened(true);
         GObject::ClanBoss::instance().start();
+    }
     Stream st(SPEP::OPENCB);
     st << ret << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID,st);

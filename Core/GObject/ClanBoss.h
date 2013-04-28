@@ -47,6 +47,8 @@ namespace GObject
         void clear();
 		void init();
 		bool LoadFromDB();
+        void setCanOpened(bool v) {_canOpened = v;};
+        bool getCanOpened() {return _canOpened;}
        
         void onClanBossReq(GameMsgHdr&, const void*);
         void makePlayerInfo(Player* pl);
@@ -136,6 +138,7 @@ namespace GObject
 
         UInt32 _setBossHp;
 
+        bool _canOpened;
         UInt32 m_openTime;
         UInt32 _hp;
         UInt32 m_bossMaxHp;
