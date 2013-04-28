@@ -134,7 +134,7 @@ public:
 	inline float getAttack() {float ret = _attack + _attackAdd + _attackAdd2 + _atkAddSpecial + _atkDecSpecial + _moAttackAdd + _petAttackAdd + (_petExAtkEnable?_petExAtk:0) + _counter_spirit_atk_add + _pet_coatk; return  ret;}
 	inline float getMagAttack() {float ret = _magatk + _magAtkAdd + _magAtkAdd2 + _magAtkAddSpecial + _magAtkDecSpecial + _moMagAtkAdd + _petMagAtkAdd + _counter_spirit_magatk_add + _pet_coatk; return ret;}
 	inline float getDefend() {float ret = _defend + _defAdd + _defAdd2 + _counter_spirit_def_add; return (ret > 0 ? ret : 0);}
-	inline float getMagDefend() {float ret = _magdef + _magDefAdd + _magDefAdd2 + _counter_spirit_magdef_add; return (ret > 0 ? ret : 0);}
+	inline float getMagDefend() {float ret = _magdef + _magDefAdd + _magDefAdd2 + _counter_spirit_magdef_add + _fire_defend; return (ret > 0 ? ret : 0);}
 	float getHitrate(BattleFighter* defgt);
 	float getEvade(BattleFighter* defgt);
 	float getCritical(BattleFighter* defgt);
@@ -571,6 +571,10 @@ private:
 
     float _bleedMo;
     UInt8 _bleedMoLast;
+    UInt32 _blind_bleed;
+    float _blind_present;
+    UInt8 _blind_present_cd;
+    UInt8 _blind_cd, _blind_bleed_last;
     BattleFighter* _summoner;
     UInt8 _unSummonAura;
 
@@ -850,6 +854,15 @@ public:
     inline void resetBleedMo() { _bleedMo = 0; _bleedMoLast = 0; }
     bool releaseBleedMo();
 
+    //XXX
+    inline UInt8& getBlindCD() { return _blind_cd; }
+    inline float getBlindPresent() { return _blind_present; }
+    inline UInt8& getBlindBleedLast() { return _blind_bleed_last; }
+    inline float getBlindBleed() { return _blind_bleed; }
+    inline void setBlindBleed(float value, UInt8 last, UInt8 cd) { _blind_bleed = value; _blind_bleed_last = last; _blind_cd = cd; }
+    inline void setBlindPresent(float v, UInt8 cd) { _blind_present = v; _blind_present_cd = cd; }
+    inline UInt8 getBlindPresentCD() { return _blind_present_cd; }
+
     void setUnSummonAura(BattleFighter* bf, UInt32 aura) { _summoner = bf, _unSummonAura = aura; }
     bool isSummon() { return _summon; }
     BattleFighter* getSummoner() { return _summoner; }
@@ -943,6 +956,16 @@ private:
     float _pet_coatk;
     void setPetCoAtk(float v) { _pet_coatk = v; }
     void releasePetCoAtk() { if(_pet_coatk > 0.001f) _pet_coatk = 0; }
+
+    float _fire_defend;
+    UInt8 _fire_defend_last;
+    float _fire_fake_dead_rate;
+    UInt8 _fire_fake_dead_rate_last;
+    void setFireDefend(float v, UInt8 l) { _fire_defend = v; _fire_defend_last = l; }
+    bool releaseFireDefend();
+    void setFireFakeDead(float v, UInt8 l) { _fire_fake_dead_rate = v; _fire_fake_dead_rate_last = l; }
+    bool doFireFakeDead();
+    bool releaseFireFakeDead();
 
 public:
 	enum StatusFlag

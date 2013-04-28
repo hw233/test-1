@@ -1,4 +1,4 @@
-function checkExpire(player)
+﻿function checkExpire(player)
   local tm = os.time()
   local nextReward = player:getNextExtraReward()
   if tm >= nextReward then
@@ -4316,104 +4316,6 @@ function sendRechargeMails_2013_04_27(player, ototal, ntotal)
     _sendRechargeMails(player, ototal, ntotal, lvls, items)
 end
 
-function sendRechargeMails_2013_04_28(player, ototal, ntotal)
-    local lvls = {
-        10,99,499,999,5999,
-    }
-    local items = {
-        {9367,3,1, 9369,3,1},
-        {503,5,1},
-        {516,2,1, 517,2,1},
-        {509,2,1},
-        {500,50,1},
-    }
-    _sendRechargeMails(player, ototal, ntotal, lvls, items)
-end
-
-function sendRechargeMails_2013_04_29(player, ototal, ntotal)
-    local lvls = {
-        10,99,599,999,5999,
-    }
-    local items = {
-        {9367,3,1, 9369,3,1},
-        {503,5,1},
-        {551,3,1},
-        {134,5,1},
-        {1325,15,1},
-    }
-    _sendRechargeMails(player, ototal, ntotal, lvls, items)
-end
-
-function sendRechargeMails_2013_04_30(player, ototal, ntotal)
-    local lvls = {
-        10,99,499,999,5999,
-    }
-    local items = {
-        {9367,3,1, 9369,3,1},
-        {503,5,1},
-        {516,2,1, 507,1,1},
-        {9076,3,1},
-        {134,15,1},
-    }
-    _sendRechargeMails(player, ototal, ntotal, lvls, items)
-end
-
-function sendRechargeMails_2013_05_01(player, ototal, ntotal)
-    local lvls = {
-        10,99,599,999,5999,
-    }
-    local items = {
-        {9367,3,1, 9369,3,1},
-        {515,1,1},
-        {503,2,1},
-        {509,2,1, 507,2,1},
-        {516,20,1},
-    }
-    _sendRechargeMails(player, ototal, ntotal, lvls, items)
-end
-
-function sendRechargeMails_2013_05_02(player, ototal, ntotal)
-    local lvls = {
-        10,99,499,999,5999,
-    }
-    local items = {
-        {9367,3,1, 9369,3,1},
-        {515,1,1},
-        {516,2,1, 507,1,1},
-        {1325,5,1},
-        {9338,15,1},
-    }
-    _sendRechargeMails(player, ototal, ntotal, lvls, items)
-end
-
-function sendRechargeMails_2013_05_03(player, ototal, ntotal)
-    local lvls = {
-        10,99,499,999,5999,
-    }
-    local items = {
-        {9367,3,1, 9369,3,1},
-        {515,1,1},
-        {509,1,1, 507,1,1},
-        {515,3,1},
-        {9371,60,1},
-    }
-    _sendRechargeMails(player, ototal, ntotal, lvls, items)
-end
-
-function sendRechargeMails_2013_05_04(player, ototal, ntotal)
-    local lvls = {
-        10,99,599,999,5999,
-    }
-    local items = {
-        {9367,3,1, 9369,3,1},
-        {515,1,1},
-        {516,2,1, 517,2,1},
-        {509,2,1},
-        {516,20,1},
-    }
-    _sendRechargeMails(player, ototal, ntotal, lvls, items)
-end
-
 -- RECHARGE
 function sendRechargeMails(player, ototal, ntotal)
     if isRPServer() then
@@ -4439,6 +4341,26 @@ function sendRechargeMails(player, ototal, ntotal)
         end
     end
 
+    local t = { ['year'] = 2013, ['month'] = 4, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local s = os.time(t)
+    local n = os.time() + 11
+
+    if n >= s and n < (s + 1*86400) then
+        sendRechargeMails_2013_04_14(player, ototal, ntotal)
+    elseif n >= (s + 1*86400) and n < (s + 2*86400) then
+        sendRechargeMails_2013_04_15(player, ototal, ntotal)
+    elseif n >= (s + 2*86400) and n < (s + 3*86400) then
+        sendRechargeMails_2013_04_16(player, ototal, ntotal)
+    elseif n >= (s + 3*86400) and n < (s + 4*86400) then
+        sendRechargeMails_2013_04_17(player, ototal, ntotal)
+    elseif n >= (s + 4*86400) and n < (s + 5*86400) then
+        sendRechargeMails_2013_04_18(player, ototal, ntotal)
+    elseif n >= (s + 5*86400) and n < (s + 6*86400) then
+        sendRechargeMails_2013_04_19(player, ototal, ntotal)
+    elseif n >= (s + 6*86400) and n < (s + 7*86400) then
+        sendRechargeMails_2013_04_20(player, ototal, ntotal)
+    end
+
     local t = { ['year'] = 2013, ['month'] = 4, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local s = os.time(t)
     local n = os.time() + 11
@@ -4457,26 +4379,6 @@ function sendRechargeMails(player, ototal, ntotal)
         sendRechargeMails_2013_04_26(player, ototal, ntotal)
     elseif n >= (s + 6*86400) and n < (s + 7*86400) then
         sendRechargeMails_2013_04_27(player, ototal, ntotal)
-    end
-
-    local t = { ['year'] = 2013, ['month'] = 4, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-    local s = os.time(t)
-    local n = os.time() + 11
-
-    if n >= s and n < (s + 1*86400) then
-        sendRechargeMails_2013_04_28(player, ototal, ntotal)
-    elseif n >= (s + 1*86400) and n < (s + 2*86400) then
-        sendRechargeMails_2013_04_29(player, ototal, ntotal)
-    elseif n >= (s + 2*86400) and n < (s + 3*86400) then
-        sendRechargeMails_2013_04_30(player, ototal, ntotal)
-    elseif n >= (s + 3*86400) and n < (s + 4*86400) then
-        sendRechargeMails_2013_05_01(player, ototal, ntotal)
-    elseif n >= (s + 4*86400) and n < (s + 5*86400) then
-        sendRechargeMails_2013_05_02(player, ototal, ntotal)
-    elseif n >= (s + 5*86400) and n < (s + 6*86400) then
-        sendRechargeMails_2013_05_03(player, ototal, ntotal)
-    elseif n >= (s + 6*86400) and n < (s + 7*86400) then
-        sendRechargeMails_2013_05_04(player, ototal, ntotal)
     end
 end
 
@@ -6897,7 +6799,7 @@ function sendRechargeRankAward(player, pos)
         end
     end
 
-    local t = { ['year'] = 2013, ['month'] = 4, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local t = { ['year'] = 2013, ['month'] = 4, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local s = os.time(t)
     local n = os.time()
 
@@ -6917,7 +6819,7 @@ function sendRechargeRankAward(player, pos)
         sendRechargeRankAward_2013_04_20(player, pos)
     end
 
-    local t = { ['year'] = 2013, ['month'] = 4, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local t = { ['year'] = 2013, ['month'] = 4, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local s = os.time(t)
     local n = os.time()
 
@@ -7862,7 +7764,12 @@ local equipTrump1 = {
     -- level 100
     [5137] = {
         [1] = {{2664,30},{2665,30},{2666,30},{2667,30},{2668,30},{2669,30},{2670,30},{2671,30},{2672,30},{2673,30},{2674,30},{2675,30},{2676,30},{2677,30},{2678,30},{2679,30},{2680,30},{2681,30},{2682,30},{2683,30},{2684,30},{2685,30},{2686,30},{2687,30},},
-        [2] = {{6039,10},{6040,10},{6041,10},{6042,10},{6043,10},{6044,10},{6045,10},{6046,10},{6047,10},{6048,10},{6049,10},{6050,10},{6051,10},{6052,10},},
+        [2] = {{6039,10},{6040,10},{6041,10},{6042,10},{6043,10},{6044,10},{6045,10},{6046,10},{6047,10},{6048,10},{6049,10},{6050,10},{6051,10},{6052,10},{6137,10},{6138,10},{6139,10},{6140,10},{6141,10},{6142,10},{6143,10},{6144,10},{6145,10},},
+    },
+    -- level 110
+    [9991] = {
+        [1] = {{2936,30},{2937,30},{2938,30},{2939,30},{2940,30},{2941,30},{2942,30},{2943,30},{2944,30},{2945,30},{2946,30},{2947,30},{2948,30},{2949,30},{2950,30},{2951,30},{2952,30},{2953,30},{2954,30},{2955,30},{2956,30},{2957,30},{2958,30},{2959,30},},
+        [2] = {{6146,10},{6147,10},{6148,10},{6149,10},{6150,10},{6151,10},{6152,10},{6153,10},{6154,10},{6155,10},{6156,10},{6157,10},{6158,10},{6159,10},{6160,10},{6161,10},{6162,10},{6163,10},{6164,10},{6165,10},{6166,10},{6167,10},{6168,10},},
     },
 
     -- 阵图

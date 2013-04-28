@@ -17012,7 +17012,7 @@ void Player::sendCopyFrontAllAward()
 
 UInt8 Player::getCopyId()
 {
-    static UInt16 spots[] = {776, 2067, 5906, 8198, 12818, 10512, 0x1411};
+    static UInt16 spots[] = {776, 2067, 5906, 8198, 12818, 10512, 0x1411, 0x2707};
 
     UInt16 currentSpot = PLAYER_DATA(this, location);
     for(UInt8 i = 0; i < sizeof(spots)/sizeof(spots[0]); i++)

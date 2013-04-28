@@ -50,12 +50,14 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _summon(false), _summonLast(0), _moAuraBuf(0), _moAuraBufLast(0), _moEvade100(false), _moEvade100Last(0),
     _hideBuf(false), _hideBufLast(0), _markMo(false), _markMoLast(0),
     _blind(0), _blind_last(0), _deep_blind_dmg_extra(0), _deep_blind_last(0),
+    
 	_moAttackAdd(0), _moMagAtkAdd(0), _moAtkReduce(0), _moMagAtkReduce(0),
 	_moAttackAddCD(0), _moMagAtkAddCD(0), _moAtkReduceCD(0), _moMagAtkReduceCD(0),
 	_petAttackAdd(0), _petMagAtkAdd(0), _petAtkReduce(0), _petMagAtkReduce(0),
 	_petAttackAddCD(0), _petMagAtkAddCD(0), _petAtkReduceCD(0), _petMagAtkReduceCD(0),
     _petExAtk(0), _petExAtkEnable(false), _petExAtkId(0),
-    _bleedMo(0), _bleedMoLast(0), _summoner(NULL), _unSummonAura(0), 
+    _bleedMo(0), _bleedMoLast(0), _blind_bleed(0), _blind_present(0), _blind_present_cd(0),
+    _blind_cd(0), _blind_bleed_last(0), _summoner(NULL), _unSummonAura(0), 
     _shieldHP(0), _shieldHPLast(0), _petShieldHP(0), 
     _petProtect100(false), _petProtect100Last(0), _petAtk100(0), _petAtk100Last(0), _petMark(false),
     _atkAddSpecial(0), _atkSpecialLast(0), _magAtkAddSpecial(0), _magAtkSpecialLast(0), 
@@ -64,7 +66,7 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _bleedRandom(0), _bleedRandomLast(0), _bleedAttackClass(1),_bleedBySkill(0), _bleedBySkillLast(0), _bleedBySkillClass(1),
     _hitChangeByPeerless(0),_counterChangeByPeerless(0),_bSingleAttackFlag(false),_bMainTargetDead(false),_nCurrentAttackIndex(0),
     _darkVigor(0), _dvFactor(0), _darkVigorLast(0), _hpShieldSelf(0), _hpShieldSelf_last(0),
-    _counter_spirit_atk_add(0), _counter_spirit_magatk_add(0), _counter_spirit_def_add(0), _counter_spirit_magdef_add(0), _counter_spirit_times(0), _counter_spirit_last(0), _counter_spirit_efv(0), _counter_spirit_skillid(0), _counter_spirit_skill_cd(0), _pet_coatk(0)
+    _counter_spirit_atk_add(0), _counter_spirit_magatk_add(0), _counter_spirit_def_add(0), _counter_spirit_magdef_add(0), _counter_spirit_times(0), _counter_spirit_last(0), _counter_spirit_efv(0), _counter_spirit_skillid(0), _counter_spirit_skill_cd(0), _pet_coatk(0), _fire_defend(0), _fire_defend_last(0), _fire_fake_dead_rate(0)
 {
     memset(_immuneLevel, 0, sizeof(_immuneLevel));
     memset(_immuneRound, 0, sizeof(_immuneRound));
@@ -2724,5 +2726,47 @@ float BattleFighter::getCounterSpiritAtk()
 
     return (_counter_spirit_efv * lostHP);
 }
+
+bool BattleFighter::releaseFireDefend()
+{
+    if(_fire_defend_last == 0)
+        return false;
+
+    -- _fire_defend_last;
+    if(_fire_defend_last != 0)
+        return false;
+
+    _fire_defend = 0;
+    return true;
+}
+
+bool BattleFighter::doFireFakeDead()
+{
+    if(_fire_fake_dead_rate_last == 0)
+        return false;
+
+    if(uRand(10000) < _fire_fake_dead_rate * 100)
+    {
+        _fire_fake_dead_rate = 0;
+        _fire_fake_dead_rate_last = 0;
+        return true;
+    }
+
+    return false;
+}
+
+bool BattleFighter::releaseFireFakeDead()
+{
+    if(_fire_fake_dead_rate_last == 0)
+        return false;
+
+    -- _fire_fake_dead_rate_last;
+    if(_fire_fake_dead_rate_last != 0)
+        return false;
+
+    _fire_fake_dead_rate = 0;
+    return true;
+}
+
 
 }

@@ -37,6 +37,7 @@ enum
     ON_HIDE = 20,       // 隐身时
     ON_BLEED = 21,     // 流血时
     ON_CONFUSE = 22,   // 混乱时
+    ON_HITE = 23,      // 命中时
 };
 
 enum
@@ -78,6 +79,7 @@ enum
     TYPE_DEC_COUNTER = 35, // 减敌方当前反击率
     TYPE_HITRATE_COUNTER = 36, // 增加当前命中减敌方当前反击率
     TYPE_SHIELD_HP = 37,   // 生命护盾
+    TYPE_FAKE_DEAD = 38,   // 概率不死
     TYPE_MAX,
 };
 
