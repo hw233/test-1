@@ -3548,7 +3548,7 @@ namespace GObject
 
     bool Player::attackTianjieNpc(UInt32 npcId, UInt32 expMulti, bool isEvent,bool isBoss)
 	{
-        int turns = 100;
+        int turns = 200;
 		UInt32 now = TimeUtil::Now();
 		UInt32 buffLeft = getBuffData(PLAYER_BUFF_ATTACKING, now);
 		if(buffLeft > now)

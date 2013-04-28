@@ -950,12 +950,12 @@ void TownDeamon::addActivity(Player* pl)
 }
 void TownDeamon::getTjItem(Player* pl, UInt8 townLevel)
 {
-    static const int s_tjLevTownLev[][2] = {{59,50},{69,60},{79,70},{89,80},{99,90},{109,100}};
-    static const int s_tjItemId[] = {1653, 1654, 1655, 1532, 1533, 1534};
+    static const int s_tjLevTownLev[][2] = {{59,50},{69,60},{79,70},{89,80},{99,90},{109,100},{119,110}};
+    static const int s_tjItemId[] = {1653, 1654, 1655, 1532, 1533, 1534,1661};
     UInt32 v = GVAR.GetVar(GVAR_TJ_TOWN_999_BUG);
     UInt8 tjLevel = GObject::Tianjie::instance().getLastPassedLevel();
     DeamonPlayerData* dpd = pl->getDeamonPlayerData();
-    for (int i = 0; i < 6; ++i)
+    for (int i = 0; i < 7; ++i)
     {
         if (townLevel != s_tjLevTownLev[i][1])
             continue;
@@ -979,15 +979,16 @@ void TownDeamon::getTjItem(Player* pl, UInt8 townLevel)
 
 void TownDeamon::sendTjItemInfo(Player* pl)
 {
-    static const int s_tjLevTownLev[][2] = {{59,50},{69,60},{79,70},{89,80},{99,90},{109,100}};
-    static const int s_tjItemId[] = {1653, 1654, 1655, 1532, 1533, 1534};
+    static const int s_tjLevTownLev[][2] = {{59,50},{69,60},{79,70},{89,80},{99,90},{109,100}, {119,110}};
+    static const int s_tjItemId[] = {1653, 1654, 1655, 1532, 1533, 1534,1661};
     UInt32 v = GVAR.GetVar(GVAR_TJ_TOWN_999_BUG);
     UInt8 tjLevel = GObject::Tianjie::instance().getLastPassedLevel();
     DeamonPlayerData* dpd = pl->getDeamonPlayerData();
     Stream st(REP::TOWN_DEAMON);
     st << static_cast<UInt8>(0x09);
     st << tjLevel;
-    for (int i = 0; i < 6; ++i)
+    st << static_cast<UInt8>(sizeof(s_tjLevTownLev)/sizeof(int)/2);
+    for (UInt8 i = 0; i < sizeof(s_tjLevTownLev)/sizeof(int)/2; ++i)
     {
         UInt8 townLevel = s_tjLevTownLev[i][1];
         UInt8 status = 0; //可领取
