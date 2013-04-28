@@ -227,6 +227,8 @@ int  Tianjie::manualOpenTj(int level, bool force)
         return 1;
     if (m_manualTjLevel > 0)
         return 4;
+    if (m_isTjOpened && m_currOpenedTjLevel == 119 && level == 999)
+        return 4;
  	std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 	if (execu.get() == NULL || !execu->isConnected()) return 2;
 
