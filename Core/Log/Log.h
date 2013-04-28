@@ -169,6 +169,7 @@ enum MailItemType
     NewCountryBattleAward,
     LingbaoFuling,
     TreasureAct,
+    ClanBossAct
 };
 enum ItemFrom
 {
