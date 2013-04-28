@@ -599,6 +599,7 @@ bool Tianjie::LoadFromDB()
                 {
                     m_currOpenedTjLevel = 119;
 	   	            DB1().PushUpdateData("INSERT INTO `tianjie`(`level`) VALUES(%d)",m_currOpenedTjLevel);
+                    m_tjTypeId += 1;
                 }
             }
             else if ( TimeUtil::Now() >= m_openTime &&  TimeUtil::Now() < (m_openTime + TJ_EVENT_PROCESS_TIME))
