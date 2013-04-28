@@ -115,7 +115,7 @@ namespace GObject
             snprintf (res, MAX_RET_LEN, "%s%s", host, url);
             res[MAX_RET_LEN - 1] = '\0';
 
-            int timeout = 1;
+            int timeout = 10;
 
             curl_easy_setopt(curl, CURLOPT_URL, res);
             curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, recvret);
