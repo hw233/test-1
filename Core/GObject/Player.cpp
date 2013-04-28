@@ -11276,7 +11276,6 @@ namespace GObject
     }
     void Player::getLevelAward(UInt8 opt)
     {
-            return ; //等级奖励接口
             UInt8 idx = 0;
             if( 0 == (idx = GameAction()->RunLevelAward(this,opt)) )
                 return;
@@ -11295,7 +11294,6 @@ namespace GObject
     }
     void Player::getLevelAwardInfo()
     {
-        return ; //等级奖励接口
         UInt32 var_lev = GetVar(VAR_LEVEL_AWARD);
         UInt32 lev = GetLev();
         if(lev < 28 )
