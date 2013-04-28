@@ -305,6 +305,8 @@ void ClanBoss::onClanBossReq(GameMsgHdr& hdr, const void* data)
         pl->sendMsgCode(0, 1127);
         return;
     }
+    if (pl->getThreadId() != WORKER_THREAD_NEUTRAL)
+        return;
  
     switch (type)
     {
@@ -851,6 +853,9 @@ bool ClanBoss::attack(Player* pl)
         pl->sendMsgCode(0, 1126); 
         return false;
     }
+    if (pl->getThreadId() != WORKER_THREAD_NEUTRAL)
+        return false;
+ 
    static UInt32 sendflag = 5;
     ++sendflag;
 
@@ -1148,6 +1153,12 @@ void ClanBoss::pickXianyun(Player* pl, UInt64 other)
                     membersAction(cl, pl, true, 3);
                     broadClanStatus(cl);
                     sendMyStatus(pl);
+
+                    Stream st(REP::CLANBOSS);
+                    st << static_cast<UInt8>(3) << static_cast<UInt8>(0) <<static_cast<UInt8>(3);
+                    st << cl->getName().c_str() << pl->getName().c_str();
+                    st << Stream::eos;
+                    plOther->send(st);
                     return;
                 }
            }
@@ -1355,6 +1366,13 @@ void ClanBoss::Empowerment(Player* pl, UInt8 t, UInt64 other)
                         membersAction(cl, pl, true, 3);
                         broadClanStatus(cl);
                         sendMyStatus(pl);
+
+                        Stream st(REP::CLANBOSS);
+                        st << static_cast<UInt8>(7) << static_cast<UInt8>(0) <<static_cast<UInt8>(3);
+                        st << cl->getName().c_str() << pl->getName().c_str();
+                        st << Stream::eos;
+                        plOther->send(st);
+ 
                         return;
                     }
                 }
@@ -1797,6 +1815,7 @@ void ClanBoss::ClanMembersResume(Clan* cl)
             (*it3)->setBuffData(PLAYER_BUFF_CLANBOSS_CD, now);
             iter0->second.insert(*it3);
             _playerStatus[*it3] = 0;
+            _crazyPlayer[*it3] = 0;
         }
         iter3->second.clear();
         broadClanMembersResume(cl);
