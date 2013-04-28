@@ -8151,7 +8151,10 @@ void BattleSimulator::setStatusChange_MagDef(BattleFighter * bf, UInt8 side, UIn
         if(skill->cond == GData::SKILL_BEATKED && bf != bfgt)
             ++last;
     }
-    bfgt->setMagDefendAdd(value, last);
+    if(isFireDefend(skill))
+        bfgt->setFireDefend(value, last);
+    else
+        bfgt->setMagDefendAdd(value, last);
     UInt32 value2 = static_cast<UInt32>(bfgt->getMagDefend());
     appendStatusChange(e_stMagDef, value2, skillId, bfgt);
 }
@@ -8167,10 +8170,7 @@ void BattleSimulator::setStatusChange_MagRes(BattleFighter * bf, UInt8 side, UIn
         if(skill->cond == GData::SKILL_BEATKED && bf != bfgt)
             ++last;
     }
-    if(!isFireDefend(skill))
-        bfgt->setFireDefend(value, last);
-    else
-        bfgt->setMagResAdd(value, last);
+    bfgt->setMagResAdd(value, last);
     UInt32 value2 = static_cast<UInt32>(bfgt->getMagRes(NULL)*100);
     appendStatusChange(e_stMagRes, value2, skillId, bfgt);
 }
