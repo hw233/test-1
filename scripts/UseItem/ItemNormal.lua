@@ -7266,7 +7266,7 @@ function ItemNormal_00010128(iid, num, bind, param)
 
         if 10128 == iid then
             package:AddItem(509, num*1*factor, true, 0, 2);
-            package:AddItem(15, num*1*factor, true, 0, 2);
+            package:AddItem(9371, num*1*factor, true, 0, 2);
             player:getCoupon(num*10*factor)
         elseif 10129 == iid then
             package:AddItem(507, num*1*factor, true, 0, 2);
@@ -7275,11 +7275,11 @@ function ItemNormal_00010128(iid, num, bind, param)
         elseif 10130 == iid then
             package:AddItem(134, num*1*factor, true, 0, 2);
             package:AddItem(57, num*1*factor, true, 0, 2);
-            package:AddItem(15, num*1*factor, true, 0, 2);
+            package:AddItem(514, num*1*factor, true, 0, 2);
         elseif 10131 == iid then
             package:AddItem(515, num*1*factor, true, 0, 2);
             package:AddItem(511, num*2*factor, true, 0, 2);
-            package:AddItem(56, num*1*factor, true, 0, 2);
+            package:AddItem(551, num*1*factor, true, 0, 2);
         end
 
         package:DelItemSendMsg(iid, player);
@@ -10190,6 +10190,7 @@ local ItemNormal_Table = {
     [10129] = ItemNormal_00010128,
     [10130] = ItemNormal_00010128,
     [10131] = ItemNormal_00010128,
+    [10132] = ItemNormal_00010127,
 };
 
 function ItemNormalOther_00000441(iid, num, bind, other)

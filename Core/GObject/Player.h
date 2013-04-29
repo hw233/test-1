@@ -2312,6 +2312,10 @@ namespace GObject
         void getLuckyStarItem(UInt8);
         void LuckyStarActUdpLog(UInt8);
 
+        //女娲石盘
+        void sendNuwaInfo();
+        void setNuwaSignet(UInt8);
+
         void LuckyBagRank();
         void getQQGameOnlineAward();
         void sendQQGameOnlineAward();

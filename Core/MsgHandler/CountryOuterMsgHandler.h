@@ -1951,6 +1951,21 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
         }
         break;
 
+        case 0x0D:
+        {
+            UInt8 type = 0;
+            br >> type;
+            if(type == 1)
+                player->sendNuwaInfo();
+            else if(type == 2)
+            {
+                UInt8 idx = 0;
+                br >> idx;
+                player->setNuwaSignet(idx);
+            }
+        }
+        break;
+
         case 10:
         {
             UInt8 type;

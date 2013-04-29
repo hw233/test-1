@@ -736,6 +736,20 @@ void NewCountryBattle::broadcast( Stream& st )
 
 void NewCountryBattle::updateFirst()
 {   //广播连胜王与荣誉王
+    NCBPlayerData::iterator iter = m_ncbpData.begin();
+    for(; iter != m_ncbpData.end(); ++ iter)
+    {
+        if(iter->second->totalAchievement > m_maxAchievement)
+        {
+            m_achieveKing = iter->first;
+            m_maxAchievement = iter->second->totalAchievement;
+        }
+        if(iter->second->currKillStreak > m_topStreak)
+        {
+            m_topKiller = iter->first;
+            m_topStreak = iter->second->currKillStreak;
+        }
+    }
     Stream st(REP::NEW_CAMPS_WAR_JOIN);
     st << static_cast<UInt8>(0x03);
     if(m_topKiller)
@@ -930,6 +944,7 @@ void NewCountryBattle::handleBattle()
             ncbpData1->skillFlags = 0;
             if(ncbpData1->currKillStreak > ncbpData1->maxKillStreak)
                 ncbpData1->maxKillStreak = ncbpData1->currKillStreak;
+            /*
             if(ncbpData1->currKillStreak > m_topStreak)
             {
                 m_topKiller = player1;
@@ -940,6 +955,7 @@ void NewCountryBattle::handleBattle()
                 m_achieveKing = player1;
                 m_maxAchievement = ncbpData1->totalAchievement;
             }
+            */
             if(currHp1 < currHp2)
             {   //击败一位生命高于自己的对手
                 if(UInt8 award = ncbpData1->updateEffortInfo(6))
@@ -1000,6 +1016,7 @@ void NewCountryBattle::handleBattle()
             ncbpData2->skillFlags = 0;
             if(ncbpData2->currKillStreak > ncbpData2->maxKillStreak)
                 ncbpData2->maxKillStreak = ncbpData2->currKillStreak;
+            /*
             if(ncbpData2->currKillStreak > m_topStreak)
             {
                 m_topKiller = player2;
@@ -1010,6 +1027,7 @@ void NewCountryBattle::handleBattle()
                 m_achieveKing = player2;
                 m_maxAchievement = ncbpData2->totalAchievement;
             }
+            */
 
             if(currHp2 < currHp1)
             {   //击败一位生命高于自己的对手

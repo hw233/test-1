@@ -3853,12 +3853,25 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
 
 void GMHandler::OnFoolsDayGM(GObject::Player *player, std::vector<std::string>& args)
 {
-    player->SetVar(VAR_FOOLS_DAY, 0);
-    player->SetVar(VAR_FOOLS_DAY_INFO, 0);
+	if(args.size() < 1)
+		return;
+    UInt8 type = atoi(args[0].c_str());
+    if(type == 1)
+    {
+        player->SetVar(VAR_FOOLS_DAY, 0);
+        player->SetVar(VAR_FOOLS_DAY_INFO, 0);
+    }
+    else if(type == 2)
+    {
+        player->SetVar(VAR_NUWA_SIGNET, 0);
+        player->SetVar(VAR_NUWA_OPENTIME, 0);
+    }
 }
 
 void GMHandler::OnLuckyStarGM(GObject::Player *player, std::vector<std::string>& args)
 {
+	if(args.size() < 1)
+		return;
     UInt8 type = atoi(args[0].c_str());
     switch(type)
     {

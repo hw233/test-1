@@ -19522,6 +19522,9 @@ bool Player::in7DayFromCreated()
 #define CLR_BIT_8(X,Y)   (X & ~(0xFF<<(Y*8)))
 #define SET_BIT_8(X,Y,V) (CLR_BIT_8(X,Y) | V<<(Y*8))
 #define GET_BIT_8(X,Y)   ((X >> (Y*8)) & 0xFF)
+#define CLR_BIT_3(X,Y)   (X & ~(0x07<<(Y*3)))
+#define SET_BIT_3(X,Y,V) (CLR_BIT_3(X,Y) | V<<(Y*3))
+#define GET_BIT_3(X,Y)   ((X >> (Y*3)) & 0x07)
 void Player::sendFoolsDayInfo(UInt8 answer)
 {
     UInt32 info = GetVar(VAR_FOOLS_DAY_INFO);
@@ -19836,6 +19839,196 @@ void Player::getLuckyStarItem(UInt8 idx)
             LuckyStarActUdpLog(4);
     }
     sendLuckyStarInfo(2);
+}
+
+//女娲石盘
+void Player::sendNuwaInfo()
+{
+    UInt32 now_sharp = TimeUtil::SharpDay(1);
+    UInt32 created_sharp = TimeUtil::SharpDay(0, getCreated());
+    if (created_sharp > now_sharp)
+        return;
+    UInt32 time = GetVar(VAR_NUWA_OPENTIME);
+    time = time == 0 ? created_sharp : TimeUtil::SharpDay(1, time);
+    if (time > now_sharp)
+        return;
+    UInt32 signet = GetVar(VAR_NUWA_SIGNET);
+    UInt8 c = 0, remDay = 0;
+    for(UInt8 i = 1; i <= 9; ++ i)
+    {
+        if(GET_BIT_3(signet, i))
+            ++ c;
+    }
+    UInt8 cnt = GET_BIT_3(signet, 0);
+    UInt32 off_set = CREATE_OFFSET(created_sharp, now_sharp);
+    if (off_set <= 5)
+    {
+        if(c >= 3 || c <= 0)
+        {
+            if (time == created_sharp && cnt == 0)
+                signet = 0;
+            else
+                remDay = (created_sharp + 5 * DAY_SECS - now_sharp) / DAY_SECS + 1;
+        }
+    }
+    else if(off_set >= 6 && off_set <= 30)
+    {
+        if(c >= 3 || c <= 0)
+        {
+            if(time < created_sharp + 6 * DAY_SECS)
+                signet = 0;
+            else
+            {
+                if(now_sharp > time)
+                {
+                    if(cnt < 2)
+                        signet = cnt;
+                    else
+                        remDay = (created_sharp + 30 * DAY_SECS - now_sharp) / DAY_SECS + 1;
+                }
+                else
+                {
+                    if(cnt < 2)
+                        remDay = 1;
+                    else
+                        remDay = (created_sharp + 30 * DAY_SECS - now_sharp) / DAY_SECS + 1;
+                }
+            }
+        }
+    }
+    else    //创建角色第30*n+1至30*n+30天内（n>=1）
+    {
+        if(c >= 3 || c <= 0)
+        {
+            if(time <= created_sharp + off_set/30 * 30 * DAY_SECS)
+            {
+                if(off_set % 30 == 0 && time != created_sharp)
+                {
+                    if(cnt < 2 && now_sharp > time)
+                        signet = cnt;
+                    else
+                        remDay = 1;
+                }
+                else
+                    signet = 0;
+            }
+            else
+            {
+                if(now_sharp > time)
+                {
+                    if(cnt < 2)
+                        signet = cnt;
+                    else
+                        remDay = (created_sharp + (off_set/30+1) * 30 * DAY_SECS - now_sharp) / DAY_SECS + 1;
+                }
+                else
+                {
+                    if(cnt < 2)
+                        remDay = 1;
+                    else
+                        remDay = (created_sharp + (off_set/30+1) * 30 * DAY_SECS - now_sharp) / DAY_SECS + 1;
+                }
+            }
+        }
+    }
+    SetVar(VAR_NUWA_SIGNET, signet);
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(0x0D) << static_cast<UInt8>(0x01);
+    st << static_cast<UInt32>(signet >> 3);
+    st << remDay << Stream::eos;
+    send(st);
+}
+
+void Player::setNuwaSignet(UInt8 idx)
+{
+    if(idx <= 0 || idx > 9)
+        return;
+    UInt32 signet = GetVar(VAR_NUWA_SIGNET);
+    UInt8 c = 0;
+    for(UInt8 i = 1; i <= 9; ++ i)
+    {
+        if(GET_BIT_3(signet, i))
+            ++ c;
+    }
+    if(c >= 3 || GET_BIT_3(signet, idx))
+        return;
+    UInt8 cnt = GET_BIT_3(signet, 0);
+    UInt32 now_sharp = TimeUtil::SharpDay(1);
+    UInt32 created_sharp = TimeUtil::SharpDay(0, getCreated());
+    UInt32 off_set = CREATE_OFFSET(created_sharp, now_sharp);
+    UInt32 time = GetVar(VAR_NUWA_OPENTIME);
+    time = time == 0 ? 0 : TimeUtil::SharpDay(1, time);
+    if(off_set < 6)
+    {
+        if(cnt >= 1) return;
+    }
+    else if (off_set >= 6 && off_set <= 30)
+    {
+        if(cnt >= 2) return;
+        if(time < created_sharp + 6 * DAY_SECS)
+            cnt = 0;
+    }
+    else if(off_set >= 31)
+    {
+        if(cnt >= 2) return;
+        if(time < created_sharp + (off_set/30 * 30 +1) * DAY_SECS)
+            cnt = 0;
+    }
+    //1女娲印记1%，2轩辕印记5%，3神农印记34%，4伏羲印记60%
+    UInt32 rnd = uRand(10000);
+    UInt8 sign = 0;
+    if(rnd < 100)
+        sign = 1;
+    else if(rnd < 600)
+        sign = 2;
+    else if(rnd < 4000)
+        sign = 3;
+    else
+        sign = 4;
+    signet = SET_BIT_3(signet, idx, sign);
+    //女娲石盘开满三个印记
+    if(++c >= 3)
+    {
+        UInt8 snt[4] = {0};
+        for(UInt8 i = 1; i <= 9; ++ i)
+        {
+            UInt8 sign = GET_BIT_3(signet, i);
+            if(sign == 1)
+                ++snt[0];
+            else if(sign == 2)
+                ++snt[1];
+            else if(sign == 3)
+                ++snt[2];
+            else if(sign == 4)
+                ++snt[3];
+        }
+        UInt32 coupon = 0;
+        if(snt[0] >= 3)                         //3个女娲印记
+            coupon = 3000;
+        else if(snt[1] >= 3)                    //3个轩辕印记
+            coupon = 1500;
+        else if(snt[0] >= 1 && snt[1] >= 1)     //1个女娲印记，1个轩辕印记+?
+            coupon = 1000;
+        else if(snt[2] >= 3)                    //3个神农印记
+            coupon = 500;
+        else if(snt[2] >= 1 && snt[3] >= 1)     //1个神农印记，1个伏羲印记+?
+            coupon = 300;
+        else if(snt[3] >= 2)                    //两个伏羲印记+?
+            coupon = 200;
+        else if(snt[1] >= 1)                    //1个轩辕印记+?
+            coupon = 150;
+        else                                    //任意3个
+            coupon = 100;
+        getCoupon(coupon);
+        sendMsgCode(0, 1092, coupon);
+        if(coupon >= 1000)
+            SYSMSG_BROADCASTV(300, getCountry(), getName().c_str(), coupon);
+        signet = SET_BIT_3(signet, 0, (cnt + 1));
+        SetVar(VAR_NUWA_OPENTIME, TimeUtil::Now());
+        TRACE_LOG("NUWA_SHIPAN==>>playerId:[%"I64_FMT"u],Coupon::[%u],signet:[%u]", getId(), coupon, signet);
+    }
+    SetVar(VAR_NUWA_SIGNET, signet);
+    sendNuwaInfo();
 }
 
     void Player::LuckyBagRank()
