@@ -672,7 +672,11 @@ public:
         UInt32 begin = GVAR.GetVar(GVAR_SURNAMELEGEND_BEGIN);
         UInt32 end = GVAR.GetVar(GVAR_SURNAMELEGEND_END);
         UInt32 now = TimeUtil::Now() + time;
-        if( now >= begin && now <= end)
+        if(begin == 0 && end ==0 )
+        {
+            return _surnamelegend;
+        }
+        else  if( now >= begin && now <= end)
             _surnamelegend = true;
         else
             _surnamelegend = false;
@@ -884,7 +888,6 @@ private:
     static void AthleticsPhysicalCheck(void *);
 	static void Tianjie_Refresh(void*);
 	static void DaysRank_Refresh(void*);
-	static void ClanBoss_Refresh(void*);
     static void SendQQGameGift(void*);
     static void TownDeamonTmAward(void *);
     static void ArenaExtraActTimer(void *);

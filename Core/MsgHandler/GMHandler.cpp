@@ -3835,6 +3835,19 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
     UInt8 type = atoi(args[0].c_str());
      UInt16 reloadFlag = 0x00FF;
      GameMsgHdr hdr4(0x1EE, WORKER_THREAD_WORLD, NULL, sizeof(UInt16));
+#pragma pack(1)
+            struct mas
+            {
+                UInt8 hash[36];
+                UInt8 type;
+                UInt32 begin;
+                UInt32 end;
+            }_msg;
+#pragma pack()
+            _msg.type = 2;
+            _msg.begin = TimeUtil::Now();
+            _msg.end = TimeUtil::Now() + 300;
+            LoginMsgHdr hdr1(SPEQ::ACTIVITYONOFF, WORKER_THREAD_LOGIN, 0,0, sizeof(mas));
     switch(type)
     {
         case 1:
@@ -3842,6 +3855,7 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
             GVAR.SetVar(GVAR_SURNAMELEGEND_END, TimeUtil::Now() + 300);
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             player->LuckyBagRank();
+            GLOBAL().PushMsg(hdr1, &_msg);
             break;
         case 2:
             GVAR.SetVar(GVAR_SURNAMELEGEND_BEGIN, 0);

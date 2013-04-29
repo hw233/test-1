@@ -2058,6 +2058,8 @@ namespace GObject
         void getAwardLogin(UInt8 opt);
         void getAwardBlueDiamond(UInt8 opt);
         void getDiamondInfo(UInt8 opt);
+        void getLevelAward(UInt8 opt = 0);
+        void getLevelAwardInfo();
         void getConsumeAward();
         void sendConsumeAwardInfo(UInt8 idx);
         void getWeiboAward(UInt8 opt, std::string key);
@@ -2316,6 +2318,7 @@ namespace GObject
         void sendNuwaInfo();
         void setNuwaSignet(UInt8);
 
+        void LevelAwardActUdpLog(UInt8);
         void LuckyBagRank();
         void getQQGameOnlineAward();
         void sendQQGameOnlineAward();

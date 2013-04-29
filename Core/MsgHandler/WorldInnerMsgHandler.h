@@ -1468,10 +1468,6 @@ void OnSaleItemCancle( GameMsgHdr& hdr, const void * data )
         GObject::gSaleMgr.cancelSale(player, saleCancelNotify->ids[i]);
 }
 
-void OnClanBossReq( GameMsgHdr& hdr, const void* data)
-{
-    GObject::ClanBoss::instance().onClanBossReq(hdr, data);
-}
 void OnAttackClanBoss(GameMsgHdr& hdr, const void* data)
 {
     MSG_QUERY_PLAYER(player);

@@ -143,7 +143,7 @@ function loadStore()
         end
         
         if getSurnameLegend() then
-            store:add(2 ,9382 , 20)
+            store:add(2 ,9383 , 20)
         end
 
         if is2013_0201_0228() then
@@ -155,8 +155,11 @@ function loadStore()
             store:add(2, 1701, 599) --折翼扇
             store:add(2, 1702, 599) --西方之焰
             store:add(2, 1703, 599) --玫瑰情缘
+            store:add(2,1706,599)
             store:add(2, 1709, 599) --圣诞萌萌的糖
             store:add(2, 1710, 599) --圣诞老人的包袱
+            store:add(2, 1711, 599) --爆竹
+            store:add(2, 1712, 599) --莲花灯
         end
         store:add(2, 1704, 599) --轩辕双剑
         store:add(2, 1705, 599) --伏羲古琴

@@ -8339,11 +8339,12 @@ function ItemNormal_00009382(iid, num, bind, param)
     local items = {  15,  9088,512, 33,  9371,551, 501, 513, 503, 1325,134, 507, 509, 515 }
     local chance = { 1500,3000,3900,4800,5700,6600,7400,8200,8800,9100,9400,9600,9800,10000 }
     local card_num = 0;
+    local used_num = player:GetVar(452);
     if package:GetRestPackageSize() < num then
         player:sendMsgCode(2, 1011, 0)
         return 0; 
     end
-    package:DelItemSendMsg(9382, player)
+    package:DelItemSendMsg(iid, player)
     for n = 1, num do
         local rand = math.random(1,10000)
         local g = 0
@@ -8354,18 +8355,27 @@ function ItemNormal_00009382(iid, num, bind, param)
             end
         end
         package:Add(items[g], 1, true, false, 2)
-        local rand_card = math.random(1,100);
-        if rand_card <= 30 then
+        if iid == 9383 then 
+        local rand_card = math.random(1,10000);
+        local card_chance = 3000;
+        if  used_num + n > 30 then
+            card_chance = card_chance -(used_num + n-30)*15;
+        end
+        if card_chance < 500  then
+            card_chance = 500;
+        end
+        if rand_card <= card_chance then
            local  rand_card_num = math.random(1,5)
            rand_card_num = rand_card_num +452;
            player:AddVar(rand_card_num , 1);
            card_num = card_num +1;
         end
+        player:AddVar(452, 1)
+        end
     end
     if card_num~=0 then
     SendMsg(player, 0x35, "获得卡牌 x"..card_num);
     end
-    player:AddVar(452, num)
     player:sendLuckyBagInfo()
     player:LuckyBagRank();
     return num;
@@ -10051,6 +10061,7 @@ local ItemNormal_Table = {
     [9373] = ItemNormal_00009366,
     [9374] = ItemNormal_00009366,
     [9382] = ItemNormal_00009382,
+    [9383] = ItemNormal_00009382,
     [9900] = ItemNormal_NameCard,
     [9901] = ItemNormal_NameCard,
     [9902] = ItemNormal_NameCard,
@@ -10058,6 +10069,7 @@ local ItemNormal_Table = {
     [9904] = ItemNormal_NameCard,
     [9905] = ItemNormal_NameCard,
     [9906] = ItemNormal_NameCard,
+    [9907] = ItemNormal_NameCard,
 
     [10000] = ItemNormal_00010000,
     [10001] = ItemNormal_00010001,
