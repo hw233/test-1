@@ -113,6 +113,7 @@ enum PurchaseType
     ClanBossAct1                = 102, //末日之战鼓舞生命
     ClanBossAct2                = 103, //末日之战鼓舞攻击
     ClanBossAct3                = 104, //末日之战鼓舞身法
+    LevelUpAward                = 105, //付费获得升级奖励
     //繁体私有占150～200
 };
 

@@ -979,50 +979,53 @@ local LevelAwards = {
     [139] = {{515 ,8},{1325, 8},{8000, 8},{53,5}},
     [140] = {{515 ,8},{9338, 8},{8000, 8},{53,5}},
 }
-local Level_gold = { 5,5,5,5,5,8,8,5,5,5,
-                     8,8,8,8,8,8,8,  20,20,20,
-                     20,20,  25,25,25,   50,50,50,   99,99,
-                     99,99,  20,20,20,20,  50,50,35,35,
-                     35,35,  50,50,50,50,50,  20,20,20,
-                     66,66,  30,30,  40,40,  50,  99,99, 99,
-                     111,111,  77,77,77,  150,150, 88,88, 88,
-                     99,99,99,99,99,99,99,99,99, 99,
-                     99,99,99,99,99,99,99,99,99, 99,
-                     99,99,   150,150,150,99,99,99,   150, 150,
-                     150,99,99,99,   150,150,150,99,99, 99, 
-                     150,150,150}
-function RunLevelAward(player,opt)
+local Level_gold = {
+    5,5,5,5,5,          8,8,5,5,5,
+    8,8,8,8,8,          8,8,20,20,20,
+    20,20,25,25,25,     50,50,50,99,99,
+    99,99,20,20,20,     20,50,50,35,35,
+    35,35,50,50,50,     50,50,20,20,20,
+    66,66,30,30,40,     40,50,99,99,99,
+    111,111,77,77,77,   150,150,88,88,88,
+    99,99,99,99,99,     99,99,99,99,99,
+    99,99,99,99,99,     99,99,99,99,99,
+    99,99,150,150,150,  99,99,99,150,150,
+    150,99,99,99,150,   150,150,99,99,99,
+    150,150,150,
+}
+function RunLevelAward(player, opt)
     if player == nil then
         return false;
     end
     local var_level = player:GetVar(458)
     local level = player:GetLev();
     local double = 1;
-    if var_level >= level then 
-        player:SetVar(458,level)
-         return 0;
+    if var_level >= level then
+        player:SetVar(458, level)
+        return 0;
     end
     local awards = LevelAwards[level]
-    if awards == nil then 
+    if awards == nil then
         return 0;
     end
     local package = player:GetPackage();
-     if package:GetRestPackageSize() < 4 then 
+    if package:GetRestPackageSize() < 4 then
        player:sendMsgCode(2, 1011, 0)
-       return 0; 
-     end
-     if opt ==1 then
-        local gold_need = Level_gold[level - 27]
-        if player:getGoldInLua()< gold_need then
-         player:sendMsgCode(2, 1004,0) 
-        return 0; 
-        end
-        player:useGoldInLua( gold_need ) 
-        double = 2;
-     end
-    for idx = 1,#awards do 
-    package:Add(awards[idx][1], awards[idx][2] * double, true, 0, 44);
+       return 0;
     end
-    player:SetVar(458,level)
+    if opt == 1 then
+        local gold_need = Level_gold[level - 27]
+        if nil == gold_need or player:getGoldInLua() < gold_need then
+            player:sendMsgCode(2, 1104,0)
+            return 0;
+        end
+        player:useGoldInLua(gold_need, 105)
+        double = 2;
+    end
+    for idx = 1, #awards do
+        package:Add(awards[idx][1], awards[idx][2] * double, true, false, 44);
+    end
+    player:SetVar(458, level)
     return true;
 end
+
