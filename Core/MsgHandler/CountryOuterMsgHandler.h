@@ -2937,8 +2937,7 @@ void OnAttackNpcReq( GameMsgHdr& hdr, AttackNpcReq& anr )
 	}
     if (anr._npcId == 5515)
     {
-        GameMsgHdr hdr2(0x1D1, WORKER_THREAD_WORLD, player, 0);
-	    GLOBAL().PushMsg(hdr2, 0);
+        GObject::ClanBoss::instance().attack(player);
         return;
     }
 
@@ -6249,6 +6248,10 @@ void OnRPServerReq( GameMsgHdr & hdr, const void * data)
     }
 }
  
+void OnClanBossReq( GameMsgHdr& hdr, const void* data)
+{
+    GObject::ClanBoss::instance().onClanBossReq(hdr, data);
+}
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

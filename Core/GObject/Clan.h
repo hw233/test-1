@@ -584,19 +584,32 @@ public:
             return 0;
         return _urge[t];
     }
-    void setUrge(UInt8 t, UInt8 n)
+    void setUrge(UInt8 t, UInt8 n, bool toDB = true)
     {
         if (t < 3)
+        {
             _urge[t] = n;
+            if (toDB)
+                urgeToDB();
+        }
     }
     void clearUrge()
     {
         memset(_urge, 0, sizeof(_urge));
+        urgeToDB();
     }
     void addUrge(UInt8 t, UInt8 n)
     {
         if (t < 3)
+        {
             _urge[t] += n;
+            urgeToDB();
+        }
+    }
+    void urgeToDB()
+    {
+         UInt32 t = _urge[0] + ((UInt32)_urge[1]<<8) + ((UInt32)_urge[2]<<16);
+         DB5().PushUpdateData("UPDATE `clan` SET `urge` = %u WHERE `id` = %u", t, _id);
     }
     UInt32 getGongxian() {return _gongxian;}
     UInt32 addGongxian(int num)    {

@@ -47,8 +47,6 @@ MSG_REG(GameMsgHdr, OnLuckDrawRankListReq);
 MSG_REG(GameMsgHdr, OnItemHistoryReq);
 MSG_REG_2(GameMsgHdr, REQ::CLAN_PACKAGE, OnClanPackageReq);
 
-MSG_REG_2(GameMsgHdr, REQ::CLANBOSS, OnClanBossReq);
-
 MSG_REG_2(GameMsgHdr, REQ::CLAN_SKILL, OnClanTechOpReq);
 MSG_REG_2(GameMsgHdr, REQ::CLAN_BATTLE, OnClanCityBattleReq);
 MSG_REG_2(GameMsgHdr, REQ::CLANCITYBATTLELIST, OnClanCityBattleListReq);

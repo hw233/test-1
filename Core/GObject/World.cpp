@@ -57,7 +57,6 @@
 #include "MsgHandler/Memcached.h"
 #include "RechargeTmpl.h"
 #include "GVar.h"
-#include "ClanBoss.h"
 
 static const UInt32 DAYSRANKTM = 23 * 3600+50*60;
 
@@ -548,6 +547,13 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 26)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 27)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 5, 1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 5, 2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 5, 3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 5, 4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 5, 5)
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
     {
@@ -1396,6 +1402,13 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 26)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 27)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 4, 30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 5, 1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 5, 2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 5, 3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 5, 4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 5, 5)
             )
         bRechargeEnd = true;
     if (cfg.rpServer)
@@ -1559,11 +1572,6 @@ void World::DaysRank_Refresh(void*)
 {
 	GObject::DaysRank::instance().process();
 }
-void World::ClanBoss_Refresh(void*)
-{
-	GObject::ClanBoss::instance().refresh();
-}
-
 void World::SendQQGameGift(void*)
 {
     UInt32 now = TimeUtil::Now();
@@ -1882,9 +1890,7 @@ bool World::Init()
 	GObject::Tianjie::instance().Init();
 	AddTimer(5 * 1000, Tianjie_Refresh, static_cast<void*>(NULL));
 	GObject::DaysRank::instance().Init(); 
-    GObject::ClanBoss::instance().init();
-	AddTimer(1000, ClanBoss_Refresh, static_cast<void*>(NULL));
-	//AddTimer(60 * 1000, DaysRank_Refresh, static_cast<void*>(NULL)); //调试用
+    //AddTimer(60 * 1000, DaysRank_Refresh, static_cast<void*>(NULL)); //调试用
 
 	GObjectManager::delayLoad();
 	GObjectManager::LoadPracticeData();

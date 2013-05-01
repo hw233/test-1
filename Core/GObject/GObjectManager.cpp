@@ -2157,6 +2157,14 @@ namespace GObject
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
+            if (bosshp.id == 5515) //末日之战boss
+            {
+                if (bosshp.level == 1)//正在进行中down机了
+                {
+                    GObject::ClanBoss::instance().setNeedRestart(true, bosshp.hp);
+                    continue;
+                }
+            }
 			Boss * boss = bossManager.findBoss(bosshp.id);
 			if(boss == NULL)
 				continue;
@@ -3125,7 +3133,7 @@ namespace GObject
         // ??????Ϣ
 		LoadingCounter lc("Loading clans:");
 		DBClan cl;
-		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `funds`, `foundTime`, `founder`, `leader`, `watchman`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle`, `battleScore`, `dailyBattleScore`, `battleRanking`,`qqOpenid`,`xianyun`,`gongxian` FROM `clan`", cl) != DB::DB_OK)
+		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `funds`, `foundTime`, `founder`, `leader`, `watchman`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle`, `battleScore`, `dailyBattleScore`, `battleRanking`,`qqOpenid`,`xianyun`,`gongxian`,`urge` FROM `clan`", cl) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		Clan * clan = NULL;
@@ -3171,6 +3179,11 @@ namespace GObject
                 clan->setQQOpenid(cl.qqOpenid);
                 clan->setXianyun(cl.xianyun);
                 clan->setGongxian(cl.gongxian);
+                if (cl.urge > 0)
+                {
+                    for (UInt8 i = 0; i < 3; i++)
+                        clan->setUrge(i, (UInt8)(cl.urge>>(8*i)), false);
+                }
                 if (cl.gongxian > 0)
                     GObject::ClanBoss::instance().insertToGxSort(clan, 0, cl.gongxian);
 		}
