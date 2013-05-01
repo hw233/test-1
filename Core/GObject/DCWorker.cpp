@@ -324,7 +324,7 @@ namespace GObject
         #undef JSON_ERR_CUSTOM3
         #undef JSON_ERR_CUSTOM4
     }
-    bool DCWorker::CheckRPOpenid(char* openid)
+    UInt8 DCWorker::CheckRPOpenid(char* openid)
     {
         if (!cfg.rpServer)
             return true;
@@ -334,7 +334,8 @@ namespace GObject
         char key[64] = {0};
         size_t len = snprintf(key, sizeof(key), "uid_asss_rp_%s", openid); 
         m_MCached.get(key, len, value, sizeof(value));
-        return value[0] == '1';
+        value[1] = 0;
+        return atoi(value);
     }
 }
 

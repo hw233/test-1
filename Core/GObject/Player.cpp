@@ -11206,7 +11206,6 @@ namespace GObject
 
     void Player::getAwardBlueDiamond(UInt8 opt)
     {
-        std::cout<<opt<<std::endl;
         if(opt >= 1) //抽奖
         {
             UInt8 idx = 0;
@@ -17026,20 +17025,27 @@ void Player::get3366GiftAward(UInt8 type)
             sendMsgCode(0, 1011);
             return;
         }
-        if(getGold() < 368)
+        if(getGold() < 79/*368*/)
         {
             sendMsgCode(0, 1104);
             return;
         }
 		ConsumeInfo ci(Enum3366Gift,0,0);
-		useGold(368,&ci);
+		useGold(79/*368*/,&ci);
         AddVar(VAR_3366GIFT, 1);
+        /*
         m_Package->Add(500, 2, true);
         m_Package->Add(501, 2, true);
         m_Package->Add(1325, 2, true);
         m_Package->Add(516, 2, true);
         m_Package->Add(134, 2, true);
         m_Package->Add(515, 2, true);
+        */
+        static UInt32 itemId[] = {9371, 9338, 9141, 503, 500, 501};
+        for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); ++ i)
+        {
+            GetPackage()->Add(itemId[i], 1, true);
+        }
         send3366GiftInfo();
     }
 }
@@ -18905,7 +18911,7 @@ void Player::sendRP7TreasureInfo(bool isLogin)
     if (cfg.rpServer && b ==0)
     {
         b = World::getOpenTime();
-        n = b+7*86400;
+        n = b+7*86400-1;
     }
     Stream st(REP::RP_SERVER);
     st << static_cast<UInt8>(0x02) <<static_cast<UInt8>(0x01);
@@ -18950,6 +18956,7 @@ void Player::sendRP7TreasureInfo(bool isLogin)
 void Player::buyRP7Treasure(UInt8 idx)
 {
     static UInt32 s_gold[] = {1000,10000,30000,50000,80000,120000};
+    static UInt32 s_rpgold[] = {100,500,1000,2000,5000,10000};
     if (idx > 5)
         return;
  
@@ -18985,8 +18992,11 @@ void Player::buyRP7Treasure(UInt8 idx)
         {
             if(!hasChecked())
                 return;
+            UInt32 gold = s_gold[idx];
+            if (cfg.rpServer)
+                gold = s_rpgold[idx];
  
-     		if (getGold() < s_gold[idx])
+     		if (getGold() < gold)
             {
                 res = 3;
                 sendMsgCode(0,1104);
@@ -18994,8 +19004,9 @@ void Player::buyRP7Treasure(UInt8 idx)
             }
             else
             {
-            	ConsumeInfo ci(RP7Treasure,0,0);
-        	    useGold(s_gold[idx],&ci);
+            	//ConsumeInfo ci(RP7Treasure,0,0);
+        	    //useGold(gold,&ci);
+                useGold(gold);
                 v |= (1<<idx);
                 SetVar(VAR_RP7_TREASURE, v);
 
@@ -19011,6 +19022,7 @@ void Player::buyRP7Treasure(UInt8 idx)
                     SetVar(VAR_RP7_TREASURE1_GETTIME+2, GetVar(VAR_RP7_TREASURE1_GETTIME+1));
                 }
                 SetVar(var,tm);  
+                udpLog("huodong", "F_10000_0417_1", "", "", "", "", "act", gold);
             }
         }
     }
@@ -19025,6 +19037,7 @@ void Player::buyRP7Treasure(UInt8 idx)
 void Player::getRP7TreasureAward(UInt8 idx)
 {
     static UInt32 s_gold[] = {1000,10000,30000,50000,80000,120000};
+    static UInt32 s_rpgold[] = {100,500,1000,2000,5000,10000};
     static MailPackage::MailItem s_item[][8] = {
         {{0xB000,100},{57,1},{56,1},{29,10},{15,1},{48,1}},
         {{0xB000,1000},{0xA000,20},{509,1},{507,1},{516,1},{547,1}},
@@ -19032,6 +19045,14 @@ void Player::getRP7TreasureAward(UInt8 idx)
         {{0xB000,5000},{0xA000,80},{509,2},{503,2},{515,2},{507,2}},
         {{0xB000,8000},{0xA000,100},{1325,3},{134,3},{509,3},{507,3}},
         {{0xB000,12000},{0xA000,150},{1325,5},{134,5},{509,5},{507,5}},
+    };
+    static MailPackage::MailItem s_rpitem[][8] = {
+        {{0xB000,10},{508,1},{506,1},{15,1},{51,1}},
+        {{0xB000,50},{0xA000,5},{57,1},{56,1},{29,10},{15,1}},
+        {{0xB000,100},{0xA000,10},{508,1},{506,1},{516,1},{29,10}},
+        {{0xB000,200},{0xA000,20},{503,1},{48,1},{500,1},{501,1}},
+        {{0xB000,500},{0xA000,30},{503,1},{515,1},{49,1},{50,1}},
+        {{0xB000,1000},{0xA000,50},{1325,2},{134,2},{509,2},{507,2}},
     };
     if (idx > 5)
         return;
@@ -19057,9 +19078,17 @@ void Player::getRP7TreasureAward(UInt8 idx)
             res = 3;
         else
         {
+            UInt32 gold = s_gold[idx];
+            MailPackage::MailItem* pItem = s_item[idx];
+            if (cfg.rpServer)
+            {
+                pItem = s_rpitem[idx];
+                gold = s_rpgold[idx];
+            }
+            MailItemsInfo itemsInfo(pItem, TreasureAct, 6);
             SYSMSG(title,4912);
-            SYSMSGV(content,4913,s_gold[idx],count+1);
-			Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            SYSMSGV(content,4913,gold,count+1);
+			Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000,true, &itemsInfo);
             if (mail)
             {
                 UInt8 t = GetVar(VAR_RP7_TREASURE_TODAY_GOT);
@@ -19069,8 +19098,10 @@ void Player::getRP7TreasureAward(UInt8 idx)
                 v1 &= ~(0xFF<<(c*8));
                 v1 += (count<<(c*8));
                 SetVar(VAR_RP7_TREASURE, v1);
-                mailPackageManager.push(mail->id, s_item[idx], 8, true);
+
+               mailPackageManager.push(mail->id, pItem, 8, true);
             }
+            udpLog("huodong", "F_10000_0417_2", "", "", "", "", "act", gold/10);
         }
     }
     Stream st(REP::RP_SERVER);
@@ -19753,7 +19784,7 @@ void Player::getLuckyStarItem(UInt8 idx)
         {
             UInt32 LuckbagNum = GetVar(VAR_SURNAMELEGEND_USED);
             GameMsgHdr hdr(0x1C8, WORKER_THREAD_WORLD, this, sizeof(LuckbagNum));
-             GLOBAL().PushMsg(hdr, &LuckbagNum);
+            GLOBAL().PushMsg(hdr, &LuckbagNum);
         }
     }
 } // namespace GObject

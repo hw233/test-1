@@ -828,10 +828,10 @@ void SendLuckyBagRank(Stream& st)
 {
     using namespace GObject;
     st.init(REP::ACT);
-    UInt8 cnt = World::LuckyBagSort.size();
+    UInt32 cnt = World::LuckyBagSort.size();
     if (cnt > CNT)
         cnt = CNT;
-    st << static_cast<UInt8>(2) << static_cast<UInt8>(4) << static_cast<UInt8>(0) << cnt;
+    st << static_cast<UInt8>(2) << static_cast<UInt8>(4) << static_cast<UInt8>(0) << static_cast<UInt8>(cnt);
     UInt32 c = 0;
     for (RCSortType::iterator i = World::LuckyBagSort.begin(), e = World::LuckyBagSort.end(); i != e; ++i)
     {
