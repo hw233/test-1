@@ -2689,9 +2689,9 @@ namespace GObject
         }
     }
 
-    UInt8 Package::Enchant( UInt16 fighterId, UInt32 itemId, UInt8 type, UInt16 count, UInt8 level, UInt16& success, UInt16& failed/*, bool protect*/ )
+    UInt8 Package::Enchant( UInt16 fighterId, UInt32 itemId, UInt8 type, UInt16 count, UInt8 level, UInt16& success, UInt16& failed, UInt16& bless /*, bool protect*/ )
 	{
-		if (type > 1) return 2;
+		if (type > 2) return 2;
 		Fighter * fgt = NULL;
 		UInt8 pos = 0;
         UInt32 failThisTime = 0;
@@ -2733,10 +2733,9 @@ namespace GObject
             return 2;
 
         // count不为0则type必须为1，表示自动强化时必须消耗精金
-        if(count !=0 && type != 1)
+        if(count !=0 && type == 0)
             return 2;
-
-		if(GetItemAnyNum(item_enchant_l + type) < (count > 0 ? count : 1))
+		if(type < 2 && GetItemAnyNum(item_enchant_l + type) < (count > 0 ? count : 1))
             return 2;
 
         HoneyFall* hf = m_Owner->getHoneyFall();
@@ -2778,11 +2777,16 @@ namespace GObject
         UInt32 enc_times = 1;
 	    UInt8 oldEnchant = ied.enchant;
         UInt8 oldHfValue = hf->getHftValue(hft);
+        if(type == 2)
+        {
+            bless = oldHfValue;
+            return 3;
+        }
         if(0 == count)
         {
             if(uRand(100000) < enchant)
             {
-                if(type != 0 && ied.enchant > 3)
+                if(type == 1 )
                 {
                     updateHft = true;
                     hf->setHftValue(hft, 0);
@@ -2802,7 +2806,7 @@ namespace GObject
                 }
                 enchantUdpLog(equip, ied.enchant);
             }
-            else if(type != 0 && ied.enchant > 3)
+            else if(type == 1)
             {
                 updateHft = true;
                 hf->incHftValue(hft);
@@ -2838,7 +2842,6 @@ namespace GObject
                 }
                 else
                 {
-                    if(ied.enchant > 3)
                     {
                         updateHft = true;
                         hf->incHftValue(hft);
@@ -2852,7 +2855,6 @@ namespace GObject
                 enchant = hf->getChanceFromHft(quality, ied.enchant, hft);
             }
         }
-
         if(!DelItemAny(item_enchant_l + type, enc_times, &isBound))
         {
             success = 0;
@@ -2864,7 +2866,7 @@ namespace GObject
 
         if(updateHft)
             hf->updateHftValueToDB(hft);
-
+        bless = hf->getHftValue(hft);
         if(equip->getClass() == Item_Trump || equip->getClass() == Item_Halo)
             GameAction()->doStrong(this->m_Owner, SthTrumpEnchant, 0, 0);
         else
