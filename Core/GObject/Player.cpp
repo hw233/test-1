@@ -13204,7 +13204,7 @@ namespace GObject
 
         UInt32 rpValue = GetVar(VAR_RP_VALUE);
         UInt8 packageType = rpValue;
-        if (packageType > 0)
+        if (packageType > 0 && packageType < 4)
         {
             UInt8 packageGot = rpValue >> 8;
             UInt8 rewardGot = GetVar(VAR_RP_REWARD_GOT);
@@ -13465,11 +13465,14 @@ namespace GObject
         if (today > 7)
             return;
         UInt32 rpValue = GetVar(VAR_RP_VALUE);
-        if (rpValue != 4)
+        if (rpValue != 4 && rpValue != 5)
             return;
         UInt32 v = GetVar(VAR_FISHUSER_AWARD);
         Stream st(REP::RC7DAY);
-        st << static_cast<UInt8>(9);
+        if (4 == rpValue)
+            st << static_cast<UInt8>(9);
+        else
+            st << static_cast<UInt8>(11);
         st << static_cast<UInt8>(today);
         st << static_cast<UInt8>(v);
         st << Stream::eos;
@@ -13480,7 +13483,7 @@ namespace GObject
         if (GetLev() < 45)
             return;
         UInt32 rpValue = GetVar(VAR_RP_VALUE);
-        if (rpValue != 4)
+        if (rpValue != 4 && rpValue != 5)
             return;
 
         if (TimeUtil::SharpDay(0, TimeUtil::Now()) - TimeUtil::SharpDay(0, getCreated()) > 6 * DAY_SECS)
