@@ -7507,7 +7507,6 @@ namespace GObject
             OnShuoShuo(nLev/10-4 + SS_40);
 
         sendVipPrivilegeMail(nLev);
-        getLevelAwardInfo();
 	}
 
     void Player::sendFormationList()
@@ -11274,10 +11273,10 @@ namespace GObject
         Stream st(REP::GETAWARD);
         st << static_cast<UInt8>(17) << opt << num << Stream::eos;
         send(st);
-        getLevelAwardInfo();
     }
     void Player::getLevelAward(UInt8 opt)
     {
+            return ; //等级奖励接口
             UInt8 idx = 0;
             if( 0 == (idx = GameAction()->RunLevelAward(this,opt)) )
                 return;
@@ -11296,6 +11295,7 @@ namespace GObject
     }
     void Player::getLevelAwardInfo()
     {
+        return ; //等级奖励接口
         UInt32 var_lev = GetVar(VAR_LEVEL_AWARD);
         UInt32 lev = GetLev();
         if(lev < 28 )
