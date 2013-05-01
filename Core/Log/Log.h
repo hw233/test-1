@@ -216,6 +216,7 @@ enum ItemFrom
     FromVipPrivilege = 41, // 限时vip 
     FromCFriend = 42, //好友邀请
     FromLuckyStar = 43, //充值幸运星
+    FromLevelAward = 44, //等级奖励
 };
 
 enum ItemTo

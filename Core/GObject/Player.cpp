@@ -7507,6 +7507,7 @@ namespace GObject
             OnShuoShuo(nLev/10-4 + SS_40);
 
         sendVipPrivilegeMail(nLev);
+        getLevelAwardInfo();
 	}
 
     void Player::sendFormationList()
@@ -10925,6 +10926,9 @@ namespace GObject
         case 17:
             getDiamondInfo(opt);
             break;
+        case 18:
+            getLevelAward(opt);
+            break;
         }
     }
 
@@ -11269,6 +11273,36 @@ namespace GObject
         UInt8 num = GetVar(id);
         Stream st(REP::GETAWARD);
         st << static_cast<UInt8>(17) << opt << num << Stream::eos;
+        send(st);
+        getLevelAwardInfo();
+    }
+    void Player::getLevelAward(UInt8 opt)
+    {
+            UInt8 idx = 0;
+            if( 0 == (idx = GameAction()->RunLevelAward(this,opt)) )
+                return;
+            Stream st(REP::GETAWARD);
+            st << static_cast<UInt8>(18) << idx << Stream::eos;
+            send(st);
+            LevelAwardActUdpLog(opt);
+            getLevelAwardInfo();
+    }
+    void Player::LevelAwardActUdpLog(UInt8 type)
+    {
+        UInt32 level = GetLev();
+       char action[16] = "";
+       snprintf (action, 16, "F_10000_%d_%u", type,level);
+       udpLog("LevelAward", action, "", "", "", "", "act");
+    }
+    void Player::getLevelAwardInfo()
+    {
+        UInt32 var_lev = GetVar(VAR_LEVEL_AWARD);
+        UInt32 lev = GetLev();
+        if(lev < 28 )
+            return ;
+        UInt8 suc =( var_lev == lev );
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(18) <<suc << Stream::eos;
         send(st);
     }
     void Player::getConsumeAward()

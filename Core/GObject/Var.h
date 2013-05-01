@@ -410,7 +410,7 @@ namespace GObject
         VAR_CARD_3 = 455,
         VAR_CARD_4 = 456,
         VAR_CARD_5 = 457,
-
+        VAR_LEVEL_AWARD = 458, 
         VAR_CLANBOSS_GONGXIAN= 460, //末日之战贡献
 
         //繁体版占用470-499

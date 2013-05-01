@@ -1283,6 +1283,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     //充值幸运星活动
     pl->setLuckyStarCondition();
     pl->sendLuckyStarInfo(1);
+    pl->getLevelAwardInfo();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )

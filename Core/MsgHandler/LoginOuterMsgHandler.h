@@ -3148,7 +3148,6 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
 {
     BinaryReader br(data, hdr.msgHdr.bodyLen);
     CHKKEY();
-
     UInt32 begin = 0, end = 0;
     UInt8 type = 0;
     br >> type >> begin >> end;
