@@ -131,8 +131,8 @@ public:
 	inline float getSoul() { return _soul; }
 	inline float getAura() { return (_aura > 0 ? _aura : 0); }
 	inline float getAuraMax() { return (_auraMax > 0 ? _auraMax : 0); }
-	inline float getAttack() {float ret = _attack + _attackAdd + _attackAdd2 + _atkAddSpecial + _atkDecSpecial + _moAttackAdd + _petAttackAdd + (_petExAtkEnable?_petExAtk:0) + _counter_spirit_atk_add; return  ret;}
-	inline float getMagAttack() {float ret = _magatk + _magAtkAdd + _magAtkAdd2 + _magAtkAddSpecial + _magAtkDecSpecial + _moMagAtkAdd + _petMagAtkAdd + _counter_spirit_magatk_add; return ret;}
+	inline float getAttack() {float ret = _attack + _attackAdd + _attackAdd2 + _atkAddSpecial + _atkDecSpecial + _moAttackAdd + _petAttackAdd + (_petExAtkEnable?_petExAtk:0) + _counter_spirit_atk_add + _pet_coatk; return  ret;}
+	inline float getMagAttack() {float ret = _magatk + _magAtkAdd + _magAtkAdd2 + _magAtkAddSpecial + _magAtkDecSpecial + _moMagAtkAdd + _petMagAtkAdd + _counter_spirit_magatk_add + _pet_coatk; return ret;}
 	inline float getDefend() {float ret = _defend + _defAdd + _defAdd2 + _counter_spirit_def_add; return (ret > 0 ? ret : 0);}
 	inline float getMagDefend() {float ret = _magdef + _magDefAdd + _magDefAdd2 + _counter_spirit_magdef_add; return (ret > 0 ? ret : 0);}
 	float getHitrate(BattleFighter* defgt);
@@ -938,6 +938,11 @@ public:
     UInt16 getCounterSpiritSkillId() { return _counter_spirit_skillid; }
     std::vector<float>& getCounterSpiritFactor() { return _counter_spirit_factor; }
     bool releaseCounterSpirit();
+
+private:
+    float _pet_coatk;
+    void setPetCoAtk(float v) { _pet_coatk = v; }
+    void releasePetCoAtk() { if(_pet_coatk > 0.001f) _pet_coatk = 0; }
 
 public:
 	enum StatusFlag
