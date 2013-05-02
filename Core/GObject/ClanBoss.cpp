@@ -289,6 +289,11 @@ void ClanBoss::refresh()
             }
         }
     }
+
+    if (_isBossDead)
+    {
+        close();
+    }
 }
 void ClanBoss::onClanBossReq(GameMsgHdr& hdr, const void* data)
 {
@@ -1706,7 +1711,6 @@ void ClanBoss::Change2PowerStatus()
 void ClanBoss::BossDead(Player* pl)
 {
     _isBossDead = true;
-    close();
 }
 void ClanBoss::Urge(Player* pl, UInt8 t)
 {
