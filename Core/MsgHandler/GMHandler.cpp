@@ -1867,6 +1867,7 @@ void GMHandler::OnSetLevel( GObject::Player * player, std::vector<std::string>& 
                 UInt8 lvl = atoi(args[1].c_str());
                 UInt64 exp = GData::expTable.getLevelMin(lvl);
                 pl->setLevelAndExp(lvl, exp);
+                pl->SetVar(VAR_LEVEL_AWARD, (lvl == 0 ? 1 : lvl)-1);
             }
             else
             {
@@ -1893,6 +1894,7 @@ void GMHandler::OnSetLevel( GObject::Player * player, std::vector<std::string>& 
 		UInt8 lvl = atoi(args[0].c_str());
 		UInt64 exp = GData::expTable.getLevelMin(lvl);
 		player->setLevelAndExp(lvl, exp);
+        player->SetVar(VAR_LEVEL_AWARD, (lvl == 0 ? 1 : lvl)-1);
 	}
 }
 

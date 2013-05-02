@@ -2832,6 +2832,8 @@ function ItemNormal_00000043(iid, num, bind, param)
 	if fgt == nil then
 		return false;
 	end
+    --[[
+    去掉使用次数限制 孙涛 2013-5-2 17:00:00
     if num > 1 then
 		player:sendMsgCode(2, 1058, 0);
         return false
@@ -2856,7 +2858,36 @@ function ItemNormal_00000043(iid, num, bind, param)
 		package:DelItemSendMsg(43, player);
 		return num;
 	end
-    return num;
+    --]]
+    if fgt:isPExpFull() then
+        player:sendMsgCode(2, 1069, 0);
+        return false
+    end
+    local pp = 0;
+    if 43 == iid then
+        pp = 20000
+    elseif 52 == iid then
+        pp = 2000
+    elseif 53 == iid then
+        pp = 10000
+    else
+        pp = 5000
+    end
+    local pexp = fgt:getPExp()
+    local n = 0;
+    for i = 1, num do
+        n = n + 1
+        pexp = pexp + pp
+        if pexp >= fgt:getPExpMax() then
+            break
+        end
+    end
+
+    if n ~= 0 then
+        fgt:addPExp(n * pp);
+        package:DelItemSendMsg(iid, player);
+    end
+    return n;
 end
 
 function ItemNormal_00000052(iid, num, bind, param)
@@ -8434,9 +8465,9 @@ local ItemNormal_Table = {
 	[39] = ItemNormal_00000039,
 	[40] = ItemNormal_00000040,
 	[43] = ItemNormal_00000043,
-	[52] = ItemNormal_00000052,
-	[53] = ItemNormal_00000053,
-	[66] = ItemNormal_00000066,
+	[52] = ItemNormal_00000043,--ItemNormal_00000052,
+	[53] = ItemNormal_00000043,--ItemNormal_00000053,
+	[66] = ItemNormal_00000043,--ItemNormal_00000066,
     [69] = ItemNormal_00000069,
     [111] = ItemNormal_00000111,
     [112] = ItemNormal_00000111,
@@ -8688,6 +8719,7 @@ local ItemNormal_Table = {
     [1359] = ItemNormal_citta,
     [1360] = ItemNormal_citta,
     [1361] = ItemNormal_citta,
+    [1362] = ItemNormal_citta,
 
     [1000] = ItemNormal_formation,
     [1001] = ItemNormal_formation,

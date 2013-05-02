@@ -11277,13 +11277,13 @@ namespace GObject
     }
     void Player::getLevelAward(UInt8 opt)
     {
-        return ; //等级奖励接口
-        UInt8 idx = 0;
-        if(0 == (idx = GameAction()->RunLevelAward(this,opt)))
+        if(GetLev() < 28)
             return;
-        Stream st(REP::GETAWARD);
-        st << static_cast<UInt8>(18) << idx << Stream::eos;
-        send(st);
+        UInt32 opTime = TimeUtil::MkTime(cfg.openYear, cfg.openMonth, cfg.openDay);
+        if(opTime <= TimeUtil::MkTime(2013, 5, 3))
+            return;
+        if(!GameAction()->RunLevelAward(this, opt))
+            return;
         LevelAwardActUdpLog(opt);
         getLevelAwardInfo();
     }
@@ -11296,14 +11296,16 @@ namespace GObject
     }
     void Player::getLevelAwardInfo()
     {
-        return ; //等级奖励接口
         UInt32 var_lev = GetVar(VAR_LEVEL_AWARD);
         UInt32 lev = GetLev();
         if(lev < 28)
             return;
+        UInt32 opTime = TimeUtil::MkTime(cfg.openYear, cfg.openMonth, cfg.openDay);
         UInt8 suc = (var_lev == lev);
         Stream st(REP::GETAWARD);
-        st << static_cast<UInt8>(18) << suc << Stream::eos;
+        st << static_cast<UInt8>(18) << suc;
+        st << static_cast<UInt8>(opTime <= TimeUtil::MkTime(2013, 5, 3) ? 0 : 1);
+        st << Stream::eos;
         send(st);
     }
     void Player::getConsumeAward()
@@ -17788,10 +17790,10 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
  *2:大闹龙宫之金蛇起舞
  *3:大闹龙宫之天芒神梭
 */
-static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11 };
-static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379 };
+static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14 };
+static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385 };
 //6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页
-static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137 };
+static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362 };
 void Player::getDragonKingInfo()
 {
     if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)
@@ -19883,9 +19885,9 @@ void Player::sendNuwaInfo()
     UInt32 created_sharp = TimeUtil::SharpDay(0, getCreated());
     if (created_sharp > now_sharp)
         return;
-    UInt32 time = GetVar(VAR_NUWA_OPENTIME);
-    time = time == 0 ? created_sharp : TimeUtil::SharpDay(1, time);
-    if (time > now_sharp)
+    UInt32 ptime = GetVar(VAR_NUWA_OPENTIME);
+    ptime = ptime == 0 ? created_sharp : TimeUtil::SharpDay(1, ptime);
+    if (ptime > now_sharp)
         return;
     UInt32 signet = GetVar(VAR_NUWA_SIGNET);
     UInt8 c = 0, remDay = 0;
@@ -19896,25 +19898,28 @@ void Player::sendNuwaInfo()
     }
     if(c >= 3 || c <= 0)
     {
-        if(World::_wday == 6)
+        //不能使用World::_wday,有30秒误差
+        time_t curtime = time(NULL);
+        struct tm *local = localtime(&curtime);
+        if(local->tm_wday == 6)
         {
-            if(time < now_sharp)
+            if(ptime < now_sharp)
                 signet = 0;
             else
                 remDay = 1;
         }
-        else if(World::_wday == 7)
+        else if(local->tm_wday == 0)
         {
-            if(time < now_sharp)
+            if(ptime < now_sharp)
                 signet = 0;
             else
                 remDay = 6;
         }
         else
         {
-            remDay = 6 - World::_wday;
+            remDay = 6 - local->tm_wday;
         }
-        if(now_sharp == TimeUtil::MkTime(2013, 5, 4) && time < now_sharp)
+        if(now_sharp == TimeUtil::MkTime(2013, 5, 4) && ptime < now_sharp)
         {
             signet = 0;
             remDay = 0;
@@ -19933,7 +19938,7 @@ void Player::sendNuwaInfo()
     {
         if(c >= 3 || c <= 0)
         {
-            if (time == created_sharp && cnt == 0)
+            if (ptime == created_sharp && cnt == 0)
                 signet = 0;
             else
                 remDay = (created_sharp + 5 * DAY_SECS - now_sharp) / DAY_SECS + 1;
@@ -19943,11 +19948,11 @@ void Player::sendNuwaInfo()
     {
         if(c >= 3 || c <= 0)
         {
-            if(time < created_sharp + 6 * DAY_SECS)
+            if(ptime < created_sharp + 6 * DAY_SECS)
                 signet = 0;
             else
             {
-                if(now_sharp > time)
+                if(now_sharp > ptime)
                 {
                     if(cnt < 2)
                         signet = cnt;
@@ -19968,11 +19973,11 @@ void Player::sendNuwaInfo()
     {
         if(c >= 3 || c <= 0)
         {
-            if(time <= created_sharp + off_set/30 * 30 * DAY_SECS)
+            if(ptime <= created_sharp + off_set/30 * 30 * DAY_SECS)
             {
-                if(off_set % 30 == 0 && time != created_sharp)
+                if(off_set % 30 == 0 && ptime != created_sharp)
                 {
-                    if(cnt < 2 && now_sharp > time)
+                    if(cnt < 2 && now_sharp > ptime)
                         signet = cnt;
                     else
                         remDay = 1;
@@ -19982,7 +19987,7 @@ void Player::sendNuwaInfo()
             }
             else
             {
-                if(now_sharp > time)
+                if(now_sharp > ptime)
                 {
                     if(cnt < 2)
                         signet = cnt;
@@ -20015,14 +20020,22 @@ void Player::setNuwaSignet(UInt8 idx)
     }
     if(c >= 3 || GET_BIT_3(signet, idx))
         return;
+    //不能使用World::_wday,有30秒误差
+	time_t curtime = time(NULL);
+	struct tm *local = localtime(&curtime);
+    if(c <= 0 && local->tm_wday != 6 && local->tm_wday != 0)
+    {
+        if(TimeUtil::SharpDay(1) != TimeUtil::MkTime(2013, 5, 4))
+            return;
+    }
     UInt8 cnt = GET_BIT_3(signet, 0);
     if(cnt >= 1) return;
     /*
     UInt32 now_sharp = TimeUtil::SharpDay(1);
     UInt32 created_sharp = TimeUtil::SharpDay(0, getCreated());
     UInt32 off_set = CREATE_OFFSET(created_sharp, now_sharp);
-    UInt32 time = GetVar(VAR_NUWA_OPENTIME);
-    time = time == 0 ? 0 : TimeUtil::SharpDay(1, time);
+    UInt32 ptime = GetVar(VAR_NUWA_OPENTIME);
+    ptime = ptime == 0 ? 0 : TimeUtil::SharpDay(1, ptime);
     if(off_set < 6)
     {
         if(cnt >= 1) return;
@@ -20030,13 +20043,13 @@ void Player::setNuwaSignet(UInt8 idx)
     else if (off_set >= 6 && off_set <= 30)
     {
         if(cnt >= 2) return;
-        if(time < created_sharp + 6 * DAY_SECS)
+        if(ptime < created_sharp + 6 * DAY_SECS)
             cnt = 0;
     }
     else if(off_set >= 31)
     {
         if(cnt >= 2) return;
-        if(time < created_sharp + (off_set/30 * 30 +1) * DAY_SECS)
+        if(ptime < created_sharp + (off_set/30 * 30 +1) * DAY_SECS)
             cnt = 0;
     }
     */
