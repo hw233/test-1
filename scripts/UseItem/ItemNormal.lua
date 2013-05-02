@@ -7266,7 +7266,7 @@ function ItemNormal_00010128(iid, num, bind, param)
 
         if 10128 == iid then
             package:AddItem(509, num*1*factor, true, 0, 2);
-            package:AddItem(15, num*1*factor, true, 0, 2);
+            package:AddItem(9371, num*1*factor, true, 0, 2);
             player:getCoupon(num*10*factor)
         elseif 10129 == iid then
             package:AddItem(507, num*1*factor, true, 0, 2);
@@ -7275,11 +7275,11 @@ function ItemNormal_00010128(iid, num, bind, param)
         elseif 10130 == iid then
             package:AddItem(134, num*1*factor, true, 0, 2);
             package:AddItem(57, num*1*factor, true, 0, 2);
-            package:AddItem(15, num*1*factor, true, 0, 2);
+            package:AddItem(514, num*1*factor, true, 0, 2);
         elseif 10131 == iid then
             package:AddItem(515, num*1*factor, true, 0, 2);
             package:AddItem(511, num*2*factor, true, 0, 2);
-            package:AddItem(56, num*1*factor, true, 0, 2);
+            package:AddItem(551, num*1*factor, true, 0, 2);
         end
 
         package:DelItemSendMsg(iid, player);
@@ -8684,6 +8684,10 @@ local ItemNormal_Table = {
     [1355] = ItemNormal_citta,
     [1356] = ItemNormal_citta,
     [1357] = ItemNormal_citta,
+    [1358] = ItemNormal_citta,
+    [1359] = ItemNormal_citta,
+    [1360] = ItemNormal_citta,
+    [1361] = ItemNormal_citta,
 
     [1000] = ItemNormal_formation,
     [1001] = ItemNormal_formation,
@@ -10070,6 +10074,10 @@ local ItemNormal_Table = {
     [9905] = ItemNormal_NameCard,
     [9906] = ItemNormal_NameCard,
     [9907] = ItemNormal_NameCard,
+    [9908] = ItemNormal_NameCard,
+    [9909] = ItemNormal_NameCard,
+    [9910] = ItemNormal_NameCard,
+    [9911] = ItemNormal_NameCard,
 
     [10000] = ItemNormal_00010000,
     [10001] = ItemNormal_00010001,
@@ -10202,6 +10210,7 @@ local ItemNormal_Table = {
     [10129] = ItemNormal_00010128,
     [10130] = ItemNormal_00010128,
     [10131] = ItemNormal_00010128,
+    [10132] = ItemNormal_00010127,
 };
 
 function ItemNormalOther_00000441(iid, num, bind, other)

@@ -88,7 +88,7 @@ static const UInt32 s_tlzNpcId[][2] = {
 {7035, 7036},  //99
 {7041, 7042},  //109
 {7073, 7074},  //119
-{7073, 7074},  //129
+{7073, 7075},  //129
 {7073, 7074},  //139
 {7073, 7074},  //149
 {7113, 7114}   //999
@@ -148,8 +148,8 @@ static const UInt32 s_tjTotalBoxId[] = {9127, 9128, 9129, 9130};
 static const UInt32 s_tjEventRewardId = 9131;
 static const UInt32 s_tjTotalRewardId = 9132;
                                        //59, 69,  79,  89,  99,  109, 119, 129, 139, 149, 999
-static const UInt32 s_tjWeaponId[] =   {1650,1651,1652,1529,1530,1531,1532,1533,1534,1535,1355};
-static const UInt32 s_tjNameCardId[] = {9154,9155,9156,9157,9158,9159,9160,9161,9162,9163,9900};
+static const UInt32 s_tjWeaponId[] =   {1650,1651,1652,1529,1530,1531,1660,1533,1534,1535,1355};
+static const UInt32 s_tjNameCardId[] = {9154,9155,9156,9157,9158,9159,9908,9161,9162,9163,9900};
 static  MailPackage::MailItem s_eventItem[2]= {{30,10}, {509,1}};
 #define TJ_START_TIME_HOUR 19 
 #define TJ_START_TIME_MIN  45
@@ -223,7 +223,7 @@ Tianjie::Tianjie()
 }
 int  Tianjie::manualOpenTj(int level, bool force)
 {
-    if (level != 999 && ((level % 10 != 9) || level < 59 || level > 109))
+    if (level != 999 && ((level % 10 != 9) || level < 59 || level > 119))
         return 1;
     if (m_manualTjLevel > 0)
         return 4;
@@ -239,7 +239,7 @@ int  Tianjie::manualOpenTj(int level, bool force)
         execu->Execute2("delete from tianjie where level = %d", level);
     }
 	GData::DBTianjie dbexp;
-    if(execu->Prepare("SELECT `id`, `is_opened`,`is_execute`,`is_finish`,`is_ok`,`level`,`rate`,UNIX_TIMESTAMP(opentime),`r1_killed`,`r2_donated`,`r3_copyid`,`r4_day`,`open_next`, `is_wait`,`is_manual`,`is_touch` FROM `tianjie` order by level desc", dbexp) != DB::DB_OK)
+    if(execu->Prepare("SELECT `id`, `is_opened`,`is_execute`,`is_finish`,`is_ok`,`level`,`rate`,UNIX_TIMESTAMP(opentime),`r1_killed`,`r2_donated`,`r3_copyid`,`r4_day`,`open_next`, `is_wait`,`is_manual`,`is_touch` FROM `tianjie` where `level` !=999 order by level desc", dbexp) != DB::DB_OK)
 		return 99;
 
     int maxLevel = 0;
@@ -591,9 +591,15 @@ bool Tianjie::LoadFromDB()
                 clearPlayerTaskScore();
                 //天劫全都跑完了
                 //if (m_tjTypeId == (sizeof(s_tjRoleLevel)/sizeof(s_tjRoleLevel[0])-1) && m_currTjRate >= 4)
-                if (s_tjRoleLevel[m_tjTypeId] == 109 && m_currTjRate >= 4)
+                if (s_tjRoleLevel[m_tjTypeId] == 119 && m_currTjRate >= 4)
                 {
                    m_currOpenedTjLevel = 0;
+                }
+                else if (s_tjRoleLevel[m_tjTypeId] == 109 && m_currTjRate >= 4)
+                {
+                    m_currOpenedTjLevel = 119;
+	   	            DB1().PushUpdateData("INSERT INTO `tianjie`(`level`) VALUES(%d)",m_currOpenedTjLevel);
+                    m_tjTypeId += 1;
                 }
             }
             else if ( TimeUtil::Now() >= m_openTime &&  TimeUtil::Now() < (m_openTime + TJ_EVENT_PROCESS_TIME))
@@ -1285,7 +1291,7 @@ void Tianjie::goNext()
            else
            {
                //if ((UInt8)(m_tjTypeId+1) < sizeof(s_tjRoleLevel)/sizeof(s_tjRoleLevel[0])-1)
-               if (s_tjRoleLevel[m_tjTypeId] < 109)
+               if (s_tjRoleLevel[m_tjTypeId] < 119)
                {
                    m_currOpenedTjLevel = s_tjRoleLevel[++m_tjTypeId];
 	   	           DB1().PushUpdateData("INSERT INTO `tianjie`(`level`) VALUES(%d)",m_currOpenedTjLevel);

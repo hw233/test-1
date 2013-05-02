@@ -18,7 +18,7 @@
 namespace GObject
 {
 extern URandom GRND;
-#define CLANBOSS_START_TIME_HOUR 14 
+#define CLANBOSS_START_TIME_HOUR 16 
 #define CLANBOSS_START_TIME_MIN  0
 #define TIME_60 60
 #define ONE_DAY_SECOND (24*3600)
@@ -38,6 +38,7 @@ const UInt32 g_empowerNum  = 10;   //每次充10点能量
 const UInt32 g_usedXianyun = 10;
 const UInt32 g_gongxian   = 15;
 const UInt32 g_gongxian2   = 45;
+const UInt32 g_maxAttackBossGx = 20;
 
 const UInt16 g_bossNpcId = 5515;
 const UInt16 g_bossSpot = 12806;
@@ -819,8 +820,13 @@ void ClanBoss::caclPlayerBuff(Player* pl, bool isAttackBoss)
     //狂暴
     if (!isAttackBoss && isCrazy(pl))
     {
-        af.attackP += 1;
-        af.magatkP += 1;
+        af.hpP += 0.01*cl->getUrge(0);
+        af.attackP += 0.01*cl->getUrge(1);
+        af.magatkP += 0.01*cl->getUrge(1);
+        af.actionP += 0.01*cl->getUrge(2);
+
+        af.attackP += 0.3;
+        af.magatkP += 0.3;
     }
     //深渊劫阵
     af.attackP -= (float)(_minutes)/100;
@@ -976,6 +982,7 @@ bool ClanBoss::attack(Player* pl)
                     gx = ((float)damage / maxHp) * g_powerGongxian;
                 else
                     gx = ((float)damage / maxHp) * g_bossGongxian;
+                gx = MIN(gx, g_maxAttackBossGx);
                 addGongXian(pl,pl->getClan(), gx, true);
 
                /* AttackInfo info(pl, damage);
@@ -1236,8 +1243,17 @@ void ClanBoss::pickComplete(Player* pl, Player* other, bool timeFinish, bool sto
     else if (other != NULL)
     {
         res = 2;
-        num /= 2;
-        gx /= 2;
+        UInt8 seconds =g_buffTime+g_extraBuffTime- (pl->getBuffData(PLAYER_BUFF_CLANBOSS_CD, TimeUtil::Now()) - TimeUtil::Now());
+        if (seconds >= 0 && seconds <= (g_buffTime+g_extraBuffTime))
+        {
+            gx = gx*seconds/(g_buffTime+g_extraBuffTime);
+            num = num*seconds/(g_buffTime+g_extraBuffTime);
+        }
+        else
+        {
+            num /= 2;
+            gx /= 2;
+        }
         membersAction(cl, pl, true, 3);
         //_playerStatus[pl] = 3;
 
@@ -1467,8 +1483,18 @@ void ClanBoss::EmpowerComplete(Player* pl, UInt8 t, Player* other, bool timeFini
     else if (other != NULL)
     {
         res = 2;
-        num /= 2;
-        gongxian /= 2;
+        UInt8 seconds =g_buffTime+g_extraBuffTime- (pl->getBuffData(PLAYER_BUFF_CLANBOSS_CD, TimeUtil::Now()) - TimeUtil::Now());
+        if (seconds >= 0 && seconds <= (g_buffTime+g_extraBuffTime))
+        {
+            gongxian = gongxian*seconds/(g_buffTime+g_extraBuffTime);
+            num = num*seconds/(g_buffTime+g_extraBuffTime);
+        }
+        else
+        {
+            num /= 2;
+            gongxian /= 2;
+        }
+ 
         membersAction(cl, pl, true, 3);
         //_playerStatus[pl] = 3;
         /*if (toBeCrazy(pl)) //清掉他的Buff,让他狂暴
@@ -1964,17 +1990,20 @@ void ClanBoss::reward()
                     return true;
                 SYSMSG(title2, 4222);
                 SYSMSGV(content2, 4223, score);
-                Mail * mail2 = member->player->GetMailBox()->newMail(NULL, 0x21, title2, content2, 0xFFFE0000);
+                UInt8 idx = 0;
+                for (UInt8 i = 0; i < sizeof(s_score2)/sizeof(s_score2[0]); ++i)
+                {
+                    if (score >= s_score2[i])
+                    {
+                        idx = i;
+                        break;
+                    }
+                }
+		        MailItemsInfo itemsInfo(&s_items2[idx], ClanBossAct, 1);
+                Mail * mail2 = member->player->GetMailBox()->newMail(NULL, 0x21, title2, content2, 0xFFFE0000, true, &itemsInfo);
                 if(mail2)
                 {
-                    for (UInt8 i = 0; i < sizeof(s_score2)/sizeof(s_score2[0]); ++i)
-                    {
-                        if (score >= s_score2[i])
-                        {
-                            mailPackageManager.push(mail2->id, s_items2[i].id, s_items2[i].count, true);
-                            break;
-                        }
-                    }
+                    mailPackageManager.push(mail2->id, s_items2[idx].id, s_items2[idx].count, true);
                 }
                 member->player->SetVar(VAR_CLANBOSS_GONGXIAN, 0);
                 if (_bossDead)

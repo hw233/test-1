@@ -298,6 +298,8 @@ private:
         e_unPetAtk100 = 84,       // 100%合击标志
         e_counterSpirit = 85,     // 反击士气
         e_unCounterSpirit = 86,   // 解除反击士气
+        e_fireFakeDead = 87,     // 火遁(有概率假死一次)
+        e_unFireFakeDead = 88,   // 解除火遁
 
         e_MAX_STATE,
     };
@@ -426,6 +428,8 @@ private:
     bool doSkillStrengthenAttack(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
 
     typedef bool (Battle::BattleSimulator::*doSkillStrengthenFunc)(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
+
+    bool doSkillStrengthen_FireFakeDead(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
 
     bool doSkillStrengthen_disperse(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
     bool doSkillStrengthen_reduce(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
@@ -632,6 +636,7 @@ private:
     bool doAuraPresent(BattleFighter* bf);
     bool doConfusePresent(BattleFighter* bf);
     bool doStunPresent(BattleFighter* bf);
+    bool doBlindPresent(BattleFighter* bf);
     void appendInitDefStatus(BattleFighter* bf);
 
 private:
@@ -655,6 +660,12 @@ private:
     static  bool isPet(BattleObject* bo);
     UInt32 upPetObject(UInt8, bool = true);
     UInt32 doSpiritAttack(BattleFighter * bf, BattleFighter* bo, float atk, bool& pr, bool& cs, bool& first);
+
+private:
+    // 记录每回合命中次数
+    UInt8 _hit_cnt;
+    void doSkillStrenghtenHitConfuse(BattleFighter* bf, const GData::SkillBase* skill, GData::SkillStrengthenBase* ss, int target_side, int target_pos);
+    bool isFireDefend(const GData::SkillBase* skill);
 };
 
 }
