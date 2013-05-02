@@ -6893,19 +6893,21 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
             break;
         }
 
+        if(static_cast<BattleFighter*>(bo)->doFireFakeDead())
+        {
+            fFakeDead = true;
+            (static_cast<BattleFighter*>(bo))->setHP(1);
+            appendDefStatus(e_unFireFakeDead, 0, static_cast<BattleFighter*>(bo));
+            break;
+        }
+
         size_t idx = 0;
         const GData::SkillBase* passiveSkill = NULL;
         passiveSkill = (static_cast<BattleFighter*>(bo))->getPassiveSkillDead100(idx);
         if(passiveSkill == NULL)
             passiveSkill = (static_cast<BattleFighter*>(bo))->getPassiveSkillDead();
 
-        if(static_cast<BattleFighter*>(bo)->doFireFakeDead())
-        {
-            fFakeDead = true;
-            (static_cast<BattleFighter*>(bo))->setHP(1);
-            appendDefStatus(e_unFireFakeDead, 0, static_cast<BattleFighter*>(bo));
-        }
-        else if(passiveSkill != NULL)
+        if(passiveSkill != NULL)
         {
             switch(SKILL_ID(passiveSkill->getId()))
             {

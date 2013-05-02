@@ -4372,6 +4372,8 @@ namespace GObject
     void Player::vote(Player* other)
     {
         if(GetLev() < 45)
+            return;
+        if(other->GetLev() < 45)
         {
             sendMsgCode(0, 1510);
             return;
@@ -4394,6 +4396,10 @@ namespace GObject
         sendMsgCode(0, 1509);
         GameMsgHdr hdr2(0x1C6, WORKER_THREAD_WORLD, this, 0);
         GLOBAL().PushMsg(hdr2, NULL);
+
+        Stream st(REP::FRIEND_ACTION);
+        st << static_cast<UInt8>(0x09) << static_cast<UInt8>(1) << Stream::eos;
+        send(st);
     }
 
     void Player::beVoted()
