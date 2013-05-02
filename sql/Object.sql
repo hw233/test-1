@@ -1899,7 +1899,7 @@ CREATE TABLE `lingbaosmelt` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-CREATE TABLE IF NOT EXISTS `dreamer` (                       
+CREATE TABLE IF NOT EXISTS `dreamer` (
     `playerId` bigint(20) unsigned NOT NULL,  
     `progress` tinyint(3) unsigned NOT NULL,      
     `level` tinyint(3) unsigned NOT NULL,      
@@ -1921,8 +1921,7 @@ CREATE TABLE IF NOT EXISTS `dreamer` (
     PRIMARY KEY (`playerId`)                  
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `fairyPet`;
-CREATE TABLE `fairyPet` (
+CREATE TABLE IF NOT EXISTS `fairyPet` (
     `id` int(10) unsigned NOT NULL,
     `playerId` bigint(20) unsigned NOT NULL,
     `petLev` smallint(6) unsigned NOT NULL,

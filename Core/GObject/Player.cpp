@@ -19893,6 +19893,39 @@ void Player::sendNuwaInfo()
         if(GET_BIT_3(signet, i))
             ++ c;
     }
+    if(c >= 3 || c <= 0)
+    {
+        if(World::_wday == 6)
+        {
+            if(time < now_sharp)
+                signet = 0;
+            else
+                remDay = 1;
+        }
+        else if(World::_wday == 7)
+        {
+            if(time < now_sharp)
+                signet = 0;
+            else
+                remDay = 6;
+        }
+        else
+        {
+            remDay = 6 - World::_wday;
+        }
+        if(now_sharp == TimeUtil::MkTime(2013, 5, 4) && time < now_sharp)
+        {
+            signet = 0;
+            remDay = 0;
+        }
+        SetVar(VAR_NUWA_SIGNET, signet);
+    }
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(0x0D) << static_cast<UInt8>(0x01);
+    st << static_cast<UInt32>(signet >> 3);
+    st << remDay << Stream::eos;
+    send(st);
+    /*
     UInt8 cnt = GET_BIT_3(signet, 0);
     UInt32 off_set = CREATE_OFFSET(created_sharp, now_sharp);
     if (off_set <= 5)
@@ -19965,12 +19998,7 @@ void Player::sendNuwaInfo()
             }
         }
     }
-    SetVar(VAR_NUWA_SIGNET, signet);
-    Stream st(REP::COUNTRY_ACT);
-    st << static_cast<UInt8>(0x0D) << static_cast<UInt8>(0x01);
-    st << static_cast<UInt32>(signet >> 3);
-    st << remDay << Stream::eos;
-    send(st);
+    */
 }
 
 void Player::setNuwaSignet(UInt8 idx)
@@ -19987,6 +20015,8 @@ void Player::setNuwaSignet(UInt8 idx)
     if(c >= 3 || GET_BIT_3(signet, idx))
         return;
     UInt8 cnt = GET_BIT_3(signet, 0);
+    if(cnt >= 1) return;
+    /*
     UInt32 now_sharp = TimeUtil::SharpDay(1);
     UInt32 created_sharp = TimeUtil::SharpDay(0, getCreated());
     UInt32 off_set = CREATE_OFFSET(created_sharp, now_sharp);
@@ -20008,6 +20038,7 @@ void Player::setNuwaSignet(UInt8 idx)
         if(time < created_sharp + (off_set/30 * 30 +1) * DAY_SECS)
             cnt = 0;
     }
+    */
     //1女娲印记1%，2轩辕印记5%，3神农印记34%，4伏羲印记60%
     UInt32 rnd = uRand(10000);
     UInt8 sign = 0;
