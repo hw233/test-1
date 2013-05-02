@@ -425,7 +425,11 @@ namespace GObject
             fprintf(stderr, "loadDreamer error!\n");
             std::abort();
         }
-       
+        if(!fixItem9383Leader())
+        {
+            fprintf(stderr, "fixItem9383Leader error!\n");
+            std::abort();
+        }
 
 		DB::gDataDBConnectionMgr->UnInit();
 	}
@@ -5660,6 +5664,39 @@ namespace GObject
 			lc.advance();
         }
         lc.finalize();
+        return true;
+    }
+
+    bool GObjectManager::fixItem9383Leader()
+    {
+        std::string path = cfg.scriptPath + "fixItem9383leader";
+        File destFile(path);
+        if(!destFile.exists())
+        {
+            return true;
+        }
+        destFile.remove(false);
+
+        // 9383物品使用纪录
+		std::unique_ptr<DB::DBExecutor> execu(DB::gLogDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("fixItem9383Leader");
+        DBItemSum dbis;
+        if(execu->Prepare("select distinct `player_id`, `item_id`, sum(item_num) as item_nums from `item_histories_2013_4` group by `player_id`, `item_id` having `item_id`=9383", dbis) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+        Player * player = NULL;
+		while(execu->Next() == DB::DB_OK)
+        {
+            player = globalPlayers[dbis.player_id];
+            if (player)
+            {
+                player->SetVar(VAR_SURNAMELEGEND_USED, dbis.item_nums);
+            }
+			lc.advance();
+        }
+        lc.finalize();
+
         return true;
     }
 }

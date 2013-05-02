@@ -1193,6 +1193,13 @@ struct DBFairyPetData
     UInt16 dazhou;
 };
 
+struct DBItemSum 
+{
+    UInt64 player_id;
+    UInt32 item_id;
+    UInt32 item_nums;
+};
+
 }
 
 namespace DB {
@@ -2695,6 +2702,15 @@ SPECIALDEF(11)
     UInt32, overTime,
     UInt16, xiaozhou,
     UInt16, dazhou
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBItemSum)
+SPECIALDEF(3)
+(
+    UInt64, player_id,
+    UInt32, item_id,
+    UInt32, item_nums
 )
 SPECIALEND()
 
