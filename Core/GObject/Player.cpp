@@ -7507,6 +7507,7 @@ namespace GObject
             OnShuoShuo(nLev/10-4 + SS_40);
 
         sendVipPrivilegeMail(nLev);
+        getLevelAwardInfo();
 	}
 
     void Player::sendFormationList()
