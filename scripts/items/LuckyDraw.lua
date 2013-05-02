@@ -1662,7 +1662,7 @@ function luckyDraw(player, id, num, bind)
             end
         end
 
-        --print('use: ' .. use)
+        print('use: ' .. use)
 
         if use == 1 then
             if package:DelItem(needitem, 1, bind) == false then

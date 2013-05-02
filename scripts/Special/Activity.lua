@@ -4419,7 +4419,7 @@ function sendRechargeMails_2013_05_05(player, ototal, ntotal)
         10,99,499,999,5999,
     }
     local items = {
-        {9080,3,1},
+        {0xA000,30,1},
         {503,5,1},
         {516,2,1, 517,2,1},
         {509,2,1},
