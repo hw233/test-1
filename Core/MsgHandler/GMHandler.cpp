@@ -43,6 +43,7 @@
 #include "GObject/ClanCopy.h"
 #include "GObject/ClanBoss.h"
 #include "Common/Itoa.h"
+#include "GObject/TownDeamon.h"
 
 #include "GObject/Tianjie.h"
 #include "Memcached.h"
@@ -255,6 +256,8 @@ GMHandler::GMHandler()
     Reg(3, "pick", &GMHandler::OnClanBossPick);
     Reg(3, "empower", &GMHandler::OnClanBossEmpower);
     Reg(3, "setem", &GMHandler::OnClanBossSetEm);
+
+    Reg(3, "settdlvl", &GMHandler::OnSetTownDeamonMaxLevel);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -3937,4 +3940,11 @@ void GMHandler::OnClanBossSetEm(GObject::Player *player, std::vector<std::string
     GObject::ClanBoss::instance().setPowerType(t);
 }
 
+void GMHandler::OnSetTownDeamonMaxLevel(GObject::Player *player, std::vector<std::string>& args)
+{
+    if(args.size() < 1)
+        return;
+    UInt16 lv = atoi(args[0].c_str()); 
+    player->getDeamonPlayerData()->maxLevel = lv;
+}
 

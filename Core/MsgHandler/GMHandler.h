@@ -194,6 +194,8 @@ private:
     void OnClanBossEmpower(GObject::Player *player, std::vector<std::string>& args);
     void OnClanBossSetEm(GObject::Player *player, std::vector<std::string>& args);
     void OnClanBossOpen(GObject::Player *player, std::vector<std::string>& args);
+
+    void OnSetTownDeamonMaxLevel(GObject::Player *player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;

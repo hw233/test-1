@@ -5595,9 +5595,9 @@ UInt32 BattleSimulator::doAttack( int pos )
             while(NULL != (passiveSkill = bf->getPassiveSkillOnAttackBleed100(idx, noPossibleTarget)))
             {
                 if(passiveSkill->target == GData::e_battle_target_otherside && bo && bo->getHP() &&  (bo->getSide() != bf->getSide()) &&
-                        (bo->getBleedRandomLast() || bo->getBleedBySkillLast() || //bo->getBleedBySkillClass() || bo->getBleedAttackClass() || 
+                        (bo->getBleedRandomLast() || bo->getBleedBySkillLast() || 
                          bo->getBleed1Last() || bo->getBleed2Last() || bo ->getBleed3Last() || bo->getAuraBleedLast() || bo->getStunBleedLast() || bo->getConfuceBleedLast() ||
-                         bo->getBleedMoLast() || bo->getSelfBleedLast()))
+                         bo->getBleedMoLast() || bo->getSelfBleedLast() || bo->getBlindBleedLast()))
                 {
                     int cnt = 0;
                     getSkillTarget(bf, passiveSkill, otherside, target_pos, cnt);
@@ -8477,14 +8477,25 @@ bool BattleSimulator::doSkillStrengthen_BleedBySkill(BattleFighter* bf, const GD
     UInt8 nClass = bf->getClass();
     if(nBleed > 0)
     {
+        /*
         bo->setBleedBySkill(nBleed, ef->last);
         bo->setBleedBySkillClass(nClass);
+        */
         if(nClass == e_cls_ru)
+        {
+            bo->setBleed1(nBleed, ef->last);
             appendDefStatus(e_Bleed1, 0, bo);
+        }
         else if(nClass == e_cls_shi)
+        {
+            bo->setBleed2(nBleed, ef->last);
             appendDefStatus(e_Bleed2, 0, bo);
+        }
         else
+        {
+            bo->setBleed3(nBleed, ef->last);
             appendDefStatus(e_Bleed3, 0, bo);
+        }
     }
     return true;
 }
@@ -8748,20 +8759,26 @@ bool BattleSimulator::BleedRandom_SkillStrengthen(BattleFighter* bf, BattleFight
     UInt8 nClass = bf->getClass();
     if(nBleed > 0)
     {
+        /*
         bo->setBleedRandom(nBleed, ef->last);
         bo->setBleedAttackClass(nClass);
+        */
         switch(nClass)
         {
         case e_cls_ru:
+            bo->setBleed1(nBleed, ef->last);
             appendDefStatus(e_Bleed1, 0, bo);
             break;
         case e_cls_shi:
+            bo->setBleed2(nBleed, ef->last);
             appendDefStatus(e_Bleed2, 0, bo);
             break;
         case e_cls_dao:
+            bo->setBleed3(nBleed, ef->last);
             appendDefStatus(e_Bleed3, 0, bo);
             break;
         case e_cls_mo:
+            bo->setBleedMo(nBleed, ef->last);
             appendDefStatus(e_BleedMo, 0, bo);
             break;
         }
