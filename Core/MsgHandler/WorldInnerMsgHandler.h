@@ -942,7 +942,8 @@ void OnLuckyBagRank ( GameMsgHdr& hdr,  const void* data )
         ++rank;
 
         Stream st(REP::ACT);
-        st << static_cast<UInt8>(2) << static_cast<UInt8>(4) << static_cast<UInt8>(2) << i->total << static_cast<UInt8>(rank) << Stream::eos;
+        st << static_cast<UInt8>(2) << static_cast<UInt8>(4) << static_cast<UInt8>(2);
+        st << i->total << static_cast<UInt8>(rank > 255 ? 255 : rank) << Stream::eos;
         i->player->send(st);
     }
 
@@ -1067,12 +1068,20 @@ void OnSendLuckyBagRank ( GameMsgHdr& hdr,  const void* data )
         if (i->player == player)
         {
             Stream st(REP::ACT);
-            st << static_cast<UInt8>(2) << static_cast<UInt8>(4) << static_cast<UInt8>(2) << i->total << static_cast<UInt8>(rank) << Stream::eos;
+            st << static_cast<UInt8>(2) << static_cast<UInt8>(4) << static_cast<UInt8>(2);
+            st << i->total << static_cast<UInt8>(rank > 255 ? 255 : rank) << Stream::eos;
             player->send(st);
             break;
         }
     }
 }
+
+//For 后台操控设置活动时间及清理数据
+void OnClearLuckyBagRank ( GameMsgHdr& hdr,  const void* data )
+{
+    World::LuckyBagSort.clear();
+}
+
 void OnSendConsumeRank ( GameMsgHdr& hdr,  const void* data )
 {
     using namespace GObject;

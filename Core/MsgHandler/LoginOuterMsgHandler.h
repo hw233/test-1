@@ -2840,6 +2840,8 @@ inline bool player_enum_2(GObject::Player* pl, int type)
                 {
                     pl->SetVar(GObject::VAR_SURNAMELEGEND_USED+i, 0);
                 }
+                GameMsgHdr hdr(0x1CC, WORKER_THREAD_WORLD, NULL, 0);
+                GLOBAL().PushMsg(hdr, NULL);
             }
             break;
         default:
@@ -3161,9 +3163,11 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
     }
     else if (type == 2 && begin <= end)
     {
+        if(GObject::GVAR.GetVar(GObject::GVAR_SURNAMELEGEND_BEGIN) > TimeUtil::Now()
+                || GObject::GVAR.GetVar(GObject::GVAR_SURNAMELEGEND_END) < TimeUtil::Now())
+            GObject::globalPlayers.enumerate(player_enum_2, 3);
         GObject::GVAR.SetVar(GObject::GVAR_SURNAMELEGEND_BEGIN, begin);
         GObject::GVAR.SetVar(GObject::GVAR_SURNAMELEGEND_END, end);
-        GObject::globalPlayers.enumerate(player_enum_2, 3);
         ret = 1;
     }
 

@@ -19925,11 +19925,6 @@ void Player::sendNuwaInfo()
         {
             remDay = 6 - local->tm_wday;
         }
-        if(now_sharp == TimeUtil::MkTime(2013, 5, 4) && ptime < now_sharp)
-        {
-            signet = 0;
-            remDay = 0;
-        }
         SetVar(VAR_NUWA_SIGNET, signet);
     }
     Stream st(REP::COUNTRY_ACT);
@@ -20030,10 +20025,7 @@ void Player::setNuwaSignet(UInt8 idx)
 	time_t curtime = time(NULL);
 	struct tm *local = localtime(&curtime);
     if(c <= 0 && local->tm_wday != 6 && local->tm_wday != 0)
-    {
-        if(TimeUtil::SharpDay(1) != TimeUtil::MkTime(2013, 5, 4))
-            return;
-    }
+        return;
     UInt8 cnt = GET_BIT_3(signet, 0);
     if(cnt >= 1) return;
     /*

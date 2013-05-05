@@ -2759,13 +2759,16 @@ inline bool player_enum_rc(GObject::Player * p, int)
         s.total = popularity;
         World::popularitySort.insert(s);
     }
-    UInt32 used = p->GetVar(VAR_SURNAMELEGEND_USED);
-    if (used)
+    if (World::getSurnameLegend())
     {
-        RCSort s;
-        s.player = p;
-        s.total = used;
-        World::LuckyBagSort.insert(s);
+        UInt32 used = p->GetVar(VAR_SURNAMELEGEND_USED);
+        if (used)
+        {
+            RCSort s;
+            s.player = p;
+            s.total = used;
+            World::LuckyBagSort.insert(s);
+        }
     }
     return true;
 }
