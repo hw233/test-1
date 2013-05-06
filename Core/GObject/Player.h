@@ -172,6 +172,13 @@ namespace GObject
 
 #define SYS_DIALOG_ALL_PLATFORM 0
 
+#define SPREAD_START_TIME         11*3600
+#define SPREAD_END_TIME           22*3600
+#define SPREAD_INTERVA_TIME       5*60
+#define SPREAD_ALREADY_CONDITION  0x01
+#define SPREAD_ALREADY_GET        0x02
+#define SPREAD_ALREADY_USE        0x04
+
     enum PEXP_HOOK_INFEX
     {
         ENUM_TRAINP1 = 1,  /** 初级经验加速符*1.2,加速(*1.3) **/
@@ -2331,6 +2338,7 @@ namespace GObject
         void sendRP7SignInfo();
         void RP7Sign(UInt8 idx);
         void getRP7SignPackage(UInt8 idx);
+        void sendSpreadInfo();
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

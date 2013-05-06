@@ -212,6 +212,8 @@ stArenaExtra World::stArena;
 /** 0：侠骨；1：柔情；2财富；3传奇 **/
 RCSortType World::killMonsterSort[4];
 UInt8 World::m_sysDailogPlatform = SYS_DIALOG_ALL_PLATFORM;
+Player* World::spreadKeeper;
+UInt16 World::spreadCount = 0;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
@@ -792,6 +794,15 @@ bool enum_extra_act_award(Player* player, void* data)
         GameMsgHdr hdr(0x251, player->getThreadId(), player, sizeof(moneyArena));
         GLOBAL().PushMsg(hdr, &moneyArena);
     }
+    return true;
+}
+
+bool enum_spread_count(Player* pl, void *data)
+{
+	if(pl == NULL)
+		return true;
+    if(pl->GetVar(VAR_SPREAD_FLAG) & SPREAD_ALREADY_USE)
+        ++World::spreadCount;
     return true;
 }
 
@@ -3198,6 +3209,28 @@ void World::SendRechargeRP7RankAward()
 //    World::rechargeRP7Sort.clear();
 }
 
+Player* World::getSpreadKeeper()
+{
+    if(!World::spreadKeeper)
+    {
+        UInt64 playerId = (static_cast<UInt64>(GVAR.GetVar(GVAR_SPREAD_KEEPER1)) << 32) + GVAR.GetVar(GVAR_SPREAD_KEEPER2);
+        Player* pl = globalPlayers[playerId];
+        if(pl)
+            World::spreadKeeper = pl;
+    }
+    return World::spreadKeeper;
+}
+
+UInt16 World::getSpreadCount()
+{
+    static bool isFirst = true;
+    if(isFirst && !World::spreadCount)
+    {
+        globalPlayers.enumerate(enum_spread_count, static_cast<void *>(NULL));
+        isFirst = false;
+    }
+    return World::spreadCount;
+}
 
 }
 

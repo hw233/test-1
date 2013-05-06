@@ -144,6 +144,7 @@ MSG_REG_2(GameMsgHdr, 0x1CB, SendRechargeRP7Rank);
 
 MSG_REG_2(GameMsgHdr, 0x1D0, OnSendClanMemberList);
 
+MSG_REG_2(GameMsgHdr, 0x1EB, OnSendSpreadInfo);
 MSG_REG_2(GameMsgHdr, 0x1EC, OnDaysRankMsg);
 MSG_REG_2(GameMsgHdr, 0x1EE, OnReloadLuaReq);
 MSG_REG_2(GameMsgHdr, 0x1ED, OnRunscriptReq);

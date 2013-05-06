@@ -1181,6 +1181,9 @@ namespace GObject
         sendFeastLoginAct();
         //蛇年春节套装
         sendSnakeSpringEquipMail();
+        //落英秘典
+        GameMsgHdr hdr1(0x1EB, WORKER_THREAD_WORLD, this, 0);
+        GLOBAL().PushMsg(hdr1, NULL);
 
         char buf[64] = {0};
         snprintf(buf, sizeof(buf), "%"I64_FMT"u", _id);
@@ -20117,6 +20120,37 @@ void Player::setNuwaSignet(UInt8 idx)
             GLOBAL().PushMsg(hdr, &LuckbagNum);
         }
     }
+
+void Player::sendSpreadInfo()
+{
+	UInt32 now = TimeUtil::Now();
+    UInt8 week = TimeUtil::GetWeekDay(now);
+    if(week != 6 && week != 7)
+        return;
+    UInt32 startTime = TimeUtil::SharpDayT(0, now) + SPREAD_START_TIME;
+    if(now < startTime)
+        return;
+	Stream st(REP::ACT);
+    UInt8 type = 0;
+    st << type;
+    std::string name;
+    UInt32 leftTime = 0;
+    Player *pl = World::getSpreadKeeper();
+    if(pl)
+    {
+        name = pl->getName();
+        UInt32 curEndTime = pl->GetVar(VAR_SPREAD_BUFF);
+        if(curEndTime > now)
+            leftTime = curEndTime - now;
+    }
+    st << name;
+    st << leftTime;
+    st << World::getSpreadCount();
+    st << (GetVar(VAR_SPREAD_FLAG) & (SPREAD_ALREADY_CONDITION | SPREAD_ALREADY_GET));
+    st << Stream::eos;
+    send(st);
+}
+
 } // namespace GObject
 
 

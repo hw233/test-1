@@ -733,6 +733,8 @@ public:
 	static void calWeekDay( World * world );
     inline static void setSysDailogPlatform(UInt8 v) { m_sysDailogPlatform = v; }
     inline static UInt8 getSysDailogPlatform() { return m_sysDailogPlatform; }
+    static Player* getSpreadKeeper();
+    static UInt16 getSpreadCount();
 public:
     static UInt32 _moneyLogged;
     static MoneyIn _moneyIn[7][2];
@@ -851,6 +853,8 @@ public:
     static bool _autobattleact;
     static UInt8 _snakespringequipact;
     static UInt8 m_sysDailogPlatform;
+    static Player* spreadKeeper;
+    static UInt16 spreadCount;
 public:
     static RCSortType rechargeSort;
     static RCSortType consumeSort;

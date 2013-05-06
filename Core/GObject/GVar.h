@@ -70,6 +70,9 @@ namespace GObject
         GVAR_LUCKYSTAR_BEGIN = 36, //幸运星活动开始时间
         GVAR_LUCKYSTAR_END   = 37, //幸运星活动结束时间
 
+        GVAR_SPREAD_KEEPER1 = 38, //持有者ID高32位
+        GVAR_SPREAD_KEEPER2 = 39, //持有者ID低32位
+
         GVAR_MAX,
     };
 
@@ -127,6 +130,9 @@ namespace GObject
             GREGISTER_VAR(GVAR_SURNAMELEGEND_END, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_LUCKYSTAR_BEGIN, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_LUCKYSTAR_END, GCYCLE_NONE);
+
+            GREGISTER_VAR(GVAR_SPREAD_KEEPER1, GCYCLE_DAY);
+            GREGISTER_VAR(GVAR_SPREAD_KEEPER2, GCYCLE_DAY);
 
         }
 
