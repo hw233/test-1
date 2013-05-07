@@ -2340,7 +2340,7 @@ namespace GObject
         void RP7Sign(UInt8 idx);
         void getRP7SignPackage(UInt8 idx);
         void sendSpreadInfo();
-        void sendSpreadBasicInfo();
+        void sendSpreadBasicInfo(UInt8 statue);
         void sendSpreadAwardInfo();
         void spreadToOther(UInt8 type, std::string name);
         void spreadToSelf();

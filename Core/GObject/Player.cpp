@@ -20123,7 +20123,7 @@ void Player::setNuwaSignet(UInt8 idx)
 
 void Player::sendSpreadInfo()
 {
-    sendSpreadBasicInfo();
+    sendSpreadBasicInfo(0);
     sendSpreadAwardInfo();
 }
 
@@ -20148,7 +20148,7 @@ bool spreadCompareTime(bool checkStartTime, bool checkEndTime)
     return true;
 }
 
-void Player::sendSpreadBasicInfo()
+void Player::sendSpreadBasicInfo(UInt8 statue)
 {
     bool bRet = spreadCompareTime(true, false);
     if(!bRet)
@@ -20171,6 +20171,7 @@ void Player::sendSpreadBasicInfo()
     st << leftTime;
     st << static_cast<UInt16>(World::getSpreadCount());
     st << static_cast<UInt8>((GVAR.GetVar(GVAR_SPREAD_CONDITION) & 0x01) | (GetVar(VAR_SPREAD_FLAG) & 0x02));
+    st << statue;
     st << Stream::eos;
     send(st);
 }
@@ -20244,10 +20245,17 @@ void Player::spreadToSelf()
 	UInt32 now = TimeUtil::Now();
     if(now < GVAR.GetVar(GVAR_SPREAD_BUFF))
     {
+        UInt32 timeTmp = GetVar(VAR_SPREAD_INTERVAL);
+        if(now < timeTmp)
+        {
+            sendMsgCode(0, 2216);
+            return;
+        }
         Player *pl = World::getSpreadKeeper();
-        UInt64 playerId = 0;
-        if(pl)
-            playerId = pl->getId();
+        if(!pl)
+            return;
+        SetVar(VAR_SPREAD_INTERVAL, now + 10);
+        UInt64 playerId = pl->getId();
         GameMsgHdr hdr(0x354, getThreadId(), this, sizeof(playerId));
         GLOBAL().PushMsg(hdr, &playerId);
         SYSMSG_SENDV(1100, this);
