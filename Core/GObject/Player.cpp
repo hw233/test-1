@@ -20123,14 +20123,37 @@ void Player::setNuwaSignet(UInt8 idx)
 
 void Player::sendSpreadInfo()
 {
+    sendSpreadBasicInfo();
+    sendSpreadAwardInfo();
+}
+
+bool spreadCompareTime(bool checkStartTime, bool checkEndTime)
+{
 	UInt32 now = TimeUtil::Now();
     UInt8 week = TimeUtil::GetWeekDay(now);
-    if(week != 6 && week != 7)
+    if(week != SPREAD_START_WEEK && week != SPREAD_END_WEEK)
+        return false;
+    if(checkStartTime)
+    {
+        UInt32 startTime = TimeUtil::SharpDayT(0, now) + SPREAD_START_TIME;
+        if(now < startTime)
+            return false;
+    }
+    if(checkEndTime)
+    {
+        UInt32 endTime = TimeUtil::SharpDayT(0, now) + SPREAD_END_TIME;
+        if(now > endTime)
+            return false;
+    }
+    return true;
+}
+
+void Player::sendSpreadBasicInfo()
+{
+    bool bRet = spreadCompareTime(true, false);
+    if(!bRet)
         return;
-    UInt32 startTime = TimeUtil::SharpDayT(0, now) + SPREAD_START_TIME;
-    if(now < startTime)
-        return;
-	Stream st(REP::ACT);
+	Stream st(REP::ACTIVE);
     UInt8 type = 0;
     st << type;
     std::string name;
@@ -20139,16 +20162,131 @@ void Player::sendSpreadInfo()
     if(pl)
     {
         name = pl->getName();
-        UInt32 curEndTime = pl->GetVar(VAR_SPREAD_BUFF);
+        UInt32 curEndTime = GVAR.GetVar(GVAR_SPREAD_BUFF);
+	    UInt32 now = TimeUtil::Now();
         if(curEndTime > now)
             leftTime = curEndTime - now;
     }
     st << name;
     st << leftTime;
-    st << World::getSpreadCount();
-    st << (GetVar(VAR_SPREAD_FLAG) & (SPREAD_ALREADY_CONDITION | SPREAD_ALREADY_GET));
+    st << static_cast<UInt16>(World::getSpreadCount());
+    st << static_cast<UInt8>((GVAR.GetVar(GVAR_SPREAD_CONDITION) & 0x01) | (GetVar(VAR_SPREAD_FLAG) & 0x02));
     st << Stream::eos;
     send(st);
+}
+
+void Player::sendSpreadAwardInfo()
+{
+    bool bRet = spreadCompareTime(false, false);
+    if(!bRet)
+        return;
+	Stream st(REP::ACTIVE);
+    UInt8 type = 2;
+    st << type;
+    st << static_cast<UInt16>(cfg.spreadCountLimit);
+    lua_tinker::table award = GameAction()->GetSpreadAward();
+    UInt8 size = award.size();
+    st << size;
+    for(UInt8 j = 0; j < size; ++j)
+    {
+        lua_tinker::table a = award.get<lua_tinker::table>(j + 1);
+        st << a.get<UInt16>(1) << a.get<UInt16>(2);
+    }
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::spreadToOther(UInt8 type, std::string name)
+{
+    bool bRet = spreadCompareTime(true, true);
+    if(!bRet)
+        return;
+	UInt32 now = TimeUtil::Now();
+    if(now < GVAR.GetVar(GVAR_SPREAD_BUFF))
+        return;
+    Player * pl = globalNamedPlayers[fixName(name)];
+    if(!pl)
+    {
+        sendMsgCode(0, 1506);
+        return;
+    }
+    UInt32 tmp = GetVar(VAR_SPREAD_FLAG);
+    if(tmp & SPREAD_ALREADY_USE)
+        return;
+    if(pl->GetVar(VAR_SPREAD_FLAG) & SPREAD_ALREADY_USE)
+    {
+        sendMsgCode(0, 2215);
+        return;
+    }
+    SetVar(VAR_SPREAD_FLAG, tmp | SPREAD_ALREADY_USE);
+    GVAR.SetVar(GVAR_SPREAD_KEEPER1, pl->getId()>>32);
+    GVAR.SetVar(GVAR_SPREAD_KEEPER2, pl->getId()&0xFFFFFFFF);
+    GVAR.SetVar(GVAR_SPREAD_BUFF, now + SPREAD_INTERVA_TIME);
+
+    World::spreadKeeper = pl;
+    ++World::spreadCount;
+    if(World::spreadCount >= cfg.spreadCountLimit)
+        GVAR.SetVar(GVAR_SPREAD_CONDITION, 1);
+
+    if(type == 0)
+    {
+        UInt32 pexp = 1000;
+        GameMsgHdr hdr2(0x238, getThreadId(), this, sizeof(pexp));
+        GLOBAL().PushMsg(hdr2, &pexp);
+    }
+}
+
+void Player::spreadToSelf()
+{
+    bool bRet = spreadCompareTime(true, true);
+    if(!bRet)
+        return;
+	UInt32 now = TimeUtil::Now();
+    if(now < GVAR.GetVar(GVAR_SPREAD_BUFF))
+    {
+        Player *pl = World::getSpreadKeeper();
+        UInt64 playerId = 0;
+        if(pl)
+            playerId = pl->getId();
+        GameMsgHdr hdr(0x354, getThreadId(), this, sizeof(playerId));
+        GLOBAL().PushMsg(hdr, &playerId);
+        SYSMSG_SENDV(1100, this);
+        return;
+    }
+    SYSMSG_SENDV(1101, this);
+    spreadToOther(1, getName());
+}
+
+void Player::spreadGetAward()
+{
+    bool bRet = spreadCompareTime(true, false);
+    if(!bRet)
+        return;
+    if(!(GVAR.GetVar(GVAR_SPREAD_CONDITION) & 0x01))
+        return;
+    UInt32 tmp = GetVar(VAR_SPREAD_FLAG);
+    if(!(tmp & SPREAD_ALREADY_USE))
+        return;
+    if(tmp & SPREAD_ALREADY_GET)
+        return;
+
+    lua_tinker::table award = GameAction()->GetSpreadAward();
+    UInt8 size = award.size();
+    if(GetPackage()->GetRestPackageSize() < size)
+    {
+        sendMsgCode(0, 1011);
+        return;
+    }
+    SetVar(VAR_SPREAD_FLAG, tmp | SPREAD_ALREADY_GET);
+    UInt16 itemId;
+    UInt16 itemCount;
+    for(UInt8 j = 0; j < size; ++j)
+    {
+        lua_tinker::table a = award.get<lua_tinker::table>(j + 1);
+        itemId = a.get<UInt16>(1);
+        itemCount = a.get<UInt16>(2);
+        GetPackage()->Add(itemId, itemCount, true);
+    }
 }
 
 } // namespace GObject

@@ -1630,5 +1630,10 @@ namespace Script
         assert(player != NULL);
         Call<void>("GetLuckyBagAward",player);
     }
+
+    lua_tinker::table GameActionLua::GetSpreadAward()
+    {
+        return Call<lua_tinker::table>("GetSpreadAward");
+    }
 }
 

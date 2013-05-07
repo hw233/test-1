@@ -103,7 +103,7 @@ public:
     bool autoForbid;
     bool autoKick;
     bool rpServer;
-    UInt16 spreadCountLimit;
+    UInt32 spreadCountLimit;
 
 public:
 	inline void setTcpPort(UInt16 p) {tcpPort = p;}
@@ -177,7 +177,7 @@ public:
     inline void SetSQLItemCourses(const char* p){ sql_item_courses = p;}
     inline void SetSQLItemHistories(const char* p){ sql_item_histories = p;}
     inline void SetSQLMailItemHistories(const char* p){ sql_mailitem_histories = p;}
-	inline void setSpreadCountLimit(UInt16 count) { spreadCountLimit = count; }
+	inline void setSpreadCountLimit(UInt32 count) { spreadCountLimit = count; }
 private:
 	struct IPMask
 	{

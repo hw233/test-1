@@ -72,6 +72,8 @@ namespace GObject
 
         GVAR_SPREAD_KEEPER1 = 38, //持有者ID高32位
         GVAR_SPREAD_KEEPER2 = 39, //持有者ID低32位
+        GVAR_SPREAD_BUFF = 40, //落英秘典-buff
+        GVAR_SPREAD_CONDITION = 41, //落英秘典-(0~0bits代表是否达到领取条件;8~31bits代表阶段(1代表刚开始(11:00);2代表刚结束(22:00))
 
         GVAR_MAX,
     };
@@ -133,6 +135,8 @@ namespace GObject
 
             GREGISTER_VAR(GVAR_SPREAD_KEEPER1, GCYCLE_DAY);
             GREGISTER_VAR(GVAR_SPREAD_KEEPER2, GCYCLE_DAY);
+            GREGISTER_VAR(GVAR_SPREAD_BUFF, GCYCLE_DAY);
+            GREGISTER_VAR(GVAR_SPREAD_CONDITION, GCYCLE_DAY);
 
         }
 

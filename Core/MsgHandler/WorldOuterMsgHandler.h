@@ -2484,6 +2484,21 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             GLOBAL().PushMsg(h, &type);
             break;
         }
+        case 0x41:
+        {
+            brd >> op;
+            if(op == 0)
+            {
+                std::string name;
+                brd >> name;
+                player->spreadToOther(0, name);
+            }
+            else if(op == 1)
+                player->spreadGetAward();
+            else if(op == 3)
+                player->spreadToSelf();
+        }
+        break;
         default:
             break;
     }

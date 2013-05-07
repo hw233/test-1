@@ -361,6 +361,7 @@ MSG_REG_2(GameMsgHdr, 0x333, OnOpenAPIFailed);
 MSG_REG_2(GameMsgHdr, 0x352, OnSaleItemCancleAll);
 
 MSG_REG_2(GameMsgHdr, 0x353, OnCalcLBBattlePoint);
+MSG_REG_2(GameMsgHdr, 0x354, OnSpreadWhisper);
 MSG_REG_2(GameMsgHdr, 0x360, OnBeVoted);
 MSG_REG_2(GameMsgHdr, 0x361, OnSendPopularityAward);
 

@@ -212,8 +212,8 @@ stArenaExtra World::stArena;
 /** 0：侠骨；1：柔情；2财富；3传奇 **/
 RCSortType World::killMonsterSort[4];
 UInt8 World::m_sysDailogPlatform = SYS_DIALOG_ALL_PLATFORM;
-Player* World::spreadKeeper;
-UInt16 World::spreadCount = 0;
+Player* World::spreadKeeper = NULL;
+UInt32 World::spreadCount = 0;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
@@ -1893,6 +1893,37 @@ void World::ClanStatueCheck(void *)
     globalClans.enumerate(visitor);
 }
 
+bool enum_spread_send(Player* player, void* data)
+{
+    if(player == NULL || !player->isOnline())
+        return true;
+    player->sendSpreadBasicInfo();
+    return true;
+}
+
+void SpreadCheck(void* data)
+{
+	UInt32 now = TimeUtil::Now();
+    UInt8 week = TimeUtil::GetWeekDay(now);
+    if(week != SPREAD_START_WEEK && week != SPREAD_END_WEEK)
+        return;
+    UInt32 startTime = TimeUtil::SharpDayT(0, now) + SPREAD_START_TIME;
+    UInt32 flag;
+    if(now >= startTime && (flag = GVAR.GetVar(GVAR_SPREAD_CONDITION) >> 8) == 0)
+    {
+        flag += (1 << 8);
+        GVAR.SetVar(GVAR_SPREAD_CONDITION, flag);
+        globalPlayers.enumerate(enum_spread_send, static_cast<void *>(NULL));
+    }
+    UInt32 endTime = TimeUtil::SharpDayT(0, now) + SPREAD_END_TIME;
+    if(now <= endTime && (flag = GVAR.GetVar(GVAR_SPREAD_CONDITION) >> 8) == 1)
+    {
+        flag += (1 << 8);
+        GVAR.SetVar(GVAR_SPREAD_CONDITION, flag);
+        globalPlayers.enumerate(enum_spread_send, static_cast<void *>(NULL));
+    }
+}
+
 #if 0
 bool advancedHookEnumerate(Player * pl, UInt8 para)
 {
@@ -1996,6 +2027,7 @@ bool World::Init()
     AddTimer(86400 * 1000, SendQQGameGift, static_cast<void *>(NULL), (QQGameGiftPoint >= now ? QQGameGiftPoint - now : 86400 + QQGameGiftPoint - now) * 1000);
     UInt32 sweek = TimeUtil::SharpWeek(1);
     AddTimer(3600 * 24 * 7 * 1000, SendPopulatorRankAward, static_cast<void * >(NULL), (sweek - now - 10) * 1000);
+	AddTimer(5 * 1000, SpreadCheck, static_cast<void *>(NULL), (5 - now % 5) * 1000);
     
     return true;
 }
@@ -3211,17 +3243,19 @@ void World::SendRechargeRP7RankAward()
 
 Player* World::getSpreadKeeper()
 {
-    if(!World::spreadKeeper)
+    static bool isFirst = true;
+    if(isFirst && !World::spreadKeeper)
     {
         UInt64 playerId = (static_cast<UInt64>(GVAR.GetVar(GVAR_SPREAD_KEEPER1)) << 32) + GVAR.GetVar(GVAR_SPREAD_KEEPER2);
         Player* pl = globalPlayers[playerId];
         if(pl)
             World::spreadKeeper = pl;
+        isFirst = false;
     }
     return World::spreadKeeper;
 }
 
-UInt16 World::getSpreadCount()
+UInt32 World::getSpreadCount()
 {
     static bool isFirst = true;
     if(isFirst && !World::spreadCount)

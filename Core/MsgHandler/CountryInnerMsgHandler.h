@@ -1986,6 +1986,40 @@ void OnCalcLBBattlePoint( GameMsgHdr &hdr, const void * data)
     MSG_QUERY_PLAYER(player);
     player->calcLingbaoBattlePoint();
 }
+
+void OnSpreadWhisper(GameMsgHdr &hdr, const void* data)
+{
+	MSG_QUERY_PLAYER(player);
+	if(player->getBuffData(PLAYER_BUFF_BANCHAT)!=0)
+        return;
+
+	ChatRep rep;
+	rep.type = 0xFF;
+    UInt64 playerId = *(reinterpret_cast<UInt64 *>(const_cast<void *>(data)));
+	GObject::Player * pl = GObject::globalPlayers[playerId];
+	if(pl == NULL || pl->GetSessionID() == -1)
+	{
+		rep.cny = 0;
+		rep.sex = 0;
+		rep.office = player->getTitle();
+		rep.guard = player->getPF();
+		rep.level = player->GetLev();
+		player->send(rep);
+	}
+	else
+	{
+		rep.name = player->getName();
+        SYSMSGV(content, 741);
+		rep.text = content;
+		rep.cny = player->getCountry();
+		rep.sex = player->IsMale() ? 0 : 1;
+		rep.office = player->getTitle();
+		rep.guard = player->getPF();
+		rep.level = player->GetLev();
+		pl->send(rep);
+	}
+}
+
 void OnSurnameLegendAct( GameMsgHdr &hdr, const void * data  )
 {
     MSG_QUERY_PLAYER(player);

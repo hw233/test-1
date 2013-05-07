@@ -8414,3 +8414,10 @@ function GetLuckyBagAward(player)
     Broadcast(0x27, "恭喜玩家[p:"..player:getCountry()..":"..player:getPName().."]".."在\"为雅安祈福\"活动中人品爆发，集齐所有卡牌，成功领取超级大奖")
     return true
 end
+
+function GetSpreadAward()
+    local award = {{514,1}, {515,2}, {516,3}, {517,4}}
+    return award
+end
+
+
