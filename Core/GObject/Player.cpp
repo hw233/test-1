@@ -20183,7 +20183,7 @@ void Player::sendSpreadAwardInfo()
 	Stream st(REP::ACTIVE);
     UInt8 type = 2;
     st << type;
-    st << static_cast<UInt16>(cfg.spreadCountLimit);
+    st << static_cast<UInt16>(GameAction()->GetSpreadCountForAward());
     lua_tinker::table award = GameAction()->GetSpreadAward();
     UInt8 size = award.size();
     st << size;
@@ -20225,7 +20225,7 @@ void Player::spreadToOther(UInt8 type, std::string name)
 
     World::spreadKeeper = pl;
     ++World::spreadCount;
-    if(World::spreadCount >= cfg.spreadCountLimit)
+    if(World::spreadCount >= GameAction()->GetSpreadCountForAward())
         GVAR.SetVar(GVAR_SPREAD_CONDITION, 1);
 
     if(type == 0)

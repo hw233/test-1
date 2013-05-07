@@ -8415,6 +8415,19 @@ function GetLuckyBagAward(player)
     return true
 end
 
+local serverNoSpreadCount = {
+    [1] = 5000,
+    [2] = 4000,
+    [3] = 2000
+}
+function GetSpreadCountForAward(serverNo)
+    local spreadCount = 3000
+    if serverNoSpreadCount[serverNo] ~= nil then
+        spreadCount = serverNoSpreadCount[serverNo]
+    end
+    return spreadCount
+end
+
 function GetSpreadAward()
     local award = {{514,1}, {515,2}, {516,3}, {517,4}}
     return award

@@ -366,6 +366,7 @@ namespace Script
         void getAwardInFoolsDay(Player* player, UInt8 idx);
         bool getLuckyStarAward(Player* player, UInt8 idx);
         void GetLuckyBagAward(Player * player);
+        UInt32 GetSpreadCountForAward();
         lua_tinker::table GetSpreadAward();
 	private:
 		Player* _player1;	//?ű???????Ϊ????1

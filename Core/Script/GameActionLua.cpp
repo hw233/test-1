@@ -1631,9 +1631,14 @@ namespace Script
         Call<void>("GetLuckyBagAward",player);
     }
 
+    UInt32 GameActionLua::GetSpreadCountForAward()
+    {
+        return Call<UInt32>("GetSpreadCountForAward");
+    }
+
     lua_tinker::table GameActionLua::GetSpreadAward()
     {
-        return Call<lua_tinker::table>("GetSpreadAward");
+        return Call<lua_tinker::table>("GetSpreadAward", cfg.serverNo);
     }
 }
 
