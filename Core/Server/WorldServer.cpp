@@ -369,6 +369,7 @@ void WorldServer::do_curl_request( const char* url )
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, recvret);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
     curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10);
+    curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
 
     fprintf(stderr, "URL: %s\n", url);
 
@@ -391,6 +392,7 @@ bool WorldServer::do_http_request(const char* url, int timeout)
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, recvret);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
     curl_easy_setopt(curl, CURLOPT_TIMEOUT, timeout);
+    curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
 
     fprintf(stderr, "URL: %s\n", url);
 
