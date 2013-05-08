@@ -7680,16 +7680,16 @@ function FoolBaoLoot(player,lootlvl)
             [1] = 1,
             [2] = 2,
             [3] = 3,
-        };
+    };
     local package = player:GetPackage();
     package:AddItem(9375, itemNum[lootlvl], true,0,10);
 end
 
 --蜀山传奇掉落活动
 function SurnameLegendLoot(player,lootlvl)
-   if not getSurnameLegend() then
-             return
-   end
+    if not getSurnameLegend() then
+        return
+    end
     if lootlvl > 3 then
         lootlvl = 0
     end
@@ -7698,7 +7698,7 @@ function SurnameLegendLoot(player,lootlvl)
             [1] = 1,
             [2] = 1,
             [3] = 1,
-        };
+    };
     local package = player:GetPackage();
     package:AddItem(9383, itemNum[lootlvl], true,0,10);
 end

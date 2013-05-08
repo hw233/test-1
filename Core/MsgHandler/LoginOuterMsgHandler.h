@@ -3153,6 +3153,9 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
     UInt32 begin = 0, end = 0;
     UInt8 type = 0;
     br >> type >> begin >> end;
+    begin = TimeUtil::SharpDay(0, begin);
+    if(end > begin && (end - begin)%86400 > 0)
+        end = TimeUtil::SharpDay(1, end);
     UInt8 ret = 0;
     if(type == 1 && begin <= end)
     {   //充值幸运星活动
