@@ -70,6 +70,9 @@ namespace GObject
         GVAR_LUCKYSTAR_BEGIN = 36, //幸运星活动开始时间
         GVAR_LUCKYSTAR_END   = 37, //幸运星活动结束时间
 
+        GVAR_TOTALRECHARGEACT_S = 38, //充值活动开始时间（IDIP）
+        GVAR_TOTALRECHARGEACT_E = 39, //充值活动结束时间（IDIP）
+
         GVAR_MAX,
     };
 
@@ -127,6 +130,8 @@ namespace GObject
             GREGISTER_VAR(GVAR_SURNAMELEGEND_END, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_LUCKYSTAR_BEGIN, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_LUCKYSTAR_END, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_TOTALRECHARGEACT_S, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_TOTALRECHARGEACT_E, GCYCLE_NONE);
 
         }
 
