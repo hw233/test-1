@@ -1639,6 +1639,57 @@ void OpenCb(LoginMsgHdr &hdr,const void * data)
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
+void OnTotalRechargeAct(LoginMsgHdr &hdr, const void* data)
+{
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+
+    UInt64 playerId = 0;
+    br >> playerId;
+
+    UInt32 total = 0;
+	GObject::Player * player = GObject::globalPlayers[playerId];
+    if (!player)
+        total = 0;
+    else
+        total = player->GetVar(GObject::VAR_TOTALRECHARGEACT);
+
+    Stream st(SPEP::TOTALRECHARGEACT);
+    st << total << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
+inline bool player_enum_cleartra(GObject::Player* p, int)
+{
+    if (p->GetVar(GObject::VAR_TOTALRECHARGEACT))
+        p->SetVar(GObject::VAR_TOTALRECHARGEACT, 0);
+    return true;
+}
+void OnSetTotalRechargeAct(LoginMsgHdr &hdr, const void* data)
+{
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+
+    UInt32 s = 0;
+    UInt32 e = 0;
+
+    br >> s >> e;
+
+    UInt8 ret = 1;
+
+    if (s < e)
+    {
+        GObject::globalPlayers.enumerate(player_enum_cleartra, 0);
+        GObject::GVAR.SetVar(GObject::GVAR_TOTALRECHARGEACT_S, s);
+        GObject::GVAR.SetVar(GObject::GVAR_TOTALRECHARGEACT_E, e);
+        ret = 0;
+    }
+
+    Stream st(SPEP::SETTOTALRECHARGEACT);
+    st << ret << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
 void GmHandlerFromBs(LoginMsgHdr &hdr,const void * data)
 {
     BinaryReader br(data,hdr.msgHdr.bodyLen);
@@ -3153,6 +3204,9 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
     UInt32 begin = 0, end = 0;
     UInt8 type = 0;
     br >> type >> begin >> end;
+    begin = TimeUtil::SharpDay(0, begin);
+    if(end > begin && (end - begin)%86400 > 0)
+        end = TimeUtil::SharpDay(1, end);
     UInt8 ret = 0;
     if(type == 1 && begin <= end)
     {   //充值幸运星活动

@@ -7793,6 +7793,11 @@ namespace GObject
         if (flag)
             sendDiscountLimit();
 
+
+        if (now >= GVAR.GetVar(GVAR_TOTALRECHARGEACT_S) && now <= GVAR.GetVar(GVAR_TOTALRECHARGEACT_E))
+        {
+            AddVar(VAR_TOTALRECHARGEACT, r);
+        }
     }
 
     void Player::addRechargeNextRet(UInt32 r)

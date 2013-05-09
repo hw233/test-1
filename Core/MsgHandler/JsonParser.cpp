@@ -54,10 +54,17 @@ struct JsonHead
     char   errmsg[100+1];
 };
 
-json_t* my_json_new_number(int number)
+json_t* my_json_new_number_i(int number)
 {
     char buf[1024] = {0};
     snprintf(buf, sizeof(buf), "%d", number);
+    return json_new_number(buf);
+}
+
+json_t* my_json_new_number_u(unsigned int number)
+{
+    char buf[1024] = {0};
+    snprintf(buf, sizeof(buf), "%u", number);
     return json_new_number(buf);
 }
 
@@ -102,14 +109,14 @@ bool parseHead(json_t* obj, JsonHead* head)
 
 void fillHead(json_t* head, JsonHead* hdr)
 {
-    json_insert_pair_into_object(head, "uiPacketLen", my_json_new_number(hdr->length));
-    json_insert_pair_into_object(head, "uiCmdid", my_json_new_number(hdr->cmd));
-    json_insert_pair_into_object(head, "uiSeqid", my_json_new_number(hdr->seqid));
+    json_insert_pair_into_object(head, "uiPacketLen", my_json_new_number_u(hdr->length));
+    json_insert_pair_into_object(head, "uiCmdid", my_json_new_number_u(hdr->cmd));
+    json_insert_pair_into_object(head, "uiSeqid", my_json_new_number_u(hdr->seqid));
     json_insert_pair_into_object(head, "szServiceName", json_new_string(hdr->name));
-    json_insert_pair_into_object(head, "uiSendTime", my_json_new_number(hdr->sendTime));
-    json_insert_pair_into_object(head, "uiVersion", my_json_new_number(hdr->version));
+    json_insert_pair_into_object(head, "uiSendTime", my_json_new_number_u(hdr->sendTime));
+    json_insert_pair_into_object(head, "uiVersion", my_json_new_number_u(hdr->version));
     json_insert_pair_into_object(head, "ucAuthenticate", json_new_string(hdr->auth));
-    json_insert_pair_into_object(head, "iResult", my_json_new_number(hdr->retcode));
+    json_insert_pair_into_object(head, "iResult", my_json_new_number_i(hdr->retcode));
     json_insert_pair_into_object(head, "szRetErrMsg", json_new_string(hdr->errmsg));
 }
 
@@ -194,21 +201,21 @@ int query_rolebaseinfo_req(JsonHead* head, json_t* body, json_t* retbody, std::s
     }
 
     json_insert_pair_into_object(retbody, "szRoleName", json_new_string(fixPlayerName(player->getName()).c_str()));
-    json_insert_pair_into_object(retbody, "ucGender", my_json_new_number(player->IsMale()?1:2));
+    json_insert_pair_into_object(retbody, "ucGender", my_json_new_number_u(player->IsMale()?1:2));
     char title[32] = {0};
     snprintf(title, sizeof(title), "%u", player->getTitle_noCheck());
     json_insert_pair_into_object(retbody, "szCharTitle", json_new_string(title));
-    json_insert_pair_into_object(retbody, "ucJob", my_json_new_number(player->GetClass()));
-    json_insert_pair_into_object(retbody, "ucNation", my_json_new_number(player->getCountry()));
-    json_insert_pair_into_object(retbody, "uiCurHP", my_json_new_number(player->getMainHP()));
-    json_insert_pair_into_object(retbody, "uiQuality", my_json_new_number(player->getMainPExp()));
-    json_insert_pair_into_object(retbody, "uiReputation", my_json_new_number(0));
-    json_insert_pair_into_object(retbody, "uiMoney", my_json_new_number(player->getGold()));
-    json_insert_pair_into_object(retbody, "uiGold", my_json_new_number(player->getTael()));
-    json_insert_pair_into_object(retbody, "usLevel", my_json_new_number(player->GetLev()));
-    json_insert_pair_into_object(retbody, "usVip", my_json_new_number(player->getVipLevel()));
-    json_insert_pair_into_object(retbody, "uiRegisterTime", my_json_new_number(player->getCreated()));
-    json_insert_pair_into_object(retbody, "uiLastLoginTime", my_json_new_number(player->getLastOnline()));
+    json_insert_pair_into_object(retbody, "ucJob", my_json_new_number_u(player->GetClass()));
+    json_insert_pair_into_object(retbody, "ucNation", my_json_new_number_u(player->getCountry()));
+    json_insert_pair_into_object(retbody, "uiCurHP", my_json_new_number_u(player->getMainHP()));
+    json_insert_pair_into_object(retbody, "uiQuality", my_json_new_number_u(player->getMainPExp()));
+    json_insert_pair_into_object(retbody, "uiReputation", my_json_new_number_u(0));
+    json_insert_pair_into_object(retbody, "uiMoney", my_json_new_number_u(player->getGold()));
+    json_insert_pair_into_object(retbody, "uiGold", my_json_new_number_u(player->getTael()));
+    json_insert_pair_into_object(retbody, "usLevel", my_json_new_number_u(player->GetLev()));
+    json_insert_pair_into_object(retbody, "usVip", my_json_new_number_u(player->getVipLevel()));
+    json_insert_pair_into_object(retbody, "uiRegisterTime", my_json_new_number_u(player->getCreated()));
+    json_insert_pair_into_object(retbody, "uiLastLoginTime", my_json_new_number_u(player->getLastOnline()));
 
     head->cmd = 4;
     return 0;
@@ -249,7 +256,7 @@ int add_playeritem_req(JsonHead* head, json_t* body, json_t* retbody, std::strin
     if (!player)
     {
         err += "player not exist!";
-        json_insert_pair_into_object(retbody, "iResult", my_json_new_number(1));
+        json_insert_pair_into_object(retbody, "iResult", my_json_new_number_i(1));
         json_insert_pair_into_object(retbody, "szRetMsg", json_new_string(err.c_str()));
         return EPLAYER_NOT_EXIST;
     }
@@ -266,7 +273,7 @@ int add_playeritem_req(JsonHead* head, json_t* body, json_t* retbody, std::strin
     GLOBAL().PushMsg(hdr, &ai);
 
     head->cmd = 6;
-    json_insert_pair_into_object(retbody, "iResult", my_json_new_number(0));
+    json_insert_pair_into_object(retbody, "iResult", my_json_new_number_i(0));
     json_insert_pair_into_object(retbody, "szRetMsg", json_new_string("success"));
     return 0;
 }
@@ -287,7 +294,7 @@ int query_town_ranking_req(JsonHead* head, json_t* body, json_t* retbody, std::s
     std::vector<GObject::TownRankingInfoList>& townVec = GObject::leaderboard.getTownList();
     UInt32 count = townVec.size();
 
-    json_insert_pair_into_object(retbody, "uiCount", my_json_new_number(count));
+    json_insert_pair_into_object(retbody, "uiCount", my_json_new_number_u(count));
     json_t* arr = json_new_array();
     if (arr)
     {
@@ -306,10 +313,10 @@ int query_town_ranking_req(JsonHead* head, json_t* body, json_t* retbody, std::s
                     clanName = "-";
                 json_insert_pair_into_object(obj, "ullRoleId", json_new_string(playerId));
                 json_insert_pair_into_object(obj, "szRoleName", json_new_string(fixPlayerName(info.name).c_str()));
-                json_insert_pair_into_object(obj, "ucCamp", my_json_new_number(info.country));
+                json_insert_pair_into_object(obj, "ucCamp", my_json_new_number_u(info.country));
                 json_insert_pair_into_object(obj, "szFactionName", json_new_string(clanName.c_str()));
-                json_insert_pair_into_object(obj, "usLevel", my_json_new_number(info.roleLevel));
-                json_insert_pair_into_object(obj, "uiLayers", my_json_new_number(info.value));
+                json_insert_pair_into_object(obj, "usLevel", my_json_new_number_u(info.roleLevel));
+                json_insert_pair_into_object(obj, "uiLayers", my_json_new_number_u(info.value));
                 json_insert_pair_into_object(obj, "uiReachedTime", json_new_string(time));
                 json_insert_child(arr, obj);
             }
@@ -353,7 +360,7 @@ int query_ranking_req(JsonHead* head, json_t* body, json_t* retbody, std::string
         return EUNKNOW;
 
     count = levelVec->size();
-    json_insert_pair_into_object(retbody, "uiCount", my_json_new_number(count));
+    json_insert_pair_into_object(retbody, "uiCount", my_json_new_number_u(count));
     json_t* arr = json_new_array();
     if (arr)
     {
@@ -373,9 +380,9 @@ int query_ranking_req(JsonHead* head, json_t* body, json_t* retbody, std::string
                 
                 json_insert_pair_into_object(obj, "ullRoleId", json_new_string(playerId));
                 json_insert_pair_into_object(obj, "szRoleName", json_new_string(fixPlayerName(info.name).c_str()));
-                json_insert_pair_into_object(obj, "ucCamp", my_json_new_number(info.country));
+                json_insert_pair_into_object(obj, "ucCamp", my_json_new_number_u(info.country));
                 json_insert_pair_into_object(obj, "szFactionName", json_new_string(clanName.c_str()));
-                json_insert_pair_into_object(obj, "usLevel", my_json_new_number(info.roleLevel));
+                json_insert_pair_into_object(obj, "usLevel", my_json_new_number_u(info.roleLevel));
                 json_insert_pair_into_object(obj, "uiRankValue", json_new_string(exp));
                 json_insert_child(arr, obj);
             }
@@ -416,7 +423,7 @@ int query_inviter_req(JsonHead* head, json_t* body, json_t* retbody, std::string
 
     std::set<GObject::Player *>& inviters = player->getInviters();
     UInt32 count = inviters.size();
-    json_insert_pair_into_object(retbody, "pInviteList_count", my_json_new_number(count));
+    json_insert_pair_into_object(retbody, "pInviteList_count", my_json_new_number_u(count));
     json_t* arr = json_new_array();
     if (arr)
     {
@@ -432,7 +439,7 @@ int query_inviter_req(JsonHead* head, json_t* body, json_t* retbody, std::string
                 
                 json_insert_pair_into_object(obj, "ullRoleId", json_new_string(inviterId));
                 json_insert_pair_into_object(obj, "szRoleName", json_new_string(fixPlayerName(pl->getName()).c_str()));
-                json_insert_pair_into_object(obj, "uiCreateTime", my_json_new_number(pl->getCreated()));
+                json_insert_pair_into_object(obj, "uiCreateTime", my_json_new_number_u(pl->getCreated()));
                 json_insert_child(arr, obj);
             }
         }
@@ -474,7 +481,7 @@ int query_fighters_battle_req(JsonHead* head, json_t* body, json_t* retbody, std
     UInt32 count = player->getLineupCount();
     json_insert_pair_into_object(retbody, "ullRoleId", json_new_string(playerId));
     json_insert_pair_into_object(retbody, "szRoleName", json_new_string(fixPlayerName(player->getName()).c_str()));
-    json_insert_pair_into_object(retbody, "pSummonList_count", my_json_new_number(count));
+    json_insert_pair_into_object(retbody, "pSummonList_count", my_json_new_number_u(count));
     json_t* arr = json_new_array();
     if (arr)
     {
@@ -489,8 +496,8 @@ int query_fighters_battle_req(JsonHead* head, json_t* body, json_t* retbody, std
             {
                 UInt32 fgtId = fgt->getId();
                 UInt32 battle = fgt->getBattlePoint_Dirty();
-                json_insert_pair_into_object(obj, "uiSummonId", my_json_new_number(fgtId));
-                json_insert_pair_into_object(obj, "uiSumBttlEffctv", my_json_new_number(battle));
+                json_insert_pair_into_object(obj, "uiSummonId", my_json_new_number_u(fgtId));
+                json_insert_pair_into_object(obj, "uiSumBttlEffctv", my_json_new_number_u(battle));
                 json_insert_child(arr, obj);
             }
         }
@@ -501,6 +508,39 @@ int query_fighters_battle_req(JsonHead* head, json_t* body, json_t* retbody, std
     return 0;
 }
 
+int query_pay_cash_req(JsonHead* head, json_t* body, json_t* retbody, std::string& err)
+{
+    if (!head || !body || !retbody)
+        return EUNKNOW;
+
+    char openid[36] = {0};
+    char playerId[32] = {0};
+    UInt32 areaid = 0;
+    UInt64 playerid = 0;
+
+    body = body->child;
+    if (!body)
+        return EUNKNOW;
+
+    GET_STRING(body, "szOpenId", openid, 36);
+    GET_STRING(body, "playerId", playerId, 32);
+    json_t* val = json_find_first_label(body, "uiAreaId");
+    if (val && val->child && val->child->text)
+        areaid = atoi(val->child->text);
+
+    playerid = atoll(playerId);
+    GObject::Player* player = GObject::globalPlayers[playerid];
+    if (!player)
+    {
+        err += "player not exist!";
+        return EPLAYER_NOT_EXIST;
+    }
+ 
+    json_insert_pair_into_object(retbody, "uiAmount", my_json_new_number_u(player->GetVar(GObject::VAR_TOTALRECHARGEACT)));
+
+    head->cmd = 112;
+    return 0;
+}
 
 int query_pagoda_rsq(JsonHead* head, json_t* body, json_t* retbody, std::string& err)
 {
@@ -518,7 +558,7 @@ int query_pagoda_rsq(JsonHead* head, json_t* body, json_t* retbody, std::string&
 
     const std::vector<GObject::LeaderboardTowndown>& towndown = GObject::leaderboard.getTowndown();
     UInt32 count = towndown.size();
-    json_insert_pair_into_object(retbody, "uiCount", my_json_new_number(count));
+    json_insert_pair_into_object(retbody, "uiCount", my_json_new_number_u(count));
     json_t* arr = json_new_array();
     if (arr)
     {
@@ -531,8 +571,8 @@ int query_pagoda_rsq(JsonHead* head, json_t* body, json_t* retbody, std::string&
                 snprintf(playerId, sizeof(playerId), "%"I64_FMT"u", towndown[i].id);
                 json_insert_pair_into_object(obj, "ullRoleId", json_new_string(playerId));
                 json_insert_pair_into_object(obj, "szRoleName", json_new_string(fixPlayerName(towndown[i].name).c_str()));
-                json_insert_pair_into_object(obj, "uiLayers", my_json_new_number(towndown[i].level));
-                json_insert_pair_into_object(obj, "uiReachedTime", my_json_new_number(towndown[i].time));
+                json_insert_pair_into_object(obj, "uiLayers", my_json_new_number_u(towndown[i].level));
+                json_insert_pair_into_object(obj, "uiReachedTime", my_json_new_number_u(towndown[i].time));
                 json_insert_child(arr, obj);
             }
         }
@@ -559,7 +599,7 @@ int query_gangcopy_complete_layer_req(JsonHead* head, json_t* body, json_t* retb
 
     const std::vector<GObject::LeaderboardClanCopy>& clancopy = GObject::leaderboard.getClanCopy();
     UInt32 count = clancopy.size();
-    json_insert_pair_into_object(retbody, "uiCount", my_json_new_number(count));
+    json_insert_pair_into_object(retbody, "uiCount", my_json_new_number_u(count));
     json_t* arr = json_new_array();
     if (arr)
     {
@@ -573,7 +613,7 @@ int query_gangcopy_complete_layer_req(JsonHead* head, json_t* body, json_t* retb
                 snprintf(id, sizeof(id), "%"I64_FMT"u", clancopy[i].id);
                 json_insert_pair_into_object(obj, "uiFactionID", json_new_string(id));
                 json_insert_pair_into_object(obj, "szFactionName", json_new_string(fixPlayerName(clancopy[i].name).c_str()));
-                json_insert_pair_into_object(obj, "uiFactionMaxLevel", my_json_new_number(clancopy[i].level));
+                json_insert_pair_into_object(obj, "uiFactionMaxLevel", my_json_new_number_u(clancopy[i].level));
                 snprintf(time, sizeof(time), "%"I64_FMT"u", clancopy[i].time);
                 json_insert_pair_into_object(obj, "uiFactiontime2MaxLvl", json_new_string(time));
                 json_insert_child(arr, obj);
@@ -601,7 +641,7 @@ int query_clancopy_ranking_req(JsonHead* head, json_t* body, json_t* retbody, st
 
     const std::vector<GObject::ClanCopyRankingInfoList>& clancopy = GObject::leaderboard.getClanCopyList();
     UInt32 count = clancopy.size();
-    json_insert_pair_into_object(retbody, "uiCount", my_json_new_number(count));
+    json_insert_pair_into_object(retbody, "uiCount", my_json_new_number_u(count));
     json_t* arr = json_new_array();
     if (arr)
     {
@@ -614,10 +654,10 @@ int query_clancopy_ranking_req(JsonHead* head, json_t* body, json_t* retbody, st
                 const GObject::ClanCopyRankingInfoList& info = clancopy[i];
                 json_insert_pair_into_object(obj, "szFactionName", json_new_string(fixPlayerName(info.name).c_str()));
                 json_insert_pair_into_object(obj, "szBangzhu", json_new_string(fixPlayerName(info.leaderName).c_str()));
-                json_insert_pair_into_object(obj, "usLevel", my_json_new_number(info.level));
-                json_insert_pair_into_object(obj, "usNum", my_json_new_number(info.memberCount));
-                json_insert_pair_into_object(obj, "ucCamp", my_json_new_number(info.country));
-                json_insert_pair_into_object(obj, "uiLayers", my_json_new_number(info.value));
+                json_insert_pair_into_object(obj, "usLevel", my_json_new_number_u(info.level));
+                json_insert_pair_into_object(obj, "usNum", my_json_new_number_u(info.memberCount));
+                json_insert_pair_into_object(obj, "ucCamp", my_json_new_number_u(info.country));
+                json_insert_pair_into_object(obj, "uiLayers", my_json_new_number_u(info.value));
                 snprintf(time, sizeof(time), "%"I64_FMT"u", info.reachTime);
                 json_insert_pair_into_object(obj, "uiReachedTime", json_new_string(time));
                 json_insert_child(arr, obj);
@@ -646,7 +686,7 @@ int query_clanbattle_ranking_req(JsonHead* head, json_t* body, json_t* retbody, 
 
     const std::vector<GObject::ClanBattleRankingInfoList>& clanbattle = GObject::leaderboard.getClanBattleList();
     UInt32 count = clanbattle.size();
-    json_insert_pair_into_object(retbody, "uiCount", my_json_new_number(count));
+    json_insert_pair_into_object(retbody, "uiCount", my_json_new_number_u(count));
     json_t* arr = json_new_array();
     if (arr)
     {
@@ -658,10 +698,10 @@ int query_clanbattle_ranking_req(JsonHead* head, json_t* body, json_t* retbody, 
                 const GObject::ClanBattleRankingInfoList& info = clanbattle[i];
                 json_insert_pair_into_object(obj, "szFactionName", json_new_string(fixPlayerName(info.name).c_str()));
                 json_insert_pair_into_object(obj, "szBangzhu", json_new_string(fixPlayerName(info.leaderName).c_str()));
-                json_insert_pair_into_object(obj, "usLevel", my_json_new_number(info.level));
-                json_insert_pair_into_object(obj, "usNum", my_json_new_number(info.memberCount));
-                json_insert_pair_into_object(obj, "ucCamp", my_json_new_number(info.country));
-                json_insert_pair_into_object(obj, "uiIntegral", my_json_new_number(info.value));
+                json_insert_pair_into_object(obj, "usLevel", my_json_new_number_u(info.level));
+                json_insert_pair_into_object(obj, "usNum", my_json_new_number_u(info.memberCount));
+                json_insert_pair_into_object(obj, "ucCamp", my_json_new_number_u(info.country));
+                json_insert_pair_into_object(obj, "uiIntegral", my_json_new_number_u(info.value));
                 json_insert_child(arr, obj);
             }
         }
@@ -709,7 +749,7 @@ int query_activity_req(JsonHead* head, json_t* body, json_t* retbody, std::strin
     json_insert_pair_into_object(retbody, "szOpenId", json_new_string(openid));
     json_insert_pair_into_object(retbody, "szRoleName", json_new_string(fixPlayerName(player->getName()).c_str()));
     json_insert_pair_into_object(retbody, "ullRoleId", json_new_string(playerId));
-    json_insert_pair_into_object(retbody, "uiActval", my_json_new_number(v));
+    json_insert_pair_into_object(retbody, "uiActval", my_json_new_number_u(v));
 
     head->cmd = 60;
     return 0;
@@ -745,7 +785,7 @@ int query_role_pagoda_req(JsonHead* head, json_t* body, json_t* retbody, std::st
 
     json_insert_pair_into_object(retbody, "ullRoleId", json_new_string(playerId));
     json_insert_pair_into_object(retbody, "szRoleName", json_new_string(fixPlayerName(player->getName()).c_str()));
-    json_insert_pair_into_object(retbody, "uiLayers", my_json_new_number(player->getDeamonPlayerData()?player->getDeamonPlayerData()->maxLevel:0));
+    json_insert_pair_into_object(retbody, "uiLayers", my_json_new_number_u(player->getDeamonPlayerData()?player->getDeamonPlayerData()->maxLevel:0));
 
     head->cmd = 62;
     return 0;
@@ -784,7 +824,7 @@ int query_event_state_req(JsonHead* head, json_t* body, json_t* retbody, std::st
     if (val && val->child && val->child->text)
         eventid = atoi(val->child->text);
 
-    json_insert_pair_into_object(retbody, "ucState", my_json_new_number(player->getEventState(eventid)));
+    json_insert_pair_into_object(retbody, "ucState", my_json_new_number_u(player->getEventState(eventid)));
 
     head->cmd = 70;
     return 0;
@@ -834,7 +874,7 @@ int do_item_pay_req(JsonHead* head, json_t* body, json_t* retbody, std::string& 
         price = atoi(val->child->text);
 
     int ret = player->IDIPBuy(itemId, itemCount, price, err);
-    json_insert_pair_into_object(retbody, "iResult", my_json_new_number(ret));
+    json_insert_pair_into_object(retbody, "iResult", my_json_new_number_u(ret));
     json_insert_pair_into_object(retbody, "szRetMsg", json_new_string(err.c_str()));
 
     head->cmd = 72;
@@ -942,6 +982,9 @@ void jsonParser2(void * buf, int len, Stream& st)
             break;
         case 109:
             ret = query_fighters_battle_req(&head, body, retbody, err);
+            break;
+        case 111:
+            ret = query_pay_cash_req(&head, body, retbody, err);
             break;
        
         default:

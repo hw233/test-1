@@ -70,9 +70,12 @@ namespace GObject
         GVAR_LUCKYSTAR_BEGIN = 36, //幸运星活动开始时间
         GVAR_LUCKYSTAR_END   = 37, //幸运星活动结束时间
 
-        GVAR_SPREAD_KEEPER1 = 38, //持有者ID高32位
-        GVAR_SPREAD_KEEPER2 = 39, //持有者ID低32位
-        GVAR_SPREAD_CONDITION = 40, //0~7bits代表阶段(1代表刚开始(11:00);2代表刚结束(22:00);8-31bits代表使用秘典的人的个数)
+        GVAR_TOTALRECHARGEACT_S = 38, //充值活动开始时间（IDIP）
+        GVAR_TOTALRECHARGEACT_E = 39, //充值活动结束时间（IDIP）
+
+        GVAR_SPREAD_KEEPER1 = 40, //持有者ID高32位
+        GVAR_SPREAD_KEEPER2 = 41, //持有者ID低32位
+        GVAR_SPREAD_CONDITION = 42, //0~7bits代表阶段(1代表刚开始(11:00);2代表刚结束(22:00);8-31bits代表使用秘典的人的个数)
 
         GVAR_MAX,
     };
@@ -131,6 +134,8 @@ namespace GObject
             GREGISTER_VAR(GVAR_SURNAMELEGEND_END, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_LUCKYSTAR_BEGIN, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_LUCKYSTAR_END, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_TOTALRECHARGEACT_S, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_TOTALRECHARGEACT_E, GCYCLE_NONE);
 
             GREGISTER_VAR(GVAR_SPREAD_KEEPER1, GCYCLE_DAY);
             GREGISTER_VAR(GVAR_SPREAD_KEEPER2, GCYCLE_DAY);

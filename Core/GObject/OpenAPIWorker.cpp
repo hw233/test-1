@@ -121,6 +121,7 @@ namespace GObject
             curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, recvret);
             curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
             curl_easy_setopt(curl, CURLOPT_TIMEOUT, timeout);
+            curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
 
 
             CURLcode curlRes = curl_easy_perform(curl);
