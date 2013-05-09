@@ -11323,16 +11323,18 @@ namespace GObject
     void Player::getConsumeAward()
     {
         static int s_items[2][8] ={
-            {515,507,509,503,1325,47,134,5026},
+            {515,507,509,503,1325,47,134,1717},
             {515,507,509,503,1325,47,134,5026}
             };
         if (!World::getConsumeAwardAct())
             return;
+        /*
         if (!is3366AndBD())
             return;
-        if (int(GetVar(VAR_CONSUME)/500) - GetVar(VAR_CONSUME_AWARD_COUNT) > 0)
+        */
+        if (int(GetVar(VAR_CONSUME)/300) - GetVar(VAR_CONSUME_AWARD_COUNT) > 0)
         {
-            UInt8 opt = 2; //1:普通用户 2:3366蓝钻
+            UInt8 opt = 1; //1:普通用户 2:3366蓝钻
            // if (atoi(getDomain()) == 11 && isBD())
             UInt8 idx = GameAction()->RunConsumeAward(this, opt);
             if (idx > 0)
@@ -11392,11 +11394,13 @@ namespace GObject
     {
         if (!World::getConsumeAwardAct())
             return;
+        /*
         if (!is3366AndBD())
             return;
-        UInt8 opt = 2; //1:普通用户 2:3366蓝钻
+        */
+        UInt8 opt = 1; //1:普通用户 2:3366蓝钻
         //if (atoi(getDomain()) == 11 && isBD())
-        int v = int(GetVar(VAR_CONSUME)/500) - GetVar(VAR_CONSUME_AWARD_COUNT);
+        int v = int(GetVar(VAR_CONSUME)/300) - GetVar(VAR_CONSUME_AWARD_COUNT);
         if (v < 0)
             v = 0;
         Stream st(REP::GETAWARD);
@@ -14650,7 +14654,7 @@ namespace GObject
         {
             UInt32 total = GetVar(VAR_CONSUME);
             GameAction()->sendConsumeMails(this, total, total+c);
-            SetVar(VAR_CONSUME, total+c);
+            //SetVar(VAR_CONSUME, total+c);
             sendConsumeInfo(true);
         }
         if (World::getConsume918())
@@ -14713,6 +14717,7 @@ namespace GObject
         }
         if (World::getConsumeAwardAct())
         {
+            AddVar(VAR_CONSUME, c);
             sendConsumeAwardInfo(0);
         }
     }
