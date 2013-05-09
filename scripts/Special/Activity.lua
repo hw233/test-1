@@ -4512,6 +4512,104 @@ function sendRechargeMails_2013_05_11(player, ototal, ntotal)
     _sendRechargeMails(player, ototal, ntotal, lvls, items)
 end
 
+function sendRechargeMails_2013_05_12(player, ototal, ntotal)
+    local lvls = {
+        10,99,499,999,5999,
+    }
+    local items = {
+        {0xA000,30,1},
+        {503,5,1},
+        {516,2,1, 517,2,1},
+        {509,2,1},
+        {500,50,1},
+    }
+    _sendRechargeMails(player, ototal, ntotal, lvls, items)
+end
+
+function sendRechargeMails_2013_05_13(player, ototal, ntotal)
+    local lvls = {
+        10,99,599,999,5999,
+    }
+    local items = {
+        {0xA000,30,1},
+        {503,5,1},
+        {551,3,1},
+        {134,5,1},
+        {1325,15,1},
+    }
+    _sendRechargeMails(player, ototal, ntotal, lvls, items)
+end
+
+function sendRechargeMails_2013_05_14(player, ototal, ntotal)
+    local lvls = {
+        10,99,499,999,5999,
+    }
+    local items = {
+        {0xA000,30,1},
+        {503,5,1},
+        {516,2,1, 507,1,1},
+        {9076,3,1},
+        {134,15,1},
+    }
+    _sendRechargeMails(player, ototal, ntotal, lvls, items)
+end
+
+function sendRechargeMails_2013_05_15(player, ototal, ntotal)
+    local lvls = {
+        10,99,599,999,5999,
+    }
+    local items = {
+        {0xA000,30,1},
+        {515,1,1},
+        {503,2,1},
+        {509,2,1, 507,2,1},
+        {516,20,1},
+    }
+    _sendRechargeMails(player, ototal, ntotal, lvls, items)
+end
+
+function sendRechargeMails_2013_05_16(player, ototal, ntotal)
+    local lvls = {
+        10,99,499,999,5999,
+    }
+    local items = {
+        {0xA000,30,1},
+        {515,1,1},
+        {516,2,1, 507,1,1},
+        {1325,5,1},
+        {9338,15,1},
+    }
+    _sendRechargeMails(player, ototal, ntotal, lvls, items)
+end
+
+function sendRechargeMails_2013_05_17(player, ototal, ntotal)
+    local lvls = {
+        10,99,499,999,5999,
+    }
+    local items = {
+        {0xA000,30,1},
+        {515,1,1},
+        {509,1,1, 507,1,1},
+        {515,3,1},
+        {9371,60,1},
+    }
+    _sendRechargeMails(player, ototal, ntotal, lvls, items)
+end
+
+function sendRechargeMails_2013_05_18(player, ototal, ntotal)
+    local lvls = {
+        10,99,599,999,5999,
+    }
+    local items = {
+        {0xA000,30,1},
+        {515,1,1},
+        {516,2,1, 517,2,1},
+        {509,2,1},
+        {516,20,1},
+    }
+    _sendRechargeMails(player, ototal, ntotal, lvls, items)
+end
+
 -- RECHARGE
 function sendRechargeMails(player, ototal, ntotal)
     if isRPServer() then
@@ -4537,26 +4635,6 @@ function sendRechargeMails(player, ototal, ntotal)
         end
     end
 
-    local t = { ['year'] = 2013, ['month'] = 4, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-    local s = os.time(t)
-    local n = os.time() + 11
-
-    if n >= s and n < (s + 1*86400) then
-        sendRechargeMails_2013_04_28(player, ototal, ntotal)
-    elseif n >= (s + 1*86400) and n < (s + 2*86400) then
-        sendRechargeMails_2013_04_29(player, ototal, ntotal)
-    elseif n >= (s + 2*86400) and n < (s + 3*86400) then
-        sendRechargeMails_2013_04_30(player, ototal, ntotal)
-    elseif n >= (s + 3*86400) and n < (s + 4*86400) then
-        sendRechargeMails_2013_05_01(player, ototal, ntotal)
-    elseif n >= (s + 4*86400) and n < (s + 5*86400) then
-        sendRechargeMails_2013_05_02(player, ototal, ntotal)
-    elseif n >= (s + 5*86400) and n < (s + 6*86400) then
-        sendRechargeMails_2013_05_03(player, ototal, ntotal)
-    elseif n >= (s + 6*86400) and n < (s + 7*86400) then
-        sendRechargeMails_2013_05_04(player, ototal, ntotal)
-    end
-
     local t = { ['year'] = 2013, ['month'] = 5, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local s = os.time(t)
     local n = os.time() + 11
@@ -4575,6 +4653,26 @@ function sendRechargeMails(player, ototal, ntotal)
         sendRechargeMails_2013_05_10(player, ototal, ntotal)
     elseif n >= (s + 6*86400) and n < (s + 7*86400) then
         sendRechargeMails_2013_05_11(player, ototal, ntotal)
+    end
+
+    local t = { ['year'] = 2013, ['month'] = 5, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local s = os.time(t)
+    local n = os.time() + 11
+
+    if n >= s and n < (s + 1*86400) then
+        sendRechargeMails_2013_05_12(player, ototal, ntotal)
+    elseif n >= (s + 1*86400) and n < (s + 2*86400) then
+        sendRechargeMails_2013_05_13(player, ototal, ntotal)
+    elseif n >= (s + 2*86400) and n < (s + 3*86400) then
+        sendRechargeMails_2013_05_14(player, ototal, ntotal)
+    elseif n >= (s + 3*86400) and n < (s + 4*86400) then
+        sendRechargeMails_2013_05_15(player, ototal, ntotal)
+    elseif n >= (s + 4*86400) and n < (s + 5*86400) then
+        sendRechargeMails_2013_05_16(player, ototal, ntotal)
+    elseif n >= (s + 5*86400) and n < (s + 6*86400) then
+        sendRechargeMails_2013_05_17(player, ototal, ntotal)
+    elseif n >= (s + 6*86400) and n < (s + 7*86400) then
+        sendRechargeMails_2013_05_18(player, ototal, ntotal)
     end
 end
 
@@ -6995,7 +7093,7 @@ function sendRechargeRankAward(player, pos)
         end
     end
 
-    local t = { ['year'] = 2013, ['month'] = 4, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local t = { ['year'] = 2013, ['month'] = 5, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local s = os.time(t)
     local n = os.time()
 
@@ -7015,7 +7113,7 @@ function sendRechargeRankAward(player, pos)
         sendRechargeRankAward_2013_04_20(player, pos)
     end
 
-    local t = { ['year'] = 2013, ['month'] = 5, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local t = { ['year'] = 2013, ['month'] = 5, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local s = os.time(t)
     local n = os.time()
 
@@ -7680,16 +7778,16 @@ function FoolBaoLoot(player,lootlvl)
             [1] = 1,
             [2] = 2,
             [3] = 3,
-        };
+    };
     local package = player:GetPackage();
     package:AddItem(9375, itemNum[lootlvl], true,0,10);
 end
 
 --蜀山传奇掉落活动
 function SurnameLegendLoot(player,lootlvl)
-   if not getSurnameLegend() then
-             return
-   end
+    if not getSurnameLegend() then
+        return
+    end
     if lootlvl > 3 then
         lootlvl = 0
     end
@@ -7698,7 +7796,7 @@ function SurnameLegendLoot(player,lootlvl)
             [1] = 1,
             [2] = 1,
             [3] = 1,
-        };
+    };
     local package = player:GetPackage();
     package:AddItem(9383, itemNum[lootlvl], true,0,10);
 end
@@ -8414,3 +8512,158 @@ function GetLuckyBagAward(player)
     Broadcast(0x27, "恭喜玩家[p:"..player:getCountry()..":"..player:getPName().."]".."在\"为雅安祈福\"活动中人品爆发，集齐所有卡牌，成功领取超级大奖")
     return true
 end
+
+local serverNoSpreadCount = {
+    [358] = 12000,
+    [357] = 12000,
+    [356] = 7300,
+    [355] = 9100,
+    [354] = 9600,
+    [501] = 600,
+    [353] = 6700,
+    [352] = 7500,
+    [351] = 8200,
+    [350] = 7200,
+    [349] = 5400,
+    [348] = 7600,
+    [347] = 5800,
+    [346] = 6000,
+    [345] = 6600,
+    [344] = 8100,
+    [343] = 9100,
+    [342] = 13300,
+    [341] = 13200,
+    [340] = 15000,
+    [339] = 9700,
+    [338] = 15100,
+    [337] = 12000,
+    [336] = 14700,
+    [335] = 13800,
+    [334] = 9700,
+    [333] = 11500,
+    [332] = 6000,
+    [331] = 5200,
+    [330] = 7500,
+    [329] = 4500,
+    [328] = 7400,
+    [327] = 5400,
+    [326] = 6700,
+    [325] = 4800,
+    [324] = 1400,
+    [323] = 5900,
+    [322] = 2800,
+    [321] = 7100,
+    [320] = 7600,
+    [319] = 6700,
+    [318] = 9800,
+    [317] = 6000,
+    [316] = 6500,
+    [315] = 5100,
+    [314] = 8200,
+    [313] = 3900,
+    [311] = 9800,
+    [309] = 13000,
+    [307] = 8600,
+    [305] = 7400,
+    [303] = 7400,
+    [301] = 6100,
+    [299] = 10000,
+    [296] = 10100,
+    [293] = 6000,
+    [290] = 7200,
+    [288] = 9900,
+    [286] = 4900,
+    [284] = 11200,
+    [282] = 5300,
+    [280] = 12000,
+    [278] = 3600,
+    [276] = 8100,
+    [274] = 6300,
+    [272] = 9800,
+    [270] = 5400,
+    [266] = 3700,
+    [263] = 6100,
+    [261] = 3800,
+    [253] = 12900,
+    [247] = 7300,
+    [244] = 4900,
+    [238] = 12400,
+    [231] = 14200,
+    [225] = 12100,
+    [221] = 12600,
+    [217] = 8300,
+    [214] = 8400,
+    [211] = 10800,
+    [208] = 8900,
+    [201] = 14600,
+    [198] = 9000,
+    [195] = 11300,
+    [191] = 8200,
+    [187] = 7400,
+    [185] = 8300,
+    [183] = 4700,
+    [181] = 5700,
+    [176] = 16800,
+    [171] = 14700,
+    [169] = 9600,
+    [167] = 9600,
+    [165] = 13400,
+    [163] = 8100,
+    [161] = 6800,
+    [159] = 9300,
+    [157] = 5000,
+    [154] = 12700,
+    [151] = 12800,
+    [149] = 8100,
+    [146] = 14100,
+    [143] = 7800,
+    [141] = 9800,
+    [139] = 5500,
+    [137] = 4500,
+    [134] = 8000,
+    [131] = 6900,
+    [128] = 7100,
+    [125] = 8200,
+    [123] = 5800,
+    [121] = 4900,
+    [118] = 7100,
+    [115] = 6300,
+    [113] = 3700,
+    [111] = 4000,
+    [108] = 4900,
+    [106] = 3900,
+    [103] = 5300,
+    [100] = 4900,
+    [94] = 8800,
+    [85] = 9000,
+    [75] = 3300,
+    [65] = 5200,
+    [56] = 3700,
+    [41] = 3600,
+    [33] = 3500,
+    [22] = 7000,
+    [17] = 7400,
+    [11] = 8600,
+    [7] = 7300,
+    [4] = 5500,
+    [2] = 4800,
+    [1] = 4400,
+    [9990] = 2900,
+}
+function GetSpreadCountForAward(serverNo)
+    local spreadCount = 5000
+    if serverNo ~= 9990 and serverNo ~= 501 and serverNo > 358 then
+        serverNo = 358
+    end
+    if serverNoSpreadCount[serverNo] ~= nil then
+        spreadCount = serverNoSpreadCount[serverNo]
+    end
+    return spreadCount
+end
+
+function GetSpreadAward()
+    local award = {{515,1}, {1325,2}, {134,2}, {9367,10}}
+    return award
+end
+
+

@@ -73,6 +73,7 @@ MSG_REG_2(ArenaMsgHdr, 0x108, OnArenaBattlePoint);
 MSG_REG_2(ArenaMsgHdr, 0x109, OnArenaLeaderBoard);
 
 MSG_REG_2(GameMsgHdr, 0x160, OnClanChatReq);
+MSG_REG_2(GameMsgHdr, 0x165, OnSpreadModifyVar);
 
 MSG_REG_2(GameMsgHdr, 0x171, OnClanTakeRewardResultReq);
 MSG_REG_2(GameMsgHdr, 0x173, OnClanMailInviteClick);
@@ -137,6 +138,7 @@ MSG_REG_2(GameMsgHdr, 0x1C6, OnSendPopularityRank);
 MSG_REG_2(GameMsgHdr, 0x1C7, OnPopularityRank);
 MSG_REG_2(GameMsgHdr, 0x1C8, OnLuckyBagRank);
 MSG_REG_2(GameMsgHdr, 0x1C9, OnSendLuckyBagRank);
+MSG_REG_2(GameMsgHdr, 0x1CC, OnClearLuckyBagRank);
 
 MSG_REG_2(GameMsgHdr, 0x1CA, OnRechargeRP7Rank);
 MSG_REG_2(GameMsgHdr, 0x1CB, SendRechargeRP7Rank);

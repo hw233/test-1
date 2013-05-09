@@ -194,6 +194,10 @@ public:
     { _qgamegiftact = v; }
     inline static bool getQgameGiftAct()
     { return _qgamegiftact; }
+    inline static void setSpreadAct(bool v)
+    { _spreadAct = v; }
+    inline static bool getSpreadAct()
+    { return _spreadAct; }
     inline static void setValentineDay(bool v)
     { _valentineday = v; }
     inline static bool getValentineDay()
@@ -672,11 +676,11 @@ public:
         UInt32 begin = GVAR.GetVar(GVAR_SURNAMELEGEND_BEGIN);
         UInt32 end = GVAR.GetVar(GVAR_SURNAMELEGEND_END);
         UInt32 now = TimeUtil::Now() + time;
-        if(begin == 0 && end ==0 )
+        if(begin == 0 && end == 0)
         {
             return _surnamelegend;
         }
-        else  if( now >= begin && now <= end)
+        else if( now >= begin && now <= end)
             _surnamelegend = true;
         else
             _surnamelegend = false;
@@ -733,6 +737,8 @@ public:
 	static void calWeekDay( World * world );
     inline static void setSysDailogPlatform(UInt8 v) { m_sysDailogPlatform = v; }
     inline static UInt8 getSysDailogPlatform() { return m_sysDailogPlatform; }
+    static Player* getSpreadKeeper();
+    static UInt32 getSpreadCount();
 public:
     static UInt32 _moneyLogged;
     static MoneyIn _moneyIn[7][2];
@@ -755,6 +761,7 @@ public:
     static bool _rechargeactive3366;
     static bool _yearact;
     static bool _qgamegiftact;
+    static bool _spreadAct;
     static UInt8 _rechargeactiveno;
     static bool _valentineday;
     static bool _netvalentineday;
@@ -851,6 +858,8 @@ public:
     static bool _autobattleact;
     static UInt8 _snakespringequipact;
     static UInt8 m_sysDailogPlatform;
+    static Player* spreadKeeper;
+    static UInt32 spreadBuff;
 public:
     static RCSortType rechargeSort;
     static RCSortType consumeSort;

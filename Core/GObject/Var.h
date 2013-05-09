@@ -269,6 +269,8 @@ namespace GObject
         VAR_ITEM_9281_FAILED_COUNT = 215, // 锦云兜·龙礼包连续开启失败次数
         VAR_ITEM_9282_FAILED_COUNT = 216, // 锦云兜·墨礼包连续开启失败次数
 
+        VAR_TOTALRECHARGEACT = 217, // 活动期间充值总额
+
         /*
          * 【注:此段var(217--239)貌似未被占用】
          */
@@ -381,6 +383,7 @@ namespace GObject
         VAR_ONLINE_AWARD = 409, //累计在线奖励是否领取
         VAR_QZONE_QQGAME_ACT = 410, //空间黄钻(bit1表示普通，bit2表示会员)、大厅蓝钻礼包(bit3表示普通，bit4表示会员)
         VAR_LAST_HOOK_TYPE = 411, //最后挂机类型
+        VAR_SPREAD_FLAG = 413, //低第1bit表示是否使用落英秘典,低第2bit表示是否已领取
 
         //421-430 for suntao
         VAR_FOOLS_DAY_INFO  = 421,  //愚公移山答题信息(0位表示失败,1-30位表示题目id及是否答对)
@@ -665,6 +668,7 @@ namespace GObject
             REGISTER_VAR(VAR_ITEM_9280_FAILED_COUNT, CYCLE_NONE);
             REGISTER_VAR(VAR_ITEM_9281_FAILED_COUNT, CYCLE_NONE);
             REGISTER_VAR(VAR_ITEM_9282_FAILED_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_TOTALRECHARGEACT, CYCLE_NONE);
             REGISTER_VAR(VAR_USETAEL_CNT, CYCLE_DAY);
             REGISTER_VAR(VAR_USECOUPON_CNT, CYCLE_DAY);
             REGISTER_VAR(VAR_USEGOLD_CNT, CYCLE_DAY);
@@ -782,6 +786,8 @@ namespace GObject
             REGISTER_VAR(VAR_FOOLBAO_USED, CYCLE_NONE);
             REGISTER_VAR(VAR_HHBAWARD_GOT, CYCLE_DAY);
             REGISTER_VAR(VAR_LAST_HOOK_TYPE, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_SPREAD_FLAG, CYCLE_DAY);
 
             REGISTER_VAR(VAR_CLANBOSS_GONGXIAN, CYCLE_DAY);
         }

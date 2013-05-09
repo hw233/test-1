@@ -1630,5 +1630,18 @@ namespace Script
         assert(player != NULL);
         Call<void>("GetLuckyBagAward",player);
     }
+
+    UInt32 GameActionLua::GetSpreadCountForAward()
+    {
+        UInt32 serverNo = cfg.serverNo;
+        if(cfg.isTestPlatform)
+            serverNo = 9990;
+        return Call<UInt32>("GetSpreadCountForAward", serverNo);
+    }
+
+    lua_tinker::table GameActionLua::GetSpreadAward()
+    {
+        return Call<lua_tinker::table>("GetSpreadAward");
+    }
 }
 

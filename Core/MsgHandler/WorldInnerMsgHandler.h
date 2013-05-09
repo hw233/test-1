@@ -146,6 +146,12 @@ void OnClanChatReq( GameMsgHdr& hdr, const void * data )
 		player->getClan()->broadcast(data, hdr.msgHdr.bodyLen);
 }
 
+void OnSpreadModifyVar(GameMsgHdr& hdr, const void* data)
+{
+	MSG_QUERY_PLAYER(player);
+    player->SetVar(VAR_SPREAD_FLAG, player->GetVar(VAR_SPREAD_FLAG) | SPREAD_ALREADY_GET);
+}
+
 void OnClanTakeRewardResultReq(GameMsgHdr& hdr, const void * data)
 {
 	MSG_QUERY_PLAYER(player);
@@ -942,7 +948,8 @@ void OnLuckyBagRank ( GameMsgHdr& hdr,  const void* data )
         ++rank;
 
         Stream st(REP::ACT);
-        st << static_cast<UInt8>(2) << static_cast<UInt8>(4) << static_cast<UInt8>(2) << i->total << static_cast<UInt8>(rank) << Stream::eos;
+        st << static_cast<UInt8>(2) << static_cast<UInt8>(4) << static_cast<UInt8>(2);
+        st << i->total << static_cast<UInt8>(rank > 255 ? 255 : rank) << Stream::eos;
         i->player->send(st);
     }
 
@@ -1067,12 +1074,20 @@ void OnSendLuckyBagRank ( GameMsgHdr& hdr,  const void* data )
         if (i->player == player)
         {
             Stream st(REP::ACT);
-            st << static_cast<UInt8>(2) << static_cast<UInt8>(4) << static_cast<UInt8>(2) << i->total << static_cast<UInt8>(rank) << Stream::eos;
+            st << static_cast<UInt8>(2) << static_cast<UInt8>(4) << static_cast<UInt8>(2);
+            st << i->total << static_cast<UInt8>(rank > 255 ? 255 : rank) << Stream::eos;
             player->send(st);
             break;
         }
     }
 }
+
+//For 后台操控设置活动时间及清理数据
+void OnClearLuckyBagRank ( GameMsgHdr& hdr,  const void* data )
+{
+    World::LuckyBagSort.clear();
+}
+
 void OnSendConsumeRank ( GameMsgHdr& hdr,  const void* data )
 {
     using namespace GObject;
@@ -1359,7 +1374,6 @@ void OnDaysRankMsg( GameMsgHdr& hdr, const void* data )
     daysValueRankMsg* msg = reinterpret_cast<daysValueRankMsg*>(const_cast<void*>(data));
     GObject::DaysRank::instance().updateDaysValue(msg); 
 }
-
 
 void OnSendClanMemberList( GameMsgHdr& hdr, const void* data )
 {

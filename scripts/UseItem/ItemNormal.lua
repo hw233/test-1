@@ -8367,7 +8367,7 @@ end
 function ItemNormal_00009382(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage()
-    local items = {  15,  9088,512, 33,  9371,551, 501, 513, 503, 1325,134, 507, 509, 515 }
+    local items = { 15, 9088, 512, 33, 9371, 551, 501, 513, 503, 1325, 134, 507, 509, 515 }
     local chance = { 1500,3000,3900,4800,5700,6600,7400,8200,8800,9100,9400,9600,9800,10000 }
     local card_num = 0;
     local used_num = player:GetVar(452);
@@ -8386,26 +8386,28 @@ function ItemNormal_00009382(iid, num, bind, param)
             end
         end
         package:Add(items[g], 1, true, false, 2)
-        if iid == 9383 then 
-        local rand_card = math.random(1,10000);
-        local card_chance = 3000;
-        if  used_num + n > 30 then
-            card_chance = card_chance -(used_num + n-30)*15;
-        end
-        if card_chance < 500  then
-            card_chance = 500;
-        end
-        if rand_card <= card_chance then
-           local  rand_card_num = math.random(1,5)
-           rand_card_num = rand_card_num +452;
-           player:AddVar(rand_card_num , 1);
-           card_num = card_num +1;
-        end
-        player:AddVar(452, 1)
+        if iid == 9383 and getSurnameLegend() then
+            local rand_card = math.random(1,10000);
+            local card_chance = 3000;
+            if used_num + n > 30 then
+                card_chance = card_chance - (used_num + n-30)*15;
+            end
+            if card_chance < 500 then
+                card_chance = 500;
+            end
+            if rand_card <= card_chance then
+               local rand_card_num = math.random(1,5)
+               rand_card_num = rand_card_num + 452;
+               player:AddVar(rand_card_num , 1);
+               card_num = card_num +1;
+            end
         end
     end
-    if card_num~=0 then
-    SendMsg(player, 0x35, "获得卡牌 x"..card_num);
+    if card_num > 0 then
+        SendMsg(player, 0x35, "获得卡牌 x"..card_num);
+    end
+    if iid == 9383 and getSurnameLegend() then
+        player:AddVar(452, num)
     end
     player:sendLuckyBagInfo()
     player:LuckyBagRank();

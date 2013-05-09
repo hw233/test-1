@@ -105,6 +105,7 @@ bool World::_rechargeactive = false;
 bool World::_rechargeactive3366 = false;
 bool World::_yearact = false;
 bool World::_qgamegiftact = false;
+bool World::_spreadAct = false;
 UInt8 World::_rechargeactiveno = 0;
 bool World::_valentineday = false;
 bool World::_netvalentineday = false;
@@ -212,6 +213,8 @@ stArenaExtra World::stArena;
 /** 0：侠骨；1：柔情；2财富；3传奇 **/
 RCSortType World::killMonsterSort[4];
 UInt8 World::m_sysDailogPlatform = SYS_DIALOG_ALL_PLATFORM;
+Player* World::spreadKeeper = NULL;
+UInt32 World::spreadBuff = 0;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
@@ -561,6 +564,13 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 5, 10)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 5, 11)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 5, 12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 5, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 5, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 5, 15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 5, 16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 5, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 5, 18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 5, 19)
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
     {
@@ -794,7 +804,16 @@ bool enum_extra_act_award(Player* player, void* data)
     }
     return true;
 }
-
+#if 0
+bool enum_spread_count(Player* pl, void *data)
+{
+	if(pl == NULL)
+		return true;
+    if(pl->GetVar(VAR_SPREAD_FLAG) & SPREAD_ALREADY_USE)
+        ++World::spreadCount;
+    return true;
+}
+#endif
 void World::makeActivityInfo(Stream &st)
 {
 	st.init(REP::DAILY_DATA);
@@ -1423,6 +1442,13 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 5, 10)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 5, 11)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 5, 12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 5, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 5, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 5, 15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 5, 16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 5, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 5, 18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 5, 19)
             )
         bRechargeEnd = true;
     if (cfg.rpServer)
@@ -1882,6 +1908,39 @@ void World::ClanStatueCheck(void *)
     globalClans.enumerate(visitor);
 }
 
+inline static bool enum_spread_send(Player* player, void* data)
+{
+    if(player == NULL || !player->isOnline())
+        return true;
+    player->sendSpreadBasicInfo();
+    return true;
+}
+
+void SpreadCheck(void* data)
+{
+    if (!World::getSpreadAct())
+        return;
+	UInt32 now = TimeUtil::Now();
+    UInt8 week = TimeUtil::GetWeekDay(now);
+    if(week != SPREAD_START_WEEK && week != SPREAD_END_WEEK)
+        return;
+    UInt32 startTime = TimeUtil::SharpDayT(0, now) + SPREAD_START_TIME;
+    UInt32 flag;
+    if(now >= startTime && ((flag = GVAR.GetVar(GVAR_SPREAD_CONDITION)) & 0xFF) == 0)
+    {
+        flag += 1;
+        GVAR.SetVar(GVAR_SPREAD_CONDITION, flag);
+        globalPlayers.enumerate(enum_spread_send, static_cast<void *>(NULL));
+    }
+    UInt32 endTime = TimeUtil::SharpDayT(0, now) + SPREAD_END_TIME;
+    if(now >= endTime && ((flag = GVAR.GetVar(GVAR_SPREAD_CONDITION)) &0xFF) == 1)
+    {
+        flag += 1;
+        GVAR.SetVar(GVAR_SPREAD_CONDITION, flag);
+        globalPlayers.enumerate(enum_spread_send, static_cast<void *>(NULL));
+    }
+}
+
 #if 0
 bool advancedHookEnumerate(Player * pl, UInt8 para)
 {
@@ -1985,6 +2044,7 @@ bool World::Init()
     AddTimer(86400 * 1000, SendQQGameGift, static_cast<void *>(NULL), (QQGameGiftPoint >= now ? QQGameGiftPoint - now : 86400 + QQGameGiftPoint - now) * 1000);
     UInt32 sweek = TimeUtil::SharpWeek(1);
     AddTimer(3600 * 24 * 7 * 1000, SendPopulatorRankAward, static_cast<void * >(NULL), (sweek - now - 10) * 1000);
+	AddTimer(5 * 1000, SpreadCheck, static_cast<void *>(NULL), (5 - now % 5) * 1000);
     
     return true;
 }
@@ -2759,13 +2819,16 @@ inline bool player_enum_rc(GObject::Player * p, int)
         s.total = popularity;
         World::popularitySort.insert(s);
     }
-    UInt32 used = p->GetVar(VAR_SURNAMELEGEND_USED);
-    if (used)
+    if (World::getSurnameLegend())
     {
-        RCSort s;
-        s.player = p;
-        s.total = used;
-        World::LuckyBagSort.insert(s);
+        UInt32 used = p->GetVar(VAR_SURNAMELEGEND_USED);
+        if (used)
+        {
+            RCSort s;
+            s.player = p;
+            s.total = used;
+            World::LuckyBagSort.insert(s);
+        }
     }
     return true;
 }
@@ -3195,6 +3258,22 @@ void World::SendRechargeRP7RankAward()
 //    World::rechargeRP7Sort.clear();
 }
 
+Player* World::getSpreadKeeper()
+{
+    if(!World::spreadKeeper)
+    {
+        UInt64 playerId = (static_cast<UInt64>(GVAR.GetVar(GVAR_SPREAD_KEEPER1)) << 32) + GVAR.GetVar(GVAR_SPREAD_KEEPER2);
+        Player* pl = globalPlayers[playerId];
+        if(pl)
+            World::spreadKeeper = pl;
+    }
+    return World::spreadKeeper;
+}
+
+UInt32 World::getSpreadCount()
+{
+    return (GVAR.GetVar(GVAR_SPREAD_CONDITION) >> 8);
+}
 
 }
 
