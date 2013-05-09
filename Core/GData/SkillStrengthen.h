@@ -80,6 +80,7 @@ enum
     TYPE_HITRATE_COUNTER = 36, // 增加当前命中减敌方当前反击率
     TYPE_SHIELD_HP = 37,   // 生命护盾
     TYPE_FAKE_DEAD = 38,   // 概率不死
+    TYPE_SNEAD_RECOVER = 39,  // 暗杀消失时概率恢复暗杀
     TYPE_MAX,
 };
 

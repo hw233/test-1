@@ -300,6 +300,8 @@ private:
         e_unCounterSpirit = 86,   // 解除反击士气
         e_fireFakeDead = 87,     // 火遁(有概率假死一次)
         e_unFireFakeDead = 88,   // 解除火遁
+        e_sneakAtk = 89,     // 暗杀
+        e_unSneakAtk = 90,   // 解除暗杀
 
         e_MAX_STATE,
     };
@@ -460,6 +462,7 @@ private:
     bool AddExtraDamageAfterResist_SkillStrengthen(BattleFighter* pFighter, BattleFighter* pTarget, const GData::SkillBase* skill, int nDamage);
     // 毒被抵抗时上状态
     bool AddStateAfterPoisonResist_SkillStrengthen(BattleFighter* pFighter, BattleFighter* pTarget, const GData::SkillBase* skill, int nfactor);
+    bool doSkillStrengthen_SneakRecover(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
 
     bool doDeBufAttack(BattleFighter* bf);
 
@@ -507,6 +510,7 @@ private:
     void doSkillEffectExtra_AtkPetMarkDmg(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_ProtectPet100(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_PetAtk100(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
+    void doSkillEffectExtra_SneakAtk(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
 
 
     void doSkillEffectExtraAbsorb(BattleFighter* bf, UInt32 dmg, const GData::SkillBase* skill);
@@ -666,6 +670,10 @@ private:
     UInt8 _hit_cnt;
     void doSkillStrenghtenHitConfuse(BattleFighter* bf, const GData::SkillBase* skill, GData::SkillStrengthenBase* ss, int target_side, int target_pos);
     bool isFireDefend(const GData::SkillBase* skill);
+
+    std::vector<BattleFighter*> _sneak_atker;
+    void pushSneakAtker(BattleFighter* bf) { _sneak_atker.push_back(bf); }
+    void doSneakAttack(BattleFighter* bf, BattleFighter* bo, bool& pr, bool& cs);
 };
 
 }
