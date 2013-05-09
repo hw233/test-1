@@ -20128,7 +20128,7 @@ bool spreadCompareTime(bool checkStartTime, bool checkEndTime)
 {
 	UInt32 now = TimeUtil::Now();
     UInt8 week = TimeUtil::GetWeekDay(now);
-    if(week != SPREAD_START_WEEK && week != SPREAD_END_WEEK)
+    if(week < SPREAD_START_WEEK || week > SPREAD_END_WEEK)
         return false;
     if(checkStartTime)
     {
@@ -20261,6 +20261,15 @@ void Player::spreadToOther(UInt8 type, std::string name)
     }
 
     World::spreadKeeper = pl;
+    UInt8 week = TimeUtil::GetWeekDay(now);
+    if(week == SPREAD_START_WEEK)
+    {
+        SYSMSG_BROADCASTV(4136, pl->getCountry(), pl->getName().c_str());
+    }
+    else if(week == (SPREAD_END_WEEK))
+    {
+        SYSMSG_BROADCASTV(4137, pl->getCountry(), pl->getName().c_str());
+    }
     globalPlayers.enumerate(enum_spread_send2, static_cast<void *>(NULL));
 }
 
