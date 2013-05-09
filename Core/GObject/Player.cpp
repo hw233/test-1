@@ -20159,7 +20159,7 @@ void Player::sendSpreadBasicInfo()
         if(World::spreadBuff > now)
             leftTime = World::spreadBuff - now;
     }
-    st << name;
+    st << fixName(name);
     st << leftTime;
     st << static_cast<UInt16>(World::getSpreadCount());
     st << static_cast<UInt8>((GetVar(VAR_SPREAD_FLAG) & 0x03));
@@ -20170,7 +20170,7 @@ void Player::sendSpreadBasicInfo()
 
 void Player::sendSpreadAwardInfo()
 {
-    bool bRet = spreadCompareTime(true, false);
+    bool bRet = spreadCompareTime(false, false);
     if(!bRet)
         return;
 	Stream st(REP::ACTIVE);
@@ -20210,14 +20210,14 @@ void Player::spreadToOther(UInt8 type, std::string name)
         sendMsgCode(0, 1506);
         return;
     }
-    if(pl == this)
+    if(World::spreadKeeper == pl)
     {
         sendMsgCode(0, 2211);
         return;
     }
     if(pl->GetLev() < 45)
     {
-        sendMsgCode(0, 1010);
+        sendMsgCode(0, 3503);
         return;
     }
     if(!pl->isOnline())
@@ -20230,23 +20230,32 @@ void Player::spreadToOther(UInt8 type, std::string name)
         sendMsgCode(0, 2215);
         return;
     }
-    SetVar(VAR_SPREAD_FLAG, GetVar(VAR_SPREAD_FLAG) | SPREAD_ALREADY_USE);
+
     GVAR.SetVar(GVAR_SPREAD_KEEPER1, pl->getId()>>32);
     GVAR.SetVar(GVAR_SPREAD_KEEPER2, pl->getId()&0xFFFFFFFF);
     World::spreadBuff = now + SPREAD_INTERVA_TIME;
 
-    World::spreadKeeper = pl;
-    GVAR.AddVar(GVAR_SPREAD_CONDITION, 1 << 8);
-
     if(type == 0)
     {
+        UInt32 tmp = GetVar(VAR_SPREAD_FLAG);
+        if(tmp & SPREAD_ALREADY_USE)
+        {
+            sendMsgCode(0, 2215);
+            return;
+        }
+        SetVar(VAR_SPREAD_FLAG, tmp | SPREAD_ALREADY_USE);
+        GVAR.AddVar(GVAR_SPREAD_CONDITION, 1 << 8);
         UInt32 pexp = 50000;
         GameMsgHdr hdr2(0x238, getThreadId(), this, sizeof(pexp));
         GLOBAL().PushMsg(hdr2, &pexp);
     }
     else
-        sendMsgCode(0, 3501);
+    {
+        if(World::spreadKeeper)
+            sendMsgCode(0, 3501);
+    }
 
+    World::spreadKeeper = pl;
     globalPlayers.enumerate(enum_spread_send2, static_cast<void *>(NULL));
 }
 
