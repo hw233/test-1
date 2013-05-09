@@ -11332,7 +11332,7 @@ namespace GObject
         if (!is3366AndBD())
             return;
         */
-        if (int(GetVar(VAR_CONSUME)/300) - GetVar(VAR_CONSUME_AWARD_COUNT) > 0)
+        if (GetVar(VAR_CONSUME)/300 > GetVar(VAR_CONSUME_AWARD_COUNT))
         {
             UInt8 opt = 1; //1:普通用户 2:3366蓝钻
            // if (atoi(getDomain()) == 11 && isBD())
