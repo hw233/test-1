@@ -176,7 +176,7 @@ namespace GObject
 #define SPREAD_END_WEEK           7
 #define SPREAD_START_TIME         11*3600
 #define SPREAD_END_TIME           22*3600
-#define SPREAD_INTERVA_TIME       5*60
+#define SPREAD_INTERVA_TIME       150
 #define SPREAD_ALREADY_USE        0x01
 #define SPREAD_ALREADY_GET        0x02
 
