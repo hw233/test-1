@@ -8658,7 +8658,7 @@ function GetSpreadCountForAward(serverNo)
     if serverNoSpreadCount[serverNo] ~= nil then
         spreadCount = serverNoSpreadCount[serverNo]
     end
-    spreadCount = spreadCount / 4 * 5
+    spreadCount = spreadCount * 4 / 5
     return spreadCount
 end
 
