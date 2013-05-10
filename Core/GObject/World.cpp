@@ -1922,7 +1922,7 @@ void SpreadCheck(void* data)
         return;
 	UInt32 now = TimeUtil::Now();
     UInt8 week = TimeUtil::GetWeekDay(now);
-    if(week != SPREAD_START_WEEK && week != SPREAD_END_WEEK)
+    if(week < SPREAD_START_WEEK || week > SPREAD_END_WEEK)
         return;
     UInt32 startTime = TimeUtil::SharpDayT(0, now) + SPREAD_START_TIME;
     UInt32 flag;

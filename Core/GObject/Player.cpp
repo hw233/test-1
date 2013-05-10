@@ -11323,16 +11323,18 @@ namespace GObject
     void Player::getConsumeAward()
     {
         static int s_items[2][8] ={
-            {515,507,509,503,1325,47,134,5026},
+            {515,507,509,503,1325,47,134,1717},
             {515,507,509,503,1325,47,134,5026}
             };
         if (!World::getConsumeAwardAct())
             return;
+        /*
         if (!is3366AndBD())
             return;
-        if (int(GetVar(VAR_CONSUME)/500) - GetVar(VAR_CONSUME_AWARD_COUNT) > 0)
+        */
+        if (GetVar(VAR_CONSUME)/300 > GetVar(VAR_CONSUME_AWARD_COUNT))
         {
-            UInt8 opt = 2; //1:普通用户 2:3366蓝钻
+            UInt8 opt = 1; //1:普通用户 2:3366蓝钻
            // if (atoi(getDomain()) == 11 && isBD())
             UInt8 idx = GameAction()->RunConsumeAward(this, opt);
             if (idx > 0)
@@ -11392,11 +11394,13 @@ namespace GObject
     {
         if (!World::getConsumeAwardAct())
             return;
+        /*
         if (!is3366AndBD())
             return;
-        UInt8 opt = 2; //1:普通用户 2:3366蓝钻
+        */
+        UInt8 opt = 1; //1:普通用户 2:3366蓝钻
         //if (atoi(getDomain()) == 11 && isBD())
-        int v = int(GetVar(VAR_CONSUME)/500) - GetVar(VAR_CONSUME_AWARD_COUNT);
+        int v = int(GetVar(VAR_CONSUME)/300) - GetVar(VAR_CONSUME_AWARD_COUNT);
         if (v < 0)
             v = 0;
         Stream st(REP::GETAWARD);
@@ -14650,7 +14654,7 @@ namespace GObject
         {
             UInt32 total = GetVar(VAR_CONSUME);
             GameAction()->sendConsumeMails(this, total, total+c);
-            SetVar(VAR_CONSUME, total+c);
+            //SetVar(VAR_CONSUME, total+c);
             sendConsumeInfo(true);
         }
         if (World::getConsume918())
@@ -14713,6 +14717,7 @@ namespace GObject
         }
         if (World::getConsumeAwardAct())
         {
+            AddVar(VAR_CONSUME, c);
             sendConsumeAwardInfo(0);
         }
     }
@@ -20128,7 +20133,7 @@ bool spreadCompareTime(bool checkStartTime, bool checkEndTime)
 {
 	UInt32 now = TimeUtil::Now();
     UInt8 week = TimeUtil::GetWeekDay(now);
-    if(week != SPREAD_START_WEEK && week != SPREAD_END_WEEK)
+    if(week < SPREAD_START_WEEK || week > SPREAD_END_WEEK)
         return false;
     if(checkStartTime)
     {
@@ -20261,6 +20266,13 @@ void Player::spreadToOther(UInt8 type, std::string name)
     }
 
     World::spreadKeeper = pl;
+    UInt8 week = TimeUtil::GetWeekDay(now);
+    if(week == SPREAD_START_WEEK)
+        SYSMSG_BROADCASTV(4136, pl->getCountry(), pl->getName().c_str())
+    else if(week == (SPREAD_END_WEEK))
+        SYSMSG_BROADCASTV(4137, pl->getCountry(), pl->getName().c_str())
+    else
+        SYSMSG_BROADCASTV(4138, pl->getCountry(), pl->getName().c_str())
     globalPlayers.enumerate(enum_spread_send2, static_cast<void *>(NULL));
 }
 
@@ -20306,8 +20318,8 @@ void Player::spreadGetAward()
     if(!bRet)
         return;
     UInt32 tmp = GetVar(VAR_SPREAD_FLAG);
-    if(!(tmp & SPREAD_ALREADY_USE))
-        return;
+    //if(!(tmp & SPREAD_ALREADY_USE))
+    //    return;
     if(tmp & SPREAD_ALREADY_GET)
         return;
     UInt32 spreadCount = World::getSpreadCount();
