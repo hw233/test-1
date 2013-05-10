@@ -8659,6 +8659,9 @@ function GetSpreadCountForAward(serverNo)
         spreadCount = serverNoSpreadCount[serverNo]
     end
     spreadCount = spreadCount * 4 / 50
+    if spreadCount > 500 then
+        spreadCount = 500
+    end
     return spreadCount
 end
 
