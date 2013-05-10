@@ -6915,14 +6915,17 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
             fSummonOrMirror = true;
             break;
         }
-    
+
         if(static_cast<BattleFighter*>(bo)->isSummon())
         {
             BattleFighter* summoner = static_cast<BattleFighter*>(bo)->getSummoner();
-            UInt8 aura = static_cast<BattleFighter*>(bo)->getUnSummonAura();
 
             if(summoner)
+            {
+                summoner->setSelfSummon(NULL);
+                UInt8 aura = static_cast<BattleFighter*>(bo)->getUnSummonAura();
                 setStatusChange(static_cast<BattleFighter*>(bo), summoner->getSide(), summoner->getPos(), 1, 0, e_stAura, aura, 0, false);
+            }
 
             fSummonOrMirror = true;
             break;
@@ -11758,6 +11761,10 @@ void BattleSimulator::doSkillEffectExtra_SneakAtk(BattleFighter* bf, int target_
         ++ last;
     bf->setSneakAtk(skill->effect->efv[eftIdx], e_sneak_on, last);
     appendDefStatus(e_sneakAtk, 0, bf);
+
+    BattleFighter* selfSummon = bf->getSelfSummon();
+    if(selfSummon)
+        selfSummon->setSneakAtk(skill->effect->efv[eftIdx], e_sneak_on, last);
 }
 
 bool BattleSimulator::doSkillStrengthen_SneakRecover(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active)
@@ -11766,6 +11773,9 @@ bool BattleSimulator::doSkillStrengthen_SneakRecover(BattleFighter* bf, const GD
         return false;
 
     bf->setRecoverSnakeAtk(ef->value * 100);
+    BattleFighter* selfSummon = bf->getSelfSummon();
+    if(selfSummon)
+        selfSummon->setRecoverSnakeAtk(ef->value * 100);
 
     return true;
 }
