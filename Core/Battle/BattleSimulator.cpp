@@ -112,6 +112,7 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, cons
         skillStrengthenTable[GData::TYPE_BLEED_BYSKILL] = &BattleSimulator::doSkillStrengthen_BleedBySkill;
         skillStrengthenTable[GData::TYPE_SHIELD_HP] = &BattleSimulator::doSkillStrengthen_ShieldHP;
         skillStrengthenTable[GData::TYPE_FAKE_DEAD] = &BattleSimulator::doSkillStrengthen_FireFakeDead;
+        skillStrengthenTable[GData::TYPE_SNEAD_RECOVER] = &BattleSimulator::doSkillStrengthen_SneakRecover;
     }
     {
         for(int i = 0; i < GData::e_eft_max; ++ i)
@@ -138,6 +139,7 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, cons
         skillEffectExtraTable[GData::e_eft_atk_pet_mark_extra_dmg] = &BattleSimulator::doSkillEffectExtra_AtkPetMarkDmg;
         skillEffectExtraTable[GData::e_eft_protect_pet_100] = &BattleSimulator::doSkillEffectExtra_ProtectPet100;
         skillEffectExtraTable[GData::e_eft_pet_atk_100] = &BattleSimulator::doSkillEffectExtra_PetAtk100;
+        skillEffectExtraTable[GData::e_eft_sneak_atk] = &BattleSimulator::doSkillEffectExtra_SneakAtk;
     }
 }
 
@@ -215,6 +217,7 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, GObj
         skillStrengthenTable[GData::TYPE_BLEED_BYSKILL] = &BattleSimulator::doSkillStrengthen_BleedBySkill;
         skillStrengthenTable[GData::TYPE_SHIELD_HP] = &BattleSimulator::doSkillStrengthen_ShieldHP;
         skillStrengthenTable[GData::TYPE_FAKE_DEAD] = &BattleSimulator::doSkillStrengthen_FireFakeDead;
+        skillStrengthenTable[GData::TYPE_SNEAD_RECOVER] = &BattleSimulator::doSkillStrengthen_SneakRecover;
     }
     {
         for(int i = 0; i < GData::e_eft_max; ++ i)
@@ -241,6 +244,7 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, GObj
         skillEffectExtraTable[GData::e_eft_atk_pet_mark_extra_dmg] = &BattleSimulator::doSkillEffectExtra_AtkPetMarkDmg;
         skillEffectExtraTable[GData::e_eft_protect_pet_100] = &BattleSimulator::doSkillEffectExtra_ProtectPet100;
         skillEffectExtraTable[GData::e_eft_pet_atk_100] = &BattleSimulator::doSkillEffectExtra_PetAtk100;
+        skillEffectExtraTable[GData::e_eft_sneak_atk] = &BattleSimulator::doSkillEffectExtra_SneakAtk;
     }
 }
 
@@ -1516,6 +1520,11 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
             {
                 area_target->setEvad100(false);
                 appendDefStatus(e_damEvade, 0, area_target);
+                if(area_target->getSneakStatus() == e_sneak_on)
+                {
+                    _sneak_atker.push_back(area_target);
+                    area_target->nextSneakStatus();
+                }
             }
             else
             {
@@ -5998,6 +6007,32 @@ UInt32 BattleSimulator::doAttack( int pos )
             _activeFgt = NULL;
         }
     }
+    size_t size = _sneak_atker.size();
+    if(size != 0)
+    {
+        for(size_t i = 0; i < size; ++ i)
+        {
+            bool cs = false;
+            bool pr = false;
+            if(bf->getHP() == 0)
+                break;
+            BattleFighter* sneaker = _sneak_atker[i];
+            _activeFgt = sneaker;
+            sneaker->nextSneakStatus();
+            if(!sneaker->recoverSneakAtk())
+                appendDefStatus(e_unSneakAtk, 0, static_cast<BattleFighter*>(sneaker));
+
+            doSneakAttack(sneaker, bf, pr, cs);
+
+            if(_defList.size() > 0 || _scList.size() > 0)
+            {
+                appendToPacket(sneaker->getSide(), sneaker->getPos(), 0, 2, 10001, cs, pr);
+                ++ rcnt;
+            }
+        }
+        _sneak_atker.clear();
+        _activeFgt = NULL;
+    }
 
     return rcnt;
 }
@@ -7404,6 +7439,11 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
     bf->releasePetCoAtk();
     bf->releaseSkillCD(1);
     bf->releaseMoEvade100();
+
+    if(bf->releaseSneakAtk())
+    {
+        appendDefStatus(e_unSneakAtk, 0, static_cast<BattleFighter*>(bf));
+    }
 
     if(bf->releaseCounterSpirit())
     {
@@ -11708,5 +11748,88 @@ bool BattleSimulator::doSkillStrengthen_FireFakeDead(BattleFighter* bf, const GD
     return true;
 }
 
+void BattleSimulator::doSkillEffectExtra_SneakAtk(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
+{
+    BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, target_pos));
+    if(!bf || !bo)
+        return;
+    UInt16 last = skill->last;
+    if(bf->isHide() || bo->isMarkMo())
+        ++ last;
+    bf->setSneakAtk(skill->effect->efv[eftIdx], e_sneak_on, last);
+    appendDefStatus(e_sneakAtk, 0, bf);
+}
+
+bool BattleSimulator::doSkillStrengthen_SneakRecover(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active)
+{
+    if(!bf || !skill || !ef)
+        return false;
+
+    bf->setRecoverSnakeAtk(ef->value * 100);
+
+    return true;
+}
+
+void BattleSimulator::doSneakAttack(BattleFighter* bf, BattleFighter* bo, bool& pr, bool& cs)
+{
+    if(!bf || !bo)
+        return;
+
+    float sneak_atk =  bf->getSneakAtk();
+    if(sneak_atk < 0.001f)
+        return;
+
+    UInt32 dmg = 0;
+    UInt8 bo_stun = bo->getStunRound();
+    bool enterEvade = bo->getEvad100();
+    bool defend100 = bo->getDefend100();
+
+    if(!defend100 && (bo_stun > 0 || (!enterEvade && bf->calcHit(bo, NULL))))
+    {
+        pr = bf->calcPierce(bo);
+        float atk = 0;
+        float cf = 0.0f;
+        atk = bf->calcAttack(cs, bo, &cf);
+        if(cs)
+        {
+            UInt8 s = bf->getSide();
+            if(s < 2)
+                _maxCSFactor[s] = std::max( cf, _maxCSFactor[s] ) ;
+
+        }
+
+        float def;
+        float toughFactor = pr ? bo->getTough(bf) : 1.0f;
+        def = bo->getDefend();
+        float atkreduce = bo->getAtkReduce();
+        dmg = _formula->calcDamage(atk * sneak_atk, def, bf->getLevel(), toughFactor, atkreduce);
+        dmg *= static_cast<float>(950 + _rnd(100)) / 1000;
+        dmg = dmg > 0 ? dmg : 1;
+        UInt32 dmg2 = dmg;
+        makeDamage(bo, dmg2);
+        appendDefStatus(e_damNormal, dmg, bo, e_damagePhysic);
+        UInt32 rhp = (dmg >> 1);
+        bf->regenHP(rhp);
+        appendDefStatus(e_damAbsorb, rhp, bf);
+
+        if(bo->getHP() == 0)
+            onDead(false, bo);
+        else if(_winner == 0)
+            onDamage(bo, true, NULL);
+    }
+    else
+    {
+        if(defend100)
+        {
+            appendDefStatus(e_damOut, 0, bo);
+            bo->setDefend100(false);
+        }
+        else
+        {
+            appendDefStatus(e_damEvade, 0, bo);
+            bo->setEvad100(false);
+        }
+    }
+}
 
 }

@@ -829,7 +829,7 @@ function onActivityCheck(tm)
       elseif tm >= actTime2013_04_09 and tm < actTime2013_04_09+5*86400 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
-      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+28*86400 then
+      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+35*86400 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
       else
@@ -878,7 +878,7 @@ function onActivityCheck(tm)
       else
           setConsumeActive(false)
       end
-      if tm >= actTime550 and tm < actTime550_1 then
+      if tm >= actTime247_0 and tm < actTime247_1 then
           setConsumeAwardAct(true)
       else
           setConsumeAwardAct(false)
@@ -1032,6 +1032,12 @@ function onActivityCheck(tm)
           setMayDayLoginAct(true)
       else
           setMayDayLoginAct(false)
+      end
+
+      if tm >= actTime246_0 and tm < actTime246_1 then
+          setSpreadAct(true)
+      else
+          setSpreadAct(false)
       end
 
       if tm >= actTime2013_03_15 and tm < (actTime2013_03_15+86400) then
@@ -1363,6 +1369,10 @@ function initActTime(y, m, d)
   local  SerStartTm244 = { ['year'] = 2013, ['month'] = 3, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 五一活动(节日套装)
   local  SerStartTm245 = { ['year'] = 2013, ['month'] = 4, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --落英秘典
+  local  SerStartTm246 = { ['year'] = 2013, ['month'] = 5, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --消费抽奖活动
+  local  SerStartTm247= { ['year'] = 2013, ['month'] = 5, ['day'] = 10, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm2013_04_14 = { ['year'] = 2013, ['month'] = 4, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
@@ -1781,6 +1791,12 @@ function initActTime(y, m, d)
 
   actTime245_0= os.time(SerStartTm245)
   actTime245_1= os.time(SerStartTm245) + 7*86400;
+
+  actTime246_0= os.time(SerStartTm246)
+  actTime246_1= os.time(SerStartTm246) + 2*86400;
+
+  actTime247_0= os.time(SerStartTm247)
+  actTime247_1= os.time(SerStartTm247) + 7*86400;
 
   actTime2013_01_29= os.time(SerStartTm2013_01_29);
   actTime2013_02_01= os.time(SerStartTm2013_02_01);

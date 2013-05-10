@@ -66,7 +66,7 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _bleedRandom(0), _bleedRandomLast(0), _bleedAttackClass(1),_bleedBySkill(0), _bleedBySkillLast(0), _bleedBySkillClass(1),
     _hitChangeByPeerless(0),_counterChangeByPeerless(0),_bSingleAttackFlag(false),_bMainTargetDead(false),_nCurrentAttackIndex(0),
     _darkVigor(0), _dvFactor(0), _darkVigorLast(0), _hpShieldSelf(0), _hpShieldSelf_last(0),
-    _counter_spirit_atk_add(0), _counter_spirit_magatk_add(0), _counter_spirit_def_add(0), _counter_spirit_magdef_add(0), _counter_spirit_times(0), _counter_spirit_last(0), _counter_spirit_efv(0), _counter_spirit_skillid(0), _counter_spirit_skill_cd(0), _pet_coatk(0), _fire_defend(0), _fire_defend_last(0), _fire_fake_dead_rate(0), _fire_fake_dead_rate_last(0)
+    _counter_spirit_atk_add(0), _counter_spirit_magatk_add(0), _counter_spirit_def_add(0), _counter_spirit_magdef_add(0), _counter_spirit_times(0), _counter_spirit_last(0), _counter_spirit_efv(0), _counter_spirit_skillid(0), _counter_spirit_skill_cd(0), _pet_coatk(0), _fire_defend(0), _fire_defend_last(0), _fire_fake_dead_rate(0), _fire_fake_dead_rate_last(0), _sneak_atk(0), _sneak_atk_status(0), _sneak_atk_last(0), _sneak_atk_recover_rate(0)
 {
     memset(_immuneLevel, 0, sizeof(_immuneLevel));
     memset(_immuneRound, 0, sizeof(_immuneRound));
@@ -2116,6 +2116,9 @@ BattleFighter* BattleFighter::summonSelf(float factor, UInt8 last)
     if(isHide())
         aura = 100;
 
+    bf->setSneakAtk(_sneak_atk, _sneak_atk_status, _sneak_atk_last);
+    bf->setRecoverSnakeAtk(_sneak_atk_recover_rate);
+
     bf->setSummonFactor(aura, factor, last);
 
     return bf;
@@ -2768,5 +2771,52 @@ bool BattleFighter::releaseFireFakeDead()
     return true;
 }
 
+void BattleFighter::nextSneakStatus()
+{
+    switch(_sneak_atk_status)
+    {
+    case e_sneak_none:
+        break;
+    case e_sneak_on:
+        _sneak_atk_status = e_sneak_atk;
+        break;
+    case e_sneak_atk:
+        _sneak_atk_status = e_sneak_none;
+        break;
+    }
+
+    return;
+}
+
+bool BattleFighter::releaseSneakAtk()
+{
+    if(_sneak_atk_last == 0)
+        return false;
+
+     -- _sneak_atk_last;
+     if(_sneak_atk_last != 0)
+         return false;
+
+     _sneak_atk_status = e_sneak_none;
+     _sneak_atk_recover_rate = 0;
+     _sneak_atk = 0;
+
+     return true;
+}
+
+bool BattleFighter::recoverSneakAtk()
+{
+    if(_sneak_atk_status != e_sneak_none || _sneak_atk_last == 0)
+        return false;
+
+    if(_sneak_atk_recover_rate > uRand(10000))
+    {
+        _sneak_atk_status = e_sneak_on;
+        _sneak_atk_recover_rate *= 0.5f;
+        return true;
+    }
+
+    return false;
+}
 
 }

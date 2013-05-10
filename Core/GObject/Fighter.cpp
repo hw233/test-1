@@ -5591,6 +5591,8 @@ UInt16 Fighter::getPortrait()
             portrait = 1093;
         else if(getFashionTypeId() == 1712)
             portrait = 1094;
+        else if(getFashionTypeId() == 1717)
+            portrait = 1096;
  
     }
 

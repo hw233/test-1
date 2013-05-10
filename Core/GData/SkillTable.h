@@ -93,6 +93,7 @@ enum
     e_eft_pet_protect_reduce = 26,      // 宠物援护免伤
     e_eft_counter_spirit = 27,     // 反击后的士气(增加防御、攻击,累计5次对敌方全体造成物理伤害)
     e_eft_fire_def = 28,           // 火甲(增加防御，不被其他buf覆盖)
+    e_eft_sneak_atk = 29,           // 暗杀(闪避时对敌方造成伤害并吸血)
 
     e_eft_max
 };
