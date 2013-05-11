@@ -1023,9 +1023,9 @@ namespace GObject
 
         bool isCopyPassed(UInt8 copyid);
         bool inVipPrivilegeTime();
-        bool SetVipPrivilege(bool = true);
+        bool SetVipPrivilege();
         void doVipPrivilege(UInt8 idx);
-        void sendVipPrivilege();
+        void sendVipPrivilege(bool = false);
         void sendVipPrivilegeMail(UInt8 lv);
         bool SetVipPrivilege_1();
         bool SetVipPrivilege_2();

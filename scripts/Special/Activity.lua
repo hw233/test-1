@@ -8013,7 +8013,7 @@ function getLuckyStarAward(player, idx)
     end
     local golds = {0, 99, 99, 20, 0, 59, 59, 59, 0, 568, 268, 999}
     local recharge = { 100, 500, 1000 }
-    if player:GetVar(378) < recharge[math.floor((idx-1)/4)+1] then
+    if player:GetVar(369) < recharge[math.floor((idx-1)/4)+1] then
         SendMsg(player, 0x35, "充值仙石未达到对应额度，不能领取或购买！")
         return false
     end
@@ -8026,11 +8026,11 @@ function getLuckyStarAward(player, idx)
         return false
     end
     if items[idx][1][1] == "vip" then
-        if player:SetVipPrivilege(false) == false then
+        if player:SetVipPrivilege() == false then
             player:sendMsgCode(0, 1091)
             return false
         end
-        player:sendVipPrivilege()
+        player:sendVipPrivilege(true)
     else
         for _, val in pairs(items[idx]) do
             player:GetPackage():Add(val[1], val[2], true, false, 43)

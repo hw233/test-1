@@ -7604,10 +7604,11 @@ namespace GObject
 	{
 		if(r == 0)
 			return;
-        if(World::getLuckyStarAct())
+        setLuckyStarCondition();
+        if(getLuckyStarAct())
         {
             AddVar(VAR_LUCKYSTAR_RECHARGE_TOTAL, r);
-            setLuckyStarCondition();
+            sendLuckyStarInfo(2);
         }
 
 		UInt32 oldVipLevel = _vipLevel;
@@ -19198,7 +19199,7 @@ bool Player::inVipPrivilegeTime()
     return ret;
 }
 
-bool Player::SetVipPrivilege(bool flag)
+bool Player::SetVipPrivilege()
 {
     UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME);
     bool ret = false;
@@ -19215,11 +19216,6 @@ bool Player::SetVipPrivilege(bool flag)
         validate |= 0x2;
         SetVar(VAR_VIP_PRIVILEGE_TIME, validate);
         ret = true;
-        if(flag)
-        {
-            ConsumeInfo ci(VipPrivilege, 0, 0);
-            useGold(100, &ci);
-        }
     }
 
     return ret;
@@ -19368,7 +19364,7 @@ void Player::sendVipPrivilegeMail(UInt8 lv)
     }
 }
 
-void Player::sendVipPrivilege()
+void Player::sendVipPrivilege(bool isLStar)
 {
     UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME);
     UInt32 data = GetVar(VAR_VIP_PRIVILEGE_DATA);
@@ -19402,6 +19398,8 @@ void Player::sendVipPrivilege()
         SET_VIP_PRIVILEGE_OPEN(data, 0);
     }
 
+    if(isLStar)
+        extra |= 0x4;
     SET_VIP_PRIVILEGE_DAYTH(data, dayth);
     Stream st(REP::RC7DAY);
     st << static_cast<UInt8>(10) << timeLeft << static_cast<UInt8>(data) << extra;
@@ -19666,6 +19664,11 @@ void Player::setLuckyStarCondition()
 {
     if(!World::getLuckyStarAct())
         return;
+    UInt32 now_sharp = TimeUtil::SharpDay(0);
+    UInt32 created_sharp = TimeUtil::SharpDay(0, getCreated());
+    if (created_sharp > now_sharp || now_sharp - created_sharp < 7 * 86400)
+        return;
+
     if(GetVar(VAR_LUCKYSTAR_LOGIN_TIME))
         return;
     if(!getTotalRecharge() && GetVar(VAR_LUCKYSTAR_IS_CONSUME))
@@ -19679,7 +19682,10 @@ void Player::setLuckyStarCondition()
 void Player::sendLuckyStarInfo(UInt8 opt)
 {
     if(!getLuckyStarAct())
+    {
+        sendMsgCode(0, 1090);
         return;
+    }
     Stream st(REP::ACTIVE);
     st << static_cast<UInt8>(0x12);
     switch(opt)
@@ -19706,7 +19712,10 @@ void Player::sendLuckyStarInfo(UInt8 opt)
 void Player::getLuckyStarItem(UInt8 idx)
 {
     if(!getLuckyStarAct() || idx >= 12)
+    {
+        sendMsgCode(0, 1090);
         return;
+    }
     if (!hasChecked())
         return;
     UInt32 value = GetVar(VAR_LUCKYSTAR_GET_STATUS);
