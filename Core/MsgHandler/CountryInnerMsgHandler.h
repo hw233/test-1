@@ -2048,17 +2048,8 @@ void OnSendSpreadAwardInfo(GameMsgHdr &hdr, const void* data)
 void OnSpreadGetAward(GameMsgHdr &hdr, const void* data)
 {
     MSG_QUERY_PLAYER(player);
-    player->spreadGetAwardInCountry();
-}
-
-void OnSpreadModifyGVarInCountry(GameMsgHdr &hdr, const void* data)
-{
-	const UInt32 tmp = *reinterpret_cast<const UInt32 *>(data);
-    if(tmp >= GameAction()->GetSpreadCountForAward())
-    {
-        GameMsgHdr hdr(0x165, WORKER_THREAD_WORLD, NULL, 0);
-        GLOBAL().PushMsg(hdr, NULL);
-    }
+    UInt32 spreadCount = *reinterpret_cast<const UInt32 *>(data);
+    player->spreadGetAwardInCountry(spreadCount);
 }
 
 void OnBeVoted( GameMsgHdr &hdr, const void * data)

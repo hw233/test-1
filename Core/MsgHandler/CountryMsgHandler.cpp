@@ -306,7 +306,6 @@ MSG_REG_2(GameMsgHdr, 0x346, OnSurnameLegendAct);
 
 MSG_REG_2(GameMsgHdr, 0x348, OnSendSpreadAwardInfo);
 MSG_REG_2(GameMsgHdr, 0x349, OnSpreadGetAward);
-MSG_REG_2(GameMsgHdr, 0x350, OnSpreadModifyGVarInCountry);
 
 MSG_REG_2(GameMsgHdr, 0x236, OnAwardHIPrestige);
 MSG_REG_2(GameMsgHdr, 0x237, OnSendShusanLoveTitleCard);

@@ -2339,12 +2339,12 @@ namespace GObject
         void sendRP7SignInfo();
         void RP7Sign(UInt8 idx);
         void getRP7SignPackage(UInt8 idx);
-        void sendSpreadBasicInfo(bool needBroad = false);
+        void sendSpreadBasicInfo();
         void sendSpreadAwardInfo();
         void spreadToOther(UInt8 type, std::string name);
         void spreadToSelf();
         void spreadGetAward();
-        void spreadGetAwardInCountry();
+        void spreadGetAwardInCountry(UInt32 spreadCount);
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

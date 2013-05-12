@@ -1909,16 +1909,16 @@ void SpreadCheck(void* data)
         return;
     UInt32 startTime = TimeUtil::SharpDayT(0, now) + SPREAD_START_TIME;
     UInt32 flag;
-    if(now >= startTime && (((flag = GVAR.GetVar(GVAR_SPREAD_CONDITION)) >> 1) & 0x07) == 0)
+    if(now >= startTime && ((flag = GVAR.GetVar(GVAR_SPREAD_CONDITION)) & 0xFF) == 0)
     {
-        flag += (1 << 1);
+        flag += 1;
         GVAR.SetVar(GVAR_SPREAD_CONDITION, flag);
         globalPlayers.enumerate(enum_spread_send, static_cast<void *>(NULL));
     }
     UInt32 endTime = TimeUtil::SharpDayT(0, now) + SPREAD_END_TIME;
-    if(now <= endTime && (((flag = GVAR.GetVar(GVAR_SPREAD_CONDITION)) >> 1) & 0x07) == 1)
+    if(now <= endTime && ((flag = GVAR.GetVar(GVAR_SPREAD_CONDITION)) &0xFF) == 1)
     {
-        flag += (1 << 1);
+        flag += 1;
         GVAR.SetVar(GVAR_SPREAD_CONDITION, flag);
         globalPlayers.enumerate(enum_spread_send, static_cast<void *>(NULL));
     }
@@ -3255,7 +3255,7 @@ Player* World::getSpreadKeeper()
 
 UInt32 World::getSpreadCount()
 {
-    return (GVAR.GetVar(GVAR_SPREAD_CONDITION) >> 4);
+    return (GVAR.GetVar(GVAR_SPREAD_CONDITION) >> 8);
 }
 
 }

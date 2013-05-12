@@ -146,10 +146,10 @@ void OnClanChatReq( GameMsgHdr& hdr, const void * data )
 		player->getClan()->broadcast(data, hdr.msgHdr.bodyLen);
 }
 
-void OnSpreadModifyGVar(GameMsgHdr& hdr, const void* data)
+void OnSpreadModifyVar(GameMsgHdr& hdr, const void* data)
 {
-    if((GVAR.GetVar(GVAR_SPREAD_CONDITION) & 0x01) == 0)
-        GVAR.AddVar(GVAR_SPREAD_CONDITION, 1);
+	MSG_QUERY_PLAYER(player);
+    player->SetVar(VAR_SPREAD_FLAG, player->GetVar(VAR_SPREAD_FLAG) | SPREAD_ALREADY_GET);
 }
 
 void OnClanTakeRewardResultReq(GameMsgHdr& hdr, const void * data)

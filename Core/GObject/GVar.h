@@ -72,7 +72,7 @@ namespace GObject
 
         GVAR_SPREAD_KEEPER1 = 38, //持有者ID高32位
         GVAR_SPREAD_KEEPER2 = 39, //持有者ID低32位
-        GVAR_SPREAD_CONDITION = 40, //落英秘典-(0~0bits代表是否达到领取条件;1~3bits代表阶段(1代表刚开始(11:00);2代表刚结束(22:00);4-31bits代表使用秘典的人的个数)
+        GVAR_SPREAD_CONDITION = 40, //0~7bits代表阶段(1代表刚开始(11:00);2代表刚结束(22:00);8-31bits代表使用秘典的人的个数)
 
         GVAR_MAX,
     };

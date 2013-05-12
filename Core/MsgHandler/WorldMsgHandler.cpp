@@ -73,7 +73,7 @@ MSG_REG_2(ArenaMsgHdr, 0x108, OnArenaBattlePoint);
 MSG_REG_2(ArenaMsgHdr, 0x109, OnArenaLeaderBoard);
 
 MSG_REG_2(GameMsgHdr, 0x160, OnClanChatReq);
-MSG_REG_2(GameMsgHdr, 0x165, OnSpreadModifyGVar);
+MSG_REG_2(GameMsgHdr, 0x165, OnSpreadModifyVar);
 
 MSG_REG_2(GameMsgHdr, 0x171, OnClanTakeRewardResultReq);
 MSG_REG_2(GameMsgHdr, 0x173, OnClanMailInviteClick);
