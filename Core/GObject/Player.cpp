@@ -20210,7 +20210,12 @@ void Player::spreadToOther(UInt8 type, std::string name)
         sendMsgCode(0, 1506);
         return;
     }
-    if(pl->GetLev() < 30)
+    if(pl == this)
+    {
+        sendMsgCode(0, 2211);
+        return;
+    }
+    if(pl->GetLev() < 45)
     {
         sendMsgCode(0, 1010);
         return;
@@ -20240,7 +20245,7 @@ void Player::spreadToOther(UInt8 type, std::string name)
         GLOBAL().PushMsg(hdr2, &pexp);
     }
     else
-        SYSMSG_SENDV(1101, pl);
+        sendMsgCode(0, 3501);
 
     globalPlayers.enumerate(enum_spread_send2, static_cast<void *>(NULL));
 }
@@ -20250,7 +20255,7 @@ void Player::spreadToSelf()
     bool bRet = spreadCompareTime(true, true);
     if(!bRet)
         return;
-    if(GetLev() < 30)
+    if(GetLev() < 45)
     {
         sendMsgCode(0, 1010);
         return;
@@ -20275,7 +20280,7 @@ void Player::spreadToSelf()
         UInt64 playerId = pl->getId();
         GameMsgHdr hdr(0x354, getThreadId(), this, sizeof(playerId));
         GLOBAL().PushMsg(hdr, &playerId);
-        SYSMSG_SENDV(1100, this);
+        sendMsgCode(0, 3502);
         return;
     }
     spreadToOther(1, getName());

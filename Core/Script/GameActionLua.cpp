@@ -1633,7 +1633,10 @@ namespace Script
 
     UInt32 GameActionLua::GetSpreadCountForAward()
     {
-        return Call<UInt32>("GetSpreadCountForAward", cfg.serverNo);
+        UInt32 serverNo = cfg.serverNo;
+        if(cfg.isTestPlatform)
+            serverNo = 9990;
+        return Call<UInt32>("GetSpreadCountForAward", serverNo);
     }
 
     lua_tinker::table GameActionLua::GetSpreadAward()
