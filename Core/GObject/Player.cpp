@@ -694,6 +694,7 @@ namespace GObject
         m_hf = new HoneyFall(this);
         m_dpData = new DeamonPlayerData();
         m_csFlag = 0;
+        m_spreadInterval = 0;
         _mditem = 0;
         _qixiBinding = false;
 
@@ -20189,7 +20190,7 @@ void Player::sendSpreadAwardInfo()
     send(st);
 }
 
-bool enum_spread_send(Player* player, void* data)
+inline static bool enum_spread_send2(Player* player, void* data)
 {
     if(player == NULL || !player->isOnline())
         return true;
@@ -20207,6 +20208,11 @@ void Player::spreadToOther(UInt8 type, std::string name)
     if(!pl)
     {
         sendMsgCode(0, 1506);
+        return;
+    }
+    if(pl->GetLev() < 30)
+    {
+        sendMsgCode(0, 1010);
         return;
     }
     if(!pl->isOnline())
@@ -20233,7 +20239,7 @@ void Player::spreadToOther(UInt8 type, std::string name)
         GameMsgHdr hdr2(0x238, getThreadId(), this, sizeof(pexp));
         GLOBAL().PushMsg(hdr2, &pexp);
     }
-    globalPlayers.enumerate(enum_spread_send, static_cast<void *>(NULL));
+    globalPlayers.enumerate(enum_spread_send2, static_cast<void *>(NULL));
 }
 
 void Player::spreadToSelf()
@@ -20241,11 +20247,15 @@ void Player::spreadToSelf()
     bool bRet = spreadCompareTime(true, true);
     if(!bRet)
         return;
+    if(GetLev() < 30)
+    {
+        sendMsgCode(0, 1010);
+        return;
+    }
 	UInt32 now = TimeUtil::Now();
     if(now < World::spreadBuff)
     {
-        UInt32 timeTmp = GetVar(VAR_SPREAD_INTERVAL);
-        if(now < timeTmp)
+        if(now < m_spreadInterval)
         {
             sendMsgCode(0, 2216);
             return;
@@ -20253,7 +20263,7 @@ void Player::spreadToSelf()
         Player *pl = World::getSpreadKeeper();
         if(!pl)
             return;
-        SetVar(VAR_SPREAD_INTERVAL, now + 10);
+        m_spreadInterval = now + 10;
         UInt64 playerId = pl->getId();
         GameMsgHdr hdr(0x354, getThreadId(), this, sizeof(playerId));
         GLOBAL().PushMsg(hdr, &playerId);

@@ -2124,6 +2124,8 @@ namespace GObject
         DeamonPlayerData* m_dpData;
         std::map<UInt8, ClanSkill> m_clanSkill;
         UInt8 m_csFlag;
+    private:
+        UInt32 m_spreadInterval;
 
     public:
         inline void setAtoHICfg(const std::string& cfg) { m_hicfg = cfg; }
