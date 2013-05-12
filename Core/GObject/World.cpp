@@ -105,6 +105,7 @@ bool World::_rechargeactive = false;
 bool World::_rechargeactive3366 = false;
 bool World::_yearact = false;
 bool World::_qgamegiftact = false;
+bool World::_spreadAct = false;
 UInt8 World::_rechargeactiveno = 0;
 bool World::_valentineday = false;
 bool World::_netvalentineday = false;
@@ -1903,6 +1904,8 @@ inline static bool enum_spread_send(Player* player, void* data)
 
 void SpreadCheck(void* data)
 {
+    if (!World::getSpreadAct())
+        return;
 	UInt32 now = TimeUtil::Now();
     UInt8 week = TimeUtil::GetWeekDay(now);
     if(week != SPREAD_START_WEEK && week != SPREAD_END_WEEK)

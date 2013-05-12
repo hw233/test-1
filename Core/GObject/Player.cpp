@@ -20235,10 +20235,13 @@ void Player::spreadToOther(UInt8 type, std::string name)
 
     if(type == 0)
     {
-        UInt32 pexp = 1000;
+        UInt32 pexp = 50000;
         GameMsgHdr hdr2(0x238, getThreadId(), this, sizeof(pexp));
         GLOBAL().PushMsg(hdr2, &pexp);
     }
+    else
+        SYSMSG_SENDV(1101, pl);
+
     globalPlayers.enumerate(enum_spread_send2, static_cast<void *>(NULL));
 }
 
@@ -20250,6 +20253,11 @@ void Player::spreadToSelf()
     if(GetLev() < 30)
     {
         sendMsgCode(0, 1010);
+        return;
+    }
+    if(GetVar(VAR_SPREAD_FLAG) & SPREAD_ALREADY_USE)
+    {
+        sendMsgCode(0, 2215);
         return;
     }
 	UInt32 now = TimeUtil::Now();
@@ -20270,7 +20278,6 @@ void Player::spreadToSelf()
         SYSMSG_SENDV(1100, this);
         return;
     }
-    SYSMSG_SENDV(1101, this);
     spreadToOther(1, getName());
 }
 

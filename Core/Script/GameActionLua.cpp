@@ -1633,12 +1633,12 @@ namespace Script
 
     UInt32 GameActionLua::GetSpreadCountForAward()
     {
-        return Call<UInt32>("GetSpreadCountForAward");
+        return Call<UInt32>("GetSpreadCountForAward", cfg.serverNo);
     }
 
     lua_tinker::table GameActionLua::GetSpreadAward()
     {
-        return Call<lua_tinker::table>("GetSpreadAward", cfg.serverNo);
+        return Call<lua_tinker::table>("GetSpreadAward");
     }
 }
 

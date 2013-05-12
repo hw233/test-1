@@ -2486,6 +2486,8 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         }
         case 0x41:
         {
+            if (!World::getSpreadAct())
+                return;
             brd >> op;
             if(op == 0)
             {

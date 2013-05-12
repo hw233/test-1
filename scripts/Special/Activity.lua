@@ -8416,7 +8416,7 @@ function GetLuckyBagAward(player)
 end
 
 local serverNoSpreadCount = {
-    [1] = 5000,
+    [1] = 10,
     [2] = 4000,
     [3] = 2000
 }

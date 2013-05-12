@@ -194,6 +194,10 @@ public:
     { _qgamegiftact = v; }
     inline static bool getQgameGiftAct()
     { return _qgamegiftact; }
+    inline static void setSpreadAct(bool v)
+    { _spreadAct = v; }
+    inline static bool getSpreadAct()
+    { return _spreadAct; }
     inline static void setValentineDay(bool v)
     { _valentineday = v; }
     inline static bool getValentineDay()
@@ -757,6 +761,7 @@ public:
     static bool _rechargeactive3366;
     static bool _yearact;
     static bool _qgamegiftact;
+    static bool _spreadAct;
     static UInt8 _rechargeactiveno;
     static bool _valentineday;
     static bool _netvalentineday;
