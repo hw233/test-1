@@ -20139,7 +20139,7 @@ bool spreadCompareTime(bool checkStartTime, bool checkEndTime)
     return true;
 }
 
-void Player::sendSpreadBasicInfo()
+void Player::sendSpreadBasicInfo(bool needBroad)
 {
     bool bRet = spreadCompareTime(true, false);
     if(!bRet)
@@ -20161,10 +20161,13 @@ void Player::sendSpreadBasicInfo()
     st << name;
     st << leftTime;
     st << static_cast<UInt16>(World::getSpreadCount());
-    st << static_cast<UInt8>((GVAR.GetVar(GVAR_SPREAD_CONDITION) & 0x01) | (GetVar(VAR_SPREAD_FLAG) & 0x02));
+    st << static_cast<UInt8>((GetVar(VAR_SPREAD_FLAG) & 0x03));
     st << now;
     st << Stream::eos;
-    send(st);
+    if(needBroad)
+        NETWORK()->Broadcast(st);
+    else
+        send(st);
 }
 
 void Player::sendSpreadAwardInfo()
@@ -20195,33 +20198,35 @@ void Player::spreadToOther(UInt8 type, std::string name)
     if(!bRet)
         return;
 	UInt32 now = TimeUtil::Now();
-    if(now < World::spreadBuff)
-        return;
     Player * pl = globalNamedPlayers[fixName(name)];
     if(!pl)
     {
         sendMsgCode(0, 1506);
         return;
     }
-    UInt32 tmp = GetVar(VAR_SPREAD_FLAG);
-    if(tmp & SPREAD_ALREADY_USE)
+    if(!pl->isOnline())
+    {
+        sendMsgCode(0, 2218);
         return;
-    if(pl->GetVar(VAR_SPREAD_FLAG) & SPREAD_ALREADY_USE)
+    }
+    UInt32 tmp = pl->GetVar(VAR_SPREAD_FLAG);
+    if(tmp & SPREAD_ALREADY_USE)
     {
         sendMsgCode(0, 2215);
         return;
     }
-    SetVar(VAR_SPREAD_FLAG, tmp | SPREAD_ALREADY_USE);
+    SetVar(VAR_SPREAD_FLAG, GetVar(VAR_SPREAD_FLAG) | SPREAD_ALREADY_USE);
     GVAR.SetVar(GVAR_SPREAD_KEEPER1, pl->getId()>>32);
     GVAR.SetVar(GVAR_SPREAD_KEEPER2, pl->getId()&0xFFFFFFFF);
     World::spreadBuff = now + SPREAD_INTERVA_TIME;
 
     World::spreadKeeper = pl;
-    ++World::spreadCount;
+    GVAR.AddVar(GVAR_SPREAD_CONDITION, 1 << 4);
 
     //是否要更新GVAR
-    GameMsgHdr h(0x350,  getThreadId(), this, sizeof(World::spreadCount));
-    GLOBAL().PushMsg(h, &(World::spreadCount));
+    UInt32 spreadCount = World::getSpreadCount();
+    GameMsgHdr h(0x350,  getThreadId(), this, sizeof(spreadCount));
+    GLOBAL().PushMsg(h, &spreadCount);
 
     if(type == 0)
     {
@@ -20229,6 +20234,7 @@ void Player::spreadToOther(UInt8 type, std::string name)
         GameMsgHdr hdr2(0x238, getThreadId(), this, sizeof(pexp));
         GLOBAL().PushMsg(hdr2, &pexp);
     }
+    sendSpreadBasicInfo(true);
 }
 
 void Player::spreadToSelf()

@@ -213,7 +213,6 @@ stArenaExtra World::stArena;
 RCSortType World::killMonsterSort[4];
 UInt8 World::m_sysDailogPlatform = SYS_DIALOG_ALL_PLATFORM;
 Player* World::spreadKeeper = NULL;
-UInt32 World::spreadCount = 0;
 UInt32 World::spreadBuff = 0;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
@@ -797,7 +796,7 @@ bool enum_extra_act_award(Player* player, void* data)
     }
     return true;
 }
-
+#if 0
 bool enum_spread_count(Player* pl, void *data)
 {
 	if(pl == NULL)
@@ -806,7 +805,7 @@ bool enum_spread_count(Player* pl, void *data)
         ++World::spreadCount;
     return true;
 }
-
+#endif
 void World::makeActivityInfo(Stream &st)
 {
 	st.init(REP::DAILY_DATA);
@@ -1910,20 +1909,18 @@ void SpreadCheck(void* data)
         return;
     UInt32 startTime = TimeUtil::SharpDayT(0, now) + SPREAD_START_TIME;
     UInt32 flag;
-    if(now >= startTime && ((flag = GVAR.GetVar(GVAR_SPREAD_CONDITION)) >> 8) == 0)
+    if(now >= startTime && (((flag = GVAR.GetVar(GVAR_SPREAD_CONDITION)) >> 1) & 0x07) == 0)
     {
-        flag += (1 << 8);
+        flag += (1 << 1);
         GVAR.SetVar(GVAR_SPREAD_CONDITION, flag);
         globalPlayers.enumerate(enum_spread_send, static_cast<void *>(NULL));
     }
     UInt32 endTime = TimeUtil::SharpDayT(0, now) + SPREAD_END_TIME;
-    if(now <= endTime && ((flag = GVAR.GetVar(GVAR_SPREAD_CONDITION)) >> 8) == 1)
+    if(now <= endTime && (((flag = GVAR.GetVar(GVAR_SPREAD_CONDITION)) >> 1) & 0x07) == 1)
     {
-        flag += (1 << 8);
+        flag += (1 << 1);
         GVAR.SetVar(GVAR_SPREAD_CONDITION, flag);
         globalPlayers.enumerate(enum_spread_send, static_cast<void *>(NULL));
-        World::spreadKeeper = NULL;
-        World::spreadCount = 0;
     }
 }
 
@@ -3246,27 +3243,19 @@ void World::SendRechargeRP7RankAward()
 
 Player* World::getSpreadKeeper()
 {
-    static bool isFirst = true;
-    if(isFirst && !World::spreadKeeper)
+    if(!World::spreadKeeper)
     {
         UInt64 playerId = (static_cast<UInt64>(GVAR.GetVar(GVAR_SPREAD_KEEPER1)) << 32) + GVAR.GetVar(GVAR_SPREAD_KEEPER2);
         Player* pl = globalPlayers[playerId];
         if(pl)
             World::spreadKeeper = pl;
-        isFirst = false;
     }
     return World::spreadKeeper;
 }
 
 UInt32 World::getSpreadCount()
 {
-    static bool isFirst = true;
-    if(isFirst && !World::spreadCount)
-    {
-        globalPlayers.enumerate(enum_spread_count, static_cast<void *>(NULL));
-        isFirst = false;
-    }
-    return World::spreadCount;
+    return (GVAR.GetVar(GVAR_SPREAD_CONDITION) >> 4);
 }
 
 }
