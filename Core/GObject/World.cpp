@@ -214,6 +214,7 @@ RCSortType World::killMonsterSort[4];
 UInt8 World::m_sysDailogPlatform = SYS_DIALOG_ALL_PLATFORM;
 Player* World::spreadKeeper = NULL;
 UInt32 World::spreadCount = 0;
+UInt32 World::spreadBuff = 0;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
@@ -1909,18 +1910,20 @@ void SpreadCheck(void* data)
         return;
     UInt32 startTime = TimeUtil::SharpDayT(0, now) + SPREAD_START_TIME;
     UInt32 flag;
-    if(now >= startTime && (flag = GVAR.GetVar(GVAR_SPREAD_CONDITION) >> 8) == 0)
+    if(now >= startTime && ((flag = GVAR.GetVar(GVAR_SPREAD_CONDITION)) >> 8) == 0)
     {
         flag += (1 << 8);
         GVAR.SetVar(GVAR_SPREAD_CONDITION, flag);
         globalPlayers.enumerate(enum_spread_send, static_cast<void *>(NULL));
     }
     UInt32 endTime = TimeUtil::SharpDayT(0, now) + SPREAD_END_TIME;
-    if(now <= endTime && (flag = GVAR.GetVar(GVAR_SPREAD_CONDITION) >> 8) == 1)
+    if(now <= endTime && ((flag = GVAR.GetVar(GVAR_SPREAD_CONDITION)) >> 8) == 1)
     {
         flag += (1 << 8);
         GVAR.SetVar(GVAR_SPREAD_CONDITION, flag);
         globalPlayers.enumerate(enum_spread_send, static_cast<void *>(NULL));
+        World::spreadKeeper = NULL;
+        World::spreadCount = 0;
     }
 }
 

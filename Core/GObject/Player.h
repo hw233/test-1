@@ -2344,6 +2344,7 @@ namespace GObject
         void spreadToOther(UInt8 type, std::string name);
         void spreadToSelf();
         void spreadGetAward();
+        void spreadGetAwardInCountry();
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

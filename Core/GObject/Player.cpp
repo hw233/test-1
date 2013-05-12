@@ -20145,6 +20145,7 @@ void Player::sendSpreadBasicInfo()
     if(!bRet)
         return;
 	Stream st(REP::ACTIVE);
+    st << static_cast<UInt8>(0x41);
     UInt8 type = 0;
     st << type;
     std::string name;
@@ -20154,9 +20155,8 @@ void Player::sendSpreadBasicInfo()
     if(pl)
     {
         name = pl->getName();
-        UInt32 curEndTime = GVAR.GetVar(GVAR_SPREAD_BUFF);
-        if(curEndTime > now)
-            leftTime = curEndTime - now;
+        if(World::spreadBuff > now)
+            leftTime = World::spreadBuff - now;
     }
     st << name;
     st << leftTime;
@@ -20173,6 +20173,7 @@ void Player::sendSpreadAwardInfo()
     if(!bRet)
         return;
 	Stream st(REP::ACTIVE);
+    st << static_cast<UInt8>(0x41);
     UInt8 type = 2;
     st << type;
     st << static_cast<UInt16>(GameAction()->GetSpreadCountForAward());
@@ -20194,7 +20195,7 @@ void Player::spreadToOther(UInt8 type, std::string name)
     if(!bRet)
         return;
 	UInt32 now = TimeUtil::Now();
-    if(now < GVAR.GetVar(GVAR_SPREAD_BUFF))
+    if(now < World::spreadBuff)
         return;
     Player * pl = globalNamedPlayers[fixName(name)];
     if(!pl)
@@ -20213,12 +20214,14 @@ void Player::spreadToOther(UInt8 type, std::string name)
     SetVar(VAR_SPREAD_FLAG, tmp | SPREAD_ALREADY_USE);
     GVAR.SetVar(GVAR_SPREAD_KEEPER1, pl->getId()>>32);
     GVAR.SetVar(GVAR_SPREAD_KEEPER2, pl->getId()&0xFFFFFFFF);
-    GVAR.SetVar(GVAR_SPREAD_BUFF, now + SPREAD_INTERVA_TIME);
+    World::spreadBuff = now + SPREAD_INTERVA_TIME;
 
     World::spreadKeeper = pl;
     ++World::spreadCount;
-    if(World::spreadCount >= GameAction()->GetSpreadCountForAward())
-        GVAR.SetVar(GVAR_SPREAD_CONDITION, 1);
+
+    //是否要更新GVAR
+    GameMsgHdr h(0x350,  getThreadId(), this, sizeof(World::spreadCount));
+    GLOBAL().PushMsg(h, &(World::spreadCount));
 
     if(type == 0)
     {
@@ -20234,7 +20237,7 @@ void Player::spreadToSelf()
     if(!bRet)
         return;
 	UInt32 now = TimeUtil::Now();
-    if(now < GVAR.GetVar(GVAR_SPREAD_BUFF))
+    if(now < World::spreadBuff)
     {
         UInt32 timeTmp = GetVar(VAR_SPREAD_INTERVAL);
         if(now < timeTmp)
@@ -20268,15 +20271,20 @@ void Player::spreadGetAward()
         return;
     if(tmp & SPREAD_ALREADY_GET)
         return;
-
-    lua_tinker::table award = GameAction()->GetSpreadAward();
-    UInt8 size = award.size();
-    if(GetPackage()->GetRestPackageSize() < size)
+    if(GetPackage()->GetRestPackageSize() < 4)
     {
         sendMsgCode(0, 1011);
         return;
     }
     SetVar(VAR_SPREAD_FLAG, tmp | SPREAD_ALREADY_GET);
+    GameMsgHdr h(0x349, getThreadId(), this, 0);
+    GLOBAL().PushMsg(h, NULL);
+}
+
+void Player::spreadGetAwardInCountry()
+{
+    lua_tinker::table award = GameAction()->GetSpreadAward();
+    UInt8 size = award.size();
     UInt16 itemId;
     UInt16 itemCount;
     for(UInt8 j = 0; j < size; ++j)

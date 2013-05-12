@@ -855,6 +855,7 @@ public:
     static UInt8 m_sysDailogPlatform;
     static Player* spreadKeeper;
     static UInt32 spreadCount;
+    static UInt32 spreadBuff;
 public:
     static RCSortType rechargeSort;
     static RCSortType consumeSort;

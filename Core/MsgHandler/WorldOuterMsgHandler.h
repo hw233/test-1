@@ -2500,7 +2500,10 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             else if(op == 4)
                 player->sendSpreadBasicInfo();
             else if(op == 5)
-                player->sendSpreadAwardInfo();
+            {
+                GameMsgHdr h(0x348,  player->getThreadId(), player, 0);
+                GLOBAL().PushMsg(h, NULL);
+            }
         }
         break;
         default:
