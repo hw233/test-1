@@ -1892,7 +1892,7 @@ void World::ClanStatueCheck(void *)
     UpdateStatueVisitor visitor;
     globalClans.enumerate(visitor);
 }
-
+#if 0
 bool enum_spread_send(Player* player, void* data)
 {
     if(player == NULL || !player->isOnline())
@@ -1900,7 +1900,7 @@ bool enum_spread_send(Player* player, void* data)
     player->sendSpreadBasicInfo();
     return true;
 }
-
+#endif
 void SpreadCheck(void* data)
 {
 	UInt32 now = TimeUtil::Now();
@@ -1913,7 +1913,7 @@ void SpreadCheck(void* data)
     {
         flag += 1;
         GVAR.SetVar(GVAR_SPREAD_CONDITION, flag);
-        globalPlayers.enumerate(enum_spread_send, static_cast<void *>(NULL));
+        globalPlayers.enumerate(GObject::enum_spread_send, static_cast<void *>(NULL));
     }
     UInt32 endTime = TimeUtil::SharpDayT(0, now) + SPREAD_END_TIME;
     if(now <= endTime && ((flag = GVAR.GetVar(GVAR_SPREAD_CONDITION)) &0xFF) == 1)

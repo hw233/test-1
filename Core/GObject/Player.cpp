@@ -20189,7 +20189,7 @@ void Player::sendSpreadAwardInfo()
     send(st);
 }
 
-bool enum_spread_send2(Player* player, void* data)
+bool enum_spread_send(Player* player, void* data)
 {
     if(player == NULL || !player->isOnline())
         return true;
@@ -20233,7 +20233,7 @@ void Player::spreadToOther(UInt8 type, std::string name)
         GameMsgHdr hdr2(0x238, getThreadId(), this, sizeof(pexp));
         GLOBAL().PushMsg(hdr2, &pexp);
     }
-    globalPlayers.enumerate(enum_spread_send2, static_cast<void *>(NULL));
+    globalPlayers.enumerate(enum_spread_send, static_cast<void *>(NULL));
 }
 
 void Player::spreadToSelf()
