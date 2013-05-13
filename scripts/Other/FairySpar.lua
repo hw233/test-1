@@ -36,6 +36,7 @@ local FairySparPara = {
 
 function GetFairySparParaMax(_type, count)
     local paraMax = 999
+    count = count + 1
     if FairySparPara[_type] == nil then
         return paraMax;
     end

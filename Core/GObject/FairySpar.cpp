@@ -3,6 +3,7 @@
 #include "MsgID.h"
 #include "Script/GameActionLua.h"
 #include "Country.h"
+#include "Clan.h"
 
 namespace GObject
 {
@@ -49,15 +50,15 @@ namespace GObject
 
         st << m_atk;
         st << m_atk * m_complexPercent / 100;
-        st << GameAction()->GetFairySparParaMax(ATK_MAX, m_breakoutCnt + 1);
+        st << GameAction()->GetFairySparParaMax(ATK_MAX, m_breakoutCnt);
 
         st << m_magAtk;
         st << m_magAtk * m_complexPercent / 100;
-        st << GameAction()->GetFairySparParaMax(MAG_ATK_MAX, m_breakoutCnt + 1);
+        st << GameAction()->GetFairySparParaMax(MAG_ATK_MAX, m_breakoutCnt);
 
         st << m_phy;
         st << m_phy * m_complexPercent / 100;
-        st << GameAction()->GetFairySparParaMax(PHY_MAX, m_breakoutCnt + 1);
+        st << GameAction()->GetFairySparParaMax(PHY_MAX, m_breakoutCnt);
 
         st << m_breakoutCnt;
         st << Stream::eos;
@@ -118,5 +119,137 @@ namespace GObject
         sendElementInfo();
         DB3().PushUpdateData("UPDATE `fairy_spar` SET `element1` = %u, `element2` = %u, `element3` = %u, `element4` = %u, `element5` = %u WHERE `playerId` = %"I64_FMT"u", m_element[0], m_element[1], m_element[2], m_element[3], m_element[4], m_owner->getId());
     }
+
+    void FairySpar::fuseElement()
+    {
+        UInt16 level = m_owner->getClan()->getStatueLevel();
+        if(m_breakoutCnt <= level)
+        {
+            m_owner->sendMsgCode(0, 1359);
+            return;
+        }
+        UInt16 prob = uRand(10000);
+        UInt32 atkTmpSum = 0;
+        UInt32 magAtkTmpSum = 0;
+        UInt32 phyTmpSum = 0;
+        UInt32 atkTmp;
+        UInt32 magAtkTmp;
+        UInt32 phyTmp;
+        UInt8 i;
+        bool addPercent100 = false;
+        bool doublePercent100 = false;
+
+        for(i = 0; i < 5; i++)
+        {
+            switch(m_element[i])
+            {
+                case 12:
+                    addPercent100 = true;
+                break;
+                case 13:
+                    doublePercent100 = true;
+                break;
+                default:
+                break;
+            }
+        }
+
+        for(i = 0; i < 5; i++)
+        {
+            atkTmp = 0;
+            magAtkTmp = 0;
+            phyTmp = 0;
+            switch(m_element[i])
+            {
+                case 1:
+                    if(addPercent100 || prob < 2000)
+                        atkTmp += 10;
+                break;
+                case 2:
+                    if(addPercent100 || prob < 2000)
+                        magAtkTmp += 10;
+                break;
+                case 3:
+                    if(addPercent100 || prob < 2000)
+                        phyTmp += 10;
+                break;
+                case 4:
+                    if(addPercent100 || prob < 2000)
+                        atkTmp += 20;
+                break;
+                case 5:
+                    if(addPercent100 || prob < 2000)
+                        magAtkTmp += 20;
+                break;
+                case 6:
+                    if(addPercent100 || prob < 2000)
+                        phyTmp += 20;
+                break;
+                case 7:
+                    if(addPercent100 || prob < 2000)
+                        atkTmp += 30;
+                break;
+                case 8:
+                    if(addPercent100 || prob < 2000)
+                        magAtkTmp += 30;
+                break;
+                case 9:
+                    if(addPercent100 || prob < 2000)
+                        phyTmp += 30;
+                break;
+                case 10:
+                    if(doublePercent100 || prob < 2000)
+                    {
+                        atkTmp *= 2;
+                        magAtkTmp *= 2;
+                        phyTmp *= 20;
+                    }
+                break;
+                case 11:
+                    if(doublePercent100 || prob < 3000)
+                    {
+                        atkTmp *= 2;
+                        magAtkTmp *= 2;
+                        phyTmp *= 20;
+                    }
+                break;
+                case 14:
+                break;
+                default:
+                break;
+            }
+            atkTmpSum += atkTmp;
+            magAtkTmpSum += magAtkTmp;
+            phyTmpSum += phyTmp;
+        }
+
+        bool isDirty = false;
+        if(atkTmpSum > 0)
+        {
+            m_atk += atkTmpSum;
+            isDirty = true;
+        }
+        if(magAtkTmpSum > 0)
+        {
+            m_magAtk += magAtkTmpSum;
+            isDirty = true;
+        }
+        if(atkTmpSum > 0)
+        {
+            m_phy += phyTmpSum;
+            isDirty = true;
+        }
+        if(isDirty)
+        {
+            sendAtkPhyInfo();
+            m_owner->setFightersDirty(true);
+            DB3().PushUpdateData("UPDATE `fairy_spar` SET `atk` = %u, `magAtk` = %u, `phy` = %u  WHERE `playerId` = %"I64_FMT"u", m_atk, m_magAtk, m_phy, m_owner->getId());
+        }
+    }
+
+    void FairySpar::countermark()
+    {
+    }
+
 }
 

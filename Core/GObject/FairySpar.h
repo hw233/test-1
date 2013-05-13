@@ -22,6 +22,8 @@ class FairySpar
         void sendAllInfo();
         void getElement();
         void freshElement();
+        void fuseElement();
+        void countermark();
 
     private:
         Player* m_owner;
