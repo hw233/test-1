@@ -4995,6 +4995,34 @@ void OnTianjieReq( GameMsgHdr& hdr, const void* data)
     GObject::Tianjie::instance().onTianjieReq(hdr, data);
 }
 
+void OnFairySparReq(GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    GObject::Clan* clan = player->getClan();
+    if (clan == NULL)
+        return;
+
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    br >> type;
+    switch(type)
+    {
+        case 0:
+        break;
+        case 1:
+        break;
+        case 2:
+        break;
+        case 3:
+        break;
+        case 4:
+        break;
+        case 5:
+        break;
+        default:
+        break;
+    }
+}
 
 void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
 {

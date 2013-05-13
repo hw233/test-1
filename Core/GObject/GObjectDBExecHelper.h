@@ -1076,6 +1076,17 @@ struct DBNewRelation
     std::string sign;
 };
 
+struct DBFairySpar
+{
+    UInt64 playerId;
+    UInt32 atk;
+    UInt32 magAtk;
+    UInt32 phy;
+    UInt8 element[5];
+    UInt8 complexPercent;
+    UInt8 curMark;
+};
+
 struct DBRNR
 {
     UInt64 id;
@@ -2517,6 +2528,23 @@ SPECIALDEF(3)
     UInt64, playerId,
     UInt8, mood,
     std::string, sign
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBFairySpar)
+SPECIALDEF(11)
+(
+    UInt64, playerId,
+    UInt32, atk,
+    UInt32, magAtk,
+    UInt32, phy,
+    UInt8, element[0],
+    UInt8, element[1],
+    UInt8, element[2],
+    UInt8, element[3],
+    UInt8, element[4],
+    UInt8, complexPercent,
+    UInt8, curMark
 )
 SPECIALEND()
 
