@@ -5008,7 +5008,9 @@ void OnFairySparReq(GameMsgHdr& hdr, const void * data)
     switch(type)
     {
         case 0:
+            player->GetFairySpar()->sendAllInfo();
         break;
+            player->GetFairySpar()->freshElement();
         case 1:
         break;
         case 2:

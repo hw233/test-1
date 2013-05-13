@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS `fairy_spar` (
     `element5` tinyint(3) unsigned NOT NULL DEFAULT '0',
     `complexPercent` tinyint(3) unsigned NOT NULL DEFAULT '0',
     `curMark` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `breakoutCnt` tinyint(3) unsigned NOT NULL DEFAULT '0',
     PRIMARY KEY(`playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

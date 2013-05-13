@@ -1085,6 +1085,7 @@ struct DBFairySpar
     UInt8 element[5];
     UInt8 complexPercent;
     UInt8 curMark;
+    UInt8 breakoutCnt;
 };
 
 struct DBRNR
@@ -2532,7 +2533,7 @@ SPECIALDEF(3)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBFairySpar)
-SPECIALDEF(11)
+SPECIALDEF(12)
 (
     UInt64, playerId,
     UInt32, atk,
@@ -2544,7 +2545,8 @@ SPECIALDEF(11)
     UInt8, element[3],
     UInt8, element[4],
     UInt8, complexPercent,
-    UInt8, curMark
+    UInt8, curMark,
+    UInt8, breakoutCnt
 )
 SPECIALEND()
 

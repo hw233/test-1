@@ -368,6 +368,9 @@ namespace Script
         void GetLuckyBagAward(Player * player);
         UInt32 GetSpreadCountForAward();
         lua_tinker::table GetSpreadAward();
+        UInt32 GetFairySparParaMax(UInt8 type, UInt8 count);
+        Table GetFairySparElement();
+
 	private:
 		Player* _player1;	//?ű???????Ϊ????1
 		Player* _player2;	//?ű???????Ϊ????2

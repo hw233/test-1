@@ -15,7 +15,13 @@ class FairySpar
     public:
         FairySpar(Player* player);
         ~FairySpar();
-        void loadFairySparFromDB(UInt32 atk, UInt32 magAtk, UInt32 phy, UInt8 element1, UInt8 element2, UInt8 element3, UInt8 element4, UInt8 element5, UInt8 complexPercent, UInt8 curMark);
+        void loadFairySparFromDB(UInt32 atk, UInt32 magAtk, UInt32 phy, UInt8 element1, UInt8 element2, UInt8 element3, UInt8 element4, UInt8 element5, UInt8 complexPercent, UInt8 curMark, UInt8 breakoutCnt);
+        void sendAtkPhyInfo();
+        void sendElementInfo();
+        void sendMarkInfo();
+        void sendAllInfo();
+        void getElement();
+        void freshElement();
 
     private:
         Player* m_owner;
@@ -25,6 +31,8 @@ class FairySpar
         UInt8 m_element[5];
         UInt8 m_complexPercent;
         UInt8 m_curMark;
+        UInt8 m_breakoutCnt;
+        bool alreadyExistTable;
 };
 
 }

@@ -5721,7 +5721,7 @@ namespace GObject
             Player* pl = globalPlayers[t.playerId];
             if(!pl)
             continue;
-                pl->GetFairySpar()->loadFairySparFromDB(t.atk, t.magAtk, t.phy, t.element[0], t.element[1], t.element[2], t.element[3], t.element[4], t.complexPercent, t.curMark);
+                pl->GetFairySpar()->loadFairySparFromDB(t.atk, t.magAtk, t.phy, t.element[0], t.element[1], t.element[2], t.element[3], t.element[4], t.complexPercent, t.curMark, t.breakoutCnt);
         }
         lc.finalize();
         return true;
