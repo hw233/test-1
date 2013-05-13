@@ -1181,9 +1181,6 @@ namespace GObject
         sendFeastLoginAct();
         //蛇年春节套装
         sendSnakeSpringEquipMail();
-        //落英秘典
-        GameMsgHdr hdr1(0x1EB, WORKER_THREAD_WORLD, this, 0);
-        GLOBAL().PushMsg(hdr1, NULL);
 
         char buf[64] = {0};
         snprintf(buf, sizeof(buf), "%"I64_FMT"u", _id);
@@ -20121,12 +20118,6 @@ void Player::setNuwaSignet(UInt8 idx)
         }
     }
 
-void Player::sendSpreadInfo()
-{
-    sendSpreadBasicInfo(0);
-    sendSpreadAwardInfo();
-}
-
 bool spreadCompareTime(bool checkStartTime, bool checkEndTime)
 {
 	UInt32 now = TimeUtil::Now();
@@ -20148,7 +20139,7 @@ bool spreadCompareTime(bool checkStartTime, bool checkEndTime)
     return true;
 }
 
-void Player::sendSpreadBasicInfo(UInt8 statue)
+void Player::sendSpreadBasicInfo()
 {
     bool bRet = spreadCompareTime(true, false);
     if(!bRet)
@@ -20158,12 +20149,12 @@ void Player::sendSpreadBasicInfo(UInt8 statue)
     st << type;
     std::string name;
     UInt32 leftTime = 0;
+	UInt32 now = TimeUtil::Now();
     Player *pl = World::getSpreadKeeper();
     if(pl)
     {
         name = pl->getName();
         UInt32 curEndTime = GVAR.GetVar(GVAR_SPREAD_BUFF);
-	    UInt32 now = TimeUtil::Now();
         if(curEndTime > now)
             leftTime = curEndTime - now;
     }
@@ -20171,7 +20162,7 @@ void Player::sendSpreadBasicInfo(UInt8 statue)
     st << leftTime;
     st << static_cast<UInt16>(World::getSpreadCount());
     st << static_cast<UInt8>((GVAR.GetVar(GVAR_SPREAD_CONDITION) & 0x01) | (GetVar(VAR_SPREAD_FLAG) & 0x02));
-    st << statue;
+    st << now;
     st << Stream::eos;
     send(st);
 }

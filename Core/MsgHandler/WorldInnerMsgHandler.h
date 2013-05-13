@@ -1369,13 +1369,6 @@ void OnDaysRankMsg( GameMsgHdr& hdr, const void* data )
     GObject::DaysRank::instance().updateDaysValue(msg); 
 }
 
-
-void OnSendSpreadInfo( GameMsgHdr& hdr, const void* data )
-{
-    MSG_QUERY_PLAYER(player);
-    player->sendSpreadInfo();
-}
-
 void OnSendClanMemberList( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);

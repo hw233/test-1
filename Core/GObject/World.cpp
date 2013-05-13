@@ -1897,8 +1897,7 @@ bool enum_spread_send(Player* player, void* data)
 {
     if(player == NULL || !player->isOnline())
         return true;
-    UInt8 state = *reinterpret_cast<UInt8 *>(data);
-    player->sendSpreadBasicInfo(state);
+    player->sendSpreadBasicInfo();
     return true;
 }
 
@@ -1910,21 +1909,18 @@ void SpreadCheck(void* data)
         return;
     UInt32 startTime = TimeUtil::SharpDayT(0, now) + SPREAD_START_TIME;
     UInt32 flag;
-    UInt8 state;
     if(now >= startTime && (flag = GVAR.GetVar(GVAR_SPREAD_CONDITION) >> 8) == 0)
     {
         flag += (1 << 8);
         GVAR.SetVar(GVAR_SPREAD_CONDITION, flag);
-        state = 1;
-        globalPlayers.enumerate(enum_spread_send, static_cast<void *>(&state));
+        globalPlayers.enumerate(enum_spread_send, static_cast<void *>(NULL));
     }
     UInt32 endTime = TimeUtil::SharpDayT(0, now) + SPREAD_END_TIME;
     if(now <= endTime && (flag = GVAR.GetVar(GVAR_SPREAD_CONDITION) >> 8) == 1)
     {
         flag += (1 << 8);
         GVAR.SetVar(GVAR_SPREAD_CONDITION, flag);
-        state = 2;
-        globalPlayers.enumerate(enum_spread_send, static_cast<void *>(&state));
+        globalPlayers.enumerate(enum_spread_send, static_cast<void *>(NULL));
     }
 }
 

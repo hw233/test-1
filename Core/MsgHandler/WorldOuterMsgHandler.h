@@ -2497,6 +2497,10 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                 player->spreadGetAward();
             else if(op == 3)
                 player->spreadToSelf();
+            else if(op == 4)
+                player->sendSpreadBasicInfo();
+            else if(op == 5)
+                player->sendSpreadAwardInfo();
         }
         break;
         default:
