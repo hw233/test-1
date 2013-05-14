@@ -13555,19 +13555,46 @@ namespace GObject
     }
     void Player::sendFishUserInfo()
     {
-        UInt8 today = (TimeUtil::SharpDay(0, TimeUtil::Now()) - TimeUtil::SharpDay(0, getCreated())) / DAY_SECS + 1;
-        if (today > 7)
-            return;
         UInt32 rpValue = GetVar(VAR_RP_VALUE);
-        if (rpValue != 4 && rpValue != 5)
+        UInt8 type = 0;
+        switch(rpValue)
+        {
+        case e_pf_xiaoyu:
+            type = 9;
+            break;
+        case e_pf_louyi:
+            type = 11;
+            break;
+        case e_pf_shenma:
+            type = 12;
+            break;
+        case e_pf_konglong:
+            type = 13;
+            break;
+        default:
             return;
+        }
+
         UInt32 v = GetVar(VAR_FISHUSER_AWARD);
+        UInt8 idx = 0;
+        for(int i = 6; i >= 0; -- i)
+        {
+            if(v & (0x01 << i))
+            {
+                idx = i + 1;
+                break;
+            }
+        }
+
+        if(0 == GetVar(VAR_TUIGUAN_AWARD_GOT))
+            ++ idx;
+
+        if (idx > 7)
+            return;
+
         Stream st(REP::RC7DAY);
-        if (4 == rpValue)
-            st << static_cast<UInt8>(9);
-        else
-            st << static_cast<UInt8>(11);
-        st << static_cast<UInt8>(today);
+        st << type;
+        st << static_cast<UInt8>(idx);
         st << static_cast<UInt8>(v);
         st << Stream::eos;
         send(st);
@@ -13577,7 +13604,8 @@ namespace GObject
         if (GetLev() < 45)
             return;
         UInt32 rpValue = GetVar(VAR_RP_VALUE);
-        if (rpValue != 4 && rpValue != 5)
+        if (rpValue != e_pf_xiaoyu && rpValue != e_pf_louyi
+                && rpValue != e_pf_shenma && rpValue != e_pf_konglong)
             return;
 
         if (TimeUtil::SharpDay(0, TimeUtil::Now()) - TimeUtil::SharpDay(0, getCreated()) > 6 * DAY_SECS)
@@ -13612,11 +13640,29 @@ namespace GObject
             {{15,5},{509,5},{56,10}},
             {{15,5},{226,1},{56,10}}
         };
-        UInt8 today = (TimeUtil::SharpDay(0, TimeUtil::Now()) - TimeUtil::SharpDay(0, getCreated())) / DAY_SECS + 1;
-        if (today > 7 || today == 0)
+
+        UInt32 rpValue = GetVar(VAR_RP_VALUE);
+        if (rpValue != e_pf_xiaoyu && rpValue != e_pf_louyi
+                && rpValue != e_pf_shenma && rpValue != e_pf_konglong)
             return;
-        UInt8 v = GetVar(VAR_FISHUSER_AWARD);
-        if ((v&(0x01<<(today-1))) == 0)
+
+        UInt8 idx = 0;
+        UInt32 v = GetVar(VAR_FISHUSER_AWARD);
+        for(int i = 6; i >= 0; -- i)
+        {
+            if(v & (0x01 << i))
+            {
+                idx = i + 1;
+                break;
+            }
+        }
+
+        if(0 == GetVar(VAR_TUIGUAN_AWARD_GOT))
+            ++ idx;
+
+        if (idx > 7 || idx == 0)
+            return;
+        if ((v&(0x01<<(idx-1))) == 0)
         {
             if (GetPackage()->GetRestPackageSize() < 3)
             {
@@ -13626,9 +13672,9 @@ namespace GObject
             getCoupon(50);
             for (UInt8 i = 0; i < 3; ++i)
             {
-                GetPackage()->Add(s_items[today-1][i].id, s_items[today-1][i].count, true);
+                GetPackage()->Add(s_items[idx-1][i].id, s_items[idx-1][i].count, true);
             }
-            v |= (0x01<<(today-1));
+            v |= (0x01<<(idx-1));
             SetVar(VAR_FISHUSER_AWARD, v); 
         }
         sendFishUserInfo();
