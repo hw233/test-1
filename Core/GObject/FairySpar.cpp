@@ -4,6 +4,7 @@
 #include "Script/GameActionLua.h"
 #include "Country.h"
 #include "Clan.h"
+#include "Package.h"
 
 namespace GObject
 {
@@ -249,6 +250,94 @@ namespace GObject
 
     void FairySpar::countermark()
     {
+#define MARK_ITEM_ID  515
+        if(m_owner->GetPackage()->GetItemAnyNum(MARK_ITEM_ID) < 1)
+            return;
+        if(m_complexPercent >= 100)
+            return;
+        m_owner->GetPackage()->DelItemAny(MARK_ITEM_ID, 1);
+        Int32 startPoint;
+        Int32 endPoint;
+        if(m_complexPercent == 0)
+            startPoint = 50;
+        else if(m_complexPercent == 1)
+            startPoint = 45;
+        else if(m_complexPercent == 2)
+            startPoint = 40;
+        else if(m_complexPercent == 3)
+            startPoint = 35;
+        else if(m_complexPercent == 4)
+            startPoint = 30;
+        else if(m_complexPercent == 5)
+            startPoint = 25;
+        else if(m_complexPercent == 6)
+            startPoint = 20;
+        else if(m_complexPercent == 7)
+            startPoint = 15;
+        else if(m_complexPercent == 8)
+            startPoint = 10;
+        else if(m_complexPercent == 9)
+            startPoint = 5;
+        else if(m_complexPercent == 10)
+            startPoint = 0;
+        else
+            startPoint = -5;
+
+        endPoint = startPoint + 15;
+        if(m_curMark == 0)
+        {
+            startPoint += 10;
+            endPoint += 5;
+        }
+        else if(m_curMark == 20)
+        {
+            startPoint += 8;
+            endPoint += 3;
+        }
+        else if(m_curMark == 40)
+        {
+            startPoint += 6;
+            endPoint += 1;
+        }
+        else if(m_curMark == 60)
+        {
+            startPoint += 4;
+            endPoint += -1;
+        }
+        else if(m_curMark == 80)
+        {
+            startPoint += 2;
+            endPoint += -3;
+        }
+        else if(m_curMark == 90)
+        {
+            startPoint += 0;
+            endPoint += -5;
+        }
+
+        Int32 range = endPoint - startPoint + 1;
+        Int32 tmp = startPoint + uRand(range);
+        if(tmp != 0)
+        {
+            tmp += m_curMark;
+            if(tmp < 0)
+                tmp = 0;
+            m_curMark = tmp;
+            if(m_curMark >= 100)
+            {
+                ++m_complexPercent;
+                m_curMark -= 100;
+                DB3().PushUpdateData("UPDATE `fairy_spar` SET `complexPercent` = %u, `curMark` = %u WHERE `playerId` = %"I64_FMT"u", m_complexPercent, m_curMark, m_owner->getId());
+                sendAtkPhyInfo();
+                sendMarkInfo();
+            }
+            else
+            {
+                DB3().PushUpdateData("UPDATE `fairy_spar` SET `curMark` = %u WHERE `playerId` = %"I64_FMT"u", m_curMark, m_owner->getId());
+                sendMarkInfo();
+            }
+
+        }
     }
 
 }
