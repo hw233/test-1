@@ -28,7 +28,11 @@
 #define RNORMAL1_ID     10999
 #define LBMIN_ID        11500
 #define LBMAX_ID        11999
-#define LOTHER_ID       12000
+#define LPETARM_ID      12000
+#define RPETARM_ID      12999
+#define LPETGEM_ID      13000
+#define RPETGEM_ID      14999
+#define LOTHER_ID       15000
 #define ROTHER_ID       65535
 
 #define COUPON_ID       499
@@ -106,6 +110,15 @@ enum ItemClass
     Item_Guji_Xin_Evade = 124, // 信·闪避古籍
     Item_Guji_Xin_Hitrate = 125, // 信·命中古籍
     Item_Guji_Dossier = 126, // 通用卷宗
+
+    Item_PetEquip = 200,    //仙宠装备 200~219                          //生命
+    Item_PetEquip1, Item_PetEquip2, Item_PetEquip3, Item_PetEquip4,     //物攻，法功，物防，法防
+    Item_PetEquip5, Item_PetEquip6, Item_PetEquip7, Item_PetEquip8,     //暴击，破击，命中，躲避
+    Item_PetEquip9, Item_PetEquip10,                                    //反击，坚韧
+	Item_PetGem = 220,		//仙宠宝石 220~229                          //生命
+    Item_PetGem1, Item_PetGem2, Item_PetGem3, Item_PetGem4,             //物攻，法功，物防，法防
+    Item_PetGem5, Item_PetGem6, Item_PetGem7, Item_PetGem8,             //暴击，暴击伤害，破击，命中
+    Item_PetGem9, Item_PetGem10, Item_PetGem11,                         //躲避，反击，坚韧
 };
 
 inline bool IsEquipId(UInt32 id) // XXX: 这个是流水号
@@ -121,7 +134,17 @@ inline bool IsEquipTypeId(UInt32 id)
 
 inline bool IsLingbaoTypeId(UInt32 id)
 {
-	return (id >=LBMIN_ID && id <= LBMAX_ID);
+	return (id >= LBMIN_ID && id <= LBMAX_ID);
+}
+
+inline bool IsPetEquipTypeId(UInt32 id)
+{
+	return id >= LPETARM_ID && id <= LPETARM_ID;
+}
+
+inline bool IsPetItem(UInt32 id)
+{
+	return id >= LPETGEM_ID && id <= RPETGEM_ID;
 }
 
 /** 新增11,12级宝石 **/
@@ -208,6 +231,8 @@ inline ItemClass GetItemSubClass(UInt32 id)
         return Item_Soul;
     if (id >= LSL_ID && id <= RSL_ID)
         return Item_SL;
+    if (id >= LPETGEM_ID && id <= RPETGEM_ID)
+        return Item_PetGem;
 	return Item_Other;
 }
 
@@ -323,6 +348,7 @@ namespace GData
 	extern ItemBaseTypeManager itemBaseTypeManager;
 	extern ItemBaseTypeNameManager itemBaseTypeNameManager;
 	extern std::vector<ItemGemType *> gemTypes;
+	extern std::vector<ItemGemType *> petGemTypes;
 	typedef ObjectListT<ItemEquipSetType> ItemEquipSetTypeManager;
 	extern ItemEquipSetTypeManager itemEquipSetTypeManager;
 

@@ -269,6 +269,19 @@ namespace GObject
     private:
         ItemLingbaoAttr m_lbAttr;
     };
+
+    class ItemPetEq : public ItemEquip
+    {
+        public:
+        ItemPetEq(UInt32 id, const GData::ItemBaseType* itemEquipType, ItemEquipData& itemEquipData, ItemPetEqAttr & peAttr)
+            : ItemEquip(id, itemEquipType, itemEquipData), m_peAttr(peAttr)
+        {}
+        ItemPetEqAttr & getPetEqAttr() { return m_peAttr; }
+
+        private:
+            ItemPetEqAttr m_peAttr;
+    };
+
 }
 
 #endif

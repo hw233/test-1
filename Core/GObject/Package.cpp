@@ -5,6 +5,7 @@
 #include "Player.h"
 #include "Fighter.h"
 #include "Package.h"
+#include "PetPackage.h"
 #include "DB/DBExecutor.h"
 #include "DB/DBConnectionMgr.h"
 #include "GObjectDBExecHelper.h"
@@ -519,6 +520,8 @@ namespace GObject
 	{
 		if(IsEquipTypeId(typeId))
 			return AddEquipN(typeId, num, bind, silence, FromWhere);
+        else if(IsPetEquipTypeId(typeId))
+			return m_Owner->GetPetPackage()->AddPetEquipN(typeId, num, bind, silence, FromWhere);
 		return AddItem(typeId, num, bind, silence, FromWhere);
 	}
 
@@ -597,7 +600,10 @@ namespace GObject
 	ItemBase* Package::AddItem2(UInt32 typeId, UInt32 num, bool notify, bool bind, UInt8 fromWhere)
 	{
         if (!typeId || !num) return NULL;
-		if (IsEquipTypeId(typeId)) return NULL;
+		if (IsEquipTypeId(typeId) || IsPetEquipTypeId(typeId))
+            return NULL;
+        else if(IsPetItem(typeId))
+			return m_Owner->GetPetPackage()->AddPetItem(typeId, num, bind, notify, fromWhere);
 		const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[typeId];
 		if(itemType == NULL) return NULL;
 		ITEM_BIND_CHECK(itemType->bindType,bind);
@@ -775,9 +781,12 @@ namespace GObject
 	ItemBase* Package::AddItem2(ItemBase* item, UInt8 fromWhere)
 	{
 		UInt32 typeId = item->GetItemType().getId();
-		if (IsEquipTypeId(typeId)) return item;
 		bool bind = item->GetBindStatus();
 		UInt16 count = item->Count();
+		if (IsEquipTypeId(typeId))
+            return item;
+        else if(IsPetItem(typeId))
+			return m_Owner->GetPetPackage()->AddPetItem(typeId, count, bind, false, fromWhere);
 		ItemBase * exist = FindItem(typeId, bind);
         
 		if (exist != NULL)
@@ -942,10 +951,10 @@ namespace GObject
 		if (item == NULL) return NULL;
 		ITEM_BIND_CHECK(itemType->bindType,bind);
 		item->SetBindStatus(bind);
-		UInt16 oldq = item->Size(), newq = item->Size(item->Count() + num);
-		m_Size = m_Size + newq - oldq;
-		item->IncItem(num);
-		m_Items[ItemKey(id, bind)] = item;
+        UInt16 oldq = item->Size(), newq = item->Size(item->Count() + num);
+        m_Size = m_Size + newq - oldq;
+        item->IncItem(num);
+        m_Items[ItemKey(id, bind)] = item;
 		return item;
 	}
 
@@ -1302,10 +1311,15 @@ namespace GObject
 		if(equip == NULL) return NULL;
 		ITEM_BIND_CHECK(equip->getBindType(),bind);
 		equip->SetBindStatus(bind);
-		ItemBase *& e = m_Items[ItemKey(id)];
-		if(e == NULL)
-			++ m_Size;
-		e = equip;
+        if(IsPetEquipTypeId(equip->GetTypeId()))
+            m_Owner->GetPetPackage()->AddExistEquip(static_cast<ItemPetEq *>(equip), true);
+        else
+        {
+            ItemBase *& e = m_Items[ItemKey(id)];
+            if(e == NULL)
+                ++ m_Size;
+            e = equip;
+        }
 		return equip;
 	}
 

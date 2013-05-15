@@ -40,6 +40,7 @@ namespace GData
 	ItemBaseTypeNameManager itemBaseTypeNameManager;
 	ObjectMapT<GObject::ItemWeapon> npcWeapons;
 	std::vector<ItemGemType *> gemTypes(1000);
+	std::vector<ItemGemType *> petGemTypes(1000);
 	ItemEquipSetTypeManager	itemEquipSetTypeManager;
     std::map<UInt16, UInt16> skill2item;
 
@@ -623,6 +624,24 @@ namespace GData
 					ItemGemType * igt = new ItemGemType(idt.typeId, idt.name, idt.attrExtra);
 					wt = igt;
 					gemTypes[wt->getId() - LGEM_ID] = igt;
+				}
+				break;
+            case Item_PetGem:
+            case Item_PetGem1:
+            case Item_PetGem2:
+            case Item_PetGem3:
+            case Item_PetGem4:
+            case Item_PetGem5:
+            case Item_PetGem6:
+            case Item_PetGem7:
+            case Item_PetGem8:
+            case Item_PetGem9:
+            case Item_PetGem10:
+            case Item_PetGem11:
+				{
+					ItemGemType * igt = new ItemGemType(idt.typeId, idt.name, idt.attrExtra);
+					wt = igt;
+					petGemTypes[wt->getId() - LPETGEM_ID] = igt;
 				}
 				break;
 			default:

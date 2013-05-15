@@ -3,6 +3,7 @@
 #include "MsgID.h"
 #include "Player.h"
 #include "Package.h"
+#include "PetPackage.h"
 #include "TaskMgr.h"
 #include "AttainMgr.h"
 #include "ActivityMgr.h"
@@ -675,6 +676,7 @@ namespace GObject
 
 		memset(_buffData, 0, sizeof(UInt32) * PLAYER_BUFF_COUNT);
 		m_Package = new Package(this);
+		m_PetPackage = new PetPackage(this);
 		m_TaskMgr = new TaskMgr(this);
 		m_Trade = new Trade(this);
 		m_Sale = new Sale(this);
@@ -4030,7 +4032,6 @@ namespace GObject
 		send(st);
 		return true;
 	}
-
 
 	UInt16 Player::GetFreePackageSize()
 	{

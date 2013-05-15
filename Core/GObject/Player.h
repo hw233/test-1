@@ -208,6 +208,7 @@ namespace GObject
 	class Trade;
 	class Sale;
 	class Package;
+	class PetPackage;
 	class Fighter;
 	struct SpotData;
 	class Clan;
@@ -501,6 +502,7 @@ namespace GObject
 	struct PlayerData
 	{
 		static const UInt16 INIT_PACK_SIZE = 150;
+
 		PlayerData()
 			: gold(0), coupon(0), tael(0), coin(0), prestige(0), status(0), country(0),
 			title(0), achievement(0), attainment(0) , qqvipl(0), qqvipyear(0),qqawardgot(0), qqawardEnd(0), ydGemId(0), location(0), inCity(false), lastOnline(0),
@@ -1379,6 +1381,7 @@ namespace GObject
 		bool     ExtendPackageSize();
 
 		Package* GetPackage() { return m_Package; }
+		PetPackage* GetPetPackage() { return m_PetPackage; }
 		TaskMgr* GetTaskMgr() { return m_TaskMgr; }
 		MailBox* GetMailBox() { return m_MailBox; }
 		AttainMgr* GetAttainMgr() { return m_AttainMgr; }
@@ -1663,6 +1666,7 @@ namespace GObject
 #endif
 
 		Package* m_Package;
+		PetPackage* m_PetPackage;
 
 		std::set<Player *> _friends[4];
 		std::vector<FriendActStruct *> _friendActs;

@@ -94,8 +94,6 @@ namespace GObject
 
 	class Package
 	{
-		typedef std::map<ItemKey, ItemBase *> ItemCont;
-		typedef ItemCont::iterator item_elem_iter;
 	public:
 		Package(Player* player);
 		~Package();
@@ -265,11 +263,14 @@ namespace GObject
         bool FinishLBSmeltSpecial(const GData::ItemBaseType * itype, ItemLingbaoAttr& lbattr, UInt8& attrNum);
         void testLingbao(UInt32 itemId, UInt32* colorNums, UInt8 size, UInt32* skills, UInt8 size2);
 
+    protected:
+		typedef std::map<ItemKey, ItemBase *> ItemCont;
+		typedef ItemCont::iterator item_elem_iter;
+		Player* m_Owner;
 	private:
 		enum {ItemClassSize = Item_Weapon + 1};
 
 		ItemCont m_Items;
-		Player* m_Owner;
 		UInt16 m_Size;		//already used grids
 		UInt8 _lastActivateLv;
 		UInt8 _lastActivateQ;

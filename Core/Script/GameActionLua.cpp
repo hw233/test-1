@@ -1600,6 +1600,11 @@ namespace Script
 		return Call<UInt32>("exchangPurplePet", player);
     }
 
+	UInt32 GameActionLua::getpetGemIdByMerge(UInt16 reqLev)
+	{
+		return Call<UInt32>("getpetGemIdByMerge", reqLev);
+    }
+
     bool GameActionLua::RunVipPrivilegeAward(Player* player, UInt8 idx, UInt8 dayth)
     {
 		return Call<bool>("RunVipPrivilegeAward", player, idx, dayth);

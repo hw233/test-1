@@ -17,6 +17,7 @@
 #include "Item.h"
 #include "Mail.h"
 #include "Package.h"
+#include "PetPackage.h"
 #include "TaskMgr.h"
 #include "AttainMgr.h"
 #include "Trade.h"
@@ -2061,7 +2062,9 @@ namespace GObject
 			if(pl == NULL)
 				continue;
 #if 1
-			if (!IsEquipId(idata.id))
+			if (IsPetItem(idata.id))
+				pl->GetPetPackage()->AddItemFromDB(idata.id, idata.itemNum, idata.bindType != 0);
+            else if (!IsEquipId(idata.id))
 				pl->GetPackage()->AddItemFromDB(idata.id, idata.itemNum, idata.bindType != 0);
 #else
 			if (!IsEquipId(idata.id))
