@@ -24,6 +24,9 @@ class FairySpar
         void freshElement();
         void fuseElement();
         void countermark();
+        float getFairySparPH();
+        float getFairySparAtk();
+        float getFairySparMagAtk();
 
     private:
         Player* m_owner;

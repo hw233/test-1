@@ -340,5 +340,20 @@ namespace GObject
         }
     }
 
+    float FairySpar::getFairySparPH()
+    {
+        return static_cast<float>(m_phy * ( 100 + m_complexPercent) / 100);
+    }
+
+    float FairySpar::getFairySparAtk()
+    {
+        return static_cast<float>(m_atk * ( 100 + m_complexPercent) / 100);
+    }
+
+    float FairySpar::getFairySparMagAtk()
+    {
+        return static_cast<float>(m_magAtk * ( 100 + m_complexPercent) / 100);
+    }
+
 }
 
