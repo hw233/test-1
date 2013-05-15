@@ -176,7 +176,7 @@ namespace GObject
 #define SPREAD_END_WEEK           7
 #define SPREAD_START_TIME         11*3600
 #define SPREAD_END_TIME           22*3600
-#define SPREAD_INTERVA_TIME       5*60
+#define SPREAD_INTERVA_TIME       150
 #define SPREAD_ALREADY_USE        0x01
 #define SPREAD_ALREADY_GET        0x02
 
@@ -1226,6 +1226,7 @@ namespace GObject
 		void makeFighterList(Stream&);
 		void makeFighterInfo(Stream&, Fighter *, bool = true);
 		bool makeFighterInfo(Stream&, UInt32);
+        void sendTodayRechargeInfo();
         void sendRechargeInfo(bool rank = false);
         void sendConsumeInfo(bool rank = false);
         void getMDItem(UInt8 v=1);

@@ -28,7 +28,7 @@ function update_data()
     #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20130127_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20130227_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20130315_1.sql
-    mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20130525_1.sql   #修改item_template字段subClass的数据类型
+    mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20130517_1.sql   #修改item_template字段subClass类型
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from loot; source loot;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from map_object; source mapobject;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from item_template; source itemtemplate;";

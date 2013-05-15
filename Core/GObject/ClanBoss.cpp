@@ -106,7 +106,10 @@ void ClanBoss::sendStatus(Player* pl, UInt8 t)
     if (t == 0)
         tm = m_openTime - TimeUtil::Now();
     else if (t == 1)
-        tm = TimeUtil::Now() - m_openTime;
+    {
+     //   tm = TimeUtil::Now() - m_openTime;
+        tm = 3600 - _seconds;
+    }
     Stream st(REP::CLANBOSS);
     st << static_cast<UInt8>(20);
     st << t;
@@ -209,12 +212,17 @@ void ClanBoss::refresh()
     if (!m_isOpening)
         return;
     _seconds++;
-    if (_seconds % 60 == 0)
+    if (m_powerType == 6)
+        _seconds++;
+ 
+    if (_seconds >= 3600)
+    {
+        close();
+    }
+/*    if ((_seconds % 60) == 0)
     {
         _minutes++;
-        if (m_powerType == 6)
-            _minutes++;
-        if (_minutes > 60)
+       if (_minutes > 60)
             _minutes = 60;
         UInt8 oldPercent = _totalPercent;
         _totalPercent = _minutes*100/60;
@@ -228,9 +236,11 @@ void ClanBoss::refresh()
         st << _totalPercent;
         st << Stream::eos;
         NETWORK()->Broadcast(st);
+   
         if (_totalPercent >= 100)
             close();
     }
+*/
     UInt32 now = TimeUtil::Now();
     set<Player*>::iterator it;
     for (it = _pickPlayer.begin(); it != _pickPlayer.end(); )
@@ -834,12 +844,23 @@ void ClanBoss::caclPlayerBuff(Player* pl, bool isAttackBoss)
         af.magatkP += 0.3;
     }
     //深渊劫阵
-    af.attackP -= (float)(_minutes)/100;
-    af.magatkP -= (float)(_minutes)/100;
-    af.defendP -= (float)(_minutes)/100;
-    af.magdefP -= (float)(_minutes)/100;
-    af.hpP     -= (float)(_minutes)/100;
+//    af.attackP -= (float)(_minutes)/100;
+//    af.magatkP -= (float)(_minutes)/100;
+//    af.defendP -= (float)(_minutes)/100;
+//    af.magdefP -= (float)(_minutes)/100;
+//    af.hpP     -= (float)(_minutes)/100;
 
+    UInt32 gx = pl->GetVar(VAR_CLANBOSS_GONGXIAN);
+    if (gx > 500)
+    {
+        UInt32 f = (gx-500) / 30;
+        if (f >= 100)
+            f = 99;
+        af.attackP -= (float)f/100;
+        af.magatkP -= (float)f/100;
+        af.hpP -= (float)f/100;
+        af.actionP -= (float)f/100;
+    }
      //深渊之力
     if (1 == m_bossStatus)
     {
@@ -1632,8 +1653,8 @@ void ClanBoss::broadEmpower(UInt8 releaseType, UInt8 powerType)
     st << Stream::eos;
     NETWORK()->Broadcast(st); 
 }
-const UInt8 g_powerEmPercent = 10;       //对深渊之力造成的伤害 
-const UInt8 g_powerEmExtraPercent = 20;  //法器相克额外造成的伤害
+const UInt8 g_powerEmPercent = 5;       //对深渊之力造成的伤害 
+const UInt8 g_powerEmExtraPercent = 10;  //法器相克额外造成的伤害
 const UInt8 g_hpEmPercent = 1;         //对BOSS真身造成的伤害
 void ClanBoss::EmpowerRelease(Player* pl,UInt8 t)
 {
@@ -1707,6 +1728,7 @@ void ClanBoss::Change2PowerStatus()
 
     broadEmpower(2, m_powerType);
     notify();
+    sendStatus(NULL, 1);
 }
 void ClanBoss::BossDead(Player* pl)
 {

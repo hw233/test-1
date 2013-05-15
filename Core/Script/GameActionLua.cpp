@@ -154,6 +154,7 @@ namespace Script
 		lua_tinker::def(_L, "getSurnameLegend", GObject::World::getSurnameLegend);
 		lua_tinker::def(_L, "getOpenTime", GObject::World::getOpenTime);
 		lua_tinker::def(_L, "isRPServer", GObject::World::isRPServer);
+		lua_tinker::def(_L, "getAccRecharge", GObject::World::getAccRecharge);
 
         CLASS_DEF(GameActionLua, Print);
         lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);
@@ -1614,6 +1615,12 @@ namespace Script
     {
 		return Call<bool>("RunLevelAward", player,opt);
     }
+
+    void GameActionLua::onRecharge(Player* player, UInt32 r)
+    {
+		Call<void>("onRecharge", player, r);
+    }
+
     UInt8 GameActionLua::getAnswerInFoolsDay(UInt8 qid)
     {
 		return Call<UInt8>("getAnswerInFoolsDay", qid);

@@ -988,6 +988,9 @@ private:
     void setRecoverSnakeAtk(float v) { _sneak_atk_recover_rate = v; }
     bool recoverSneakAtk();
 
+    BattleFighter* _selfSummon;
+    inline void setSelfSummon(BattleFighter* bf) { _selfSummon = bf; }
+    inline BattleFighter* getSelfSummon() { return _selfSummon; }
 public:
 	enum StatusFlag
 	{

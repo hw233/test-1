@@ -7799,6 +7799,9 @@ namespace GObject
         {
             AddVar(VAR_TOTALRECHARGEACT, r);
         }
+
+        AddVar(VAR_RECHARGE_TODAY, r);
+        GameAction()->onRecharge(this, r);
     }
 
     void Player::addRechargeNextRet(UInt32 r)
@@ -7910,6 +7913,12 @@ namespace GObject
         }
     }
 
+    void Player::sendTodayRechargeInfo()
+    {
+        Stream st(REP::DAILY_DATA);
+        st << static_cast<UInt8>(19) << GetVar(VAR_RECHARGE_TODAY) << Stream::eos;
+        send((st));
+    }
 
     void Player::sendRechargeInfo(bool rank)
     {
@@ -7932,6 +7941,7 @@ namespace GObject
             GLOBAL().PushMsg(hdr, &total);
         }
     }
+
     void Player::sendConsumeInfo(bool rank)
     {
         if (!World::getConsumeActive())
@@ -20269,13 +20279,11 @@ void Player::spreadToOther(UInt8 type, std::string name)
     World::spreadKeeper = pl;
     UInt8 week = TimeUtil::GetWeekDay(now);
     if(week == SPREAD_START_WEEK)
-    {
-        SYSMSG_BROADCASTV(4136, pl->getCountry(), pl->getName().c_str());
-    }
+        SYSMSG_BROADCASTV(4136, pl->getCountry(), pl->getName().c_str())
     else if(week == (SPREAD_END_WEEK))
-    {
-        SYSMSG_BROADCASTV(4137, pl->getCountry(), pl->getName().c_str());
-    }
+        SYSMSG_BROADCASTV(4137, pl->getCountry(), pl->getName().c_str())
+    else
+        SYSMSG_BROADCASTV(4138, pl->getCountry(), pl->getName().c_str())
     globalPlayers.enumerate(enum_spread_send2, static_cast<void *>(NULL));
 }
 
@@ -20321,8 +20329,8 @@ void Player::spreadGetAward()
     if(!bRet)
         return;
     UInt32 tmp = GetVar(VAR_SPREAD_FLAG);
-    if(!(tmp & SPREAD_ALREADY_USE))
-        return;
+    //if(!(tmp & SPREAD_ALREADY_USE))
+    //    return;
     if(tmp & SPREAD_ALREADY_GET)
         return;
     UInt32 spreadCount = World::getSpreadCount();
