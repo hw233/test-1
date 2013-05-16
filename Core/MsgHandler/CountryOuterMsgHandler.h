@@ -5881,9 +5881,10 @@ void OnExJob( GameMsgHdr & hdr, const void * data )
                     case 2:
                     case 3:
                     case 4:
+                    case 5:
                         jobHunter->OnRequestStart(val);
                         break;
-                    case 5: 
+                    case 10:
                         // 老虎机转盘转动
                         jobHunter->OnUpdateSlot();
                         break;
