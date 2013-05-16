@@ -243,7 +243,7 @@ namespace GObject
     inline bool isSuccessRate(Int8 count)
     {
         bool bRet = false;
-        while(count > 0)
+        while(count-- > 0)
         {
             if(uRand(10000) < 3000)
             {
@@ -281,6 +281,7 @@ namespace GObject
         UInt8 addPercentCnt = 0;
         bool addPercent100 = false;
         bool doublePercent100 = false;
+        bool already = false;
 
         for(i = 0; i < 5; i++)
         {
@@ -314,47 +315,47 @@ namespace GObject
                 case 1:
                     isExtra = true;
                     if(addPercent100 || uRand(10000) < 3000)
-                        atkTmp += 5;
+                        atkTmp += 2;
                 break;
                 case 2:
                     isExtra = true;
                     if(addPercent100 || uRand(10000) < 3000)
-                        magAtkTmp += 5;
+                        magAtkTmp += 2;
                 break;
                 case 3:
                     isExtra = true;
                     if(addPercent100 || uRand(10000) < 3000)
-                        phyTmp += 50;
+                        phyTmp += 20;
                 break;
                 case 4:
                     isExtra = true;
                     if(addPercent100 || uRand(10000) < 3000)
-                        atkTmp += 10;
+                        atkTmp += 5;
                 break;
                 case 5:
                     isExtra = true;
                     if(addPercent100 || uRand(10000) < 3000)
-                        magAtkTmp += 10;
+                        magAtkTmp += 5;
                 break;
                 case 6:
                     isExtra = true;
                     if(addPercent100 || uRand(10000) < 3000)
-                        phyTmp += 100;
+                        phyTmp += 50;
                 break;
                 case 7:
                     isExtra = true;
                     if(addPercent100 || uRand(10000) < 3000)
-                        atkTmp += 15;
+                        atkTmp += 10;
                 break;
                 case 8:
                     isExtra = true;
                     if(addPercent100 || uRand(10000) < 3000)
-                        magAtkTmp += 15;
+                        magAtkTmp += 10;
                 break;
                 case 9:
                     isExtra = true;
                     if(addPercent100 || uRand(10000) < 2000)
-                        phyTmp += 150;
+                        phyTmp += 100;
                 break;
                 default:
                 break;
@@ -364,18 +365,27 @@ namespace GObject
             {
                 if(atkTmp > 0 && (doublePercent100 || isSuccessRate(doublePercentCnt)))
                     atkTmp *= 2;
-                if(atkTmp > 0 && isSuccessRate(addPercentCnt))
-                    atkTmp += 10;
+                if(!already && atkTmp > 0 && isSuccessRate(addPercentCnt))
+                {
+                    already = true;
+                    atkTmp += 5;
+                }
 
                 if(magAtkTmp > 0 && (doublePercent100 || isSuccessRate(doublePercentCnt)))
                     magAtkTmp *= 2;
-                if(magAtkTmp > 0 && isSuccessRate(addPercentCnt))
-                    magAtkTmp += 10;
+                if(!already && magAtkTmp > 0 && isSuccessRate(addPercentCnt))
+                {
+                    already = true;
+                    magAtkTmp += 5;
+                }
 
                 if(phyTmp > 0 && (doublePercent100 || isSuccessRate(doublePercentCnt)))
                     phyTmp *= 2;
-                if(phyTmp > 0 && isSuccessRate(addPercentCnt))
-                    phyTmp += 10;
+                if(!already && phyTmp > 0 && isSuccessRate(addPercentCnt))
+                {
+                    already = true;
+                    phyTmp += 5;
+                }
             }
             atkTmpSum += atkTmp;
             magAtkTmpSum += magAtkTmp;
@@ -506,6 +516,7 @@ namespace GObject
                 else
                     m_curMark -= 100;
                 DB3().PushUpdateData("UPDATE `fairy_spar` SET `complexPercent` = %u, `curMark` = %u WHERE `playerId` = %"I64_FMT"u", m_complexPercent, m_curMark, m_owner->getId());
+                m_owner->setFightersDirty(true);
                 sendAtkPhyInfo();
                 sendMarkInfo();
             }
@@ -564,8 +575,6 @@ namespace GObject
             atkAddMax = atkMax[m_breakoutCnt] - atkMax[breakoutCnt];
             magAtkAddMax = magAtkMax[m_breakoutCnt] - magAtkMax[breakoutCnt];
         }
-        printf("---%u, %u, %u, ", phyAdd, atkAdd, magAtkAdd);
-        printf("%u, %u, %u---\n", phyAddMax, atkAddMax, magAtkAddMax);
         return (phyAdd+atkAdd*10+magAtkAdd*10)*100/(phyAddMax+atkAddMax*10+magAtkAddMax*10);
     }
 
@@ -577,6 +586,7 @@ namespace GObject
         if(m_complexPercent == 100)
             m_curMark = 100;
         DB3().PushUpdateData("UPDATE `fairy_spar` SET `complexPercent` = %u, `curMark` = %u WHERE `playerId` = %"I64_FMT"u", m_complexPercent, m_curMark, m_owner->getId());
+        m_owner->setFightersDirty(true);
         sendAtkPhyInfo();
         sendMarkInfo();
     }
