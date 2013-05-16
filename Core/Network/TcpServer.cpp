@@ -325,8 +325,8 @@ TcpMasterServer::TcpMasterServer(UInt16 port):
 	TcpServer(), _socket(0), _ev_server(NULL)
 {
 	listen(INADDR_ANY, port, 8);
-	//evutil_make_socket_nonblocking(_socket);
-	//make_linger(_socket);
+	evutil_make_socket_nonblocking(_socket);
+	make_linger(_socket);
 }
 
 void TcpMasterServer::listen(UInt32 addr, UInt16 port, UInt32 backlog)
