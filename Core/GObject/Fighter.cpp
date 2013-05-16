@@ -1836,7 +1836,7 @@ void Fighter::rebuildEquipAttr()
         _attrExtraEquip.magatk += _wbextmagatk;
     }
 
-    if(_owner && _owner->getClan())
+    if(_owner/* && _owner->getClan()*/)
     {
         //仙蕴晶石的加成
         _attrExtraEquip.hp += _owner->GetFairySpar()->getFairySparPH();

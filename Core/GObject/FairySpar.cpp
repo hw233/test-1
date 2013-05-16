@@ -541,16 +541,22 @@ namespace GObject
         }
         else
         {
+            //未突破
+            UInt8 tmp = m_breakoutCnt + 1;
+            if(tmp > 6)
+                tmp = 6;
+            if(m_phy >= phyMax[tmp] && m_atk >= atkMax[tmp] && m_magAtk >= magAtkMax[tmp])
+                return 100;
             UInt8 breakoutCnt = m_breakoutCnt - 1;
-            if(m_phy > phyMax[breakoutCnt])
+            if(m_phy >= phyMax[breakoutCnt])
                 phyAdd = m_phy - phyMax[breakoutCnt];
             else
                 phyAdd = m_phy;
-            if(m_atk > atkMax[breakoutCnt])
+            if(m_atk >= atkMax[breakoutCnt])
                 atkAdd = m_atk - atkMax[breakoutCnt];
             else
                 atkAdd = m_atk;
-            if(m_magAtk > magAtkMax[breakoutCnt])
+            if(m_magAtk >= magAtkMax[breakoutCnt])
                 magAtkAdd = m_magAtk - magAtkMax[breakoutCnt];
             else
                 magAtkAdd = m_magAtk;
