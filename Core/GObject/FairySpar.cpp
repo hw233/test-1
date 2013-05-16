@@ -281,7 +281,6 @@ namespace GObject
         UInt8 addPercentCnt = 0;
         bool addPercent100 = false;
         bool doublePercent100 = false;
-        bool already = false;
 
         for(i = 0; i < 5; i++)
         {
@@ -365,27 +364,18 @@ namespace GObject
             {
                 if(atkTmp > 0 && (doublePercent100 || isSuccessRate(doublePercentCnt)))
                     atkTmp *= 2;
-                if(!already && atkTmp > 0 && isSuccessRate(addPercentCnt))
-                {
-                    already = true;
+                if(atkTmp > 0 && isSuccessRate(addPercentCnt))
                     atkTmp += 5;
-                }
 
                 if(magAtkTmp > 0 && (doublePercent100 || isSuccessRate(doublePercentCnt)))
                     magAtkTmp *= 2;
-                if(!already && magAtkTmp > 0 && isSuccessRate(addPercentCnt))
-                {
-                    already = true;
+                if(magAtkTmp > 0 && isSuccessRate(addPercentCnt))
                     magAtkTmp += 5;
-                }
 
                 if(phyTmp > 0 && (doublePercent100 || isSuccessRate(doublePercentCnt)))
                     phyTmp *= 2;
-                if(!already && phyTmp > 0 && isSuccessRate(addPercentCnt))
-                {
-                    already = true;
+                if(phyTmp > 0 && isSuccessRate(addPercentCnt))
                     phyTmp += 5;
-                }
             }
             atkTmpSum += atkTmp;
             magAtkTmpSum += magAtkTmp;
