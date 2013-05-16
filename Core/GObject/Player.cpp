@@ -7917,7 +7917,7 @@ namespace GObject
     void Player::sendTodayRechargeInfo()
     {
         Stream st(REP::DAILY_DATA);
-        st << static_cast<UInt8>(19) << GetVar(VAR_RECHARGE_TODAY) << Stream::eos;
+        st << static_cast<UInt8>(19) << GetVar(VAR_RECHARGE_TODAY) << static_cast<UInt8>(GetVar(VAR_RECHARGE_CONDCNT)) << Stream::eos;
         send((st));
     }
 
