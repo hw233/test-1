@@ -13569,7 +13569,7 @@ namespace GObject
         UInt8 type = 0;
         switch(rpValue)
         {
-        case e_pf_xiaoyu:
+        case e_pf_buyu:
             type = 9;
             break;
         case e_pf_louyi:
@@ -13580,6 +13580,9 @@ namespace GObject
             break;
         case e_pf_konglong:
             type = 13;
+            break;
+        case e_pf_xiaoyu:
+            type = 14;
             break;
         default:
             return;
@@ -13614,8 +13617,9 @@ namespace GObject
         if (GetLev() < 45)
             return;
         UInt32 rpValue = GetVar(VAR_RP_VALUE);
-        if (rpValue != e_pf_xiaoyu && rpValue != e_pf_louyi
-                && rpValue != e_pf_shenma && rpValue != e_pf_konglong)
+        if (rpValue != e_pf_buyu && rpValue != e_pf_louyi
+                && rpValue != e_pf_shenma && rpValue != e_pf_konglong
+                && rpValue != e_pf_xiaoyu)
             return;
 
         if (TimeUtil::SharpDay(0, TimeUtil::Now()) - TimeUtil::SharpDay(0, getCreated()) > 6 * DAY_SECS)
@@ -13652,8 +13656,9 @@ namespace GObject
         };
 
         UInt32 rpValue = GetVar(VAR_RP_VALUE);
-        if (rpValue != e_pf_xiaoyu && rpValue != e_pf_louyi
-                && rpValue != e_pf_shenma && rpValue != e_pf_konglong)
+        if (rpValue != e_pf_buyu && rpValue != e_pf_louyi
+                && rpValue != e_pf_shenma && rpValue != e_pf_konglong
+                && rpValue != e_pf_xiaoyu)
             return;
 
         UInt8 idx = 0;

@@ -203,10 +203,11 @@ namespace GObject
 
     enum TUIGUANG_PLATFORM  // 推广平台
     {
-        e_pf_xiaoyu = 4,
+        e_pf_buyu = 4,
         e_pf_louyi = 5,
         e_pf_shenma = 6,
-        e_pf_konglong = 7
+        e_pf_konglong = 7,
+        e_pf_xiaoyu = 8
     };
 
 	class Map;

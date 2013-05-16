@@ -5585,11 +5585,13 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
         case 11:
         case 13:
         case 15:
+        case 17:
             player->getFishUserAward();
             break;
         case 12:
         case 14:
         case 16:
+        case 18:
             player->getFishUserPackage();
             break;
 

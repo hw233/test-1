@@ -783,15 +783,15 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 
             pl->SetVar(GObject::VAR_RP_VALUE, nu._rp);
             pl->setTitle(0, 0);
-            if (nu._via == "sscq_byhd" || nu._via == "xiaoyu") //捕鱼达人用户
-            {
+            if (nu._via == "sscq_byhd") //捕鱼达人用户
+                pl->SetVar(GObject::VAR_RP_VALUE, GObject::e_pf_buyu);
+            else if (nu._via == "sscq_xycc" || nu._via == "xiaoyu") // 小鱼吃吃吃
                 pl->SetVar(GObject::VAR_RP_VALUE, GObject::e_pf_xiaoyu);
-            }
-            if (nu._via == "sscq_dlhd" || nu._via == "louyi") //摩天大楼用户
+            else if (nu._via == "sscq_dlhd" || nu._via == "louyi") //摩天大楼用户
                 pl->SetVar(GObject::VAR_RP_VALUE, GObject::e_pf_louyi);
-            if (nu._via == "sscq_smsg" || nu._via == "shenma") //神马三国
+            else if (nu._via == "sscq_smsg" || nu._via == "shenma") //神马三国
                 pl->SetVar(GObject::VAR_RP_VALUE, GObject::e_pf_shenma);
-            if (nu._via == "sscq_klsd" || nu._via == "konglong") //恐龙时代
+            else if (nu._via == "sscq_klsd" || nu._via == "konglong") //恐龙时代
                 pl->SetVar(GObject::VAR_RP_VALUE, GObject::e_pf_konglong);
 
             if (GObject::World::getPetEggAct())
