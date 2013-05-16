@@ -13,7 +13,7 @@ namespace GObject
 #define MAG_ATK_MAX   2
 #define PHY_MAX       3
 
-    const Int32 statusLevel[7] = {0,5,10,15,20,25,30};
+    const Int32 statusLevel[7] = {0,3,6,9,12,15,18};
     const Int32 atkMax[7] = {100,160,240,340,460,600,800};
     const Int32 magAtkMax[7] = {100,160,240,340,460,600,800};
     const Int32 phyMax[7] = {1000,1600,2400,3400,4600,6000,8000};
@@ -116,7 +116,7 @@ namespace GObject
     void FairySpar::getElement()
     {
         UInt8 flag;
-        if(getFusePercent() == 100)
+        if(getFusePercent() >= 100)
             flag = 2;
         else
             flag = 1;
@@ -143,16 +143,19 @@ namespace GObject
             m_owner->useClanProffer(100, &ci);
         }
         getElement();
-        sendElementInfo();
         DB3().PushUpdateData("UPDATE `fairy_spar` SET `element1` = %u, `element2` = %u, `element3` = %u, `element4` = %u, `element5` = %u WHERE `playerId` = %"I64_FMT"u", m_element[0], m_element[1], m_element[2], m_element[3], m_element[4], m_owner->getId());
+        sendElementInfo();
     }
 
     void FairySpar::fuseBreakout()
     {
         if(m_breakoutCnt >= 6)
+        {
+            m_owner->sendMsgCode(0, 1361);
             return;
+        }
         UInt16 level = m_owner->getClan()->getStatueLevel();
-        if(level <= statusLevel[m_breakoutCnt])
+        if(level <= statusLevel[m_breakoutCnt + 1])
         {
             m_owner->sendMsgCode(0, 1359);
             return;
@@ -169,8 +172,8 @@ namespace GObject
         UInt16 prob = uRand(10000);
         UInt16 successProb = 0;
         UInt32 atkTmp = 0;
-        UInt32 magAtkTmp;
-        UInt32 phyTmp;
+        UInt32 magAtkTmp = 0;
+        UInt32 phyTmp = 0;
 
         for(UInt8 i = 0; i < 5; i++)
         {
@@ -235,8 +238,6 @@ namespace GObject
 
         if(m_breakoutCnt > 6)
             return;
-        if(m_breakoutCnt == 6 && m_atk >= atkMax[m_breakoutCnt] && m_magAtk >= magAtkMax[m_breakoutCnt] && m_phy >= phyMax[m_breakoutCnt])
-            return;
         UInt32 proffer = (getFusePercent() / 10 + 1) * 50 * (m_breakoutCnt + 1);
         if(m_owner->getClanProffer() < proffer)
         {
@@ -288,40 +289,40 @@ namespace GObject
             switch(m_element[i])
             {
                 case 1:
-                    if(addPercent100 || prob < 2000)
-                        atkTmp += 10;
+                    if(addPercent100 || prob < 3000)
+                        atkTmp += 5;
                 break;
                 case 2:
-                    if(addPercent100 || prob < 2000)
-                        magAtkTmp += 10;
+                    if(addPercent100 || prob < 3000)
+                        magAtkTmp += 5;
                 break;
                 case 3:
-                    if(addPercent100 || prob < 2000)
-                        phyTmp += 100;
+                    if(addPercent100 || prob < 3000)
+                        phyTmp += 50;
                 break;
                 case 4:
-                    if(addPercent100 || prob < 2000)
-                        atkTmp += 20;
+                    if(addPercent100 || prob < 3000)
+                        atkTmp += 10;
                 break;
                 case 5:
-                    if(addPercent100 || prob < 2000)
-                        magAtkTmp += 20;
+                    if(addPercent100 || prob < 3000)
+                        magAtkTmp += 10;
                 break;
                 case 6:
-                    if(addPercent100 || prob < 2000)
-                        phyTmp += 200;
+                    if(addPercent100 || prob < 3000)
+                        phyTmp += 100;
                 break;
                 case 7:
-                    if(addPercent100 || prob < 2000)
-                        atkTmp += 30;
+                    if(addPercent100 || prob < 3000)
+                        atkTmp += 15;
                 break;
                 case 8:
-                    if(addPercent100 || prob < 2000)
-                        magAtkTmp += 30;
+                    if(addPercent100 || prob < 3000)
+                        magAtkTmp += 15;
                 break;
                 case 9:
                     if(addPercent100 || prob < 2000)
-                        phyTmp += 300;
+                        phyTmp += 150;
                 break;
                 default:
                 break;
@@ -414,7 +415,10 @@ namespace GObject
         if(m_owner->GetPackage()->GetItemAnyNum(MARK_ITEM_ID) < 1)
             return;
         if(m_complexPercent >= 100)
+        {
+            m_owner->sendMsgCode(0, 1361);
             return;
+        }
         m_owner->GetPackage()->DelItemAny(MARK_ITEM_ID, 1);
         Int32 startPoint;
         Int32 endPoint;
@@ -486,7 +490,10 @@ namespace GObject
             if(m_curMark >= 100)
             {
                 ++m_complexPercent;
-                m_curMark -= 100;
+                if(m_complexPercent == 100)
+                    m_curMark = 100;
+                else
+                    m_curMark -= 100;
                 DB3().PushUpdateData("UPDATE `fairy_spar` SET `complexPercent` = %u, `curMark` = %u WHERE `playerId` = %"I64_FMT"u", m_complexPercent, m_curMark, m_owner->getId());
                 sendAtkPhyInfo();
                 sendMarkInfo();

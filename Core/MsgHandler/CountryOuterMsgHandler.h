@@ -1111,6 +1111,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->GetShuoShuo()->sendShuoShuo();
     pl->GetCFriend()->sendCFriend();
     pl->GetStrengthenMgr()->CheckTimeOver(now);
+    pl->sendTodayRechargeInfo();
     pl->sendRechargeInfo();
     pl->sendConsumeInfo();
     pl->sendRechargeNextRetInfo(now);
@@ -1285,6 +1286,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->setLuckyStarCondition();
     pl->sendLuckyStarInfo(1);
     pl->getLevelAwardInfo();
+    pl->GetFairySpar()->sendAllInfo();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )

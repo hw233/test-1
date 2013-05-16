@@ -241,7 +241,7 @@ DROP TABLE IF EXISTS `item_template`;
 CREATE TABLE `item_template` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
-  `subClass` tinyint(3) NOT NULL COMMENT '物品类型',
+  `subClass` tinyint(3) unsigned NOT NULL COMMENT '物品类型',
   `career` tinyint(3) NOT NULL COMMENT '职业',
   `reqLev` smallint(6) NOT NULL DEFAULT '1' COMMENT '等级需求',
   `vLev` smallint(6) NOT NULL DEFAULT '1' COMMENT '价值等级',

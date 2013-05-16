@@ -541,6 +541,11 @@ public:
     inline static bool getQQGameOnlineAwardAct()
     { return _qqgameonlineawardact; }
 
+    inline static void setAccRecharge(bool v)
+    { _accrecharge = v; }
+    inline static bool getAccRecharge()
+    { return _accrecharge; }
+
     inline static bool getLuckyStarAct()
     {
         UInt32 now = TimeUtil::Now();
@@ -755,6 +760,7 @@ public:
     static bool _singleday;
     static bool _thanksgiving;
     static bool _christmas;
+    static bool _accrecharge;
     static bool _newyear;
     static bool _blueactiveday;
     static bool _rechargeactive;
