@@ -1232,6 +1232,7 @@ namespace GObject
 		void makeFighterList(Stream&);
 		void makeFighterInfo(Stream&, Fighter *, bool = true);
 		bool makeFighterInfo(Stream&, UInt32);
+        void sendTodayRechargeInfo();
         void sendRechargeInfo(bool rank = false);
         void sendConsumeInfo(bool rank = false);
         void getMDItem(UInt8 v=1);

@@ -220,6 +220,10 @@ namespace GObject
 
         VAR_DONTIAN_KILLPOINT = 171, //洞天福地击杀点数
 
+        VAR_RECHARGE_TODAY = 172, // 今日充值额度
+        VAR_RECHARGE_TODAY_COUNTED = 173, // 今日充值额度已达目标额度
+        VAR_RECHARGE_CONDCNT = 174, // 达到充值额度的次数
+
         VAR_YEAR_SWORDSMAN = 180, //周岁剑侠红包
         VAR_YEAR_NOBLE = 181, //周岁贵族红包
         /** 斩妖除魔剑侠路 **/
@@ -659,6 +663,9 @@ namespace GObject
             REGISTER_VAR(VAR_TGC_1_DUNGEON, CYCLE_NONE);
 
             REGISTER_VAR(VAR_DONTIAN_KILLPOINT, CYCLE_NONE);
+            REGISTER_VAR(VAR_RECHARGE_TODAY, CYCLE_DAY);
+            REGISTER_VAR(VAR_RECHARGE_TODAY_COUNTED, CYCLE_DAY);
+            REGISTER_VAR(VAR_RECHARGE_CONDCNT, CYCLE_NONE);
 
             REGISTER_VAR(VAR_CTSLANDING_AWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_CTSLANDING_AWARD2, CYCLE_NONE);
