@@ -155,7 +155,7 @@ namespace GObject
             return;
         }
         UInt16 level = m_owner->getClan()->getStatueLevel();
-        if(level <= statusLevel[m_breakoutCnt + 1])
+        if(level < statusLevel[m_breakoutCnt + 1])
         {
             m_owner->sendMsgCode(0, 1359);
             return;
@@ -207,6 +207,7 @@ namespace GObject
         bool isDirty = false;
         if(prob < successProb)
         {
+            m_owner->sendMsgCode(0, 1365);
             ++m_breakoutCnt;
             if(atkTmp > 0)
             {
@@ -228,7 +229,23 @@ namespace GObject
             sendAtkPhyInfo();
             DB3().PushUpdateData("UPDATE `fairy_spar` SET `atk` = %u, `magAtk` = %u, `phy` = %u, `breakoutCnt` = %u  WHERE `playerId` = %"I64_FMT"u", m_atk, m_magAtk, m_phy, m_breakoutCnt, m_owner->getId());
         }
+        else
+            m_owner->sendMsgCode(0, 1364);
         freshElement(false);
+    }
+
+    inline bool isSuccessRate(Int8 count)
+    {
+        bool bRet = false;
+        while(count > 0)
+        {
+            if(uRand(10000) < 3000)
+            {
+                bRet = true;
+                break;
+            }
+        }
+        return bRet;
     }
 
     void FairySpar::fuseElement()
@@ -247,7 +264,6 @@ namespace GObject
         ConsumeInfo ci(FairySparFuseElement, 0, 0);
         m_owner->useClanProffer(proffer, &ci);
 
-        UInt16 prob = uRand(10000);
         UInt32 atkTmpSum = 0;
         UInt32 magAtkTmpSum = 0;
         UInt32 phyTmpSum = 0;
@@ -286,93 +302,65 @@ namespace GObject
             atkTmp = 0;
             magAtkTmp = 0;
             phyTmp = 0;
+            bool isExtra = false;
             switch(m_element[i])
             {
                 case 1:
-                    if(addPercent100 || prob < 3000)
+                    isExtra = true;
+                    if(addPercent100 || uRand(10000) < 3000)
                         atkTmp += 5;
                 break;
                 case 2:
-                    if(addPercent100 || prob < 3000)
+                    isExtra = true;
+                    if(addPercent100 || uRand(10000) < 3000)
                         magAtkTmp += 5;
                 break;
                 case 3:
-                    if(addPercent100 || prob < 3000)
+                    isExtra = true;
+                    if(addPercent100 || uRand(10000) < 3000)
                         phyTmp += 50;
                 break;
                 case 4:
-                    if(addPercent100 || prob < 3000)
+                    isExtra = true;
+                    if(addPercent100 || uRand(10000) < 3000)
                         atkTmp += 10;
                 break;
                 case 5:
-                    if(addPercent100 || prob < 3000)
+                    isExtra = true;
+                    if(addPercent100 || uRand(10000) < 3000)
                         magAtkTmp += 10;
                 break;
                 case 6:
-                    if(addPercent100 || prob < 3000)
+                    isExtra = true;
+                    if(addPercent100 || uRand(10000) < 3000)
                         phyTmp += 100;
                 break;
                 case 7:
-                    if(addPercent100 || prob < 3000)
+                    isExtra = true;
+                    if(addPercent100 || uRand(10000) < 3000)
                         atkTmp += 15;
                 break;
                 case 8:
-                    if(addPercent100 || prob < 3000)
+                    isExtra = true;
+                    if(addPercent100 || uRand(10000) < 3000)
                         magAtkTmp += 15;
                 break;
                 case 9:
-                    if(addPercent100 || prob < 2000)
+                    isExtra = true;
+                    if(addPercent100 || uRand(10000) < 2000)
                         phyTmp += 150;
                 break;
                 default:
                 break;
             }
 
-            Int32 curtmp;
-            Int32 curdoublePercentCnt;
-            Int32 curaddPercentCnt;
-            for(UInt8 j = 0; j < 3; j++)
+            if(isExtra)
             {
-                if(j == 0)
-                    curtmp = atkTmp;
-                else if(j == 1)
-                    curtmp = magAtkTmp;
-                else
-                    curtmp = phyTmp;
-
-                curdoublePercentCnt = doublePercentCnt;
-                curaddPercentCnt = addPercentCnt;
-
-                if(curtmp > 0)
-                {
-                    while(curdoublePercentCnt > 0)
-                    {
-                        --curdoublePercentCnt;
-                        if(uRand(10000) < 3000)
-                        {
-                            curtmp *= 2;
-                            break;
-                        }
-                    }
-                    while(curaddPercentCnt > 0)
-                    {
-                        --curaddPercentCnt;
-                        if(uRand(10000) < 3000)
-                        {
-                            curtmp += 10;
-                            break;
-                        }
-                    }
-                }
-
-                if(j == 0)
-                    atkTmp = curtmp;
-                else if(j == 1)
-                    magAtkTmp = curtmp;
-                else
-                    phyTmp = curtmp;
+                if(atkTmp > 0 && (doublePercent100 || isSuccessRate(doublePercentCnt)))
+                    atkTmp *= 2;
+                if(atkTmp > 0 && isSuccessRate(addPercentCnt))
+                    atkTmp += 10;
             }
-
             atkTmpSum += atkTmp;
             magAtkTmpSum += magAtkTmp;
             phyTmpSum += phyTmp;
@@ -402,10 +390,13 @@ namespace GObject
         }
         if(isDirty)
         {
+            m_owner->sendMsgCode(0, 1363);
             sendAtkPhyInfo();
             m_owner->setFightersDirty(true);
             DB3().PushUpdateData("UPDATE `fairy_spar` SET `atk` = %u, `magAtk` = %u, `phy` = %u  WHERE `playerId` = %"I64_FMT"u", m_atk, m_magAtk, m_phy, m_owner->getId());
         }
+        else
+            m_owner->sendMsgCode(0, 1362);
         freshElement(false);
     }
 
