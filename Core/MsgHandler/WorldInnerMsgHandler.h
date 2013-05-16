@@ -146,6 +146,12 @@ void OnClanChatReq( GameMsgHdr& hdr, const void * data )
 		player->getClan()->broadcast(data, hdr.msgHdr.bodyLen);
 }
 
+void OnSpreadModifyVar(GameMsgHdr& hdr, const void* data)
+{
+	MSG_QUERY_PLAYER(player);
+    player->SetVar(VAR_SPREAD_FLAG, player->GetVar(VAR_SPREAD_FLAG) | SPREAD_ALREADY_GET);
+}
+
 void OnClanTakeRewardResultReq(GameMsgHdr& hdr, const void * data)
 {
 	MSG_QUERY_PLAYER(player);
@@ -1368,7 +1374,6 @@ void OnDaysRankMsg( GameMsgHdr& hdr, const void* data )
     daysValueRankMsg* msg = reinterpret_cast<daysValueRankMsg*>(const_cast<void*>(data));
     GObject::DaysRank::instance().updateDaysValue(msg); 
 }
-
 
 void OnSendClanMemberList( GameMsgHdr& hdr, const void* data )
 {

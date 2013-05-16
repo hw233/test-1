@@ -29,6 +29,15 @@ namespace GData
 namespace Battle
 {
 
+    enum SneakStatus
+    {
+        e_sneak_none = 0,
+        e_sneak_on = 1,
+        e_sneak_atk = 2
+    };
+
+
+
 class BattleFighter:
 	public BattleObject
 {
@@ -966,6 +975,18 @@ private:
     void setFireFakeDead(float v, UInt8 l) { _fire_fake_dead_rate = v; _fire_fake_dead_rate_last = l; }
     bool doFireFakeDead();
     bool releaseFireFakeDead();
+
+    float _sneak_atk;
+    UInt8 _sneak_atk_status;
+    UInt8 _sneak_atk_last;
+    float _sneak_atk_recover_rate;
+    float getSneakAtk() { return _sneak_atk; }
+    UInt8 getSneakStatus() { return _sneak_atk_status; }
+    void nextSneakStatus();
+    void setSneakAtk(float v, UInt8 s, UInt8 l) { _sneak_atk = v, _sneak_atk_status = s, _sneak_atk_last = l; }
+    bool releaseSneakAtk();
+    void setRecoverSnakeAtk(float v) { _sneak_atk_recover_rate = v; }
+    bool recoverSneakAtk();
 
 public:
 	enum StatusFlag

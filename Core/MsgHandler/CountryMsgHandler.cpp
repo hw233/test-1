@@ -304,6 +304,9 @@ MSG_REG_2(GameMsgHdr, 0x344, OnFoolsDayAct);
 MSG_REG_2(GameMsgHdr, 0x345, OnLuckyStarAct);
 MSG_REG_2(GameMsgHdr, 0x346, OnSurnameLegendAct);
 
+MSG_REG_2(GameMsgHdr, 0x348, OnSendSpreadAwardInfo);
+MSG_REG_2(GameMsgHdr, 0x349, OnSpreadGetAward);
+
 MSG_REG_2(GameMsgHdr, 0x236, OnAwardHIPrestige);
 MSG_REG_2(GameMsgHdr, 0x237, OnSendShusanLoveTitleCard);
 MSG_REG_2(GameMsgHdr, 0x238, OnAddPExpBy);
@@ -361,6 +364,7 @@ MSG_REG_2(GameMsgHdr, 0x333, OnOpenAPIFailed);
 MSG_REG_2(GameMsgHdr, 0x352, OnSaleItemCancleAll);
 
 MSG_REG_2(GameMsgHdr, 0x353, OnCalcLBBattlePoint);
+MSG_REG_2(GameMsgHdr, 0x354, OnSpreadWhisper);
 MSG_REG_2(GameMsgHdr, 0x360, OnBeVoted);
 MSG_REG_2(GameMsgHdr, 0x361, OnSendPopularityAward);
 
