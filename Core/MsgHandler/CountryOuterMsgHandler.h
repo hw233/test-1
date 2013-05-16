@@ -6197,6 +6197,17 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
         case 0x04:  //仙宠免费领取
             player->getPetByLevelUp(opt);
             break;
+        case 0x06:
+            switch(opt)
+            {
+                case 0x00:
+                    player->sendBBFTInfo();
+                    break;
+                case 0x01:
+                    player->enBaseScore();
+                    break;
+            }
+            break;
         default:
             break;
     }
