@@ -202,6 +202,15 @@ namespace GObject
         DRAGONKING_MAX,
     };
 
+    enum TUIGUANG_PLATFORM  // 推广平台
+    {
+        e_pf_buyu = 4,
+        e_pf_louyi = 5,
+        e_pf_shenma = 6,
+        e_pf_konglong = 7,
+        e_pf_xiaoyu = 8
+    };
+
 	class Map;
 	class Player;
 	class ItemBase;
@@ -2103,6 +2112,7 @@ namespace GObject
         void send11DailyInfo();
         void getSSToolbarAward();
         void sendSSToolbarInfo();
+        void getQQExplorerAward(UInt8 opt);
 
         // 帮派神像
         float getClanStatueHPEffect();

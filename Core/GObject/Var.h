@@ -299,6 +299,8 @@ namespace GObject
         VAR_ACT_LOGIN_AWARD_VIP = 271, // 节日每日登陆奖励VIP
         VAR_VIP_PRIVILEGE_TIME  = 272, // VIP特权剩余时间
         VAR_VIP_PRIVILEGE_DATA  = 273, // VIP特权数据
+        VAR_TUIGUAN_AWARD_GOT = 274, // 推广平台用户奖励当天是否领取
+        VAR_QQEXPLORER_AWARD = 279, // QQ浏览器奖励是否领取
 
         // 281-290 占用 fro qiwy
         VAR_ARENA_SUPPORT = 281, //场外活动，支持的序列id
@@ -702,6 +704,8 @@ namespace GObject
             REGISTER_VAR(VAR_ACT_LOGIN_AWARD_VIP, CYCLE_DAY);
             REGISTER_VAR(VAR_VIP_PRIVILEGE_TIME, CYCLE_NONE);
             REGISTER_VAR(VAR_VIP_PRIVILEGE_DATA, CYCLE_DAY);
+            REGISTER_VAR(VAR_TUIGUAN_AWARD_GOT, CYCLE_DAY);
+            REGISTER_VAR(VAR_QQEXPLORER_AWARD, CYCLE_NONE);
 
             REGISTER_VAR(VAR_ARENA_SUPPORT, CYCLE_DAY);
             //REGISTER_VAR(VAR_ARENA_SUFFERED, CYCLE_DAY);
