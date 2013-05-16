@@ -3969,10 +3969,20 @@ void GMHandler::OnFairySpar(GObject::Player *player, std::vector<std::string>& a
         if(args.size() < 6)
             return;
         UInt8 elem1 = atoi(args[1].c_str());
+        if(elem1 > 24)
+            elem1 = 24;
         UInt8 elem2 = atoi(args[2].c_str());
+        if(elem2 > 24)
+            elem2 = 24;
         UInt8 elem3 = atoi(args[3].c_str());
+        if(elem3 > 24)
+            elem3 = 24;
         UInt8 elem4 = atoi(args[4].c_str());
+        if(elem4 > 24)
+            elem4 = 24;
         UInt8 elem5 = atoi(args[5].c_str());
+        if(elem5 > 24)
+            elem5 = 24;
         player->GetFairySpar()->gmSetElement(elem1, elem2, elem3, elem4, elem5);
     }
 }

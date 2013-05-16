@@ -180,16 +180,16 @@ namespace GObject
             switch(m_element[i])
             {
                 case 21:
-                    successProb += 1000;
+                    successProb += 100;
                 break;
                 case 22:
-                    successProb += 2000;
+                    successProb += 500;
                 break;
                 case 23:
-                    successProb += 3000;
+                    successProb += 1000;
                 break;
                 case 24:
-                    successProb += 4000;
+                    successProb += 1500;
                 break;
                 case 25:
                     atkTmp += 25;
@@ -212,16 +212,22 @@ namespace GObject
             if(atkTmp > 0)
             {
                 m_atk += atkTmp;
+                if(m_atk > atkMax[m_breakoutCnt])
+                    m_atk = atkMax[m_breakoutCnt];
                 isDirty = true;
             }
             if(magAtkTmp > 0)
             {
                 m_magAtk += magAtkTmp;
+                if(m_magAtk > magAtkMax[m_breakoutCnt])
+                    m_magAtk = magAtkMax[m_breakoutCnt];
                 isDirty = true;
             }
             if(phyTmp > 0)
             {
                 m_phy += phyTmp;
+                if(m_phy > phyMax[m_breakoutCnt])
+                    m_phy = phyMax[m_breakoutCnt];
                 isDirty = true;
             }
             if(isDirty)
@@ -391,7 +397,7 @@ namespace GObject
                 m_magAtk = magAtkMax[m_breakoutCnt];
             isDirty = true;
         }
-        if(atkTmpSum > 0 && m_phy < phyMax[m_breakoutCnt])
+        if(phyTmpSum > 0 && m_phy < phyMax[m_breakoutCnt])
         {
             m_phy += phyTmpSum;
             if(m_phy > phyMax[m_breakoutCnt])
@@ -487,6 +493,10 @@ namespace GObject
             tmp += m_curMark;
             if(tmp < 0)
                 tmp = 0;
+            if(tmp > m_curMark)
+                m_owner->sendMsgCode(0, 1367);
+            else
+                m_owner->sendMsgCode(0, 1366);
             m_curMark = tmp;
             if(m_curMark >= 100)
             {
@@ -506,6 +516,8 @@ namespace GObject
             }
 
         }
+        else
+            m_owner->sendMsgCode(0, 1366);
     }
 
     UInt8 FairySpar::getFusePercent()
