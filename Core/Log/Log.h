@@ -219,6 +219,7 @@ enum ItemFrom
     FromCFriend = 42, //好友邀请
     FromLuckyStar = 43, //充值幸运星
     FromLevelAward = 44, //等级奖励
+    FromBBFT = 45, // 八部浮屠
 };
 
 enum ItemTo

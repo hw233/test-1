@@ -6347,4 +6347,89 @@ namespace GObject
             break;
         }
     }
+
+    static int getRandomPetEqGemColorIdx(UInt32 score)
+    {
+        if(score < 400)
+            return -1;
+        int cidx = 0;
+        UInt32 chance = uRand(10000);
+        if(score <=600)
+        {
+            if(chance < (15000 - 25 * score))
+                cidx = 0;
+            else
+                cidx = 1;
+        }
+        else if(score < 1301)
+        {
+            if(chance < (18200 - 14 * score))
+                cidx = 1;
+            else
+                cidx = 2;
+        }
+        else if(score < 2001)
+        {
+            if(chance < (20000 - 10 * score))
+                cidx = 2;
+            else
+                cidx = 3;
+        }
+        else
+        {
+            return -1;
+        }
+
+        return cidx;
+    }
+
+    ItemBase* Package::AddRandomPetEq(UInt32 score, UInt32 typeId, int colorIdx)
+    {
+		if(m_Size >= m_Owner->getPacksize() + 50)
+			return NULL;
+        if(score != 0)
+            colorIdx = getRandomPetEqGemColorIdx(score);
+        if(colorIdx == -1)
+            return NULL;
+
+        int eqIdx = 0;
+        size_t eqCnt = GData::m_petEqs[colorIdx].size();
+        size_t skillCnt = GData::m_petEqSkills[colorIdx].size();
+        if(eqCnt == 0 || skillCnt == 0)
+            return NULL;
+
+        if(typeId == 0)
+            typeId = GData::m_petEqs[colorIdx][uRand(eqCnt)];
+        UInt16 skillId = GData::m_petEqSkills[colorIdx][uRand(skillCnt)];
+
+		const GData::ItemBaseType * itype = GData::itemBaseTypeManager[typeId];
+		if(itype == NULL)
+            return NULL;
+
+        UInt32 id = IDGenerator::gItemOidGenerator.ID();
+        ItemPetEqAttr ipeqAttr;
+        ItemEquipData edata;
+        equip = new ItemPetEq(id, itype, edata, ipeqAttr);
+
+        if(equip == NULL)
+            return NULL;
+        ITEM_BIND_CHECK(itype->bindType,bind);
+        equip->SetBindStatus(bind);
+
+        return AddPetEquip(equip, FromBBFT);
+    }
+
+    ItemBase* Package::AddRandomPetGem(UInt32 score, int lvIdx)
+    {
+        if(score == 0)
+            lvIdx = getRandomPetEqGemColorIdx(score);
+        if(lvIdx == -1)
+            return NULL;
+
+        int eqIdx = 0;
+        size_t gemCnt = GData::m_petGems[lvIdx].size();
+        UInt32 itemId = GData::m_petGems[lvIdx][uRand(gemCnt)];
+        return AddItem(itemId, 1, true, false, FromBBFT);
+    }
+
 }

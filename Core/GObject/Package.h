@@ -265,6 +265,9 @@ namespace GObject
         bool FinishLBSmeltSpecial(const GData::ItemBaseType * itype, ItemLingbaoAttr& lbattr, UInt8& attrNum);
         void testLingbao(UInt32 itemId, UInt32* colorNums, UInt8 size, UInt32* skills, UInt8 size2);
 
+        ItemBase* AddRandomPetEq(UInt32 score, UInt32 typeId = 0, int colorIdx = -1);
+        ItemBase* AddRandomPetGem(UInt32 score, int lvIdx = -1);
+
 	private:
 		enum {ItemClassSize = Item_Weapon + 1};
 

@@ -152,6 +152,16 @@ namespace GObject
             return 0;
         }
     };
+
+    // 仙宠内丹属性
+    struct ItemPetEqAttr
+    {
+        UInt8  lv;
+		UInt32 exp;	    //内丹经验
+        UInt16 skill;
+		UInt16 gems[4]; //精魄附加属性
+		ItemPetEqAttr(): lv(1), exp(0), skill(0), { memset(gems, 0, sizeof(gems)); }
+    };
 }
 
 #endif

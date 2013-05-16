@@ -40,6 +40,7 @@ namespace GData
 	ItemBaseTypeNameManager itemBaseTypeNameManager;
 	ObjectMapT<GObject::ItemWeapon> npcWeapons;
 	std::vector<ItemGemType *> gemTypes(1000);
+	std::vector<ItemGemType *> petGemTypes(1000);
 	ItemEquipSetTypeManager	itemEquipSetTypeManager;
     std::map<UInt16, UInt16> skill2item;
 
@@ -70,6 +71,9 @@ namespace GData
     std::vector<UInt32> GDataManager::m_udpLogItems;
     std::map<UInt16, std::vector<UInt32> > GDataManager::m_skillstrengthexp;
     std::map<UInt16, std::vector<UInt32> > GDataManager::m_skillstrengthprob;
+    std::vector<UInt32>     GDataManager::m_petEqs[4];
+    std::vector<UInt32>     GDataManager::m_petGems[4];
+    std::vector<UInt32>     GDataManager::m_petEqSkills[4];
 
 	bool GDataManager::LoadAllData()
 	{
@@ -625,6 +629,39 @@ namespace GData
 					gemTypes[wt->getId() - LGEM_ID] = igt;
 				}
 				break;
+            case Item_PetGem:
+            case Item_PetGem1:
+            case Item_PetGem2:
+            case Item_PetGem3:
+            case Item_PetGem4:
+            case Item_PetGem5:
+            case Item_PetGem6:
+            case Item_PetGem7:
+            case Item_PetGem8:
+            case Item_PetGem9:
+            case Item_PetGem10:
+            case Item_PetGem11:
+				{
+					ItemGemType * igt = new ItemGemType(idt.typeId, idt.name, idt.attrExtra);
+					wt = igt;
+					petGemTypes[wt->getId() - LPETGEM_ID] = igt;
+                    if(idt.level < 5)
+                        m_petGems[idt.level - 1].push_back(idt.typeId);
+				}
+				break;
+            case Item_PetEquip:
+            case Item_PetEquip1:
+            case Item_PetEquip2:
+            case Item_PetEquip3:
+            case Item_PetEquip4:
+            case Item_PetEquip5:
+            case Item_PetEquip6:
+            case Item_PetEquip7:
+            case Item_PetEquip8:
+            case Item_PetEquip9:
+            case Item_PetEquip10:
+                if(idt.quality > 2 && idt.quality < 6)
+                    m_petEqs[idt.quality - 2].push_back(idt.typeId);
 			default:
 				{
 					wt = new ItemNormalType(idt.typeId, idt.name);
@@ -1290,6 +1327,8 @@ namespace GData
             skill->cd = skills.cd;
             skill->effect = skillEffectManager[skills.effectid];
             skillManager.add(skill);
+            if(skills.id > 60000)
+                m_petEqSkills.push_back(skills.id);
         }
         return true;
     }

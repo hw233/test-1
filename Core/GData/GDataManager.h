@@ -136,6 +136,9 @@ namespace GData
         static std::vector<UInt32>      m_udpLogItems;
         static std::map<UInt16, std::vector<UInt32> > m_skillstrengthexp;
         static std::map<UInt16, std::vector<UInt32> > m_skillstrengthprob;
+        static std::vector<UInt32>       m_petEqs[4];
+        static std::vector<UInt32>       m_petGems[4];
+        static std::vector<UInt32>       m_petEqSkills[4];
 	};
 
     extern std::map<UInt16, UInt16> skill2item;
