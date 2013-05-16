@@ -308,6 +308,12 @@ namespace GData
             std::abort();
         }
 
+        if (!LoadPetEquipExp())
+        {
+            fprintf (stderr, "Load PetEquipLevelUpExp Table Error !\n");
+            std::abort();
+        }
+
 		return true;
 	}
 
@@ -1950,6 +1956,28 @@ namespace GData
             lyd.initBone = dbly.initBone;
             lyd.finalBone = dbly.finalBone;
             pet.setLingyaTable(lyd);
+        }
+        return true;
+    }
+
+    bool GDataManager::LoadPetEquipExp()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBPetEqExp dbeq;
+		if(execu->Prepare("SELECT `id`, `green`, `blue`, `purple`, `yellow` FROM `pet_EqLevup`", dbeq) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            Pet::EquipExpData eqd;
+            eqd.level = dbeq.id;
+            eqd.levExp[0] = dbeq.green;
+            eqd.levExp[1] = dbeq.blue;
+            eqd.levExp[2] = dbeq.purple;
+            eqd.levExp[3] = dbeq.yellow;
+            pet.setEqExpTable(eqd);
         }
         return true;
     }

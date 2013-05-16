@@ -1936,3 +1936,15 @@ CREATE TABLE IF NOT EXISTS `fairyPet` (
     PRIMARY KEY (`id`, `playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE IF NOT EXISTS `petEquipattr` (
+    `id` int(10) unsigned NOT NULL,
+    `level` tinyint(3) unsigned NOT NULL,
+    `exp` int(10) unsigned NOT NULL,
+    `skillId` smallint(6) unsigned NOT NULL,
+    `socket1` int(10) unsigned NOT NULL,
+    `socket2` int(10) unsigned NOT NULL,
+    `socket3` int(10) unsigned NOT NULL,
+    `socket4` int(10) unsigned NOT NULL,
+    PRIMARY KEY (`id`, `playerId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+

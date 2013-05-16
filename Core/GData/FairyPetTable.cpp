@@ -44,6 +44,11 @@ void Pet::setLingyaTable(Pet::LingyaData& ly)
     _lingyaData.insert(std::make_pair(ly.petId, ly));
 }
 
+void Pet::setEqExpTable(EquipExpData& eqd)
+{
+    _equipExpData.insert(std::make_pair(eqd.level, eqd));
+}
+
 Pet::PinjieData * Pet::getLevTable(UInt16 id)
 {
     std::map<UInt16, PinjieData>::iterator iter = _levData.find(id);
@@ -88,6 +93,16 @@ float Pet::getPetPotential(UInt16 id)
 {
     GenguData * ggd = getBoneTable(id);
     return ggd ? ggd->growRate : 1.0f;
+}
+
+UInt32 Pet::getEquipExpData(UInt8 lvl, int quality)
+{
+    if(quality < 0 || quality > 4)
+        return 0;
+    std::map<UInt8, EquipExpData>::iterator iter = _equipExpData.find(lvl);
+    if(iter == _equipExpData.end())
+        return 0;
+    return iter->second.levExp[quality];
 }
 
 }

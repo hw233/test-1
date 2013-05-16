@@ -533,6 +533,15 @@ struct DBLingYa
     UInt16 finalBone;
 };
 
+struct DBPetEqExp
+{
+    UInt8 id;
+    UInt32 green;
+    UInt32 blue;
+    UInt32 purple;
+    UInt32 yellow;
+};
+
 }
 
 namespace DB {
@@ -1150,6 +1159,16 @@ SPECIALDEF(5)
 	)
 SPECIALEND()
 
+SPECIALBEGIN(GData::DBPetEqExp)
+SPECIALDEF(5)
+	(
+    UInt8, id,
+    UInt32, green,
+    UInt32, blue,
+    UInt32, purple,
+    UInt32, yellow
+	)
+SPECIALEND()
 
 }
 

@@ -47,19 +47,29 @@ public:
         UInt16 initBone;
         UInt16 finalBone;
 	};
+	struct EquipExpData
+	{   //仙宠装备升级经验
+        UInt8 level;
+        UInt32 levExp[4];   //绿蓝紫橙
+        EquipExpData(): level(0)
+        { memset(levExp, 0, sizeof(levExp)); }
+	};
 public:
     void setLevTable(DBPinJie&);
     void setBoneTable(GenguData&);
     void setLingyaTable(LingyaData&);
+    void setEqExpTable(EquipExpData&);
     PinjieData * getLevTable(UInt16);
     GenguData * getBoneTable(UInt16);
     LingyaData * getLingyaTable(UInt32);
     UInt16 getPinjieBless(UInt16, UInt16);
     float getPetPotential(UInt16);
+    UInt32 getEquipExpData(UInt8, int);
 private:
     std::map<UInt16, PinjieData> _levData;
     std::map<UInt16, GenguData> _boneData;
     std::map<UInt32, LingyaData> _lingyaData;
+    std::map<UInt8, EquipExpData> _equipExpData;
 };
 
 extern Pet pet;

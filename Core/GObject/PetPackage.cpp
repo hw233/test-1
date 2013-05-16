@@ -15,7 +15,7 @@ namespace GObject
     extern URandom GRND;
 
 	PetPackage::PetPackage(Player* player) : Package(player),
-        m_PetItemSize(0), m_PetEquipSize(0)
+        m_ItemSize(0), m_EquipSize(0)
 	{
 	}
 
@@ -49,7 +49,7 @@ namespace GObject
 		ITEM_BIND_CHECK(itemType->bindType, bind);
 		item->SetBindStatus(bind);
         UInt16 oldq = item->Size(), newq = item->Size(item->Count() + num);
-        m_PetItemSize = m_PetItemSize + newq - oldq;
+        m_ItemSize = m_ItemSize + newq - oldq;
         item->IncItem(num);
         m_PetItems[ItemKey(id, bind)] = item;
 		return item;
@@ -59,7 +59,7 @@ namespace GObject
 	{
 		ItemBase *& e = m_PetEquips[ItemKey(equip->getId())];
 		if(e == NULL)
-			++ m_PetEquipSize;
+			++ m_EquipSize;
 		e = equip;
 		//SendSingleEquipData(equip);
 		return equip;
@@ -123,7 +123,7 @@ namespace GObject
 
 				ItemBase *& e = m_PetEquips[id];
 				if(e == NULL)
-					++ m_PetEquipSize;
+					++ m_EquipSize;
 				e = equip;
 				DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, 1, %"I64_FMT"u, %u)", id, m_Owner->getId(), bind ? 1 : 0);
 				DB4().PushUpdateData("INSERT INTO `equipment`(`id`, `itemId`, `maxTRank`, `trumpExp`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`) VALUES(%u, %u, %u, %u, %u, %d, %u, %d, %u, %d)", id, typeId, edata.maxTRank, edata.trumpExp, edata.extraAttr2.type1, edata.extraAttr2.value1, edata.extraAttr2.type2, edata.extraAttr2.value2, edata.extraAttr2.type3, edata.extraAttr2.value3);
@@ -146,14 +146,14 @@ namespace GObject
 
 	bool PetPackage::TryAddPetItem( ItemBase * item, UInt16 num )
 	{
-		UInt16 cur = GetPetGemPgRestSize();
+		UInt16 cur = m_ItemSize;
 		UInt16 oldq = item->Size(), newq = item->Size(item->Count() + num);
 		cur = cur - oldq + newq;
 		if(cur > INIT_PETGEM_PACK_SIZE)
 			return false;
 		if(!item->IncItem(num))
 			return false;
-		m_PetItemSize = cur;
+		m_ItemSize = cur;
 		return true;
 	}
 
@@ -161,12 +161,12 @@ namespace GObject
 	{
 		if(item->Count() < num)
 			return false;
-		UInt16 cur = m_PetItemSize;
+		UInt16 cur = m_ItemSize;
 		UInt16 oldq = item->Size(), newq = item->Size(item->Count() - num);
 		cur = cur - oldq + newq;
 		if(!item->DecItem(num))
 			return false;
-		m_PetItemSize = cur;
+		m_ItemSize = cur;
 
 		return true;
 	}

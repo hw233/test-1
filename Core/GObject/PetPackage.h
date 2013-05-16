@@ -14,8 +14,8 @@ namespace GObject
 
 	private:
         //仙宠背包相关
-        UInt16 m_PetItemSize;
-        UInt16 m_PetEquipSize;
+        UInt16 m_ItemSize;
+        UInt16 m_EquipSize;
 		ItemCont m_PetItems;
 		ItemCont m_PetEquips;
         static const UInt16 INIT_PETGEM_PACK_SIZE = 20;   //初始仙宠宝石背包大小
@@ -23,11 +23,11 @@ namespace GObject
 	public:
 		inline UInt16 GetPetGemPgRestSize() const
         {
-            return INIT_PETGEM_PACK_SIZE > m_PetItemSize ? (INIT_PETGEM_PACK_SIZE - m_PetItemSize) : 0;
+            return INIT_PETGEM_PACK_SIZE > m_ItemSize ? (INIT_PETGEM_PACK_SIZE - m_ItemSize) : 0;
         }
 		inline UInt16 GetPetEqPgRestSize() const
         {
-            return INIT_PETARM_PACK_SIZE > m_PetEquipSize ? (INIT_PETARM_PACK_SIZE - m_PetEquipSize) : 0;
+            return INIT_PETARM_PACK_SIZE > m_EquipSize ? (INIT_PETARM_PACK_SIZE - m_EquipSize) : 0;
         }
 		inline ItemBase * FindPetItem(UInt32 id, bool bind = false)
 		{

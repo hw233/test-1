@@ -884,5 +884,15 @@ CREATE TABLE `pet_pressure` (
     PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `pet_equipExp`;
+CREATE TABLE `pet_equipExp` (
+    `id` tinyint(3) unsigned NOT NULL DEFAULT 0,
+    `green` int(10) unsigned NOT NULL DEFAULT 0,
+    `blue` int(10) unsigned NOT NULL DEFAULT 0,
+    `purple` int(10) unsigned NOT NULL DEFAULT 0,
+    `yellow` int(10) unsigned NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 -- Dump completed
 
