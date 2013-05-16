@@ -29,6 +29,8 @@ class FairySpar
         float getFairySparPH();
         float getFairySparAtk();
         float getFairySparMagAtk();
+        void gmSetComplexPercent(UInt8 complexP);
+        void gmSetElement(UInt8 elem1, UInt8 elem2, UInt8 elem3, UInt8 elem4, UInt8 elem5);
 
     private:
         Player* m_owner;

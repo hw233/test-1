@@ -360,6 +360,16 @@ namespace GObject
                     atkTmp *= 2;
                 if(atkTmp > 0 && isSuccessRate(addPercentCnt))
                     atkTmp += 10;
+
+                if(magAtkTmp > 0 && (doublePercent100 || isSuccessRate(doublePercentCnt)))
+                    magAtkTmp *= 2;
+                if(magAtkTmp > 0 && isSuccessRate(addPercentCnt))
+                    magAtkTmp += 10;
+
+                if(phyTmp > 0 && (doublePercent100 || isSuccessRate(doublePercentCnt)))
+                    phyTmp *= 2;
+                if(phyTmp > 0 && isSuccessRate(addPercentCnt))
+                    phyTmp += 10;
             }
             atkTmpSum += atkTmp;
             magAtkTmpSum += magAtkTmp;
@@ -505,21 +515,63 @@ namespace GObject
         Int32 phyAdd;
         Int32 atkAdd;
         Int32 magAtkAdd;
-        if(m_phy > phyMax[m_breakoutCnt])
-            phyAdd = m_phy - phyMax[m_breakoutCnt];
-        else
+        Int32 phyAddMax;
+        Int32 atkAddMax;
+        Int32 magAtkAddMax;
+        if(m_breakoutCnt == 0)
+        {
             phyAdd = m_phy;
-        if(m_atk > atkMax[m_breakoutCnt])
-            atkAdd = m_atk - atkMax[m_breakoutCnt];
-        else
             atkAdd = m_atk;
-        if(m_magAtk > magAtkMax[m_breakoutCnt])
-            magAtkAdd = m_magAtk - magAtkMax[m_breakoutCnt];
-        else
             magAtkAdd = m_magAtk;
+            phyAddMax = phyMax[m_breakoutCnt];
+            atkAddMax = atkMax[m_breakoutCnt];
+            magAtkAddMax = magAtkMax[m_breakoutCnt];
+        }
+        else
+        {
+            UInt8 breakoutCnt = m_breakoutCnt - 1;
+            if(m_phy > phyMax[breakoutCnt])
+                phyAdd = m_phy - phyMax[breakoutCnt];
+            else
+                phyAdd = m_phy;
+            if(m_atk > atkMax[breakoutCnt])
+                atkAdd = m_atk - atkMax[breakoutCnt];
+            else
+                atkAdd = m_atk;
+            if(m_magAtk > magAtkMax[breakoutCnt])
+                magAtkAdd = m_magAtk - magAtkMax[breakoutCnt];
+            else
+                magAtkAdd = m_magAtk;
+            phyAddMax = phyMax[m_breakoutCnt] - phyMax[breakoutCnt];
+            atkAddMax = atkMax[m_breakoutCnt] - atkMax[breakoutCnt];
+            magAtkAddMax = magAtkMax[m_breakoutCnt] - magAtkMax[breakoutCnt];
+        }
         printf("---%u, %u, %u, ", phyAdd, atkAdd, magAtkAdd);
-        printf("%u, %u, %u---\n", phyMax[m_breakoutCnt], atkMax[m_breakoutCnt], magAtkMax[m_breakoutCnt]);
-        return (phyAdd+atkAdd*10+magAtkAdd*10)*100/(phyMax[m_breakoutCnt]+atkMax[m_breakoutCnt]*10+magAtkMax[m_breakoutCnt]*10);
+        printf("%u, %u, %u---\n", phyAddMax, atkAddMax, magAtkAddMax);
+        return (phyAdd+atkAdd*10+magAtkAdd*10)*100/(phyAddMax+atkAddMax*10+magAtkAddMax*10);
+    }
+
+    void FairySpar::gmSetComplexPercent(UInt8 complexP)
+    {
+        if(m_complexPercent == complexP)
+            return;
+        m_complexPercent = complexP;
+        if(m_complexPercent == 100)
+            m_curMark = 100;
+        DB3().PushUpdateData("UPDATE `fairy_spar` SET `complexPercent` = %u, `curMark` = %u WHERE `playerId` = %"I64_FMT"u", m_complexPercent, m_curMark, m_owner->getId());
+        sendAtkPhyInfo();
+        sendMarkInfo();
+    }
+
+    void FairySpar::gmSetElement(UInt8 elem1, UInt8 elem2, UInt8 elem3, UInt8 elem4, UInt8 elem5)
+    {
+        m_element[0] = elem1;
+        m_element[1] = elem2;
+        m_element[2] = elem3;
+        m_element[3] = elem4;
+        m_element[4] = elem5;
+        DB3().PushUpdateData("UPDATE `fairy_spar` SET `element1` = %u, `element2` = %u, `element3` = %u, `element4` = %u, `element5` = %u WHERE `playerId` = %"I64_FMT"u", m_element[0], m_element[1], m_element[2], m_element[3], m_element[4], m_owner->getId());
+        sendElementInfo();
     }
 
     float FairySpar::getFairySparPH()
