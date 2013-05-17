@@ -8285,6 +8285,9 @@ namespace GObject
         globalCountryBattle.sendDaily(this);
         teamCopyManager->sendDaily(this, 7);
         teamCopyManager->sendDaily(this, 11);
+
+        if(WORLD().getAccRecharge())
+            sendTodayRechargeInfo();
 	}
 
 	void Player::regenAll(bool full)
