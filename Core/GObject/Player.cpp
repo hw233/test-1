@@ -10967,7 +10967,7 @@ namespace GObject
         if(opt == 1 && v == 0)
         {
             GetPackage()->AddItem(503, 1, true, false, FromQQExplorer);
-            GetPackage()->AddItem(504, 1, true, false, FromQQExplorer);
+            GetPackage()->AddItem(514, 1, true, false, FromQQExplorer);
             GetPackage()->AddItem(1325, 1, true, false, FromQQExplorer);
             GetPackage()->AddItem(134, 1, true, false, FromQQExplorer);
             GetPackage()->AddItem(509, 1, true, false, FromQQExplorer);
