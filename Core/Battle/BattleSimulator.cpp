@@ -992,9 +992,17 @@ UInt32 BattleSimulator::doSpiritAttack(BattleFighter * bf, BattleFighter* bo, fl
         float toughFactor = pr2 ? bo->getTough(bf) : 1.0f;
         def = bo->getDefend();
         float atkreduce = bo->getAtkReduce();
-        dmg = _formula->calcDamage(atk, def, bf->getLevel(), toughFactor, atkreduce);
-        dmg *= static_cast<float>(950 + _rnd(100)) / 1000;
-        dmg = dmg > 0 ? dmg : 1;
+
+        if(bo->hasFlag(BattleFighter::IsMirror))
+        {
+            dmg = bo->getHP();
+        }
+        else
+        {
+            dmg = _formula->calcDamage(atk, def, bf->getLevel(), toughFactor, atkreduce);
+            dmg *= static_cast<float>(950 + _rnd(100)) / 1000;
+            dmg = dmg > 0 ? dmg : 1;
+        }
 
         UInt32 dmg2 = dmg;
         makeDamage(bo, dmg);
@@ -8997,6 +9005,13 @@ bool BattleSimulator::AddSkillStrengthenState(BattleFighter* pFighter, BattleFig
     }
     UInt16 nImmu = pTarget->getImmune();
     UInt16 nImmu2 = pTarget->getImmune2();
+    UInt16 colorStock = pTarget->getColorStock();
+    if(arrayState[nIndex] & colorStock)
+    {
+        appendDefStatus(e_Immune, 0, pTarget);
+        return false;
+    }
+
     if(arrayState[nIndex]& nImmu2)
     {
         pTarget->setImmune2(0);
