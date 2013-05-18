@@ -2369,6 +2369,7 @@ namespace GObject
         void addCuilianTimes();
         void doCuilian(UInt8 clType, UInt8 clOpt);
         void pickupCuilian(UInt8 clType);
+        void checkBBFT();
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

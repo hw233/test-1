@@ -20452,6 +20452,8 @@ void Player::spreadGetAwardInCountry(UInt32 spreadCount)
 
 void Player::sendBBFTInfo()
 {
+    if(!checkBBFT())
+        return;
     Stream st(REP::FAIRY_PET);
     st << static_cast<UInt8>(0x06) << static_cast<UInt8>(0x00);
     st << GetVar(VAR_PET_CUILIAN_SCORE_EQUIP);
@@ -20469,6 +20471,8 @@ void Player::sendBBFTInfo()
 
 void Player::enhanceBaseScore()
 {
+    if(!checkBBFT())
+        return;
     if(getGold() < 2)
         return;
 
@@ -20511,27 +20515,162 @@ void Player::enhanceBaseScore()
 
 void Player::addCuilianTimes()
 {
-    if(getGold() < 2)
+    if(!checkBBFT())
+        return;
+    UInt32 times = GetVar(VAR_PET_CUILIAN_GOLD_DAILY_CNT) + 1;
+
+    if(getGold() < 2*times)
         return;
 
     ConsumeInfo ci(PetBBFT,0,0);
-    useGold(2,&ci);
+    useGold(2*times, &ci);
 
+    UInt32 cnt = GetVar(VAR_PET_CUILIAN_LEFT_CNT) + 10;
     Stream st(REP::FAIRY_PET);
     st << static_cast<UInt8>(0x06) << static_cast<UInt8>(0x02);
-    st << static_cast<UInt16>(GetVar(VAR_PET_CUILIAN_LEFT_CNT));
+    st << static_cast<UInt16>(cnt);
     st << Stream::eos;
     send(st);
+
+    SetVar(VAR_PET_CUILIAN_GOLD_DAILY_CNT, times);
+    SetVar(VAR_PET_CUILIAN_LEFT_CNT, cnt);
 }
 
 void Player::doCuilian(UInt8 clType, UInt8 clOpt)
 {
+    if(!checkBBFT())
+        return;
+    UInt32 leftCnt = GetVar(VAR_PET_CUILIAN_LEFT_CNT);
+    UInt32 times = 0;
+    if(leftCnt == 0)
+        return;
+    if(clType == 0)
+        times = GetVar(VAR_PET_CUILIAN_SCORE_EQUIP_TIMES);
+    else
+        times = GetVar(VAR_PET_CUILIAN_SCORE_GEM_TIMES);
+    if(times == 10)
+        return;
+
+    ConsumeInfo ci(PetBBFT,0,0);
+    switch(clOpt)
+    {
+    case 0x00:
+        if(getTael() < 10)
+            return;
+        useTael(10, &ci);
+        break;
+    case 0x01:
+        {
+            UInt32 petLike = GetVar(VAR_FAIRYPET_LIKEABILITY);
+            if(petLike < 1)
+                return;
+            SetVar(VAR_FAIRYPET_LIKEABILITY, petLike - 1);
+        }
+        break;
+    case 0x02:
+        if(getGold() < 5)
+            return;
+        useGold(5, &ci);
+        break;
+    default:
+        return;
+    }
+
+    ++ times;
+    -- leftCnt;
+
+    UInt32 low = GetVar(VAR_PET_CUILIAN_EXTRA_LOW_SCORE) + 40;
+    UInt32 up = GetVar(VAR_PET_CUILIAN_EXTRA_UP_SCORE) + 60;
+    UInt32 score = low;
+    if(up > low)
+        score += uRand(up - low);
+    if(clType == 0)
+    {
+        score += GetVar(VAR_PET_CUILIAN_SCORE_EQUIP);
+        SetVar(VAR_PET_CUILIAN_SCORE_EQUIP, score);
+        SetVar(VAR_PET_CUILIAN_SCORE_EQUIP_TIMES, times);
+    }
+    else
+    {
+        score += GetVar(VAR_PET_CUILIAN_SCORE_GEM);
+        SetVar(VAR_PET_CUILIAN_SCORE_GEM, score);
+        SetVar(VAR_PET_CUILIAN_SCORE_GEM_TIMES, times);
+    }
+    SetVar(VAR_PET_CUILIAN_LEFT_CNT, leftCnt);
+
+    Stream st(REP::FAIRY_PET);
+    st << static_cast<UInt8>(0x06) << static_cast<UInt8>(0x03);
+    st << clType << score << static_cast<UInt8>(times) << static_cast<UInt16>(leftCnt);
+    st << Stream::eos;
+    send(st);
 }
 
 void Player::pickupCuilian(UInt8 clType)
 {
+    if(!checkBBFT())
+        return;
+    UInt32 times = 0;
+    UInt32 score = 0;
+    if(clType == 0)
+    {
+        times = GetVar(VAR_PET_CUILIAN_SCORE_EQUIP_TIMES);
+        score = GetVar(VAR_PET_CUILIAN_SCORE_EQUIP);
+    }
+    else
+    {
+        times = GetVar(VAR_PET_CUILIAN_SCORE_GEM_TIMES);
+        score = GetVar(VAR_PET_CUILIAN_SCORE_GEM);
+    }
+
+    if(times != 10)
+        return;
+
+    if(clType == 0)
+    {
+        GetPackage()->AddRandomPetEq(score);
+        SetVar(VAR_PET_CUILIAN_SCORE_EQUIP, 0);
+        SetVar(VAR_PET_CUILIAN_SCORE_EQUIP_TIMES, 0);
+    }
+    else
+    {
+        GetPackage()->AddRandomPetGem(score);
+        SetVar(VAR_PET_CUILIAN_SCORE_GEM, 0);
+        SetVar(VAR_PET_CUILIAN_SCORE_GEM_TIMES, 0);
+    }
+
+    sendBBFTInfo();
 }
 
+bool Player::checkBBFT()
+{
+    if(GetLev() < 60)
+        return false;
+
+    UInt32 now = TimeUtil::Now();
+    UInt32 today = TimeUtil::SharpDayT(0 , now);
+    UInt32 lastDate = TimeUtil::SharpDayT(0, GetVar(VAR_PET_CUILIAN_DAILY_CNT_DATE));
+    UInt32 leftCnt = GetVar(VAR_PET_CUILIAN_LEFT_CNT);
+    static UInt32 cntUp[] = {30, 60, 90, 120, 150};
+    UInt8 lvIdx = (GetLev() - 60)/10;
+    if(lvIdx > 4)
+        lvIdx = 4;
+
+    if(today != lastDate && leftCnt >= cntUp[lvIdx])
+    {
+        UInt32 factor = (lastDate == 0 ? 1 : (today - lastDate) / 86400);
+        leftCnt = std::min(leftCnt + (10 * factor), cntUp[lvIdx]);
+        SetVar(VAR_PET_CUILIAN_LEFT_CNT, leftCnt);
+        SetVar(VAR_PET_CUILIAN_DAILY_CNT_DATE, today + 86400);
+
+        Stream st(REP::FAIRY_PET);
+        st << static_cast<UInt8>(0x06) << static_cast<UInt8>(0x02);
+        st << static_cast<UInt16>(leftCnt);
+        st << Stream::eos;
+        send(st);
+    }
+
+    return true;
+}
 
 } // namespace GObject
 
