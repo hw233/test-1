@@ -852,7 +852,6 @@ void OnClanQQ( GameMsgHdr& hdr, const void * data)
     }
 }
 
-
 void OnItemHistoryReq( GameMsgHdr& hdr, ClanItemHistoryReq& req)
 {
     MSG_QUERY_PLAYER(player);

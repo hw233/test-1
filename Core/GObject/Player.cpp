@@ -687,6 +687,7 @@ namespace GObject
         m_ShuoShuo = new ShuoShuo(this);
         m_CFriend = new CFriend(this);
         m_relation = new NewRelation(this);
+		m_FairySpar = new FairySpar(this);
         m_pVars = new VarSystem(id);
         memset(&m_ctp, 0, sizeof(m_ctp));
         m_teamData = NULL;
@@ -934,6 +935,7 @@ namespace GObject
         SAFE_DELETE(m_ShuoShuo);
         SAFE_DELETE(m_CFriend);
         SAFE_DELETE(m_relation);
+		SAFE_DELETE(m_FairySpar);
 	}
 
 	UInt8 Player::GetCountryThread()
@@ -7798,6 +7800,11 @@ namespace GObject
         {
             AddVar(VAR_TOTALRECHARGEACT, r);
         }
+
+        AddVar(VAR_RECHARGE_TODAY, r);
+        GameAction()->onRecharge(this, r);
+        if(WORLD().getAccRecharge())
+            sendTodayRechargeInfo();
     }
 
     void Player::addRechargeNextRet(UInt32 r)
@@ -7909,6 +7916,12 @@ namespace GObject
         }
     }
 
+    void Player::sendTodayRechargeInfo()
+    {
+        Stream st(REP::DAILY_DATA);
+        st << static_cast<UInt8>(19) << GetVar(VAR_RECHARGE_TODAY) << static_cast<UInt8>(GetVar(VAR_RECHARGE_CONDCNT)) << Stream::eos;
+        send((st));
+    }
 
     void Player::sendRechargeInfo(bool rank)
     {
@@ -7931,6 +7944,7 @@ namespace GObject
             GLOBAL().PushMsg(hdr, &total);
         }
     }
+
     void Player::sendConsumeInfo(bool rank)
     {
         if (!World::getConsumeActive())
@@ -8271,6 +8285,9 @@ namespace GObject
         globalCountryBattle.sendDaily(this);
         teamCopyManager->sendDaily(this, 7);
         teamCopyManager->sendDaily(this, 11);
+
+        if(WORLD().getAccRecharge())
+            sendTodayRechargeInfo();
 	}
 
 	void Player::regenAll(bool full)
@@ -10941,7 +10958,30 @@ namespace GObject
         case 18:
             getLevelAward(opt);
             break;
+        case 19:
+            getQQExplorerAward(opt);
+            break;
         }
+    }
+
+    void Player::getQQExplorerAward(UInt8 opt)
+    {
+        UInt8 v = GetVar(VAR_QQEXPLORER_AWARD);
+        if(opt == 1 && v == 0)
+        {
+            GetPackage()->AddItem(503, 1, true, false, FromQQExplorer);
+            GetPackage()->AddItem(514, 1, true, false, FromQQExplorer);
+            GetPackage()->AddItem(1325, 1, true, false, FromQQExplorer);
+            GetPackage()->AddItem(134, 1, true, false, FromQQExplorer);
+            GetPackage()->AddItem(509, 1, true, false, FromQQExplorer);
+            SetVar(VAR_QQEXPLORER_AWARD, 1);
+            v = 1;
+        }
+
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(19);
+        st << v << Stream::eos;
+        send(st);
     }
 
     void Player::getSSToolbarAward()
@@ -13555,19 +13595,54 @@ namespace GObject
     }
     void Player::sendFishUserInfo()
     {
-        UInt8 today = (TimeUtil::SharpDay(0, TimeUtil::Now()) - TimeUtil::SharpDay(0, getCreated())) / DAY_SECS + 1;
-        if (today > 7)
-            return;
         UInt32 rpValue = GetVar(VAR_RP_VALUE);
-        if (rpValue != 4 && rpValue != 5)
+        UInt8 type = 0;
+        switch(rpValue)
+        {
+        case e_pf_buyu:
+            type = 9;
+            break;
+        case e_pf_louyi:
+            type = 11;
+            break;
+        case e_pf_shenma:
+            type = 12;
+            break;
+        case e_pf_konglong:
+            type = 13;
+            break;
+        case e_pf_xiaoyu:
+            type = 14;
+            break;
+        default:
             return;
+        }
+
         UInt32 v = GetVar(VAR_FISHUSER_AWARD);
+        UInt8 idx = 0;
+        for(int i = 6; i >= 0; -- i)
+        {
+            if(v & (0x01 << i))
+            {
+                idx = i + 1;
+                break;
+            }
+        }
+
+        if(0 == GetVar(VAR_TUIGUAN_AWARD_GOT))
+            ++ idx;
+
+        if (idx > 7)
+        {
+            if((v&0x80) != 0)
+                return;
+            else
+                idx = 7;
+        }
+
         Stream st(REP::RC7DAY);
-        if (4 == rpValue)
-            st << static_cast<UInt8>(9);
-        else
-            st << static_cast<UInt8>(11);
-        st << static_cast<UInt8>(today);
+        st << type;
+        st << static_cast<UInt8>(idx);
         st << static_cast<UInt8>(v);
         st << Stream::eos;
         send(st);
@@ -13577,10 +13652,9 @@ namespace GObject
         if (GetLev() < 45)
             return;
         UInt32 rpValue = GetVar(VAR_RP_VALUE);
-        if (rpValue != 4 && rpValue != 5)
-            return;
-
-        if (TimeUtil::SharpDay(0, TimeUtil::Now()) - TimeUtil::SharpDay(0, getCreated()) > 6 * DAY_SECS)
+        if (rpValue != e_pf_buyu && rpValue != e_pf_louyi
+                && rpValue != e_pf_shenma && rpValue != e_pf_konglong
+                && rpValue != e_pf_xiaoyu)
             return;
 
         UInt32 v = GetVar(VAR_FISHUSER_AWARD);
@@ -13597,6 +13671,8 @@ namespace GObject
                 GetPackage()->Add(1325,5,true);
                 v |= 0x80;
                 SetVar(VAR_FISHUSER_AWARD, v);
+                if(0 == GetVar(VAR_TUIGUAN_AWARD_GOT) && ((v&0x7F) == 0x7F))
+                    SetVar(VAR_TUIGUAN_AWARD_GOT, 1);
             }
         }
         sendFishUserInfo();
@@ -13612,11 +13688,30 @@ namespace GObject
             {{15,5},{509,5},{56,10}},
             {{15,5},{226,1},{56,10}}
         };
-        UInt8 today = (TimeUtil::SharpDay(0, TimeUtil::Now()) - TimeUtil::SharpDay(0, getCreated())) / DAY_SECS + 1;
-        if (today > 7 || today == 0)
+
+        UInt32 rpValue = GetVar(VAR_RP_VALUE);
+        if (rpValue != e_pf_buyu && rpValue != e_pf_louyi
+                && rpValue != e_pf_shenma && rpValue != e_pf_konglong
+                && rpValue != e_pf_xiaoyu)
             return;
-        UInt8 v = GetVar(VAR_FISHUSER_AWARD);
-        if ((v&(0x01<<(today-1))) == 0)
+
+        UInt8 idx = 0;
+        UInt32 v = GetVar(VAR_FISHUSER_AWARD);
+        for(int i = 6; i >= 0; -- i)
+        {
+            if(v & (0x01 << i))
+            {
+                idx = i + 1;
+                break;
+            }
+        }
+
+        if(0 == GetVar(VAR_TUIGUAN_AWARD_GOT))
+            ++ idx;
+
+        if (idx > 7 || idx == 0)
+            return;
+        if ((v&(0x01<<(idx-1))) == 0)
         {
             if (GetPackage()->GetRestPackageSize() < 3)
             {
@@ -13626,10 +13721,11 @@ namespace GObject
             getCoupon(50);
             for (UInt8 i = 0; i < 3; ++i)
             {
-                GetPackage()->Add(s_items[today-1][i].id, s_items[today-1][i].count, true);
+                GetPackage()->Add(s_items[idx-1][i].id, s_items[idx-1][i].count, true);
             }
-            v |= (0x01<<(today-1));
+            v |= (0x01<<(idx-1));
             SetVar(VAR_FISHUSER_AWARD, v); 
+            SetVar(VAR_TUIGUAN_AWARD_GOT, 1);
         }
         sendFishUserInfo();
     }

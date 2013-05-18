@@ -114,7 +114,10 @@ enum PurchaseType
     ClanBossAct2                = 103, //末日之战鼓舞攻击
     ClanBossAct3                = 104, //末日之战鼓舞身法
     LevelUpAward                = 105, //付费获得升级奖励
-    PetBBFT                     = 106, //八部浮屠
+    FairySparFreshElement       = 106, //刷新仙蕴晶石中的材料
+    FairySparFuseElement        = 107, //融合仙蕴晶石中的材料
+    FairySparBreakoutElement    = 108, //融合(突破)仙蕴晶石中的材料
+    PetBBFT                     = 109, //八部浮屠
     //繁体私有占150～200
 };
 
@@ -221,6 +224,7 @@ enum ItemFrom
     FromLuckyStar = 43, //充值幸运星
     FromLevelAward = 44, //等级奖励
     FromBBFT = 45, // 八部浮屠
+    FromQQExplorer = 46, //QQ浏览器奖励
 };
 
 enum ItemTo
