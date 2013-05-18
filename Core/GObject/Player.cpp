@@ -20367,7 +20367,6 @@ void Player::sendBBFTInfo()
     UInt32 now = TimeUtil::Now();
     st << TimeUtil::SharpDayT(1, now) - now;
     st << static_cast<UInt16>(GetVar(VAR_PET_CUILIAN_LEFT_CNT));
-    st << static_cast<UInt16>(GetVar(VAR_PET_CUILIAN_TOTAL_CNT));
     st << Stream::eos;
     send(st);
 }
@@ -20425,7 +20424,6 @@ void Player::addCuilianTimes()
     Stream st(REP::FAIRY_PET);
     st << static_cast<UInt8>(0x06) << static_cast<UInt8>(0x02);
     st << static_cast<UInt16>(GetVar(VAR_PET_CUILIAN_LEFT_CNT));
-    st << static_cast<UInt16>(GetVar(VAR_PET_CUILIAN_TOTAL_CNT));
     st << Stream::eos;
     send(st);
 }

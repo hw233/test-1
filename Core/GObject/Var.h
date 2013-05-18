@@ -297,8 +297,7 @@ namespace GObject
         VAR_VIP_PRIVILEGE_DATA  = 273, // VIP特权数据
         VAR_PET_CUILIAN_DAILY_CNT_DATE = 275, // 领取每日免费淬炼次数日期
         VAR_PET_CUILIAN_LEFT_CNT = 276,  // 剩余淬炼次数
-        VAR_PET_CUILIAN_TOTAL_CNT = 277, // 可累计淬炼次数
-        VAR_PET_CUILIAN_GOLD_DAILY_CNT = 278,  // 每日仙石购买淬炼次数
+        VAR_PET_CUILIAN_GOLD_DAILY_CNT = 277,  // 每日仙石购买淬炼次数
 
         // 281-290 占用 fro qiwy
         VAR_ARENA_SUPPORT = 281, //场外活动，支持的序列id
@@ -709,7 +708,6 @@ namespace GObject
             REGISTER_VAR(VAR_VIP_PRIVILEGE_DATA, CYCLE_DAY);
             REGISTER_VAR(VAR_PET_CUILIAN_DAILY_CNT_DATE, CYCLE_NONE);
             REGISTER_VAR(VAR_PET_CUILIAN_LEFT_CNT, CYCLE_NONE);
-            REGISTER_VAR(VAR_PET_CUILIAN_TOTAL_CNT, CYCLE_NONE);
             REGISTER_VAR(VAR_PET_CUILIAN_GOLD_DAILY_CNT, CYCLE_DAY);
 
             REGISTER_VAR(VAR_ARENA_SUPPORT, CYCLE_DAY);
