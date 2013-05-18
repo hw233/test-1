@@ -26,6 +26,7 @@
 #include "JobHunter.h"
 #include "Dreamer.h"
 #include "FairyPet.h"
+#include "FairySpar.h"
 
 
 namespace Battle
@@ -199,6 +200,15 @@ namespace GObject
         TREASURE    = 10,   //聚宝盆
 
         DRAGONKING_MAX,
+    };
+
+    enum TUIGUANG_PLATFORM  // 推广平台
+    {
+        e_pf_buyu = 4,
+        e_pf_louyi = 5,
+        e_pf_shenma = 6,
+        e_pf_konglong = 7,
+        e_pf_xiaoyu = 8
     };
 
 	class Map;
@@ -1224,6 +1234,7 @@ namespace GObject
 		void makeFighterList(Stream&);
 		void makeFighterInfo(Stream&, Fighter *, bool = true);
 		bool makeFighterInfo(Stream&, UInt32);
+        void sendTodayRechargeInfo();
         void sendRechargeInfo(bool rank = false);
         void sendConsumeInfo(bool rank = false);
         void getMDItem(UInt8 v=1);
@@ -1388,6 +1399,7 @@ namespace GObject
         ShuoShuo* GetShuoShuo(){return m_ShuoShuo;}
         CFriend* GetCFriend(){return m_CFriend;}
         NewRelation* GetNewRelation() { return m_relation; }
+        FairySpar* GetFairySpar() { return m_FairySpar; }
 		Trade* GetTrade()			{ return m_Trade; }
 		Sale* GetSale()				{ return m_Sale; }
 		Athletics* GetAthletics()	{ return m_Athletics; }
@@ -1679,6 +1691,7 @@ namespace GObject
         ShuoShuo* m_ShuoShuo;
         CFriend* m_CFriend;
         NewRelation* m_relation;
+        FairySpar* m_FairySpar;
 		MailBox* m_MailBox;
 
 		bool _isOnline;
@@ -2099,6 +2112,7 @@ namespace GObject
         void send11DailyInfo();
         void getSSToolbarAward();
         void sendSSToolbarInfo();
+        void getQQExplorerAward(UInt8 opt);
 
         // 帮派神像
         float getClanStatueHPEffect();

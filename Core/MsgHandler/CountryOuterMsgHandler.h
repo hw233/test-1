@@ -1112,6 +1112,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->GetShuoShuo()->sendShuoShuo();
     pl->GetCFriend()->sendCFriend();
     pl->GetStrengthenMgr()->CheckTimeOver(now);
+    pl->sendTodayRechargeInfo();
     pl->sendRechargeInfo();
     pl->sendConsumeInfo();
     pl->sendRechargeNextRetInfo(now);
@@ -1286,6 +1287,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->setLuckyStarCondition();
     pl->sendLuckyStarInfo(1);
     pl->getLevelAwardInfo();
+    pl->GetFairySpar()->sendAllInfo();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -4996,6 +4998,34 @@ void OnTianjieReq( GameMsgHdr& hdr, const void* data)
     GObject::Tianjie::instance().onTianjieReq(hdr, data);
 }
 
+void OnFairySparReq(GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    GObject::Clan* clan = player->getClan();
+    if (clan == NULL)
+        return;
+
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    br >> type;
+    switch(type)
+    {
+        case 0:
+            //player->GetFairySpar()->sendAllInfo();
+        break;
+        case 2:
+            player->GetFairySpar()->freshElement();
+        break;
+        case 4:
+            player->GetFairySpar()->fuseElement();
+        break;
+        case 5:
+            player->GetFairySpar()->countermark();
+        break;
+        default:
+        break;
+    }
+}
 
 void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
 {
@@ -5583,9 +5613,15 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
             }
             break;
         case 11:
+        case 13:
+        case 15:
+        case 17:
             player->getFishUserAward();
             break;
         case 12:
+        case 14:
+        case 16:
+        case 18:
             player->getFishUserPackage();
             break;
 

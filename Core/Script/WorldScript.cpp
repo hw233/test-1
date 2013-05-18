@@ -61,6 +61,8 @@ void WorldScript::init()
 	def("getThanksgiving", GObject::World::getThanksgiving);
 	def("getChristmas", GObject::World::getChristmas);
 	def("setChristmas", GObject::World::setChristmas);
+	def("getAccRecharge", GObject::World::getAccRecharge);
+	def("setAccRecharge", GObject::World::setAccRecharge);
 	def("getNewYear", GObject::World::getNewYear);
 	def("setNewYear", GObject::World::setNewYear);
 	def("getBlueactiveday", GObject::World::getBlueactiveday);

@@ -196,6 +196,7 @@ private:
     void OnClanBossOpen(GObject::Player *player, std::vector<std::string>& args);
 
     void OnSetTownDeamonMaxLevel(GObject::Player *player, std::vector<std::string>& args);
+    void OnFairySpar(GObject::Player *player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;
