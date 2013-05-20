@@ -25,7 +25,9 @@ private:
     UInt32 _overTime;
     UInt16 _xiaozhou;
     UInt16 _dazhou;
+    UInt16 _evolve;
     UInt16 _initskl[INIT_SKILL_UPMAX];
+    ItemPetEq * _equips[3];
 public:
     FairyPet(UInt32, Player *);
     void LoadFromDB(DBFairyPetData&);
@@ -33,8 +35,6 @@ public:
     void UpdateToDB();
     bool checkTimeOver();
     virtual FairyPet * clone(Player *);
-    inline bool isOnBattle()            { return _onBattle; }
-    inline void setOnBattle(bool flag)  { _onBattle = flag; }
     void upgradeLev();
     void upgradeLevAuto();
     void upgradeBone();
@@ -42,6 +42,13 @@ public:
     void sendPinjieInfo();
     void sendGenguInfo();
     void initSkillUp();
+    void AppendEquipData(Stream& st);
+    void sendModification(ItemPetEq * equip, UInt8 pos);
+    ItemPetEq * findEquip(UInt32 id, UInt8& pos);
+    ItemPetEq * setEquip(ItemPetEq * eq, UInt8& pos, bool writedb = true);
+
+    inline bool isOnBattle()            { return _onBattle; }
+    inline void setOnBattle(bool flag)  { _onBattle = flag; }
     inline void setPetBone(UInt16 v)    { _petBone = v; }
     inline void setPetLev(UInt16 v)     { _petLev = v; }
     inline void setXiaozhou(UInt16 v)   { _xiaozhou = v; }
@@ -58,7 +65,6 @@ public:
     inline UInt8 getChongNum()          { return _chong; }
     inline UInt32 getGenguBless()       { return _genguBless; }
     inline UInt16 getPinjieBless1()     { return _pinjieBless; }
-
     inline UInt8 getTargetPos()
     {
         switch (getClass())

@@ -10,6 +10,7 @@ namespace GData
 
 class Pet
 {
+#define PETEQUIP_MAXLEV 71
 public:
     struct stBless
     {
@@ -50,8 +51,9 @@ public:
 	struct EquipExpData
 	{   //仙宠装备升级经验
         UInt8 level;
+        UInt8 skillLev;
         UInt32 levExp[4];   //绿蓝紫橙
-        EquipExpData(): level(0)
+        EquipExpData(): level(0), skillLev(0)
         { memset(levExp, 0, sizeof(levExp)); }
 	};
 public:
@@ -65,6 +67,8 @@ public:
     UInt16 getPinjieBless(UInt16, UInt16);
     float getPetPotential(UInt16);
     UInt32 getEquipExpData(UInt8, int);
+    UInt8 getEquipSkillLev(UInt8);
+    UInt8 getEquipMaxLev();
 private:
     std::map<UInt16, PinjieData> _levData;
     std::map<UInt16, GenguData> _boneData;

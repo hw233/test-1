@@ -891,6 +891,7 @@ CREATE TABLE `pet_equipExp` (
     `blue` int(10) unsigned NOT NULL DEFAULT 0,
     `purple` int(10) unsigned NOT NULL DEFAULT 0,
     `yellow` int(10) unsigned NOT NULL DEFAULT 0,
+    `skillLev` tinyint(3) unsigned NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 

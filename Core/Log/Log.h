@@ -219,6 +219,8 @@ enum ItemFrom
     FromCFriend = 42, //好友邀请
     FromLuckyStar = 43, //充值幸运星
     FromLevelAward = 44, //等级奖励
+    FromPetGemMgerge = 45, //仙宠宝石合成
+    FromPetDetachGem = 46, //仙宠宝石拆卸
 };
 
 enum ItemTo
@@ -249,6 +251,10 @@ enum ItemTo
     ToDeleteMail = 151, //删除邮件
     ToDeleteTrade = 152, //删除交易
     ToLingbao = 153, // 附灵
+    ToPetEquipUpgrade = 154, //仙宠装备升级(吞噬)
+    ToPetGemMgerge = 155, //仙宠宝石合成
+    ToPetGemAttach = 156, //仙宠宝石镶嵌
+    ToPetDetachGemDesdroy = 157, //仙宠宝石拆卸
 };
 
 struct IncommingInfo

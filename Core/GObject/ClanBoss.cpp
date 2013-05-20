@@ -1558,7 +1558,7 @@ void ClanBoss::EmpowerComplete(Player* pl, UInt8 t, Player* other, bool timeFini
     broadClanInfo(cl, pl);
     sendMyStatus(pl);
 
-    if (_empower[t]-num < g_empowerFull/2 && _empower[t] >= g_empowerFull/2)
+    if ((UInt32)(_empower[t]-num) < g_empowerFull/2 && _empower[t] >= g_empowerFull/2)
     {
         SYSMSGV(str, 4200,  t+1, 50);
         sendClanBossMsg(str);

@@ -1966,7 +1966,7 @@ namespace GData
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
         DBPetEqExp dbeq;
-		if(execu->Prepare("SELECT `id`, `green`, `blue`, `purple`, `yellow` FROM `pet_EqLevup`", dbeq) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `green`, `blue`, `purple`, `yellow`, `skillLev` FROM `pet_equipExp`", dbeq) != DB::DB_OK)
 			return false;
 
 		while(execu->Next() == DB::DB_OK)
@@ -1977,6 +1977,7 @@ namespace GData
             eqd.levExp[1] = dbeq.blue;
             eqd.levExp[2] = dbeq.purple;
             eqd.levExp[3] = dbeq.yellow;
+            eqd.skillLev = dbeq.skillLev;
             pet.setEqExpTable(eqd);
         }
         return true;

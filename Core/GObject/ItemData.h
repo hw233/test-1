@@ -160,6 +160,23 @@ namespace GObject
         UInt16 skill;
         UInt16 gems[4]; //精魄附加属性
         ItemPetEqAttr(): lv(1), exp(0), skill(0) { memset(gems, 0, sizeof(gems)); }
+
+		inline void appendAttrToStream(Stream& st)
+        {
+            st << skill << lv << exp;
+            UInt8 count = 0;
+            size_t pos = st.size();
+            st << count;
+            for(UInt8 z = 0; z < sizeof(gems)/sizeof(gems[0]); ++ z)
+            {
+                if(gems[z] > 0)
+                {
+                    ++ count;
+                    st << gems[z];
+                }
+            }
+            st.data<UInt8>(pos) = count;
+        }
      };
 
 }

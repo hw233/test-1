@@ -1191,6 +1191,10 @@ struct DBFairyPetData
     UInt32 overTime;
     UInt16 xiaozhou;
     UInt16 dazhou;
+    UInt16 evolve;
+    UInt32 equip1;
+    UInt32 equip2;
+    UInt32 equip3;
 };
 
 struct DBItemSum 
@@ -1198,6 +1202,18 @@ struct DBItemSum
     UInt64 player_id;
     UInt32 item_id;
     UInt32 item_nums;
+};
+
+struct DBPetEquipAttr
+{
+    UInt32 id;
+    UInt8  level;
+    UInt32 exp;
+    UInt16 skillId;
+    UInt16 socket1;
+    UInt16 socket2;
+    UInt16 socket3;
+    UInt16 socket4;
 };
 
 }
@@ -2689,11 +2705,11 @@ SPECIALDEF(18)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBFairyPetData)
-SPECIALDEF(11)
+SPECIALDEF(15)
 (
     UInt32, id,
     UInt64, playerId,
-    UInt8, onBattle,
+    UInt8,  onBattle,
     UInt16, petLev,
     UInt16, petBone,
     UInt16, pinjieBless,
@@ -2701,7 +2717,11 @@ SPECIALDEF(11)
     UInt16, chong,
     UInt32, overTime,
     UInt16, xiaozhou,
-    UInt16, dazhou
+    UInt16, dazhou,
+    UInt16, evolve,
+    UInt32, equip1,
+    UInt32, equip2,
+    UInt32, equip3
 )
 SPECIALEND()
 
@@ -2711,6 +2731,20 @@ SPECIALDEF(3)
     UInt64, player_id,
     UInt32, item_id,
     UInt32, item_nums
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBPetEquipAttr)
+SPECIALDEF(8)
+(
+    UInt32, id,
+    UInt8,  level,
+    UInt32, exp,
+    UInt16, skillId,
+    UInt16, socket1,
+    UInt16, socket2,
+    UInt16, socket3,
+    UInt16, socket4
 )
 SPECIALEND()
 

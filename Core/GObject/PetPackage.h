@@ -29,14 +29,14 @@ namespace GObject
         {
             return INIT_PETARM_PACK_SIZE > m_EquipSize ? (INIT_PETARM_PACK_SIZE - m_EquipSize) : 0;
         }
-		inline ItemBase * FindPetItem(UInt32 id, bool bind = false)
+		inline ItemBase * FindPetItem(UInt32 id, bool bind = true)
 		{
 			item_elem_iter iter = m_PetItems.find(ItemKey(id, bind));
 			if(iter == m_PetItems.end())
 				return NULL;
 			return iter->second;
 		}
-		inline ItemPetEq * FindPetEquip(UInt32 id, bool bind = false)
+		inline ItemPetEq * FindPetEquip(UInt32 id, bool bind = true)
 		{
             item_elem_iter iter = m_PetEquips.find(ItemKey(id, bind));
 			if(iter == m_PetEquips.end())
@@ -46,7 +46,7 @@ namespace GObject
 
         ItemBase * AddItemFromDB(UInt32 id, UInt32 num, bool bind);
         ItemBase * AddExistEquip(ItemPetEq * equip, bool fromDB = false);
-	    ItemPetEq * FindPetEquip( FairyPet *& pet, UInt8& pos, UInt16 petId, UInt32 id );
+	    ItemPetEq * FindPetEquip( FairyPet *& pet, UInt16 petId, UInt8& pos, UInt32 id );
 		ItemBase*  AddPetEquip(UInt32 typeId, bool bind = false, bool silence = false, UInt8 FromWhere = 0);
 		ItemBase*  AddPetEquip(ItemEquip *, UInt8 FromWhere = 0);
 		ItemBase*  AddPetEquipN(UInt32 typeId, UInt32 num, bool bind = false, bool silence = false, UInt8 FromWhere = 0);
@@ -54,8 +54,18 @@ namespace GObject
         ItemBase* AddPetItem(UInt32 typeId, UInt32 num, bool bind = false, bool notify = false, UInt8 FromWhere = 0);
 	    bool TryDelPetItem( ItemBase * item, UInt16 num );
 	    bool DelPetItem(UInt32 id, UInt16 num, bool bind, UInt8 toWhere = 0);
-	    UInt8 MergePetGem(UInt32 gemId1, UInt32 gemId2, UInt32& ogid);
-	    UInt8 AttachPetGem(UInt32 petId, UInt32 itemId, UInt32 gemId);
+        bool DelPetEquip(UInt32 id, UInt8 toWhere = 0);
+	    UInt8 MergePetGem(UInt16 gemId1, UInt16 gemId2);
+	    UInt8 AttachPetGem(UInt32 petId, UInt32 equipId, UInt16 gemId);
+	    UInt8 DetachPetGem(UInt32 petId, UInt32 equipId, UInt8 gemPos);
+	    bool EquipTo(UInt32 id, FairyPet * pet, UInt8& pos);
+	    UInt8 equipUpgrade(UInt32 petId, UInt32 equipId, std::string& idStr);
+        UInt32 equipUpgrade(ItemPetEq *, ItemPetEq *);
+
+	    void SendPackageItemInfor();
+	    void AppendEquipData(Stream& st, ItemPetEq * equip);
+	    void SendSingleEquipData(ItemPetEq * equip, UInt8 type);
+	    void SendItemData(ItemBase * item);
 	};
 
 }

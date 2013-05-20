@@ -432,6 +432,12 @@ namespace GObject
             std::abort();
         }
 
+        if(!loadPetEquipAttr())
+        {
+            fprintf(stderr, "loadPetEquipAttr error!\n");
+            std::abort();
+        }
+
 		DB::gDataDBConnectionMgr->UnInit();
 	}
 
@@ -2039,6 +2045,33 @@ namespace GObject
 		}
 		lc.finalize();
 
+		lc.prepare("Loading fairyPet data:");
+		last_id = 0xFFFFFFFFFFFFFFFFull;
+		pl = NULL;
+		DBFairyPetData fpetdb;
+		if(execu->Prepare("SELECT `id`, `playerId`, `onBattle`, `petLev`, `petBone`, `pinjieBless`, `genguBless`, `chong`, `overTime`, `xiaozhou`, `dazhou`, `evolve`, `equip1`, `equip2`, `equip3` FROM `fairyPet` ORDER BY `playerId`", fpetdb) != DB::DB_OK)
+			return false;
+		lc.reset(200);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(fpetdb.playerId != last_id)
+			{
+				last_id = fpetdb.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+			FairyPet * pet = static_cast<FairyPet *>(pl->findFairyPet(fpetdb.id));
+			if(pet != NULL)
+            {
+                pet->LoadFromDB(fpetdb);
+                if(fpetdb.onBattle)
+                    pl->setFairypetBattle(pet, false);
+            }
+		}
+		lc.finalize();
+
 		//load all items
 		lc.prepare("Loading items:");
 		last_id = 0xFFFFFFFFFFFFFFFFull;
@@ -2067,7 +2100,9 @@ namespace GObject
             else if (!IsEquipId(idata.id))
 				pl->GetPackage()->AddItemFromDB(idata.id, idata.itemNum, idata.bindType != 0);
 #else
-			if (!IsEquipId(idata.id))
+			if (IsPetItem(idata.id))
+				pl->GetPetPackage()->AddItemFromDB(idata.id, idata.itemNum, idata.bindType != 0);
+            else if (!IsEquipId(idata.id))
             {
                 if (idata.id >= 1200 && idata.id <= 1499)
                     pl->GetPackage()->AddItemFromDB(idata.id, idata.itemNum, idata.bindType != 0);
@@ -2561,11 +2596,12 @@ namespace GObject
 		}
 		lc.finalize();
 
+        /*
 		lc.prepare("Loading fairyPet data:");
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		pl = NULL;
 		DBFairyPetData fpetdb;
-		if(execu->Prepare("SELECT `id`, `playerId`, `onBattle`, `petLev`, `petBone`, `pinjieBless`, `genguBless`, `chong`, `overTime`, `xiaozhou`, `dazhou` FROM `fairyPet` ORDER BY `playerId`", fpetdb) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `playerId`, `onBattle`, `petLev`, `petBone`, `pinjieBless`, `genguBless`, `chong`, `overTime`, `xiaozhou`, `dazhou`, `evolve`, `equip1`, `equip2`, `equip3` FROM `fairyPet` ORDER BY `playerId`", fpetdb) != DB::DB_OK)
 			return false;
 		lc.reset(200);
 		while(execu->Next() == DB::DB_OK)
@@ -2587,6 +2623,7 @@ namespace GObject
             }
 		}
 		lc.finalize();
+        */
 		/////////////////////////////////
 
 		globalPlayers.enumerate(player_load, 0);
@@ -4264,6 +4301,17 @@ namespace GObject
                 case Item_LBling:
                 case Item_LBwu:
                 case Item_LBxin:
+                case Item_PetEquip:
+                case Item_PetEquip1:
+                case Item_PetEquip2:
+                case Item_PetEquip3:
+                case Item_PetEquip4:
+                case Item_PetEquip5:
+                case Item_PetEquip6:
+                case Item_PetEquip7:
+                case Item_PetEquip8:
+                case Item_PetEquip9:
+                case Item_PetEquip10:
                 {
                     ItemEquipData ied;
                     ied.enchant = dbe.enchant;
@@ -4317,6 +4365,22 @@ namespace GObject
                         {
                             ItemLingbaoAttr lbattr;
                             equip = new ItemLingbao(dbe.id, itype, ied, lbattr);
+                        }
+                        break;
+                    case Item_PetEquip:
+                    case Item_PetEquip1:
+                    case Item_PetEquip2:
+                    case Item_PetEquip3:
+                    case Item_PetEquip4:
+                    case Item_PetEquip5:
+                    case Item_PetEquip6:
+                    case Item_PetEquip7:
+                    case Item_PetEquip8:
+                    case Item_PetEquip9:
+                    case Item_PetEquip10:
+                        {
+                            ItemPetEqAttr peAttr;
+                            equip = new ItemPetEq(dbe.id, itype, ied, peAttr);
                         }
                         break;
                     default:
@@ -5668,6 +5732,44 @@ namespace GObject
         }
         lc.finalize();
         return true;
+    }
+
+	bool GObjectManager::loadPetEquipAttr()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading petEquip attr:");
+        DBPetEquipAttr dbeqa;
+        if(execu->Prepare("SELECT `equipment`.`id`, `level`, `exp`, `skillId`, p.`socket1`, p.`socket2`, p.`socket3`, p.`socket4` FROM `petEquipattr` p LEFT JOIN `equipment` ON `equipment`.`id` = p.`id`", dbeqa) != DB::DB_OK)
+            return false;
+
+        lc.reset(2000);
+        while(execu->Next() == DB::DB_OK)
+        {
+            lc.advance();
+            std::map<UInt32, ItemEquip *>::iterator it = equips.find(dbeqa.id);
+            if(it == equips.end())
+                continue;
+
+            ItemEquip * equip = it->second;
+            if(equip == NULL)
+                continue;
+            if(IsPetEquipTypeId(equip->GetTypeId()))
+            {
+                ItemPetEqAttr& eqa = (static_cast<ItemPetEq*>(equip))->getPetEqAttr();
+                eqa.lv = dbeqa.level;
+                eqa.exp = dbeqa.exp;
+                eqa.skill = dbeqa.skillId;
+                eqa.gems[0] = dbeqa.socket1;
+                eqa.gems[1] = dbeqa.socket2;
+                eqa.gems[2] = dbeqa.socket3;
+                eqa.gems[3] = dbeqa.socket4;
+			}
+		}
+		lc.finalize();
+
+		return true;
     }
 
     bool GObjectManager::fixItem9383Leader()

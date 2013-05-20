@@ -11,6 +11,7 @@
 #include "GObject/Player.h"
 #include "GObject/CFriend.h"
 #include "GObject/Package.h"
+#include "GObject/PetPackage.h"
 #include "GObject/Fighter.h"
 #include "GObject/Clan.h"
 #include "GObject/Country.h"
@@ -513,6 +514,10 @@ void GMHandler::OnAddItem(GObject::Player * player, std::vector<std::string>& ar
 		{
 			player->GetPackage()->AddEquip(itemId);
 		}
+        else if(IsPetEquipTypeId(itemId))
+		{
+			player->GetPetPackage()->AddPetEquip(itemId);
+		}
 		else
 		{
 			++ i;
@@ -534,6 +539,10 @@ void GMHandler::OnAddItemB(GObject::Player * player, std::vector<std::string>& a
 		if(IsEquipTypeId(itemId))
 		{
 			player->GetPackage()->AddEquip(itemId, true);
+		}
+        else if(IsPetEquipTypeId(itemId))
+		{
+			player->GetPetPackage()->AddPetEquip(itemId, true);
 		}
 		else
 		{

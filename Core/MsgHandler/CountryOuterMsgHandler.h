@@ -22,6 +22,7 @@
 #include "GObject/MapObject.h"
 #include "GObject/MOAction.h"
 #include "GObject/Package.h"
+#include "GObject/PetPackage.h"
 #include "GObject/Trade.h"
 #include "GObject/TaskMgr.h"
 #include "GObject/AttainMgr.h"
@@ -1267,6 +1268,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendNewYearQzoneContinueAct();
     pl->sendFairyPetResource(); //仙宠资源
     pl->sendFairyPetList(); //仙宠列表
+    pl->GetPetPackage()->SendPackageItemInfor(); //仙宠背包列表
     if (pl->getClan() != NULL)
     {
         pl->getClan()->sendQQOpenid(pl);
@@ -6197,6 +6199,71 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
             break;
         case 0x04:  //仙宠免费领取
             player->getPetByLevelUp(opt);
+            break;
+        case 0x05:  //仙宠背包
+            {
+                switch(opt)
+                {
+                    case 0x04:
+                        {
+                            UInt32 petId = 0, equipId = 0;
+                            UInt8 pos = 0;
+                            brd >> petId >> pos >> equipId;
+                            FairyPet * pet = player->findFairyPet(petId);
+                            if(!pet) return;
+                            pet->checkTimeOver();
+                            player->GetPetPackage()->EquipTo(equipId, pet, pos);
+                        }
+                        break;
+                    case 0x05:
+                        {
+                            UInt32 petId = 0, equipId = 0;
+                            std::string idStr = "";
+                            brd >> petId >> equipId >> idStr;
+                            Stream st(REP::FAIRY_PET);
+                            st << type << opt;
+                            st << player->GetPetPackage()->equipUpgrade(petId, equipId, idStr);
+                            st << Stream::eos;
+                            player->send(st);
+                        }
+                        break;
+                    case 0x06:
+                        {
+                            UInt16 gemId1 = 0, gemId2 = 0;
+                            brd >> gemId1 >> gemId2;
+                            Stream st(REP::FAIRY_PET);
+                            st << type << opt;
+                            st << player->GetPetPackage()->MergePetGem(gemId1, gemId2);
+                            st << Stream::eos;
+                            player->send(st);
+                        }
+                        break;
+                    case 0x07:
+                        {
+                            UInt32 petId = 0, equipId = 0;
+                            UInt16 gemId = 0;
+                            brd >> petId >> equipId >> gemId;
+                            Stream st(REP::FAIRY_PET);
+                            st << type << opt;
+                            st << player->GetPetPackage()->AttachPetGem(petId, equipId, gemId);
+                            st << Stream::eos;
+                            player->send(st);
+                        }
+                        break;
+                    case 0x08:
+                        {
+                            UInt32 petId = 0, equipId = 0;
+                            UInt8 gemPos = 0;
+                            brd >> petId >> equipId >> gemPos;
+                            Stream st(REP::FAIRY_PET);
+                            st << type << opt;
+                            st << player->GetPetPackage()->DetachPetGem(petId, equipId, gemPos);
+                            st << Stream::eos;
+                            player->send(st);
+                        }
+                        break;
+                }
+            }
             break;
         default:
             break;

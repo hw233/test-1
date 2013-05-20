@@ -27,7 +27,9 @@ namespace GObject
         _xiaozhou = 0;
         _dazhou = 0;
         _overTime = 0;
+        _evolve = 0;
         memset(_initskl, 0, sizeof(_initskl));
+        memset(_equips, 0, 3 * sizeof(ItemPetEq *));
     }
 
     void FairyPet::LoadFromDB(DBFairyPetData& data)
@@ -41,6 +43,17 @@ namespace GObject
         _xiaozhou = data.xiaozhou;
         _dazhou = data.dazhou;
         _overTime = data.overTime;
+        _evolve = data.evolve;
+		ItemPetEq * equip = static_cast<ItemPetEq *>(GObjectManager::fetchEquipment(data.equip1, false));
+        //setEquip(equip, 0, false);
+        _equips[0] = equip;
+		equip = static_cast<ItemPetEq *>(GObjectManager::fetchEquipment(data.equip2, false));
+        //setEquip(equip, 1, false);
+        _equips[1] = equip;
+		equip = static_cast<ItemPetEq *>(GObjectManager::fetchEquipment(data.equip3, false));
+        //setEquip(equip, 2, false);
+        _equips[2] = equip;
+
     }
 
 
@@ -58,8 +71,9 @@ namespace GObject
     void FairyPet::UpdateToDB()
     {
         _overTime = _overTime ? _overTime : TimeUtil::SharpDayT(1);
-        DB2().PushUpdateData("REPLACE INTO `fairyPet` (`id`, `playerId`, `onBattle`, `petLev`, `petBone`, `pinjieBless`, `genguBless`, `chong`, `overTime`, `xiaozhou`, `dazhou`) VALUES (%u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", 
-                getId(), _owner->getId(), _onBattle, _petLev, _petBone, _pinjieBless, _genguBless, _chong, _overTime, _xiaozhou, _dazhou);
+        DB2().PushUpdateData("REPLACE INTO `fairyPet` (`id`, `playerId`, `onBattle`, `petLev`, `petBone`, `pinjieBless`, `genguBless`, `chong`, `overTime`, `xiaozhou`, `dazhou`, `evolve`, `equip1`, `equip2`, `equip3`) VALUES (%u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", 
+                getId(), _owner->getId(), _onBattle, _petLev, _petBone, _pinjieBless, _genguBless, _chong, _overTime, _xiaozhou, _dazhou,
+                _evolve, _equips[0] ? _equips[0]->getId() : 0, _equips[1] ? _equips[1]->getId() : 0, _equips[2] ? _equips[2]->getId() : 0);
     }
 
     bool FairyPet::checkTimeOver()
@@ -419,6 +433,86 @@ namespace GObject
         st << static_cast<UInt32>(getGenguBless() + ggd->baseProb);
         st << Stream::eos;
         _owner->send(st);
+    }
+
+    void FairyPet::AppendEquipData(Stream& st)
+    {
+        size_t pos = st.size();
+        UInt8 count = 0;
+        st << count;
+        for(UInt8 i = 0; i < 3; ++ i)
+        {
+            if(_equips[i])
+            {
+                count |= (1<<i);
+                st << _equips[i]->getId() << static_cast<UInt8>(_equips[i]->GetBindStatus() ? 1 : 0);
+                st << static_cast<UInt16>(_equips[i]->GetItemType().getId());
+                _equips[i]->getPetEqAttr().appendAttrToStream(st);
+            }
+        }
+        st.data<UInt8>(pos) = count;
+    }
+
+    void FairyPet::sendModification(ItemPetEq * equip, UInt8 pos)
+    {
+		Stream st(REP::FAIRY_PET);
+		st << static_cast<UInt8>(0x05) << static_cast<UInt8>(0x04);
+        st << getId() << pos;
+        if(equip)
+        {
+            st << equip->getId() << static_cast<UInt8>(equip->GetBindStatus() ? 1 : 0);
+            st << static_cast<UInt16>(equip->GetItemType().getId());
+            equip->getPetEqAttr().appendAttrToStream(st);
+        }
+		st << Stream::eos;
+		_owner->send(st);
+    }
+
+    ItemPetEq * FairyPet::findEquip(UInt32 id, UInt8& pos)
+    {
+        pos = 0xFF;
+        for(UInt8 i = 0; i < 3; ++ i)
+        {
+            if(_equips[i] && _equips[i]->getId() == id)
+            {
+                pos = i;
+                return _equips[i];
+            }
+        }
+        return NULL;
+    }
+
+    ItemPetEq * FairyPet::setEquip(ItemPetEq * eq, UInt8& pos, bool writedb)
+    {
+        if(pos >= 3)
+        {
+            pos = 0xFF;
+            return eq;
+        }
+        for(UInt8 i = 0; i < 3; ++ i)
+        {
+            if(i != pos && _equips[i] && eq && _equips[i]->getClass() == eq->getClass())
+            {
+                pos = 0xFF;
+                return eq;
+            }
+        }
+        ItemPetEq * old = _equips[pos];
+        if(old == NULL && eq == NULL)
+        {
+            pos = 0xFF;
+            return old;
+        }
+        _equips[pos] = eq;
+        if(writedb)
+        {
+            if(eq)
+                eq->DoEquipBind(true);
+            sendModification(eq, pos);
+            UpdateToDB();
+        }
+        setDirty();
+        return old;
     }
 
 }

@@ -535,11 +535,12 @@ struct DBLingYa
 
 struct DBPetEqExp
 {
-    UInt8 id;
+    UInt8  id;
     UInt32 green;
     UInt32 blue;
     UInt32 purple;
     UInt32 yellow;
+    UInt8  skillLev;
 };
 
 }
@@ -1160,13 +1161,14 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBPetEqExp)
-SPECIALDEF(5)
+SPECIALDEF(6)
 	(
-    UInt8, id,
+    UInt8,  id,
     UInt32, green,
     UInt32, blue,
     UInt32, purple,
-    UInt32, yellow
+    UInt32, yellow,
+    UInt8,  skillLev
 	)
 SPECIALEND()
 

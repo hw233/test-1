@@ -18532,6 +18532,8 @@ UInt8 Player::toQQGroup(bool isJoin)
             st << it->second->getPetLev();
             st << it->second->getPetBone();
             st << it->second->getChongNum();
+            st << static_cast<UInt8>(0);
+            it->second->AppendEquipData(st);
             ++ it;
         }
         st << Stream::eos;

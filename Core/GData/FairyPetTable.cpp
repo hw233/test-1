@@ -105,4 +105,17 @@ UInt32 Pet::getEquipExpData(UInt8 lvl, int quality)
     return iter->second.levExp[quality];
 }
 
+UInt8 Pet::getEquipSkillLev(UInt8 lvl)
+{
+    std::map<UInt8, EquipExpData>::iterator iter = _equipExpData.find(lvl);
+    if(iter == _equipExpData.end())
+        return 0;
+    return iter->second.skillLev;
+}
+
+UInt8 Pet::getEquipMaxLev()
+{
+    return _equipExpData.size() > PETEQUIP_MAXLEV ? _equipExpData.size() : PETEQUIP_MAXLEV;
+}
+
 }
