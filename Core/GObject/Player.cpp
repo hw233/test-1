@@ -1283,6 +1283,8 @@ namespace GObject
 #ifdef DREAMER_DEBUG
         getDreamer();
 #endif
+
+        GetFairySpar()->sendAllInfo();
 	}
 
 #define WEBDOWNLOAD 255

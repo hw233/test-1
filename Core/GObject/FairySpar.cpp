@@ -14,9 +14,9 @@ namespace GObject
 #define PHY_MAX       3
 
     const Int32 statusLevel[7] = {0,5,10,15,20,25,30};
-    const Int32 atkMax[7] = {250,500,750,1000,1250,1500,2000};
-    const Int32 magAtkMax[7] = {250,500,750,1000,1250,1500,2000};
-    const Int32 phyMax[7] = {1000,2000,3000,4000,5000,6000,8000};
+    const Int32 atkMax[7] = {100,160,240,340,460,600,800};
+    const Int32 magAtkMax[7] = {100,160,240,340,460,600,800};
+    const Int32 phyMax[7] = {1000,1600,2400,3400,4600,6000,8000};
 
     FairySpar::FairySpar(Player* player) : m_owner(player), m_atk(0), m_magAtk(0), m_phy(0), m_complexPercent(0), m_curMark(0), m_breakoutCnt(0)
     {
@@ -49,21 +49,27 @@ namespace GObject
     //血之晶石
     void FairySpar::sendAtkPhyInfo()
     {
+        if(m_breakoutCnt > 6)
+            return;
+
         Stream st(REP::FARIY_SPAR);
         UInt8 type = 1;
         st << type;
 
         st << m_atk;
         st << m_atk * m_complexPercent / 100;
-        st << GameAction()->GetFairySparParaMax(ATK_MAX, m_breakoutCnt);
+        //st << GameAction()->GetFairySparParaMax(ATK_MAX, m_breakoutCnt);
+        st << atkMax[m_breakoutCnt];
 
         st << m_magAtk;
         st << m_magAtk * m_complexPercent / 100;
-        st << GameAction()->GetFairySparParaMax(MAG_ATK_MAX, m_breakoutCnt);
+        //st << GameAction()->GetFairySparParaMax(MAG_ATK_MAX, m_breakoutCnt);
+        st << magAtkMax[m_breakoutCnt];
 
         st << m_phy;
         st << m_phy * m_complexPercent / 100;
-        st << GameAction()->GetFairySparParaMax(PHY_MAX, m_breakoutCnt);
+        //st << GameAction()->GetFairySparParaMax(PHY_MAX, m_breakoutCnt);
+        st << phyMax[m_breakoutCnt];
 
         st << m_breakoutCnt;
         st << getFusePercent();
@@ -128,13 +134,13 @@ namespace GObject
     {
         if(isCharge)
         {
-            if(m_owner->getClanProffer() < 500)
+            if(m_owner->getClanProffer() < 100)
             {
                 m_owner->sendMsgCode(0, 1360);
                 return;
             }
             ConsumeInfo ci(FairySparFreshElement, 0, 0);
-            m_owner->useClanProffer(500, &ci);
+            m_owner->useClanProffer(100, &ci);
         }
         getElement();
         sendElementInfo();
@@ -151,7 +157,7 @@ namespace GObject
             m_owner->sendMsgCode(0, 1359);
             return;
         }
-        UInt32 proffer = (getFusePercent() / 10 + 1) * 100 * (m_breakoutCnt + 1);
+        UInt32 proffer = (getFusePercent() / 10 + 1) * 50 * (m_breakoutCnt + 1);
         if(m_owner->getClanProffer() < proffer)
         {
             m_owner->sendMsgCode(0, 1360);
@@ -171,16 +177,16 @@ namespace GObject
             switch(m_element[i])
             {
                 case 21:
-                    successProb += 10;
+                    successProb += 1000;
                 break;
                 case 22:
-                    successProb += 20;
+                    successProb += 2000;
                 break;
                 case 23:
-                    successProb += 30;
+                    successProb += 3000;
                 break;
                 case 24:
-                    successProb += 40;
+                    successProb += 4000;
                 break;
                 case 25:
                     atkTmp += 25;
@@ -189,7 +195,7 @@ namespace GObject
                     magAtkTmp += 25;
                 break;
                 case 27:
-                    phyTmp += 25;
+                    phyTmp += 250;
                 break;
                 default:
                 break;
@@ -201,39 +207,37 @@ namespace GObject
             ++m_breakoutCnt;
             if(atkTmp > 0)
             {
-                m_atk = atkTmp;
+                m_atk += atkTmp;
                 isDirty = true;
             }
             if(magAtkTmp > 0)
             {
-                m_magAtk = magAtkTmp;
+                m_magAtk += magAtkTmp;
                 isDirty = true;
             }
             if(phyTmp > 0)
             {
-                m_phy = phyTmp;
+                m_phy += phyTmp;
                 isDirty = true;
             }
             if(isDirty)
-            {
-                sendAtkPhyInfo();
                 m_owner->setFightersDirty(true);
-                DB3().PushUpdateData("UPDATE `fairy_spar` SET `atk` = %u, `magAtk` = %u, `phy` = %u, `breakoutCnt` = %u  WHERE `playerId` = %"I64_FMT"u", m_atk, m_magAtk, m_phy, m_breakoutCnt, m_owner->getId());
-            }
+            sendAtkPhyInfo();
+            DB3().PushUpdateData("UPDATE `fairy_spar` SET `atk` = %u, `magAtk` = %u, `phy` = %u, `breakoutCnt` = %u  WHERE `playerId` = %"I64_FMT"u", m_atk, m_magAtk, m_phy, m_breakoutCnt, m_owner->getId());
         }
         freshElement(false);
     }
 
     void FairySpar::fuseElement()
     {
-        if(getFusePercent() == 100)
+        if(getFusePercent() >= 100)
             return fuseBreakout();
 
         if(m_breakoutCnt > 6)
             return;
         if(m_breakoutCnt == 6 && m_atk >= atkMax[m_breakoutCnt] && m_magAtk >= magAtkMax[m_breakoutCnt] && m_phy >= phyMax[m_breakoutCnt])
             return;
-        UInt32 proffer = (getFusePercent() / 10 + 1) * 100 * (m_breakoutCnt + 1);
+        UInt32 proffer = (getFusePercent() / 10 + 1) * 50 * (m_breakoutCnt + 1);
         if(m_owner->getClanProffer() < proffer)
         {
             m_owner->sendMsgCode(0, 1360);
@@ -293,7 +297,7 @@ namespace GObject
                 break;
                 case 3:
                     if(addPercent100 || prob < 2000)
-                        phyTmp += 10;
+                        phyTmp += 100;
                 break;
                 case 4:
                     if(addPercent100 || prob < 2000)
@@ -305,7 +309,7 @@ namespace GObject
                 break;
                 case 6:
                     if(addPercent100 || prob < 2000)
-                        phyTmp += 20;
+                        phyTmp += 200;
                 break;
                 case 7:
                     if(addPercent100 || prob < 2000)
@@ -317,7 +321,7 @@ namespace GObject
                 break;
                 case 9:
                     if(addPercent100 || prob < 2000)
-                        phyTmp += 30;
+                        phyTmp += 300;
                 break;
                 default:
                 break;
@@ -374,19 +378,25 @@ namespace GObject
         }
 
         bool isDirty = false;
-        if(atkTmpSum > 0)
+        if(atkTmpSum > 0 && m_atk < atkMax[m_breakoutCnt])
         {
             m_atk += atkTmpSum;
+            if(m_atk > atkMax[m_breakoutCnt])
+                m_atk = atkMax[m_breakoutCnt];
             isDirty = true;
         }
-        if(magAtkTmpSum > 0)
+        if(magAtkTmpSum > 0 && m_magAtk < magAtkMax[m_breakoutCnt])
         {
             m_magAtk += magAtkTmpSum;
+            if(m_magAtk > magAtkMax[m_breakoutCnt])
+                m_magAtk = magAtkMax[m_breakoutCnt];
             isDirty = true;
         }
-        if(atkTmpSum > 0)
+        if(atkTmpSum > 0 && m_phy < phyMax[m_breakoutCnt])
         {
             m_phy += phyTmpSum;
+            if(m_phy > phyMax[m_breakoutCnt])
+                m_phy = phyMax[m_breakoutCnt];
             isDirty = true;
         }
         if(isDirty)
@@ -395,6 +405,7 @@ namespace GObject
             m_owner->setFightersDirty(true);
             DB3().PushUpdateData("UPDATE `fairy_spar` SET `atk` = %u, `magAtk` = %u, `phy` = %u  WHERE `playerId` = %"I64_FMT"u", m_atk, m_magAtk, m_phy, m_owner->getId());
         }
+        freshElement(false);
     }
 
     void FairySpar::countermark()
@@ -499,15 +510,17 @@ namespace GObject
         if(m_phy > phyMax[m_breakoutCnt])
             phyAdd = m_phy - phyMax[m_breakoutCnt];
         else
-            phyAdd = 0;
+            phyAdd = m_phy;
         if(m_atk > atkMax[m_breakoutCnt])
             atkAdd = m_atk - atkMax[m_breakoutCnt];
         else
-            atkAdd = 0;
+            atkAdd = m_atk;
         if(m_magAtk > magAtkMax[m_breakoutCnt])
             magAtkAdd = m_magAtk - magAtkMax[m_breakoutCnt];
         else
-            magAtkAdd = 0;
+            magAtkAdd = m_magAtk;
+        printf("---%u, %u, %u, ", phyAdd, atkAdd, magAtkAdd);
+        printf("%u, %u, %u---\n", phyMax[m_breakoutCnt], atkMax[m_breakoutCnt], magAtkMax[m_breakoutCnt]);
         return (phyAdd+atkAdd*10+magAtkAdd*10)*100/(phyMax[m_breakoutCnt]+atkMax[m_breakoutCnt]*10+magAtkMax[m_breakoutCnt]*10);
     }
 
