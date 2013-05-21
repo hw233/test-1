@@ -5712,7 +5712,7 @@ namespace GObject
             return false;
         LoadingCounter lc("Loading Fairy Spar");
         DBFairySpar t;
-        if(execu->Prepare("SELECT `playerId`, `atk`, `magAtk`, `phy`, `element1`, `element2`, `element3`, `element4`, `element5`, `complexPercent`, `curMark` FROM `new_relation` ORDER BY `playerId`", t)!= DB::DB_OK)
+        if(execu->Prepare("SELECT `playerId`, `atk`, `magAtk`, `phy`, `element1`, `element2`, `element3`, `element4`, `element5`, `complexPercent`, `curMark`, `breakoutCnt` FROM `fairy_spar` ORDER BY `playerId`", t)!= DB::DB_OK)
             return false;
         lc.reset(1000);
         while(execu->Next() == DB::DB_OK)

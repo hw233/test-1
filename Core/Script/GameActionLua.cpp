@@ -1649,9 +1649,9 @@ namespace Script
         return Call<UInt32>("GetFairySparParaMax", type, count);
     }
 
-    Table GameActionLua::GetFairySparElement()
+    Table GameActionLua::GetFairySparElement(UInt8 flag)
     {
-        return Call<Table>("GetFairySparElement");
+        return Call<Table>("GetFairySparElement", flag);
     }
 
 }

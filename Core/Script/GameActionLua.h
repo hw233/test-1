@@ -369,7 +369,7 @@ namespace Script
         UInt32 GetSpreadCountForAward();
         lua_tinker::table GetSpreadAward();
         UInt32 GetFairySparParaMax(UInt8 type, UInt8 count);
-        Table GetFairySparElement();
+        Table GetFairySparElement(UInt8 flag);
 
 	private:
 		Player* _player1;	//?ű???????Ϊ????1

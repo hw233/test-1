@@ -21,23 +21,24 @@ class FairySpar
         void sendMarkInfo();
         void sendAllInfo();
         void getElement();
-        void freshElement();
+        void freshElement(bool isCharge = true);
+        void fuseBreakout();
         void fuseElement();
         void countermark();
+        UInt8 getFusePercent();
         float getFairySparPH();
         float getFairySparAtk();
         float getFairySparMagAtk();
 
     private:
         Player* m_owner;
-        UInt32 m_atk;
-        UInt32 m_magAtk;
-        UInt32 m_phy;
+        Int32 m_atk;
+        Int32 m_magAtk;
+        Int32 m_phy;
         UInt8 m_element[5];
         UInt8 m_complexPercent;
         UInt8 m_curMark;
         UInt8 m_breakoutCnt;
-        bool alreadyExistTable;
 };
 
 }

@@ -61,20 +61,30 @@ end
     绿玛瑙    :11
     白珍珠    :12
     黑珍珠    :13
-    无材料    :14
 ]]
-local elementPool = {1,2,3,4,5,6,7,8,9,10,11,12,13,14}
-local elementProb = {1000,2000,3000,4000,5000,6000,7000,8000,9000,10000,10000,10000,10000,10000}
-
-function GetFairySparElement()
+local elementPools = {
+    [1] = {1,2,3,4,5,6,7,8,9,10,11,12,13},
+    [2] = {31,32,33,34,35,36,37},
+}
+local elementProbs = {
+    [1] = {1000,2000,3000,4000,5000,6000,7000,8000,9000,9200,9500,9700,10000},
+    [2] = {5500,7500,8000,8500,9000,9500,10000},
+}
+function GetFairySparElement(flag)
     local elements = {}
     local i = 1
     local prob
+    local elementPool = elementPools[flag]
+    local elementProb = elementProbs[flag]
+
+    if elementPool == nil or elementProb == nil then
+        return elements
+    end
 
     for cnt = 1, 5 do
         prob = math.random(1,10000)
         for n = 1,#elementProb do
-            if p <= elementProb[n] then
+            if prob <= elementProb[n] then
                 i = n
                 break
             end
@@ -82,10 +92,10 @@ function GetFairySparElement()
         if elementPool[i] == nil then
             return elements
         end
+        print(elementPool[i])
         table.insert(elements, elementPool[i]);
     end
 
     return elements
 end
-
 
