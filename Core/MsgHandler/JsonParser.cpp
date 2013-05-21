@@ -542,6 +542,61 @@ int query_pay_cash_req(JsonHead* head, json_t* body, json_t* retbody, std::strin
     return 0;
 }
 
+struct RechargeInfo
+{
+    char name[64];
+    UInt32 total;
+};
+
+int query_pay_cash_top_req(JsonHead* head, json_t* body, json_t* retbody, std::string& err)
+{
+    if (!head || !body || !retbody)
+        return EUNKNOW;
+
+    char openid[36] = {0};
+    char playerId[32] = {0};
+    UInt32 areaid = 0;
+
+    body = body->child;
+    if (!body)
+        return EUNKNOW;
+
+    GET_STRING(body, "szOpenId", openid, 36);
+    GET_STRING(body, "playerId", playerId, 32);
+    json_t* val = json_find_first_label(body, "uiAreaId");
+    if (val && val->child && val->child->text)
+        areaid = atoi(val->child->text);
+
+    extern struct RechargeInfo RechargeRank4IDIP[7];
+
+    json_t* arr = json_new_array();
+    if (arr)
+    {
+        UInt32 c = 0;
+        for (UInt32 i = 0; i < 7; ++i)
+        {
+            if (!RechargeRank4IDIP[i].total)
+                break;
+
+            ++c;
+            json_t* obj = json_new_object();
+            if (obj)
+            {
+                json_insert_pair_into_object(obj, "uiAmount", my_json_new_number_u(RechargeRank4IDIP[i].total));
+                json_insert_pair_into_object(obj, "szRoleName", json_new_string(fixPlayerName(RechargeRank4IDIP[i].name).c_str()));
+                json_insert_pair_into_object(obj, "uiAreaId", my_json_new_number_u(areaid));
+                json_insert_child(arr, obj);
+            }
+        }
+
+        json_insert_pair_into_object(retbody, "pPayCashList_count", my_json_new_number_u(c));
+        json_insert_pair_into_object(retbody, "pPayCashList", arr);
+    }
+
+    head->cmd = 118;
+    return 0;
+}
+
 int query_pagoda_rsq(JsonHead* head, json_t* body, json_t* retbody, std::string& err)
 {
     if (!head || !body || !retbody)
@@ -985,6 +1040,9 @@ void jsonParser2(void * buf, int len, Stream& st)
             break;
         case 111:
             ret = query_pay_cash_req(&head, body, retbody, err);
+            break;
+        case 117:
+            ret = query_pay_cash_top_req(&head, body, retbody, err);
             break;
        
         default:
