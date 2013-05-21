@@ -170,25 +170,25 @@ namespace GObject
         {
             switch(m_element[i])
             {
-                case 31:
+                case 21:
                     successProb += 10;
                 break;
-                case 32:
+                case 22:
                     successProb += 20;
                 break;
-                case 33:
+                case 23:
                     successProb += 30;
                 break;
-                case 34:
+                case 24:
                     successProb += 40;
                 break;
-                case 35:
+                case 25:
                     atkTmp += 25;
                 break;
-                case 36:
+                case 26:
                     magAtkTmp += 25;
                 break;
-                case 37:
+                case 27:
                     phyTmp += 25;
                 break;
                 default:
@@ -399,7 +399,7 @@ namespace GObject
 
     void FairySpar::countermark()
     {
-#define MARK_ITEM_ID  515
+#define MARK_ITEM_ID  9389
         if(m_owner->GetPackage()->GetItemAnyNum(MARK_ITEM_ID) < 1)
             return;
         if(m_complexPercent >= 100)
