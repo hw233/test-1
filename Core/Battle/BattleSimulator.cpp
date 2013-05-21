@@ -1017,6 +1017,8 @@ UInt32 BattleSimulator::doSpiritAttack(BattleFighter * bf, BattleFighter* bo, fl
             onDamage(bo, true, NULL);
         }
     }
+    else if(!defend100 && !enterEvade)
+        appendDefStatus(e_damEvade, 0, bo);
     else
     {
         if(!defend100)
@@ -8649,6 +8651,8 @@ UInt32 BattleSimulator::CalcNormalAttackDamage(BattleFighter * bf, BattleObject*
         dmg = dmg > 0 ? dmg : 1;
         eStateType = e_damNormal;
     }
+    else if(!defend100 && !enterEvade)
+        eStateType = e_damEvade;
     else
     {
         if(enterEvade)
@@ -11843,6 +11847,8 @@ void BattleSimulator::doSneakAttack(BattleFighter* bf, BattleFighter* bo, bool& 
         else if(_winner == 0)
             onDamage(bo, true, NULL);
     }
+    else if(!defend100 && !enterEvade)
+        appendDefStatus(e_damEvade, 0, bo);
     else
     {
         if(defend100)
