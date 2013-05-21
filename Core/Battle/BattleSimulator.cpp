@@ -1051,7 +1051,6 @@ UInt32 BattleSimulator::doXinmoAttack(BattleFighter * bf, BattleObject* bo)
     bool enterEvade = area_target->getEvad100();
     bool defend100 = area_target->getDefend100();
 
-
     appendDefStatus(e_xinmo, 0, bf);
     bool pr = false;
     bool cs = false;
@@ -1091,6 +1090,8 @@ UInt32 BattleSimulator::doXinmoAttack(BattleFighter * bf, BattleObject* bo)
             onDamage(area_target, true, NULL);
         }
     }
+    else if(!defend100 && !enterEvade)
+        appendDefStatus(e_damEvade, 0, area_target);
     else
     {
         if(enterEvade)
