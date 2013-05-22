@@ -728,6 +728,8 @@ public:
     }
     inline static bool isRPServer()
     {return cfg.rpServer;}
+    inline static bool getGMCheck()
+    {return cfg.GMCheck;}
  
 public:
 	inline static UInt8 getWeekDay()

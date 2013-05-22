@@ -25,6 +25,7 @@
 #include "FighterProb.h"
 #include "Money.h"
 #include "Common/StringTokenizer.h"
+#include "Common/URandom.h"
 #include "EUpgradeTable.h"
 #include "GObject/HeroMemo.h"
 #include "Script/lua_tinker.h"
@@ -71,6 +72,9 @@ namespace GData
     std::vector<UInt32> GDataManager::m_udpLogItems;
     std::map<UInt16, std::vector<UInt32> > GDataManager::m_skillstrengthexp;
     std::map<UInt16, std::vector<UInt32> > GDataManager::m_skillstrengthprob;
+    std::vector<UInt16>     GDataManager::m_petEqs[4];
+    std::vector<UInt16>     GDataManager::m_petGems[20];
+    std::vector<UInt16>     GDataManager::m_petEqSkills;
 
 	bool GDataManager::LoadAllData()
 	{
@@ -311,6 +315,12 @@ namespace GData
         if (!LoadPetEquipExp())
         {
             fprintf (stderr, "Load PetEquipLevelUpExp Table Error !\n");
+            std::abort();
+        }
+
+        if (!LoadPetEqAttreffect())
+        {
+            fprintf (stderr, "Load PetEqAttreffect Table Error !\n");
             std::abort();
         }
 
@@ -648,8 +658,25 @@ namespace GData
 					ItemGemType * igt = new ItemGemType(idt.typeId, idt.name, idt.attrExtra);
 					wt = igt;
 					petGemTypes[wt->getId() - LPETGEM_ID] = igt;
+                    if(idt.reqLev > 0 && idt.reqLev <= 20)
+                        m_petGems[idt.reqLev - 1].push_back(idt.typeId);
 				}
 				break;
+            case Item_PetEquip:
+            case Item_PetEquip1:
+            case Item_PetEquip2:
+            case Item_PetEquip3:
+            case Item_PetEquip4:
+            case Item_PetEquip5:
+            case Item_PetEquip6:
+            case Item_PetEquip7:
+            case Item_PetEquip8:
+            case Item_PetEquip9:
+            case Item_PetEquip10:
+                {
+                    if(idt.quality > 2 && idt.quality < 6)
+                        m_petEqs[idt.quality - 2].push_back(idt.typeId);
+                }
 			default:
 				{
 					wt = new ItemNormalType(idt.typeId, idt.name);
@@ -1315,6 +1342,8 @@ namespace GData
             skill->cd = skills.cd;
             skill->effect = skillEffectManager[skills.effectid];
             skillManager.add(skill);
+            if(skills.id > 60000)
+                m_petEqSkills.push_back(skills.id);
         }
         return true;
     }
@@ -1983,6 +2012,35 @@ namespace GData
         return true;
     }
 
+    bool GDataManager::LoadPetEqAttreffect()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBPetEqAttreffect dbeqAttr;
+		if(execu->Prepare("SELECT `id`, `hp`, `atk`, `magatk`, `def`, `magdef`, `critical`, `pierce`, `hitrate`, `evade`, `counter`, `tough` FROM `pet_eqAttreffect`", dbeqAttr) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            Pet::EquipAttreffect eqAttr;
+            eqAttr.level = dbeqAttr.id;
+            eqAttr.effect[0] = dbeqAttr.hp;
+            eqAttr.effect[1] = dbeqAttr.atk;
+            eqAttr.effect[2] = dbeqAttr.magatk;
+            eqAttr.effect[3] = dbeqAttr.def;
+            eqAttr.effect[4] = dbeqAttr.magdef;
+            eqAttr.effect[5] = dbeqAttr.critical;
+            eqAttr.effect[6] = dbeqAttr.pierce;
+            eqAttr.effect[7] = dbeqAttr.hitrate;
+            eqAttr.effect[8] = dbeqAttr.evade;
+            eqAttr.effect[9] = dbeqAttr.counter;
+            eqAttr.effect[10] = dbeqAttr.tough;
+            pet.setEqAttreffect(eqAttr);
+        }
+        return true;
+    }
+
 	bool GDataManager::LoadMoney()
 	{
 			lua_State* L = lua_open();
@@ -2185,6 +2243,35 @@ namespace GData
     UInt8 GDataManager::GetOnlineAwardCount()
     {
         return m_OnlineAwardTime.size();
+    }
+
+    //仙宠相关
+    UInt16 GDataManager::GetPetEqTypeIdByColor(int colorIdx)
+    {
+        if(colorIdx < 0 || colorIdx >= 4)
+            return 0;
+        size_t eqCnt = m_petEqs[colorIdx].size();
+        if(eqCnt == 0)
+            return 0;
+        return m_petEqs[colorIdx][uRand(eqCnt)];
+    }
+
+    UInt16 GDataManager::GetPetGemTypeIdByLev(int lvIdx)
+    {
+        if(lvIdx < 0 || lvIdx >= 20)
+            return 0;
+        size_t gemCnt = m_petGems[lvIdx].size();
+        if(gemCnt == 0)
+            return 0;
+        return m_petGems[lvIdx][uRand(gemCnt)];
+    }
+
+    UInt16 GDataManager::GetPetEqSkill()
+    {
+        size_t cnt = m_petEqSkills.size();
+        if(cnt == 0)
+            return 0;
+        return m_petEqSkills[uRand(cnt)];
     }
 
     bool GDataManager::LoadSpiritAttrTable()

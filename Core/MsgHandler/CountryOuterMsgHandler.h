@@ -1288,6 +1288,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->setLuckyStarCondition();
     pl->sendLuckyStarInfo(1);
     pl->getLevelAwardInfo();
+    pl->GetFairySpar()->sendAllInfo();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -4998,6 +4999,34 @@ void OnTianjieReq( GameMsgHdr& hdr, const void* data)
     GObject::Tianjie::instance().onTianjieReq(hdr, data);
 }
 
+void OnFairySparReq(GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    GObject::Clan* clan = player->getClan();
+    if (clan == NULL)
+        return;
+
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    br >> type;
+    switch(type)
+    {
+        case 0:
+            //player->GetFairySpar()->sendAllInfo();
+        break;
+        case 2:
+            player->GetFairySpar()->freshElement();
+        break;
+        case 4:
+            player->GetFairySpar()->fuseElement();
+        break;
+        case 5:
+            player->GetFairySpar()->countermark();
+        break;
+        default:
+        break;
+    }
+}
 
 void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
 {
@@ -5585,9 +5614,15 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
             }
             break;
         case 11:
+        case 13:
+        case 15:
+        case 17:
             player->getFishUserAward();
             break;
         case 12:
+        case 14:
+        case 16:
+        case 18:
             player->getFishUserPackage();
             break;
 
@@ -6113,156 +6148,179 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
             }
             break;
         case 0x02:  //仙宠空间
+            switch(opt)
             {
-                switch(opt)
-                {
-                    case 0x01:
-                        player->getFariyPetSpaceInfo();
-                        break;
-                    case 0x02:
+                case 0x01:
+                    player->getFariyPetSpaceInfo();
+                    break;
+                case 0x02:
+                    {
+                        UInt8 count = 0;
+                        UInt8 isConvert = 0;
+                        brd >> count >> isConvert;
+                        player->seekFairyPet(count, isConvert);
+                    }
+                    break;
+                case 0x03:
+                    {
+                        UInt32 petId = 0;
+                        brd >> petId;
+                        UInt8 res = player->hireFairyPet(petId);
+                        Stream st(REP::FAIRY_PET);
+                        st << type << opt;
+                        st << res << petId << Stream::eos;
+                        player->send(st);
+                    }
+                    break;
+                case 0x04:
+                    {
+                        if(!player->hasChecked())
+                            return;
+                        UInt32 petId = 0;
+                        UInt8 isHas = 0;
+                        brd >> petId >> isHas;
+                        UInt8 res = player->convertFairyPet(petId, isHas);
+                        Stream st(REP::FAIRY_PET);
+                        st << type << opt;
+                        st << res << petId;
+                        st << isHas << Stream::eos;
+                        player->send(st);
+                    }
+                    break;
+                case 0x05:
+                    {
+                        if(player->getCanHirePetNum())
+                            return;
+                        UInt32 petId = GameAction()->exchangPurplePet(player);
+                        Stream st(REP::FAIRY_PET);
+                        st << type << opt << petId;
+                        st << static_cast<UInt16>(player->GetVar(VAR_FAIRYPET_LIKEABILITY));
+                        st << Stream::eos;
+                        player->send(st);
+                        if(petId)
                         {
-                            UInt8 count = 0;
-                            UInt8 isConvert = 0;
-                            brd >> count >> isConvert;
-                            player->seekFairyPet(count, isConvert);
+                            player->setCanHirePet(petId);
+                            player->writeCanHiretPet();
                         }
-                        break;
-                    case 0x03:
-                        {
-                            UInt32 petId = 0;
-                            brd >> petId;
-                            UInt8 res = player->hireFairyPet(petId);
-                            Stream st(REP::FAIRY_PET);
-                            st << type << opt;
-                            st << res << petId << Stream::eos;
-                            player->send(st);
-                        }
-                        break;
-                    case 0x04:
-                        {
-                            if(!player->hasChecked())
-                                return;
-                            UInt32 petId = 0;
-                            UInt8 isHas = 0;
-                            brd >> petId >> isHas;
-                            UInt8 res = player->convertFairyPet(petId, isHas);
-                            Stream st(REP::FAIRY_PET);
-                            st << type << opt;
-                            st << res << petId;
-                            st << isHas << Stream::eos;
-                            player->send(st);
-                        }
-                        break;
-                    case 0x05:
-                        {
-                            if(player->getCanHirePetNum())
-                                return;
-                            UInt32 petId = GameAction()->exchangPurplePet(player);
-                            Stream st(REP::FAIRY_PET);
-                            st << type << opt << petId;
-                            st << static_cast<UInt16>(player->GetVar(VAR_FAIRYPET_LIKEABILITY));
-                            st << Stream::eos;
-                            player->send(st);
-                            if(petId)
-                            {
-                                player->setCanHirePet(petId);
-                                player->writeCanHiretPet();
-                            }
-                        }
-                        break;
-                }
+                    }
+                    break;
             }
             break;
         case 0x03:  //仙宠列表
+            switch(opt)
             {
-                switch(opt)
-                {
-                    case 0x01:
-                        player->sendFairyPetList();
-                        break;
-                    case 0x02:
-                        player->sendFairyPetResource();
-                        break;
-                    case 0x03:
-                        {
-                            UInt32 petId = 0;
-                            brd >> petId;
-                            UInt32 id = player->setFairypetBattle(petId);
-                            Stream st(REP::FAIRY_PET);
-                            st << type << opt;
-                            st << id << Stream::eos;
-                            player->send(st);
-                        }
-                        break;
-                }
+                case 0x01:
+                    player->sendFairyPetList();
+                    break;
+                case 0x02:
+                    player->sendFairyPetResource();
+                    break;
+                case 0x03:
+                    {
+                        UInt32 petId = 0;
+                        brd >> petId;
+                        UInt32 id = player->setFairypetBattle(petId);
+                        Stream st(REP::FAIRY_PET);
+                        st << type << opt;
+                        st << id << Stream::eos;
+                        player->send(st);
+                    }
+                    break;
             }
             break;
         case 0x04:  //仙宠免费领取
             player->getPetByLevelUp(opt);
             break;
         case 0x05:  //仙宠背包
+            switch(opt)
             {
-                switch(opt)
-                {
-                    case 0x04:
-                        {
-                            UInt32 petId = 0, equipId = 0;
-                            UInt8 pos = 0;
-                            brd >> petId >> pos >> equipId;
-                            FairyPet * pet = player->findFairyPet(petId);
-                            if(!pet) return;
-                            pet->checkTimeOver();
-                            player->GetPetPackage()->EquipTo(equipId, pet, pos);
-                        }
-                        break;
-                    case 0x05:
-                        {
-                            UInt32 petId = 0, equipId = 0;
-                            std::string idStr = "";
-                            brd >> petId >> equipId >> idStr;
-                            Stream st(REP::FAIRY_PET);
-                            st << type << opt;
-                            st << player->GetPetPackage()->equipUpgrade(petId, equipId, idStr);
-                            st << Stream::eos;
-                            player->send(st);
-                        }
-                        break;
-                    case 0x06:
-                        {
-                            UInt16 gemId1 = 0, gemId2 = 0;
-                            brd >> gemId1 >> gemId2;
-                            Stream st(REP::FAIRY_PET);
-                            st << type << opt;
-                            st << player->GetPetPackage()->MergePetGem(gemId1, gemId2);
-                            st << Stream::eos;
-                            player->send(st);
-                        }
-                        break;
-                    case 0x07:
-                        {
-                            UInt32 petId = 0, equipId = 0;
-                            UInt16 gemId = 0;
-                            brd >> petId >> equipId >> gemId;
-                            Stream st(REP::FAIRY_PET);
-                            st << type << opt;
-                            st << player->GetPetPackage()->AttachPetGem(petId, equipId, gemId);
-                            st << Stream::eos;
-                            player->send(st);
-                        }
-                        break;
-                    case 0x08:
-                        {
-                            UInt32 petId = 0, equipId = 0;
-                            UInt8 gemPos = 0;
-                            brd >> petId >> equipId >> gemPos;
-                            Stream st(REP::FAIRY_PET);
-                            st << type << opt;
-                            st << player->GetPetPackage()->DetachPetGem(petId, equipId, gemPos);
-                            st << Stream::eos;
-                            player->send(st);
-                        }
-                        break;
-                }
+                case 0x04:
+                    {
+                        UInt32 petId = 0, equipId = 0;
+                        UInt8 pos = 0;
+                        brd >> petId >> pos >> equipId;
+                        FairyPet * pet = player->findFairyPet(petId);
+                        if(!pet) return;
+                        pet->checkTimeOver();
+                        player->GetPetPackage()->EquipTo(equipId, pet, pos);
+                    }
+                    break;
+                case 0x05:
+                    {
+                        UInt32 petId = 0, equipId = 0;
+                        std::string idStr = "";
+                        brd >> petId >> equipId >> idStr;
+                        Stream st(REP::FAIRY_PET);
+                        st << type << opt;
+                        st << player->GetPetPackage()->equipUpgrade(petId, equipId, idStr);
+                        st << Stream::eos;
+                        player->send(st);
+                    }
+                    break;
+                case 0x06:
+                    {
+                        UInt16 gemId1 = 0, gemId2 = 0, ogid = 0;
+                        brd >> gemId1 >> gemId2;
+                        Stream st(REP::FAIRY_PET);
+                        st << type << opt;
+                        st << player->GetPetPackage()->MergePetGem(gemId1, gemId2, ogid);
+                        st << ogid << Stream::eos;
+                        player->send(st);
+                    }
+                    break;
+                case 0x07:
+                    {
+                        UInt32 petId = 0, equipId = 0;
+                        UInt16 gemId = 0;
+                        brd >> petId >> equipId >> gemId;
+                        Stream st(REP::FAIRY_PET);
+                        st << type << opt;
+                        st << player->GetPetPackage()->AttachPetGem(petId, equipId, gemId);
+                        st << Stream::eos;
+                        player->send(st);
+                    }
+                    break;
+                case 0x08:
+                    {
+                        UInt32 petId = 0, equipId = 0;
+                        UInt8 gemPos = 0;
+                        brd >> petId >> equipId >> gemPos;
+                        Stream st(REP::FAIRY_PET);
+                        st << type << opt;
+                        st << player->GetPetPackage()->DetachPetGem(petId, equipId, gemPos);
+                        st << Stream::eos;
+                        player->send(st);
+                    }
+                    break;
+            }
+            break;
+        case 0x06:  //八部浮屠
+            switch(opt)
+            {
+                case 0x00:  //请求八部浮屠信息
+                    player->sendBBFTInfo();
+                    break;
+                case 0x01:  //提升基础品质
+                    player->enhanceBaseScore();
+                    break;
+                case 0x02:  //增加淬炼次数
+                    player->addCuilianTimes();
+                    break;
+                case 0x03:  //开始淬炼
+                    {
+                        UInt8 clType = 0;
+                        UInt8 clOpt = 0;
+                        brd >> clType >> clOpt;
+                        player->doCuilian(clType, clOpt);
+                    }
+                    break;
+                case 0x04:  //提取淬炼（内丹或精魄）
+                    {
+                        UInt8 clType = 0;
+                        brd >> clType;
+                        player->pickupCuilian(clType);
+                    }
+                    break;
             }
             break;
         default:

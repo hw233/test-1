@@ -171,7 +171,7 @@ namespace GObject
             {
                 if(gems[z] > 0)
                 {
-                    ++ count;
+                    count |= (1<<z);
                     st << gems[z];
                 }
             }

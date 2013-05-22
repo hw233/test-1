@@ -4,6 +4,7 @@
 #include <map>
 #include "Config.h"
 #include "GDataDBExecHelper.h"
+#include "ItemType.h"
 
 namespace GData
 {
@@ -11,6 +12,7 @@ namespace GData
 class Pet
 {
 #define PETEQUIP_MAXLEV 71
+#define PETEQUIP_ATTR 11
 public:
     struct stBless
     {
@@ -56,11 +58,20 @@ public:
         EquipExpData(): level(0), skillLev(0)
         { memset(levExp, 0, sizeof(levExp)); }
 	};
+    struct EquipAttreffect
+    {
+        UInt8 level;
+        float effect[PETEQUIP_ATTR];
+        //生命,物理攻击,法术攻击,物理防御,法术防御,暴击,破击,命中,闪避,反击,坚韧
+        EquipAttreffect(): level(0)
+        { memset(effect, 0, sizeof(effect)); }
+    };
 public:
     void setLevTable(DBPinJie&);
     void setBoneTable(GenguData&);
     void setLingyaTable(LingyaData&);
     void setEqExpTable(EquipExpData&);
+    void setEqAttreffect(EquipAttreffect&);
     PinjieData * getLevTable(UInt16);
     GenguData * getBoneTable(UInt16);
     LingyaData * getLingyaTable(UInt32);
@@ -69,11 +80,13 @@ public:
     UInt32 getEquipExpData(UInt8, int);
     UInt8 getEquipSkillLev(UInt8);
     UInt8 getEquipMaxLev();
+    float getEquipAttreffect(UInt8, ItemClass);
 private:
     std::map<UInt16, PinjieData> _levData;
     std::map<UInt16, GenguData> _boneData;
     std::map<UInt32, LingyaData> _lingyaData;
     std::map<UInt8, EquipExpData> _equipExpData;
+    std::map<UInt8, EquipAttreffect> _equipAttreffect;
 };
 
 extern Pet pet;

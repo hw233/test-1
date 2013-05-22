@@ -1102,7 +1102,7 @@ function onActivityCheck(tm)
       setGoldSnakeAct(false)
   end
 
-  if tm >= actTime2013_05_18 and tm < (actTime2013_05_18 + 10*86400) then
+  if tm >= actTime2013_05_18 and tm < (actTime2013_05_18 + 7*86400) then
       setAccRecharge(true)
   else
       setAccRecharge(false)

@@ -706,7 +706,9 @@ public:
 
     void getAttrExtraEquip(Stream& st);
 protected:
-	void rebuildEquipAttr();
+    void addAttrExtra( GData::AttrExtra& ae, const GData::AttrExtra * ext );
+    void addAttrExtra( GData::AttrExtra& ae, const GData::CittaEffect* ce );
+	virtual void rebuildEquipAttr();
 	void rebuildBattlePoint();
 	void rebuildSkillBattlePoint();
 	inline void checkDirty()

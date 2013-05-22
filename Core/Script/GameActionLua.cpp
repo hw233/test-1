@@ -155,6 +155,7 @@ namespace Script
 		lua_tinker::def(_L, "getOpenTime", GObject::World::getOpenTime);
 		lua_tinker::def(_L, "isRPServer", GObject::World::isRPServer);
 		lua_tinker::def(_L, "getAccRecharge", GObject::World::getAccRecharge);
+		lua_tinker::def(_L, "getGMCheck", GObject::World::getGMCheck);
 
         CLASS_DEF(GameActionLua, Print);
         lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);
@@ -309,6 +310,7 @@ namespace Script
         CLASS_DEF(Player, sendVipPrivilege);
         CLASS_DEF(Player, sendLuckyBagInfo);
 		CLASS_DEF(Player, LuckyBagRank);
+		CLASS_DEF(Player, updateCuilianTimes);
 
         CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);
@@ -1601,11 +1603,6 @@ namespace Script
 		return Call<UInt32>("exchangPurplePet", player);
     }
 
-	UInt32 GameActionLua::getpetGemIdByMerge(UInt16 reqLev)
-	{
-		return Call<UInt32>("getpetGemIdByMerge", reqLev);
-    }
-
     bool GameActionLua::RunVipPrivilegeAward(Player* player, UInt8 idx, UInt8 dayth)
     {
 		return Call<bool>("RunVipPrivilegeAward", player, idx, dayth);
@@ -1655,5 +1652,16 @@ namespace Script
     {
         return Call<lua_tinker::table>("GetSpreadAward");
     }
+
+    UInt32 GameActionLua::GetFairySparParaMax(UInt8 type, UInt8 count)
+    {
+        return Call<UInt32>("GetFairySparParaMax", type, count);
+    }
+
+    Table GameActionLua::GetFairySparElement(UInt8 flag)
+    {
+        return Call<Table>("GetFairySparElement", flag);
+    }
+
 }
 

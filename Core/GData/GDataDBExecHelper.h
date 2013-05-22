@@ -543,6 +543,22 @@ struct DBPetEqExp
     UInt8  skillLev;
 };
 
+struct DBPetEqAttreffect
+{
+    UInt8 id;
+    float hp;
+    float atk;
+    float magatk;
+    float def;
+    float magdef;
+    float critical;
+    float pierce;
+    float hitrate;
+    float evade;
+    float counter;
+    float tough;
+};
+
 }
 
 namespace DB {
@@ -1169,6 +1185,24 @@ SPECIALDEF(6)
     UInt32, purple,
     UInt32, yellow,
     UInt8,  skillLev
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBPetEqAttreffect)
+SPECIALDEF(12)
+	(
+    UInt8, id,
+    float, hp,
+    float, atk,
+    float, magatk,
+    float, def,
+    float, magdef,
+    float, critical,
+    float, pierce,
+    float, hitrate,
+    float, evade,
+    float, counter,
+    float, tough
 	)
 SPECIALEND()
 

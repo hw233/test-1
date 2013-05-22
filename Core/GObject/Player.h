@@ -26,6 +26,7 @@
 #include "JobHunter.h"
 #include "Dreamer.h"
 #include "FairyPet.h"
+#include "FairySpar.h"
 
 
 namespace Battle
@@ -199,6 +200,15 @@ namespace GObject
         TREASURE    = 10,   //聚宝盆
 
         DRAGONKING_MAX,
+    };
+
+    enum TUIGUANG_PLATFORM  // 推广平台
+    {
+        e_pf_buyu = 4,
+        e_pf_louyi = 5,
+        e_pf_shenma = 6,
+        e_pf_konglong = 7,
+        e_pf_xiaoyu = 8
     };
 
 	class Map;
@@ -1392,6 +1402,7 @@ namespace GObject
         ShuoShuo* GetShuoShuo(){return m_ShuoShuo;}
         CFriend* GetCFriend(){return m_CFriend;}
         NewRelation* GetNewRelation() { return m_relation; }
+        FairySpar* GetFairySpar() { return m_FairySpar; }
 		Trade* GetTrade()			{ return m_Trade; }
 		Sale* GetSale()				{ return m_Sale; }
 		Athletics* GetAthletics()	{ return m_Athletics; }
@@ -1684,6 +1695,7 @@ namespace GObject
         ShuoShuo* m_ShuoShuo;
         CFriend* m_CFriend;
         NewRelation* m_relation;
+        FairySpar* m_FairySpar;
 		MailBox* m_MailBox;
 
 		bool _isOnline;
@@ -2104,6 +2116,7 @@ namespace GObject
         void send11DailyInfo();
         void getSSToolbarAward();
         void sendSSToolbarInfo();
+        void getQQExplorerAward(UInt8 opt);
 
         // 帮派神像
         float getClanStatueHPEffect();
@@ -2352,6 +2365,16 @@ namespace GObject
         void spreadToSelf();
         void spreadGetAward();
         void spreadGetAwardInCountry(UInt32 spreadCount);
+
+    public:
+        // 八部浮屠
+        void sendBBFTInfo();
+        void updateCuilianTimes();
+        void enhanceBaseScore();
+        void addCuilianTimes();
+        void doCuilian(UInt8 clType, UInt8 clOpt);
+        void pickupCuilian(UInt8 clType);
+        bool checkBBFT();
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

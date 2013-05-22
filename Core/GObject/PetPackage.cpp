@@ -1,10 +1,11 @@
 ﻿#include "Config.h"
-#include "GData/Store.h"
 #include "Server/OidGenerator.h"
 #include "Server/SysMsg.h"
 #include "Script/GameActionLua.h"
 #include "GData/FairyPetTable.h"
 #include "GData/SkillTable.h"
+#include "GData/GDataManager.h"
+#include "GData/Store.h"
 #include "Common/StringTokenizer.h"
 #include "Common/Itoa.h"
 #include "Country.h"
@@ -17,7 +18,40 @@
 namespace GObject
 {
 
-    extern URandom GRND;
+    static int getRandomPetEqGemColorIdx(UInt32 score, UInt8 type)
+    {   //type 0:内丹 1:精魄
+        if(score < 400)
+            return -1;
+        int cidx = 0;
+        UInt32 chance = uRand(10000);
+        if(score <= 600)
+        {
+            if(chance < (15000 - 25 * score))
+                cidx = type ? 0 : 0;
+            else
+                cidx = type ? 2 : 1;
+        }
+        else if(score < 1301)
+        {
+            if(chance < (18200 - 14 * score))
+                cidx = type ? 2 : 1;
+            else
+                cidx = type ? 4 : 2;
+        }
+        else if(score < 2001)
+        {
+            if(chance < (20000 - 10 * score))
+                cidx = type ? 4 : 2;
+            else
+                cidx = type ? 6 : 3;
+        }
+        else
+        {
+            return -1;
+        }
+
+        return cidx;
+    }
 
 	PetPackage::PetPackage(Player* player) : Package(player),
         m_ItemSize(0), m_EquipSize(0)
@@ -73,8 +107,6 @@ namespace GObject
 
 	ItemPetEq * PetPackage::FindPetEquip( FairyPet *& pet, UInt16 petId, UInt8& pos, UInt32 id )
 	{
-		if(!IsPetEquipTypeId(id))
-			 return NULL;
 		if(petId == 0)
 			return FindPetEquip(id);
 		pet = m_Owner->findFairyPet(petId);
@@ -91,55 +123,35 @@ namespace GObject
 		ItemBase * item = NULL;
 		for(UInt32 i = 0; i < num; ++ i)
 		{
-			item = AddPetEquip(typeId, bind, !silence, FromWhere);
+			item = AddRandomPetEq(0, typeId, -1, FromWhere);
 		}
 		return item;
 	}
 
-	ItemBase* PetPackage::AddPetEquip(UInt32 typeId, bool bind, bool notify, UInt8 FromWhere)
+	ItemBase* PetPackage::AddPetEquip(ItemPetEq * equip, bool notify, UInt8 FromWhere)
 	{
-		if (!IsPetEquipTypeId(typeId)) return NULL;
-		if(GetPetEqPgRestSize() < 1)
+		if(equip == NULL || GetPetEqPgRestSize() < 1)
 			return NULL;
-		//Add New Equip
-		const GData::ItemBaseType * itype = GData::itemBaseTypeManager[typeId];
-		if(itype == NULL) return NULL;
-
-        ItemPetEqAttr peAttr;
-        ItemEquipData edata;
-        edata.extraAttr2.type1 = 0; edata.extraAttr2.value1 = 0;
-        edata.extraAttr2.type2 = 0; edata.extraAttr2.value2 = 0;
-        edata.extraAttr2.type3 = 0; edata.extraAttr2.value3 = 0;
-
-        UInt32 id = IDGenerator::gItemOidGenerator.ID();
-        ItemEquip * equip = new ItemPetEq(id, itype, edata, peAttr);
-        if(equip == NULL)
-            return NULL;
-        ITEM_BIND_CHECK(itype->bindType, bind);
-
-        /*
-        if (itype->subClass == Item_Trump || itype->subClass == Item_Halo || itype->subClass == Item_Fashion)
-            m_Owner->OnShuoShuo(SS_TRUMP);
-        */
-
-        ItemBase *& e = m_PetEquips[id];
+        ItemBase *& e = m_PetEquips[equip->getId()];
         if(e == NULL)
             ++ m_EquipSize;
         e = equip;
-        DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, 1, %"I64_FMT"u, %u)", id, m_Owner->getId(), bind ? 1 : 0);
-        DB4().PushUpdateData("INSERT INTO `equipment`(`id`, `itemId`, `maxTRank`, `trumpExp`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`) VALUES(%u, %u, %u, %u, %u, %d, %u, %d, %u, %d)", id, typeId, edata.maxTRank, edata.trumpExp, edata.extraAttr2.type1, edata.extraAttr2.value1, edata.extraAttr2.type2, edata.extraAttr2.value2, edata.extraAttr2.type3, edata.extraAttr2.value3);
-        if(FromWhere != 0 && itype->quality >= 4)
-            DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), typeId, id, FromWhere, TimeUtil::Now());
+		ItemEquipData& edata = equip->getItemEquipData();
+        ItemPetEqAttr& peqAttr = equip->getPetEqAttr();
+        DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, 1, %"I64_FMT"u, %u)", equip->getId(), m_Owner->getId(), equip->GetBindStatus() ? 1 : 0);
+        DB4().PushUpdateData("INSERT INTO `equipment`(`id`, `itemId`, `maxTRank`, `trumpExp`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`) VALUES(%u, %u, %u, %u, %u, %d, %u, %d, %u, %d)", equip->getId(), equip->GetTypeId(), edata.maxTRank, edata.trumpExp, edata.extraAttr2.type1, edata.extraAttr2.value1, edata.extraAttr2.type2, edata.extraAttr2.value2, edata.extraAttr2.type3, edata.extraAttr2.value3);
+        DB4().PushUpdateData("INSERT INTO `petEquipattr`(`id`, `level`, `exp`, `skillId`, `socket1`, `socket2`, `socket3`, `socket4`) VALUES(%u, %u, %u, %u, %u, %u, %u, %u)", equip->getId(), peqAttr.lv, peqAttr.exp, peqAttr.skill, peqAttr.gems[0], peqAttr.gems[1], peqAttr.gems[2], peqAttr.gems[3]);
+        if(FromWhere != 0 && equip->getQuality() >= Item_Purple)
+            DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), equip->GetTypeId(), equip->getId(), FromWhere, TimeUtil::Now());
 
-        equip->SetBindStatus(bind);
         SendSingleEquipData(static_cast<ItemPetEq *>(equip), 1);
         if(notify)
             ItemNotifyEquip(equip);
 
-        if(equip->getQuality() >= 5 && FromWhere == FromPetGemMgerge)
+        if(equip->getQuality() >= Item_Yellow && FromWhere == FromBBFT)
             SYSMSG_BROADCASTV(4156, m_Owner->getCountry(), m_Owner->getName().c_str(), equip->getQuality(), equip->getName().c_str(), 1);
         return equip;
-	}
+    }
 
 	bool PetPackage::TryAddPetItem( ItemBase * item, UInt16 num )
 	{
@@ -216,7 +228,7 @@ namespace GObject
         DB4().PushUpdateData("DELETE FROM `item` WHERE `id` = %u", id);
         DB4().PushUpdateData("DELETE FROM `equipment` WHERE `id` = %u", id);
         DB4().PushUpdateData("DELETE FROM `petEquipattr` WHERE `id` = %u", id);
-        if(toWhere != 0 && equip->getQuality() >= 3)
+        if(toWhere != 0 && equip->getQuality() >= Item_Purple)
         {
             DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), equip->GetItemType().getId(), equip->getId(), toWhere, TimeUtil::Now());
         }
@@ -259,7 +271,7 @@ namespace GObject
         if(notify)
             ItemNotify(typeId, num);
         SendItemData(item);
-        if(item->getQuality() >= 5 && FromWhere == FromPetGemMgerge)
+        if(item->getQuality() >= Item_Yellow && FromWhere == FromPetGemMgerge)
             SYSMSG_BROADCASTV(4155, m_Owner->getCountry(), m_Owner->getName().c_str(), item->getQuality(), item->getName().c_str(), num);
         AddItemCoursesLog(typeId, num, FromWhere);
         if (FromWhere != FromNpcBuy && (GData::store.getPrice(typeId) || GData::GDataManager::isInUdpItem(typeId)))
@@ -267,27 +279,28 @@ namespace GObject
         return item;
 	}
 
-	UInt8 PetPackage::MergePetGem(UInt16 gemId1, UInt16 gemId2)
+	UInt8 PetPackage::MergePetGem(UInt16 gemId1, UInt16 gemId2, UInt16& ogid)
 	{   //仙宠宝石合成
 		if (GetItemSubClass(gemId1) != Item_PetGem || GetItemSubClass(gemId2) != Item_PetGem)
-            return 1;
+            return 0;
 		if(GetPetGemPgRestSize() < 1)
 		{
 			m_Owner->sendMsgCode(0, 1011);
-			return 1;
+			return 0;
 		}
 
 		ItemBase * item1 = FindPetItem(gemId1, true);
 		ItemBase * item2 = FindPetItem(gemId2, true);
+        if(gemId1 == gemId2 && item1->Count() < 2)
+            return 0;
         if(!item1 || !item2)
-            return 1;
+            return 0;
         if(item1->getReqLev() != item2->getReqLev())
-            return 1;
+            return 0;
         if(item1->getQuality() != item2->getQuality())
-            return 1;
+            return 0;
         if(item1->getReqLev() >= 20 && item1->getQuality() >= 5)
-            return 1;
-        UInt32 ogid = 0;
+            return 0;
         if(gemId1 == gemId2)
             ogid = gemId1 + 1;
         else
@@ -298,31 +311,36 @@ namespace GObject
             else if(rnd < 8000)
                 ogid = gemId2 + 1;
             else
-                ogid = GameAction()->getpetGemIdByMerge(item1->getReqLev() + 1);
+                ogid = GData::GDataManager::GetPetGemTypeIdByLev(item1->getReqLev());
         }
         if(GetItemSubClass(ogid) != Item_PetGem)
-            return 1;
-	    DelPetItem(gemId1, 1, true, ToPetGemMgerge);
-	    DelPetItem(gemId2, 1, true, ToPetGemMgerge);
+            return 0;
+        if(gemId1 == gemId2)
+            DelPetItem(gemId1, 2, true, ToPetGemMgerge);
+        else
+        {
+            DelPetItem(gemId1, 1, true, ToPetGemMgerge);
+            DelPetItem(gemId2, 1, true, ToPetGemMgerge);
+        }
 	    AddPetItem(ogid, 1, true, true, FromPetGemMgerge);
-		return 0;
+		return 1;
 	}
 
 	UInt8 PetPackage::AttachPetGem(UInt32 petId, UInt32 equipId, UInt16 gemId)
 	{   //仙宠宝石镶嵌
-		if (GetItemSubClass(gemId) != Item_PetGem) return 1;
+		if (GetItemSubClass(gemId) != Item_PetGem) return 0;
 		FairyPet * pet = NULL;
         UInt8 pos = 0;
 		ItemPetEq * equip = FindPetEquip(pet, petId, pos, equipId);
 		if(equip == NULL)
-			return 1;
+			return 0;
         GData::ItemGemType * igt = GData::petGemTypes[gemId - LPETGEM_ID];
         if(!igt)
-            return 1;
+            return 0;
 
         ItemPetEqAttr& peAttr = equip->getPetEqAttr();
 		UInt8 pempty = 0xFF;
-		for(int i = 0; i < (int)(equip->getQuality()) - 2 && i < (int)(sizeof(peAttr.gems)/sizeof(peAttr.gems[0])); ++ i)
+		for(int i = 0; i <= (int)(equip->getQuality()) - 2 && i < (int)(sizeof(peAttr.gems)/sizeof(peAttr.gems[0])); ++ i)
 		{
 			if(peAttr.gems[i] == 0)
 			{
@@ -333,16 +351,16 @@ namespace GObject
             {
                 const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[peAttr.gems[i]];
                 if(!itemType || itemType->subClass == equip->getClass())
-				    return 1;
+				    return 0;
             }
 		}
 		if(pempty == 0xFF)
-            return 1;
+            return 0;
 		if(!DelPetItem(gemId, 1, true, ToPetGemAttach))
-			return 1;
+			return 0;
 		peAttr.gems[pempty] = gemId;
 	    equip->DoEquipBind(true);
-		DB4().PushUpdateData("UPDATE `petEquipAttr` SET `socket%u` = %u WHERE `id` = %u", pempty + 1, peAttr.gems[pempty], equip->getId());
+		DB4().PushUpdateData("UPDATE `petEquipattr` SET `socket%u` = %u WHERE `id` = %u", pempty + 1, peAttr.gems[pempty], equip->getId());
 
 		if(pet != NULL)
 		{
@@ -351,31 +369,31 @@ namespace GObject
 		}
 		else
 			SendSingleEquipData(equip, 2);
-		return 0;
+		return 1;
 	}
 
 	UInt8 PetPackage::DetachPetGem(UInt32 petId, UInt32 equipId, UInt8 gemPos)
 	{   //仙宠宝石拆卸
         if(gemPos >= 4)
-            return 1;
+            return 0;
 		if(GetPetGemPgRestSize() < 1)
 		{
 			m_Owner->sendMsgCode(0, 1011);
-			return 1;
+			return 0;
 		}
 		FairyPet * pet = NULL;
         UInt8 pos= 0;
 		ItemPetEq * equip = FindPetEquip(pet, petId, pos, equipId);
 		if(equip == NULL)
-			return 1;
+			return 0;
         ItemPetEqAttr& peAttr = equip->getPetEqAttr();
         UInt16 oldGem = peAttr.gems[gemPos];
         if(oldGem == 0)
-            return 1;
+            return 0;
 		peAttr.gems[gemPos] = 0;
         AddPetItem(oldGem, 1, true, true, FromPetDetachGem);
 	    equip->DoEquipBind(true);
-		DB4().PushUpdateData("UPDATE `petEquipAttr` SET `socket%u` = %u WHERE `id` = %u", gemPos, 0, equip->getId());
+		DB4().PushUpdateData("UPDATE `petEquipattr` SET `socket%u` = %u WHERE `id` = %u", gemPos, 0, equip->getId());
 
 		if(pet != NULL)
 		{
@@ -384,7 +402,7 @@ namespace GObject
 		}
 		else
 			SendSingleEquipData(equip, 2);
-		return 0;
+		return 1;
 	}
 
 	bool PetPackage::EquipTo(UInt32 id, FairyPet * pet, UInt8& pos)
@@ -431,17 +449,27 @@ namespace GObject
 		ItemPetEq * equip = FindPetEquip(pet, petId, pos, equipId);
         ItemPetEq * eatEq = NULL;
 		if(equip == NULL)
-			return 1;
+			return 0;
         StringTokenizer tk(idStr, ",");
         ItemPetEqAttr & peAttr = equip->getPetEqAttr();
         if(peAttr.lv >= GData::pet.getEquipMaxLev())
-            return 1;
+            return 0;
         for(UInt8 i = 0; i < tk.count(); ++i)
         {
             UInt32 id = atoi(tk[i].c_str());
             eatEq = FindPetEquip(id);
             if(eatEq == NULL)
                 continue;
+            bool hasGem = false;
+            for(UInt8 i = 0; i < sizeof(peAttr.gems)/sizeof(peAttr.gems[0]); ++ i)
+            {
+		        if(GetItemSubClass(eatEq->getPetEqAttr().gems[i]) == Item_PetGem)
+                {
+                    hasGem = true;
+                    break;
+                }
+            }
+            if(hasGem) continue;
             UInt32 res = equipUpgrade(equip, eatEq);
             if(res > 0)
             {
@@ -451,9 +479,19 @@ namespace GObject
             }
         }
         UInt8 skillLev = GData::pet.getEquipSkillLev(peAttr.lv);
-        if(skillLev)
+        if(skillLev && SKILLANDLEVEL(SKILL_ID(peAttr.skill), skillLev) != peAttr.skill)
+        {
             peAttr.skill = SKILLANDLEVEL(SKILL_ID(peAttr.skill), skillLev);
-		DB4().PushUpdateData("UPDATE `petEquipAttr` SET `exp` = %u, `level` = %u, `skillId` = %u WHERE `id` = %u", peAttr.exp, peAttr.lv, peAttr.skill, equipId);
+            /*
+            if (pet)
+            {
+                std::string skills = Itoa(peAttr.skill);
+                pet->setSkills(skills, false);
+                pet->updateToDBPetSkill();
+            }
+            */
+        }
+		DB4().PushUpdateData("UPDATE `petEquipattr` SET `exp` = %u, `level` = %u, `skillId` = %u WHERE `id` = %u", peAttr.exp, peAttr.lv, peAttr.skill, equipId);
 		if(pet != NULL)
 		{
 			pet->setDirty();
@@ -461,21 +499,28 @@ namespace GObject
 		}
 		else
 			SendSingleEquipData(equip, 2);
-		return 0;
+		return 1;
 	}
 
     UInt32 PetPackage::equipUpgrade(ItemPetEq * equip, ItemPetEq * eatEq)
     {
         ItemPetEqAttr & peAttr = equip->getPetEqAttr();
-        UInt32 upExp = GData::pet.getEquipExpData(peAttr.lv + 1, equip->getQuality() - 2);
+        UInt32 upExp = GData::pet.getEquipExpData(peAttr.lv, equip->getQuality() - 2);
         if(upExp == 0) return 0;
         peAttr.exp += (eatEq->GetItemType().trumpExp + eatEq->getPetEqAttr().exp);
         if(peAttr.exp >= upExp)
         {
-            if(++peAttr.lv >= GData::pet.getEquipMaxLev())
+            UInt8 maxLev = GData::pet.getEquipMaxLev();
+            UInt8 tmp = peAttr.lv;
+            for(UInt8 i = tmp; i <= maxLev; ++ i)
             {
-                peAttr.lv = GData::pet.getEquipMaxLev();
-                peAttr.exp = upExp;
+                if(peAttr.exp < GData::pet.getEquipExpData(i, equip->getQuality() - 2))
+                    break;
+                ++ peAttr.lv;
+            }
+            if(peAttr.lv >= maxLev)
+            {
+                peAttr.lv = maxLev;
                 return 1;
             }
         }
@@ -504,7 +549,7 @@ namespace GObject
 	void PetPackage::AppendEquipData(Stream& st, ItemPetEq * equip)
 	{
 		st << equip->getId() << static_cast<UInt8>(equip->GetBindStatus() ? 1 : 0);
-		st << static_cast<UInt16>(equip->GetItemType().getId());
+		st << equip->GetTypeId();
         equip->getPetEqAttr().appendAttrToStream(st);
 	}
 
@@ -531,6 +576,68 @@ namespace GObject
 		st << Stream::eos;
 		m_Owner->send(st);
 	}
+
+    ItemBase* PetPackage::AddRandomPetEq(UInt32 score, UInt32 typeId, int colorIdx, UInt8 FromWhere)
+    {
+		if(GetPetEqPgRestSize() < 1)
+		{
+			m_Owner->sendMsgCode(0, 1011);
+			return NULL;
+		}
+		const GData::ItemBaseType * itype = NULL;
+        if(score != 0)
+            colorIdx = getRandomPetEqGemColorIdx(score, 0);
+        else
+        {
+            if(typeId != 0)
+            {
+		        itype = GData::itemBaseTypeManager[typeId];
+                if(itype == NULL)
+                    return NULL;
+                colorIdx = itype->quality - 2;
+            }
+        }
+        if(colorIdx < 0)
+            return NULL;
+        if(typeId == 0)
+            typeId = GData::GDataManager::GetPetEqTypeIdByColor(colorIdx);
+        UInt16 skillId = GData::GDataManager::GetPetEqSkill();
+        /*
+        if(skillId == 0 || typeId == 0)
+            return NULL;
+        */
+		itype = GData::itemBaseTypeManager[typeId];
+		if(itype == NULL)
+            return NULL;
+
+        UInt32 id = IDGenerator::gItemOidGenerator.ID();
+        ItemPetEqAttr ipeqAttr;
+        ItemEquipData edata;
+        ipeqAttr.skill = skillId;
+        ItemPetEq * equip = new ItemPetEq(id, itype, edata, ipeqAttr);
+
+        if(equip == NULL)
+            return NULL;
+        equip->SetBindStatus(true);
+
+        return AddPetEquip(equip, true, FromWhere);
+    }
+
+    ItemBase* PetPackage::AddRandomPetGem(UInt32 score, int lvIdx)
+    {
+		if(GetPetGemPgRestSize() < 1)
+		{
+			m_Owner->sendMsgCode(0, 1011);
+			return NULL;
+		}
+        if(score != 0)
+            lvIdx = getRandomPetEqGemColorIdx(score, 1);
+        if(lvIdx < 0 || lvIdx > 6)
+            return NULL;
+
+        UInt32 itemId = GData::GDataManager::GetPetGemTypeIdByLev(lvIdx);
+        return AddPetItem(itemId, 1, true, true, FromBBFT);
+    }
 
 }
 

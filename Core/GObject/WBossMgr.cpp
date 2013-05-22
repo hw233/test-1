@@ -497,8 +497,22 @@ void WBoss::reward(Player* player)
         }
         else
         {
+            /*
             MailPackage::MailItem item[] = {{133,1},{MailPackage::Tael,1000}};
             (*i).player->sendMailItem(568, 569, item, 2);
+            */
+            UInt8 size = 2 + (*i).player->GetLev() >= 60 ? 1 : 0;
+            MailPackage::MailItem * item = new MailPackage::MailItem [size];
+            item[0].id = 133;
+            item[0].count = 1;
+            item[1].id = MailPackage::Tael;
+            item[1].count = 1000;
+            if((*i).player->GetLev() >= 60)
+            {
+                item[2].id = 9390;
+                item[2].count = 1;
+            }
+            (*i).player->sendMailItem(568, 569, item, size);
         }
 
         GameAction()->doStrong((*i).player, SthBoss, 0, 0);

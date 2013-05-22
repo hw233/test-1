@@ -3,6 +3,9 @@
 
 
 #define INIT_SKILL_UPMAX 4
+#define PET_EQUIP_UPMAX 3
+#define PROB_BASE 10000
+#define GET_REMAINDER(val)  (val % 10)
 
 class Stream;
 namespace GObject
@@ -27,7 +30,7 @@ private:
     UInt16 _dazhou;
     UInt16 _evolve;
     UInt16 _initskl[INIT_SKILL_UPMAX];
-    ItemPetEq * _equips[3];
+    ItemPetEq * _equips[PET_EQUIP_UPMAX];
 public:
     FairyPet(UInt32, Player *);
     void LoadFromDB(DBFairyPetData&);
@@ -42,10 +45,13 @@ public:
     void sendPinjieInfo();
     void sendGenguInfo();
     void initSkillUp();
+    void delSkills(std::string&);
     void AppendEquipData(Stream& st);
     void sendModification(ItemPetEq * equip, UInt8 pos);
+    ItemPetEq * findEquipForGM(UInt8 pos);
     ItemPetEq * findEquip(UInt32 id, UInt8& pos);
     ItemPetEq * setEquip(ItemPetEq * eq, UInt8& pos, bool writedb = true);
+    void rebuildEquipAttr();
 
     inline bool isOnBattle()            { return _onBattle; }
     inline void setOnBattle(bool flag)  { _onBattle = flag; }

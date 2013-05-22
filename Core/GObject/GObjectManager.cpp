@@ -235,6 +235,11 @@ namespace GObject
             fprintf(stderr, "loadEquipments error!\n");
             std::abort();
         }
+        if(!loadPetEquipAttr())
+        {
+            fprintf(stderr, "loadPetEquipAttr error!\n");
+            std::abort();
+        }
 		if(!loadEquipmentsSpirit())
         {
             fprintf(stderr, "loadEquipmentsSpirit error!\n");
@@ -431,10 +436,9 @@ namespace GObject
             fprintf(stderr, "fixItem9383Leader error!\n");
             std::abort();
         }
-
-        if(!loadPetEquipAttr())
+        if(!loadFairySpar())
         {
-            fprintf(stderr, "loadPetEquipAttr error!\n");
+            fprintf(stderr, "loadFairySpar error!\n");
             std::abort();
         }
 
@@ -5804,5 +5808,28 @@ namespace GObject
 
         return true;
     }
+
+    bool GObjectManager::loadFairySpar()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+        if(execu.get() == NULL || !execu->isConnected())
+            return false;
+        LoadingCounter lc("Loading Fairy Spar");
+        DBFairySpar t;
+        if(execu->Prepare("SELECT `playerId`, `atk`, `magAtk`, `phy`, `element1`, `element2`, `element3`, `element4`, `element5`, `complexPercent`, `curMark`, `breakoutCnt` FROM `fairy_spar` ORDER BY `playerId`", t)!= DB::DB_OK)
+            return false;
+        lc.reset(1000);
+        while(execu->Next() == DB::DB_OK)
+        {
+            lc.advance();
+            Player* pl = globalPlayers[t.playerId];
+            if(!pl)
+            continue;
+                pl->GetFairySpar()->loadFairySparFromDB(t.atk, t.magAtk, t.phy, t.element[0], t.element[1], t.element[2], t.element[3], t.element[4], t.complexPercent, t.curMark, t.breakoutCnt);
+        }
+        lc.finalize();
+        return true;
+    }
+
 }
 

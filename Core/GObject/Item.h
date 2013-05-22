@@ -272,16 +272,15 @@ namespace GObject
 
     class ItemPetEq : public ItemEquip
     {
-        public:
-        ItemPetEq(UInt32 id, const GData::ItemBaseType* itemEquipType, ItemEquipData& itemEquipData, ItemPetEqAttr & peAttr)
-            : ItemEquip(id, itemEquipType, itemEquipData), m_peAttr(peAttr)
-        {}
+    public:
+		ItemPetEq(UInt32 id, const GData::ItemBaseType* itemEquipType, ItemEquipData& itemEquipData, ItemPetEqAttr & peAttr)
+		    : ItemEquip(id, itemEquipType, itemEquipData), m_peAttr(peAttr)
+		{}
         ItemPetEqAttr & getPetEqAttr() { return m_peAttr; }
 
-        private:
-            ItemPetEqAttr m_peAttr;
+    private:
+        ItemPetEqAttr m_peAttr;
     };
-
 }
 
 #endif

@@ -37,6 +37,14 @@
 
 #define COUPON_ID       499
 
+enum ItemQuality
+{
+    Item_Green  = 2,    //绿色
+    Item_Blue   = 3,    //蓝色
+    Item_Purple = 4,    //紫色
+    Item_Yellow = 5,    //橙色
+};
+
 enum ItemClass
 {
     // [00~19]  装备 [1500~4990]   1武器，2头，3胸，4肩，5腰，6腿，7项链，8戒指，10法宝，11时装
@@ -139,7 +147,7 @@ inline bool IsLingbaoTypeId(UInt32 id)
 
 inline bool IsPetEquipTypeId(UInt32 id)
 {
-	return id >= LPETARM_ID && id <= LPETARM_ID;
+	return id >= LPETARM_ID && id <= RPETARM_ID;
 }
 
 inline bool IsPetItem(UInt32 id)

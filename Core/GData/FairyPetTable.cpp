@@ -1,5 +1,5 @@
-#include "FairyPetTable.h"
 #include "Common/StringTokenizer.h"
+#include "FairyPetTable.h"
 
 
 namespace GData
@@ -47,6 +47,11 @@ void Pet::setLingyaTable(Pet::LingyaData& ly)
 void Pet::setEqExpTable(EquipExpData& eqd)
 {
     _equipExpData.insert(std::make_pair(eqd.level, eqd));
+}
+
+void Pet::setEqAttreffect(EquipAttreffect& eqattr)
+{
+    _equipAttreffect.insert(std::make_pair(eqattr.level, eqattr));
 }
 
 Pet::PinjieData * Pet::getLevTable(UInt16 id)
@@ -116,6 +121,17 @@ UInt8 Pet::getEquipSkillLev(UInt8 lvl)
 UInt8 Pet::getEquipMaxLev()
 {
     return _equipExpData.size() > PETEQUIP_MAXLEV ? _equipExpData.size() : PETEQUIP_MAXLEV;
+}
+
+float Pet::getEquipAttreffect(UInt8 lvl, ItemClass subClass)
+{
+    int idx = subClass - Item_PetEquip;
+    if(idx < 0 || idx >= PETEQUIP_ATTR)
+        return 0;
+    std::map<UInt8, EquipAttreffect>::iterator iter = _equipAttreffect.find(lvl);
+    if(iter == _equipAttreffect.end())
+        return 0;
+    return iter->second.effect[idx];
 }
 
 }

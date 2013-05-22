@@ -29,6 +29,7 @@
 #include "GData/SoulExpTable.h"
 #include "GData/LBSkillTable.h"
 #include "GObject/Leaderboard.h"
+#include "FairySpar.h"
 
 namespace GObject
 {
@@ -1294,14 +1295,14 @@ void Fighter::setCapacity( float c, bool writedb )
     }
 }
 
-inline void addAttrExtra( GData::AttrExtra& ae, const GData::AttrExtra * ext )
+void Fighter::addAttrExtra( GData::AttrExtra& ae, const GData::AttrExtra * ext )
 {
 	if(ext == NULL)
 		return;
 	ae += *ext;
 }
 
-inline void addAttrExtra( GData::AttrExtra& ae, const GData::CittaEffect* ce )
+void Fighter::addAttrExtra( GData::AttrExtra& ae, const GData::CittaEffect* ce )
 {
 	if(ce == NULL)
 		return;
@@ -1833,6 +1834,14 @@ void Fighter::rebuildEquipAttr()
     {
         _attrExtraEquip.attack += _wbextatk;
         _attrExtraEquip.magatk += _wbextmagatk;
+    }
+
+    if(_owner/* && _owner->getClan()*/)
+    {
+        //仙蕴晶石的加成
+        _attrExtraEquip.hp += _owner->GetFairySpar()->getFairySparPH();
+        _attrExtraEquip.attack += _owner->GetFairySpar()->getFairySparAtk();
+        _attrExtraEquip.magatk += _owner->GetFairySpar()->getFairySparMagAtk();
     }
 
 	_maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
@@ -3147,7 +3156,7 @@ void Fighter::setSkills( std::string& skills, bool writedb )
     if (_id >= 999 || isPet())
         up = true;
 
-    const GData::SkillBase* s  = 0;
+    const GData::SkillBase* s = 0;
     std::vector<const GData::SkillBase*> vt_skills;
     for (size_t i = 0; i < tk.count(); ++i)
     {

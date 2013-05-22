@@ -267,6 +267,7 @@ namespace GObject
 		typedef std::map<ItemKey, ItemBase *> ItemCont;
 		typedef ItemCont::iterator item_elem_iter;
 		Player* m_Owner;
+
 	private:
 		enum {ItemClassSize = Item_Weapon + 1};
 

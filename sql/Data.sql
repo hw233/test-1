@@ -241,7 +241,7 @@ DROP TABLE IF EXISTS `item_template`;
 CREATE TABLE `item_template` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
-  `subClass` tinyint(3) NOT NULL COMMENT '物品类型',
+  `subClass` tinyint(3) unsigned NOT NULL COMMENT '物品类型',
   `career` tinyint(3) NOT NULL COMMENT '职业',
   `reqLev` smallint(6) NOT NULL DEFAULT '1' COMMENT '等级需求',
   `vLev` smallint(6) NOT NULL DEFAULT '1' COMMENT '价值等级',
@@ -892,6 +892,23 @@ CREATE TABLE `pet_equipExp` (
     `purple` int(10) unsigned NOT NULL DEFAULT 0,
     `yellow` int(10) unsigned NOT NULL DEFAULT 0,
     `skillLev` tinyint(3) unsigned NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `pet_eqAttreffect`;
+CREATE TABLE `pet_eqAttreffect` (
+    `id` tinyint(3) unsigned NOT NULL DEFAULT 0,
+    `hp` float(5,2) unsigned NOT NULL DEFAULT '0.00',
+    `atk` float(5,2) unsigned NOT NULL DEFAULT '0.00',
+    `magatk` float(5,2) unsigned NOT NULL DEFAULT '0.00',
+    `def` float(5,2) unsigned NOT NULL DEFAULT '0.00',
+    `magdef` float(5,2) unsigned NOT NULL DEFAULT '0.00',
+    `critical` float(5,2) unsigned NOT NULL DEFAULT '0.00',
+    `pierce` float(5,2) unsigned NOT NULL DEFAULT '0.00',
+    `hitrate` float(5,2) unsigned NOT NULL DEFAULT '0.00',
+    `evade` float(5,2) unsigned NOT NULL DEFAULT '0.00',
+    `counter` float(5,2) unsigned NOT NULL DEFAULT '0.00',
+    `tough` float(5,2) unsigned NOT NULL DEFAULT '0.00',
     PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 

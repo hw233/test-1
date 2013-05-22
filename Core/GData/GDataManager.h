@@ -66,6 +66,7 @@ namespace GData
         static bool LoadPetGenGu();
         static bool LoadPetLingYa();
         static bool LoadPetEquipExp();
+        static bool LoadPetEqAttreffect();
 
         static void clearUdpItem();
         static void addUdpItem(UInt32 id);
@@ -108,7 +109,10 @@ namespace GData
             else
                 return false;
         };
-
+        //仙宠相关
+        static UInt16 GetPetEqTypeIdByColor(int);
+        static UInt16 GetPetGemTypeIdByLev(int);
+        static UInt16 GetPetEqSkill();
 	public:
 		static TaskTypeList				 m_TaskTypeList;
 		static TaskTypeRelationList		 m_TaskTypeRelationList;
@@ -137,6 +141,9 @@ namespace GData
         static std::vector<UInt32>      m_udpLogItems;
         static std::map<UInt16, std::vector<UInt32> > m_skillstrengthexp;
         static std::map<UInt16, std::vector<UInt32> > m_skillstrengthprob;
+        static std::vector<UInt16>       m_petEqs[4];
+        static std::vector<UInt16>       m_petGems[20];
+        static std::vector<UInt16>       m_petEqSkills;
 	};
 
     extern std::map<UInt16, UInt16> skill2item;

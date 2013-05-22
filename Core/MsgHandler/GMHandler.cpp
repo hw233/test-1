@@ -21,6 +21,8 @@
 #include "GData/DungeonData.h"
 #include "GData/ExpTable.h"
 #include "GData/NpcGroup.h"
+#include "GData/SkillTable.h"
+#include "GData/FairyPetTable.h"
 #include "GObject/Dungeon.h"
 #include "GObject/Arena.h"
 #include "Script/GameActionLua.h"
@@ -49,6 +51,7 @@
 #include "GObject/Tianjie.h"
 #include "Memcached.h"
 #include "Version.h"
+#include "GObject/FairySpar.h"
 GMHandler gmHandler;
 
 GMHandler::GMHandler()
@@ -259,6 +262,8 @@ GMHandler::GMHandler()
     Reg(3, "setem", &GMHandler::OnClanBossSetEm);
 
     Reg(3, "settdlvl", &GMHandler::OnSetTownDeamonMaxLevel);
+    Reg(3, "spar", &GMHandler::OnFairySpar);
+    Reg(2, "eqexp", &GMHandler::OnAddPetEquipExp);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -516,7 +521,7 @@ void GMHandler::OnAddItem(GObject::Player * player, std::vector<std::string>& ar
 		}
         else if(IsPetEquipTypeId(itemId))
 		{
-			player->GetPetPackage()->AddPetEquip(itemId);
+			player->GetPetPackage()->AddRandomPetEq(0, itemId);
 		}
 		else
 		{
@@ -542,7 +547,7 @@ void GMHandler::OnAddItemB(GObject::Player * player, std::vector<std::string>& a
 		}
         else if(IsPetEquipTypeId(itemId))
 		{
-			player->GetPetPackage()->AddPetEquip(itemId, true);
+			player->GetPetPackage()->AddRandomPetEq(0, itemId);
 		}
 		else
 		{
@@ -3955,5 +3960,89 @@ void GMHandler::OnSetTownDeamonMaxLevel(GObject::Player *player, std::vector<std
         return;
     UInt16 lv = atoi(args[0].c_str()); 
     player->getDeamonPlayerData()->maxLevel = lv;
+}
+
+void GMHandler::OnFairySpar(GObject::Player *player, std::vector<std::string>& args)
+{
+    if(args.size() < 1)
+        return;
+    UInt8 type = atoi(args[0].c_str());
+    if(type == 0)
+    {
+        if(args.size() < 2)
+            return;
+        UInt8 complexP = atoi(args[1].c_str());
+        if(complexP > 100)
+            complexP = 100;
+        player->GetFairySpar()->gmSetComplexPercent(complexP);
+    }
+    else if(type == 1)
+    {
+        if(args.size() < 6)
+            return;
+        UInt8 elem1 = atoi(args[1].c_str());
+        if(elem1 > 24)
+            elem1 = 24;
+        UInt8 elem2 = atoi(args[2].c_str());
+        if(elem2 > 24)
+            elem2 = 24;
+        UInt8 elem3 = atoi(args[3].c_str());
+        if(elem3 > 24)
+            elem3 = 24;
+        UInt8 elem4 = atoi(args[4].c_str());
+        if(elem4 > 24)
+            elem4 = 24;
+        UInt8 elem5 = atoi(args[5].c_str());
+        if(elem5 > 24)
+            elem5 = 24;
+        player->GetFairySpar()->gmSetElement(elem1, elem2, elem3, elem4, elem5);
+    }
+}
+
+void GMHandler::OnAddPetEquipExp(GObject::Player *player, std::vector<std::string>& args)
+{
+    if(args.size() < 3)
+        return;
+    UInt32 petId = atoi(args[0].c_str());
+    UInt8 pos = atoi(args[1].c_str());
+    FairyPet * pet = player->findFairyPet(petId);
+    if(!pet) return;
+    ItemPetEq * equip = pet->findEquipForGM(pos);
+    if(!equip) return;
+    ItemPetEqAttr & peAttr = equip->getPetEqAttr();
+    if(peAttr.lv >= GData::pet.getEquipMaxLev())
+        return;
+    UInt32 upExp = GData::pet.getEquipExpData(peAttr.lv, equip->getQuality() - 2);
+    if(upExp == 0) return;
+    peAttr.exp += atoi(args[2].c_str());
+    if(peAttr.exp >= upExp)
+    {
+        UInt8 maxLev = GData::pet.getEquipMaxLev();
+        UInt8 tmp = peAttr.lv;
+        for(UInt8 i = tmp; i <= maxLev; ++ i)
+        {
+            if(peAttr.exp < GData::pet.getEquipExpData(i, equip->getQuality() - 2))
+                break;
+            ++ peAttr.lv;
+        }
+        if(peAttr.lv >= maxLev)
+            peAttr.lv = maxLev;
+    }
+    UInt8 skillLev = GData::pet.getEquipSkillLev(peAttr.lv);
+    if(skillLev && SKILLANDLEVEL(SKILL_ID(peAttr.skill), skillLev) != peAttr.skill)
+    {
+        peAttr.skill = SKILLANDLEVEL(SKILL_ID(peAttr.skill), skillLev);
+        /*
+        if (pet)
+        {
+            std::string skills = Itoa(peAttr.skill);
+            pet->setSkills(skills, false);
+            pet->updateToDBPetSkill();
+        }
+        */
+    }
+    DB4().PushUpdateData("UPDATE `petEquipattr` SET `exp` = %u, `level` = %u, `skillId` = %u WHERE `id` = %u", peAttr.exp, peAttr.lv, peAttr.skill, equip->getId());
+    pet->setDirty();
+    pet->sendModification(equip, pos);
 }
 

@@ -8593,6 +8593,18 @@ function ItemNormal_00009382(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00009390(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage()
+    if player:GetLev() < 60 then
+        return false
+    end
+    player:AddVar(276, 5*num)
+    player:updateCuilianTimes()
+    package:DelItemSendMsg(iid, player)
+    return num;
+end
+
 local ItemNormal_Table = {
     [1] = ItemNormal_00000001,
 	[8] = ItemNormal_00000008,
@@ -10317,6 +10329,7 @@ local ItemNormal_Table = {
     [9374] = ItemNormal_00009366,
     [9382] = ItemNormal_00009382,
     [9383] = ItemNormal_00009382,
+    [9390] = ItemNormal_00009390,
     [9900] = ItemNormal_NameCard,
     [9901] = ItemNormal_NameCard,
     [9902] = ItemNormal_NameCard,

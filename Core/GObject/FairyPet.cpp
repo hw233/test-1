@@ -1,9 +1,11 @@
 ﻿#include "Config.h"
 #include "GObjectDBExecHelper.h"
 #include "GData/FairyPetTable.h"
+#include "GData/SkillTable.h"
 #include "Common/URandom.h"
 #include "Common/Itoa.h"
 #include "Common/StringTokenizer.h"
+#include "Script/BattleFormula.h"
 #include "Server/SysMsg.h"
 #include "Log/Log.h"
 #include "Fighter.h"
@@ -13,9 +15,8 @@
 
 namespace GObject
 {
+
     extern URandom GRND;
-#define PROB_BASE 10000
-#define GET_REMAINDER(val)  (val % 10)
 
     FairyPet::FairyPet(UInt32 id, Player * owner): Fighter(id, owner),
         _petLev(50), _petBone(0), _onBattle(false)
@@ -29,7 +30,7 @@ namespace GObject
         _overTime = 0;
         _evolve = 0;
         memset(_initskl, 0, sizeof(_initskl));
-        memset(_equips, 0, 3 * sizeof(ItemPetEq *));
+        memset(_equips, 0, PET_EQUIP_UPMAX * sizeof(ItemPetEq *));
     }
 
     void FairyPet::LoadFromDB(DBFairyPetData& data)
@@ -150,6 +151,21 @@ namespace GObject
             setSkills(skills, false);
             updateToDBPetSkill();
         }
+    }
+
+    void FairyPet::delSkills(std::string& skills)
+    {
+        StringTokenizer tk(skills, ",");
+        const GData::SkillBase* s = NULL;
+        std::vector<const GData::SkillBase*> vt_skills;
+        for (size_t i = 0; i < tk.count(); ++i)
+        {
+            s = GData::skillManager[::atoi(tk[i].c_str())];
+            if (s)
+                vt_skills.push_back(s);
+        }
+        if (vt_skills.size())
+            delSkillsFromCT(vt_skills, false);
     }
 
     void FairyPet::addChongNum(int num)
@@ -440,7 +456,7 @@ namespace GObject
         size_t pos = st.size();
         UInt8 count = 0;
         st << count;
-        for(UInt8 i = 0; i < 3; ++ i)
+        for(UInt8 i = 0; i < PET_EQUIP_UPMAX; ++ i)
         {
             if(_equips[i])
             {
@@ -461,17 +477,24 @@ namespace GObject
         if(equip)
         {
             st << equip->getId() << static_cast<UInt8>(equip->GetBindStatus() ? 1 : 0);
-            st << static_cast<UInt16>(equip->GetItemType().getId());
+            st << equip->GetTypeId();
             equip->getPetEqAttr().appendAttrToStream(st);
         }
 		st << Stream::eos;
 		_owner->send(st);
     }
 
+    ItemPetEq * FairyPet::findEquipForGM(UInt8 pos)
+    {
+        if(pos > 2)
+            return NULL;
+        return _equips[pos];
+    }
+
     ItemPetEq * FairyPet::findEquip(UInt32 id, UInt8& pos)
     {
         pos = 0xFF;
-        for(UInt8 i = 0; i < 3; ++ i)
+        for(UInt8 i = 0; i < PET_EQUIP_UPMAX; ++ i)
         {
             if(_equips[i] && _equips[i]->getId() == id)
             {
@@ -484,12 +507,12 @@ namespace GObject
 
     ItemPetEq * FairyPet::setEquip(ItemPetEq * eq, UInt8& pos, bool writedb)
     {
-        if(pos >= 3)
+        if(pos >= PET_EQUIP_UPMAX)
         {
             pos = 0xFF;
             return eq;
         }
-        for(UInt8 i = 0; i < 3; ++ i)
+        for(UInt8 i = 0; i < PET_EQUIP_UPMAX; ++ i)
         {
             if(i != pos && _equips[i] && eq && _equips[i]->getClass() == eq->getClass())
             {
@@ -503,16 +526,108 @@ namespace GObject
             pos = 0xFF;
             return old;
         }
+        setDirty();
         _equips[pos] = eq;
         if(writedb)
         {
-            if(eq)
-                eq->DoEquipBind(true);
             sendModification(eq, pos);
             UpdateToDB();
         }
-        setDirty();
+        /*
+        std::string skills = "";
+        if (old)
+        {
+            skills = Itoa(old->getPetEqAttr().skill);
+            delSkills(skills, false);
+        }
+        if (eq)
+        {
+            eq->DoEquipBind(true);
+            skills = Itoa(eq->getPetEqAttr().skill);
+            setSkills(skills, false);
+        }
+        updateToDBPetSkill();
+        */
         return old;
+    }
+
+    void FairyPet::rebuildEquipAttr()
+    {
+	    _attrExtraEquip.reset();
+        float effect = 0;
+        for(UInt8 i = 0; i < PET_EQUIP_UPMAX; ++ i)
+        {
+            if(_equips[i] == NULL)
+                continue;
+            ItemPetEqAttr& peAttr = _equips[i]->getPetEqAttr();
+            effect = GData::pet.getEquipAttreffect(peAttr.lv, _equips[i]->getClass());
+            switch(_equips[i]->getQuality())
+            {
+                case Item_Green:
+                    effect *= 0.4;
+                    break;
+                case Item_Blue:
+                    effect *= 0.6;
+                    break;
+                case Item_Purple:
+                    effect *= 0.8;
+                    break;
+                case Item_Yellow:
+                    effect *= 1.0;
+                    break;
+                default:
+                    effect *= 0.4;
+                    break;
+            }
+            if(effect <= 0)
+                continue;
+            switch(_equips[i]->getClass())
+            {
+                case Item_PetEquip:
+                    _attrExtraEquip.hp += effect;
+                    break;
+                case Item_PetEquip1:
+                    _attrExtraEquip.attack += effect;
+                    break;
+                case Item_PetEquip2:
+                    _attrExtraEquip.magatk += effect;
+                    break;
+                case Item_PetEquip3:
+                    _attrExtraEquip.defend += effect;
+                    break;
+                case Item_PetEquip4:
+                    _attrExtraEquip.magdef += effect;
+                    break;
+                case Item_PetEquip5:
+                    _attrExtraEquip.critical += effect;
+                    break;
+                case Item_PetEquip6:
+                    _attrExtraEquip.pierce += effect;
+                    break;
+                case Item_PetEquip7:
+                    _attrExtraEquip.hitrate += effect;
+                    break;
+                case Item_PetEquip8:
+                    _attrExtraEquip.evade += effect;
+                    break;
+                case Item_PetEquip9:
+                    _attrExtraEquip.counter += effect;
+                    break;
+                case Item_PetEquip10:
+                    _attrExtraEquip.tough += effect;
+                    break;
+                default:
+                    break;
+            }
+            for(UInt8 i = 0; i < sizeof(peAttr.gems)/sizeof(peAttr.gems[0]); ++ i)
+            {
+                if(peAttr.gems[i] == 0 || GetItemSubClass(peAttr.gems[i]) != Item_PetGem)
+                    continue;
+                GData::ItemGemType * igt = GData::petGemTypes[peAttr.gems[i] - LPETGEM_ID];
+                addAttrExtra(_attrExtraEquip, igt->attrExtra);
+            }
+        }
+	    _maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
     }
 
 }
