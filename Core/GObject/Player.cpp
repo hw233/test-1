@@ -10959,9 +10959,101 @@ namespace GObject
             getLevelAward(opt);
             break;
         case 19:
+            //QQ浏览器奖励
             getQQExplorerAward(opt);
             break;
+        case 20:
+            //QQ导航奖励
+            getQQNavigationAward(opt);
+            break;
+        case 21:
+            //QQ音乐奖励
+            getQQMusicAward(opt);
+            break;
         }
+    }
+
+
+    void Player::getQQMusicAward(UInt8 opt)
+    {
+         
+        UInt8 state = GetVar(VAR_QQMUSIC_DAY_AWARD);
+
+        if (GetPackage()->GetRestPackageSize() < 6 && opt == 1)
+        {
+			sendMsgCode(0, 1011);
+
+            return;
+        }
+
+        if(opt == 1 && state == 0)
+        {
+            GetPackage()->AddItem(134, 1, true, false, FromQQMusic);
+            GetPackage()->AddItem(1325, 1, true, false, FromQQMusic);
+            GetPackage()->AddItem(50, 1, true, false, FromQQMusic);
+            GetPackage()->AddItem(49, 1, true, false, FromQQMusic);
+            GetPackage()->AddItem(30, 1, true, false, FromQQMusic);
+            SetVar(VAR_QQMUSIC_DAY_AWARD, 1);
+            state = 1;
+        }
+
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(21);
+        st << state << Stream::eos;
+        send(st);
+    }
+
+    void Player::getQQNavigationAward(UInt8 opt)
+    {
+        UInt8 states = 0;
+
+        UInt8 dayAward = GetVar(VAR_QQNAVIGATION_DAY_AWARD);
+        UInt8 weekAward = GetVar(VAR_QQNAVIGATION_WEEK_AWARD);
+        UInt8 firstLoginAward = GetVar(VAR_QQNAVIGATION_FIRST_LOGIN_AWARD);
+
+        if (GetPackage()->GetRestPackageSize() < 6 && opt >= 1 && opt <= 3) 
+        {
+			sendMsgCode(0, 1011);
+
+            return;
+        }
+
+
+        if(getVia() == "ssgw_qqdh")
+        {
+           
+             if(opt == 1 && dayAward == 0)  //领取QQ导航每天奖励
+             {
+                 GetPackage()->AddItem(15, 1, true, false,FromQQNavigation);
+                 GetPackage()->AddItem(48, 1, true, false, FromQQNavigation);
+                 SetVar(VAR_QQNAVIGATION_DAY_AWARD, 1);
+                 dayAward = 1;
+             }
+             else if(opt == 2 && weekAward == 0)  //领取QQ导航每月奖励
+             {
+                 GetPackage()->AddItem(133, 1, true, false,FromQQNavigation);
+                 GetPackage()->AddItem(1325, 1, true, false, FromQQNavigation);
+                 SetVar(VAR_QQNAVIGATION_WEEK_AWARD, 1);
+                 weekAward = 1;
+             }
+             else if(opt == 3 && firstLoginAward == 0)  //领取QQ导航首次登录奖励
+             {
+                 GetPackage()->AddItem(503, 1, true, false,FromQQNavigation);
+                 GetPackage()->AddItem(500, 1, true, false, FromQQNavigation);
+                 GetPackage()->AddItem(50, 1, true, false, FromQQNavigation);
+                 GetPackage()->AddItem(49, 1, true, false, FromQQNavigation);
+                 SetVar(VAR_QQNAVIGATION_FIRST_LOGIN_AWARD, 1);
+                 firstLoginAward = 1;
+             }
+        }
+
+        states = (dayAward + 1) | (weekAward + 1)<<2 | (firstLoginAward + 1)<<4;
+
+
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(20);
+        st << states << Stream::eos;
+        send(st);
     }
 
     void Player::getQQExplorerAward(UInt8 opt)

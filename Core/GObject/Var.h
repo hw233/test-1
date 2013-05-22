@@ -300,7 +300,7 @@ namespace GObject
         VAR_VIP_PRIVILEGE_TIME  = 272, // VIP特权剩余时间
         VAR_VIP_PRIVILEGE_DATA  = 273, // VIP特权数据
         VAR_TUIGUAN_AWARD_GOT = 274, // 推广平台用户奖励当天是否领取
-        VAR_QQEXPLORER_AWARD = 279, // QQ浏览器奖励是否领取
+        VAR_QQEXPLORER_AWARD = 279, // QQ浏览器奖励是否领取 
 
         // 281-290 占用 fro qiwy
         VAR_ARENA_SUPPORT = 281, //场外活动，支持的序列id
@@ -427,6 +427,13 @@ namespace GObject
 
         //繁体版占用470-499
 
+        //500-520 for lijr
+        VAR_QQNAVIGATION_DAY_AWARD = 500, // QQ导航每天奖励是否领取
+        VAR_QQNAVIGATION_WEEK_AWARD = 501, // QQ导航每周奖励是否领取
+        VAR_QQNAVIGATION_FIRST_LOGIN_AWARD = 502, // QQ导航首次登录奖励是否领取
+
+        VAR_QQMUSIC_DAY_AWARD = 503, // QQ音乐每天奖励是否领取
+       
         VAR_MAX,
     };
 
@@ -707,7 +714,11 @@ namespace GObject
             REGISTER_VAR(VAR_TUIGUAN_AWARD_GOT, CYCLE_DAY);
             REGISTER_VAR(VAR_QQEXPLORER_AWARD, CYCLE_NONE);
 
-            REGISTER_VAR(VAR_ARENA_SUPPORT, CYCLE_DAY);
+            REGISTER_VAR(VAR_QQNAVIGATION_DAY_AWARD, CYCLE_DAY);
+            REGISTER_VAR(VAR_QQNAVIGATION_WEEK_AWARD, CYCLE_WEEK);
+            REGISTER_VAR(VAR_QQNAVIGATION_FIRST_LOGIN_AWARD, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_QQMUSIC_DAY_AWARD, CYCLE_DAY);
             //REGISTER_VAR(VAR_ARENA_SUFFERED, CYCLE_DAY);
             //REGISTER_VAR(VAR_ARENA_LASTTIME, CYCLE_DAY);
             REGISTER_VAR(VAR_ARENA_SUPPORT_TUE, CYCLE_WEEK);
