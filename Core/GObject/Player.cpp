@@ -10951,7 +10951,30 @@ namespace GObject
         case 18:
             getLevelAward(opt);
             break;
+        case 19:
+            getQQExplorerAward();
+            break;
         }
+    }
+
+    void Player::getQQExplorerAward()
+    {
+        UInt8 v = GetVar(VAR_QQEXPLORER_AWARD);
+        if( v == 0)
+        {
+            GetPackage()->AddItem(503, 1, true, false, FromQQExplorer);
+            GetPackage()->AddItem(504, 1, true, false, FromQQExplorer);
+            GetPackage()->AddItem(1325, 1, true, false, FromQQExplorer);
+            GetPackage()->AddItem(134, 1, true, false, FromQQExplorer);
+            GetPackage()->AddItem(509, 1, true, false, FromQQExplorer);
+            SetVar(VAR_QQEXPLORER_AWARD, 1);
+            v = 1;
+        }
+
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(19);
+        st << v << Stream::eos;
+        send(st);
     }
 
     void Player::getSSToolbarAward()
@@ -13603,7 +13626,12 @@ namespace GObject
             ++ idx;
 
         if (idx > 7)
-            return;
+        {
+            if((v&0x80) != 0)
+                return;
+            else
+                idx = 7;
+        }
 
         Stream st(REP::RC7DAY);
         st << type;
@@ -13622,9 +13650,6 @@ namespace GObject
                 && rpValue != e_pf_xiaoyu)
             return;
 
-        if (TimeUtil::SharpDay(0, TimeUtil::Now()) - TimeUtil::SharpDay(0, getCreated()) > 6 * DAY_SECS)
-            return;
-
         UInt32 v = GetVar(VAR_FISHUSER_AWARD);
         if ((v&0x80) == 0)
         {
@@ -13639,6 +13664,8 @@ namespace GObject
                 GetPackage()->Add(1325,5,true);
                 v |= 0x80;
                 SetVar(VAR_FISHUSER_AWARD, v);
+                if(0 == GetVar(VAR_TUIGUAN_AWARD_GOT) && ((v&0x7F) == 0x7F))
+                    SetVar(VAR_TUIGUAN_AWARD_GOT, 1);
             }
         }
         sendFishUserInfo();
@@ -13691,6 +13718,7 @@ namespace GObject
             }
             v |= (0x01<<(idx-1));
             SetVar(VAR_FISHUSER_AWARD, v); 
+            SetVar(VAR_TUIGUAN_AWARD_GOT, 1);
         }
         sendFishUserInfo();
     }
