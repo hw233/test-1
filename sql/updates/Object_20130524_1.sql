@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS `petEquipattr` (
     `id` int(10) unsigned NOT NULL,
     `level` tinyint(3) unsigned NOT NULL,
     `exp` int(10) unsigned NOT NULL,
-    `skillId` smallint(6) unsigned NOT NULL,
+    `skillId` smallint(10) unsigned NOT NULL,
     `socket1` smallint(10) unsigned NOT NULL,
     `socket2` smallint(10) unsigned NOT NULL,
     `socket3` smallint(10) unsigned NOT NULL,
