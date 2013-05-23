@@ -75,5 +75,6 @@ MSG_REG_2(LoginMsgHdr,SPEQ::SETTOTALRECHARGEACT, OnSetTotalRechargeAct);
 MSG_REG_2(LoginMsgHdr, 0x300, OnCheckPackKey);
 MSG_REG_2(LoginMsgHdr, 0x301, OnSetCrackValue);
 MSG_REG_2(LoginMsgHdr, 0x330, OnForbidSale);
+MSG_REG_2(LoginMsgHdr, 0x331, OnRecharge4IDIP);
 
 MSG_HANDLER_END()

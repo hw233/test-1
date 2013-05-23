@@ -41,6 +41,10 @@ enum
     /*15*/ SKILL_ONATKDMG,
     /*16*/ SKILL_ONPETPROTECT,
     /*17*/ SKILL_ONGETDMG,
+    /*18*/ SKILL_ONBEDMG,
+    /*19*/ SKILL_ONBEPHYDMG,
+    /*20*/ SKILL_ONBEMAGDMG,
+    /*21*/ SKILL_ONHP10P,    // 生命剩余10%
     SKILL_PASSIVES
 };
 
@@ -94,6 +98,13 @@ enum
     e_eft_counter_spirit = 27,     // 反击后的士气(增加防御、攻击,累计5次对敌方全体造成物理伤害)
     e_eft_fire_def = 28,           // 火甲(增加防御，不被其他buf覆盖)
     e_eft_sneak_atk = 29,           // 暗杀(闪避时对敌方造成伤害并吸血)
+    e_eft_dec_wave_dmg = 30,           // 减少受到的波及伤害
+    e_eft_lingqu = 31,             // 灵躯
+    e_eft_lingshi_bleed = 32,           // 灵蚀（宠物流血)
+    e_eft_lingyou_atk = 33,           // 灵佑（物攻)
+    e_eft_lingyou_magatk = 34,           // 灵佑（法功)
+    e_eft_lingyou_def = 35,           // 灵佑（物防)
+    e_eft_lingyou_magdef = 36,           // 灵佑（法防)
 
     e_eft_max
 };
