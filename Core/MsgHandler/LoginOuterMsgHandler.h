@@ -1041,7 +1041,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
                         UInt16 id;
                         UInt16 num;
                         UInt32 code; // 0-正常 1-未开启 2-次数上限
-                    } purchase;
+                    } purchase = {0,0,0};
 
                     if (!player->GetVar(GObject::VAR_DIRECTPUROPEN))
                         purchase.code = 1;
