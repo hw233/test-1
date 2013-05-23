@@ -2268,10 +2268,21 @@ namespace GData
 
     UInt16 GDataManager::GetPetEqSkill()
     {
+        /*
         size_t cnt = m_petEqSkills.size();
         if(cnt == 0)
             return 0;
         return m_petEqSkills[uRand(cnt)];
+        */
+        static UInt16 petEqSkills[] = { 60001, 60101, 60201, 60301, 60401, 60501, 60601, 60701, 60801, 60901, 61001, 61101, 61201, 61301, 61401, 61501 };
+        static UInt16 chance[] = { 200, 400, 600, 1200, 1800, 2400, 3000, 3600, 4200, 4800, 5400, 6000, 7000, 8000, 9000, 10000 };
+        UInt16 rnd = uRand(10000);
+        for(UInt8 i = 0; i < sizeof(chance)/sizeof(UInt16); ++ i)
+        {
+            if(rnd < chance[i])
+                return petEqSkills[i];
+        }
+        return 0;
     }
 
     bool GDataManager::LoadSpiritAttrTable()
