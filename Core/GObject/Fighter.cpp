@@ -3504,6 +3504,8 @@ void Fighter::delSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_ONATKDMG ||
                         s->cond == GData::SKILL_ONPETPROTECT ||
                         s->cond == GData::SKILL_ONGETDMG ||
+                        s->cond == GData::SKILL_ONBEDMG ||
+                        s->cond == GData::SKILL_ONBEPHYDMG ||
                         s->cond == GData::SKILL_ONBEMAGDMG ||
                         s->cond == GData::SKILL_ONHP10P
                         )
@@ -3549,6 +3551,8 @@ void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_ONATKDMG ||
                         s->cond == GData::SKILL_ONPETPROTECT ||
                         s->cond == GData::SKILL_ONGETDMG ||
+                        s->cond == GData::SKILL_ONBEDMG ||
+                        s->cond == GData::SKILL_ONBEPHYDMG ||
                         s->cond == GData::SKILL_ONBEMAGDMG ||
                         s->cond == GData::SKILL_ONHP10P
                         )
