@@ -1157,8 +1157,10 @@ namespace GObject
                     itemId = 9015;
                 else if(level < 100)
                     itemId = 9016;
-                else
+                else if(level < 110)
                     itemId = 9035;
+                else
+                    itemId = 9391;
                 MailPackage::MailItem mitem[1] = {{itemId, 1}};
                 MailItemsInfo itemsInfo(mitem, BlueDiamondCmd, 1);
                 mailPackageManager.push(mail->id, mitem, 1, true);

@@ -937,6 +937,7 @@ function LuckyDrawBox(player, id)
         [5] = 9015,
         [6] = 9016,
         [7] = 9035,
+        [8] = 9391,
     }
 
     local item = items[id]
