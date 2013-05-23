@@ -2562,7 +2562,7 @@ namespace GObject
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		pl = NULL;
 		DBFairyPetData fpetdb;
-		if(execu->Prepare("SELECT `id`, `playerId`, `onBattle`, `petLev`, `petBone`, `pinjieBless`, `genguBless`, `chong`, `overTime`, `xiaozhou`, `dazhou` FROM `fairyPet` ORDER BY `playerId`", fpetdb) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `playerId`, `onBattle`, `petLev`, `petBone`, `pinjieBless`, `genguBless`, `chong`, `overTime`, `xiaozhou`, `dazhou`, `evolve` FROM `fairyPet` ORDER BY `playerId`", fpetdb) != DB::DB_OK)
 			return false;
 		lc.reset(200);
 		while(execu->Next() == DB::DB_OK)

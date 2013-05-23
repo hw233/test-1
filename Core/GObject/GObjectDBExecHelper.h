@@ -1191,6 +1191,7 @@ struct DBFairyPetData
     UInt32 overTime;
     UInt16 xiaozhou;
     UInt16 dazhou;
+    UInt16 evolve;
 };
 
 struct DBItemSum 
@@ -2689,7 +2690,7 @@ SPECIALDEF(18)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBFairyPetData)
-SPECIALDEF(11)
+SPECIALDEF(12)
 (
     UInt32, id,
     UInt64, playerId,
@@ -2701,7 +2702,8 @@ SPECIALDEF(11)
     UInt16, chong,
     UInt32, overTime,
     UInt16, xiaozhou,
-    UInt16, dazhou
+    UInt16, dazhou,
+    UInt16, evolve
 )
 SPECIALEND()
 

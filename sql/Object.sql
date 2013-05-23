@@ -1933,6 +1933,7 @@ CREATE TABLE IF NOT EXISTS `fairyPet` (
     `overTime` int(10) unsigned NOT NULL,
     `xiaozhou` smallint(6) unsigned NOT NULL,
     `dazhou` smallint(6) unsigned NOT NULL,
+    `evolve` smallint(6) unsigned NOT NULL,
     PRIMARY KEY (`id`, `playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
