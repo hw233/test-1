@@ -1027,6 +1027,8 @@ UInt32 BattleSimulator::doSpiritAttack(BattleFighter * bf, BattleFighter* bo, fl
             onDamage(bo, true, NULL);
         }
     }
+    else if(!defend100 && !enterEvade)
+        appendDefStatus(e_damEvade, 0, bo);
     else
     {
         if(!defend100)
@@ -1060,7 +1062,6 @@ UInt32 BattleSimulator::doXinmoAttack(BattleFighter * bf, BattleObject* bo)
     UInt8 target_stun = area_target->getStunRound();
     bool enterEvade = area_target->getEvad100();
     bool defend100 = area_target->getDefend100();
-
 
     appendDefStatus(e_xinmo, 0, bf);
     bool pr = false;
@@ -1100,6 +1101,8 @@ UInt32 BattleSimulator::doXinmoAttack(BattleFighter * bf, BattleObject* bo)
             onDamage(area_target, true, NULL);
         }
     }
+    else if(!defend100 && !enterEvade)
+        appendDefStatus(e_damEvade, 0, area_target);
     else
     {
         if(enterEvade)
@@ -8702,6 +8705,8 @@ UInt32 BattleSimulator::CalcNormalAttackDamage(BattleFighter * bf, BattleObject*
         dmg = dmg > 0 ? dmg : 1;
         eStateType = e_damNormal;
     }
+    else if(!defend100 && !enterEvade)
+        eStateType = e_damEvade;
     else
     {
         if(enterEvade)
@@ -11931,6 +11936,8 @@ void BattleSimulator::doSneakAttack(BattleFighter* bf, BattleFighter* bo, bool& 
         else if(_winner == 0)
             onDamage(bo, true, NULL);
     }
+    else if(!defend100 && !enterEvade)
+        appendDefStatus(e_damEvade, 0, bo);
     else
     {
         if(defend100)
