@@ -7,10 +7,10 @@ then
     F=$1
 fi
 
-function pet_eqAttreffect()
+function pet_neidan()
 {
     f=$1
-    d=pet_eqAttreffect
+    d=pet_neidan
     sed -i /ID/d $f
     sed -i /id/d $f
     sed -i /^$/d $f
@@ -20,7 +20,7 @@ function pet_eqAttreffect()
     echo "Generating file $d, total lines $l"
     awk '
         BEGIN {
-            print "INSERT INTO `pet_eqAttreffect` VALUES";
+            print "INSERT INTO `pet_neidan` VALUES";
         } {
             printf("(%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f)",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12);
             if (NR <= ENVIRON["lines"]-1)
@@ -51,7 +51,7 @@ function iconv2utf8()
 
 if [ -f $F  ]
 then
-    pet_eqAttreffect $F
+    pet_neidan $F
 else
     echo "File $F is not exists"
 fi

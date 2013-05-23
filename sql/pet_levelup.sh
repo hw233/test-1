@@ -7,10 +7,10 @@ then
     F=$1
 fi
 
-function pet_equipExp()
+function pet_levelup()
 {
     f=$1
-    d=pet_equipExp
+    d=pet_levelup
     sed -i /ID/d $f
     sed -i /id/d $f
     sed -i /^$/d $f
@@ -20,7 +20,7 @@ function pet_equipExp()
     echo "Generating file $d, total lines $l"
     awk '
         BEGIN {
-            print "INSERT INTO `pet_equipExp` VALUES";
+            print "INSERT INTO `pet_levelup` VALUES";
         } {
             printf("(%d,%d,%d,%d,%d,%d)",$1,$2,$3,$4,$5,$6);
             if (NR <= ENVIRON["lines"]-1)
@@ -51,7 +51,7 @@ function iconv2utf8()
 
 if [ -f $F  ]
 then
-    pet_equipExp $F
+    pet_levelup $F
 else
     echo "File $F is not exists"
 fi

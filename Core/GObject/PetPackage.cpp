@@ -393,7 +393,7 @@ namespace GObject
 		peAttr.gems[gemPos] = 0;
         AddPetItem(oldGem, 1, true, true, FromPetDetachGem);
 	    equip->DoEquipBind(true);
-		DB4().PushUpdateData("UPDATE `petEquipattr` SET `socket%u` = %u WHERE `id` = %u", gemPos, 0, equip->getId());
+		DB4().PushUpdateData("UPDATE `petEquipattr` SET `socket%u` = %u WHERE `id` = %u", gemPos + 1, 0, equip->getId());
 
 		if(pet != NULL)
 		{
