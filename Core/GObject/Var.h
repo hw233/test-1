@@ -274,6 +274,8 @@ namespace GObject
         VAR_ITEM_9282_FAILED_COUNT = 216, // 锦云兜·墨礼包连续开启失败次数
 
         VAR_TOTALRECHARGEACT = 217, // 活动期间充值总额
+        VAR_DIRECTPUROPEN = 218, // 幸运星活动直购是否开启
+        VAR_DIRECTPURCNT = 219, // 幸运星活动直购次数
 
         /*
          * 【注:此段var(217--239)貌似未被占用】
@@ -678,6 +680,8 @@ namespace GObject
             REGISTER_VAR(VAR_ITEM_9281_FAILED_COUNT, CYCLE_NONE);
             REGISTER_VAR(VAR_ITEM_9282_FAILED_COUNT, CYCLE_NONE);
             REGISTER_VAR(VAR_TOTALRECHARGEACT, CYCLE_NONE);
+            REGISTER_VAR(VAR_DIRECTPUROPEN, CYCLE_NONE);
+            REGISTER_VAR(VAR_DIRECTPURCNT, CYCLE_NONE);
             REGISTER_VAR(VAR_USETAEL_CNT, CYCLE_DAY);
             REGISTER_VAR(VAR_USECOUPON_CNT, CYCLE_DAY);
             REGISTER_VAR(VAR_USEGOLD_CNT, CYCLE_DAY);

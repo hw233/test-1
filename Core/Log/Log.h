@@ -223,6 +223,7 @@ enum ItemFrom
     FromLuckyStar = 43, //充值幸运星
     FromLevelAward = 44, //等级奖励
     FromQQExplorer = 46, //QQ浏览器奖励
+    FromDirectPurchase = 47, //Q点直购
 };
 
 enum ItemTo

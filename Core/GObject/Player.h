@@ -1057,6 +1057,7 @@ namespace GObject
         void sendVipPrivilegeMail(UInt8 lv);
         bool SetVipPrivilege_1();
         bool SetVipPrivilege_2();
+        void sendDirectPurInfo();
 
     private:
         GData::AttrExtra _hiattr;

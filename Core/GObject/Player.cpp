@@ -19590,6 +19590,14 @@ void Player::doVipPrivilege(UInt8 idx)
     sendVipPrivilege();
 }
 
+void Player::sendDirectPurInfo()
+{
+    Stream st(REP::ACTIVE);
+    st << static_cast<UInt8>(0x42) << static_cast<UInt8>(GetVar(VAR_DIRECTPUROPEN)) << static_cast<UInt8>(GetVar(VAR_DIRECTPURCNT)) << _playerData.totalRecharge;
+    st << Stream::eos;
+    send(st);
+}
+
 void Player::sendVipPrivilegeMail(UInt8 lv)
 {
     if(lv != 32 || !in7DayFromCreated())

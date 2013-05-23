@@ -259,6 +259,7 @@ MSG_REG_2(GameMsgHdr, 0x297, OnCreateAward);
 MSG_REG_2(GameMsgHdr, 0x2A1, OnAutoJobHunterStep);
 
 MSG_REG_2(GameMsgHdr, 0x2F0, OnGoldRecharge);
+MSG_REG_2(GameMsgHdr, 0x2F2, OnDirectPurchase);
 MSG_REG_2(GameMsgHdr, 0x2F1, OnYDPacks);
 
 MSG_REG_2(GameMsgHdr, 0x300, OnSalePriceCheckNotify);

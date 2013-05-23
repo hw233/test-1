@@ -1287,6 +1287,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendLuckyStarInfo(1);
     pl->getLevelAwardInfo();
     pl->GetFairySpar()->sendAllInfo();
+    pl->sendDirectPurInfo();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
