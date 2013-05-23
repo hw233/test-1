@@ -992,9 +992,17 @@ UInt32 BattleSimulator::doSpiritAttack(BattleFighter * bf, BattleFighter* bo, fl
         float toughFactor = pr2 ? bo->getTough(bf) : 1.0f;
         def = bo->getDefend();
         float atkreduce = bo->getAtkReduce();
-        dmg = _formula->calcDamage(atk, def, bf->getLevel(), toughFactor, atkreduce);
-        dmg *= static_cast<float>(950 + _rnd(100)) / 1000;
-        dmg = dmg > 0 ? dmg : 1;
+
+        if(bo->hasFlag(BattleFighter::IsMirror))
+        {
+            dmg = bo->getHP();
+        }
+        else
+        {
+            dmg = _formula->calcDamage(atk, def, bf->getLevel(), toughFactor, atkreduce);
+            dmg *= static_cast<float>(950 + _rnd(100)) / 1000;
+            dmg = dmg > 0 ? dmg : 1;
+        }
 
         UInt32 dmg2 = dmg;
         makeDamage(bo, dmg);
@@ -1009,6 +1017,8 @@ UInt32 BattleSimulator::doSpiritAttack(BattleFighter * bf, BattleFighter* bo, fl
             onDamage(bo, true, NULL);
         }
     }
+    else if(!defend100 && !enterEvade)
+        appendDefStatus(e_damEvade, 0, bo);
     else
     {
         if(!defend100)
@@ -1042,7 +1052,6 @@ UInt32 BattleSimulator::doXinmoAttack(BattleFighter * bf, BattleObject* bo)
     UInt8 target_stun = area_target->getStunRound();
     bool enterEvade = area_target->getEvad100();
     bool defend100 = area_target->getDefend100();
-
 
     appendDefStatus(e_xinmo, 0, bf);
     bool pr = false;
@@ -1083,6 +1092,8 @@ UInt32 BattleSimulator::doXinmoAttack(BattleFighter * bf, BattleObject* bo)
             onDamage(area_target, true, NULL);
         }
     }
+    else if(!defend100 && !enterEvade)
+        appendDefStatus(e_damEvade, 0, area_target);
     else
     {
         if(enterEvade)
@@ -8640,6 +8651,8 @@ UInt32 BattleSimulator::CalcNormalAttackDamage(BattleFighter * bf, BattleObject*
         dmg = dmg > 0 ? dmg : 1;
         eStateType = e_damNormal;
     }
+    else if(!defend100 && !enterEvade)
+        eStateType = e_damEvade;
     else
     {
         if(enterEvade)
@@ -8997,6 +9010,13 @@ bool BattleSimulator::AddSkillStrengthenState(BattleFighter* pFighter, BattleFig
     }
     UInt16 nImmu = pTarget->getImmune();
     UInt16 nImmu2 = pTarget->getImmune2();
+    UInt16 colorStock = pTarget->getColorStock();
+    if(arrayState[nIndex] & colorStock)
+    {
+        appendDefStatus(e_Immune, 0, pTarget);
+        return false;
+    }
+
     if(arrayState[nIndex]& nImmu2)
     {
         pTarget->setImmune2(0);
@@ -11827,6 +11847,8 @@ void BattleSimulator::doSneakAttack(BattleFighter* bf, BattleFighter* bo, bool& 
         else if(_winner == 0)
             onDamage(bo, true, NULL);
     }
+    else if(!defend100 && !enterEvade)
+        appendDefStatus(e_damEvade, 0, bo);
     else
     {
         if(defend100)

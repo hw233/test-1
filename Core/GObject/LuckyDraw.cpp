@@ -18,7 +18,7 @@
 
 namespace GObject
 {
-
+#define LEVEL110_ADD_NUM 1
 void LuckyDraw::sendInfo(Player* player)
 {
     if (!player)
@@ -28,8 +28,8 @@ void LuckyDraw::sendInfo(Player* player)
     Stream st(REP::LUCKYDRAW);
 
     st << static_cast<UInt8>(1);
-    st << static_cast<UInt8>(6);
-    for (UInt8 i = 2; i < 8; ++i)
+    st << static_cast<UInt8>(6 + LEVEL110_ADD_NUM);
+    for (UInt8 i = 2; i < 8 + LEVEL110_ADD_NUM; ++i)
     {
         if (GVAR.GetVar(GVAR_TCPASS) >= i)
             st << static_cast<UInt8>(1);
@@ -191,7 +191,7 @@ void LuckyDraw::pushLog(const std::string& name, const std::string& its)
 
 void LuckyDraw::notifyPass(UInt8 id)
 {
-    if (id <= 1 || id == 8)
+    if (id <= 1 || id == 8 + LEVEL110_ADD_NUM)
         return;
     UInt8 maxid = GVAR.GetVar(GVAR_TCPASS);
     if (id > maxid)

@@ -49,6 +49,7 @@
 #include "GObject/Tianjie.h"
 #include "Memcached.h"
 #include "Version.h"
+#include "GObject/FairySpar.h"
 GMHandler gmHandler;
 
 GMHandler::GMHandler()
@@ -259,6 +260,7 @@ GMHandler::GMHandler()
     Reg(3, "setem", &GMHandler::OnClanBossSetEm);
 
     Reg(3, "settdlvl", &GMHandler::OnSetTownDeamonMaxLevel);
+    Reg(3, "spar", &GMHandler::OnFairySpar);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -3964,5 +3966,42 @@ void GMHandler::OnSetTownDeamonMaxLevel(GObject::Player *player, std::vector<std
         return;
     UInt16 lv = atoi(args[0].c_str()); 
     player->getDeamonPlayerData()->maxLevel = lv;
+}
+
+void GMHandler::OnFairySpar(GObject::Player *player, std::vector<std::string>& args)
+{
+    if(args.size() < 1)
+        return;
+    UInt8 type = atoi(args[0].c_str());
+    if(type == 0)
+    {
+        if(args.size() < 2)
+            return;
+        UInt8 complexP = atoi(args[1].c_str());
+        if(complexP > 100)
+            complexP = 100;
+        player->GetFairySpar()->gmSetComplexPercent(complexP);
+    }
+    else if(type == 1)
+    {
+        if(args.size() < 6)
+            return;
+        UInt8 elem1 = atoi(args[1].c_str());
+        if(elem1 > 24)
+            elem1 = 24;
+        UInt8 elem2 = atoi(args[2].c_str());
+        if(elem2 > 24)
+            elem2 = 24;
+        UInt8 elem3 = atoi(args[3].c_str());
+        if(elem3 > 24)
+            elem3 = 24;
+        UInt8 elem4 = atoi(args[4].c_str());
+        if(elem4 > 24)
+            elem4 = 24;
+        UInt8 elem5 = atoi(args[5].c_str());
+        if(elem5 > 24)
+            elem5 = 24;
+        player->GetFairySpar()->gmSetElement(elem1, elem2, elem3, elem4, elem5);
+    }
 }
 

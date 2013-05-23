@@ -287,6 +287,7 @@ namespace Script
         UInt32 getDreamerItem(UInt8 id, UInt8 index);
         bool RunVipPrivilegeAward(Player* player, UInt8 idx, UInt8 dayth);
         bool RunLevelAward(Player* player,UInt8 opt =0 );
+        void onRecharge(Player* player, UInt32 r);
 
     public:
 
@@ -369,6 +370,9 @@ namespace Script
         void GetLuckyBagAward(Player * player);
         UInt32 GetSpreadCountForAward();
         lua_tinker::table GetSpreadAward();
+        UInt32 GetFairySparParaMax(UInt8 type, UInt8 count);
+        Table GetFairySparElement(UInt8 flag);
+
 	private:
 		Player* _player1;	//?ű???????Ϊ????1
 		Player* _player2;	//?ű???????Ϊ????2

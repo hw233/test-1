@@ -164,5 +164,24 @@ void OnForbidSale( LoginMsgHdr&hdr, const void *data)
     }
 }
 
+struct RechargeInfo
+{
+    char name[64];
+    UInt32 total;
+} RechargeRank4IDIP[7] = {{{0,},0},};
+
+void OnRecharge4IDIP( LoginMsgHdr&hdr, const void *data )
+{
+    memcpy(&RechargeRank4IDIP, data, sizeof(RechargeRank4IDIP));
+    struct RechargeInfo* pinfo = (RechargeInfo*)(&RechargeRank4IDIP);
+    for (UInt32 i = 0; i < 7; ++i)
+    {
+        if (!pinfo[i].total)
+            break;
+
+        fprintf(stderr, "name: %s\n", pinfo[i].name);
+        fprintf(stderr, "total: %u\n", pinfo[i].total);
+    }
+}
 
 #endif // _LOGININNERMSGHANDLER_H_

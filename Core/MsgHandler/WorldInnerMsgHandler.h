@@ -811,6 +811,29 @@ void OnLuckyDraw( GameMsgHdr& hdr,  const void* data )
 }
 
 #define CNT 7
+void SyncToLogin4IDIP()
+{
+    struct RechargeInfo
+    {
+        char name[64];
+        UInt32 total;
+    } info[7] = {{{0,},0},};
+
+    UInt32 c = 0;
+    for (RCSortType::iterator i = World::rechargeSort.begin(), e = World::rechargeSort.end(); i != e; ++i)
+    {
+        snprintf(info[c].name, 63, i->player->getName().c_str());
+        info[c].total = i->total;
+
+        ++c;
+        if (c >= CNT)
+            break;
+    }
+
+    LoginMsgHdr hdr1(0x331, WORKER_THREAD_LOGIN, NULL, -1, sizeof(info));
+    GLOBAL().PushMsg(hdr1, &info);
+}
+
 void SendRechargeRank(Stream& st)
 {
     using namespace GObject;
@@ -830,7 +853,10 @@ void SendRechargeRank(Stream& st)
             break;
     }
     st << Stream::eos;
+
+    SyncToLogin4IDIP();
 }
+
 void SendLuckyBagRank(Stream& st)
 {
     using namespace GObject;

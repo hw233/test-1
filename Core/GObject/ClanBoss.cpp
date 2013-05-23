@@ -1595,6 +1595,7 @@ void ClanBoss::addGongXian(Player* pl, Clan* cl, UInt32 num, bool pend)
     pl->pendLastGongxian(num);
     if (!pend)
         pl->addLastGongxian();
+    cl->addMemberProffer(pl, num);
     for (UInt8 i = 0; i < sizeof(s_plGx)/sizeof(s_plGx[0]); ++i)
     {
         if (plOldGx < s_plGx[i] && (plOldGx+num) >= s_plGx[i])
@@ -1985,11 +1986,14 @@ const UInt8 g_rankRewardSize = 3;
 void ClanBoss::reward()
 {
     static MailPackage::MailItem s_rankItems[g_rankRewardSize] = {{134,150},{134,80},{134,50}};
+    static MailPackage::MailItem s_rankItems2[g_rankRewardSize] = {{9389,100},{9389,60},{9389,30}};
     static MailPackage::MailItem s_items[4] = {{1325,10},{1325,6},{1325,3},{1325,1}};
+    static MailPackage::MailItem s_items_2[4] = {{9389,10},{9389,6},{9389,3},{9389,1}};
     static UInt32  s_score[4] = {10000, 5000, 1000, 1};
-    static MailPackage::MailItem s_items2[6] = {{1325,10},{1325,8},{1325,6},{1325,4},{1325,2},{1325,1}};
+    static MailPackage::MailItem s_items2[12] = {{1325,10},{9389,10},{1325,8},{9389,8},{1325,6},{9389,6},{1325,4},{9389,4},{1325,2},{9389,2},{1325,1},{9389,1}};
     static UInt32  s_score2[6] = {3000,2000,1000,500,100,1};
     static MailPackage::MailItem s_items3[] = {{134,50},{134,30},{134,20},{134,10}};
+    static MailPackage::MailItem s_items3_2[] = {{9389,30},{9389,20},{9389,10},{9389,5}};
     static UInt32  s_score3[] = {999,4999,9999,15000};
 
 
@@ -2025,11 +2029,11 @@ void ClanBoss::reward()
                         break;
                     }
                 }
-		        MailItemsInfo itemsInfo(&s_items2[idx], ClanBossAct, 1);
+		        MailItemsInfo itemsInfo(&s_items2[idx*2], ClanBossAct, 2);
                 Mail * mail2 = member->player->GetMailBox()->newMail(NULL, 0x21, title2, content2, 0xFFFE0000, true, &itemsInfo);
                 if(mail2)
                 {
-                    mailPackageManager.push(mail2->id, s_items2[idx].id, s_items2[idx].count, true);
+                    mailPackageManager.push(mail2->id, &s_items2[idx*2], 2, true);
                 }
                 member->player->SetVar(VAR_CLANBOSS_GONGXIAN, 0);
                 if (_bossDead)
@@ -2059,11 +2063,16 @@ void ClanBoss::reward()
             if (rankCount == 0)
                 maxScore = it->first;
             it->second->AddItem(s_rankItems[rankCount].id, s_rankItems[rankCount].count);
+            it->second->AddItem(s_rankItems2[rankCount].id, s_rankItems2[rankCount].count);
             names[rankCount] = it->second->getName();
 
             std::ostringstream itemstream;
             itemstream << s_rankItems[rankCount].id << "," << s_rankItems[rankCount].count << ";";
             it->second->AddItemHistory(ClanItemHistory::CLANBOSS, TimeUtil::Now(), 0, itemstream.str());
+
+            std::ostringstream itemstream2;
+            itemstream2 << s_rankItems2[rankCount].id << "," << s_rankItems2[rankCount].count << ";";
+            it->second->AddItemHistory(ClanItemHistory::CLANBOSS, TimeUtil::Now(), 0, itemstream2.str());
         }
         UInt32 score = it->first;
         for (UInt8 i = 0; i < sizeof(s_score)/sizeof(s_score[0]); ++i)
@@ -2071,9 +2080,13 @@ void ClanBoss::reward()
             if (score >= s_score[i])
             {
                 it->second->AddItem(s_items[i].id, s_items[i].count);
+                it->second->AddItem(s_items_2[i].id, s_items_2[i].count);
                 std::ostringstream itemstream;
                 itemstream << s_items[i].id << "," << s_items[i].count << ";";
                 it->second->AddItemHistory(ClanItemHistory::CLANBOSS, TimeUtil::Now(), 0, itemstream.str());
+                std::ostringstream itemstream2;
+                itemstream2 << s_items_2[i].id << "," << s_items_2[i].count << ";";
+                it->second->AddItemHistory(ClanItemHistory::CLANBOSS, TimeUtil::Now(), 0, itemstream2.str());
                 break;
             }
         }
@@ -2082,9 +2095,13 @@ void ClanBoss::reward()
             if (maxScore-score <= s_score3[i])
             {
                 it->second->AddItem(s_items3[i].id, s_items3[i].count);
+                it->second->AddItem(s_items3_2[i].id, s_items3_2[i].count);
                 std::ostringstream itemstream;
                 itemstream << s_items3[i].id << "," << s_items3[i].count << ";";
                 it->second->AddItemHistory(ClanItemHistory::CLANBOSS, TimeUtil::Now(), 0, itemstream.str());
+                std::ostringstream itemstream2;
+                itemstream2 << s_items3_2[i].id << "," << s_items3_2[i].count << ";";
+                it->second->AddItemHistory(ClanItemHistory::CLANBOSS, TimeUtil::Now(), 0, itemstream2.str());
                 break;
             }
         }
