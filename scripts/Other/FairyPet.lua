@@ -15,10 +15,10 @@ local converts = {
         [2] = 7500,
         [3] = 7,
     },
-    [3] = {     --橙色仙宠(无)
-        [1] = 0,
-        [2] = 0,
-        [3] = 0,
+    [3] = {     --橙色仙宠
+        [1] = 15000,
+        [2] = 15000,
+        [3] = 7,
     },
     [4] = {     --暗金仙宠(无)
         [1] = 0,
@@ -30,6 +30,7 @@ local converts = {
 greenPet = {501, 504, 507, 510}     --绿色仙宠id  【注:设置为全局变量】
 bluePet = {502, 505, 508, 511}      --蓝色仙宠id  【注:设置为全局变量】
 purplePet = {503, 506, 509, 512}    --紫色仙宠id  【注:设置为全局变量】
+yellowPet = {513, 514, 515, 516}    --橙色仙宠id  【注:设置为全局变量】
 
 function exchangPurplePet(player)
     if nil == player then
@@ -58,6 +59,11 @@ function getPetColorFromId(petId)
     for _, val in pairs(purplePet) do
         if petId == val then
             return 2
+        end
+    end
+    for _, val in pairs(yellowPet) do
+        if petId == val then
+            return 3
         end
     end
     return 10
@@ -160,5 +166,22 @@ function getConvertPetValue(petId)
     result.fengsui = converts[color][2]
     result.like = converts[color][3]
     return result
+end
+
+function getYellowPetId(petId)
+    if nil == petId then
+        return 0
+    end
+    local idx = 0
+    for k, id in pairs(purplePet) do
+        if petId == id then
+            idx = k
+            break
+        end
+    end
+    if nil == yellowPet[idx] then
+        return 0
+    end
+    return yellowPet[idx]
 end
 
