@@ -20730,12 +20730,12 @@ void Player::addCuilianTimes()
         return;
 
     UInt32 times = GetVar(VAR_PET_CUILIAN_GOLD_DAILY_CNT) + 1;
-    if(getGold() < 50*times)
+    if(getGold() < 10*times-5)
         return;
 
     UInt32 cnt = GetVar(VAR_PET_CUILIAN_LEFT_CNT) + 10;
     ConsumeInfo ci(PetBBFT,0,0);
-    useGold(50*times, &ci);
+    useGold(10*times-5, &ci);
     SetVar(VAR_PET_CUILIAN_GOLD_DAILY_CNT, times);
     SetVar(VAR_PET_CUILIAN_LEFT_CNT, cnt);
 
@@ -20777,9 +20777,9 @@ void Player::doCuilian(UInt8 clType, UInt8 clOpt)
         }
         break;
     case 0x02:
-        if(getGold() < 40)
+        if(getGold() < 5)
             return;
-        useGold(40, &ci);
+        useGold(5, &ci);
         score = 100;
         break;
     default:

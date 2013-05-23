@@ -7,7 +7,7 @@
 #define PROB_BASE 10000
 #define GET_REMAINDER(val)  (val % 10)
 #define MAX_EVOLVE_VALUE 100
-#define EVOLVE_BONE_LIMIT 52
+#define EVOLVE_BONE_LIMIT 30
 
 class Stream;
 namespace GObject

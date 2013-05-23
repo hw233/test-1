@@ -3874,7 +3874,7 @@ void GMHandler::OnFairyPetGM(GObject::Player *player, std::vector<std::string>& 
                 FairyPet * pet = player->findFairyPet(val);
                 if(pet)
                 {
-                    pet->setPetBone(52);
+                    pet->setPetBone(EVOLVE_BONE_LIMIT);
                     pet->sendGenguInfo();
                 }
             }
