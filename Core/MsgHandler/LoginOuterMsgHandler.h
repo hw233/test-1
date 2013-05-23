@@ -963,8 +963,11 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
 
     if (no.length())
     {
-        DB8().PushUpdateData("REPLACE INTO `recharge` (`no`,`playerId`,`id`,`num`,`status`) VALUES ('%s', %"I64_FMT"u, %u, %u, %u)",
+        if (id == 29999)
+            DB8().PushUpdateData("REPLACE INTO `recharge` (`no`,`playerId`,`id`,`num`,`status`) VALUES ('%s', %"I64_FMT"u, %u, %u, %u)",
                 no.c_str(), player_Id, id, num, 0); // 0-准备/不成功 1-成功,2-补单成功
+        else
+            TRACE_LOG("DIRECTPUR: id: %u num: %u", id, num);
     }
     else
     {
@@ -1007,6 +1010,53 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
             {
                 GObject::prepaid.push(player_Id, num, no.c_str());
                 ret=0;
+            }
+        }
+        else if (num) // 直购其他物品
+        {
+            static UInt16 ids[] =
+            {
+                30,     10,
+                509,    2,
+                515,    2,
+                1325,   6,
+                134,    8,
+                549,    3,
+            };
+
+            bool in = false;
+            for (UInt8 i = 0; i < sizeof(ids)/sizeof(UInt16); i += 2)
+            {
+                if (ids[i] == id && num == ids[i+1])
+                    in = true;
+            }
+
+            if (in)
+            {
+                GObject::Player * player=GObject::globalPlayers[player_Id];
+                if (player != NULL)
+                {
+                    struct DirectPurchase
+                    {
+                        UInt16 id;
+                        UInt16 num;
+                        UInt32 code; // 0-正常 1-未开启 2-次数上限
+                    } purchase = {0,0,0};
+
+                    if (!player->GetVar(GObject::VAR_DIRECTPUROPEN))
+                        purchase.code = 1;
+
+                    if (player->GetVar(GObject::VAR_DIRECTPURCNT) >= 5)
+                        purchase.code = 2;
+
+                    purchase.id = id;
+                    purchase.num = num;
+                    GameMsgHdr hdr(0x2F2, player->getThreadId(), player, sizeof(purchase));
+                    GLOBAL().PushMsg(hdr, &purchase);
+
+                    if (!purchase.code)
+                        ret=0;
+                }
             }
         }
         else

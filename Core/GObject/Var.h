@@ -274,6 +274,8 @@ namespace GObject
         VAR_ITEM_9282_FAILED_COUNT = 216, // 锦云兜·墨礼包连续开启失败次数
 
         VAR_TOTALRECHARGEACT = 217, // 活动期间充值总额
+        VAR_DIRECTPUROPEN = 218, // 幸运星活动直购是否开启
+        VAR_DIRECTPURCNT = 219, // 幸运星活动直购次数
 
         /*
          * 【注:此段var(217--239)貌似未被占用】
@@ -417,6 +419,13 @@ namespace GObject
         VAR_HAS_VOTE = 441,                 // 本日是否投票过
         VAR_POPULARITY = 442,               // 本周人气
 
+        VAR_PET_CUILIAN_EXTRA_LOW_SCORE = 443, // 额外淬炼基础品质下限
+        VAR_PET_CUILIAN_EXTRA_UP_SCORE = 444,  // 额外淬炼基础品质下限
+        VAR_PET_CUILIAN_SCORE_EQUIP = 445,     // 内丹淬炼值
+        VAR_PET_CUILIAN_SCORE_GEM = 446,       // 精魄淬炼值
+        VAR_PET_CUILIAN_SCORE_EQUIP_TIMES = 447,     // 内丹淬炼次数
+        VAR_PET_CUILIAN_SCORE_GEM_TIMES = 448,       // 精魄淬炼次数
+
         VAR_FOOLBAO_USED = 450,  //愚人宝箱使用数
         VAR_HHBAWARD_GOT = 451 , //豪华蓝钻领取
         VAR_SURNAMELEGEND_USED = 452, //蜀山传奇幸运礼包使用数
@@ -430,14 +439,13 @@ namespace GObject
 
         //繁体版占用470-499
 
-        // 500-520 for zhgc
-        VAR_PET_CUILIAN_EXTRA_LOW_SCORE = 500, // 额外淬炼基础品质下限
-        VAR_PET_CUILIAN_EXTRA_UP_SCORE = 501,  // 额外淬炼基础品质下限
-        VAR_PET_CUILIAN_SCORE_EQUIP = 502,     // 内丹淬炼值
-        VAR_PET_CUILIAN_SCORE_GEM = 503,       // 精魄淬炼值
-        VAR_PET_CUILIAN_SCORE_EQUIP_TIMES = 504,     // 内丹淬炼次数
-        VAR_PET_CUILIAN_SCORE_GEM_TIMES = 505,       // 精魄淬炼次数
+        //500-520 for lijr
+        VAR_QQNAVIGATION_DAY_AWARD = 500, // QQ导航每天奖励是否领取
+        VAR_QQNAVIGATION_WEEK_AWARD = 501, // QQ导航每周奖励是否领取
+        VAR_QQNAVIGATION_FIRST_LOGIN_AWARD = 502, // QQ导航首次登录奖励是否领取
 
+        VAR_QQMUSIC_DAY_AWARD = 503, // QQ音乐每天奖励是否领取
+       
         VAR_MAX,
     };
 
@@ -689,6 +697,8 @@ namespace GObject
             REGISTER_VAR(VAR_ITEM_9281_FAILED_COUNT, CYCLE_NONE);
             REGISTER_VAR(VAR_ITEM_9282_FAILED_COUNT, CYCLE_NONE);
             REGISTER_VAR(VAR_TOTALRECHARGEACT, CYCLE_NONE);
+            REGISTER_VAR(VAR_DIRECTPUROPEN, CYCLE_NONE);
+            REGISTER_VAR(VAR_DIRECTPURCNT, CYCLE_NONE);
             REGISTER_VAR(VAR_USETAEL_CNT, CYCLE_DAY);
             REGISTER_VAR(VAR_USECOUPON_CNT, CYCLE_DAY);
             REGISTER_VAR(VAR_USEGOLD_CNT, CYCLE_DAY);
@@ -721,7 +731,11 @@ namespace GObject
             REGISTER_VAR(VAR_PET_CUILIAN_GOLD_DAILY_CNT, CYCLE_DAY);
             REGISTER_VAR(VAR_QQEXPLORER_AWARD, CYCLE_NONE);
 
-            REGISTER_VAR(VAR_ARENA_SUPPORT, CYCLE_DAY);
+            REGISTER_VAR(VAR_QQNAVIGATION_DAY_AWARD, CYCLE_DAY);
+            REGISTER_VAR(VAR_QQNAVIGATION_WEEK_AWARD, CYCLE_WEEK);
+            REGISTER_VAR(VAR_QQNAVIGATION_FIRST_LOGIN_AWARD, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_QQMUSIC_DAY_AWARD, CYCLE_DAY);
             //REGISTER_VAR(VAR_ARENA_SUFFERED, CYCLE_DAY);
             //REGISTER_VAR(VAR_ARENA_LASTTIME, CYCLE_DAY);
             REGISTER_VAR(VAR_ARENA_SUPPORT_TUE, CYCLE_WEEK);

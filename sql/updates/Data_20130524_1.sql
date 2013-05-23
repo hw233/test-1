@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS `pet_equipExp`;
-CREATE TABLE `pet_equipExp` (
+DROP TABLE IF EXISTS `pet_levelup`;
+CREATE TABLE `pet_levelup` (
     `id` tinyint(3) unsigned NOT NULL DEFAULT 0,
     `green` int(10) unsigned NOT NULL DEFAULT 0,
     `blue` int(10) unsigned NOT NULL DEFAULT 0,
@@ -9,8 +9,8 @@ CREATE TABLE `pet_equipExp` (
     PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `pet_eqAttreffect`;
-CREATE TABLE `pet_eqAttreffect` (
+DROP TABLE IF EXISTS `pet_neidan`;
+CREATE TABLE `pet_neidan` (
     `id` tinyint(3) unsigned NOT NULL DEFAULT 0,
     `hp` float(10,2) unsigned NOT NULL DEFAULT '0.00',
     `atk` float(10,2) unsigned NOT NULL DEFAULT '0.00',

@@ -241,6 +241,7 @@ MSG_REG_2(GameMsgHdr, 0x280, OnCancelDungeonAutoNotifyReq);
 MSG_REG_2(GameMsgHdr, 0x281, OnCompleteDungeonAutoNotifyReq);
 MSG_REG_2(GameMsgHdr, 0x282, OnResetRecharge);
 MSG_REG_2(GameMsgHdr, 0x283, OnResetConsume);
+MSG_REG_2(GameMsgHdr, 0x284, OnResetAccRechargeCnt);
 MSG_REG_2(GameMsgHdr, 0x289, OnTimerEventCompletedNotify);
 MSG_REG_2(GameMsgHdr, 0x28C, OnSearchAutoBattleResult);
 MSG_REG_2(GameMsgHdr, 0x28D, OnSearchAutoDungeonResult);
@@ -259,6 +260,7 @@ MSG_REG_2(GameMsgHdr, 0x297, OnCreateAward);
 MSG_REG_2(GameMsgHdr, 0x2A1, OnAutoJobHunterStep);
 
 MSG_REG_2(GameMsgHdr, 0x2F0, OnGoldRecharge);
+MSG_REG_2(GameMsgHdr, 0x2F2, OnDirectPurchase);
 MSG_REG_2(GameMsgHdr, 0x2F1, OnYDPacks);
 
 MSG_REG_2(GameMsgHdr, 0x300, OnSalePriceCheckNotify);

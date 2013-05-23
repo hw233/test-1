@@ -285,7 +285,7 @@ namespace GObject
             return 0;
 		if(GetPetGemPgRestSize() < 1)
 		{
-			m_Owner->sendMsgCode(0, 1011);
+			m_Owner->sendMsgCode(0, 1094);
 			return 0;
 		}
 
@@ -378,7 +378,7 @@ namespace GObject
             return 0;
 		if(GetPetGemPgRestSize() < 1)
 		{
-			m_Owner->sendMsgCode(0, 1011);
+			m_Owner->sendMsgCode(0, 1094);
 			return 0;
 		}
 		FairyPet * pet = NULL;
@@ -411,7 +411,7 @@ namespace GObject
             return false;
 		if(id == 0 && GetPetEqPgRestSize() < 1)
 		{
-			m_Owner->sendMsgCode(0, 1011);
+			m_Owner->sendMsgCode(0, 1094);
 			return false;
 		}
 		ItemPetEq * old = NULL;
@@ -582,7 +582,7 @@ namespace GObject
     {
 		if(GetPetEqPgRestSize() < 1)
 		{
-			m_Owner->sendMsgCode(0, 1011);
+			m_Owner->sendMsgCode(0, 1094);
 			return NULL;
 		}
 		const GData::ItemBaseType * itype = NULL;
@@ -628,7 +628,7 @@ namespace GObject
     {
 		if(GetPetGemPgRestSize() < 1)
 		{
-			m_Owner->sendMsgCode(0, 1011);
+			m_Owner->sendMsgCode(0, 1094);
 			return NULL;
 		}
         if(score != 0)

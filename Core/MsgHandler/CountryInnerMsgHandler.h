@@ -183,6 +183,13 @@ void OnResetRecharge(GameMsgHdr& hdr, const void * data)
     player->sendRechargeInfo();
 }
 
+void OnResetAccRechargeCnt(GameMsgHdr& hdr, const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+    if (player->GetVar(VAR_RECHARGE_CONDCNT))
+        player->SetVar(VAR_RECHARGE_CONDCNT, 0);
+}
+
 void OnResetConsume(GameMsgHdr& hdr, const void * data)
 {
 	MSG_QUERY_PLAYER(player);
@@ -962,6 +969,43 @@ void OnGoldRecharge( GameMsgHdr& hdr, const void * data )
         // XXX: 把创建银角色前的所有订单号置成成功
         DB8().PushUpdateData("UPDATE `recharge` SET `status` = 1 WHERE playerId = %"I64_FMT"u", player->getId());
     }
+}
+
+void OnDirectPurchase( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+    struct DirectPurchase
+    {
+        UInt16 id;
+        UInt16 num;
+        UInt32 code; // 0-正常 1-未开启 2-次数上限
+    };
+
+    DirectPurchase* pur = (DirectPurchase*)data;
+    if (!pur->id || !pur->num)
+        return;
+
+    if (pur->code == 1)
+    {
+        SYSMSG_SENDV(4916, player);
+        return;
+    }
+    if (pur->code == 2)
+    {
+        SYSMSG_SENDV(4917, player);
+        return;
+    }
+
+    Package* pkg = player->GetPackage();
+    if (pkg->GetRestPackageSize() < 1)
+    {
+        player->sendMsgCode(0, 1011);
+        return;
+    }
+
+    pkg->AddItem(pur->id, pur->num, true, false, FromDirectPurchase);
+    player->AddVar(VAR_DIRECTPURCNT, 1);
+    player->sendDirectPurInfo();
 }
 
 void OnYDPacks( GameMsgHdr& hdr, const void * data )

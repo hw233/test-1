@@ -204,13 +204,15 @@ namespace GObject
         UInt8 EquipUpgrade( UInt16 fighterId, UInt32 itemId , UInt32* pNewID, UInt16* pFgtId);
 
         //×°±¸ÊôÐÔ×ªÒÆ
-        UInt8 EquipMove( UInt16 ffighterId, UInt16 tfighterId,UInt32 fromItemId, UInt32 toItemId, UInt8 type);
-        UInt8 moveEquipEnchant(Fighter*,Fighter*, ItemEquip*, UInt8, ItemEquip*, UInt8);
-        UInt8 moveEquipGem(Fighter*,Fighter*, ItemEquip*, UInt8, ItemEquip*, UInt8);
-        UInt8 moveEquipSpirit(Fighter*,Fighter*, ItemEquip*, UInt8, ItemEquip*, UInt8);
-        UInt8 isCanMove(ItemEquip* fromEquip, ItemEquip* toEquip, UInt8 type);
+        UInt8 EquipMove( UInt16 ffighterId, UInt16 tfighterId,UInt32 fromItemId, UInt32 toItemId, UInt8 type, UInt8 mark);
+        UInt8 moveEquipEnchant(Fighter*,Fighter*, ItemEquip*, UInt8, ItemEquip*, UInt8, UInt8);
+        UInt8 moveEquipGem(Fighter*,Fighter*, ItemEquip*, UInt8, ItemEquip*, UInt8, UInt8);
+        UInt8 moveEquipSpirit(Fighter*,Fighter*, ItemEquip*, UInt8, ItemEquip*, UInt8, UInt8);
+        UInt8 isCanMove(ItemEquip* fromEquip, ItemEquip* toEquip, UInt8 type, UInt8 mark);
         UInt8 moveUseMoney(ItemEquip* fromEquip, ItemEquip* toEquip, UInt8 type);
-        UInt8 moveEquipFashion(Fighter*,Fighter*, ItemEquip*, UInt8, ItemEquip*, UInt8);
+        UInt8 moveEquipFashion(Fighter*,Fighter*, ItemEquip*, UInt8, ItemEquip*, UInt8); 
+        UInt8 moveEquipPurify(Fighter*,Fighter*, ItemEquip*, UInt8, ItemEquip*, UInt8); 
+        UInt8 moveDeductMoney(ItemEquip* fromEquip, ItemEquip* toEquip, UInt8 type);
 
         void setItemBind(UInt32 typeId);
 

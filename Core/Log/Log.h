@@ -225,8 +225,11 @@ enum ItemFrom
     FromLevelAward = 44, //等级奖励
     FromBBFT = 45, // 八部浮屠
     FromQQExplorer = 46, //QQ浏览器奖励
-    FromPetGemMgerge = 47, //仙宠宝石合成
-    FromPetDetachGem = 48, //仙宠宝石拆卸
+    FromQQNavigation = 47, //QQ导航奖励
+    FromQQMusic = 48, //QQ音乐奖励
+    FromDirectPurchase = 49, //Q点直购
+    FromPetGemMgerge = 50, //仙宠宝石合成
+    FromPetDetachGem = 51, //仙宠宝石拆卸
 };
 
 enum ItemTo

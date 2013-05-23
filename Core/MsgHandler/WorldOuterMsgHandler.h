@@ -2507,6 +2507,13 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             }
         }
         break;
+        case 0x42:
+        {
+            UInt8 flag = 0;
+            brd >> flag;
+            player->SetVar(VAR_DIRECTPUROPEN, flag?1:0);
+        }
+        break;
         default:
             break;
     }
