@@ -11,6 +11,8 @@
 #include "Fighter.h"
 #include "MsgID.h"
 #include "FairyPet.h"
+#include "Script/GameActionLua.h"
+#include "GObject/Country.h"
 
 
 namespace GObject
@@ -449,6 +451,37 @@ namespace GObject
         st << static_cast<UInt32>(getGenguBless() + ggd->baseProb);
         st << Stream::eos;
         _owner->send(st);
+    }
+
+    void FairyPet::sendPetEvolve()
+    {
+        Stream st(REP::FAIRY_PET);
+        st << static_cast<UInt8>(0x01) << static_cast<UInt8>(0x07);
+        st << static_cast<UInt8>(0);
+        st << getId() << getPetEvolve() << Stream::eos;
+        _owner->send(st);
+    }
+
+    UInt16 FairyPet::addPetEvolveInlua(UInt16 num)
+    {
+        UInt8 evolve = getPetEvolve();
+        if(!num || evolve >= getPetEvMax() || getPetBone() < EVOLVE_BONE_LIMIT || getColor() != 2)
+            return 0;
+        UInt32 newId = GameAction()->getYellowPetId(getId());
+        if(_owner->findFairyPet(newId))
+            return 0;
+        UInt16 n = 0;
+        for(UInt16 i = 0; i < num; ++ i)
+        {
+            ++ n;
+            evolve += (GRND(9) + 1);
+            if(evolve >= getPetEvMax())
+                break;
+        }
+        setPetEvolve(evolve);
+        UpdateToDB();
+        sendPetEvolve();
+        return n;
     }
 
     void FairyPet::AppendEquipData(Stream& st)

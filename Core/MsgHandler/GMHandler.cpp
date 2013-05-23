@@ -48,6 +48,7 @@
 #include "Common/Itoa.h"
 #include "GObject/TownDeamon.h"
 #include "Script/BattleFormula.h"
+#include "GObject/FairyPet.h"
 
 #include "GObject/Tianjie.h"
 #include "Memcached.h"
@@ -3867,6 +3868,16 @@ void GMHandler::OnFairyPetGM(GObject::Player *player, std::vector<std::string>& 
     UInt32 val = atoi(args[1].c_str());
     switch(type)
     {
+        case 0:
+            {
+                FairyPet * pet = player->findFairyPet(val);
+                if(pet)
+                {
+                    pet->setPetBone(52);
+                    pet->sendGenguInfo();
+                }
+            }
+            break;
         case 1:
             player->setCanHirePet(val);
             player->hireFairyPet(val);
@@ -3880,7 +3891,14 @@ void GMHandler::OnFairyPetGM(GObject::Player *player, std::vector<std::string>& 
             player->sendFairyPetResource();
             break;
         case 3:
-            player->setFairypetBattle(val);
+            {
+                FairyPet * pet = player->findFairyPet(val);
+                if(pet)
+                {
+                    pet->setPetEvolve(atoi(args[2].c_str()));
+                    pet->sendPetEvolve();
+                }
+            }
             break;
         case 4:
             player->AddVar(VAR_FAIRYPET_LIKEABILITY, val);

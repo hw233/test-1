@@ -6144,6 +6144,15 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
                             player->send(st);
                         }
                         break;
+                    case 0x07:
+                        {
+                            UInt32 id = player->evolvePet(petId);
+                            Stream st(REP::FAIRY_PET);
+                            st << type << opt << static_cast<UInt8>(1);
+                            st << id << Stream::eos;
+                            player->send(st);
+                        }
+                        break;
                 }
             }
             break;

@@ -1933,13 +1933,7 @@ namespace GObject
             {
                 if(member->player->GetVar(VAR_DAILY_CLANBATTLE) != 0)
                 {
-                    Mail * mail = member->player->GetMailBox()->newMail(NULL, 0x41, m_Title, m_Content, m_Score, true, m_pInfo);
-                    if(member->player->GetLev() >= 60)
-                    {
-                        MailPackage::MailItem mitem[] = { {9390, 1} };
-                        if(mail)
-                            GObject::mailPackageManager.push(mail->id, mitem, 1, true);
-                    }
+                    member->player->GetMailBox()->newMail(NULL, 0x41, m_Title, m_Content, m_Score, true, m_pInfo);
                     member->player->SetVar(VAR_DAILY_CLANBATTLE, 0);
                 }
                 return true;

@@ -115,6 +115,7 @@ function loadStore()
 
         discount(store)
 
+        store:add(2, 9388, 50)
         store:add(2, 9371, 10)
 
         if getSpecialBookAct() then  --特殊古籍活动

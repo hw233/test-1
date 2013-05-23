@@ -2600,34 +2600,6 @@ namespace GObject
 		}
 		lc.finalize();
 
-        /*
-		lc.prepare("Loading fairyPet data:");
-		last_id = 0xFFFFFFFFFFFFFFFFull;
-		pl = NULL;
-		DBFairyPetData fpetdb;
-		if(execu->Prepare("SELECT `id`, `playerId`, `onBattle`, `petLev`, `petBone`, `pinjieBless`, `genguBless`, `chong`, `overTime`, `xiaozhou`, `dazhou`, `evolve`, `equip1`, `equip2`, `equip3` FROM `fairyPet` ORDER BY `playerId`", fpetdb) != DB::DB_OK)
-			return false;
-		lc.reset(200);
-		while(execu->Next() == DB::DB_OK)
-		{
-			lc.advance();
-			if(fpetdb.playerId != last_id)
-			{
-				last_id = fpetdb.playerId;
-				pl = globalPlayers[last_id];
-			}
-			if(pl == NULL)
-				continue;
-			FairyPet * pet = static_cast<FairyPet *>(pl->findFairyPet(fpetdb.id));
-			if(pet != NULL)
-            {
-                pet->LoadFromDB(fpetdb);
-                if(fpetdb.onBattle)
-                    pl->setFairypetBattle(pet, false);
-            }
-		}
-		lc.finalize();
-        */
 		/////////////////////////////////
 
 		globalPlayers.enumerate(player_load, 0);

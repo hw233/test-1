@@ -6,6 +6,8 @@
 #define PET_EQUIP_UPMAX 3
 #define PROB_BASE 10000
 #define GET_REMAINDER(val)  (val % 10)
+#define MAX_EVOLVE_VALUE 100
+#define EVOLVE_BONE_LIMIT 52
 
 class Stream;
 namespace GObject
@@ -28,7 +30,7 @@ private:
     UInt32 _overTime;
     UInt16 _xiaozhou;
     UInt16 _dazhou;
-    UInt16 _evolve;
+    UInt16 _evolve;     //仙宠进化值(紫色)
     UInt16 _initskl[INIT_SKILL_UPMAX];
     ItemPetEq * _equips[PET_EQUIP_UPMAX];
 public:
@@ -44,6 +46,8 @@ public:
     void useZhoutian(UInt8);
     void sendPinjieInfo();
     void sendGenguInfo();
+    void sendPetEvolve();
+    UInt16 addPetEvolveInlua(UInt16);
     void initSkillUp();
     void delSkills(std::string&);
     void AppendEquipData(Stream& st);
@@ -55,6 +59,7 @@ public:
 
     inline bool isOnBattle()            { return _onBattle; }
     inline void setOnBattle(bool flag)  { _onBattle = flag; }
+    inline void setPetEvolve(UInt16 v)  { _evolve = v > getPetEvMax() ? getPetEvMax() : v; }
     inline void setPetBone(UInt16 v)    { _petBone = v; }
     inline void setPetLev(UInt16 v)     { _petLev = v; }
     inline void setXiaozhou(UInt16 v)   { _xiaozhou = v; }
@@ -71,6 +76,9 @@ public:
     inline UInt8 getChongNum()          { return _chong; }
     inline UInt32 getGenguBless()       { return _genguBless; }
     inline UInt16 getPinjieBless1()     { return _pinjieBless; }
+    inline UInt8 getPetEvolve()         { return _evolve; }
+    inline UInt8 getPetEvMax()          { return MAX_EVOLVE_VALUE; }
+
     inline UInt8 getTargetPos()
     {
         switch (getClass())

@@ -2318,6 +2318,7 @@ namespace GObject
         void getPetByLevelUp(UInt8);
         UInt8 getPetByPetEgg(UInt32);
         UInt8 transferPet(UInt32, UInt32);
+        UInt32 evolvePet(UInt32);
 
         void getXianyuanLua(UInt32);
         void getLongyuanLua(UInt32);
