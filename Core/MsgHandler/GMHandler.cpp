@@ -103,6 +103,7 @@ GMHandler::GMHandler()
     Reg(3, "lbskill", &GMHandler::OnLingbaoSkill);
     Reg(3, "lbs", &GMHandler::OnLingbaos);
     Reg(3, "testlb", &GMHandler::testLingbao);
+    Reg(3, "peteq", &GMHandler::OnPetEq);
 
 
 
@@ -4102,5 +4103,33 @@ void GMHandler::OnAddPetEquipExp(GObject::Player *player, std::vector<std::strin
     DB4().PushUpdateData("UPDATE `petEquipattr` SET `exp` = %u, `level` = %u, `skillId` = %u WHERE `id` = %u", peAttr.exp, peAttr.lv, peAttr.skill, equip->getId());
     pet->setDirty();
     pet->sendModification(equip, pos);
+}
+
+void GMHandler::OnPetEq(GObject::Player * player, std::vector<std::string>& args)
+{
+	if (args.size() < 1)
+		return ;
+	for(size_t i = 0; i < args.size(); ++ i)
+	{
+		UInt32 itemId = atoi(args[i].c_str());
+        ++ i;
+        UInt16 skill = atoi(args[i].c_str()); 
+		const GData::ItemBaseType * itype = GData::itemBaseTypeManager[itemId];
+		if(itype == NULL)
+            break;
+
+        GObject::PetPackage * package = player->GetPetPackage();
+        UInt32 id = IDGenerator::gItemOidGenerator.ID();
+        ItemPetEqAttr ipeqAttr;
+        ItemEquipData edata;
+        ipeqAttr.skill = skill;
+        ItemPetEq * equip = new ItemPetEq(id, itype, edata, ipeqAttr);
+        if(equip == NULL)
+            break;
+
+        equip->SetBindStatus(true);
+        package->AddPetEquip(equip, true);
+    }
+
 }
 
