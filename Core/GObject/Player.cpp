@@ -10979,7 +10979,7 @@ namespace GObject
     void Player::getQQMusicAward(UInt8 opt)
     {
          
-        UInt8 state = GetVar(VAR_QQMUSIC_DAY_AWARD);
+       /* UInt8 state = GetVar(VAR_QQMUSIC_DAY_AWARD);
 
         if (GetPackage()->GetRestPackageSize() < 6 && opt == 1)
         {
@@ -11002,7 +11002,7 @@ namespace GObject
         Stream st(REP::GETAWARD);
         st << static_cast<UInt8>(21);
         st << state << Stream::eos;
-        send(st);
+        send(st);*/
     }
 
     void Player::getQQNavigationAward(UInt8 opt)
@@ -11023,7 +11023,6 @@ namespace GObject
 
         if(getVia() == "ssgw_qqdh")
         {
-           
              if(opt == 1 && dayAward == 0)  //领取QQ导航每天奖励
              {
                  GetPackage()->AddItem(15, 1, true, false,FromQQNavigation);
@@ -11047,10 +11046,28 @@ namespace GObject
                  SetVar(VAR_QQNAVIGATION_FIRST_LOGIN_AWARD, 1);
                  firstLoginAward = 1;
              }
+
+           states = (dayAward + 1) | (weekAward + 1) << 2 | (firstLoginAward + 1) << 4;
         }
+        else
+        {
+            if(1 == dayAward)
+            {
+                dayAward += 1;
+            }
 
-        states = (dayAward + 1) | (weekAward + 1)<<2 | (firstLoginAward + 1)<<4;
+            if(1 == weekAward)
+            {
+                weekAward += 1;
+            }
 
+            if(1 == firstLoginAward)
+            {
+                firstLoginAward += 1;
+            }
+            
+           states = dayAward | weekAward << 2 | firstLoginAward << 4;
+        }
 
         Stream st(REP::GETAWARD);
         st << static_cast<UInt8>(20);
