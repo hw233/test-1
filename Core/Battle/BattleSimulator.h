@@ -302,6 +302,10 @@ private:
         e_unFireFakeDead = 88,   // 解除火遁
         e_sneakAtk = 89,     // 暗杀
         e_unSneakAtk = 90,   // 解除暗杀
+        e_lingQu = 91,     // 灵躯
+        e_unLingQu = 92,     // 解除灵躯
+        e_lingShiBleed = 93,     // 灵蚀
+        e_unLingShiBleed = 94,   // 解除灵蚀
 
         e_MAX_STATE,
     };
@@ -511,6 +515,16 @@ private:
     void doSkillEffectExtra_ProtectPet100(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_PetAtk100(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_SneakAtk(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
+    void doSkillEffectExtra_DecWaveDmg(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
+    void doSkillEffectExtra_LingYouAtk(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
+    void doSkillEffectExtra_LingYouMagAtk(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
+    void doSkillEffectExtra_LingYouDef(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
+    void doSkillEffectExtra_LingYouMagDef(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
+
+    bool doSkillEffectExtra_LingQu(BattleFighter* bf, const GData::SkillBase* skill);
+    bool doSkillEffectExtra_LingShiBleed(BattleFighter* bf, BattleFighter* bo, const GData::SkillBase* skill, UInt32 dmg);
+    bool doSkillDmg(BattleFighter* bf, const GData::SkillBase* skill);
+    void doPassiveSkillBegDmg(BattleFighter* bf, BattleFighter* bo, UInt32 dmg);
 
 
     void doSkillEffectExtraAbsorb(BattleFighter* bf, UInt32 dmg, const GData::SkillBase* skill);
@@ -674,6 +688,19 @@ private:
     std::vector<BattleFighter*> _sneak_atker;
     void pushSneakAtker(BattleFighter* bf) { _sneak_atker.push_back(bf); }
     void doSneakAttack(BattleFighter* bf, BattleFighter* bo, bool& pr, bool& cs);
+
+    float calcPoison(BattleFighter* bf, const GData::SkillBase* skill, BattleFighter* defender, bool cs);
+    float calcMaxTherapy(BattleFighter* bf, const GData::SkillBase* skill);
+    float calcTherapy(BattleFighter* bf, bool& isCritical, bool& first, const GData::SkillBase* skill);
+    float calcMagAttack(BattleFighter* bf, bool& isCritical, BattleFighter* defender , float* pCf);
+    float calcAttack(BattleFighter* bf, bool& isCritical, BattleFighter* defender, float* pCf);
+    void calcSkillAttack(BattleFighter* bf, bool& isCritical, BattleFighter* defender, float& atk, float& magatk, float* pCf);
+    float getBFMagAtk(BattleFighter* bf);
+    float getBFAttack(BattleFighter* bf);
+    float getBFMagDefend(BattleFighter* bf);
+    float getBFDefend(BattleFighter* bf);
+    void doPassiveSkillBeMagDmg(BattleFighter* bf, BattleFighter* bo, UInt32 dmg);
+    void doPassiveSkillBePHYDmg(BattleFighter* bf, BattleFighter* bo, UInt32 dmg);
 };
 
 }
