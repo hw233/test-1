@@ -291,6 +291,11 @@ public:
     const GData::SkillBase* getPassiveSkillAftNAtk100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnAtkDmg100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnGetDmg100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnBeDmg100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnBePHYDmg100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnBeMagDmg100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnHP10P100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnDmg100(size_t& idx, bool noPossibleTarget = false);
 
     const GData::SkillBase* getPassiveSkillPreAtk(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillAftAtk(bool noPossibleTarget = false);
@@ -306,10 +311,17 @@ public:
     const GData::SkillBase* getPassiveSkillOnPetProtectForce(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnPetAtk(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnGetDmg(bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnBeDmg(bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnBePHYDmg(bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnBeMagDmg(bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnHP10P(bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnDmg(bool noPossibleTarget = false);
 
     void releaseSkillCD(int cd);
     void releaseSkillCD(std::vector<GData::SkillItem>& skill, int cd);
 
+    void updatePassiveSkill(std::vector<UInt16>& passiveSkillId, std::vector<GData::SkillItem>& passiveSkill);
+    void updatePassiveSkill100(std::vector<UInt16>& passiveSkill100Id, std::vector<GData::SkillItem>& passiveSkill100);
 
     const GData::SkillBase* getPassiveSkillOnTherapy();
     const GData::SkillBase* getPassiveSkillOnSkillDmg();
@@ -889,6 +901,17 @@ private:
     std::vector<GData::SkillItem> _passiveSkillOnAtkDmg100;
     std::vector<GData::SkillItem> _passiveSkillOnGetDmg100;
     std::vector<GData::SkillItem> _passiveSkillOnGetDmg;
+
+    std::vector<GData::SkillItem> _passiveSkillOnBeDmg100;
+    std::vector<GData::SkillItem> _passiveSkillOnBePHYDmg100;
+    std::vector<GData::SkillItem> _passiveSkillOnBeMagDmg100;
+    std::vector<GData::SkillItem> _passiveSkillOnHP10P100;
+
+    std::vector<GData::SkillItem> _passiveSkillOnBeDmg;
+    std::vector<GData::SkillItem> _passiveSkillOnBePHYDmg;
+    std::vector<GData::SkillItem> _passiveSkillOnBeMagDmg;
+    std::vector<GData::SkillItem> _passiveSkillOnHP10P;
+
     float _darkVigor, _dvFactor;
     UInt8 _darkVigorLast;
 public:
@@ -991,6 +1014,35 @@ private:
     BattleFighter* _selfSummon;
     inline void setSelfSummon(BattleFighter* bf) { _selfSummon = bf; }
     inline BattleFighter* getSelfSummon() { return _selfSummon; }
+
+    float _dec_wave_dmg;
+    float getDecWaveDmg() { return _dec_wave_dmg; }
+    void setDecWaveDmg(float v) { _dec_wave_dmg = v; }
+
+    UInt8 _lingqu_last;
+    inline void setLingQu(UInt8 l) { _lingqu_last = l; }
+    inline bool isLingQu() { return _lingqu_last != 0; }
+    bool releaseLingQu();
+
+    float _lingshi_bleed;
+    UInt8 _lingshi_bleed_last;
+    float getLingShiBleed() { return _lingshi_bleed; }
+    void setLingShiBleed(float v, UInt8 l) { _lingshi_bleed = v; _lingshi_bleed_last = l; }
+    bool releaseLingShiBleed();
+
+    float _lingyou_atk;
+    float _lingyou_magatk;
+    float _lingyou_def;
+    float _lingyou_magdef;
+    float getLingYouAtk() { return _lingyou_atk; }
+    float getLingYouMagAtk() { return _lingyou_magatk; }
+    float getLingYouDef() { return _lingyou_def; }
+    float getLingYouMagDef() { return _lingyou_magdef; }
+    void setLingYouAtk(float v) { _lingyou_atk = v; }
+    void setLingYouMagAtk(float v) { _lingyou_magatk = v; }
+    void setLingYouDef(float v) { _lingyou_def = v; }
+    void setLingYouMagDef(float v) { _lingyou_magdef = v; }
+
 public:
 	enum StatusFlag
 	{

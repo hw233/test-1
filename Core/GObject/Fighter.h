@@ -354,6 +354,15 @@ public:
     inline std::vector<UInt16>& getPassiveSkillOnAtkDmg() {return _rpasskl[GData::SKILL_ONATKDMG-GData::SKILL_PASSSTART]; }
     inline std::vector<UInt16>& getPassiveSkillOnAtkDmg100() { return _passkl[GData::SKILL_ONATKDMG - GData::SKILL_PASSSTART]; }
 
+    inline std::vector<UInt16>& getPassiveSkillOnBeDmg100() { return _passkl[GData::SKILL_ONBEDMG - GData::SKILL_PASSSTART]; }
+    inline std::vector<UInt16>& getPassiveSkillOnBeDmg() { return _rpasskl[GData::SKILL_ONBEDMG - GData::SKILL_PASSSTART]; }
+    inline std::vector<UInt16>& getPassiveSkillOnBePHYDmg100() { return _passkl[GData::SKILL_ONBEPHYDMG - GData::SKILL_PASSSTART]; }
+    inline std::vector<UInt16>& getPassiveSkillOnBePHYDmg() { return _rpasskl[GData::SKILL_ONBEPHYDMG - GData::SKILL_PASSSTART]; }
+    inline std::vector<UInt16>& getPassiveSkillOnBeMagDmg100() { return _passkl[GData::SKILL_ONBEMAGDMG - GData::SKILL_PASSSTART]; }
+    inline std::vector<UInt16>& getPassiveSkillOnBeMagDmg() { return _rpasskl[GData::SKILL_ONBEMAGDMG - GData::SKILL_PASSSTART]; }
+    inline std::vector<UInt16>& getPassiveSkillOnHP10P100() { return _passkl[GData::SKILL_ONHP10P - GData::SKILL_PASSSTART]; }
+    inline std::vector<UInt16>& getPassiveSkillOnHP10P() { return _rpasskl[GData::SKILL_ONHP10P - GData::SKILL_PASSSTART]; }
+
     // 取得心法带出技能的ID表
     const std::vector<const GData::SkillBase*>& skillFromCitta(UInt16 citta);
 
