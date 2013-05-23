@@ -484,7 +484,7 @@ namespace GObject
 		_owner->send(st);
     }
 
-    ItemPetEq * FairyPet::findEquipForGM(UInt8 pos)
+    ItemPetEq * FairyPet::findEquip(UInt8 pos)
     {
         if(pos > 2)
             return NULL;

@@ -501,7 +501,7 @@ void WBoss::reward(Player* player)
             MailPackage::MailItem item[] = {{133,1},{MailPackage::Tael,1000}};
             (*i).player->sendMailItem(568, 569, item, 2);
             */
-            UInt8 size = 2 + (*i).player->GetLev() >= 60 ? 1 : 0;
+            UInt8 size = 2 + ((*i).player->GetLev() >= 60 ? 1 : 0);
             MailPackage::MailItem * item = new MailPackage::MailItem [size];
             item[0].id = 133;
             item[0].count = 1;

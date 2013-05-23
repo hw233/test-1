@@ -47,6 +47,7 @@
 #include "GObject/ClanBoss.h"
 #include "Common/Itoa.h"
 #include "GObject/TownDeamon.h"
+#include "Script/BattleFormula.h"
 
 #include "GObject/Tianjie.h"
 #include "Memcached.h"
@@ -3243,16 +3244,55 @@ void GMHandler::OnNewPlayerAutoSuper(GObject::Player* player, std::vector<std::s
     }
 }
 
-void GMHandler::OnShowBattlePoint(GObject::Player* player, std::vector<std::string>& arge)
+void GMHandler::OnShowBattlePoint(GObject::Player* player, std::vector<std::string>& args)
 {
-	SYSMSG_SENDV(623, player, static_cast<UInt32>(player->getBattlePoint()));
-
-    for(int i = 0; i < 5; ++ i)
+    if (args.size() < 1)
+        return;
+    UInt8 type = atoi(args[0].c_str());
+    if(type == 1)
     {
-        GObject::Lineup& lup = PLAYER_DATA(player, lineup)[i];
-        Fighter* fighter = lup.fighter;
-        if(fighter)
-            SYSMSG_SENDV(624, player, fighter->getName().c_str(), static_cast<UInt32>(fighter->getBattlePoint()));
+        SYSMSG_SENDV(623, player, static_cast<UInt32>(player->getBattlePoint()));
+
+        for(int i = 0; i < 5; ++ i)
+        {
+            GObject::Lineup& lup = PLAYER_DATA(player, lineup)[i];
+            Fighter* fighter = lup.fighter;
+            if(fighter)
+                SYSMSG_SENDV(624, player, fighter->getName().c_str(), static_cast<UInt32>(fighter->getBattlePoint()));
+        }
+        std::map<UInt32, FairyPet *>& fairyPet = player->getFairyPet();
+        std::map<UInt32, FairyPet *>::iterator it = fairyPet.begin();
+        for(; it != fairyPet.end(); ++ it)
+        {
+            FairyPet * pet = it->second;
+            if(pet)
+                SYSMSG_SENDV(625, player, pet->getName().c_str(), static_cast<UInt32>(pet->getBattlePoint()));
+        }
+    }
+    else if(type == 2)
+    {
+        UInt32 petId = atoi(args[1].c_str());
+        FairyPet * pet = player->findFairyPet(petId);
+        if(pet == NULL) return;
+        Script::BattleFormula * bformula = Script::BattleFormula::getCurrent();
+        UInt32 hp = static_cast<UInt32>(bformula->calcHP(pet));
+        UInt16 atk = static_cast<UInt16>(bformula->calcAttack(pet));
+        UInt16 magatk = static_cast<UInt16>(bformula->calcMagAttack(pet));
+        UInt16 def = static_cast<UInt16>(bformula->calcDefend(pet));
+        UInt16 magdef = static_cast<UInt16>(bformula->calcMagDefend(pet));
+        //身法
+        UInt8 lingya = pet->getPetLingya();
+        UInt16 cri = static_cast<float>(bformula->calcCritical(pet, NULL)) * 100;
+        //暴击伤害
+        UInt16 prc = static_cast<float>(bformula->calcPierce(pet, NULL)) * 100;
+        UInt16 magres = static_cast<float>(bformula->calcMagRes(pet, NULL)) * 100;
+        UInt16 hit = static_cast<float>(bformula->calcHitrate(pet, NULL)) * 100;
+        UInt16 evd = static_cast<float>(bformula->calcEvade(pet, NULL)) * 100;
+        UInt16 cnt = static_cast<float>(bformula->calcCounter(pet, NULL)) * 100;
+        UInt16 tough = static_cast<float>(bformula->calcTough(pet, NULL)) * 100;
+
+        SYSMSG_SENDV(626, player, pet->getName().c_str(), static_cast<UInt32>(pet->getBattlePoint()),
+                hp, atk, magatk, def, magdef, 0, lingya, cri, 0, prc, magres, hit, evd, cnt, tough);
     }
 }
 
@@ -4007,7 +4047,7 @@ void GMHandler::OnAddPetEquipExp(GObject::Player *player, std::vector<std::strin
     UInt8 pos = atoi(args[1].c_str());
     FairyPet * pet = player->findFairyPet(petId);
     if(!pet) return;
-    ItemPetEq * equip = pet->findEquipForGM(pos);
+    ItemPetEq * equip = pet->findEquip(pos);
     if(!equip) return;
     ItemPetEqAttr & peAttr = equip->getPetEqAttr();
     if(peAttr.lv >= GData::pet.getEquipMaxLev())

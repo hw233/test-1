@@ -439,6 +439,7 @@ namespace GObject
         }
 		if(old != NULL)
 			AddExistEquip(old);
+        pet->rebuildEquipAttr();
 		return true;
     }
 

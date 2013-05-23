@@ -2298,6 +2298,7 @@ namespace GObject
         void fairyPetUdpLog(UInt32 id, UInt8 type);
         inline FairyPet * getBattlePet() { return _onBattlePet; }
         inline UInt8 getCanHirePetNum() { return _playerData.canHirePet.size();}
+        inline std::map<UInt32, FairyPet *>& getFairyPet() { return _fairyPets; }
         void setCanHirePet(UInt32 id);
 	    FairyPet * findFairyPet(UInt32);
         bool hasCanHirePet(UInt32);

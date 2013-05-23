@@ -12,11 +12,11 @@ CREATE TABLE `pet_equipExp` (
 DROP TABLE IF EXISTS `pet_eqAttreffect`;
 CREATE TABLE `pet_eqAttreffect` (
     `id` tinyint(3) unsigned NOT NULL DEFAULT 0,
-    `hp` float(5,2) unsigned NOT NULL DEFAULT '0.00',
-    `atk` float(5,2) unsigned NOT NULL DEFAULT '0.00',
-    `magatk` float(5,2) unsigned NOT NULL DEFAULT '0.00',
-    `def` float(5,2) unsigned NOT NULL DEFAULT '0.00',
-    `magdef` float(5,2) unsigned NOT NULL DEFAULT '0.00',
+    `hp` float(10,2) unsigned NOT NULL DEFAULT '0.00',
+    `atk` float(10,2) unsigned NOT NULL DEFAULT '0.00',
+    `magatk` float(10,2) unsigned NOT NULL DEFAULT '0.00',
+    `def` float(10,2) unsigned NOT NULL DEFAULT '0.00',
+    `magdef` float(10,2) unsigned NOT NULL DEFAULT '0.00',
     `critical` float(5,2) unsigned NOT NULL DEFAULT '0.00',
     `pierce` float(5,2) unsigned NOT NULL DEFAULT '0.00',
     `hitrate` float(5,2) unsigned NOT NULL DEFAULT '0.00',

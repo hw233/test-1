@@ -48,7 +48,7 @@ public:
     void delSkills(std::string&);
     void AppendEquipData(Stream& st);
     void sendModification(ItemPetEq * equip, UInt8 pos);
-    ItemPetEq * findEquipForGM(UInt8 pos);
+    ItemPetEq * findEquip(UInt8 pos);
     ItemPetEq * findEquip(UInt32 id, UInt8& pos);
     ItemPetEq * setEquip(ItemPetEq * eq, UInt8& pos, bool writedb = true);
     void rebuildEquipAttr();

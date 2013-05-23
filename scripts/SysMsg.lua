@@ -382,6 +382,8 @@ sysMsg:set(622, 1, "所在线程: 0x%x");
 
 sysMsg:set(623, 1, "玩家战力: %u")
 sysMsg:set(624, 1, "散仙[%s]: %u")
+sysMsg:set(625, 1, "仙宠[%s]: %u")
+sysMsg:set(626, 1, "仙宠[%s]: %u\n生命:%u\n物理攻击:%u\n法术攻击:%u\n物理防御:%u\n法术防御:%u\n身法:%u\n灵压:%u\n暴击:%u\n暴击伤害:%u\n破击:%u\n法术抵抗:%u\n命中:%u\n躲避:%u\n反击:%u\n坚韧:%u\n")
 
 sysMsg:set(400, 0x27, "")
 sysMsg:set(401, 0x27, "")

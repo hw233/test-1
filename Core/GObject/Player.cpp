@@ -18868,6 +18868,16 @@ UInt8 Player::toQQGroup(bool isJoin)
         pet2->updateToDB(2, lev);
         pet2->initSkillUp();
 
+        ItemPetEq * equip = pet1->findEquip(0);
+        if(equip)
+            GetPetPackage()->AddExistEquip(equip);
+        equip = pet1->findEquip(1);
+        if(equip)
+            GetPetPackage()->AddExistEquip(equip);
+        equip = pet1->findEquip(2);
+        if(equip)
+            GetPetPackage()->AddExistEquip(equip);
+
         delFairyPet(petId1, 1);
         delete pet1;
         pet2->sendPinjieInfo();
