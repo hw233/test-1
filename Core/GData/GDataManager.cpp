@@ -2000,6 +2000,8 @@ namespace GData
 
 		while(execu->Next() == DB::DB_OK)
 		{
+            if(dbeq.id == 0)
+                continue;
             Pet::EquipExpData eqd;
             eqd.level = dbeq.id;
             eqd.levExp[0] = dbeq.green;
@@ -2023,6 +2025,8 @@ namespace GData
 
 		while(execu->Next() == DB::DB_OK)
 		{
+            if(dbeqAttr.id == 0)
+                continue;
             Pet::EquipAttreffect eqAttr;
             eqAttr.level = dbeqAttr.id;
             eqAttr.effect[0] = dbeqAttr.hp;

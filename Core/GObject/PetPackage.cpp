@@ -291,9 +291,9 @@ namespace GObject
 
 		ItemBase * item1 = FindPetItem(gemId1, true);
 		ItemBase * item2 = FindPetItem(gemId2, true);
-        if(gemId1 == gemId2 && item1->Count() < 2)
-            return 0;
         if(!item1 || !item2)
+            return 0;
+        if(gemId1 == gemId2 && item1->Count() < 2)
             return 0;
         if(item1->getReqLev() != item2->getReqLev())
             return 0;
