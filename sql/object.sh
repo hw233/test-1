@@ -164,9 +164,9 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130429_1.sql   #清除节日套装人人拿(var294)
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130510_1.sql   #清除消费抽奖(var142/348)
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearbluediamond.sql  #蓝钻活动需要打开
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_fairy_spar.sql
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearaccrecharge.sql   #清除累积充值记录
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130524_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_fairy_spar.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearaccrecharge.sql   #清除累积充值记录
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130524_1.sql
 
     #. clearshiyamen.sh
 }

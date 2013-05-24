@@ -567,19 +567,88 @@ namespace GObject
             UpdateToDB();
         }
         std::string skills = "";
+        UInt16 oldskill = 0;
         if (old)
         {
-            skills = Itoa(old->getPetEqAttr().skill);
-            delSkills(skills);
+            UInt16 oldskill = old->getPetEqAttr().skill;
+            UInt16 newskill = 0;
+            for(int i = 0; i < PET_EQUIP_UPMAX; ++ i)
+            {
+                if(_equips[i] != NULL)
+                {
+                    UInt16 skill1 = _equips[i]->getPetEqAttr().skill;
+                    if(SKILL_ID(oldskill) == SKILL_ID(skill1) && newskill < skill1)
+                    {
+                        newskill = skill1;
+                    }
+                }
+            }
+            if(newskill == 0)
+            {
+                skills = Itoa(oldskill);
+                delSkills(skills);
+            }
+            else if(newskill != oldskill)
+            {
+                skills = Itoa(newskill);
+                setSkills(skills, false);
+            }
         }
         if (eq)
         {
             eq->DoEquipBind(true);
-            skills = Itoa(eq->getPetEqAttr().skill);
-            setSkills(skills, false);
+            UInt16 eqskill = eq->getPetEqAttr().skill;
+            bool find = false;
+            if(SKILL_ID(oldskill) != SKILL_ID(eqskill))
+            {
+                for(int i = 0; i < PET_EQUIP_UPMAX; ++ i)
+                {
+                    if(_equips[i] != NULL && _equips[i] != eq)
+                    {
+                        UInt16 skill1 = _equips[i]->getPetEqAttr().skill;
+                        if(SKILL_ID(eqskill) == SKILL_ID(skill1) && eqskill <= skill1)
+                        {
+                            find = true;
+                            break;
+                        }
+                    }
+                }
+                if(!find)
+                {
+                    skills = Itoa(eq->getPetEqAttr().skill);
+                    setSkills(skills, false);
+                }
+            }
         }
         updateToDBPetSkill();
         return old;
+    }
+
+    void FairyPet::upgradeEquipSkill(ItemPetEq * eq)
+    {
+        if(!eq)
+            return;
+
+        UInt16 eqskill = eq->getPetEqAttr().skill;
+        bool find = false;
+        for(int i = 0; i < PET_EQUIP_UPMAX; ++ i)
+        {
+            if(_equips[i] != NULL && _equips[i] != eq)
+            {
+                UInt16 skill1 = _equips[i]->getPetEqAttr().skill;
+                if(SKILL_ID(eqskill) == SKILL_ID(skill1) && eqskill <= skill1)
+                {
+                    find = true;
+                    break;
+                }
+            }
+        }
+        if(!find)
+        {
+            std::string skills = Itoa(eq->getPetEqAttr().skill);
+            setSkills(skills, false);
+            updateToDBPetSkill();
+        }
     }
 
     void FairyPet::rebuildEquipAttr()
