@@ -7560,12 +7560,8 @@ function ItemNormal_00010157(iid, num, bind, param)
         player:sendMsgCode(2, 1011, 0);
         return false
     end
-    if 10157 == iid then
-        player:getCoupon(num*800)
-        package:Add(9178, num*5, true, false, 2);
-    elseif 10159 == iid then
-        package:Add(503, num*1, true, false, 2);
-    end
+    player:getCoupon(num*800)
+    package:Add(9178, num*5, true, false, 2);
 
     package:DelItemSendMsg(iid, player);
     return num;
@@ -7596,24 +7592,10 @@ function ItemNormal_00010159(iid, num, bind, param)
         player:sendMsgCode(2, 1011, 0);
         return false
     end
-    package:Add(503, num*1, true, false, 2);
-    package:Add(515, num*1, true, false, 2);
-
-    package:DelItemSendMsg(iid, player);
-    return num;
-end
-
-function ItemNormal_00010160(iid, num, bind, param)
-    local player = GetPlayer()
-    local package = player:GetPackage();
-
-    if package:GetRestPackageSize() < (3+(3*num*2)/99) then
-        player:sendMsgCode(2, 1011, 0);
-        return false
-    end
-    package:Add(15, num*2, true, false, 2);
-    package:Add(9371, num*2, true, false, 2);
-    package:Add(548, num*2, true, false, 2);
+    package:Add(9371, num*5, true, false, 2);
+    package:Add(33, num*5, true, false, 2);
+    package:Add(49, num*2, true, false, 2);
+    package:Add(50, num*2, true, false, 2);
 
     package:DelItemSendMsg(iid, player);
     return num;
@@ -10647,7 +10629,6 @@ local ItemNormal_Table = {
     [10157] = ItemNormal_00010157,
     [10158] = ItemNormal_00010158,
     [10159] = ItemNormal_00010159,
-    [10160] = ItemNormal_00010160,
 };
 
 function ItemNormalOther_00000441(iid, num, bind, other)
