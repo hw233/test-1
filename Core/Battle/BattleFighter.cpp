@@ -2574,7 +2574,10 @@ bool BattleFighter::releaseLingShiBleed()
         return false;
     -- _lingshi_bleed_last;
     if(_lingshi_bleed_last == 0)
+    {
+        _lingshi_bleed = 0;
         return true;
+    }
     return false;
 }
 

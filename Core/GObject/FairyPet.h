@@ -105,6 +105,8 @@ private:
     bool canLevUp();
     bool canBoneUp();
     void reset(UInt8 type);
+public:
+    void upgradeEquipSkill(ItemPetEq * eq);
 };
 
 }
