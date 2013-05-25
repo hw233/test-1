@@ -20,7 +20,6 @@
 #include "Script/GameActionLua.h"
 #include "Script/BattleFormula.h"
 #include "GData/FighterProb.h"
-#include "GObject/Mail.h"
 #include "HeroMemo.h"
 #include "AttainMgr.h"
 #include "GData/SpiritAttrTable.h"
@@ -29,6 +28,7 @@
 #include "GObjectDBExecHelper.h"
 #include "GData/SoulExpTable.h"
 #include "GData/LBSkillTable.h"
+#include "GObject/Leaderboard.h"
 
 namespace GObject
 {
@@ -1854,6 +1854,146 @@ UInt16 Fighter::calcSkillBattlePoint(UInt16 skillId, UInt8 type)
     return 0;
 }
 
+UInt32 Fighter::calcLingbaoBattlePoint()
+{
+    if(!_owner)
+        return 0;
+
+    LingbaoInfoList lingbao;
+    lingbao.id = _owner->getId();
+    lingbao.name = _owner->getName();
+    lingbao.pf = _owner->getPF();
+    UInt32 value = 0;
+    for(int idx = 0; idx < getMaxLingbaos(); ++ idx)
+    {
+        UInt32 bp = 0;
+		ItemLingbao* lb = static_cast<ItemLingbao*>(getLingbao(idx));
+        if(!lb)
+            continue;
+        ItemLingbaoAttr& lbattr = lb->getLingbaoAttr();
+        bp = Script::BattleFormula::getCurrent()->calcLingbaoBattlePoint(&lbattr);
+        lingbao.equipId = lb->getId();
+        lingbao.itemId = lb->GetTypeId();
+        lingbao.tongling = lbattr.tongling;
+        lingbao.lbColor = lbattr.lbColor;
+        for (UInt8 i = 0; i < 4; ++i)
+        {
+            lingbao.type[i] = lbattr.type[i];
+            lingbao.value[i] = lbattr.value[i];
+        }
+        for (UInt8 i = 0; i < 2; ++i)
+        {
+            if (lbattr.skill[i])
+            {
+                const GData::LBSkillBase* lbskill = GData::lbSkillManager[lbattr.skill[i]];
+                bp += lbskill->battlepoint * (((float)(lbattr.factor[i]))/10000);
+                lingbao.skill[i] = lbattr.skill[i];
+                lingbao.factor[i] = lbattr.factor[i];
+            }
+        }
+        if (bp != lbattr.battlePoint)
+        {
+            lbattr.battlePoint = bp;
+            DB4().PushUpdateData("UPDATE `lingbaoattr` SET `battlepoint`='%u' WHERE `id`=%u", bp, lb->getId());
+        }
+        lingbao.battlePoint = lbattr.battlePoint;
+        leaderboard.pushLingbaoInfo(lingbao);
+        value = value > bp ? value:bp;
+    }
+
+    UInt32 maxlbBp = _owner->getMaxLingbaoBattlePoint();
+    if(value > maxlbBp)
+        _owner->setMaxLingbaoBattlePoint(value);
+
+    return value;
+}
+
+void Fighter::pushLingbaoInfo(ItemEquip* equip)
+{
+    if(!equip || !_owner)
+        return;
+
+    ItemLingbao* lb = static_cast<ItemLingbao*>(equip);
+    UInt32 bp = 0;
+    LingbaoInfoList lingbao;
+    lingbao.id = _owner->getId();
+    lingbao.name = _owner->getName();
+    lingbao.pf = _owner->getPF();
+
+    ItemLingbaoAttr& lbattr = lb->getLingbaoAttr();
+    bp = Script::BattleFormula::getCurrent()->calcLingbaoBattlePoint(&lbattr);
+    lingbao.equipId = lb->getId();
+    lingbao.itemId = lb->GetTypeId();
+    lingbao.tongling = lbattr.tongling;
+    lingbao.lbColor = lbattr.lbColor;
+    for (UInt8 i = 0; i < 4; ++i)
+    {
+        lingbao.type[i] = lbattr.type[i];
+        lingbao.value[i] = lbattr.value[i];
+    }
+    for (UInt8 i = 0; i < 2; ++i)
+    {
+        if (lbattr.skill[i])
+        {
+            const GData::LBSkillBase* lbskill = GData::lbSkillManager[lbattr.skill[i]];
+            bp += lbskill->battlepoint * (((float)(lbattr.factor[i]))/10000);
+            lingbao.skill[i] = lbattr.skill[i];
+            lingbao.factor[i] = lbattr.factor[i];
+        }
+    }
+    if (bp != lbattr.battlePoint)
+    {
+        lbattr.battlePoint = bp;
+    }
+    lingbao.battlePoint = lbattr.battlePoint;
+    leaderboard.pushLingbaoInfo(lingbao);
+
+    UInt32 maxlbBp = _owner->getMaxLingbaoBattlePoint();
+    if(bp> maxlbBp)
+        _owner->setMaxLingbaoBattlePoint(bp);
+}
+
+void Fighter::eraseLingbaoInfo(ItemEquip* equip)
+{
+    if(!equip)
+        return;
+
+    ItemLingbao* lb = static_cast<ItemLingbao*>(equip);
+    UInt32 bp = 0;
+    LingbaoInfoList lingbao;
+    lingbao.id = _owner->getId();
+    lingbao.name = _owner->getName();
+    lingbao.pf = _owner->getPF();
+
+    ItemLingbaoAttr& lbattr = lb->getLingbaoAttr();
+    bp = Script::BattleFormula::getCurrent()->calcLingbaoBattlePoint(&lbattr);
+    lingbao.equipId = lb->getId();
+    lingbao.itemId = lb->GetTypeId();
+    lingbao.tongling = lbattr.tongling;
+    lingbao.lbColor = lbattr.lbColor;
+    for (UInt8 i = 0; i < 4; ++i)
+    {
+        lingbao.type[i] = lbattr.type[i];
+        lingbao.value[i] = lbattr.value[i];
+    }
+    for (UInt8 i = 0; i < 2; ++i)
+    {
+        if (lbattr.skill[i])
+        {
+            const GData::LBSkillBase* lbskill = GData::lbSkillManager[lbattr.skill[i]];
+            bp += lbskill->battlepoint * (((float)(lbattr.factor[i]))/10000);
+            lingbao.skill[i] = lbattr.skill[i];
+            lingbao.factor[i] = lbattr.factor[i];
+        }
+    }
+    if (bp != lbattr.battlePoint)
+    {
+        lbattr.battlePoint = bp;
+    }
+    lingbao.battlePoint = lbattr.battlePoint;
+    leaderboard.eraseLingbaoInfo(lingbao);
+}
+
 void Fighter::rebuildSkillBattlePoint()
 {
     _skillBP = 0;
@@ -1891,17 +2031,21 @@ void Fighter::rebuildSkillBattlePoint()
 void Fighter::rebuildBattlePoint()
 {
 	_battlePoint = Script::BattleFormula::getCurrent()->calcBattlePoint(this);
-    if(_owner)
+    if(!isPet())
     {
-        const GData::Formation* form = GData::formationManager[_owner->getFormation()];
-        if(form)
-            _battlePoint += form->getBattlePoint();
-    }
-    UInt8 cnt = _lbSkill.size();
-    for(UInt8 i = 0; i < cnt; ++ i)
-    {
-        const GData::LBSkillBase* lbskill = GData::lbSkillManager[_lbSkill[i].skillid];
-        _battlePoint += lbskill->battlepoint * (((float)(_lbSkill[i].factor))/10000);
+        if(_owner)
+        {
+            const GData::Formation* form = GData::formationManager[_owner->getFormation()];
+            if(form)
+                _battlePoint += form->getBattlePoint();
+        }
+        UInt8 cnt = _lbSkill.size();
+        for(UInt8 i = 0; i < cnt; ++ i)
+        {
+            const GData::LBSkillBase* lbskill = GData::lbSkillManager[_lbSkill[i].skillid];
+            _battlePoint += lbskill->battlepoint * (((float)(_lbSkill[i].factor))/10000);
+        }
+        calcLingbaoBattlePoint();
     }
 }
 
@@ -3697,7 +3841,7 @@ void Fighter::delAllCitta( bool writedb )
     std::vector<UInt16> cittas = _cittas;
     for (size_t i = 0; i < cittas.size(); ++i)
     {
-        delCitta(cittas[i], writedb);
+        delCitta(cittas[i], writedb, true);
     }
 }
 
@@ -3716,7 +3860,7 @@ bool Fighter::CanDelCitta(UInt16 citta)
     return true;
 }
 
-bool Fighter::delCitta( UInt16 citta, bool writedb )
+bool Fighter::delCitta( UInt16 citta, bool writedb, bool delSS )
 {
     int idx = hasCitta(citta);
     if (idx < 0)
@@ -3770,59 +3914,25 @@ bool Fighter::delCitta( UInt16 citta, bool writedb )
             {
                 tId = 2012;
                 cId = 2013;
-                if (isMoDefaultCitta)
-                {
-                    tId = 2014;
-                    cId = 2015;
-                }
             }
             SYSMSG(title, tId);
             SYSMSGV(content, cId, getLevel(), getColor(), getName().c_str(), yacb->type, yacb->getName().c_str(), lvl);
-            MailPackage::MailItem mitem[4] = {{static_cast<UInt16>(CITTA_ITEMID(citta)), 1}, {31, rCount1}, {30, rCount2}, {29, rCount3}};
+            MailPackage::MailItem mitem[4] = {{static_cast<UInt16>(CITTA_TO_ITEMID(citta)), 1}, {31, rCount1}, {30, rCount2}, {29, rCount3}};
             MailItemsInfo itemsInfo(mitem, DismissCitta, 4);
-            GObject::Mail * pmail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
-            if(pmail && !isMoDefaultCitta)
-                GObject::mailPackageManager.push(pmail->id, mitem, 4, true);
-            ////////////////////
-            //返回技能符文熔炼符60%
+
+            GObject::Mail * pmail = NULL;
+            if(!isMoDefaultCitta)
+            {
+                pmail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+                if(pmail)
+                    GObject::mailPackageManager.push(pmail->id, mitem, 4, true);
+            }
+
+            //返回技能符文熔炼诀60%
             UInt16 skillid = 0;
             if (!cb->effect->skill.empty())
                 skillid = cb->effect->skill[0]->getId();
-            UInt32 sid = SKILL_ID(skillid);
-            std::map<UInt16, SStrengthen>::iterator i = m_ss.find(sid);
-            if (i != m_ss.end())
-            {
-                SStrengthen& ss = i->second;
-                UInt16 ssCount1 = 0;
-                UInt16 ssCount2 = 0;
-                UInt16 ssCount3 = 0;
-                UInt16 ssCount4 = 0;
-                UInt32 ssExp = 0;
-                for (UInt8 lvl = 0; lvl < ss.lvl; ++lvl)
-                {
-                    ssExp += GData::GDataManager::getMaxStrengthenVal(sid, lvl);
-                }
-                ssExp += ss.curVal;
-                ssExp *= 0.6;
-                if(ssExp){
-                    ssCount1 = static_cast<UInt16>(ssExp / 1000);
-                    ssExp = ssExp % 1000;
-                    ssCount2 = static_cast<UInt16>(ssExp / 200);
-                    ssExp = ssExp % 200;
-                    ssCount3 = static_cast<UInt16>(ssExp / 50);
-                    ssExp = ssExp % 50;
-                    ssCount4 = static_cast<UInt16>(ssExp / 10);
-                    MailPackage::MailItem ssmitem[4] = {{1325,ssCount1}, {1326, ssCount2}, {1327, ssCount3}, {1328, ssCount4}};
-                    GObject::mailPackageManager.push(pmail->id, ssmitem, 4, true);
-
-                }
-                ss.maxVal = 0;
-                ss.curVal = 0;
-                ss.lvl = 0;
-                ss.maxLvl = 0;
-                SSUpdate2DB(skillid,ss);
-            }
-            //////////////////////
+            SSDismiss(skillid, delSS, pmail);
         }
     }
 
@@ -5249,6 +5359,67 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, UInt16 itemNum, bool bind)
     return ret;
 }
 
+void Fighter::SSDismiss(UInt16 skillid, bool isDel, Mail * mail)
+{
+    //技能符文散功 返回技能符文熔炼诀60%
+    UInt32 sid = SKILL_ID(skillid);
+    std::map<UInt16, SStrengthen>::iterator it = m_ss.find(sid);
+    if (it == m_ss.end())
+        return;
+    SStrengthen& ss = it->second;
+    UInt32 ssExp = 0;
+    for (UInt8 lvl = 0; lvl < ss.lvl; ++lvl)
+    {
+        ssExp += GData::GDataManager::getMaxStrengthenVal(sid, lvl);
+    }
+    ssExp += ss.curVal;
+    ssExp *= 0.6;
+    if(ssExp < 10)
+        return;
+    UInt16 ssCount1 = static_cast<UInt16>(ssExp / 1000);
+    ssExp = ssExp % 1000;
+    UInt16 ssCount2 = static_cast<UInt16>(ssExp / 200);
+    ssExp = ssExp % 200;
+    UInt16 ssCount3 = static_cast<UInt16>(ssExp / 50);
+    ssExp = ssExp % 50;
+    UInt16 ssCount4 = static_cast<UInt16>(ssExp / 10);
+
+    MailPackage::MailItem ssmitem[4] = {{1325, ssCount1}, {1326, ssCount2}, {1327, ssCount3}, {1328, ssCount4}};
+    if(!mail)
+    {
+        const GData::SkillBase* skill = GData::skillManager[skillid];
+        if (!skill) return;
+        StringTokenizer sk(skill->getName(), "LV");
+        SYSMSG(title, 2014);
+        SYSMSGV(content, 2015, getLevel(), getColor(), getName().c_str(), sk[0].c_str());
+        MailItemsInfo itemsInfo(ssmitem, DismissCitta, 4);
+        mail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+    }
+    if(mail)
+        mailPackageManager.push(mail->id, ssmitem, 4, true);
+    ss.lvl = 0;
+    ss.curVal = 0;
+    ss.maxVal = GData::GDataManager::getMaxStrengthenVal(sid, ss.lvl);
+    if(!isDel)
+        SSUpdate2DB(skillid, ss);
+}
+
+void Fighter::SSDismissAll(bool isDel)
+{
+    std::map<UInt16, SStrengthen>::iterator it = m_ss.begin();
+    while(it != m_ss.end())
+    {
+        SSDismiss(SKILLANDLEVEL(it->first, 1), isDel);
+        if(isDel)
+        {
+            SSDeleteDB(it->first);
+            m_ss.erase(it++);
+        }
+        else
+            ++ it;
+    }
+}
+
 void Fighter::SSErase(UInt16 id)
 {
     if (!_owner)
@@ -5420,6 +5591,8 @@ UInt16 Fighter::getPortrait()
             portrait = 1093;
         else if(getFashionTypeId() == 1712)
             portrait = 1094;
+        else if(getFashionTypeId() == 1717)
+            portrait = 1096;
  
     }
 

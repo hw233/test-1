@@ -32,6 +32,7 @@
 #include "GObject/AthleticsRank.h"
 #include <mysql.h>
 #include <sstream>
+#include "GObject/ClanBoss.h"
 
 namespace GObject
 {
@@ -45,11 +46,12 @@ GlobalNamedClans globalOwnedClans[COUNTRY_MAX];
 #define CLAN_AUTHORITY_COPY 7
 UInt8 ClanAuthority[5][8] =
 {
-	{ 0, 1, 0, 0, 0, 0, 0, 0 },
-	{ 0, 1, 0, 0, 0, 0, 0, 0 },
-	{ 1, 1, 0, 0, 0, 0, 0, 1 },
-	{ 1, 1, 1, 1, 0, 0, 0, 1 },
-	{ 1, 1, 1, 1, 1, 1, 1, 1 }
+    // 0-批准加入 1- 2- 3-踢人 4- 5- 6- 7-帮派副本
+	{ 0, 1, 0, 0, 0, 0, 0, 0 },  // 成员
+	{ 0, 1, 0, 0, 0, 0, 0, 0 },  // 精英
+	{ 1, 1, 0, 0, 0, 0, 0, 1 },  // 长老
+	{ 1, 1, 1, 1, 0, 0, 0, 1 },  // 副帮主
+	{ 1, 1, 1, 1, 1, 1, 1, 1 }   // 帮主
 };
 
 
@@ -280,6 +282,11 @@ Clan::Clan( UInt32 id, const std::string& name, UInt32 ft, UInt8 lvl ) :
     _copyLevelUpdateTime = 0;
     _copyMaxLevel = 0;
     _copyMaxTime = 0;
+
+    _lastCallTime = 0;
+    _xianyun = 0;
+    _gongxian = 0;
+    memset(_urge, 0, sizeof(_urge));
 }
 
 Clan::~Clan()
@@ -3577,7 +3584,7 @@ void Clan::sendClanList(Player *player, UInt8 type, UInt8 start, UInt8 cnt)
     else
         cnt = end - start;
     Stream st(REP::FRIEND_LIST);
-    st << static_cast<UInt8>(type) << start << cnt << sz;
+    st << static_cast<UInt8>(type) << static_cast<UInt8>(player->GetVar(VAR_HAS_VOTE)?1:0)<< start << cnt << sz;
     if (sz && cnt)
     {
         Members::iterator it = _members.begin();
@@ -3973,8 +3980,10 @@ void   Clan::sendClanCopyInfo(Player * player, UInt8 val)
     st << static_cast<UInt8>(getOnlineMembersCount());
 
     st << static_cast<UInt16>(_techs->getLev(CLAN_TECH_STATUE));     // 神像科技等级
+//    st << static_cast<UInt16>(_techs->getLev(CLAN_TECH_COPY_LEVEL)); // 副本科技等级
+    st << static_cast<UInt16>(getXianyun()); //仙蕴精华 
+    //st << static_cast<UInt16>(_techs->getLev(CLAN_TECH_COPY_ROB));    // 掠夺科技等级
     st << static_cast<UInt16>(_techs->getLev(CLAN_TECH_COPY_LEVEL)); // 副本科技等级
-    st << static_cast<UInt16>(_techs->getLev(CLAN_TECH_COPY_ROB));    // 掠夺科技等级
 
     st << static_cast<UInt16>(getStatueLevel());
     st << static_cast<UInt32>(getStatueExp());
@@ -4073,6 +4082,13 @@ void   Clan::addCopyLevel()
         {
             GVAR.SetVar(GVAR_CLANCOPYPASS, _copyLevel);
 			SYSMSG_BROADCASTV(805, _name.c_str(), _copyLevel);
+        }
+        if (_copyMaxLevel >= 10 && !GObject::ClanBoss::instance().getCanOpened())
+        {
+            GObject::ClanBoss::instance().setCanOpened(true);
+            GObject::ClanBoss::instance().init();
+            GObject::ClanBoss::instance().sendStatus(NULL);
+            SYSMSG_BROADCASTV(4211);
         }
     }
 }
@@ -4215,6 +4231,44 @@ void Clan::sendQQOpenid(Player* player)
     st << static_cast<UInt8>(player->isInQQGroup());
     st << Stream::eos;
     player->send(st);
+}
+
+void Clan::sendClanBattle(Player *player, Player *caller)
+{
+    Stream st(REP::CLAN_RANKBATTLE_REPINIT);
+    st << static_cast<UInt8>(0x08);
+    st << caller->getName();
+    st << Stream::eos;
+    player->send(st);
+}
+
+void Clan::broadcastClanBattle(Player *caller)
+{
+    UInt32 now = TimeUtil::Now();
+    if(now < _lastCallTime + 30)
+        return;
+    _lastCallTime = now;
+    UInt32 startTime = TimeUtil::SharpDayT(0, now) + RANK_BATTLE_SIGNUP_BEGINTIME;
+    UInt32 endTime = startTime + RANK_BATTLE_SIGNUP_TIME + FULL_BATTLE_TIME * BATTLE_NUM_PER_DAY;
+    if(now < startTime || now > endTime)
+        return;
+    Mutex::ScopedLock lk(_mutex);
+//#define CLAN_BATTLE_LOCATION 1811
+	ClanMember *mem = NULL;
+    Clan::Members::iterator offset;
+	for(offset = _members.begin(); offset != _members.end(); ++offset)
+	{
+        mem = *offset;
+        if(!mem)
+            continue;
+        if(!mem->player || mem->player == caller)
+            continue;
+        if(!mem->player->isOnline())
+            continue;
+        //if(mem->player->getLocation() == CLAN_BATTLE_LOCATION)
+        //    continue;
+        sendClanBattle(mem->player, caller);
+	}
 }
 // 帮派副本
 //////////////////////////////////////////

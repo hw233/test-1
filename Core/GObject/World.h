@@ -5,6 +5,8 @@
 #include "Server/WorkerThread.h"
 #include "Common/Stream.h"
 #include "Server/Cfg.h"
+#include "Common/TimeUtil.h"
+#include "GObject/GVar.h"
 #ifndef _WIN32
 #include "kingnet_analyzer.h"
 #endif
@@ -192,6 +194,10 @@ public:
     { _qgamegiftact = v; }
     inline static bool getQgameGiftAct()
     { return _qgamegiftact; }
+    inline static void setSpreadAct(bool v)
+    { _spreadAct = v; }
+    inline static bool getSpreadAct()
+    { return _spreadAct; }
     inline static void setValentineDay(bool v)
     { _valentineday = v; }
     inline static bool getValentineDay()
@@ -392,6 +398,10 @@ public:
     { _newYearQzoneContinueAct= v; }
     inline static bool getNewYearQzoneContinueAct()
     { return _newYearQzoneContinueAct; }
+    inline static void setMayDayLoginAct(bool v)
+    { _maydayloginAct= v; }
+    inline static bool getMayDayLoginAct()
+    { return _maydayloginAct; }
 
     inline static void setTowerLoginAct(UInt8 v)
     { _towerloginAct= v; }
@@ -531,6 +541,13 @@ public:
     inline static bool getQQGameOnlineAwardAct()
     { return _qqgameonlineawardact; }
 
+    inline static bool getLuckyStarAct()
+    {
+        UInt32 now = TimeUtil::Now();
+        UInt32 btime = GVAR.GetVar(GVAR_LUCKYSTAR_BEGIN);
+        UInt32 etime = GVAR.GetVar(GVAR_LUCKYSTAR_END);
+        return btime <= now && now <= etime;
+    }
     inline static void setArenaHeroId(UInt8 pos, UInt8 heroId)
     {
         if(pos < 5 && stArena.heroId[pos] != heroId)
@@ -638,6 +655,43 @@ public:
     { _compassact = v; }
     inline static bool getCompassAct()
     { return _compassact; }
+
+    inline static void setFoolBao(bool v)
+    { _foolbao = v; }
+    inline static bool getFoolBao()
+    { return _foolbao; } 
+    
+    inline static void setSurnameLegend(bool v)
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_SURNAMELEGEND_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_SURNAMELEGEND_END);
+        UInt32 now = TimeUtil::Now();
+        if( now >= begin && now <= end)
+            return;
+        _surnamelegend = v;
+    }
+   
+    inline static bool getSurnameLegend(UInt32 time = 0)
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_SURNAMELEGEND_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_SURNAMELEGEND_END);
+        UInt32 now = TimeUtil::Now() + time;
+        if(begin == 0 && end == 0)
+        {
+            return _surnamelegend;
+        }
+        else if( now >= begin && now <= end)
+            _surnamelegend = true;
+        else
+            _surnamelegend = false;
+        return _surnamelegend;
+    } 
+
+    inline static void setHalfGold(bool v)
+    { _halfgold = v; }
+    inline static bool getHalfGold()
+    { return _halfgold; } 
+
     inline static void setCallSnakeEggAct(UInt8 v)
     { _callsnakeeggact = v; }
     inline static UInt8 getCallSnakeEggAct()
@@ -662,6 +716,13 @@ public:
     { _snakespringequipact = v; }
     inline static UInt8 getSnakeSpringEquipAct()
     { return _snakespringequipact; }
+    inline static UInt32 getOpenTime()
+    {
+        UInt32 opTime = TimeUtil::MkTime(cfg.openYear, cfg.openMonth, cfg.openDay);
+        return opTime;
+    }
+    inline static bool isRPServer()
+    {return cfg.rpServer;}
  
 public:
 	inline static UInt8 getWeekDay()
@@ -672,10 +733,12 @@ public:
     void RankLuckyDraw(Player* player, bool notify = true);
     void SendLuckyDrawList(Player* player);
     void SendLuckyDrawAward();
-
 public:
 	static void calWeekDay( World * world );
-
+    inline static void setSysDailogPlatform(UInt8 v) { m_sysDailogPlatform = v; }
+    inline static UInt8 getSysDailogPlatform() { return m_sysDailogPlatform; }
+    static Player* getSpreadKeeper();
+    static UInt32 getSpreadCount();
 public:
     static UInt32 _moneyLogged;
     static MoneyIn _moneyIn[7][2];
@@ -698,6 +761,7 @@ public:
     static bool _rechargeactive3366;
     static bool _yearact;
     static bool _qgamegiftact;
+    static bool _spreadAct;
     static UInt8 _rechargeactiveno;
     static bool _valentineday;
     static bool _netvalentineday;
@@ -747,6 +811,7 @@ public:
     static bool _newYearQQGameAct;
     static bool _QZoneQQGameAct;
     static bool _newYearQzoneContinueAct;
+    static bool _maydayloginAct;
     static UInt8 _towerloginAct;
     static bool _guoqing;
     static bool _9215Act;
@@ -783,20 +848,28 @@ public:
     static stArenaExtra stArenaOld[2];
     static stArenaExtra stArena;
     static bool _compassact;
+    static bool _foolbao;
+    static bool _surnamelegend;
+    static bool _halfgold;
     static UInt8 _callsnakeeggact;
     static UInt8 _snakeeggawardact;
     static bool _item9344act;
     static bool _item9343act;
     static bool _autobattleact;
     static UInt8 _snakespringequipact;
-
+    static UInt8 m_sysDailogPlatform;
+    static Player* spreadKeeper;
+    static UInt32 spreadBuff;
 public:
     static RCSortType rechargeSort;
     static RCSortType consumeSort;
+    static RCSortType popularitySort;
+    static RCSortType LuckyBagSort;
     static void initRCRank();
+    static void initRP7RCRank();
 
     static RCSortType killMonsterSort[4];
-
+    static RCSortType rechargeRP7Sort;
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }
 	void OnTimer();
@@ -829,8 +902,8 @@ private:
     static void ArenaExtraActTimer(void *);
     static void ClanCopyCheck(void *);
     static void ClanStatueCheck(void *);
+    static void SendPopulatorRankAward(void*);
     //static void advancedHookTimer(void *para);
-
 public:
 	static void ReCalcWeekDay( World * );
 
@@ -853,7 +926,8 @@ public:
     void SendGoldSnakeAward();
     void SendItem9344Award();
     void SendItem9343Award();
-
+    void SendFoolBaoAward();
+    void SendSurnameLegendAward();
     void UpdateSnowScore(Player* pl, Player* lover);
     void sendSnowPlayers(Player* pl);
     void DivorceSnowPair(Player* pl);
@@ -864,6 +938,7 @@ public:
     void killMonsterInit();
     void UpdateKillMonsterRank(Player* pl, UInt8 Type, UInt8 count);
 
+    static void SendRechargeRP7RankAward();
 private:
 	void testUpdate();
 	Script::WorldScript * _worldScript;

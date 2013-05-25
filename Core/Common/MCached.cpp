@@ -12,6 +12,9 @@ MCached::MCached() : _inited(false)
 
 MCached::~MCached()
 {
+    if (_inited)
+        memcached_free(&_memsvr);
+    _inited = false;
 }
 
 bool MCached::init(const char* hosts)

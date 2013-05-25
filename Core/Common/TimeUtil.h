@@ -62,6 +62,14 @@ public:
         localtime_r(&now2,&local);
 		return static_cast<UInt8>(local.tm_mday);
 	}
+    static inline UInt8 Month(UInt32 now = Now())
+    {
+		time_t now2 = static_cast<time_t>(now);
+		struct tm local;
+        localtime_r(&now2,&local);
+		return static_cast<UInt8>(local.tm_mon + 1);
+    }
+
 	static inline UInt32 SharpDayT(int c = 0, UInt32 cur = Now())
     {
         time_t t = cur;
@@ -213,12 +221,9 @@ public:
         switch(mon)
         {
             case 2:
-                {
-                    if(leapYear)
-                        return 29;
-                    return 28;
-                }
-                break;
+                if(leapYear)
+                    return 29;
+                return 28;
             case 1:
             case 3:
             case 5:
@@ -227,13 +232,11 @@ public:
             case 10:
             case 12:
                 return 31;
-                break;
             case 4:
             case 6:
             case 9:
             case 11:
                 return 30;
-                break;
             default:
                 return 30;
                 break;

@@ -7,6 +7,7 @@
 #include "GObjectManager.h"
 #include "ClanDynamicMsg.h"
 #include "Server/ServerTypes.h"
+#include "Server/WorldServer.h"
 #include "Common/BinaryReader.h"
 
 class SysMsgItem;
@@ -138,6 +139,7 @@ struct ClanItemHistory
         CLANBATTLE = 0, //帮会战奖励
         ALLOCATED = 1,  //分配获得
         DRAWWEAL = 2,   //领取福利
+        CLANBOSS = 3,   //末日之战
     };
 
     ClanItemHistory(UInt8 type, UInt32 time, UInt64 playerid, const std::string& itemstr)
@@ -424,6 +426,8 @@ public:
     void setQQOpenid(Player* player,std::string openid); 
     void offQQOpenid(Player* player); 
     void setQQOpenid(std::string openid) {m_qqOpenid = openid;};
+    void sendClanBattle(Player *player, Player* caller);
+    void broadcastClanBattle(Player *caller);
 
 public:
 	inline bool alive() { return !_deleted; }
@@ -562,6 +566,64 @@ public:
 	void broadcast(SysMsgItem *);
     void broadcastCopyInfo();
 
+    void setXianyun(UInt32 num) {_xianyun = num;}
+    UInt32 getXianyun() {return _xianyun;}
+    void addXianyun(int num) 
+    {
+        if (0 == num)
+            return;
+        if (num < 0 && (num+_xianyun) < 0)
+            _xianyun = 0;
+        else
+            _xianyun += num;
+	    DB5().PushUpdateData("UPDATE `clan` SET `xianyun` = %u WHERE `id` = %u", _xianyun, _id);
+    }
+    UInt8 getUrge(UInt8 t)
+    {
+        if (t >= 3)
+            return 0;
+        return _urge[t];
+    }
+    void setUrge(UInt8 t, UInt8 n, bool toDB = true)
+    {
+        if (t < 3)
+        {
+            _urge[t] = n;
+            if (toDB)
+                urgeToDB();
+        }
+    }
+    void clearUrge()
+    {
+        memset(_urge, 0, sizeof(_urge));
+        urgeToDB();
+    }
+    void addUrge(UInt8 t, UInt8 n)
+    {
+        if (t < 3)
+        {
+            _urge[t] += n;
+            urgeToDB();
+        }
+    }
+    void urgeToDB()
+    {
+         UInt32 t = _urge[0] + ((UInt32)_urge[1]<<8) + ((UInt32)_urge[2]<<16);
+         DB5().PushUpdateData("UPDATE `clan` SET `urge` = %u WHERE `id` = %u", t, _id);
+    }
+    UInt32 getGongxian() {return _gongxian;}
+    UInt32 addGongxian(int num)    {
+        _gongxian += num;
+	    DB5().PushUpdateData("UPDATE `clan` SET `gongxian` = %u WHERE `id` = %u", _gongxian, _id);
+        return _gongxian;
+    }
+    void setGongxian(UInt32 num, bool toDB=false)
+    {
+        _gongxian = num;
+        if (toDB)
+            DB5().PushUpdateData("UPDATE `clan` SET `gongxian` = %u WHERE `id` = %u", _gongxian, _id);
+    }
+
 public:
 	ClanMember * getClanMember(Player *);
 	bool existClanMember(Player *);
@@ -628,6 +690,8 @@ private:
     UInt16 _copyMaxLevel;
     UInt32 _copyMaxTime;
 
+    UInt32 _lastCallTime;
+
     std::list<ClanCopyLog> _copyLog;
     std::map<Player *, UInt8> _copySpotSnap;
 
@@ -643,6 +707,10 @@ private:
     std::string m_qqOpenid;
 
 	Mutex _mutex;
+
+    UInt32 _xianyun;
+    UInt32 _gongxian;
+    UInt8 _urge[3];
 };
 
 typedef GGlobalObjectManagerT<Clan, UInt32> GlobalClans;

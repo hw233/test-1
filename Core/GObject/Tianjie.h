@@ -143,6 +143,17 @@ namespace GObject
 		bool isTjNpc(UInt32 npcid, UInt16 loc);
         void OpenTj();
         int  getLastPassedLevel() {return m_lastPassedLevel;};
+        UInt8 getLastIndex()
+        {
+            static const int s_tjRoleLevel[] = {59,69,79,89,99,109,119,129,139,149,999};
+            for (UInt8 i = 0; i < sizeof(s_tjRoleLevel)/sizeof(s_tjRoleLevel[0])-1; ++i)
+            {
+                if (m_lastPassedLevel == s_tjRoleLevel[i])
+                    return i+1;
+            }
+            return 0;
+        }
+
 
         void initSortMap();
         void insertToScoreSortMap(Player* pl, int newScore, int oldScore);

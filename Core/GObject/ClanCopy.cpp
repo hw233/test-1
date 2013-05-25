@@ -1228,6 +1228,8 @@ void ClanCopy::addWinReward(UInt32 awardValue)
     notifyCopyWin(awardValue, types, mitem);
     delete[] mitem;
 
+    //仙蕴精华30点
+    _clan->addXianyun(30);
 }
 
 

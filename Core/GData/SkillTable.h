@@ -13,10 +13,12 @@ namespace GData
 #define SKILL_ID(x) (((UInt16)(x))/SKILL_LEVEL_MAX)
 #define SKILLANDLEVEL(s,l) (((UInt16)(s))*SKILL_LEVEL_MAX + ((UInt16)(l)))
 
+#define CITTA_LEVEL_MAX 100
 #define CITTA_LEVEL(x) (((UInt16)(x))%CITTA_LEVEL_MAX)
 #define CITTA_ID(x) (((UInt16)(x))/CITTA_LEVEL_MAX)
 #define CITTAANDLEVEL(c,l) (((UInt16)(c))*CITTA_LEVEL_MAX + ((UInt16)(l)))
-#define CITTA_ITEMID(x) ((UInt16)(x) / CITTA_LEVEL_MAX + LCITTA_ID - 1)
+#define CITTA_TO_ITEMID(x) ((UInt16)(x) / CITTA_LEVEL_MAX + LCITTA_ID - 1)
+#define ITEMID_TO_CITTA(x,l) (((UInt16)(x) - LCITTA_ID + 1)*100 + ((UInt16)(l > 9 ? 9 : l)))
 
 enum
 {
@@ -77,7 +79,7 @@ enum
     e_eft_selfside_buf_aura = 12, // 全体队友获得心动后涨灵气的buf
     e_eft_selfside_absorb = 13, // 给队友吸血
     e_eft_hide_aura = 14, // (墨印或潜行时)敌方被攻击时不增加灵气
-    e_eft_counter_hate = 15, // 反击后的仇恨值
+    e_eft_counter_hate = 15, // 反击后的仇恨值(反击伤害累计到敌方，buf消除时累计的伤害爆炸，并波及斜十字的对象)
     e_eft_hp_shield = 16,       // 释放自己生命值百分比的护盾
     e_eft_self_bleed = 17,           // 给自己加点燃效果（自焚？）
     e_eft_random_shield = 18,        // 随机释放护盾
@@ -89,6 +91,9 @@ enum
     e_eft_protect_pet_100 = 24,         // 宠物100%保护目标
     e_eft_pet_atk_100 = 25,             // 宠物100%帮目标合击
     e_eft_pet_protect_reduce = 26,      // 宠物援护免伤
+    e_eft_counter_spirit = 27,     // 反击后的士气(增加防御、攻击,累计5次对敌方全体造成物理伤害)
+    e_eft_fire_def = 28,           // 火甲(增加防御，不被其他buf覆盖)
+    e_eft_sneak_atk = 29,           // 暗杀(闪避时对敌方造成伤害并吸血)
 
     e_eft_max
 };

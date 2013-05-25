@@ -36,6 +36,7 @@ MSG_REG_2(GameMsgHdr, REQ::LUCKYDRAW, OnLuckyDrawReq);
 MSG_REG_2(GameMsgHdr, REQ::COUNTRY_ACT, OnCountryActReq);
 
 MSG_REG_2(GameMsgHdr, REQ::CLAN_COPY, OnClanCopyReq);
+MSG_REG_2(GameMsgHdr, REQ::CLANBOSS, OnClanBossReq);
 
 MSG_REG(GameMsgHdr, OnPracticeHookAddReq);
 MSG_REG(GameMsgHdr, OnExtendPackageReq);
@@ -176,6 +177,7 @@ MSG_REG_2(GameMsgHdr, REQ::FAIRY_PET, OnFairyPet);
 
 MSG_REG_2(GameMsgHdr, REQ::EQ_LINGBAO, OnEquipLingbaoReq);
 
+MSG_REG_2(GameMsgHdr, REQ::RP_SERVER, OnRPServerReq);
 MSG_REG_2(GameMsgHdr, 0x1D0, OnDailyReq2);
 
 MSG_REG_2(GameMsgHdr, 0x1EE, OnReLoadLuaReq);
@@ -185,6 +187,9 @@ MSG_REG_2(GameMsgHdr, 0x1F0, PlayerEnter);
 MSG_REG_2(GameMsgHdr, 0x1F1, PlayerLeave);
 MSG_REG_2(GameMsgHdr, 0x1F2, OnBroadcast);
 
+
+MSG_REG_2(GameMsgHdr, 0x1F3, OnClanRankBattleReqInitInner);
+MSG_REG_2(GameMsgHdr, 0x1F4, OnClanRankBattleSortListInner);
 
 
 MSG_REG_2(GameMsgHdr, 0x200, PlayerLogout);
@@ -292,8 +297,15 @@ MSG_REG_2(GameMsgHdr, 0x234, OnAthleticsMartialBeAttack);
 MSG_REG_2(GameMsgHdr, 0x235, OnAwardAthleticsMartial);
 
 MSG_REG_2(GameMsgHdr, 0x340, OnTownDeamonlBeAttack);
+MSG_REG_2(GameMsgHdr, 0x341, OnCFriendAthleticsRank);
 MSG_REG_2(GameMsgHdr, 0x342, OnPostDragonKing);
 MSG_REG_2(GameMsgHdr, 0x343, OnSaveGoldAct);
+MSG_REG_2(GameMsgHdr, 0x344, OnFoolsDayAct);
+MSG_REG_2(GameMsgHdr, 0x345, OnLuckyStarAct);
+MSG_REG_2(GameMsgHdr, 0x346, OnSurnameLegendAct);
+
+MSG_REG_2(GameMsgHdr, 0x348, OnSendSpreadAwardInfo);
+MSG_REG_2(GameMsgHdr, 0x349, OnSpreadGetAward);
 
 MSG_REG_2(GameMsgHdr, 0x236, OnAwardHIPrestige);
 MSG_REG_2(GameMsgHdr, 0x237, OnSendShusanLoveTitleCard);
@@ -345,10 +357,17 @@ MSG_REG_2(GameMsgHdr, 0x327, OnDelTianjieNpc);
 MSG_REG_2(GameMsgHdr, 0x328, OnDelMapObj);
 MSG_REG_2(GameMsgHdr, 0x329, OnAddMapObj);
 
-MSG_REG_2(GameMsgHdr, 0x330, OnForbidSale);
 MSG_REG_2(GameMsgHdr, 0x331, OnForbidSaleQueryFail);
 MSG_REG_2(GameMsgHdr, 0x332, OnOpenIdInvalid);
 MSG_REG_2(GameMsgHdr, 0x333, OnOpenAPIFailed);
 
 MSG_REG_2(GameMsgHdr, 0x352, OnSaleItemCancleAll);
+
+MSG_REG_2(GameMsgHdr, 0x353, OnCalcLBBattlePoint);
+MSG_REG_2(GameMsgHdr, 0x354, OnSpreadWhisper);
+MSG_REG_2(GameMsgHdr, 0x360, OnBeVoted);
+MSG_REG_2(GameMsgHdr, 0x361, OnSendPopularityAward);
+
+//0x365-380繁体占用
+
 MSG_HANDLER_END()

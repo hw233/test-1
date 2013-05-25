@@ -967,7 +967,8 @@ CREATE TABLE `sale` (
   `price` int(10) NOT NULL DEFAULT '0',
   `itemId` int(10) NOT NULL,
   `itemNum` int(10) NOT NULL,
-  PRIMARY KEY (`saleId`)
+  PRIMARY KEY (`saleId`),
+  INDEX (`ownerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1099,6 +1100,9 @@ CREATE TABLE `clan` (
   `dailyBattleScore` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '帮会战日积分',
   `battleRanking` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '上周帮会战排名', 
   `qqOpenid` varchar(36) DEFAULT NULL,
+  `xianyun` int(10) unsigned NOT NULL DEFAULT '0',
+  `gongxian` int(10) unsigned NOT NULL DEFAULT '0',
+  `urge` int(10) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1879,6 +1883,7 @@ CREATE TABLE `lingbaoattr` (
     `values` varchar(256) NOT NULL DEFAULT '',
     `skills` varchar(256) NOT NULL DEFAULT '',
     `factors` varchar(256) NOT NULL DEFAULT '',
+    `battlepoint` int (10) unsigned NOT NULL DEFAULT '0',
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -1894,7 +1899,7 @@ CREATE TABLE `lingbaosmelt` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-CREATE TABLE IF NOT EXISTS `dreamer` (                       
+CREATE TABLE IF NOT EXISTS `dreamer` (
     `playerId` bigint(20) unsigned NOT NULL,  
     `progress` tinyint(3) unsigned NOT NULL,      
     `level` tinyint(3) unsigned NOT NULL,      
@@ -1916,8 +1921,7 @@ CREATE TABLE IF NOT EXISTS `dreamer` (
     PRIMARY KEY (`playerId`)                  
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `fairyPet`;
-CREATE TABLE `fairyPet` (
+CREATE TABLE IF NOT EXISTS `fairyPet` (
     `id` int(10) unsigned NOT NULL,
     `playerId` bigint(20) unsigned NOT NULL,
     `petLev` smallint(6) unsigned NOT NULL,

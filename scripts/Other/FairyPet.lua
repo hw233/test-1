@@ -27,9 +27,9 @@ local converts = {
     },
 }
 
-local greenPet = {501, 504, 507, 510}   --绿色仙宠id
-local purplePet = {503, 506, 509, 512}  --紫色仙宠id
-bluePet = {502, 505, 508, 511}          --蓝色仙宠id  【注:设置为全局变量】
+greenPet = {501, 504, 507, 510}     --绿色仙宠id  【注:设置为全局变量】
+bluePet = {502, 505, 508, 511}      --蓝色仙宠id  【注:设置为全局变量】
+purplePet = {503, 506, 509, 512}    --紫色仙宠id  【注:设置为全局变量】
 
 function exchangPurplePet(player)
     if nil == player then
@@ -143,12 +143,16 @@ function onSeekFairypetAwardAndSucceed(step, isConvert)
     return result
 end
 
-function getConvertPetValue(color)
+function getConvertPetValue(petId)
     local result = {
         ["longyuan"] = 0,
         ["fengsui"] = 0,
         ["like"] = 0,
     }
+    if nil == petId then
+        return result
+    end
+    local color = getPetColorFromId(petId)
     if nil == color or nil == converts[color] then
         return result
     end

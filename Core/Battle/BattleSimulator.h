@@ -32,6 +32,8 @@ namespace Battle
         BS_ATHLETICS1 = 0xFD01,
         // 新阵营(蜀山论剑)
         BS_NEWCOUNTRYBATTLE = 0xFD02,
+        //末日之战
+        BS_CLANBOSSBATTLE = 0xFD03,
         // 世界BOSS
         BS_WBOSS = 0xFC01
     };
@@ -294,6 +296,12 @@ private:
         e_unPetProtect100 = 82,   // 100%援护标志
         e_petAtk100 = 83,       // 100%合击标志
         e_unPetAtk100 = 84,       // 100%合击标志
+        e_counterSpirit = 85,     // 反击士气
+        e_unCounterSpirit = 86,   // 解除反击士气
+        e_fireFakeDead = 87,     // 火遁(有概率假死一次)
+        e_unFireFakeDead = 88,   // 解除火遁
+        e_sneakAtk = 89,     // 暗杀
+        e_unSneakAtk = 90,   // 解除暗杀
 
         e_MAX_STATE,
     };
@@ -423,6 +431,8 @@ private:
 
     typedef bool (Battle::BattleSimulator::*doSkillStrengthenFunc)(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
 
+    bool doSkillStrengthen_FireFakeDead(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
+
     bool doSkillStrengthen_disperse(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
     bool doSkillStrengthen_reduce(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
     bool doSkillStrengthen_week(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
@@ -452,6 +462,7 @@ private:
     bool AddExtraDamageAfterResist_SkillStrengthen(BattleFighter* pFighter, BattleFighter* pTarget, const GData::SkillBase* skill, int nDamage);
     // 毒被抵抗时上状态
     bool AddStateAfterPoisonResist_SkillStrengthen(BattleFighter* pFighter, BattleFighter* pTarget, const GData::SkillBase* skill, int nfactor);
+    bool doSkillStrengthen_SneakRecover(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
 
     bool doDeBufAttack(BattleFighter* bf);
 
@@ -499,6 +510,7 @@ private:
     void doSkillEffectExtra_AtkPetMarkDmg(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_ProtectPet100(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_PetAtk100(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
+    void doSkillEffectExtra_SneakAtk(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
 
 
     void doSkillEffectExtraAbsorb(BattleFighter* bf, UInt32 dmg, const GData::SkillBase* skill);
@@ -514,7 +526,7 @@ private:
 
 
     bool doDarkVigorAttack(BattleFighter* bf, float darkVigor);
-    float getSkillEffectExtraCounterDarkVigor(const GData::SkillBase* skill);
+    void doSkillEffectExtraCounter(BattleFighter* bf, BattleFighter* bo, const GData::SkillBase* skill);
     void doPassiveSkillOnCounter(BattleFighter* bf, BattleFighter* bo);
 
 private:
@@ -628,6 +640,8 @@ private:
     bool doAuraPresent(BattleFighter* bf);
     bool doConfusePresent(BattleFighter* bf);
     bool doStunPresent(BattleFighter* bf);
+    bool doBlindPresent(BattleFighter* bf);
+    void appendInitDefStatus(BattleFighter* bf);
 
 private:
     // 和仙宠有关的
@@ -639,18 +653,27 @@ private:
     bool    doProtectDamage(BattleFighter* bf, BattleFighter* pet, float& phyAtk, float& magAtk, float factor);
     bool    protectDamage(BattleFighter* bf, BattleFighter* pet, float& phyAtk, float& magAtk, float factor);
 
-    bool    tryAttackWithPet(BattleFighter* bf, float& phyAtk, float& magatk, float factor);
-    bool    do100AttackWithPet(BattleFighter* bf, BattleFighter* pet, float& phyAtk, float& magAtk, float factor);
-    bool    doAttackWithPet(BattleFighter* bf, BattleFighter* pet, float& phyAtk, float& magAtk, float factor);
-    bool    attackWithPet(BattleFighter* bf, BattleFighter* pet, float& phyAtk, float& magAtk, float factor);
+    bool    tryAttackWithPet(BattleFighter* bf);
+    bool    do100AttackWithPet(BattleFighter* bf, BattleFighter* pet);
+    bool    doAttackWithPet(BattleFighter* bf, BattleFighter* pet);
+    bool    attackWithPet(BattleFighter* bf, BattleFighter* pet);
 private:
     int     getPossibleTarget(int, int, BattleFighter* bf = NULL); // return -1 for no found target
 
     static  bool hasPetMarked(BattleObject* bo);
     static  bool isPet(BattleObject* bo);
     UInt32 upPetObject(UInt8, bool = true);
+    UInt32 doSpiritAttack(BattleFighter * bf, BattleFighter* bo, float atk, bool& pr, bool& cs, bool& first);
 
 private:
+    // 记录每回合命中次数
+    UInt8 _hit_cnt;
+    void doSkillStrenghtenHitConfuse(BattleFighter* bf, const GData::SkillBase* skill, GData::SkillStrengthenBase* ss, int target_side, int target_pos);
+    bool isFireDefend(const GData::SkillBase* skill);
+
+    std::vector<BattleFighter*> _sneak_atker;
+    void pushSneakAtker(BattleFighter* bf) { _sneak_atker.push_back(bf); }
+    void doSneakAttack(BattleFighter* bf, BattleFighter* bo, bool& pr, bool& cs);
 };
 
 }

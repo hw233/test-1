@@ -520,14 +520,6 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
         if (World::getWhiteLoveDay() && World::_wday == 6)
             player->GetPackage()->AddItem2(476, 5, 1, 1);
 
-        if(World::getChingMing())
-        {
-            if(PLAYER_DATA(player, dungeonCnt) > getMaxCount())
-                player->GetPackage()->AddItem2(481, 5, 1, 1);
-            else
-                player->GetPackage()->AddItem2(481, 1, 1, 1);
-        }
-
         if(World::getFourCopAct())
         {
             UInt32 randNum;

@@ -1,6 +1,8 @@
 #ifndef _SERVERTYPES_H_
 #define _SERVERTYPES_H_
 
+//#define OPEN_API_ON
+
 struct ServerInfor
 {
 	std::string m_Ip;		//服务器绑定的IP
@@ -21,7 +23,7 @@ enum
 #ifndef _WIN32
 	WORKER_THREAD_DC,				//
 #ifdef OPEN_API_ON
-    WORKER_THREAD_OPEN_API,               //
+    WORKER_THREAD_OPEN_API,         //
 #endif
 #endif
 	WORKER_THREAD_DB,				//7  DB

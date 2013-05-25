@@ -120,7 +120,6 @@ namespace Script
 		lua_tinker::def(_L, "getRandOEquip",	GObject::getRandOEquip);
 		lua_tinker::def(_L, "getRandPEquip",	GObject::getRandPEquip);
         lua_tinker::def(_L, "getRandGem" ,      GObject::getRandGem);
-		lua_tinker::def(_L, "getChingMing", GObject::World::getChingMing);
 		lua_tinker::def(_L, "getGemMergeAct", GObject::World::getGemMergeAct);
 		lua_tinker::def(_L, "getEnchantGt11", GObject::World::getEnchantGt11);
         lua_tinker::def(_L, "getBlueDiamondAct", GObject::World::getBlueDiamondAct);
@@ -150,6 +149,11 @@ namespace Script
 		lua_tinker::def(_L, "getItem9343Act", GObject::World::getItem9343Act);
 		lua_tinker::def(_L, "getAutoBattleAct", GObject::World::getAutoBattleAct);
 		lua_tinker::def(_L, "getSnakeSpringEquipAct", GObject::World::setSnakeSpringEquipAct);
+		lua_tinker::def(_L, "getFoolBao", GObject::World::getFoolBao);
+		lua_tinker::def(_L, "getHalfGold", GObject::World::getHalfGold);
+		lua_tinker::def(_L, "getSurnameLegend", GObject::World::getSurnameLegend);
+		lua_tinker::def(_L, "getOpenTime", GObject::World::getOpenTime);
+		lua_tinker::def(_L, "isRPServer", GObject::World::isRPServer);
 
         CLASS_DEF(GameActionLua, Print);
         lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);
@@ -194,6 +198,7 @@ namespace Script
 		CLASS_DEF(Player, getGoldInLua);
 		CLASS_DEF(Player, getCoupon);
 		CLASS_DEF(Player, useCoupon);
+		CLASS_DEF(Player, pendCoupon);
 		CLASS_DEF(Player, getTael);
 		CLASS_DEF(Player, useTael);
 		CLASS_DEF(Player, getCoin);
@@ -289,6 +294,7 @@ namespace Script
         CLASS_DEF(Player, lastQueqiaoAwardPush);
         CLASS_DEF(Player, lastKillMonsterAwardPush);
         CLASS_DEF(Player, lastNew7DayTargetAwardPush);
+		CLASS_DEF(Player, lastCFTicketsAward);
         CLASS_DEF(Player, luaUdpLog);
         CLASS_DEF(Player, addFighterFromItem);
         CLASS_DEF(Player, hasFighter);
@@ -298,6 +304,10 @@ namespace Script
         CLASS_DEF(Player, getFengsuiLua);
         CLASS_DEF(Player, getLongyuanLua);
         CLASS_DEF(Player, getPetByPetEgg);
+        CLASS_DEF(Player, SetVipPrivilege);
+        CLASS_DEF(Player, sendVipPrivilege);
+        CLASS_DEF(Player, sendLuckyBagInfo);
+		CLASS_DEF(Player, LuckyBagRank);
 
         CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);
@@ -1012,6 +1022,11 @@ namespace Script
 		return Call<bool>("onGetCFriendAward", player, idx);
 	}
 
+	UInt8 GameActionLua::onUseTickets( Player* player)
+	{
+		return Call<UInt8>("onUseTickets", player);
+	}
+
 	bool GameActionLua::testTakePack( Player* player, UInt8 type, UInt8 freq )
 	{
 		return Call<bool>("testTakePack", player, type, freq);
@@ -1575,9 +1590,9 @@ namespace Script
 		return Call<UInt8>("getPetColorFromId", petId);
     }
 
-	Table GameActionLua::getConvertPetValue(UInt8 color)
+	Table GameActionLua::getConvertPetValue(UInt32 petId)
 	{
-		return Call<Table>("getConvertPetValue", color);
+		return Call<Table>("getConvertPetValue", petId);
     }
 
 	UInt32 GameActionLua::exchangPurplePet( Player* player )
@@ -1588,6 +1603,45 @@ namespace Script
     bool GameActionLua::RunVipPrivilegeAward(Player* player, UInt8 idx, UInt8 dayth)
     {
 		return Call<bool>("RunVipPrivilegeAward", player, idx, dayth);
+    }
+
+    bool GameActionLua::RunLevelAward(Player* player,UInt8 opt)
+    {
+		return Call<bool>("RunLevelAward", player,opt);
+    }
+    UInt8 GameActionLua::getAnswerInFoolsDay(UInt8 qid)
+    {
+		return Call<UInt8>("getAnswerInFoolsDay", qid);
+    }
+
+    void GameActionLua::getAwardInFoolsDay(Player* player, UInt8 idx)
+    {
+		assert(player != NULL);
+		Call<void>("getAwardInFoolsDay", player, idx);
+    }
+
+    bool GameActionLua::getLuckyStarAward(Player* player, UInt8 idx)
+    {
+		assert(player != NULL);
+		return Call<bool>("getLuckyStarAward", player, idx);
+    }
+    void GameActionLua::GetLuckyBagAward(Player * player)
+    {
+        assert(player != NULL);
+        Call<void>("GetLuckyBagAward",player);
+    }
+
+    UInt32 GameActionLua::GetSpreadCountForAward()
+    {
+        UInt32 serverNo = cfg.serverNo;
+        if(cfg.isTestPlatform)
+            serverNo = 9990;
+        return Call<UInt32>("GetSpreadCountForAward", serverNo);
+    }
+
+    lua_tinker::table GameActionLua::GetSpreadAward()
+    {
+        return Call<lua_tinker::table>("GetSpreadAward");
     }
 }
 

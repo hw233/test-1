@@ -20,6 +20,16 @@ void RealItemAwardMgr::load(UInt32 id, UInt32 cd, std::string& card_no, std::str
     return;
 }
 
+/*
+ *注:QB已使用的id段划分
+ *[1]七日目标实物抽奖60QB
+ *[2]七日目标实物抽奖10QB
+ *[3--32]新手注册邀请好友抽奖活动10QB
+ *[33--40]好友邀请抽奖10QB 【临时占用,并未使用2013-01-22】
+ *[41--70]新注册七日每日目标奖励10QB
+ *
+ *
+ */
 bool RealItemAwardMgr::hasAward(UInt32 id)
 {
     FastMutex::ScopedLock lk(m_mutex);
@@ -58,7 +68,7 @@ void RealItemAwardMgr::getAward(Player* pl, UInt32 id)
 
         DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '', %u)", cfg.serverLogId, pl->getId(), mail->id, RealItemAwardActive, title, content, mail->recvTime);
     }
-    if(id >=3 && id <= 32)
+    else if(id >= 3 && id <= 32)
     {
         num = 10;
         SYSMSG(title, 2368);
@@ -67,8 +77,16 @@ void RealItemAwardMgr::getAward(Player* pl, UInt32 id)
 
         DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '', %u)", cfg.serverLogId, pl->getId(), mail->id, RealItemAwardActive, title, content, mail->recvTime);
     }
+    else if(id >= 33 && id <= 40)
+    {
+        num = 10;
+        SYSMSG(title, 2370);
+        SYSMSGV(content, 2371, num, award.card_no.c_str(), award.card_psw.c_str());
+        Mail * mail = pl->GetMailBox()->newMail(NULL, 0x01, title, content);
 
-    if(id >=41 && id <= 70)
+        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '', %u)", cfg.serverLogId, pl->getId(), mail->id, RealItemAwardActive, title, content, mail->recvTime);
+    }
+    else if(id >= 41 && id <= 70)
     {
         num = 10;
         SYSMSG(title, 2366);

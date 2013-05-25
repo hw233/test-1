@@ -78,14 +78,14 @@ namespace GObject
     {
         std::vector<LogMsg> log;
         std::vector<LogMsg> unionLog;
-        std::vector<OpenIdMsg> openIdLog;
+        //std::vector<OpenIdMsg> openIdLog;
         {
             FastMutex::ScopedLock lk(m_Mutex);
             log.swap(m_DCLog);
 
             unionLog.swap(m_UnionLog);
 
-            openIdLog.swap(m_Openid);
+            //openIdLog.swap(m_Openid);
         }
         if (!log.empty())
         {
@@ -143,7 +143,8 @@ namespace GObject
                     puts(res);
                     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, recvret);
                     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
-                    curl_easy_setopt(curl, CURLOPT_TIMEOUT, 1);
+                    curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10);
+                    curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
                     CURLcode curlRes = curl_easy_perform(curl);
                     if (CURLE_OK == curlRes)
                     {
@@ -158,6 +159,7 @@ namespace GObject
                 ++i;
             }
         }
+        /*
         if (!openIdLog.empty())
         {
             size_t size = openIdLog.size();
@@ -197,6 +199,7 @@ namespace GObject
                 ++i;
             }
         }
+        */
     }
 
     void DCWorker::OnPause()
@@ -238,6 +241,7 @@ namespace GObject
 
     void DCWorker::PushCheckOpenId(UInt64 playerId, const char * openId, UInt32 len)
     {
+        /*
         if (!openId)
             return;
 
@@ -257,9 +261,10 @@ namespace GObject
             FastMutex::ScopedLock lk(m_Mutex);
             m_Openid.push_back(openMsg);
         }
-
+        */
     }
 
+    /*
     bool DCWorker::CheckOpenId(UInt64 playerId, char * openId)
     {
         // Memcached 校验playerID和openID
@@ -281,6 +286,7 @@ namespace GObject
             return false;
         }
     }
+    */
 
     UInt32 DCWorker::UnionLoggerResultParse(char* result, char* msg)
     {
@@ -318,6 +324,19 @@ namespace GObject
         #undef JSON_ERR_CUSTOM2
         #undef JSON_ERR_CUSTOM3
         #undef JSON_ERR_CUSTOM4
+    }
+    UInt8 DCWorker::CheckRPOpenid(char* openid)
+    {
+        if (!cfg.rpServer)
+            return true;
+        if (!m_inited || NULL == openid)
+            return false;
+        char value[32] = {0};
+        char key[64] = {0};
+        size_t len = snprintf(key, sizeof(key), "uid_asss_rp_%s", openid); 
+        m_MCached.get(key, len, value, sizeof(value));
+        value[1] = 0;
+        return atoi(value);
     }
 }
 

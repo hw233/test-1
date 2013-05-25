@@ -71,6 +71,7 @@ void WorldScript::init()
 	def("setYearActive", GObject::World::setYearActive);
 	def("getQgameGiftAct", GObject::World::getQgameGiftAct);
 	def("setQgameGiftAct", GObject::World::setQgameGiftAct);
+	def("setSpreadAct", GObject::World::setSpreadAct);
 	def("getRechargeActive3366", GObject::World::getRechargeActive3366);
 	def("setRechargeActive3366", GObject::World::setRechargeActive3366);
 	def("getValentineDay", GObject::World::getValentineDay);
@@ -147,6 +148,7 @@ void WorldScript::init()
     def("get11Act", GObject::World::get11Act);
     def("setSSToolbarAct", GObject::World::setSSToolbarAct);
     def("setFeastLoginAct", GObject::World::setFeastLoginAct);
+    def("setMayDayLoginAct", GObject::World::setMayDayLoginAct);
     def("setNewYearGiveGiftAct", GObject::World::setNewYearGiveGiftAct);
     def("setNewYearQQGameAct", GObject::World::setNewYearQQGameAct);
     def("setNewYearQzoneContinueAct", GObject::World::setNewYearQzoneContinueAct);
@@ -228,12 +230,22 @@ void WorldScript::init()
 	def("getItem9343Act", GObject::World::getItem9343Act);
 	def("setAutoBattleAct", GObject::World::setAutoBattleAct);
 	def("setSnakeSpringEquipAct", GObject::World::setSnakeSpringEquipAct);
+    def("setFoolBao",GObject::World::setFoolBao);
+    def("getFoolBao",GObject::World::getFoolBao);
+    def("setHalfGold",GObject::World::setHalfGold);
+    def("getHalfGold",GObject::World::getHalfGold);
+
+    def("setSurnameLegend",GObject::World::setSurnameLegend);
+    def("getSurnameLegend",GObject::World::getSurnameLegend);
 
     def("setMergeAthAct", GObject::World::setMergeAthAct);
     def("getMergeAthAct", GObject::World::getMergeAthAct);
     def("setFourCopAct", GObject::World::setFourCopAct);
     def("getFourCopAct", GObject::World::getFourCopAct);
     def("commitArenaForceOnce", GObject::World::commitArenaForceOnce);
+
+	def("getOpenTime", GObject::World::getOpenTime);
+	def("isRPServer", GObject::World::isRPServer);
 
 	class_add<GData::Store>("Store");
 	class_def<GData::Store>("clear", &GData::Store::clear);

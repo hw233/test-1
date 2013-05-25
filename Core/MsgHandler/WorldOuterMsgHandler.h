@@ -1195,19 +1195,36 @@ void OnStoreListReq( GameMsgHdr& hdr, StoreListReq& lr )
 void OnLeaderboardReq( GameMsgHdr& hdr, LeaderboardReq& lr )
 {
 	MSG_QUERY_PLAYER(player);
-	Stream * st;
+	Stream  st;
     //if(GObject::leaderboard.hasUpdate(lr._id) && GObject::leaderboard.getPacket(lr._type, st, player))
-	if (GObject::leaderboard.getPacket(lr._type, st, player))
+    if (lr._type == 7)
     {
-        if (!GObject::leaderboard.isSorting())
-            player->send(*st);
-	}
-	else
-	{
-		UInt8 failed_packet[9] = {0x05, 0x00, 0xFF, REP::SORT_LIST, lr._type, 0x00, 0x00, 0x00, 0x00};
-		player->send(failed_packet, 9);
-	}
+        GameMsgHdr hdr(0x1C6, WORKER_THREAD_WORLD, player, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+    }
+    else
+    {
+        if (GObject::leaderboard.getPacket(lr._type, st, player))
+        {
+            if (!GObject::leaderboard.isSorting())
+                player->send(st);
+        }
+        else
+        {
+            if (lr._type != 6)
+            {
+                UInt8 failed_packet[9] = {0x05, 0x00, 0xFF, REP::SORT_LIST, lr._type, 0x00, 0x00, 0x00, 0x00};
+                player->send(failed_packet, 9);
+            }
+            else
+            {
+                UInt8 failed_packet[14] = {0x05, 0x00, 0xFF, REP::SORT_LIST, lr._type, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+                player->send(failed_packet, 14);
+            }
+        }
+    }
 }
+
 
 void OnOwnLeaderboardReq( GameMsgHdr& hdr, OwnLeaderboardReq& olr )
 {
@@ -2199,8 +2216,8 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
 		return;
     */
 	BinaryReader brd(data, hdr.msgHdr.bodyLen);
-	UInt8 op;
-    UInt8 type;
+	UInt8 op = 0;
+    UInt8 type = 0;
 
     brd >> type;
     switch(type)
@@ -2216,19 +2233,19 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             {
             case 0x01:
                 {
-                    UInt8 type = 0;
-                    brd >> type;
-                    if(type == 1)
+                    UInt8 form = 0;
+                    brd >> form;
+                    if(form == 1)
                         player->sendQixiInfo();
-                    else if(type == 2)
+                    else if(form == 2)
                         WORLD().sendQixiPlayers(player);
                 }
                 break;
             case 0x02:
                 {
-                    UInt8 type = 0;
-                    brd >> type;
-                    if(type == 0)
+                    UInt8 form = 0;
+                    brd >> form;
+                    if(form == 0)
                     {
                         UInt64 pid = 0;
                         brd >> pid;
@@ -2238,7 +2255,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                             break;
                         player->postQixiEyes(pl);
                     }
-                    else if(type == 1)
+                    else if(form == 1)
                     {
                         player->divorceQixi();
                     }
@@ -2330,6 +2347,9 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         case 0x0A:
         case 0x0B:
         case 0x0D:
+        case 0x0F:
+        case 0x11:
+        case 0x14:
         {
             brd >> op;
             switch(op)
@@ -2339,7 +2359,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                 break;
             case 0x02:  //龙宫寻宝
                 {
-                    UInt8 count= 0;
+                    UInt8 count = 0;
                     brd >> count;
                     player->postDragonKing(count);
                 }
@@ -2420,6 +2440,74 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             }
             break;
         }
+        case 0x10:
+        {
+            if (!World::getFoolsDay())
+                return;
+            brd >> op;
+            struct foolsData
+            {
+                UInt8 type;
+                UInt8 id;
+                char answer;
+            }fdata;
+            fdata.type = op;
+            brd >> fdata.id;
+            brd >> fdata.answer;
+            GameMsgHdr h(0x344,  player->getThreadId(), player, sizeof(fdata));
+            GLOBAL().PushMsg(h, &fdata);
+            break;
+        }
+        case 0x12:
+        {
+            if (!player->getLuckyStarAct())
+                return;
+            brd >> op;
+            struct starData
+            {
+                UInt8 type;
+                UInt8 idx;
+            }sdata;
+            sdata.type = op;
+            brd >> sdata.idx;
+            GameMsgHdr h(0x345,  player->getThreadId(), player, sizeof(sdata));
+            GLOBAL().PushMsg(h, &sdata);
+        }
+        break;
+        case 0x13:
+        {
+            if (!World::getSurnameLegend())
+                return;
+            brd >> op;
+            UInt8 type = op;
+            GameMsgHdr h(0x346,  player->getThreadId(), player, sizeof(type));
+            GLOBAL().PushMsg(h, &type);
+            break;
+        }
+        case 0x41:
+        {
+            if (!World::getSpreadAct())
+                return;
+            brd >> op;
+            if(op == 0)
+            {
+                std::string name;
+                brd >> name;
+                player->spreadToOther(0, name);
+            }
+            else if(op == 1)
+                player->spreadGetAward();
+            else if(op == 3)
+                player->spreadToSelf();
+            else if(op == 4)
+                player->sendSpreadBasicInfo();
+            else if(op == 5)
+            {
+                GameMsgHdr h(0x348,  player->getThreadId(), player, 0);
+                GLOBAL().PushMsg(h, NULL);
+            }
+        }
+        break;
         default:
             break;
     }

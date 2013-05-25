@@ -68,6 +68,7 @@
 #include "GData/LBSkillTable.h"
 #include "GData/FairyPetTable.h"
 #include "FairyPet.h"
+#include "GObject/ClanBoss.h"
 
 namespace GObject
 {
@@ -424,7 +425,11 @@ namespace GObject
             fprintf(stderr, "loadDreamer error!\n");
             std::abort();
         }
-       
+        if(!fixItem9383Leader())
+        {
+            fprintf(stderr, "fixItem9383Leader error!\n");
+            std::abort();
+        }
 
 		DB::gDataDBConnectionMgr->UnInit();
 	}
@@ -2156,6 +2161,14 @@ namespace GObject
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
+            if (bosshp.id == 5515) //末日之战boss
+            {
+                if (bosshp.level == 1)//正在进行中down机了
+                {
+                    GObject::ClanBoss::instance().setNeedRestart(true, bosshp.hp);
+                    continue;
+                }
+            }
 			Boss * boss = bossManager.findBoss(bosshp.id);
 			if(boss == NULL)
 				continue;
@@ -3124,7 +3137,7 @@ namespace GObject
         // ??????Ϣ
 		LoadingCounter lc("Loading clans:");
 		DBClan cl;
-		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `funds`, `foundTime`, `founder`, `leader`, `watchman`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle`, `battleScore`, `dailyBattleScore`, `battleRanking`,`qqOpenid` FROM `clan`", cl) != DB::DB_OK)
+		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `funds`, `foundTime`, `founder`, `leader`, `watchman`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle`, `battleScore`, `dailyBattleScore`, `battleRanking`,`qqOpenid`,`xianyun`,`gongxian`,`urge` FROM `clan`", cl) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		Clan * clan = NULL;
@@ -3168,6 +3181,15 @@ namespace GObject
 				clanBattle->setNextBattleTime(cl.nextBattleTime);
 				globalClans.add(cl.id, clan);
                 clan->setQQOpenid(cl.qqOpenid);
+                clan->setXianyun(cl.xianyun);
+                clan->setGongxian(cl.gongxian);
+                if (cl.urge > 0)
+                {
+                    for (UInt8 i = 0; i < 3; i++)
+                        clan->setUrge(i, (UInt8)(cl.urge>>(8*i)), false);
+                }
+                if (cl.gongxian > 0)
+                    GObject::ClanBoss::instance().insertToGxSort(clan, 0, cl.gongxian);
 		}
 			else
 			{
@@ -3604,6 +3626,8 @@ namespace GObject
             }
             if(clan == NULL) continue;
             clan->LoadCopy(cc.level, cc.levelUpdateTime, cc.maxLevel, cc.maxLevelTime);
+            if (cc.maxLevel >= 10)
+                GObject::ClanBoss::instance().setCanOpened(true);
         }
         lc.finalize();
         
@@ -5502,7 +5526,7 @@ namespace GObject
 
         LoadingCounter lc("Loading lingbao attr:");
         DBLingbaoAttr dblba;
-        if(execu->Prepare("SELECT `equipment`.`id`, `tongling`, `lbcolor`, `types`, `values`, `skills`, `factors` FROM `lingbaoattr` LEFT JOIN `equipment` ON `equipment`.`id` = `lingbaoattr`.`id`", dblba) != DB::DB_OK)
+        if(execu->Prepare("SELECT `equipment`.`id`, `tongling`, `lbcolor`, `types`, `values`, `skills`, `factors`, `battlepoint` FROM `lingbaoattr` LEFT JOIN `equipment` ON `equipment`.`id` = `lingbaoattr`.`id`", dblba) != DB::DB_OK)
             return false;
 
         lc.reset(2000);
@@ -5526,6 +5550,7 @@ namespace GObject
                     ItemLingbaoAttr& lba = lb->getLingbaoAttr();
                     lba.tongling = dblba.tongling;
                     lba.lbColor = dblba.lbcolor;
+                    lba.battlePoint = dblba.battlePoint;
                     {
                         StringTokenizer tk(dblba.types, ",");
                         if (tk.count())
@@ -5620,7 +5645,7 @@ namespace GObject
 
     bool GObjectManager::loadDreamer()
     {
-        // TODO: 读取水晶梦境有关数据
+        // 读取水晶梦境有关数据
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading dreamer");
@@ -5639,6 +5664,39 @@ namespace GObject
 			lc.advance();
         }
         lc.finalize();
+        return true;
+    }
+
+    bool GObjectManager::fixItem9383Leader()
+    {
+        std::string path = cfg.scriptPath + "fixItem9383leader";
+        File destFile(path);
+        if(!destFile.exists())
+        {
+            return true;
+        }
+        destFile.remove(false);
+
+        // 9383物品使用纪录
+		std::unique_ptr<DB::DBExecutor> execu(DB::gLogDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("fixItem9383Leader");
+        DBItemSum dbis;
+        if(execu->Prepare("select distinct `player_id`, `item_id`, sum(item_num) as item_nums from `item_histories_2013_4` group by `player_id`, `item_id` having `item_id`=9383", dbis) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+        Player * player = NULL;
+		while(execu->Next() == DB::DB_OK)
+        {
+            player = globalPlayers[dbis.player_id];
+            if (player)
+            {
+                player->SetVar(VAR_SURNAMELEGEND_USED, dbis.item_nums);
+            }
+			lc.advance();
+        }
+        lc.finalize();
+
         return true;
     }
 }

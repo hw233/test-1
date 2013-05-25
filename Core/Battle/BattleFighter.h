@@ -29,6 +29,15 @@ namespace GData
 namespace Battle
 {
 
+    enum SneakStatus
+    {
+        e_sneak_none = 0,
+        e_sneak_on = 1,
+        e_sneak_atk = 2
+    };
+
+
+
 class BattleFighter:
 	public BattleObject
 {
@@ -131,10 +140,10 @@ public:
 	inline float getSoul() { return _soul; }
 	inline float getAura() { return (_aura > 0 ? _aura : 0); }
 	inline float getAuraMax() { return (_auraMax > 0 ? _auraMax : 0); }
-	inline float getAttack() {float ret = _attack + _attackAdd + _attackAdd2 + _atkAddSpecial + _atkDecSpecial + _moAttackAdd + _petAttackAdd + (_petExAtkEnable?_petExAtk:0); return  ret;}
-	inline float getMagAttack() {float ret = _magatk + _magAtkAdd + _magAtkAdd2 + _magAtkAddSpecial + _magAtkDecSpecial + _moMagAtkAdd + _petMagAtkAdd; return ret;}
-	inline float getDefend() {float ret = _defend + _defAdd + _defAdd2; return (ret > 0 ? ret : 0);}
-	inline float getMagDefend() {float ret = _magdef + _magDefAdd + _magDefAdd2; return (ret > 0 ? ret : 0);}
+	inline float getAttack() {float ret = _attack + _attackAdd + _attackAdd2 + _atkAddSpecial + _atkDecSpecial + _moAttackAdd + _petAttackAdd + (_petExAtkEnable?_petExAtk:0) + _counter_spirit_atk_add + _pet_coatk; return  ret;}
+	inline float getMagAttack() {float ret = _magatk + _magAtkAdd + _magAtkAdd2 + _magAtkAddSpecial + _magAtkDecSpecial + _moMagAtkAdd + _petMagAtkAdd + _counter_spirit_magatk_add + _pet_coatk; return ret;}
+	inline float getDefend() {float ret = _defend + _defAdd + _defAdd2 + _counter_spirit_def_add; return (ret > 0 ? ret : 0);}
+	inline float getMagDefend() {float ret = _magdef + _magDefAdd + _magDefAdd2 + _counter_spirit_magdef_add + _fire_defend; return (ret > 0 ? ret : 0);}
 	float getHitrate(BattleFighter* defgt);
 	float getEvade(BattleFighter* defgt);
 	float getCritical(BattleFighter* defgt);
@@ -571,6 +580,10 @@ private:
 
     float _bleedMo;
     UInt8 _bleedMoLast;
+    UInt32 _blind_bleed;
+    float _blind_present;
+    UInt8 _blind_present_cd;
+    UInt8 _blind_cd, _blind_bleed_last;
     BattleFighter* _summoner;
     UInt8 _unSummonAura;
 
@@ -850,6 +863,15 @@ public:
     inline void resetBleedMo() { _bleedMo = 0; _bleedMoLast = 0; }
     bool releaseBleedMo();
 
+    //XXX
+    inline UInt8& getBlindCD() { return _blind_cd; }
+    inline float getBlindPresent() { return _blind_present; }
+    inline UInt8& getBlindBleedLast() { return _blind_bleed_last; }
+    inline float getBlindBleed() { return _blind_bleed; }
+    inline void setBlindBleed(float value, UInt8 last, UInt8 cd) { _blind_bleed = value; _blind_bleed_last = last; _blind_cd = cd; }
+    inline void setBlindPresent(float v, UInt8 cd) { _blind_present = v; _blind_present_cd = cd; }
+    inline UInt8 getBlindPresentCD() { return _blind_present_cd; }
+
     void setUnSummonAura(BattleFighter* bf, UInt32 aura) { _summoner = bf, _unSummonAura = aura; }
     bool isSummon() { return _summon; }
     BattleFighter* getSummoner() { return _summoner; }
@@ -919,6 +941,57 @@ public:
     bool releasePetAtk100();
 
 public:
+    float _counter_spirit_atk_add;
+    float _counter_spirit_magatk_add;
+    float _counter_spirit_def_add;
+    float _counter_spirit_magdef_add;
+    UInt8 _counter_spirit_times;
+    UInt8 _counter_spirit_last;
+    float _counter_spirit_efv;
+    std::vector<float> _counter_spirit_factor;
+    UInt16 _counter_spirit_skillid;
+    UInt8 _counter_spirit_skill_cd;
+
+    inline UInt8 getCounterSpiritTimes() { return _counter_spirit_times; }
+    void addCounterSpiritBuf(float atk, float magatk, float def, float magdef, UInt8 last);
+    void setCounterSpiritSkill(UInt16 skillid, float efv, const std::vector<float>& factor);
+    void clearCounterSpiritSkill();
+    float getCounterSpiritAtk();
+    UInt16 getCounterSpiritSkillId() { return _counter_spirit_skillid; }
+    std::vector<float>& getCounterSpiritFactor() { return _counter_spirit_factor; }
+    bool releaseCounterSpirit();
+
+private:
+    float _pet_coatk;
+    void setPetCoAtk(float v) { _pet_coatk = v; }
+    void releasePetCoAtk() { if(_pet_coatk > 0.001f) _pet_coatk = 0; }
+
+    float _fire_defend;
+    UInt8 _fire_defend_last;
+    float _fire_fake_dead_rate;
+    UInt8 _fire_fake_dead_rate_last;
+    void setFireDefend(float v, UInt8 l) { _fire_defend = v; _fire_defend_last = l; }
+    bool releaseFireDefend();
+    void setFireFakeDead(float v, UInt8 l) { _fire_fake_dead_rate = v; _fire_fake_dead_rate_last = l; }
+    bool doFireFakeDead();
+    bool releaseFireFakeDead();
+
+    float _sneak_atk;
+    UInt8 _sneak_atk_status;
+    UInt8 _sneak_atk_last;
+    float _sneak_atk_recover_rate;
+    float getSneakAtk() { return _sneak_atk; }
+    UInt8 getSneakStatus() { return _sneak_atk_status; }
+    void nextSneakStatus();
+    void setSneakAtk(float v, UInt8 s, UInt8 l) { _sneak_atk = v, _sneak_atk_status = s, _sneak_atk_last = l; }
+    bool releaseSneakAtk();
+    void setRecoverSnakeAtk(float v) { _sneak_atk_recover_rate = v; }
+    bool recoverSneakAtk();
+
+    BattleFighter* _selfSummon;
+    inline void setSelfSummon(BattleFighter* bf) { _selfSummon = bf; }
+    inline BattleFighter* getSelfSummon() { return _selfSummon; }
+public:
 	enum StatusFlag
 	{
 		Enh1 = 0x03,
@@ -928,6 +1001,7 @@ public:
         Enh5 = 0x40,
         Enh6 = 0x80000000,
         Enh7 = 0x100,
+        Enh8 = 0x200,
 		Stun = 0xE0,
 		Poison = 0x700,
 		Confuse = 0x3800,

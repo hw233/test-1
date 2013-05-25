@@ -74,7 +74,7 @@ UInt32 FrontMap::getEnterGold(Player* pl)
         { 0,  0,  0},
     };
 
-    return GData::moneyNeed[GData::FRONTMAP_ENTER1+PLAYER_DATA(pl, frontGoldCnt)].gold + extraVipGold[vipl][PLAYER_DATA(pl, frontGoldCnt)];
+    return (GData::moneyNeed[GData::FRONTMAP_ENTER1+PLAYER_DATA(pl, frontGoldCnt)].gold + extraVipGold[vipl][PLAYER_DATA(pl, frontGoldCnt)]);
 }
 
 void FrontMap::sendInfo(Player* pl, UInt8 id, bool needspot, bool force)

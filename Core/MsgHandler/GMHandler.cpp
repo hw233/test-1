@@ -9,6 +9,7 @@
 #include "GData/ExpTable.h"
 #include "GData/NpcGroup.h"
 #include "GObject/Player.h"
+#include "GObject/CFriend.h"
 #include "GObject/Package.h"
 #include "GObject/Fighter.h"
 #include "GObject/Clan.h"
@@ -40,7 +41,9 @@
 #include "GObject/NewCountryBattle.h"
 #include "GObject/Tianjie.h"
 #include "GObject/ClanCopy.h"
+#include "GObject/ClanBoss.h"
 #include "Common/Itoa.h"
+#include "GObject/TownDeamon.h"
 
 #include "GObject/Tianjie.h"
 #include "Memcached.h"
@@ -233,6 +236,8 @@ GMHandler::GMHandler()
     Reg(3, "loginlimit", &GMHandler::OnSetLoginLimit);
 
     Reg(3, "sysup", &GMHandler::OnSysUpdate);
+    Reg(2, "cfriend", &GMHandler::OnCFriend);
+    Reg(2, "shuo", &GMHandler::OnShuoShuo);
     Reg(2, "gold", &GMHandler::OnSaveGoldAct);
 
     Reg(3, "drtm", &GMHandler::OnDreamerTimeSet);
@@ -242,6 +247,17 @@ GMHandler::GMHandler()
     Reg(3, "act", &GMHandler::OnSomeAct);
     Reg(2, "king", &GMHandler::OnDragonKingAct);
     Reg(2, "pet", &GMHandler::OnFairyPetGM);
+    Reg(2, "fool", &GMHandler::OnFoolsDayGM);
+    Reg(2, "star", &GMHandler::OnLuckyStarGM);
+    Reg(2, "acttm", &GMHandler::OnSurnameleg);
+
+    Reg(3, "opencb", &GMHandler::OnClanBossOpen);
+    Reg(3, "cb", &GMHandler::OnClanBoss);
+    Reg(3, "pick", &GMHandler::OnClanBossPick);
+    Reg(3, "empower", &GMHandler::OnClanBossEmpower);
+    Reg(3, "setem", &GMHandler::OnClanBossSetEm);
+
+    Reg(3, "settdlvl", &GMHandler::OnSetTownDeamonMaxLevel);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -848,7 +864,7 @@ void GMHandler::OnReLoadLua( std::vector<std::string>& args )
 	}
 	if(world)
 	{
-		GameMsgHdr hdr4(0x1EE, WORKER_THREAD_WORLD, NULL, sizeof(UInt32));
+		GameMsgHdr hdr4(0x1EE, WORKER_THREAD_WORLD, NULL, sizeof(UInt16));
 		GLOBAL().PushMsg(hdr4, &reloadFlag);
 	}
 	else if(country)
@@ -1854,6 +1870,7 @@ void GMHandler::OnSetLevel( GObject::Player * player, std::vector<std::string>& 
                 UInt8 lvl = atoi(args[1].c_str());
                 UInt64 exp = GData::expTable.getLevelMin(lvl);
                 pl->setLevelAndExp(lvl, exp);
+                pl->SetVar(VAR_LEVEL_AWARD, (lvl == 0 ? 1 : lvl)-1);
             }
             else
             {
@@ -1880,6 +1897,7 @@ void GMHandler::OnSetLevel( GObject::Player * player, std::vector<std::string>& 
 		UInt8 lvl = atoi(args[0].c_str());
 		UInt64 exp = GData::expTable.getLevelMin(lvl);
 		player->setLevelAndExp(lvl, exp);
+        player->SetVar(VAR_LEVEL_AWARD, (lvl == 0 ? 1 : lvl)-1);
 	}
 }
 
@@ -2714,11 +2732,31 @@ void GMHandler::OnGetHeroMemoAward(GObject::Player* player, std::vector<std::str
 inline bool player_enum(GObject::Player* p, int)
 {
     if (!p->isOnline())
+    {
         p->setSysDailog(true);
+    }
+    else
+    {
+        if(World::getSysDailogPlatform() == SYS_DIALOG_ALL_PLATFORM || World::getSysDailogPlatform() == atoi(p->getDomain()))
+        {
+            Stream st(REP::SYSDAILOG);
+            st << Stream::eos;
+            p->send(st);
+        }
+        else
+        {
+            p->setSysDailog(true);
+        }
+    }
     return true;
 }
+
 void GMHandler::OnSysDailog(GObject::Player* player, std::vector<std::string>& args)
 {
+    if (!args.size())
+        return;
+    UInt8 platform = atoi(args[0].c_str());
+    World::setSysDailogPlatform(platform);
     GObject::globalPlayers.enumerate(player_enum, 0);
 }
 void GMHandler::OnRegenAll(GObject::Player* player, std::vector<std::string>& args)
@@ -3300,6 +3338,8 @@ void GMHandler::OnForbidSale(GObject::Player *player, std::vector<std::string>& 
         return;
     UInt64 playerId = atoll(args[0].c_str());
     setForbidSaleValue(playerId, true);
+//    UInt32 fTime = atol(args[1].c_str());
+//    setForbidSaleValue(playerId, true,fTime);
 
     GObject::Player * pl = GObject::globalPlayers[playerId];
     if (NULL != pl)
@@ -3407,6 +3447,56 @@ void GMHandler::OnSysUpdate(GObject::Player *player, std::vector<std::string>& a
 //    player->sendSysUpdate();
 }
 
+void GMHandler::OnCFriend(GObject::Player *player, std::vector<std::string>& args)
+{
+	if(args.size() < 1)
+		return;
+    CFriend * cFriend = player->GetCFriend();
+    if(!cFriend) return;
+    switch(atoi(args[0].c_str()))
+    {
+    case 1:
+        {
+            UInt8 idx = atoi(args[1].c_str());
+            cFriend->setCFriendSafe(idx);
+            if(idx > 3 && idx < 7)
+                cFriend->setCFriendNum(3);
+            if(idx >= 39)
+                cFriend->setCFriendSuccess(3);
+        }
+        break;
+    case 2:
+        cFriend->clearAllForGM();
+        break;
+    case 3:
+        player->AddVar(VAR_CFRIENDTICKETS, atoi(args[1].c_str()));
+        break;
+    default:
+        break;
+     }
+    cFriend->sendCFriend();
+}
+
+void GMHandler::OnShuoShuo(GObject::Player *player, std::vector<std::string>& args)
+{
+	if(args.size() < 1)
+		return;
+    ShuoShuo * sShuo = player->GetShuoShuo();
+    if(!sShuo) return;
+    switch(atoi(args[0].c_str()))
+    {
+    case 1:
+        sShuo->setShuoSafe(atoi(args[1].c_str()));
+        break;
+    case 2:
+        sShuo->clearAllForGM();
+        break;
+    default:
+        break;
+     }
+    sShuo->sendShuoShuo();
+}
+
 void GMHandler::OnSaveGoldAct(GObject::Player *player, std::vector<std::string>& args)
 {
 	if (args.size() < 1)
@@ -3508,7 +3598,7 @@ void GMHandler::OnLingbao(GObject::Player * player, std::vector<std::string>& ar
                         }
                     }
 
-                    DB4().PushUpdateData("REPLACE INTO `lingbaoattr`(`id`, `tongling`, `lbcolor`, `types`, `values`, `skills`, `factors`) VALUES(%u, %d, %d, '%s', '%s', '%s', '%s')", equip->getId(), lbattr.tongling, lbattr.lbColor, strType.c_str(), strValue.c_str(), strSkill.c_str(), strFactor.c_str());
+                    DB4().PushUpdateData("REPLACE INTO `lingbaoattr`(`id`, `tongling`, `lbcolor`, `types`, `values`, `skills`, `factors`, `battlepoint`) VALUES(%u, %d, %d, '%s', '%s', '%s', '%s', '%u')", equip->getId(), lbattr.tongling, lbattr.lbColor, strType.c_str(), strValue.c_str(), strSkill.c_str(), strFactor.c_str(), lbattr.battlePoint);
                 }
                 break;
             default:
@@ -3605,7 +3695,7 @@ void GMHandler::OnLingbaoSkill(GObject::Player * player, std::vector<std::string
                         }
                     }
 
-                    DB4().PushUpdateData("REPLACE INTO `lingbaoattr`(`id`, `tongling`, `lbcolor`, `types`, `values`, `skills`, `factors`) VALUES(%u, %d, %d, '%s', '%s', '%s', '%s')", equip->getId(), lbattr.tongling, lbattr.lbColor, strType.c_str(), strValue.c_str(), strSkill.c_str(), strFactor.c_str());
+                    DB4().PushUpdateData("REPLACE INTO `lingbaoattr`(`id`, `tongling`, `lbcolor`, `types`, `values`, `skills`, `factors`, `battlepoint`) VALUES(%u, %d, %d, '%s', '%s', '%s', '%s', '%u')", equip->getId(), lbattr.tongling, lbattr.lbColor, strType.c_str(), strValue.c_str(), strSkill.c_str(), strFactor.c_str(), lbattr.battlePoint);
                 }
                 break;
             default:
@@ -3661,7 +3751,6 @@ void GMHandler::OnDreamerTimeSet(GObject::Player *player, std::vector<std::strin
     player->setDreamerTime(count);
 }
 
-
 void GMHandler::OnDreamerKeySet(GObject::Player *player, std::vector<std::string>& args)
 {
     if (args.size() < 1)
@@ -3706,18 +3795,14 @@ void GMHandler::OnSomeAct(GObject::Player *player, std::vector<std::string>& arg
 
 void GMHandler::OnDragonKingAct(GObject::Player *player, std::vector<std::string>& args)
 {
-    if (args.size() < 3)
+    if (args.size() < 1)
         return;
-    UInt32 begin = atoi(args[0].c_str());
-    UInt32 end = atoi(args[1].c_str());
-    UInt32 type = atoi(args[2].c_str());
-    GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_BEGIN, begin);
-    GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_END, end);
-    GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_ACTION, type);
-    /*
     UInt32 type = atoi(args[0].c_str());
+    if(type >= GObject::DRAGONKING_MAX)
+        type = 1;
     GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_ACTION, type);
-    */
+    GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_BEGIN, TimeUtil::Now());
+    GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_END, TimeUtil::Now() + 3600);
 }
 
 void GMHandler::OnFairyPetGM(GObject::Player *player, std::vector<std::string>& args)
@@ -3743,6 +3828,123 @@ void GMHandler::OnFairyPetGM(GObject::Player *player, std::vector<std::string>& 
         case 3:
             player->setFairypetBattle(val);
             break;
+        case 4:
+            player->AddVar(VAR_FAIRYPET_LIKEABILITY, val);
+            player->sendFairyPetResource();
+            break;
     }
+}
+
+void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& args)
+{
+    UInt8 type = atoi(args[0].c_str());
+     UInt16 reloadFlag = 0x00FF;
+     GameMsgHdr hdr4(0x1EE, WORKER_THREAD_WORLD, NULL, sizeof(UInt16));
+#pragma pack(1)
+            struct mas
+            {
+                UInt8 hash[36];
+                UInt8 type;
+                UInt32 begin;
+                UInt32 end;
+            }_msg;
+#pragma pack()
+            _msg.type = 2;
+            _msg.begin = TimeUtil::Now();
+            _msg.end = TimeUtil::Now() + 300;
+            LoginMsgHdr hdr1(SPEQ::ACTIVITYONOFF, WORKER_THREAD_LOGIN, 0,0, sizeof(mas));
+    switch(type)
+    {
+        case 1:
+            GVAR.SetVar(GVAR_SURNAMELEGEND_BEGIN, TimeUtil::Now());
+            GVAR.SetVar(GVAR_SURNAMELEGEND_END, TimeUtil::Now() + 300);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            player->LuckyBagRank();
+            GLOBAL().PushMsg(hdr1, &_msg);
+            break;
+        case 2:
+            GVAR.SetVar(GVAR_SURNAMELEGEND_BEGIN, 0);
+            GVAR.SetVar(GVAR_SURNAMELEGEND_END, 0);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            break;
+    }
+}
+
+void GMHandler::OnFoolsDayGM(GObject::Player *player, std::vector<std::string>& args)
+{
+	if(args.size() < 1)
+		return;
+    UInt8 type = atoi(args[0].c_str());
+    if(type == 1)
+    {
+        player->SetVar(VAR_FOOLS_DAY, 0);
+        player->SetVar(VAR_FOOLS_DAY_INFO, 0);
+    }
+    else if(type == 2)
+    {
+        player->SetVar(VAR_NUWA_SIGNET, 0);
+        player->SetVar(VAR_NUWA_OPENTIME, 0);
+    }
+}
+
+void GMHandler::OnLuckyStarGM(GObject::Player *player, std::vector<std::string>& args)
+{
+	if(args.size() < 1)
+		return;
+    UInt8 type = atoi(args[0].c_str());
+    switch(type)
+    {
+        case 1:
+            GVAR.SetVar(GVAR_LUCKYSTAR_BEGIN, TimeUtil::Now());
+            GVAR.SetVar(GVAR_LUCKYSTAR_END, TimeUtil::Now()+86400*2);
+            break;
+        case 2:
+            player->SetVar(VAR_LUCKYSTAR_GET_STATUS, 0);
+            player->sendLuckyStarInfo(2);
+            break;
+        case 3:
+            GVAR.SetVar(GVAR_LUCKYSTAR_BEGIN, 0);
+            GVAR.SetVar(GVAR_LUCKYSTAR_END, 0);
+            break;
+    }
+}
+void GMHandler::OnClanBossOpen(GObject::Player *player, std::vector<std::string>& args)
+{
+    GObject::ClanBoss::instance().setCanOpened(true);
+    GObject::ClanBoss::instance().start();
+}
+
+void GMHandler::OnClanBoss(GObject::Player *player, std::vector<std::string>& args)
+{
+	if(args.size() < 1)
+		return;
+    int bossMaxHp = atoi(args[0].c_str());
+    GObject::ClanBoss::instance().setBossHp(bossMaxHp);
+}
+void GMHandler::OnClanBossPick(GObject::Player *player, std::vector<std::string>& args)
+{
+}
+void GMHandler::OnClanBossEmpower(GObject::Player *player, std::vector<std::string>& args)
+{
+	if(args.size() < 2)
+		return;
+    UInt8 t = atoi(args[0].c_str());
+    UInt32 em = atoi(args[1].c_str());
+    GObject::ClanBoss::instance().addEmpower(t, em);
+}
+void GMHandler::OnClanBossSetEm(GObject::Player *player, std::vector<std::string>& args)
+{
+    if(args.size() < 1)
+        return;
+    UInt8 t = atoi(args[0].c_str()); 
+    GObject::ClanBoss::instance().setPowerType(t);
+}
+
+void GMHandler::OnSetTownDeamonMaxLevel(GObject::Player *player, std::vector<std::string>& args)
+{
+    if(args.size() < 1)
+        return;
+    UInt16 lv = atoi(args[0].c_str()); 
+    player->getDeamonPlayerData()->maxLevel = lv;
 }
 

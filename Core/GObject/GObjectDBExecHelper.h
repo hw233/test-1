@@ -600,6 +600,9 @@ struct DBClan
     UInt32 dailyBattleScore;
     UInt32 battleRanking;
     std::string qqOpenid;
+    UInt32 xianyun;
+    UInt32 gongxian;
+    UInt32 urge;
 };
 
 struct DBClanRepo
@@ -1139,6 +1142,7 @@ struct DBLingbaoAttr
     std::string values;
     std::string skills;
     std::string factors;
+    UInt32 battlePoint;
 };
 
 struct DBLingbaoSmelt
@@ -1187,6 +1191,13 @@ struct DBFairyPetData
     UInt32 overTime;
     UInt16 xiaozhou;
     UInt16 dazhou;
+};
+
+struct DBItemSum 
+{
+    UInt64 player_id;
+    UInt32 item_id;
+    UInt32 item_nums;
 };
 
 }
@@ -1813,7 +1824,7 @@ SPECIALDEF(3)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBClan)
-SPECIALDEF(30)
+SPECIALDEF(33)
 (
 	UInt32, id,
 	std::string, name,
@@ -1844,7 +1855,10 @@ SPECIALDEF(30)
     UInt32, battleScore,
     UInt32, dailyBattleScore,
     UInt32, battleRanking,
-    std::string, qqOpenid
+    std::string, qqOpenid,
+    UInt32, xianyun,
+    UInt32, gongxian,
+    UInt32, urge
 )
 SPECIALEND()
 
@@ -2624,7 +2638,7 @@ SPECIALDEF(16)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBLingbaoAttr)
-SPECIALDEF(7)
+SPECIALDEF(8)
 (
     UInt32, id,
     UInt8, tongling,
@@ -2632,7 +2646,8 @@ SPECIALDEF(7)
     std::string, types,
     std::string, values,
     std::string, skills,
-    std::string, factors
+    std::string, factors,
+    UInt32, battlePoint
 )
 SPECIALEND()
 
@@ -2687,6 +2702,15 @@ SPECIALDEF(11)
     UInt32, overTime,
     UInt16, xiaozhou,
     UInt16, dazhou
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBItemSum)
+SPECIALDEF(3)
+(
+    UInt64, player_id,
+    UInt32, item_id,
+    UInt32, item_nums
 )
 SPECIALEND()
 

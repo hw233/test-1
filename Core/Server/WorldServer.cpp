@@ -321,7 +321,11 @@ void WorldServer::Shutdown()
 	//关闭所有工作线程
 	for (worker = 0; worker < MAX_THREAD_NUM; worker++)
 	{
+#ifdef OPEN_API_ON
+		if(worker < WORKER_THREAD_DB && worker != WORKER_THREAD_OPEN_API)
+#else
 		if(worker < WORKER_THREAD_DB)
+#endif
 			m_AllWorker[worker]->Shutdown();
 	}
 
@@ -337,6 +341,9 @@ void WorldServer::Shutdown()
 	m_AllWorker[WORKER_THREAD_DB8]->Shutdown();
 	m_AllWorker[WORKER_THREAD_DB_LOG]->Shutdown();
 	m_AllWorker[WORKER_THREAD_DB_LOG1]->Shutdown();
+#ifdef OPEN_API_ON
+    m_AllWorker[WORKER_THREAD_OPEN_API]->Shutdown();
+#endif
 }
 
 #define MAX_RET_LEN 1024
@@ -362,6 +369,7 @@ void WorldServer::do_curl_request( const char* url )
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, recvret);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
     curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10);
+    curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
 
     fprintf(stderr, "URL: %s\n", url);
 
@@ -384,6 +392,7 @@ bool WorldServer::do_http_request(const char* url, int timeout)
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, recvret);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
     curl_easy_setopt(curl, CURLOPT_TIMEOUT, timeout);
+    curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
 
     fprintf(stderr, "URL: %s\n", url);
 

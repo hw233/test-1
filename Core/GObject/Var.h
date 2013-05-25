@@ -90,7 +90,7 @@ namespace GObject
         VAR_GOLD_TOKEN = 55, //金代币 先天灵石
         VAR_TAEL_TOKEN = 56, //银代币 盘古灵石
         VAR_COIN_TOKEN = 57, //铜代币 轩辕灵石
-        VAR_FOOLS_DAY = 58, //愚人节礼包是否领取
+        VAR_FOOLS_DAY = 58, //愚人节礼包是否领取  愚公移山(byte0失败题目id,byte1领取奖励的题目数,byte2购买复活卡次数,byte3玩家离线标志)
         VAR_CBWHITEPACK = 59, //阵营战白色情人节礼包
 
         VAR_ATYITEM_1 = 60, //活跃度星期一奖励
@@ -118,7 +118,7 @@ namespace GObject
         VAR_CL3DAY = 86, // 七天连接三天登陆奖励
         VAR_RC7DAYRECHARGE = 87, // 创建角色后前七天充值总额
         VAR_RC7DAYWILL = 88, // 创建角色后前七天充值奖励领取（许愿类型 << 8 | 点亮龙珠数量）
-        VAR_INVITES = 89, // 邀请好友的次数
+        VAR_INVITES = 89, // 邀请好友的人数
         VAR_MDSOUL = 90, // 五一活动灵气值
         VAR_MDSOUL_CNT1 = 91, // 五一活动风雷宝珠使用次数 9000
         VAR_MDSOUL_CNT2 = 92, // 雷之石 497
@@ -140,7 +140,7 @@ namespace GObject
         VAR_NETVDPACK = 106, // 网络情人节礼包是否发放
         VAR_LASTATHRANK = 107, // 昨天结算前的斗剑排名
         VAR_SHUOSHUO = 108, // 今天领取过说说奖励次数
-        VAR_INVITED = 109, // 今天领取过邀请好友奖励次数
+        VAR_INVITED = 109, // 今天领取过邀请好友奖励次数    //停用[suntao:2013-1-15]
 
         VAR_JUNE = 110,      // 六月礼包是否发放
         VAR_JUNE_EQUIP = 111, // 六月节日套装是否发放
@@ -269,6 +269,12 @@ namespace GObject
         VAR_ITEM_9281_FAILED_COUNT = 215, // 锦云兜·龙礼包连续开启失败次数
         VAR_ITEM_9282_FAILED_COUNT = 216, // 锦云兜·墨礼包连续开启失败次数
 
+        VAR_TOTALRECHARGEACT = 217, // 活动期间充值总额
+
+        /*
+         * 【注:此段var(217--239)貌似未被占用】
+         */
+
         VAR_LOCAL_RANK = 240, //本服斗剑，当前排名
         VAR_LOCAL_MAXRANK = 241, //本服斗剑，最好排名
         VAR_LOCAL_PRESTIGE = 242, //本服斗剑，声望数
@@ -327,7 +333,7 @@ namespace GObject
         VAR_ITEM_9316_FAILED_COUNT = 347, // 都率宝伞礼包连续开启失败次数
         VAR_CONSUME_AWARD_COUNT = 348,   //消费抽奖已抽次数
         VAR_NEW_YEAR_GIVE_GIFT = 349,   //迎新纳福，红包入袋(bit1~10依次代表对应的天数是否领取过奖励)
-        VAR_FAIRYPET_ISGET_PET = 350,   //50级以上玩家是免费否领取过仙宠
+        VAR_FAIRYPET_ISGET_PET = 350,   //50级以上玩家是否免费领取过仙宠
 
         // 351~360 占用 for JLT
         VAR_DISCOUNT_CONSUME1  = 351, // 消费限购的金额
@@ -347,10 +353,11 @@ namespace GObject
         VAR_SAVEGOLD_SET_TIME = 364,    //金蛇献瑞,聚福兆祥活动中玩家设置的结算时间
         VAR_SAVEGOLD_GET_STATUS = 365,    //金蛇献瑞,聚福兆祥活动中玩家领取自己仙石的状态,低10位
         VAR_SAVEGOLD_ISGET = 366,   //金蛇献瑞,聚福兆祥活动中玩家当日是否领取
-        VAR_DRAGONKINGSNAKE_STEP = 367,      //大闹龙宫之金蛇起舞当前移动到的格子
-        VAR_DRAGONKINGSNAKE_STEP4_COUNT = 368, //大闹龙宫之金蛇起舞从第4格移动到第5失败的次数
-        VAR_TIANMANG_STEP = 369,      //大闹龙宫之天芒神梭当前移动到的格子
-        VAR_TIANMANG_STEP4_COUNT = 370, //大闹龙宫之天芒神梭从第4格移动到第5失败的次数
+
+        VAR_LUCKYSTAR_IS_CONSUME     = 367, //幸运星:是否消费过
+        VAR_LUCKYSTAR_GET_STATUS     = 368, //幸运星:玩家领取和购买的状态(低12bit,0-3蓝 4-7紫 8-11橙)
+        VAR_LUCKYSTAR_RECHARGE_TOTAL = 369, //幸运星:玩家充值仙石总数
+        VAR_LUCKYSTAR_LOGIN_TIME     = 370, //幸运星:活动期间玩家第一次登录时间
         
         VAR_CALLSNAKEEGG = 371,         //拜金蛇
         VAR_SNAKEEGG_AWARD=372,         //领蛇蛋
@@ -359,6 +366,10 @@ namespace GObject
         VAR_SNAKE_SPRING_EQUIP_GOT=375,
         VAR_WEIBO_AWARD_GOT=376,
         VAR_FISHUSER_AWARD=377,            //捕鱼大亨用户领奖标志 
+
+        VAR_NUWA_SIGNET = 378,   //女娲石盘解封的印记(9个印记,一个印记3bit)
+        VAR_NUWA_OPENTIME = 379, //女娲石盘解封时间
+
         //越南版380-399
         //400-420 for qiwy
         VAR_NEWYEAR_QQGAME_ACT = 401, //蓝钻新年回馈活动
@@ -371,12 +382,44 @@ namespace GObject
         VAR_ONLINE_TOTAL_TIME = 408, //累计在线时间
         VAR_ONLINE_AWARD = 409, //累计在线奖励是否领取
         VAR_QZONE_QQGAME_ACT = 410, //空间黄钻(bit1表示普通，bit2表示会员)、大厅蓝钻礼包(bit3表示普通，bit4表示会员)
+        VAR_LAST_HOOK_TYPE = 411, //最后挂机类型
+        VAR_SPREAD_FLAG = 413, //低第1bit表示是否使用落英秘典,低第2bit表示是否已领取
 
         //421-430 for suntao
-        VAR_HUNYUAN_STEP = 421, //大闹龙宫之混元剑诀
-        VAR_HUNYUAN_STEP4_COUNT = 422, //大闹龙宫之混元剑诀从第4格移动到第5失败的次数
+        VAR_FOOLS_DAY_INFO  = 421,  //愚公移山答题信息(0位表示失败,1-30位表示题目id及是否答对)
+        VAR_FOOLS_DAY_TIME  = 422,  //愚公移山答题开始时间
+        VAR_INVITEDSUCCESS = 423, //邀请成功的好友人数
+        VAR_CFRIENDTICKETS = 424, //好友邀请的抽奖券
+
         //431-440 for yijian
         VAR_LONGYUAN_GOT = 431,  //龙元风髓领取标志
+
+
+        VAR_RP7_TREASURE = 432,  //回流服务器聚宝盆, 1-8位:是否购买的标志为 9-16,17-24,25-32位第1-3个聚宝盆的已领取次数
+        VAR_RP7_TREASURE_TODAY_GOT=433, //第1-3位:各个聚宝盆今天是否已领取
+        VAR_RP7_TREASURE1_GETTIME=434, //第1个聚宝盆的领取时间
+        VAR_RP7_TREASURE2_GETTIME=435, //第2个聚宝盆的领取时间
+        VAR_RP7_TREASURE3_GETTIME=436, //第3个聚宝盆的领取时间
+        VAR_RP7_SIGN=437,              //注册签到
+        VAR_RP7_SIGN_PACKAGE=438,      //连续签到礼包
+        VAR_RP7_RECHARGE=439,      //开服7天充值金额
+
+        // 441-442 for JLT
+        VAR_HAS_VOTE = 441,                 // 本日是否投票过
+        VAR_POPULARITY = 442,               // 本周人气
+
+        VAR_FOOLBAO_USED = 450,  //愚人宝箱使用数
+        VAR_HHBAWARD_GOT = 451 , //豪华蓝钻领取
+        VAR_SURNAMELEGEND_USED = 452, //蜀山传奇幸运礼包使用数
+        VAR_CARD_1 = 453,       //卡片活动  集齐五张获大奖
+        VAR_CARD_2 = 454,
+        VAR_CARD_3 = 455,
+        VAR_CARD_4 = 456,
+        VAR_CARD_5 = 457,
+        VAR_LEVEL_AWARD = 458, 
+        VAR_CLANBOSS_GONGXIAN= 460, //末日之战贡献
+
+        //繁体版占用470-499
 
         VAR_MAX,
     };
@@ -625,6 +668,7 @@ namespace GObject
             REGISTER_VAR(VAR_ITEM_9280_FAILED_COUNT, CYCLE_NONE);
             REGISTER_VAR(VAR_ITEM_9281_FAILED_COUNT, CYCLE_NONE);
             REGISTER_VAR(VAR_ITEM_9282_FAILED_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_TOTALRECHARGEACT, CYCLE_NONE);
             REGISTER_VAR(VAR_USETAEL_CNT, CYCLE_DAY);
             REGISTER_VAR(VAR_USECOUPON_CNT, CYCLE_DAY);
             REGISTER_VAR(VAR_USEGOLD_CNT, CYCLE_DAY);
@@ -675,6 +719,9 @@ namespace GObject
             REGISTER_VAR(VAR_FAIRYPET_LIKEABILITY, CYCLE_NONE);
             REGISTER_VAR(VAR_FAIRYPET_ISGET_PET, CYCLE_NONE);
 
+            REGISTER_VAR(VAR_INVITEDSUCCESS, CYCLE_MONTH);
+            REGISTER_VAR(VAR_CFRIENDTICKETS, CYCLE_NONE);
+
             REGISTER_VAR(VAR_TOWER_LOGIN, CYCLE_DAY);
             REGISTER_VAR(VAR_TOWER_LEVEL, CYCLE_NONE);
 
@@ -688,14 +735,22 @@ namespace GObject
             REGISTER_VAR(VAR_SAVEGOLD_SET_TIME, CYCLE_NONE);
             REGISTER_VAR(VAR_SAVEGOLD_GET_STATUS, CYCLE_NONE);
             REGISTER_VAR(VAR_SAVEGOLD_ISGET, CYCLE_DAY);
-            REGISTER_VAR(VAR_DRAGONKINGSNAKE_STEP, CYCLE_NONE);
-            REGISTER_VAR(VAR_DRAGONKINGSNAKE_STEP4_COUNT, CYCLE_NONE);
-            REGISTER_VAR(VAR_TIANMANG_STEP, CYCLE_NONE);
-            REGISTER_VAR(VAR_TIANMANG_STEP4_COUNT, CYCLE_NONE);
-            REGISTER_VAR(VAR_HUNYUAN_STEP, CYCLE_NONE);
-            REGISTER_VAR(VAR_HUNYUAN_STEP4_COUNT, CYCLE_NONE);
 
+            REGISTER_VAR(VAR_LUCKYSTAR_IS_CONSUME, CYCLE_NONE);
+            REGISTER_VAR(VAR_LUCKYSTAR_GET_STATUS, CYCLE_NONE);
+            REGISTER_VAR(VAR_LUCKYSTAR_RECHARGE_TOTAL, CYCLE_NONE);
+            REGISTER_VAR(VAR_LUCKYSTAR_LOGIN_TIME, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_HHBAWARD_GOT, CYCLE_DAY);
             REGISTER_VAR(VAR_LONGYUAN_GOT, CYCLE_NONE);
+            REGISTER_VAR(VAR_RP7_TREASURE, CYCLE_NONE);
+            REGISTER_VAR(VAR_RP7_TREASURE_TODAY_GOT, CYCLE_DAY);
+            REGISTER_VAR(VAR_RP7_TREASURE1_GETTIME, CYCLE_NONE);
+            REGISTER_VAR(VAR_RP7_TREASURE2_GETTIME, CYCLE_NONE);
+            REGISTER_VAR(VAR_RP7_TREASURE3_GETTIME, CYCLE_NONE);
+            REGISTER_VAR(VAR_RP7_SIGN, CYCLE_NONE);
+            REGISTER_VAR(VAR_RP7_SIGN_PACKAGE, CYCLE_NONE);
+            REGISTER_VAR(VAR_RP7_RECHARGE, CYCLE_NONE);
 
             REGISTER_VAR(VAR_CALLSNAKEEGG, CYCLE_NONE);
             REGISTER_VAR(VAR_SNAKEEGG_AWARD, CYCLE_NONE);
@@ -704,6 +759,8 @@ namespace GObject
             REGISTER_VAR(VAR_SNAKE_SPRING_EQUIP_GOT, CYCLE_NONE);
             REGISTER_VAR(VAR_WEIBO_AWARD_GOT, CYCLE_NONE);
             REGISTER_VAR(VAR_FISHUSER_AWARD, CYCLE_NONE);
+            REGISTER_VAR(VAR_NUWA_SIGNET, CYCLE_NONE);
+            REGISTER_VAR(VAR_NUWA_OPENTIME, CYCLE_NONE);
             REGISTER_VAR(VAR_NEWYEAR_QQGAME_ACT, CYCLE_DAY);
             REGISTER_VAR(VAR_NEWYEAR_QZONECONTINUE_ACT, CYCLE_NONE);
             REGISTER_VAR(VAR_NEWYEAR_QZONECONTINUE_LASTTIME, CYCLE_NONE);
@@ -714,6 +771,25 @@ namespace GObject
             REGISTER_VAR(VAR_ONLINE_TOTAL_TIME, CYCLE_DAY);
             REGISTER_VAR(VAR_ONLINE_AWARD, CYCLE_DAY);
             REGISTER_VAR(VAR_QZONE_QQGAME_ACT, CYCLE_DAY);
+
+            REGISTER_VAR(VAR_FOOLS_DAY_INFO, CYCLE_DAY);
+            REGISTER_VAR(VAR_FOOLS_DAY_TIME, CYCLE_DAY);
+            REGISTER_VAR(VAR_HAS_VOTE, CYCLE_DAY);
+            REGISTER_VAR(VAR_POPULARITY, CYCLE_WEEK);
+            REGISTER_VAR(VAR_SURNAMELEGEND_USED, CYCLE_NONE);
+            REGISTER_VAR(VAR_CARD_1, CYCLE_NONE);
+            REGISTER_VAR(VAR_CARD_2, CYCLE_NONE);
+            REGISTER_VAR(VAR_CARD_3, CYCLE_NONE);
+            REGISTER_VAR(VAR_CARD_4, CYCLE_NONE);
+            REGISTER_VAR(VAR_CARD_5, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_FOOLBAO_USED, CYCLE_NONE);
+            REGISTER_VAR(VAR_HHBAWARD_GOT, CYCLE_DAY);
+            REGISTER_VAR(VAR_LAST_HOOK_TYPE, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_SPREAD_FLAG, CYCLE_DAY);
+
+            REGISTER_VAR(VAR_CLANBOSS_GONGXIAN, CYCLE_DAY);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

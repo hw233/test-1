@@ -91,7 +91,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20121111_2.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearaward.sql # must be once for delete token
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20121122_1.sql # must be once for record ganenjie active
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearbluediamond.sql # must be once for delete recharge total
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearbluediamond.sql # must be once for delete recharge total
 
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/cleartotalrecharge.sql # must be once for delete recharge total
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearconsume.sql # must be once for delete total consume
@@ -105,7 +105,6 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20121128_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20121130_1.sql  #add table recharge_item
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20121130_2.sql  # must be once for delete var total
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar199.sql        #清除强化装备的8次限制
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20121206_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20121211_1.sql # must be once 场外活动
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20121217_1.sql
@@ -142,18 +141,29 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130118_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearid295.sql # must be once 登录礼包人人有
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar_20130118.sql
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar199.sql        #清除强化装备的8次限制
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130114_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130116_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130116_2.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130124_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar_20130118.sql
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar199.sql          #清除强化装备的8次限制
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130225_1.sql          #帮派QQ群
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130304_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130304_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130225_1.sql          #帮派QQ群
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130315_1.sql # must be once 有删除操作
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130319_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130326_1.sql # must be once 有删除操作
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearbluediamond.sql  #蓝钻活动需要打开 
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearyellowdiamond.sql  #黄钻活动需要打开 
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearqqvipdiamond.sql     #QQ会员活动需要打开 
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130403_1.sql # must be once 有删除操作
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130408_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar199.sql        #清除强化装备的8次限制
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130422_1.sql   #末日之战帮派增加xianyun和gongxian
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130425_1.sql   #末日之战帮派增加urge
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130419_1.sql   #清除3366蓝砖礼包购买次数
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130429_1.sql   #清除节日套装人人拿(var294)
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130510_1.sql   #清除消费抽奖(var142/348)
 
     #. clearshiyamen.sh
 }

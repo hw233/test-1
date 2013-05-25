@@ -582,7 +582,10 @@ void HeroIsland::applayPlayers()
                 if (j && pd && pd->player && pd->expcd <= now)
                 {
                     UInt8 factor = (World::_wday == 6 || World::_wday == 7)?2:1;
-                    pd->player->AddExp(calcExp(pd->player->GetLev())*_expfactor[j-1]*factor);
+                    if (cfg.rpServer && pd->player->GetLev() < 70)
+                        pd->player->AddExp(calcExp(pd->player->GetLev())*_expfactor[j-1]*factor*2);
+                    else
+                        pd->player->AddExp(calcExp(pd->player->GetLev())*_expfactor[j-1]*factor);
                     pd->expcd = now + 60;
                 }
             }
@@ -2056,7 +2059,10 @@ bool HeroIsland::getAward(Player* player, UInt8 id, UInt8 type)
                     break;
 
                 case 2:
-                    player->AddExp(awards[id].num);
+                    if (cfg.rpServer && player->GetLev() < 70)
+                        player->AddExp(awards[id].num * 2);
+                    else
+                        player->AddExp(awards[id].num);
                     break;
 
                 case 3:

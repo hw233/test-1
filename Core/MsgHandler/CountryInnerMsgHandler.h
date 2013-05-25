@@ -768,8 +768,8 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
 
     if(player->inVipPrivilegeTime())
     {
-        extraFactor = 0.2f;
-        extraExp = static_cast<UInt32>(exp * 0.2f);
+        extraFactor = 1.0f;
+        extraExp = static_cast<UInt32>(exp * 1.0f);
     }
     if(curHookIndex == ENUM_TRAINP1)
     {
@@ -1581,6 +1581,7 @@ void OnArenaEnterCommit( GameMsgHdr& hdr, const void* data )
         Stream st(ARENAREQ::ENTER, 0xEF);
         st << player->getId() << player->getName() << static_cast<UInt8>(player->getTitle());
         player->appendLineup2(st);
+        player->appendPetOnBattle(st);
         st << Stream::eos;
         NETWORK()->SendToArena(st);
     }
@@ -1589,6 +1590,7 @@ void OnArenaEnterCommit( GameMsgHdr& hdr, const void* data )
         Stream st(ARENAREQ::COMMIT_LINEUP, 0xEF);
         st << player->getId();
         player->appendLineup2(st);
+        player->appendPetOnBattle(st);
         st << Stream::eos;
         NETWORK()->SendToArena(st);
     }
@@ -1824,25 +1826,10 @@ void OnAddMapObj( GameMsgHdr& hdr, const void * data)
     map->Show(mo->m_ID, true, mo->m_Type);
 }
 
-void OnForbidSale( GameMsgHdr &hdr, const void *data)
+void OnCFriendAthleticsRank( GameMsgHdr& hdr, const void * data)
 {
-	MSG_QUERY_PLAYER(player);
-    if (cfg.autoForbid)
-    {
-        if (cfg.merged)
-        {
-            setForbidSaleValue(player->getId()&0xFFFFFFFF, true);
-        }
-        else
-        {
-            setForbidSaleValue(player->getId(), true);
-        }
-        player->setForbidSale(true, true);
-    }
-    else
-    {
-        player->udpLog("svr_forbid_sale", "known", "", "", "", "", "act_tmp");
-    }
+    MSG_QUERY_PLAYER(player);
+    player->OnCFriendAthleticsRank();
 }
 
 void OnForbidSaleQueryFail( GameMsgHdr &hdr, const void *data)
@@ -1938,5 +1925,196 @@ void OnSaveGoldAct( GameMsgHdr& hdr, const void * data)
         player->saveGoldAct(gData->opt, gData->param);
 }
 
+void OnFoolsDayAct( GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    struct foolsData
+    {
+        UInt8 type;
+        UInt8 id;
+        char answer;
+    };
+    foolsData * fdata = reinterpret_cast<foolsData*>(const_cast<void *>(data));
+    if(fdata)
+    {
+        switch(fdata->type)
+        {
+            case 0x00:
+                player->checkAnswerActInFoolsDay();
+                break;
+            case 0x01:
+                player->sendFoolsDayInfo();
+                break;
+            case 0x02:
+                player->submitAnswerInFoolsDay(fdata->id, fdata->answer);
+                break;
+            case 0x03:
+                player->getAwardInFoolsDay();
+                break;
+            case 0x04:
+                player->buyResurrectionCard();
+                break;
+        }
+    }
+}
+
+void OnLuckyStarAct( GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    struct starData
+    {
+        UInt8 type;
+        UInt8 idx;
+    };
+    starData * sdata = reinterpret_cast<starData*>(const_cast<void *>(data));
+    if(sdata)
+    {
+        switch(sdata->type)
+        {
+            case 0x01:
+                player->sendLuckyStarInfo(2);
+                break;
+            case 0x02:
+                player->getLuckyStarItem(sdata->idx);
+                break;
+        }
+    }
+}
+
+void OnCalcLBBattlePoint( GameMsgHdr &hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    player->calcLingbaoBattlePoint();
+}
+
+void OnSpreadWhisper(GameMsgHdr &hdr, const void* data)
+{
+	MSG_QUERY_PLAYER(player);
+	if(player->getBuffData(PLAYER_BUFF_BANCHAT)!=0)
+        return;
+
+	ChatRep rep;
+	rep.type = 0xFF;
+    UInt64 playerId = *(reinterpret_cast<UInt64 *>(const_cast<void *>(data)));
+	GObject::Player * pl = GObject::globalPlayers[playerId];
+	if(pl == NULL || pl->GetSessionID() == -1)
+	{
+		rep.cny = 0;
+		rep.sex = 0;
+		rep.office = player->getTitle();
+		rep.guard = player->getPF();
+		rep.level = player->GetLev();
+		player->send(rep);
+	}
+	else
+	{
+		rep.name = player->getName();
+        SYSMSGV(content, 741);
+		rep.text = content;
+		rep.cny = player->getCountry();
+		rep.sex = player->IsMale() ? 0 : 1;
+		rep.office = player->getTitle();
+		rep.guard = player->getPF();
+		rep.level = player->GetLev();
+		pl->send(rep);
+	}
+}
+
+void OnSurnameLegendAct( GameMsgHdr &hdr, const void * data  )
+{
+    MSG_QUERY_PLAYER(player);
+    if(player==NULL)
+        return ;
+    UInt8 type = *(reinterpret_cast<UInt8 *>(const_cast<void *>(data)));
+   switch(type)
+   {
+    case 0x00:
+        player->sendLuckyBagInfo();
+        break;
+    case 0x03:
+          //player->GetLuckyBagAward();
+          GameAction()->GetLuckyBagAward(player);
+          break;
+   }
+    
+}
+
+void OnSendSpreadAwardInfo(GameMsgHdr &hdr, const void* data)
+{
+    MSG_QUERY_PLAYER(player);
+    player->sendSpreadAwardInfo();
+}
+
+void OnSpreadGetAward(GameMsgHdr &hdr, const void* data)
+{
+    MSG_QUERY_PLAYER(player);
+    UInt32 spreadCount = *reinterpret_cast<const UInt32 *>(data);
+    player->spreadGetAwardInCountry(spreadCount);
+}
+
+void OnBeVoted( GameMsgHdr &hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    player->beVoted();
+}
+
+void OnSendPopularityAward(GameMsgHdr &hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    player->sendPopularityRandAward(*(int*)data);
+}
+
+void OnClanRankBattleReqInitInner(GameMsgHdr& hdr,const void* data)
+{
+    MSG_QUERY_PLAYER(player);
+
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    brd >> type;
+
+    switch(type)
+    {
+        case 0: //请求帮会战状态信息
+            {
+                ClanRankBattleMgr::Instance().SendInitStatus(player);
+            }
+            break;
+        case 1: //报名进入战斗
+            {
+                UInt8 field = 0;
+                brd >> field;
+                ClanRankBattleMgr::Instance().Signup(player, field);
+            }
+            break;
+        case 2: //取消报名
+            {
+                ClanRankBattleMgr::Instance().Signout(player);
+            }
+            break;
+        case 8:
+            {
+                GObject::Clan *clan = player->getClan();
+                if(clan)
+                    clan->broadcastClanBattle(player);
+            }
+            break;
+        default:
+            break;
+    }
+}
+
+void OnClanRankBattleSortListInner(GameMsgHdr& hdr, const void* data)
+{
+    MSG_QUERY_PLAYER(player);
+
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt16 startId = 0;
+    UInt8 count = 0;
+    brd >> startId >> count;
+
+    ClanRankBattleMgr::Instance().SendSortList(player, startId, count);
+}
+
 #endif // _COUNTRYINNERMSGHANDLER_H_
+
 

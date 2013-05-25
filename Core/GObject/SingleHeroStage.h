@@ -30,7 +30,6 @@ namespace GObject
         UInt32 _timeBegin;
         UInt32 _timeEnd;
     };
-
     struct StageBattleReport
     {
         UInt8 _won;

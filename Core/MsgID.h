@@ -399,6 +399,8 @@ namespace REQ
     const UInt8 SECOND_SOUL         = 0x8E;
     /** 新手引导的UDPLOG请求 */
     const UInt8 GUIDEUDP            = 0xF4;
+    /*回流服务器*/
+    const UInt8 RP_SERVER           = 0xFE;
 
     const UInt8 FOURCOP             = 0x1F;
     /** 新关系 * */
@@ -412,6 +414,8 @@ namespace REQ
 
     /** 单挑 **/
     const UInt8 SINGLE_HERO         = 0XA5;
+    /** 末日之战 **/
+    const UInt8 CLANBOSS            = 0xF8;
 }
 
 namespace REP
@@ -656,6 +660,8 @@ namespace REP
     const UInt8 GETBOX              = 0xF7;// 0xD4
     const UInt8 BLOCKBOSS           = 0xF9;// 0xD5
 
+    const UInt8 CLANBOSS           = 0xF8;// 0xD5
+
     const UInt8 CLAN_RANKBATTLE_REPINIT = 0x59;  //非战斗时信息返回
     const UInt8 CLAN_RANKBATTLE_REP     = 0x5A;  //战斗时信息返回
     const UInt8 CLAN_RANKBATTLE_SORTLIST = 0x5B; //帮会战排名列表
@@ -675,6 +681,8 @@ namespace REP
 
     /** 元神系统 */
     const UInt8 SECOND_SOUL         = 0x8E;
+    /*回流服务器*/
+    const UInt8 RP_SERVER           = 0xFE;
 
     const UInt8 FOURCOP             = 0x1F;
     /** 新关系 * */
@@ -750,6 +758,11 @@ namespace SPEQ
     const UInt16 ADDRECHARGESCORE    = 0x140;// 增加充值的积分
     const UInt16 SYSUPDATE           = 0x141;// 系统更新公告
     const UInt16 FB_SPECIFY_FIND     = 0x142;// FB-隆中网络查询
+    const UInt16 ACTIVITYONOFF       = 0x143;// 后台操作活动开关
+    const UInt16 QUERYACTIVITYONOFF  = 0x144;// 后台查询活动开启状态
+    const UInt16 OPENCB              = 0x145;// 开启末日之战
+    const UInt16 TOTALRECHARGEACT    = 0x146;// 活动期间的充值总额
+    const UInt16 SETTOTALRECHARGEACT = 0x147;// 设置活动区间
 }
 
 namespace SPEP
@@ -788,23 +801,28 @@ namespace SPEP
     const UInt8 QUERYDISCOUNT       = 0x22; // 查询限时活动
     const UInt8 CLEARDISCOUNT       = 0x23; // 清空限时活动
 
-    const UInt16 REALAWARDINFO       = 0x24; //
-    const UInt16 ADDREALAWARD        = 0x25; //
-    const UInt16 ADDCLANAWARD        = 0x28; // 发放物品给帮派仓库
-    const UInt16 MANUALOPENTJ        = 0x29; //手动开启天劫 
-    const UInt16 SHSTAGEONOFF        = 0x30; // 职业第一开关
-    const UInt16 QUERYSHSTAGEONOFF   = 0x31; // 查询职业第一
-    const UInt16 BIGLOCKUSER         = 0x32;
-    const UInt16 BIGUNLOCKUSER       = 0x33;
-    const UInt16 CLSTASKALL          = 0x34;//
-    const UInt16 FORBIDSALE          = 0x35;// 全区禁止交易
-    const UInt16 UNFORBIDSALE        = 0x36;// 全区解除禁止交易
-    const UInt16 QUERYLOCKUSER       = 0x37;// 查询玩家是否被禁止登陆和交易
-    const UInt16 SETLOGINLIMIT       = 0x38;// 设置平台一个ip最大登录数
-    const UInt16 DELETEGOLD          = 0x39;// 删除仙石
-    const UInt16 ADDRECHARGESCORE    = 0x40;// 增加充值的积分
-    const UInt16 SYSUPDATE           = 0x41;// 系统更新公告
-    const UInt16 FB_SPECIFY_FIND     = 0x42;// FB-隆中网络查询
+    const UInt8 REALAWARDINFO       = 0x24; //
+    const UInt8 ADDREALAWARD        = 0x25; //
+    const UInt8 ADDCLANAWARD        = 0x28; // 发放物品给帮派仓库
+    const UInt8 MANUALOPENTJ        = 0x29; //手动开启天劫 
+    const UInt8 SHSTAGEONOFF        = 0x30; // 职业第一开关
+    const UInt8 QUERYSHSTAGEONOFF   = 0x31; // 查询职业第一
+    const UInt8 BIGLOCKUSER         = 0x32;
+    const UInt8 BIGUNLOCKUSER       = 0x33;
+    const UInt8 CLSTASKALL          = 0x34;//
+    const UInt8 FORBIDSALE          = 0x35;// 全区禁止交易
+    const UInt8 UNFORBIDSALE        = 0x36;// 全区解除禁止交易
+    const UInt8 QUERYLOCKUSER       = 0x37;// 查询玩家是否被禁止登陆和交易
+    const UInt8 SETLOGINLIMIT       = 0x38;// 设置平台一个ip最大登录数
+    const UInt8 DELETEGOLD          = 0x39;// 删除仙石
+    const UInt8 ADDRECHARGESCORE    = 0x40;// 增加充值的积分
+    const UInt8 SYSUPDATE           = 0x41;// 系统更新公告
+    const UInt8 FB_SPECIFY_FIND     = 0x42;// FB-隆中网络查询
+    const UInt8 ACTIVITYONOFF       = 0x43;// 后台操作活动开关
+    const UInt8 QUERYACTIVITYONOFF  = 0x44;// 后台查询活动开启状态
+    const UInt8 OPENCB              = 0x45;// 开启末日之战
+    const UInt8 TOTALRECHARGEACT    = 0x46;// 活动期间的充值总额
+    const UInt8 SETTOTALRECHARGEACT = 0x47;// 设置活动区间
 }
 
 namespace ARENAREQ

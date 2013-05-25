@@ -55,6 +55,8 @@ MSG_REG_2(LoginMsgHdr,SPEQ::ADDCLANAWARD, AddClanAward);
 MSG_REG_2(LoginMsgHdr,SPEQ::MANUALOPENTJ, ManualOpenTj);
 MSG_REG_2(LoginMsgHdr,SPEQ::SHSTAGEONOFF, SHStageOnOff);
 MSG_REG_2(LoginMsgHdr,SPEQ::QUERYSHSTAGEONOFF, QuerySHStageOnOff);
+MSG_REG_2(LoginMsgHdr,SPEQ::ACTIVITYONOFF, ControlActivityOnOff);
+MSG_REG_2(LoginMsgHdr,SPEQ::QUERYACTIVITYONOFF, QueryOneActivityOnOff);
 
 MSG_REG_2(LoginMsgHdr,SPEQ::BIGLOCKUSER,BigLockUser);
 MSG_REG_2(LoginMsgHdr,SPEQ::BIGUNLOCKUSER,BigUnlockUser);
@@ -66,8 +68,12 @@ MSG_REG_2(LoginMsgHdr,SPEQ::SETLOGINLIMIT,SetPlatformLoginLimit);
 MSG_REG_2(LoginMsgHdr,SPEQ::DELETEGOLD,DeleteGold);
 MSG_REG_2(LoginMsgHdr,SPEQ::ADDRECHARGESCORE,addRechargeScore);
 MSG_REG_2(LoginMsgHdr,SPEQ::SYSUPDATE, SysUpdate);
+MSG_REG_2(LoginMsgHdr,SPEQ::OPENCB,OpenCb);
+MSG_REG_2(LoginMsgHdr,SPEQ::TOTALRECHARGEACT, OnTotalRechargeAct);
+MSG_REG_2(LoginMsgHdr,SPEQ::SETTOTALRECHARGEACT, OnSetTotalRechargeAct);
 
 MSG_REG_2(LoginMsgHdr, 0x300, OnCheckPackKey);
 MSG_REG_2(LoginMsgHdr, 0x301, OnSetCrackValue);
+MSG_REG_2(LoginMsgHdr, 0x330, OnForbidSale);
 
 MSG_HANDLER_END()

@@ -213,6 +213,7 @@ namespace Script
 		void onLevelup(Player* player, UInt8 olev, UInt8 nlev);
 		void onInvitedBy(Player* player);
 		bool onGetCFriendAward(Player* player, UInt8 idx);
+	    UInt8 onUseTickets( Player* player);
 		void onGetVipPack(Player* player, UInt8 type);
 		bool testTakePack(Player* player, UInt8 type, UInt8 freq);
 		bool testTakePackSize(Player* player, UInt8 type);
@@ -285,6 +286,7 @@ namespace Script
         UInt32 getDreamerTreasure(UInt8 id);
         UInt32 getDreamerItem(UInt8 id, UInt8 index);
         bool RunVipPrivilegeAward(Player* player, UInt8 idx, UInt8 dayth);
+        bool RunLevelAward(Player* player,UInt8 opt =0 );
 
     public:
 
@@ -358,9 +360,14 @@ namespace Script
         //仙宠
 	    Table onSeekFairypetAwardAndSucceed(UInt8 step, UInt8 isConvert);
 	    UInt8 getPetColorFromId(UInt32 petId);
-	    Table getConvertPetValue(UInt8 color);
+	    Table getConvertPetValue(UInt32 petId);
 	    UInt32 exchangPurplePet( Player* player );
-
+        UInt8 getAnswerInFoolsDay(UInt8 qid);
+        void getAwardInFoolsDay(Player* player, UInt8 idx);
+        bool getLuckyStarAward(Player* player, UInt8 idx);
+        void GetLuckyBagAward(Player * player);
+        UInt32 GetSpreadCountForAward();
+        lua_tinker::table GetSpreadAward();
 	private:
 		Player* _player1;	//?ű???????Ϊ????1
 		Player* _player2;	//?ű???????Ϊ????2

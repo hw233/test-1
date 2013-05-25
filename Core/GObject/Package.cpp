@@ -64,14 +64,14 @@ namespace GObject
 
     UInt16 getRandOEquip(UInt8 lvl)
     {
-        static const UInt16* equips[] = {OEquip50, OEquip60, OEquip70, OEquip80, OEquip90, OEquip100};
+        static const UInt16* equips[] = {OEquip50, OEquip60, OEquip70, OEquip80, OEquip90, OEquip100, OEquip110};
 
         UInt16 equipid = 0;
 
         if (lvl < 50)
             lvl = 50;
-        if (lvl > 100)
-            lvl = 100;
+        if (lvl > 110)
+            lvl = 110;
 
         lvl -= 50;
         lvl /= 10;
@@ -602,7 +602,8 @@ namespace GObject
 		if(itemType == NULL) return NULL;
 		ITEM_BIND_CHECK(itemType->bindType,bind);
 		ItemBase * item = FindItem(typeId, bind);
-        
+
+
 		if (item != NULL)
 		{
 			bool ret = TryAddItem(item, num);
@@ -1138,7 +1139,7 @@ namespace GObject
                                 }
                             }
                         }
-                        DB4().PushUpdateData("REPLACE INTO `lingbaoattr`(`id`, `tongling`, `lbcolor`, `types`, `values`, `skills`, `factors`) VALUES(%u, %d, %d, '%s', '%s', '%s', '%s')", id, lbattr.tongling, lbattr.lbColor, strType.c_str(), strValue.c_str(), strSkill.c_str(), strFactor.c_str());
+                        DB4().PushUpdateData("REPLACE INTO `lingbaoattr`(`id`, `tongling`, `lbcolor`, `types`, `values`, `skills`, `factors`, `battlepoint`) VALUES(%u, %d, %d, '%s', '%s', '%s', '%s', '%u')", id, lbattr.tongling, lbattr.lbColor, strType.c_str(), strValue.c_str(), strSkill.c_str(), strFactor.c_str(), lbattr.battlePoint);
                     }
                     break;
 				default:
@@ -1687,6 +1688,7 @@ namespace GObject
             case 0x61:
             case 0x62:
                 old = fgt->setLingbao(part-0x60, static_cast<GObject::ItemLingbao*>(item));
+                fgt->eraseLingbaoInfo(old);
                 break;
             default:
                 return false;
@@ -1740,6 +1742,7 @@ namespace GObject
             case 0x61:
             case 0x62:
                 old = fgt->setLingbao(part-0x60, static_cast<GObject::ItemLingbao*>(NULL));
+                fgt->eraseLingbaoInfo(old);
                 break;
             default:
                 return false;
@@ -1949,7 +1952,6 @@ namespace GObject
 		m_Owner->send(st);
 		return ret;
 	}
-
     bool Package::UseItemOther(UInt32 id, UInt16 num, std::string& name, UInt8 bind)
     {
 		if(!m_Owner->hasChecked())
@@ -2687,9 +2689,9 @@ namespace GObject
         }
     }
 
-    UInt8 Package::Enchant( UInt16 fighterId, UInt32 itemId, UInt8 type, UInt16 count, UInt8 level, UInt16& success, UInt16& failed/*, bool protect*/ )
+    UInt8 Package::Enchant( UInt16 fighterId, UInt32 itemId, UInt8 type, UInt16 count, UInt8 level, UInt16& success, UInt16& failed, UInt16& bless /*, bool protect*/ )
 	{
-		if (type > 1) return 2;
+		if (type > 2) return 2;
 		Fighter * fgt = NULL;
 		UInt8 pos = 0;
         UInt32 failThisTime = 0;
@@ -2731,10 +2733,9 @@ namespace GObject
             return 2;
 
         // count不为0则type必须为1，表示自动强化时必须消耗精金
-        if(count !=0 && type != 1)
+        if(count !=0 && type == 0)
             return 2;
-
-		if(GetItemAnyNum(item_enchant_l + type) < (count > 0 ? count : 1))
+		if(type < 2 && GetItemAnyNum(item_enchant_l + type) < (count > 0 ? count : 1))
             return 2;
 
         HoneyFall* hf = m_Owner->getHoneyFall();
@@ -2776,11 +2777,16 @@ namespace GObject
         UInt32 enc_times = 1;
 	    UInt8 oldEnchant = ied.enchant;
         UInt8 oldHfValue = hf->getHftValue(hft);
+        if(type == 2)
+        {
+            bless = oldHfValue;
+            return 3;
+        }
         if(0 == count)
         {
             if(uRand(100000) < enchant)
             {
-                if(type != 0 && ied.enchant > 3)
+                if(type == 1 )
                 {
                     updateHft = true;
                     hf->setHftValue(hft, 0);
@@ -2800,7 +2806,7 @@ namespace GObject
                 }
                 enchantUdpLog(equip, ied.enchant);
             }
-            else if(type != 0 && ied.enchant > 3)
+            else if(type == 1)
             {
                 updateHft = true;
                 hf->incHftValue(hft);
@@ -2836,7 +2842,6 @@ namespace GObject
                 }
                 else
                 {
-                    if(ied.enchant > 3)
                     {
                         updateHft = true;
                         hf->incHftValue(hft);
@@ -2850,7 +2855,6 @@ namespace GObject
                 enchant = hf->getChanceFromHft(quality, ied.enchant, hft);
             }
         }
-
         if(!DelItemAny(item_enchant_l + type, enc_times, &isBound))
         {
             success = 0;
@@ -2862,7 +2866,7 @@ namespace GObject
 
         if(updateHft)
             hf->updateHftValueToDB(hft);
-
+        bless = hf->getHftValue(hft);
         if(equip->getClass() == Item_Trump || equip->getClass() == Item_Halo)
             GameAction()->doStrong(this->m_Owner, SthTrumpEnchant, 0, 0);
         else
@@ -4626,7 +4630,7 @@ namespace GObject
             return 1;
 
         if (fromEquip->getClass() != toEquip->getClass() ||
-            fromEquip->getQuality() != toEquip->getQuality())
+            fromEquip->getQuality() != toEquip->getQuality() || toEquip->getQuality() < 5)
             return 2;
 
         if(type & 0x08)
@@ -4634,11 +4638,16 @@ namespace GObject
             if(fromEquip->getClass() != Item_Fashion || toEquip->getClass() != Item_Fashion)
                 return 12;
         }
+        else if(type & 0x10)
+        {   //1539五遁神斧
+            if(fromEquip->getClass() != Item_Trump || toEquip->GetTypeId() != 1539)
+                return 13;
+        }
         else if (toEquip->GetCareer() != 4)
             return 11;
 
-//        if (m_Owner->GetVar(VAR_EQUIP_MOVE_COUNT) >= 8)
-//            return 9;
+        if (m_Owner->GetVar(VAR_EQUIP_MOVE_COUNT) >= 8)
+            return 9;
         res = isCanMove(fromEquip, toEquip, type);
         if (res > 0)
             return res;
@@ -4657,7 +4666,7 @@ namespace GObject
             res = moveEquipGem(fFgt,tFgt,fromEquip, fPos, toEquip, tPos);
         if (type & 4)
             res = moveEquipSpirit(fFgt,tFgt,fromEquip, fPos, toEquip, tPos);
-        if (type & 0x08)
+        if (type & 0x08 || type & 0x10)
             res = moveEquipFashion(fFgt,tFgt,fromEquip, fPos, toEquip, tPos);
 
         return res;
@@ -4693,6 +4702,13 @@ namespace GObject
         }
         if(type & 0x08)
         {
+            if(fIed.trumpExp <= tIed.trumpExp)
+                return 14;
+        }
+        if(type & 0x10)
+        {
+            if(fIed.enchant <= tIed.enchant && fIed.trumpExp <= tIed.trumpExp)
+                return 14;
         }
         return 0;
     }
@@ -4700,6 +4716,7 @@ namespace GObject
     {
         static const UInt32 s_money1[] = {10,10,10,10,15,20,50,150,900,2100,4600};
         static const UInt32 s_money2[] = {10,10,10,10,10,10,15,40,340,940,2200};
+        static const UInt32 s_money3[] = {0,10,10,10,10,80,240,440,704,0,0};  //法宝收费
         
         ItemEquipData& fIed = fromEquip->getItemEquipData();
         ItemEquipData& tIed = toEquip->getItemEquipData();
@@ -4732,7 +4749,7 @@ namespace GObject
         }
         if (type & 4)
             money += (fIed.spiritAttr.spLev[0]+fIed.spiritAttr.spLev[1]+fIed.spiritAttr.spLev[2]+fIed.spiritAttr.spLev[3])/1;
-        if (type & 0x08)
+        if (type & 0x08 || type & 0x10)
         {
             UInt32 extramoney;
 
@@ -4796,6 +4813,10 @@ namespace GObject
                     extramoney = 1;
                 money += extramoney;
             }
+            if(type & 0x10)
+            {
+                money += s_money3[fIed.enchant];
+            }
         }
        if(m_Owner->getGold() < money && cfg.serverNum != 34)
 	    {
@@ -4852,6 +4873,8 @@ namespace GObject
     {
         ItemEquipData& fIed = fromEquip->getItemEquipData();
         ItemEquipData& tIed = toEquip->getItemEquipData();
+        if(fIed.sockets == 0)
+            return 0;
         //转移宝石
         if (tIed.sockets < fIed.sockets)
         {
@@ -4893,6 +4916,9 @@ namespace GObject
     //转移时装法宝属性
     UInt8 Package::moveEquipFashion(Fighter* fFgt,Fighter* tFgt, ItemEquip* fromEquip,UInt8 fPos, ItemEquip* toEquip,UInt8 tPos)
     {
+        ItemClass fcl = fromEquip->getClass();
+        if(fcl != Item_Trump && fcl != Item_Fashion && fcl != Item_Halo)
+            return 0;
         ItemEquipData& fIed = fromEquip->getItemEquipData();
         ItemEquipData& tIed = toEquip->getItemEquipData();
 
@@ -4900,6 +4926,13 @@ namespace GObject
         sprintf(str, "F_1158_%03d00%03d", fromEquip->getReqLev(),  toEquip->getReqLev());
         m_Owner->udpLog("move", str, "", "", "", "", "act");
 
+        UInt8 init = 0x20;
+        if(fromEquip->getClass() == Item_Trump)
+        {
+            init = 0x0a;
+            tIed.enchant = fIed.enchant;
+            fIed.enchant = 0;
+        }
         tIed.tRank = fIed.tRank;
         tIed.maxTRank = fIed.maxTRank;
         tIed.trumpExp = fIed.trumpExp;
@@ -4909,7 +4942,7 @@ namespace GObject
         tIed.extraAttr2.value1 = fIed.extraAttr2.value1;
         tIed.extraAttr2.value2 = fIed.extraAttr2.value2;
         tIed.extraAttr2.value3 = fIed.extraAttr2.value3;
-        DB4().PushUpdateData("UPDATE `equipment` SET `tRank` = %u,`maxTRank` = %u,`trumpExp` = %u,`attrType1` = %u,`attrType2` = %u,`attrType3` = %u,`attrValue1` = %u,`attrValue2` = %u,`attrValue3` = %u WHERE `id` = %u", tIed.tRank, tIed.maxTRank, tIed.trumpExp, tIed.extraAttr2.type1, tIed.extraAttr2.type2, tIed.extraAttr2.type3, tIed.extraAttr2.value1, tIed.extraAttr2.value2, tIed.extraAttr2.value3, toEquip->getId());
+        DB4().PushUpdateData("UPDATE `equipment` SET `tRank` = %u,`maxTRank` = %u,`trumpExp` = %u,`attrType1` = %u,`attrType2` = %u,`attrType3` = %u,`attrValue1` = %u,`attrValue2` = %u,`attrValue3` = %u, `enchant` = %u WHERE `id` = %u", tIed.tRank, tIed.maxTRank, tIed.trumpExp, tIed.extraAttr2.type1, tIed.extraAttr2.type2, tIed.extraAttr2.type3, tIed.extraAttr2.value1, tIed.extraAttr2.value2, tIed.extraAttr2.value3, tIed.enchant, toEquip->getId());
 
         fIed.tRank = 0;
         fIed.maxTRank = 1;
@@ -4920,12 +4953,19 @@ namespace GObject
         fIed.extraAttr2.value1 = 0;
         fIed.extraAttr2.value2 = 0;
         fIed.extraAttr2.value3 = 0;
-        DB4().PushUpdateData("UPDATE `equipment` SET `tRank` = %u,`maxTRank` = %u,`trumpExp` = %u,`attrType1` = %u,`attrType2` = %u,`attrType3` = %u,`attrValue1` = %u,`attrValue2` = %u,`attrValue3` = %u WHERE `id` = %u", fIed.tRank, fIed.maxTRank, fIed.trumpExp, fIed.extraAttr2.type1, fIed.extraAttr2.type2, fIed.extraAttr2.type3, fIed.extraAttr2.value1, fIed.extraAttr2.value2, fIed.extraAttr2.value3, fromEquip->getId());
+        DB4().PushUpdateData("UPDATE `equipment` SET `tRank` = %u,`maxTRank` = %u,`trumpExp` = %u,`attrType1` = %u,`attrType2` = %u,`attrType3` = %u,`attrValue1` = %u,`attrValue2` = %u,`attrValue3` = %u, `enchant` = %u WHERE `id` = %u", fIed.tRank, fIed.maxTRank, fIed.trumpExp, fIed.extraAttr2.type1, fIed.extraAttr2.type2, fIed.extraAttr2.type3, fIed.extraAttr2.value1, fIed.extraAttr2.value2, fIed.extraAttr2.value3, fIed.enchant, fromEquip->getId());
 
         if(fFgt != NULL)
         {
             fFgt->setDirty();
-            fFgt->sendModification(0x20 + fPos, fromEquip, false);
+            fFgt->sendModification(init + fPos, fromEquip, false);
+            if(fromEquip->getClass() == Item_Trump)
+            {
+                GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(fromEquip->getAttrExtra());
+                ((ItemTrump*)fromEquip)->enchant(fIed.enchant, attr);
+                if (fFgt && attr)
+                    fFgt->addSkillsFromCT(attr->skills, true);
+            }
         }
         else
             SendSingleEquipData(fromEquip);
@@ -4933,7 +4973,14 @@ namespace GObject
         if(tFgt != NULL)
         {
             tFgt->setDirty();
-            tFgt->sendModification(0x20 + tPos, toEquip, false);
+            tFgt->sendModification(init + tPos, toEquip, false);
+            if(toEquip->getClass() == Item_Trump)
+            {
+                GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(toEquip->getAttrExtra());
+                ((ItemTrump*)toEquip)->enchant(tIed.enchant, attr);
+                if (tFgt && attr)
+                    tFgt->addSkillsFromCT(attr->skills, true);
+            }
         }
         else
             SendSingleEquipData(toEquip);
@@ -4942,6 +4989,8 @@ namespace GObject
 
     UInt8 Package::moveEquipSpirit(Fighter* fFgt,Fighter* tFgt, ItemEquip* fromEquip,UInt8 fPos, ItemEquip* toEquip,UInt8 tPos)
     {
+        if ((fromEquip->getClass() < Item_Weapon || fromEquip->getClass() > Item_Ring))
+            return 0;
         ItemEquipData& fIed = fromEquip->getItemEquipData();
         ItemEquipData& tIed = toEquip->getItemEquipData();
         
@@ -6183,7 +6232,7 @@ namespace GObject
                 }
             }
         }
-        DB4().PushUpdateData("REPLACE INTO `lingbaoattr`(`id`, `tongling`, `lbcolor`, `types`, `values`, `skills`, `factors`) VALUES(%u, %d, %d, '%s', '%s', '%s', '%s')", id, lbattr.tongling, lbattr.lbColor, strType.c_str(), strValue.c_str(), strSkill.c_str(), strFactor.c_str());
+        DB4().PushUpdateData("REPLACE INTO `lingbaoattr`(`id`, `tongling`, `lbcolor`, `types`, `values`, `skills`, `factors`, `battlepoint`) VALUES(%u, %d, %d, '%s', '%s', '%s', '%s', '%u')", id, lbattr.tongling, lbattr.lbColor, strType.c_str(), strValue.c_str(), strSkill.c_str(), strFactor.c_str(), lbattr.battlePoint);
 
         SendSingleEquipData(equip);
 

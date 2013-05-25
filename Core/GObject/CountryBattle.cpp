@@ -41,14 +41,18 @@ UInt32 CountryBattleData::getReward(UInt8 lvl, UInt32 curtime, UInt32 nextReward
     UInt32 exp = 16 * ((plvl - 10) * ((plvl > 99 ? 99 : plvl) / 10) * 5 + 25);
     player->AddExp(exp);
     */
+    UInt8 f = 1;
+    if (cfg.rpServer&&plvl<70)
+        f = 2;
+	
     if(plvl <= 90)
-		player->AddExp(2 * (duration * ((plvl - 40) * 6 + 20)));
+		player->AddExp(f*2 * (duration * ((plvl - 40) * 6 + 20)));
 	else if(plvl <= 100)
-		player->AddExp(2 * (duration * ((plvl - 90) * 22 + 320)));
+		player->AddExp(f*2 * (duration * ((plvl - 90) * 22 + 320)));
 	else if(plvl <= 114)
-		player->AddExp(2 * (duration * ((plvl - 100) * 140 + 540)));
+		player->AddExp(f*2 * (duration * ((plvl - 100) * 140 + 540)));
 	else
-		player->AddExp(2 * (duration * 2500));
+		player->AddExp(f*2 * (duration * 2500));
 	return duration;
 }
 
@@ -223,7 +227,7 @@ void CountryBattle::process(UInt32 curtime)
 				rotate(curtime + turns * 2, lvl, 0, pos1, achieve, 2);
 
 				UInt32 viplvl = cbd2->player->getVipLevel();
-				if(viplvl >= 4 || cbd1->player->inVipPrivilegeTime())
+				if(viplvl >= 4 || cbd2->player->inVipPrivilegeTime())
 				{
 					rotate(curtime + turns * 2, lvl, 1, pos2, loserAchieve, 1);
 					cbd2->killStreak = 0;

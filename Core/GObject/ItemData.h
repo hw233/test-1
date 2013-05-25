@@ -101,8 +101,9 @@ namespace GObject
         UInt16 value[4];
         UInt16 skill[2];
         UInt16 factor[2];
+        UInt32 battlePoint;
 
-        ItemLingbaoAttr() : tongling(0), lbColor(0)
+        ItemLingbaoAttr() : tongling(0), lbColor(0), battlePoint(0)
         {
             memset(type, 0, sizeof(type));
             memset(value, 0, sizeof(value));
@@ -136,6 +137,19 @@ namespace GObject
                 st.data<UInt8>(offset) = cnt;
                 st << skill[0] << factor[0] << skill[1] << factor[1];
             }
+        }
+
+        UInt16 getType(UInt8 i)
+        {
+            if (i >= 0 && i <4)
+                return type[i];
+            return 0;
+        }
+        UInt16 getValue(UInt8 i)
+        {
+            if (i >= 0 && i <4)
+                return value[i];
+            return 0;
         }
     };
 }

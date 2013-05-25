@@ -48,6 +48,7 @@
 #include "Memcached.h"
 #include "GObject/RechargeTmpl.h"
 #include "Version.h"
+#include "GObject/ClanBoss.h"
 
 #ifndef _WIN32
 //#include <libmemcached/memcached.h>
@@ -243,6 +244,8 @@ inline UInt8 doLogin(Network::GameClient * cl, UInt64 pid, UInt32 hsid, GObject:
 
     std::string fsaleTime;
     player->setForbidSale(checkForbidSale(player->getId(), fsaleTime));
+//    std::string foverTime;
+//    player->setForbidSale(checkForbidSale(player->getId(), fsaleTime,foverTime));
 	return res;
 }
 
@@ -346,9 +349,12 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
         std::string clientIp;
         std::string pf;
         std::string pfkey;
+        std::string xinyue;
         StringTokenizer st(ul._para, ":");
         switch (st.count())
         {
+            case 4:
+                xinyue = st[3];
             case 3:
                 pfkey = st[2].c_str();
             case 2:
@@ -397,6 +403,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             player->setClientIp(clientIp);
             player->setSource(pf);
             player->setPfKey(pfkey);
+            player->setXinYue(atoi(xinyue.c_str()));
 #ifdef _FB
             PLAYER_DATA(player, wallow) = 0;
 #endif
@@ -553,9 +560,12 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
     std::string clientIp;
     std::string pf;
     std::string pfkey;
+    std::string xinyue;
     StringTokenizer st(nu._para, ":");
     switch (st.count())
     {
+        case 4:
+            xinyue = st[3];
         case 3:
             pfkey = st[2].c_str();
         case 2:
@@ -577,6 +587,16 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
     {
         UserLogonRepStruct rep;
         rep._result = 6;
+        GObject::dclogger.create_sec(us);
+        NETWORK()->SendMsgToClient(conn.get(), rep);
+        conn->pendClose();
+        return;
+    }
+    UInt8 rpFlag = 0;
+    if (cfg.GMCheck && cfg.rpServer && 0 == (rpFlag=GObject::dclogger.checkRPOpenid((char*)us._openid.c_str())))
+    {
+        UserLogonRepStruct rep;
+        rep._result = 7;
         GObject::dclogger.create_sec(us);
         NETWORK()->SendMsgToClient(conn.get(), rep);
         conn->pendClose();
@@ -713,6 +733,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->setOpenId(nu._openid);
             pl->setOpenKey(nu._openkey);
             pl->setVia(nu._via);
+            pl->setXinYue(atoi(xinyue.c_str()));
             if(cfg.merged)
             {
                 UInt64 inviterId = (pl->getId() & 0xffff000000000000) + atoll(nu._invited.c_str());
@@ -766,11 +787,15 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             {
                 pl->SetVar(GObject::VAR_RP_VALUE, 4);
             }
+            if (nu._via == "sscq_dlhd") //摩天大楼用户
+                pl->SetVar(GObject::VAR_RP_VALUE, 5);
             if (GObject::World::getPetEggAct())
             {
                 GObject::MailPackage::MailItem item = {9366,1};
                 pl->sendMailItem(4140, 4141, &item, 1, true);
             }
+            if (cfg.rpServer && rpFlag > 0)
+                pl->SetVar(GObject::VAR_RP_VALUE, rpFlag);
 
 #ifndef _FB
 #ifndef _VT
@@ -1405,8 +1430,10 @@ void BigUnlockUser(LoginMsgHdr& hdr,const void * data)
 void ForbidSale(LoginMsgHdr& hdr,const void * data)
 {
     BinaryReader br(data,hdr.msgHdr.bodyLen);
+    //UInt32 tm = 0;
     std::string playerIds;
     CHKKEY();
+//    br >> tm;
     br>>playerIds;
 
     UInt16 serverNo = 0;
@@ -1421,25 +1448,26 @@ void ForbidSale(LoginMsgHdr& hdr,const void * data)
     {
         UInt64 pid = atoll(playerId.c_str());
         pid = pid & 0xFFFFFFFFFF;
-        setForbidSaleValue(pid, true);
-
-        if(cfg.merged)
-            pid += (static_cast<UInt64>(serverNo) << 48);
-	    GObject::Player * pl = GObject::globalPlayers[pid];
-        if (NULL != pl)
+        string str;
+        if (!checkForbidSale(pid,str))
         {
-            pl->setForbidSale(true);
+            setForbidSaleValue(pid, true);
+//        setForbidSaleValue(pid, true,tm);
 
-            GameMsgHdr hdr(0x352, pl->getThreadId(), pl, NULL);
-            GLOBAL().PushMsg(hdr, NULL);
+            if(cfg.merged)
+                pid += (static_cast<UInt64>(serverNo) << 48);
+    	    GObject::Player * pl = GObject::globalPlayers[pid];
+            if (NULL != pl)
+            {
+                pl->setForbidSale(true);
+    
+                GameMsgHdr hdr(0x352, pl->getThreadId(), pl, NULL);
+                GLOBAL().PushMsg(hdr, NULL);
+            }
+            if (execu.get() != NULL && execu->isConnected())
+                execu->Execute2("REPLACE into `fsale_player` values(%"I64_FMT"u,%d,1)", pid, TimeUtil::Now());
         }
         playerId = GetNextSection(playerIds, ',');
-
-        if (execu.get() != NULL && execu->isConnected())
-        {
-            execu->Execute2("REPLACE into `fsale_player` values(%"I64_FMT"u,%d,1)", pid, TimeUtil::Now());
-        }
- 
     }
     ret = 0;
     Stream st(SPEP::FORBIDSALE);
@@ -1493,15 +1521,18 @@ void QueryLockUser(LoginMsgHdr& hdr,const void * data)
     BinaryReader br(data,hdr.msgHdr.bodyLen);
     UInt64 pid = 0;
     std::string fsaleTime;
+    std::string foverTime;
     CHKKEY();
     br>>pid;
 
     pid = pid & 0xFFFFFFFFFF;
     UInt8 isLockLogin = IsBigLock(pid);
     UInt8 isForbidSale = checkForbidSale(pid, fsaleTime);
+//    UInt8 isForbidSale = checkForbidSale(pid, fsaleTime,foverTime);
         
     Stream st(SPEP::QUERYLOCKUSER);
     st << isLockLogin << isForbidSale << fsaleTime << Stream::eos;
+//    st << isLockLogin << isForbidSale << fsaleTime<< foverTime << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
@@ -1586,6 +1617,75 @@ void addRechargeScore(LoginMsgHdr& hdr,const void * data)
     }
     ret = 0;
     Stream st(SPEP::ADDRECHARGESCORE);
+    st << ret << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+void OpenCb(LoginMsgHdr &hdr,const void * data)
+{
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+ 
+    UInt8 ret = 0;
+    INFO_LOG("OPENCB");
+    if (GObject::ClanBoss::instance().isOpening())
+        ret = 1;
+    else
+    {
+        GObject::ClanBoss::instance().setCanOpened(true);
+        GObject::ClanBoss::instance().start();
+    }
+    Stream st(SPEP::OPENCB);
+    st << ret << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
+void OnTotalRechargeAct(LoginMsgHdr &hdr, const void* data)
+{
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+
+    UInt64 playerId = 0;
+    br >> playerId;
+
+    UInt32 total = 0;
+	GObject::Player * player = GObject::globalPlayers[playerId];
+    if (!player)
+        total = 0;
+    else
+        total = player->GetVar(GObject::VAR_TOTALRECHARGEACT);
+
+    Stream st(SPEP::TOTALRECHARGEACT);
+    st << total << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
+inline bool player_enum_cleartra(GObject::Player* p, int)
+{
+    if (p->GetVar(GObject::VAR_TOTALRECHARGEACT))
+        p->SetVar(GObject::VAR_TOTALRECHARGEACT, 0);
+    return true;
+}
+void OnSetTotalRechargeAct(LoginMsgHdr &hdr, const void* data)
+{
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+
+    UInt32 s = 0;
+    UInt32 e = 0;
+
+    br >> s >> e;
+
+    UInt8 ret = 1;
+
+    if (s < e)
+    {
+        GObject::globalPlayers.enumerate(player_enum_cleartra, 0);
+        GObject::GVAR.SetVar(GObject::GVAR_TOTALRECHARGEACT_S, s);
+        GObject::GVAR.SetVar(GObject::GVAR_TOTALRECHARGEACT_E, e);
+        ret = 0;
+    }
+
+    Stream st(SPEP::SETTOTALRECHARGEACT);
     st << ret << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
@@ -2602,7 +2702,22 @@ void GetMoneyFromBs(LoginMsgHdr &hdr, const void * data)
 inline bool player_enum(GObject::Player* p, int)
 {
     if (!p->isOnline())
+    {
         p->setSysDailog(true);
+    }
+    else
+    {
+        if(GObject::World::getSysDailogPlatform() == SYS_DIALOG_ALL_PLATFORM || GObject::World::getSysDailogPlatform() == atoi(p->getDomain()))
+        {
+            Stream st(REP::SYSDAILOG);
+            st << Stream::eos;
+            p->send(st);
+        }
+        else
+        {
+            p->setSysDailog(true);
+        }
+    }
     return true;
 }
 
@@ -2610,11 +2725,14 @@ void SysDailog(LoginMsgHdr &hdr, const void * data)
 {
 	BinaryReader br(data,hdr.msgHdr.bodyLen);
     CHKKEY();
-
+    UInt8 platform = 0;
+    br >> platform;
+#if 0
     Stream st(REP::SYSDAILOG);
     st << Stream::eos;
 	NETWORK()->Broadcast(st);
-
+#endif
+    GObject::World::setSysDailogPlatform(platform);
 	GObject::globalPlayers.enumerate(player_enum, 0);
 }
 void SysUpdate(LoginMsgHdr &hdr, const void * data)
@@ -2750,6 +2868,39 @@ UInt8 SwitchAutoForbid(UInt32 val)
     return 0;
 }
 
+inline bool player_enum_2(GObject::Player* pl, int type)
+{
+    switch(type)
+    {
+        case 1:
+            pl->SetVar(GObject::VAR_DRAGONKING_STEP, 0);
+            pl->SetVar(GObject::VAR_DRAGONKING_STEP4_COUNT, 0);
+            break;
+        case 2:
+            {
+                UInt32 btime = GObject::GVAR.GetVar(GObject::GVAR_LUCKYSTAR_BEGIN);
+                UInt32 etime = GObject::GVAR.GetVar(GObject::GVAR_LUCKYSTAR_END);
+                UInt32 ltime = pl->GetVar(GObject::VAR_LUCKYSTAR_LOGIN_TIME);
+                if(ltime && (ltime < btime || ltime > etime))
+                    pl->SetVar(GObject::VAR_LUCKYSTAR_LOGIN_TIME, 0);
+            }
+            break;
+        case 3:
+            {
+                for(UInt32 i = 0; i < 6; ++ i)
+                {
+                    pl->SetVar(GObject::VAR_SURNAMELEGEND_USED+i, 0);
+                }
+                GameMsgHdr hdr(0x1CC, WORKER_THREAD_WORLD, NULL, 0);
+                GLOBAL().PushMsg(hdr, NULL);
+            }
+            break;
+        default:
+            return false;
+    }
+    return true;
+}
+
 void GMCmd(LoginMsgHdr& hdr, const void* data)
 {
     // 接受后台传来的GM指令，返回0表示操作成功，非0为操作失败
@@ -2769,25 +2920,39 @@ void GMCmd(LoginMsgHdr& hdr, const void* data)
             break;
         case 0x02:
             result = SwitchAutoForbid(val);
+            break;
         case 0x03:
             {
                 UInt32 endTime = 0;
                 UInt32 flag = 0;
                 br >> endTime >> flag;
-                //大闹龙宫的flag暂时只为1,2,3,4
-                if(endTime < val || flag > 4)
+                //大闹龙宫的flag暂时只为1,2,3,4,5,6
+                //10:聚宝盆
+                if(endTime < val || flag >= GObject::DRAGONKING_MAX)
                     result = 1;
                 else
                 {
-                    GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_BEGIN, val);
-                    GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_END, endTime);
-                    GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_ACTION, flag);
+                    if (flag != 10)
+                    {
+                        if(flag != GObject::GVAR.GetVar(GObject::GVAR_DRAGONKING_ACTION))
+                            GObject::globalPlayers.enumerate(player_enum_2, 1);
+                        GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_BEGIN, val);
+                        GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_END, endTime);
+                        GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_ACTION, flag);
+                    }
+                    else
+                    {
+                        GObject::GVAR.SetVar(GObject::GVAR_TREASURE_BEGIN, val);
+                        GObject::GVAR.SetVar(GObject::GVAR_TREASURE_END, endTime); 
+                        GObject::GVAR.SetVar(GObject::GVAR_TREASURE_ACTION, flag);   
+                    }
                     result = 0;
                 }
             }
         case 0x04:
             cfg.setAutoKick(val == 1? true:false);
             result = 0;
+            break;
         default:
             break;
     }
@@ -3029,6 +3194,64 @@ void QuerySHStageOnOff(LoginMsgHdr& hdr, const void* data)
 
     Stream st(SPEP::QUERYSHSTAGEONOFF);
     st << onOff._timeBegin << onOff._timeEnd << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID, st);
+}
+
+void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
+{
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    CHKKEY();
+    UInt32 begin = 0, end = 0;
+    UInt8 type = 0;
+    br >> type >> begin >> end;
+    begin = TimeUtil::SharpDay(0, begin);
+    if(end > begin && (end - begin)%86400 > 0)
+        end = TimeUtil::SharpDay(1, end);
+    UInt8 ret = 0;
+    if(type == 1 && begin <= end)
+    {   //充值幸运星活动
+        GObject::GVAR.SetVar(GObject::GVAR_LUCKYSTAR_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_LUCKYSTAR_END, end);
+        GObject::globalPlayers.enumerate(player_enum_2, 2);
+        ret = 1;
+    }
+    else if (type == 2 && begin <= end)
+    {
+        if(GObject::GVAR.GetVar(GObject::GVAR_SURNAMELEGEND_BEGIN) > TimeUtil::Now()
+                || GObject::GVAR.GetVar(GObject::GVAR_SURNAMELEGEND_END) < TimeUtil::Now())
+            GObject::globalPlayers.enumerate(player_enum_2, 3);
+        GObject::GVAR.SetVar(GObject::GVAR_SURNAMELEGEND_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_SURNAMELEGEND_END, end);
+        ret = 1;
+    }
+
+    Stream st(SPEP::ACTIVITYONOFF);
+    st << ret << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID, st);
+}
+
+void QueryOneActivityOnOff(LoginMsgHdr& hdr, const void* data)
+{
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+
+    UInt8 type = 0;
+    br >> type;
+
+    UInt32 begin = 0, end = 0;
+    if(type == 1)
+    {
+        begin = GObject::GVAR.GetVar(GObject::GVAR_LUCKYSTAR_BEGIN);
+        end = GObject::GVAR.GetVar(GObject::GVAR_LUCKYSTAR_END);
+    }
+    else if (type == 2)
+    {
+        begin = GObject::GVAR.GetVar(GObject::GVAR_SURNAMELEGEND_BEGIN);
+        end = GObject::GVAR.GetVar(GObject::GVAR_SURNAMELEGEND_END);
+    }
+
+    Stream st(SPEP::QUERYACTIVITYONOFF);
+    st << type << begin << end << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID, st);
 }
 

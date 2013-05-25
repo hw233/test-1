@@ -50,12 +50,14 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _summon(false), _summonLast(0), _moAuraBuf(0), _moAuraBufLast(0), _moEvade100(false), _moEvade100Last(0),
     _hideBuf(false), _hideBufLast(0), _markMo(false), _markMoLast(0),
     _blind(0), _blind_last(0), _deep_blind_dmg_extra(0), _deep_blind_last(0),
+    
 	_moAttackAdd(0), _moMagAtkAdd(0), _moAtkReduce(0), _moMagAtkReduce(0),
 	_moAttackAddCD(0), _moMagAtkAddCD(0), _moAtkReduceCD(0), _moMagAtkReduceCD(0),
 	_petAttackAdd(0), _petMagAtkAdd(0), _petAtkReduce(0), _petMagAtkReduce(0),
 	_petAttackAddCD(0), _petMagAtkAddCD(0), _petAtkReduceCD(0), _petMagAtkReduceCD(0),
     _petExAtk(0), _petExAtkEnable(false), _petExAtkId(0),
-    _bleedMo(0), _bleedMoLast(0), _summoner(NULL), _unSummonAura(0), 
+    _bleedMo(0), _bleedMoLast(0), _blind_bleed(0), _blind_present(0), _blind_present_cd(0),
+    _blind_cd(0), _blind_bleed_last(0), _summoner(NULL), _unSummonAura(0), 
     _shieldHP(0), _shieldHPLast(0), _petShieldHP(0), 
     _petProtect100(false), _petProtect100Last(0), _petAtk100(0), _petAtk100Last(0), _petMark(false),
     _atkAddSpecial(0), _atkSpecialLast(0), _magAtkAddSpecial(0), _magAtkSpecialLast(0), 
@@ -63,7 +65,9 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _skillUsedChangeAttrValue(0), _skillUsedChangeAttrLast(0), _skillUsedChangeAttr(0),
     _bleedRandom(0), _bleedRandomLast(0), _bleedAttackClass(1),_bleedBySkill(0), _bleedBySkillLast(0), _bleedBySkillClass(1),
     _hitChangeByPeerless(0),_counterChangeByPeerless(0),_bSingleAttackFlag(false),_bMainTargetDead(false),_nCurrentAttackIndex(0),
-    _darkVigor(0), _dvFactor(0), _darkVigorLast(0), _hpShieldSelf(0), _hpShieldSelf_last(0)
+    _darkVigor(0), _dvFactor(0), _darkVigorLast(0), _hpShieldSelf(0), _hpShieldSelf_last(0),
+    _counter_spirit_atk_add(0), _counter_spirit_magatk_add(0), _counter_spirit_def_add(0), _counter_spirit_magdef_add(0), _counter_spirit_times(0), _counter_spirit_last(0), _counter_spirit_efv(0), _counter_spirit_skillid(0), _counter_spirit_skill_cd(0), _pet_coatk(0), _fire_defend(0), _fire_defend_last(0), _fire_fake_dead_rate(0), _fire_fake_dead_rate_last(0), _sneak_atk(0), _sneak_atk_status(0), _sneak_atk_last(0), _sneak_atk_recover_rate(0),
+    _selfSummon(NULL)
 {
     memset(_immuneLevel, 0, sizeof(_immuneLevel));
     memset(_immuneRound, 0, sizeof(_immuneRound));
@@ -587,6 +591,7 @@ void BattleFighter::updateAllAttr()
 	{
 		_hp = getMaxHP();
 	}
+
 }
 
 void BattleFighter::setAttrExtra(UInt8 klass, UInt8 career, UInt8 level)
@@ -628,6 +633,12 @@ inline void addAttrExtra( GData::AttrExtra& ae, const GData::AttrExtra * ext )
 		return;
 	ae += *ext;
 }
+inline void factorAttrExtra( GData::AttrExtra& ae, const GObject::AttrFactor * ef )
+{
+	if(ef == NULL)
+		return;
+	ae *= (*ef);
+}
 
 void BattleFighter::updateBuffExtras()
 {
@@ -651,8 +662,20 @@ void BattleFighter::updateBuffExtras()
         if (ae)
             addAttrExtra(_attrExtra, ae);
     }
-
-	if(ext > 0)
+/*    if(_fighter && _fighter->getOwner() && _fighter->getOwner()->hasHiAfFlag())
+    {
+        const GObject::AttrExtra* af = _fighter->getOwner()->getHIAf();
+        if (af)
+        {
+            _attrExtra.attackP += af->attackP;
+            _attrExtra.magatkP += af->magatkP;
+            if (af->hp > 0)
+                _attrExtra.hpP += af->hpP;
+            _attrExtra.actionP += af->actionP;
+        }
+    }
+*/
+    if(ext > 0)
 	{
 		float extAttr = 0.05f * ext;
 		_attrExtra.strengthP += extAttr;
@@ -998,6 +1021,11 @@ void BattleFighter::initStats(bool checkEnh)
 		updateAllAttr();
 		if(_hp == 0)
 			_hp = _maxhp;
+ 
+        if(_fighter && _fighter->getOwner() && _fighter->getOwner()->getCBHPFlag())
+        {
+            _hp *= 0.1;
+        }
 	}
 }
 
@@ -1005,11 +1033,12 @@ UInt32 BattleFighter::regenHP( UInt32 u, bool weak /* = false */, float hppec /*
 {
     if(_weakRound > 0 && weak)
         u /= 2;
-    u += getMaxHP() * hppec;
+    UInt32 tmp = getMaxHP() * hppec;
 
     if (maxRhp > 0)
-        u = u > maxRhp? maxRhp:u;
+        tmp = tmp > maxRhp? maxRhp:tmp;
 
+    u += tmp;
 	UInt32 oldhp = _hp;
 	if(oldhp >= getMaxHP())
 	{
@@ -2088,7 +2117,11 @@ BattleFighter* BattleFighter::summonSelf(float factor, UInt8 last)
     if(isHide())
         aura = 100;
 
+    bf->setSneakAtk(_sneak_atk, _sneak_atk_status, _sneak_atk_last);
+    bf->setRecoverSnakeAtk(_sneak_atk_recover_rate);
+
     bf->setSummonFactor(aura, factor, last);
+    setSelfSummon(bf);
 
     return bf;
 }
@@ -2637,5 +2670,155 @@ bool BattleFighter::releasePetAtk100()
     return false;
 }
 
+void BattleFighter::addCounterSpiritBuf(float atk, float magatk, float def, float magdef, UInt8 last)
+{
+    if(_counter_spirit_times < 3)
+    {
+        ++ _counter_spirit_times;
+        _counter_spirit_atk_add += atk;
+        _counter_spirit_magatk_add += magatk;
+        _counter_spirit_def_add += def;
+        _counter_spirit_magdef_add += magdef;
+    }
+    _counter_spirit_last = last;
+
+    return;
+}
+
+bool BattleFighter::releaseCounterSpirit()
+{
+    if(_counter_spirit_skill_cd != 0)
+        --_counter_spirit_skill_cd;
+
+    if(_counter_spirit_last == 0)
+        return false;
+
+    -- _counter_spirit_last;
+    if(_counter_spirit_last != 0)
+        return false;
+
+    _counter_spirit_times = 0;
+    _counter_spirit_atk_add = 0;
+    _counter_spirit_magatk_add = 0;
+    _counter_spirit_def_add = 0;
+    _counter_spirit_magdef_add = 0;
+    return true;
+}
+
+void BattleFighter::setCounterSpiritSkill(UInt16 skillid, float efv, const std::vector<float>& factor)
+{
+    if(_counter_spirit_skill_cd == 0)
+    {
+        _counter_spirit_efv = efv;
+        _counter_spirit_factor = factor;
+        _counter_spirit_skillid = skillid;
+        ++ _counter_spirit_skill_cd;
+    }
+}
+
+void BattleFighter::clearCounterSpiritSkill()
+{
+    _counter_spirit_efv = 0.0f;
+    _counter_spirit_factor.clear();
+    _counter_spirit_skillid = 0;
+}
+
+float BattleFighter::getCounterSpiritAtk()
+{
+    float lostHP = getLostHP();
+    if(lostHP * 10 < getMaxHP())
+        lostHP = getMaxHP() / 10;
+
+    return (_counter_spirit_efv * lostHP);
+}
+
+bool BattleFighter::releaseFireDefend()
+{
+    if(_fire_defend_last == 0)
+        return false;
+
+    -- _fire_defend_last;
+    if(_fire_defend_last != 0)
+        return false;
+
+    _fire_defend = 0;
+    return true;
+}
+
+bool BattleFighter::doFireFakeDead()
+{
+    if(_fire_fake_dead_rate_last == 0)
+        return false;
+
+    if(uRand(10000) < _fire_fake_dead_rate * 100)
+    {
+        _fire_fake_dead_rate = 0;
+        _fire_fake_dead_rate_last = 0;
+        return true;
+    }
+
+    return false;
+}
+
+bool BattleFighter::releaseFireFakeDead()
+{
+    if(_fire_fake_dead_rate_last == 0)
+        return false;
+
+    -- _fire_fake_dead_rate_last;
+    if(_fire_fake_dead_rate_last != 0)
+        return false;
+
+    _fire_fake_dead_rate = 0;
+    return true;
+}
+
+void BattleFighter::nextSneakStatus()
+{
+    switch(_sneak_atk_status)
+    {
+    case e_sneak_none:
+        break;
+    case e_sneak_on:
+        _sneak_atk_status = e_sneak_atk;
+        break;
+    case e_sneak_atk:
+        _sneak_atk_status = e_sneak_none;
+        break;
+    }
+
+    return;
+}
+
+bool BattleFighter::releaseSneakAtk()
+{
+    if(_sneak_atk_last == 0)
+        return false;
+
+     -- _sneak_atk_last;
+     if(_sneak_atk_last != 0)
+         return false;
+
+     _sneak_atk_status = e_sneak_none;
+     _sneak_atk_recover_rate = 0;
+     _sneak_atk = 0;
+
+     return true;
+}
+
+bool BattleFighter::recoverSneakAtk()
+{
+    if(_sneak_atk_status != e_sneak_none || _sneak_atk_last == 0)
+        return false;
+
+    if(_sneak_atk_recover_rate > uRand(10000))
+    {
+        _sneak_atk_status = e_sneak_on;
+        _sneak_atk_recover_rate *= 0.5f;
+        return true;
+    }
+
+    return false;
+}
 
 }

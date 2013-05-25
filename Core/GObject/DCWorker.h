@@ -27,6 +27,7 @@ public:
 	UInt8 TID() const { return m_Worker; }
     void Push(const char* msg, size_t len, const char logType = LT_NORMAL);
     void PushCheckOpenId(UInt64 playerId, const char* openId, UInt32 len);
+    UInt8 CheckRPOpenid(char* openid);
 
 protected:
 	bool Init();
@@ -38,7 +39,7 @@ protected:
 
 private:
     UInt32 UnionLoggerResultParse(char* result, char* msg);
-    bool CheckOpenId(UInt64 playerId, char * openId);
+    //bool CheckOpenId(UInt64 playerId, char * openId);
 
 private:
     struct LogMsg
@@ -58,7 +59,7 @@ private:
     AtomicVal<UInt32> m_Limit;
 	std::vector<LogMsg> m_DCLog;
     std::vector<LogMsg> m_UnionLog;
-    std::vector<OpenIdMsg> m_Openid;
+    //std::vector<OpenIdMsg> m_Openid;
     CLogger* m_logger;
     bool m_inited;
 

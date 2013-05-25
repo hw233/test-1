@@ -186,3 +186,23 @@ LOCK TABLES `clan_copy_template` WRITE;
 source clancopytemplate
 UNLOCK TABLES;
 
+LOCK TABLES `lbskills` WRITE;
+source lbskills
+UNLOCK TABLES;
+
+LOCK TABLES `dreamer_template` WRITE;
+source dreamer_template
+UNLOCK TABLES;
+
+LOCK TABLES `pet_pinjie` WRITE;
+source pet_pinjie
+UNLOCK TABLES;
+
+LOCK TABLES `pet_gengu` WRITE;
+source pet_gengu
+UNLOCK TABLES;
+
+LOCK TABLES `pet_pressure` WRITE;
+source pet_pressure
+UNLOCK TABLES;
+

@@ -63,6 +63,7 @@
 #include "GObject/Tianjie.h"
 #include "Memcached.h"
 #include "GObject/RechargeTmpl.h"
+#include "GObject/ClanBoss.h"
 
 struct NullReq
 {
@@ -1202,7 +1203,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         }
     }
 
-    if (pl->getSysDailog())
+    if (pl->getSysDailog() && (World::getSysDailogPlatform() == SYS_DIALOG_ALL_PLATFORM || World::getSysDailogPlatform() == atoi(pl->getDomain())))
     {
         Stream st(REP::SYSDAILOG);
         st << Stream::eos;
@@ -1224,6 +1225,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     }
     {
         GObject::Tianjie::instance().getTianjieData(pl, true);
+        GObject::ClanBoss::instance().sendStatus(pl, 0);
         if (World::getConsume918())
         {
             Stream st(REP::DAILY_DATA);
@@ -1242,6 +1244,12 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     if (World::getNeedConsumeRank())
     {
         GameMsgHdr hdr(0x1C4, WORKER_THREAD_WORLD, pl, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+    }
+    
+    if (World::getSurnameLegend())
+    {
+        GameMsgHdr hdr(0x1C9, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr, NULL);
     }
     pl->sendYearRPInfo();
@@ -1264,6 +1272,19 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     }
     pl->sendQZoneQQGameAct(1);
     pl->sendQZoneQQGameAct(2);
+    pl->sendVipPrivilege();
+    pl->svrSt(4);
+    pl->sendRP7TreasureInfo(true);
+    if (cfg.rpServer)
+    {
+        pl->sendRP7SignInfo();
+        GameMsgHdr hdr(0x1CB, WORKER_THREAD_WORLD, pl, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+    }
+    //充值幸运星活动
+    pl->setLuckyStarCondition();
+    pl->sendLuckyStarInfo(1);
+    pl->getLevelAwardInfo();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -1679,6 +1700,8 @@ void OnFighterDismissReq( GameMsgHdr& hdr, FighterDismissReq& fdr )
 		}
 	}
     fgt->delAllCitta();
+    //此处只剩下法宝符文未散功了！！
+    fgt->SSDismissAll(true);
 	delete fgt;
 	rep._fgtid = fdr._fgtid;
 	rep._result = 0;
@@ -1930,6 +1953,21 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
         }
         break;
 
+        case 0x0D:
+        {
+            UInt8 type = 0;
+            br >> type;
+            if(type == 1)
+                player->sendNuwaInfo();
+            else if(type == 2)
+            {
+                UInt8 idx = 0;
+                br >> idx;
+                player->setNuwaSignet(idx);
+            }
+        }
+        break;
+
         case 10:
         {
             UInt8 type;
@@ -1953,7 +1991,8 @@ void OnEnchantReq( GameMsgHdr& hdr, EnchantReq& er )
 	Stream st(REP::EQ_TO_STRONG);
     UInt16 success = 0;
     UInt16 failed = 0;
-	st << player->GetPackage()->Enchant(er._fighterId, er._itemid, er._type, er._count, er._level, success, failed/*, er._protect > 0*/) << er._fighterId << er._itemid;
+    UInt16 bless = 0;
+	st << player->GetPackage()->Enchant(er._fighterId, er._itemid, er._type, er._count, er._level, success, failed, bless/*, er._protect > 0*/) << er._fighterId << er._itemid<<bless;
 
     if(er._count != 0)
         st << success << failed;
@@ -2912,6 +2951,11 @@ void OnAttackNpcReq( GameMsgHdr& hdr, AttackNpcReq& anr )
 		player->sendMsgCode(0, 1408);
 		return;
 	}
+    if (anr._npcId == 5515)
+    {
+        GObject::ClanBoss::instance().attack(player);
+        return;
+    }
 
 	if (GObject::Tianjie::instance().isTjNpc(anr._npcId, loc))
 	{
@@ -2978,6 +3022,7 @@ void OnBattleEndReq( GameMsgHdr& hdr, BattleEndReq& req )
     }
 
     player->addLastTjScore();
+    player->addLastGongxian();
 
 	player->checkLastBattled();
 
@@ -4150,6 +4195,8 @@ void OnFriendOpReq( GameMsgHdr& hdr, FriendOpReq& fr )
         player->delCFriend(pl);
         pl->delCFriend(player);
         break;
+    case 9:
+        player->vote(pl);
 	}
 }
 
@@ -4442,6 +4489,7 @@ void OnClanRankBattleReqInit(GameMsgHdr& hdr,const void* data)
 	if(CURRENT_THREAD_ID() != WORKER_THREAD_NEUTRAL)
     {
         hdr.msgHdr.desWorkerID = WORKER_THREAD_NEUTRAL;
+        hdr.msgHdr.cmdID = 0x1F3;
         GLOBAL().PushMsg(hdr, (void*)data);
         return;
     }
@@ -4467,6 +4515,13 @@ void OnClanRankBattleReqInit(GameMsgHdr& hdr,const void* data)
         case 2: //取消报名
             {
                 ClanRankBattleMgr::Instance().Signout(player);
+            }
+            break;
+        case 8:
+            {
+                GObject::Clan *clan = player->getClan();
+                if(clan)
+                    clan->broadcastClanBattle(player);
             }
             break;
         default:
@@ -4552,6 +4607,7 @@ void OnClanRankBattleSortList(GameMsgHdr& hdr, const void* data)
 	if(CURRENT_THREAD_ID() != WORKER_THREAD_NEUTRAL)
     {
         hdr.msgHdr.desWorkerID = WORKER_THREAD_NEUTRAL;
+        hdr.msgHdr.cmdID = 0x1F4;
         GLOBAL().PushMsg(hdr, (void*)data);
         return;
     }
@@ -4939,6 +4995,7 @@ void OnTianjieReq( GameMsgHdr& hdr, const void* data)
     GObject::Tianjie::instance().onTianjieReq(hdr, data);
 }
 
+
 void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
 {
 	MSG_QUERY_PLAYER(player);
@@ -5296,10 +5353,22 @@ void OnGetCFriendAward( GameMsgHdr& hdr, GetCFriendAward& req )
     MSG_QUERY_PLAYER(player);
     if(!player->hasChecked())
          return;
-    if (req._flag == 1)
-        player->GetCFriend()->setCFriendNum(req._idx);
-    else
-        player->GetCFriend()->getAward(req._idx);
+    CFriend * cFriend = player->GetCFriend();
+    if(!cFriend) return;
+    if (req._flag == 0)
+        cFriend->getAward(req._idx);
+    else if (req._flag == 1)
+        cFriend->setCFriendNum(req._idx);
+    else if (req._flag == 2)
+        cFriend->recallFriend();
+    else if (req._flag == 3)
+        cFriend->giveLift();
+    else if (req._flag == 4)
+        cFriend->getLift();
+    else if (req._flag == 5)
+        cFriend->useTickets(req._idx);
+    else if (req._flag == 6)
+        cFriend->setCFriendSuccess(req._idx);
 }
 
 void OnGetOfflineExp( GameMsgHdr& hdr, GetOfflineExp& req )
@@ -5459,9 +5528,6 @@ void OnSvrSt( GameMsgHdr& hdr, SvrSt& req )
 void OnRC7Day( GameMsgHdr& hdr, const void* data )
 {
 	MSG_QUERY_PLAYER(player);
-    if(!player->hasChecked())
-         return;
-
     // XXX: 不使用老版本新注册七日活动
     //return; // XXX: 不使用老版本新注册七日活动
 
@@ -5471,6 +5537,8 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
 
     if (op  < 6 )
         return;
+    if(op != 10 && !player->hasChecked())
+         return;
 
     switch(op)
     {
@@ -5508,8 +5576,16 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
             {
                 UInt8 idx = 0;
                 br >> idx;
+                if(idx != 0 && !player->hasChecked())
+                    return;
                 player->doVipPrivilege(idx);
             }
+            break;
+        case 11:
+            player->getFishUserAward();
+            break;
+        case 12:
+            player->getFishUserPackage();
             break;
 
         default:
@@ -5685,17 +5761,13 @@ void OnSkillStrengthen( GameMsgHdr& hdr, const void* data)
     Fighter* fgt = pl->findFighter(fighterid);
     if (!fgt)
         return;
+    UInt16 skillid = 0;
+    br >> skillid;
     if (type == 1)
-    {
-        UInt16 skillid = 0;
-        br >> skillid;
         fgt->SSOpen(skillid);
-    }
     else if (type == 2)
     {
-        UInt16 skillid = 0;
         UInt16 num = 0;
-        br >> skillid;
         br >> num;
 
         for (UInt16 i = 0; i < num; ++i)
@@ -5711,6 +5783,8 @@ void OnSkillStrengthen( GameMsgHdr& hdr, const void* data)
                 break;
         }
     }
+    else if (type == 3)
+        fgt->SSDismiss(skillid);
 }
 
 void OnMakeStrong( GameMsgHdr& hdr, const void * data )
@@ -5807,9 +5881,10 @@ void OnExJob( GameMsgHdr & hdr, const void * data )
                     case 2:
                     case 3:
                     case 4:
+                    case 5:
                         jobHunter->OnRequestStart(val);
                         break;
-                    case 5: 
+                    case 10:
                         // 老虎机转盘转动
                         jobHunter->OnUpdateSlot();
                         break;
@@ -6082,7 +6157,7 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
                             UInt32 petId = GameAction()->exchangPurplePet(player);
                             Stream st(REP::FAIRY_PET);
                             st << type << opt << petId;
-                            st << static_cast<UInt8>(player->GetVar(VAR_FAIRYPET_LIKEABILITY));
+                            st << static_cast<UInt16>(player->GetVar(VAR_FAIRYPET_LIKEABILITY));
                             st << Stream::eos;
                             player->send(st);
                             if(petId)
@@ -6127,7 +6202,73 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
     }
 }
 
+void OnRPServerReq( GameMsgHdr & hdr, const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
 
+    UInt8 op = 0;
+    brd >> op;
+    switch(op)
+    {
+        //开服7天排行榜
+        case 0x01:
+            {
+                UInt8 type = 0;
+                brd >> type;
+                if (1 == type)//充值排行
+                {
+                    GameMsgHdr hdr(0x1CB, WORKER_THREAD_WORLD, player, 0);
+                    GLOBAL().PushMsg(hdr, NULL);
+                }
+            }
+            break;
+            //聚宝盆
+        case 0x02:
+            {
+                UInt8 type = 0;
+                brd >> type;
+                if (1 == type)
+                {
+                    player->sendRP7TreasureInfo();
+                }
+                else
+                {
+                    UInt8 idx = 0;
+                    brd >> idx;
+                    if (2 == type)
+                        player->buyRP7Treasure(idx);
+                    else if (3 == type)
+                        player->getRP7TreasureAward(idx);
+                }
+            }
+            //注册30日签到
+        case 0x03:
+            {
+                UInt8 type = 0;
+                brd >> type;
+                if (1 == type)
+                    player->sendRP7SignInfo();
+                else
+                {
+                    UInt8 idx = 0;
+                    brd >> idx;
+                    if (2 ==type)
+                        player->RP7Sign(idx);
+                    else if (3 == type)
+                        player->getRP7SignPackage(idx);
+                }
+            }
+            break;
+        default:
+            break;
+    }
+}
+ 
+void OnClanBossReq( GameMsgHdr& hdr, const void* data)
+{
+    GObject::ClanBoss::instance().onClanBossReq(hdr, data);
+}
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

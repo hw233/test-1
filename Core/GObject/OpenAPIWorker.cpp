@@ -45,6 +45,8 @@ namespace GObject
 
     OpenAPIWorker::~OpenAPIWorker()
     {
+        if (curl)
+            curl_easy_cleanup(curl);
     }
 
     bool OpenAPIWorker::Init()
@@ -113,12 +115,13 @@ namespace GObject
             snprintf (res, MAX_RET_LEN, "%s%s", host, url);
             res[MAX_RET_LEN - 1] = '\0';
 
-            int timeout = 1;
+            int timeout = 10;
 
             curl_easy_setopt(curl, CURLOPT_URL, res);
             curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, recvret);
             curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
             curl_easy_setopt(curl, CURLOPT_TIMEOUT, timeout);
+            curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
 
 
             CURLcode curlRes = curl_easy_perform(curl);
@@ -140,8 +143,8 @@ namespace GObject
                         if(needForbid)
                         {
                             // 需要封杀交易功能
-                            GameMsgHdr imh(0x330, pl->getThreadId(), pl, 0);
-                            GLOBAL().PushMsg(imh, NULL);
+                            LoginMsgHdr hdr1(0x330, WORKER_THREAD_LOGIN, 0, pl->GetSessionID(), sizeof(pl));
+                            GLOBAL().PushMsg(hdr1, &pl);
                         }
                         else
                         {
@@ -194,7 +197,7 @@ namespace GObject
     void OpenAPIWorker::Push(UInt64 playerId, UInt16 type, const char * openId, const char * openKey, const char * pf, const char * userIp)
     {
         const static int OPEN_ID_LEN  = 64;
-        const static int OPEN_KEY_LEN = 128;
+        const static int OPEN_KEY_LEN = 256;
         const static int PF_LEN = 64;
         const static int IP_LEN = 20;
         int len = 0;
@@ -389,7 +392,7 @@ namespace GObject
             return true;
         playerId = playerId & 0xFFFFFFFF;
         char buf[128] = {0};
-        snprintf(buf, 128, "oid_%"I64_FMT"u", playerId);
+        snprintf(buf, 127, "oid_%"I64_FMT"u", playerId);
         char openId2[256] = {0};
         m_MCached.get(buf, strlen(buf), openId2, 255);
         openId2[255] = '\0';

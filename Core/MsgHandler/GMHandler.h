@@ -172,6 +172,8 @@ private:
     void OnIdipBuy(GObject::Player* player, std::vector<std::string>& arge);
     void OnStrengthen(GObject::Player *player, std::vector<std::string>& args);
     void OnNewCountryBattle(GObject::Player *player, std::vector<std::string>& args);
+    void OnCFriend(GObject::Player *player, std::vector<std::string>& args);
+    void OnShuoShuo(GObject::Player *player, std::vector<std::string>& args);
     void OnSaveGoldAct(GObject::Player *player, std::vector<std::string>& args);
     void OnLingbao(GObject::Player * player, std::vector<std::string>& args);
     void OnLingbaoSkill(GObject::Player * player, std::vector<std::string>& args);
@@ -184,6 +186,16 @@ private:
     void OnSomeAct(GObject::Player *player, std::vector<std::string>& args);
     void OnDragonKingAct(GObject::Player *player, std::vector<std::string>& args);
     void OnFairyPetGM(GObject::Player *player, std::vector<std::string>& args);
+    void OnSurnameleg(GObject::Player *player, std::vector<std::string>& args);
+    void OnFoolsDayGM(GObject::Player *player, std::vector<std::string>& args);
+    void OnLuckyStarGM(GObject::Player *player, std::vector<std::string>& args);
+    void OnClanBoss(GObject::Player *player, std::vector<std::string>& args);
+    void OnClanBossPick(GObject::Player *player, std::vector<std::string>& args);
+    void OnClanBossEmpower(GObject::Player *player, std::vector<std::string>& args);
+    void OnClanBossSetEm(GObject::Player *player, std::vector<std::string>& args);
+    void OnClanBossOpen(GObject::Player *player, std::vector<std::string>& args);
+
+    void OnSetTownDeamonMaxLevel(GObject::Player *player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;

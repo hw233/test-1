@@ -47,7 +47,6 @@ MSG_REG(GameMsgHdr, OnLuckDrawRankListReq);
 MSG_REG(GameMsgHdr, OnItemHistoryReq);
 MSG_REG_2(GameMsgHdr, REQ::CLAN_PACKAGE, OnClanPackageReq);
 
-
 MSG_REG_2(GameMsgHdr, REQ::CLAN_SKILL, OnClanTechOpReq);
 MSG_REG_2(GameMsgHdr, REQ::CLAN_BATTLE, OnClanCityBattleReq);
 MSG_REG_2(GameMsgHdr, REQ::CLANCITYBATTLELIST, OnClanCityBattleListReq);
@@ -74,6 +73,7 @@ MSG_REG_2(ArenaMsgHdr, 0x108, OnArenaBattlePoint);
 MSG_REG_2(ArenaMsgHdr, 0x109, OnArenaLeaderBoard);
 
 MSG_REG_2(GameMsgHdr, 0x160, OnClanChatReq);
+MSG_REG_2(GameMsgHdr, 0x165, OnSpreadModifyVar);
 
 MSG_REG_2(GameMsgHdr, 0x171, OnClanTakeRewardResultReq);
 MSG_REG_2(GameMsgHdr, 0x173, OnClanMailInviteClick);
@@ -124,6 +124,7 @@ MSG_REG_2(GameMsgHdr, 0x1AC, OnSHStageOnOff);
 MSG_REG_2(GameMsgHdr, 0x1B1, OnSearchSaleNotify);
 MSG_REG_2(GameMsgHdr, 0x1B2, OnPutSaleNotify);
 MSG_REG_2(GameMsgHdr, 0x1B3, OnBuySaleCheckOKNotify);
+MSG_REG_2(GameMsgHdr, 0x1B4, OnSaleItemCancle);
 
 MSG_REG_2(GameMsgHdr, 0x1C0, OnLuckyDraw);
 MSG_REG_2(GameMsgHdr, 0x1C1, OnRechargeRank);
@@ -132,6 +133,15 @@ MSG_REG_2(GameMsgHdr, 0x1C3, OnSendRechargeRank);
 MSG_REG_2(GameMsgHdr, 0x1C4, OnSendConsumeRank);
 
 MSG_REG_2(GameMsgHdr, 0x1C5, OnGetQgameGiftAward);
+
+MSG_REG_2(GameMsgHdr, 0x1C6, OnSendPopularityRank);
+MSG_REG_2(GameMsgHdr, 0x1C7, OnPopularityRank);
+MSG_REG_2(GameMsgHdr, 0x1C8, OnLuckyBagRank);
+MSG_REG_2(GameMsgHdr, 0x1C9, OnSendLuckyBagRank);
+MSG_REG_2(GameMsgHdr, 0x1CC, OnClearLuckyBagRank);
+
+MSG_REG_2(GameMsgHdr, 0x1CA, OnRechargeRP7Rank);
+MSG_REG_2(GameMsgHdr, 0x1CB, SendRechargeRP7Rank);
 
 MSG_REG_2(GameMsgHdr, 0x1D0, OnSendClanMemberList);
 

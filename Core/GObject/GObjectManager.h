@@ -332,6 +332,7 @@ namespace GObject
         static bool loadLBSkill();
         static bool loadLingbaoAttr();
         static bool loadLingbaoSmelt();
+        static bool fixItem9383Leader();
 
         static bool addGM(UInt64 id, UInt8 lvl);
         static bool delGM(UInt64 id);

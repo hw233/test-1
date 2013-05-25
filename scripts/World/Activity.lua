@@ -277,13 +277,13 @@ function onActivityCheck(tm)
   else
       setChingMing(false)
   end
-
+  --[[
   if tm >= actTime23 and tm < actTime30 then
       setCarnival(true)
   else
       setCarnival(false)
   end
-
+  --]]
   if tm >= actTime31 and tm < actTime32 then
       is_4_21 = true
   else
@@ -826,6 +826,12 @@ function onActivityCheck(tm)
       elseif tm >= actTime563 and tm < actTime563_1 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
+      elseif tm >= actTime2013_04_09 and tm < actTime2013_04_09+5*86400 then
+          setRechargeActive(true, 16)
+          setNeedRechargeRank(true)
+      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+35*86400 then
+          setRechargeActive(true, 16)
+          setNeedRechargeRank(true)
       else
           setRechargeActive(false, 16)
           setNeedRechargeRank(false)
@@ -839,11 +845,11 @@ function onActivityCheck(tm)
           setTgcEvent(false)
       end
 
-      -- if tm >= actTime536 and tm < actTime536_1 then
+      if tm >= actTime536 and tm < actTime536_1 then
           set3366GiftAct(true)
-      -- else
-      --    set3366GiftAct(false)
-      -- end
+      else
+          set3366GiftAct(false)
+      end
 
       if tm >= actTime537 and tm < actTime537_1 then
           setConsumeActive(true)
@@ -872,7 +878,7 @@ function onActivityCheck(tm)
       else
           setConsumeActive(false)
       end
-      if tm >= actTime550 and tm < actTime550_1 then
+      if tm >= actTime247_0 and tm < actTime247_1 then
           setConsumeAwardAct(true)
       else
           setConsumeAwardAct(false)
@@ -883,6 +889,24 @@ function onActivityCheck(tm)
           setCompassAct(false)
       end
 
+      if tm >= actTime553 and tm < actTime553_1 then
+          setFoolBao(true)
+      else
+          setFoolBao(false)
+      end
+      
+      if tm >= actTime555 and tm < actTime555_1 then
+          setHalfGold(true)
+      else
+          setHalfGold(false)
+      end
+
+      if tm >= actTime556 and tm < actTime556_1 then
+          setSurnameLegend(true)
+      else
+          setSurnameLegend(false)
+      end
+      
       if tm >= actTime232_0 and tm < actTime232_1 then
           setFeastLoginAct(true)
       else
@@ -1003,11 +1027,30 @@ function onActivityCheck(tm)
       else
           setQZoneQQGameAct(false)
       end
+
+      if tm >= actTime245_0 and tm < actTime245_1 then
+          setMayDayLoginAct(true)
+      else
+          setMayDayLoginAct(false)
+      end
+
+      if tm >= actTime246_0 and tm < actTime246_1 then
+          setSpreadAct(true)
+      else
+          setSpreadAct(false)
+      end
+
       if tm >= actTime2013_03_15 and tm < (actTime2013_03_15+86400) then
           setPetEggAct(true)
       elseif tm >= (actTime2013_03_15+8*86400) and tm < (actTime2013_03_15+9*86400) then
           setPetEggAct(true)
       elseif tm >= (actTime2013_03_15+16*86400) and tm < (actTime2013_03_15+17*86400) then
+          setPetEggAct(true)
+      elseif tm >= (actTime2013_04_03) and tm < (actTime2013_04_03+86400) then
+          setPetEggAct(true)
+      elseif tm >= (actTime2013_04_12) and tm < (actTime2013_04_12+86400) then
+          setPetEggAct(true)
+      elseif tm >= (actTime2013_04_27) and tm < (actTime2013_04_27+86400) then
           setPetEggAct(true)
       else
           setPetEggAct(false)
@@ -1017,7 +1060,18 @@ function onActivityCheck(tm)
       else
           setLongyuanAct(false)
       end
- 
+      if isRPServer() then
+          if getRechargeActive() == false then
+              if tm >= getOpenTime() and tm < (getOpenTime()+7*86400) then
+                  setRechargeActive(true, 16)
+                  setNeedRechargeRank(true)
+              else
+                  setRechargeActive(false, 16)
+                  setNeedRechargeRank(false)
+              end
+          end
+      end
+
       setShuoShuo(true);
   end
 
@@ -1083,10 +1137,10 @@ function initActTime(y, m, d)
   local  SerStartTm12= { ['year'] = 2012, ['month'] = 3, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 充值返利（3/23-3/31）
   local  SerStartTm13= { ['year'] = 2012, ['month'] = 3, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  -- 愚人节活动（3/29-4/1）
-  local  SerStartTm14= { ['year'] = 2012, ['month'] = 3, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 愚人节活动（2012 3/29-4/1,2013 3/30-4/1）
+  local  SerStartTm14= { ['year'] = 2013, ['month'] = 4, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 清明节
-  local  SerStartTm15= { ['year'] = 2012, ['month'] = 4, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm15= { ['year'] = 2013, ['month'] = 4, ['day'] = 4, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm16= { ['year'] = 2012, ['month'] = 4, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm17= { ['year'] = 2012, ['month'] = 4, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1182,7 +1236,7 @@ function initActTime(y, m, d)
   -- 蜀山好声音合作
   local  SerStartTm535= { ['year'] = 2012, ['month'] = 12, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 3366合作礼包
-  local  SerStartTm536= { ['year'] = 2012, ['month'] = 12, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm536= { ['year'] = 2013, ['month'] = 4, ['day'] = 24, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm537= { ['year'] = 2012, ['month'] = 12, ['day'] = 15, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 商城消耗返利
   local  SerStartTm538= { ['year'] = 2013, ['month'] = 1, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1197,6 +1251,18 @@ function initActTime(y, m, d)
   local  SerStartTm551= { ['year'] = 2013, ['month'] = 1, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm551_1= { ['year'] = 2013, ['month'] = 3, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
+--愚公宝箱
+  local  SerStartTm553= { ['year'] = 2013, ['month'] = 3, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm553_1= { ['year'] = 2013, ['month'] = 4, ['day'] = 6, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  
+  --周末活动
+  local  SerStartTm555= { ['year'] = 2013, ['month'] = 4, ['day'] = 13, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm555_1= { ['year'] = 2013, ['month'] = 4, ['day'] = 15, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+ 
+    --蜀山传奇掉落活动
+  local  SerStartTm556= { ['year'] = 2013, ['month'] = 4, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm556_1= { ['year'] = 2013, ['month'] = 5, ['day'] = 6, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    
   -- 繁体版
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm102 = { ['year'] = 2012, ['month'] = 6, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1262,7 +1328,7 @@ function initActTime(y, m, d)
   local  SerStartTm234 = { ['year'] = 2013, ['month'] = 1, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm234_1 = { ['year'] = 2013, ['month'] = 1, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 时装法宝
-  local  SerStartTm235 = { ['year'] = 2013, ['month'] = 1, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm235 = { ['year'] = 2013, ['month'] = 4, ['day'] = 26, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --大闹龙宫活动
   local  SerStartTm236 = { ['year'] = 2013, ['month'] = 1, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm236_1 = { ['year'] = 2013, ['month'] = 1, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1295,12 +1361,20 @@ function initActTime(y, m, d)
   local  SerStartTm241 = { ['year'] = 2013, ['month'] = 2, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm241_1 = { ['year'] = 2013, ['month'] = 2, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --特殊古籍活动
-  local  SerStartTm242 = { ['year'] = 2013, ['month'] = 3, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTm242_1 = { ['year'] = 2013, ['month'] = 3, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm242 = { ['year'] = 2013, ['month'] = 5, ['day'] = 4, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm242_1 = { ['year'] = 2013, ['month'] = 5, ['day'] = 6, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --大厅累积在线奖励
   local  SerStartTm243 = { ['year'] = 2013, ['month'] = 3, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --空间黄钻、大厅蓝钻礼包
   local  SerStartTm244 = { ['year'] = 2013, ['month'] = 3, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 五一活动(节日套装)
+  local  SerStartTm245 = { ['year'] = 2013, ['month'] = 4, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --落英秘典
+  local  SerStartTm246 = { ['year'] = 2013, ['month'] = 5, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --消费抽奖活动
+  local  SerStartTm247= { ['year'] = 2013, ['month'] = 5, ['day'] = 10, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
+  local  SerStartTm2013_04_14 = { ['year'] = 2013, ['month'] = 4, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   --300-399越南版用了
   actTime0 = os.time(SerStartTm);
@@ -1346,10 +1420,10 @@ function initActTime(y, m, d)
   actTime26 = os.time(SerStartTm13) + 9 * 86400;
 
   actTime27 = os.time(SerStartTm14);
-  actTime28 = os.time(SerStartTm14) + 4 * 86400;
+  actTime28 = os.time(SerStartTm14) + 3 * 86400;
 
   actTime29 = os.time(SerStartTm15);
-  actTime30 = os.time(SerStartTm15) + 8 * 86400;
+  actTime30 = os.time(SerStartTm15) + 3 * 86400;
 
   actTime31 = os.time(SerStartTm16);
   actTime32 = os.time(SerStartTm16) + 11 * 86400;
@@ -1563,7 +1637,7 @@ function initActTime(y, m, d)
   actTime535_1 = os.time(SerStartTm535) + 4 * 86400;
 
   actTime536 = os.time(SerStartTm536);
-  actTime536_1 = os.time(SerStartTm536) + 1 * 86400;
+  actTime536_1 = os.time(SerStartTm536) + 7 * 86400;
 
   actTime537 = os.time(SerStartTm537);
   actTime537_1 = os.time(SerStartTm537) + 7 * 86400;
@@ -1580,6 +1654,15 @@ function initActTime(y, m, d)
   actTime551 = os.time(SerStartTm551);
   actTime551_1 = os.time(SerStartTm551_1) ;
 
+  actTime553 = os.time(SerStartTm553);
+  actTime553_1 = os.time(SerStartTm553_1) ;
+
+  actTime555 = os.time(SerStartTm555);
+  actTime555_1 = os.time(SerStartTm555_1) ;
+  
+  actTime556 = os.time(SerStartTm556);
+  actTime556_1 = os.time(SerStartTm556_1) ;
+
   actTime560 = os.time(SerStartTm560);
   actTime560_1 = os.time(SerStartTm560) + 10 * 86400;
 
@@ -1590,7 +1673,7 @@ function initActTime(y, m, d)
   actTime562_1 = os.time(SerStartTm562) + 7 * 86400;
 
   actTime563 = os.time(SerStartTm563);
-  actTime563_1 = os.time(SerStartTm563) + (29+8) * 86400;
+  actTime563_1 = os.time(SerStartTm563) + (29+8+8) * 86400;
   -- 繁体版
   actTime101 = os.time(SerStartTm101);
   actTime102 = os.time(SerStartTm101) + 8 * 86400;
@@ -1677,7 +1760,7 @@ function initActTime(y, m, d)
   actTime234_1= os.time(SerStartTm234_1);
 
   actTime235_0= os.time(SerStartTm235);
-  actTime235_1= os.time(SerStartTm235) + 11 * 86400;
+  actTime235_1= os.time(SerStartTm235) + 7 * 86400;
 
   actTime236_0= os.time(SerStartTm236);
   actTime236_1= os.time(SerStartTm236_1);
@@ -1706,6 +1789,15 @@ function initActTime(y, m, d)
   actTime244_0= os.time(SerStartTm244);
   actTime244_1= os.time(SerStartTm244) + 7 * 86400;
 
+  actTime245_0= os.time(SerStartTm245)
+  actTime245_1= os.time(SerStartTm245) + 7*86400;
+
+  actTime246_0= os.time(SerStartTm246)
+  actTime246_1= os.time(SerStartTm246) + 2*86400;
+
+  actTime247_0= os.time(SerStartTm247)
+  actTime247_1= os.time(SerStartTm247) + 7*86400;
+
   actTime2013_01_29= os.time(SerStartTm2013_01_29);
   actTime2013_02_01= os.time(SerStartTm2013_02_01);
   actTime2013_02_05= os.time(SerStartTm2013_02_05);
@@ -1721,6 +1813,11 @@ function initActTime(y, m, d)
   actTime2013_03_14= os.time(SerStartTm2013_03_15)-86400;
   actTime2013_03_15= os.time(SerStartTm2013_03_15);
   actTime2013_04_01= os.time(SerStartTm2013_04_01);
+  actTime2013_04_03= os.time(SerStartTm2013_04_01)+86400*2;
+  actTime2013_04_12= os.time(SerStartTm2013_04_01)+86400*11;
+  actTime2013_04_27= os.time(SerStartTm2013_04_01)+86400*26;
+  actTime2013_04_09= os.time(SerStartTm2013_04_01)+86400*8;
+  actTime2013_04_14= os.time(SerStartTm2013_04_14)
 
   onActivityCheck(os.time() + 30);
 

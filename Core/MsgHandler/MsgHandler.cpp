@@ -47,6 +47,11 @@ bool MsgHandler::ProcessMsg()
                     delete[] (char *)hdr;
                     continue;
                 }
+                else if(ihdr->player->getThreadId() != m_Worker)
+                {
+                    delete[] (char *)hdr;
+                    continue;
+                }
             }
         }
         else if(hdr->cmdID >= MIN_INNER_CHECK_MSG) // Throttler to check thread id
