@@ -608,6 +608,7 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 6, 1)
         ))
     {
+#if 0
         if (pl->isOnline())
         {
             GameMsgHdr hdr(0x284, pl->getThreadId(), pl, 0);
@@ -618,6 +619,10 @@ bool enum_midnight(void * ptr, void* next)
             if (pl->GetVar(VAR_RECHARGE_CONDCNT))
                 pl->SetVar(VAR_RECHARGE_CONDCNT, 0);
         }
+#else
+        if (pl->GetVar(VAR_RECHARGE_CONDCNT))
+            pl->SetVar(VAR_RECHARGE_CONDCNT, 0);
+#endif
     }
 
     if (pl->GetVar(VAR_CONSUME) &&
