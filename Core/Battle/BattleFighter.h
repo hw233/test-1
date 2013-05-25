@@ -295,7 +295,6 @@ public:
     const GData::SkillBase* getPassiveSkillOnBePHYDmg100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnBeMagDmg100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnHP10P100(size_t& idx, bool noPossibleTarget = false);
-    const GData::SkillBase* getPassiveSkillOnDmg100(size_t& idx, bool noPossibleTarget = false);
 
     const GData::SkillBase* getPassiveSkillPreAtk(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillAftAtk(bool noPossibleTarget = false);
@@ -315,7 +314,6 @@ public:
     const GData::SkillBase* getPassiveSkillOnBePHYDmg(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnBeMagDmg(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnHP10P(bool noPossibleTarget = false);
-    const GData::SkillBase* getPassiveSkillOnDmg(bool noPossibleTarget = false);
 
     void releaseSkillCD(int cd);
     void releaseSkillCD(std::vector<GData::SkillItem>& skill, int cd);
