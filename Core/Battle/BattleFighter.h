@@ -1047,6 +1047,12 @@ private:
     bool getLingHpShield() { return _lingHpShield; }
     void setLingHpShield(bool v) { _lingHpShield = v; }
 
+    std::vector<GData::SkillItem> _passiveSkillDeadFake100;
+    std::vector<GData::SkillItem> _passiveSkillDeadFake;
+
+    const GData::SkillBase* getPassiveSkillDeadFake100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillDeadFake(bool noPossibleTarget = false);
+
 public:
 	enum StatusFlag
 	{
