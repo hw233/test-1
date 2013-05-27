@@ -117,7 +117,9 @@ enum PurchaseType
     FairySparFreshElement       = 106, //刷新仙蕴晶石中的材料
     FairySparFuseElement        = 107, //融合仙蕴晶石中的材料
     FairySparBreakoutElement    = 108, //融合(突破)仙蕴晶石中的材料
-    PetBBFT                     = 109, //八部浮屠
+    PetBBFT_PINZHI              = 109, //八部浮屠之提升基础品质消费
+    PetBBFT_CUILIAN             = 110, //八部浮屠之淬炼内丹精魄消费
+    PetBBFT_BUYCUILIAN          = 111, //八部浮屠之购买淬炼次数消费
     //繁体私有占150～200
 };
 
@@ -216,7 +218,6 @@ enum ItemFrom
     FromNewRC7DayTarget = 36, //七日目标
     FromDailyStrengthen = 37, //变强秘宝
     FromJobHunter = 38, // 寻墨游戏
-    //80 ~ 100，繁体占用
     FromDreamer = 39, // 水晶梦境
     FromFuling = 40, // 灵宝附灵
     FromVipPrivilege = 41, // 限时vip 
@@ -230,6 +231,8 @@ enum ItemFrom
     FromDirectPurchase = 49, //Q点直购
     FromPetGemMgerge = 50, //仙宠宝石合成
     FromPetDetachGem = 51, //仙宠宝石拆卸
+
+    //80 ~ 100，繁体占用
 };
 
 enum ItemTo

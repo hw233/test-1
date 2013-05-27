@@ -20692,7 +20692,7 @@ void Player::enhanceBaseScore()
     if(low > up || up > 100)
         return;
 
-    ConsumeInfo ci(PetBBFT,0,0);
+    ConsumeInfo ci(PetBBFT_PINZHI,0,0);
     useGold(10,&ci);
 
     if(low == up)
@@ -20734,7 +20734,7 @@ void Player::addCuilianTimes()
         return;
 
     UInt32 cnt = GetVar(VAR_PET_CUILIAN_LEFT_CNT) + 10;
-    ConsumeInfo ci(PetBBFT,0,0);
+    ConsumeInfo ci(PetBBFT_BUYCUILIAN,0,0);
     useGold(10*times-5, &ci);
     SetVar(VAR_PET_CUILIAN_GOLD_DAILY_CNT, times);
     SetVar(VAR_PET_CUILIAN_LEFT_CNT, cnt);
@@ -20758,7 +20758,7 @@ void Player::doCuilian(UInt8 clType, UInt8 clOpt)
         return;
 
     UInt32 score = 0;
-    ConsumeInfo ci(PetBBFT,0,0);
+    ConsumeInfo ci(PetBBFT_CUILIAN,0,0);
     switch(clOpt)
     {
     case 0x00:

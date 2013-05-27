@@ -150,6 +150,8 @@ namespace GObject
 
         if(equip->getQuality() >= Item_Yellow && FromWhere == FromBBFT)
             SYSMSG_BROADCASTV(4156, m_Owner->getCountry(), m_Owner->getName().c_str(), equip->getQuality(), equip->getName().c_str(), 1);
+        if(FromWhere == FromBBFT)
+            m_Owner->fairyPetUdpLog(10000, equip->getQuality() + 20);
         return equip;
     }
 
@@ -276,6 +278,17 @@ namespace GObject
         AddItemCoursesLog(typeId, num, FromWhere);
         if (FromWhere != FromNpcBuy && (GData::store.getPrice(typeId) || GData::GDataManager::isInUdpItem(typeId)))
             udpLog(item->getClass(), typeId, num, 0, "add");
+        if(FromWhere == FromBBFT)
+        {
+            if(item->getReqLev() == 1)
+                m_Owner->fairyPetUdpLog(10000, 26);
+            else if(item->getReqLev() == 3)
+                m_Owner->fairyPetUdpLog(10000, 27);
+            else if(item->getReqLev() == 5)
+                m_Owner->fairyPetUdpLog(10000, 28);
+            else if(item->getReqLev() == 7)
+                m_Owner->fairyPetUdpLog(10000, 29);
+        }
         return item;
 	}
 
