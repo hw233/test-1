@@ -1909,15 +1909,14 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
             UInt8 idx = 0;
 
             Int16 nStateLast = boSkill->last;
-            UInt32 effect_state = 0;
-            if(SKILL_ID(skillParam) == 122)  // 元磁神雷的符文状态被反弹
+            UInt32 effect_state = (*atkAct)[idx].param1;
+            //if(SKILL_ID(skillParam) == 122)  // 元磁神雷的符文状态被反弹
+            if(effect_state & 0xFFFF0000)
             {
                 UInt32 nparm = (*atkAct)[idx].param1;
                 nStateLast = nparm & 0x0000ffff;
                 effect_state = (nparm&0xffff0000) >> 16;
             }
-            else
-                effect_state = (*atkAct)[idx].param1;
 
             UInt16 immune = bo->getImmune();
             if((effect_state & immune) && SKILL_LEVEL(boSkill->getId()) <= bo->getImmuneLevel(effect_state))
