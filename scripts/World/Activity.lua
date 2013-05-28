@@ -1101,6 +1101,13 @@ function onActivityCheck(tm)
   else
       setGoldSnakeAct(false)
   end
+
+  if tm >= actTime2013_05_18 and tm < (actTime2013_05_18 + 10*86400) then
+      setAccRecharge(true)
+  else
+      setAccRecharge(false)
+  end
+
   --[[
   if tm >= actTime234_0 and tm < actTime234_1 then
       setHeroIslandAct(true)
@@ -1375,6 +1382,7 @@ function initActTime(y, m, d)
   local  SerStartTm247= { ['year'] = 2013, ['month'] = 5, ['day'] = 10, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm2013_04_14 = { ['year'] = 2013, ['month'] = 4, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm2013_05_18 = { ['year'] = 2013, ['month'] = 5, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   --300-399越南版用了
   actTime0 = os.time(SerStartTm);
@@ -1818,6 +1826,7 @@ function initActTime(y, m, d)
   actTime2013_04_27= os.time(SerStartTm2013_04_01)+86400*26;
   actTime2013_04_09= os.time(SerStartTm2013_04_01)+86400*8;
   actTime2013_04_14= os.time(SerStartTm2013_04_14)
+  actTime2013_05_18= os.time(SerStartTm2013_05_18)
 
   onActivityCheck(os.time() + 30);
 

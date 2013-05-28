@@ -1111,6 +1111,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->GetShuoShuo()->sendShuoShuo();
     pl->GetCFriend()->sendCFriend();
     pl->GetStrengthenMgr()->CheckTimeOver(now);
+    pl->sendTodayRechargeInfo();
     pl->sendRechargeInfo();
     pl->sendConsumeInfo();
     pl->sendRechargeNextRetInfo(now);

@@ -7798,6 +7798,9 @@ namespace GObject
         {
             AddVar(VAR_TOTALRECHARGEACT, r);
         }
+
+        AddVar(VAR_RECHARGE_TODAY, r);
+        GameAction()->onRecharge(this, r);
     }
 
     void Player::addRechargeNextRet(UInt32 r)
@@ -7909,6 +7912,12 @@ namespace GObject
         }
     }
 
+    void Player::sendTodayRechargeInfo()
+    {
+        Stream st(REP::DAILY_DATA);
+        st << static_cast<UInt8>(19) << GetVar(VAR_RECHARGE_TODAY) << Stream::eos;
+        send((st));
+    }
 
     void Player::sendRechargeInfo(bool rank)
     {
@@ -7931,6 +7940,7 @@ namespace GObject
             GLOBAL().PushMsg(hdr, &total);
         }
     }
+
     void Player::sendConsumeInfo(bool rank)
     {
         if (!World::getConsumeActive())

@@ -8670,4 +8670,28 @@ function GetSpreadAward()
     return award
 end
 
+function onRecharge(player, r)
+    if getAccRecharge() then
+        local cond = 100
+        if player:GetVar(172) >= cond and player:GetVar(173) == 0 then
+            player:AddVar(174, 1);
+            player:SetVar(173, 1)
+
+            local awards = {
+                [1] = {134,1,1},
+                [3] = {503,2,1, 500,2,1},
+                [5] = {516,2,1, 547,2,1},
+                [7] = {515,2,1, 509,1,1},
+            }
+
+            local c = player:GetVar(174)
+            if awards[c] == nil then
+                return
+            end
+
+            local ctx = string.format(msg_135, player:getPName(), c)
+            sendItemPackageMail(player, msg_134, ctx, awards[c])
+        end
+    end
+end
 

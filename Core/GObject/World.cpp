@@ -99,6 +99,7 @@ bool World::_halloween = false;
 bool World::_singleday = false;
 bool World::_thanksgiving = false;
 bool World::_christmas = false;
+bool World::_accrecharge = false;
 bool World::_newyear = false;
 bool World::_blueactiveday = false;
 bool World::_rechargeactive = false;
