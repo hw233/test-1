@@ -18568,6 +18568,7 @@ UInt8 Player::toQQGroup(bool isJoin)
         DBLOG1().PushUpdateData("insert into pet_histories (server_id,player_id,pet_id,pet_name,delete_type,pet_pinjie,pet_gengu,delete_time) values(%u,%"I64_FMT"u,%u,'%s',%u,%u,%u,%u)",
             cfg.serverLogId, getId(), id, it->second->getName().c_str(), delete_type, it->second->getPetLev(), it->second->getPetBone(), TimeUtil::Now());
 
+        SAFE_DELETE(it->second);
         _fairyPets.erase(it);
         DB2().PushUpdateData("DELETE FROM `fairyPet` WHERE id = %u AND `playerId` = %"I64_FMT"u", id, getId());
 	    DB2().PushUpdateData("DELETE FROM `fighter` WHERE `id` = %u AND `playerId` = %"I64_FMT"u", id, getId());
@@ -18696,7 +18697,6 @@ UInt8 Player::toQQGroup(bool isJoin)
                 GetPetPackage()->AddExistEquip(equip);
 
             delFairyPet(id);
-            delete pet;
         }
         else
         {
@@ -18933,7 +18933,10 @@ UInt8 Player::toQQGroup(bool isJoin)
         if(pet1->isOnBattle() || pet2->isOnBattle())
             return 1;
         if(pet1->getColor() > pet2->getColor())
-            return 1;
+        {
+            if(pet1->getColor() != 3 || pet2->getColor() != 2)
+                return 1;
+        }
         UInt16 lev = 0, pBless = 0, bone = 0;
         UInt16 gBless = 0, dazhou = 0, xiaozhou = 0, chong = 0;
         if(pet1->getPetLev() > pet2->getPetLev())
@@ -18975,6 +18978,31 @@ UInt8 Player::toQQGroup(bool isJoin)
             xiaozhou = std::max(pet1->getXiaozhou(), pet2->getXiaozhou());
             chong    = std::max(pet1->getChongNum(), pet2->getChongNum());
         }
+        UInt8 evolve = std::max(pet1->getPetEvolve(), pet2->getPetEvolve());
+        if(pet1->getColor() == 3 && pet2->getColor() == 2)
+        {   //橙宠转紫宠
+            ItemPetEq * equip = pet2->findEquip(0);
+            if(equip)
+                GetPetPackage()->AddExistEquip(equip);
+            equip = pet2->findEquip(1);
+            if(equip)
+                GetPetPackage()->AddExistEquip(equip);
+            equip = pet2->findEquip(2);
+            if(equip)
+                GetPetPackage()->AddExistEquip(equip);
+            delFairyPet(petId2, 1);
+
+            petId2 = GameAction()->getYellowPetId(petId2);
+            FairyPet * npet = static_cast<FairyPet *>(globalFighters[petId2]);
+            if(npet == NULL || findFairyPet(petId2))
+                return 1;
+            evolve = 0;
+            pet2 = npet->clone(this);
+            pet2->setColor(3);
+            addFairyPet(pet2, true);
+            SYSMSG_BROADCASTV(4139, getCountry(), getName().c_str(), pet2->getColor(), pet2->getName().c_str());
+            SYSMSG_SENDV(4134, this, pet2->getColor(), pet2->getName().c_str());
+        }
         pet2->setPetLev(lev);
         pet2->setPetBone(bone);
         pet2->setPinjieBless1(pBless);
@@ -18982,6 +19010,7 @@ UInt8 Player::toQQGroup(bool isJoin)
         pet2->setDazhou(dazhou);
         pet2->setXiaozhou(xiaozhou);
         pet2->setChongNum(chong);
+        pet2->setPetEvolve(evolve);
         pet2->UpdateToDB();
         pet2->setPotential(GData::pet.getPetPotential(bone));
         pet2->setLevel(lev);
@@ -18999,9 +19028,9 @@ UInt8 Player::toQQGroup(bool isJoin)
             GetPetPackage()->AddExistEquip(equip);
 
         delFairyPet(petId1, 1);
-        delete pet1;
-        pet2->sendPinjieInfo();
-        pet2->sendGenguInfo();
+        //pet2->sendPinjieInfo();
+        //pet2->sendGenguInfo();
+        //pet2->sendPetEvolve();
         return 0;
     }
 
@@ -19053,7 +19082,6 @@ UInt8 Player::toQQGroup(bool isJoin)
         SYSMSG_BROADCASTV(4139, getCountry(), getName().c_str(), npet2->getColor(), npet2->getName().c_str());
 		SYSMSG_SENDV(4134, this, npet2->getColor(), npet2->getName().c_str());
         delFairyPet(petId, 2);
-        delete pet;
         //npet2->sendPinjieInfo();
         //npet2->sendGenguInfo();
         return petId;

@@ -6578,7 +6578,7 @@ namespace GObject
         }
 
         SYSMSG(title, 4124);
-        SYSMSG(content, 4124);
+        SYSMSG(content, 4125);
 
         MailItemsInfo itemsInfo(&(mitem[0]), LingbaoFuling, mitem.size());
         Mail * pmail = m_Owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
