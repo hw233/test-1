@@ -20770,58 +20770,74 @@ void Player::addCuilianTimes()
     updateCuilianTimes();
 }
 
-void Player::doCuilian(UInt8 clType, UInt8 clOpt)
+void Player::doCuilian(UInt8 clType, UInt8 clOpt, UInt8 isAll)
 {
     if(!checkBBFT())
         return;
-    UInt32 leftCnt = GetVar(VAR_PET_CUILIAN_LEFT_CNT);
-    UInt32 times = 0;
-    if(leftCnt == 0)
+    int leftCnt = GetVar(VAR_PET_CUILIAN_LEFT_CNT);
+    int times = 0;
+    if(leftCnt <= 0)
         return;
     if(clType == 0)
         times = GetVar(VAR_PET_CUILIAN_SCORE_EQUIP_TIMES);
     else
         times = GetVar(VAR_PET_CUILIAN_SCORE_GEM_TIMES);
-    if(times >= 10)
+    if(times >= 10 || times < 0)
         return;
 
     UInt32 score = 0;
+    UInt32 cltimes = isAll ? 10-times : 1;
     ConsumeInfo ci(PetBBFT_CUILIAN,0,0);
     switch(clOpt)
     {
     case 0x00:
-        if(getTael() < 10)
+        if(getTael() < 10*cltimes)
             return;
-        useTael(10, &ci);
+        if(isAll)
+            cltimes = doCuilian1(leftCnt, times);
+        useTael(10*cltimes, &ci);
         break;
     case 0x01:
         {
             UInt32 petLike = GetVar(VAR_FAIRYPET_LIKEABILITY);
-            if(petLike < 1)
+            if(petLike < 1*cltimes)
                 return;
-            SetVar(VAR_FAIRYPET_LIKEABILITY, petLike - 1);
+            if(isAll)
+                cltimes = doCuilian1(leftCnt, times);
+            SYSMSG_SENDV(145, this, cltimes);
+            SYSMSG_SENDV(1045, this, cltimes);
+            SetVar(VAR_FAIRYPET_LIKEABILITY, petLike - 1*cltimes);
             sendFairyPetResource();
-            score = 100;
+            score = 100*cltimes;
         }
         break;
     case 0x02:
-        if(getGold() < 5)
+        if(getGold() < 5*cltimes)
             return;
-        useGold(5, &ci);
-        score = 100;
+        if(isAll)
+            cltimes = doCuilian1(leftCnt, times);
+        useGold(5*cltimes, &ci);
+        score = 100*cltimes;
         break;
     default:
         return;
     }
 
-    ++ times;
-    -- leftCnt;
+    if(cltimes == 0) return;
+    if(isAll == false)
+    {
+        ++ times;
+        -- leftCnt;
+    }
 
     UInt32 low = GetVar(VAR_PET_CUILIAN_EXTRA_LOW_SCORE) + 40;
     UInt32 up = GetVar(VAR_PET_CUILIAN_EXTRA_UP_SCORE) + 60;
-    score += low;
-    if(up > low)
-        score += uRand(up - low);
+    for(UInt8 i = 0; i < cltimes; ++ i)
+    {
+        score += low;
+        if(up > low)
+            score += uRand(up - low);
+    }
     if(clType == 0)
     {
         score += GetVar(VAR_PET_CUILIAN_SCORE_EQUIP);
@@ -20843,6 +20859,29 @@ void Player::doCuilian(UInt8 clType, UInt8 clOpt)
     send(st);
 }
 
+UInt8 Player::doCuilian1(int& leftCnt, int& times)
+{
+    UInt8 cltimes = 0;
+    int tmp1 = leftCnt, tmp2 = 10 - times;
+    for(int i = 0; i < tmp1 && i < tmp2; ++ i)
+    {
+        ++ cltimes;
+        ++ times;
+        -- leftCnt;
+        if(leftCnt <= 0)
+        {
+            leftCnt = 0;
+            break;
+        }
+        if(times >= 10)
+        {
+            times = 10;
+            break;
+        }
+    }
+    return cltimes;
+}
+
 void Player::pickupCuilian(UInt8 clType)
 {
     if(!checkBBFT())
@@ -20860,7 +20899,7 @@ void Player::pickupCuilian(UInt8 clType)
         score = GetVar(VAR_PET_CUILIAN_SCORE_GEM);
     }
 
-    if(times != 10 || score == 0)
+    if(times < 10 || score == 0)
         return;
 
     if(clType == 0)
