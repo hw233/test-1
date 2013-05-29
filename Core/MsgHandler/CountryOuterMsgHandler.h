@@ -1291,6 +1291,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->getLevelAwardInfo();
     pl->GetFairySpar()->sendAllInfo();
     pl->sendDirectPurInfo();
+    pl->getQQTenpayAward(0);
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )

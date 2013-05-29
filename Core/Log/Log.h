@@ -120,6 +120,7 @@ enum PurchaseType
     PetBBFT_PINZHI              = 109, //八部浮屠之提升基础品质消费
     PetBBFT_CUILIAN             = 110, //八部浮屠之淬炼内丹精魄消费
     PetBBFT_BUYCUILIAN          = 111, //八部浮屠之购买淬炼次数消费
+    Equip_Inherit               = 112, //装备继承消费
     //繁体私有占150～200
 };
 
@@ -231,7 +232,9 @@ enum ItemFrom
     FromDirectPurchase = 49, //Q点直购
     FromPetGemMgerge = 50, //仙宠宝石合成
     FromPetDetachGem = 51, //仙宠宝石拆卸
-
+    FromQQTenpay = 52, //QQ财付通奖励
+    FromQQIMQuickLogin = 53, //QQIM快速登录奖励
+    FromEquipMoveAward = 54, //装备继承奖励
     //80 ~ 100，繁体占用
 };
 

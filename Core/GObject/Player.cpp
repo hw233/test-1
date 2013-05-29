@@ -10972,9 +10972,227 @@ namespace GObject
             //QQ音乐奖励
             getQQMusicAward(opt);
             break;
+        case 22:
+            //QQ财付通奖励
+            getQQTenpayAward(opt);
+            break;
+        case 23:
+            //QQIM快速登录奖励
+            getQQIMQuickLoginAward(opt);
+            break;
+        case 24:
+            //装备继承补偿
+            getEquipMoveAward(opt);
+            break;
+
         }
     }
+                
+    void Player::getEquipMoveAward(UInt8 opt)
+    {
+       /* UInt8 state = GetVar(VAR_EQUIP_MOVE_AWARD);
 
+        int count = int(getFighterEquipAward() + GetPackage()->getPackageEquipCount());
+
+        if(0 == state)
+        {
+            if(1 == opt)
+            {
+
+                if(GetPackage()->GetRestPackageSize() < 6)
+                {
+                    sendMsgCode(0, 1011);
+
+                     return;
+                }
+
+                GetPackage()->AddItem(503, count, true, false, FromEquipMoveAward);
+
+                SetVar(VAR_EQUIP_MOVE_AWARD, 1);
+
+                count = -1;
+            }
+        }
+        else
+        {
+            count = -1;
+        }
+
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(24);
+        st << count << Stream::eos;
+        send(st);*/
+    }
+
+    UInt8 Player::getFighterEquipAward()
+    {
+        UInt8 count = 0;
+
+        std::map<UInt32, Fighter *>::iterator it = _fighters.begin();
+
+        for (; it != _fighters.end(); ++it)
+        {
+            Fighter* fgt = it->second;
+
+            ItemEquip* e[8] = {fgt->getWeapon(), fgt->getArmor(0), fgt->getArmor(1),
+                fgt->getArmor(2), fgt->getArmor(3), fgt->getArmor(4), fgt->getAmulet(),
+                fgt->getRing()};
+
+            for (int i = 0; i < 8; ++i)
+            {
+                if(e[i] && e[i]->getReqLev() >= 60)
+                {
+                   if(Item_Weapon == e[i]->getClass())
+                   {
+                       if(6 == e[i]->getItemEquipData().enchant)
+                       {
+                            count += 1;
+                       }
+                       else if(7 == e[i]->getItemEquipData().enchant)
+                       {
+                           count += 2;
+                       }
+                       else if(8 == e[i]->getItemEquipData().enchant)
+                       {
+                           count += 10;
+                       }
+                       else if(9 == e[i]->getItemEquipData().enchant)
+                       {
+                           count += 30;
+                       }
+                       else if(10 == e[i]->getItemEquipData().enchant)
+                       {
+                           count += 50;
+                       }
+                       else if(11 == e[i]->getItemEquipData().enchant)
+                       {
+                           count += 100;
+                       }
+                       else if(12 == e[i]->getItemEquipData().enchant)
+                       {
+                           count += 150;
+                       }
+                   }
+                   else
+                   {
+                       if(6 == e[i]->getItemEquipData().enchant)
+                       {
+                            count += 1;
+                       }
+                       else if(7 == e[i]->getItemEquipData().enchant)
+                       {
+                           count += 2;
+                       }
+                       else if(8 == e[i]->getItemEquipData().enchant)
+                       {
+                           count += 5;
+                       }
+                       else if(9 == e[i]->getItemEquipData().enchant)
+                       {
+                           count += 10;
+                       }
+                       else if(10 == e[i]->getItemEquipData().enchant)
+                       {
+                           count += 20;
+                       }
+                       else if(11 == e[i]->getItemEquipData().enchant)
+                       {
+                           count += 40;
+                       }
+                       else if(12 == e[i]->getItemEquipData().enchant)
+                       {
+                           count += 70;
+                       }
+                   }
+                }
+            }
+        }
+       
+        return count;
+    }
+
+    void Player::getQQTenpayAward(UInt8 opt)
+    {
+        
+       /* UInt8 state = GetVar(VAR_QQTENPAY_AWARD);
+
+        if(getVia() == "ssgw_qqdh")
+        {
+
+            if (GetPackage()->GetRestPackageSize() < 6 && opt == 1)
+            {
+			    sendMsgCode(0, 1011);
+
+                return;
+            }
+
+            if(opt == 1 && state == 0)
+            {
+                GetPackage()->AddItem(9371, 2, true, false, FromQQTenpay);
+                GetPackage()->AddItem(503, 1, true, false, FromQQTenpay);
+                GetPackage()->AddItem(515, 1, true, false, FromQQTenpay);
+                GetPackage()->AddItem(509, 1, true, false, FromQQTenpay);
+                GetPackage()->AddItem(30, 2, true, false, FromQQTenpay);
+
+                SetVar(VAR_QQTENPAY_AWARD, 1);
+            }
+            
+            state += 1;
+        }
+        else
+        {
+            if(1 == state)
+            {
+                state += 1;
+            }
+        }
+
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(22);
+        st << 1 << Stream::eos;
+        send(st);*/
+    }
+
+    void Player::getQQIMQuickLoginAward(UInt8 opt)
+    {
+       /* UInt8 state = GetVar(VAR_QQIM_QUICK_LOGIN_AWARD);
+
+        if(getVia() == "sscq_QQCLIENT.MAINPANEL.SETAPP")
+        {
+
+            if(GetPackage()->GetRestPackageSize() < 6 && 1 == opt)
+            {
+			    sendMsgCode(0, 1011);
+
+                return;
+            }
+
+            if(state == 0 && opt == 1)
+            {
+                GetPackage()->AddItem(51, 1, true, false, FromQQIMQuickLogin);
+                GetPackage()->AddItem(48, 1, true, false, FromQQIMQuickLogin);
+                GetPackage()->AddItem(9371, 1, true, false, FromQQIMQuickLogin);
+                GetPackage()->AddItem(56, 1, true, false, FromQQIMQuickLogin);
+                GetPackage()->AddItem(15, 1, true, false, FromQQIMQuickLogin);
+
+                SetVar(VAR_QQIM_QUICK_LOGIN_AWARD, 1);
+                state = 1;
+            }
+            state += 1;
+        }
+        else
+        {
+            if(1 == state)
+            {
+                state += 1;
+            }
+        }
+
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(23);
+        st << state << Stream::eos;
+        send(st);*/
+    }
 
     void Player::getQQMusicAward(UInt8 opt)
     {
@@ -10995,7 +11213,9 @@ namespace GObject
             GetPackage()->AddItem(50, 1, true, false, FromQQMusic);
             GetPackage()->AddItem(49, 1, true, false, FromQQMusic);
             GetPackage()->AddItem(30, 1, true, false, FromQQMusic);
+
             SetVar(VAR_QQMUSIC_DAY_AWARD, 1);
+
             state = 1;
         }
 
@@ -11013,41 +11233,41 @@ namespace GObject
         UInt8 weekAward = GetVar(VAR_QQNAVIGATION_WEEK_AWARD);
         UInt8 firstLoginAward = GetVar(VAR_QQNAVIGATION_FIRST_LOGIN_AWARD);
 
-        if (GetPackage()->GetRestPackageSize() < 6 && opt >= 1 && opt <= 3) 
-        {
-			sendMsgCode(0, 1011);
-
-            return;
-        }
-
-
         if(getVia() == "ssgw_qqdh")
         {
-             if(opt == 1 && dayAward == 0)  //领取QQ导航每天奖励
-             {
-                 GetPackage()->AddItem(15, 1, true, false,FromQQNavigation);
-                 GetPackage()->AddItem(48, 1, true, false, FromQQNavigation);
-                 SetVar(VAR_QQNAVIGATION_DAY_AWARD, 1);
-                 dayAward = 1;
-             }
-             else if(opt == 2 && weekAward == 0)  //领取QQ导航每月奖励
-             {
-                 GetPackage()->AddItem(133, 1, true, false,FromQQNavigation);
-                 GetPackage()->AddItem(1325, 1, true, false, FromQQNavigation);
-                 SetVar(VAR_QQNAVIGATION_WEEK_AWARD, 1);
-                 weekAward = 1;
-             }
-             else if(opt == 3 && firstLoginAward == 0)  //领取QQ导航首次登录奖励
-             {
-                 GetPackage()->AddItem(503, 1, true, false,FromQQNavigation);
-                 GetPackage()->AddItem(500, 1, true, false, FromQQNavigation);
-                 GetPackage()->AddItem(50, 1, true, false, FromQQNavigation);
-                 GetPackage()->AddItem(49, 1, true, false, FromQQNavigation);
-                 SetVar(VAR_QQNAVIGATION_FIRST_LOGIN_AWARD, 1);
-                 firstLoginAward = 1;
-             }
 
-           states = (dayAward + 1) | (weekAward + 1) << 2 | (firstLoginAward + 1) << 4;
+            if (GetPackage()->GetRestPackageSize() < 6 && opt >= 1 && opt <= 3) 
+            {
+			    sendMsgCode(0, 1011);
+
+                return;
+            }
+
+            if(opt == 1 && dayAward == 0)  //领取QQ导航每天奖励
+            {
+                GetPackage()->AddItem(15, 1, true, false,FromQQNavigation);
+                GetPackage()->AddItem(48, 1, true, false, FromQQNavigation);
+                SetVar(VAR_QQNAVIGATION_DAY_AWARD, 1);
+                dayAward = 1;
+            }
+            else if(opt == 2 && weekAward == 0)  //领取QQ导航每月奖励
+            {
+                GetPackage()->AddItem(133, 1, true, false,FromQQNavigation);
+                GetPackage()->AddItem(1325, 1, true, false, FromQQNavigation);
+                SetVar(VAR_QQNAVIGATION_WEEK_AWARD, 1);
+                weekAward = 1;
+            }
+            else if(opt == 3 && firstLoginAward == 0)  //领取QQ导航首次登录奖励
+            {
+                GetPackage()->AddItem(503, 1, true, false,FromQQNavigation);
+                GetPackage()->AddItem(500, 1, true, false, FromQQNavigation);
+                GetPackage()->AddItem(50, 1, true, false, FromQQNavigation);
+                GetPackage()->AddItem(49, 1, true, false, FromQQNavigation);
+                SetVar(VAR_QQNAVIGATION_FIRST_LOGIN_AWARD, 1);
+                firstLoginAward = 1;
+            }
+
+            states = (dayAward + 1) | (weekAward + 1) << 2 | (firstLoginAward + 1) << 4;
         }
         else
         {
