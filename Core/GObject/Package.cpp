@@ -1188,6 +1188,20 @@ namespace GObject
 		return NULL;
 	}
 
+    ItemBase*  Package::AddEquipEnchant(UInt32 typeId, UInt8 enchant, bool notify, bool bind/* = false*/, UInt8 FromWhere/* = 0*/)
+    {
+		ItemEquip* equip = AddEquip2(typeId, notify, bind, FromWhere);
+        if(!equip)
+            return NULL;
+
+		ItemEquipData& ied = equip->getItemEquipData();
+        ied.enchant = enchant;
+        DB4().PushUpdateData("UPDATE `equipment` SET `enchant` = %u WHERE `id` = %u", ied.enchant, equip->getId());
+        DBLOG().PushUpdateData("insert into enchant_histories (server_id, player_id, equip_id, template_id, enchant_level, enchant_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), equip->getId(), equip->GetItemType().getId(), ied.enchant, TimeUtil::Now());
+
+        return equip;
+    }
+
     ItemEquip* Package::AddUpgradeEquip(UInt32 typeId, UInt32 oldEquipId, bool notify, bool bind , ItemEquipData& ed, float * maxv)
     {
         const GData::ItemBaseType * itype = CheckBeforeEquipUpgrade(typeId);

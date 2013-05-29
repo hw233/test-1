@@ -120,6 +120,7 @@ enum PurchaseType
     PetBBFT_PINZHI              = 109, //八部浮屠之提升基础品质消费
     PetBBFT_CUILIAN             = 110, //八部浮屠之淬炼内丹精魄消费
     PetBBFT_BUYCUILIAN          = 111, //八部浮屠之购买淬炼次数消费
+    ZCJBRoolAward               = 112, //招财进宝抽奖
     //繁体私有占150～200
 };
 
@@ -133,6 +134,7 @@ enum IncomingType
     FengsuiFromYouli            = 133, //游历获得凤髓
     FengsuiFromConvert          = 134, //放生获得凤髓
     FengsuiFromUseItem          = 135, //使用物品获得凤髓
+    InZCJBRoolAward             = 136, //招财进宝抽奖
 };
 
 enum MoneyType
@@ -231,6 +233,7 @@ enum ItemFrom
     FromDirectPurchase = 49, //Q点直购
     FromPetGemMgerge = 50, //仙宠宝石合成
     FromPetDetachGem = 51, //仙宠宝石拆卸
+    FromOEquipAward = 52, //橙装礼包
 
     //80 ~ 100，繁体占用
 };

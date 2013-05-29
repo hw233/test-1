@@ -887,15 +887,16 @@ void Leaderboard::newDrawingGame(UInt32 nextday)
     if(cfg.openYear <= 2011)
         return;
     UInt32 opTime = TimeUtil::MkTime(cfg.openYear, cfg.openMonth, cfg.openDay);
+    bool after_20130531 = (TimeUtil::MkTime(2013, 5, 31) <= opTime);
     UInt32 days = 7;
-    if (cfg.rpServer)
-        days = 30;;
+    if (cfg.rpServer || after_20130531)
+        days = 30;
     if(TimeUtil::SharpDay(0, nextday) == opTime + days * 86400 )
     {
         UInt16 newAward[] = { 1000,800,600,400,200,100,100,100,100,100 };
         UInt16 newAwardRP[] = { 1000,800,600,300,300,300,300,300,300,300 };
         UInt16* pAward = newAward;
-        if (cfg.rpServer)
+        if (cfg.rpServer || after_20130531)
             pAward = newAwardRP;
         //新人冲级赛 等级前十 送礼券
         for(UInt16 rank = 0; rank < _levelRankWorld10.size(); ++rank){
@@ -920,9 +921,21 @@ void Leaderboard::newDrawingGame(UInt32 nextday)
         }
     }
     //回流服务器战斗力排行
-    if(cfg.rpServer && TimeUtil::SharpDay(0, nextday) == opTime + 30 * 86400)
+    //if(cfg.rpServer && TimeUtil::SharpDay(0, nextday) == opTime + 30 * 86400)
+    if(TimeUtil::SharpDay(0, nextday) == opTime + 30 * 86400)
     {
-        static  MailPackage::MailItem s_item[6] = {{0xA000,500},{503,20},{515,10},{1325,10},{134,10},{50,10}};
+        static  MailPackage::MailItem s_item[10][6] = {
+            {{0xA000,1000},{9367,20},{9369,20},{134,20},{50,20}},
+            {{0xA000,800},{9367,10},{9369,10},{134,10},{50,10}},
+            {{0xA000,600},{9367,8},{9369,8},{134,8},{50,8}},
+            {{0xA000,300},{9367,3},{9369,3},{134,3},{50,3}},
+            {{0xA000,300},{9367,3},{9369,3},{134,3},{50,3}},
+            {{0xA000,300},{9367,3},{9369,3},{134,3},{50,3}},
+            {{0xA000,300},{9367,3},{9369,3},{134,3},{50,3}},
+            {{0xA000,300},{9367,3},{9369,3},{134,3},{50,3}},
+            {{0xA000,300},{9367,3},{9369,3},{134,3},{50,3}},
+            {{0xA000,300},{9367,3},{9369,3},{134,3},{50,3}}
+        };
         int rank = 0;
         std::multimap<int, Player*, std::greater<int> >::iterator iter1;
         for (iter1 = _battleRankWorld.begin(); iter1 != _battleRankWorld.end(); ++iter1)
@@ -931,13 +944,12 @@ void Leaderboard::newDrawingGame(UInt32 nextday)
             Player* pl = iter1->second;
             if (pl)
             {
-                UInt16 ctxId = rank>3?4904:(4900+rank);
                 SYSMSG(title, 4900);
-                SYSMSGV(content, ctxId, rank);
+                SYSMSGV(content, 4901, rank);
                 Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
                 if(mail)
                 {
-                    mailPackageManager.push(mail->id, s_item, 6, true);
+                    mailPackageManager.push(mail->id, s_item, 5, true);
                 }
             }
             if (rank >= 10)
@@ -945,7 +957,8 @@ void Leaderboard::newDrawingGame(UInt32 nextday)
 	    }
     }
     //回流服务器充值排行
-    if(cfg.rpServer && TimeUtil::SharpDay(0, nextday) == opTime + 7 * 86400 )
+    //if(cfg.rpServer && TimeUtil::SharpDay(0, nextday) == opTime + 7 * 86400 )
+    if(TimeUtil::SharpDay(0, nextday) == opTime + 7 * 86400 )
         World::SendRechargeRP7RankAward();
 
 }

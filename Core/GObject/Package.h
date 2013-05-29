@@ -112,6 +112,8 @@ namespace GObject
 		ItemBase*  AddEquip2(ItemEquip *, UInt8 FromWhere = 0);
 		ItemBase*  AddEquip2(UInt32 typeId, bool notify, bool bind = false, UInt8 FromWhere = 0);
 		ItemBase*  AddEquipN(UInt32 typeId, UInt32 num, bool bind = false, bool silence = false, UInt8 FromWhere = 0);
+		ItemBase*  AddEquipEnchant(UInt32 typeId, UInt8 enchant, bool notify, bool bind = false, UInt8 FromWhere = 0);
+
 		ItemBase*  AddEquipFromDB(UInt32 id, bool bind);
 		ItemBase*  Add(UInt32 typeId, UInt32 num, bool bind = false, bool silence = false, UInt8 FromWhere = 0);
 		ItemBase*  SetItem(UInt32 typeId, UInt32 num, bool bind = false);

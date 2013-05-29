@@ -445,7 +445,12 @@ namespace GObject
         VAR_QQNAVIGATION_FIRST_LOGIN_AWARD = 502, // QQ导航首次登录奖励是否领取
 
         VAR_QQMUSIC_DAY_AWARD = 503, // QQ音乐每天奖励是否领取
-       
+
+        // 521-540 for zhgc
+        VAR_ZCJB_TIMES = 521,      // 招财进宝
+        VAR_ZRYJ_COUNT = 522,      // 逐日印记
+        VAR_HYYJ_COUNT = 523,      // 皓月印记
+
         VAR_MAX,
     };
 
@@ -836,6 +841,10 @@ namespace GObject
             REGISTER_VAR(VAR_PET_CUILIAN_SCORE_GEM, CYCLE_NONE);
             REGISTER_VAR(VAR_PET_CUILIAN_SCORE_EQUIP_TIMES, CYCLE_NONE);
             REGISTER_VAR(VAR_PET_CUILIAN_SCORE_GEM_TIMES, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_ZCJB_TIMES, CYCLE_NONE);
+            REGISTER_VAR(VAR_ZRYJ_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_HYYJ_COUNT, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

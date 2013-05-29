@@ -7807,6 +7807,8 @@ namespace GObject
         GameAction()->onRecharge(this, r);
         if(WORLD().getAccRecharge())
             sendTodayRechargeInfo();
+
+        checkZCJB();
     }
 
     void Player::addRechargeNextRet(UInt32 r)
@@ -16829,6 +16831,10 @@ void EventTlzAuto::notify(bool isBeginAuto)
             return;
         if(career == 0 || career > 3)
             return;
+
+        if(_playerData.totalRecharge < newRecharge[step])
+            return;
+
         UInt32 curStep = GetVar(VAR_FIRST_RECHARGE_STEP);
         /*
          * bit 1: 10XS
@@ -20893,6 +20899,95 @@ bool Player::checkBBFT()
     }
 
     return true;
+}
+
+#define ZCJB_TOTAL(v) ((v>>8)&0xFF)
+#define ZCJB_LEFT(v)  (v&0xFF)
+#define ZCJB(t, l)    (((t&0xFF)<<8)|(l&0xFF))
+void Player::sendRPZCJBInfo()
+{
+    UInt32 opTime = TimeUtil::MkTime(cfg.openYear, cfg.openMonth, cfg.openDay);
+    bool after_20130531 = (TimeUtil::MkTime(2013, 5, 31) <= opTime);
+    if(!after_20130531)
+        return;
+
+    UInt32 zcjb = GetVar(VAR_ZCJB_TIMES);
+    Stream st(REP::RP_SERVER);
+    st << static_cast<UInt8>(0x04);
+    st << static_cast<UInt8>(ZCJB_TOTAL(zcjb));
+    st << static_cast<UInt8>(ZCJB_LEFT(zcjb));
+    st << Stream::eos;
+    send(st);
+}
+
+static UInt32 zcjb_prob[2] = {99, 100};
+static UInt32 zcjb_gold[16] = {
+    100, 200, 400, 600,
+    800, 1200, 2000, 4000,
+    8000, 15000, 30000, 60000,
+    100000, 200000, 400000, 800000
+};
+static UInt32 zcjb_award[16][3] = {
+    {110, 113, 150}, {210, 214, 300}, {420, 432, 600}, {620, 636, 800},
+    {820, 848, 1100}, {1240, 1296, 1800}, {2100, 2180, 2800}, {4240, 4480, 6000},
+    {8480, 8960, 13000}, {16000, 16500, 23000}, {32100, 33300, 50000}, {64200, 66600, 90000},
+    {106000, 109000, 160000}, {216000, 222000, 350000}, {432000, 444000, 680000}, {880000, 896000, 999999}
+};
+
+bool Player::getRPZCJBAward()
+{
+    UInt32 zcjb = GetVar(VAR_ZCJB_TIMES);
+    UInt8 left = ZCJB_LEFT(zcjb);
+    UInt8 total = ZCJB_TOTAL(zcjb);
+
+    if(left == 0 || left > total)
+        return false;
+    UInt8 awardIdx = total - left;
+    if(getGold() < zcjb_gold[awardIdx])
+    {
+        sendMsgCode(0, 1104);
+        return false;
+    }
+    UInt8 roolIdx = 1;
+    UInt8 rnd = uRand(100);
+    if(rnd < zcjb_prob[0])
+        roolIdx = 0;
+
+    ConsumeInfo ci(ZCJBRoolAward,0,0);
+    useGold(zcjb_gold[awardIdx], &ci);
+
+    UInt32 awardGold = zcjb_award[awardIdx][roolIdx] + uRand((zcjb_award[awardIdx][roolIdx+1] - zcjb_award[awardIdx][roolIdx]));
+    IncommingInfo ii(InZCJBRoolAward, 0, 0);
+    getGold(awardGold, &ii);
+
+    sendRPZCJBInfo();
+    return true;
+}
+
+void Player::checkZCJB()
+{
+    UInt32 opTime = TimeUtil::MkTime(cfg.openYear, cfg.openMonth, cfg.openDay);
+    bool after_20130531 = (TimeUtil::MkTime(2013, 5, 31) <= opTime);
+    if(!after_20130531)
+        return;
+
+    UInt32 zcjb = GetVar(VAR_ZCJB_TIMES);
+    UInt8 left = ZCJB_LEFT(zcjb);
+    UInt8 total = ZCJB_TOTAL(zcjb);
+
+    UInt8 oldTotal = total;
+    for(; total < 16; ++ total)
+    {
+        if(_playerData.totalRecharge < zcjb_gold[total])
+            break;
+    }
+
+    if(oldTotal < total)
+    {
+        left += total - oldTotal;
+        SetVar(VAR_ZCJB_TIMES, ZCJB(total, left));
+        sendRPZCJBInfo();
+    }
 }
 
 } // namespace GObject
