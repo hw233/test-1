@@ -4720,7 +4720,7 @@ namespace GObject
 
     UInt8 Package::EquipMove( UInt16 fFighterId, UInt16 tFighterId, UInt32 fromItemId, UInt32 toItemId, UInt8 type, UInt8 mark)
     {
-        if(mark == 1 && World().getOpenTime() < TimeUtil::MkTime(2013, 5, 30))
+        if(mark == 1 && World::getOpenTime() < TimeUtil::MkTime(2013, 5, 30))
             return 19;
 
         UInt8 res = 0;
