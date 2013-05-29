@@ -6,6 +6,7 @@
 #include "MsgID.h"
 #include "Fighter.h"
 #include "Package.h"
+#include "PetPackage.h"
 #include "Script/BattleFormula.h"
 #include "Server/WorldServer.h"
 #include "Server/OidGenerator.h"
@@ -89,6 +90,11 @@ void ChatItem::post( UInt8 type, UInt64 pid, UInt32 id, Player * player )
 		}
 		break;
 	case 0x06:
+		{
+			FastMutex::ScopedLock lk(_petItemMutex);
+			addPetItem(player, id, pid);
+			return;
+		}
 		break;
 	case 0x07:
 		{
@@ -123,6 +129,17 @@ void ChatItem::post( UInt8 type, UInt64 pid, UInt32 id, Player * player )
 		}
 		break;
 	case 0x16:
+		{
+			FastMutex::ScopedLock lk(_petItemMutex);
+			std::map<UInt32, ChatItemData>::iterator it = _petItemData.find(id);
+			if(it == _petItemData.end())
+			{
+				return;
+			}
+			it->second.lastAccess = TimeUtil::Now();
+			player->send(it->second.st);
+			return;
+		}
 		break;
 	case 0x17:
 		{
@@ -168,6 +185,18 @@ void ChatItem::purge( UInt32 curtime )
 	}
 
 	{
+		FastMutex::ScopedLock lk(_petItemMutex);
+		std::map<UInt32, ChatItemData>::iterator it = _petItemData.begin();
+		while(it != _petItemData.end())
+		{
+			if(curtime > it->second.lastAccess + 3600 * 3)
+				_petItemData.erase(it ++);
+			else
+				++ it;
+		}
+	}
+
+	{
 		FastMutex::ScopedLock lk(_petMutex);
 		std::map<FIndex, ChatItemData>::iterator it = _fairyPetData.begin();
 		while(it != _fairyPetData.end())
@@ -178,6 +207,23 @@ void ChatItem::purge( UInt32 curtime )
 				++ it;
 		}
 	}
+}
+
+void ChatItem::addPetItem( Player * player, UInt32 id, UInt32 petId )
+{
+    FairyPet * pet = NULL;
+    UInt8 pos = 0;
+    ItemPetEq * equip = player->GetPetPackage()->FindPetEquip(pet, petId, pos, id);
+    if(equip == NULL)
+        return;
+
+	ChatItemData& cid = _petItemData[id];
+	cid.st.init(REP::FLAUNT_GOOD);
+	cid.st << static_cast<UInt8>(0x06) << static_cast<UInt8>(player->IsMale() ? 0 : 1) << player->getCountry()
+		<< player->getName();
+	player->GetPetPackage()->AppendEquipData(cid.st, equip);
+	cid.st << Stream::eos;
+	cid.lastAccess = TimeUtil::Now();
 }
 
 UInt32 ChatItem::addFairyPet( Player * player, UInt32 id )

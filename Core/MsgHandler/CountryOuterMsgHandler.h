@@ -6211,6 +6211,8 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
                         player->send(st);
                         if(petId)
                         {
+                            SYSMSG_SENDV(145, player, 15);
+                            SYSMSG_SENDV(1045, player, 15);
                             player->setCanHirePet(petId);
                             player->writeCanHiretPet();
                         }
@@ -6320,10 +6322,9 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
                     break;
                 case 0x03:  //开始淬炼
                     {
-                        UInt8 clType = 0;
-                        UInt8 clOpt = 0;
-                        brd >> clType >> clOpt;
-                        player->doCuilian(clType, clOpt);
+                        UInt8 clType = 0, clOpt = 0, isAll = 0;
+                        brd >> clType >> clOpt >> isAll;
+                        player->doCuilian(clType, clOpt, isAll);
                     }
                     break;
                 case 0x04:  //提取淬炼（内丹或精魄）

@@ -18788,6 +18788,7 @@ UInt8 Player::toQQGroup(bool isJoin)
         DBLOG1().PushUpdateData("insert into pet_histories (server_id,player_id,pet_id,pet_name,delete_type,pet_pinjie,pet_gengu,delete_time) values(%u,%"I64_FMT"u,%u,'%s',%u,%u,%u,%u)",
             cfg.serverLogId, getId(), id, it->second->getName().c_str(), delete_type, it->second->getPetLev(), it->second->getPetBone(), TimeUtil::Now());
 
+        SAFE_DELETE(it->second);
         _fairyPets.erase(it);
         DB2().PushUpdateData("DELETE FROM `fairyPet` WHERE id = %u AND `playerId` = %"I64_FMT"u", id, getId());
 	    DB2().PushUpdateData("DELETE FROM `fighter` WHERE `id` = %u AND `playerId` = %"I64_FMT"u", id, getId());
@@ -18916,7 +18917,6 @@ UInt8 Player::toQQGroup(bool isJoin)
                 GetPetPackage()->AddExistEquip(equip);
 
             delFairyPet(id);
-            delete pet;
         }
         else
         {
@@ -19153,7 +19153,10 @@ UInt8 Player::toQQGroup(bool isJoin)
         if(pet1->isOnBattle() || pet2->isOnBattle())
             return 1;
         if(pet1->getColor() > pet2->getColor())
-            return 1;
+        {
+            if(pet1->getColor() != 3 || pet2->getColor() != 2)
+                return 1;
+        }
         UInt16 lev = 0, pBless = 0, bone = 0;
         UInt16 gBless = 0, dazhou = 0, xiaozhou = 0, chong = 0;
         if(pet1->getPetLev() > pet2->getPetLev())
@@ -19195,6 +19198,31 @@ UInt8 Player::toQQGroup(bool isJoin)
             xiaozhou = std::max(pet1->getXiaozhou(), pet2->getXiaozhou());
             chong    = std::max(pet1->getChongNum(), pet2->getChongNum());
         }
+        UInt8 evolve = std::max(pet1->getPetEvolve(), pet2->getPetEvolve());
+        if(pet1->getColor() == 3 && pet2->getColor() == 2)
+        {   //橙宠转紫宠
+            ItemPetEq * equip = pet2->findEquip(0);
+            if(equip)
+                GetPetPackage()->AddExistEquip(equip);
+            equip = pet2->findEquip(1);
+            if(equip)
+                GetPetPackage()->AddExistEquip(equip);
+            equip = pet2->findEquip(2);
+            if(equip)
+                GetPetPackage()->AddExistEquip(equip);
+            delFairyPet(petId2, 1);
+
+            petId2 = GameAction()->getYellowPetId(petId2);
+            FairyPet * npet = static_cast<FairyPet *>(globalFighters[petId2]);
+            if(npet == NULL || findFairyPet(petId2))
+                return 1;
+            evolve = 0;
+            pet2 = npet->clone(this);
+            pet2->setColor(3);
+            addFairyPet(pet2, true);
+            SYSMSG_BROADCASTV(4139, getCountry(), getName().c_str(), pet2->getColor(), pet2->getName().c_str());
+            SYSMSG_SENDV(4134, this, pet2->getColor(), pet2->getName().c_str());
+        }
         pet2->setPetLev(lev);
         pet2->setPetBone(bone);
         pet2->setPinjieBless1(pBless);
@@ -19202,6 +19230,7 @@ UInt8 Player::toQQGroup(bool isJoin)
         pet2->setDazhou(dazhou);
         pet2->setXiaozhou(xiaozhou);
         pet2->setChongNum(chong);
+        pet2->setPetEvolve(evolve);
         pet2->UpdateToDB();
         pet2->setPotential(GData::pet.getPetPotential(bone));
         pet2->setLevel(lev);
@@ -19219,9 +19248,9 @@ UInt8 Player::toQQGroup(bool isJoin)
             GetPetPackage()->AddExistEquip(equip);
 
         delFairyPet(petId1, 1);
-        delete pet1;
-        pet2->sendPinjieInfo();
-        pet2->sendGenguInfo();
+        //pet2->sendPinjieInfo();
+        //pet2->sendGenguInfo();
+        //pet2->sendPetEvolve();
         return 0;
     }
 
@@ -19273,7 +19302,6 @@ UInt8 Player::toQQGroup(bool isJoin)
         SYSMSG_BROADCASTV(4139, getCountry(), getName().c_str(), npet2->getColor(), npet2->getName().c_str());
 		SYSMSG_SENDV(4134, this, npet2->getColor(), npet2->getName().c_str());
         delFairyPet(petId, 2);
-        delete pet;
         //npet2->sendPinjieInfo();
         //npet2->sendGenguInfo();
         return petId;
@@ -20962,58 +20990,74 @@ void Player::addCuilianTimes()
     updateCuilianTimes();
 }
 
-void Player::doCuilian(UInt8 clType, UInt8 clOpt)
+void Player::doCuilian(UInt8 clType, UInt8 clOpt, UInt8 isAll)
 {
     if(!checkBBFT())
         return;
-    UInt32 leftCnt = GetVar(VAR_PET_CUILIAN_LEFT_CNT);
-    UInt32 times = 0;
-    if(leftCnt == 0)
+    int leftCnt = GetVar(VAR_PET_CUILIAN_LEFT_CNT);
+    int times = 0;
+    if(leftCnt <= 0)
         return;
     if(clType == 0)
         times = GetVar(VAR_PET_CUILIAN_SCORE_EQUIP_TIMES);
     else
         times = GetVar(VAR_PET_CUILIAN_SCORE_GEM_TIMES);
-    if(times >= 10)
+    if(times >= 10 || times < 0)
         return;
 
     UInt32 score = 0;
+    UInt32 cltimes = isAll ? 10-times : 1;
     ConsumeInfo ci(PetBBFT_CUILIAN,0,0);
     switch(clOpt)
     {
     case 0x00:
-        if(getTael() < 10)
+        if(getTael() < 10*cltimes)
             return;
-        useTael(10, &ci);
+        if(isAll)
+            cltimes = doCuilian1(leftCnt, times);
+        useTael(10*cltimes, &ci);
         break;
     case 0x01:
         {
             UInt32 petLike = GetVar(VAR_FAIRYPET_LIKEABILITY);
-            if(petLike < 1)
+            if(petLike < 1*cltimes)
                 return;
-            SetVar(VAR_FAIRYPET_LIKEABILITY, petLike - 1);
+            if(isAll)
+                cltimes = doCuilian1(leftCnt, times);
+            SYSMSG_SENDV(145, this, cltimes);
+            SYSMSG_SENDV(1045, this, cltimes);
+            SetVar(VAR_FAIRYPET_LIKEABILITY, petLike - 1*cltimes);
             sendFairyPetResource();
-            score = 100;
+            score = 100*cltimes;
         }
         break;
     case 0x02:
-        if(getGold() < 5)
+        if(getGold() < 5*cltimes)
             return;
-        useGold(5, &ci);
-        score = 100;
+        if(isAll)
+            cltimes = doCuilian1(leftCnt, times);
+        useGold(5*cltimes, &ci);
+        score = 100*cltimes;
         break;
     default:
         return;
     }
 
-    ++ times;
-    -- leftCnt;
+    if(cltimes == 0) return;
+    if(isAll == false)
+    {
+        ++ times;
+        -- leftCnt;
+    }
 
     UInt32 low = GetVar(VAR_PET_CUILIAN_EXTRA_LOW_SCORE) + 40;
     UInt32 up = GetVar(VAR_PET_CUILIAN_EXTRA_UP_SCORE) + 60;
-    score += low;
-    if(up > low)
-        score += uRand(up - low);
+    for(UInt8 i = 0; i < cltimes; ++ i)
+    {
+        score += low;
+        if(up > low)
+            score += uRand(up - low);
+    }
     if(clType == 0)
     {
         score += GetVar(VAR_PET_CUILIAN_SCORE_EQUIP);
@@ -21035,6 +21079,29 @@ void Player::doCuilian(UInt8 clType, UInt8 clOpt)
     send(st);
 }
 
+UInt8 Player::doCuilian1(int& leftCnt, int& times)
+{
+    UInt8 cltimes = 0;
+    int tmp1 = leftCnt, tmp2 = 10 - times;
+    for(int i = 0; i < tmp1 && i < tmp2; ++ i)
+    {
+        ++ cltimes;
+        ++ times;
+        -- leftCnt;
+        if(leftCnt <= 0)
+        {
+            leftCnt = 0;
+            break;
+        }
+        if(times >= 10)
+        {
+            times = 10;
+            break;
+        }
+    }
+    return cltimes;
+}
+
 void Player::pickupCuilian(UInt8 clType)
 {
     if(!checkBBFT())
@@ -21052,7 +21119,7 @@ void Player::pickupCuilian(UInt8 clType)
         score = GetVar(VAR_PET_CUILIAN_SCORE_GEM);
     }
 
-    if(times != 10 || score == 0)
+    if(times < 10 || score == 0)
         return;
 
     if(clType == 0)

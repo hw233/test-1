@@ -1899,7 +1899,8 @@ CREATE TABLE `lingbaosmelt` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-CREATE TABLE IF NOT EXISTS `dreamer` (
+DROP TABLE IF EXISTS `dreamer`;
+CREATE TABLE `dreamer` (
     `playerId` bigint(20) unsigned NOT NULL,  
     `progress` tinyint(3) unsigned NOT NULL,      
     `level` tinyint(3) unsigned NOT NULL,      
@@ -1921,7 +1922,8 @@ CREATE TABLE IF NOT EXISTS `dreamer` (
     PRIMARY KEY (`playerId`)                  
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `fairyPet` (
+DROP TABLE IF EXISTS `fairyPet`;
+CREATE TABLE `fairyPet` (
     `id` int(10) unsigned NOT NULL,
     `playerId` bigint(20) unsigned NOT NULL,
     `petLev` smallint(6) unsigned NOT NULL,
@@ -1940,7 +1942,8 @@ CREATE TABLE IF NOT EXISTS `fairyPet` (
     PRIMARY KEY (`id`, `playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `petEquipattr` (
+DROP TABLE IF EXISTS `petEquipattr`;
+CREATE TABLE `petEquipattr` (
     `id` int(10) unsigned NOT NULL,
     `level` tinyint(3) unsigned NOT NULL,
     `exp` int(10) unsigned NOT NULL,
@@ -1949,7 +1952,7 @@ CREATE TABLE IF NOT EXISTS `petEquipattr` (
     `socket2` smallint(10) unsigned NOT NULL,
     `socket3` smallint(10) unsigned NOT NULL,
     `socket4` smallint(10) unsigned NOT NULL,
-    PRIMARY KEY (`id`, `playerId`)
+    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `fairy_spar`;

@@ -2381,7 +2381,8 @@ namespace GObject
         void updateCuilianTimes();
         void enhanceBaseScore();
         void addCuilianTimes();
-        void doCuilian(UInt8 clType, UInt8 clOpt);
+        void doCuilian(UInt8, UInt8, UInt8);
+        UInt8 doCuilian1(int&, int&);
         void pickupCuilian(UInt8 clType);
         bool checkBBFT();
 	};

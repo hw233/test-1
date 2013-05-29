@@ -20,6 +20,7 @@ public:
 
 private:
 	void addItem(Player *, UInt32);
+    void addPetItem(Player *, UInt32, UInt32);
 	UInt32 addFighter(Player *, UInt32);
     UInt32 addFairyPet(Player *, UInt32);
 
@@ -40,9 +41,10 @@ private:
 			return pid < other.pid;
 		}
 	};
-	FastMutex _itemMutex, _fighterMutex, _petMutex;
+	FastMutex _itemMutex, _fighterMutex, _petItemMutex, _petMutex;
 	std::map<UInt32, ChatItemData> _itemData;
 	std::map<FIndex, ChatItemData> _fighterData;
+	std::map<UInt32, ChatItemData> _petItemData;
 	std::map<FIndex, ChatItemData> _fairyPetData;
 };
 

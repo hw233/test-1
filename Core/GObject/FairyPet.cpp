@@ -519,7 +519,7 @@ namespace GObject
 
     ItemPetEq * FairyPet::findEquip(UInt8 pos)
     {
-        if(pos > 2)
+        if(pos >= PET_EQUIP_UPMAX)
             return NULL;
         return _equips[pos];
     }
