@@ -1363,7 +1363,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                 float magdef;
                 float toughFactor = pr2 ? area_target->getTough(bf) : 1.0f;
 
-                if (canProtect)  
+                if (canProtect)
                 {
                     tryProtectDamage(area_target, atk, magatk, factor);
                 }
@@ -1909,15 +1909,14 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
             UInt8 idx = 0;
 
             Int16 nStateLast = boSkill->last;
-            UInt32 effect_state = 0;
-            if(SKILL_ID(skillParam) == 122)  // 元磁神雷的符文状态被反弹
+            UInt32 effect_state = (*atkAct)[idx].param1;
+            //if(SKILL_ID(skillParam) == 122)  // 元磁神雷的符文状态被反弹
+            if(effect_state & 0xFFFF0000)
             {
                 UInt32 nparm = (*atkAct)[idx].param1;
                 nStateLast = nparm & 0x0000ffff;
                 effect_state = (nparm&0xffff0000) >> 16;
             }
-            else
-                effect_state = (*atkAct)[idx].param1;
 
             UInt16 immune = bo->getImmune();
             if((effect_state & immune) && SKILL_LEVEL(boSkill->getId()) <= bo->getImmuneLevel(effect_state))
@@ -4919,28 +4918,25 @@ bool BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GD
 BattleFighter* BattleSimulator::getTherapyTarget(BattleFighter* bf)
 {
     UInt8 side = bf->getSide();
+    BattleFighter* pet = NULL;
     for(UInt8 i = 0; i < 25; ++ i)
     {
         BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
-        if(bo == NULL || bo->getHP() == 0 || bo->hasFlag(BattleFighter::IsMirror) || bo->isSummon() || bo->isPet())
+        if(bo == NULL || bo->getHP() == 0 || bo->hasFlag(BattleFighter::IsMirror) || bo->isSummon() || bo->isLingQu())
             continue;
         if(bo->getHP() < (bo->getMaxHP() >> 1))
         {
-            return bo;
-        }
-    }
-    for(UInt8 i = 0; i < 25; ++ i)
-    {
-        BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
-        if(bo == NULL || bo->getHP() == 0 || bo->hasFlag(BattleFighter::IsMirror) || bo->isSummon())
-            continue;
-        if(bo->getHP() < (bo->getMaxHP() >> 1))
-        {
+            if(bo->isPet())
+            {
+                pet = bo;
+                continue;
+            }
+
             return bo;
         }
     }
 
-    return NULL;
+    return pet;
 }
 
 BattleFighter* BattleSimulator::getTherapyTarget2(BattleFighter* bf, UInt8 * excepts, size_t exceptCount, bool isFirst /* = false */)
@@ -4953,7 +4949,7 @@ BattleFighter* BattleSimulator::getTherapyTarget2(BattleFighter* bf, UInt8 * exc
     for(UInt8 i = 0; i < 25; ++ i)
     {
         bo = static_cast<BattleFighter*>(getObject(side, i));
-        if(bo == NULL || bo->getHP() == 0 || bo->hasFlag(BattleFighter::IsMirror) || (isFirst && bo->isPet()))
+        if(bo == NULL || bo->getHP() == 0 || bo->hasFlag(BattleFighter::IsMirror) || bo->isLingQu() || (isFirst && bo->isPet()))
             continue;
         if(bo->isSummon())
         {
@@ -5005,7 +5001,7 @@ BattleFighter* BattleSimulator::getTherapyTarget3(BattleFighter* bf, UInt8 * exc
     for(UInt8 i = 0; i < 25; ++ i)
     {
         bo = static_cast<BattleFighter*>(getObject(side, i));
-        if(bo == NULL || bo->getHP() == 0 || bo->hasFlag(BattleFighter::IsMirror))
+        if(bo == NULL || bo->getHP() == 0 || bo->hasFlag(BattleFighter::IsMirror) || bo->isLingQu())
             continue;
         if(bo->isSummon())
         {
@@ -6983,9 +6979,9 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
 
         size_t idx = 0;
         const GData::SkillBase* passiveSkill = NULL;
-        passiveSkill = (static_cast<BattleFighter*>(bo))->getPassiveSkillDead100(idx);
+        passiveSkill = (static_cast<BattleFighter*>(bo))->getPassiveSkillDeadFake100(idx);
         if(passiveSkill == NULL)
-            passiveSkill = (static_cast<BattleFighter*>(bo))->getPassiveSkillDead();
+            passiveSkill = (static_cast<BattleFighter*>(bo))->getPassiveSkillDeadFake();
 
         if(passiveSkill != NULL)
         {
@@ -7020,17 +7016,6 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
                 break;
             default:
                 {
-                    BattleFighter* bf = static_cast<BattleFighter*>(bo);
-                    if(doSkillEffectExtra_LingQu(bf, passiveSkill))
-                    {
-                        fFakeDead = true;
-                    }
-                    else
-                    {
-                        appendDefStatus(e_skill, passiveSkill->getId(), static_cast<BattleFighter*>(bo));
-                        if(!doSkillEffectExtra_LingShiBleed(bf, NULL, passiveSkill, bf->getMaxHP()))
-                            doSkillDmg(bf, passiveSkill);
-                    }
                 }
                 break;
             }
@@ -7041,6 +7026,35 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
                 break;
             }
         }
+
+        idx = 0;
+        bool fend = false;
+        for(;;)
+        {
+            passiveSkill = (static_cast<BattleFighter*>(bo))->getPassiveSkillDead100(idx);
+            if(passiveSkill == NULL)
+            {
+                passiveSkill = (static_cast<BattleFighter*>(bo))->getPassiveSkillDead();
+                fend = true;
+                if(!passiveSkill)
+                    break;
+            }
+
+            appendDefStatus(e_skill, passiveSkill->getId(), static_cast<BattleFighter*>(bo));
+            BattleFighter* bf = static_cast<BattleFighter*>(bo);
+            if(doSkillEffectExtra_LingQu(bf, passiveSkill))
+            {
+                fFakeDead = true;
+            }
+            else
+            {
+                if(!doSkillEffectExtra_LingShiBleed(bf, NULL, passiveSkill, bf->getMaxHP()))
+                    doSkillDmg(bf, passiveSkill);
+            }
+            if(fend)
+                break;
+        }
+
     } while(false);
 
     if(!fFakeDead && !fRevival)
@@ -11501,6 +11515,9 @@ UInt32 BattleSimulator::doPetEnter(UInt8 side)
 
 bool BattleSimulator::tryProtectDamage(BattleFighter* bf, float& phyAtk, float& magAtk, float factor)
 {
+     if(bf->isSummon())
+         return false;
+
     // 宠物保护主目标吸收一半伤害，当然，也可能保护完两个都挂了
     int tidx = -1;
     if ((tidx = getSpecificTarget(bf->getSide(), BattleSimulator::isPet)) >= 0)
@@ -11706,6 +11723,8 @@ int BattleSimulator::getPossibleTarget( int side, int idx , BattleFighter * bf /
 
 bool BattleSimulator::tryAttackWithPet(BattleFighter* bf)
 {
+    if(bf->isSummon())
+        return false;
     // 宠物合击
     int tidx = 0;
     if ((tidx = getSpecificTarget(bf->getSide(), BattleSimulator::isPet)) >= 0)
