@@ -10952,15 +10952,15 @@ namespace GObject
             getLevelAward(opt);
             break;
         case 19:
-            getQQExplorerAward();
+            getQQExplorerAward(opt);
             break;
         }
     }
 
-    void Player::getQQExplorerAward()
+    void Player::getQQExplorerAward(UInt8 opt)
     {
         UInt8 v = GetVar(VAR_QQEXPLORER_AWARD);
-        if( v == 0)
+        if(opt == 1 && v == 0)
         {
             GetPackage()->AddItem(503, 1, true, false, FromQQExplorer);
             GetPackage()->AddItem(504, 1, true, false, FromQQExplorer);

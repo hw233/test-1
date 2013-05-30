@@ -2109,7 +2109,7 @@ namespace GObject
         void send11DailyInfo();
         void getSSToolbarAward();
         void sendSSToolbarInfo();
-        void getQQExplorerAward();
+        void getQQExplorerAward(UInt8 opt);
 
         // 帮派神像
         float getClanStatueHPEffect();
