@@ -1190,7 +1190,7 @@ namespace GObject
 
     ItemBase*  Package::AddEquipEnchant(UInt32 typeId, UInt8 enchant, bool notify, bool bind/* = false*/, UInt8 FromWhere/* = 0*/)
     {
-		ItemEquip* equip = AddEquip2(typeId, notify, bind, FromWhere);
+		ItemEquip* equip = static_cast<ItemEquip*>(AddEquip2(typeId, notify, bind, FromWhere));
         if(!equip)
             return NULL;
 

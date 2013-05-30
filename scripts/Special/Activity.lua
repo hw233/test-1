@@ -1019,6 +1019,9 @@ function onCopyWin(player, id, floor, spot, lootlvl)
 --    CompassAct(player, lootlvl);
     Item9344Act(player, lootlvl);
     Item9343Act(player, lootlvl);
+    if inActive_opTime_20130531() then
+        player:AddVar(522, 20);  -- 逐日印记
+    end
 end
 
 function onFrontMapFloorWin(player, id, spot, lootlvl)
@@ -1057,6 +1060,9 @@ function onFrontMapWin(player, id, spot, lootlvl)
 --    CompassAct(player, lootlvl);
     Item9344Act(player, lootlvl);
     Item9343Act(player, lootlvl);
+    if inActive_opTime_20130531() then
+        player:AddVar(523, 20); -- 皓月印记
+    end
 end
 
 local vippack = {
@@ -8096,7 +8102,7 @@ function onFirstRecharge(player, index)
         if index < 3 then
             package:Add(v[1], v[2], 1)
         else
-            package:AddEquipEnchant(v[1], v[2], true, true, 52)
+            package:AddEquipEnchant(v[1], v[2], true, true, 55)
         end
 
     end

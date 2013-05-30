@@ -156,6 +156,7 @@ namespace Script
 		lua_tinker::def(_L, "isRPServer", GObject::World::isRPServer);
 		lua_tinker::def(_L, "getAccRecharge", GObject::World::getAccRecharge);
 		lua_tinker::def(_L, "getGMCheck", GObject::World::getGMCheck);
+		lua_tinker::def(_L, "inActive_opTime_20130531", GObject::World::inActive_opTime_20130531);
 
         CLASS_DEF(GameActionLua, Print);
         lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);

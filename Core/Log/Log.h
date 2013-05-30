@@ -234,14 +234,11 @@ enum ItemFrom
     FromDirectPurchase = 49, //Q点直购
     FromPetGemMgerge = 50, //仙宠宝石合成
     FromPetDetachGem = 51, //仙宠宝石拆卸
-<<<<<<< HEAD
-    FromOEquipAward = 52, //橙装礼包
-
-=======
     FromQQTenpay = 52, //QQ财付通奖励
     FromQQIMQuickLogin = 53, //QQIM快速登录奖励
     FromEquipMoveAward = 54, //装备继承奖励
->>>>>>> master
+    FromOEquipAward = 55, //橙装礼包
+    FromRYHBAward = 56, //日月合璧
     //80 ~ 100，繁体占用
 };
 

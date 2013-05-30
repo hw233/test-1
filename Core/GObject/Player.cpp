@@ -4546,7 +4546,11 @@ namespace GObject
 #endif
 #endif // _WIN32
         if(ci && ci->purchaseType != TrainFighter)
+        {
             AddVar(VAR_USEGOLD_CNT, c);
+            if(World::inActive_opTime_20130531())
+                AddVar(VAR_HYYJ_COUNT, c);
+        }
         if(!GetVar(VAR_LUCKYSTAR_IS_CONSUME))
             SetVar(VAR_LUCKYSTAR_IS_CONSUME, 1);
         setLuckyStarCondition();
@@ -7809,6 +7813,9 @@ namespace GObject
             sendTodayRechargeInfo();
 
         checkZCJB();
+
+        if(World::inActive_opTime_20130531())
+            AddVar(VAR_ZRYJ_COUNT, r);
     }
 
     void Player::addRechargeNextRet(UInt32 r)
@@ -21193,9 +21200,7 @@ bool Player::checkBBFT()
 #define ZCJB(t, l)    (((t&0xFF)<<8)|(l&0xFF))
 void Player::sendRPZCJBInfo()
 {
-    UInt32 opTime = TimeUtil::MkTime(cfg.openYear, cfg.openMonth, cfg.openDay);
-    bool after_20130531 = (TimeUtil::MkTime(2013, 5, 31) <= opTime);
-    if(!after_20130531)
+    if(World::inActive_opTime_20130531())
         return;
 
     UInt32 zcjb = GetVar(VAR_ZCJB_TIMES);
@@ -21253,9 +21258,7 @@ bool Player::getRPZCJBAward()
 
 void Player::checkZCJB()
 {
-    UInt32 opTime = TimeUtil::MkTime(cfg.openYear, cfg.openMonth, cfg.openDay);
-    bool after_20130531 = (TimeUtil::MkTime(2013, 5, 31) <= opTime);
-    if(!after_20130531)
+    if(World::inActive_opTime_20130531())
         return;
 
     UInt32 zcjb = GetVar(VAR_ZCJB_TIMES);
@@ -21275,6 +21278,87 @@ void Player::checkZCJB()
         SetVar(VAR_ZCJB_TIMES, ZCJB(total, left));
         sendRPZCJBInfo();
     }
+}
+
+static UInt32 ryhb_items[15][4] = {
+    {8, 8, 78, 9},          // 升级优惠礼包
+    {28, 28, 79, 9},        // 炼器优惠礼包
+    {8, 15, 80, 9},         // 九疑鼎优惠礼包
+    {2, 5, 1325, 99},       // 技能符文熔炼诀
+    {2, 5, 134, 99},        // 法灵精金
+    {2, 5, 547, 99},        // 天赋保护符
+    {1, 3, 503, 99},        // 太乙精金
+    {4, 8, 515, 99},        // 五行精金
+    {1, 5, 509, 99},        // 凝神易筋丹
+    {1, 5, 507, 99},        // 补髓益元丹
+    {1, 3, 9371, 99},       // 仙缘石
+    {99, 88, 1717, 1},      // 女仆头饰
+    {555, 300, 0, 1},      // 散仙令
+};
+
+void Player::sendRYHBInfo()
+{
+    if(World::inActive_opTime_20130531())
+        return;
+
+    Stream st(REP::RP_SERVER);
+    st << static_cast<UInt8>(0x05) << static_cast<UInt8>(0);
+    st << (GetVar(VAR_ZRYJ_COUNT)/20);
+    st << (GetVar(VAR_HYYJ_COUNT)/20);
+
+    UInt8 cnt = 0;
+    size_t offset = st.size();
+    st << cnt;
+    for(int i = 0; i < 15; ++ i)
+    {
+        if(ryhb_items[i][2] == 0)
+            break;
+        st << static_cast<UInt8>(ryhb_items[i][3] - GetVar(VAR_RYHB_ITEM_CNT_1+i));
+        ++ cnt;
+    }
+
+    st.data<UInt8>(offset) = cnt;
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::getRYHBAward(UInt8 idx, UInt8 cnt)
+{
+    if(World::inActive_opTime_20130531())
+        return;
+    if(idx >= 15)
+        return;
+
+    UInt32 itemId = ryhb_items[idx][2];
+    const GData::ItemBaseType* ibt = GData::itemBaseTypeManager[itemId];
+    if(!ibt)
+        return;
+
+    if(GetFreePackageSize() < ibt->Size(cnt))
+        return;
+
+    UInt32 zryj = GetVar(VAR_ZRYJ_COUNT)/20;
+    UInt32 hyyj = GetVar(VAR_HYYJ_COUNT)/20;
+    UInt8 item_cnt = GetVar(VAR_RYHB_ITEM_CNT_1+idx);
+    if(ryhb_items[idx][0]*cnt > zryj || ryhb_items[idx][1]*cnt > hyyj || ryhb_items[idx][3] < (item_cnt + cnt))
+        return;
+
+    zryj -= ryhb_items[idx][0] * cnt;
+    hyyj -= ryhb_items[idx][1] * cnt;
+    item_cnt += cnt;
+
+    UInt8 left_cnt = ryhb_items[idx][3] - item_cnt;
+    SetVar(VAR_RYHB_ITEM_CNT_1+idx, item_cnt);
+    SetVar(VAR_ZRYJ_COUNT, zryj);
+    SetVar(VAR_HYYJ_COUNT, hyyj);
+
+    m_Package->Add(itemId, cnt, true, false, FromRYHBAward);
+
+    Stream st(REP::RP_SERVER);
+    st << static_cast<UInt8>(0x05) << static_cast<UInt8>(1);
+    st << zryj << hyyj << idx << left_cnt;
+    st << Stream::eos;
+    send(st);
 }
 
 } // namespace GObject

@@ -2385,6 +2385,12 @@ namespace GObject
         UInt8 doCuilian1(int&, int&);
         void pickupCuilian(UInt8 clType);
         bool checkBBFT();
+
+        void sendRPZCJBInfo();
+        bool getRPZCJBAward();
+        void checkZCJB();
+        void sendRYHBInfo();
+        void getRYHBAward(UInt8 idx, UInt8 cnt);
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

@@ -949,7 +949,7 @@ void Leaderboard::newDrawingGame(UInt32 nextday)
                 Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
                 if(mail)
                 {
-                    mailPackageManager.push(mail->id, s_item, 5, true);
+                    mailPackageManager.push(mail->id, s_item[rank-1], 5, true);
                 }
             }
             if (rank >= 10)
