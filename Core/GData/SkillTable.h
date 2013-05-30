@@ -45,6 +45,7 @@ enum
     /*19*/ SKILL_ONBEPHYDMG,
     /*20*/ SKILL_ONBEMAGDMG,
     /*21*/ SKILL_ONHP10P,    // 生命剩余1/3
+    /*22*/ SKILL_DEAD_FAKE,  // 复活
     SKILL_PASSIVES
 };
 

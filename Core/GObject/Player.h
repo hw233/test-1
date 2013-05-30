@@ -2120,7 +2120,11 @@ namespace GObject
         void getQQExplorerAward(UInt8 opt);
         void getQQNavigationAward(UInt8 opt);
         void getQQMusicAward(UInt8 opt);
-            
+        void getQQTenpayAward(UInt8 opt);
+        void getQQIMQuickLoginAward(UInt8 opt);
+        void getEquipMoveAward(UInt8 opt);
+        UInt8 getFighterEquipAward();
+
         // 帮派神像
         float getClanStatueHPEffect();
         float getClanStatueAtkEffect();
@@ -2377,7 +2381,8 @@ namespace GObject
         void updateCuilianTimes();
         void enhanceBaseScore();
         void addCuilianTimes();
-        void doCuilian(UInt8 clType, UInt8 clOpt);
+        void doCuilian(UInt8, UInt8, UInt8);
+        UInt8 doCuilian1(int&, int&);
         void pickupCuilian(UInt8 clType);
         bool checkBBFT();
 	};

@@ -215,7 +215,7 @@ namespace GObject
         UInt8 moveEquipFashion(Fighter*,Fighter*, ItemEquip*, UInt8, ItemEquip*, UInt8); 
         UInt8 moveEquipPurify(Fighter*,Fighter*, ItemEquip*, UInt8, ItemEquip*, UInt8); 
         UInt8 moveDeductMoney(ItemEquip* fromEquip, ItemEquip* toEquip, UInt8 type);
-
+        UInt8 getPackageEquipCount();
         void setItemBind(UInt32 typeId);
 
 	private:

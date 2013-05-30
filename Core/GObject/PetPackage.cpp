@@ -96,6 +96,8 @@ namespace GObject
 
 	ItemBase * PetPackage::AddExistEquip(ItemPetEq * equip, bool fromDB)
 	{
+        if(equip == NULL)
+            return NULL;
 		ItemBase *& e = m_PetEquips[ItemKey(equip->getId())];
 		if(e == NULL)
 			++ m_EquipSize;
@@ -530,6 +532,7 @@ namespace GObject
             if(peAttr.lv >= maxLev)
             {
                 peAttr.lv = maxLev;
+                SYSMSG_BROADCASTV(4157, m_Owner->getCountry(), m_Owner->getName().c_str(), equip->getQuality(), equip->getName().c_str(), maxLev);
                 return 1;
             }
         }

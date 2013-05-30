@@ -11,7 +11,7 @@ namespace GData
 
 class Pet
 {
-#define PETEQUIP_MAXLEV 71
+#define PETEQUIP_MAXLEV 70
 #define PETEQUIP_ATTR 11
 public:
     struct stBless

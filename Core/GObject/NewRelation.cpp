@@ -66,6 +66,7 @@ void NewRelation::beAttack(Player * atker, UInt16 formation, UInt16 portrait, Li
 			bf->setHP(0);
 		}
 	}
+    atker->PutPets(bsim, 0);
 	defer->PutFighters( bsim, 1, true );
 	bsim.start();
 	bool res = bsim.getWinner() == 1;

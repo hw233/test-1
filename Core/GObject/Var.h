@@ -445,12 +445,15 @@ namespace GObject
         VAR_QQNAVIGATION_FIRST_LOGIN_AWARD = 502, // QQ导航首次登录奖励是否领取
 
         VAR_QQMUSIC_DAY_AWARD = 503, // QQ音乐每天奖励是否领取
+        VAR_QQTENPAY_AWARD = 504, // QQ财付通奖励是否领取
+        VAR_QQIM_QUICK_LOGIN_AWARD = 505, // QQIM快捷登录奖励是否领取
+        VAR_EQUIP_MOVE_AWARD = 506, // 装备继承奖励
 
         // 521-540 for zhgc
         VAR_ZCJB_TIMES = 521,      // 招财进宝
         VAR_ZRYJ_COUNT = 522,      // 逐日印记
         VAR_HYYJ_COUNT = 523,      // 皓月印记
-
+       
         VAR_MAX,
     };
 
@@ -741,6 +744,11 @@ namespace GObject
             REGISTER_VAR(VAR_QQNAVIGATION_FIRST_LOGIN_AWARD, CYCLE_NONE);
 
             REGISTER_VAR(VAR_QQMUSIC_DAY_AWARD, CYCLE_DAY);
+            REGISTER_VAR(VAR_QQTENPAY_AWARD, CYCLE_NONE);
+            REGISTER_VAR(VAR_QQIM_QUICK_LOGIN_AWARD, CYCLE_DAY);
+
+            REGISTER_VAR(VAR_EQUIP_MOVE_AWARD, CYCLE_NONE);
+
             //REGISTER_VAR(VAR_ARENA_SUFFERED, CYCLE_DAY);
             //REGISTER_VAR(VAR_ARENA_LASTTIME, CYCLE_DAY);
             REGISTER_VAR(VAR_ARENA_SUPPORT_TUE, CYCLE_WEEK);
