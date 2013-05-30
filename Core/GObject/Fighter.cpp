@@ -29,6 +29,7 @@
 #include "GData/SoulExpTable.h"
 #include "GData/LBSkillTable.h"
 #include "GObject/Leaderboard.h"
+#include "FairySpar.h"
 
 namespace GObject
 {
@@ -1833,6 +1834,14 @@ void Fighter::rebuildEquipAttr()
     {
         _attrExtraEquip.attack += _wbextatk;
         _attrExtraEquip.magatk += _wbextmagatk;
+    }
+
+    if(_owner/* && _owner->getClan()*/)
+    {
+        //仙蕴晶石的加成
+        _attrExtraEquip.hp += _owner->GetFairySpar()->getFairySparPH();
+        _attrExtraEquip.attack += _owner->GetFairySpar()->getFairySparAtk();
+        _attrExtraEquip.magatk += _owner->GetFairySpar()->getFairySparMagAtk();
     }
 
 	_maxHP = Script::BattleFormula::getCurrent()->calcHP(this);

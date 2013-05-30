@@ -169,6 +169,8 @@ MSG_REG_2(GameMsgHdr, REQ::NEWRC7DAY, OnNewRC7Day);
 
 MSG_REG_2(GameMsgHdr, REQ::TIANJIE, OnTianjieReq);
 
+MSG_REG_2(GameMsgHdr, REQ::FARIY_SPAR, OnFairySparReq);
+
 MSG_REG_2(GameMsgHdr, REQ::EXJOB, OnExJob);
 MSG_REG_2(GameMsgHdr, REQ::JOBHUNTER, OnJobHunter);
 MSG_REG_2(GameMsgHdr, REQ::AUTOJOBHUNTER, OnAutoJobHunter);

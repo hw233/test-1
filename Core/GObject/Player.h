@@ -26,6 +26,7 @@
 #include "JobHunter.h"
 #include "Dreamer.h"
 #include "FairyPet.h"
+#include "FairySpar.h"
 
 
 namespace Battle
@@ -1398,6 +1399,7 @@ namespace GObject
         ShuoShuo* GetShuoShuo(){return m_ShuoShuo;}
         CFriend* GetCFriend(){return m_CFriend;}
         NewRelation* GetNewRelation() { return m_relation; }
+        FairySpar* GetFairySpar() { return m_FairySpar; }
 		Trade* GetTrade()			{ return m_Trade; }
 		Sale* GetSale()				{ return m_Sale; }
 		Athletics* GetAthletics()	{ return m_Athletics; }
@@ -1689,6 +1691,7 @@ namespace GObject
         ShuoShuo* m_ShuoShuo;
         CFriend* m_CFriend;
         NewRelation* m_relation;
+        FairySpar* m_FairySpar;
 		MailBox* m_MailBox;
 
 		bool _isOnline;

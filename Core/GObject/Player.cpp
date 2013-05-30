@@ -687,6 +687,7 @@ namespace GObject
         m_ShuoShuo = new ShuoShuo(this);
         m_CFriend = new CFriend(this);
         m_relation = new NewRelation(this);
+		m_FairySpar = new FairySpar(this);
         m_pVars = new VarSystem(id);
         memset(&m_ctp, 0, sizeof(m_ctp));
         m_teamData = NULL;
@@ -934,6 +935,7 @@ namespace GObject
         SAFE_DELETE(m_ShuoShuo);
         SAFE_DELETE(m_CFriend);
         SAFE_DELETE(m_relation);
+		SAFE_DELETE(m_FairySpar);
 	}
 
 	UInt8 Player::GetCountryThread()
@@ -7915,7 +7917,7 @@ namespace GObject
     void Player::sendTodayRechargeInfo()
     {
         Stream st(REP::DAILY_DATA);
-        st << static_cast<UInt8>(19) << GetVar(VAR_RECHARGE_TODAY) << Stream::eos;
+        st << static_cast<UInt8>(19) << GetVar(VAR_RECHARGE_TODAY) << static_cast<UInt8>(GetVar(VAR_RECHARGE_CONDCNT)) << Stream::eos;
         send((st));
     }
 

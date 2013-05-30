@@ -1650,5 +1650,16 @@ namespace Script
     {
         return Call<lua_tinker::table>("GetSpreadAward");
     }
+
+    UInt32 GameActionLua::GetFairySparParaMax(UInt8 type, UInt8 count)
+    {
+        return Call<UInt32>("GetFairySparParaMax", type, count);
+    }
+
+    Table GameActionLua::GetFairySparElement(UInt8 flag)
+    {
+        return Call<Table>("GetFairySparElement", flag);
+    }
+
 }
 
