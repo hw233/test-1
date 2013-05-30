@@ -6204,7 +6204,25 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
                     player->sendBBFTInfo();
                     break;
                 case 0x01:
-                    player->enBaseScore();
+                    player->enhanceBaseScore();
+                    break;
+                case 0x02:
+                    player->addCuilianTimes();
+                    break;
+                case 0x03:
+                    {
+                        UInt8 clType = 0;
+                        UInt8 clOpt = 0;
+                        br >> clType >> clOpt;
+                        player->doCuilian(clType, clOpt);
+                    }
+                    break;
+                case 0x04:
+                    {
+                        UInt8 clType = 0;
+                        br >> clType;
+                        player->pickupCuilian(clType);
+                    }
                     break;
             }
             break;

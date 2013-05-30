@@ -2347,6 +2347,14 @@ namespace GObject
         void spreadToSelf();
         void spreadGetAward();
         void spreadGetAwardInCountry(UInt32 spreadCount);
+
+    public:
+        // 八部浮屠
+        void sendBBFTInfo();
+        void enhanceBaseScore();
+        void addCuilianTimes();
+        void doCuilian(UInt8 clType, UInt8 clOpt);
+        void pickupCuilian(UInt8 clType);
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

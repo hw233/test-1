@@ -20354,6 +20354,91 @@ void Player::spreadGetAwardInCountry(UInt32 spreadCount)
     }
 }
 
+void Player::sendBBFTInfo()
+{
+    Stream st(REP::FAIRY_PET);
+    st << static_cast<UInt8>(0x06) << static_cast<UInt8>(0x00);
+    st << GetVar(VAR_PET_CUILIAN_SCORE_EQUIP);
+    st << static_cast<UInt8>(GetVar(VAR_PET_CUILIAN_SCORE_EQUIP_TIMES));
+    st << GetVar(VAR_PET_CUILIAN_SCORE_GEM);
+    st << static_cast<UInt8>(GetVar(VAR_PET_CUILIAN_SCORE_GEM_TIMES));
+    st << static_cast<UInt16>(GetVar(VAR_PET_CUILIAN_EXTRA_LOW_SCORE) + 40);
+    st << static_cast<UInt16>(GetVar(VAR_PET_CUILIAN_EXTRA_UP_SCORE) + 60);
+    UInt32 now = TimeUtil::Now();
+    st << TimeUtil::SharpDayT(1, now) - now;
+    st << static_cast<UInt16>(GetVar(VAR_PET_CUILIAN_LEFT_CNT));
+    st << static_cast<UInt16>(GetVar(VAR_PET_CUILIAN_TOTAL_CNT));
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::enhanceBaseScore()
+{
+    if(getGold() < 2)
+        return;
+
+    UInt16 extra_low = GetVar(VAR_PET_CUILIAN_EXTRA_LOW_SCORE);
+    UInt16 extra_up = GetVar(VAR_PET_CUILIAN_EXTRA_UP_SCORE);
+    UInt16 low = extra_low + 40;
+    UInt16 up = extra_up + 60;
+    if(low == 100 && up == 100)
+        return;
+
+    ConsumeInfo ci(PetBBFT,0,0);
+    useGold(2,&ci);
+
+    if(low == up)
+    {
+        extra_up += 5;
+        up += 5;
+        SetVar(VAR_PET_CUILIAN_EXTRA_UP_SCORE, extra_up);
+    }
+    else if(uRand(2) == 0)
+    {
+        extra_low += 5;
+        low += 5;
+        SetVar(VAR_PET_CUILIAN_EXTRA_LOW_SCORE, extra_low);
+    }
+    else
+    {
+        extra_up += 5;
+        up += 5;
+        SetVar(VAR_PET_CUILIAN_EXTRA_UP_SCORE, extra_up);
+    }
+
+    Stream st(REP::FAIRY_PET);
+    st << static_cast<UInt8>(0x06) << static_cast<UInt8>(0x01);
+    st << low << up;
+    st << Stream::eos;
+    send(st);
+
+}
+
+void Player::addCuilianTimes()
+{
+    if(getGold() < 2)
+        return;
+
+    ConsumeInfo ci(PetBBFT,0,0);
+    useGold(2,&ci);
+
+    Stream st(REP::FAIRY_PET);
+    st << static_cast<UInt8>(0x06) << static_cast<UInt8>(0x02);
+    st << static_cast<UInt16>(GetVar(VAR_PET_CUILIAN_LEFT_CNT));
+    st << static_cast<UInt16>(GetVar(VAR_PET_CUILIAN_TOTAL_CNT));
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::doCuilian(UInt8 clType, UInt8 clOpt)
+{
+}
+
+void Player::pickupCuilian(UInt8 clType)
+{
+}
+
+
 } // namespace GObject
 
 
