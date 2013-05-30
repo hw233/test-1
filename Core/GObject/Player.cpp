@@ -7803,6 +7803,8 @@ namespace GObject
 
         AddVar(VAR_RECHARGE_TODAY, r);
         GameAction()->onRecharge(this, r);
+        if(WORLD().getAccRecharge())
+            sendTodayRechargeInfo();
     }
 
     void Player::addRechargeNextRet(UInt32 r)
