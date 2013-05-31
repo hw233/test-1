@@ -632,22 +632,22 @@ namespace GObject
                     _attrExtraEquip.magdef += effect;
                     break;
                 case Item_PetEquip5:
-                    _attrExtraEquip.critical += effect;
+                    _attrExtraEquip.crilvl += effect;
                     break;
                 case Item_PetEquip6:
-                    _attrExtraEquip.pierce += effect;
+                    _attrExtraEquip.pirlvl += effect;
                     break;
                 case Item_PetEquip7:
-                    _attrExtraEquip.hitrate += effect;
+                    _attrExtraEquip.hitrlvl += effect;
                     break;
                 case Item_PetEquip8:
-                    _attrExtraEquip.evade += effect;
+                    _attrExtraEquip.evdlvl += effect;
                     break;
                 case Item_PetEquip9:
-                    _attrExtraEquip.counter += effect;
+                    _attrExtraEquip.counterlvl += effect;
                     break;
                 case Item_PetEquip10:
-                    _attrExtraEquip.tough += effect;
+                    _attrExtraEquip.toughlvl += effect;
                     break;
                 default:
                     break;
