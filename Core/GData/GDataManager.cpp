@@ -2018,7 +2018,7 @@ namespace GData
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
         DBPetEqAttreffect dbeqAttr;
-		if(execu->Prepare("SELECT `id`, `hp`, `atk`, `magatk`, `def`, `magdef`, `critical`, `pierce`, `hitrate`, `evade`, `counter`, `tough` FROM `pet_neiean`", dbeqAttr) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `hp`, `atk`, `magatk`, `def`, `magdef`, `critical`, `pierce`, `hitrate`, `evade`, `counter`, `tough` FROM `pet_neidan`", dbeqAttr) != DB::DB_OK)
 			return false;
 
 		while(execu->Next() == DB::DB_OK)
