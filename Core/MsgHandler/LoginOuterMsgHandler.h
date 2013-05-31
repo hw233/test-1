@@ -1058,6 +1058,8 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
                         ret=0;
                 }
             }
+            else
+                ret = 1;
         }
         else
         {
