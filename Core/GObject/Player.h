@@ -2114,7 +2114,9 @@ namespace GObject
         void getSSToolbarAward();
         void sendSSToolbarInfo();
         void getQQExplorerAward(UInt8 opt);
-
+        void getQQNavigationAward(UInt8 opt);
+        void getQQMusicAward(UInt8 opt);
+            
         // 帮派神像
         float getClanStatueHPEffect();
         float getClanStatueAtkEffect();
@@ -2314,6 +2316,7 @@ namespace GObject
         void getPetByLevelUp(UInt8);
         UInt8 getPetByPetEgg(UInt32);
         UInt8 transferPet(UInt32, UInt32);
+        UInt32 evolvePet(UInt32);
 
         void getXianyuanLua(UInt32);
         void getLongyuanLua(UInt32);

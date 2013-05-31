@@ -254,7 +254,8 @@ struct EquipMoveReq
 	UInt32 _fitemId;
 	UInt32 _titemId;
     UInt8  _type;
-	MESSAGE_DEF5(REQ::EQ_MOVE, UInt16, _ffighterId,UInt16, _tfighterId, UInt32, _fitemId,UInt32, _titemId,UInt8,_type);
+    UInt8  _mark;
+MESSAGE_DEF6(REQ::EQ_MOVE, UInt16, _ffighterId, UInt16, _tfighterId, UInt32, _fitemId, UInt32, _titemId, UInt8, _type, UInt8, _mark);
 };
 
 #if 0
@@ -2259,10 +2260,10 @@ void OnEquipMoveReq( GameMsgHdr& hdr, EquipMoveReq& aar )
 	MSG_QUERY_PLAYER(player);
 	if(!player->hasChecked())
 		return;
-    UInt8 res = player->GetPackage()->EquipMove(aar._ffighterId, aar._tfighterId, aar._fitemId,aar._titemId,aar._type);
+    UInt8 res = player->GetPackage()->EquipMove(aar._ffighterId, aar._tfighterId, aar._fitemId, aar._titemId, aar._type, aar._mark);
     UInt8 count = player->GetVar(VAR_EQUIP_MOVE_COUNT);
 	Stream st(REP::EQ_MOVE);
-	st <<  res << count << Stream::eos;
+	st << res << count << aar._mark << Stream::eos;
 	player->send(st);
 }
 
@@ -6140,6 +6141,15 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
                             if(res == 0)
                                 st << petId << petId2;
                             st << Stream::eos;
+                            player->send(st);
+                        }
+                        break;
+                    case 0x07:
+                        {
+                            UInt32 id = player->evolvePet(petId);
+                            Stream st(REP::FAIRY_PET);
+                            st << type << opt << static_cast<UInt8>(1);
+                            st << id << Stream::eos;
                             player->send(st);
                         }
                         break;

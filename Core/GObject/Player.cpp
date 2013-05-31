@@ -11,7 +11,6 @@
 #include "CFriend.h"
 #include "Trade.h"
 #include "Sale.h"
-#include "Country.h"
 #include "GObjectManager.h"
 #include "MapCollection.h"
 #include "Country.h"
@@ -10961,9 +10960,118 @@ namespace GObject
             getLevelAward(opt);
             break;
         case 19:
+            //QQ浏览器奖励
             getQQExplorerAward(opt);
             break;
+        case 20:
+            //QQ导航奖励
+            getQQNavigationAward(opt);
+            break;
+        case 21:
+            //QQ音乐奖励
+            getQQMusicAward(opt);
+            break;
         }
+    }
+
+
+    void Player::getQQMusicAward(UInt8 opt)
+    {
+         
+       /* UInt8 state = GetVar(VAR_QQMUSIC_DAY_AWARD);
+
+        if (GetPackage()->GetRestPackageSize() < 6 && opt == 1)
+        {
+			sendMsgCode(0, 1011);
+
+            return;
+        }
+
+        if(opt == 1 && state == 0)
+        {
+            GetPackage()->AddItem(134, 1, true, false, FromQQMusic);
+            GetPackage()->AddItem(1325, 1, true, false, FromQQMusic);
+            GetPackage()->AddItem(50, 1, true, false, FromQQMusic);
+            GetPackage()->AddItem(49, 1, true, false, FromQQMusic);
+            GetPackage()->AddItem(30, 1, true, false, FromQQMusic);
+            SetVar(VAR_QQMUSIC_DAY_AWARD, 1);
+            state = 1;
+        }
+
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(21);
+        st << state << Stream::eos;
+        send(st);*/
+    }
+
+    void Player::getQQNavigationAward(UInt8 opt)
+    {
+        UInt8 states = 0;
+
+        UInt8 dayAward = GetVar(VAR_QQNAVIGATION_DAY_AWARD);
+        UInt8 weekAward = GetVar(VAR_QQNAVIGATION_WEEK_AWARD);
+        UInt8 firstLoginAward = GetVar(VAR_QQNAVIGATION_FIRST_LOGIN_AWARD);
+
+        if (GetPackage()->GetRestPackageSize() < 6 && opt >= 1 && opt <= 3) 
+        {
+			sendMsgCode(0, 1011);
+
+            return;
+        }
+
+
+        if(getVia() == "ssgw_qqdh")
+        {
+             if(opt == 1 && dayAward == 0)  //领取QQ导航每天奖励
+             {
+                 GetPackage()->AddItem(15, 1, true, false,FromQQNavigation);
+                 GetPackage()->AddItem(48, 1, true, false, FromQQNavigation);
+                 SetVar(VAR_QQNAVIGATION_DAY_AWARD, 1);
+                 dayAward = 1;
+             }
+             else if(opt == 2 && weekAward == 0)  //领取QQ导航每月奖励
+             {
+                 GetPackage()->AddItem(133, 1, true, false,FromQQNavigation);
+                 GetPackage()->AddItem(1325, 1, true, false, FromQQNavigation);
+                 SetVar(VAR_QQNAVIGATION_WEEK_AWARD, 1);
+                 weekAward = 1;
+             }
+             else if(opt == 3 && firstLoginAward == 0)  //领取QQ导航首次登录奖励
+             {
+                 GetPackage()->AddItem(503, 1, true, false,FromQQNavigation);
+                 GetPackage()->AddItem(500, 1, true, false, FromQQNavigation);
+                 GetPackage()->AddItem(50, 1, true, false, FromQQNavigation);
+                 GetPackage()->AddItem(49, 1, true, false, FromQQNavigation);
+                 SetVar(VAR_QQNAVIGATION_FIRST_LOGIN_AWARD, 1);
+                 firstLoginAward = 1;
+             }
+
+           states = (dayAward + 1) | (weekAward + 1) << 2 | (firstLoginAward + 1) << 4;
+        }
+        else
+        {
+            if(1 == dayAward)
+            {
+                dayAward += 1;
+            }
+
+            if(1 == weekAward)
+            {
+                weekAward += 1;
+            }
+
+            if(1 == firstLoginAward)
+            {
+                firstLoginAward += 1;
+            }
+            
+           states = dayAward | weekAward << 2 | firstLoginAward << 4;
+        }
+
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(20);
+        st << states << Stream::eos;
+        send(st);
     }
 
     void Player::getQQExplorerAward(UInt8 opt)
@@ -18454,7 +18562,7 @@ UInt8 Player::toQQGroup(bool isJoin)
     }
 
     void Player::delFairyPet(UInt32 id, UInt8 delete_type)
-    {   //delete_type=>>0:放生 1:传承
+    {   //delete_type=>>0:放生 1:传承 2:进化
         std::map<UInt32, FairyPet *>::iterator it = _fairyPets.find(id);
         DBLOG1().PushUpdateData("insert into pet_histories (server_id,player_id,pet_id,pet_name,delete_type,pet_pinjie,pet_gengu,delete_time) values(%u,%"I64_FMT"u,%u,'%s',%u,%u,%u,%u)",
             cfg.serverLogId, getId(), id, it->second->getName().c_str(), delete_type, it->second->getPetLev(), it->second->getPetBone(), TimeUtil::Now());
@@ -18619,6 +18727,7 @@ UInt8 Player::toQQGroup(bool isJoin)
             st << it->second->getPetLev();
             st << it->second->getPetBone();
             st << it->second->getChongNum();
+            st << it->second->getPetEvolve();
             ++ it;
         }
         st << Stream::eos;
@@ -18804,7 +18913,7 @@ UInt8 Player::toQQGroup(bool isJoin)
     }
 
     UInt8 Player::transferPet(UInt32 petId1, UInt32 petId2)
-    {
+    {   //仙宠传承
         FairyPet * pet1 = findFairyPet(petId1);
         FairyPet * pet2 = findFairyPet(petId2);
         if(!pet1 || !pet2 || pet1 == pet2)
@@ -18872,6 +18981,48 @@ UInt8 Player::toQQGroup(bool isJoin)
         pet2->sendPinjieInfo();
         pet2->sendGenguInfo();
         return 0;
+    }
+
+    UInt32 Player::evolvePet(UInt32 petId)
+    {   //仙宠进化
+        FairyPet * pet = findFairyPet(petId);
+		if(!pet || hasFighter(petId))
+			return 0;
+        UInt32 newId = GameAction()->getYellowPetId(petId);
+		FairyPet * npet = static_cast<FairyPet *>(globalFighters[newId]);
+		if(npet == NULL || findFairyPet(newId))
+			return 0;
+        UInt8 color = GameAction()->getPetColorFromId(petId);
+        if(pet->getPetBone() < EVOLVE_BONE_LIMIT || pet->getPetEvolve() < pet->getPetEvMax() || color != 2)
+            return 0;
+		FairyPet * npet2 = npet->clone(this);
+		addFairyPet(npet2, true);
+        npet2->setPetLev(pet->getPetLev());
+        npet2->setPetBone(pet->getPetBone());
+        npet2->setPinjieBless1(pet->getPinjieBless1());
+        npet2->setGenguBless(pet->getGenguBless());
+        npet2->setDazhou(pet->getDazhou());
+        npet2->setXiaozhou(pet->getXiaozhou());
+        npet2->setChongNum(pet->getChongNum());
+        if(pet->isOnBattle())
+        {
+            setFairypetBattle(npet2, false);
+            npet2->setOnBattle(true);
+        }
+        npet2->UpdateToDB();
+        npet2->setColor(color+1);
+        npet2->setPotential(GData::pet.getPetPotential(pet->getPetBone()));
+        npet2->setLevel(pet->getPetLev());
+        npet2->updateToDB(2, pet->getPetLev());
+        npet2->initSkillUp();
+
+        SYSMSG_BROADCASTV(4139, getCountry(), getName().c_str(), npet2->getColor(), npet2->getName().c_str());
+		SYSMSG_SENDV(4134, this, npet2->getColor(), npet2->getName().c_str());
+        delFairyPet(petId, 2);
+        delete pet;
+        //npet2->sendPinjieInfo();
+        //npet2->sendGenguInfo();
+        return petId;
     }
 
     void Player::getLongyuanLua(UInt32 c)

@@ -9,13 +9,13 @@
 #include "Fighter.h"
 #include "MsgID.h"
 #include "FairyPet.h"
+#include "Script/GameActionLua.h"
+#include "GObject/Country.h"
 
 
 namespace GObject
 {
     extern URandom GRND;
-#define PROB_BASE 10000
-#define GET_REMAINDER(val)  (val % 10)
 
     FairyPet::FairyPet(UInt32 id, Player * owner): Fighter(id, owner),
         _petLev(50), _petBone(0), _onBattle(false)
@@ -27,6 +27,7 @@ namespace GObject
         _xiaozhou = 0;
         _dazhou = 0;
         _overTime = 0;
+        _evolve = 0;
         memset(_initskl, 0, sizeof(_initskl));
     }
 
@@ -41,6 +42,7 @@ namespace GObject
         _xiaozhou = data.xiaozhou;
         _dazhou = data.dazhou;
         _overTime = data.overTime;
+        _evolve = data.evolve;
     }
 
 
@@ -58,8 +60,8 @@ namespace GObject
     void FairyPet::UpdateToDB()
     {
         _overTime = _overTime ? _overTime : TimeUtil::SharpDayT(1);
-        DB2().PushUpdateData("REPLACE INTO `fairyPet` (`id`, `playerId`, `onBattle`, `petLev`, `petBone`, `pinjieBless`, `genguBless`, `chong`, `overTime`, `xiaozhou`, `dazhou`) VALUES (%u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", 
-                getId(), _owner->getId(), _onBattle, _petLev, _petBone, _pinjieBless, _genguBless, _chong, _overTime, _xiaozhou, _dazhou);
+        DB2().PushUpdateData("REPLACE INTO `fairyPet` (`id`, `playerId`, `onBattle`, `petLev`, `petBone`, `pinjieBless`, `genguBless`, `chong`, `overTime`, `xiaozhou`, `dazhou`, `evolve`) VALUES (%u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", 
+                getId(), _owner->getId(), _onBattle, _petLev, _petBone, _pinjieBless, _genguBless, _chong, _overTime, _xiaozhou, _dazhou, _evolve);
     }
 
     bool FairyPet::checkTimeOver()
@@ -421,5 +423,35 @@ namespace GObject
         _owner->send(st);
     }
 
+    void FairyPet::sendPetEvolve()
+    {
+        Stream st(REP::FAIRY_PET);
+        st << static_cast<UInt8>(0x01) << static_cast<UInt8>(0x07);
+        st << static_cast<UInt8>(0);
+        st << getId() << getPetEvolve() << Stream::eos;
+        _owner->send(st);
+    }
+
+    UInt16 FairyPet::addPetEvolveInlua(UInt16 num)
+    {
+        UInt8 evolve = getPetEvolve();
+        if(!num || evolve >= getPetEvMax() || getPetBone() < EVOLVE_BONE_LIMIT || getColor() != 2)
+            return 0;
+        UInt32 newId = GameAction()->getYellowPetId(getId());
+        if(_owner->findFairyPet(newId))
+            return 0;
+        UInt16 n = 0;
+        for(UInt16 i = 0; i < num; ++ i)
+        {
+            ++ n;
+            evolve += (GRND(9) + 1);
+            if(evolve >= getPetEvMax())
+                break;
+        }
+        setPetEvolve(evolve);
+        UpdateToDB();
+        sendPetEvolve();
+        return n;
+    }
 }
 

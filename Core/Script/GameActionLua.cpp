@@ -309,6 +309,7 @@ namespace Script
         CLASS_DEF(Player, sendVipPrivilege);
         CLASS_DEF(Player, sendLuckyBagInfo);
 		CLASS_DEF(Player, LuckyBagRank);
+		CLASS_DEF(Player, findFairyPet);
 
         CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);
@@ -339,6 +340,9 @@ namespace Script
 		CLASS_DEF(Fighter, changeSecondSoulXinxiu);
 		CLASS_DEF(Fighter, get2ndSounSoulMax);
 		CLASS_DEF(Fighter, isPet);
+
+        CLASS_ADD(FairyPet);
+		CLASS_DEF(FairyPet, addPetEvolveInlua);
 
 		//????
 		CLASS_ADD(TaskMgr);
@@ -1599,6 +1603,11 @@ namespace Script
 	UInt32 GameActionLua::exchangPurplePet( Player* player )
 	{
 		return Call<UInt32>("exchangPurplePet", player);
+    }
+
+	UInt32 GameActionLua::getYellowPetId(UInt32 petId)
+	{
+		return Call<UInt32>("getYellowPetId", petId);
     }
 
     bool GameActionLua::RunVipPrivilegeAward(Player* player, UInt8 idx, UInt8 dayth)
