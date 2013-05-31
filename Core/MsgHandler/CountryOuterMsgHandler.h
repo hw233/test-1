@@ -6399,6 +6399,33 @@ void OnRPServerReq( GameMsgHdr & hdr, const void * data)
                 }
             }
             break;
+        case 0x04:
+            {
+                UInt8 type = 0;
+                brd >> type;
+                if(1 == type)
+                    player->getRPZCJBAward();
+                else
+                    player->sendRPZCJBInfo();
+            }
+            break;
+        case 0x05:
+            {
+                UInt8 type = 0;
+                brd >> type;
+                if(1 == type)
+                {
+                    UInt8 idx = 0;
+                    UInt8 cnt = 0;
+                    brd >> idx >> cnt;
+                    player->getRYHBAward(idx, cnt);
+                }
+                else
+                {
+                    player->sendRYHBInfo();
+                }
+            }
+            break;
         default:
             break;
     }

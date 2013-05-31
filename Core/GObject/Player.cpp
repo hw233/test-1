@@ -21204,10 +21204,12 @@ void Player::sendRPZCJBInfo()
         return;
 
     UInt32 zcjb = GetVar(VAR_ZCJB_TIMES);
+    UInt32 gold_got = GetVar(VAR_ZCJB_GOLD_GOT);
     Stream st(REP::RP_SERVER);
     st << static_cast<UInt8>(0x04);
     st << static_cast<UInt8>(ZCJB_TOTAL(zcjb));
     st << static_cast<UInt8>(ZCJB_LEFT(zcjb));
+    st << gold_got << static_cast<UInt32>(0);
     st << Stream::eos;
     send(st);
 }
@@ -21228,6 +21230,9 @@ static UInt32 zcjb_award[16][3] = {
 
 bool Player::getRPZCJBAward()
 {
+    if(World::inActive_opTime_20130531())
+        return;
+
     UInt32 zcjb = GetVar(VAR_ZCJB_TIMES);
     UInt8 left = ZCJB_LEFT(zcjb);
     UInt8 total = ZCJB_TOTAL(zcjb);
@@ -21240,6 +21245,7 @@ bool Player::getRPZCJBAward()
         sendMsgCode(0, 1104);
         return false;
     }
+    -- left;
     UInt8 roolIdx = 1;
     UInt8 rnd = uRand(100);
     if(rnd < zcjb_prob[0])
@@ -21252,7 +21258,18 @@ bool Player::getRPZCJBAward()
     IncommingInfo ii(InZCJBRoolAward, 0, 0);
     getGold(awardGold, &ii);
 
-    sendRPZCJBInfo();
+    UInt32 gold_got = GetVar(VAR_ZCJB_GOLD_GOT);
+    gold_got += awardGold;
+
+    SetVar(VAR_ZCJB_TIMES, ZCJB(total, left));
+    SetVar(VAR_ZCJB_GOLD_GOT, gold_got);
+
+    Stream st(REP::RP_SERVER);
+    st << static_cast<UInt8>(0x04);
+    st << total << left;
+    st << gold_got << awardGold;
+    st << Stream::eos;
+    send(st);
     return true;
 }
 
@@ -21326,7 +21343,7 @@ void Player::getRYHBAward(UInt8 idx, UInt8 cnt)
 {
     if(World::inActive_opTime_20130531())
         return;
-    if(idx >= 15)
+    if(idx >= 15 || cnt == 0)
         return;
 
     UInt32 itemId = ryhb_items[idx][2];

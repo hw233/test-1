@@ -451,23 +451,24 @@ namespace GObject
 
         // 521-540 for zhgc
         VAR_ZCJB_TIMES = 521,      // 招财进宝
-        VAR_ZRYJ_COUNT = 522,      // 逐日印记
-        VAR_HYYJ_COUNT = 523,      // 皓月印记
-        VAR_RYHB_ITEM_CNT_1 = 524,      // 日月合璧购买物品1个数
-        VAR_RYHB_ITEM_CNT_2 = 524,      // 日月合璧购买物品2个数
-        VAR_RYHB_ITEM_CNT_3 = 524,      // 日月合璧购买物品3个数
-        VAR_RYHB_ITEM_CNT_4 = 524,      // 日月合璧购买物品4个数
-        VAR_RYHB_ITEM_CNT_5 = 524,      // 日月合璧购买物品5个数
-        VAR_RYHB_ITEM_CNT_6 = 524,      // 日月合璧购买物品6个数
-        VAR_RYHB_ITEM_CNT_7 = 524,      // 日月合璧购买物品7个数
-        VAR_RYHB_ITEM_CNT_8 = 524,      // 日月合璧购买物品8个数
-        VAR_RYHB_ITEM_CNT_9 = 524,      // 日月合璧购买物品9个数
-        VAR_RYHB_ITEM_CNT_10 = 524,      // 日月合璧购买物品10个数
-        VAR_RYHB_ITEM_CNT_11 = 524,      // 日月合璧购买物品11个数
-        VAR_RYHB_ITEM_CNT_12 = 524,      // 日月合璧购买物品12个数
-        VAR_RYHB_ITEM_CNT_13 = 524,      // 日月合璧购买物品13个数
-        VAR_RYHB_ITEM_CNT_14 = 524,      // 日月合璧购买物品14个数
-        VAR_RYHB_ITEM_CNT_15 = 524,      // 日月合璧购买物品15个数
+        VAR_ZCJB_GOLD_GOT = 522,   // 招财进宝总共获得仙石
+        VAR_ZRYJ_COUNT = 523,      // 逐日印记
+        VAR_HYYJ_COUNT = 524,      // 皓月印记
+        VAR_RYHB_ITEM_CNT_1 = 525,      // 日月合璧购买物品1个数
+        VAR_RYHB_ITEM_CNT_2 = 526,      // 日月合璧购买物品2个数
+        VAR_RYHB_ITEM_CNT_3 = 527,      // 日月合璧购买物品3个数
+        VAR_RYHB_ITEM_CNT_4 = 528,      // 日月合璧购买物品4个数
+        VAR_RYHB_ITEM_CNT_5 = 529,      // 日月合璧购买物品5个数
+        VAR_RYHB_ITEM_CNT_6 = 530,      // 日月合璧购买物品6个数
+        VAR_RYHB_ITEM_CNT_7 = 531,      // 日月合璧购买物品7个数
+        VAR_RYHB_ITEM_CNT_8 = 532,      // 日月合璧购买物品8个数
+        VAR_RYHB_ITEM_CNT_9 = 533,      // 日月合璧购买物品9个数
+        VAR_RYHB_ITEM_CNT_10 = 534,      // 日月合璧购买物品10个数
+        VAR_RYHB_ITEM_CNT_11 = 535,      // 日月合璧购买物品11个数
+        VAR_RYHB_ITEM_CNT_12 = 536,      // 日月合璧购买物品12个数
+        VAR_RYHB_ITEM_CNT_13 = 537,      // 日月合璧购买物品13个数
+        VAR_RYHB_ITEM_CNT_14 = 538,      // 日月合璧购买物品14个数
+        VAR_RYHB_ITEM_CNT_15 = 539,      // 日月合璧购买物品15个数
        
         VAR_MAX,
     };
