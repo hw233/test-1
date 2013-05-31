@@ -482,14 +482,12 @@ namespace GObject
         if(skillLev && SKILLANDLEVEL(SKILL_ID(peAttr.skill), skillLev) != peAttr.skill)
         {
             peAttr.skill = SKILLANDLEVEL(SKILL_ID(peAttr.skill), skillLev);
-            /*
             if (pet)
             {
                 std::string skills = Itoa(peAttr.skill);
                 pet->setSkills(skills, false);
                 pet->updateToDBPetSkill();
             }
-            */
         }
 		DB4().PushUpdateData("UPDATE `petEquipattr` SET `exp` = %u, `level` = %u, `skillId` = %u WHERE `id` = %u", peAttr.exp, peAttr.lv, peAttr.skill, equipId);
 		if(pet != NULL)
