@@ -183,6 +183,13 @@ void OnResetRecharge(GameMsgHdr& hdr, const void * data)
     player->sendRechargeInfo();
 }
 
+void OnResetAccRechargeCnt(GameMsgHdr& hdr, const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+    if (player->GetVar(VAR_RECHARGE_CONDCNT))
+        player->SetVar(VAR_RECHARGE_CONDCNT, 0);
+}
+
 void OnResetConsume(GameMsgHdr& hdr, const void * data)
 {
 	MSG_QUERY_PLAYER(player);
