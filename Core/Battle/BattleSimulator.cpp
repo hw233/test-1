@@ -145,6 +145,7 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, cons
         skillEffectExtraTable[GData::e_eft_lingyou_magatk] = &BattleSimulator::doSkillEffectExtra_LingYouMagAtk;
         skillEffectExtraTable[GData::e_eft_lingyou_def] = &BattleSimulator::doSkillEffectExtra_LingYouDef;
         skillEffectExtraTable[GData::e_eft_lingyou_magdef] = &BattleSimulator::doSkillEffectExtra_LingYouMagDef;
+        skillEffectExtraTable[GData::e_eft_lingshi_bleed] = &BattleSimulator::doSkillEffectExtra_LingShiBleed2;
     }
 }
 
@@ -255,6 +256,7 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, GObj
         skillEffectExtraTable[GData::e_eft_lingyou_magatk] = &BattleSimulator::doSkillEffectExtra_LingYouMagAtk;
         skillEffectExtraTable[GData::e_eft_lingyou_def] = &BattleSimulator::doSkillEffectExtra_LingYouDef;
         skillEffectExtraTable[GData::e_eft_lingyou_magdef] = &BattleSimulator::doSkillEffectExtra_LingYouMagDef;
+        skillEffectExtraTable[GData::e_eft_lingshi_bleed] = &BattleSimulator::doSkillEffectExtra_LingShiBleed2;
     }
 }
 
@@ -7197,7 +7199,7 @@ void BattleSimulator::onDamage( BattleObject * bo, bool active, std::vector<Atta
     if(!bo)
         return;
     BattleFighter* bo2 = static_cast<BattleFighter*>(bo);
-    if(bo2->getHP() * 10 < bo2->getMaxHP())
+    if(bo2->getHP() * 3 < bo2->getMaxHP() && !bo2->getLingHpShield())
     {
         size_t idx = 0;
         const GData::SkillBase* passiveSkill = NULL;
@@ -7210,7 +7212,12 @@ void BattleSimulator::onDamage( BattleObject * bo, bool active, std::vector<Atta
 
         if(!passiveSkill)
             passiveSkill = bo2->getPassiveSkillOnHP10P();
-        doSkillEffectExtraAttack(bo2, bo2->getSide(), bo2->getPos(), passiveSkill);
+
+        if(passiveSkill)
+        {
+            bo2->setLingHpShield(true);
+            doSkillEffectExtraAttack(bo2, bo2->getSide(), bo2->getPos(), passiveSkill);
+        }
     }
 
     UInt8& auraCD = bo2->getAuraDecCD();
@@ -11993,13 +12000,17 @@ bool BattleSimulator::doSkillEffectExtra_LingQu(BattleFighter* bf, const GData::
     if(!skill || !skill->effect)
         return false;
     const std::vector<UInt16>& eft = skill->effect->eft;
+    const std::vector<UInt8>& efl = skill->effect->efl;
 
     size_t cnt = eft.size();
+    if(cnt != efl.size())
+        return false;
+
     for(size_t i = 0; i < cnt; ++ i)
     {
         if(eft[i] == GData::e_eft_lingqu)
         {
-            bf->setLingQu(skill->last);
+            bf->setLingQu(efl[i]);
             bf->setHP(1);
             appendDefStatus(e_lingQu, 0, bf);
             return true;
@@ -12007,6 +12018,26 @@ bool BattleSimulator::doSkillEffectExtra_LingQu(BattleFighter* bf, const GData::
     }
 
     return false;
+}
+
+void BattleSimulator::doSkillEffectExtra_LingShiBleed2(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
+{
+    if(!skill || !skill->effect)
+        return;
+    const std::vector<float>& efv = skill->effect->efv;
+    const std::vector<UInt8>& efl = skill->effect->efl;
+
+    AtkList atklist;
+    getAtkList(bf, skill, atklist);
+    UInt8 cnt = atklist.size();
+    float dmg = bf->getMaxHP() * efv[eftIdx];
+    for(size_t i = 0; i < cnt; ++ i)
+    {
+        BattleFighter* bo = atklist[i].bf;
+        float factor = atklist[i].factor;
+        bo->setLingShiBleed(factor*dmg, efl[eftIdx]);
+        appendDefStatus(e_lingShiBleed, 0, bo);
+    }
 }
 
 bool BattleSimulator::doSkillEffectExtra_LingShiBleed(BattleFighter* bf, BattleFighter* bo, const GData::SkillBase* skill, UInt32 dmg)
@@ -12028,11 +12059,11 @@ bool BattleSimulator::doSkillEffectExtra_LingShiBleed(BattleFighter* bf, BattleF
             {
                 AtkList atklist;
                 getAtkList(bf, skill, atklist);
-                cnt = atklist.size();
-                for(size_t i = 0; i < cnt; ++ i)
+                UInt8 cnt = atklist.size();
+                for(size_t j = 0; j < cnt; ++ j)
                 {
-                    BattleFighter* bo = atklist[i].bf;
-                    float factor = atklist[i].factor;
+                    BattleFighter* bo = atklist[j].bf;
+                    float factor = atklist[j].factor;
                     bo->setLingShiBleed(efv[i]*factor*dmg, efl[i]);
                     appendDefStatus(e_lingShiBleed, 0, bo);
                 }

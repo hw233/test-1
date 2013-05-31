@@ -44,7 +44,7 @@ enum
     /*18*/ SKILL_ONBEDMG,
     /*19*/ SKILL_ONBEPHYDMG,
     /*20*/ SKILL_ONBEMAGDMG,
-    /*21*/ SKILL_ONHP10P,    // 生命剩余10%
+    /*21*/ SKILL_ONHP10P,    // 生命剩余1/3
     SKILL_PASSIVES
 };
 

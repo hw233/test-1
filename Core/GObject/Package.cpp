@@ -5998,7 +5998,7 @@ namespace GObject
             {
                 stLBAttrConf& lbAttrConf = GObjectManager::getLBAttrConf();
                 ItemLingbaoAttr& lba = (static_cast<ItemLingbao*>(item))->getLingbaoAttr();
-                UInt8 lv = item->getReqLev();
+                UInt8 lv = item->getValueLev();
                 UInt8 skillNum = 0;
                 if(lba.skill[0])
                     ++ skillNum;
@@ -6068,17 +6068,18 @@ namespace GObject
         if(!guji || !item)
             return;
 
-        UInt8 lv = guji->reqLev;
+        UInt8 lv = guji->vLev;
         UInt8 lvIdx = (lv - 70)/10;
-        if(lvIdx > 3) lvIdx = 3;
+        if(lvIdx > 4) lvIdx = 4;
 
         UInt16 gjIdx = guji->subClass - Item_Guji;
         UInt8 lbIdx[17] = {0xFF, 0, 1, 2, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 0xFF};
-        UInt16 lbids[4][3] = {
+        UInt16 lbids[5][3] = {
             {11500, 11501, 11502},
             {11503, 11504, 11505},
             {11506, 11507, 11508},
-            {11509, 11510, 11511}};
+            {11509, 11510, 11511},
+            {11512, 11513, 11514}};
 
         UInt8 itemIdx = lbIdx[gjIdx];
         if(lbIdx[gjIdx] == 0xFF)

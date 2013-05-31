@@ -1043,6 +1043,10 @@ private:
     void setLingYouDef(float v) { _lingyou_def = v; }
     void setLingYouMagDef(float v) { _lingyou_magdef = v; }
 
+    bool _lingHpShield;
+    bool getLingHpShield() { return _lingHpShield; }
+    void setLingHpShield(bool v) { _lingHpShield = v; }
+
 public:
 	enum StatusFlag
 	{
