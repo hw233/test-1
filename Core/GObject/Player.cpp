@@ -10998,13 +10998,22 @@ namespace GObject
     }
                 
     void Player::getEquipMoveAward(UInt8 opt)
-    {
-       /* UInt8 state = GetVar(VAR_EQUIP_MOVE_AWARD);
+    {   
+        return; //暂时不上
 
-        int count = int(getFighterEquipAward() + GetPackage()->getPackageEquipCount());
+        int count = 0;
+
+        UInt8 state = GetVar(VAR_EQUIP_MOVE_AWARD);
 
         if(0 == state)
         {
+            count = int(getFighterEquipAward() + GetPackage()->getPackageEquipCount());
+
+            if(0 == count)
+            {
+                count = 1;
+            }
+
             if(1 == opt)
             {
 
@@ -11030,12 +11039,12 @@ namespace GObject
         Stream st(REP::GETAWARD);
         st << static_cast<UInt8>(24);
         st << count << Stream::eos;
-        send(st);*/
+        send(st);
     }
 
-    UInt8 Player::getFighterEquipAward()
+    UInt32 Player::getFighterEquipAward()
     {
-        UInt8 count = 0;
+        UInt32 count = 0;
 
         std::map<UInt32, Fighter *>::iterator it = _fighters.begin();
 
@@ -11044,8 +11053,8 @@ namespace GObject
             Fighter* fgt = it->second;
 
             ItemEquip* e[8] = {fgt->getWeapon(), fgt->getArmor(0), fgt->getArmor(1),
-                fgt->getArmor(2), fgt->getArmor(3), fgt->getArmor(4), fgt->getAmulet(),
-                fgt->getRing()};
+                               fgt->getArmor(2), fgt->getArmor(3), fgt->getArmor(4),
+                               fgt->getAmulet(), fgt->getRing()};
 
             for (int i = 0; i < 8; ++i)
             {
@@ -11053,64 +11062,56 @@ namespace GObject
                 {
                    if(Item_Weapon == e[i]->getClass())
                    {
-                       if(6 == e[i]->getItemEquipData().enchant)
+                       switch(e[i]->getItemEquipData().enchant)
                        {
-                            count += 1;
-                       }
-                       else if(7 == e[i]->getItemEquipData().enchant)
-                       {
-                           count += 2;
-                       }
-                       else if(8 == e[i]->getItemEquipData().enchant)
-                       {
-                           count += 10;
-                       }
-                       else if(9 == e[i]->getItemEquipData().enchant)
-                       {
-                           count += 30;
-                       }
-                       else if(10 == e[i]->getItemEquipData().enchant)
-                       {
-                           count += 50;
-                       }
-                       else if(11 == e[i]->getItemEquipData().enchant)
-                       {
-                           count += 100;
-                       }
-                       else if(12 == e[i]->getItemEquipData().enchant)
-                       {
-                           count += 150;
+                           case 6:
+                               count += 1;
+                               break;
+                           case 7:
+                               count += 2;
+                               break;
+                           case 8:
+                               count += 10;
+                               break;
+                           case 9:
+                               count += 30;
+                               break;
+                           case 10:
+                               count += 50;
+                               break;
+                           case 11:
+                               count += 100;
+                               break;
+                           case 12:
+                               count += 150;
+                               break;
                        }
                    }
                    else
                    {
-                       if(6 == e[i]->getItemEquipData().enchant)
+                       switch(e[i]->getItemEquipData().enchant)
                        {
-                            count += 1;
-                       }
-                       else if(7 == e[i]->getItemEquipData().enchant)
-                       {
-                           count += 2;
-                       }
-                       else if(8 == e[i]->getItemEquipData().enchant)
-                       {
-                           count += 5;
-                       }
-                       else if(9 == e[i]->getItemEquipData().enchant)
-                       {
-                           count += 10;
-                       }
-                       else if(10 == e[i]->getItemEquipData().enchant)
-                       {
-                           count += 20;
-                       }
-                       else if(11 == e[i]->getItemEquipData().enchant)
-                       {
-                           count += 40;
-                       }
-                       else if(12 == e[i]->getItemEquipData().enchant)
-                       {
-                           count += 70;
+                           case 6:
+                               count += 1;
+                               break;
+                           case 7:
+                               count += 2;
+                               break;
+                           case 8:
+                               count += 5;
+                               break;
+                           case 9:
+                               count += 10;
+                               break;
+                           case 10:
+                               count += 20;
+                               break;
+                           case 11:
+                               count += 40;
+                               break;
+                           case 12:
+                               count += 70;
+                               break;
                        }
                    }
                 }
@@ -11122,8 +11123,9 @@ namespace GObject
 
     void Player::getQQTenpayAward(UInt8 opt)
     {
-        
-       /* UInt8 state = GetVar(VAR_QQTENPAY_AWARD);
+        return; //暂时不上
+
+        UInt8 state = GetVar(VAR_QQTENPAY_AWARD);
 
         if(getVia() == "ssgw_qqdh")
         {
@@ -11144,6 +11146,7 @@ namespace GObject
                 GetPackage()->AddItem(30, 2, true, false, FromQQTenpay);
 
                 SetVar(VAR_QQTENPAY_AWARD, 1);
+                state = 1;
             }
             
             state += 1;
@@ -11158,17 +11161,16 @@ namespace GObject
 
         Stream st(REP::GETAWARD);
         st << static_cast<UInt8>(22);
-        st << 1 << Stream::eos;
-        send(st);*/
+        st << state << Stream::eos;
+        send(st);
     }
 
     void Player::getQQIMQuickLoginAward(UInt8 opt)
     {
-       /* UInt8 state = GetVar(VAR_QQIM_QUICK_LOGIN_AWARD);
+        UInt8 state = GetVar(VAR_QQIM_QUICK_LOGIN_AWARD);
 
         if(getVia() == "sscq_QQCLIENT.MAINPANEL.SETAPP")
         {
-
             if(GetPackage()->GetRestPackageSize() < 6 && 1 == opt)
             {
 			    sendMsgCode(0, 1011);
@@ -11178,10 +11180,10 @@ namespace GObject
 
             if(state == 0 && opt == 1)
             {
-                GetPackage()->AddItem(51, 1, true, false, FromQQIMQuickLogin);
-                GetPackage()->AddItem(48, 1, true, false, FromQQIMQuickLogin);
-                GetPackage()->AddItem(9371, 1, true, false, FromQQIMQuickLogin);
-                GetPackage()->AddItem(56, 1, true, false, FromQQIMQuickLogin);
+                GetPackage()->AddItem(50, 1, true, false, FromQQIMQuickLogin);
+                GetPackage()->AddItem(509, 1, true, false, FromQQIMQuickLogin);
+                GetPackage()->AddItem(9367, 1, true, false, FromQQIMQuickLogin);
+                GetPackage()->AddItem(9369, 1, true, false, FromQQIMQuickLogin);
                 GetPackage()->AddItem(15, 1, true, false, FromQQIMQuickLogin);
 
                 SetVar(VAR_QQIM_QUICK_LOGIN_AWARD, 1);
@@ -11200,13 +11202,14 @@ namespace GObject
         Stream st(REP::GETAWARD);
         st << static_cast<UInt8>(23);
         st << state << Stream::eos;
-        send(st);*/
+        send(st);
     }
 
     void Player::getQQMusicAward(UInt8 opt)
     {
-         
-       /* UInt8 state = GetVar(VAR_QQMUSIC_DAY_AWARD);
+        return; //暂时不上
+
+        UInt8 state = GetVar(VAR_QQMUSIC_DAY_AWARD);
 
         if (GetPackage()->GetRestPackageSize() < 6 && opt == 1)
         {
@@ -11231,7 +11234,7 @@ namespace GObject
         Stream st(REP::GETAWARD);
         st << static_cast<UInt8>(21);
         st << state << Stream::eos;
-        send(st);*/
+        send(st);
     }
 
     void Player::getQQNavigationAward(UInt8 opt)
@@ -11295,7 +11298,7 @@ namespace GObject
                 firstLoginAward += 1;
             }
             
-           states = dayAward | weekAward << 2 | firstLoginAward << 4;
+            states = dayAward | weekAward << 2 | firstLoginAward << 4;
         }
 
         Stream st(REP::GETAWARD);
@@ -21231,7 +21234,7 @@ static UInt32 zcjb_award[16][3] = {
 bool Player::getRPZCJBAward()
 {
     if(World::inActive_opTime_20130531())
-        return;
+        return false;
 
     UInt32 zcjb = GetVar(VAR_ZCJB_TIMES);
     UInt8 left = ZCJB_LEFT(zcjb);
@@ -21376,6 +21379,27 @@ void Player::getRYHBAward(UInt8 idx, UInt8 cnt)
     st << zryj << hyyj << idx << left_cnt;
     st << Stream::eos;
     send(st);
+}
+
+void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
+{
+    if (World::getSurnameLegend())
+    {
+        if(flag == e_sla_none)
+        {
+            GetPackage()->AddItem(9397, 1, true, false, FromNpc);
+        }
+        else
+        {
+            UInt32 status = GetVar(VAR_SURNAME_LEGEND_STATUS);
+            if(!(status & flag))
+            {
+                GetPackage()->AddItem(9397, 1, true, false, FromNpc);
+                status |= flag;
+                SetVar(VAR_SURNAME_LEGEND_STATUS, status);
+            }
+        }
+    }
 }
 
 } // namespace GObject

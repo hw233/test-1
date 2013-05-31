@@ -588,6 +588,7 @@ void HeroIsland::applayPlayers()
                         pd->player->AddExp(calcExp(pd->player->GetLev())*_expfactor[j-1]*factor);
                     pd->expcd = now + 60;
                 }
+                pd->player->getSurnameLegendAward(e_sla_hi);
             }
 
             if (pd && pd->player && now >= pd->attrcd && pd->attr)

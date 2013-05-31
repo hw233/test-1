@@ -143,8 +143,9 @@ function loadStore()
             store:add(2 ,9375 ,20)
         end
         
-        if getSurnameLegend() then
-            store:add(2 ,9383 , 20)
+        if getSurnameLegend(30) then
+            --store:add(2 ,9383 , 20)
+            store:add(2 ,9397, 20)
         end
 
         if is2013_0201_0228() then

@@ -8771,7 +8771,7 @@ function ItemNormal_00009382(iid, num, bind, param)
             end
         end
         package:Add(items[g], 1, true, false, 2)
-        if iid == 9383 and getSurnameLegend() then
+        if iid == 9397 and getSurnameLegend() then
             local rand_card = math.random(1,10000);
             local card_chance = 3000;
             if used_num + n > 30 then
@@ -8791,7 +8791,7 @@ function ItemNormal_00009382(iid, num, bind, param)
     if card_num > 0 then
         SendMsg(player, 0x35, "获得卡牌 x"..card_num);
     end
-    if iid == 9383 and getSurnameLegend() then
+    if iid == 9397 and getSurnameLegend() then
         player:AddVar(452, num)
     end
     player:sendLuckyBagInfo()
@@ -10551,6 +10551,7 @@ local ItemNormal_Table = {
     [9374] = ItemNormal_00009366,
     [9382] = ItemNormal_00009382,
     [9383] = ItemNormal_00009382,
+    [9397] = ItemNormal_00009382,
     [9388] = ItemNormal_00009388,
     [9390] = ItemNormal_00009390,
     [9900] = ItemNormal_NameCard,

@@ -181,6 +181,15 @@ namespace GObject
 #define SPREAD_ALREADY_USE        0x01
 #define SPREAD_ALREADY_GET        0x02
 
+    enum SurnameLegendAwardFlag
+    {
+        e_sla_none = 0x00,
+        e_sla_cb = 0x01,
+        e_sla_clb = 0x02,
+        e_sla_hi = 0x04,
+        e_sla_mr = 0x08,
+    };
+
     enum PEXP_HOOK_INFEX
     {
         ENUM_TRAINP1 = 1,  /** 初级经验加速符*1.2,加速(*1.3) **/
@@ -2123,7 +2132,7 @@ namespace GObject
         void getQQTenpayAward(UInt8 opt);
         void getQQIMQuickLoginAward(UInt8 opt);
         void getEquipMoveAward(UInt8 opt);
-        UInt8 getFighterEquipAward();
+        UInt32 getFighterEquipAward();
 
         // 帮派神像
         float getClanStatueHPEffect();
@@ -2391,6 +2400,7 @@ namespace GObject
         void checkZCJB();
         void sendRYHBInfo();
         void getRYHBAward(UInt8 idx, UInt8 cnt);
+        void getSurnameLegendAward(SurnameLegendAwardFlag flag);
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n
