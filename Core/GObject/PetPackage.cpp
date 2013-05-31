@@ -602,10 +602,8 @@ namespace GObject
         if(typeId == 0)
             typeId = GData::GDataManager::GetPetEqTypeIdByColor(colorIdx);
         UInt16 skillId = GData::GDataManager::GetPetEqSkill();
-        /*
         if(skillId == 0 || typeId == 0)
             return NULL;
-        */
 		itype = GData::itemBaseTypeManager[typeId];
 		if(itype == NULL)
             return NULL;

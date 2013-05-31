@@ -566,12 +566,11 @@ namespace GObject
             sendModification(eq, pos);
             UpdateToDB();
         }
-        /*
         std::string skills = "";
         if (old)
         {
             skills = Itoa(old->getPetEqAttr().skill);
-            delSkills(skills, false);
+            delSkills(skills);
         }
         if (eq)
         {
@@ -580,7 +579,6 @@ namespace GObject
             setSkills(skills, false);
         }
         updateToDBPetSkill();
-        */
         return old;
     }
 

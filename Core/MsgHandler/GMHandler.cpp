@@ -3282,10 +3282,10 @@ void GMHandler::OnShowBattlePoint(GObject::Player* player, std::vector<std::stri
         UInt16 magatk = static_cast<UInt16>(bformula->calcMagAttack(pet));
         UInt16 def = static_cast<UInt16>(bformula->calcDefend(pet));
         UInt16 magdef = static_cast<UInt16>(bformula->calcMagDefend(pet));
-        //身法
+        UInt16 action = static_cast<UInt16>(bformula->calcAction(pet));
         UInt8 lingya = pet->getPetLingya();
         UInt16 cri = static_cast<float>(bformula->calcCritical(pet, NULL)) * 100;
-        //暴击伤害
+        UInt16 cridmg = static_cast<float>(bformula->calcCriticalDmg(pet)) * 100;
         UInt16 prc = static_cast<float>(bformula->calcPierce(pet, NULL)) * 100;
         UInt16 magres = static_cast<float>(bformula->calcMagRes(pet, NULL)) * 100;
         UInt16 hit = static_cast<float>(bformula->calcHitrate(pet, NULL)) * 100;
@@ -3294,7 +3294,7 @@ void GMHandler::OnShowBattlePoint(GObject::Player* player, std::vector<std::stri
         UInt16 tough = static_cast<float>(bformula->calcTough(pet, NULL)) * 100;
 
         SYSMSG_SENDV(626, player, pet->getName().c_str(), static_cast<UInt32>(pet->getBattlePoint()),
-                hp, atk, magatk, def, magdef, 0, lingya, cri, 0, prc, magres, hit, evd, cnt, tough);
+                hp, atk, magatk, def, magdef, action, lingya, cri, cridmg, prc, magres, hit, evd, cnt, tough);
     }
 }
 
@@ -4091,14 +4091,12 @@ void GMHandler::OnAddPetEquipExp(GObject::Player *player, std::vector<std::strin
     if(skillLev && SKILLANDLEVEL(SKILL_ID(peAttr.skill), skillLev) != peAttr.skill)
     {
         peAttr.skill = SKILLANDLEVEL(SKILL_ID(peAttr.skill), skillLev);
-        /*
         if (pet)
         {
             std::string skills = Itoa(peAttr.skill);
             pet->setSkills(skills, false);
             pet->updateToDBPetSkill();
         }
-        */
     }
     DB4().PushUpdateData("UPDATE `petEquipattr` SET `exp` = %u, `level` = %u, `skillId` = %u WHERE `id` = %u", peAttr.exp, peAttr.lv, peAttr.skill, equip->getId());
     pet->setDirty();
@@ -4113,7 +4111,7 @@ void GMHandler::OnPetEq(GObject::Player * player, std::vector<std::string>& args
 	{
 		UInt32 itemId = atoi(args[i].c_str());
         ++ i;
-        UInt16 skill = atoi(args[i].c_str()); 
+        UInt16 skill = atoi(args[i].c_str());
 		const GData::ItemBaseType * itype = GData::itemBaseTypeManager[itemId];
 		if(itype == NULL)
             break;
