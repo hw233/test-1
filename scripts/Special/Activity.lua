@@ -1023,7 +1023,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     Item9344Act(player, lootlvl);
     Item9343Act(player, lootlvl);
     if inActive_opTime_20130531() then
-        player:AddVar(522, 20);  -- 逐日印记
+        player:AddVar(523, 20);  -- 逐日印记
     end
 end
 
@@ -1064,7 +1064,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
     Item9344Act(player, lootlvl);
     Item9343Act(player, lootlvl);
     if inActive_opTime_20130531() then
-        player:AddVar(523, 20); -- 皓月印记
+        player:AddVar(524, 20); -- 皓月印记
     end
 end
 

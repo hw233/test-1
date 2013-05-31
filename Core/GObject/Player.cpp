@@ -17062,7 +17062,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
         if(career == 0 || career > 3)
             return;
 
-        if(_playerData.totalRecharge < newRecharge[step])
+        if(_playerData.totalRecharge < newRecharge[step-1])
             return;
 
         UInt32 curStep = GetVar(VAR_FIRST_RECHARGE_STEP);
@@ -19553,11 +19553,14 @@ UInt32 Player::getQQGameOnlineTotalTime()
 }
 void Player::sendRP7TreasureInfo(bool isLogin)
 {
+    if(cfg.rpServer != e_rp_xinyun)
+        return;
+
     bool isFinish = false;
     UInt8 totalGot = 0;
     UInt32 b = GVAR.GetVar(GVAR_TREASURE_BEGIN);
     UInt32 n = GVAR.GetVar(GVAR_TREASURE_END);
-    if (cfg.rpServer && b ==0)
+    if (b ==0)
     {
         b = World::getOpenTime();
         n = b+7*86400-1;
@@ -19762,7 +19765,7 @@ void Player::getRP7TreasureAward(UInt8 idx)
 
 void Player::sendRP7SignInfo()
 {
-    if (!cfg.rpServer)
+    if(cfg.rpServer != e_rp_xinyun)
         return;
  
     UInt32 now_sharp = TimeUtil::SharpDay(0);
@@ -21203,7 +21206,7 @@ bool Player::checkBBFT()
 #define ZCJB(t, l)    (((t&0xFF)<<8)|(l&0xFF))
 void Player::sendRPZCJBInfo()
 {
-    if(World::inActive_opTime_20130531())
+    if(!World::inActive_opTime_20130531())
         return;
 
     UInt32 zcjb = GetVar(VAR_ZCJB_TIMES);
@@ -21233,7 +21236,7 @@ static UInt32 zcjb_award[16][3] = {
 
 bool Player::getRPZCJBAward()
 {
-    if(World::inActive_opTime_20130531())
+    if(!World::inActive_opTime_20130531())
         return false;
 
     UInt32 zcjb = GetVar(VAR_ZCJB_TIMES);
@@ -21278,7 +21281,7 @@ bool Player::getRPZCJBAward()
 
 void Player::checkZCJB()
 {
-    if(World::inActive_opTime_20130531())
+    if(!World::inActive_opTime_20130531())
         return;
 
     UInt32 zcjb = GetVar(VAR_ZCJB_TIMES);
@@ -21318,7 +21321,7 @@ static UInt32 ryhb_items[15][4] = {
 
 void Player::sendRYHBInfo()
 {
-    if(World::inActive_opTime_20130531())
+    if(!World::inActive_opTime_20130531())
         return;
 
     Stream st(REP::RP_SERVER);
@@ -21344,7 +21347,7 @@ void Player::sendRYHBInfo()
 
 void Player::getRYHBAward(UInt8 idx, UInt8 cnt)
 {
-    if(World::inActive_opTime_20130531())
+    if(!World::inActive_opTime_20130531())
         return;
     if(idx >= 15 || cnt == 0)
         return;
@@ -21355,16 +21358,19 @@ void Player::getRYHBAward(UInt8 idx, UInt8 cnt)
         return;
 
     if(GetFreePackageSize() < ibt->Size(cnt))
+    {
+        sendMsgCode(0, 1011);
         return;
+    }
 
-    UInt32 zryj = GetVar(VAR_ZRYJ_COUNT)/20;
-    UInt32 hyyj = GetVar(VAR_HYYJ_COUNT)/20;
+    UInt32 zryj = GetVar(VAR_ZRYJ_COUNT);
+    UInt32 hyyj = GetVar(VAR_HYYJ_COUNT);
     UInt8 item_cnt = GetVar(VAR_RYHB_ITEM_CNT_1+idx);
-    if(ryhb_items[idx][0]*cnt > zryj || ryhb_items[idx][1]*cnt > hyyj || ryhb_items[idx][3] < (item_cnt + cnt))
+    if(ryhb_items[idx][0]*cnt > zryj/20 || ryhb_items[idx][1]*cnt > hyyj/20 || ryhb_items[idx][3] < (item_cnt + cnt))
         return;
 
-    zryj -= ryhb_items[idx][0] * cnt;
-    hyyj -= ryhb_items[idx][1] * cnt;
+    zryj -= ryhb_items[idx][0] * cnt * 20;
+    hyyj -= ryhb_items[idx][1] * cnt * 20;
     item_cnt += cnt;
 
     UInt8 left_cnt = ryhb_items[idx][3] - item_cnt;
@@ -21376,7 +21382,7 @@ void Player::getRYHBAward(UInt8 idx, UInt8 cnt)
 
     Stream st(REP::RP_SERVER);
     st << static_cast<UInt8>(0x05) << static_cast<UInt8>(1);
-    st << zryj << hyyj << idx << left_cnt;
+    st << static_cast<UInt32>(zryj/20) << static_cast<UInt32>(hyyj/20) << idx << left_cnt;
     st << Stream::eos;
     send(st);
 }

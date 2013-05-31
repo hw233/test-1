@@ -8486,6 +8486,7 @@ function ItemNormal_fighterCard(iid, num, bind, param)
         [9270] = 33 ,
         [9271] = 43 ,
         [9272] = 52 ,
+        [9396] = 160,
     }
 
     local id = fighters[iid]
@@ -10504,6 +10505,7 @@ local ItemNormal_Table = {
     [9270] = ItemNormal_fighterCard,
     [9271] = ItemNormal_fighterCard,
     [9272] = ItemNormal_fighterCard,
+    [9396] = ItemNormal_fighterCard,
     [9274] = ItemNormal_00009274,
     [9276] = ItemNormal_00009276,
     [9277] = ItemNormal_00009277,
