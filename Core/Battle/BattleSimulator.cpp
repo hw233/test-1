@@ -6952,10 +6952,7 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
             break;
         }
         if(static_cast<BattleFighter*>(bo)->isPet())
-        {
             fSummonOrMirror = true;
-            break;
-        }
 
         if(static_cast<BattleFighter*>(bo)->isSummon())
         {
