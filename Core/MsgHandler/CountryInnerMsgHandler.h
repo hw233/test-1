@@ -988,11 +988,13 @@ void OnDirectPurchase( GameMsgHdr& hdr, const void * data )
     if (pur->code == 1)
     {
         SYSMSG_SENDV(4916, player);
+        player->sendMsgCode(0, 1090);
         return;
     }
     if (pur->code == 2)
     {
         SYSMSG_SENDV(4917, player);
+        player->sendMsgCode(0, 1507);
         return;
     }
 
