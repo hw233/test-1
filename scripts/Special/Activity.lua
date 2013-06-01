@@ -182,9 +182,9 @@ function onLogin(player)
         onNVDLogin(player)
     end
 
-    if getJune() then
-        onJune(player)
-    end
+    --if getJune() then
+    --    onJune(player)
+    --end
     if getJune1() then
         onJune1(player)
     end
@@ -197,6 +197,7 @@ function onLogin(player)
 
     onWansheng(player)
     TgcEvent(player, 0)
+    onJune_20130601(player)
 end
 
 function onNVDLogin(player)
@@ -227,15 +228,17 @@ function onLevelup(player, olev, nlev)
     if getMayDay1() then
         onMayDay1(player)
     end
-    if getJune() then
-        onJune(player)
-    end
+    --if getJune() then
+    --    onJune(player)
+    --end
     if getJune1() then
         onJune1(player)
     end
     if getJuly() then
         onJuly(player)
     end
+
+    onJune_20130601(player)
 end
 
 function onDungeonWin(player, id, count, free)
@@ -1738,6 +1741,27 @@ function onJune(player)
 
     if lvl >= 40 and player:GetVar(111) == 0 then
         sendItemPackageMail(player, msg_51, msg_52, {1756,1,1});
+        player:SetVar(111, 1)
+    end
+end
+
+function onJune_20130601(player)
+    local startTm = { ['year'] = 2013, ['month'] = 6, ['day'] = 01, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local endTm = { ['year'] = 2013, ['month'] = 6, ['day'] = 04, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local s = os.time(startTm);
+    local e = os.time(endTm);
+    local n = os.time();
+    if n < s or n > e then
+        return
+    end
+
+    local lvl = player:GetLev()
+    if lvl < 40 then
+        return
+    end
+
+    if player:GetVar(111) == 0 then
+        sendItemPackageMail(player, msg_51, msg_52, {1765,1,1});
         player:SetVar(111, 1)
     end
 end

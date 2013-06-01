@@ -10978,10 +10978,6 @@ namespace GObject
             break;
         case 23:
             //QQIM快速登录奖励
-            if(World::getOpenTime() < TimeUtil::MkTime(2013, 5, 30))
-            {
-                return;
-            }
             getQQIMQuickLoginAward(opt);
             break;
         case 24:
