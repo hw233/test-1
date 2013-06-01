@@ -700,6 +700,8 @@ private:
     float getBFAttack(BattleFighter* bf);
     float getBFMagDefend(BattleFighter* bf);
     float getBFDefend(BattleFighter* bf);
+    float getBFAtkReduce(BattleFighter* bf);
+    float getBFMagAtkReduce(BattleFighter* bf);
     void doPassiveSkillBeMagDmg(BattleFighter* bf, BattleFighter* bo, UInt32 dmg);
     void doPassiveSkillBePHYDmg(BattleFighter* bf, BattleFighter* bo, UInt32 dmg);
 };
