@@ -2035,6 +2035,7 @@ void ClanBoss::reward()
                 {
                     mailPackageManager.push(mail2->id, &s_items2[idx*2], 2, true);
                 }
+                member->player->getSurnameLegendAward(e_sla_mr);
                 member->player->SetVar(VAR_CLANBOSS_GONGXIAN, 0);
                 if (_bossDead)
                 {

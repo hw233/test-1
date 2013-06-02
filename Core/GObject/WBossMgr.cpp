@@ -517,6 +517,7 @@ void WBoss::reward(Player* player)
 
         GameAction()->doStrong((*i).player, SthBoss, 0, 0);
         (*i).player->setContinuousRFAward(6);
+        player->getSurnameLegendAward(e_sla_none);
     }
 
     if (player)

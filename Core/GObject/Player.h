@@ -181,6 +181,15 @@ namespace GObject
 #define SPREAD_ALREADY_USE        0x01
 #define SPREAD_ALREADY_GET        0x02
 
+    enum SurnameLegendAwardFlag
+    {
+        e_sla_none = 0x00,
+        e_sla_cb = 0x01,
+        e_sla_clb = 0x02,
+        e_sla_hi = 0x04,
+        e_sla_mr = 0x08,
+    };
+
     enum PEXP_HOOK_INFEX
     {
         ENUM_TRAINP1 = 1,  /** 初级经验加速符*1.2,加速(*1.3) **/
@@ -2385,6 +2394,8 @@ namespace GObject
         UInt8 doCuilian1(int&, int&);
         void pickupCuilian(UInt8 clType);
         bool checkBBFT();
+
+        void getSurnameLegendAward(SurnameLegendAwardFlag flag);
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n
