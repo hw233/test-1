@@ -3495,6 +3495,7 @@ void Fighter::delSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_AFTEVD ||
                         s->cond == GData::SKILL_AFTRES ||
                         s->cond == GData::SKILL_DEAD ||
+                        s->cond == GData::SKILL_DEAD_FAKE ||
                         s->cond == GData::SKILL_ENTER ||
                         s->cond == GData::SKILL_ONTHERAPY ||
                         s->cond == GData::SKILL_ONSKILLDMG ||
@@ -3542,6 +3543,7 @@ void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_AFTEVD ||
                         s->cond == GData::SKILL_AFTRES ||
                         s->cond == GData::SKILL_DEAD ||
+                        s->cond == GData::SKILL_DEAD_FAKE ||
                         s->cond == GData::SKILL_ENTER ||
                         s->cond == GData::SKILL_ONTHERAPY ||
                         s->cond == GData::SKILL_ONSKILLDMG ||
@@ -3578,6 +3580,16 @@ bool Fighter::upPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb)
     UInt16 idx = type - GData::SKILL_PASSSTART;
     if (p100)
     { // 100%
+        for (size_t j = 0; j < _rpasskl[idx].size(); ++j)
+        {
+            if (SKILL_ID(_rpasskl[idx][j]) == SKILL_ID(skill))
+            { // off
+                std::vector<UInt16>::iterator i = _rpasskl[idx].begin();
+                std::advance(i, j);
+                _rpasskl[idx].erase(i);
+                _skillBPDirty = true;
+            }
+        }
         for (size_t j = 0; j < _passkl[idx].size(); ++j)
         {
             if (SKILL_ID(_passkl[idx][j]) == SKILL_ID(skill))
@@ -3603,6 +3615,15 @@ bool Fighter::upPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb)
     }
     else
     {
+        for (size_t j = 0; j < _passkl[idx].size(); ++j)
+        {
+            if (SKILL_ID(_passkl[idx][j]) == SKILL_ID(skill))
+            {
+                ret = true;
+                break;
+            }
+        }
+
         for (size_t j = 0; j < _rpasskl[idx].size(); ++j)
         {
             if (SKILL_ID(_rpasskl[idx][j]) == SKILL_ID(skill))
