@@ -2132,7 +2132,7 @@ namespace GObject
         void getQQTenpayAward(UInt8 opt);
         void getQQIMQuickLoginAward(UInt8 opt);
         void getEquipMoveAward(UInt8 opt);
-        UInt8 getFighterEquipAward();
+        UInt32 getFighterEquipAward();
 
         // 帮派神像
         float getClanStatueHPEffect();

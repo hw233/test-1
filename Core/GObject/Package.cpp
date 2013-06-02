@@ -4632,9 +4632,9 @@ namespace GObject
     }
     
 
-    UInt8 Package::getPackageEquipCount()
+    UInt32 Package::getPackageEquipCount()
     {
-        UInt8 count = 0;
+        UInt32 count = 0;
 
         item_elem_iter iter = m_Items.begin();
 
@@ -4645,71 +4645,62 @@ namespace GObject
              ItemEquip * equip = static_cast<ItemEquip*>(item);
 
              if(item->getReqLev() >= 60 && Item_Yellow == item->getQuality() && 
-               /* IsEquipTypeId(item->GetTypeId()) && !IsLingbaoTypeId(item->GetTypeId())*/ 
                IsEquip(equip->getClass()) && Item_Trump != equip->getClass())
              {
-                ItemEquip * equip = static_cast<ItemEquip*>(item);
                 ItemEquipData& ied = equip->getItemEquipData();
+
                 if(Item_Weapon == equip->getClass())
                 {
-                    if(6 == ied.enchant)
+                    switch(ied.enchant)
                     {
-                        count += 1; 
-                    }
-                    else if(7 == ied.enchant)
-                    {
-                        count += 2; 
-                    }
-                    else if(8 == ied.enchant)
-                    {
-                        count += 10; 
-                    }
-                    else if(9 == ied.enchant)
-                    {
-                        count += 30; 
-                    }
-                    else if(10 == ied.enchant)
-                    {
-                        count += 50; 
-                    }
-                    else if(11 == ied.enchant)
-                    {
-                        count += 100; 
-                    }
-                    else if(12 == ied.enchant)
-                    {
-                        count += 150; 
+                        case 6:
+                            count += 1;
+                            break;
+                        case 7:
+                            count += 2;
+                            break;
+                        case 8:
+                            count += 10;
+                            break;
+                        case 9:
+                            count += 30;
+                            break;
+                        case 10:
+                            count += 50;
+                            break;
+                        case 11:
+                            count += 100;
+                            break;
+                        case 12:
+                            count += 150;
+                            break;
                     }
                 }
                 else
                 {
-                    if(6 == ied.enchant)
+                    switch(ied.enchant)
                     {
-                        count += 1; 
-                    }
-                    else if(7 == ied.enchant)
-                    {
-                        count += 2; 
-                    }
-                    else if(8 == ied.enchant)
-                    {
-                        count += 5; 
-                    }
-                    else if(9 == ied.enchant)
-                    {
-                        count += 10; 
-                    }
-                    else if(10 == ied.enchant)
-                    {
-                        count += 20; 
-                    }
-                    else if(11 == ied.enchant)
-                    {
-                        count += 40; 
-                    }
-                    else if(12 == ied.enchant)
-                    {
-                        count += 70; 
+                        case 6:
+                            count += 1;
+                            break;
+                        case 7:
+                            count += 2;
+                            break;
+                        case 8:
+                            count += 5;
+                            break;
+                        case 9:
+                            count += 10;
+                            break;
+                        case 10:
+                            count += 20;
+                            break;
+                        case 11:
+                            count += 40;
+                            break;
+                        case 12:
+                            count += 70;
+                            break;
                     }
                 }
              }
