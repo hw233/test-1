@@ -4465,7 +4465,7 @@ namespace GObject
 		}
 		if(field != NULL)
 			DB1().PushUpdateData("UPDATE `player` SET `%s` = %u WHERE `id` = %"I64_FMT"u", field, v, _id);
-        if (cfg.rpServer && t == 7 && TimeUtil::Now() < World::getOpenTime() + 7 * 86400)
+        if (t == 7 && TimeUtil::Now() < World::getOpenTime() + 7 * 86400)
         {
             SetVar(VAR_RP7_RECHARGE, v);
         }
@@ -7694,7 +7694,6 @@ namespace GObject
         addRC7DayRecharge(r);
         addRF7DayRecharge(r);
         addRechargeNextRet(r);
-        if (cfg.rpServer)
         {
             GameMsgHdr hdr(0x1CA, WORKER_THREAD_WORLD, this, sizeof(_playerData.totalRecharge));
             GLOBAL().PushMsg(hdr, &_playerData.totalRecharge);
