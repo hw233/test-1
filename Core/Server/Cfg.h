@@ -1,6 +1,14 @@
 #ifndef _CFG_H_
 #define _CFG_H_
 
+
+enum RPServerType
+{
+    e_rp_none = 0,
+    e_rp_xinyun = 1,
+    e_rp_lianmen = 2,
+};
+
 class Cfg
 {
 public:
@@ -102,7 +110,7 @@ public:
     bool unionPlatform;
     bool autoForbid;
     bool autoKick;
-    bool rpServer;
+    RPServerType rpServer;
 
 public:
 	inline void setTcpPort(UInt16 p) {tcpPort = p;}
@@ -148,7 +156,7 @@ public:
     inline void setSecDCLog(bool v) { secdclog = v; }
     inline void setSecDCLogTest(bool v) { secdclogTest = v; }
     inline void setUnionPlatform(bool v) { unionPlatform = v; }
-	inline void setRPServer(bool v) {rpServer  = v; }
+	inline void setRPServer(RPServerType v) {rpServer  = v; }
 
     inline void setAutoForbid(bool v) { autoForbid = v; }
     inline void setAutoKick(bool v) { autoKick = v; }

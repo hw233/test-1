@@ -1279,9 +1279,9 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendVipPrivilege();
     pl->svrSt(4);
     pl->sendRP7TreasureInfo(true);
+    pl->sendRP7SignInfo();
     if (cfg.rpServer)
     {
-        pl->sendRP7SignInfo();
         GameMsgHdr hdr(0x1CB, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr, NULL);
     }
@@ -6365,6 +6365,8 @@ void OnRPServerReq( GameMsgHdr & hdr, const void * data)
             //聚宝盆
         case 0x02:
             {
+                if(cfg.rpServer != e_rp_xinyun)
+                    break;
                 UInt8 type = 0;
                 brd >> type;
                 if (1 == type)
@@ -6384,6 +6386,8 @@ void OnRPServerReq( GameMsgHdr & hdr, const void * data)
             //注册30日签到
         case 0x03:
             {
+                if(cfg.rpServer != e_rp_xinyun)
+                    break;
                 UInt8 type = 0;
                 brd >> type;
                 if (1 == type)
@@ -6396,6 +6400,37 @@ void OnRPServerReq( GameMsgHdr & hdr, const void * data)
                         player->RP7Sign(idx);
                     else if (3 == type)
                         player->getRP7SignPackage(idx);
+                }
+            }
+            break;
+        case 0x04:
+            {
+                if(cfg.rpServer == e_rp_xinyun)
+                    break;
+                UInt8 type = 0;
+                brd >> type;
+                if(1 == type)
+                    player->getRPZCJBAward();
+                else
+                    player->sendRPZCJBInfo();
+            }
+            break;
+        case 0x05:
+            {
+                if(cfg.rpServer == e_rp_xinyun)
+                    break;
+                UInt8 type = 0;
+                brd >> type;
+                if(1 == type)
+                {
+                    UInt8 idx = 0;
+                    UInt8 cnt = 0;
+                    brd >> idx >> cnt;
+                    player->getRYHBAward(idx, cnt);
+                }
+                else
+                {
+                    player->sendRYHBInfo();
                 }
             }
             break;

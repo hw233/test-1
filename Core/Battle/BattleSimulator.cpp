@@ -12035,7 +12035,6 @@ bool BattleSimulator::doSkillEffectExtra_LingQu(BattleFighter* bf, const GData::
         if(eft[i] == GData::e_eft_lingqu)
         {
             bf->setLingQu(true, efl[i]);
-            bf->setHP(1);
             appendDefStatus(e_lingQu, 0, bf);
             return true;
         }
@@ -12433,6 +12432,9 @@ bool BattleSimulator::doSkillDmg(BattleFighter* bf, const GData::SkillBase* skil
    for(size_t i = 0; i < cnt; ++ i)
    {
        BattleFighter* bo = atklist[i].bf;
+       if(bo->getSide() == bf->getSide())
+           continue;
+
        float factor = atklist[i].factor;
        if(atk > 0)
        {

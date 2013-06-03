@@ -447,13 +447,31 @@ namespace GObject
         VAR_QQNAVIGATION_FIRST_LOGIN_AWARD = 502, // QQ导航首次登录奖励是否领取
 
         VAR_QQMUSIC_DAY_AWARD = 503, // QQ音乐每天奖励是否领取
-       
         VAR_QQTENPAY_AWARD = 504, // QQ财付通奖励是否领取
-       
         VAR_QQIM_QUICK_LOGIN_AWARD = 505, // QQIM快捷登录奖励是否领取
-
         VAR_EQUIP_MOVE_AWARD = 506, // 装备继承奖励
 
+        // 521-540 for zhgc
+        VAR_ZCJB_TIMES = 521,      // 招财进宝
+        VAR_ZCJB_GOLD_GOT = 522,   // 招财进宝总共获得仙石
+        VAR_ZRYJ_COUNT = 523,      // 逐日印记
+        VAR_HYYJ_COUNT = 524,      // 皓月印记
+        VAR_RYHB_ITEM_CNT_1 = 525,      // 日月合璧购买物品1个数
+        VAR_RYHB_ITEM_CNT_2 = 526,      // 日月合璧购买物品2个数
+        VAR_RYHB_ITEM_CNT_3 = 527,      // 日月合璧购买物品3个数
+        VAR_RYHB_ITEM_CNT_4 = 528,      // 日月合璧购买物品4个数
+        VAR_RYHB_ITEM_CNT_5 = 529,      // 日月合璧购买物品5个数
+        VAR_RYHB_ITEM_CNT_6 = 530,      // 日月合璧购买物品6个数
+        VAR_RYHB_ITEM_CNT_7 = 531,      // 日月合璧购买物品7个数
+        VAR_RYHB_ITEM_CNT_8 = 532,      // 日月合璧购买物品8个数
+        VAR_RYHB_ITEM_CNT_9 = 533,      // 日月合璧购买物品9个数
+        VAR_RYHB_ITEM_CNT_10 = 534,      // 日月合璧购买物品10个数
+        VAR_RYHB_ITEM_CNT_11 = 535,      // 日月合璧购买物品11个数
+        VAR_RYHB_ITEM_CNT_12 = 536,      // 日月合璧购买物品12个数
+        VAR_RYHB_ITEM_CNT_13 = 537,      // 日月合璧购买物品13个数
+        VAR_RYHB_ITEM_CNT_14 = 538,      // 日月合璧购买物品14个数
+        VAR_RYHB_ITEM_CNT_15 = 539,      // 日月合璧购买物品15个数
+       
         VAR_MAX,
     };
 
@@ -851,6 +869,25 @@ namespace GObject
             REGISTER_VAR(VAR_PET_CUILIAN_SCORE_GEM, CYCLE_NONE);
             REGISTER_VAR(VAR_PET_CUILIAN_SCORE_EQUIP_TIMES, CYCLE_NONE);
             REGISTER_VAR(VAR_PET_CUILIAN_SCORE_GEM_TIMES, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_ZCJB_TIMES, CYCLE_NONE);
+            REGISTER_VAR(VAR_ZRYJ_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_HYYJ_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_RYHB_ITEM_CNT_1, CYCLE_NONE);
+            REGISTER_VAR(VAR_RYHB_ITEM_CNT_2, CYCLE_NONE);
+            REGISTER_VAR(VAR_RYHB_ITEM_CNT_3, CYCLE_NONE);
+            REGISTER_VAR(VAR_RYHB_ITEM_CNT_4, CYCLE_NONE);
+            REGISTER_VAR(VAR_RYHB_ITEM_CNT_5, CYCLE_NONE);
+            REGISTER_VAR(VAR_RYHB_ITEM_CNT_6, CYCLE_NONE);
+            REGISTER_VAR(VAR_RYHB_ITEM_CNT_7, CYCLE_NONE);
+            REGISTER_VAR(VAR_RYHB_ITEM_CNT_8, CYCLE_NONE);
+            REGISTER_VAR(VAR_RYHB_ITEM_CNT_9, CYCLE_NONE);
+            REGISTER_VAR(VAR_RYHB_ITEM_CNT_10, CYCLE_NONE);
+            REGISTER_VAR(VAR_RYHB_ITEM_CNT_11, CYCLE_NONE);
+            REGISTER_VAR(VAR_RYHB_ITEM_CNT_12, CYCLE_NONE);
+            REGISTER_VAR(VAR_RYHB_ITEM_CNT_13, CYCLE_NONE);
+            REGISTER_VAR(VAR_RYHB_ITEM_CNT_14, CYCLE_NONE);
+            REGISTER_VAR(VAR_RYHB_ITEM_CNT_15, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

@@ -1020,7 +1020,7 @@ private:
     UInt8 _lingqu_last;
     bool _lingqu;
     inline bool getLingQu() { return _lingqu; }
-    inline void setLingQu(bool v, UInt8 l) { _lingqu = v; _lingqu_last = l; }
+    inline void setLingQu(bool v, UInt8 l) { _hp = 1; _lingqu = v; _lingqu_last = l; }
     inline bool isLingQu() { return _lingqu_last != 0; }
     bool releaseLingQu();
 

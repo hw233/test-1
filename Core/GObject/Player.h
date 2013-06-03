@@ -2395,6 +2395,11 @@ namespace GObject
         void pickupCuilian(UInt8 clType);
         bool checkBBFT();
 
+        void sendRPZCJBInfo();
+        bool getRPZCJBAward();
+        void checkZCJB();
+        void sendRYHBInfo();
+        void getRYHBAward(UInt8 idx, UInt8 cnt);
         void getSurnameLegendAward(SurnameLegendAwardFlag flag);
 	};
 

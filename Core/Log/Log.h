@@ -121,6 +121,7 @@ enum PurchaseType
     PetBBFT_CUILIAN             = 110, //八部浮屠之淬炼内丹精魄消费
     PetBBFT_BUYCUILIAN          = 111, //八部浮屠之购买淬炼次数消费
     Equip_Inherit               = 112, //装备继承消费
+    ZCJBRoolAward               = 113, //招财进宝抽奖
     //繁体私有占150～200
 };
 
@@ -134,6 +135,7 @@ enum IncomingType
     FengsuiFromYouli            = 133, //游历获得凤髓
     FengsuiFromConvert          = 134, //放生获得凤髓
     FengsuiFromUseItem          = 135, //使用物品获得凤髓
+    InZCJBRoolAward             = 136, //招财进宝抽奖
 };
 
 enum MoneyType
@@ -235,6 +237,8 @@ enum ItemFrom
     FromQQTenpay = 52, //QQ财付通奖励
     FromQQIMQuickLogin = 53, //QQIM快速登录奖励
     FromEquipMoveAward = 54, //装备继承奖励
+    FromOEquipAward = 55, //橙装礼包
+    FromRYHBAward = 56, //日月合璧
     //80 ~ 100，繁体占用
 };
 

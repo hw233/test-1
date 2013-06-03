@@ -4546,7 +4546,11 @@ namespace GObject
 #endif
 #endif // _WIN32
         if(ci && ci->purchaseType != TrainFighter)
+        {
             AddVar(VAR_USEGOLD_CNT, c);
+            if(World::inActive_opTime_20130531())
+                AddVar(VAR_HYYJ_COUNT, c);
+        }
         if(!GetVar(VAR_LUCKYSTAR_IS_CONSUME))
             SetVar(VAR_LUCKYSTAR_IS_CONSUME, 1);
         setLuckyStarCondition();
@@ -7807,6 +7811,11 @@ namespace GObject
         GameAction()->onRecharge(this, r);
         if(WORLD().getAccRecharge())
             sendTodayRechargeInfo();
+
+        checkZCJB();
+
+        if(World::inActive_opTime_20130531())
+            AddVar(VAR_ZRYJ_COUNT, r);
     }
 
     void Player::addRechargeNextRet(UInt32 r)
@@ -17052,6 +17061,10 @@ void EventTlzAuto::notify(bool isBeginAuto)
             return;
         if(career == 0 || career > 3)
             return;
+
+        if(_playerData.totalRecharge < newRecharge[step-1])
+            return;
+
         UInt32 curStep = GetVar(VAR_FIRST_RECHARGE_STEP);
         /*
          * bit 1: 10XS
@@ -19540,11 +19553,14 @@ UInt32 Player::getQQGameOnlineTotalTime()
 }
 void Player::sendRP7TreasureInfo(bool isLogin)
 {
+    if(cfg.rpServer != e_rp_xinyun)
+        return;
+
     bool isFinish = false;
     UInt8 totalGot = 0;
     UInt32 b = GVAR.GetVar(GVAR_TREASURE_BEGIN);
     UInt32 n = GVAR.GetVar(GVAR_TREASURE_END);
-    if (cfg.rpServer && b ==0)
+    if (b ==0)
     {
         b = World::getOpenTime();
         n = b+7*86400-1;
@@ -19749,7 +19765,7 @@ void Player::getRP7TreasureAward(UInt8 idx)
 
 void Player::sendRP7SignInfo()
 {
-    if (!cfg.rpServer)
+    if(cfg.rpServer != e_rp_xinyun)
         return;
  
     UInt32 now_sharp = TimeUtil::SharpDay(0);
@@ -21185,6 +21201,192 @@ bool Player::checkBBFT()
     return true;
 }
 
+#define ZCJB_TOTAL(v) ((v>>8)&0xFF)
+#define ZCJB_LEFT(v)  (v&0xFF)
+#define ZCJB(t, l)    (((t&0xFF)<<8)|(l&0xFF))
+void Player::sendRPZCJBInfo()
+{
+    if(!World::inActive_opTime_20130531())
+        return;
+
+    UInt32 zcjb = GetVar(VAR_ZCJB_TIMES);
+    UInt32 gold_got = GetVar(VAR_ZCJB_GOLD_GOT);
+    Stream st(REP::RP_SERVER);
+    st << static_cast<UInt8>(0x04);
+    st << static_cast<UInt8>(ZCJB_TOTAL(zcjb));
+    st << static_cast<UInt8>(ZCJB_LEFT(zcjb));
+    st << gold_got << static_cast<UInt32>(0);
+    st << Stream::eos;
+    send(st);
+}
+
+static UInt32 zcjb_prob[2] = {99, 100};
+static UInt32 zcjb_gold[16] = {
+    100, 200, 400, 600,
+    800, 1200, 2000, 4000,
+    8000, 15000, 30000, 60000,
+    100000, 200000, 400000, 800000
+};
+static UInt32 zcjb_award[16][3] = {
+    {110, 113, 150}, {210, 214, 300}, {420, 432, 600}, {620, 636, 800},
+    {820, 848, 1100}, {1240, 1296, 1800}, {2100, 2180, 2800}, {4240, 4480, 6000},
+    {8480, 8960, 13000}, {16000, 16500, 23000}, {32100, 33300, 50000}, {64200, 66600, 90000},
+    {106000, 109000, 160000}, {216000, 222000, 350000}, {432000, 444000, 680000}, {880000, 896000, 999999}
+};
+
+bool Player::getRPZCJBAward()
+{
+    if(!World::inActive_opTime_20130531())
+        return false;
+
+    UInt32 zcjb = GetVar(VAR_ZCJB_TIMES);
+    UInt8 left = ZCJB_LEFT(zcjb);
+    UInt8 total = ZCJB_TOTAL(zcjb);
+
+    if(left == 0 || left > total)
+        return false;
+    UInt8 awardIdx = total - left;
+    if(getGold() < zcjb_gold[awardIdx])
+    {
+        sendMsgCode(0, 1104);
+        return false;
+    }
+    -- left;
+    UInt8 roolIdx = 1;
+    UInt8 rnd = uRand(100);
+    if(rnd < zcjb_prob[0])
+        roolIdx = 0;
+
+    ConsumeInfo ci(ZCJBRoolAward,0,0);
+    useGold(zcjb_gold[awardIdx], &ci);
+
+    UInt32 awardGold = zcjb_award[awardIdx][roolIdx] + uRand((zcjb_award[awardIdx][roolIdx+1] - zcjb_award[awardIdx][roolIdx]));
+    IncommingInfo ii(InZCJBRoolAward, 0, 0);
+    getGold(awardGold, &ii);
+
+    UInt32 gold_got = GetVar(VAR_ZCJB_GOLD_GOT);
+    gold_got += awardGold;
+
+    SetVar(VAR_ZCJB_TIMES, ZCJB(total, left));
+    SetVar(VAR_ZCJB_GOLD_GOT, gold_got);
+
+    Stream st(REP::RP_SERVER);
+    st << static_cast<UInt8>(0x04);
+    st << total << left;
+    st << gold_got << awardGold;
+    st << Stream::eos;
+    send(st);
+    return true;
+}
+
+void Player::checkZCJB()
+{
+    if(!World::inActive_opTime_20130531())
+        return;
+
+    UInt32 zcjb = GetVar(VAR_ZCJB_TIMES);
+    UInt8 left = ZCJB_LEFT(zcjb);
+    UInt8 total = ZCJB_TOTAL(zcjb);
+
+    UInt8 oldTotal = total;
+    for(; total < 16; ++ total)
+    {
+        if(_playerData.totalRecharge < zcjb_gold[total])
+            break;
+    }
+
+    if(oldTotal < total)
+    {
+        left += total - oldTotal;
+        SetVar(VAR_ZCJB_TIMES, ZCJB(total, left));
+        sendRPZCJBInfo();
+    }
+}
+
+static UInt32 ryhb_items[15][4] = {
+    {8, 8, 78, 9},          // 升级优惠礼包
+    {28, 28, 79, 9},        // 炼器优惠礼包
+    {8, 15, 80, 9},         // 九疑鼎优惠礼包
+    {2, 5, 1325, 99},       // 技能符文熔炼诀
+    {2, 5, 134, 99},        // 法灵精金
+    {2, 5, 547, 99},        // 天赋保护符
+    {1, 3, 503, 99},        // 太乙精金
+    {4, 8, 515, 99},        // 五行精金
+    {1, 5, 509, 99},        // 凝神易筋丹
+    {1, 5, 507, 99},        // 补髓益元丹
+    {1, 3, 9371, 99},       // 仙缘石
+    {99, 88, 1717, 1},      // 女仆头饰
+    {555, 300, 9396, 1},    // 散仙令
+};
+
+void Player::sendRYHBInfo()
+{
+    if(!World::inActive_opTime_20130531())
+        return;
+
+    Stream st(REP::RP_SERVER);
+    st << static_cast<UInt8>(0x05) << static_cast<UInt8>(0);
+    st << (GetVar(VAR_ZRYJ_COUNT)/20);
+    st << (GetVar(VAR_HYYJ_COUNT)/20);
+
+    UInt8 cnt = 0;
+    size_t offset = st.size();
+    st << cnt;
+    for(int i = 0; i < 15; ++ i)
+    {
+        if(ryhb_items[i][2] == 0)
+            break;
+        st << static_cast<UInt8>(ryhb_items[i][3] - GetVar(VAR_RYHB_ITEM_CNT_1+i));
+        ++ cnt;
+    }
+
+    st.data<UInt8>(offset) = cnt;
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::getRYHBAward(UInt8 idx, UInt8 cnt)
+{
+    if(!World::inActive_opTime_20130531())
+        return;
+    if(idx >= 15 || cnt == 0)
+        return;
+
+    UInt32 itemId = ryhb_items[idx][2];
+    const GData::ItemBaseType* ibt = GData::itemBaseTypeManager[itemId];
+    if(!ibt)
+        return;
+
+    if(GetFreePackageSize() < ibt->Size(cnt))
+    {
+        sendMsgCode(0, 1011);
+        return;
+    }
+
+    UInt32 zryj = GetVar(VAR_ZRYJ_COUNT);
+    UInt32 hyyj = GetVar(VAR_HYYJ_COUNT);
+    UInt8 item_cnt = GetVar(VAR_RYHB_ITEM_CNT_1+idx);
+    if(ryhb_items[idx][0]*cnt > zryj/20 || ryhb_items[idx][1]*cnt > hyyj/20 || ryhb_items[idx][3] < (item_cnt + cnt))
+        return;
+
+    zryj -= ryhb_items[idx][0] * cnt * 20;
+    hyyj -= ryhb_items[idx][1] * cnt * 20;
+    item_cnt += cnt;
+
+    UInt8 left_cnt = ryhb_items[idx][3] - item_cnt;
+    SetVar(VAR_RYHB_ITEM_CNT_1+idx, item_cnt);
+    SetVar(VAR_ZRYJ_COUNT, zryj);
+    SetVar(VAR_HYYJ_COUNT, hyyj);
+
+    m_Package->Add(itemId, cnt, true, false, FromRYHBAward);
+
+    Stream st(REP::RP_SERVER);
+    st << static_cast<UInt8>(0x05) << static_cast<UInt8>(1);
+    st << static_cast<UInt32>(zryj/20) << static_cast<UInt32>(hyyj/20) << idx << left_cnt;
+    st << Stream::eos;
+    send(st);
+}
+
 void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
 {
     if (World::getSurnameLegend())
@@ -21205,7 +21407,6 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
         }
     }
 }
-
 
 } // namespace GObject
 
