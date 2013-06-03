@@ -4524,7 +4524,7 @@ namespace GObject
 		SYSMSG_SENDV(1050, this, c);
 		sendModification(1, _playerData.gold);
 
-        if (ci)
+        if (ci && ci->purchaseType != ZCJBRoolAward)
         {
             udpLog(ci->purchaseType, ci->itemId, ci->itemNum, c, "add");
         }
