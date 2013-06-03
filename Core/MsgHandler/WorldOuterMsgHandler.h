@@ -1386,7 +1386,7 @@ void OnAthleticsChallengeReq( GameMsgHdr& hdr, const void * data)
             std::string name;
             UInt8 rivalDifficulty = 0;
             brd >> name;
-            brd >> rivalDifficulty;
+            //brd >> rivalDifficulty;
             GObject::gAthleticsRank.challenge2(player, name, 3, rivalDifficulty);
         }
         break;
