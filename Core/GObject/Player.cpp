@@ -11169,34 +11169,23 @@ namespace GObject
     {
         UInt8 state = GetVar(VAR_QQIM_QUICK_LOGIN_AWARD);
 
-        if(getVia() == "sscq_QQCLIENT.MAINPANEL.SETAPP")
+        if(GetPackage()->GetRestPackageSize() < 6 && 1 == opt)
         {
-            if(GetPackage()->GetRestPackageSize() < 6 && 1 == opt)
-            {
-			    sendMsgCode(0, 1011);
+            sendMsgCode(0, 1011);
 
-                return;
-            }
-
-            if(state == 0 && opt == 1)
-            {
-                GetPackage()->AddItem(50, 1, true, false, FromQQIMQuickLogin);
-                GetPackage()->AddItem(509, 1, true, false, FromQQIMQuickLogin);
-                GetPackage()->AddItem(9367, 1, true, false, FromQQIMQuickLogin);
-                GetPackage()->AddItem(9369, 1, true, false, FromQQIMQuickLogin);
-                GetPackage()->AddItem(15, 1, true, false, FromQQIMQuickLogin);
-
-                SetVar(VAR_QQIM_QUICK_LOGIN_AWARD, 1);
-                state = 1;
-            }
-            state += 1;
+            return;
         }
-        else
+
+        if(state == 0 && opt == 1)
         {
-            if(1 == state)
-            {
-                state += 1;
-            }
+            GetPackage()->AddItem(50, 1, true, false, FromQQIMQuickLogin);
+            GetPackage()->AddItem(509, 1, true, false, FromQQIMQuickLogin);
+            GetPackage()->AddItem(9367, 1, true, false, FromQQIMQuickLogin);
+            GetPackage()->AddItem(9369, 1, true, false, FromQQIMQuickLogin);
+            GetPackage()->AddItem(15, 1, true, false, FromQQIMQuickLogin);
+
+            SetVar(VAR_QQIM_QUICK_LOGIN_AWARD, 1);
+            state = 1;
         }
 
         Stream st(REP::GETAWARD);
@@ -20128,9 +20117,9 @@ bool Player::in7DayFromCreated()
 }
 
 #define QUESTIONID_MAX 30
-#define SET_BIT(X,Y)     (X | (1<<Y))
+/*#define SET_BIT(X,Y)     (X | (1<<Y))
 #define GET_BIT(X,Y)     (X & (1<<Y))
-#define CLR_BIT(X,Y)     (X & ~(1<<Y))
+#define CLR_BIT(X,Y)     (X & ~(1<<Y))*/
 #define CLR_BIT_8(X,Y)   (X & ~(0xFF<<(Y*8)))
 #define SET_BIT_8(X,Y,V) (CLR_BIT_8(X,Y) | V<<(Y*8))
 #define GET_BIT_8(X,Y)   ((X >> (Y*8)) & 0xFF)

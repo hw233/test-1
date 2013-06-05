@@ -79,16 +79,21 @@ UInt32 FrontMap::getEnterGold(Player* pl)
 
 void FrontMap::sendInfo(Player* pl, UInt8 id, bool needspot, bool force)
 {
+
+    UInt32 mark = pl->GetVar(VAR_FRONTMAP_AUTO_FIGHT_USE_MONEY_MARK);
+    UInt8 pos = id - 1;
+    mark = GET_BIT(mark, pos);
+
     FastMutex::ScopedLock lk(_mutex);
     Stream st(REP::FORMATTON_INFO);
     UInt8 count = getCount(pl);
     st << static_cast<UInt8>(0);
     st << id;
     st << count;
+    st << mark;
 
     if (needspot)
         sendFrontMap(st, pl, id, needspot?true:force);
-
     st << Stream::eos;
     pl->send(st);
 }
@@ -540,12 +545,18 @@ void FrontMap::reset(Player* pl, UInt8 id)
     if (!tmp.size()) {
         st << static_cast<UInt8>(2) << id << static_cast<UInt8>(1) << Stream::eos;
         pl->send(st);
+
         return;
     }
 
     tmp.resize(0);
     st << static_cast<UInt8>(2) << id << static_cast<UInt8>(0) << Stream::eos;
     pl->send(st);
+
+    UInt32 mark = pl->GetVar(VAR_FRONTMAP_AUTO_FIGHT_USE_MONEY_MARK);
+    UInt8 pos = id - 1;
+    mark = CLR_BIT(mark, pos);
+    pl->SetVar(VAR_FRONTMAP_AUTO_FIGHT_USE_MONEY_MARK, mark);
 
     TRACE_LOG("%s: %"I64_FMT"u, %u", __PRETTY_FUNCTION__, pl->getId(), id);
     DB3().PushUpdateData("DELETE FROM `player_frontmap` WHERE `playerId` = %"I64_FMT"u AND `id` = %u", pl->getId(), id);
@@ -574,6 +585,8 @@ void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool in
     if (!tmp.size())
         return;
 
+    UInt32 mark = pl->GetVar(VAR_FRONTMAP_AUTO_FIGHT_USE_MONEY_MARK); 
+    UInt8 pos = id - 1;
     switch (type)
     {
         case 0:
@@ -591,8 +604,9 @@ void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool in
 
                     bool girl = (World::getGirlDay() && !pl->IsMale());
                     if (!World::getNewYear() &&
-                            !girl &&
-                            !World::getNetValentineDay())
+                        !girl &&
+                        !World::getNetValentineDay() &&
+                        0 == GET_BIT(mark, pos))
                     {
                         UInt32 pref = 0;
                         UInt8 div = 1;
@@ -621,6 +635,9 @@ void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool in
                                 pl->useTael((GData::moneyNeed[GData::FRONTMAP_AUTO1+id-1].tael - pref)/div, &ci);
                             }
                         }
+
+                        mark = SET_BIT(mark, pos);
+                        pl->SetVar(VAR_FRONTMAP_AUTO_FIGHT_USE_MONEY_MARK, mark);
                     }
                 }
 
@@ -710,6 +727,9 @@ void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool in
                         break;
                 }
                 pl->setBuffData(PLAYER_BUFF_ATTACKING, 0);
+
+                mark = CLR_BIT(mark, pos);
+                pl->SetVar(VAR_FRONTMAP_AUTO_FIGHT_USE_MONEY_MARK, mark);
             }
             break;
 
