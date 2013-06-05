@@ -14,9 +14,12 @@ class XingchenData
         struct stXingchen
         {
             UInt8 level;
-            UInt32 maxVal;
+            std::string name;
             UInt32 consume;
-            float rate;
+            UInt32 maxVal;
+            float rate1;    //基础宝石加成
+            float rate2;    //攻防宝石加成
+            float rate3;    //身法宝石加成
         };
     private:
         std::map<UInt8, stXingchen> _xingchen;

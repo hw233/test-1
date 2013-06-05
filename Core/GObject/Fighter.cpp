@@ -5779,21 +5779,17 @@ bool Fighter::upgradeXingchen()
         return false;
     if ((UInt16)(((getLevel() - 60) / 10 + 1) * 5) <= m_xingchen.curVal)
         return false;
-    GData::XingchenData::stXingchen * stxc = GData::xingchenData.getXingchenTable(m_xingchen.lvl);
+    GData::XingchenData::stXingchen * stxc = GData::xingchenData.getXingchenTable(m_xingchen.lvl+1);
     if (stxc == NULL)
         return false;
     UInt32 value = _owner->GetVar(VAR_XINGCHENZHEN_VALUE);
     if (value < stxc->consume)
         return false;
-    _owner->SetVar(VAR_XINGCHENZHEN_VALUE, value - stxc->consume);
     m_xingchen.curVal += uRand(10) + 1;
-    stxc = GData::xingchenData.getXingchenTable(m_xingchen.lvl+1);
-    if (stxc)
-    {
-        if(m_xingchen.curVal >= stxc->maxVal)
-            ++ m_xingchen.lvl;
-    }
+    if(m_xingchen.curVal >= stxc->maxVal)
+        ++ m_xingchen.lvl;
     updateDBxingchen();
+    _owner->SetVar(VAR_XINGCHENZHEN_VALUE, value - stxc->consume);
     return true;
 }
 
