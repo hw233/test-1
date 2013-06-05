@@ -11,6 +11,7 @@
 #include "GData/SkillTable.h"
 #include "GData/CittaTable.h"
 #include "GData/AcuPraTable.h"
+#include "GData/XingchenData.h"
 #include "Server/SysMsg.h"
 #include "Server/Cfg.h"
 #include "Common/Stream.h"
@@ -5758,6 +5759,49 @@ void Fighter::getAllLbSkills(Stream& st)
     {
         st << _lbSkill[i].skillid << _lbSkill[i].factor;
     }
+}
+
+//镇封星辰图
+void Fighter::setXingchenFromDB(DBXingchen& dbxc)
+{
+    m_xingchen.lvl = dbxc.level;
+    m_xingchen.curVal = dbxc.curVal;
+    m_xingchen.gems[0] = dbxc.gem1;
+    m_xingchen.gems[1] = dbxc.gem2;
+    m_xingchen.gems[2] = dbxc.gem3;
+}
+
+bool Fighter::upgradeXingchen()
+{
+    if (isPet() || !_owner || getLevel() < 60)
+        return false;
+    if (m_xingchen.curVal >= 25)
+        return false;
+    if ((UInt16)(((getLevel() - 60) / 10 + 1) * 5) <= m_xingchen.curVal)
+        return false;
+    GData::XingchenData::stXingchen * stxc = GData::xingchenData.getXingchenTable(m_xingchen.lvl);
+    if (stxc == NULL)
+        return false;
+    UInt32 value = _owner->GetVar(VAR_XINGCHENZHEN_VALUE);
+    if (value < stxc->consume)
+        return false;
+    _owner->SetVar(VAR_XINGCHENZHEN_VALUE, value - stxc->consume);
+    m_xingchen.curVal += uRand(10) + 1;
+    stxc = GData::xingchenData.getXingchenTable(m_xingchen.lvl+1);
+    if (stxc)
+    {
+        if(m_xingchen.curVal >= stxc->maxVal)
+            ++ m_xingchen.lvl;
+    }
+    updateDBxingchen();
+    return true;
+}
+
+void Fighter::updateDBxingchen()
+{
+    DB1().PushUpdateData("REPLACE INTO `fighter_xingchen` (`fighterId`, `playerId`, `level`, `curVal`, `gem1`, `gem2`, `gem3`)\
+            VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u, %u)", getId(), _owner->getId(), m_xingchen.lvl, m_xingchen.curVal,
+            m_xingchen.gems[0], m_xingchen.gems[1], m_xingchen.gems[2]);
 }
 
 }

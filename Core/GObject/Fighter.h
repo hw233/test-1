@@ -77,6 +77,16 @@ enum
     e_cls_max
 };
 
+struct DBXingchen;
+struct Xingchenzhen
+{
+    Xingchenzhen() : lvl(0), curVal(0) { memset(gems, 0, sizeof(gems)); }
+
+    UInt8 lvl;      // 星辰等级
+    UInt32 curVal;  // 当前星辰值
+    UInt16 gems[3]; //镶嵌的宝石id
+};
+
 struct SStrengthen
 {
     SStrengthen() : father(0), maxVal(0), curVal(0), lvl(0) {}
@@ -950,13 +960,22 @@ public:
 	std::vector<Offset> extraPos;
 
     // 仙宠
-
 public:
     inline bool isPet() { return getClass() >= e_cls_qinglong && getClass() <= e_cls_xuanwu; }
     UInt8 getPassklNum();
     UInt8 getRpassklNum();
     void updateToDBPetSkill();
+
+    //镇封星辰图
+private:
+    Xingchenzhen m_xingchen;
+public:
+    void setXingchenFromDB(DBXingchen&);
+    bool upgradeXingchen();
+    void updateDBxingchen();
+
 };
+
 class GlobalFighters
 {
 public:
