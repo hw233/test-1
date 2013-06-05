@@ -1423,8 +1423,6 @@ void OnRechargeRP7Rank ( GameMsgHdr& hdr,  const void* data )
 {
     using namespace GObject;
     MSG_QUERY_PLAYER(player);
-    if (!cfg.rpServer)
-        return;
     if (TimeUtil::Now() > World::getOpenTime()+7*86400)
         return;
  
@@ -1457,8 +1455,6 @@ void OnRechargeRP7Rank ( GameMsgHdr& hdr,  const void* data )
 void SendRechargeRP7Rank(GameMsgHdr& hdr,  const void* data )
 {
     using namespace GObject;
-    if (!cfg.rpServer)
-        return;
     if (TimeUtil::Now() > World::getOpenTime()+30*86400)
         return;
  

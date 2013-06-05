@@ -1281,7 +1281,12 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->svrSt(4);
     pl->sendRP7TreasureInfo(true);
     pl->sendRP7SignInfo();
-    if (cfg.rpServer)
+    if(cfg.rpServer != e_rp_xinyun)
+    {
+        pl->sendRPZCJBInfo();
+        pl->sendRYHBInfo();
+    }
+
     {
         GameMsgHdr hdr(0x1CB, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr, NULL);
