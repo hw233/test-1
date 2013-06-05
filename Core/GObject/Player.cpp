@@ -3136,7 +3136,7 @@ namespace GObject
 		if(cfg.limitLuckyDraw == 2 || (cfg.limitLuckyDraw == 1 && _vipLevel < 2))
 			status |= 0x80;
 		st << _playerData.country << _playerData.gold << _playerData.coupon << _playerData.tael << _playerData.coin << getClanName()
-			<< status << _playerData.title << static_cast<UInt8>(0) << _playerData.totalRecharge << static_cast<UInt8>(_playerData.qqvipl%10) << _playerData.qqvipyear << _playerData.achievement << _playerData.prestige<< _playerData.attainment << _playerData.packSize << _playerData.newGuild <<  _playerData.mounts << c;
+			<< status << _playerData.title << static_cast<UInt8>(0) << _playerData.totalRecharge << static_cast<UInt8>(_playerData.qqvipl%10) << _playerData.qqvipyear << _playerData.achievement << _playerData.prestige<< _playerData.attainment << getPacksize(0) << getPacksize(1) << _playerData.newGuild <<  _playerData.mounts << c;
 		for(UInt8 i = 0; i < c; ++ i)
 		{
 			st << buffid[i] << buffleft[i];
@@ -4016,22 +4016,31 @@ namespace GObject
 	}
 
 
-	bool Player::ExtendPackageSize()
+	bool Player::ExtendPackageSize(UInt8 type)
 	{
-		static const UInt16 MAX_PACK_SIZE = PlayerData::INIT_PACK_SIZE+MAX_EXTEND_TIME*EACH_EXTEND_NUM;
-		if (_playerData.packSize >= MAX_PACK_SIZE || (_playerData.packSize+EACH_EXTEND_NUM) > MAX_PACK_SIZE)
+		static const UInt16 MAX_PACK_SIZE = PlayerData::INIT_PACK_SIZE + MAX_EXTEND_TIME*EACH_EXTEND_NUM;
+        UInt16 size = getPacksize(type);
+		if (size >= MAX_PACK_SIZE || (size + EACH_EXTEND_NUM) > MAX_PACK_SIZE)
 			return false;
-		UInt32 lvl = 1 + (_playerData.packSize - PlayerData::INIT_PACK_SIZE) / EACH_EXTEND_NUM;
+		UInt32 lvl = 1 + (size - (PlayerData::INIT_PACK_SIZE + (type ? 50 : 0))) / EACH_EXTEND_NUM;
 		UInt32 gold = lvl * (lvl + 1) * 5;
 		if (getGold() < gold)
 			return false;
 		ConsumeInfo ci(ExtendPackage,0,0);
 		useGold(gold,&ci);
 
-		_playerData.packSize += EACH_EXTEND_NUM;
-		updateDB(32, _playerData.packSize);
+        if(type == 0)
+        {
+            _playerData.packSize += EACH_EXTEND_NUM;
+            updateDB(32, _playerData.packSize);
+        }
+        else
+        {
+            _playerData.packSizeSoul += EACH_EXTEND_NUM;
+            updateDB(33, _playerData.packSizeSoul);
+        }
 		Stream st(REP::PACK_EXTEND);
-		st << getPacksize() << Stream::eos;
+		st << type << getPacksize(type) << Stream::eos;
 		send(st);
 		return true;
 	}
@@ -4462,10 +4471,11 @@ namespace GObject
 		case 9: field = "mounts"; break;
         case 0x0B:field = "attainment"; break;
 		case 0x20: field = "packSize"; break;
+		case 0x21: field = "packSizeSoul"; break;
 		}
 		if(field != NULL)
 			DB1().PushUpdateData("UPDATE `player` SET `%s` = %u WHERE `id` = %"I64_FMT"u", field, v, _id);
-        if (cfg.rpServer && t == 7 && TimeUtil::Now() < World::getOpenTime() + 7 * 86400)
+        if (t == 7 && TimeUtil::Now() < World::getOpenTime() + 7 * 86400)
         {
             SetVar(VAR_RP7_RECHARGE, v);
         }
@@ -4524,7 +4534,7 @@ namespace GObject
 		SYSMSG_SENDV(1050, this, c);
 		sendModification(1, _playerData.gold);
 
-        if (ci)
+        if (ci && ci->purchaseType != ZCJBRoolAward)
         {
             udpLog(ci->purchaseType, ci->itemId, ci->itemNum, c, "add");
         }
@@ -4545,7 +4555,7 @@ namespace GObject
 
 #endif
 #endif // _WIN32
-        if(ci && ci->purchaseType != TrainFighter)
+        if(ci && ci->purchaseType != TrainFighter && ci->purchaseType != ZCJBRoolAward)
         {
             AddVar(VAR_USEGOLD_CNT, c);
             if(World::inActive_opTime_20130531())
@@ -7694,7 +7704,6 @@ namespace GObject
         addRC7DayRecharge(r);
         addRF7DayRecharge(r);
         addRechargeNextRet(r);
-        if (cfg.rpServer)
         {
             GameMsgHdr hdr(0x1CA, WORKER_THREAD_WORLD, this, sizeof(_playerData.totalRecharge));
             GLOBAL().PushMsg(hdr, &_playerData.totalRecharge);
@@ -11644,8 +11653,11 @@ namespace GObject
             Stream st(REP::GETAWARD);
             st << static_cast<UInt8>(12) << idx << Stream::eos;
             send(st);
-
             getDiamondInfo(opt);
+
+            char str[16] = {0};
+            sprintf(str, "F_130531_%d", opt);
+            udpLog("choujiangquan", str, "", "", "", "", "act");
         }
     }
     void Player::getDiamondInfo(UInt8 opt)
@@ -20637,23 +20649,47 @@ void Player::setNuwaSignet(UInt8 idx)
             else if(sign == 4)
                 ++snt[3];
         }
-        UInt32 coupon = 0;
+        UInt32 coupon = 0, opt = 0;
         if(snt[0] >= 3)                         //3个女娲印记
+        {
             coupon = 3000;
+            opt = 1;
+        }
         else if(snt[1] >= 3)                    //3个轩辕印记
+        {
             coupon = 1500;
+            opt = 2;
+        }
         else if(snt[0] >= 1 && snt[1] >= 1)     //1个女娲印记，1个轩辕印记+?
+        {
             coupon = 1000;
+            opt = 3;
+        }
         else if(snt[2] >= 3)                    //3个神农印记
+        {
             coupon = 500;
+            opt = 4;
+        }
         else if(snt[2] >= 1 && snt[3] >= 1)     //1个神农印记，1个伏羲印记+?
+        {
             coupon = 300;
+            opt = 5;
+        }
         else if(snt[3] >= 2)                    //两个伏羲印记+?
+        {
             coupon = 200;
+            opt = 6;
+        }
         else if(snt[1] >= 1)                    //1个轩辕印记+?
+        {
             coupon = 150;
+            opt = 7;
+        }
         else                                    //任意3个
+        {
             coupon = 100;
+            opt = 8;
+        }
         getCoupon(coupon);
         sendMsgCode(0, 1092, coupon);
         if(coupon >= 1000)
@@ -20661,6 +20697,9 @@ void Player::setNuwaSignet(UInt8 idx)
         signet = SET_BIT_3(signet, 0, (cnt + 1));
         SetVar(VAR_NUWA_OPENTIME, TimeUtil::Now());
         TRACE_LOG("NUWA_SHIPAN==>>playerId:[%"I64_FMT"u],Coupon::[%u],signet:[%u]", getId(), coupon, signet);
+        char str[16] = {0};
+        sprintf(str, "F_10000_%d", opt);
+        udpLog("NvWa", str, "", "", "", "", "act");
     }
     SetVar(VAR_NUWA_SIGNET, signet);
     sendNuwaInfo();

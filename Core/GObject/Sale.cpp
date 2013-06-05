@@ -396,7 +396,8 @@ bool Sale::addSaleMailItems(UInt32 id)
 	ItemBase * item = found->second->item;
 	Package * package = _owner->GetPackage();
 	UInt16 usedGrids = IsEquipId(item->getId()) ? 1 :  package->GetItemUsedGrids(item->getId(), item->Count());
-	if (usedGrids > package->GetRestPackageSize())
+    bool isSoul = GetItemSubClass(item->getId()) == Item_Soul;
+	if (usedGrids > package->GetRestPackageSize(isSoul))
 	{
 		_owner->sendMsgCode(2, 1015);
 		return false;

@@ -2940,8 +2940,6 @@ void World::initRP7RCRank()
 {
     if (initRP7)
         return;
-    if (!cfg.rpServer)
-        return;
  
     GObject::globalPlayers.enumerate(player_enum_rp7rc, 0);
     initRP7 = true;
@@ -3292,8 +3290,6 @@ void World::SendSnowAward()
 void World::SendRechargeRP7RankAward()
 {
     static UInt32 s_couponCount[] = {2000,1000,500,200,200,200,200,200,200,200};
-    if (!cfg.rpServer)
-        return;
  
     World::initRP7RCRank();
     int pos = 0;

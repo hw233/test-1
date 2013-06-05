@@ -545,7 +545,8 @@ void OnUseItemOtherReq( GameMsgHdr& hdr, UseItemOtherReq& req )
 
 struct ExtendPackageReq
 {
-	MESSAGE_DEF(REQ::PACK_EXTEND);
+	UInt8 _type;
+	MESSAGE_DEF1(REQ::PACK_EXTEND, UInt8, _type);
 };
 
 struct MailClickReq
@@ -599,12 +600,12 @@ struct FriendActReq
 };
 #endif
 
-void OnExtendPackageReq( GameMsgHdr& hdr, ExtendPackageReq& )
+void OnExtendPackageReq( GameMsgHdr& hdr, ExtendPackageReq& epr)
 {
 	MSG_QUERY_PLAYER(pl);
 	if(!pl->hasChecked())
 		return;
-	pl->ExtendPackageSize();
+	pl->ExtendPackageSize(epr._type);
 }
 
 #if 0
@@ -1280,7 +1281,12 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->svrSt(4);
     pl->sendRP7TreasureInfo(true);
     pl->sendRP7SignInfo();
-    if (cfg.rpServer)
+    if(cfg.rpServer != e_rp_xinyun)
+    {
+        pl->sendRPZCJBInfo();
+        pl->sendRYHBInfo();
+    }
+
     {
         GameMsgHdr hdr(0x1CB, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr, NULL);
