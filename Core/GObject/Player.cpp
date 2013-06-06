@@ -11132,42 +11132,27 @@ namespace GObject
 
     void Player::getQQTenpayAward(UInt8 opt)
     {
-        return; //暂时不上
-
         UInt8 state = GetVar(VAR_QQTENPAY_AWARD);
 
-        if(getVia() == "ssgw_qqdh")
+        if (GetPackage()->GetRestPackageSize() < 6 && opt == 1)
         {
+            sendMsgCode(0, 1011);
 
-            if (GetPackage()->GetRestPackageSize() < 6 && opt == 1)
-            {
-			    sendMsgCode(0, 1011);
+            return;
+        }
 
-                return;
-            }
+        if(opt == 1 && state == 0)
+        {
+            GetPackage()->AddItem(9371, 2, true, false, FromQQTenpay);
+            GetPackage()->AddItem(503, 1, true, false, FromQQTenpay);
+            GetPackage()->AddItem(515, 1, true, false, FromQQTenpay);
+            GetPackage()->AddItem(509, 1, true, false, FromQQTenpay);
+            GetPackage()->AddItem(30, 2, true, false, FromQQTenpay);
 
-            if(opt == 1 && state == 0)
-            {
-                GetPackage()->AddItem(9371, 2, true, false, FromQQTenpay);
-                GetPackage()->AddItem(503, 1, true, false, FromQQTenpay);
-                GetPackage()->AddItem(515, 1, true, false, FromQQTenpay);
-                GetPackage()->AddItem(509, 1, true, false, FromQQTenpay);
-                GetPackage()->AddItem(30, 2, true, false, FromQQTenpay);
-
-                SetVar(VAR_QQTENPAY_AWARD, 1);
-                state = 1;
-            }
+            SetVar(VAR_QQTENPAY_AWARD, 1);
+            state = 1;
+        }
             
-            state += 1;
-        }
-        else
-        {
-            if(1 == state)
-            {
-                state += 1;
-            }
-        }
-
         Stream st(REP::GETAWARD);
         st << static_cast<UInt8>(22);
         st << state << Stream::eos;
@@ -11178,34 +11163,23 @@ namespace GObject
     {
         UInt8 state = GetVar(VAR_QQIM_QUICK_LOGIN_AWARD);
 
-        if(getVia() == "sscq_QQCLIENT.MAINPANEL.SETAPP")
+        if(GetPackage()->GetRestPackageSize() < 6 && 1 == opt)
         {
-            if(GetPackage()->GetRestPackageSize() < 6 && 1 == opt)
-            {
-			    sendMsgCode(0, 1011);
+            sendMsgCode(0, 1011);
 
-                return;
-            }
-
-            if(state == 0 && opt == 1)
-            {
-                GetPackage()->AddItem(50, 1, true, false, FromQQIMQuickLogin);
-                GetPackage()->AddItem(509, 1, true, false, FromQQIMQuickLogin);
-                GetPackage()->AddItem(9367, 1, true, false, FromQQIMQuickLogin);
-                GetPackage()->AddItem(9369, 1, true, false, FromQQIMQuickLogin);
-                GetPackage()->AddItem(15, 1, true, false, FromQQIMQuickLogin);
-
-                SetVar(VAR_QQIM_QUICK_LOGIN_AWARD, 1);
-                state = 1;
-            }
-            state += 1;
+            return;
         }
-        else
+
+        if(state == 0 && opt == 1)
         {
-            if(1 == state)
-            {
-                state += 1;
-            }
+            GetPackage()->AddItem(50, 1, true, false, FromQQIMQuickLogin);
+            GetPackage()->AddItem(509, 1, true, false, FromQQIMQuickLogin);
+            GetPackage()->AddItem(9367, 1, true, false, FromQQIMQuickLogin);
+            GetPackage()->AddItem(9369, 1, true, false, FromQQIMQuickLogin);
+            GetPackage()->AddItem(15, 1, true, false, FromQQIMQuickLogin);
+
+            SetVar(VAR_QQIM_QUICK_LOGIN_AWARD, 1);
+            state = 1;
         }
 
         Stream st(REP::GETAWARD);
@@ -11216,8 +11190,6 @@ namespace GObject
 
     void Player::getQQMusicAward(UInt8 opt)
     {
-        return; //暂时不上
-
         UInt8 state = GetVar(VAR_QQMUSIC_DAY_AWARD);
 
         if (GetPackage()->GetRestPackageSize() < 6 && opt == 1)
@@ -18269,10 +18241,10 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
  *2:大闹龙宫之金蛇起舞
  *3:大闹龙宫之天芒神梭
 */
-static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14 };
-static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385 };
+static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15 };
+static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402 };
 //6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页
-static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362 };
+static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139 };
 void Player::getDragonKingInfo()
 {
     if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)
@@ -20152,9 +20124,9 @@ bool Player::in7DayFromCreated()
 }
 
 #define QUESTIONID_MAX 30
-#define SET_BIT(X,Y)     (X | (1<<Y))
+/*#define SET_BIT(X,Y)     (X | (1<<Y))
 #define GET_BIT(X,Y)     (X & (1<<Y))
-#define CLR_BIT(X,Y)     (X & ~(1<<Y))
+#define CLR_BIT(X,Y)     (X & ~(1<<Y))*/
 #define CLR_BIT_8(X,Y)   (X & ~(0xFF<<(Y*8)))
 #define SET_BIT_8(X,Y,V) (CLR_BIT_8(X,Y) | V<<(Y*8))
 #define GET_BIT_8(X,Y)   ((X >> (Y*8)) & 0xFF)

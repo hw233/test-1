@@ -68,7 +68,7 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _darkVigor(0), _dvFactor(0), _darkVigorLast(0), _hpShieldSelf(0), _hpShieldSelf_last(0),
     _counter_spirit_atk_add(0), _counter_spirit_magatk_add(0), _counter_spirit_def_add(0), _counter_spirit_magdef_add(0), _counter_spirit_times(0), _counter_spirit_last(0), _counter_spirit_efv(0), _counter_spirit_skillid(0), _counter_spirit_skill_cd(0), _pet_coatk(0), _fire_defend(0), _fire_defend_last(0), _fire_fake_dead_rate(0), _fire_fake_dead_rate_last(0), _sneak_atk(0), _sneak_atk_status(0), _sneak_atk_last(0), _sneak_atk_recover_rate(0),
     _selfSummon(NULL), _dec_wave_dmg(0), _lingqu_last(0), _lingqu(false),  _lingshi_bleed(0), _lingshi_bleed_last(0),
-    _lingyou_atk(0), _lingyou_magatk(0), _lingyou_def(0), _lingyou_magdef(0), _lingHpShield(false)
+    _lingyou_atk(0), _lingyou_magatk(0), _lingyou_def(0), _lingyou_magdef(0), _lingHpShield(false), _criticaldmgreduce(0)
 {
     memset(_immuneLevel, 0, sizeof(_immuneLevel));
     memset(_immuneRound, 0, sizeof(_immuneRound));
@@ -1401,7 +1401,11 @@ float BattleFighter::getCriticalDmg()
     if(cridmg < 0)
         cridmg = 0;
 
-    return cridmg;
+    float factor = 1.0f + getCriticalDmgReduce();
+    if(factor < 0)
+        factor = 0;
+
+    return cridmg * factor;
 }
 
 float BattleFighter::getTough(BattleFighter* defgt)

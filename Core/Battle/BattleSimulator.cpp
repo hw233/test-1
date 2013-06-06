@@ -146,6 +146,7 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, cons
         skillEffectExtraTable[GData::e_eft_lingyou_def] = &BattleSimulator::doSkillEffectExtra_LingYouDef;
         skillEffectExtraTable[GData::e_eft_lingyou_magdef] = &BattleSimulator::doSkillEffectExtra_LingYouMagDef;
         skillEffectExtraTable[GData::e_eft_lingshi_bleed] = &BattleSimulator::doSkillEffectExtra_LingShiBleed2;
+        skillEffectExtraTable[GData::e_eft_criticaldmgreduce] = &BattleSimulator::doSkillEffectExtra_CriticalDmgReduce;
     }
 }
 
@@ -257,6 +258,7 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, GObj
         skillEffectExtraTable[GData::e_eft_lingyou_def] = &BattleSimulator::doSkillEffectExtra_LingYouDef;
         skillEffectExtraTable[GData::e_eft_lingyou_magdef] = &BattleSimulator::doSkillEffectExtra_LingYouMagDef;
         skillEffectExtraTable[GData::e_eft_lingshi_bleed] = &BattleSimulator::doSkillEffectExtra_LingShiBleed2;
+        skillEffectExtraTable[GData::e_eft_criticaldmgreduce] = &BattleSimulator::doSkillEffectExtra_CriticalDmgReduce;
     }
 }
 
@@ -12066,6 +12068,21 @@ void BattleSimulator::doSkillEffectExtra_LingShiBleed2(BattleFighter* bf, int ta
         float factor = atklist[i].factor;
         bo->setLingShiBleed(factor*dmg, efl[eftIdx]);
         appendDefStatus(e_lingShiBleed, 0, bo);
+    }
+}
+
+void BattleSimulator::doSkillEffectExtra_CriticalDmgReduce(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
+{
+    if(!skill || !skill->effect)
+        return;
+    const std::vector<float>& efv = skill->effect->efv;
+    AtkList atklist;
+    getAtkList(bf, skill, atklist);
+    UInt8 cnt = atklist.size();
+    for(size_t i = 0; i < cnt; ++ i)
+    {
+        BattleFighter* bo = atklist[i].bf;
+        bo->setCriticalDmgReduce(efv[eftIdx]);
     }
 }
 
