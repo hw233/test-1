@@ -2415,7 +2415,7 @@ namespace GObject
 			return;
 		_buffData[id] = data;
 		if(writedb || (id >= PLAYER_BUFF_HIFIGHT && id <= PLAYER_BUFF_HIESCAPE))
-			sendModification(0x40 + id, data, writedb);
+			sendModification(PLAYER_BUFF_START + id, data, writedb);
 	}
 
 	void Player::addBuffData(UInt8 id, UInt32 data)
@@ -2428,7 +2428,7 @@ namespace GObject
 			_buffData[id] = now + data;
 		else
 			_buffData[id] = olddata + data;
-		sendModification(0x40 + id, _buffData[id]);
+		sendModification(PLAYER_BUFF_START + id, _buffData[id]);
 	}
 
 	UInt32 Player::getBuffData( UInt8 idx, UInt32 tm )
@@ -2445,7 +2445,7 @@ namespace GObject
                 _buffData[idx] > 0 && _buffData[idx] <= tm)
 		{
 			_buffData[idx] = 0;
-			updateDB(0x40 + idx, 0);
+			updateDB(PLAYER_BUFF_START + idx, 0);
 			return 0;
 		}
 		return _buffData[idx];
@@ -3104,7 +3104,7 @@ namespace GObject
 			{
 				if(_buffData[i] > 0)
 				{
-					buffid[c] = i + 0x40;
+					buffid[c] = i + PLAYER_BUFF_START;
 					buffleft[c] = _buffData[i];
 					++ c;
 				}
@@ -3119,13 +3119,13 @@ namespace GObject
                     UInt32 varData = GetVar(varId);
                     if(varData == 0)
                         continue;
-					buffid[c] = i + 0x40;
+					buffid[c] = i + PLAYER_BUFF_START;
 					buffleft[c] = varData;
                     ++c;
                 }
                 else if(_buffData[i] > curtime)
 				{
-					buffid[c] = i + 0x40;
+					buffid[c] = i + PLAYER_BUFF_START;
 					buffleft[c] = _buffData[i] - curtime;
 					++ c;
 				}
@@ -3232,7 +3232,7 @@ namespace GObject
 				UInt32 data = fgt->getBuffData(i);
 				if(data > 0)
 				{
-					buffid[c] = i + 0x40;
+					buffid[c] = i + PLAYER_BUFF_START;
 					buffleft[c] = data - curtime;
 					++ c;
 				}
@@ -4429,7 +4429,7 @@ namespace GObject
 		if(_isOnline)
 		{
 			Stream st(REP::USER_INFO_CHANGE);
-			if(t > 0x40)
+			if(t > PLAYER_BUFF_START)
 			{
                 UInt32 tm = TimeUtil::Now();
                 if(v > tm)
@@ -4447,14 +4447,14 @@ namespace GObject
 
 	void Player::updateDB( UInt8 t, UInt32 v )
 	{
-		if(t >= 0x40 && t < 0x40 + PLAYER_BUFF_COUNT)
+		if(t >= PLAYER_BUFF_START && t < PLAYER_BUFF_START + PLAYER_BUFF_COUNT)
 		{
-			if(t >= 0x40 + PLAYER_BUFF_DISPLAY_MAX)
+			if(t >= PLAYER_BUFF_START + PLAYER_BUFF_DISPLAY_MAX)
 				return;
 			if(v > 0)
-				DB7().PushUpdateData("REPLACE INTO `player_buff`(`id`, `buffId`, `data`) VALUES(%"I64_FMT"u, %u, %u)", _id, t - 0x40, v);
+				DB7().PushUpdateData("REPLACE INTO `player_buff`(`id`, `buffId`, `data`) VALUES(%"I64_FMT"u, %u, %u)", _id, t - PLAYER_BUFF_START, v);
             else
-				DB7().PushUpdateData("DELETE FROM `player_buff` WHERE `id` = %"I64_FMT"u AND `buffId` = %u", _id, t - 0x40);
+				DB7().PushUpdateData("DELETE FROM `player_buff` WHERE `id` = %"I64_FMT"u AND `buffId` = %u", _id, t - PLAYER_BUFF_START);
 			return;
 		}
 		const char * field = NULL;
@@ -17797,14 +17797,21 @@ void Player::setDreamerKey(UInt8 count)
 
 void Player::sendSysUpdate()
 {
-   //版本更新公告
-   Stream st(REP::SYSDAILOG);
-   st << static_cast<UInt8>(1);
-   st << static_cast<UInt8>(1); //0:老版本 1:最新版
-   st << static_cast<UInt8>(1); //0:按钮不显示 1:按钮显示
-   st << (char*)VERSION;
-   st << Stream::eos;
-   send(st);
+    UInt32 v = getSysUpDateDlg();
+
+    //版本更新公告
+    Stream st(REP::SYSDAILOG);
+    st << static_cast<UInt8>(1);
+    st << static_cast<UInt8>(SYS_UPDLG_V(v)); //0:老版本 1:最新版
+    st << static_cast<UInt8>(SYS_UPDLG_F(v)); //0:按钮不显示 1:按钮显示
+    st << (char*)VERSION;
+    st << Stream::eos;
+    send(st);
+
+    if(SYS_UPDLG_F(v))
+    {
+        setSysUpDateDlg(SYS_UPDLG_VF(SYS_UPDLG_V(v), 0));
+    }
 }
 
 void Player::sendSnakeEggInfo()
@@ -21362,6 +21369,23 @@ static UInt32 ryhb_items[15][4] = {
     {99, 88, 1717, 1},      // 女仆头饰
     {555, 300, 9396, 1},    // 散仙令
 };
+static const char* ryhb_udplog[15] = {
+    "F_130603_1",
+    "F_130603_2",
+    "F_130603_3",
+    "F_130603_4",
+    "F_130603_5",
+    "F_130603_6",
+    "F_130603_7",
+    "F_130603_8",
+    "F_130603_9",
+    "F_130603_10",
+    "F_130603_11",
+    "F_130603_12",
+    "F_130603_13",
+    "F_130603_14",
+    "F_130603_15",
+};
 
 void Player::sendRYHBInfo()
 {
@@ -21423,6 +21447,7 @@ void Player::getRYHBAward(UInt8 idx, UInt8 cnt)
     SetVar(VAR_HYYJ_COUNT, hyyj);
 
     m_Package->Add(itemId, cnt, true, false, FromRYHBAward);
+    udpLog("riyue", ryhb_udplog[idx], "", "", "", "", "act");
 
     Stream st(REP::RP_SERVER);
     st << static_cast<UInt8>(0x05) << static_cast<UInt8>(1);
@@ -21452,6 +21477,16 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
             }
         }
     }
+}
+
+void Player::setSysUpDateDlg(UInt32 v)
+{
+    SetVar(VAR_SYS_UPDATE_DLG, v);
+}
+
+UInt32 Player::getSysUpDateDlg()
+{
+    return GetVar(VAR_SYS_UPDATE_DLG);
 }
 
 } // namespace GObject

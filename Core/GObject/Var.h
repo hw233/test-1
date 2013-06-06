@@ -308,6 +308,7 @@ namespace GObject
         VAR_PET_CUILIAN_GOLD_DAILY_CNT = 277,  // 每日仙石购买淬炼次数
         VAR_SURNAME_LEGEND_STATUS = 278,  // 每日幸运礼包领取情况
         VAR_QQEXPLORER_AWARD = 279, // QQ浏览器奖励是否领取
+        VAR_SYS_UPDATE_DLG = 280, // 更新公告弹窗
 
         // 281-290 占用 fro qiwy
         VAR_ARENA_SUPPORT = 281, //场外活动，支持的序列id
@@ -758,6 +759,7 @@ namespace GObject
             REGISTER_VAR(VAR_PET_CUILIAN_GOLD_DAILY_CNT, CYCLE_DAY);
             REGISTER_VAR(VAR_QQEXPLORER_AWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_SURNAME_LEGEND_STATUS, CYCLE_DAY);
+            REGISTER_VAR(VAR_SYS_UPDATE_DLG, CYCLE_NONE);
 
             REGISTER_VAR(VAR_QQNAVIGATION_DAY_AWARD, CYCLE_DAY);
             REGISTER_VAR(VAR_QQNAVIGATION_WEEK_AWARD, CYCLE_WEEK);
