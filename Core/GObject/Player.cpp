@@ -11132,42 +11132,27 @@ namespace GObject
 
     void Player::getQQTenpayAward(UInt8 opt)
     {
-        return; //暂时不上
-
         UInt8 state = GetVar(VAR_QQTENPAY_AWARD);
 
-        if(getVia() == "ssgw_qqdh")
+        if (GetPackage()->GetRestPackageSize() < 6 && opt == 1)
         {
+            sendMsgCode(0, 1011);
 
-            if (GetPackage()->GetRestPackageSize() < 6 && opt == 1)
-            {
-			    sendMsgCode(0, 1011);
+            return;
+        }
 
-                return;
-            }
+        if(opt == 1 && state == 0)
+        {
+            GetPackage()->AddItem(9371, 2, true, false, FromQQTenpay);
+            GetPackage()->AddItem(503, 1, true, false, FromQQTenpay);
+            GetPackage()->AddItem(515, 1, true, false, FromQQTenpay);
+            GetPackage()->AddItem(509, 1, true, false, FromQQTenpay);
+            GetPackage()->AddItem(30, 2, true, false, FromQQTenpay);
 
-            if(opt == 1 && state == 0)
-            {
-                GetPackage()->AddItem(9371, 2, true, false, FromQQTenpay);
-                GetPackage()->AddItem(503, 1, true, false, FromQQTenpay);
-                GetPackage()->AddItem(515, 1, true, false, FromQQTenpay);
-                GetPackage()->AddItem(509, 1, true, false, FromQQTenpay);
-                GetPackage()->AddItem(30, 2, true, false, FromQQTenpay);
-
-                SetVar(VAR_QQTENPAY_AWARD, 1);
-                state = 1;
-            }
+            SetVar(VAR_QQTENPAY_AWARD, 1);
+            state = 1;
+        }
             
-            state += 1;
-        }
-        else
-        {
-            if(1 == state)
-            {
-                state += 1;
-            }
-        }
-
         Stream st(REP::GETAWARD);
         st << static_cast<UInt8>(22);
         st << state << Stream::eos;
@@ -11178,34 +11163,23 @@ namespace GObject
     {
         UInt8 state = GetVar(VAR_QQIM_QUICK_LOGIN_AWARD);
 
-        if(getVia() == "sscq_QQCLIENT.MAINPANEL.SETAPP")
+        if(GetPackage()->GetRestPackageSize() < 6 && 1 == opt)
         {
-            if(GetPackage()->GetRestPackageSize() < 6 && 1 == opt)
-            {
-			    sendMsgCode(0, 1011);
+            sendMsgCode(0, 1011);
 
-                return;
-            }
-
-            if(state == 0 && opt == 1)
-            {
-                GetPackage()->AddItem(50, 1, true, false, FromQQIMQuickLogin);
-                GetPackage()->AddItem(509, 1, true, false, FromQQIMQuickLogin);
-                GetPackage()->AddItem(9367, 1, true, false, FromQQIMQuickLogin);
-                GetPackage()->AddItem(9369, 1, true, false, FromQQIMQuickLogin);
-                GetPackage()->AddItem(15, 1, true, false, FromQQIMQuickLogin);
-
-                SetVar(VAR_QQIM_QUICK_LOGIN_AWARD, 1);
-                state = 1;
-            }
-            state += 1;
+            return;
         }
-        else
+
+        if(state == 0 && opt == 1)
         {
-            if(1 == state)
-            {
-                state += 1;
-            }
+            GetPackage()->AddItem(50, 1, true, false, FromQQIMQuickLogin);
+            GetPackage()->AddItem(509, 1, true, false, FromQQIMQuickLogin);
+            GetPackage()->AddItem(9367, 1, true, false, FromQQIMQuickLogin);
+            GetPackage()->AddItem(9369, 1, true, false, FromQQIMQuickLogin);
+            GetPackage()->AddItem(15, 1, true, false, FromQQIMQuickLogin);
+
+            SetVar(VAR_QQIM_QUICK_LOGIN_AWARD, 1);
+            state = 1;
         }
 
         Stream st(REP::GETAWARD);
@@ -11216,8 +11190,6 @@ namespace GObject
 
     void Player::getQQMusicAward(UInt8 opt)
     {
-        return; //暂时不上
-
         UInt8 state = GetVar(VAR_QQMUSIC_DAY_AWARD);
 
         if (GetPackage()->GetRestPackageSize() < 6 && opt == 1)
@@ -18071,7 +18043,7 @@ void Player::getNewYearQQGameAward(UInt8 type)
 
 void Player::getQZoneQQGameAward(UInt8 domainType, UInt8 type)
 {
-    if(domainType == 1)
+    if(0/*domainType == 1*/)
     {
         if(atoi(m_domain) != 1 && atoi(m_domain) != 2)
             return;
@@ -20140,9 +20112,9 @@ bool Player::in7DayFromCreated()
 }
 
 #define QUESTIONID_MAX 30
-#define SET_BIT(X,Y)     (X | (1<<Y))
+/*#define SET_BIT(X,Y)     (X | (1<<Y))
 #define GET_BIT(X,Y)     (X & (1<<Y))
-#define CLR_BIT(X,Y)     (X & ~(1<<Y))
+#define CLR_BIT(X,Y)     (X & ~(1<<Y))*/
 #define CLR_BIT_8(X,Y)   (X & ~(0xFF<<(Y*8)))
 #define SET_BIT_8(X,Y,V) (CLR_BIT_8(X,Y) | V<<(Y*8))
 #define GET_BIT_8(X,Y)   ((X >> (Y*8)) & 0xFF)
@@ -21432,14 +21404,16 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
     {
         if(flag == e_sla_none)
         {
-            GetPackage()->AddItem(9397, 1, true, false, FromNpc);
+            //GetPackage()->AddItem(9397, 1, true, false, FromNpc);
+            GetPackage()->AddItem(9401, 1, true, false, FromNpc);
         }
         else
         {
             UInt32 status = GetVar(VAR_SURNAME_LEGEND_STATUS);
             if(!(status & flag))
             {
-                GetPackage()->AddItem(9397, 1, true, false, FromNpc);
+                //GetPackage()->AddItem(9397, 1, true, false, FromNpc);
+                GetPackage()->AddItem(9401, 1, true, false, FromNpc);
                 status |= flag;
                 SetVar(VAR_SURNAME_LEGEND_STATUS, status);
             }

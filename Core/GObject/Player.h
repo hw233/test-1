@@ -181,6 +181,9 @@ namespace GObject
 #define SPREAD_ALREADY_USE        0x01
 #define SPREAD_ALREADY_GET        0x02
 
+#define SET_BIT(X,Y)     (X | (1<<Y))                                                                                                                                                          
+#define GET_BIT(X,Y)     (X & (1<<Y))
+#define CLR_BIT(X,Y)     (X & ~(1<<Y))
     enum SurnameLegendAwardFlag
     {
         e_sla_none = 0x00,
