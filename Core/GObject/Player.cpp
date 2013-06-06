@@ -11132,6 +11132,7 @@ namespace GObject
 
     void Player::getQQTenpayAward(UInt8 opt)
     {
+        UInt8 state = GetVar(VAR_QQTENPAY_AWARD);
 
         if (GetPackage()->GetRestPackageSize() < 6 && opt == 1)
         {
