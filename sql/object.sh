@@ -168,6 +168,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearaccrecharge.sql   #清除累积充值记录
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130524_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130530_1.sql
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130607_1.sql
 
     #. clearshiyamen.sh
 }

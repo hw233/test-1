@@ -3041,7 +3041,7 @@ function ItemNormal_00007000(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage()
 
-	if package:GetRestPackageSize() < (2+3*num/99) then
+	if package:GetRestPackageSize(1) < (2+3*num/99) then
 		player:sendMsgCode(2, 1011, 0);
 		return false;
 	end

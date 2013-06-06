@@ -40,7 +40,7 @@ void Mail::packetTitle( Stream& st )
 bool MailPackage::takeIt( Player * player, bool gm )
 {
 	Package * package = player->GetPackage();
-	UInt32 required = 0;
+	UInt16 required = 0, required1 = 0;
 	std::map<UInt16, UInt16>::iterator it;
 	for(it = _items.begin(); it != _items.end(); ++ it)
 	{
@@ -50,9 +50,13 @@ bool MailPackage::takeIt( Player * player, bool gm )
 		bool bind = true;
 		if(isbind == 0)
 			bind = false;
-		required += package->GetItemUsedGrids(it->first, it->second & 0x00FF, bind);
+        UInt16 size = package->GetItemUsedGrids(it->first, it->second & 0x00FF, bind);
+        if(GetItemSubClass(it->first) == Item_Soul)
+            required1 += size;
+        else
+            required += size;
 	}
-	if(required > package->GetRestPackageSize())
+	if(required > package->GetRestPackageSize(0) || required1 > package->GetRestPackageSize(1))
 		return false;
 	for(it = _items.begin(); it != _items.end(); ++ it)
 	{
