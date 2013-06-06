@@ -21432,14 +21432,16 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
     {
         if(flag == e_sla_none)
         {
-            GetPackage()->AddItem(9397, 1, true, false, FromNpc);
+            //GetPackage()->AddItem(9397, 1, true, false, FromNpc);
+            GetPackage()->AddItem(9401, 1, true, false, FromNpc);
         }
         else
         {
             UInt32 status = GetVar(VAR_SURNAME_LEGEND_STATUS);
             if(!(status & flag))
             {
-                GetPackage()->AddItem(9397, 1, true, false, FromNpc);
+                //GetPackage()->AddItem(9397, 1, true, false, FromNpc);
+                GetPackage()->AddItem(9401, 1, true, false, FromNpc);
                 status |= flag;
                 SetVar(VAR_SURNAME_LEGEND_STATUS, status);
             }

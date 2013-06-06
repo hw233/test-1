@@ -7910,7 +7910,8 @@ function SurnameLegendLoot(player,lootlvl)
     };
     local package = player:GetPackage();
     --package:AddItem(9383, itemNum[lootlvl], true,0,10);
-    package:AddItem(9397, itemNum[lootlvl], true,0,10);
+    --package:AddItem(9397, itemNum[lootlvl], true,0,10);
+    package:AddItem(9401, itemNum[lootlvl], true,0,10);
 end
 
 -- 万圣节套装

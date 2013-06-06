@@ -1194,7 +1194,8 @@ void World::SendSurnameLegendAward()
             MailPackage::MailItem items[] =
             {
                 //{9907, 1}
-                {9911, 1}
+                //{9911, 1}
+                {9913, 1}
             };
             player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
         }
