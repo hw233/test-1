@@ -1909,10 +1909,10 @@ namespace GObject
         void transformElixir(Fighter * fFgt, Fighter * tFgt);
             
     private:
-        char m_domain[256];
-        char m_openid[256];
-        char m_openkey[256];
-        char m_clientIp[256];
+        char m_domain[256+1];
+        char m_openid[256+1];
+        char m_openkey[256+1];
+        char m_clientIp[256+1];
 
         std::string m_source;
         std::string m_via;
@@ -1943,7 +1943,7 @@ namespace GObject
             }
         }
         void setOpenId(const std::string& openid, bool load = false);
-        inline void setOpenKey(const std::string& openkey) { strncpy(m_openkey, openkey.c_str(), 256); m_openkey[255] = '\0';}
+        inline void setOpenKey(const std::string& openkey) { strncpy(m_openkey, openkey.c_str(), 256); m_openkey[256] = '\0';}
         inline void setSource(const std::string& source) 
         { 
             m_source = source; 
