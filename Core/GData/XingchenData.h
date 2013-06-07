@@ -14,6 +14,7 @@ class XingchenData
         struct stXingchen
         {
             UInt8 level;
+            UInt8 limitLev;
             std::string name;
             UInt32 consume;
             UInt32 maxVal;

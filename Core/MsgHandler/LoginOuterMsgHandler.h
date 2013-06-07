@@ -2794,6 +2794,17 @@ void SysDailog(LoginMsgHdr &hdr, const void * data)
     GObject::World::setSysDailogPlatform(platform);
 	GObject::globalPlayers.enumerate(player_enum, 0);
 }
+
+inline bool player_enum_sys_update(GObject::Player* p, int)
+{
+    if (!p->isOnline())
+        p->setSysUpDateDlg(SYS_UPDLG_VF(0, 1));
+    else
+        p->setSysUpDateDlg(SYS_UPDLG_VF(0, 0));
+
+    return true;
+}
+
 void SysUpdate(LoginMsgHdr &hdr, const void * data)
 {
 	BinaryReader br(data,hdr.msgHdr.bodyLen);
@@ -2811,8 +2822,9 @@ void SysUpdate(LoginMsgHdr &hdr, const void * data)
 
     Stream st1(SPEP::SYSUPDATE);
     st1 << static_cast<UInt8>(0) << Stream::eos;
-    NETWORK()->SendMsgToClient(hdr.sessionID,st1);
 
+	GObject::globalPlayers.enumerate(player_enum_sys_update, 0);
+    NETWORK()->SendMsgToClient(hdr.sessionID,st1);
 }
 
 

@@ -43,6 +43,7 @@ namespace GObject
 #define FIGHTER_BUFF_SANTA      0x12 //圣诞老人变身卡
 
 #define FIGHTER_BUFF_COUNT 0x20
+#define FIGHTER_BUFF_START 0x80
 
 #define SKILL_UPMAX 3 // 技能最初就能装备3个
 #define CITTA_UPMAX 9
@@ -730,6 +731,7 @@ public:
 protected:
     void addAttrExtra( GData::AttrExtra& ae, const GData::AttrExtra * ext );
     void addAttrExtra( GData::AttrExtra& ae, const GData::CittaEffect* ce );
+    void addAttrExtraGem( GData::AttrExtra& ae, GData::ItemGemType * igt );
 	virtual void rebuildEquipAttr();
 	void rebuildBattlePoint();
 	void rebuildSkillBattlePoint();
@@ -970,6 +972,7 @@ public:
 private:
     Xingchenzhen m_xingchen;
 public:
+    inline Xingchenzhen& getXingchen() { return m_xingchen; }
     void setXingchenFromDB(DBXingchen&);
     bool upgradeXingchen();
     void updateDBxingchen();

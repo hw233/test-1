@@ -22,7 +22,7 @@ function xingchen()
         BEGIN {
             print "INSERT INTO `xingchen` VALUES";
         } {
-            printf("(%d,\x27%s\x27,%d,%d,%f,%f,%f)",$1,$2,$3,$4,$5,$6,$7);
+            printf("(%d,%d,\x27%s\x27,%d,%d,%f,%f,%f)",$1,$2,$3,$4,$5,$6,$7,$8);
             if (NR <= ENVIRON["lines"]-1)
                 printf(",");
             else if (NR >= ENVIRON["lines"])

@@ -199,6 +199,59 @@ struct AttrExtra
 		return *this;
 	}
 
+	AttrExtra operator *(const float rate) const
+	{
+        AttrExtra aet = *this;
+		aet.strength *= rate;
+		aet.physique *= rate;
+		aet.agility *= rate;
+		aet.intelligence *= rate;
+		aet.will *= rate;
+		aet.soul *= rate;
+		aet.aura = rate;
+		aet.auraMax = rate;
+		aet.attack *= rate;
+        aet.magatk *= rate;
+		aet.defend *= rate;
+        aet.magdef *= rate;
+		aet.hp *= rate;
+		aet.tough *= rate;
+		aet.action *= rate;
+		aet.hitrate *= rate;
+		aet.evade *= rate;
+		aet.critical *= rate;
+		aet.criticaldmg *= rate;
+		aet.pierce *= rate;
+		aet.counter *= rate;
+        aet.magres *= rate;
+
+		aet.strengthP *= rate;
+		aet.physiqueP *= rate;
+		aet.agilityP *= rate;
+		aet.intelligenceP *= rate;
+		aet.willP *= rate;
+		aet.soulP *= rate;
+		aet.attackP *= rate;
+        aet.magatkP *= rate;
+		aet.defendP *= rate;
+        aet.magdefP *= rate;
+
+		aet.hpP *= rate;
+		aet.actionP *= rate;
+		aet.criticaldmgP *= rate;
+		aet.counterP *= rate;
+        aet.magresP *= rate;
+
+        aet.hitrlvl *= rate;
+        aet.evdlvl *= rate;
+        aet.crilvl *= rate;
+        aet.pirlvl *= rate;
+        aet.counterlvl *= rate;
+        aet.mreslvl *= rate;
+        aet.toughlvl *= rate;
+        return aet;
+	}
+
 	inline void reset()
 	{
         strength = 0;

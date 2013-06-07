@@ -156,9 +156,9 @@ namespace GObject
 
 	public:
 		UInt16 GetItemUsedGrids(UInt32 id, UInt16 num, bool bind = false);
-		inline UInt16 GetUsedPackageSize() const { return m_Size; }
+		inline UInt16 GetUsedPackageSize(UInt8 type = 0) const { return type ? m_SizeSoul : m_Size; }
 		inline UInt16 GetMaxPackageSize() const { return m_Owner->getPacksize(); }
-		inline UInt16 GetRestPackageSize() const { return (m_Owner->getPacksize() > m_Size) ? (m_Owner->getPacksize() - m_Size) : 0; }
+		inline UInt16 GetRestPackageSize(UInt8 type = 0) const { return (m_Owner->getPacksize(type) > GetUsedPackageSize(type)) ? (m_Owner->getPacksize(type) - GetUsedPackageSize(type)) : 0; }
 		inline bool IsFull() const { return m_Owner->getPacksize() <= m_Size; }
 
 	public:
@@ -237,9 +237,19 @@ namespace GObject
 
 		inline ItemBase * FindItem(UInt32 id, bool bind = false)
 		{
-			item_elem_iter iter = m_Items.find(ItemKey(id, bind));
-			if(iter == m_Items.end())
-				return NULL;
+            item_elem_iter iter;
+            if(GetItemSubClass(id) == Item_Soul)
+            {
+			    iter = m_ItemsSoul.find(ItemKey(id, bind));
+                if(iter == m_ItemsSoul.end())
+                    return NULL;
+            }
+            else
+            {
+			    iter = m_Items.find(ItemKey(id, bind));
+                if(iter == m_Items.end())
+                    return NULL;
+            }
 			return iter->second;
 		}
 
@@ -276,7 +286,9 @@ namespace GObject
 		enum {ItemClassSize = Item_Weapon + 1};
 
 		ItemCont m_Items;
+		ItemCont m_ItemsSoul;
 		UInt16 m_Size;		//already used grids
+		UInt16 m_SizeSoul;  //already used soul grids
 		UInt8 _lastActivateLv;
 		UInt8 _lastActivateQ;
 		UInt8 _lastActivateCount;
