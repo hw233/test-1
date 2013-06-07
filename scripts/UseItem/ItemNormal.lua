@@ -97,6 +97,7 @@ Athletics_Orange_Equip = {
 
 CittaBookBase = 1200
 FormationBookBase  = 1000
+PLAYER_BUFF_START = 0x80
 
 function getRandTrump(lvl)
   if lvl < 40 then
@@ -2101,7 +2102,7 @@ function ItemNormal_00000055(iid, num, bind, param)
     num2 = max_num
   end
   player:SetVar(405, num2)
-  player:sendExpHook(0x40 + 5, num2)
+  player:sendExpHook(PLAYER_BUFF_START + 5, num2)
   local package = player:GetPackage();
   package:DelItemSendMsg(iid, player);
   return num
@@ -2135,7 +2136,7 @@ function ItemNormal_00000056(iid, num, bind, param)
     num2 = max_num
   end
   player:SetVar(406, num2)
-  player:sendExpHook(0x40 + 6, num2)
+  player:sendExpHook(PLAYER_BUFF_START + 6, num2)
   local package = player:GetPackage();
   package:DelItemSendMsg(iid, player);
   return num
@@ -8604,7 +8605,7 @@ function ItemNormal_00009360(iid, num, bind, param)
     num2 = max_num
   end
   player:SetVar(407, num2)
-  player:sendExpHook(0x40 + 10, num2)
+  player:sendExpHook(PLAYER_BUFF_START + 10, num2)
   local package = player:GetPackage();
   package:DelItemSendMsg(iid, player);
   return num
