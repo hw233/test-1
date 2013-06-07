@@ -795,7 +795,7 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
                 left = 0;
             }
             player->SetVar(VAR_TRAINP1, left);
-            player->sendExpHook(0x40 + PLAYER_BUFF_TRAINP1, left);
+            player->sendExpHook(PLAYER_BUFF_START + PLAYER_BUFF_TRAINP1, left);
         }
     }
     else if(curHookIndex == ENUM_TRAINP2)
@@ -815,7 +815,7 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
                 left = 0;
             }
             player->SetVar(VAR_TRAINP2, left);
-            player->sendExpHook(0x40 + PLAYER_BUFF_TRAINP2, left);
+            player->sendExpHook(PLAYER_BUFF_START + PLAYER_BUFF_TRAINP2, left);
         }
     }
     else if(curHookIndex == ENUM_TRAINP3)
@@ -835,7 +835,7 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
                 left = 0;
             }
             player->SetVar(VAR_TRAINP3, left);
-            player->sendExpHook(0x40 + PLAYER_BUFF_TRAINP3, left);
+            player->sendExpHook(PLAYER_BUFF_START + PLAYER_BUFF_TRAINP3, left);
         }
     }
     else

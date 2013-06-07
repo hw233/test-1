@@ -106,6 +106,7 @@ enum
     e_eft_lingyou_magatk = 34,           // 灵佑（法功)
     e_eft_lingyou_def = 35,           // 灵佑（物防)
     e_eft_lingyou_magdef = 36,           // 灵佑（法防)
+    e_eft_criticaldmgreduce = 37,           //减敌方暴击伤害
 
     e_eft_max
 };

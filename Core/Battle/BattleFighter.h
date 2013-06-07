@@ -1047,6 +1047,10 @@ private:
     bool getLingHpShield() { return _lingHpShield; }
     void setLingHpShield(bool v) { _lingHpShield = v; }
 
+    float _criticaldmgreduce;
+    float getCriticalDmgReduce() { return _criticaldmgreduce; }
+    void setCriticalDmgReduce(float v) { _criticaldmgreduce = v; }
+
     std::vector<GData::SkillItem> _passiveSkillDeadFake100;
     std::vector<GData::SkillItem> _passiveSkillDeadFake;
 

@@ -386,6 +386,12 @@ void JobHunter::SendMapInfo()
         }
     }
     st << static_cast<UInt8>(POS_TO_CLIENT_POS(POS_TO_INDEX(_posX, _posY)));
+
+    UInt8 mark = _owner->GetVar(VAR_JOBHUNT_AUTO_FIGHT_USE_MONEY_MARK);
+    UInt8 pos = _gameProgress - 1;
+    mark = GET_BIT(mark, pos);
+    st << mark;
+
     st << Stream::eos;
     _owner->send(st);
 }
@@ -1370,6 +1376,12 @@ bool JobHunter::OnFoundCave(bool isAuto)
 void JobHunter::OnAbort(bool isAuto /* = false */)
 {
     // 主动放弃
+
+    UInt32 mark = _owner->GetVar(VAR_JOBHUNT_AUTO_FIGHT_USE_MONEY_MARK);
+    UInt8 pos = _gameProgress - 1;
+    mark = CLR_BIT(mark, pos);
+    _owner->SetVar(VAR_JOBHUNT_AUTO_FIGHT_USE_MONEY_MARK, mark);
+
     _gameProgress = PROGRESS_NONE;
     _stepCount = 0;
     _posX = _posY = 0;
@@ -1398,19 +1410,43 @@ void JobHunter::OnLeaveGame(UInt16 spotId)
 void JobHunter::OnAutoStart()
 {
     // 开始自动战斗
-    if (!World::getAutoBattleAct() && _owner->getVipLevel() < 4)
+    /* if (!World::getAutoBattleAct())
     {
         return;
-    }
-    if (1000 > _owner->getTael())
+    }*/
+
+    UInt32 tael = 0;
+    UInt32 mark = _owner->GetVar(VAR_JOBHUNT_AUTO_FIGHT_USE_MONEY_MARK); 
+    UInt8 pos = _gameProgress - 1;
+    if(0 == GET_BIT(mark, pos))
     {
-        _owner->sendMsgCode(0, 1100);
-        return;
+        if(_owner->getVipLevel() >= 4)
+        {
+            if (1000 > _owner->getTael())
+            {
+                _owner->sendMsgCode(0, 1100);
+                return;
+            }
+
+            tael = 1000;
+        }
+        else
+        {
+            if (1500 > _owner->getTael())
+            {
+                _owner->sendMsgCode(0, 1100);
+                return;
+            }
+
+            tael = 1500;
+        }
+
+        ConsumeInfo ci(AutoJobHunter,0,0);
+        _owner->useTael(tael, &ci);
+
+       mark = SET_BIT(mark, pos);
+       _owner->SetVar(VAR_JOBHUNT_AUTO_FIGHT_USE_MONEY_MARK, mark);
     }
-
-    ConsumeInfo ci(AutoJobHunter,0,0);
-    _owner->useTael(1000, &ci);
-
     EventAutoJobHunter* event = new (std::nothrow) EventAutoJobHunter(_owner, 20, MAX_GRID, _gameProgress);
     if (!event) 
     {
@@ -1471,6 +1507,12 @@ void JobHunter::OnAutoStep()
     OnJumpWhenAuto(nextPos, steps);
     if (CheckEnd())
     {
+
+        UInt32 mark = _owner->GetVar(VAR_JOBHUNT_AUTO_FIGHT_USE_MONEY_MARK);
+        UInt8 pos = _gameProgress - 1;
+        mark = CLR_BIT(mark, pos);
+        _owner->SetVar(VAR_JOBHUNT_AUTO_FIGHT_USE_MONEY_MARK, mark);
+
         OnAbort(true);
         GameMsgHdr hdr1(0x17E, WORKER_THREAD_WORLD, _owner, 0);
         GLOBAL().PushMsg(hdr1, NULL);
@@ -1503,6 +1545,9 @@ void JobHunter::OnAutoStop()
 void JobHunter::OnAutoFinish()
 {
     // 立即完成自动战斗
+    if(_owner->getVipLevel() < 4)
+        return;
+
     if (10 > _owner->getGoldOrCoupon())
     {
         _owner->sendMsgCode(0, 1101);

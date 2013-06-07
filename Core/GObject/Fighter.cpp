@@ -540,14 +540,14 @@ UInt64 Fighter::getExpMax()
 void Fighter::updateToDB( UInt8 t, UInt64 v )
 {
 	const char * field = NULL;
-	if(t >= 0x40 && t < 0x40 + FIGHTER_BUFF_COUNT)
+	if(t >= FIGHTER_BUFF_START && t < FIGHTER_BUFF_START + FIGHTER_BUFF_COUNT)
 	{
 		if(_owner == NULL)
 			return;
 		if(v > 0)
-			DB1().PushUpdateData("REPLACE INTO `fighter_buff`(`playerId`, `id`, `buffId`, `data`) VALUES(%"I64_FMT"u, %u, %u, %u)", _owner->getId(), _id, t - 0x40, v);
+			DB1().PushUpdateData("REPLACE INTO `fighter_buff`(`playerId`, `id`, `buffId`, `data`) VALUES(%"I64_FMT"u, %u, %u, %u)", _owner->getId(), _id, t - FIGHTER_BUFF_START, v);
 		else
-			DB1().PushUpdateData("DELETE FROM `fighter_buff` WHERE `playerId` = %"I64_FMT"u AND `id` = %u AND `buffId` = %u", _owner->getId(), _id, t - 0x40);
+			DB1().PushUpdateData("DELETE FROM `fighter_buff` WHERE `playerId` = %"I64_FMT"u AND `id` = %u AND `buffId` = %u", _owner->getId(), _id, t - FIGHTER_BUFF_START);
 		return;
 	}
     if (t >= 0x0a && t < 0x0a+ getMaxTrumps())
@@ -759,7 +759,7 @@ void Fighter::sendModification( UInt8 n, UInt8 * t, UInt64 * v ,bool writedb)
 	for(UInt8 i = 0; i < n; ++ i)
 	{
 		st << t[i];
-		if(t[i] >= 0x40)
+		if(t[i] >= FIGHTER_BUFF_START)
 		{
 			st << static_cast<UInt32>(v[i] - TimeUtil::Now());
 		}
@@ -1250,7 +1250,7 @@ void Fighter::setBuffData( UInt8 id, UInt32 data, bool writedb )
 		return;
 	_buffData[id] = data;
 	if(writedb)
-		sendModification(0x40 + id, data);
+		sendModification(FIGHTER_BUFF_START + id, data);
 }
 
 UInt32 Fighter::getBuffData( UInt8 idx, UInt32 now )
@@ -1260,7 +1260,7 @@ UInt32 Fighter::getBuffData( UInt8 idx, UInt32 now )
 	if(_buffData[idx] > 0 && _buffData[idx] <= now)
 	{
 		_buffData[idx] = 0;
-		updateToDB(0x40 + idx, 0);
+		updateToDB(FIGHTER_BUFF_START + idx, 0);
 		return 0;
 	}
 	return _buffData[idx];

@@ -81,9 +81,9 @@ qixitmpl:addScoreAwards(200, 56, 7)
 qixitmpl:addScoreAwards(200, 57, 7)
 qixitmpl:addScoreAwards(200, 15, 7)
 -- 50分：太乙真金(502)x7，初级打孔石(510)x7，粗制拆卸石(504)x7
-qixitmpl:addScoreAwards(50, 502, 7)
+qixitmpl:addScoreAwards(50, 502, 14)
 qixitmpl:addScoreAwards(50, 510, 7)
-qixitmpl:addScoreAwards(50, 504, 7)
+--qixitmpl:addScoreAwards(50, 504, 7)
 
 qixitmpl:setPartnerTitle(4058)
 qixitmpl:setPartnerContent(4059)

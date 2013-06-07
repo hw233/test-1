@@ -43,6 +43,10 @@ namespace GData
 	struct Attr2Extra;
 }
 
+#define SYS_UPDLG_VF(v, f) ((v << 1) | f)
+#define SYS_UPDLG_V(v) (v >> 1)
+#define SYS_UPDLG_F(f) (f&0x01)
+
 namespace GObject
 {
 #define PLAYER_BUFF_AUTOHEAL		0x00
@@ -135,6 +139,7 @@ namespace GObject
 
 #define PLAYER_BUFF_DISPLAY_MAX		0x5F
 #define PLAYER_BUFF_COUNT			0x5F
+#define PLAYER_BUFF_START           0x80
 
 #define CLAN_TASK_MAXCOUNT          5       // ????ÿ????????????
 #define SHIMEN_TASK_MAXCOUNT        5       // ʦ??ÿ????????????
@@ -181,6 +186,9 @@ namespace GObject
 #define SPREAD_ALREADY_USE        0x01
 #define SPREAD_ALREADY_GET        0x02
 
+#define SET_BIT(X,Y)     (X | (1<<Y))                                                                                                                                                          
+#define GET_BIT(X,Y)     (X & (1<<Y))
+#define CLR_BIT(X,Y)     (X & ~(1<<Y))
     enum SurnameLegendAwardFlag
     {
         e_sla_none = 0x00,
@@ -206,6 +214,7 @@ namespace GObject
         XINGCHEN    = 5,    //遁天星辰诀
         WUDUN       = 6,    //五遁神斧
         JIUYOU      = 7,    //九幽秘典
+        JIUJIE      = 8,    //九戒困龙珠
         TREASURE    = 10,   //聚宝盆
 
         DRAGONKING_MAX,
@@ -2020,6 +2029,9 @@ namespace GObject
     public:
         inline void setSysDailog(bool v) { m_sysDailog = v; }
         inline bool getSysDailog() { return m_sysDailog; }
+
+        void setSysUpDateDlg(UInt32 v);
+        UInt32 getSysUpDateDlg();
     private:
         bool m_sysDailog;
 
