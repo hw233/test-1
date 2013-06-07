@@ -2415,7 +2415,7 @@ namespace GObject
 			return;
 		_buffData[id] = data;
 		if(writedb || (id >= PLAYER_BUFF_HIFIGHT && id <= PLAYER_BUFF_HIESCAPE))
-			sendModification(0x40 + id, data, writedb);
+			sendModification(PLAYER_BUFF_START + id, data, writedb);
 	}
 
 	void Player::addBuffData(UInt8 id, UInt32 data)
@@ -2428,7 +2428,7 @@ namespace GObject
 			_buffData[id] = now + data;
 		else
 			_buffData[id] = olddata + data;
-		sendModification(0x40 + id, _buffData[id]);
+		sendModification(PLAYER_BUFF_START + id, _buffData[id]);
 	}
 
 	UInt32 Player::getBuffData( UInt8 idx, UInt32 tm )
@@ -2445,7 +2445,7 @@ namespace GObject
                 _buffData[idx] > 0 && _buffData[idx] <= tm)
 		{
 			_buffData[idx] = 0;
-			updateDB(0x40 + idx, 0);
+			updateDB(PLAYER_BUFF_START + idx, 0);
 			return 0;
 		}
 		return _buffData[idx];
@@ -3104,7 +3104,7 @@ namespace GObject
 			{
 				if(_buffData[i] > 0)
 				{
-					buffid[c] = i + 0x40;
+					buffid[c] = i + PLAYER_BUFF_START;
 					buffleft[c] = _buffData[i];
 					++ c;
 				}
@@ -3119,13 +3119,13 @@ namespace GObject
                     UInt32 varData = GetVar(varId);
                     if(varData == 0)
                         continue;
-					buffid[c] = i + 0x40;
+					buffid[c] = i + PLAYER_BUFF_START;
 					buffleft[c] = varData;
                     ++c;
                 }
                 else if(_buffData[i] > curtime)
 				{
-					buffid[c] = i + 0x40;
+					buffid[c] = i + PLAYER_BUFF_START;
 					buffleft[c] = _buffData[i] - curtime;
 					++ c;
 				}
@@ -3232,7 +3232,7 @@ namespace GObject
 				UInt32 data = fgt->getBuffData(i);
 				if(data > 0)
 				{
-					buffid[c] = i + 0x40;
+					buffid[c] = i + PLAYER_BUFF_START;
 					buffleft[c] = data - curtime;
 					++ c;
 				}
@@ -4429,7 +4429,7 @@ namespace GObject
 		if(_isOnline)
 		{
 			Stream st(REP::USER_INFO_CHANGE);
-			if(t > 0x40)
+			if(t > PLAYER_BUFF_START)
 			{
                 UInt32 tm = TimeUtil::Now();
                 if(v > tm)
@@ -4447,14 +4447,14 @@ namespace GObject
 
 	void Player::updateDB( UInt8 t, UInt32 v )
 	{
-		if(t >= 0x40 && t < 0x40 + PLAYER_BUFF_COUNT)
+		if(t >= PLAYER_BUFF_START && t < PLAYER_BUFF_START + PLAYER_BUFF_COUNT)
 		{
-			if(t >= 0x40 + PLAYER_BUFF_DISPLAY_MAX)
+			if(t >= PLAYER_BUFF_START + PLAYER_BUFF_DISPLAY_MAX)
 				return;
 			if(v > 0)
-				DB7().PushUpdateData("REPLACE INTO `player_buff`(`id`, `buffId`, `data`) VALUES(%"I64_FMT"u, %u, %u)", _id, t - 0x40, v);
+				DB7().PushUpdateData("REPLACE INTO `player_buff`(`id`, `buffId`, `data`) VALUES(%"I64_FMT"u, %u, %u)", _id, t - PLAYER_BUFF_START, v);
             else
-				DB7().PushUpdateData("DELETE FROM `player_buff` WHERE `id` = %"I64_FMT"u AND `buffId` = %u", _id, t - 0x40);
+				DB7().PushUpdateData("DELETE FROM `player_buff` WHERE `id` = %"I64_FMT"u AND `buffId` = %u", _id, t - PLAYER_BUFF_START);
 			return;
 		}
 		const char * field = NULL;
@@ -11132,42 +11132,27 @@ namespace GObject
 
     void Player::getQQTenpayAward(UInt8 opt)
     {
-        return; //暂时不上
-
         UInt8 state = GetVar(VAR_QQTENPAY_AWARD);
 
-        if(getVia() == "ssgw_qqdh")
+        if (GetPackage()->GetRestPackageSize() < 6 && opt == 1)
         {
+            sendMsgCode(0, 1011);
 
-            if (GetPackage()->GetRestPackageSize() < 6 && opt == 1)
-            {
-			    sendMsgCode(0, 1011);
+            return;
+        }
 
-                return;
-            }
+        if(opt == 1 && state == 0)
+        {
+            GetPackage()->AddItem(9371, 2, true, false, FromQQTenpay);
+            GetPackage()->AddItem(503, 1, true, false, FromQQTenpay);
+            GetPackage()->AddItem(515, 1, true, false, FromQQTenpay);
+            GetPackage()->AddItem(509, 1, true, false, FromQQTenpay);
+            GetPackage()->AddItem(30, 2, true, false, FromQQTenpay);
 
-            if(opt == 1 && state == 0)
-            {
-                GetPackage()->AddItem(9371, 2, true, false, FromQQTenpay);
-                GetPackage()->AddItem(503, 1, true, false, FromQQTenpay);
-                GetPackage()->AddItem(515, 1, true, false, FromQQTenpay);
-                GetPackage()->AddItem(509, 1, true, false, FromQQTenpay);
-                GetPackage()->AddItem(30, 2, true, false, FromQQTenpay);
-
-                SetVar(VAR_QQTENPAY_AWARD, 1);
-                state = 1;
-            }
+            SetVar(VAR_QQTENPAY_AWARD, 1);
+            state = 1;
+        }
             
-            state += 1;
-        }
-        else
-        {
-            if(1 == state)
-            {
-                state += 1;
-            }
-        }
-
         Stream st(REP::GETAWARD);
         st << static_cast<UInt8>(22);
         st << state << Stream::eos;
@@ -11178,34 +11163,23 @@ namespace GObject
     {
         UInt8 state = GetVar(VAR_QQIM_QUICK_LOGIN_AWARD);
 
-        if(getVia() == "sscq_QQCLIENT.MAINPANEL.SETAPP")
+        if(GetPackage()->GetRestPackageSize() < 6 && 1 == opt)
         {
-            if(GetPackage()->GetRestPackageSize() < 6 && 1 == opt)
-            {
-			    sendMsgCode(0, 1011);
+            sendMsgCode(0, 1011);
 
-                return;
-            }
-
-            if(state == 0 && opt == 1)
-            {
-                GetPackage()->AddItem(50, 1, true, false, FromQQIMQuickLogin);
-                GetPackage()->AddItem(509, 1, true, false, FromQQIMQuickLogin);
-                GetPackage()->AddItem(9367, 1, true, false, FromQQIMQuickLogin);
-                GetPackage()->AddItem(9369, 1, true, false, FromQQIMQuickLogin);
-                GetPackage()->AddItem(15, 1, true, false, FromQQIMQuickLogin);
-
-                SetVar(VAR_QQIM_QUICK_LOGIN_AWARD, 1);
-                state = 1;
-            }
-            state += 1;
+            return;
         }
-        else
+
+        if(state == 0 && opt == 1)
         {
-            if(1 == state)
-            {
-                state += 1;
-            }
+            GetPackage()->AddItem(50, 1, true, false, FromQQIMQuickLogin);
+            GetPackage()->AddItem(509, 1, true, false, FromQQIMQuickLogin);
+            GetPackage()->AddItem(9367, 1, true, false, FromQQIMQuickLogin);
+            GetPackage()->AddItem(9369, 1, true, false, FromQQIMQuickLogin);
+            GetPackage()->AddItem(15, 1, true, false, FromQQIMQuickLogin);
+
+            SetVar(VAR_QQIM_QUICK_LOGIN_AWARD, 1);
+            state = 1;
         }
 
         Stream st(REP::GETAWARD);
@@ -11216,8 +11190,6 @@ namespace GObject
 
     void Player::getQQMusicAward(UInt8 opt)
     {
-        return; //暂时不上
-
         UInt8 state = GetVar(VAR_QQMUSIC_DAY_AWARD);
 
         if (GetPackage()->GetRestPackageSize() < 6 && opt == 1)
@@ -17797,14 +17769,21 @@ void Player::setDreamerKey(UInt8 count)
 
 void Player::sendSysUpdate()
 {
-   //版本更新公告
-   Stream st(REP::SYSDAILOG);
-   st << static_cast<UInt8>(1);
-   st << static_cast<UInt8>(1); //0:老版本 1:最新版
-   st << static_cast<UInt8>(1); //0:按钮不显示 1:按钮显示
-   st << (char*)VERSION;
-   st << Stream::eos;
-   send(st);
+    UInt32 v = getSysUpDateDlg();
+
+    //版本更新公告
+    Stream st(REP::SYSDAILOG);
+    st << static_cast<UInt8>(1);
+    st << static_cast<UInt8>(SYS_UPDLG_V(v)); //0:老版本 1:最新版
+    st << static_cast<UInt8>(SYS_UPDLG_F(v)); //0:按钮不显示 1:按钮显示
+    st << (char*)VERSION;
+    st << Stream::eos;
+    send(st);
+
+    if(SYS_UPDLG_F(v))
+    {
+        setSysUpDateDlg(SYS_UPDLG_VF(SYS_UPDLG_V(v), 0));
+    }
 }
 
 void Player::sendSnakeEggInfo()
@@ -18071,7 +18050,7 @@ void Player::getNewYearQQGameAward(UInt8 type)
 
 void Player::getQZoneQQGameAward(UInt8 domainType, UInt8 type)
 {
-    if(domainType == 1)
+    if(0/*domainType == 1*/)
     {
         if(atoi(m_domain) != 1 && atoi(m_domain) != 2)
             return;
@@ -18262,10 +18241,10 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
  *2:大闹龙宫之金蛇起舞
  *3:大闹龙宫之天芒神梭
 */
-static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14 };
-static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385 };
+static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15 };
+static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402 };
 //6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页
-static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362 };
+static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139 };
 void Player::getDragonKingInfo()
 {
     if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)
@@ -19958,7 +19937,12 @@ bool Player::SetVipPrivilege_2()
     bool ret = false;
     if(validate > 0 && (0 == (validate & 0x2)))
     {
-        validate += 5*86400;
+        UInt32 now = TimeUtil::Now();
+        if(validate > now)
+            validate += 5*86400;
+        else
+            validate = now + 5*86400;
+
         // 保持最低位为0
         if(validate & 0x1)
             validate = validate + 1;
@@ -20024,7 +20008,7 @@ void Player::doVipPrivilege(UInt8 idx)
         SetVipPrivilege_1();
         break;
     case 6:
-        if(!inVipPrivilegeTime())
+        if(!in7DayFromCreated())
             return;
         if (getGold() < 70)
             return;
@@ -20140,9 +20124,9 @@ bool Player::in7DayFromCreated()
 }
 
 #define QUESTIONID_MAX 30
-#define SET_BIT(X,Y)     (X | (1<<Y))
+/*#define SET_BIT(X,Y)     (X | (1<<Y))
 #define GET_BIT(X,Y)     (X & (1<<Y))
-#define CLR_BIT(X,Y)     (X & ~(1<<Y))
+#define CLR_BIT(X,Y)     (X & ~(1<<Y))*/
 #define CLR_BIT_8(X,Y)   (X & ~(0xFF<<(Y*8)))
 #define SET_BIT_8(X,Y,V) (CLR_BIT_8(X,Y) | V<<(Y*8))
 #define GET_BIT_8(X,Y)   ((X >> (Y*8)) & 0xFF)
@@ -21357,6 +21341,23 @@ static UInt32 ryhb_items[15][4] = {
     {99, 88, 1717, 1},      // 女仆头饰
     {555, 300, 9396, 1},    // 散仙令
 };
+static const char* ryhb_udplog[15] = {
+    "F_130603_1",
+    "F_130603_2",
+    "F_130603_3",
+    "F_130603_4",
+    "F_130603_5",
+    "F_130603_6",
+    "F_130603_7",
+    "F_130603_8",
+    "F_130603_9",
+    "F_130603_10",
+    "F_130603_11",
+    "F_130603_12",
+    "F_130603_13",
+    "F_130603_14",
+    "F_130603_15",
+};
 
 void Player::sendRYHBInfo()
 {
@@ -21418,6 +21419,7 @@ void Player::getRYHBAward(UInt8 idx, UInt8 cnt)
     SetVar(VAR_HYYJ_COUNT, hyyj);
 
     m_Package->Add(itemId, cnt, true, false, FromRYHBAward);
+    udpLog("riyue", ryhb_udplog[idx], "", "", "", "", "act");
 
     Stream st(REP::RP_SERVER);
     st << static_cast<UInt8>(0x05) << static_cast<UInt8>(1);
@@ -21432,19 +21434,31 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
     {
         if(flag == e_sla_none)
         {
-            GetPackage()->AddItem(9397, 1, true, false, FromNpc);
+            //GetPackage()->AddItem(9397, 1, true, false, FromNpc);
+            GetPackage()->AddItem(9401, 1, true, false, FromNpc);
         }
         else
         {
             UInt32 status = GetVar(VAR_SURNAME_LEGEND_STATUS);
             if(!(status & flag))
             {
-                GetPackage()->AddItem(9397, 1, true, false, FromNpc);
+                //GetPackage()->AddItem(9397, 1, true, false, FromNpc);
+                GetPackage()->AddItem(9401, 1, true, false, FromNpc);
                 status |= flag;
                 SetVar(VAR_SURNAME_LEGEND_STATUS, status);
             }
         }
     }
+}
+
+void Player::setSysUpDateDlg(UInt32 v)
+{
+    SetVar(VAR_SYS_UPDATE_DLG, v);
+}
+
+UInt32 Player::getSysUpDateDlg()
+{
+    return GetVar(VAR_SYS_UPDATE_DLG);
 }
 
 } // namespace GObject

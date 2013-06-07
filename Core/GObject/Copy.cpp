@@ -23,6 +23,7 @@ namespace GObject
 {
 #define PRIVILEGE_COUNT 1
 #define MAX_COPY_ID 8
+
 UInt8 PlayerCopy::_activeCount = 0;
 static UInt16 spots[] = {776, 2067, 5906, 8198, 12818, 10512, 0x1411, 0x2707};
 
@@ -149,6 +150,10 @@ void PlayerCopy::sendInfo(Player* pl, UInt8 id)
         count = maxCount;
     st << count;
     st << maxCount;
+    UInt8 mark = pl->GetVar(VAR_COPY_AUTO_FIGHT_USE_MONEY_MARK);
+    UInt8 pos = id - 1;
+    mark = GET_BIT(mark, pos);
+    st << mark;
     st << Stream::eos;
     pl->send(st);
 }
@@ -626,6 +631,11 @@ void PlayerCopy::reset(Player* pl, UInt8 id)
     st << static_cast<UInt8>(2) << id << static_cast<UInt8>(0) << Stream::eos;
     pl->send(st);
 
+    UInt32 mark = pl->GetVar(VAR_COPY_AUTO_FIGHT_USE_MONEY_MARK);
+    UInt8 pos = id - 1;
+    mark = CLR_BIT(mark, pos);
+    pl->SetVar(VAR_COPY_AUTO_FIGHT_USE_MONEY_MARK, mark);
+
     if (pl->hasFlag(Player::AutoCopy))
     {
         autoClear(pl);
@@ -730,6 +740,8 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool 
     if (!tcd.floor)
         return;
 
+    UInt32 mark = pl->GetVar(VAR_COPY_AUTO_FIGHT_USE_MONEY_MARK);
+    UInt8 pos = id - 1;
     switch (type) {
         case 0:
             {
@@ -746,8 +758,9 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool 
 
                     bool girl = (World::getGirlDay() && !pl->IsMale());
                     if (!World::getNewYear() &&
-                            !girl &&
-                            !World::getNetValentineDay())
+                        !girl &&
+                        !World::getNetValentineDay() &&
+                        (0 == GET_BIT(mark, pos)))
                     {
                         // XXX: moneyNeed must greater than 1000
                         UInt32 pref = 0;
@@ -777,6 +790,9 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool 
                                 pl->useTael((GData::moneyNeed[GData::COPY_AUTO1+id-1].tael - pref)/div, &ci);
                             }
                         }
+
+                        mark = SET_BIT(mark, pos);
+                        pl->SetVar(VAR_COPY_AUTO_FIGHT_USE_MONEY_MARK, mark);
                     }
                 }
 
@@ -864,6 +880,9 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool 
                     sp = 1;
                 }
                 pl->setBuffData(PLAYER_BUFF_ATTACKING, 0);
+
+                mark = CLR_BIT(mark, pos);
+                pl->SetVar(VAR_COPY_AUTO_FIGHT_USE_MONEY_MARK, mark);
             }
 _over:
             break;
