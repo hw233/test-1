@@ -6076,6 +6076,96 @@ void OnEquipLingbaoReq( GameMsgHdr & hdr, const void * data )
     }
 }
 
+
+void OnDelueGemReq( GameMsgHdr & hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	if(!player->hasChecked())
+    {
+		return;
+    }
+
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 opt = 0;
+    UInt16 fighterId = 0;
+    br >> opt >> fighterId;
+
+    GObject::Fighter * fgt = player->findFighter(fighterId);
+    if(fgt == NULL)
+    {  
+        return;
+    }
+
+    switch(opt)
+    {
+    case 0:
+        {
+            //请求多彩宝石信息
+            fgt->xinchenInfo();
+        }
+        break;
+    case 1:
+        {
+            //请求镶嵌宝石
+            UInt16 gemId = 0;
+            UInt8  bind = 0;
+            UInt8 pos = 0;
+            br >> gemId >> bind >>pos;
+
+            fgt->setGem(gemId, bind, pos);
+        }
+        break;
+    case 2:
+        {
+            //请求拆卸宝石
+            UInt8 pos = 0;
+            br >> pos;
+
+            fgt->dismantleGem(pos);
+        }
+        break;
+    case 3:
+        {
+            //阵旗转化星辰值
+            UInt8 itemDataCount = 0;
+            UInt32 xcValue = 0;
+            UInt16 zqId = 0;
+            UInt8 zqCount = 0;
+            UInt8 bind = 0;
+
+            br >> itemDataCount;
+
+            for(UInt8 i=0; i<itemDataCount; i++)
+            {
+                br >> zqId >> zqCount >> bind;
+
+                if(zqCount > 0)
+                {
+                    xcValue += fgt->exchangeXingchenValue(zqId, zqCount, bind);
+                }
+                else
+                {
+                    continue;
+                }
+            }
+
+            if(xcValue > 0)
+            {
+                player->AddVar(VAR_XINGCHENZHEN_VALUE, xcValue);
+                fgt->updateDBxingchen();
+                fgt->xinchenInfo();
+            }
+        }
+        break;
+    case 4:
+        {
+            //星辰图升级
+            fgt->upgradeXingchen();
+        }
+        break;
+    }
+}
+
 void OnDreamer( GameMsgHdr & hdr, const void * data)
 {
 	MSG_QUERY_PLAYER(player);

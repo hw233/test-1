@@ -5790,6 +5790,7 @@ bool Fighter::upgradeXingchen()
         ++ m_xingchen.lvl;
     updateDBxingchen();
     _owner->SetVar(VAR_XINGCHENZHEN_VALUE, value - stxc->consume);
+    xinchenInfo();
     return true;
 }
 
@@ -5800,5 +5801,159 @@ void Fighter::updateDBxingchen()
             m_xingchen.gems[0], m_xingchen.gems[1], m_xingchen.gems[2]);
 }
 
+void Fighter::xinchenInfo()
+{
+    UInt32 value = _owner->GetVar(VAR_XINGCHENZHEN_VALUE);
+
+    Stream st(REP::EQ_DELUEGEM);
+    st << static_cast<UInt16>(getId()) << value << m_xingchen.lvl << m_xingchen.curVal << m_xingchen.gems[0] << m_xingchen.gems[1] << m_xingchen.gems[2] << Stream::eos;
+    _owner->send(st);
 }
 
+void Fighter::setGem(UInt16 gemId, UInt8 bind, UInt8 pos)
+{
+    if (isPet() || !_owner || getLevel() < 60)
+    {
+        return;
+    }
+
+    if(pos >= 1 && pos <= 3)
+    {
+        return;
+    }
+
+    if(m_xingchen.gems[pos-1] > 0)
+    {
+        return;
+    }
+
+    ItemBase * item = _owner->GetPackage()->FindItem(gemId, bind > 0);
+
+    if(NULL == item) 
+    {
+        return;
+    }
+
+    if(m_xingchen.lvl >= 5 && pos == 1)
+    {
+        if(IsCanSetGem(item, 2) && IsCanSetGem(item, 3))
+        {
+            m_xingchen.gems[0] = gemId;
+        }
+    }
+    else if(m_xingchen.lvl >= 10 && pos == 2)
+    {
+        if(IsCanSetGem(item, 1) && IsCanSetGem(item, 3))
+        {
+            m_xingchen.gems[1] = gemId;
+        }
+    }
+    else if(m_xingchen.lvl >= 15 && pos == 3)
+    {
+        if(IsCanSetGem(item, 1) && IsCanSetGem(item, 2))
+        {
+            m_xingchen.gems[2] = gemId;
+        }
+    }
+    else
+    {
+        return;
+    }
+
+    _owner->GetPackage()->DelItem(gemId, 1, bind > 0, ToSetGem);
+    
+    updateDBxingchen();
+    xinchenInfo();
+}
+
+bool Fighter::IsCanSetGem(ItemBase * item, UInt8 pos)
+{
+    if(pos >= 1 && pos <= 3)
+    {
+        return false;
+    }
+
+    const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[m_xingchen.gems[pos-1]];
+
+    if(NULL == itemType) return false;
+
+    if(NULL == item) return false;
+
+    if(itemType->subClass == item->getClass()) return false;
+
+    return true;
+}
+
+void Fighter::dismantleGem(UInt8 pos)
+{
+    
+    if (isPet() || !_owner || getLevel() < 60)
+    {
+        return;
+    }
+
+    if(pos >= 1 && pos <= 3)
+    {
+        return;
+    }
+
+    if(m_xingchen.gems[pos-1] == 0)
+    {
+        return;
+    }
+
+    if(_owner->GetPackage()->GetRestPackageSize() < 1)
+    {
+        _owner->sendMsgCode(0, 1011);
+        return;
+    }
+
+    UInt16 gemId = m_xingchen.gems[pos-1];
+
+    if(m_xingchen.lvl >= 5 && pos == 1)
+    {
+        m_xingchen.gems[0] = 0;
+    }
+    else if(m_xingchen.lvl >= 10 && pos == 2)
+    {
+        m_xingchen.gems[1] = 0;
+    }
+    else if(m_xingchen.lvl >= 15 && pos == 3)
+    {
+        m_xingchen.gems[2] = 0;
+    }
+    else
+    {
+        return;
+    }
+
+    _owner->GetPackage()->AddItem(gemId, 1, true, false, TodismantleGem);
+    updateDBxingchen();
+    xinchenInfo();
+}
+
+UInt32 Fighter::exchangeXingchenValue(UInt16 zqId, UInt8 zqCount, UInt8 bind)
+{
+    if (GetItemSubClass(zqId) != Item_Formula)
+        return 0;
+    ItemBase * item = _owner->GetPackage()->FindItem(zqId, bind > 0);
+    if(NULL == item)
+    {
+        return 0;
+    }
+                         
+    UInt32 xcValue = 0;
+    if(zqCount > item->Count())
+    {
+        return 0;
+    }
+    else
+    {
+        xcValue = (item->GetItemType().trumpExp) * zqCount;
+        _owner->GetPackage()->DelItem(zqId, zqCount, bind > 0);
+    }
+
+    return xcValue;
+}
+
+}
