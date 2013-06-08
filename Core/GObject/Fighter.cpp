@@ -5861,7 +5861,7 @@ void Fighter::setGem(UInt16 gemId, UInt8 bind, UInt8 pos)
     if(getLevel() < stxc->limitLev)
         return;
 
-    if(pos >= 1 && pos <= 3)
+    if(pos < 1 || pos > 3)
     {
         return;
     }
@@ -5912,7 +5912,7 @@ void Fighter::setGem(UInt16 gemId, UInt8 bind, UInt8 pos)
 
 bool Fighter::IsCanSetGem(ItemBase * item, UInt8 pos)
 {
-    if(pos >= 1 && pos <= 3)
+    if(pos < 1 || pos > 3)
     {
         return false;
     }
@@ -5930,18 +5930,23 @@ bool Fighter::IsCanSetGem(ItemBase * item, UInt8 pos)
 
 void Fighter::dismantleGem(UInt8 pos)
 {
-    
     if (isPet() || !_owner)
     {
         return;
     }
+
     GData::XingchenData::stXingchen * stxc = GData::xingchenData.getXingchenTable(1);
     if (stxc == NULL)
+    {
         return;
-    if(getLevel() < stxc->limitLev)
-        return;
+    }
 
-    if(pos >= 1 && pos <= 3)
+    if(getLevel() < stxc->limitLev)
+    {
+        return;
+    }
+
+    if(pos < 1 || pos > 3)
     {
         return;
     }
@@ -5984,7 +5989,10 @@ void Fighter::dismantleGem(UInt8 pos)
 UInt32 Fighter::exchangeXingchenValue(UInt16 zqId, UInt8 zqCount, UInt8 bind)
 {
     if (GetItemSubClass(zqId) != Item_Formula)
+    {
         return 0;
+    }
+
     ItemBase * item = _owner->GetPackage()->FindItem(zqId, bind > 0);
     if(NULL == item)
     {

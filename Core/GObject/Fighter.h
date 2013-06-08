@@ -981,7 +981,7 @@ public:
     void dismantleGem(UInt8 pos);
     UInt32 exchangeXingchenValue(UInt16 zqId, UInt8 zqCount, UInt8 bind);
     bool IsCanSetGem(ItemBase *item, UInt8 pos);
-
+    void dismissXingchen();
 };
 
 class GlobalFighters

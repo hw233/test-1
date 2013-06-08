@@ -6089,7 +6089,7 @@ void OnDelueGemReq( GameMsgHdr & hdr, const void * data )
 
     BinaryReader br(data, hdr.msgHdr.bodyLen);
     UInt8 opt = 0;
-    UInt16 fighterId = 0;
+    UInt32 fighterId = 0;
     br >> opt >> fighterId;
 
     GObject::Fighter * fgt = player->findFighter(fighterId);
