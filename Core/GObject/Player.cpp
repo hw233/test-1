@@ -11132,42 +11132,27 @@ namespace GObject
 
     void Player::getQQTenpayAward(UInt8 opt)
     {
-        return; //暂时不上
-
         UInt8 state = GetVar(VAR_QQTENPAY_AWARD);
 
-        if(getVia() == "ssgw_qqdh")
+        if (GetPackage()->GetRestPackageSize() < 6 && opt == 1)
         {
+            sendMsgCode(0, 1011);
 
-            if (GetPackage()->GetRestPackageSize() < 6 && opt == 1)
-            {
-			    sendMsgCode(0, 1011);
-
-                return;
-            }
-
-            if(opt == 1 && state == 0)
-            {
-                GetPackage()->AddItem(9371, 2, true, false, FromQQTenpay);
-                GetPackage()->AddItem(503, 1, true, false, FromQQTenpay);
-                GetPackage()->AddItem(515, 1, true, false, FromQQTenpay);
-                GetPackage()->AddItem(509, 1, true, false, FromQQTenpay);
-                GetPackage()->AddItem(30, 2, true, false, FromQQTenpay);
-
-                SetVar(VAR_QQTENPAY_AWARD, 1);
-                state = 1;
-            }
-            
-            state += 1;
-        }
-        else
-        {
-            if(1 == state)
-            {
-                state += 1;
-            }
+            return;
         }
 
+        if(opt == 1 && state == 0)
+        {
+            GetPackage()->AddItem(9371, 2, true, false, FromQQTenpay);
+            GetPackage()->AddItem(503, 1, true, false, FromQQTenpay);
+            GetPackage()->AddItem(515, 1, true, false, FromQQTenpay);
+            GetPackage()->AddItem(509, 1, true, false, FromQQTenpay);
+            GetPackage()->AddItem(30, 2, true, false, FromQQTenpay);
+
+            SetVar(VAR_QQTENPAY_AWARD, 1);
+            state = 1;
+        }
+        
         Stream st(REP::GETAWARD);
         st << static_cast<UInt8>(22);
         st << state << Stream::eos;
@@ -11205,8 +11190,6 @@ namespace GObject
 
     void Player::getQQMusicAward(UInt8 opt)
     {
-        return; //暂时不上
-
         UInt8 state = GetVar(VAR_QQMUSIC_DAY_AWARD);
 
         if (GetPackage()->GetRestPackageSize() < 6 && opt == 1)
