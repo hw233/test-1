@@ -1310,6 +1310,34 @@ void Fighter::addAttrExtra( GData::AttrExtra& ae, const GData::CittaEffect* ce )
 	ae += *ce;
 }
 
+void Fighter::addAttrExtraGem( GData::AttrExtra& ae, GData::ItemGemType * igt )
+{
+	if(igt == NULL)
+		return;
+    GData::XingchenData::stXingchen * stxc = GData::xingchenData.getXingchenTable(m_xingchen.lvl);
+    switch(igt->subClass)
+    {
+        case Item_Gem:
+        case Item_Gem1:
+        case Item_Gem2:
+        case Item_Gem3:
+        case Item_Gem4:
+        case Item_Gem5:
+	        ae += *(igt->attrExtra) * (1.0 + (stxc ? stxc->rate1 : 0));
+            break;
+        case Item_Gem6:
+        case Item_Gem8:
+	        ae += *(igt->attrExtra) * (1.0 + (stxc ? stxc->rate2 : 0));
+            break;
+        case Item_Gem14:
+	        ae += *(igt->attrExtra) * (1.0 + (stxc ? stxc->rate3 : 0));
+            break;
+        default:
+	        ae += *(igt->attrExtra);
+            break;
+    }
+}
+
 inline void addEquipAttr2( GData::AttrExtra& ae, UInt8 type, UInt16 value, UInt8 level )
 {
 	switch(type)
@@ -1624,7 +1652,8 @@ void Fighter::addAttr( ItemEquip * equip )
 		{
             GData::ItemGemType * igt = NULL;
 			igt = GData::gemTypes[ied.gems[i] - LGEM_ID];
-			addAttrExtra(_attrExtraEquip, igt->attrExtra);
+			//addAttrExtra(_attrExtraEquip, igt->attrExtra);
+            addAttrExtraGem(_attrExtraEquip, igt);
 		}
 	}
 }
@@ -1843,6 +1872,16 @@ void Fighter::rebuildEquipAttr()
         _attrExtraEquip.hp += _owner->GetFairySpar()->getFairySparPH();
         _attrExtraEquip.attack += _owner->GetFairySpar()->getFairySparAtk();
         _attrExtraEquip.magatk += _owner->GetFairySpar()->getFairySparMagAtk();
+    }
+    //镇封星辰宝石加成
+    for(UInt8 i = 0; i < sizeof(m_xingchen.gems)/sizeof(m_xingchen.gems[0]); ++ i)
+    {
+        if(m_xingchen.gems[i] > 0)
+        {
+            GData::ItemGemType * igt = NULL;
+			igt = GData::gemTypes[m_xingchen.gems[i] - LGEM_ID];
+            addAttrExtraGem(_attrExtraEquip, igt);
+        }
     }
 
 	_maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
@@ -5773,14 +5812,14 @@ void Fighter::setXingchenFromDB(DBXingchen& dbxc)
 
 bool Fighter::upgradeXingchen()
 {
-    if (isPet() || !_owner || getLevel() < 60)
+    if (isPet() || !_owner)
         return false;
     if (m_xingchen.curVal >= 25)
         return false;
-    if ((UInt16)(((getLevel() - 60) / 10 + 1) * 5) <= m_xingchen.curVal)
-        return false;
     GData::XingchenData::stXingchen * stxc = GData::xingchenData.getXingchenTable(m_xingchen.lvl+1);
     if (stxc == NULL)
+        return false;
+    if(getLevel() < stxc->limitLev)
         return false;
     UInt32 value = _owner->GetVar(VAR_XINGCHENZHEN_VALUE);
     if (value < stxc->consume)
@@ -5798,6 +5837,37 @@ void Fighter::updateDBxingchen()
     DB1().PushUpdateData("REPLACE INTO `fighter_xingchen` (`fighterId`, `playerId`, `level`, `curVal`, `gem1`, `gem2`, `gem3`)\
             VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u, %u)", getId(), _owner->getId(), m_xingchen.lvl, m_xingchen.curVal,
             m_xingchen.gems[0], m_xingchen.gems[1], m_xingchen.gems[2]);
+}
+
+void Fighter::dismissXingchen()
+{
+    if (isPet() || !_owner || getLevel() < 60)
+        return;
+    SYSMSG(title, 2016);
+    SYSMSGV(content, 2017);
+    UInt8 size = 1;
+    for(UInt8 i = 0; i < sizeof(m_xingchen.gems)/sizeof(m_xingchen.gems[0]); ++ i)
+    {
+        if(m_xingchen.gems[i] > 0)
+            ++ size;
+    }
+    MailPackage::MailItem * mitem = new MailPackage::MailItem [size];
+    for(UInt8 i = 0, j = 0; i < sizeof(m_xingchen.gems)/sizeof(m_xingchen.gems[0]); ++ i)
+    {
+        if(m_xingchen.gems[i] > 0)
+        {
+            mitem[j].id = m_xingchen.gems[i];
+            mitem[j].count = 1;
+            ++ j;
+        }
+    }
+    MailItemsInfo itemsInfo(mitem, DismissXingchen, size);
+
+    GObject::Mail * pmail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+    if(pmail)
+        GObject::mailPackageManager.push(pmail->id, mitem, size, true);
+
+    DB1().PushUpdateData("DELETE FROM `fighter_xingchen` WHERE `fighterId` = %u AND `playerId` = %"I64_FMT"u", getId(), _owner->getId());
 }
 
 }

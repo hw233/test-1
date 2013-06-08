@@ -562,6 +562,7 @@ struct DBPetEqAttreffect
 struct DBXingchenConfig
 {
     UInt8 id;
+    UInt8 limitLev;
     std::string name;
     UInt32 consume;
     UInt32 maxVal;
@@ -1218,9 +1219,10 @@ SPECIALDEF(12)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBXingchenConfig)
-SPECIALDEF(7)
+SPECIALDEF(8)
 	(
     UInt8, id,
+    UInt8, limitLev,
     std::string, name,
     UInt32, consume,
     UInt32, maxVal,

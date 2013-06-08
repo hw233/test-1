@@ -731,6 +731,7 @@ public:
 protected:
     void addAttrExtra( GData::AttrExtra& ae, const GData::AttrExtra * ext );
     void addAttrExtra( GData::AttrExtra& ae, const GData::CittaEffect* ce );
+    void addAttrExtraGem( GData::AttrExtra& ae, GData::ItemGemType * igt );
 	virtual void rebuildEquipAttr();
 	void rebuildBattlePoint();
 	void rebuildSkillBattlePoint();
@@ -971,9 +972,11 @@ public:
 private:
     Xingchenzhen m_xingchen;
 public:
+    inline Xingchenzhen& getXingchen() { return m_xingchen; }
     void setXingchenFromDB(DBXingchen&);
     bool upgradeXingchen();
     void updateDBxingchen();
+    void dismissXingchen();
 
 };
 
