@@ -1966,6 +1966,7 @@ namespace GObject
         bool m_isOffical;
         bool m_isXY;
         UInt8 m_XinYue;
+        std::string m_JinQuan;
     public:
         inline void setDomain(const std::string& domain)
         {
@@ -2022,6 +2023,8 @@ namespace GObject
         inline bool isXY() const { return m_isXY; }
         inline void setXinYue(UInt8 v) { m_XinYue = v; }
         inline UInt8 getXinYue() const { return m_XinYue; }
+        inline void setJinQuan(std::string& v) { m_JinQuan = v; }
+        inline const std::string& getJinQuan() const { return m_JinQuan; }
         inline const char* getClientIp() const { return m_clientIp; }
 
         inline UInt8 getPlatform() const { return atoi(m_domain); }

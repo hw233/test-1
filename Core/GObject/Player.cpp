@@ -1209,12 +1209,12 @@ namespace GObject
         {
             StringTokenizer via(m_via, "_");
             if (via.count() > 1)
-                udpLog(via[0].c_str(), via[1].c_str(), "", "", "", "0", "login");
+                udpLog(via[0].c_str(), via[1].c_str(), "", "", getJinQuan().c_str(), "0", "login");
             else
-                udpLog(m_via.c_str(), "", "", "", "", "0", "login");
+                udpLog(m_via.c_str(), "", "", "", getJinQuan().c_str(), "0", "login");
         }
         else
-            udpLog("", "", "", "", "", "0", "login");
+            udpLog("", "", "", "", getJinQuan().c_str(), "0", "login");
 
         sendTowerLoginAct();
 
