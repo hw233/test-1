@@ -744,10 +744,6 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
         break;
 	case 2:
 		{
-
-            mark = CLR_BIT(mark, pos);
-            player->SetVar(VAR_DUNGEON_AUTO_FIGHT_USE_MONEY_MARK, mark);
-
 			player->delFlag(Player::AutoDungeon);
 			Stream st(REP::COPY_AUTO_FIGHT);
 			st << _id << static_cast<UInt8>(it->second.level) << static_cast<UInt8>(2) << *totalExp << Stream::eos;
