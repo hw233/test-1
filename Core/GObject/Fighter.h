@@ -976,11 +976,12 @@ public:
     void setXingchenFromDB(DBXingchen&);
     bool upgradeXingchen();
     void updateDBxingchen();
-    void xinchenInfo();
+    void sendXingchenInfo();
     void setGem(UInt16 gemId,UInt8 bind, UInt8 pos);
     void dismantleGem(UInt8 pos);
     UInt32 exchangeXingchenValue(UInt16 zqId, UInt8 zqCount, UInt8 bind);
     bool IsCanSetGem(ItemBase *item, UInt8 pos);
+    void dismissXingchen();
 
 };
 

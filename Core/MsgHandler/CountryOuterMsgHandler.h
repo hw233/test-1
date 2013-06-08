@@ -1715,6 +1715,7 @@ void OnFighterDismissReq( GameMsgHdr& hdr, FighterDismissReq& fdr )
     fgt->delAllCitta();
     //此处只剩下法宝符文未散功了！！
     fgt->SSDismissAll(true);
+    fgt->dismissXingchen();
 	delete fgt;
 	rep._fgtid = fdr._fgtid;
 	rep._result = 0;
@@ -6103,7 +6104,7 @@ void OnDelueGemReq( GameMsgHdr & hdr, const void * data )
     case 0:
         {
             //请求多彩宝石信息
-            fgt->xinchenInfo();
+            fgt->sendXingchenInfo();
         }
         break;
     case 1:
@@ -6155,7 +6156,7 @@ void OnDelueGemReq( GameMsgHdr & hdr, const void * data )
             {
                 player->AddVar(VAR_XINGCHENZHEN_VALUE, xcValue);
                 fgt->updateDBxingchen();
-                fgt->xinchenInfo();
+                fgt->sendXingchenInfo();
             }
         }
         break;
