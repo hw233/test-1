@@ -82,7 +82,7 @@ void FrontMap::sendInfo(Player* pl, UInt8 id, bool needspot, bool force)
 
     UInt32 mark = pl->GetVar(VAR_FRONTMAP_AUTO_FIGHT_USE_MONEY_MARK);
     UInt8 pos = id - 1;
-    mark = GET_BIT(mark, pos);
+    pos = static_cast<UInt8>(GET_BIT(mark, pos));
 
     FastMutex::ScopedLock lk(_mutex);
     Stream st(REP::FORMATTON_INFO);
@@ -90,7 +90,7 @@ void FrontMap::sendInfo(Player* pl, UInt8 id, bool needspot, bool force)
     st << static_cast<UInt8>(0);
     st << id;
     st << count;
-    st << mark;
+    st << pos;
 
     if (needspot)
         sendFrontMap(st, pl, id, needspot?true:force);
@@ -442,6 +442,11 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
             { 
                 pl->GetPackage()->AddItem(9138, 1, false, false);
             }
+
+            UInt32 mark = pl->GetVar(VAR_FRONTMAP_AUTO_FIGHT_USE_MONEY_MARK);
+            UInt8 pos = id - 1;
+            mark = CLR_BIT(mark, pos);
+            pl->SetVar(VAR_FRONTMAP_AUTO_FIGHT_USE_MONEY_MARK, mark);
 
             GameAction()->onFrontMapWin(pl, id, spot, tmp[spot].lootlvl);
             pl->copyFrontWinAward(2);
