@@ -949,6 +949,16 @@ public:
 	struct Offset { Int8 x, y; };
 	std::vector<Offset> extraPos;
 
+    //分别计算散仙的战斗力
+public:
+	inline GData::AttrExtra& getAttrExtraEquip1() { return _attrExtraEquip; }
+    UInt32 calcBaseBattlePoint();   //基础
+    UInt32 calcEquipBattlePoint();  //装备与法宝
+    UInt32 calcSkillBattlePoint();  //技能
+    UInt32 calcCittaBattlePoint();  //心法
+    UInt32 calc2ndSoulBattlePoint();  //第二元神
+    UInt32 calcClanBattlePoint();  //帮派
+    UInt32 calcLingbaoBattlePoint1();  //宝具
     // 仙宠
 
 public:

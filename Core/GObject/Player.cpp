@@ -16406,6 +16406,117 @@ void EventTlzAuto::notify(bool isBeginAuto)
         return _maxLingbaoBattlePoint;
     }
 
+    UInt32 Player::getBaseBattlePoint()
+    {
+        UInt32 bp = 0;
+        for(int j = 0; j < 5; ++ j)
+        {
+            Fighter* fighter = _playerData.lineup[j].fighter;
+            if(fighter)
+                bp += fighter->calcBaseBattlePoint();
+        }
+        return bp;
+    }
+
+    UInt32 Player::getEquipBattlePoint()
+    {
+        UInt32 bp = 0;
+        for(int j = 0; j < 5; ++ j)
+        {
+            Fighter* fighter = _playerData.lineup[j].fighter;
+            if(fighter)
+                bp += fighter->calcEquipBattlePoint();
+        }
+        return bp;
+    }
+
+    UInt32 Player::getSkillBattlePoint()
+    {
+        UInt32 bp = 0;
+        for(int j = 0; j < 5; ++ j)
+        {
+            Fighter* fighter = _playerData.lineup[j].fighter;
+            if(fighter)
+                bp += fighter->calcSkillBattlePoint();
+        }
+        return bp;
+    }
+
+    UInt32 Player::getCittaBattlePoint()
+    {
+        UInt32 bp = 0;
+        for(int j = 0; j < 5; ++ j)
+        {
+            Fighter* fighter = _playerData.lineup[j].fighter;
+            if(fighter)
+                bp += fighter->calcCittaBattlePoint();
+        }
+        return bp;
+    }
+
+    UInt32 Player::get2ndSoulBattlePoint()
+    {
+        UInt32 bp = 0;
+        for(int j = 0; j < 5; ++ j)
+        {
+            Fighter* fighter = _playerData.lineup[j].fighter;
+            if(fighter)
+                bp += fighter->calc2ndSoulBattlePoint();
+        }
+        return bp;
+    }
+
+    UInt32 Player::getClanBattlePoint()
+    {
+        UInt32 bp = 0;
+        for(int j = 0; j < 5; ++ j)
+        {
+            Fighter* fighter = _playerData.lineup[j].fighter;
+            if(fighter)
+                bp += fighter->calcClanBattlePoint();
+        }
+        return bp;
+    }
+
+    UInt32 Player::getLingbaoBattlePoint()
+    {
+        UInt32 bp = 0;
+        for(int j = 0; j < 5; ++ j)
+        {
+            Fighter* fighter = _playerData.lineup[j].fighter;
+            if(fighter)
+                bp += fighter->calcLingbaoBattlePoint1();
+        }
+        return bp;
+    }
+
+    void Player::sendCompareBP(Player * player)
+    {
+        if(!player) return;
+        Stream st(REP::COMPARE_BP);
+        st << getId() << GetLev() << getName();
+        st << getBaseBattlePoint();
+        st << getEquipBattlePoint();
+        st << getSkillBattlePoint();
+        st << getCittaBattlePoint();
+        st << get2ndSoulBattlePoint();
+        st << getClanBattlePoint();
+        FairyPet * pet = getBattlePet();
+        if(pet)
+            st << static_cast<UInt32>(pet->getBattlePoint());
+        else
+            st << static_cast<UInt32>(0);
+        st << getLingbaoBattlePoint();
+        st << getCountry();
+        Fighter * fgt = getMainFighter();
+        if(fgt)
+            st << static_cast<UInt8>(fgt->getId()) << fgt->getSex();
+        else
+            st << static_cast<UInt8>(0) << static_cast<UInt8>(0);
+        st << Stream::eos;
+        player->send(st);
+    }
+
     void Player::verifyFighter()
     {
         Fighter* mfgt = NULL;

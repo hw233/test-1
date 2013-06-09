@@ -2161,6 +2161,13 @@ void OnClanRankBattleSortListInner(GameMsgHdr& hdr, const void* data)
     ClanRankBattleMgr::Instance().SendSortList(player, startId, count);
 }
 
+void OnCompareBP( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	Player * pl = reinterpret_cast<Player *>(const_cast<void *>(data));
+    player->sendCompareBP(pl);
+}
+
 #endif // _COUNTRYINNERMSGHANDLER_H_
 
 

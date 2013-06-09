@@ -3296,6 +3296,29 @@ void GMHandler::OnShowBattlePoint(GObject::Player* player, std::vector<std::stri
         SYSMSG_SENDV(626, player, pet->getName().c_str(), static_cast<UInt32>(pet->getBattlePoint()),
                 hp, atk, magatk, def, magdef, action, lingya, cri, cridmg, prc, magres, hit, evd, cnt, tough);
     }
+    else if(type == 3)
+    {
+        for(int i = 0; i < 5; ++ i)
+        {
+            GObject::Lineup& lup = PLAYER_DATA(player, lineup)[i];
+            Fighter* fighter = lup.fighter;
+            if(fighter)
+            {
+                UInt32 basePoint = fighter->calcBaseBattlePoint();
+                UInt32 eqPoint = fighter->calcEquipBattlePoint();
+                UInt32 skillPoint = fighter->calcSkillBattlePoint();
+                UInt32 cittaPoint = fighter->calcCittaBattlePoint();
+                UInt32 soulPoint = fighter->calc2ndSoulBattlePoint();
+                UInt32 clanPoint = fighter->calcClanBattlePoint();
+                UInt32 lingbaoPoint = fighter->calcLingbaoBattlePoint1();
+                UInt32 petPoint = 0;
+                FairyPet * pet = player->getBattlePet();
+                if(pet)
+                    petPoint = pet->getBattlePoint();
+                SYSMSG_SENDV(627, player, fighter->getName().c_str(), basePoint, eqPoint, skillPoint, cittaPoint, soulPoint, clanPoint, petPoint, lingbaoPoint);
+            }
+        }
+    }
 }
 
 void GMHandler::OnEnterArena(GObject::Player* player, std::vector<std::string>& arge)

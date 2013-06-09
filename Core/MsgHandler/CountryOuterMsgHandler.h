@@ -720,6 +720,12 @@ struct GuideUdp
     MESSAGE_DEF3(REQ::GUIDEUDP, UInt8, _type, std::string, p1, std::string, p2);
 };
 
+struct CompareBattlePoint
+{
+    std::string _name;
+	MESSAGE_DEF1(REQ::COMPARE_BP, std::string, _name);
+};
+
 
 void OnSellItemReq( GameMsgHdr& hdr, const void * buffer)
 {
@@ -6448,6 +6454,25 @@ void OnRPServerReq( GameMsgHdr & hdr, const void * data)
 void OnClanBossReq( GameMsgHdr& hdr, const void* data)
 {
     GObject::ClanBoss::instance().onClanBossReq(hdr, data);
+}
+
+void OnComparBattelPoint( GameMsgHdr & hdr, CompareBattlePoint& cbp)
+{
+	MSG_QUERY_PLAYER(player);
+
+	GObject::Player * pl = GObject::globalNamedPlayers[cbp._name];
+    if (NULL == pl)
+        return;
+    UInt8 tid = pl->getThreadId();
+	if(tid == player->getThreadId())
+	{
+        pl->sendCompareBP(player);
+    }
+    else
+    {
+        GameMsgHdr hdr(0x275, tid, pl, sizeof(Player *));
+        GLOBAL().PushMsg(hdr, player);
+    }
 }
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_

@@ -2213,6 +2213,15 @@ namespace GObject
         UInt32 getMaxLingbaoBattlePoint();
         void verifyFighter();
 
+        //分别计算玩家的战斗力
+        UInt32 getBaseBattlePoint();
+        UInt32 getEquipBattlePoint();
+        UInt32 getSkillBattlePoint();
+        UInt32 getCittaBattlePoint();
+        UInt32 get2ndSoulBattlePoint();
+        UInt32 getClanBattlePoint();
+        UInt32 getLingbaoBattlePoint();
+        void sendCompareBP(Player *);
     private:
         UInt32 _maxLingbaoBattlePoint;
 

@@ -391,6 +391,9 @@ namespace REQ
     /** 战报数据 */
     const UInt8 FIGHT_REPORT2       = 0x0F;
 
+    /** 玩家战力对比*/
+    const UInt8 COMPARE_BP          = 0xA7;
+
     /** 仙宠系统 */
     const UInt8 FAIRY_PET           = 0xA8;
 
@@ -676,6 +679,9 @@ namespace REP
     const UInt8 FIGHT_REPORT2       = 0x0F;
     /** 系统弹窗公告 */
     const UInt8 SYSDAILOG           = 0x0E;
+
+    /** 玩家战力对比*/
+    const UInt8 COMPARE_BP          = 0xA7;
 
     /** 仙宠系统 */
     const UInt8 FAIRY_PET           = 0xA8;
