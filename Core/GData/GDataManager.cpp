@@ -2069,6 +2069,7 @@ namespace GData
             stxc.level = dbxcc.id;
             stxc.limitLev = dbxcc.limitLev;
             stxc.name  = dbxcc.name;
+            stxc.consume = dbxcc.consume;
             stxc.maxVal = dbxcc.maxVal;
             stxc.rate1 = dbxcc.rate1;
             stxc.rate2 = dbxcc.rate2;
