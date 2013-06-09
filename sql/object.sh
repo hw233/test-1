@@ -168,9 +168,11 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearaccrecharge.sql   #清除累积充值记录
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130524_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130530_1.sql
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130607_2.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130607_2.sql #must be once
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearbluediamond.sql  #蓝钻活动需要打开
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130607_1.sql
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130608_1.sql  #must be once强制阵旗，阵眼在交易区下架
+
 
     #. clearshiyamen.sh
 }
