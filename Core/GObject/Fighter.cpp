@@ -6041,7 +6041,7 @@ void Fighter::dismissXingchen()
     GData::XingchenData::stXingchen * stxc = GData::xingchenData.getXingchenTable(1);
     if(!stxc || getLevel() < stxc->limitLev)
         return;
-    UInt8 size = 1;
+    UInt8 size = 2;
     for(UInt8 i = 0; i < sizeof(m_xingchen.gems)/sizeof(m_xingchen.gems[0]); ++ i)
     {
         if(m_xingchen.gems[i] > 0)
@@ -6060,8 +6060,12 @@ void Fighter::dismissXingchen()
         }
     }
     stxc = GData::xingchenData.getXingchenTable(m_xingchen.lvl);
-    mitem[size-1].id = 1126;
-    mitem[size-1].count = static_cast<UInt16>((stxc ? stxc->payBack : 0) / 100);
+    UInt32 payBack = stxc ? stxc->payBack : 0;
+    mitem[size-1].id = 1127;
+    mitem[size-1].count = static_cast<UInt16>(payBack / 1000);
+    payBack = payBack % 1000;
+    mitem[size-2].id = 1126;
+    mitem[size-2].count = static_cast<UInt16>(payBack / 100);
     MailItemsInfo itemsInfo(mitem, DismissXingchen, size);
 
     GObject::Mail * pmail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
