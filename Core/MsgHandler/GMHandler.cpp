@@ -266,6 +266,10 @@ GMHandler::GMHandler()
 
     Reg(3, "settdlvl", &GMHandler::OnSetTownDeamonMaxLevel);
     Reg(3, "spar", &GMHandler::OnFairySpar);
+    
+    Reg(3, "setxzlvl", &GMHandler::OnSetXZLvl);
+    Reg(3, "setxzvalue", &GMHandler::OnSetXCValue);
+
     Reg(2, "eqexp", &GMHandler::OnAddPetEquipExp);
 }
 
@@ -345,6 +349,43 @@ bool GMHandler::Handle( const std::string& txt, GObject::Player * player, bool i
 #ifdef _WIN32
 #define strtoull _strtoui64
 #endif
+
+void GMHandler::OnSetXZLvl(GObject::Player * player, std::vector<std::string>& args)
+{
+    
+	if(args.empty())
+		return;
+	if(args.size() == 2)
+	{
+		UInt32 fighterId = atoi(args[0].c_str());
+		UInt32 xzLevel = atoi(args[1].c_str());
+		GObject::Fighter * fgt = player->findFighter(fighterId);
+		if(fgt == NULL)
+			return;
+        fgt->getXingchen().lvl = xzLevel;
+
+        fgt->updateDBxingchen();
+        fgt->sendXingchenInfo();
+	}
+}
+
+void GMHandler::OnSetXCValue(GObject::Player * player, std::vector<std::string>& args)
+{
+
+	if(args.empty())
+		return;
+	if(args.size() == 2)
+	{
+		UInt32 fighterId = atoi(args[0].c_str());
+		UInt32 xcValue  = atoi(args[1].c_str());
+		GObject::Fighter * fgt = player->findFighter(fighterId);
+		if(fgt == NULL)
+			return;
+        player->SetVar(VAR_XINGCHENZHEN_VALUE, xcValue);
+        
+        fgt->sendXingchenInfo();
+	}
+}
 
 void GMHandler::OnsetWeekDay(std::vector<std::string>& args)
 {
