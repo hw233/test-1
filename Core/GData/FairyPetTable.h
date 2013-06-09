@@ -41,6 +41,7 @@ public:
 		UInt32 consume1;    //小周天消耗的凤髓
 		UInt32 consume2;    //大周天消耗的凤髓
         float growRate;     //成长倍率
+        GenguData(): id(0), name(""), limit(0), baseProb(0), failBack(0), consume1(0), consume2(0), growRate(0.0) {}
 	};
 	struct LingyaData
 	{
@@ -49,6 +50,7 @@ public:
         UInt8 lingya;
         UInt16 initBone;
         UInt16 finalBone;
+        LingyaData(): petId(0), color(0), lingya(0), initBone(0), finalBone(0) {}
 	};
 	struct EquipExpData
 	{   //仙宠装备升级经验

@@ -21034,6 +21034,8 @@ void Player::addCuilianTimes()
 
 void Player::doCuilian(UInt8 clType, UInt8 clOpt, UInt8 isAll)
 {
+    if(!hasChecked())
+        return;
     if(!checkBBFT())
         return;
     int leftCnt = GetVar(VAR_PET_CUILIAN_LEFT_CNT);

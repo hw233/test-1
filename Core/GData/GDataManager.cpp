@@ -2058,7 +2058,7 @@ namespace GData
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
         DBXingchenConfig dbxcc;
-		if(execu->Prepare("SELECT `id`, `limitLev`, `name`, `consume`, `maxVal`, `rate1`, `rate2`, `rate3` FROM `xingchen`", dbxcc) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `limitLev`, `name`, `consume`, `maxVal`, `rate1`, `rate2`, `rate3`, `payBack` FROM `xingchen`", dbxcc) != DB::DB_OK)
 			return false;
 
 		while(execu->Next() == DB::DB_OK)
@@ -2073,6 +2073,7 @@ namespace GData
             stxc.rate1 = dbxcc.rate1;
             stxc.rate2 = dbxcc.rate2;
             stxc.rate3 = dbxcc.rate3;
+            stxc.payBack = dbxcc.payBack;
             xingchenData.setXingchenTable(stxc);
         }
         return true;
