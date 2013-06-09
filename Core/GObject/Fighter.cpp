@@ -5846,10 +5846,12 @@ void Fighter::updateDBxingchen()
 void Fighter::sendXingchenInfo()
 {
     GData::XingchenData::stXingchen * stxc = GData::xingchenData.getXingchenTable(m_xingchen.lvl-1);
+
     Stream st(REP::EQ_DELUEGEM);
     st << static_cast<UInt16>(getId());
     st << _owner->GetVar(VAR_XINGCHENZHEN_VALUE);
     st << m_xingchen.lvl << static_cast<UInt32>(m_xingchen.curVal - (stxc ? stxc->maxVal : 0));
+
     for(UInt8 i = 0; i < sizeof(m_xingchen.gems)/sizeof(m_xingchen.gems[0]); ++ i)
     {
         st << m_xingchen.gems[i];
@@ -5866,9 +5868,14 @@ void Fighter::setGem(UInt16 gemId, UInt8 bind, UInt8 pos)
     }
     GData::XingchenData::stXingchen * stxc = GData::xingchenData.getXingchenTable(1);
     if (stxc == NULL)
+    {
         return;
+    }
+
     if(getLevel() < stxc->limitLev)
+    {
         return;
+    }
 
     if(pos < 1 || pos > 3)
     {
