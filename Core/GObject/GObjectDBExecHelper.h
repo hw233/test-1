@@ -1228,6 +1228,17 @@ struct DBPetEquipAttr
     UInt16 socket4;
 };
 
+struct DBXingchen
+{
+	UInt32 fighterId;
+	UInt64 playerId;
+	UInt8  level;
+	UInt32 curVal;
+    UInt16 gem1;
+    UInt16 gem2;
+    UInt16 gem3;
+};
+
 }
 
 namespace DB {
@@ -1585,7 +1596,6 @@ SPECIALDEF(8)
     std::string, skills
 )
 SPECIALEND()
-
 
 SPECIALBEGIN(GObject::DBPracticePlace)
 SPECIALDEF(12)
@@ -2776,6 +2786,19 @@ SPECIALDEF(8)
     UInt16, socket2,
     UInt16, socket3,
     UInt16, socket4
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBXingchen)
+SPECIALDEF(7)
+(
+	UInt32, fighterId,
+	UInt64, playerId,
+	UInt8,  level,
+	UInt32, curVal,
+    UInt16, gem1,
+    UInt16, gem2,
+    UInt16, gem3
 )
 SPECIALEND()
 

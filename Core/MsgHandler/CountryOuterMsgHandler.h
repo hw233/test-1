@@ -720,6 +720,12 @@ struct GuideUdp
     MESSAGE_DEF3(REQ::GUIDEUDP, UInt8, _type, std::string, p1, std::string, p2);
 };
 
+struct CompareBattlePoint
+{
+    std::string _name;
+	MESSAGE_DEF1(REQ::COMPARE_BP, std::string, _name);
+};
+
 
 void OnSellItemReq( GameMsgHdr& hdr, const void * buffer)
 {
@@ -1715,6 +1721,7 @@ void OnFighterDismissReq( GameMsgHdr& hdr, FighterDismissReq& fdr )
     fgt->delAllCitta();
     //此处只剩下法宝符文未散功了！！
     fgt->SSDismissAll(true);
+    fgt->dismissXingchen();
 	delete fgt;
 	rep._fgtid = fdr._fgtid;
 	rep._result = 0;
@@ -6078,6 +6085,95 @@ void OnEquipLingbaoReq( GameMsgHdr & hdr, const void * data )
     }
 }
 
+
+void OnDelueGemReq( GameMsgHdr & hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	if(!player->hasChecked())
+    {
+		return;
+    }
+
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 opt = 0;
+    UInt16 fighterId = 0;
+    br >> opt >> fighterId;
+
+    GObject::Fighter * fgt = player->findFighter(fighterId);
+    if(fgt == NULL)
+    {  
+        return;
+    }
+
+    switch(opt)
+    {
+    case 0:
+        {
+            //请求多彩宝石信息
+            fgt->sendXingchenInfo();
+        }
+        break;
+    case 1:
+        {
+            //请求镶嵌宝石
+            UInt16 gemId = 0;
+            UInt8  bind = 0;
+            UInt8 pos = 0;
+            br >> gemId >> bind >>pos;
+
+            fgt->setGem(gemId, bind, pos);
+        }
+        break;
+    case 2:
+        {
+            //请求拆卸宝石
+            UInt8 pos = 0;
+            br >> pos;
+
+            fgt->dismantleGem(pos);
+        }
+        break;
+    case 3:
+        {
+            //阵旗转化星辰值
+            UInt8 itemDataCount = 0;
+            UInt32 xcValue = 0;
+            UInt16 zqId = 0;
+            UInt8 zqCount = 0;
+            UInt8 bind = 0;
+
+            br >> itemDataCount;
+
+            for(UInt8 i=0; i<itemDataCount; i++)
+            {
+                br >> zqId >> zqCount >> bind;
+
+                if(zqCount > 0)
+                {
+                    xcValue += fgt->exchangeXingchenValue(zqId, zqCount, bind);
+                }
+                else
+                {
+                    continue;
+                }
+            }
+
+            if(xcValue > 0)
+            {
+                player->AddVar(VAR_XINGCHENZHEN_VALUE, xcValue);
+                fgt->sendXingchenInfo();
+            }
+        }
+        break;
+    case 4:
+        {
+            //星辰图升级
+            fgt->upgradeXingchen();
+        }
+        break;
+    }
+}
+
 void OnDreamer( GameMsgHdr & hdr, const void * data)
 {
 	MSG_QUERY_PLAYER(player);
@@ -6449,6 +6545,25 @@ void OnRPServerReq( GameMsgHdr & hdr, const void * data)
 void OnClanBossReq( GameMsgHdr& hdr, const void* data)
 {
     GObject::ClanBoss::instance().onClanBossReq(hdr, data);
+}
+
+void OnComparBattelPoint( GameMsgHdr & hdr, CompareBattlePoint& cbp)
+{
+	MSG_QUERY_PLAYER(player);
+
+	GObject::Player * pl = GObject::globalNamedPlayers[cbp._name];
+    if (NULL == pl)
+        return;
+    UInt8 tid = pl->getThreadId();
+	if(tid == player->getThreadId())
+	{
+        pl->sendCompareBP(player);
+    }
+    else
+    {
+        GameMsgHdr hdr(0x275, tid, pl, sizeof(Player *));
+        GLOBAL().PushMsg(hdr, player);
+    }
 }
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_

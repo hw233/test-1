@@ -266,6 +266,10 @@ GMHandler::GMHandler()
 
     Reg(3, "settdlvl", &GMHandler::OnSetTownDeamonMaxLevel);
     Reg(3, "spar", &GMHandler::OnFairySpar);
+    
+    Reg(3, "setxzlvl", &GMHandler::OnSetXZLvl);
+    Reg(3, "setxzvalue", &GMHandler::OnSetXCValue);
+
     Reg(2, "eqexp", &GMHandler::OnAddPetEquipExp);
 }
 
@@ -345,6 +349,43 @@ bool GMHandler::Handle( const std::string& txt, GObject::Player * player, bool i
 #ifdef _WIN32
 #define strtoull _strtoui64
 #endif
+
+void GMHandler::OnSetXZLvl(GObject::Player * player, std::vector<std::string>& args)
+{
+    
+	if(args.empty())
+		return;
+	if(args.size() == 2)
+	{
+		UInt32 fighterId = atoi(args[0].c_str());
+		UInt32 xzLevel = atoi(args[1].c_str());
+		GObject::Fighter * fgt = player->findFighter(fighterId);
+		if(fgt == NULL)
+			return;
+        fgt->getXingchen().lvl = xzLevel;
+
+        fgt->updateDBxingchen();
+        fgt->sendXingchenInfo();
+	}
+}
+
+void GMHandler::OnSetXCValue(GObject::Player * player, std::vector<std::string>& args)
+{
+
+	if(args.empty())
+		return;
+	if(args.size() == 2)
+	{
+		UInt32 fighterId = atoi(args[0].c_str());
+		UInt32 xcValue  = atoi(args[1].c_str());
+		GObject::Fighter * fgt = player->findFighter(fighterId);
+		if(fgt == NULL)
+			return;
+        player->SetVar(VAR_XINGCHENZHEN_VALUE, xcValue);
+        
+        fgt->sendXingchenInfo();
+	}
+}
 
 void GMHandler::OnsetWeekDay(std::vector<std::string>& args)
 {
@@ -3295,6 +3336,29 @@ void GMHandler::OnShowBattlePoint(GObject::Player* player, std::vector<std::stri
 
         SYSMSG_SENDV(626, player, pet->getName().c_str(), static_cast<UInt32>(pet->getBattlePoint()),
                 hp, atk, magatk, def, magdef, action, lingya, cri, cridmg, prc, magres, hit, evd, cnt, tough);
+    }
+    else if(type == 3)
+    {
+        for(int i = 0; i < 5; ++ i)
+        {
+            GObject::Lineup& lup = PLAYER_DATA(player, lineup)[i];
+            Fighter* fighter = lup.fighter;
+            if(fighter)
+            {
+                UInt32 basePoint = fighter->calcBaseBattlePoint();
+                UInt32 eqPoint = fighter->calcEquipBattlePoint();
+                UInt32 skillPoint = fighter->calcSkillBattlePoint();
+                UInt32 cittaPoint = fighter->calcCittaBattlePoint();
+                UInt32 soulPoint = fighter->calc2ndSoulBattlePoint();
+                UInt32 clanPoint = fighter->calcClanBattlePoint();
+                UInt32 lingbaoPoint = fighter->calcLingbaoBattlePoint1();
+                UInt32 petPoint = 0;
+                FairyPet * pet = player->getBattlePet();
+                if(pet)
+                    petPoint = pet->getBattlePoint();
+                SYSMSG_SENDV(627, player, fighter->getName().c_str(), basePoint, eqPoint, skillPoint, cittaPoint, soulPoint, clanPoint, petPoint, lingbaoPoint);
+            }
+        }
     }
 }
 

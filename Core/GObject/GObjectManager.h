@@ -320,6 +320,7 @@ namespace GObject
         static bool LoadDiscount();
         static bool LoadSoulItemChance();
         static bool loadSecondSoul();
+        static bool loadFighterXingchen();
         static bool LoadLuckyLog();
         static bool loadRealItemAward();
         static bool loadNewRelation();

@@ -11,6 +11,7 @@
 #include "GData/SkillTable.h"
 #include "GData/CittaTable.h"
 #include "GData/AcuPraTable.h"
+#include "GData/XingchenData.h"
 #include "Server/SysMsg.h"
 #include "Server/Cfg.h"
 #include "Common/Stream.h"
@@ -1309,6 +1310,34 @@ void Fighter::addAttrExtra( GData::AttrExtra& ae, const GData::CittaEffect* ce )
 	ae += *ce;
 }
 
+void Fighter::addAttrExtraGem( GData::AttrExtra& ae, GData::ItemGemType * igt )
+{
+	if(igt == NULL)
+		return;
+    GData::XingchenData::stXingchen * stxc = GData::xingchenData.getXingchenTable(m_xingchen.lvl);
+    switch(igt->subClass)
+    {
+        case Item_Gem:
+        case Item_Gem1:
+        case Item_Gem2:
+        case Item_Gem3:
+        case Item_Gem4:
+        case Item_Gem5:
+	        ae += *(igt->attrExtra) * (1.0 + (stxc ? stxc->rate1 : 0));
+            break;
+        case Item_Gem6:
+        case Item_Gem8:
+	        ae += *(igt->attrExtra) * (1.0 + (stxc ? stxc->rate2 : 0));
+            break;
+        case Item_Gem14:
+	        ae += *(igt->attrExtra) * (1.0 + (stxc ? stxc->rate3 : 0));
+            break;
+        default:
+	        ae += *(igt->attrExtra);
+            break;
+    }
+}
+
 inline void addEquipAttr2( GData::AttrExtra& ae, UInt8 type, UInt16 value, UInt8 level )
 {
 	switch(type)
@@ -1623,7 +1652,8 @@ void Fighter::addAttr( ItemEquip * equip )
 		{
             GData::ItemGemType * igt = NULL;
 			igt = GData::gemTypes[ied.gems[i] - LGEM_ID];
-			addAttrExtra(_attrExtraEquip, igt->attrExtra);
+			//addAttrExtra(_attrExtraEquip, igt->attrExtra);
+            addAttrExtraGem(_attrExtraEquip, igt);
 		}
 	}
 }
@@ -1842,6 +1872,16 @@ void Fighter::rebuildEquipAttr()
         _attrExtraEquip.hp += _owner->GetFairySpar()->getFairySparPH();
         _attrExtraEquip.attack += _owner->GetFairySpar()->getFairySparAtk();
         _attrExtraEquip.magatk += _owner->GetFairySpar()->getFairySparMagAtk();
+    }
+    //镇封星辰宝石加成
+    for(UInt8 i = 0; i < sizeof(m_xingchen.gems)/sizeof(m_xingchen.gems[0]); ++ i)
+    {
+        if(m_xingchen.gems[i] > 0)
+        {
+            GData::ItemGemType * igt = NULL;
+			igt = GData::gemTypes[m_xingchen.gems[i] - LGEM_ID];
+            addAttrExtraGem(_attrExtraEquip, igt);
+        }
     }
 
 	_maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
@@ -5760,5 +5800,572 @@ void Fighter::getAllLbSkills(Stream& st)
     }
 }
 
+//镇封星辰图
+void Fighter::setXingchenFromDB(DBXingchen& dbxc)
+{
+    m_xingchen.lvl = dbxc.level;
+    m_xingchen.curVal = dbxc.curVal;
+    m_xingchen.gems[0] = dbxc.gem1;
+    m_xingchen.gems[1] = dbxc.gem2;
+    m_xingchen.gems[2] = dbxc.gem3;
 }
 
+bool Fighter::upgradeXingchen()
+{
+    if (isPet() || !_owner)
+        return false;
+    if (m_xingchen.lvl >= 25)
+        return false;
+    GData::XingchenData::stXingchen * stxc = GData::xingchenData.getXingchenTable(m_xingchen.lvl+1);
+    if(!stxc || getLevel() < stxc->limitLev)
+        return false;
+    UInt32 value = _owner->GetVar(VAR_XINGCHENZHEN_VALUE);
+    if (value < stxc->consume)
+        return false;
+    m_xingchen.curVal += uRand(19) + 1;
+    if(m_xingchen.curVal >= stxc->maxVal)
+    {
+        ++ m_xingchen.lvl;
+        setDirty();
+    }
+
+    updateDBxingchen();
+    _owner->SetVar(VAR_XINGCHENZHEN_VALUE, value - stxc->consume);
+    sendXingchenInfo();
+    _owner->sendMsgCode(0, 4005);
+    return true;
+}
+
+void Fighter::updateDBxingchen()
+{
+    DB1().PushUpdateData("REPLACE INTO `fighter_xingchen` (`fighterId`, `playerId`, `level`, `curVal`, `gem1`, `gem2`, `gem3`)\
+            VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u, %u)", getId(), _owner->getId(), m_xingchen.lvl, m_xingchen.curVal,
+            m_xingchen.gems[0], m_xingchen.gems[1], m_xingchen.gems[2]);
+}
+
+void Fighter::sendXingchenInfo()
+{
+    GData::XingchenData::stXingchen * stxc = NULL;
+    if(m_xingchen.lvl > 0)
+        stxc = GData::xingchenData.getXingchenTable(m_xingchen.lvl);
+
+    Stream st(REP::EQ_DELUEGEM);
+    st << static_cast<UInt16>(getId());
+    st << _owner->GetVar(VAR_XINGCHENZHEN_VALUE);
+    st << m_xingchen.lvl << static_cast<UInt32>(m_xingchen.curVal - (stxc ? stxc->maxVal : 0));
+
+    for(UInt8 i = 0; i < sizeof(m_xingchen.gems)/sizeof(m_xingchen.gems[0]); ++i)
+    {
+        st << m_xingchen.gems[i];
+    }
+    st << Stream::eos;
+    _owner->send(st);
+}
+
+void Fighter::setGem(UInt16 gemId, UInt8 bind, UInt8 pos)
+{
+    if (isPet() || !_owner)
+    {
+        return;
+    }
+    GData::XingchenData::stXingchen * stxc = GData::xingchenData.getXingchenTable(1);
+    if (stxc == NULL)
+    {
+        return;
+    }
+
+    if(getLevel() < stxc->limitLev)
+    {
+        return;
+    }
+
+    if(pos < 1 || pos > 3)
+    {
+        return;
+    }
+
+    if(m_xingchen.gems[pos-1] > 0)
+    {
+        return;
+    }
+
+    ItemBase * item = _owner->GetPackage()->FindItem(gemId, bind > 0);
+
+    if(NULL == item) 
+    {
+        return;
+    }
+
+    if(m_xingchen.lvl >= 5 && pos == 1)
+    {
+        if(IsCanSetGem(item, 2) && IsCanSetGem(item, 3))
+        {
+            m_xingchen.gems[0] = gemId;
+        }
+    }
+    else if(m_xingchen.lvl >= 10 && pos == 2)
+    {
+        if(IsCanSetGem(item, 1) && IsCanSetGem(item, 3))
+        {
+            m_xingchen.gems[1] = gemId;
+        }
+    }
+    else if(m_xingchen.lvl >= 15 && pos == 3)
+    {
+        if(IsCanSetGem(item, 1) && IsCanSetGem(item, 2))
+        {
+            m_xingchen.gems[2] = gemId;
+        }
+    }
+    else
+    {
+        return;
+    }
+
+    _owner->GetPackage()->DelItem(gemId, 1, bind > 0, ToSetGem);
+    
+    setDirty();
+    updateDBxingchen();
+    sendXingchenInfo();
+}
+
+bool Fighter::IsCanSetGem(ItemBase * item, UInt8 pos)
+{
+    if(pos < 1 || pos > 3)
+    {
+        return false;
+    }
+
+    if(m_xingchen.gems[pos-1] > 0)
+    {
+        const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[m_xingchen.gems[pos-1]];
+
+        if(NULL == itemType) return false;
+
+        if(NULL == item) return false;
+
+        if(itemType->subClass == item->getClass()) return false;
+    }
+    return true;
+}
+
+void Fighter::dismantleGem(UInt8 pos)
+{
+    if (isPet() || !_owner)
+    {
+        return;
+    }
+
+    GData::XingchenData::stXingchen * stxc = GData::xingchenData.getXingchenTable(1);
+    if (stxc == NULL)
+    {
+        return;
+    }
+
+    if(getLevel() < stxc->limitLev)
+    {
+        return;
+    }
+
+    if(pos < 1 || pos > 3)
+    {
+        return;
+    }
+
+    if(m_xingchen.gems[pos-1] == 0)
+    {
+        return;
+    }
+
+    if(_owner->GetPackage()->GetRestPackageSize() < 1)
+    {
+        _owner->sendMsgCode(0, 1011);
+        return;
+    }
+
+    UInt16 gemId = m_xingchen.gems[pos-1];
+
+    if(m_xingchen.lvl >= 5 && pos == 1)
+    {
+        m_xingchen.gems[0] = 0;
+    }
+    else if(m_xingchen.lvl >= 10 && pos == 2)
+    {
+        m_xingchen.gems[1] = 0;
+    }
+    else if(m_xingchen.lvl >= 15 && pos == 3)
+    {
+        m_xingchen.gems[2] = 0;
+    }
+    else
+    {
+        return;
+    }
+
+    _owner->GetPackage()->AddItem(gemId, 1, true, false, TodismantleGem);
+    
+    setDirty();
+    updateDBxingchen();
+    sendXingchenInfo();
+}
+
+UInt32 Fighter::exchangeXingchenValue(UInt16 zqId, UInt8 zqCount, UInt8 bind)
+{
+    ItemBase * item = _owner->GetPackage()->FindItem(zqId, bind > 0);
+    if(NULL == item)
+    {
+        return 0;
+    }
+
+    if(item->getClass() <= Item_Formula || item->getClass() > Item_Formula9)
+    {   
+        return 0;
+    }
+
+    UInt32 xcValue = 0;
+    if(zqCount > item->Count())
+    {
+        return 0;
+    }
+    else
+    {
+        xcValue = (item->GetItemType().trumpExp) * zqCount;
+        _owner->GetPackage()->DelItem(zqId, zqCount, bind > 0, ToExchangXCValue);
+    }
+
+    return xcValue;
+}
+
+void Fighter::dismissXingchen()
+{
+    if (isPet() || !_owner)
+        return;
+    GData::XingchenData::stXingchen * stxc = GData::xingchenData.getXingchenTable(1);
+    if(!stxc || getLevel() < stxc->limitLev)
+        return;
+    UInt8 size = 2;
+    for(UInt8 i = 0; i < sizeof(m_xingchen.gems)/sizeof(m_xingchen.gems[0]); ++ i)
+    {
+        if(m_xingchen.gems[i] > 0)
+            ++ size;
+    }
+    SYSMSG(title, 2016);
+    SYSMSGV(content, 2017, getLevel(), getColor(), getName().c_str());
+    MailPackage::MailItem * mitem = new MailPackage::MailItem [size];
+    for(UInt8 i = 0, j = 0; i < sizeof(m_xingchen.gems)/sizeof(m_xingchen.gems[0]); ++ i)
+    {
+        if(m_xingchen.gems[i] > 0)
+        {
+            mitem[j].id = m_xingchen.gems[i];
+            mitem[j].count = 1;
+            ++ j;
+        }
+    }
+    stxc = GData::xingchenData.getXingchenTable(m_xingchen.lvl);
+    UInt32 payBack = stxc ? stxc->payBack : 0;
+    mitem[size-1].id = 1127;
+    mitem[size-1].count = static_cast<UInt16>(payBack / 1000);
+    payBack = payBack % 1000;
+    mitem[size-2].id = 1126;
+    mitem[size-2].count = static_cast<UInt16>(payBack / 100);
+
+    MailItemsInfo itemsInfo(mitem, DismissXingchen, size);
+
+    GObject::Mail * pmail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+    if(pmail)
+        GObject::mailPackageManager.push(pmail->id, mitem, size, true);
+
+    DB1().PushUpdateData("DELETE FROM `fighter_xingchen` WHERE `fighterId` = %u AND `playerId` = %"I64_FMT"u", getId(), _owner->getId());
+}
+
+/*
+ *begin分别计算散仙的战斗力
+*/
+UInt32 Fighter::calcBaseBattlePoint()
+{
+    if(isPet() || !_owner)
+        return 0;
+	Fighter * fgt = this->cloneWithOutDirty(NULL);
+	GData::AttrExtra& attrExtra = fgt->getAttrExtraEquip1();
+	attrExtra.reset();
+    addTalentAttr(attrExtra, this->getAttrType1(), this->getAttrValue1());
+    addTalentAttr(attrExtra, this->getAttrType2(), this->getAttrValue2());
+    addTalentAttr(attrExtra, this->getAttrType3(), this->getAttrValue3());
+    /*
+    //镇封星辰宝石加成
+    for(UInt8 i = 0; i < sizeof(m_xingchen.gems)/sizeof(m_xingchen.gems[0]); ++ i)
+    {
+        if(m_xingchen.gems[i] > 0)
+        {
+            GData::ItemGemType * igt = GData::gemTypes[m_xingchen.gems[i] - LGEM_ID];
+            addAttrExtraGem(attrExtra, igt);
+        }
+    }
+    */
+	fgt->_maxHP = Script::BattleFormula::getCurrent()->calcHP(fgt);
+	UInt32 point = Script::BattleFormula::getCurrent()->calcBattlePoint(fgt);
+    delete fgt;
+    return point;
+}
+
+inline void clearFighterBaseValue(Fighter * fgt)
+{
+    if(fgt == NULL)
+        return;
+    ElixirAttr attr;
+    fgt->setElixirAttr(attr);
+
+    fgt->setPotential(0, false);
+    fgt->setCapacity(0, false);
+    fgt->setLevel(1, false);
+    fgt->strength = 0;
+    fgt->physique = 0;
+    fgt->agility = 0;
+    fgt->intelligence = 0;
+    fgt->will = 0;
+    fgt->soulMax = 0;
+    fgt->baseSoul = 0;
+    fgt->aura = 0;
+    fgt->auraMax = 0;
+    fgt->tough = 0;
+    fgt->attack = 0;
+    fgt->magatk = 0;
+    fgt->defend = 0;
+    fgt->magdef = 0;
+    fgt->maxhp = 0;
+    fgt->action = 0;
+    fgt->talent = 0;
+    fgt->hitrate = 0;
+    fgt->evade = 0;
+    fgt->critical = 0;
+    fgt->criticaldmg = 0;
+    fgt->pierce = 0;
+    fgt->counter = 0;
+    fgt->magres = 0;
+}
+
+UInt32 Fighter::calcEquipBattlePoint()
+{
+    if(isPet() || !_owner)
+        return 0;
+	UInt32 setId[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+	UInt32 setNum[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+
+	Fighter * fgt = this->cloneWithOutDirty(NULL);
+    clearFighterBaseValue(fgt);
+	GData::AttrExtra& attrExtra = fgt->getAttrExtraEquip1();
+	attrExtra.reset();
+	ItemEquip * equip = this->getFashion();
+    if (equip != NULL)
+        fgt->addTrumpAttr(equip);
+
+	ItemEquip * halo = this->getHalo();
+    if (halo != NULL)
+        fgt->addTrumpAttr(halo);
+
+	equip = this->getWeapon();
+	if(equip != NULL)
+	{
+		if(equip->getQuality() >= 4)
+			testEquipInSet(setId, setNum, equip->GetItemType().getId());
+		fgt->addAttr(equip);
+
+        const GData::AttrExtra * ext = equip->getAttrExtra();
+
+        attrExtra.attack += ext->attack * enc_factor[equip->getItemEquipData().enchant];
+        attrExtra.magatk += ext->magatk * enc_factor[equip->getItemEquipData().enchant];
+	}
+
+	for(int i = 0; i < 5; ++ i)
+	{
+		equip = this->getArmor(i);
+		if(equip != NULL)
+		{
+			if(equip->getQuality() >= 4)
+				testEquipInSet(setId, setNum, equip->GetItemType().getId());
+			fgt->addAttr(equip);
+
+            const GData::AttrExtra * ext = equip->getAttrExtra();
+            attrExtra.defend += ext->defend * enc_factor[equip->getItemEquipData().enchant];
+            attrExtra.magdef += ext->magdef * enc_factor[equip->getItemEquipData().enchant];
+		}
+	}
+
+	equip = this->getRing();
+	if(equip != NULL)
+	{
+		if(equip->getQuality() >= 4)
+			testEquipInSet(setId, setNum, equip->GetItemType().getId());
+		fgt->addAttr(equip);
+
+        attrExtra.hp += GObjectManager::getRingHpFromEnchant(equip->getValueLev(), equip->GetCareer(), equip->getItemEquipData().enchant);
+	}
+
+	equip = this->getAmulet();
+	if(equip != NULL)
+	{
+		if(equip->getQuality() >= 4)
+			testEquipInSet(setId, setNum, equip->GetItemType().getId());
+		fgt->addAttr(equip);
+        attrExtra.hp += GObjectManager::getRingHpFromEnchant(equip->getValueLev(), equip->GetCareer(), equip->getItemEquipData().enchant);
+	}
+
+	for(int i = 0; i < 8; ++ i)
+	{
+		if(setId[i] == 0)
+			break;
+		if(setNum[i] < 2)
+			continue;
+		const GData::ItemEquipSetType * iest = GData::itemEquipSetTypeManager[setId[i]];
+		if(iest == NULL)
+			continue;
+		int idx = setNum[i] / 2 - 1;
+        while(idx >= 0)
+        {
+            if(iest->attrExtra[idx])
+                attrExtra += *iest->attrExtra[idx];
+            --idx;
+        }
+	}
+    bool hasActiveTrump = false;
+    for(int i = 0; i < this->getMaxTrumps(); ++i)
+    {
+		ItemTrump* trump = static_cast<ItemTrump*>(this->getTrump(i));
+
+		if(trump != NULL)
+        {
+            if(!hasActiveTrump && trump->getId() >= 1600)
+            {
+                fgt->addTrumpAttr(trump);
+                hasActiveTrump = true;
+            }
+            else
+            {
+                fgt->addTrumpAttr(trump);
+            }
+        }
+    }
+
+	fgt->_maxHP = Script::BattleFormula::getCurrent()->calcHP(fgt);
+	UInt32 point = Script::BattleFormula::getCurrent()->calcBattlePoint(fgt);
+    delete fgt;
+    return point;
+}
+
+UInt32 Fighter::calcSkillBattlePoint()
+{
+    if(isPet() || !_owner)
+        return 0;
+	Fighter * fgt = this->cloneWithOutDirty(NULL);
+    clearFighterBaseValue(fgt);
+    fgt->rebuildSkillBattlePoint();
+	UInt32 point = fgt->_skillBP;
+    delete fgt;
+    return point;
+}
+
+UInt32 Fighter::calcCittaBattlePoint()
+{
+    if(isPet() || !_owner)
+        return 0;
+	Fighter * fgt = this->cloneWithOutDirty(NULL);
+    clearFighterBaseValue(fgt);
+    fgt->_attrExtraEquip.reset();
+    for (int i = 0; i < getUpCittasNum(); ++i)
+    {
+        if (_citta[i])
+        {
+            const GData::CittaBase* cb = GData::cittaManager[_citta[i]];
+            if (cb && cb->effect)
+                fgt->addAttr(cb->effect);
+        }
+    }
+	fgt->_maxHP = Script::BattleFormula::getCurrent()->calcHP(fgt);
+	UInt32 point = Script::BattleFormula::getCurrent()->calcBattlePoint(fgt);
+    delete fgt;
+    return point;
+}
+
+UInt32 Fighter::calc2ndSoulBattlePoint()
+{
+    if(isPet() || !_owner || !m_2ndSoul)
+        return 0;
+
+	Fighter * fgt = this->cloneWithOutDirty(NULL);
+    clearFighterBaseValue(fgt);
+	GData::AttrExtra& attrExtra = fgt->getAttrExtraEquip1();
+	attrExtra.reset();
+    //m_2ndSoul->setDirty(true);
+    m_2ndSoul->addAttr(attrExtra);
+	fgt->_maxHP = Script::BattleFormula::getCurrent()->calcHP(fgt);
+	UInt32 point = Script::BattleFormula::getCurrent()->calcBattlePoint(fgt);
+    delete fgt;
+    return point;
+}
+
+UInt32 Fighter::calcClanBattlePoint()
+{
+    if(isPet() || !_owner)
+        return 0;
+	Fighter * fgt = this->cloneWithOutDirty(NULL);
+    clearFighterBaseValue(fgt);
+	GData::AttrExtra& attrExtra = fgt->getAttrExtraEquip1();
+	attrExtra.reset();
+    // 帮派秘术对额外属性的加成
+    attrExtra.hp += _owner->getClanSkillHPEffect();
+    attrExtra.attack += _owner->getClanSkillAtkEffect();
+    attrExtra.defend += _owner->getClanSkillDefendEffect();
+    attrExtra.magatk += _owner->getClanSkillMagAtkEffect();
+    attrExtra.magdef += _owner->getClanSkillMagDefentEffect();
+    attrExtra.action += _owner->getClanSkillActionEffect();
+    attrExtra.hitrlvl += _owner->getClanSkillHitrLvlEffect();
+
+    // 帮派神像对额外属性的加成
+    attrExtra.hp += _owner->getClanStatueHPEffect();
+    attrExtra.attack += _owner->getClanStatueAtkEffect();
+    attrExtra.defend += _owner->getClanStatueDefendEffect();
+    attrExtra.magatk += _owner->getClanStatueMagAtkEffect();
+    attrExtra.magdef += _owner->getClanStatueMagDefentEffect();
+    attrExtra.action += _owner->getClanStatueActionEffect();
+    attrExtra.hitrlvl += _owner->getClanStatueHitrLvlEffect();
+
+    //仙蕴晶石的加成
+    attrExtra.hp += _owner->GetFairySpar()->getFairySparPH();
+    attrExtra.attack += _owner->GetFairySpar()->getFairySparAtk();
+    attrExtra.magatk += _owner->GetFairySpar()->getFairySparMagAtk();
+
+	fgt->_maxHP = Script::BattleFormula::getCurrent()->calcHP(fgt);
+	UInt32 point = Script::BattleFormula::getCurrent()->calcBattlePoint(fgt);
+    delete fgt;
+    return point;
+}
+
+UInt32 Fighter::calcLingbaoBattlePoint1()
+{
+    if(isPet() || !_owner)
+        return 0;
+    UInt32 bp = 0;
+    for(int idx = 0; idx < getMaxLingbaos(); ++ idx)
+    {
+		ItemLingbao* lb = static_cast<ItemLingbao*>(getLingbao(idx));
+        if(!lb)
+            continue;
+        ItemLingbaoAttr& lbattr = lb->getLingbaoAttr();
+        bp += Script::BattleFormula::getCurrent()->calcLingbaoBattlePoint(&lbattr);
+        for (UInt8 i = 0; i < 2; ++i)
+        {
+            if (lbattr.skill[i])
+            {
+                const GData::LBSkillBase* lbskill = GData::lbSkillManager[lbattr.skill[i]];
+                bp += lbskill->battlepoint * (((float)(lbattr.factor[i]))/10000);
+            }
+        }
+    }
+    return bp;
+}
+/*
+ *end分别计算散仙的战斗力
+*/
+
+
+}

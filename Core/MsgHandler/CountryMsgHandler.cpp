@@ -105,6 +105,8 @@ MSG_REG(GameMsgHdr, OnChatReq);
 MSG_REG(GameMsgHdr, OnPrivChatReq);
 MSG_REG(GameMsgHdr, OnChatItemReq);
 
+MSG_REG(GameMsgHdr, OnComparBattelPoint);
+
 MSG_REG(GameMsgHdr, OnSubmitBugInfo);
 MSG_REG(GameMsgHdr, OnYellowDiamondInfo);
 MSG_REG(GameMsgHdr, OnYellowDiamondAwardRcv);
@@ -179,6 +181,8 @@ MSG_REG_2(GameMsgHdr, REQ::FAIRY_PET, OnFairyPet);
 
 MSG_REG_2(GameMsgHdr, REQ::EQ_LINGBAO, OnEquipLingbaoReq);
 
+MSG_REG_2(GameMsgHdr, REQ::EQ_DELUEGEM, OnDelueGemReq);
+
 MSG_REG_2(GameMsgHdr, REQ::RP_SERVER, OnRPServerReq);
 MSG_REG_2(GameMsgHdr, 0x1D0, OnDailyReq2);
 
@@ -231,6 +235,7 @@ MSG_REG_2(GameMsgHdr, 0x270, OnGetClanBattleRewardReq);
 MSG_REG_2(GameMsgHdr, 0x271, OnClanTakeRewardReq);
 MSG_REG_2(GameMsgHdr, 0x272, OnClanBattleAttendReq);
 MSG_REG_2(GameMsgHdr, 0x274, OnExpGainByInstantCompleteReq);
+MSG_REG_2(GameMsgHdr, 0x275, OnCompareBP);
 MSG_REG_2(GameMsgHdr, 0x276, OnAutoCopyAttack);
 MSG_REG_2(GameMsgHdr, 0x277, OnPlayerTimeTick);
 MSG_REG_2(GameMsgHdr, 0x278, OnAutoFrontMapAttack);

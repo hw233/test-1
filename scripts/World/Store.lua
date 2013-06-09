@@ -115,6 +115,7 @@ function loadStore()
 
         discount(store)
 
+        store:add(2, 1126, 20)
         store:add(2, 9388, 100)
         store:add(2, 9371, 10)
 

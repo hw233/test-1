@@ -34,6 +34,7 @@
 #include "SkillStrengthen.h"
 #include "DreamerTable.h"
 #include "FairyPetTable.h"
+#include "XingchenData.h"
 
 namespace GData
 {
@@ -321,6 +322,12 @@ namespace GData
         if (!LoadPetEqAttreffect())
         {
             fprintf (stderr, "Load PetEqAttreffect Table Error !\n");
+            std::abort();
+        }
+
+        if (!LoadXingchenConfig())
+        {
+            fprintf (stderr, "Load LoadXingchenConfig Error !\n");
             std::abort();
         }
 
@@ -2041,6 +2048,34 @@ namespace GData
             eqAttr.effect[9] = dbeqAttr.counter;
             eqAttr.effect[10] = dbeqAttr.tough;
             pet.setEqAttreffect(eqAttr);
+        }
+        return true;
+    }
+
+    bool GDataManager::LoadXingchenConfig()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBXingchenConfig dbxcc;
+		if(execu->Prepare("SELECT `id`, `limitLev`, `name`, `consume`, `maxVal`, `rate1`, `rate2`, `rate3`, `payBack` FROM `xingchen`", dbxcc) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            if(dbxcc.id == 0)
+                continue;
+            XingchenData::stXingchen stxc;
+            stxc.level = dbxcc.id;
+            stxc.limitLev = dbxcc.limitLev;
+            stxc.name  = dbxcc.name;
+            stxc.consume = dbxcc.consume;
+            stxc.maxVal = dbxcc.maxVal;
+            stxc.rate1 = dbxcc.rate1;
+            stxc.rate2 = dbxcc.rate2;
+            stxc.rate3 = dbxcc.rate3;
+            stxc.payBack = dbxcc.payBack;
+            xingchenData.setXingchenTable(stxc);
         }
         return true;
     }

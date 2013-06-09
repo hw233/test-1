@@ -179,7 +179,7 @@ bool DCLogger::login_sec(Player* player)
     msg << "&AID=1";
 
     msg << "&ACT=" << static_cast<UInt64>(static_cast<UInt64>(player->getCreated()) * 1000);
-    msg << "&PAY=" << static_cast<UInt32>(player->getTotalRecharge()? 1:0);
+    msg << "&PAY=" << player->getTotalRecharge();
     msg << "&RID=" << player->getId();
     msg << "&RNA=" << player->getName();
     msg << "&RLV=" << static_cast<UInt32>(player->GetLev());

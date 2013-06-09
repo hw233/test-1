@@ -67,6 +67,7 @@ namespace GData
         static bool LoadPetLingYa();
         static bool LoadPetEquipExp();
         static bool LoadPetEqAttreffect();
+        static bool LoadXingchenConfig();
 
         static void clearUdpItem();
         static void addUdpItem(UInt32 id);

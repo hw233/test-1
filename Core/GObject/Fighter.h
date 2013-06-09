@@ -78,6 +78,16 @@ enum
     e_cls_max
 };
 
+struct DBXingchen;
+struct Xingchenzhen
+{
+    Xingchenzhen() : lvl(0), curVal(0) { memset(gems, 0, sizeof(gems)); }
+
+    UInt8 lvl;      // 星辰等级
+    UInt32 curVal;  // 当前星辰值
+    UInt16 gems[3]; //镶嵌的宝石id
+};
+
 struct SStrengthen
 {
     SStrengthen() : father(0), maxVal(0), curVal(0), lvl(0) {}
@@ -721,6 +731,7 @@ public:
 protected:
     void addAttrExtra( GData::AttrExtra& ae, const GData::AttrExtra * ext );
     void addAttrExtra( GData::AttrExtra& ae, const GData::CittaEffect* ce );
+    void addAttrExtraGem( GData::AttrExtra& ae, GData::ItemGemType * igt );
 	virtual void rebuildEquipAttr();
 	void rebuildBattlePoint();
 	void rebuildSkillBattlePoint();
@@ -950,14 +961,39 @@ public:
 	struct Offset { Int8 x, y; };
 	std::vector<Offset> extraPos;
 
+    //分别计算散仙的战斗力
+public:
+	inline GData::AttrExtra& getAttrExtraEquip1() { return _attrExtraEquip; }
+    UInt32 calcBaseBattlePoint();   //基础
+    UInt32 calcEquipBattlePoint();  //装备与法宝
+    UInt32 calcSkillBattlePoint();  //技能
+    UInt32 calcCittaBattlePoint();  //心法
+    UInt32 calc2ndSoulBattlePoint();  //第二元神
+    UInt32 calcClanBattlePoint();  //帮派
+    UInt32 calcLingbaoBattlePoint1();  //宝具
     // 仙宠
-
 public:
     inline bool isPet() { return getClass() >= e_cls_qinglong && getClass() <= e_cls_xuanwu; }
     UInt8 getPassklNum();
     UInt8 getRpassklNum();
     void updateToDBPetSkill();
+
+    //镇封星辰图
+private:
+    Xingchenzhen m_xingchen;
+public:
+    inline Xingchenzhen& getXingchen() { return m_xingchen; }
+    void setXingchenFromDB(DBXingchen&);
+    bool upgradeXingchen();
+    void updateDBxingchen();
+    void sendXingchenInfo();
+    void setGem(UInt16 gemId,UInt8 bind, UInt8 pos);
+    void dismantleGem(UInt8 pos);
+    UInt32 exchangeXingchenValue(UInt16 zqId, UInt8 zqCount, UInt8 bind);
+    bool IsCanSetGem(ItemBase *item, UInt8 pos);
+    void dismissXingchen();
 };
+
 class GlobalFighters
 {
 public:

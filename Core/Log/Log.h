@@ -179,7 +179,8 @@ enum MailItemType
     NewCountryBattleAward,
     LingbaoFuling,
     TreasureAct,
-    ClanBossAct
+    ClanBossAct,
+	DismissXingchen,
 };
 enum ItemFrom
 {
@@ -274,6 +275,9 @@ enum ItemTo
     ToPetGemMgerge = 155, //仙宠宝石合成
     ToPetGemAttach = 156, //仙宠宝石镶嵌
     ToPetDetachGemDesdroy = 157, //仙宠宝石拆卸
+    ToSetGem = 158, //多彩宝石镶嵌
+    TodismantleGem = 159, //多彩宝石拆卸
+    ToExchangXCValue = 160, //阵旗转换星辰值
 };
 
 struct IncommingInfo
