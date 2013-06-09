@@ -51,7 +51,7 @@ autobattle_A = 2.5
 -- 第二元神属性成长
 --           1青龙 2朱雀 3玄武 4狂雷•青龙 5烈阳•青龙 6雨泽•青龙 7炽炎•朱雀 8羽焰•朱雀 9浴火•朱雀 10冰锋•玄武 11凛风•玄武 12水盾•玄武 
 --           13白虎 14战神•白虎 15森罗•白虎 16金刚•白虎
-soul_str_factor = {2, 3, 5, 3, 5, 3, 4, 4, 4, 8, 6, 6, 6, 9, 7, 7}
+soul_str_factor = {2, 3, 5, 4, 5, 3, 4, 4, 4, 8, 6, 6, 6, 9, 7, 7}
 soul_phy_factor = {6, 7, 8, 7, 7, 9, 8, 8, 10,9, 9, 11, 6, 7, 7, 7}
 soul_agi_factor = {3, 2, 5, 4, 4, 4, 3, 3, 3, 6, 8, 6, 4, 5, 7, 5}
 soul_int_factor = {6, 5, 2, 9, 7, 7, 8, 6, 6, 3, 3, 3, 2, 3, 3, 3}
@@ -600,7 +600,39 @@ function calcBattlePoint(fgt)
     bp = bp + (fgt:getBaseCounter() + fgt:getExtraCounter())/100 * bp_factor_counter
     bp = bp + (fgt:getBaseMagRes() + fgt:getExtraMagRes())/100 * bp_factor_magres
 
+    --printBattlePoint(fgt)
     return bp;
+end
+
+function printBattlePoint(fgt)
+    if fgt == nil then
+        return
+    end
+    print("+++++++++++++++++++++Begin")
+    print("Attack:"..calcAttack(fgt).."__"..calcAttack(fgt) * bp_factor_atk)
+    print("MagAttack:"..calcMagAttack(fgt).."__"..calcMagAttack(fgt) * bp_factor_magatk)
+    print("Defend:"..calcDefend(fgt).."__"..calcDefend(fgt) * bp_factor_def)
+    print("MagDefend:"..calcMagDefend(fgt).."__"..calcMagDefend(fgt) * bp_factor_magdef)
+    print("HP:"..calcHP(fgt).."__"..calcHP(fgt) * bp_factor_hp)
+    print("ToughLevel:"..calcToughLevel(fgt).."__"..calcToughLevel(fgt) * bp_factor_toughl)
+    print("Action:"..calcAction(fgt).."__"..calcAction(fgt) * bp_factor_action)
+    print("HitRateLevel:"..calcHitRateLevel(fgt).."__"..calcHitRateLevel(fgt) * bp_factor_hitrl)
+    print("EvadeLevel:"..calcEvadeLevel(fgt).."__"..calcEvadeLevel(fgt) * bp_factor_evadl)
+    print("CriticalLevel:"..calcCriticalLevel(fgt).."__"..calcCriticalLevel(fgt) * bp_factor_crtl)
+    print("PierceLevel:"..calcPierceLevel(fgt).."__"..calcPierceLevel(fgt) * bp_factor_pirl)
+    print("CounterLevel:"..calcCounterLevel(fgt).."__"..calcCounterLevel(fgt) * bp_factor_counterl)
+    print("MagResLevel:"..calcMagResLevel(fgt).."__"..calcMagResLevel(fgt) * bp_factor_magresl)
+    print("Aura:"..calcAura(fgt).."__"..calcAura(fgt) * bp_factor_aura)
+    print("AuraMax:"..calcAuraMax(fgt).."__"..calcAuraMax(fgt) * bp_factor_auraMax)
+    print("CriticalDmg:"..fgt:getExtraCriticalDmg().."__"..fgt:getExtraCriticalDmg() * bp_factor_crtdmg)
+    print("Tough:"..(((fgt:getBaseTough() + fgt:getExtraTough())/100)).."__"..((fgt:getBaseTough() + fgt:getExtraTough())/100 * bp_factor_tough))
+    print("Hitrate:"..(fgt:getExtraHitrate()/100).."__"..(fgt:getExtraHitrate()/100 * bp_factor_hitr))
+    print("Evade:"..((fgt:getBaseEvade() + fgt:getExtraEvade())/100).."__"..((fgt:getBaseEvade() + fgt:getExtraEvade())/100 * bp_factor_evad))
+    print("Critical:"..((fgt:getBaseCritical() + fgt:getExtraCritical())/100).."__"..((fgt:getBaseCritical() + fgt:getExtraCritical())/100 * bp_factor_crt))
+    print("Pierce:"..((fgt:getBasePierce() + fgt:getExtraPierce())/100).."__"..((fgt:getBasePierce() + fgt:getExtraPierce())/100 * bp_factor_pir))
+    print("Counter:"..((fgt:getBaseCounter() + fgt:getExtraCounter())/100).."__"..((fgt:getBaseCounter() + fgt:getExtraCounter())/100 * bp_factor_counter))
+    print("MagRes:"..((fgt:getBaseMagRes() + fgt:getExtraMagRes())/100).."__"..((fgt:getBaseMagRes() + fgt:getExtraMagRes())/100 * bp_factor_magres))
+    print("+++++++++++++++++++++End")
 end
 
 -- c:skill_color l:skill_level t:skill_type s:skillstrengthen_level

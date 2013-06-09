@@ -562,6 +562,12 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
                 player->GetPackage()->Add(9343, 1, true, false);
         }
         bool free = (PLAYER_DATA(player, dungeonCnt) <= getMaxCount());
+
+        UInt32 mark = player->GetVar(VAR_DUNGEON_AUTO_FIGHT_USE_MONEY_MARK);
+        UInt8 pos = _id - 1; 
+        mark = CLR_BIT(mark, pos);
+        player->SetVar(VAR_DUNGEON_AUTO_FIGHT_USE_MONEY_MARK, mark);
+
 		GameAction()->onDungeonWin(player, _id, dpi.totalCount, free);
         if(PLAYER_DATA(player, dungeonCnt) > getMaxCount())
         {
@@ -738,10 +744,6 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
         break;
 	case 2:
 		{
-
-            mark = CLR_BIT(mark, pos);
-            player->SetVar(VAR_DUNGEON_AUTO_FIGHT_USE_MONEY_MARK, mark);
-
 			player->delFlag(Player::AutoDungeon);
 			Stream st(REP::COPY_AUTO_FIGHT);
 			st << _id << static_cast<UInt8>(it->second.level) << static_cast<UInt8>(2) << *totalExp << Stream::eos;
@@ -871,10 +873,10 @@ void Dungeon::sendDungeonInfo(Player * player)
 	{
 		Stream st(REP::COPY_DATA_UPDATE);
 		UInt8 enterCount = (_extraCount[player->getVipLevel()] << 4) | getEnterCount();
-        UInt8 mark = player->GetVar(VAR_DUNGEON_AUTO_FIGHT_USE_MONEY_MARK);
+        UInt32 mark = player->GetVar(VAR_DUNGEON_AUTO_FIGHT_USE_MONEY_MARK);
         UInt8 pos = _id - 1;
-        mark = GET_BIT(mark, pos);
-		st << static_cast<UInt8>(0) << _id << static_cast<UInt8>(0) << PLAYER_DATA(player, dungeonCnt) << enterCount << static_cast<UInt16>(0) << static_cast<UInt32>(0) << static_cast<UInt8>(0) << mark << Stream::eos;
+        pos = static_cast<UInt8>(GET_BIT(mark, pos));
+		st << static_cast<UInt8>(0) << _id << static_cast<UInt8>(0) << PLAYER_DATA(player, dungeonCnt) << enterCount << static_cast<UInt16>(0) << static_cast<UInt32>(0) << static_cast<UInt8>(0) << pos << Stream::eos;
 		player->send(st);
 		return;
 	}
@@ -887,10 +889,10 @@ void Dungeon::sendDungeonInfo(Player * player, DungeonPlayerInfo& dpi)
 	Stream st(REP::COPY_DATA_UPDATE);
 	UInt8 enterCount = (_extraCount[player->getVipLevel()] << 4) | getEnterCount();
 
-    UInt8 mark = player->GetVar(VAR_DUNGEON_AUTO_FIGHT_USE_MONEY_MARK);
+    UInt32 mark = player->GetVar(VAR_DUNGEON_AUTO_FIGHT_USE_MONEY_MARK);
     UInt8 pos = _id - 1;
-    mark = GET_BIT(mark, pos);
-	st << static_cast<UInt8>(0) << _id << static_cast<UInt8>(dpi.level) << PLAYER_DATA(player, dungeonCnt) << enterCount << dpi.totalCount << dpi.firstPass << dpi.justice<< mark << Stream::eos;
+    pos = static_cast<UInt8>(GET_BIT(mark, pos));
+	st << static_cast<UInt8>(0) << _id << static_cast<UInt8>(dpi.level) << PLAYER_DATA(player, dungeonCnt) << enterCount << dpi.totalCount << dpi.firstPass << dpi.justice<< pos << Stream::eos;
 	player->send(st);
 }
 

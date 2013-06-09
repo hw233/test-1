@@ -171,6 +171,8 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130607_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130607_2.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearbluediamond.sql  #蓝钻活动需要打开
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130607_1.sql
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130609_1.sql
 
     #. clearshiyamen.sh
