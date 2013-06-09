@@ -5826,12 +5826,13 @@ bool Fighter::upgradeXingchen()
     if(m_xingchen.curVal >= stxc->maxVal)
     {
         ++ m_xingchen.lvl;
-        _owner->sendMsgCode(0, 4005);
+        setDirty();
     }
+
     updateDBxingchen();
     _owner->SetVar(VAR_XINGCHENZHEN_VALUE, value - stxc->consume);
     sendXingchenInfo();
-    setDirty();
+    _owner->sendMsgCode(0, 4005);
     return true;
 }
 
@@ -5844,10 +5845,11 @@ void Fighter::updateDBxingchen()
 
 void Fighter::sendXingchenInfo()
 {
+    GData::XingchenData::stXingchen * stxc = GData::xingchenData.getXingchenTable(m_xingchen.lvl-1);
     Stream st(REP::EQ_DELUEGEM);
     st << static_cast<UInt16>(getId());
     st << _owner->GetVar(VAR_XINGCHENZHEN_VALUE);
-    st << m_xingchen.lvl << m_xingchen.curVal;
+    st << m_xingchen.lvl << static_cast<UInt32>(m_xingchen.curVal - (stxc ? stxc->maxVal : 0));
     for(UInt8 i = 0; i < sizeof(m_xingchen.gems)/sizeof(m_xingchen.gems[0]); ++ i)
     {
         st << m_xingchen.gems[i];
@@ -5862,7 +5864,7 @@ void Fighter::setGem(UInt16 gemId, UInt8 bind, UInt8 pos)
     {
         return;
     }
-    GData::XingchenData::stXingchen * stxc = GData::xingchenData.getXingchenTable(m_xingchen.lvl+1);
+    GData::XingchenData::stXingchen * stxc = GData::xingchenData.getXingchenTable(1);
     if (stxc == NULL)
         return;
     if(getLevel() < stxc->limitLev)
@@ -5991,9 +5993,9 @@ void Fighter::dismantleGem(UInt8 pos)
         return;
     }
 
-    setDirty();
-
     _owner->GetPackage()->AddItem(gemId, 1, true, false, TodismantleGem);
+    
+    setDirty();
     updateDBxingchen();
     sendXingchenInfo();
 }
@@ -6050,8 +6052,9 @@ void Fighter::dismissXingchen()
             ++ j;
         }
     }
+    stxc = GData::xingchenData.getXingchenTable(m_xingchen.lvl);
     mitem[size-1].id = 1126;
-    mitem[size-1].count = static_cast<UInt16>(stxc->payBack / 100);
+    mitem[size-1].count = static_cast<UInt16>((stxc ? stxc->payBack : 0) / 100);
     MailItemsInfo itemsInfo(mitem, DismissXingchen, size);
 
     GObject::Mail * pmail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
