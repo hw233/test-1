@@ -28,7 +28,7 @@ class XingchenData
         std::map<UInt8, stXingchen> _xingchen;
     public:
         void setXingchenTable(stXingchen&);
-        stXingchen * getXingchenTable(UInt8);
+        stXingchen * getXingchenTable(int);
 };
 
 extern XingchenData xingchenData;
