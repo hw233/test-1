@@ -5814,7 +5814,7 @@ bool Fighter::upgradeXingchen()
 {
     if (isPet() || !_owner)
         return false;
-    if (m_xingchen.curVal >= 25)
+    if (m_xingchen.lvl >= 25)
         return false;
     GData::XingchenData::stXingchen * stxc = GData::xingchenData.getXingchenTable(m_xingchen.lvl+1);
     if(!stxc || getLevel() < stxc->limitLev)
@@ -5824,10 +5824,15 @@ bool Fighter::upgradeXingchen()
         return false;
     m_xingchen.curVal += uRand(19) + 1;
     if(m_xingchen.curVal >= stxc->maxVal)
+    {
         ++ m_xingchen.lvl;
+        setDirty();
+    }
+
     updateDBxingchen();
     _owner->SetVar(VAR_XINGCHENZHEN_VALUE, value - stxc->consume);
     sendXingchenInfo();
+    _owner->sendMsgCode(0, 4005);
     return true;
 }
 
@@ -5840,10 +5845,11 @@ void Fighter::updateDBxingchen()
 
 void Fighter::sendXingchenInfo()
 {
+    GData::XingchenData::stXingchen * stxc = GData::xingchenData.getXingchenTable(m_xingchen.lvl-1);
     Stream st(REP::EQ_DELUEGEM);
     st << static_cast<UInt16>(getId());
     st << _owner->GetVar(VAR_XINGCHENZHEN_VALUE);
-    st << m_xingchen.lvl << m_xingchen.curVal;
+    st << m_xingchen.lvl << static_cast<UInt32>(m_xingchen.curVal - (stxc ? stxc->maxVal : 0));
     for(UInt8 i = 0; i < sizeof(m_xingchen.gems)/sizeof(m_xingchen.gems[0]); ++ i)
     {
         st << m_xingchen.gems[i];
@@ -5858,13 +5864,13 @@ void Fighter::setGem(UInt16 gemId, UInt8 bind, UInt8 pos)
     {
         return;
     }
-    GData::XingchenData::stXingchen * stxc = GData::xingchenData.getXingchenTable(m_xingchen.lvl+1);
+    GData::XingchenData::stXingchen * stxc = GData::xingchenData.getXingchenTable(1);
     if (stxc == NULL)
         return;
     if(getLevel() < stxc->limitLev)
         return;
 
-    if(pos >= 1 && pos <= 3)
+    if(pos < 1 || pos > 3)
     {
         return;
     }
@@ -5909,42 +5915,50 @@ void Fighter::setGem(UInt16 gemId, UInt8 bind, UInt8 pos)
 
     _owner->GetPackage()->DelItem(gemId, 1, bind > 0, ToSetGem);
     
+    setDirty();
     updateDBxingchen();
     sendXingchenInfo();
 }
 
 bool Fighter::IsCanSetGem(ItemBase * item, UInt8 pos)
 {
-    if(pos >= 1 && pos <= 3)
+    if(pos < 1 || pos > 3)
     {
         return false;
     }
 
-    const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[m_xingchen.gems[pos-1]];
+    if(m_xingchen.gems[pos-1] > 0)
+    {
+        const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[m_xingchen.gems[pos-1]];
 
-    if(NULL == itemType) return false;
+        if(NULL == itemType) return false;
 
-    if(NULL == item) return false;
+        if(NULL == item) return false;
 
-    if(itemType->subClass == item->getClass()) return false;
-
+        if(itemType->subClass == item->getClass()) return false;
+    }
     return true;
 }
 
 void Fighter::dismantleGem(UInt8 pos)
 {
-    
     if (isPet() || !_owner)
     {
         return;
     }
+
     GData::XingchenData::stXingchen * stxc = GData::xingchenData.getXingchenTable(1);
     if (stxc == NULL)
+    {
         return;
-    if(getLevel() < stxc->limitLev)
-        return;
+    }
 
-    if(pos >= 1 && pos <= 3)
+    if(getLevel() < stxc->limitLev)
+    {
+        return;
+    }
+
+    if(pos < 1 || pos > 3)
     {
         return;
     }
@@ -5980,20 +5994,25 @@ void Fighter::dismantleGem(UInt8 pos)
     }
 
     _owner->GetPackage()->AddItem(gemId, 1, true, false, TodismantleGem);
+    
+    setDirty();
     updateDBxingchen();
     sendXingchenInfo();
 }
 
 UInt32 Fighter::exchangeXingchenValue(UInt16 zqId, UInt8 zqCount, UInt8 bind)
 {
-    if (GetItemSubClass(zqId) != Item_Formula)
-        return 0;
     ItemBase * item = _owner->GetPackage()->FindItem(zqId, bind > 0);
     if(NULL == item)
     {
         return 0;
     }
-                         
+
+    if(item->getClass() <= Item_Formula || item->getClass() > Item_Formula9)
+    {   
+        return 0;
+    }
+
     UInt32 xcValue = 0;
     if(zqCount > item->Count())
     {
@@ -6033,8 +6052,9 @@ void Fighter::dismissXingchen()
             ++ j;
         }
     }
+    stxc = GData::xingchenData.getXingchenTable(m_xingchen.lvl);
     mitem[size-1].id = 1126;
-    mitem[size-1].count = static_cast<UInt16>(stxc->payBack / 100);
+    mitem[size-1].count = static_cast<UInt16>((stxc ? stxc->payBack : 0) / 100);
     MailItemsInfo itemsInfo(mitem, DismissXingchen, size);
 
     GObject::Mail * pmail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);

@@ -6155,7 +6155,6 @@ void OnDelueGemReq( GameMsgHdr & hdr, const void * data )
             if(xcValue > 0)
             {
                 player->AddVar(VAR_XINGCHENZHEN_VALUE, xcValue);
-                fgt->updateDBxingchen();
                 fgt->sendXingchenInfo();
             }
         }
