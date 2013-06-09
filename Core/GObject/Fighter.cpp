@@ -5845,14 +5845,16 @@ void Fighter::updateDBxingchen()
 
 void Fighter::sendXingchenInfo()
 {
-    GData::XingchenData::stXingchen * stxc = GData::xingchenData.getXingchenTable(m_xingchen.lvl-1);
+    GData::XingchenData::stXingchen * stxc = NULL;
+    if(m_xingchen.lvl > 0)
+        stxc = GData::xingchenData.getXingchenTable(m_xingchen.lvl);
 
     Stream st(REP::EQ_DELUEGEM);
     st << static_cast<UInt16>(getId());
     st << _owner->GetVar(VAR_XINGCHENZHEN_VALUE);
     st << m_xingchen.lvl << static_cast<UInt32>(m_xingchen.curVal - (stxc ? stxc->maxVal : 0));
 
-    for(UInt8 i = 0; i < sizeof(m_xingchen.gems)/sizeof(m_xingchen.gems[0]); ++ i)
+    for(UInt8 i = 0; i < sizeof(m_xingchen.gems)/sizeof(m_xingchen.gems[0]); ++i)
     {
         st << m_xingchen.gems[i];
     }
@@ -6066,6 +6068,7 @@ void Fighter::dismissXingchen()
     payBack = payBack % 1000;
     mitem[size-2].id = 1126;
     mitem[size-2].count = static_cast<UInt16>(payBack / 100);
+
     MailItemsInfo itemsInfo(mitem, DismissXingchen, size);
 
     GObject::Mail * pmail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
