@@ -21,6 +21,8 @@ class XingchenData
             float rate1;    //基础宝石加成
             float rate2;    //攻防宝石加成
             float rate3;    //身法宝石加成
+            UInt32 payBack; //解雇补偿
+            stXingchen(): level(0), limitLev(0), name(""), consume(0), maxVal(0), rate1(0.0), rate2(0.0), rate3(0.0), payBack(0) {}
         };
     private:
         std::map<UInt8, stXingchen> _xingchen;

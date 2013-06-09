@@ -6032,28 +6032,12 @@ void Fighter::dismissXingchen()
     GData::XingchenData::stXingchen * stxc = GData::xingchenData.getXingchenTable(1);
     if(!stxc || getLevel() < stxc->limitLev)
         return;
-    bool hasMail = false;
-    UInt32 exp = m_xingchen.curVal * 0.6;
-    UInt16 rCount1 = 0, rCount2 = 0;
-    if(exp)
-    {
-        rCount1 = static_cast<UInt16>(exp / 100);
-        exp = exp % 100;
-        rCount2 = static_cast<UInt16>(exp / 10);
-        if(rCount1 || rCount2)
-            hasMail = true;
-    }
-    UInt8 size = 2;
+    UInt8 size = 1;
     for(UInt8 i = 0; i < sizeof(m_xingchen.gems)/sizeof(m_xingchen.gems[0]); ++ i)
     {
         if(m_xingchen.gems[i] > 0)
-        {
             ++ size;
-            hasMail = true;
-        }
     }
-    if(!hasMail)
-        return;
     SYSMSG(title, 2016);
     SYSMSGV(content, 2017, getLevel(), getColor(), getName().c_str());
     MailPackage::MailItem * mitem = new MailPackage::MailItem [size];
@@ -6066,10 +6050,8 @@ void Fighter::dismissXingchen()
             ++ j;
         }
     }
-    mitem[size-2].id = 1126;
-    mitem[size-2].count = rCount1;
-    mitem[size-1].id = 1125;
-    mitem[size-1].count = rCount2;
+    mitem[size-1].id = 1126;
+    mitem[size-1].count = static_cast<UInt16>(stxc->payBack / 100);
     MailItemsInfo itemsInfo(mitem, DismissXingchen, size);
 
     GObject::Mail * pmail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);

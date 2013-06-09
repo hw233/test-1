@@ -569,6 +569,7 @@ struct DBXingchenConfig
     float rate1;
     float rate2;
     float rate3;
+    UInt32 payBack;
 };
 
 }
@@ -1219,7 +1220,7 @@ SPECIALDEF(12)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBXingchenConfig)
-SPECIALDEF(8)
+SPECIALDEF(9)
 	(
     UInt8, id,
     UInt8, limitLev,
@@ -1228,7 +1229,8 @@ SPECIALDEF(8)
     UInt32, maxVal,
     float, rate1,
     float, rate2,
-    float, rate3
+    float, rate3,
+    UInt32, payBack
 	)
 SPECIALEND()
 

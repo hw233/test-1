@@ -8,6 +8,7 @@ CREATE TABLE `xingchen` (
     `rate1` float(5,2) unsigned NOT NULL DEFAULT '0.00',
     `rate2` float(5,2) unsigned NOT NULL DEFAULT '0.00',
     `rate3` float(5,2) unsigned NOT NULL DEFAULT '0.00',
+    `payBack` int(10) unsigned NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
