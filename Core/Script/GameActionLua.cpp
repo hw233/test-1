@@ -6,6 +6,7 @@
 #include "GObject/Mail.h"
 #include "GObject/TaskMgr.h"
 #include "GObject/Package.h"
+#include "GObject/PetPackage.h"
 #include "GObject/MOAction.h"
 #include "GObject/AttainMgr.h"
 #include "GObject/Country.h"
@@ -228,6 +229,7 @@ namespace Script
 		CLASS_DEF(Player, GetClass);
 		CLASS_DEF(Player, GetTaskMgr);
 		CLASS_DEF(Player, GetPackage);
+		CLASS_DEF(Player, GetPetPackage);
 		CLASS_DEF(Player, GetMailBox);
 		CLASS_DEF(Player, GetFreePackageSize);
 		CLASS_DEF(Player, addFightCurrentHp);
@@ -451,6 +453,10 @@ namespace Script
 		CLASS_ADD(MailBox);
 		CLASS_DEF(MailBox, newItemMail);
 		CLASS_DEF(MailBox, newItemPackageMail);
+
+		CLASS_ADD(PetPackage);
+		CLASS_DEF(PetPackage, GetPetEqPgRestSize);
+		CLASS_DEF(PetPackage, GetPetGemPgRestSize);
 	}
 
 	const char* GameActionLua::GetItemName(UInt32 itemId)

@@ -66,7 +66,7 @@ namespace GObject
 	    void SendSingleEquipData(ItemPetEq * equip, UInt8 type);
 	    void SendItemData(ItemBase * item);
 
-        ItemBase* AddRandomPetEq(UInt32 score, UInt32 typeId = 0, int colorIdx = -1, UInt8 FromWhere = 0);
+        ItemBase* AddRandomPetEq(UInt32 score, UInt32 typeId = 0, int colorIdx = -1, UInt8 FromWhere = 0, bool notify = true);
         ItemBase* AddRandomPetGem(UInt32 score, int lvIdx = -1);
 	};
 

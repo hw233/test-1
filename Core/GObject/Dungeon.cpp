@@ -145,6 +145,11 @@ UInt8 Dungeon::playerLeave( Player * player )
 	it->second.level = 0;
 	updateToDB(player, it->second);
 
+    UInt32 mark = player->GetVar(VAR_DUNGEON_AUTO_FIGHT_USE_MONEY_MARK);
+    UInt8 pos = _id - 1; 
+    mark = CLR_BIT(mark, pos);
+    player->SetVar(VAR_DUNGEON_AUTO_FIGHT_USE_MONEY_MARK, mark);
+
 	return 0;
 }
 
@@ -557,6 +562,12 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
                 player->GetPackage()->Add(9343, 1, true, false);
         }
         bool free = (PLAYER_DATA(player, dungeonCnt) <= getMaxCount());
+
+        UInt32 mark = player->GetVar(VAR_DUNGEON_AUTO_FIGHT_USE_MONEY_MARK);
+        UInt8 pos = _id - 1; 
+        mark = CLR_BIT(mark, pos);
+        player->SetVar(VAR_DUNGEON_AUTO_FIGHT_USE_MONEY_MARK, mark);
+
 		GameAction()->onDungeonWin(player, _id, dpi.totalCount, free);
         if(PLAYER_DATA(player, dungeonCnt) > getMaxCount())
         {
@@ -645,14 +656,18 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
 	std::map<Player *, DungeonPlayerInfo>::iterator it = _players.find(player);
 	if(it == _players.end())
 		return;
+    
+    UInt32 mark = player->GetVar(VAR_DUNGEON_AUTO_FIGHT_USE_MONEY_MARK);
+    UInt8 pos = _id - 1; 
 	switch(type)
 	{
 	case 0:
 		{
             bool girl = (World::getGirlDay() && !player->IsMale());
             if (!World::getNewYear() &&
-                    !girl &&
-                    !World::getNetValentineDay())
+                !girl &&
+                !World::getNetValentineDay() &&
+                0 == GET_BIT(mark, pos))
             {
                 UInt32 viplevel = player->getVipLevel();
                 if(viplevel < 6)
@@ -698,6 +713,9 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
                             player->useTael(taelReq[_id], &ci);
                         }
                     }
+
+                    mark = SET_BIT(mark, pos);
+                    player->SetVar(VAR_DUNGEON_AUTO_FIGHT_USE_MONEY_MARK, mark);
                 }
             }
 			DBLOG1().PushUpdateData("insert into `dungeon_statistics` (`server_id`, `player_id`, `dungeon_id`, `this_day`, `pass_time`) values(%u, %"I64_FMT"u, %u, %u, %u)", cfg.serverLogId, player->getId(), _id + 100, TimeUtil::SharpDay(0), TimeUtil::Now());
@@ -855,7 +873,10 @@ void Dungeon::sendDungeonInfo(Player * player)
 	{
 		Stream st(REP::COPY_DATA_UPDATE);
 		UInt8 enterCount = (_extraCount[player->getVipLevel()] << 4) | getEnterCount();
-		st << static_cast<UInt8>(0) << _id << static_cast<UInt8>(0) << PLAYER_DATA(player, dungeonCnt) << enterCount << static_cast<UInt16>(0) << static_cast<UInt32>(0) << static_cast<UInt8>(0) << Stream::eos;
+        UInt32 mark = player->GetVar(VAR_DUNGEON_AUTO_FIGHT_USE_MONEY_MARK);
+        UInt8 pos = _id - 1;
+        pos = static_cast<UInt8>(GET_BIT(mark, pos));
+		st << static_cast<UInt8>(0) << _id << static_cast<UInt8>(0) << PLAYER_DATA(player, dungeonCnt) << enterCount << static_cast<UInt16>(0) << static_cast<UInt32>(0) << static_cast<UInt8>(0) << pos << Stream::eos;
 		player->send(st);
 		return;
 	}
@@ -867,7 +888,11 @@ void Dungeon::sendDungeonInfo(Player * player, DungeonPlayerInfo& dpi)
 {
 	Stream st(REP::COPY_DATA_UPDATE);
 	UInt8 enterCount = (_extraCount[player->getVipLevel()] << 4) | getEnterCount();
-	st << static_cast<UInt8>(0) << _id << static_cast<UInt8>(dpi.level) << PLAYER_DATA(player, dungeonCnt) << enterCount << dpi.totalCount << dpi.firstPass << dpi.justice << Stream::eos;
+
+    UInt32 mark = player->GetVar(VAR_DUNGEON_AUTO_FIGHT_USE_MONEY_MARK);
+    UInt8 pos = _id - 1;
+    pos = static_cast<UInt8>(GET_BIT(mark, pos));
+	st << static_cast<UInt8>(0) << _id << static_cast<UInt8>(dpi.level) << PLAYER_DATA(player, dungeonCnt) << enterCount << dpi.totalCount << dpi.firstPass << dpi.justice<< pos << Stream::eos;
 	player->send(st);
 }
 

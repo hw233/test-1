@@ -1962,6 +1962,7 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
 
         case 0x0C:
         {
+            //2013-06-05，现在仅仅是大厅
             if(!World::getQZoneQQGameAct())
                 return;
             UInt8 domainType;

@@ -3476,11 +3476,11 @@ namespace GObject
 		bool bind = false;
         if(!protect)
         {
-            if(DelItem(ITEM_DETACH_RUNE, 1, true))
-                bind = true;
-            else if(!DelItem(ITEM_DETACH_RUNE, 1, false))
-                return 2;
-             AddItemHistoriesLog(ITEM_DETACH_RUNE, 1);
+            //if(DelItem(ITEM_DETACH_RUNE, 1, true))
+            //    bind = true;
+            //else if(!DelItem(ITEM_DETACH_RUNE, 1, false))
+            //    return 2;
+            //AddItemHistoriesLog(ITEM_DETACH_RUNE, 1);
             //DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_DETACH_RUNE, 1, TimeUtil::Now());
         }
         else

@@ -4,6 +4,7 @@ function update_object()
 {
     echo "update_object"
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/cleargm.sql  # XXX: 清除所有GM权限，请一直保留
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/sysupdlg.sql # XXX: 更新公告弹窗，请一直保留
     #mysql -h$H -u$U -p$P -P$PT -D$DBO < updates/Object_20110918_1.sql
     #mysql -h$H -u$U -p$P -P$PT -D$DBO < updates/Object_20110913_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20111010_2.sql
@@ -163,12 +164,14 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130419_1.sql   #清除3366蓝砖礼包购买次数
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130429_1.sql   #清除节日套装人人拿(var294)
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130510_1.sql   #清除消费抽奖(var142/348)
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearbluediamond.sql  #蓝钻活动需要打开
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_fairy_spar.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearaccrecharge.sql   #清除累积充值记录
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130524_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130530_1.sql
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130607_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130607_2.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearbluediamond.sql  #蓝钻活动需要打开
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130607_1.sql
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启
 
     #. clearshiyamen.sh
 }

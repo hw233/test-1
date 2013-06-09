@@ -22,6 +22,7 @@ extern URandom GRND;
 #define CLANBOSS_START_TIME_MIN  0
 #define TIME_60 60
 #define ONE_DAY_SECOND (24*3600)
+#define TWICE_PER_WEEK true
 const UInt8 g_rankSize = 3;
 static const int CLANBOSS_CHANGE_TIME = 10*60;    //boss状态改变时间
 static const int CLANBOSS_PROCESS_TIME = 60*60;   //boss持续时间
@@ -78,6 +79,7 @@ void ClanBoss::clear()
 }
 void ClanBoss::init()
 {
+#if !TWICE_PER_WEEK
     int now = TimeUtil::Now();
     UInt8 week = TimeUtil::GetWeekDay(now);
     int day7 = TimeUtil::SharpDayT() + (7-week)*86400;
@@ -95,6 +97,33 @@ void ClanBoss::init()
     {
         m_openTime = startTime+7*86400;
     }
+#else
+    UInt32 now = TimeUtil::Now();
+    UInt8 week = TimeUtil::GetWeekDay(now);
+    UInt32 startTime;
+    if(week < 6)
+        m_openTime = TimeUtil::SharpDayT() + (6 - week) * 86400 + CLANBOSS_START_TIME_HOUR * 3600 + CLANBOSS_START_TIME_MIN * 60;
+    else if(week == 6)
+    {
+        startTime = TimeUtil::SharpDayT() + CLANBOSS_START_TIME_HOUR * 3600 + CLANBOSS_START_TIME_MIN * 60;
+        if(now < startTime)
+            m_openTime = startTime;
+        else if(now < startTime + CLANBOSS_PROCESS_TIME) //中途宕机
+            start();
+        else //周日再开
+            m_openTime = startTime + 86400;
+    }
+    else
+    {
+        startTime = TimeUtil::SharpDayT() + CLANBOSS_START_TIME_HOUR * 3600 + CLANBOSS_START_TIME_MIN * 60;
+        if(now < startTime)
+            m_openTime = startTime;
+        else if(now < startTime + CLANBOSS_PROCESS_TIME) //中途宕机
+            start();
+        else //下周六再开
+            m_openTime = startTime + 6 * 86400;
+    }
+#endif
 }
 void ClanBoss::sendStatus(Player* pl, UInt8 t)
 {
@@ -182,10 +211,12 @@ void ClanBoss::start()
 }
 void ClanBoss::close()
 {
+#if !TWICE_PER_WEEK
     UInt32 day7 = TimeUtil::SharpWeek(7);
     UInt32 startTime = day7+ CLANBOSS_START_TIME_HOUR*3600+CLANBOSS_START_TIME_MIN*60;
     m_openTime = startTime+7*86400;
 
+#endif
     sendStatus(NULL, 2);
     reward();
 
@@ -197,6 +228,20 @@ void ClanBoss::close()
 	p_map->DelObject(g_bossNpcId);
 
     DB1().PushUpdateData("update boss set level=0,hp=0 where id=%d", g_bossNpcId);
+#if TWICE_PER_WEEK
+    UInt32 now = TimeUtil::Now();
+    UInt8 week = TimeUtil::GetWeekDay(now);
+    if(week == 6)
+    {
+        m_openTime = TimeUtil::SharpDayT() + 86400 + CLANBOSS_START_TIME_HOUR * 3600 + CLANBOSS_START_TIME_MIN * 60;
+        _canOpened = true;
+        sendStatus(NULL, 0);
+    }
+    else
+    {
+        m_openTime = TimeUtil::SharpDayT() + 6 * 86400 + CLANBOSS_START_TIME_HOUR * 3600 + CLANBOSS_START_TIME_MIN * 60;
+    }
+#endif
 }
 
 

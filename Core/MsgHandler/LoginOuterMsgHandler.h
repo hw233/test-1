@@ -350,17 +350,20 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
         std::string pf;
         std::string pfkey;
         std::string xinyue;
+        std::string jinquan;
         StringTokenizer st(ul._para, ":");
         switch (st.count())
         {
+            case 5:
+                jinquan = st[4];
             case 4:
                 xinyue = st[3];
             case 3:
-                pfkey = st[2].c_str();
+                pfkey = st[2];
             case 2:
-                pf = st[1].c_str();
+                pf = st[1];
             case 1:
-                clientIp = st[0].c_str();
+                clientIp = st[0];
                 break;
             default:
                 break;
@@ -404,6 +407,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             player->setSource(pf);
             player->setPfKey(pfkey);
             player->setXinYue(atoi(xinyue.c_str()));
+            player->setJinQuan(jinquan);
 #ifdef _FB
             PLAYER_DATA(player, wallow) = 0;
 #endif
@@ -561,17 +565,20 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
     std::string pf;
     std::string pfkey;
     std::string xinyue;
+    std::string jinquan;
     StringTokenizer st(nu._para, ":");
     switch (st.count())
     {
+        case 5:
+            jinquan = st[4];
         case 4:
             xinyue = st[3];
         case 3:
-            pfkey = st[2].c_str();
+            pfkey = st[2];
         case 2:
-            pf = st[1].c_str();
+            pf = st[1];
         case 1:
-            clientIp = st[0].c_str();
+            clientIp = st[0];
             break;
         default:
             break;
@@ -734,6 +741,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->setOpenKey(nu._openkey);
             pl->setVia(nu._via);
             pl->setXinYue(atoi(xinyue.c_str()));
+            pl->setJinQuan(jinquan);
             if(cfg.merged)
             {
                 UInt64 inviterId = (pl->getId() & 0xffff000000000000) + atoll(nu._invited.c_str());
@@ -1016,12 +1024,12 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
         {
             static UInt16 ids[] =
             {
-                1325,   5,
-                509,    2,
-                515,    2,
-                134,    6,
-                503,    10,
-                549,    3,
+                503,    4,
+                549,    2,
+                9367,   10,
+                1325,   6,
+                134,    8,
+                9369,   16,
             };
 
             bool in = false;
@@ -2794,6 +2802,17 @@ void SysDailog(LoginMsgHdr &hdr, const void * data)
     GObject::World::setSysDailogPlatform(platform);
 	GObject::globalPlayers.enumerate(player_enum, 0);
 }
+
+inline bool player_enum_sys_update(GObject::Player* p, int)
+{
+    if (!p->isOnline())
+        p->setSysUpDateDlg(SYS_UPDLG_VF(0, 1));
+    else
+        p->setSysUpDateDlg(SYS_UPDLG_VF(0, 0));
+
+    return true;
+}
+
 void SysUpdate(LoginMsgHdr &hdr, const void * data)
 {
 	BinaryReader br(data,hdr.msgHdr.bodyLen);
@@ -2811,8 +2830,9 @@ void SysUpdate(LoginMsgHdr &hdr, const void * data)
 
     Stream st1(SPEP::SYSUPDATE);
     st1 << static_cast<UInt8>(0) << Stream::eos;
-    NETWORK()->SendMsgToClient(hdr.sessionID,st1);
 
+	GObject::globalPlayers.enumerate(player_enum_sys_update, 0);
+    NETWORK()->SendMsgToClient(hdr.sessionID,st1);
 }
 
 
