@@ -208,8 +208,8 @@ struct AttrExtra
 		aet.intelligence *= rate;
 		aet.will *= rate;
 		aet.soul *= rate;
-		aet.aura = rate;
-		aet.auraMax = rate;
+		aet.aura *= rate;
+		aet.auraMax *= rate;
 		aet.attack *= rate;
         aet.magatk *= rate;
 		aet.defend *= rate;
