@@ -289,8 +289,6 @@ void ActivityMgr::ActivitySignIn()
     _owner->send(st);
     //活跃度签到
     GameAction()->doStrong(_owner, SthActSignIn, 0, 0);
-    if(World::getSurnameLegend())
-        _owner->GetPackage()->Add(1527, 1, true, false, FromDailyActivity);
 }
 
 //刷新待兑换的道具
