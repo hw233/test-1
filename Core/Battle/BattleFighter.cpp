@@ -1394,18 +1394,14 @@ float BattleFighter::calcCriticalDmg(BattleFighter* defender)
 
 float BattleFighter::getCriticalDmg()
 {
-    float cridmg = _criticaldmg + _criticalDmgAdd + _criticalDmgAdd2;
+    float cridmg = _criticaldmg + _criticalDmgAdd + _criticalDmgAdd2 + _criticaldmgreduce;
     if(cridmg > GObject::GObjectManager::getCriticalDmgMax() && !isNpc())
         cridmg = GObject::GObjectManager::getCriticalDmgMax();
 
     if(cridmg < 0)
         cridmg = 0;
 
-    float factor = 1.0f + getCriticalDmgReduce();
-    if(factor < 0)
-        factor = 0;
-
-    return cridmg * factor;
+    return cridmg;
 }
 
 float BattleFighter::getTough(BattleFighter* defgt)
