@@ -18058,7 +18058,7 @@ void Player::getNewYearQQGameAward(UInt8 type)
 
 void Player::getQZoneQQGameAward(UInt8 domainType, UInt8 type)
 {
-    if(domainType == 1)
+    if(0/*domainType == 1*/)
     {
         if(atoi(m_domain) != 1 && atoi(m_domain) != 2)
             return;
