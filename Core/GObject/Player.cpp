@@ -4545,7 +4545,7 @@ namespace GObject
 
 #endif
 #endif // _WIN32
-        if(ci && ci->purchaseType != TrainFighter)
+        if(ci && ci->purchaseType != TrainFighter && ci->purchaseType != ZCJBRoolAward)
         {
             AddVar(VAR_USEGOLD_CNT, c);
             if(World::inActive_opTime_20130531())
