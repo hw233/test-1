@@ -1564,6 +1564,7 @@ namespace GObject
 
         std::string& getOriginName(std::string& name);
 		std::string& fixName(std::string& name);
+		std::string getRealName();
         void patchDeleteDotS(std::string& name);
 		inline void patchMergedName() { patchMergedName(_id, _playerData.name); }
 		static void patchMergedName(UInt64 id, std::string& name);

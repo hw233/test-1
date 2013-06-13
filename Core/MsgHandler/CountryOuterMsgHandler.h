@@ -5022,6 +5022,16 @@ void OnFairySparReq(GameMsgHdr& hdr, const void * data)
     GObject::Clan* clan = player->getClan();
     if (clan == NULL)
         return;
+    ClanMember* mem = clan->getClanMember(player);
+    if(!mem)
+        return;
+	UInt32 now = TimeUtil::Now();
+    UInt32 joinTime = mem->joinTime;
+    if(now >= joinTime && now - joinTime < 24 * 60 * 60)
+    {
+		player->sendMsgCode(0, 1368);
+		return;
+    }
 
     BinaryReader br(data, hdr.msgHdr.bodyLen);
     UInt8 type = 0;
