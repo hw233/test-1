@@ -82,7 +82,7 @@ void FrontMap::sendInfo(Player* pl, UInt8 id, bool needspot, bool force)
 
     UInt32 mark = pl->GetVar(VAR_FRONTMAP_AUTO_FIGHT_USE_MONEY_MARK);
     UInt8 pos = id - 1;
-    pos = static_cast<UInt8>(GET_BIT(mark, pos));
+    pos = static_cast<UInt8>(GET_BIT_MARK(mark, pos));
 
     FastMutex::ScopedLock lk(_mutex);
     Stream st(REP::FORMATTON_INFO);
@@ -611,7 +611,7 @@ void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool in
                     if (!World::getNewYear() &&
                         !girl &&
                         !World::getNetValentineDay() &&
-                        0 == GET_BIT(mark, pos))
+                        0 == GET_BIT_MARK(mark, pos))
                     {
                         UInt32 pref = 0;
                         UInt8 div = 1;

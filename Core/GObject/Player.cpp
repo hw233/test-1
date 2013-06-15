@@ -11038,10 +11038,11 @@ namespace GObject
     
     void Player::getVipLevelAward(UInt8 opt)
     {
-        if(opt > getVipLevel() && opt > 15)
+        if(opt > getVipLevel())
         {
-            return;
             sendMsgCode(0, 1003);
+
+            return;
         }
 
         if (GetPackage()->GetRestPackageSize() < 6 && opt > 0)
@@ -11056,19 +11057,31 @@ namespace GObject
         if(opt > 0)
         {
             UInt8 pos = opt - 1;
-            UInt8 mark = GET_BIT(state, pos);
+            UInt8 mark = GET_BIT_MARK(state, pos);
 
             if(opt > 0 && mark == 0)
             {
-                bool res = GameAction()->onVipLevelAward(opt);
-                if(res)
+                UInt8 res = GameAction()->onVipLevelAward(this, opt);
+                if(1 == res)
                 {
                     state = SET_BIT(state, pos);
                     SetVar(VAR_VIPLEVEL_AWARD, state);
                 }
-                else
+                else if(2 == res)
                 {
                     sendMsgCode(0, 1090);
+
+                    return;
+                }
+                else if(3 == res)
+                {
+                    sendMsgCode(0, 1003);
+
+                    return;
+                }
+                else
+                {
+                    return;
                 }
             }
         }

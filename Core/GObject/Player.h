@@ -189,6 +189,8 @@ namespace GObject
 #define SET_BIT(X,Y)     (X | (1<<Y))                                                                                                                                                          
 #define GET_BIT(X,Y)     (X & (1<<Y))
 #define CLR_BIT(X,Y)     (X & ~(1<<Y))
+#define GET_BIT_MARK(X,Y)     ((X>>Y) & 1)
+
     enum SurnameLegendAwardFlag
     {
         e_sla_none = 0x00,

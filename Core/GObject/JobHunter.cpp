@@ -387,10 +387,10 @@ void JobHunter::SendMapInfo()
     }
     st << static_cast<UInt8>(POS_TO_CLIENT_POS(POS_TO_INDEX(_posX, _posY)));
 
-    UInt8 mark = _owner->GetVar(VAR_JOBHUNT_AUTO_FIGHT_USE_MONEY_MARK);
+    UInt32 mark = _owner->GetVar(VAR_JOBHUNT_AUTO_FIGHT_USE_MONEY_MARK);
     UInt8 pos = _gameProgress - 1;
-    mark = GET_BIT(mark, pos);
-    st << mark;
+    pos = static_cast<UInt8>(GET_BIT_MARK(mark, pos));
+    st << pos;
 
     st << Stream::eos;
     _owner->send(st);
@@ -1418,7 +1418,7 @@ void JobHunter::OnAutoStart()
     UInt32 tael = 0;
     UInt32 mark = _owner->GetVar(VAR_JOBHUNT_AUTO_FIGHT_USE_MONEY_MARK); 
     UInt8 pos = _gameProgress - 1;
-    if(0 == GET_BIT(mark, pos))
+    if(0 == GET_BIT_MARK(mark, pos))
     {
         if(_owner->getVipLevel() >= 4)
         {

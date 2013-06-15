@@ -152,7 +152,7 @@ void PlayerCopy::sendInfo(Player* pl, UInt8 id)
     st << maxCount;
     UInt32 mark = pl->GetVar(VAR_COPY_AUTO_FIGHT_USE_MONEY_MARK);
     UInt8 pos = id - 1;
-    pos = static_cast<UInt8>(GET_BIT(mark, pos));
+    pos = static_cast<UInt8>(GET_BIT_MARK(mark, pos));
     st << pos;
     st << Stream::eos;
     pl->send(st);
@@ -766,7 +766,7 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool 
                     if (!World::getNewYear() &&
                         !girl &&
                         !World::getNetValentineDay() &&
-                        (0 == GET_BIT(mark, pos)))
+                        (0 == GET_BIT_MARK(mark, pos)))
                     {
                         // XXX: moneyNeed must greater than 1000
                         UInt32 pref = 0;

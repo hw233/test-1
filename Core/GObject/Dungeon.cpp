@@ -667,7 +667,7 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
             if (!World::getNewYear() &&
                 !girl &&
                 !World::getNetValentineDay() &&
-                0 == GET_BIT(mark, pos))
+                0 == GET_BIT_MARK(mark, pos))
             {
                 UInt32 viplevel = player->getVipLevel();
                 if(viplevel < 6)
@@ -875,7 +875,7 @@ void Dungeon::sendDungeonInfo(Player * player)
 		UInt8 enterCount = (_extraCount[player->getVipLevel()] << 4) | getEnterCount();
         UInt32 mark = player->GetVar(VAR_DUNGEON_AUTO_FIGHT_USE_MONEY_MARK);
         UInt8 pos = _id - 1;
-        pos = static_cast<UInt8>(GET_BIT(mark, pos));
+        pos = static_cast<UInt8>(GET_BIT_MARK(mark, pos));
 		st << static_cast<UInt8>(0) << _id << static_cast<UInt8>(0) << PLAYER_DATA(player, dungeonCnt) << enterCount << static_cast<UInt16>(0) << static_cast<UInt32>(0) << static_cast<UInt8>(0) << pos << Stream::eos;
 		player->send(st);
 		return;
@@ -891,7 +891,7 @@ void Dungeon::sendDungeonInfo(Player * player, DungeonPlayerInfo& dpi)
 
     UInt32 mark = player->GetVar(VAR_DUNGEON_AUTO_FIGHT_USE_MONEY_MARK);
     UInt8 pos = _id - 1;
-    pos = static_cast<UInt8>(GET_BIT(mark, pos));
+    pos = static_cast<UInt8>(GET_BIT_MARK(mark, pos));
 	st << static_cast<UInt8>(0) << _id << static_cast<UInt8>(dpi.level) << PLAYER_DATA(player, dungeonCnt) << enterCount << dpi.totalCount << dpi.firstPass << dpi.justice<< pos << Stream::eos;
 	player->send(st);
 }

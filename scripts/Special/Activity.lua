@@ -982,7 +982,7 @@ function sendWinReward(player, lootlvl, typeId)
     end
 end
 
-function onVipLevelAward(vipLevel)
+function onVipLevelAward(player, vipLevel)
     
     local itemCount = {3, 10, 20, 45, 100, 150, 200, 270, 360, 500, 650, 800, 950, 1300, 1800};
 
@@ -991,13 +991,17 @@ function onVipLevelAward(vipLevel)
     local s = os.time(startTime);
     local e = os.time(endTime);
     local n = os.time();
-    
-    if n >= s and n < e  and vipLevel >=1 and vipLevel <= 15 then
-        package:AddItem(503, itemCount[vipLevel-1], true, false, 57);
 
-        return true;
+    if vipLevel < 1 and vipLevel > 15 then
+        return 3;
+    end
+
+    if n >= s and n < e then
+        local package = player:GetPackage();
+        package:AddItem(503, itemCount[vipLevel], true, 0, 57);
+        return 1;
     else
-        return false;
+        return 2;
     end
 end
 

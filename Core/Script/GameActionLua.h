@@ -373,7 +373,7 @@ namespace Script
         lua_tinker::table GetSpreadAward();
         UInt32 GetFairySparParaMax(UInt8 type, UInt8 count);
         Table GetFairySparElement(UInt8 flag);
-        bool onVipLevelAward(UInt8 opt);
+        UInt8 onVipLevelAward(Player* player, UInt8 opt);
 
 	private:
 		Player* _player1;	//?ű???????Ϊ????1
