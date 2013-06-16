@@ -22,6 +22,7 @@ extern URandom GRND;
 #define CLANBOSS_START_TIME_MIN  0
 #define TIME_60 60
 #define ONE_DAY_SECOND (24*3600)
+#define TWICE_PER_WEEK true
 const UInt8 g_rankSize = 3;
 static const int CLANBOSS_CHANGE_TIME = 10*60;    //boss状态改变时间
 static const int CLANBOSS_PROCESS_TIME = 60*60;   //boss持续时间
@@ -78,9 +79,9 @@ void ClanBoss::clear()
 }
 void ClanBoss::init()
 {
+#if !TWICE_PER_WEEK
     int now = TimeUtil::Now();
     UInt8 week = TimeUtil::GetWeekDay(now);
-#if 0
     int day7 = TimeUtil::SharpDayT() + (7-week)*86400;
     int startTime = day7+ CLANBOSS_START_TIME_HOUR*3600+CLANBOSS_START_TIME_MIN*60;
     if (day7 >= now || now < startTime)
@@ -97,6 +98,8 @@ void ClanBoss::init()
         m_openTime = startTime+7*86400;
     }
 #else
+    UInt32 now = TimeUtil::Now();
+    UInt8 week = TimeUtil::GetWeekDay(now);
     UInt32 startTime;
     if(week < 6)
         m_openTime = TimeUtil::SharpDayT() + (6 - week) * 86400 + CLANBOSS_START_TIME_HOUR * 3600 + CLANBOSS_START_TIME_MIN * 60;
@@ -208,16 +211,11 @@ void ClanBoss::start()
 }
 void ClanBoss::close()
 {
-#if 0
+#if !TWICE_PER_WEEK
     UInt32 day7 = TimeUtil::SharpWeek(7);
     UInt32 startTime = day7+ CLANBOSS_START_TIME_HOUR*3600+CLANBOSS_START_TIME_MIN*60;
     m_openTime = startTime+7*86400;
-#else
-    UInt8 week = TimeUtil::GetWeekDay(now);
-    if(week == 6)
-        m_openTime = TimeUtil::SharpDayT() + 86400 + CLANBOSS_START_TIME_HOUR * 3600 + CLANBOSS_START_TIME_MIN * 60;
-    else
-        m_openTime = TimeUtil::SharpDayT() + 6 * 86400 + CLANBOSS_START_TIME_HOUR * 3600 + CLANBOSS_START_TIME_MIN * 60;
+
 #endif
     sendStatus(NULL, 2);
     reward();
@@ -230,6 +228,20 @@ void ClanBoss::close()
 	p_map->DelObject(g_bossNpcId);
 
     DB1().PushUpdateData("update boss set level=0,hp=0 where id=%d", g_bossNpcId);
+#if TWICE_PER_WEEK
+    UInt32 now = TimeUtil::Now();
+    UInt8 week = TimeUtil::GetWeekDay(now);
+    if(week == 6)
+    {
+        m_openTime = TimeUtil::SharpDayT() + 86400 + CLANBOSS_START_TIME_HOUR * 3600 + CLANBOSS_START_TIME_MIN * 60;
+        _canOpened = true;
+        sendStatus(NULL, 0);
+    }
+    else
+    {
+        m_openTime = TimeUtil::SharpDayT() + 6 * 86400 + CLANBOSS_START_TIME_HOUR * 3600 + CLANBOSS_START_TIME_MIN * 60;
+    }
+#endif
 }
 
 
