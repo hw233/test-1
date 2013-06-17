@@ -1913,7 +1913,7 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
             if(boSkill == NULL || boSkill->effect == NULL)
                 continue;
 
-            UInt8 state[3] = {0};
+            //UInt8 state[3] = {0};
             UInt8 idx = 0;
 
             Int16 nStateLast = boSkill->last;
