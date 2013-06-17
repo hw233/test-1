@@ -2475,6 +2475,7 @@ bool BattleFighter::doFireFakeDead()
     {
         _fire_fake_dead_rate = 0;
         _fire_fake_dead_rate_last = 0;
+        _hp = 1;
         return true;
     }
 
