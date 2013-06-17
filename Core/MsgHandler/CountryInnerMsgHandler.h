@@ -933,7 +933,8 @@ void OnGoldRecharge( GameMsgHdr& hdr, const void * data )
         Recharge* recharge = (Recharge*)(data);
         if(recharge->gold == 0)
             return;
-        player->getGold(recharge->gold);
+        IncommingInfo ii(InFromRecharge, 0, 0);
+        player->getGold(recharge->gold, &ii);
         player->addTotalRecharge(recharge->gold);
         DB8().PushUpdateData("UPDATE `recharge` SET `status` = 1 WHERE no = '%s' AND playerId = %"I64_FMT"u",
                 recharge->no, player->getId());
@@ -963,7 +964,8 @@ void OnGoldRecharge( GameMsgHdr& hdr, const void * data )
         Recharge* recharge = (Recharge*)(data);
         if(recharge->gold == 0)
             return;
-        player->getGold(recharge->gold);
+        IncommingInfo ii(InFromRecharge, 0, 0);
+        player->getGold(recharge->gold, &ii);
         player->addTotalRecharge(recharge->gold);
 
         // XXX: 把创建银角色前的所有订单号置成成功
@@ -1288,7 +1290,8 @@ void OnSetMoneyReq( GameMsgHdr& hdr, const void* data )
     Money* money = (Money*)(data);
     if (money->type == 0)
     {
-        player->getGold(money->gold);
+        IncommingInfo ii(InFromBSSet, 0, 0);
+        player->getGold(money->gold, &ii);
         player->getTael(money->tael);
         player->getCoupon(money->coupon);
         player->getAchievement(money->achievement);

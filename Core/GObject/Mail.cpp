@@ -76,7 +76,8 @@ bool MailPackage::takeIt( Player * player, bool gm )
 			case Gold:
                 {
                     UInt32 c = it->second + ((it->first & 0x0FFF) << 16);
-                    player->getGold(c);
+                    IncommingInfo ii(InFromMail, 0, 0);
+                    player->getGold(c, &ii);
 
                     if (gm)
                     {
@@ -618,7 +619,10 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 					const UInt32 vipGoldTable[10] = { 0, 0, 0, 100, 500, 1000, 2000, 3000, 6000, 6000 };
 					UInt32 g = vipGoldTable[pkgId - 0xFFF1];
 					if(g > 0)
-						_owner->getGold(g);
+                    {
+                        IncommingInfo ii(InFromMail, 0, 0);
+						_owner->getGold(g, &ii);
+                    }
 					const UInt32 * t = vipRollTable[pkgId - 0xFFF1];
 					URandom ur(mail->id);
 					for(UInt32 i = 0; i < 3 && t[i] > 0; ++ i)
