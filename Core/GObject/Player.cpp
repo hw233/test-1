@@ -105,6 +105,10 @@
 
 #define QIXI_XIQUE 9122
 
+#define QQ_GAME_NEED_TIME  1200
+#define QQ_GAME_START_TIME  21*3600
+#define QQ_GAME_END_TIME    (21*3600+1800)
+
 namespace GObject
 {
     UInt32 Player::_recruit_cost = 20;
@@ -19673,7 +19677,7 @@ void Player::getQQGameOnlineAward()
         return;
     if(GetVar(VAR_ONLINE_AWARD) > 0)
         return;
-    if(getQQGameOnlineTotalTime() < 3600)
+    if(getQQGameOnlineTotalTime() < QQ_GAME_NEED_TIME)
         return;
     if (GetPackage()->GetRestPackageSize() < 4)
     {
@@ -19699,10 +19703,10 @@ void Player::sendQQGameOnlineAward()
     st << static_cast<UInt8>(GetVar(VAR_ONLINE_AWARD));
     UInt16 totalTime = getQQGameOnlineTotalTime();
     UInt16 leftTime;
-    if(totalTime >= 3600)
+    if(totalTime >= QQ_GAME_NEED_TIME)
         leftTime = 0;
     else
-        leftTime = 3600 - totalTime;
+        leftTime = QQ_GAME_NEED_TIME - totalTime;
     st << leftTime;
     st << Stream::eos;
     send(st);
@@ -19723,21 +19727,21 @@ UInt32 Player::getQQGameOnlineTotalTime()
     UInt32 today = TimeUtil::SharpDayT( 0 , now);
     UInt32 lastOnline = _playerData.lastOnline; //考虑了是前几天登录的情况
     UInt32 curTime;
-    if(now <= today + 19*3600)
+    if(now <= today + QQ_GAME_START_TIME)
         curTime = 0;
-    else if(now <= today + 21*3600)
+    else if(now <= today + QQ_GAME_END_TIME)
     {
-        if(lastOnline <= (today + 19*3600))
-            curTime = now - (today + 19*3600);
+        if(lastOnline <= (today + QQ_GAME_START_TIME))
+            curTime = now - (today + QQ_GAME_START_TIME);
         else
             curTime = now - lastOnline;
     }
     else
     {
-        if(lastOnline <= (today + 19*3600))
-            curTime = 3600;
+        if(lastOnline <= (today + QQ_GAME_START_TIME))
+            curTime = QQ_GAME_NEED_TIME;
         else
-            curTime = (today + 21*3600) > lastOnline ? ((today + 21*3600) - lastOnline) : 0;
+            curTime = (today + QQ_GAME_END_TIME) > lastOnline ? ((today + QQ_GAME_END_TIME) - lastOnline) : 0;
     }
     return GetVar(VAR_ONLINE_TOTAL_TIME) + curTime;
 }
