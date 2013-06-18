@@ -5169,7 +5169,8 @@ namespace GObject
 					SYSMSGV(title, 406);
 					SYSMSGV(content, 409, fgt->getName().c_str(), data->price - money, data->accExp, money);
 					GetMailBox()->newMail(NULL, 0x12, title, content);
-					getGold(money);
+                    IncommingInfo ii(InFromCancelTrain, 0, 0);
+					getGold(money, &ii);
 				}
 				else
 				{
