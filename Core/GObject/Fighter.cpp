@@ -88,6 +88,7 @@ Fighter::Fighter(UInt32 id, Player * owner):
     _soulMax = 0;
     _soulExtraAura = 0;
     _soulAuraLeft = 0;
+    _soulSkillSoulOut = 0;
     _hideFashion = 0;
 }
 
@@ -4727,6 +4728,16 @@ UInt8 Fighter::getSoulAuraLeft()
         return 0;
 
     return m_2ndSoul->getAuraLeft();
+}
+
+UInt16 Fighter::getSoulSkillSoulOut()
+{
+    if(_soulSkillSoulOut)
+        return _soulSkillSoulOut;
+    if(!m_2ndSoul)
+        return 0;
+
+    return m_2ndSoul->getSkillSoulOut();
 }
 
 bool Fighter::practiceLevelUp()

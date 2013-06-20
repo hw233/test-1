@@ -306,6 +306,8 @@ private:
         e_unLingQu = 92,     // 解除灵躯
         e_lingShiBleed = 93,     // 灵蚀
         e_unLingShiBleed = 94,   // 解除灵蚀
+        e_soulout = 95,    // 元神出窍
+        e_unSoulout = 96,    // 解除
 
         e_MAX_STATE,
     };
@@ -523,7 +525,7 @@ private:
     void doSkillEffectExtra_LingShiBleed2(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_CriticalDmgReduce(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
 
-    bool doSkillEffectExtra_LingQu(BattleFighter* bf, const GData::SkillBase* skill);
+    bool doSkillEffectExtra_Dead(BattleFighter* bf, const GData::SkillBase* skill);
     bool doSkillEffectExtra_LingShiBleed(BattleFighter* bf, BattleFighter* bo, const GData::SkillBase* skill, UInt32 dmg);
     bool doSkillDmg(BattleFighter* bf, const GData::SkillBase* skill);
     void doPassiveSkillBegDmg(BattleFighter* bf, BattleFighter* bo, UInt32 dmg);

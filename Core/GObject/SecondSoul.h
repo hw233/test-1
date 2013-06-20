@@ -36,6 +36,7 @@ struct SoulSkill
 //#define SOUL_SKILL_PRACLVLUP     12         // 天赋术, 减少元神升级的修为消耗
 #define SOUL_SKILL_TALENT        12         // 新天赋术，使用无双技能后保留部分灵气（上面那个暂时废除了）
 //#define SOUL_SKILL_ALLATTR      11          // 通神术, 增加元神所有属性
+#define SOUL_SKILL_SOULOUT       13         // 元神出窍，死亡后元神出窍
 
 class SecondSoul
 {
@@ -61,6 +62,7 @@ public:
     float getPracticeFactor();
     float getPracticeLevUpFactor();
 
+    UInt16 getSkillSoulOut();
     UInt8 getExtraAura();
     UInt8 getAuraLeft();
     bool practiceLevelUp(UInt32& pexp);

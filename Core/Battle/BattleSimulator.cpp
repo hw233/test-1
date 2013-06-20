@@ -985,7 +985,7 @@ float BattleSimulator::testLink( BattleFighter *& bf, UInt16& skillId )
 
 UInt32 BattleSimulator::doSpiritAttack(BattleFighter * bf, BattleFighter* bo, float atk, bool& pr, bool& cs, bool& first)
 {
-    if(!bf || !bo || bf->getHP() == 0 || bo->getHP() == 0)
+    if(!bf || !bo || bf->getHP() == 0 || bo->getHP() == 0 || bo->isSoulOut())
         return 0;
 
     UInt32 dmg = 0;
@@ -1160,6 +1160,9 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
             -- colorStockTimes;
             colorStock = true;
         }
+        if(area_target->isSoulOut())
+            return 0;
+
         if(area_target->isLingQu())
             colorStock = true;
 
@@ -2404,7 +2407,7 @@ bool BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
         return false;
 
     BattleFighter* target_bo = static_cast<BattleFighter*>(bo);
-    if(target_bo->isLingQu() || target_bo->getHP() == 0)
+    if(target_bo->isLingQu() || target_bo->getHP() == 0 || target_bo->isSoulOut())
         return false;
 
     UInt16 effect_state = skill->effect->state;
@@ -4589,7 +4592,7 @@ bool BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GD
     {
         if(bo->getColorStock() != 0)
             return false;
-        if(bo->isLingQu())
+        if(bo->isLingQu() || bo->isSoulOut())
             return false;
         float value = bo->_attack * skill->effect->atkP + skill->effect->atk;
         if(value > 0 && bf->getSide() != target_side)
@@ -4638,7 +4641,7 @@ bool BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GD
     {
         if(bo->getColorStock() != 0)
             return false;
-        if(bo->isLingQu())
+        if(bo->isLingQu() || bo->isSoulOut())
             return false;
         float value = bo->_magatk * skill->effect->magatkP + skill->effect->magatk;
         if(value > 0 && bf->getSide() != target_side)
@@ -4930,7 +4933,7 @@ BattleFighter* BattleSimulator::getTherapyTarget(BattleFighter* bf)
     for(UInt8 i = 0; i < 25; ++ i)
     {
         BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
-        if(bo == NULL || bo->getHP() == 0 || bo->hasFlag(BattleFighter::IsMirror) || bo->isSummon() || bo->isLingQu())
+        if(bo == NULL || bo->getHP() == 0 || bo->hasFlag(BattleFighter::IsMirror) || bo->isSummon() || bo->isLingQu() || bo->isSoulOut())
             continue;
         if(bo->getHP() < (bo->getMaxHP() >> 1))
         {
@@ -4958,7 +4961,7 @@ BattleFighter* BattleSimulator::getTherapyTarget2(BattleFighter* bf, UInt8 * exc
     for(UInt8 i = 0; i < 25; ++ i)
     {
         bo = static_cast<BattleFighter*>(getObject(side, i));
-        if(bo == NULL || bo->getHP() == 0 || bo->hasFlag(BattleFighter::IsMirror) || bo->isLingQu() || (isFirst && bo->isPet()))
+        if(bo == NULL || bo->getHP() == 0 || bo->hasFlag(BattleFighter::IsMirror) || bo->isLingQu() || bo->isSoulOut() || (isFirst && bo->isPet()))
             continue;
         if(bo->isSummon())
         {
@@ -5011,7 +5014,7 @@ BattleFighter* BattleSimulator::getTherapyTarget3(BattleFighter* bf, UInt8 * exc
     for(UInt8 i = 0; i < 25; ++ i)
     {
         bo = static_cast<BattleFighter*>(getObject(side, i));
-        if(bo == NULL || bo->getHP() == 0 || bo->hasFlag(BattleFighter::IsMirror) || bo->isLingQu())
+        if(bo == NULL || bo->getHP() == 0 || bo->hasFlag(BattleFighter::IsMirror) || bo->isLingQu() || bo->isSoulOut())
             continue;
         if(bo->isSummon())
         {
@@ -6391,6 +6394,8 @@ int BattleSimulator::testWinner()
         size_t c = fgtlist.size();
         for(size_t i = 0; i < c; ++ i)
         {
+            if(fgtlist[i]->isSoulOut())
+                continue;
             alive[fgtlist[i]->getSide()] ++;
         }
     }
@@ -6413,6 +6418,8 @@ int BattleSimulator::testWinner2()
         size_t c = fgtlist.size();
         for(size_t i = 0; i < c; ++ i)
         {
+            if(fgtlist[i]->isSoulOut())
+                continue;
             leftHPAll[fgtlist[i]->getSide()] += fgtlist[i]->getHP();
         }
     }
@@ -6963,6 +6970,8 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
             fSummonOrMirror = true;
         if(static_cast<BattleFighter*>(bo)->getLingQu())
             break;
+        if(static_cast<BattleFighter*>(bo)->isSoulOut())
+            break;
 
         if(static_cast<BattleFighter*>(bo)->isSummon())
         {
@@ -7051,7 +7060,7 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
 
             appendDefStatus(e_skill, passiveSkill->getId(), static_cast<BattleFighter*>(bo));
             BattleFighter* bf = static_cast<BattleFighter*>(bo);
-            if(doSkillEffectExtra_LingQu(bf, passiveSkill))
+            if(doSkillEffectExtra_Dead(bf, passiveSkill))
             {
                 fFakeDead = true;
             }
@@ -7543,6 +7552,13 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
         if(bf->releaseLingQu())
         {
             appendDefStatus(e_unLingQu, 0, static_cast<BattleFighter*>(bf));
+            onDead(true, bf);
+            break;
+        }
+
+        if(bf->releaseSoulOut())
+        {
+            appendDefStatus(e_unSoulout, 0, static_cast<BattleFighter*>(bf));
             onDead(true, bf);
             break;
         }
@@ -9069,7 +9085,7 @@ bool BattleSimulator::AddSkillStrengthenState(BattleFighter* pFighter, BattleFig
 {
     if(!pFighter || !pTarget || pFighter->getHP() <= 0 || pTarget->getHP() < 0)
         return false;
-    if(pTarget->isLingQu())
+    if(pTarget->isLingQu() || pTarget->isSoulOut())
         return false;
 
     std::vector<AttackAct> vAttackAct; // 这个存被动技能等造成的更多动作
@@ -12032,7 +12048,7 @@ void BattleSimulator::doSkillEffectExtra_LingYouMagDef(BattleFighter* bf, int ta
     bf->setLingYouMagDef(skill->effect->efv[eftIdx]);
 }
 
-bool BattleSimulator::doSkillEffectExtra_LingQu(BattleFighter* bf, const GData::SkillBase* skill)
+bool BattleSimulator::doSkillEffectExtra_Dead(BattleFighter* bf, const GData::SkillBase* skill)
 {
     if(!skill || !skill->effect)
         return false;
@@ -12049,6 +12065,12 @@ bool BattleSimulator::doSkillEffectExtra_LingQu(BattleFighter* bf, const GData::
         {
             bf->setLingQu(true, efl[i]);
             appendDefStatus(e_lingQu, 0, bf);
+            return true;
+        }
+        else if(eft[i] == GData::e_eft_soul_out)
+        {
+            bf->setSoulOut(true, efl[i]);
+            appendDefStatus(e_soulout, 0, bf);
             return true;
         }
     }

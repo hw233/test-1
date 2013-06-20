@@ -1745,6 +1745,7 @@ CREATE TABLE `sh_fighter_attr2` (
     `type` tinyint(3) unsigned NOT NULL DEFAULT '0',
     `soulExtraAura` tinyint(3) unsigned NOT NULL,
     `soulAuraLeft` tinyint(3) unsigned NOT NULL,
+    `soulSkillSoulOut` smallint(5) unsigned NOT NULL,
     `elixir_strength` int(10) NOT NULL,
     `elixir_physique` int(10) NOT NULL,
     `elixir_agility` int(10) NOT NULL,

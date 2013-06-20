@@ -847,6 +847,8 @@ public:
     void setSecondSoul(SecondSoul* sedondSoul);
     UInt8 getSoulExtraAura();
     UInt8 getSoulAuraLeft();
+    UInt16 getSoulSkillSoulOut();
+
     bool practiceLevelUp();
     bool changeSecondSoulClass(UInt8 cls);
     bool changeSecondSoulXinxiu(UInt8 xinxiu);
@@ -893,12 +895,14 @@ public:
     inline void setSoulMax(Int32 v) { _soulMax = v; }
     inline void setSoulExtraAura(Int32 v) { _soulExtraAura = v; }
     inline void setSoulAuraLeft(Int32 v) { _soulAuraLeft = v; }
+    inline void setSoulSkillSoulOut(Int32 v) { _soulSkillSoulOut = v; }
     inline void setUpCittasMax() { _cittaslot = CITTA_UPMAX; }
     bool upCittaWithOutCheck( UInt16 citta, int idx );
     UInt16 getTrumpSkill(int i) { if(i >= TRUMP_UPMAX) return 0; else return _trumpSkill[i]; }
     Int32 _soulMax;
     UInt8 _soulExtraAura;
     UInt8 _soulAuraLeft;
+    UInt16 _soulSkillSoulOut;
     UInt16 _trumpSkill[TRUMP_UPMAX];
 
     // 内丹系统

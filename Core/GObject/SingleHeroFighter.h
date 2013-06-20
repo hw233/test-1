@@ -33,7 +33,7 @@ namespace GObject
 
 
         void setAttrExtraEquip(GData::AttrExtra& attr);
-        void setAttr2(UInt8 soulExtraAura, UInt8 soulAuraLeft, ElixirAttr& attr);
+        void setAttr2(UInt8 soulExtraAura, UInt8 soulAuraLeft, UInt16 soulSkillSoulOut, ElixirAttr& attr);
 
         void setPotential(float potential);
         void setCapacity(float capacity);
@@ -124,6 +124,7 @@ namespace GObject
         ElixirAttr _elixirattr;
         UInt8 _soulExtraAura;
         UInt8 _soulAuraLeft;
+        UInt16 _soulSkillSoulOut;
 
         UInt16 _tLevel;
         UInt32 _tTurns;

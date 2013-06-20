@@ -178,6 +178,7 @@ struct DBSHAttr2
     UInt8 type;
     UInt8 soulExtraAura;
     UInt8 soulAuraLeft;
+    UInt16 soulSkillSoulOut;
     Int32 elixir_strength;
     Int32 elixir_physique;
     Int32 elixir_agility;
@@ -374,13 +375,14 @@ SPECIALEND()
 
 
 SPECIALBEGIN(GObject::DBSHAttr2)
-SPECIALDEF(19)
+SPECIALDEF(20)
 (
     UInt32, fighterId,
     UInt64, playerId,
     UInt8, type,
     UInt8, soulExtraAura,
     UInt8, soulAuraLeft,
+    UInt16, soulSkillSoulOut,
     Int32, elixir_strength,
     Int32, elixir_physique,
     Int32, elixir_agility,
@@ -4807,7 +4809,7 @@ namespace GObject
 
         DBSHAttr2 dba2;
 
-		if(execu->Prepare("SELECT `fighterId`, `playerId`, `type`, `soulExtraAura`, `soulAuraLeft`, `elixir_strength`, `elixir_physique`, `elixir_agility`,"
+		if(execu->Prepare("SELECT `fighterId`, `playerId`, `type`, `soulExtraAura`, `soulAuraLeft`, `soulSkillSoulOut`, `elixir_strength`, `elixir_physique`, `elixir_agility`,"
                 " `elixir_intelligence`, `elixir_will`, `elixir_soul`, `elixir_attack`, `elixir_defend`, `elixir_critical`, `elixir_pierce`, `elixir_evade`, `elixir_counter`,"
                 " `elixir_tough`, `elixir_action` FROM `sh_fighter_attr2` ORDER BY `playerId`, `fighterId`", dba2) != DB::DB_OK)
 			return false;
@@ -4856,7 +4858,7 @@ namespace GObject
             attr.tough = dba2.elixir_tough;
             attr.action = dba2.elixir_action;
 
-            fgt->setAttr2(dba2.soulExtraAura, dba2.soulAuraLeft, attr);
+            fgt->setAttr2(dba2.soulExtraAura, dba2.soulAuraLeft, dba2.soulSkillSoulOut, attr);
         }
 
         return true;
