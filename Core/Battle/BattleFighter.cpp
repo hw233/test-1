@@ -1911,7 +1911,10 @@ bool BattleFighter::releaseSummon()
 
     -- _summonLast;
     if(_summonLast == 0)
+    {
+        _hp = 0;
         return true;
+    }
 
     return false;
 }

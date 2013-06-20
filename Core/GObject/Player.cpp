@@ -19945,7 +19945,12 @@ bool Player::SetVipPrivilege_2()
     bool ret = false;
     if(validate > 0 && (0 == (validate & 0x2)))
     {
-        validate += 5*86400;
+        UInt32 now = TimeUtil::Now();
+        if(validate > now)
+            validate += 5*86400;
+        else
+            validate = now + 5*86400;
+
         // 保持最低位为0
         if(validate & 0x1)
             validate = validate + 1;
@@ -20011,7 +20016,7 @@ void Player::doVipPrivilege(UInt8 idx)
         SetVipPrivilege_1();
         break;
     case 6:
-        if(!inVipPrivilegeTime())
+        if(!in7DayFromCreated())
             return;
         if (getGold() < 70)
             return;
