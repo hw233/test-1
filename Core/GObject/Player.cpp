@@ -11244,6 +11244,7 @@ namespace GObject
 
             SetVar(VAR_QQTENPAY_AWARD, 1);
             state = 1;
+            udpLog("huodong", "F_130620_1", "", "", "", "", "act");
         }
             
         Stream st(REP::GETAWARD);
