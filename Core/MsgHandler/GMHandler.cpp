@@ -365,7 +365,7 @@ void GMHandler::OnSetXZLvl(GObject::Player * player, std::vector<std::string>& a
         fgt->getXingchen().lvl = xzLevel;
 
         fgt->updateDBxingchen();
-        fgt->sendXingchenInfo();
+        fgt->sendXingchenInfo(0);
 	}
 }
 
@@ -383,7 +383,7 @@ void GMHandler::OnSetXCValue(GObject::Player * player, std::vector<std::string>&
 			return;
         player->SetVar(VAR_XINGCHENZHEN_VALUE, xcValue);
         
-        fgt->sendXingchenInfo();
+        fgt->sendXingchenInfo(0);
 	}
 }
 

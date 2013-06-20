@@ -101,6 +101,9 @@ void NpcGroup::getLoots( GObject::Player * player, std::vector<LootResult>& il, 
                 bind = true;
             if(GDataManager::getNeedBindLevel30CFD(lr[j].id))
                 bind = true;
+            if(player->GetVar(VAR_DROP_OUT_ITEM_MARK))
+                bind = true;
+
             if (player->GetPackage()->Add(lr[j].id, lr[j].count, bind || lr[j].bind, true, FromNpc))
             {
                 ++cnt;
@@ -132,6 +135,9 @@ void NpcGroup::getLoots( GObject::Player * player, std::vector<LootResult>& il, 
         {
             if(GDataManager::getNeedBindLevel30CFD(lr[j].id))
                 bind = true;
+            if(player->GetVar(VAR_DROP_OUT_ITEM_MARK))
+                bind = true;
+
             if (player->GetPackage()->Add(lr[j].id, lr[j].count, bind || lr[j].bind, true, FromNpc))
             {
                 ++cnt;
@@ -164,6 +170,9 @@ void NpcGroup::forceGetLoots( GObject::Player * player, std::vector<LootResult>&
             bool bind = false;
             if(IsGemId(lr[j].id) && !lootlvl && player->GetLev() <= 55)
                 bind = true;
+            if(player->GetVar(VAR_DROP_OUT_ITEM_MARK))
+                bind = true;
+
             if (player->GetPackage()->Add(lr[j].id, lr[j].count, bind || lr[j].bind, false, FromNpc))
             {
                 ++cnt;
