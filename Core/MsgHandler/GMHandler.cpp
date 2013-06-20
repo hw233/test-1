@@ -673,7 +673,8 @@ void GMHandler::OnAddMoney( GObject::Player * player, std::vector<std::string>& 
                     if (player2)
                         player = player2;
                 }
-                player->getGold(val);
+                IncommingInfo ii(InFromAddMoney, 0, 0);
+                player->getGold(val, &ii);
 
                 {
                     char gold[32] = {0};
@@ -809,7 +810,8 @@ void GMHandler::OnTopup( GObject::Player * player, std::vector<std::string>& arg
 	if(args.empty())
 		return;
 	UInt32 val = atoi(args[0].c_str());
-	player->getGold(val);
+    IncommingInfo ii(InFromTopUp, 0, 0);
+	player->getGold(val, &ii);
     {
         char gold[32] = {0};
         snprintf(gold, 32, "%u", val);
@@ -1481,7 +1483,8 @@ void GMHandler::OnSuper( GObject::Player * player, std::vector<std::string>& arg
 		return;
 	player->AddExp(GData::expTable.getLevelMin(100));
     player->AddPExp(100000);
-    player->getGold(10000000);
+    IncommingInfo ii(InFromSuper, 0, 0);
+    player->getGold(10000000, &ii);
     {
         char gold[32] = {0};
         snprintf(gold, 32, "%u", 10000000);
@@ -2415,7 +2418,8 @@ inline bool give_money(Player * p, UInt32* money)
     {
         if (moneys[0])
         {
-            p->getGold(moneys[0]);
+            IncommingInfo ii(InFromMoney2All, 0, 0);
+            p->getGold(moneys[0], &ii);
             {
                 char gold[32] = {0};
                 snprintf(gold, 32, "%u", moneys[0]);

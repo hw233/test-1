@@ -728,6 +728,9 @@ void BattleSimulator::CheckAttain()
 
 void BattleSimulator::insertFighterStatus2Current( BattleFighter* bf )
 {
+    if(bf->getHP() == 0)
+        return;
+
     std::vector<BattleFighter*>& cur_fgtlist = _fgtlist[_cur_fgtlist_idx];
     int cnt = static_cast<int>(cur_fgtlist.size());
     for(int i = 0; i < cnt ; ++ i)
@@ -747,6 +750,9 @@ void BattleSimulator::insertFighterStatus2Current( BattleFighter* bf )
 }
 void BattleSimulator::insertFighterStatus( BattleFighter* bf )
 {
+    if(bf->getHP() == 0)
+        return;
+
     Int8 next_fgtlist_idx = _cur_fgtlist_idx == 0 ? 1 : 0;
     std::vector<BattleFighter*>& next_fgtlist = _fgtlist[next_fgtlist_idx];
     int cnt = static_cast<int>(next_fgtlist.size());
@@ -1907,7 +1913,7 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
             if(boSkill == NULL || boSkill->effect == NULL)
                 continue;
 
-            UInt8 state[3] = {0};
+            //UInt8 state[3] = {0};
             UInt8 idx = 0;
 
             Int16 nStateLast = boSkill->last;
@@ -1961,6 +1967,15 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
                     dmg3 = dmg*1.5;
                     makeDamage(bo, dmg3);
                     appendDefStatus(e_UnPoison, dmg3, bo, e_damagePoison);
+                    if(bo->getHP() == 0)
+                    {
+                        onDead(!activeFlag, bo);
+                    }
+                    else if(_winner == 0)
+                    {
+                        onDamage(bo, activeFlag);
+                    }
+
                 }
                 break;
             case GData::e_state_confuse:
@@ -2018,15 +2033,6 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
                 }
                 break;
             }
-
-            if(bo->getHP() == 0)
-            {
-                onDead(!activeFlag, bo);
-            }
-            else if((_winner == 0) && (state[idx] == 1))
-            {
-                onDamage(bo, activeFlag);
-            }
             continue;
         }
 
@@ -2068,16 +2074,16 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
                     {
                         makeDamage(bo, fdmg);
                         appendDefStatus(e_damBack, fdmg, bo, e_damageTrue);
+                        if(bo->getHP() == 0)
+                        {
+                            onDead(!activeFlag, bo);
+                        }
+                        else if(_winner == 0)
+                        {
+                            onDamage(bo, activeFlag);
+                        }
                     }
 
-                    if(bo->getHP() == 0)
-                    {
-                        onDead(!activeFlag, bo);
-                    }
-                    else if(_winner == 0)
-                    {
-                        onDamage(bo, activeFlag);
-                    }
                     continue;
                 }
 
@@ -6976,7 +6982,6 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
         if(static_cast<BattleFighter*>(bo)->doFireFakeDead())
         {
             fFakeDead = true;
-            (static_cast<BattleFighter*>(bo))->setHP(1);
             appendDefStatus(e_unFireFakeDead, 0, static_cast<BattleFighter*>(bo));
             break;
         }

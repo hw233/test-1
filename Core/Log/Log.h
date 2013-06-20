@@ -136,6 +136,14 @@ enum IncomingType
     FengsuiFromConvert          = 134, //放生获得凤髓
     FengsuiFromUseItem          = 135, //使用物品获得凤髓
     InZCJBRoolAward             = 136, //招财进宝抽奖
+    InFromRecharge              = 137, //充值
+    InFromBSSet                 = 138, //后台设置
+    InFromCancelTrain           = 139, //取消修炼
+    InFromMail                  = 140, //邮件中来
+    InFromAddMoney              = 141, //addmoney/money
+    InFromTopUp                 = 142, //topup
+    InFromMoney2All             = 143, //money2all
+    InFromSuper                 = 144, //super
 };
 
 enum MoneyType
