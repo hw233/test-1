@@ -3191,7 +3191,7 @@ namespace GObject
 		st << Stream::eos;
 	}
 
-	void Player::xingchenInfo()
+	/*void Player::xingchenInfo()
 	{
 		for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++it)
 	    {
@@ -3200,7 +3200,7 @@ namespace GObject
                 it->second->sendXingchenInfo();
             }
         }
-	}
+	}*/
 
 	void Player::makeFighterList( Stream& st )
 	{
@@ -3257,6 +3257,7 @@ namespace GObject
 				st << buffid[i] << buffleft[i];
 			}
             st << static_cast<UInt8>(fgt->getHideFashion());
+            fgt->xingchenInfo(st);
 		}
 	}
 
@@ -6077,6 +6078,7 @@ namespace GObject
 
     bool Player::addAwardByTaskColor(UInt32 taskid, bool im)
     {
+        SetVar(VAR_DROP_OUT_ITEM_MARK, 0);
         if (!im) {
             std::vector<UInt32>& shimen = _playerData.shimen;
             std::vector<UInt8>& smcolor = _playerData.smcolor;
@@ -7543,6 +7545,11 @@ namespace GObject
             GLOBAL().PushMsg(hdr, 0);
         }
 
+        if(oLev < 60 && nLev >= 60)
+        {
+            SetVar(VAR_DROP_OUT_ITEM_MARK, 0);
+        }
+
         if (nLev == 40 || nLev == 50 || nLev == 60 || nLev == 70 || nLev == 80 || nLev == 90 || nLev == 100)
             OnShuoShuo(nLev/10-4 + SS_40);
 
@@ -7840,6 +7847,8 @@ namespace GObject
 
         if(World::inActive_opTime_20130531())
             AddVar(VAR_ZRYJ_COUNT, r);
+
+        SetVar(VAR_DROP_OUT_ITEM_MARK, 0);
     }
 
     void Player::addRechargeNextRet(UInt32 r)
@@ -11240,7 +11249,7 @@ namespace GObject
             GetPackage()->AddItem(503, 1, true, false, FromQQTenpay);
             GetPackage()->AddItem(515, 1, true, false, FromQQTenpay);
             GetPackage()->AddItem(509, 1, true, false, FromQQTenpay);
-            GetPackage()->AddItem(30, 2, true, false, FromQQTenpay);
+            GetPackage()->AddItem(50, 10, true, false, FromQQTenpay);
 
             SetVar(VAR_QQTENPAY_AWARD, 1);
             state = 1;
@@ -16557,6 +16566,18 @@ void EventTlzAuto::notify(bool isBeginAuto)
         return bp;
     }
 
+    UInt32 Player::getFormBattlePoint()
+    {
+        UInt32 bp = 0;
+        for(int j = 0; j < 5; ++ j)
+        {
+            Fighter* fighter = _playerData.lineup[j].fighter;
+            if(fighter)
+                bp += fighter->calcFormBattlePoint();
+        }
+        return bp;
+    }
+
     void Player::sendCompareBP(Player * player)
     {
         if(!player) return;
@@ -16574,6 +16595,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
         else
             st << static_cast<UInt32>(0);
         st << getLingbaoBattlePoint();
+        st << getFormBattlePoint();
         st << getCountry();
         Fighter * fgt = getMainFighter();
         if(fgt)
@@ -16761,6 +16783,8 @@ void EventTlzAuto::notify(bool isBeginAuto)
             res = transformSoul(fFgt, tFgt);
         if ((type & 0x10) && res==0)
             transformElixir(fFgt, tFgt);
+        if ((type &0x20) && res==0)
+            transfromXingchen(fFgt, tFgt);
 
         return res;
     }
@@ -16873,6 +16897,13 @@ void EventTlzAuto::notify(bool isBeginAuto)
             }
             money += abs(int(f-t))*1;
             money4 += abs(int(f-t))*1;
+        }
+        if (type & 0x20)
+        {
+            UInt8 fLevel = fFgt->getXingchenLvl();
+            UInt8 tLevel = tFgt->getXingchenLvl();
+
+            money += abs(int(fLevel - tLevel)) * 10;
         }
         //34是测试区
         if(getGold() < money && cfg.serverNum != 34)
@@ -17028,6 +17059,27 @@ void EventTlzAuto::notify(bool isBeginAuto)
         tFgt->sendMaxSoul();
         return 0;
     }
+
+    //换功星辰
+    UInt8 Player::transfromXingchen(Fighter * fFgt, Fighter * tFgt)
+    {
+         Xingchenzhen & fFgtxingchen = fFgt->getXingchen();
+         Xingchenzhen & tFgtxingchen = tFgt->getXingchen();
+         Xingchenzhen swapXingchen = fFgtxingchen;
+         fFgtxingchen = tFgtxingchen;
+         tFgtxingchen = swapXingchen;
+
+         fFgt->updateDBxingchen();
+         tFgt->updateDBxingchen();
+         fFgt->setDirty();
+         tFgt->setDirty();
+
+         fFgt->sendXingchenInfo(0);
+         tFgt->sendXingchenInfo(0);
+
+         return 0;
+    }
+
     void Player::transformElixir(Fighter * fFgt, Fighter * tFgt)
     {
         for (UInt8 i = 0; i < 14; ++i)
@@ -18447,10 +18499,10 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
  *2:大闹龙宫之金蛇起舞
  *3:大闹龙宫之天芒神梭
 */
-static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15 };
-static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402 };
+static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16 };
+static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405 };
 //6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页
-static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139 };
+static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520 };
 void Player::getDragonKingInfo()
 {
     if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)
@@ -18532,7 +18584,8 @@ void Player::postDragonKing(UInt8 count)
             UInt16 itemId = award.get<UInt16>(j);
             st << itemId << award.get<UInt8>(j+1);
             GetPackage()->Add(itemId, award.get<UInt32>(j+1), isBind, true, FromQixi);
-            if (itemId == Dragon_Broadcast[flag])
+            if (itemId == Dragon_Broadcast[flag]
+                    || (flag == YUANSHEN && (itemId == Dragon_Broadcast[flag]+1 || itemId == Dragon_Broadcast[flag]+2)))
                 SYSMSG_BROADCASTV(295, getCountry(), getName().c_str(), itemId);
         }
     }

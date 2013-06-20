@@ -308,6 +308,7 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
     bsim.applyFighterHP(0, pl);
 
     pl->setBuffData(PLAYER_BUFF_ATTACKING, now + 30);
+    pl->SetVar(VAR_DROP_OUT_ITEM_MARK, 0);
     return res;
 }
 

@@ -217,6 +217,7 @@ namespace GObject
         WUDUN       = 6,    //五遁神斧
         JIUYOU      = 7,    //九幽秘典
         JIUJIE      = 8,    //九戒困龙珠
+        YUANSHEN    = 9,    //元神出窍
         TREASURE    = 10,   //聚宝盆
 
         DRAGONKING_MAX,
@@ -1300,7 +1301,7 @@ namespace GObject
 
         void consumeGold(UInt32 c);
 
-        void xingchenInfo();
+        //void xingchenInfo();
 
 	public:
 		Map* GetMap();
@@ -1956,6 +1957,7 @@ namespace GObject
         UInt8 transformPotential(Fighter * fFgt, Fighter * tFgt);
         UInt8 transformCapacity(Fighter * fFgt, Fighter * tFgt);
         UInt8 transformSoul(Fighter * fFgt, Fighter * tFgt);
+        UInt8 transfromXingchen(Fighter * fFgt, Fighter * tFgt);
         void transformElixir(Fighter * fFgt, Fighter * tFgt);
             
     private:
@@ -2242,6 +2244,7 @@ namespace GObject
         UInt32 get2ndSoulBattlePoint();
         UInt32 getClanBattlePoint();
         UInt32 getLingbaoBattlePoint();
+        UInt32 getFormBattlePoint();
         void sendCompareBP(Player *);
     private:
         UInt32 _maxLingbaoBattlePoint;
