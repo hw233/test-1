@@ -810,6 +810,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             if (cfg.rpServer && rpFlag > 0)
                 pl->SetVar(GObject::VAR_RP_VALUE, rpFlag);
 
+            pl->SetVar(GObject::VAR_DROP_OUT_ITEM_MARK, 1);
 #ifndef _FB
 #ifndef _VT
 #ifndef _WIN32
@@ -1024,19 +1025,23 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
         {
             static UInt16 ids[] =
             {
-                503,    4,
-                549,    2,
-                9367,   10,
-                1325,   6,
-                134,    8,
-                9369,   16,
+                78,     1,
+                9371,   3,
+                509,    2,
+                503,    10,
+                515,    4,
+                549,    2
             };
 
+            UInt8 idx = 0;
             bool in = false;
             for (UInt8 i = 0; i < sizeof(ids)/sizeof(UInt16); i += 2)
             {
                 if (ids[i] == id && num == ids[i+1])
+                {
                     in = true;
+                    idx = i+1;
+                }
             }
 
             if (in)
@@ -1049,7 +1054,8 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
                         UInt16 id;
                         UInt16 num;
                         UInt32 code; // 0-正常 1-未开启 2-次数上限
-                    } purchase = {0,0,0};
+                        UInt8 idx;
+                    } purchase = {0,0,0,0};
 
                     if (!player->GetVar(GObject::VAR_DIRECTPUROPEN))
                         purchase.code = 1;
@@ -1059,6 +1065,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
 
                     purchase.id = id;
                     purchase.num = num;
+                    purchase.idx = idx;
                     GameMsgHdr hdr(0x2F2, player->getThreadId(), player, sizeof(purchase));
                     GLOBAL().PushMsg(hdr, &purchase);
 

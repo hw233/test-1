@@ -1301,7 +1301,7 @@ namespace GObject
 
         void consumeGold(UInt32 c);
 
-        void xingchenInfo();
+        //void xingchenInfo();
 
 	public:
 		Map* GetMap();
@@ -1957,6 +1957,7 @@ namespace GObject
         UInt8 transformPotential(Fighter * fFgt, Fighter * tFgt);
         UInt8 transformCapacity(Fighter * fFgt, Fighter * tFgt);
         UInt8 transformSoul(Fighter * fFgt, Fighter * tFgt);
+        UInt8 transfromXingchen(Fighter * fFgt, Fighter * tFgt);
         void transformElixir(Fighter * fFgt, Fighter * tFgt);
             
     private:

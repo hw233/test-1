@@ -984,15 +984,18 @@ private:
     Xingchenzhen m_xingchen;
 public:
     inline Xingchenzhen& getXingchen() { return m_xingchen; }
+    inline UInt8 getXingchenLvl()  {return m_xingchen.lvl;}
     void setXingchenFromDB(DBXingchen&);
-    bool upgradeXingchen();
+    bool upgradeXingchen(UInt8 type);
     void updateDBxingchen();
-    void sendXingchenInfo();
-    void setGem(UInt16 gemId,UInt8 bind, UInt8 pos);
-    void dismantleGem(UInt8 pos);
-    UInt32 exchangeXingchenValue(UInt16 zqId, UInt8 zqCount, UInt8 bind);
+    void sendXingchenInfo(UInt8 type);
+    void setGem(UInt16 gemId,UInt8 bind, UInt8 pos, UInt8 type);
+    void dismantleGem(UInt8 pos, UInt8 type);
+    UInt32 exchangeXingchenValue(UInt16 zqId, UInt32 zqCount, UInt8 bind);
     bool IsCanSetGem(ItemBase *item, UInt8 pos);
     void dismissXingchen();
+    bool quickUpGrade(UInt8 type);
+    void xingchenInfo(Stream & st);
 };
 
 class GlobalFighters
