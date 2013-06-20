@@ -2167,7 +2167,7 @@ void OnClanRankBattleSortListInner(GameMsgHdr& hdr, const void* data)
 void OnCompareBP( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
-	Player * pl = reinterpret_cast<Player *>(const_cast<void *>(data));
+	Player * pl = *reinterpret_cast<Player **>(const_cast<void *>(data));
     player->sendCompareBP(pl);
 }
 

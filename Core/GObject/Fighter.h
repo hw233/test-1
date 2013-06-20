@@ -971,6 +971,7 @@ public:
     UInt32 calc2ndSoulBattlePoint();  //第二元神
     UInt32 calcClanBattlePoint();  //帮派
     UInt32 calcLingbaoBattlePoint1();  //宝具
+    UInt32 calcFormBattlePoint();  //阵法
     // 仙宠
 public:
     inline bool isPet() { return getClass() >= e_cls_qinglong && getClass() <= e_cls_xuanwu; }

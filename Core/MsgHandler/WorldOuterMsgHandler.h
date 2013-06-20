@@ -2350,6 +2350,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         case 0x11:
         case 0x14:
         case 0x15:
+        case 0x16:
         {
             brd >> op;
             switch(op)

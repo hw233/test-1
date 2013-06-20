@@ -6567,7 +6567,7 @@ void OnComparBattelPoint( GameMsgHdr & hdr, CompareBattlePoint& cbp)
     else
     {
         GameMsgHdr hdr(0x275, tid, pl, sizeof(Player *));
-        GLOBAL().PushMsg(hdr, player);
+        GLOBAL().PushMsg(hdr, &player);
     }
 }
 

@@ -16555,6 +16555,18 @@ void EventTlzAuto::notify(bool isBeginAuto)
         return bp;
     }
 
+    UInt32 Player::getFormBattlePoint()
+    {
+        UInt32 bp = 0;
+        for(int j = 0; j < 5; ++ j)
+        {
+            Fighter* fighter = _playerData.lineup[j].fighter;
+            if(fighter)
+                bp += fighter->calcFormBattlePoint();
+        }
+        return bp;
+    }
+
     void Player::sendCompareBP(Player * player)
     {
         if(!player) return;
@@ -16572,6 +16584,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
         else
             st << static_cast<UInt32>(0);
         st << getLingbaoBattlePoint();
+        st << getFormBattlePoint();
         st << getCountry();
         Fighter * fgt = getMainFighter();
         if(fgt)
@@ -18445,10 +18458,10 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
  *2:大闹龙宫之金蛇起舞
  *3:大闹龙宫之天芒神梭
 */
-static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15 };
-static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402 };
+static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16 };
+static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405 };
 //6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页
-static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139 };
+static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520 };
 void Player::getDragonKingInfo()
 {
     if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)
@@ -18530,7 +18543,8 @@ void Player::postDragonKing(UInt8 count)
             UInt16 itemId = award.get<UInt16>(j);
             st << itemId << award.get<UInt8>(j+1);
             GetPackage()->Add(itemId, award.get<UInt32>(j+1), isBind, true, FromQixi);
-            if (itemId == Dragon_Broadcast[flag])
+            if (itemId == Dragon_Broadcast[flag]
+                    || (flag == YUANSHEN && (itemId == Dragon_Broadcast[flag]+1 || itemId == Dragon_Broadcast[flag]+2)))
                 SYSMSG_BROADCASTV(295, getCountry(), getName().c_str(), itemId);
         }
     }

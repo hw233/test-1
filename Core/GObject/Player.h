@@ -217,6 +217,7 @@ namespace GObject
         WUDUN       = 6,    //五遁神斧
         JIUYOU      = 7,    //九幽秘典
         JIUJIE      = 8,    //九戒困龙珠
+        YUANSHEN    = 9,    //元神出窍
         TREASURE    = 10,   //聚宝盆
 
         DRAGONKING_MAX,
@@ -2242,6 +2243,7 @@ namespace GObject
         UInt32 get2ndSoulBattlePoint();
         UInt32 getClanBattlePoint();
         UInt32 getLingbaoBattlePoint();
+        UInt32 getFormBattlePoint();
         void sendCompareBP(Player *);
     private:
         UInt32 _maxLingbaoBattlePoint;

@@ -1650,8 +1650,7 @@ void Fighter::addAttr( ItemEquip * equip )
 	{
 		if(ied.gems[i] != 0)
 		{
-            GData::ItemGemType * igt = NULL;
-			igt = GData::gemTypes[ied.gems[i] - LGEM_ID];
+            GData::ItemGemType * igt = GData::gemTypes[ied.gems[i] - LGEM_ID];
 			//addAttrExtra(_attrExtraEquip, igt->attrExtra);
             addAttrExtraGem(_attrExtraEquip, igt);
 		}
@@ -1878,8 +1877,7 @@ void Fighter::rebuildEquipAttr()
     {
         if(m_xingchen.gems[i] > 0)
         {
-            GData::ItemGemType * igt = NULL;
-			igt = GData::gemTypes[m_xingchen.gems[i] - LGEM_ID];
+            GData::ItemGemType * igt = GData::gemTypes[m_xingchen.gems[i] - LGEM_ID];
             addAttrExtraGem(_attrExtraEquip, igt);
         }
     }
@@ -6091,7 +6089,6 @@ UInt32 Fighter::calcBaseBattlePoint()
     addTalentAttr(attrExtra, this->getAttrType1(), this->getAttrValue1());
     addTalentAttr(attrExtra, this->getAttrType2(), this->getAttrValue2());
     addTalentAttr(attrExtra, this->getAttrType3(), this->getAttrValue3());
-    /*
     //镇封星辰宝石加成
     for(UInt8 i = 0; i < sizeof(m_xingchen.gems)/sizeof(m_xingchen.gems[0]); ++ i)
     {
@@ -6101,7 +6098,6 @@ UInt32 Fighter::calcBaseBattlePoint()
             addAttrExtraGem(attrExtra, igt);
         }
     }
-    */
 	fgt->_maxHP = Script::BattleFormula::getCurrent()->calcHP(fgt);
 	UInt32 point = Script::BattleFormula::getCurrent()->calcBattlePoint(fgt);
     delete fgt;
@@ -6362,6 +6358,14 @@ UInt32 Fighter::calcLingbaoBattlePoint1()
         }
     }
     return bp;
+}
+
+UInt32 Fighter::calcFormBattlePoint()
+{
+    if(isPet() || !_owner)
+        return 0;
+    const GData::Formation* form = GData::formationManager[_owner->getFormation()];
+    return form ? form->getBattlePoint() : 0;
 }
 /*
  *end分别计算散仙的战斗力

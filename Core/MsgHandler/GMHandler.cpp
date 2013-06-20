@@ -3356,11 +3356,12 @@ void GMHandler::OnShowBattlePoint(GObject::Player* player, std::vector<std::stri
                 UInt32 soulPoint = fighter->calc2ndSoulBattlePoint();
                 UInt32 clanPoint = fighter->calcClanBattlePoint();
                 UInt32 lingbaoPoint = fighter->calcLingbaoBattlePoint1();
+                UInt32 formPoint = fighter->calcFormBattlePoint();
                 UInt32 petPoint = 0;
                 FairyPet * pet = player->getBattlePet();
                 if(pet)
                     petPoint = pet->getBattlePoint();
-                SYSMSG_SENDV(627, player, fighter->getName().c_str(), basePoint, eqPoint, skillPoint, cittaPoint, soulPoint, clanPoint, petPoint, lingbaoPoint);
+                SYSMSG_SENDV(627, player, fighter->getName().c_str(), basePoint, eqPoint, skillPoint, cittaPoint, soulPoint, clanPoint, petPoint, lingbaoPoint, formPoint);
             }
         }
     }
