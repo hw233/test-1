@@ -810,6 +810,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             if (cfg.rpServer && rpFlag > 0)
                 pl->SetVar(GObject::VAR_RP_VALUE, rpFlag);
 
+            pl->SetVar(GObject::VAR_DROP_OUT_ITEM_MARK, 1);
 #ifndef _FB
 #ifndef _VT
 #ifndef _WIN32

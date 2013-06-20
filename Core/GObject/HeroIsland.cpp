@@ -588,6 +588,7 @@ void HeroIsland::applayPlayers()
                         pd->player->AddExp(calcExp(pd->player->GetLev())*_expfactor[j-1]*factor);
                     pd->expcd = now + 60;
                 }
+                pd->player->SetVar(VAR_DROP_OUT_ITEM_MARK, 0);
                 pd->player->getSurnameLegendAward(e_sla_hi);
             }
 

@@ -1304,7 +1304,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->GetFairySpar()->sendAllInfo();
     pl->sendDirectPurInfo();
     pl->getQQTenpayAward(0);
-    pl->xingchenInfo();
+   // pl->xingchenInfo();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -6126,7 +6126,7 @@ void OnDelueGemReq( GameMsgHdr & hdr, const void * data )
             UInt8 pos = 0;
             br >> gemId >> bind >> pos;
 
-            fgt->setGem(gemId, bind, pos);
+            fgt->setGem(gemId, bind, pos, opt);
         }
         break;
     case 2:
@@ -6135,7 +6135,7 @@ void OnDelueGemReq( GameMsgHdr & hdr, const void * data )
             UInt8 pos = 0;
             br >> pos;
 
-            fgt->dismantleGem(pos);
+            fgt->dismantleGem(pos, opt);
         }
         break;
     case 3:
@@ -6144,7 +6144,7 @@ void OnDelueGemReq( GameMsgHdr & hdr, const void * data )
             UInt8 itemDataCount = 0;
             UInt32 xcValue = 0;
             UInt16 zqId = 0;
-            UInt8 zqCount = 0;
+            UInt32 zqCount = 0;
             UInt8 bind = 0;
 
             br >> itemDataCount;
@@ -6166,14 +6166,20 @@ void OnDelueGemReq( GameMsgHdr & hdr, const void * data )
             if(xcValue > 0)
             {
                 player->AddVar(VAR_XINGCHENZHEN_VALUE, xcValue);
-                fgt->sendXingchenInfo();
+                fgt->sendXingchenInfo(opt);
             }
         }
         break;
     case 4:
         {
             //星辰图升级
-            fgt->upgradeXingchen();
+            fgt->upgradeXingchen(opt);
+        }
+        break;
+    case 5:
+        {
+            //一键描绘星辰图
+            fgt->quickUpGrade(opt);
         }
         break;
     }
