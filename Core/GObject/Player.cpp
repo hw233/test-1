@@ -11249,7 +11249,7 @@ namespace GObject
             GetPackage()->AddItem(503, 1, true, false, FromQQTenpay);
             GetPackage()->AddItem(515, 1, true, false, FromQQTenpay);
             GetPackage()->AddItem(509, 1, true, false, FromQQTenpay);
-            GetPackage()->AddItem(30, 2, true, false, FromQQTenpay);
+            GetPackage()->AddItem(50, 10, true, false, FromQQTenpay);
 
             SetVar(VAR_QQTENPAY_AWARD, 1);
             state = 1;
