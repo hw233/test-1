@@ -6394,8 +6394,6 @@ int BattleSimulator::testWinner()
         size_t c = fgtlist.size();
         for(size_t i = 0; i < c; ++ i)
         {
-            if(fgtlist[i]->isSoulOut())
-                continue;
             alive[fgtlist[i]->getSide()] ++;
         }
     }
@@ -6418,8 +6416,6 @@ int BattleSimulator::testWinner2()
         size_t c = fgtlist.size();
         for(size_t i = 0; i < c; ++ i)
         {
-            if(fgtlist[i]->isSoulOut())
-                continue;
             leftHPAll[fgtlist[i]->getSide()] += fgtlist[i]->getHP();
         }
     }
@@ -12052,11 +12048,12 @@ bool BattleSimulator::doSkillEffectExtra_Dead(BattleFighter* bf, const GData::Sk
 {
     if(!skill || !skill->effect)
         return false;
+    const std::vector<float>& efv = skill->effect->efv;
     const std::vector<UInt16>& eft = skill->effect->eft;
     const std::vector<UInt8>& efl = skill->effect->efl;
 
     size_t cnt = eft.size();
-    if(cnt != efl.size())
+    if(cnt != efl.size() || efv.size() != cnt)
         return false;
 
     for(size_t i = 0; i < cnt; ++ i)
@@ -12069,7 +12066,7 @@ bool BattleSimulator::doSkillEffectExtra_Dead(BattleFighter* bf, const GData::Sk
         }
         else if(eft[i] == GData::e_eft_soul_out)
         {
-            bf->setSoulOut(true, efl[i]);
+            bf->setSoulOut(efv[i], efl[i]);
             appendDefStatus(e_soulout, 0, bf);
             return true;
         }

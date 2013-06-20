@@ -2555,6 +2555,7 @@ void BattleFighter::updateSoulSkillDead(UInt16 skillId)
     if(skillItem.base == NULL)
         return;
 
+    skillItem.cd = 0;
     if(skillItem.base->prob > 99.999f)
     {
         skillItem.rateExtent = 0;
@@ -2563,7 +2564,10 @@ void BattleFighter::updateSoulSkillDead(UInt16 skillId)
     else
     {
         size_t cnt = _passiveSkillDead.size();
-        skillItem.rateExtent = _passiveSkillDead[cnt-1].rateExtent + skillItem.base->prob * 100;
+        if(cnt > 0)
+            skillItem.rateExtent = _passiveSkillDead[cnt-1].rateExtent + skillItem.base->prob * 100;
+        else
+            skillItem.rateExtent = skillItem.base->prob * 100;
         _passiveSkillDead.insert(_passiveSkillDead.end(), skillItem);
     }
 }
