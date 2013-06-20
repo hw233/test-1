@@ -981,6 +981,7 @@ void OnDirectPurchase( GameMsgHdr& hdr, const void * data )
         UInt16 id;
         UInt16 num;
         UInt32 code; // 0-正常 1-未开启 2-次数上限
+        UInt8 idx;
     };
 
     DirectPurchase* pur = (DirectPurchase*)data;
@@ -1010,6 +1011,10 @@ void OnDirectPurchase( GameMsgHdr& hdr, const void * data )
     pkg->AddItem(pur->id, pur->num, true, false, FromDirectPurchase);
     player->AddVar(VAR_DIRECTPURCNT, 1);
     player->sendDirectPurInfo();
+
+    char action[32] = {0,};
+    snprintf(action, sizeof(action), "F_130619_%d", pur->idx);
+    player->udpLog("Qdianzhigou", action, "", "", "", "", "act");
 }
 
 void OnYDPacks( GameMsgHdr& hdr, const void * data )
