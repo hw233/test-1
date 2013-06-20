@@ -789,7 +789,7 @@ bool Trade::appendTradeItems(ItemBase** items, UInt16 itemNum)
 {
 	if (itemNum == 0)
 		return true;
-	UInt16 grids = 0;
+	UInt16 grids = 0, grids1 = 0;
 	Package* package = _owner->GetPackage();
 	for (UInt16 i = 0; i < itemNum; ++i)
 	{
@@ -798,9 +798,15 @@ bool Trade::appendTradeItems(ItemBase** items, UInt16 itemNum)
 		if (IsEquipId(items[i]->getId()))
 			++grids;
 		else
-			grids += package->GetItemUsedGrids(items[i]->getId(), items[i]->Count());
+        {
+            UInt16 size = package->GetItemUsedGrids(items[i]->getId(), items[i]->Count());
+            if(GetItemSubClass(items[i]->getId()) == Item_Soul)
+                grids1 += size;
+            else
+                grids += size;
+        }
 	}
-	if (grids > package->GetRestPackageSize())
+	if (grids > package->GetRestPackageSize(0) || grids1 > package->GetRestPackageSize(1))
 	{
 		_owner->sendMsgCode(2, 1015);
 		return false;

@@ -481,7 +481,7 @@ namespace GObject
         }
     }
 
-	Package::Package(Player* player) : m_Owner(player), m_Size(0), _lastActivateLv(0), _lastActivateQ(0), _lastActivateCount(0)
+	Package::Package(Player* player) : m_Owner(player), m_Size(0), m_SizeSoul(0), _lastActivateLv(0), _lastActivateQ(0), _lastActivateCount(0)
 	{
 	}
 
@@ -699,7 +699,10 @@ namespace GObject
 			bool ret = TryAddItem(item, num);
 			if (ret)
 			{
-				m_Items[ItemKey(typeId, bind)] = item;
+                if(GetItemSubClass(typeId) == Item_Soul)
+				    m_ItemsSoul[ItemKey(typeId, bind)] = item;
+                else
+				    m_Items[ItemKey(typeId, bind)] = item;
 				DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, %u, %"I64_FMT"u, %u)", typeId, num, m_Owner->getId(), bind ? 1 : 0);
                 if (fromWhere != FromNpcBuy && (GData::store.getPrice(typeId) || GData::GDataManager::isInUdpItem(typeId)))
                 {
@@ -864,11 +867,20 @@ namespace GObject
 		}
 		else
 		{
-			UInt32 newSize = m_Size + item->Size();
-			if(newSize > (UInt32)(m_Owner->getPacksize()) + 50)
-				return item;
-			m_Size = newSize;
-			m_Items[ItemKey(typeId, bind)] = item;
+            if(GetItemSubClass(typeId) == Item_Soul)
+            {
+                if(item->Size() + m_SizeSoul > m_Owner->getPacksize(1))
+                    return item;
+                m_ItemsSoul[ItemKey(typeId, bind)] = item;
+                ++ m_SizeSoul;
+            }
+            else
+            {
+                if(item->Size() + m_Size > m_Owner->getPacksize(0) + 50)
+                    return item;
+                m_Items[ItemKey(typeId, bind)] = item;
+                ++ m_Size;
+            }
 			DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, %u, %"I64_FMT"u, %u)", typeId, count, m_Owner->getId(), bind ? 1 : 0);
             if (fromWhere != FromNpcBuy && (GData::store.getPrice(typeId) || GData::GDataManager::isInUdpItem(typeId)))
             {
@@ -952,9 +964,17 @@ namespace GObject
 		ITEM_BIND_CHECK(itemType->bindType,bind);
 		item->SetBindStatus(bind);
         UInt16 oldq = item->Size(), newq = item->Size(item->Count() + num);
-        m_Size = m_Size + newq - oldq;
         item->IncItem(num);
-        m_Items[ItemKey(id, bind)] = item;
+        if(GetItemSubClass(id) == Item_Soul)
+        {
+            m_SizeSoul = m_SizeSoul + newq - oldq;
+            m_ItemsSoul[ItemKey(id, bind)] = item;
+        }
+        else
+        {
+            m_Size = m_Size + newq - oldq;
+            m_Items[ItemKey(id, bind)] = item;
+        }
 		return item;
 	}
 
@@ -1440,7 +1460,10 @@ namespace GObject
 			if (cnt == 0)
 			{
 				SAFE_DELETE(item);
-				m_Items.erase(ItemKey(id, bind));
+                if(GetItemSubClass(id) == Item_Soul)
+				    m_ItemsSoul.erase(ItemKey(id, bind));
+                else
+				    m_Items.erase(ItemKey(id, bind));
 				DB4().PushUpdateData("DELETE FROM `item` WHERE `id` = %u AND `bindType` = %u AND `ownerId` = %"I64_FMT"u", id, bind, m_Owner->getId());
 			}
 			else
@@ -1505,7 +1528,10 @@ namespace GObject
 			if (cnt == 0)
 			{
 				SAFE_DELETE(item);
-				m_Items.erase(ItemKey(id, bind));
+                if(GetItemSubClass(id) == Item_Soul)
+				    m_ItemsSoul.erase(ItemKey(id, bind));
+                else
+				    m_Items.erase(ItemKey(id, bind));
 				DB4().PushUpdateData("DELETE FROM `item` WHERE `id` = %u AND `bindType` = %u AND `ownerId` = %"I64_FMT"u", id, bind, m_Owner->getId());
 			}
 			else
@@ -2211,7 +2237,10 @@ namespace GObject
                 return 2;
         }
         else{
-            if(item->Size(item->Count() + Mnum) - item->Size() + 1 > GetRestPackageSize())
+            UInt16 grids = item->Size(item->Count() + Mnum) - item->Size() + 1;
+            if(GetItemSubClass(itemId) == Item_Soul && grids > GetRestPackageSize(1))
+                return 2;
+            if(GetItemSubClass(itemId) != Item_Soul && grids > GetRestPackageSize(0))
                 return 2;
         }
 
@@ -2357,6 +2386,12 @@ namespace GObject
 				count++;
 				AppendItemData(st, item);
 			}
+		}
+        cit = m_ItemsSoul.begin();
+		for (; cit != m_ItemsSoul.end(); ++cit)
+		{
+            count++;
+            AppendItemData(st, cit->second);
 		}
 		st.data<UInt16>(4) = count;
 		st << Stream::eos;
@@ -3441,11 +3476,11 @@ namespace GObject
 		bool bind = false;
         if(!protect)
         {
-            if(DelItem(ITEM_DETACH_RUNE, 1, true))
-                bind = true;
-            else if(!DelItem(ITEM_DETACH_RUNE, 1, false))
-                return 2;
-             AddItemHistoriesLog(ITEM_DETACH_RUNE, 1);
+            //if(DelItem(ITEM_DETACH_RUNE, 1, true))
+            //    bind = true;
+            //else if(!DelItem(ITEM_DETACH_RUNE, 1, false))
+            //    return 2;
+            //AddItemHistoriesLog(ITEM_DETACH_RUNE, 1);
             //DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_DETACH_RUNE, 1, TimeUtil::Now());
         }
         else
@@ -5655,14 +5690,22 @@ namespace GObject
 
 	bool Package::TryAddItem( ItemBase * item, UInt16 num )
 	{
-		UInt16 cur = m_Size;
+        if(item == NULL)
+            return false;
+        bool isSoul = GetItemSubClass(item->GetTypeId()) == Item_Soul;
+		UInt16 cur = isSoul ? m_SizeSoul : m_Size;
 		UInt16 oldq = item->Size(), newq = item->Size(item->Count() + num);
 		cur = cur - oldq + newq;
-		if(cur > m_Owner->getPacksize() + 50)
+        if(isSoul && cur > m_Owner->getPacksize(1))
+			return false;
+		if(!isSoul && cur > m_Owner->getPacksize(0) + 50)
 			return false;
 		if(!item->IncItem(num))
 			return false;
-		m_Size = cur;
+        if(isSoul)
+		    m_SizeSoul = cur;
+        else
+		    m_Size = cur;
 		return true;
 	}
 
@@ -5699,14 +5742,20 @@ namespace GObject
 
 	bool Package::TryDelItem( ItemBase * item, UInt16 num )
 	{
+        if(item == NULL)
+            return false;
 		if(item->Count() < num)
 			return false;
-		UInt16 cur = m_Size;
+        bool isSoul = GetItemSubClass(item->GetTypeId()) == Item_Soul;
+		UInt16 cur = isSoul ? m_SizeSoul : m_Size;
 		UInt16 oldq = item->Size(), newq = item->Size(item->Count() - num);
 		cur = cur - oldq + newq;
 		if(!item->DecItem(num))
 			return false;
-		m_Size = cur;
+        if(isSoul)
+		    m_SizeSoul = cur;
+        else
+		    m_Size = cur;
 
 		return true;
 	}

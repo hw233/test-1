@@ -7910,7 +7910,8 @@ function SurnameLegendLoot(player,lootlvl)
     };
     local package = player:GetPackage();
     --package:AddItem(9383, itemNum[lootlvl], true,0,10);
-    package:AddItem(9397, itemNum[lootlvl], true,0,10);
+    --package:AddItem(9397, itemNum[lootlvl], true,0,10);
+    package:AddItem(9401, itemNum[lootlvl], true,0,10);
 end
 
 -- 万圣节套装
@@ -8609,7 +8610,7 @@ end
 
 function GetLuckyBagAward(player)
     local items = {
-       { 9367,5} , {9369,5},{ 503,5},{515,1},{134,1},{1325,2} 
+       { 9367,5} , {9369,5},{ 503,5},{515,1},{138,1},{1325,2}
     } 
     for i = 1 , 5  do
         local num = player:GetVar(452+i);
@@ -8626,7 +8627,7 @@ function GetLuckyBagAward(player)
         player:GetPackage():Add(item[1],item[2],true,false,32);
     end
     player:sendLuckyBagInfo();
-    Broadcast(0x27, "恭喜玩家[p:"..player:getCountry()..":"..player:getPName().."]".."在\"儿童节快乐\"活动中人品爆发，集齐所有卡牌，成功领取超级大奖")
+    Broadcast(0x27, msg_68.."[p:"..player:getCountry()..":"..player:getPName().."]"..msg_136)
     return true
 end
 

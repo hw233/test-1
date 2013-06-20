@@ -7,7 +7,7 @@ local maxSoul = {
 
 local point2Award = {
     [maxSoul[1]] = {Money["Coupon"],10, 55,5, 502,5, 510,5},
-    [maxSoul[2]] = {5131,1, 504,5, 5102,1},
+    [maxSoul[2]] = {5131,1, 502,5, 5102,1},
     [maxSoul[3]] = {Money["Coupon"],20, 9,3, 15,2, 511,2},
     [maxSoul[4]] = {56,5, 57,5},
     [maxSoul[5]] = {Money["Coupon"],30, 500,3, 133,2, 512,2},

@@ -1201,7 +1201,7 @@ function ItemNormal_00000429(iid, num, bind, param)
 		return false;
 	end
 
-    local items = {{502,1},{504,1},{5002,1},{5012,1},{5022,1},{5032,1},{5042,1},{5052,1},{5062,1},{5072,1},{5082,1},{5092,1},{5102,1},{5112,1},{5122,1},{5132,1},{5142,1},{15,1},{510,1},{55,2}}
+    local items = {{502,1},{502,1},{5002,1},{5012,1},{5022,1},{5032,1},{5042,1},{5052,1},{5062,1},{5072,1},{5082,1},{5092,1},{5102,1},{5112,1},{5122,1},{5132,1},{5142,1},{15,1},{510,1},{55,2}}
 
     for k = 1, num do
         local i = math.random(1, #items)
@@ -1369,7 +1369,7 @@ function ItemNormal_00000448(iid, num, bind, param)
             return used
         end
 
-        local item = {502,510,504,55}
+        local item = {502,510,502,55}
         local i = math.random(1,#item)
         used = used + 1
         package:AddItem(item[i], 1, true, false)
@@ -1415,7 +1415,7 @@ function ItemNormal_00000478(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-    local items = {502,504,510,50000,60000,60000,60001,508,506,503,514,}
+    local items = {502,502,510,50000,60000,60000,60001,508,506,503,514,}
     local nums = {1,1,1,1,500,1000,10,1,1,1,1,}
     local prob = {888,1775,2781,4024,5207,6095,7042,7930,8817,9113,10000,}
     local item = 0
@@ -1647,7 +1647,7 @@ function ItemNormal_00000492(iid, num, bind, param)
         return false;
     end
 
-    local items = {{502,1},{504,1},{0,1},{510,1},{55,2}}
+    local items = {{502,1},{502,1},{0,1},{510,1},{55,2}}
 
     for tmp = 1,num do
         local i = math.random(1, #items)
@@ -2461,8 +2461,8 @@ function ItemNormal_00000021(iid, num, bind, param)
 		   package:AddItem(57, 1*num, 1, 0, 2);
 		   package:AddItem(48, 1*num, 1, 0, 2);
 		   package:AddItem(51, 1*num, 1, 0, 2);
-		   package:AddItem(502, 1*num, 1, 0, 2);
-		   package:AddItem(504, 1*num, 1, 0, 2);
+		   package:AddItem(502, 2*num, 1, 0, 2);
+		   --package:AddItem(504, 1*num, 1, 0, 2);
 		   package:AddItem(1212, 1*num, 1, 0, 2);
 		   package:AddItem(5031, 1*num, 1, 0, 2);
 		   player:getCoupon(40*num);
@@ -3041,7 +3041,7 @@ function ItemNormal_00007000(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage()
 
-	if package:GetRestPackageSize() < (2+3*num/99) then
+	if package:GetRestPackageSize(1) < (2+3*num/99) then
 		player:sendMsgCode(2, 1011, 0);
 		return false;
 	end
@@ -7814,7 +7814,7 @@ function ItemNormal_00009279(iid, num, bind, param)
     local _items = {
         [1] = {
             {{502,1},},
-            {{504,1},},
+            {{502,1},},
             {{5002,1},{5012,1},{5022,1},{5032,1},{5042,1},{5052,1},{5062,1},{5072,1},{5082,1},{5092,1},{5102,1},{5112,1},{5122,1},{5132,1},{5142,1},},
             {{55,2},},
             {{510,1},},
@@ -8047,7 +8047,7 @@ function ItemNormal_00009193(iid, num, bind, param)
     end
 
     for tmp=1,num do
-        local item = {502,510,504,55}
+        local item = {502,510,502,55}
         local i = math.random(1,#item)
 
         package:AddItem(item[i], 1, true, false)
@@ -8753,7 +8753,7 @@ end
 function ItemNormal_00009382(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage()
-    local items = { 15, 9088, 512, 33, 9371, 551, 501, 513, 503, 1325, 134, 507, 509, 515 }
+    local items = { 15, 9088, 512, 33, 9371, 551, 501, 513, 503, 1325, 138, 507, 509, 515 }
     local chance = { 1500,3000,3900,4800,5700,6600,7400,8200,8800,9100,9400,9600,9800,10000 }
     local card_num = 0;
     local used_num = player:GetVar(452);
@@ -8772,7 +8772,8 @@ function ItemNormal_00009382(iid, num, bind, param)
             end
         end
         package:Add(items[g], 1, true, false, 2)
-        if iid == 9397 and getSurnameLegend() then
+        --if iid == 9397 and getSurnameLegend() then
+        if iid == 9401 and getSurnameLegend() then
             local rand_card = math.random(1,10000);
             local card_chance = 3000;
             if used_num + n > 30 then
@@ -8792,7 +8793,8 @@ function ItemNormal_00009382(iid, num, bind, param)
     if card_num > 0 then
         SendMsg(player, 0x35, "获得卡牌 x"..card_num);
     end
-    if iid == 9397 and getSurnameLegend() then
+    --if iid == 9397 and getSurnameLegend() then
+    if iid == 9401 and getSurnameLegend() then
         player:AddVar(452, num)
     end
     player:sendLuckyBagInfo()
@@ -10554,6 +10556,7 @@ local ItemNormal_Table = {
     [9382] = ItemNormal_00009382,
     [9383] = ItemNormal_00009382,
     [9397] = ItemNormal_00009382,
+    [9401] = ItemNormal_00009382,
     [9388] = ItemNormal_00009388,
     [9390] = ItemNormal_00009390,
     [9900] = ItemNormal_NameCard,
@@ -10568,6 +10571,7 @@ local ItemNormal_Table = {
     [9909] = ItemNormal_NameCard,
     [9910] = ItemNormal_NameCard,
     [9911] = ItemNormal_NameCard,
+    [9913] = ItemNormal_NameCard,
 
     [10000] = ItemNormal_00010000,
     [10001] = ItemNormal_00010001,
