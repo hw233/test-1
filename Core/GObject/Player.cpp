@@ -11038,11 +11038,10 @@ namespace GObject
     
     void Player::getVipLevelAward(UInt8 opt)
     {
-        return; //暂时不上
-
         if(opt > getVipLevel() && opt > 15)
         {
             return;
+            sendMsgCode(0, 1003);
         }
 
         if (GetPackage()->GetRestPackageSize() < 6 && opt > 0)
