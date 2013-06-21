@@ -8863,6 +8863,23 @@ namespace GObject
         return name;
 	}
 
+    std::string Player::getRealName()
+    {
+        if(cfg.merged && !_playerData.name.empty())
+        {
+            std::string name = _playerData.name;
+            Int32 index = name.size() - 1;
+            for (; index > 0; --index)
+            {
+                if(static_cast<UInt8>(name[index]) >= 32)
+                    break;
+            }
+            name.resize(index + 1);
+            return name;
+        }
+        return _playerData.name;
+    }
+
     void Player::patchDeleteDotS(std::string& name)
     {
         if(cfg.merged && !name.empty())
