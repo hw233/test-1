@@ -21369,6 +21369,24 @@ static UInt32 zcjb_award[16][3] = {
     {8480, 8960, 13000}, {16000, 16500, 23000}, {32100, 33300, 50000}, {64200, 66600, 90000},
     {106000, 109000, 160000}, {216000, 222000, 350000}, {432000, 444000, 680000}, {880000, 896000, 999999}
 };
+static const char* zcjb_udplog[16] = {
+    "F_130613_1",
+    "F_130613_2",
+    "F_130613_3",
+    "F_130613_4",
+    "F_130613_5",
+    "F_130613_6",
+    "F_130613_7",
+    "F_130613_8",
+    "F_130613_9",
+    "F_130613_10",
+    "F_130613_11",
+    "F_130613_12",
+    "F_130613_13",
+    "F_130613_14",
+    "F_130613_15",
+    "F_130613_16",
+};
 
 bool Player::getRPZCJBAward()
 {
@@ -21395,6 +21413,7 @@ bool Player::getRPZCJBAward()
 
     ConsumeInfo ci(ZCJBRoolAward,0,0);
     useGold(zcjb_gold[awardIdx], &ci);
+    udpLog("xschoujiang", zcjb_udplog[awardIdx], "", "", "", "", "act");
 
     UInt32 awardGold = zcjb_award[awardIdx][roolIdx] + uRand((zcjb_award[awardIdx][roolIdx+1] - zcjb_award[awardIdx][roolIdx]));
     IncommingInfo ii(InZCJBRoolAward, 0, 0);
