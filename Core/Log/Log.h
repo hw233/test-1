@@ -240,6 +240,7 @@ enum ItemFrom
     FromEquipMoveAward = 54, //装备继承奖励
     FromOEquipAward = 55, //橙装礼包
     FromRYHBAward = 56, //日月合璧
+    FromVipLevelAward = 57, //御剑等级回馈
     //80 ~ 100，繁体占用
 };
 

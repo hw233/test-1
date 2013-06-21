@@ -3187,6 +3187,16 @@ namespace GObject
 		st << Stream::eos;
 	}
 
+	void Player::xingchenInfo()
+	{
+		for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++it)
+	    {
+            if(it->second)
+            {
+                it->second->sendXingchenInfo();
+            }
+        }
+	}
 
 	void Player::makeFighterList( Stream& st )
 	{
@@ -11002,10 +11012,53 @@ namespace GObject
             //装备继承补偿
             getEquipMoveAward(opt);
             break;
-
+        case 25:
+            //御剑等级回馈
+            getVipLevelAward(opt);
+            break;
         }
     }
-                
+    
+    void Player::getVipLevelAward(UInt8 opt)
+    {
+        return; //暂时不上
+
+        if(opt > getVipLevel())
+        {
+            return;
+        }
+
+        if (GetPackage()->GetRestPackageSize() < 6 && opt > 0)
+        {
+            sendMsgCode(0, 1011);
+
+            return;
+        }
+
+        UInt32 state = GetVar(VAR_VIPLEVEL_AWARD);
+
+        if(opt > 0)
+        {
+            UInt8 pos = opt - 1;
+            UInt8 mark = GET_BIT(state, pos);
+
+            if(opt > 0 && mark == 0)
+            {
+                bool res = GameAction()->onVipLevelAward(opt);
+                if(res)
+                {
+                    state = SET_BIT(state, pos);
+                    SetVar(VAR_VIPLEVEL_AWARD, state);
+                }
+            }
+        }
+
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(25);
+        st << state << Stream::eos;
+        send(st);
+    }
+
     void Player::getEquipMoveAward(UInt8 opt)
     {   
         return; //暂时不上

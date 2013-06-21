@@ -456,7 +456,8 @@ namespace GObject
         VAR_FRONTMAP_AUTO_FIGHT_USE_MONEY_MARK = 508, // 阵图自动战斗使用金钱情况
         VAR_DUNGEON_AUTO_FIGHT_USE_MONEY_MARK = 509, // 决战之地自动战斗使用金钱情况
         VAR_JOBHUNT_AUTO_FIGHT_USE_MONEY_MARK = 510, // 寻墨自动战斗使用金钱情况
-        
+        VAR_VIPLEVEL_AWARD = 511, // 御剑等级回馈
+
         // 521-540 for zhgc
         VAR_ZCJB_TIMES = 521,      // 招财进宝
         VAR_ZCJB_GOLD_GOT = 522,   // 招财进宝总共获得仙石

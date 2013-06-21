@@ -1298,6 +1298,8 @@ namespace GObject
 
         void consumeGold(UInt32 c);
 
+        void xingchenInfo();
+
 	public:
 		Map* GetMap();
 		SpotData * GetMapSpot();
@@ -2148,6 +2150,7 @@ namespace GObject
         void getQQTenpayAward(UInt8 opt);
         void getQQIMQuickLoginAward(UInt8 opt);
         void getEquipMoveAward(UInt8 opt);
+        void getVipLevelAward(UInt8 opt);
         UInt32 getFighterEquipAward();
 
         // 帮派神像

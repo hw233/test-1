@@ -5148,7 +5148,7 @@ namespace GObject
 			if(pl == NULL)
 				continue;
 			Fighter * fgt = pl->findFighter(dbxc.fighterId);
-			if(fgt == NULL || fgt->getLevel() < 60)
+			if(fgt == NULL || fgt->getLevel() < 55)
             {
                 continue;
             }

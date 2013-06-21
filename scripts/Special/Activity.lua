@@ -1,4 +1,4 @@
-﻿function checkExpire(player)
+function checkExpire(player)
   local tm = os.time()
   local nextReward = player:getNextExtraReward()
   if tm >= nextReward then
@@ -979,6 +979,25 @@ function sendWinReward(player, lootlvl, typeId)
         else
             package:Add(actItems[lootlvl], 1, true);
         end
+    end
+end
+
+function onVipLevelAward(vipLevel)
+    
+    local itemCount = {3, 10, 20, 45, 100, 150, 200, 270, 360, 500, 650, 800, 950, 1300, 1800};
+
+    local startTime = { ['year'] = 2013, ['month'] = 6, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local endTime = { ['year'] = 2013, ['month'] = 6, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local s = os.time(startTime);
+    local e = os.time(endTime);
+    local n = os.time();
+    
+    if n >= s and n < e  and vipLevel >=1 && vipLevel <= 15 then
+        package:AddItem(503, itemCount[vipLevel-1], true, false, 57);
+
+        return true;
+    else
+        return false;
     end
 end
 

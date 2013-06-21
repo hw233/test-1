@@ -1680,5 +1680,9 @@ namespace Script
         return Call<Table>("GetFairySparElement", flag);
     }
 
+    bool GameActionLua::onVipLevelAward(UInt8 opt)
+    {
+        return Call<bool>("onVipLevelAward", opt);
+    }
 }
 

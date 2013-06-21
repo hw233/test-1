@@ -1304,6 +1304,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->GetFairySpar()->sendAllInfo();
     pl->sendDirectPurInfo();
     pl->getQQTenpayAward(0);
+    pl->xingchenInfo();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -6107,19 +6108,13 @@ void OnDelueGemReq( GameMsgHdr & hdr, const void * data )
 
     switch(opt)
     {
-    case 0:
-        {
-            //请求多彩宝石信息
-            fgt->sendXingchenInfo();
-        }
-        break;
     case 1:
         {
             //请求镶嵌宝石
             UInt16 gemId = 0;
             UInt8  bind = 0;
             UInt8 pos = 0;
-            br >> gemId >> bind >>pos;
+            br >> gemId >> bind >> pos;
 
             fgt->setGem(gemId, bind, pos);
         }
