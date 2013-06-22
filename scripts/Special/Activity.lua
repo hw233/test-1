@@ -992,7 +992,7 @@ function onVipLevelAward(vipLevel)
     local e = os.time(endTime);
     local n = os.time();
     
-    if n >= s and n < e  and vipLevel >=1 && vipLevel <= 15 then
+    if n >= s and n < e  and vipLevel >=1 and vipLevel <= 15 then
         package:AddItem(503, itemCount[vipLevel-1], true, false, 57);
 
         return true;
