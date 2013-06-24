@@ -692,6 +692,43 @@ public:
         return _surnamelegend;
     } 
 
+    inline static void setRYHBActivity(bool v)
+    {
+        UInt32 opTime = TimeUtil::MkTime(cfg.openYear, cfg.openMonth, cfg.openDay);
+        UInt32 time20130531 = TimeUtil::MkTime(2013, 5, 31);
+        if(opTime >= time20130531)
+            return;
+
+        UInt32 begin = GVAR.GetVar(GVAR_RYHB_ACTIVITY_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_RYHB_ACTIVITY_END);
+        UInt32 now = TimeUtil::Now();
+        if( now >= begin && now <= end)
+            return;
+        _ryhbActivity = v;
+    }
+
+    inline static bool getRYHBActivity()
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_RYHB_ACTIVITY_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_RYHB_ACTIVITY_END);
+        UInt32 now = TimeUtil::Now();
+        if(begin != 0 && end != 0)
+        {
+            if(_ryhbActivity)
+            {
+                if(now < begin || now > end)
+                    _ryhbActivity = false;
+            }
+            else
+            {
+                if(now >= begin && now <= end)
+                    _ryhbActivity = true;
+            }
+        }
+
+        return _ryhbActivity;
+    }
+
     inline static void setHalfGold(bool v)
     { _halfgold = v; }
     inline static bool getHalfGold()
@@ -865,6 +902,7 @@ public:
     static bool _compassact;
     static bool _foolbao;
     static bool _surnamelegend;
+    static bool _ryhbActivity;
     static bool _halfgold;
     static UInt8 _callsnakeeggact;
     static UInt8 _snakeeggawardact;
