@@ -1287,7 +1287,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->svrSt(4);
     pl->sendRP7TreasureInfo(true);
     pl->sendRP7SignInfo();
-    if(cfg.rpServer != e_rp_xinyun)
+    //if(cfg.rpServer != e_rp_xinyun)
     {
         pl->sendRPZCJBInfo();
         pl->sendRYHBInfo();
@@ -6531,8 +6531,8 @@ void OnRPServerReq( GameMsgHdr & hdr, const void * data)
             break;
         case 0x05:
             {
-                if(cfg.rpServer == e_rp_xinyun)
-                    break;
+                /*if(cfg.rpServer == e_rp_xinyun)
+                    break; */
                 UInt8 type = 0;
                 brd >> type;
                 if(1 == type)
