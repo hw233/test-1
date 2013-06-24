@@ -1750,7 +1750,7 @@ namespace GObject
             if(!pl->hasTitle(dbpd.pdata.title))
                 pl->fixOldVertionTitle(dbpd.pdata.title);
             */
-            if(!pl->hasTitle(dbpd.pdata.title) && pl->isForeverTitle(dbpd.pdata.title))
+            if(!pl->hasTitle(dbpd.pdata.title) && !pl->isForeverTitle(dbpd.pdata.title))
                 pl->changeTitle(0);
             pl->setOpenId(dbpd.openid, true);
 
