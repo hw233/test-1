@@ -6151,6 +6151,7 @@ void Fighter::dismissXingchen()
     if(!stxc || getLevel() < stxc->limitLev)
         return;
     UInt8 size = 2;
+    bool hasMail = false;
     for(UInt8 i = 0; i < sizeof(m_xingchen.gems)/sizeof(m_xingchen.gems[0]); ++ i)
     {
         if(m_xingchen.gems[i] > 0)
@@ -6165,6 +6166,7 @@ void Fighter::dismissXingchen()
         {
             mitem[j].id = m_xingchen.gems[i];
             mitem[j].count = 1;
+            hasMail = true;
             ++ j;
         }
     }
@@ -6175,12 +6177,17 @@ void Fighter::dismissXingchen()
     payBack = payBack % 1000;
     mitem[size-2].id = 1126;
     mitem[size-2].count = static_cast<UInt16>(payBack / 100);
+    if(mitem[size-1].count > 0 || mitem[size-2].count > 0)
+        hasMail = true;
 
-    MailItemsInfo itemsInfo(mitem, DismissXingchen, size);
+    if(hasMail)
+    {
+        MailItemsInfo itemsInfo(mitem, DismissXingchen, size);
 
-    GObject::Mail * pmail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
-    if(pmail)
-        GObject::mailPackageManager.push(pmail->id, mitem, size, true);
+        GObject::Mail * pmail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+        if(pmail)
+            GObject::mailPackageManager.push(pmail->id, mitem, size, true);
+    }
 
     DB1().PushUpdateData("DELETE FROM `fighter_xingchen` WHERE `fighterId` = %u AND `playerId` = %"I64_FMT"u", getId(), _owner->getId());
 }
