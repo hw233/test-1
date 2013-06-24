@@ -3709,7 +3709,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             }
         }
         //仙宠、十字攻击，两次伤害则混乱（先选取主目标横排攻击，再选取剩下的主目标纵排攻击）(火龙地狱)
-        else if(SKILL_ID(skill->getId()) == 53)
+        else if(SKILL_ID(skill->getId()) == 53 || SKILL_ID(skill->getId()) == 70)
         {
             AtkList atklist;
             getAtkList(bf, skill, atklist);
@@ -3750,7 +3750,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
 
         }
         //仙宠、两次单体攻击，两次伤害则眩晕 (天崩地裂)
-        else if(SKILL_ID(skill->getId()) == 48)
+        else if(SKILL_ID(skill->getId()) == 48 || SKILL_ID(skill->getId()) == 67)
         {
             UInt32 dmg1 = 0;
             UInt32 dmg2 = 0;
