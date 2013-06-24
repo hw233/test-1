@@ -13387,6 +13387,7 @@ namespace GObject
         AddVar(VAR_OFFLINE_EXP, exp);
         AddVar(VAR_OFFLINE_PEXP, offline/60);
         AddVar(VAR_OFFLINE_EQUIP, offline);
+        SetVar(VAR_OFFLINE, now);
     }
 
     void Player::getOfflineExp()
