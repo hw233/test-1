@@ -249,8 +249,14 @@ int  Tianjie::manualOpenTj(int level, bool force)
 	{
         if (maxLevel < dbexp.level)
             maxLevel = dbexp.level;
-        if (maxLevel < level && level != 999)    //玩家等级过低,不能手动启动天劫
-            return 2;
+        if(level == 119 && maxLevel == 109)
+        {
+        }
+        else
+        {
+            if (maxLevel < level && level != 999)    //玩家等级过低,不能手动启动天劫
+                return 2;
+        }
         if (dbexp.level == level) //已经触发了
         {
             m_isManualOpening = false;
