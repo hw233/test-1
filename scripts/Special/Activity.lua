@@ -8342,7 +8342,7 @@ function getCopyFrontmapAward(step, localtion)
     end
     local order
     if step == 1 then
-        order = math.random(1, 8)
+        order = math.random(1, 2)
         if order == 1 or order == 2 then
             local items_1 = equipTrump1[localtion];
             if items_1 == nil then
