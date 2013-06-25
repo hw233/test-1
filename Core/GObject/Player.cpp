@@ -21635,9 +21635,9 @@ void Player::checkZCJB(UInt32 recharge)
     {
         left += total - oldTotal;
         SetVar(VAR_ZCJB_TIMES, ZCJB(total, left));
-        if(isOnline())
-            sendRPZCJBInfo();
     }
+    if(isOnline())
+        sendRPZCJBInfo();
 }
 
 static UInt32 ryhb_items_1[15][4] = {
