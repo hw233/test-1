@@ -21519,6 +21519,7 @@ void Player::sendRPZCJBInfo()
     st << static_cast<UInt8>(ZCJB_TOTAL(zcjb));
     st << static_cast<UInt8>(ZCJB_LEFT(zcjb));
     st << gold_got << static_cast<UInt32>(0);
+    st << GetVar(VAR_ZCJB_RECHARGE_GOLD);
     st << beginTime << endTime;
     st << Stream::eos;
     send(st);
@@ -21607,6 +21608,7 @@ bool Player::getRPZCJBAward()
     st << static_cast<UInt8>(0x04);
     st << total << left;
     st << gold_got << awardGold;
+    st << GetVar(VAR_ZCJB_RECHARGE_GOLD);
     st << beginTime << endTime;
     st << Stream::eos;
     send(st);
