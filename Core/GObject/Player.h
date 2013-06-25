@@ -1724,6 +1724,7 @@ namespace GObject
         FairySpar* m_FairySpar;
 		MailBox* m_MailBox;
 
+        bool _loadMark;
 		bool _isOnline;
         bool _isHoding;
         UInt32 _holdGold;

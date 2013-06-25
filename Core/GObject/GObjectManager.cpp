@@ -2570,7 +2570,7 @@ namespace GObject
 		}
 
         lc.finalize();
-		lc.prepare("Loading mail package:");
+		/*lc.prepare("Loading mail package:");
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		DBMailPackageData mpdata;
 		if(execu->Prepare("SELECT `id`, `itemId`, `itemCount` FROM `mail_package` ORDER BY `id`", mpdata) != DB::DB_OK)
@@ -2608,7 +2608,7 @@ namespace GObject
 				continue;
 			pl->GetMailBox()->newMail(mdata.id, mdata.sender, mdata.recvTime, mdata.flag, mdata.title, mdata.content, mdata.additionalId);
 		}
-		lc.finalize();
+		lc.finalize();*/
 
 		/////////////////////////////////
 
