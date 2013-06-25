@@ -1746,8 +1746,12 @@ namespace GObject
 
             if(!pl->hasTitle(0))
                 pl->fixOldVertionTitle(0);
+            /*
             if(!pl->hasTitle(dbpd.pdata.title))
                 pl->fixOldVertionTitle(dbpd.pdata.title);
+            */
+            if(!pl->hasTitle(dbpd.pdata.title) && !pl->isForeverTitle(dbpd.pdata.title))
+                pl->changeTitle(0);
             pl->setOpenId(dbpd.openid, true);
 
             if (dbpd.canHirePet.length())

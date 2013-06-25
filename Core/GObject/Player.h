@@ -1039,6 +1039,9 @@ namespace GObject
         void SetVarNow(UInt32 id,  UInt32 val, UInt32 now);
         void AddVarNow(UInt32 id , UInt32 val, UInt32 now);
 
+        void AddZRYJCount(UInt32 v);
+        void AddHYYJCount(UInt32 v);
+
         void SetVarOffset(UInt32 offset);
 
 		inline const std::string& getName() { return _playerData.name; }
@@ -1171,6 +1174,7 @@ namespace GObject
 		{ return (_playerData.status >> bitStart) & (((1 << bitCount) - 1)); }
 		bool canClosePK();
 
+        bool isForeverTitle(UInt8 t);
         void loadTitleAll(UInt8 t, UInt32 timeEnd);
         void fixOldVertionTitle(UInt8 t);
 		void setTitle(UInt8 s, UInt32 timeLen = 0);

@@ -315,6 +315,8 @@ namespace Script
 		CLASS_DEF(Player, LuckyBagRank);
 		CLASS_DEF(Player, findFairyPet);
 		CLASS_DEF(Player, updateCuilianTimes);
+        CLASS_DEF(Player, AddZRYJCount);
+        CLASS_DEF(Player, AddHYYJCount);
 
         CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);
