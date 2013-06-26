@@ -120,7 +120,7 @@ namespace GObject
 
         void move(Player* player, UInt8 spot);
         void move(CCBPlayer* pl, UInt8 spot);
-        void openCanAtkSpot();
+        void openNextSpot(UInt8 id);
     };
 
 } // namespace GObject

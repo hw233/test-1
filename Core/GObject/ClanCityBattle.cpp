@@ -156,7 +156,7 @@ void CCBSpot::end()
         canAtk = false;
         if(id != 1)
         {
-            clancity->openCanAtkSpot();
+            clancity->openNextSpot(id);
             moveAll(alive[0], 1);
             moveAll(alive[1], 7);
             moveAll(waiters[0], 1);
@@ -213,6 +213,8 @@ void ClanCityBattle::end()
 
 bool ClanCityBattle::playerEnter(Player * player)
 {
+    if(!player)
+        return false;
     Clan* cl = player->getClan();
     if(!cl)
         return false;
@@ -238,6 +240,8 @@ bool ClanCityBattle::playerEnter(Player * player)
 
 void ClanCityBattle::playerLeave(Player * player)
 {
+    if(!player)
+        return;
     CCBPlayerMap::iterator it = m_players.find(player);
     if(it == m_players.end())
         return;
@@ -249,6 +253,8 @@ void ClanCityBattle::playerLeave(Player * player)
 
 void ClanCityBattle::move(Player* player, UInt8 spot)
 {
+    if(!player)
+        return;
     CCBPlayerMap::iterator it = m_players.find(player);
     if(it == m_players.end())
         return;
@@ -262,9 +268,16 @@ void ClanCityBattle::move(Player* player, UInt8 spot)
 
 void ClanCityBattle::move(CCBPlayer* pl, UInt8 spot)
 {
+    if(!pl)
+        return;
+    UInt8 pos = pl->pos;
+    if(spot == pos + 1)
+        return;
+    if(m_spots[pos].playerLeave(pl))
+        m_spots[spot-1].playerEnter(pl);
 }
 
-void ClanCityBattle::openCanAtkSpot()
+void ClanCityBattle::openNextSpot(UInt8 id)
 {
 }
 
