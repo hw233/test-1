@@ -2998,6 +2998,7 @@ inline bool player_enum_2(GObject::Player* pl, int type)
                 //pl->SetVar(GObject::VAR_ZCJB_RECHARGE_GOLD, 0);
                 pl->SetVar(GObject::VAR_ZCJB_TIMES, 0);
                 pl->SetVar(GObject::VAR_ZCJB_GOLD_GOT, 0);
+                pl->checkZCJB();
             }
             break;
         default:

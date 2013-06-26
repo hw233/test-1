@@ -7850,7 +7850,7 @@ namespace GObject
         if(WORLD().getAccRecharge())
             sendTodayRechargeInfo();
 
-        checkZCJB();
+        checkZCJB(r);
 
         AddZRYJCount(r);
 
@@ -21501,6 +21501,17 @@ void Player::sendRPZCJBInfo()
     if(!World::inActive_opTime_20130531() && !World::getZCJBActivity())
         return;
 
+    UInt32 beginTime = 0, endTime = 0;
+    if(World::inActive_opTime_20130531())
+    {
+        beginTime = TimeUtil::MkTime(cfg.openYear, cfg.openMonth, cfg.openDay);
+        endTime = beginTime + 7 * 86400;
+    }
+    else if(World::getZCJBActivity())
+    {
+        beginTime = GVAR.GetVar(GVAR_ZCJB_ACTIVITY_BEGIN);
+        endTime = GVAR.GetVar(GVAR_ZCJB_ACTIVITY_END);
+    }
     UInt32 zcjb = GetVar(VAR_ZCJB_TIMES);
     UInt32 gold_got = GetVar(VAR_ZCJB_GOLD_GOT);
     Stream st(REP::RP_SERVER);
@@ -21508,6 +21519,7 @@ void Player::sendRPZCJBInfo()
     st << static_cast<UInt8>(ZCJB_TOTAL(zcjb));
     st << static_cast<UInt8>(ZCJB_LEFT(zcjb));
     st << gold_got << static_cast<UInt32>(0);
+    st << beginTime << endTime;
     st << Stream::eos;
     send(st);
 }
@@ -21524,6 +21536,24 @@ static UInt32 zcjb_award[16][3] = {
     {820, 848, 1100}, {1240, 1296, 1800}, {2100, 2180, 2800}, {4240, 4480, 6000},
     {8480, 8960, 13000}, {16000, 16500, 23000}, {32100, 33300, 50000}, {64200, 66600, 90000},
     {106000, 109000, 160000}, {216000, 222000, 350000}, {432000, 444000, 680000}, {880000, 896000, 999999}
+};
+
+static const char* zcjb_udplog[15] = {
+    "F_130613_1",
+    "F_130613_2",
+    "F_130613_3",
+    "F_130613_4",
+    "F_130613_5",
+    "F_130613_6",
+    "F_130613_7",
+    "F_130613_8",
+    "F_130613_9",
+    "F_130613_10",
+    "F_130613_11",
+    "F_130613_12",
+    "F_130613_13",
+    "F_130613_14",
+    "F_130613_15",
 };
 
 bool Player::getRPZCJBAward()
@@ -21562,19 +21592,33 @@ bool Player::getRPZCJBAward()
     SetVar(VAR_ZCJB_TIMES, ZCJB(total, left));
     SetVar(VAR_ZCJB_GOLD_GOT, gold_got);
 
+    UInt32 beginTime = 0, endTime = 0;
+    if(World::inActive_opTime_20130531())
+    {
+        beginTime = TimeUtil::MkTime(cfg.openYear, cfg.openMonth, cfg.openDay);
+        endTime = beginTime + 7 * 86400;
+    }
+    else if(World::getZCJBActivity())
+    {
+        beginTime = GVAR.GetVar(GVAR_ZCJB_ACTIVITY_BEGIN);
+        endTime = GVAR.GetVar(GVAR_ZCJB_ACTIVITY_END);
+    }
     Stream st(REP::RP_SERVER);
     st << static_cast<UInt8>(0x04);
     st << total << left;
     st << gold_got << awardGold;
+    st << beginTime << endTime;
     st << Stream::eos;
     send(st);
+    udpLog("xschoujiang", zcjb_udplog[awardIdx], "", "", "", "", "act");
     return true;
 }
 
-void Player::checkZCJB()
+void Player::checkZCJB(UInt32 recharge)
 {
-    if(!World::inActive_opTime_20130531() && !World::getZCJBActivity())
+    if(recharge && !World::inActive_opTime_20130531() && !World::getZCJBActivity())
         return;
+    AddVar(VAR_ZCJB_RECHARGE_GOLD, recharge);
 
     UInt32 zcjb = GetVar(VAR_ZCJB_TIMES);
     UInt8 left = ZCJB_LEFT(zcjb);
@@ -21591,7 +21635,8 @@ void Player::checkZCJB()
     {
         left += total - oldTotal;
         SetVar(VAR_ZCJB_TIMES, ZCJB(total, left));
-        sendRPZCJBInfo();
+        if(isOnline())
+            sendRPZCJBInfo();
     }
 }
 
