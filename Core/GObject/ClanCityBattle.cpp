@@ -2,12 +2,21 @@
 #include "CountryBattle.h"
 #include "ClanCityBattle.h"
 #include "Clan.h"
+#include "Player.h"
 
+#define BATTLE_TIME 2
+#define FIRST_PREPARE_TIME 120
 namespace GObject
 {
 
-static int atkRout[6][2] = {
-    {0, 0}, {1, 0}, {0, 1}, {2, 0}, {2, 3}, {0, 3}
+static int atkRout[7][3] = {
+    {0, 0, 0},
+    {1, 0, 0},
+    {0, 1, 0},
+    {2, 0, 0},
+    {2, 3, 0},
+    {0, 3, 0},
+    {4, 5, 6}
 };
 
 void CCBPlayer::sendInfo()
@@ -71,9 +80,6 @@ bool CCBSpot::playerLeave(CCBPlayer* pl)
     if(!pl)
         return false;
     UInt8 side = pl->side;
-    if(side != 0)
-        return false;
-
     return erasePl(waiters[side], pl);
 }
 
@@ -99,6 +105,8 @@ void CCBSpot::prepare()
 
 void CCBSpot::handleBattle()
 {
+    if(!canAtk)
+        return;
     if(hp == 0)
         return;
 
@@ -187,31 +195,57 @@ void CCBSkill::doSkillEffect(CCBPlayer* pl)
 {
 }
 
-ClanCityBattle::ClanCityBattle(UInt16 loc) : m_loc(loc)
+ClanCity::ClanCity(UInt16 loc) : m_loc(loc)
 {
 }
 
-void ClanCityBattle::Init()
+void ClanCity::Init()
 {
 }
 
-void ClanCityBattle::process(UInt32)
+void ClanCity::process(UInt32 curtime)
+{
+    UInt32 startTime = globalCountryBattle.getStartTime();
+    if(startTime == 0)
+        return;
+    if(curtime < startTime + FIRST_PREPARE_TIME)
+        return;
+
+    UInt8 corr = (curtime - startTime - FIRST_PREPARE_TIME) / BATTLE_TIME;
+    if(!m_nextTime)
+    {   
+        m_nextTime = startTime + FIRST_PREPARE_TIME + (corr + 1) * BATTLE_TIME;
+    }
+    if(curtime < m_nextTime)
+        return;
+    m_nextTime += BATTLE_TIME;
+
+    handleBattle();
+    if(curtime >= globalCountryBattle.getEndTime())
+    {
+        end();
+        return;
+    }
+}
+
+void ClanCity::prepare(UInt16)
+{
+    UInt32 startTime = globalCountryBattle.getStartTime();
+    if(startTime == 0)
+        return;
+    m_nextTime = startTime + FIRST_PREPARE_TIME;
+    openNextSpot(7);
+}
+
+void ClanCity::start(UInt16 rt)
 {
 }
 
-void ClanCityBattle::prepare(UInt16)
+void ClanCity::end()
 {
 }
 
-void ClanCityBattle::start(UInt16)
-{
-}
-
-void ClanCityBattle::end()
-{
-}
-
-bool ClanCityBattle::playerEnter(Player * player)
+bool ClanCity::playerEnter(Player * player)
 {
     if(!player)
         return false;
@@ -219,6 +253,18 @@ bool ClanCityBattle::playerEnter(Player * player)
     if(!cl)
         return false;
 
+    if (player->getCountry() >= COUNTRY_NEUTRAL)
+        return false;
+	if(!globalCountryBattle.isRunning())
+		return false;
+	UInt32 curtime = TimeUtil::Now();
+	if(player->getBuffData(PLAYER_BUFF_NEW_CBATTLE, curtime))
+	{
+		player->sendMsgCode(0, 1402);
+		return false;
+	}
+
+	player->addFlag(Player::CountryBattle);
     CCBPlayerMap::iterator it = m_players.find(player);
     if(it == m_players.end())
     {
@@ -238,20 +284,33 @@ bool ClanCityBattle::playerEnter(Player * player)
     }
 }
 
-void ClanCityBattle::playerLeave(Player * player)
+void ClanCity::playerLeave(Player * player)
 {
     if(!player)
         return;
+    if (player->getCountry() >= COUNTRY_NEUTRAL)
+        return;
+
     CCBPlayerMap::iterator it = m_players.find(player);
     if(it == m_players.end())
         return;
+
     CCBPlayer* pl = it->second;
     UInt8 pos = pl->pos;
     if(m_spots[pos].playerLeave(pl))
+    {
+        UInt32 curtime = TimeUtil::Now();
         m_players.erase(player);
+        if(curtime >= globalCountryBattle.getStartTime() && curtime < globalCountryBattle.getEndTime())
+            player->setBuffData(PLAYER_BUFF_NEW_CBATTLE, curtime + 5 * 60);
+
+        player->delFlag(Player::CountryBattle);
+        player->clearHIAttr();
+        player->autoRegenAll();
+    }
 }
 
-void ClanCityBattle::move(Player* player, UInt8 spot)
+void ClanCity::move(Player* player, UInt8 spot)
 {
     if(!player)
         return;
@@ -266,7 +325,7 @@ void ClanCityBattle::move(Player* player, UInt8 spot)
         m_spots[spot-1].playerEnter(pl);
 }
 
-void ClanCityBattle::move(CCBPlayer* pl, UInt8 spot)
+void ClanCity::move(CCBPlayer* pl, UInt8 spot)
 {
     if(!pl)
         return;
@@ -277,8 +336,25 @@ void ClanCityBattle::move(CCBPlayer* pl, UInt8 spot)
         m_spots[spot-1].playerEnter(pl);
 }
 
-void ClanCityBattle::openNextSpot(UInt8 id)
+void ClanCity::openNextSpot(UInt8 id)
 {
+    UInt8 pos = id - 1;
+    for(UInt8 i = 0; i < 3; ++ i)
+    {
+        UInt8 nextSpot = atkRout[pos][i];
+        if(nextSpot == 0)
+            continue;
+        UInt8 nextPos = nextSpot - 1;
+        m_spots[nextPos].canAtk = true;
+    }
+}
+
+void ClanCity::handleBattle()
+{
+    for(int i = 0; i < 6; ++ i)
+    {
+        m_spots[i].handleBattle();
+    }
 }
 
 }

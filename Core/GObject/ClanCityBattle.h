@@ -11,7 +11,7 @@ namespace GObject
     class Stream;
     class Clan;
     struct CCBSkill;
-    class ClanCityBattle;
+    class ClanCity;
 
     enum CCBPlayerType
     {
@@ -54,9 +54,9 @@ namespace GObject
         CCBPlayerList dead[2];
         CCBSkill skills[2][3];
         CCBPlayerList battler[2];
-        ClanCityBattle* clancity;
+        ClanCity* clancity;
 
-        CCBSpot(ClanCityBattle* cc) : id(0), canAtk(false), hp(0), clancity(cc) {}
+        CCBSpot(ClanCity* cc) : id(0), canAtk(false), hp(0), clancity(cc) {}
         void playerEnter(CCBPlayer* pl);
         void playerLeave(CCBPlayer* pl);
         void prepare();
@@ -97,7 +97,7 @@ namespace GObject
     typedef std::map<Clan*, CCBClan*> CCBClanMap;
     typedef std::set<CCBClan*, bpGreater> CCBClanSort;
 
-    class ClanCityBattle
+    class ClanCity
     {
     private:
         CCBPlayerMap m_players;
@@ -107,7 +107,7 @@ namespace GObject
         UInt16       m_loc;
         UInt32       m_nextTime;
     public:
-        ClanCityBattle(UInt16 loc);
+        ClanCity(UInt16 loc);
 
         static void Init();
         inline UInt16 getLocation() { return m_loc; }
@@ -121,6 +121,7 @@ namespace GObject
         void move(Player* player, UInt8 spot);
         void move(CCBPlayer* pl, UInt8 spot);
         void openNextSpot(UInt8 id);
+        void handleBattle();
     };
 
 } // namespace GObject
