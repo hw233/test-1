@@ -6683,6 +6683,27 @@ bool BattleSimulator::applyFighterHP( UInt8 side, GObject::Player * player, bool
     return res;
 }
 
+float BattleSimulator::getLostHPPercent(UInt8 side, GObject::Player * player)
+{
+    float maxhp = 0;
+    float hp = 0;
+    for(int j = 0; j < 5; ++ j)
+    {
+        GObject::Lineup& pd = player->getLineup(j);
+        if(pd.fighter == NULL)
+            continue;
+        BattleObject * obj = getObject(side, pd.pos);
+        if(obj != NULL && obj->isChar())
+        {
+            BattleFighter * bf = static_cast<BattleFighter *>(obj);
+            hp += bf->getHP();
+            maxhp += bf->getMaxHP();
+        }
+    }
+
+    return 1 - hp/maxhp;
+}
+
 void BattleSimulator::getFighterHP( UInt8 side, GObject::Fighter ** fighters, UInt8 * pos, UInt32 * hp, UInt32 percent )
 {
     for(int j = 0; j < 5; ++ j)

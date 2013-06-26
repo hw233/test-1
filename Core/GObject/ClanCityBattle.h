@@ -28,17 +28,19 @@ namespace GObject
         {
             Player* player;
             UInt32 npcId;
-            UInt8 skillid;
+            CCBSkill* skill;
         } fgt;
         UInt8 side;
         UInt8 pos;
         UInt32 score;
         UInt32 cd;
-        UInt16 weary;
+        UInt32 weary;
 
         CCBPlayer(CCBPlayerType t) : type(t), fgt(0), side(0), pos(0), score(0), cd(0), weary(0) {}
         void sendInfo();
         bool challenge(CCBPlayer* other);
+        bool attackNpc(CCBPlayer* npc);
+        bool attackPlayer(CCBPlayer* other);
     };
 
     typedef std::vector<CCBPlayer*> CCBPlayerList;
@@ -52,11 +54,13 @@ namespace GObject
         CCBPlayerList waiters[2];
         CCBPlayerList alive[2];
         CCBPlayerList dead[2];
-        CCBSkill skills[2][3];
+        CCBSkill skill_dmg[2];
+        CCBSkill skill_action[2];
+        CCBSkill skill_bomb[2];
         CCBPlayerList battler[2];
         ClanCity* clancity;
+        CCBPlayer   bomb[2];
 
-        CCBSpot(ClanCity* cc) : id(0), canAtk(false), hp(0), clancity(cc) {}
         void playerEnter(CCBPlayer* pl);
         void playerLeave(CCBPlayer* pl);
         void prepare();
@@ -64,15 +68,19 @@ namespace GObject
         void end();
         void erasePl(CCBPlayerList& list, CCBPlayer* pl);
         void moveAll(CCBPlayerList& list, UInt16 spot);
+        void fillTo100(CCBPlayerList& dst, CCBPlayerList& src, CCBPlayer* bomb);
+        void makeDamage(UInt16 dmg);
     };
 
     struct CCBClan
     {
         Clan* clan;
         UInt32 score;
-        CCBSkill skills[3];
+        CCBSkill skill_hp;
+        CCBSkill skill_atk;
+        CCBSkill skill_action;
 
-        CCBClan() : clan(NULL), score(0) {}
+        void doSkill(CCBPlayer* pl);
     };
     struct bpGreater
     {
@@ -91,8 +99,8 @@ namespace GObject
         CCBSkill() : id(0), lvl(0), times(0) {}
         void init() { times = 0; }
         void doSkillEffect(CCBSpot& spot);
-        void doSkillEffect(CCBClan& clan);
         void doSkillEffect(CCBPlayer* pl);
+        UInt16 doSkillEffect(UInt16 dmg);
     };
     typedef std::map<Clan*, CCBClan*> CCBClanMap;
     typedef std::set<CCBClan*, bpGreater> CCBClanSort;
@@ -109,7 +117,6 @@ namespace GObject
     public:
         ClanCity(UInt16 loc);
 
-        static void Init();
         inline UInt16 getLocation() { return m_loc; }
         void process(UInt32);
         void prepare(UInt16);
@@ -122,6 +129,7 @@ namespace GObject
         void move(CCBPlayer* pl, UInt8 spot);
         void openNextSpot(UInt8 id);
         void handleBattle();
+        void doClanSkill(CCBPlayer* pl);
     };
 
 } // namespace GObject

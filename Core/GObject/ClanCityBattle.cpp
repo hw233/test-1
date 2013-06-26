@@ -3,9 +3,21 @@
 #include "ClanCityBattle.h"
 #include "Clan.h"
 #include "Player.h"
+#include "Common/URandom.h"
 
 #define BATTLE_TIME 2
 #define FIRST_PREPARE_TIME 120
+
+#define CCB_SKILL_HP              1     // 生命鼓舞
+#define CCB_SKILL_ATK             2     // 攻击鼓舞
+#define CCB_SKILL_ACTION_1        3     // 身法鼓舞
+#define CCB_SKILL_SPOT_DEC_DMG    4     // 巨熊
+#define CCB_SKILL_ACTION_2        5     // 猎豹
+#define CCB_SKILL_SPOT_BOMB_1     6     // 炼蛇
+#define CCB_SKILL_SPOT_EXTRA_DMG  7     // 蛮牛
+#define CCB_SKILL_ACTION_3        8     // 飞鹰
+#define CCB_SKILL_SPOT_BOMB_2     9     // 狂狮
+
 namespace GObject
 {
 
@@ -25,6 +37,162 @@ void CCBPlayer::sendInfo()
 
 bool CCBPlayer::challenge(CCBPlayer* other)
 {
+    if(!other)
+        return true;
+
+    bool ret = false;
+    if(type == e_skill)
+        ret = fgt.skill->doSkillEffect(other);
+    else if(other->type == e_skill)
+        ret = !(other->fgt.skill->doSkillEffect(this));
+    else if(type == e_player)
+    {
+        if(other->type == e_player)
+        {
+            ret = attackPlayer(other);
+        }
+        else
+            ret = attackNpc(other);
+    }
+    else if(other->type == e_player)
+    {
+        ret = !(other->attackNpc(this));
+    }
+
+    if(type == e_player)
+        fgt.player->clearHIAttr();
+    if(other->type == e_player)
+        other->fgt.player->clearHIAttr();
+
+    return ret;
+}
+
+bool CCBPlayer::attackNpc(CCBPlayer* npc)
+{
+    if(!npc)
+        return true;
+
+    GData::NpcGroups::iterator it = GData::npcGroups.find(npc->fgt.npcId);
+    if(it == GData::npcGroups.end())
+		return true;
+
+    Player* player = fgt.player;
+    float factor = 1.0f - static_cast<float>(weary)*0.5f;
+    if(factor < 0.001f)
+        factor = 0;
+    player->setSpiritFactor(factor);
+
+	GData::NpcGroup * ng = it->second;
+    Battle::BattleSimulator bsim(location, player, ng->getName(), ng->getLevel(), false, turns);
+    fgt.player->PutFighters( bsim, 0 );
+    ng->putFighters( bsim );
+
+    std::vector<GData::NpcFData>& nflist = _ng->getList();
+    GData::NpcFData& nfdata = nflist[0];
+    Battle::BattleFighter * bf = bsim.newFighter(1, nfdata.pos, nfdata.fighter);
+    if(npc->weary != 0)
+    {
+        bf->setHP(npc->weary);
+    }
+
+    bsim.start();
+    player->setSpiritFactor(1.0f);
+
+    bool res = bsim.getWinner() == 1;
+    if(res)
+    {
+        npc->weary = 0;
+        bsim.applyFighterHP(0, player, false, false);
+        weary = 1 + 0.5f * bsim.getLostHPPercent(0, player);
+    }
+    else
+    {
+        npc->weary = bf->getHP();
+        player->autoRegenAll();
+    }
+
+    return res;
+}
+
+bool CCBPlayer::attackPlayer(CCBPlayer* other)
+{
+    if(!other)
+        return true;
+
+    Player* player1 = fgt.player;
+    Player* player2 = other->fgt.player;
+
+    float factor = 1.0f - static_cast<float>(weary)*0.5f;
+    if(factor < 0.001f)
+        factor = 0;
+    player1->setSpiritFactor(factor);
+
+    factor = 1.0f - static_cast<float>(other->weary)*0.5f;
+    if(factor < 0.001f)
+        factor = 0;
+    player2->setSpiritFactor(factor);
+
+    Battle::BattleSimulator bsim(location, player1, player2);
+    player1->PutFighters( bsim, 0);
+    player2->PutFighters( bsim, 1);
+
+    bsim.start();
+    player1->setSpiritFactor(1.0f);
+    player2->setSpiritFactor(1.0f);
+
+    bool res = bsim.getWinner() == 1;
+    if(res)
+    {
+        bsim.applyFighterHP(0, player1, false, false);
+        weary = 1 + 0.5f * bsim.getLostHPPercent(0, player1);
+        player2->autoRegenAll();
+        other->weary = 0;
+    }
+    else
+    {
+        weary = 0;
+        bsim.applyFighterHP(1, player2, false, false);
+        weary = 1 + 0.5f * bsim.getLostHPPercent(0, player1);
+        other->weary = 1 + 0.5f * bsim.getLostHPPercent(1, player2);
+        player1->autoRegenAll();
+    }
+
+    return res;
+}
+
+CCBClan::CCBClan() : clan(NULL), score(0)
+{
+    skill_hp.id = CCB_SKILL_HP;
+    skill_atk.id = CCB_SKILL_ATK;
+    skill_action.id = CCB_SKILL_ACTION_1;
+}
+
+void CCBClan::doSkill(CCBPlayer* pl)
+{
+    if(!pl)
+        return;
+    skill_hp.doSkillEffect(pl);
+    skill_atk.doSkillEffect(pl);
+    skill_action.doSkillEffect(pl);
+}
+
+CCBSpot::CCBSpot(ClanCity* cc) : id(0), canAtk(false), hp(0), clancity(cc)
+{
+    for(int i = 0; i < 2; ++ i)
+    {
+        bomb[i].type = e_skill;
+        bomb[i].side = i;
+        bomb[i].pos = id - 1;
+        bomb[i].fgt.skill = &(skill_bomb[i]);
+    }
+
+    skill_dmg[0].id = CCB_SKILL_SPOT_DEC_DMG;
+    skill_action[0].id = CCB_SKILL_ACTION_2;
+    skill_bomb[0].id = CCB_SKILL_SPOT_BOMB_1;
+
+    skill_dmg[1].id = CCB_SKILL_SPOT_EXTRA_DMG;
+    skill_action[1].id = CCB_SKILL_ACTION_3;
+    skill_bomb[1].id = CCB_SKILL_SPOT_BOMB_2;
 }
 
 void CCBSpot::playerEnter(CCBPlayer* pl)
@@ -33,6 +201,7 @@ void CCBSpot::playerEnter(CCBPlayer* pl)
         return;
 
     UInt8 side = pl->side;
+    pl->pos = id - 1;
     waiters[side].push_back(pl);
 }
 
@@ -53,11 +222,12 @@ void CCBSpot::moveAll(CCBPlayerList& list, UInt8 spot)
     for(size_t i = 0; i < cnt; ++ i)
     {
         CCBPlayer* pl = list[i];
-        clancity->move(pl, spot);
+        if(pl->type == e_player)
+            clancity->move(pl, spot);
     }
 }
 
-void CCBSpot::fillTo100(CCBPlayerList& dst, CCBPlayerList& src)
+void CCBSpot::fillTo100(CCBPlayerList& dst, CCBPlayerList& src, CCBPlayer* bomb)
 {
     size_t cnt = dst.size();
     if(100 - cnt > src.size())
@@ -67,11 +237,20 @@ void CCBSpot::fillTo100(CCBPlayerList& dst, CCBPlayerList& src)
     }
     else
     {
-        for(size_t i = 0; i < 100 - cnt; ++ i)
+        size_t cnt2 = 100 - cnt;
+        if(bomb != NULL)
+            -- cnt;
+        for(size_t i = 0; i < cnt2; ++ i)
         {
             dst.push_back(src[i]);
         }
         src.erase(src.begin(), src.begin()+i);
+    }
+    if(bomb != NULL)
+    {
+        size_t cnt = dst.size();
+        UInt32 = uRand(cnt);
+        dst.insert(dst.begin() + rnd, bomb);
     }
 }
 
@@ -88,10 +267,17 @@ void CCBSpot::prepare()
     if(hp == 0)
         return;
 
-    for(int i = 0; i < 3; ++ i)
+    CCBPlayer* bomb0= NULL;
+    CCBPlayer* bomb1= NULL;
+    skill_bomb[0].init();
+    skill_bomb[1].init();
+    if(skill_bomb[0].id == CCB_SKILL_SPOT_BOMB_1 && skill_bomb[0].lvl > 0)
     {
-        skills[0][i].init();
-        skills[1][i].init();
+        bomb0 = &(bomb[0]);
+    }
+    if(skill_bomb[1].id == CCB_SKILL_SPOT_BOMB_2 && skill_bomb[1].lvl > 0)
+    {
+        bomb1 = &(bomb[1]);
     }
 
     dead[0].clear()
@@ -99,8 +285,8 @@ void CCBSpot::prepare()
     battler[0].clear()
     battler[1].clear()
 
-    fillTo100(alive[0], waiters[0]);
-    fillTo100(alive[1], waiters[1]);
+    fillTo100(alive[0], waiters[0], bomb0);
+    fillTo100(alive[1], waiters[1], bomb1);
 }
 
 void CCBSpot::handleBattle()
@@ -124,13 +310,18 @@ void CCBSpot::handleBattle()
                 battler[1].push_back(alive[1][i]);
                 CCBPlayer* pl0 = battler[0][i];
                 CCBPlayer* pl1 = battler[1][i];
-                if(pl0.challenge(pl1))
+                skill_action[0].doSkillEffect(pl0);
+                skill_action[1].doSkillEffect(pl1);
+                clancity->doClanSkill(pl0);
+                clancity->doClanSkill(pl1);
+                if(pl0->challenge(pl1))
                 {
                     dead[1].push_back(pl1);
                     erasePl(alive[1], pl1);
                 }
                 else
                 {
+                    skill_dmg[1].doSkillEffect(this);
                     dead[0].push_back(pl0);
                     erasePl(alive[0], pl0);
                 }
@@ -146,9 +337,21 @@ void CCBSpot::handleBattle()
             {
                 break;
             }
-            hp -= 10;
+            makeDamage(10);
         }
     }
+}
+
+void CCBSpot::makeDamage(UInt16 dmg)
+{
+    if(hp == 0)
+        return;
+
+    UInt16 dmg2 = skill_dmg[0].doSkillEffect(dmg);
+    if(dmg2 > hp)
+        hp = 0;
+    else
+        hp -= dmg2;
 }
 
 void CCBSpot::end()
@@ -179,27 +382,86 @@ void CCBSpot::end()
         moveAll(dead[1], 7);
     }
 
+    erasePl(alive[0], &(bomb[0]));
+    erasePl(alive[1], &(bomb[1]));
+
     dead[0].clear()
     dead[1].clear()
 }
 
 void CCBSkill::doSkillEffect(CCBSpot& spot)
 {
+    if(lvl == 0)
+        return;
+    if(id == CCB_SKILL_SPOT_EXTRA_DMG)
+    {
+        if(uRand(1000) < 0.5f*lvl)
+        {
+            spot.makeDamage(5);
+        }
+    }
 }
 
-void CCBSkill::doSkillEffect(CCBClan& clan)
+bool CCBSkill::doSkillEffect(CCBPlayer* pl)
 {
+    if(!pl || lvl == 0)
+        return false;
+    GData::AttrExtra attr;
+    switch(id)
+    {
+    case CCB_SKILL_HP:
+        attr.hpP = 0.1f * lvl;
+        break;
+    case CCB_SKILL_ATK:
+        attr.atkP = 0.1f * lvl;
+        attr.magatkP = 0.1f * lvl;
+        break;
+    case CCB_SKILL_ACTION_1:
+    case CCB_SKILL_ACTION_2:
+    case CCB_SKILL_ACTION_3:
+        attr.actionP = 0.1f * lvl;
+        break;
+    case CCB_SKILL_SPOT_BOMB_1:
+        if(times >= 10)
+            return false;
+        if(uRand(1000) < 10 * lvl)
+        {
+            ++ times;
+            return true;
+        }
+        return false;
+    case CCB_SKILL_SPOT_BOMB_2:
+        if(times >= 3)
+            return false;
+        if(uRand(1000) < 5 * lvl)
+        {
+            ++ times;
+            return true;
+        }
+        return false;
+    }
+    if(pl->type == e_player)
+        pl->fgt.player->addHIAttr(attr);
+    return false;
 }
 
-void CCBSkill::doSkillEffect(CCBPlayer* pl)
+UInt16 CCBSkill::doSkillEffect(UInt16 dmg)
 {
+    if(lvl == 0)
+        return dmg;
+
+    if(id == CCB_SKILL_SPOT_DEC_DMG)
+    {
+        if(uRand(1000) < 5 * lvl)
+        {
+            return dmg/2;
+        }
+    }
+
+    return dmg;
 }
 
 ClanCity::ClanCity(UInt16 loc) : m_loc(loc)
-{
-}
-
-void ClanCity::Init()
 {
 }
 
@@ -355,6 +617,23 @@ void ClanCity::handleBattle()
     {
         m_spots[i].handleBattle();
     }
+}
+
+void ClanCity::doClanSkill(CCBPlayer* pl)
+{
+    if(!pl)
+        return;
+
+    Clan* cl = pl->player->getClan();
+    if(!cl)
+        return;
+
+    CCBClanMap::iterator it = m_clans.find(cl);
+    if(it == m_clans.end())
+        return;
+
+    CCBClan* ccl = it->second;
+    ccl->doSkill(pl);
 }
 
 }
