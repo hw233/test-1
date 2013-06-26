@@ -729,6 +729,28 @@ public:
         return _ryhbActivity;
     }
 
+    inline static bool getZCJBActivity()
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_ZCJB_ACTIVITY_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_ZCJB_ACTIVITY_END);
+        UInt32 now = TimeUtil::Now();
+        if(begin != 0 && end != 0)
+        {
+            if(_zcjbActivity)
+            {
+                if(now < begin || now > end)
+                    _zcjbActivity = false;
+            }
+            else
+            {
+                if(now >= begin && now <= end)
+                    _zcjbActivity = true;
+            }
+        }
+
+        return _zcjbActivity;
+    }
+
     inline static void setHalfGold(bool v)
     { _halfgold = v; }
     inline static bool getHalfGold()
@@ -903,6 +925,7 @@ public:
     static bool _foolbao;
     static bool _surnamelegend;
     static bool _ryhbActivity;
+    static bool _zcjbActivity;
     static bool _halfgold;
     static UInt8 _callsnakeeggact;
     static UInt8 _snakeeggawardact;

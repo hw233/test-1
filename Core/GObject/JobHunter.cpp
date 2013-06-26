@@ -200,18 +200,18 @@ void JobHunter::OnHireFighter(UInt16 id)
         st << Stream::eos;
         _owner->send(st);
 
-                Mail *pmail = NULL;
-                MailPackage::MailItem mitem[9] = {{2872, 1}, {2873, 1}, {2874, 1}, {2875, 1}, {2876, 1}, {2877, 1}, {2878, 1}, {2879, 1}, {1656, 1}};
-                MailItemsInfo itemsInfo(mitem, NEWJOBHIRE, 9);
+        Mail *pmail = NULL;
+        MailPackage::MailItem mitem[9] = {{2872, 1}, {2873, 1}, {2874, 1}, {2875, 1}, {2876, 1}, {2877, 1}, {2878, 1}, {2879, 1}, {1656, 1}};
+        MailItemsInfo itemsInfo(mitem, NEWJOBHIRE, 9);
 
-                SYSMSG(title, 4070);
-                SYSMSG(content, 4071);
-                pmail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+        SYSMSG(title, 4070);
+        SYSMSG(content, 4071);
+        pmail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
 
-                if(pmail != NULL)
-                {
-                    mailPackageManager.push(pmail->id, mitem, 9, true);
-                }
+        if(pmail != NULL)
+        {
+            mailPackageManager.push(pmail->id, mitem, 9, true);
+        }
     }
     _fighterList.erase(id);
 

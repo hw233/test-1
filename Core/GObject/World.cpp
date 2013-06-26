@@ -145,6 +145,7 @@ bool World::_foolbao = false;
 bool World::_halfgold = false;
 bool World::_surnamelegend = false;
 bool World::_ryhbActivity = false;
+bool World::_zcjbActivity = false;
 bool World::_wansheng= false;
 bool World::_qingren= false;
 bool World::_specialbook= false;
