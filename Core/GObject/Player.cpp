@@ -4573,8 +4573,7 @@ namespace GObject
         if(ci && ci->purchaseType != TrainFighter && ci->purchaseType != ZCJBRoolAward)
         {
             AddVar(VAR_USEGOLD_CNT, c);
-            if(World::inActive_opTime_20130531())
-                AddVar(VAR_HYYJ_COUNT, c);
+            AddHYYJCount(c);
         }
         if(!GetVar(VAR_LUCKYSTAR_IS_CONSUME))
             SetVar(VAR_LUCKYSTAR_IS_CONSUME, 1);
@@ -5453,13 +5452,13 @@ namespace GObject
     bool Player::isForeverTitle(UInt8 t)
     {   //38道尊 39释尊 40儒尊 201名震蜀山
         if(t == 38 || t == 39 || t == 40 || t == 201)
-            return true;
-        return false;
+            return false;
+        return true;
     }
 
     void Player::loadTitleAll(UInt8 t, UInt32 timeEnd)
     {
-        if(isForeverTitle(t) && timeEnd == 0)
+        if(!isForeverTitle(t) && timeEnd == 0)
             return;
         std::map<UInt8, UInt32>& titleAll = _playerData.titleAll;
         titleAll[t] = timeEnd;
@@ -7853,8 +7852,7 @@ namespace GObject
 
         checkZCJB();
 
-        if(World::inActive_opTime_20130531())
-            AddVar(VAR_ZRYJ_COUNT, r);
+        AddZRYJCount(r);
 
         SetVar(VAR_DROP_OUT_ITEM_MARK, 0);
     }
@@ -21500,7 +21498,7 @@ bool Player::checkBBFT()
 #define ZCJB(t, l)    (((t&0xFF)<<8)|(l&0xFF))
 void Player::sendRPZCJBInfo()
 {
-    if(!World::inActive_opTime_20130531())
+    if(!World::inActive_opTime_20130531() && !World::getZCJBActivity())
         return;
 
     UInt32 zcjb = GetVar(VAR_ZCJB_TIMES);
@@ -21530,7 +21528,7 @@ static UInt32 zcjb_award[16][3] = {
 
 bool Player::getRPZCJBAward()
 {
-    if(!World::inActive_opTime_20130531())
+    if(!World::inActive_opTime_20130531() && !World::getZCJBActivity())
         return false;
 
     UInt32 zcjb = GetVar(VAR_ZCJB_TIMES);
@@ -21575,7 +21573,7 @@ bool Player::getRPZCJBAward()
 
 void Player::checkZCJB()
 {
-    if(!World::inActive_opTime_20130531())
+    if(!World::inActive_opTime_20130531() && !World::getZCJBActivity())
         return;
 
     UInt32 zcjb = GetVar(VAR_ZCJB_TIMES);
@@ -21585,7 +21583,7 @@ void Player::checkZCJB()
     UInt8 oldTotal = total;
     for(; total < 16; ++ total)
     {
-        if(_playerData.totalRecharge < zcjb_gold[total])
+        if(GetVar(VAR_ZCJB_RECHARGE_GOLD) < zcjb_gold[total])
             break;
     }
 
@@ -21597,7 +21595,7 @@ void Player::checkZCJB()
     }
 }
 
-static UInt32 ryhb_items[15][4] = {
+static UInt32 ryhb_items_1[15][4] = {
     {8, 8, 78, 9},          // 升级优惠礼包
     {28, 28, 79, 9},        // 炼器优惠礼包
     {8, 15, 80, 9},         // 九疑鼎优惠礼包
@@ -21612,6 +21610,25 @@ static UInt32 ryhb_items[15][4] = {
     {99, 88, 1717, 1},      // 女仆头饰
     {555, 300, 9396, 1},    // 散仙令
 };
+
+static UInt32 ryhb_items_2[15][4] = {
+    {8, 8, 78, 9},          // 升级优惠礼包
+    {28, 28, 79, 9},        // 炼器优惠礼包
+    {8, 15, 80, 9},         // 九疑鼎优惠礼包
+    {333, 288, 5136, 3},    // 六级身法石
+    {2, 5, 1325, 99},       // 技能符文熔炼诀
+    {2, 5, 134, 99},        // 法灵精金
+    {2, 5, 547, 99},        // 天赋保护符
+    {2, 5, 501, 99},        // 洗练保护符
+    {1, 3, 503, 99},        // 太乙精金
+    {4, 8, 515, 99},        // 五行精金
+    {1, 5, 509, 99},        // 凝神易筋丹
+    {1, 3, 9371, 99},       // 仙缘石
+    {99, 99, 1717, 5},      // 女仆头饰
+    {99, 99, 1719, 5},      // 兔耳朵
+    {88, 88, 8555, 64},      // 天劫术
+};
+
 static const char* ryhb_udplog[15] = {
     "F_130603_1",
     "F_130603_2",
@@ -21630,10 +21647,31 @@ static const char* ryhb_udplog[15] = {
     "F_130603_15",
 };
 
+void Player::AddZRYJCount(UInt32 v)
+{
+    if(!World::inActive_opTime_20130531() && !World::getRYHBActivity())
+        return;
+    AddVar(VAR_ZRYJ_COUNT, v);
+    sendRYHBInfo();
+}
+
+void Player::AddHYYJCount(UInt32 v)
+{
+    if(!World::inActive_opTime_20130531() && !World::getRYHBActivity())
+        return;
+    AddVar(VAR_HYYJ_COUNT, v);
+    sendRYHBInfo();
+}
+
 void Player::sendRYHBInfo()
 {
+    UInt32 (*ryhb_items)[4] = ryhb_items_1;
     if(!World::inActive_opTime_20130531())
-        return;
+    {
+        if(!World::getRYHBActivity())
+            return;
+        ryhb_items = ryhb_items_2;
+    }
 
     Stream st(REP::RP_SERVER);
     st << static_cast<UInt8>(0x05) << static_cast<UInt8>(0);
@@ -21658,8 +21696,13 @@ void Player::sendRYHBInfo()
 
 void Player::getRYHBAward(UInt8 idx, UInt8 cnt)
 {
+    UInt32 (*ryhb_items)[4] = ryhb_items_1;
     if(!World::inActive_opTime_20130531())
-        return;
+    {
+        if(!World::getRYHBActivity())
+            return;
+        ryhb_items = ryhb_items_2;
+    }
     if(idx >= 15 || cnt == 0)
         return;
 

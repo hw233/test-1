@@ -1039,6 +1039,9 @@ namespace GObject
         void SetVarNow(UInt32 id,  UInt32 val, UInt32 now);
         void AddVarNow(UInt32 id , UInt32 val, UInt32 now);
 
+        void AddZRYJCount(UInt32 v);
+        void AddHYYJCount(UInt32 v);
+
         void SetVarOffset(UInt32 offset);
 
 		inline const std::string& getName() { return _playerData.name; }

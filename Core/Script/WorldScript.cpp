@@ -239,6 +239,8 @@ void WorldScript::init()
 
     def("setSurnameLegend",GObject::World::setSurnameLegend);
     def("getSurnameLegend",GObject::World::getSurnameLegend);
+    def("setRYHBActivity",GObject::World::setRYHBActivity);
+    def("getRYHBActivity",GObject::World::getRYHBActivity);
 
     def("setMergeAthAct", GObject::World::setMergeAthAct);
     def("getMergeAthAct", GObject::World::getMergeAthAct);

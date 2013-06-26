@@ -2981,6 +2981,25 @@ inline bool player_enum_2(GObject::Player* pl, int type)
                 GLOBAL().PushMsg(hdr, NULL);
             }
             break;
+        case 4:
+            {
+                pl->SetVar(GObject::VAR_ZRYJ_COUNT, 0);
+                pl->SetVar(GObject::VAR_HYYJ_COUNT, 0);
+                for(int i = 0; i < 15; ++ i)
+                {
+                    pl->SetVar(GObject::VAR_RYHB_ITEM_CNT_1 + i, 0);
+                }
+            }
+            break;
+        case 5:
+            {
+                UInt32 curGold = pl->GetVar(GObject::VAR_RECHARGE_TODAY);
+                pl->SetVar(GObject::VAR_ZCJB_RECHARGE_GOLD, curGold);
+                //pl->SetVar(GObject::VAR_ZCJB_RECHARGE_GOLD, 0);
+                pl->SetVar(GObject::VAR_ZCJB_TIMES, 0);
+                pl->SetVar(GObject::VAR_ZCJB_GOLD_GOT, 0);
+            }
+            break;
         default:
             return false;
     }
@@ -3310,6 +3329,22 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
         GObject::GVAR.SetVar(GObject::GVAR_SURNAMELEGEND_END, end);
         ret = 1;
     }
+    else if (type == 3 && begin <= end && !GObject::World::inActive_opTime_20130531())
+    {
+        if(!GObject::World::getRYHBActivity())
+            GObject::globalPlayers.enumerate(player_enum_2, 4);
+        GObject::GVAR.SetVar(GObject::GVAR_RYHB_ACTIVITY_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_RYHB_ACTIVITY_END, end);
+        ret = 1;
+    }
+    else if (type == 4 && begin <= end && !GObject::World::inActive_opTime_20130531())
+    {
+        if(!GObject::World::getZCJBActivity())
+            GObject::globalPlayers.enumerate(player_enum_2, 5);
+        GObject::GVAR.SetVar(GObject::GVAR_ZCJB_ACTIVITY_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_ZCJB_ACTIVITY_END, end);
+        ret = 1;
+    }
 
     Stream st(SPEP::ACTIVITYONOFF);
     st << ret << Stream::eos;
@@ -3335,6 +3370,12 @@ void QueryOneActivityOnOff(LoginMsgHdr& hdr, const void* data)
         begin = GObject::GVAR.GetVar(GObject::GVAR_SURNAMELEGEND_BEGIN);
         end = GObject::GVAR.GetVar(GObject::GVAR_SURNAMELEGEND_END);
     }
+    else if (type == 3)
+    {
+        begin = GObject::GVAR.GetVar(GObject::GVAR_RYHB_ACTIVITY_BEGIN);
+        end = GObject::GVAR.GetVar(GObject::GVAR_RYHB_ACTIVITY_END);
+    }
+
 
     Stream st(SPEP::QUERYACTIVITYONOFF);
     st << type << begin << end << Stream::eos;

@@ -906,6 +906,12 @@ function onActivityCheck(tm)
       else
           setSurnameLegend(false)
       end
+
+      if tm >= actTimeRYHB and tm < actTimeRYHB_1 then
+          setRYHBActivity(true)
+      else
+          setRYHBActivity(false)
+      end
       
       if tm >= actTime232_0 and tm < actTime232_1 then
           setFeastLoginAct(true)
@@ -1335,7 +1341,7 @@ function initActTime(y, m, d)
   local  SerStartTm234 = { ['year'] = 2013, ['month'] = 1, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm234_1 = { ['year'] = 2013, ['month'] = 1, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 时装法宝
-  local  SerStartTm235 = { ['year'] = 2013, ['month'] = 4, ['day'] = 26, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm235 = { ['year'] = 2013, ['month'] = 6, ['day'] = 26, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --大闹龙宫活动
   local  SerStartTm236 = { ['year'] = 2013, ['month'] = 1, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm236_1 = { ['year'] = 2013, ['month'] = 1, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1383,6 +1389,10 @@ function initActTime(y, m, d)
 
   local  SerStartTm2013_04_14 = { ['year'] = 2013, ['month'] = 4, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm2013_05_18 = { ['year'] = 2013, ['month'] = 5, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
+    --日月合璧活动
+  local  SerStartTmRYHB= { ['year'] = 2013, ['month'] = 6, ['day'] = 26, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTmRYHB_1= { ['year'] = 2013, ['month'] = 6, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   --300-399越南版用了
   actTime0 = os.time(SerStartTm);
@@ -1671,6 +1681,9 @@ function initActTime(y, m, d)
   actTime556 = os.time(SerStartTm556);
   actTime556_1 = os.time(SerStartTm556_1) ;
 
+  actTimeRYHB = os.time(SerStartTmRYHB);
+  actTimeRYHB_1 = os.time(SerStartTmRYHB_1) ;
+
   actTime560 = os.time(SerStartTm560);
   actTime560_1 = os.time(SerStartTm560) + 10 * 86400;
 
@@ -1768,7 +1781,7 @@ function initActTime(y, m, d)
   actTime234_1= os.time(SerStartTm234_1);
 
   actTime235_0= os.time(SerStartTm235);
-  actTime235_1= os.time(SerStartTm235) + 7 * 86400;
+  actTime235_1= os.time(SerStartTm235) + 5 * 86400;
 
   actTime236_0= os.time(SerStartTm236);
   actTime236_1= os.time(SerStartTm236_1);
