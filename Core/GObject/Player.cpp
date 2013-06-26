@@ -21498,7 +21498,7 @@ bool Player::checkBBFT()
 #define ZCJB(t, l)    (((t&0xFF)<<8)|(l&0xFF))
 void Player::sendRPZCJBInfo()
 {
-    if(!World::inActive_opTime_20130531())
+    if(!World::inActive_opTime_20130531() && !World::getZCJBActivity())
         return;
 
     UInt32 zcjb = GetVar(VAR_ZCJB_TIMES);
@@ -21528,7 +21528,7 @@ static UInt32 zcjb_award[16][3] = {
 
 bool Player::getRPZCJBAward()
 {
-    if(!World::inActive_opTime_20130531())
+    if(!World::inActive_opTime_20130531() && !World::getZCJBActivity())
         return false;
 
     UInt32 zcjb = GetVar(VAR_ZCJB_TIMES);
@@ -21573,7 +21573,7 @@ bool Player::getRPZCJBAward()
 
 void Player::checkZCJB()
 {
-    if(!World::inActive_opTime_20130531())
+    if(!World::inActive_opTime_20130531() && !World::getZCJBActivity())
         return;
 
     UInt32 zcjb = GetVar(VAR_ZCJB_TIMES);
@@ -21583,7 +21583,7 @@ void Player::checkZCJB()
     UInt8 oldTotal = total;
     for(; total < 16; ++ total)
     {
-        if(_playerData.totalRecharge < zcjb_gold[total])
+        if(GetVar(VAR_ZCJB_RECHARGE_GOLD) < zcjb_gold[total])
             break;
     }
 
