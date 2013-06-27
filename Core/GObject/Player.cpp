@@ -15037,6 +15037,7 @@ namespace GObject
 
             st << _onBattlePet->getSoulExtraAura();
             st << _onBattlePet->getSoulAuraLeft();
+            st << _onBattlePet->getSoulSkillSoulOut();
             st << _onBattlePet->getPortrait();
             _onBattlePet->appendElixirAttr2(st);
         }
