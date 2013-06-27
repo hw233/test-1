@@ -3338,7 +3338,7 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
         GObject::GVAR.SetVar(GObject::GVAR_RYHB_ACTIVITY_END, end);
         ret = 1;
     }
-    else if (type == 4 && begin <= end && !GObject::World::inActive_opTime_20130531())
+    else if (type == 4 && begin <= end && !GObject::World::inActive_opTime_20130531_zcjb())
     {
         if(!GObject::World::getZCJBActivity())
             GObject::globalPlayers.enumerate(player_enum_2, 5);
