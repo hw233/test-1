@@ -17614,12 +17614,17 @@ void Player::resetCopyFrontWinAward(bool fresh)
         if(i == tmp1)
             step = 1;
         else if(i == tmp2)
-            step = 2;
+        {
+            if(GetVar(VAR_CF_FLAG) == 1)
+                step = 2;
+            else
+                step = 0;
+        }
         else
             step = 0;
         if(GetVar(VAR_CF_LOCATION) == 0)
             SetVar(VAR_CF_LOCATION, PLAYER_DATA(this, location));
-        Table award = GameAction()->getCopyFrontmapAward(step, GetVar(VAR_CF_LOCATION));
+        Table award = GameAction()->getCopyFrontmapAward(step, GetVar(VAR_CF_LOCATION), GetVar(VAR_CF_FLAG));
         if (award.size() < 2)
         {
             printf("award.size() < 2\n");
