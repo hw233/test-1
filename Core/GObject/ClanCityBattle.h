@@ -32,11 +32,12 @@ namespace GObject
         } fgt;
         UInt8 side;
         UInt8 pos;
+        UInt8 win;
         UInt32 score;
         UInt32 cd;
         UInt32 weary;
 
-        CCBPlayer(CCBPlayerType t) : type(t), fgt(0), side(0), pos(0), score(0), cd(0), weary(0) {}
+        CCBPlayer(CCBPlayerType t) : type(t), fgt.player(0), side(0), pos(0), win(0), score(0), cd(0), weary(0) {}
         void sendInfo();
         bool challenge(CCBPlayer* other);
         bool attackNpc(CCBPlayer* npc);
@@ -60,6 +61,7 @@ namespace GObject
         CCBPlayerList battler[2];
         ClanCity* clancity;
         CCBPlayer   bomb[2];
+        CCBPlayerList npc;
 
         void playerEnter(CCBPlayer* pl);
         void playerLeave(CCBPlayer* pl);
@@ -114,6 +116,10 @@ namespace GObject
         CCBSpot      m_spots[7];
         UInt16       m_loc;
         UInt32       m_nextTime;
+        UInt32       m_expTime;
+        UInt8        m_type;
+        UInt8        m_round;
+        UInt8        m_open;
     public:
         ClanCity(UInt16 loc);
 
@@ -130,6 +136,9 @@ namespace GObject
         void openNextSpot(UInt8 id);
         void handleBattle();
         void doClanSkill(CCBPlayer* pl);
+        inline void setType(UInt8 type) { m_type = type; }
+        void endOneRound();
+        void loadFromDB();
     };
 
 } // namespace GObject

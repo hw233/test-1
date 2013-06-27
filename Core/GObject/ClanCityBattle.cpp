@@ -4,9 +4,13 @@
 #include "Clan.h"
 #include "Player.h"
 #include "Common/URandom.h"
+#include "DB/DBConnectionMgr.h"
+#include "DB/DBExecutor.h"
+#include "DB/DBExecHelper.h"
 
 #define BATTLE_TIME 2
-#define FIRST_PREPARE_TIME 120
+#define FIRST_PREPARE_TIME 90
+#define PREPARE_TIME 45
 
 #define CCB_SKILL_HP              1     // 生命鼓舞
 #define CCB_SKILL_ATK             2     // 攻击鼓舞
@@ -17,6 +21,9 @@
 #define CCB_SKILL_SPOT_EXTRA_DMG  7     // 蛮牛
 #define CCB_SKILL_ACTION_3        8     // 飞鹰
 #define CCB_SKILL_SPOT_BOMB_2     9     // 狂狮
+
+#define CLAN_CITY_TYPE_DEF            1 // 防守战
+#define CLAN_CITY_TYPE_ATK            2 // 攻城战
 
 namespace GObject
 {
@@ -30,6 +37,10 @@ static int atkRout[7][3] = {
     {0, 3, 0},
     {4, 5, 6}
 };
+
+namespace DB
+{
+}
 
 void CCBPlayer::sendInfo()
 {
@@ -102,11 +113,13 @@ bool CCBPlayer::attackNpc(CCBPlayer* npc)
     if(res)
     {
         npc->weary = 0;
+        ++ win;
         bsim.applyFighterHP(0, player, false, false);
         weary = 1 + 0.5f * bsim.getLostHPPercent(0, player);
     }
     else
     {
+        win = 0;
         npc->weary = bf->getHP();
         player->autoRegenAll();
     }
@@ -147,12 +160,15 @@ bool CCBPlayer::attackPlayer(CCBPlayer* other)
         weary = 1 + 0.5f * bsim.getLostHPPercent(0, player1);
         player2->autoRegenAll();
         other->weary = 0;
+        ++ win;
+        other->win = 0;
     }
     else
     {
+        win = 0;
+        ++ other->win;
         weary = 0;
         bsim.applyFighterHP(1, player2, false, false);
-        weary = 1 + 0.5f * bsim.getLostHPPercent(0, player1);
         other->weary = 1 + 0.5f * bsim.getLostHPPercent(1, player2);
         player1->autoRegenAll();
     }
@@ -197,7 +213,7 @@ CCBSpot::CCBSpot(ClanCity* cc) : id(0), canAtk(false), hp(0), clancity(cc)
 
 void CCBSpot::playerEnter(CCBPlayer* pl)
 {
-    if(!pl || !canAtk || hp == 0)
+    if(!pl || (!canAtk && id != 1 && id != 7) || hp == 0)
         return;
 
     UInt8 side = pl->side;
@@ -257,6 +273,8 @@ void CCBSpot::fillTo100(CCBPlayerList& dst, CCBPlayerList& src, CCBPlayer* bomb)
 bool CCBSpot::playerLeave(CCBPlayer* pl)
 {
     if(!pl)
+        return false;
+    if(canAtk)
         return false;
     UInt8 side = pl->side;
     return erasePl(waiters[side], pl);
@@ -461,8 +479,17 @@ UInt16 CCBSkill::doSkillEffect(UInt16 dmg)
     return dmg;
 }
 
-ClanCity::ClanCity(UInt16 loc) : m_loc(loc)
+ClanCity::ClanCity(UInt16 loc) : m_loc(loc), m_nextTime(0), m_expTime(0), m_type(0), m_round(0)
 {
+    for(int i = 0; i < 7; ++ i)
+    {
+        m_spots[i].id = i+1;
+        m_spots[i].hp = 1000;
+        if(i > 2 && i < 6)
+            m_spots[i].canAtk = true;
+        else
+            m_spots[i].canAtk = false;
+    }
 }
 
 void ClanCity::process(UInt32 curtime)
@@ -472,17 +499,33 @@ void ClanCity::process(UInt32 curtime)
         return;
     if(curtime < startTime + FIRST_PREPARE_TIME)
         return;
+    if(m_expTime)
+        checkAddExp(curtime);
 
-    UInt8 corr = (curtime - startTime - FIRST_PREPARE_TIME) / BATTLE_TIME;
+    if(!m_expTime)
+        m_expTime = startTime + 60;
+
     if(!m_nextTime)
     {   
+        UInt8 corr = (curtime - startTime - FIRST_PREPARE_TIME) / BATTLE_TIME;
         m_nextTime = startTime + FIRST_PREPARE_TIME + (corr + 1) * BATTLE_TIME;
     }
     if(curtime < m_nextTime)
         return;
-    m_nextTime += BATTLE_TIME;
 
     handleBattle();
+    ++ m_round;
+    if(0 == (m_round % 20))
+    {
+        m_round = 0;
+        endOneRound();
+        m_nextTime += PREPARE_TIME;
+    }
+    else
+    {
+        m_nextTime += BATTLE_TIME;
+    }
+
     if(curtime >= globalCountryBattle.getEndTime())
     {
         end();
@@ -496,6 +539,7 @@ void ClanCity::prepare(UInt16)
     if(startTime == 0)
         return;
     m_nextTime = startTime + FIRST_PREPARE_TIME;
+    m_expTime = 0;
     openNextSpot(7);
 }
 
@@ -619,6 +663,14 @@ void ClanCity::handleBattle()
     }
 }
 
+void ClanCity::endOneRound()
+{
+    for(int i = 0; i < 6; ++ i)
+    {
+        m_spots[i].end();
+    }
+}
+
 void ClanCity::doClanSkill(CCBPlayer* pl)
 {
     if(!pl)
@@ -634,6 +686,34 @@ void ClanCity::doClanSkill(CCBPlayer* pl)
 
     CCBClan* ccl = it->second;
     ccl->doSkill(pl);
+}
+
+void ClanCity::checkAddExp(UInt32 curtime)
+{
+    if(m_expTime > curtime)
+        return;
+    CCBPlayerMap::iterator iter = m_players.begin();
+    while(iter != m_players.end())
+    {
+        //计算经验
+        Player * player = iter->first;
+        if(player && iter->second->type != 1)
+        {
+            UInt8 plvl = player->GetLev();
+            UInt32 exp = 16 * ((plvl - 10) * ((plvl > 99 ? 99 : plvl) / 10) * 5 + 25);
+            if (cfg.rpServer && player->GetLev() < 70)
+                exp *= 2;
+            player->AddExp(exp);
+        }
+        ++ iter;
+    }
+    m_expTime += 60;
+}
+
+void ClanCity::loadFromDB()
+{
+    std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+    char querystr[1024] = {0};
 }
 
 }
