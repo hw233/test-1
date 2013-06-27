@@ -6093,7 +6093,7 @@ namespace GObject
 
     bool Player::addAwardByTaskColor(UInt32 taskid, bool im)
     {
-        SetVar(VAR_DROP_OUT_ITEM_MARK, 0);
+        //SetVar(VAR_DROP_OUT_ITEM_MARK, 0);
         if (!im) {
             std::vector<UInt32>& shimen = _playerData.shimen;
             std::vector<UInt8>& smcolor = _playerData.smcolor;
@@ -7560,10 +7560,10 @@ namespace GObject
             GLOBAL().PushMsg(hdr, 0);
         }
 
-        if(oLev < 60 && nLev >= 60)
+       /* if(oLev < 60 && nLev >= 60)
         {
             SetVar(VAR_DROP_OUT_ITEM_MARK, 0);
-        }
+        }*/
 
         if (nLev == 40 || nLev == 50 || nLev == 60 || nLev == 70 || nLev == 80 || nLev == 90 || nLev == 100)
             OnShuoShuo(nLev/10-4 + SS_40);
@@ -7862,7 +7862,7 @@ namespace GObject
 
         AddZRYJCount(r);
 
-        SetVar(VAR_DROP_OUT_ITEM_MARK, 0);
+        //SetVar(VAR_DROP_OUT_ITEM_MARK, 0);
     }
 
     void Player::addRechargeNextRet(UInt32 r)

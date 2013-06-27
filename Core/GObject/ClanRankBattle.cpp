@@ -1402,7 +1402,7 @@ namespace GObject
         }
 
         clan->BroadcastBattleData(m_Now);
-        player->SetVar(VAR_DROP_OUT_ITEM_MARK, 0);
+        //player->SetVar(VAR_DROP_OUT_ITEM_MARK, 0);
         player->getSurnameLegendAward(e_sla_clb);
         Stream stream(REP::CLAN_RANKBATTLE_REPINIT);
         stream << UInt8(1) << UInt8(0) << Stream::eos;
