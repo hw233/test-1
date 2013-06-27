@@ -8398,35 +8398,68 @@ function getCopyFrontmapAward(step, localtion, cf)
         item = common2[order]
         return item;
     else
-        order = math.random(1, 14)
-        if order <= 1 then
-            local items_1 = equipTrump1[localtion];
-            if items_1 == nil then
-                return {}
+        if cf == 1 then
+            order = math.random(1, 14)
+            if order <= 1 then
+                local items_1 = equipTrump1[localtion];
+                if items_1 == nil then
+                    return {}
+                end
+                local items = items_1[order]
+                if items == nil then
+                    return {}
+                end
+                order = math.random(1, #items)
+                item = items[order]
+                return item
+            elseif order <= 5 then
+                order = math.random(1, #extra_2)
+                item = extra_2[order]
+                return item
+            elseif order <= 12 then
+                order = math.random(1, #common2)
+                item = common2[order]
+                return item;
+            elseif order <= 13 then
+                order = math.random(1, #common3)
+                item = common3[order]
+                return item;
+            else
+                order = math.random(1, #gem3)
+                item = gem3[order]
+                return item;
             end
-            local items = items_1[order]
-            if items == nil then
-                return {}
-            end
-            order = math.random(1, #items)
-            item = items[order]
-            return item
-        elseif order <= 5 then
-            order = math.random(1, #extra_2)
-            item = extra_2[order]
-            return item
-        elseif order <= 12 then
-            order = math.random(1, #common2)
-            item = common2[order]
-            return item;
-        elseif order <= 13 then
-            order = math.random(1, #common3)
-            item = common3[order]
-            return item;
         else
-            order = math.random(1, #gem3)
-            item = gem3[order]
-            return item;
+            order = math.random(1, 14)
+            if order <= 0 then
+                local items_1 = equipTrump1[localtion];
+                if items_1 == nil then
+                    return {}
+                end
+                local items = items_1[order]
+                if items == nil then
+                    return {}
+                end
+                order = math.random(1, #items)
+                item = items[order]
+                return item
+            elseif order <= 4 then
+                order = math.random(1, #extra_2)
+                item = extra_2[order]
+                return item
+            elseif order <= 12 then
+                order = math.random(1, #common2)
+                item = common2[order]
+                return item;
+            elseif order <= 13 then
+                order = math.random(1, #common3)
+                item = common3[order]
+                return item;
+            else
+                order = math.random(1, #gem3)
+                item = gem3[order]
+                return item;
+            end
         end
     end
 end
