@@ -2436,7 +2436,7 @@ namespace GObject
 
         void sendRPZCJBInfo();
         bool getRPZCJBAward();
-        void checkZCJB();
+        void checkZCJB(UInt32 = 0);
         void sendRYHBInfo();
         void getRYHBAward(UInt8 idx, UInt8 cnt);
         void getSurnameLegendAward(SurnameLegendAwardFlag flag);

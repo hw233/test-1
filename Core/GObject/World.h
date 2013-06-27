@@ -729,6 +729,28 @@ public:
         return _ryhbActivity;
     }
 
+    inline static bool getZCJBActivity()
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_ZCJB_ACTIVITY_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_ZCJB_ACTIVITY_END);
+        UInt32 now = TimeUtil::Now();
+        if(begin != 0 && end != 0)
+        {
+            if(_zcjbActivity)
+            {
+                if(now < begin || now > end)
+                    _zcjbActivity = false;
+            }
+            else
+            {
+                if(now >= begin && now <= end)
+                    _zcjbActivity = true;
+            }
+        }
+
+        return _zcjbActivity;
+    }
+
     inline static void setHalfGold(bool v)
     { _halfgold = v; }
     inline static bool getHalfGold()
@@ -769,6 +791,13 @@ public:
         UInt32 time20130531 = TimeUtil::MkTime(2013, 5, 31);
 
         return ((opTime >= time20130531) && (now < (opTime + 7 * 86400)));
+    }
+    inline static bool inActive_opTime_20130531_zcjb()
+    {
+        UInt32 opTime = TimeUtil::MkTime(cfg.openYear, cfg.openMonth, cfg.openDay);
+        UInt32 time20130531 = TimeUtil::MkTime(2013, 5, 31);
+
+        return opTime >= time20130531;
     }
     inline static bool isRPServer()
     {return cfg.rpServer;}
@@ -903,6 +932,7 @@ public:
     static bool _foolbao;
     static bool _surnamelegend;
     static bool _ryhbActivity;
+    static bool _zcjbActivity;
     static bool _halfgold;
     static UInt8 _callsnakeeggact;
     static UInt8 _snakeeggawardact;
