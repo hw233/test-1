@@ -7062,7 +7062,7 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
             if(doSkillEffectExtra_Dead(bf, passiveSkill))
             {
                 _winner = testWinner();
-                if(_winner > 0)
+                if(_winner != 0)
                     return true;
                 fFakeDead = true;
             }
