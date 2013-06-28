@@ -1171,6 +1171,7 @@ namespace GObject
 		{ return (_playerData.status >> bitStart) & (((1 << bitCount) - 1)); }
 		bool canClosePK();
 
+        bool isForeverTitle(UInt8 t);
         void loadTitleAll(UInt8 t, UInt32 timeEnd);
         void fixOldVertionTitle(UInt8 t);
 		void setTitle(UInt8 s, UInt32 timeLen = 0);

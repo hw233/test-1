@@ -5439,7 +5439,6 @@ namespace GObject
             {
                 notifyTitleAll();
                 writeTitleAll();
-                changeTitle(0);
             }
         }
         else
@@ -5451,8 +5450,17 @@ namespace GObject
         return _playerData.title;
     }
 
+    bool Player::isForeverTitle(UInt8 t)
+    {   //38道尊 39释尊 40儒尊 201名震蜀山
+        if(t == 38 || t == 39 || t == 40 || t == 201)
+            return true;
+        return false;
+    }
+
     void Player::loadTitleAll(UInt8 t, UInt32 timeEnd)
     {
+        if(isForeverTitle(t) && timeEnd == 0)
+            return;
         std::map<UInt8, UInt32>& titleAll = _playerData.titleAll;
         titleAll[t] = timeEnd;
     }
@@ -16704,6 +16712,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
         }
 
         _playerData.titleAll.erase(title);
+        changeTitle(0);
         return false;
     }
 
