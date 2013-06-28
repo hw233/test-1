@@ -6567,7 +6567,7 @@ void OnComparBattelPoint( GameMsgHdr & hdr, CompareBattlePoint& cbp)
 {
 	MSG_QUERY_PLAYER(player);
 
-	GObject::Player * pl = GObject::globalNamedPlayers[cbp._name];
+	GObject::Player * pl = GObject::globalNamedPlayers[player->fixName(cbp._name)];
     if (NULL == pl)
         return;
     UInt8 tid = pl->getThreadId();
