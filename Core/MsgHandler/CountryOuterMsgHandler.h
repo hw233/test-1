@@ -6524,8 +6524,10 @@ void OnRPServerReq( GameMsgHdr & hdr, const void * data)
             break;
         case 0x04:
             {
+                /*
                 if(cfg.rpServer == e_rp_xinyun)
                     break;
+                */
                 UInt8 type = 0;
                 brd >> type;
                 if(1 == type)
@@ -6567,7 +6569,7 @@ void OnComparBattelPoint( GameMsgHdr & hdr, CompareBattlePoint& cbp)
 {
 	MSG_QUERY_PLAYER(player);
 
-	GObject::Player * pl = GObject::globalNamedPlayers[cbp._name];
+	GObject::Player * pl = GObject::globalNamedPlayers[player->fixName(cbp._name)];
     if (NULL == pl)
         return;
     UInt8 tid = pl->getThreadId();
