@@ -254,6 +254,14 @@ namespace GObject
 		    : ItemTrump(id, itemEquipType, itemEquipData)
 		{ }
     };
+    
+    class ItemInnateTrump: public ItemTrump
+    {
+	public:
+		ItemInnateTrump(UInt32 id, const GData::ItemBaseType* itemEquipType, ItemEquipData& itemEquipData)
+		    : ItemTrump(id, itemEquipType, itemEquipData)
+		{ }
+    };
 
     class ItemLingbao : public ItemEquip
     {

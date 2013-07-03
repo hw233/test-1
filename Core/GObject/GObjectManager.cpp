@@ -4286,6 +4286,7 @@ namespace GObject
                 case Item_Ring:
                 case Item_Amulet:
                 case Item_Halo:
+                case Item_InnateTrump:
                 case Item_Fashion:
                 case Item_Trump:
                 case Item_LBling:
@@ -4330,12 +4331,19 @@ namespace GObject
 						equip = new ItemArmor(dbe.id, itype, ied);
                         break;
                     case Item_Halo:
+                    case Item_InnateTrump:
                     case Item_Fashion:
                     case Item_Trump:
                         if (itype->subClass == Item_Halo)
                         {
                             equip = new ItemHalo(dbe.id, itype, ied);
                             if (equip && ied.enchant)
+                                ((ItemTrump*)equip)->fixSkills();
+                        }
+                        else if(itype->subClass == Item_InnateTrump)
+                        {
+                            equip = new ItemInnateTrump(dbe.id, itype, ied);
+                            if(equip && ied.enchant)
                                 ((ItemTrump*)equip)->fixSkills();
                         }
                         else if (itype->subClass == Item_Fashion)
@@ -4952,6 +4960,19 @@ namespace GObject
 			return NULL;
 		}
 		return static_cast<ItemHalo*>(equip);
+	}
+
+	ItemInnateTrump * GObjectManager::fetchInnateTrump( UInt32 id )
+	{
+		ItemEquip * equip = fetchEquipment(id);
+		if(equip == NULL)
+			return NULL;
+		if(equip->GetItemType().subClass != static_cast<UInt8>(Item_InnateTrump))
+		{
+			delete equip;
+			return NULL;
+		}
+		return static_cast<ItemInnateTrump*>(equip);
 	}
 
 	ItemWeapon * GObjectManager::fetchWeapon( UInt32 id )

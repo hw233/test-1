@@ -821,7 +821,8 @@ void Fighter::sendModification( UInt8 n, UInt8 * t, ItemEquip ** v, bool writedb
                 esa.appendAttrToStream(st);
             }
 
-            if(equip->getClass() == Item_Trump || equip->getClass() == Item_Fashion || equip->getClass() == Item_Halo)
+            if(equip->getClass() == Item_Trump || equip->getClass() == Item_Fashion ||
+               equip->getClass() == Item_Halo || equip->getClass() == Item_InnateTrump)
             {
                 st << ied.maxTRank << ied.trumpExp;
             }
@@ -1064,7 +1065,7 @@ inline bool checkTrumpMutually(Player* _owner, UInt32 trumpid)
 ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
 {
     ItemEquip* t = 0;
-    if (trump && trump->getClass() == Item_Halo)
+    if (trump && (trump->getClass() == Item_Halo || trump->getClass() == Item_InnateTrump))
     {
         //return setHalo((ItemHalo*)trump, writedb);
         // XXX: 直接放入包裹
@@ -5290,7 +5291,8 @@ void Fighter::SSOpen(UInt16 id)
         return;
 
     //
-    if (item->getClass() != Item_Trump && item->getClass() != Item_Halo && item->getClass() != Item_Fashion)
+    if (item->getClass() != Item_Trump && item->getClass() != Item_Halo && 
+        item->getClass() != Item_Fashion && item->getClass() != Item_InnateTrump)
     {
         if(!pkg->DelItem2(item, 1, ToSkillStrengthenOpen))
             return;
@@ -5393,7 +5395,9 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, UInt16 itemNum, bool bind)
     if (!item)
         return 0;
 
-    if ((item->getClass() == Item_Trump || item->getClass() == Item_Fashion || item->getClass() == Item_Halo) && itemNum > 1)
+    if ((item->getClass() == Item_Trump || item->getClass() == Item_Fashion ||
+         item->getClass() == Item_Halo || item->getClass() == Item_InnateTrump) && 
+         (itemNum > 1))
         return 0;
 
     const GData::ItemBaseType& ibt = item->GetItemType();

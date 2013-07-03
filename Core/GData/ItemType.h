@@ -71,6 +71,7 @@ enum ItemClass
     Item_LBling,        // 灵宝-灵 13
     Item_LBwu,          // 灵宝-悟 14
     Item_LBxin,         // 灵宝-信 15
+    Item_InnateTrump,   // 先天法宝 16
 	Item_Normal = 20,	//普通物品 20~29
     Item_Normal27 = 27,
     Item_Normal28 = 28,

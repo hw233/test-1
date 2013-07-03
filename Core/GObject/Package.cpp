@@ -1025,6 +1025,7 @@ namespace GObject
 		case Item_Ring:
 		case Item_Amulet:
         case Item_Halo:
+        case Item_InnateTrump:
         case Item_Fashion:
         case Item_Trump:
         case Item_LBling:
@@ -1042,6 +1043,7 @@ namespace GObject
                 case Item_Trump:
                 case Item_Fashion:
                 case Item_Halo:
+                case Item_InnateTrump:
                 case Item_LBling:
                 case Item_LBwu:
                 case Item_LBxin:
@@ -1085,6 +1087,7 @@ namespace GObject
                     equip = new ItemArmor(id, itype, edata);
 					break;
                 case Item_Halo:
+                case Item_InnateTrump:
                 case Item_Fashion:
                 case Item_Trump:
                     {
@@ -1105,6 +1108,10 @@ namespace GObject
                         if (itype->subClass == Item_Halo)
                         {
                             equip = new ItemHalo(id, itype, edata);
+                        }
+                        else if (itype->subClass == Item_InnateTrump)
+                        {
+                            equip = new ItemInnateTrump(id, itype, edata);
                         }
                         else if (itype->subClass == Item_Fashion)
                         {
@@ -1180,9 +1187,12 @@ namespace GObject
 				ITEM_BIND_CHECK(itype->bindType,bind);
 				equip->SetBindStatus(bind);
 
-                if (itype->subClass != Item_Trump && itype->subClass != Item_Fashion && itype->subClass != Item_Halo && itype->quality == 5)
+                if (itype->subClass != Item_Trump && itype->subClass != Item_Fashion && 
+                    itype->subClass != Item_Halo && itype->subClass != Item_InnateTrump && 
+                    itype->quality == 5)
                     m_Owner->OnShuoShuo(SS_OE);
-                if (itype->subClass == Item_Trump || itype->subClass == Item_Halo || itype->subClass == Item_Fashion)
+                if (itype->subClass == Item_Trump || itype->subClass == Item_Halo ||
+                    itype->subClass == Item_Fashion || itype->subClass == Item_InnateTrump)
                     m_Owner->OnShuoShuo(SS_TRUMP);
 
 				ItemBase *& e = m_Items[id];
@@ -1306,14 +1316,13 @@ namespace GObject
         if(FromWhere == FromDungeon || FromWhere  == FromNpc)
         {
                     //获取法宝成就
-            if(itype->subClass == Item_Trump || itype->subClass == Item_Halo || itype->subClass == Item_Fashion)
+            if(itype->subClass == Item_Trump || itype->subClass == Item_Halo ||
+               itype->subClass == Item_Fashion || itype->subClass == Item_InnateTrump)
             {
                 GameAction()->doAttainment(this->m_Owner, Script::ADD_TRUMP, itype->quality);
     //                if(itype->quality == 5)
                //获得累计法宝
                 GameAction()->doAttainment(this->m_Owner, Script::ADD_NTRUMP,1 );
-
-
             }
             else
             {
