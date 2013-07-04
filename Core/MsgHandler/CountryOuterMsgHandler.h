@@ -1665,6 +1665,8 @@ void OnRecruitFighterReq( GameMsgHdr& hdr, RecruitFighterReq& rfr )
     {   //将新招募的散仙放入修炼位
         UInt32 fgts[1] = { id };
         GObject::practicePlace.sitdown(player, fgts, 1);
+        player->GetTaskMgr()->CompletedTask(201);
+        player->GetTaskMgr()->CompletedTask(202);
     }
     GameAction()->RunOperationTaskAction0(player, 3);
 }
@@ -5597,8 +5599,8 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
     //return; // XXX: 不使用老版本新注册七日活动
 
 	BinaryReader br(data, hdr.msgHdr.bodyLen);
-    UInt8 op = 0;
-    br >> op;
+    UInt8 op = 0, idx = 0;
+    br >> op >> idx;
 
     if (op  < 6 )
         return;
@@ -5614,11 +5616,7 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
             break;
 
         case 4:
-            {
-                UInt8 idx = 0;
-                br >> idx;
-                player->getContinuousReward(op, idx);
-            }
+            player->getContinuousReward(op, idx);
             break;
 
         case 5:
@@ -5631,32 +5629,26 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
         case 7:
             player->getYearRPReward();
             break;
-        case 8:
-            player->getFishUserAward();
-            break;
-        case 9:
-            player->getFishUserPackage();
-            break;
         case 10:
             {
-                UInt8 idx = 0;
-                br >> idx;
                 if(idx != 0 && !player->hasChecked())
                     return;
                 player->doVipPrivilege(idx);
             }
             break;
+        case 8:
         case 11:
         case 13:
         case 15:
         case 17:
             player->getFishUserAward();
             break;
+        case 9:
         case 12:
         case 14:
         case 16:
         case 18:
-            player->getFishUserPackage();
+            player->getFishUserPackage(idx);
             break;
 
         default:

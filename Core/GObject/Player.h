@@ -186,7 +186,7 @@ namespace GObject
 #define SPREAD_ALREADY_USE        0x01
 #define SPREAD_ALREADY_GET        0x02
 
-#define SET_BIT(X,Y)     (X | (1<<Y))                                                                                                                                                          
+#define SET_BIT(X,Y)     (X | (1<<Y))
 #define GET_BIT(X,Y)     (X & (1<<Y))
 #define CLR_BIT(X,Y)     (X & ~(1<<Y))
 #define GET_BIT_MARK(X,Y)     ((X>>Y) & 1)
@@ -1414,7 +1414,7 @@ namespace GObject
         void setInQQGroup (bool v) {_inQQGroup = v;}
         //捕鱼大亨用户
         void sendFishUserInfo();
-        void getFishUserPackage();
+        void getFishUserPackage(UInt8);
         void getFishUserAward();
 	public:
 		UInt16   GetFreePackageSize();
@@ -1941,6 +1941,8 @@ namespace GObject
         void newRC7DayUdpLog(UInt32 id, UInt32 type = 0, UInt32 num  = 1);
         void transformUdpLog(UInt32 id, UInt32 type, UInt32 money1, UInt32 money2, UInt32 money3, UInt32 money4, UInt8 val1);
         void dreamerUdpLog(UInt32 id, UInt32 type, UInt32 num = 1);
+        void blueDiamondAwardUdpLog(UInt8 type);
+        void cFriendAwardUdpLog(UInt8 type);
         void guideUdp(UInt8 type, std::string& p1, std::string& p2);
         void moneyLog(int type, int gold, int coupon = 0, int tael = 0, int achievement = 0, int prestige = 0);
         void actUdp(UInt8 type, std::string& p1, std::string& p2);

@@ -2803,6 +2803,10 @@ function ItemNormal_00000037(iid, num, bind, param)
 	local player = GetPlayer();
     local package = player:GetPackage();
 
+    if player:GetLev() < 30 then
+        player:sendMsgCode(0, 1093, 30);
+        return false
+    end
     if package:GetRestPackageSize() < 8*num then     
         player:sendMsgCode(2, 1011, 0);
         return false;

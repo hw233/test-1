@@ -89,8 +89,9 @@ function onUseTickets(player)
         player:sendMsgCode(2, 1110, 0)
         return 0
     end
-    local items = { {502, 1}, {510, 1}, {499, 10}, {503, 1}, {57, 1}, {56, 1}, {15, 1} }
-    local chance = {2700, 5400, 6000, 6400, 7600, 8800, 10000}
+    local items = { {15, 1}, {133, 1}, {1326, 1}, {503, 1}, {548, 1}, {499, 10}, {5135, 1}, {1717, 1} }
+    local chance = {2100, 4200, 6300, 7080, 9180, 9994, 9999, 10000}
+    --[[
     if not isFBVersion() then    --10QB奖励
         for i = 33, 40 do
             if player:hasRealItemAward(i) then
@@ -102,13 +103,14 @@ function onUseTickets(player)
             end
         end
     end
+    --]]
     local package = player:GetPackage()
     if package:GetRestPackageSize() < 1 then
         player:sendMsgCode(2, 1011, 0)
         return 0
     end
-    local r = math.random(1, 10000)
     local tmp = 0
+    local r = math.random(1, 10000)
     for i = 1, #chance do
         if r <= chance[i] then
             tmp = i
@@ -119,6 +121,9 @@ function onUseTickets(player)
         player:pendCoupon(items[tmp][2])
     else
         package:Add(items[tmp][1], items[tmp][2], true, true, 40)
+    end
+    if items[tmp][1] == 5135 or items[tmp][1] == 1717 then
+        Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]运气爆棚，抽到了[4:"..items[tmp][1].."]x1，邀请好友、分享游戏故事即可获得抽奖机会！")
     end
     player:SetVar(424, var - 1)
     player:lastCFTicketsAward(items[tmp][1], items[tmp][2])
