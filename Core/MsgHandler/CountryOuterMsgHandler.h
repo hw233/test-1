@@ -1305,6 +1305,16 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendDirectPurInfo();
     pl->getQQTenpayAward(0);
    // pl->xingchenInfo();
+   //处理老玩家的新手任务！
+   if(pl->GetLev() >= 45)
+   {
+        pl->GetTaskMgr()->AcceptTask(200);
+        pl->GetTaskMgr()->CompletedTask(200);
+   }
+   if(pl->getFighterCount() >= 4)
+        pl->GetTaskMgr()->CompletedTask(201);
+   if(pl->getFighterCount() >= 5)
+        pl->GetTaskMgr()->CompletedTask(202);
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
