@@ -986,8 +986,8 @@ function onVipLevelAward(player, vipLevel)
     
     local itemCount = {3, 10, 20, 45, 100, 150, 200, 270, 360, 500, 650, 800, 950, 1300, 1800};
 
-    local startTime = { ['year'] = 2013, ['month'] = 6, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-    local endTime = { ['year'] = 2013, ['month'] = 6, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local startTime = { ['year'] = 2013, ['month'] = 7, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local endTime = { ['year'] = 2013, ['month'] = 7, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local s = os.time(startTime);
     local e = os.time(endTime);
     local n = os.time();

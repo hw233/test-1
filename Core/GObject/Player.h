@@ -2160,6 +2160,7 @@ namespace GObject
         void getQQIMQuickLoginAward(UInt8 opt);
         void getEquipMoveAward(UInt8 opt);
         void getVipLevelAward(UInt8 opt);
+        void getQQXiuAward(UInt8 opt);                                                                                       
         UInt32 getFighterEquipAward();
 
         // 帮派神像

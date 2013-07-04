@@ -457,6 +457,7 @@ namespace GObject
         VAR_JOBHUNT_AUTO_FIGHT_USE_MONEY_MARK = 510, // 寻墨自动战斗使用金钱情况
         VAR_VIPLEVEL_AWARD = 511, // 御剑等级回馈
         VAR_DROP_OUT_ITEM_MARK = 512,// 反工作室限制方案
+        VAR_QQXIU_AWARD = 513, // QQ秀合作
 
         // 521-540 for zhgc
         VAR_ZCJB_TIMES = 521,      // 招财进宝
@@ -783,6 +784,7 @@ namespace GObject
             REGISTER_VAR(VAR_JOBHUNT_AUTO_FIGHT_USE_MONEY_MARK, CYCLE_NONE);
             REGISTER_VAR(VAR_VIPLEVEL_AWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_DROP_OUT_ITEM_MARK, CYCLE_NONE);
+            REGISTER_VAR(VAR_QQXIU_AWARD, CYCLE_NONE);
 
             //REGISTER_VAR(VAR_ARENA_SUFFERED, CYCLE_DAY);
             //REGISTER_VAR(VAR_ARENA_LASTTIME, CYCLE_DAY);

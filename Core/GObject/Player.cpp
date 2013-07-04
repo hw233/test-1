@@ -11053,13 +11053,46 @@ namespace GObject
             //御剑等级回馈
             getVipLevelAward(opt);
             break;
+        case 26:
+            //QQ秀合作
+            getQQXiuAward(opt);
+            break;
         }
     }
     
-    void Player::getVipLevelAward(UInt8 opt)
+    void Player::getQQXiuAward(UInt8 opt)
     {
         return; //暂时不上
 
+        UInt8 state = GetVar(VAR_QQXIU_AWARD);
+
+        if (GetPackage()->GetRestPackageSize() < 6 && opt == 1)
+        {
+            sendMsgCode(0, 1011);
+
+            return;
+        }
+
+        if(opt == 1 && state == 0)
+        {
+            GetPackage()->AddItem(9371, 2, true, false, FromQQXiu);
+            GetPackage()->AddItem(503, 1, true, false, FromQQXiu);
+            GetPackage()->AddItem(515, 1, true, false, FromQQXiu);
+            GetPackage()->AddItem(509, 1, true, false, FromQQXiu);
+            GetPackage()->AddItem(50, 10, true, false, FromQQXiu);
+
+            SetVar(VAR_QQXIU_AWARD, 1);
+            state = 1;
+        }
+            
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(26);
+        st << state << Stream::eos;
+        send(st);
+    }
+
+    void Player::getVipLevelAward(UInt8 opt)
+    {
         if(opt > getVipLevel())
         {
             sendMsgCode(0, 1003);
