@@ -1902,11 +1902,7 @@ void Fighter::isCanStrengthenSuit(UInt32 * setId, UInt32 * setNum)
         {
             if(equip[i]->getItemEquipData().enchant >= 8)
             {
-                if(0 == i)
-                {
-                    aMark = true;
-                }
-                if(i>0 && aMark)
+                if((0 == i) || (i>0 && aMark))
                 {
                     aMark = true;
                 }
@@ -1921,11 +1917,7 @@ void Fighter::isCanStrengthenSuit(UInt32 * setId, UInt32 * setNum)
 
             if(equip[i]->getItemEquipData().enchant >= 9)
             {
-                if(0 == i)
-                {
-                    bMark = true;
-                }
-                if(i>0 && bMark)
+                if((0 == i) || (i>0 && bMark))
                 {
                     bMark = true;
                 }
@@ -1939,11 +1931,7 @@ void Fighter::isCanStrengthenSuit(UInt32 * setId, UInt32 * setNum)
 
             if(equip[i]->getItemEquipData().enchant >= 10)
             {
-                if(0 == i)
-                {
-                    cMark = true;
-                }
-                if(i>0 && cMark)
+                if((0 == i) || (i>0 && cMark))
                 {
                     cMark = true;
                 }
