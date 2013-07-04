@@ -729,6 +729,8 @@ namespace GObject
         _cbHPflag = false;
 
         _inQQGroup = false;
+
+        _loadMark = false;
 	}
 
 
@@ -1290,6 +1292,12 @@ namespace GObject
 #ifdef DREAMER_DEBUG
         getDreamer();
 #endif
+
+        if(!_loadMark)
+        {
+            LOAD().Push(getId(), 0);
+            _loadMark = true;
+        }
 	}
 
 #define WEBDOWNLOAD 255
@@ -1426,6 +1434,7 @@ namespace GObject
 
     void Player::skillStrengthenLog(UInt8 type, UInt32 val)
     {
+        return; // XXX: 取消上报
         char action[16] = "";
         UInt32 num = 1;
         switch (type)
@@ -1505,6 +1514,7 @@ namespace GObject
 
     void Player::athleticsUdpLog(UInt32 id, UInt8 type /* = 0 */)
     {
+        return; // XXX: 取消上报
         // 斗剑功能相关日志
         char action[16] = "";
         if (type)
@@ -1602,6 +1612,7 @@ namespace GObject
 
     void Player::secondSoulUdpLog(UInt32 id, UInt32 val /* = 0 */, UInt32 num /* = 1 */)
     {
+        return; // XXX: 取消上报
         // 元神相关日志
         char action[16] = "";
         if (val)
@@ -1627,6 +1638,7 @@ namespace GObject
 
     void Player::clanCopyUdpLog(UInt32 id, UInt32 val /* = 0 */, UInt32 num /* = 1 */)
     {
+        return; // XXX: 取消上报
         // 帮派副本相关日志
         char action[16] = "";
         if (val)
@@ -1657,6 +1669,7 @@ namespace GObject
 
     void Player::storeUdpLog(UInt32 id, UInt32 type, UInt32 itemId, UInt32 num /* = 1 */)
     {
+        return; // XXX: 取消上报
         // 商城购买相关日志（现在只有荣誉和声望）
         char action[32] = "";
         snprintf (action, 32, "F_%d_%d_%d", id, type, itemId);
@@ -15070,6 +15083,7 @@ namespace GObject
 
             st << _onBattlePet->getSoulExtraAura();
             st << _onBattlePet->getSoulAuraLeft();
+            st << _onBattlePet->getSoulSkillSoulOut();
             st << _onBattlePet->getPortrait();
             _onBattlePet->appendElixirAttr2(st);
         }
@@ -17646,12 +17660,17 @@ void Player::resetCopyFrontWinAward(bool fresh)
         if(i == tmp1)
             step = 1;
         else if(i == tmp2)
-            step = 2;
+        {
+            if(GetVar(VAR_CF_FLAG) == 1)
+                step = 2;
+            else
+                step = 0;
+        }
         else
             step = 0;
         if(GetVar(VAR_CF_LOCATION) == 0)
             SetVar(VAR_CF_LOCATION, PLAYER_DATA(this, location));
-        Table award = GameAction()->getCopyFrontmapAward(step, GetVar(VAR_CF_LOCATION));
+        Table award = GameAction()->getCopyFrontmapAward(step, GetVar(VAR_CF_LOCATION), GetVar(VAR_CF_FLAG));
         if (award.size() < 2)
         {
             printf("award.size() < 2\n");

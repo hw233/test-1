@@ -1,4 +1,5 @@
 ﻿#include "Config.h"
+
 #include "WorldServer.h"
 #include "GData/GDataManager.h"
 #include "GObject/GObjectManager.h"
@@ -161,6 +162,8 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 #endif
 #endif
 #endif
+	worker = WORKER_THREAD_LOAD;
+	m_AllWorker[worker] = new WorkerThread<GObject::LoadWorker>(new GObject::LoadWorker(0, WORKER_THREAD_LOAD));
 	worker = WORKER_THREAD_DB;
 	m_AllWorker[worker] = new WorkerThread<DB::DBWorker>(new DB::DBWorker(0, WORKER_THREAD_DB));
 	worker = WORKER_THREAD_DB1;
@@ -235,6 +238,8 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 #endif
 #endif
 #endif
+    worker = WORKER_THREAD_LOAD;
+    m_AllWorker[worker]->Run();
 	return true;
 }
 
@@ -344,6 +349,8 @@ void WorldServer::Shutdown()
 #ifdef OPEN_API_ON
     m_AllWorker[WORKER_THREAD_OPEN_API]->Shutdown();
 #endif
+
+    m_AllWorker[WORKER_THREAD_LOAD]->Shutdown();
 }
 
 #define MAX_RET_LEN 1024
@@ -498,6 +505,11 @@ GObject::OpenAPIWorker& WorldServer::GetOpenAPI()
 #endif
 #endif
 #endif
+
+GObject::LoadWorker& WorldServer::GetLoad()
+{
+	return Worker<GObject::LoadWorker>(WORKER_THREAD_LOAD);
+}
 
 DB::DBWorker& WorldServer::GetDB()
 {
