@@ -258,8 +258,37 @@ Mail * MailBox::newMail( Player * sender, UInt8 type, const std::string& title, 
 	return mail;
 }
 
+class find_mail_less
+{
+public:
+	bool operator()(const Mail * mail1, const Mail * mail2)
+	{
+		return mail1->id > mail2->id;
+	}
+
+	bool operator()(const Mail * mail, UInt32 id)
+	{
+		return mail->id > id;
+	}
+
+	bool operator()(UInt32 id, const Mail * mail)
+	{
+		return mail->id < id;
+	}
+
+};
+
 Mail * MailBox::newMail( UInt32 id, const std::string& sender, UInt32 recvTime, UInt8 type, const std::string& title, const std::string& content, UInt32 additional /*= 0*/ )
 {
+    if(_mailBox.size() > 0)
+    {
+        std::deque<Mail *>::iterator it = _mailBox.begin();
+        for(; it != _mailBox.end(); ++it)
+        {
+            if((*it)->id == id) return NULL;
+        }
+    }
+
 	Mail * mail = new(std::nothrow) Mail();
 	if(mail == NULL)
 		return NULL;
@@ -272,7 +301,12 @@ Mail * MailBox::newMail( UInt32 id, const std::string& sender, UInt32 recvTime, 
 	mail->additional = additional;
 	if(!(type & 0x80))
 		++ _newMails;
-	_mailBox.push_front(mail);
+
+	std::deque<Mail *>::iterator iter = std::lower_bound(_mailBox.begin(), _mailBox.end(), id, find_mail_less());
+    if(iter == _mailBox.end())
+        _mailBox.push_back(mail);
+    else
+        _mailBox.insert(iter, mail);
 	return mail;
 }
 
@@ -319,27 +353,6 @@ Mail * MailBox::newItemPackageMail(const char * title, const char * content, lua
 	SAFE_DELETE(mitem);
 	return pmail;
 }
-
-
-class find_mail_less
-{
-public:
-	bool operator()(const Mail * mail1, const Mail * mail2)
-	{
-		return mail1->id > mail2->id;
-	}
-
-	bool operator()(const Mail * mail, UInt32 id)
-	{
-		return mail->id > id;
-	}
-
-	bool operator()(UInt32 id, const Mail * mail)
-	{
-		return mail->id < id;
-	}
-
-};
 
 bool MailBox::delMail( UInt32 id, bool freeAdd )
 {

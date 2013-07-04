@@ -3286,7 +3286,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                     {
                         ConsumeInfo ci(Discount3+logVarOffset, 0, 0);
                         player->useGold(price, &ci);
-                        player->discountLog(discountType);
+                        //player->discountLog(discountType);
                     }
                     st << static_cast<UInt8>(0);
 
@@ -6516,8 +6516,10 @@ void OnRPServerReq( GameMsgHdr & hdr, const void * data)
             break;
         case 0x04:
             {
+                /*
                 if(cfg.rpServer == e_rp_xinyun)
                     break;
+                */
                 UInt8 type = 0;
                 brd >> type;
                 if(1 == type)
