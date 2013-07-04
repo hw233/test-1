@@ -3284,7 +3284,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                     {
                         ConsumeInfo ci(Discount3+logVarOffset, 0, 0);
                         player->useGold(price, &ci);
-                        player->discountLog(discountType);
+                        //player->discountLog(discountType);
                     }
                     st << static_cast<UInt8>(0);
 

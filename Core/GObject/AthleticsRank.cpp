@@ -1748,7 +1748,7 @@ void AthleticsRank::TmExtraAward(UInt8 type)
                     //udplog
                     char udpStr[32] = {0};
                     sprintf(udpStr, "F_1119_%d", rank);
-                    ranker->udpLog("athleticsRank", udpStr, "", "", "", "", "act");
+                    //ranker->udpLog("athleticsRank", udpStr, "", "", "", "", "act");
                 }
 
                 RankL start1L = curType.begin();
@@ -1826,7 +1826,7 @@ void AthleticsRank::TmExtraAward(UInt8 type)
                     //udplog
                     char udpStr[32] = {0};
                     sprintf(udpStr, "F_1119_%d", i);
-                    rank->ranker->udpLog("athleticsRank", udpStr, "", "", "", "", "act");
+                    //rank->ranker->udpLog("athleticsRank", udpStr, "", "", "", "", "act");
                 }
             }
         }
@@ -1888,7 +1888,7 @@ void AthleticsRank::TmExtraAward(UInt8 type)
             //udplog
             char udpStr[32] = {0};
             sprintf(udpStr, "F_1119_%d", rank);
-            ranker->udpLog("athleticsRank", udpStr, "", "", "", "", "act");
+            //ranker->udpLog("athleticsRank", udpStr, "", "", "", "", "act");
         }
 
         AthleticsList::iterator start1 = _athleticses[1].begin();
