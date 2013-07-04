@@ -1380,7 +1380,7 @@ namespace GObject
             equip->getQuality() == 5)
             m_Owner->OnShuoShuo(SS_OE);
         if (equip->getClass() == Item_Trump || equip->getClass() == Item_Halo || 
-            equip->getClass() == Item_Fashion || equip == Item_InnateTrump)
+            equip->getClass() == Item_Fashion || equip->getClass() == Item_InnateTrump)
             m_Owner->OnShuoShuo(SS_TRUMP);
 
 		DB4().PushUpdateData("REPLACE INTO `item` VALUES(%u, %u, %"I64_FMT"u, %d)", equip->getId(), 1, m_Owner->getId(), equip->GetBindStatus() ? 1 : 0);
@@ -1745,7 +1745,7 @@ namespace GObject
 					return false;
 				old = fgt->setRing(static_cast<GObject::ItemEquip *>(item));
 				break;
-            case 0x29:
+            case 0x70:
 				if(item->getClass() != Item_InnateTrump)
 					return false;
 				old = fgt->setInnateTrump(static_cast<GObject::ItemInnateTrump*>(item));
@@ -1819,6 +1819,9 @@ namespace GObject
             case 0x62:
                 old = fgt->setLingbao(part-0x60, static_cast<GObject::ItemLingbao*>(NULL));
                 fgt->eraseLingbaoInfo(old);
+                break;
+            case 0x70:
+				old = fgt->setInnateTrump(NULL);
                 break;
             default:
                 return false;
@@ -2956,7 +2959,7 @@ namespace GObject
         if(updateHft)
             hf->updateHftValueToDB(hft);
         bless = hf->getHftValue(hft);
-        if(equip->getClass() == Item_Trump || equip->getClass() == Item_Halo || equp->getClass() == Item_InnateTrump)
+        if(equip->getClass() == Item_Trump || equip->getClass() == Item_Halo || equip->getClass() == Item_InnateTrump)
             GameAction()->doStrong(this->m_Owner, SthTrumpEnchant, 0, 0);
         else
             GameAction()->doStrong(this->m_Owner, SthEnchant, 0, 0);
@@ -5959,8 +5962,7 @@ namespace GObject
             if(item == NULL ||
                (item->getClass() != Item_Trump && 
                 item->getClass() != Item_Fashion &&
-                item->getClass() != Item_Hali &&
-
+                item->getClass() != Item_Halo &&
                 item->getClass() != Item_InnateTrump))
                 return 2;
 

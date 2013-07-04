@@ -438,6 +438,7 @@ public:
     void addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills, bool = true, bool = false, bool = true);
     void delSkillsFromCT(const std::vector<const GData::SkillBase*>& skills, bool = true);
 
+	inline ItemInnateTrump* getInnateTrump() { return _innateTrunp; }
 	inline ItemHalo* getHalo() { return _halo; }
 	inline ItemFashion* getFashion() { return _fashion; }
 	inline ItemWeapon * getWeapon() { return _weapon; }
@@ -502,6 +503,7 @@ public:
 	UInt32 getBuffData(UInt8 idx, UInt32 now = TimeUtil::Now());
 	void setBuffData(UInt8, UInt32, bool = true);
 
+	UInt32 getInnateTrumpId();
 	UInt32 getHaloId();
 	UInt32 getFashionId();
 	UInt32 getWeaponId();
@@ -509,6 +511,7 @@ public:
 	UInt32 getAmuletId();
 	UInt32 getRingId();
 
+	UInt32 getInnateTrumpTypeId();
 	UInt32 getHaloTypeId();
 	UInt32 getFashionTypeId();
     UInt16 getPortrait();
@@ -519,7 +522,7 @@ public:
 	inline UInt8 getColor() { return _color; }
 	static UInt8 getColor2(float);
 
-	ItemEquip * setInnateTrump(ItemHalo* r, bool = true);
+	ItemEquip * setInnateTrump(ItemInnateTrump* r, bool = true);
 	ItemEquip * setHalo(ItemHalo* r, bool = true);
 	ItemEquip * setFashion(ItemFashion* r, bool = true);
 	ItemWeapon * setWeapon(ItemWeapon * w, bool = true);
@@ -810,6 +813,7 @@ protected:
 	ItemEquip * _amulet;
 	ItemEquip * _trump[TRUMP_UPMAX];    // 法宝
 	ItemEquip * _lingbao[e_lb_max];// 灵宝
+    ItemInnateTrump * _innateTrunp; // 先天法宝
 
 	bool _attrDirty;
 	UInt32 _maxHP;
