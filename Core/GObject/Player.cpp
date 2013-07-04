@@ -729,6 +729,8 @@ namespace GObject
         _cbHPflag = false;
 
         _inQQGroup = false;
+
+        _loadMark = false;
 	}
 
 
@@ -1290,6 +1292,12 @@ namespace GObject
 #ifdef DREAMER_DEBUG
         getDreamer();
 #endif
+
+        if(!_loadMark)
+        {
+            LOAD().Push(getId(), 0);
+            _loadMark = true;
+        }
 	}
 
 #define WEBDOWNLOAD 255

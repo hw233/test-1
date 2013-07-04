@@ -8,6 +8,7 @@
 #include "DB/DBWorker.h"
 #include "Login/LoginWorker.h"
 #include "WorkerThread.h"
+#include "GObject/LoadWorker.h"
 
 #include <curl/curl.h>
 
@@ -21,6 +22,7 @@ namespace GObject
     class DCWorker;
     class OpenAPIWorker;
 #endif
+    class LoadWorker;
 }
 
 class BaseThread;
@@ -62,6 +64,7 @@ public:
 	DB::DBWorker& GetDBLog();
 	DB::DBWorker& GetDBLog1();
 	Login::LoginWorker& GetLogin();
+    GObject::LoadWorker& GetLoad();
 
 	inline Network::TcpServerWrapper* GetTcpService() {return m_TcpService;}
 
@@ -120,6 +123,7 @@ private:
 #define DBLOG()			SERVER().GetDBLog()
 #define DBLOG1()		SERVER().GetDBLog1()
 #define LOGIN()			SERVE().GetLogin()
+#define LOAD()          SERVER().GetLoad()
 
 #define CURRENT_THREAD_ID() WorkerThread<WorkerRunner<> >::LocalWorker().GetThreadID()
 inline  bool  IsMainThread()
