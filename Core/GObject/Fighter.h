@@ -519,6 +519,7 @@ public:
 	inline UInt8 getColor() { return _color; }
 	static UInt8 getColor2(float);
 
+	ItemEquip * setInnateTrump(ItemHalo* r, bool = true);
 	ItemEquip * setHalo(ItemHalo* r, bool = true);
 	ItemEquip * setFashion(ItemFashion* r, bool = true);
 	ItemWeapon * setWeapon(ItemWeapon * w, bool = true);
