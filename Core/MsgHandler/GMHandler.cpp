@@ -9,6 +9,7 @@
 #include "GData/ExpTable.h"
 #include "GData/NpcGroup.h"
 #include "GObject/Player.h"
+#include "GObject/TaskMgr.h"
 #include "GObject/CFriend.h"
 #include "GObject/Package.h"
 #include "GObject/PetPackage.h"
@@ -271,6 +272,8 @@ GMHandler::GMHandler()
     Reg(3, "setxzvalue", &GMHandler::OnSetXCValue);
 
     Reg(2, "eqexp", &GMHandler::OnAddPetEquipExp);
+    Reg(2, "task", &GMHandler::OnHandleTask);
+    Reg(2, "task0", &GMHandler::OnCompletedManyTask);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -4199,4 +4202,68 @@ void GMHandler::OnPetEq(GObject::Player * player, std::vector<std::string>& args
     }
 
 }
+
+void GMHandler::OnHandleTask(GObject::Player * player, std::vector<std::string>& args)
+{
+	if(args.size() <= 1)
+        return;
+	else
+    {
+		UInt32 taskId = atoi(args[1].c_str());
+		if(taskId == 0)
+			return;
+        switch(atoi(args[0].c_str()))
+		{
+		case 1:
+			{   //接受任务
+                if(GameAction()->AcceptTask(player, taskId)){
+                    TaskActionResp resp;
+                    resp.m_TaskId = taskId;
+                    resp.m_Action = 0;
+                    player->send(resp);
+                }
+            }
+            break;
+        case 2:
+            {   //完成任务
+                player->GetTaskMgr()->CompletedTask(taskId);
+            }
+            break;
+        case 3:
+            {   //提交任务
+                if(GameAction()->SubmitTask(player, taskId, 0, 0)){
+                    TaskActionResp resp;
+                    resp.m_TaskId = taskId;
+                    resp.m_Action = 1;
+                    player->send(resp);
+                }
+            }
+            break;
+        case 4:
+            {   //取消任务
+                if(GameAction()->AbandonTask(player, taskId)){
+                    TaskActionResp resp;
+                    resp.m_TaskId = taskId;
+                    resp.m_Action = 2;
+                    player->send(resp);
+                }
+            }
+            break;
+        }
+    }
+}
+
+void GMHandler::OnCompletedManyTask(GObject::Player* player, std::vector<std::string>& args)
+{
+	if(args.size() <= 1)
+		return;
+    for(int id = atoi(args[0].c_str()); id <= atoi(args[1].c_str()); ++id)
+    {
+        TaskMgr* mgr = player->GetTaskMgr();
+        mgr->AcceptTask(id);
+        mgr->CompletedTask(id);
+        mgr->SubmitTask(id);
+    }
+}
+
 

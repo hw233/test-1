@@ -279,7 +279,7 @@ namespace GObject
         VAR_DIRECTPURCNT = 219, // 幸运星活动直购次数
 
         /*
-         * 【注:此段var(217--239)貌似未被占用】
+         * 【注:此段var(220--239)貌似未被占用】
          */
 
         VAR_LOCAL_RANK = 240, //本服斗剑，当前排名

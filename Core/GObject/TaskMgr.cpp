@@ -239,6 +239,13 @@ namespace GObject
 
 	}
 
+    bool TaskMgr::CompletedTask(UInt32 taskId)
+    {
+        if(!HasAcceptedTask(taskId) || HasCompletedTask(taskId) || HasSubmitedTask(taskId))
+            return false;
+        return AddTaskStep(taskId);
+    }
+
 	bool TaskMgr::DelCompletedTask(UInt32 taskId)
 	{
 		task_iterator it;
@@ -454,8 +461,22 @@ namespace GObject
 		{
 			if (TaskCanAccept(*cit))
 			{
+                /*
 				m_CanAcceptTaskList.insert(*cit);
 				notify = true;
+                */
+                const TaskType& taskType = GDataManager::GetTaskTypeData(*cit);
+                if(taskType.m_TypeId && taskType.m_SubType == 10)
+                {
+                    TaskData* task = AddTask(*cit);
+			        if(task)
+                        SendNewTaskInfor(*task);
+                }
+                else
+                {
+                    m_CanAcceptTaskList.insert(*cit);
+				    notify = true;
+                }
 			}
 		}
 		if(notify)
@@ -504,8 +525,22 @@ namespace GObject
 		const std::set<UInt32>& taskLevRelation = GDataManager::GetTaskLevRelation(lev);
 		for (std::set<UInt32>::const_iterator cit = taskLevRelation.begin(); cit != taskLevRelation.end(); ++cit)
 		{
+            /*
 			if (TaskCanAccept(*cit))
                 m_CanAcceptTaskList.insert(*cit);
+            */
+			if (TaskCanAccept(*cit))
+            {
+                const TaskType& taskType = GDataManager::GetTaskTypeData(*cit);
+                if(taskType.m_TypeId && taskType.m_SubType == 10)
+                {
+                    TaskData* task = AddTask(*cit);
+			        if(task)
+                        SendNewTaskInfor(*task);
+                }
+                else
+                    m_CanAcceptTaskList.insert(*cit);
+            }
 
 		}
 		if (notify)
