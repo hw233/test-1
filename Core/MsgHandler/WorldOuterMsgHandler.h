@@ -1750,8 +1750,8 @@ void OnArenaOpReq( GameMsgHdr& hdr, const void * data )
                     r = GObject::arena.bet2(player, state, group, pos, tael);
                 if(r == 0xFF)
                     break;
-                if (r <= 1)
-                    player->arenaUdpLog(1002, r);
+                //if (r <= 1)
+                //    player->arenaUdpLog(1002, r);
 				Stream st(REP::SERVER_ARENA_OP);
 				st << type << r << state;
                 if(state < 2)

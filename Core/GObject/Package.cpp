@@ -664,12 +664,12 @@ namespace GObject
                     m_Owner->udpLog("item", strBuf, "", "", "", "", "act", num);
                 }
 
-                if (typeId >= 48 && typeId <= 51)//乾坤净水等4个物品
-                {   
-                    char udpStr[32] = {0};            
-                    sprintf(udpStr, "F_1140%d%d_%d", bind, typeId, fromWhere);
-                    m_Owner->udpLog("tripod", udpStr, "", "", "", "", "act", num);
-                }
+                //if (typeId >= 48 && typeId <= 51)//乾坤净水等4个物品
+                //{   
+                //    char udpStr[32] = {0};            
+                //    sprintf(udpStr, "F_1140%d%d_%d", bind, typeId, fromWhere);
+                //    m_Owner->udpLog("tripod", udpStr, "", "", "", "", "act", num);
+                //}
 		
                 if (typeId >= 5001 && typeId <= 5152)// 宝石
                 {   
@@ -745,12 +745,12 @@ namespace GObject
                     snprintf(strBuf, 32, "I_%u_1_%u", typeId, (UInt32)fromWhere);
                     m_Owner->udpLog("item", strBuf, "", "", "", "", "act", num);
                 }
-                if (typeId >= 48 && typeId <= 51)//乾坤净水等4个物品
-                {   
-                    char udpStr[32] = {0};            
-                    sprintf(udpStr, "F_1140%d%d_%d", bind, typeId, fromWhere);
-                    m_Owner->udpLog("tripod", udpStr, "", "", "", "", "act", num);
-                 }
+                //if (typeId >= 48 && typeId <= 51)//乾坤净水等4个物品
+                //{   
+                //    char udpStr[32] = {0};            
+                //    sprintf(udpStr, "F_1140%d%d_%d", bind, typeId, fromWhere);
+                //    m_Owner->udpLog("tripod", udpStr, "", "", "", "", "act", num);
+                // }
                 if (typeId >= 5001 && typeId <= 5152)// 宝石
                 {   
                     char udpStr[32] = {0};            
@@ -842,12 +842,12 @@ namespace GObject
                 snprintf(strBuf, 32, "I_%u_1_%u", typeId, (UInt32)fromWhere);
                 m_Owner->udpLog("item", strBuf, "", "", "", "", "act", count);
             }
-            if (typeId >= 48 && typeId <= 51)//乾坤净水等4个物品
-            {   
-                char udpStr[32] = {0};            
-                sprintf(udpStr, "F_1140%d%d_%d", bind, typeId, fromWhere);
-                m_Owner->udpLog("tripod", udpStr, "", "", "", "", "act", count);
-            }
+            //if (typeId >= 48 && typeId <= 51)//乾坤净水等4个物品
+            //{   
+            //    char udpStr[32] = {0};            
+            //    sprintf(udpStr, "F_1140%d%d_%d", bind, typeId, fromWhere);
+            //    m_Owner->udpLog("tripod", udpStr, "", "", "", "", "act", count);
+            //}
                 if (typeId >= 5001 && typeId <= 5152)// 宝石
                 {   
                     char udpStr[32] = {0};            
@@ -929,12 +929,12 @@ namespace GObject
             //{
             AddItemCoursesLog(typeId, static_cast<UInt32>(count), fromWhere);
             //}
-            if (typeId >= 48 && typeId <= 51)//乾坤净水等4个物品
-            {   
-                char udpStr[32] = {0};            
-                sprintf(udpStr, "F_1140%d%d_%d", bind, typeId, fromWhere);
-                m_Owner->udpLog("tripod", udpStr, "", "", "", "", "act", count);
-            }
+            //if (typeId >= 48 && typeId <= 51)//乾坤净水等4个物品
+            //{   
+            //    char udpStr[32] = {0};            
+            //    sprintf(udpStr, "F_1140%d%d_%d", bind, typeId, fromWhere);
+            //    m_Owner->udpLog("tripod", udpStr, "", "", "", "", "act", count);
+            //}
                 if (typeId >= 5001 && typeId <= 5152)// 宝石
                 {   
                     char udpStr[32] = {0};            
@@ -2105,6 +2105,7 @@ namespace GObject
 
     void Package::cittaUdpLog(UInt8 type, UInt32 id, UInt32 num)
     {
+        return; // XXX: 取消上报
         char itemAct[32] = "";
 
         // 是否是解封石
@@ -2133,7 +2134,7 @@ namespace GObject
             return;
 
         snprintf (itemAct, 32, "I_%d_%d", id, type);
-        m_Owner->udpLog("secondSoul", itemAct, "", "", "", "", "act", num);
+        //m_Owner->udpLog("secondSoul", itemAct, "", "", "", "", "act", num);
     }
 
     void Package::qixiUdpLog(UInt32 id, UInt32 num)
@@ -2146,12 +2147,12 @@ namespace GObject
 
     void Package::gemMergeUdpLog(UInt32 num)
     {
-        m_Owner->udpLog("gemMerge", "F_1078", "", "", "", "", "act", num);
+        // m_Owner->udpLog("gemMerge", "F_1078", "", "", "", "", "act", num);
     }
 
     void Package::multiMergeUdpLog(UInt32 num)
     {
-        m_Owner->udpLog("multiMerge", "F_1080", "", "", "", "", "act", num);
+        //m_Owner->udpLog("multiMerge", "F_1080", "", "", "", "", "act", num);
     }
 
     UInt8 Package::GetItemCareer(UInt32 itemid, UInt8 bind)
@@ -3194,7 +3195,7 @@ namespace GObject
                 return;
             sprintf(udpStr, "F_%d_%d", udpId, level);
         }
-        m_Owner->udpLog("enchant", udpStr, "", "", "", "", "act");
+        //m_Owner->udpLog("enchant", udpStr, "", "", "", "", "act");
     }
 
     void  Package::OnFailEnchAttainment( UInt32 failThisTime)

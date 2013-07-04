@@ -1426,6 +1426,7 @@ namespace GObject
 
     void Player::skillStrengthenLog(UInt8 type, UInt32 val)
     {
+        return; // XXX: 取消上报
         char action[16] = "";
         UInt32 num = 1;
         switch (type)
@@ -1505,6 +1506,7 @@ namespace GObject
 
     void Player::athleticsUdpLog(UInt32 id, UInt8 type /* = 0 */)
     {
+        return; // XXX: 取消上报
         // 斗剑功能相关日志
         char action[16] = "";
         if (type)
@@ -1602,6 +1604,7 @@ namespace GObject
 
     void Player::secondSoulUdpLog(UInt32 id, UInt32 val /* = 0 */, UInt32 num /* = 1 */)
     {
+        return; // XXX: 取消上报
         // 元神相关日志
         char action[16] = "";
         if (val)
@@ -1627,6 +1630,7 @@ namespace GObject
 
     void Player::clanCopyUdpLog(UInt32 id, UInt32 val /* = 0 */, UInt32 num /* = 1 */)
     {
+        return; // XXX: 取消上报
         // 帮派副本相关日志
         char action[16] = "";
         if (val)
@@ -1657,6 +1661,7 @@ namespace GObject
 
     void Player::storeUdpLog(UInt32 id, UInt32 type, UInt32 itemId, UInt32 num /* = 1 */)
     {
+        return; // XXX: 取消上报
         // 商城购买相关日志（现在只有荣誉和声望）
         char action[32] = "";
         snprintf (action, 32, "F_%d_%d_%d", id, type, itemId);
