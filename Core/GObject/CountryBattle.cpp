@@ -944,7 +944,7 @@ void GlobalCountryBattle::prepare( UInt32 t )
 	else
 	{
 		_startTime = _prepareTime + 30;
-		_endTime = _startTime + 30 * 60;
+		_endTime = _startTime + 9 * 60;
 	}
 }
 

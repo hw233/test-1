@@ -145,6 +145,7 @@ bool World::_foolbao = false;
 bool World::_halfgold = false;
 bool World::_surnamelegend = false;
 bool World::_ryhbActivity = false;
+bool World::_zcjbActivity = false;
 bool World::_wansheng= false;
 bool World::_qingren= false;
 bool World::_specialbook= false;
@@ -614,6 +615,23 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 6, 27)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 6, 28)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 6, 29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 6, 30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 6)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 7)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 9)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 10)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 11)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 13)
+
+
+
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
     {
@@ -639,6 +657,9 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 6, 15)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 6, 22)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 6, 29)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 6)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 13)
+
         ))
     {
 #if 0
@@ -1569,7 +1590,24 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 6, 27)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 6, 28)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 6, 29)
-            )
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 6, 30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 6)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 7)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 9)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 10)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 11)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 13)
+          
+         
+         
+         )
         bRechargeEnd = true;
     if (cfg.rpServer)
     {

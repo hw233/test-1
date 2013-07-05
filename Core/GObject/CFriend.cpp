@@ -265,6 +265,11 @@ void CFriend::useTickets(UInt8 type)
         st << id << Stream::eos;
         m_owner->send(st);
         updateRecordData();
+        m_owner->blueDiamondAwardUdpLog(6);
+        if(id == 7)
+            m_owner->cFriendAwardUdpLog(4);
+        else if(id == 8)
+            m_owner->cFriendAwardUdpLog(5);
     }
     else
         m_owner->checkLastCFTicketsAward();

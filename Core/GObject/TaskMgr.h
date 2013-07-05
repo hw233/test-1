@@ -64,6 +64,7 @@ namespace GObject
 		bool   HasAcceptedTask(UInt32 taskId);
 		bool   HasCompletedTask(UInt32 taskId);
 		bool   HasSubmitedTask(UInt32 taskId);
+        bool   CompletedTask(UInt32 taskId);
 		bool   DelCompletedTask(UInt32 taskId);
 		bool   DelAcceptedTask(UInt32 taskId);
 		bool   DelSubmitedTask(UInt32 taskId);

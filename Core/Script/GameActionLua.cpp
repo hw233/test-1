@@ -1540,9 +1540,9 @@ namespace Script
         return Call<UInt16>("getSpecialItem", id, index);
     }
 
-    lua_tinker::table GameActionLua::getCopyFrontmapAward(UInt8 step, UInt16 localtion)
+    lua_tinker::table GameActionLua::getCopyFrontmapAward(UInt8 step, UInt16 localtion, UInt8 cf)
     {
-        return Call<lua_tinker::table>("getCopyFrontmapAward", step, localtion);
+        return Call<lua_tinker::table>("getCopyFrontmapAward", step, localtion, cf);
     }
 
     UInt32 GameActionLua::getDreamerTreasure(UInt8 id)
@@ -1685,6 +1685,12 @@ namespace Script
     UInt8 GameActionLua::onVipLevelAward(Player* player, UInt8 opt)
     {
         return Call<UInt8>("onVipLevelAward", player, opt);
+    }
+
+    bool GameActionLua::onFishUserPackage(Player* player, UInt8 idx)
+    {
+		assert(player != NULL);
+		return Call<bool>("onFishUserPackage", player, idx);
     }
 }
 

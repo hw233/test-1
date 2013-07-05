@@ -6388,6 +6388,7 @@ UInt32 BattleSimulator::tryDelayUseSkill( BattleFighter * bf, BattleObject * tar
 int BattleSimulator::testWinner()
 {
     int alive[2] = { 0, 0 };
+    int soulOut[2] = { 0, 0 };
     for(Int8 fgtlist_idx = 0; fgtlist_idx < 2; fgtlist_idx++)
     {
         std::vector<BattleFighter*>& fgtlist = _fgtlist[fgtlist_idx];
@@ -6395,11 +6396,13 @@ int BattleSimulator::testWinner()
         for(size_t i = 0; i < c; ++ i)
         {
             alive[fgtlist[i]->getSide()] ++;
+            if(fgtlist[i]->isSoulOut())
+                soulOut[fgtlist[i]->getSide()]++;
         }
     }
-    if(alive[0] == 0)
+    if(alive[0] == 0 || alive[0] == soulOut[0])
         return 2;
-    else if(alive[1] == 0)
+    else if(alive[1] == 0 || alive[1] == soulOut[1])
         return 1;
     return 0;
 }
@@ -7079,6 +7082,9 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
             BattleFighter* bf = static_cast<BattleFighter*>(bo);
             if(doSkillEffectExtra_Dead(bf, passiveSkill))
             {
+                _winner = testWinner();
+                if(_winner != 0)
+                    return true;
                 fFakeDead = true;
             }
             else

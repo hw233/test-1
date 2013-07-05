@@ -664,12 +664,12 @@ namespace GObject
                     m_Owner->udpLog("item", strBuf, "", "", "", "", "act", num);
                 }
 
-                if (typeId >= 48 && typeId <= 51)//乾坤净水等4个物品
-                {   
-                    char udpStr[32] = {0};            
-                    sprintf(udpStr, "F_1140%d%d_%d", bind, typeId, fromWhere);
-                    m_Owner->udpLog("tripod", udpStr, "", "", "", "", "act", num);
-                }
+                //if (typeId >= 48 && typeId <= 51)//乾坤净水等4个物品
+                //{   
+                //    char udpStr[32] = {0};            
+                //    sprintf(udpStr, "F_1140%d%d_%d", bind, typeId, fromWhere);
+                //    m_Owner->udpLog("tripod", udpStr, "", "", "", "", "act", num);
+                //}
 		
                 if (typeId >= 5001 && typeId <= 5152)// 宝石
                 {   
@@ -745,12 +745,12 @@ namespace GObject
                     snprintf(strBuf, 32, "I_%u_1_%u", typeId, (UInt32)fromWhere);
                     m_Owner->udpLog("item", strBuf, "", "", "", "", "act", num);
                 }
-                if (typeId >= 48 && typeId <= 51)//乾坤净水等4个物品
-                {   
-                    char udpStr[32] = {0};            
-                    sprintf(udpStr, "F_1140%d%d_%d", bind, typeId, fromWhere);
-                    m_Owner->udpLog("tripod", udpStr, "", "", "", "", "act", num);
-                 }
+                //if (typeId >= 48 && typeId <= 51)//乾坤净水等4个物品
+                //{   
+                //    char udpStr[32] = {0};            
+                //    sprintf(udpStr, "F_1140%d%d_%d", bind, typeId, fromWhere);
+                //    m_Owner->udpLog("tripod", udpStr, "", "", "", "", "act", num);
+                // }
                 if (typeId >= 5001 && typeId <= 5152)// 宝石
                 {   
                     char udpStr[32] = {0};            
@@ -842,12 +842,12 @@ namespace GObject
                 snprintf(strBuf, 32, "I_%u_1_%u", typeId, (UInt32)fromWhere);
                 m_Owner->udpLog("item", strBuf, "", "", "", "", "act", count);
             }
-            if (typeId >= 48 && typeId <= 51)//乾坤净水等4个物品
-            {   
-                char udpStr[32] = {0};            
-                sprintf(udpStr, "F_1140%d%d_%d", bind, typeId, fromWhere);
-                m_Owner->udpLog("tripod", udpStr, "", "", "", "", "act", count);
-            }
+            //if (typeId >= 48 && typeId <= 51)//乾坤净水等4个物品
+            //{   
+            //    char udpStr[32] = {0};            
+            //    sprintf(udpStr, "F_1140%d%d_%d", bind, typeId, fromWhere);
+            //    m_Owner->udpLog("tripod", udpStr, "", "", "", "", "act", count);
+            //}
                 if (typeId >= 5001 && typeId <= 5152)// 宝石
                 {   
                     char udpStr[32] = {0};            
@@ -929,12 +929,12 @@ namespace GObject
             //{
             AddItemCoursesLog(typeId, static_cast<UInt32>(count), fromWhere);
             //}
-            if (typeId >= 48 && typeId <= 51)//乾坤净水等4个物品
-            {   
-                char udpStr[32] = {0};            
-                sprintf(udpStr, "F_1140%d%d_%d", bind, typeId, fromWhere);
-                m_Owner->udpLog("tripod", udpStr, "", "", "", "", "act", count);
-            }
+            //if (typeId >= 48 && typeId <= 51)//乾坤净水等4个物品
+            //{   
+            //    char udpStr[32] = {0};            
+            //    sprintf(udpStr, "F_1140%d%d_%d", bind, typeId, fromWhere);
+            //    m_Owner->udpLog("tripod", udpStr, "", "", "", "", "act", count);
+            //}
                 if (typeId >= 5001 && typeId <= 5152)// 宝石
                 {   
                     char udpStr[32] = {0};            
@@ -2085,6 +2085,7 @@ namespace GObject
 
     void Package::cittaUdpLog(UInt8 type, UInt32 id, UInt32 num)
     {
+        return; // XXX: 取消上报
         char itemAct[32] = "";
 
         // 是否是解封石
@@ -2113,7 +2114,7 @@ namespace GObject
             return;
 
         snprintf (itemAct, 32, "I_%d_%d", id, type);
-        m_Owner->udpLog("secondSoul", itemAct, "", "", "", "", "act", num);
+        //m_Owner->udpLog("secondSoul", itemAct, "", "", "", "", "act", num);
     }
 
     void Package::qixiUdpLog(UInt32 id, UInt32 num)
@@ -2126,12 +2127,12 @@ namespace GObject
 
     void Package::gemMergeUdpLog(UInt32 num)
     {
-        m_Owner->udpLog("gemMerge", "F_1078", "", "", "", "", "act", num);
+        // m_Owner->udpLog("gemMerge", "F_1078", "", "", "", "", "act", num);
     }
 
     void Package::multiMergeUdpLog(UInt32 num)
     {
-        m_Owner->udpLog("multiMerge", "F_1080", "", "", "", "", "act", num);
+        //m_Owner->udpLog("multiMerge", "F_1080", "", "", "", "", "act", num);
     }
 
     UInt8 Package::GetItemCareer(UInt32 itemid, UInt8 bind)
@@ -3166,7 +3167,7 @@ namespace GObject
                 return;
             sprintf(udpStr, "F_%d_%d", udpId, level);
         }
-        m_Owner->udpLog("enchant", udpStr, "", "", "", "", "act");
+        //m_Owner->udpLog("enchant", udpStr, "", "", "", "", "act");
     }
 
     void  Package::OnFailEnchAttainment( UInt32 failThisTime)
@@ -4762,8 +4763,8 @@ namespace GObject
 
     UInt8 Package::EquipMove( UInt16 fFighterId, UInt16 tFighterId, UInt32 fromItemId, UInt32 toItemId, UInt8 type, UInt8 mark)
     {
-        if(mark == 1 && World::getOpenTime() < TimeUtil::MkTime(2013, 5, 30))
-            return 19;
+       /*if(mark == 1 && World::getOpenTime() < TimeUtil::MkTime(2013, 5, 30))
+            return 19;*/
 
         UInt8 res = 0;
         Fighter * fFgt = NULL;
@@ -4787,7 +4788,6 @@ namespace GObject
 
         if(0 == mark) //活动转移装备，条件限制
         {   
-            
              if(type & 0x08)
              {
                 if(fromEquip->getClass() != Item_Fashion || toEquip->getClass() != Item_Fashion)
@@ -4811,9 +4811,13 @@ namespace GObject
         }
         else if(1 == mark)
         {
-            if (fromEquip->GetCareer() != toEquip->GetCareer())
+            if (fromEquip->GetCareer() != toEquip->GetCareer() &&
+                fromEquip->GetCareer() > 0 &&
+                toEquip->GetCareer() > 0)
             {
-                return 18;   //原始装备和继承装备需要同职业
+                /*1.原始装备和继承装备需要同职业;
+                  2.全职业装备可继承任何职业装备，或接受任何职业装备的继承;*/
+                return 18;
             }
 
             if(m_Owner->getVipLevel() < 4)
@@ -5194,6 +5198,12 @@ namespace GObject
             }
         }
            
+        UInt32 a = toEquip->getValueLev()/10 - fromEquip->getValueLev()/10;
+        if(a >= 2)
+        {
+            money += (a - 1) * 0.2 * money; //手续费
+        }
+
         if(m_Owner->getGold() < money && cfg.serverNum != 34)
 	    {
             m_Owner->sendMsgCode(0, 1101);
@@ -5222,9 +5232,9 @@ namespace GObject
         UInt8 tlv = toEquip->getValueLev();
         UInt8 tq = toEquip->getQuality() - 3;
         UInt8 tcrr = toEquip->GetCareer();
-        float tmaxV1 = GObjectManager::getAttrMax(tlv, tIed.extraAttr2.type1 - 1, tq, tcrr);
-        float tmaxV2 = GObjectManager::getAttrMax(tlv, tIed.extraAttr2.type2 - 1, tq, tcrr);
-        float tmaxV3 = GObjectManager::getAttrMax(tlv, tIed.extraAttr2.type3 - 1, tq, tcrr);
+        float tmaxV1 = GObjectManager::getAttrMax(tlv, fIed.extraAttr2.type1 - 1, tq, tcrr);
+        float tmaxV2 = GObjectManager::getAttrMax(tlv, fIed.extraAttr2.type2 - 1, tq, tcrr);
+        float tmaxV3 = GObjectManager::getAttrMax(tlv, fIed.extraAttr2.type3 - 1, tq, tcrr);
         UInt32 tdics = GObjectManager::getAttrDics(tq, 1) - GObjectManager::getAttrDics(tq, 0);
         UInt32 tfactor = GObjectManager::getAttrDics(tq, 0) + static_cast<float>(tdics) / 100;
 
@@ -5232,6 +5242,7 @@ namespace GObject
         tIed.extraAttr2.type2 = fIed.extraAttr2.type2;
         tIed.extraAttr2.type3 = fIed.extraAttr2.type3;
         tIed.extraAttr2.value1 = fIed.extraAttr2.value1 - fmaxV1 * 15;
+        
         if(float(tIed.extraAttr2.value1) < tmaxV1 * tfactor)
         {
             tIed.extraAttr2.value1 = tmaxV1*tfactor;

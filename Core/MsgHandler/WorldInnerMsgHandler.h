@@ -561,7 +561,7 @@ void OnDoInstantPracticeAccReq( GameMsgHdr& hdr, const void* data)
 		return;
 	GObject::EventPlayerPractice* event = static_cast<GObject::EventPlayerPractice*>(it->second);
 	event->instantComplete();
-    player->practiceUdpLog();
+    //player->practiceUdpLog();
 }
 
 bool enum_send_sh_active(void * ptr, void * data )
