@@ -4491,7 +4491,7 @@ function ItemNormal_00009093(iid, num, bind, param)
     local package = player:GetPackage();
     player:setBuffData(0x4, 0, true)
     player:setBuffData(0x16, 0, true)
-    num = ItemNormal_AddBuf2(player, 0x17, 3600, num, 3596400)
+    num = ItemNormal_AddBuff2(player, 0x17, 3600, num, 3596400)
     if num > 0 then
         package:DelItemSendMsg(iid, player);
         return num;
