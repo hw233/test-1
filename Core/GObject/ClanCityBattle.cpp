@@ -41,6 +41,8 @@ struct DBClanCity
     UInt8 type;
     UInt8 round;
     UInt32 openTime;
+    UInt32 startTime;
+    UInt32 endTime;
     UInt32 defClanId;
 };
 
@@ -85,11 +87,13 @@ namespace DB
 {
 
 SPECIALBEGIN(GObject::DBClanCity)
-SPECIALDEF(4)
+SPECIALDEF(6)
 (
     UInt8, type,
     UInt8, round,
     UInt32, openTime,
+    UInt32, startTime,
+    UInt32, endTime,
     UInt32, defClanId
 )
 SPECIALEND()
@@ -226,7 +230,7 @@ void CCBPlayer::sendInfo()
     if(now < realivecd)
         cdtime = realivecd - now;
     st << realive << static_cast<UInt8>(cdtime);
-    st << side << pos + 1;
+    st << side << static_cast<UInt8>(pos + 1);
     st << Stream::eos;
 
     fgt.player->send(st);
@@ -446,7 +450,11 @@ void CCBClan::sendInfo(CCBPlayer* pl)
 
     Stream st(REP::CCB);
     st << static_cast<UInt8>(0) << static_cast<UInt8>(2);
-    st << clan->getLeader()->getName();
+    Player* leader = clan->getLeader();
+    if(leader)
+        st << leader->getName();
+    else
+        st << "";
     st << score << pl->score;
     st << skill_hp.lvl;
     st << skill_atk.lvl;
@@ -1040,6 +1048,7 @@ void CCBSpot::handleBattle()
         while(pl)
         {
             battler[0].insert(battler[0].begin() + i, pl);
+            pl = popOnePlayer(b0);
             ++ i;
         }
     }
@@ -1049,6 +1058,7 @@ void CCBSpot::handleBattle()
         while(pl)
         {
             battler[1].insert(battler[1].begin() + i, pl);
+            pl = popOnePlayer(b1);
             ++ i;
         }
     }
@@ -1230,18 +1240,16 @@ void ClanCity::writeToDB()
 
 bool ClanCity::isOpen()
 {
-    /*
     //XXX
     UInt32 now = TimeUtil::Now();
     UInt32 today = TimeUtil::SharpDayT(0);
-    if(today + 19*3600 + 30*60 <= now && now < today + 20*3600+30*60)
+    if(today + 22*3600 <= now && now < today + 23*3600)
         return true;
     else
         return false;
-        */
 
     return true;
-    //return (m_openFlag &&(TimeUtil::Now() > m_openTime) && (World::_wday > 5));
+    return (m_openFlag &&(TimeUtil::Now() > m_openTime) && (World::_wday > 5));
 }
 
 void ClanCity::process(UInt32 curtime)
@@ -1251,23 +1259,21 @@ void ClanCity::process(UInt32 curtime)
 
     if(m_startTime == 0)
     {
+        /*XXX
         if(cfg.GMCheck)
             m_startTime = TimeUtil::SharpDay(0) + 20 * 60 * 60;
         else
             m_startTime = curtime + 30;
-        /*XXX
+        */
         if(m_type == 0 || m_type == CCB_CITY_TYPE_DEF)
             m_startTime = TimeUtil::SharpDay(0) + 22 * 60 * 60;
         else
             m_startTime = TimeUtil::SharpDay(0) + 22 * 60 * 60 + 30*60;
-        */
         m_endTime = m_startTime + 30 * 60;
+
+        if(curtime > m_endTime)
+            return;
     }
-    /*
-    UInt32 today = TimeUtil::SharpDayT(0);
-    if(m_endTime > today + 20*3600+30*60 || curtime > m_endTime)
-        return;
-        */
 
     if(curtime < m_startTime)
         return;
@@ -1329,13 +1335,12 @@ void ClanCity::prepare()
         return;
 
     UInt32 now = TimeUtil::Now();
-    if(now < m_nextTime)
-        return;
-
     m_expTime = 0;
     //XXX
     if(m_type == 0)
         m_type = CCB_CITY_TYPE_DEF;
+    /*
+        */
     if(World::_wday == 6)
         m_type = CCB_CITY_TYPE_DEF;
     else if(World::_wday == 7)
@@ -1364,11 +1369,9 @@ void ClanCity::prepare()
         openNextSpot(7);
     }
 
-    /*
     if(cfg.GMCheck)
-        m_nextTime = m_startTime + FIRST_PREPARE_TIME + m_round * ((20 * BATTLE_TIME) + PREPARE_TIME) - PREPARE_TIME;
+        m_nextTime = m_startTime + FIRST_PREPARE_TIME + m_round * ((20 * BATTLE_TIME) + PREPARE_TIME);
     else
-    */
         m_nextTime = m_startTime + PREPARE_TIME;
 
     Stream st(REP::CCB);
@@ -1557,11 +1560,25 @@ void ClanCity::end()
             m_defClanId = ccl->clan->getId();
         }
         m_type = CCB_CITY_TYPE_ATK;
+        /*XXX
+        if(cfg.GMCheck)
+            m_startTime = TimeUtil::SharpDay(1) + 20 * 60 * 60;
+        else
+            m_startTime = TimeUtil::Now() + 30;
+        m_endTime = m_startTime + 30 * 60;
+            */
     }
     else
     {
         m_type = CCB_CITY_TYPE_DEF;
         m_defClanId = 0;
+        /*XXX
+        if(cfg.GMCheck)
+            m_startTime = TimeUtil::SharpWeek(1) + 6*86400 + 20 * 60 * 60;
+        else
+            m_startTime = TimeUtil::Now() + 30;
+        m_endTime = m_startTime + 30 * 60;
+        */
     }
 
     for(CCBPlayerMap::iterator itp = m_players.begin(); itp != m_players.end(); ++ itp)
@@ -1595,6 +1612,7 @@ void ClanCity::end()
 
     writeToDB();
 
+    //XXX
     m_startTime = 0;
     m_endTime = 0;
     m_nextTime = 0;
@@ -2352,18 +2370,26 @@ void ClanCity::forceEnter(CCBPlayer* pl, UInt8 spot)
     pl->sendInfo();
 }
 
+bool ClanCity::isRunning()
+{
+    UInt32 now = TimeUtil::Now();
+    return (now >= m_startTime && now <= m_endTime);
+}
+
 void ClanCity::loadFromDB()
 {
     std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
     char querystr[1024] = {0};
 
-    sprintf(querystr, "SELECT `type`, `round`, `openTime`, `defClanId` FROM `clancity`");
+    sprintf(querystr, "SELECT `type`, `round`, `openTime`, `startTime`, `endTime`, `defClanId` FROM `clancity`");
     DBClanCity dbcc = {0};
     if(execu->Extract(querystr, dbcc) == DB::DB_OK)
     {
         m_round = dbcc.round;
         m_type = dbcc.type;
         m_openTime = dbcc.openTime;
+        m_startTime = dbcc.startTime;
+        m_endTime = dbcc.endTime;
         m_defClanId = dbcc.defClanId;
     }
     if(m_openFlag && m_openTime == 0xFFFFFFFF)

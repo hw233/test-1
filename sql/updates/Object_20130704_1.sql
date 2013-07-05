@@ -4,6 +4,8 @@ CREATE TABLE IF NOT EXISTS `clancity` (
     `type` tinyint(3) unsigned NOT NULL,
     `round` tinyint(3) unsigned NOT NULL,
     `openTime` int(10) unsigned NOT NULL,
+    `startTime` int(10) unsigned NOT NULL,
+    `endtTime` int(10) unsigned NOT NULL,
     `defClanId` int(10) unsigned NOT NULL,
     PRIMARY KEY(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

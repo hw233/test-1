@@ -178,6 +178,7 @@ namespace GObject
     public:
         ClanCity(UInt16 loc);
 
+        bool isRunning();
         bool isOpen();
         void setOpenTime();
         void setOpenFlag() { m_openFlag = true; }
