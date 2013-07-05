@@ -760,6 +760,7 @@ void CCBSpot::flushNpc()
     fillBoss(alive[1], npcs);
 
     npcs_size = npcs.size();
+    npcs_idx = 0;
     UInt32 total = npc_num[round][6]/2;
     UInt32 num = uRand(total) + total;
     UInt32 max_flush_num = 100 - alive[1].size();
@@ -949,10 +950,11 @@ void CCBSpot::handleBattle()
     if(battler[1].size() == 0) 
         return;
 
+    UInt8 round = clancity->getRecycleRound();
     Stream st(REP::CCB);
-    st << static_cast<UInt8>(0) << static_cast<UInt8>(6) << static_cast<UInt8>(1);
-    size_t offset = st.size();
+    st << static_cast<UInt8>(0) << static_cast<UInt8>(6) << static_cast<UInt8>(1) << round;
     UInt8 cnt = 0;
+    size_t offset = st.size();
     st << cnt;
 
     CCBPlayerList b0;
@@ -1031,8 +1033,25 @@ void CCBSpot::handleBattle()
         if(hp == 0)
             break;
     }
-    battler[0].swap(b0);
-    battler[1].swap(b1);
+
+    {
+        int i = 0;
+        CCBPlayer* pl = popOnePlayer(b0);
+        while(pl)
+        {
+            battler[0].insert(battler[0].begin() + i, pl);
+            ++ i;
+        }
+    }
+    {
+        int i = 0;
+        CCBPlayer* pl = popOnePlayer(b1);
+        while(pl)
+        {
+            battler[1].insert(battler[1].begin() + i, pl);
+            ++ i;
+        }
+    }
 
     st.data<UInt8>(offset) = cnt;
     st << Stream::eos;
@@ -1211,6 +1230,7 @@ void ClanCity::writeToDB()
 
 bool ClanCity::isOpen()
 {
+    /*
     //XXX
     UInt32 now = TimeUtil::Now();
     UInt32 today = TimeUtil::SharpDayT(0);
@@ -1218,6 +1238,7 @@ bool ClanCity::isOpen()
         return true;
     else
         return false;
+        */
 
     return true;
     //return (m_openFlag &&(TimeUtil::Now() > m_openTime) && (World::_wday > 5));
@@ -1230,22 +1251,23 @@ void ClanCity::process(UInt32 curtime)
 
     if(m_startTime == 0)
     {
-        /*XXX
         if(cfg.GMCheck)
             m_startTime = TimeUtil::SharpDay(0) + 20 * 60 * 60;
         else
             m_startTime = curtime + 30;
-        */
+        /*XXX
         if(m_type == 0 || m_type == CCB_CITY_TYPE_DEF)
-            m_startTime = TimeUtil::SharpDay(0) + 19 * 60 * 60 + 30*60;
+            m_startTime = TimeUtil::SharpDay(0) + 22 * 60 * 60;
         else
-            m_startTime = TimeUtil::SharpDay(0) + 20 * 60 * 60;
+            m_startTime = TimeUtil::SharpDay(0) + 22 * 60 * 60 + 30*60;
+        */
         m_endTime = m_startTime + 30 * 60;
-
-        UInt32 today = TimeUtil::SharpDayT(0);
-        if(m_endTime >= today + 20*3600+30*60 || curtime > m_endTime)
-            return;
     }
+    /*
+    UInt32 today = TimeUtil::SharpDayT(0);
+    if(m_endTime > today + 20*3600+30*60 || curtime > m_endTime)
+        return;
+        */
 
     if(curtime < m_startTime)
         return;
@@ -1265,16 +1287,16 @@ void ClanCity::process(UInt32 curtime)
     if(curtime < m_nextTime)
         return;
 
-    if(curtime <= m_endTime)
+    if(curtime <= m_endTime || m_recycle_round != 0)
     {
         if(m_recycle_round == 0)
         {
             ++ m_round;
             prepareOneRound();
         }
+        ++ m_recycle_round;
         m_status = 1;
         handleBattle();
-        ++ m_recycle_round;
         m_nextTime += BATTLE_TIME;
 
         if(0 == (m_recycle_round % 20))
