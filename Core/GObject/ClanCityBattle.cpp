@@ -1235,20 +1235,22 @@ ClanCity::ClanCity(UInt16 loc) : m_loc(loc), m_openTime(0xFFFFFFFF), m_nextTime(
 
 void ClanCity::writeToDB()
 {
-    DB1().PushUpdateData("REPLACE INTO `clancity` (`id`, `type`, `round`, `openTime`, `defClanId`) VALUES (1, %u, %u, %u, %u)", m_type, m_round, m_openTime, m_defClanId);
+    DB1().PushUpdateData("REPLACE INTO `clancity` (`id`, `type`, `round`, `openTime`, `startTime`, `endTime`, `defClanId`) VALUES (1, %u, %u, %u, %u, %u, %u)", m_type, m_round, m_openTime, m_startTime, m_endTime, m_defClanId);
 }
 
 bool ClanCity::isOpen()
 {
+    /*
     //XXX
     UInt32 now = TimeUtil::Now();
     UInt32 today = TimeUtil::SharpDayT(0);
-    if(today + 22*3600 <= now && now < today + 23*3600)
+    if(today + 30*60 <= now && now < today + 3600+30*60)
         return true;
     else
         return false;
-
     return true;
+    */
+
     return (m_openFlag &&(TimeUtil::Now() > m_openTime) && (World::_wday > 5));
 }
 
@@ -1259,20 +1261,20 @@ void ClanCity::process(UInt32 curtime)
 
     if(m_startTime == 0)
     {
-        /*XXX
         if(cfg.GMCheck)
             m_startTime = TimeUtil::SharpDay(0) + 20 * 60 * 60;
         else
             m_startTime = curtime + 30;
-        */
-        if(m_type == 0 || m_type == CCB_CITY_TYPE_DEF)
-            m_startTime = TimeUtil::SharpDay(0) + 22 * 60 * 60;
-        else
-            m_startTime = TimeUtil::SharpDay(0) + 22 * 60 * 60 + 30*60;
         m_endTime = m_startTime + 30 * 60;
+        /*XXX
+        if(m_type == 0 || m_type == CCB_CITY_TYPE_DEF)
+            m_startTime = TimeUtil::SharpDay(0) + 30 * 60;
+        else
+            m_startTime = TimeUtil::SharpDay(0) + 3600;
 
         if(curtime > m_endTime)
             return;
+            */
     }
 
     if(curtime < m_startTime)
@@ -1339,8 +1341,6 @@ void ClanCity::prepare()
     //XXX
     if(m_type == 0)
         m_type = CCB_CITY_TYPE_DEF;
-    /*
-        */
     if(World::_wday == 6)
         m_type = CCB_CITY_TYPE_DEF;
     else if(World::_wday == 7)
@@ -1560,25 +1560,23 @@ void ClanCity::end()
             m_defClanId = ccl->clan->getId();
         }
         m_type = CCB_CITY_TYPE_ATK;
-        /*XXX
+        //XXX
         if(cfg.GMCheck)
             m_startTime = TimeUtil::SharpDay(1) + 20 * 60 * 60;
         else
             m_startTime = TimeUtil::Now() + 30;
         m_endTime = m_startTime + 30 * 60;
-            */
     }
     else
     {
         m_type = CCB_CITY_TYPE_DEF;
         m_defClanId = 0;
-        /*XXX
+        //XXX
         if(cfg.GMCheck)
-            m_startTime = TimeUtil::SharpWeek(1) + 6*86400 + 20 * 60 * 60;
+            m_startTime = TimeUtil::SharpWeek(1) + 5*86400 + 20 * 60 * 60;
         else
             m_startTime = TimeUtil::Now() + 30;
         m_endTime = m_startTime + 30 * 60;
-        */
     }
 
     for(CCBPlayerMap::iterator itp = m_players.begin(); itp != m_players.end(); ++ itp)
@@ -1612,9 +1610,11 @@ void ClanCity::end()
 
     writeToDB();
 
+    /*
     //XXX
     m_startTime = 0;
     m_endTime = 0;
+    */
     m_nextTime = 0;
 
     DB1().PushUpdateData("DELETE FROM `clancity_player`");
