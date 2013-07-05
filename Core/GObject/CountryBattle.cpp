@@ -17,6 +17,7 @@
 #include "HeroMemo.h"
 #include "ShuoShuo.h"
 #include "Package.h"
+#include "ClanCityBattle.h"
 
 namespace GObject
 {
@@ -943,13 +944,16 @@ void GlobalCountryBattle::prepare( UInt32 t )
 	else
 	{
 		_startTime = _prepareTime + 30;
-		_endTime = _startTime + 8 * 60;
+		_endTime = _startTime + 30 * 60;
 	}
 }
 
 void GlobalCountryBattle::prepare2( UInt32 t )
 {
-    if (WORLD().isNewCountryBattle())
+    if(gClanCity&& gClanCity->isOpen())
+    {
+    }
+    else if (WORLD().isNewCountryBattle())
     {
         if (!_NewcountryBattle) return;
 	    _NewcountryBattle->prepare(_startTime - t);
@@ -964,7 +968,10 @@ void GlobalCountryBattle::prepare2( UInt32 t )
 
 void GlobalCountryBattle::start( UInt32 t )
 {
-    if (WORLD().isNewCountryBattle())
+    if(gClanCity&& gClanCity->isOpen())
+    {
+    }
+    else if (WORLD().isNewCountryBattle())
     {
         if (!_NewcountryBattle) return;
 	    _NewcountryBattle->start(_endTime - t);
@@ -979,7 +986,7 @@ void GlobalCountryBattle::start( UInt32 t )
 
 void GlobalCountryBattle::end( )
 {
-    if (!WORLD().isNewCountryBattle())
+    if(!WORLD().isNewCountryBattle() && !(gClanCity && gClanCity->isOpen()))
     {
         if (!_countryBattle) return;
         UInt32 curtime = TimeUtil::Now();
@@ -1033,7 +1040,10 @@ bool GlobalCountryBattle::process(UInt32 curtime)
 				Player * player = *it;
 				if(player->getThreadId() != WORKER_THREAD_NEUTRAL)
 					continue;
-                if (WORLD().isNewCountryBattle())
+                if(gClanCity&& gClanCity->isOpen())
+                {
+                }
+                else if (WORLD().isNewCountryBattle())
                 {
                     player->moveTo(_NewcountryBattle->getLocation(), true);
                     _NewcountryBattle->playerEnter(player);
@@ -1051,7 +1061,10 @@ bool GlobalCountryBattle::process(UInt32 curtime)
 		{
 			if(curtime < _startTime - 5 * 60)
 				return false;
-            if(WORLD().isNewCountryBattle())
+            if(gClanCity&& gClanCity->isOpen())
+            {
+            }
+            else if(WORLD().isNewCountryBattle())
             {
 			    SYSMSG_BROADCASTV(239, 5);
             }
@@ -1066,7 +1079,10 @@ bool GlobalCountryBattle::process(UInt32 curtime)
 		{
 			if(curtime < _startTime - 10 * 60)
 				return false;
-            if(WORLD().isNewCountryBattle())
+            if(gClanCity&& gClanCity->isOpen())
+            {
+            }
+            else if(WORLD().isNewCountryBattle())
             {
 			    SYSMSG_BROADCASTV(239, 10);
             }
@@ -1079,7 +1095,10 @@ bool GlobalCountryBattle::process(UInt32 curtime)
 		return false;
 	default:
 		{
-            if(WORLD().isNewCountryBattle())
+            if(gClanCity&& gClanCity->isOpen())
+            {
+            }
+            else if(WORLD().isNewCountryBattle())
             {
 			    SYSMSG_BROADCAST(238);
             }
@@ -1093,7 +1112,10 @@ bool GlobalCountryBattle::process(UInt32 curtime)
 		return false;
 	}
 
-    if (WORLD().isNewCountryBattle())
+    if(gClanCity&& gClanCity->isOpen())
+    {
+    }
+    else if (WORLD().isNewCountryBattle())
 	    _NewcountryBattle->process(curtime); //不能用定时器去直接调用_NewcountryBattle->end()
 	if(curtime >= _endTime)
 	{
@@ -1118,7 +1140,7 @@ void GlobalCountryBattle::delAutoCB( Player * player )
 
 void GlobalCountryBattle::sendDaily(Player* player)
 {
-    if(WORLD().isNewCountryBattle())
+    if(WORLD().isNewCountryBattle() || (gClanCity && gClanCity->isOpen()))
         return;
     Stream st(REP::DAILY_DATA);
     st << static_cast<UInt8>(9);
@@ -1132,7 +1154,7 @@ void GlobalCountryBattle::sendDaily(Player* player)
 
 void GlobalCountryBattle::sendForNewCB(Player * player)
 {   //玩家登录时调用
-    if(!WORLD().isNewCountryBattle())
+    if(!WORLD().isNewCountryBattle() || (gClanCity && gClanCity->isOpen()))
         return;
     UInt32 curtime = TimeUtil::Now();
     if(curtime >= _prepareTime && curtime < _startTime)

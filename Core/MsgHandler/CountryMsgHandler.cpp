@@ -184,6 +184,11 @@ MSG_REG_2(GameMsgHdr, REQ::EQ_LINGBAO, OnEquipLingbaoReq);
 MSG_REG_2(GameMsgHdr, REQ::EQ_DELUEGEM, OnDelueGemReq);
 
 MSG_REG_2(GameMsgHdr, REQ::RP_SERVER, OnRPServerReq);
+
+
+MSG_REG_2(GameMsgHdr, REQ::CCB, OnCCBReq);
+
+
 MSG_REG_2(GameMsgHdr, 0x1D0, OnDailyReq2);
 
 MSG_REG_2(GameMsgHdr, 0x1EE, OnReLoadLuaReq);

@@ -123,6 +123,7 @@ namespace GObject
 #define PLAYER_BUFF_JOYBUFF         0x48    //心悦会员
 
 #define PLAYER_BUFF_NEW_CBATTLE	    0x49    //新阵营战(蜀山论剑)
+#define PLAYER_BUFF_CLAN_CITY 	    0x50    //墨守城规
 
 #define PLAYER_BUFF_ATHL1           0x51
 #define PLAYER_BUFF_ATHL2           0x52
@@ -675,6 +676,7 @@ namespace GObject
 		{
 			ClanBattleFlag = 0x00000001,
 			CanTaskInit	= 0x00000002,
+			ClanCityFlag = 0x00000004,
 			Challenging = 0x00000010,		//????״̬, ?=??̴߳???
 			BeChallenging = 0x00000020,		//?Ǿ???״̬
 			SGPunish	= 0x00000040,		//???ٳͷ?

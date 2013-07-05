@@ -122,6 +122,8 @@ enum PurchaseType
     PetBBFT_BUYCUILIAN          = 111, //八部浮屠之购买淬炼次数消费
     Equip_Inherit               = 112, //装备继承消费
     ZCJBRoolAward               = 113, //招财进宝抽奖
+    CCBSkillUP                  = 114, //墨守成规升级技能
+    CCBReAlive                  = 115, //墨守成规复活
     //繁体私有占150～200
 };
 

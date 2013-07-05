@@ -70,6 +70,7 @@
 #include "GData/FairyPetTable.h"
 #include "FairyPet.h"
 #include "GObject/ClanBoss.h"
+#include "GObject/ClanCityBattle.h"
 
 namespace GObject
 {
@@ -446,6 +447,8 @@ namespace GObject
             fprintf(stderr, "loadFairySpar error!\n");
             std::abort();
         }
+        if(gClanCity)
+            gClanCity->loadFromDB();
 
 		DB::gDataDBConnectionMgr->UnInit();
 	}
@@ -1919,6 +1922,11 @@ namespace GObject
                 {
                     if(specfgtobj.level >= SINGLE_HERO_OPEN_LEVEL)
                         GObject::shStageMgr.incActive(1);
+                }
+
+                if(gClanCity && !gClanCity->hasValidateOpenTime() && specfgtobj.level >= CCB_OPEN_LEVEL)
+                {
+                    gClanCity->setOpenFlag();
                 }
             }
 

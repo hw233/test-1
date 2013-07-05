@@ -65,6 +65,7 @@
 #include "Memcached.h"
 #include "GObject/RechargeTmpl.h"
 #include "GObject/ClanBoss.h"
+#include "GObject/ClanCityBattle.h"
 
 struct NullReq
 {
@@ -1304,6 +1305,8 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->GetFairySpar()->sendAllInfo();
     pl->sendDirectPurInfo();
     pl->getQQTenpayAward(0);
+    if(gClanCity)
+        gClanCity->sendOpenStatus(pl);
    // pl->xingchenInfo();
 }
 
@@ -2682,7 +2685,7 @@ struct CountryBattleJoinReply
 void CountryBattleJoinReq( GameMsgHdr& hdr, CountryBattleJoinStruct& req )
 {
 	MSG_QUERY_PLAYER(player);
-    if(WORLD().isNewCountryBattle())
+    if(WORLD().isNewCountryBattle() || (gClanCity && gClanCity->isOpen()))
 		return;
 	if(!PLAYER_DATA(player, inCity))
 		return;
@@ -2711,7 +2714,7 @@ void CountryBattleJoinReq( GameMsgHdr& hdr, CountryBattleJoinStruct& req )
 void NewCountryBattleJoinReq( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
-    if(!WORLD().isNewCountryBattle())
+    if(!WORLD().isNewCountryBattle() || (gClanCity && gClanCity->isOpen()))
 		return;
 	if(!PLAYER_DATA(player, inCity))
 		return;
@@ -6579,6 +6582,108 @@ void OnComparBattelPoint( GameMsgHdr & hdr, CompareBattlePoint& cbp)
     {
         GameMsgHdr hdr(0x275, tid, pl, sizeof(Player *));
         GLOBAL().PushMsg(hdr, &player);
+    }
+}
+
+void OnCCBReq( GameMsgHdr& hdr, const void* data )
+{
+	MSG_QUERY_PLAYER(player);
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+
+    if(!gClanCity)
+        return;
+
+    UInt8 req = 0;
+    brd >> req;
+
+    if(req == 0)
+    {
+        UInt8 type = 0;
+        brd >> type;
+        switch(type)
+        {
+        case 0:
+            if(gClanCity->playerEnter(player))
+            {
+                gClanCity->sendAllSpotInfo(player);
+                gClanCity->sendPlayerInfo(player);
+                gClanCity->sendClanInfo(player);
+                gClanCity->sendLeaderBoard(player);
+                gClanCity->sendSelfSpotInfo(player);
+            }
+            break;
+        case 1:
+            gClanCity->sendPlayerInfo(player);
+            break;
+        case 2:
+            gClanCity->sendClanInfo(player);
+            break;
+        case 3:
+            gClanCity->sendAllSpotInfo(player);
+            break;
+        case 4:
+            gClanCity->sendLeaderBoard(player);
+            break;
+        case 5:
+            gClanCity->sendSelfSpotInfo(player);
+            break;
+        }
+    }
+    else if(req == 1)
+    {
+        UInt8 opt = 0;
+        brd >> opt;
+        switch(opt)
+        {
+        case 0:
+            {
+                UInt8 type = 0;
+                brd >> type;
+                bool res = false;
+                if(type == 1)
+                    res = gClanCity->playerEnter(player);
+                else
+                    res = gClanCity->playerLeave(player);
+                Stream st(REP::CCB);
+                st << static_cast<UInt8>(1) << static_cast<UInt8>(0) << type << static_cast<UInt8>(res ? 0 : 1) << Stream::eos;
+                player->send(st);
+            }
+            break;
+        case 1:
+            {
+                UInt8 spot = 0;
+                brd >> spot;
+                UInt8 res = gClanCity->move(player, spot);
+                Stream st(REP::CCB);
+                st << static_cast<UInt8>(1) << static_cast<UInt8>(1);
+                st << res;
+                st << spot << Stream::eos;
+                player->send(st);
+            }
+            break;
+        case 2:
+            {
+                UInt8 sidx = 0;
+                brd >> sidx;
+                gClanCity->upClanSkill(player, sidx);
+            }
+            break;
+        case 3:
+            {
+                UInt8 force = 0;
+                brd >> force;
+                gClanCity->reAlive(player, force);
+            }
+            break;
+        case 4:
+            {
+                UInt8 spot = 0;
+                UInt8 sidx = 0;
+                brd >> spot >> sidx;
+                gClanCity->upSpotSkill(player, spot, sidx);
+            }
+            break;
+        }
     }
 }
 
