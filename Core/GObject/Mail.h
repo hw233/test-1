@@ -60,7 +60,7 @@ class MailPackageManager
 public:
 	void push(UInt32, UInt16, UInt32, bool isbind = false);
 	void push(UInt32, MailPackage::MailItem *, UInt32, bool isbind = false);
-	MailPackage * add(UInt32);
+	MailPackage * add(UInt32, bool* = NULL);
 	MailPackage * operator [] (UInt32);
 	void remove(UInt32);
 private:
