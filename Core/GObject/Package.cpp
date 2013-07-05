@@ -1653,7 +1653,7 @@ namespace GObject
                 return 0x28;
 
             case Item_InnateTrump:
-                return 0x29;
+                return 0x70;
         }
         return 0;
     }
@@ -3060,7 +3060,7 @@ namespace GObject
                 if(equip->getClass() == Item_Halo)
                     fgt->sendModification(0x1f, equip, false);
                 else if(equip->getClass() == Item_InnateTrump)
-                    fgt->sendModification(0x29, equip, false);
+                    fgt->sendModification(0x70, equip, false);
                 else if(equip->getClass() == Item_Trump)
                     fgt->sendModification(0x0a+ pos, equip, false);
                 else
@@ -3148,7 +3148,7 @@ namespace GObject
                 else if(equip->getClass() == Item_Halo)
                     fgt->sendModification(0x1f, equip, false);
                 else if(equip->getClass() == Item_InnateTrump)
-                    fgt->sendModification(0x29, equip, false);
+                    fgt->sendModification(0x70, equip, false);
                 else
                     fgt->sendModification(0x20 + pos, equip, false);
 			}
@@ -4571,7 +4571,7 @@ namespace GObject
                 else if(equip->getClass() == Item_Halo)
                     fgt->sendModification(0x1f, equip, false);
                 else if(equip->getClass() == Item_InnateTrump)
-                    fgt->sendModification(0x29, equip, false);
+                    fgt->sendModification(0x70, equip, false);
                 else
                     fgt->sendModification(0x20 + pos, equip, false);
 			}
@@ -5730,7 +5730,7 @@ namespace GObject
             else if(equip->GetItemType().subClass == Item_Halo)
                 fgt->sendModification(0x1f, equip, false);
             else if(equip->GetItemType().subClass == Item_InnateTrump)
-                fgt->sendModification(0x29, equip, false);
+                fgt->sendModification(0x70, equip, false);
             else
                 fgt->sendModification(0x20 + pos, equip, false);
 		}
@@ -6142,7 +6142,7 @@ namespace GObject
             if (trump->getClass() == Item_Halo)
                 fgt->sendModification(0x1f, trump, false);
             if (trump->getClass() == Item_InnateTrump)
-                fgt->sendModification(0x29, trump, false);
+                fgt->sendModification(0x70, trump, false);
             else if (trump->getClass() == Item_Fashion)
                 fgt->sendModification(0x20, trump, false);
             else
@@ -6203,7 +6203,7 @@ namespace GObject
             if (trump->getClass() == Item_Halo)
                 fgt->sendModification(0x1f, trump, false);
             else if (trump->getClass() == Item_InnateTrump)
-                fgt->sendModification(0x29, trump, false);
+                fgt->sendModification(0x70, trump, false);
             else if (trump->getClass() == Item_Fashion)
                 fgt->sendModification(0x20, trump, false);
             else

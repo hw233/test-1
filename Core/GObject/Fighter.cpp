@@ -5617,7 +5617,7 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, UInt16 itemNum, bool bind)
             break;
     }
 
-    if (item->getClass() != Item_Trump && item->getClass() != Item_Fashion && item->getClass() != Item_Halo)
+    if (item->getClass() != Item_Trump && item->getClass() != Item_Fashion && item->getClass() != Item_Halo && item->getClass() != Item_InnateTrump)
     {
         if(!pkg->DelItem2(item, yanum-itemNum, ToSkillStrengthenOpen))
             return 0;
