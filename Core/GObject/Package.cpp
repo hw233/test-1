@@ -5232,9 +5232,9 @@ namespace GObject
         UInt8 tlv = toEquip->getValueLev();
         UInt8 tq = toEquip->getQuality() - 3;
         UInt8 tcrr = toEquip->GetCareer();
-        float tmaxV1 = GObjectManager::getAttrMax(tlv, tIed.extraAttr2.type1 - 1, tq, tcrr);
-        float tmaxV2 = GObjectManager::getAttrMax(tlv, tIed.extraAttr2.type2 - 1, tq, tcrr);
-        float tmaxV3 = GObjectManager::getAttrMax(tlv, tIed.extraAttr2.type3 - 1, tq, tcrr);
+        float tmaxV1 = GObjectManager::getAttrMax(tlv, fIed.extraAttr2.type1 - 1, tq, tcrr);
+        float tmaxV2 = GObjectManager::getAttrMax(tlv, fIed.extraAttr2.type2 - 1, tq, tcrr);
+        float tmaxV3 = GObjectManager::getAttrMax(tlv, fIed.extraAttr2.type3 - 1, tq, tcrr);
         UInt32 tdics = GObjectManager::getAttrDics(tq, 1) - GObjectManager::getAttrDics(tq, 0);
         UInt32 tfactor = GObjectManager::getAttrDics(tq, 0) + static_cast<float>(tdics) / 100;
 
@@ -5242,6 +5242,7 @@ namespace GObject
         tIed.extraAttr2.type2 = fIed.extraAttr2.type2;
         tIed.extraAttr2.type3 = fIed.extraAttr2.type3;
         tIed.extraAttr2.value1 = fIed.extraAttr2.value1 - fmaxV1 * 15;
+        
         if(float(tIed.extraAttr2.value1) < tmaxV1 * tfactor)
         {
             tIed.extraAttr2.value1 = tmaxV1*tfactor;
