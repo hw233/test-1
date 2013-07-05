@@ -1,15 +1,17 @@
 
+DROP TABLE IF EXISTS `clancity`;
 CREATE TABLE IF NOT EXISTS `clancity` (
     `id`   tinyint(3) unsigned NOT NULL DEFAULT 1,
     `type` tinyint(3) unsigned NOT NULL,
     `round` tinyint(3) unsigned NOT NULL,
     `openTime` int(10) unsigned NOT NULL,
     `startTime` int(10) unsigned NOT NULL,
-    `endtTime` int(10) unsigned NOT NULL,
+    `endTime` int(10) unsigned NOT NULL,
     `defClanId` int(10) unsigned NOT NULL,
     PRIMARY KEY(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `clancity_spot`;
 CREATE TABLE IF NOT EXISTS `clancity_spot` (
     `id`   tinyint(3) unsigned NOT NULL,
     `hp`   smallint(5) unsigned NOT NULL,
@@ -23,6 +25,7 @@ CREATE TABLE IF NOT EXISTS `clancity_spot` (
     PRIMARY KEY(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `clancity_clan`;
 CREATE TABLE IF NOT EXISTS `clancity_clan` (
     `clanId`   int(10) unsigned NOT NULL,
     `score`   int(10) unsigned NOT NULL,
@@ -32,6 +35,7 @@ CREATE TABLE IF NOT EXISTS `clancity_clan` (
     PRIMARY KEY(`clanId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `clancity_player`;
 CREATE TABLE IF NOT EXISTS `clancity_player` (
     `playerId`   bigint(20) unsigned NOT NULL,
     `side`   tinyint(3) unsigned NOT NULL,
