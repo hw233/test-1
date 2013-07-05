@@ -4377,13 +4377,52 @@ namespace GObject
                         equip = new ItemEquip(dbe.id, itype, ied);
 						break;
 					}
+                              
 					ItemEquipAttr2& ea2 = equip->getEquipAttr2();
+
 					ea2.type1 = dbe.attrType1;
 					ea2.value1 = dbe.attrValue1;
+
+
 					ea2.type2 = dbe.attrType2;
 					ea2.value2 = dbe.attrValue2;
+
 					ea2.type3 = dbe.attrType3;
 					ea2.value3 = dbe.attrValue3;
+
+                    UInt8 lv = equip->getValueLev();
+                    UInt8 q = equip->getQuality() - 3;
+                    UInt8 crr = equip->GetCareer();
+                    if(dbe.attrType1 > 0)
+                    {
+                        float maxV1 = GObjectManager::getAttrMax(lv, dbe.attrType1 - 1, q, crr) * 100;
+
+                        if(ea2.value1 > maxV1)
+                        {
+                            ea2.value1 = maxV1;
+                        }
+                    }
+
+                    if(dbe.attrType2 > 0)
+                    {
+                        float maxV2 = GObjectManager::getAttrMax(lv, dbe.attrType2 - 1, q, crr) * 100;
+
+                        if(ea2.value2 > maxV2)
+                        {
+                            ea2.value2 = maxV2;
+                        }
+                    }
+
+                    if(dbe.attrType3 > 0)
+                    {
+                        float maxV3 = GObjectManager::getAttrMax(lv, dbe.attrType3 - 1, q, crr) * 100;
+
+                        if(ea2.value3 > maxV3)
+                        {
+                            ea2.value3 = maxV3;
+                        }
+                    }
+
 					equip->SetBindStatus(dbe.bindType > 0);
 					equips[dbe.id] = equip;
 				}
