@@ -203,6 +203,8 @@ private:
     
     void OnSetXZLvl(GObject::Player *player, std::vector<std::string>& args);
     void OnSetXCValue(GObject::Player *player, std::vector<std::string>& args);
+    void OnHandleTask(GObject::Player * player, std::vector<std::string>& args);
+    void OnCompletedManyTask(GObject::Player* player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;

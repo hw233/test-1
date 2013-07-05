@@ -4799,8 +4799,8 @@ namespace GObject
 
     UInt8 Package::EquipMove( UInt16 fFighterId, UInt16 tFighterId, UInt32 fromItemId, UInt32 toItemId, UInt8 type, UInt8 mark)
     {
-        if(mark == 1 && World::getOpenTime() < TimeUtil::MkTime(2013, 5, 30))
-            return 19;
+       /*if(mark == 1 && World::getOpenTime() < TimeUtil::MkTime(2013, 5, 30))
+            return 19;*/
 
         UInt8 res = 0;
         Fighter * fFgt = NULL;
@@ -4824,7 +4824,6 @@ namespace GObject
 
         if(0 == mark) //活动转移装备，条件限制
         {   
-            
              if(type & 0x08)
              {
                 if(fromEquip->getClass() != Item_Fashion || toEquip->getClass() != Item_Fashion)
@@ -4848,9 +4847,13 @@ namespace GObject
         }
         else if(1 == mark)
         {
-            if (fromEquip->GetCareer() != toEquip->GetCareer())
+            if (fromEquip->GetCareer() != toEquip->GetCareer() &&
+                fromEquip->GetCareer() > 0 &&
+                toEquip->GetCareer() > 0)
             {
-                return 18;   //原始装备和继承装备需要同职业
+                /*1.原始装备和继承装备需要同职业;
+                  2.全职业装备可继承任何职业装备，或接受任何职业装备的继承;*/
+                return 18;
             }
 
             if(m_Owner->getVipLevel() < 4)
@@ -5231,6 +5234,12 @@ namespace GObject
             }
         }
            
+        UInt32 a = toEquip->getValueLev()/10 - fromEquip->getValueLev()/10;
+        if(a >= 2)
+        {
+            money += (a - 1) * 0.2 * money; //手续费
+        }
+
         if(m_Owner->getGold() < money && cfg.serverNum != 34)
 	    {
             m_Owner->sendMsgCode(0, 1101);

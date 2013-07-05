@@ -1686,5 +1686,11 @@ namespace Script
     {
         return Call<UInt8>("onVipLevelAward", player, opt);
     }
+
+    bool GameActionLua::onFishUserPackage(Player* player, UInt8 idx)
+    {
+		assert(player != NULL);
+		return Call<bool>("onFishUserPackage", player, idx);
+    }
 }
 

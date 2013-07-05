@@ -1809,7 +1809,9 @@ void Fighter::rebuildEquipAttr()
         _attrExtraEquip.hp += GObjectManager::getRingHpFromEnchant(equip->getValueLev(), equip->GetCareer(), equip->getItemEquipData().enchant);
 	}
 
-	for(int i = 0; i < 8; ++ i)
+    isCanStrengthenSuit(setId, setNum);
+
+	/*for(int i = 0; i < 8; ++ i)
 	{
 		if(setId[i] == 0)
 			break;
@@ -1826,7 +1828,7 @@ void Fighter::rebuildEquipAttr()
             --idx;
         }
 		//_attrExtraEquip += *iest->attrExtra[idx];
-	}
+	}*/
 #if 0
 	_attrExtraEquip.attack += getWeaponAttack();
 	_attrExtraEquip.magatk += getWeaponAttack();
@@ -1939,6 +1941,113 @@ void Fighter::rebuildEquipAttr()
     }
 
 	_maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
+}
+
+void Fighter::isCanStrengthenSuit(UInt32 * setId, UInt32 * setNum)
+{
+	ItemEquip * equip[8] = {this->getWeapon(), this->getArmor(0), this->getArmor(1),                                                                                                                                        this->getArmor(2), this->getArmor(3), this->getArmor(4),
+                            this->getAmulet(), this->getRing()};
+    bool aMark = false;
+    bool bMark = false;
+    bool cMark = false;
+
+    for(int i=0; i<8; i++)
+    {
+        if(equip[i])
+        {
+            if(equip[i]->getItemEquipData().enchant >= 8)
+            {
+                if((0 == i) || (i>0 && aMark))
+                {
+                    aMark = true;
+                }
+            }
+            else
+            {
+                aMark = false;
+                bMark = false;
+                cMark = false;
+                break;
+            }
+
+            if(equip[i]->getItemEquipData().enchant >= 9)
+            {
+                if((0 == i) || (i>0 && bMark))
+                {
+                    bMark = true;
+                }
+            }
+            else
+            {
+                bMark = false;
+                cMark = false;
+                continue;
+            }
+
+            if(equip[i]->getItemEquipData().enchant >= 10)
+            {
+                if((0 == i) || (i>0 && cMark))
+                {
+                    cMark = true;
+                }
+            }
+            else
+            {
+                cMark = false;
+            }
+        }
+        else
+        {
+            aMark = false;
+            bMark = false;
+            cMark = false;
+            break;
+        }
+    }
+
+    float value = 1;
+
+    if(aMark)
+    {
+        _attrExtraEquip.hp += 2000;
+
+        value += 0.15;
+    }
+
+    if(bMark)
+    {
+        _attrExtraEquip.action += 100;
+
+        value += 0.25;
+    }
+
+    if(cMark)
+    {
+        _attrExtraEquip.attack += 500;
+        _attrExtraEquip.magatk += 500;
+
+        value += 0.5;
+    }
+    
+	for(int i=0; i<8; ++i)
+	{
+		if(setId[i] == 0)
+			break;
+		if(setNum[i] < 2)
+			continue;
+		const GData::ItemEquipSetType * iest = GData::itemEquipSetTypeManager[setId[i]];
+		if(iest == NULL)
+			continue;
+		int idx = setNum[i] / 2 - 1;
+        while(idx >= 0)
+        {
+            if(iest->attrExtra[idx])
+            {
+                _attrExtraEquip += *iest->attrExtra[idx] * value;
+            }
+            --idx;
+        }
+	}
 }
 
 UInt16 Fighter::calcSkillBattlePoint(UInt16 skillId, UInt8 type)

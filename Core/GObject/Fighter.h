@@ -770,6 +770,7 @@ protected:
         return true;
     }
 
+    void isCanStrengthenSuit(UInt32 * setId, UInt32 * setNum);
 protected:
 	UInt32 _id;
 
