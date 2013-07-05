@@ -1212,8 +1212,15 @@ void ClanCity::writeToDB()
 bool ClanCity::isOpen()
 {
     //XXX
+    UInt32 now = TimeUtil::Now();
+    UInt32 today = TimeUtil::SharpDayT(0);
+    if(today + 19*3600 + 30*60 <= now && now < today + 20*3600+30*60)
+        return true;
+    else
+        return false;
+
     return true;
-    //return (m_openFlag &&((TimeUtil::Now() > m_openTime) && (World::_wday > 5)));
+    //return (m_openFlag &&(TimeUtil::Now() > m_openTime) && (World::_wday > 5));
 }
 
 void ClanCity::process(UInt32 curtime)
@@ -1227,9 +1234,17 @@ void ClanCity::process(UInt32 curtime)
         if(cfg.GMCheck)
             m_startTime = TimeUtil::SharpDay(0) + 20 * 60 * 60;
         else
-        */
             m_startTime = curtime + 30;
+        */
+        if(m_type == 0 || m_type == CCB_CITY_TYPE_DEF)
+            m_startTime = TimeUtil::SharpDay(0) + 19 * 60 * 60 + 30*60;
+        else
+            m_startTime = TimeUtil::SharpDay(0) + 20 * 60 * 60;
         m_endTime = m_startTime + 30 * 60;
+
+        UInt32 today = TimeUtil::SharpDayT(0);
+        if(m_endTime >= today + 20*3600+30*60 || curtime > m_endTime)
+            return;
     }
 
     if(curtime < m_startTime)
@@ -1574,7 +1589,7 @@ bool ClanCity::playerEnter(Player * player)
     if(!cl)
         return false;
 
-    if (player->getCountry() >= COUNTRY_NEUTRAL)
+    if(player->getThreadId() != WORKER_THREAD_NEUTRAL)
         return false;
 
 	UInt32 curtime = TimeUtil::Now();
@@ -1657,7 +1672,7 @@ bool ClanCity::playerLeave(Player * player)
 {
     if(!player)
         return false;
-    if (player->getCountry() >= COUNTRY_NEUTRAL)
+    if(player->getThreadId() != WORKER_THREAD_NEUTRAL)
         return false;
 
     CCBPlayerMap::iterator it = m_players.find(player);
