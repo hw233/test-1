@@ -1479,7 +1479,7 @@ void ClanCity::end()
         if(pmail != NULL)
             mailPackageManager.push(pmail->id, mitem, 1, true);
 
-        player->delGlobalFlag(Player::ClanCityFlag);
+        player->setInCity(false);
         player->clearHIAttr();
         player->autoRegenAll();
     }
@@ -1544,6 +1544,7 @@ void ClanCity::end()
         Mail * pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
         if(pmail != NULL)
             mailPackageManager.push(pmail->id, mitem, 1, true);
+        player->setInCity(false);
     }
 
     Stream st(REP::CCB);
@@ -1641,7 +1642,7 @@ bool ClanCity::playerEnter(Player * player)
 		return false;
 	}
 
-	player->addGlobalFlag(Player::ClanCityFlag);
+	player->setInCity(true);
     CCBPlayerMap::iterator it = m_players.find(player);
     if(it == m_players.end())
     {
@@ -1735,7 +1736,7 @@ bool ClanCity::playerLeave(Player * player)
         if(curtime >= m_startTime && curtime < m_endTime)
             player->setBuffData(PLAYER_BUFF_CLAN_CITY, curtime + 5 * 60);
 
-        player->delGlobalFlag(Player::ClanCityFlag);
+        player->setInCity(false);
         player->clearHIAttr();
         player->autoRegenAll();
         return true;
@@ -2469,7 +2470,7 @@ void ClanCity::loadFromDB()
             {
                 m_players[player] = pl;
                 m_clanPlayers[dbccbp.side].insert(std::make_pair(cl, pl));
-                player->addGlobalFlag(Player::ClanCityFlag);
+                player->setInCity(true);
                 if(pl->side == 0)
                     m_spots[0].playerEnter(pl);
                 else

@@ -677,6 +677,7 @@ namespace GObject
         m_ClanBattleSkillFlag = 0;
         _invitedBy = 0;
         m_arenaCommitCD = 0;
+        _inClanCity = false;
 
 		memset(_buffData, 0, sizeof(UInt32) * PLAYER_BUFF_COUNT);
 		m_Package = new Package(this);
@@ -5869,7 +5870,7 @@ namespace GObject
 		UInt8 old_cny = GObject::mapCollection.getCountryFromSpot(_playerData.location);
         if (old_cny != cny.GetThreadID())
             return;
-        if(hasGlobalFlag(ClanCityFlag) && gClanCity)
+        if(inClanCity() && gClanCity)
         {
             if(!gClanCity->playerLeave(this))
                 return;
