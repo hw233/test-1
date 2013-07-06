@@ -1749,6 +1749,9 @@ UInt8 ClanCity::move(Player* player, UInt8 spot)
 {
     if(!player)
         return 5;
+    if(player->getThreadId() != WORKER_THREAD_NEUTRAL)
+        return false;
+
     CCBPlayerMap::iterator it = m_players.find(player);
     if(it == m_players.end())
         return 5;
@@ -2073,6 +2076,10 @@ void ClanCity::upClanSkill(Player* player, UInt8 sidx)
         return;
 	if(!player->hasChecked())
 		return;
+
+    if(player->getThreadId() != WORKER_THREAD_NEUTRAL)
+        return false;
+
     if(player->getGold() < 30)
     {
         player->sendMsgCode(0, 1104);
@@ -2136,6 +2143,8 @@ void ClanCity::reAlive(Player* player, UInt8 force)
 {
     if(!player)
         return;
+    if(player->getThreadId() != WORKER_THREAD_NEUTRAL)
+        return false;
     CCBPlayerMap::iterator it = m_players.find(player);
     if(it == m_players.end())
         return;
@@ -2173,6 +2182,8 @@ void ClanCity::upSpotSkill(Player* player, UInt8 spot, UInt8 sidx)
 {
     if(!player || m_status == 1)
         return;
+    if(player->getThreadId() != WORKER_THREAD_NEUTRAL)
+        return false;
     if(player->getGold() < 30)
     {
         player->sendMsgCode(0, 1104);
