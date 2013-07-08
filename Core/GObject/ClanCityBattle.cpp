@@ -33,6 +33,8 @@
 
 #define CCB_CITY_MOVE_CD             15
 
+//#define  NEICE_VESION
+
 namespace GObject
 {
 
@@ -1248,8 +1250,10 @@ bool ClanCity::isOpen()
         return true;
     else
         return false;
-    return true;
     */
+#ifdef NEICE_VESION
+    return true;
+#endif
 
     return (m_openFlag &&(TimeUtil::Now() > m_openTime) && (World::_wday > 5));
 }
@@ -1261,9 +1265,11 @@ void ClanCity::process(UInt32 curtime)
 
     if(m_startTime == 0)
     {
+#ifndef NEICE_VESION
         if(cfg.GMCheck)
             m_startTime = TimeUtil::SharpDay(0) + 20 * 60 * 60;
         else
+#endif
             m_startTime = curtime + 30;
         m_endTime = m_startTime + 30 * 60;
         /*XXX
@@ -1369,9 +1375,11 @@ void ClanCity::prepare()
         openNextSpot(7);
     }
 
+    /*
     if(cfg.GMCheck)
         m_nextTime = m_startTime + FIRST_PREPARE_TIME + m_round * ((20 * BATTLE_TIME) + PREPARE_TIME);
     else
+    */
         m_nextTime = m_startTime + PREPARE_TIME;
 
     Stream st(REP::CCB);
@@ -1561,23 +1569,27 @@ void ClanCity::end()
             m_defClanId = ccl->clan->getId();
         }
         m_type = CCB_CITY_TYPE_ATK;
+#ifndef NEICE_VESION
         //XXX
         if(cfg.GMCheck)
             m_startTime = TimeUtil::SharpDay(1) + 20 * 60 * 60;
         else
             m_startTime = TimeUtil::Now() + 30;
         m_endTime = m_startTime + 30 * 60;
+#endif
     }
     else
     {
         m_type = CCB_CITY_TYPE_DEF;
         m_defClanId = 0;
+#ifndef NEICE_VESION
         //XXX
         if(cfg.GMCheck)
             m_startTime = TimeUtil::SharpWeek(1) + 5*86400 + 20 * 60 * 60;
         else
             m_startTime = TimeUtil::Now() + 30;
         m_endTime = m_startTime + 30 * 60;
+#endif
     }
 
     for(CCBPlayerMap::iterator itp = m_players.begin(); itp != m_players.end(); ++ itp)
@@ -1611,11 +1623,11 @@ void ClanCity::end()
 
     writeToDB();
 
-    /*
+#ifdef NEICE_VESION
     //XXX
     m_startTime = 0;
     m_endTime = 0;
-    */
+#endif
     m_nextTime = 0;
 
     DB1().PushUpdateData("DELETE FROM `clancity_player`");
