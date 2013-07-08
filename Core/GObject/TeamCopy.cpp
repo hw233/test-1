@@ -1277,6 +1277,8 @@ void TeamCopyPlayerInfo::rollAward(UInt8 type)
         return;
     if(m_rollId == 0)
         return;
+    if(m_rollId > TEAMCOPY_MAXCOPYCNT)
+        return;
 
     if(type > 0)
     {
