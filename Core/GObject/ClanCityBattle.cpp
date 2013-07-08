@@ -1479,7 +1479,7 @@ void ClanCity::end()
         if(pmail != NULL)
             mailPackageManager.push(pmail->id, mitem, 1, true);
 
-        player->setInCity(false);
+        player->setInClanCity(false);
         player->clearHIAttr();
         player->autoRegenAll();
     }
@@ -1544,7 +1544,7 @@ void ClanCity::end()
         Mail * pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
         if(pmail != NULL)
             mailPackageManager.push(pmail->id, mitem, 1, true);
-        player->setInCity(false);
+        player->setInClanCity(false);
     }
 
     Stream st(REP::CCB);
@@ -1642,7 +1642,7 @@ bool ClanCity::playerEnter(Player * player)
 		return false;
 	}
 
-	player->setInCity(true);
+	player->setInClanCity(true);
     CCBPlayerMap::iterator it = m_players.find(player);
     if(it == m_players.end())
     {
@@ -1736,7 +1736,7 @@ bool ClanCity::playerLeave(Player * player)
         if(curtime >= m_startTime && curtime < m_endTime)
             player->setBuffData(PLAYER_BUFF_CLAN_CITY, curtime + 5 * 60);
 
-        player->setInCity(false);
+        player->setInClanCity(false);
         player->clearHIAttr();
         player->autoRegenAll();
         return true;
@@ -1750,7 +1750,7 @@ UInt8 ClanCity::move(Player* player, UInt8 spot)
     if(!player)
         return 5;
     if(player->getThreadId() != WORKER_THREAD_NEUTRAL)
-        return false;
+        return 5;
 
     CCBPlayerMap::iterator it = m_players.find(player);
     if(it == m_players.end())
@@ -2078,7 +2078,7 @@ void ClanCity::upClanSkill(Player* player, UInt8 sidx)
 		return;
 
     if(player->getThreadId() != WORKER_THREAD_NEUTRAL)
-        return false;
+        return;
 
     if(player->getGold() < 30)
     {
@@ -2144,7 +2144,7 @@ void ClanCity::reAlive(Player* player, UInt8 force)
     if(!player)
         return;
     if(player->getThreadId() != WORKER_THREAD_NEUTRAL)
-        return false;
+        return;
     CCBPlayerMap::iterator it = m_players.find(player);
     if(it == m_players.end())
         return;
@@ -2183,7 +2183,7 @@ void ClanCity::upSpotSkill(Player* player, UInt8 spot, UInt8 sidx)
     if(!player || m_status == 1)
         return;
     if(player->getThreadId() != WORKER_THREAD_NEUTRAL)
-        return false;
+        return;
     if(player->getGold() < 30)
     {
         player->sendMsgCode(0, 1104);
@@ -2481,7 +2481,7 @@ void ClanCity::loadFromDB()
             {
                 m_players[player] = pl;
                 m_clanPlayers[dbccbp.side].insert(std::make_pair(cl, pl));
-                player->setInCity(true);
+                player->setInClanCity(true);
                 if(pl->side == 0)
                     m_spots[0].playerEnter(pl);
                 else
