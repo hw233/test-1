@@ -5198,7 +5198,7 @@ namespace GObject
             }
         }
            
-        UInt32 a = toEquip->getValueLev()/10 - fromEquip->getValueLev()/10;
+        int a = toEquip->getValueLev()/10 - fromEquip->getValueLev()/10;
         if(a >= 2)
         {
             money += (a - 1) * 0.2 * money; //手续费
