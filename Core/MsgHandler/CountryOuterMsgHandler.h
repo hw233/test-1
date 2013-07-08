@@ -6596,6 +6596,8 @@ void OnCCBReq( GameMsgHdr& hdr, const void* data )
 
     if(!gClanCity)
         return;
+    if(player->getLocation() != gClanCity->getLocation())
+        return;
 
     UInt8 req = 0;
     brd >> req;
