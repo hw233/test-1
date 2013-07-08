@@ -422,6 +422,9 @@ namespace REQ
     const UInt8 SINGLE_HERO         = 0XA5;
     /** 末日之战 **/
     const UInt8 CLANBOSS            = 0xF8;
+
+    /** 墨守成规 */
+    const UInt8 CCB                 = 0X26;
 }
 
 namespace REP
@@ -708,6 +711,8 @@ namespace REP
 
     /** 单挑 **/
     const UInt8 SINGLE_HERO         = 0XA5;
+    /** 墨守成规 */
+    const UInt8 CCB                 = 0X26;
 }
 
 namespace SPEQ

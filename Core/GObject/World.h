@@ -792,13 +792,6 @@ public:
 
         return ((opTime >= time20130531) && (now < (opTime + 7 * 86400)));
     }
-    inline static bool inActive_opTime_20130531_zcjb()
-    {
-        UInt32 opTime = TimeUtil::MkTime(cfg.openYear, cfg.openMonth, cfg.openDay);
-        UInt32 time20130531 = TimeUtil::MkTime(2013, 5, 31);
-
-        return opTime >= time20130531;
-    }
     inline static bool isRPServer()
     {return cfg.rpServer;}
     inline static bool getGMCheck()

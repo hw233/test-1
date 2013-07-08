@@ -28,6 +28,7 @@
 #include "ClanStatue.h"
 #include "ClanCopy.h"
 #include "GVar.h"
+#include "ClanCityBattle.h"
 
 #include "GObject/AthleticsRank.h"
 #include <mysql.h>
@@ -496,7 +497,7 @@ bool Clan::join(ClanMember * cm)
 
 bool Clan::kick(Player * player, UInt64 pid)
 {
-	if (_clanBattle->isInBattling())
+	if (_clanBattle->isInBattling() || gClanCity->isRunning())
 	{
         player->sendMsgCode(0, 1317);
         return false;
@@ -611,7 +612,7 @@ bool Clan::leave(Player * player)
 	if (found == _members.end())
 		return false;
 	ClanMember * member = (*found);
-	if (_clanBattle->isInBattling())
+	if (_clanBattle->isInBattling() || gClanCity->isRunning())
 	{
 		player->sendMsgCode(0, 1317);
 		return false;

@@ -208,8 +208,13 @@ void MailPackageManager::remove( UInt32 id )
 	_packages.erase(id);
 }
 
-MailPackage * MailPackageManager::add( UInt32 id )
+MailPackage * MailPackageManager::add( UInt32 id, bool* needjump )
 {
+    if (_packages.find(id) != _packages.end() && needjump)
+    {
+        *needjump = true;
+    }
+
 	MailPackage& mp = _packages[id];
 	return &mp;
 }

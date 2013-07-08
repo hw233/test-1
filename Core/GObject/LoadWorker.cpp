@@ -95,7 +95,12 @@ namespace GObject
             if(mpdata.id != last_pid)
             {
                 last_pid = mpdata.id;
-                mp = mailPackageManager.add(last_pid);
+                bool needjump = false;
+                mp = mailPackageManager.add(last_pid, &needjump);
+                if(needjump)
+                {
+                    continue;
+                }
             }
             mp->push(mpdata.itemId, mpdata.itemCount);
         }

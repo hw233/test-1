@@ -2993,9 +2993,7 @@ inline bool player_enum_2(GObject::Player* pl, int type)
             break;
         case 5:
             {
-                UInt32 curGold = pl->GetVar(GObject::VAR_RECHARGE_TODAY);
-                pl->SetVar(GObject::VAR_ZCJB_RECHARGE_GOLD, curGold);
-                //pl->SetVar(GObject::VAR_ZCJB_RECHARGE_GOLD, 0);
+                pl->SetVar(GObject::VAR_ZCJB_RECHARGE_GOLD, 0);
                 pl->SetVar(GObject::VAR_ZCJB_TIMES, 0);
                 pl->SetVar(GObject::VAR_ZCJB_GOLD_GOT, 0);
                 pl->checkZCJB();
@@ -3338,7 +3336,7 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
         GObject::GVAR.SetVar(GObject::GVAR_RYHB_ACTIVITY_END, end);
         ret = 1;
     }
-    else if (type == 4 && begin <= end && !GObject::World::inActive_opTime_20130531_zcjb())
+    else if (type == 4 && begin <= end && !GObject::World::inActive_opTime_20130531())
     {
         if(!GObject::World::getZCJBActivity())
             GObject::globalPlayers.enumerate(player_enum_2, 5);
