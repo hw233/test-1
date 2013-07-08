@@ -766,7 +766,7 @@ protected:
         return true;
     }
 
-    void isCanStrengthenSuit(UInt32 * setId, UInt32 * setNum);
+    void isCanStrengthenSuit(UInt32 * setId, UInt32 * setNum, Fighter * fgt);
 protected:
 	UInt32 _id;
 

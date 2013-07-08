@@ -32,6 +32,7 @@
 #include "GObject/SHSYTmpl.h"
 #include "GObject/DaysRank.h"
 #include "GObject/ClanBoss.h"
+#include "GObject/ClanCityBattle.h"
 
 void OnPushTimerEvent( GameMsgHdr& hdr, const void * data )
 {
@@ -626,6 +627,10 @@ void OnLevelChange( GameMsgHdr& hdr, const void* data)
             GObject::shStageMgr.init(WORLD().Now(), WORLD().getWeekDay());
             GObject::globalPlayers.enumerate(enum_send_sh_active, static_cast<void *>(NULL));
         }
+    }
+    if(gClanCity && !gClanCity->hasValidateOpenTime() && lvc->newLv >= CCB_OPEN_LEVEL)
+    {
+        gClanCity->setOpenTime();
     }
 }
 #if 0

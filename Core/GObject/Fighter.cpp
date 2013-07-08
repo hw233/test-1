@@ -1754,7 +1754,7 @@ void Fighter::rebuildEquipAttr()
         _attrExtraEquip.hp += GObjectManager::getRingHpFromEnchant(equip->getValueLev(), equip->GetCareer(), equip->getItemEquipData().enchant);
 	}
 
-    isCanStrengthenSuit(setId, setNum);
+    isCanStrengthenSuit(setId, setNum, this);
 
 	/*for(int i = 0; i < 8; ++ i)
 	{
@@ -1888,10 +1888,12 @@ void Fighter::rebuildEquipAttr()
 	_maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
 }
 
-void Fighter::isCanStrengthenSuit(UInt32 * setId, UInt32 * setNum)
+void Fighter::isCanStrengthenSuit(UInt32 * setId, UInt32 * setNum, Fighter * fgt)
 {
-	ItemEquip * equip[8] = {this->getWeapon(), this->getArmor(0), this->getArmor(1),                                                                                                                                        this->getArmor(2), this->getArmor(3), this->getArmor(4),
-                            this->getAmulet(), this->getRing()};
+    if(fgt == NULL)
+        fgt = this;
+	ItemEquip * equip[8] = {fgt->getWeapon(), fgt->getArmor(0), fgt->getArmor(1),
+        fgt->getArmor(2), fgt->getArmor(3), fgt->getArmor(4), fgt->getAmulet(), fgt->getRing()};
     bool aMark = false;
     bool bMark = false;
     bool cMark = false;
@@ -6433,6 +6435,7 @@ UInt32 Fighter::calcEquipBattlePoint()
         attrExtra.hp += GObjectManager::getRingHpFromEnchant(equip->getValueLev(), equip->GetCareer(), equip->getItemEquipData().enchant);
 	}
 
+    /*
 	for(int i = 0; i < 8; ++ i)
 	{
 		if(setId[i] == 0)
@@ -6450,6 +6453,7 @@ UInt32 Fighter::calcEquipBattlePoint()
             --idx;
         }
 	}
+    */
     bool hasActiveTrump = false;
     for(int i = 0; i < this->getMaxTrumps(); ++i)
     {
@@ -6468,6 +6472,7 @@ UInt32 Fighter::calcEquipBattlePoint()
             }
         }
     }
+    fgt->isCanStrengthenSuit(setId, setNum, this);
 
 	fgt->_maxHP = Script::BattleFormula::getCurrent()->calcHP(fgt);
 	UInt32 point = Script::BattleFormula::getCurrent()->calcBattlePoint(fgt);

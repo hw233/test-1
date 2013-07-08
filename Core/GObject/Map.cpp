@@ -7,6 +7,7 @@
 #include "Common/TimeUtil.h"
 #include "MsgID.h"
 #include "MapCollection.h"
+#include "ClanCityBattle.h"
 
 namespace GObject
 {
@@ -98,7 +99,7 @@ void Map::PlayerLeave(Player * pl, bool onlogout, bool notify)
 	if(sd == NULL)
 		return;
 
-	if(!onlogout && sd->m_IsCountryBattle)
+	if(!onlogout && sd->m_IsCountryBattle && !(gClanCity && gClanCity->isOpen()))
     {
         if(WORLD().isNewCountryBattle())
         {
@@ -170,6 +171,10 @@ void Map::AddSpot( UInt16 id, const std::string& name, UInt8 type, UInt8 country
 			globalCountryBattle.setCountryBattle(sd.m_CountryBattle);
 			globalCountryBattle.setNewCountryBattle(sd.m_NewCountryBattle);
 		}
+        if(type == 12 && !gClanCity)
+        {
+            gClanCity = new ClanCity(id);
+        }
 	}
 }
 
@@ -373,7 +378,7 @@ void Map::SendAtCity(Player * pl, bool inCity, bool notify)
 	SpotData * sd = GetSpot(PLAYER_DATA(pl, location));
 	if(sd == NULL)
 		return;
-	if(sd->m_IsCountryBattle && !WORLD().isNewCountryBattle())
+	if(sd->m_IsCountryBattle && !WORLD().isNewCountryBattle() && !(gClanCity && gClanCity->isOpen()))
 	{
         if(sd->m_CountryBattle)
             sd->m_CountryBattle->sendInfo(pl);
