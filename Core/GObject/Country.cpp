@@ -19,6 +19,7 @@
 #include "Athletics.h"
 #include "HeroMemo.h"
 #include "ClanBoss.h"
+#include "ClanCityBattle.h"
 
 namespace GObject
 {
@@ -39,7 +40,10 @@ void Country::Country_Boss_Check(void *)
 
 void Country::Country_Battle_Check(void *)
 {
-	globalCountryBattle.process(TimeUtil::Now());
+    if(gClanCity && gClanCity->isOpen())
+        gClanCity->process(TimeUtil::Now());
+    else
+        globalCountryBattle.process(TimeUtil::Now());
 }
 
 void Country::Hero_Island_Check(void *)
@@ -121,7 +125,8 @@ bool Country::Init()
         ClanRankBattleMgr::Instance().Init();
         NewCountryBattle::Init();
 		AddTimer(30000, Country_Boss_Check);
-        AddTimer(5000, Country_Battle_Check, static_cast<void *>(NULL), (5 - (now % 5)) * 1000);
+        //AddTimer(5000, Country_Battle_Check, static_cast<void *>(NULL), (5 - (now % 5)) * 1000);
+        AddTimer(1000, Country_Battle_Check);
 		AddTimer(5000, Hero_Island_Check, static_cast<void *>(NULL), (5 - (now % 5)) * 1000);
         AddTimer(1000, ClanRankBattleCheck);
         //townDeamonManager->process();

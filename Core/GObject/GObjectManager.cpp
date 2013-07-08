@@ -70,6 +70,7 @@
 #include "GData/FairyPetTable.h"
 #include "FairyPet.h"
 #include "GObject/ClanBoss.h"
+#include "GObject/ClanCityBattle.h"
 
 namespace GObject
 {
@@ -446,6 +447,8 @@ namespace GObject
             fprintf(stderr, "loadFairySpar error!\n");
             std::abort();
         }
+        if(gClanCity)
+            gClanCity->loadFromDB();
 
 		DB::gDataDBConnectionMgr->UnInit();
 	}
@@ -1919,6 +1922,11 @@ namespace GObject
                 {
                     if(specfgtobj.level >= SINGLE_HERO_OPEN_LEVEL)
                         GObject::shStageMgr.incActive(1);
+                }
+
+                if(gClanCity && !gClanCity->hasValidateOpenTime() && specfgtobj.level >= CCB_OPEN_LEVEL)
+                {
+                    gClanCity->setOpenFlag();
                 }
             }
 
@@ -4389,6 +4397,8 @@ namespace GObject
 					ea2.type3 = dbe.attrType3;
 					ea2.value3 = dbe.attrValue3;
 
+                    if(itype->subClass == Item_Weapon || itype->subClass == Item_Armor1 || itype->subClass == Item_Armor2 || itype->subClass == Item_Armor3 || itype->subClass == Item_Armor4 || itype->subClass == Item_Armor5 || itype->subClass == Item_Ring || itype->subClass == Item_Amulet)
+                    {
                     UInt8 lv = equip->getValueLev();
                     UInt8 q = equip->getQuality() - 3;
                     UInt8 crr = equip->GetCareer();
@@ -4420,6 +4430,7 @@ namespace GObject
                         {
                             ea2.value3 = maxV3;
                         }
+                    }
                     }
 
 					equip->SetBindStatus(dbe.bindType > 0);

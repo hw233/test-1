@@ -79,6 +79,7 @@
 #include "GData/ExpTable.h"
 #include "Version.h"
 #include "GObject/ClanBoss.h"
+#include "ClanCityBattle.h"
 
 
 #define NTD_ONLINE_TIME (4*60*60)
@@ -676,6 +677,7 @@ namespace GObject
         m_ClanBattleSkillFlag = 0;
         _invitedBy = 0;
         m_arenaCommitCD = 0;
+        _inClanCity = false;
 
 		memset(_buffData, 0, sizeof(UInt32) * PLAYER_BUFF_COUNT);
 		m_Package = new Package(this);
@@ -5868,6 +5870,11 @@ namespace GObject
 		UInt8 old_cny = GObject::mapCollection.getCountryFromSpot(_playerData.location);
         if (old_cny != cny.GetThreadID())
             return;
+        if(inClanCity() && gClanCity)
+        {
+            if(!gClanCity->playerLeave(this))
+                return;
+        }
 
         if (isJumpingMap())
             return;
@@ -5887,7 +5894,7 @@ namespace GObject
             delFlag(Player::InHeroIsland);
         }
         SpotData * spotData = GetMapSpot();
-        if(spotData && spotData->m_CountryBattle)
+        if(spotData && spotData->m_CountryBattle && !(gClanCity && gClanCity->isOpen()))
         {
             GObject::CountryBattle *cb = spotData->GetCountryBattle();
 	        NewCountryBattle * ncb = spotData->GetNewCountryBattle();

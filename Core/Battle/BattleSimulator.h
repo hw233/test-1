@@ -57,6 +57,7 @@ public:
 	BattleFighter * newFighter(UInt8 side, UInt8 pos, GObject::Fighter *);
     BattleFighter * newPet(UInt8 side, UInt8 pos, GObject::Fighter *);
 	inline void setFormula(Script::BattleFormula * formula) { _formula = formula; }
+    float getLostHPPercent(UInt8 side, GObject::Player * player);
 
     void putTeams(const std::string& name, UInt8 level, UInt16 portrait, UInt8 side);
     void switchPlayer(GObject::Player* player, UInt8 side);
