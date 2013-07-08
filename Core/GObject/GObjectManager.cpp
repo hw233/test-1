@@ -4383,7 +4383,6 @@ namespace GObject
 					ea2.type1 = dbe.attrType1;
 					ea2.value1 = dbe.attrValue1;
 
-
 					ea2.type2 = dbe.attrType2;
 					ea2.value2 = dbe.attrValue2;
 
