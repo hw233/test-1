@@ -438,7 +438,7 @@ public:
     void addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills, bool = true, bool = false, bool = true);
     void delSkillsFromCT(const std::vector<const GData::SkillBase*>& skills, bool = true);
 
-	inline ItemInnateTrump* getInnateTrump() { return _innateTrunp; }
+	inline ItemInnateTrump* getInnateTrump() { return _innateTrump; }
 	inline ItemHalo* getHalo() { return _halo; }
 	inline ItemFashion* getFashion() { return _fashion; }
 	inline ItemWeapon * getWeapon() { return _weapon; }
@@ -814,7 +814,7 @@ protected:
 	ItemEquip * _amulet;
 	ItemEquip * _trump[TRUMP_UPMAX];    // 法宝
 	ItemEquip * _lingbao[e_lb_max];// 灵宝
-    ItemInnateTrump * _innateTrunp; // 先天法宝
+    ItemInnateTrump * _innateTrump; // 先天法宝
 
 	bool _attrDirty;
 	UInt32 _maxHP;

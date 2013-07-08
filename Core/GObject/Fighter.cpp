@@ -90,7 +90,7 @@ Fighter::Fighter(UInt32 id, Player * owner):
     _soulAuraLeft = 0;
     _soulSkillSoulOut = 0;
     _hideFashion = 0;
-    _innateTrunp = NULL;
+    _innateTrump = NULL;
 }
 
 /*
@@ -247,8 +247,8 @@ Fighter::~Fighter()
 {
     if (!_halo)
         SAFE_DELETE(_halo);
-    if (!_innateTrunp)
-        SAFE_DELETE(_innateTrunp);
+    if (!_innateTrump)
+        SAFE_DELETE(_innateTrump);
     if (!_fashion)
         SAFE_DELETE(_fashion);
     if (_weapon)
@@ -335,12 +335,12 @@ UInt32 Fighter::getHaloTypeId()
 
 UInt32 Fighter::getInnateTrumpId()
 {
-	return _innateTrunp ? _innateTrunp->getId() : 0;
+	return _innateTrump ? _innateTrump->getId() : 0;
 }
 
 UInt32 Fighter::getInnateTrumpTypeId()
 {
-	return _innateTrunp ? _innateTrunp->GetTypeId() : 0;
+	return _innateTrump ? _innateTrump->GetTypeId() : 0;
 }
 
 UInt32 Fighter::getFashionId()
@@ -907,8 +907,8 @@ ItemEquip * Fighter::setHalo( ItemHalo* r, bool writedb )
 
 ItemEquip * Fighter::setInnateTrump(ItemInnateTrump* r, bool writedb)
 {
-	ItemEquip * rr = _innateTrunp;
-	_innateTrunp = r;
+	ItemEquip * rr = _innateTrump;
+	_innateTrump = r;
 
     if (rr)
     {
@@ -2275,7 +2275,7 @@ Fighter * Fighter::clone(Player * player)
     fgt->peerless = peerless;
 	fgt->_owner = player;
 	fgt->_halo = NULL;
-	fgt->_innateTrunp = NULL;
+	fgt->_innateTrump = NULL;
 	fgt->_fashion = NULL;
 	fgt->_weapon = NULL;
 	fgt->_ring = NULL;
@@ -2337,10 +2337,10 @@ ItemEquip * Fighter::findEquip( UInt32 id, UInt8& pos )
         return _halo;
     }
 
-    if (_innateTrunp != NULL && _innateTrunp->getId() == id)
+    if (_innateTrump != NULL && _innateTrump->getId() == id)
     {
         pos = 10;
-        return _innateTrunp;
+        return _innateTrump;
     }
 
     if(_fashion != NULL && _fashion->getId() == id)
@@ -2400,9 +2400,9 @@ void Fighter::removeEquip( UInt8 pos, ItemEquip * equip, UInt8 toWhere )
 	switch(pos)
 	{
     case 10:
-        if (_innateTrunp == equip)
+        if (_innateTrump == equip)
         {
-            _innateTrunp = NULL;
+            _innateTrump = NULL;
 			sendModification(0x70, NULL, true);
 			found = true;
         }
@@ -2485,10 +2485,10 @@ Fighter * Fighter::cloneWithEquip(Player * player)
         fgt->_halo = new ItemHalo(*_halo);
     else
         fgt->_halo = NULL;
-    if (_innateTrunp != NULL)
-        fgt->_innateTrunp = new ItemInnateTrump(*_innateTrunp);
+    if (_innateTrump != NULL)
+        fgt->_innateTrump = new ItemInnateTrump(*_innateTrump);
     else
-        fgt->_innateTrunp = NULL;
+        fgt->_innateTrump = NULL;
     if (_fashion != NULL)
         fgt->_fashion = new ItemFashion(*_fashion);
     else
