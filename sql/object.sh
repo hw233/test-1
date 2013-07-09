@@ -154,7 +154,6 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130315_1.sql # must be once 有删除操作
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130319_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130326_1.sql # must be once 有删除操作
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearyellowdiamond.sql  #黄钻活动需要打开 
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearqqvipdiamond.sql     #QQ会员活动需要打开 
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130403_1.sql # must be once 有删除操作
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130408_1.sql
@@ -176,6 +175,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130620_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearbluediamond.sql  #蓝钻活动需要打开
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130704_1.sql
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearyellowdiamond.sql  #黄钻活动需要打开
 
     #. clearshiyamen.sh
 }
