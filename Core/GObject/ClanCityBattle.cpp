@@ -33,7 +33,7 @@
 
 #define CCB_CITY_MOVE_CD             15
 
-#define  NEICE_VESION
+//#define  NEICE_VESION
 
 namespace GObject
 {
@@ -1387,11 +1387,9 @@ void ClanCity::prepare()
         openNextSpot(7);
     }
 
-#ifndef NEICE_VESION
     if(cfg.GMCheck)
-        m_nextTime = m_startTime + FIRST_PREPARE_TIME + m_round * ((20 * BATTLE_TIME) + PREPARE_TIME);
+        m_nextTime = m_startTime + FIRST_PREPARE_TIME + (m_round-1) * ((20 * BATTLE_TIME) + PREPARE_TIME);
     else
-#endif
         m_nextTime = m_startTime + PREPARE_TIME;
     prepareNpc();
 
@@ -1400,17 +1398,20 @@ void ClanCity::prepare()
     st << static_cast<UInt8>(0) << Stream::eos;
     NETWORK()->Broadcast(st);
 
-    for(; m_round < 20; ++ m_round)
+    if(cfg.GMCheck)
     {
-        if(now > m_nextTime)
-            m_nextTime += 20 * BATTLE_TIME;
-        else
-            break;
+        for(; m_round < 20; ++ m_round)
+        {
+            if(now > m_nextTime)
+                m_nextTime += 20 * BATTLE_TIME;
+            else
+                break;
 
-        if(now > m_nextTime)
-            m_nextTime += PREPARE_TIME;
-        else
-            break;
+            if(now > m_nextTime)
+                m_nextTime += PREPARE_TIME;
+            else
+                break;
+        }
     }
     writeToDB();
 }
@@ -1442,6 +1443,10 @@ void ClanCity::end()
         CCBPlayer* pl = itp->second;
         Player* player = pl->fgt.player;
         Clan* cl = player->getClan();
+
+        player->setInClanCity(false);
+        player->clearHIAttr();
+        player->autoRegenAll();
         if(pl->score == 0)
             continue;
 
@@ -1499,16 +1504,13 @@ void ClanCity::end()
         Mail * pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
         if(pmail != NULL)
             mailPackageManager.push(pmail->id, mitem, 1, true);
-
-        player->setInClanCity(false);
-        player->clearHIAttr();
-        player->autoRegenAll();
     }
     for(CCBPlayerMap::iterator itp = m_players_leave.begin(); itp != m_players_leave.end(); ++ itp)
     {
         CCBPlayer* pl = itp->second;
         Player* player = pl->fgt.player;
         Clan* cl = player->getClan();
+        player->setInClanCity(false);
         if(pl->score == 0)
             continue;
 
@@ -1565,7 +1567,6 @@ void ClanCity::end()
         Mail * pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
         if(pmail != NULL)
             mailPackageManager.push(pmail->id, mitem, 1, true);
-        player->setInClanCity(false);
     }
 
     Stream st(REP::CCB);
@@ -1754,7 +1755,10 @@ bool ClanCity::playerLeave(Player * player)
 
     CCBPlayerMap::iterator it = m_players.find(player);
     if(it == m_players.end())
+    {
+        player->setInClanCity(false);
         return true;
+    }
 
     Clan* cl = player->getClan();
     CCBPlayer* pl = it->second;
