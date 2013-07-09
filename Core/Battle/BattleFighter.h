@@ -1052,7 +1052,6 @@ private:
         _moMagAtkAdd = 0;
         _petMagAtkAdd = 0;
         _counter_spirit_magatk_add = 0;
-        _pet_coatk = 0;
 
         _soulout = true;
         _soulout_last = l;
