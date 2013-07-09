@@ -519,7 +519,7 @@ void CCBSpot::clear()
 
 bool CCBSpot::canMoveTo()
 {
-    return (canAtk || id == 1 || id == 7 || hp != 0);
+    return ((canAtk && hp != 0) || id == 1 || id == 7);
 }
 
 void CCBSpot::reAlive(CCBPlayer* pl, bool force)
@@ -542,7 +542,7 @@ void CCBSpot::reAlive(CCBPlayer* pl, bool force)
 
 void CCBSpot::playerEnter(CCBPlayer* pl)
 {
-    if(!pl || (!canAtk && id != 1 && id != 7) || hp == 0)
+    if(!pl)
         return;
 
     UInt8 side = pl->side;
