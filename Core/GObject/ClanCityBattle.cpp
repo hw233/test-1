@@ -33,7 +33,7 @@
 
 #define CCB_CITY_MOVE_CD             15
 
-//#define  NEICE_VESION
+#define  NEICE_VESION
 
 namespace GObject
 {
@@ -186,8 +186,8 @@ static float npc_atk_factor[6] = {0.01, 0.05, 0.1, 0.3, 0.7, 1.0};
 static float npc_hp_factor[6] = {0.001, 0.005, 0.01, 0.01, 0.03, 0.05};
 
 static UInt32 spot_score[2][6] = {
-    {  5,   5,   5,  10, 10,   20},
-    {100, 100, 100, 200, 200, 300}
+    {  20,   10,   10,  5, 5,   5},
+    {300, 200, 200, 100, 100, 100}
 };
 
 static bool isBoss(UInt32 npcid)
@@ -415,7 +415,13 @@ bool CCBPlayer::attackPlayer(CCBPlayer* other, UInt32& bid)
 
 void CCBPlayer::addReAliveCD()
 {
-    realivecd = TimeUtil::Now() + deadcd[dead - 1];
+    UInt8 idx = 0;
+
+    if(dead  > 4)
+        idx = 4;
+    else
+        idx = dead - 1;
+    realivecd = TimeUtil::Now() + deadcd[idx];
     writeToDB();
 }
 
@@ -739,8 +745,13 @@ void CCBSpot::fillTo100(CCBPlayerList& dst, CCBPlayerList& src, CCBPlayer* bomb)
 
 void CCBSpot::flushNpc()
 {
+    if(!canAtk || hp == 0)
+        return;
+
     skill_dmg[1].lvl = 100;
-    UInt8 round = clancity->getRound() - 1;
+    UInt8 round = clancity->getRound();
+    if(round > 19)
+        round = 19;
 
     UInt32 npcs_size = npcs.size();
     UInt32 npcs_idx = 0;
@@ -767,7 +778,7 @@ void CCBSpot::flushNpc()
             }
         }
     }
-    fillBoss(alive[1], npcs);
+    fillBoss(waiters[1], npcs);
 
     npcs_size = npcs.size();
     npcs_idx = 0;
@@ -810,7 +821,7 @@ void CCBSpot::flushNpc()
         }
     }
 
-    fillNpc(alive[1], npcs);
+    fillNpc(waiters[1], npcs);
 }
 
 bool CCBSpot::playerLeave(CCBPlayer* pl)
@@ -879,7 +890,7 @@ void CCBSpot::prepare()
 
     fillTo100(alive[0], waiters[0], bomb0);
     if(clancity->getType() == CCB_CITY_TYPE_DEF)
-        flushNpc();
+        fillTo100(alive[1], waiters[1], NULL);
     else
         fillTo100(alive[1], waiters[1], bomb1);
 
@@ -1318,6 +1329,7 @@ void ClanCity::process(UInt32 curtime)
             m_status = 0;
             m_recycle_round = 0;
             endOneRound();
+            prepareNpc();
             m_nextTime += PREPARE_TIME;
         }
 
@@ -1329,7 +1341,7 @@ void ClanCity::process(UInt32 curtime)
         }
     }
 
-    if(curtime >= m_endTime || m_spots[0].hp == 0 || (m_round == 20 && m_recycle_round == 0))
+    if(curtime >= m_endTime || m_spots[0].hp == 0 || (m_round == 20 && m_recycle_round == 0) || m_round > 20)
     {
         end();
         return;
@@ -1375,19 +1387,20 @@ void ClanCity::prepare()
         openNextSpot(7);
     }
 
-    /*
+#ifndef NEICE_VESION
     if(cfg.GMCheck)
         m_nextTime = m_startTime + FIRST_PREPARE_TIME + m_round * ((20 * BATTLE_TIME) + PREPARE_TIME);
     else
-    */
+#endif
         m_nextTime = m_startTime + PREPARE_TIME;
+    prepareNpc();
 
     Stream st(REP::CCB);
     makeOpenStatusInfo(st);
     st << static_cast<UInt8>(0) << Stream::eos;
     NETWORK()->Broadcast(st);
 
-    for(; m_round <= 20; ++ m_round)
+    for(; m_round < 20; ++ m_round)
     {
         if(now > m_nextTime)
             m_nextTime += 20 * BATTLE_TIME;
@@ -1432,7 +1445,7 @@ void ClanCity::end()
         if(pl->score == 0)
             continue;
 
-        player->getAchievement(pl->score);
+        player->getAchievement(pl->score*2);
 
         UInt32 clscore = 0;
         CCBClanMap::iterator itc = m_clans.find(cl);
@@ -1482,7 +1495,7 @@ void ClanCity::end()
             }
         }
 
-        SYSMSGV(content, 4920+m_type, winner, clanname, pl->score, pl->score, count, clscore, clscore*10, jointo, act);
+        SYSMSGV(content, 4920+m_type, winner, clanname, pl->score, pl->score*2, count, clscore, clscore*10, jointo, act);
         Mail * pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
         if(pmail != NULL)
             mailPackageManager.push(pmail->id, mitem, 1, true);
@@ -1499,7 +1512,7 @@ void ClanCity::end()
         if(pl->score == 0)
             continue;
 
-        player->getAchievement(pl->score);
+        player->getAchievement(pl->score*2);
 
         UInt32 count = 0;
         if(pl->score >= 500)
@@ -1548,7 +1561,7 @@ void ClanCity::end()
             }
         }
 
-        SYSMSGV(content, 4920+m_type, winner, clanname, pl->score, pl->score, count, clscore, clscore, jointo, act);
+        SYSMSGV(content, 4920+m_type, winner, clanname, pl->score, pl->score*2, count, clscore, clscore, jointo, act);
         Mail * pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
         if(pmail != NULL)
             mailPackageManager.push(pmail->id, mitem, 1, true);
@@ -1607,10 +1620,18 @@ void ClanCity::end()
         CCBClan* ccl = itc->second;
         delete ccl;
     }
+    for(int idx = 0; idx < 2; ++ idx)
+    {
+        for(CCBClanPlayerMap::iterator itcp = m_clanPlayers[idx].begin(); itcp != m_clanPlayers[idx].end(); ++ itcp)
+        {
+            CCBPlayerList& list = itcp->second;
+            list.clear();
+        }
+        m_clanPlayers[idx].clear();
+    }
+
     m_players.clear();
     m_players_leave.clear();
-    m_clanPlayers[0].clear();
-    m_clanPlayers[1].clear();
     m_clans.clear();
     m_clanSort.clear();
     m_recycle_round = 0;
@@ -1672,13 +1693,15 @@ bool ClanCity::playerEnter(Player * player)
             pl->side = side;
             pl->entered = 1;
             m_players[player] = pl;
-            m_clanPlayers[side].insert(std::make_pair(cl, pl));
+            CCBPlayerList& list = m_clanPlayers[side][cl];
+            list.push_back(pl);
             CCBClanMap::iterator itc = m_clans.find(cl);
             if(itc == m_clans.end())
             {
                 CCBClan* ccl = new CCBClan(cl);
                 m_clans[cl] = ccl;
                 m_clanSort.insert(ccl);
+                ccl->writeToDB();
             }
         }
         else
@@ -1686,7 +1709,8 @@ bool ClanCity::playerEnter(Player * player)
             pl = it->second;
             pl->entered = 1;
             m_players[player] = pl;
-            m_clanPlayers[side].insert(std::make_pair(cl, pl));
+            CCBPlayerList& list = m_clanPlayers[side][cl];
+            list.push_back(pl);
             m_players_leave.erase(player);
         }
         pl->writeToDB();
@@ -1742,7 +1766,10 @@ bool ClanCity::playerLeave(Player * player)
         pl->entered = 0;
         m_players_leave[player] = pl;
         m_players.erase(player);
-        m_clanPlayers[side].erase(cl);
+        CCBPlayerList& list = m_clanPlayers[side][cl];
+        CCBPlayerList::iterator itp = std::find(list.begin(), list.end(), pl);
+        if(itp != list.end())
+            list.erase(itp);
         pl->writeToDB();
 
         if(curtime >= m_startTime && curtime < m_endTime)
@@ -1865,6 +1892,17 @@ void ClanCity::handleBattle()
     for(int i = 0; i < 6; ++ i)
     {
         m_spots[i].handleBattle();
+    }
+}
+
+void ClanCity::prepareNpc()
+{
+    if(m_type != CCB_CITY_TYPE_DEF)
+        return;
+
+    for(int i = 0; i < 6; ++ i)
+    {
+        m_spots[i].flushNpc();
     }
 }
 
@@ -2051,9 +2089,22 @@ void ClanCity::sendSelfSpotInfo(Player* player)
             CCBPlayer* pl = m_spots[pos].alive[i][j];
             if(pl->type == e_player)
             {
+                st << static_cast<UInt8>(1);
                 st << pl->fgt.player->getId();
                 st << pl->fgt.player->getName();
                 st << pl->weary;
+                ++ cnt;
+            }
+            else if(pl->type == e_npc)
+            {
+                st << static_cast<UInt8>(3);
+                st << pl->fgt.npcId;
+                ++ cnt;
+            }
+            else if(pl->type == e_skill)
+            {
+                st << static_cast<UInt8>(0);
+                st << pl->fgt.skill->id;
                 ++ cnt;
             }
         }
@@ -2062,9 +2113,22 @@ void ClanCity::sendSelfSpotInfo(Player* player)
             CCBPlayer* pl = m_spots[pos].waiters[i][j];
             if(pl->type == e_player)
             {
+                st << static_cast<UInt8>(1);
                 st << pl->fgt.player->getId();
                 st << pl->fgt.player->getName();
                 st << pl->weary;
+                ++ cnt;
+            }
+            else if(pl->type == e_npc)
+            {
+                st << static_cast<UInt8>(3);
+                st << pl->fgt.npcId;
+                ++ cnt;
+            }
+            else if(pl->type == e_skill)
+            {
+                st << static_cast<UInt8>(0);
+                st << pl->fgt.skill->id;
                 ++ cnt;
             }
         }
@@ -2092,7 +2156,7 @@ void ClanCity::upClanSkill(Player* player, UInt8 sidx)
     if(player->getThreadId() != WORKER_THREAD_NEUTRAL)
         return;
 
-    if(player->getGold() < 30)
+    if(player->getGold() < 5)
     {
         player->sendMsgCode(0, 1104);
         return;
@@ -2129,7 +2193,7 @@ void ClanCity::upClanSkill(Player* player, UInt8 sidx)
 
     ++ skill->lvl;
     ConsumeInfo ci(CCBSkillUP, 0, 0);
-    player->useGold(30, &ci);
+    player->useGold(5, &ci);
     ccl->writeToDB();
 
     Stream st(REP::CCB);
@@ -2142,10 +2206,14 @@ void ClanCity::upClanSkill(Player* player, UInt8 sidx)
 
     UInt8 side = pl->side;
     CCBClanPlayerMap::iterator it2 = m_clanPlayers[side].find(cl);
-    for(; it2 != m_clanPlayers[side].end() && it2->first == cl; ++ it2)
+    if(it2 != m_clanPlayers[side].end())
     {
-        CCBPlayer* pl = it2->second;
-        pl->fgt.player->send(st);
+        CCBPlayerList& players = it2->second;
+        for(CCBPlayerList::iterator itp = players.begin(); itp != players.end(); ++ itp)
+        {
+            CCBPlayer* pl = *itp;
+            pl->fgt.player->send(st);
+        }
     }
 }
 
@@ -2196,7 +2264,7 @@ void ClanCity::upSpotSkill(Player* player, UInt8 spot, UInt8 sidx)
         return;
     if(player->getThreadId() != WORKER_THREAD_NEUTRAL)
         return;
-    if(player->getGold() < 30)
+    if(player->getGold() < 5)
     {
         player->sendMsgCode(0, 1104);
         return;
@@ -2230,7 +2298,7 @@ void ClanCity::upSpotSkill(Player* player, UInt8 spot, UInt8 sidx)
 
     ++ skill->lvl;
     ConsumeInfo ci(CCBSkillUP, 0, 0);
-    player->useGold(30, &ci);
+    player->useGold(5, &ci);
     m_spots[pos].writeToDB();
 
     Stream st(REP::CCB);
@@ -2338,51 +2406,46 @@ void ClanCity::giveScore(CCBPlayer*pl, UInt32 score)
     }
 
     CCBClanPlayerMap::iterator it2 = m_clanPlayers[side].find(cl);
-    for(; it2 != m_clanPlayers[side].end() && it2->first == cl; ++ it2)
+    if(it2 != m_clanPlayers[side].end())
     {
-        CCBPlayer* pl = it2->second;
-        ccl->sendInfo(pl);
+        CCBPlayerList& players = it2->second;
+        for(CCBPlayerList::iterator itp = players.begin(); itp != players.end(); ++ itp)
+        {
+            CCBPlayer* pl = *itp;
+            ccl->sendInfo(pl);
+        }
     }
 }
 
 void ClanCity::giveAllScore(UInt8 side, UInt32 score)
 {
-    Clan* oldcl = NULL;
-    CCBClan* ccl = NULL;
     for(CCBClanPlayerMap::iterator itcp = m_clanPlayers[side].begin(); itcp != m_clanPlayers[side].end(); ++ itcp)
     {
-        CCBPlayer* pl = itcp->second;
-        pl->score += score;
-        pl->writeToDB();
-
         Clan* cl = itcp->first;
-        if(oldcl != cl)
+        CCBClan* ccl = NULL;
+        CCBClanMap::iterator itc = m_clans.find(cl);
+        if(itc != m_clans.end())
         {
-            CCBClanMap::iterator itc = m_clans.find(cl);
-            if(itc != m_clans.end())
-            {
-                ccl = itc->second;
-                m_clanSort.erase(ccl);
-                ccl->score += score;
-                ccl->writeToDB();
-                CCBClanSort::iterator itres = m_clanSort.insert(ccl).first;
-                if(std::distance(m_clanSort.begin(), itres) < 3)
-                {
-                    Stream st(REP::CCB);
-                    makeLeaderBoardInfo(st);
-                    broadcast(st);
-                }
-            }
-            else
-            {
-                ccl = NULL;
-            }
-
-            oldcl = cl;
+            ccl = itc->second;
+            m_clanSort.erase(ccl);
+            ccl->score += score;
+            ccl->writeToDB();
+            m_clanSort.insert(ccl);
         }
-        if(ccl)
-            ccl->sendInfo(pl);
+
+        CCBPlayerList& list = itcp->second;
+        for(CCBPlayerList::iterator itp = list.begin(); itp != list.end(); ++ itp)
+        {
+            CCBPlayer* pl = *itp;
+            pl->score += score;
+            pl->writeToDB();
+            if(ccl)
+                ccl->sendInfo(pl);
+        }
     }
+    Stream st(REP::CCB);
+    makeLeaderBoardInfo(st);
+    broadcast(st);
 }
 
 void ClanCity::forceEnter(CCBPlayer* pl, UInt8 spot)
@@ -2492,7 +2555,8 @@ void ClanCity::loadFromDB()
             if(dbccbp.entered != 0)
             {
                 m_players[player] = pl;
-                m_clanPlayers[dbccbp.side].insert(std::make_pair(cl, pl));
+                CCBPlayerList& list = m_clanPlayers[dbccbp.side][cl];
+                list.push_back(pl);
                 player->setInClanCity(true);
                 if(pl->side == 0)
                     m_spots[0].playerEnter(pl);

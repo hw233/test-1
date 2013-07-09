@@ -151,7 +151,7 @@ namespace GObject
     };
 
     typedef std::map<Clan*, CCBClan*> CCBClanMap;
-    typedef std::multimap<Clan*, CCBPlayer*> CCBClanPlayerMap;
+    typedef std::map<Clan*, CCBPlayerList> CCBClanPlayerMap;
     typedef std::set<CCBClan*, bpGreater> CCBClanSort;
 
     class ClanCity
@@ -207,6 +207,7 @@ namespace GObject
         void prepareOneRound();
         void checkAddExp(UInt32 curtime);
         void loadFromDB();
+        void prepareNpc();
 
         void makeLeaderBoardInfo(Stream& st);
         void makeOpenStatusInfo(Stream& st);
