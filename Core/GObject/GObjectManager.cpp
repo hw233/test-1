@@ -5013,7 +5013,7 @@ namespace GObject
 		return static_cast<ItemHalo*>(equip);
 	}
 
-	ItemInnateTrump * GObjectManager::fetchInnateTrump( UInt32 id )
+	ItemInnateTrump * GObjectManager::fetchInnateTrump(UInt32 id)
 	{
 		ItemEquip * equip = fetchEquipment(id);
 		if(equip == NULL)

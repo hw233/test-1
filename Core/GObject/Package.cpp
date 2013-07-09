@@ -6142,7 +6142,7 @@ namespace GObject
                 fgt->setDirty();
             if (trump->getClass() == Item_Halo)
                 fgt->sendModification(0x1f, trump, false);
-            if (trump->getClass() == Item_InnateTrump)
+            else if (trump->getClass() == Item_InnateTrump)
                 fgt->sendModification(0x70, trump, false);
             else if (trump->getClass() == Item_Fashion)
                 fgt->sendModification(0x20, trump, false);
