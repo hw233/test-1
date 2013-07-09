@@ -89,20 +89,19 @@ namespace GObject
         UInt32 last_pid = 0xFFFFFFFF;
         MailPackage * mp = NULL;
 
+        bool needjump = false;
         while(execu->Next() == DB::DB_OK)
         {
             lc.advance();
             if(mpdata.id != last_pid)
             {
+                needjump = false;
                 last_pid = mpdata.id;
-                bool needjump = false;
                 mp = mailPackageManager.add(last_pid, &needjump);
-                if(needjump)
-                {
-                    continue;
-                }
             }
-            mp->push(mpdata.itemId, mpdata.itemCount);
+
+            if (!needjump)
+                mp->push(mpdata.itemId, mpdata.itemCount);
         }
         lc.finalize();
 
