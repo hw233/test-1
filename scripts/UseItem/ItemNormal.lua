@@ -176,6 +176,26 @@ function ItemNormal_AddBuff(obj, idx, num, count, max_num)
   return true
 end
 
+function ItemNormal_AddBuff2(obj, idx, num, count, max_num)
+  local now = os.time()
+  local num2 = obj:getBuffData(idx);
+  local num3 = 0
+  if num2 > now then
+    num3 = num2 - now
+    if num3 >= max_num then
+      return 0
+    end
+  end
+  if num3 + num * count > max_num then
+      count = math.ceil((max_num - num3) / num)
+      num3 = max_num
+  else
+      num3 = num3 + num * count
+  end
+  obj:setBuffData(idx, num3 + now, true)
+  return count
+end
+
 function ItemNormal_00000001(iid, num, bind, param)
   local player = GetPlayer()
   local package = player:GetPackage();
@@ -2147,7 +2167,8 @@ function ItemNormal_00000057(iid, num, bind, param)
   local package = player:GetPackage();
   player:setBuffData(0x16, 0, true)
   player:setBuffData(0x17, 0, true)
-  if ItemNormal_AddBuff(player, 4, 3600, num, 356400) then
+  num = ItemNormal_AddBuff2(player, 4, 3600, num, 3596400)
+  if num > 0 then
   	package:DelItemSendMsg(57, player);
 	return num;
   else
@@ -2158,7 +2179,8 @@ end
 function ItemNormal_00000058(iid, num, bind, param)
   local player = GetPlayer()
   local package = player:GetPackage();
-  if ItemNormal_AddBuff(player, 4, 3600, num, 356400) then
+  num = ItemNormal_AddBuff2(player, 4, 3600, num, 3596400)
+  if num > 0 then
   	package:DelItemSendMsg(58, player);
 	return num;
   else
@@ -4465,7 +4487,8 @@ function ItemNormal_00009093(iid, num, bind, param)
     local package = player:GetPackage();
     player:setBuffData(0x4, 0, true)
     player:setBuffData(0x16, 0, true)
-    if ItemNormal_AddBuff(player, 0x17, 3600, num, 356400) then
+    num = ItemNormal_AddBuf2(player, 0x17, 3600, num, 3596400)
+    if num > 0 then
         package:DelItemSendMsg(iid, player);
         return num;
     else
