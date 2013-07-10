@@ -37,6 +37,7 @@ enum
 	WORKER_THREAD_DB8,				//15 recharge
 	WORKER_THREAD_DB_LOG,			//后台LOG
 	WORKER_THREAD_DB_LOG1,			//后台LOG1
+    WORKER_THREAD_LOAD,		        //加载(邮件)
 	MAX_THREAD_NUM
 };
 

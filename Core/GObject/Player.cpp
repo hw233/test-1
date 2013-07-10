@@ -729,6 +729,8 @@ namespace GObject
         _cbHPflag = false;
 
         _inQQGroup = false;
+
+        _loadMark = false;
 	}
 
 
@@ -1290,6 +1292,12 @@ namespace GObject
 #ifdef DREAMER_DEBUG
         getDreamer();
 #endif
+
+        if(!_loadMark)
+        {
+            LOAD().Push(getId(), 0);
+            _loadMark = true;
+        }
 	}
 
 #define WEBDOWNLOAD 255
@@ -1954,6 +1962,14 @@ namespace GObject
 
     void Player::sendLevelPack(UInt8 lvl)
     {
+        if (lvl >= 30 && !(_playerData.qqawardgot & 0x10) && getCreated() < TimeUtil::MkTime(2013, 7, 5, 8))
+        {
+            GetPackage()->Add(37, 1, true, true);
+            _playerData.qqawardgot |= 0x10;
+            DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardgot, getId());
+        }
+        /** deleted by suntao 2013-6-29 **/
+#if 0
         if (lvl >= 30 && !(_playerData.qqawardgot & 0x10))
         {
             SYSMSG(title, 2120);
@@ -1975,6 +1991,7 @@ namespace GObject
                 DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardgot, getId());
             }
         }
+#endif
         /** deleted by qiwy 2012-12-07 **/
 #if 0
         if (lvl >= 40 && !(_playerData.qqawardgot & 0x08))
@@ -2680,10 +2697,8 @@ namespace GObject
                 continue;
             if (fgt->hasCitta(citta) < 0) {
                 if (fgt->addNewCitta(citta, writedb, true)) {
-                    /*
-                    if (fgt->upCitta(citta, 0, writedb)) {
+                    if (!isMainFighter(fgt->getId()) && fgt->upCitta(citta, 0, writedb)) {
                     }
-                    */
                 }
             }
         }
@@ -6874,6 +6889,22 @@ namespace GObject
 				for(; i < 6; ++ i)
 				{
 					Fighter * fgt = globalFighters.getRandomOut(this, excepts, excepts2, extraRefresh ? 0 : 1, rateidx0, rateidx1, rateidx2);
+                    if (i == 0 && GetLev() <= 10 && !type && GetTaskMgr()->HasAcceptedTask(14)
+                            && !GetTaskMgr()->HasCompletedTask(14) && !GetTaskMgr()->HasSubmitedTask(14))
+                    {
+                        UInt32 fgtId = 0;
+                        if(3 == GetClass())  //道
+                        {
+                            static UInt32 shi[] = { 45, 46, 49, 50 };
+                            fgtId = shi[uRand(4)];
+                        }
+                        else    //释或者儒
+                        {
+                            static UInt32 dao[] = { 54, 58, 59, 60 };
+                            fgtId = dao[uRand(4)];
+                        }
+		                fgt = globalFighters[fgtId];
+                    }
 					if(fgt == NULL)
 					{
 						_playerData.tavernId[i] = 0;
@@ -11751,12 +11782,23 @@ namespace GObject
             st << static_cast<UInt8>(12) << idx << Stream::eos;
             send(st);
             getDiamondInfo(opt);
-
-            char str[16] = {0};
-            sprintf(str, "F_130531_%d", opt);
-            udpLog("choujiangquan", str, "", "", "", "", "act");
+            blueDiamondAwardUdpLog(opt);
         }
     }
+    void Player::blueDiamondAwardUdpLog(UInt8 type)
+    {
+            char str[16] = {0};
+            sprintf(str, "F_130531_%d", type);
+            udpLog("choujiangquan", str, "", "", "", "", "act");
+    }
+
+    void Player::cFriendAwardUdpLog(UInt8 type)
+    {
+            char str[16] = {0};
+            sprintf(str, "F_1077_%d", type);
+            udpLog("inviteLuckyDraw", str, "", "", "", "", "act");
+    }
+
     void Player::getDiamondInfo(UInt8 opt)
     {
         static UInt32 s_varId[] = {196, 197, 245};
@@ -14086,11 +14128,13 @@ namespace GObject
         st << type;
         st << static_cast<UInt8>(idx);
         st << static_cast<UInt8>(v);
+        st << static_cast<UInt8>(v>>27);
         st << Stream::eos;
         send(st);
     }
-    void Player::getFishUserPackage()
+    void Player::getFishUserPackage(UInt8 idx)
     {
+        /*
         if (GetLev() < 45)
             return;
         UInt32 rpValue = GetVar(VAR_RP_VALUE);
@@ -14116,6 +14160,28 @@ namespace GObject
                 if(0 == GetVar(VAR_TUIGUAN_AWARD_GOT) && ((v&0x7F) == 0x7F))
                     SetVar(VAR_TUIGUAN_AWARD_GOT, 1);
             }
+        }
+        */
+        if (idx > 4)
+            return;
+        UInt32 rpValue = GetVar(VAR_RP_VALUE);
+        if (rpValue != e_pf_buyu && rpValue != e_pf_louyi
+                && rpValue != e_pf_shenma && rpValue != e_pf_konglong
+                && rpValue != e_pf_xiaoyu)
+            return;
+
+        UInt32 v = GetVar(VAR_FISHUSER_AWARD);
+        //27-31位存储推广的专属成长礼包领取状态 10、20、30、40、45级
+        if (v & (0x01 << (idx+27)))
+            return;
+        if (idx != 4 && GetLev() < (idx+1)*10)
+            return;
+        if (idx == 4 && GetLev() < 45)
+            return;
+        if (GameAction()->onFishUserPackage(this, idx))
+        {
+            v |= (0x01 << (idx+27));
+            SetVar(VAR_FISHUSER_AWARD, v);
         }
         sendFishUserInfo();
     } 

@@ -9054,3 +9054,43 @@ function onRecharge(player, r)
     end
 end
 
+function onFishUserPackage(player, idx)
+    if player == nil or idx == nil or idx > 4 or idx < 0 then
+        return false
+    end
+    local items = {
+        [0] = { {35, 20}, {499, 50}, {29, 30}, {55, 10} },
+        [1] = { {29, 50}, {499, 50}, {55, 20}, {15, 5} },
+        [2] = { {55, 30}, {499, 50}, {510, 20}, {15, 5} },
+        [3] = { {499, 50}, {502, 30}, {15, 5}, {30, 5} },
+        [4] = { {1277, 1}, {499, 50}, {30, 5}, {15, 5} },
+    }
+    local package = player:GetPackage()
+    local reqGrids = #items[idx] - 1
+    if idx == 3 then
+        reqGrids = reqGrids + 10
+    elseif idx == 4 then
+        reqGrids = reqGrids + 1
+    end
+    if package:GetRestPackageSize() < reqGrids then
+        player:sendMsgCode(2, 1011, 0)
+        return false
+    end
+    for _, val in pairs(items[idx]) do
+        if val[1] == 499 then
+            player:getCoupon(val[2])
+        else
+            package:Add(val[1], val[2], true)
+        end
+    end
+    if idx == 3 then
+        local gems = { 5001, 5011, 5021, 5031, 5041, 5051, 5061, 5071, 5081, 5091, 5101, 5111, 5121, 5131, 5141 }
+        for k = 1, 10 do
+            package:Add(gems[math.random(1, #gems)], 1, true)
+        end
+    elseif idx == 4 then
+        local equipId = math.random(2544, 2567)
+        package:Add(equipId, 1, true)
+    end
+    return true
+end

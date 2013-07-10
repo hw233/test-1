@@ -374,6 +374,7 @@ namespace Script
         UInt32 GetFairySparParaMax(UInt8 type, UInt8 count);
         Table GetFairySparElement(UInt8 flag);
         UInt8 onVipLevelAward(Player* player, UInt8 opt);
+        bool onFishUserPackage(Player* player, UInt8 idx);
 
 	private:
 		Player* _player1;	//?ű???????Ϊ????1
