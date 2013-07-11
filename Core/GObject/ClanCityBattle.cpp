@@ -2441,7 +2441,11 @@ void ClanCity::makeOpenStatusInfo(Stream& st)
     else
     {
         UInt32 curtime = TimeUtil::Now();
-        if(curtime >= m_startTime && curtime < m_endTime)
+        if(curtime < m_startTime)
+        {
+            st << static_cast<UInt8>(1);
+        }
+        else if(curtime >= m_startTime && curtime < m_endTime)
         {
             if(m_spots[0].hp == 0 || (m_round == 20 && m_recycle_round == 0))
                 st << static_cast<UInt8>(3);
