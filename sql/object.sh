@@ -176,6 +176,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearbluediamond.sql  #蓝钻活动需要打开
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130704_1.sql
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearyellowdiamond.sql  #黄钻活动需要打开
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/clear_var410.sql  #空间黄钻/大厅蓝钻礼包
 
     #. clearshiyamen.sh
 }

@@ -1379,7 +1379,7 @@ function initActTime(y, m, d)
   --大厅累积在线奖励
   local  SerStartTm243 = { ['year'] = 2013, ['month'] = 6, ['day'] = 24, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --空间黄钻、大厅蓝钻礼包
-  local  SerStartTm244 = { ['year'] = 2013, ['month'] = 6, ['day'] = 7, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm244 = { ['year'] = 2013, ['month'] = 7, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 五一活动(节日套装)
   local  SerStartTm245 = { ['year'] = 2013, ['month'] = 4, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --落英秘典
