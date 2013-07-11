@@ -188,7 +188,7 @@ inline bool IsGemId(UInt32 id)
 
 inline bool IsEquip(UInt8 subClass)
 {
-	return subClass >= static_cast<UInt8>(Item_Weapon) && subClass <= static_cast<UInt8>(Item_LBxin);
+	return subClass >= static_cast<UInt8>(Item_Weapon) && subClass <= static_cast<UInt8>(Item_InnateTrump);
 }
 
 inline bool IsWeapon(UInt8 subClass)

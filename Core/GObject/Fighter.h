@@ -206,6 +206,9 @@ public:
 
     void setCapacity(float c, bool = true);
 	inline float getCapacity() {return _capacity;}
+    
+    //获取先天技能
+    UInt16 getInnateSkill();
 
     // 装备无双技能
     void setPeerless(UInt16 pl, bool = true);

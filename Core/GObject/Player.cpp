@@ -3280,6 +3280,8 @@ namespace GObject
 				st << buffid[i] << buffleft[i];
 			}
             st << static_cast<UInt8>(fgt->getHideFashion());
+            st << static_cast<UInt32>(fgt->getPortrait());
+
             fgt->xingchenInfo(st);
 		}
 	}

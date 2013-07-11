@@ -786,6 +786,12 @@ void Fighter::sendModification( UInt8 n, UInt8 * t, UInt64 * v ,bool writedb)
 		{
 			st << static_cast<UInt32>(v[i]);
 		}
+
+        if(0x33 == t[i])
+        {
+			st << static_cast<UInt32>(getPortrait());
+        }
+
         if (writedb)
             updateToDB(t[i], v[i]);
 	}
@@ -845,6 +851,13 @@ void Fighter::sendModification( UInt8 n, UInt8 * t, ItemEquip ** v, bool writedb
                 ItemLingbaoAttr& lba = (static_cast<ItemLingbao*>(equip))->getLingbaoAttr();
                 lba.appendAttrToStream(st);
             }
+
+            if(0x70== t[i])
+            {
+                UInt16 skillId = getInnateSkill();
+                st << skillId;
+            }
+
 			if(writedb)
 				updateToDB(t[i], equip->getId());
 		}
@@ -937,6 +950,24 @@ ItemEquip * Fighter::setInnateTrump(ItemInnateTrump* r, bool writedb)
 
     sendModification(0x70, r, writedb);
 	return rr;
+}
+
+UInt16 Fighter::getInnateSkill()
+{
+   ItemEquip * innateTrump = getInnateTrump(); 
+
+   if(innateTrump)
+   {
+        const GData::AttrExtra* attr = innateTrump->getAttrExtra();
+
+        if(attr->skills.size() > 0)
+        {
+            if(attr->skills[0])
+                return attr->skills[0]->getId();
+        }
+   }
+
+   return 0;
 }
 
 ItemWeapon * Fighter::setWeapon( ItemWeapon * w, bool writedb )
