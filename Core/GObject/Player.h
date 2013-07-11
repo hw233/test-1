@@ -1264,6 +1264,7 @@ namespace GObject
 		void makePlayerInfo(Stream&);
 		void makeFormationInfo(Stream&);
         void makeFighterSSList(Stream& st);
+        void makeFighterSSListWithNoSkill(Stream& st);
 		void makeFighterList(Stream&);
 		void makeFighterInfo(Stream&, Fighter *, bool = true);
 		bool makeFighterInfo(Stream&, UInt32);

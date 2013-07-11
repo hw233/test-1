@@ -5306,6 +5306,38 @@ void Fighter::makeFighterSSInfo(Stream& st)
     st.data<UInt8>(offset) = c;
 }
 
+void Fighter::makeFighterSSInfoWithNoSkill(Stream& st)
+{
+    st << getId();
+    size_t offset = st.size();
+    st << static_cast<UInt8>(0);
+    UInt8 c = 0;
+
+    std::set<UInt16> skills;
+
+    for (int i = 0; i < getUpSkillsMax(); ++i)
+    {
+        if (_skill[i])
+        {
+            skills.insert(SKILL_ID(_skill[i]));
+        }
+    }
+
+    if (peerless)
+        skills.insert(SKILL_ID(peerless));
+
+    for (std::map<UInt16, SStrengthen>::iterator i = m_ss.begin(), e = m_ss.end(); i != e; ++i)
+    {
+        if (skills.find(i->first) == skills.end())
+        {
+            if (appendFighterSSInfo(st, SKILLANDLEVEL(i->first, 0)))
+                ++c;
+        }
+    }
+
+    st.data<UInt8>(offset) = c;
+}
+
 void Fighter::getAllSSAndLevel(Stream& st)
 {
     size_t offset = st.size();
