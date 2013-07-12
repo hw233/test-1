@@ -921,6 +921,7 @@ public:
     void SSSendSSInfo(UInt16 skill);
     void SSNotify(UInt16 id, SStrengthen& ss);
     void makeFighterSSInfo(Stream& st);
+    void makeFighterSSInfoWithNoSkill(Stream& st);
     bool appendFighterSSInfo(Stream& st, UInt16 skillid);
     bool appendFighterSSInfo(Stream& st, UInt16 skillid, SStrengthen* ss);
     void PeerlessSSNotify(UInt16 id);

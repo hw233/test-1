@@ -251,7 +251,7 @@ void HeroMemo::updateToDB()
             memos += "|";
     }
 
-    DB().PushUpdateData("REPLACE INTO `heromemo` (`playerId`, `awards`, `memos`) VALUES (%"I64_FMT"u, '%s', '%s')"  ,
+    DB().PushUpdateData("REPLACE INTO `heromemo` (`playerId`, `awards`, `memos`) VALUES (%" I64_FMT "u, '%s', '%s')"  ,
             this->m_owner->getId(), awards.c_str(), memos.c_str());
 }
 

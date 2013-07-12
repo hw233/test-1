@@ -1301,7 +1301,7 @@ bool ClanBattle::incAwardClanBattleVictor(Player * player)
 	if ((clanMember->enterCount >> 4) >= 3)
 		return false;
 	clanMember->enterCount += 0x10;
-	DB5().PushUpdateData("UPDATE `clan_player` SET `enterCount` = %u WHERE `playerId` = %"I64_FMT"u", clanMember->enterCount, player->getId());
+	DB5().PushUpdateData("UPDATE `clan_player` SET `enterCount` = %u WHERE `playerId` = %" I64_FMT "u", clanMember->enterCount, player->getId());
 	return true;
 }
 
@@ -1614,7 +1614,7 @@ bool ClanCityBattle::enterTotem(Player * player)
 	if (firstEnter)
 	{
 		clanBattlePlayerEx->id = IDGenerator::gClanBatterRecordIDGenerator.ID();
-		DB5().PushUpdateData("REPLACE INTO `clan_battler`(`id`, `battler`, `battlerLev`, `battleClanId`, `battleClanTime`, `battleHold`, `hasEnter`) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u, %u)", clanBattlePlayerEx->id, player->getId(), player->GetLev(), _clan->getId(), TimeUtil::SharpDay(0, now), clanBattlePlayerEx->hold, clanBattlePlayerEx->hasEnter);
+		DB5().PushUpdateData("REPLACE INTO `clan_battler`(`id`, `battler`, `battlerLev`, `battleClanId`, `battleClanTime`, `battleHold`, `hasEnter`) VALUES(%u, %" I64_FMT "u, %u, %u, %u, %u, %u)", clanBattlePlayerEx->id, player->getId(), player->GetLev(), _clan->getId(), TimeUtil::SharpDay(0, now), clanBattlePlayerEx->hold, clanBattlePlayerEx->hasEnter);
 	}
 	notifyClanBattleEnterInfo(player, 1, 0);
 	notifyClanBattlePlayerMoveInfo(player, 0, clanBattlePlayerEx->hold);
@@ -1735,9 +1735,9 @@ bool ClanCityBattle::enterClanCity(Player * player)
 	if (firstEnter)
 	{
 		clanBattlePlayerEx->id = IDGenerator::gClanBatterRecordIDGenerator.ID();
-		DB5().PushUpdateData("REPLACE INTO `clan_battler`(`id`, `battler`, `battlerLev`, `battleClanId`, `battleClanTime`, `battleHold`, `hasEnter`) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u, %u)", clanBattlePlayerEx->id, player->getId(), player->GetLev(), _clan->getId(), thisDay, clanBattlePlayerEx->hold, clanBattlePlayerEx->hasEnter);
+		DB5().PushUpdateData("REPLACE INTO `clan_battler`(`id`, `battler`, `battlerLev`, `battleClanId`, `battleClanTime`, `battleHold`, `hasEnter`) VALUES(%u, %" I64_FMT "u, %u, %u, %u, %u, %u)", clanBattlePlayerEx->id, player->getId(), player->GetLev(), _clan->getId(), thisDay, clanBattlePlayerEx->hold, clanBattlePlayerEx->hasEnter);
 	}
-	DB5().PushUpdateData("UPDATE `clan_player` SET `enterCount` = %u  WHERE `playerId` = %"I64_FMT"u ", clanMember->enterCount, player->getId());
+	DB5().PushUpdateData("UPDATE `clan_player` SET `enterCount` = %u  WHERE `playerId` = %" I64_FMT "u ", clanMember->enterCount, player->getId());
 	notifyClanBattleEnterInfo(player, 2, 0, _clan->getName());
 	notifyClanBattlePlayerMoveInfo(player, 0, clanBattlePlayerEx->hold);
 	listClanHoldPlayerInfo(player, clanBattlePlayerEx->hold);
@@ -2569,7 +2569,7 @@ void ClanCityBattle::closingBattlerAward(UInt8 succ)
 				clan->getClanBattle()->incGrabAcheive(cbp->grabAchieve);
 				clan->updateRank(cm, oldLeaderName);
 				clan->setProffer(clan->getProffer() + cbp->grabAchieve);
-				DB5().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %"I64_FMT"u", cm->proffer, cm->player->getId());
+				DB5().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %" I64_FMT "u", cm->proffer, cm->player->getId());
 				DB5().PushUpdateData("UPDATE `clan_battler` SET `grabAchieve` = %u WHERE `id` = %u", cbp->grabAchieve, cbp->id);
 			}
 			gainScore = cbp->wins * 1.0f + (cbp->northEdurance + cbp->southEdurance) * 1.5f + cbp->grabAchieve * 2.0f;
@@ -2987,7 +2987,7 @@ bool ClanRobBattle::enterTotem(Player * player)
 	if (firstEnter)
 	{
 		clanBattlePlayerEx->id = IDGenerator::gClanBatterRecordIDGenerator.ID();
-		DB5().PushUpdateData("REPLACE INTO `clan_battler`(`id`, `battler`, `battlerLev`, `battleClanId`, `battleClanTime`, `battleHold`, `hasEnter`) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u, %u)", clanBattlePlayerEx->id, player->getId(),	\
+		DB5().PushUpdateData("REPLACE INTO `clan_battler`(`id`, `battler`, `battlerLev`, `battleClanId`, `battleClanTime`, `battleHold`, `hasEnter`) VALUES(%u, %" I64_FMT "u, %u, %u, %u, %u, %u)", clanBattlePlayerEx->id, player->getId(),	\
 			player->GetLev(), 0, TimeUtil::SharpDay(0, now), clanBattlePlayerEx->hold, clanBattlePlayerEx->hasEnter);
 	}
 	notifyBattleScore(player);
@@ -3096,10 +3096,10 @@ bool ClanRobBattle::enterClanCity(Player * player)
 	if (firstEnter)
 	{
 		clanBattlePlayerEx->id = IDGenerator::gClanBatterRecordIDGenerator.ID();
-		DB5().PushUpdateData("REPLACE INTO `clan_battler`(`id`, `battler`, `battlerLev`, `battleClanId`, `battleClanTime`, `battleHold`, `hasEnter`) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u, %u)", clanBattlePlayerEx->id, player->getId(),
+		DB5().PushUpdateData("REPLACE INTO `clan_battler`(`id`, `battler`, `battlerLev`, `battleClanId`, `battleClanTime`, `battleHold`, `hasEnter`) VALUES(%u, %" I64_FMT "u, %u, %u, %u, %u, %u)", clanBattlePlayerEx->id, player->getId(),
 			player->GetLev(), 0, thisDay, clanBattlePlayerEx->hold, clanBattlePlayerEx->hasEnter);
 	}
-	DB5().PushUpdateData("UPDATE `clan_player` SET `enterCount` = %u  WHERE `playerId` = %"I64_FMT"u ", clanMember->enterCount, player->getId());
+	DB5().PushUpdateData("UPDATE `clan_player` SET `enterCount` = %u  WHERE `playerId` = %" I64_FMT "u ", clanMember->enterCount, player->getId());
 	notifyBattleScore(player);
 	notifySelfBattleScore(player);
 	notifyClanBattleEnterInfo(player, 2, 0, _heroClanName);
