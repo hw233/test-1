@@ -306,8 +306,8 @@ int query_town_ranking_req(JsonHead* head, json_t* body, json_t* retbody, std::s
             {
                 char playerId[64] = {0};
                 char time[64] = {0};
-                sprintf(playerId, "%"I64_FMT"u", info.id);
-                snprintf(time, sizeof(time), "%"I64_FMT"u", info.reachTime);
+                sprintf(playerId, "%" I64_FMT "u", info.id);
+                snprintf(time, sizeof(time), "%" I64_FMT "u", info.reachTime);
                 std::string clanName = fixPlayerName(info.clanName);
                 if (clanName.empty())
                     clanName = "-";
@@ -372,8 +372,8 @@ int query_ranking_req(JsonHead* head, json_t* body, json_t* retbody, std::string
             {
                 char playerId[64] = {0};
                 char exp[64] = {0};
-                sprintf(playerId, "%"I64_FMT"u", info.id);
-                sprintf(exp, "%"I64_FMT"u", info.value);
+                sprintf(playerId, "%" I64_FMT "u", info.id);
+                sprintf(exp, "%" I64_FMT "u", info.value);
                 std::string clanName = fixPlayerName(info.clanName);
                 if (clanName.empty())
                     clanName = "-";
@@ -435,7 +435,7 @@ int query_inviter_req(JsonHead* head, json_t* body, json_t* retbody, std::string
             if (obj && pl)
             {
                 char inviterId[64] = {0};
-                sprintf(inviterId, "%"I64_FMT"u", pl->getId());
+                sprintf(inviterId, "%" I64_FMT "u", pl->getId());
                 
                 json_insert_pair_into_object(obj, "ullRoleId", json_new_string(inviterId));
                 json_insert_pair_into_object(obj, "szRoleName", json_new_string(fixPlayerName(pl->getName()).c_str()));
@@ -623,7 +623,7 @@ int query_pagoda_rsq(JsonHead* head, json_t* body, json_t* retbody, std::string&
             json_t* obj = json_new_object();
             if (obj)
             {
-                snprintf(playerId, sizeof(playerId), "%"I64_FMT"u", towndown[i].id);
+                snprintf(playerId, sizeof(playerId), "%" I64_FMT "u", towndown[i].id);
                 json_insert_pair_into_object(obj, "ullRoleId", json_new_string(playerId));
                 json_insert_pair_into_object(obj, "szRoleName", json_new_string(fixPlayerName(towndown[i].name).c_str()));
                 json_insert_pair_into_object(obj, "uiLayers", my_json_new_number_u(towndown[i].level));
@@ -665,11 +665,11 @@ int query_gangcopy_complete_layer_req(JsonHead* head, json_t* body, json_t* retb
             json_t* obj = json_new_object();
             if (obj)
             {
-                snprintf(id, sizeof(id), "%"I64_FMT"u", clancopy[i].id);
+                snprintf(id, sizeof(id), "%" I64_FMT "u", clancopy[i].id);
                 json_insert_pair_into_object(obj, "uiFactionID", json_new_string(id));
                 json_insert_pair_into_object(obj, "szFactionName", json_new_string(fixPlayerName(clancopy[i].name).c_str()));
                 json_insert_pair_into_object(obj, "uiFactionMaxLevel", my_json_new_number_u(clancopy[i].level));
-                snprintf(time, sizeof(time), "%"I64_FMT"u", clancopy[i].time);
+                snprintf(time, sizeof(time), "%" I64_FMT "u", clancopy[i].time);
                 json_insert_pair_into_object(obj, "uiFactiontime2MaxLvl", json_new_string(time));
                 json_insert_child(arr, obj);
             }
@@ -713,7 +713,7 @@ int query_clancopy_ranking_req(JsonHead* head, json_t* body, json_t* retbody, st
                 json_insert_pair_into_object(obj, "usNum", my_json_new_number_u(info.memberCount));
                 json_insert_pair_into_object(obj, "ucCamp", my_json_new_number_u(info.country));
                 json_insert_pair_into_object(obj, "uiLayers", my_json_new_number_u(info.value));
-                snprintf(time, sizeof(time), "%"I64_FMT"u", info.reachTime);
+                snprintf(time, sizeof(time), "%" I64_FMT "u", info.reachTime);
                 json_insert_pair_into_object(obj, "uiReachedTime", json_new_string(time));
                 json_insert_child(arr, obj);
             }

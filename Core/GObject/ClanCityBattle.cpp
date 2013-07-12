@@ -217,7 +217,7 @@ void CCBPlayer::writeToDB()
 {
     if(type != e_player)
         return;
-    DB1().PushUpdateData("REPLACE INTO `clancity_player` (`playerId`, `side`, `entered`, `win`, `dead`, `realive`, `score`, `realivecd`, `weary`) VALUES (%"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u)", fgt.player->getId(), side, entered, win, dead, realive, score, realivecd, weary);
+    DB1().PushUpdateData("REPLACE INTO `clancity_player` (`playerId`, `side`, `entered`, `win`, `dead`, `realive`, `score`, `realivecd`, `weary`) VALUES (%" I64_FMT "u, %u, %u, %u, %u, %u, %u, %u, %u)", fgt.player->getId(), side, entered, win, dead, realive, score, realivecd, weary);
 }
 
 void CCBPlayer::sendInfo()

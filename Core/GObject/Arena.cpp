@@ -256,7 +256,7 @@ UInt8 Arena::bet1( Player * player, UInt8 state, UInt8 group, UInt64 pid, UInt8 
     if(group > 0)
         i = group - 1;
 	_players[player].betList[state][i].push_back(binfo);
-	DB1().PushUpdateData("REPLACE INTO `arena_bet`(`id`, `round`, `state`, `group`, `recieved`, `pos`, `tael`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u)", player->getId(), binfo.round, binfo.state, binfo.group, binfo.recieved, binfo.pos, binfo.type);
+	DB1().PushUpdateData("REPLACE INTO `arena_bet`(`id`, `round`, `state`, `group`, `recieved`, `pos`, `tael`) VALUES(%" I64_FMT "u, %u, %u, %u, %u, %u, %u)", player->getId(), binfo.round, binfo.state, binfo.group, binfo.recieved, binfo.pos, binfo.type);
 	GameMsgHdr hdr(0x230, player->getThreadId(), player, 2);
 	UInt16 data = type;
 	GLOBAL().PushMsg(hdr, &data);
@@ -316,7 +316,7 @@ UInt8 Arena::bet2( Player * player, UInt8 state, UInt8 group, UInt16 pos, UInt8 
     if(group > 0)
         i = group - 1;
 	_players[player].betList[state][i].push_back(binfo);
-	DB1().PushUpdateData("REPLACE INTO `arena_bet`(`id`, `round`, `state`, `group`, `recieved`, `pos`, `tael`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u)", player->getId(), binfo.round, binfo.state, binfo.group, binfo.recieved, binfo.pos, binfo.type);
+	DB1().PushUpdateData("REPLACE INTO `arena_bet`(`id`, `round`, `state`, `group`, `recieved`, `pos`, `tael`) VALUES(%" I64_FMT "u, %u, %u, %u, %u, %u, %u)", player->getId(), binfo.round, binfo.state, binfo.group, binfo.recieved, binfo.pos, binfo.type);
 	GameMsgHdr hdr(0x230, player->getThreadId(), player, 2);
 	UInt16 data = type;
 	GLOBAL().PushMsg(hdr, &data);
@@ -1686,7 +1686,7 @@ void Arena::calcFinalBet(int i)
                                         strItems += Itoa(1);
                                         strItems += "|";
                                         mailPackageManager.push(mail->id, award[i][j-1][0], 1, true);
-                                        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+                                        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
                                     }
                                 }
                                 if(nidx2 != (UInt8)(0xFF))
@@ -1712,7 +1712,7 @@ void Arena::calcFinalBet(int i)
                                         strItems += Itoa(1);
                                         strItems += "|";
                                         mailPackageManager.push(mail->id, award[i][j][0], 1, true);
-                                        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+                                        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
                                     }
                                 }
                             }
@@ -2127,7 +2127,7 @@ void Arena::calcBet(PreliminaryPlayer& pp, UInt16 pos, UInt8 state, UInt8 group,
                 {
                     recieved = false;
                     bit->recieved = 1;
-                    DB1().PushUpdateData("REPLACE INTO `arena_bet`(`id`, `round`, `state`, `group`, `recieved`, `pos`, `tael`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u)", player->getId(), bit->round, bit->state, bit->group, bit->recieved, bit->pos, bit->type);
+                    DB1().PushUpdateData("REPLACE INTO `arena_bet`(`id`, `round`, `state`, `group`, `recieved`, `pos`, `tael`) VALUES(%" I64_FMT "u, %u, %u, %u, %u, %u, %u)", player->getId(), bit->round, bit->state, bit->group, bit->recieved, bit->pos, bit->type);
                 }
                 break;
             }
@@ -2244,7 +2244,7 @@ void Arena::setArenaInfo(UInt8 type)
         cur.support = (*it).support;
         cur.heroId = (*it).heroId;
         cur.name = (*it).name;
-        //printf("userId = %"I64_FMT"u\n", (*it).id);
+        //printf("userId = %" I64_FMT "u\n", (*it).id);
         cur.playerId = (*it).id;
         arenaSupported.insert(cur);
     }

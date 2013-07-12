@@ -122,7 +122,7 @@ bool SecondSoul::practiceLevelUp(UInt32& pexp)
         }
         setDirty(true);
         m_fgt->setDirty(true);
-        DB2().PushUpdateData("UPDATE `second_soul` SET `practiceLevel` = %u WHERE `fighterId` = %u AND `playerId` = %"I64_FMT"u", m_practiceLevel, m_fgt->getId(), m_fgt->getOwner()->getId());
+        DB2().PushUpdateData("UPDATE `second_soul` SET `practiceLevel` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", m_practiceLevel, m_fgt->getId(), m_fgt->getOwner()->getId());
         return true;
     }
 
@@ -134,7 +134,7 @@ void SecondSoul::setPracticeLevel(UInt8 lev)
     m_practiceLevel = lev;
     setDirty(true);
     m_fgt->setDirty(true);  
-    DB2().PushUpdateData("UPDATE `second_soul` SET `practiceLevel` = %u WHERE `fighterId` = %u AND `playerId` = %"I64_FMT"u", m_practiceLevel, m_fgt->getId(), m_fgt->getOwner()->getId());
+    DB2().PushUpdateData("UPDATE `second_soul` SET `practiceLevel` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", m_practiceLevel, m_fgt->getId(), m_fgt->getOwner()->getId());
 }
 
 void SecondSoul::decStateExp(UInt32 exp)
@@ -146,7 +146,7 @@ void SecondSoul::decStateExp(UInt32 exp)
     if(m_stateExp < GData::soulExpTable.getLevelMin(m_stateLevel))
         m_stateExp = GData::soulExpTable.getLevelMin(m_stateLevel);
 
-    DB2().PushUpdateData("UPDATE `second_soul` SET `stateExp` = %u WHERE `fighterId` = %u AND `playerId` = %"I64_FMT"u", m_stateExp, m_fgt->getId(), m_fgt->getOwner()->getId());
+    DB2().PushUpdateData("UPDATE `second_soul` SET `stateExp` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", m_stateExp, m_fgt->getId(), m_fgt->getOwner()->getId());
 }
 
 void SecondSoul::addStateExp(UInt32 exp)
@@ -159,7 +159,7 @@ void SecondSoul::addStateExp(UInt32 exp)
         m_fgt->sendMaxSoul();
     }
 
-    DB2().PushUpdateData("UPDATE `second_soul` SET `stateLevel` = %u, `stateExp` = %u WHERE `fighterId` = %u AND `playerId` = %"I64_FMT"u", m_stateLevel, m_stateExp, m_fgt->getId(), m_fgt->getOwner()->getId());
+    DB2().PushUpdateData("UPDATE `second_soul` SET `stateLevel` = %u, `stateExp` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", m_stateLevel, m_stateExp, m_fgt->getId(), m_fgt->getOwner()->getId());
 }
 
 void SecondSoul::setStateExp(UInt8 lev, UInt32 exp)
@@ -174,7 +174,7 @@ void SecondSoul::setStateExp(UInt8 lev, UInt32 exp)
         m_fgt->setDirty(true);
         m_fgt->sendMaxSoul();
     }
-    DB2().PushUpdateData("UPDATE `second_soul` SET `stateLevel` = %u, `stateExp` = %u WHERE `fighterId` = %u AND `playerId` = %"I64_FMT"u", m_stateLevel, m_stateExp, m_fgt->getId(), m_fgt->getOwner()->getId());
+    DB2().PushUpdateData("UPDATE `second_soul` SET `stateLevel` = %u, `stateExp` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", m_stateLevel, m_stateExp, m_fgt->getId(), m_fgt->getOwner()->getId());
 }
 SoulSkill* SecondSoul::getSoulSkill(UInt8 idx)
 {
@@ -226,7 +226,7 @@ UInt32 SecondSoul::setSoulSkill(UInt8 idx, SoulSkill ss, bool writeDB)
     {
         std::string str;
         vector2string(m_skills, m_skills.size(), str);
-        DB2().PushUpdateData("UPDATE `second_soul` SET `skills` = '%s' WHERE `fighterId` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), m_fgt->getId(), m_fgt->getOwner()->getId());
+        DB2().PushUpdateData("UPDATE `second_soul` SET `skills` = '%s' WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", str.c_str(), m_fgt->getId(), m_fgt->getOwner()->getId());
     }
 
     switch(ss.id)
@@ -311,7 +311,7 @@ void SecondSoul::insertIntoDB()
 {
     std::string str;
     vector2string(m_skills, m_skills.size(), str);
-    DB2().PushUpdateData("INSERT INTO `second_soul` (`fighterId`, `playerId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `skills`) VALUES (%u, %"I64_FMT"u, %u, 0, 1, 1, 0, '%s')", m_fgt->getId(), m_fgt->getOwner()->getId(), m_cls, str.c_str());
+    DB2().PushUpdateData("INSERT INTO `second_soul` (`fighterId`, `playerId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `skills`) VALUES (%u, %" I64_FMT "u, %u, 0, 1, 1, 0, '%s')", m_fgt->getId(), m_fgt->getOwner()->getId(), m_cls, str.c_str());
 }
 
 void SecondSoul::sendInfo(Player* pl)
@@ -357,7 +357,7 @@ bool SecondSoul::setClass(UInt8 cls)
     }
 
     m_cls = cls;
-    DB2().PushUpdateData("UPDATE `second_soul` SET `cls` = %d WHERE `fighterId` = %u AND `playerId` = %"I64_FMT"u", m_cls, m_fgt->getId(), m_fgt->getOwner()->getId());
+    DB2().PushUpdateData("UPDATE `second_soul` SET `cls` = %d WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", m_cls, m_fgt->getId(), m_fgt->getOwner()->getId());
 
     sendInfo(m_fgt->getOwner());
     setDirty(true);
@@ -405,7 +405,7 @@ bool SecondSoul::setXinxiu(UInt8 xinxiu)
     }
 
     m_xinxiu = xinxiu;
-    DB2().PushUpdateData("UPDATE `second_soul` SET `xinxiu` = %d WHERE `fighterId` = %u AND `playerId` = %"I64_FMT"u", m_xinxiu, m_fgt->getId(), m_fgt->getOwner()->getId());
+    DB2().PushUpdateData("UPDATE `second_soul` SET `xinxiu` = %d WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", m_xinxiu, m_fgt->getId(), m_fgt->getOwner()->getId());
 
     sendInfo(m_fgt->getOwner());
     setDirty(true);

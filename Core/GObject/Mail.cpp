@@ -245,7 +245,7 @@ Mail * MailBox::newMail( Player * sender, UInt8 type, const std::string& title, 
 		char title2[256], content2[8192];
 		mysql_escape_string(title2, title.c_str(), title.length()>256?255:title.length());
 		mysql_escape_string(content2, content.c_str(), content.length()>4096?4095:content.length());
-		DB1().PushUpdateData("INSERT INTO `mail` (`mailId`, `playerId`, `sender`, `recvTime`, `flag`, `title`, `content`, `additionalId`) VALUES (%u, %"I64_FMT"u, '%s', %u, %u, '%s', '%s', %u)", mail->id, ((_owner != NULL) ? _owner->getId() : static_cast<UInt64>(0)), mail->sender.c_str(), mail->recvTime, mail->flag, title2, content2, mail->additional);
+		DB1().PushUpdateData("INSERT INTO `mail` (`mailId`, `playerId`, `sender`, `recvTime`, `flag`, `title`, `content`, `additionalId`) VALUES (%u, %" I64_FMT "u, '%s', %u, %u, '%s', '%s', %u)", mail->id, ((_owner != NULL) ? _owner->getId() : static_cast<UInt64>(0)), mail->sender.c_str(), mail->recvTime, mail->flag, title2, content2, mail->additional);
 	}
 	if(itemsInfo != NULL)
 	{
@@ -257,7 +257,7 @@ Mail * MailBox::newMail( Player * sender, UInt8 type, const std::string& title, 
 			strItems += Itoa(itemsInfo->items[i].count);
 			strItems += "|";
 		}
-		DBLOG1().PushUpdateData("insert into mailitem_histories(`server_id`, `player_id`, `mail_id`, `mail_type`, `title`, `content_text`, `content_item`, `receive_time`) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, _owner->getId(), mail->id, itemsInfo->type, title.c_str(), content.c_str(), strItems.c_str(), mail->recvTime);
+		DBLOG1().PushUpdateData("insert into mailitem_histories(`server_id`, `player_id`, `mail_id`, `mail_type`, `title`, `content_text`, `content_item`, `receive_time`) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, _owner->getId(), mail->id, itemsInfo->type, title.c_str(), content.c_str(), strItems.c_str(), mail->recvTime);
 	}
 
 	return mail;

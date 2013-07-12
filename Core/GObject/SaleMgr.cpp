@@ -252,7 +252,7 @@ void SaleMgr::sellSale(Player * player, SalePut * salePuts, UInt8 count)
             itemName = sale->_item->getName();
         }
 		memcpy(saleSellRespDatas[i].itemName, itemName.c_str(), std::min(sizeof(saleSellRespDatas[i].itemName)-1, itemName.length()));
-		DB4().PushUpdateData("INSERT INTO `sale` VALUES (%u,  %"I64_FMT"u, %d, %u, %d, %u, %u, %u)", sale->_id, sale->_owner->getId(), sale->_status, sale->_time, sale->_priceType, sale->_price, sale->_item->getId(), sale->_item->Count());
+		DB4().PushUpdateData("INSERT INTO `sale` VALUES (%u,  %" I64_FMT "u, %d, %u, %d, %u, %u, %u)", sale->_id, sale->_owner->getId(), sale->_status, sale->_time, sale->_priceType, sale->_price, sale->_item->getId(), sale->_item->Count());
         UInt8 idx = sale->_owner->getVipLevel();
         if(idx > 2)
             idx = 2;
@@ -262,7 +262,7 @@ void SaleMgr::sellSale(Player * player, SalePut * salePuts, UInt8 count)
             comboItemId=Itoa(sale->_item->getId())+"|"+Itoa(sale->_item->GetItemType().getId());
         else
             comboItemId=Itoa(sale->_item->getId());
-		DBLOG().PushUpdateData("insert into sales (server_id,sale_id,player_id,price_type,price,item,item_num,sale_time) values(%u,%u,%"I64_FMT"u,%u,%u,'%s',%u,%u)",
+		DBLOG().PushUpdateData("insert into sales (server_id,sale_id,player_id,price_type,price,item,item_num,sale_time) values(%u,%u,%" I64_FMT "u,%u,%u,'%s',%u,%u)",
 			cfg.serverLogId, sale->_id, sale->_owner->getId(), sale->_priceType, sale->_price, comboItemId.c_str(), sale->_item->Count(), sale->_time);
 	}
 
@@ -317,14 +317,14 @@ void SaleMgr::addSaleItem(Player * player, UInt32 id, UInt32 pos)
 			delSaleCheck(sale);
 			_salePos.erase(sale->_id);
 
-			DB4().PushUpdateData("UPDATE `sale` SET `ownerId` = %"I64_FMT"u, `status` = %d WHERE `saleId` = %u", player->getId(), static_cast<UInt8>(SALE_BUY), sale->_id);
-			DBLOG().PushUpdateData("update sales set purchaser=%"I64_FMT"u,purchase_time=%u where sale_id=%u and server_id=%u", player->getId(), TimeUtil::Now(), sale->_id, cfg.serverLogId);
+			DB4().PushUpdateData("UPDATE `sale` SET `ownerId` = %" I64_FMT "u, `status` = %d WHERE `saleId` = %u", player->getId(), static_cast<UInt8>(SALE_BUY), sale->_id);
+			DBLOG().PushUpdateData("update sales set purchaser=%" I64_FMT "u,purchase_time=%u where sale_id=%u and server_id=%u", player->getId(), TimeUtil::Now(), sale->_id, cfg.serverLogId);
 			if(IsEquipId(sale->_item->getId()))
 			{
 				if(sale->_item->getQuality() >= 4)
 				{
-					DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, player->getId(), sale->_item->GetItemType().getId(), sale->_item->getId(), FromSale, TimeUtil::Now());
-					DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, sale->_owner->getId(), sale->_item->GetItemType().getId(), sale->_item->getId(), ToSale, TimeUtil::Now());
+					DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %" I64_FMT "u, %u, %u, %u, %u)", cfg.serverLogId, player->getId(), sale->_item->GetItemType().getId(), sale->_item->getId(), FromSale, TimeUtil::Now());
+					DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %" I64_FMT "u, %u, %u, %u, %u)", cfg.serverLogId, sale->_owner->getId(), sale->_item->GetItemType().getId(), sale->_item->getId(), ToSale, TimeUtil::Now());
 				}
 			}
 			else
@@ -333,7 +333,7 @@ void SaleMgr::addSaleItem(Player * player, UInt32 id, UInt32 pos)
 				{
                     std::string tbn("item_courses");
                     DBLOG().GetMultiDBName(tbn);
-					DBLOG().PushUpdateData("insert into `%s`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)",tbn.c_str(), cfg.serverLogId, player->getId(), sale->_item->getId(), sale->_item->Count(), FromSale, TimeUtil::Now());
+					DBLOG().PushUpdateData("insert into `%s`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %" I64_FMT "u, %u, %u, %u, %u)",tbn.c_str(), cfg.serverLogId, player->getId(), sale->_item->getId(), sale->_item->Count(), FromSale, TimeUtil::Now());
 				}
 			}
 			saleItemBuy.id = id;

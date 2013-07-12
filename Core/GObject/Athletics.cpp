@@ -90,7 +90,7 @@ UInt32 Athletics::addAthleticsData(UInt8 side, Player * target, UInt8 win, UInt3
 		_athleticses.pop_front();
 	}
 	_athleticses.push_back(data);
-	DB6().PushUpdateData("INSERT INTO `athletics_record` (`id`, `atker`, `defer`, `repid`, `time`, `winSide`) VALUES(%u, %"I64_FMT"u, %"I64_FMT"u, %u, %u, %u)", data->id, (side == 0 ? _owner->getId() : target->getId()), (side == 0 ? target->getId() : _owner->getId()), data->reptid, data->time, win);
+	DB6().PushUpdateData("INSERT INTO `athletics_record` (`id`, `atker`, `defer`, `repid`, `time`, `winSide`) VALUES(%u, %" I64_FMT "u, %" I64_FMT "u, %u, %u, %u)", data->id, (side == 0 ? _owner->getId() : target->getId()), (side == 0 ? target->getId() : _owner->getId()), data->reptid, data->time, win);
 	return data->id;
 }
 
@@ -693,7 +693,7 @@ void Athletics::awardMartial(Player* defer, bool win)
                     PlayerPInfo.eCanAttack[i] = 0;
                     char column[32];
                     sprintf(column, "eCanAttack%u", i + 1);
-                    DB6().PushUpdateData("UPDATE `athletics_rank` SET `%s` = %u WHERE `ranker` = %"I64_FMT"u", column, PlayerPInfo.eCanAttack[i], _owner->getId());
+                    DB6().PushUpdateData("UPDATE `athletics_rank` SET `%s` = %u WHERE `ranker` = %" I64_FMT "u", column, PlayerPInfo.eCanAttack[i], _owner->getId());
                 }
                 break;
             }
@@ -900,7 +900,7 @@ void Athletics::listAthleticsMartial()
                     char column[32];
                     sprintf(column, "eCombine%u", i + 1);
                     PlayerPInfo.eCombine[i] = dbValue;
-                    DB6().PushUpdateData("UPDATE `athletics_rank` SET `%s` = %u WHERE `ranker` = %"I64_FMT"u", column, PlayerPInfo.eCombine[i], _owner->getId());
+                    DB6().PushUpdateData("UPDATE `athletics_rank` SET `%s` = %u WHERE `ranker` = %" I64_FMT "u", column, PlayerPInfo.eCombine[i], _owner->getId());
                 }
             }
             st << Stream::eos;
@@ -993,7 +993,7 @@ void Athletics::listAthleticsMartial2(UInt8 type, bool update)
                     char column[32];
                     sprintf(column, "eCombine%u", i + 1);
                     PlayerPInfo.eCombine[i] = dbValue;
-                    DB6().PushUpdateData("UPDATE `athletics_rank` SET `%s` = %u WHERE `ranker` = %"I64_FMT"u", column, PlayerPInfo.eCombine[i], _owner->getId());
+                    DB6().PushUpdateData("UPDATE `athletics_rank` SET `%s` = %u WHERE `ranker` = %" I64_FMT "u", column, PlayerPInfo.eCombine[i], _owner->getId());
                 }
             }
         }
@@ -1225,7 +1225,7 @@ void Athletics::updateAthleticsMartial(Player *pl)
             PlayerPInfo.eCanAttack[i] = 0;
             PlayerPInfo.eRivalType[i] = 0;
         }
-        DB6().PushUpdateData("UPDATE `athletics_rank` SET `%s` = %"I64_FMT"u, `%s` = %u, `%s` = %u WHERE `ranker` = %"I64_FMT"u", column1, PlayerPInfo.eRival[i], column2, PlayerPInfo.eCanAttack[i], column3, PlayerPInfo.eRivalType[i], pl->getId());
+        DB6().PushUpdateData("UPDATE `athletics_rank` SET `%s` = %" I64_FMT "u, `%s` = %u, `%s` = %u WHERE `ranker` = %" I64_FMT "u", column1, PlayerPInfo.eRival[i], column2, PlayerPInfo.eCanAttack[i], column3, PlayerPInfo.eRivalType[i], pl->getId());
 
     }
 }
@@ -1279,7 +1279,7 @@ void Athletics::updateAthleticsP(Player* pl, UInt8 type)
                 char column[32];
                 sprintf(column, "eCombine%u", index);
                 PlayerPInfo.eCombine[index - 1] = dbValue;
-                DB6().PushUpdateData("UPDATE `athletics_rank` SET `eSelectIndex` = %u, `%s` = %u WHERE `ranker` = %"I64_FMT"u", PlayerPInfo.eSelectIndex, column, PlayerPInfo.eCombine[index - 1], pl->getId());
+                DB6().PushUpdateData("UPDATE `athletics_rank` SET `eSelectIndex` = %u, `%s` = %u WHERE `ranker` = %" I64_FMT "u", PlayerPInfo.eSelectIndex, column, PlayerPInfo.eCombine[index - 1], pl->getId());
                 pl->setBuffData(PLAYER_BUFF_AMARTIAL_WIN, 0);
                 Stream st(REP::ATHLETICS_REFRESH_MARTIAL);
                 st << type << Stream::eos;
@@ -1325,7 +1325,7 @@ void Athletics::updateAthleticsP(Player* pl, UInt8 type)
                 pl->useGold(1, &ci);
                 PlayerPInfo.ePhysical += 1;
                 pl->athleticsUdpLog(1029);
-                DB6().PushUpdateData("UPDATE `athletics_rank` SET `ePhysical` = %u WHERE `ranker` = %"I64_FMT"u", PlayerPInfo.ePhysical, pl->getId());
+                DB6().PushUpdateData("UPDATE `athletics_rank` SET `ePhysical` = %u WHERE `ranker` = %" I64_FMT "u", PlayerPInfo.ePhysical, pl->getId());
                 Stream st(REP::ATHLETICS_REFRESH_MARTIAL);
                 st << type << PlayerPInfo.ePhysical << Stream::eos;
                 pl->send(st);
@@ -1363,7 +1363,7 @@ void Athletics::RequestSubDir(Player* player, UInt8 athlDiffculty, UInt8 athlCat
     st << static_cast<UInt8>(4) << PlayerPInfo.ePhysical << Stream::eos;
     player->send(st);
     PlayerPInfo.eSelectIndex = i + 1;
-    DB6().PushUpdateData("UPDATE `athletics_rank` SET `ePhysical` = %u, `eSelectIndex` = %u WHERE `ranker` = %"I64_FMT"u", PlayerPInfo.ePhysical, PlayerPInfo.eSelectIndex, player->getId());
+    DB6().PushUpdateData("UPDATE `athletics_rank` SET `ePhysical` = %u, `eSelectIndex` = %u WHERE `ranker` = %" I64_FMT "u", PlayerPInfo.ePhysical, PlayerPInfo.eSelectIndex, player->getId());
     updateAthleticsMartial(player);
     //player->GetAthletics()->listAthleticsMartial();
     //GameMsgHdr hdr(0x232, player->getThreadId(), player, 0);
@@ -1397,14 +1397,14 @@ void Athletics::process()
             if(data->ePhysical == MaxPhysical[Viplvl])
             {
                 if(needSave)
-                    DB6().PushUpdateData("UPDATE `athletics_rank` SET `ePhysical` = %u WHERE `ranker` = %"I64_FMT"u", data->ePhysical, data->ranker->getId());
+                    DB6().PushUpdateData("UPDATE `athletics_rank` SET `ePhysical` = %u WHERE `ranker` = %" I64_FMT "u", data->ePhysical, data->ranker->getId());
                 continue;
             }
             else if(data->ePhysical > MaxPhysical[Viplvl])
                 data->ePhysical = MaxPhysical[Viplvl];
             else
                 data->ePhysical += 1;
-            DB6().PushUpdateData("UPDATE `athletics_rank` SET `ePhysical` = %u WHERE `ranker` = %"I64_FMT"u", data->ePhysical, data->ranker->getId());
+            DB6().PushUpdateData("UPDATE `athletics_rank` SET `ePhysical` = %u WHERE `ranker` = %" I64_FMT "u", data->ePhysical, data->ranker->getId());
         }
     }
 #endif
@@ -1424,14 +1424,14 @@ void Athletics::process()
         if(PlayerPInfo.ePhysical == gAthleticsRank.GetMaxPhysical(Viplvl))
         {
             if(needSave)
-                DB6().PushUpdateData("UPDATE `athletics_rank` SET `ePhysical` = %u WHERE `ranker` = %"I64_FMT"u", PlayerPInfo.ePhysical, _owner->getId());
+                DB6().PushUpdateData("UPDATE `athletics_rank` SET `ePhysical` = %u WHERE `ranker` = %" I64_FMT "u", PlayerPInfo.ePhysical, _owner->getId());
             return;
         }
         else if(PlayerPInfo.ePhysical > gAthleticsRank.GetMaxPhysical(Viplvl))
             PlayerPInfo.ePhysical = gAthleticsRank.GetMaxPhysical(Viplvl);
         else
             PlayerPInfo.ePhysical += 1;
-        DB6().PushUpdateData("UPDATE `athletics_rank` SET `ePhysical` = %u WHERE `ranker` = %"I64_FMT"u", PlayerPInfo.ePhysical, _owner->getId());
+        DB6().PushUpdateData("UPDATE `athletics_rank` SET `ePhysical` = %u WHERE `ranker` = %" I64_FMT "u", PlayerPInfo.ePhysical, _owner->getId());
     }
 
 }

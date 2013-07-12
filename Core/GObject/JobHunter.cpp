@@ -29,7 +29,7 @@ JobHunter::JobHunter(Player * player)
     _posX(0), _posY(0), _earlyPosX(0), _earlyPosY(0), _stepCount(0), _isInAuto(false), _isAutoLose(false)
 {
     _nextMoveTime = TimeUtil::Now();
-    DB2().PushUpdateData("INSERT IGNORE INTO `job_hunter` (`playerId`) VALUES (%"I64_FMT"u)", player->getId()); 
+    DB2().PushUpdateData("INSERT IGNORE INTO `job_hunter` (`playerId`) VALUES (%" I64_FMT "u)", player->getId()); 
     memset(_spItemRate, 0, sizeof(_spItemRate));
 }
 
@@ -133,7 +133,7 @@ void JobHunter::SaveMapInfo()
     if (pbuf != buf)
         mapString = buf;
 
-    DB2().PushUpdateData("UPDATE `job_hunter` SET `mapInfo` = '%s', `posX` = %u, `posY` = %u, `earlyPosX` = %u, `earlyPosY` = %u, `stepCount` = %u WHERE `playerId` = %"I64_FMT"u", 
+    DB2().PushUpdateData("UPDATE `job_hunter` SET `mapInfo` = '%s', `posX` = %u, `posY` = %u, `earlyPosX` = %u, `earlyPosY` = %u, `stepCount` = %u WHERE `playerId` = %" I64_FMT "u", 
             mapString.c_str(), _posX, _posY, _earlyPosX, _earlyPosY, _stepCount, _owner->getId());
 }
 
@@ -157,7 +157,7 @@ void JobHunter::AddToFighterList(UInt16 id)
     std::string list;
     FighterList2String(list);
 
-    DB2().PushUpdateData("UPDATE `job_hunter` SET `fighterList` = '%s' WHERE `playerId` = %"I64_FMT"u", list.c_str(), _owner->getId());
+    DB2().PushUpdateData("UPDATE `job_hunter` SET `fighterList` = '%s' WHERE `playerId` = %" I64_FMT "u", list.c_str(), _owner->getId());
 
     SendFighterList();
 }
@@ -218,7 +218,7 @@ void JobHunter::OnHireFighter(UInt16 id)
     std::string list;
     FighterList2String(list);
 
-    DB2().PushUpdateData("UPDATE `job_hunter` SET `fighterList` = '%s' WHERE `playerId` = %"I64_FMT"u", list.c_str(), _owner->getId());
+    DB2().PushUpdateData("UPDATE `job_hunter` SET `fighterList` = '%s' WHERE `playerId` = %" I64_FMT "u", list.c_str(), _owner->getId());
 
     SendFighterList();
 }
@@ -253,7 +253,7 @@ void JobHunter::OnRequestStart(UInt8 index)
     _spotId = GetSpotIdFromGameId(index);
     _owner->SetVar(VAR_JOB_HUNTER_SPOT_ID, _spotId);
     SendGameInfo(2, true);
-    DB2().PushUpdateData("UPDATE `job_hunter` SET `progress` = '%u' WHERE `playerId` = %"I64_FMT"u", _gameProgress, _owner->getId());
+    DB2().PushUpdateData("UPDATE `job_hunter` SET `progress` = '%u' WHERE `playerId` = %" I64_FMT "u", _gameProgress, _owner->getId());
     _owner->udpLog("jobHunter", "F_1161", "", "", "", "", "act");
 }
 
@@ -303,7 +303,7 @@ void JobHunter::OnUpdateSlot(bool isAuto)
         _spItemRate[i] = ITEM_RATE[res[i]];
     }
 
-    DB2().PushUpdateData("UPDATE `job_hunter` SET `slotVal1` = '%d',`slotVal2` = '%d', `slotVal3`= '%d' WHERE `playerId` = %"I64_FMT"u", 
+    DB2().PushUpdateData("UPDATE `job_hunter` SET `slotVal1` = '%d',`slotVal2` = '%d', `slotVal3`= '%d' WHERE `playerId` = %" I64_FMT "u", 
             _slot1, _slot2, _slot3, _owner->getId());
     
     if (!isAuto)
@@ -1392,7 +1392,7 @@ void JobHunter::OnAbort(bool isAuto /* = false */)
     _isInAuto = false;
     _owner->SetVar(VAR_JOB_HUNTER_SPOT_ID, _spotId);
     _nextMoveTime = TimeUtil::Now();
-    DB2().PushUpdateData("UPDATE `job_hunter` SET `progress` = '%u', `mapInfo` = '', `posX` = %u, `posY` = %u, `earlyPosX` = %u, `earlyPosY` = %u, `stepCount` = %u  WHERE `playerId` = %"I64_FMT"u", 
+    DB2().PushUpdateData("UPDATE `job_hunter` SET `progress` = '%u', `mapInfo` = '', `posX` = %u, `posY` = %u, `earlyPosX` = %u, `earlyPosY` = %u, `stepCount` = %u  WHERE `playerId` = %" I64_FMT "u", 
             _gameProgress, _posX, _posY, _earlyPosX, _earlyPosY, _stepCount, _owner->getId());
     SendGameInfo(2);
 }
