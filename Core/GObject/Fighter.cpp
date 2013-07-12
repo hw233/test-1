@@ -960,10 +960,13 @@ UInt16 Fighter::getInnateSkill()
    {
         const GData::AttrExtra* attr = innateTrump->getAttrExtra();
 
-        if(attr->skills.size() > 0)
+        if(attr)
         {
-            if(attr->skills[0])
-                return attr->skills[0]->getId();
+            if(attr->skills.size() > 0)
+            {
+                if(attr->skills[0])
+                    return attr->skills[0]->getId();
+            }
         }
    }
 
