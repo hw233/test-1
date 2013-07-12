@@ -458,6 +458,7 @@ namespace GObject
         VAR_VIPLEVEL_AWARD = 511, // 御剑等级回馈
         VAR_DROP_OUT_ITEM_MARK = 512,// 反工作室限制方案
         VAR_QQXIU_AWARD = 513, // QQ秀合作
+        VAR_QQTENPAY_LOTTERY = 514, //QQ财付通抽奖 
 
         // 521-540 for zhgc
         VAR_ZCJB_TIMES = 521,      // 招财进宝
@@ -774,6 +775,7 @@ namespace GObject
 
             REGISTER_VAR(VAR_QQMUSIC_DAY_AWARD, CYCLE_DAY);
             REGISTER_VAR(VAR_QQTENPAY_AWARD, CYCLE_NONE);
+            REGISTER_VAR(VAR_QQTENPAY_LOTTERY, CYCLE_NONE);
             REGISTER_VAR(VAR_QQIM_QUICK_LOGIN_AWARD, CYCLE_NONE);
 
             REGISTER_VAR(VAR_EQUIP_MOVE_AWARD, CYCLE_NONE);

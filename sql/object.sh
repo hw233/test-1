@@ -3,6 +3,7 @@ source conf.sh
 function update_object()
 {
     echo "update_object"
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/ClearQQTenpayAward.sql  # XXX: 清除QQ财付通奖励
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/cleargm.sql  # XXX: 清除所有GM权限，请一直保留
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/sysupdlg.sql # XXX: 更新公告弹窗，请一直保留
     #mysql -h$H -u$U -p$P -P$PT -D$DBO < updates/Object_20110918_1.sql

@@ -11316,8 +11316,10 @@ namespace GObject
     void Player::getQQTenpayAward(UInt8 opt)
     {
         UInt8 state = GetVar(VAR_QQTENPAY_AWARD);
+        UInt8 state1 = GetVar(VAR_QQTENPAY_LOTTERY);
+        int idx = -1;
 
-        if (GetPackage()->GetRestPackageSize() < 6 && opt == 1)
+        if (GetPackage()->GetRestPackageSize() < 6 && (opt == 1 || opt == 2))
         {
             sendMsgCode(0, 1011);
 
@@ -11336,10 +11338,19 @@ namespace GObject
             state = 1;
             udpLog("huodong", "F_130620_1", "", "", "", "", "act");
         }
+        else if(opt == 2 && state1 == 0)
+        {
+            idx = GameAction()->RunBlueDiamondAward(this, 6);
+            if(idx <= 0)
+                return;
+            SetVar(VAR_QQTENPAY_LOTTERY, 1);
+            state1 = 1;
+        }
             
+        UInt8 states = state | (state1 << 1);
         Stream st(REP::GETAWARD);
         st << static_cast<UInt8>(22);
-        st << state << Stream::eos;
+        st << states << idx << Stream::eos;
         send(st);
     }
 
