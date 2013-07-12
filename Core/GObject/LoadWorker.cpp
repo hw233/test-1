@@ -83,7 +83,7 @@ namespace GObject
         LoadingCounter lc("Loading mail package:");
         DBMailPackageData mpdata;
         char buf[1024] = {0};
-        snprintf(buf, sizeof(buf), "SELECT `id`, `itemId`, `itemCount` FROM `mail_package` m_p, `mail` m  WHERE m_p.id = m.mailId AND m.playerId = %"I64_FMT"u  ORDER BY `id`", playerId);
+        snprintf(buf, sizeof(buf), "SELECT `id`, `itemId`, `itemCount` FROM `mail_package` m_p, `mail` m  WHERE m_p.id = m.mailId AND m.playerId = %" I64_FMT "u  ORDER BY `id`", playerId);
         if(execu->Prepare(buf, mpdata) != DB::DB_OK) return false;
         lc.reset(50);
         UInt32 last_pid = 0xFFFFFFFF;
@@ -108,7 +108,7 @@ namespace GObject
         lc.prepare("Loading mails:");
         DBMailData mdata;
         char buf1[1024] = {0};
-        snprintf(buf1, sizeof(buf1), "SELECT `mailId`, `playerId`, `sender`, `recvTime`, `flag`, `title`, `content`, `additionalId` FROM `mail` WHERE `playerId` = %"I64_FMT"u ORDER BY `playerId`, `mailId`", playerId);
+        snprintf(buf1, sizeof(buf1), "SELECT `mailId`, `playerId`, `sender`, `recvTime`, `flag`, `title`, `content`, `additionalId` FROM `mail` WHERE `playerId` = %" I64_FMT "u ORDER BY `playerId`, `mailId`", playerId);
         if(execu->Prepare(buf1, mdata) != DB::DB_OK) return false;
         lc.reset(500);
         GObject::Player *pl = GObject::globalPlayers[playerId];

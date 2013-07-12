@@ -392,7 +392,7 @@ bool Dungeon::doChallenge( Player * player, DungeonPlayerInfo& dpi, bool report,
 	bsim.start();
     player->setJusticeRoar(0);
     dpi.justice_roar = 0;
-    DB3().PushUpdateData("UPDATE `dungeon_player` SET `justice_roar` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", dpi.justice_roar, _id, player->getId());
+    DB3().PushUpdateData("UPDATE `dungeon_player` SET `justice_roar` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", dpi.justice_roar, _id, player->getId());
 
 	Stream& packet = bsim.getPacket();
 	if(packet.size() <= 8)
@@ -472,7 +472,7 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
     {
         dpi.justice_roar = 0;
         dpi.justice = 0;
-        DB3().PushUpdateData("UPDATE `dungeon_player` SET `justice` = %u, `justice_roar` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", dpi.justice, dpi.justice_roar, _id, player->getId());
+        DB3().PushUpdateData("UPDATE `dungeon_player` SET `justice` = %u, `justice_roar` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", dpi.justice, dpi.justice_roar, _id, player->getId());
 		return true;
     }
 	leaveLevel(player, level);
@@ -480,7 +480,7 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
     if(dpi.justice < 100)
     {
         dpi.justice += 5;
-        DB3().PushUpdateData("UPDATE `dungeon_player` SET `justice` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", dpi.justice, _id, player->getId());
+        DB3().PushUpdateData("UPDATE `dungeon_player` SET `justice` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", dpi.justice, _id, player->getId());
     }
 
     // TODO:
@@ -501,7 +501,7 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
 	{
 		dpi.level = level;
 		enterLevel(player, level);
-		DB3().PushUpdateData("UPDATE `dungeon_player` SET `level` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", dpi.level, _id, player->getId());
+		DB3().PushUpdateData("UPDATE `dungeon_player` SET `level` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", dpi.level, _id, player->getId());
 		r = false;
 	}
 	else
@@ -511,15 +511,15 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
 		if(dpi.firstPass == 0)
 		{
 			dpi.firstPass = TimeUtil::Now();
-			DB3().PushUpdateData("UPDATE `dungeon_player` SET `level` = %u, `totalCount` = %u, `firstPass` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", dpi.level, dpi.totalCount, dpi.firstPass, _id, player->getId());
+			DB3().PushUpdateData("UPDATE `dungeon_player` SET `level` = %u, `totalCount` = %u, `firstPass` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", dpi.level, dpi.totalCount, dpi.firstPass, _id, player->getId());
 
             //第一次通关给荣誉
             GameAction()->doAttainment(player, 10354, _id);
 		}
 		else
-			DB3().PushUpdateData("UPDATE `dungeon_player` SET `level` = %u, `totalCount` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", dpi.level, dpi.totalCount, _id, player->getId());
+			DB3().PushUpdateData("UPDATE `dungeon_player` SET `level` = %u, `totalCount` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", dpi.level, dpi.totalCount, _id, player->getId());
 		r = true;
-		DBLOG1().PushUpdateData("insert into `dungeon_statistics` (`server_id`, `player_id`, `dungeon_id`, `this_day`, `pass_time`) values(%u, %"I64_FMT"u, %u, %u, %u)", cfg.serverLogId, player->getId(), _id, TimeUtil::SharpDay(0), TimeUtil::Now());
+		DBLOG1().PushUpdateData("insert into `dungeon_statistics` (`server_id`, `player_id`, `dungeon_id`, `this_day`, `pass_time`) values(%u, %" I64_FMT "u, %u, %u, %u)", cfg.serverLogId, player->getId(), _id, TimeUtil::SharpDay(0), TimeUtil::Now());
 
         player->OnHeroMemo(MC_SLAYER, MD_STARTED, 0, 2);
         if (World::getWhiteLoveDay() && World::_wday == 6)
@@ -718,7 +718,7 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
                     player->SetVar(VAR_DUNGEON_AUTO_FIGHT_USE_MONEY_MARK, mark);
                 }
             }
-			DBLOG1().PushUpdateData("insert into `dungeon_statistics` (`server_id`, `player_id`, `dungeon_id`, `this_day`, `pass_time`) values(%u, %"I64_FMT"u, %u, %u, %u)", cfg.serverLogId, player->getId(), _id + 100, TimeUtil::SharpDay(0), TimeUtil::Now());
+			DBLOG1().PushUpdateData("insert into `dungeon_statistics` (`server_id`, `player_id`, `dungeon_id`, `this_day`, `pass_time`) values(%u, %" I64_FMT "u, %u, %u, %u)", cfg.serverLogId, player->getId(), _id + 100, TimeUtil::SharpDay(0), TimeUtil::Now());
 			Stream st(REP::COPY_AUTO_FIGHT);
 			st << _id << static_cast<UInt8>(it->second.level) << static_cast<UInt8>(0) << Stream::eos;
 			player->send(st);
@@ -729,7 +729,7 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
         if(advanceLevel(player, it->second, true, totalExp))
         {
             player->delFlag(Player::AutoDungeon);
-            DB3().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %"I64_FMT"u", player->getId());
+            DB3().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %" I64_FMT "u", player->getId());
             return;
         }
         if(player->GetPackage()->GetRestPackageSize() < 4)
@@ -738,7 +738,7 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
             Stream st(REP::COPY_AUTO_FIGHT);
             st << _id << static_cast<UInt8>(it->second.level) << static_cast<UInt8>(5) << *totalExp << Stream::eos;
 			player->send(st);
-			DB3().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %"I64_FMT"u", player->getId());
+			DB3().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %" I64_FMT "u", player->getId());
 			return;
 		}
         break;
@@ -748,7 +748,7 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
 			Stream st(REP::COPY_AUTO_FIGHT);
 			st << _id << static_cast<UInt8>(it->second.level) << static_cast<UInt8>(2) << *totalExp << Stream::eos;
 			player->send(st);
-			DB3().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %"I64_FMT"u", player->getId());
+			DB3().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %" I64_FMT "u", player->getId());
 			return;
 		}
 		break;
@@ -759,7 +759,7 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
 		return;
 	UInt32 turns = 0;
 	bool r = doChallenge(player, it->second, false, &turns);
-	DB3().PushUpdateData("REPLACE INTO `dungeon_auto`(`playerId`, `dungeonId`, `totalExp`, `won`) VALUES(%"I64_FMT"u, %u, %u, %u)", player->getId(), _id, *totalExp, r ? 1 : 0);
+	DB3().PushUpdateData("REPLACE INTO `dungeon_auto`(`playerId`, `dungeonId`, `totalExp`, `won`) VALUES(%" I64_FMT "u, %u, %u, %u)", player->getId(), _id, *totalExp, r ? 1 : 0);
 	EventDungeonAuto * event = new(std::nothrow) EventDungeonAuto(player, 2 * turns, this, r, *totalExp);
 	PushTimerEvent(event);
 }
@@ -767,7 +767,7 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
 void Dungeon::cancelAutoChallengeNotify( Player * player, UInt32 exp )
 {
 	player->delFlag(Player::AutoDungeon);
-	DB3().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %"I64_FMT"u", player->getId());
+	DB3().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %" I64_FMT "u", player->getId());
 	std::map<Player *, DungeonPlayerInfo>::iterator it = _players.find(player);
 	if(it == _players.end())
 		return;
@@ -801,7 +801,7 @@ void Dungeon::completeAutoChallenge( Player * player, UInt32 exp, bool won )
 			if(advanceLevel(player, it->second, true, &exp, count))
 			{
 				player->delFlag(Player::AutoDungeon);
-				DB3().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %"I64_FMT"u", player->getId());
+				DB3().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %" I64_FMT "u", player->getId());
                 player->setBuffData(PLAYER_BUFF_ATTACKING, 0);
                 return;
 			}
@@ -814,7 +814,7 @@ void Dungeon::completeAutoChallenge( Player * player, UInt32 exp, bool won )
 			Stream st(REP::COPY_AUTO_FIGHT);
 			st << _id << static_cast<UInt8>(it->second.level) << static_cast<UInt8>(2) << exp << Stream::eos;
 			player->send(st);
-			DB3().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %"I64_FMT"u", player->getId());
+			DB3().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %" I64_FMT "u", player->getId());
             player->setBuffData(PLAYER_BUFF_ATTACKING, 0);
             return;
 		}
@@ -981,9 +981,9 @@ void Dungeon::leaveLevel( Player * player, UInt8 level )
 
 void Dungeon::updateToDB( Player * player, DungeonPlayerInfo& dpi )
 {
-	DB3().PushUpdateData("REPLACE INTO `dungeon_player`(`id`, `playerId`, `level`, `count`, `totalCount`, `firstPass`, `counterEnd`) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u, %u)", _id, player->getId(), dpi.level, dpi.count, dpi.totalCount, dpi.firstPass, dpi.counterEnd);
+	DB3().PushUpdateData("REPLACE INTO `dungeon_player`(`id`, `playerId`, `level`, `count`, `totalCount`, `firstPass`, `counterEnd`) VALUES(%u, %" I64_FMT "u, %u, %u, %u, %u, %u)", _id, player->getId(), dpi.level, dpi.count, dpi.totalCount, dpi.firstPass, dpi.counterEnd);
 
-	DB1().PushUpdateData("UPDATE `player` SET `dungeonCnt` = %d, `dungeonEnd` = %u where `id` = %"I64_FMT"u", PLAYER_DATA(player, dungeonCnt), PLAYER_DATA(player, dungeonEnd), player->getId());
+	DB1().PushUpdateData("UPDATE `player` SET `dungeonCnt` = %d, `dungeonEnd` = %u where `id` = %" I64_FMT "u", PLAYER_DATA(player, dungeonCnt), PLAYER_DATA(player, dungeonEnd), player->getId());
 }
 
 void Dungeon::checkForTimeout( Player * player, DungeonPlayerInfo& dpi, bool writeDB )
@@ -998,9 +998,9 @@ void Dungeon::checkForTimeout( Player * player, DungeonPlayerInfo& dpi, bool wri
 		dpi.lootToday.clear();
 		if(writeDB)
 		{
-			DB3().PushUpdateData("UPDATE `dungeon_player` SET `count` = 0, `counterEnd` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", dpi.counterEnd, _id, player->getId());
+			DB3().PushUpdateData("UPDATE `dungeon_player` SET `count` = 0, `counterEnd` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", dpi.counterEnd, _id, player->getId());
 
-            DB1().PushUpdateData("UPDATE `player` SET `dungeonCnt` = %u, `dungeonEnd` = %u where `id` = %"I64_FMT"u", PLAYER_DATA(player, dungeonCnt), PLAYER_DATA(player, dungeonEnd), player->getId());
+            DB1().PushUpdateData("UPDATE `player` SET `dungeonCnt` = %u, `dungeonEnd` = %u where `id` = %" I64_FMT "u", PLAYER_DATA(player, dungeonCnt), PLAYER_DATA(player, dungeonEnd), player->getId());
 		}
 	}
 }
@@ -1135,7 +1135,7 @@ void Dungeon::doJusticeRoar(Player* pl)
         return;
     }
 
-    DB3().PushUpdateData("UPDATE `dungeon_player` SET `justice` = %u, `justice_roar` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", dpi.justice, dpi.justice_roar, _id, pl->getId());
+    DB3().PushUpdateData("UPDATE `dungeon_player` SET `justice` = %u, `justice_roar` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", dpi.justice, dpi.justice_roar, _id, pl->getId());
     Stream st(REP::COPY_DATA_UPDATE);
     st << static_cast<UInt8>(6) << _id << dpi.justice << Stream::eos;
     pl->send(st);

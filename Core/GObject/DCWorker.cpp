@@ -192,7 +192,7 @@ namespace GObject
                     }
                 }
 //#endif
-                TRACE_LOG("[%u]%u:%u:PlayerId: %"I64_FMT"u, OpenId: %s] -> %d", m_Worker, i, size, playerId, msg, r ? 1 : 0);
+                TRACE_LOG("[%u]%u:%u:PlayerId: %" I64_FMT "u, OpenId: %s] -> %d", m_Worker, i, size, playerId, msg, r ? 1 : 0);
 
                 delete[] msg;
                 ++i;
@@ -271,7 +271,7 @@ namespace GObject
             return true;
         playerId = playerId & 0xFFFFFFFF;
         char buf[128] = {0};
-        snprintf(buf, 128, "oid_%"I64_FMT"u", playerId);
+        snprintf(buf, 128, "oid_%" I64_FMT "u", playerId);
         char openId2[256] = {0};
         m_MCached.get(buf, strlen(buf), openId2, 255);
         openId2[255] = '\0';

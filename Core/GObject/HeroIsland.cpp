@@ -2098,7 +2098,7 @@ void HeroIsland::saveAtoCfg(Player* player, const std::string& cfg)
         return;
 
     player->setAtoHICfg(cfg);
-    DB3().PushUpdateData("UPDATE `player` set `atohicfg` = '%s' WHERE `id` = %"I64_FMT"u", cfg.c_str(), player->getId());
+    DB3().PushUpdateData("UPDATE `player` set `atohicfg` = '%s' WHERE `id` = %" I64_FMT "u", cfg.c_str(), player->getId());
 }
 
 void HeroIsland::sendAtoCfg(Player* player)

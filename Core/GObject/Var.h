@@ -480,6 +480,7 @@ namespace GObject
         VAR_RYHB_ITEM_CNT_14 = 538,      // 日月合璧购买物品14个数
         VAR_RYHB_ITEM_CNT_15 = 539,      // 日月合璧购买物品15个数
        
+       VAR_VIP_PRIVILEGE_DATA_TYPE = 540 ,     //新手御剑奖励类型(0-未开通，1-七大豪享特权一阶段，2-十大至尊特权一阶段，3-七大豪享特权二阶段，4-十大至尊特权二阶段，5-七大梦幻特权，6-十大梦幻特权)
         VAR_MAX,
     };
 
@@ -760,6 +761,8 @@ namespace GObject
             REGISTER_VAR(VAR_ACT_LOGIN_AWARD_VIP, CYCLE_DAY);
             REGISTER_VAR(VAR_VIP_PRIVILEGE_TIME, CYCLE_NONE);
             REGISTER_VAR(VAR_VIP_PRIVILEGE_DATA, CYCLE_DAY);
+            REGISTER_VAR(VAR_VIP_PRIVILEGE_DATA_TYPE, CYCLE_NONE);
+            
             REGISTER_VAR(VAR_TUIGUAN_AWARD_GOT, CYCLE_DAY);
             REGISTER_VAR(VAR_PET_CUILIAN_DAILY_CNT_DATE, CYCLE_NONE);
             REGISTER_VAR(VAR_PET_CUILIAN_LEFT_CNT, CYCLE_NONE);

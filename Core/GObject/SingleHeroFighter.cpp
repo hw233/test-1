@@ -232,7 +232,7 @@ namespace GObject
             strSS(strss);
             strLbs(strlbs);
 
-            DB1().PushUpdateData("REPLACE INTO `sh_fighter`(`id`, `playerId`, `potential`, `capacity`, `type`, `level`, `soulMax`, `citta`, `trump`, `skillstrengthen`, `lbskill`) VALUES(%u, %"I64_FMT"u, %u.%02u, %u.%02u, %u, %u, %u, \'%s\', \'%s\', \'%s\', \'%s\')", getId(), _player->getId(), p / 100, p % 100, c / 100, c % 100, _type, _fgt->getLevel(), _soulMax,  strcitta.c_str(), strtrump.c_str(), strss.c_str(), strlbs.c_str());
+            DB1().PushUpdateData("REPLACE INTO `sh_fighter`(`id`, `playerId`, `potential`, `capacity`, `type`, `level`, `soulMax`, `citta`, `trump`, `skillstrengthen`, `lbskill`) VALUES(%u, %" I64_FMT "u, %u.%02u, %u.%02u, %u, %u, %u, \'%s\', \'%s\', \'%s\', \'%s\')", getId(), _player->getId(), p / 100, p % 100, c / 100, c % 100, _type, _fgt->getLevel(), _soulMax,  strcitta.c_str(), strtrump.c_str(), strss.c_str(), strlbs.c_str());
         }
 
         {
@@ -245,7 +245,7 @@ namespace GObject
                 "`auraMaxP`, `attackP`, `magatkP`, `defendP`, `magdefP`, `hpP`, `toughP`, `actionP`,"
                 "`hitrateP`, `evadeP`, `criticalP`, `criticaldmgP`, `pierceP`, `counterP`, `magresP`,"
                 "`hitrlvl`, `evdlvl`, `crilvl`, `pirlvl`, `counterlvl`, `mreslvl`, `toughlvl`"
-                ") VALUES(%u, %"I64_FMT"u, %u, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f,"
+                ") VALUES(%u, %" I64_FMT "u, %u, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f,"
                     "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f,"
                     "%f, %f, %f, %f, %f, %f, %f)", getId(), _player->getId(), _type,
                     attr.strength, attr.physique, attr.agility, attr.intelligence, attr.will, attr.soul, attr.aura,
@@ -261,7 +261,7 @@ namespace GObject
             ElixirAttr& attr = _elixirattr;
             DB1().PushUpdateData("REPLACE INTO `sh_fighter_attr2`(`fighterId`, `playerId`, `type`, `soulExtraAura`, `soulAuraLeft`, `soulSkillSoulOut`, `elixir_strength`, `elixir_physique`, `elixir_agility`,"
                     " `elixir_intelligence`, `elixir_will`, `elixir_soul`, `elixir_attack`, `elixir_defend`, `elixir_critical`, `elixir_pierce`, `elixir_evade`, `elixir_counter`,"
-                    " `elixir_tough`, `elixir_action`) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", getId(), _player->getId(), _type,
+                    " `elixir_tough`, `elixir_action`) VALUES(%u, %" I64_FMT "u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", getId(), _player->getId(), _type,
                     _soulExtraAura, _soulAuraLeft, _soulSkillSoulOut, attr.strength, attr.physique, attr.agility, attr.intelligence, attr.will, attr.soul, attr.attack, attr.defend, attr.critical,
                     attr.pierce, attr.evade, attr.counter, attr.tough, attr.action);
         }
@@ -482,7 +482,7 @@ namespace GObject
 
     void SingleHeroFighter::saveTowerProgress()
     {
-        DB1().PushUpdateData("UPDATE `sh_player` SET `tLevel`=%u, `tTurns`=%u, `tLastTurns`=%u WHERE `playerId`=%"I64_FMT"u", _tLevel, _tTurns, _tLastTurns, _player->getId());
+        DB1().PushUpdateData("UPDATE `sh_player` SET `tLevel`=%u, `tTurns`=%u, `tLastTurns`=%u WHERE `playerId`=%" I64_FMT "u", _tLevel, _tTurns, _tLastTurns, _player->getId());
     }
 }
 

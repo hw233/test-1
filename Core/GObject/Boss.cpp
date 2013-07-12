@@ -149,7 +149,7 @@ bool Boss::attackBy( Player * player )
 				exp = damage / 2;
 		}
 		dmg.exp += exp;
-		DB().PushUpdateData("REPLACE INTO `boss_damage`(`id`, `playerId`, `damage`, `exp`) VALUES(%u, %"I64_FMT"u, %u, %u)", _ng->getId(), player->getId(), dmg.damage, dmg.exp);
+		DB().PushUpdateData("REPLACE INTO `boss_damage`(`id`, `playerId`, `damage`, `exp`) VALUES(%u, %" I64_FMT "u, %u, %u)", _ng->getId(), player->getId(), dmg.damage, dmg.exp);
 		player->pendExp(exp, !res);
 	}
 	else

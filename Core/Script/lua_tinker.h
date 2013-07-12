@@ -202,6 +202,8 @@ namespace lua_tinker
 		ref2user(T& t) : user(&t) {}
 	};
 
+	void push_meta(lua_State *L, const char* name);
+
 	// to lua
 	template<typename T>
 	struct val2lua { static void invoke(lua_State *L, T& input){ new(lua_newuserdata(L, sizeof(val2user<T>))) val2user<T>(input); } };
@@ -873,7 +875,6 @@ namespace lua_tinker
 	// class helper
 	int meta_get(lua_State *L);
 	int meta_set(lua_State *L);
-	void push_meta(lua_State *L, const char* name);
 
 	// class init
 	template<typename T>
