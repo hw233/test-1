@@ -8852,7 +8852,7 @@ function ItemNormal_00009382(iid, num, bind, param)
         end
         package:Add(items[g], 1, true, false, 2)
         --if iid == 9397 and getSurnameLegend() then
-        if iid == 9401 and getSurnameLegend() then
+   --     if iid == 9401 and getSurnameLegend() then
             local rand_card = math.random(1,10000);
             local card_chance = 3000;
             if used_num + n > 30 then
@@ -8862,13 +8862,37 @@ function ItemNormal_00009382(iid, num, bind, param)
                 card_chance = 500;
             end
             if rand_card <= card_chance then
-               local rand_card_num = math.random(1,5)
+               local rand_card_num = 0;
+               local card_chance = {0,0,0,0,0}; 
+               local card_chance_max = 0;
+               for n=1,5 do 
+                    local num_c =player:GetVar(452+n);
+                    print(num_c)
+                    if num_c > 5 then 
+                        numc = 5
+                    end
+                    card_chance[n] = 5 - num_c;
+                    card_chance_max = card_chance_max + num_c;
+               end
+               print(card_chance_max)
+               for n=2,5 do
+                    card_chance[n] = card_chance[n-1]+card_chance[n]
+               end
+               card_chance_max = 25 - card_chance_max;
+              print( card_chance_max);
+               card_rand = math.random(1,card_chance_max);
+               for i = 1, #card_chance do
+                   if card_rand <=card_chance[i] then
+                       rand_card_num = i
+                       break
+                   end
+               end
                rand_card_num = rand_card_num + 452;
                player:AddVar(rand_card_num , 1);
                card_num = card_num +1;
             end
         end
-    end
+    --end
     if card_num > 0 then
         SendMsg(player, 0x35, "获得卡牌 x"..card_num);
     end
