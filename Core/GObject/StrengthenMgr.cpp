@@ -205,7 +205,7 @@ void StrengthenMgr::UpdateToDB()
         if(i < STRONGTYPE_CNT - 1)
             orange += "|";
     }
-    DB().PushUpdateData("REPLACE INTO `strengthenData` (`playerId`, `overTime`, `souls`, `soulId`, `flags`, `greenBox`, `blueBox`, `purpleBox`, `orangeBox`)VALUES (%"I64_FMT"u, %u, %u, %u, '%s', '%s', '%s', '%s', '%s')",
+    DB().PushUpdateData("REPLACE INTO `strengthenData` (`playerId`, `overTime`, `souls`, `soulId`, `flags`, `greenBox`, `blueBox`, `purpleBox`, `orangeBox`)VALUES (%" I64_FMT "u, %u, %u, %u, '%s', '%s', '%s', '%s', '%s')",
             this->_owner->getId(), _item.overTime, _item.souls, _item.soulId, strFlag.c_str(), green.c_str(), blue.c_str(), purple.c_str(), orange.c_str());
 }
 

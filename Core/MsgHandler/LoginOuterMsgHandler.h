@@ -169,7 +169,7 @@ bool IsBigLock(UInt64 pid)
     {
         GObject::DBBigLock lockData;
         char sql[256] = {0};
-        sprintf(sql,"SELECT `player_id`, `lockExpireTime` FROM `locked_player` where `player_id`=%"I64_FMT"u",pid);
+        sprintf(sql,"SELECT `player_id`, `lockExpireTime` FROM `locked_player` where `player_id`=%" I64_FMT "u",pid);
         if(execu->Prepare(sql, lockData) == DB::DB_OK && 
            execu->Next() == DB::DB_OK &&
            lockData.lockExpireTime > TimeUtil::Now())
@@ -198,7 +198,7 @@ inline UInt8 doLogin(Network::GameClient * cl, UInt64 pid, UInt32 hsid, GObject:
 			if(player->getLockExpireTime() <= TimeUtil::Now())
 			{
 				player->setLockExpireTime(0);
-				DB1().PushUpdateData("DELETE FROM `locked_player` WHERE `player_id` = %"I64_FMT"u", pid);
+				DB1().PushUpdateData("DELETE FROM `locked_player` WHERE `player_id` = %" I64_FMT "u", pid);
 			}
 			else
 				return 6;
@@ -218,7 +218,7 @@ inline UInt8 doLogin(Network::GameClient * cl, UInt64 pid, UInt32 hsid, GObject:
 		{
 			if(kickOld)
 			{
-                TRACE_LOG("被踢, %"I64_FMT"u, %u, %u", player->getId(), sid, hsid);
+                TRACE_LOG("被踢, %" I64_FMT "u, %u, %u", player->getId(), sid, hsid);
 				Network::GameClient * cl2 = static_cast<Network::GameClient *>(c.get());
                 if (cl2 && cl2->GetPlayer() == player)
                 {
@@ -386,7 +386,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             }
         }
         
-        TRACE_LOG("id: %"I64_FMT"u from %s of asss_%d", ul._userid, clientIp.c_str(), cfg.serverNum);
+        TRACE_LOG("id: %" I64_FMT "u from %s of asss_%d", ul._userid, clientIp.c_str(), cfg.serverNum);
         if (res == 0 && player && cfg.GMCheck && checkCrack(ul._platform, clientIp, ul._userid))
         {
             player->SetSessionID(-1);
@@ -416,7 +416,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 		UInt8 flag = 0;
 		if(res == 0)
 		{
-            TRACE_LOG("登陆成功, %s, %"I64_FMT"u, %"I64_FMT"u, %u, %d", ul._openid.c_str(), ul._userid, pid, hdr.sessionID, player->getThreadId());
+            TRACE_LOG("登陆成功, %s, %" I64_FMT "u, %" I64_FMT "u, %u, %d", ul._openid.c_str(), ul._userid, pid, hdr.sessionID, player->getThreadId());
 #ifndef _WIN32
 #ifdef _FB
 #else
@@ -431,7 +431,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 		}
 		else if(res == 4)
 		{
-            TRACE_LOG("重复登陆, %s, %"I64_FMT"u, %"I64_FMT"u, %u, %d", ul._openid.c_str(), ul._userid, pid, hdr.sessionID, player->getThreadId());
+            TRACE_LOG("重复登陆, %s, %" I64_FMT "u, %" I64_FMT "u, %u, %d", ul._openid.c_str(), ul._userid, pid, hdr.sessionID, player->getThreadId());
 #ifndef _WIN32
 #ifdef _FB
 #else
@@ -722,7 +722,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 			lup.fighter = fgt;
 			lup.updateId();
 
-			DB1().PushUpdateData("INSERT INTO `player` (`id`, `name`, `country`, `location`, `lineup`, `wallow`, `formation`, `formations`, `openid`) VALUES (%" I64_FMT "u, '%s', %u, %u, '%u,12', %u, %u, '%u,%u', '%s')", pl->getId(), nu._name.c_str(), country, loc, fgtId, PLAYER_DATA(pl, wallow), FORMATION_1, FORMATION_1, FORMATION_2, nu._openid.c_str());
+			DB1().PushUpdateData("INSERT INTO `player` (`id`, `name`, `country`, `location`, `lineup`, `wallow`, `formation`, `formations`, `openid`) VALUES (%"  I64_FMT  "u, '%s', %u, %u, '%u,12', %u, %u, '%u,%u', '%s')", pl->getId(), nu._name.c_str(), country, loc, fgtId, PLAYER_DATA(pl, wallow), FORMATION_1, FORMATION_1, FORMATION_2, nu._openid.c_str());
 
 			GObject::globalPlayers.add(pl);
 			GObject::newPlayers.add(pl);
@@ -753,7 +753,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->setInvited(nu._invited);
             pl->SetVar(GObject::VAR_VIPFIRST, 1); // XXX: fix old servers
 
-			DBLOG1().PushUpdateData("insert into register_states(server_id,player_id,player_name,platform,reg_time) values(%u,%"I64_FMT"u, '%s', %u, %u)", cfg.serverLogId, pl->getId(), pl->getName().c_str(), atoi(nu._platform.c_str()), TimeUtil::Now());
+			DBLOG1().PushUpdateData("insert into register_states(server_id,player_id,player_name,platform,reg_time) values(%u,%" I64_FMT "u, '%s', %u, %u)", cfg.serverLogId, pl->getId(), pl->getName().c_str(), atoi(nu._platform.c_str()), TimeUtil::Now());
 
 #ifndef _WIN32
 #ifdef _FB
@@ -917,7 +917,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
 
         int retry = 3;
         memcached_return rc;
-        len = snprintf(key, sizeof(key), "token_27036_%"I64_FMT"u_%s", /*player_Id*/player_Id_tmp, token.c_str());
+        len = snprintf(key, sizeof(key), "token_27036_%" I64_FMT "u_%s", /*player_Id*/player_Id_tmp, token.c_str());
         while (retry)
         {
             --retry;
@@ -973,7 +973,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
     if (no.length())
     {
         if (id == 29999)
-            DB8().PushUpdateData("REPLACE INTO `recharge` (`no`,`playerId`,`id`,`num`,`status`) VALUES ('%s', %"I64_FMT"u, %u, %u, %u)",
+            DB8().PushUpdateData("REPLACE INTO `recharge` (`no`,`playerId`,`id`,`num`,`status`) VALUES ('%s', %" I64_FMT "u, %u, %u, %u)",
                 no.c_str(), player_Id, id, num, 0); // 0-准备/不成功 1-成功,2-补单成功
         else
             TRACE_LOG("DIRECTPUR: id: %u num: %u", id, num);
@@ -1317,7 +1317,7 @@ void OnKickUser(LoginMsgHdr& hdr,const void * data)
     CHKKEY();
     br>>playerId;
     st<<playerId;
-    INFO_LOG("GM[%s]: %"I64_FMT"u", __PRETTY_FUNCTION__, playerId);
+    INFO_LOG("GM[%s]: %" I64_FMT "u", __PRETTY_FUNCTION__, playerId);
 	GObject::Player * pl= GObject::globalPlayers[playerId];
     if(pl==NULL)
     {
@@ -1352,7 +1352,7 @@ void LockUser(LoginMsgHdr& hdr,const void * data)
     CHKKEY();
     br>>playerId;
     br>>expireTime;
-    INFO_LOG("GM[%s]: %"I64_FMT"u, %u", __PRETTY_FUNCTION__, playerId, expireTime);
+    INFO_LOG("GM[%s]: %" I64_FMT "u, %u", __PRETTY_FUNCTION__, playerId, expireTime);
     st<<playerId;
     if(cfg.merged)
     {
@@ -1371,7 +1371,7 @@ void LockUser(LoginMsgHdr& hdr,const void * data)
         if(pl->getLockExpireTime() == static_cast<UInt32>(0))
         {
             pl->setLockExpireTime(static_cast<UInt32>(expireTime));
-            DB1().PushUpdateData("REPLACE INTO `locked_player`(`player_id`, `lockExpireTime`) VALUES(%"I64_FMT"u, %u)", playerId, expireTime);
+            DB1().PushUpdateData("REPLACE INTO `locked_player`(`player_id`, `lockExpireTime`) VALUES(%" I64_FMT "u, %u)", playerId, expireTime);
             st<<static_cast<Int32>(0);
 			if(pl->isOnline())
 			{
@@ -1398,7 +1398,7 @@ void UnlockUser(LoginMsgHdr& hdr,const void * data)
     UInt64 playerId;
     CHKKEY();
     br>>playerId;
-    INFO_LOG("GM[%s]: %"I64_FMT"u", __PRETTY_FUNCTION__, playerId);
+    INFO_LOG("GM[%s]: %" I64_FMT "u", __PRETTY_FUNCTION__, playerId);
     st<<playerId;
     if(cfg.merged)
     {
@@ -1418,7 +1418,7 @@ void UnlockUser(LoginMsgHdr& hdr,const void * data)
         else
         {
             pl->setLockExpireTime(0);
-            DB1().PushUpdateData("DELETE FROM `locked_player` WHERE `player_id` = %"I64_FMT"u", pl->getId());
+            DB1().PushUpdateData("DELETE FROM `locked_player` WHERE `player_id` = %" I64_FMT "u", pl->getId());
             st<<static_cast<UInt32>(0);
         }
     }
@@ -1463,7 +1463,7 @@ void BigLockUser(LoginMsgHdr& hdr,const void * data)
             pid = pid & 0xFFFFFFFFFF;
             memLockUser(pid, expireTime);
             setForbidSaleValue(pid, true);
-//            execu->Execute2("REPLACE INTO `locked_player`(`player_id`, `lockExpireTime`) VALUES(%"I64_FMT"u, %u)", pid,expireTime);
+//            execu->Execute2("REPLACE INTO `locked_player`(`player_id`, `lockExpireTime`) VALUES(%" I64_FMT "u, %u)", pid,expireTime);
             playerId = GetNextSection(playerIds, ',');
         }
         ret = 0;
@@ -1491,7 +1491,7 @@ void BigUnlockUser(LoginMsgHdr& hdr,const void * data)
             UInt64 pid = atoll(playerId.c_str());
             pid = pid & 0xFFFFFFFFFF;
             memUnLockUser(pid);
-            //execu->Execute2("DELETE FROM `locked_player` WHERE `player_id` = %"I64_FMT"u", pid);
+            //execu->Execute2("DELETE FROM `locked_player` WHERE `player_id` = %" I64_FMT "u", pid);
             playerId = GetNextSection(playerIds, ',');
         }
         ret = 0;
@@ -1539,7 +1539,7 @@ void ForbidSale(LoginMsgHdr& hdr,const void * data)
                 GLOBAL().PushMsg(hdr, NULL);
             }
             if (execu.get() != NULL && execu->isConnected())
-                execu->Execute2("REPLACE into `fsale_player` values(%"I64_FMT"u,%d,1)", pid, TimeUtil::Now());
+                execu->Execute2("REPLACE into `fsale_player` values(%" I64_FMT "u,%d,1)", pid, TimeUtil::Now());
         }
         playerId = GetNextSection(playerIds, ',');
     }
@@ -1579,7 +1579,7 @@ void UnForbidSale(LoginMsgHdr& hdr,const void * data)
 
         if (execu.get() != NULL && execu->isConnected())
         {
-            execu->Execute2("REPLACE into `fsale_player` values(%"I64_FMT"u,%d,0)", pid, TimeUtil::Now());
+            execu->Execute2("REPLACE into `fsale_player` values(%" I64_FMT "u,%d,0)", pid, TimeUtil::Now());
         }
  
 
@@ -1825,7 +1825,7 @@ void PlayerIDAuth( LoginMsgHdr& hdr, const void * data )
 		return;
 
 	PLAYER_DATA(player, wallow) = type;
-	DB1().PushUpdateData("UPDATE `player` SET `wallow`=%u WHERE `id`=%"I64_FMT"u", type, pid);
+	DB1().PushUpdateData("UPDATE `player` SET `wallow`=%u WHERE `id`=%" I64_FMT "u", type, pid);
 	player->sendWallow();
 }
 
@@ -2139,7 +2139,7 @@ void SetLevelFromBs(LoginMsgHdr& hdr, const void * data)
         id += (static_cast<UInt64>(serverNo) <<  48);
     }
 
-    INFO_LOG("GM[%s]: %"I64_FMT"u, %u", __PRETTY_FUNCTION__, id, level);
+    INFO_LOG("GM[%s]: %" I64_FMT "u, %u", __PRETTY_FUNCTION__, id, level);
 
     UInt8 ret = 1;
     GObject::Player * pl = GObject::globalPlayers[id];
@@ -2323,7 +2323,7 @@ void SetPropsFromBs(LoginMsgHdr &hdr,const void * data)
         id += (static_cast<UInt64>(serverNo) << 48);
     }
 
-    INFO_LOG("GM[%s]: %"I64_FMT"u, %u, %u, %u", __PRETTY_FUNCTION__, id, pexp, prestige, honor);
+    INFO_LOG("GM[%s]: %" I64_FMT "u, %u, %u, %u", __PRETTY_FUNCTION__, id, pexp, prestige, honor);
 
     UInt8 ret = 1;
     GObject::Player * pl = GObject::globalPlayers[id];
@@ -2370,7 +2370,7 @@ void SetMoneyFromBs(LoginMsgHdr &hdr,const void * data)
     br>>tael;
     br>>coupon;
     br>>achievement;
-    INFO_LOG("GM[%s]: %"I64_FMT"u, %s, %u, %u, %u, %u, %u",
+    INFO_LOG("GM[%s]: %" I64_FMT "u, %s, %u, %u, %u, %u, %u",
             __PRETTY_FUNCTION__, id, token.c_str(), type, gold, tael, coupon, achievement);
 
     st<<id;
@@ -2493,7 +2493,7 @@ void SetVIPLFromBs(LoginMsgHdr &hdr, const void * data)
         id += (static_cast<UInt64>(serverNo) << 48);
     }
 
-    INFO_LOG("GM[%s]: %"I64_FMT"u, %u", __PRETTY_FUNCTION__, id, lv);
+    INFO_LOG("GM[%s]: %" I64_FMT "u, %u", __PRETTY_FUNCTION__, id, lv);
 
     UInt8 ret = 1;
     GObject::Player * pl = GObject::globalPlayers[id];
@@ -2519,7 +2519,7 @@ void ClearTaskFromBs(LoginMsgHdr &hdr, const void * data)
     br>>type;
     st<<id;
 
-    INFO_LOG("GM[%s]: %"I64_FMT"u, %u", __PRETTY_FUNCTION__, id, type);
+    INFO_LOG("GM[%s]: %" I64_FMT "u, %u", __PRETTY_FUNCTION__, id, type);
 
     UInt8 ret = 1;
     if(cfg.merged)
@@ -2714,7 +2714,7 @@ void AddFighterFromBs(LoginMsgHdr &hdr, const void * data)
     br >> playerId;
     br >> fgtid;
 
-    INFO_LOG("GM[%s]: %"I64_FMT"u, %u", __PRETTY_FUNCTION__, playerId, fgtid);
+    INFO_LOG("GM[%s]: %" I64_FMT "u, %u", __PRETTY_FUNCTION__, playerId, fgtid);
 
     UInt8 ret = 0;
     GObject::Fighter * fgt = GObject::globalFighters[fgtid];

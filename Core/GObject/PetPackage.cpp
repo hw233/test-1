@@ -140,11 +140,11 @@ namespace GObject
         e = equip;
 		ItemEquipData& edata = equip->getItemEquipData();
         ItemPetEqAttr& peqAttr = equip->getPetEqAttr();
-        DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, 1, %"I64_FMT"u, %u)", equip->getId(), m_Owner->getId(), equip->GetBindStatus() ? 1 : 0);
+        DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, 1, %" I64_FMT "u, %u)", equip->getId(), m_Owner->getId(), equip->GetBindStatus() ? 1 : 0);
         DB4().PushUpdateData("INSERT INTO `equipment`(`id`, `itemId`, `maxTRank`, `trumpExp`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`) VALUES(%u, %u, %u, %u, %u, %d, %u, %d, %u, %d)", equip->getId(), equip->GetTypeId(), edata.maxTRank, edata.trumpExp, edata.extraAttr2.type1, edata.extraAttr2.value1, edata.extraAttr2.type2, edata.extraAttr2.value2, edata.extraAttr2.type3, edata.extraAttr2.value3);
         DB4().PushUpdateData("INSERT INTO `petEquipattr`(`id`, `level`, `exp`, `skillId`, `socket1`, `socket2`, `socket3`, `socket4`) VALUES(%u, %u, %u, %u, %u, %u, %u, %u)", equip->getId(), peqAttr.lv, peqAttr.exp, peqAttr.skill, peqAttr.gems[0], peqAttr.gems[1], peqAttr.gems[2], peqAttr.gems[3]);
         if(FromWhere != 0 && equip->getQuality() >= Item_Purple)
-            DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), equip->GetTypeId(), equip->getId(), FromWhere, TimeUtil::Now());
+            DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %" I64_FMT "u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), equip->GetTypeId(), equip->getId(), FromWhere, TimeUtil::Now());
 
         SendSingleEquipData(static_cast<ItemPetEq *>(equip), 1);
         if(notify)
@@ -197,7 +197,7 @@ namespace GObject
 		{
             std::string tbn("item_courses");
             DBLOG().GetMultiDBName(tbn);
-            DBLOG().PushUpdateData("insert into  `%s`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)",tbn.c_str(), cfg.serverLogId, m_Owner->getId(), item->GetItemType().getId(), num, toWhere, TimeUtil::Now());
+            DBLOG().PushUpdateData("insert into  `%s`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %" I64_FMT "u, %u, %u, %u, %u)",tbn.c_str(), cfg.serverLogId, m_Owner->getId(), item->GetItemType().getId(), num, toWhere, TimeUtil::Now());
 
             UInt32 price = GData::store.getPrice(id);
             if (price || GData::GDataManager::isInUdpItem(id))
@@ -211,10 +211,10 @@ namespace GObject
 			{
 				SAFE_DELETE(item);
 				m_PetItems.erase(ItemKey(id, bind));
-				DB4().PushUpdateData("DELETE FROM `item` WHERE `id` = %u AND `bindType` = %u AND `ownerId` = %"I64_FMT"u", id, bind, m_Owner->getId());
+				DB4().PushUpdateData("DELETE FROM `item` WHERE `id` = %u AND `bindType` = %u AND `ownerId` = %" I64_FMT "u", id, bind, m_Owner->getId());
 			}
 			else
-				DB4().PushUpdateData("UPDATE `item` SET `itemNum` = %u WHERE `id` = %u AND `bindType` = %u AND`ownerId` = %"I64_FMT"u", cnt, id, bind, m_Owner->getId());
+				DB4().PushUpdateData("UPDATE `item` SET `itemNum` = %u WHERE `id` = %u AND `bindType` = %u AND`ownerId` = %" I64_FMT "u", cnt, id, bind, m_Owner->getId());
 		}
 		return ret;
 	}
@@ -234,7 +234,7 @@ namespace GObject
         DB4().PushUpdateData("DELETE FROM `petEquipattr` WHERE `id` = %u", id);
         if(toWhere != 0 && equip->getQuality() >= Item_Purple)
         {
-            DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), equip->GetItemType().getId(), equip->getId(), toWhere, TimeUtil::Now());
+            DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %" I64_FMT "u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), equip->GetItemType().getId(), equip->getId(), toWhere, TimeUtil::Now());
         }
         SendSingleEquipData(equip, 0);
 		SAFE_DELETE(equip);
@@ -255,7 +255,7 @@ namespace GObject
 			bool ret = TryAddPetItem(item, num);
 			if (ret == false)
 			    return NULL;
-            DB4().PushUpdateData("UPDATE `item` SET `itemNum` = %u WHERE `id` = %u AND `bindType` = %u AND `ownerId` = %"I64_FMT"u", item->Count(), typeId, bind, m_Owner->getId());
+            DB4().PushUpdateData("UPDATE `item` SET `itemNum` = %u WHERE `id` = %u AND `bindType` = %u AND `ownerId` = %" I64_FMT "u", item->Count(), typeId, bind, m_Owner->getId());
 		}
 		else
 		{
@@ -269,7 +269,7 @@ namespace GObject
                 return NULL;
             }
             m_PetItems[ItemKey(typeId, bind)] = item;
-            DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, %u, %"I64_FMT"u, %u)", typeId, num, m_Owner->getId(), bind ? 1 : 0);
+            DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, %u, %" I64_FMT "u, %u)", typeId, num, m_Owner->getId(), bind ? 1 : 0);
 			item->SetBindStatus(bind);
 		}
         if(notify)

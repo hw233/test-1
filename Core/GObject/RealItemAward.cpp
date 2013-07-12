@@ -66,7 +66,7 @@ void RealItemAwardMgr::getAward(Player* pl, UInt32 id)
         SYSMSGV(content, 2367, num, award.card_no.c_str(), award.card_psw.c_str());
         Mail * mail = pl->GetMailBox()->newMail(NULL, 0x01, title, content);
 
-        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '', %u)", cfg.serverLogId, pl->getId(), mail->id, RealItemAwardActive, title, content, mail->recvTime);
+        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '', %u)", cfg.serverLogId, pl->getId(), mail->id, RealItemAwardActive, title, content, mail->recvTime);
     }
     else if(id >= 3 && id <= 32)
     {
@@ -75,7 +75,7 @@ void RealItemAwardMgr::getAward(Player* pl, UInt32 id)
         SYSMSGV(content, 2369, num, award.card_no.c_str(), award.card_psw.c_str());
         Mail * mail = pl->GetMailBox()->newMail(NULL, 0x01, title, content);
 
-        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '', %u)", cfg.serverLogId, pl->getId(), mail->id, RealItemAwardActive, title, content, mail->recvTime);
+        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '', %u)", cfg.serverLogId, pl->getId(), mail->id, RealItemAwardActive, title, content, mail->recvTime);
     }
     else if(id >= 33 && id <= 40)
     {
@@ -84,7 +84,7 @@ void RealItemAwardMgr::getAward(Player* pl, UInt32 id)
         SYSMSGV(content, 2371, num, award.card_no.c_str(), award.card_psw.c_str());
         Mail * mail = pl->GetMailBox()->newMail(NULL, 0x01, title, content);
 
-        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '', %u)", cfg.serverLogId, pl->getId(), mail->id, RealItemAwardActive, title, content, mail->recvTime);
+        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '', %u)", cfg.serverLogId, pl->getId(), mail->id, RealItemAwardActive, title, content, mail->recvTime);
     }
     else if(id >= 41 && id <= 70)
     {
@@ -93,7 +93,7 @@ void RealItemAwardMgr::getAward(Player* pl, UInt32 id)
         SYSMSGV(content, 2367, num, award.card_no.c_str(), award.card_psw.c_str());
         Mail * mail = pl->GetMailBox()->newMail(NULL, 0x01, title, content);
 
-        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '', %u)", cfg.serverLogId, pl->getId(), mail->id, RealItemAwardActive, title, content, mail->recvTime);
+        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '', %u)", cfg.serverLogId, pl->getId(), mail->id, RealItemAwardActive, title, content, mail->recvTime);
     }
     m_awards.erase(it);
     DB1().PushUpdateData("DELETE FROM `real_item_award` WHERE `id` = %u", id);
