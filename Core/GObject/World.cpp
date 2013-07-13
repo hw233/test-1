@@ -629,6 +629,14 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 11)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 12)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 19)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 20)
+
 
 
 
@@ -659,6 +667,8 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 6, 29)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 6)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 13)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 20)
+
 
         ))
     {
@@ -1604,6 +1614,13 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 11)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 12)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 19)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 20)
           
          
          
