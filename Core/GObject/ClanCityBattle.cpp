@@ -1499,13 +1499,18 @@ void ClanCity::start()
 void ClanCity::end()
 {
 	SYSMSG(title, 4920);
+    UInt32 leavescore[2] = {0, 0};
     if(m_spots[0].hp == 0)
     {
+        leavescore[0] = 50;
+        leavescore[1] = 100;
         giveAllScore(0, 50);
         giveAllScore(1, 100);
     }
     else
     {
+        leavescore[0] = 100;
+        leavescore[1] = 50;
         giveAllScore(0, 100);
         giveAllScore(1, 50);
     }
@@ -1594,8 +1599,7 @@ void ClanCity::end()
         Player* player = pl->fgt.player;
         Clan* cl = player->getClan();
         player->setInClanCity(false);
-        if(pl->score == 0)
-            continue;
+        pl->score += leavescore[pl->side];
 
         player->getAchievement(pl->score*2);
 
@@ -1646,7 +1650,7 @@ void ClanCity::end()
             }
         }
 
-        SYSMSGV(content, 4920+m_type, winner, clanname, pl->score, pl->score*2, count, clscore, clscore, jointo, act);
+        SYSMSGV(content, 4920+m_type, winner, clanname, pl->score, pl->score*2, count, clscore, clscore*10, jointo, act);
         Mail * pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
         if(pmail != NULL)
             mailPackageManager.push(pmail->id, mitem, 1, true);
