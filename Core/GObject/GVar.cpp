@@ -62,7 +62,7 @@ namespace GObject
 #if 0
         if (TimeUtil::Now() > overTime)
         {
-            DB7().PushUpdateData("DELETE FROM `var` WHERE `playerId` = %"I64_FMT"u AND `id` = %u", m_PlayerID, id);
+            DB7().PushUpdateData("DELETE FROM `var` WHERE `playerId` = %" I64_FMT "u AND `id` = %u", m_PlayerID, id);
             return;
         }
 #endif
