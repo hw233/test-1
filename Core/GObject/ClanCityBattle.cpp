@@ -868,8 +868,19 @@ void CCBSpot::playerEscape(CCBPlayer* pl)
 
     UInt8 side = pl->side;
     pl->entered = 0;
-    erasePl(waiters[side], pl);
     erasePl(dead[side], pl);
+    bool res = erasePl(waiters[side], pl);
+    if(pl->type == e_player && res)
+    {
+        Stream st(REP::CCB);
+        st << static_cast<UInt8>(0) << static_cast<UInt8>(10);
+        st << id << static_cast<UInt8>(0) << side;
+        st << pl->fgt.player->getId();
+        st << pl->fgt.player->getName();
+        st << pl->weary;
+        st << Stream::eos;
+        broadcast(st);
+    }
 }
 
 void CCBSpot::prepare()
