@@ -8853,9 +8853,10 @@ function ItemNormal_00009375(iid, num, bind, param)
 end
 
 function ItemNormal_00009382(iid, num, bind, param)
+    local itmeId = 9407;
     local player = GetPlayer()
     local package = player:GetPackage()
-    local items = { 15, 9088, 512, 33, 9371, 551, 501, 513, 503, 1325, 138, 507, 509, 515 }
+    local items = { 15, 9088, 512, 33, 9371, 551, 501, 513, 503, 1325, 134, 507, 509, 515 }
     local chance = { 1500,3000,3900,4800,5700,6600,7400,8200,8800,9100,9400,9600,9800,10000 }
     local card_num = 0;
     local used_num = player:GetVar(452);
@@ -8875,7 +8876,7 @@ function ItemNormal_00009382(iid, num, bind, param)
         end
         package:Add(items[g], 1, true, false, 2)
         --if iid == 9397 and getSurnameLegend() then
-   --     if iid == 9401 and getSurnameLegend() then
+       if iid == itmeId and getSurnameLegend() then
             local rand_card = math.random(1,10000);
             local card_chance = 3000;
             if used_num + n > 30 then
@@ -8886,28 +8887,30 @@ function ItemNormal_00009382(iid, num, bind, param)
             end
             if rand_card <= card_chance then
                local rand_card_num = 0;
-               local card_chance = {0,0,0,0,0}; 
+               local card_chance_ = {0,0,0,0,0}; 
                local card_chance_max = 0;
                for n=1,5 do 
                     local num_c =player:GetVar(452+n);
-                    print(num_c)
-                    if num_c > 5 then 
-                        numc = 5
+                   -- print(num_c)
+                   card_chance_[n] = 5 - num_c;
+                    if card_chance_[n] <1 then
+                        card_chance_[n] =1;
                     end
-                    card_chance[n] = 5 - num_c;
-                    card_chance_max = card_chance_max + num_c;
+                    card_chance_max = card_chance_max + card_chance_[n];
                end
-               print(card_chance_max)
+             --  print(card_chance_max)
                for n=2,5 do
-                    card_chance[n] = card_chance[n-1]+card_chance[n]
+                    card_chance_[n] = card_chance_[n-1]+card_chance_[n]
                end
+
                card_chance_max = 25 - card_chance_max;
-              print( card_chance_max);
-               card_rand = math.random(1,card_chance_max);
-               for i = 1, #card_chance do
-                   if card_rand <=card_chance[i] then
-                       rand_card_num = i
-                       break
+               if card_chance_max > 0 then
+                   card_rand = math.random(1,card_chance_max);
+                   for i = 1, #card_chance_ do
+                       if card_rand <=card_chance_[i] then
+                           rand_card_num = i
+                           break;
+                       end
                    end
                end
                rand_card_num = rand_card_num + 452;
@@ -8915,12 +8918,12 @@ function ItemNormal_00009382(iid, num, bind, param)
                card_num = card_num +1;
             end
         end
-    --end
+    end
     if card_num > 0 then
         SendMsg(player, 0x35, "获得卡牌 x"..card_num);
     end
     --if iid == 9397 and getSurnameLegend() then
-    if iid == 9401 and getSurnameLegend() then
+    if iid == itmeId and getSurnameLegend() then
         player:AddVar(452, num)
     end
     player:sendLuckyBagInfo()
@@ -10683,6 +10686,8 @@ local ItemNormal_Table = {
     [9383] = ItemNormal_00009382,
     [9397] = ItemNormal_00009382,
     [9401] = ItemNormal_00009382,
+    [9407] = ItemNormal_00009382,
+
     [9388] = ItemNormal_00009388,
     [9390] = ItemNormal_00009390,
     [9900] = ItemNormal_NameCard,
@@ -10699,6 +10704,7 @@ local ItemNormal_Table = {
     [9911] = ItemNormal_NameCard,
     [9913] = ItemNormal_NameCard,
 
+    [9914] = ItemNormal_NameCard,
     [10000] = ItemNormal_00010000,
     [10001] = ItemNormal_00010001,
     [10002] = ItemNormal_00010002,

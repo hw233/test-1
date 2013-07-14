@@ -20320,7 +20320,7 @@ bool Player::SetNewRcVip(UInt8  op)
     if(!in7DayFromCreated()) 
         return false;
     UInt32 vipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
-   if (viptype != 0 )
+   if (vipType != 0 )
        return false;
     bool ret = false;
     UInt32 vipCharge= 30;
@@ -20448,7 +20448,7 @@ bool Player::AddNewRcVip()
 #define SET_VIP_PRIVILEGE_DAYTH(data, v)      (data|=((v<<5)&0xE0))
 #define SET_VIP_PRIVILEGE_TIMEOUT(data, v)    (data|=((v)&0x1))
 
-void Player::doVipPrivilege(UInt8 idx,UInt8 op)
+void Player::doVipPrivilege(UInt8 idx)
 {
     UInt32 data = GetVar(VAR_VIP_PRIVILEGE_DATA);
     switch(idx)
@@ -20479,8 +20479,8 @@ void Player::doVipPrivilege(UInt8 idx,UInt8 op)
 
         if (getGold() < 30)
             return;
-       // SetVipPrivilege_1();
-       SetNewRcVip(1);
+        SetVipPrivilege_1();
+      // SetNewRcVip(1);
         break;
     case 6:
         if(!in7DayFromCreated())
@@ -20490,7 +20490,7 @@ void Player::doVipPrivilege(UInt8 idx,UInt8 op)
         SetVipPrivilege_2();
         break;
     case 8:
-        AddNewEcVip();
+        AddNewRcVip();
         break;
     case 9:
         if(!in7DayFromCreated())
@@ -22014,7 +22014,8 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
         if(flag == e_sla_none)
         {
             //GetPackage()->AddItem(9397, 1, true, false, FromNpc);
-            GetPackage()->AddItem(9401, 1, true, false, FromNpc);
+            //GetPackage()->AddItem(9401, 1, true, false, FromNpc);
+            GetPackage()->AddItem(9407, 1, true, false, FromNpc);
         }
         else
         {
@@ -22022,7 +22023,8 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
             if(!(status & flag))
             {
                 //GetPackage()->AddItem(9397, 1, true, false, FromNpc);
-                GetPackage()->AddItem(9401, 1, true, false, FromNpc);
+                //GetPackage()->AddItem(9401, 1, true, false, FromNpc);
+                GetPackage()->AddItem(9407, 1, true, false, FromNpc);
                 status |= flag;
                 SetVar(VAR_SURNAME_LEGEND_STATUS, status);
             }

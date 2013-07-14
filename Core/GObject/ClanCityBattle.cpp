@@ -33,7 +33,7 @@
 
 #define CCB_CITY_MOVE_CD             15
 
-//#define  NEICE_VESION
+#define  NEICE_VESION
 
 namespace GObject
 {
@@ -1675,7 +1675,7 @@ bool ClanCity::playerEnter(Player * player)
 		player->sendMsgCode(0, 2300);
 		return false;
 	}
-
+ player->getSurnameLegendAward(e_sla_cb);
 	player->setInClanCity(true);
     CCBPlayerMap::iterator it = m_players.find(player);
     if(it == m_players.end())
