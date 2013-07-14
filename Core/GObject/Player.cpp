@@ -20333,6 +20333,39 @@ bool Player::SetVipPrivilege_1()
     return ret;
 }
 
+bool Player::SetNewRcVip(UInt8  op)
+{
+    UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME);
+    if(!in7DayFromCreated()) 
+        return false;
+    UInt32 vipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
+   if (vipType != 0 )
+       return false;
+    bool ret = false;
+    UInt32 vipCharge= 30;
+    if(op == 2 )
+        vipCharge = 200;
+    if(validate == 0)
+    {
+        UInt32 now = TimeUtil::Now();
+        UInt32 validate = now + 2*86400;
+        // 保持最低位为0
+        if(validate & 0x1)
+            validate = validate + 1;
+        // 保持第2位为0, 
+        // validate&0x2 为false表示限时vip为2天
+        // validate&0x2 为true表示限时vip为7天
+        if(validate & 0x2)
+            validate = validate + 0x2;
+        SetVar(VAR_VIP_PRIVILEGE_TIME, validate);
+        SetVar(VAR_VIP_PRIVILEGE_DATA_TYPE, op);
+        ret = true;
+        ConsumeInfo ci(VipPrivilege, 0, 0);
+        useGold(vipCharge, &ci);
+    }
+
+    return ret;
+}
 bool Player::SetVipPrivilege_2()
 {
     UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME);
@@ -20361,6 +20394,64 @@ bool Player::SetVipPrivilege_2()
     return ret;
 }
 
+bool Player::AddNewRcVip()
+{
+    UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME);
+    bool ret = false;
+    UInt32 vipCharge ;
+    UInt32 vipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
+    UInt32 addVipDay = 7;
+    switch(vipType)
+    {
+        case 1:
+            vipCharge =70;
+            addVipDay = 5;
+            break;
+        case 2:
+            vipCharge = 450;
+            addVipDay = 5;
+            break;
+        case 3:
+            vipCharge = 150;
+            break;
+        case 4:
+            vipCharge = 700;
+            break;
+        case 5:
+            vipCharge = 200;
+            break;
+        case 6:
+            vipCharge = 1000;
+            break;
+    }
+     if (getGold() < vipCharge )
+         return false;
+    if(validate > 0 && (0 == (validate & 0x2)))
+    {
+        UInt32 now = TimeUtil::Now();
+        if(validate > now)
+            validate += addVipDay*86400;
+        else
+            validate = now + addVipDay*86400;
+
+        // 保持最低位为0
+        if(validate & 0x1)
+            validate = validate + 1;
+        // 保持第2位为1, 
+        // validate&0x2 为false表示限时vip为2天
+        // validate&0x2 为true表示限时vip为7天
+        validate |= 0x2;
+        SetVar(VAR_VIP_PRIVILEGE_TIME, validate);
+        if(vipType < 5)
+            vipType+=2;
+        SetVar(VAR_VIP_PRIVILEGE_DATA_TYPE, vipType);
+        ret = true;
+        ConsumeInfo ci(VipPrivilege, 0, 0);
+        useGold(vipCharge, &ci);
+    }
+
+    return ret;
+}
 #define VIP_PRIVILEGE_DAYLYAWARD(data) (0x01&data)
 #define VIP_PRIVILEGE_LIMITBUY1(data)  (0x02&data)
 #define VIP_PRIVILEGE_LIMITBUY2(data)  (0x04&data)
@@ -20408,6 +20499,7 @@ void Player::doVipPrivilege(UInt8 idx)
         if (getGold() < 30)
             return;
         SetVipPrivilege_1();
+      // SetNewRcVip(1);
         break;
     case 6:
         if(!in7DayFromCreated())
@@ -20415,6 +20507,16 @@ void Player::doVipPrivilege(UInt8 idx)
         if (getGold() < 70)
             return;
         SetVipPrivilege_2();
+        break;
+    case 8:
+        AddNewRcVip();
+        break;
+    case 9:
+        if(!in7DayFromCreated())
+            return;
+        if (getGold() < 200)
+            return;
+        SetNewRcVip(2);
         break;
     }
 
@@ -21931,7 +22033,8 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
         if(flag == e_sla_none)
         {
             //GetPackage()->AddItem(9397, 1, true, false, FromNpc);
-            GetPackage()->AddItem(9401, 1, true, false, FromNpc);
+            //GetPackage()->AddItem(9401, 1, true, false, FromNpc);
+            GetPackage()->AddItem(9407, 1, true, false, FromNpc);
         }
         else
         {
@@ -21939,7 +22042,8 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
             if(!(status & flag))
             {
                 //GetPackage()->AddItem(9397, 1, true, false, FromNpc);
-                GetPackage()->AddItem(9401, 1, true, false, FromNpc);
+                //GetPackage()->AddItem(9401, 1, true, false, FromNpc);
+                GetPackage()->AddItem(9407, 1, true, false, FromNpc);
                 status |= flag;
                 SetVar(VAR_SURNAME_LEGEND_STATUS, status);
             }

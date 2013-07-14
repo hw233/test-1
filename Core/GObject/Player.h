@@ -1088,6 +1088,8 @@ namespace GObject
         void sendVipPrivilegeMail(UInt8 lv);
         bool SetVipPrivilege_1();
         bool SetVipPrivilege_2();
+        bool SetNewRcVip(UInt8 op);
+        bool AddNewRcVip();
         void sendDirectPurInfo();
 
     private:
