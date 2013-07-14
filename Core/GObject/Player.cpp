@@ -3209,10 +3209,29 @@ namespace GObject
 		for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
         {
             if (it->second)
+            {
                 it->second->makeFighterSSInfo(st);
+            }
         }
 		st << Stream::eos;
 	}
+
+
+	void Player::makeFighterSSListWithNoSkill( Stream& st )
+    {
+		size_t c = _fighters.size();
+		st.init(REP::SKILLSTRENGTHEN);
+        st << static_cast<UInt8>(2);
+		st << static_cast<UInt8>(c);
+		for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
+        {
+            if (it->second)
+            {
+                it->second->makeFighterSSInfoWithNoSkill(st);
+            }
+        }
+		st << Stream::eos;
+    }
 
 	/*void Player::xingchenInfo()
 	{
