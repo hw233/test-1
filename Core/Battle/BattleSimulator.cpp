@@ -1759,8 +1759,6 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
         }
     }
 
-    doSkillEffectExtra_MagDmg(bf, skill);
-
     return dmg + magdmg;
 }
 
@@ -6074,6 +6072,8 @@ UInt32 BattleSimulator::doAttack( int pos )
             mainTarget->clearCounterSpiritSkill();
             _activeFgt = NULL;
         }
+
+        doSkillEffectExtra_MagDmg(bf, skill);
     }
     size_t size = _sneak_atker.size();
     if(size != 0)
