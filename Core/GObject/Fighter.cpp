@@ -3646,6 +3646,8 @@ void Fighter::delSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_AFTRES ||
                         s->cond == GData::SKILL_DEAD ||
                         s->cond == GData::SKILL_DEAD_FAKE ||
+                        s->cond == GData::SKILL_ABNORMAL_TYPE_DMG ||
+                        s->cond == GData::SKILL_BLEED_TYPE_DMG ||
                         s->cond == GData::SKILL_ENTER ||
                         s->cond == GData::SKILL_ONTHERAPY ||
                         s->cond == GData::SKILL_ONSKILLDMG ||
@@ -3694,6 +3696,8 @@ void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_AFTRES ||
                         s->cond == GData::SKILL_DEAD ||
                         s->cond == GData::SKILL_DEAD_FAKE ||
+                        s->cond == GData::SKILL_ABNORMAL_TYPE_DMG ||
+                        s->cond == GData::SKILL_BLEED_TYPE_DMG ||
                         s->cond == GData::SKILL_ENTER ||
                         s->cond == GData::SKILL_ONTHERAPY ||
                         s->cond == GData::SKILL_ONSKILLDMG ||

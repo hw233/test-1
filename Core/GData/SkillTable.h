@@ -46,6 +46,8 @@ enum
     /*20*/ SKILL_ONBEMAGDMG,
     /*21*/ SKILL_ONHP10P,    // 生命剩余1/3
     /*22*/ SKILL_DEAD_FAKE,  // 复活
+    /*23*/ SKILL_ABNORMAL_TYPE_DMG,  // 异常类状态伤害
+    /*24*/ SKILL_BLEED_TYPE_DMG,  // 流血类状态伤害
     SKILL_PASSIVES
 };
 

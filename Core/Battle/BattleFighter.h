@@ -1098,13 +1098,19 @@ private:
     void resetAbnormalTypeCnt() { _abnormalTypeCnt = 0; }
 
     UInt8 _bleedTypeCnt;
-    void addBleedTypeCnt() { if(_abnormalTypeCnt < 6) ++_bleedTypeCnt; }
+    void addBleedTypeCnt() { printf("bleed:%u\n", _bleedTypeCnt); if(_abnormalTypeCnt < 6) ++_bleedTypeCnt; }
+    UInt8 getBleedTypeCnt() { return _bleedTypeCnt; }
+    void resetBleedTypeCnt() { _bleedTypeCnt = 0; }
 
     std::vector<GData::SkillItem> _passiveSkillDeadFake100;
     std::vector<GData::SkillItem> _passiveSkillDeadFake;
+    std::vector<GData::SkillItem> _passiveSkillAbnormalTypeDmg;
+    std::vector<GData::SkillItem> _passiveSkillBleedTypeDmg;
 
     const GData::SkillBase* getPassiveSkillDeadFake100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillDeadFake(bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillAbnormalTypeDmg(bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillBleedTypeDmg(bool noPossibleTarget = false);
 
 public:
 	enum StatusFlag

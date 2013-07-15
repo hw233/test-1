@@ -16489,7 +16489,8 @@ void EventTlzAuto::notify(bool isBeginAuto)
             {1531, 1534},
             {1650, 1653},
             {1651, 1654},
-            {1652, 1655}
+            {1652, 1655},
+            {1541, 1542}
         };
         if ((trumpid >= 1529 && trumpid <= 1534)
                 || (trumpid >= 1650 && trumpid <= 1655))
