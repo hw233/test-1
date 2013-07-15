@@ -12204,6 +12204,9 @@ void BattleSimulator::doSkillEffectExtra_AbnormalTypeDmg(BattleFighter* bf, cons
     {
         if(eft[i] == GData::e_eft_abnormal_type_dmg)
         {
+            appendDefStatus(e_skill, skill->getId(), bf);
+            appendDefStatus(e_abnormalType, bf->getAbnormalTypeCnt(), bf);
+
             printf("doSkillEffectExtra_AbnormalTypeDmg\n");
             AtkList atklist;
             getAtkList(bf, skill, atklist);
@@ -12267,6 +12270,8 @@ void BattleSimulator::doSkillEffectExtra_BleedTypeDmg(BattleFighter* bf, const G
         {
             printf("doSkillEffectExtra_BleedTypeDmg\n");
             appendDefStatus(e_skill, skill->getId(), bf);
+            appendDefStatus(e_BleedType, bf->getBleedTypeCnt(), bf);
+
             UInt32 hpMax = bf->getMaxHP();
             UInt32 hp = static_cast<float>(bf->getBleedTypeCnt()) * efv[i] * static_cast<float>(hpMax);
             UInt32 hpr = bf->regenHP(hp);

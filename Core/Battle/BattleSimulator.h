@@ -309,6 +309,8 @@ private:
         e_unLingShiBleed = 94,   // 解除灵蚀
         e_soulout = 95,    // 元神出窍
         e_unSoulout = 96,    // 解除
+        e_abnormalType = 97,    // 异常类状态
+        e_BleedType = 98,    // 流血类状态
 
         e_MAX_STATE,
     };
