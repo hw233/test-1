@@ -1095,7 +1095,7 @@ private:
     void setCriticalDmgReduce(float v) { _criticaldmgreduce = v; }
 
     UInt8 _abnormalTypeCnt;
-    void addAbnormalTypeCnt() { if(_abnormalTypeCnt < 6) ++_abnormalTypeCnt; }
+    void addAbnormalTypeCnt() { printf("abnormal:%u\n", _abnormalTypeCnt); if(_abnormalTypeCnt < 6) ++_abnormalTypeCnt; }
     UInt8 getAbnormalTypeCnt() { return _abnormalTypeCnt; }
     void resetAbnormalTypeCnt() { _abnormalTypeCnt = 0; }
 

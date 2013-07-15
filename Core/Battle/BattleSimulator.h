@@ -549,7 +549,7 @@ private:
     void doSkillEffectExtraCounter(BattleFighter* bf, BattleFighter* bo, const GData::SkillBase* skill);
     void doPassiveSkillOnCounter(BattleFighter* bf, BattleFighter* bo);
 
-    void calcAbnormalTypeCnt();
+    void calcAbnormalTypeCnt(BattleObject* bobj);
 
 private:
 	int _id, _winner, _turns;
