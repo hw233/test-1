@@ -380,9 +380,9 @@ public:
     inline std::vector<UInt16>& getPassiveSkillDeadFake() { return _rpasskl[GData::SKILL_DEAD_FAKE-GData::SKILL_PASSSTART]; }
     inline std::vector<UInt16>& getPassiveSkillDeadFake100() { return _passkl[GData::SKILL_DEAD_FAKE-GData::SKILL_PASSSTART]; }
 
-    inline std::vector<UInt16>& getPassiveSkillAbnormalTypeDmg100() { return _rpasskl[GData::SKILL_ABNORMAL_TYPE_DMG-GData::SKILL_PASSSTART]; }
-    inline std::vector<UInt16>& getPassiveSkillBleedTypeDmg100() { return _rpasskl[GData::SKILL_BLEED_TYPE_DMG-GData::SKILL_PASSSTART]; }
-    inline std::vector<UInt16>& getPassiveSkillBleedTypeDmg() { return _passkl[GData::SKILL_BLEED_TYPE_DMG-GData::SKILL_PASSSTART]; }
+    inline std::vector<UInt16>& getPassiveSkillAbnormalTypeDmg100() { return _passkl[GData::SKILL_ABNORMAL_TYPE_DMG-GData::SKILL_PASSSTART]; }
+    inline std::vector<UInt16>& getPassiveSkillBleedTypeDmg100() { return _passkl[GData::SKILL_BLEED_TYPE_DMG-GData::SKILL_PASSSTART]; }
+    inline std::vector<UInt16>& getPassiveSkillBleedTypeDmg() { return _rpasskl[GData::SKILL_BLEED_TYPE_DMG-GData::SKILL_PASSSTART]; }
 
     // 取得心法带出技能的ID表
     const std::vector<const GData::SkillBase*>& skillFromCitta(UInt16 citta);

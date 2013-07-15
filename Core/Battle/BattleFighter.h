@@ -1098,7 +1098,7 @@ private:
     void useAbnormalTypeCnt() { if(_abnormalTypeCnt >= 3) _abnormalTypeCnt -= 3; }
 
     UInt8 _bleedTypeCnt;
-    void addBleedTypeCnt() { printf("bleed:%u\n", _bleedTypeCnt); if(_abnormalTypeCnt < 5) ++_bleedTypeCnt; }
+    void addBleedTypeCnt() { printf("bleed:%u\n", _bleedTypeCnt); if(_bleedTypeCnt < 5) ++_bleedTypeCnt; }
     UInt8 getBleedTypeCnt() { return _bleedTypeCnt; }
     void useBleedTypeCnt() { if(_bleedTypeCnt >= 3) _bleedTypeCnt -= 3; }
 
