@@ -3233,6 +3233,13 @@ namespace GObject
 		st << Stream::eos;
     }
 
+    void Player::sendFighterSSListWithNoSkill()
+    {
+        Stream st;
+        makeFighterSSListWithNoSkill(st);
+		send(st);
+    }
+
 	/*void Player::xingchenInfo()
 	{
 		for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++it)
@@ -20971,7 +20978,7 @@ void Player::sendNuwaInfo()
         if(GET_BIT_3(signet, i))
             ++ c;
     }
-    if(c >= 3 || c <= 0)
+    if(c >= 3 || c <= 0 || GET_BIT_3(signet, 0))
     {
         //不能使用World::_wday,有30秒误差
         time_t curtime = time(NULL);
