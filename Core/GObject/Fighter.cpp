@@ -2426,6 +2426,14 @@ void Fighter::findTrumpByTypeId(std::vector<ItemEquip*>& ret, UInt32 id)
                 ret.push_back(_trump[idx]);
         }
     }
+
+    if(_innateTrump)
+    {
+        if(_innateTrump->GetItemType().getId() == id)
+        {
+            ret.push_back(_innateTrump);
+        }
+    }
 }
 
 void Fighter::removeEquip( UInt8 pos, ItemEquip * equip, UInt8 toWhere )
