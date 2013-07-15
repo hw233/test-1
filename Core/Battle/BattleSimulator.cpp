@@ -1163,8 +1163,12 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
         if(area_target->isSoulOut())
             return 0;
 
-        if(area_target->isLingQu())
+        UInt8& lingquTimes = area_target->getLingQuTimes();
+        if(lingquTimes > 0)
+        {
+            -- lingquTimes;
             colorStock = true;
+        }
 
         GData::LBSkillItem* itemLing = NULL;
         if(first)
@@ -1887,6 +1891,10 @@ UInt32 BattleSimulator::doPoisonAttack(BattleFighter* bf, bool cs, const GData::
             break;
     }
 
+    UInt8& lingquTimes = area_target->getLingQuTimes();
+    if(lingquTimes > 0)
+        -- lingquTimes;
+
     return dmg;
 }
 
@@ -2416,7 +2424,10 @@ bool BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
 
     BattleFighter* target_bo = static_cast<BattleFighter*>(bo);
     if(target_bo->isLingQu() || target_bo->getHP() == 0 || target_bo->isSoulOut())
+    {
+        dmg = 0;
         return false;
+    }
 
     UInt16 effect_state = skill->effect->state;
     getSkillEffectExtraBlind(bf, target_bo, skill, effect_state);
