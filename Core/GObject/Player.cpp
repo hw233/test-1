@@ -79,6 +79,7 @@
 #include "GData/ExpTable.h"
 #include "Version.h"
 #include "GObject/ClanBoss.h"
+#include "ClanCityBattle.h"
 
 
 #define NTD_ONLINE_TIME (4*60*60)
@@ -290,12 +291,12 @@ namespace GObject
 		if(count > 0)
 		{
 			if(isNew)
-				DB3().PushUpdateData("REPLACE INTO `auto_battle`(`playerId`, `npcId`, `count`, `interval`) VALUES(%"I64_FMT"u, %u, %u, %u)", m_Player->getId(), /*_npcGroup->getId()*/0, count, m_Timer.GetInterval());
+				DB3().PushUpdateData("REPLACE INTO `auto_battle`(`playerId`, `npcId`, `count`, `interval`) VALUES(%" I64_FMT "u, %u, %u, %u)", m_Player->getId(), /*_npcGroup->getId()*/0, count, m_Timer.GetInterval());
 			else
-				DB3().PushUpdateData("UPDATE `auto_battle` SET `count` = %u WHERE `playerId` = %"I64_FMT"u", count, m_Player->getId());
+				DB3().PushUpdateData("UPDATE `auto_battle` SET `count` = %u WHERE `playerId` = %" I64_FMT "u", count, m_Player->getId());
 		}
 		else
-			DB3().PushUpdateData("DELETE FROM `auto_battle` WHERE `playerId` = %"I64_FMT"u", m_Player->getId());
+			DB3().PushUpdateData("DELETE FROM `auto_battle` WHERE `playerId` = %" I64_FMT "u", m_Player->getId());
 	}
 
 	bool EventFighterTrain::Equal(UInt32 id, size_t fgtId) const
@@ -330,7 +331,7 @@ namespace GObject
 		_fighter->addExp(exp);
 		data->accExp += exp;
 		data->checktime = leftCount;
-		DB().PushUpdateData("UPDATE `fighter_train` SET `checkTime` = %u, `accExp` = %u WHERE `fgtId` = %u AND `ownerId` = %"I64_FMT"u", data->checktime, data->accExp, fgtId, m_Player->getId());
+		DB().PushUpdateData("UPDATE `fighter_train` SET `checkTime` = %u, `accExp` = %u WHERE `fgtId` = %u AND `ownerId` = %" I64_FMT "u", data->checktime, data->accExp, fgtId, m_Player->getId());
 		if(leftCount == 0)
 		{
 			m_Player->delTrainFighter(fgtId, true);
@@ -378,7 +379,7 @@ namespace GObject
             data->checktime = 0;
 		if(leftCount == 0 || data->checktime == 0)
 		{
-            DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u, `place` = %u, `slot` = %u, winnerid = %"I64_FMT"u, fighters = '' WHERE `id` = %"I64_FMT"u", data->checktime, PPLACE_MAX, 0, 0, m_Player->getId());
+            DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u, `place` = %u, `slot` = %u, winnerid = %" I64_FMT "u, fighters = '' WHERE `id` = %" I64_FMT "u", data->checktime, PPLACE_MAX, 0, 0, m_Player->getId());
             GameMsgHdr hdr1(0x1F7, WORKER_THREAD_WORLD, m_Player, 0);
             GLOBAL().PushMsg(hdr1, NULL);
 			PopTimerEvent(m_Player, EVENT_PLAYERPRACTICING, m_Player->getId());
@@ -386,7 +387,7 @@ namespace GObject
 		}
         else
         {
-            DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u WHERE `id` = %"I64_FMT"u",
+            DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u WHERE `id` = %" I64_FMT "u",
                     data->checktime, m_Player->getId());
         }
         return;
@@ -445,13 +446,13 @@ namespace GObject
                 data->checktime = 0;
             if(data->checktime == 0)
             {
-                DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u, `place` = %u, `slot` = %u, winnerid = %"I64_FMT"u, fighters = '' WHERE `id` = %"I64_FMT"u", data->checktime, PPLACE_MAX, 0, 0, m_Player->getId());
+                DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u, `place` = %u, `slot` = %u, winnerid = %" I64_FMT "u, fighters = '' WHERE `id` = %" I64_FMT "u", data->checktime, PPLACE_MAX, 0, 0, m_Player->getId());
                 practicePlace.stop(m_Player);
                 PopTimerEvent(m_Player, EVENT_PLAYERPRACTICING, m_Player->getId());
             }
             else
             {
-                DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u WHERE `id` = %"I64_FMT"u",
+                DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u WHERE `id` = %" I64_FMT "u",
                         data->checktime, m_Player->getId());
             }
 
@@ -509,12 +510,12 @@ namespace GObject
             PopTimerEvent(m_Player, EVENT_PLAYERPRTRIPOD, m_Player->getId());
             data.awdst = 1;
             data.soul = MAX_TRIPOD_SOUL;
-            DB().PushUpdateData("UPDATE `tripod` SET `awdst` = %u WHERE `id` = %"I64_FMT"u", data.awdst, m_Player->getId());
+            DB().PushUpdateData("UPDATE `tripod` SET `awdst` = %u WHERE `id` = %" I64_FMT "u", data.awdst, m_Player->getId());
             return;
         }
 
         if (!(leftCount % 3))
-            DB().PushUpdateData("UPDATE `tripod` SET `soul` = %u WHERE `id` = %"I64_FMT"u", data.soul, m_Player->getId());
+            DB().PushUpdateData("UPDATE `tripod` SET `soul` = %u WHERE `id` = %" I64_FMT "u", data.soul, m_Player->getId());
     }
 
     bool EventAutoCopy::Equal(UInt32 id, size_t playerid) const
@@ -676,6 +677,7 @@ namespace GObject
         m_ClanBattleSkillFlag = 0;
         _invitedBy = 0;
         m_arenaCommitCD = 0;
+        _inClanCity = false;
 
 		memset(_buffData, 0, sizeof(UInt32) * PLAYER_BUFF_COUNT);
 		m_Package = new Package(this);
@@ -712,7 +714,7 @@ namespace GObject
         _isForbidSale = false;
 
         char buf[64] = {0};
-        snprintf(buf, sizeof(buf), "%"I64_FMT"u", _id);
+        snprintf(buf, sizeof(buf), "%" I64_FMT "u", _id);
 #ifndef _WIN32
         m_ulog = _analyzer.GetInstance(buf);
         m_ulog->SetUserIP("0.0.0.0");
@@ -729,6 +731,8 @@ namespace GObject
         _cbHPflag = false;
 
         _inQQGroup = false;
+
+        _loadMark = false;
 	}
 
 
@@ -807,7 +811,7 @@ namespace GObject
             _playerData.totalRecharge = 5888888;
         else if (lvl == 15)
             _playerData.totalRecharge = 8888888;
-		DB1().PushUpdateData("UPDATE `player` SET `totalRecharge` = %u WHERE `id` = %"I64_FMT"u", _playerData.totalRecharge, getId());
+		DB1().PushUpdateData("UPDATE `player` SET `totalRecharge` = %u WHERE `id` = %" I64_FMT "u", _playerData.totalRecharge, getId());
         recalcVipLevel();
 		sendModification(7, _playerData.totalRecharge);
     }
@@ -1028,7 +1032,7 @@ namespace GObject
             setBuffData(PLAYER_BUFF_ONLINE, 0);
 
 		_playerData.lastOnline = curtime;
-		DB1().PushUpdateData("UPDATE `player` SET `lastOnline` = %u WHERE `id` = %"I64_FMT"u", curtime, getId());
+		DB1().PushUpdateData("UPDATE `player` SET `lastOnline` = %u WHERE `id` = %" I64_FMT "u", curtime, getId());
 
 		if(_isOnline)
 			_isOnline = false;
@@ -1179,7 +1183,7 @@ namespace GObject
                     strItems += "|";
                 }
 
-                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
             }
         }
 
@@ -1193,7 +1197,7 @@ namespace GObject
         sendSnakeSpringEquipMail();
 
         char buf[64] = {0};
-        snprintf(buf, sizeof(buf), "%"I64_FMT"u", _id);
+        snprintf(buf, sizeof(buf), "%" I64_FMT "u", _id);
 #ifndef _WIN32
         if (!m_ulog)
             m_ulog = _analyzer.GetInstance(buf);
@@ -1264,7 +1268,7 @@ namespace GObject
                     strItems += "|";
                 }
 
-                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
             }
 		}
         */
@@ -1290,6 +1294,12 @@ namespace GObject
 #ifdef DREAMER_DEBUG
         getDreamer();
 #endif
+
+        if(!_loadMark)
+        {
+            LOAD().Push(getId(), 0);
+            _loadMark = true;
+        }
 	}
 
 #define WEBDOWNLOAD 255
@@ -1303,10 +1313,10 @@ namespace GObject
             char buf[1024] = {0};
             char* pbuf = &buf[0];
             if (cfg.isTestPlatform)
-                pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u|%u|%u|%u|%u|%u|%u||%u||%u|1|",
+                pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%" I64_FMT "u|%s|||||%u||%u|%u|%u|%u|%u|%u|%u||%u||%u|1|",
                     cfg.serverNum, cfg.tcpPort, getId(), getOpenId(), GetLev(), _playerData.gold, _playerData.coupon, _playerData.tael, getVipLevel(), _clan? _clan->getId() : 0, getXinYue(), _playerData.qqvipl, cfg.serverNum, platform);
             else
-                pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u|%u|%u|%u|%u|%u|%u||%u||%u|",
+                pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%" I64_FMT "u|%s|||||%u||%u|%u|%u|%u|%u|%u|%u||%u||%u|",
                     cfg.serverNum, cfg.tcpPort, getId(), getOpenId(), GetLev(), _playerData.gold, _playerData.coupon, _playerData.tael, getVipLevel(), _clan? _clan->getId() : 0, getXinYue(), _playerData.qqvipl, cfg.serverNum, platform);
 
             m_ulog->SetUserMsg(buf);
@@ -1392,7 +1402,8 @@ namespace GObject
             DB8().PushUpdateData("INSERT INTO `money` (`time`, `type`, `gold`, `coupon`, `tael`, `achievement`, `prestige`) VALUES (%d,1,0,0,0,0,0)", today);
             DB8().PushUpdateData("INSERT INTO `money` (`time`, `type`, `gold`, `coupon`, `tael`, `achievement`, `prestige`) VALUES (%d,2,0,0,0,0,0)", today);
         }
-        DB8().PushUpdateData("UPDATE `money` SET `gold` = `gold` + %d, `coupon` = `coupon` + %d, `tael` = `tael` + %d, `achievement` = `achievement` + %d, `prestige` = `prestige` + %d WHERE `time` = %d AND `type` = %d", gold, coupon, tael, achievement, prestige, today, type);
+        if(gold != 0 || coupon != 0 || tael != 0 || achievement!= 0 || prestige != 0)
+            DB8().PushUpdateData("UPDATE `money` SET `gold` = `gold` + %d, `coupon` = `coupon` + %d, `tael` = `tael` + %d, `achievement` = `achievement` + %d, `prestige` = `prestige` + %d WHERE `time` = %d AND `type` = %d", gold, coupon, tael, achievement, prestige, today, type);
 
         World::_moneyLogged = now;
         // TODO:
@@ -1426,6 +1437,7 @@ namespace GObject
 
     void Player::skillStrengthenLog(UInt8 type, UInt32 val)
     {
+        return; // XXX: 取消上报
         char action[16] = "";
         UInt32 num = 1;
         switch (type)
@@ -1505,6 +1517,7 @@ namespace GObject
 
     void Player::athleticsUdpLog(UInt32 id, UInt8 type /* = 0 */)
     {
+        return; // XXX: 取消上报
         // 斗剑功能相关日志
         char action[16] = "";
         if (type)
@@ -1602,6 +1615,7 @@ namespace GObject
 
     void Player::secondSoulUdpLog(UInt32 id, UInt32 val /* = 0 */, UInt32 num /* = 1 */)
     {
+        return; // XXX: 取消上报
         // 元神相关日志
         char action[16] = "";
         if (val)
@@ -1627,6 +1641,7 @@ namespace GObject
 
     void Player::clanCopyUdpLog(UInt32 id, UInt32 val /* = 0 */, UInt32 num /* = 1 */)
     {
+        return; // XXX: 取消上报
         // 帮派副本相关日志
         char action[16] = "";
         if (val)
@@ -1657,6 +1672,7 @@ namespace GObject
 
     void Player::storeUdpLog(UInt32 id, UInt32 type, UInt32 itemId, UInt32 num /* = 1 */)
     {
+        return; // XXX: 取消上报
         // 商城购买相关日志（现在只有荣誉和声望）
         char action[32] = "";
         snprintf (action, 32, "F_%d_%d_%d", id, type, itemId);
@@ -1731,7 +1747,7 @@ namespace GObject
             if (_online)
             {
                 _playerData.lastOnline = now;
-                DB1().PushUpdateData("UPDATE `player` SET `lastOnline` = %u WHERE `id` = %"I64_FMT"u", now, getId());
+                DB1().PushUpdateData("UPDATE `player` SET `lastOnline` = %u WHERE `id` = %" I64_FMT "u", now, getId());
             }
         }
         else
@@ -1760,7 +1776,7 @@ namespace GObject
                 strItems += Itoa(mitem[i].count);
                 strItems += "|";
             }
-            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
         }
 
         if (online == 3)
@@ -1780,7 +1796,7 @@ namespace GObject
                     strItems += Itoa(mitem[i].count);
                     strItems += "|";
                 }
-                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
             }
         }
 
@@ -1808,7 +1824,7 @@ namespace GObject
                 strItems += Itoa(mitem[i].count);
                 strItems += "|";
             }
-            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
             setBuffData(PLAYER_BUFF_ONLINE, static_cast<UInt32>(-1), true);
         }
     }
@@ -1884,7 +1900,7 @@ namespace GObject
             case 2:
             case 1:
                 _playerData.qqawardgot |= value;
-                DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u",
+                DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %" I64_FMT "u",
                         _playerData.qqawardgot, getId());
             break;
 
@@ -1919,7 +1935,7 @@ namespace GObject
                 strItems += "|";
             }
             mailPackageManager.push(mail->id, mitem, size, true);
-            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, _title, _content, strItems.c_str(), mail->recvTime);
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, _title, _content, strItems.c_str(), mail->recvTime);
             delete mitem;
         }
     }
@@ -1943,7 +1959,7 @@ namespace GObject
                 strItems += "|";
             }
             mailPackageManager.push(mail->id, mitem, size, bind);
-            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, _title, _content, strItems.c_str(), mail->recvTime);
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, _title, _content, strItems.c_str(), mail->recvTime);
         }
     }
 
@@ -1953,7 +1969,7 @@ namespace GObject
         {
             GetPackage()->Add(37, 1, true, true);
             _playerData.qqawardgot |= 0x10;
-            DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardgot, getId());
+            DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %" I64_FMT "u", _playerData.qqawardgot, getId());
         }
         /** deleted by suntao 2013-6-29 **/
 #if 0
@@ -1972,10 +1988,10 @@ namespace GObject
                 strItems += ",";
                 strItems += Itoa(mitem[0].count);
                 strItems += "|";
-                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
 
                 _playerData.qqawardgot |= 0x10;
-                DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardgot, getId());
+                DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %" I64_FMT "u", _playerData.qqawardgot, getId());
             }
         }
 #endif
@@ -1996,10 +2012,10 @@ namespace GObject
                 strItems += ",";
                 strItems += Itoa(mitem[0].count);
                 strItems += "|";
-                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
 
                 _playerData.qqawardgot |= 0x08;
-                DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardgot, getId());
+                DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %" I64_FMT "u", _playerData.qqawardgot, getId());
             }
         }
 #endif
@@ -2079,7 +2095,7 @@ namespace GObject
         */
 
         int addr = inet_addr(m_clientIp);
-		DBLOG1().PushUpdateData("update login_states set logout_time=%u where server_id=%u and player_id=%"I64_FMT"u and login_time=%u", curtime, addr?addr:cfg.serverLogId, _id, _playerData.lastOnline);
+		DBLOG1().PushUpdateData("update login_states set logout_time=%u where server_id=%u and player_id=%" I64_FMT "u and login_time=%u", curtime, addr?addr:cfg.serverLogId, _id, _playerData.lastOnline);
 		writeOnlineRewardToDB();
 
 		removeStatus(SGPunish);
@@ -2124,8 +2140,8 @@ namespace GObject
 		}
         setQQGameOnlineTotalTime();
         int addr = inet_addr(m_clientIp);
-		DBLOG1().PushUpdateData("update login_states set logout_time=%u where server_id=%u and player_id=%"I64_FMT"u and login_time=%u", curtime, addr?addr:cfg.serverLogId, _id, _playerData.lastOnline);
-		DB1().PushUpdateData("UPDATE `player` SET `lastOnline` = %u, `nextReward` = '%u|%u|%u|%u' WHERE `id` = %"I64_FMT"u", curtime, _playerData.rewardStep, _playerData.nextRewardItem, _playerData.nextRewardCount, _playerData.nextRewardTime, _id);
+		DBLOG1().PushUpdateData("update login_states set logout_time=%u where server_id=%u and player_id=%" I64_FMT "u and login_time=%u", curtime, addr?addr:cfg.serverLogId, _id, _playerData.lastOnline);
+		DB1().PushUpdateData("UPDATE `player` SET `lastOnline` = %u, `nextReward` = '%u|%u|%u|%u' WHERE `id` = %" I64_FMT "u", curtime, _playerData.rewardStep, _playerData.nextRewardItem, _playerData.nextRewardCount, _playerData.nextRewardTime, _id);
         if(_isOnline && !hasFlag(Training))
         {
             //if(cfg.GMCheck)
@@ -2340,7 +2356,7 @@ namespace GObject
 
 		if(update)
 		{
-			DB1().PushUpdateDataL("UPDATE `player` SET `lastExp` = 0, `lastResource` = 0 WHERE `id` = %"I64_FMT"u", _id);
+			DB1().PushUpdateDataL("UPDATE `player` SET `lastExp` = 0, `lastResource` = 0 WHERE `id` = %" I64_FMT "u", _id);
 		}
 	}
 
@@ -2546,7 +2562,7 @@ namespace GObject
 
 	void Player::storeFighters()
 	{
-		DB1().PushUpdateData("UPDATE `player` SET `lineup` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u' WHERE id = %" I64_FMT "u",
+		DB1().PushUpdateData("UPDATE `player` SET `lineup` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u' WHERE id = %"  I64_FMT  "u",
 			_playerData.lineup[0].fid, _playerData.lineup[0].pos, _playerData.lineup[1].fid, _playerData.lineup[1].pos,
 			_playerData.lineup[2].fid, _playerData.lineup[2].pos, _playerData.lineup[3].fid, _playerData.lineup[3].pos,
 			_playerData.lineup[4].fid, _playerData.lineup[4].pos, getId());
@@ -2704,7 +2720,7 @@ namespace GObject
 			UInt32 p = static_cast<UInt32>((fgt->getPotential()+0.005) * 100);
 			UInt32 c = static_cast<UInt32>((fgt->getCapacity()+0.05) * 100);
 			DB2().PushUpdateData("INSERT INTO `fighter` (`id`, `playerId`, `potential`, `capacity`, `level`, `experience`)\
-                    VALUES(%u, %"I64_FMT"u, %u.%02u, %u.%02u, %u, %u)",
+                    VALUES(%u, %" I64_FMT "u, %u.%02u, %u.%02u, %u, %u)",
                     id, getId(), p / 100, p % 100, c / 100, c % 100, fgt->getLevel(), fgt->getExp());
 
             //招募散仙荣誉
@@ -2937,8 +2953,8 @@ namespace GObject
 				m_Package->EquipTo(0, fgt, t+0x60, equip, true);
 
 			_fighters.erase(it);
-			DB2().PushUpdateData("DELETE FROM `fighter` WHERE `id` = %u AND `playerId` = %"I64_FMT"u", id, getId());
-			DB2().PushUpdateData("DELETE FROM `second_soul` WHERE `fighterId` = %u AND `playerId` = %"I64_FMT"u", id, getId());
+			DB2().PushUpdateData("DELETE FROM `fighter` WHERE `id` = %u AND `playerId` = %" I64_FMT "u", id, getId());
+			DB2().PushUpdateData("DELETE FROM `second_soul` WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", id, getId());
 
             if(fgt->getColor() >= 2) //删除散仙荣誉
                 GameAction()->doAttainment(this, 10107, fgt->getColor());
@@ -3095,7 +3111,7 @@ namespace GObject
 		if(_playerData.formation == f)
 			return true;
 		_playerData.formation = f;
-		DB1().PushUpdateData("UPDATE `player` SET `formation` = %u WHERE id = %"I64_FMT"u", f, _id);
+		DB1().PushUpdateData("UPDATE `player` SET `formation` = %u WHERE id = %" I64_FMT "u", f, _id);
 
         return true;
 	}
@@ -3193,10 +3209,36 @@ namespace GObject
 		for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
         {
             if (it->second)
+            {
                 it->second->makeFighterSSInfo(st);
+            }
         }
 		st << Stream::eos;
 	}
+
+
+	void Player::makeFighterSSListWithNoSkill( Stream& st )
+    {
+		size_t c = _fighters.size();
+		st.init(REP::SKILLSTRENGTHEN);
+        st << static_cast<UInt8>(2);
+		st << static_cast<UInt8>(c);
+		for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
+        {
+            if (it->second)
+            {
+                it->second->makeFighterSSInfoWithNoSkill(st);
+            }
+        }
+		st << Stream::eos;
+    }
+
+    void Player::sendFighterSSListWithNoSkill()
+    {
+        Stream st;
+        makeFighterSSListWithNoSkill(st);
+		send(st);
+    }
 
 	/*void Player::xingchenInfo()
 	{
@@ -3286,7 +3328,7 @@ namespace GObject
  		if ((stepVal & _playerData.newGuild) == 0)
 		{
 			_playerData.newGuild |= stepVal;
-			DB1().PushUpdateData("UPDATE `player` SET `newGuild` = %"I64_FMT"u WHERE `id` = %"I64_FMT"u", _playerData.newGuild, _id);
+			DB1().PushUpdateData("UPDATE `player` SET `newGuild` = %" I64_FMT "u WHERE `id` = %" I64_FMT "u", _playerData.newGuild, _id);
 			switch (step)
 			{
 			case 3:
@@ -3318,7 +3360,7 @@ namespace GObject
 		send(st);
 #else
         PLAYER_DATA(this, newGuild) = step;
-        DB1().PushUpdateData("UPDATE `player` SET `newGuild` = %"I64_FMT"u WHERE `id` = %"I64_FMT"u", _playerData.newGuild, getId());
+        DB1().PushUpdateData("UPDATE `player` SET `newGuild` = %" I64_FMT "u WHERE `id` = %" I64_FMT "u", _playerData.newGuild, getId());
 #endif
 		return true;
 	}
@@ -3886,7 +3928,7 @@ namespace GObject
             cnt = getMaxIcCount(getVipLevel());
 		st << static_cast<UInt32>(0) << static_cast<UInt8>(0) << static_cast<UInt16>(0) << static_cast<UInt32>(0) << cnt << Stream::eos;
 		send(st);
-		DB3().PushUpdateData("DELETE FROM `auto_battle` WHERE `playerId` = %"I64_FMT"u", _id);
+		DB3().PushUpdateData("DELETE FROM `auto_battle` WHERE `playerId` = %" I64_FMT "u", _id);
 		delFlag(Training);
 	}
 
@@ -4177,7 +4219,7 @@ namespace GObject
 			SYSMSG_SEND(132, this);
 			SYSMSG_SENDV(1032, this, pl->getCountry(), pl->getName().c_str());
 			if(writedb)
-				DB1().PushUpdateData("REPLACE INTO `friend` (`id`, `type`, `friendId`) VALUES (%"I64_FMT"u, 0, %"I64_FMT"u)", getId(), pl->getId());
+				DB1().PushUpdateData("REPLACE INTO `friend` (`id`, `type`, `friendId`) VALUES (%" I64_FMT "u, 0, %" I64_FMT "u)", getId(), pl->getId());
 		}
 		_friends[0].insert(pl);
 
@@ -4203,7 +4245,7 @@ namespace GObject
 			SYSMSG_SEND(2341, this);
 			SYSMSG_SENDV(2342, this, pl->getCountry(), pl->getName().c_str());
 			if(writedb)
-				DB1().PushUpdateData("REPLACE INTO `friend` (`id`, `type`, `friendId`) VALUES (%"I64_FMT"u, 3, %"I64_FMT"u)", getId(), pl->getId());
+				DB1().PushUpdateData("REPLACE INTO `friend` (`id`, `type`, `friendId`) VALUES (%" I64_FMT "u, 3, %" I64_FMT "u)", getId(), pl->getId());
 		}
 		_friends[3].insert(pl);
         //更新密友信息
@@ -4237,7 +4279,7 @@ namespace GObject
 		SYSMSG_SEND(134, this);
 		SYSMSG_SENDV(1034, this, pl->getCountry(), pl->getName().c_str());
 		if(writedb)
-			DB1().PushUpdateData("DELETE FROM `friend` WHERE `id` = %"I64_FMT"u AND `type` = 0 AND `friendId` = %"I64_FMT"u", getId(), pl->getId());
+			DB1().PushUpdateData("DELETE FROM `friend` WHERE `id` = %" I64_FMT "u AND `type` = 0 AND `friendId` = %" I64_FMT "u", getId(), pl->getId());
 	}
 
 	void Player::delCFriendInternal( Player * pl, bool writedb )
@@ -4252,7 +4294,7 @@ namespace GObject
 		SYSMSG_SEND(2339, this);
 		SYSMSG_SENDV(2340, this, pl->getCountry(), pl->getName().c_str());
 		if(writedb)
-			DB1().PushUpdateData("DELETE FROM `friend` WHERE `id` = %"I64_FMT"u AND `type` = 3 AND `friendId` = %"I64_FMT"u", getId(), pl->getId());
+			DB1().PushUpdateData("DELETE FROM `friend` WHERE `id` = %" I64_FMT "u AND `type` = 3 AND `friendId` = %" I64_FMT "u", getId(), pl->getId());
 	}
 
 	Player * Player::_findFriend( UInt8 type, std::string& name )
@@ -4295,7 +4337,7 @@ namespace GObject
 		Stream st(REP::FRIEND_ACTION);
 		st << static_cast<UInt8>(0x03) << pl->getId() << pl->getName() << pl->getPF() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry() << pl->GetLev() << pl->GetClass() << pl->getClanName() << Stream::eos;
 		send(st);
-		DB1().PushUpdateData("REPLACE INTO `friend` (`id`, `type`, `friendId`) VALUES (%"I64_FMT"u, 1, %"I64_FMT"u)", getId(), pl->getId());
+		DB1().PushUpdateData("REPLACE INTO `friend` (`id`, `type`, `friendId`) VALUES (%" I64_FMT "u, 1, %" I64_FMT "u)", getId(), pl->getId());
 		SYSMSG_SEND(135, this);
 		SYSMSG_SENDV(1035, this, pl->getCountry(), pl->getName().c_str());
 
@@ -4321,7 +4363,7 @@ namespace GObject
 		Stream st(REP::FRIEND_ACTION);
 		st << static_cast<UInt8>(0x04) << pl->getName() << Stream::eos;
 		send(st);
-		DB1().PushUpdateData("DELETE FROM `friend` WHERE `id` = %"I64_FMT"u AND `type` = 1 AND `friendId` = %"I64_FMT"u", getId(), pl->getId());
+		DB1().PushUpdateData("DELETE FROM `friend` WHERE `id` = %" I64_FMT "u AND `type` = 1 AND `friendId` = %" I64_FMT "u", getId(), pl->getId());
 		return true;
 	}
 
@@ -4339,7 +4381,7 @@ namespace GObject
 		Stream st(REP::FRIEND_ACTION);
 		st << static_cast<UInt8>(0x05) << pl->getId() << pl->getName() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry() << pl->GetLev() << pl->GetClass() << pl->getClanName() << Stream::eos;
 		send(st);
-		DB1().PushUpdateData("REPLACE INTO `friend` (`id`, `type`, `friendId`) VALUES (%"I64_FMT"u, 2, %"I64_FMT"u)", getId(), pl->getId());
+		DB1().PushUpdateData("REPLACE INTO `friend` (`id`, `type`, `friendId`) VALUES (%" I64_FMT "u, 2, %" I64_FMT "u)", getId(), pl->getId());
 		//SYSMSG_SEND(157, this);
 		//SYSMSG_SENDV(1057, this, pl->getCountry(), pl->getName().c_str());
 
@@ -4372,7 +4414,7 @@ namespace GObject
 		Stream st(REP::FRIEND_ACTION);
 		st << static_cast<UInt8>(0x06) << pl->getName() << Stream::eos;
 		send(st);
-		DB1().PushUpdateData("DELETE FROM `friend` WHERE `id` = %"I64_FMT"u AND `type` = 2 AND `friendId` = %"I64_FMT"u", getId(), pl->getId());
+		DB1().PushUpdateData("DELETE FROM `friend` WHERE `id` = %" I64_FMT "u AND `type` = 2 AND `friendId` = %" I64_FMT "u", getId(), pl->getId());
 		return true;
 	}
 
@@ -4474,9 +4516,9 @@ namespace GObject
 			if(t >= PLAYER_BUFF_START + PLAYER_BUFF_DISPLAY_MAX)
 				return;
 			if(v > 0)
-				DB7().PushUpdateData("REPLACE INTO `player_buff`(`id`, `buffId`, `data`) VALUES(%"I64_FMT"u, %u, %u)", _id, t - PLAYER_BUFF_START, v);
+				DB7().PushUpdateData("REPLACE INTO `player_buff`(`id`, `buffId`, `data`) VALUES(%" I64_FMT "u, %u, %u)", _id, t - PLAYER_BUFF_START, v);
             else
-				DB7().PushUpdateData("DELETE FROM `player_buff` WHERE `id` = %"I64_FMT"u AND `buffId` = %u", _id, t - PLAYER_BUFF_START);
+				DB7().PushUpdateData("DELETE FROM `player_buff` WHERE `id` = %" I64_FMT "u AND `buffId` = %u", _id, t - PLAYER_BUFF_START);
 			return;
 		}
 		const char * field = NULL;
@@ -4496,7 +4538,7 @@ namespace GObject
 		case 0x21: field = "packSizeSoul"; break;
 		}
 		if(field != NULL)
-			DB1().PushUpdateData("UPDATE `player` SET `%s` = %u WHERE `id` = %"I64_FMT"u", field, v, _id);
+			DB1().PushUpdateData("UPDATE `player` SET `%s` = %u WHERE `id` = %" I64_FMT "u", field, v, _id);
         if (t == 7 && TimeUtil::Now() < World::getOpenTime() + 7 * 86400)
         {
             SetVar(VAR_RP7_RECHARGE, v);
@@ -4514,7 +4556,7 @@ namespace GObject
 
         if(ii && ii->incommingType != 0)
         {
-            DBLOG1().PushUpdateData("insert into consume_gold (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+            DBLOG1().PushUpdateData("insert into consume_gold (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
                 cfg.serverLogId, getId(), ii->incommingType, ii->itemId, ii->itemNum, c, TimeUtil::Now());
         }
 
@@ -4548,7 +4590,7 @@ namespace GObject
 		    _playerData.gold -= c;
 		    if(ci!=NULL)
 		    {
-				DBLOG1().PushUpdateData("insert into consume_gold (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+				DBLOG1().PushUpdateData("insert into consume_gold (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
 					cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, c, TimeUtil::Now());
             }
         }
@@ -4657,7 +4699,7 @@ namespace GObject
 
                 if(ci!=NULL)
                 {
-                    DBLOG1().PushUpdateData("insert into consume_gold (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+                    DBLOG1().PushUpdateData("insert into consume_gold (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
                             cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, c, TimeUtil::Now());
                 }
 
@@ -4685,7 +4727,7 @@ namespace GObject
 			}
 			break;
 		}
-		WARN_LOG("Hold money : action[%d]owerId[%"I64_FMT"u]gold[%u]time[%u]",  action, getId(), c, TimeUtil::Now());
+		WARN_LOG("Hold money : action[%d]owerId[%" I64_FMT "u]gold[%u]time[%u]",  action, getId(), c, TimeUtil::Now());
 		return true;
 	}
 
@@ -4741,7 +4783,7 @@ namespace GObject
 		    _playerData.coupon -= c;
             if(ci!=NULL)
 		    {
-				DBLOG1().PushUpdateData("insert into consume_coupon (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+				DBLOG1().PushUpdateData("insert into consume_coupon (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
 					cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, c, TimeUtil::Now());
             }
 #ifndef _WIN32
@@ -4826,7 +4868,7 @@ namespace GObject
 			{
                 std::string tbn("consume_tael");
                 DBLOG1().GetMultiDBName(tbn);
-				DBLOG1().PushUpdateData("insert into %s (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",tbn.c_str(), cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, c, TimeUtil::Now());
+				DBLOG1().PushUpdateData("insert into %s (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",tbn.c_str(), cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, c, TimeUtil::Now());
 			}
 			_playerData.tael -= c;
 #ifndef _WIN32
@@ -4867,7 +4909,7 @@ namespace GObject
 			{
                 std::string tbn("consume_tael");
                 DBLOG1().GetMultiDBName(tbn);
-				DBLOG1().PushUpdateData("insert into %s (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+				DBLOG1().PushUpdateData("insert into %s (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
 					tbn.c_str(),cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, c, TimeUtil::Now());
 			}
 			_playerData.tael -= c;
@@ -4907,7 +4949,7 @@ namespace GObject
 
         if(ii && ii->incommingType != 0)
         {
-            DBLOG1().PushUpdateData("insert into consume_arena (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+            DBLOG1().PushUpdateData("insert into consume_arena (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
                 cfg.serverLogId, getId(), ii->incommingType, ii->itemId, ii->itemNum, c, TimeUtil::Now());
         }
 
@@ -4926,7 +4968,7 @@ namespace GObject
             moneyArena -= a;
             if(ci!=NULL)
             {
-                DBLOG1().PushUpdateData("insert into consume_arena (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+                DBLOG1().PushUpdateData("insert into consume_arena (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
                 cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, a, TimeUtil::Now());
             }
         }
@@ -4959,11 +5001,11 @@ namespace GObject
             st << static_cast<UInt8>(5) << member->proffer << Stream::eos;
             send(st);
         }
-        DB5().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %"I64_FMT"u", member->proffer, this->getId());
+        DB5().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %" I64_FMT "u", member->proffer, this->getId());
 
         if(ii && ii->incommingType != 0)
         {
-            DBLOG1().PushUpdateData("insert into consume_clan_proffer (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+            DBLOG1().PushUpdateData("insert into consume_clan_proffer (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
                 cfg.serverLogId, getId(), ii->incommingType, ii->itemId, ii->itemNum, c, TimeUtil::Now());
         }
 
@@ -4985,7 +5027,7 @@ namespace GObject
             member->proffer -= a;
             if(ci!=NULL)
             {
-                DBLOG1().PushUpdateData("insert into consume_clan_proffer (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+                DBLOG1().PushUpdateData("insert into consume_clan_proffer (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
                 cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, a, TimeUtil::Now());
             }
         }
@@ -4996,7 +5038,7 @@ namespace GObject
             st << static_cast<UInt8>(5) << member->proffer << Stream::eos;
             send(st);
         }
-        DB5().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %"I64_FMT"u", member->proffer, this->getId());
+        DB5().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %" I64_FMT "u", member->proffer, this->getId());
 
         return member->proffer;
     }
@@ -5066,7 +5108,7 @@ namespace GObject
 		{
 		    if(ci!=NULL)
 		    {
-				DBLOG1().PushUpdateData("insert into consume_coin (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+				DBLOG1().PushUpdateData("insert into consume_coin (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
 					cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, c, TimeUtil::Now());
             }
 		    _playerData.coin -= c;
@@ -5105,7 +5147,7 @@ namespace GObject
 			}
 			break;
 		}
-		WARN_LOG("Hold money : action[%d]owerId[%"I64_FMT"u]coin[%u]time[%u]",  action, getId(), c, TimeUtil::Now());
+		WARN_LOG("Hold money : action[%d]owerId[%" I64_FMT "u]coin[%u]time[%u]",  action, getId(), c, TimeUtil::Now());
 		return true;
 	}
 
@@ -5113,7 +5155,7 @@ namespace GObject
     {
         if (!ci)
             return false;
-        DBLOG1().PushUpdateData("insert into consume_demon (server_id,player_id,consume_type,item_id,item_num,id,num,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u,%u)", cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, id, num, TimeUtil::Now());
+        DBLOG1().PushUpdateData("insert into consume_demon (server_id,player_id,consume_type,item_id,item_num,id,num,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u,%u)", cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, id, num, TimeUtil::Now());
         return true;
     }
 
@@ -5205,7 +5247,7 @@ namespace GObject
 		}
 		delete data;
 		_trainFighters.erase(id);
-		DB1().PushUpdateData("DELETE FROM `fighter_train` WHERE `fgtId` = %u AND `ownerId` = %"I64_FMT"u", id, _id);
+		DB1().PushUpdateData("DELETE FROM `fighter_train` WHERE `fgtId` = %u AND `ownerId` = %" I64_FMT "u", id, _id);
 		Stream st(REP::TRAIN_FIGHTER_OP);
 		st << static_cast<UInt8>(2) << id << static_cast<UInt8>(1) << static_cast<UInt32>(0) << Stream::eos;
 		send(st);
@@ -5268,7 +5310,7 @@ namespace GObject
 		data->price = price;
 		data->priceType = priceType;
 		data->trainend = TimeUtil::Now() + 3600 * data->checktime;
-		DB1().PushUpdateData("REPLACE INTO `fighter_train`(`fgtId`, `ownerId`, `priceType`, `price`, `trainTime`, `checkTime`) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u)", id, getId(), priceType, price, data->traintime, data->checktime);
+		DB1().PushUpdateData("REPLACE INTO `fighter_train`(`fgtId`, `ownerId`, `priceType`, `price`, `trainTime`, `checkTime`) VALUES(%u, %" I64_FMT "u, %u, %u, %u, %u)", id, getId(), priceType, price, data->traintime, data->checktime);
 		removeFighterFromLineup(id);
 		EventFighterTrain* event = new(std::nothrow) EventFighterTrain(this, 3600, data->checktime, fgt, data->trainend);
 		if (event == NULL) return false;
@@ -5324,7 +5366,7 @@ namespace GObject
 			}
 			else
 			{
-				DB().PushUpdateData("UPDATE `fighter_train` SET `checkTime` = %u, `accExp` = %u WHERE `fgtId` = %u AND `ownerId` = %"I64_FMT"u", data->checktime, data->accExp, id, _id);
+				DB().PushUpdateData("UPDATE `fighter_train` SET `checkTime` = %u, `accExp` = %u WHERE `fgtId` = %u AND `ownerId` = %" I64_FMT "u", data->checktime, data->accExp, id, _id);
 				Stream st(REP::TRAIN_FIGHTER_OP);
 				UInt32 now = TimeUtil::Now();
 				st << static_cast<UInt8>(2) << id << static_cast<UInt8>(0);
@@ -5589,7 +5631,7 @@ namespace GObject
 		    _playerData.achievement -= a;
 		    if(ci!=NULL)
 		    {
-				DBLOG1().PushUpdateData("insert into consume_achievement (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+				DBLOG1().PushUpdateData("insert into consume_achievement (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
 					cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, a, TimeUtil::Now());
             }
 		}
@@ -5610,7 +5652,7 @@ namespace GObject
 			_playerData.achievement -= a;
 			if(ci!=NULL)
 			{
-				DBLOG1().PushUpdateData("insert into consume_achievement (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+				DBLOG1().PushUpdateData("insert into consume_achievement (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
 					cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, a, TimeUtil::Now());
 			}
 		}
@@ -5659,7 +5701,7 @@ namespace GObject
             SYSMSG_SENDV(1090, this, a);
         }
 
-        DB6().PushUpdateData("UPDATE `player` SET `prestige` = %u WHERE `id` = %"I64_FMT"u", _playerData.prestige, getId());
+        DB6().PushUpdateData("UPDATE `player` SET `prestige` = %u WHERE `id` = %" I64_FMT "u", _playerData.prestige, getId());
 
         Stream st(REP::USER_INFO_CHANGE);
         st << static_cast<UInt8>(0x15) << _playerData.prestige << Stream::eos;
@@ -5687,14 +5729,14 @@ namespace GObject
 		    _playerData.prestige -= a;
 		    if(ci!=NULL)
 		    {
-				DBLOG1().PushUpdateData("insert into consume_prestige (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+				DBLOG1().PushUpdateData("insert into consume_prestige (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
 					cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, a, TimeUtil::Now());
             }
 		}
 		SYSMSG_SENDV(186, this, a);
 		SYSMSG_SENDV(1091, this, a);
 
-        DB6().PushUpdateData("UPDATE `player` SET `prestige` = %u WHERE `id` = %"I64_FMT"u", _playerData.prestige, getId());
+        DB6().PushUpdateData("UPDATE `player` SET `prestige` = %u WHERE `id` = %" I64_FMT "u", _playerData.prestige, getId());
 
         Stream st(REP::USER_INFO_CHANGE);
         st << static_cast<UInt8>(0x15) << _playerData.prestige << Stream::eos;
@@ -5854,6 +5896,11 @@ namespace GObject
 		UInt8 old_cny = GObject::mapCollection.getCountryFromSpot(_playerData.location);
         if (old_cny != cny.GetThreadID())
             return;
+        if(inClanCity() && gClanCity)
+        {
+            if(!gClanCity->playerLeave(this))
+                return;
+        }
 
         if (isJumpingMap())
             return;
@@ -5873,7 +5920,7 @@ namespace GObject
             delFlag(Player::InHeroIsland);
         }
         SpotData * spotData = GetMapSpot();
-        if(spotData && spotData->m_CountryBattle)
+        if(spotData && spotData->m_CountryBattle && !(gClanCity && gClanCity->isOpen()))
         {
             GObject::CountryBattle *cb = spotData->GetCountryBattle();
 	        NewCountryBattle * ncb = spotData->GetNewCountryBattle();
@@ -5935,7 +5982,7 @@ namespace GObject
 
 		_playerData.inCity = inCity ? 1 : 0;
 		_playerData.location = spot;
-		DB1().PushUpdateData("UPDATE `player` SET `inCity` = %u, `location` = %u WHERE id = %" I64_FMT "u", _playerData.inCity, _playerData.location, getId());
+		DB1().PushUpdateData("UPDATE `player` SET `inCity` = %u, `location` = %u WHERE id = %"  I64_FMT  "u", _playerData.inCity, _playerData.location, getId());
 
         ClanRankBattleMgr::Instance().PlayerEnter(this);
 
@@ -5971,7 +6018,7 @@ namespace GObject
 
 	void Player::writeTavernIds()
 	{
-		DB1().PushUpdateData("UPDATE `player` SET `tavernId` = '%u|%u|%u|%u|%u|%u|%u|%u|%u|%u' WHERE `id` = %"I64_FMT"u",
+		DB1().PushUpdateData("UPDATE `player` SET `tavernId` = '%u|%u|%u|%u|%u|%u|%u|%u|%u|%u' WHERE `id` = %" I64_FMT "u",
                 _playerData.tavernId[0], _playerData.tavernId[1], _playerData.tavernId[2], _playerData.tavernId[3],
                 _playerData.tavernId[4], _playerData.tavernId[5], _playerData.tavernBlueCount,
                 _playerData.tavernPurpleCount, _playerData.tavernOrangeCount, _nextTavernUpdate, _id);
@@ -6017,7 +6064,7 @@ namespace GObject
             shimen += '|';
         }
 
-		DB1().PushUpdateData("UPDATE `player` SET `shimen` = '%s%u|%u|%u', `fshimen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u' WHERE `id` = %"I64_FMT"u",
+		DB1().PushUpdateData("UPDATE `player` SET `shimen` = '%s%u|%u|%u', `fshimen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u' WHERE `id` = %" I64_FMT "u",
                 shimen.c_str(), _playerData.smFreeCount, _playerData.smFinishCount, _playerData.smAcceptCount,
                 _playerData.fshimen[0], _playerData.fsmcolor[0], _playerData.fshimen[1], _playerData.fsmcolor[1],
                 _playerData.fshimen[2], _playerData.fsmcolor[2], _playerData.fshimen[3], _playerData.fsmcolor[3],
@@ -6043,7 +6090,7 @@ namespace GObject
             yamen += '|';
         }
 
-		DB1().PushUpdateData("UPDATE `player` SET `yamen` = '%s%u|%u|%u',`fyamen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u' WHERE `id` = %"I64_FMT"u",
+		DB1().PushUpdateData("UPDATE `player` SET `yamen` = '%s%u|%u|%u',`fyamen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u' WHERE `id` = %" I64_FMT "u",
                 yamen.c_str(), _playerData.ymFreeCount, _playerData.ymFinishCount, _playerData.ymAcceptCount,
                 _playerData.fyamen[0], _playerData.fymcolor[0], _playerData.fyamen[1], _playerData.fymcolor[1],
                 _playerData.fyamen[2], _playerData.fymcolor[2], _playerData.fyamen[3], _playerData.fymcolor[3],
@@ -6079,7 +6126,7 @@ namespace GObject
             yamen += '|';
         }
 
-		DB1().PushUpdateData("UPDATE `player` SET `shimen` = '%s|%u|%u|%u', `fshimen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u', `yamen` = '%s|%u|%u|%u', `fyamen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u' WHERE `id` = %"I64_FMT"u",
+		DB1().PushUpdateData("UPDATE `player` SET `shimen` = '%s|%u|%u|%u', `fshimen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u', `yamen` = '%s|%u|%u|%u', `fyamen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u' WHERE `id` = %" I64_FMT "u",
                 shimen.c_str(), _playerData.smFreeCount, _playerData.smFinishCount, _playerData.smAcceptCount,
                 _playerData.fshimen[0], _playerData.fsmcolor[0], _playerData.fshimen[1], _playerData.fsmcolor[1],
                 _playerData.fshimen[2], _playerData.fsmcolor[2], _playerData.fshimen[3], _playerData.fsmcolor[3],
@@ -6451,7 +6498,7 @@ namespace GObject
         st << Stream::eos;
         send(st);
 
-		DB1().PushUpdateData("UPDATE `player` SET `clantask` = '%u,%u' WHERE `id` = %"I64_FMT"u",  _playerData.clanTaskId, _playerData.ctFinishCount, _id);
+		DB1().PushUpdateData("UPDATE `player` SET `clantask` = '%u,%u' WHERE `id` = %" I64_FMT "u",  _playerData.clanTaskId, _playerData.ctFinishCount, _id);
 	}
 
     UInt32 Player::getClanTaskId()
@@ -7218,7 +7265,7 @@ namespace GObject
 		if(_playerData.gmLevel == l)
 			return;
 		_playerData.gmLevel = l;
-		DB1().PushUpdateData("UPDATE `player` SET `gmLevel` = %u WHERE `id` = %"I64_FMT"u", l, _id);
+		DB1().PushUpdateData("UPDATE `player` SET `gmLevel` = %u WHERE `id` = %" I64_FMT "u", l, _id);
 	}
 
 	void Player::autoLineup( Fighter * fgt )
@@ -7292,7 +7339,7 @@ namespace GObject
 	{
 		checkIcExpire(false);
 		++ _playerData.icCount;
-		DB1().PushUpdateData("UPDATE `player` SET `icCount` = '%u|%u' WHERE `id` = %"I64_FMT"u", _playerData.icCount, _playerData.nextIcReset, _id);
+		DB1().PushUpdateData("UPDATE `player` SET `icCount` = '%u|%u' WHERE `id` = %" I64_FMT "u", _playerData.icCount, _playerData.nextIcReset, _id);
 	}
 
 	void Player::resetIcCount( )
@@ -7300,7 +7347,7 @@ namespace GObject
 		checkIcExpire(false);
 		if(_playerData.icCount > 0)
 			_playerData.icCount = 0;
-		DB1().PushUpdateData("UPDATE `player` SET `icCount` = '%u|%u' WHERE `id` = %"I64_FMT"u", _playerData.icCount, _playerData.nextIcReset, _id);
+		DB1().PushUpdateData("UPDATE `player` SET `icCount` = '%u|%u' WHERE `id` = %" I64_FMT "u", _playerData.icCount, _playerData.nextIcReset, _id);
 	}
 
 	UInt8 Player::getIcCount()
@@ -7316,7 +7363,7 @@ namespace GObject
 		{
 			_playerData.nextIcReset = TimeUtil::SharpDay(1, now);
 			_playerData.icCount = 0;
-			DB1().PushUpdateData("UPDATE `player` SET `icCount` = '%u|%u' WHERE `id` = %"I64_FMT"u", _playerData.icCount, _playerData.nextIcReset, _id);
+			DB1().PushUpdateData("UPDATE `player` SET `icCount` = '%u|%u' WHERE `id` = %" I64_FMT "u", _playerData.icCount, _playerData.nextIcReset, _id);
 		}
 	}
 
@@ -7708,7 +7755,7 @@ namespace GObject
         }
 
         SYSMSG_SENDV(2104, this, newformation->getName().c_str());
-        DB1().PushUpdateData("UPDATE `player` SET `formations` = '%s' WHERE id = %" I64_FMT "u", formations.c_str(), _id);
+        DB1().PushUpdateData("UPDATE `player` SET `formations` = '%s' WHERE id = %"  I64_FMT  "u", formations.c_str(), _id);
 
         //学习阵法的成就
         GameAction()->doAttainment(this,Script:: LEARNED_FORMATION, cnt);
@@ -7918,7 +7965,7 @@ namespace GObject
             if(i != size - 1)
                 str += "|";
         }
-		DB1().PushUpdateData("REPLACE INTO `rechargenextret` VALUES (%"I64_FMT"u, '%s')", getId(), str.c_str());
+		DB1().PushUpdateData("REPLACE INTO `rechargenextret` VALUES (%" I64_FMT "u, '%s')", getId(), str.c_str());
     }
 
     void Player::loadRNRFromDB(const std::string& str)
@@ -8038,7 +8085,7 @@ namespace GObject
 	void Player::sendTopupMail(const char* title, const char* content, UInt32 gold, UInt8 num)
 	{
 		m_MailBox->newMail(NULL, 0x01, title, content);
-		DBLOG1().PushUpdateData("insert into `topup_num`(`server_id`, `player_id`, `topup_gold`, `rand_num`, `topup_time`) values(%u, %"I64_FMT"u, %u, %u, %u)", cfg.serverLogId, getId(), gold, num, TimeUtil::Now());
+		DBLOG1().PushUpdateData("insert into `topup_num`(`server_id`, `player_id`, `topup_gold`, `rand_num`, `topup_time`) values(%u, %" I64_FMT "u, %u, %u, %u)", cfg.serverLogId, getId(), gold, num, TimeUtil::Now());
 	}
 
 	void Player::setTotalRecharge( UInt32 r )
@@ -8066,7 +8113,7 @@ namespace GObject
 
 	void Player::writeOnlineRewardToDB()
 	{
-		DB1().PushUpdateData("UPDATE `player` SET `nextReward` = '%u|%u|%u|%u' WHERE `id` = %"I64_FMT"u", _playerData.rewardStep, _playerData.nextRewardItem, _playerData.nextRewardCount, _playerData.nextRewardTime, _id);
+		DB1().PushUpdateData("UPDATE `player` SET `nextReward` = '%u|%u|%u|%u' WHERE `id` = %" I64_FMT "u", _playerData.rewardStep, _playerData.nextRewardItem, _playerData.nextRewardCount, _playerData.nextRewardTime, _id);
 	}
 
 	bool Player::takeOnlineReward()
@@ -8650,7 +8697,7 @@ namespace GObject
                         strItems += Itoa(mitem[i].count);
                         strItems += "|";
                     }
-                    DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+                    DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
                 }
             }
         }
@@ -8673,31 +8720,31 @@ namespace GObject
 		_playerData.lastExp += exp;
 		if(leaveCity)
 			_playerData.lastExp |= 0x80000000;
-		DB1().PushUpdateDataL("UPDATE `player` SET `lastExp` = %u WHERE `id` = %"I64_FMT"u", _playerData.lastExp, _id);
+		DB1().PushUpdateDataL("UPDATE `player` SET `lastExp` = %u WHERE `id` = %" I64_FMT "u", _playerData.lastExp, _id);
 	}
 
 	void Player::pendTael( UInt32 t )
 	{
 		_playerData.lastResource = (_playerData.lastResource & 0xFFFFFFFFFFFF0000ull) | ((_playerData.lastResource & 0xFFFFull) + t);
-		DB1().PushUpdateData("UPDATE `player` SET `lastResource` = %u WHERE `id` = %"I64_FMT"u", _playerData.lastResource, _id);
+		DB1().PushUpdateData("UPDATE `player` SET `lastResource` = %u WHERE `id` = %" I64_FMT "u", _playerData.lastResource, _id);
 	}
 
 	void Player::pendCoupon( UInt32 c )
 	{
 		_playerData.lastResource = (_playerData.lastResource & 0xFFFFFFFF0000FFFFull) | ((((_playerData.lastResource >> 16) + static_cast<UInt64>(c)) & 0xFFFFull) << 16);
-		DB1().PushUpdateData("UPDATE `player` SET `lastResource` = %u WHERE `id` = %"I64_FMT"u", _playerData.lastResource, _id);
+		DB1().PushUpdateData("UPDATE `player` SET `lastResource` = %u WHERE `id` = %" I64_FMT "u", _playerData.lastResource, _id);
 	}
 
 	void Player::pendCoin( UInt32 c )
 	{
 		_playerData.lastResource = (_playerData.lastResource & 0xFFF00000FFFFFFFFull) | ((((_playerData.lastResource >> 32) + static_cast<UInt64>(c)) & 0xFFFFFull) << 32);
-		DB1().PushUpdateData("UPDATE `player` SET `lastResource` = %u WHERE `id` = %"I64_FMT"u", _playerData.lastResource, _id);
+		DB1().PushUpdateData("UPDATE `player` SET `lastResource` = %u WHERE `id` = %" I64_FMT "u", _playerData.lastResource, _id);
 	}
 
 	void Player::pendAchievement( UInt32 a )
 	{
 		_playerData.lastResource = (_playerData.lastResource & 0x000FFFFFFFFFFFFFull) | (((_playerData.lastResource >> 52) + static_cast<UInt64>(a)) << 52);
-		DB1().PushUpdateData("UPDATE `player` SET `lastResource` = %u WHERE `id` = %"I64_FMT"u", _playerData.lastResource, _id);
+		DB1().PushUpdateData("UPDATE `player` SET `lastResource` = %u WHERE `id` = %" I64_FMT "u", _playerData.lastResource, _id);
 	}
 
 	void Player::setTavernInterval( UInt32 inter )
@@ -8743,7 +8790,7 @@ namespace GObject
 	void Player::setNextExtraReward( UInt32 ner )
 	{
 		_playerData.nextExtraReward = ner;
-		DB1().PushUpdateData("UPDATE `player` SET `nextExtraReward` = %u WHERE `id` = %"I64_FMT"u", _playerData.nextExtraReward, _id);
+		DB1().PushUpdateData("UPDATE `player` SET `nextExtraReward` = %u WHERE `id` = %" I64_FMT "u", _playerData.nextExtraReward, _id);
 	}
 
 	bool Player::isDungeonPassed( UInt8 id )
@@ -9080,7 +9127,7 @@ namespace GObject
 			}
 
 			mailPackageManager.push(mail->id, mitem, mcount, true);
-			DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+			DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
         }
     }
 
@@ -9147,7 +9194,7 @@ namespace GObject
 #endif
 
 			mailPackageManager.push(mail->id, mitem, mcount, true);
-			DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+			DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
 		}
 	}
 
@@ -9271,7 +9318,7 @@ namespace GObject
 			}
 
 			mailPackageManager.push(mail->id, mitem, mcount, true);
-			DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+			DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
 		}
 	}
 
@@ -9301,7 +9348,7 @@ namespace GObject
 
                 mailPackageManager.push(mail->id, &mitem, 1, true);
 
-                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
             }
             if(left > 0)
             {
@@ -9318,7 +9365,7 @@ namespace GObject
 
                 mailPackageManager.push(mail->id, &mitem, 1, true);
 
-                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
             }
         }
     }
@@ -9354,8 +9401,8 @@ namespace GObject
 		_exchangeTicketCount = cnt;
 		if(writedb)
 		{
-			DB1().PushUpdateData("REPLACE INTO `exchange_ticket` VALUES(%"I64_FMT"u, %u)", getId(), _exchangeTicketCount);
-			DBLOG1().PushUpdateData("replace into `exchange_ticket` VALUES(%u, %"I64_FMT"u, %u)", cfg.serverLogId, getId(), _exchangeTicketCount);
+			DB1().PushUpdateData("REPLACE INTO `exchange_ticket` VALUES(%" I64_FMT "u, %u)", getId(), _exchangeTicketCount);
+			DBLOG1().PushUpdateData("replace into `exchange_ticket` VALUES(%u, %" I64_FMT "u, %u)", cfg.serverLogId, getId(), _exchangeTicketCount);
 		}
 	}
 
@@ -9383,7 +9430,7 @@ namespace GObject
 			return;
 		_bossLevel = lvl;
 		if(writedb)
-			DB1().PushUpdateData("UPDATE `player` SET `bossLevel` = %u WHERE id = %"I64_FMT"u", _bossLevel, getId());
+			DB1().PushUpdateData("UPDATE `player` SET `bossLevel` = %u WHERE id = %" I64_FMT "u", _bossLevel, getId());
 		setBlockBossByLevel();
 	}
 
@@ -9610,7 +9657,7 @@ namespace GObject
         if(_playerData.entered == e)
             return;
         _playerData.entered = e;
-        DB().PushUpdateData("UPDATE `player` SET `entered` = %u WHERE `id` = %"I64_FMT"u", e, _id);
+        DB().PushUpdateData("UPDATE `player` SET `entered` = %u WHERE `id` = %" I64_FMT "u", e, _id);
     }
 
     UInt64 Player::getOriginId(UInt64 id)
@@ -9651,7 +9698,7 @@ namespace GObject
 
 	void Player::writeBookStoreIds()
 	{
-		DB1().PushUpdateData("UPDATE `player` SET `bookStore` = '%u|%u|%u|%u|%u|%u|%u' WHERE `id` = %"I64_FMT"u", _playerData.bookStore[0], _playerData.bookStore[1], _playerData.bookStore[2], _playerData.bookStore[3], _playerData.bookStore[4], _playerData.bookStore[5], _nextBookStoreUpdate, _id);
+		DB1().PushUpdateData("UPDATE `player` SET `bookStore` = '%u|%u|%u|%u|%u|%u|%u' WHERE `id` = %" I64_FMT "u", _playerData.bookStore[0], _playerData.bookStore[1], _playerData.bookStore[2], _playerData.bookStore[3], _playerData.bookStore[4], _playerData.bookStore[5], _nextBookStoreUpdate, _id);
 	}
 
 	inline UInt32 getBookPriceById(UInt32 id)
@@ -9864,7 +9911,7 @@ namespace GObject
 		char answerTmp[256];
 		mysql_escape_string(questionTmp, _pwdInfo.questionForPWD.c_str(), _pwdInfo.questionForPWD.length()>255?255:_pwdInfo.questionForPWD.length());
 		mysql_escape_string(answerTmp, _pwdInfo.answerForPWD.c_str(), _pwdInfo.answerForPWD.length()>255?255:_pwdInfo.answerForPWD.length());
-		DB1().PushUpdateData("INSERT INTO `pass_word` VALUES(%"I64_FMT"u, '%s', '%s', '%s')", _id, _pwdInfo.secondPWD.c_str(), questionTmp, answerTmp);
+		DB1().PushUpdateData("INSERT INTO `pass_word` VALUES(%" I64_FMT "u, '%s', '%s', '%s')", _id, _pwdInfo.secondPWD.c_str(), questionTmp, answerTmp);
 		Stream st;
 		makeSenconPWDInfo(st);
 		send(st);
@@ -9879,7 +9926,7 @@ namespace GObject
 		_pwdInfo.secondPWD.clear();
 		_pwdInfo.answerForPWD.clear();
 		_pwdInfo.questionForPWD.clear();
-		DB1().PushUpdateData("DELETE FROM `pass_word` WHERE `playerId` = %"I64_FMT"u", _id);
+		DB1().PushUpdateData("DELETE FROM `pass_word` WHERE `playerId` = %" I64_FMT "u", _id);
 		Stream st;
 		makeSenconPWDInfo(st);
 		send(st);
@@ -9892,7 +9939,7 @@ namespace GObject
 			return 1;
 		_pwdInfo.errCount = 0;
 		_pwdInfo.secondPWD = pwd;
-		DB1().PushUpdateData("UPDATE `pass_word` SET `password` = '%s' WHERE `playerId` =  %"I64_FMT"u", _pwdInfo.secondPWD.c_str(), _id);
+		DB1().PushUpdateData("UPDATE `pass_word` SET `password` = '%s' WHERE `playerId` =  %" I64_FMT "u", _pwdInfo.secondPWD.c_str(), _id);
 		return 0;
 	}
 
@@ -9905,7 +9952,7 @@ namespace GObject
 		if(newPWD.length() != 6)
 			return 1;
 		_pwdInfo.secondPWD = newPWD;
-		DB1().PushUpdateData("UPDATE `pass_word` SET `password` = '%s' WHERE `playerId` =  %"I64_FMT"u", _pwdInfo.secondPWD.c_str(), _id);
+		DB1().PushUpdateData("UPDATE `pass_word` SET `password` = '%s' WHERE `playerId` =  %" I64_FMT "u", _pwdInfo.secondPWD.c_str(), _id);
 		return 0;
 	}
 
@@ -10056,7 +10103,7 @@ namespace GObject
     void Player::setCountry(UInt8 cny)
     {
         _playerData.country = cny;
-		DB1().PushUpdateData("UPDATE `player` SET `country` = %u WHERE `id` = %"I64_FMT"u", cny, getId());
+		DB1().PushUpdateData("UPDATE `player` SET `country` = %u WHERE `id` = %" I64_FMT "u", cny, getId());
 
 		Stream st(REP::USER_INFO_CHANGE);
 		st << static_cast<UInt8>(0x11) << static_cast<UInt32>(cny) << Stream::eos;
@@ -10203,7 +10250,7 @@ namespace GObject
     {
         std::vector<UInt32> ydGem = GObjectManager::getYDGem();
         _playerData.ydGemId = ydGem[uRand(ydGem.size())];
-		DB1().PushUpdateData("UPDATE `player` SET `ydgemid` = %u WHERE `id` = %"I64_FMT"u", _playerData.ydGemId, getId());
+		DB1().PushUpdateData("UPDATE `player` SET `ydgemid` = %u WHERE `id` = %" I64_FMT "u", _playerData.ydGemId, getId());
     }
 
     void Player::checkQQAward()
@@ -10243,7 +10290,7 @@ namespace GObject
         {
             _playerData.qqawardEnd = TimeUtil::SharpDay(1, now);
             _playerData.qqawardgot &= 0xFCFC;
-            DB1().PushUpdateData("UPDATE `player` SET `qqawardEnd` = %u, `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardEnd, _playerData.qqawardgot, getId());
+            DB1().PushUpdateData("UPDATE `player` SET `qqawardEnd` = %u, `qqawardgot` = %u WHERE `id` = %" I64_FMT "u", _playerData.qqawardEnd, _playerData.qqawardgot, getId());
             RollYDGem();
         }
 
@@ -10268,7 +10315,7 @@ namespace GObject
                     GetPackage()->AddItem2(7, 1, true, true);
                 else
                     GetPackage()->AddItem2(67, 1, true, true);
-                DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardgot, getId());
+                DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %" I64_FMT "u", _playerData.qqawardgot, getId());
             }
         }
 
@@ -10603,7 +10650,7 @@ namespace GObject
         }
         if(nRes && nRes != 5)
         {
-            DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardgot, getId());
+            DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %" I64_FMT "u", _playerData.qqawardgot, getId());
         }
 
         st << nRes << Stream::eos;
@@ -10616,7 +10663,7 @@ namespace GObject
 	{
         checkPIcCount();
 		++ _playerData.picCount;
-        DB1().PushUpdateData("UPDATE `player` SET piccount = %u, nextpicreset = %u where `id`= %"I64_FMT"u", _playerData.picCount, _playerData.nextPIcReset, _id);
+        DB1().PushUpdateData("UPDATE `player` SET piccount = %u, nextpicreset = %u where `id`= %" I64_FMT "u", _playerData.picCount, _playerData.nextPIcReset, _id);
 	}
 
 
@@ -10636,7 +10683,7 @@ namespace GObject
 		{
 			_playerData.nextPIcReset = TimeUtil::SharpDay(1, now);
             _playerData.picCount = 0;
-            DB1().PushUpdateData("UPDATE `player` SET piccount = %u, nextpicreset = %u where `id`= %"I64_FMT"u", _playerData.picCount, _playerData.nextPIcReset, _id);
+            DB1().PushUpdateData("UPDATE `player` SET piccount = %u, nextpicreset = %u where `id`= %" I64_FMT "u", _playerData.picCount, _playerData.nextPIcReset, _id);
 		}
     }
 
@@ -10705,7 +10752,7 @@ namespace GObject
             strItems += ",";
             strItems += Itoa(mitem[0].count);
             strItems += "|";
-            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
         }
     }
 
@@ -10726,7 +10773,7 @@ namespace GObject
         st << m_td.quality;
 
         genAward(st);
-        DB6().PushUpdateData("UPDATE `tripod` SET `regen` = %u, `quality` = %u, `itemId` = %u, `num` = %u WHERE `id` = %"I64_FMT"u",
+        DB6().PushUpdateData("UPDATE `tripod` SET `regen` = %u, `quality` = %u, `itemId` = %u, `num` = %u WHERE `id` = %" I64_FMT "u",
                 m_td.needgen, m_td.quality, m_td.itemId, m_td.num, getId());
 
         st << static_cast<UInt32>(MAX_TRIPOD_SOUL) << m_td.soul << Stream::eos;
@@ -10856,7 +10903,7 @@ namespace GObject
             m_td.needgen = 0;
         }
 
-        DB6().PushUpdateData("UPDATE `tripod` SET `soul` = %u, `quality` = %u, `awdst` = %u, `regen` = %u, `itemId` = %u, `num` = %u WHERE `id` = %"I64_FMT"u",
+        DB6().PushUpdateData("UPDATE `tripod` SET `soul` = %u, `quality` = %u, `awdst` = %u, `regen` = %u, `itemId` = %u, `num` = %u WHERE `id` = %" I64_FMT "u",
                 m_td.soul, m_td.quality, m_td.awdst, m_td.needgen, m_td.itemId, m_td.num, getId());
     }
 
@@ -10932,7 +10979,7 @@ namespace GObject
         genAward(st);
         st << Stream::eos;
         send(st);
-        DB6().PushUpdateData("UPDATE `tripod` SET `fire` = %u, `regen` = %u, `itemId` = %u, `num` = %u WHERE `id` = %"I64_FMT"u",
+        DB6().PushUpdateData("UPDATE `tripod` SET `fire` = %u, `regen` = %u, `itemId` = %u, `num` = %u WHERE `id` = %" I64_FMT "u",
                 m_td.fire, m_td.needgen, m_td.itemId, m_td.num, getId());
 
         GetPackage()->DelItem2(ib1, 1);
@@ -10977,7 +11024,7 @@ namespace GObject
         m_td.soul = 0;
         m_td.itemId = 0;
         m_td.num = 0;
-        DB6().PushUpdateData("UPDATE `tripod` SET `soul`=0, `fire`=0, `quality`=%u, `awdst`=0, `itemId`=0, `num`=0, `regen`=1 WHERE `id` = %"I64_FMT"u",
+        DB6().PushUpdateData("UPDATE `tripod` SET `soul`=0, `fire`=0, `quality`=%u, `awdst`=0, `itemId`=0, `num`=0, `regen`=1 WHERE `id` = %" I64_FMT "u",
                 m_td.quality, getId());
         runTripodData(m_td);
         sendTripodInfo();
@@ -11076,13 +11123,44 @@ namespace GObject
             //御剑等级回馈
             getVipLevelAward(opt);
             break;
+        case 26:
+            //QQ秀合作
+            getQQXiuAward(opt);
+            break;
         }
     }
     
+    void Player::getQQXiuAward(UInt8 opt)
+    {
+        UInt8 state = GetVar(VAR_QQXIU_AWARD);
+
+        if (GetPackage()->GetRestPackageSize() < 6 && opt == 1)
+        {
+            sendMsgCode(0, 1011);
+
+            return;
+        }
+
+        if(opt == 1 && state == 0)
+        {
+            GetPackage()->AddItem(9371, 2, true, false, FromQQXiu);
+            GetPackage()->AddItem(503, 2, true, false, FromQQXiu);
+            GetPackage()->AddItem(515, 2, true, false, FromQQXiu);
+            GetPackage()->AddItem(548, 5, true, false, FromQQXiu);
+            GetPackage()->AddItem(8520, 1, true, false, FromQQXiu);
+
+            SetVar(VAR_QQXIU_AWARD, 1);
+            state = 1;
+        }
+            
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(26);
+        st << state << Stream::eos;
+        send(st);
+    }
+
     void Player::getVipLevelAward(UInt8 opt)
     {
-        return; //暂时不上
-
         if(opt > getVipLevel())
         {
             sendMsgCode(0, 1003);
@@ -12676,7 +12754,7 @@ namespace GObject
 
         if (update)
         {
-            DB6().PushUpdateData("UPDATE `tripod` SET `regen` = %u, `quality` = %u WHERE `id` = %"I64_FMT"u",
+            DB6().PushUpdateData("UPDATE `tripod` SET `regen` = %u, `quality` = %u WHERE `id` = %" I64_FMT "u",
                     m_td.needgen, m_td.quality, getId());
         }
         m_hasTripod = true;
@@ -12685,7 +12763,7 @@ namespace GObject
 
     TripodData& Player::newTripodData()
     {
-        DB6().PushUpdateData("REPLACE INTO `tripod`(`id`, `soul`, `fire`, `quality`, `awdst`, `regen`, `itemId`, `num`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u,%u)" , getId(), m_td.soul, m_td.fire, m_td.quality, m_td.awdst, m_td.needgen, m_td.itemId, m_td.num);
+        DB6().PushUpdateData("REPLACE INTO `tripod`(`id`, `soul`, `fire`, `quality`, `awdst`, `regen`, `itemId`, `num`) VALUES(%" I64_FMT "u, %u, %u, %u, %u, %u, %u,%u)" , getId(), m_td.soul, m_td.fire, m_td.quality, m_td.awdst, m_td.needgen, m_td.itemId, m_td.num);
         return runTripodData(m_td);
     }
 
@@ -12759,7 +12837,7 @@ namespace GObject
                         strItems += "|";
                     }
 
-                    DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, BuChangNewRC7Day, title, content, strItems.c_str(), mail->recvTime);
+                    DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, BuChangNewRC7Day, title, content, strItems.c_str(), mail->recvTime);
 
                     ctslandingAward |= (1<<i);
                     SetVar(VAR_CTSLANDING_AWARD, ctslandingAward);
@@ -12846,7 +12924,7 @@ namespace GObject
         cs.id = skillId;
         cs.level = 0;
 
-        DB5().PushUpdateData("REPLACE INTO `clan_skill`(`playerId`, `skillId`, `level`) VALUES(%"I64_FMT"u, %u, 0)", getId(), skillId);
+        DB5().PushUpdateData("REPLACE INTO `clan_skill`(`playerId`, `skillId`, `level`) VALUES(%" I64_FMT "u, %u, 0)", getId(), skillId);
     }
 
     UInt8 Player::getClanSkillLevel(UInt8 skillId)
@@ -12879,7 +12957,7 @@ namespace GObject
 
             ClanSkill& cs = it->second;
             ++ cs.level;
-            DB5().PushUpdateData("UPDATE `clan_skill` SET `level` = %u WHERE `playerId` = %"I64_FMT"u and `skillId`=%u", cs.level, getId(), skillId);
+            DB5().PushUpdateData("UPDATE `clan_skill` SET `level` = %u WHERE `playerId` = %" I64_FMT "u and `skillId`=%u", cs.level, getId(), skillId);
 
             if(skillId == CLAN_SKILL_MAXSOUL)
             {
@@ -13206,7 +13284,7 @@ namespace GObject
                 strItems += "|";
             }
             mailPackageManager.push(mail->id, mitem, size, true);
-            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, _title, _content, strItems.c_str(), mail->recvTime);
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, _title, _content, strItems.c_str(), mail->recvTime);
         }
 #else
         GameAction()->sendRechargeRankAward(this, pos);
@@ -13376,7 +13454,7 @@ namespace GObject
                 m_dpData->itemNum = 0;
                 m_dpData->quitLevel = 0;
                 m_dpData->attacker = NULL;
-                DB3().PushUpdateData("UPDATE `towndeamon_player` SET `itemId`=0, `itemNum`=0, `quitLevel`=0, `attacker`=0 WHERE `playerId` = %"I64_FMT"u", getId());
+                DB3().PushUpdateData("UPDATE `towndeamon_player` SET `itemId`=0, `itemNum`=0, `quitLevel`=0, `attacker`=0 WHERE `playerId` = %" I64_FMT "u", getId());
             }
             else
                 sendMsgCode(2, 1011);
@@ -13385,7 +13463,7 @@ namespace GObject
         {
             m_dpData->quitLevel = 0;
             m_dpData->attacker = NULL;
-            DB3().PushUpdateData("UPDATE `towndeamon_player` SET `quitLevel`=0, `attacker`=0 WHERE `playerId` = %"I64_FMT"u", getId());
+            DB3().PushUpdateData("UPDATE `towndeamon_player` SET `quitLevel`=0, `attacker`=0 WHERE `playerId` = %" I64_FMT "u", getId());
         }
     }
 
@@ -13398,7 +13476,7 @@ namespace GObject
         _invitedBy = id;
         if (writedb)
         {
-            DB3().PushUpdateData("REPLACE INTO `cfriend_awards` (`playerId`, `invitedId`, `awards`) VALUES (%"I64_FMT"u, %"I64_FMT"u, '')", _id, id);
+            DB3().PushUpdateData("REPLACE INTO `cfriend_awards` (`playerId`, `invitedId`, `awards`) VALUES (%" I64_FMT "u, %" I64_FMT "u, '')", _id, id);
             GetCFriend()->setCFriendSafe(CF_INVITED);
         }
     }
@@ -14967,7 +15045,7 @@ namespace GObject
                 strItems += Itoa(mitem[i].count);
                 strItems += "|";
             }
-            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
         }
     }
 
@@ -15151,7 +15229,7 @@ namespace GObject
                 strItems += Itoa(mitem[i].count);
                 strItems += "|";
             }
-            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
         }
     }
 #endif
@@ -15856,7 +15934,7 @@ namespace GObject
        m_openid[255] = '\0';
        if (!load)
        {
-           DB1().PushUpdateData("UPDATE `player` SET `openid` = '%s' WHERE `id` = %"I64_FMT"u", m_openid, getId());
+           DB1().PushUpdateData("UPDATE `player` SET `openid` = '%s' WHERE `id` = %" I64_FMT "u", m_openid, getId());
        }
    }
 
@@ -15977,7 +16055,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
         pl->beDivorceQixi(this);
         qixiUdpLog(1085);
 
-		DB1().PushUpdateData("UPDATE `qixi` SET `lover`=0, `bind`=0 WHERE `playerId` = %"I64_FMT"u", getId());
+		DB1().PushUpdateData("UPDATE `qixi` SET `lover`=0, `bind`=0 WHERE `playerId` = %" I64_FMT "u", getId());
         WORLD().DivorceQixiPair(this);
         sendQixiInfo();
     }
@@ -15998,7 +16076,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
         }
         qixiUdpLog(1084);
 
-		DB1().PushUpdateData("REPLACE INTO `qixi` (`pos`, `event`, `score`, `bind`, `lover`, `playerId`) VALUES(%u, %u, %u, %u, %"I64_FMT"u, %"I64_FMT"u)", m_qixi.pos, m_qixi.event, m_qixi.score, m_qixi.bind, pl->getId(), getId());
+		DB1().PushUpdateData("REPLACE INTO `qixi` (`pos`, `event`, `score`, `bind`, `lover`, `playerId`) VALUES(%u, %u, %u, %u, %" I64_FMT "u, %" I64_FMT "u)", m_qixi.pos, m_qixi.event, m_qixi.score, m_qixi.bind, pl->getId(), getId());
     }
 
     void Player::roamingQueqiao(UInt8 pos)
@@ -16031,7 +16109,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
         m_qixi.bind = 0;
 
         sendMsgCode(0, qixiTmpl._divorceMsgCode);
-		DB1().PushUpdateData("UPDATE `qixi` SET `bind`=0 WHERE `playerId` = %"I64_FMT"u", getId());
+		DB1().PushUpdateData("UPDATE `qixi` SET `bind`=0 WHERE `playerId` = %" I64_FMT "u", getId());
         sendQixiInfo();
     }
 
@@ -16047,7 +16125,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
             m_qixi.bind = 1;
             bind = 1;
 
-            DB1().PushUpdateData("UPDATE `qixi` SET `bind`=%u WHERE `playerId` = %"I64_FMT"u", bind, getId());
+            DB1().PushUpdateData("UPDATE `qixi` SET `bind`=%u WHERE `playerId` = %" I64_FMT "u", bind, getId());
             sendQixiInfo();
         }
 
@@ -16091,9 +16169,9 @@ void EventTlzAuto::notify(bool isBeginAuto)
         m_qixi.score += score;
 
         if(m_qixi.lover == NULL && m_qixi.score == score)
-            DB1().PushUpdateData("REPLACE INTO `qixi` (`pos`, `event`, `score`, `bind`, `lover`, `playerId`) VALUES(%u, %u, %u, %u, 0, %"I64_FMT"u)", m_qixi.pos, m_qixi.event, m_qixi.score, m_qixi.bind, getId());
+            DB1().PushUpdateData("REPLACE INTO `qixi` (`pos`, `event`, `score`, `bind`, `lover`, `playerId`) VALUES(%u, %u, %u, %u, 0, %" I64_FMT "u)", m_qixi.pos, m_qixi.event, m_qixi.score, m_qixi.bind, getId());
         else
-            DB1().PushUpdateData("UPDATE `qixi` SET `pos`=%u, `event`=%u, `score`=%u WHERE `playerId` = %"I64_FMT"u", pos, event, m_qixi.score, getId());
+            DB1().PushUpdateData("UPDATE `qixi` SET `pos`=%u, `event`=%u, `score`=%u WHERE `playerId` = %" I64_FMT "u", pos, event, m_qixi.score, getId());
         if(m_qixi.bind)
             WORLD().UpdateQixiScore(this, m_qixi.lover);
     }
@@ -16102,14 +16180,14 @@ void EventTlzAuto::notify(bool isBeginAuto)
     {
         m_qixi.bind = 0;
         m_qixi.lover = NULL;
-        DB1().PushUpdateData("UPDATE `qixi` SET `bind`=0, `lover`=0 WHERE `playerId` = %"I64_FMT"u", getId());
+        DB1().PushUpdateData("UPDATE `qixi` SET `bind`=0, `lover`=0 WHERE `playerId` = %" I64_FMT "u", getId());
     }
 
     void Player::resetSnow()
     {
         m_snow.bind = 0;
         m_snow.lover = NULL;
-        DB1().PushUpdateData("UPDATE `snow` SET `bind`=0, `lover`=0 WHERE `playerId` = %"I64_FMT"u", getId());
+        DB1().PushUpdateData("UPDATE `snow` SET `bind`=0, `lover`=0 WHERE `playerId` = %" I64_FMT "u", getId());
     }
 
     void Player::sendSnowInfo()
@@ -16141,7 +16219,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
         pl->beDivorceSnowLover(this);
        // qixiUdpLog(1085);
 
-		DB1().PushUpdateData("UPDATE `snow` SET `lover`=0, `bind`=0 WHERE `playerId` = %"I64_FMT"u", getId());
+		DB1().PushUpdateData("UPDATE `snow` SET `lover`=0, `bind`=0 WHERE `playerId` = %" I64_FMT "u", getId());
         WORLD().DivorceSnowPair(this);
         sendSnowInfo();
     }
@@ -16154,7 +16232,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
         m_snow.lover = NULL;
 
         sendMsgCode(0, 1034);
-		DB1().PushUpdateData("UPDATE `snow` SET `bind`=0,`lover`=0 WHERE `playerId` = %"I64_FMT"u", getId());
+		DB1().PushUpdateData("UPDATE `snow` SET `bind`=0,`lover`=0 WHERE `playerId` = %" I64_FMT "u", getId());
         sendSnowInfo();
     }
 
@@ -16174,7 +16252,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
         }
        // qixiUdpLog(1084);
 
-		DB1().PushUpdateData("REPLACE INTO `snow` (`score`, `bind`, `lover`, `playerId`) VALUES(%u, %u, %"I64_FMT"u, %"I64_FMT"u)", m_snow.score, m_snow.bind, pl->getId(), getId());
+		DB1().PushUpdateData("REPLACE INTO `snow` (`score`, `bind`, `lover`, `playerId`) VALUES(%u, %u, %" I64_FMT "u, %" I64_FMT "u)", m_snow.score, m_snow.bind, pl->getId(), getId());
     }
     UInt8 Player::beSnowLoverBind(Player* pl)
     {
@@ -16188,7 +16266,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
             m_snow.bind = 1;
             bind = 1;
 
-            DB1().PushUpdateData("UPDATE `snow` SET `bind`=%u WHERE `playerId` = %"I64_FMT"u", bind, getId());
+            DB1().PushUpdateData("UPDATE `snow` SET `bind`=%u WHERE `playerId` = %" I64_FMT "u", bind, getId());
             sendSnowInfo();
         }
 
@@ -16233,9 +16311,9 @@ void EventTlzAuto::notify(bool isBeginAuto)
             }
             WORLD().UpdateSnowScore(this, m_snow.lover);
             if (NULL !=  m_snow.lover)
-		        DB1().PushUpdateData("REPLACE INTO `snow` (`score`, `bind`, `lover`, `playerId`) VALUES(%u, %u, %"I64_FMT"u, %"I64_FMT"u)", m_snow.score, m_snow.bind, m_snow.lover->getId(), getId());
+		        DB1().PushUpdateData("REPLACE INTO `snow` (`score`, `bind`, `lover`, `playerId`) VALUES(%u, %u, %" I64_FMT "u, %" I64_FMT "u)", m_snow.score, m_snow.bind, m_snow.lover->getId(), getId());
             else
-		        DB1().PushUpdateData("REPLACE INTO `snow` (`score`, `bind`, `lover`, `playerId`) VALUES(%u, %u, 0, %"I64_FMT"u)", m_snow.score, m_snow.bind, getId());
+		        DB1().PushUpdateData("REPLACE INTO `snow` (`score`, `bind`, `lover`, `playerId`) VALUES(%u, %u, 0, %" I64_FMT "u)", m_snow.score, m_snow.bind, getId());
 
             return 0;
         }
@@ -16418,7 +16496,8 @@ void EventTlzAuto::notify(bool isBeginAuto)
             {1531, 1534},
             {1650, 1653},
             {1651, 1654},
-            {1652, 1655}
+            {1652, 1655},
+            {1541, 1542}
         };
         if ((trumpid >= 1529 && trumpid <= 1534)
                 || (trumpid >= 1650 && trumpid <= 1655))
@@ -16688,7 +16767,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
                     mfgt = fgt;
                 else if( fgt->getLevel() <= mfgt->getLevel())
                 {
-                    DB1().PushUpdateData("DELETE FROM `fighter` where `id`=%d and `playerId`=%"I64_FMT"u", fgt->getId(), _id);
+                    DB1().PushUpdateData("DELETE FROM `fighter` where `id`=%d and `playerId`=%" I64_FMT "u", fgt->getId(), _id);
                     std::map<UInt32, Fighter *>::iterator tmp = it;
                     -- tmp;
                     _fighters.erase(it);
@@ -16698,7 +16777,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
                 }
                 else
                 {
-                    DB1().PushUpdateData("DELETE FROM `fighter` where `id`=%d and `playerId`=%"I64_FMT"u", mfgt->getId(), _id);
+                    DB1().PushUpdateData("DELETE FROM `fighter` where `id`=%d and `playerId`=%" I64_FMT "u", mfgt->getId(), _id);
                     _fighters.erase(mfgt->getId());
                     delete mfgt;
                     mfgt = fgt;
@@ -16821,7 +16900,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
             title += '|';
         }
 
-        DB1().PushUpdateData("UPDATE `player` SET `titleAll` = '%s' WHERE `id` = %"I64_FMT"u", title.c_str(), getId());
+        DB1().PushUpdateData("UPDATE `player` SET `titleAll` = '%s' WHERE `id` = %" I64_FMT "u", title.c_str(), getId());
     }
     UInt8 Player::fightTransform(UInt16 fFighterId, UInt16 tFighterId, UInt8 type)
     {
@@ -17566,7 +17645,7 @@ void Player::getCopyFrontCurrentAward(UInt8 index)
         useGold(needGold, &ci);
     }
     cf_posPut[curId] = index;
-    DB1().PushUpdateData("UPDATE `copy_front_win` SET `posPut` = %u where `playerId` = %"I64_FMT"u and `posOrig` = %u", cf_posPut[curId], getId(), curId);
+    DB1().PushUpdateData("UPDATE `copy_front_win` SET `posPut` = %u where `playerId` = %" I64_FMT "u and `posOrig` = %u", cf_posPut[curId], getId(), curId);
 
     Stream st(REP::COUNTRY_ACT);
     st << static_cast<UInt8>(0x04);
@@ -17692,9 +17771,9 @@ void Player::resetCopyFrontWinAward(bool fresh)
         cf_ratio[i] = award.get<UInt32>(2);
         cf_posPut[i] = 0;
         if(fresh)
-            DB1().PushUpdateData("UPDATE `copy_front_win` SET `posPut` = %u, `itemId` = %u, `ratio` = %u WHERE `playerId` = %"I64_FMT"u AND `posOrig` = %u", cf_posPut[i], cf_itemId[i], cf_ratio[i], getId(), i);
+            DB1().PushUpdateData("UPDATE `copy_front_win` SET `posPut` = %u, `itemId` = %u, `ratio` = %u WHERE `playerId` = %" I64_FMT "u AND `posOrig` = %u", cf_posPut[i], cf_itemId[i], cf_ratio[i], getId(), i);
         else
-            DB1().PushUpdateData("REPLACE INTO `copy_front_win` (`playerId`, `posOrig`, `posPut`, `itemId`, `ratio`) VALUES(%"I64_FMT"u, %u, %u, %u, %u)", getId(), i, cf_posPut[i], cf_itemId[i], cf_ratio[i]);
+            DB1().PushUpdateData("REPLACE INTO `copy_front_win` (`playerId`, `posOrig`, `posPut`, `itemId`, `ratio`) VALUES(%" I64_FMT "u, %u, %u, %u, %u)", getId(), i, cf_posPut[i], cf_itemId[i], cf_ratio[i]);
     }
 }
 
@@ -17749,9 +17828,9 @@ void Player::closeCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index)
         cf_posPut[i] = 0;
         cf_itemId[i] = 0;
         cf_ratio[i] = 0;
-        //DB1().PushUpdateData("UPDATE `copy_front_win` SET `posPut` = %u, `itemId` = %u, `ratio` = %u WHERE `playerId` = %"I64_FMT"u AND `posOrig` = %u", cf_posPut[i], cf_itemId[i], cf_ratio[i], getId(), i);
+        //DB1().PushUpdateData("UPDATE `copy_front_win` SET `posPut` = %u, `itemId` = %u, `ratio` = %u WHERE `playerId` = %" I64_FMT "u AND `posOrig` = %u", cf_posPut[i], cf_itemId[i], cf_ratio[i], getId(), i);
     }
-    DB1().PushUpdateData("DELETE FROM `copy_front_win` WHERE `playerId` = %"I64_FMT"u", getId());
+    DB1().PushUpdateData("DELETE FROM `copy_front_win` WHERE `playerId` = %" I64_FMT "u", getId());
 }
 
 void Player::sendCopyFrontAllAward()
@@ -18710,7 +18789,7 @@ void Player::saveGoldAct(UInt8 opt, UInt32 param)
             AddVar(VAR_SAVEGOLD_COUNT, param);
 		    useGold(param);
             sendSaveGoldAct();
-            TRACE_LOG("此次存仙石数量playerId_num:SaveGoldAction_%"I64_FMT"u_%u", getId(), param);
+            TRACE_LOG("此次存仙石数量playerId_num:SaveGoldAction_%" I64_FMT "u_%u", getId(), param);
         }
         break;
     case 0x04:  //领取福囊
@@ -19072,7 +19151,7 @@ UInt8 Player::toQQGroup(bool isJoin)
     if (_inQQGroup != isJoin)
     {
         _inQQGroup = isJoin;
-	    DB1().PushUpdateData("UPDATE `clan_player` SET `inQQGroup` = %u WHERE `playerId` = %"I64_FMT"u", _inQQGroup, getId());
+	    DB1().PushUpdateData("UPDATE `clan_player` SET `inQQGroup` = %u WHERE `playerId` = %" I64_FMT "u", _inQQGroup, getId());
 
         getClan()->sendQQOpenid(this);
     }
@@ -19123,13 +19202,13 @@ UInt8 Player::toQQGroup(bool isJoin)
     void Player::delFairyPet(UInt32 id, UInt8 delete_type)
     {   //delete_type=>>0:放生 1:传承 2:进化
         std::map<UInt32, FairyPet *>::iterator it = _fairyPets.find(id);
-        DBLOG1().PushUpdateData("insert into pet_histories (server_id,player_id,pet_id,pet_name,delete_type,pet_pinjie,pet_gengu,delete_time) values(%u,%"I64_FMT"u,%u,'%s',%u,%u,%u,%u)",
+        DBLOG1().PushUpdateData("insert into pet_histories (server_id,player_id,pet_id,pet_name,delete_type,pet_pinjie,pet_gengu,delete_time) values(%u,%" I64_FMT "u,%u,'%s',%u,%u,%u,%u)",
             cfg.serverLogId, getId(), id, it->second->getName().c_str(), delete_type, it->second->getPetLev(), it->second->getPetBone(), TimeUtil::Now());
 
         SAFE_DELETE(it->second);
         _fairyPets.erase(it);
-        DB2().PushUpdateData("DELETE FROM `fairyPet` WHERE id = %u AND `playerId` = %"I64_FMT"u", id, getId());
-	    DB2().PushUpdateData("DELETE FROM `fighter` WHERE `id` = %u AND `playerId` = %"I64_FMT"u", id, getId());
+        DB2().PushUpdateData("DELETE FROM `fairyPet` WHERE id = %u AND `playerId` = %" I64_FMT "u", id, getId());
+	    DB2().PushUpdateData("DELETE FROM `fighter` WHERE `id` = %u AND `playerId` = %" I64_FMT "u", id, getId());
     }
 
 	void Player::writeCanHiretPet()
@@ -19142,7 +19221,7 @@ UInt8 Player::toQQGroup(bool isJoin)
             if(i < size - 1)
                 petStr += ",";
         }
-        DB1().PushUpdateData("UPDATE `player` SET `canHirePet` = '%s' WHERE id = %"I64_FMT"u", petStr.c_str(), getId());
+        DB1().PushUpdateData("UPDATE `player` SET `canHirePet` = '%s' WHERE id = %" I64_FMT "u", petStr.c_str(), getId());
     }
 
 	bool Player::isFairyPetFull() const
@@ -19197,7 +19276,7 @@ UInt8 Player::toQQGroup(bool isJoin)
 			UInt32 p = static_cast<UInt32>((pet->getPotential()+0.005) * 100);
 			UInt32 c = static_cast<UInt32>((pet->getCapacity()+0.05) * 100);
 			DB2().PushUpdateData("INSERT INTO `fighter` (`id`, `playerId`, `potential`, `capacity`, `level`, `experience`)\
-                    VALUES(%u, %"I64_FMT"u, %u.%02u, %u.%02u, %u, %u)",
+                    VALUES(%u, %" I64_FMT "u, %u.%02u, %u.%02u, %u, %u)",
                     pet->getId(), getId(), p / 100, p % 100, c / 100, c % 100, pet->getLevel(), pet->getExp());
             pet->updateToDBPetSkill();
         }
@@ -19683,7 +19762,7 @@ UInt8 Player::toQQGroup(bool isJoin)
 
         if(ii && ii->incommingType != 0)
         {
-            DBLOG1().PushUpdateData("insert into consume_pet (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+            DBLOG1().PushUpdateData("insert into consume_pet (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
                 cfg.serverLogId, getId(), ii->incommingType, ii->itemId, ii->itemNum, c, TimeUtil::Now());
         }
 
@@ -19702,7 +19781,7 @@ UInt8 Player::toQQGroup(bool isJoin)
             xianyuan -= a;
             if(ci != NULL)
             {
-                DBLOG1().PushUpdateData("insert into consume_pet (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+                DBLOG1().PushUpdateData("insert into consume_pet (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
                 cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, a, TimeUtil::Now());
             }
         }
@@ -19725,7 +19804,7 @@ UInt8 Player::toQQGroup(bool isJoin)
 
         if(ii && ii->incommingType != 0)
         {
-            DBLOG1().PushUpdateData("insert into consume_pet (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+            DBLOG1().PushUpdateData("insert into consume_pet (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
                 cfg.serverLogId, getId(), ii->incommingType, ii->itemId, ii->itemNum, c, TimeUtil::Now());
         }
 
@@ -19744,7 +19823,7 @@ UInt8 Player::toQQGroup(bool isJoin)
             longyuan -= a;
             if(ci != NULL)
             {
-                DBLOG1().PushUpdateData("insert into consume_pet (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+                DBLOG1().PushUpdateData("insert into consume_pet (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
                 cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, a, TimeUtil::Now());
             }
         }
@@ -19767,7 +19846,7 @@ UInt8 Player::toQQGroup(bool isJoin)
 
         if(ii && ii->incommingType != 0)
         {
-            DBLOG1().PushUpdateData("insert into consume_pet (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+            DBLOG1().PushUpdateData("insert into consume_pet (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
                 cfg.serverLogId, getId(), ii->incommingType, ii->itemId, ii->itemNum, c, TimeUtil::Now());
         }
 
@@ -19786,7 +19865,7 @@ UInt8 Player::toQQGroup(bool isJoin)
             fengsui -= a;
             if(ci != NULL)
             {
-                DBLOG1().PushUpdateData("insert into consume_pet (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+                DBLOG1().PushUpdateData("insert into consume_pet (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
                 cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, a, TimeUtil::Now());
             }
         }
@@ -20262,6 +20341,39 @@ bool Player::SetVipPrivilege_1()
     return ret;
 }
 
+bool Player::SetNewRcVip(UInt8  op)
+{
+    UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME);
+    if(!in7DayFromCreated()) 
+        return false;
+    UInt32 vipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
+   if (vipType != 0 )
+       return false;
+    bool ret = false;
+    UInt32 vipCharge= 30;
+    if(op == 2 )
+        vipCharge = 200;
+    if(validate == 0)
+    {
+        UInt32 now = TimeUtil::Now();
+        UInt32 validate = now + 2*86400;
+        // 保持最低位为0
+        if(validate & 0x1)
+            validate = validate + 1;
+        // 保持第2位为0, 
+        // validate&0x2 为false表示限时vip为2天
+        // validate&0x2 为true表示限时vip为7天
+        if(validate & 0x2)
+            validate = validate + 0x2;
+        SetVar(VAR_VIP_PRIVILEGE_TIME, validate);
+        SetVar(VAR_VIP_PRIVILEGE_DATA_TYPE, op);
+        ret = true;
+        ConsumeInfo ci(VipPrivilege, 0, 0);
+        useGold(vipCharge, &ci);
+    }
+
+    return ret;
+}
 bool Player::SetVipPrivilege_2()
 {
     UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME);
@@ -20290,6 +20402,64 @@ bool Player::SetVipPrivilege_2()
     return ret;
 }
 
+bool Player::AddNewRcVip()
+{
+    UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME);
+    bool ret = false;
+    UInt32 vipCharge ;
+    UInt32 vipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
+    UInt32 addVipDay = 7;
+    switch(vipType)
+    {
+        case 1:
+            vipCharge =70;
+            addVipDay = 5;
+            break;
+        case 2:
+            vipCharge = 450;
+            addVipDay = 5;
+            break;
+        case 3:
+            vipCharge = 150;
+            break;
+        case 4:
+            vipCharge = 700;
+            break;
+        case 5:
+            vipCharge = 200;
+            break;
+        case 6:
+            vipCharge = 1000;
+            break;
+    }
+     if (getGold() < vipCharge )
+         return false;
+    if(validate > 0 && (0 == (validate & 0x2)))
+    {
+        UInt32 now = TimeUtil::Now();
+        if(validate > now)
+            validate += addVipDay*86400;
+        else
+            validate = now + addVipDay*86400;
+
+        // 保持最低位为0
+        if(validate & 0x1)
+            validate = validate + 1;
+        // 保持第2位为1, 
+        // validate&0x2 为false表示限时vip为2天
+        // validate&0x2 为true表示限时vip为7天
+        validate |= 0x2;
+        SetVar(VAR_VIP_PRIVILEGE_TIME, validate);
+        if(vipType < 5)
+            vipType+=2;
+        SetVar(VAR_VIP_PRIVILEGE_DATA_TYPE, vipType);
+        ret = true;
+        ConsumeInfo ci(VipPrivilege, 0, 0);
+        useGold(vipCharge, &ci);
+    }
+
+    return ret;
+}
 #define VIP_PRIVILEGE_DAYLYAWARD(data) (0x01&data)
 #define VIP_PRIVILEGE_LIMITBUY1(data)  (0x02&data)
 #define VIP_PRIVILEGE_LIMITBUY2(data)  (0x04&data)
@@ -20337,6 +20507,7 @@ void Player::doVipPrivilege(UInt8 idx)
         if (getGold() < 30)
             return;
         SetVipPrivilege_1();
+      // SetNewRcVip(1);
         break;
     case 6:
         if(!in7DayFromCreated())
@@ -20344,6 +20515,16 @@ void Player::doVipPrivilege(UInt8 idx)
         if (getGold() < 70)
             return;
         SetVipPrivilege_2();
+        break;
+    case 8:
+        AddNewRcVip();
+        break;
+    case 9:
+        if(!in7DayFromCreated())
+            return;
+        if (getGold() < 200)
+            return;
+        SetNewRcVip(2);
         break;
     }
 
@@ -20798,7 +20979,7 @@ void Player::sendNuwaInfo()
         if(GET_BIT_3(signet, i))
             ++ c;
     }
-    if(c >= 3 || c <= 0)
+    if(c >= 3 || c <= 0 || GET_BIT_3(signet, 0))
     {
         //不能使用World::_wday,有30秒误差
         time_t curtime = time(NULL);
@@ -21022,7 +21203,7 @@ void Player::setNuwaSignet(UInt8 idx)
             SYSMSG_BROADCASTV(300, getCountry(), getName().c_str(), coupon);
         signet = SET_BIT_3(signet, 0, (cnt + 1));
         SetVar(VAR_NUWA_OPENTIME, TimeUtil::Now());
-        TRACE_LOG("NUWA_SHIPAN==>>playerId:[%"I64_FMT"u],Coupon::[%u],signet:[%u]", getId(), coupon, signet);
+        TRACE_LOG("NUWA_SHIPAN==>>playerId:[%" I64_FMT "u],Coupon::[%u],signet:[%u]", getId(), coupon, signet);
         char str[16] = {0};
         sprintf(str, "F_10000_%d", opt);
         udpLog("NvWa", str, "", "", "", "", "act");
@@ -21860,7 +22041,8 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
         if(flag == e_sla_none)
         {
             //GetPackage()->AddItem(9397, 1, true, false, FromNpc);
-            GetPackage()->AddItem(9401, 1, true, false, FromNpc);
+            //GetPackage()->AddItem(9401, 1, true, false, FromNpc);
+            GetPackage()->AddItem(9407, 1, true, false, FromNpc);
         }
         else
         {
@@ -21868,7 +22050,8 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
             if(!(status & flag))
             {
                 //GetPackage()->AddItem(9397, 1, true, false, FromNpc);
-                GetPackage()->AddItem(9401, 1, true, false, FromNpc);
+                //GetPackage()->AddItem(9401, 1, true, false, FromNpc);
+                GetPackage()->AddItem(9407, 1, true, false, FromNpc);
                 status |= flag;
                 SetVar(VAR_SURNAME_LEGEND_STATUS, status);
             }

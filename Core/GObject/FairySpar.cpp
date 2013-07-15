@@ -106,7 +106,7 @@ namespace GObject
         if(m_element[0] == 0 && m_element[1] == 0 && m_element[2] == 0 && m_element[3] == 0 && m_element[4] == 0)
         {
             getElement();
-            DB3().PushUpdateData("INSERT INTO `fairy_spar`(`playerId`, `atk`, `magAtk`, `phy`,`element1`,`element2`,`element3`,`element4`,`element5`,`complexPercent`,`curMark`,`breakoutCnt`) VALUES (%"I64_FMT"u, 0, 0, 0, %u, %u, %u, %u, %u, 0, 0, 0)", m_owner->getId(), m_element[0], m_element[1], m_element[2], m_element[3], m_element[4]);
+            DB3().PushUpdateData("INSERT INTO `fairy_spar`(`playerId`, `atk`, `magAtk`, `phy`,`element1`,`element2`,`element3`,`element4`,`element5`,`complexPercent`,`curMark`,`breakoutCnt`) VALUES (%" I64_FMT "u, 0, 0, 0, %u, %u, %u, %u, %u, 0, 0, 0)", m_owner->getId(), m_element[0], m_element[1], m_element[2], m_element[3], m_element[4]);
         }
         sendAtkPhyInfo();
         sendElementInfo();
@@ -143,7 +143,7 @@ namespace GObject
             m_owner->useClanProffer(100, &ci);
         }
         getElement();
-        DB3().PushUpdateData("UPDATE `fairy_spar` SET `element1` = %u, `element2` = %u, `element3` = %u, `element4` = %u, `element5` = %u WHERE `playerId` = %"I64_FMT"u", m_element[0], m_element[1], m_element[2], m_element[3], m_element[4], m_owner->getId());
+        DB3().PushUpdateData("UPDATE `fairy_spar` SET `element1` = %u, `element2` = %u, `element3` = %u, `element4` = %u, `element5` = %u WHERE `playerId` = %" I64_FMT "u", m_element[0], m_element[1], m_element[2], m_element[3], m_element[4], m_owner->getId());
         sendElementInfo();
     }
 
@@ -233,7 +233,7 @@ namespace GObject
             if(isDirty)
                 m_owner->setFightersDirty(true);
             sendAtkPhyInfo();
-            DB3().PushUpdateData("UPDATE `fairy_spar` SET `atk` = %u, `magAtk` = %u, `phy` = %u, `breakoutCnt` = %u  WHERE `playerId` = %"I64_FMT"u", m_atk, m_magAtk, m_phy, m_breakoutCnt, m_owner->getId());
+            DB3().PushUpdateData("UPDATE `fairy_spar` SET `atk` = %u, `magAtk` = %u, `phy` = %u, `breakoutCnt` = %u  WHERE `playerId` = %" I64_FMT "u", m_atk, m_magAtk, m_phy, m_breakoutCnt, m_owner->getId());
         }
         else
             m_owner->sendMsgCode(0, 1364);
@@ -409,7 +409,7 @@ namespace GObject
             m_owner->sendMsgCode(0, 1363);
             sendAtkPhyInfo();
             m_owner->setFightersDirty(true);
-            DB3().PushUpdateData("UPDATE `fairy_spar` SET `atk` = %u, `magAtk` = %u, `phy` = %u  WHERE `playerId` = %"I64_FMT"u", m_atk, m_magAtk, m_phy, m_owner->getId());
+            DB3().PushUpdateData("UPDATE `fairy_spar` SET `atk` = %u, `magAtk` = %u, `phy` = %u  WHERE `playerId` = %" I64_FMT "u", m_atk, m_magAtk, m_phy, m_owner->getId());
         }
         else
             m_owner->sendMsgCode(0, 1362);
@@ -505,14 +505,14 @@ namespace GObject
                     m_curMark = 100;
                 else
                     m_curMark -= 100;
-                DB3().PushUpdateData("UPDATE `fairy_spar` SET `complexPercent` = %u, `curMark` = %u WHERE `playerId` = %"I64_FMT"u", m_complexPercent, m_curMark, m_owner->getId());
+                DB3().PushUpdateData("UPDATE `fairy_spar` SET `complexPercent` = %u, `curMark` = %u WHERE `playerId` = %" I64_FMT "u", m_complexPercent, m_curMark, m_owner->getId());
                 m_owner->setFightersDirty(true);
                 sendAtkPhyInfo();
                 sendMarkInfo();
             }
             else
             {
-                DB3().PushUpdateData("UPDATE `fairy_spar` SET `curMark` = %u WHERE `playerId` = %"I64_FMT"u", m_curMark, m_owner->getId());
+                DB3().PushUpdateData("UPDATE `fairy_spar` SET `curMark` = %u WHERE `playerId` = %" I64_FMT "u", m_curMark, m_owner->getId());
                 sendMarkInfo();
             }
 
@@ -575,7 +575,7 @@ namespace GObject
         m_complexPercent = complexP;
         if(m_complexPercent == 100)
             m_curMark = 100;
-        DB3().PushUpdateData("UPDATE `fairy_spar` SET `complexPercent` = %u, `curMark` = %u WHERE `playerId` = %"I64_FMT"u", m_complexPercent, m_curMark, m_owner->getId());
+        DB3().PushUpdateData("UPDATE `fairy_spar` SET `complexPercent` = %u, `curMark` = %u WHERE `playerId` = %" I64_FMT "u", m_complexPercent, m_curMark, m_owner->getId());
         m_owner->setFightersDirty(true);
         sendAtkPhyInfo();
         sendMarkInfo();
@@ -588,7 +588,7 @@ namespace GObject
         m_element[2] = elem3;
         m_element[3] = elem4;
         m_element[4] = elem5;
-        DB3().PushUpdateData("UPDATE `fairy_spar` SET `element1` = %u, `element2` = %u, `element3` = %u, `element4` = %u, `element5` = %u WHERE `playerId` = %"I64_FMT"u", m_element[0], m_element[1], m_element[2], m_element[3], m_element[4], m_owner->getId());
+        DB3().PushUpdateData("UPDATE `fairy_spar` SET `element1` = %u, `element2` = %u, `element3` = %u, `element4` = %u, `element5` = %u WHERE `playerId` = %" I64_FMT "u", m_element[0], m_element[1], m_element[2], m_element[3], m_element[4], m_owner->getId());
         sendElementInfo();
     }
 

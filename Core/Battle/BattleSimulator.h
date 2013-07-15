@@ -57,6 +57,7 @@ public:
 	BattleFighter * newFighter(UInt8 side, UInt8 pos, GObject::Fighter *);
     BattleFighter * newPet(UInt8 side, UInt8 pos, GObject::Fighter *);
 	inline void setFormula(Script::BattleFormula * formula) { _formula = formula; }
+    float getLostHPPercent(UInt8 side, GObject::Player * player);
 
     void putTeams(const std::string& name, UInt8 level, UInt16 portrait, UInt8 side);
     void switchPlayer(GObject::Player* player, UInt8 side);
@@ -526,6 +527,8 @@ private:
     void doSkillEffectExtra_CriticalDmgReduce(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
 
     bool doSkillEffectExtra_Dead(BattleFighter* bf, const GData::SkillBase* skill);
+    void doSkillEffectExtra_AbnormalTypeDmg(BattleFighter* bf, const GData::SkillBase* skill, bool& cs, bool& pr);
+    void doSkillEffectExtra_BleedTypeDmg(BattleFighter* bf, const GData::SkillBase* skill);
     bool doSkillEffectExtra_LingShiBleed(BattleFighter* bf, BattleFighter* bo, const GData::SkillBase* skill, UInt32 dmg);
     bool doSkillDmg(BattleFighter* bf, const GData::SkillBase* skill);
     void doPassiveSkillBegDmg(BattleFighter* bf, BattleFighter* bo, UInt32 dmg);
@@ -546,6 +549,9 @@ private:
     bool doDarkVigorAttack(BattleFighter* bf, float darkVigor);
     void doSkillEffectExtraCounter(BattleFighter* bf, BattleFighter* bo, const GData::SkillBase* skill);
     void doPassiveSkillOnCounter(BattleFighter* bf, BattleFighter* bo);
+
+    void calcAbnormalTypeCnt(BattleObject* bo);
+    void calcBleedTypeCnt(BattleObject* bo);
 
 private:
 	int _id, _winner, _turns;

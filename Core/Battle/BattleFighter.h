@@ -1034,6 +1034,25 @@ private:
         _hp = 1;
         _attack = _attack * v;
         _magatk = _magatk * v;
+
+        _attackAdd = 0;
+        _attackAdd2 = 0;
+        _atkAddSpecial = 0;
+        _atkDecSpecial = 0;
+        _moAttackAdd = 0;
+        _petAttackAdd = 0;
+        _petExAtk = 0;
+        _counter_spirit_atk_add = 0;
+        _pet_coatk = 0;
+
+        _magAtkAdd = 0;
+        _magAtkAdd2 = 0;
+        _magAtkAddSpecial = 0;
+        _magAtkDecSpecial = 0;
+        _moMagAtkAdd = 0;
+        _petMagAtkAdd = 0;
+        _counter_spirit_magatk_add = 0;
+
         _soulout = true;
         _soulout_last = l;
 
@@ -1073,11 +1092,27 @@ private:
     float getCriticalDmgReduce() { return _criticaldmgreduce; }
     void setCriticalDmgReduce(float v) { _criticaldmgreduce = v; }
 
+    UInt8 _abnormalTypeCnt;
+    void addAbnormalTypeCnt() { printf("abnormal:%u\n", _abnormalTypeCnt); if(_abnormalTypeCnt < 6) ++_abnormalTypeCnt; }
+    UInt8 getAbnormalTypeCnt() { return _abnormalTypeCnt; }
+    void resetAbnormalTypeCnt() { _abnormalTypeCnt = 0; }
+
+    UInt8 _bleedTypeCnt;
+    void addBleedTypeCnt() { printf("bleed:%u\n", _bleedTypeCnt); if(_abnormalTypeCnt < 6) ++_bleedTypeCnt; }
+    UInt8 getBleedTypeCnt() { return _bleedTypeCnt; }
+    void resetBleedTypeCnt() { _bleedTypeCnt = 0; }
+
     std::vector<GData::SkillItem> _passiveSkillDeadFake100;
     std::vector<GData::SkillItem> _passiveSkillDeadFake;
+    std::vector<GData::SkillItem> _passiveSkillAbnormalTypeDmg100;
+    std::vector<GData::SkillItem> _passiveSkillBleedTypeDmg100;
+    std::vector<GData::SkillItem> _passiveSkillBleedTypeDmg;
 
     const GData::SkillBase* getPassiveSkillDeadFake100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillDeadFake(bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillAbnormalTypeDmg100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillBleedTypeDmg100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillBleedTypeDmg(bool noPossibleTarget = false);
 
 public:
 	enum StatusFlag

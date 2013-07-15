@@ -56,7 +56,7 @@ void autoClear(Player* pl, bool complete = false, UInt8 id = 0, UInt8 floor = 0,
     PopTimerEvent(pl, EVENT_AUTOCOPY, pl->getId());
     pl->setBuffData(PLAYER_BUFF_AUTOCOPY, 0, true);
     pl->delFlag(Player::AutoCopy);
-    DB3().PushUpdateData("DELETE FROM `autocopy` WHERE playerId = %"I64_FMT"u", pl->getId());
+    DB3().PushUpdateData("DELETE FROM `autocopy` WHERE playerId = %" I64_FMT "u", pl->getId());
 }
 
 void PlayerCopy::sendAllInfo(Player* pl)
@@ -258,7 +258,7 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
 
     if (PLAYER_DATA(pl, copyFreeCnt) < getFreeCount()) {
         ++PLAYER_DATA(pl, copyFreeCnt);
-        DB1().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = %u, `copyGoldCnt` = %u WHERE `id` = %"I64_FMT"u",
+        DB1().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = %u, `copyGoldCnt` = %u WHERE `id` = %" I64_FMT "u",
                 PLAYER_DATA(pl, copyFreeCnt), PLAYER_DATA(pl, copyGoldCnt), pl->getId());
         pl->copyUdpLog(id, 1);
         cf_bind_flag &= 0xF2;
@@ -275,7 +275,7 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
         pl->useGold(gold, &ci);
 
         ++PLAYER_DATA(pl, copyGoldCnt);
-        DB1().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = %u, `copyGoldCnt` = %u WHERE `id` = %"I64_FMT"u",
+        DB1().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = %u, `copyGoldCnt` = %u WHERE `id` = %" I64_FMT "u",
                 PLAYER_DATA(pl, copyFreeCnt), PLAYER_DATA(pl, copyGoldCnt), pl->getId());
         lootlvl = PLAYER_DATA(pl, copyGoldCnt);
         pl->copyUdpLog(id, 3);
@@ -359,7 +359,7 @@ void PlayerCopy::enter(Player* pl, UInt8 id)
             tcd.lootlvl = lootlvl;
         }
 
-        DB3().PushUpdateData("UPDATE `player_copy` SET `floor`=%u,`spot`=%u, `lootlvl`=%u WHERE `playerId` = %"I64_FMT"u AND `id` = %u",
+        DB3().PushUpdateData("UPDATE `player_copy` SET `floor`=%u,`spot`=%u, `lootlvl`=%u WHERE `playerId` = %" I64_FMT "u AND `id` = %u",
                 tcd.floor, tcd.spot, lootlvl, pl->getId(), id);
 
         GameAction()->doStrong(pl, SthCopy , 0,0);
@@ -550,7 +550,7 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
 
             tcd.floor = 0;
             tcd.spot = 0;
-            DB3().PushUpdateData("DELETE FROM `player_copy` WHERE `playerId` = %"I64_FMT"u AND `id` = %u", pl->getId(), id);
+            DB3().PushUpdateData("DELETE FROM `player_copy` WHERE `playerId` = %" I64_FMT "u AND `id` = %u", pl->getId(), id);
             return 2;
         } else {
             if (ato) {
@@ -584,7 +584,7 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
             }
         }
 
-        DB3().PushUpdateData("UPDATE `player_copy` SET `floor`=%u,`spot`=%u WHERE `playerId` = %"I64_FMT"u AND `id` = %u",
+        DB3().PushUpdateData("UPDATE `player_copy` SET `floor`=%u,`spot`=%u WHERE `playerId` = %" I64_FMT "u AND `id` = %u",
                 tcd.floor, tcd.spot, pl->getId(), id);
         return 1;
     } else {
@@ -631,7 +631,7 @@ void PlayerCopy::reset(Player* pl, UInt8 id)
     tcd.floor = 0;
     tcd.spot = 0;
 
-    DB3().PushUpdateData("DELETE FROM `player_copy` WHERE `playerId` = %"I64_FMT"u AND `id` = %u",
+    DB3().PushUpdateData("DELETE FROM `player_copy` WHERE `playerId` = %" I64_FMT "u AND `id` = %u",
             tcd.spot, pl->getId(), id);
 
     st << static_cast<UInt8>(2) << id << static_cast<UInt8>(0) << Stream::eos;
@@ -684,7 +684,7 @@ void PlayerCopy::getCount(Player* pl, UInt8* free, UInt8* gold, bool lock)
                 *free = 0;
             if (gold)
                 *gold = 0;
-            DB1().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = 0, `copyGoldCnt` = 0, `copyUpdate` = %u WHERE `id` = %"I64_FMT"u", TimeUtil::Now(), playerId);
+            DB1().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = 0, `copyGoldCnt` = 0, `copyUpdate` = %u WHERE `id` = %" I64_FMT "u", TimeUtil::Now(), playerId);
         } else {
             if (free)
                 *free = PLAYER_DATA(pl, copyFreeCnt);
@@ -701,7 +701,7 @@ void PlayerCopy::getCount(Player* pl, UInt8* free, UInt8* gold, bool lock)
                 *free = 0;
             if (gold)
                 *gold = 0;
-            DB1().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = 0, `copyGoldCnt` = 0, `copyUpdate` = %u WHERE `id` = %"I64_FMT"u", TimeUtil::Now(), playerId);
+            DB1().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = 0, `copyGoldCnt` = 0, `copyUpdate` = %u WHERE `id` = %" I64_FMT "u", TimeUtil::Now(), playerId);
         } else {
             if (free)
                 *free = PLAYER_DATA(pl, copyFreeCnt);
@@ -722,7 +722,7 @@ CopyData& PlayerCopy::getCopyData(Player* pl, UInt64 playerId, UInt8 id, bool up
     }
     CopyData& cd = m_copys[playerId][id];
     if (!cd.floor && update) {
-        DB3().PushUpdateData("REPLACE INTO `player_copy`(`playerId`, `id`, `floor`, `spot`) VALUES(%"I64_FMT"u, %u, %u, %u)",
+        DB3().PushUpdateData("REPLACE INTO `player_copy`(`playerId`, `id`, `floor`, `spot`) VALUES(%" I64_FMT "u, %u, %u, %u)",
                 playerId, id, cd.floor, cd.spot);
     }
 
@@ -823,7 +823,7 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool 
 
                 pl->addFlag(Player::AutoCopy);
                 pl->setBuffData(PLAYER_BUFF_AUTOCOPY, id, true);
-                DB3().PushUpdateData("REPLACE INTO `autocopy` (`playerId`, `id`) VALUES (%"I64_FMT"u, %u)", pl->getId(), id);
+                DB3().PushUpdateData("REPLACE INTO `autocopy` (`playerId`, `id`) VALUES (%" I64_FMT "u, %u)", pl->getId(), id);
 
                 Stream st(REP::AUTO_COPY);
                 st << static_cast<UInt8>(0) << id << tcd.floor << tcd.spot << Stream::eos;

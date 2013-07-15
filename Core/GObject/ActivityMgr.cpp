@@ -145,9 +145,9 @@ void ActivityMgr::UpdateToDB()
             strSign += "|";
     }
 
-    //DB().PushUpdateData("REPLACE INTO `activityData` (`playerId`, `overTime`, `awardId`,`point`,`award`, `flags`, `scores`, `propsID`, `signRecord`) VALUES (%"I64_FMT"u, %u, %u, %u, %u, '%s', '%u', '%u', '%s')"  ,
+    //DB().PushUpdateData("REPLACE INTO `activityData` (`playerId`, `overTime`, `awardId`,`point`,`award`, `flags`, `scores`, `propsID`, `signRecord`) VALUES (%" I64_FMT "u, %u, %u, %u, %u, '%s', '%u', '%u', '%s')"  ,
     //        this->_owner->getId(), _item.overTime, _item.awardID, _item.point, _item.award, strFlag.c_str(), _item.scores, _item.propsID, strSign.c_str());
-    DB().PushUpdateData("REPLACE INTO `activityData` (`playerId`, `overTime`, `scores`, `propsID`, `signRecord`) VALUES (%"I64_FMT"u, %u, %u, %u, '%s')"  ,
+    DB().PushUpdateData("REPLACE INTO `activityData` (`playerId`, `overTime`, `scores`, `propsID`, `signRecord`) VALUES (%" I64_FMT "u, %u, %u, %u, '%s')"  ,
             this->_owner->getId(), _item.overTime, _item.scores, _item.propsID, strSign.c_str());
 }
 

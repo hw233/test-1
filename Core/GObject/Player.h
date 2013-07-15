@@ -123,6 +123,7 @@ namespace GObject
 #define PLAYER_BUFF_JOYBUFF         0x48    //心悦会员
 
 #define PLAYER_BUFF_NEW_CBATTLE	    0x49    //新阵营战(蜀山论剑)
+#define PLAYER_BUFF_CLAN_CITY 	    0x50    //墨守城规
 
 #define PLAYER_BUFF_ATHL1           0x51
 #define PLAYER_BUFF_ATHL2           0x52
@@ -675,6 +676,7 @@ namespace GObject
 		{
 			ClanBattleFlag = 0x00000001,
 			CanTaskInit	= 0x00000002,
+			//ClanCityFlag = 0x00000004,
 			Challenging = 0x00000010,		//????״̬, ?=??̴߳???
 			BeChallenging = 0x00000020,		//?Ǿ???״̬
 			SGPunish	= 0x00000040,		//???ٳͷ?
@@ -1052,6 +1054,8 @@ namespace GObject
 		inline bool hasFlag(UInt32 flag) { return (_flag & flag) != 0; }
 		inline void addFlag(UInt32 flag) { _flag |= flag; }
 		inline void delFlag(UInt32 flag) { _flag &= ~flag; }
+        inline bool inClanCity() { return _inClanCity; }
+        inline void setInClanCity(bool v) { _inClanCity = v; }
 
 		inline bool hasGlobalFlag(UInt32 flag) { return (_gflag & flag) == flag; }
 		inline void addGlobalFlag(UInt32 flag) { _gflag |= flag; }
@@ -1084,6 +1088,8 @@ namespace GObject
         void sendVipPrivilegeMail(UInt8 lv);
         bool SetVipPrivilege_1();
         bool SetVipPrivilege_2();
+        bool SetNewRcVip(UInt8 op);
+        bool AddNewRcVip();
         void sendDirectPurInfo();
 
     private:
@@ -1260,6 +1266,8 @@ namespace GObject
 		void makePlayerInfo(Stream&);
 		void makeFormationInfo(Stream&);
         void makeFighterSSList(Stream& st);
+        void makeFighterSSListWithNoSkill(Stream& st);
+        void sendFighterSSListWithNoSkill();
 		void makeFighterList(Stream&);
 		void makeFighterInfo(Stream&, Fighter *, bool = true);
 		bool makeFighterInfo(Stream&, UInt32);
@@ -1728,6 +1736,7 @@ namespace GObject
         FairySpar* m_FairySpar;
 		MailBox* m_MailBox;
 
+        bool _loadMark;
 		bool _isOnline;
         bool _isHoding;
         UInt32 _holdGold;
@@ -1748,6 +1757,7 @@ namespace GObject
 		ClanBattle * _clanBattle;
 		std::string _battleName;
 		UInt32 _flag, _gflag;
+        bool _inClanCity;
 
 		UInt32 _onlineDuration; // for wallow use
 		UInt32 _offlineTime; // for wallow use
@@ -2162,6 +2172,7 @@ namespace GObject
         void getQQIMQuickLoginAward(UInt8 opt);
         void getEquipMoveAward(UInt8 opt);
         void getVipLevelAward(UInt8 opt);
+        void getQQXiuAward(UInt8 opt);                                                                                       
         UInt32 getFighterEquipAward();
 
         // 帮派神像

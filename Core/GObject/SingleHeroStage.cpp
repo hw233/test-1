@@ -515,13 +515,13 @@ namespace GObject
         _player = pl;
         _fgt = fgt;
         if(writeDB)
-            DB1().PushUpdateData("UPDATE `sh_player` SET `entered`=`entered`|%u WHERE `playerId`=%"I64_FMT"u", type, _player->getId());
+            DB1().PushUpdateData("UPDATE `sh_player` SET `entered`=`entered`|%u WHERE `playerId`=%" I64_FMT "u", type, _player->getId());
     }
 
     void SingleHeroPlayer::setTeam(UInt32 teamId)
     {
         _teamId = teamId;
-        DB1().PushUpdateData("UPDATE `sh_player` SET `teamId`=%u WHERE `playerId`=%"I64_FMT"u", teamId, _player->getId());
+        DB1().PushUpdateData("UPDATE `sh_player` SET `teamId`=%u WHERE `playerId`=%" I64_FMT "u", teamId, _player->getId());
     }
 
 
@@ -570,7 +570,7 @@ namespace GObject
         _player = pl;
         _fgt = fgt;
         if(writeDB)
-            DB1().PushUpdateData("UPDATE `sh_player` SET `entered`=`entered`|%u WHERE `playerId`=%"I64_FMT"u", type, _player->getId());
+            DB1().PushUpdateData("UPDATE `sh_player` SET `entered`=`entered`|%u WHERE `playerId`=%" I64_FMT "u", type, _player->getId());
     }
 
 
@@ -822,7 +822,7 @@ namespace GObject
                 pl1->_player->send(st1);
                 pl2->_player->send(st2);
 
-                DB1().PushUpdateData("REPLACE INTO `sh_preliminary`(`gpId`, `cls`, `type`, `won`, `player1`, `player2`, `battleTime`, `battleId`) VALUES(%u, %u, %u, %u, %"I64_FMT"u, %"I64_FMT"u, %u, %u)", m_gpId, m_cls, m_type, result ? 1 : 0, pl1->_player->getId(), pl2->_player->getId(), sbr._battleTime, sbr._battleId);
+                DB1().PushUpdateData("REPLACE INTO `sh_preliminary`(`gpId`, `cls`, `type`, `won`, `player1`, `player2`, `battleTime`, `battleId`) VALUES(%u, %u, %u, %u, %" I64_FMT "u, %" I64_FMT "u, %u, %u)", m_gpId, m_cls, m_type, result ? 1 : 0, pl1->_player->getId(), pl2->_player->getId(), sbr._battleTime, sbr._battleId);
             }
             if(!flag)
             {
@@ -892,12 +892,12 @@ namespace GObject
                         if(bspl1 != NULL)
                         {
                             m_3finals[0][j] = bspl1;
-                            DB1().PushUpdateData("UPDATE `sh_final_player` SET `final3pos`=%u WHERE `gpId`=%u AND `type`=%u AND `playerId`=%"I64_FMT"u", j+1, m_gpId, m_type, bspl1->_player->getId());
+                            DB1().PushUpdateData("UPDATE `sh_final_player` SET `final3pos`=%u WHERE `gpId`=%u AND `type`=%u AND `playerId`=%" I64_FMT "u", j+1, m_gpId, m_type, bspl1->_player->getId());
                         }
                         if(bspl2 != NULL)
                         {
                             m_3finals[0][j+2] = bspl2;
-                            DB1().PushUpdateData("UPDATE `sh_final_player` SET `final3pos`=%u WHERE `gpId`=%u AND `type`=%u AND `playerId`=%"I64_FMT"u", j+3, m_gpId, m_type, bspl2->_player->getId());
+                            DB1().PushUpdateData("UPDATE `sh_final_player` SET `final3pos`=%u WHERE `gpId`=%u AND `type`=%u AND `playerId`=%" I64_FMT "u", j+3, m_gpId, m_type, bspl2->_player->getId());
                         }
                     }
                 }
@@ -909,12 +909,12 @@ namespace GObject
                         if(bspl2 != NULL)
                         {
                             m_3finals[0][j] = bspl2;
-                            DB1().PushUpdateData("UPDATE `sh_final_player` SET `final3pos`=%u WHERE `gpId`=%u AND `type`=%u AND `playerId`=%"I64_FMT"u", j+1, m_gpId, m_type, bspl2->_player->getId());
+                            DB1().PushUpdateData("UPDATE `sh_final_player` SET `final3pos`=%u WHERE `gpId`=%u AND `type`=%u AND `playerId`=%" I64_FMT "u", j+1, m_gpId, m_type, bspl2->_player->getId());
                         }
                         if(bspl1 != NULL)
                         {
                             m_3finals[0][j+2] = bspl1;
-                            DB1().PushUpdateData("UPDATE `sh_final_player` SET `final3pos`=%u WHERE `gpId`=%u AND `type`=%u AND `playerId`=%"I64_FMT"u", j+3, m_gpId, m_type, bspl1->_player->getId());
+                            DB1().PushUpdateData("UPDATE `sh_final_player` SET `final3pos`=%u WHERE `gpId`=%u AND `type`=%u AND `playerId`=%" I64_FMT "u", j+3, m_gpId, m_type, bspl1->_player->getId());
                         }
                     }
                 }
@@ -1074,7 +1074,7 @@ namespace GObject
                 (*it)->_won = 0;
                 m_finals[j][0][base + n] = *it;
                 sendStageMail(*it, true);
-                DB1().PushUpdateData("REPLACE INTO `sh_final_player`(`gpId`, `type`, `cls`, `stage_idx`, `pos`, `playerId`, `final3pos`) VALUES(%u, %u, %u, %u, %u, %"I64_FMT"u, 0)", m_gpId, m_type, m_cls, j, base+n, (*it)->_player->getId());
+                DB1().PushUpdateData("REPLACE INTO `sh_final_player`(`gpId`, `type`, `cls`, `stage_idx`, `pos`, `playerId`, `final3pos`) VALUES(%u, %u, %u, %u, %u, %" I64_FMT "u, 0)", m_gpId, m_type, m_cls, j, base+n, (*it)->_player->getId());
                 if(m_gpId == e_sh_gp_sl)
                 {
                     Player* pl = (*it)->_player;
@@ -1492,7 +1492,7 @@ namespace GObject
         m_finals.push_back(sp);
 
         int pos = m_finals.size() - 1;
-        DB1().PushUpdateData("REPLACE INTO `sh_final_player`(`gpId`, `type`, `cls`, `stage_idx`, `pos`, `playerId`, `final3pos`) VALUES(%u, %u, %u, 2, %u, %"I64_FMT"u, 0)", m_gpId, m_type, m_cls, pos, player->getId());
+        DB1().PushUpdateData("REPLACE INTO `sh_final_player`(`gpId`, `type`, `cls`, `stage_idx`, `pos`, `playerId`, `final3pos`) VALUES(%u, %u, %u, 2, %u, %" I64_FMT "u, 0)", m_gpId, m_type, m_cls, pos, player->getId());
         return true;
     }
 
@@ -1559,7 +1559,7 @@ namespace GObject
             else
                 ++ sp2->_won;
 
-            DB1().PushUpdateData("REPLACE INTO `sh_preliminary`(`gpId`, `cls`, `type`, `won`, `player1`, `player2`, `battleTime`, `battleId`) VALUES(%u, %u, %u, %u, %"I64_FMT"u, %"I64_FMT"u, %u, %u)", m_gpId, m_cls, m_type, result ? 1 : 0, sp1->_player->getId(), sp2->_player->getId(), sbr._battleTime, sbr._battleId);
+            DB1().PushUpdateData("REPLACE INTO `sh_preliminary`(`gpId`, `cls`, `type`, `won`, `player1`, `player2`, `battleTime`, `battleId`) VALUES(%u, %u, %u, %u, %" I64_FMT "u, %" I64_FMT "u, %u, %u)", m_gpId, m_cls, m_type, result ? 1 : 0, sp1->_player->getId(), sp2->_player->getId(), sbr._battleTime, sbr._battleId);
         }
 
         ++ m_round;
@@ -1633,7 +1633,7 @@ namespace GObject
                 strItems += "|";
             }
             mailPackageManager.push(mail->id, mitem, size, true);
-            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
         }
     }
 
@@ -2212,7 +2212,7 @@ namespace GObject
         tbr._turns = turns;
         tbr._npcId = npcId;
         _battleMap[fighter->getPlayer()].push_back(tbr);
-        DB1().PushUpdateData("INSERT INTO `sh_towerbattle`(`cls`, `player`, `won`, `level`, `turns`, `battleId`, `npcId` ) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u, %u)", 
+        DB1().PushUpdateData("INSERT INTO `sh_towerbattle`(`cls`, `player`, `won`, `level`, `turns`, `battleId`, `npcId` ) VALUES(%u, %" I64_FMT "u, %u, %u, %u, %u, %u)", 
                 m_cls, fighter->getPlayer()->getId(), tbr._won, tbr._level, tbr._turns, tbr._battleId, tbr._npcId );
         return res;
     }
@@ -2534,7 +2534,7 @@ namespace GObject
                     }
                 }
 
-                DB1().PushUpdateData("REPLACE INTO `sh_preliminary`(`gpId`, `cls`, `type`, `won`, `player1`, `player2`, `battleTime`, `battleId`) VALUES(%u, 0, %u, %u, %"I64_FMT"u, %"I64_FMT"u, %u, %u)", m_gpId, m_type, result ? 1 : 0, pl1->_teamId, pl2->_teamId, sbr._battleTime, sbr._battleId);
+                DB1().PushUpdateData("REPLACE INTO `sh_preliminary`(`gpId`, `cls`, `type`, `won`, `player1`, `player2`, `battleTime`, `battleId`) VALUES(%u, 0, %u, %u, %" I64_FMT "u, %" I64_FMT "u, %u, %u)", m_gpId, m_type, result ? 1 : 0, pl1->_teamId, pl2->_teamId, sbr._battleTime, sbr._battleId);
             }
             if(!flag)
             {
@@ -3509,7 +3509,7 @@ namespace GObject
                 strItems += "|";
             }
             mailPackageManager.push(mail->id, mitem, size, true);
-            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
         }
     }
 
@@ -3997,7 +3997,7 @@ namespace GObject
                         strItems += "|";
                     }
                     mailPackageManager.push(mail->id, mitem, size, true);
-                    DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+                    DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
                 }
             }
         }
@@ -4235,7 +4235,7 @@ namespace GObject
     {
         UInt8 cls = fgt->getClass();
 
-        DB1().PushUpdateData("INSERT INTO `sh_player` (`playerId`, `entered`, `teamId`, `tLevel`, `tTurns`, `tLastTurns`, `score`) VALUES (%"I64_FMT"u, 0, 0, 0, 0, 0, 0)", player->getId());
+        DB1().PushUpdateData("INSERT INTO `sh_player` (`playerId`, `entered`, `teamId`, `tLevel`, `tTurns`, `tLastTurns`, `score`) VALUES (%" I64_FMT "u, 0, 0, 0, 0, 0, 0)", player->getId());
 
         SingleHeroFighter* slFgt = new SingleHeroFighter(player, fgt, e_sh_gp_sl);
         SingleHeroFighter* syFgt = new SingleHeroFighter(player, cls, e_sh_gp_sy);
@@ -4954,7 +4954,7 @@ namespace GObject
         }
 
         if(writeDB)
-            DB1().PushUpdateData("UPDATE `sh_player` SET `score`=%u WHERE `playerId`=%"I64_FMT"u", sp->_score, pl->getId());
+            DB1().PushUpdateData("UPDATE `sh_player` SET `score`=%u WHERE `playerId`=%" I64_FMT "u", sp->_score, pl->getId());
     }
 
     void SHBattleStageMgr::initSupportData()
@@ -5077,10 +5077,10 @@ namespace GObject
         if ((shsPlayer->_mySupport)[3] != NULL)
             plId3 = (shsPlayer->_mySupport)[3]->getId();
 
-        DB1().PushUpdateData("REPLACE INTO `sh_candidate` (`playerId`, `jobClass`, `supportedCount`, `pos`) VALUES (%"I64_FMT"u, %u, %u, %u)", 
+        DB1().PushUpdateData("REPLACE INTO `sh_candidate` (`playerId`, `jobClass`, `supportedCount`, `pos`) VALUES (%" I64_FMT "u, %u, %u, %u)", 
                 votePlayer->getId(), (UInt32)cls, ((*m_candidateMap[votePlayer])->_supportedCount),(UInt32)((*m_candidateMap[votePlayer])->_pos));
         DB1().PushUpdateData("REPLACE INTO `sh_supporter` (`playerId`, `flag`, `class1PlayerId`, `class2PlayerId`, `class3PlayerId`) \
-                VALUES (%"I64_FMT"u, %u, %"I64_FMT"u, %"I64_FMT"u, %"I64_FMT"u)", player->getId(), shsPlayer->_flag, plId1, plId2, plId3);
+                VALUES (%" I64_FMT "u, %u, %" I64_FMT "u, %" I64_FMT "u, %" I64_FMT "u)", player->getId(), shsPlayer->_flag, plId1, plId2, plId3);
 
 
         Stream st2(REP::SINGLE_HERO);
@@ -5102,7 +5102,7 @@ namespace GObject
             {
                 m_topPopular[cls][i] = votePlayer;
                 (*m_candidateMap[votePlayer])->_pos = i + 1;
-                DB1().PushUpdateData("REPLACE INTO `sh_candidate` (`playerId`, `jobClass`, `supportedCount`, `pos`) VALUES (%"I64_FMT"u, %u, %u, %u)", 
+                DB1().PushUpdateData("REPLACE INTO `sh_candidate` (`playerId`, `jobClass`, `supportedCount`, `pos`) VALUES (%" I64_FMT "u, %u, %u, %u)", 
                         votePlayer->getId(), (UInt32)cls, ((*m_candidateMap[votePlayer])->_supportedCount),(UInt32)((*m_candidateMap[votePlayer])->_pos));
                 st << static_cast<UInt64>(m_topPopular[cls][0] ? m_topPopular[cls][0]->getId() : 0);
                 st << static_cast<UInt64>(m_topPopular[cls][1] ? m_topPopular[cls][1]->getId() : 0);
@@ -5122,11 +5122,11 @@ namespace GObject
                     if (m_topPopular[cls][j])
                     {
                         ++((*m_candidateMap[m_topPopular[cls][j]])->_pos);
-                        DB1().PushUpdateData("REPLACE INTO `sh_candidate` (`playerId`, `jobClass`, `supportedCount`, `pos`) VALUES (%"I64_FMT"u, %u, %u, %u)", 
+                        DB1().PushUpdateData("REPLACE INTO `sh_candidate` (`playerId`, `jobClass`, `supportedCount`, `pos`) VALUES (%" I64_FMT "u, %u, %u, %u)", 
                                 m_topPopular[cls][j]->getId(), (UInt32)cls, ((*m_candidateMap[m_topPopular[cls][j]])->_supportedCount),(UInt32)((*m_candidateMap[m_topPopular[cls][j]])->_pos));
                         m_topPopular[cls][j] = pl;
                         (*m_candidateMap[pl])->_pos = j + 1;
-                        DB1().PushUpdateData("REPLACE INTO `sh_candidate` (`playerId`, `jobClass`, `supportedCount`, `pos`) VALUES (%"I64_FMT"u, %u, %u, %u)", 
+                        DB1().PushUpdateData("REPLACE INTO `sh_candidate` (`playerId`, `jobClass`, `supportedCount`, `pos`) VALUES (%" I64_FMT "u, %u, %u, %u)", 
                                 m_topPopular[cls][j]->getId(), (UInt32)cls, ((*m_candidateMap[m_topPopular[cls][j]])->_supportedCount),(UInt32)((*m_candidateMap[m_topPopular[cls][j]])->_pos));
                         if(tmppl == votePlayer)
                             break;
@@ -5178,7 +5178,7 @@ namespace GObject
             return;
         m_stars[cls].insert(shCandidate);
         m_candidateMap.insert(std::make_pair(player, m_stars[cls].find(shCandidate)));
-        DB1().PushUpdateData("REPLACE INTO `sh_candidate` (`playerId`, `jobClass`, `supportedCount`, `pos`) VALUES (%"I64_FMT"u, %u, %u, %u)", 
+        DB1().PushUpdateData("REPLACE INTO `sh_candidate` (`playerId`, `jobClass`, `supportedCount`, `pos`) VALUES (%" I64_FMT "u, %u, %u, %u)", 
                 player->getId(), (UInt32)cls, (shCandidate->_supportedCount), (UInt32)(shCandidate->_pos));
 
     }

@@ -62,7 +62,7 @@ void SpecialAward::AthleticsAward()
 	//mailPackageManager.push(pmail->id, MailPackage::Gold, ServerAthleticsAward[size]);
 	//SYSMSG_BROADCASTV(362, player->getCountry(), player->getName().c_str(), ServerAthleticsAward[size]);
 	m_SpecialAward[2].push_back(player);
-	DB().PushUpdateData("INSERT INTO `SpecialAward` VALUES(%u, %u, %"I64_FMT"u, %u)", size, 2, player->getId(), TimeUtil::Now());
+	DB().PushUpdateData("INSERT INTO `SpecialAward` VALUES(%u, %u, %" I64_FMT "u, %u)", size, 2, player->getId(), TimeUtil::Now());
 
 }
 void SpecialAward::AddSpecialAwardList(UInt8 type, Player *player)
@@ -94,7 +94,7 @@ void SpecialAward::AddSpecialAwardList(UInt8 type, Player *player)
 	}
 
 	UInt32 now = TimeUtil::Now();
-	DB().PushUpdateData("INSERT INTO `SpecialAward` VALUES(%u, %u, %"I64_FMT"u, %u)", size, type, player->getId(), now);
+	DB().PushUpdateData("INSERT INTO `SpecialAward` VALUES(%u, %u, %" I64_FMT "u, %u)", size, type, player->getId(), now);
 
 	GameMsgHdr hdr(0x296, player->getThreadId(), player, sizeof(Award));
 	GLOBAL().PushMsg(hdr, &Award);
@@ -115,7 +115,7 @@ void SpecialAward::luckydrawAward(Player * player)
 	//SYSMSGV(content, 364, ServerLuckyDrawAward[size]);
 	//Mail *pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
 	//mailPackageManager.push(pmail->id, MailPackage::Coupon, ServerLuckyDrawAward[size]);
-	DB().PushUpdateData("INSERT INTO `SpecialAward` VALUES(%u, %u, %"I64_FMT"u, %u)", size, 3, player->getId(), TimeUtil::Now());
+	DB().PushUpdateData("INSERT INTO `SpecialAward` VALUES(%u, %u, %" I64_FMT "u, %u)", size, 3, player->getId(), TimeUtil::Now());
 }
 
 void SpecialAward::newServerActivity(Player *pl, UInt8 challengeNum)

@@ -63,7 +63,7 @@ void ShuoShuo::updateToDB()
     }
 
     m_updateTime = TimeUtil::Now();
-    DB().PushUpdateData("REPLACE INTO `shuoshuo` (`playerId`, `updateTime`, `shuoshuo`) VALUES (%"I64_FMT"u, %u, '%s')",
+    DB().PushUpdateData("REPLACE INTO `shuoshuo` (`playerId`, `updateTime`, `shuoshuo`) VALUES (%" I64_FMT "u, %u, '%s')",
             m_owner->getId(), m_updateTime, ss.c_str());
 }
 

@@ -125,7 +125,7 @@ static void setForbidSaleValue(const UInt64 playerId, bool isForbid)
     {
         char value[32] = {'0'};
         char key[MEMCACHED_MAX_KEY] = {0};
-        size_t len = snprintf(key, sizeof(key), "asss_globallock_%"I64_FMT"u", playerId);
+        size_t len = snprintf(key, sizeof(key), "asss_globallock_%" I64_FMT "u", playerId);
         if (isForbid) value[0] = '1';
         sprintf(&value[1],"%d", TimeUtil::Now());
 /*        {
@@ -150,7 +150,7 @@ static bool checkForbidSale(const UInt64 playerId, std::string& t)
     char value[32] = {0};
     char key[MEMCACHED_MAX_KEY] = {0};
     UInt64 pid = playerId & 0xFFFFFFFFFF;
-    size_t len = snprintf(key, sizeof(key), "asss_globallock_%"I64_FMT"u", pid);
+    size_t len = snprintf(key, sizeof(key), "asss_globallock_%" I64_FMT "u", pid);
 
     if (memcinited)
         MemcachedGet(key, len, value, sizeof(value));
@@ -210,17 +210,17 @@ static bool checkCrack(std::string& platform, std::string& ip, UInt64 id)
                 v = atoi(value);
                 /*if (pf == 11 && v >= 3)
                 {
-                    TRACE_LOG("id: %"I64_FMT"u from %s of asss_%d is cracking...", id, ip.c_str(), cfg.serverNum);
+                    TRACE_LOG("id: %" I64_FMT "u from %s of asss_%d is cracking...", id, ip.c_str(), cfg.serverNum);
                     return true;
                 }
                 else if (pf == 17 && v >= 5)
                 {
-                    TRACE_LOG("id: %"I64_FMT"u from %s of asss_%d is cracking...", id, ip.c_str(), cfg.serverNum);
+                    TRACE_LOG("id: %" I64_FMT "u from %s of asss_%d is cracking...", id, ip.c_str(), cfg.serverNum);
                     return true;
                 }*/
                 if (g_platform_login_number[pf] > 0 && v >= g_platform_login_number[pf])
                 {
-                    TRACE_LOG("id: %"I64_FMT"u from %s of asss_%d is cracking...", id, ip.c_str(), cfg.serverNum);
+                    TRACE_LOG("id: %" I64_FMT "u from %s of asss_%d is cracking...", id, ip.c_str(), cfg.serverNum);
                     return true;
                 }
             }
@@ -239,7 +239,7 @@ static void memLockUser(const UInt64 playerId, UInt32 expireTime)
     {
         char value[32] = {0};
         char key[MEMCACHED_MAX_KEY] = {0};
-        size_t len = snprintf(key, sizeof(key), "asss_locklogin_%"I64_FMT"u", playerId);
+        size_t len = snprintf(key, sizeof(key), "asss_locklogin_%" I64_FMT "u", playerId);
         size_t vlen = snprintf(value, sizeof(value), "%d", expireTime);
 
         MemcachedSet(key, len, value, vlen, 0);
@@ -253,7 +253,7 @@ static void memUnLockUser(const UInt64 playerId)
     {
         char value[2] = {'0'};
         char key[MEMCACHED_MAX_KEY] = {0};
-        size_t len = snprintf(key, sizeof(key), "asss_locklogin_%"I64_FMT"u", playerId);
+        size_t len = snprintf(key, sizeof(key), "asss_locklogin_%" I64_FMT "u", playerId);
 
         MemcachedSet(key, len, value, 1, 0);
     }
@@ -267,7 +267,7 @@ static UInt32 getLockUserValue(const UInt64 playerId)
     char value[32] = {0};
     char key[MEMCACHED_MAX_KEY] = {0};
     UInt64 pid = playerId & 0xFFFFFFFFFF;
-    size_t len = snprintf(key, sizeof(key), "asss_locklogin_%"I64_FMT"u", pid);
+    size_t len = snprintf(key, sizeof(key), "asss_locklogin_%" I64_FMT "u", pid);
 
     if (memcinited)
         MemcachedGet(key, len, value, sizeof(value));

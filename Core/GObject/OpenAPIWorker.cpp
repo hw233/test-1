@@ -392,7 +392,7 @@ namespace GObject
             return true;
         playerId = playerId & 0xFFFFFFFF;
         char buf[128] = {0};
-        snprintf(buf, 127, "oid_%"I64_FMT"u", playerId);
+        snprintf(buf, 127, "oid_%" I64_FMT "u", playerId);
         char openId2[256] = {0};
         m_MCached.get(buf, strlen(buf), openId2, 255);
         openId2[255] = '\0';
