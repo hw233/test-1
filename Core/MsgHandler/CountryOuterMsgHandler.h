@@ -1049,9 +1049,13 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 		conn->send(&st[0], st.size());
     }
     {
+#if 0
         Stream st;
         pl->makeFighterSSListWithNoSkill(st);
 		conn->send(&st[0], st.size());
+#else
+        pl->sendFighterSSListWithNoSkill();
+#endif
     }
 	{
 		Stream st;
@@ -1747,6 +1751,7 @@ void OnFighterDismissReq( GameMsgHdr& hdr, FighterDismissReq& fdr )
     fgt->delAllCitta();
     //此处只剩下法宝符文未散功了！！
     fgt->SSDismissAll(true);
+    player->sendFighterSSListWithNoSkill();
     fgt->dismissXingchen();
 	delete fgt;
 	rep._fgtid = fdr._fgtid;
