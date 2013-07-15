@@ -3233,6 +3233,13 @@ namespace GObject
 		st << Stream::eos;
     }
 
+    void Player::sendFighterSSListWithNoSkill()
+    {
+        Stream st;
+        makeFighterSSListWithNoSkill(st);
+		send(st);
+    }
+
 	/*void Player::xingchenInfo()
 	{
 		for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++it)

@@ -928,7 +928,7 @@ public:
     void makeFighterSSInfoWithNoSkill(Stream& st);
     bool appendFighterSSInfo(Stream& st, UInt16 skillid);
     bool appendFighterSSInfo(Stream& st, UInt16 skillid, SStrengthen* ss);
-    void PeerlessSSNotify(UInt16 id);
+    void PeerlessSSNotify(UInt16 id, bool writedb);
 
     UInt16 calcSkillBattlePoint(UInt16 skillId, UInt8 type);
 
