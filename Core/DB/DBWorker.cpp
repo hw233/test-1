@@ -38,7 +38,7 @@ void DBWorker::CalcUserLost(DBWorker * worker)
 			if(created < tend)
 			{
 				if(created >= tstart)
-					worker->PushUpdateData("update register_states set level=%u where server_id=%u and player_id=%"I64_FMT"u", pl->GetLev(), cfg.serverLogId, pl->getId());
+					worker->PushUpdateData("update register_states set level=%u where server_id=%u and player_id=%" I64_FMT "u", pl->GetLev(), cfg.serverLogId, pl->getId());
 				newplayers.erase(it ++);
 			}
 			else

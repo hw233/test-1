@@ -1111,7 +1111,7 @@ UInt8 TeamCopyPlayerInfo::getPassTimes(UInt8 copyId, UInt8 t)
     {
         m_vTime[t][copyIdx] = TimeUtil::SharpDayT(1, now);
         m_passTimes[t][copyIdx] = 0;
-        DB3().PushUpdateData("UPDATE `teamcopy_player` SET `passTimes`=%u,`vTime`=%u WHERE `playerId` = %"I64_FMT"u AND `copyId` = %u AND `type` = %u", m_passTimes[t][copyIdx], m_vTime[t][copyIdx], m_owner->getId(), copyId, t);
+        DB3().PushUpdateData("UPDATE `teamcopy_player` SET `passTimes`=%u,`vTime`=%u WHERE `playerId` = %" I64_FMT "u AND `copyId` = %u AND `type` = %u", m_passTimes[t][copyIdx], m_vTime[t][copyIdx], m_owner->getId(), copyId, t);
 
         reqTeamCopyInfo();
     }
@@ -1141,7 +1141,7 @@ void TeamCopyPlayerInfo::setPass(UInt8 copyId, UInt8 t, bool pass, bool notify)
     if(notify)
         sendUpdateTeamCopyInfo(copyId);
 
-    DB3().PushUpdateData("REPLACE INTO `teamcopy_player`(`playerId`, `copyId`, `type`, `pass`, `passTimes`, `vTime`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u)", m_owner->getId(), copyId, t, m_pass[t][copyIdx] ? 1 : 0, m_passTimes[t][copyIdx], m_vTime[t][copyIdx]);
+    DB3().PushUpdateData("REPLACE INTO `teamcopy_player`(`playerId`, `copyId`, `type`, `pass`, `passTimes`, `vTime`) VALUES(%" I64_FMT "u, %u, %u, %u, %u, %u)", m_owner->getId(), copyId, t, m_pass[t][copyIdx] ? 1 : 0, m_passTimes[t][copyIdx], m_vTime[t][copyIdx]);
 }
 
 void TeamCopyPlayerInfo::setPassTimesFromDB(UInt8 copyId, UInt8 t, UInt8 passTimes, UInt32 vTime)
@@ -1165,7 +1165,7 @@ void TeamCopyPlayerInfo::setPassTimes(UInt8 copyId, UInt8 t, UInt8 passTimes, UI
     m_passTimes[t][copyIdx] = passTimes;
     m_vTime[t][copyIdx] = vTime;
 
-    DB3().PushUpdateData("UPDATE `teamcopy_player` SET `passTimes`=%u,`vTime`=%u WHERE `playerId` = %"I64_FMT"u AND `copyId` = %u AND `type` = %u", m_passTimes[t][copyIdx], m_vTime[t][copyIdx], m_owner->getId(), copyId, t);
+    DB3().PushUpdateData("UPDATE `teamcopy_player` SET `passTimes`=%u,`vTime`=%u WHERE `playerId` = %" I64_FMT "u AND `copyId` = %u AND `type` = %u", m_passTimes[t][copyIdx], m_vTime[t][copyIdx], m_owner->getId(), copyId, t);
 }
 
 void TeamCopyPlayerInfo::incPass(UInt8 copyId, UInt8 t)
@@ -1189,7 +1189,7 @@ void TeamCopyPlayerInfo::incPass(UInt8 copyId, UInt8 t)
     }
 
     sendUpdateTeamCopyInfo(copyId);
-    DB3().PushUpdateData("UPDATE `teamcopy_player` SET `passTimes`=%u,`vTime`=%u WHERE `playerId` = %"I64_FMT"u AND `copyId` = %u AND `type` = %u", m_passTimes[t][copyIdx], m_vTime[t][copyIdx], m_owner->getId(), copyId, t);
+    DB3().PushUpdateData("UPDATE `teamcopy_player` SET `passTimes`=%u,`vTime`=%u WHERE `playerId` = %" I64_FMT "u AND `copyId` = %u AND `type` = %u", m_passTimes[t][copyIdx], m_vTime[t][copyIdx], m_owner->getId(), copyId, t);
 }
 
 bool TeamCopyPlayerInfo::checkTeamCopyPlayer(UInt8 copyId, UInt8 t)
@@ -1277,6 +1277,8 @@ void TeamCopyPlayerInfo::rollAward(UInt8 type)
         return;
     if(m_rollId == 0)
         return;
+    if(m_rollId > TEAMCOPY_MAXCOPYCNT)
+        return;
 
     if(type > 0)
     {
@@ -1307,7 +1309,7 @@ void TeamCopyPlayerInfo::rollAward(UInt8 type)
     st << static_cast<UInt8>(0x0D) << m_awardId << Stream::eos;
     m_owner->send(st);
 
-    DB3().PushUpdateData("UPDATE `teamcopy_player_award` SET `roll`=%u, `awardId`=%u, `awardCnt`=%u WHERE `playerId`=%"I64_FMT"u", m_roll, m_awardId, m_awardCnt, m_owner->getId());
+    DB3().PushUpdateData("UPDATE `teamcopy_player_award` SET `roll`=%u, `awardId`=%u, `awardCnt`=%u WHERE `playerId`=%" I64_FMT "u", m_roll, m_awardId, m_awardCnt, m_owner->getId());
 }
 
 bool TeamCopyPlayerInfo::getAward()
@@ -1341,7 +1343,7 @@ bool TeamCopyPlayerInfo::getAward()
     st << m_rollId << m_roll << m_awardId << Stream::eos;
     m_owner->send(st);
 
-    DB3().PushUpdateData("DELETE FROM `teamcopy_player_award` WHERE `playerId` = %"I64_FMT"u", m_owner->getId());
+    DB3().PushUpdateData("DELETE FROM `teamcopy_player_award` WHERE `playerId` = %" I64_FMT "u", m_owner->getId());
 
     m_owner->OnShuoShuo(SS_TEAMCP);
     return true;
@@ -1352,7 +1354,7 @@ void TeamCopyPlayerInfo::setAwardRoll(UInt8 rollId)
     m_rollId = rollId;
     m_roll = _needRoll;
 
-    DB3().PushUpdateData("REPLACE INTO `teamcopy_player_award`(`playerId`, `rollId`, `roll`, `awardId`, `awardCnt`) VALUES(%"I64_FMT"u, %u, %u, 0, 0)", m_owner->getId(), m_rollId, m_roll);
+    DB3().PushUpdateData("REPLACE INTO `teamcopy_player_award`(`playerId`, `rollId`, `roll`, `awardId`, `awardCnt`) VALUES(%" I64_FMT "u, %u, %u, 0, 0)", m_owner->getId(), m_rollId, m_roll);
 }
 
 void TeamCopyPlayerInfo::sendAwardInfo()

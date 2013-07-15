@@ -36,7 +36,7 @@ Dreamer::Dreamer(Player * player)
     }
     */
 #endif
-    DB2().PushUpdateData("INSERT IGNORE INTO `dreamer` (`playerId`) VALUES (%"I64_FMT"u)", player->getId()); 
+    DB2().PushUpdateData("INSERT IGNORE INTO `dreamer` (`playerId`) VALUES (%" I64_FMT "u)", player->getId()); 
     
 }
 
@@ -102,7 +102,7 @@ void Dreamer::SaveMapInfo()
     DB2().PushUpdateData("UPDATE `dreamer` SET `progress` = '%u', `level` = '%u', `timeConsume` = '%u',"\
             "`maxX` = '%u', `maxY` = '%u', `maxGrid` = '%u', `mapInfo` = '%s', "\
             "`posX` = '%u', `posY` = '%u', `earlyPosX` = '%u', `earlyPosY` = '%u', `remainTime` = '%u', `keys` = '%u',"\
-            "`eyes` = '%u', `eyeTime` = '%u', `eyeX` = '%u', `eyeY` = '%u' WHERE `playerId` = %"I64_FMT"u", 
+            "`eyes` = '%u', `eyeTime` = '%u', `eyeX` = '%u', `eyeY` = '%u' WHERE `playerId` = %" I64_FMT "u", 
             _gameProgress, _gameLevel, _timeConsume, 
             _maxX, _maxY, _maxGrid, mapString.c_str(), 
             _posX, _posY, _earlyPosX, _earlyPosY, _remainTime, _keysCount, 
@@ -566,7 +566,7 @@ void Dreamer::OnRequestStart(UInt8 progress)
     _remainTime = 50;
     _keysCount = 0;
     _eyesCount = 1;
-    DB2().PushUpdateData("UPDATE `dreamer` SET `progress` = '%u', `level` = '%u', `keys` = '%u' WHERE `playerId` = %"I64_FMT"u", _gameProgress, _gameLevel, _keysCount, _owner->getId());
+    DB2().PushUpdateData("UPDATE `dreamer` SET `progress` = '%u', `level` = '%u', `keys` = '%u' WHERE `playerId` = %" I64_FMT "u", _gameProgress, _gameLevel, _keysCount, _owner->getId());
     if (!InitMap(_gameLevel))
     {
         OnAbort();
@@ -679,7 +679,7 @@ void Dreamer::OnAbort()
     _eyeX = _eyeY = 0;
     DB2().PushUpdateData("UPDATE `dreamer` SET `progress` = '%u', `level` = '%u', `maxX` = '%u',  `maxY` = '%u', `maxGrid` = '%u', `mapInfo` = '',"\
             "`posX` = %u, `posY` = %u, `earlyPosX` = %u, `earlyPosY` = %u, `remainTime` = %u, `keys` = '%u',"\
-            "`eyes` = '%u', `eyeTime` = '%u', `eyeX` = '%u', `eyeY` = '%u' WHERE `playerId` = %"I64_FMT"u", 
+            "`eyes` = '%u', `eyeTime` = '%u', `eyeX` = '%u', `eyeY` = '%u' WHERE `playerId` = %" I64_FMT "u", 
             _gameProgress, _gameLevel, _maxX, _maxY, _maxGrid, _posX, _posY, _earlyPosX, _earlyPosY, _remainTime, _keysCount, 
             _eyesCount, _eyesTime, _eyeX, _eyeY, _owner->getId());
     SendGameInfo();
@@ -747,7 +747,7 @@ bool Dreamer::OnGetTreasure()
 
     st << Stream::eos;
 
-    DB2().PushUpdateData("UPDATE `dreamer` SET `keys` = '%u' WHERE `playerId` = %"I64_FMT"u", _keysCount, _owner->getId());
+    DB2().PushUpdateData("UPDATE `dreamer` SET `keys` = '%u' WHERE `playerId` = %" I64_FMT "u", _keysCount, _owner->getId());
     _owner->dreamerUdpLog(10000, 9 + _gameLevel);
     return true;
 }
@@ -761,7 +761,7 @@ bool Dreamer::OnGetKey()
         return false;
     }
     ++_keysCount;
-    DB2().PushUpdateData("UPDATE `dreamer` SET `keys` = '%u' WHERE `playerId` = %"I64_FMT"u", _keysCount, _owner->getId());
+    DB2().PushUpdateData("UPDATE `dreamer` SET `keys` = '%u' WHERE `playerId` = %" I64_FMT "u", _keysCount, _owner->getId());
     return true;
 }
 
@@ -859,7 +859,7 @@ bool Dreamer::OnGetEye()
         return false;
     }
     ++_eyesCount;
-    DB2().PushUpdateData("UPDATE `dreamer` SET `eyes` = '%u' WHERE `playerId` = %"I64_FMT"u", _eyesCount, _owner->getId());
+    DB2().PushUpdateData("UPDATE `dreamer` SET `eyes` = '%u' WHERE `playerId` = %" I64_FMT "u", _eyesCount, _owner->getId());
     return true;
 }
 
@@ -893,7 +893,7 @@ bool Dreamer::OnUseEye(UInt8 type)
             --_eyesCount;
             _eyesTime = 3;
             INDEX_TO_POS(it->first, _eyeX, _eyeY);
-            DB2().PushUpdateData("UPDATE `dreamer` SET `eyes` = '%u', `eyeTime` = '%u', `eyeX` = '%u',`eyeY` = '%u' WHERE `playerId` = %"I64_FMT"u", _eyesCount, _eyesTime, _eyeX, _eyeY, _owner->getId());
+            DB2().PushUpdateData("UPDATE `dreamer` SET `eyes` = '%u', `eyeTime` = '%u', `eyeX` = '%u',`eyeY` = '%u' WHERE `playerId` = %" I64_FMT "u", _eyesCount, _eyesTime, _eyeX, _eyeY, _owner->getId());
             _owner->dreamerUdpLog(10000, 9);
             return true;
         }

@@ -63,7 +63,7 @@ void DaysRank::process(bool toDB)
             std::string s4 = pInfo->toString(3);
             std::string s5 = pInfo->toString(4);
             if(toDB)
-                DB1().PushUpdateData("REPLACE INTO `days_rank` VALUES(%"I64_FMT"u,'%s','%s','%s','%s','%s')", 
+                DB1().PushUpdateData("REPLACE INTO `days_rank` VALUES(%" I64_FMT "u,'%s','%s','%s','%s','%s')", 
                     pl->getId(),s1.c_str(),s2.c_str(),s3.c_str(),s4.c_str(),s5.c_str());
 
         }

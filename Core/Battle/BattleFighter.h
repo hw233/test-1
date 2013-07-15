@@ -1045,7 +1045,6 @@ private:
         _counter_spirit_atk_add = 0;
         _pet_coatk = 0;
 
-        _magatk = 0;
         _magAtkAdd = 0;
         _magAtkAdd2 = 0;
         _magAtkAddSpecial = 0;
@@ -1053,7 +1052,6 @@ private:
         _moMagAtkAdd = 0;
         _petMagAtkAdd = 0;
         _counter_spirit_magatk_add = 0;
-        _pet_coatk = 0;
 
         _soulout = true;
         _soulout_last = l;

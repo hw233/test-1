@@ -629,6 +629,14 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 11)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 12)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 19)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 20)
+
 
 
 
@@ -659,6 +667,8 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 6, 29)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 6)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 13)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 20)
+
 
         ))
     {
@@ -1189,7 +1199,7 @@ void SendRechargeRankAward()
             char id[1024] = {0};
             char ctx[1024] = {0};
             snprintf(id, sizeof(id), "F_10000_1213_%u_%d", cfg.serverNum, pos);
-            snprintf(ctx, sizeof(ctx), "%"I64_FMT"u_%s_%u", player->getId(), player->getRealName().c_str(), i->total);
+            snprintf(ctx, sizeof(ctx), "%" I64_FMT "u_%s_%u", player->getId(), player->getRealName().c_str(), i->total);
             World::udpLog(id, ctx, "", "", "", "", "act");
         }
         World::rechargeSort.clear();
@@ -1216,7 +1226,7 @@ void SendConsumeRankAward()
             GLOBAL().PushMsg(hdr, &pos);
 
             SYSMSG_BROADCASTV(4034, pos, player->getCountry(), player->getPName(), i->total);
-            //TRACE_LOG("CONSUME RANK: %s\t\t\t%"I64_FMT"u\t\t\t%s\t\t\t%u", pos, player->getId(), player->getPName(), i->total);
+            //TRACE_LOG("CONSUME RANK: %s\t\t\t%" I64_FMT "u\t\t\t%s\t\t\t%u", pos, player->getId(), player->getPName(), i->total);
         }
         World::consumeSort.clear();
     }
@@ -1241,7 +1251,8 @@ void World::SendSurnameLegendAward()
             {
                 //{9907, 1}
                 //{9911, 1}
-                {9913, 1}
+               // {9913, 1}
+                {9914, 1}
             };
             player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
         }
@@ -1263,7 +1274,7 @@ void World::SendPopulatorRankAward(void*)
     char id[1024] = {0};
     char ctx[1024] = {0};
     snprintf(id, sizeof(id), "F_10000_pop_%u_%d", cfg.serverNum, i->total);
-    snprintf(ctx, sizeof(ctx), "%"I64_FMT"u_%s_%u", player->getId(), player->getPName(), i->total);
+    snprintf(ctx, sizeof(ctx), "%" I64_FMT "u_%s_%u", player->getId(), player->getPName(), i->total);
     player->setTitle(201, 7 * 3600 * 24);
     SYSMSGV(title, 4145, TimeUtil::Month(), TimeUtil::MonthDay());
     SYSMSGV(content, 4146, TimeUtil::Month(), TimeUtil::MonthDay(), i->total);
@@ -1604,6 +1615,13 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 11)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 12)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 19)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 20)
           
          
          
@@ -1918,7 +1936,7 @@ void World::ArenaExtraActTimer(void *)
                         strItems += Itoa(mitem[index].count);
                         strItems += "|";
                     }
-                    DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, LogArenaExtraAct, title, content, strItems.c_str(), mail->recvTime);
+                    DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, LogArenaExtraAct, title, content, strItems.c_str(), mail->recvTime);
                 }
             }
 
@@ -2002,7 +2020,7 @@ void World::ArenaExtraActTimer(void *)
                     strItems += Itoa(mitem[index].count);
                     strItems += "|";
                 }
-                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, LogArenaExtraAct, title, content, strItems.c_str(), mail->recvTime);
+                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, LogArenaExtraAct, title, content, strItems.c_str(), mail->recvTime);
             }
         }
 
@@ -2353,7 +2371,7 @@ void World::SendLuckyDrawAward()
                     strItems += Itoa(mitem[i].count);
                     strItems += "|";
                 }
-                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, (*rank)->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, (*rank)->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
             }
         }
         else if(pos == 1)
@@ -2372,7 +2390,7 @@ void World::SendLuckyDrawAward()
                     strItems += Itoa(mitem[i].count);
                     strItems += "|";
                 }
-                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, (*rank)->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, (*rank)->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
             }
         }
         else if(pos == 2)
@@ -2391,7 +2409,7 @@ void World::SendLuckyDrawAward()
                     strItems += Itoa(mitem[i].count);
                     strItems += "|";
                 }
-                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, (*rank)->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, (*rank)->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
             }
         }
         else
@@ -2410,7 +2428,7 @@ void World::SendLuckyDrawAward()
                     strItems += Itoa(mitem[i].count);
                     strItems += "|";
                 }
-                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, (*rank)->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, (*rank)->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
             }
         }
     }
@@ -2663,7 +2681,7 @@ void World::SendQixiAward()
                         strItems += "|";
                     }
 
-                    DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+                    DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
                 }
             }
         }
@@ -2690,7 +2708,7 @@ void World::sendQixiScoreAward(Player* pl)
             strItems += Itoa(mitem[i].count);
             strItems += "|";
         }
-        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
     }
 
     UInt32 score = pl->getScore();
@@ -2721,7 +2739,7 @@ void World::sendQixiScoreAward(Player* pl)
         }
     }
 
-    DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+    DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
 }
 
 struct SSelectYuebingUsedMost : public Visitor<Player>
@@ -3405,7 +3423,7 @@ void World::SendRechargeRP7RankAward()
 /*        char id[1024] = {0};
         char ctx[1024] = {0};
         snprintf(id, sizeof(id), "F_10000_1213_%u_%d", cfg.serverNum, pos);
-        snprintf(ctx, sizeof(ctx), "%"I64_FMT"u_%s_%u", player->getId(), player->getPName(), i->total);
+        snprintf(ctx, sizeof(ctx), "%" I64_FMT "u_%s_%u", player->getId(), player->getPName(), i->total);
         World::udpLog(id, ctx, "", "", "", "", "act");
   */
     }

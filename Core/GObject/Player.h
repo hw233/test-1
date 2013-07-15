@@ -1088,6 +1088,8 @@ namespace GObject
         void sendVipPrivilegeMail(UInt8 lv);
         bool SetVipPrivilege_1();
         bool SetVipPrivilege_2();
+        bool SetNewRcVip(UInt8 op);
+        bool AddNewRcVip();
         void sendDirectPurInfo();
 
     private:
@@ -1264,6 +1266,7 @@ namespace GObject
 		void makePlayerInfo(Stream&);
 		void makeFormationInfo(Stream&);
         void makeFighterSSList(Stream& st);
+        void makeFighterSSListWithNoSkill(Stream& st);
 		void makeFighterList(Stream&);
 		void makeFighterInfo(Stream&, Fighter *, bool = true);
 		bool makeFighterInfo(Stream&, UInt32);

@@ -118,9 +118,9 @@ namespace GObject
     void AttainMgr::UpdateDB(const AttainData* ad, bool bInsert)
     {
         if(bInsert)
-            DB().PushUpdateData("INSERT INTO `attainment` (`ownerId`, `attainId`, `status`, `updatetime`) VALUES (%"I64_FMT"u, %u, %u, %u)", ad->ownerId, ad->attainId, ad->status, TimeUtil::Now());
+            DB().PushUpdateData("INSERT INTO `attainment` (`ownerId`, `attainId`, `status`, `updatetime`) VALUES (%" I64_FMT "u, %u, %u, %u)", ad->ownerId, ad->attainId, ad->status, TimeUtil::Now());
         else
-            DB().PushUpdateData("UPDATE `attainment` SET `status` = %u , `updatetime` = %u WHERE `ownerId` = %"I64_FMT"u AND `attainId` = %u",ad->status, TimeUtil::Now(),ad->ownerId, ad->attainId);
+            DB().PushUpdateData("UPDATE `attainment` SET `status` = %u , `updatetime` = %u WHERE `ownerId` = %" I64_FMT "u AND `attainId` = %u",ad->status, TimeUtil::Now(),ad->ownerId, ad->attainId);
     }
 
 
