@@ -1093,14 +1093,14 @@ private:
     void setCriticalDmgReduce(float v) { _criticaldmgreduce = v; }
 
     UInt8 _abnormalTypeCnt;
-    void addAbnormalTypeCnt() { printf("abnormal:%u\n", _abnormalTypeCnt); if(_abnormalTypeCnt < 6) ++_abnormalTypeCnt; }
+    void addAbnormalTypeCnt() { printf("abnormal:%u\n", _abnormalTypeCnt); if(_abnormalTypeCnt < 5) ++_abnormalTypeCnt; }
     UInt8 getAbnormalTypeCnt() { return _abnormalTypeCnt; }
-    void resetAbnormalTypeCnt() { _abnormalTypeCnt = 0; }
+    void useAbnormalTypeCnt() { if(_abnormalTypeCnt >= 3) _abnormalTypeCnt -= 3; }
 
     UInt8 _bleedTypeCnt;
-    void addBleedTypeCnt() { printf("bleed:%u\n", _bleedTypeCnt); if(_abnormalTypeCnt < 6) ++_bleedTypeCnt; }
+    void addBleedTypeCnt() { printf("bleed:%u\n", _bleedTypeCnt); if(_abnormalTypeCnt < 5) ++_bleedTypeCnt; }
     UInt8 getBleedTypeCnt() { return _bleedTypeCnt; }
-    void resetBleedTypeCnt() { _bleedTypeCnt = 0; }
+    void useBleedTypeCnt() { if(_bleedTypeCnt >= 3) _bleedTypeCnt -= 3; }
 
     std::vector<GData::SkillItem> _passiveSkillDeadFake100;
     std::vector<GData::SkillItem> _passiveSkillDeadFake;

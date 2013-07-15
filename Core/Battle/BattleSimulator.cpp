@@ -12218,7 +12218,6 @@ void BattleSimulator::doSkillEffectExtra_AbnormalTypeDmg(BattleFighter* bf, cons
                 bool pr2 = bf->calcPierce(target);
                 float cf = 0.0f;
                 bool cs2 = false;
-                float magatk = static_cast<float>(bf->getAbnormalTypeCnt()) * efv[i] * calcMagAttack(bf, cs2, target, &cf);
                 if(cs2)
                 {
                     UInt8 s = bf->getSide();
@@ -12233,18 +12232,35 @@ void BattleSimulator::doSkillEffectExtra_AbnormalTypeDmg(BattleFighter* bf, cons
                     first = false;
                 }
 
-                float toughFactor = pr2 ? target->getTough(bf) : 1.0f;
-                float magdef = getBFMagDefend(target);
-                float magatkreduce = getBFMagAtkReduce(target);
-                float magdmg = _formula->calcDamage(magatk, magdef, bf->getLevel(), toughFactor, magatkreduce);
-                magdmg *= static_cast<float>(950 + _rnd(100)) / 1000;
-                magdmg = magdmg > 0 ? magdmg : 1;
+                float atk = 0;
+                float def = 0;
+                float reduce = 0;
+                bool isPhysic = false;
+                if(bf->getClass() == GObject::e_cls_dao || bf->getClass() == GObject::e_cls_mo)
+                {
+                    atk = efv[i] * calcAttack(bf, cs2, target, NULL);
+                    def = getBFDefend(target);
+                    reduce = getBFAtkReduce(target);
+                    isPhysic = true;
+                }
+                else
+                {
+                    atk = efv[i] * calcMagAttack(bf, cs2, target, NULL);
+                    def = getBFMagDefend(target);
+                    reduce = getBFMagAtkReduce(target);
+                    isPhysic = false;
+                }
 
-                UInt32 magicDmg = magdmg;
+                float toughFactor = pr2 ? target->getTough(bf) : 1.0f;
+                float dmg = _formula->calcDamage(atk, def, bf->getLevel(), toughFactor, reduce);
+                dmg *= static_cast<float>(950 + _rnd(100)) / 1000;
+                dmg = dmg > 0 ? dmg : 1;
+
+                UInt32 magicDmg = dmg;
                 makeDamage(target, magicDmg);
-                appendDefStatus(e_damNormal, magicDmg, target, e_damageMagic);
+                appendDefStatus(e_damNormal, magicDmg, target, isPhysic ? e_damagePhysic : e_damageMagic);
             }
-            bf->resetAbnormalTypeCnt();
+            bf->useAbnormalTypeCnt();
             return;
         }
     }
@@ -12278,7 +12294,7 @@ void BattleSimulator::doSkillEffectExtra_BleedTypeDmg(BattleFighter* bf, const G
             if(hpr == 0)
                 continue;
             appendDefStatus(e_damHpAdd, hpr, bf);
-            bf->resetBleedTypeCnt();
+            bf->useBleedTypeCnt();
 
             //该效果可触发神农宝鼎
             for(size_t i = 0; i < _onTherapy.size(); ++ i)
@@ -12751,10 +12767,10 @@ bool BattleSimulator::doSkillDmg(BattleFighter* bf, const GData::SkillBase* skil
 
 void BattleSimulator::calcAbnormalTypeCnt(BattleObject* bo)
 {
-    Int32 otherside = 1 - bo->getSide();
+    Int32 target_side = 1 - bo->getSide();
     for(UInt8 i = 0; i < 25; i++)
     {
-        bo = getObject(otherside, i);
+        bo = getObject(target_side, i);
         if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
             continue;
         size_t idx = 0;
@@ -12771,10 +12787,10 @@ void BattleSimulator::calcAbnormalTypeCnt(BattleObject* bo)
 
 void BattleSimulator::calcBleedTypeCnt(BattleObject* bo)
 {
-    Int32 otherside = 1 - bo->getSide();
+    Int32 target_side = 1 - bo->getSide();
     for(UInt8 i = 0; i < 25; i++)
     {
-        bo = getObject(otherside, i);
+        bo = getObject(target_side, i);
         if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
             continue;
         bool flag = false;
