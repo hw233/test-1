@@ -2984,7 +2984,12 @@ void Fighter::setPeerless( UInt16 pl, bool writedb )
 
     // 装备无双技能，通知前端符文相关内容
     if(peerless)
-        PeerlessSSNotify(peerless);
+        PeerlessSSNotify(peerless, writedb);
+    else
+    {
+        if (_owner && writedb)
+            _owner->sendFighterSSListWithNoSkill();
+    }
 }
 
 UInt8 Fighter::getAcupointCnt()
@@ -3283,6 +3288,8 @@ bool Fighter::upSkill( UInt16 skill, int idx, bool writedb, bool online )
         }
 
         SSSendSSInfo(skill);
+        if(_owner && writedb)
+            _owner->sendFighterSSListWithNoSkill();
     }
     else
     {
@@ -3297,6 +3304,8 @@ bool Fighter::upSkill( UInt16 skill, int idx, bool writedb, bool online )
                 _skill[src] ^= _skill[idx];
                 ret = true;
             }
+            if(_owner && writedb)
+                _owner->sendFighterSSListWithNoSkill();
         }
         else
         { // upgrade
@@ -3347,6 +3356,8 @@ bool Fighter::offSkill( UInt16 skill, bool writedb )
     _skill[i] = 0;
     _skillBPDirty = true;
     sendModification(0x2a, 0, i, writedb);
+    if(_owner && writedb)
+        _owner->sendFighterSSListWithNoSkill();
 #else
     _skill[idx] = 0;
     sendModification(0x2a, 0, idx, writedb);
@@ -5569,6 +5580,7 @@ void Fighter::SSOpen(UInt16 id)
             SSUpdate2DB(id, ss);
             _owner->skillStrengthenLog(1, 1);
             _owner->sendMsgCode(0, 1023);
+            _owner->sendFighterSSListWithNoSkill();
         }
         else
         {
@@ -5743,7 +5755,10 @@ void Fighter::SSDismiss(UInt16 skillid, bool isDel, Mail * mail)
     ss.curVal = 0;
     ss.maxVal = GData::GDataManager::getMaxStrengthenVal(sid, ss.lvl);
     if(!isDel)
+    {
         SSUpdate2DB(skillid, ss);
+        _owner->sendFighterSSListWithNoSkill();
+    }
 }
 
 void Fighter::SSDismissAll(bool isDel)
@@ -5800,13 +5815,16 @@ void Fighter::SSNotify(UInt16 id, SStrengthen& ss)
     _owner->send(st);
 }
 
-void Fighter::PeerlessSSNotify(UInt16 id)
+void Fighter::PeerlessSSNotify(UInt16 id, bool writedb)
 {
     UInt16 sid = SKILL_ID(id);
     std::map<UInt16, SStrengthen>::iterator it = m_ss.find(sid);
     if (it == m_ss.end())
         return;
     SSNotify(id, it->second);
+
+    if(_owner && writedb)
+        _owner->sendFighterSSListWithNoSkill();
 }
 
 void Fighter::SSDeleteDB(UInt16 id)
