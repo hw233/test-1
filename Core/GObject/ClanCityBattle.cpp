@@ -2443,7 +2443,12 @@ void ClanCity::makeOpenStatusInfo(Stream& st)
         UInt32 curtime = TimeUtil::Now();
         if(curtime < m_startTime)
         {
-            st << static_cast<UInt8>(1);
+            if(m_type == CCB_CITY_TYPE_DEF)
+                st << static_cast<UInt8>(1);
+            else if(World::_wday == 6)
+                st << static_cast<UInt8>(3);
+            else
+                st << static_cast<UInt8>(2);
         }
         else if(curtime >= m_startTime && curtime < m_endTime)
         {
