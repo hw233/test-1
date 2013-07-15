@@ -235,6 +235,7 @@ void Athletics::adjustAthlDeferBuffData(Player *atker, Player *defer, bool reset
 
 void Athletics::attack(Player * defer)
 {
+    _owner->SetVar(VAR_DROP_OUT_ITEM_MARK, 0);
 	UInt8 tid = defer->getThreadId();
 	if(tid == _owner->getThreadId())
 	{
@@ -261,7 +262,6 @@ void Athletics::attack(Player * defer)
 		Stream st(REP::ATTACK_NPC);
 		st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
 		_owner->send(st);
-
 		UInt32 id = addAthleticsData(0, defer, res ? 0 : 1, reptid, time);
 		notifyAthleticsDeferData(0, defer, id, res ? 0 : 1, reptid, time);
 		AthleticsResult ar = { id, 0, defer, res };
@@ -550,6 +550,7 @@ void Athletics::attackMartial(Player* defer)
         if(0 == PlayerPInfo.eCanAttack[idx])
             break;
 
+        _owner->SetVar(VAR_DROP_OUT_ITEM_MARK, 0);
         UInt8 tid = defer->getThreadId();
         if(_owner->getThreadId() != tid)
         {

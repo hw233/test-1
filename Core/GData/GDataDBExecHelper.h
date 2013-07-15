@@ -559,6 +559,19 @@ struct DBPetEqAttreffect
     float tough;
 };
 
+struct DBXingchenConfig
+{
+    UInt8 id;
+    UInt8 limitLev;
+    std::string name;
+    UInt32 consume;
+    UInt32 maxVal;
+    float rate1;
+    float rate2;
+    float rate3;
+    UInt32 payBack;
+};
+
 }
 
 namespace DB {
@@ -1203,6 +1216,21 @@ SPECIALDEF(12)
     float, evade,
     float, counter,
     float, tough
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBXingchenConfig)
+SPECIALDEF(9)
+	(
+    UInt8, id,
+    UInt8, limitLev,
+    std::string, name,
+    UInt32, consume,
+    UInt32, maxVal,
+    float, rate1,
+    float, rate2,
+    float, rate3,
+    UInt32, payBack
 	)
 SPECIALEND()
 

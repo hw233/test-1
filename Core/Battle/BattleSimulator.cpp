@@ -146,6 +146,7 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, cons
         skillEffectExtraTable[GData::e_eft_lingyou_def] = &BattleSimulator::doSkillEffectExtra_LingYouDef;
         skillEffectExtraTable[GData::e_eft_lingyou_magdef] = &BattleSimulator::doSkillEffectExtra_LingYouMagDef;
         skillEffectExtraTable[GData::e_eft_lingshi_bleed] = &BattleSimulator::doSkillEffectExtra_LingShiBleed2;
+        skillEffectExtraTable[GData::e_eft_criticaldmgreduce] = &BattleSimulator::doSkillEffectExtra_CriticalDmgReduce;
     }
 }
 
@@ -257,6 +258,7 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, GObj
         skillEffectExtraTable[GData::e_eft_lingyou_def] = &BattleSimulator::doSkillEffectExtra_LingYouDef;
         skillEffectExtraTable[GData::e_eft_lingyou_magdef] = &BattleSimulator::doSkillEffectExtra_LingYouMagDef;
         skillEffectExtraTable[GData::e_eft_lingshi_bleed] = &BattleSimulator::doSkillEffectExtra_LingShiBleed2;
+        skillEffectExtraTable[GData::e_eft_criticaldmgreduce] = &BattleSimulator::doSkillEffectExtra_CriticalDmgReduce;
     }
 }
 
@@ -726,6 +728,9 @@ void BattleSimulator::CheckAttain()
 
 void BattleSimulator::insertFighterStatus2Current( BattleFighter* bf )
 {
+    if(bf->getHP() == 0)
+        return;
+
     std::vector<BattleFighter*>& cur_fgtlist = _fgtlist[_cur_fgtlist_idx];
     int cnt = static_cast<int>(cur_fgtlist.size());
     for(int i = 0; i < cnt ; ++ i)
@@ -745,6 +750,9 @@ void BattleSimulator::insertFighterStatus2Current( BattleFighter* bf )
 }
 void BattleSimulator::insertFighterStatus( BattleFighter* bf )
 {
+    if(bf->getHP() == 0)
+        return;
+
     Int8 next_fgtlist_idx = _cur_fgtlist_idx == 0 ? 1 : 0;
     std::vector<BattleFighter*>& next_fgtlist = _fgtlist[next_fgtlist_idx];
     int cnt = static_cast<int>(next_fgtlist.size());
@@ -977,7 +985,7 @@ float BattleSimulator::testLink( BattleFighter *& bf, UInt16& skillId )
 
 UInt32 BattleSimulator::doSpiritAttack(BattleFighter * bf, BattleFighter* bo, float atk, bool& pr, bool& cs, bool& first)
 {
-    if(!bf || !bo || bf->getHP() == 0 || bo->getHP() == 0)
+    if(!bf || !bo || bf->getHP() == 0 || bo->getHP() == 0 || bo->isSoulOut())
         return 0;
 
     UInt32 dmg = 0;
@@ -1152,6 +1160,9 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
             -- colorStockTimes;
             colorStock = true;
         }
+        if(area_target->isSoulOut())
+            return 0;
+
         if(area_target->isLingQu())
             colorStock = true;
 
@@ -1905,7 +1916,7 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
             if(boSkill == NULL || boSkill->effect == NULL)
                 continue;
 
-            UInt8 state[3] = {0};
+            //UInt8 state[3] = {0};
             UInt8 idx = 0;
 
             Int16 nStateLast = boSkill->last;
@@ -1959,6 +1970,15 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
                     dmg3 = dmg*1.5;
                     makeDamage(bo, dmg3);
                     appendDefStatus(e_UnPoison, dmg3, bo, e_damagePoison);
+                    if(bo->getHP() == 0)
+                    {
+                        onDead(!activeFlag, bo);
+                    }
+                    else if(_winner == 0)
+                    {
+                        onDamage(bo, activeFlag);
+                    }
+
                 }
                 break;
             case GData::e_state_confuse:
@@ -2016,15 +2036,6 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
                 }
                 break;
             }
-
-            if(bo->getHP() == 0)
-            {
-                onDead(!activeFlag, bo);
-            }
-            else if((_winner == 0) && (state[idx] == 1))
-            {
-                onDamage(bo, activeFlag);
-            }
             continue;
         }
 
@@ -2066,16 +2077,16 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
                     {
                         makeDamage(bo, fdmg);
                         appendDefStatus(e_damBack, fdmg, bo, e_damageTrue);
+                        if(bo->getHP() == 0)
+                        {
+                            onDead(!activeFlag, bo);
+                        }
+                        else if(_winner == 0)
+                        {
+                            onDamage(bo, activeFlag);
+                        }
                     }
 
-                    if(bo->getHP() == 0)
-                    {
-                        onDead(!activeFlag, bo);
-                    }
-                    else if(_winner == 0)
-                    {
-                        onDamage(bo, activeFlag);
-                    }
                     continue;
                 }
 
@@ -2396,7 +2407,7 @@ bool BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
         return false;
 
     BattleFighter* target_bo = static_cast<BattleFighter*>(bo);
-    if(target_bo->isLingQu())
+    if(target_bo->isLingQu() || target_bo->getHP() == 0 || target_bo->isSoulOut())
         return false;
 
     UInt16 effect_state = skill->effect->state;
@@ -3698,7 +3709,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             }
         }
         //仙宠、十字攻击，两次伤害则混乱（先选取主目标横排攻击，再选取剩下的主目标纵排攻击）(火龙地狱)
-        else if(SKILL_ID(skill->getId()) == 53)
+        else if(SKILL_ID(skill->getId()) == 53 || SKILL_ID(skill->getId()) == 70)
         {
             AtkList atklist;
             getAtkList(bf, skill, atklist);
@@ -3739,7 +3750,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
 
         }
         //仙宠、两次单体攻击，两次伤害则眩晕 (天崩地裂)
-        else if(SKILL_ID(skill->getId()) == 48)
+        else if(SKILL_ID(skill->getId()) == 48 || SKILL_ID(skill->getId()) == 67)
         {
             UInt32 dmg1 = 0;
             UInt32 dmg2 = 0;
@@ -4581,7 +4592,7 @@ bool BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GD
     {
         if(bo->getColorStock() != 0)
             return false;
-        if(bo->isLingQu())
+        if(bo->isLingQu() || bo->isSoulOut())
             return false;
         float value = bo->_attack * skill->effect->atkP + skill->effect->atk;
         if(value > 0 && bf->getSide() != target_side)
@@ -4630,7 +4641,7 @@ bool BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GD
     {
         if(bo->getColorStock() != 0)
             return false;
-        if(bo->isLingQu())
+        if(bo->isLingQu() || bo->isSoulOut())
             return false;
         float value = bo->_magatk * skill->effect->magatkP + skill->effect->magatk;
         if(value > 0 && bf->getSide() != target_side)
@@ -4922,7 +4933,7 @@ BattleFighter* BattleSimulator::getTherapyTarget(BattleFighter* bf)
     for(UInt8 i = 0; i < 25; ++ i)
     {
         BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
-        if(bo == NULL || bo->getHP() == 0 || bo->hasFlag(BattleFighter::IsMirror) || bo->isSummon() || bo->isLingQu())
+        if(bo == NULL || bo->getHP() == 0 || bo->hasFlag(BattleFighter::IsMirror) || bo->isSummon() || bo->isLingQu() || bo->isSoulOut())
             continue;
         if(bo->getHP() < (bo->getMaxHP() >> 1))
         {
@@ -4943,13 +4954,14 @@ BattleFighter* BattleSimulator::getTherapyTarget2(BattleFighter* bf, UInt8 * exc
 {
     UInt8 side = bf->getSide();
     BattleFighter* bo = NULL;
+    BattleFighter* retbo = NULL;
     BattleFighter* boSummon = NULL;
     UInt32 maxHpLost = 0;
     UInt8 pos = 0;
     for(UInt8 i = 0; i < 25; ++ i)
     {
         bo = static_cast<BattleFighter*>(getObject(side, i));
-        if(bo == NULL || bo->getHP() == 0 || bo->hasFlag(BattleFighter::IsMirror) || bo->isLingQu() || (isFirst && bo->isPet()))
+        if(bo == NULL || bo->getHP() == 0 || bo->hasFlag(BattleFighter::IsMirror) || bo->isLingQu() || bo->isSoulOut() || (isFirst && bo->isPet()))
             continue;
         if(bo->isSummon())
         {
@@ -4984,24 +4996,25 @@ BattleFighter* BattleSimulator::getTherapyTarget2(BattleFighter* bf, UInt8 * exc
     }
 
     if(maxHpLost != 0)
-        bo = static_cast<BattleFighter*>(getObject(side, pos));
+        retbo = static_cast<BattleFighter*>(getObject(side, pos));
     else if(boSummon && boSummon->getHP() < boSummon->getMaxHP())
-        bo = boSummon;
+        retbo = boSummon;
 
-    return bo;
+    return retbo;
 }
 
 BattleFighter* BattleSimulator::getTherapyTarget3(BattleFighter* bf, UInt8 * excepts, size_t exceptCount)
 {
     UInt8 side = bf->getSide();
     BattleFighter* bo = NULL;
+    BattleFighter* retbo = NULL;
     BattleFighter* boSummon = NULL;
     UInt32 maxHpLost = 0;
     UInt8 pos = 0;
     for(UInt8 i = 0; i < 25; ++ i)
     {
         bo = static_cast<BattleFighter*>(getObject(side, i));
-        if(bo == NULL || bo->getHP() == 0 || bo->hasFlag(BattleFighter::IsMirror) || bo->isLingQu())
+        if(bo == NULL || bo->getHP() == 0 || bo->hasFlag(BattleFighter::IsMirror) || bo->isLingQu() || bo->isSoulOut())
             continue;
         if(bo->isSummon())
         {
@@ -5032,11 +5045,11 @@ BattleFighter* BattleSimulator::getTherapyTarget3(BattleFighter* bf, UInt8 * exc
     }
 
     if(maxHpLost != 0)
-        bo = static_cast<BattleFighter*>(getObject(side, pos));
+        retbo = static_cast<BattleFighter*>(getObject(side, pos));
     else if(boSummon && boSummon->getHP() < boSummon->getMaxHP())
-        bo = boSummon;
+        retbo = boSummon;
 
-    return bo;
+    return retbo;
 }
 
 UInt32 BattleSimulator::FightersEnter(UInt8 prevWin)
@@ -6375,6 +6388,7 @@ UInt32 BattleSimulator::tryDelayUseSkill( BattleFighter * bf, BattleObject * tar
 int BattleSimulator::testWinner()
 {
     int alive[2] = { 0, 0 };
+    int soulOut[2] = { 0, 0 };
     for(Int8 fgtlist_idx = 0; fgtlist_idx < 2; fgtlist_idx++)
     {
         std::vector<BattleFighter*>& fgtlist = _fgtlist[fgtlist_idx];
@@ -6382,11 +6396,13 @@ int BattleSimulator::testWinner()
         for(size_t i = 0; i < c; ++ i)
         {
             alive[fgtlist[i]->getSide()] ++;
+            if(fgtlist[i]->isSoulOut())
+                soulOut[fgtlist[i]->getSide()]++;
         }
     }
-    if(alive[0] == 0)
+    if(alive[0] == 0 || alive[0] == soulOut[0])
         return 2;
-    else if(alive[1] == 0)
+    else if(alive[1] == 0 || alive[1] == soulOut[1])
         return 1;
     return 0;
 }
@@ -6953,6 +6969,8 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
             fSummonOrMirror = true;
         if(static_cast<BattleFighter*>(bo)->getLingQu())
             break;
+        if(static_cast<BattleFighter*>(bo)->isSoulOut())
+            break;
 
         if(static_cast<BattleFighter*>(bo)->isSummon())
         {
@@ -6972,7 +6990,6 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
         if(static_cast<BattleFighter*>(bo)->doFireFakeDead())
         {
             fFakeDead = true;
-            (static_cast<BattleFighter*>(bo))->setHP(1);
             appendDefStatus(e_unFireFakeDead, 0, static_cast<BattleFighter*>(bo));
             break;
         }
@@ -7042,8 +7059,11 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
 
             appendDefStatus(e_skill, passiveSkill->getId(), static_cast<BattleFighter*>(bo));
             BattleFighter* bf = static_cast<BattleFighter*>(bo);
-            if(doSkillEffectExtra_LingQu(bf, passiveSkill))
+            if(doSkillEffectExtra_Dead(bf, passiveSkill))
             {
+                _winner = testWinner();
+                if(_winner != 0)
+                    return true;
                 fFakeDead = true;
             }
             else
@@ -7525,368 +7545,379 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
         return 0;
     }
 
-    bf->releasePetCoAtk();
-    bf->releaseSkillCD(1);
-    bf->releaseMoEvade100();
+    do
+    {
+        bf->releasePetCoAtk();
+        bf->releaseSkillCD(1);
+        bf->releaseMoEvade100();
 
-    if(bf->releaseLingQu())
-    {
-        appendDefStatus(e_unLingQu, 0, static_cast<BattleFighter*>(bf));
-        onDead(true, bf);
-    }
-
-    if(bf->releaseSneakAtk())
-    {
-        appendDefStatus(e_unSneakAtk, 0, static_cast<BattleFighter*>(bf));
-    }
-
-    if(bf->releaseCounterSpirit())
-    {
-        appendDefStatus(e_unCounterSpirit, 0, bf);
-        UInt32 value = static_cast<UInt32>(bf->getAttack());
-        appendStatusChange(e_stAtk, value, 0, bf);
-        value = static_cast<UInt32>(bf->getMagAttack());
-        appendStatusChange(e_stMagAtk, value, 0, bf);
-        value = static_cast<UInt32>(bf->getDefend());
-        appendStatusChange(e_stDef, value, 0, bf);
-        value = static_cast<UInt32>(bf->getMagDefend());
-        appendStatusChange(e_stMagDef, value, 0, bf);
-    }
-
-    if(bf->releaseFireDefend())
-    {
-        UInt32 value = static_cast<UInt32>(bf->getMagAttack());
-        appendStatusChange(e_stMagAtk, value, 0, bf);
-    }
-    if(bf->releaseFireFakeDead())
-    {
-        appendDefStatus(e_unFireFakeDead, 0, bf);
-    }
-
-    if (bf->releasePetAttackAdd())
-    {
-        UInt32 value = static_cast<UInt32>(bf->getAttack());
-        appendStatusChange(e_stAtk, value, 0, bf);
-    }
-
-    if (bf->releasePetMagAtkAdd())
-    {
-        UInt32 value = static_cast<UInt32>(bf->getMagAttack());
-        appendStatusChange(e_stMagAtk, value, 0, bf);
-    }
-
-    if(bf->releaseHpSieldSelf())
-    {
-        appendDefStatus(e_unHpShieldSelf, 0, bf);
-    }
-
-    if(bf->releaseMoAttackAdd())
-    {
-        UInt32 value = static_cast<UInt32>(bf->getAttack());
-        appendStatusChange(e_stAtk, value, 0, bf);
-    }
-    if(bf->releaseMoMagAtkAdd())
-    {
-        UInt32 value = static_cast<UInt32>(bf->getMagAttack());
-        appendStatusChange(e_stMagAtk, value, 0, bf);
-    }
-    if(bf->releaseMoAtkReduce())
-    {
-        UInt32 value = static_cast<UInt32>(bf->getAtkReduce()*100);
-        appendStatusChange(e_stAtkReduce, value, 0, bf);
-    }
-    if(bf->releaseMoMagAtkReduce())
-    {
-        UInt32 value = static_cast<UInt32>(bf->getMagAtkReduce()*100);
-        appendStatusChange(e_stMagAtkReduce, value, 0, bf);
-    }
-
-    if(bf->getMoAuraBuf() != 0)
-    {
-        setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAura, bf->getMoAuraBuf(), 0, false);
-        if(bf->releaseMoAuraBuf())
+        if(bf->releaseLingQu())
         {
-            appendDefStatus(e_unMoAuraBuf, 0, bf);
-        }
-    }
-    if(bf->releaseSummon())
-    {
-        bf->setHP(0);
-        onDead(true, bf);
-        appendDefStatus(e_unSummon, 0, bf);
-    }
-    if(bf->releaseHideBuf())
-    {
-        appendDefStatus(e_unHide, 0, bf);
-    }
-    bool isDeepBlind = (bf->getDeepBlindDmgExtra() > 0);
-    if(bf->releaseBlind())
-    {
-        appendDefStatus(isDeepBlind ? e_unDeepBlind : e_unBlind, 0, bf);
-    }
-    if(bf->releaseMarkMo())
-    {
-        appendDefStatus(e_unMarkMo, 0, bf);
-    }
-
-    UInt32 confuse = bf->getConfuseRound();
-    if(confuse > 0)
-    {
-        -- confuse;
-
-        if(confuse == 0)
-        {
-            if(0 != bf->getDeepConfuseLast())
-            {
-                bf->setDeepConfuseDmgExtra(0, 0);
-                appendDefStatus(e_unDeepConfuse, 0, bf);
-            }
-            else
-            {
-                appendDefStatus(e_UnConfuse, 0, bf);
-            }
+            appendDefStatus(e_unLingQu, 0, static_cast<BattleFighter*>(bf));
+            onDead(true, bf);
+            break;
         }
 
-        bf->setConfuseRound(confuse);
-    }
-
-    UInt32 forget = bf->getForgetRound();
-    if(forget > 0)
-    {
-        -- forget;
-        if(forget == 0)
+        if(bf->releaseSoulOut())
         {
-            if(0 != bf->getDeepForgetLast())
+            appendDefStatus(e_unSoulout, 0, static_cast<BattleFighter*>(bf));
+            onDead(true, bf);
+            break;
+        }
+
+        if(bf->releaseSneakAtk())
+        {
+            appendDefStatus(e_unSneakAtk, 0, static_cast<BattleFighter*>(bf));
+        }
+
+        if(bf->releaseCounterSpirit())
+        {
+            appendDefStatus(e_unCounterSpirit, 0, bf);
+            UInt32 value = static_cast<UInt32>(bf->getAttack());
+            appendStatusChange(e_stAtk, value, 0, bf);
+            value = static_cast<UInt32>(bf->getMagAttack());
+            appendStatusChange(e_stMagAtk, value, 0, bf);
+            value = static_cast<UInt32>(bf->getDefend());
+            appendStatusChange(e_stDef, value, 0, bf);
+            value = static_cast<UInt32>(bf->getMagDefend());
+            appendStatusChange(e_stMagDef, value, 0, bf);
+        }
+
+        if(bf->releaseFireDefend())
+        {
+            UInt32 value = static_cast<UInt32>(bf->getMagAttack());
+            appendStatusChange(e_stMagAtk, value, 0, bf);
+        }
+        if(bf->releaseFireFakeDead())
+        {
+            appendDefStatus(e_unFireFakeDead, 0, bf);
+        }
+
+        if (bf->releasePetAttackAdd())
+        {
+            UInt32 value = static_cast<UInt32>(bf->getAttack());
+            appendStatusChange(e_stAtk, value, 0, bf);
+        }
+
+        if (bf->releasePetMagAtkAdd())
+        {
+            UInt32 value = static_cast<UInt32>(bf->getMagAttack());
+            appendStatusChange(e_stMagAtk, value, 0, bf);
+        }
+
+        if(bf->releaseHpSieldSelf())
+        {
+            appendDefStatus(e_unHpShieldSelf, 0, bf);
+        }
+
+        if(bf->releaseMoAttackAdd())
+        {
+            UInt32 value = static_cast<UInt32>(bf->getAttack());
+            appendStatusChange(e_stAtk, value, 0, bf);
+        }
+        if(bf->releaseMoMagAtkAdd())
+        {
+            UInt32 value = static_cast<UInt32>(bf->getMagAttack());
+            appendStatusChange(e_stMagAtk, value, 0, bf);
+        }
+        if(bf->releaseMoAtkReduce())
+        {
+            UInt32 value = static_cast<UInt32>(bf->getAtkReduce()*100);
+            appendStatusChange(e_stAtkReduce, value, 0, bf);
+        }
+        if(bf->releaseMoMagAtkReduce())
+        {
+            UInt32 value = static_cast<UInt32>(bf->getMagAtkReduce()*100);
+            appendStatusChange(e_stMagAtkReduce, value, 0, bf);
+        }
+
+        if(bf->getMoAuraBuf() != 0)
+        {
+            setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAura, bf->getMoAuraBuf(), 0, false);
+            if(bf->releaseMoAuraBuf())
             {
-                bf->setDeepForgetDmgExtra(0, 0);
-                appendDefStatus(e_unDeepForget, 0, bf);
+                appendDefStatus(e_unMoAuraBuf, 0, bf);
             }
-            else
+        }
+        if(bf->releaseSummon())
+        {
+            appendDefStatus(e_unSummon, 0, bf);
+            onDead(true, bf);
+            break;
+        }
+        if(bf->releaseHideBuf())
+        {
+            appendDefStatus(e_unHide, 0, bf);
+        }
+        bool isDeepBlind = (bf->getDeepBlindDmgExtra() > 0);
+        if(bf->releaseBlind())
+        {
+            appendDefStatus(isDeepBlind ? e_unDeepBlind : e_unBlind, 0, bf);
+        }
+        if(bf->releaseMarkMo())
+        {
+            appendDefStatus(e_unMarkMo, 0, bf);
+        }
+
+        UInt32 confuse = bf->getConfuseRound();
+        if(confuse > 0)
+        {
+            -- confuse;
+
+            if(confuse == 0)
             {
-                appendDefStatus(e_UnForget, 0, bf);
+                if(0 != bf->getDeepConfuseLast())
+                {
+                    bf->setDeepConfuseDmgExtra(0, 0);
+                    appendDefStatus(e_unDeepConfuse, 0, bf);
+                }
+                else
+                {
+                    appendDefStatus(e_UnConfuse, 0, bf);
+                }
+            }
+
+            bf->setConfuseRound(confuse);
+        }
+
+        UInt32 forget = bf->getForgetRound();
+        if(forget > 0)
+        {
+            -- forget;
+            if(forget == 0)
+            {
+                if(0 != bf->getDeepForgetLast())
+                {
+                    bf->setDeepForgetDmgExtra(0, 0);
+                    appendDefStatus(e_unDeepForget, 0, bf);
+                }
+                else
+                {
+                    appendDefStatus(e_UnForget, 0, bf);
+                }
+            }
+
+            bf->setForgetRound(forget);
+        }
+
+        UInt32 stun = bf->getStunRound();
+        if(stun > 0)
+        {
+            -- stun;
+            if(stun == 0)
+            {
+                if(0 != bf->getDeepStunLast())
+                {
+                    bf->setDeepStunDmgExtra(0, 0);
+                    appendDefStatus(e_unDeepStun, 0, bf);
+                }
+                else
+                {
+                    appendDefStatus(e_UnStun, 0, bf);
+                }
+            }
+
+            bf->setStunRound(stun);
+        }
+
+        UInt8& atkAdd_last = bf->getAttackAddLast();
+        if(atkAdd_last > 0)
+        {
+            -- atkAdd_last;
+           if(0 == atkAdd_last)
+                setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAtk, 0, 0, false);
+        }
+
+        UInt8& magAtkAdd_last = bf->getMagAttackAddLast();
+        if(magAtkAdd_last > 0)
+        {
+            -- magAtkAdd_last;
+           if(0 == magAtkAdd_last)
+                setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stMagAtk, 0, 0, false);
+        }
+
+        bool clearDefDec = false;
+        UInt8& defAdd_last = bf->getDefendAddLast();
+        if(defAdd_last > 0)
+        {
+            -- defAdd_last;
+           if(0 == defAdd_last)
+           {
+                setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stDef, 0, 0, false);
+                float defdec = abs(bf->getDefDec());
+                if(defdec > 0.001f)
+                {
+                    bf->setDefDec(0, 0);
+                    bf->setDefDecTimes(0);
+                    clearDefDec = true;
+                }
+           }
+        }
+
+        UInt8& magDefAdd_last = bf->getMagDefendAddLast();
+        if(magDefAdd_last > 0)
+        {
+            -- magDefAdd_last;
+           if(0 == magDefAdd_last)
+           {
+                setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stMagDef, 0, 0, false);
+                float defdec = abs(bf->getDefDec());
+                if(defdec > 0.001f)
+                {
+                    bf->setDefDec(0, 0);
+                    bf->setDefDecTimes(0);
+                    clearDefDec = true;
+                }
+           }
+        }
+
+        if(clearDefDec)
+        {
+            bf->setDefDecTimes(0);
+            appendDefStatus(e_undefDec, bf->getDefDecTimes(), bf);
+        }
+
+        UInt8& colorStockLast = bf->getColorStockLast();
+        if(colorStockLast > 0)
+        {
+            -- colorStockLast;
+            if(0 == colorStockLast)
+            {
+                bf->setColorStock(0, 0, 0);
+                appendDefStatus(e_unImmune3, 0, bf);
             }
         }
 
-        bf->setForgetRound(forget);
-    }
 
-    UInt32 stun = bf->getStunRound();
-    if(stun > 0)
-    {
-        -- stun;
-        if(stun == 0)
+        UInt8& hitrateAdd_last = bf->getHitrateAddLast();
+        if(hitrateAdd_last > 0)
         {
-            if(0 != bf->getDeepStunLast())
-            {
-                bf->setDeepStunDmgExtra(0, 0);
-                appendDefStatus(e_unDeepStun, 0, bf);
-            }
-            else
-            {
-                appendDefStatus(e_UnStun, 0, bf);
-            }
+            -- hitrateAdd_last;
+           if(0 == hitrateAdd_last)
+                setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stHitRate, 0, 0, false);
         }
 
-        bf->setStunRound(stun);
-    }
-
-    UInt8& atkAdd_last = bf->getAttackAddLast();
-    if(atkAdd_last > 0)
-    {
-        -- atkAdd_last;
-       if(0 == atkAdd_last)
-            setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAtk, 0, 0, false);
-    }
-
-    UInt8& magAtkAdd_last = bf->getMagAttackAddLast();
-    if(magAtkAdd_last > 0)
-    {
-        -- magAtkAdd_last;
-       if(0 == magAtkAdd_last)
-            setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stMagAtk, 0, 0, false);
-    }
-
-    bool clearDefDec = false;
-    UInt8& defAdd_last = bf->getDefendAddLast();
-    if(defAdd_last > 0)
-    {
-        -- defAdd_last;
-       if(0 == defAdd_last)
-       {
-            setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stDef, 0, 0, false);
-            float defdec = abs(bf->getDefDec());
-            if(defdec > 0.001f)
-            {
-                bf->setDefDec(0, 0);
-                bf->setDefDecTimes(0);
-                clearDefDec = true;
-            }
-       }
-    }
-
-    UInt8& magDefAdd_last = bf->getMagDefendAddLast();
-    if(magDefAdd_last > 0)
-    {
-        -- magDefAdd_last;
-       if(0 == magDefAdd_last)
-       {
-            setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stMagDef, 0, 0, false);
-            float defdec = abs(bf->getDefDec());
-            if(defdec > 0.001f)
-            {
-                bf->setDefDec(0, 0);
-                bf->setDefDecTimes(0);
-                clearDefDec = true;
-            }
-       }
-    }
-
-    if(clearDefDec)
-    {
-        bf->setDefDecTimes(0);
-        appendDefStatus(e_undefDec, bf->getDefDecTimes(), bf);
-    }
-
-    UInt8& colorStockLast = bf->getColorStockLast();
-    if(colorStockLast > 0)
-    {
-        -- colorStockLast;
-        if(0 == colorStockLast)
+        UInt8& evadeAdd_last = bf->getEvadeAddLast();
+        if(evadeAdd_last > 0)
         {
-            bf->setColorStock(0, 0, 0);
-            appendDefStatus(e_unImmune3, 0, bf);
+            -- evadeAdd_last;
+           if(0 == evadeAdd_last)
+                setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stEvade, 0, 0, false);
         }
-    }
 
+        UInt8& criticalAdd_last = bf->getCriticalAddLast();
+        if(criticalAdd_last > 0)
+        {
+            -- criticalAdd_last;
+           if(0 == criticalAdd_last)
+                setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stCritical, 0, 0, false);
+        }
 
-    UInt8& hitrateAdd_last = bf->getHitrateAddLast();
-    if(hitrateAdd_last > 0)
-    {
-        -- hitrateAdd_last;
-       if(0 == hitrateAdd_last)
-            setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stHitRate, 0, 0, false);
-    }
-
-    UInt8& evadeAdd_last = bf->getEvadeAddLast();
-    if(evadeAdd_last > 0)
-    {
-        -- evadeAdd_last;
-       if(0 == evadeAdd_last)
-            setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stEvade, 0, 0, false);
-    }
-
-    UInt8& criticalAdd_last = bf->getCriticalAddLast();
-    if(criticalAdd_last > 0)
-    {
-        -- criticalAdd_last;
-       if(0 == criticalAdd_last)
-            setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stCritical, 0, 0, false);
-    }
-
-    // TODO
+        // TODO
 #if 0
-    UInt32 criticalDmgAdd_last = bf->getCriticalDmgAddLast();
-    if(criticalDmgAdd_last > 0)
-    {
-        -- criticalDmgAdd_last;
-       if(0 == criticalDmgAdd_last)
-            setStatusChange( bf->getSide(), bf->getPos(), 1, 0, e_stCriticalDmg, 0, 0, false);
-    }
+        UInt32 criticalDmgAdd_last = bf->getCriticalDmgAddLast();
+        if(criticalDmgAdd_last > 0)
+        {
+            -- criticalDmgAdd_last;
+           if(0 == criticalDmgAdd_last)
+                setStatusChange( bf->getSide(), bf->getPos(), 1, 0, e_stCriticalDmg, 0, 0, false);
+        }
 #endif
 
-    UInt8& pierceAdd_last = bf->getPierceAddLast();
-    if(pierceAdd_last > 0)
-    {
-        -- pierceAdd_last;
-       if(0 == pierceAdd_last)
-            setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stPierce, 0, 0, false);
-    }
-
-    UInt8& counterAdd_last = bf->getCounterAddLast();
-    if(counterAdd_last > 0)
-    {
-        -- counterAdd_last;
-       if(0 == counterAdd_last)
-            setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stCounter, 0, 0, false);
-    }
-
-    UInt8& magResAdd_last = bf->getMagResAddLast();
-    if(magResAdd_last > 0)
-    {
-        -- magResAdd_last;
-       if(0 == magResAdd_last)
-            setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stMagRes, 0, 0, false);
-    }
-
-    UInt8& toughAdd_last = bf->getToughAddLast();
-    if(toughAdd_last > 0)
-    {
-        -- toughAdd_last;
-       if(0 == toughAdd_last)
-            setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stTough, 0, 0, false);
-    }
-
-    UInt8& atkreduce_last = bf->getAtkReduceLast();
-    if(atkreduce_last > 0)
-    {
-        -- atkreduce_last;
-       if(0 == atkreduce_last)
-            setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAtkReduce, 0, 0, false);
-    }
-
-    UInt8& magatkreduce_last = bf->getMagAtkReduceLast();
-    if(magatkreduce_last > 0)
-    {
-        -- magatkreduce_last;
-       if(0 == magatkreduce_last)
-            setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stMagAtkReduce, 0, 0, false);
-    }
-
-    UInt8& evad100CD = bf->getEvad100CD();
-    bool evad100 = bf->getEvad100();
-    if(evad100CD > 0 && !evad100)
-    {
-        --evad100CD;
-        if(0 == evad100CD)
+        UInt8& pierceAdd_last = bf->getPierceAddLast();
+        if(pierceAdd_last > 0)
         {
-            bf->setEvad100(true);
-            bf->setEvad100CD(bf->getEvad100BaseCD());
+            -- pierceAdd_last;
+           if(0 == pierceAdd_last)
+                setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stPierce, 0, 0, false);
         }
-    }
 
-    UInt8& defend100CD = bf->getDefend100CD();
-    bool defend100 = bf->getDefend100();
-    if(defend100CD > 0 && !defend100)
-    {
-        --defend100CD;
-        if(0 == defend100CD)
+        UInt8& counterAdd_last = bf->getCounterAddLast();
+        if(counterAdd_last > 0)
         {
-            bf->setDefend100(true);
-            bf->setDefend100CD(bf->getDefend100BaseCD());
+            -- counterAdd_last;
+           if(0 == counterAdd_last)
+                setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stCounter, 0, 0, false);
         }
-    }
 
-    // TODO
+        UInt8& magResAdd_last = bf->getMagResAddLast();
+        if(magResAdd_last > 0)
+        {
+            -- magResAdd_last;
+           if(0 == magResAdd_last)
+                setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stMagRes, 0, 0, false);
+        }
+
+        UInt8& toughAdd_last = bf->getToughAddLast();
+        if(toughAdd_last > 0)
+        {
+            -- toughAdd_last;
+           if(0 == toughAdd_last)
+                setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stTough, 0, 0, false);
+        }
+
+        UInt8& atkreduce_last = bf->getAtkReduceLast();
+        if(atkreduce_last > 0)
+        {
+            -- atkreduce_last;
+           if(0 == atkreduce_last)
+                setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAtkReduce, 0, 0, false);
+        }
+
+        UInt8& magatkreduce_last = bf->getMagAtkReduceLast();
+        if(magatkreduce_last > 0)
+        {
+            -- magatkreduce_last;
+           if(0 == magatkreduce_last)
+                setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stMagAtkReduce, 0, 0, false);
+        }
+
+        UInt8& evad100CD = bf->getEvad100CD();
+        bool evad100 = bf->getEvad100();
+        if(evad100CD > 0 && !evad100)
+        {
+            --evad100CD;
+            if(0 == evad100CD)
+            {
+                bf->setEvad100(true);
+                bf->setEvad100CD(bf->getEvad100BaseCD());
+            }
+        }
+
+        UInt8& defend100CD = bf->getDefend100CD();
+        bool defend100 = bf->getDefend100();
+        if(defend100CD > 0 && !defend100)
+        {
+            --defend100CD;
+            if(0 == defend100CD)
+            {
+                bf->setDefend100(true);
+                bf->setDefend100CD(bf->getDefend100BaseCD());
+            }
+        }
+
+        // TODO
 #if 0
-    UInt32 maxhpAdd_last = bf->getMaxHPAddLast();
-    if(maxhpAdd_last > 0)
-    {
-        -- maxhpAdd_last;
-       if(0 == maxhpAdd_last)
-            setStatusChange( bf->getSide(), bf->getPos(), 1, 0, e_stMaxHP, 0, 0, scList, scCount, false);
-    }
+        UInt32 maxhpAdd_last = bf->getMaxHPAddLast();
+        if(maxhpAdd_last > 0)
+        {
+            -- maxhpAdd_last;
+           if(0 == maxhpAdd_last)
+                setStatusChange( bf->getSide(), bf->getPos(), 1, 0, e_stMaxHP, 0, 0, scList, scCount, false);
+        }
 #endif
 
-    UInt8& maxActionAdd_last = bf->getActionAddLast();
-    if(maxActionAdd_last > 0)
-    {
-        -- maxActionAdd_last;
-       if(0 == maxActionAdd_last)
-            setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAction, 0, 0, false);
-    }
+        UInt8& maxActionAdd_last = bf->getActionAddLast();
+        if(maxActionAdd_last > 0)
+        {
+            -- maxActionAdd_last;
+           if(0 == maxActionAdd_last)
+                setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAction, 0, 0, false);
+        }
 
-    if (isPet(bf))
-        bf->setPetExAtkEnable(false);
+        if (isPet(bf))
+            bf->setPetExAtkEnable(false);
+    }while(false);
 
     if(_defList.size() > 0 || _scList.size() > 0)
     {
@@ -9056,7 +9087,7 @@ bool BattleSimulator::AddSkillStrengthenState(BattleFighter* pFighter, BattleFig
 {
     if(!pFighter || !pTarget || pFighter->getHP() <= 0 || pTarget->getHP() < 0)
         return false;
-    if(pTarget->isLingQu())
+    if(pTarget->isLingQu() || pTarget->isSoulOut())
         return false;
 
     std::vector<AttackAct> vAttackAct; // 这个存被动技能等造成的更多动作
@@ -12019,15 +12050,16 @@ void BattleSimulator::doSkillEffectExtra_LingYouMagDef(BattleFighter* bf, int ta
     bf->setLingYouMagDef(skill->effect->efv[eftIdx]);
 }
 
-bool BattleSimulator::doSkillEffectExtra_LingQu(BattleFighter* bf, const GData::SkillBase* skill)
+bool BattleSimulator::doSkillEffectExtra_Dead(BattleFighter* bf, const GData::SkillBase* skill)
 {
     if(!skill || !skill->effect)
         return false;
+    const std::vector<float>& efv = skill->effect->efv;
     const std::vector<UInt16>& eft = skill->effect->eft;
     const std::vector<UInt8>& efl = skill->effect->efl;
 
     size_t cnt = eft.size();
-    if(cnt != efl.size())
+    if(cnt != efl.size() || efv.size() != cnt)
         return false;
 
     for(size_t i = 0; i < cnt; ++ i)
@@ -12036,6 +12068,12 @@ bool BattleSimulator::doSkillEffectExtra_LingQu(BattleFighter* bf, const GData::
         {
             bf->setLingQu(true, efl[i]);
             appendDefStatus(e_lingQu, 0, bf);
+            return true;
+        }
+        else if(eft[i] == GData::e_eft_soul_out)
+        {
+            bf->setSoulOut(efv[i], efl[i]);
+            appendDefStatus(e_soulout, 0, bf);
             return true;
         }
     }
@@ -12060,6 +12098,21 @@ void BattleSimulator::doSkillEffectExtra_LingShiBleed2(BattleFighter* bf, int ta
         float factor = atklist[i].factor;
         bo->setLingShiBleed(factor*dmg, efl[eftIdx]);
         appendDefStatus(e_lingShiBleed, 0, bo);
+    }
+}
+
+void BattleSimulator::doSkillEffectExtra_CriticalDmgReduce(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
+{
+    if(!skill || !skill->effect)
+        return;
+    const std::vector<float>& efv = skill->effect->efv;
+    AtkList atklist;
+    getAtkList(bf, skill, atklist);
+    UInt8 cnt = atklist.size();
+    for(size_t i = 0; i < cnt; ++ i)
+    {
+        BattleFighter* bo = atklist[i].bf;
+        bo->setCriticalDmgReduce(efv[eftIdx]);
     }
 }
 

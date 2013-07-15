@@ -9,6 +9,7 @@
 #include "GData/ExpTable.h"
 #include "GData/NpcGroup.h"
 #include "GObject/Player.h"
+#include "GObject/TaskMgr.h"
 #include "GObject/CFriend.h"
 #include "GObject/Package.h"
 #include "GObject/PetPackage.h"
@@ -266,7 +267,13 @@ GMHandler::GMHandler()
 
     Reg(3, "settdlvl", &GMHandler::OnSetTownDeamonMaxLevel);
     Reg(3, "spar", &GMHandler::OnFairySpar);
+    
+    Reg(3, "setxzlvl", &GMHandler::OnSetXZLvl);
+    Reg(3, "setxzvalue", &GMHandler::OnSetXCValue);
+
     Reg(2, "eqexp", &GMHandler::OnAddPetEquipExp);
+    Reg(2, "task", &GMHandler::OnHandleTask);
+    Reg(2, "task0", &GMHandler::OnCompletedManyTask);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -345,6 +352,43 @@ bool GMHandler::Handle( const std::string& txt, GObject::Player * player, bool i
 #ifdef _WIN32
 #define strtoull _strtoui64
 #endif
+
+void GMHandler::OnSetXZLvl(GObject::Player * player, std::vector<std::string>& args)
+{
+    
+	if(args.empty())
+		return;
+	if(args.size() == 2)
+	{
+		UInt32 fighterId = atoi(args[0].c_str());
+		UInt32 xzLevel = atoi(args[1].c_str());
+		GObject::Fighter * fgt = player->findFighter(fighterId);
+		if(fgt == NULL)
+			return;
+        fgt->getXingchen().lvl = xzLevel;
+
+        fgt->updateDBxingchen();
+        fgt->sendXingchenInfo(0);
+	}
+}
+
+void GMHandler::OnSetXCValue(GObject::Player * player, std::vector<std::string>& args)
+{
+
+	if(args.empty())
+		return;
+	if(args.size() == 2)
+	{
+		UInt32 fighterId = atoi(args[0].c_str());
+		UInt32 xcValue  = atoi(args[1].c_str());
+		GObject::Fighter * fgt = player->findFighter(fighterId);
+		if(fgt == NULL)
+			return;
+        player->SetVar(VAR_XINGCHENZHEN_VALUE, xcValue);
+        
+        fgt->sendXingchenInfo(0);
+	}
+}
 
 void GMHandler::OnsetWeekDay(std::vector<std::string>& args)
 {
@@ -632,7 +676,8 @@ void GMHandler::OnAddMoney( GObject::Player * player, std::vector<std::string>& 
                     if (player2)
                         player = player2;
                 }
-                player->getGold(val);
+                IncommingInfo ii(InFromAddMoney, 0, 0);
+                player->getGold(val, &ii);
 
                 {
                     char gold[32] = {0};
@@ -768,7 +813,8 @@ void GMHandler::OnTopup( GObject::Player * player, std::vector<std::string>& arg
 	if(args.empty())
 		return;
 	UInt32 val = atoi(args[0].c_str());
-	player->getGold(val);
+    IncommingInfo ii(InFromTopUp, 0, 0);
+	player->getGold(val, &ii);
     {
         char gold[32] = {0};
         snprintf(gold, 32, "%u", val);
@@ -1440,7 +1486,8 @@ void GMHandler::OnSuper( GObject::Player * player, std::vector<std::string>& arg
 		return;
 	player->AddExp(GData::expTable.getLevelMin(100));
     player->AddPExp(100000);
-    player->getGold(10000000);
+    IncommingInfo ii(InFromSuper, 0, 0);
+    player->getGold(10000000, &ii);
     {
         char gold[32] = {0};
         snprintf(gold, 32, "%u", 10000000);
@@ -2374,7 +2421,8 @@ inline bool give_money(Player * p, UInt32* money)
     {
         if (moneys[0])
         {
-            p->getGold(moneys[0]);
+            IncommingInfo ii(InFromMoney2All, 0, 0);
+            p->getGold(moneys[0], &ii);
             {
                 char gold[32] = {0};
                 snprintf(gold, 32, "%u", moneys[0]);
@@ -3296,6 +3344,30 @@ void GMHandler::OnShowBattlePoint(GObject::Player* player, std::vector<std::stri
         SYSMSG_SENDV(626, player, pet->getName().c_str(), static_cast<UInt32>(pet->getBattlePoint()),
                 hp, atk, magatk, def, magdef, action, lingya, cri, cridmg, prc, magres, hit, evd, cnt, tough);
     }
+    else if(type == 3)
+    {
+        for(int i = 0; i < 5; ++ i)
+        {
+            GObject::Lineup& lup = PLAYER_DATA(player, lineup)[i];
+            Fighter* fighter = lup.fighter;
+            if(fighter)
+            {
+                UInt32 basePoint = fighter->calcBaseBattlePoint();
+                UInt32 eqPoint = fighter->calcEquipBattlePoint();
+                UInt32 skillPoint = fighter->calcSkillBattlePoint();
+                UInt32 cittaPoint = fighter->calcCittaBattlePoint();
+                UInt32 soulPoint = fighter->calc2ndSoulBattlePoint();
+                UInt32 clanPoint = fighter->calcClanBattlePoint();
+                UInt32 lingbaoPoint = fighter->calcLingbaoBattlePoint1();
+                UInt32 formPoint = fighter->calcFormBattlePoint();
+                UInt32 petPoint = 0;
+                FairyPet * pet = player->getBattlePet();
+                if(pet)
+                    petPoint = pet->getBattlePoint();
+                SYSMSG_SENDV(627, player, fighter->getName().c_str(), basePoint, eqPoint, skillPoint, cittaPoint, soulPoint, clanPoint, petPoint, lingbaoPoint, formPoint);
+            }
+        }
+    }
 }
 
 void GMHandler::OnEnterArena(GObject::Player* player, std::vector<std::string>& arge)
@@ -4130,4 +4202,68 @@ void GMHandler::OnPetEq(GObject::Player * player, std::vector<std::string>& args
     }
 
 }
+
+void GMHandler::OnHandleTask(GObject::Player * player, std::vector<std::string>& args)
+{
+	if(args.size() <= 1)
+        return;
+	else
+    {
+		UInt32 taskId = atoi(args[1].c_str());
+		if(taskId == 0)
+			return;
+        switch(atoi(args[0].c_str()))
+		{
+		case 1:
+			{   //接受任务
+                if(GameAction()->AcceptTask(player, taskId)){
+                    TaskActionResp resp;
+                    resp.m_TaskId = taskId;
+                    resp.m_Action = 0;
+                    player->send(resp);
+                }
+            }
+            break;
+        case 2:
+            {   //完成任务
+                player->GetTaskMgr()->CompletedTask(taskId);
+            }
+            break;
+        case 3:
+            {   //提交任务
+                if(GameAction()->SubmitTask(player, taskId, 0, 0)){
+                    TaskActionResp resp;
+                    resp.m_TaskId = taskId;
+                    resp.m_Action = 1;
+                    player->send(resp);
+                }
+            }
+            break;
+        case 4:
+            {   //取消任务
+                if(GameAction()->AbandonTask(player, taskId)){
+                    TaskActionResp resp;
+                    resp.m_TaskId = taskId;
+                    resp.m_Action = 2;
+                    player->send(resp);
+                }
+            }
+            break;
+        }
+    }
+}
+
+void GMHandler::OnCompletedManyTask(GObject::Player* player, std::vector<std::string>& args)
+{
+	if(args.size() <= 1)
+		return;
+    for(int id = atoi(args[0].c_str()); id <= atoi(args[1].c_str()); ++id)
+    {
+        TaskMgr* mgr = player->GetTaskMgr();
+        mgr->AcceptTask(id);
+        mgr->CompletedTask(id);
+        mgr->SubmitTask(id);
+    }
+}
+
 

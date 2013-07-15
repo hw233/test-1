@@ -150,10 +150,10 @@ void PlayerCopy::sendInfo(Player* pl, UInt8 id)
         count = maxCount;
     st << count;
     st << maxCount;
-    UInt8 mark = pl->GetVar(VAR_COPY_AUTO_FIGHT_USE_MONEY_MARK);
+    UInt32 mark = pl->GetVar(VAR_COPY_AUTO_FIGHT_USE_MONEY_MARK);
     UInt8 pos = id - 1;
-    mark = GET_BIT(mark, pos);
-    st << mark;
+    pos = static_cast<UInt8>(GET_BIT_MARK(mark, pos));
+    st << pos;
     st << Stream::eos;
     pl->send(st);
 }
@@ -509,6 +509,12 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
             {
                 pl->GetPackage()->AddItem(9138, 1, false, false);
             }
+            
+            UInt32 mark = pl->GetVar(VAR_COPY_AUTO_FIGHT_USE_MONEY_MARK);
+            UInt8 pos = id - 1;
+            mark = CLR_BIT(mark, pos);
+            pl->SetVar(VAR_COPY_AUTO_FIGHT_USE_MONEY_MARK, mark);
+
             GameAction()->onCopyWin(pl, id, tcd.floor, tcd.spot, tcd.lootlvl);
             pl->copyFrontWinAward(1);
 
@@ -760,7 +766,7 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool 
                     if (!World::getNewYear() &&
                         !girl &&
                         !World::getNetValentineDay() &&
-                        (0 == GET_BIT(mark, pos)))
+                        (0 == GET_BIT_MARK(mark, pos)))
                     {
                         // XXX: moneyNeed must greater than 1000
                         UInt32 pref = 0;

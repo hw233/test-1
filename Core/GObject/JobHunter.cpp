@@ -200,18 +200,18 @@ void JobHunter::OnHireFighter(UInt16 id)
         st << Stream::eos;
         _owner->send(st);
 
-                Mail *pmail = NULL;
-                MailPackage::MailItem mitem[9] = {{2872, 1}, {2873, 1}, {2874, 1}, {2875, 1}, {2876, 1}, {2877, 1}, {2878, 1}, {2879, 1}, {1656, 1}};
-                MailItemsInfo itemsInfo(mitem, NEWJOBHIRE, 9);
+        Mail *pmail = NULL;
+        MailPackage::MailItem mitem[9] = {{2872, 1}, {2873, 1}, {2874, 1}, {2875, 1}, {2876, 1}, {2877, 1}, {2878, 1}, {2879, 1}, {1656, 1}};
+        MailItemsInfo itemsInfo(mitem, NEWJOBHIRE, 9);
 
-                SYSMSG(title, 4070);
-                SYSMSG(content, 4071);
-                pmail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+        SYSMSG(title, 4070);
+        SYSMSG(content, 4071);
+        pmail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
 
-                if(pmail != NULL)
-                {
-                    mailPackageManager.push(pmail->id, mitem, 9, true);
-                }
+        if(pmail != NULL)
+        {
+            mailPackageManager.push(pmail->id, mitem, 9, true);
+        }
     }
     _fighterList.erase(id);
 
@@ -387,10 +387,10 @@ void JobHunter::SendMapInfo()
     }
     st << static_cast<UInt8>(POS_TO_CLIENT_POS(POS_TO_INDEX(_posX, _posY)));
 
-    UInt8 mark = _owner->GetVar(VAR_JOBHUNT_AUTO_FIGHT_USE_MONEY_MARK);
+    UInt32 mark = _owner->GetVar(VAR_JOBHUNT_AUTO_FIGHT_USE_MONEY_MARK);
     UInt8 pos = _gameProgress - 1;
-    mark = GET_BIT(mark, pos);
-    st << mark;
+    pos = static_cast<UInt8>(GET_BIT_MARK(mark, pos));
+    st << pos;
 
     st << Stream::eos;
     _owner->send(st);
@@ -1418,7 +1418,7 @@ void JobHunter::OnAutoStart()
     UInt32 tael = 0;
     UInt32 mark = _owner->GetVar(VAR_JOBHUNT_AUTO_FIGHT_USE_MONEY_MARK); 
     UInt8 pos = _gameProgress - 1;
-    if(0 == GET_BIT(mark, pos))
+    if(0 == GET_BIT_MARK(mark, pos))
     {
         if(_owner->getVipLevel() >= 4)
         {

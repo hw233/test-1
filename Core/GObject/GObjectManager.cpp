@@ -286,6 +286,11 @@ namespace GObject
             std::abort();
         }
         //loadSecondSoul();
+		if(!loadFighterXingchen())
+        {
+            fprintf(stderr, "load Fighter xingchen error!\n");
+            std::abort();
+        }
 		if(!loadAllAthletics())
         {
             fprintf(stderr, "loadAllAthletics error!\n");
@@ -1741,8 +1746,12 @@ namespace GObject
 
             if(!pl->hasTitle(0))
                 pl->fixOldVertionTitle(0);
+            /*
             if(!pl->hasTitle(dbpd.pdata.title))
                 pl->fixOldVertionTitle(dbpd.pdata.title);
+            */
+            if(!pl->hasTitle(dbpd.pdata.title) && !pl->isForeverTitle(dbpd.pdata.title))
+                pl->changeTitle(0);
             pl->setOpenId(dbpd.openid, true);
 
             if (dbpd.canHirePet.length())
@@ -5114,6 +5123,41 @@ namespace GObject
                 ++ idx;
             }
             fgt->setSecondSoul(secondSoul);
+		}
+		lc.finalize();
+
+        return true;
+    }
+
+    bool GObjectManager::loadFighterXingchen()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading Fighter xingchen:");
+		DBXingchen dbxc;
+        Player* pl = NULL;
+		if(execu->Prepare("SELECT `fighterId`, `playerId`, `level`, `curVal`, `gem1`, `gem2`, `gem3` FROM `fighter_xingchen`", dbxc) != DB::DB_OK)
+			return false;
+		lc.reset(20);
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(dbxc.playerId != last_id)
+			{
+				last_id = dbxc.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+			Fighter * fgt = pl->findFighter(dbxc.fighterId);
+			if(fgt == NULL || fgt->getLevel() < 55)
+            {
+                continue;
+            }
+
+            fgt->setXingchenFromDB(dbxc);
 		}
 		lc.finalize();
 

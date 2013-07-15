@@ -46,15 +46,15 @@ UInt32 ChatItem::addFighter( Player * player, UInt32 id )
 		<< player->getName() << static_cast<UInt16>(fgt->getId()) << fgt->getLevel() << fgt->getPotential() << fgt->getPeerlessAndLevel();
 
 	Script::BattleFormula * bformula = Script::BattleFormula::getCurrent();
-	UInt16 str = static_cast<UInt16>(bformula->calcStrength(fgt));
-	UInt16 agi = static_cast<UInt16>(bformula->calcAgility(fgt));
-	UInt16 inte = static_cast<UInt16>(bformula->calcIntelligence(fgt));
-	UInt16 will = static_cast<UInt16>(bformula->calcWill(fgt));
-	UInt16 phy = static_cast<UInt16>(bformula->calcPhysique(fgt));
-	UInt16 atk = static_cast<UInt16>(bformula->calcAttack(fgt));
-	UInt16 magatk = static_cast<UInt16>(bformula->calcMagAttack(fgt));
-	UInt16 def = static_cast<UInt16>(bformula->calcDefend(fgt));
-	UInt16 magdef = static_cast<UInt16>(bformula->calcMagDefend(fgt));
+	UInt32 str = static_cast<UInt32>(bformula->calcStrength(fgt));
+	UInt32 agi = static_cast<UInt32>(bformula->calcAgility(fgt));
+	UInt32 inte = static_cast<UInt32>(bformula->calcIntelligence(fgt));
+	UInt32 will = static_cast<UInt32>(bformula->calcWill(fgt));
+	UInt32 phy = static_cast<UInt32>(bformula->calcPhysique(fgt));
+	UInt32 atk = static_cast<UInt32>(bformula->calcAttack(fgt));
+	UInt32 magatk = static_cast<UInt32>(bformula->calcMagAttack(fgt));
+	UInt32 def = static_cast<UInt32>(bformula->calcDefend(fgt));
+	UInt32 magdef = static_cast<UInt32>(bformula->calcMagDefend(fgt));
 	UInt32 hp = static_cast<UInt32>(bformula->calcHP(fgt));
 
 	UInt16 hit = static_cast<float>(bformula->calcHitrate(fgt, NULL)) * 100;

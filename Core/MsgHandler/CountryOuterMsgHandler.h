@@ -720,6 +720,12 @@ struct GuideUdp
     MESSAGE_DEF3(REQ::GUIDEUDP, UInt8, _type, std::string, p1, std::string, p2);
 };
 
+struct CompareBattlePoint
+{
+    std::string _name;
+	MESSAGE_DEF1(REQ::COMPARE_BP, std::string, _name);
+};
+
 
 void OnSellItemReq( GameMsgHdr& hdr, const void * buffer)
 {
@@ -1281,7 +1287,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->svrSt(4);
     pl->sendRP7TreasureInfo(true);
     pl->sendRP7SignInfo();
-    if(cfg.rpServer != e_rp_xinyun)
+    //if(cfg.rpServer != e_rp_xinyun)
     {
         pl->sendRPZCJBInfo();
         pl->sendRYHBInfo();
@@ -1298,6 +1304,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->GetFairySpar()->sendAllInfo();
     pl->sendDirectPurInfo();
     pl->getQQTenpayAward(0);
+   // pl->xingchenInfo();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -1658,6 +1665,8 @@ void OnRecruitFighterReq( GameMsgHdr& hdr, RecruitFighterReq& rfr )
     {   //将新招募的散仙放入修炼位
         UInt32 fgts[1] = { id };
         GObject::practicePlace.sitdown(player, fgts, 1);
+        player->GetTaskMgr()->CompletedTask(201);
+        player->GetTaskMgr()->CompletedTask(202);
     }
     GameAction()->RunOperationTaskAction0(player, 3);
 }
@@ -1688,33 +1697,39 @@ void OnFighterDismissReq( GameMsgHdr& hdr, FighterDismissReq& fdr )
     else
         exp = fgt->getExp() / 2;
 
+    UInt16 rCount1 = 0, rCount2 = 0, rCount3 = 0;
 	if(exp >= 25000 || (fgt->getClass() == 4))
 	{
-		UInt16 rCount1 = static_cast<UInt16>(exp / 50000000);
+		rCount1 = static_cast<UInt16>(exp / 50000000);
 		exp = exp % 50000000;
-		UInt16 rCount2 = static_cast<UInt16>(exp / 500000);
+		rCount2 = static_cast<UInt16>(exp / 500000);
 		exp = exp % 500000;
-		UInt16 rCount3 = static_cast<UInt16>(exp / 5000);
-		
-	    UInt64 pexp = fgt->getPExp() * 0.6;
-        UInt16 rCount4 = static_cast<UInt16>(pexp / 1000000);
-        pexp = pexp % 1000000;
-		UInt16 rCount5 = static_cast<UInt16>(pexp / 10000);
-        pexp = pexp % 10000;
-		UInt16 rCount6 = static_cast<UInt16>(pexp / 100);
-		SYSMSG(title, 236);
-		SYSMSGV(content, 237, fgt->getLevel(), fgt->getColor(), fgt->getName().c_str());
-		MailPackage::MailItem mitem[6] = {{14, rCount1}, {13, rCount2}, {12, rCount3}, {31, rCount4}, {30, rCount5}, {29, rCount6}};
-		MailItemsInfo itemsInfo(mitem, DismissFighter, 6);
-		GObject::Mail * pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
-		if(pmail != NULL)
-		{
-			GObject::mailPackageManager.push(pmail->id, mitem, 6, true);
-		}
+		rCount3 = static_cast<UInt16>(exp / 5000);
 	}
+    UInt64 pexp = fgt->getPExp() * 0.6;
+    UInt16 rCount4 = static_cast<UInt16>(pexp / 1000000);
+    pexp = pexp % 1000000;
+    UInt16 rCount5 = static_cast<UInt16>(pexp / 10000);
+    pexp = pexp % 10000;
+    UInt16 rCount6 = static_cast<UInt16>(pexp / 100);
+    bool hasMail = false;
+    if(rCount1 > 0 || rCount2 > 0 || rCount3 > 0 || rCount4 > 0 || rCount5 > 0 || rCount6 > 0)
+        hasMail = true;
+    if(hasMail)
+    {
+        SYSMSG(title, 236);
+        SYSMSGV(content, 237, fgt->getLevel(), fgt->getColor(), fgt->getName().c_str());
+        MailPackage::MailItem mitem[6] = {{14, rCount1}, {13, rCount2}, {12, rCount3}, {31, rCount4}, {30, rCount5}, {29, rCount6}};
+        MailItemsInfo itemsInfo(mitem, DismissFighter, 6);
+        GObject::Mail * pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+        if(pmail != NULL)
+            GObject::mailPackageManager.push(pmail->id, mitem, 6, true);
+    }
+
     fgt->delAllCitta();
     //此处只剩下法宝符文未散功了！！
     fgt->SSDismissAll(true);
+    fgt->dismissXingchen();
 	delete fgt;
 	rep._fgtid = fdr._fgtid;
 	rep._result = 0;
@@ -1956,6 +1971,7 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
 
         case 0x0C:
         {
+            //2013-06-05，现在仅仅是大厅
             if(!World::getQZoneQQGameAct())
                 return;
             UInt8 domainType;
@@ -5014,6 +5030,16 @@ void OnFairySparReq(GameMsgHdr& hdr, const void * data)
     GObject::Clan* clan = player->getClan();
     if (clan == NULL)
         return;
+    ClanMember* mem = clan->getClanMember(player);
+    if(!mem)
+        return;
+	UInt32 now = TimeUtil::Now();
+    UInt32 joinTime = mem->joinTime;
+    if(now >= joinTime && now - joinTime < 24 * 60 * 60)
+    {
+		player->sendMsgCode(0, 1368);
+		return;
+    }
 
     BinaryReader br(data, hdr.msgHdr.bodyLen);
     UInt8 type = 0;
@@ -5573,8 +5599,8 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
     //return; // XXX: 不使用老版本新注册七日活动
 
 	BinaryReader br(data, hdr.msgHdr.bodyLen);
-    UInt8 op = 0;
-    br >> op;
+    UInt8 op = 0, idx = 0;
+    br >> op >> idx;
 
     if (op  < 6 )
         return;
@@ -5590,11 +5616,7 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
             break;
 
         case 4:
-            {
-                UInt8 idx = 0;
-                br >> idx;
-                player->getContinuousReward(op, idx);
-            }
+            player->getContinuousReward(op, idx);
             break;
 
         case 5:
@@ -5607,32 +5629,26 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
         case 7:
             player->getYearRPReward();
             break;
-        case 8:
-            player->getFishUserAward();
-            break;
-        case 9:
-            player->getFishUserPackage();
-            break;
         case 10:
             {
-                UInt8 idx = 0;
-                br >> idx;
                 if(idx != 0 && !player->hasChecked())
                     return;
                 player->doVipPrivilege(idx);
             }
             break;
+        case 8:
         case 11:
         case 13:
         case 15:
         case 17:
             player->getFishUserAward();
             break;
+        case 9:
         case 12:
         case 14:
         case 16:
         case 18:
-            player->getFishUserPackage();
+            player->getFishUserPackage(idx);
             break;
 
         default:
@@ -6077,6 +6093,95 @@ void OnEquipLingbaoReq( GameMsgHdr & hdr, const void * data )
     }
 }
 
+
+void OnDelueGemReq( GameMsgHdr & hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	if(!player->hasChecked())
+    {
+		return;
+    }
+
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 opt = 0;
+    UInt16 fighterId = 0;
+    br >> opt >> fighterId;
+
+    GObject::Fighter * fgt = player->findFighter(fighterId);
+    if(fgt == NULL)
+    {  
+        return;
+    }
+
+    switch(opt)
+    {
+    case 1:
+        {
+            //请求镶嵌宝石
+            UInt16 gemId = 0;
+            UInt8  bind = 0;
+            UInt8 pos = 0;
+            br >> gemId >> bind >> pos;
+
+            fgt->setGem(gemId, bind, pos, opt);
+        }
+        break;
+    case 2:
+        {
+            //请求拆卸宝石
+            UInt8 pos = 0;
+            br >> pos;
+
+            fgt->dismantleGem(pos, opt);
+        }
+        break;
+    case 3:
+        {
+            //阵旗转化星辰值
+            UInt8 itemDataCount = 0;
+            UInt32 xcValue = 0;
+            UInt16 zqId = 0;
+            UInt32 zqCount = 0;
+            UInt8 bind = 0;
+
+            br >> itemDataCount;
+
+            for(UInt8 i=0; i<itemDataCount; i++)
+            {
+                br >> zqId >> zqCount >> bind;
+
+                if(zqCount > 0)
+                {
+                    xcValue += fgt->exchangeXingchenValue(zqId, zqCount, bind);
+                }
+                else
+                {
+                    continue;
+                }
+            }
+
+            if(xcValue > 0)
+            {
+                player->AddVar(VAR_XINGCHENZHEN_VALUE, xcValue);
+                fgt->sendXingchenInfo(opt);
+            }
+        }
+        break;
+    case 4:
+        {
+            //星辰图升级
+            fgt->upgradeXingchen(opt);
+        }
+        break;
+    case 5:
+        {
+            //一键描绘星辰图
+            fgt->quickUpGrade(opt);
+        }
+        break;
+    }
+}
+
 void OnDreamer( GameMsgHdr & hdr, const void * data)
 {
 	MSG_QUERY_PLAYER(player);
@@ -6423,8 +6528,8 @@ void OnRPServerReq( GameMsgHdr & hdr, const void * data)
             break;
         case 0x05:
             {
-                if(cfg.rpServer == e_rp_xinyun)
-                    break;
+                /*if(cfg.rpServer == e_rp_xinyun)
+                    break; */
                 UInt8 type = 0;
                 brd >> type;
                 if(1 == type)
@@ -6448,6 +6553,25 @@ void OnRPServerReq( GameMsgHdr & hdr, const void * data)
 void OnClanBossReq( GameMsgHdr& hdr, const void* data)
 {
     GObject::ClanBoss::instance().onClanBossReq(hdr, data);
+}
+
+void OnComparBattelPoint( GameMsgHdr & hdr, CompareBattlePoint& cbp)
+{
+	MSG_QUERY_PLAYER(player);
+
+	GObject::Player * pl = GObject::globalNamedPlayers[player->fixName(cbp._name)];
+    if (NULL == pl)
+        return;
+    UInt8 tid = pl->getThreadId();
+	if(tid == player->getThreadId())
+	{
+        pl->sendCompareBP(player);
+    }
+    else
+    {
+        GameMsgHdr hdr(0x275, tid, pl, sizeof(Player *));
+        GLOBAL().PushMsg(hdr, &player);
+    }
 }
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_

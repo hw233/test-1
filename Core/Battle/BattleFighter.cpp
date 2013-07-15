@@ -67,8 +67,8 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _hitChangeByPeerless(0),_counterChangeByPeerless(0),_bSingleAttackFlag(false),_bMainTargetDead(false),_nCurrentAttackIndex(0),
     _darkVigor(0), _dvFactor(0), _darkVigorLast(0), _hpShieldSelf(0), _hpShieldSelf_last(0),
     _counter_spirit_atk_add(0), _counter_spirit_magatk_add(0), _counter_spirit_def_add(0), _counter_spirit_magdef_add(0), _counter_spirit_times(0), _counter_spirit_last(0), _counter_spirit_efv(0), _counter_spirit_skillid(0), _counter_spirit_skill_cd(0), _pet_coatk(0), _fire_defend(0), _fire_defend_last(0), _fire_fake_dead_rate(0), _fire_fake_dead_rate_last(0), _sneak_atk(0), _sneak_atk_status(0), _sneak_atk_last(0), _sneak_atk_recover_rate(0),
-    _selfSummon(NULL), _dec_wave_dmg(0), _lingqu_last(0), _lingqu(false),  _lingshi_bleed(0), _lingshi_bleed_last(0),
-    _lingyou_atk(0), _lingyou_magatk(0), _lingyou_def(0), _lingyou_magdef(0), _lingHpShield(false)
+    _selfSummon(NULL), _dec_wave_dmg(0), _lingqu_last(0), _lingqu(false), _soulout_last(0), _soulout(false),  _lingshi_bleed(0), _lingshi_bleed_last(0),
+    _lingyou_atk(0), _lingyou_magatk(0), _lingyou_def(0), _lingyou_magdef(0), _lingHpShield(false), _criticaldmgreduce(0)
 {
     memset(_immuneLevel, 0, sizeof(_immuneLevel));
     memset(_immuneRound, 0, sizeof(_immuneRound));
@@ -145,6 +145,8 @@ void BattleFighter::setFighter( GObject::Fighter * f )
     updatePassiveSkill(_fighter->getPassiveSkillOnBeMagDmg(), _passiveSkillOnBeMagDmg);
     updatePassiveSkill(_fighter->getPassiveSkillOnHP10P(), _passiveSkillOnHP10P);
     updatePassiveSkill(_fighter->getPassiveSkillDeadFake(), _passiveSkillDeadFake);
+
+    updateSoulSkillDead(_fighter->getSoulSkillSoulOut());
 
     std::vector<GObject::LBSkill>& lbSkills =  _fighter->getLBSkill();
     cnt = lbSkills.size();
@@ -1394,7 +1396,7 @@ float BattleFighter::calcCriticalDmg(BattleFighter* defender)
 
 float BattleFighter::getCriticalDmg()
 {
-    float cridmg = _criticaldmg + _criticalDmgAdd + _criticalDmgAdd2;
+    float cridmg = _criticaldmg + _criticalDmgAdd + _criticalDmgAdd2 + _criticaldmgreduce;
     if(cridmg > GObject::GObjectManager::getCriticalDmgMax() && !isNpc())
         cridmg = GObject::GObjectManager::getCriticalDmgMax();
 
@@ -1771,7 +1773,7 @@ void BattleFighter::makeDamage( UInt32& u )
         -- _colorStockTimes;
         return;
     }
-    if(isLingQu())
+    if(isLingQu() || isSoulOut())
     {
         u = 0;
         return;
@@ -1911,7 +1913,10 @@ bool BattleFighter::releaseSummon()
 
     -- _summonLast;
     if(_summonLast == 0)
+    {
+        _hp = 0;
         return true;
+    }
 
     return false;
 }
@@ -2472,6 +2477,7 @@ bool BattleFighter::doFireFakeDead()
     {
         _fire_fake_dead_rate = 0;
         _fire_fake_dead_rate_last = 0;
+        _hp = 1;
         return true;
     }
 
@@ -2539,6 +2545,33 @@ bool BattleFighter::recoverSneakAtk()
     return false;
 }
 
+void BattleFighter::updateSoulSkillDead(UInt16 skillId)
+{
+    if(skillId == 0)
+        return;
+
+    GData::SkillItem skillItem;
+    skillItem.base = GData::skillManager[skillId];
+    if(skillItem.base == NULL)
+        return;
+
+    skillItem.cd = 0;
+    if(skillItem.base->prob > 99.999f)
+    {
+        skillItem.rateExtent = 0;
+        _passiveSkillDead100.insert(_passiveSkillDead100.end(), skillItem);
+    }
+    else
+    {
+        size_t cnt = _passiveSkillDead.size();
+        if(cnt > 0)
+            skillItem.rateExtent = _passiveSkillDead[cnt-1].rateExtent + skillItem.base->prob * 100;
+        else
+            skillItem.rateExtent = skillItem.base->prob * 100;
+        _passiveSkillDead.insert(_passiveSkillDead.end(), skillItem);
+    }
+}
+
 void BattleFighter::updatePassiveSkill100(std::vector<UInt16>& passiveSkill100Id, std::vector<GData::SkillItem>& passiveSkill100)
 {
     size_t idx;
@@ -2600,6 +2633,20 @@ bool BattleFighter::releaseLingShiBleed()
         _lingshi_bleed = 0;
         return true;
     }
+    return false;
+}
+
+bool BattleFighter::releaseSoulOut()
+{
+    if(_soulout_last == 0)
+        return false;
+    -- _soulout_last;
+    if(_soulout_last == 0)
+    {
+        _hp = 0;
+        return true;
+    }
+
     return false;
 }
 

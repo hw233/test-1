@@ -140,7 +140,6 @@ namespace GObject
                     // curl调用上报
                     char buffer[MAX_RET_LEN] = {0};
                     curl_easy_setopt(curl, CURLOPT_URL, res);
-                    puts(res);
                     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, recvret);
                     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
                     curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10);
@@ -149,7 +148,7 @@ namespace GObject
                     if (CURLE_OK == curlRes)
                     {
                         char msg[MAX_RET_LEN] = "";
-                        ret = UnionLoggerResultParse(buffer, msg);
+                        ret = UnionLoggerResultParse(buffer, msg, sizeof(msg)-1);
                     }
                 }
 #endif
@@ -288,7 +287,7 @@ namespace GObject
     }
     */
 
-    UInt32 DCWorker::UnionLoggerResultParse(char* result, char* msg)
+    UInt32 DCWorker::UnionLoggerResultParse(char* result, char* msg, size_t size)
     {
         // 上报结果解析
         #define JSON_ERR_CUSTOM -9527
@@ -304,7 +303,7 @@ namespace GObject
         if ((jerr = json_parse_document(&obj, result)) != JSON_OK)
             return JSON_ERR_CUSTOM;
 
-        json_t* hdr = json_find_first_label(obj, "ret");
+        json_t* hdr = json_find_first_label(obj, "iRet");
         if (!hdr || !hdr->child || !hdr->text)
             return JSON_ERR_CUSTOM2;
 
@@ -312,12 +311,13 @@ namespace GObject
         if (ret)
             return ret;
 
-        hdr =  json_find_first_label(obj, "msg");
+        hdr =  json_find_first_label(obj, "iMsg");
         if (!hdr || !hdr->child || !hdr->text)
             return JSON_ERR_CUSTOM3;
         ret = atoi(hdr->child->text);
         UInt32 len = strlen(hdr->child->text);
-        strncpy (msg, hdr->child->text, len + 1);
+        len = len > size ? size : len;
+        strncpy (msg, hdr->child->text, len);
         msg[len] = '\0';
         return 0;
         #undef JSON_ERR_CUSTOM

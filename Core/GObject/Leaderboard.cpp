@@ -886,6 +886,7 @@ void Leaderboard::newDrawingGame(UInt32 nextday)
 {
     if(cfg.openYear <= 2011)
         return;
+
     UInt32 opTime = TimeUtil::MkTime(cfg.openYear, cfg.openMonth, cfg.openDay);
     bool after_20130531 = (TimeUtil::MkTime(2013, 5, 31) <= opTime);
     UInt32 days = 7;
@@ -893,6 +894,7 @@ void Leaderboard::newDrawingGame(UInt32 nextday)
         days = 30;
     if(TimeUtil::SharpDay(0, nextday) == opTime + days * 86400 )
     {
+        FastMutex::ScopedLock lk(_opMutex);
         UInt16 newAward[] = { 1000,800,600,400,200,100,100,100,100,100 };
         UInt16 newAwardRP[] = { 1000,800,600,300,300,300,300,300,300,300 };
         UInt16* pAward = newAward;
@@ -924,6 +926,8 @@ void Leaderboard::newDrawingGame(UInt32 nextday)
     //if(cfg.rpServer && TimeUtil::SharpDay(0, nextday) == opTime + 30 * 86400)
     if(TimeUtil::SharpDay(0, nextday) == opTime + 30 * 86400)
     {
+        FastMutex::ScopedLock lk(_opMutex);
+        buildBattlePacket();
         static  MailPackage::MailItem s_item[10][6] = {
             {{0xA000,1000},{9367,20},{9369,20},{134,20},{50,20}},
             {{0xA000,800},{9367,10},{9369,10},{134,10},{50,10}},

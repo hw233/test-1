@@ -43,6 +43,7 @@ namespace GObject
 #define FIGHTER_BUFF_SANTA      0x12 //圣诞老人变身卡
 
 #define FIGHTER_BUFF_COUNT 0x20
+#define FIGHTER_BUFF_START 0x80
 
 #define SKILL_UPMAX 3 // 技能最初就能装备3个
 #define CITTA_UPMAX 9
@@ -75,6 +76,16 @@ enum
     e_cls_xuanwu = 8,
 
     e_cls_max
+};
+
+struct DBXingchen;
+struct Xingchenzhen
+{
+    Xingchenzhen() : lvl(0), curVal(0) { memset(gems, 0, sizeof(gems)); }
+
+    UInt8 lvl;      // 星辰等级
+    UInt32 curVal;  // 当前星辰值
+    UInt16 gems[3]; //镶嵌的宝石id
 };
 
 struct SStrengthen
@@ -720,6 +731,7 @@ public:
 protected:
     void addAttrExtra( GData::AttrExtra& ae, const GData::AttrExtra * ext );
     void addAttrExtra( GData::AttrExtra& ae, const GData::CittaEffect* ce );
+    void addAttrExtraGem( GData::AttrExtra& ae, GData::ItemGemType * igt );
 	virtual void rebuildEquipAttr();
 	void rebuildBattlePoint();
 	void rebuildSkillBattlePoint();
@@ -835,6 +847,8 @@ public:
     void setSecondSoul(SecondSoul* sedondSoul);
     UInt8 getSoulExtraAura();
     UInt8 getSoulAuraLeft();
+    UInt16 getSoulSkillSoulOut();
+
     bool practiceLevelUp();
     bool changeSecondSoulClass(UInt8 cls);
     bool changeSecondSoulXinxiu(UInt8 xinxiu);
@@ -881,12 +895,14 @@ public:
     inline void setSoulMax(Int32 v) { _soulMax = v; }
     inline void setSoulExtraAura(Int32 v) { _soulExtraAura = v; }
     inline void setSoulAuraLeft(Int32 v) { _soulAuraLeft = v; }
+    inline void setSoulSkillSoulOut(Int32 v) { _soulSkillSoulOut = v; }
     inline void setUpCittasMax() { _cittaslot = CITTA_UPMAX; }
     bool upCittaWithOutCheck( UInt16 citta, int idx );
     UInt16 getTrumpSkill(int i) { if(i >= TRUMP_UPMAX) return 0; else return _trumpSkill[i]; }
     Int32 _soulMax;
     UInt8 _soulExtraAura;
     UInt8 _soulAuraLeft;
+    UInt16 _soulSkillSoulOut;
     UInt16 _trumpSkill[TRUMP_UPMAX];
 
     // 内丹系统
@@ -949,14 +965,43 @@ public:
 	struct Offset { Int8 x, y; };
 	std::vector<Offset> extraPos;
 
+    //分别计算散仙的战斗力
+public:
+	inline GData::AttrExtra& getAttrExtraEquip1() { return _attrExtraEquip; }
+    UInt32 calcBaseBattlePoint();   //基础
+    UInt32 calcEquipBattlePoint();  //装备与法宝
+    UInt32 calcSkillBattlePoint();  //技能
+    UInt32 calcCittaBattlePoint();  //心法
+    UInt32 calc2ndSoulBattlePoint();  //第二元神
+    UInt32 calcClanBattlePoint();  //帮派
+    UInt32 calcLingbaoBattlePoint1();  //宝具
+    UInt32 calcFormBattlePoint();  //阵法
     // 仙宠
-
 public:
     inline bool isPet() { return getClass() >= e_cls_qinglong && getClass() <= e_cls_xuanwu; }
     UInt8 getPassklNum();
     UInt8 getRpassklNum();
     void updateToDBPetSkill();
+
+    //镇封星辰图
+private:
+    Xingchenzhen m_xingchen;
+public:
+    inline Xingchenzhen& getXingchen() { return m_xingchen; }
+    inline UInt8 getXingchenLvl()  {return m_xingchen.lvl;}
+    void setXingchenFromDB(DBXingchen&);
+    bool upgradeXingchen(UInt8 type);
+    void updateDBxingchen();
+    void sendXingchenInfo(UInt8 type);
+    void setGem(UInt16 gemId,UInt8 bind, UInt8 pos, UInt8 type);
+    void dismantleGem(UInt8 pos, UInt8 type);
+    UInt32 exchangeXingchenValue(UInt16 zqId, UInt32 zqCount, UInt8 bind);
+    bool IsCanSetGem(ItemBase *item, UInt8 pos);
+    void dismissXingchen();
+    bool quickUpGrade(UInt8 type);
+    void xingchenInfo(Stream & st);
 };
+
 class GlobalFighters
 {
 public:

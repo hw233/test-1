@@ -125,7 +125,7 @@ namespace GObject
 		ItemBase * item = NULL;
 		for(UInt32 i = 0; i < num; ++ i)
 		{
-			item = AddRandomPetEq(0, typeId, -1, FromWhere);
+			item = AddRandomPetEq(0, typeId, -1, FromWhere, !silence);
 		}
 		return item;
 	}
@@ -589,7 +589,7 @@ namespace GObject
 		m_Owner->send(st);
 	}
 
-    ItemBase* PetPackage::AddRandomPetEq(UInt32 score, UInt32 typeId, int colorIdx, UInt8 FromWhere)
+    ItemBase* PetPackage::AddRandomPetEq(UInt32 score, UInt32 typeId, int colorIdx, UInt8 FromWhere, bool notify)
     {
 		if(GetPetEqPgRestSize() < 1)
 		{
@@ -630,7 +630,7 @@ namespace GObject
             return NULL;
         equip->SetBindStatus(true);
 
-        return AddPetEquip(equip, true, FromWhere);
+        return AddPetEquip(equip, notify, FromWhere);
     }
 
     ItemBase* PetPackage::AddRandomPetGem(UInt32 score, int lvIdx)

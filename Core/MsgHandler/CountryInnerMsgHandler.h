@@ -795,7 +795,7 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
                 left = 0;
             }
             player->SetVar(VAR_TRAINP1, left);
-            player->sendExpHook(0x40 + PLAYER_BUFF_TRAINP1, left);
+            player->sendExpHook(PLAYER_BUFF_START + PLAYER_BUFF_TRAINP1, left);
         }
     }
     else if(curHookIndex == ENUM_TRAINP2)
@@ -815,7 +815,7 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
                 left = 0;
             }
             player->SetVar(VAR_TRAINP2, left);
-            player->sendExpHook(0x40 + PLAYER_BUFF_TRAINP2, left);
+            player->sendExpHook(PLAYER_BUFF_START + PLAYER_BUFF_TRAINP2, left);
         }
     }
     else if(curHookIndex == ENUM_TRAINP3)
@@ -835,7 +835,7 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
                 left = 0;
             }
             player->SetVar(VAR_TRAINP3, left);
-            player->sendExpHook(0x40 + PLAYER_BUFF_TRAINP3, left);
+            player->sendExpHook(PLAYER_BUFF_START + PLAYER_BUFF_TRAINP3, left);
         }
     }
     else
@@ -933,7 +933,8 @@ void OnGoldRecharge( GameMsgHdr& hdr, const void * data )
         Recharge* recharge = (Recharge*)(data);
         if(recharge->gold == 0)
             return;
-        player->getGold(recharge->gold);
+        IncommingInfo ii(InFromRecharge, 0, 0);
+        player->getGold(recharge->gold, &ii);
         player->addTotalRecharge(recharge->gold);
         DB8().PushUpdateData("UPDATE `recharge` SET `status` = 1 WHERE no = '%s' AND playerId = %"I64_FMT"u",
                 recharge->no, player->getId());
@@ -963,7 +964,8 @@ void OnGoldRecharge( GameMsgHdr& hdr, const void * data )
         Recharge* recharge = (Recharge*)(data);
         if(recharge->gold == 0)
             return;
-        player->getGold(recharge->gold);
+        IncommingInfo ii(InFromRecharge, 0, 0);
+        player->getGold(recharge->gold, &ii);
         player->addTotalRecharge(recharge->gold);
 
         // XXX: 把创建银角色前的所有订单号置成成功
@@ -979,6 +981,7 @@ void OnDirectPurchase( GameMsgHdr& hdr, const void * data )
         UInt16 id;
         UInt16 num;
         UInt32 code; // 0-正常 1-未开启 2-次数上限
+        UInt8 idx;
     };
 
     DirectPurchase* pur = (DirectPurchase*)data;
@@ -1008,6 +1011,10 @@ void OnDirectPurchase( GameMsgHdr& hdr, const void * data )
     pkg->AddItem(pur->id, pur->num, true, false, FromDirectPurchase);
     player->AddVar(VAR_DIRECTPURCNT, 1);
     player->sendDirectPurInfo();
+
+    char action[32] = {0,};
+    snprintf(action, sizeof(action), "F_130619_%d", pur->idx);
+    player->udpLog("Qdianzhigou", action, "", "", "", "", "act");
 }
 
 void OnYDPacks( GameMsgHdr& hdr, const void * data )
@@ -1177,6 +1184,7 @@ void OnCreateAward(GameMsgHdr& hdr, const void * data)
 {
     MSG_QUERY_PLAYER(player);
     player->GetPackage()->AddItem(18, 1, true);
+    player->GetPackage()->AddItem(37, 1, true);
     //player->GetPackage()->AddItem(449, 1, true); // XXX: 首充礼包
     player->getCoupon(888);
 #if defined(_FB) && defined(_FB_TEST)
@@ -1288,7 +1296,8 @@ void OnSetMoneyReq( GameMsgHdr& hdr, const void* data )
     Money* money = (Money*)(data);
     if (money->type == 0)
     {
-        player->getGold(money->gold);
+        IncommingInfo ii(InFromBSSet, 0, 0);
+        player->getGold(money->gold, &ii);
         player->getTael(money->tael);
         player->getCoupon(money->coupon);
         player->getAchievement(money->achievement);
@@ -2159,6 +2168,13 @@ void OnClanRankBattleSortListInner(GameMsgHdr& hdr, const void* data)
     brd >> startId >> count;
 
     ClanRankBattleMgr::Instance().SendSortList(player, startId, count);
+}
+
+void OnCompareBP( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	Player * pl = *reinterpret_cast<Player **>(const_cast<void *>(data));
+    player->sendCompareBP(pl);
 }
 
 #endif // _COUNTRYINNERMSGHANDLER_H_

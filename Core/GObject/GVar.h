@@ -76,6 +76,10 @@ namespace GObject
         GVAR_SPREAD_KEEPER1 = 40, //持有者ID高32位
         GVAR_SPREAD_KEEPER2 = 41, //持有者ID低32位
         GVAR_SPREAD_CONDITION = 42, //0~7bits代表阶段(1代表刚开始(11:00);2代表刚结束(22:00);8-31bits代表使用秘典的人的个数)
+        GVAR_RYHB_ACTIVITY_BEGIN = 43, // 日月合璧活动开始时间
+        GVAR_RYHB_ACTIVITY_END = 44, // 日月合璧活动结束时间
+        GVAR_ZCJB_ACTIVITY_BEGIN = 45, // 招财进宝活动开始时间
+        GVAR_ZCJB_ACTIVITY_END = 46, // 招财进宝活动结束时间
 
         GVAR_MAX,
     };
@@ -141,6 +145,10 @@ namespace GObject
             GREGISTER_VAR(GVAR_SPREAD_KEEPER2, GCYCLE_DAY);
             GREGISTER_VAR(GVAR_SPREAD_CONDITION, GCYCLE_DAY);
 
+            GREGISTER_VAR(GVAR_RYHB_ACTIVITY_BEGIN, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_RYHB_ACTIVITY_END, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_ZCJB_ACTIVITY_BEGIN, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_ZCJB_ACTIVITY_END, GCYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

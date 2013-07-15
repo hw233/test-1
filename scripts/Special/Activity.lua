@@ -1,4 +1,4 @@
-﻿function checkExpire(player)
+function checkExpire(player)
   local tm = os.time()
   local nextReward = player:getNextExtraReward()
   if tm >= nextReward then
@@ -982,6 +982,29 @@ function sendWinReward(player, lootlvl, typeId)
     end
 end
 
+function onVipLevelAward(player, vipLevel)
+    
+    local itemCount = {3, 10, 20, 45, 100, 150, 200, 270, 360, 500, 650, 800, 950, 1300, 1800};
+
+    local startTime = { ['year'] = 2013, ['month'] = 6, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local endTime = { ['year'] = 2013, ['month'] = 6, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local s = os.time(startTime);
+    local e = os.time(endTime);
+    local n = os.time();
+
+    if vipLevel < 1 and vipLevel > 15 then
+        return 3;
+    end
+
+    if n >= s and n < e then
+        local package = player:GetPackage();
+        package:AddItem(503, itemCount[vipLevel], true, 0, 57);
+        return 1;
+    else
+        return 2;
+    end
+end
+
 function onCopyWin(player, id, floor, spot, lootlvl)
     SingleDayReward(player, lootlvl);
     Christmas(player, lootlvl, 0);
@@ -1022,9 +1045,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
 --    CompassAct(player, lootlvl);
     Item9344Act(player, lootlvl);
     Item9343Act(player, lootlvl);
-    if inActive_opTime_20130531() then
-        player:AddVar(523, 20);  -- 逐日印记
-    end
+    player:AddZRYJCount(20); -- 逐日印记
 end
 
 function onFrontMapFloorWin(player, id, spot, lootlvl)
@@ -1063,9 +1084,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
 --    CompassAct(player, lootlvl);
     Item9344Act(player, lootlvl);
     Item9343Act(player, lootlvl);
-    if inActive_opTime_20130531() then
-        player:AddVar(524, 20); -- 皓月印记
-    end
+    player:AddHYYJCount(20); -- 皓月印记
 end
 
 local vippack = {
@@ -4743,7 +4762,7 @@ function sendRechargeMails(player, ototal, ntotal)
         end
     end
 
-    local t = { ['year'] = 2013, ['month'] = 5, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local t = { ['year'] = 2013, ['month'] = 6, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local s = os.time(t)
     local n = os.time() + 11
 
@@ -4763,7 +4782,7 @@ function sendRechargeMails(player, ototal, ntotal)
         sendRechargeMails_2013_05_24(player, ototal, ntotal)
     end
 
-    local t = { ['year'] = 2013, ['month'] = 6, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local t = { ['year'] = 2013, ['month'] = 6, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local s = os.time(t)
     local n = os.time() + 11
 
@@ -7178,6 +7197,86 @@ function sendRechargeRankAward_2013_04_20(player, pos)
     sendItemPackageMail(player, title, ctx, items[pos]);
 end
 
+function sendRechargeRankAward_2013_06_11(player, pos)
+    local items = {
+        {5028,1,1},
+        {5027,2,1},
+        {5027,1,1},
+        {5026,2,1},
+        {5026,2,1},
+        {5026,2,1},
+        {5026,2,1},
+    }
+
+    if items[pos] == nil then
+        return
+    end
+
+    local title = string.format(msg_111, pos)
+    local ctx = string.format(msg_111, pos)
+    sendItemPackageMail(player, title, ctx, items[pos]);
+end
+
+function sendRechargeRankAward_2013_06_22(player, pos)
+    local items = {
+        {1126,99,1},
+        {1126,77,1},
+        {1126,55,1},
+        {1126,33,1},
+        {1126,33,1},
+        {1126,33,1},
+        {1126,33,1},
+    }
+
+    if items[pos] == nil then
+        return
+    end
+
+    local title = string.format(msg_111, pos)
+    local ctx = string.format(msg_111, pos)
+    sendItemPackageMail(player, title, ctx, items[pos]);
+end
+
+function sendRechargeRankAward_2013_06_25(player, pos)
+    local items = {
+        {5008,1,1},
+        {5007,2,1},
+        {5007,1,1},
+        {5006,2,1},
+        {5006,2,1},
+        {5006,2,1},
+        {5006,2,1},
+    }
+
+    if items[pos] == nil then
+        return
+    end
+
+    local title = string.format(msg_111, pos)
+    local ctx = string.format(msg_111, pos)
+    sendItemPackageMail(player, title, ctx, items[pos]);
+end
+
+function sendRechargeRankAward_2013_07_02(player, pos)
+    local items = {
+        {5028,1,1},
+        {5027,2,1},
+        {5027,1,1},
+        {5026,2,1},
+        {5026,2,1},
+        {5026,2,1},
+        {5026,2,1},
+    }
+
+    if items[pos] == nil then
+        return
+    end
+
+    local title = string.format(msg_111, pos)
+    local ctx = string.format(msg_111, pos)
+    sendItemPackageMail(player, title, ctx, items[pos]);
+end
+
 -- RANK
 function sendRechargeRankAward(player, pos)
     if isRPServer() then
@@ -7203,18 +7302,18 @@ function sendRechargeRankAward(player, pos)
         end
     end
 
-    local t = { ['year'] = 2013, ['month'] = 5, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local t = { ['year'] = 2013, ['month'] = 6, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local s = os.time(t)
     local n = os.time()
 
     if n >= (s + 10 * 60) and n < (s + 86400 + 10*60) then
-        sendRechargeRankAward_2013_04_14(player, pos)
+        sendRechargeRankAward_2013_06_22(player, pos)
     elseif n >= (s + 86400 + 10*60) and n < (s + 2*86400 + 10*60) then
         sendRechargeRankAward_2013_04_15(player, pos)
     elseif n >= (s + 2*86400 + 10*60) and n < (s + 3*86400 + 10*60) then
         sendRechargeRankAward_2013_03_29(player, pos)
     elseif n >= (s + 3*86400 + 10*60) and n < (s + 4*86400 + 10*60) then
-        sendRechargeRankAward_2013_04_17(player, pos)
+        sendRechargeRankAward_2013_06_25(player, pos)
     elseif n >= (s + 4*86400 + 10*60) and n < (s + 5*86400 + 10*60) then
         sendRechargeRankAward_2013_04_18(player, pos)
     elseif n >= (s + 5*86400 + 10*60) and n < (s + 6*86400 + 10*60) then
@@ -7223,18 +7322,18 @@ function sendRechargeRankAward(player, pos)
         sendRechargeRankAward_2013_04_08(player, pos)
     end
 
-    local t = { ['year'] = 2013, ['month'] = 6, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local t = { ['year'] = 2013, ['month'] = 6, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local s = os.time(t)
     local n = os.time()
 
     if n >= (s + 10 * 60) and n < (s + 86400 + 10*60) then
-        sendRechargeRankAward_2013_04_14(player, pos)
+        sendRechargeRankAward_2013_06_22(player, pos)
     elseif n >= (s + 86400 + 10*60) and n < (s + 2*86400 + 10*60) then
         sendRechargeRankAward_2013_04_15(player, pos)
     elseif n >= (s + 2*86400 + 10*60) and n < (s + 3*86400 + 10*60) then
         sendRechargeRankAward_2013_03_29(player, pos)
     elseif n >= (s + 3*86400 + 10*60) and n < (s + 4*86400 + 10*60) then
-        sendRechargeRankAward_2013_04_17(player, pos)
+        sendRechargeRankAward_2013_07_02(player, pos)
     elseif n >= (s + 4*86400 + 10*60) and n < (s + 5*86400 + 10*60) then
         sendRechargeRankAward_2013_04_18(player, pos)
     elseif n >= (s + 5*86400 + 10*60) and n < (s + 6*86400 + 10*60) then
@@ -7242,7 +7341,6 @@ function sendRechargeRankAward(player, pos)
     elseif n >= (s + 6*86400 + 10*60) and n < (s + 7*86400 + 10*60) then
         sendRechargeRankAward_2013_04_08(player, pos)
     end
-
 end
 
 function sendConsumeRankAward_2012_10_19(player, pos)
@@ -7910,7 +8008,8 @@ function SurnameLegendLoot(player,lootlvl)
     };
     local package = player:GetPackage();
     --package:AddItem(9383, itemNum[lootlvl], true,0,10);
-    package:AddItem(9397, itemNum[lootlvl], true,0,10);
+    --package:AddItem(9397, itemNum[lootlvl], true,0,10);
+    package:AddItem(9401, itemNum[lootlvl], true,0,10);
 end
 
 -- 万圣节套装
@@ -8110,14 +8209,20 @@ function onFirstRecharge(player, index)
         {{56, 5}, {57, 2}, {503, 5}, {514, 10}, {515, 2}, {507, 2}, {509, 2}, {15, 3}, {517, 2}},
         {{56, 10}, {57, 4}, {503, 10}, {514, 20}, {515, 4}, {507, 4}, {509, 4}, {15, 6}, {517, 4}},
 
-        {{2544, 3}}, --{2545, 1}, {2546, 1}, {2547, 1}, {2548, 1}, {2549, 1}, {2550, 1}, {2551, 1}, {1600, 1}},
-        {{2712, 7}}, --{2713, 1}, {2714, 1}, {2715, 1}, {2716, 1}, {2717, 1}, {2718, 1}, {2719, 1}, {1608, 1}},
+        --{{2544, 3}}, --{2545, 1}, {2546, 1}, {2547, 1}, {2548, 1}, {2549, 1}, {2550, 1}, {2551, 1}, {1600, 1}},
+        --{{2712, 7}}, --{2713, 1}, {2714, 1}, {2715, 1}, {2716, 1}, {2717, 1}, {2718, 1}, {2719, 1}, {1608, 1}},
+        {{2544, 1}, {2545, 1}, {2546, 1}, {2547, 1}, {2548, 1}, {2549, 1}, {2550, 1}, {2551, 1}, {502, 20}},
+        {{2712, 1}, {2713, 1}, {2714, 1}, {2715, 1}, {2716, 1}, {2717, 1}, {2718, 1}, {2719, 1}, {502, 99}},
 
-        {{2552, 3}}, --{2553, 1}, {2554, 1}, {2555, 1}, {2556, 1}, {2557, 1}, {2558, 1}, {2559, 1}, {1601, 1}},
-        {{2720, 7}}, --{2721, 1}, {2722, 1}, {2723, 1}, {2724, 1}, {2725, 1}, {2726, 1}, {2727, 1}, {1609, 1}},
+        --{{2552, 3}}, --{2553, 1}, {2554, 1}, {2555, 1}, {2556, 1}, {2557, 1}, {2558, 1}, {2559, 1}, {1601, 1}},
+        --{{2720, 7}}, --{2721, 1}, {2722, 1}, {2723, 1}, {2724, 1}, {2725, 1}, {2726, 1}, {2727, 1}, {1609, 1}},
+        {{2552, 1}, {2553, 1}, {2554, 1}, {2555, 1}, {2556, 1}, {2557, 1}, {2558, 1}, {2559, 1}, {502, 20}},
+        {{2720, 1}, {2721, 1}, {2722, 1}, {2723, 1}, {2724, 1}, {2725, 1}, {2726, 1}, {2727, 1}, {502, 99}},
 
-        {{2560, 3}}, --{2561, 1}, {2562, 1}, {2563, 1}, {2564, 1}, {2565, 1}, {2566, 1}, {2567, 1}, {1602, 1}},
-        {{2728, 7}}, --{2729, 1}, {2730, 1}, {2731, 1}, {2732, 1}, {2733, 1}, {2734, 1}, {2735, 1}, {1610, 1}},
+        --{{2560, 3}}, --{2561, 1}, {2562, 1}, {2563, 1}, {2564, 1}, {2565, 1}, {2566, 1}, {2567, 1}, {1602, 1}},
+        --{{2728, 7}}, --{2729, 1}, {2730, 1}, {2731, 1}, {2732, 1}, {2733, 1}, {2734, 1}, {2735, 1}, {1610, 1}},
+        {{2560, 1}, {2561, 1}, {2562, 1}, {2563, 1}, {2564, 1}, {2565, 1}, {2566, 1}, {2567, 1}, {502, 20}},
+        {{2728, 1}, {2729, 1}, {2730, 1}, {2731, 1}, {2732, 1}, {2733, 1}, {2734, 1}, {2735, 1}, {502, 99}},
     }
     local item = items[index]
 
@@ -8128,11 +8233,11 @@ function onFirstRecharge(player, index)
     end
 
     for k, v in pairs(item) do
-        if index < 3 then
+        --if index < 3 then
             package:Add(v[1], v[2], 1)
-        else
-            package:AddEquipEnchant(v[1], v[2], true, true, 55)
-        end
+        --else
+        --    package:AddEquipEnchant(v[1], v[2], true, true, 55)
+        --end
 
     end
 
@@ -8150,7 +8255,7 @@ local equipTrump1 = {
     },
     -- level 45
     [2067] = {
-        [1] = {{2544,30},{2545,30},{2546,30},{2547,30},{2548,30},{2549,30},{2550,30},{2551,30},{2552,30},{2553,30},{2554,30},{2555,30},{2556,30},{2557,30},{2558,30},{2559,30},{2560,30},{2561,30},{2562,30},{2563,30},{2564,30},{2565,30},{2566,30},{2567,30},},
+        [1] = {{2544,80},{2545,80},{2546,80},{2547,80},{2548,80},{2549,80},{2550,80},{2551,80},{2552,80},{2553,80},{2554,80},{2555,80},{2556,80},{2557,80},{2558,80},{2559,80},{2560,80},{2561,80},{2562,80},{2563,80},{2564,80},{2565,80},{2566,80},{2567,80},},
         [2] = {{1235,20},{1310,20},},
     },
     -- level 60
@@ -8187,62 +8292,62 @@ local equipTrump1 = {
     -- level 35
     [1284] = {
         [1] = {{1600,30},{1601,30},{1602,30},{1500,30},{1501,30},{1502,30},},
-        [2] = {{1205,20},{1220,20},{1221,20},},
+        [2] = {{1205,20},{1220,20},{1221,20},  {1116,40},{1118,40},{1119,40},{1120,40},{1121,40},{1122,40},{1123,40},{1124,40}},
     },
     -- level 45
     [2053] = {
         [1] = {{1604,30},{1605,30},{1606,30},{1503,30},},
-        [2] = {{1231,20},{1224,20},{1308,20},},
+        [2] = {{1231,20},{1224,20},{1308,20},  {1059,40},{1061,40},{1062,40},{1063,40},{1064,40}},
     },
     -- level 50
     [4360] = {
         [1] = {{1603,30},{1608,30},{1609,30},{1505,30},{1506,30},},
-        [2] = {{1238,20},{1233,20},{1225,20},{1311,20},},
+        [2] = {{1238,20},{1233,20},{1225,20},{1311,20},  {1107,40},{1109,40},{1110,40},{1111,40},{1112,40},{1113,40},{1114,40},{1115,40}},
     },
     -- level 55
     [4611] = {
         [1] = {{1610,30},{1614,30},{1615,30},{1507,30},{1508,30},},
-        [2] = {{1246,20},{1229,20},{1243,20},{1315,20},},
+        [2] = {{1246,20},{1229,20},{1243,20},{1315,20},  {1096,40},{1098,40},{1099,40},{1100,40},{1101,40},{1102,40},{1103,40},{1104,40},{1105,40},{1106,40}},
     },
     -- level 60
     [5893] = {
         [1] = {{1612,30},{1616,30},{1607,30},{1611,30},{1509,30},},
-        [2] = {{1251,20},{1317,20},},
+        [2] = {{1251,20},{1317,20},  {1084,40},{1086,40},{1087,40},{1088,40},{1089,40},{1090,40},{1091,40},{1092,40},{1093,40},{1094,40},{1095,40}},
     },
     -- level 65
     [5637] = {
         [1] = {{200,30},{201,30},{202,30},{203,30},{204,30},{205,30},{206,30},{207,30},{208,30},{82,30},{83,30},{84,30},{85,30},{86,30},{87,30},{88,30},{89,30},},
-        [2] = {{1413,20},{1414,20},{1415,20},{1241,20},{1242,20},{6053,20},},
+        [2] = {{1413,20},{1414,20},{1415,20},{1241,20},{1242,20},{6053,20},  {1074,40},{1076,40},{1077,40},{1078,40},{1079,40},{1080,40},{1081,40},{1082,40},{1083,40}},
     },
     -- level 70
     [8195] = {
         [1] = {{209,30},{210,30},{211,30},{212,30},{213,30},{214,30},{215,30},{216,30},{217,30},{218,30},{219,30},{220,30},{221,30},{222,30},{223,30},{224,30},{103,30},{104,30},{105,30},{106,30},{107,30},{108,30},{109,30},{110,30},},
-        [2] = {{1421,10},{1422,10},{1423,10},{1424,10},{1425,10},{1426,10},{1253,20},{1250,20},{6061,10},},
+        [2] = {{1421,10},{1422,10},{1423,10},{1424,10},{1425,10},{1426,10},{1253,20},{1250,20},{6061,10},  {1020,40},{1022,40},{1023,40},{1024,40},{1025,40},{1026,40},{1027,40},{1028,40},{1029,40},{1030,40}},
     },
     -- level 75
     [6153] = {
         [1] = {{228,30},{229,30},{230,30},{231,30},{232,30},{233,30},{234,30},{235,30},{236,30},{237,30},{238,30},{239,30},{240,30},{241,30},{242,30},{91,30},{92,30},{93,30},{94,30},{95,30},{96,30},{97,30},{98,30},{99,30},{100,30},{101,30},{102,30},},
-        [2] = {{1427,10},{1428,10},{1429,10},{1430,10},{1431,10},{1432,10},{1245,20},{6067,10},},
+        [2] = {{1427,10},{1428,10},{1429,10},{1430,10},{1431,10},{1432,10},{1245,20},{6067,10},  {1065,40},{1067,40},{1068,40},{1069,40},{1070,40},{1071,40},{1072,40},{1073,40}},
     },
     -- level 80
     [9222] = {
         [1] = {{243,30},{244,30},{245,30},{246,30},{247,30},{248,30},{249,30},{250,30},{251,30},{252,30},{253,30},{254,30},{255,30},{256,30},{257,30},{258,30},{259,30},{260,30},{261,30},{262,30},{263,30},{264,30},{265,30},{266,30},{267,30},{268,30},{269,30},},
-        [2] = {{1440,10},{1441,10},{1442,10},{1443,10},{1444,10},{1445,10},{1446,10},{1247,20},{1249,20},{6080,10},},
+        [2] = {{1440,10},{1441,10},{1442,10},{1443,10},{1444,10},{1445,10},{1446,10},{1247,20},{1249,20},{6080,10},  {1040,40},{1042,40},{1043,40},{1044,40},{1045,40},{1046,40},{1047,40},{1048,40},{1049,40},{1050,40},{1051,40}},
     },
     -- level 85
     [9481] = {
         [1] = {{271,30},{272,30},{273,30},{274,30},{275,30},{276,30},{277,30},{278,30},{279,30},{280,30},{281,30},{282,30},{283,30},{284,30},{285,30},{286,30},{287,30},{288,30},{289,30},{290,30},{291,30},{292,30},{293,30},{294,30},{295,30},{296,30},{297,30},},
-        [2] = {{1447,10},{1448,10},{1449,10},{1450,10},{1451,10},{1452,10},{1453,10},{1254,20},{1255,20},{6087,10},},
+        [2] = {{1447,10},{1448,10},{1449,10},{1450,10},{1451,10},{1452,10},{1453,10},{1254,20},{1255,20},{6087,10},  {1052,40},{1054,40},{1055,40},{1056,40},{1057,40},{1058,40}},
     },
     -- level 90
     [10244] = {
         [1] = {{120,30},{121,30},{122,30},{123,30},{124,30},{125,30},{126,30},{127,30},{128,30},},
-        [2] = {{1482,10},{1483,10},{1484,10},{1485,10},{1486,10},{1487,10},{1488,10},{1489,10},{1490,10},{1468,10},{1469,10},{1470,10},{1471,10},{1472,10},{1473,10},{1474,10},{1475,10},{1476,10},{1477,10},{1478,10},{1479,10},{1480,10},{1481,10},{6094,10},},
+        [2] = {{1482,10},{1483,10},{1484,10},{1485,10},{1486,10},{1487,10},{1488,10},{1489,10},{1490,10},{1468,10},{1469,10},{1470,10},{1471,10},{1472,10},{1473,10},{1474,10},{1475,10},{1476,10},{1477,10},{1478,10},{1479,10},{1480,10},{1481,10},{6094,10},  {1031,40},{1033,40},{1034,40},{1035,40},{1036,40},{1037,40},{1038,40},{1039,40}},
     },
     -- level 95
     [5129] = {
         [1] = {{299,30},{300,30},{301,30},{302,30},{303,30},{304,30},{305,30},{306,30},{307,30},},
-        [2] = {{6011,10},{6012,10},{6013,10},{6014,10},{6015,10},{6016,10},{6017,10},{6018,10},{6019,10},{6020,10},{6021,10},{6022,10},{6023,10},{6024,10},{6025,10},{6026,10},{6027,10},{6028,10},{6029,10},{6030,10},{6031,10},{6032,10},{6033,10},{6112,10},},
+        [2] = {{6011,10},{6012,10},{6013,10},{6014,10},{6015,10},{6016,10},{6017,10},{6018,10},{6019,10},{6020,10},{6021,10},{6022,10},{6023,10},{6024,10},{6025,10},{6026,10},{6027,10},{6028,10},{6029,10},{6030,10},{6031,10},{6032,10},{6033,10},{6112,10},  {1012,40},{1014,40},{1015,40},{1016,40},{1017,40},{1018,40},{1019,40}},
     },
 }
 local common2 = {{50,20},{49,20},{514,20},{135,20},{511,20},{1412,20},{1411,20},}
@@ -8252,14 +8357,26 @@ local extra1 = {{50,20},{49,20},{135,20},{1411,20},{507,1},{509,1},}
 local extra_2 = {{50,20},{49,20},{135,20},{1411,20},}
 local item = {}
 
-function getCopyFrontmapAward(step, localtion)
+function getCopyFrontmapAward(step, localtion, cf)
     if step > 2 then
         return {}
     end
     local order
     if step == 1 then
-        order = math.random(1, 8)
-        if order == 1 or order == 2 then
+        if true then
+            if cf == 1 then
+                if math.random(1, 100) <= 90 then
+                    order = 1
+                else
+                    order = 2
+                end
+            else
+                if math.random(1, 100) <= 50 then
+                    order = 1
+                else
+                    order = 2
+                end
+            end
             local items_1 = equipTrump1[localtion];
             if items_1 == nil then
                 return {}
@@ -8281,35 +8398,68 @@ function getCopyFrontmapAward(step, localtion)
         item = common2[order]
         return item;
     else
-        order = math.random(1, 14)
-        if order <= 1 then
-            local items_1 = equipTrump1[localtion];
-            if items_1 == nil then
-                return {}
+        if cf == 1 then
+            order = math.random(1, 14)
+            if order <= 1 then
+                local items_1 = equipTrump1[localtion];
+                if items_1 == nil then
+                    return {}
+                end
+                local items = items_1[order]
+                if items == nil then
+                    return {}
+                end
+                order = math.random(1, #items)
+                item = items[order]
+                return item
+            elseif order <= 5 then
+                order = math.random(1, #extra_2)
+                item = extra_2[order]
+                return item
+            elseif order <= 12 then
+                order = math.random(1, #common2)
+                item = common2[order]
+                return item;
+            elseif order <= 13 then
+                order = math.random(1, #common3)
+                item = common3[order]
+                return item;
+            else
+                order = math.random(1, #gem3)
+                item = gem3[order]
+                return item;
             end
-            local items = items_1[order]
-            if items == nil then
-                return {}
-            end
-            order = math.random(1, #items)
-            item = items[order]
-            return item
-        elseif order <= 5 then
-            order = math.random(1, #extra_2)
-            item = extra_2[order]
-            return item
-        elseif order <= 12 then
-            order = math.random(1, #common2)
-            item = common2[order]
-            return item;
-        elseif order <= 13 then
-            order = math.random(1, #common3)
-            item = common3[order]
-            return item;
         else
-            order = math.random(1, #gem3)
-            item = gem3[order]
-            return item;
+            order = math.random(1, 14)
+            if order <= 0 then
+                local items_1 = equipTrump1[localtion];
+                if items_1 == nil then
+                    return {}
+                end
+                local items = items_1[order]
+                if items == nil then
+                    return {}
+                end
+                order = math.random(1, #items)
+                item = items[order]
+                return item
+            elseif order <= 4 then
+                order = math.random(1, #extra_2)
+                item = extra_2[order]
+                return item
+            elseif order <= 12 then
+                order = math.random(1, #common2)
+                item = common2[order]
+                return item;
+            elseif order <= 13 then
+                order = math.random(1, #common3)
+                item = common3[order]
+                return item;
+            else
+                order = math.random(1, #gem3)
+                item = gem3[order]
+                return item;
+            end
         end
     end
 end
@@ -8366,6 +8516,8 @@ function getDragonKingAward(step, flag)
             [5] = {{1357,1}},
             [6] = {{137,1}},
             [7] = {{1362,1}},
+            [8] = {{139,1}},
+            [9] = {{8520,1}, {8521,1}, {8522,1}},
         },
     }
     local chances = {
@@ -8390,6 +8542,15 @@ function getDragonKingAward(step, flag)
     for i = 1, #chances[step] do
         if r <= chances[step][i] then
             if 5 == step then
+                if flag == 9 then  --大闹龙宫之元神出窍
+                    local chance = { 1400, 8400, 10000 }
+                    local rnd = math.random(1, 10000)
+                    for j = 1, #chance do
+                        if rnd <= chance[j] then
+                            return items[step][flag][j]
+                        end
+                    end
+                end
                 return items[step][flag][i]
             end
             return items[step][i]
@@ -8609,7 +8770,7 @@ end
 
 function GetLuckyBagAward(player)
     local items = {
-       { 9367,5} , {9369,5},{ 503,5},{515,1},{134,1},{1325,2} 
+       { 9367,5} , {9369,5},{ 503,5},{515,1},{138,1},{1325,2}
     } 
     for i = 1 , 5  do
         local num = player:GetVar(452+i);
@@ -8626,7 +8787,7 @@ function GetLuckyBagAward(player)
         player:GetPackage():Add(item[1],item[2],true,false,32);
     end
     player:sendLuckyBagInfo();
-    Broadcast(0x27, "恭喜玩家[p:"..player:getCountry()..":"..player:getPName().."]".."在\"儿童节快乐\"活动中人品爆发，集齐所有卡牌，成功领取超级大奖")
+    Broadcast(0x27, msg_68.."[p:"..player:getCountry()..":"..player:getPName().."]"..msg_136)
     return true
 end
 
@@ -8826,6 +8987,46 @@ function onAccRecharge_2013_06_01(player)
     sendAccRechargeAwards(player, awards)
 end
 
+function onAccRecharge_2013_06_08(player)
+    local awards = {
+        [1] = {0xA000,100,1},
+        [3] = {514,5,1, 501,3,1, 5035,1,1},
+        [5] = {9371,5,1, 5025,1,1, 5005,1,1, 0xA000,150,1},
+        [7] = {515,2,1, 5136,1,1},
+    }
+    sendAccRechargeAwards(player, awards)
+end
+
+function onAccRecharge_2013_06_15(player)
+    local awards = {
+        [1] = {0xA000,100,1},
+        [3] = {514,5,1, 501,3,1, 5055,1,1},
+        [5] = {9371,5,1, 5065,1,1, 0xA000,150,1},
+        [7] = {515,2,1, 5136,1,1},
+    }
+    sendAccRechargeAwards(player, awards)
+end
+
+function onAccRecharge_2013_06_22(player)
+    local awards = {
+        [1] = {0xA000,100,1},
+        [3] = {514,5,1, 501,3,1, 5035,1,1},
+        [5] = {9371,5,1, 5115,1,1, 0xA000,150,1},
+        [7] = {515,2,1, 5136,1,1},
+    }
+    sendAccRechargeAwards(player, awards)
+end
+
+function onAccRecharge_2013_06_29(player)
+    local awards = {
+        [1] = {0xA000,100,1},
+        [3] = {514,5,1, 501,3,1, 5025,1,1},
+        [5] = {9371,5,1, 5085,1,1, 0xA000,150,1},
+        [7] = {515,2,1, 5026,1,1},
+    }
+    sendAccRechargeAwards(player, awards)
+end
+
 function onRecharge(player, r)
     if getAccRecharge() then
         local cond = 100
@@ -8833,22 +9034,63 @@ function onRecharge(player, r)
             player:AddVar(174, 1);
             player:SetVar(173, 1)
 
-            local t = { ['year'] = 2013, ['month'] = 5, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+            local t = { ['year'] = 2013, ['month'] = 6, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
             local s = os.time(t)
             local n = os.time() + 11
 
             if n >= s and n < (s + 7*86400) then
-                onAccRecharge_2013_05_25(player)
+                onAccRecharge_2013_06_22(player)
             end
 
-            local t = { ['year'] = 2013, ['month'] = 6, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+            local t = { ['year'] = 2013, ['month'] = 6, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
             local s = os.time(t)
             local n = os.time() + 11
 
             if n >= s and n < (s + 7*86400) then
-                onAccRecharge_2013_06_01(player)
+                onAccRecharge_2013_06_29(player)
             end
+
         end
     end
 end
 
+function onFishUserPackage(player, idx)
+    if player == nil or idx == nil or idx > 4 or idx < 0 then
+        return false
+    end
+    local items = {
+        [0] = { {35, 20}, {499, 50}, {29, 30}, {55, 10} },
+        [1] = { {29, 50}, {499, 50}, {55, 20}, {15, 5} },
+        [2] = { {55, 30}, {499, 50}, {510, 20}, {15, 5} },
+        [3] = { {499, 50}, {502, 30}, {15, 5}, {30, 5} },
+        [4] = { {1277, 1}, {499, 50}, {30, 5}, {15, 5} },
+    }
+    local package = player:GetPackage()
+    local reqGrids = #items[idx] - 1
+    if idx == 3 then
+        reqGrids = reqGrids + 10
+    elseif idx == 4 then
+        reqGrids = reqGrids + 1
+    end
+    if package:GetRestPackageSize() < reqGrids then
+        player:sendMsgCode(2, 1011, 0)
+        return false
+    end
+    for _, val in pairs(items[idx]) do
+        if val[1] == 499 then
+            player:getCoupon(val[2])
+        else
+            package:Add(val[1], val[2], true)
+        end
+    end
+    if idx == 3 then
+        local gems = { 5001, 5011, 5021, 5031, 5041, 5051, 5061, 5071, 5081, 5091, 5101, 5111, 5121, 5131, 5141 }
+        for k = 1, 10 do
+            package:Add(gems[math.random(1, #gems)], 1, true)
+        end
+    elseif idx == 4 then
+        local equipId = math.random(2544, 2567)
+        package:Add(equipId, 1, true)
+    end
+    return true
+end

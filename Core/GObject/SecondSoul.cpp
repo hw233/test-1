@@ -84,6 +84,11 @@ UInt8 SecondSoul::getAuraLeft()
     return static_cast<UInt8>(getSoulSkillValue(SOUL_SKILL_TALENT));
 }
 
+UInt16 SecondSoul::getSkillSoulOut()
+{
+    return static_cast<UInt16>(getSoulSkillValue(SOUL_SKILL_SOULOUT));
+}
+
 float SecondSoul::getSoulSkillValue(UInt8 id)
 {
     int size = m_skills.size();

@@ -43,7 +43,7 @@ void NewCBPlayerData::setAllEffortInfo()
         effort.award = info.get<UInt8>(2);
         effort.complete = 0;
         effortInfo.insert(std::make_pair(effort.effortId, effort));
-        player->countryBattleUdpLog(1217, 4, Itoa(effort.effortId));
+        //player->countryBattleUdpLog(1217, 4, Itoa(effort.effortId));
     }
 }
 
@@ -58,7 +58,7 @@ UInt8 NewCBPlayerData::updateEffortInfo(UInt8 effortId)
         if(effort.complete)
             return 0;
         effort.complete = 1;
-        player->countryBattleUdpLog(1217, 5, Itoa(effortId));
+        //player->countryBattleUdpLog(1217, 5, Itoa(effortId));
         return effort.award;
     }
     return 0;
@@ -214,7 +214,7 @@ bool NewCountryBattle::playerEnter( Player * player )
     player->countryBattleUdpLog(1090, player->getCountry());
     player->countryBattleUdpLog(1090, 2);
     player->countryBattleUdpLog(1217, 0);
-
+    player->SetVar(VAR_DROP_OUT_ITEM_MARK, 0);
     player->getSurnameLegendAward(e_sla_cb);
 
 	return true;
@@ -306,7 +306,7 @@ void NewCountryBattle::useSkill(Player * player, UInt8 skillId)
         player->addHIAttr(m_skills[skillId].attrs);
         skillTriggerEffort(ncbpData, m_skills[skillId].effortId);
         sendSelfInfo(player, ncbpData);
-        player->countryBattleUdpLog(1217, 6, Itoa(skillId));
+        //player->countryBattleUdpLog(1217, 6, Itoa(skillId));
     }
 }
 
@@ -347,7 +347,7 @@ void NewCountryBattle::buySkill(Player * player, UInt8 type)
         st << ncbpData->domineer;
     st << Stream::eos;
     player->send(st);
-    player->countryBattleUdpLog(1217, 2, Itoa(type));
+    //player->countryBattleUdpLog(1217, 2, Itoa(type));
 }
 
 void NewCountryBattle::checkAddExp(UInt32 curtime)
@@ -592,7 +592,7 @@ void NewCountryBattle::end()
         sendEndAwardInfo(player, items);
 
         player->countryBattleUdpLog(1091, player->getCountry());
-        player->countryBattleUdpLog(1217, 1, Itoa(ncbpData->totalWin)+","+Itoa(ncbpData->totallose)+","+Itoa(ncbpData->totalAchievement + count));
+        //player->countryBattleUdpLog(1217, 1, Itoa(ncbpData->totalWin)+","+Itoa(ncbpData->totallose)+","+Itoa(ncbpData->totalAchievement + count));
     }
 	
     Stream st(REP::NEW_CAMPS_WAR_JOIN);

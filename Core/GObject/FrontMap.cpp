@@ -82,7 +82,7 @@ void FrontMap::sendInfo(Player* pl, UInt8 id, bool needspot, bool force)
 
     UInt32 mark = pl->GetVar(VAR_FRONTMAP_AUTO_FIGHT_USE_MONEY_MARK);
     UInt8 pos = id - 1;
-    mark = GET_BIT(mark, pos);
+    pos = static_cast<UInt8>(GET_BIT_MARK(mark, pos));
 
     FastMutex::ScopedLock lk(_mutex);
     Stream st(REP::FORMATTON_INFO);
@@ -90,7 +90,7 @@ void FrontMap::sendInfo(Player* pl, UInt8 id, bool needspot, bool force)
     st << static_cast<UInt8>(0);
     st << id;
     st << count;
-    st << mark;
+    st << pos;
 
     if (needspot)
         sendFrontMap(st, pl, id, needspot?true:force);
@@ -443,6 +443,11 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
                 pl->GetPackage()->AddItem(9138, 1, false, false);
             }
 
+            UInt32 mark = pl->GetVar(VAR_FRONTMAP_AUTO_FIGHT_USE_MONEY_MARK);
+            UInt8 pos = id - 1;
+            mark = CLR_BIT(mark, pos);
+            pl->SetVar(VAR_FRONTMAP_AUTO_FIGHT_USE_MONEY_MARK, mark);
+
             GameAction()->onFrontMapWin(pl, id, spot, tmp[spot].lootlvl);
             pl->copyFrontWinAward(2);
             DB3().PushUpdateData("DELETE FROM `player_frontmap` WHERE `playerId` = %"I64_FMT"u AND `id` = %u", pl->getId(), id);
@@ -606,7 +611,7 @@ void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool in
                     if (!World::getNewYear() &&
                         !girl &&
                         !World::getNetValentineDay() &&
-                        0 == GET_BIT(mark, pos))
+                        0 == GET_BIT_MARK(mark, pos))
                     {
                         UInt32 pref = 0;
                         UInt8 div = 1;

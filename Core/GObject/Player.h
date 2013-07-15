@@ -43,6 +43,10 @@ namespace GData
 	struct Attr2Extra;
 }
 
+#define SYS_UPDLG_VF(v, f) ((v << 1) | f)
+#define SYS_UPDLG_V(v) (v >> 1)
+#define SYS_UPDLG_F(f) (f&0x01)
+
 namespace GObject
 {
 #define PLAYER_BUFF_AUTOHEAL		0x00
@@ -135,6 +139,7 @@ namespace GObject
 
 #define PLAYER_BUFF_DISPLAY_MAX		0x5F
 #define PLAYER_BUFF_COUNT			0x5F
+#define PLAYER_BUFF_START           0x80
 
 #define CLAN_TASK_MAXCOUNT          5       // ????ÿ????????????
 #define SHIMEN_TASK_MAXCOUNT        5       // ʦ??ÿ????????????
@@ -181,9 +186,11 @@ namespace GObject
 #define SPREAD_ALREADY_USE        0x01
 #define SPREAD_ALREADY_GET        0x02
 
-#define SET_BIT(X,Y)     (X | (1<<Y))                                                                                                                                                          
+#define SET_BIT(X,Y)     (X | (1<<Y))
 #define GET_BIT(X,Y)     (X & (1<<Y))
 #define CLR_BIT(X,Y)     (X & ~(1<<Y))
+#define GET_BIT_MARK(X,Y)     ((X>>Y) & 1)
+
     enum SurnameLegendAwardFlag
     {
         e_sla_none = 0x00,
@@ -209,6 +216,8 @@ namespace GObject
         XINGCHEN    = 5,    //遁天星辰诀
         WUDUN       = 6,    //五遁神斧
         JIUYOU      = 7,    //九幽秘典
+        JIUJIE      = 8,    //九戒困龙珠
+        YUANSHEN    = 9,    //元神出窍
         TREASURE    = 10,   //聚宝盆
 
         DRAGONKING_MAX,
@@ -1030,6 +1039,9 @@ namespace GObject
         void SetVarNow(UInt32 id,  UInt32 val, UInt32 now);
         void AddVarNow(UInt32 id , UInt32 val, UInt32 now);
 
+        void AddZRYJCount(UInt32 v);
+        void AddHYYJCount(UInt32 v);
+
         void SetVarOffset(UInt32 offset);
 
 		inline const std::string& getName() { return _playerData.name; }
@@ -1162,6 +1174,7 @@ namespace GObject
 		{ return (_playerData.status >> bitStart) & (((1 << bitCount) - 1)); }
 		bool canClosePK();
 
+        bool isForeverTitle(UInt8 t);
         void loadTitleAll(UInt8 t, UInt32 timeEnd);
         void fixOldVertionTitle(UInt8 t);
 		void setTitle(UInt8 s, UInt32 timeLen = 0);
@@ -1292,6 +1305,8 @@ namespace GObject
 
         void consumeGold(UInt32 c);
 
+        //void xingchenInfo();
+
 	public:
 		Map* GetMap();
 		SpotData * GetMapSpot();
@@ -1399,7 +1414,7 @@ namespace GObject
         void setInQQGroup (bool v) {_inQQGroup = v;}
         //捕鱼大亨用户
         void sendFishUserInfo();
-        void getFishUserPackage();
+        void getFishUserPackage(UInt8);
         void getFishUserAward();
 	public:
 		UInt16   GetFreePackageSize();
@@ -1558,6 +1573,7 @@ namespace GObject
 
         std::string& getOriginName(std::string& name);
 		std::string& fixName(std::string& name);
+		std::string getRealName();
         void patchDeleteDotS(std::string& name);
 		inline void patchMergedName() { patchMergedName(_id, _playerData.name); }
 		static void patchMergedName(UInt64 id, std::string& name);
@@ -1925,6 +1941,8 @@ namespace GObject
         void newRC7DayUdpLog(UInt32 id, UInt32 type = 0, UInt32 num  = 1);
         void transformUdpLog(UInt32 id, UInt32 type, UInt32 money1, UInt32 money2, UInt32 money3, UInt32 money4, UInt8 val1);
         void dreamerUdpLog(UInt32 id, UInt32 type, UInt32 num = 1);
+        void blueDiamondAwardUdpLog(UInt8 type);
+        void cFriendAwardUdpLog(UInt8 type);
         void guideUdp(UInt8 type, std::string& p1, std::string& p2);
         void moneyLog(int type, int gold, int coupon = 0, int tael = 0, int achievement = 0, int prestige = 0);
         void actUdp(UInt8 type, std::string& p1, std::string& p2);
@@ -1945,6 +1963,7 @@ namespace GObject
         UInt8 transformPotential(Fighter * fFgt, Fighter * tFgt);
         UInt8 transformCapacity(Fighter * fFgt, Fighter * tFgt);
         UInt8 transformSoul(Fighter * fFgt, Fighter * tFgt);
+        UInt8 transfromXingchen(Fighter * fFgt, Fighter * tFgt);
         void transformElixir(Fighter * fFgt, Fighter * tFgt);
             
     private:
@@ -1960,6 +1979,7 @@ namespace GObject
         bool m_isOffical;
         bool m_isXY;
         UInt8 m_XinYue;
+        std::string m_JinQuan;
     public:
         inline void setDomain(const std::string& domain)
         {
@@ -2016,6 +2036,8 @@ namespace GObject
         inline bool isXY() const { return m_isXY; }
         inline void setXinYue(UInt8 v) { m_XinYue = v; }
         inline UInt8 getXinYue() const { return m_XinYue; }
+        inline void setJinQuan(std::string& v) { m_JinQuan = v; }
+        inline const std::string& getJinQuan() const { return m_JinQuan; }
         inline const char* getClientIp() const { return m_clientIp; }
 
         inline UInt8 getPlatform() const { return atoi(m_domain); }
@@ -2023,6 +2045,9 @@ namespace GObject
     public:
         inline void setSysDailog(bool v) { m_sysDailog = v; }
         inline bool getSysDailog() { return m_sysDailog; }
+
+        void setSysUpDateDlg(UInt32 v);
+        UInt32 getSysUpDateDlg();
     private:
         bool m_sysDailog;
 
@@ -2136,6 +2161,7 @@ namespace GObject
         void getQQTenpayAward(UInt8 opt);
         void getQQIMQuickLoginAward(UInt8 opt);
         void getEquipMoveAward(UInt8 opt);
+        void getVipLevelAward(UInt8 opt);
         UInt32 getFighterEquipAward();
 
         // 帮派神像
@@ -2216,6 +2242,16 @@ namespace GObject
         UInt32 getMaxLingbaoBattlePoint();
         void verifyFighter();
 
+        //分别计算玩家的战斗力
+        UInt32 getBaseBattlePoint();
+        UInt32 getEquipBattlePoint();
+        UInt32 getSkillBattlePoint();
+        UInt32 getCittaBattlePoint();
+        UInt32 get2ndSoulBattlePoint();
+        UInt32 getClanBattlePoint();
+        UInt32 getLingbaoBattlePoint();
+        UInt32 getFormBattlePoint();
+        void sendCompareBP(Player *);
     private:
         UInt32 _maxLingbaoBattlePoint;
 
@@ -2401,7 +2437,7 @@ namespace GObject
 
         void sendRPZCJBInfo();
         bool getRPZCJBAward();
-        void checkZCJB();
+        void checkZCJB(UInt32 = 0);
         void sendRYHBInfo();
         void getRYHBAward(UInt8 idx, UInt8 cnt);
         void getSurnameLegendAward(SurnameLegendAwardFlag flag);

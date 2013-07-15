@@ -38,7 +38,7 @@ protected:
 	std::string GetLogName();
 
 private:
-    UInt32 UnionLoggerResultParse(char* result, char* msg);
+    UInt32 UnionLoggerResultParse(char* result, char* msg, size_t size);
     //bool CheckOpenId(UInt64 playerId, char * openId);
 
 private:

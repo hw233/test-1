@@ -350,17 +350,20 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
         std::string pf;
         std::string pfkey;
         std::string xinyue;
+        std::string jinquan;
         StringTokenizer st(ul._para, ":");
         switch (st.count())
         {
+            case 5:
+                jinquan = st[4];
             case 4:
                 xinyue = st[3];
             case 3:
-                pfkey = st[2].c_str();
+                pfkey = st[2];
             case 2:
-                pf = st[1].c_str();
+                pf = st[1];
             case 1:
-                clientIp = st[0].c_str();
+                clientIp = st[0];
                 break;
             default:
                 break;
@@ -404,6 +407,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             player->setSource(pf);
             player->setPfKey(pfkey);
             player->setXinYue(atoi(xinyue.c_str()));
+            player->setJinQuan(jinquan);
 #ifdef _FB
             PLAYER_DATA(player, wallow) = 0;
 #endif
@@ -561,17 +565,20 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
     std::string pf;
     std::string pfkey;
     std::string xinyue;
+    std::string jinquan;
     StringTokenizer st(nu._para, ":");
     switch (st.count())
     {
+        case 5:
+            jinquan = st[4];
         case 4:
             xinyue = st[3];
         case 3:
-            pfkey = st[2].c_str();
+            pfkey = st[2];
         case 2:
-            pf = st[1].c_str();
+            pf = st[1];
         case 1:
-            clientIp = st[0].c_str();
+            clientIp = st[0];
             break;
         default:
             break;
@@ -734,6 +741,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->setOpenKey(nu._openkey);
             pl->setVia(nu._via);
             pl->setXinYue(atoi(xinyue.c_str()));
+            pl->setJinQuan(jinquan);
             if(cfg.merged)
             {
                 UInt64 inviterId = (pl->getId() & 0xffff000000000000) + atoll(nu._invited.c_str());
@@ -802,6 +810,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             if (cfg.rpServer && rpFlag > 0)
                 pl->SetVar(GObject::VAR_RP_VALUE, rpFlag);
 
+            pl->SetVar(GObject::VAR_DROP_OUT_ITEM_MARK, 1);
 #ifndef _FB
 #ifndef _VT
 #ifndef _WIN32
@@ -1016,19 +1025,23 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
         {
             static UInt16 ids[] =
             {
-                1325,   5,
+                9143,   2,
+                47,     1,
                 509,    2,
-                515,    2,
-                134,    6,
-                503,    10,
-                549,    3,
+                1325,   6,
+                134,    8,
+                1126,   6
             };
 
+            UInt8 idx = 0;
             bool in = false;
             for (UInt8 i = 0; i < sizeof(ids)/sizeof(UInt16); i += 2)
             {
                 if (ids[i] == id && num == ids[i+1])
+                {
                     in = true;
+                    idx = i+1;
+                }
             }
 
             if (in)
@@ -1041,7 +1054,8 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
                         UInt16 id;
                         UInt16 num;
                         UInt32 code; // 0-正常 1-未开启 2-次数上限
-                    } purchase = {0,0,0};
+                        UInt8 idx;
+                    } purchase = {0,0,0,0};
 
                     if (!player->GetVar(GObject::VAR_DIRECTPUROPEN))
                         purchase.code = 1;
@@ -1051,6 +1065,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
 
                     purchase.id = id;
                     purchase.num = num;
+                    purchase.idx = idx;
                     GameMsgHdr hdr(0x2F2, player->getThreadId(), player, sizeof(purchase));
                     GLOBAL().PushMsg(hdr, &purchase);
 
@@ -2794,6 +2809,17 @@ void SysDailog(LoginMsgHdr &hdr, const void * data)
     GObject::World::setSysDailogPlatform(platform);
 	GObject::globalPlayers.enumerate(player_enum, 0);
 }
+
+inline bool player_enum_sys_update(GObject::Player* p, int)
+{
+    if (!p->isOnline())
+        p->setSysUpDateDlg(SYS_UPDLG_VF(0, 1));
+    else
+        p->setSysUpDateDlg(SYS_UPDLG_VF(0, 0));
+
+    return true;
+}
+
 void SysUpdate(LoginMsgHdr &hdr, const void * data)
 {
 	BinaryReader br(data,hdr.msgHdr.bodyLen);
@@ -2811,8 +2837,9 @@ void SysUpdate(LoginMsgHdr &hdr, const void * data)
 
     Stream st1(SPEP::SYSUPDATE);
     st1 << static_cast<UInt8>(0) << Stream::eos;
-    NETWORK()->SendMsgToClient(hdr.sessionID,st1);
 
+	GObject::globalPlayers.enumerate(player_enum_sys_update, 0);
+    NETWORK()->SendMsgToClient(hdr.sessionID,st1);
 }
 
 
@@ -2952,6 +2979,26 @@ inline bool player_enum_2(GObject::Player* pl, int type)
                 }
                 GameMsgHdr hdr(0x1CC, WORKER_THREAD_WORLD, NULL, 0);
                 GLOBAL().PushMsg(hdr, NULL);
+            }
+            break;
+        case 4:
+            {
+                pl->SetVar(GObject::VAR_ZRYJ_COUNT, 0);
+                pl->SetVar(GObject::VAR_HYYJ_COUNT, 0);
+                for(int i = 0; i < 15; ++ i)
+                {
+                    pl->SetVar(GObject::VAR_RYHB_ITEM_CNT_1 + i, 0);
+                }
+            }
+            break;
+        case 5:
+            {
+                UInt32 curGold = pl->GetVar(GObject::VAR_RECHARGE_TODAY);
+                pl->SetVar(GObject::VAR_ZCJB_RECHARGE_GOLD, curGold);
+                //pl->SetVar(GObject::VAR_ZCJB_RECHARGE_GOLD, 0);
+                pl->SetVar(GObject::VAR_ZCJB_TIMES, 0);
+                pl->SetVar(GObject::VAR_ZCJB_GOLD_GOT, 0);
+                pl->checkZCJB();
             }
             break;
         default:
@@ -3283,6 +3330,22 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
         GObject::GVAR.SetVar(GObject::GVAR_SURNAMELEGEND_END, end);
         ret = 1;
     }
+    else if (type == 3 && begin <= end && !GObject::World::inActive_opTime_20130531())
+    {
+        if(!GObject::World::getRYHBActivity())
+            GObject::globalPlayers.enumerate(player_enum_2, 4);
+        GObject::GVAR.SetVar(GObject::GVAR_RYHB_ACTIVITY_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_RYHB_ACTIVITY_END, end);
+        ret = 1;
+    }
+    else if (type == 4 && begin <= end && !GObject::World::inActive_opTime_20130531_zcjb())
+    {
+        if(!GObject::World::getZCJBActivity())
+            GObject::globalPlayers.enumerate(player_enum_2, 5);
+        GObject::GVAR.SetVar(GObject::GVAR_ZCJB_ACTIVITY_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_ZCJB_ACTIVITY_END, end);
+        ret = 1;
+    }
 
     Stream st(SPEP::ACTIVITYONOFF);
     st << ret << Stream::eos;
@@ -3308,6 +3371,12 @@ void QueryOneActivityOnOff(LoginMsgHdr& hdr, const void* data)
         begin = GObject::GVAR.GetVar(GObject::GVAR_SURNAMELEGEND_BEGIN);
         end = GObject::GVAR.GetVar(GObject::GVAR_SURNAMELEGEND_END);
     }
+    else if (type == 3)
+    {
+        begin = GObject::GVAR.GetVar(GObject::GVAR_RYHB_ACTIVITY_BEGIN);
+        end = GObject::GVAR.GetVar(GObject::GVAR_RYHB_ACTIVITY_END);
+    }
+
 
     Stream st(SPEP::QUERYACTIVITYONOFF);
     st << type << begin << end << Stream::eos;

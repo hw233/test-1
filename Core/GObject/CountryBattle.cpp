@@ -602,6 +602,7 @@ bool CountryBattle::playerEnter( Player * player )
         player->SetVar(VAR_CBWHITEPACK, 1);
     }
 
+    player->SetVar(VAR_DROP_OUT_ITEM_MARK, 0);
     player->getSurnameLegendAward(e_sla_cb);
 
     player->countryBattleUdpLog(1090, 2);
@@ -942,7 +943,7 @@ void GlobalCountryBattle::prepare( UInt32 t )
 	else
 	{
 		_startTime = _prepareTime + 30;
-		_endTime = _startTime + 8 * 60;
+		_endTime = _startTime + 9 * 60;
 	}
 }
 

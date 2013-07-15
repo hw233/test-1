@@ -200,6 +200,11 @@ private:
     void OnSetTownDeamonMaxLevel(GObject::Player *player, std::vector<std::string>& args);
     void OnFairySpar(GObject::Player *player, std::vector<std::string>& args);
     void OnAddPetEquipExp(GObject::Player *player, std::vector<std::string>& args);
+    
+    void OnSetXZLvl(GObject::Player *player, std::vector<std::string>& args);
+    void OnSetXCValue(GObject::Player *player, std::vector<std::string>& args);
+    void OnHandleTask(GObject::Player * player, std::vector<std::string>& args);
+    void OnCompletedManyTask(GObject::Player* player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;

@@ -321,6 +321,8 @@ public:
     void updatePassiveSkill(std::vector<UInt16>& passiveSkillId, std::vector<GData::SkillItem>& passiveSkill);
     void updatePassiveSkill100(std::vector<UInt16>& passiveSkill100Id, std::vector<GData::SkillItem>& passiveSkill100);
 
+    void updateSoulSkillDead(UInt16 skillId);
+
     const GData::SkillBase* getPassiveSkillOnTherapy();
     const GData::SkillBase* getPassiveSkillOnSkillDmg();
     const GData::SkillBase* getPassiveSkillOnOtherDead();
@@ -1024,6 +1026,26 @@ private:
     inline bool isLingQu() { return _lingqu_last != 0; }
     bool releaseLingQu();
 
+    UInt8 _soulout_last;
+    bool _soulout;
+    inline bool isSoulOut() { return _soulout; }
+    inline void setSoulOut(float v, UInt8 l)
+    {
+        _hp = 1;
+        _attack = _attack * v;
+        _magatk = _magatk * v;
+        _soulout = true;
+        _soulout_last = l;
+
+        _hideBufLast = 0;
+        _hideBuf = false;
+        _shieldHP = 0;
+        _shieldHPLast = 0;
+
+        setHide(true);
+    }
+    bool releaseSoulOut();
+
     float _lingshi_bleed;
     UInt8 _lingshi_bleed_last;
     float getLingShiBleed() { return _lingshi_bleed; }
@@ -1046,6 +1068,10 @@ private:
     bool _lingHpShield;
     bool getLingHpShield() { return _lingHpShield; }
     void setLingHpShield(bool v) { _lingHpShield = v; }
+
+    float _criticaldmgreduce;
+    float getCriticalDmgReduce() { return _criticaldmgreduce; }
+    void setCriticalDmgReduce(float v) { _criticaldmgreduce = v; }
 
     std::vector<GData::SkillItem> _passiveSkillDeadFake100;
     std::vector<GData::SkillItem> _passiveSkillDeadFake;

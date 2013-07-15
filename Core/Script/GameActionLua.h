@@ -282,7 +282,7 @@ namespace Script
         UInt32 foundCave(UInt8 id);
         UInt32 getStepAward(UInt8 progress, UInt32 step);
         UInt16 getSpecialItem(UInt8 id, UInt8 index);
-        lua_tinker::table getCopyFrontmapAward(UInt8 step, UInt16 localtion);
+        lua_tinker::table getCopyFrontmapAward(UInt8 step, UInt16 localtion, UInt8 cf);
         UInt32 getDreamerTreasure(UInt8 id);
         UInt32 getDreamerItem(UInt8 id, UInt8 index);
         bool RunVipPrivilegeAward(Player* player, UInt8 idx, UInt8 dayth);
@@ -373,6 +373,8 @@ namespace Script
         lua_tinker::table GetSpreadAward();
         UInt32 GetFairySparParaMax(UInt8 type, UInt8 count);
         Table GetFairySparElement(UInt8 flag);
+        UInt8 onVipLevelAward(Player* player, UInt8 opt);
+        bool onFishUserPackage(Player* player, UInt8 idx);
 
 	private:
 		Player* _player1;	//?ű???????Ϊ????1

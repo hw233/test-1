@@ -6,6 +6,7 @@
 #include "GObject/Mail.h"
 #include "GObject/TaskMgr.h"
 #include "GObject/Package.h"
+#include "GObject/PetPackage.h"
 #include "GObject/MOAction.h"
 #include "GObject/AttainMgr.h"
 #include "GObject/Country.h"
@@ -228,6 +229,7 @@ namespace Script
 		CLASS_DEF(Player, GetClass);
 		CLASS_DEF(Player, GetTaskMgr);
 		CLASS_DEF(Player, GetPackage);
+		CLASS_DEF(Player, GetPetPackage);
 		CLASS_DEF(Player, GetMailBox);
 		CLASS_DEF(Player, GetFreePackageSize);
 		CLASS_DEF(Player, addFightCurrentHp);
@@ -313,6 +315,8 @@ namespace Script
 		CLASS_DEF(Player, LuckyBagRank);
 		CLASS_DEF(Player, findFairyPet);
 		CLASS_DEF(Player, updateCuilianTimes);
+        CLASS_DEF(Player, AddZRYJCount);
+        CLASS_DEF(Player, AddHYYJCount);
 
         CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);
@@ -451,6 +455,10 @@ namespace Script
 		CLASS_ADD(MailBox);
 		CLASS_DEF(MailBox, newItemMail);
 		CLASS_DEF(MailBox, newItemPackageMail);
+
+		CLASS_ADD(PetPackage);
+		CLASS_DEF(PetPackage, GetPetEqPgRestSize);
+		CLASS_DEF(PetPackage, GetPetGemPgRestSize);
 	}
 
 	const char* GameActionLua::GetItemName(UInt32 itemId)
@@ -1532,9 +1540,9 @@ namespace Script
         return Call<UInt16>("getSpecialItem", id, index);
     }
 
-    lua_tinker::table GameActionLua::getCopyFrontmapAward(UInt8 step, UInt16 localtion)
+    lua_tinker::table GameActionLua::getCopyFrontmapAward(UInt8 step, UInt16 localtion, UInt8 cf)
     {
-        return Call<lua_tinker::table>("getCopyFrontmapAward", step, localtion);
+        return Call<lua_tinker::table>("getCopyFrontmapAward", step, localtion, cf);
     }
 
     UInt32 GameActionLua::getDreamerTreasure(UInt8 id)
@@ -1674,5 +1682,15 @@ namespace Script
         return Call<Table>("GetFairySparElement", flag);
     }
 
+    UInt8 GameActionLua::onVipLevelAward(Player* player, UInt8 opt)
+    {
+        return Call<UInt8>("onVipLevelAward", player, opt);
+    }
+
+    bool GameActionLua::onFishUserPackage(Player* player, UInt8 idx)
+    {
+		assert(player != NULL);
+		return Call<bool>("onFishUserPackage", player, idx);
+    }
 }
 

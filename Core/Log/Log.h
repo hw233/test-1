@@ -136,6 +136,14 @@ enum IncomingType
     FengsuiFromConvert          = 134, //放生获得凤髓
     FengsuiFromUseItem          = 135, //使用物品获得凤髓
     InZCJBRoolAward             = 136, //招财进宝抽奖
+    InFromRecharge              = 137, //充值
+    InFromBSSet                 = 138, //后台设置
+    InFromCancelTrain           = 139, //取消修炼
+    InFromMail                  = 140, //邮件中来
+    InFromAddMoney              = 141, //addmoney/money
+    InFromTopUp                 = 142, //topup
+    InFromMoney2All             = 143, //money2all
+    InFromSuper                 = 144, //super
 };
 
 enum MoneyType
@@ -179,7 +187,8 @@ enum MailItemType
     NewCountryBattleAward,
     LingbaoFuling,
     TreasureAct,
-    ClanBossAct
+    ClanBossAct,
+	DismissXingchen,
 };
 enum ItemFrom
 {
@@ -239,6 +248,7 @@ enum ItemFrom
     FromEquipMoveAward = 54, //装备继承奖励
     FromOEquipAward = 55, //橙装礼包
     FromRYHBAward = 56, //日月合璧
+    FromVipLevelAward = 57, //御剑等级回馈
     //80 ~ 100，繁体占用
 };
 
@@ -274,6 +284,9 @@ enum ItemTo
     ToPetGemMgerge = 155, //仙宠宝石合成
     ToPetGemAttach = 156, //仙宠宝石镶嵌
     ToPetDetachGemDesdroy = 157, //仙宠宝石拆卸
+    ToSetGem = 158, //多彩宝石镶嵌
+    TodismantleGem = 159, //多彩宝石拆卸
+    ToExchangXCValue = 160, //阵旗转换星辰值
 };
 
 struct IncommingInfo
