@@ -5393,6 +5393,8 @@ namespace GObject
             s.curVal = ss.curVal;
             s.lvl = ss.lvl;
             s.maxLvl = ss.maxLvl;
+            if (!s.maxLvl)
+                s.maxLvl = 1;
             fgt->SSFromDB(ss.skillid, s);
         }
         lc.finalize();
