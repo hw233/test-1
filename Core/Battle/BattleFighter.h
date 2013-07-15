@@ -1020,10 +1020,12 @@ private:
     void setDecWaveDmg(float v) { _dec_wave_dmg = v; }
 
     UInt8 _lingqu_last;
+    UInt8 _lingqu_times;
     bool _lingqu;
     inline bool getLingQu() { return _lingqu; }
-    inline void setLingQu(bool v, UInt8 l) { _hp = 1; _lingqu = v; _lingqu_last = l; }
+    inline void setLingQu(bool v, UInt8 l) { _hp = 1; _lingqu = v; _lingqu_last = l; _lingqu_times = 9; }
     inline bool isLingQu() { return _lingqu_last != 0; }
+    inline UInt8& getLingQuTimes() { return _lingqu_times; }
     bool releaseLingQu();
 
     UInt8 _soulout_last;
