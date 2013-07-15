@@ -8876,7 +8876,7 @@ function ItemNormal_00009382(iid, num, bind, param)
         end
         package:Add(items[g], 1, true, false, 2)
         --if iid == 9397 and getSurnameLegend() then
-       if iid == itmeId and getSurnameLegend() then
+        if iid == itmeId and getSurnameLegend() then
             local rand_card = math.random(1,10000);
             local card_chance = 3000;
             if used_num + n > 30 then
@@ -8890,20 +8890,20 @@ function ItemNormal_00009382(iid, num, bind, param)
                local card_chance_ = {0,0,0,0,0}; 
                local card_chance_max = 0;
                for n=1,5 do 
-                    local num_c =player:GetVar(452+n);
-                   -- print(num_c)
+                   local num_c =player:GetVar(452+n);
+                   --print(num_c)
                    card_chance_[n] = 5 - num_c;
-                    if card_chance_[n] <1 then
-                        card_chance_[n] =1;
-                    end
-                    card_chance_max = card_chance_max + card_chance_[n];
+                   if card_chance_[n] <1 then
+                       card_chance_[n] =1;
+                   end
+                   card_chance_max = card_chance_max + card_chance_[n];
                end
-             --  print(card_chance_max)
+               --print(card_chance_max)
                for n=2,5 do
                     card_chance_[n] = card_chance_[n-1]+card_chance_[n]
                end
 
-               card_chance_max = 25 - card_chance_max;
+               --card_chance_max = 25 - card_chance_max;
                if card_chance_max > 0 then
                    card_rand = math.random(1,card_chance_max);
                    for i = 1, #card_chance_ do
