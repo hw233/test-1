@@ -5655,7 +5655,7 @@ UInt32 BattleSimulator::doAttack( int pos )
 
             while(NULL != (passiveSkill = bf->getPassiveSkillOnAttackBleed100(idx, noPossibleTarget)))
             {
-                if(passiveSkill->target == GData::e_battle_target_otherside && bo && bo->getHP() &&  (bo->getSide() != bf->getSide()) &&
+                if(passiveSkill->target == GData::e_battle_target_otherside && bo && bo->getHP() &&  (bo->getSide() != bf->getSide()) && !bo->isSoulOut() &&
                         (bo->getBleedRandomLast() || bo->getBleedBySkillLast() || 
                          bo->getBleed1Last() || bo->getBleed2Last() || bo ->getBleed3Last() || bo->getAuraBleedLast() || bo->getStunBleedLast() || bo->getConfuceBleedLast() ||
                          bo->getBleedMoLast() || bo->getSelfBleedLast() || bo->getBlindBleedLast()))
@@ -6686,6 +6686,27 @@ bool BattleSimulator::applyFighterHP( UInt8 side, GObject::Player * player, bool
     return res;
 }
 
+float BattleSimulator::getLostHPPercent(UInt8 side, GObject::Player * player)
+{
+    float maxhp = 0;
+    float hp = 0;
+    for(int j = 0; j < 5; ++ j)
+    {
+        GObject::Lineup& pd = player->getLineup(j);
+        if(pd.fighter == NULL)
+            continue;
+        BattleObject * obj = getObject(side, pd.pos);
+        if(obj != NULL && obj->isChar())
+        {
+            BattleFighter * bf = static_cast<BattleFighter *>(obj);
+            hp += bf->getHP();
+            maxhp += bf->getMaxHP();
+        }
+    }
+
+    return 1 - hp/maxhp;
+}
+
 void BattleSimulator::getFighterHP( UInt8 side, GObject::Fighter ** fighters, UInt8 * pos, UInt32 * hp, UInt32 percent )
 {
     for(int j = 0; j < 5; ++ j)
@@ -6958,6 +6979,7 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
     bool fRevival = false;
     bool fFakeDead = false;
     bool fSummonOrMirror = false;
+    bool bIfDead = false;
     do
     {
         if(static_cast<BattleFighter*>(bo)->hasFlag(BattleFighter::IsMirror))
@@ -7061,9 +7083,17 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
             BattleFighter* bf = static_cast<BattleFighter*>(bo);
             if(doSkillEffectExtra_Dead(bf, passiveSkill))
             {
+                if(static_cast<BattleFighter*>(bo)->isSoulOut())
+                    bIfDead = true;
+
                 _winner = testWinner();
                 if(_winner != 0)
                     return true;
+                else if(bIfDead)
+                {
+                    doItemWuSkillAttack(static_cast<BattleFighter*>(bo));
+                }
+
                 fFakeDead = true;
             }
             else
@@ -7125,109 +7155,114 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
             }
         }
 
-        // re-test winner
-        _winner = testWinner();
+        if(!fSummonOrMirror)
+        {
+            if(!static_cast<BattleFighter*>(bo)->isSoulOut())
+                bIfDead = true;
+        }
 
-        if(_winner == 0)
+        _winner = testWinner();
+        if(_winner != 0)
+            return true;
+        else if(bIfDead)
         {
             doItemWuSkillAttack(static_cast<BattleFighter*>(bo));
         }
+    }
 
-        if(!fSummonOrMirror)
+    if(bIfDead)
+    {
+        // 五彩石
+        for(size_t i = 0; i < _onOtherDead.size(); ++ i)
         {
-            // 五彩石
-            for(size_t i = 0; i < _onOtherDead.size(); ++ i)
+            BattleFighter* bo2 = _onOtherDead[i];
+            if(!bo2 || bo2->getHP() == 0 || bo2 == bo)
+                continue;
+            const GData::SkillBase* pskill = bo2->getPassiveSkillOnOtherDead();
+            if(!pskill)
+                continue;
+
+            float flag = bo2->getSide() == bo->getSide() ? activeFlag : !activeFlag;
+
+            appendDefStatus(e_skill, pskill->getId(), bo2);
+
+            UInt8 last = pskill->last;
+            if(bo2 == _activeFgt)
+                ++ last;
+            float atkadd = bo2->_attack * pskill->effect->atkP;
+            setStatusChange_Atk(bo2, bo2->getSide(), bo2->getPos(), NULL, atkadd, last, !flag);
+            float magatkadd = bo2->_magatk * pskill->effect->magatkP;
+            setStatusChange_MagAtk(bo2, bo2->getSide(), bo2->getPos(), NULL, magatkadd, last, !flag);
+
+            if(bo2->getSide() == bo->getSide())
             {
-                BattleFighter* bo2 = _onOtherDead[i];
-                if(!bo2 || bo2->getHP() == 0 || bo2 == bo)
-                    continue;
-                const GData::SkillBase* pskill = bo2->getPassiveSkillOnOtherDead();
-                if(!pskill)
-                    continue;
-
-                float flag = bo2->getSide() == bo->getSide() ? activeFlag : !activeFlag;
-
-                appendDefStatus(e_skill, pskill->getId(), bo2);
-
-                UInt8 last = pskill->last;
-                if(bo2 == _activeFgt)
-                    ++ last;
-                float atkadd = bo2->_attack * pskill->effect->atkP;
-                setStatusChange_Atk(bo2, bo2->getSide(), bo2->getPos(), NULL, atkadd, last, !flag);
-                float magatkadd = bo2->_magatk * pskill->effect->magatkP;
-                setStatusChange_MagAtk(bo2, bo2->getSide(), bo2->getPos(), NULL, magatkadd, last, !flag);
-
-                if(bo2->getSide() == bo->getSide())
+                if(bo2->getConfuseRound() != 0)
                 {
-                    if(bo2->getConfuseRound() != 0)
+                    bo2->setConfuseLevel(0);
+                    bo2->setConfuseRound(0);
+
+                    if(bo2->getDeepConfuseLast() != 0)
                     {
-                        bo2->setConfuseLevel(0);
-                        bo2->setConfuseRound(0);
-
-                        if(bo2->getDeepConfuseLast() != 0)
-                        {
-                            bo2->setDeepConfuseDmgExtra(0, 0);
-                            appendDefStatus(e_unDeepConfuse, 0, bo2);
-                        }
-                        else
-                        {
-                            appendDefStatus(e_UnConfuse, 0, bo2);
-                        }
+                        bo2->setDeepConfuseDmgExtra(0, 0);
+                        appendDefStatus(e_unDeepConfuse, 0, bo2);
                     }
-
-                    if(bo2->getStunRound() != 0)
+                    else
                     {
-                        bo2->setStunLevel(0);
-                        bo2->setStunRound(0);
-
-                        if(bo2->getDeepStunLast() != 0)
-                        {
-                            bo2->setDeepStunDmgExtra(0, 0);
-                            appendDefStatus(e_unDeepStun, 0, bo2);
-                        }
-                        else
-                        {
-                            appendDefStatus(e_UnStun, 0, bo2);
-                        }
+                        appendDefStatus(e_UnConfuse, 0, bo2);
                     }
-
-                    if(bo2->getForgetRound() != 0)
-                    {
-                        bo2->setForgetLevel(0);
-                        bo2->setForgetRound(0);
-
-                        if(bo2->getDeepForgetLast() != 0)
-                        {
-                            bo2->setDeepForgetDmgExtra(0, 0);
-                            appendDefStatus(e_unDeepForget, 0, bo2);
-                        }
-                        else
-                        {
-                            appendDefStatus(e_UnForget, 0, bo2);
-                        }
-                    }
-
-                    if(bo2->getBlind() > 0.001f)
-                    {
-                        bo2->resetBlind();
-                        if(bo2->getDeepBlindDmgExtra() > 0.001f)
-                        {
-                            bo2->resetDeepBlind();
-                            appendDefStatus(e_unDeepBlind, 0, bo2);
-                        }
-                        else
-                        {
-                            appendDefStatus(e_unBlind, 0, bo2);
-                        }
-                    }
-
-                    bo2->setColorStock(GData::e_state_c_s_f_b, SKILL_LEVEL(pskill->getId()), last);
-                    appendDefStatus(e_Immune3, 0, bo2);
                 }
+
+                if(bo2->getStunRound() != 0)
+                {
+                    bo2->setStunLevel(0);
+                    bo2->setStunRound(0);
+
+                    if(bo2->getDeepStunLast() != 0)
+                    {
+                        bo2->setDeepStunDmgExtra(0, 0);
+                        appendDefStatus(e_unDeepStun, 0, bo2);
+                    }
+                    else
+                    {
+                        appendDefStatus(e_UnStun, 0, bo2);
+                    }
+                }
+
+                if(bo2->getForgetRound() != 0)
+                {
+                    bo2->setForgetLevel(0);
+                    bo2->setForgetRound(0);
+
+                    if(bo2->getDeepForgetLast() != 0)
+                    {
+                        bo2->setDeepForgetDmgExtra(0, 0);
+                        appendDefStatus(e_unDeepForget, 0, bo2);
+                    }
+                    else
+                    {
+                        appendDefStatus(e_UnForget, 0, bo2);
+                    }
+                }
+
+                if(bo2->getBlind() > 0.001f)
+                {
+                    bo2->resetBlind();
+                    if(bo2->getDeepBlindDmgExtra() > 0.001f)
+                    {
+                        bo2->resetDeepBlind();
+                        appendDefStatus(e_unDeepBlind, 0, bo2);
+                    }
+                    else
+                    {
+                        appendDefStatus(e_unBlind, 0, bo2);
+                    }
+                }
+
+                bo2->setColorStock(GData::e_state_c_s_f_b, SKILL_LEVEL(pskill->getId()), last);
+                appendDefStatus(e_Immune3, 0, bo2);
             }
         }
     }
-
     return true;
 }
 

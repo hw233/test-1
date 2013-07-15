@@ -1034,6 +1034,25 @@ private:
         _hp = 1;
         _attack = _attack * v;
         _magatk = _magatk * v;
+
+        _attackAdd = 0;
+        _attackAdd2 = 0;
+        _atkAddSpecial = 0;
+        _atkDecSpecial = 0;
+        _moAttackAdd = 0;
+        _petAttackAdd = 0;
+        _petExAtk = 0;
+        _counter_spirit_atk_add = 0;
+        _pet_coatk = 0;
+
+        _magAtkAdd = 0;
+        _magAtkAdd2 = 0;
+        _magAtkAddSpecial = 0;
+        _magAtkDecSpecial = 0;
+        _moMagAtkAdd = 0;
+        _petMagAtkAdd = 0;
+        _counter_spirit_magatk_add = 0;
+
         _soulout = true;
         _soulout_last = l;
 

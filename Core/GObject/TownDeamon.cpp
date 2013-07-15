@@ -276,7 +276,7 @@ void TownDeamon::useAccItem(Player* pl, UInt8 count)
             if(dpd->calcAccLeft() > TD_MAXACCTIME)
                 dpd->accLen = TD_MAXACCTIME + TimeUtil::Now() - dpd->accTime;
 
-            DB3().PushUpdateData("UPDATE `towndeamon_player` SET `accTime`=%u,`accLen`=%u, `accAwards`=%u WHERE `playerId` = %"I64_FMT"u", dpd->accTime, dpd->accLen, dpd->accAwards, pl->getId());
+            DB3().PushUpdateData("UPDATE `towndeamon_player` SET `accTime`=%u,`accLen`=%u, `accAwards`=%u WHERE `playerId` = %" I64_FMT "u", dpd->accTime, dpd->accLen, dpd->accAwards, pl->getId());
         }
     }
 
@@ -349,7 +349,7 @@ void TownDeamon::useVitalityItem(Player* pl, UInt8 count)
             if(dpd->vitality > TD_MAXVITALITY)
                 dpd->vitality = TD_MAXVITALITY;
 
-            DB3().PushUpdateData("UPDATE `towndeamon_player` SET `spirit`=%u,`vitality`=%u, `vitalityTime`=%u WHERE `playerId` = %"I64_FMT"u", dpd->spirit, dpd->vitality, dpd->vitalityTime, pl->getId());
+            DB3().PushUpdateData("UPDATE `towndeamon_player` SET `spirit`=%u,`vitality`=%u, `vitalityTime`=%u WHERE `playerId` = %" I64_FMT "u", dpd->spirit, dpd->vitality, dpd->vitalityTime, pl->getId());
         }
     }
 
@@ -387,7 +387,7 @@ void TownDeamon::cancelDeamon(Player* pl)
         dpd->spirit = 100;
 
         showTown(pl);
-        DB3().PushUpdateData("UPDATE `towndeamon_player` SET `deamonLevel`=%u, `startTime`=%u, `accTime`=%u, `vitalityTime`=%u, `accAwards`=%u, `vitality`=%u, `spirit`=%u, `accLen`=%u WHERE `playerId` = %"I64_FMT"u", dpd->deamonLevel, dpd->startTime, dpd->accTime, dpd->vitalityTime, dpd->accAwards, dpd->vitality, dpd->spirit, dpd->accLen, pl->getId());
+        DB3().PushUpdateData("UPDATE `towndeamon_player` SET `deamonLevel`=%u, `startTime`=%u, `accTime`=%u, `vitalityTime`=%u, `accAwards`=%u, `vitality`=%u, `spirit`=%u, `accLen`=%u WHERE `playerId` = %" I64_FMT "u", dpd->deamonLevel, dpd->startTime, dpd->accTime, dpd->vitalityTime, dpd->accAwards, dpd->vitality, dpd->spirit, dpd->accLen, pl->getId());
     }
     else
     {
@@ -623,7 +623,7 @@ void TownDeamon::challenge(Player* pl, UInt16 level, UInt8 type)
             else
             {
                 dpd->challengeTime = TimeUtil::Now();
-                DB3().PushUpdateData("UPDATE `towndeamon_player` SET `challengeTime`=%u WHERE `playerId` = %"I64_FMT"u", dpd->challengeTime, pl->getId());
+                DB3().PushUpdateData("UPDATE `towndeamon_player` SET `challengeTime`=%u WHERE `playerId` = %" I64_FMT "u", dpd->challengeTime, pl->getId());
 
                 occupyDeamon(pl, level);
                 UInt8 res = 0;
@@ -686,7 +686,7 @@ void TownDeamon::notifyChallengeResult(Player* pl, Player* defer, bool win)
     if(dpd->challengeTime + TD_CHALLENGE_TIMEUNIT > TimeUtil::Now())
         challengeCD = dpd->challengeTime + TD_CHALLENGE_TIMEUNIT - TimeUtil::Now();
 
-    DB3().PushUpdateData("UPDATE `towndeamon_player` SET `challengeTime`=%u WHERE `playerId` = %"I64_FMT"u", dpd->challengeTime, pl->getId());
+    DB3().PushUpdateData("UPDATE `towndeamon_player` SET `challengeTime`=%u WHERE `playerId` = %" I64_FMT "u", dpd->challengeTime, pl->getId());
     st << static_cast<UInt8>(0x05);
     st << level << static_cast<UInt8>(1) << res << challengeCD << Stream::eos;
     pl->send(st);
@@ -712,7 +712,7 @@ void TownDeamon::notifyAttackNpcResult(Player* pl, bool win)
         {
             ++ dpd->maxLevel;
             dpd->time2MaxLvl = TimeUtil::Now();
-            DB3().PushUpdateData("INSERT INTO `towndeamon_player` ( `deamonLevel`, `curLevel`, `maxLevel`, `time2MaxLvl`, `playerId`, `startTime`, `accTime`, `accLen`, `accAwards`, `vitalityTime`, `vitality`, `spirit`, `challengeTime`, `itemId`, `itemNum`, `quitLevel`, `attacker`) VALUES (%u, %u, %u, %u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %"I64_FMT"u) ", dpd->deamonLevel, dpd->curLevel, dpd->maxLevel, dpd->time2MaxLvl, pl->getId(), dpd->startTime, dpd->accTime, dpd->accLen, dpd->accAwards, dpd->vitalityTime, dpd->vitality, dpd->spirit, dpd->challengeTime, dpd->itemId, dpd->itemNum, dpd->quitLevel, dpd->attacker);
+            DB3().PushUpdateData("INSERT INTO `towndeamon_player` ( `deamonLevel`, `curLevel`, `maxLevel`, `time2MaxLvl`, `playerId`, `startTime`, `accTime`, `accLen`, `accAwards`, `vitalityTime`, `vitality`, `spirit`, `challengeTime`, `itemId`, `itemNum`, `quitLevel`, `attacker`) VALUES (%u, %u, %u, %u, %" I64_FMT "u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %" I64_FMT "u) ", dpd->deamonLevel, dpd->curLevel, dpd->maxLevel, dpd->time2MaxLvl, pl->getId(), dpd->startTime, dpd->accTime, dpd->accLen, dpd->accAwards, dpd->vitalityTime, dpd->vitality, dpd->spirit, dpd->challengeTime, dpd->itemId, dpd->itemNum, dpd->quitLevel, dpd->attacker);
         }
         else
         {
@@ -720,10 +720,10 @@ void TownDeamon::notifyAttackNpcResult(Player* pl, bool win)
             {
                 dpd->maxLevel = dpd->curLevel;
                 dpd->time2MaxLvl = TimeUtil::Now();
-                DB3().PushUpdateData("UPDATE `towndeamon_player` SET `curLevel`=%u, `maxLevel`=%u, `time2MaxLvl`=%u, `startTime`=%u WHERE `playerId` = %"I64_FMT"u", dpd->curLevel, dpd->maxLevel, dpd->time2MaxLvl, dpd->startTime, pl->getId());
+                DB3().PushUpdateData("UPDATE `towndeamon_player` SET `curLevel`=%u, `maxLevel`=%u, `time2MaxLvl`=%u, `startTime`=%u WHERE `playerId` = %" I64_FMT "u", dpd->curLevel, dpd->maxLevel, dpd->time2MaxLvl, dpd->startTime, pl->getId());
             }
             else
-                DB3().PushUpdateData("UPDATE `towndeamon_player` SET `curLevel`=%u, `startTime`=%u  WHERE `playerId` = %"I64_FMT"u", dpd->curLevel, dpd->startTime, pl->getId());
+                DB3().PushUpdateData("UPDATE `towndeamon_player` SET `curLevel`=%u, `startTime`=%u  WHERE `playerId` = %" I64_FMT "u", dpd->curLevel, dpd->startTime, pl->getId());
         }
     }
     Stream st(REP::TOWN_DEAMON);
@@ -769,7 +769,7 @@ void TownDeamon::autoCompleteQuiteCheck(Player* pl, UInt16 levels)
         if(dpd->startTime == 0)
             dpd->startTime = TimeUtil::Now();
         dpd->curLevel += maxCnt;
-        DB3().PushUpdateData("UPDATE `towndeamon_player` SET `curLevel`=%u, `startTime`=%u WHERE `playerId` = %"I64_FMT"u", dpd->curLevel, dpd->startTime, pl->getId());
+        DB3().PushUpdateData("UPDATE `towndeamon_player` SET `curLevel`=%u, `startTime`=%u WHERE `playerId` = %" I64_FMT "u", dpd->curLevel, dpd->startTime, pl->getId());
         getTownReward_10_15(pl, dpd->curLevel);
     }
     else
@@ -897,7 +897,7 @@ void TownDeamon::quitDeamon(Player* pl, Player* attacker)
         attackerId = attacker->getId();
 
     showTown(pl);
-    DB3().PushUpdateData("UPDATE `towndeamon_player` SET `deamonLevel`=%u, `curLevel`=%u, `startTime`=%u, `accTime`=%u, `vitalityTime`=%u, `accAwards`=%u, `vitality`=%u, `spirit`=%u, `accLen`=%u, `itemId`=%u, `itemNum`=%u, `quitLevel`=%u, `attacker`=%"I64_FMT"u  WHERE `playerId` = %"I64_FMT"u", dpd->deamonLevel, dpd->curLevel, dpd->startTime, dpd->accTime, dpd->vitalityTime, dpd->accAwards, dpd->vitality, dpd->spirit, dpd->accLen, dpd->itemId, dpd->itemNum, dpd->quitLevel, attackerId, pl->getId());
+    DB3().PushUpdateData("UPDATE `towndeamon_player` SET `deamonLevel`=%u, `curLevel`=%u, `startTime`=%u, `accTime`=%u, `vitalityTime`=%u, `accAwards`=%u, `vitality`=%u, `spirit`=%u, `accLen`=%u, `itemId`=%u, `itemNum`=%u, `quitLevel`=%u, `attacker`=%" I64_FMT "u  WHERE `playerId` = %" I64_FMT "u", dpd->deamonLevel, dpd->curLevel, dpd->startTime, dpd->accTime, dpd->vitalityTime, dpd->accAwards, dpd->vitality, dpd->spirit, dpd->accLen, dpd->itemId, dpd->itemNum, dpd->quitLevel, attackerId, pl->getId());
 }
 
 void TownDeamon::occupyDeamon(Player* pl, UInt16 level)
@@ -917,7 +917,7 @@ void TownDeamon::occupyDeamon(Player* pl, UInt16 level)
     dpd->vitalityTime = tmNow;
 
     showTown(pl);
-    DB3().PushUpdateData("UPDATE `towndeamon_player` SET `deamonLevel`=%u,`startTime`=%u, `accTime`=%u, `vitalityTime`=%u WHERE `playerId` = %"I64_FMT"u", dpd->deamonLevel, dpd->startTime, dpd->accTime, dpd->vitalityTime, pl->getId());
+    DB3().PushUpdateData("UPDATE `towndeamon_player` SET `deamonLevel`=%u,`startTime`=%u, `accTime`=%u, `vitalityTime`=%u WHERE `playerId` = %" I64_FMT "u", dpd->deamonLevel, dpd->startTime, dpd->accTime, dpd->vitalityTime, pl->getId());
 }
 
 void TownDeamon::checkStartTime(Player* pl)
@@ -935,7 +935,7 @@ void TownDeamon::checkStartTime(Player* pl)
             dpd->startTime = 0;
             dpd->curLevel = 0;
             showTown(pl);
-            DB3().PushUpdateData("UPDATE `towndeamon_player` SET `startTime`=0, `curLevel`=0 WHERE `playerId` = %"I64_FMT"u", pl->getId());
+            DB3().PushUpdateData("UPDATE `towndeamon_player` SET `startTime`=0, `curLevel`=0 WHERE `playerId` = %" I64_FMT "u", pl->getId());
         }
     }
 }

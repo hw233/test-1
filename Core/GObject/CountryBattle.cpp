@@ -17,6 +17,7 @@
 #include "HeroMemo.h"
 #include "ShuoShuo.h"
 #include "Package.h"
+#include "ClanCityBattle.h"
 
 namespace GObject
 {
@@ -488,7 +489,7 @@ void CountryBattle::end(UInt32 curtime)
             LeaveGetAttainment(it->first, it->second);
 		}
 	}
-	DBLOG1().PushUpdateData("insert into `country_battle`(`server_id`, `total_achievement1`, `total_players1`, `total_achievement2`, `total_players2`, `total_achievement3`, `total_players3`, `max_player1`, `max_achievement1`, `max_player2`, `max_achievement2`, `max_player3`, `max_achievement3`, `created_at`) values(%u, %u, %u, %u, %u, %u, %u, %"I64_FMT"u, %u, %"I64_FMT"u, %u, %"I64_FMT"u, %u, %u)", cfg.serverLogId, totalAchievement[0], enterSize[0], totalAchievement[1], enterSize[1], totalAchievement[2], enterSize[2], maxPlayer[0], maxAchievement[0], maxPlayer[1], maxAchievement[1], maxPlayer[2], maxAchievement[2], TimeUtil::Now());
+	DBLOG1().PushUpdateData("insert into `country_battle`(`server_id`, `total_achievement1`, `total_players1`, `total_achievement2`, `total_players2`, `total_achievement3`, `total_players3`, `max_player1`, `max_achievement1`, `max_player2`, `max_achievement2`, `max_player3`, `max_achievement3`, `created_at`) values(%u, %u, %u, %u, %u, %u, %u, %" I64_FMT "u, %u, %" I64_FMT "u, %u, %" I64_FMT "u, %u, %u)", cfg.serverLogId, totalAchievement[0], enterSize[0], totalAchievement[1], enterSize[1], totalAchievement[2], enterSize[2], maxPlayer[0], maxAchievement[0], maxPlayer[1], maxAchievement[1], maxPlayer[2], maxAchievement[2], TimeUtil::Now());
 
 	_lastReport.init(REP::COUNTRY_WAR_RESULT);
 	_lastReport << _spot << _score[0] << _score[1] << _owner << static_cast<UInt16>(0);
@@ -949,7 +950,10 @@ void GlobalCountryBattle::prepare( UInt32 t )
 
 void GlobalCountryBattle::prepare2( UInt32 t )
 {
-    if (WORLD().isNewCountryBattle())
+    if(gClanCity&& gClanCity->isOpen())
+    {
+    }
+    else if (WORLD().isNewCountryBattle())
     {
         if (!_NewcountryBattle) return;
 	    _NewcountryBattle->prepare(_startTime - t);
@@ -964,7 +968,10 @@ void GlobalCountryBattle::prepare2( UInt32 t )
 
 void GlobalCountryBattle::start( UInt32 t )
 {
-    if (WORLD().isNewCountryBattle())
+    if(gClanCity&& gClanCity->isOpen())
+    {
+    }
+    else if (WORLD().isNewCountryBattle())
     {
         if (!_NewcountryBattle) return;
 	    _NewcountryBattle->start(_endTime - t);
@@ -979,7 +986,7 @@ void GlobalCountryBattle::start( UInt32 t )
 
 void GlobalCountryBattle::end( )
 {
-    if (!WORLD().isNewCountryBattle())
+    if(!WORLD().isNewCountryBattle() && !(gClanCity && gClanCity->isOpen()))
     {
         if (!_countryBattle) return;
         UInt32 curtime = TimeUtil::Now();
@@ -1033,7 +1040,10 @@ bool GlobalCountryBattle::process(UInt32 curtime)
 				Player * player = *it;
 				if(player->getThreadId() != WORKER_THREAD_NEUTRAL)
 					continue;
-                if (WORLD().isNewCountryBattle())
+                if(gClanCity&& gClanCity->isOpen())
+                {
+                }
+                else if (WORLD().isNewCountryBattle())
                 {
                     player->moveTo(_NewcountryBattle->getLocation(), true);
                     _NewcountryBattle->playerEnter(player);
@@ -1051,7 +1061,10 @@ bool GlobalCountryBattle::process(UInt32 curtime)
 		{
 			if(curtime < _startTime - 5 * 60)
 				return false;
-            if(WORLD().isNewCountryBattle())
+            if(gClanCity&& gClanCity->isOpen())
+            {
+            }
+            else if(WORLD().isNewCountryBattle())
             {
 			    SYSMSG_BROADCASTV(239, 5);
             }
@@ -1066,7 +1079,10 @@ bool GlobalCountryBattle::process(UInt32 curtime)
 		{
 			if(curtime < _startTime - 10 * 60)
 				return false;
-            if(WORLD().isNewCountryBattle())
+            if(gClanCity&& gClanCity->isOpen())
+            {
+            }
+            else if(WORLD().isNewCountryBattle())
             {
 			    SYSMSG_BROADCASTV(239, 10);
             }
@@ -1079,7 +1095,10 @@ bool GlobalCountryBattle::process(UInt32 curtime)
 		return false;
 	default:
 		{
-            if(WORLD().isNewCountryBattle())
+            if(gClanCity&& gClanCity->isOpen())
+            {
+            }
+            else if(WORLD().isNewCountryBattle())
             {
 			    SYSMSG_BROADCAST(238);
             }
@@ -1093,7 +1112,10 @@ bool GlobalCountryBattle::process(UInt32 curtime)
 		return false;
 	}
 
-    if (WORLD().isNewCountryBattle())
+    if(gClanCity&& gClanCity->isOpen())
+    {
+    }
+    else if (WORLD().isNewCountryBattle())
 	    _NewcountryBattle->process(curtime); //不能用定时器去直接调用_NewcountryBattle->end()
 	if(curtime >= _endTime)
 	{
@@ -1118,7 +1140,7 @@ void GlobalCountryBattle::delAutoCB( Player * player )
 
 void GlobalCountryBattle::sendDaily(Player* player)
 {
-    if(WORLD().isNewCountryBattle())
+    if(WORLD().isNewCountryBattle() || (gClanCity && gClanCity->isOpen()))
         return;
     Stream st(REP::DAILY_DATA);
     st << static_cast<UInt8>(9);
@@ -1132,7 +1154,7 @@ void GlobalCountryBattle::sendDaily(Player* player)
 
 void GlobalCountryBattle::sendForNewCB(Player * player)
 {   //玩家登录时调用
-    if(!WORLD().isNewCountryBattle())
+    if(!WORLD().isNewCountryBattle() || (gClanCity && gClanCity->isOpen()))
         return;
     UInt32 curtime = TimeUtil::Now();
     if(curtime >= _prepareTime && curtime < _startTime)

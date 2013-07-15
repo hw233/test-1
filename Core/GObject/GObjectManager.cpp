@@ -70,6 +70,7 @@
 #include "GData/FairyPetTable.h"
 #include "FairyPet.h"
 #include "GObject/ClanBoss.h"
+#include "GObject/ClanCityBattle.h"
 
 namespace GObject
 {
@@ -446,6 +447,8 @@ namespace GObject
             fprintf(stderr, "loadFairySpar error!\n");
             std::abort();
         }
+        if(gClanCity)
+            gClanCity->loadFromDB();
 
 		DB::gDataDBConnectionMgr->UnInit();
 	}
@@ -1116,7 +1119,7 @@ namespace GObject
             strItems += "|";
         }
 
-        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, p->getId(), mail->id, BuChang1530, title, content, strItems.c_str(), mail->recvTime);
+        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, p->getId(), mail->id, BuChang1530, title, content, strItems.c_str(), mail->recvTime);
     }
 
     bool buchang1530_2(std::pair<const unsigned int, GObject::Fighter*>& f)
@@ -1170,7 +1173,7 @@ namespace GObject
             strItems += Itoa(mitem[0].count);
             strItems += "|";
 
-            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, p->getId(), mail->id, BuChangMo, title, content, strItems.c_str(), mail->recvTime);
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, p->getId(), mail->id, BuChangMo, title, content, strItems.c_str(), mail->recvTime);
         }
     }
 
@@ -1451,7 +1454,7 @@ namespace GObject
 			if(dbpd.pdata.gold > 0x7FFFFFFF)
 			{
 				dbpd.pdata.gold = 10;
-				DB1().PushUpdateData("UPDATE `player` SET `gold` = 10 WHERE `id` = %"I64_FMT"u", id);
+				DB1().PushUpdateData("UPDATE `player` SET `gold` = 10 WHERE `id` = %" I64_FMT "u", id);
 			}
 
 			{
@@ -1473,12 +1476,12 @@ namespace GObject
             if (dbpd.pdata.packSize < PlayerData::INIT_PACK_SIZE)
             {
                 dbpd.pdata.packSize = PlayerData::INIT_PACK_SIZE;
-				DB1().PushUpdateData("UPDATE `player` SET `packSize` = %u WHERE `id` = %"I64_FMT"u", dbpd.pdata.packSize, id);
+				DB1().PushUpdateData("UPDATE `player` SET `packSize` = %u WHERE `id` = %" I64_FMT "u", dbpd.pdata.packSize, id);
             }
             if (dbpd.pdata.packSizeSoul < PlayerData::INIT_PACK_SIZE+50)
             {
                 dbpd.pdata.packSizeSoul = PlayerData::INIT_PACK_SIZE + 50;
-				DB1().PushUpdateData("UPDATE `player` SET `packSizeSoul` = %u WHERE `id` = %"I64_FMT"u", dbpd.pdata.packSizeSoul, id);
+				DB1().PushUpdateData("UPDATE `player` SET `packSizeSoul` = %u WHERE `id` = %" I64_FMT "u", dbpd.pdata.packSizeSoul, id);
             }
 
 			{
@@ -1879,7 +1882,7 @@ namespace GObject
         UInt8 lvl_max = 0;
 		DBFighter2 specfgtobj;
         //if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `fashion`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `acupoints`, `skill`, `citta`, `fighter`.`skills`, `cittas`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul`, `elixir`.`attack`,`elixir`.`defend`, `elixir`.`critical`, `elixir`.`pierce`, `elixir`.`evade`, `elixir`.`counter`, `elixir`.`tough`, `elixir`.`action`, `fighter`.`hideFashion` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
-		if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `halo`, `fashion`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `lingbao`, `acupoints`, `skill`, `citta`, `fighter`.`skills`, `cittas`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul`, `elixir`.`attack`,`elixir`.`defend`, `elixir`.`critical`, `elixir`.`pierce`, `elixir`.`evade`, `elixir`.`counter`, `elixir`.`tough`, `elixir`.`action`,`fighter`.`hideFashion` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
+		if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `halo`, `fashion`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `lingbao`, `acupoints`, `skill`, `citta`, `fighter`.`skills`, `cittas`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul`, `elixir`.`attack`,`elixir`.`defend`, `elixir`.`critical`, `elixir`.`pierce`, `elixir`.`evade`, `elixir`.`counter`, `elixir`.`tough`, `elixir`.`action`,`fighter`.`hideFashion`, `innateTrump` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -1919,6 +1922,11 @@ namespace GObject
                 {
                     if(specfgtobj.level >= SINGLE_HERO_OPEN_LEVEL)
                         GObject::shStageMgr.incActive(1);
+                }
+
+                if(gClanCity && !gClanCity->hasValidateOpenTime() && specfgtobj.level >= CCB_OPEN_LEVEL)
+                {
+                    gClanCity->setOpenFlag();
                 }
             }
 
@@ -1981,6 +1989,7 @@ namespace GObject
 			fgt2->setCurrentHP(specfgtobj.hp, false);
             fgt2->setAcupoints(specfgtobj.acupoints, false);
 			fgt2->setHalo(fetchHalo(specfgtobj.halo), false);
+			fgt2->setInnateTrump(fetchInnateTrump(specfgtobj.innateTrump), false);
 			fgt2->setFashion(fetchFashion(specfgtobj.fashion), false);
 			fgt2->setWeapon(fetchWeapon(specfgtobj.weapon), false);
 			fgt2->setArmor(0, fetchArmor(specfgtobj.armor1), false);
@@ -2131,13 +2140,13 @@ namespace GObject
                         UInt16 num = pl->GetPackage()->GetItemNum(idata.id, true);
                         if (num)
                         {
-                            DB1().PushUpdateData("DELETE FROM `item` where `id` = %u and `ownerId` = %"I64_FMT"u and `bindType` = 0", idata.id, pl->getId());
-                            DB1().PushUpdateData("UPDATE `item` set `itemNum` = `itemNum` + %u where `id` = %u and `ownerId` = %"I64_FMT"u",
+                            DB1().PushUpdateData("DELETE FROM `item` where `id` = %u and `ownerId` = %" I64_FMT "u and `bindType` = 0", idata.id, pl->getId());
+                            DB1().PushUpdateData("UPDATE `item` set `itemNum` = `itemNum` + %u where `id` = %u and `ownerId` = %" I64_FMT "u",
                                     idata.itemNum, idata.id, pl->getId());
                         }
                         else
                         {
-                            DB1().PushUpdateData("UPDATE `item` set `bindType` = 1 where `id` = %u and `ownerId` = %"I64_FMT"u",
+                            DB1().PushUpdateData("UPDATE `item` set `bindType` = 1 where `id` = %u and `ownerId` = %" I64_FMT "u",
                                     idata.id, pl->getId());
                         }
                         pl->GetPackage()->AddItemFromDB(idata.id, idata.itemNum+num, true);
@@ -2574,7 +2583,7 @@ namespace GObject
 		}
 
         lc.finalize();
-		lc.prepare("Loading mail package:");
+		/*lc.prepare("Loading mail package:");
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		DBMailPackageData mpdata;
 		if(execu->Prepare("SELECT `id`, `itemId`, `itemCount` FROM `mail_package` ORDER BY `id`", mpdata) != DB::DB_OK)
@@ -2612,7 +2621,7 @@ namespace GObject
 				continue;
 			pl->GetMailBox()->newMail(mdata.id, mdata.sender, mdata.recvTime, mdata.flag, mdata.title, mdata.content, mdata.additionalId);
 		}
-		lc.finalize();
+		lc.finalize();*/
 
 		/////////////////////////////////
 
@@ -2654,7 +2663,7 @@ namespace GObject
 #if 0
             if(rank[dbd.row] != dbd.rank/* && rank[dbd.row] <= ATHLETICS_RANK_MAX_CNT*/)
             {
-                DB6().PushUpdateData("UPDATE `athletics_rank` SET `rank` = %u WHERE `ranker` = %"I64_FMT"u", data->rank, dbd.ranker);
+                DB6().PushUpdateData("UPDATE `athletics_rank` SET `rank` = %u WHERE `ranker` = %" I64_FMT "u", data->rank, dbd.ranker);
             }
 #endif
 			data->maxrank = dbd.maxRank;
@@ -2819,10 +2828,10 @@ namespace GObject
 					if(checkTime > trainTime)
 						checkTime = trainTime;
 					pl->addTrainFighterFromDB(dbft.fighterId, dbft.priceType, dbft.price, trainTime, checkTime, dbft.accExp);
-					DB1().PushUpdateData("REPLACE INTO `fighter_train`(`fgtId`, `ownerId`, `priceType`, `price`, `trainTime`, `checkTime`) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u)", dbft.fighterId, dbft.ownerId, dbft.priceType, dbft.price, trainTime, checkTime);
+					DB1().PushUpdateData("REPLACE INTO `fighter_train`(`fgtId`, `ownerId`, `priceType`, `price`, `trainTime`, `checkTime`) VALUES(%u, %" I64_FMT "u, %u, %u, %u, %u)", dbft.fighterId, dbft.ownerId, dbft.priceType, dbft.price, trainTime, checkTime);
 				}
 				else
-					DB1().PushUpdateData("DELETE FROM `fighter_train` WHERE `fgtId` = %u AND `ownerId` = %"I64_FMT"u", dbft.fighterId, dbft.ownerId);
+					DB1().PushUpdateData("DELETE FROM `fighter_train` WHERE `fgtId` = %u AND `ownerId` = %" I64_FMT "u", dbft.fighterId, dbft.ownerId);
 			}
 			else
 				pl->addTrainFighterFromDB(dbft.fighterId, dbft.priceType, dbft.price, dbft.trainTime, dbft.checkTime, dbft.accExp);
@@ -3269,7 +3278,7 @@ namespace GObject
 			}
 			if(clan == NULL)
             {
-                DB5().PushUpdateData("DELETE FROM `clan_player` WHERE `playerId` = %"I64_FMT"u", cp.playerId);
+                DB5().PushUpdateData("DELETE FROM `clan_player` WHERE `playerId` = %" I64_FMT "u", cp.playerId);
 				continue;
             }
 			Player * pl = globalPlayers[cp.playerId];
@@ -3285,14 +3294,14 @@ namespace GObject
                 if(cp.cls != 4)
                 {
                     cm->cls = 4;
-                    DB5().PushUpdateData("UPDATE `clan_player` SET `cls` = 4 WHERE `playerId` = %"I64_FMT"u", pl->getId());
+                    DB5().PushUpdateData("UPDATE `clan_player` SET `cls` = 4 WHERE `playerId` = %" I64_FMT "u", pl->getId());
                 }
 			}
 			cm->joinTime = cp.joinTime;
             cm->proffer = cp.proffer;
 			if (thisDay != cp.thisDay)
 			{
-				DB5().PushUpdateData("UPDATE `clan_player` SET `enterCount` = 0, `thisDay` = %u WHERE `playerId` = %"I64_FMT"u", thisDay, pl->getId());
+				DB5().PushUpdateData("UPDATE `clan_player` SET `enterCount` = 0, `thisDay` = %u WHERE `playerId` = %" I64_FMT "u", thisDay, pl->getId());
 				cm->enterCount = 0;
 			}
 			else
@@ -4286,6 +4295,7 @@ namespace GObject
                 case Item_Ring:
                 case Item_Amulet:
                 case Item_Halo:
+                case Item_InnateTrump:
                 case Item_Fashion:
                 case Item_Trump:
                 case Item_LBling:
@@ -4330,12 +4340,19 @@ namespace GObject
 						equip = new ItemArmor(dbe.id, itype, ied);
                         break;
                     case Item_Halo:
+                    case Item_InnateTrump:
                     case Item_Fashion:
                     case Item_Trump:
                         if (itype->subClass == Item_Halo)
                         {
                             equip = new ItemHalo(dbe.id, itype, ied);
                             if (equip && ied.enchant)
+                                ((ItemTrump*)equip)->fixSkills();
+                        }
+                        else if(itype->subClass == Item_InnateTrump)
+                        {
+                            equip = new ItemInnateTrump(dbe.id, itype, ied);
+                            if(equip && ied.enchant)
                                 ((ItemTrump*)equip)->fixSkills();
                         }
                         else if (itype->subClass == Item_Fashion)
@@ -4377,13 +4394,54 @@ namespace GObject
                         equip = new ItemEquip(dbe.id, itype, ied);
 						break;
 					}
+                              
 					ItemEquipAttr2& ea2 = equip->getEquipAttr2();
+
 					ea2.type1 = dbe.attrType1;
 					ea2.value1 = dbe.attrValue1;
+
 					ea2.type2 = dbe.attrType2;
 					ea2.value2 = dbe.attrValue2;
+
 					ea2.type3 = dbe.attrType3;
 					ea2.value3 = dbe.attrValue3;
+
+                    if(itype->subClass == Item_Weapon || itype->subClass == Item_Armor1 || itype->subClass == Item_Armor2 || itype->subClass == Item_Armor3 || itype->subClass == Item_Armor4 || itype->subClass == Item_Armor5 || itype->subClass == Item_Ring || itype->subClass == Item_Amulet)
+                    {
+                        UInt8 lv = equip->getValueLev();
+                        UInt8 q = equip->getQuality() - 3;
+                        UInt8 crr = equip->GetCareer();
+                        if(dbe.attrType1 > 0)
+                        {
+                            float maxV1 = GObjectManager::getAttrMax(lv, dbe.attrType1 - 1, q, crr) * 100;
+
+                            if(ea2.value1 > maxV1)
+                            {
+                                ea2.value1 = maxV1;
+                            }
+                        }
+
+                        if(dbe.attrType2 > 0)
+                        {
+                            float maxV2 = GObjectManager::getAttrMax(lv, dbe.attrType2 - 1, q, crr) * 100;
+
+                            if(ea2.value2 > maxV2)
+                            {
+                                ea2.value2 = maxV2;
+                            }
+                        }
+
+                        if(dbe.attrType3 > 0)
+                        {
+                            float maxV3 = GObjectManager::getAttrMax(lv, dbe.attrType3 - 1, q, crr) * 100;
+
+                            if(ea2.value3 > maxV3)
+                            {
+                                ea2.value3 = maxV3;
+                            }
+                        }
+                    }
+
 					equip->SetBindStatus(dbe.bindType > 0);
 					equips[dbe.id] = equip;
 				}
@@ -4952,6 +5010,19 @@ namespace GObject
 			return NULL;
 		}
 		return static_cast<ItemHalo*>(equip);
+	}
+
+	ItemInnateTrump * GObjectManager::fetchInnateTrump(UInt32 id)
+	{
+		ItemEquip * equip = fetchEquipment(id);
+		if(equip == NULL)
+			return NULL;
+		if(equip->GetItemType().subClass != static_cast<UInt8>(Item_InnateTrump))
+		{
+			delete equip;
+			return NULL;
+		}
+		return static_cast<ItemInnateTrump*>(equip);
 	}
 
 	ItemWeapon * GObjectManager::fetchWeapon( UInt32 id )

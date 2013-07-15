@@ -32,6 +32,7 @@
 #include "GObject/SHSYTmpl.h"
 #include "GObject/DaysRank.h"
 #include "GObject/ClanBoss.h"
+#include "GObject/ClanCityBattle.h"
 
 void OnPushTimerEvent( GameMsgHdr& hdr, const void * data )
 {
@@ -560,7 +561,7 @@ void OnDoInstantPracticeAccReq( GameMsgHdr& hdr, const void* data)
 		return;
 	GObject::EventPlayerPractice* event = static_cast<GObject::EventPlayerPractice*>(it->second);
 	event->instantComplete();
-    player->practiceUdpLog();
+    //player->practiceUdpLog();
 }
 
 bool enum_send_sh_active(void * ptr, void * data )
@@ -626,6 +627,10 @@ void OnLevelChange( GameMsgHdr& hdr, const void* data)
             GObject::shStageMgr.init(WORLD().Now(), WORLD().getWeekDay());
             GObject::globalPlayers.enumerate(enum_send_sh_active, static_cast<void *>(NULL));
         }
+    }
+    if(gClanCity && !gClanCity->hasValidateOpenTime() && lvc->newLv >= CCB_OPEN_LEVEL)
+    {
+        gClanCity->setOpenTime();
     }
 }
 #if 0
@@ -746,7 +751,7 @@ void OnLuckyDraw( GameMsgHdr& hdr,  const void* data )
                 strItems += Itoa(mitem[i].count);
                 strItems += "|";
             }
-            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, player->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, player->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
         }
     }
     if((oldCnt < 40) && ((oldCnt + times) >=40))
@@ -765,7 +770,7 @@ void OnLuckyDraw( GameMsgHdr& hdr,  const void* data )
                 strItems += Itoa(mitem[i].count);
                 strItems += "|";
             }
-            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, player->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, player->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
         }
     }
     if((oldCnt < 60) && ((oldCnt + times) >=60))
@@ -784,7 +789,7 @@ void OnLuckyDraw( GameMsgHdr& hdr,  const void* data )
                 strItems += Itoa(mitem[i].count);
                 strItems += "|";
             }
-            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, player->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, player->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
         }
     }
     if((oldCnt < 80) && ((oldCnt + times) >=80))
@@ -803,7 +808,7 @@ void OnLuckyDraw( GameMsgHdr& hdr,  const void* data )
                 strItems += Itoa(mitem[i].count);
                 strItems += "|";
             }
-            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, player->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, player->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
         }
     }
 

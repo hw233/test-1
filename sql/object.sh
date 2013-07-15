@@ -154,7 +154,6 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130315_1.sql # must be once 有删除操作
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130319_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130326_1.sql # must be once 有删除操作
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearyellowdiamond.sql  #黄钻活动需要打开 
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearqqvipdiamond.sql     #QQ会员活动需要打开 
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130403_1.sql # must be once 有删除操作
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130408_1.sql
@@ -172,9 +171,12 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130607_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130608_1.sql  #must be once强制阵旗，阵眼在交易区下架
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130609_1.sql
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130620_1.sql
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearbluediamond.sql  #蓝钻活动需要打开
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearbluediamond.sql  #蓝钻活动需要打开
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130704_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearyellowdiamond.sql  #黄钻活动需要打开
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130712_1.sql #fighter表里面添加 innateTrump 字段
 
     #. clearshiyamen.sh
 }

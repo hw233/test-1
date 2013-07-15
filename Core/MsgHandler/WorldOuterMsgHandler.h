@@ -396,7 +396,7 @@ void OnClanCreateReq( GameMsgHdr& hdr, ClanCreateReq& ccr )
 	mysql_escape_string(contact2, ccr._contact.c_str(), ccr._contact.length()>1022?1022:ccr._contact.length());
 	mysql_escape_string(purpose2, ccr._purpose.c_str(), ccr._purpose.length()>1022?1022:ccr._purpose.length());
 	mysql_escape_string(name2, strNametmp.c_str(), strNametmp.length()>1022?1022:strNametmp.length());
-	DB5().PushUpdateData("INSERT INTO `clan` (`id`, `name`, `foundTime`, `founder`, `leader`, `construction`, `contact`, `purpose`, `level`) VALUES (%u, '%s', %u, %"I64_FMT"u, %"I64_FMT"u, 0, '%s', '%s', %u)", clan->getId(), name2, TimeUtil::Now(), player->getId(), player->getId(), contact2, purpose2, clan->getLev());
+	DB5().PushUpdateData("INSERT INTO `clan` (`id`, `name`, `foundTime`, `founder`, `leader`, `construction`, `contact`, `purpose`, `level`) VALUES (%u, '%s', %u, %" I64_FMT "u, %" I64_FMT "u, 0, '%s', '%s', %u)", clan->getId(), name2, TimeUtil::Now(), player->getId(), player->getId(), contact2, purpose2, clan->getLev());
 	ConsumeInfo ci(ClanCreate,0,0);
 	player->useTael(GData::moneyNeed[GData::CLAN_CREATE].tael,&ci);
 	clan->initBuildClan();
@@ -1750,8 +1750,8 @@ void OnArenaOpReq( GameMsgHdr& hdr, const void * data )
                     r = GObject::arena.bet2(player, state, group, pos, tael);
                 if(r == 0xFF)
                     break;
-                if (r <= 1)
-                    player->arenaUdpLog(1002, r);
+                //if (r <= 1)
+                //    player->arenaUdpLog(1002, r);
 				Stream st(REP::SERVER_ARENA_OP);
 				st << type << r << state;
                 if(state < 2)
@@ -1890,7 +1890,7 @@ static UInt8 readEquips(GObject::Player * player, BinaryReader& br)
 	}
 	else
 	{
-		DB().PushUpdateData("DELETE FROM `fighter` WHERE `playerId` = %"I64_FMT"u", player->getId());
+		DB().PushUpdateData("DELETE FROM `fighter` WHERE `playerId` = %" I64_FMT "u", player->getId());
 		for(UInt8 i = 0; i < fgtCount; ++ i)
 		{
 			UInt8 pos;
@@ -1922,7 +1922,7 @@ static UInt8 readEquips(GObject::Player * player, BinaryReader& br)
 			fgt->setPotential(static_cast<float>(potential) / 100.0f);
 			fgt->setSkillAndLevel(skillId);
 			UInt32 p = static_cast<UInt32>(fgt->getPotential() * 100 + 0.5);
-			DB().PushUpdateData("REPLACE INTO `fighter`(`id`, `playerId`, `potential`, `level`, `skill`) VALUES(%u, %"I64_FMT"u, %u.%02u, %u, %u)", fgtId, player->getId(), p / 100, p % 100, fgt->getLevel(), fgt->getSkillAndLevel());
+			DB().PushUpdateData("REPLACE INTO `fighter`(`id`, `playerId`, `potential`, `level`, `skill`) VALUES(%u, %" I64_FMT "u, %u.%02u, %u, %u)", fgtId, player->getId(), p / 100, p % 100, fgt->getLevel(), fgt->getSkillAndLevel());
 			GObject::ItemWeapon * weapon;
 			GObject::ItemArmor * armor;
 			GObject::ItemEquip * equip;
@@ -2059,7 +2059,7 @@ void onPlayerEnter(GameMsgHdr& hdr, const void * data)
 		{
 			PLAYER_DATA(player, name) = name;
 			PLAYER_DATA(player, title) = title;
-			DB().PushUpdateData("REPLACE INTO `player`(`id`, `name`, `title`, `entered`) VALUES (%"I64_FMT"u, '%s', %u, %u)", player->getId(), player->getName().c_str(), player->getTitle(), player->getEntered());
+			DB().PushUpdateData("REPLACE INTO `player`(`id`, `name`, `title`, `entered`) VALUES (%" I64_FMT "u, '%s', %u, %u)", player->getId(), player->getName().c_str(), player->getTitle(), player->getEntered());
 			r = readEquips(player, br);
 			if(r == 0)
 			{
@@ -2070,7 +2070,7 @@ void onPlayerEnter(GameMsgHdr& hdr, const void * data)
 		}
 		if(r != 0 && newplayer)
 		{
-			DB().PushUpdateData("DELETE FROM `player` WHERE `id` = %"I64_FMT"u", player->getId());
+			DB().PushUpdateData("DELETE FROM `player` WHERE `id` = %" I64_FMT "u", player->getId());
 			delete player;
 		}
 		Stream st(0x02);
