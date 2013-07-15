@@ -527,7 +527,7 @@ private:
     void doSkillEffectExtra_CriticalDmgReduce(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
 
     bool doSkillEffectExtra_Dead(BattleFighter* bf, const GData::SkillBase* skill);
-    void doSkillEffectExtra_AbnormalTypeDmg(BattleFighter* bf, const GData::SkillBase* skill);
+    void doSkillEffectExtra_AbnormalTypeDmg(BattleFighter* bf, const GData::SkillBase* skill, bool& cs, bool& pr);
     void doSkillEffectExtra_BleedTypeDmg(BattleFighter* bf, const GData::SkillBase* skill);
     bool doSkillEffectExtra_LingShiBleed(BattleFighter* bf, BattleFighter* bo, const GData::SkillBase* skill, UInt32 dmg);
     bool doSkillDmg(BattleFighter* bf, const GData::SkillBase* skill);

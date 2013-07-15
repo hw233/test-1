@@ -127,6 +127,8 @@ void BattleFighter::setFighter( GObject::Fighter * f )
     updatePassiveSkill100(_fighter->getPassiveSkillOnBeMagDmg100(), _passiveSkillOnBeMagDmg100);
     updatePassiveSkill100(_fighter->getPassiveSkillOnHP10P100(), _passiveSkillOnHP10P100);
     updatePassiveSkill100(_fighter->getPassiveSkillDeadFake100(), _passiveSkillDeadFake100);
+    updatePassiveSkill100(_fighter->getPassiveSkillAbnormalTypeDmg100(), _passiveSkillAbnormalTypeDmg100);
+    updatePassiveSkill100(_fighter->getPassiveSkillBleedTypeDmg100(), _passiveSkillBleedTypeDmg100);
 
     updatePassiveSkill(_fighter->getPassiveSkillPreAtk(), _passiveSkillPreAtk);
     updatePassiveSkill(_fighter->getPassiveSkillAftAtk(), _passiveSkillAftAtk);
@@ -147,7 +149,6 @@ void BattleFighter::setFighter( GObject::Fighter * f )
     updatePassiveSkill(_fighter->getPassiveSkillDeadFake(), _passiveSkillDeadFake);
 
     updateSoulSkillDead(_fighter->getSoulSkillSoulOut());
-    updatePassiveSkill(_fighter->getPassiveSkillAbnormalTypeDmg100(), _passiveSkillAbnormalTypeDmg100);
     updatePassiveSkill(_fighter->getPassiveSkillBleedTypeDmg(), _passiveSkillBleedTypeDmg);
 
     std::vector<GObject::LBSkill>& lbSkills =  _fighter->getLBSkill();
@@ -1016,6 +1017,16 @@ const GData::SkillBase* BattleFighter::getPassiveSkillOnBeDmg100(size_t& idx, bo
     return getPassiveSkill100( _passiveSkillOnBeDmg100, idx, noPossibleTarget);
 }
 
+const GData::SkillBase* BattleFighter::getPassiveSkillAbnormalTypeDmg100(size_t& idx, bool noPossibleTarget)
+{
+    return getPassiveSkill100(_passiveSkillAbnormalTypeDmg100, idx, noPossibleTarget);
+}
+
+const GData::SkillBase* BattleFighter::getPassiveSkillBleedTypeDmg100(size_t& idx, bool noPossibleTarget)
+{
+    return getPassiveSkill100(_passiveSkillBleedTypeDmg100, idx, noPossibleTarget);
+}
+
 const GData::SkillBase* BattleFighter::getPassiveSkill(std::vector<GData::SkillItem>& passiveSkill, bool noPossibleTarget)
 {
     size_t cnt = passiveSkill.size();
@@ -1107,11 +1118,6 @@ const GData::SkillBase* BattleFighter::getPassiveSkillDead(bool noPossibleTarget
 const GData::SkillBase* BattleFighter::getPassiveSkillDeadFake(bool noPossibleTarget)
 {
     return getPassiveSkill(_passiveSkillDeadFake, noPossibleTarget);
-}
-
-const GData::SkillBase* BattleFighter::getPassiveSkillAbnormalTypeDmg100(bool noPossibleTarget)
-{
-    return getPassiveSkill(_passiveSkillAbnormalTypeDmg100, noPossibleTarget);
 }
 
 const GData::SkillBase* BattleFighter::getPassiveSkillBleedTypeDmg(bool noPossibleTarget)
@@ -1870,6 +1876,8 @@ void BattleFighter::clearSkill()
     _passiveSkillOnBeMagDmg100.clear();
     _passiveSkillOnHP10P100.clear();
     _passiveSkillDeadFake100.clear();
+    _passiveSkillAbnormalTypeDmg100.clear();
+    _passiveSkillBleedTypeDmg100.clear();
 
     _passiveSkillPreAtk.clear();
     _passiveSkillAftAtk.clear();
@@ -1886,6 +1894,7 @@ void BattleFighter::clearSkill()
     _passiveSkillOnBeMagDmg.clear();
     _passiveSkillOnHP10P.clear();
     _passiveSkillDeadFake.clear();
+    _passiveSkillBleedTypeDmg.clear();
 
     _passiveSkillOnTherapy.clear();
     _passiveSkillOnSkillDmg.clear();
