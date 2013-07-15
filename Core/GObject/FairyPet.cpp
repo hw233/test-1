@@ -584,15 +584,10 @@ namespace GObject
                     }
                 }
             }
-            if(newskill == 0)
+            if(newskill == 0 || newskill != oldskill)
             {
                 skills = Itoa(oldskill);
                 delSkills(skills);
-            }
-            else if(newskill != oldskill)
-            {
-                skills = Itoa(newskill);
-                setSkills(skills, false);
             }
         }
         if (eq)
