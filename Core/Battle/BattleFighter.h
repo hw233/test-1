@@ -1104,12 +1104,12 @@ private:
 
     std::vector<GData::SkillItem> _passiveSkillDeadFake100;
     std::vector<GData::SkillItem> _passiveSkillDeadFake;
-    std::vector<GData::SkillItem> _passiveSkillAbnormalTypeDmg;
+    std::vector<GData::SkillItem> _passiveSkillAbnormalTypeDmg100;
     std::vector<GData::SkillItem> _passiveSkillBleedTypeDmg;
 
     const GData::SkillBase* getPassiveSkillDeadFake100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillDeadFake(bool noPossibleTarget = false);
-    const GData::SkillBase* getPassiveSkillAbnormalTypeDmg(bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillAbnormalTypeDmg100(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillBleedTypeDmg(bool noPossibleTarget = false);
 
 public:

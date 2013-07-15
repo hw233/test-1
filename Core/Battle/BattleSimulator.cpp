@@ -6110,7 +6110,7 @@ UInt32 BattleSimulator::doAttack( int pos )
     if(bf->getAbnormalTypeCnt() >= 3)
     {
         const GData::SkillBase* passiveSkill = NULL;
-        while(NULL != (passiveSkill = bf->getPassiveSkillAbnormalTypeDmg(idx)))
+        while(NULL != (passiveSkill = bf->getPassiveSkillAbnormalTypeDmg100(idx)))
         {
             doSkillEffectExtra_AbnormalTypeDmg(bf, passiveSkill);
         }
@@ -12711,7 +12711,7 @@ void BattleSimulator::calcAbnormalTypeCnt(BattleObject* bo)
             continue;
         size_t idx = 0;
         bool flag = false;
-        while(NULL != static_cast<BattleFighter* >(bo)->getPassiveSkillAbnormalTypeDmg(idx))
+        while(NULL != static_cast<BattleFighter* >(bo)->getPassiveSkillAbnormalTypeDmg100(idx))
         {
             flag = true;
             break;

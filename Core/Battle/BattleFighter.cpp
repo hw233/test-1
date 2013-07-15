@@ -147,7 +147,7 @@ void BattleFighter::setFighter( GObject::Fighter * f )
     updatePassiveSkill(_fighter->getPassiveSkillDeadFake(), _passiveSkillDeadFake);
 
     updateSoulSkillDead(_fighter->getSoulSkillSoulOut());
-    updatePassiveSkill(_fighter->getPassiveSkillAbnormalTypeDmg(), _passiveSkillAbnormalTypeDmg);
+    updatePassiveSkill(_fighter->getPassiveSkillAbnormalTypeDmg100(), _passiveSkillAbnormalTypeDmg100);
     updatePassiveSkill(_fighter->getPassiveSkillBleedTypeDmg(), _passiveSkillBleedTypeDmg);
 
     std::vector<GObject::LBSkill>& lbSkills =  _fighter->getLBSkill();
@@ -1109,9 +1109,9 @@ const GData::SkillBase* BattleFighter::getPassiveSkillDeadFake(bool noPossibleTa
     return getPassiveSkill(_passiveSkillDeadFake, noPossibleTarget);
 }
 
-const GData::SkillBase* BattleFighter::getPassiveSkillAbnormalTypeDmg(bool noPossibleTarget)
+const GData::SkillBase* BattleFighter::getPassiveSkillAbnormalTypeDmg100(bool noPossibleTarget)
 {
-    return getPassiveSkill(_passiveSkillAbnormalTypeDmg, noPossibleTarget);
+    return getPassiveSkill(_passiveSkillAbnormalTypeDmg100, noPossibleTarget);
 }
 
 const GData::SkillBase* BattleFighter::getPassiveSkillBleedTypeDmg(bool noPossibleTarget)
